@@ -9,6 +9,98 @@
 #include "gramc.h"
 
 
+int lexer_handle_reserved(void){
+
+    register int value = 0;
+
+    if ( strncmp( real_token_buffer, "signed", 6 ) == 0 )
+    {  value = TOKENMODIFIER;  modifier_found = MSIGNED;  }
+
+    if ( strncmp( real_token_buffer, "unsigned", 8 ) == 0 )
+    {  value = TOKENMODIFIER;  modifier_found = MUNSIGNED;  }
+
+    if ( strncmp( real_token_buffer, "int", 3 ) == 0 )
+    {  value = TOKENTYPE;  type_found = TINT;  }
+
+    if ( strncmp( real_token_buffer, "void", 4 ) == 0 )
+    {  value = TOKENTYPE;  type_found = TVOID;  }
+
+    if ( strncmp( real_token_buffer, "char", 4 ) == 0 )
+    {  value = TOKENTYPE; type_found = TCHAR; }
+
+    if ( strncmp( real_token_buffer, "short", 5 ) == 0 )
+    {  value = TOKENTYPE;  type_found = TSHORT; }
+
+    if ( strncmp( real_token_buffer, "long", 4 ) == 0 )
+    {  value = TOKENTYPE; type_found = TLONG; }
+
+    if ( strncmp( real_token_buffer, "asm", 3 ) == 0 )
+    {  value = TOKENKEYWORD; keyword_found = KWASM; }
+
+    if ( strncmp( real_token_buffer, "goto", 4 ) == 0 )
+    {  value = TOKENKEYWORD; keyword_found = KWGOTO; }
+
+    if ( strncmp( real_token_buffer, "return", 6 ) == 0 )
+    {  value = TOKENKEYWORD;  keyword_found = KWRETURN; }
+
+    if ( strncmp( real_token_buffer, "continue", 8 ) == 0 )
+    {  value = TOKENKEYWORD;  keyword_found = KWCONTINUE; }
+
+    if ( strncmp( real_token_buffer, "default", 7 ) == 0 )
+    {  value = TOKENKEYWORD;  keyword_found = KWDEFAULT; }
+
+    if ( strncmp( real_token_buffer, "case", 4 ) == 0 )
+    {  value = TOKENKEYWORD;  keyword_found = KWCASE;  }
+
+    if ( strncmp( real_token_buffer, "switch", 6 ) == 0 )
+    {  value = TOKENKEYWORD;  keyword_found = KWSWITCH;  }
+
+    if ( strncmp( real_token_buffer, "for", 3 ) == 0 )
+    {  value = TOKENKEYWORD;  keyword_found = KWFOR;  }
+
+    if ( strncmp( real_token_buffer, "do", 2 ) == 0 )
+    {  value = TOKENKEYWORD;  keyword_found = KWDO; }
+
+    if ( strncmp( real_token_buffer, "while", 5 ) == 0 )
+    {  value = TOKENKEYWORD; keyword_found = KWWHILE; }
+
+    if ( strncmp( real_token_buffer, "else", 4 ) == 0 )
+    { value = TOKENKEYWORD; keyword_found = KWELSE; }
+
+    if ( strncmp( real_token_buffer, "if", 2 ) == 0 )
+    { value = TOKENKEYWORD; keyword_found = KWIF; }
+
+    if ( strncmp( real_token_buffer, "union", 5 ) == 0 )
+    { value = TOKENKEYWORD; keyword_found = KWUNION; }
+
+    if ( strncmp( real_token_buffer, "struct", 6 ) == 0 )
+    { value = TOKENKEYWORD; keyword_found = KWSTRUCT; }
+
+    if ( strncmp( real_token_buffer, "enum", 4 ) == 0 )
+    {  value = TOKENKEYWORD; keyword_found = KWENUM; }
+
+    if ( strncmp( real_token_buffer, "sizeof", 6 ) == 0 )
+    { value = TOKENKEYWORD; keyword_found = KWSIZEOF; }
+
+    if( strncmp( real_token_buffer, "volatile", 8 ) == 0  )
+    { value = TOKENKEYWORD; keyword_found = KWVOLATILE; }
+
+    if ( strncmp( real_token_buffer, "inline", 6 ) == 0 )
+    { value = TOKENKEYWORD; keyword_found = KWINLINE; }
+
+    if ( strncmp( real_token_buffer, "def", 3 ) == 0 )
+    { value = TOKENKEYWORD; keyword_found = KWDEF; }
+
+    if ( strncmp( real_token_buffer, "static", 6 ) == 0 )
+    { value = TOKENKEYWORD; keyword_found = KWSTATIC; }
+
+    if ( strncmp( real_token_buffer, "var", 3 ) == 0  )
+    { value = TOKENKEYWORD; keyword_found = KWVAR; }
+
+    return (value);
+}
+
+
 //#### supensa ###
 /*
 int check_newline ()
@@ -113,32 +205,21 @@ begin:
     {
         switch (c)
         {
-			// ## spaces ##	
+			// spaces	
 			// Se encontramos um espaço, pegamos o próximo e saímos do switch 
 			// para reentrarmos no switch.
                 
-            case ' ':
-            case '\t':
-            case '\f':
-            case '\r':
-            case '\b':
-                c = getc (finput);
+            case ' ': case '\t': case '\f': case '\r': case '\b':
+                c = getc(finput);
                 break;
 
-			// ## new lines ##	
-
+			// new lines
             case '\n':
-               lineno++;
-				//próximo.
-                c = getc (finput);
+                c = getc(finput); lineno++; 
                 break;
 
-			// ## comments ##
-			// '/' 
-			//(#importante: Isso pode ser a primeira barra do comentário ou uma divisão.)
-                
+			// comments
             case '/':
-                
                 c = getc (finput);
                 
 				//#### inicia um comentário de uma linha ####
@@ -275,7 +356,6 @@ begin:
 				};
                 break;
             */
-				
 
             // Se não é espaço, nem comentário, nem preprocessador.
             default:
@@ -298,7 +378,7 @@ int yylex (){
 
     register int c;
     register char *p;
-    register int value;
+    register int value = 0;
 
     register int c1;
     register int number_length = 0;
@@ -314,341 +394,93 @@ again:
     {
         case 0:
         case EOF:
-            
-            // #debug
-            //printf ("yylex: EOF\n");
-            
-            eofno++;  
-            value = TOKENEOF;
-		    return (value);
+            value = TOKENEOF;  eofno++;  return (value);
 		    break;
 
-        
         // identifier ou keyword.
-        case 'A':
-        case 'B':
-        case 'C':
-        case 'D':
-        case 'E':
-        case 'F':
-        case 'G':
-        case 'H':
-        case 'I':
-        case 'J':
-        case 'K':
-        case 'L':
-        case 'M':
-        case 'N':
-        case 'O':
-        case 'P':
-        case 'Q':
-        case 'R':
-        case 'S':
-        case 'T':
-        case 'U':
-        case 'V':
-        case 'W':
-        case 'X':
-        case 'Y':
-        case 'Z':
-        case 'a':
-        case 'b':
-        case 'c':
-        case 'd':
-        case 'e':
-        case 'f':
-        case 'g':
-        case 'h':
-        case 'i':
-        case 'j':
-        case 'k':
-        case 'l':
-        case 'm':
-        case 'n':
-        case 'o':
-        case 'p':
-        case 'q':
-        case 'r':
-        case 's':
-        case 't':
-        case 'u':
-        case 'v':
-        case 'w':
-        case 'x':
-        case 'y':
-        case 'z':
+        case 'A': case 'B': case 'C': case 'D':
+        case 'E': case 'F': case 'G': case 'H':
+        case 'I': case 'J': case 'K': case 'L':
+        case 'M': case 'N': case 'O': case 'P':
+        case 'Q': case 'R': case 'S': case 'T':
+        case 'U': case 'V': case 'W': case 'X': case 'Y': case 'Z':
+        case 'a': case 'b': case 'c': case 'd':
+        case 'e': case 'f': case 'g': case 'h':
+        case 'i': case 'j': case 'k': case 'l':
+        case 'm': case 'n': case 'o': case 'p':
+        case 'q': case 'r': case 's': case 't':
+        case 'u': case 'v': case 'w': case 'x': case 'y': case 'z':
         case '_':
-
+            
             p = token_buffer;
 
             // Se for um dos chars acima, 
-            // então vamos contruir uma paçavra num buffer.
+            // então vamos contruir uma palavra num buffer.
             
             while (1)
             {
-			    *p = c;  // Coloca o char no buffer.
-			    p++;     // Incrementa o buffer.
+                // Coloca o char no buffer e incrementar o buffer.
+			    // Pega o próximo char da palavra.
+                *p = c;  p++; c = getc(finput);
 
-                
-                // Pega o próximo char da palavra.
-                // #bugbug:
-                // Se esse ungetc() funcionar com o char depois da palavra,
-                // então temos que ter certeza que ele funcionou corretamente,
-                // e que poderemos recuperar o char recolocado com o ungetc().
-
-                c = getc (finput);
-
-				//Se não for identificador, finalize o buffer.
-				//Devolve o que não batia com a comparação do while.
-
+				// Se não pertence a um identificador, finalize o buffer.
+				// Devolve o que não batia com a comparação do while.
+                // alfa-numerico e '_'.
                 if ( ( isalnum(c) == 0 ) && (c != '_') )
                 {
-                    *p = 0;
-
-                    ungetc ( c, finput );
-
-                    goto id_ok;
+                    *p = 0;  ungetc( c, finput );  goto id_ok;
                 }
             };
 
-            id_ok:
+            // Temos um identificador.
+            // ?? Reserved ??
+            // Determinamos que era um identificador,
+            // Mas vamos ver se ele é uma palavra reservada.
+            // As palavras reservadas podem ser modificadores, tipos
+            // ou palavras chave.
 
-			//Temos um identificador.
-			value = TOKENIDENTIFIER;
-			
-			// ?? Reserved ??
-			// Determinamos que era um identificador,
-			// Mas vamos ver se ele é uma palavra reservada.
-			// As palavras reservadas podem ser modificadores, tipos
-			// ou palavras chave.
-
-            if ( strncmp( real_token_buffer, "signed", 6 ) == 0 )
-            {
-                value = TOKENMODIFIER;
-                modifier_found = MSIGNED;
-            }
-
-            if ( strncmp( real_token_buffer, "unsigned", 8 ) == 0 )
-            {
-                value = TOKENMODIFIER;
-                modifier_found = MUNSIGNED;
-            }
-
-            if ( strncmp( real_token_buffer, "int", 3 ) == 0 )
-            {
-                value = TOKENTYPE;
-                type_found = TINT;
-            }
-
-            if ( strncmp( real_token_buffer, "void", 4 ) == 0 )
-            {
-                value = TOKENTYPE;
-                type_found = TVOID;
-            }
-
-            if ( strncmp( real_token_buffer, "char", 4 ) == 0 )
-            {
-                value = TOKENTYPE;
-                type_found = TCHAR;
-            }
-
-            if ( strncmp( real_token_buffer, "short", 5 ) == 0 )
-            {
-                value = TOKENTYPE;
-                type_found = TSHORT;
-            }
-
-            if ( strncmp( real_token_buffer, "long", 4 ) == 0 )
-            {
-                value = TOKENTYPE;
-                type_found = TLONG;
-            }
-
-            if ( strncmp( real_token_buffer, "asm", 3 ) == 0 )
-            {
-                value = TOKENKEYWORD;
-                keyword_found = KWASM;
-            }
-
-            if ( strncmp( real_token_buffer, "goto", 4 ) == 0 )
-            {
-                value = TOKENKEYWORD;
-                keyword_found = KWGOTO;
-            }
-
-            if ( strncmp( real_token_buffer, "return", 6 ) == 0 )
-            {
-                value = TOKENKEYWORD;
-                keyword_found = KWRETURN;
-            }
-
-            if ( strncmp( real_token_buffer, "continue", 8 ) == 0 )
-            {
-                value = TOKENKEYWORD;
-                keyword_found = KWCONTINUE;
-            }
-
-            if ( strncmp( real_token_buffer, "default", 7 ) == 0 )
-            {
-                value = TOKENKEYWORD;
-                keyword_found = KWDEFAULT;
-            }
-
-            if ( strncmp( real_token_buffer, "case", 4 ) == 0 )
-            {
-                value = TOKENKEYWORD;
-                keyword_found = KWCASE;
-            }
-
-            if ( strncmp( real_token_buffer, "switch", 6 ) == 0 )
-            {
-                value = TOKENKEYWORD;
-                keyword_found = KWSWITCH;
-            }
-
-            if ( strncmp( real_token_buffer, "for", 3 ) == 0 )
-            {
-                value = TOKENKEYWORD;
-                keyword_found = KWFOR;
-            }
-
-            if ( strncmp( real_token_buffer, "do", 2 ) == 0 )
-            {
-                value = TOKENKEYWORD;
-                keyword_found = KWDO;
-            }
-
-            if ( strncmp( real_token_buffer, "while", 5 ) == 0 )
-            {
-                value = TOKENKEYWORD;
-                keyword_found = KWWHILE;
-            }
-
-            if ( strncmp( real_token_buffer, "else", 4 ) == 0 )
-            {
-                value = TOKENKEYWORD;
-                keyword_found = KWELSE;
-            }
-
-            if ( strncmp( real_token_buffer, "if", 2 ) == 0 )
-            {
-                value = TOKENKEYWORD;
-                keyword_found = KWIF;
-            }
-
-            if ( strncmp( real_token_buffer, "union", 5 ) == 0 )
-            {
-                value = TOKENKEYWORD;
-                keyword_found = KWUNION;
-            }
-
-            if ( strncmp( real_token_buffer, "struct", 6 ) == 0 )
-            {
-                value = TOKENKEYWORD;
-                keyword_found = KWSTRUCT;
-            }
-
-            if ( strncmp( real_token_buffer, "enum", 4 ) == 0 )
-            {
-                value = TOKENKEYWORD;
-                keyword_found = KWENUM;
-            }
-
-            if ( strncmp( real_token_buffer, "sizeof", 6 ) == 0 )
-            {
-                value = TOKENKEYWORD;
-                keyword_found = KWSIZEOF;
-            }
-
-            if( strncmp( real_token_buffer, "volatile", 8 ) == 0  )
-            {
-                value = TOKENKEYWORD;
-                keyword_found = KWVOLATILE;
-            }
-
-            if ( strncmp( real_token_buffer, "inline", 6 ) == 0 )
-            {
-                value = TOKENKEYWORD;
-                keyword_found = KWINLINE;
-            }
-
-            if ( strncmp( real_token_buffer, "def", 3 ) == 0 )
-            {
-                value = TOKENKEYWORD;
-                keyword_found = KWDEF;
-            }
-
-            if ( strncmp( real_token_buffer, "static", 6 ) == 0 )
-            {
-                value = TOKENKEYWORD;
-                keyword_found = KWSTATIC;
-            }
-
-            if ( strncmp( real_token_buffer, "var", 3 ) == 0  )
-            {
-                value = TOKENKEYWORD;
-                keyword_found = KWVAR;
-            }
-
-            //...
-
-            //return (value);
+            id_ok: 
+            value = TOKENIDENTIFIER;  
+            value = lexer_handle_reserved();
             break;
 
+
         // number ?
-        case '0':
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-        case '5':
-        case '6':
-        case '7':
-        case '8':
-        case '9':
+        case '0': case '1': case '2': case '3':
+        case '4': case '5': case '6': case '7':
+        case '8': case '9':
         //case '.':
 
             p = token_buffer;
 
             if ( c == '0' )
             {
+				// Coloca no buffer e pega o próximo.
+                *p = c;  p++;  c = getc (finput);
 
-				//coloca no buffer.
-                *p = c;
-                p++;
-
-                c = getc (finput);
-                
                 if ( c == 'x' || c == 'X' )
                 {
 					//base = 16;
-					//*p++ = c; //coloca o x.
-
-                     *p = c;
-                     p++;
+                    *p = c;  p++;
 
                     while (1)
                     {
                         c = getc (finput);
 
-						// Se o próximo não for um digito hexadecimal. 
+						// Se o próximo não for um digito hexadecimal.
+                        // Finaliza o buffer e devolve o char. 
                         if ( isxdigit (c) == 0 )
                         {
-                            *p = 0;
+                            *p = 0;  ungetc(c,finput);
 
-                             ungetc ( c, finput );
-
-						   //fim.
 						    value = TOKENCONSTANT;
-							//constant_type_found = //#todo tem que contar. 
 							constant_base_found = CONSTANT_BASE_HEX;
-                            
+                            //constant_type_found = //#todo tem que contar.                             
                             goto constant_done;
                         }
 
-						//coloca se é hexa.
-                        *p = c;
-                        p++;
+						// Coloca no buffer se é hexa.
+                        *p = c;  p++;
                     };
                 }
 
@@ -657,7 +489,8 @@ again:
                 exit (1);
 
             }else{
-				//base = 10.
+				
+                //base = 10.
 
                 *p++ = c; 
                 
@@ -665,22 +498,18 @@ again:
                 {
                      c = getc (finput);
 
-					//se não é digito.
+					// Se não é digito, finaliza o buffer e devolve o char.
                     if ( isdigit( c ) == 0 )
                     {
-						//fim.
-						*p = 0;
-							
-						ungetc(c, finput);
+						*p = 0;  ungetc(c,finput);
 							
 						value = TOKENCONSTANT;
-						//constant_type_found = //#todo tem que contar. 
 						constant_base_found = CONSTANT_BASE_DEC;
-                        
+                        //constant_type_found = //#todo tem que contar. 
                         goto constant_done;
                     }
 
-					//coloca o digito.
+					// Coloca o digito no buffer.
                     *p++ = c;
                 }
             };
@@ -688,15 +517,14 @@ again:
 			constant_done:
             break;
 	
-        // String
-        // Começando com aspas.
+        // String. Começando com aspas.
         case '\"':
         {
-            c = getc (finput);
-            
             p = token_buffer;
 
-			//coloca no token_buffer.
+            c = getc(finput);
+
+			// Coloca no token_buffer.
             while (c != '\"')
             {
 	            //if (c == '\\')
@@ -736,29 +564,17 @@ again:
         case '[': case ']':
         case ',': case '.': case ';': case ':': case '?':
             p = token_buffer;
-            *p++ = c;
-            *p++ = 0;
-            
-            value = TOKENSEPARATOR;
-            //return (value); //#test
+            *p++ = c;  *p++ = 0; value = TOKENSEPARATOR;
             break;
 
 
-		//usadas em expressões matemáticas, 
+		// Esadas em expressões matemáticas, 
 		//#todo: não mudar isso.
         //@todo: talvez se enviarmos esses chars para o buffer ajude no debug.		
-        case '+':
-        case '-':
-        case '&':
-        case '|':
-        case '<':
-        case '>':
-        case '*':
-        case '/':
-        case '%':
-        case '^':
-        case '!':
-        case '=':
+        
+        case '+':  case '-':  case '*':  case '/':
+        case '>':  case '<':  case '=':  case '!':
+        case '|':  case '&':  case '%':  case '^':
         {
             combine:
 
@@ -778,7 +594,7 @@ again:
                 case '>':    lexer_code = GT_EXPR;         break;
 	        }	
 
-	        c1 = getc (finput);
+	        c1 = getc(finput);
 			
 	        if (c1 == '=')
 	        {
@@ -802,8 +618,7 @@ again:
 						goto done;
 	            }
 				
-	            value = ASSIGN; 
-				goto done;
+	            value = ASSIGN;  goto done;
 				
 	        }else if (c == c1){
 				
@@ -820,8 +635,7 @@ again:
 					
             }else if ((c == '-') && (c1 == '>')) {
 				
-		        value = POINTSAT; 
-				goto done; 
+		        value = POINTSAT;  goto done; 
 		    }
 	        
 			ungetc (c1, finput);
@@ -833,14 +647,13 @@ again:
         };
 
         //
-        default:
+        default:  
             value = c;
     
     }; //switch
 
     
-done:
-    
+done:  
     return (value);
 }
 
