@@ -7,15 +7,20 @@
 #include "gramc.h"
 
 
+// symbol table (simple list of identifiers)
+int *x_sym;     
+
+// currently parsed identifier
+int *id;        
+
+
 char *x_p;        // current position in source code
 char *x_lp;       // current position in source code
 char *x_data;     // data/bss pointer
 
-
 int *x_e;       // current position in emitted code
 int *x_le;      // current position in emitted code
-int *x_id;      // currently parsed identifier
-int *x_sym;     // symbol table (simple list of identifiers)
+
 int x_tk;       // current token
 int x_ival;     // current token value
 int x_ty;       // current expression type
@@ -25,12 +30,10 @@ int x_src;      // print source and assembly flag
 int x_debug;    // print executed instructions
 
 
-
 // opcodes #todo
 enum { 
        
-       OPCODE_NOTHING, 
-       OPCODE_MAIN, 
+       OPCODE_NOP, 
        
        OPCODE_LEA, 
        OPCODE_IMM, 
@@ -1693,7 +1696,42 @@ expression_exit:
 }
 
 
+void stmt(void);
+void stmt(void)
+{
+    // #todo:
+    // o que segue é uma keyword.
+    // temos que ver qual statemente é a keyword e
+    // chamar a rotina de tratamento apropriada para cada stmt.
+    
+    switch ( keyword_found )
+    {
+        case KWRETURN:
+            printf ("stmt: [TODO] KWRETURN found\n");
+            break;
+            
+        case KWGOTO:
+            printf ("stmt: [TODO] KWGOTO found\n");
+            break;
+                  
+        case KWIF:
+            printf ("stmt: [TODO] KWIF found\n");
+            break;
+            
+        case KWWHILE:
+            printf ("stmt: [TODO] KWWHILE found\n");
+            break;
 
+        case KWASM:
+            printf ("stmt: [TODO] KWASM found\n");
+            break;
+            
+            
+        default:
+            printf ("stmt: [TODO] DEFAULT keyword_found found\n");
+            break;
+    };                      
+}
 
 
 /*
@@ -1712,6 +1750,7 @@ int parse (){
     
     //++
     int fd, bt, ty, poolsz, *idmain;
+    
     // vm registers
     int *reg_pc; 
     int *reg_sp; 
@@ -1834,66 +1873,56 @@ int parse (){
     while (running == 1)
     {
         // EOF: O lexer nos disse que acabou.
-        if ( token == TOKENEOF ){ 
-            printf ("parse: ~EOF\n"); running = 0; break; 
-        }
+        if ( token == TOKENEOF ){ printf ("parse: ~EOF\n"); running = 0; break; }
  
-        // INT CHAR 
-        if ( token == TOKENTYPE )
-        {
-            id[ID_TYPE] = type_found; 
-            token = yylex();  // pega o identificador.
-        }
+        // tipos: INT CHAR 
+        if ( token == TOKENTYPE ){ id[ID_TYPE] = type_found; token = yylex(); }
         
         // symbol depois do tipo.
         // #bugbug: E se o anterior não foi um tipo ??
         
+        // Apocalipse: Enquanto for diferente do fim.';' '}'.
         //while (tk != ';' && tk != '}')
         while (1)
         {
-            // fim do loop.
+            // O fim!
+            // volta par ao while principal. 
+            // Pois terminamos uma declaração de variável ou um corpo de função.
             if ( token == TOKENSEPARATOR )
             {
-                if ( strncmp( (char *) real_token_buffer, ";", 1 ) == 0  )
-                {
-                    break; //todo
-                }
-
-                if ( strncmp( (char *) real_token_buffer, "}", 1 ) == 0  )
-                {
-                    break; //todo
-                }                
+                if ( strncmp( (char *) real_token_buffer, ";", 1 ) == 0  ){ break; } 
+                if ( strncmp( (char *) real_token_buffer, "}", 1 ) == 0  ){ break; }  
             }
             
-            
-            // Se não é um symbol.
-            // Deveríamos ter um symbol logo após o tipo.
-
-            if (token != TOKENIDENTIFIER) { 
-                printf ("%d: bad global declaration\n", lineno); 
-                //printf ("%d: Symbol not found! \n", lineno);
-                printf("%s\n",real_token_buffer );
-                return -1; 
+            // *Alerta: Precisamos de um symbol depois do tipo.
+            // Se não é um symbol. Fail!
+            if (token != TOKENIDENTIFIER) 
+            { 
+                printf ("%d: symbol expected \n", lineno);  
+                printf ("%d: {%s} \n", lineno, real_token_buffer);
+                exit (1);
             }
             
-            // Se o if acima falhou, então temos um identifier.
-            // mais ainda não sabemos se ele é uma variável ou uma função
-            // então não vamos determinar a classe ainda.
-
-            // #debug
+            // #debug - symbol found!
             printf ("%d: $$$ symbol found! {%s} \n", lineno, real_token_buffer);
 
-            if ( strncmp( (char *) real_token_buffer, "main", 4 ) == 0  )
-            {
-                id[ID_OPCODE] = OPCODE_MAIN;
-            }
+
+            id[ID_TOKEN] = TOKENIDENTIFIER;
+            id[ID_OPCODE] = OPCODE_NOP;
+            id[ID_STACK_OFFSET] = stack_index;
+            // Não sei a que classe pertence o symboll
+            // se é função ou variável.
+            id[ID_CLASS] = IDCLASS_NOTHING;  
 
             // Salva o símbolo. #isso funciona.
             sprintf ( save_symbol, real_token_buffer );
-
-            id[ID_TOKEN] = TOKENIDENTIFIER;
-            id[ID_STACK_OFFSET] = stack_index;
-            id[ID_CLASS] = ID_CLASS_VAR;  // determinando.
+       
+            //main:
+            if ( strncmp( (char *) real_token_buffer, "main", 4 ) == 0  )
+            { 
+                idmain = id; 
+                id[ID_CLASS] = IDCLASS_FUNCTION;
+            }
             
             // Avança para depois de um identifier.
                               
@@ -1913,85 +1942,74 @@ int parse (){
                 {
                 	//printf ("::(\n");
                     // Mudando a classe. Agora temos uma função.
-                    id[ID_CLASS] = ID_CLASS_FUNCTION;
+                    id[ID_CLASS] = IDCLASS_FUNCTION;
                                 
-                    //break;
+                    // break;
                     // dentro da ílha de parâmetros.
+                    // Apocalipse: Enquanto for diferente do fim.')'.
                     while(1)
                     {
-                        token = yylex();  //next
+                        token = yylex();  
                         
+                        // Termina a pilha de parâmetros.
                         if ( token == TOKENSEPARATOR )
                         {
-                            // Termina a pilha de parâmetros.
-                            if ( strncmp( (char *) real_token_buffer, ")", 1 ) == 0  )
-                            {
-                            	//printf ("::)\n");
-                                break;
-                            }
+                            if ( strncmp( (char *) real_token_buffer, ")", 1 ) == 0  ){ break; }
+                            //if ( strncmp( (char *) real_token_buffer, ",", 1 ) == 0  ){ printf("::,\n"); }
                         }        
-                    
                         // #bugbug: loop infinito se não encontrar ).
                     };
                     
                     token = yylex();  //next
 
-                    //obs: sem espaço entre ')' e '{';
-                    
-                    // acabou a pilha de parâmetros.
+                    // Acabou a pilha de parâmetros.
+
                     // vamos entrar no corpo.
                     // '{'
-                    if ( token != TOKENSEPARATOR ){
-                       printf ("%d: Expected { separator!\n", lineno);
-                       exit(-1);
-                    }
+                    if ( token != TOKENSEPARATOR )
+                    { printf ("%d: Expected { separator!\n", lineno); exit(-1); }
                     
-                    // temos um separator
-                    // precisa ser '{'
+                    // É um separador, mas não é o que queremos.
                     if ( strncmp( (char *) real_token_buffer, "{", 1 ) != 0  )
-                    {
-                       printf ("%d: Expected { separator!\n", lineno);
-                       exit(-1);
-                    }
-                    
-                    // ...
+                    { printf ("%d: Expected { separator!\n", lineno);exit(-1); }
                     
                     // encontramos o { ...
-                    // estamos dentro do corpo da função.
+                    // Entraremos no corpo da função.
                     
                     while (1)
                     {
-                        // Depois de '{'
-                        token = yylex();  //next
+                        token = yylex(); 
 
-                        
-                        // Encontramos o separador que finaliza o corpo ?
+                        // Apocalipse:  Enquanto for diferente do fim.'}'.
                         if ( token == TOKENSEPARATOR )
                         {
-                            // Se chegamos ao fim do corpo.
+                            // FIM !!!
+                            // Se chegou ao fim, temos que atualizar a tabela de symbolos.
                             if ( strncmp( (char *) real_token_buffer, "}", 1 ) == 0  )
-                            {
-                                //#debug
-                                //printf ("%d: Separator } found!\n", lineno);
+                            { 
+                                id = id + ID_SIZE;
                                 break;
                             }
                         }
                         
-                        // Encontramos uma cariável ou função dentro do corpo ?
-                        //if ( token == TOKENIDENTIFIER)
-                        //{}
-                        
-                        // EOF: 
-                        // O lexer nos disse que acabou.
-                        if ( token == TOKENEOF ){
-                            printf ("%d: [ERROR] Missing } separator!\n", 
-                            lineno);
-                            running = 0;
-                            break;
+                        // #todo
+                        // Enquanto não chega ao fim analizaremos os statements.
+                        // Todo statement é uma keyword.
+                        if ( token == TOKENKEYWORD )
+                        {
+                            id[ID_CLASS] = IDCLASS_STATEMENT; 
+                            
+                            // #todo
+                            // comparar e chamar a rotina de tratamento do statemente específico.
+                            // ou chamar uma rotina genérica que seja um hub de statement.
+                            // stmt();
+                            stmt();
                         }
                         
-                        printf ("%d: Nothing\n", lineno); 
-                        // ...
+                        
+                        // EOF: O lexer nos disse que acabou o arquivo, mas não encontramos o apocalipse.
+                        if ( token == TOKENEOF )
+                        { printf ("%d: [ERROR] Missing }\n", lineno); running = 0; break; }
                     };
                 }
                 
@@ -1999,9 +2017,9 @@ int parse (){
                 
                 // Separador de symbols.
                 if ( strncmp( (char *) real_token_buffer, ",", 1 ) == 0  )
-                {
-                    //printf ("%d: #debug: , found\n", lineno); 
-                    break;
+                { 
+                    //printf ("%d:  ',' found\n", lineno); 
+                    break; 
                 }
                 
                 // ??
@@ -2062,7 +2080,9 @@ int parse (){
     printf ("Running ...\n");
     printf ("\n");
     
-    
+    // Começamos com main.
+    reg_pc = (int *) &idmain[ID_OPCODE];
+
     while (1)
     {
         ++reg_cycle;
@@ -2072,25 +2092,31 @@ int parse (){
          
         //i = *pc++;
          
-        inst = id[ID_OPCODE];
+        //inst = id[ID_OPCODE];
+         inst = *reg_pc;
+         
+         // Proxima instrução é proxima função ??
+         id = id + ID_SIZE;
+         reg_pc = (int *) &id[ID_OPCODE];
+         
+         // NOP 
+         if ( inst == OPCODE_NOP ){
+             printf ("OPCODE_NOP on cycle %d \n", reg_cycle); 
+             break;
          
          
-         // NOTHING
-         if ( inst == OPCODE_NOTHING ){
-             printf ("OPCODE_NOTHING on cycle %d \n", reg_cycle); break;
-         
-         
-         // MAIN
+         // LEA
          }
-         else if ( inst == OPCODE_MAIN ){
-             printf ("main(?): on cycle %d \n", reg_cycle); break;
+         else if ( inst == OPCODE_LEA ){
+             printf ("LEA: on cycle %d \n", reg_cycle); 
+             //break;
          
          //...
          
          // ERROR
          }
          else {
-            printf ("unknown instruction = %d! cycle = %d\n", inst, reg_cycle); 
+            printf ("unknown instruction: opcode=%d! cycle = %d\n", inst, reg_cycle); 
             exit(-1); 
          };
      };

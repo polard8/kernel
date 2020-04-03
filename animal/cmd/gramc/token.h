@@ -356,6 +356,7 @@ static	 while
 // Informações sobre o identificador atual. 
 // Encontrado no momento.
 
+/*
 // Qual é o token, deve ser sempre TOKENIDENTIFIER.
 #define ID_TOKEN 0 
 
@@ -386,23 +387,36 @@ static	 while
 // o opcode pode ser uma operação ou uma função.
 // Ex: JMP, ADD ou PRINTF ...
 #define ID_OPCODE 7
+*/
+
+enum {
+
+	ID_TOKEN,
+	ID_CLASS,
+	ID_STACK_OFFSET,
+	ID_VALUE,
+	ID_ADDRESS,
+	ID_TYPE,
+	ID_INDEX,
+	ID_OPCODE,
+	ID_SIZE
+};
+
 
 
 //...
-#define ID_CLASS_VAR       100
-#define ID_CLASS_STRING    101
-#define ID_CLASS_STRUCT    102
-#define ID_CLASS_FUNCTION  103
-#define ID_CLASS_ENUM      104
-#define ID_CLASS_LABEL     105
-//...
+#define IDCLASS_NOTHING   99
+#define IDCLASS_VAR       100
+#define IDCLASS_STRING    101
+#define IDCLASS_STRUCT    102
+#define IDCLASS_FUNCTION  103
+#define IDCLASS_FUNCTION_CALL  104
+#define IDCLASS_STATEMENT  105
+#define IDCLASS_ENUM      106
+#define IDCLASS_LABEL     107
 
-//8 elementos que explicam o identificador.
-//int id[8];
+// ...
 
-// deve apontar para áreas alocadas ... pois teremos vários id[].
-// Isso funcionou.
-int *id;     
 
 
 
