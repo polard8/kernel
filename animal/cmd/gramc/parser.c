@@ -1967,11 +1967,11 @@ int parse (){
                     // vamos entrar no corpo.
                     // '{'
                     if ( token != TOKENSEPARATOR )
-                    { printf ("%d: Expected { separator!\n", lineno); exit(-1); }
+                    { printf ("%d: Expected { separator!\n", lineno); exit(1); }
                     
                     // É um separador, mas não é o que queremos.
                     if ( strncmp( (char *) real_token_buffer, "{", 1 ) != 0  )
-                    { printf ("%d: Expected { separator!\n", lineno);exit(-1); }
+                    { printf ("%d: Expected { separator!\n", lineno); exit(1); }
                     
                     // encontramos o { ...
                     // Entraremos no corpo da função.
@@ -2028,7 +2028,7 @@ int parse (){
                 
               // Não era um separador depois do symbol.
             } else { 
-                printf ("%d: Separator expected!\n", lineno);  exit(-1);
+                printf ("%d: Separator expected!\n", lineno); exit(1);
             };
             
 
@@ -2346,7 +2346,18 @@ int parse (){
 
     printf ("parse: done\n");
     return 0;
+    
+//
+// Sintax error:
+//
+
+//sintax:
+    //printf ("%d: [parse()] Sintax error!\n", lineno);
+    //return (0);
 }
+
+
+
 
 
 

@@ -714,6 +714,14 @@ _strout (
     int fillch );
 
 
+
+int unix_get (int ifile); 
+
+
+//
+// initialization
+//
+
 int libcStartTerminal (void);
 
 /*Inicialização da biblioteca*/

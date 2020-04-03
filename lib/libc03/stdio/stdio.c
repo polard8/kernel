@@ -5217,6 +5217,46 @@ void stdioInitialize (){
 
 
 
+// #test
+/*
+ *******************************
+ * unix_get:
+ */
+
+char __unix_get_buf[512];
+int __unix_get_nread = 1;
+
+int unix_get (int ifile) 
+{
+    char *ibuf;
+    //static ibuf;
+    
+    //printf ("$");
+    //fflush(stdout);
+
+    if(--__unix_get_nread)
+    {
+        return (*ibuf++);
+    }
+
+    if (__unix_get_nread = read (ifile, __unix_get_buf, 512, 0 ) )
+    {
+        if(__unix_get_nread < 0)goto err;
+        
+        ibuf = __unix_get_buf;
+        return (*ibuf++);
+    }
+
+    __unix_get_nread = 1;
+    return (-1);
+
+err:
+  __unix_get_nread = 1;
+  printf ("unix_get: read error\n");
+  return (-1);
+}
+
+
 //
 // End.
 //
