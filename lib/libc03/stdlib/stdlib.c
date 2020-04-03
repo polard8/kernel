@@ -664,7 +664,6 @@ int libcInitRT (){
 
     Status = (int) stdlibInitMM();
 
-    // erro
     if ( Status != 0 ){
         debug_print ("libcInitRT: stdlibInitMM fail\n");
         return (int) 1; 
@@ -721,14 +720,14 @@ void *xmalloc (int size){
 
 
 void stdlib_die (char *str){
-	
+
     printf ("stdlib_die: %s",str);
 	//@todo
 	fprintf(stderr,"%s\n",str);
-	
-	while (1){
-	    asm ("pause");
-	};
+
+    while (1){
+        asm ("pause");
+    };
 }
 
 
@@ -765,13 +764,9 @@ void *malloc ( size_t size ){
     void *ret;
     unsigned long s = ( unsigned long) size;
 
-    if ( s < 0 ){
-        return NULL;
-    }
+    if ( s < 0 ){ return NULL; }
 
-    if ( s == 0 ){
-       s = 1;
-    }
+    if ( s == 0 ){ s = 1; }
 
 
 	//s = (s ? s : 1);	/* if s == 0, s = 1 */
@@ -842,7 +837,9 @@ void *realloc ( void *start, size_t newsize ){
  *
  */
 
-void free ( void *ptr ){	
+void free ( void *ptr )
+{
+    debug_print ("free: [TODO]\n"); 
 
 /*
    //@todo: Copiar o do kernel base.
@@ -901,9 +898,10 @@ fail:
     refresh_screen();
 	while(1){}
 done:	
-*/	
+*/
+
    return;  
-};
+}
 
 
 /*
@@ -949,24 +947,24 @@ void *calloc (size_t count, size_t size){
  *     Alloca memória e zera o conteúdo. */
 
 void *zmalloc ( size_t size){
-	
-	void *mmnew;
-	
-	mmnew = malloc (size);
 
-	if ( (void *) mmnew == NULL )
-	{
-	    //free (mmnew);
-		return NULL;
-	
-	}else{
-		
-		memset(mmnew, 0, size);
+    void *mmnew;
+
+    mmnew = malloc(size);
+
+    if ( (void *) mmnew == NULL ){
+        //free (mmnew);
+        return NULL;
+
+    }else{
+
+        memset (mmnew, 0, size);
 	    return mmnew;
-	}
+    };
 
-    //fail
-	return NULL;
+
+    // fail
+    return NULL;
 }
 
 
@@ -1195,7 +1193,7 @@ fail:
 //       uma opção é usar 'done:'. 
 exit:    
     return (int) 0;
-};
+}
 
 
 /*
@@ -1204,8 +1202,8 @@ exit:
  *     Obs: Função de uso interno. */
 
 int stdlib_strncmp ( char *s1, char *s2, int len ){
-	
-	int n = len;
+
+    int n = len;
 	
 	while ( n > 0 )
 	{	
@@ -1219,15 +1217,14 @@ int stdlib_strncmp ( char *s1, char *s2, int len ){
 		*s1++; 
 		*s2++;
 	};		
-			
-	if ( *s1 != '\0' || *s2 != '\0' )
-	{	
+
+    if ( *s1 != '\0' || *s2 != '\0' )
+    {
 	    return (int) 2;
-	};
+    }
 
 
-//done:
-	return 0;
+    return 0;
 }
 
 
@@ -1359,7 +1356,6 @@ char *__findenv ( const char *name, int *offset ){
 
 char *getenv (const char *name)
 {
-
     int offset;
     char *result;
 
@@ -1378,7 +1374,6 @@ char *getenv (const char *name)
     result = __findenv (name, &offset);
 	//rwlock_unlock(&__environ_lock);
 
-
     return (char *) result;
 }
 
@@ -1386,6 +1381,7 @@ char *getenv (const char *name)
 //#todo
 int setenv (const char *name, const char *value, int overwrite)
 {
+    debug_print("setenv: [TODO]\n"); 
     return (int) (-1);
 }
 
@@ -1393,6 +1389,7 @@ int setenv (const char *name, const char *value, int overwrite)
 //#todo
 int unsetenv (const char *name)
 {
+    debug_print("unsetenv: [TODO]\n"); 
     return (int) (-1);
 }
 
@@ -1613,9 +1610,10 @@ strtod (char *str, char **ptr)
 */
 
 
-int abs ( int j){
-	
-	return (j < 0 ? -j : j);
+// ok.
+int abs ( int j)
+{
+    return (j < 0 ? -j : j);
 }
 
 
@@ -1756,17 +1754,23 @@ double strtod(const char *str, char **endptr){
 }
 
 
-float strtof(const char *str, char **endptr) {
-  return (float) strtod(str, endptr);
+// #bugbug: float not supported?
+float strtof(const char *str, char **endptr)
+{
+    return (float) strtod(str, endptr);
 }
 
 
-long double strtold(const char *str, char **endptr) {
-  return strtod(str, endptr);
+// ?? #bugbug: 64bit ?? type not supported
+long double strtold(const char *str, char **endptr)
+{
+    debug_print("strtold: [BUGBUG]\n"); 
+    return strtod(str, endptr);
 }
 
 
-double atof(const char *str) {
+double atof(const char *str)
+{
   return strtod(str, NULL);
 }
 
@@ -1787,29 +1791,31 @@ void abort()
 
 long labs (long j)
 {
-	return (j < 0 ? -j : j);
+    return (j < 0 ? -j : j);
 }
-
 
 
 
 //mkstemp(): 4.3BSD, POSIX.1-2001.
 int mkstemp(char *template)
-{ 
-	return -1; 
+{
+    debug_print("mktemp: [TODO]\n"); 
+    return -1; 
 }
 
 
 //mkostemp() and mkostemps(): are glibc extensions.
 int mkostemp(char *template, int flags)
 { 
-	return -1; 
+    debug_print("mkostemp: [TODO]\n"); 
+    return -1; 
 }
 
 //mkstemps(): unstandardized, but appears on several other systems.
 int mkstemps(char *template, int suffixlen)
 { 
-	return -1; 
+    debug_print("mktemps: [TODO]\n"); 
+    return -1; 
 }
 
 
@@ -1817,7 +1823,8 @@ int mkstemps(char *template, int suffixlen)
 //mkostemp() and mkostemps(): are glibc extensions.
 int mkostemps(char *template, int suffixlen, int flags)
 { 
-	return -1; 
+    debug_print("mkostemps: [TODO]\n"); 
+    return -1; 
 }
 
 
@@ -1840,8 +1847,9 @@ char* ptsname(int fd)
 //The ptsname() function returns the name of the slave pseudoterminal
 //       device corresponding to the master referred to by fd.
 char *ptsname(int fd)
-{ 
-	return NULL; 
+{
+    debug_print("ptsname: [TODO]\n"); 
+    return NULL; 
 }
 
 
@@ -1854,7 +1862,8 @@ char *ptsname(int fd)
 //argument specifies the number of bytes available in buf.
 int ptsname_r(int fd, char *buf, size_t buflen)
 { 
-	return -1;   //use syscall !!
+    debug_print("ptsname_r: [TODO]\n"); 
+    return -1;   //use syscall !!
 }
 
 
@@ -1947,7 +1956,8 @@ int posix_openpt (int flags)
 //POSIX.1-2001. 
 int grantpt(int fd)
 { 
-	return -1; 
+    debug_print("grantpt: [TODO]\n"); 
+    return -1; 
 }
 
 
@@ -1956,25 +1966,66 @@ int grantpt(int fd)
 //unlockpt - unlock a pseudoterminal master/slave pair 
 int unlockpt(int fd)
 { 
-	return -1; 
+    debug_print("unlockpt: [TODO]\n"); 
+    return -1; 
 }
 
 //getpt - open the pseudoterminal master (PTM) 
 //getpt() is glibc-specific; use posix_openpt(3) instead. 
 int getpt(void)
-{ 
-	return -1; 
+{
+    debug_print("getpt: [TODO]\n"); 
+    return -1; 
 }
-
 
 
 const char	*getprogname(void)
 {
-	return NULL;
+    debug_print("getprogname: [TODO]\n");
+    return NULL;
 }
 
 void setprogname(const char *progname)
-{}
+{
+    debug_print("setprogname: [TODO]\n");
+}
+
+void *
+bsearch ( 
+    const void *key, 
+    const void *base, 
+    size_t nmemb,
+    size_t size,
+    int (*compar)(const void *, const void *)
+    )
+{
+    debug_print("bsearch: [TODO]\n");
+    return NULL;
+}
+
+
+void 
+qsort (
+    void *base, 
+    size_t nmemb, 
+    size_t size,
+    int (*compar)(const void *, const void *)
+    )
+{
+    debug_print("qsort: [TODO]\n");
+}
+
+void 
+qsort_r (
+    void *base, 
+    size_t nmemb, 
+    size_t size,
+    int (*compar)(const void *, const void *, void *),
+    void *arg 
+    )
+{
+    debug_print("qsort_r: [TODO]\n");
+}
 
 
 

@@ -26,6 +26,7 @@ all:
 	make -C ./fasm  
 	
 	make -C ./unknown 
+	make -C ./miniyacc 
 
 
 # ...

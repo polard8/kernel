@@ -28,11 +28,11 @@ CFLAGS = -m32 \
 	-s
 	
 	
-LIBC    = ../../lib/libc03/include/
-LIBCOBJ = ../../lib/libc03/obj
+LIBC    = ../../../lib/libc03/include/
+LIBCOBJ = ../../../lib/libc03/obj
+API     = ../../../lib/api02/include/
+APIOBJ  = ../../../lib/api02/obj
 
-API     = ../../lib/api02/include/
-APIOBJ  = ../../lib/api02/obj
 
 
 	##
@@ -49,7 +49,8 @@ unistd.o \
 termios.o \
 ioctl.o \
 fcntl.o \
-stubs.o
+strtol.o \
+stubs.o    
 
 
 
@@ -82,14 +83,15 @@ all-c:
 	cp $(LIBCOBJ)/termios.o  .
 	cp $(LIBCOBJ)/ioctl.o  .
 	cp $(LIBCOBJ)/fcntl.o  .
+	cp $(LIBCOBJ)/strtol.o .
 
-	
+
 cat-link:
 	ld -m elf_i386 -T ../link.ld -o MINIYACC.BIN $(myObjects)    
 
 
 finalize:
-	cp MINIYACC.BIN  ../../bin
+	cp MINIYACC.BIN  ../bin
 
 clean:
 	-rm *.o

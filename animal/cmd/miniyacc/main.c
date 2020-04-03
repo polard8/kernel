@@ -1315,7 +1315,10 @@ void init (int ac, char *av[]){
  */
 
 int main (int ac, char *av[]){
-	
+
+
+    printf ("miniyacc: \n");
+
 	init(ac, av);
 	
 	getdecls();
@@ -1334,7 +1337,9 @@ int main (int ac, char *av[]){
 	if (rrconf)
 		fprintf(stderr, "%d reduce/reduce conflicts\n", rrconf);
 
-	exit (0);
+
+    printf ("miniyacc: done\n");
+    exit (0);
 }
 
 
