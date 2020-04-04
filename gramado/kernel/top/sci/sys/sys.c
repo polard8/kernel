@@ -172,8 +172,10 @@ int sys_fcntl ( int fd, int cmd, ... )
 int sys_open (const char *pathname, int flags, mode_t mode ){
 
     struct process_d *p;
-    int i;
     int __Status = -1;
+    int Size = -1;
+    
+    
     
     // Ajust.
     read_fntos ( (char *) pathname );
@@ -183,35 +185,31 @@ int sys_open (const char *pathname, int flags, mode_t mode ){
     __Status = (int) KiSearchFile ( (unsigned char *) pathname, 
                          VOLUME1_ROOTDIR_ADDRESS );
 
-    if (__Status == 1){
-		
-		 //#debug
-         //printf("found\n");
-    }else{
-         printf("not found\n");
+    if (__Status != 1){
+         printf("sys_open: not found\n");
+         refresh_screen();
          return -1;
     };
 
 
-    //taskswitch_lock ();
-    //scheduler_lock ();
-    //name , address.
 
-     int Size = (int) fsGetFileSize ( (unsigned char *) pathname ); 
-     //scheduler_unlock ();
-     //taskswitch_unlock ();
-
+    // IN: name , address.
+    Size = (int) fsGetFileSize ( (unsigned char *) pathname ); 
     
-    if( Size<=0 || Size> 1024*1024)
-        return -1;
+    if( Size<=0 || Size> 1024*1024 )
+    {
+         printf("sys_open: Size\n");
+         refresh_screen();
+         return -1;
+    }
 
 
-
-    // igual open();
+    // Essa função funciona igual open().
+    // See: fs/fs.c
     // #todo: flags e mode.
-    // See: fs.c
     // IN: name, flags, mode;
     // OUT: fd.
+    
     return (int) sys_read_file ( (char *) pathname, 0, 0 );
 }
 
@@ -309,7 +307,10 @@ int file_read_buffer ( file *f, char *buffer, int len ){
     // Copy!
     //
     
-    memcpy ( (void *) buffer, (const void *) f->_base, len ); 
+    // A próxima leitura precisa ser depois dessa.
+    //memcpy ( (void *) buffer, (const void *) f->_base, len ); 
+    memcpy ( (void *) buffer, (const void *) f->_p, len ); 
+    f->_p = f->_p + len;
     return (int) len;
 
 fail:
@@ -347,7 +348,16 @@ int file_write_buffer ( file *f, char *string, int len ){
     // Copy!
     //
 
-    memcpy ( (void *) f->_base, (const void *) string, len ); 
+    // Tem que atualizar o ponteiro para que o próximo
+    // write seja depois desse write.
+    // Para isso o ponteiro precisa estar no base quando
+    // o write for usado pela primeira vez.
+    // Mas se o write for usado num arquivo aberto com 
+    // open(), então o ponteiro deve estar no fim do arquivo.
+    
+    //memcpy ( (void *) f->_base, (const void *) string, len ); 
+    memcpy ( (void *) f->_p, (const void *) string, len ); 
+    f->_p = f->_p + len;
     return len;
     
 fail:
@@ -665,7 +675,9 @@ fail:
 // Aqui devemos selecionar o dispositivo à escrever.
 // See:
 // https://github.com/zavg/linux-0.01/blob/master/fs/read_write.c
+// https://linux.die.net/man/2/write
 // ...
+
 
 int sys_write (unsigned int fd,char *ubuf,int count){
 
@@ -901,8 +913,7 @@ int sys_write (unsigned int fd,char *ubuf,int count){
     // socket_write()
     
 
-    //tem que retonar o tanto de bytes escritos.
-    //See: unistd.c
+    // Tem que retonar o tanto de bytes escritos.
     // Escreve em uma stream uma certa quantidade de chars.
     
     

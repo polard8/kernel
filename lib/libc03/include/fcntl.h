@@ -26,6 +26,20 @@
 #define F_WRLCK            2	/* exclusive or write lock */
 #define F_UNLCK            3	/* unlock */
 
+
+//
+// O_
+//
+
+/* File access modes for open() and fcntl().  POSIX Table 6-6. */
+#define O_RDONLY           0	/* open(name, O_RDONLY) opens read only */
+#define O_WRONLY           1	/* open(name, O_WRONLY) opens write only */
+#define O_RDWR             2	/* open(name, O_RDWR) opens read/write */
+
+/* Mask for use with file access modes.  POSIX Table 6-7. */
+#define O_ACCMODE         03	/* mask for file access modes */
+
+
 /* Oflag values for open().  POSIX Table 6-4. */
 #define O_CREAT        00100	/* creat file if it doesn't exist */
 #define O_EXCL         00200	/* exclusive use flag */
@@ -38,15 +52,10 @@
 /* automatically re-open device after driver restart */
 #define O_REOPEN      010000
 
-/* File access modes for open() and fcntl().  POSIX Table 6-6. */
-#define O_RDONLY           0	/* open(name, O_RDONLY) opens read only */
-#define O_WRONLY           1	/* open(name, O_WRONLY) opens write only */
-#define O_RDWR             2	/* open(name, O_RDWR) opens read/write */
 
-/* Mask for use with file access modes.  POSIX Table 6-7. */
-#define O_ACCMODE         03	/* mask for file access modes */
-
-
+//#todo
+//#define	O_DIRECTORY	0x00200000	/* fail if not a directory */
+//#define	O_CLOEXEC	0x00400000	/* set close on exec */
 
 /*
   Credits: Serenity OS.

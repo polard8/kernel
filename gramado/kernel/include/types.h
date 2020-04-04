@@ -112,20 +112,12 @@ typedef  unsigned long  vm_size_t;
 
 
 
-
-/* 
- Parent Process IDentifier 
-   
- */
-typedef int ppid_t;
+// Parent Process IDentifier 
+typedef  int  ppid_t;
 
 
-/* 
- Thread IDentifier 
- linux,  
- */
-typedef int tid_t; 
-
+// Thread IDentifier. linux,  
+typedef  int  tid_t; 
 
 
 //

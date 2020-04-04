@@ -58,18 +58,24 @@ typedef	long	swblk_t;		/* swap offset */
 typedef	long	segsz_t;		/* segment size */
 
 #ifdef _BSD_SOURCE
-typedef	u_short	uid_t;			/* user id */
-typedef	u_short	gid_t;			/* group id */
-typedef	short	pid_t;			/* process id */
+typedef  u_short    uid_t;	/* user id */
+typedef  u_short    gid_t;	/* group id */
+typedef  short      pid_t;	/* process id */
 #endif
 
-typedef	u_short	mode_t;			/* permissions */
-typedef u_long	fixpt_t;		/* fixed point number */
+
+// old ... 
+// #bugbug: Como no bsd encontramos valores de 32bit
+// vamos mudar isso.
+//typedef	u_short	mode_t;			/* permissions */
+typedef ulong mode_t;
+
+typedef u_long  fixpt_t;		/* fixed point number */
 
 #ifndef _POSIX_SOURCE
-typedef	struct	_uquad	{ u_long val[2]; } u_quad;
-typedef	struct	_quad	{   long val[2]; } quad;
-typedef	long *	qaddr_t;	/* should be typedef quad * qaddr_t; */
+typedef  struct _uquad  { u_long val[2]; } u_quad;
+typedef  struct _quad   {   long val[2]; } quad;
+typedef  long   *qaddr_t;	/* should be typedef quad * qaddr_t; */
 
 #define	major(x)	((int)(((u_int)(x) >> 8)&0xff))	/* major number */
 #define	minor(x)	((int)((x)&0xff))		/* minor number */

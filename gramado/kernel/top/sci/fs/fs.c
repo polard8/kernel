@@ -1757,8 +1757,6 @@ int sys_read_file ( char *file_name,  int flags, mode_t mode ){
          refresh_screen();
          return -1;
     }
-    
-    
 
 
     //
@@ -1776,27 +1774,14 @@ int sys_read_file ( char *file_name,  int flags, mode_t mode ){
         
     for (__slot=0; __slot<32; __slot++)
     {
-         if ( p->Objects[__slot] == 0 ){
-             goto __OK;
-         }
+         if ( p->Objects[__slot] == 0 ){ goto __OK; }
     };
-    
-    // #todo
-    // Esse limite pertence somente � um processo.
-    // Poder�amos avisar que o processo n�o pode mais abrir arquivos
-    // depois retornar.
     
     panic ("sys_read_file: No slots!\n");
 
-
+// Slot found.
 __OK:
 
-    __file = (file *) kmalloc ( sizeof(file) );
-    
-    if ( (void *) __file == NULL )
-        return -1;
-        
-        
     if ( __slot < 0 || __slot >= 32 )
     {
         printf ("sys_read_file: Slot fail\n");
@@ -1804,16 +1789,27 @@ __OK:
         return -1;
     }
     
+    // Struct
+    
+    __file = (file *) kmalloc ( sizeof(file) );
+    
+    if ( (void *) __file == NULL )
+    {
+        printf ("sys_read_file: __file\n");
+        refresh_screen();
+        return -1;
+    }
+    
+    
     __file->_file = __slot;
-    
-    
     __file->used = 1;
     __file->magic = 1234;
-    
-    //
-    // buffer padr�o
-    //
-    
+
+
+    // buffer padrão
+    // #bugbug: open chama isso. E se o arquivo for maior que o buffer ?
+    // open() precisa alocar outro buffer.
+        
     __file->_base = (char *) kmalloc (BUFSIZ);
     
     if ( (void *) __file->_base == NULL )
@@ -1837,7 +1833,6 @@ __OK:
         return -1;
     }
 
-    
     if ( s < __file->_lbfsize )
     {
         s = __file->_lbfsize;
@@ -1889,11 +1884,13 @@ __OK:
         refresh_screen();
         return -1;
     }
-    
-    
+
+   // Pointer.
     __file->_p = __file->_base;
     
-
+    //
+    // Load.
+    //
  
     Status = (int) fsLoadFile ( VOLUME1_FAT_ADDRESS, 
                        VOLUME1_ROOTDIR_ADDRESS, 
@@ -1901,8 +1898,77 @@ __OK:
                        (unsigned long) __file->_base );
    
     if ( Status != 0 )
+    {
+        printf ("sys_read_file: fsLoadFile fail\n");
+        refresh_screen();
         return -1;
+    }
+     
+    //
+    // Pointer. (mode)
+    //
+    
+    // Ajusta o ponteiro para depois do tamanho do arquivo.
+    // Dependendo do modo.
+    
+    // See:
+    // https://linux.die.net/man/2/open
+
+           /*
+           O_RDONLY        open for reading only
+           O_WRONLY        open for writing only
+           O_RDWR          open for reading and writing
+           O_NONBLOCK      do not block on open or for data to become available
+           O_APPEND        append on each write
+           O_CREAT         create file if it does not exist
+           O_TRUNC         truncate size to 0
+           O_EXCL          error if O_CREAT and the file exists
+           O_SHLOCK        atomically obtain a shared lock
+           O_EXLOCK        atomically obtain an exclusive lock
+           O_NOFOLLOW      do not follow symlinks
+           O_SYMLINK       allow open of symlinks
+           */
+          
+     // Default ???
+       
+       
+      //if (mode == 0)
+      //{
+       debug_print ("sys_read_file: default mode\n");
+       __file->_p = __file->_base;
+      //}
+
+
+      // The file is opened in append mode. 
+      // O offset fica no fim do arquivo.
+      if ( mode & O_APPEND)        
+      { 
+           debug_print ("sys_read_file: O_APPEND\n");
+            //__file->_p = __file->_base + s;
+      }
+
+      if ( mode & O_ASYNC )        
+      { 
+           debug_print ("sys_read_file: O_ASYNC\n");
+      }
+
+      /* 
+      // Enable the close-on-exec flag for the new file descriptor.
+      if ( mode & O_CLOEXEC )        
+      { 
+           debug_print ("sys_read_file: O_CLOEXEC\n");
+      }
+      */
+
+
+      if ( mode & O_CREAT )        
+      { 
+           debug_print ("sys_read_file: O_CREAT\n");
+      }
         
+           
+    
+     
         
     // salva o ponteiro.  
     // ja checamos fd.

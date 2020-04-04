@@ -772,7 +772,7 @@ char *strpbrk (const char *cs, const char *ct){
  * Same semantics, slimmer shape. ;)
  */
 
-char *strsep(char **s, const char *ct){
+char *strsep (char **s, const char *ct){
 
     char *sbegin = *s;
     char *end;
@@ -1290,8 +1290,8 @@ char *__strdup (char *l){
 char *index (const char *s, int c){
 
     do {
-		if (*s == c)
-			return (char *) (s);
+        if (*s == c)
+            return (char *) (s);
     } while (*s++);
 
     return(NULL);
@@ -1395,7 +1395,11 @@ char *strerror (int errnum)
 
 
 /* XSI-compliant */
-int strerror_r (int errnum, char *buf, size_t buflen)
+int 
+strerror_r (
+    int errnum, 
+    char *buf, 
+    size_t buflen )
 {
     char *msg = strerror (errnum);
 
@@ -1457,6 +1461,33 @@ void strtoupper (char *src){
         c++;
     };
 }
+
+
+/*
+// From unix. Not tested yet. hahaha
+int nodup (char *l[], char s[]);
+int nodup (char *l[], char s[])
+{
+
+    char *t, *os, c;
+
+    os = s;
+
+	while(t = *l++) 
+	{
+		s = os;
+		
+		while(c = *s++)
+			if (c != *t++) goto ll;
+
+        if (*t++ == '\0') 
+            return (0);
+ll:
+    }
+
+    return (1);
+}
+*/
 
 
 //

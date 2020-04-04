@@ -27,6 +27,32 @@
 #define F_WRLCK            2	/* exclusive or write lock */
 #define F_UNLCK            3	/* unlock */
 
+
+//
+//  O_ flags !!!
+//
+
+/* File access modes for open() and fcntl().  POSIX Table 6-6. */
+#define O_RDONLY           0	/* open(name, O_RDONLY) opens read only */
+#define O_WRONLY           1	/* open(name, O_WRONLY) opens write only */
+#define O_RDWR             2	/* open(name, O_RDWR) opens read/write */
+/* Mask for use with file access modes.  POSIX Table 6-7. */
+#define O_ACCMODE         03	/* mask for file access modes */
+
+
+// #define	O_NONBLOCK	0x00000004	/* no delay */
+// #define	O_APPEND	0x00000008	/* set append mode */
+//#define	O_SHLOCK	0x00000010	/* open with shared file lock */
+//#define	O_EXLOCK	0x00000020	/* open with exclusive file lock */
+#define	O_ASYNC		0x00000040	/* signal pgrp when data ready */
+// #define	O_SYNC		0x00000080	/* synchronous writes */
+
+
+/* don't follow symlinks on the last */
+/* path component */
+//#define	O_NOFOLLOW	0x00000100	
+
+
 /* Oflag values for open().  POSIX Table 6-4. */
 #define O_CREAT        00100	/* creat file if it doesn't exist */
 #define O_EXCL         00200	/* exclusive use flag */
@@ -38,32 +64,17 @@
 /* File status flags for open() and fcntl().  POSIX Table 6-5. */
 #define O_APPEND       02000	/* set append mode */
 #define O_NONBLOCK     04000	/* no delay */
+
+// valor muito grande;
+#define	O_ALT_IO	0x00040000	/* use alternate i/o semantics */
+#define	O_DIRECT	0x00080000	/* direct I/O hint *
+
 /* automatically re-open device after driver restart */
 #define O_REOPEN      010000
 
 
-
-/* File access modes for open() and fcntl().  POSIX Table 6-6. */
-#define O_RDONLY           0	/* open(name, O_RDONLY) opens read only */
-#define O_WRONLY           1	/* open(name, O_WRONLY) opens write only */
-#define O_RDWR             2	/* open(name, O_RDWR) opens read/write */
-
-/* Mask for use with file access modes.  POSIX Table 6-7. */
-#define O_ACCMODE         03	/* mask for file access modes */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#define  O_DIRECTORY  0x00200000  /* fail if not a directory */
+#define  O_CLOEXEC    0x00400000  /* set close on exec */
 
 
 
