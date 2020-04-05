@@ -458,8 +458,10 @@ int sys_socket ( int family, int type, int protocol ){
 	// Filtros
 	//
 
-    if (family < 0)
+    if (family < 0){
+        //debug_print ("sys_socket: family not supported\n");
         return -1;
+    }
 
     //if (type < 0)
         //return -1;
@@ -540,6 +542,7 @@ int sys_socket ( int family, int type, int protocol ){
            
            
            default:
+               //debug_print ("sys_socket: default family\n");
                return -1;
                break;
        }
@@ -998,6 +1001,7 @@ sys_bind (
     
     struct socket_d *s;
 
+    int i=0;
 
 
     printf ("sys_bind: PID %d | fd %d | \n",
@@ -1053,7 +1057,6 @@ sys_bind (
     // Everything is ok.
     // So now we need to include the 'name' into the socket structure
     // respecting the socket's family.
-    int n = 0;
 
     // AF_GRAMADO
     if (s->addr.sa_family == AF_GRAMADO){
@@ -1061,9 +1064,9 @@ sys_bind (
         printf ("~Binding the name to the socket.\n");
         
         // Always 14.
-        for(n=0; n<14; n++)
-            s->addr.sa_data[n] = addr->sa_data[n];
-
+        for (i=0; i<14; i++){ 
+            s->addr.sa_data[i] = addr->sa_data[i];
+        }; 
 
         printf ("process %d ; family %d ; len %d \n", 
             current_process, addr->sa_family, addrlen  );
@@ -1087,11 +1090,11 @@ sys_bind (
     // DEFAULT:
     printf ("sys_bind: fail. family not valid\n");
 
-fail:    
+fail:
+    debug_print ("sys_bind: fail\n"); 
     printf ("sys_bind: fail\n");
     refresh_screen();
     
-    debug_print ("sys_bind: fail\n");
     return -1;
 }   
 

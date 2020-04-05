@@ -67,12 +67,13 @@ See: https://wiki.osdev.org/Graphics_stack
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-
-#include <gws.h>
+#include <sys/socket.h>
 
 #include <api.h>
 
-#include <sys/socket.h>
+#include <gws.h>
+
+
 
 
 
