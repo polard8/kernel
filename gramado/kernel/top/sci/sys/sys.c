@@ -283,7 +283,7 @@ int permission (file *f)
 
 // File read.
 // It's called by sys_read.
-// COpia à partir do início do arquivo.
+// Copia à partir do início do arquivo.
 int file_read_buffer ( file *f, char *buffer, int len ){
 
     char *p;
@@ -308,11 +308,17 @@ int file_read_buffer ( file *f, char *buffer, int len ){
     //
     
     // A próxima leitura precisa ser depois dessa.
-    memcpy ( (void *) buffer, (const void *) f->_base, len ); 
     
-    // Esse é o jeito certo.
-    //memcpy ( (void *) buffer, (const void *) f->_p, len ); 
-    //f->_p = f->_p + len;
+    // Se o arquivo é um socket, então não concatenaremos escrita ou leitura.
+    if ( f->____object == ObjectTypeSocket )
+    {    
+        memcpy ( (void *) buffer, (const void *) f->_base, len ); 
+        return len;
+    }
+
+    // Normal file.
+    memcpy ( (void *) buffer, (const void *) f->_p, len ); 
+    f->_p = f->_p + len;
     
     return (int) len;
 
@@ -358,11 +364,16 @@ int file_write_buffer ( file *f, char *string, int len ){
     // Mas se o write for usado num arquivo aberto com 
     // open(), então o ponteiro deve estar no fim do arquivo.
     
-    memcpy ( (void *) f->_base, (const void *) string, len ); 
+    // Se o arquivo é um socket, então não concatenaremos escrita ou leitura.
+    if ( f->____object == ObjectTypeSocket )
+    { 
+        memcpy ( (void *) f->_base, (const void *) string, len ); 
+        return len;
+    }
     
-    // Esse é o jeito certo.
-    //memcpy ( (void *) f->_p, (const void *) string, len ); 
-    //f->_p = f->_p + len;
+    // Normal file.
+    memcpy ( (void *) f->_p, (const void *) string, len ); 
+    f->_p = f->_p + len;
     
     return len;
     
@@ -861,7 +872,7 @@ int sys_write (unsigned int fd,char *ubuf,int count){
 
         if ( __file2->____object == ObjectTypeSocket )
         {
-            
+
             // #debug
             //printf ("sys_write: (2)  pid %d  Writing in the socket file %d \n",
                 //current_process, __file2->_file);

@@ -1,12 +1,14 @@
 /*
  * File: socket.c
  *     SOCKET. network access protocol.
+ *
  * 
+ * History:
+ *     2020 - Created by Fred Nora. 
  */
 
 
 #include <kernel.h>
-
 
 
 
