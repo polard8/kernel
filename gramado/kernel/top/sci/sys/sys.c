@@ -308,9 +308,12 @@ int file_read_buffer ( file *f, char *buffer, int len ){
     //
     
     // A próxima leitura precisa ser depois dessa.
-    //memcpy ( (void *) buffer, (const void *) f->_base, len ); 
-    memcpy ( (void *) buffer, (const void *) f->_p, len ); 
-    f->_p = f->_p + len;
+    memcpy ( (void *) buffer, (const void *) f->_base, len ); 
+    
+    // Esse é o jeito certo.
+    //memcpy ( (void *) buffer, (const void *) f->_p, len ); 
+    //f->_p = f->_p + len;
+    
     return (int) len;
 
 fail:
@@ -355,9 +358,12 @@ int file_write_buffer ( file *f, char *string, int len ){
     // Mas se o write for usado num arquivo aberto com 
     // open(), então o ponteiro deve estar no fim do arquivo.
     
-    //memcpy ( (void *) f->_base, (const void *) string, len ); 
-    memcpy ( (void *) f->_p, (const void *) string, len ); 
-    f->_p = f->_p + len;
+    memcpy ( (void *) f->_base, (const void *) string, len ); 
+    
+    // Esse é o jeito certo.
+    //memcpy ( (void *) f->_p, (const void *) string, len ); 
+    //f->_p = f->_p + len;
+    
     return len;
     
 fail:

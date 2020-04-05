@@ -5,9 +5,9 @@
  *    Using socket to connect with gws.
  *    AF_GRAMADO family.
  *
- * 2020 - Created by Fred Nora.
+ * History:
+ *     2020 - Created by Fred Nora.
  */
- 
 
 
 // tutorial example taken from. 
@@ -37,25 +37,21 @@
  
  
 #include <types.h>
-
 #include <stdio.h>
 #include <stdlib.h>
-
 #include <string.h>
-
 #include <netdb.h>
 #include <netinet/in.h>
-
 #include <arpa/inet.h>
-
 #include <sys/socket.h>
 
 
-//#test
+
 #include <gws.h>
 
 
-// tipos de pacotes.
+// Tipos de pacotes.
+// #todo: Move this to gws.h
 #define SERVER_PACKET_TYPE_REQUEST    1000 
 #define SERVER_PACKET_TYPE_REPLY      1001 
 #define SERVER_PACKET_TYPE_EVENT      1002
