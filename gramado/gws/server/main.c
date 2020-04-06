@@ -189,10 +189,12 @@ void handle_request (int fd){
     //n_reads = read ( fd, __buffer, sizeof(__buffer) );
     n_reads = recv ( fd, __buffer, sizeof(__buffer), 0 );
 
-    // 
-    // Se nao tem o que ler. saimos. 
     if (n_reads <= 0)
         return;
+ 
+     
+ 
+ 
         
     // Nesse momento lemos alguma coisa.   
  

@@ -261,6 +261,9 @@ ssize_t read (int fd, const void *buf, size_t count);
 ssize_t write (int fd, const void *buf, size_t count);
 
 
+// See: http://man7.org/linux/man-pages/man2/pwrite.2.html
+ssize_t pread (int fd, void *buf, size_t count, off_t offset);
+ssize_t pwrite (int fd, const void *buf, size_t count, off_t offset);
 
 
 /*

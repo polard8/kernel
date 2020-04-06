@@ -1927,7 +1927,13 @@ __OK:
            O_EXLOCK        atomically obtain an exclusive lock
            O_NOFOLLOW      do not follow symlinks
            O_SYMLINK       allow open of symlinks
+           O_FSYNC         write will save into the disk. :)
            */
+      
+      // Saving into de disk ?
+      // You can use the O_FSYNC open mode to make write always 
+      // store the data to disk before returning;    
+          
           
      // Default ???
        

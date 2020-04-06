@@ -234,11 +234,25 @@ new_message:
        //it's a test yet.
 __again:
     n_reads = read ( client_fd, __buffer, sizeof(__buffer) );
+    
     // Não vamos insistir num arquivo vazio.
-    if (n_reads<=0){
+    //if (n_reads<=0){
+    //     gnst_yield();        
+    //    goto __again;
+    //}
+
+    if (n_reads == 0){
          gnst_yield();        
         goto __again;
     }
+    
+    if (n_reads < 0){
+        printf ("gnst: recv fail.\n");
+        printf ("Something is wrong with the socket.\n");
+        exit (1);
+    }
+    
+
     
     // Get the message sended by the server.
     int msg = (int) message_buffer[1];

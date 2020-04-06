@@ -1076,6 +1076,7 @@ sys_bind (
     }
 
     // AF_UNIX
+    // See: http://man7.org/linux/man-pages/man7/unix.7.html
     if (s->addr.sa_family == AF_UNIX){
         debug_print ("sys_bind: AF_UNIX not supported yet\n");
         return -1;

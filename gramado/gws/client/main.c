@@ -215,12 +215,25 @@ response_loop:
     //n_reads = read ( client_fd, __buffer, sizeof(__buffer) );
     n_reads = recv ( client_fd, __buffer, sizeof(__buffer), 0 );
     
-    // Não vamos insistir num arquivo vazio.
-    if (n_reads<=0){
+    //if (n_reads<=0){
+    //     gws_yield(); 
+    //    goto response_loop;
+    //}
+    
+    // Se retornou 0, podemos tentar novamente.
+    if (n_reads == 0){
          gws_yield(); 
         goto response_loop;
     }
     
+    // Se retornou -1 é porque algo está errado com o arquivo.
+    if (n_reads < 0){
+        printf ("gwst: recv fail.\n");
+        printf ("Something is wrong with the socket.\n");
+        exit (1);
+    }
+
+
     //
     // The msg index.
     //

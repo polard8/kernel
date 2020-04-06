@@ -226,13 +226,15 @@ ssize_t write_VC (int fd, const void *buf, size_t count)
 }
 
 
+
 /*
+ ********************************
  * read:
  *     Standard read() function.
  */
 //usam a lista de arquivos abertos do processo.
-ssize_t read (int fd, const void *buf, size_t count)
-{
+ssize_t read (int fd, const void *buf, size_t count){
+
     if (fd<0)
         return -1;
 
@@ -243,13 +245,15 @@ ssize_t read (int fd, const void *buf, size_t count)
 }
 
 
+
 /*
+ ********************************************
  * write: 
  *     Standard write() function. 
  */
 // usam a lista de arquivos abertos do processo. 
-ssize_t write (int fd, const void *buf, size_t count)
-{
+ssize_t write (int fd, const void *buf, size_t count){
+
     if (fd<0)
         return -1;
 
@@ -259,6 +263,18 @@ ssize_t write (int fd, const void *buf, size_t count)
                          (unsigned long) count ); 
 }
 
+
+ssize_t pread (int fd, void *buf, size_t count, off_t offset)
+{
+    debug_print ("pread: [TODO]\n");
+    return -1;
+}
+
+ssize_t pwrite (int fd, const void *buf, size_t count, off_t offset)
+{
+    debug_print ("pread: [TODO]\n");
+    return -1;
+}
 
 
 

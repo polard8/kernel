@@ -394,6 +394,9 @@ fail:
 // Service 18.
 // #todo: There's a lot to do with synchronization.
 
+// OUT:
+
+
 int sys_read (unsigned int fd, char *ubuf, int count){
 
     struct process_d *__P;
@@ -596,12 +599,16 @@ int sys_read (unsigned int fd, char *ubuf, int count){
                 return (int) nbytes;
             }
 
+            // error
+            if (nbytes < 0)
+                goto fail; 
+            
             // Se nenhum byte foi lido: 
             // + A thread atual dorme,
             // + reescalonamos as threads e
             // + sinalizamos que podem escrever no arquivo.
-
-            if (nbytes <= 0){
+ 
+            if (nbytes == 0){
              
                 // #debug
                 //printf ("sys_read: The thread %d is waiting now \n", 
@@ -668,12 +675,22 @@ int sys_read (unsigned int fd, char *ubuf, int count){
     //
     // Fail!
     //
+    
+// #bugbug
+// See manual for the error:
+// https://www.gnu.org/software/libc/manual/html_node/I_002fO-Primitives.html
+// http://man7.org/linux/man-pages/man2/read.2.html
 
 fail:
 
     debug_print ("sys_read: fail\n");
     refresh_screen();
-    return 0;
+    //return 0;
+    
+   // #bugbug:
+   // A intenção é que um erro seja representado por -1 e não por 0.
+   // Zero representará fim de arquivo. 
+   return -1;
 }
 
 
@@ -695,6 +712,8 @@ fail:
 // https://linux.die.net/man/2/write
 // ...
 
+// OUT:
+// see: 
 
 int sys_write (unsigned int fd,char *ubuf,int count){
 
@@ -834,6 +853,16 @@ int sys_write (unsigned int fd,char *ubuf,int count){
         nbytes = (int) file_write_buffer ( (file *) __file, 
                            (char *) ubuf, (int) count );
                             
+        if (nbytes < 0){
+            debug_print("sys_write: file_write_buffer fail \n");
+            goto fail;
+         }
+         
+         // retorna sem mudar as flags do arquivo.
+         if (nbytes == 0){
+             return 0;
+         }
+            
         // #debug
         //printf ("sys_write: written\n");
         //refresh_screen();
@@ -883,7 +912,18 @@ int sys_write (unsigned int fd,char *ubuf,int count){
             nbytes = (int) file_write_buffer ( (file *) __file2, 
                                (char *) ubuf, (int) ncopy );
                                
+
+            if (nbytes < 0){
+                debug_print("sys_write: file_write_buffer fail (2)\n");
+                goto fail;
+            }
             
+            // Não foi escrito ...
+            // não mudamos flag, nem dormimos.
+            if (nbytes == 0){
+                return 0;
+            }
+       
             //printf ("sys_write: written\n");
             //refresh_screen();
              
@@ -962,7 +1002,7 @@ int sys_write (unsigned int fd,char *ubuf,int count){
 fail:
     //refresh_screen();
     debug_print("sys_write: fail\n");
-    return 0;
+    return -1;
 }
 
 
