@@ -11,8 +11,8 @@
 
 
 // service 377.
-int sys_uname (struct utsname *ubuf)
-{
+int sys_uname (struct utsname *ubuf){
+
 
     if ( (void *) ubuf == NULL )
         return -1;
@@ -394,7 +394,14 @@ fail:
 // Service 18.
 // #todo: There's a lot to do with synchronization.
 
+// #todo
+// We need to call one subfunctions for
+// each different kind of file intead of implementing
+// an internal sub-routine.
+
 // OUT:
+// 0 = Couldn't read.
+// -1 = Error.
 
 
 int sys_read (unsigned int fd, char *ubuf, int count){
@@ -520,7 +527,7 @@ int sys_read (unsigned int fd, char *ubuf, int count){
     // #todo: 
     // Now we can call socket_read(...)
     
-    
+    // ==== Socket =======================
     // Se o arquivo for um socket.
     if ( __file->____object == ObjectTypeSocket )
     {
@@ -653,6 +660,7 @@ int sys_read (unsigned int fd, char *ubuf, int count){
     //
 
 
+    // ==== Regular file =======================
     // Read a regular file.
     // See: unistd.c
     // #todo Tem que retornar a quantidade de bytes lido.
@@ -681,19 +689,15 @@ int sys_read (unsigned int fd, char *ubuf, int count){
 // https://www.gnu.org/software/libc/manual/html_node/I_002fO-Primitives.html
 // http://man7.org/linux/man-pages/man2/read.2.html
 
+// A intenção é que um erro seja representado por -1 e não por 0.
+// Zero representará fim de arquivo. 
+
 fail:
 
     debug_print ("sys_read: fail\n");
     refresh_screen();
-    //return 0;
-    
-   // #bugbug:
-   // A intenção é que um erro seja representado por -1 e não por 0.
-   // Zero representará fim de arquivo. 
-   return -1;
+    return -1;
 }
-
-
 
 
 /*
@@ -712,8 +716,14 @@ fail:
 // https://linux.die.net/man/2/write
 // ...
 
+// #todo
+// We need to call one subfunctions for
+// each different kind of file intead of implementing
+// an internal sub-routine.
+
 // OUT:
-// see: 
+// 0 = Couldn't read.
+// -1 = Error.
 
 int sys_write (unsigned int fd,char *ubuf,int count){
 
@@ -805,6 +815,7 @@ int sys_write (unsigned int fd,char *ubuf,int count){
     // is_
 
 
+    // ==== Console ===============================
     // >> Console.
     // Se o descritor usado por write() for de um arquivo
     // do tipo console, escreveremos no console 0.
@@ -829,8 +840,8 @@ int sys_write (unsigned int fd,char *ubuf,int count){
     
     ncopy = count;
     
-    // descobrindo o soquete que devemos copiar.
-    
+    // ==== Socket ===============================
+    // Descobrindo o soquete que devemos copiar.
     if ( __file->____object == ObjectTypeSocket )
     {
         //pega a estrutura de soquete.
@@ -963,11 +974,7 @@ int sys_write (unsigned int fd,char *ubuf,int count){
     // Arquivos normais (regular)
     //
     
-    //if pipe
-    
-    
-    //if socket
-    // socket_write()
+    // ==== Regular file ===============================
     
 
     // Tem que retonar o tanto de bytes escritos.
@@ -981,6 +988,16 @@ int sys_write (unsigned int fd,char *ubuf,int count){
     nbytes = (int) file_write_buffer ( (file *) __file, 
                        (char *) ubuf, (int) count );
     
+
+    // #todo:
+    // Falha ao escrever num arquivo normal.
+    //if (nbytes<0){ goto fail; }
+    
+    // #todo
+    // Se o arquivo está bom, mas não escrevemos.
+    // Retornamos sem mudar a flag.
+    //if (nbytes==0){ return 0; }
+
     // Avisa que o arquivo não está mais no modo escrita,
     // que agora pode ler.
 
@@ -1000,8 +1017,8 @@ int sys_write (unsigned int fd,char *ubuf,int count){
     // 
 
 fail:
-    //refresh_screen();
     debug_print("sys_write: fail\n");
+    //refresh_screen();    
     return -1;
 }
 
@@ -1034,15 +1051,17 @@ int sys_fcntl(unsigned int fd, unsigned int cmd, unsigned long arg)
         // qual é o processo atual e determina que ele será o 
         // processo pai. 
 
-void *sys_create_process ( struct room_d *room,
-                           struct desktop_d  *desktop,
-                           struct window_d *window,
-                           unsigned long res1, 
-                           unsigned long priority, 
-                           int ppid, 
-                           char *name,
-                           unsigned long iopl, 
-                           unsigned long res2 )
+void *
+sys_create_process ( 
+    struct room_d     *room,
+    struct desktop_d  *desktop,
+    struct window_d   *window,
+    unsigned long res1, 
+    unsigned long priority, 
+    int ppid, 
+    char *name,
+    unsigned long iopl, 
+    unsigned long res2 )
 {
 
    //#bugbug
@@ -1069,7 +1088,7 @@ void *sys_create_process ( struct room_d *room,
     
     
     
-    debug_print("sys_create_process:\n");
+    debug_print ("sys_create_process:\n");
 
     //? kb 1024*?/4096 = 
     tmp_va = (unsigned long) allocPages(40); //40 páginas;
@@ -1082,9 +1101,7 @@ void *sys_create_process ( struct room_d *room,
             
             
 	// loading image.
-	
 
-    
     fileret = (unsigned long) fsLoadFile ( VOLUME1_FAT_ADDRESS, 
                                   VOLUME1_ROOTDIR_ADDRESS, 
                                   name, 
@@ -1166,39 +1183,31 @@ void *sys_create_process ( struct room_d *room,
 
 
 // 85
-// #bugbug: 
-// Isso está retornando o ID do processo pai do processo atual.
-// O que queremos é o ID do processo pai do processo que está chamando.
-// Pega o id do processo atual.
+// Get PID of the current process.
 int sys_getpid (void)
 {
-	// ??
     return (int) current_process;
 }
 
 
 
-//81
-//#bugbug Isso está retornando o ID do processo atual.
-//O que queremos é o ID do processo que está chamando
-//Pega o ID do processo pai do processo atual.
+// 81
+// Get the PID of the father.
 int sys_getppid (void){
 	
-    int pid;
-	int ppid;
-	
+    int pid = -1;
 	struct process_d *p;
-	
+
+
 	pid = (int) current_process;
 	
 	if ( pid >= 0 && pid < PROCESS_COUNT_MAX )
 	{
 		p = (void *) processList[pid]; 		
 		
-		if ( (void *) p == NULL )
-		{
-			return (int) -1;
-		}
+		if ( (void *) p == NULL ){ 
+            return (int) -1; 
+        }
 		
 		if ( p->used != 1 || p->magic != 1234 ){
 		    
@@ -1221,9 +1230,8 @@ int sys_getppid (void){
  */
 
 // #todo 
-
-int sys_fork (void){
-
+int sys_fork (void)
+{
     return (int) fork ();
 }
 
@@ -1254,15 +1262,18 @@ void sys_exit_process ( int pid, int code ){
     // Enviar os argumentos via buffer.
 
 
-void *sys_create_thread ( struct room_d *room,
-                          struct desktop_d  *desktop,
-                          struct window_d *window,
-                          unsigned long init_eip, 
-                          unsigned long priority, 
-                          int ppid, 
-                          char *name )
+void *
+sys_create_thread ( 
+    struct room_d     *room,
+    struct desktop_d  *desktop,
+    struct window_d   *window,
+    unsigned long init_eip, 
+    unsigned long priority, 
+    int ppid, 
+    char *name )
 {
     struct thread_d *t;
+
 
     debug_print ("sys_create_thread:\n");
 
@@ -1270,12 +1281,11 @@ void *sys_create_thread ( struct room_d *room,
 
 	// Create thread.
     t = (struct thread_d *) create_thread ( room, desktop, window, 
-                        init_eip, 
-                        priority, 
-                        ppid, 
-                        name ); 
+                        init_eip, priority, ppid, name ); 
 
-    if ( (void *) t == NULL ){
+    if ( (void *) t == NULL )
+    {
+        //debug_print ("sys_create_thread: create_thread fail\n");
         return NULL;
     }
 
@@ -1283,9 +1293,6 @@ void *sys_create_thread ( struct room_d *room,
 
     return (struct thread_d *) t;
 }
-
-
-
 
 
 
@@ -1300,7 +1307,8 @@ void sys_exit_thread (int tid){
 
 
 
-//90 Coletor de threads Zombie. (a tarefa idle pode chamar isso.)
+// 90 - Coletor de threads Zombie. 
+// (a tarefa idle pode chamar isso.)
 void sys_dead_thread_collector (void)
 {
     dead_thread_collector ();
@@ -1395,12 +1403,10 @@ void sys_show_system_info ( int n ){
     switch (n)
     {
         case 1:
-            //diskShowCurrentDiskInfo();
             disk_show_info();
             break;
 
         case 2:
-            //volumeShowCurrentVolumeInfo();
             volume_show_info();
             break;
 
@@ -1422,6 +1428,13 @@ void sys_show_system_info ( int n ){
 
     refresh_screen ();
 }
+
+
+//
+// End
+//
+
+
 
 
 
