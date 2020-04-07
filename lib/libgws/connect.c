@@ -87,15 +87,32 @@ int gws_get_connect_status (void)
 }
 
 
+void gws_set_connect_status(int status)
+{
+    ____gws_connected = status;
+}
+
+
 int gws_get_client_fd (void)
 {
     return ____gws_client_fd;
 }
 
 
+void gws_set_client_fd(int client_id)
+{
+    ____gws_client_fd = client_id;
+}
+
+
 int gws_get_desktop_id (void)
 {
     return __gws__desktop__id;
+}
+
+void gws_set_desktop_id(int desktop_id)
+{
+    __gws__desktop__id = desktop_id;
 }
 
 

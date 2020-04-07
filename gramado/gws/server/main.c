@@ -644,7 +644,7 @@ int main (int argc, char **argv){
 
 
     gde_clone_and_execute ("gwst.bin");  
-    //gde_clone_and_execute ("s3.bin");    //testando um cliente simples.  
+    //gde_clone_and_execute ("s3.bin"); 
     // ...
 
  
