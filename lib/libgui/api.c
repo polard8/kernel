@@ -1,3 +1,11 @@
+
+// Ok. This is the system's API. It's not just a client-side libgui.
+// #todo: 
+// We need to separate the system's API from the
+// old libgui that uses the window server inside the kernel.
+// It's because now we are building a new window server
+// that will run on ring3.
+
 /*
  * File: api.c 
  *
@@ -69,12 +77,13 @@
 #include "include/api.h"  
 
 
-// buttons
-struct window_d *first_responder;
-struct window_d *messagebox_button1;
-struct window_d *messagebox_button2;
-struct window_d *dialogbox_button1;
-struct window_d *dialogbox_button2;
+// Buttons
+struct window_d  *first_responder;
+struct window_d  *messagebox_button1;
+struct window_d  *messagebox_button2;
+struct window_d  *dialogbox_button1;
+struct window_d  *dialogbox_button2;
+// ...
 
 
 //
@@ -99,21 +108,23 @@ dbProcedure (
 
 
 /*
- *****************************************************************
+ ***************************************************
  * system_call:  
- *    Interrupção de sistema, número 0x80, chama vários serviços 
- * do Kernel com a mesma interrupção. 
- *    Essa é a chamada mais simples.
  *
- * Argumentos:
- *    eax = arg1, O número do serviço.
+ *    The system interrupt.
+ *    Interrupt number 0x80.
+ *
+ * IN:
+ *    eax = arg1, The number of the system service.
  *    ebx = arg2. 
  *    ecx = arg3.
  *    edx = arg4.
  *
- * 2015 - Created by Fred Nora.
- * ...
+ * History:
+ *     2015 - Created by Fred Nora.
+ *     ...
  */
+
 
 void *
 system_call ( 
@@ -127,13 +138,13 @@ system_call (
 	//Temos que pegar unsigned long?? void*. ??
 	//unsigned long RET = 0;
 
-    int RET = 0;
+    unsigned long __RET = 0;
 
     asm volatile ("int %1 \n"
-                  : "=a"(RET)
+                  : "=a"(__RET)
                   : "i"(IA32_SYSCALL_VECTOR), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
 
-    return (void *) RET;
+    return (void *) __RET;
 }
 
 
@@ -141,21 +152,14 @@ system_call (
 /*
  ***********************************
  * gde_system: 
- *    Interpreta um comando e envia uma systemcall para o kernel.
- *    Obs: Assim como system, isso deve chamar aplicativos. 
- * ?? Talvez deva chamar o próprio shell ??     
+ *     Maybe it will call the shell.
  */
 
-int gde_system (const char *command){
-
-    // #todo
-    // 
-
-    return 0;
+int gde_system (const char *command)
+{
+    gde_debug_print ("gde_system: [TODO]\n");
+    return -1;
 }
-
-
-
 
 
 
@@ -246,7 +250,7 @@ gde_print_string (
     unsigned long color, 
     unsigned char *string )
 {
-    //#todo
+    gde_debug_print ("gde_print_string: [TODO]\n");
 }
 
 
@@ -288,11 +292,7 @@ gde_system_procedure (
     message_buffer[3] = (unsigned long) long2;
     
     
-    // Isso evita muitos problemas.
-    if ( (void *) window == NULL ){
-        return NULL;
-    }
-
+    if ( (void *) window == NULL ){ return NULL; }
 
     return (void *) system_call ( SYSTEMCALL_CALL_SYSTEMPROCEDURE, 
                         (unsigned long) &message_buffer[0], 
@@ -309,8 +309,8 @@ gde_system_procedure (
  *
  */
 
-int __gde_set_cursor (unsigned long x, unsigned long y){
-
+int __gde_set_cursor (unsigned long x, unsigned long y)
+{
     return (int) gramado_system_call ( SYSTEMCALL_SETCURSOR, x, y, 0 );
 }
 
@@ -327,7 +327,7 @@ __gde_put_char (
     unsigned long color, 
     unsigned char *ch )
 {
-    //return;    //Nothing for now.
+    gde_debug_print ("__gde_put_char: [TODO]\n");
 }
 
 
@@ -364,9 +364,9 @@ gde_load_bitmap_16x16 (
  *     Shutdown the machine.
  */
 
-void gde_shutdown (){
-
-
+void gde_shutdown ()
+{
+    gde_debug_print ("gde_shutdown: [TODO]\n");
     //gramado_system_call ( ??, 0, 0, 0 );
 
     while (1){ asm ("pause"); };
@@ -384,6 +384,7 @@ void gde_shutdown (){
 
 void gde_init_background ()
 {
+    gde_debug_print ("gde_init_background: [TODO]\n");
     //todo: Implementar.	
     //Não há uma chamada para isso ainda.
 }
@@ -405,9 +406,8 @@ int __mb_current_button;
 int gde_message_box ( int type, char *string1, char *string2 ){
 
     int Response = 0;
-    int running = 1;  //Loop.
-
-    struct window_d *hWnd;    //Window.
+    int running = 1;          // Loop.
+    struct window_d *hWnd;    // Window.
 
 	// x and y
 	// #todo 
@@ -531,10 +531,10 @@ do_create_messagebox_3:
                                       hWnd, 0, 
                                       xCOLOR_GRAY1, xCOLOR_GRAY1 );
 
-    if ( (void *) messagebox_button1 == NULL )
-    {
+    if ( (void *) messagebox_button1 == NULL ){
         printf ("OK button fail\n");
         return (int) -1;
+
     }else{
         gde_register_window (messagebox_button1); 
         gde_show_window (messagebox_button1);
@@ -554,10 +554,10 @@ do_create_messagebox_3:
                                       hWnd, 0, 
                                       xCOLOR_GRAY1, xCOLOR_GRAY1 );
 
-    if ( (void *) messagebox_button2 == NULL )
-    {
+    if ( (void *) messagebox_button2 == NULL ){
         printf (" CANCEL button fail \n");
         return (int) -1;
+
     }else{
         gde_register_window (messagebox_button2); 
         gde_show_window (hWnd);
@@ -911,7 +911,9 @@ int gde_dialog_box ( int type, char *string1, char *string2 ){
 	unsigned long WindowClientAreaColor;
 	unsigned long WindowColor;
 	
-	
+
+
+
 	WindowClientAreaColor = COLOR_YELLOW;
 	WindowColor = COLOR_PINK;	
 	
@@ -988,12 +990,12 @@ int gde_dialog_box ( int type, char *string1, char *string2 ){
 
 	// button 1 	
 	dialogbox_button1 = (void *) gde_create_window ( WT_BUTTON, 1, 1, "OK",     
-                                (cx/3), ((cy/8)*5), 80, 24,    
-                                hWnd, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
+                                     (cx/3), ((cy/8)*5), 80, 24,    
+                                     hWnd, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
 								
-	if ( (void *) dialogbox_button1 == NULL )
-	{
+	if ( (void *) dialogbox_button1 == NULL ){
 	    printf("button fail \n");
+
 	}else{
         gde_register_window (dialogbox_button1);   	
 	}
@@ -1001,12 +1003,12 @@ int gde_dialog_box ( int type, char *string1, char *string2 ){
      
 	// button 2
 	dialogbox_button2 = (void *) gde_create_window ( WT_BUTTON, 1, 1, "CANCEL",     
-                                ((cx/3)*2), ((cy/8)*5), 80, 24,    
-                                hWnd, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
+                                     ((cx/3)*2), ((cy/8)*5), 80, 24,    
+                                     hWnd, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
 								
-	if ( (void *) dialogbox_button2 == NULL )
-	{
+	if ( (void *) dialogbox_button2 == NULL ){
 	    printf("button fail \n");
+
 	}else{
         gde_register_window (dialogbox_button2);   	
 	}
@@ -1224,7 +1226,6 @@ gde_create_window (
 	message_buffer[10] = (unsigned long) clientcolor;
 	message_buffer[11] = (unsigned long) color;
 	
-    
 
     Window = (void *) system_call ( 118 , 
                           (unsigned long) &message_buffer[0], 
@@ -1232,8 +1233,10 @@ gde_create_window (
                           (unsigned long) &message_buffer[0] );
     
 
-    if ( (void *) Window == NULL )
+    if ( (void *) Window == NULL ){
+        gde_debug_print ("gde_create_window: fail\n");
         return NULL;  
+    }
 
 
     // ??
@@ -1256,6 +1259,7 @@ int gde_register_window (struct window_d *window){
 
 
     if ( (void *) window == NULL ){
+        gde_debug_print ("gde_register_window: fail\n");
         return 1;
 
     }else{
@@ -1281,6 +1285,7 @@ int gde_close_window (struct window_d *window){
 
 
     if ( (void *) window == NULL ){
+        gde_debug_print ("gde_close_window: fail\n");
         return (int) 1;
 
     }else{
@@ -1303,8 +1308,8 @@ int gde_close_window (struct window_d *window){
 int gde_set_focus (struct window_d *window){
 
 
-    if ( (void *) window == NULL )
-    {
+    if ( (void *) window == NULL ){
+        gde_debug_print ("gde_set_focus: fail\n");
         return (int) 1;
     }else{
 
@@ -1323,8 +1328,8 @@ int gde_set_focus (struct window_d *window){
  *     Get Focus. 
  */
 
-int gde_get_focus (){
-	
+int gde_get_focus ()
+{
     return (int) system_call ( SYSTEMCALL_GETFOCUS, 0, 0, 0 );
 }
 
@@ -1339,6 +1344,7 @@ int gde_kill_focus (struct window_d *window){
 
 
     if ( (void *) window == NULL ){
+        gde_debug_print ("gde_kill_focus: fail\n");
         return (int) 1;
  
     }else{
@@ -1362,8 +1368,8 @@ int gde_kill_focus (struct window_d *window){
 
 int gde_set_active_window (struct window_d *window){
 	
-	if ( (void *) window == NULL )
-	{
+	if ( (void *) window == NULL ){
+        gde_debug_print ("gde_set_active_window: fail\n");
 		return (int) 1;
 	}else{
 	
@@ -1386,8 +1392,8 @@ int gde_set_active_window (struct window_d *window){
  *     Get Active Window Id.
  */
 
-int gde_get_active_window (){
-
+int gde_get_active_window ()
+{
     return (int) system_call ( SYSTEMCALL_GETACTIVEWINDOW, 0, 0, 0 );
 }
 
@@ -1520,7 +1526,7 @@ void gde_exit (int exit_code){
 
 void gde_kill (int exit_code)
 {
-	//#todo
+    gde_debug_print ("gde_kill: [TODO]\n");
 }
 
 
@@ -1556,7 +1562,6 @@ void gde_dead_thread_collector (){
  */
 
 int gde_strncmp (char *s1, char *s2, int len){
-
 
     int n = len;
 
@@ -1595,8 +1600,8 @@ int gde_strncmp (char *s1, char *s2, int len){
  *     Passa o conteúdo do backbuffer para o lfb. 
  */
 
-void gde_show_backbuffer (){
-
+void gde_show_backbuffer ()
+{
     // #todo
     // trocar o nome dessa systemcall.
     // refresh screen será associado à refresh all windows.
@@ -1619,11 +1624,12 @@ void gde_show_backbuffer (){
 	// as camadas de software de mais alto nível antes
 	// de efetuar o reboot de hardware propriamente dito. 
 
-void gde_reboot (){
-
+void gde_reboot ()
+{
     gramado_system_call ( SYSTEMCALL_REBOOT, 0, 0, 0 );
-    
-    // ?? return ??
+
+    gde_debug_print ("gde_reboot: unexpected return\n");
+    while (1){ asm("pause"); };
 }
 
 
@@ -1641,6 +1647,7 @@ void gde_set_cursor ( unsigned long x, unsigned long y ){
 // #todo
 void gde_get_cursor ( unsigned long *x, unsigned long *y )
 {
+    gde_debug_print ("gde_get_cursor: [TODO]\n");
 }
 
 
@@ -1941,7 +1948,8 @@ void gde_up (struct semaphore_d *s){
         //Bloquear a thread, não adianta fazer a system call.
         //@todo: Chamar rotina que bloqueia a thread.
 
-    if ( (void *) s == NULL  ){
+    if ( (void *) s == NULL  )
+    {
         printf ("gde_up: *fail");
         while (1){ asm ("pause"); }
     }
@@ -2029,12 +2037,14 @@ void gde_exit_critical_section (){
 // P (Proberen) testar.
 void gde_p ()
 {
+    gde_debug_print ("gde_p: [TODO]\n");
     //gde_enter_critical_section ();         
 }
 
 // V (Verhogen) incrementar.
 void gde_v ()
 {
+    gde_debug_print ("gde_v: [TODO]\n");
     //gde_exit_critical_section ();          
 }
 
@@ -2089,7 +2099,7 @@ gde_def_dialog (
     unsigned long long1, 
     unsigned long long2 )
 {
-    // ??
+    gde_debug_print ("gde_def_dialog: [TODO]\n");
     return (unsigned long) 1;
 }
 
@@ -2102,6 +2112,11 @@ gde_def_dialog (
  */
  
 unsigned long gde_get_system_metrics (int index){
+
+    //if (index<0){
+        //gde_debug_print ("gde_get_system_metrics: fail\n");
+        //return 0;
+    //}
 
     return (unsigned long) system_call ( SYSTEMCALL_GETSYSTEMMETRICS, 
                                (unsigned long) index, 
@@ -2140,6 +2155,8 @@ int gde_dialog ( const char *string ){
     int ch = 0;
 
 
+    //if ( (void *) string == NULL ){ return -1; }   
+
     printf (string);
 
     while (1)
@@ -2154,15 +2171,13 @@ int gde_dialog ( const char *string ){
 				    return (int) Status;
                     break;
 					
-			    case 'Y':
-				case 'y':
-				    printf("Yes\n");
+			    case 'Y': case 'y':
+				    printf ("Yes\n");
 			        Status = 1;
 				    break;
 				   
-			    case 'N':
-				case 'n':
-			        printf("No\n");
+			    case 'N': case 'n':
+			        printf ("No\n");
 					Status = 0;
 				    break;
 					
@@ -2205,9 +2220,10 @@ int gde_getchar ()
 static int nibble_count_16colors = 0;
  
 int 
-gde_display_bmp ( char *address, 
-                  unsigned long x, 
-                  unsigned long y )
+gde_display_bmp ( 
+    char *address, 
+    unsigned long x, 
+    unsigned long y )
 {
     int i, j, base, offset;
 
@@ -2584,8 +2600,10 @@ gde_send_message_to_process (
     unsigned long message_buffer[5];
 
 
-    if ( pid<0 )
+    if ( pid<0 ){
+        gde_debug_print ("gde_send_message_to_process: fail\n");
         return -1;
+    }
 
 
     message_buffer[0] = (unsigned long) window;
@@ -2618,8 +2636,10 @@ gde_send_message_to_thread (
 
     unsigned long message_buffer[5];
 
-    if (tid < 0)
+    if (tid < 0){
+        gde_debug_print ("gde_send_message_to_thread: fail\n");
         return -1;
+    }
 
 
     message_buffer[0] = (unsigned long) window;
@@ -2769,7 +2789,7 @@ void gde_show_window (struct window_d *window){
  
 int gde_start_terminal (void){
 
-    int PID;
+    int PID = -1;
 
     // Clona e executa o noraterm como processo filho. 
 

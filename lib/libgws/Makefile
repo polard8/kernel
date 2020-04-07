@@ -28,7 +28,7 @@ CFLAGS = -m32 \
 	-s
 
 
-LIBS  = -I. -I ../libcore/include/
+LIBS  = -I. -I ../libc03/include/
 
 
 

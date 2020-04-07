@@ -16,7 +16,7 @@
 
 
 
-//libcore
+// libc03
 #include <types.h>  
 #include <stddef.h>
 #include <stdio.h>
@@ -30,11 +30,13 @@
 
 
 
-// system call.
-void *gws_system_call ( unsigned long a, 
-                        unsigned long b, 
-                        unsigned long c, 
-                        unsigned long d )
+// System call.
+void *
+gws_system_call ( 
+    unsigned long a, 
+    unsigned long b, 
+    unsigned long c, 
+    unsigned long d )
 {
     int __Ret = 0;
 
@@ -47,7 +49,8 @@ void *gws_system_call ( unsigned long a,
     return (void *) __Ret; 
 }
 
-// Envia uma string para a porta serial COM1
+
+// Debug vai serial port. (COM1)
 void gws_debug_print (char *string)
 {
     gws_system_call ( 289, 
@@ -56,18 +59,21 @@ void gws_debug_print (char *string)
         (unsigned long) string );
 }
 
-// Initialize the library.
-int gws_initialize_library(void)
-{
 
+// Initialize the library.
+int gws_initialize_library (void)
+{
     int status = -1;
+    
+    
     status = gws_initialize_connection();    
 
     if(status<0){
         gws_debug_print("gws_initialize_library: fail\n");
         return -1;
     }
-    
+
+
     return 0;
 }
 
@@ -76,10 +82,12 @@ int gws_initialize_library(void)
 
 // Services.
 // IN: service number, ...
-void *gws_services ( int service,
-                     unsigned long arg2,
-                     unsigned long arg3,
-                     unsigned long arg4 )
+void *
+gws_services ( 
+    int service,
+    unsigned long arg2,
+    unsigned long arg3,
+    unsigned long arg4 )
 {
 
    if (service<0)
@@ -101,7 +109,7 @@ void *gws_services ( int service,
 
 
 /*
- **********************************************************
+ ***********************
  * gws_send_message_to_process:
  *     Envia uma mensagem para a thread de controle de um dado processo.
  *     Dado o PID.
@@ -112,13 +120,13 @@ void *gws_services ( int service,
 // de buffer.
 
 int
-gws_send_message_to_process ( int pid, 
-                              struct window_d *window, 
-                              int message,
-                              unsigned long long1,
-                              unsigned long long2 )
+gws_send_message_to_process ( 
+    int pid, 
+    struct window_d *window, 
+    int message,
+    unsigned long long1,
+    unsigned long long2 )
 {
-
     unsigned long message_buffer[5];
 
 
@@ -146,11 +154,12 @@ gws_send_message_to_process ( int pid,
  */
 
 int 
-gws_send_message_to_thread ( int tid, 
-                             struct window_d *window, 
-                             int message,
-                             unsigned long long1,
-                             unsigned long long2 )
+gws_send_message_to_thread ( 
+    int tid, 
+    struct window_d *window, 
+    int message,
+    unsigned long long1,
+    unsigned long long2 )
 {
 
     unsigned long message_buffer[5];
@@ -174,32 +183,34 @@ gws_send_message_to_thread ( int tid,
 
 void gws_reboot(void)
 {
+   //
 }
 
 
 // Talvez vamos retonar o descritor
 // dado pelo servidor.
-void *gws_create_window ( unsigned long type,        //1, Tipo de janela (popup,normal,...)
-                          unsigned long status,      //2, Estado da janela (ativa ou nao)
-                          unsigned long view,        //3, (min, max ...)
-                          char *windowname,          //4, Título.                          
-                          unsigned long x,           //5, Deslocamento em relação às margens do Desktop.                           
-                          unsigned long y,           //6, Deslocamento em relação às margens do Desktop.
-                          unsigned long width,       //7, Largura da janela.
-                          unsigned long height,      //8, Altura da janela.
-                          struct window_d *pWindow,  //9, Endereço da estrutura da janela mãe.
-                          unsigned long onde,        //10, Ambiente.( Est� no desktop, barra, cliente ...)
-                          unsigned long clientcolor, //11, Cor da área de cliente
-                          unsigned long color )      //12, Color (bg) (para janela simples).
+void *
+gws_create_window ( 
+    unsigned long type,        //1, Tipo de janela (popup,normal,...)
+    unsigned long status,      //2, Estado da janela (ativa ou nao)
+    unsigned long view,        //3, (min, max ...)
+    char *windowname,          //4, Título.                          
+    unsigned long x,           //5, Deslocamento em relação às margens do Desktop.                           
+    unsigned long y,           //6, Deslocamento em relação às margens do Desktop.
+    unsigned long width,       //7, Largura da janela.
+    unsigned long height,      //8, Altura da janela.
+    struct window_d *pWindow,  //9, Endereço da estrutura da janela mãe.
+    unsigned long onde,        //10, Ambiente.( Est� no desktop, barra, cliente ...)
+    unsigned long clientcolor, //11, Cor da área de cliente
+    unsigned long color )      //12, Color (bg) (para janela simples).
  
 {
-
 
     int n_writes = 0;   // For sending requests.
     int n_reads = 0;    // For receiving responses.
 
-
     unsigned long buffer;
+
 
 
     buffer = (unsigned long) gws_get_message_buffer();
@@ -286,9 +297,11 @@ void *gws_create_window ( unsigned long type,        //1, Tipo de janela (popup,
 }
 
 
-void gws_yield(void){
-	
+void gws_yield (void)
+{
     gws_system_call(265,0,0,0); //yield thread.
 }
-	
+
+
+
 

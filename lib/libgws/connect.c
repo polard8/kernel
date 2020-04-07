@@ -4,11 +4,8 @@
    // Os cpodigos da libgws vão precisar disso 
    // pra se conectarem com o Window Server. gws
    
-   
-   
-// libcore 
-// #todo: tem coisa que tem que implementar na libcore.
-// #atenção: não usaremos a libc03.
+
+// libc03
 #include <types.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,9 +18,11 @@
 //#include <netinet/in.h>
 //#include <arpa/inet.h>
 
-//libgws
+
+// libgws
 #include "include/connect.h"  
 #include "include/gws.h"  
+
 
 
 
@@ -82,27 +81,26 @@ int gws_connect (void){
 
 
 
-int gws_get_connect_status(void){
+int gws_get_connect_status (void)
+{
     return ____gws_connected;
 }
 
 
-
-
-int gws_get_client_fd(void){
-
+int gws_get_client_fd (void)
+{
     return ____gws_client_fd;
 }
 
 
-
-int gws_get_desktop_id(void){
+int gws_get_desktop_id (void)
+{
     return __gws__desktop__id;
 }
 
 
 
-int gws_initialize_connection(void)
+int gws_initialize_connection (void)
 {
     // Pega o id do desktop atual.
     // ?? Ou o qual o processo pertence ??
@@ -144,8 +142,8 @@ int gws_initialize_connection(void)
 }
 
 
-unsigned long gws_get_message_buffer(void){
-
+unsigned long gws_get_message_buffer (void)
+{
     return (unsigned long) &____gws_io_buffer[0];   
 }
 

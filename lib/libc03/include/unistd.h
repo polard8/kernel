@@ -1,8 +1,11 @@
 /*
  * File: unistd.h
  *
- *     standard symbolic constants and types
+ *     Standard symbolic constants and types.
+ *
+ * History:
  *     2018 - Created by Fred Nora.
+ *     2020 - New functions.
  */
  
 
@@ -13,13 +16,12 @@
 #include <sys/types.h>
 
 
+// The <unistd.h> header shall declare the following external variables:
 
 extern char **environ;
-
-
-//The <unistd.h> header shall declare the following external variables:
 extern char  *optarg;
 extern int    opterr, optind, optopt;
+
 
 
 /*
@@ -94,32 +96,32 @@ extern int    opterr, optind, optopt;
  
 /* MINIX 3 */ 
 /* The following relate to configurable system variables. POSIX Table 4-2. */
-#define _SC_ARG_MAX	        1
-#define _SC_CHILD_MAX	    2
-#define _SC_CLOCKS_PER_SEC  3
-#define _SC_CLK_TCK	        3
-#define _SC_NGROUPS_MAX	    4
-#define _SC_OPEN_MAX	    5
-#define _SC_JOB_CONTROL	    6
-#define _SC_SAVED_IDS	    7
-#define _SC_VERSION	        8
-#define _SC_STREAM_MAX	    9
-#define _SC_TZNAME_MAX     10
-#define _SC_PAGESIZE	   11
-#define _SC_PAGE_SIZE	   _SC_PAGESIZE
+#define  _SC_ARG_MAX         1
+#define  _SC_CHILD_MAX       2
+#define  _SC_CLOCKS_PER_SEC  3
+#define  _SC_CLK_TCK         3
+#define  _SC_NGROUPS_MAX     4
+#define  _SC_OPEN_MAX        5
+#define  _SC_JOB_CONTROL     6
+#define  _SC_SAVED_IDS       7
+#define  _SC_VERSION         8
+#define  _SC_STREAM_MAX      9
+#define  _SC_TZNAME_MAX      10
+#define  _SC_PAGESIZE        11
+#define  _SC_PAGE_SIZE       _SC_PAGESIZE
 
 
 /* MINIX 3 */ 
 /* The following relate to configurable pathname variables. POSIX Table 5-2. */
-#define _PC_LINK_MAX	   1	/* link count */
-#define _PC_MAX_CANON	   2	/* size of the canonical input queue */
-#define _PC_MAX_INPUT	   3	/* type-ahead buffer size */
-#define _PC_NAME_MAX	   4	/* file name size */
-#define _PC_PATH_MAX	   5	/* pathname size */
-#define _PC_PIPE_BUF	   6	/* pipe size */
-#define _PC_NO_TRUNC	   7	/* treatment of long name components */
-#define _PC_VDISABLE	   8	/* tty disable */
-#define _PC_CHOWN_RESTRICTED 9	/* chown restricted or not */
+#define  _PC_LINK_MAX          1  /* link count */
+#define  _PC_MAX_CANON         2  /* size of the canonical input queue */
+#define  _PC_MAX_INPUT         3  /* type-ahead buffer size */
+#define  _PC_NAME_MAX          4  /* file name size */
+#define  _PC_PATH_MAX          5  /* pathname size */
+#define  _PC_PIPE_BUF          6  /* pipe size */
+#define  _PC_NO_TRUNC          7  /* treatment of long name components */
+#define  _PC_VDISABLE          8  /* tty disable */
+#define  _PC_CHOWN_RESTRICTED  9  /* chown restricted or not */
  
 
 /* 
@@ -147,8 +149,12 @@ typedef int gid_t;
 
 
 int execv (const char *path, char *const argv[] );
-int execve ( const char *path, char *const argv[], char *const envp[] );  
-// ...
+
+int 
+execve ( 
+    const char *path, 
+    char *const argv[], 
+    char *const envp[] );  
 
 
 
@@ -200,10 +206,12 @@ int unlink(const char *pathname);
 //  POSIX.1-2001.
 long sysconf (int name);
 
+
 // fsync,  fdatasync  -  synchronize  a  file's in-core state with storage device
 //4.3BSD, POSIX.1-2001.
 int fsync (int fd);
 int fdatasync (int fd);
+
 
 //fpathconf, pathconf - get configuration values for files
 //POSIX.1-2001.
@@ -255,39 +263,38 @@ ssize_t read_VC (int fd, const void *buf, size_t count);
 ssize_t write_VC (int fd, const void *buf, size_t count);
 
 
-
-//usam a lista de arquivos abertos do processo. p->Streams[i]
+// Usam a lista de arquivos abertos do processo. p->Streams[i]
 ssize_t read (int fd, const void *buf, size_t count);
 ssize_t write (int fd, const void *buf, size_t count);
 
 
 // See: http://man7.org/linux/man-pages/man2/pwrite.2.html
 ssize_t pread (int fd, void *buf, size_t count, off_t offset);
-ssize_t pwrite (int fd, const void *buf, size_t count, off_t offset);
 
-
-/*
-//http://kirste.userpage.fu-berlin.de/chemnet/use/info/libc/libc_12.html
-//This function returns 1 if filedes is a file descriptor associated with an open terminal device, and 0 otherwise. 
-int isatty (int filedes);
-char * ttyname (int filedes);
-*/
-
+ssize_t 
+pwrite (
+    int fd, 
+    const void *buf, 
+    size_t count, 
+    off_t offset );
 
 
 
-//#test
+int truncate (const char *path, off_t length);
+int ftruncate (int fd, off_t length); 
+
+
 char *getlogin (void);
 int setlogin(const char *name);
-
 char *__gethostname (void);
 
-//See: http://man7.org/linux/man-pages/man2/sethostname.2.html
 
+//See: http://man7.org/linux/man-pages/man2/sethostname.2.html
 int gethostname (char *name, size_t len);
 int sethostname (const char *name, size_t len);
 int getusername (char *name, size_t len);
 int setusername (const char *name, size_t len);
+
 
 char *ttyname(int fd);
 int ttyname_r(int fd, char *buf, size_t buflen);
@@ -305,9 +312,10 @@ int brk(void *addr);
 int execvp (const char *file, char *const argv[]);
 
 int 
-execvpe ( const char *file, 
-          char *const argv[],
-          char *const envp[] );
+execvpe ( 
+    const char *file, 
+    char *const argv[],
+    char *const envp[] );
 
 
 int chdir(const char *path);
@@ -330,35 +338,41 @@ void swab (const void *from, void *to, ssize_t n);
 off_t lseek(int fd, off_t offset, int whence);
 off_t tell(int fildes);
 
-int access(const char *pathname, int mode);
+
+int access (const char *pathname, int mode);
 
 
-int chown(const char *pathname, uid_t owner, gid_t group);
-int fchown(int fd, uid_t owner, gid_t group);
-int lchown(const char *pathname, uid_t owner, gid_t group);
+int chown (const char *pathname, uid_t owner, gid_t group);
+int fchown (int fd, uid_t owner, gid_t group);
+int lchown (const char *pathname, uid_t owner, gid_t group);
 
 
 // Compare
 // Not tested yet.
-int compar(char *s1, char *s2);
+int compar (char *s1, char *s2);
 
 // pega uma label em uma linha do arquivo
 // para comparar strings;
-int getlin(char s[]);
+int getlin (char s[]);
 
 int eq (char *a, char *b);
 
 
 pid_t 
-xxx_todo_int133 ( unsigned long ax, 
-                  unsigned long bx, 
-                  unsigned long cx, 
-                  unsigned long dx );
+xxx_todo_int133 ( 
+    unsigned long ax, 
+    unsigned long bx, 
+    unsigned long cx, 
+    unsigned long dx );
+
+
+
+char *getcwd(char *buf, size_t size);
+char *getwd(char *buf);
+char *get_current_dir_name(void);
 
 
 #endif /* _UNISTD_H */
-
-
 
 
 

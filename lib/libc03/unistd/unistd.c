@@ -5,36 +5,27 @@
  * 
  * History:
  *     2019 - Created by Fred Nora.
+ *     2020 - New functions.
  */
 
 
 #include <sys/types.h>  
 #include <sys/socket.h>
 #include <sys/mman.h>
-
 //#include <sys/stat.h>   
-
 #include <fcntl.h>
 #include <unistd.h>
-
 #include <limits.h>
-
-//#todo
-//nice() precisa disso.
 #include <sys/time.h>
 #include <sys/resource.h>
-
-
-//#test
 #include <pty.h>
 #include <utmp.h>
 #include <termios.h>
-
 #include <sys/utsname.h>
 
-//system calls.
-#include <stubs/gramado.h> 
 
+// System calls.
+#include <stubs/gramado.h> 
 
 
 
@@ -110,9 +101,10 @@ int execv (const char *path, char *const argv[] )
  */
 
 int 
-execve ( const char *path, 
-         char *const argv[], 
-         char *const envp[] )
+execve ( 
+    const char *path, 
+    char *const argv[], 
+    char *const envp[] )
 {
     int __ret = -1;
 
@@ -158,7 +150,7 @@ ssize_t read_ttyList (int fd, const void *buf, size_t count)
  *  fd present in a list calle ttyList[fd].
  */
 
-// o descritor seleciona uma tty em ttyList[]
+// O descritor seleciona uma tty em ttyList[]
 ssize_t write_ttyList (int fd, const void *buf, size_t count)
 {
     if (fd<0)
@@ -212,6 +204,7 @@ ssize_t read_VC (int fd, const void *buf, size_t count)
 
 }
 
+
 // write on virtual console!
 // range: 0 ~ 3
 ssize_t write_VC (int fd, const void *buf, size_t count)
@@ -232,7 +225,7 @@ ssize_t write_VC (int fd, const void *buf, size_t count)
  * read:
  *     Standard read() function.
  */
-//usam a lista de arquivos abertos do processo.
+// Usam a lista de arquivos abertos do processo.
 ssize_t read (int fd, const void *buf, size_t count){
 
     if (fd<0)
@@ -251,7 +244,7 @@ ssize_t read (int fd, const void *buf, size_t count){
  * write: 
  *     Standard write() function. 
  */
-// usam a lista de arquivos abertos do processo. 
+// Usam a lista de arquivos abertos do processo. 
 ssize_t write (int fd, const void *buf, size_t count){
 
     if (fd<0)
@@ -268,14 +261,44 @@ ssize_t pread (int fd, void *buf, size_t count, off_t offset)
 {
     debug_print ("pread: [TODO]\n");
     return -1;
+
+    /*   
+    // Credits: Serenity OS. 
+    // FIXME: This is not thread safe and should be implemented in the kernel instead.
+    off_t old_offset = lseek(fd, 0, SEEK_CUR);
+    lseek(fd, offset, SEEK_SET);
+    ssize_t nread = read(fd, buf, count);
+    lseek(fd, old_offset, SEEK_SET);
+    return nread;
+    */
 }
 
-ssize_t pwrite (int fd, const void *buf, size_t count, off_t offset)
+
+ssize_t 
+pwrite (
+    int fd, 
+    const void *buf, 
+    size_t count, 
+    off_t offset )
 {
     debug_print ("pread: [TODO]\n");
     return -1;
 }
 
+
+
+int truncate(const char *path, off_t length)
+{ 
+    debug_print ("truncate: [TODO]\n");
+    return -1;
+}
+
+
+int ftruncate(int fd, off_t length)
+{ 
+    debug_print ("ftrucate: [TODO]\n");
+    return -1;
+}
 
 
 /*
@@ -298,8 +321,10 @@ ssize_t pwrite (int fd, const void *buf, size_t count, off_t offset)
 // The exit() function causes normal process termination and the value
 // of status & 0xFF is returned to the parent.
 
-void exit (int status){
+void exit (int status)
+{
 
+    debug_print ("exit:\n");
 
     // #todo
     // Chamar rotina para finalizar a biblioteca.
@@ -340,7 +365,8 @@ void exit (int status){
 pid_t fork (void)
 {
     pid_t __ret = -1;
-    
+
+
     __ret = (pid_t) gramado_system_call( UNISTD_SYSTEMCALL_FORK, 
                         0, 0, 0 );
     
@@ -426,13 +452,26 @@ gid_t getgid (void)
 
 
 
-/*
-char* getwd(char* buf)
+char *getcwd(char *buf, size_t size)
 {
-    auto* p = getcwd(buf, PATH_MAX);
-    return p;
+    debug_print ("getcwd: [TODO]\n");
+    return (char *) 0;
 }
-*/
+
+
+char *getwd(char *buf)
+{
+    debug_print ("getwd: [TODO]\n");
+    return (char *) 0;
+}
+
+
+char *get_current_dir_name(void)
+{
+    debug_print ("get_current_dir_name: [TODO]\n");
+    return (char *) 0;
+}
+
 
 
 /*
@@ -453,6 +492,7 @@ void sysbeep()
 
 
 /*
+ *************************************
  * dup:
  *
  */
@@ -490,14 +530,15 @@ int dup3 (int oldfd, int newfd, int flags){
 }
 
 
-//see: sys/resource.h
+// See: sys/resource.h
 int getpriority (int which, id_t who)
 {
     debug_print ("getpriority: [TODO]\n");
     return -1;
 }
 
-//see: sys/resource.h
+
+// See: sys/resource.h
 int setpriority (int which, id_t who, int prio)
 {
     debug_print ("setpriority: [TODO]\n");
@@ -507,6 +548,7 @@ int setpriority (int which, id_t who, int prio)
 
 
 /*
+ ************************************
  * nice:
  *     Change process priority.
  */
@@ -686,6 +728,7 @@ void sync(void)
 	//todo: use syscall!!
 }
 
+
 // commit buffer cache to disk 
 int syncfs(int fd)
 {
@@ -715,12 +758,6 @@ int close (int fd){
 }
 
 
-/*
- **************************************************
- * pipe:
- *
- */
-
 int pipe2 ( int pipefd[2], int flags )
 {
     return (int) gramado_system_call ( 247, 
@@ -729,6 +766,12 @@ int pipe2 ( int pipefd[2], int flags )
                      (unsigned long) 0 );
 }
 
+
+/*
+ ****************************************
+ * pipe:
+ *
+ */
 
 int pipe (int pipefd[2])
 {
@@ -752,10 +795,11 @@ long pathconf (const char *pathname, int name)
 
 
 /*
+ **********************************
  * __gethostname:
  * 
  */
- 
+
 char __Hostname_buffer[64];
 char *__gethostname (void)
 {
@@ -990,7 +1034,8 @@ int ttyname_r(int fd, char *buf, size_t buflen)
 }
 
 
-//#todo
+// #todo
+// ??
 /*
 int ttyslot (void);
 int ttyslot (void)
@@ -1012,16 +1057,11 @@ int isatty (int fd)
 }
 
 
-/*
-int isatty(int fd)
-{
-    struct termios dummy;
-    return tcgetattr(fd, &dummy) == 0;
-}
-*/
-
-
-int getopt (int argc, char * const argv[], const char *optstring)
+int 
+getopt (
+    int argc, 
+    char *const argv[], 
+    const char *optstring )
 {
     debug_print ("getopt: [TODO]\n");
     return -1;
@@ -1087,6 +1127,8 @@ void *sbrk(intptr_t increment)
 */
 
 
+// #todo
+// This function use the variable 'environ'.
 int execvp (const char *file, char *const argv[])
 {
     debug_print ("execvep: [TODO]\n");
@@ -1162,7 +1204,7 @@ unsigned int sleep(unsigned int seconds)
 // exit deveria ser o wrapper para _exit ?
 void _exit (int status)
 {
-    //improvisando
+    debug_print ("_exit: [error=O]\n");
     exit(0);
 }
 
@@ -1541,10 +1583,6 @@ int umatch(char *s, char *p){
 
 
 
-
-
-
-
 // Compare
 // Not tested yet.
 int compar (char *s1, char *s2){
@@ -1631,10 +1669,11 @@ int __dup ( char **l, char s[] ){
  */
 
 pid_t 
-xxx_todo_int133 ( unsigned long ax, 
-            unsigned long bx, 
-            unsigned long cx, 
-            unsigned long dx )
+xxx_todo_int133 ( 
+    unsigned long ax, 
+    unsigned long bx, 
+    unsigned long cx, 
+    unsigned long dx )
 {
     pid_t Ret = 0;
 
@@ -1653,13 +1692,6 @@ xxx_todo_int133 ( unsigned long ax,
 //
 // End.
 //
-
-
-
-
-
-
-
 
 
 
