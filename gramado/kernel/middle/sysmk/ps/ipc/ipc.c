@@ -1,6 +1,7 @@
 /*
- * File: ipc/ipc.c 
+ * File: ps/ipc/ipc.c 
  *
+ * 
  * Description:
  *     IPC - ( Inter-Process Comunication ).    
  *     ring 0
@@ -24,12 +25,22 @@ int ipcStatus;
 
 
 
+/*
+ * ipc_send_to_ws:
+ *     Send a message to the ws if it is present.
+ * 
+ */
+
+// OUT:
+// <= 0 - The ws is present and we sent the message to it.
+// > 0  - The ws PID.
 
 int
-ipc_send_to_ws ( struct window_d *window, 
-                 int msg, 
-                 unsigned long long1, 
-                 unsigned long long2 )
+ipc_send_to_ws ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 )
 {
 
     struct process_d *__p;
@@ -42,36 +53,50 @@ ipc_send_to_ws ( struct window_d *window,
     // o ws recebeu a mensagem de teclado.
     // E é rápido.
 
-    if ( (void *) CurrentDesktop == NULL )
+    if ( (void *) CurrentDesktop == NULL ){
+        debug_print ("ipc_send_to_ws: CurrentDesktop\n");
         return -1;
+    }
         
   
     if ( CurrentDesktop->desktopUsed != 1 || 
          CurrentDesktop->desktopMagic != 1234 )
     {
+        debug_print ("ipc_send_to_ws: CurrentDesktop validation\n");
         return -1;
     }
 
     
-    // PID
-    // Ainda não sabemos se esse PID é válido.
-    if (CurrentDesktop->ws <= 0)
-        return -1;   
+    // The ws PID.
+    // #bugbug: Is it a valid PID ?
+    if (CurrentDesktop->ws <= 0){
+        debug_print ("ipc_send_to_ws: ws\n");
+        return -1;
+    }
     
-    
+    // The ws process.
     __p = (struct process_d *) processList[ CurrentDesktop->ws  ];
-                     
-    __p->control->window_list[ __p->control->tail_pos ] = window;
-    __p->control->msg_list[ __p->control->tail_pos ] = msg;
-    __p->control->long1_list[ __p->control->tail_pos ] = long1;
-    __p->control->long2_list[ __p->control->tail_pos ] = long2;
-        
+      
+    if ( (void *) __p == NULL ){
+        debug_print ("ipc_send_to_ws: __p\n");
+        return -1;
+    }
+      
+    __p->control->window_list[ __p->control->tail_pos ]  = window;
+    __p->control->msg_list[ __p->control->tail_pos ]     = msg;
+    __p->control->long1_list[ __p->control->tail_pos ]   = long1;
+    __p->control->long2_list[ __p->control->tail_pos ]   = long2;
+ 
+ 
     __p->control->tail_pos++;
     if ( __p->control->tail_pos >= 31 )
         __p->control->tail_pos = 0;
         
-        
-    //ok    
+ 
+    //
+    // Ok.
+    // 
+
     return 0;
 }
 

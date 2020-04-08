@@ -815,24 +815,23 @@ int kgws_mouse_scan_windows (void){
 
 
 
-
-
-
+// ?? Not used yet ??
 // Registrar um window server.
 int kgwsRegisterWindowServer ( int pid ){
 
     int Status = 0;
 
-
+    // ?? Where ??
     if ( kgws_status != 1 )
     {
-		Status = 1;
-		goto fail;
+        Status = 1;
+        goto fail;
+
     }else{
-		
-	    kgws_ws_PID = (int) pid;	
-	    kgws_ws_status = 1;
-		goto done;
+
+        kgws_ws_PID = (int) pid;
+        kgws_ws_status = 1;
+        goto done;
     };
 
 
@@ -844,28 +843,31 @@ done:
 }
 
 
+// kgws:
+// Send a message to the thread associated with the
+// window with focus.
 
 int
-kgws_send_to_controlthread_of_currentwindow ( struct window_d *window, 
-                                           int msg, 
-                                           unsigned long long1, 
-                                           unsigned long long2 )
+kgws_send_to_controlthread_of_currentwindow ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 )
 {
 
     struct window_d *w;
     struct thread_d *t;
 
-
-
+   //
+   // Window with focus.
+   //
 
     w = (void *) windowList[window_with_focus];
 
-    if ( (void *) w == NULL )
-    {
+    if ( (void *) w == NULL ){
         panic ("kgws_send_to_controlthread_of_currentwindow: w");
 
     }else{
-
         if ( w->used != 1 || w->magic != 1234 ){
             panic ("kgws_send_to_controlthread_of_currentwindow: w validation");
         }
@@ -896,16 +898,18 @@ kgws_send_to_controlthread_of_currentwindow ( struct window_d *window,
     
         
         
-        t->window_list[ t->tail_pos ] = window;
-        t->msg_list[ t->tail_pos ] = msg;
-        t->long1_list[ t->tail_pos ] = long1;
-        t->long2_list[ t->tail_pos ] = tmp_sc;
-        
+        t->window_list[ t->tail_pos ]  = window;
+        t->msg_list[ t->tail_pos ]     = msg;
+        t->long1_list[ t->tail_pos ]   = long1;
+        t->long2_list[ t->tail_pos ]   = tmp_sc;
+
+
         t->tail_pos++;
         if ( t->tail_pos >= 31 )
             t->tail_pos = 0;
     };
-    
+
+
     return 0;
 }
 
@@ -923,9 +927,17 @@ int register_ws_process ( pid_t pid ){
     }
 
     __gpidWindowServer = (pid_t) pid;
-    
+
+
     return 0;
 }
+
+
+//
+// End.
+//
+
+
 
 
 

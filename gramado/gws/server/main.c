@@ -298,6 +298,12 @@ __again:
 }
 
 
+/*
+ ********************************** 
+ * handle_ipc_message: 
+ * 
+ * 
+ */
 
 // internal
 // System ipc messages. (It's like a signal)
@@ -317,7 +323,6 @@ void handle_ipc_message (void){
     if ( message_buffer[1] == 0 )
          return;
 
-        
     // Send message to the window procedure.
     gwsProcedure ( (struct gws_window_d *) message_buffer[0], 
         (int) message_buffer[1], 
@@ -359,6 +364,7 @@ gwsProcedure (
             {
                 // #debug
                 case VK_F1:
+                    gde_debug_print("gwsProcedure: VK_F1\n");
                     gde_reboot ();
                     break;
                     

@@ -279,156 +279,138 @@ int KEYBOARD_SEND_MESSAGE ( unsigned char SC ){
     
     int save_pos = 0;
 
-    //
-    // Step1 - Pegar o scancode.
-    //
 
-    //O driver pegou o scancode e passou para a disciplina de linha 
-    //através de parâmetro.	
-	
-	scancode = SC;
-	
+    // Step1
+    // Pegar o scancode.
+    // O driver pegou o scancode e passou para a disciplina de linha 
+    // através de parâmetro.
+
+    scancode = SC;
+
 
 	// Obs: 
 	// Observe que daqui pra frente todas as rotinas poderiam 
 	// estar em user mode.
 
 
-    // Debug stuff.
+    // #debug.
     // Show the scancode if the flag is enabled.
 
     if (scStatus == 1){
         kprintf ("{%d,%x} ", scancode, scancode );
+        // Refresh screen?
     }
 
-    //
-    // Step 2 - Tratar as mensagens.
-    //
 
-    //Se a tecla for (liberada).
-	//Dá '0' se o bit de paridade for '0'.
-	
+    // Step 2
+    // Tratar as mensagens.
+
+
+    // Se a tecla for (liberada).
+    // Dá '0' se o bit de paridade for '0'.
+
     if ( (scancode & LDISC_KEY_RELEASED) == 0 )
     {
-		//Desativando o bit de paridade caso esteja ligado.
-		
+        // Desativando o bit de paridade caso esteja ligado.
+
         key = scancode;
         key &= LDISC_KEY_MASK;    
 
-		//Configurando se é do sistema ou não.
-		//@todo: Aqui podemos chamar uma rotina interna que faça essa checagem.
-		
-		switch (key)
-		{
+		// Configurando se é do sistema ou não.
+		// #todo: 
+		// Aqui podemos chamar uma rotina interna que faça essa checagem.
+
+        switch (key)
+        {
 			//Os primeiros 'case' é quando libera tecla do sistema.
 			//O case 'default' é pra quando libera tecla que não é do sistema.
 			
 			//left Shift liberado.
-			case VK_LSHIFT:
-				shift_status = 0;
-				message = MSG_SYSKEYUP;
-			    break;
+            case VK_LSHIFT: 
+                shift_status = 0;  message = MSG_SYSKEYUP;
+                break;
 
 			//Left Control liberado.
-			case VK_LCONTROL:
-				ctrl_status = 0;
-				message = MSG_SYSKEYUP;
-				break;
+            case VK_LCONTROL:
+                ctrl_status = 0;  message = MSG_SYSKEYUP;
+                break;
 
 			//left Winkey liberada.
-			case VK_LWIN:
-			    winkey_status = 0;
-                message = MSG_SYSKEYUP;
-				break;
+            case VK_LWIN:
+                winkey_status = 0;  message = MSG_SYSKEYUP;
+                break;
 
 			//Left Alt liberado.
             case VK_LMENU:
-				alt_status = 0;
-				message = MSG_SYSKEYUP;
-			    break;				
-			
+                alt_status = 0;  message = MSG_SYSKEYUP;
+                break;
+
 			//right winkey liberada.
-			case VK_RWIN:
-			    winkey_status = 0;
-                message = MSG_SYSKEYUP;
-				break;
+            case VK_RWIN:
+                winkey_status = 0;  message = MSG_SYSKEYUP;
+                break;
 
 			//control menu.
-			case VK_CONTROL_MENU:
+            case VK_CONTROL_MENU:
 			    //controlmenu_status = 0; //@todo
 			    message = MSG_SYSKEYUP;
-			    break;
+                break;
 
             //right control liberada.
-			case VK_RCONTROL:
-				ctrl_status = 0;
-				message = MSG_SYSKEYUP;
-				break;
-				
+            case VK_RCONTROL:
+                ctrl_status = 0;  message = MSG_SYSKEYUP;
+                break;
+
 			//right Shift liberado.
-			case VK_RSHIFT:
-				shift_status = 0;
-				message = MSG_SYSKEYUP;
-			    break;
+            case VK_RSHIFT:
+                shift_status = 0;  message = MSG_SYSKEYUP;
+                break;
 
-			//Funções liberadas.
-            case VK_F1:
-            case VK_F2:
-            case VK_F3:
-            case VK_F4:
-            case VK_F5:
-            case VK_F6:
-            case VK_F7:
-            case VK_F8:
-            case VK_F9:
-            case VK_F10:
-            case VK_F11:
-            case VK_F12:
-			    message = MSG_SYSKEYUP;
-			    break;
+            // Funções liberadas.
+            case VK_F1: case VK_F2: case VK_F3: case VK_F4:
+            case VK_F5: case VK_F6: case VK_F7: case VK_F8:
+            case VK_F9: case VK_F10: case VK_F11: case VK_F12:
+                message = MSG_SYSKEYUP;
+                break;
 
-			//...
-				
-			//A tecla liberada NÃO é do sistema.
-			default:
-			    message = MSG_KEYUP;
-				break;
-		};
+			// ...
 
-		//Selecionando o char para os casos de tecla liberada.
+			// A tecla liberada NÃO é do sistema.
+            default:
+                message = MSG_KEYUP;
+                break;
+        };
+
+		// Selecionando o char para os casos de tecla liberada.
 
 		// Analiza: Se for tecla normal, pega o mapa de caracteres apropriado.
 		// minúscula
 		// Nenhuma tecla de modificação ligada.
-        if (message == MSG_KEYUP){
-            ch = map_abnt2[key];
-            goto done;
-        }
+        if (message == MSG_KEYUP)    
+        { ch = map_abnt2[key]; }
 
         // Analiza: Se for do sistema usa o mapa de caracteres apropriado. 
         // Normal.
-        if (message == MSG_SYSKEYUP){
-            ch = map_abnt2[key];
-        }
+        if (message == MSG_SYSKEYUP) 
+        { ch = map_abnt2[key]; }
 
-
-        //Nothing.
-		goto done;
+        // Nothing.
+        goto done;
     };
 
-	
-	// * Tecla (pressionada) ...........	
-	if ( (scancode & LDISC_KEY_RELEASED) != 0 )
-	{ 
-		key = scancode;
-		key &= LDISC_KEY_MASK; //Desativando o bit de paridade caso esteja ligado.
+
+    // * Tecla (pressionada) ...........
+    if ( (scancode & LDISC_KEY_RELEASED) != 0 )
+    { 
+        key = scancode;
+        key &= LDISC_KEY_MASK; //Desativando o bit de paridade caso esteja ligado.
 
 		//O Último bit é zero para key press.
 		//Checando se é a tecla pressionada é o sistema ou não.
 		//@todo: Aqui podemos chamar uma rotina interna que faça essa checagem.
 		
-		switch (key)
-		{
+        switch (key)
+        {
 			//back space será tratado como tecla normal
 			
 			//@todo: tab,
@@ -439,37 +421,32 @@ int KEYBOARD_SEND_MESSAGE ( unsigned char SC ){
 			    //muda o status do capslock não importa o anterior.
 				if (capslock_status == 0)
 				{ 
-				    capslock_status = 1; 
-					message = MSG_SYSKEYDOWN; 
-					break; 
-				};
+                    capslock_status = 1; message = MSG_SYSKEYDOWN; 
+                    break; 
+				}
 				if (capslock_status == 1)
 				{ 
-				    capslock_status = 0; 
-					message = MSG_SYSKEYDOWN; 
-					break; 
-				};
+                    capslock_status = 0; message = MSG_SYSKEYDOWN; 
+                    break; 
+				}
 				break; 
 
 			//Left shift pressionada.
 			case VK_LSHIFT:
 			//case KEY_SHIFT:
-				shift_status = 1;
-				message = MSG_SYSKEYDOWN;
-			    break;
+                shift_status = 1; message = MSG_SYSKEYDOWN;
+                break;
 
 			//left control pressionada.
 			//case KEY_CTRL:
-			case VK_LCONTROL:
-				ctrl_status = 1;
-				message = MSG_SYSKEYDOWN;
-				break;
+            case VK_LCONTROL:
+                ctrl_status = 1; message = MSG_SYSKEYDOWN;
+                break;
 
 			//Left Winkey pressionada.
-			case VK_LWIN:
-			    winkey_status = 1;
-				message = MSG_SYSKEYDOWN;
-				break;
+            case VK_LWIN:
+                winkey_status = 1; message = MSG_SYSKEYDOWN;
+                break;
 
             //left Alt pressionada.
             case VK_LMENU:
@@ -488,95 +465,73 @@ int KEYBOARD_SEND_MESSAGE ( unsigned char SC ){
             //@todo: Control menu.
             
 			//Right control pressionada.
-			case VK_RCONTROL:
-				ctrl_status = 1;
-				message = MSG_SYSKEYDOWN;
-				break;
+            case VK_RCONTROL:
+                ctrl_status = 1; message = MSG_SYSKEYDOWN;
+                break;
 
 			//Right shift pressionada.
-			case VK_RSHIFT:
-				shift_status = 1;
-				message = MSG_SYSKEYDOWN;
-			    break;
+            case VK_RSHIFT:
+                shift_status = 1; message = MSG_SYSKEYDOWN;
+                break;
+
+            case VK_F1: case VK_F2: case VK_F3: case VK_F4:
+            case VK_F5: case VK_F6: case VK_F7: case VK_F8:
+            case VK_F9: case VK_F10: case VK_F11: case VK_F12:
+                message = MSG_SYSKEYDOWN;
+                break;
 
 
-            case VK_F1:
-            case VK_F2:
-            case VK_F3:
-            case VK_F4:
-            case VK_F5:
-            case VK_F6:
-            case VK_F7:
-            case VK_F8:
-            case VK_F9:
-            case VK_F10:
-            case VK_F11:
-            case VK_F12:
-			    message = MSG_SYSKEYDOWN;
-			    break;
+            // Num Lock.
+            case VK_NUMLOCK:
+                // Muda o status do numlock não importa o anterior.
+                if (numlock_status == 0)
+                {
+                    numlock_status = 1; message = MSG_SYSKEYDOWN;
+                    break;
+                }
+                if (numlock_status == 1)
+                { 
+                    numlock_status = 0; message = MSG_SYSKEYDOWN; 
+                    break; 
+                }
+                break;
 
-
-			//Num Lock.	
-		    case VK_NUMLOCK:
-			    //muda o status do numlock não importa o anterior.
-				if (numlock_status == 0)
-				{
-		            numlock_status = 1;
-					message = MSG_SYSKEYDOWN;
-					break;
-				};
-				if (numlock_status == 1)
-				{ 
-				    numlock_status = 0;
-                    message = MSG_SYSKEYDOWN; 					
-					break; 
-				};
-			    break;
-				
-			//Scroll Lock.	
-		    case VK_SCROLL:
-			    //muda o status do numlock não importa o anterior.
-				if(scrolllock_status == 0)
-				{
-		            scrolllock_status = 1;
-					message = MSG_SYSKEYDOWN;
-					break;
-				};
-				if(scrolllock_status == 1){ 
-				    scrolllock_status = 0;
-                    message = MSG_SYSKEYDOWN; 
-					break; 
-				};
-			    break;
+            // Scroll Lock.
+            case VK_SCROLL:
+                // Muda o status do numlock não importa o anterior.
+                if (scrolllock_status == 0)
+                {  
+                    scrolllock_status = 1; message = MSG_SYSKEYDOWN;
+                    break;
+                }
+                if (scrolllock_status == 1)
+                { 
+                    scrolllock_status = 0; message = MSG_SYSKEYDOWN; 
+                    break; 
+                };
+                break;
 
             //...
 
-			//A tecla pressionada não é do sistema.
-			
-			default:
-			    message = MSG_KEYDOWN;
-				//printf("keyboard debug: default: MSG_KEYDOWN\n");
-				break;
-		};
+            // A tecla pressionada não é do sistema.
+            default:
+                // printf("keyboard debug: default: MSG_KEYDOWN\n");
+                message = MSG_KEYDOWN;
+                break;
+        };
 
 		//uma tecla normal foi pressionada.
 		//mensagem de digitação.	
-		if (message == MSG_KEYDOWN)
-		{
-            //maiúsculas.			
-			if (capslock_status == 1)
-			{
-			    ch = shift_abnt2[key];
-			    goto done;
-			}
+        if (message == MSG_KEYDOWN)
+        {
+            // Maiúsculas.
+            if (capslock_status == 1)
+            { ch = shift_abnt2[key]; goto done; }
 
-			//minúsculas.
-			if (capslock_status == 0)
-			{
-		        ch = map_abnt2[key];
-			    goto done;
-			};
-			
+            // Minúsculas.
+            if (capslock_status == 0)
+            { ch = map_abnt2[key]; goto done; }
+
 			//#todo
 			// fomos avisados que se trata de uma scape sequence para teclas extras
 			// do teclado estendido. Temos que pegar o scancode de outro mapa.
@@ -589,62 +544,37 @@ int KEYBOARD_SEND_MESSAGE ( unsigned char SC ){
 			//}
 			
             //Nothing.
-		};
+        };
 		
-		//uma tecla do sistema foi pressionada.
-		if (message == MSG_SYSKEYDOWN)
-		{
-			ch = map_abnt2[key];
-            goto done;
-		};		
-		
-		//Nothing.
-		goto done;
-	};//fim do else
+		// Uma tecla do sistema foi pressionada.
+        if (message == MSG_SYSKEYDOWN)
+        { 
+            ch = map_abnt2[key]; 
+        }
+
+        // Nothing.
+        goto done;
+        
+    };  // Fim do else
+
 
     //
-	// ## Done ##
-	//
-	
-	// Para finalizar, vamos enviar a mensagem para fila certa.
-	
+    // ## Done ##
+    //
+
+
+	// Para finalizar, 
+	// vamos enviar a mensagem para fila certa.
+    
 done:
 
 	//
 	// Control + Alt + Del.
 	//
 
-		//Opções:
-		//@todo: Chamar a interface do sistema para reboot.
-		//@todo: Opção chamar utilitário para gerenciador de tarefas.
-		//@todo: Abre um desktop para operações com usuário, senha, logoff, 
-		// gerenciador de tarefas.
 
-		//Chamando o módulo /sm diretamente.
-		//mas não é o driver de teclado que deve chamar o reboot.
-		//o driver de teclado deve enviar o comando para o tty, /sm,
-		//e o tty chama a rotina de reboot do teclado.
-		//Uma mensagem de reboot pode ser enviada para o procedimento do sistema.
-		//Pois o teclado envia mensagens e não trata as mensagens.
-	
-	    //Um driver não deve chamar rotinas de interface. como as rotians de serviço.	
-		//A intenção é que essa mensagem chegue no procedimento do sistema.
-		//Porem o sistema tambem deve saber quem está enviando esse pedido.@todo.
-		//@todo: podemos O reboot pode ser feito através de um utilitário em user mode.
-			
-	
-		//Uma opção aqui, é enviar para o aplicativo uma mensagem de reboot.
-		//como o aplicativo não trata esse tipo de mensagem ele apenas reecaminha 
-		//para o procedimentod e janelas do sistema.
-	
-		
-		//system_procedure ...
-		// @todo: Chamar o aplicativo REBOOT.BIN.
 
-		// #todo: 
-		// Chamar outra rotina de reboot.
-		// Se o driver estiver em user mode, tem que fazer uma chamada ao sistema.
-
+    // control + alt + del.
     if ( (ctrl_status == 1) && (alt_status == 1) && (ch == KEY_DELETE) )
     {
         // reboot ();
@@ -753,27 +683,24 @@ done:
 		// Como o scancode é um char, precisamos converte-lo em unsigned long.
 
 
-        
-        
-        // #todo
-        // Se o ws está rodando, então mandaremos a mensagem para 
-        // a a fila de mensagem dele.
-        
-        // #isso funcionou.
-        // o ws recebeu a mensagem de teclado.
-        // E é rápido.
+
 
     //
     // ws
     // 
+
+    // Se o ws está rodando, então mandaremos a mensagem para 
+    // a fila de mensagem dele.
+    // #isso funcionou.
+    // O ws recebeu a mensagem de teclado, e é rápido.
     
     // Tentamos mandar a mensagem para ws, 
     // se der certo a gente retorna,
     // se não der certo então enviaremos para
     // a thread de controle da janela com o foco
     // ou para um procedimento aqui nesse documento.
-
-
+    // See: ps/ipc/ipc.c
+    
     msg_status = (int) ipc_send_to_ws ( (struct window_d *) w,
                            (int) message, 
                            (unsigned long) ch,
@@ -781,9 +708,10 @@ done:
         
     // Se a mensagem foi enviada para o ws,
     // então podemos retornar.
-    if ( msg_status == 0 )
+    if ( msg_status == 0 ){
+        debug_print ("KEYBOARD_SEND_MESSAGE: >>>> to ws\n");        
         return 0;
-            
+    }
  
         
    // #importante
@@ -808,35 +736,45 @@ done:
 
             switch (ch){
 
-                case VK_F5:
-                case VK_F6:
-                case VK_F7:
+                // Handle the message.
+                case VK_F5: 
+                case VK_F6: 
+                case VK_F7: 
                 case VK_F8:
-                    
-                    // Handle the message.
-                    __local_ps2kbd_procedure (  w, 
+                    __local_ps2kbd_procedure ( w, 
                         (int) message, 
                         (unsigned long) ch, 
                         (unsigned long) tmp_sc );
+                    debug_print ("KEYBOARD_SEND_MESSAGE: >>>> to system procedure\n");        
                     return 0;
                     break;
-                     
-                default:   
+
+                // kgws:
+                // Send a message to the thread associated with the
+                // window with focus.
+                // See: top/ws/kgws.c
+                default:
                     kgws_send_to_controlthread_of_currentwindow ( w,
                         (int) message, 
                         (unsigned long) ch, 
                         (unsigned long) tmp_sc );
+                    debug_print ("KEYBOARD_SEND_MESSAGE: >>>> to wwf\n");        
                     return 0; 
                     break;
             }
             break;
                 
-            //para todas as outras mensagens,
+        // Para todas as outras mensagens.
+        // kgws:
+        // Send a message to the thread associated with the
+        // window with focus.
+        // See: top/ws/kgws.c
         default:
             kgws_send_to_controlthread_of_currentwindow ( w,
-                    (int) message, 
-                    (unsigned long) ch, 
-                    (unsigned long) tmp_sc );
+                (int) message, 
+                (unsigned long) ch, 
+                (unsigned long) tmp_sc );
+            debug_print ("KEYBOARD_SEND_MESSAGE: >>>> to wwf\n");
             return 0;
             break;
     };

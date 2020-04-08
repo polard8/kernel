@@ -205,6 +205,14 @@ void abnt2_keyboard_handler (void){
     
 //__thread:
 
+    // #bugbug
+    // Não é a thread atual e sim a thread
+    // da janela com o foco de entrada.
+    // Porém quando estivermos usando o gws,
+    // a mensagem vai para ele.
+    // Isso aqui era um jeito da thread atual pegar o input ?
+    // Esta errado.
+
     struct thread_d *t;
     
     t = (void *) threadList[current_thread];
@@ -263,10 +271,11 @@ sc_again:
      }
 
 
-    //#obs:
-    //o scancode é enviado para a rotina,
-    //mas ela precisa conferir ke0 antes de construir a mensagem,
-    //para assim usar o array certo.
+    // #obs:
+    // O scancode é enviado para a rotina,
+    // mas ela precisa conferir ke0 antes de construir a mensagem,
+    // para assim usar o array certo.
+    // See: ws/ps2kbd.c
 
     KEYBOARD_SEND_MESSAGE (__raw);
 
