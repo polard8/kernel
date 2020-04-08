@@ -1,7 +1,8 @@
 /*
- * File: mk/pc/thread.h
+ * File: thread.h
  *
- * Descrição:
+ * 
+ * Description:
  *     Header para threads.
  *     Pertence ao módulo microkernel, dentro do kernel.
  *
@@ -9,7 +10,10 @@
  *     2015 - Created by Fred Nora.
  *     2018 - Revision.
  */
- 
+
+
+#define THREAD_MAGIC  1234
+
 
 
 //O primeiro índice na contagem das threads do sistema e o
@@ -27,15 +31,12 @@
 
   
 // Identificadores de thread.
-#define IDLE_ID  0 
-#define IDLE  IDLE_ID 
-#define THREAD_IDLE  IDLE_ID  
-//... 
- 
- 
-#define THREAD_MAGIC 1234
- 
- 
+#define IDLE_ID        0 
+#define IDLE           IDLE_ID 
+#define THREAD_IDLE    IDLE_ID  
+// ... 
+
+
  
 /*
  * Globais.
@@ -193,12 +194,12 @@ typedef enum {
  */
 
 struct thread_d 
-{	
-	object_type_t objectType;
-	object_class_t objectClass;
+{
+    object_type_t objectType;
+    object_class_t objectClass;
 	
 	//object control
-	struct object_d *object;
+    struct object_d *object;
 
 	
 	//call back //d
@@ -207,22 +208,23 @@ struct thread_d
 	// Identificadores.
 	//
 	
-	int tid;                //c, thread ID.   	
-	int ownerPID;           //ID do processo ao qual o thread pertencer. 
-	//int ownerPPID;        //Acho que isso não é necessário !! 
-	
+    int tid;                //c, thread ID.   	
+    int ownerPID;           //ID do processo ao qual o thread pertencer. 
+
+
 	//#importante:
 	//Isso pode ser unsigne long mesmo.
-	unsigned long used;     
+	// #todo: Change to int.
+    unsigned long used;     
     unsigned long magic;    
-	
-    //
-	// type: 
-	// Tipo de tarefa.
+
+
+    // type: 
+    // Tipo de tarefa.
     // (SYSTEM, PERIODIC, RR, IDLE).	
-	thread_type_t type;	
-	
-	thread_state_t state;    //flag, Estado atual da tarefa. ( RUNNING, DEAD ...).	
+    thread_type_t type;
+
+    thread_state_t state;    //flag, Estado atual da tarefa. ( RUNNING, DEAD ...).	
 
 
 	// flag. 
@@ -275,7 +277,8 @@ struct thread_d
 	//...
 	
 	//
-	// ORDEM: O que segue é referenciado durante o processo de task switch.
+	// ORDEM: 
+	// O que segue é referenciado durante o processo de task switch.
 	//
 	
 	
@@ -328,32 +331,34 @@ struct thread_d
 	//continua o contexto ...	
 	
 	//O endereço incial, para controle.
-	unsigned long initial_eip;	
-	
+    unsigned long initial_eip;
+
 	//#todo
 	//isso é muito necessário.
-	struct i386tss_d *tss;
+    struct i386tss_d *tss;
 	
 	//
-	// ORDEM: O que segue é referenciado durante o processo de scheduler.
+	// ORDEM: 
+	// O que segue é referenciado durante o processo de scheduler.
 	//
-	
-	//poderia ser base_priority e dinamic_priority.
-	unsigned long base_priority;    //Prioridade básica.
-	unsigned long priority;         //Prioridade dinâmica.
+
+	// Poderia ser base_priority e dinamic_priority.
+    unsigned long base_priority;    //Prioridade básica.
+    unsigned long priority;         //Prioridade dinâmica.
 	
 	
 	
 	/*
 	 * preempted:
 	 *     flag ~ Sinaliza que uma tarefa pode ou não sofrer preempção.
-     *	   Uma tarefa de menor prioridade pode deixar o estado running 
+     *     Uma tarefa de menor prioridade pode deixar o estado running 
 	 * para assumir o estado ready em favor de uma tarefa de maior prioridade
 	 * que assumirá o estado running.
 	 * @todo: isso pode ser int, bool ou char.
 	 */
-	unsigned long preempted;
-	
+
+    unsigned long preempted;
+
 	//
 	// ORDEM: O que segue é referenciado durante o processo de dispatch.
 	//
@@ -362,20 +367,21 @@ struct thread_d
 	 * save ~ Sinaliza que a tarefa teve o seu contexto salvo.
 	 @todo: isso pode ser int, bool ou char.
 	 */
-	unsigned long saved;
-	
+
+    unsigned long saved;
+
 	
 	/*
 	 * HEAP and STACK:
      * @todo: Usar a estrutura. 
 	 */
 	//struct heap_d *heap;
-	
-	unsigned long Heap;
-	unsigned long Stack;
-	unsigned long HeapSize;
-	unsigned long StackSize;
-	
+
+    unsigned long  Heap;
+    unsigned long  Stack;
+    unsigned long  HeapSize;
+    unsigned long  StackSize;
+
 
 	//endereço de um array contendo ponteiros para variso serviços
 	//que a thread pode usar.
@@ -500,16 +506,16 @@ struct thread_d
 	//
 	// tty support
 	//
-	
-	// ID da tty usada.
-	int tty_id;
-	
 
-    //process.
-	//À qual processo pertence a thread.
-	struct process_d *process; 
+    // ID da tty usada.
+    int tty_id;
 
-	
+    // process.
+    // À qual processo pertence a thread.
+    // #bugbug: Isso já existe no início da estrutura.
+    struct process_d *process; 
+
+
 	/*
 	 * Janela e procedimento.
 	 */
@@ -518,7 +524,7 @@ struct thread_d
 	
 	unsigned long procedure; //Endereço do procedimento de janela da tarefa. 
 	//unsigned long control_menu_procedure; //procedimento do control menu.
-	
+
 	
 	// #ORDEM: 
 	// O que segue é referenciado durante as trocas de mensagens.
@@ -528,38 +534,41 @@ struct thread_d
     // Single message.
     //
 
-	
-	//4 argumentos padrão;
-	struct window_d *window;    //arg1.
-	int msg;                    //arg2.
-	unsigned long long1;        //arg3.
-	unsigned long long2;        //arg4.
-	
-	//argumentos extra usados pelos drivers e servidores.
-	unsigned long long3;
-	unsigned long long4;
-	unsigned long long5;
-	unsigned long long6;
-	unsigned long long7;
-	unsigned long long8;
-	unsigned long long9;
-	unsigned long long10;
-	unsigned long long11;
-	unsigned long long12;
-	//...
-	
-	int newmessageFlag;         //flag avisando que tem nova mensagem.
-	
-	
-	
-	
-	struct window_d *window_list[32];
-	int msg_list[32];
-	unsigned long long1_list[32];
-	unsigned long long2_list[32];
-	int tail_pos;
-	int head_pos;
-	
+    // 4 argumentos padrão;
+    struct window_d *window;    //arg1.
+    int msg;                    //arg2.
+    unsigned long long1;        //arg3.
+    unsigned long long2;        //arg4.
+
+    // Argumentos extra usados pelos drivers e servidores.
+    unsigned long long3;
+    unsigned long long4;
+    unsigned long long5;
+    unsigned long long6;
+    unsigned long long7;
+    unsigned long long8;
+    unsigned long long9;
+    unsigned long long10;
+    unsigned long long11;
+    unsigned long long12;
+    // ...
+
+    // Flag avisando que tem nova mensagem.
+    int newmessageFlag;         
+
+
+    //
+    // Queue. (list)
+    //
+
+    struct window_d *window_list[32];
+    int msg_list[32];
+    unsigned long long1_list[32];
+    unsigned long long2_list[32];
+    int tail_pos;
+    int head_pos;
+
+
     //
     // Message Queue
     //
@@ -570,6 +579,14 @@ struct thread_d
     unsigned long MsgQueue[32];
     int MsgQueueHead;  //retira. 
     int MsgQueueTail;  //coloca.
+
+
+
+    // Quando um processo só pode receber mensagens de um 
+    // determinado processo. Ou de qualquer um.
+    // Ex: ANY=-1, PID ...
+    // pid_t receive_from_pid;
+
 
 
 
@@ -669,9 +686,12 @@ int conductorIndex;
 
 
 
-//
-// Thread list.
-//
+/*
+ * threadList:
+ * 
+ * 
+ * 
+ */
 
 // #Atenção
 // Esse é a lista principal. Contém todas as threads.

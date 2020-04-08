@@ -1,7 +1,10 @@
 /*
- * File: mk/ps/process.h
+ * File: process.h
  *
- * Descri��o:
+ * #todo: Redo this comments here.
+ * 
+ * 
+ * Description:
  *     Header principal para as rotinas de gerenciamento de processos.
  *
  * Classes de processos (tipo de n�vel):
@@ -29,11 +32,15 @@
  * medir quantidade de opera��es de leitura e sa�da.
  * +name, pathname e cmd(command line).
  *
- * Hist�rico:
- *     Vers�o: 1.0, 2015 - Esse arquivo foi criado por Fred Nora.
- *     Vers�o: 1.0, 2016 - Aprimoramento geral das rotinas b�sicas.
- *     ...
+ *
+ * History:
+ *     2015 - Created by Fred Nora.
+ *     2016 ~ 2020 New routines.
  */
+
+
+#define PROCESS_MAGIC  1234
+
 
 
 //#todo;
@@ -48,9 +55,7 @@ struct process_d *xxxClonedProcess;
 #define gramado_pid_t pid_t
 
 
-//Limite para cria��o de processos. 
-#define PROCESS_COUNT_MAX 1024   
- 
+
 //
 //#define FIRST_PROCESS processList[0]
 //#define LAST_PROCESS  processList[PROCESS_COUNT_MAX-1] 
@@ -107,11 +112,9 @@ struct process_d *xxxClonedProcess;
 #define USER_BASE_PID 100    
  
  
-/*
- * Constantes para n�veis de prioridade.
- */
- 
-//Defini��es principais. 
+// Priority levels.
+// Used by processes and threads.
+
 #define PRIORITY_LOW4      1  //4
 #define PRIORITY_LOW3      2  //3
 #define PRIORITY_LOW2      3  //2
@@ -122,11 +125,11 @@ struct process_d *xxxClonedProcess;
 #define PRIORITY_HIGH3     8  //3
 #define PRIORITY_HIGH4     9  //4
 
-//Defini��es secund�rias.
 #define PRIORITY_LOW        PRIORITY_LOW1
 #define PRIORITY_MIN        PRIORITY_LOW4
 #define PRIORITY_HIGH       PRIORITY_HIGH1 
 #define PRIORITY_MAX        PRIORITY_HIGH4
+
 
 
 
@@ -174,8 +177,7 @@ struct process_d *xxxClonedProcess;
 //N�mero total de slots para cria��o de processo.
 //@todo: deletar, definido em threads. ??? 
 #define NUMERO_TOTAL_DE_SLOTS 256   
- 
-#define PROCESS_MAGIC 1234
+
  
 /*
  * Globais.
@@ -251,8 +253,11 @@ struct process_info_d
     //env variables?
 };  
 */
-  
+
+
+
 /*
+ *********************************************
  * process_d: 
  *
  *    PCB - Process Control Block.
@@ -290,43 +295,28 @@ struct process_d
     object_type_t objectType;
     object_class_t objectClass;
 
-  
-    struct object_d *object;  //Talvez n�o.
-
+    struct object_d *object;
 
     int used;  
     int magic; 
-    
+
 
     // Arquivos abertos.
     // Objetos abertos pelo processo.
     unsigned long Objects[64];
 
 
-
-
-	//
 	//  Identificadores.
-	//
- 
 	//PID, (Process Identification), 
-	//N�mero que identifica unicamente um processo.	
 	//PPID, (Parent Process Identification),
-	//N�mero de identifica��o do processo pai.	
 	//UID, (User Identification),
-	//N�mero de identifica��o do usu�rio que criou o processo.	
 	//GID, (Group Identification),
-	//N�mero do grupo do dono do processo.
 
-    pid_t pid;
-    pid_t ppid;
+    pid_t  pid;
+    pid_t  ppid;
+    uid_t  uid;
+    gid_t  gid;
 
-    //
-    // Privilégios.
-    //
-
-    uid_t uid;   
-    gid_t gid;
 
 	// State.
 	// flag ?
@@ -344,8 +334,8 @@ struct process_d
 	// +cmd      (linha de comando ex:EXEM ) 
 
 	//char *pathname;              //@todo: Incluir.	
-	char *cmd;                     //Nome curto que serve de comando.
-	char *name;                    //Nome do processo. 
+    char *cmd;                     //Nome curto que serve de comando.
+    char *name;                    //Nome do processo. 
 	//unsigned long name_address;    //@todo: n�o usar isso.
 
     //#test
@@ -393,8 +383,8 @@ struct process_d
 	//janela de terminal para o aplicativo.
 	//APPMODE_WINDOW = O kernel n�o cria estrutura de terminal para 
 	//esse processo e o processo criar� janelas.
-	
-	appmode_t appMode;
+
+    appmode_t appMode;
 
 	//
 	//    ****  Banco de dados ****
@@ -411,13 +401,13 @@ struct process_d
 	//
 
 	//Acesso ao banco de dados do kernel. (n�o � uma lista).
-	struct bank_d *kdb;
+    struct bank_d *kdb;
 
 	//Lista de acessos � bancos de contas conjuntas.
-	struct bank_d *gdbListHead;
+    struct bank_d *gdbListHead;
 
 	//Lista de acessos � bancos de contas pessoais.
-	struct bank_d *ldbListHead;
+    struct bank_d *ldbListHead;
 
 
 	//
@@ -425,16 +415,16 @@ struct process_d
 	//
 
 	//Lista de contas conjuntas que o processo tem.
-	struct aspace_d *aspaceSharedListHead;
+    struct aspace_d *aspaceSharedListHead;
 
 	//Lista de contas pessoais que o processo tem.
-	struct aspace_d *aspacePersonalListHead;
+    struct aspace_d *aspacePersonalListHead;
 
 	//Lista de contas conjuntas que o processo tem.
-	struct dspace_d *dspaceSharedListHead;
+    struct dspace_d *dspaceSharedListHead;
 
 	//Lista de contas pessoais que o processo tem.
-	struct dspace_d *dspacePersonalListHead;
+    struct dspace_d *dspacePersonalListHead;
 
 	//Testing...
 	//Process Page Table. (PPT)
@@ -457,26 +447,26 @@ struct process_d
 	// deve ser atribu�do a ele, mesmo antes de mapear os frames desse 
 	// framepool em alguma pagetable do page directory do processo.
 
-	struct frame_pool_d *framepoolListHead;
+    struct frame_pool_d *framepoolListHead;
 
 
 	//Quantidade de mem�ria f�sica usada pelo processo que n�o pode ser compartilhada
 	//com outros processos. (em KB).
-	unsigned long private_memory_size;
+    unsigned long private_memory_size;
 
 	//Quantidade de mem�ria f�sica usada pelo processo que pode ser compartilhada
 	//com outros processos. (em KB).
-	unsigned long shared_memory_size;
+    unsigned long shared_memory_size;
 
 	//Quantidade de mem�ria usada por um processo em determinado espa�o de tempo.
 	// workset = (private + shared);
-	unsigned long workingset_size;
-	unsigned long workingset_peak_size;	
+    unsigned long workingset_size;
+    unsigned long workingset_peak_size;	
 
 
 	//Qualquer pagefault deve ser registrada na estrutura do processo corrente.
 	//?? n�o seria na thread ??
-	unsigned long pagefaultCount;
+    unsigned long pagefaultCount;
 	//...
 
 	//ticks running ..
@@ -553,11 +543,11 @@ struct process_d
 	// Tamanho da imagem do processo.
 	// Quantas p�ginas foram usadas por essa imagem. ImageSize/PageSize
 	 
-	unsigned long Image; 
-	unsigned long ImagePA; 
-	
-	unsigned long ImageSize;      
-	unsigned long PagesPerImage; 
+    unsigned long Image; 
+    unsigned long ImagePA; 
+
+    unsigned long ImageSize;      
+    unsigned long PagesPerImage; 
 
 
     // Usado durante fork().
@@ -569,7 +559,7 @@ struct process_d
 
 	//#todo: estrutura com informa��es sobre a imagem do processo.
 	//see: pc/image.h
-	struct image_info_d *image_info;
+    struct image_info_d *image_info;
 	
 	//#test
 	//struct page_control_t *page_list_head;
@@ -801,17 +791,17 @@ struct process_d
 	//   ## IPC ##
 	//
 
-	// Signal	
-	unsigned long signal;
-	unsigned long signal_mask;
+    // Signal	
+    unsigned long signal;
+    unsigned long signal_mask;
 
-    //#bugbug
-    //deleta isso.
-	//Argumentos para o procedimento de janela.
-	//struct window_d *window;    //arg1.
-	//int msg;                    //arg2.
-	//unsigned long long1;        //arg3.
-	//unsigned long long2;        //arg4.
+
+
+    // Quando um processo só pode receber mensagens de um 
+    // determinado processo. Ou de qualquer um.
+    // Ex: ANY=-1, PID ...
+    // pid_t receive_from_pid;
+
 
 	// di�logo com o processo.
 	// importante no caso de servidores e drivers
@@ -860,7 +850,10 @@ struct process_d *CurrentProcess;    //Current.
  *     Essa � a thread job list, ou job queue.
  *     Armazena todos os processos do sistema.
  *     os que est�o residentes na memoria ram e as que n�o est�o.
- */  
+ */ 
+
+// Max number of processes.
+#define  PROCESS_COUNT_MAX  1024    
 
 unsigned long processList[PROCESS_COUNT_MAX];
 
