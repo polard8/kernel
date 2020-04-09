@@ -128,10 +128,12 @@ gwsProcedure (
     unsigned long long1, 
     unsigned long long2 );
  
+
+int service_drain_input (void);
 int serviceCreateWindow ( void );
 int servicepixelBackBufferPutpixel (void);
 int servicelineBackbufferDrawHorizontalLine (void);
-//...
+// ...
 
 
 /*
@@ -200,7 +202,7 @@ void handle_request (int fd){
  
     //debug_print ("gws: request found on its own socket \n");  
             
-    //  mensagem invalida  
+    // Mensagem invalida  
     if (message_buffer[1] == 0 )
         return;
 
@@ -234,7 +236,7 @@ void handle_request (int fd){
     //printf ("gws: handle_request: calling window procedure \n");
  
                 
-    // realiza o serviço.
+    // Realiza o serviço.
     gwsProcedure ( (struct gws_window_d *) message_buffer[0], 
        (int) message_buffer[1], 
        (unsigned long) message_buffer[2], 
@@ -319,7 +321,7 @@ void handle_ipc_message (void){
             (unsigned long) &message_buffer[0] );
     gde_exit_critical_section ();
 
-    //se não tem mensagem
+    // Se não tem mensagem.
     if ( message_buffer[1] == 0 )
          return;
 
@@ -358,6 +360,14 @@ gwsProcedure (
   
     switch (msg)
     {
+        // Se o cliente enviar essa mensagem, significa
+        // que ele quer que drenemos o input que o
+        // ws recebe via mensagens tradicionais e passemos
+        // pra ele via socket.
+        case 8080:
+            gde_debug_print("gwsProcedure: 8080\n");
+            service_drain_input();
+            break;
 
         case MSG_SYSKEYUP:
             switch ( long1)
@@ -673,11 +683,11 @@ int main (int argc, char **argv){
      //while (running == 1){
      while (1){
 
-         handle_ipc_message();
-
-         if( dirty_status == 1 )
+         if ( dirty_status == 1 )
              compositor();
         
+         // Presta vários serviços inclusive drenar input
+         // via mensagens tradicionais e repassar via socket.
          handle_request (____saved_server_fd);
     };
 
@@ -692,6 +702,14 @@ int main (int argc, char **argv){
     printf ("gws: exited. \n");
     
     return 0; 
+}
+
+
+int service_drain_input (void)
+{
+    gde_debug_print ("gws: service_drain_input [TODO]\n");
+    //handle_ipc_message();
+    return -1;
 }
 
 

@@ -297,6 +297,12 @@ gnsProcedure (
   
     switch (msg)
     {
+        // Com essa mensagem o cliente solicita input.
+        // então devemos drenar input usado loop de mensagens e
+        // repassar para o cliente via socket.
+        case 8080:
+            gde_debug_print ("gns: [TODO] 8080. drain messages ...\n");
+            break;
 
         case MSG_SYSKEYUP:
             switch ( long1)
@@ -597,24 +603,16 @@ int main (int argc, char **argv){
 // loop:
 
      while (1){
-       
-        // Normal messages. (It's like signals.)
-        //debug_print("$m");
-         __ipc_message ();
-        
 
-        // Repaint dirty rectangles.
-        //debug_print("$c");
-        //if( dirty_status == 1 )
-            //compositor();
-        
         // Messages sended via sockets.
-        //debug_print("$s");
-        // It works.
+        // Mensagens enviadas pelos clientes via socket.
+        // Inclusive a mensagem que pede para drenar input e 
+        // via mensagens e repassar via socket. (8080)
         __socket_messages (____saved_server_fd);
 
         //...
     };
+
 
     //
     // =======================================
