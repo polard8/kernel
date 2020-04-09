@@ -1,18 +1,26 @@
+/*
+ * File: panic.c
+ *
+ * History:
+ *     2015 - Created by Fred Nora.
+ */
+
 
 #include <kernel.h>
 
 
 // #todo
-// Definir as várias opções de mensagens que podem ser exibidas.
-// O que mostrar em caso de erro fatal?
+// We need to define some messages here.
+
 
 
 /*
  *************************************************
  * panic:
- *     klibc function to show a formated string and hang the system.
+ *     This function shows a formated string and 
+ * hang the system.
  */
- 
+
 void panic ( const char *format, ... ){
 
     register int *varg = (int *) (&format);
@@ -22,6 +30,7 @@ void panic ( const char *format, ... ){
     die ();
 }
 
-
-
+//
+// End.
+//
 

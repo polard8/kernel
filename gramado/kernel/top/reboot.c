@@ -1,16 +1,18 @@
-
+/*
+ * File: reboot.c
+ *
+ * History:
+ *     2015 - Created by Fred Nora.
+ */
 
 
 #include <kernel.h>
 
 
 
-
 /*
  * reboot: 
- *     @todo: essa rotina poderá ter seu próprio arquivo.
  *     Reboot system via keyboard port.
- *     ?? #bugbug Por que o reboot está aqui ??
  *
  * *IMPORTANTE: a interface fechou o que tinha qe fechar,
  * hal chamou essa hotina para efetuar a parte de hardware reboot apenas.
@@ -93,6 +95,12 @@ void reboot (void){
     systemReboot ();   
     die ();
 }
+
+//
+// End.
+//
+
+
 
 
 

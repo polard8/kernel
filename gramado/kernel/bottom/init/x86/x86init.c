@@ -1,15 +1,11 @@
 /*
- * Gramado Operating System - The main file for the kernel.
- * (c) Copyright 2015~2019 - Fred Nora.
- *
- * File: kernel/init/x86/x86main.c 
+ * File: x86/x86main.c 
  * 
  * 
  * Description:
  *     It's is the initialization for x86 architechture.
- *     x86main was calle by kernel/main.c
+ *     x86main was called by kernel/main.c
  *
- * 
  * The Kernel area is the first 4MB of real memory.
  * The image was loaded in the address 0x00100000 and the entry point 
  * is in the address 0x00101000. 
@@ -41,12 +37,13 @@
 // # external dependencies #
 
 // Variables from Boot Loader.
-extern unsigned long SavedBootBlock;    //Boot Loader Block.
-extern unsigned long SavedLFB;          //LFB address.  
-extern unsigned long SavedX;            //Screen width. 
-extern unsigned long SavedY;            //Screen height.
-extern unsigned long SavedBPP;          //Bits per pixel.
-//...
+extern unsigned long SavedBootBlock;    // Boot Loader Block.
+extern unsigned long SavedLFB;          // LFB address.
+extern unsigned long SavedX;            // Screen width.
+extern unsigned long SavedY;            // Screen height.
+extern unsigned long SavedBPP;          // Bits per pixel.
+// ...
+
 
 // Args.
 extern unsigned long kArg1;
@@ -62,7 +59,6 @@ extern unsigned long SavedBootMode;
 // Task switching support.
 extern void turn_task_switch_on (void);
 
-
 extern void clear_nt_flag (void);
 
 
@@ -73,21 +69,17 @@ static inline void mainSetCr3 (unsigned long value){
 
 
 /*
- *********************************************************
+ *********************************
  * x86mainStartFirstThread:
- *      #interna
- *      
- * Seleciona a primeira thread para rodar e salta para user mode.
- * Returns program control from an exception or interrupt handler 
- * to a program or procedure that was interrupted by an exception, 
- * an external interrupt, or a software-generated interrupt.  
+ *      # internal.
+ *
+ * It selects the first thread to run and jumps to ring3. 
  */
 
-void x86mainStartFirstThread ( void ){
+void x86mainStartFirstThread (void){
 
     struct thread_d *Thread;
     int i=0;
-
 
 
     // Select the idle thread.
@@ -113,27 +105,25 @@ void x86mainStartFirstThread ( void ){
 
 
         set_current ( Thread->tid );       
-        //...
+        // ...
     };
 
     // State  
-    if ( Thread->state != STANDBY )
-    {
+    if ( Thread->state != STANDBY ){
         printf ("x86mainStartFirstThread: state tid={%d}\n", 
             Thread->tid);
         die ();
     }
 
     // * MOVEMENT 2 ( Standby --> Running)
-    if ( Thread->state == STANDBY )
-    {
+    if ( Thread->state == STANDBY ){
         Thread->state = RUNNING;
         queue_insert_data ( queue, (unsigned long) Thread, QUEUE_RUNNING);
     }
 
-	//Current process.
+    // Current process.
 
-    current_process = Thread->process->pid;    
+    current_process = Thread->process->pid;
 
 	//
 	// Done!
@@ -154,19 +144,19 @@ void x86mainStartFirstThread ( void ){
     turn_task_switch_on ();
 
 
-	//timerInit8253 ( HZ );
-	//timerInit8253 ( 800 );
+    // timerInit8253 ( HZ );
+    // timerInit8253 ( 800 );
     // timerInit8253 ( 900 );
 
 	//nesse momento usaremos o mapeamento do processo alvo ..
 	//no mapeamento do processo alvo tambem tem o kernel
 	//entao nao há problemas.
 
-    //Set cr3 and flush TLB.
-	//isso não é necessário se chamarmos spawn ela faz isso.
+    // Set cr3 and flush TLB.
+    // isso não é necessário se chamarmos spawn ela faz isso.
     mainSetCr3 ( (unsigned long) Thread->DirectoryPA );
     asm ("movl %cr3, %eax");
-		//#todo: delay.
+    //#todo: delay.
     asm ("movl %eax, %cr3");  
 
 
@@ -223,34 +213,31 @@ void x86mainStartFirstThread ( void ){
 
 
     if ( buff1[0] != 0x7F ||
-         buff1[1] != 'E' ||
-         buff1[2] != 'L' ||
-         buff1[3] != 'F' )
+         buff1[1] != 'E' || buff1[2] != 'L' || buff1[3] != 'F' )
     {
         panic ("x86mainStartFirstThread: init .ELF signature");
     }
 
-    printf (">>> IRET\n");
+    printf (">> IRET\n");
     refresh_screen ();
 
-    //
+
     // Fly!
-    //
-
     // We need to have the same stack in the TSS.
+    // ss, esp, eflags, cs, eip;
 
-    asm volatile ( " movl $0x003FFFF0, %esp \n" 
-                   " movl $0x23,       %ds:0x10(%esp)  \n"  // ss.
-                   " movl $0x0044FFF0, %ds:0x0C(%esp)  \n"  // esp 
-                   " movl $0x3000,     %ds:0x08(%esp)  \n"  // eflags.
-                   " movl $0x1B,       %ds:0x04(%esp)  \n"  // cs.
-                   " movl $0x00401000, %ds:0x00(%esp)  \n"  // eip. 
+    asm volatile ( " movl $0x003FFFF0, %esp \n"
+                   " movl $0x23,       %ds:0x10(%esp)  \n"
+                   " movl $0x0044FFF0, %ds:0x0C(%esp)  \n"
+                   " movl $0x3000,     %ds:0x08(%esp)  \n"
+                   " movl $0x1B,       %ds:0x04(%esp)  \n"
+                   " movl $0x00401000, %ds:0x00(%esp)  \n"
                    " movl $0x23, %eax  \n"
-                   " mov %ax, %ds    \n"
-                   " mov %ax, %es    \n"
-                   " mov %ax, %fs    \n"
-                   " mov %ax, %gs    \n"
-                   " iret \n" );
+                   " mov %ax, %ds      \n"
+                   " mov %ax, %es      \n"
+                   " mov %ax, %fs      \n"
+                   " mov %ax, %gs      \n"
+                   " iret              \n" );
 
 
     // Paranoia

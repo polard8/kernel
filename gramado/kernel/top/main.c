@@ -1,12 +1,10 @@
 /*
- * File: kernel/init/main.c 
+ * File: kernel/top/main.c 
  * 
  *     This is the main file for the kernel.
- *
  *     It's architecture independent.
- *
  *     The Assembly code passed the control for us, so now
- * we're gonna do some architechture intependent initialization     
+ * we're gonna do some architechture intependent initialization 
  * and call the next part of the architechture dependent stuff.
  *
  * History:
@@ -40,10 +38,7 @@ int kernel_main (int arch_type){
     int Status = 0;
 
 
-    //
     // Current arch support.
-    //
-
     // We received this arg from Assembly.
 
     current_arch = arch_type;
@@ -60,37 +55,30 @@ int kernel_main (int arch_type){
     // ...
 
 
-    //
-    //  Virtual Console
-    //
-
+    // Virtual Console
     // The kernel only have four virtual consoles.
 
     console_set_current_virtual_console (0);
-    
     console_init_virtual_console (0);
     console_init_virtual_console (1);
     console_init_virtual_console (2);
-    console_init_virtual_console (3); 
+    console_init_virtual_console (3);
 
 
-	//
-	// Serial debug
-	//
-
+    // Serial debug
     // Initialize all the ports.
     serial_init ();
 
 
-    debug_print("============================================\n");
-    debug_print("== main.c: Architechture independent part ==\n");
-    debug_print("============================================\n");
-    debug_print("[Kernel] kernel_main: \n");
-    debug_print("[Kernel] kernel_main: Initializing the part in C ...\n");
+    debug_print ("============================================\n");
+    debug_print ("== main.c: Architechture independent part ==\n");
+    debug_print ("============================================\n");
+    debug_print ("[Kernel] kernel_main: \n");
+    debug_print ("[Kernel] kernel_main: Initializing the part in C ...\n");
 
 
-    switch (current_arch)
-    {
+    switch (current_arch){
+
         case CURRENT_ARCH_X86:
             debug_print ("[Kernel] kernel_main: x86? \n");
             break;
@@ -104,14 +92,15 @@ int kernel_main (int arch_type){
         // ...
 
         default:
-            debug_print ("[Kernel] kernel_main: Current arch not defined!\n *hang");
+            debug_print ("[Kernel] kernel_main: Current arch not defined!\n");
+            debug_print ("*Hang\n");
             goto fail;
             break; 
     };
 
 
 
-    //Initializing the global spinlock.
+    // Initializing the global spinlock.
 
     __spinlock_ipc = 1;
 
@@ -141,7 +130,7 @@ int kernel_main (int arch_type){
         g_useGUI = GUI_OFF;
         VideoBlock.useGui = GUI_OFF;
         debug_print ("[Kernel] kernel_main: GUI_OFF\n");
-		debug_print ("[Kernel] kernel_main: Text mode not supported! *hang");
+        debug_print ("[Kernel] kernel_main: Text mode not supported! *hang");
 
         while (1){
             asm ("cli \n");
@@ -152,7 +141,7 @@ int kernel_main (int arch_type){
 
 		// #todo
 		// No message support at the moment ?!
-		//panic ("kernel_main: Text mode not supported");
+		// panic ("kernel_main: Text mode not supported");
 	};
 
 
@@ -167,12 +156,12 @@ int kernel_main (int arch_type){
     stdio_verbosemode_flag = 1;
 
 
-	// In video.c 
+    // In video.c 
 
     videoVideo ();
     videoInit ();
 
-	// Init screen
+    // Init screen
 
 
 // If we are using graphics mode.
@@ -193,10 +182,10 @@ int kernel_main (int arch_type){
 	// Runtime
 	//
 
-	// #bugbug:
+    // #bugbug:
     // We need the runtime initialization for the messages.
-	// What about to initialize it early?!
-	// See: sm/rt/runtime.c
+    // What about to initialize it early?!
+    // See: sm/rt/runtime.c
 
     debug_print ("[Kernel] kernel_main: Initializing runtime\n");
 
@@ -225,8 +214,8 @@ int kernel_main (int arch_type){
 	// A partir daqui faremos inicializações de partes
 	// dependentes da arquitetura.
 
-    switch (current_arch)
-    {
+    switch (current_arch){
+
         // See: sci/arch/x86/entry/x86main.c
         case CURRENT_ARCH_X86:
             debug_print ("[Kernel] kernel_main: Initializing x86 arch ...\n");
@@ -247,7 +236,8 @@ int kernel_main (int arch_type){
 
 
         default:
-            debug_print ("[Kernel] kernel_main: Current arch not defined!\n *hang");
+            debug_print ("[Kernel] kernel_main: Current arch not defined!\n ");
+            debug_print ("*Hang\n");
             goto fail;
             break; 
     };
@@ -261,5 +251,10 @@ fail:
     debug_print ("[Kernel] kernel_main-fail:  *hang \n");
     return (-1);
 }
+
+
+//
+// End.
+//
 
 
