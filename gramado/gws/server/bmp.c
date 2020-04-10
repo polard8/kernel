@@ -470,58 +470,64 @@ fail:
  */
 
 int 
-bmpDisplayBMP ( char *address, 
-                unsigned long x, 
-                unsigned long y )
+bmpDisplayBMP ( 
+    char *address, 
+    unsigned long x, 
+    unsigned long y )
 {
-	int i, j, base, offset;
-	
-	unsigned long left, top, bottom;
 
-	unsigned long Width, Height;
-	unsigned long xLimit, yLimit;
-	
-	unsigned short sig;
-	
-	unsigned long color, color2;
-	unsigned long pal_address;	
-	
-	struct bmp_header_d *bh;
-	struct bmp_infoheader_d *bi;
-	
-	// Endereço base do BMP que foi carregado na memória
-	unsigned char *bmp = (unsigned char *) address;
-	
-	// Variável para salvar rgba.
-	unsigned char *c = (unsigned char *) &color;
+    int i, j, base, offset;
+
+    unsigned long left, top, bottom;
+
+    unsigned long Width, Height;
+    unsigned long xLimit, yLimit;
+
+    unsigned short sig;
+
+    unsigned long color, color2;
+    unsigned long pal_address;
+
+    // 
+    struct gws_bmp_header_d      *bh;
+    struct gws_bmp_infoheader_d  *bi;
+
+
+    // Endereço base do BMP que foi carregado na memória
+    unsigned char *bmp = (unsigned char *) address;
+
+    // Variável para salvar rgba.
+    unsigned char *c = (unsigned char *) &color;
     unsigned char *c2 = (unsigned char *) &color2;	
-	
-	unsigned long *palette = (unsigned long *) (address + 0x36);		
-	unsigned char *palette_index = (unsigned char *) &pal_address;	
-	
-	// Limits
-	// @todo: get system metrics.
-	xLimit = 800;
-	yLimit = 600;
-	
-	
-	// Limits.
-	if ( x > xLimit || y > yLimit )
-	{
+
+    unsigned long *palette       = (unsigned long *) (address + 0x36);
+    unsigned char *palette_index = (unsigned char *) &pal_address;
+
+
+    // Limits
+    // #todo: Get system metrics.
+    xLimit = 800;
+    yLimit = 600;
+
+
+    // Limits.
+    if ( x > xLimit || y > yLimit )
+    {
 		printf("bmpDisplayBMP: Limits \n");
         goto fail;		
         //return (int) 1; 
-	};
-	
+    }
+
 
 	// @todo:
 	// Testar validade do endereço.
 	
 	
-	if( address == 0 ){
+    if ( address == 0 )
+    {
 		//goto fail;
-	};
-	
+    }
+
 	
 	//
 	// struct for Info header
@@ -533,24 +539,24 @@ bmpDisplayBMP ( char *address,
 	//precisamos usar um buffer interno para
 	//essa estrutura.
 	
-	char buffer[512];
-	char buffer2[512];
-	
+    char buffer[512];
+    char buffer2[512];
+
 	//bh = (struct bmp_header_d *) malloc( sizeof(struct bmp_header_d) );	
-    bh = (struct bmp_header_d *) &buffer[0];
-	if( (void*) bh == NULL )
-	{
+    bh = (struct gws_bmp_header_d *) &buffer[0];
+    if( (void *) bh == NULL )
+    {
 		//goto fail;
-	}	
-	
+    }
+
 	// Signature.
-	sig = *( unsigned short* ) &bmp[0];
-	bh->bmpType = sig;
-	
+    sig = *( unsigned short* ) &bmp[0];
+    bh->bmpType = sig;
+
 	// Size. ( 2 bytes )
-	unsigned short Size = *( unsigned short* ) &bmp[2];
-	bh->bmpSize = Size;
-	
+    unsigned short Size = *( unsigned short *) &bmp[2];
+    bh->bmpSize = Size;
+
 	
 	//
 	// struct for Info header
@@ -558,30 +564,30 @@ bmpDisplayBMP ( char *address,
 	
 	//Windows bmp.
 	//bi = (struct bmp_infoheader_d *) malloc( sizeof(struct bmp_infoheader_d) );
-    bi = (struct bmp_infoheader_d *)  &buffer2[0];
-	if( (void*) bi == NULL )
-	{
+    bi = (struct gws_bmp_infoheader_d *)  &buffer2[0];
+    if( (void*) bi == NULL )
+    {
 		//goto fail;
-	}	
-	
+    }	
+
 	//The size of this header.
-	bi->bmpSize = *( unsigned long* ) &bmp[14];
-	
+    bi->bmpSize = *( unsigned long* ) &bmp[14];
+
 	// Width and height.
-    Width = *( unsigned long * ) &bmp[18];
-    Height = *( unsigned long * ) &bmp[22];	
-	
+    Width =  *( unsigned long * ) &bmp[18];
+    Height = *( unsigned long * ) &bmp[22];
+
 	//@todo: checar validade da altura e da largura encontrada.
-	
+
 	// Salvar.
-	bi->bmpWidth = (unsigned long) Width;
-	bi->bmpHeight = (unsigned long) Height;
-	
-	
+    bi->bmpWidth  = (unsigned long) Width;
+    bi->bmpHeight = (unsigned long) Height;
+
+
 	// Number of bits per pixel.
 	// 1, 4, 8, 16, 24 and 32.
-	bi->bmpBitCount = *( unsigned short * ) &bmp[28];
-	
+    bi->bmpBitCount = *( unsigned short * ) &bmp[28];
+
 	// 24
 	//if( bi->bmpBitCount != 24 ){
 	//	//fail
@@ -589,9 +595,10 @@ bmpDisplayBMP ( char *address,
 	
 	
 	// 0 = Nenhuma compressão.
-	if( bi->bmpCompression != 0 ){
+    if ( bi->bmpCompression != 0 )
+    {
 		//fail
-	}
+    }
 	
 	
 	//
@@ -600,19 +607,20 @@ bmpDisplayBMP ( char *address,
 	
 //DrawBMP:	
 
-	left = x;    
-	top = y; 
-	bottom = ( top + bi->bmpHeight );
+    left = x;    
+    top = y; 
+    bottom = ( top + bi->bmpHeight );
 
 	// Início da área de dados do BMP.
 	
 	//#importante:
 	//A base é diferente para os tipos ?? 
 
-	switch( bi->bmpBitCount )
+    switch( bi->bmpBitCount )
     {
-		//Obs: Cada cor é representada com 4 bytes. RGBA.
-		
+        // Obs: 
+        // Cada cor é representada com 4 bytes. RGBA.
+
 		//case 1:
 		//    base = (0x36 + 0x40);
 		//    break;
@@ -621,21 +629,16 @@ bmpDisplayBMP ( char *address,
 		//    base = (0x36 + 0x40);
 		//    break;
 		
-        // 4 bytes pra cada cor, 16 cores, 64 bytes.		
-		case 4:
-		    base = (0x36 + 0x40);
-		    break; 
-		
-        //4 bytes pra cada cor, 256 cores, 1024bytes.		
-		case 8: 
-		    base = (0x36 + 0x400); 
-			break; 
-			
-		default:
-		    base = 0x36;
-			break;
-	};	
-	
+        // 4 bytes pra cada cor, 16 cores, 64 bytes.
+        case 4:  base = (0x36 + 0x40);  break; 
+
+        //4 bytes pra cada cor, 256 cores, 1024bytes.
+        case 8:  base = (0x36 + 0x400); break; 
+
+        default:  base = 0x36;  break;
+    };
+
+
 //#Aprendendo:
 //1     -  1 bpp (Mono)
 //4     -  4 bpp (Indexed)
@@ -647,30 +650,30 @@ bmpDisplayBMP ( char *address,
 //32    - 32 bpp (True color, RGB)
 //320   - 32 bpp (True color, RGBA)	
 
-	
-	for( i=0; i < bi->bmpHeight; i++ )	
-	{		
-		for( j=0; j < bi->bmpWidth; j++ )	
-		{	
+
+    for( i=0; i < bi->bmpHeight; i++ )
+    {
+        for( j=0; j < bi->bmpWidth; j++ )
+        {
 	        // 16 cores
             // Um pixel por nibble.
-	        if(bi->bmpBitCount == 4 )
-	        {				
-				offset = base;
-							    
-				palette_index[0] = bmp[offset];
-												
+            if (bi->bmpBitCount == 4 )
+            {
+                offset = base;
+    
+                palette_index[0] = bmp[offset];
+
                 // Segundo nibble.
-				if( nibble_count_16colors == 2222 )
-				{
-					palette_index[0] = ( palette_index[0] & 0x0F);  
-					color = (unsigned long) palette[  palette_index[0]  ];
-					
+                if ( nibble_count_16colors == 2222 )
+                {
+                    palette_index[0] = ( palette_index[0] & 0x0F);  
+                    color = (unsigned long) palette[  palette_index[0]  ];
+
 					nibble_count_16colors = 0;
 					base = base + 1;
 					
-				// Primeiro nibble.	
-				}else{
+                // Primeiro nibble.
+                }else{
 
 			        palette_index[0] =  ( (  palette_index[0] >> 4 ) & 0x0F);
 					color = (unsigned long) palette[  palette_index[0] ];
@@ -678,28 +681,28 @@ bmpDisplayBMP ( char *address,
 					nibble_count_16colors = 2222;
 					//base = base;
 				};
-	        };	
+			};
 
 			// 256 cores
 			// Próximo pixel para 8bpp
-	        if( bi->bmpBitCount == 8 )
-	        {   
-				offset = base;
-				color = (unsigned long) palette[  bmp[offset] ];
-				
-				base = base + 1;     
-	        };			
+            if( bi->bmpBitCount == 8 )
+            {   
+                offset = base;
+                color = (unsigned long) palette[  bmp[offset] ];
+
+                base = base + 1;     
+            }
 			
 			
 			// Próximo pixel para 16bpp
-	        if( bi->bmpBitCount == 16 )
-	        {
+            if ( bi->bmpBitCount == 16 )
+            {
 				//a
-				c[0] = 0;  	
+				c[0] = 0;  
 				
-				offset = base;	
+				offset = base;
 			    
-				//b				
+				//b
 			    c[1] = bmp[offset];
 			    c[1] = (c[1] & 0xF8);      // '1111 1000' 0000 0000  
 				
@@ -712,7 +715,7 @@ bmpDisplayBMP ( char *address,
 					
 			    //r
 			    c[3] = bmp[offset+1];
-			    c[3] = c[3] & 0x1F;        // 0000 0000 '0001 1111' 										
+			    c[3] = c[3] & 0x1F;        // 0000 0000 '0001 1111' 
 		        
 				base = base + 2;    
 	        };			
@@ -762,8 +765,8 @@ bmpDisplayBMP ( char *address,
 			//Agora se a flag de mascara estiver selecionada,
 			//então devemos ignora o pixel e não pintá-lo.	
 			
-			switch(bmp_change_color_flag)
-			{
+            switch (bmp_change_color_flag)
+            {
 				//1000
 				//flag para ignorarmos a cor selecionada.
 				//Não pinte nada.
@@ -883,11 +886,12 @@ bmpDisplayBMP ( char *address,
 done:	
 	//Debug
 	//printf("w={%d} h={%d}\n", bi->bmpWidth, bi->bmpHeight );
-	return (int) 0;
-fail:	
+    return 0;
+
+fail:
     //printf("fail");	
-	return (int) 1;
-};
+    return (int) 1;
+}
 
 
 
