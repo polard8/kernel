@@ -150,15 +150,17 @@ update_button ( struct button_d *button,
 //#todo
 //Precisamos usar o esquema de cores.
 
-void *draw_button ( unsigned char *string,
-                    int style,
-                    int state,
-                    int type, 
-                    unsigned long x, 
-                    unsigned long y, 
-                    unsigned long width, 
-                    unsigned long height, 
-                    unsigned long color )
+void *
+draw_button ( 
+    unsigned char *string,
+    int style,
+    int state,
+    int type, 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long width, 
+    unsigned long height, 
+    unsigned long color )
 {
 
     int Focus;    //(precisa de borda)
@@ -182,12 +184,12 @@ void *draw_button ( unsigned char *string,
 
     b = (void *) kmalloc ( sizeof(struct button_d) );
 
-    if ( (void *) b == NULL )
-    {
-		return NULL;
+    if ( (void *) b == NULL ){
+        return NULL;
+
     }else{
 
-		// Object.
+        // Object.
         b->objectType = ObjectTypeButton;
         b->objectClass = ObjectClassGuiObjects;
 

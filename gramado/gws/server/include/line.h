@@ -1,12 +1,27 @@
 
+/*
+ * File: line.h
+ * 
+ * 
+ */
 
-/* lineBackbufferDrawHorizontalLine:
- *     Draw a horizontal line on backbuffer. */
+
+/* 
+ * lineBackbufferDrawHorizontalLine:
+ *     Draw a horizontal line on backbuffer. 
+ */
 
 void 
-lineBackbufferDrawHorizontalLine ( unsigned long x1,
-                                   unsigned long y, 
-                                   unsigned long x2,  
-                                   unsigned long color );
+lineBackbufferDrawHorizontalLine ( 
+    unsigned long x1,
+    unsigned long y, 
+    unsigned long x2,  
+    unsigned long color );
+    
+    
+
+//
+// End.
+//
 
 

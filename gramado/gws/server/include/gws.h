@@ -23,6 +23,9 @@ unsigned long  ____BACKBUFFER_VA;
 
 #include "packet.h"
 
+#include "bmp.h"
+
+
 
 
 // draw char support

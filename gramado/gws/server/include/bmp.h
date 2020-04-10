@@ -26,33 +26,11 @@ int bmp_change_color_flag;
 unsigned long bmp_substitute_color; 
  
 //cor selecionada para ser substituída ou ignorada. 
-unsigned long bmp_selected_color;  
- 
-/* ## Cancelada ! ## */
-static unsigned long cga_16colors_palette[1] = { 0x000000, };
-
-/* ## Cancelada ! ## */
-static unsigned long vga_256colors_palette[1] = { 0x00000000, };
+unsigned long bmp_selected_color; 
 
 
 
-      
 
-/*
- ******************************************************
- * bmpDirectDisplayBMP:
- *
- * Mostra na tela uma imagem bmp carregada na memória. (no LFB)
- * 
- * IN:
- *     address = endereço base
- *     x       = posicionamento 
- *     y       = posicionamento
- *
- */
-int bmpDirectDisplayBMP( char *address, 
-                   unsigned long x, 
-				   unsigned long y );
 
 
 /*
@@ -70,17 +48,10 @@ int bmpDirectDisplayBMP( char *address,
 int bmpDisplayBMP( char *address, 
                    unsigned long x, 
 				   unsigned long y );
-				   
-int bmpDisplayMousePointerBMP( char *address, 
-                               unsigned long x, 
-				               unsigned long y );
-							   
-							   
-//mostra no lfb
-//levando em consideração tratamento de transparência.
-int bmpDisplayCursorBMP( char *address, 
-                         unsigned long x, 
-				         unsigned long y );
+
+
+
+
 					
 						   
 //

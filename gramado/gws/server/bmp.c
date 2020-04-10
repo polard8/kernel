@@ -1,5 +1,5 @@
 /*
- * File: gws/gws/bmp.c
+ * File: gws/server/bmp.c
  *
  * Description:
  *     BMP support.
@@ -20,7 +20,9 @@
  */
 
 
-#include <kernel.h>
+#include <api.h>
+#include <gws.h>
+
 
 
 // 4bpp support.
@@ -42,10 +44,25 @@ static int nibble_count_16colors = 0;
  *	// @todo: Criar defines para esses deslocamentos.
  */ 
 
+
+// #todo
+// Vamos suspender essa rotina, porque
+// falta  a função que escreve diretamente no lfb
+// estando aqui em ring3.
+
+/*
+ 
 int 
-bmpDirectDisplayBMP ( char *address,
-                      unsigned long x,
-                      unsigned long y )
+bmpDirectDisplayBMP ( 
+    char *address, 
+    unsigned long x, 
+    unsigned long y );
+
+int 
+bmpDirectDisplayBMP ( 
+    char *address,
+    unsigned long x,
+    unsigned long y )
 {
 	int i, j, base, offset;
 	
@@ -82,7 +99,8 @@ bmpDirectDisplayBMP ( char *address,
 	// Sincronização do retraço vertical.
 	//
 	
-	vsync ();
+	// #suspenso
+	// vsync ();
 	
 	
 	// Limits.
@@ -426,11 +444,13 @@ bmpDirectDisplayBMP ( char *address,
 done:	
 	//Debug
 	//printf("w={%d} h={%d}\n", bi->bmpWidth, bi->bmpHeight );
-	return (int) 0;
-fail:	
+	return 0;
+
+fail:
     //printf("fail");	
-	return (int) 1;
-};
+    return (int) 1;
+}
+*/
 
 
 
@@ -757,10 +777,15 @@ bmpDisplayBMP ( char *address,
 						//    (unsigned long) bottom, 
 						//    0 );	
 
-		                backbuffer_putpixel ( (unsigned long) color, 
-			                (unsigned long) left, 
-						    (unsigned long) bottom, 
-						    0 );							
+		                //backbuffer_putpixel ( (unsigned long) color, 
+			                //(unsigned long) left, 
+						    //(unsigned long) bottom, 
+						    //0 );
+						    
+					    
+					    pixelBackBufferPutpixel ( (unsigned long) color, 
+					    (unsigned long) left, (unsigned long) bottom );
+					
 					};
 				    break;
 					
@@ -779,10 +804,13 @@ bmpDisplayBMP ( char *address,
 						//    (unsigned long) bottom, 
 						//     0 );
 							 
-						backbuffer_putpixel ( (unsigned long) bmp_substitute_color, 
-			                (unsigned long) left, 
-						    (unsigned long) bottom, 
-						     0 );
+						//backbuffer_putpixel ( (unsigned long) bmp_substitute_color, 
+			            //    (unsigned long) left, 
+						//    (unsigned long) bottom, 
+						//     0 );
+
+					    pixelBackBufferPutpixel ( (unsigned long) bmp_substitute_color, 
+					    (unsigned long) left, (unsigned long) bottom );
 
 							 
                     } else {
@@ -792,12 +820,14 @@ bmpDisplayBMP ( char *address,
 						//    (unsigned long) bottom, 
 						//    0 );
 							
-						backbuffer_putpixel ( (unsigned long) color, 
-			                (unsigned long) left, 
-						    (unsigned long) bottom, 
-						    0 );
+						//backbuffer_putpixel ( (unsigned long) color, 
+			            //    (unsigned long) left, 
+						//    (unsigned long) bottom, 
+						//    0 );
 
-							
+					    pixelBackBufferPutpixel ( (unsigned long) bmp_substitute_color, 
+					    (unsigned long) left, (unsigned long) bottom );
+
 					};							 
 				    break;
 					
@@ -813,11 +843,15 @@ bmpDisplayBMP ( char *address,
 					//	(unsigned long) bottom, 
 					//	0 );				
 				    
-			        backbuffer_putpixel ( (unsigned long) color, 
-			            (unsigned long) left, 
-						(unsigned long) bottom, 
-						0 );		
-						
+			        //backbuffer_putpixel ( (unsigned long) color, 
+			        //    (unsigned long) left, 
+					//	(unsigned long) bottom, 
+					//	0 );
+
+					pixelBackBufferPutpixel ( (unsigned long) bmp_substitute_color, 
+					(unsigned long) left, (unsigned long) bottom );
+
+
 					break;
 			};
 
@@ -860,12 +894,21 @@ fail:
 //mostra no lfb
 //levando em consideração tratamento de transparência.
 
+// #todo: precisamos de put pixel direto no lfb.
+/*
 int 
-bmpDisplayMousePointerBMP ( char *address, 
-                            unsigned long x, 
-                            unsigned long y )
+bmpDisplayMousePointerBMP ( 
+    char *address, 
+    unsigned long x, 
+    unsigned long y );
+
+int 
+bmpDisplayMousePointerBMP ( 
+    char *address, 
+    unsigned long x, 
+    unsigned long y )
 {
-	
+
 	//flag para ignorarmos a cor selecionada.
 	bmp_change_color_flag = BMP_CHANGE_COLOR_TRANSPARENT;
 	
@@ -886,21 +929,34 @@ bmpDisplayMousePointerBMP ( char *address,
 	//clear flags.
 	bmp_change_color_flag = 0;
 	bmp_selected_color = 0;
-	
-    return (int) 0;
-};
 
+
+    return 0;
+}
+*/
 
 
 //mostra no lfb
 //levando em consideração tratamento de transparência.
+//mostra no lfb
+//levando em consideração tratamento de transparência.
+
+// #todo: precisamos de putpixl direto no lfb.
+
+/*
+int 
+bmpDisplayCursorBMP ( 
+    char *address, 
+    unsigned long x, 
+    unsigned long y );
 
 int 
-bmpDisplayCursorBMP ( char *address, 
-                      unsigned long x, 
-                      unsigned long y )
+bmpDisplayCursorBMP ( 
+    char *address, 
+    unsigned long x, 
+    unsigned long y )
 {
-	
+
 	//flag para ignorarmos a cor selecionada.
 	bmp_change_color_flag = BMP_CHANGE_COLOR_TRANSPARENT;
 
@@ -917,9 +973,11 @@ bmpDisplayCursorBMP ( char *address,
 	
 	bmp_change_color_flag = 0;
 	bmp_selected_color = 0;
-    
-	return (int) 0;
-};
+
+
+    return 0;
+}
+*/
 
 
 
