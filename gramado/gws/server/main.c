@@ -75,24 +75,15 @@ See: https://wiki.osdev.org/Graphics_stack
 
 
 
-
-
-//
-// O buffer para  as mensagens recebidas via socket.
-//
-
-// Our PID.
-int __ws_pid;
-
 int running = 0;
 
 int ____saved_server_fd = -1;
 
+// O buffer para  as mensagens recebidas via socket.
 char __buffer[512];   
 
 
-// Our desktop;
-struct desktop_d *__desktop;
+
 
 
 int dirty_status = 0;
@@ -585,19 +576,22 @@ int main (int argc, char **argv){
     dirty_status = 1;
  
 
-    // Desktop
-    // Getting current desktop;
-
     // Register.
-    // Register window server as the current server for this
-    // desktop.
-    
-    
-    __desktop = (struct desktop_d *) gramado_system_call (519,0,0,0);
+    // Register window server as the current server 
+    // for this desktop.
+    // See: connect.c
 
-    __ws_pid = (int) getpid();
+    int _status = -1;
+    _status = (int) register_ws ();
+    
+    if (_status<0)
+    {
+        gde_debug_print ("gws: Couldn't register the server \n");
+        printf ("gws: Couldn't register the server \n");
+        exit (1);
+    }
 
-    gramado_system_call ( 513, __desktop, __ws_pid, __ws_pid );
+    gde_debug_print ("gws: registration ok \n");
 
 
 

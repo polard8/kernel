@@ -1,7 +1,6 @@
 
-
-
-
+#ifndef __CHAR_H
+#define __CHAR_H
 
 
 
@@ -13,22 +12,25 @@ int charGetCharHeight ();
 
 
 void 
-charBackbufferCharBlt ( unsigned long x, 
-                        unsigned long y, 
-                        unsigned long color, 
-                        unsigned long c );
+charBackbufferCharBlt ( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long color, 
+    unsigned long c );
+
 
 /*
  ******************************************************
  * drawchar_transparent:
  *     Desenha um caractere sem alterar o pano de fundo.
- */		
+ */
 
 void 
-charBackbufferDrawcharTransparent ( unsigned long x, 
-                           unsigned long y, 
-                           unsigned long color, 
-                           unsigned long c );
+charBackbufferDrawcharTransparent ( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long color, 
+    unsigned long c );
 
 
 /*
@@ -39,13 +41,27 @@ charBackbufferDrawcharTransparent ( unsigned long x,
  */ 
 
 void 
-charBackbufferDrawchar ( unsigned long x, 
-                unsigned long y,  
-                unsigned long c,
-                unsigned long fgcolor,
-                unsigned long bgcolor );
+charBackbufferDrawchar ( 
+    unsigned long x, 
+    unsigned long y,  
+    unsigned long c,
+    unsigned long fgcolor,
+    unsigned long bgcolor );
+
+
+#endif
+
+
+//
+// End.
+//
 
 
 
+
+
+
+
+  
 
 

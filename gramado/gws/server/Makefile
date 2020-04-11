@@ -61,7 +61,7 @@ myObjects = crt0.o main.o stubs.o \
 ctype.o stdio.o stdlib.o string.o conio.o socket.o signal.o unistd.o \
 api.o \
 pixel.o line.o rect.o char.o dtext.o createw.o gws.o comp.o window.o \
-bmp.o \
+bmp.o connect.o\
 termios.o ioctl.o fcntl.o    
 
 
@@ -86,7 +86,10 @@ all-c:
 	gcc  -c  rect.c     -I $(LIBC) -I $(API02)   -I $(GWS_INCLUDES) -I . $(CFLAGS) -o rect.o
 	gcc  -c  window.c   -I $(LIBC) -I $(API02)   -I $(GWS_INCLUDES) -I . $(CFLAGS) -o window.o
 	gcc  -c  bmp.c      -I $(LIBC) -I $(API02)   -I $(GWS_INCLUDES) -I . $(CFLAGS) -o bmp.o
+	gcc  -c  connect.c  -I $(LIBC) -I $(API02)   -I $(GWS_INCLUDES) -I . $(CFLAGS) -o connect.o
 	# ...
+	
+	
 
 
 	# base

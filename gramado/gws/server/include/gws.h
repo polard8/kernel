@@ -20,10 +20,13 @@ unsigned long  ____BACKBUFFER_VA;
 #include "line.h"
 #include "pixel.h"
 #include "window.h"
-
 #include "packet.h"
-
 #include "bmp.h"
+
+// #todo:
+// We can put this thing in the library. (libgws)
+// or (libcon)
+#include "connect.h"
 
 
 
