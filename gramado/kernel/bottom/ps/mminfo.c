@@ -1,5 +1,5 @@
 /*
- * File: mminfo.c
+ * File: bottom/ps/mminfo.c
  *
  * Informações sobre a gerência de memória.
  * Valores em variáveis e estruturas.
@@ -46,9 +46,9 @@ void mmShowPDE (int index, unsigned long pd_va){
 void mmShowPDEForAllProcesses (int entry_number){
 
     struct process_d *p;
-	
-	int i;
-	
+	int i=0;
+
+
 	printf ("mmShowPDEForAllProcesses:\n");
 	
 	for ( i=0; i<111; i++)
@@ -57,15 +57,16 @@ void mmShowPDEForAllProcesses (int entry_number){
 		
 		if ( (void *) p != NULL )
 		{
-		    if ( p->DirectoryVA != 0 )
-		    {
-			    // Mostra a entrada 1, que se refere ao endereço lógico 0x400000
+
+            // Mostra a entrada 1, que se refere ao endereço lógico 0x400000
+		    if ( p->DirectoryVA != 0 ){
 		        printf ("Process %d: ", i);
 			    mmShowPDE ( entry_number, (unsigned long) p->DirectoryVA );	
 		    }		
 		}
 	}
-	
+
+
 	refresh_screen ();
 }
 
@@ -107,7 +108,6 @@ void memoryShowMemoryInfo (void){
 
 	printf (" frame table = (%d KB)\n", mm_used_frame_table );
 
-	
 	
 	printf ("\n This is a ");
 		
@@ -272,8 +272,8 @@ void memoryShowMemoryInfo (void){
 
 void show_memory_structs (void){
 
-    int i = 0;
     struct mmblock_d *B;
+    int i = 0;
 
 
 	// Title.
@@ -313,7 +313,8 @@ void show_memory_structs (void){
 
 /*
  * testingPageAlloc:
- *     Rotina de teste. */ 
+ *     Rotina de teste. 
+ */ 
 
 void testingPageAlloc (void){
 

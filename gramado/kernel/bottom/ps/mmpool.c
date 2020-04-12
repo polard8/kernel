@@ -1,11 +1,11 @@
 /*
- * File: mmpool.c  ??
+ * File: bottom/ps/mmpool.c 
  *
- * g_pagedpool_va é o endereço virtual de uma área de memória pré alocada
- * de onde tiraremos páginas para o alocador.
- *
+ * g_pagedpool_va é o endereço virtual de uma área de memória 
+ * pré alocada de onde tiraremos páginas para o alocador.
  */
- 
+
+
 // #importante
 // As rotinas nesse documento manipulam o pool pageAllocList[].
 
@@ -16,7 +16,9 @@
 // ...
 
 
+
 #include <kernel.h>
+
 
 // Internal
 void *page (void); 
@@ -36,7 +38,6 @@ void initializeFramesAlloc (void){
 	//
 	// Inicializando a lista de pages.
 	//
-
 
     for ( __slot=0; __slot < PAGE_COUNT_MAX; __slot++ )
     {
@@ -59,15 +60,11 @@ void initializeFramesAlloc (void){
     }else{
 
         p->id = 0;
-
         p->used = 1;
         p->magic = 1234;
-
-        //p->free = 0;  //not free
         p->free = 1;  //free
-        
         p->next = NULL; 
-        //...
+        // ...
 
         pageAllocList[0] = ( unsigned long ) p; 
     };
@@ -76,7 +73,7 @@ void initializeFramesAlloc (void){
 
 
 /*
- ******************************************************
+ ***********************************************
  * page:
  *
  *     Cria uma estrutura de página.
@@ -91,8 +88,7 @@ void initializeFramesAlloc (void){
 void *page (void){
 
     struct page_d *New;
-    
-    
+
     int __slot = 0;
 
 
@@ -100,12 +96,9 @@ void *page (void){
     // Vamos procurar um slot vazio.
     // 
 
-
     for ( __slot=0; __slot < PAGE_COUNT_MAX; __slot++ )
     {
-
-       
-        
+   
         New = (void *) pageAllocList[__slot];
 
         if ( New == NULL )

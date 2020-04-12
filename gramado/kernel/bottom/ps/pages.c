@@ -1,5 +1,5 @@
 /*
- * File: pc/mm/x86/pages.c
+ * File: bottom/ps/pages.c
  *
  * Descri��o:
  *     Faz a configura��o da pagina��o de mem�ria e oferece rotinas de
@@ -161,11 +161,10 @@ int initialize_frame_table (void){
     int i=0;
 
 
-
     FT.total_frames = (FT.frame_table_size_in_bytes/4096);
 
-    //número de páginas necessárias para termos uma tabela.
-    //cada página pode conter 4096 entradas de i byte
+    // Número de páginas necessárias para termos uma tabela.
+    // Cada página pode conter 4096 entradas de i byte
     FT.n_pages = (FT.total_frames/4096) ; 
 
     FT.frame_table = (unsigned char *) allocPages (FT.n_pages);
@@ -181,10 +180,10 @@ int initialize_frame_table (void){
 
 
     // Clear frame table.
-    for (i=0; i< FT.total_frames; i++)
-    {
-        FT.frame_table[i] = 0; // livres.
+    for (i=0; i< FT.total_frames; i++){
+        FT.frame_table[i] = 0;
     }
+
 
     //#debug
     printf ("table size in pages %d\n",FT.n_pages);
@@ -266,10 +265,6 @@ unsigned long get_table_pointer (void)
 
 
 
-
-
-
-
 // Para clonar um diretório.
 // Queremos clonar o diretório atual,
 // para que o processo filho tenha o memso diretório
@@ -287,16 +282,13 @@ void *clone_directory( unsigned long directory_va ){
         panic ("CreatePageDirectory: destAddressVA\n");
     }
 
-
-    unsigned long *src = (unsigned long *) directory_va;  
-
+    unsigned long *src = (unsigned long *) directory_va;
     unsigned long *dst = (unsigned long *) destAddressVA;  
 
-	for ( i=0; i < 1024; i++ )
-	{
-		dst[i] = (unsigned long) src[i];    
-	};
-	
+    for ( i=0; i < 1024; i++ ){
+        dst[i] = (unsigned long) src[i];    
+    };
+
 	//
 	// Done.
 	//
@@ -305,12 +297,6 @@ void *clone_directory( unsigned long directory_va ){
 	
 	return (void *) destAddressVA;
 }
-
-
-
-
-
-
 
 
 /*
@@ -325,9 +311,10 @@ void *clone_directory( unsigned long directory_va ){
  * que � um clone do diret�rio de p�ginas do kernel.
  *
  * #importante:
- * Retornaremos o endere�o virtual, para que a fun��o create_process possa usar 
- * tanto o endere�o virtual quanto o f�sico.
+ * Retornaremos o endere�o virtual, para que a fun��o create_process 
+ * possa usar tanto o endere�o virtual quanto o f�sico.
  */
+
 
 // Clonando o diret�rio do kernel.
 // Isso aparentemente est� funcionando bem,
@@ -335,7 +322,7 @@ void *clone_directory( unsigned long directory_va ){
 void *CloneKernelPageDirectory (void){
 
     unsigned long destAddressVA;  
-    int i;
+    int i=0;
 
 
 	// virtual address.
@@ -381,9 +368,8 @@ void *CloneKernelPageDirectory (void){
 
 
     unsigned long *src = (unsigned long *) gKernelPageDirectoryAddress;  
-
     unsigned long *dst = (unsigned long *) destAddressVA;  
-	
+
 	
 	//
 	// ## Copiar ##
@@ -406,11 +392,11 @@ void *CloneKernelPageDirectory (void){
 	// Retornamos um endere�o l�gico, que ser� transformado em f�sico
 	// para colocarmos no cr3.	
 	
-	for ( i=0; i < 1024; i++ )
-	{
-		dst[i] = (unsigned long) src[i];    
-	};
-	
+    for ( i=0; i < 1024; i++ ){
+        dst[i] = (unsigned long) src[i];    
+    };
+
+
 	//
 	// Done.
 	//
@@ -470,7 +456,7 @@ CreatePageTable (
 
     unsigned long *PD = (unsigned long *) directory_address_va;
 
-    int i;
+    int i=0;
 
 
 	//
@@ -483,11 +469,9 @@ CreatePageTable (
 	// Endere�o virtual do diret�rio de p�ginas.
 	// Precisamos do endere�o virtual do diret�rio para edit�-lo.
 
-	if ( directory_address_va == 0 )
-	{
-		panic ("CreatePageTable: directory_address_va\n");	
-	}
-
+    if ( directory_address_va == 0 ){
+        panic ("CreatePageTable: directory_address_va\n");	
+    }
 
 	
 	//
@@ -516,15 +500,15 @@ CreatePageTable (
 	//unsigned long ptVA = (unsigned long) 0x1000;               //ok
 	unsigned long ptVA = (unsigned long) get_table_pointer();  //ok
 	
-		
-	if ( ptVA == 0 )
-	{
-		kprintf ("CreatePageTable: ptVA #bugbug\n");
-	}	
-	
-	// O endere�o virtual permite manipularmos a pagetable daqui do kernel.
-	unsigned long *newPT = (unsigned long *) ptVA;
 
+    if ( ptVA == 0 ){
+        kprintf ("CreatePageTable: ptVA #bugbug\n");
+    }	
+
+
+    // O endereço virtual permite manipularmos a 
+    // pagetable daqui do kernel.
+    unsigned long *newPT = (unsigned long *) ptVA;
 
 	
 	//
@@ -545,11 +529,10 @@ CreatePageTable (
 	// ### region  ###
 	//
 
-	//Limits.
-	if ( region_address == 0 )
-	{
-		panic ("CreatePageTable: region_address\n");
-	}
+	// Limits.
+    if ( region_address == 0 ){
+        panic ("CreatePageTable: region_address\n");
+    }
 
 	
 	//
@@ -581,8 +564,6 @@ CreatePageTable (
 	
 	//#debug
 	//printf (">> newPT[0] = %x \n", newPT[0]);
-	
-	
 	
 	
 	//
@@ -617,18 +598,14 @@ CreatePageTable (
 	//printf (">> ptVA = %x \n",ptVA);
 	//printf (">> ptPA = %x \n",ptPA);	
 
-	if ( ptPA == 0 )
-	{
-		panic ("CreatePageTable: ptPA\n");
-	}
-	
+    if ( ptPA == 0 ){
+        panic ("CreatePageTable: ptPA\n");
+    }
+
 	PD[dir_index] = (unsigned long) ptPA;
     PD[dir_index] = (unsigned long) PD[dir_index] | 7;      
 
-    //
 	// Done.
-	//
-	
 	// Retornaremos o endere�o virtual da pagetable,
 	// para que a tabela possa ser manipulada pelo kernel.
 
@@ -647,8 +624,9 @@ CreatePageTable (
 // #bugbug: Esse método não está bom.
 // Usar o outro presente nesse documento.
 // mm_switch_directory.
-void x86_SetCR3 (unsigned long pa)
-{
+
+void x86_SetCR3 (unsigned long pa){
+
 
     // N�o podemos usar um diret�rio de p�ginas que esteja
     // no in�cio da mem�ria RAM.
@@ -681,6 +659,7 @@ unsigned long mm_get_current_directory_pa (void){
 void mm_switch_directory ( unsigned long dir){
 
     if (dir == 0) {
+        // #debug ?
         return;
     }
 
@@ -2003,8 +1982,8 @@ int SetUpPaging (void){
 
 
 //checar se a estrutura de p'agina � nula
-int pEmpty (struct page_d *p){
-	
+int pEmpty (struct page_d *p)
+{
     return p == NULL ? 1 : 0;
 }
 
@@ -2013,6 +1992,7 @@ int pEmpty (struct page_d *p){
 void freePage (struct page_d *p){
 
     if (p == NULL){
+        // #debug ?
         return;  
     }
 
@@ -2027,6 +2007,7 @@ void freePage (struct page_d *p){
 void notfreePage (struct page_d *p){
 
     if (p == NULL){
+        // #debug ?
         return; 
     }
  
@@ -2052,6 +2033,7 @@ virtual_to_physical (
 
     if (dir_va == 0)
         panic ("virtual_to_physical: invalid dir va");
+
 
     // Directory.
     unsigned long *dir = (unsigned long *) dir_va;
@@ -2113,7 +2095,6 @@ void pages_calc_mem (void){
     
     refresh_screen();
 }
-
 
 
 
