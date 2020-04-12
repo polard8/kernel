@@ -116,6 +116,90 @@ unsigned long windows_count;
 
 
 
+
+
+
+/*
+ *************************************
+ * button_d:
+ *     Structure for button object.
+ *     Env: gws in ring3.
+ */
+
+struct gws_button_d
+{
+    object_type_t   objectType;
+    object_class_t  objectClass;
+
+    int used;
+    int magic;
+
+    // ??
+    // Ordem dos botões que pertencam à mesma janela.
+    // A qual janela o botão pertence.
+    // Esse índice pode trabalhar junto com 
+    // a lista encadeada de 'next'.
+
+    //int index;	
+    struct gws_window_d *window; 
+    
+	// label
+	// #todo: mudar o tipo para (char *)
+    unsigned char *string; 
+	
+	// Estilo de design.
+	// 3D, flat ...
+    int style;
+	
+	
+    //button states:
+    //1. Default
+    //2. Focus
+    //3. Expanded/Toggled/Selected
+    //4. Disabled
+    //5. Hover and Active	
+    int state;
+
+
+	//Check Boxes
+	//Group Boxes
+	//Push Buttons
+	//Radio Buttons
+
+    int type;
+
+    int selected;
+	
+	// Border color
+    // Isso é para o caso do estilo 3D.
+	// Ou para causar alguns efito em outros estilos.
+
+    unsigned long border1;
+    unsigned long border2;
+
+
+    // Deslocamento em relação ao left da janela
+    // Deslocamento em relação ao top da janela
+
+    unsigned long x;    
+    unsigned long y;   
+    unsigned long width; 
+    unsigned long height;
+
+    // Background color.
+    unsigned long color;
+
+	//More ??
+	//...
+
+    // Next button.    
+    struct gws_button_d *Next;  
+};
+
+
+
+
+
 /*
  **************************************************
  * rect_d:
@@ -128,37 +212,37 @@ struct gws_rect_d
 	//object_type_t objectType;
 	//object_class_t objectClass;
 
-    int used;	
-	int magic;
-	
-	int flag;
-	
-	//estilo de design
-	int style;
+    int used;
+    int magic;
+
+    int flag;
+
+    //estilo de design
+    int style;
 	
 	//int validated;
 	//int focus;
-	
+
     unsigned long x;
     unsigned long y;
     unsigned long cx;
     unsigned long cy;
 
-	
+
     unsigned long width;
     unsigned long height;
 
-	unsigned long left;
-	unsigned long top;	
-	unsigned long right;
-	unsigned long bottom;
-	
-	unsigned long bg_color; //color_bg;
-	
-	//Essa é  ajanela à qual o retângulo pertence.
-	struct window_d *window;   //mudar. #todo
-	
-	struct gws_rect_d *next;
+    unsigned long left;
+    unsigned long top;	
+    unsigned long right;
+    unsigned long bottom;
+
+    unsigned long bg_color; //color_bg;
+
+    //Essa é  ajanela à qual o retângulo pertence.
+    struct gws_window_d *window;   //mudar. #todo
+
+    struct gws_rect_d *next;
 };
 
 
@@ -221,23 +305,23 @@ struct gws_window_class_d
 	// do sistema, dos processos ...
     //tipo de classe.
 	
-	gws_wc_t windowClass; 
+    gws_wc_t windowClass; 
 
 	//1
     gws_client_window_classes_t	clientClass;
 	
 	//2
-	gws_kernel_window_classes_t	kernelClass;
+    gws_kernel_window_classes_t	kernelClass;
 	
 	//3
-	gws_server_window_classes_t	serverClass;
+    gws_server_window_classes_t	serverClass;
 	
 	//Endereço do procedimento de janela.
 	//(eip da thread primcipal do app)
-	unsigned long procedure;
-    //...
+    unsigned long procedure;
+    
+    // ...
 };
-
 
 
 
@@ -852,6 +936,19 @@ int top_window;
 // ...
 
 
+//#todo
+//Precisamos usar o esquema de cores.
+void *
+gws_draw_button ( 
+    unsigned char *string,
+    int style,
+    int state,
+    int type, 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long width, 
+    unsigned long height, 
+    unsigned long color );
 
 
 void 

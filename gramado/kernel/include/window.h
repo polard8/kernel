@@ -1,23 +1,21 @@
 /*
- * File: kgws/kgws/window.h 
+ * File: kernel/include/window.h 
  *
+ * 
  * Descrição:
  *    Funções e parâmetros para o kernel controlar a interface gráfica 
  * e as operações com vídeo.
  *
  *     WINDOW -> DESKTOP -> ROOM (WINDOW STATION) -> USER SECTION.
  *
+ * 
  * History:
- *     Versão: 1.0, 2014 - Esse arquivo foi criado por Fred Nora.
- *     Versão: 1.0, 2015 - Revisão. 
- *     Versão: 1.0, 2016 - Revisão.
+ *     2014 - Created by Fred Nora.
+ *     2016 - Review.
  */
 
-
  
-//
 // z order support.
-//
 
 #define KGWS_ZORDER_BOTTOM  0 
 #define KGWS_ZORDER_TOP     1023   //top window
@@ -413,37 +411,36 @@ unsigned long g_navigationbar_width;
 unsigned long g_navigationbar_height;
 
 
- 
-
 /*
+ *************************************
  * button_d:
- *     Estrutura para botões.
+ *     Structure for button object.
  */
 
 struct button_d
 {
-	object_type_t objectType;
-	object_class_t objectClass;	
-	
-	int used;
+    object_type_t   objectType;
+    object_class_t  objectClass;
+
+    int used;
     int magic;
 
-	// ??
-	// Ordem dos botões que pertencam à mesma janela.
+    // ??
+    // Ordem dos botões que pertencam à mesma janela.
     // A qual janela o botão pertence.
-	// Esse índice pode trabalhar junto com 
-	// a lista encadeada de 'next'.
-	
-	//int index;	
+    // Esse índice pode trabalhar junto com 
+    // a lista encadeada de 'next'.
+
+    //int index;	
     struct window_d *window; 
     
 	// label
 	// #todo: mudar o tipo para (char *)
-	unsigned char *string; 
+    unsigned char *string; 
 	
 	// Estilo de design.
 	// 3D, flat ...
-	int style;
+    int style;
 	
 	
     //button states:
@@ -453,44 +450,41 @@ struct button_d
     //4. Disabled
     //5. Hover and Active	
     int state;
-	
+
 
 	//Check Boxes
 	//Group Boxes
 	//Push Buttons
 	//Radio Buttons
-	
-	int type;
+
+    int type;
 
     int selected;
 	
 	// Border color
     // Isso é para o caso do estilo 3D.
 	// Ou para causar alguns efito em outros estilos.
-	
-	unsigned long border1;
+
+    unsigned long border1;
     unsigned long border2;
-	
-	
-	// Deslocamento em relação ao left da janela
+
+
+    // Deslocamento em relação ao left da janela
     // Deslocamento em relação ao top da janela
-	
-	unsigned long x;    
+
+    unsigned long x;    
     unsigned long y;   
-    
-	unsigned long width; 
+    unsigned long width; 
     unsigned long height;
 
-    // Cor do background.
+    // Background color.
     unsigned long color;
-	
+
 	//More ??
 	//...
-	
-	//??
-	//proximo botão dentro da mesma janela.
-    
-	struct button_d *Next;  
+
+    // Next button.    
+    struct button_d *Next;  
 };
 
 //Botões na janela principal. 
@@ -1454,9 +1448,9 @@ struct zorderInfo
 struct backbufferinfo_d
 {
 	//@todo: object support
-	
-	int used;
-	int magic;
+
+    int used;
+    int magic;
 	
     unsigned long start;
     unsigned long end;

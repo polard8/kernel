@@ -1,10 +1,7 @@
 /*
  * File: dtext.c 
  * 
- * 
- * 
- * 
- * 
+ *     string support.
  */
 
 

@@ -124,6 +124,7 @@ int service_drain_input (void);
 int serviceCreateWindow ( void );
 int servicepixelBackBufferPutpixel (void);
 int servicelineBackbufferDrawHorizontalLine (void);
+int serviceDrawButton(void);
 // ...
 
 
@@ -419,7 +420,6 @@ gwsProcedure (
             serviceCreateWindow (); 
             break; 
 
-
         case 1002:
             servicepixelBackBufferPutpixel(); //pixel
             break;
@@ -429,6 +429,11 @@ gwsProcedure (
             servicelineBackbufferDrawHorizontalLine();
             break;
                
+    
+        // #todo ; 1004. draw button
+        case 1004:
+           serviceDrawButton();
+           break;
     
         //
         // Testing some drawing routines.
@@ -831,6 +836,32 @@ int servicelineBackbufferDrawHorizontalLine (void)
    gws_show_backbuffer (); // for debug   
    return 0;
 }
+
+
+int serviceDrawButton(void)
+{
+	//o buffer é uma global nesse documento.
+    unsigned long *message_address = (unsigned long *) &__buffer[0];
+
+
+    unsigned long x,y,width,height;
+      
+    x      = message_address[4];  // 
+    y      = message_address[5];  // 
+    width  = message_address[6];  // 
+    height = message_address[7];  //
+    // ...
+
+
+    gws_draw_button ("Label", 1,1,1, 
+        x, y, width, height, GWS_COLOR_BUTTONFACE3 );
+
+
+   gws_show_backbuffer (); // for debug   
+   return 0;
+}
+
+
 
 void gws_yield(void){
 	
