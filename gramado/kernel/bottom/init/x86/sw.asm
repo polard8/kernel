@@ -1,23 +1,23 @@
 ;
-; File: x86/entry/head/sw.inc 
+; File: bottom/init/sw.inc 
 ;
 ; Descri��o:
 ;     Interrup��es de software.
 ;     * As primeiras s�o em ordem num�rica.
 ;     * As outras s�o gen�ricas ou especiais.
-;	  * As interrup��es de software come�am na 48! v�o at� 255.
+;     * As interrup��es de software come�am na 48! v�o at� 255.
 ;
-; Hist�rico:
-; Vers�o: 1.0, 2015 - Created.
-; Vers�o: 1.0, 2016 - Revis�o.
+; History:
+;     2015 - Created by Fred Nora.
+;     2016 - Review.
 ;
 
 
-;;@todo: deletar.
+;; #todo: deletar.
 extern _new_task_scheduler 
 
 
-;;
+
 global _int48
 _int48:
     cli
@@ -376,24 +376,26 @@ _int129:
 
 
 
-;Change procedure.
+
+; Change procedure.
 global _int201 
 _int201:
-	cli
-	sti	
+    cli
+    sti
     iretd
-  
+
+
 ;---------------------
 ; _int213:
 ;      Executa nova tarefa.
 ; 
 global _int213  
 _int213:
-	cli
-	sti	
+    cli
+    sti
     iretd
-	
-	
+
+
 ;------------------------------------------------------
 ; _int216:
 ;     Chamada r�pida e direta para cria��o de janela.
@@ -409,11 +411,16 @@ _int213:
 ;
 ;++
 
+;; #todo
+;; Not used ?? 
+;; Delete!
+
 extern _CreateWindow
 global _int216
 _int216:  
-	cli 
-	
+
+    cli 
+
 	;salva.
 	pushad 
 	
@@ -488,7 +495,10 @@ _int216:
 .arg2: dd 0
 .arg1: dd 0 ;;type
 .res:  dd 0 ;;reserved.
-;--  	
+;--
+
+
+
 ;-----------------------------------------------
 ; Handler's gen�ricos para interrup��es negligenciadas. 
 ; 
@@ -501,9 +511,12 @@ system_interrupt:
 unhandled_int:
     cli
     sti
-	iretd
-	
+    iretd
+
+
+
 ;
 ; End.
 ;  
-	
+
+

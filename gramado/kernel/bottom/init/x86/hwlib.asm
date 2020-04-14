@@ -1,5 +1,5 @@
 ;
-; File: x86/head/hwlib.inc
+; File: x86/hwlib.inc
 ;
 ; Descrição:
 ;     Hardware Lib.
@@ -8,6 +8,7 @@
 ;
 ; 2015 - Created by Fred Nora.
 ;
+
 
 ;1F0 (Read and Write): Data Register
 ;1F1 (Read): Error Register
@@ -71,95 +72,104 @@ _hd_lba: dd 0
 ;     + Habilita o funcionamento do mecanismo de taskswitch.
 ;       Essa função é chamada em microkernel\cpu\start.c
 ;
+
 global _turn_task_switch_on
 _turn_task_switch_on:
-	cli 
-	;mov eax,  dword _timer_test ;provisório
-	mov eax,  dword _irq0        ;definitivo
-	mov ebx, dword 32
-	call _setup_idt_vector
-	
- 	;recarrega a nova idt (talvez seja necessario)
-	;lidt [IDT_register]
-	
-	;status do mecanismo de taskswitch.
-	mov dword [_task_switch_status], dword 1    ;UNLOCKED.
+
+    cli 
+    ;mov eax,  dword _timer_test ;provisório
+    mov eax,  dword _irq0        ;definitivo
+    mov ebx, dword 32
+    call _setup_idt_vector
+
+    ;recarrega a nova idt (talvez seja necessario)
+    ;lidt [IDT_register]
+
+    ;status do mecanismo de taskswitch.
+    mov dword [_task_switch_status], dword 1    ;UNLOCKED.
     ret
 
-	
+
+
 ;-------------------------------------------------------------
 ; _turn_task_switch_off:
 ;     Desabilita a IRQ0 responsável por fazer o task switch.
 ;
 global _turn_task_switch_off
 _turn_task_switch_off:
-	cli
-	;mov eax,  dword _irq0
-	mov eax,  dword _timer_test
-	mov ebx, dword 32
-	call _setup_idt_vector
 
-	;status do mecanismo de taskswitch.
-	mov dword [_task_switch_status], dword 0    ;LOCKED.	
-	ret
+    cli
+    ;mov eax,  dword _irq0
+    mov eax,  dword _timer_test
+    mov ebx, dword 32
+    call _setup_idt_vector
 
-	
-;===================================	
+    ;status do mecanismo de taskswitch.
+    mov dword [_task_switch_status], dword 0    ;LOCKED.
+    ret
+
+
+;===================================
 ; _os_read_sector:
 ;
 ; Read sector on PATA PIO 0 MODE.
 ; IN: [_hd_lba] e [_hd_buffer]
-; 
+;
+
 global _os_read_sector
 _os_read_sector:
+
     push eax
-	push ebx
-	
-	; Uma nova rotina, bem mais rápida.
+    push ebx
+
+    ; Uma nova rotina, bem mais rápida.
     ; @param EAX Logical Block Address of sector
     ; @param CL  Number of sectors to read
     ; @param RDI The address of buffer to put data 
-    ; obtained from disk	
-	mov eax, dword [_hd_lba]     
-	xor ecx, ecx 
-	mov cl, 1
-	mov edi, dword [_hd_buffer]      
-	
-	call ata_lba_read	
-	
-	pop ebx
-	pop eax
-	ret
+    ; obtained from disk
+ 
+    mov eax, dword [_hd_lba]     
+    xor ecx, ecx 
+    mov cl, 1
+    mov edi, dword [_hd_buffer]      
 
-	
+    call ata_lba_read
+
+    pop ebx
+    pop eax
+    ret
+
+
 ;======================================
 ; _os_write_sector:
 ;     Write sector on PATA PIO 0 MODE.
 ; IN: [_hd_lba] e [_hd_buffer]
 ;
+
 global _os_write_sector
 _os_write_sector:
+
     push eax
-	push ebx
-    	
+    push ebx
+
     ; Uma nova rotina, bem mais rápida. 
     ; @param EAX Logical Block Address of sector
     ; @param CL  Number of sectors to write
     ; @param RDI The address of data to write to the disk 
-	
-	mov eax, dword [_hd_lba]     
-	xor ecx, ecx 
-	mov cl, 1
-	mov edi, dword [_hd_buffer]      
-	
-	call ata_lba_write
-	
-	pop ebx
-	pop eax
-	ret
 
-	
-	
+    mov eax, dword [_hd_lba]     
+    xor ecx, ecx 
+    mov cl, 1
+    mov edi, dword [_hd_buffer]      
+
+    call ata_lba_write
+
+    pop ebx
+    pop eax
+    ret
+
+
+
 ;==================================================
 ; ata_lba_read:
 ;     ATA read sectors (LBA mode) 
@@ -176,7 +186,7 @@ _os_write_sector:
 
 ata_lba_read:
     
-	pushf
+    pushf
     and eax, 0x0FFFFFFF
     push eax
     push ebx
@@ -238,9 +248,9 @@ ata_lba_read:
     pop ebx
     pop eax
     popf
-    ret	
-	
-	
+    ret
+
+
 ;=========================================
 ; ata_lba_write:
 ;     ATA write sectors (LBA mode) 
@@ -254,7 +264,9 @@ ata_lba_read:
 ; @return None
 ;=================================================
 ;;ide_channel0_master_write:
+
 ata_lba_write:
+
     pushf
     and eax, 0x0FFFFFFF
     push eax
@@ -320,32 +332,35 @@ ata_lba_write:
     popf
     ret
 
- 
 
 ;--------------------------------
 ; _reset_ide0:
 ;
+
 global _reset_ide0
 _reset_ide0:
+
     push dx
     mov dl, byte 0
-	call IDE_RESET_DISK
-	pop dx
-	ret
+    call IDE_RESET_DISK
+    pop dx
+    ret
 
-	
+
 ;--------------------------------	
 ; init_ide0_master:	
 ;     Reseta o ide0 master.
 ;
-init_ide0_master:
-    push dx
-	mov dl, byte 0
-	call IDE_RESET_DISK
-	pop dx
-	ret
 
-	
+init_ide0_master:
+
+    push dx
+    mov dl, byte 0
+    call IDE_RESET_DISK
+    pop dx
+    ret
+
+
 ;==============================================
 ; IDE_RESET_DISK:
 ;
@@ -355,47 +370,48 @@ init_ide0_master:
 ; IN: 
 ;     dl = Drive (0=master,1=slave)
 ;
+
 IDE_RESET_DISK:
 
-	and dl, 01           ;isolate bit 0.
-	mov al, dl           ;al = dl.
-	shl al, 4            ;move drive selector into bit 4.
-	or al, 0A0h          ;make bits 7 and 5 a 1.
-	
-	mov dx, 01F6h        ;dx = drive/head regsiter port address.
-	out dx, al           ;write to drive/head register.
-	IODELAY
-	
-	mov al, 10h          ;Command 1xh: Recalibrate.
-	inc dx                         ;dx is now 01F7h, port address of command register.
-	mov byte [lastcommand], 10h    ;Tell our ISR what we are doing.
-	out dx, al                     ;Recalibrate.
+    and dl, 01           ;isolate bit 0.
+    mov al, dl           ;al = dl.
+    shl al, 4            ;move drive selector into bit 4.
+    or al, 0A0h          ;make bits 7 and 5 a 1.
+
+    mov dx, 01F6h        ;dx = drive/head regsiter port address.
+    out dx, al           ;write to drive/head register.
     IODELAY
-    
-	mov ax,0FFFFh                 ;loop var = 0FFFFh.
-	xor dl,dl
-	mov byte [commanddone], dl    ;init commanddone with 0.
+
+    mov al, 10h                    ;Command 1xh: Recalibrate.
+    inc dx                         ;dx is now 01F7h, port address of command register.
+    mov byte [lastcommand], 10h    ;Tell our ISR what we are doing.
+    out dx, al                     ;Recalibrate.
+    IODELAY
+ 
+    mov ax,0FFFFh                 ;loop var = 0FFFFh.
+    xor dl,dl
+    mov byte [commanddone], dl    ;init commanddone with 0.
 again:
-	cmp byte [commanddone], 1
-	je resetisdone
-	
-	cmp ax, 0
-	je noreset
-	
-	dec ax
-	jmp again
+    cmp byte [commanddone], 1
+    je resetisdone
+
+    cmp ax, 0
+    je noreset
+
+    dec ax
+    jmp again
 resetisdone:
-	cli
-	mov byte [lastcommand], 01h    ;Set this in case of unexpected command.
-	;sti
-	clc    ;its all good.
-	ret    
+    cli
+    mov byte [lastcommand], 01h    ;Set this in case of unexpected command.
+    ;sti
+    clc    ;its all good.
+    ret    
 noreset:
-	cli
-	mov byte [lastcommand], 01h    ;Set this in case of unexpected command.
-	;sti
-	stc     ;Error.
-	ret                 
+    cli
+    mov byte [lastcommand], 01h    ;Set this in case of unexpected command.
+    ;sti
+    stc     ;Error.
+    ret                 
 ; end of IDE_RESET_DISK.
 lastcommand db 0    ;The last command given to the disk.
 commanddone db 0    ;Command done flag.
@@ -409,38 +425,37 @@ commandok   db 0    ;Command completed properly flag.
 
 ;; Hour
 global _hour
-_hour:    
-    db 0
-	
-;;Minute	
-global _minute
-_minute:  
-    db 0
-	
-;;Second	
-global _second
-_second:  
-    db 0
+_hour:          db 0
 
-	
+;; Minute
+global _minute
+_minute:        db 0
+
+;; Second
+global _second
+_second:        db 0
+
+
+
+
 ;==================================
 ; CMOS_GET_DATE:
 ;     Pega Hora, Minuto e Segundo.
 
-global _CMOS_GET_DATE	
+global _CMOS_GET_DATE
 _CMOS_GET_DATE:
-    
-	PUSHAD
-    
-	; get the "second" byte.
-	MOV  al, 0x00           
+
+    PUSHAD
+
+    ; get the "second" byte.
+    MOV  al, 0x00           
     OUT  0x70, AL
     IODELAY
     IN   AL, 0x71 
     IODELAY
-	CALL  BCD2bin
+    CALL  BCD2bin
     MOV  BYTE [_second], AL
-		
+
     ; get the "minute" byte.
     MOV  AL, 0x02           
     OUT  0x70, AL
@@ -448,9 +463,9 @@ _CMOS_GET_DATE:
     IN   AL, 0x71
     IODELAY
     CALL  BCD2bin
-    MOV  BYTE [_minute], AL	
-		
-	; get the "hour" byte.	
+    MOV  BYTE [_minute], AL
+
+    ; get the "hour" byte.
     MOV  AL, 0x04           
     OUT  0x70, AL
     IODELAY
@@ -458,11 +473,11 @@ _CMOS_GET_DATE:
     IODELAY
     CALL  BCD2bin
     MOV  BYTE [_hour], AL
-	
+
     POPAD
     RET
 
-	
+
 ;---------------------------------------------- 
 ; BCD2bin:
 ;     Calculate binary from BCD. 
@@ -470,18 +485,20 @@ _CMOS_GET_DATE:
 ;  in:  AL = BCD. 
 ; out:  AL = bin.
 ;
+
 BCD2bin:
+
     PUSH  EBX  
-	MOV BL, AL
+    MOV BL, AL
     AND BL, 0x0F
     SHR AL, 4     ;AL = (AL/16).
     MOV BH, 10
     MUL BH        ;multiply by 10.
     ADD AL, BL    ;add in low nib. 
-	POP  EBX
-	RET
-	
-	
+    POP  EBX
+    RET
+
+
  
 ; Enable L2 Cache (Not supported on P4 or Atom)
 ;	mov ecx, 0x0000011E		; Control register 3: used to configure the L2 Cache
@@ -673,5 +690,7 @@ BCD2bin:
 	
 ;
 ; End.
-;	
-	
+;
+
+
+
