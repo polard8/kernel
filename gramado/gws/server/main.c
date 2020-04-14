@@ -559,7 +559,9 @@ int main (int argc, char **argv){
 
     // Flag usada no loop.
     running = 1;
-    
+
+    // Activate the compositor.
+    dirty_status = 1;
 
     // #debug
     gde_debug_print ("---------------------\n");
@@ -568,34 +570,27 @@ int main (int argc, char **argv){
 
     
     // Init gws infrastructure.
-    
     gwsInit ();
 
 
     // Let's create the traditional green background.
-
     create_background();
     create_taskbar();
-
-    // Activate the compositor.
-    dirty_status = 1;
  
 
     // Register.
-    // Register window server as the current server 
+    // Register window server as the current widnow server 
     // for this desktop.
     // See: connect.c
 
     int _status = -1;
     _status = (int) register_ws ();
     
-    if (_status<0)
-    {
+    if (_status<0){
         gde_debug_print ("gws: Couldn't register the server \n");
         printf ("gws: Couldn't register the server \n");
         exit (1);
     }
-
     gde_debug_print ("gws: registration ok \n");
 
 

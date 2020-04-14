@@ -1,7 +1,12 @@
+/*
+ * File: gws.c
+ * 
+ *     gws - client-side library for gws window server.
+ *     gws is a window server running in ring3, and this is
+ *  a library used by the apps.
+ *     
+ */
 
-
-// File: gws.c
-// gws - client side
 
 // Devemos incluir o objeto gws.o nos aplicativos para fazermos
 // as chamadas ao servidor.
@@ -24,7 +29,7 @@
 #include <heap.h>   
 
 
-//libgws
+// libgws
 #include "include/connect.h"  
 #include "include/gws.h"  
 
@@ -297,10 +302,20 @@ gws_create_window (
 }
 
 
+
+// Yield thread.
 void gws_yield (void)
 {
-    gws_system_call(265,0,0,0); //yield thread.
+    gws_system_call(265,0,0,0); 
 }
+
+
+//
+// End.
+//
+
+
+
 
 
 

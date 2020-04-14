@@ -46,7 +46,7 @@
 #include <sys/socket.h>
 
 
-
+// libgws ?
 #include <gws.h>
 
 
@@ -79,8 +79,8 @@ int main ( int argc, char *argv[] ){
     int client_fd;
 
 
-    debug_print ("--------------------------\n"); 
-    debug_print ("gwst.bin: Initializing ...\n");
+    gws_debug_print ("--------------------------\n"); 
+    gws_debug_print ("gwst.bin: Initializing ...\n");
 
     char *name = "Window name 1";
 
@@ -138,7 +138,7 @@ int main ( int argc, char *argv[] ){
 
 
     // #debug
-    debug_print ("gwst: Writing ...\n");      
+    gws_debug_print ("gwst: Writing ...\n");      
 
     // Enviamos um request para o servidor.
     // ?? Precisamos mesmo de um loop para isso. ??
@@ -184,11 +184,11 @@ int main ( int argc, char *argv[] ){
     // obs: Nesse momento deveríamos estar dormindo.
 
     // #debug
-    debug_print ("gwst: Waiting ...\n");      
+    gws_debug_print ("gwst: Waiting ...\n");      
 
     int y;
     for(y=0; y<15; y++)
-        gws_yield();
+        gws_yield();   // See: libgws/
 
 
     // #todo
@@ -204,7 +204,7 @@ int main ( int argc, char *argv[] ){
     //
 
     // #debug
-    debug_print ("gwst: reading ...\n");      
+    gws_debug_print ("gwst: reading ...\n");      
 
 
     //#caution
@@ -260,7 +260,7 @@ response_loop:
             break;
             
         case SERVER_PACKET_TYPE_ERROR:
-            debug_print ("gwst: SERVER_PACKET_TYPE_ERROR\n");
+            gws_debug_print ("gwst: SERVER_PACKET_TYPE_ERROR\n");
             goto response_loop;
             //exit (-1);
             break;
@@ -278,10 +278,14 @@ response_loop:
     
 process_reply:
 
-    debug_print ("gwst: bye\n"); 
+    gws_debug_print ("gwst: bye\n"); 
 
     printf ("gwst: Window ID %d \n", message_buffer[0] );
     printf ("gwst: Bye\n");
+    
+    // #todo
+    // Podemos usar a biblioteca e testarmos
+    // vários serviços da biblioteca nesse momento.
 
     return 0;
 }

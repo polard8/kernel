@@ -31,39 +31,27 @@ CFLAGS = -m32 \
 	-no-pie \
 	-fno-stack-protector \
 	-s
-
-#	-fleading-underscore \
-#	-fno-stack-protector \
-#	-s
 	
+
+
 
 
 LIBC      = ../../../lib/libc03/include/
 LIBCOBJ   = ../../../lib/libc03/obj
+
 LIBGWS    = ../../../lib/libgws/include/
 LIBGWSOBJ = ../../../lib/libgws/obj
 
 
 
-	##
-	## Objects
-	##
+	#
+	# Objects
+	#
 
 myObjects = crt0.o main.o stubs.o \
-ctype.o \
-stdio.o \
-fcntl.o \
-stdlib.o \
-string.o \
-unistd.o \
-termios.o \
-ioctl.o \
+ctype.o stdio.o fcntl.o stdlib.o string.o unistd.o termios.o ioctl.o \
 socket.o \
 gws.o connect.o events.o rw.o    
-
-
-
-
 
 
 
