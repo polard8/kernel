@@ -758,8 +758,8 @@ void updateObject ()
 
 
 //interna
-//cria a janel
-struct widnow_d *xmas_tree_window;
+//cria a janela
+struct window_d *xmas_tree_window;
 void *xmas_tree_buffer;
 void
 xmas_tree_create ( char *file_name)
@@ -771,9 +771,9 @@ xmas_tree_create ( char *file_name)
     
     gde_register_window ( (struct window_d *) xmas_tree_window );
     
-    
+
 	// testando malloc.
-	xmas_tree_buffer = (void *) malloc (1024*50); 
+    xmas_tree_buffer = (void *) malloc (1024*50); 
 	
 	//existe um buffer
     shellui_fntos ( (char *) file_name );
@@ -781,8 +781,8 @@ xmas_tree_create ( char *file_name)
     //@todo: Usar alguma rotina da API espec�fica para carregar arquivo.
 	// na verdade tem que fazer essas rotinas na API.
 	
-	gramado_system_call ( SYSTEMCALL_READ_FILE, 
-	    (unsigned long) file_name, 
+    gramado_system_call ( SYSTEMCALL_READ_FILE, 
+        (unsigned long) file_name, 
         (unsigned long) xmas_tree_buffer, 
         (unsigned long) xmas_tree_buffer );
 }

@@ -756,8 +756,8 @@ void updateObject ()
 
 
 //interna
-//cria a janel
-struct widnow_d *xmas_tree_window;
+//cria a janela
+struct window_d *xmas_tree_window;
 void *xmas_tree_buffer;
 void
 xmas_tree_create ( char *file_name)

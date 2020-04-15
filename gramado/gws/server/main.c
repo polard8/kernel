@@ -579,7 +579,7 @@ int main (int argc, char **argv){
  
 
     // Register.
-    // Register window server as the current widnow server 
+    // Register window server as the current window server 
     // for this desktop.
     // See: connect.c
 
