@@ -1,5 +1,5 @@
 /*
- * File: kgws/comp/bg.c 
+ * File: ws/bg.c 
  *
  * Descrição:
  *     Rotinas de configuração do background de um desktop.
@@ -33,18 +33,34 @@ extern unsigned long SavedBPP;
 void bg_load_image (void)
 {
 
+    int status = -1;
+    
 	// 512*4096 = 2MB
     void *__buffer = (void *) allocPages ( 512 );
 
-    fsLoadFile ( VOLUME1_FAT_ADDRESS, VOLUME1_ROOTDIR_ADDRESS, 
-        "ANIMAL  BMP", 
-        (unsigned long) __buffer );
-        
     
     // # not tested.
+    // See: fs.c
     // IN: path os two levels, address.
-    // load_path ("BOOT/ANIMAL.BMP", (unsigned long) __buffer );
+    status = (int) load_path ( "/BOOT/ANIMAL.BMP", 
+                       (unsigned long) __buffer );
+                       
+    if (status < 0)
+    {
+        // See: read.c
+        status = (int) fsLoadFile ( VOLUME1_FAT_ADDRESS, VOLUME1_ROOTDIR_ADDRESS, 
+            "ANIMAL  BMP", (unsigned long) __buffer );
+        
+        if (status != 0)
+        {
+            debug_print ("bg_load_image: fail\n");
+            return;
+        }
+    }
 
+    // A imagem foi carregada no buffer.
+    // Vamos exibir na tela em 0,0.
+    
     // #bugbug: 
     // A imagem sai cortada do lado direito.
 

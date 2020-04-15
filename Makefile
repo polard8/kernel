@@ -297,7 +297,8 @@ vhd-copy-files:
 	sudo cp gramado/kernel/KERNEL.BIN    /mnt/gramadovhd/BOOT
 	sudo cp gramado/boot/x86/bin/BM.BIN  /mnt/gramadovhd/BOOT
 	sudo cp gramado/boot/x86/bin/BL.BIN  /mnt/gramadovhd/BOOT
-
+	
+	-sudo cp gramado/base/res/wall/ANIMAL.BMP   /mnt/gramadovhd/BOOT
 
 
 # ======== Files in the /TMP/ folder. ========

@@ -50,15 +50,9 @@ void fs_show_mounted_list(void)
 }
 
 
-
-
-
-
-
-// na lista de arquivos do processo.
+// Na lista de arquivos do processo.
 int fs_get_free_fd ( int pid )
 {
-
     struct process_d *p;
     int __slot;
 
@@ -206,14 +200,17 @@ int fsCheckPEFile ( unsigned long address ){
  */
 
 void 
-fsListFiles ( int disk_id, 
-              int volume_id, 
-              int directory_id )
+fsListFiles ( 
+    int disk_id, 
+    int volume_id, 
+    int directory_id )
 {
+
 	// @todo: Checar mais limites.
 
     if ( disk_id == -1 || volume_id == -1 || directory_id == -1 )
     {
+        //#debug
         goto fail;
     }
 
@@ -242,19 +239,6 @@ done:
     refresh_screen ();
     return;
 }
- 
-
-
-/*
-int fsIsFAT12();
-int fsIsFAT12()
-{
-   //testa o tipo de fat.
-    return 0;
-};
-*/
-
-
 
 
 /*
@@ -726,23 +710,26 @@ int load_path ( unsigned char *path, unsigned long address ){
 
     int i=0;         // Deslocamento dentro do buffer.
     int level=0;
-
+    int l=0;
+    unsigned long n_levels = 0;
+    
+    // Fail. 
+    // Usado na função que carrega o arquivo.
+    int Ret = -1;    
+        
     char buffer[12];
     unsigned char *p;
-
-    int Ret = -1;    // fail. Usado na função que carrega o arquivo.
 
 
     //onde carregaremos o diretório.
     void *__src_buffer; 
     void *__dst_buffer; 
-    void *__file_buffer;                 
+    void *__file_buffer;      
+
+
 
     __file_buffer = (void *) address;
 
-    unsigned long n_levels = 0;
-    
-    
     n_levels = path_count(path);
     
     if(n_levels==0){
@@ -750,36 +737,34 @@ int load_path ( unsigned char *path, unsigned long address ){
     }    
 
 
-
     // Address
-
     if (address == 0){
         panic ("load_path: address\n");
     }
 
 
     level = 0;
-    
+
     p = path;
 
 
-    //primeiro src =  root address;
+    // Primeiro src =  root address;
     __src_buffer = (void *) VOLUME1_ROOTDIR_ADDRESS;
 
-    int l;
-    for(l=0; l<n_levels; l++)
+    for (l=0; l<n_levels; l++)
     {
 
         printf ("\n[LEVEL %d]\n\n",l);
         
-        // Tem que começar o level com '/'
-        if ( p[0] != '/' ){
-            panic ("load_path: The level needs to start with '/' \n");
+        // O level tem que começar o level com '/',
+        // mesmo que seja o primeiro.
+        if ( p[0] != '/' )
+        {
+            panic ("load_path: All levels need to start with '/' \n");
         }
         p++; //pula o '/' 
 
-        
-        i=0;
+        //i=0;
         for ( i=0; i<12; i++ )
         {
             // #debug
@@ -844,15 +829,14 @@ int load_path ( unsigned char *path, unsigned long address ){
                     panic ("bl-load_path: __dir\n");
                 }
 
-                      //IN: fat address, dir address, filename, file address.
+                      // IN: 
+                      // fat address, dir address, filename, file address.
                 Ret = fsLoadFile ( (unsigned long) VOLUME1_FAT_ADDRESS,  // fat address
                           (unsigned long) __src_buffer,                  // dir address. onde procurar.  
                           (unsigned char *) buffer,                      // nome 
                           (unsigned long) __dst_buffer );                // addr. Onde carregar. 
-                                
 
                 // ok.
-
                 if ( Ret == 0 )
                 {
                     printf ("level %d carregado com sucesso.\n",l);
@@ -881,7 +865,8 @@ int load_path ( unsigned char *path, unsigned long address ){
             
             // Se encontramos um indicador de próximo nível,
             // então esse nível não será considerado binário.
-            // obs: Ao iniciar o for ele precisa encontrar esse mesmo char.
+            // obs: 
+            // Ao iniciar o for ele precisa encontrar esse mesmo char.
             
             if ( *p == '/' )
             {
@@ -937,21 +922,10 @@ int load_path ( unsigned char *path, unsigned long address ){
     };   
     
 
-
+    //debug_print ("load_path: fail\n");
+    
     return (-1);
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1154,6 +1128,7 @@ fail:
     return;
 }
 
+
 /*
  ********************************************************
  * fsInit:
@@ -1232,19 +1207,16 @@ int fsInit (void){
 	// Agora inicialzamos as stream 4 e 5.
 	// As anteriores foram inicializadas em stdio,
 	// pois s�o o fluxo padr�o.
-	
-	
-	//
-    //  ## volume 1 root dir  ##
-	//
-	
-	
-	//foi definido em stdio.h
 
+
+    //
+    // Volume 1 root dir.  
+    //
+
+    // Foi definido em stdio.h
     volume1_rootdir = (FILE *) kmalloc ( sizeof(FILE) );
 
-    if ( (void *) volume1_rootdir == NULL )
-    {
+    if ( (void *) volume1_rootdir == NULL ){
         panic ("fsInit: volume1_rootdir \n");
 
     } else {
@@ -1267,20 +1239,19 @@ int fsInit (void){
     };
 
 
+    //
+    // Volume 2 root dir.
+    //
 
-	//
-	//  ## volume 2 root dir  ##
-	//
-	
-	
+
 	//foi definido em stdio.h
 	//FILE *volume2_rootdir;
 
     volume2_rootdir = (FILE *) kmalloc ( sizeof(FILE) );
 
-    if ( (void *) volume2_rootdir == NULL )
-    {
+    if ( (void *) volume2_rootdir == NULL ){
         panic ("fsInit: volume2_rootdir\n");
+
 
     }else{
 
@@ -1306,20 +1277,19 @@ int fsInit (void){
 	
 	//aloca mem�ria para a estrutura.
     pipe_gramadocore_init_execve = (FILE *) kmalloc ( sizeof(FILE) );
-	
-    if ( (void *) pipe_gramadocore_init_execve == NULL )
-    {
+
+    if ( (void *) pipe_gramadocore_init_execve == NULL ){
         panic ("fsInit: pipe_gramadocore_init_execve\n");
 
     }else{
 
-        //aloca mem�ria para o buffer.
+        // Aloca memória para o buffer.
         unsigned long pipe0base = (unsigned long) kmalloc (512);
 
-        if ( (void *) pipe0base == NULL )
-        {
+        if ( (void *) pipe0base == NULL ){
             panic ("fsInit: pipe0base\n");
         }
+
 
         pipe_gramadocore_init_execve->used = 1;
         pipe_gramadocore_init_execve->magic = 1234;
@@ -1334,7 +1304,7 @@ int fsInit (void){
         // #todo
         //fileList[ ? ] = (unsigned long) pipe_gramadocore_init_execve;
 
-	    //0
+        // 0
         Pipes[0] = (unsigned long) pipe_gramadocore_init_execve;
     };
 
@@ -1342,8 +1312,8 @@ int fsInit (void){
 	//
 	// ## PWD ##
 	//
-	
-	//inicializa p pwd support.
+
+	// Inicializa o pwd support.
     fsInitializeWorkingDiretoryString ();
 	
 	//
@@ -1353,16 +1323,7 @@ int fsInit (void){
 	//inicializa a estrutura de suporte ao target dir.
     fsInitTargetDir ();
 
-	//
-	// @todo: Continua ...
-	//
-
-
-//done:
-
-//#ifdef EXECVE_VERBOSE
-    //printf("Done\n");
-//#endif 
+    // Done.
 
     return 0;
 }
@@ -1480,8 +1441,9 @@ void fsInitTargetDir (void){
 
 int fs_initialize_process_pwd ( int pid, char *string ){
 
-    int i;
     struct process_d *p;
+    int i=0;
+
 
     if ( pwd_initialized == 0 ){
         panic ("fs_initialize_process_pwd: pwd not initialized\n"); 
@@ -1501,8 +1463,7 @@ int fs_initialize_process_pwd ( int pid, char *string ){
 
     p = (struct process_d *) processList[pid];
 
-    if ( (void *) p == NULL )
-    {
+    if ( (void *) p == NULL ){
         panic ("fs_initialize_process_pwd: p\n");
 
     }else{
@@ -1573,13 +1534,12 @@ int fs_print_process_pwd (int pid){
  
 void fsUpdateWorkingDiretoryString ( char *string ){
 
-    int i;    
     struct process_d *p;
     char *tmp;
+    int i=0; 
 
 
     tmp = string;
-
 
     if ( pwd_initialized == 0 ){
         printf ("fsUpdateWorkingDiretoryString: pwd not initialized\n"); 
@@ -1621,12 +1581,11 @@ void fsUpdateWorkingDiretoryString ( char *string ){
             //atualiza a string global.
             //usando a string do processo atual.
 
-			for ( i=0; i<32; i++ )
-			{
-				current_workingdiretory_string[i] = p->pwd_string[i];
-			}
-			
-			//name
+            for ( i=0; i<32; i++ ){
+                current_workingdiretory_string[i] = p->pwd_string[i];
+            }
+
+            // Name.
             for ( i=0; i< 11; i++ ){
                 current_target_dir.name[i] = *tmp;
                 tmp++;
@@ -1651,8 +1610,8 @@ void fsUpdateWorkingDiretoryString ( char *string ){
  
 void fs_pathname_backup ( int pid, int n ){
 
-    int i;
     struct process_d *p;
+    int i=0;
 
 
     if ( pwd_initialized == 0 ){
@@ -1697,21 +1656,18 @@ void fs_pathname_backup ( int pid, int n ){
             *++s = '\0';
         };
 
-		//atualizando a string global.
-		for ( i=0; i<32; i++ )
-		{
-			current_workingdiretory_string[i] = p->pwd_string[i];
-		}
+        // Atualizando a string global.
+        for ( i=0; i<32; i++ ){
+            current_workingdiretory_string[i] = p->pwd_string[i];
+        }
 
 
-		// name.
-		for ( i=0; i< 11; i++ )
-		{
-			current_target_dir.name[i] = '\0';
-		}
+        // Name.
+        for ( i=0; i< 11; i++ ){
+            current_target_dir.name[i] = '\0';
+        }
     };
 }
-
 
 
 // usada por open()
@@ -2012,20 +1968,21 @@ __OK:
  */
 
 int fsLoadFileFromCurrentTargetDir (void){
-	
-	int Ret = -1;
-	int i;
-	
-	unsigned long new_address;
-	
+
+    int Ret = -1;
+    int i=0;
+    unsigned long new_address;
+
+
+
 	//#bugbug
 	//Isso 'e um limite para o tamanho do arquivo (apenas dir).
 	//precisamos expandir isso.
 	//aqui no m'aquimo o arquivo pode ter 4kb.
 	//acho ques estamos falando somente de diret'orio aqui.
 	
-	new_address = (unsigned long) kmalloc (4096);
-	
+    new_address = (unsigned long) kmalloc (4096);
+
 	if ( new_address == 0 )
 	{
 		return -1;

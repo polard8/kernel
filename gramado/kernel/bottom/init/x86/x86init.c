@@ -1,5 +1,5 @@
 /*
- * File: x86/x86main.c 
+ * File: bottom/init/x86/x86main.c 
  * 
  * 
  * Description:
@@ -632,8 +632,12 @@ void x86main (void){
 
     // #test:
     // Background support.
-    // See: kgws/comp/bg.c
-    // bg_load_image ();
+    // Used to test load_path()
+    // See: ws/bg.c
+    
+    //bg_load_image ();
+    //refresh_screen();
+    //while(1){}
 
 
 	// #Aviso:

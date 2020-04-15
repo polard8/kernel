@@ -306,20 +306,23 @@ const char *break_path (const char *pathname, char *filename)
 
 
 // IN: ??
-// OUT: 1=fail 0=ok.
+// OUT: 
+//    1=fail 
+//    0=ok.
 
 unsigned long 
-fsLoadFile ( unsigned long fat_address,
-             unsigned long dir_address,
-             unsigned char *file_name, 
-             unsigned long file_address )
+fsLoadFile ( 
+    unsigned long fat_address,
+    unsigned long dir_address,
+    unsigned char *file_name, 
+    unsigned long file_address )
 {
+
     int Status;
 
     int i = 0;
     int SavedDirEntry = 0;
     unsigned short next;
-
 
     unsigned long max = 64;    //?? @todo: rever. Número máximo de entradas.
     unsigned long z = 0;       //Deslocamento do rootdir 
