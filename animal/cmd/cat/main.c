@@ -77,6 +77,16 @@ int main ( int argc, char *argv[] ){
         printf ("write fail\n");
         exit(-1);
     }
+    
+    
+    // # testing libc
+    // creat
+    //int s = -1;
+    //s = creat ( "nothing.txt", 0666);
+    //if(s<=0)
+    //    printf ("creat fail\n");
+
+
 
     return 0;
 }

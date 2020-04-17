@@ -47,6 +47,9 @@ int sys_uname (struct utsname *ubuf){
 // See: sm/debug/debug.c
 int sys_serial_debug_printk ( char *s )
 {
+    //if ( (void *) s == NULL )
+        //return -1;
+        
     debug_print ( (char *) s );
     return 0;
 }
@@ -54,6 +57,7 @@ int sys_serial_debug_printk ( char *s )
 
 
 /*
+ *******************************
  * sys_ioctl:
  *     system call implementation of ioctl().
  *     Executa um dado comando em um dado dispositivo.
@@ -67,15 +71,14 @@ int sys_serial_debug_printk ( char *s )
 // In particular, many operating characteristics of
 // character special files (e.g., terminals) may be controlled with
 // ioctl() requests.  The argument fd must be an open file descriptor.
-   
- 
- // OK Isso é um wrapper.
- // Chamaremos tty_ioctl() ou outros ...  
+
+// OK Isso é um wrapper.
+// Chamaremos tty_ioctl() ou outros ...  
        
 // IN: fd, what to do, ?
 
-int sys_ioctl ( int fd, unsigned long request, char *arg )
-{
+int sys_ioctl ( int fd, unsigned long request, char *arg ){
+
     struct process_d *p;
     file *f;
 
@@ -167,15 +170,23 @@ int sys_fcntl ( int fd, int cmd, ... )
 // para que a libc possa manipular o buffer ?
 
 // ou open deve ser usado somente com dispositivos ??
-//#obs:
-//vamos retornar o indice da tabela de arquivos abertos do processo atual.
+// #obs:
+// vamos retornar o indice da tabela de arquivos abertos 
+// do processo atual.
+
 int sys_open (const char *pathname, int flags, mode_t mode ){
 
     struct process_d *p;
     int __Status = -1;
     int Size = -1;
     
-    
+
+    // #steps
+    // Change to uppercase.
+    // Search in the directory.
+    // Create the file if it doesn't exist and 
+    // we have the flag O_CREAT
+    // ...    
     
     // Ajust.
     read_fntos ( (char *) pathname );
@@ -185,11 +196,24 @@ int sys_open (const char *pathname, int flags, mode_t mode ){
     __Status = (int) KiSearchFile ( (unsigned char *) pathname, 
                          VOLUME1_ROOTDIR_ADDRESS );
 
-    if (__Status != 1){
-         printf("sys_open: not found\n");
+    // The file doesn't exist.
+    // #todo:
+    // Create the file if it doesn't exist and 
+    // we have the flag O_CREAT
+    
+    if (__Status != 1)
+    {
+         if (flags & O_CREAT)
+         {
+             //#todo: Create an empty file.
+             debug_print ("sys_open: [TODO] O_CREAT\n");
+         }
+         
+         //debug_print ("sys_open: not found\n");
+         printf ("sys_open: not found\n");
          refresh_screen();
          return -1;
-    };
+    }
 
 
 
