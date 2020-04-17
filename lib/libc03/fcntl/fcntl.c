@@ -12,6 +12,9 @@
 #include <fcntl.h>
 // ...
 
+//used for flock()
+#include <sys/file.h>
+
 
 
 /*
@@ -20,8 +23,6 @@
  *
  */
 
-// Isso é um wrapper usando fcntl()
-
 int fcntl ( int fd, int cmd, ... )
 {
     debug_print("fcntl: [TODO]\n");
@@ -29,6 +30,8 @@ int fcntl ( int fd, int cmd, ... )
     if (fd<0) {
         return -1;
     }
+
+    //#todo:
     
     /*
     va_list ap;
@@ -41,9 +44,6 @@ int fcntl ( int fd, int cmd, ... )
   
     return -1; //#todo
 }
-
-
-
 
 
 
@@ -90,7 +90,6 @@ int open (const char *pathname, int flags, mode_t mode){
       //               (unsigned long) pathname, 
       //               (unsigned long) flags, 
       //               (unsigned long) mode );
-      
       
 
     //
@@ -162,6 +161,7 @@ int __open2(const char* path, int options, ...)
 
 
 /*
+ **********************************
  * creat:
  *     Linux klibc style.
  */
@@ -171,15 +171,6 @@ int creat (const char *pathname, mode_t mode)
     return open (pathname, O_CREAT|O_WRONLY|O_TRUNC, mode);
 }
 
-
-
-// it's a wrapper.
-// lock operation using fcntl()
-int flock (int fd, int operation)
-{
-    debug_print("flock: [TODO]\n");
-    return -1;
-}
 
 /*
 // MINIX 3
@@ -198,6 +189,32 @@ int flock(int fd, int mode)
   return fcntl(fd, mode & LOCK_NB ? F_SETLK : F_SETLKW, &lck);
 }
 */
+
+
+/*
+ ********************
+ * flock:
+ * 
+ * 
+ */
+ 
+// #todo: It's a wrapper.
+// Lock operation using fcntl()
+// See: sys/file.h
+int flock (int fd, int operation)
+{
+    debug_print("flock: [TODO]\n");
+    return -1;
+}
+
+
+
+//
+// End.
+//
+
+
+
 
 
 

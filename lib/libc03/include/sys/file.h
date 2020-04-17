@@ -1,5 +1,19 @@
 
+// sys/file.h
 
-//criado para compatibilidade 
+
+#ifndef __SYS_FILE_H
+#define __SYS_FILE_H
+
+int flock (int fd, int operation); 
+
+
+
+#endif  
+
+//
+// End.
+//
+
 
 
