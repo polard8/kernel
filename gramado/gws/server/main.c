@@ -520,13 +520,27 @@ void create_taskbar (void)
 
     __taskbar_window = (struct gws_window_d *) createwCreateWindow ( WT_SIMPLE, 
                                                1, 1, "gws-taskbar",  
-                                               0, 0, w, 36,   
+                                               0, 0, w, 40,   
                                                gui->screen, 0, 
                                                xCOLOR_GRAY1, xCOLOR_GRAY1 );
     
     if ( (void *) __taskbar_window == NULL ){
         gde_debug_print ("gws: __taskbar_window fail\n");  
     }
+    
+    // #test
+    // Create button.
+
+    //gws_draw_button ("Button 1", 1,1,1, 
+        //8, 8, w, h, GWS_COLOR_BUTTONFACE3 );    
+
+    
+    gws_draw_button ("Button 1", 1,1,1, 
+        __taskbar_window->left +2, 
+        __taskbar_window->top  +2, 
+        100, 36, 
+        GWS_COLOR_BUTTONFACE3 );    
+
 }
 
 
