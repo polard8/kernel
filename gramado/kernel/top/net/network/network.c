@@ -7,19 +7,23 @@
  * History:
  *     2016 - Created by Fred Nora.
  */
- 
- /*
-uint16_t switch_endian16(uint16_t nb) {
-       return (nb>>8) | (nb<<8);
-   }
+
+
+/*
+uint16_t switch_endian16(uint16_t nb)
+{
+    return (nb>>8) | (nb<<8);
+}
    
-   uint_t switch_endian32(uint_t nb) {
+uint_t switch_endian32(uint_t nb)
+{
        return ((nb>>24)&0xff)      |
               ((nb<<8)&0xff0000)   |
               ((nb>>8)&0xff00)     |
               ((nb<<24)&0xff000000);
-   }  
-  */
+}  
+*/
+
 
 /*
  @todo:
@@ -65,17 +69,20 @@ uint16_t switch_endian16(uint16_t nb) {
 #include <kernel.h>
 
 
-//0 - uninitialized
-//1 - initialized
+// Status do driver de network
+// 0 - uninitialized
+// 1 - initialized
 
-//status do driver de network
 int network_status;   
 
-//status para notifica��es.
-//podemos ou n�o notificar os processo sobre os eventos de rede.
-//o shell vai habilitar essa notifica��o no momento em que
-//envia um stream para mensagens de texto.
+
+// Status para notificações.
+// Podemos ou não notificar os processo sobre os eventos de rede.
+// O shell vai habilitar essa notificação no momento em que
+// envia um stream para mensagens de texto.
+
 int notification_status; 
+
 
 
 // Usado por esse módulo.
@@ -84,9 +91,9 @@ file *____network_file;
 
 
 /*
+ ************************************
  * network_procedure:
  *     Dialog.
- * 
  */
  
 // Dialog with this module.
@@ -236,16 +243,16 @@ network_procedure (
 
 void networkSetstatus (int status){
 
-	if ( status < 0 || status > 1 )
-		return;
-	
-	network_status = (int) status;
+    if ( status < 0 || status > 1 )
+        return;
+
+    network_status = (int) status;
 }
 
 
-int networkGetStatus (void){
-
-	return (int) network_status;
+int networkGetStatus (void)
+{
+    return (int) network_status;
 }
  
  
@@ -258,8 +265,8 @@ int networkGetStatus (void){
 
 int networkInit (void){
 
-	// Status.
-	networkSetstatus (0);
+    // Status.
+    networkSetstatus (0);
 
 
 	// Host info struct. 
@@ -288,8 +295,8 @@ int networkInit (void){
         HostInfo->hostVersionRevision = 0;
         HostInfo->hostArchitecture = 0; 
 
-		//...
-		
+        // ...
+
     };
 
 	// Criando socket para local host porta 80;
@@ -298,10 +305,13 @@ int networkInit (void){
 
     LocalHostHTTPSocket = (struct socket_d *) create_socket (0,0);  
 
+    //if ( (void *) LocalHostHTTPSocket == NULL )
+        //return -1;
+
 
     CurrentSocket = (struct socket_d *) LocalHostHTTPSocket;
 
-	//...
+	// ...
 
 
     socket_init();
@@ -386,18 +396,18 @@ void show_current_nic_info (void){
             currentNIC->pci->Vendor, currentNIC->pci->Device );
 
 
-		// bars
-		printf ("BAR0 %x\n", currentNIC->pci->BAR0 );
-		printf ("BAR1 %x\n", currentNIC->pci->BAR1 );
-		printf ("BAR2 %x\n", currentNIC->pci->BAR2 );
-		printf ("BAR3 %x\n", currentNIC->pci->BAR3 );
-		printf ("BAR4 %x\n", currentNIC->pci->BAR4 );
-		printf ("BAR5 %x\n \n", currentNIC->pci->BAR5 );
+        // BARs
+        printf ("BAR0 %x\n", currentNIC->pci->BAR0 );
+        printf ("BAR1 %x\n", currentNIC->pci->BAR1 );
+        printf ("BAR2 %x\n", currentNIC->pci->BAR2 );
+        printf ("BAR3 %x\n", currentNIC->pci->BAR3 );
+        printf ("BAR4 %x\n", currentNIC->pci->BAR4 );
+        printf ("BAR5 %x\n \n", currentNIC->pci->BAR5 );
 
 		//
 		// ## Device status ##
 		//
-		
+
 		// Device status.
 		// To test your mapping, try printing out the device status register 
 		// (section 13.4.2). This is a 4 byte register that starts at byte 8 
@@ -433,35 +443,24 @@ void show_current_nic_info (void){
             printf ("1000Mbs\n");
         }
 
-		//
-		// ## MAC ##
-		//
-
+        // MAC
         printf ("MAC %x %x %x %x %x %x \n", 
-            currentNIC->mac_address[0], 
-            currentNIC->mac_address[1], 
-            currentNIC->mac_address[2],
-            currentNIC->mac_address[3], 
-            currentNIC->mac_address[4], 
-            currentNIC->mac_address[5] );
+            currentNIC->mac_address[0], currentNIC->mac_address[1], 
+            currentNIC->mac_address[2], currentNIC->mac_address[3], 
+            currentNIC->mac_address[4], currentNIC->mac_address[5] );
 
-		//
-		// ## IP ##
-		//
-
+        // IP
         printf ("IP %d %d %d %d \n", 
-            currentNIC->ip_address[0], 
-            currentNIC->ip_address[1], 
-            currentNIC->ip_address[2],
-            currentNIC->ip_address[3] );
+            currentNIC->ip_address[0], currentNIC->ip_address[1], 
+            currentNIC->ip_address[2], currentNIC->ip_address[3] );
 
+        // irq, shared INTA#
         printf ("int_line={%d} int_pin={%d}\n",
-            currentNIC->pci->irq_line,     //irq
-            currentNIC->pci->irq_pin );    //shared INTA#
+            currentNIC->pci->irq_line, currentNIC->pci->irq_pin ); 
 
         printf ("interrupt_count={%d}\n", currentNIC->interrupt_count );
 
-		//...
+        // ...
 
     };
 
@@ -473,8 +472,8 @@ void show_current_nic_info (void){
 /*
  *********************************************
  * handle_ipv6:
- *     Manipular o pacote ipv6 recebido pelo handle do e1000. Ou por qualquer 
- * outro adaptador.
+ *     Manipular o pacote ipv6 recebido pelo handle do e1000. 
+ * Ou por qualquer outro adaptador.
  */
 
 //#todo
@@ -547,8 +546,7 @@ void network_test(void)
     // Network info.
     debug_print("network_test: Show info\n");
     show_network_info();
-    
-    
+
     refresh_screen();
     debug_print("network_test: done\n");
 }
@@ -562,12 +560,12 @@ void network_test(void)
  *     Isso bota ele pra funcionar depois de inicializado.
  */
 
-// #IMPORTANTE
+// # IMPORTANTE
 // Chamada por F6 no procedimento de janela do sistema.
-// Essa rotina aciona uma flag que (DESTRAVA) o handler da interrup��o.
+// Subrotina chamada por rotinas de teste.
+// Essa rotina aciona uma flag que (DESTRAVA) o handler da interrupção.
 
 void testNIC (void){
-
 
     debug_print ("testNIC:\n");
 
@@ -580,33 +578,42 @@ void testNIC (void){
     printf ("testNIC: Unlock interrupt handler \n");
     e1000_interrupt_flag = 1;
 
-	uint8_t source_ip_address[4];
-	source_ip_address[0] = 192;
-	source_ip_address[1] = 168;
-	source_ip_address[2] = 1;   
-	source_ip_address[3] = 112; 
+    // Source = 192.168.1.112
+    // Gramado.
+    uint8_t source_ip_address[4];
+    source_ip_address[0] = 192;
+    source_ip_address[1] = 168;
+    source_ip_address[2] = 1;   
+    source_ip_address[3] = 112; 
 
-	uint8_t target_ip_address[4];
-	target_ip_address[0] = 192;
-	target_ip_address[1] = 168;
-	target_ip_address[2] = 1; 
-	target_ip_address[3] = 111; 
-	
-	uint8_t target_mac_address[6];
-	target_mac_address[0] = 0xFF;
-	target_mac_address[1] = 0xFF;
-	target_mac_address[2] = 0xFF;
-	target_mac_address[3] = 0xFF;
-	target_mac_address[4] = 0xFF;
-	target_mac_address[5] = 0xFF;
-	
-	//tests
-	
-	//mudar network.
-	//tem que ter uma abstra��o que selecione o nic atual
+    // Target = 192.168.1.111
+    // Linux host.
+    uint8_t target_ip_address[4];
+    target_ip_address[0] = 192;
+    target_ip_address[1] = 168;
+    target_ip_address[2] = 1; 
+    target_ip_address[3] = 111; 
+
+    // MAC for broadcast.
+    // 0xFF 0xFF 0xFF 0xFF 0xFF 0xFF.
+    uint8_t target_mac_address[6];
+    target_mac_address[0] = 0xFF;
+    target_mac_address[1] = 0xFF;
+    target_mac_address[2] = 0xFF;
+    target_mac_address[3] = 0xFF;
+    target_mac_address[4] = 0xFF;
+    target_mac_address[5] = 0xFF;
+
+    //
+    // #test
+    //
+    
+	// Mudar network.
+	// Tem que ter uma abstração que selecione o nic atual
 
     printf ("testNIC: Sending arp request \n");
-    SendARP ( source_ip_address, target_ip_address, target_mac_address );
+    SendARP ( source_ip_address, target_ip_address, 
+        target_mac_address );
 
 
 	//==============================================
@@ -697,7 +704,7 @@ network_SendIPV4_UDP (
     }else{
 
         // Configurando a estrutura do dispositivo.
-
+        // 192.168.1.112
         currentNIC->ip_address[0] = source_ip[0];  //192;
         currentNIC->ip_address[1] = source_ip[1];  //168;
         currentNIC->ip_address[2] = source_ip[2];  //1;
@@ -1022,7 +1029,8 @@ SendARP (
 		// #bugbug
 		// Estamos configurando a estrutura do dispositivo
 		// Esse não é o momento de fazermos isso.
-
+		
+        // 192.168.1.112
         currentNIC->ip_address[0] = source_ip[0];  //192;
         currentNIC->ip_address[1] = source_ip[1];  //168;
         currentNIC->ip_address[2] = source_ip[2];  //1;
@@ -1371,6 +1379,7 @@ network_driver_dialog (
 
 
 /*
+ *********************************************
  * network_decode_buffer:
  *     Decode the buffer and call routines for each protocol.
  */
@@ -1390,15 +1399,14 @@ network_driver_dialog (
 
 int network_decode_buffer ( unsigned long buffer_address ){
 
+    // Only the ethernet header.
+    struct ether_header *eh;
+
+
     //#debug
     debug_print ("network_decode_buffer:\n");
     //printf ("network_decode_buffer:\n");
 
-    //
-    // Only the ethernet header.
-    //
-
-    struct ether_header *eh;
 
     if ( buffer_address == 0 ){
         printf ("network_decode_buffer: buffer\n");
@@ -1579,11 +1587,11 @@ int do_arp ( unsigned long buffer ){
     //
 
     if ( ah->op == ToNetByteOrder16(ARP_OPC_REPLY) ){
-        goto __do_reply;
+        goto __reply_received;
     }
     
     if ( ah->op == ToNetByteOrder16(ARP_OPC_REQUEST) ){
-        goto __do_request;
+        goto __request_received;
     }
 
     // Fail:
@@ -1592,10 +1600,10 @@ int do_arp ( unsigned long buffer ){
     return -1;
 
 //
-// Reply!
+// Reply received.
 //
 
-__do_reply:
+__reply_received:
 
     // Recebemos um reply.
     // Não faremos nada por enquanto.
@@ -1603,8 +1611,8 @@ __do_reply:
     // alguma informação que solicitamos, como o MAC de um dispositivo.
     
     //#debug
-    //printf ("\n ARP REPLY received \n");
-    //refresh_screen();
+    printf ("\n ARP REPLY received \n");
+    refresh_screen();
         
     //#debug
     //printf("REPLY received\n");
@@ -1617,10 +1625,10 @@ __do_reply:
     
 
 //
-// Request!
+// Request received.
 //
 
-__do_request:
+__request_received:
 
     // Recebemos um request.
     // Vamos responter.
@@ -1692,9 +1700,7 @@ __do_request:
     // Send.
     
     E1000Send ( (void *) currentNIC, 
-        (uint32_t) arp_tx_len, 
-        (uint8_t *) buffer );
-
+        (uint32_t) arp_tx_len, (uint8_t *) buffer );
 
     //printf ("\n");
     //refresh_screen ();
