@@ -770,8 +770,8 @@ gde_extra_services (
     }    
 
 
-    //o processo est� se comunicando com o driver de rede.
-     //um descritor de soquete � enviado via argumento.
+    // O processo está se comunicando com o driver de rede.
+    // Um descritor de soquete é enviado via argumento.
     if ( number == 967 )
     {
         return (void *) network_procedure ( NULL,

@@ -117,7 +117,7 @@ e1000_init_nic (
     if ( Vendor != 0x8086 || Device != 0x100E )
     {
 		// #todo: 
-		// Criar menasgem aqui. 
+		// Criar mensagem aqui. 
 		// Pois essa rotina foi chamada porque encontramos
 		// esse dispositivo específicamente.
 
@@ -314,7 +314,7 @@ e1000_init_nic (
 		    currentNIC->mac_address[5] = (uint8_t)(tmp >> 8);
 
 
-		// We can't use the EEPROM :(
+        // We can't use the EEPROM :(
         }else{
 
 			//printf("MAC from registers \n"); 
@@ -830,6 +830,8 @@ int e1000_reset_controller (void){
 	
 	
     // And alloc the phys/virt address of the transmit buffer
+    // tx_descs_phys conterá o endereço físico e
+    // legacy_tx_descs conterá o endereço virtual.
 
     currentNIC->tx_descs_phys = E1000AllocCont ( 0x1000, (uint32_t *)(&currentNIC->legacy_tx_descs) );
 
@@ -997,9 +999,9 @@ int e1000_reset_controller (void){
 	
     E1000WriteCommand (currentNIC, 0x2800, currentNIC->rx_descs_phys );  // low
     E1000WriteCommand (currentNIC, 0x2804, 0);                           // high 
-    E1000WriteCommand (currentNIC, 0x2808, 512);                         // 32*16
-    E1000WriteCommand (currentNIC, 0x2810, 0);         // head
-    E1000WriteCommand (currentNIC, 0x2818, 31);        // tail
+    E1000WriteCommand (currentNIC, 0x2808, 512);    // 32*16
+    E1000WriteCommand (currentNIC, 0x2810, 0);      // head
+    E1000WriteCommand (currentNIC, 0x2818, 31);     // tail
     E1000WriteCommand (currentNIC, 0x100, 0x602801E);  // RCTL	= 0x0100,	/* Receive Control */
 	
 	
@@ -1012,12 +1014,11 @@ int e1000_reset_controller (void){
 	//TDBAL	= 0x3800,	/* Tx Descriptor Base Address Low */
 	//TDBAH	= 0x3804,	/* Tx Descriptor Base Address High */
 	
-    E1000WriteCommand (currentNIC, 0x3800, currentNIC->tx_descs_phys );	//low (endereço do ring)							
+    E1000WriteCommand (currentNIC, 0x3800, currentNIC->tx_descs_phys );  //low (endereço do ring)
     E1000WriteCommand (currentNIC, 0x3804, 0);                           //high
-
-    E1000WriteCommand (currentNIC, 0x3808, 128);                         //8*16
-    E1000WriteCommand (currentNIC, 0x3810, 0);  //head
-    E1000WriteCommand (currentNIC, 0x3818, 0);  //tail
+    E1000WriteCommand (currentNIC, 0x3808, 128);    //8*16
+    E1000WriteCommand (currentNIC, 0x3810, 0);      //head
+    E1000WriteCommand (currentNIC, 0x3818, 7); //0);      //tail
 
 	//#define E1000_TCTL     0x00400  /* TX Control - RW */
     //• CT = 0x0F (16d collision)
@@ -1149,7 +1150,7 @@ E1000ReadCommand (
 
 /*
  * E1000AllocCont: ??
- * retorna o endereço fisico e coloca o virtual em *virt
+ * retorna o endereço físico e coloca o virtual em *virt
  * ah ... então eu vou alocar usando endereços virtuais
  * ... e traduzir para físico 
  * ... colocar o virtual em *virt e retornar o físico.

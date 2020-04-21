@@ -1017,7 +1017,11 @@ SendARP (
     }else{
 
 		// Source IP.
-		// Configurando a estrutura do dispositivo,
+		// Configurando a estrutura do dispositivo.
+		
+		// #bugbug
+		// Estamos configurando a estrutura do dispositivo
+		// Esse não é o momento de fazermos isso.
 
         currentNIC->ip_address[0] = source_ip[0];  //192;
         currentNIC->ip_address[1] = source_ip[1];  //168;
@@ -1551,9 +1555,10 @@ int do_arp ( unsigned long buffer ){
     int i=0;
 
 
-   //debug
-   // printf ("do_arp: \n");
-
+    // #debug
+    // printf ("do_arp: \n");
+    debug_print ("do_arp: \n");
+        
     eh = (struct ether_header *) (buffer + 0);
     ah = (struct ether_arp *)    (buffer + 14);
     
