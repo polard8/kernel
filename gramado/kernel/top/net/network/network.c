@@ -1233,9 +1233,10 @@ SendARP (
 	//
 
 
-	// #importante: 
-	// Diga ao controlador qual � o �ndice do descritor a ser usado para  
-	// transmitir dados.
+    // #importante: 
+    // Diga ao controlador qual é o índice do descritor a ser usado 
+    // para transmitir dados.
+
 	// TDH	= 0x3810,    /* Tx Descriptor Head */
 	// TDT	= 0x3818,    /* Tx Descriptor Tail */
 

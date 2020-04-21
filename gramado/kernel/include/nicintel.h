@@ -102,21 +102,21 @@ Protocol addresses of the source and destination hosts
 //intel defines
 
 /*
-#define CTRL_SLU	(1 << 6)  //Set Link Up 
-#define TCTL_EN		(1 << 1)
-#define RCTL_EN		(1 << 1)
-#define ICR_TXDW	     (1) //Transmit Descriptor Written Back 
-#define ICR_TXQE	(1 << 1) //Transmit Queue Empty 
-#define ICR_RXO		(1 << 6) //Receiver Overrun 
-#define IMS_RXO		(1 << 6) //Receiver FIFO Overrun 
-#define TDESC_EOP	     (1) // End Of Packet 
-#define TDESC_RS	(1 << 3) // Report Status 
-#define RDESC_STA_DD	     (1) // Descriptor Done 
-#define TDESC_STA_DD	     (1) // Descriptor Done 
+#define CTRL_SLU    (1 << 6)  //Set Link Up 
+#define TCTL_EN     (1 << 1)
+#define RCTL_EN     (1 << 1)
+#define ICR_TXDW         (1) //Transmit Descriptor Written Back 
+#define ICR_TXQE    (1 << 1) //Transmit Queue Empty 
+#define ICR_RXO     (1 << 6) //Receiver Overrun 
+#define IMS_RXO     (1 << 6) //Receiver FIFO Overrun 
+#define TDESC_EOP        (1) // End Of Packet 
+#define TDESC_RS    (1 << 3) // Report Status 
+#define RDESC_STA_DD     (1) // Descriptor Done 
+#define TDESC_STA_DD     (1) // Descriptor Done 
 */
 
 
-
+// Transmit Descriptor
 struct legacy_tx_desc 
 {
 
@@ -174,8 +174,7 @@ struct e1000_tx_desc {
 //
 
 
-/* Receive Descriptor */
-
+// Receive Descriptor
 struct legacy_rx_desc 
 {
 
@@ -222,15 +221,15 @@ struct intel_nic_info_d
 {
     object_type_t objectType;
     object_class_t objectClass;
-	
-	//validação da estrutura.
-	//se as flags estiverem acionadas, devemos
-	//procurar as informações na estrutura de dispositivo pci.
+
+    // Validação da estrutura.
+    // Se as flags estiverem acionadas, devemos procurar 
+    // as informações na estrutura de dispositivo pci.
 
     int used;
     int magic;
 
-	// Salvando o endereço base.
+    // Salvando o endereço base.
     unsigned long registers_base_address;
     unsigned long DeviceControl;
     unsigned long DeviceStatus;

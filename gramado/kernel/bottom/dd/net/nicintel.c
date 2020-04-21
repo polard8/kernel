@@ -428,7 +428,8 @@ void xxxe1000handler (void){
 	// See: intel.h
     e1000_irq_count++;
 
-    //#test
+
+    // Interrupt count.
     if ( (void *) currentNIC != NULL ){
         currentNIC->interrupt_count++;
     }
@@ -443,15 +444,15 @@ void xxxe1000handler (void){
     E1000WriteCommand ( currentNIC, 0xD0, 1);
 
 
-    // status
+    // Status
     uint32_t status = E1000ReadCommand ( currentNIC, 0xC0 ); 
 
     // 0x04 - Linkup
     if (status & 0x04) 
     {
-		uint32_t val = E1000ReadCommand ( currentNIC, 0 );
-		E1000WriteCommand ( currentNIC, 0, val | 0x40 );
-		return;
+        uint32_t val = E1000ReadCommand ( currentNIC, 0 );
+        E1000WriteCommand ( currentNIC, 0, val | 0x40 );
+        return;
 
     // 0x80 - ?
     } else if (status & 0x80){
@@ -459,9 +460,12 @@ void xxxe1000handler (void){
         //printf("e1000 handler ");
         //refresh_screen();
 
-
+        // #todo
+        // Esse sequência está funcionando. Não mudar.
+        // Precisamos entender ela melhor.
         // Todos os buffers de recebimento.
         // Olhamos um bit do status de todos os buffers.
+   
         while ( (currentNIC->legacy_rx_descs[currentNIC->rx_cur].status & 0x01) == 0x01 ) 
         {
              uint16_t old = currentNIC->rx_cur;
@@ -478,7 +482,7 @@ void xxxe1000handler (void){
             // circula.
             currentNIC->rx_cur = (currentNIC->rx_cur + 1) % 32;
 
-            // ??
+            // ?? Provavelmente seleciona o buffer.
             E1000WriteCommand ( currentNIC, 0x2818, old );
         };
     };
@@ -909,12 +913,14 @@ int e1000_reset_controller (void){
 
     for ( i=0; i < 32; i++ ) 
     {
-		// Alloc the phys/virt address of this transmit desc
-		currentNIC->legacy_rx_descs[i].addr = E1000AllocCont ( 0x3000, (uint32_t *) &currentNIC->rx_descs_virt[i] );		
-		currentNIC->legacy_rx_descs[i].addr2 = 0;
-		
+        // Alloc the phys/virt address of this transmit desc
+        currentNIC->legacy_rx_descs[i].addr = E1000AllocCont ( 0x3000, (uint32_t *) &currentNIC->rx_descs_virt[i] );
+        currentNIC->legacy_rx_descs[i].addr2 = 0;
+
+        // Buffer null.
         // We failed, unmap everything
-        if (currentNIC->legacy_rx_descs[i].addr == 0){
+        if (currentNIC->legacy_rx_descs[i].addr == 0)
+        {
             printf ("e1000_reset_controller: dev->rx_descs[i].addr fail");
             refresh_screen ();
             while (1){};
