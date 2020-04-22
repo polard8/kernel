@@ -1,4 +1,5 @@
 
+// File: window.h
 
 // #todo
 // Structures.
@@ -12,6 +13,10 @@
 
 
 // #todo
+// Talvez não usaremos estrutura de janela nessa biblioteca,
+// usaremos apenas o descritor de objeto janela.
+// #deletar.
+/*
 struct window_d
 {
     int id;
@@ -21,9 +26,15 @@ struct window_d
     
     // ...
 };
+*/
+
+//unsigned long windowList[1024];
+int windowList[1024];  //lista de descritores.
 
 
-unsigned long windowList[1024];
+//
+// End.
+//
 
 
 

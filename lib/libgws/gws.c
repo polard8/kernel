@@ -127,7 +127,7 @@ gws_services (
 int
 gws_send_message_to_process ( 
     int pid, 
-    struct window_d *window, 
+    int window, 
     int message,
     unsigned long long1,
     unsigned long long2 )
@@ -161,7 +161,7 @@ gws_send_message_to_process (
 int 
 gws_send_message_to_thread ( 
     int tid, 
-    struct window_d *window, 
+    int window, 
     int message,
     unsigned long long1,
     unsigned long long2 )
@@ -204,7 +204,7 @@ gws_create_window (
     unsigned long y,           //6, Deslocamento em relação às margens do Desktop.
     unsigned long width,       //7, Largura da janela.
     unsigned long height,      //8, Altura da janela.
-    struct window_d *pWindow,  //9, Endereço da estrutura da janela mãe.
+    int parentwindow,  //9, Endereço da estrutura da janela mãe.
     unsigned long onde,        //10, Ambiente.( Est� no desktop, barra, cliente ...)
     unsigned long clientcolor, //11, Cor da área de cliente
     unsigned long color )      //12, Color (bg) (para janela simples).
@@ -244,7 +244,6 @@ gws_create_window (
 
     
     while(1){
-
 
         //create window        
         

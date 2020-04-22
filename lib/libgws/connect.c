@@ -144,16 +144,17 @@ int gws_initialize_connection (void)
 
         // IN: PID, window, msg, long1, long2
         gws_send_message_to_process ( __ws__pid, 
-            NULL, 1000, 0, 0 );  
+            0, 1000, 0, 0 );  
     
 
         // put some pixel in this position.
         gws_send_message_to_process ( __ws__pid, 
-            NULL, 2000, 40, 40 );  
+            0, 2000, 40, 40 );  
 
         // refresh screen
         gws_send_message_to_process ( __ws__pid, 
-            NULL, 2020, 0, 0 );     
+            0, 2020, 0, 0 );     
+        
         
     return 0;
 }
