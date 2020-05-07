@@ -180,23 +180,43 @@ void handle_request (int fd){
     // Recv.
     //
     
+    // Lê a mensagem e coloca no buffer.
+    
     //n_reads = read ( fd, __buffer, sizeof(__buffer) );
     n_reads = recv ( fd, __buffer, sizeof(__buffer), 0 );
 
     if (n_reads <= 0)
         return;
- 
-     
- 
- 
-        
+
+
+
     // Nesse momento lemos alguma coisa.   
  
     //debug_print ("gws: request found on its own socket \n");  
             
-    // Mensagem invalida  
+    // Mensagem inválida  
     if (message_buffer[1] == 0 )
         return;
+
+
+    // #test
+    // Input solicitado.
+    if (message_buffer[1] == 369)
+    {
+        debug_print ("gws: [TEST] INPUT request !!! \n");
+
+        //pegar o input. 
+        //gde_enter_critical_section ();
+        //gramado_system_call ( 111,
+        //    (unsigned long) &message_buffer[0],
+        //    (unsigned long) &message_buffer[0],
+        //    (unsigned long) &message_buffer[0] );
+        //gde_exit_critical_section ();
+        
+        message_buffer[1] = SERVER_PACKET_TYPE_EVENT;
+        send ( fd, __buffer, sizeof(__buffer), 0 );
+        return;
+    }
 
 
     debug_print ("gws: Got a request!\n");
@@ -552,6 +572,9 @@ void create_taskbar (void)
 
 int main (int argc, char **argv){
 
+    int i=0;
+    int _status = -1;
+
 
     // Isso registra uma gramado port.
     // a porta do ws.
@@ -568,7 +591,7 @@ int main (int argc, char **argv){
     int server_fd = -1; 
     int bind_status = -1;
     
-    int i=0;
+
 
 
     // Flag usada no loop.
@@ -597,7 +620,6 @@ int main (int argc, char **argv){
     // for this desktop.
     // See: connect.c
 
-    int _status = -1;
     _status = (int) register_ws ();
     
     if (_status<0){
@@ -605,15 +627,14 @@ int main (int argc, char **argv){
         printf ("gws: Couldn't register the server \n");
         exit (1);
     }
-    gde_debug_print ("gws: registration ok \n");
-
+    gde_debug_print ("gws: Registration ok \n");
 
 
 
     //
-    // socket
+    // Socket
     //
-    
+
     // #debug
     printf ("gws: Creating socket\n");
 

@@ -1,5 +1,5 @@
 /*
- * File: s2.c
+ * File: main.c
  *
  *    Client side application for Gramado Window Server.
  *    Using socket to connect with gws.
@@ -8,6 +8,7 @@
  * History:
  *     2020 - Created by Fred Nora.
  */
+
 
 
 // tutorial example taken from. 
@@ -142,11 +143,11 @@ int main ( int argc, char *argv[] ){
 
     // Enviamos um request para o servidor.
     // ?? Precisamos mesmo de um loop para isso. ??
+    // msg = 369 (get input event)
 
     while (1)
     {
         // Create window    
-            
         message_buffer[0] = 0;       // window. 
         message_buffer[1] = 1001;    // msg. Create window.
         message_buffer[2] = 0;
@@ -207,8 +208,9 @@ int main ( int argc, char *argv[] ){
     gws_debug_print ("gwst: reading ...\n");      
 
 
-    //#caution
-    // we can stay here for ever.
+    // #caution
+    // Waiting for response.
+    // We can stay here for ever.
 
 response_loop:
 
@@ -255,8 +257,8 @@ response_loop:
             break;
             
         case SERVER_PACKET_TYPE_EVENT:
-            //todo: call procedure.
-            goto response_loop;
+            goto process_event;
+            //goto response_loop;
             break;
             
         case SERVER_PACKET_TYPE_ERROR:
@@ -269,6 +271,10 @@ response_loop:
             goto response_loop;
             break; 
     };
+
+
+
+
 
 //
 // Process reply.
@@ -287,6 +293,14 @@ process_reply:
     // Podemos usar a biblioteca e testarmos
     // vários serviços da biblioteca nesse momento.
 
+    return 0;
+
+//
+// Process an event.
+//
+
+process_event:
+    gws_debug_print ("gwst: We got an event\n"); 
     return 0;
 }
 

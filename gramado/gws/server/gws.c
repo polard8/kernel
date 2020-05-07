@@ -65,10 +65,12 @@ unsigned long gws_get_device_height(void)
 
 int gwsInit (){
 
+    int i=0;
+    
     // Initializing the counter.
     windows_count = 0;
-    
-    int i;
+
+   
     for (i=0; i<1024; i++)
         windowList[0] = 0;
 
@@ -129,8 +131,10 @@ int gwsInit (){
     // #kgws.
     gde_show_backbuffer ();
 
-	return 0;
+
+    return 0;
 }
+
 
 
 
