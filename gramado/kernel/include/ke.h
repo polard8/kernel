@@ -1,12 +1,12 @@
 /*
  * File: ke.h
+ * 
  *     Kernel External functions support.
- *     O objetivo é chamar rotinas que estão fora do kernel base.
- * As rotinas chamadas podem estar em servidores em user mode ou
- * em módulos em kernel mode.
- *
- * Histórico:
- *     Oct 2016 - Created.
+ *     It's gonna be used to call functions that are not
+ * inside the base kernel.
+ * 
+ * History:
+ *     2016 - Created by Fred Nora.
  */
 
 
@@ -29,9 +29,9 @@
 #ifndef ____KE_H 
 #define ____KE_H
  
-//Informações sobre o kernel. módulo externo.
+ 
+// Informations about the base kernel.
 void KeInformation (void);   
-
 
 
 #endif

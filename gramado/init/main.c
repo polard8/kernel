@@ -1,14 +1,15 @@
 /*
  * File: main.c 
  *
+ *     The INIT.BIN process.
+ * 
  * Environment:
-
+ *     ring 3.
  * 
  * Purpose:
  *     + To call interrupt 129 to enable maskable interrupts.
  *     + Hang forever. Some new process will reuse this process.
  * 
-
  *
  *     Esse programa deverá ser chamado sempre que o sistema estiver ocioso,
  * ou com falta de opções viáveis. Então esse programa deve ficar responsável 
@@ -28,11 +29,13 @@
  * Obs: O entry point está em head.s
  *      Agora idle pode fazer systemcalls. 
  *
- * @todo: Criar argumento de entrada.
+ * #todo: 
+ *     Criar argumento de entrada.
  *
- * Histórico:
- *     Versão 1.0, 2015 - Esse arquivo foi criado por Fred Nora.
- *     Versão 1.0, 2016 - Revisão.
+ * History:
+ *     2015 - Created by Fred Nora.
+ *     2016 - Lil changes.
+ *     2019 - The int 129 support.
  *     ...
  */
  
@@ -54,6 +57,7 @@ ID 	Name 	Description
 5 	Start the system normally with appropriate display manager (with GUI) 	Same as runlevel 3 + display manager.
 6 	Reboot 	Reboots the system.  
  */
+
 int __current_runlevel;
 
 //

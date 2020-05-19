@@ -2,8 +2,8 @@
 VERSION = 1
 PATCHLEVEL = 35
 SUBLEVEL =
-EXTRAVERSION = -rc16
-NAME = Gramado 1.xx
+EXTRAVERSION = 
+NAME = Gramado 1.xx (Different Feelings)
 
 # Documentation.
 # See: docs/

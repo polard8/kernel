@@ -1,16 +1,13 @@
 /*
  * File: heap.h
  *
- * Descrição:
- *     Gerenciar o ponteiro global para o heap atual, onde será
- * alocada memória.
- * *IMPORTANTE: Esse arquivo é importante para gerenciar a alocação
- * de memória para um processo em user mode.
+ *    Its used to manage the heap support.
+ *    The heap is used to allocate memory for malloc.
+ *    + Manage the pointer of the current heap.
  * 
- * Histórico:
- *     Version: 1.0, 2016 - Created.
+ * History:
+ *     2016 - Created by Fred Nora.
  */
-
 
 
 /*
@@ -28,7 +25,6 @@ unsigned long g_available_heap;     // Available.
 
 
 
-
 /*
  * heap_d:
  *     Estrutura para heap.
@@ -36,13 +32,10 @@ unsigned long g_available_heap;     // Available.
  *     Cada heap tem uma lista encadeada de blocos.  
  */  
 
-//typedef struct heap_d heap_descriptor_t;
-
 struct heap_d 
 {
     object_type_t objectType;
     object_class_t objectClass;
-
 
     int id;
 
@@ -57,10 +50,10 @@ struct heap_d
 
 
 
-	// Ponteiro para a lista de blocos de um heap.
+    // Ponteiro para a lista de blocos de um heap.
     // Lista encadeada de blocos que formam o heap.
-	// A estrutura para um bloco é: mmblock_d e está definida em mm.h
-	//
+    // A estrutura para um bloco é: mmblock_d e está definida em mm.h
+    //
     // Obs: 
 	// Foram alocados vários blocos de memória dentro de um heap. Portanto 
 	// podemos colocar os ponteiros para as estruturas desses blocos dentro 
@@ -86,13 +79,13 @@ struct heap_d
 	
 	
 	//Um heap pertence à um desktop.
-	struct desktop_d *desktop;
+    struct desktop_d *desktop;
 	
 	//Um heap pertence à um processo.
-	struct process_d *process;
+    struct process_d *process;
 	
 	//Um heap pode pertencer à um thread.
-	struct thread_d *thread;
+    struct thread_d *thread;
 	
 	//
 	// Compartilhamento de heap:
@@ -119,24 +112,19 @@ struct heap_d
 	//cada processo tem seu heap.
 	//struct heap_d *next;
 };
-//struct heap_d *CurrentHeap;
-//struct heap_d *KernelHeap;
-//struct heap_d *UserHeap;
-//...
+
 
 
 #define HEAP_COUNT_MAX  8
 
-unsigned long heapList[HEAP_COUNT_MAX];     
-
-
-
+unsigned long heapList[HEAP_COUNT_MAX];  
 
 
 
 //
-// Protótipos.
+// Prototypes.
 //
+
 
 int init_heap (void);
 
@@ -146,12 +134,11 @@ struct heap_d *memory_create_new_head ( unsigned long start_va,
 
 
 // Destrói um heap se as flags permitirem.
-void 
-memory_destroy_heap (struct heap_d *heap );
+void memory_destroy_heap (struct heap_d *heap );
 
 
-//Pega o endereço do início do header da próxima alocação.
-unsigned long get_process_heap_pointer(int pid);
+// Pega o endereço do início do header da próxima alocação.
+unsigned long get_process_heap_pointer (int pid);
 
 //
 // Alloc and Free.
