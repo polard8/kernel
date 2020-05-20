@@ -6,6 +6,22 @@
 #include <gws.h>
 
 
+/*
+// #todo
+// Retorna o ponteiro de estrutura de janela
+// dado o id da janela.
+struct gws_window_d *gws_window_from_id (int id);
+struct gws_window_d *gws_window_from_id (int id)
+{
+    struct gws_window_d *w;
+    
+    // ...
+    
+    return (struct gws_window_d *) w;
+}
+*/
+ 
+ 
    
 /*
  *******************************************************
@@ -102,16 +118,18 @@ int get_zorder ( struct window_d *window ){
     return (int) -1;
 }
 
+
+
 int get_top_window (){
-	
-	return (int) top_window;
+
+    return (int) top_window;
 }
 
 
 //Setando a top window.
 void set_top_window (int id){
-	
-	top_window = (int) id;
+
+    top_window = (int) id;
 }
 
 
@@ -168,7 +186,7 @@ gws_replace_window (
 	
         window->left = (unsigned long) x;
         window->top = (unsigned long) y;
-	};
+    };
 
     return 0;
 }
@@ -207,12 +225,8 @@ void gwsWindowUnlock (struct gws_window_d *window){
 }
 
 
-
-
-
-
-
-
-
+//
+// End.
+//
 
 

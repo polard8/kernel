@@ -368,7 +368,7 @@ gwsProcedure (
 
     int my_pid = -1;
 
-
+    // #debug
     debug_print ("gwsProcedure:\n");
   
     switch (msg)
@@ -400,9 +400,21 @@ gwsProcedure (
                     connection_status = 0;
                     //my_pid = (int) getpid();
                     //gramado_system_call (7008,my_pid,0,0);
-                    break; 
+                    break;
 
+                case VK_F3:
+                    gde_debug_print ("F3\n");
+                    break;
 
+                // #test
+                // Die.
+                case VK_F4:
+                    gde_debug_print ("F4 [EXIT] Exiting the server ...\n");
+                    running = 0;
+                    break;
+
+                // ...
+                  
                 // Enviar a mensagem para o processo associado
                 // com a janela que tem o foco de entrada.
                 default:
@@ -515,11 +527,10 @@ gwsProcedure (
 
 void create_background (void)
 {
-    unsigned long w=0;
-    unsigned long h=0;
-    
-    w = gws_get_device_width();
-    h = gws_get_device_height();
+    unsigned long w = gws_get_device_width();
+    unsigned long h = gws_get_device_height();
+
+    gde_debug_print ("gws: create_background\n");
 
 
     __bg_window = (struct gws_window_d *) createwCreateWindow ( WT_SIMPLE, 
@@ -537,11 +548,10 @@ void create_background (void)
 
 void create_taskbar (void)
 {
-    unsigned long w=0;
-    unsigned long h=0;
-    
-    w = gws_get_device_width();
-    h = gws_get_device_height();
+    unsigned long w = gws_get_device_width();
+    unsigned long h = gws_get_device_height();
+
+    gde_debug_print ("gws: create_taskbar\n");
 
     __taskbar_window = (struct gws_window_d *) createwCreateWindow ( WT_SIMPLE, 
                                                1, 1, "gws-taskbar",  
@@ -560,12 +570,10 @@ void create_taskbar (void)
         //8, 8, w, h, GWS_COLOR_BUTTONFACE3 );    
 
     
-    gws_draw_button ("Button 1", 1,1,1, 
+    gws_draw_button ("Button 1", 1, 1, 1, 
         __taskbar_window->left +2, 
         __taskbar_window->top  +2, 
-        100, 36, 
-        GWS_COLOR_BUTTONFACE3 );    
-
+        100, 36, GWS_COLOR_BUTTONFACE3 );
 }
 
 
@@ -717,32 +725,33 @@ int main (int argc, char **argv){
 
 // loop:
 
+    gde_debug_print ("gws: Entering main loop.\n");
+    
       // + Normal messages. (It's like signals.)
       // + Compositor. (Redraw dirty rectangles)
       // + Socket requests.
  
-     //while (running == 1){
-     while (1)
-     {
-         // Pinta ou não.
-         if ( dirty_status == 1 )
-             compositor();
 
-         // Status da conecção com os clientes.
-         if (connection_status == 1)
-         {
-             // Pega mensagens de seus clientes.
-             // Presta vários serviços inclusive drenar input
-             // via mensagens tradicionais e repassar via socket.
-             handle_request (____saved_server_fd);
+    // while (1)
+    while (running == 1)
+    {
+        // Pinta ou não.
+        if ( dirty_status == 1 )
+            compositor();
 
-         // Conexão desligada.
-         // Ela começa desligada.Ligamos com F1.
-         // Pega mensagens como um aplicativo normal.
-         }else{
-             handle_ipc_message(); 
-         };
+        // Status da conecção com os clientes.
+        // Pega mensagens de seus clientes.
+        // Presta vários serviços inclusive drenar input
+        // via mensagens tradicionais e repassar via socket.
+        if (connection_status == 1){
+            handle_request (____saved_server_fd);
 
+        // Conexão desligada.
+        // Ela começa desligada.Ligamos com F1.
+        // Pega mensagens como um aplicativo normal.
+        }else{
+            handle_ipc_message(); 
+        };
     };
 
 
@@ -754,6 +763,17 @@ int main (int argc, char **argv){
     
     gde_debug_print ("gws: exited. \n");
     printf ("gws: exited. \n");
+    
+    // #todo
+    // The kernel needs to react when the window server closes.
+    // We can't live without it.
+    
+    // #debug
+    // #bugbug:
+    // Page fault  when exiting ... 
+    while(1){
+        // HANG
+    }
     
     return 0; 
 }
