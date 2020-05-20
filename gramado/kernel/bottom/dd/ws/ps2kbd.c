@@ -140,46 +140,44 @@ Non Standard Commands
 */
 
 
-// propotypes
+//
+// Propotypes
+//
+
 
 int BAT_TEST (void);
 
 
 
-
-
-
-
 unsigned long 
-__local_ps2kbd_procedure ( struct window_d *window, 
-                           int msg, 
-                           unsigned long long1, 
-                           unsigned long long2 ); 
+__local_ps2kbd_procedure ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 ); 
 
 
-
-
-
-
-
-
+// Local procedure.
 unsigned long 
-__local_ps2kbd_procedure ( struct window_d *window, 
-                           int msg, 
-                           unsigned long long1, 
-                           unsigned long long2 )
+__local_ps2kbd_procedure ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 )
 {
 
    // #test
-   // Testando uma rotina de pintura que usa escape sequance.
+   // Testando uma rotina de pintura que usa escape sequence.
    // Queremos que ela funcione na máquina real.
    // Vamos testar os ponteiros.
-   
-   char buffer[128];
-   sprintf (buffer,"My super \x1b[8C string!!\n"); 
 
+
+    char buffer[128];
+    sprintf (buffer,"My super \x1b[8C string!!\n"); 
 
     int Status = -1;
+
+
 
     switch (msg)
     {
@@ -246,18 +244,21 @@ __local_ps2kbd_procedure ( struct window_d *window,
 /*
  ***************
  * KEYBOARD_SEND_MESSAGE:
- *     Envia uma mensagem de teclado para a janela com o foco de entrada.
+ *     Envia uma mensagem de teclado para a janela com o 
+ * foco de entrada.
  */
-	
-// Pega um scancode, transforma em caractere e envia na forma de mensagem
-// para a thread de controle associada com a janela que tem o foco de entrada.
 
+// Pega um scancode, transforma em caractere e envia 
+// na forma de mensagem para a thread de controle associada 
+// com a janela que tem o foco de entrada.
+
+// #todo
 // #importante
-// precisa conferir ke0 antes de construir a mensagem,
+// Precisa conferir ke0 antes de construir a mensagem,
 // para assim usar o array certo. ke0 indica o teclado estendido.
 
-int KEYBOARD_SEND_MESSAGE ( unsigned char SC ){
 
+int KEYBOARD_SEND_MESSAGE ( unsigned char SC ){
 
     struct process_d *__p;
     struct thread_d *t;
@@ -324,7 +325,7 @@ int KEYBOARD_SEND_MESSAGE ( unsigned char SC ){
         {
 			//Os primeiros 'case' é quando libera tecla do sistema.
 			//O case 'default' é pra quando libera tecla que não é do sistema.
-			
+
 			//left Shift liberado.
             case VK_LSHIFT: 
                 shift_status = 0;  message = MSG_SYSKEYUP;
@@ -577,6 +578,7 @@ done:
     // control + alt + del.
     if ( (ctrl_status == 1) && (alt_status == 1) && (ch == KEY_DELETE) )
     {
+        // debug_print("...[todo]");
         // reboot ();
     }
 
@@ -699,8 +701,8 @@ done:
     // se não der certo então enviaremos para
     // a thread de controle da janela com o foco
     // ou para um procedimento aqui nesse documento.
-    // See: ps/ipc/ipc.c
-    
+    // See: middle/sysmk//ps/ipc/ipc.c
+
     msg_status = (int) ipc_send_to_ws ( (struct window_d *) w,
                            (int) message, 
                            (unsigned long) ch,

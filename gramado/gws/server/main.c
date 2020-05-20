@@ -87,6 +87,7 @@ char __buffer[512];
 
 
 int dirty_status = 0;
+int connection_status = 0;
 
 
 //window.
@@ -386,18 +387,22 @@ gwsProcedure (
             {
                 // #debug
                 case VK_F1:
-                    gde_debug_print("gwsProcedure: VK_F1\n");
-                    gde_reboot ();
+                    gde_debug_print("gwsProcedure: VK_F1 Connection ON\n");
+                    connection_status = 1;
+                    //gde_reboot ();
                     break;
                     
                 // #debug
                 // mostrar informações sobre o socket 
                 // do gws.    
                 case VK_F2:
-                    my_pid = (int) getpid();
-                    gramado_system_call (7008,my_pid,0,0);
+                    gde_debug_print("gwsProcedure: VK_F2 Connection OFF\n");
+                    connection_status = 0;
+                    //my_pid = (int) getpid();
+                    //gramado_system_call (7008,my_pid,0,0);
                     break; 
-             
+
+
                 // Enviar a mensagem para o processo associado
                 // com a janela que tem o foco de entrada.
                 default:
@@ -564,6 +569,7 @@ void create_taskbar (void)
 }
 
 
+
 /*
  ******************************
  * main: 
@@ -629,6 +635,12 @@ int main (int argc, char **argv){
     }
     gde_debug_print ("gws: Registration ok \n");
 
+
+
+    // #todo
+    // Daqui pra frente é conexão com cliente.
+    // Lembrando que o servidor vai se conectar à mais de um cliente.
+    // ...
 
 
     //
@@ -710,14 +722,27 @@ int main (int argc, char **argv){
       // + Socket requests.
  
      //while (running == 1){
-     while (1){
-
+     while (1)
+     {
+         // Pinta ou não.
          if ( dirty_status == 1 )
              compositor();
-        
-         // Presta vários serviços inclusive drenar input
-         // via mensagens tradicionais e repassar via socket.
-         handle_request (____saved_server_fd);
+
+         // Status da conecção com os clientes.
+         if (connection_status == 1)
+         {
+             // Pega mensagens de seus clientes.
+             // Presta vários serviços inclusive drenar input
+             // via mensagens tradicionais e repassar via socket.
+             handle_request (____saved_server_fd);
+
+         // Conexão desligada.
+         // Ela começa desligada.Ligamos com F1.
+         // Pega mensagens como um aplicativo normal.
+         }else{
+             handle_ipc_message(); 
+         };
+
     };
 
 

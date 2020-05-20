@@ -26,6 +26,7 @@ int ipcStatus;
 
 
 /*
+ ********************************************
  * ipc_send_to_ws:
  *     Send a message to the ws if it is present.
  * 
@@ -47,10 +48,9 @@ ipc_send_to_ws (
 
     // #todo
     // Se o ws está rodando, então mandaremos a mensagem para 
-    // a a fila de mensagem dele.
-        
+    // à fila de mensagem dele.
     // #isso funcionou.
-    // o ws recebeu a mensagem de teclado.
+    // O ws recebeu a mensagem de teclado.
     // E é rápido.
 
     if ( (void *) CurrentDesktop == NULL ){
@@ -66,28 +66,36 @@ ipc_send_to_ws (
         return -1;
     }
 
+    //
+    // PID
+    //
     
     // The ws PID.
-    // #bugbug: Is it a valid PID ?
+    // #bugbug: Is it a valid PID? range?
     if (CurrentDesktop->ws <= 0){
-        debug_print ("ipc_send_to_ws: ws\n");
-        return -1;
+        debug_print ("ipc_send_to_ws: ws PID\n");
+        return (int) (-1);
     }
-    
+
     // The ws process.
-    __p = (struct process_d *) processList[ CurrentDesktop->ws  ];
+    // #todo: 
+    // Process validation.
+
+    __p = (struct process_d *) processList[ CurrentDesktop->ws ];
       
     if ( (void *) __p == NULL ){
         debug_print ("ipc_send_to_ws: __p\n");
-        return -1;
-    }
-      
-    __p->control->window_list[ __p->control->tail_pos ]  = window;
-    __p->control->msg_list[ __p->control->tail_pos ]     = msg;
-    __p->control->long1_list[ __p->control->tail_pos ]   = long1;
-    __p->control->long2_list[ __p->control->tail_pos ]   = long2;
- 
- 
+        return (int) (-1);
+    } 
+
+    // used ? magic ?
+    
+    __p->control->window_list[ __p->control->tail_pos ] = window;
+    __p->control->msg_list[ __p->control->tail_pos ]    = msg;
+    __p->control->long1_list[ __p->control->tail_pos ]  = long1;
+    __p->control->long2_list[ __p->control->tail_pos ]  = long2;
+
+
     __p->control->tail_pos++;
     if ( __p->control->tail_pos >= 31 )
         __p->control->tail_pos = 0;
@@ -99,10 +107,6 @@ ipc_send_to_ws (
 
     return 0;
 }
-
-
-
-
 
 
 
