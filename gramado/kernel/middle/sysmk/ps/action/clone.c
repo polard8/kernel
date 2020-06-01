@@ -1,5 +1,11 @@
+/*
+ * File: clone.c 
+ * 
+ * 
+ */
 
-// fork
+
+// fork ?
 
 
 #include <kernel.h>
@@ -309,7 +315,7 @@ do_clone:
         // In the fork() routine we need the same esp from father,
         // and not the start of the stack.
 
-        Clone->control->ss   = Current->control->ss;
+        Clone->control->ss = Current->control->ss;
         
         //
         // Clild stack
@@ -320,7 +326,7 @@ do_clone:
                 
         // O conteúdo da pilha foi copiado, porém elas possuem endereço virtual diferentes.
         //Clone->control->esp         = Current->control->esp;  // #Atention!
-        Clone->control->esp         = Current->childStack;  // #Atention!
+        Clone->control->esp = Current->childStack;  // #Atention!
 
         //podemos copiar a stack do pai numa área de memória compartilhada
         //e pasasrmos o ponteiro
@@ -345,10 +351,10 @@ do_clone:
         //refresh_screen();
 
 
-        Clone->control->eflags      = Current->control->eflags;
-        Clone->control->cs          = Current->control->cs;
+        Clone->control->eflags = Current->control->eflags;
+        Clone->control->cs     = Current->control->cs;
         
-        Clone->control->eip         = Current->control->eip;  // mesmo do pai.
+        Clone->control->eip    = Current->control->eip;  // mesmo do pai.
         //Clone->control->eip = 0x401000; //teste: para o clone começar do início.
 
 

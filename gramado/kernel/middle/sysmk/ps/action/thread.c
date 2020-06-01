@@ -29,7 +29,7 @@
 
 unsigned long __GetThreadStats ( int tid, int index )
 {
-	
+
     struct thread_d *t;
 
     //#todo:
@@ -407,6 +407,10 @@ struct thread_d *threadCopyThread ( struct thread_d *thread ){
         panic ("threadCopyThread: thread\n");
     }
 
+    // #todo
+    // Aqui, na hora de criar o nome, vamos dar
+    // um nome personalizado pra não ficar tudo igual.
+    //char new_name[32];
 
     clone = (struct thread_d *) create_thread ( NULL,      // room
                                     NULL,                  // desktop
@@ -416,7 +420,7 @@ struct thread_d *threadCopyThread ( struct thread_d *thread ){
                                     current_process,       // pid.
                                     "clone-thread" );      // name
 
-	// A c�pia.
+	// The copy.
 
     if ( (void *) clone == NULL ){
         panic ("threadCopyThread: clone\n");
@@ -659,7 +663,7 @@ struct thread_d *threadCopyThread ( struct thread_d *thread ){
 	
 	//while(1){}
 
-	return (struct thread_d *) clone;
+    return (struct thread_d *) clone;
 }
 
 

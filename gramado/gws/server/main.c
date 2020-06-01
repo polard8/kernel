@@ -31,46 +31,13 @@ See: https://wiki.osdev.org/Graphics_stack
 
 */
 
-/*	$NetBSD: tty.c,v 1.8 2011/09/06 18:34:57 joerg Exp $	*/
-
-/*
- * Copyright (c) 1988, 1993
- *	The Regents of the University of California.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the University nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- */
-
 
 #include <sys/cdefs.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/socket.h>
-
 #include <api.h>
-
 #include <gws.h>
 
 
@@ -84,16 +51,14 @@ char __buffer[512];
 
 
 
-
-
 int dirty_status = 0;
 int connection_status = 0;
 
 
-//window.
+// Window.
 struct gws_window_d *__bg_window;
 struct gws_window_d *__taskbar_window; 
-struct gws_window_d *__mywindow;  //generic, for tests.
+struct gws_window_d *__mywindow;    // Generic, for tests.
 // ...
 
 
@@ -111,7 +76,7 @@ unsigned long next_response[32];
 // Prototypes.
 void create_background (void);
 void create_taskbar (void);
-void gws_yield(void);
+void gws_yield (void);
 
 int 
 gwsProcedure ( 
@@ -125,7 +90,7 @@ int service_drain_input (void);
 int serviceCreateWindow ( void );
 int servicepixelBackBufferPutpixel (void);
 int servicelineBackbufferDrawHorizontalLine (void);
-int serviceDrawButton(void);
+int serviceDrawButton (void);
 // ...
 
 
@@ -138,6 +103,7 @@ void client_shutdown (int fd)
 	//deallocate resources.
 }
 */
+
 
 /*
 void client_die(int fd);
@@ -206,7 +172,8 @@ void handle_request (int fd){
     {
         debug_print ("gws: [TEST] INPUT request !!! \n");
 
-        //pegar o input. 
+        // Pegar o input!
+
         //gde_enter_critical_section ();
         //gramado_system_call ( 111,
         //    (unsigned long) &message_buffer[0],
@@ -274,9 +241,10 @@ void handle_request (int fd){
 
 __again:
 
-    // #debug: para a máquina real.
-    debug_print ("Sending response ...\n");
-                
+    // #debug:
+
+    gde_debug_print ("Sending response ...\n");
+        
     // #debug
     //sprintf (__buffer," ................. This is a response");
                 
@@ -461,11 +429,9 @@ gwsProcedure (
             servicepixelBackBufferPutpixel(); //pixel
             break;
 
-
         case 1003:
             servicelineBackbufferDrawHorizontalLine();
             break;
-               
     
         // #todo ; 1004. draw button
         case 1004:
@@ -499,8 +465,8 @@ gwsProcedure (
         // Refresh screen 
         // refresh screen using kgws service. 
         case 2020:
-             gws_show_backbuffer ();
-             break;
+            gws_show_backbuffer ();
+            break;
              
 
         // Refresh rectangle ... 
@@ -566,10 +532,6 @@ void create_taskbar (void)
     // #test
     // Create button.
 
-    //gws_draw_button ("Button 1", 1,1,1, 
-        //8, 8, w, h, GWS_COLOR_BUTTONFACE3 );    
-
-    
     gws_draw_button ("Button 1", 1, 1, 1, 
         __taskbar_window->left +2, 
         __taskbar_window->top  +2, 
@@ -606,8 +568,6 @@ int main (int argc, char **argv){
     int bind_status = -1;
     
 
-
-
     // Flag usada no loop.
     running = 1;
 
@@ -619,7 +579,7 @@ int main (int argc, char **argv){
     gde_debug_print ("gws: Initializing ...\n");
     printf ("gws: gws is alive !  \n");
 
-    
+
     // Init gws infrastructure.
     gwsInit ();
 
@@ -634,8 +594,8 @@ int main (int argc, char **argv){
     // for this desktop.
     // See: connect.c
 
-    _status = (int) register_ws ();
-    
+    _status = (int) register_ws();
+
     if (_status<0){
         gde_debug_print ("gws: Couldn't register the server \n");
         printf ("gws: Couldn't register the server \n");
@@ -694,19 +654,23 @@ int main (int argc, char **argv){
 
     dtextDrawText ( (struct gws_window_d *) gui->screen,
         8, 80, COLOR_RED, "gws: Calling child" );
-        
+
     
     // #atenção: 
-    //na máquina real, isso mostrou a barra, 
-    //mas não mostrou a string criada na janela gui->screen..
+    // Na máquina real, isso mostrou a barra, 
+    // mas não mostrou a string criada na janela gui->screen..
     gws_show_backbuffer ();
 
 
     printf ("gws: * Calling child \n");
+    
     // #test
     // Nesse test, s2 usará socket para se conectar
     // AF_GRAMADO.
 
+
+    // #important:
+    // Calling a child.
 
     gde_clone_and_execute ("gwst.bin");  
     //gde_clone_and_execute ("s3.bin"); 
@@ -726,10 +690,11 @@ int main (int argc, char **argv){
 // loop:
 
     gde_debug_print ("gws: Entering main loop.\n");
-    
-      // + Normal messages. (It's like signals.)
-      // + Compositor. (Redraw dirty rectangles)
-      // + Socket requests.
+
+
+    // + Compositor. (Redraw dirty rectangles)    
+    // + Socket requests.
+    // + Normal messages. (It's like signals.)
  
 
     // while (1)
@@ -787,26 +752,24 @@ int service_drain_input (void)
 }
 
 
-
-// wrapper
-// chamaremos a função que cria a janela
+// service: Create a window.
+// It's a wrapper.
+// Chamaremos a função que cria a janela
 // com base nos argumentos que estão no buffer
 // que é uma variável global nesse documento.
 
 int serviceCreateWindow (void){
 
-	//o buffer é uma global nesse documento.
+	// O buffer é uma global nesse documento.
     unsigned long *message_address = (unsigned long *) &__buffer[0];
-    
-    
+        
     struct gws_window_d *__mywindow;
 
-    unsigned long x,y,w,h, color;
-        
+    unsigned long x, y, w, h, color;
+
     
     gde_debug_print("gws: serviceCreateWindow:\n");
     //printf ("serviceCreateWindow:\n");
-
 
     x=message_address[4];  //x
     y=message_address[5];  //y
