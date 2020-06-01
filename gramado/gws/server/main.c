@@ -783,12 +783,9 @@ int serviceCreateWindow (void){
 
      __mywindow = (struct gws_window_d *) createwCreateWindow ( WT_OVERLAPPED, 
                                               1, 1, "No-Name",  
-                                              x, y, 
-                                              w, h,   
+                                              x, y, w, h,   
                                               gui->screen, 0, 
-                                              COLOR_PINK, color );   
-
-
+                                              COLOR_PINK, color ); 
 
     if ( (void *) __mywindow == NULL ){
        gde_debug_print ("createwCreateWindow: fail\n");

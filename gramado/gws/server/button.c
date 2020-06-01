@@ -1,3 +1,9 @@
+/*
+ * File: button.c
+ * 
+ *     Create button.
+ */
+
 
 #include <api.h>
 #include <gws.h>
@@ -17,7 +23,11 @@
  * #importante: 
  * Retorna o ponteiro pra estrutura do botão.
  */
-    
+
+
+// #todo
+// Criar o argumento de ponteiro de estrutura de janela
+// para usar em posicionamento relativo.
 
 void *
 gws_draw_button ( 
@@ -211,7 +221,7 @@ gws_draw_button (
 	// Se vamos usar uma imagem ao invés de uma string.
 	//if(useImage == 1{ ... goto done;}
 	
-    //usado para calcular o tamanho de uma string.
+    // Usado para calcular o tamanho de uma string.
      size_t tmp_size = (size_t) strlen ( (const char *) string );
 	
 	//if ( tmp_size > (width/8) )
@@ -219,15 +229,13 @@ gws_draw_button (
 	//    printf("fail");
 	//}
 	
-	
+
     gde_debug_print ("button: >>> text\n");
 
-
-    /*    
-	//(a largura do botão menos a largura da string)/2
+	// (a largura do botão menos a largura da string)/2
     unsigned long offset = ( ( (unsigned long) width - ( (unsigned long) tmp_size * (unsigned long) gcharWidth) ) / 2 );
 
-	//button label
+	// Button label
     if (Selected == 1)
     {
         dtextDrawString ( x +offset,y +8, COLOR_WHITE, string );
@@ -239,13 +247,11 @@ gws_draw_button (
 		// (window->left +x) left 
 		// (largura do botão, menos a largura da string)/2
 
+        // #debug: Rotina provisória
+        //dtextDrawString ( x +20, y +20, COLOR_TERMINALTEXT, string );
         dtextDrawString ( x +offset, y +8, COLOR_TERMINALTEXT, string );
-
     };
-    */
-    
-    // #debug: rotina provisória
-    dtextDrawString ( x +20, y +20, COLOR_TERMINALTEXT, string );
+
 
     gde_debug_print ("button: >>> text ok\n");
     

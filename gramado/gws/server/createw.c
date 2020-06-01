@@ -28,15 +28,16 @@
 
 
 /*
+ *****************************
  * createwDrawTitleBar:
- * 
  * 
  * 
  */
 
 // #importante
-// >>> Criaremos a barra de títulos depois que a janela estiver pronta.
-            
+// Criaremos a barra de títulos depois que a janela estiver pronta.
+// Desenhar a barra de titulos faz parte da criação do frame.
+  
 int 
 createwDrawTitleBar ( 
     struct gws_window_d *window,
@@ -50,24 +51,30 @@ createwDrawTitleBar (
 
     unsigned long __tmp_color;
 
-    // podemos desenhar a string e os botões de controle.
+    // Podemos desenhar a string e os botões de controle.
     // Isso poderá ser chamado pelo wm.
 
     //todo: checar validades.
 
-       // barra de títulos;   
-       //todo: usar o esquema de cores.      
+    // barra de títulos;   
+    //todo: usar o esquema de cores.      
 
+    // mais escuro
     if (window->focus == 1)
-    { __tmp_color = xCOLOR_GRAY1; }        // mais escuro
+    { __tmp_color = xCOLOR_GRAY1; }  
 
+
+    // escolhida pelo aplicativo;
     if (window->focus == 0)
-    { __tmp_color = window->bg_color; }    // escolhida pelo aplicativo;
-      
+    { __tmp_color = xCOLOR_GRAY5; }    
+    //{ __tmp_color = window->bg_color; }     
+ 
     // Retângulo da barra de títulos.
-    rectBackbufferDrawRectangle ( window->left +2, window->top +2, 
-        window->width -4, 30, __tmp_color );        
-        
+    // #todo: Posicionar direito. 
+    // Queremos que as bordas fiquem evidentes.
+    rectBackbufferDrawRectangle ( window->left +3, window->top +3, 
+        window->width -5, 30, __tmp_color );        
+ 
 	// String
     dtextDrawString ( 
         window->left +16 +8 +8, 
@@ -76,6 +83,18 @@ createwDrawTitleBar (
         window->name );  
 
 
+    // #test:
+    // Draw button.
+    // #todo: registra isso na estrutura da janela.
+    // #bugbug: Tem que pintar usando posicionamento relativo. 
+    // #todo: mudar a função gws_draw_button e incluir o argumento
+    // ponteiro de estrutura de janela.
+    
+    gws_draw_button ("X", 1,1,1, 
+        window->left + window->width -32, window->top +4, 
+        28, 28, 
+        xCOLOR_GRAY3 );//GWS_COLOR_BUTTONFACE3 );
+
     return 0;
 }
 
@@ -83,27 +102,28 @@ createwDrawTitleBar (
 
 
 /*
+ ********************************
  * createwDrawFrame:
- * 
  * 
  */
 
 // #importante:
-// essa rotina será chamada depois que criarmos uma janela básica
-// mas só para alguns tipos de janelas
-// pois nem todos os tipos precisam de um frame.
-// ou ainda, cada tipo de janela tem um frame diferente ...
-// por exemplo, podemos considerar que um checkbox tem um tipo de frame.
-// toda janela criada pode ter um frame.
-// >> durante a rotina de criação do frame para uma janela que ja existe
+// Essa rotina será chamada depois que criarmos uma janela básica,
+// mas só para alguns tipos de janelas, pois nem todos os tipos 
+// precisam de um frame. Ou ainda, cada tipo de janela tem um 
+// frame diferente. Por exemplo: Podemos considerar que um checkbox 
+// tem um tipo de frame.
+// Toda janela criada pode ter um frame.
+// Durante a rotina de criação do frame para uma janela que ja existe
 // podemos chamar a rotina de criação da caption bar, que vai criar os
 // botões de controle ... mas nem toda janela que tem frame precisa
-// de uma caption bar.
+// de uma caption bar (Title bar).
+// Estilo do frame:
+// Dependendo do estilo do frame, podemos ou nao criar a caption bar.
+// Por exemplo: Uma editbox tem um frame mas não tem uma caption bar.
 
-//estilo do frame.
-//dependendo do estilo do frame, podemos ou nao criar a caption bar.
-// por exemplo: uma editbox tem um frame mas não tem uma caption bar;
-// style: estilo do frame.
+// IN:
+// style = Estilo do frame.
 
 
 int 
@@ -116,37 +136,38 @@ createwDrawFrame (
     int style ) 
 {
 
-    unsigned long border_color;
-    unsigned long border_size;
+    unsigned long border_color=0;
+    unsigned long border_size=0;
     
     
     // #todo
-    // desenhar o frame e depois desenhar a barra de títulos
+    // Desenhar o frame e depois desenhar a barra de títulos
     // caso esse estilo de frame precise de uma barra.
 
+    // Editbox
     // EDITBOX NÃO PRECISA DE BARRA DE TÍTULOS.
     // MAS PRECISA DE FRAME ... QUE SERÃO AS BORDAS.
-    // Editbox
-
+    
     if ( window->type == WT_EDITBOX )
     {
-			// Se tiver o foco.
+            // Se tiver o foco.
             if ( window->focus == 1 )
             {
                 border_color = COLOR_BLUE;
                 border_size = 2;
             }else{
-                border_color = COLOR_PINK; //COLOR_INACTIVEBORDER;
+                border_color = COLOR_PINK;  // COLOR_INACTIVEBORDER;
                 border_size = 1;
             };
-            
+        
+        // board1, borda de cima e esquerda.
         rectBackbufferDrawRectangle( window->left, 
             window->top, window->width, border_size, border_color );
 
         rectBackbufferDrawRectangle( window->left, 
             window->top, border_size, window->height, border_color );
 
-		//board2, borda direita e baixo.
+        // board2, borda direita e baixo.
         rectBackbufferDrawRectangle( window->left +window->width -1, 
             window->top, border_size, window->height, border_color );
 
@@ -172,7 +193,8 @@ createwDrawFrame (
             };
             
         // Quatro bordas.
-            
+         
+        // board1, borda de cima e esquerda.
         rectBackbufferDrawRectangle( window->left, 
             window->top, window->width, border_size, border_color );
 
@@ -189,17 +211,14 @@ createwDrawFrame (
         
         // Title bar.
         createwDrawTitleBar ( (struct gws_window_d *) window, 
-            x, y,
-            width, height, 
-            1,
-            (char *) window->name );  //style
-
+            x, y, width, height, 
+            1, (char *) window->name ); 
 
         return 0;
     }
 
 
-     return 1;
+    return 1;
 }
 
 
@@ -2093,15 +2112,14 @@ createwCreateWindow (
                            (char *) windowname, 
                            x, y, width, height, 
                            (struct gws_window_d *) pWindow, 
-                           desktopid, 
-                           clientcolor, 
-                           color );      
+                           desktopid, clientcolor, color );      
     
-        //pintamos simples, mas a tipagem será  overlapped
+        // Pintamos simples, mas a tipagem será overlapped.
         __w->type = WT_OVERLAPPED;   
        goto draw_frame;
     }
-    
+
+
     if ( type == WT_EDITBOX )
     {
 		// Podemos usar o esquema padrão de cores ...
@@ -2111,10 +2129,8 @@ createwCreateWindow (
                            (char *) windowname, 
                            x, y, width, height, 
                            (struct gws_window_d *) pWindow, 
-                           desktopid, 
-                           clientcolor, 
-                           color );      
-    
+                           desktopid, clientcolor, color );      
+
         //pintamos simples, mas a tipagem será  overlapped
         __w->type = WT_EDITBOX;   
         goto draw_frame;
@@ -2136,6 +2152,7 @@ draw_frame:
     // OVERLAPED, EDITBOX, CHECKBOX ...
 
     // draw frame.
+    // #todo:
     // Nessa hora essa rotina podera criar a barra de títulos.
     // o wm poderá chamar a rotina de criar frame.
     
@@ -2146,26 +2163,23 @@ draw_frame:
             1 );  //style
         
         return (void *) __w;   
-   }
+    }
     
     
     
     //================
-    
-    
-    // OS TIPOS ABAIXO BÃO PRECISAM DE FRAME.
-    // PODERIAMOS DEIXAR ESSA ROTINA LÁ EM CIMA COM UM IF PARA SEUS TIPOS.
-          
+
+    // OS TIPOS ABAIXO NÃO PRECISAM DE FRAME.
+    // PODERIAMOS DEIXAR ESSA ROTINA LÁ EM CIMA 
+    // COM UM IF PARA SEUS TIPOS.
+     
     __w = (void *) createwCreateWindow2 ( type, 
                        status, 
                        view, 
                        (char *) windowname, 
                        x, y, width, height, 
                        (struct gws_window_d *) pWindow, 
-                       desktopid, 
-                       clientcolor, 
-                       color );      
-
+                       desktopid, clientcolor, color );  
 
     if ( (void *) __w == NULL )
         gde_debug_print ("createwCreateWindow: createwCreateWindow2 fail \n");
