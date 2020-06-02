@@ -1,9 +1,9 @@
 # License: BSD License
 VERSION = 1
-PATCHLEVEL = 35
+PATCHLEVEL = 36
 SUBLEVEL =
-EXTRAVERSION = 
-NAME = Gramado 1.xx (Different Feelings)
+EXTRAVERSION = -rc0
+NAME = Gramado 1.xx 
 
 # Documentation.
 # See: docs/
