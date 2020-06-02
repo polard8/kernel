@@ -90,10 +90,27 @@ createwDrawTitleBar (
     // #todo: mudar a função gws_draw_button e incluir o argumento
     // ponteiro de estrutura de janela.
     
-    gws_draw_button ("X", 1,1,1, 
-        window->left + window->width -32, window->top +4, 
-        28, 28, 
-        xCOLOR_GRAY3 );//GWS_COLOR_BUTTONFACE3 );
+    //gws_draw_button ("X", 1,1,1, 
+    //    window->left + window->width -32, window->top +4, 
+    //    28, 28, 
+    //    xCOLOR_GRAY3 );//GWS_COLOR_BUTTONFACE3 );
+    
+    /*
+    struct gws_window_d *__mybutton;
+
+    __mybutton = (struct gws_window_d *) createwCreateWindow ( WT_BUTTON, 
+                                              1, 1, "x",  
+                                              window->width -32, +4, 
+                                              28, 28,   
+                                              window, 0, 
+                                              COLOR_PINK, xCOLOR_GRAY3 ); 
+
+    if ( (void *) __mybutton == NULL ){
+       gde_debug_print ("createwDrawTitleBar: __mybutton fail\n");
+       //return -1;
+    }
+    */
+ 
 
     return 0;
 }
@@ -139,6 +156,8 @@ createwDrawFrame (
     unsigned long border_color=0;
     unsigned long border_size=0;
     
+    
+    struct gws_window_d *__mybutton;
     
     // #todo
     // Desenhar o frame e depois desenhar a barra de títulos
@@ -212,11 +231,38 @@ createwDrawFrame (
         // Title bar.
         createwDrawTitleBar ( (struct gws_window_d *) window, 
             x, y, width, height, 
-            1, (char *) window->name ); 
+            1, (char *) window->name );
+            
+
+        gde_debug_print ("[DEBUG]: Drawing the button in the title bar\n");
+        __mybutton = (struct gws_window_d *) createwCreateWindow ( WT_BUTTON, 
+                                              1, 1, "x",  
+                                              window->width -32, 4, 
+                                              28, 28,   
+                                              window, 0, 
+                                              COLOR_PINK, xCOLOR_GRAY3 ); 
+
+        if ( (void *) __mybutton == NULL ){
+           gde_debug_print (" __mybutton fail\n");
+           //return -1;
+        }
 
         return 0;
     }
 
+
+    
+    if ( window->type == WT_BUTTON )
+    {
+        gde_debug_print ("[DEBUG]: desenha o frame do botao\n");
+        
+        gws_draw_button (window->name, 1,1,1, 
+            window->left, window->top, 
+            width, height, 
+            GWS_COLOR_BUTTONFACE3 );
+        
+        return 0;
+    }
 
     return 1;
 }
@@ -876,6 +922,8 @@ createwCreateWindow2 (
         //Nothing for now ...
         //Deixaremos a rotina de desenhar o botão fazer tudo por enquanto.          
         case WT_BUTTON:
+            Background = 1;
+            window->backgroundUsed = 1;
             break;
 
 
@@ -1198,6 +1246,13 @@ createwCreateWindow2 (
     //  ======   cut here =========
     //
 
+    //
+    //  ======   cut here =========
+    //
+
+    //
+    //  ======   cut here =========
+    //
 
 
     // ## Title bar ##
@@ -2122,7 +2177,7 @@ createwCreateWindow (
 
     if ( type == WT_EDITBOX )
     {
-		// Podemos usar o esquema padrão de cores ...
+        // Podemos usar o esquema padrão de cores ...
         __w = (void *) createwCreateWindow2 ( WT_SIMPLE, 
                            status, 
                            view, 
@@ -2135,6 +2190,27 @@ createwCreateWindow (
         __w->type = WT_EDITBOX;   
         goto draw_frame;
     }
+
+
+    if ( type == WT_BUTTON )
+    {
+        gde_debug_print ("[DEBUG]: createwCreateWindow WT_BUTTON\n");
+        // Podemos usar o esquema padrão de cores ...
+        __w = (void *) createwCreateWindow2 ( WT_BUTTON, 
+                           status, 
+                           view, 
+                           (char *) windowname, 
+                           pWindow->left +x, pWindow->top +y, 
+                           width, height, 
+                           (struct gws_window_d *) pWindow, 
+                           desktopid, clientcolor, color );      
+
+        //pintamos simples, mas a tipagem será  overlapped
+        __w->type = WT_BUTTON;   
+        goto draw_frame;
+    }
+    
+    
     
     //
     // Draw frame.
@@ -2156,7 +2232,7 @@ draw_frame:
     // Nessa hora essa rotina podera criar a barra de títulos.
     // o wm poderá chamar a rotina de criar frame.
     
-    if ( type == WT_OVERLAPPED || type == WT_EDITBOX )
+    if ( type == WT_OVERLAPPED || type == WT_EDITBOX || type == WT_BUTTON )
     {
         createwDrawFrame ( (struct gws_window_d *) __w, 
             x, y, width, height, 
@@ -2164,7 +2240,7 @@ draw_frame:
         
         return (void *) __w;   
     }
-    
+
     
     
     //================
@@ -2172,7 +2248,7 @@ draw_frame:
     // OS TIPOS ABAIXO NÃO PRECISAM DE FRAME.
     // PODERIAMOS DEIXAR ESSA ROTINA LÁ EM CIMA 
     // COM UM IF PARA SEUS TIPOS.
-     
+   
     __w = (void *) createwCreateWindow2 ( type, 
                        status, 
                        view, 
@@ -2183,7 +2259,7 @@ draw_frame:
 
     if ( (void *) __w == NULL )
         gde_debug_print ("createwCreateWindow: createwCreateWindow2 fail \n");
-
+    
 
     return (void *) __w;
 }

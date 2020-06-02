@@ -936,8 +936,10 @@ int top_window;
 // ...
 
 
-//#todo
-//Precisamos usar o esquema de cores.
+
+
+// #todo
+// Precisamos usar o esquema de cores.
 void *
 gws_draw_button ( 
     unsigned char *string,
@@ -949,6 +951,7 @@ gws_draw_button (
     unsigned long width, 
     unsigned long height, 
     unsigned long color );
+
 
 
 void 
