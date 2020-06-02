@@ -35,25 +35,18 @@
 // https://wiki.osdev.org/Message_Passing_Tutorial
 // https://wiki.osdev.org/Synchronization_Primitives
 // ...
- 
- 
-#include <types.h>
 
+
+#include <types.h>
 #include <stdio.h>
 #include <stdlib.h>
-
 #include <string.h>
-
 #include <netdb.h>
 #include <netinet/in.h>
-
 #include <arpa/inet.h>
-
 #include <sys/socket.h>
-
-
-//#test
 #include <gws.h>
+
 
 
 // tipos de pacotes.
@@ -74,6 +67,8 @@ struct sockaddr addr = {
     .sa_data[0] = 'w',
     .sa_data[1] = 's',
 };
+
+
 
 
 // main
@@ -117,11 +112,11 @@ round:
 
     while (1)
     {
-        // Create window        
+        // The message.
         message_buffer[0] = 0;       // window. 
         message_buffer[1] = 1000;    // msg=hello!
-        message_buffer[2] = 0;
-        message_buffer[3] = 0;
+        message_buffer[2] = 10;
+        message_buffer[3] = 10;
 
         n_writes = write (client_fd, __buffer, sizeof(__buffer));
        

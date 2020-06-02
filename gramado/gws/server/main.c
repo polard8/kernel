@@ -406,16 +406,19 @@ gwsProcedure (
 
         case 1000:
         
-            //draw text inside a window.
+            gde_debug_print ("gws: Message number 1000\n");
+            
+            // Draw text inside a window.
+            // #bugbug: O window server não tem esse ponteiro de janela.
+            // ele até aceitaria um handle.
             dtextDrawText ( (struct gws_window_d *) __mywindow,
-                60, 70, COLOR_GREEN,
+                long1, long2, COLOR_GREEN,
                 "Hello friend. This is the Window Server!" );
-                
-            //printf ("Hello friend! %d %d \r \n", long1, long2 );
-            
-             //#todo: send response.
-            
+
              gws_show_backbuffer ();
+
+             // #todo: 
+             // Send response ?
              break;
 
 
@@ -435,15 +438,13 @@ gwsProcedure (
             break;
     
         // #todo ; 1004. draw button
+        // #bugbug: Criaremos botões usandoa a função create window.
         case 1004:
-           serviceDrawButton();
+           //serviceDrawButton();
            break;
     
-        //
-        // Testing some drawing routines.
-        //
-         
-         
+        // ...
+               
         // put pixel
         // IN: Color, x, y
         case 2000:
@@ -454,14 +455,13 @@ gwsProcedure (
         case 2001:
             break;
              
-             
         case 2002:
             break;
-             
-             
+
         case 2003:
             break;
 
+        // ...
 
         // Refresh screen 
         // refresh screen using kgws service. 
@@ -476,8 +476,9 @@ gwsProcedure (
 
         // ...
              
-                
+        
         default:
+            gde_debug_print ("gws: Default message number\n");
             //printf ("msg=%d ",msg);
             break;
     }
@@ -696,7 +697,7 @@ int main (int argc, char **argv){
     // Calling a child.
 
     gde_clone_and_execute ("gwst.bin");  
-    //gde_clone_and_execute ("s3.bin"); 
+    // gde_clone_and_execute ("s3.bin"); 
     // ...
 
  
