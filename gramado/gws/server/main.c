@@ -58,6 +58,7 @@ int connection_status = 0;
 // Window.
 struct gws_window_d *__bg_window;
 struct gws_window_d *__taskbar_window; 
+struct gws_window_d *__taskbar_button; 
 struct gws_window_d *__mywindow;    // Generic, for tests.
 // ...
 
@@ -517,7 +518,11 @@ void create_taskbar (void)
     unsigned long w = gws_get_device_width();
     unsigned long h = gws_get_device_height();
 
-    gde_debug_print ("gws: create_taskbar\n");
+    //
+    // Bar
+    //
+
+    gde_debug_print ("gws: create_taskbar:\n");
 
     __taskbar_window = (struct gws_window_d *) createwCreateWindow ( WT_SIMPLE, 
                                                1, 1, "gws-taskbar",  
@@ -528,14 +533,32 @@ void create_taskbar (void)
     if ( (void *) __taskbar_window == NULL ){
         gde_debug_print ("gws: __taskbar_window fail\n");  
     }
+
+    //
+    // Button
+    //
     
     // #test
     // Create button.
 
+    gde_debug_print ("gws: Create the button on task bar\n");
+
+    __taskbar_button = (struct gws_window_d *) createwCreateWindow ( WT_BUTTON, 
+                                               1, 1, "button",  
+                                               2, 2, 100, 36,   
+                                               __taskbar_window, 0, 
+                                               xCOLOR_GRAY1, GWS_COLOR_BUTTONFACE3 );
+    
+    if ( (void *) __taskbar_button == NULL ){
+        gde_debug_print ("gws: task bar button fail\n");  
+    }
+
+    /*
     gws_draw_button ("Button 1", 1, 1, 1, 
         __taskbar_window->left +2, 
         __taskbar_window->top  +2, 
         100, 36, GWS_COLOR_BUTTONFACE3 );
+    */
 }
 
 
