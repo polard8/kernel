@@ -9,42 +9,53 @@
  *     camada de abstração de hardware oferecidad pelo
  *     kernel base.
  *
- * Versão 1.0, 2016.
+ * History:
+ *     2016 - Created by Fred Nora.
  */
- 
+
+
 #ifndef ____IO_H
 #define ____IO_H
 
 
-//Estrutura para gerenciamento de buffer de i/o. 
-typedef struct ioBuffer_d ioBuffer_t; 
+// Estrutura para gerenciamento de buffer de i/o. 
+
 struct ioBuffer_d
 {
-	object_type_t objectType;
-	object_class_t objectClass;
-	
-	struct process_d *OwnerProcess;    //processo dono do buffer.
-    unsigned long address;    //Address.
-    int size;              	  //size in number of bytes.
+    object_type_t objectType;
+    object_class_t objectClass;
+
+    struct process_d *OwnerProcess;    // processo dono do buffer.
+    unsigned long address;             // Address.
+    
+    int size;                          // size in number of bytes.
 }; 
-ioBuffer_t *lineBuffer;    //Buffer para uma linha de caracteres.
-ioBuffer_t *fileBuffer;    //buffer para um arquivo de texto.
-ioBuffer_t *CurrentBuffer;
-ioBuffer_t *ipcBuffer;    //IPC buffer. (Área de transferência.)
-//... 
- 
+
+// #test
+struct ioBuffer_d *CurrentIOBuffer;
+
+//struct ioBuffer_d *lineBuffer;    //Buffer para uma linha de caracteres.
+//struct ioBuffer_d *fileBuffer;    //buffer para um arquivo de texto.
+//struct ioBuffer_d *CurrentBuffer;
+//struct ioBuffer_d *ipcBuffer;    //IPC buffer. (Área de transferência.)
+// ... 
+
  
 //
-// Protótipos.
+// Prototypes.
 // 
  
 
-void *ioServices( unsigned long number, 
-                  unsigned long arg2, 
-                  unsigned long arg3, 
-                   unsigned long arg4 );
+// Handler for services.
+void *ioServices ( 
+    unsigned long number, 
+    unsigned long arg2, 
+    unsigned long arg3, 
+    unsigned long arg4 );
+
 
 int ioInit (void);
+
 
 #endif   
 
