@@ -1,5 +1,19 @@
 
 
+
+// ===========================
+// #todos
+// post_message(?);  
+// the server is posting a message to the client ...
+// meybe some kind of dual communication ...
+// its good in some kind of servers ... may not in the window server.
+//it looks like a post_reaponse()
+
+// handle_messages(?) //??
+
+
+
+// #todo
 void drain_message_from_client (struct socket_d *sock);
 void drain_message_from_client (struct socket_d *sock){
 

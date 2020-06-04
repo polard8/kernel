@@ -95,6 +95,7 @@ int serviceDrawButton (void);
 // ...
 
 
+//??
 /*
 // internal
 void client_shutdown (int fd);
@@ -106,6 +107,8 @@ void client_shutdown (int fd)
 */
 
 
+//?? Die after to handle a request.
+// no multiple requests.
 /*
 void client_die(int fd);
 void client_die(int fd)
@@ -114,6 +117,64 @@ void client_die(int fd)
 }
 */
 
+
+// ??
+/*
+int client_start(int fd);
+int client_start(int fd)
+{
+    return -1;//todo
+}
+*/
+
+
+
+/*
+int client_send_error_response(int fd);
+int client_send_error_response(int fd)
+{
+    return -1;//todo
+}
+*/
+
+
+// Getting the server pid.
+/*
+int get_server_pid();
+int get_server_pid()
+{
+    return (int) ... ; //#todo
+}
+*/
+
+// getting the client id
+/*
+int get_client_id();
+int get_client_id()
+{
+    return (int) ... ; //#todo
+}
+*/
+
+
+// setting the client id
+/*
+void set_client_id ( int id );
+void set_client_id ( int id )
+{
+	//#todo
+    //____client_id = id;
+}
+*/
+
+
+
+/*
+ ****************************
+ * handle_request:
+ * 
+ * 
+ */
 
 // internal.
 // Messages sended via socket.
