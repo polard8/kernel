@@ -434,6 +434,7 @@ gwsProcedure (
 
                 case VK_F3:
                     gde_debug_print ("F3\n");
+                    bmpDisplayBMP (0,0,0); //#todo: test.
                     break;
 
                 // #test

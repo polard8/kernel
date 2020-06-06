@@ -41,7 +41,8 @@ static int nibble_count_16colors = 0;
  *     x       = posicionamento 
  *     y       = posicionamento
  *
- *	// @todo: Criar defines para esses deslocamentos.
+ *    #todo: 
+ *    Criar defines para esses deslocamentos.
  */ 
 
 
@@ -49,6 +50,7 @@ static int nibble_count_16colors = 0;
 // Vamos suspender essa rotina, porque
 // falta  a função que escreve diretamente no lfb
 // estando aqui em ring3.
+
 
 /*
  
@@ -458,7 +460,7 @@ fail:
  ********************************************************
  * bmpDisplayBMP:
  *
- *     Mostra na tela uma imagem bmp que já está 
+ *     Mostra na tela uma imagem BMP que já está 
  * carregada na memória. (pinta no backbuffer)
  * 
  * IN:
@@ -475,6 +477,11 @@ bmpDisplayBMP (
     unsigned long x, 
     unsigned long y )
 {
+    // Endereço base do BMP que foi carregado na memória
+    unsigned char *bmp = (unsigned char *) address;
+
+    struct gws_bmp_header_d *bh;
+    struct gws_bmp_infoheader_d *bi;
 
     int i, j, base, offset;
 
@@ -488,17 +495,9 @@ bmpDisplayBMP (
     unsigned long color, color2;
     unsigned long pal_address;
 
-    // 
-    struct gws_bmp_header_d      *bh;
-    struct gws_bmp_infoheader_d  *bi;
-
-
-    // Endereço base do BMP que foi carregado na memória
-    unsigned char *bmp = (unsigned char *) address;
-
     // Variável para salvar rgba.
     unsigned char *c = (unsigned char *) &color;
-    unsigned char *c2 = (unsigned char *) &color2;	
+    unsigned char *c2 = (unsigned char *) &color2;
 
     unsigned long *palette       = (unsigned long *) (address + 0x36);
     unsigned char *palette_index = (unsigned char *) &pal_address;
@@ -511,42 +510,37 @@ bmpDisplayBMP (
 
 
     // Limits.
-    if ( x > xLimit || y > yLimit )
-    {
-		printf("bmpDisplayBMP: Limits \n");
-        goto fail;		
-        //return (int) 1; 
+    if ( x > xLimit || y > yLimit ){
+        gde_debug_print ("bmpDisplayBMP: Limits \n");
+        printf("bmpDisplayBMP: Limits \n");
+        goto fail;
     }
-
 
 	// @todo:
 	// Testar validade do endereço.
-	
-	
-    if ( address == 0 )
-    {
-		//goto fail;
+    if ( address == 0 ){
+        gde_debug_print ("bmpDisplayBMP: address fail \n");
+        goto fail;
     }
 
-	
 	//
 	// struct for Info header
 	//
-	
-	//## BUGBUG 
+
+	// #BUGBUG 
 	// Um malloc aqui pode esgotar o heap 
-	//na hora de movimentar o mouse.
-	//precisamos usar um buffer interno para
-	//essa estrutura.
-	
+	// na hora de movimentar o mouse.
+	// precisamos usar um buffer interno para
+	// essa estrutura.
+
     char buffer[512];
     char buffer2[512];
 
-	//bh = (struct bmp_header_d *) malloc( sizeof(struct bmp_header_d) );	
+    //bh = (struct bmp_header_d *) malloc( sizeof(struct bmp_header_d) );
     bh = (struct gws_bmp_header_d *) &buffer[0];
-    if( (void *) bh == NULL )
-    {
-		//goto fail;
+    if ( (void *) bh == NULL ){
+        gde_debug_print ("bmpDisplayBMP: bh fail \n");
+        goto fail;
     }
 
 	// Signature.
@@ -565,19 +559,20 @@ bmpDisplayBMP (
 	//Windows bmp.
 	//bi = (struct bmp_infoheader_d *) malloc( sizeof(struct bmp_infoheader_d) );
     bi = (struct gws_bmp_infoheader_d *)  &buffer2[0];
-    if( (void*) bi == NULL )
-    {
-		//goto fail;
-    }	
+    if ( (void *) bi == NULL ){
+        gde_debug_print ("bmpDisplayBMP: bi fail \n");
+        goto fail;
+    }
 
-	//The size of this header.
+    //The size of this header.
     bi->bmpSize = *( unsigned long* ) &bmp[14];
 
-	// Width and height.
-    Width =  *( unsigned long * ) &bmp[18];
+    // Width and height.
+    Width  = *( unsigned long * ) &bmp[18];
     Height = *( unsigned long * ) &bmp[22];
 
-	//@todo: checar validade da altura e da largura encontrada.
+	// #todo: 
+	// Checar validade da altura e da largura encontrada.
 
 	// Salvar.
     bi->bmpWidth  = (unsigned long) Width;
@@ -595,17 +590,17 @@ bmpDisplayBMP (
 	
 	
 	// 0 = Nenhuma compressão.
-    if ( bi->bmpCompression != 0 )
-    {
-		//fail
+    if ( bi->bmpCompression != 0 ){
+        gde_debug_print ("bmpDisplayBMP: bmpCompression fail \n");
     }
-	
-	
+
+
 	//
-	// # Draw #
+	// Draw
 	//
-	
-//DrawBMP:	
+
+
+//DrawBMP:
 
     left = x;    
     top = y; 
@@ -613,28 +608,27 @@ bmpDisplayBMP (
 
 	// Início da área de dados do BMP.
 	
-	//#importante:
-	//A base é diferente para os tipos ?? 
+	// #importante:
+	// A base é diferente para os tipos? 
 
-    switch( bi->bmpBitCount )
+    switch ( bi->bmpBitCount )
     {
         // Obs: 
         // Cada cor é representada com 4 bytes. RGBA.
 
-		//case 1:
-		//    base = (0x36 + 0x40);
-		//    break;
-		    
-		//case 2:
-		//    base = (0x36 + 0x40);
-		//    break;
-		
-        // 4 bytes pra cada cor, 16 cores, 64 bytes.
+        // ??
+        //case 1:  base = (0x36 + 0x40); break;
+
+        // ??
+        //case 2: base = (0x36 + 0x40); break;
+
+        // 4 bytes pra cada cor, 16 cores. Total 64 bytes.
         case 4:  base = (0x36 + 0x40);  break; 
 
-        //4 bytes pra cada cor, 256 cores, 1024bytes.
+        // 4 bytes pra cada cor, 256 cores. Total 1024 bytes.
         case 8:  base = (0x36 + 0x400); break; 
 
+        // Default.
         default:  base = 0x36;  break;
     };
 
@@ -651,11 +645,11 @@ bmpDisplayBMP (
 //320   - 32 bpp (True color, RGBA)	
 
 
-    for( i=0; i < bi->bmpHeight; i++ )
+    for ( i=0; i < bi->bmpHeight; i++ )
     {
-        for( j=0; j < bi->bmpWidth; j++ )
+        for ( j=0; j < bi->bmpWidth; j++ )
         {
-	        // 16 cores
+            // >> 16 cores
             // Um pixel por nibble.
             if (bi->bmpBitCount == 4 )
             {
@@ -669,93 +663,93 @@ bmpDisplayBMP (
                     palette_index[0] = ( palette_index[0] & 0x0F);  
                     color = (unsigned long) palette[  palette_index[0]  ];
 
-					nibble_count_16colors = 0;
-					base = base + 1;
-					
+                    nibble_count_16colors = 0;
+                    base = base + 1;
+
                 // Primeiro nibble.
                 }else{
 
-			        palette_index[0] =  ( (  palette_index[0] >> 4 ) & 0x0F);
-					color = (unsigned long) palette[  palette_index[0] ];
-				    
-					nibble_count_16colors = 2222;
-					//base = base;
-				};
-			};
+                    palette_index[0] =  ( (  palette_index[0] >> 4 ) & 0x0F);
+                    color = (unsigned long) palette[  palette_index[0] ];
 
-			// 256 cores
-			// Próximo pixel para 8bpp
-            if( bi->bmpBitCount == 8 )
+                    nibble_count_16colors = 2222;
+                    //base = base + 0;
+                };
+            };
+
+            // >> 256 cores
+            // Próximo pixel para 8bpp
+            if ( bi->bmpBitCount == 8 )
             {   
                 offset = base;
                 color = (unsigned long) palette[  bmp[offset] ];
 
                 base = base + 1;     
             }
-			
-			
-			// Próximo pixel para 16bpp
+
+            // >>
+            // Próximo pixel para 16bpp
             if ( bi->bmpBitCount == 16 )
             {
-				//a
-				c[0] = 0;  
-				
-				offset = base;
-			    
-				//b
-			    c[1] = bmp[offset];
-			    c[1] = (c[1] & 0xF8);      // '1111 1000' 0000 0000  
-				
-				//g
-			    c2[0] = bmp[offset];
-			    c2[0] = c2[0] &  0x07;     // '0000 0111' 0000 0000 
-			    c2[1] = bmp[offset+1];
-			    c2[1] = c2[1] &  0xE0;     //  0000 0000 '1110 0000' 
-				c[2] = ( c2[0] | c2[1] );  
-					
-			    //r
-			    c[3] = bmp[offset+1];
-			    c[3] = c[3] & 0x1F;        // 0000 0000 '0001 1111' 
-		        
-				base = base + 2;    
-	        };			
-			
+                //a
+                c[0] = 0;  
 
-			// Próximo pixel para 24bpp.
-	        if( bi->bmpBitCount == 24 )
-	        {  
-			    c[0] = 0; //A					
-				
-				offset = base;
-				c[1] = bmp[offset];
-			    
-			    offset = base+1;
-			    c[2] = bmp[offset];
-			
-			    offset = base+2;
-			    c[3] = bmp[offset];
-										
-		        base = base + 3;    
-	        };
-			
-			
-			// Próximo pixel para 32bpp.
-	        if( bi->bmpBitCount == 32 )
-	        {	
-			    c[0] = 0;  //A				
-				
-				offset = base;
-			    c[1] = bmp[offset];
-			
-			    offset = base+1;
-			    c[2] = bmp[offset];
-			
-			    offset = base+2;
-			    c[3] = bmp[offset];
-				
-		        base = base + 4;    
-	        };
-			
+                offset = base;
+
+                //b
+                c[1] = bmp[offset];
+                c[1] = (c[1] & 0xF8);      // '1111 1000' 0000 0000  
+
+                //g
+                c2[0] = bmp[offset];
+                c2[0] = c2[0] &  0x07;     // '0000 0111' 0000 0000 
+                c2[1] = bmp[offset+1];
+                c2[1] = c2[1] &  0xE0;     //  0000 0000 '1110 0000' 
+                c[2] = ( c2[0] | c2[1] );  
+
+                //r
+                c[3] = bmp[offset+1];
+                c[3] = c[3] & 0x1F;        // 0000 0000 '0001 1111' 
+
+                base = base + 2; 
+            };
+
+
+            // Próximo pixel para 24bpp.
+            if ( bi->bmpBitCount == 24 )
+            {  
+                c[0] = 0; //A
+
+                offset = base;
+                c[1] = bmp[offset];
+
+                offset = base+1;
+                c[2] = bmp[offset];
+
+                offset = base+2;
+                c[3] = bmp[offset];
+
+                base = base + 3;    
+            };
+
+
+            // Próximo pixel para 32bpp.
+            if ( bi->bmpBitCount == 32 )
+            {
+                c[0] = 0;  //A
+
+                offset = base;
+                c[1] = bmp[offset];
+
+                offset = base+1;
+                c[2] = bmp[offset];
+
+                offset = base+2;
+                c[3] = bmp[offset];
+
+                base = base + 4;    
+            };
+
 			//
 			// # Put pixel #
 			//
@@ -772,9 +766,13 @@ bmpDisplayBMP (
 				//Não pinte nada.
 				//Devemos pintar caso a cor atual seja  
 				//diferente da cor selecionada.
-				case BMP_CHANGE_COLOR_TRANSPARENT:
-				    if ( color != bmp_selected_color )
-					{
+                case BMP_CHANGE_COLOR_TRANSPARENT:
+                    if ( color != bmp_selected_color )
+                    {
+                        pixelBackBufferPutpixel ( (unsigned long) color, 
+                            (unsigned long) left, 
+                            (unsigned long) bottom );
+
 		                //my_buffer_put_pixel ( (unsigned long) color, 
 			            //    (unsigned long) left, 
 						//    (unsigned long) bottom, 
@@ -784,24 +782,24 @@ bmpDisplayBMP (
 			                //(unsigned long) left, 
 						    //(unsigned long) bottom, 
 						    //0 );
-						    
-					    
-					    pixelBackBufferPutpixel ( (unsigned long) color, 
-					    (unsigned long) left, (unsigned long) bottom );
-					
-					};
-				    break;
-					
+
+                    };
+                    break;
+
 				//2000	
 				//Substitua pela cor indicada.
 				//Se a cor atual é igual a cor selecionada,
 				//devemos substituir a cor atual pela substituta.
 				//Mas se a cor atual for diferente da cor selecionada,
 				//pintamos normalmente a cor atual.
-				case BMP_CHANGE_COLOR_SUBSTITUTE:
-				    if( color == bmp_selected_color )
-					{
-			            
+                case BMP_CHANGE_COLOR_SUBSTITUTE:
+                    if ( color == bmp_selected_color )
+                    {
+
+                        pixelBackBufferPutpixel ( (unsigned long) bmp_substitute_color, 
+                            (unsigned long) left, 
+                            (unsigned long) bottom );
+
 						//my_buffer_put_pixel ( (unsigned long) bmp_substitute_color, 
 			            //    (unsigned long) left, 
 						//    (unsigned long) bottom, 
@@ -812,12 +810,12 @@ bmpDisplayBMP (
 						//    (unsigned long) bottom, 
 						//     0 );
 
-					    pixelBackBufferPutpixel ( (unsigned long) bmp_substitute_color, 
-					    (unsigned long) left, (unsigned long) bottom );
-
-							 
                     } else {
-		                
+
+                        pixelBackBufferPutpixel ( (unsigned long) bmp_substitute_color, 
+                            (unsigned long) left, 
+                            (unsigned long) bottom );
+
 						//my_buffer_put_pixel( (unsigned long) color, 
 			            //    (unsigned long) left, 
 						//    (unsigned long) bottom, 
@@ -828,19 +826,20 @@ bmpDisplayBMP (
 						//    (unsigned long) bottom, 
 						//    0 );
 
-					    pixelBackBufferPutpixel ( (unsigned long) bmp_substitute_color, 
-					    (unsigned long) left, (unsigned long) bottom );
+                    }; 
+                    break;
 
-					};							 
-				    break;
-					
-				//...	
-					
+                // ...
+
 				// 0 and default
 				// Pintamos normalmente a cor atual.
-                case BMP_CHANGE_COLOR_NULL:				
-				default:
-				
+                case BMP_CHANGE_COLOR_NULL:
+                default:
+
+                    pixelBackBufferPutpixel ( (unsigned long) bmp_substitute_color, 
+                        (unsigned long) left, 
+                        (unsigned long) bottom );
+
 			        //my_buffer_put_pixel( (unsigned long) color, 
 			        //    (unsigned long) left, 
 					//	(unsigned long) bottom, 
@@ -851,25 +850,20 @@ bmpDisplayBMP (
 					//	(unsigned long) bottom, 
 					//	0 );
 
-					pixelBackBufferPutpixel ( (unsigned long) bmp_substitute_color, 
-					(unsigned long) left, (unsigned long) bottom );
-
-
-					break;
-			};
+                    break;
+            };
 
 			// Próximo pixel.
-			left++; 
-		};
-		
-		
+            left++; 
+        };
+
 		// Vamos para a linha anterior.
-		bottom = bottom-1;
-		
+        bottom = (bottom-1);
+
 		// Reiniciamos o x.
-		left = x;    
-	};	
-	
+        left = x;    
+    };
+
 	// ## test palette 
 	//int p;
 	
@@ -882,14 +876,18 @@ bmpDisplayBMP (
 	//    }
 	//    printf("\n");
 	//};
-	
-done:	
+
+
+
+done:
 	//Debug
+    gde_debug_print ("bmpDisplayBMP: [DEBUG] done \n");
 	//printf("w={%d} h={%d}\n", bi->bmpWidth, bi->bmpHeight );
     return 0;
 
 fail:
-    //printf("fail");	
+    //gde_debug_print ("bmpDisplayBMP: fail \n");
+    //printf("fail");
     return (int) 1;
 }
 
