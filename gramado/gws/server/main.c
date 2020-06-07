@@ -629,7 +629,19 @@ void create_taskbar (void)
 /*
  ******************************
  * main: 
- * 
+ *     + Initializes the gws infrastructure.
+ *     + Create the background.
+ *     + Create the taskbar.
+ *     + Register window server as the current window server 
+ *       for this desktop.
+ *     + Create the server socket.
+ *     + bind it.
+ *     + Spawn a client process. (gwst.bin)
+ *     + Enter in the main loop, waiting for some types of event.
+ *          The possible events are: Reading messages from the kernel,
+ *          or Reading our socket.
+ *       In this moment we can send a response. It depends on the
+ *           message found in the sockeck we readed.
  */
 
 int main (int argc, char **argv){

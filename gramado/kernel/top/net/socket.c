@@ -215,11 +215,12 @@ file *file_from_socket (struct socket_d *sock)
 
 
 
-int socket_init(void)
+int socket_init (void)
 {
-    int i;
-    for(i=0; i<32; i++)
-        socketList[i] = (unsigned long)0;
+    int i=0;
+
+    for (i=0; i<32; i++)
+        socketList[i] = (unsigned long) 0;
         
         
     return 0;
@@ -228,7 +229,10 @@ int socket_init(void)
 
 
 // #todo:
+// Configura a estrutura de socket para um socket da
+// família AF_GRAMADO.
 // Vai retornar o descritor de um arquivo.
+
 int 
 socket_gramado ( 
     struct socket_d *sock, 
@@ -342,12 +346,14 @@ socket_gramado (
     }else{
         
         // This file represents a object of type socket.
+        
         _file->____object = ObjectTypeSocket;
 
 
         _file->used = 1;
         _file->magic = 1234;
         
+        // fd.
         _file->_file = __slot;
         
         _file->_tmpfname = NULL;
@@ -386,6 +392,10 @@ socket_gramado (
 }
 
 
+// Configura a estrutura de socket para um socket da
+// família AF_UNIX or AF_LOCAL.
+// Precisa ser uma rotina parecida com a do outro tipo criado.
+
 int 
 socket_unix ( 
     struct socket_d *sock, 
@@ -400,6 +410,10 @@ socket_unix (
 }                
                 
 
+// Configura a estrutura de socket para um socket da
+// família AF_INET.
+// Precisa ser uma rotina parecida com a do outro tipo criado.
+// Esse domínio lida com tcp/ip ?
 
 int 
 socket_inet ( 
@@ -472,7 +486,7 @@ int sys_socket ( int family, int type, int protocol ){
 
      p = (struct process_d *) processList[current_process];
      
-     if ( (void*) p == NULL ){
+     if ( (void *) p == NULL ){
         printf ("sys_socket: p fail\n");
         refresh_screen();
         return -1;
@@ -496,7 +510,6 @@ int sys_socket ( int family, int type, int protocol ){
  
     }else{
 
-
        __socket->addr = addr;
        
        p->priv = __socket;
@@ -504,9 +517,10 @@ int sys_socket ( int family, int type, int protocol ){
 
        // family
 
-       switch(family)
+       switch (family)
        {
            case AF_GRAMADO:
+               debug_print ("sys_socket: AF_GRAMADO\n");
                return (int) socket_gramado ( __socket, 
                                 AF_GRAMADO, 
                                 (const struct sockaddr *) &addr, 
@@ -514,8 +528,11 @@ int sys_socket ( int family, int type, int protocol ){
                                 type,
                                 protocol );
                break;
-               
+           
+           
+           //case AF_LOCAL:
            case AF_UNIX:
+               debug_print ("sys_socket: AF_UNIX\n");
                return (int) socket_unix ( __socket, 
                                 AF_UNIX, 
                                 (const struct sockaddr *) &addr, 
@@ -528,6 +545,7 @@ int sys_socket ( int family, int type, int protocol ){
            //talvez precisamos rever sockaddr 
            //para essa função, e usarmos outra estrutura.               
            case AF_INET:
+               debug_print ("sys_socket: AF_INET\n");
                return (int) socket_inet ( __socket, 
                                 AF_INET, 
                                 (const struct sockaddr *) &addr, 
@@ -538,26 +556,26 @@ int sys_socket ( int family, int type, int protocol ){
            
            
                
-           //...
-           
+           // ...
            
            default:
+               debug_print ("sys_socket: default\n");
                //debug_print ("sys_socket: default family\n");
                return -1;
                break;
        }
 
 
-        //...
+        // ...
     };
-    
 
 
     return -1;
 }
 
 
-
+// Get the pointer for the socket structure of the current process
+// given the fd.
 struct socket_d *get_socket_from_fd (int fd){
 
     struct process_d *p;
@@ -565,29 +583,27 @@ struct socket_d *get_socket_from_fd (int fd){
     file *_file;
     
     
-    if(fd<0 || fd>=32)
+    if (fd<0 || fd>=32)
         return (struct socket_d *) 0;
 
 
     p = (struct process_d *) processList[current_process];
-    if( (void*) p == NULL)
+    if ( (void *) p == NULL)
         return (struct socket_d *) 0;
  
         
     _file = (file *) p->Objects[fd];    
-    if( (void*) _file == NULL)
+    if ( (void *) _file == NULL)
         return (struct socket_d *) 0;
 
-    
+
+    // Get the pointer for the socket structure of the current process
+    // given the fd.
     return (struct socket_d *) _file->socket;
 }
 
 
-
-
-
-// os dois são arquivos no mesmo processo.
-// o processo atual.
+// Os dois são arquivos no mesmo processo. O processo atual.
 int
 sock_socketpair ( 
     int family, 
@@ -605,7 +621,8 @@ sock_socketpair (
     sock1 = get_socket_from_fd(fd1);
     if( (void*) sock1 == NULL)
         return -1;
-    
+
+
     fd2 = sys_socket(family,type,protocol);
     sock2 = get_socket_from_fd(fd2);    
     if( (void*) sock2 == NULL)
@@ -618,7 +635,7 @@ sock_socketpair (
     usockvec[0] = fd1; 
     usockvec[1] = fd2;    
     
-    //ok
+    // ok
     return 0;
 }
 
@@ -647,8 +664,8 @@ int socket_connection_waiting_for_validation (struct socket_d *mysock, struct so
 */
 
 
-
-// serviços de soquetes da klibc
+// Socket ioctl
+// Serviços de soquetes da klibc
 // #todo: rever os números.
 // OUT: ?
 unsigned long 
@@ -673,6 +690,7 @@ socket_ioctl (
 		//family, type, protocol
 		//vai retornar o descritor de uma stream.	
         case 7000:
+            debug_print ("socket_ioctl: 7000. sys_socket\n");
             return (unsigned long) sys_socket ( (int) arg2, 
                                        (int) arg3, (int) arg4 );
             break;
@@ -685,6 +703,7 @@ socket_ioctl (
 		//...
 			
         default:
+            debug_print ("socket_ioctl: default\n");
             printf ("socket_ioctl: Default\n");
             refresh_screen();
             break;
@@ -927,7 +946,7 @@ sys_accept (
         refresh_screen();
         return -1;
     }
-    
+
     // process
     p = (struct process_d *) processList[current_process];
  
@@ -936,9 +955,9 @@ sys_accept (
         refresh_screen();
         return -1;
     }
- 
- 
+
     // file
+    // The socket is a file and belongs to the process.
     f = (file *) p->Objects[sockfd];
 
     if ( (void *) f == NULL ){
@@ -949,6 +968,7 @@ sys_accept (
     
  
     // socket
+    // Socket structure that belongs to the process.
     s = (struct socket_d *) p->priv;
 
     if ( (void *) s == NULL ){
@@ -975,9 +995,16 @@ sys_accept (
  
     printf ("sys_accept: [FIXME] TODO ...\n");
     refresh_screen();
+    
+    // #todo:
+    // Are we already connected?
+    // So we need a flag to indicate this status.
 
     // More ??
 
+
+    // #bugbug
+    // ?? why this value ??
     return -1;
 }   
 
@@ -1210,10 +1237,12 @@ int sys_listen (int sockfd, int backlog)
 /*
  ******************************************
  * create_socket: 
- *     Cria um socket. 
- *     Retorna o ponteiro para a estrutura.
+ *     It creates a socket structure.
+ *     Every process has its own socket structure.
+ *     The status is: NOT CONNECTED.
  */
 
+// IN: ip and port.
 
 struct socket_d *
 create_socket ( 
@@ -1251,9 +1280,12 @@ create_socket (
         s->port = port;
         
         
+        
         // Initializing pointers.
         // We don't want this kinda crash in the real machine.
         
+        // Connection ponter.
+        // Its a pointer to another socket. Is it?
         s->conn = (struct socket_d *) 0;
         // ...
         
@@ -1273,7 +1305,6 @@ unsigned long getSocketIP ( struct socket_d *socket ){
         return 0;
 
     }else{
-
         return (unsigned long) socket->ip;
     };
 }
@@ -1285,7 +1316,6 @@ unsigned long getSocketPort ( struct socket_d *socket ){
         return 0;
 
     }else{
-
         return (unsigned long) socket->port;
     };
 }
@@ -1303,7 +1333,6 @@ update_socket (
         return (int) 1;
 
     }else{
-
         socket->ip = (unsigned long) ip;
         socket->port = (unsigned short) port;
         return 0;
@@ -1314,7 +1343,7 @@ update_socket (
 
 int socket_read (unsigned int fd, char *buf, int count)
 {
-    debug_print("socket_read:[TODO]\n");
+    debug_print ("socket_read:[TODO]\n");
     return -1;
 }
 
@@ -1322,7 +1351,7 @@ int socket_read (unsigned int fd, char *buf, int count)
 
 int socket_write (unsigned int fd,char *buf,int count)
 {
-    debug_print("socket_write:[TODO]\n");
+    debug_print ("socket_write:[TODO]\n");
     return -1;
 }
 
@@ -1362,7 +1391,7 @@ int is_socket (file *f){
 
 int is_virtual_console (file *f){
 
-    if( (void*) f == NULL )
+    if( (void *) f == NULL )
         return -1;
 
     if ( f->____object == ObjectTypeVirtualConsole )
@@ -1374,7 +1403,7 @@ int is_virtual_console (file *f){
 
 
 
-//...
+// ...
 
 
 //
