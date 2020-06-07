@@ -891,12 +891,11 @@ unsigned char *dma_addr;
 
 /*
  *******************************************
- * diskATAInitialize:
+ * ata_initialize:
  *     Inicializa o IDE e mostra informações sobre o disco.
  */
  
-int diskATAInitialize ( int ataflag ){
-	
+int ata_initialize ( int ataflag ){
 
     __breaker_ata1_initialized = 0;
     __breaker_ata2_initialized = 0;
@@ -938,7 +937,7 @@ int diskATAInitialize ( int ataflag ){
 
 
 #ifdef KERNEL_VERBOSE
-    kprintf ("diskATAInitialize:\n");
+    kprintf ("ata_initialize:\n");
     kprintf ("Initializing IDE/AHCI support ...\n");
 #endif
 
@@ -953,13 +952,13 @@ int diskATAInitialize ( int ataflag ){
 
     if ( (void *) ata_pci == NULL )
     {
-        panic ("diskATAInitialize: ata_pci");
+        panic ("ata_initialize: ata_pci");
 
     }else{
 
         if ( ata_pci->used != 1 || ata_pci->magic != 1234 )
         {
-            panic ("diskATAInitialize: Validation");
+            panic ("ata_initialize: Validation");
         }
 
 		//#debug
@@ -979,15 +978,13 @@ int diskATAInitialize ( int ataflag ){
 
     Ret = (unsigned long) diskATAPCIConfigurationSpace ( ata_pci );
 
-    if ( Ret == PCI_MSG_ERROR )
-    {
-        kprintf ("diskATAInitialize: Error Driver [%x]\n", Ret );
-
+    if ( Ret == PCI_MSG_ERROR ){
+        kprintf ("ata_initialize: Error Driver [%x]\n", Ret );
         Status = (int) 1;
         goto fail;  
     }
 
-  
+
 	//
 	// Salvando informações.
 	//
@@ -1083,7 +1080,7 @@ int diskATAInitialize ( int ataflag ){
 
         if ( (void *) ata_identify_dev_buf == NULL )
         {
-            panic ("diskATAInitialize: ata_identify_dev_buf");
+            panic ("ata_initialize: ata_identify_dev_buf");
         }
 
 
@@ -1124,8 +1121,7 @@ int diskATAInitialize ( int ataflag ){
 
 
           }else{
-
-              panic ("diskATAInitialize: IDE and AHCI not found\n");
+              panic ("ata_initialize: IDE and AHCI not found\n");
           };
 
 
@@ -1137,7 +1133,7 @@ int diskATAInitialize ( int ataflag ){
 
 
 fail:
-    kprintf ("diskATAInitialize: fail\n"); 
+    kprintf ("ata_initialize: fail\n"); 
 
 
 done:
@@ -1148,12 +1144,13 @@ done:
     //refresh_screen();
 //#endif 
 
-    if ( Status == 0)
-    {
+
+    if ( Status == 0){
         __breaker_ata1_initialized = 1;    
         __breaker_ata2_initialized = 1;        
     }
-    
+
+
     return (int) Status;
 }
  

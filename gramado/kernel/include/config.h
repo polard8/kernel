@@ -17,7 +17,7 @@
 // ate que tenhamos a condiçao de selecionarmos corretamente
 // o canal e o dispositivo.
 // Inicializaremos essas variaveis ao inicializarmos
-// o controlador de ata. ide. em ata.c diskATAInitialize.
+// o controlador de ata. ide. em ata.c ata_initialize.
 
 
 // USE PRIMARY MASTER!!

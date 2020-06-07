@@ -384,23 +384,26 @@ int diskATAPCIConfigurationSpace ( struct pci_device_d *D );
 
 
 /*
- ****************************************************************
- * diskATAInitialize:
+ *******************************************************
+ * ata_initialize:
  *     Inicializa o IDE e mostra informações sobre o disco.
  */
-int diskATAInitialize( int ataflag );
+
+int ata_initialize ( int ataflag );
+
 
 
 /*
  *******************************************
- * diskATADialog:
+ * ataDialog:
  *     Rotina de diálogo com o driver ATA.
  */
 
 int 
-diskATADialog ( int msg, 
-                unsigned long long1, 
-                unsigned long long2 );
+ataDialog ( 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 );
 
 
 int disk_ata_wait_irq (void);

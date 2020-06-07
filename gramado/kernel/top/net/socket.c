@@ -875,8 +875,9 @@ sys_connect (
 
     server_socket = (struct socket_d *) tp->priv;
     
-    
-    //connecting ;;;
+    //
+    // Connecting!
+    //
     
     my_socket->conn = server_socket;
     server_socket->conn = my_socket;    
@@ -887,6 +888,7 @@ sys_connect (
     debug_print("sys_connect: connect ok\n");
     printf ("sys_connect: *done.\n");
     refresh_screen();
+
 
     return 0;
 }   
@@ -1400,6 +1402,24 @@ int is_virtual_console (file *f){
     // No
     return 0;
 }
+
+
+/*
+// #todo
+// shutdown the socket. 
+// shutdown some socket for the current process.
+// this is a fd for a list of objects of the current process.
+// 'fd' file descriptor.
+// 'how' indicates if we shutdown for read or for write.
+
+int sys_socket_shutdown (int fd, int how);
+int sys_socket_shutdown (int fd, int how)
+{
+    // #todo: 
+    debug_print ("sys_socket_shutdown: [TODO] \n");
+    return -1;
+}
+*/
 
 
 

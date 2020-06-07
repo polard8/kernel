@@ -1,11 +1,12 @@
 /*
- * File: sm/system.c
+ * File: top/syssm/system/system.c
+ * 
  * 
  * sm - System Management - 
  * Seu objetivo principal é receber os comandos de gerenciamento,
  * enviados por usuários atráves de dispositivos de interface humana. 
  *
- * ********** #importante: Essas classes são 'system dialogs' ************
+ * ******* #importante: Essas classes são 'system dialogs' **********
  *
  * Note duas coisas importantes aqui: 
  * É a interface de administração do sistema, e é ele é 
@@ -1821,8 +1822,8 @@ int init_executive (void){
 	// Só depois de inicializarmos o ata 'e que podemos carregar 
 	// alguma coisa.
 
-    debug_print ("init_executive: diskATADialog\n");
-    diskATADialog ( 1, FORCEPIO, FORCEPIO );
+    debug_print ("init_executive: ataDialog\n");
+    ataDialog ( 1, FORCEPIO, FORCEPIO );
 
 	// ??
 	// configura a tabela do kernel de funções exportadas
