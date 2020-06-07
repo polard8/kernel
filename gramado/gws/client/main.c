@@ -92,13 +92,13 @@ int main ( int argc, char *argv[] ){
     // #debug
     printf ("gwst: Creating socket\n");
 
-    // cria o soquete.
-    // AF_GRAMADO
+    // Create a socket. AF_GRAMADO = 8000
     client_fd = socket ( 8000, SOCK_STREAM, 0 );
     
     if ( client_fd < 0 ){
+       gws_debug_print ("gwst: Couldn't create socket\n");
        printf ("gwst: Couldn't create socket\n");
-       exit(1);
+       exit(1);  //#bugbug Cuidado.
     }
     
 
@@ -112,12 +112,10 @@ int main ( int argc, char *argv[] ){
     addr.sa_data[0] = 'w';
     addr.sa_data[1] = 's';  
     
-    
-    
+
     //
     // connect
     // 
-
 
     //nessa hora colocamos no accept um fd.
     //então o servidor escreverá em nosso arquivo.
@@ -127,10 +125,10 @@ int main ( int argc, char *argv[] ){
 
     if ( connect (client_fd, (struct sockaddr *) &addr, sizeof(addr)) < 0 )
     { 
-        printf("gwst: Connection Failed \n"); 
+        gws_debug_print ("gwst: Connection Failed\n");
+        printf ("gwst: Connection Failed \n"); 
         return -1; 
     } 
-
 
 
     //
@@ -230,6 +228,7 @@ response_loop:
     
     // Se retornou -1 é porque algo está errado com o arquivo.
     if (n_reads < 0){
+        gws_debug_print ("gwst: recv fail.\n");
         printf ("gwst: recv fail.\n");
         printf ("Something is wrong with the socket.\n");
         exit (1);
@@ -285,7 +284,6 @@ response_loop:
 process_reply:
 
     gws_debug_print ("gwst: bye\n"); 
-
     printf ("gwst: Window ID %d \n", message_buffer[0] );
     printf ("gwst: Bye\n");
     
