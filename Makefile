@@ -7,7 +7,7 @@ NAME = Gramado 1.xx
 
 # Documentation.
 # See: docs/
-# To see the targets execute "make help"
+# To see the targets execute "make help".
 
 
 # That's our default target when none is given on the command line
