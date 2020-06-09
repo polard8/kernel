@@ -1,15 +1,12 @@
 
- ~ Main folders for Gramado Operating System.
+    Three main folders of the project:
 
-/arch     - Archtechture stuff.
-/bin      - .bin compiled files.
-/docs     - Documentation.
-/drivers  - Ring0 loadable drivers.
-/include  - Headers.
-/init     - Initialization processes.
-/kernel   - The kernel base.
-/lib      - Libs. Source code and binaries.
-/licenses - Licenses.
-/scripts  - Scripts.
-/user     - User ideas. (User ideas, human action and spiritual quotes)
-          
+    animal/
+        Ring 3 apps and commands. The apps are GUI applications and
+        the commands will run inside the Terminal.
+
+    gramado/
+        Boot, kernel, drivers and servers.
+
+    lib/
+        Ring 3 libraries used by animal/ and gramado/.
