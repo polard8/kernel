@@ -94,7 +94,7 @@ clean-system-files
 
 #	@echo "Gramado $(VERSION) $(PATCHLEVEL) $(SUBLEVEL) $(EXTRAVERSION) $(NAME) "
 #	@echo "Arch x86"
-	@echo "Animal 1.0 $(KERNELVERSION) ($(NAME)) "
+	@echo "Gramado $(KERNELVERSION) ($(NAME)) "
 #	@echo "$(ARCH)"
 
 
@@ -205,7 +205,7 @@ vhd-create:
 	@echo "================================="
 	@echo "(Step 4) Creating a VHD in Assembly language ..."
 
-	$(NASM) gramado/boot/x86/vhd/main.asm -I gramado/boot/x86/vhd/ -o ANIMAL.VHD   
+	$(NASM) gramado/boot/x86/vhd/main.asm -I gramado/boot/x86/vhd/ -o GRAMADO.VHD   
 	
 
 
@@ -215,8 +215,7 @@ vhd-mount:
 	@echo "(Step 5) Mounting the VHD ..."
 
 	-sudo umount /mnt/gramadovhd
-#	sudo mount -t vfat -o loop,offset=32256 GRAMADO.VHD /mnt/gramadovhd/
-	sudo mount -t vfat -o loop,offset=32256 ANIMAL.VHD /mnt/gramadovhd/
+	sudo mount -t vfat -o loop,offset=32256 GRAMADO.VHD /mnt/gramadovhd/
 
 ## Step6 vhd-copy-files     - Copying files into the mounted VHD.
 vhd-copy-files:
@@ -375,7 +374,7 @@ clean-all: clean clean2 clean3 clean-system-files
 makeiso-x86:
 	#todo:  
 	#nasm -I kernel/boot/x86/iso/stage1/ \
-	#-I kernel/boot/x86/iso/???/  kernel/boot/x86/iso/main.asm  -o  ANIMAL.ISO
+	#-I kernel/boot/x86/iso/???/  kernel/boot/x86/iso/main.asm  -o  GRAMADO.ISO
 	
 	@echo "#todo Create ISO using nasm"
 	
@@ -391,7 +390,7 @@ geniso-x86:
 	rm stage1.bin
 
 	#.ISO
-#	mkisofs -R -J -c boot/gramado/boot.catalog -b boot/gramado/stage1.bin -no-emul-boot -boot-load-size 4 -boot-info-table -o ANIMAL.ISO bin
+#	mkisofs -R -J -c boot/gramado/boot.catalog -b boot/gramado/stage1.bin -no-emul-boot -boot-load-size 4 -boot-info-table -o GRAMADO.ISO bin
 	
 	@echo "iso Success?"	
 
@@ -415,7 +414,7 @@ hdd-copy-kernel:
 	sudo cp bin/boot/KERNEL.BIN /mnt/gramadohdd/BOOT 
 
 danger-hdd-clone-vhd:
-	sudo dd if=./ANIMAL.VHD of=/dev/sda
+	sudo dd if=./GRAMADO.VHD of=/dev/sda
 #	sudo dd if=./GRAMADO.VHD of=/dev/sdb
 
 
@@ -428,11 +427,13 @@ danger-hdd-clone-vhd:
 
 # Oracle Virtual Box 
 oracle-virtual-box-test:
-	VBoxManage startvm "Animal"
+	VBoxManage startvm "Gramado"
+#	VBoxManage startvm "Animal"
+
 
 # qemu 
 qemu-test:
-	qemu-system-x86_64 -hda ANIMAL.VHD -m 512 -serial stdio 
+	qemu-system-x86_64 -hda GRAMADO.VHD -m 512 -serial stdio 
 #	qemu-system-x86_64 -hda GRAMADO.VHD -m 128 -device e1000 -show-cursor -serial stdio -device e1000
 
 

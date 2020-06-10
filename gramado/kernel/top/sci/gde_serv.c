@@ -1526,11 +1526,12 @@ gde_services (
             return (void *) redraw_window ( (struct window_d *) arg2, arg3 );
             break;
 
-		//52  replace window. (handle,x,y)
-		case SYS_BUFFER_REPLACEWINDOW:
-		    return (void *) replace_window ( (struct window_d *) arg2, arg3, arg4);
-		    break;
-		
+        // 52 - IN: (handle,x,y)
+        case SYS_BUFFER_REPLACEWINDOW:
+            return (void *) replace_window ( (struct window_d *) arg2, 
+                                arg3, arg4);
+            break;
+
 		//53 maximize window 
 		//(handle)
 		case SYS_BUFFER_MAXIMIZEWINDOW:
@@ -1566,31 +1567,30 @@ gde_services (
 
         //59 - nothing
         
-        //60
-		case SYS_SETACTIVEWINDOW:
-			set_active_window (hWnd);
-			break;
+        // 60
+        case SYS_SETACTIVEWINDOW:
+            set_active_window (hWnd);
+            break;
 
-        //61
-		//Id. (int).	
-		case SYS_GETACTIVEWINDOW:
+        // 61 - Id. (int).
+        case SYS_GETACTIVEWINDOW:
             return (void *) get_active_window (); 
-			break;
+            break;
 
-        //62
-		case SYS_SETFOCUS: 
-			SetFocus ( (struct window_d *) hWnd ); 
-			break;
-			
-        //63 id
-		case SYS_GETFOCUS: 
-		    return (void *) window_with_focus;  
-			break;
-			
-        //64
-		case SYS_KILLFOCUS:
-			KillFocus ( (struct window_d *) hWnd ); 
-			break;
+        // 62
+        case SYS_SETFOCUS: 
+            SetFocus ( (struct window_d *) hWnd ); 
+            break;
+
+        // 63 id
+        case SYS_GETFOCUS: 
+            return (void *) window_with_focus;  
+            break;
+
+        // 64
+        case SYS_KILLFOCUS:
+            KillFocus ( (struct window_d *) hWnd ); 
+            break;
 
 
         // 65
@@ -1661,19 +1661,18 @@ gde_services (
 		// houver uma interrup��o de timer. 
 		// Enquanto isso a thread deve esperar em um loop.
 		// IN: ??
-
+        //#todo: criar um wrapper em sci/sys.c ou kernel/exit.c
+       
         case SYS_EXIT:
-        
-            //#todo: criar um wrapper em sci/sys.c ou kernel/exit.c
-            create_request ( (unsigned long) 12, // number 
-                (int) 1,                             // status 
-                (int) 0,                             // timeout. 0=imediatamente.
-                (int) current_process,               // target_pid
-                (int) current_thread,                // target_tid
-                NULL,                                // window 
-                (int) 0,                             // msg  
-                (unsigned long) arg2,                // long1  
-                (unsigned long) arg3 );              // long2
+            create_request ( (unsigned long) 12,  // number 
+                (int) 1,                          // status 
+                (int) 0,                          // timeout. 0=imediatamente.
+                (int) current_process,            // target_pid
+                (int) current_thread,             // target_tid
+                NULL,                             // window 
+                (int) 0,                          // msg  
+                (unsigned long) arg2,             // long1  
+                (unsigned long) arg3 );           // long2
             break;
 
 
@@ -1719,10 +1718,9 @@ gde_services (
 		//#todo: Mostrar em uma janela pr�pria.
 		//#todo: Devemos chamar uma fun��o que mostre informa��es 
 		//apenas do processo atual. 
-		case SYS_CURRENTPROCESSINFO:
-		    show_currentprocess_info ();
-		    break;
-
+        case SYS_CURRENTPROCESSINFO:
+            show_currentprocess_info ();
+            break;
 
         // 81
         // See: sci/sys/sys.c
@@ -1731,13 +1729,11 @@ gde_services (
             break;
 
 
-        // 82
-        // Mostra informações sobre todos os processos.
+        // 82 - Mostra informações sobre todos os processos.
         case 82:
             show_process_information();
             break;
-  
-			
+
 		// 83
 		// Suporte � chamada da libc waitpid(...).
 		// schedi.c
@@ -1745,13 +1741,16 @@ gde_services (
 		// TID, PID 
 		// TID � a thread atual.
 		// PID veio via argumento.
+        // IN: pid, status, option
         case SYS_WAIT4PID: 
-            //pid, status, option
-			return (void *) do_waitpid ( (pid_t) arg2, (int *) arg3, (int) arg4 );
-			//block_for_a_reason ( (int) current_thread, (int) arg2 ); //suspenso
-			break;
-			
-		//84 - nothing
+            return (void *) do_waitpid ( (pid_t) arg2, 
+                                (int *) arg3, (int) arg4 );
+                
+            //block_for_a_reason ( (int) current_thread, (int) arg2 ); //suspenso
+            break;
+
+
+        // 84 - livre.
 
 
         // 85
@@ -1768,19 +1767,18 @@ gde_services (
 		case SYS_SEMAPHORE_DOWN:
 		    return (void *) Down ( (struct semaphore_d *) arg2);
 		    break;
-			
+
 		//Testa se o processo � v�lido
         //se for v�lido retorna 1234		
 		//testando...
 		case SYS_88:   
             return (void *) processTesting (arg2);
 			break;
-			
+
 		// 89 Up. 	
 		case SYS_SEMAPHORE_UP:
 		    return (void *) Up ( (struct semaphore_d *) arg2 );
 		    break;
-		
 
  
         // 90
@@ -1817,7 +1815,8 @@ gde_services (
         //@todo: 
 		case SYS_RECEIVEMESSAGE:
 			break;
-			
+
+
 		//104, SYS_SENDMESSAGE
 		//Um processo produtor envia uma mensagem para o PCB de outr processo.
 		//Argumentos: servi�o, produtor, consumidor, mensagem.
@@ -1915,9 +1914,9 @@ gde_services (
 		// #todo: 
 		// Precisamos armazenasr os argumentos em algum lugar.
 		// #bugbug: Precisamos criar um request.
-		case 124:
-		    kernel_request = KR_DEFERED_SYSTEMPROCEDURE;
-			break;
+        case 124:
+            kernel_request = KR_DEFERED_SYSTEMPROCEDURE;
+            break;
 
 
         // 125 - system procedure call.
@@ -2008,8 +2007,7 @@ gde_services (
         // #bugbug: Ja podemos deletar esse trem ?!
         case 134:
             hWnd = (struct window_d *) arg3;
-            if ( (void *) hWnd != NULL )
-            {
+            if ( (void *) hWnd != NULL ){
                 a3[0] = (unsigned long) hWnd->rcClient->left;
                 a3[1] = (unsigned long) hWnd->rcClient->top;     
                 a3[2] = (unsigned long) hWnd->rcClient->width;
@@ -2021,7 +2019,6 @@ gde_services (
 
 		// 135 - livre.
 		// 136 - livre.
-
 
 
 		// 137
@@ -2052,13 +2049,13 @@ gde_services (
         //140
         case SYS_SET_CURRENT_KEYBOARD_RESPONDER:
             set_current_keyboard_responder (arg2);
-		    break;
+            break;
 
-		//141	
-		case SYS_GET_CURRENT_KEYBOARD_RESPONDER:
-		    return (void *) get_current_keyboard_responder();
-		    break;
-			
+		// 141
+        case SYS_GET_CURRENT_KEYBOARD_RESPONDER:
+            return (void *) get_current_keyboard_responder();
+            break;
+
 		//142	
         case SYS_SET_CURRENT_MOUSE_RESPONDER:
 		    set_current_mouse_responder(arg2);
@@ -2125,17 +2122,16 @@ gde_services (
             break;
 
 
-
         //152 - get user id
         case SYS_GETCURRENTUSERID:
             return (void *) current_user;
             break;
 
 
-		//154 - get group id	
-		case SYS_GETCURRENTGROUPID:
-		    return (void *) current_group;
-			break;
+		// 154 - get group id	
+        case SYS_GETCURRENTGROUPID:
+            return (void *) current_group;
+            break;
   
         //156 - SYS_SHOWUSERINFO
         case 156:
@@ -2153,7 +2149,8 @@ gde_services (
 		case SYS_GETCURRENTWINDOWSTATION:	
 		    return (void *) current_room; 
 			break;
-			
+
+
 		//159 - get desktop id
         case SYS_GETCURRENTDESKTOP:
 		    return (void *) current_desktop; 
@@ -2203,21 +2200,21 @@ gde_services (
 		// netSocket
         case 165:
             //IN: ( service, (unsigned long) socket, option, option );	
-			break;
+            break;
 
 		//#todo: a chamada est� no shell em net.c	
 		//netBuffer
         case 166:
             //IN:  ( service, buffer_address, option, option );	
-			break;
+            break;
 
  
        // 167 - livre.
  
  
-       //livre
+       // livre
+       // IN: filename, argv, envp
        case 168:
-           // IN: filename, argv, envp
            return (void *) __execute_new_process ( (const char *) arg2, 
                                (char **) arg3, 
                                (char **) arg4 );
@@ -2261,39 +2258,39 @@ gde_services (
         //args in: disk id, volume id, directory id
         case SYS_LISTFILES:
             fsListFiles ( arg2, arg3, arg4 );  
-			break;
-			
-			
-		//174
-		case SYS_SEARCHFILE:
-		    return (void *) KiSearchFile ( (unsigned char *) arg2, 
+            break;
+
+
+        // 174
+        case SYS_SEARCHFILE:
+            return (void *) KiSearchFile ( (unsigned char *) arg2, 
                                 (unsigned long) arg3 );
-			break;
-			
+            break;
+
 		//175
 		// cd.
         //Atualiza o pathname na estrutura do processo atual.
         //Atualiza o pathname na string global.
-		case 175:
-		    fsUpdateWorkingDiretoryString ( (char *) arg2 );
+        case 175:
+            fsUpdateWorkingDiretoryString ( (char *) arg2 );
             fsLoadFileFromCurrentTargetDir ();
-			break;
-			
-		//176	
-        //Remove n nomes de diret�rio do pathname do processo indicado no argumento.
-        //Copia o nome para a string global.
-		case 176:	
-		    fs_pathname_backup ( current_process, (int) arg3 );
-			break;
-			
+            break;
+
+        // 176
+        // Remove n nomes de diret�rio do pathname do processo 
+        // indicado no argumento.
+        // Copia o nome para a string global.
+        case 176:
+            fs_pathname_backup ( current_process, (int) arg3 );
+            break;
+
 		//177
 		//'dir'
 		//comando dir no shell.
 		//Listando arquivos em um diret�rio dado o nome.	
-		case 177:
-		    fsList ( (const char *) arg2 );
+        case 177:
+            fsList ( (const char *) arg2 );
             break;
-
 
 
         // 178
@@ -2355,7 +2352,7 @@ gde_services (
 		    //TID, reason.
             //block_for_a_reason ( (int) arg2, (int) arg3 );
 			break;		
-			
+
 		//210
 		case SYS_CREATETERMINAL: 
             break;
@@ -2424,8 +2421,8 @@ gde_services (
        //221 - execute a program. #todo
 
 
-		// 222 - Create timer.
-		// IN: window, ms e tipo
+        // 222 - Create timer.
+        // IN: window, ms e tipo
         case 222:
             return (void *) create_timer ( (struct window_d *) arg2, 
                                 (unsigned long) arg3, (int) arg4 );
@@ -2448,8 +2445,7 @@ gde_services (
 		//225 - get date
 		case SYS_GETDATE:
 		    return (void *) get_date ();
-            break;		
-
+            break;
 
 
         // Obs: 
@@ -2589,7 +2585,6 @@ gde_services (
         case SYS_SHOWKERNELINFO: 
             sys_show_system_info (5);
             break;
-
 
 
 		// #todo:

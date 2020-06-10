@@ -10,6 +10,12 @@
 #include <kernel.h>
 
 
+/*
+ *************** 
+ * sys_uname:
+ * 
+ */
+
 // service 377.
 int sys_uname (struct utsname *ubuf){
 
@@ -315,6 +321,8 @@ int permission (file *f)
     return -1;
 }
 */
+
+
 
 // File read.
 // It's called by sys_read.
@@ -1393,8 +1401,8 @@ int sys_showpciinfo (void)
  *     Chamando uma rotina interna de reboot do sistema.
  */
 
-void sys_reboot (void)
-{
+void sys_reboot (void){
+    debug_print("sys_reboot:\n");
     reboot ();
 }
 
@@ -1405,8 +1413,8 @@ void sys_reboot (void)
  *     Chama uma rotina interna para desligar a máquina.
  */
 
-void sys_shutdown (void)
-{
+void sys_shutdown (void){
+    debug_print("sys_shutdown:\n");
     hal_shutdown ();
 }
 
