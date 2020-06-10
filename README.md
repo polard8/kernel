@@ -1,4 +1,4 @@
-# Animal: unix-like operating system
+# Gramado: unix-like operating system
 
 <p align=center>
   <a href="https://github.com/frednora/gramado">
@@ -19,12 +19,12 @@
 
 ## Links:
 
-- [Animal on Github](https://github.com/frednora/animal)
+- [Gramado on Github](https://github.com/frednora/gramado)
 
 
-## What is Aminal?
+## What is Gramado?
 
-Animal (c) is a 32 bit multithreaded operating system.
+Gramado (c) is a 32 bit multithreaded operating system.
 
 
 ## Kernel features.
@@ -54,15 +54,15 @@ Animal (c) is a 32 bit multithreaded operating system.
 - unix-like libc for commands. (libc03)
 
 
-## Compiling Animal on Linux.
+## Compiling Gramado on Linux.
 
-Linux 5.3.18-1-MANJARO x86_64
+Linux 5.3.0-53-generic x86_64
 
-gcc (GCC) 9.2.0
+gcc (Ubuntu) 7.5.3
 
-GNU ld (GNU Binutils) 2.33.1
+GNU ld (GNU Binutils for Ubuntu) 2.30
 
-NASM version 2.14.02 compiled on Nov 15 2018
+NASM version 2.13.02
 
 
 ## VHD
@@ -79,7 +79,7 @@ Please, give us some feedback.
 
 ## More information
 
-Animal is a Free and Open Source operating system created by Fred Nora.
+Gramado is a Free and Open Source operating system created by Fred Nora.
 
 The source code uses the BSD license.
 
