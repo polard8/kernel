@@ -747,15 +747,28 @@ int syncfs(int fd)
  */
 
 // #obs
-// Isso deve fechar o arquivo na lista de arqquivo abertos.
+// Isso deve fechar o arquivo na lista de arquivo abertos.
+
+// See:
+// https://man7.org/linux/man-pages/man2/close.2.html
 
 int close (int fd){
 
-    return (int) gramado_system_call ( 17, 
+    int __ret = -1;
+    
+    __ret = (int) gramado_system_call ( 17, 
                      (unsigned long) fd, 
                      (unsigned long) fd, 
                      (unsigned long) fd );
+
+    // #test
+    if (__ret<0)
+        errno = __ret;
+
+
+    return (int) __ret;
 }
+
 
 
 int pipe2 ( int pipefd[2], int flags )

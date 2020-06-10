@@ -1401,11 +1401,8 @@ gde_services (
 
 
         // 17 - close()
-        // #todo: fechar o arquivo aberto ... 
-        // todo: criar sys_close()
-        //return (void *) close ( (int) arg2 );
         case SYS_CLOSE:
-            return NULL;
+            return (void *) sys_close ( (int) arg2 );
             break;
 
 

@@ -238,54 +238,65 @@ int sys_open (const char *pathname, int flags, mode_t mode ){
 }
 
 
-// fechar um dos arquivos abertos do processo atual.
-// o descritor 'e um ipndice na sua tabela dearquivos abertos.
+/*
+ **************************
+ *  sys_close:
+ * 
+ */
+
+// Fechar um dos objetos abertos do processo atual.
+// O descritor é um índice na sua tabela de objetos abertos.
+
+// See:
+// https://man7.org/linux/man-pages/man2/close.2.html
 
 int sys_close ( int fd ){
 
-	file *stream;
-		
-	struct process_d *p;
-	int i;
-	
+    file *object;
 
-	if ( fd < 0 || fd >= NUMBER_OF_FILES)
-		return -1;
-	
-	if ( current_process < 0 )
-		return -1;
-	
-	p = (void *) processList[current_process];
-    
-	if ( (void *) p == NULL )
-	{
-	    return -1;
-	}else{
-	
-	     stream = (FILE *) processList[fd];
-		 
-		 if ( (void *) stream == NULL )
-		 {
-		     return -1;
-		 }else{
-		 
-		     // #todo
-			 // Fechar corretamente esse arquivo e liberar os recursos 
-			 // associados a ele.
-			 
-			 stream = NULL;
-			 processList[fd] = (unsigned long) 0;
-			 
-			 //ok.
-			 return 0;
-		 }
-	
-	};
-	
-	//printf ("klibc-unistd-close: todo\n");
+    struct process_d *p;
+
+
+    if ( fd < 0 || fd >= NUMBER_OF_FILES){
+        debug_print("sys_close: fd\n");
+        return -1;
+    }
+
+    if ( current_process < 0 ){
+        debug_print("sys_close: current_process\n");
+        return -1;
+    }
+
+    p = (void *) processList[current_process];
+
+    if ( (void *) p == NULL ){
+        debug_print("sys_close: p\n");
+        return -1;
+
+    }else{
+        
+        object = (file *) p->Objects[fd];
+
+        if ( (void *) object == NULL ){
+            debug_print("sys_close: object\n");
+            return -1;
+
+        }else{
+ 
+            object = NULL;
+            p->Objects[fd] = (unsigned long) 0;
+
+            debug_print("sys_close: Done\n");
+            
+            // ok.
+            return 0;
+        }
+    };
+
+
+    debug_print("sys_close: FAIL\n");
     return -1;
 }
-
 
 
 

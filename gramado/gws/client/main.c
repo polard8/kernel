@@ -283,6 +283,10 @@ response_loop:
     
 process_reply:
 
+    // #test
+    gws_debug_print ("gwst: Testing close() ...\n"); 
+    close (client_fd);
+
     gws_debug_print ("gwst: bye\n"); 
     printf ("gwst: Window ID %d \n", message_buffer[0] );
     printf ("gwst: Bye\n");
