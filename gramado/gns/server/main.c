@@ -341,7 +341,9 @@ gnsProcedure (
             break;
 
         case 1000:
-            printf (">> Hello from Gramado Network Server !\n");
+            printf ("\n");
+            printf ("gns: Hello from Gramado Network Server!\n");
+            printf ("\n"); 
             break;
 
         case 1001:

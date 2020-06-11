@@ -503,11 +503,11 @@ int sys_socket ( int family, int type, int protocol ){
     __socket = (struct socket_d *) create_socket ( ip, port );
   
     if ( (void *) __socket == NULL ){
+        debug_print ("sys_socket: __socket fail\n");
         printf ("sys_socket: __socket fail\n");
         refresh_screen();
         return -1;
- 
- 
+
     }else{
 
        __socket->addr = addr;
@@ -559,12 +559,10 @@ int sys_socket ( int family, int type, int protocol ){
            // ...
            
            default:
-               debug_print ("sys_socket: default\n");
-               //debug_print ("sys_socket: default family\n");
+               debug_print ("sys_socket: default family\n");
                return -1;
                break;
-       }
-
+        };
 
         // ...
     };
@@ -715,8 +713,18 @@ socket_ioctl (
 }
 
 
+
+/*
+ ************************************** 
+ * sys_connect:
+ *     Connecting to a server given an address.
+ */
+
 // connect.
 // Em nosso exemplo o cliente quer se conectar com o servidor.
+// Conectando a um servidor dado um endereço.
+// O endereço pode vir em formatos diferentes dependendo
+// do domínio indicado na estrutura.
 // IN: client fd, address, address len
 // OUT: 0=ok <0=fail
 
@@ -759,13 +767,20 @@ sys_connect (
         return -1;
     }
 
+
     // Getting the target PID.
+    // #todo:
+    // Devemos obter o número do processo alvo dado um endereço.
+    // O tipo de endereço depende do tipo de domínio (família).
+ 
+ 
     switch (addr->sa_family)
     {
-        // AF_GRAMADO
-        // Vamos obter o número do processo alvo.
-        case 8000:
-
+        // AF_GRAMADO = 8000
+        // Vamos obter o número do processo alvo dado o endereço.
+        case AF_GRAMADO:
+            debug_print ("sys_connect: AF_GRAMADO ok\n");
+            
             // shell
             if ( addr->sa_data[0] == 's' && addr->sa_data[1] == 'h' ){   
                 target_pid = (int) gramado_ports[GRAMADO_SH_PORT]; 
@@ -790,10 +805,22 @@ sys_connect (
 
             printf (">>>> target pid %d \n", target_pid);
             break;
+        
+        
+        //case AF_LOCAL:
+        case AF_UNIX:
+            debug_print ("sys_connect: AF_UNIX not supported\n");
+            break;
+            
 
+        case AF_INET:
+            debug_print ("sys_connect: AF_INET not supported\n");
+             break;
+             
         //... 
         
         default:
+            debug_print ("sys_connect: domain not supported\n");
             printf ("Family not supported! %d \n",addr->sa_family);
             refresh_screen();
             return -1;
@@ -1343,16 +1370,15 @@ update_socket (
 
 
 
-int socket_read (unsigned int fd, char *buf, int count)
-{
+int socket_read ( unsigned int fd, char *buf, int count ){
+
     debug_print ("socket_read:[TODO]\n");
     return -1;
 }
 
 
+int socket_write ( unsigned int fd, char *buf, int count ){
 
-int socket_write (unsigned int fd,char *buf,int count)
-{
     debug_print ("socket_write:[TODO]\n");
     return -1;
 }
@@ -1360,16 +1386,20 @@ int socket_write (unsigned int fd,char *buf,int count)
 
 // Conjunto especiais de portas.
 // Usados apenas na famíla AF_GRAMADO.
-int socket_set_gramado_port (int port, int pid)
-{
- 
-    if( port<0 || port >31)
+int socket_set_gramado_port (int port, int pid){
+
+    //port
+    if ( port<0 || port >31){
+        debug_print ("socket_set_gramado_port: port fail\n");
         return -1;
+    }
 
-
+    //pid
     //todo: max
-    if(pid<0)
-        return -1;       
+    if (pid<0){
+        debug_print ("socket_set_gramado_port: port fail\n");
+        return -1;
+    }       
     
     gramado_ports[port] = (int) pid;
 
@@ -1380,11 +1410,13 @@ int socket_set_gramado_port (int port, int pid)
 
 int is_socket (file *f){
 
-    if( (void*) f == NULL )
-        return -1;
+    // Fail
+    if ( (void *) f == NULL )
+        return (int) (-1);
 
+    // Yes
     if ( f->____object == ObjectTypeSocket )
-        return 1; // Yes.
+        return (int) 1; 
         
     // No
     return 0;
@@ -1393,12 +1425,14 @@ int is_socket (file *f){
 
 int is_virtual_console (file *f){
 
-    if( (void *) f == NULL )
-        return -1;
+    // Fail
+    if ( (void *) f == NULL )
+        return (int) (-1);
 
+    // Yes
     if ( f->____object == ObjectTypeVirtualConsole )
-        return 1; // Yes.
-        
+        return (int) 1; 
+   
     // No
     return 0;
 }
