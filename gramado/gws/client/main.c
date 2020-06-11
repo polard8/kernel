@@ -121,8 +121,10 @@ int main ( int argc, char *argv[] ){
     //então o servidor escreverá em nosso arquivo.
     
     // #debug
-    printf ("gwst: connecting ...\n");      
+    printf ("gwst: Connecting to the address 'ws' ...\n");      
 
+    // Tentando nos conectar ao endereço indicado na estrutura
+    // Como o domínio é AF_GRAMADO, então o endereço é "w","s".
     if ( connect (client_fd, (struct sockaddr *) &addr, sizeof(addr)) < 0 )
     { 
         gws_debug_print ("gwst: Connection Failed\n");

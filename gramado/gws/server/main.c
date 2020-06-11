@@ -181,6 +181,9 @@ void set_client_id ( int id )
 // obs: read and write use the buffer '__buffer'
 // in the top of this file.
 
+//#todo:
+// No loop precisamos de accept() read() e write();
+
 //void handle_request (int fd);
 void handle_request (int fd){
 
@@ -190,6 +193,13 @@ void handle_request (int fd){
     int n_reads = 0;     // For requests.
     int n_writes = 0;    // For responses.
 
+    //#todo:
+    // No loop precisamos de accept() read() e write();
+
+    //#atenção:
+    // A função accept vai retornar o descritor do 
+    // socket que usaremos ... por isso poderemos fecha-lo
+    // para assim obtermos um novo da próxima vez.
 
     if (fd<0){
         gde_debug_print ("handle_request: fd\n");
@@ -707,6 +717,9 @@ int main (int argc, char **argv){
     // Daqui pra frente é conexão com cliente.
     // Lembrando que o servidor vai se conectar à mais de um cliente.
     // ...
+    
+    // #atenção
+    // socket() bind() e listen() ficam antes do loop.
 
 
     //
@@ -739,6 +752,9 @@ int main (int argc, char **argv){
         printf("gws: Couldn't bind to the socket\n");
         exit(1);
     }
+    
+    //#todo
+    //listen()
 
 
     //
@@ -785,9 +801,32 @@ int main (int argc, char **argv){
     // =======================================
     //
 
+     //
+     // Loop
+     //
+     
+    // #todo
+    // Isso é um teste.
+    // #atenção
+    // socket() bind() e listen() ficam antes do loop.
+    // Provavelmente precisamos de um loop
+    // contendo accept, read e write.
+    // Não presizamos criar o socket novamente,
+    // mas temos que refazer a conecção toda vez
+    // que enviarmos uma resposta.
+    // Então logo após enviarmos a resposta precisamos
+    // fechar o arquivo? Acabaria com o socket?
+    //#atenção:
+    // A função accept vai retornar o descritor do 
+    // socket que usaremos ... por isso poderemos fecha-lo
+    // para assim obtermos um novo da próxima vez.
+    
 // loop:
 
     gde_debug_print ("gws: Entering main loop.\n");
+
+    //#todo:
+    // No loop precisamos de accept() read() e write();
 
 
     // + Compositor. (Redraw dirty rectangles)    

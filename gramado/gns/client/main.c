@@ -146,8 +146,10 @@ int main ( int argc, char *argv[] ){
     //então o servidor escreverá em nosso arquivo.
     
     // #debug
-    printf ("gnst: connecting ...\n");      
+    printf ("gnst: Connecting to the address 'ns' ...\n");      
 
+    // Tentando nos conectar ao endereço indicado na estrutura
+    // Como o domínio é AF_GRAMADO, então o endereço é "n","s".
     if (connect (client_fd, (struct sockaddr *) &addr, sizeof(addr)) < 0){ 
         printf("gnst: Connection Failed \n"); 
         return -1; 
