@@ -111,12 +111,13 @@ int pci_setup_devices (void){
  * vendor e device.
  */
 
-struct pci_device_d *scan_pci_device_list ( unsigned short vendor, 
-                                            unsigned short device )
+struct pci_device_d *scan_pci_device_list ( 
+    unsigned short vendor, 
+    unsigned short device )
 {
     struct pci_device_d *D;
 
-    int i;
+    int i=0;
 
 	//#bugbug
 	//Nossa lista só tem 32 slots por enquanto.
@@ -148,12 +149,13 @@ struct pci_device_d *scan_pci_device_list ( unsigned short vendor,
  * classe e subclasse.
  */
 
-struct pci_device_d *scan_pci_device_list2 ( unsigned char class, 
-                                             unsigned char subclass )
+struct pci_device_d *scan_pci_device_list2 ( 
+    unsigned char class, 
+    unsigned char subclass )
 {
     struct pci_device_d *D;
 
-    int i;
+    int i=0;
 
 	// #bugbug
 	// Nossa lista só tem 32 slots por enquanto.

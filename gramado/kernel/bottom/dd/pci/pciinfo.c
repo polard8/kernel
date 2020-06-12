@@ -51,8 +51,8 @@ int pciShowDeviceInfo (int number){
 
     // Limits
 
-    if (number < 0 || number > 32)
-    {
+    if (number < 0 || number > 32){
+        // message?
         return 0;
         //return 1; //#todo: Usar ese retorno.
 
@@ -64,8 +64,7 @@ int pciShowDeviceInfo (int number){
         if ( (void *) D != NULL )
         {
             //if ( D->used == 1 && D->magic == 1234 )
-            if (D->magic == 1234)
-            {
+            if (D->magic == 1234){
                 printf ("Vend={%x} Dev={%x} ClassCode={%x} IntLine={%x} \n",
                     D->Vendor, D->Device, D->classCode, D->irq_line );
             }
@@ -80,9 +79,10 @@ int pciShowDeviceInfo (int number){
 
 
 /*
- ****************************************************************************
+ ****************************************************************
  * pciInfo:
- *     Mostra as informações salvas nas estruturas da lista de dispositivos. 
+ *     Mostra as informações salvas nas estruturas da 
+ * lista de dispositivos. 
  *
  * 0x2668  82801FB (ICH6) High Definition Audio Controller 0x8086 Intel.
  * 0x2829  Intel(R) ICH8M SATA AHCI Controller 0x8086 Intel.
@@ -90,12 +90,13 @@ int pciShowDeviceInfo (int number){
  * ...
  */
 
-	// Uma lista com no máximo 32 ponteiros para estrutura de dispositivo pci.
+// Uma lista com no máximo 32 ponteiros para estrutura 
+// de dispositivo pci.
 
 int pciInfo (void){
 
     struct pci_device_d *D;
-    int i;
+    int i=0;
     int Max = 32;
 
 
@@ -113,8 +114,7 @@ int pciInfo (void){
 			// Mostrar mais informações.
 			// Separar isso em mais de um printf.
 
-            if (D->magic == 1234)
-            {
+            if (D->magic == 1234){
                 printf ("\n [%d/%d/%d] Vend=%x Dev=%x Class=%s SubClass=%x iLine=%d iPin=%d \n",
                     D->bus, D->dev , D->func,
                     D->Vendor, D->Device, 

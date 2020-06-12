@@ -209,6 +209,10 @@ void __socket_messages (int fd){
 
 __again:
 
+
+    // #todo:
+    // Talvez aqui possamos usar alguma função chamada post_message().
+
     // #debug: para a máquina real.
     debug_print ("Sending response ...\n");
                 

@@ -1494,7 +1494,7 @@ pciHandleDevice ( unsigned char bus,
 int init_pci (void){
 
     int Status = 0;
-    int Index;
+    int Index=0;
     int Max = 32;   //@todo.
 
     unsigned long data;
@@ -1504,7 +1504,7 @@ int init_pci (void){
 
     // Is PCI supported ?
     
-    out32 ( 0xCF8, 0x80000000);
+    out32 ( 0xCF8, 0x80000000 );
     io_delay();
     
     data = (unsigned long) in32 (0xCF8);

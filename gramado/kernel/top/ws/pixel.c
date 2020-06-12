@@ -34,10 +34,11 @@
  * não a estrutura de buffer e sim apenas o ponteiro para o buffer. se bem que 
  * se fosse passado um ponteiro para um estrutura de buffer seria bem mais seguro.
  *
- * 2015.
+ * History:
+ *     2015 - Created by Fred Nora.
  */
 
- 
+
 #include <kernel.h>
 
 
@@ -84,22 +85,23 @@ void pixelDirectPutPixel( void* FrontBuffer, unsigned long x, unsigned long y, u
 
 
  
-//Pinta um pixel em um buffer de janela.
+// Pinta um pixel em um buffer de janela.
 void 
-pixelPutPixelWindowBuffer ( void *buffer, 
-                            unsigned long x, 
-                            unsigned long y, 
-                            unsigned long color )
+pixelPutPixelWindowBuffer ( 
+    void *buffer, 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long color )
 {
+    //debug_print ("pixelPutPixelWindowBuffer: [TODO]\n");
 	//return; 
 	//@todo: Ainda não implementada.
 }
 
 
 
- 
 /*
- * *IMPORTANTE
+ * #IMPORTANTE
  * Obs: Se uma estrutura de janela for passada como argumento
  *      na hora de colocar um pixel então usaremos o buffer dedicado
  * indicado nessa estutura. Caso contrário, se não for passado
@@ -111,10 +113,11 @@ pixelPutPixelWindowBuffer ( void *buffer,
  */	
 
 void 
-pixelPutPixelDedicatedWindowBuffer ( struct window_d *window, 
-                                     unsigned long x, 
-                                     unsigned long y, 
-                                     unsigned long color )
+pixelPutPixelDedicatedWindowBuffer ( 
+    struct window_d *window, 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long color )
 {
 
 
@@ -212,10 +215,11 @@ useDedicatedBuffer:
  */
 
 void 
-backbuffer_putpixel ( unsigned long ax, 
-                      unsigned long bx, 
-                      unsigned long cx, 
-                      unsigned long dx )
+backbuffer_putpixel ( 
+    unsigned long ax, 
+    unsigned long bx, 
+    unsigned long cx, 
+    unsigned long dx )
 {
 
 	// #importante
@@ -233,10 +237,10 @@ backbuffer_putpixel ( unsigned long ax,
     // Estamos determinando um valor.
     // Precisamos de uma variável de devinição do sistema.
     
-    // BACKBUFFER_VA
-    // See: /include/kernel/globals/gva.h 
+    // BACKBUFFER_VA = 0xC0800000
+    // See: gramado/kernel/include/gva.h
     
-    unsigned char *where = (unsigned char *) 0xC0800000;
+    unsigned char *where = (unsigned char *) BACKBUFFER_VA;
 
     unsigned long color = (unsigned long) ax;
 
@@ -272,14 +276,14 @@ backbuffer_putpixel ( unsigned long ax,
 
     switch (SavedBPP)
     {
-		case 32:
-		    bytes_count = 4;
-		    break;
-		
-		case 24:
-		    bytes_count = 3;
-			break;
-			
+        case 32:
+            bytes_count = 4;
+            break;
+
+        case 24:
+            bytes_count = 3;
+            break;
+
 		//#testando
 		//case 16:
 		//	bytes_count = 2;
@@ -288,15 +292,15 @@ backbuffer_putpixel ( unsigned long ax,
 		//case 8:
 		//	bytes_count = 1;
 		//	break;
-		
-		default:
-		    panic ("backbuffer_putpixel: SavedBPP");
-		    break;
-	}
-	
+
+        default:
+            panic ("backbuffer_putpixel: SavedBPP");
+            break;
+    };
+
 	// #importante
 	// Pegamos a largura do dispositivo.
-	
+
     int width = (int) SavedX; 
 
     int offset = (int) ( (bytes_count*width*y) + (bytes_count*x) );
@@ -332,62 +336,72 @@ backbuffer_putpixel ( unsigned long ax,
 
 
 void 
-lfb_putpixel ( unsigned long ax, 
-               unsigned long bx, 
-		       unsigned long cx, 
-		       unsigned long dx )
+lfb_putpixel ( 
+    unsigned long ax, 
+    unsigned long bx, 
+    unsigned long cx, 
+    unsigned long dx )
 {
-	unsigned char *where = (unsigned char *) 0xC0400000;
-	
-	unsigned long color = (unsigned long) ax;
-	
-	char b, g, r, a;
-	
-	b = (color & 0xFF);	
-	g = (color & 0xFF00) >> 8;
-	r = (color & 0xFF0000) >> 16;
-	a = (color >> 24) + 1;
-	
-	int x = (int) bx;
-	int y = (int) cx;
+    // FRONTBUFFER_VA = 0xC0400000
+    // See: gramado/kernel/include/gva.h
+    unsigned char *where = (unsigned char *) FRONTBUFFER_VA;
+
+    unsigned long color = (unsigned long) ax;
+
+    char b, g, r, a;
+
+    b = (color & 0xFF);
+    g = (color & 0xFF00) >> 8;
+    r = (color & 0xFF0000) >> 16;
+    a = (color >> 24) + 1;
+
+    int x = (int) bx;
+    int y = (int) cx;
 
 	// = 3; 
 	//24bpp
-	int bytes_count;
-	
-	switch (SavedBPP)
-	{
-		case 32:
-		    bytes_count = 4;
-		    break;
+    int bytes_count=0;
+
+
+    switch (SavedBPP)
+    {
+        case 32:
+            bytes_count = 4;
+            break;
+
+        case 24:
+            bytes_count = 3;
+            break;
+       
+		// ...
 		
-		case 24:
-		    bytes_count = 3;
-			break;
-			
-		//...
-	}	
-	
+        default:
+            panic ("lfb_putpixel: SavedBPP");
+            break;
+    };
+
+
 	//#importante
 	//Pegamos a largura salva.
-	int width = (int) SavedX; 
-	
-	int offset = (int) ( (bytes_count*width*y) + (bytes_count*x) );
-	
-	where[offset] = b;
-	where[offset +1] = g;
-	where[offset +2] = r;
+    int width = (int) SavedX; 
 
-	//teste
-	if ( SavedBPP == 32 )
-	{
-	    where[offset +3] = a;	
-	}
+    int offset = (int) ( (bytes_count*width*y) + (bytes_count*x) );
+
+    where[offset] = b;
+    where[offset +1] = g;
+    where[offset +2] = r;
+
+    // #test
+    if ( SavedBPP == 32 )
+    {
+        where[offset +3] = a;
+    }
+
 }
 
 
+
 /*
- * 
  * get_pixel:
  *     Pegando byte do backbuffer.
  * 
