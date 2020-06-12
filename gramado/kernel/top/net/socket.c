@@ -448,17 +448,21 @@ socket_inet (
 
 int sys_socket ( int family, int type, int protocol ){
 
+    // Socket structure.
     struct socket_d *__socket;
+
+    // Socket address structure.
     struct sockaddr addr;
-    
     addr.sa_family = family;
     addr.sa_data[0] = 'x'; 
     addr.sa_data[1] = 'x';
-    
+  
+    // Current process.
+    struct process_d *p;  
+
+    // ip:port used in the socket struture.
     unsigned long ip = 0x00000000;
     unsigned short port = 0x0000;
-
-    struct process_d *p;  //current
 
 
     // #debug
@@ -473,26 +477,32 @@ int sys_socket ( int family, int type, int protocol ){
 	//
 
     if (family < 0){
-        //debug_print ("sys_socket: family not supported\n");
+        debug_print ("sys_socket: family not supported\n");
         return -1;
     }
 
-    //if (type < 0)
-        //return -1;
+    if (type < 0){
+        debug_print ("sys_socket: type not supported\n");
+        return -1;
+    }
 
-    //if (protocol < 0)
-       //return -1;
+    if (protocol < 0){
+        debug_print ("sys_socket: protocol not supported\n");
+        return -1;
+    }
 
-
-     p = (struct process_d *) processList[current_process];
+    // Current process.
+    
+    p = (struct process_d *) processList[current_process];
      
-     if ( (void *) p == NULL ){
+    if ( (void *) p == NULL ){
+        debug_print ("sys_socket: p fail\n");
         printf ("sys_socket: p fail\n");
         refresh_screen();
         return -1;
-     }
+    }
 
-    
+
     //
     // Socket structure.
     //
@@ -510,6 +520,12 @@ int sys_socket ( int family, int type, int protocol ){
 
     }else{
 
+        // #test
+        __socket->family = family;
+        __socket->type = type;
+        __socket->protocol = protocol;
+    
+    
        __socket->addr = addr;
        
        p->priv = __socket;
@@ -1297,6 +1313,14 @@ create_socket (
         s->used = 1;
         s->magic = 1234;
         
+        //#test
+        s->family = 0;
+        s->type = 0;
+        s->protocol = 0;
+        
+        s->ip = ip;
+        s->port = port;
+        
         s->state = SOCKET_NOT_CONNECTED;
         
         s->private_file = (file *) 0;
@@ -1305,8 +1329,6 @@ create_socket (
         
         s->owner = current_process;
         
-        s->ip = ip;
-        s->port = port;
         
         
         

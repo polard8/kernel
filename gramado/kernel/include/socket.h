@@ -299,29 +299,28 @@ struct mmsghdr {
 
 
 
-#define 	_NETINET_IN_H_
-#define 	IPPROTO_IP   	0	// Dummy for IP.
-#define 	IPPROTO_ICMP    1	// Control message protocol.
-#define 	IPPROTO_IGMP    2	// Group management protocol.
-#define 	IPPROTO_TCP     6	// Transmission control protocol.
-#define 	IPPROTO_UDP     17 	// User datagram protocol.
-#define 	IPPROTO_RAW   	255	// Raw IP packet.
-#define 	IPPROTO_MAX   	256     // Maximum protocol identifier.
-#define 	IPPORT_RESERVED 1024    // Last reserved port number.
-#define 	IPPORT_USERRESERVED   5000 // User reserved port number.
-#define 	INADDR_ANY   (unsigned long)0x00000000 // Any IP address.
-#define 	INADDR_BROADCAST   (unsigned long)0xffffffff // Broadcast IP address.
+#define  _NETINET_IN_H_
+#define  IPPROTO_IP      0  // Dummy for IP.
+#define  IPPROTO_ICMP    1  // Control message protocol.
+#define  IPPROTO_IGMP    2  // Group management protocol.
+#define  IPPROTO_TCP     6  // Transmission control protocol.
+#define  IPPROTO_UDP     17   // User datagram protocol.
+#define  IPPROTO_RAW    255          // Raw IP packet.
+#define  IPPROTO_MAX    256          // Maximum protocol identifier.
+#define  IPPORT_RESERVED 1024        // Last reserved port number.
+#define  IPPORT_USERRESERVED   5000  // User reserved port number.
+#define  INADDR_ANY   (unsigned long)0x00000000 // Any IP address.
+#define  INADDR_BROADCAST   (unsigned long)0xffffffff // Broadcast IP address.
 
 
 
 /*
  * Types of socket shutdown(2).
  */
-#define	SHUT_RD		0		/* Disallow further receives. */
-#define	SHUT_WR		1		/* Disallow further sends. */
-#define	SHUT_RDWR	2		/* Disallow further sends/receives. */
-
-
+ 
+#define  SHUT_RD      0    /* Disallow further receives. */
+#define  SHUT_WR      1    /* Disallow further sends. */
+#define  SHUT_RDWR    2    /* Disallow further sends/receives. */
 
 
 
@@ -505,8 +504,15 @@ struct socket_d
     int used;
     int magic;
 
+    // #test.
+    int family;
+    int type;
+    int protocol;
+
     unsigned long ip;
     unsigned short port;
+    
+    
 
     //
     // Connection
@@ -552,18 +558,25 @@ unsigned long socketList[SOCKET_COUNT_MAX];
 int socket_init(void);
 
 int 
-socket_gramado ( struct socket_d *sock,
-                int family, 
-                const struct sockaddr *addr,
-                socklen_t addrlen, int type, int protocol );
+socket_gramado ( 
+    struct socket_d *sock,
+    int family, 
+    const struct sockaddr *addr,
+    socklen_t addrlen, 
+    int type, 
+    int protocol );
 
 
 int 
-socket_unix ( struct socket_d *sock, 
-              int family, 
-              const struct sockaddr *addr,
-              socklen_t addrlen, int type, int protocol );
-              
+socket_unix ( 
+    struct socket_d *sock, 
+    int family, 
+    const struct sockaddr *addr,
+    socklen_t addrlen, 
+    int type, 
+    int protocol );
+
+
 int 
 socket_inet ( struct socket_d *sock, 
               int family, 
@@ -576,38 +589,48 @@ int sys_socket ( int family, int type, int protocol );
 
 struct socket_d *get_socket_from_fd (int fd);
 
-int
-sock_socketpair (int family, int type, int protocol, int usockvec[2]);
 
-// Essa rotina sera' chamada se os serviços forem superios a 7000 ou inferiores a 8000
+int
+sock_socketpair ( 
+    int family, 
+    int type, 
+    int protocol, 
+    int usockvec[2] );
+
+
+// Essa rotina sera' chamada se os serviços 
+// forem superios a 7000 ou inferiores a 8000
 unsigned long 
-socket_ioctl ( unsigned long number, 
-               unsigned long arg2, 
-               unsigned long arg3, 
-               unsigned long arg4 );
+socket_ioctl ( 
+    unsigned long number, 
+    unsigned long arg2, 
+    unsigned long arg3, 
+    unsigned long arg4 );
 
 
 
 int 
-sys_connect ( int sockfd, 
-              const struct sockaddr *addr,
-              socklen_t addrlen );
+sys_connect ( 
+    int sockfd, 
+    const struct sockaddr *addr,
+    socklen_t addrlen );
               
               
 int sys_accept (int sockfd, struct sockaddr *addr, socklen_t *addrlen);             
-              
-int 
-sys_bind ( int sockfd, 
-           const struct sockaddr *addr,
-           socklen_t addrlen );
-       
+
 
 int 
-sys_getsockname ( int sockfd, 
-                  struct sockaddr *addr, 
-                  socklen_t *addrlen );
- 
-       
+sys_bind ( 
+    int sockfd, 
+    const struct sockaddr *addr,
+    socklen_t addrlen );
+
+int 
+sys_getsockname ( 
+    int sockfd, 
+    struct sockaddr *addr, 
+    socklen_t *addrlen );
+
 int sys_listen (int sockfd, int backlog);          
                
 
