@@ -267,6 +267,7 @@ __again:
             break;
             
         case SERVER_PACKET_TYPE_REPLY:
+            debug_print ("gnst: SERVER_PACKET_TYPE_REPLY received\n"); 
             goto process_reply;
             break;
             
@@ -295,9 +296,8 @@ process_reply:
 
     //printf("%d bytes readed\n",n_reads);
     printf("RESPONSE: {%s} \n",__buffer+16);
-    
-    
-    
+
+
     debug_print ("gnst: bye\n"); 
     printf ("gnst: bye\n");
 

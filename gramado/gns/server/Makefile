@@ -1,7 +1,6 @@
 
-# gws - Gramado Window Server.
+# gns - Gramado Network Server.
 # 2020 - Created by Fred Nora.
-
 
 
 

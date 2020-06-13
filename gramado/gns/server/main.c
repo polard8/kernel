@@ -130,6 +130,16 @@ gnsProcedure (
     unsigned long long1, 
     unsigned long long2 );
 
+void gns_send_error_response (int fd, int code, char *error_message);
+
+
+void gns_send_error_response (int fd, int code, char *error_message)
+{
+    // 500: internal server error!!
+    //#todo
+    gde_debug_print ("gns: [TODO] gns_send_error_response\n");
+}
+
 
 
 // internal.
@@ -225,6 +235,11 @@ __again:
     message_buffer[2] = next_response[2];         // Return value (long1)
     message_buffer[3] = next_response[3];         // Return value (long2)
 
+    //# it works.
+    char *m = (char *) (&__buffer[0] + 16);
+    sprintf( m, "<html><head></head><body> Nothing ... </body></html>");
+
+
     n_writes = write ( fd, __buffer, sizeof(__buffer) );
     if (n_writes<=0)
         goto __again;
@@ -235,6 +250,7 @@ __again:
     message_buffer[1] = 0;
     message_buffer[2] = 0;
     message_buffer[3] = 0;
+
 
     // Cleaning
     int c=0;
