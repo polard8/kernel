@@ -1,3 +1,11 @@
+/*
+ * File: un.h
+ * 
+ *   Socket support for unix style. 
+ * 
+ */
+
+
 
 // sys/un.h
 // Socket support for libc03.
@@ -15,6 +23,12 @@
 
 
 #define UNIX_PATH_MAX 108
+
+/*
+ * sockaddr_un:
+ *     Socket address, unix style.
+ */
+
 struct sockaddr_un {
 
     //#bugbug
@@ -23,6 +37,17 @@ struct sockaddr_un {
      uint16_t sun_family;
     char sun_path[UNIX_PATH_MAX];
 };
+
+
+/*
+// #todo
+// socket address gramado style.
+struct sockaddr_gramado {
+
+    uint16_t family;
+    char sun_path[UNIX_PATH_MAX];    
+};
+*/
 
 
 #endif    

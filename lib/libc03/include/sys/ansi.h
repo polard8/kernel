@@ -1,3 +1,9 @@
+/*
+ * File: ansi.h 
+ * 
+ */
+
+
 /*	$NetBSD: ansi.h,v 1.14 2011/07/17 20:54:54 joerg Exp $	*/
 
 /*-
@@ -29,10 +35,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef	_SYS_ANSI_H_
-#define	_SYS_ANSI_H_
-
-
+#ifndef  _SYS_ANSI_H_
+#define  _SYS_ANSI_H_
 
 
 //#include <machine/ansi.h>
@@ -41,25 +45,24 @@
 //# inclui isso, talvez precise.
 #include <_types.h>
 
-typedef char *		__caddr_t;	/* core address */
-typedef __uint32_t	__gid_t;	/* group id */
-typedef __uint32_t	__in_addr_t;	/* IP(v4) address */
-typedef __uint16_t	__in_port_t;	/* "Internet" port number */
-typedef __uint32_t	__mode_t;	/* file permissions */
 
+typedef char *      __caddr_t;    /* core address */
+typedef __uint32_t  __gid_t;      /* group id */
+typedef __uint32_t  __in_addr_t;  /* IP(v4) address */
+typedef __uint16_t  __in_port_t;  /* "Internet" port number */
+typedef __uint32_t  __mode_t;     /* file permissions */
 //typedef __int64_t	__off_t;	/* file offset */
 
 
-
-typedef __int32_t	__pid_t;	/* process id */
-typedef __uint8_t  __sa_family_t;  /* socket address family */
-typedef unsigned int	__socklen_t;	/* socket-related datum length */
-typedef __uint32_t	__uid_t;	/* user id */
-
+typedef __int32_t     __pid_t;        /* process id */
+typedef __uint8_t     __sa_family_t;  /* socket address family */
+typedef unsigned int  __socklen_t;    /* socket-related datum length */
+typedef __uint32_t    __uid_t;        /* user id */
 
 
 //typedef	__uint64_t	__fsblkcnt_t;	/* fs block count (statvfs) */
 //typedef	__uint64_t	__fsfilcnt_t;	/* fs file count */
+
 
 struct __tag_wctrans_t;
 typedef struct __tag_wctrans_t *__wctrans_t;
@@ -67,24 +70,37 @@ typedef struct __tag_wctrans_t *__wctrans_t;
 struct __tag_wctype_t;
 typedef struct __tag_wctype_t *__wctype_t;
 
+
 /*
- * mbstate_t is an opaque object to keep conversion state, during multibyte
- * stream conversions.  The content must not be referenced by user programs.
+ * mbstate_t:
+ * It is an opaque object to keep conversion state, during multibyte
+ * stream conversions.  The content must not be referenced by 
+ * user programs.
  */
+
 typedef union {
-	__int64_t __mbstateL; /* for alignment */
-	char __mbstate8[128];
+     
+    // #bugbug: 
+    // We need to change this 64 bit type. 
+    
+    __int64_t __mbstateL;    /* for alignment */
+    
+    char __mbstate8[128];
+    
 } __mbstate_t;
 
-#define _BSD_WCTRANS_T_	__wctrans_t	/* wctrans_t */
-#define _BSD_WCTYPE_T_	__wctype_t	/* wctype_t */
-#define _BSD_MBSTATE_T_	__mbstate_t	/* mbstate_t */
+
+#define _BSD_WCTRANS_T_  __wctrans_t    /* wctrans_t */
+#define _BSD_WCTYPE_T_   __wctype_t     /* wctype_t */
+#define _BSD_MBSTATE_T_  __mbstate_t    /* mbstate_t */
+
 
 #ifdef __lint__
 typedef char *__va_list;
 #else
 typedef __builtin_va_list __va_list;
 #endif
+
 
 #endif	/* !_SYS_ANSI_H_ */
 

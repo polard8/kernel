@@ -1,4 +1,7 @@
-
+/*
+ * File: in.h 
+ *     ring0. socket address for internet style.
+ */
 
 #ifndef ____IN_H
 #define ____IN_H

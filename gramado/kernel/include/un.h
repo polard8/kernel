@@ -1,3 +1,7 @@
+/*
+ * File: in.h 
+ *     ring0. socket address for unix style.
+ */
 
 // un.h
 // socket support for the base kernel.
