@@ -9,10 +9,31 @@
 #define ____UN_H
 
 
+//#test
+// #bugbug
+// It needs to be 16bit.
+// normally define in ansi.h
+//typedef __uint8_t  __sa_family_t;  /* socket address family */
+typedef __uint16_t  __sa_family_t;   /* socket address family */
+
+
+//#test
+// #bugbug: 
+// It needs to be 16bit.
+#ifndef sa_family_t
+typedef __sa_family_t  sa_family_t;
+#define sa_family_t  __sa_family_t
+#endif
+
 
 #define UNIX_PATH_MAX 108
 struct sockaddr_un {
-    uint16_t sun_family;
+
+    //#bugbug
+    //ps: It needs to be 16 bit.
+    sa_family_t sun_family; 
+    //uint16_t sun_family; 
+    
     char sun_path[UNIX_PATH_MAX];
 };
 

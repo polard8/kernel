@@ -70,11 +70,15 @@ typedef __in_port_t	in_port_t;
 #define	in_port_t	__in_port_t
 #endif
 
+
+// #bugbug: 
+// It needs to be 16bit.
 #ifndef sa_family_t
-typedef __sa_family_t	sa_family_t;
-#define	sa_family_t	__sa_family_t
+typedef __sa_family_t  sa_family_t;
+#define sa_family_t  __sa_family_t
 #endif
- 
+
+
 
 /*
  * Protocols
