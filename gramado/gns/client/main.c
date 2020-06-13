@@ -90,8 +90,12 @@ int gerar_numero(int lim_inf, int lim_sup)
 */
 
 
-int main ( int argc, char *argv[] ){
 
+int gns_event_loop(void);
+
+//int main ( int argc, char *argv[] ){
+int gns_event_loop(void){
+	
     char __buffer[512];
 
     // Isso permite ler a mensagem na forma de longs.
@@ -303,4 +307,17 @@ process_reply:
 
     return 0;
 }
+
+//Testing new main.
+int main ( int argc, char *argv[] ){
+
+    debug_print ("gnst: Starting ...\n");
+    
+    //event loop.
+
+    return (int) gns_event_loop();
+}
+
+
+
 
