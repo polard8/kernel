@@ -91,10 +91,10 @@ int gerar_numero(int lim_inf, int lim_sup)
 
 
 
-int gns_event_loop(void);
+int gnst_event_loop(void);
 
 //int main ( int argc, char *argv[] ){
-int gns_event_loop(void){
+int gnst_event_loop(void){
 	
     char __buffer[512];
 
@@ -315,7 +315,7 @@ int main ( int argc, char *argv[] ){
     
     //event loop.
 
-    return (int) gns_event_loop();
+    return (int) gnst_event_loop();
 }
 
 

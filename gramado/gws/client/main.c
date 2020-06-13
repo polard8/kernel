@@ -67,8 +67,13 @@ int gerar_numero(int lim_inf, int lim_sup)
 }
 
 
-int main ( int argc, char *argv[] ){
 
+
+int gwst_event_loop(void);
+
+
+int gwst_event_loop(void){
+	
     char __buffer[512];
 
     // Isso permite ler a mensagem na forma de longs.
@@ -306,6 +311,15 @@ process_reply:
 process_event:
     gws_debug_print ("gwst: We got an event\n"); 
     return 0;
+}
+
+
+
+int main ( int argc, char *argv[] ){
+
+    gws_debug_print ("gwst: Starting ...\n");
+    
+    return (int) gwst_event_loop();
 }
 
 
