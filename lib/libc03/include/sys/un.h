@@ -19,10 +19,8 @@ struct sockaddr_un {
 
     //#bugbug
     //ps: It needs to be 16 bit.
-    // See: netinet/in.h
-    sa_family_t sun_family; 
-    //uint16_t sun_family;
-    
+
+     uint16_t sun_family;
     char sun_path[UNIX_PATH_MAX];
 };
 

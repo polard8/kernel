@@ -182,15 +182,20 @@ struct in_addr {
  * Socket address, internet style.
  */
 
+
 struct sockaddr_in {
-	uint8_t		sin_len;
-	sa_family_t	sin_family;
-	in_port_t	sin_port;
-	struct in_addr	sin_addr;
-	__int8_t	sin_zero[8];
+    
+    // len + family = 16bit
+    uint8_t           sin_len;      // 8
+    sa_family_t       sin_family;   // 8
+    
+    in_port_t         sin_port;
+    struct in_addr    sin_addr;
+    
+    __int8_t          sin_zero[8];
 };
 
- 
+
  /*
  * Structure used to describe IP options.
  * Used to store options internally, to pass them to a process,
