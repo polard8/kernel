@@ -503,8 +503,10 @@ int load_path ( unsigned char *path, unsigned long address );
  
 void fsClearFat (void);   
 void fs_init_fat (void);
+
  
-void fs_load_fatEx (void);
+void fs_load_fat(void);
+
 
 unsigned long fs_get_fat_entry(unsigned long n);
 void fs_set_fat_entry(unsigned long n, unsigned long value);
@@ -516,15 +518,16 @@ void fs_test_fat_vector (void);
 void fs_load_rootdir (void);
 void fs_save_rootdir (void);
 void fs_save_entry_on_root(unsigned long eid);
-void fs_load_rootdirEx (void);
 
 
 // Carrega o diretório na memória, dados o endereço, 
 // o lba inicial e o número de setores.
+
 void 
-load_directory ( unsigned long address, 
-                 unsigned long lba, 
-                 unsigned long sectors );
+load_directory ( 
+    unsigned long address, 
+    unsigned long lba, 
+    unsigned long sectors );
 
 //
 // Read

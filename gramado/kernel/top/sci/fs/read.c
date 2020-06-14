@@ -647,7 +647,7 @@ __found:
 	// Talvez ela deva ficar sempre na memória.
 	// precisamos de estruturas para volumes que nos dê esse tipo de informação
 
-    fs_load_fatEx ();
+    fs_load_fat();
     
     
     
@@ -759,7 +759,7 @@ done:
 
 /*
  ****************************************
- * fs_load_fatEx:
+ * fs_load_fat:
  *    Carrega a fat na memória.
  *    Sistema de arquivos fat16.
  *    ? qual disco ?
@@ -769,11 +769,11 @@ done:
  *
  * current disk, current volume, fat status.
  *
- * +se o status da fat para o vulume atual indicar que ela já está carregada,
- *  então não precisamos carregar novamente.
+ * + Se o status da fat para o vulume atual indicar que 
+ * ela já está carregada, então não precisamos carregar novamente.
  */
 
-void fs_load_fatEx (void){
+void fs_load_fat(void){
 
     unsigned long i=0;
     unsigned long b=0;
@@ -784,7 +784,9 @@ void fs_load_fatEx (void){
 	// Salvo engano o tamanho é 246 setores.
     unsigned long szFat = 128;
 
-	
+
+    debug_print ("fs_load_fat:\n");
+
 	//#todo:
 	//+checar qual é o disco atual.
 	//+checar qual é o volume atual.
@@ -805,7 +807,7 @@ void fs_load_fatEx (void){
             0 );
 
         // Incrementa buffer para o próximo setor.
-        b = b+512;    
+        b = (b +512);    
     };
 }
 
@@ -831,33 +833,28 @@ load_directory (
     unsigned long b=0;
 
 
-    for ( i=0; i < sectors; i++ )
-    {
+    debug_print ("load_directory:\n");
+    
+    for ( i=0; i < sectors; i++ ){
         my_read_hd_sector ( address + b, lba + i, 0, 0 );
-
         b = (b +512);    
     };
 }
 
 
+/*
+ ****************************** 
+ * fs_load_rootdir:
+ * 
+ */
 // Carrega o diretório raiz.
 // address, lba, number of sectors.
 void fs_load_rootdir (void)
 {
+    debug_print ("fs_load_rootdir:\n");
     load_directory ( VOLUME1_ROOTDIR_ADDRESS, VOLUME1_ROOTDIR_LBA, 32 );
 }
 
-
-/*
- ********************************************************
- * fs_load_rootdirEx:
- *    Carrega o diretório raiz na memória. 
- */
-
-void fs_load_rootdirEx (void)
-{
-    fs_load_rootdir ();
-}
 
 
 /*

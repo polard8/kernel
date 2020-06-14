@@ -2063,11 +2063,14 @@ sys_write_file (
 {
     int __ret = -1;
 
+    debug_print ("sys_save_file:\n");
+
     //++
     // See: sci/fs/write.c
     taskswitch_lock ();
     scheduler_lock ();
 
+    //See: write.c
     __ret = (int) fsSaveFile ( (char *) file_name,    
                     (unsigned long) file_size,       
                     (unsigned long) size_in_bytes,  
@@ -2078,7 +2081,8 @@ sys_write_file (
     taskswitch_unlock ();
     //--
 
-
+    debug_print ("sys_save_file: done\n");
+    
     return __ret;
 }
 

@@ -232,15 +232,6 @@ fsSaveFile (
 	// Buffer para a entrada de diretório.
     char Entry[32];
 
-	// info
-	// me parece que todas as informações estão chegando aqui corretas.
-
-    // #debug:
-    printf ("fsSaveFile: name=%s  \n", file_name ); 
-    printf ("size=%d  \n", file_size );
-    printf ("nbytes=%d  \n", size_in_bytes );
-    printf ("address=%x  \n", file_address );
-    printf ("flag=%x \n", flag );
 
 
 	// #bugbug: 
@@ -255,32 +246,31 @@ fsSaveFile (
     //unsigned long endereco = file_address;
 
 
-    //Mensagem.
-	//printf("fsSaveFile:\n"); 
+	// info
+	// me parece que todas as informações estão chegando aqui corretas.
+
+    // #debug:
+    debug_print ("fsSaveFile:\n");
+    printf ("fsSaveFile: name=%s  \n", file_name ); 
+    printf ("size=%d  \n", file_size );
+    printf ("nbytes=%d  \n", size_in_bytes );
+    printf ("address=%x  \n", file_address );
+    printf ("flag=%x \n", flag );
 
 
-	//file_size
-	//#todo: precisamos implementar um limite para o tamanho do arquivo,
-	//principamente nessa fase de teste.
+
+	// file_size
+	// #todo: 
+	// precisamos implementar um limite para o tamanho do arquivo,
+	// principamente nessa fase de teste.
 
 
-    //Carrega root e fat.
-//rootdir:
-    //#debug
-	//printf("Loading root..\n"); 
-    fs_load_rootdirEx ();
+    // Load root dir and FAT.
+    fs_load_rootdir();
+    fs_load_fat();
 
 
-//fat:
-    //#debug
-	//printf("loading FAT..\n");
-    fs_load_fatEx ();
 
-
-	//#debug
-	//refresh_screen();
-	
-    
 	// Procurando cluster livre na fat.
 	// Nesse momento construimos uma lista de clusters livres.
 	// #todo: Essa lista já devia existir e agora somente 
@@ -301,17 +291,12 @@ fsSaveFile (
             // Encontrado todos os espaços livres 
             // que o arquivo precisa.
             // Marca o fim.
-
-            if (file_size == 0)
-            {
+            //#importante: Se der certo, saímos do loop.
+            if (file_size == 0){
                 list[j] = (unsigned short) 0xfff8;   
-
-                //#importante:
-                //Se der certo, saímos do loop.
-
                 goto save_file;
-            };    
-            
+            }
+
             //salva um endereço livre
             //salvamos um índice na fat dentro da lista
             //incrementa a lista
@@ -516,9 +501,9 @@ save_file:
 	
 	// ## Save ##
     // Vamos ao salvamento propriamente dito.
-   
-	i = 0; 
-	
+
+    i=0; 
+
 	//#debug 
 	//improvisando um endereço válido
 
@@ -543,8 +528,8 @@ save_file:
         printf ("next={%x}\n", next );
 
         //encontrada a assinatura na lista!
-        if ( next == 0xfff8 )
-        {
+        if ( next == 0xfff8 ){
+
             next = list[i-1];
             fat[next] = 0xfff8;  
             goto done;         
@@ -592,6 +577,7 @@ save_file:
 
 
 fail:
+    debug_print ("fsSaveFile: fail\n");
     printf ("~FAIL\n");
     refresh_screen ();
     return (int) 1;
@@ -644,19 +630,18 @@ done:
 		//Isso funcionou.
 		disk_ata_wait_irq ();
 
-		//#bugbug: Não podemos determinar os valores. 
+		// #bugbug: Não podemos determinar os valores. 
 		// Precisamos de estruturas.
 
-		my_write_hd_sector ( (unsigned long) VOLUME1_ROOTDIR_ADDRESS + roff, 
-		    (unsigned long) ( VOLUME1_ROOTDIR_LBA + rlbaoff ), 0, 0  );
+        my_write_hd_sector ( (unsigned long) VOLUME1_ROOTDIR_ADDRESS + roff, 
+            (unsigned long) ( VOLUME1_ROOTDIR_LBA + rlbaoff ), 0, 0  );
 
-        roff = roff + 0x200;
-        rlbaoff = rlbaoff + 1;
+        roff = (roff + 0x200);
+        rlbaoff = (rlbaoff + 1);
 
 	    //#bugbug
 		//?? Estamos esperando antes de gravarmos o próximo.
 		//wait irq
-
     };
 
     //reset_ide0 ();
@@ -722,13 +707,14 @@ done:
         my_write_hd_sector ( (unsigned long) VOLUME1_FAT_ADDRESS + off, 
             (unsigned long) ( VOLUME1_FAT_LBA + lbaoff ), 0, 0  );
 
-        off = off + 0x200;
-        lbaoff = lbaoff + 1;
+        off = (off + 0x200);
+        lbaoff = (lbaoff + 1);
     };
 
 
-    //#debug
-    printf ("fsSaveFile: done hang \n"); 
+    // #debug
+    debug_print ("fsSaveFile: Done\n");
+    printf ("fsSaveFile: done\n"); 
     refresh_screen ();
 
     return 0;
