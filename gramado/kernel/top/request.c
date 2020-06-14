@@ -1,5 +1,5 @@
 /*
- * File: kernel/request.c
+ * File: request.c
  *
  *      Kernel requests.
  *
@@ -160,26 +160,25 @@ int request (void){
 	// Filtro.
 	//
 
-	if ( PID < 0 || PID > PROCESS_COUNT_MAX )
-	{
-		Process = NULL;
-	}else{
-	    Process = (void *) processList[PID];
-	};
+    if ( PID < 0 || PID > PROCESS_COUNT_MAX ){
+        Process = NULL;
+
+    }else{
+        Process = (void *) processList[PID];
+    };
 
 
-	if ( TID < 0 || TID > THREAD_COUNT_MAX )
-	{
-	    Thread = NULL;
-	}else{
-	
-	    Thread = (void *) threadList[TID];
-	};
+    if ( TID < 0 || TID > THREAD_COUNT_MAX ){
+        Thread = NULL;
 
+    }else{
+        Thread = (void *) threadList[TID];
+
+    };
 
 
 	//
-	// # Number #
+	// Number
 	//
 
     r = kernel_request;
@@ -191,7 +190,10 @@ int request (void){
     switch (r) 
     {
         //0 - request sem motivo, (a variável foi negligenciada).
+        // Ou ainda estamos checando se tem um resquest,
+        // se não tem apenas retornamos.
         case KR_NONE:
+            //debug_print ("request: KR_NONE\n");
             //nothing for now.       
             break;
 
@@ -199,119 +201,132 @@ int request (void){
         //1 - Tratar o tempo das threads de acordo com o tipo.  
         //#importante: De acordo com o tipo de thread.
         case KR_TIME:
+            debug_print ("request: KR_TIME\n");
             panic ("request: KR_TIME\n");
-			//return -1;
             break;
 
 
         //2 - faz a current_thread dormir. 
-        case KR_SLEEP:   
+        case KR_SLEEP:
+            debug_print ("request: block a thread\n");
             do_thread_blocked ( (int) REQUEST.target_tid );
             break;
 
 
-	    //3 - acorda a current_thread.
-	    case KR_WAKEUP:
-		    wakeup_thread ( (int) REQUEST.target_tid );
-		    break;
+        //3 - acorda a current_thread.
+        case KR_WAKEUP:
+            debug_print ("request: wake up a thread\n");
+            wakeup_thread ( (int) REQUEST.target_tid );
+            break;
 
 
-        //
-	    case KR_ZOMBIE:
-            //panic ("request: KR_ZOMBIE\n");
-			do_thread_zombie ( (int) REQUEST.target_tid );
-		    break;
-
+        //4
+        case KR_ZOMBIE:
+            debug_print ("request: do thread zombie\n");
+            do_thread_zombie ( (int) REQUEST.target_tid );
+            break;
 
 		//5 - start new task.
 		//Uma nova thread passa a ser a current, para rodar pela primeira vez.
 		//Não mexer. Pois temos usado isso assim.	
-		case KR_NEW:	
-		    //Start a new thread. 
-	        if(start_new_task_status == 1)
-			{		
-		        current_thread = start_new_task_id;
-	        };
-		    break;
+        case KR_NEW:
+            debug_print ("request: Start a new thread\n");
+            //Start a new thread. 
+            if (start_new_task_status == 1){
+                current_thread = start_new_task_id;
+            }
+            break;
 
 
         //6 - torna atual a próxima thread anunciada pela atual.
-		case KR_NEXT:
+        case KR_NEXT:
+            debug_print ("request: KR_NEXT\n");
             panic ("request: KR_NEXT\n");
-			//return -1;
-			break;	
+            break;
 
 
-		//7 - tick do timer.
-		case KR_TIMER_TICK:
-		    panic ("request: KR_TIMER_TICK\n");
-		    //return -1;
-			break;
+        //7 - tick do timer.
+        case KR_TIMER_TICK:
+            debug_print ("request: timer tick \n");
+            panic ("request: KR_TIMER_TICK\n");
+            break;
 
-
-		//8 - limite de funcionamento do kernel.
+        //8 - limite de funcionamento do kernel.
         case KR_TIMER_LIMIT:
-		    panic ("request: KR_TIMER_LIMIT\n");
-		    //return -1;
-			break;
+            debug_print ("request: timer limit\n");
+            panic ("request: KR_TIMER_LIMIT\n");
+            break;
 
 
-		// 9 - Checa se ha threads para serem inicializadas e 
-		// inicializa pelo método spawn.
-		// obs: se spawn retornar, continua a rotina de request. sem problemas.	
-		case KR_CHECK_INITIALIZED:
+        // 9 - Checa se ha threads para serem inicializadas e 
+        // inicializa pelo método spawn.
+        // obs: se spawn retornar, continua a rotina de request. sem problemas.	
+        case KR_CHECK_INITIALIZED:
+            debug_print ("request: Check for standby\n");
             check_for_standby ();
-		    break;
+            break;
 
 
-		//#todo
-		//Chama o procedimento do sistema.
+        //#todo
+        //Chama o procedimento do sistema.
         // ?? args ??	
         // o serviço 124 aciona esse request.
-		case KR_DEFERED_SYSTEMPROCEDURE:
-		    //system_procedure ( REQUEST.window, REQUEST.msg, REQUEST.long1, REQUEST.long2 );
-			break;
+        case KR_DEFERED_SYSTEMPROCEDURE:
+            debug_print ("request: defered system procedure [TODO]\n");
+            //system_procedure ( REQUEST.window, REQUEST.msg, REQUEST.long1, REQUEST.long2 );
+            break;
 
 
-	    //exit process
-		case 11:
-			exit_process ( (int) REQUEST.target_pid, (int) REQUEST.long1 );
-			break;
+        //exit process
+        case 11:
+            debug_print ("request: Exit process\n");
+            exit_process ( (int) REQUEST.target_pid, (int) REQUEST.long1 );
+            break;
 
 
-		// exit thread.
-		// sairemos da thread, mas se for a thread de controle, também 
-		// sairemos do processo.
+        // exit thread.
+        // sairemos da thread, mas se for a thread de controle, também 
+        // sairemos do processo.
         case 12:
+            debug_print ("request: Exit thread\n");
             printf ("request: 12, exiting thread %d\n", REQUEST.target_tid);
             do_request_12 ( (int) REQUEST.target_tid );
             break;
 
 
-		//make target porcess current
-		//cuidado.	
-		case 13:	
-			current_process = REQUEST.target_pid;
-			break;
-			
-		//make target thread current
-		//cuidado.	
-		case 14:	
-			current_thread = REQUEST.target_tid;
-			break;
-			
-		case 15:
-		    wait_for_a_reason ( REQUEST.target_tid, (int) REQUEST.long1  );
-		    break;
-		
-		//@todo: Tratar mais tipos.	
+        //make target porcess current
+        //cuidado.
+        case 13:
+            debug_print ("request: Get current process\n");
+            current_process = REQUEST.target_pid;
+            break;
+
+
+        //make target thread current
+        //cuidado.
+        case 14:
+            debug_print ("request: Get current thread\n");
+            current_thread = REQUEST.target_tid;
+            break;
+
+
+        case 15:
+            debug_print ("request: Wait for a reason \n");
+            wait_for_a_reason ( REQUEST.target_tid, (int) REQUEST.long1  );
+            break;
+
+		// todo: 
+		// Tratar mais tipos.	
 		//...
-		
-		default:
-		    printf ("request: Default request {%d} \n", r );
-		    break;
+
+
+        default:
+            debug_print ("request: default \n");  
+            printf ("request: Default request {%d} \n", r );
+            break;
     };
-	
+
+
 //Done:
 //   Essas finalizações aplicam para todos os requests.
 
@@ -324,20 +339,29 @@ int request (void){
 }
 
 
+/*
+ * create_request:
+ *     Cria o request, que será atendido depois.
+ * 
+ */
+
 int 
-create_request ( unsigned long number, 
-                 int status, 
-                 int timeout,
-                 int target_pid,
-                 int target_tid,
-                 struct window_d *window, 
-                 int msg, 
-                 unsigned long long1, 
-                 unsigned long long2 )
+create_request ( 
+    unsigned long number, 
+    int status, 
+    int timeout,
+    int target_pid,
+    int target_tid,
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 )
 {
 
-    if (number > KERNEL_REQUEST_MAX)
+    if (number > KERNEL_REQUEST_MAX){
+        debug_print ("create_request: number not valid\n");
         return 1;
+    }
 
 
     kernel_request = number;
@@ -347,6 +371,7 @@ create_request ( unsigned long number,
 
     if (timeout < 0 ){
         REQUEST.timeout = 0;
+
     }else{
         REQUEST.timeout = timeout;
     };

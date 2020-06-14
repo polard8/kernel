@@ -681,6 +681,8 @@ int socket_connection_waiting_for_validation (struct socket_d *mysock, struct so
 // Socket ioctl
 // Serviços de soquetes da klibc
 // #todo: rever os números.
+// #todo: devemos mudar os argumentos 
+// para ficar no padrão da libc.
 // OUT: ?
 unsigned long 
 socket_ioctl ( 
@@ -741,6 +743,12 @@ socket_ioctl (
 // Conectando a um servidor dado um endereço.
 // O endereço pode vir em formatos diferentes dependendo
 // do domínio indicado na estrutura.
+
+// #atenção
+// O servidor poderá estar conectado a vários clientes,
+// mas estará ouvindo a apenas um por vez. Ou precisaremos 
+// de instâncias.
+
 // IN: client fd, address, address len
 // OUT: 0=ok <0=fail
 
@@ -818,6 +826,11 @@ sys_connect (
             }
 
             // ...
+            
+            if ( target_pid < 0 ){
+                debug_print ("sys_connect: target_pid fail\n");
+                return -1;
+            }
 
             printf (">>>> target pid %d \n", target_pid);
             break;
@@ -826,12 +839,16 @@ sys_connect (
         //case AF_LOCAL:
         case AF_UNIX:
             debug_print ("sys_connect: AF_UNIX not supported\n");
+            //target_pid = -1;
+            return -1;
             break;
             
 
         case AF_INET:
             debug_print ("sys_connect: AF_INET not supported\n");
-             break;
+            //target_pid = -1;
+            return -1;
+            break;
              
         //... 
         
@@ -861,6 +878,7 @@ sys_connect (
     }
  
     // sender's file
+    // Objeto do tipo socket.
     f = (file *) p->Objects[sockfd];
 
     if ( (void *) f == NULL ){
@@ -880,9 +898,8 @@ sys_connect (
         return -1;
     }
 
-    
 
-    //pega a estrutura de socket associada ao arquivo.
+    // Pega a estrutura de socket associada ao arquivo.
     // socket structure in the senders file.
     //s = (struct socket_d *) p->priv; 
     my_socket = (struct socket_d *) f->socket;   
@@ -907,29 +924,42 @@ sys_connect (
 
  
      // process
+     // O processo cliente chamou essa função e
+     // então pegaremos agora o processo alvo,
+     // que é um servidor.
+     
      tp = (struct process_d *) processList[target_pid];
  
      if ( (void *) tp == NULL ){
+         debug_print ("sys_connect: tp fail\n");
          printf ("sys_connect: tp fail\n");
          refresh_screen();
          return -1;
      }
 
-
+    // Esse é o socket do processo servidor.
+    
     server_socket = (struct socket_d *) tp->priv;
     
     //
     // Connecting!
     //
     
+    // Conectando o socket do processo alvo ao ponto de
+    // conecção do processo cliente.
     my_socket->conn = server_socket;
-    server_socket->conn = my_socket;    
-     
+    
+    // Conectando o socket do cliente ao ponto de conecção do
+    // processo servidor.
+    server_socket->conn = my_socket;
+    
+    // acionando as flags que indicam a conecção.
     my_socket->state = SOCKET_CONNECTED;
     server_socket->state = SOCKET_CONNECTED; 
-     
-    debug_print("sys_connect: connect ok\n");
-    printf ("sys_connect: *done.\n");
+  
+  
+    debug_print("sys_connect: connected\n");
+    printf ("sys_connect: done.\n");
     refresh_screen();
 
 
@@ -961,6 +991,11 @@ int sys_accept_sender (int n){
     //todo: validation.
 
     //todo: tem 5 possíveis conexões.
+    
+    // #bugbug
+    // Isso poderia ser um array de sockets ??
+    // Desse modo o servidor ser conectaria a 5 sockets
+    // vindos de qualquer máquina.
 
     __pid = (int) p->accept[n];
 
@@ -971,7 +1006,24 @@ int sys_accept_sender (int n){
 }
 
 
-// #todo: OUT: ???
+/*
+ ***************** 
+ * sys_accept:
+ * 
+ */
+
+// #todo:
+// Aceitar uma conecção.
+// Essa função é chamada dentro do loop, então
+// será chamada várias vezes ...
+// #importante:
+// A intenção é aceitar várias conecções mas ouvir apenas
+// uma por vez.
+
+// IN: ??
+// OUT: ?? Retornamos o fd do socket aceito.
+// provavelmente o que iremos ouvir.
+
 int 
 sys_accept (
     int sockfd, 
@@ -1055,7 +1107,7 @@ sys_accept (
 
 
 /*
-  When a socket is created with socket(2), it exists in a 
+  When a socket is created with socket(), it exists in a 
   name space (address family) but has no address assigned to it. 
   bind() assigns the address specified by addr to the socket 
   referred to by the file descriptor sockfd.
@@ -1094,7 +1146,6 @@ sys_bind (
     }
 
 
-
     // process
     p = (struct process_d *) processList[current_process];
  
@@ -1105,6 +1156,7 @@ sys_bind (
  
  
     // file
+    // O objeto do tipo socket.
     f = (file *) p->Objects[sockfd];
 
     if ( (void *) f == NULL ){
@@ -1114,6 +1166,8 @@ sys_bind (
     
  
     // socket
+    // A estrutura de socket associada ao
+    // objeto do tipo socket.
     s = (struct socket_d *) f->socket;
 
     if ( (void *) s == NULL ){
@@ -1147,7 +1201,7 @@ sys_bind (
         return 0;
     }
 
-    // AF_UNIX
+    // AF_UNIX ou AF_LOCAL
     // See: http://man7.org/linux/man-pages/man7/unix.7.html
     if (s->addr.sa_family == AF_UNIX){
         debug_print ("sys_bind: AF_UNIX not supported yet\n");
@@ -1159,6 +1213,9 @@ sys_bind (
         debug_print ("sys_bind: AF_INET not supported yet\n");
         return -1;    
     } 
+  
+    // #fail
+    // A família é de um tipo não suportado.
   
     // DEFAULT:
     printf ("sys_bind: fail. family not valid\n");

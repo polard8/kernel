@@ -464,7 +464,7 @@ void show_current_nic_info (void){
 
     };
 
-
+	// ?? precisamos do refresh ?
 	//refresh_screen ();
 }
 
