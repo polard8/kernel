@@ -148,15 +148,13 @@ void write_lba ( unsigned long address, unsigned long lba ){
         debug_print ("write_lba: limits\n");
         goto fail;
     }
-        
 
-	// ?? 
-	// Onde está fatbits ??
 
-    switch (fatbits)
+    // See: volume.h
+    switch (g_currentvolume_fatbits)
     {
         case 32:
-			printf ("fs-write-write_lba: fat32 not supported\n");
+			printf ("write_lba: FAT32 not supported\n");
 			goto fail;
             break;
 
@@ -167,12 +165,12 @@ void write_lba ( unsigned long address, unsigned long lba ){
             break;
 
         case 12:
-            printf ("fs-write-write_lba: fat12 not supported\n");
+            printf ("write_lba: FAT12 not supported\n");
             goto fail;
             break;
 
         default:
-            printf ("fs-write-write_lba: Unknow fat fs\n");
+            printf ("write_lba: g_currentvolume_fatbits NOT SUPPORTED\n");
             goto fail;
             break;
     };

@@ -457,8 +457,9 @@ void fs_show_entry ( unsigned long id, unsigned long eid )
 
 
 unsigned long 
-fs_get_entry_status ( unsigned long id, 
-                      unsigned long eid )
+fs_get_entry_status ( 
+    unsigned long id, 
+    unsigned long eid )
 {
     // Nothing for now.
 	return 0; 
@@ -466,9 +467,10 @@ fs_get_entry_status ( unsigned long id,
 
 
 void 
-fs_set_entry_status ( unsigned long id, 
-                      unsigned long eid, 
-                      unsigned long status )
+fs_set_entry_status ( 
+    unsigned long id, 
+    unsigned long eid, 
+    unsigned long status )
 {
     // Nothing for now.
 }
@@ -514,8 +516,7 @@ void fsCheckMbrFile ( unsigned char *buffer ){
 
 	//name
     printf ("OS name: [ ");
-    for ( i=0; i<8; i++ )
-    {
+    for ( i=0; i<8; i++ ){
         printf ("%c", mbr[ BS_OEMName + i ] );
     };
     printf (" ]\n");
@@ -592,18 +593,16 @@ done:
  */
  
 void 
-MountShortFileName ( char *buffer, 
-                     struct dir_entry_d *entry )
+MountShortFileName ( 
+    char *buffer, 
+    struct dir_entry_d *entry )
 {
     int i=0;
 
     // Get the file name.
     while (i < 8)
     {
-        if ( entry->FileName[i] == ' ')
-        {
-            break;
-        }
+        if ( entry->FileName[i] == ' '){ break; }
 
         buffer[i] = entry->FileName[i];
         i++;
@@ -653,7 +652,7 @@ int get_spc (void)
 
 int get_filesystem_type (void)
 {
-    return (int) g_filesystem_type;
+    return (int) g_currentvolume_filesystem_type;
 }
 
 
@@ -665,7 +664,7 @@ int get_filesystem_type (void)
 
 void set_filesystem_type (int type)
 {
-    g_filesystem_type = (int) type;
+    g_currentvolume_filesystem_type = (int) type;
 }
 
 
@@ -732,7 +731,7 @@ int load_path ( unsigned char *path, unsigned long address ){
 
     n_levels = path_count(path);
     
-    if(n_levels==0){
+    if (n_levels==0){
         panic ("load_path: n_levels\n");
     }    
 
@@ -758,8 +757,7 @@ int load_path ( unsigned char *path, unsigned long address ){
         
         // O level tem que começar o level com '/',
         // mesmo que seja o primeiro.
-        if ( p[0] != '/' )
-        {
+        if ( p[0] != '/' ){
             panic ("load_path: All levels need to start with '/' \n");
         }
         p++; //pula o '/' 
@@ -1696,6 +1694,8 @@ int sys_read_file ( char *file_name,  int flags, mode_t mode ){
     int __slot = -1;
 
 
+    debug_print ("sys_read_file:\n");
+
 
 
     // Convertendo o formato do nome do arquivo.    
@@ -1749,8 +1749,7 @@ __OK:
     
     __file = (file *) kmalloc ( sizeof(file) );
     
-    if ( (void *) __file == NULL )
-    {
+    if ( (void *) __file == NULL ){
         printf ("sys_read_file: __file\n");
         refresh_screen();
         return -1;
@@ -1768,8 +1767,7 @@ __OK:
         
     __file->_base = (char *) kmalloc (BUFSIZ);
     
-    if ( (void *) __file->_base == NULL )
-    {
+    if ( (void *) __file->_base == NULL ){
         printf ("sys_read_file: buffer fail\n");
         refresh_screen();
         return -1;
@@ -1782,8 +1780,7 @@ __OK:
 
     size_t s = (size_t) fsGetFileSize ( (unsigned char *) file_name );
     
-    if (s < 0)
-    {
+    if (s < 0){
         printf ("sys_read_file: File size fail\n");
         refresh_screen();
         return -1;
@@ -1834,8 +1831,7 @@ __OK:
 
     //limits?
     
-    if ( (void *) __file->_base == NULL )
-    {
+    if ( (void *) __file->_base == NULL ){
         printf ("sys_read_file: buffer fail\n");
         refresh_screen();
         return -1;
@@ -1853,8 +1849,7 @@ __OK:
                        file_name, 
                        (unsigned long) __file->_base );
    
-    if ( Status != 0 )
-    {
+    if ( Status != 0 ){
         printf ("sys_read_file: fsLoadFile fail\n");
         refresh_screen();
         return -1;
@@ -1992,21 +1987,20 @@ int fsLoadFileFromCurrentTargetDir (void){
 	//tenta carregar o diret'orio que tem o endere�o indicado aqui, 
 	//se falhar carregue o root por enquanto.
 	
-	if ( current_target_dir.current_dir_address == 0 )
-	{
-	    printf("fsLoadCurrentTargetDir current_target_dir.current_dir_address fail \n");
+    if ( current_target_dir.current_dir_address == 0 )
+    {
+        printf("fsLoadCurrentTargetDir current_target_dir.current_dir_address fail \n");
 
-		//reset.
-		current_target_dir.current_dir_address = VOLUME1_ROOTDIR_ADDRESS;
-		
-		for ( i=0; i< 11; i++ )
-		{
-			current_target_dir.name[i] = '\0';
-		}
+        // reset.
+        current_target_dir.current_dir_address = VOLUME1_ROOTDIR_ADDRESS;
 
-		return -1;
-	}
-	
+        for ( i=0; i< 11; i++ ){
+            current_target_dir.name[i] = '\0';
+        };
+
+        return -1;
+    }
+
 	//#debug
 	//printf ("fsLoadFileFromCurrentTargetDir: dir_name=(%s) old_dir_addr=(%x) #debug \n",
 	//    current_target_dir.name, current_target_dir.current_dir_address );
@@ -2063,7 +2057,7 @@ sys_write_file (
 {
     int __ret = -1;
 
-    debug_print ("sys_save_file:\n");
+    debug_print ("sys_write_file:\n");
 
     //++
     // See: sci/fs/write.c

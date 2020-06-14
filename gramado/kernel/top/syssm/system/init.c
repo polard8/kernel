@@ -451,7 +451,8 @@ done:
 
 /*
  **************************************************
- * Init globals: 
+ * init_globals:
+ *     Init globals. 
  *     Inicia variáveis globais do Kernel Base.
  *     Obs: Inicializar por categorias.
  */
@@ -489,10 +490,10 @@ void init_globals (void){
 	// ## FIRST MESSAGE !! ##
 	//
 	
-	debug_print("init_globals: WE HAVE MESSAGES NOW !!!\n");
-	printf("init_globals: first message!\n");
-	
-	
+    debug_print("init_globals: WE HAVE MESSAGES NOW!\n");
+    printf("init_globals: First message!\n");
+
+
 	//
 	// Runlevel
 	//
@@ -539,7 +540,7 @@ void init_globals (void){
     g_profiler_ints_irq13 = 0;  
     g_profiler_ints_irq14 = 0;  
     g_profiler_ints_irq15 = 0;  
-
+    // ...
 
 
 	//
@@ -594,8 +595,8 @@ void init_globals (void){
 
     // FS type.
     // type 1, fat16.
-    g_filesystem_type = FS_TYPE_FAT16;    
-    fatbits = (int) 16;
+    g_currentvolume_filesystem_type = FS_TYPE_FAT16;    
+    g_currentvolume_fatbits = (int) 16;
 
 
 
@@ -629,7 +630,7 @@ void init_globals (void){
 	
 	//Continua ...
 
-};
+}
 
 
 /*
@@ -654,14 +655,13 @@ int init (void){
 
     if ( KeInitPhase != 0 ){
         debug_print ("init: KeInitPhase fail\n");
-        panic ("sm-init-init: KeInitPhase\n");
+        panic ("init: KeInitPhase\n");
     }
 
 
 	//
-	// # IMPORTANTE
+	// #IMPORTANT
 	//
-	
 
     // Globals.
     debug_print ("init: Globals\n");
@@ -808,7 +808,7 @@ int init (void){
     Platform = (void *) kmalloc ( sizeof(struct platform_d) );
 
     if ( (void *) Platform ==  NULL ){
-        panic ("sm-init-init: Platform\n");
+        panic ("init: Platform\n");
 
     }else{
 
@@ -817,47 +817,47 @@ int init (void){
 
         // Hardware
         Hardware = (void *) kmalloc ( sizeof(struct hardware_d) );
-		
-	    if( (void *) Hardware ==  NULL )
-		{
-		    panic ("sm-init-init: Hardware\n");	
-		}else{
-		    Platform->Hardware = (void *) Hardware;
+
+        if ( (void *) Hardware ==  NULL ){
+            panic ("init: Hardware\n");
+
+        }else{
+            Platform->Hardware = (void *) Hardware;
             //printf(".");			
-		};
-		
+        };
+
 		//Firmware
-	    Firmware = (void *) kmalloc ( sizeof(struct firmware_d) );
-	    
-		if( (void *) Firmware ==  NULL )
-		{
-		    panic ("sm-init-init: Firmware\n");
-		}else{
-		    Platform->Firmware = (void *) Firmware;
+        Firmware = (void *) kmalloc ( sizeof(struct firmware_d) );
+
+        if ((void *) Firmware ==  NULL ){
+            panic ("sm-init-init: Firmware\n");
+
+        }else{
+            Platform->Firmware = (void *) Firmware;
             //printf(".");  			
-		};
+        };
 
 		
 		//System (software)
-	    
+
 		//
-		// *IMPORTATE: Aqui estamos inicializando a estrutura do systema.
+		// #IMPORTATE: 
+		// Aqui estamos inicializando a estrutura do systema.
 		//
-		
-		System = (void *) kmalloc ( sizeof(struct system_d) );
-		
-	    if( (void *) System ==  NULL )
-		{
-		    panic ("sm-init-init: System\n");
-		}else{
-			
-			System->used = 1;    //Sinaliza que a estrutura esta em uso.
-			System->magic = 1234; //sinaliza que a estrutura não esta corrompida.
-			
-		    Platform->System = (void *) System;
-            //printf(".");			
-		};
-		
+
+        System = (void *) kmalloc ( sizeof(struct system_d) );
+
+        if ( (void *) System ==  NULL ){
+            panic ("init: System\n");
+
+        }else{
+
+            System->used = 1;    //Sinaliza que a estrutura esta em uso.
+            System->magic = 1234; //sinaliza que a estrutura não esta corrompida.
+            Platform->System = (void *) System;
+            //printf(".");
+        };
+
 		//printf(" Done!\n");	
 		//...
     };
@@ -983,7 +983,7 @@ int init (void){
 
     return 0;  
 }
- 
+
 
 //
 // End.

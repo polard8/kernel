@@ -15,19 +15,16 @@
  
 #define VOLUME_COUNT_MAX 1024
 
+char *current_volume_string;
 
 // volume atual ??
 // Tipo de sistema de arquivos, fat16, ext2 ...
-int g_filesystem_type;   //use this one.
-
-
-char *current_volume_string;
+int g_currentvolume_filesystem_type;   //use this one.
 
 
 // volume atual do tipo fat???
 // Se é fat32, 16, 12.
-int fatbits;   
-
+int g_currentvolume_fatbits;
 
 
 

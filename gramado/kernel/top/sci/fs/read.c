@@ -137,9 +137,10 @@ _complete:
  */
  
 unsigned long 
-fatClustToSect ( unsigned short cluster, 
-                 unsigned long spc, 
-                 unsigned long first_data_sector )
+fatClustToSect ( 
+    unsigned short cluster, 
+    unsigned long spc, 
+    unsigned long first_data_sector )
 {
     unsigned long C = (unsigned long) cluster;
 
@@ -164,18 +165,16 @@ fatClustToSect ( unsigned short cluster,
  */
  
 void 
-fatLoadCluster ( unsigned long sector, 
-                 unsigned long address, 
-                 unsigned long spc )
+fatLoadCluster ( 
+    unsigned long sector, 
+    unsigned long address, 
+    unsigned long spc )
 {
-    unsigned long i;
+    unsigned long i=0;
 
-
-    for ( i=0; i < spc; i++ )
-    {
+    for ( i=0; i < spc; i++ ){
         read_lba ( address, sector + i );
-
-        address = address + 512; 
+        address = (address +512); 
     };
 }
 
@@ -191,11 +190,11 @@ fatLoadCluster ( unsigned long sector,
 void read_lba ( unsigned long address, unsigned long lba ){
 
 
-
-    switch (fatbits){
+    // See: volume.h
+    switch (g_currentvolume_fatbits){
 
         case 32:
-            //Nothing.
+            debug_print ("read_lba: FAT32 not supported\n");
             return;
             break;
 
@@ -207,11 +206,13 @@ void read_lba ( unsigned long address, unsigned long lba ){
 
         // Nothing.
         case 12:
+            debug_print ("read_lba: FAT12 not supported\n");
             return;
             break;
 
-        //default:
-            //break;
+        default:
+            debug_print ("read_lba: g_currentvolume_fatbits not supported\n");
+            break;
     };
 }
 
@@ -865,7 +866,7 @@ void fs_load_rootdir (void)
  
 void fs_load_dir ( unsigned long id )
 {
-    //#cancelar.
+    debug_print ("fs_load_dir:[TODO]\n");
 }
 
 
