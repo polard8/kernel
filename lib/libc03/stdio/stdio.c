@@ -1157,40 +1157,57 @@ size_t fread (void *ptr, size_t size, size_t n, FILE *fp){
  *
  */
 
+//IN:
+// ptr = pointer.
+// size = Tamanho do elemento dado em bytes.
+// n = quantidade de elementos.
+// fp = stream pointer.
+
+// See: 
+// https://linux.die.net/man/3/fwrite
+
 size_t fwrite (const void *ptr, size_t size, size_t n, FILE *fp){
 
     int nwrite = 0;
 
-    
-    // Se não temos o ponteiro, então não teremos o fd
-    // para usarmos em read().
-    if ( (void *) fp == NULL ){
-        printf ("fwrite: fp \n");
-        return (size_t) -1;
-    }
- 
- 
-    // #todo:
-    // n limits.
- 
-    // Quantidade inválida.
-    if ( n <= 0 ){
-        printf ("fwrite: n \n");
-        return (size_t) -1;
-    }
-   
-   
-    // #todo:    
-    //if ( size ?? )
+    int number_of_bytes = -1;
 
 
     if ( (void *) ptr == NULL ){
         printf ("fwrite: ptr \n");
         return (size_t) -1;
     }
+ 
+ 
+    // tamanho do elemento dado em bytes.
+    if ( size <= 0 ){
+        printf ("fwrite: size \n");
+        return (size_t) -1;
+    }
+
+ 
+      
+    // Quantidade de elementos.
+    if ( n <= 0 ){
+        printf ("fwrite: n \n");
+        return (size_t) -1;
+    }
+   
+   
+    // Se não temos o ponteiro, então não teremos o fd
+    // para usarmos em read().
+    if ( (void *) fp == NULL ){
+        printf ("fwrite: fp \n");
+        return (size_t) -1;
+    }
+
+
+    // Calculando a quantidade de bytes.
+    number_of_bytes = (size * n);
 
     //nwrite = write( fileno(fp), ptr, sizeof(ptr) );
-    nwrite = write ( fileno(fp), ptr, n );
+    //nwrite = write ( fileno(fp), ptr, n );
+    nwrite = write ( fileno(fp), ptr, number_of_bytes );
 
     if (nwrite <= 0){
         printf ("fwrite: write() fail \n");
