@@ -1119,6 +1119,23 @@ void clearerr (FILE* stream){
 size_t fread (void *ptr, size_t size, size_t n, FILE *fp){
 
     int nreads = 0;
+    int number_of_bytes = -1;
+
+    if ( (void *) ptr == NULL ){
+        printf ("fread: ptr \n");
+        return (size_t) -1;
+    }
+
+    if ( size <= 0 ){
+        printf ("fread: size \n");
+        return (size_t) -1;
+    }
+
+    // Quantidade inválida.
+    if ( n <= 0 ){
+        printf ("fread: n \n");
+        return (size_t) -1;
+    }
     
     // Se não temos o ponteiro, então não teremos o fd
     // para usarmos em read().
@@ -1127,20 +1144,16 @@ size_t fread (void *ptr, size_t size, size_t n, FILE *fp){
         return (size_t) -1;
     }
  
-    // Quantidade inválida.
-    if ( n <= 0 ){
-        printf ("fread: n \n");
-        return (size_t) -1;
-    }
 
-    if ( (void *) ptr == NULL ){
-        printf ("fread: ptr \n");
-        return (size_t) -1;
-    }
+    size_t _max = sizeof(ptr);
     
     // Read.
-     
-    nreads = read ( fileno(fp), ptr, sizeof(ptr) );
+    if ( number_of_bytes >= _max ){
+        nreads = read ( fileno(fp), ptr, _max );
+    }else{
+        nreads = read ( fileno(fp), ptr, number_of_bytes );
+    };
+
 
     if (nreads <= 0){
         printf ("fread: read() fail \n");
@@ -1169,7 +1182,6 @@ size_t fread (void *ptr, size_t size, size_t n, FILE *fp){
 size_t fwrite (const void *ptr, size_t size, size_t n, FILE *fp){
 
     int nwrite = 0;
-
     int number_of_bytes = -1;
 
 
