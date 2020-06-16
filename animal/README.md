@@ -1,4 +1,5 @@
-#animal
+# animal
 
-	+ GUI apps
-	+ commands to run on terminal
+
+    + GUI apps
+    + commands to run on terminal
