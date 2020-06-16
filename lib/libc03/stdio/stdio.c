@@ -1216,6 +1216,11 @@ size_t fwrite (const void *ptr, size_t size, size_t n, FILE *fp){
 
     // Calculando a quantidade de bytes.
     number_of_bytes = (size * n);
+    
+    size_t _max = sizeof(ptr);
+    
+    if ( number_of_bytes > _max )
+        number_of_bytes = _max;
 
     //nwrite = write( fileno(fp), ptr, sizeof(ptr) );
     //nwrite = write ( fileno(fp), ptr, n );
