@@ -237,8 +237,6 @@ int
 socket_gramado ( 
     struct socket_d *sock, 
     int family, 
-    const struct sockaddr *addr,
-    socklen_t addrlen, 
     int type, 
     int protocol )
 {
@@ -400,14 +398,157 @@ int
 socket_unix ( 
     struct socket_d *sock, 
     int family, 
-    const struct sockaddr *addr,
-    socklen_t addrlen, 
     int type, 
     int protocol )
 {
-    debug_print("socket_unix: [TODO]\n");
-    return -1;
-}                
+
+    file *_file;
+    
+    struct process_d *Process;
+
+    //struct socket_d *__socket;
+
+
+    // Procurar slot livres.
+    int __slot = -1;
+    int i=0;
+
+
+    //#todo
+    //check sock arg.
+
+
+
+    //
+    // Process
+    //
+
+
+    Process = (void *) processList[current_process];
+
+    if ( (void *) Process == NULL ){
+        printf("Process\n");
+        refresh_screen();
+        return -1;
+
+    }else{
+
+        if ( Process->used != 1 || Process->magic != 1234 ){
+            printf("Process validation\n");
+            refresh_screen();
+            return -1;
+        }
+
+        //ok
+    };
+
+
+	//#todo
+	//temos que criar uma rotina que procure slots em Process->Streams[]
+	//e colocarmos em process.c
+	//essa é afunção que estamos criando.
+	// process_find_empty_stream_slot ( struct process_d *process );
+
+
+
+	// #improvisando
+	// 0, 1, 2 são reservados para o fluxo padrão.
+	// Como ainda não temos rotinas par ao fluxo padrão,
+	// pode ser que peguemos os índices reservados.
+	// Para evitar, começaremos depois deles.
+
+    __slot = -1; //fail
+    
+    for ( i=3; i< NUMBER_OF_FILES; i++ )
+    {
+        if ( Process->Objects[i] == 0 ){
+            __slot = i;
+            break;
+        }
+    };
+
+
+    // Fail.
+    if ( __slot == -1 ){
+        Process->Objects[i] = (unsigned long) 0;
+        printf ("socket_gramado: No free slots\n");
+        refresh_screen();
+        return -1;
+    }
+
+
+	// buffer
+
+    char *buff = (char *) kmalloc (BUFSIZ);
+	//char *buff = (char *) newPage ();
+
+    if ( (void *) buff == NULL ){
+        Process->Objects[__slot] = (unsigned long) 0;
+        printf ("socket_gramado: Buffer allocation fail\n");
+        refresh_screen();
+        return -1;
+    }
+
+
+	//
+	// File.
+	//
+
+    _file = (void *) kmalloc ( sizeof(file) );
+
+    if ( (void *) _file == NULL  ){
+        Process->Objects[__slot] = (unsigned long) 0;
+        printf ("socket_gramado: _file fail\n");
+        refresh_screen();
+        return -1;
+
+    }else{
+        
+        // This file represents a object of type socket.
+        
+        _file->____object = ObjectTypeSocket;
+
+
+        _file->used = 1;
+        _file->magic = 1234;
+        
+        // fd.
+        _file->_file = __slot;
+        
+        _file->_tmpfname = NULL;
+        //socket_file->_tmpfname = "socket";       
+
+
+        // O buffer.
+        _file->_base = buff;
+        _file->_p = buff;
+        _file->_r = 0;
+        _file->_w = 0;
+        _file->_lbfsize = BUFSIZ; 
+        //quanto falta é igual ao tamanho.
+        _file->_cnt = _file->_lbfsize;
+        
+        _file->socket_buffer_full = 0;  
+
+        _file->socket = sock;
+        
+        // O arquivo do soquete, o buffer ?
+        sock->private_file = (file *) _file; 
+
+        // Salvamos o ponteira para estrutura de soquete
+        // na estrutura de processo do processo atual.
+        Process->priv = (void *) sock;
+        
+        //Colocando na lista de arquivos abertos no processo.
+        Process->Objects[__slot] = (unsigned long) _file;
+
+        // Retornamos o fd na lista de arquivos abertos pelo processo.
+        return (int) __slot;
+    };
+
+
+    return -1;      
+}
                 
 
 // Configura a estrutura de socket para um socket da
@@ -418,14 +559,157 @@ socket_unix (
 int 
 socket_inet ( 
     struct socket_d *sock, 
-    int family, 
-    const struct sockaddr *addr,
-    socklen_t addrlen, 
+    int family,
     int type, 
     int protocol )
 {
-    debug_print("socket_inet: [TODO]\n");
-    return -1;
+
+    file *_file;
+    
+    struct process_d *Process;
+
+    //struct socket_d *__socket;
+
+
+    // Procurar slot livres.
+    int __slot = -1;
+    int i=0;
+
+
+    //#todo
+    //check sock arg.
+
+
+
+    //
+    // Process
+    //
+
+
+    Process = (void *) processList[current_process];
+
+    if ( (void *) Process == NULL ){
+        printf("Process\n");
+        refresh_screen();
+        return -1;
+
+    }else{
+
+        if ( Process->used != 1 || Process->magic != 1234 ){
+            printf("Process validation\n");
+            refresh_screen();
+            return -1;
+        }
+
+        //ok
+    };
+
+
+	//#todo
+	//temos que criar uma rotina que procure slots em Process->Streams[]
+	//e colocarmos em process.c
+	//essa é afunção que estamos criando.
+	// process_find_empty_stream_slot ( struct process_d *process );
+
+
+
+	// #improvisando
+	// 0, 1, 2 são reservados para o fluxo padrão.
+	// Como ainda não temos rotinas par ao fluxo padrão,
+	// pode ser que peguemos os índices reservados.
+	// Para evitar, começaremos depois deles.
+
+    __slot = -1; //fail
+    
+    for ( i=3; i< NUMBER_OF_FILES; i++ )
+    {
+        if ( Process->Objects[i] == 0 ){
+            __slot = i;
+            break;
+        }
+    };
+
+
+    // Fail.
+    if ( __slot == -1 ){
+        Process->Objects[i] = (unsigned long) 0;
+        printf ("socket_gramado: No free slots\n");
+        refresh_screen();
+        return -1;
+    }
+
+
+	// buffer
+
+    char *buff = (char *) kmalloc (BUFSIZ);
+	//char *buff = (char *) newPage ();
+
+    if ( (void *) buff == NULL ){
+        Process->Objects[__slot] = (unsigned long) 0;
+        printf ("socket_gramado: Buffer allocation fail\n");
+        refresh_screen();
+        return -1;
+    }
+
+
+	//
+	// File.
+	//
+
+    _file = (void *) kmalloc ( sizeof(file) );
+
+    if ( (void *) _file == NULL  ){
+        Process->Objects[__slot] = (unsigned long) 0;
+        printf ("socket_gramado: _file fail\n");
+        refresh_screen();
+        return -1;
+
+    }else{
+        
+        // This file represents a object of type socket.
+        
+        _file->____object = ObjectTypeSocket;
+
+
+        _file->used = 1;
+        _file->magic = 1234;
+        
+        // fd.
+        _file->_file = __slot;
+        
+        _file->_tmpfname = NULL;
+        //socket_file->_tmpfname = "socket";       
+
+
+        // O buffer.
+        _file->_base = buff;
+        _file->_p = buff;
+        _file->_r = 0;
+        _file->_w = 0;
+        _file->_lbfsize = BUFSIZ; 
+        //quanto falta é igual ao tamanho.
+        _file->_cnt = _file->_lbfsize;
+        
+        _file->socket_buffer_full = 0;  
+
+        _file->socket = sock;
+        
+        // O arquivo do soquete, o buffer ?
+        sock->private_file = (file *) _file; 
+
+        // Salvamos o ponteira para estrutura de soquete
+        // na estrutura de processo do processo atual.
+        Process->priv = (void *) sock;
+        
+        //Colocando na lista de arquivos abertos no processo.
+        Process->Objects[__slot] = (unsigned long) _file;
+
+        // Retornamos o fd na lista de arquivos abertos pelo processo.
+        return (int) __slot;
+    };
+
+
+    return -1;      
 }
 
 
@@ -446,17 +730,30 @@ socket_inet (
 
 // OUT: ?
 
+#define SYS_SOCKET_IP(a, b, c, d) (a << 24 | b << 16 | c << 8 | d)
+
 int sys_socket ( int family, int type, int protocol ){
 
     // Socket structure.
     struct socket_d *__socket;
 
     // Socket address structure.
+    // usado em AF_GRAMADO
     struct sockaddr addr;
     addr.sa_family = family;
     addr.sa_data[0] = 'x'; 
     addr.sa_data[1] = 'x';
-  
+    
+    //internet style for inet.
+    //usado em AF_INET
+    struct sockaddr_in addr_in;
+    addr_in.sin_family = AF_INET;
+    addr_in.sin_port = 11369;
+    //addr_in.sin_addr = SYS_SOCKET_IP(192, 168, 1, 112); //errado
+    //addr_in->sin_addr.s_addr = inet_addr("127.0.0.1");  //todo: inet_addr see netbsd
+    addr_in.sin_addr.s_addr = SYS_SOCKET_IP(192, 168, 1, 112);
+    
+    
     // Current process.
     struct process_d *p;  
 
@@ -526,7 +823,7 @@ int sys_socket ( int family, int type, int protocol ){
         __socket->protocol = protocol;
     
     
-       __socket->addr = addr;
+       //__socket->addr = addr; //mudou para logo abaixo.
        
        p->priv = __socket;
 
@@ -537,24 +834,18 @@ int sys_socket ( int family, int type, int protocol ){
        {
            case AF_GRAMADO:
                debug_print ("sys_socket: AF_GRAMADO\n");
+               __socket->addr = addr;
                return (int) socket_gramado ( __socket, 
-                                AF_GRAMADO, 
-                                (const struct sockaddr *) &addr, 
-                                14,
-                                type,
-                                protocol );
+                                AF_GRAMADO, type, protocol );
                break;
            
            
            //case AF_LOCAL:
            case AF_UNIX:
                debug_print ("sys_socket: AF_UNIX\n");
+               __socket->addr =  addr;
                return (int) socket_unix ( __socket, 
-                                AF_UNIX, 
-                                (const struct sockaddr *) &addr, 
-                                14, 
-                                type, 
-                                protocol );
+                                AF_UNIX, type, protocol );
                break;
 
            //#bugbug: 
@@ -562,12 +853,9 @@ int sys_socket ( int family, int type, int protocol ){
            //para essa função, e usarmos outra estrutura.               
            case AF_INET:
                debug_print ("sys_socket: AF_INET\n");
+               __socket->addr_in = addr_in;
                return (int) socket_inet ( __socket, 
-                                AF_INET, 
-                                (const struct sockaddr *) &addr, 
-                                14,
-                                type,
-                                protocol );
+                                AF_INET, type, protocol );
                break;
            
            
@@ -770,6 +1058,13 @@ sys_connect (
     int target_pid = -1;
     
 
+    //#importante
+    //no caso de endereços no estilo inet
+    //vamos precisar de outra estrututura.
+    struct sockaddr_in *addr_in;
+
+   addr_in = addr;
+
     
     printf ("sys_connect: PID %d | fd %d | \n",
         current_process, sockfd );
@@ -797,7 +1092,12 @@ sys_connect (
     // Devemos obter o número do processo alvo dado um endereço.
     // O tipo de endereço depende do tipo de domínio (família).
  
- 
+    //tente inet ao menos que
+    //mudemos de planos por encontrarmos af_gramado.
+    int try_inet = 1;  
+    
+    // #importante
+    // opções de domínio se o endereço é no estilo unix. 
     switch (addr->sa_family)
     {
         // AF_GRAMADO = 8000
@@ -833,20 +1133,44 @@ sys_connect (
             }
 
             printf (">>>> target pid %d \n", target_pid);
+            
+            // não tente inet, somos af_gramado
+            try_inet = 0;
             break;
-        
         
         //case AF_LOCAL:
         case AF_UNIX:
             debug_print ("sys_connect: AF_UNIX not supported\n");
             //target_pid = -1;
+            // não tente inet, somos af_unix
+            try_inet = 0;
+
             return -1;
             break;
-            
+    }
 
+
+    if( try_inet == 1 )
+    {
+      // opções de domínio se o endereço é no estilo internet.
+      switch (addr_in->sin_family)
+      {
         case AF_INET:
-            debug_print ("sys_connect: AF_INET not supported\n");
+            debug_print ("sys_connect: AF_INET [TESTING]\n");
             //target_pid = -1;
+            
+            printf (" >>>>>>>>> port %d \n",addr_in->sin_port);
+            
+            //#test
+            //se a porta for , então usaremos o pid do NS.
+            if (addr_in->sin_port == 7548){
+                printf ("sys_connect: Connecting to the Network Server ...\n");
+                target_pid = (int) gramado_ports[GRAMADO_NS_PORT]; 
+                refresh_screen();
+                break;
+            }
+            printf("sys_connect: Port not valid\n");
+            refresh_screen();
             return -1;
             break;
              
@@ -854,12 +1178,13 @@ sys_connect (
         
         default:
             debug_print ("sys_connect: domain not supported\n");
-            printf ("Family not supported! %d \n",addr->sa_family);
+            printf ("Family not supported! %d \n",addr_in->sin_family);
             refresh_screen();
             return -1;
             break;
+      };
     }
-    
+
 
     //
     // Sender process.

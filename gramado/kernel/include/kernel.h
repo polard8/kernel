@@ -111,7 +111,7 @@ extern void do_executa_new_task (void);
 
 
 //#net
-#include "socket.h"
+//#include "socket.h" //test ... tentando mudar para baixo logo apos os headers de network
 
 
 #include "ioctl.h"
@@ -341,6 +341,8 @@ extern void do_executa_new_task (void);
 #include "ns.h"          //(network) Network Server.
 #include "network.h"     //(network) Gerenciamento de rede.  
 
+
+#include "socket.h"
 
 
 // devices

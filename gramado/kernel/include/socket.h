@@ -533,9 +533,11 @@ struct socket_d
     unsigned short flags; 
 
 
-    // Não é um ponteiro.
+    // usada em endereços AF_GRAMADO
     struct sockaddr addr;
 
+    // usada em endereços AF_INET
+    struct sockaddr_in addr_in;   
 
     pid_t owner;
 };
@@ -561,8 +563,6 @@ int
 socket_gramado ( 
     struct socket_d *sock,
     int family, 
-    const struct sockaddr *addr,
-    socklen_t addrlen, 
     int type, 
     int protocol );
 
@@ -571,8 +571,6 @@ int
 socket_unix ( 
     struct socket_d *sock, 
     int family, 
-    const struct sockaddr *addr,
-    socklen_t addrlen, 
     int type, 
     int protocol );
 
@@ -580,8 +578,8 @@ socket_unix (
 int 
 socket_inet ( struct socket_d *sock, 
               int family, 
-              const struct sockaddr *addr,
-              socklen_t addrlen, int type, int protocol );
+              int type, 
+              int protocol );
 
 
 

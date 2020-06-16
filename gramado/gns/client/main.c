@@ -1,5 +1,5 @@
 /*
- * File: s2.c
+ * File: main.c
  *
  *    Client side application for Gramado Network Server.
  *    Using socket to connect with gns.
@@ -11,7 +11,7 @@
  * 2020 - Created by Fred Nora.
  */
  
-
+// Connecting via AF_INET.
 
 // tutorial example taken from. 
 // https://www.tutorialspoint.com/unix_sockets/socket_server_example.htm
@@ -89,6 +89,18 @@ int gerar_numero(int lim_inf, int lim_sup)
 }
 */
 
+char *hello = "Hello there!\n";
+
+/*
+#define IP(a, b, c, d) (a << 24 | b << 16 | c << 8 | d)
+struct sockaddr_in addr = {
+    .sin_family = AF_INET,
+    .sin_port   = 7548, 
+    .sin_addr   = IP(192, 168, 1, 79),
+};
+*/
+
+#define IP(a, b, c, d) (a << 24 | b << 16 | c << 8 | d)
 
 
 int gnst_event_loop(void);
@@ -121,7 +133,9 @@ int gnst_event_loop(void){
 
     // cria o soquete.
     // AF_GRAMADO
-    client_fd = socket ( 8000, SOCK_STREAM, 0 );
+    //client_fd = socket ( 8000, SOCK_STREAM, 0 );
+    
+    client_fd = socket ( AF_INET, SOCK_STREAM, 0 );
     
     if ( client_fd < 0 ){
        printf ("gnst: Couldn't create socket\n");
@@ -134,12 +148,17 @@ int gnst_event_loop(void){
 
     // The port name is 'port:/ws'
 
+    /*
     struct sockaddr addr;
     addr.sa_family = 8000; //AF_GRAMADO
     addr.sa_data[0] = 'n';
     addr.sa_data[1] = 's';  
-    
-    
+    */
+
+    struct sockaddr_in addr;
+    addr.sin_family = AF_INET;
+    addr.sin_port   = 7548;   //porta para o Network Server 'ns' em gramado_ports[]
+    addr.sin_addr.s_addr = IP(192, 168, 1, 79); 
     
     //
     // connect
@@ -150,15 +169,22 @@ int gnst_event_loop(void){
     //então o servidor escreverá em nosso arquivo.
     
     // #debug
-    printf ("gnst: Connecting to the address 'ns' ...\n");      
+    //printf ("gnst: Connecting to the address 'ns' ...\n");      
 
+    /*
     // Tentando nos conectar ao endereço indicado na estrutura
     // Como o domínio é AF_GRAMADO, então o endereço é "n","s".
     if (connect (client_fd, (struct sockaddr *) &addr, sizeof(addr)) < 0){ 
         printf("gnst: Connection Failed \n"); 
         return -1; 
     } 
-
+    */
+    
+    printf ("gnst: Connecting to the address via inet  ...\n");      
+    if (connect (client_fd, (void *) &addr, sizeof(addr)) < 0){ 
+        printf("gnst: Connection Failed \n"); 
+        return -1; 
+    } 
 
      //
      // Loop for new message.
