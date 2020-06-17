@@ -60,6 +60,12 @@
 #include <packet.h>
 
 
+// #test
+// Tentando deixar o buffer aqui e aproveitar em mais funções.
+char __buffer[512];
+
+
+
 // tipos de pacotes.
 //#define SERVER_PACKET_TYPE_REQUEST    1000 
 //#define SERVER_PACKET_TYPE_REPLY      1001 
@@ -69,7 +75,14 @@
 
 
 void gnst_yield(void);
-int gnst_event_loop(int fd);
+
+
+// Hello!
+// Podemos isso na lib.
+int gnst_hello_request(int fd);
+int gnst_hello_response(int fd);
+
+
 //...
 
 
@@ -93,8 +106,7 @@ void gnst_yield(void){
 
 
 
-char *hello = "Hello there!\n";
-
+//char *hello = "Hello there!\n";
 /*
 #define IP(a, b, c, d) (a << 24 | b << 16 | c << 8 | d)
 struct sockaddr_in addr = {
@@ -107,20 +119,115 @@ struct sockaddr_in addr = {
 #define IP(a, b, c, d) (a << 24 | b << 16 | c << 8 | d)
 
 
+int gnst_hello_response(int fd)
+{
+    unsigned long *message_buffer = (unsigned long *) &__buffer[0];   
+    int n_reads = 0;    // For receiving responses.
 
 
-int gnst_event_loop(int fd){
-	
-    char __buffer[512];
+    //
+    // waiting
+    //
+
+    // Espera para ler a resposta. 
+    // Esperando com yield como teste.
+    // Isso demora, pois a resposta só será enviada depois de
+    // prestado o servido.
+    // obs: Nesse momento deveríamos estar dormindo.
+
+    // #debug
+    debug_print ("gnst: Waiting ...\n");      
+
+    int y;
+    for(y=0; y<15; y++)
+        gnst_yield();
+
+
+
+    //
+    // read
+    //
+
+    // #debug
+    debug_print ("gnst: reading ...\n");      
+
+
+       //#caution
+       //we can stay here for ever.
+       //it's a test yet.
+__again:
+    n_reads = read ( fd, __buffer, sizeof(__buffer) );
+    
+    // Não vamos insistir num arquivo vazio.
+    //if (n_reads<=0){
+    //     gnst_yield();        
+    //    goto __again;
+    //}
+
+    if (n_reads == 0){
+         gnst_yield();        
+        goto __again;
+    }
+    
+    if (n_reads < 0){
+        printf ("gnst: recv fail.\n");
+        printf ("Something is wrong with the socket.\n");
+        exit (1);
+    }
+    
+
+    
+    // Get the message sended by the server.
+    int msg = (int) message_buffer[1];
+    
+    switch (msg)
+    {
+        case SERVER_PACKET_TYPE_REQUEST:
+            gnst_yield ();
+            goto __again;
+            break;
+            
+        case SERVER_PACKET_TYPE_REPLY:
+            debug_print ("gnst: SERVER_PACKET_TYPE_REPLY received\n"); 
+            goto process_reply;
+            break;
+            
+        case SERVER_PACKET_TYPE_EVENT:
+            //todo: call procedure.
+            goto __again;
+            break;
+            
+        case SERVER_PACKET_TYPE_ERROR:
+            debug_print ("gnst: SERVER_PACKET_TYPE_ERROR\n");
+            goto __again;
+            //exit (-1);
+            break;
+        
+        default:
+            goto __again;
+            break; 
+    };
+
+
+process_reply:
+
+    //
+    // done:
+    //
+
+    //printf("%d bytes readed\n",n_reads);
+    printf("RESPONSE: {%s} \n",__buffer+16);
+
+    return 0;
+}
+
+
+int gnst_hello_request(int fd){
 
     // Isso permite ler a mensagem na forma de longs.
     unsigned long *message_buffer = (unsigned long *) &__buffer[0];   
 
     int n_writes = 0;   // For sending requests.
-    
-    
-    int n_reads = 0;    // For receiving responses.
-
 
      //
      // Loop for new message.
@@ -163,32 +270,13 @@ new_message:
     }
 
 
-    //
-    // waiting
-    //
+ 
+    return 0; 
 
-    // Espera para ler a resposta. 
-    // Esperando com yield como teste.
-    // Isso demora, pois a resposta só será enviada depois de
-    // prestado o servido.
-    // obs: Nesse momento deveríamos estar dormindo.
-
-    // #debug
-    debug_print ("gnst: Waiting ...\n");      
-
-    int y;
-    for(y=0; y<15; y++)
-        gnst_yield();
-
-
-    // #todo
-    // Podemos checar antes se o fd 
-    // representa um objeto que permite leitura.
-    // Pode nem ser possível.
-    // Mas como sabemos que é um soquete,
-    // então sabemos que é possível ler.
-
-
+    // === cut here ===
+    
+    /*
+    
     //
     // read
     //
@@ -266,7 +354,7 @@ process_reply:
 
     debug_print ("gnst: bye\n"); 
     printf ("gnst: bye\n");
-
+*/
     return 0;
 }
 
@@ -322,9 +410,30 @@ int main ( int argc, char *argv[] ){
         return -1; 
     } 
  
-    //event loop.
+    //
+    // messages
+    //
+   
+    // #test
+    // Testing loop; ok.
+    while(1){
+    gnst_hello_request(client_fd);
+    
+    // #todo
+    // Podemos checar antes se o fd 
+    // representa um objeto que permite leitura.
+    // Pode nem ser possível.
+    // Mas como sabemos que é um soquete,
+    // então sabemos que é possível ler.
 
-    return (int) gnst_event_loop(client_fd);
+    gnst_hello_response(client_fd);
+    }
+
+    debug_print ("gnst: bye\n"); 
+    printf ("gnst: bye\n");
+
+    
+    return 0;
 }
 
 
