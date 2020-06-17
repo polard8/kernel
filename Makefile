@@ -10,7 +10,7 @@ NAME = Gramado 1.xx
 # To see the targets execute "make help".
 
 
-# That's our default target when none is given on the command line
+# That's our default target when none is given on the command line.
 PHONY := _all
 _all: all
 
