@@ -67,10 +67,12 @@ int gerar_numero(int lim_inf, int lim_sup)
 }
 
 
-int gwst_event_loop(int fd);
 
 
-int gwst_event_loop(int fd){
+int gwst_event_loop(void);
+
+
+int gwst_event_loop(void){
 	
     char __buffer[512];
 
@@ -80,10 +82,61 @@ int gwst_event_loop(int fd){
     int n_writes = 0;   // For sending requests.
     int n_reads = 0;    // For receiving responses.
 
+    int client_fd;
+
+
+    gws_debug_print ("--------------------------\n"); 
+    gws_debug_print ("gwst.bin: Initializing ...\n");
 
     char *name = "Window name 1";
 
-   
+    //
+    // socket
+    // 
+
+    // #debug
+    printf ("gwst: Creating socket\n");
+
+    // Create a socket. AF_GRAMADO = 8000
+    client_fd = socket ( 8000, SOCK_STREAM, 0 );
+    
+    if ( client_fd < 0 ){
+       gws_debug_print ("gwst: Couldn't create socket\n");
+       printf ("gwst: Couldn't create socket\n");
+       exit(1);  //#bugbug Cuidado.
+    }
+    
+
+    // Vamos nos concetar com o processo identificado 
+    // com o nome 'ws'
+
+    // The port name is 'port:/ws'
+
+    struct sockaddr addr;
+    addr.sa_family = 8000; //AF_GRAMADO
+    addr.sa_data[0] = 'w';
+    addr.sa_data[1] = 's';  
+    
+
+    //
+    // connect
+    // 
+
+    //nessa hora colocamos no accept um fd.
+    //então o servidor escreverá em nosso arquivo.
+    
+    // #debug
+    printf ("gwst: Connecting to the address 'ws' ...\n");      
+
+    // Tentando nos conectar ao endereço indicado na estrutura
+    // Como o domínio é AF_GRAMADO, então o endereço é "w","s".
+    if ( connect (client_fd, (struct sockaddr *) &addr, sizeof(addr)) < 0 )
+    { 
+        gws_debug_print ("gwst: Connection Failed\n");
+        printf ("gwst: Connection Failed \n"); 
+        return -1; 
+    } 
+
 
     //
     // Send request.
@@ -118,8 +171,8 @@ int gwst_event_loop(int fd){
         // Write!
         // Se foi possível enviar, então saimos do loop.  
 
-        // n_writes = write (fd, __buffer, sizeof(__buffer));
-        n_writes = send (fd, __buffer, sizeof(__buffer), 0);
+        // n_writes = write (client_fd, __buffer, sizeof(__buffer));
+        n_writes = send (client_fd, __buffer, sizeof(__buffer), 0);
        
         if(n_writes>0)
            break;
@@ -166,8 +219,8 @@ int gwst_event_loop(int fd){
 
 response_loop:
 
-    //n_reads = read ( fd, __buffer, sizeof(__buffer) );
-    n_reads = recv ( fd, __buffer, sizeof(__buffer), 0 );
+    //n_reads = read ( client_fd, __buffer, sizeof(__buffer) );
+    n_reads = recv ( client_fd, __buffer, sizeof(__buffer), 0 );
     
     //if (n_reads<=0){
     //     gws_yield(); 
@@ -239,7 +292,7 @@ process_reply:
 
     // #test
     gws_debug_print ("gwst: Testing close() ...\n"); 
-    close (fd);
+    close (client_fd);
 
     gws_debug_print ("gwst: bye\n"); 
     printf ("gwst: Window ID %d \n", message_buffer[0] );
@@ -264,62 +317,9 @@ process_event:
 
 int main ( int argc, char *argv[] ){
 
-    int client_fd = -1;
-
-    gws_debug_print ("--------------------------\n"); 
-    gws_debug_print ("gwst.bin: Initializing ...\n");
-    //gws_debug_print ("gwst: Starting ...\n");
+    gws_debug_print ("gwst: Starting ...\n");
     
-    //
-    // socket
-    // 
-
-    // #debug
-    printf ("gwst: Creating socket\n");
-
-    // Create a socket. AF_GRAMADO = 8000
-    client_fd = socket ( 8000, SOCK_STREAM, 0 );
-    
-    if ( client_fd < 0 ){
-       gws_debug_print ("gwst: Couldn't create socket\n");
-       printf ("gwst: Couldn't create socket\n");
-       exit(1);  //#bugbug Cuidado.
-    }
-
-
-    // Vamos nos concetar com o processo identificado 
-    // com o nome 'ws'
-
-    // The port name is 'port:/ws'
-
-    struct sockaddr addr;
-    addr.sa_family = 8000; //AF_GRAMADO
-    addr.sa_data[0] = 'w';
-    addr.sa_data[1] = 's';  
-    
-
-    //
-    // connect
-    // 
-
-    //nessa hora colocamos no accept um fd.
-    //então o servidor escreverá em nosso arquivo.
-    
-    // #debug
-    printf ("gwst: Connecting to the address 'ws' ...\n");      
-
-    // Tentando nos conectar ao endereço indicado na estrutura
-    // Como o domínio é AF_GRAMADO, então o endereço é "w","s".
-    if ( connect (client_fd, (struct sockaddr *) &addr, sizeof(addr)) < 0 )
-    { 
-        gws_debug_print ("gwst: Connection Failed\n");
-        printf ("gwst: Connection Failed \n"); 
-        return -1; 
-    } 
-
-
-    
-    return (int) gwst_event_loop(client_fd);
+    return (int) gwst_event_loop();
 }
 
 

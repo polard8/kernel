@@ -65,12 +65,22 @@
 //#define SERVER_PACKET_TYPE_REPLY      1001 
 //#define SERVER_PACKET_TYPE_EVENT      1002
 //#define SERVER_PACKET_TYPE_ERROR      1003
+
+
+
 void gnst_yield(void);
+int gnst_event_loop(int fd);
+//...
 
 
 
-
-
+/*
+// gerar número aleatório dentro de uma faixa.
+int gerar_numero(int lim_inf, int lim_sup)
+{
+    return (lim_inf + (rand() % lim_sup));
+}
+*/
 
 
 
@@ -81,13 +91,7 @@ void gnst_yield(void){
 }
 
 
-/*
-// gerar número aleatório dentro de uma faixa.
-int gerar_numero(int lim_inf, int lim_sup)
-{
-    return (lim_inf + (rand() % lim_sup));
-}
-*/
+
 
 char *hello = "Hello there!\n";
 
@@ -103,10 +107,9 @@ struct sockaddr_in addr = {
 #define IP(a, b, c, d) (a << 24 | b << 16 | c << 8 | d)
 
 
-int gnst_event_loop(void);
 
-//int main ( int argc, char *argv[] ){
-int gnst_event_loop(void){
+
+int gnst_event_loop(int fd){
 	
     char __buffer[512];
 
@@ -114,77 +117,10 @@ int gnst_event_loop(void){
     unsigned long *message_buffer = (unsigned long *) &__buffer[0];   
 
     int n_writes = 0;   // For sending requests.
+    
+    
     int n_reads = 0;    // For receiving responses.
 
-    int client_fd;
-
-
-    debug_print ("---------------------------\n");    
-    debug_print ("gnst.bin: Initializing ...\n");
-
-
-
-    //
-    // socket
-    // 
-
-    // #debug
-    printf ("gnst: Creating socket\n");
-
-    // cria o soquete.
-    // AF_GRAMADO
-    //client_fd = socket ( 8000, SOCK_STREAM, 0 );
-    
-    client_fd = socket ( AF_INET, SOCK_STREAM, 0 );
-    
-    if ( client_fd < 0 ){
-       printf ("gnst: Couldn't create socket\n");
-       exit(1);
-    }
-    
-
-    // Vamos nos concetar com o processo identificado 
-    // com o nome 'ws'
-
-    // The port name is 'port:/ws'
-
-    /*
-    struct sockaddr addr;
-    addr.sa_family = 8000; //AF_GRAMADO
-    addr.sa_data[0] = 'n';
-    addr.sa_data[1] = 's';  
-    */
-
-    struct sockaddr_in addr;
-    addr.sin_family = AF_INET;
-    addr.sin_port   = 7548;   //porta para o Network Server 'ns' em gramado_ports[]
-    addr.sin_addr.s_addr = IP(192, 168, 1, 79); 
-    
-    //
-    // connect
-    // 
-
-
-    //nessa hora colocamos no accept um fd.
-    //então o servidor escreverá em nosso arquivo.
-    
-    // #debug
-    //printf ("gnst: Connecting to the address 'ns' ...\n");      
-
-    /*
-    // Tentando nos conectar ao endereço indicado na estrutura
-    // Como o domínio é AF_GRAMADO, então o endereço é "n","s".
-    if (connect (client_fd, (struct sockaddr *) &addr, sizeof(addr)) < 0){ 
-        printf("gnst: Connection Failed \n"); 
-        return -1; 
-    } 
-    */
-    
-    printf ("gnst: Connecting to the address via inet  ...\n");      
-    if (connect (client_fd, (void *) &addr, sizeof(addr)) < 0){ 
-        printf("gnst: Connection Failed \n"); 
-        return -1; 
-    } 
 
      //
      // Loop for new message.
@@ -195,6 +131,8 @@ int gnst_event_loop(void){
 // loop:
 new_message:
 
+    
+     
     //
     // Write
     //
@@ -205,23 +143,21 @@ new_message:
     // Enviamos um request para o servidor.
     // ?? Precisamos mesmo de um loop para isso. ??
 
-    while (1)
-    {
-        // Create window        
+
+    // Write!
+    // Se foi possível enviar, então saimos do loop.        
+    // obs: podemos usar send();
+
+    while (1){
+
+        // solicita um hello!      
         message_buffer[0] = 0;       // window. 
         message_buffer[1] = 1000;    // msg=hello.
         message_buffer[2] = 0;
         message_buffer[3] = 0;
-       
+        // ...
 
-        //...
-
-        // Write!
-        // Se foi possível enviar, então saimos do loop.        
-        // obs: podemos usar send();
-
-        n_writes = write (client_fd, __buffer, sizeof(__buffer));
-       
+        n_writes = write (fd, __buffer, sizeof(__buffer));
         if(n_writes>0)
            break;
     }
@@ -265,7 +201,7 @@ new_message:
        //we can stay here for ever.
        //it's a test yet.
 __again:
-    n_reads = read ( client_fd, __buffer, sizeof(__buffer) );
+    n_reads = read ( fd, __buffer, sizeof(__buffer) );
     
     // Não vamos insistir num arquivo vazio.
     //if (n_reads<=0){
@@ -334,14 +270,61 @@ process_reply:
     return 0;
 }
 
-//Testing new main.
+
+
+// Testing new main.
 int main ( int argc, char *argv[] ){
 
-    debug_print ("gnst: Starting ...\n");
+    int client_fd = -1;
     
+    //debug_print ("gnst: Starting ...\n");
+    debug_print ("---------------------------\n");    
+    debug_print ("gnst.bin: Initializing ...\n");
+
+     //
+    // socket
+    // 
+
+    // #debug
+    printf ("gnst: Creating socket\n");
+
+    // cria o soquete.
+    // AF_GRAMADO
+    //client_fd = socket ( 8000, SOCK_STREAM, 0 );
+    
+    client_fd = socket ( AF_INET, SOCK_STREAM, 0 );
+    
+    if ( client_fd < 0 ){
+       printf ("gnst: Couldn't create socket\n");
+       exit(1);
+    }
+
+
+    struct sockaddr_in addr_in;
+    addr_in.sin_family = AF_INET;
+    addr_in.sin_port   = 7548;   //porta para o Network Server 'ns' em gramado_ports[]
+    addr_in.sin_addr.s_addr = IP(192, 168, 1, 79); 
+    
+    //
+    // connect
+    // 
+
+
+    //nessa hora colocamos no accept um fd.
+    //então o servidor escreverá em nosso arquivo.
+    
+    // #debug
+    //printf ("gnst: Connecting to the address 'ns' ...\n");      
+    
+    printf ("gnst: Connecting to the address via inet  ...\n");      
+    if (connect (client_fd, (void *) &addr_in, sizeof(addr_in)) < 0){ 
+        printf("gnst: Connection Failed \n"); 
+        return -1; 
+    } 
+ 
     //event loop.
 
-    return (int) gnst_event_loop();
+    return (int) gnst_event_loop(client_fd);
 }
 
 
