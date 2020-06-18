@@ -64,7 +64,7 @@
 // Tentando deixar o buffer aqui e aproveitar em mais funções.
 char __buffer[512];
 
-
+#define IP(a, b, c, d) (a << 24 | b << 16 | c << 8 | d)
 
 // tipos de pacotes.
 //#define SERVER_PACKET_TYPE_REQUEST    1000 
@@ -116,7 +116,7 @@ struct sockaddr_in addr = {
 };
 */
 
-#define IP(a, b, c, d) (a << 24 | b << 16 | c << 8 | d)
+
 
 
 int gnst_hello_response(int fd)
