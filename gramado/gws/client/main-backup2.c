@@ -51,8 +51,6 @@
 #include <gws.h>
 
 
-char __buffer[512];
-
 // Tipos de pacotes.
 // #todo: Move this to gws.h
 #define SERVER_PACKET_TYPE_REQUEST    1000 
@@ -69,161 +67,18 @@ int gerar_numero(int lim_inf, int lim_sup)
 }
 
 
-
-int gwst_createwindow_request(int fd);
-int gwst_createwindow_response(int fd);
+int gwst_event_loop(int fd);
 
 
-//response
-int gwst_createwindow_response(int fd)
-{
-    unsigned long *message_buffer = (unsigned long *) &__buffer[0];   
-    int n_reads = 0;    // For receiving responses.
-
-    //
-    // Waiting for response. ==================
-    //
-
-    // Espera para ler a resposta. 
-    // Esperando com yield como teste.
-    // Isso demora, pois a resposta só será enviada depois de
-    // prestado o servido.
-    // obs: Nesse momento deveríamos estar dormindo.
-
-    // #debug
-    gws_debug_print ("gwst: Waiting ...\n");      
-
-    int y;
-    for(y=0; y<15; y++)
-        gws_yield();   // See: libgws/
-
-
-    // #todo
-    // Podemos checar antes se o fd 
-    // representa um objeto que permite leitura.
-    // Pode nem ser possível.
-    // Mas como sabemos que é um soquete,
-    // então sabemos que é possível ler.
-
-
-    //
-    // read
-    //
-
-    // #debug
-    gws_debug_print ("gwst: reading ...\n");      
-
-
-    // #caution
-    // Waiting for response.
-    // We can stay here for ever.
-
-response_loop:
-
-    //n_reads = read ( fd, __buffer, sizeof(__buffer) );
-    n_reads = recv ( fd, __buffer, sizeof(__buffer), 0 );
-    
-    //if (n_reads<=0){
-    //     gws_yield(); 
-    //    goto response_loop;
-    //}
-    
-    // Se retornou 0, podemos tentar novamente.
-    if (n_reads == 0){
-         gws_yield(); 
-        goto response_loop;
-    }
-    
-    // Se retornou -1 é porque algo está errado com o arquivo.
-    if (n_reads < 0){
-        gws_debug_print ("gwst: recv fail.\n");
-        printf ("gwst: recv fail.\n");
-        printf ("Something is wrong with the socket.\n");
-        exit (1);
-    }
-
-
-    //
-    // The msg index.
-    //
-    
-    // Get the message sended by the server.
-
-    int msg = (int) message_buffer[1];
-    
-    switch (msg){
-
-        case SERVER_PACKET_TYPE_REQUEST:
-            gws_yield ();
-            goto response_loop;
-            break;
-            
-        // Reply!
-        case SERVER_PACKET_TYPE_REPLY:
-            goto process_reply;
-            break;
-            
-        case SERVER_PACKET_TYPE_EVENT:
-            goto process_event;
-            //goto response_loop;
-            break;
-            
-        case SERVER_PACKET_TYPE_ERROR:
-            gws_debug_print ("gwst: SERVER_PACKET_TYPE_ERROR\n");
-            goto response_loop;
-            //exit (-1);
-            break;
-        
-        default:
-            goto response_loop;
-            break; 
-    };
-
-
-
-
-
-//
-// Process reply.
-//
-
-// A resposta tras o window id no início do buffer.
-    
-process_reply:
-
-    // #test
-    gws_debug_print ("gwst: Testing close() ...\n"); 
-    close (fd);
-
-    //gws_debug_print ("gwst: bye\n"); 
-    printf ("gwst: Window ID %d \n", message_buffer[0] );
-    //printf ("gwst: Bye\n");
-    
-    // #todo
-    // Podemos usar a biblioteca e testarmos
-    // vários serviços da biblioteca nesse momento.
-
-    return 0;
-
-//
-// Process an event.
-//
-
-process_event:
-    gws_debug_print ("gwst: We got an event\n"); 
-    return 0;
-
-}
-
-
-
-int gwst_createwindow_request(int fd){
+int gwst_event_loop(int fd){
+	
+    char __buffer[512];
 
     // Isso permite ler a mensagem na forma de longs.
     unsigned long *message_buffer = (unsigned long *) &__buffer[0];   
 
     int n_writes = 0;   // For sending requests.
-
+    int n_reads = 0;    // For receiving responses.
 
 
     char *name = "Window name 1";
@@ -271,13 +126,8 @@ int gwst_createwindow_request(int fd){
     }
 
 
-    return 0;  //===== cut here =====
-
-
-    /*
-     
     //
-    // Waiting for response. ==================
+    // Waiting for response.
     //
 
     // Espera para ler a resposta. 
@@ -408,9 +258,7 @@ process_reply:
 process_event:
     gws_debug_print ("gwst: We got an event\n"); 
     return 0;
-    */
 }
-
 
 
 
@@ -470,14 +318,8 @@ int main ( int argc, char *argv[] ){
     } 
 
 
-    //request
-    gwst_createwindow_request(client_fd);
     
-    //response
-    gwst_createwindow_response(client_fd);
-
-    gws_debug_print ("gwst: bye :) \n");
-    return 0;
+    return (int) gwst_event_loop(client_fd);
 }
 
 
