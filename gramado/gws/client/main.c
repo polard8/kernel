@@ -70,7 +70,15 @@ int gerar_numero(int lim_inf, int lim_sup)
 
 
 
-int gwst_createwindow_request(int fd);
+int 
+gwst_createwindow_request (
+    int fd,
+    unsigned long left,
+    unsigned long top,
+    unsigned long width,
+    unsigned long height,
+    unsigned long bg_color );
+    
 int gwst_createwindow_response(int fd);
 
 
@@ -193,7 +201,7 @@ process_reply:
 
     // #test
     gws_debug_print ("gwst: Testing close() ...\n"); 
-    close (fd);
+    //close (fd);
 
     //gws_debug_print ("gwst: bye\n"); 
     printf ("gwst: Window ID %d \n", message_buffer[0] );
@@ -217,8 +225,17 @@ process_event:
 
 
 
-int gwst_createwindow_request(int fd){
 
+
+int 
+gwst_createwindow_request (
+    int fd,
+    unsigned long left,
+    unsigned long top,
+    unsigned long width,
+    unsigned long height,
+    unsigned long bg_color )
+{
     // Isso permite ler a mensagem na forma de longs.
     unsigned long *message_buffer = (unsigned long *) &__buffer[0];   
 
@@ -250,12 +267,12 @@ int gwst_createwindow_request(int fd){
         message_buffer[2] = 0;
         message_buffer[3] = 0;
         
-        message_buffer[4] = 120;   //x
-        message_buffer[5] = 120;   //y
-        message_buffer[6] = 480;   //w
-        message_buffer[7] = 320;   //h
+        message_buffer[4] = left; //120;   //x
+        message_buffer[5] = top; //120;   //y
+        message_buffer[6] = width; //480;   //w
+        message_buffer[7] = height; //320;   //h
         
-        message_buffer[8] = xCOLOR_GRAY2; 
+        message_buffer[8] = bg_color; //xCOLOR_GRAY2; 
 
          
         //...
@@ -469,12 +486,19 @@ int main ( int argc, char *argv[] ){
         return -1; 
     } 
 
-
+    int i=0;
+    int l=80;
+    int t=80;
+    int c=100;
+    
+    for (i=0; i<16;i++){
     //request
-    gwst_createwindow_request(client_fd);
+    gwst_createwindow_request(client_fd, l, t, 200, 200, COLOR_BLUE+c);
+    l += 10; t += 10; c += 100;
     
     //response
     gwst_createwindow_response(client_fd);
+    }
 
     gws_debug_print ("gwst: bye :) \n");
     return 0;
