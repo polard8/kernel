@@ -336,8 +336,8 @@ fsLoadFile (
     //int IsDirectory;
 
 
-    //Cluster inicial
-    unsigned short cluster;    
+    // Cluster inicial
+    unsigned short cluster; 
 
     // ?? 
     // Primeiro setor do cluster.
@@ -346,19 +346,14 @@ fsLoadFile (
     // Usado junto com o endereço do arquivo.
     unsigned long SectorSize;
 
+
     int Spc;
 
     // Updating fat address and __dir address.
 
-    unsigned short *  fat = (unsigned short *) fat_address;   
+    unsigned short *  fat = (unsigned short *) fat_address;
     unsigned short *__dir = (unsigned short *) dir_address;
 
-
-
-
-	// Lock ??.
-	//taskswitch_lock();
-	//scheduler_lock();
 
 
     //
@@ -378,56 +373,20 @@ fsLoadFile (
     // ...
 
 
-    //
-    // ==== DIR ====
-    //
-
-    // Carrega o diretório na memória.
-    // #bugbug
-    // Como não sabemos o tamanho do diretório,
-    // estamos usando o tamanho do doretório raiz. 
-
-	//#importante
-	//Não carregaremos mais um diretório nesse momento,
-	//usaremos o endereço passado por argumento.
-	//esperamos que nesse endereço tenha um diretório carregado.
-	//Na inicialização é preciso carregar o diretório raiz
-	//antes de chamar essa função. E para caregar o diretório raiz
-	//precisa inicializar o sistema de arquivos e o controlador IDE.
-
+    // DIR
+    // Não carregaremos mais um diretório nesse momento
+    // usaremos o endereço passado por argumento.
+    // Esperamos que nesse endereço tenha um diretório carregado.
 
 //load_DIR:
-
-
-//#ifdef KERNEL_VERBOSE
     debug_print ("fsLoadFile:\n");
-//#endif
 
 
-	//#test
-	//funcionou
-	//carregando o diretório 
-	//address, lba, number of sectors.
-	
-	//load_directory ( dir_address, VOLUME1_ROOTDIR_LBA, 32 );
-    //load_directory ( VOLUME1_ROOTDIR_ADDRESS, VOLUME1_ROOTDIR_LBA, 32 );	
-	
-	//antigo.  
-	//funciona
-	//carregando o diretório raiz.
-	//fs_load_rootdirEx ();
-	
-	//#todo:
-	//precisamos na verdade carregarmos o diretório corrente.
-
-    //
     // File system structure.
-    //
-
-    // Checa se é válida a estrutura do sistema de arquivos.
-    // Pega a quantidade de setores pot cluster.
-    // Pega o tamanho do diretório raiz.
-    // Ou seja, pega o número máximo de entradas.
+    // + Checa se é válida a estrutura do sistema de arquivos.
+    // + Pega a quantidade de setores por cluster.
+    // + Pega o tamanho do diretório raiz. Ou seja, pega o número 
+    //    máximo de entradas.
     // ...
 
     if ( (void *) root == NULL ){
@@ -435,9 +394,11 @@ fsLoadFile (
 
     }else{
 
-
         // #todo
         // Check if the root is initialized.
+        //if (root->used != 1 || root->magic != 1234){
+        //    panic ("fsLoadFile: validation");
+        //}
 
         Spc = root->spc;
 
@@ -456,8 +417,7 @@ fsLoadFile (
             panic ("fsLoadFile: max root entries \n");
         }
 
-
-        // More?! 
+        // ...
     };
 
 
@@ -512,7 +472,7 @@ fsLoadFile (
     size_t size = (size_t) strlen (file_name); 
 
     if ( size > 11 ){
-         printf ("fsLoadFile: size fail %d\n", size ); 
+         printf ("fsLoadFile: size [FAIL] %d\n", size ); 
          size = 11;
     }
     
@@ -538,6 +498,8 @@ fsLoadFile (
     // Para a variável 'max' estamos considerando o número de
     // entradas no diretório raiz. Mas precisamos considerar
     // o número de entradas no diretório atual.
+    // >> Para isso vamos precisar de uma estrutura de diretório
+    // >> talvez a mesma usada em arquivos. (FILE)
 
 
     // Descrição da rotina:
@@ -570,24 +532,18 @@ fsLoadFile (
         i++;        
     }; 
 
-    
-    //
-    // Not found.
-    //
 
+    // Not found.
     // Sai do while. 
     // O arquivo não foi encontrado.
     // O arquivo não foi encontrado.
 
 //notFound:
-
-    printf ("1 fsLoadFile: %s not found\n", file_name );  
+    printf ("fsLoadFile 1: %s not found\n", file_name );  
     goto fail;
-    
-    //
+
+
     // Found.
-    //
-    
     // O arquivo foi encontrado.
 
 __found:
@@ -596,30 +552,27 @@ __found:
     // printf ("file FOUND!\n");
     // refresh_screen();
     // while(1){}
-
-    //
-    // Get the initial cluster. 
-    //
     
+    
+    //
+    // Cluster.
+    //
+
+    // Get the initial cluster. 
+    // Check cluster Limits.
     // (word). 
     // (0x1A/2) = 13.
-
-    cluster = __dir[ z+13 ];    
-
-
-    //
-    // Cluster Limits.
-    //
-
-	// Checar se 'cluster' está fora dos limites.
-	// +São 256 entradas de FAT por setor. 
-	// +São 64 setores por FAT. 
-	// Isso varia de acordo com o tamanho do disco.
-	// O número máximo do cluster nesse caso é (256*64).
-
+    // Checar se 'cluster' está fora dos limites.
+    // +São 256 entradas de FAT por setor. 
+    // +São 64 setores por FAT. 
+    // Isso varia de acordo com o tamanho do disco.
+    // O número máximo do cluster nesse caso é (256*64).
     // #todo
     // Na verdade os dois primeiros clusters estão indisponíveis.
-    
+
+
+    cluster = __dir[ z+13 ];
+
     if ( cluster <= 0 || cluster > 0xFFF0 ){
         printf ("fsLoadFile: Cluster limits %x \n", cluster );
         goto fail;
@@ -627,58 +580,38 @@ __found:
 
 
 
-	//
-	// FAT
-	//
-
+    // FAT
     //Carrega fat na memória.
+    // #bugbug: 
+    // Não devemos carregar a FAT na memória toda vez que 
+    // formos carregar um arquivo. 
+    // Talvez ela deva ficar sempre na memória.
+    // Precisamos de estruturas para volumes que nos dê esse 
+    // tipo de informação
 
 //loadFAT:
 
-
-//#ifdef KERNEL_VERBOSE		
-	//printf ("loading FAT..\n");
-//#endif 
-
-
-	//=============================
-	// #bugbug: 
-	// Não devemos carregar a FAT na memória toda vez que 
-	// formos carregar um arquivo. 
-	// Talvez ela deva ficar sempre na memória.
-	// precisamos de estruturas para volumes que nos dê esse tipo de informação
-
     fs_load_fat();
-    
-    
-    
-    //
-    // CLUSTERS
-    //
 
+
+    // Load clusters.
     // Carregar o arquivo, cluster por cluster.
     // #todo: 
     // Por enquanto, um cluster é igual à um setor, 512 bytes.
- 
+    // Loop de entradas na FAT.
+    // #todo: 
+    // Esse loop é provisório, while pode ser problema.
+    
+    // #todo
+    // Tabela temporária para salvar os números dos clusters
+    // usados pelo arquivo.
+    // ?? Qual será o tamanho dessa tabela ??
+    //unsigned short tmp_table[1024];
 
-//#ifdef KERNEL_VERBOSE		
-    //printf ("Loading clusters..\n");
-//#endif
-
-	// Loop: 
-	//     Loop de entradas na FAT.
-    //     @todo: Esse loop é provisório, while pode ser problema.
-	
-	//
-	// Carregar o arquivo.
-	//
-
-
-// Loop.
 __loop_next_entry:
 
     // #todo
-    // Para o caso de termos mais de um setor por cluster.
+    // Esse while é para o caso de termos mais de um setor por cluster.
     // Mas não é nosso caso até o momento.
 
 	/*
@@ -701,10 +634,25 @@ __loop_next_entry:
     };
 	*/
 
+
     // #todo
     // Poderia ter uma versão dessa função para ler
     // um dado número de setores consecutivos.
 
+
+    // #todo
+    // #importante
+    // Esse é o momento em que vamos registrar na estrutura de arquivos
+    // quais foram os clusters usados pelo arquivo, para assim podermos
+    // salvar somente somente os setores modificados e não sempre o 
+    // arquivo todo.
+    // >> Mas não temos a estrutura de arquivos no momento.
+    // Mesmo assim, talvez ja possomos salvar os números dos clusters
+    // em uma tabela temporária.
+    
+    //tmp_table[tmp_table_index] = cluster;
+    //tmp_table_index++;
+    
     //
     // Read LBA.
     //
@@ -725,16 +673,23 @@ __loop_next_entry:
 
     cluster = (unsigned short) next;
 
-    if ( cluster == 0xFFFF || cluster == 0xFFF8 ){ 
-        goto done; 
+    // ?? done
+    if ( cluster == 0xFFFF || cluster == 0xFFF8 )
+    { 
+        // ?? message  
+        // salvar a tabela na estrutura de arquivo.
+        // Onde está a estrutura de arquivos ??
+        // Em que momento ela é criada ?
+        // #bugbug: tem arquivo carregado pelo kernel
+        // sem ter sido registrado na estrutura do processo kernel.
+        return (unsigned long) 0; 
     }
 
     goto __loop_next_entry;
 
 
-
     //
-    // Fail!
+    // Fail
     //
 
 fail:
@@ -742,18 +697,6 @@ fail:
     printf ("fsLoadFile fail: file={%s}\n", file_name );
     refresh_screen ();
     return (unsigned long) 1;
-
-    //
-    // Done.
-    //
-
-done:
-
-    // #debug support
-    // printf("fsLoadFile: done\n");
-    // refresh_screen(); 
-
-    return (unsigned long) 0;
 }
 
 

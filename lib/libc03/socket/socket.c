@@ -78,6 +78,7 @@ int __socket_pipe ( int pipefd[2] ){
 // POSIX.1-2001, POSIX.1-2008, 4.4BSD.  socketpair() first appeared in
 // 4.2BSD.  It is generally portable to/from non-BSD systems supporting
 // clones of the BSD socket layer (including System V variants).
+// #bugbug: Porque o termo pipe é usado ???
 
 int socketpair (int domain, int type, int protocol, int sv[2]){
 
