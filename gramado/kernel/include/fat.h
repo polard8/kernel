@@ -1,5 +1,9 @@
+/*
+ * File: fat.h 
+ * 
+ *     2015 - Created by Fred Nora.
+ */
 
-// fat.h
 
 // definições, variáveios, estruturas e protótipos
 // específicos para o sistema de arquivos fat16.
@@ -112,35 +116,26 @@
 struct fat16_directory_entry_d 
 {
     unsigned char   FileName[11];       //8.3   
-                          
-    unsigned char   Attributes;     
-    unsigned char   Reserved1;                           
+
+    unsigned char   Attributes;  
+    unsigned char   Reserved1; 
     unsigned char   CreationMS;
-                         
-    unsigned short  CreationTime;                     
-    unsigned short  CreationDate;                   
+
+    unsigned short  CreationTime; 
+    unsigned short  CreationDate; 
     unsigned short  LastAccessDate;
-    unsigned short  Reserved2;          //for fat32               
-    unsigned short  LastWriteTime;                    
-    unsigned short  LastWriteDate;                    
-    unsigned short  StartingCluster;               
-    
-    unsigned long   FileSize;                         
-};                                     
-//struct fat16_directory_entry_d *FAT16CurrentDirectoryEntry;
+    unsigned short  Reserved2;          //for fat32 
+    unsigned short  LastWriteTime;  
+    unsigned short  LastWriteDate;  
+    unsigned short  StartingCluster; 
+
+    unsigned long   FileSize; 
+};  
+
+// struct fat16_directory_entry_d *FAT16CurrentDirectoryEntry;
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+//
+// End.
+//
 

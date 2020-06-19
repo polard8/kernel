@@ -246,14 +246,14 @@ void handle_request (int fd){
 
         // Pegar o input!
 
-        //gde_enter_critical_section ();
-        //gramado_system_call ( 111,
-        //    (unsigned long) &message_buffer[0],
-        //    (unsigned long) &message_buffer[0],
-        //    (unsigned long) &message_buffer[0] );
-        //gde_exit_critical_section ();
+        gde_enter_critical_section ();
+        gramado_system_call ( 111,
+            (unsigned long) &message_buffer[0],
+            (unsigned long) &message_buffer[0],
+            (unsigned long) &message_buffer[0] );
+        gde_exit_critical_section ();
         
-        message_buffer[1] = SERVER_PACKET_TYPE_EVENT;
+        //message_buffer[1] = SERVER_PACKET_TYPE_EVENT;
         send ( fd, __buffer, sizeof(__buffer), 0 );
         return;
     }

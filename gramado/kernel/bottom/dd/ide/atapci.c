@@ -35,15 +35,16 @@ const char *pci_classes[] = {
 
 
 /* 
- * read_pci_config_addr:
+ * diskReadPCIConfigAddr:
  *     READ 
  */
 
 uint32_t 
-diskReadPCIConfigAddr ( int bus, 
-                        int dev,
-                        int fun, 
-                        int offset )
+diskReadPCIConfigAddr ( 
+    int bus, 
+    int dev,
+    int fun, 
+    int offset )
 {
     out32 ( PCI_PORT_ADDR, CONFIG_ADDR( bus, dev, fun, offset ) );
 
@@ -52,16 +53,17 @@ diskReadPCIConfigAddr ( int bus,
 
 
 /* 
- * write_pci_config_addr:
+ * diskWritePCIConfigAddr:
  *     WRITE 
  */
 
 void 
-diskWritePCIConfigAddr ( int bus, 
-                         int dev,
-                         int fun, 
-                         int offset, 
-                         int data )
+diskWritePCIConfigAddr ( 
+    int bus, 
+    int dev,
+    int fun, 
+    int offset, 
+    int data )
 {
     out32 ( PCI_PORT_ADDR, CONFIG_ADDR( bus, dev, fun, offset ) );
 
@@ -69,9 +71,10 @@ diskWritePCIConfigAddr ( int bus,
 }
 
 
+
 /*
  ********************************************
- * pci_scan_device:
+ * diskPCIScanDevice:
  *     Busca um dispositivo de acordo com a classe.  
  *     Esta função deve retornar uma varia'vel contendo: 
  *     + O número de barramento, 
@@ -132,8 +135,7 @@ uint32_t diskPCIScanDevice ( int class ){
 
 	// Fail !
 
-
-    kprintf ("PCI device NOT detected\n");
+    kprintf ("diskPCIScanDevice: PCI device NOT detected\n");
 
 	//#bugbug
 	//isso e' lento
@@ -239,27 +241,24 @@ int diskATAPCIConfigurationSpace ( struct pci_device_d *D ){
 
         // Compatibilidade e nativo, primary.
         data  = diskReadPCIConfigAddr ( D->bus, D->dev, D->func, 8 );
-        if ( data & 0x200 )
-        { 
+        if ( data & 0x200 ){ 
             diskWritePCIConfigAddr ( D->bus, D->dev, D->func, 8, data | 0x100 ); 
-        }; 
+        }
 
 
         // Compatibilidade e nativo, secundary.
         data = diskReadPCIConfigAddr ( D->bus, D->dev, D->func, 8 );
-        if ( data & 0x800 )
-        { 
+        if ( data & 0x800 ){ 
             diskWritePCIConfigAddr ( D->bus, D->dev, D->func, 8, data | 0x400 ); 
-        };
+        }
 
 
         data = diskReadPCIConfigAddr ( D->bus, D->dev, D->func, 8 );
-        if ( data & 0x8000 )
-        {
+        if ( data & 0x8000 ){
             // Bus Master Enable
             data = diskReadPCIConfigAddr (D->bus, D->dev, D->func, 4);
             diskWritePCIConfigAddr ( D->bus, D->dev, D->func, 4, data | 0x4);
-        };
+        }
 
 
         // Habilitar interrupcao (INTx#)
@@ -365,7 +364,6 @@ int diskATAPCIConfigurationSpace ( struct pci_device_d *D ){
                     // não é suportado.
 
                 }else{
- 
                     panic ("diskATAPCIConfigurationSpace: Mass Storage Device NOT supported");
                 };
 
@@ -455,6 +453,7 @@ int diskATAPCIConfigurationSpace ( struct pci_device_d *D ){
 
     return (PCI_MSG_SUCCESSFUL);
 }
+
 
 //
 // End.

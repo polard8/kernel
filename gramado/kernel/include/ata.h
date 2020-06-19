@@ -225,9 +225,9 @@ struct dev_nport dev_nport;
  */ 
 struct ata
 {
-	//int used;
-    //int magic;	
-	
+    //int used;
+    //int magic;
+
     uint8_t chip_control_type;
     uint8_t channel;
     uint8_t dev_type;  
@@ -238,7 +238,7 @@ struct ata
     uint32_t ctrl_block_base_address;
     uint32_t bus_master_base_address;
     uint32_t ahci_base_address;
-	
+
 };
 struct ata ata;
 
@@ -280,12 +280,9 @@ typedef struct st_dev
 //
 
 
+// handlers.
 void ata_handler1 (void);
 void ata_handler2 (void);
-
-
-
-// ata_dev.c
 
 int nport_ajuste(char nport);
 
@@ -293,18 +290,13 @@ void ide_mass_storage_initialize (void);
 
 int ide_dev_init(char port);
 
-
-// ata_main.c
 void set_ata_addr(int channel);
 
-
-// ata.c
 int ide_identify_device(uint8_t nport);
 
-
 void ata_wait(int val);
-void ata_delay (void);
 
+void ata_delay (void);
 
 unsigned char ata_wait_not_busy (void);
 
@@ -318,26 +310,20 @@ unsigned char ata_wait_irq (void);
 
 unsigned char ata_status_read (void);
 
-
 void ata_cmd_write(int cmd_val);
 
 unsigned char ata_assert_dever(char nport);
 
-
-// ata_pio.c
 void ata_pio_read ( void *buffer, int bytes);
 void ata_pio_write ( void *buffer, int bytes);
 
-// ide.c
 
- 
-
-//ide_dma.c
 void 
-ide_dma_data ( void *addr, 
-               uint16_t byte_count, 
-               uint8_t flg, 
-               uint8_t nport );
+ide_dma_data ( 
+    void *addr, 
+    uint16_t byte_count, 
+    uint8_t flg, 
+    uint8_t nport );
 
 
 void ide_dma_start (void);
@@ -354,31 +340,30 @@ int ide_dma_read_status (void);
 
 
 //
-// PCI support.
+// PCI support for disks.
 //
-
 
 
 // PCI READ.
 uint32_t 
-diskReadPCIConfigAddr ( int bus, 
-                        int dev,
-                        int fun, 
-                        int offset );
+diskReadPCIConfigAddr ( 
+    int bus, 
+    int dev,
+    int fun, 
+    int offset );
 
 
 // PCI WRITE.   
 void 
-diskWritePCIConfigAddr ( int bus, 
-                         int dev,
-                         int fun, 
-                         int offset, 
-                         int data );
+diskWritePCIConfigAddr ( 
+    int bus, 
+    int dev,
+    int fun, 
+    int offset, 
+    int data );
 
 
 uint32_t diskPCIScanDevice ( int class );
-
-
 
 int diskATAPCIConfigurationSpace ( struct pci_device_d *D );
 
@@ -412,7 +397,7 @@ int disk_ata_wait_irq (void);
 void show_ide_info (void);
 
 
-///----------------------------
+//======================================================
 
 
 //incluindo coisas que estavam em disk1.c

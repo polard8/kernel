@@ -8,10 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 //#include <time.h>
-
-//#test
 #include <stdbool.h>
 
 
@@ -24,10 +21,7 @@ int main ( int argc, char *argv[] ){
 
     int code = 0;
     char *env_string;
-    
-    
 
-    
     printf ("\n");
     printf ("####################################################\n");
       puts ("################### Reboot #########################\n");
@@ -47,11 +41,11 @@ int main ( int argc, char *argv[] ){
    
     while(1){}
     */   
- 
-       
+
+
     env_string = (char *) getenv ("USER");
     printf(">>> Bye %s! :) \n", env_string);
-
+    //while(1);
 
 
 	// #todo

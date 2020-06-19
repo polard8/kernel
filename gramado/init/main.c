@@ -220,10 +220,10 @@ int main ( int argc, char *argv[] ){
     //
     // Child process.
     //    
-    
-    // Isso funciona.
-    // Porém apresenta alguns problemas na máquina real.
-    
+
+    // #todo
+    // In the future we're gonna initialize some servers here.
+
     gramado_system_call ( 900, (unsigned long) "gdeshell.bin", 0, 0 ); 
     //gramado_system_call ( 900, (unsigned long) "gramcode.bin", 0, 0 ); 
     //gramado_system_call ( 900, (unsigned long) "launcher.bin", 0, 0 ); 

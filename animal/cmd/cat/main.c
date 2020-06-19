@@ -11,11 +11,10 @@
 #include <string.h>
 #include <stdio.h>
 #include <unistd.h>
-
-
-
 #include <fcntl.h> 
 #include <errno.h> 
+
+
 
 // #obs
 // Talvez essa rotina não possa ser interrompida.
@@ -27,9 +26,10 @@
 
 
 // #test
-// usar ftell e fseek pra calcular o tamanho do arquivo.
-// provavlemente fasm esta usando isso e essas funções ainda não funcionam.
- 
+// Usar ftell e fseek pra calcular o tamanho do arquivo.
+// Provavelmente fasm esta usando isso e essas funções ainda 
+// não funcionam.
+
 int main ( int argc, char *argv[] ){
 
     FILE *fp;
@@ -38,7 +38,6 @@ int main ( int argc, char *argv[] ){
     char buffer[1024];
     int nreads = 0;
     int nwrites = 0;
-
 
 
     // fopen.
@@ -52,19 +51,20 @@ int main ( int argc, char *argv[] ){
     }
 
     nreads = read ( fileno(fp), buffer, sizeof(buffer) );
-    
+
     if (nreads <=0 ){
-        printf ("read fail\n");
+        printf ("cat: read fail\n");
         exit(-1);
     }
-    
+
+
     //
     // Testing size.
     //
-    
-    fseek(fp, 0, SEEK_END);  // seek to end of file
-    size_t size = ftell(fp); // get current file pointer
-    fseek(fp, 0, SEEK_SET);  // seek back to beginning of file
+
+    fseek(fp, 0, SEEK_END);   // seek to end of file
+    size_t size = ftell(fp);  // get current file pointer
+    fseek(fp, 0, SEEK_SET);   // seek back to beginning of file
     printf (">>>> size %d \n",size);  
 
 
@@ -72,20 +72,19 @@ int main ( int argc, char *argv[] ){
     
     // 1 = stdout = virtual console.
     nwrites = write ( 1, buffer, sizeof(buffer) );
-    
+
     if (nwrites <=0 ){
-        printf ("write fail\n");
+        printf ("cat: write fail\n");
         exit(-1);
     }
-    
-    
+
+
     // # testing libc
     // creat
     //int s = -1;
     //s = creat ( "nothing.txt", 0666);
     //if(s<=0)
     //    printf ("creat fail\n");
-
 
 
     return 0;

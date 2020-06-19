@@ -1,7 +1,7 @@
 /*
- * Fle: main.c
+ * File: main.c
  * 
- * cat command for Gramado.
+ * #todo: Porting fasm to Gramado.
  */
 
 
@@ -11,11 +11,9 @@
 #include <string.h>
 #include <stdio.h>
 #include <unistd.h>
-
-
-
 #include <fcntl.h> 
 #include <errno.h> 
+
 
 // #obs
 // Talvez essa rotina não possa ser interrompida.

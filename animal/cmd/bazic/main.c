@@ -1,13 +1,16 @@
+
+// bazic
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 
+
 #define MEM_SIZE	1024
-
 #define VAR_START	(MEM_SIZE / 2)
-
 #define MAX_STRING_SIZE 128
+
 
 static unsigned char memory[MEM_SIZE];
 static unsigned char *programEnd;
@@ -40,6 +43,7 @@ typedef struct {
     char *valStr;
     unsigned int length;
 } Value;
+
 
 static void dumpData(unsigned char *data, int len)
 {
@@ -768,10 +772,12 @@ static int tokenizer(char *str)
     return 0;
 }
 
-int main(int argc, char *argv[])
-{
+
+// main
+int main (int argc, char *argv[]){
+
     char str[80];
-    
+
     int poolsz = 80;
     
 

@@ -292,7 +292,6 @@ struct dir_d
 
 struct filesystem_d
 {
-    
     // Object info.
 
     object_type_t objectType;
@@ -305,7 +304,6 @@ struct filesystem_d
     int type;
 
     char *name;
-    
 
     
     // Number of entries in the root dir.
@@ -319,19 +317,18 @@ struct filesystem_d
     // #bugbug
     // Thats specific for fat16.
     // fat16.
-    unsigned long rootdir_address; //endereço do rootdir
-    unsigned long rootdir_lba;     //lba
-    unsigned long fat_address;     //endereço da fat  
-    unsigned long fat_lba;      //lba
-    unsigned long dataarea_address; //endereço do inicio da area de dados.
-    unsigned long dataarea_lba;   //lba
+    unsigned long rootdir_address;   //endereço do rootdir
+    unsigned long rootdir_lba;       //lba
+    unsigned long fat_address;       //endereço da fat  
+    unsigned long fat_lba;           //lba
+    unsigned long dataarea_address;  //endereço do inicio da area de dados.
+    unsigned long dataarea_lba;      //lba
 
 
     // #bugbug
     // its a disk stuff.
     // Sectors per cluster.
     int spc;    
-
 
     //...
 };
@@ -386,7 +383,7 @@ struct file_access_d *CurrentFileAccess;
 int fs_get_free_fd ( int pid );
 
 
-//atualiza a string do pwd na estrutura do processo. 
+// Atualiza a string do pwd na estrutura do processo. 
 int fs_initialize_process_pwd ( int pid, char *string ); 
 
 int fs_print_process_pwd ( int pid );
@@ -420,7 +417,8 @@ void fsUpdateWorkingDiretoryString ( char *string );
 /* 
  ************************************************
  * fs_pathname_backup:
- *     Remove n nomes de diretório do pathname do processo indicado no argumento.
+ *     Remove n nomes de diretório do pathname do processo indicado 
+ * no argumento.
  *     Copia o nome para a string global.
  *
  *     Remove the last N directories from PATH.  
@@ -446,15 +444,13 @@ void fs_pathname_backup ( int pid, int n );
 int sys_read_file ( char *file_name,  int flags, mode_t mode );
 
 
-
-
 int
-sys_write_file ( char *file_name, 
-                 unsigned long file_size,
-                 unsigned long size_in_bytes,
-                 char *file_address,
-                 char flag );
- 
+sys_write_file ( 
+    char *file_name, 
+    unsigned long file_size,
+    unsigned long size_in_bytes,
+    char *file_address,
+    char flag );
 
 
 //
@@ -469,11 +465,12 @@ int sys_create_empty_directory ( char *dir_name );
 
 
 
-
 void 
-fsFAT16ListFiles ( const char *dir_name, 
-                   unsigned short *dir_address, 
-                   int number_of_entries );
+fsFAT16ListFiles ( 
+   const char *dir_name, 
+   unsigned short *dir_address, 
+   int number_of_entries );
+
 
 //MBR support.
 void fsCheckMbrFile ( unsigned char *buffer );
@@ -544,11 +541,11 @@ load_directory (
 // O endereço do diretório será passado via argumento.
 
 unsigned long 
-fsLoadFile ( unsigned long fat_address,
-             unsigned long dir_address,
-             unsigned char *file_name, 
-             unsigned long file_address );
-
+fsLoadFile ( 
+    unsigned long fat_address,
+    unsigned long dir_address,
+    unsigned char *file_name, 
+    unsigned long file_address );
 
 
 // Get file size.
@@ -561,11 +558,12 @@ unsigned long fsGetFileSize ( unsigned char *file_name );
 //
 
 int
-fsSaveFile( char *file_name, 
-            unsigned long file_size,
-            unsigned long size_in_bytes, 
-            char *file_address,
-            char flag );
+fsSaveFile ( 
+    char *file_name, 
+    unsigned long file_size,
+    unsigned long size_in_bytes, 
+    char *file_address,
+    char flag );
 
 
 int fsSearchFile( unsigned char *file_name);
@@ -578,22 +576,21 @@ void *get_file(int Index);
 
 
 
-
-
 //
 // Create
 //
 
 int fs_create_file( char *name );
-unsigned long fs_create_dir( char *name , unsigned long id);
+unsigned long fs_create_dir ( char *name , unsigned long id);
 
 
 void 
-fs_create_entry ( char *name, 
-                  unsigned long id, 
-                  unsigned long eid, 
-                  unsigned long cluster, 
-                  unsigned long size );
+fs_create_entry ( 
+    char *name, 
+    unsigned long id, 
+    unsigned long eid, 
+    unsigned long cluster, 
+    unsigned long size );
 
 
 void fs_create_name( char *name, unsigned long id,unsigned long eid);
@@ -605,10 +602,12 @@ void fs_get_entry(unsigned long id, unsigned long eid);
 void fs_load_dir(unsigned long id);
 void fs_save_dir(unsigned long id);
 
+
 void 
-fs_set_entry_status ( unsigned long id, 
-                      unsigned long eid, 
-                      unsigned long status );
+fs_set_entry_status ( 
+    unsigned long id, 
+    unsigned long eid, 
+    unsigned long status );
 
 
 unsigned long fs_get_entry_status(unsigned long id, unsigned long eid);
@@ -628,43 +627,49 @@ unsigned long fs_check_cluster (unsigned long id);
 
 
 unsigned long 
-fatClustToSect( unsigned short cluster, 
-                unsigned long spc, 
-                unsigned long first_data_sector );
+fatClustToSect ( 
+    unsigned short cluster, 
+    unsigned long spc, 
+    unsigned long first_data_sector );
 
 
 void 
-fatLoadCluster ( unsigned long sector, 
-                 unsigned long address, 
-                 unsigned long spc );
+fatLoadCluster ( 
+    unsigned long sector, 
+    unsigned long address, 
+    unsigned long spc );
 
 
 void 
-fatWriteCluster ( unsigned long sector, 
-                  unsigned long address, 
-                  unsigned long spc );
+fatWriteCluster ( 
+    unsigned long sector, 
+    unsigned long address, 
+    unsigned long spc );
 
 
 void 
-MountShortFileName( char *buffer, 
-                    struct dir_entry_d *entry );
+MountShortFileName ( 
+    char *buffer, 
+    struct dir_entry_d *entry );
 
 
 int fsList ( const char *dir_name );
 
 
 void 
-fsListFiles( int disk_id, 
-             int volume_id, 
-             int directory_id );
+fsListFiles ( 
+    int disk_id, 
+    int volume_id, 
+    int directory_id );
 
 
 
 // interna
 // procura uma entrada vazia no diretório 
 int 
-findEmptyDirectoryEntry ( unsigned long dir_address, 
-                          int number_of_entries );
+findEmptyDirectoryEntry ( 
+    unsigned long dir_address, 
+    int number_of_entries );
 
 
 // Modificador de string.
@@ -688,9 +693,9 @@ void fs_show_mounted(int i);
 void fs_show_mounted_list(void);
 
 
-
 /*
- * Initialization support.
+ * fsInit:
+ *     Initialization support.
  */
 
 int fsInit (void);
