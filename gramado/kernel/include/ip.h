@@ -214,9 +214,9 @@ typedef struct udp_header_d udp_header_t;
 struct udp_header_d 
 {
     unsigned short SourcePort;
-	unsigned short DestinationPort;
+    unsigned short DestinationPort;
     unsigned short Length;
-	unsigned short Checksum;	
+    unsigned short Checksum;
 };
 
 
@@ -322,12 +322,20 @@ struct ipv6_header_d
 
 
 
-// We need adapter info: like: name, description
-//so não sei se informações sobre o adaptador deveria ficar nesse arquivos.
 
 
-//send ipv4
-void send_ipv4_packet ( struct intel_nic_info_d *dev, uint32_t len, uint8_t *data );
+// We need adapter info: 
+// like: name, description
+// So não sei se informações sobre o adaptador deveria 
+// ficar nesse arquivos.
+
+
+// Send ipv4
+void 
+send_ipv4_packet ( 
+    struct intel_nic_info_d *dev, 
+    uint32_t len, 
+    uint8_t *data );
 
 
 

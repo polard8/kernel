@@ -313,17 +313,18 @@ extern void do_executa_new_task (void);
 #include "ps2mouse.h"
 #include "ps2kbd.h"
 
-//#net
+
+//
+//    ==== NETWORK ====
+//
 
 #include "connect.h" 
 #include "host.h"
+
 #include "ethernet.h"
-
-
 #include "arp.h"
 #include "udp.h"
 #include "tcp.h"
-
 
 //intel nic - network interface controller.
 #include "nicintel.h"      
@@ -336,13 +337,21 @@ extern void do_executa_new_task (void);
 //#include "ipv6.h" 
 #include "ipv4mac.h" 
 #include "icmp.h" 
+//...
+
+#include "packet.h"      // network packets.
+
 #include "channel.h"     //(network) Channel       (sw)
 #include "client.h"      //(network) Client process support. 
 #include "ns.h"          //(network) Network Server.
 #include "network.h"     //(network) Gerenciamento de rede.  
 
-
 #include "socket.h"
+
+
+//
+//    ==== DEVICES ====
+//
 
 
 // devices

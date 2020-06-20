@@ -18,7 +18,7 @@
 // #define ETH_ALEN 6 
 // See: https://en.wikipedia.org/wiki/Address_Resolution_Protocol
 
-struct  ether_arp {
+struct ether_arp {
 
     uint16_t type;   // Hardware type (HTYPE)
     uint16_t proto;  // Protocol type (PTYPE)
