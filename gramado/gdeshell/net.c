@@ -1,11 +1,18 @@
+/*
+ * File: net.c 
+ *     Network support for gdeshell.
+ */
+
 
 
 #include "shell.h"
-
 #include "net.h"
 
 
-    //temporary. we need a system function to get this number.
+
+
+//temporary. we need a system function to get this number.
+
 
 /*    
 	uint8_t host_mac_address[6];
@@ -34,9 +41,10 @@ unsigned char host_mac_address[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
 
 void 
-__SendARP ( uint8_t source_ip[4], 
-          uint8_t target_ip[4], 
-          uint8_t target_mac[6] )
+__SendARP ( 
+    uint8_t source_ip[4], 
+    uint8_t target_ip[4], 
+    uint8_t target_mac[6] )
 {
      
     //
@@ -55,14 +63,13 @@ __SendARP ( uint8_t source_ip[4],
     struct ether_header *eh;
     struct ether_arp *h;  
   
-//==============================================
-	// # ethernet header #
-	//
+    //==============================================
+    // # ethernet header #
+    //
 
     eh = (void *) malloc ( sizeof(struct ether_header ) );
 
-    if ( (void *) eh == NULL)
-    {
+    if ( (void *) eh == NULL){
         printf ("shellTestARP: eh struct fail\n");
         return;
         //die ();
@@ -85,24 +92,20 @@ __SendARP ( uint8_t source_ip[4],
 
 		//...
     };
-  
-  
 
 
-//==============================================
-	// # arp header #
-	//
+    //==============================================
+    // # arp header #
+    //
 
     h = (void *) malloc ( sizeof(struct  ether_arp) );
 
-    if ( (void *) h == NULL)
-    {
+    if ( (void *) h == NULL){
         printf ("shellTestARP: struct h fail");
         return;
         //die ();
 
     }else{
-
 
 		// Hardware type (HTYPE)   (00 01)
 		// Protocol type (PTYPE)   (08 00)
@@ -127,7 +130,7 @@ __SendARP ( uint8_t source_ip[4],
 		// O endereço mac de origem pegamos na estrutura no nic intel.
 		// O endereço mac de destino foi passado via argumento.
 
-        for( i=0; i<6; i++)
+        for ( i=0; i<6; i++ )
         {
 			//#todo: pegar o mec do host.
 		   // h->arp_sha[i] = currentNIC->mac_address[i]; 
@@ -143,7 +146,7 @@ __SendARP ( uint8_t source_ip[4],
 		// target ip
 		// Os endereços foram passados via argumento.
 		
-        for ( i=0; i<4; i++)
+        for ( i=0; i<4; i++ )
         {
             h->arp_spa[i] = source_ip[i]; 
             h->arp_tpa[i] = target_ip[i]; 
@@ -152,15 +155,15 @@ __SendARP ( uint8_t source_ip[4],
         //...
     };
   
-   //==================================
-	//#debug
-	//show arp
-	
+    //==================================
+    // #debug
+    // show arp
+
 	printf("\n\n");
 	printf("[arp]\n\n");
-	printf("type={%x} proto={%x} hlen={%d} plen={%d} op={%x} \n", 
-	    h->type ,h->proto ,h->hlen ,h->plen ,h->op);
-	
+    printf("type={%x} proto={%x} hlen={%d} plen={%d} op={%x} \n", 
+        h->type ,h->proto ,h->hlen ,h->plen ,h->op);
+
 	printf("\n sender: mac ");
 	for( i=0; i<6; i++){ printf("%x ",h->arp_sha[i]); }
 	printf("\n sender: ip ");
@@ -170,7 +173,7 @@ __SendARP ( uint8_t source_ip[4],
 	printf("\n target: ip ");
 	for( i=0; i<4; i++){ printf("%d ",h->arp_tpa[i]); }
 	printf("\n\n");
-	
+
 	//==================================
 	
 //
@@ -185,14 +188,14 @@ __SendARP ( uint8_t source_ip[4],
     //unsigned char *buffer = (unsigned char *) 0;
     unsigned char *buffer;
     
-    buffer = (unsigned char *) malloc ( 512 );
+    buffer = (unsigned char *) malloc(512);
     
     
 	// #importante:
 	// Preparando ponteiros para manipularmos as estruturas usadas no pacote.
 
     unsigned char *src_ethernet = (unsigned char *) eh;
-    unsigned char *src_arp = (unsigned char *) h;
+    unsigned char *src_arp      = (unsigned char *) h;
 
 
     //
@@ -215,8 +218,6 @@ __SendARP ( uint8_t source_ip[4],
 	// 14 + 28;
 
     //currentNIC->legacy_tx_descs[old].length = ( ETHERNET_HEADER_LENGHT + ARP_HEADER_LENGHT );
-    
-    
 
 
     printf ("done\n");
@@ -224,23 +225,27 @@ __SendARP ( uint8_t source_ip[4],
 
 
 
-
+// Testing ARP.
+// sending arp.
 void __shellTestARP (){
 
     printf ("\n\n ============ shellTestARP ================= \n\n"); 
 
+    // Source
     uint8_t source_ip_address[4];
-	source_ip_address[0] = 192;
-	source_ip_address[1] = 168;
-	source_ip_address[2] = 1;   
-	source_ip_address[3] = 112; 
+    source_ip_address[0] = 192;
+    source_ip_address[1] = 168;
+    source_ip_address[2] = 1;   
+    source_ip_address[3] = 112; 
 
-	uint8_t target_ip_address[4];
-	target_ip_address[0] = 192;
-	target_ip_address[1] = 168;
-	target_ip_address[2] = 1; 
-	target_ip_address[3] = 111; 
-	
+    // Target.
+    uint8_t target_ip_address[4];
+    target_ip_address[0] = 192;
+    target_ip_address[1] = 168;
+    target_ip_address[2] = 1; 
+    target_ip_address[3] = 1; //111; 
+
+    // Broadcast.
 	uint8_t target_mac_address[6];
 	target_mac_address[0] = 0xFF;
 	target_mac_address[1] = 0xFF;

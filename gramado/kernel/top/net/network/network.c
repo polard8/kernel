@@ -1529,6 +1529,7 @@ int network_decode_buffer ( unsigned long buffer_address ){
 int do_ipv4 ( unsigned long buffer )
 {
     debug_print ("do_ipv4: [TODO]\n");
+    //printf("IPv4 \n");    
     return 0;
 }
 
@@ -1538,7 +1539,7 @@ int do_ipv6 ( unsigned long buffer )
     debug_print ("do_ipv6: [TODO]\n");
     
     //printf ("do_ipv6\n");
-    //printf("IPv6 ");
+    //printf("IPv6 \n");
     //ipv6_h = (void *) &buffer[14];
 
     //handle_ipv6 ( (struct intel_nic_info_d *) currentNIC, 
@@ -1611,8 +1612,8 @@ __reply_received:
     // alguma informação que solicitamos, como o MAC de um dispositivo.
     
     //#debug
-    printf ("\n ARP REPLY received \n");
-    refresh_screen();
+    //printf ("\n ARP REPLY received \n");
+    //refresh_screen();
         
     //#debug
     //printf("REPLY received\n");
@@ -1633,10 +1634,9 @@ __request_received:
     // Recebemos um request.
     // Vamos responter.
 
-
     // #debug
-    //printf ("\n ARP REQUEST received \n");
-    //refresh_screen();
+    printf ("\n ARP REQUEST received \n");
+    refresh_screen();
 
     // printf ("\n ARP REQUEST received | ");
     // for ( i=0; i<6; i++){ printf("%x ",eh->src[i]); };
