@@ -144,12 +144,12 @@ network_procedure (
                 break; 
             }
             // Mensagem.
-           __process->control->window = NULL;
-           __process->control->msg = (int) MSG_AF_INET;      //temos uma mensagem. 
-           __process->control->long1 = (unsigned long) 0;    //0;
-           __process->control->long2 = (unsigned long) 0;    //0;
+           __process->control->window  = NULL;
+           __process->control->msg     = (int) MSG_AF_INET;    //Temos uma mensagem. 
+           __process->control->long1   = (unsigned long) 0;
+           __process->control->long2   = (unsigned long) 0;
            __process->control->newmessageFlag = 1;
-            
+
             // pty_send_message_to_thread ( (unsigned long) msg_buffer, (int) t->tid );  
             //network_status = ; //apto a
             break;
@@ -287,7 +287,6 @@ int networkInit (void){
         //HostInfo->__hostname =
         HostInfo->hostName_len = (size_t) HOSTNAME_BUFFER_SIZE;
 
-
         HostInfo->hostVersion = NULL;
 
         HostInfo->hostVersionMajor = 0;
@@ -301,7 +300,7 @@ int networkInit (void){
 
 	// Criando socket para local host porta 80;
 	// Localhost (127.0.0.1):80 
-	// COnfigurando soquete atual.
+	// Configurando soquete atual.
 
     LocalHostHTTPSocket = (struct socket_d *) create_socket (0,0);  
 
@@ -328,7 +327,7 @@ int networkInit (void){
 
 
 // #todo:
-// DEbug routine.
+// Debug routine.
 // It just shows some network info.
 
 void show_network_info (void){
@@ -337,6 +336,7 @@ void show_network_info (void){
 
     if ( network_status == 1 )
         printf ("Network initialized\n");
+
 
     if ( network_status == 0 )
         printf ("Network uninitialized\n");
@@ -349,8 +349,8 @@ void show_network_info (void){
     }else{
 
         // #todo: 
-        printf ("IP %s \n ", HostInfo->hostIP );
-        printf ("MAC %s \n ", HostInfo->hostMAC );
+        printf ("IP %s ", HostInfo->hostIP );
+        printf ("MAC %s\n", HostInfo->hostMAC );
         //...
     };
 
@@ -479,24 +479,14 @@ void show_current_nic_info (void){
 //#todo
 //ipv6 needs to have its own document.
 
-int 
-handle_ipv6 ( 
-    struct intel_nic_info_d *nic, 
-    struct ipv6_header_d *header )
-{
-    //printf("\n");
+int handle_ipv6 ( struct ipv6_header_d *header ){
+
+    //debug_print ("handle_ipv6: Initializing ...\n");
     //printf("handle_ipv6: Initializing ...\n");
-
-
-    if ( (void *) nic == NULL ){
-        printf ("handle_ipv6: nic fail\n");
-        return -1;
-    }
-
 
     if ( (void *) header == NULL ){
         printf ("handle_ipv6: header fail\n");
-        return -2;
+        return -1;
 
     }else{
 
@@ -524,6 +514,7 @@ handle_ipv6 (
 
         return 0;
     };
+
 
     return 1;
 }
@@ -592,7 +583,7 @@ void testNIC (void){
     target_ip_address[0] = 192;
     target_ip_address[1] = 168;
     target_ip_address[2] = 1; 
-    target_ip_address[3] = 111; 
+    target_ip_address[3] = 105;//111; 
 
     // MAC for broadcast.
     // 0xFF 0xFF 0xFF 0xFF 0xFF 0xFF.
@@ -629,14 +620,14 @@ void testNIC (void){
 
 	// #todo: 
 	// testar isso;
+
     printf ("testNIC: Sending IPV4 \n");
     network_SendIPV4_UDP ( source_ip_address, target_ip_address, 
         target_mac_address, xxxdata, 20 );
 
 
-	//se tivermos informa��es para mostrar � sinal que a inicializa��o do kernel 
-	//funcionou. 
-	
+	// Se tivermos informações para mostrar 
+	// é sinal que a inicialização do kernel funcionou. 
 
 	//printf("\n\n");
 	//pciInfo ();
@@ -648,8 +639,6 @@ void testNIC (void){
 
     refresh_screen ();
 }
-
-
 
 
 
@@ -826,8 +815,8 @@ network_SendIPV4_UDP (
         //161 SNMP Simple Network Man. Prot.
 
     
-        udp->SourcePort = 20;   //FTP-DATA File Transfer
-        udp->DestinationPort = 20; //FTP-DATA File Transfer
+        udp->SourcePort = 20;       //FTP-DATA File Transfer
+        udp->DestinationPort = 20;  //FTP-DATA File Transfer
         //This field specifies the length in bytes of the UDP header and UDP data. 
         //The minimum length is 8 bytes, the length of the header. 
         udp->Length = (UDP_HEADER_LENGHT + 32); 
@@ -859,11 +848,12 @@ network_SendIPV4_UDP (
     unsigned char *buffer = (unsigned char *) currentNIC->tx_descs_virt[old];
 
 	// #importante:
-	// Preparando ponteiros para manipularmos as estruturas usadas no pacote.
+	// Preparando ponteiros para manipularmos as 
+	// estruturas usadas no pacote.
 
     unsigned char *src_ethernet = (unsigned char *) eh; 
-    unsigned char *src_ipv4 = (unsigned char *) ipv4; 
-    unsigned char *src_udp = (unsigned char *) udp; 
+    unsigned char *src_ipv4     = (unsigned char *) ipv4; 
+    unsigned char *src_udp      = (unsigned char *) udp; 
 
 
 	//
@@ -1532,6 +1522,8 @@ int network_decode_buffer ( unsigned long buffer_address ){
 // Decodificando um pacote ipv4.
 // Precisamos olhar no pacote para sabermos qual � a porta
 // para assim reenviarmos o pacote ao processo conectado a essa porta.
+// #todo:
+// Podemos alertar o gns.
 
 int do_ipv4 ( unsigned long buffer )
 {

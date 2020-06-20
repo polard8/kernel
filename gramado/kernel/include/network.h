@@ -55,7 +55,7 @@ struct network_info_d
 
     int networkIdentifier;  // Número identificador da rede.
     char *networkName;      // Nome da rede.
-    char *networkVersion;   // string mostrando a versão. ex: (1.1.1234)
+    char *networkVersion;   // String mostrando a versão. ex: (1.1.1234)
     unsigned short networkVersionMajor;
     unsigned short networkVersionMinor; 
     unsigned short networkVersionRevision;
@@ -67,7 +67,6 @@ struct network_info_d
 	//struct user_info_d *networkUserinfo;
 	
 	//..
-
 
     struct network_info_d *next;
 };
@@ -88,12 +87,9 @@ network_procedure (
     unsigned long long2 );
 
 
-
 // Tests.
 void network_test(void);
 void testNIC (void);
-
-
 
 
 void networkSetstatus (int status);
@@ -106,10 +102,7 @@ void show_current_nic_info (void);
 
 
 // Manipular o pacote ipv6 recebido pelo handle do e1000.
-int 
-handle_ipv6 ( 
-    struct intel_nic_info_d *nic, 
-    struct ipv6_header_d *header );
+int handle_ipv6 ( struct ipv6_header_d *header );
 
 
 // Send arp.
