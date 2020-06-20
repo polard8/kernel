@@ -296,8 +296,8 @@ int networkInit (void){
         HostInfo->hostArchitecture = 0; 
 
         // ...
-
     };
+
 
 	// Criando socket para local host porta 80;
 	// Localhost (127.0.0.1):80 
@@ -686,20 +686,21 @@ network_SendIPV4_UDP (
     int i=0;
     int j=0;
 
-    // ethernet, arp, ipv4, udp.
-    struct ether_header *eh;
-    struct ether_arp *h;
-    struct ipv4_header_d *ipv4;
-    struct udp_header_d *udp;
+
+    // ethernet, ipv4, udp.
+    struct ether_header   *eh;
+    struct ipv4_header_d  *ipv4;
+    struct udp_header_d   *udp;
 
 
 	//
 	// NIC Intel device structure.
 	//
 
-    if ( currentNIC == NULL ){
-        printf ("network_SendIPV4_UDP: currentNIC fail\n");
-        return -1;
+    if ( (void *) currentNIC == NULL ){
+        debug_print ("network_SendIPV4_UDP: currentNIC fail\n");
+        //printf ("network_SendIPV4_UDP: currentNIC fail\n");
+        return (int) (-1);
 
     }else{
 
@@ -714,7 +715,6 @@ network_SendIPV4_UDP (
 
 
 
-
 	//==============================================
 	// # ethernet header #
 	//
@@ -722,16 +722,17 @@ network_SendIPV4_UDP (
     eh = (void *) kmalloc ( sizeof(struct ether_header ) );
 
     if ( (void *) eh == NULL){
-        printf ("network_SendIPV4_UDP: eh fail");
-        return -1;
+        debug_print ("network_SendIPV4_UDP: eh fail");
+        //printf ("network_SendIPV4_UDP: eh fail");
+        return (int) (-1);
 
     }else{
 
 		// Coloca na estrutura do ethernet header os seguintes valores: 
-		// > endere�o mac da origem.
-		// > endere�o mac do destion.
-		// O endere�o mac da origem est� na estrutura do controlador nic intel. 
-		// O endere�o mac do destino foi passado via argumento.
+		// > endereço mac da origem.
+		// > endereço mac do destion.
+		// O endereço mac da origem está na estrutura do controlador nic intel. 
+		// O endereço mac do destino foi passado via argumento.
 
         for ( i=0; i<6; i++ ){
             eh->src[i] = currentNIC->mac_address[i];    // source 
@@ -740,10 +741,8 @@ network_SendIPV4_UDP (
 
         eh->type = (uint16_t) ToNetByteOrder16 (ETH_TYPE_ARP);
 
-		//...
+		// ...
     };
-
-
 
 
 	//==============================================
@@ -753,32 +752,38 @@ network_SendIPV4_UDP (
     ipv4 = (void *) kmalloc ( sizeof(struct ipv4_header_d) );
 
     if ( (void *) ipv4 == NULL){
-        printf ("network_SendIPV4_UDP: ipv4 fail\n");
-        return -1;
+        debug_print ("network_SendIPV4_UDP: ipv4 fail\n");
+        //printf ("network_SendIPV4_UDP: ipv4 fail\n");
+        return (int) (-1);
 
     }else{
 
         // IPv4 common header
-        ipv4->Version_IHL = 0x45;
-        ipv4->DSCP_ECN = 0x00;
-        ipv4->Identification = 0x0100; 
-        ipv4->Flags_FragmentOffset = 0x0000;
-        ipv4->TimeToLive = 0x40;
-
+        // See: ip.h
+        
+        //>>>>
+        ipv4->Version_IHL = 0x45;     // 8 bit
+        ipv4->DSCP_ECN    = 0x00;     // 8 bit
+        //ipv4->TotalLength           // 16 bit   
+        ipv4->Identification = 0x0100;  // 16 bit 
+        
+        //>>>>
 		// #importante
 		// Existem v�rios protocolos para ip.
 		// TCP=0x6 UDP=0x11
-		
 		//default protocol: UDP
 		//#define IPV4_PROT_UDP 0x11
+        ipv4->Flags_FragmentOffset = 0x0000;  //8 bit
+        ipv4->TimeToLive = 0x40;              //8bit
+        ipv4->Protocol = 0x11;    //IPV4_PROT_UDP;  // 8bit
+        //ipv4->HeaderChecksum                      // 16bit
 
 
-        ipv4->Protocol = 0x11;    //IPV4_PROT_UDP;
-        
-
+        //>>>>
         memcpy ( (void *) &ipv4->SourceIPAddress[0], 
             (const void *) &source_ip[0], 4 );
 
+        //>>>>
         memcpy ( (void *) &ipv4->DestinationIPAddress[0], 
             (const void *) &target_ip[0], 4 );
     };
@@ -1523,9 +1528,11 @@ int network_decode_buffer ( unsigned long buffer_address ){
 }
 
 
-// decodificando um pacote ipv4.
+
+// Decodificando um pacote ipv4.
 // Precisamos olhar no pacote para sabermos qual � a porta
 // para assim reenviarmos o pacote ao processo conectado a essa porta.
+
 int do_ipv4 ( unsigned long buffer )
 {
     debug_print ("do_ipv4: [TODO]\n");
@@ -1534,6 +1541,7 @@ int do_ipv4 ( unsigned long buffer )
 }
 
 
+// Decodificando um pacote ipv6.
 int do_ipv6 ( unsigned long buffer )
 {
     debug_print ("do_ipv6: [TODO]\n");
@@ -1556,7 +1564,8 @@ int do_ipv6 ( unsigned long buffer )
  * 
  */
  
-// decodifica um pacote arp.
+// Decodifica um pacote ARP.
+
 int do_arp ( unsigned long buffer ){
 
     struct ether_header  *eh;

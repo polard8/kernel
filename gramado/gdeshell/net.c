@@ -4,14 +4,14 @@
  */
 
 
-
 #include "shell.h"
 #include "net.h"
 
 
 
 
-//temporary. we need a system function to get this number.
+// Temporary. 
+// We need a system function to get this number.
 
 
 /*    
@@ -226,10 +226,10 @@ __SendARP (
 
 
 // Testing ARP.
-// sending arp.
+// Sending arp.
 void __shellTestARP (){
 
-    printf ("\n\n ============ shellTestARP ================= \n\n"); 
+    printf ("\n\n ==== gdeshell: __shellTestARP ==== \n\n"); 
 
     // Source
     uint8_t source_ip_address[4];
@@ -255,17 +255,14 @@ void __shellTestARP (){
 	target_mac_address[5] = 0xFF;
 
 
-   __SendARP ( source_ip_address, target_ip_address, target_mac_address );
-
+   __SendARP ( source_ip_address, 
+       target_ip_address, target_mac_address );
 }
 
 
-
-
-
-
-
-
+//
+// End.
+//
 
 
 
