@@ -1,2 +1,0 @@
-
-// gramtext - editor textos.
