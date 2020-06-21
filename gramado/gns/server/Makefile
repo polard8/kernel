@@ -58,10 +58,8 @@ GWS_INCLUDES  = include/
 	
 myObjects = crt0.o main.o stubs.o \
 ctype.o stdio.o stdlib.o string.o conio.o socket.o signal.o unistd.o \
-api.o \
+api.o connect.o \
 termios.o ioctl.o fcntl.o    
-
-
 
 
 
@@ -71,10 +69,13 @@ all: main.o all-c gws-link finalize clean
 	@echo "Ok?"
 
 main.o:
-	gcc  -c  main.c -I $(LIBC) -I $(API02)  -I $(GWS_INCLUDES) -I . $(CFLAGS) -o main.o
+	gcc  -c  main.c     -I $(LIBC) -I $(API02)  -I $(GWS_INCLUDES) -I . $(CFLAGS) -o main.o
+
 
 all-c:
 
+	gcc  -c  connect.c  -I $(LIBC) -I $(API02)  -I $(GWS_INCLUDES) -I . $(CFLAGS) -o connect.o
+	
 # nothing for now.
 
 	# libc03

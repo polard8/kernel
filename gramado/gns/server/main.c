@@ -90,15 +90,7 @@ char __buffer[512];
 int running = 0;
 
 
-// Our desktop;
-struct desktop_d *__desktop;
-
-
-// Our PID.
-//int __ws_pid;
-int __ns_pid;   // network server pid.
-
-//window.
+// Window.
 struct window_d *__mywindow; 
 
 
@@ -114,13 +106,14 @@ unsigned long next_response[32];
 
 
 void gns_yield(void);
-  
-  
+
+
+
 
 /*
+ ************************************
  * gwsProcedure:
  *     Dialog to handle the event loop.
- * 
  */
  
 int 
@@ -392,6 +385,13 @@ gnsProcedure (
         case 2003:
             break;
 
+        // Disconnect.
+        // showdown.
+        // Um cliente quer se desconectar.
+        case 2010:
+            gde_debug_print ("gns: [2010] Disconnect\n");
+            break;
+
 
         // Refresh screen 
         // refresh screen using kgws service. 
@@ -443,9 +443,9 @@ int main (int argc, char **argv){
     struct sockaddr addr;
     addr.sa_family = AF_GRAMADO;
     addr.sa_data[0] = 'n';
-    addr.sa_data[1] = 's';   
-    
-    
+    addr.sa_data[1] = 's';
+
+
     int server_fd = -1; 
     int bind_status = -1;
     
@@ -461,88 +461,10 @@ int main (int argc, char **argv){
     gde_debug_print ("gns: Initializing ...\n");
 
     // #debug
-    printf ("gns: gns is alive !  \n");
-
-    
-    // Init gws infrastructure.
-    
-    //gwsInit ();
-
-    
-    // #tests
-    // Isso funciona.
-    //pixelBackBufferPutpixel ( COLOR_RED,   100, 250 );
-    //pixelBackBufferPutpixel ( COLOR_GREEN, 105, 250 );
-    //pixelBackBufferPutpixel ( COLOR_BLUE,  110, 250 );
-    //charBackbufferDrawcharTransparent ( 250,       250, COLOR_RED,   (unsigned long) 'R');
-    //charBackbufferDrawcharTransparent ( 250 +8,    250, COLOR_GREEN, (unsigned long) 'G');
-    //charBackbufferDrawcharTransparent ( 250 +8 +8, 250, COLOR_BLUE,  (unsigned long) 'B');
-    //charBackbufferDrawchar ( 300, 300, (unsigned long) 'X', COLOR_YELLOW, COLOR_RED );
-    //lineBackbufferDrawHorizontalLine ( 400, 88, 500, COLOR_PINK );
-    //rectBackbufferDrawRectangle ( 200, 400, 100, 60, COLOR_YELLOW );
+    printf ("gns: gns is alive! \n");
 
 
-    //createwCreateWindow ( WT_SIMPLE, 1, 1, "FIRST-WINDOW",  
-        //10, 60, 
-        //(800/3), (600/3),   
-        //gui->screen, 0, xCOLOR_GRAY3, xCOLOR_GRAY3 );
-    
-
-    //createwCreateWindow ( WT_EDITBOX, 1, 1, "FIRST-WINDOW",  
-      //  80, 80, 
-      //  300, 40,   
-      // gui->screen, 0, xCOLOR_GRAY3, xCOLOR_GRAY3 );
-
-
-    //
-    // Task bar
-    //
-
-    //w = gws_get_device_width();
-    //h = gws_get_device_height();
-
-    
-    //if(w==0 && h==0)
-        //fail!
-   
-      /*  
-    // #log: isso funcionou na máquina real.    
-    __mywindow = (struct window_d *) createwCreateWindow ( WT_SIMPLE, 
-                                         1, 1, "gws-taskbar",  
-                                         0, 0, w, 36,   
-                                         gui->screen, 0, 
-                                         COLOR_GRAY, COLOR_GRAY );
-
-     */
- 
-
-    //
-    // Desktop
-    //
-
-    // Getting current desktop;
-
-    __desktop = (struct desktop_d *) gramado_system_call (519,0,0,0);
-
-
-     //draw text inside a window.
-     //draw_text ( (struct window_d *) __mywindow,
-       // 40, 40,
-        //COLOR_RED,
-         //"Drawing some text inside a window!" );
-
-
-    //
-    // Register.
-    //
-
-    // Set ws PID
-    // Setar esse processo como o ws do sistema.
-    //__ws_pid = (int) getpid();
-    //gramado_system_call ( 513, __desktop, __ws_pid, __ws_pid );
-    
-    __ns_pid = (int) getpid();
-    gramado_system_call ( 521, __desktop, __ns_pid, __ns_pid );
+    register_ns();
 
 
     //

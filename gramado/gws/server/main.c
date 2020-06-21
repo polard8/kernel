@@ -96,6 +96,7 @@ int serviceDrawButton (void);
 
 
 //??
+// Quando um cliente tenta se desconectar.
 /*
 // internal
 void client_shutdown (int fd);
@@ -476,8 +477,8 @@ gwsProcedure (
             gde_debug_print ("gws: MSG_KEYDOWN\n");
             break;
 
+        // Hello!
         case 1000:
-        
             gde_debug_print ("gws: Message number 1000\n");
             
             // Draw text inside a window.
@@ -486,11 +487,8 @@ gwsProcedure (
             dtextDrawText ( (struct gws_window_d *) __mywindow,
                 long1, long2, COLOR_GREEN,
                 "Hello friend. This is the Window Server!" );
-
+                
              gws_show_backbuffer ();
-
-             // #todo: 
-             // Send response ?
              break;
 
 
@@ -501,28 +499,30 @@ gwsProcedure (
             serviceCreateWindow (); 
             break; 
 
+        // backbuffer putpixel
         case 1002:
             servicepixelBackBufferPutpixel(); //pixel
             break;
 
+        // backbuffer draw horizontal line
         case 1003:
             servicelineBackbufferDrawHorizontalLine();
             break;
     
-        // #todo ; 1004. draw button
-        // #bugbug: Criaremos botões usandoa a função create window.
+        // #bugbug:
+        // Agora usamos a função create window pra criar botões.
         case 1004:
-           //serviceDrawButton();
            break;
     
         // ...
                
-        // put pixel
+        // backbuffer putpixel. (again)
         // IN: Color, x, y
         case 2000:
             pixelBackBufferPutpixel ( (unsigned long) COLOR_PINK,   
                 (unsigned long) long1, (unsigned long) long2 );
             break;
+ 
  
         case 2001:
             break;
@@ -535,6 +535,14 @@ gwsProcedure (
 
         // ...
 
+
+        // Disconnect.
+        // showdown.
+        // Um cliente quer se desconectar.
+        case 2010:
+            gde_debug_print ("gws: [2010] Disconnect\n");
+            break;
+            
         // Refresh screen 
         // refresh screen using kgws service. 
         case 2020:
