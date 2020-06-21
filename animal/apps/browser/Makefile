@@ -1,4 +1,4 @@
-#
+# browser
 
 #history:
 #2019 - Created by Fred Nora.
@@ -70,7 +70,7 @@ all: main.o all-c hello-link finalize clean
 	@echo "Ok?"
 
 main.o:
-	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -I $(LIBGWS) -o main.o
+	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -I $(LIBGWS) -I include/ -o main.o
 
 all-c:
 
@@ -96,15 +96,15 @@ all-c:
 	
 	
 hello-link:
-	ld -m elf_i386 -T ../link.ld -o S2.BIN $(myObjects)    
+	ld -m elf_i386 -T ../link.ld -o BROWSER.BIN $(myObjects)    
 
 
 
 finalize:
-	cp S2.BIN  ../bin
+	cp BROWSER.BIN  ../bin
 
 clean:
 	-rm *.o
-	-rm S2.BIN 
+	-rm BROWSER.BIN 
 	
 	

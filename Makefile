@@ -269,8 +269,8 @@ vhd-copy-files:
 	
 	-sudo cp animal/apps/bin/*.BIN         /mnt/gramadovhd
 	-sudo cp animal/cmd/bin/*.BIN          /mnt/gramadovhd
-#	-sudo cp animal/cmd/bin/S2.BIN         /mnt/gramadovhd
 # ...
+
 
 #
 # ======== Creating the all the folders in root dir ========
@@ -355,7 +355,7 @@ clean-all: clean clean2 clean3 clean-system-files
 	@echo "ok ?"
 
 
-## ====================================================================================
+## ==================================================================
 ## The extra stuff.
 ## 1) ISO support.
 ## 2) HDD support.
