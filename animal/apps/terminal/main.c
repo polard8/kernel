@@ -86,6 +86,252 @@ int terminal_hello_request(int fd);
 int terminal_hello_response(int fd);
 
 
+
+//message support
+int terminal_loop(int fd);
+int terminal_getmessage_request(int fd);
+int terminal_getmessage_response(int fd);
+
+int terminal_getmessage_request(int fd)
+{
+    // Isso permite ler a mensagem na forma de longs.
+    unsigned long *message_buffer = (unsigned long *) &__buffer[0];   
+
+    int n_writes = 0;   // For sending requests.
+
+
+
+    //char *name = "Window name 1";
+
+   
+
+    //
+    // Send request.
+    //
+
+
+    // #debug
+    gws_debug_print ("gwst: Writing ...\n");      
+
+    // Enviamos um request para o servidor.
+    // ?? Precisamos mesmo de um loop para isso. ??
+    // msg = 369 (get input event)
+
+    while (1)
+    {
+        // Create window    
+        message_buffer[0] = 0;       // window. 
+        message_buffer[1] = 369;    //get message request  //1001;    // msg. Create window.
+        message_buffer[2] = 0;
+        message_buffer[3] = 0;
+ 
+        //message_buffer[4] = left; //120;   //x
+        //message_buffer[5] = top; //120;   //y
+        //message_buffer[6] = width; //480;   //w
+        //message_buffer[7] = height; //320;   //h
+        
+        //message_buffer[8] = bg_color; //xCOLOR_GRAY2; 
+
+         
+        //...
+
+        // Write!
+        // Se foi possível enviar, então saimos do loop.  
+
+        // n_writes = write (fd, __buffer, sizeof(__buffer));
+        n_writes = send (fd, __buffer, sizeof(__buffer), 0);
+       
+        if(n_writes>0)
+           break;
+    }
+
+
+    return 0; 
+}
+
+int terminal_getmessage_response(int fd)
+{
+    unsigned long *message_buffer = (unsigned long *) &__buffer[0];   
+    int n_reads = 0;    // For receiving responses.
+
+    //
+    // Waiting for response. ==================
+    //
+
+    // Espera para ler a resposta. 
+    // Esperando com yield como teste.
+    // Isso demora, pois a resposta só será enviada depois de
+    // prestado o servido.
+    // obs: Nesse momento deveríamos estar dormindo.
+
+    // #debug
+    gws_debug_print ("gwst: Waiting ...\n");      
+
+    int y;
+    for(y=0; y<15; y++)
+        gws_yield();   // See: libgws/
+
+
+    // #todo
+    // Podemos checar antes se o fd 
+    // representa um objeto que permite leitura.
+    // Pode nem ser possível.
+    // Mas como sabemos que é um soquete,
+    // então sabemos que é possível ler.
+
+
+    //
+    // read
+    //
+
+    // #debug
+    gws_debug_print ("gwst: reading ...\n");      
+
+
+    // #caution
+    // Waiting for response.
+    // We can stay here for ever.
+
+response_loop:
+
+    //n_reads = read ( fd, __buffer, sizeof(__buffer) );
+    n_reads = recv ( fd, __buffer, sizeof(__buffer), 0 );
+    
+    //if (n_reads<=0){
+    //     gws_yield(); 
+    //    goto response_loop;
+    //}
+    
+    // Se retornou 0, podemos tentar novamente.
+    if (n_reads == 0){
+         gws_yield(); 
+        goto response_loop;
+    }
+    
+    // Se retornou -1 é porque algo está errado com o arquivo.
+    if (n_reads < 0){
+        gws_debug_print ("gwst: recv fail.\n");
+        printf ("gwst: recv fail.\n");
+        printf ("Something is wrong with the socket.\n");
+        exit (1);
+    }
+
+
+    //
+    // The msg index.
+    //
+    
+    // Get the message sended by the server.
+
+    int window          = (int) message_buffer[0];
+    int msg             = (int) message_buffer[1];
+    unsigned long long1 = (unsigned long) message_buffer[2];
+    unsigned long long2 = (unsigned long) message_buffer[3];
+    
+    //#debug
+    //if(msg!=0)
+        //printf ("%c",long1); //printf ("{%d%c} ",msg,long1);
+        
+        
+        
+    switch (msg){
+
+         //OK isso funcionou.
+        //case MSG_KEYDOWN:
+          case 20:  
+            //gws_debug_print ("MSG_KEYDOWN\n");
+            printf ("%c",long1);
+            fflush(stdout);
+            goto process_event;
+            break;
+
+        //case MSG_KEYUP:
+          case 21:  
+            //gws_debug_print ("MSG_KEYUP\n");
+            goto process_event;
+            break;
+
+        case SERVER_PACKET_TYPE_REQUEST:
+            gws_yield ();
+            goto response_loop;
+            break;
+            
+        // Reply!
+        case SERVER_PACKET_TYPE_REPLY:
+            goto process_reply;
+            break;
+            
+        case SERVER_PACKET_TYPE_EVENT:
+            goto process_event;
+            //goto response_loop;
+            break;
+            
+        case SERVER_PACKET_TYPE_ERROR:
+            gws_debug_print ("gwst: SERVER_PACKET_TYPE_ERROR\n");
+            goto response_loop;
+            //exit (-1);
+            break;
+        
+        default:
+            gws_debug_print ("@");
+            goto process_event;
+            //goto response_loop;
+            break; 
+    };
+
+
+
+
+
+//
+// Process reply.
+//
+
+// A resposta tras o window id no início do buffer.
+    
+process_reply:
+
+    // #test
+    gws_debug_print ("gwst: Testing close() ...\n"); 
+    //close (fd);
+
+    //gws_debug_print ("gwst: bye\n"); 
+    printf ("gwst: Window ID %d \n", message_buffer[0] );
+    //printf ("gwst: Bye\n");
+    
+    // #todo
+    // Podemos usar a biblioteca e testarmos
+    // vários serviços da biblioteca nesse momento.
+
+    return 0;
+
+//
+// Process an event.
+//
+
+process_event:
+    gws_debug_print ("gwst: We got an event\n"); 
+    return 0;
+}
+
+
+//loop
+int terminal_loop(int fd)
+{
+	//while(___running){
+    while(1){
+    terminal_getmessage_request(fd);
+    terminal_getmessage_response(fd);
+    }
+    return 0; 
+}
+
+
+
+
+
+
+
 int 
 terminal_createwindow_request (
     int fd,
@@ -571,6 +817,8 @@ int main ( int argc, char *argv[] ){
     terminal_createwindow_request(client_fd, 40, 40, 320, 280, COLOR_ORANGE);
     terminal_createwindow_response(client_fd); 
 
+    //loop
+    terminal_loop(client_fd);
 
     debug_print ("terminal: bye\n"); 
     printf ("terminal: bye\n");
