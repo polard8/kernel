@@ -60,6 +60,9 @@
 #include <packet.h>
 
 
+#include <gws.h>
+
+
 // #test
 // Tentando deixar o buffer aqui e aproveitar em mais funções.
 char __buffer[512];
@@ -79,11 +82,231 @@ void gnst_yield(void);
 
 // Hello!
 // Podemos isso na lib.
-int gnst_hello_request(int fd);
-int gnst_hello_response(int fd);
+int terminal_hello_request(int fd);
+int terminal_hello_response(int fd);
+
+
+int 
+terminal_createwindow_request (
+    int fd,
+    unsigned long left,
+    unsigned long top,
+    unsigned long width,
+    unsigned long height,
+    unsigned long bg_color );
+    
+int terminal_createwindow_response(int fd);
 
 
 //...
+
+
+int 
+terminal_createwindow_request (
+    int fd,
+    unsigned long left,
+    unsigned long top,
+    unsigned long width,
+    unsigned long height,
+    unsigned long bg_color )
+{
+    // Isso permite ler a mensagem na forma de longs.
+    unsigned long *message_buffer = (unsigned long *) &__buffer[0];   
+
+    int n_writes = 0;   // For sending requests.
+
+
+
+    char *name = "Window name 1";
+
+   
+
+    //
+    // Send request.
+    //
+
+
+    // #debug
+    gws_debug_print ("gwst: Writing ...\n");      
+
+    // Enviamos um request para o servidor.
+    // ?? Precisamos mesmo de um loop para isso. ??
+    // msg = 369 (get input event)
+
+    while (1)
+    {
+        // Create window    
+        message_buffer[0] = 0;       // window. 
+        message_buffer[1] = 1001;    // msg. Create window.
+        message_buffer[2] = 0;
+        message_buffer[3] = 0;
+        
+        message_buffer[4] = left; //120;   //x
+        message_buffer[5] = top; //120;   //y
+        message_buffer[6] = width; //480;   //w
+        message_buffer[7] = height; //320;   //h
+        
+        message_buffer[8] = bg_color; //xCOLOR_GRAY2; 
+
+         
+        //...
+
+        // Write!
+        // Se foi possível enviar, então saimos do loop.  
+
+        // n_writes = write (fd, __buffer, sizeof(__buffer));
+        n_writes = send (fd, __buffer, sizeof(__buffer), 0);
+       
+        if(n_writes>0)
+           break;
+    }
+
+
+    return 0; 
+}
+
+//response
+int terminal_createwindow_response(int fd)
+{
+    unsigned long *message_buffer = (unsigned long *) &__buffer[0];   
+    int n_reads = 0;    // For receiving responses.
+
+    //
+    // Waiting for response. ==================
+    //
+
+    // Espera para ler a resposta. 
+    // Esperando com yield como teste.
+    // Isso demora, pois a resposta só será enviada depois de
+    // prestado o servido.
+    // obs: Nesse momento deveríamos estar dormindo.
+
+    // #debug
+    gws_debug_print ("gwst: Waiting ...\n");      
+
+    int y;
+    for(y=0; y<15; y++)
+        gws_yield();   // See: libgws/
+
+
+    // #todo
+    // Podemos checar antes se o fd 
+    // representa um objeto que permite leitura.
+    // Pode nem ser possível.
+    // Mas como sabemos que é um soquete,
+    // então sabemos que é possível ler.
+
+
+    //
+    // read
+    //
+
+    // #debug
+    gws_debug_print ("gwst: reading ...\n");      
+
+
+    // #caution
+    // Waiting for response.
+    // We can stay here for ever.
+
+response_loop:
+
+    //n_reads = read ( fd, __buffer, sizeof(__buffer) );
+    n_reads = recv ( fd, __buffer, sizeof(__buffer), 0 );
+    
+    //if (n_reads<=0){
+    //     gws_yield(); 
+    //    goto response_loop;
+    //}
+    
+    // Se retornou 0, podemos tentar novamente.
+    if (n_reads == 0){
+         gws_yield(); 
+        goto response_loop;
+    }
+    
+    // Se retornou -1 é porque algo está errado com o arquivo.
+    if (n_reads < 0){
+        gws_debug_print ("gwst: recv fail.\n");
+        printf ("gwst: recv fail.\n");
+        printf ("Something is wrong with the socket.\n");
+        exit (1);
+    }
+
+
+    //
+    // The msg index.
+    //
+    
+    // Get the message sended by the server.
+
+    int msg = (int) message_buffer[1];
+    
+    switch (msg){
+
+        case SERVER_PACKET_TYPE_REQUEST:
+            gws_yield ();
+            goto response_loop;
+            break;
+            
+        // Reply!
+        case SERVER_PACKET_TYPE_REPLY:
+            goto process_reply;
+            break;
+            
+        case SERVER_PACKET_TYPE_EVENT:
+            goto process_event;
+            //goto response_loop;
+            break;
+            
+        case SERVER_PACKET_TYPE_ERROR:
+            gws_debug_print ("gwst: SERVER_PACKET_TYPE_ERROR\n");
+            goto response_loop;
+            //exit (-1);
+            break;
+        
+        default:
+            goto response_loop;
+            break; 
+    };
+
+
+
+
+
+//
+// Process reply.
+//
+
+// A resposta tras o window id no início do buffer.
+    
+process_reply:
+
+    // #test
+    gws_debug_print ("gwst: Testing close() ...\n"); 
+    //close (fd);
+
+    //gws_debug_print ("gwst: bye\n"); 
+    printf ("gwst: Window ID %d \n", message_buffer[0] );
+    //printf ("gwst: Bye\n");
+    
+    // #todo
+    // Podemos usar a biblioteca e testarmos
+    // vários serviços da biblioteca nesse momento.
+
+    return 0;
+
+//
+// Process an event.
+//
+
+process_event:
+    gws_debug_print ("gwst: We got an event\n"); 
+    return 0;
+
+}
+
+
 
 
 
@@ -119,8 +342,8 @@ struct sockaddr_in addr = {
 
 
 
-int gnst_hello_response(int fd)
-{
+int terminal_hello_response(int fd){
+
     unsigned long *message_buffer = (unsigned long *) &__buffer[0];   
     int n_reads = 0;    // For receiving responses.
 
@@ -136,7 +359,8 @@ int gnst_hello_response(int fd)
     // obs: Nesse momento deveríamos estar dormindo.
 
     // #debug
-    debug_print ("gnst: Waiting ...\n");      
+    debug_print ("terminal: Waiting ...\n");      
+
 
     int y;
     for(y=0; y<15; y++)
@@ -149,7 +373,7 @@ int gnst_hello_response(int fd)
     //
 
     // #debug
-    debug_print ("gnst: reading ...\n");      
+    debug_print ("terminal: Reading ...\n");      
 
 
        //#caution
@@ -170,7 +394,7 @@ __again:
     }
     
     if (n_reads < 0){
-        printf ("gnst: recv fail.\n");
+        printf ("terminal: recv fail.\n");
         printf ("Something is wrong with the socket.\n");
         exit (1);
     }
@@ -188,7 +412,7 @@ __again:
             break;
             
         case SERVER_PACKET_TYPE_REPLY:
-            debug_print ("gnst: SERVER_PACKET_TYPE_REPLY received\n"); 
+            debug_print ("terminal: SERVER_PACKET_TYPE_REPLY received\n"); 
             goto process_reply;
             break;
             
@@ -198,7 +422,7 @@ __again:
             break;
             
         case SERVER_PACKET_TYPE_ERROR:
-            debug_print ("gnst: SERVER_PACKET_TYPE_ERROR\n");
+            debug_print ("terminal: SERVER_PACKET_TYPE_ERROR\n");
             goto __again;
             //exit (-1);
             break;
@@ -222,7 +446,7 @@ process_reply:
 }
 
 
-int gnst_hello_request(int fd){
+int terminal_hello_request(int fd){
 
     // Isso permite ler a mensagem na forma de longs.
     unsigned long *message_buffer = (unsigned long *) &__buffer[0];   
@@ -239,13 +463,12 @@ int gnst_hello_request(int fd){
 new_message:
 
     
-     
     //
     // Write
     //
 
     // #debug
-    debug_print ("gnst: Writing ...\n");      
+    debug_print ("terminal: Writing ...\n");      
 
     // Enviamos um request para o servidor.
     // ?? Precisamos mesmo de um loop para isso. ??
@@ -278,17 +501,17 @@ new_message:
 int main ( int argc, char *argv[] ){
 
     int client_fd = -1;
-    
-    //debug_print ("gnst: Starting ...\n");
+
+
     debug_print ("---------------------------\n");    
-    debug_print ("gnst.bin: Initializing ...\n");
+    debug_print ("terminal: Initializing ...\n");
 
      //
     // socket
     // 
 
     // #debug
-    printf ("gnst: Creating socket\n");
+    printf ("terminal: Creating socket\n");
 
     // cria o soquete.
     // AF_GRAMADO
@@ -297,16 +520,18 @@ int main ( int argc, char *argv[] ){
     client_fd = socket ( AF_INET, SOCK_STREAM, 0 );
     
     if ( client_fd < 0 ){
-       printf ("gnst: Couldn't create socket\n");
+       printf ("terminal: Couldn't create socket\n");
        exit(1);
     }
 
 
+    //porta para o Window Server 'ws' em gramado_ports[]
     struct sockaddr_in addr_in;
     addr_in.sin_family = AF_INET;
-    addr_in.sin_port   = 7548;   //porta para o Network Server 'ns' em gramado_ports[]
-    addr_in.sin_addr.s_addr = IP(192, 168, 1, 79); 
-    
+    addr_in.sin_port   = 7547;   
+    addr_in.sin_addr.s_addr = IP(192, 168, 1, 112); 
+
+
     //
     // connect
     // 
@@ -316,13 +541,14 @@ int main ( int argc, char *argv[] ){
     //então o servidor escreverá em nosso arquivo.
     
     // #debug
-    //printf ("gnst: Connecting to the address 'ns' ...\n");      
+    //printf ("gnst: Connecting to the address 'ws' ...\n");      
     
-    printf ("gnst: Connecting to the address via inet  ...\n");      
+    printf ("terminal: Connecting to the address via inet  ...\n");      
     if (connect (client_fd, (void *) &addr_in, sizeof(addr_in)) < 0){ 
-        printf("gnst: Connection Failed \n"); 
+        printf("terminal: Connection Failed \n"); 
         return -1; 
     } 
+ 
  
     //
     // messages
@@ -330,9 +556,6 @@ int main ( int argc, char *argv[] ){
    
     // #test
     // Testing loop; ok.
-    while(1){
-    gnst_hello_request(client_fd);
-    
     // #todo
     // Podemos checar antes se o fd 
     // representa um objeto que permite leitura.
@@ -340,13 +563,19 @@ int main ( int argc, char *argv[] ){
     // Mas como sabemos que é um soquete,
     // então sabemos que é possível ler.
 
-    gnst_hello_response(client_fd);
-    }
+    //while(1){
+        terminal_hello_request(client_fd);
+        terminal_hello_response(client_fd);
+    //}
 
-    debug_print ("gnst: bye\n"); 
-    printf ("gnst: bye\n");
+    terminal_createwindow_request(client_fd, 40, 40, 320, 280, COLOR_ORANGE);
+    terminal_createwindow_response(client_fd); 
 
-    
+
+    debug_print ("terminal: bye\n"); 
+    printf ("terminal: bye\n");
+
+
     return 0;
 }
 

@@ -318,14 +318,18 @@ __again:
 
     gde_debug_print ("Sending response ...\n");
         
-    // #debug
-    //sprintf (__buffer," ................. This is a response");
                 
     // Primeiros longs do buffer.
     message_buffer[0] = next_response[0];         // Window ID.
     message_buffer[1] = SERVER_PACKET_TYPE_REPLY; // next_response[1] 
     message_buffer[2] = next_response[2];         // Return value (long1)
     message_buffer[3] = next_response[3];         // Return value (long2)
+
+    //# it works.
+    char *m = (char *) (&__buffer[0] + 16);
+    sprintf( m, "This is a response from GWS!\n");
+
+
 
     //
     // Send
@@ -488,8 +492,8 @@ gwsProcedure (
                 long1, long2, COLOR_GREEN,
                 "Hello friend. This is the Window Server!" );
                 
-             gws_show_backbuffer ();
-             break;
+            gws_show_backbuffer ();
+            break;
 
 
         // Create Window.
@@ -794,8 +798,8 @@ int main (int argc, char **argv){
     // #important:
     // Calling a child.
 
-    gde_clone_and_execute ("gwst.bin");  
-    // gde_clone_and_execute ("s3.bin"); 
+    //gde_clone_and_execute ("gwst.bin");  
+    gde_clone_and_execute ("terminal.bin"); 
     // ...
 
  

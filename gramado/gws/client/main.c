@@ -323,6 +323,73 @@ gwst_createwindow_request (
 int gwst_createwindow_response(int fd);
 
 
+
+int 
+gwst_createwindow_request (
+    int fd,
+    unsigned long left,
+    unsigned long top,
+    unsigned long width,
+    unsigned long height,
+    unsigned long bg_color )
+{
+    // Isso permite ler a mensagem na forma de longs.
+    unsigned long *message_buffer = (unsigned long *) &__buffer[0];   
+
+    int n_writes = 0;   // For sending requests.
+
+
+
+    char *name = "Window name 1";
+
+   
+
+    //
+    // Send request.
+    //
+
+
+    // #debug
+    gws_debug_print ("gwst: Writing ...\n");      
+
+    // Enviamos um request para o servidor.
+    // ?? Precisamos mesmo de um loop para isso. ??
+    // msg = 369 (get input event)
+
+    while (1)
+    {
+        // Create window    
+        message_buffer[0] = 0;       // window. 
+        message_buffer[1] = 1001;    // msg. Create window.
+        message_buffer[2] = 0;
+        message_buffer[3] = 0;
+        
+        message_buffer[4] = left; //120;   //x
+        message_buffer[5] = top; //120;   //y
+        message_buffer[6] = width; //480;   //w
+        message_buffer[7] = height; //320;   //h
+        
+        message_buffer[8] = bg_color; //xCOLOR_GRAY2; 
+
+         
+        //...
+
+        // Write!
+        // Se foi possível enviar, então saimos do loop.  
+
+        // n_writes = write (fd, __buffer, sizeof(__buffer));
+        n_writes = send (fd, __buffer, sizeof(__buffer), 0);
+       
+        if(n_writes>0)
+           break;
+    }
+
+
+    return 0; 
+}
+
+
+
 //response
 int gwst_createwindow_response(int fd)
 {
@@ -463,75 +530,6 @@ process_event:
     return 0;
 
 }
-
-
-
-
-
-int 
-gwst_createwindow_request (
-    int fd,
-    unsigned long left,
-    unsigned long top,
-    unsigned long width,
-    unsigned long height,
-    unsigned long bg_color )
-{
-    // Isso permite ler a mensagem na forma de longs.
-    unsigned long *message_buffer = (unsigned long *) &__buffer[0];   
-
-    int n_writes = 0;   // For sending requests.
-
-
-
-    char *name = "Window name 1";
-
-   
-
-    //
-    // Send request.
-    //
-
-
-    // #debug
-    gws_debug_print ("gwst: Writing ...\n");      
-
-    // Enviamos um request para o servidor.
-    // ?? Precisamos mesmo de um loop para isso. ??
-    // msg = 369 (get input event)
-
-    while (1)
-    {
-        // Create window    
-        message_buffer[0] = 0;       // window. 
-        message_buffer[1] = 1001;    // msg. Create window.
-        message_buffer[2] = 0;
-        message_buffer[3] = 0;
-        
-        message_buffer[4] = left; //120;   //x
-        message_buffer[5] = top; //120;   //y
-        message_buffer[6] = width; //480;   //w
-        message_buffer[7] = height; //320;   //h
-        
-        message_buffer[8] = bg_color; //xCOLOR_GRAY2; 
-
-         
-        //...
-
-        // Write!
-        // Se foi possível enviar, então saimos do loop.  
-
-        // n_writes = write (fd, __buffer, sizeof(__buffer));
-        n_writes = send (fd, __buffer, sizeof(__buffer), 0);
-       
-        if(n_writes>0)
-           break;
-    }
-
-
-    return 0; 
-}
-
 
 
 

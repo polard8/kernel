@@ -218,9 +218,7 @@ __again:
 
     // #debug: para a máquina real.
     debug_print ("Sending response ...\n");
-                
-    // #debug
-    //sprintf (__buffer," ................. This is a response");
+   
                 
     // Primeiros longs do buffer.
     message_buffer[0] = next_response[0];         //  Window ID.

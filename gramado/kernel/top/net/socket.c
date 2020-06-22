@@ -1161,14 +1161,25 @@ sys_connect (
             
             printf (" >>>>>>>>> port %d \n",addr_in->sin_port);
             
-            //#test
-            //se a porta for , então usaremos o pid do NS.
+            // #test
+            // Se a porta for , então usaremos o pid do WS.
+            if (addr_in->sin_port == 7547){
+                printf ("sys_connect: Connecting to the Window Server ...\n");
+                target_pid = (int) gramado_ports[GRAMADO_WS_PORT]; 
+                refresh_screen();
+                break;
+            }
+     
+            // #test
+            // Se a porta for , então usaremos o pid do NS.
             if (addr_in->sin_port == 7548){
                 printf ("sys_connect: Connecting to the Network Server ...\n");
                 target_pid = (int) gramado_ports[GRAMADO_NS_PORT]; 
                 refresh_screen();
                 break;
             }
+
+            
             printf("sys_connect: Port not valid\n");
             refresh_screen();
             return -1;
