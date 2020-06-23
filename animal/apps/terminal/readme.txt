@@ -1,1 +1,0 @@
-	gns client-side app

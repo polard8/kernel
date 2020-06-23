@@ -225,20 +225,88 @@ response_loop:
         
     switch (msg){
 
-         //OK isso funcionou.
-        //case MSG_KEYDOWN:
-          case 20:  
+        //OK isso funcionou.
+        case MSG_KEYDOWN:
+          //case 20:
             //gws_debug_print ("MSG_KEYDOWN\n");
-            printf ("%c",long1);
-            fflush(stdout);
-            goto process_event;
+            switch (long1)
+            {
+                //case 0:
+                    //relax cpu
+                    //break; 
+                    
+                //case VK_RETURN:
+                    //goto process_event;
+                    //break;
+                  
+                //case VK_TAB:
+                //case VK_BACK:
+                
+                //...
+                
+                
+                // We are in the terminal ...
+                // We will not process the chars ...
+                // We need to send it to the client via file.
+                default:
+                    //terminal_write_char(long1) #todo
+                    printf ("%c",long1);
+                    fflush(stdout);
+                    goto process_event;
+                    break;
+            };
             break;
+
 
         //case MSG_KEYUP:
           case 21:  
             //gws_debug_print ("MSG_KEYUP\n");
             goto process_event;
             break;
+            
+            
+        case MSG_SYSKEYDOWN:
+            switch (long1)
+            {
+                //case VK_F1:
+                default:
+                    goto process_event;
+                    break;
+            };
+            break;
+            
+
+        case MSG_SYSKEYUP:
+            switch (long1)
+            {
+                //case VK_F1:
+                default:
+                    goto process_event;
+                    break;
+            };
+            break;
+
+        // Commands.
+        case MSG_COMMAND:
+            switch (long1)
+            {
+                //case CMD_ABOUT:
+                    //printf ("terminal: CMD_ABOUT\n");
+                    //goto process_event;
+                    //break;
+                    
+                default:
+                    goto process_event;
+                    break;
+            };
+
+        
+		//case MSG_TERMINALCOMMAND:
+			//switch (long1)
+			//{
+			// CMD_XXX ??
+		    //};
+
 
         case SERVER_PACKET_TYPE_REQUEST:
             gws_yield ();
