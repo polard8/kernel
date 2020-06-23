@@ -509,6 +509,9 @@ bmpDisplayBMP (
     yLimit = 600;
 
 
+    gde_debug_print ("bmpDisplayBMP:\n");
+
+
     // Limits.
     if ( x > xLimit || y > yLimit ){
         gde_debug_print ("bmpDisplayBMP: Limits \n");
@@ -878,15 +881,14 @@ bmpDisplayBMP (
 	//};
 
 
-
 done:
 	//Debug
-    gde_debug_print ("bmpDisplayBMP: [DEBUG] done \n");
+    gde_debug_print ("bmpDisplayBMP: done \n");
 	//printf("w={%d} h={%d}\n", bi->bmpWidth, bi->bmpHeight );
     return 0;
 
 fail:
-    //gde_debug_print ("bmpDisplayBMP: fail \n");
+    gde_debug_print ("bmpDisplayBMP: fail \n");
     //printf("fail");
     return (int) 1;
 }

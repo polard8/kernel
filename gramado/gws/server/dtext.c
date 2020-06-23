@@ -32,17 +32,17 @@ dtextDrawString (
 	//int cHeight = get_char_height ();
 	
 	//if ( cWidth == 0 || cHeight == 0 )
-	if ( cWidth == 0 )
-	{
+    if ( cWidth == 0 )
+    {
 		//panic ("dtext-draw_string: cWidth");
 	    
 	    //#debug
-	    gde_message_box (3, "xxx","dtext-draw_string: cWidth");
-	    while(1){}
-	}
+        gde_message_box (3, "xxx","dtext-draw_string: cWidth");
+        while(1){}
+    }
       
     for ( Index=0; string[Index] != 0; Index++ )
-	{
+    {
 		//@todo: 
 		//   Conflito de tipo no argumento 4.
 		//   gcharWidth.

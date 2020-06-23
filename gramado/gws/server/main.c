@@ -772,20 +772,41 @@ int main (int argc, char **argv){
     //
     // =======================================
     //
-
+    
+    //#todo
+    //Trying to load and show a bmp file.
+    /*
+    void *bmp_buffer;
+    char *file_name = "terminal.bmp";
+    bmp_buffer = (void *) malloc(1024*128);
+        stdio_fntos ( (char *) file_name );
+    gramado_system_call ( SYSTEMCALL_READ_FILE, 
+        (unsigned long) file_name, 
+        (unsigned long) bmp_buffer, 
+        (unsigned long) bmp_buffer );  
+          
+    bmpDisplayBMP ((char *)bmp_buffer, (unsigned long) 80, (unsigned long) 80);    
+    //gde_display_bmp((char *)bmp_buffer, (unsigned long) 80, (unsigned long) 80);
+    */
+    
+    //
+    // =======================================
+    //
 
     //
     // Calling child.
     //
 
     dtextDrawText ( (struct gws_window_d *) gui->screen,
-        8, 80, COLOR_RED, "gws: Calling child" );
+        200, 80, COLOR_RED, "gws: Calling child" );
 
     
     // #atenção: 
     // Na máquina real, isso mostrou a barra, 
-    // mas não mostrou a string criada na janela gui->screen..
+    // mas não mostrou a string criada na janela gui->screen.
+    //printf("$\n");
     gws_show_backbuffer ();
+    //while(1);
 
 
     printf ("gws: * Calling child \n");
@@ -799,7 +820,8 @@ int main (int argc, char **argv){
     // Calling a child.
 
     //gde_clone_and_execute ("gwst.bin");  
-    gde_clone_and_execute ("terminal.bin"); 
+    //gde_clone_and_execute ("terminal.bin"); 
+    gde_clone_and_execute ("browser.bin"); 
     // ...
 
  

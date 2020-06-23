@@ -37,29 +37,18 @@
 // https://wiki.osdev.org/Message_Passing_Tutorial
 // https://wiki.osdev.org/Synchronization_Primitives
 // ...
- 
- 
-#include <types.h>
 
+
+
+#include <types.h>
 #include <stdio.h>
 #include <stdlib.h>
-
 #include <string.h>
-
 #include <netdb.h>
 #include <netinet/in.h>
-
 #include <arpa/inet.h>
-
 #include <sys/socket.h>
-
-
-//#test
-//#include <gws.h>
-
 #include <packet.h>
-
-
 #include <gws.h>
 
 
@@ -111,7 +100,7 @@ int terminal_getmessage_request(int fd)
 
 
     // #debug
-    gws_debug_print ("gwst: Writing ...\n");      
+    gws_debug_print ("terminal: Writing ...\n");      
 
     // Enviamos um request para o servidor.
     // ?? Precisamos mesmo de um loop para isso. ??
@@ -165,7 +154,7 @@ int terminal_getmessage_response(int fd)
     // obs: Nesse momento deveríamos estar dormindo.
 
     // #debug
-    gws_debug_print ("gwst: Waiting ...\n");      
+    gws_debug_print ("terminal: Waiting ...\n");      
 
     int y;
     for(y=0; y<15; y++)
@@ -185,7 +174,7 @@ int terminal_getmessage_response(int fd)
     //
 
     // #debug
-    gws_debug_print ("gwst: reading ...\n");      
+    gws_debug_print ("terminal: reading ...\n");      
 
 
     // #caution
@@ -210,8 +199,8 @@ response_loop:
     
     // Se retornou -1 é porque algo está errado com o arquivo.
     if (n_reads < 0){
-        gws_debug_print ("gwst: recv fail.\n");
-        printf ("gwst: recv fail.\n");
+        gws_debug_print ("terminal: recv fail.\n");
+        printf ("terminal: recv fail.\n");
         printf ("Something is wrong with the socket.\n");
         exit (1);
     }
@@ -267,7 +256,7 @@ response_loop:
             break;
             
         case SERVER_PACKET_TYPE_ERROR:
-            gws_debug_print ("gwst: SERVER_PACKET_TYPE_ERROR\n");
+            gws_debug_print ("terminal: SERVER_PACKET_TYPE_ERROR\n");
             goto response_loop;
             //exit (-1);
             break;
@@ -292,12 +281,12 @@ response_loop:
 process_reply:
 
     // #test
-    gws_debug_print ("gwst: Testing close() ...\n"); 
+    gws_debug_print ("terminal: Testing close() ...\n"); 
     //close (fd);
 
-    //gws_debug_print ("gwst: bye\n"); 
-    printf ("gwst: Window ID %d \n", message_buffer[0] );
-    //printf ("gwst: Bye\n");
+    //gws_debug_print ("terminal: bye\n"); 
+    printf ("terminal: Window ID %d \n", message_buffer[0] );
+    //printf ("terminal: Bye\n");
     
     // #todo
     // Podemos usar a biblioteca e testarmos
@@ -310,7 +299,7 @@ process_reply:
 //
 
 process_event:
-    gws_debug_print ("gwst: We got an event\n"); 
+    gws_debug_print ("terminal: We got an event\n"); 
     return 0;
 }
 
@@ -373,7 +362,7 @@ terminal_createwindow_request (
 
 
     // #debug
-    gws_debug_print ("gwst: Writing ...\n");      
+    gws_debug_print ("terminal: Writing ...\n");      
 
     // Enviamos um request para o servidor.
     // ?? Precisamos mesmo de um loop para isso. ??
@@ -428,7 +417,7 @@ int terminal_createwindow_response(int fd)
     // obs: Nesse momento deveríamos estar dormindo.
 
     // #debug
-    gws_debug_print ("gwst: Waiting ...\n");      
+    gws_debug_print ("terminal: Waiting ...\n");      
 
     int y;
     for(y=0; y<15; y++)
@@ -448,7 +437,7 @@ int terminal_createwindow_response(int fd)
     //
 
     // #debug
-    gws_debug_print ("gwst: reading ...\n");      
+    gws_debug_print ("terminal: reading ...\n");      
 
 
     // #caution
@@ -473,8 +462,8 @@ response_loop:
     
     // Se retornou -1 é porque algo está errado com o arquivo.
     if (n_reads < 0){
-        gws_debug_print ("gwst: recv fail.\n");
-        printf ("gwst: recv fail.\n");
+        gws_debug_print ("terminal: recv fail.\n");
+        printf ("terminal: recv fail.\n");
         printf ("Something is wrong with the socket.\n");
         exit (1);
     }
@@ -506,7 +495,7 @@ response_loop:
             break;
             
         case SERVER_PACKET_TYPE_ERROR:
-            gws_debug_print ("gwst: SERVER_PACKET_TYPE_ERROR\n");
+            gws_debug_print ("terminal: SERVER_PACKET_TYPE_ERROR\n");
             goto response_loop;
             //exit (-1);
             break;
@@ -529,12 +518,12 @@ response_loop:
 process_reply:
 
     // #test
-    gws_debug_print ("gwst: Testing close() ...\n"); 
+    gws_debug_print ("terminal: Testing close() ...\n"); 
     //close (fd);
 
-    //gws_debug_print ("gwst: bye\n"); 
-    printf ("gwst: Window ID %d \n", message_buffer[0] );
-    //printf ("gwst: Bye\n");
+    //gws_debug_print ("terminal: bye\n"); 
+    printf ("terminal: Window ID %d \n", message_buffer[0] );
+    //printf ("terminal: Bye\n");
     
     // #todo
     // Podemos usar a biblioteca e testarmos
@@ -547,7 +536,7 @@ process_reply:
 //
 
 process_event:
-    gws_debug_print ("gwst: We got an event\n"); 
+    gws_debug_print ("terminal: We got an event\n"); 
     return 0;
 
 }
@@ -826,6 +815,14 @@ int main ( int argc, char *argv[] ){
 
     return 0;
 }
+
+//
+// End.
+//
+
+
+
+
 
 
 

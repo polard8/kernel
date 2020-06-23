@@ -780,7 +780,7 @@ xmas_tree_create ( char *file_name)
 
     //@todo: Usar alguma rotina da API espec�fica para carregar arquivo.
 	// na verdade tem que fazer essas rotinas na API.
-	
+
     gramado_system_call ( SYSTEMCALL_READ_FILE, 
         (unsigned long) file_name, 
         (unsigned long) xmas_tree_buffer, 

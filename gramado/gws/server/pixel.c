@@ -25,55 +25,48 @@
 
 // usando serviço do kernel
 int 
-pixelBackBufferPutpixel2 ( unsigned long color, 
-                          unsigned long x, 
-                          unsigned long y )
+pixelBackBufferPutpixel2 ( 
+    unsigned long color, 
+    unsigned long x, 
+    unsigned long y )
 {
     return (int) gramado_system_call ( 6, color, x, y );
 }
 
 
-
+/*
+ * pixelBackBufferPutpixel:
+ * 
+ * 
+ */
 
 // usando o endereço virtual do backbuffer
 // ?? será que está mapeado ???
 // está em ring 3 ??? ou ring 0???
+
 int 
-pixelBackBufferPutpixel ( unsigned long color, 
-                          unsigned long x, 
-                          unsigned long y )
+pixelBackBufferPutpixel ( 
+    unsigned long color, 
+    unsigned long x, 
+    unsigned long y )
 {
-    //return (int) gramado_system_call ( 6, color, x, y );
-    
-    
-
-    //unsigned char *where = (unsigned char *) 0xC0800000;
     unsigned char *where = (unsigned char *) ____BACKBUFFER_VA;
-
-    //unsigned long color = (unsigned long) ax;
-
-    char b, g, r, a;
+    //unsigned char *where = (unsigned char *) 0xC0800000;
 
 
     // bgra
+    char b, g, r, a;
 
-    b = (color & 0xFF);	
+    b = (color & 0xFF);
     g = (color & 0xFF00) >> 8;
     r = (color & 0xFF0000) >> 16;
     a = (color >> 24) + 1;
 
 
-    // Position.
-
-    //int x = (int) bx;
-    //int y = (int) cx;
-
-
-
 
 	// 3 = 24 bpp
 
-    int bytes_count;
+    int bytes_count=0;
 
     //
     // bpp
@@ -82,16 +75,16 @@ pixelBackBufferPutpixel ( unsigned long color,
     // #danger
     // Esse valor foi herdado do bootloader.
 
-    switch (SavedBPP)
-    {
-		case 32:
-		    bytes_count = 4;
-		    break;
-		
-		case 24:
-		    bytes_count = 3;
-			break;
-			
+    switch (SavedBPP){
+
+        case 32:
+            bytes_count = 4;
+            break;
+
+        case 24:
+            bytes_count = 3;
+            break;
+
 		//#testando
 		//case 16:
 		//	bytes_count = 2;
@@ -100,13 +93,14 @@ pixelBackBufferPutpixel ( unsigned long color,
 		//case 8:
 		//	bytes_count = 1;
 		//	break;
-		
-		default:
+
+        default:
 		    //panic ("backbuffer_putpixel: SavedBPP");
-		    gde_message_box (3,"xxx","backbuffer_putpixel: SavedBPP");
-		    break;
-	}
-	
+            gde_message_box (3,"xxx","backbuffer_putpixel: SavedBPP");
+            break;
+    };
+
+
 	// #importante
 	// Pegamos a largura do dispositivo.
 	
@@ -128,18 +122,9 @@ pixelBackBufferPutpixel ( unsigned long color,
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
+//
+// End.
+//
 
 
 

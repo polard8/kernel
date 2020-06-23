@@ -1,4 +1,4 @@
-# browser
+# terminal
 
 #history:
 #2019 - Created by Fred Nora.
@@ -31,7 +31,6 @@ CFLAGS = -m32 \
 	-no-pie \
 	-fno-stack-protector \
 	-s
-
 
 
 LIBC      = ../../../lib/libc03/include/

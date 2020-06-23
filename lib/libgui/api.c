@@ -661,7 +661,7 @@ mbProcedure (
 {
 
     switch (msg)
-	{
+    {
 		// MSG_MOUSEKEYDOWN
 		case 30:
 		    switch (long1)
@@ -2536,7 +2536,8 @@ gde_display_bmp (
 		        base = base + 4;    
 	        };
 			
-			
+			//todo: o window server tem rotina pra pintar no backbuffer
+			//que está em ring3.
 			system_call ( SYSTEMCALL_BUFFER_PUTPIXEL, (unsigned long) color, 
 				(unsigned long) left, (unsigned long) bottom );
 			
