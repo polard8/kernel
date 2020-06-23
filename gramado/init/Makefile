@@ -27,8 +27,8 @@ CFLAGS = -m32 \
 
 LIBC    =  ../../lib/libc03/include/
 LIBCOBJ =  ../../lib/libc03/obj
-API     =  ../../lib/libgui/include/
-APIOBJ  =  ../../lib/libgui/obj
+API     =  ../../lib/libcore/include/
+APIOBJ  =  ../../lib/libcore/obj
 
 
 

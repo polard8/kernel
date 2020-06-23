@@ -15,7 +15,7 @@ all:
 	
 	# gramc thing.    
 	make -C ./gramc
-	make -C ./gramcnf
+#	make -C ./gramcnf
 	
 	# c4 thing.
 	make -C ./c4  
@@ -25,8 +25,8 @@ all:
 	
 	make -C ./fasm  
 	
-	make -C ./unknown 
-	make -C ./miniyacc 
+#	make -C ./unknown 
+#	make -C ./miniyacc 
 
 
 # ...

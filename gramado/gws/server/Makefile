@@ -38,8 +38,8 @@ CFLAGS = -m32 \
 
 LIBC    = ../../../lib/libc03/include/
 LIBCOBJ = ../../../lib/libc03/obj
-API02   = ../../../lib/libgui/include/
-APIOBJ  = ../../../lib/libgui/obj
+API02   = ../../../lib/libcore/include/
+APIOBJ  = ../../../lib/libcore/obj
 
 
 GWS_INCLUDES  = include/    

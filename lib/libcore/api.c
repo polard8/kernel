@@ -1,10 +1,7 @@
 
-// Ok. This is the system's API. It's not just a client-side libgui.
-// #todo: 
-// We need to separate the system's API from the
-// old libgui that uses the window server inside the kernel.
-// It's because now we are building a new window server
-// that will run on ring3.
+// Ok. This is the system's API. 
+// But now we are creating a window server called gws.bin
+// and we will use the client-side library for this window server.
 
 /*
  * File: api.c 
@@ -73,7 +70,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <heap.h>   
-
 #include "include/api.h"  
 
 
@@ -178,63 +174,14 @@ int gde_system (const char *command)
  *     Atualiza um buffer dado seu número.  (rever) 
  */
 
-void gde_refresh_buffer (unsigned long n){
-
-    // Limits.
-    if (n < 1 || n > 9){
-        return;
-    }
-
-
-    switch (n){
-
-        //refresh buffer 1,2,3
-        
-		case 1: 
-		    system_call( 1, 0, 0, 0); 
-			break;
-        case 2: 
-		    system_call( 2, 0, 0, 0); 
-			break;
-        case 3: 
-		    system_call( 3, 0, 0, 0); 
-			break;
-                 
-        //refresh screen     
-        case 4: 
-		    system_call( 4, 0, 0, 0); 
-			break;
-             
-        //refresh title bar    
-        case 5: 
-		    system_call( 5, 0, 0, 0); 
-			break;
-                 
-        //refresh menu bar     
-        case 6: 
-		    system_call( 6, 0, 0, 0); 
-			break;
-                 
-        //refresh tollbar    
-        case 7: 
-		    system_call( 7, 0, 0, 0); 
-			break;
-                 
-        //refresh status bar   
-        case 8: 
-		    system_call( 8, 0, 0, 0); 
-			break;
-
-        //refresh taskbar   
-        case 9: 
-		    system_call( 9, 0, 0, 0); 
-			break;
-                 
-        //default:
-            //Nothing
-			//break;
-    }
+void gde_refresh_buffer (unsigned long n)
+{
+    //n=0;
+    gde_debug_print ("gde_refresh_buffer: [DEPRECATED]\n");
+    return;
 }
+
+
 
 
 /*
@@ -384,7 +331,7 @@ void gde_shutdown ()
 
 void gde_init_background ()
 {
-    gde_debug_print ("gde_init_background: [TODO]\n");
+    gde_debug_print ("gde_init_background: [DEPRECATED]\n");
     //todo: Implementar.	
     //Não há uma chamada para isso ainda.
 }
@@ -397,6 +344,8 @@ void gde_init_background ()
  *     Types=[1~5]
  *     @todo: Devemos considerar o retorno? E se a chamada falhar?
  */
+ 
+// deprecated
  
 int __mb_current_button; 
 
@@ -901,26 +850,28 @@ int gde_dialog_box ( int type, char *string1, char *string2 ){
 	// x and y
 	// @todo centralizado: metade | um terço.
 	// @todo: Pegar a métrica do dispositivo.
-	unsigned long x  = (unsigned long) 10;       //deslocamento x
-	unsigned long y  = (unsigned long) 300;      //deslocamento y
+    unsigned long x  = (unsigned long) 10;       //deslocamento x
+    unsigned long y  = (unsigned long) 300;      //deslocamento y
     unsigned long cx = (unsigned long) (800/2);  //largura   
     unsigned long cy = (unsigned long) (600/3);  //altura
 
-	int Button = 0;	
-	
-	unsigned long WindowClientAreaColor;
-	unsigned long WindowColor;
-	
+    int Button = 0;	
 
+    unsigned long WindowClientAreaColor;
+    unsigned long WindowColor;
+
+
+    gde_debug_print ("gde_dialog_box: [DEPRECATED]\n");
 
 
 	WindowClientAreaColor = COLOR_YELLOW;
 	WindowColor = COLOR_PINK;	
-	
+
+
 	//Obs: Por enquanto para todos os tipos de messagebox 
 	// estamos usando o mesmo tipo de janela.
-	switch (type)
-	{	
+    switch (type)
+    {	
 	    // Com botão, considera o título.
 	    case 1:
 		    gde_begin_paint ();
@@ -1225,7 +1176,12 @@ gde_create_window (
 	message_buffer[9] = (unsigned long) onde;
 	message_buffer[10] = (unsigned long) clientcolor;
 	message_buffer[11] = (unsigned long) color;
-	
+
+    // #bugbug
+    // Now we need to use the window server to create windows.
+    // maybe this function can call the window server clint side
+    // functions.
+    gde_debug_print ("gde_create_window: [DEPRECATED]\n");
 
     Window = (void *) system_call ( 118 , 
                           (unsigned long) &message_buffer[0], 
@@ -1283,7 +1239,8 @@ int gde_register_window (struct window_d *window){
 
 int gde_close_window (struct window_d *window){
 
-
+    gde_debug_print ("gde_close_window: [DEPRECATED]\n");
+        
     if ( (void *) window == NULL ){
         gde_debug_print ("gde_close_window: fail\n");
         return (int) 1;
@@ -1340,6 +1297,8 @@ int gde_get_focus ()
  *     Kill Focus. 
  */
 
+// deprecated
+
 int gde_kill_focus (struct window_d *window){
 
 
@@ -1366,22 +1325,20 @@ int gde_kill_focus (struct window_d *window){
  *     @todo: Esse retorno pode ser void??. 
  */
 
+// deprecated.
+
 int gde_set_active_window (struct window_d *window){
-	
-	if ( (void *) window == NULL ){
+
+    if ( (void *) window == NULL ){
         gde_debug_print ("gde_set_active_window: fail\n");
-		return (int) 1;
-	}else{
-	
+        return (int) 1;
+
+    }else{
         return (int) system_call ( SYSTEMCALL_SETACTIVEWINDOW, 
                          (unsigned long) window, 
                          (unsigned long) window, 
-                         (unsigned long) window );	
-	}
-
-	//a flag 1 indica que deve-se redesenha e efetuar refresh.
-	//APIredraw_window ( window, 1 );
-
+                         (unsigned long) window );
+    };
 
     return 2;
 }
@@ -1391,6 +1348,8 @@ int gde_set_active_window (struct window_d *window){
  * gde_get_active_window:
  *     Get Active Window Id.
  */
+
+// deprecated
 
 int gde_get_active_window ()
 {
@@ -1427,6 +1386,8 @@ gde_resize_window (
 /*
  * gde_redraw_window:
  */
+
+//deprecated
 
 void 
 gde_redraw_window ( 
@@ -1508,6 +1469,8 @@ void gde_set_foregroung_window (struct window_d *window){
 
 void gde_exit (int exit_code){
 
+    gde_debug_print ("gde_exit:\n");
+
     system_call ( SYSTEMCALL_EXIT, 
         (unsigned long) exit_code, 
         (unsigned long) exit_code, 
@@ -1570,9 +1533,8 @@ int gde_strncmp (char *s1, char *s2, int len){
 		//return 3;
 
 
-
-	while (n > 0)
-	{	
+    while (n > 0)
+    {
 	    n--;
         
 		if (*s1 != *s2)
@@ -1582,14 +1544,14 @@ int gde_strncmp (char *s1, char *s2, int len){
 
 		*s1++;
 		*s2++;
-	};
+    };
 
-	if ( *s1 != '\0' || *s2 != '\0' )
-	{	
+    if ( *s1 != '\0' || *s2 != '\0' )
+    {	
 	    return (int) 2;
-	}
+    }
 
-	return 0;
+    return 0;
 }
 
 
@@ -1711,6 +1673,7 @@ gde_create_process (
     unsigned long process_priority, 
     char *name )
 {
+    gde_debug_print ("gde_create_process:\n");
     return (void *) system_call ( SYSTEMCALL_CREATEPROCESS, 
                         process_eip, 
                         process_priority, 
@@ -1733,6 +1696,7 @@ gde_create_thread (
     unsigned long init_stack, 
     char *name )
 {
+    gde_debug_print ("gde_create_thread:\n");
     return (void *) system_call ( SYSTEMCALL_CREATETHREAD, 
                         init_eip, 
                         init_stack, 
@@ -1774,13 +1738,15 @@ void *gde_fopen (const char *filename, const char *mode){
     // Cuidado estamos entrando na sessão crítica.
     // O aplicativo pode desejar fazer o mesmo.
 
+    gde_debug_print ("gde_fopen:\n");
+
     //#todo: deletar
-	gde_enter_critical_section();
-	
-	Ret = (void *) system_call ( SYSTEMCALL_READ_FILE, 
-	                (unsigned long) filename, 
-	                (unsigned long) mode, 
-	                0 );
+    gde_enter_critical_section();
+
+    Ret = (void *) system_call ( SYSTEMCALL_READ_FILE, 
+                       (unsigned long) filename, 
+                       (unsigned long) mode, 
+                       0 );
 
 	//#todo: deletar
     gde_exit_critical_section (); 
@@ -1794,8 +1760,10 @@ void *gde_fopen (const char *filename, const char *mode){
  * gde_save_file:
  *     Salva um arquivo no diretório raiz do volume de boot.
  *     Obs: Talvez possamos ter mais argumentos.
- *     #bugbug: Essa rotina seria mais fácil se todas as informações sobre
- * o arquivo fossem gerenciadas pelo kernel. Mas não é o que estamos fazendo agora.
+ *     #bugbug: 
+ *     Essa rotina seria mais fácil se todas as informações sobre
+ * o arquivo fossem gerenciadas pelo kernel. Mas não é o que estamos 
+ * fazendo agora.
  */
  
 //file_size = size in sectors
@@ -1818,22 +1786,17 @@ gde_save_file (
 	// #importante: Isso está funcionado, Vamos fazer assim e 
 	// não do jeito antigo.
 
-	unsigned long message_buffer[12];
-	
-	message_buffer[0] = (unsigned long) file_name;
-	message_buffer[1] = (unsigned long) file_size;
-	message_buffer[2] = (unsigned long) size_in_bytes;
-	message_buffer[3] = (unsigned long) file_address;
-	message_buffer[4] = (unsigned long) flag;
-	//message_buffer[5] = (unsigned long) x;
-	//message_buffer[6] = (unsigned long) x;
-	//message_buffer[7] = (unsigned long) x;
-	//message_buffer[8] = (unsigned long) x;
-	//message_buffer[9] = (unsigned long) x;
-	//message_buffer[10] = (unsigned long) x;
-	//message_buffer[11] = (unsigned long) x;
-		
-	
+    unsigned long message_buffer[12];
+
+    message_buffer[0] = (unsigned long) file_name;
+    message_buffer[1] = (unsigned long) file_size;
+    message_buffer[2] = (unsigned long) size_in_bytes;
+    message_buffer[3] = (unsigned long) file_address;
+    message_buffer[4] = (unsigned long) flag;
+
+    //message_buffer[5] = (unsigned long) x;
+    //message_buffer[6] = (unsigned long) x;
+    // ...
 
     gde_enter_critical_section ();
 
@@ -1863,6 +1826,7 @@ int gde_create_empty_file ( char *file_name ){
 }
 
 
+// ?? FS
 int gde_create_empty_directory ( char *dir_name ){
 
     int __ret=0;
@@ -1903,8 +1867,8 @@ tryAgain:
     
 	//0 = deu certo, entrada liberada na sessão crítica.
     //1 = algo deu errado espere tentando novamente.
-	
-	Status = (int) system_call ( SYSTEMCALL_SEMAPHORE_DOWN, 
+
+    Status = (int) system_call ( SYSTEMCALL_SEMAPHORE_DOWN, 
                        (unsigned long) s, 
                        (unsigned long) s, 
                        (unsigned long) s );
@@ -1918,8 +1882,8 @@ tryAgain:
 
 	// Devemos esperar, monitorando a flag ou bloquando a thread.
 	
-	if (Status == 1)
-	{
+    if (Status == 1)
+    {
 		// Opções:
 		// + Bloqueamos a thread e quando ela acordar tentaremos novamente.
 		// + Fazemos um loop monitorando a flag.
@@ -1929,11 +1893,11 @@ tryAgain:
 		
 		//Opção 2.
 		goto tryAgain;
-	};
-	
-fail:
+    }
 
-	goto tryAgain;
+
+fail:
+    goto tryAgain;
 }
 
 
@@ -2001,26 +1965,25 @@ void gde_enter_critical_section (){
     int S;
 
 
-    while (1)
-    {
-	    S = (int) system_call ( SYSTEMCALL_GET_KERNELSEMAPHORE, 0, 0, 0 );
+    while (1){
+        S = (int) system_call ( SYSTEMCALL_GET_KERNELSEMAPHORE, 
+                      0, 0, 0 );
 	    
 		//Se deixou de ser 0 então posso entrar.
 		//se ainda for 0, continuo no while.
 
-		if ( S == 1 )
-		{
-		    goto done;	
-		};
+        if ( S == 1 ){
+            goto done;
+        }
 		//Nothing.
-	};
-	
+    };
+
     //Nothing
 	
 done:
     //Muda para zero para que ninguém entre.
     system_call ( SYSTEMCALL_CLOSE_KERNELSEMAPHORE, 0, 0, 0 );
-	return;
+    return;
 }
 
 
@@ -2216,6 +2179,10 @@ int gde_getchar ()
  *
  *	// @todo: Criar defines para esses deslocamentos.
  */
+
+// #atenção
+// Me parece que essa rotina funcinna bem,
+// o problema é a rotina que carrega o arquivo.
 
 static int nibble_count_16colors = 0;
  
@@ -2675,10 +2642,10 @@ gde_send_message (
 
     unsigned long message_buffer[5];
 
-	message_buffer[0] = (unsigned long) window;
-	message_buffer[1] = (unsigned long) message;
-	message_buffer[2] = (unsigned long) long1;
-	message_buffer[3] = (unsigned long) long2; 
+    message_buffer[0] = (unsigned long) window;
+    message_buffer[1] = (unsigned long) message;
+    message_buffer[2] = (unsigned long) long1;
+    message_buffer[3] = (unsigned long) long2; 
 
     return (unsigned long) system_call ( 114 , 
                                (unsigned long) &message_buffer[0], 
@@ -2687,6 +2654,8 @@ gde_send_message (
 }
 
 
+// Draw text.
+// deprecated.
 int 
 gde_draw_text ( 
     struct window_d *window, 
@@ -2698,19 +2667,17 @@ gde_draw_text (
 
     unsigned long msg[8];
 
-
-	msg[0] = (unsigned long) window;
-	msg[1] = (unsigned long) x;
-	msg[2] = (unsigned long) y;
-	msg[3] = (unsigned long) color;
-	msg[4] = (unsigned long) string;
-	//...
-
+    msg[0] = (unsigned long) window;
+    msg[1] = (unsigned long) x;
+    msg[2] = (unsigned long) y;
+    msg[3] = (unsigned long) color;
+    msg[4] = (unsigned long) string;
+    // ...
 
     return (int) system_call ( SYSTEMCALL_DRAWTEXT, 
-	                (unsigned long) &msg[0], 
-	                (unsigned long) &msg[0], 
-	                (unsigned long) &msg[0] );
+                    (unsigned long) &msg[0], 
+                    (unsigned long) &msg[0], 
+                    (unsigned long) &msg[0] );
 }
 
 
@@ -2741,6 +2708,7 @@ gde_create_timer (
     unsigned long ms, 
     int type )
 {
+    gde_debug_print ("gde_create_timer:\n");
     return (struct timer_d *) gramado_system_call ( 222, 
                                   (unsigned long) window, 
                                   (unsigned long) ms, 
@@ -2761,9 +2729,9 @@ unsigned long gde_get_systime_info (int n){
 /*
  * gde_show_window 
  * 
- * 
  */
  
+//deprecated
 //mostra uma janela na tela. backbuffer ---> frontbuffer
 
 void gde_show_window (struct window_d *window){
@@ -2868,7 +2836,7 @@ struct window_d *gde_get_main_window (void)
 
 
 
-//pega o nome do processo dado o pid.
+// Pega o nome do processo dado o pid.
 int gde_getprocessname (int pid, char *name, size_t len){
 
     int __len_ret = 0;
@@ -2956,7 +2924,10 @@ unsigned long gde_get_thread_stats (int tid, int index){
 }
 
 
-
+/*
+ * gde_debug_print:
+ * 
+ */
 // Envia uma string para a porta serial COM1
 void gde_debug_print (char *string){
 
@@ -2967,13 +2938,16 @@ void gde_debug_print (char *string){
 }
 
 
-//#test: Isso ainda não foi testado.
-//#todo testar.
+/*
+ **************************************
+ * gde_clone_and_execute:
+ *     Clone and execute a process.
+ */
+
 int gde_clone_and_execute ( char *name )
 {
     return (int) gramado_system_call ( 900, (unsigned long) name, 0, 0 );
 }
-
 
 
 // Enviamos para o kernel um buffer que está no app.
