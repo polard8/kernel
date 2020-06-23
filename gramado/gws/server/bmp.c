@@ -519,23 +519,20 @@ bmpDisplayBMP (
         goto fail;
     }
 
-	// @todo:
+	// #todo:
 	// Testar validade do endereço.
     if ( address == 0 ){
         gde_debug_print ("bmpDisplayBMP: address fail \n");
         goto fail;
     }
 
+
+    
 	//
 	// struct for Info header
 	//
 
-	// #BUGBUG 
-	// Um malloc aqui pode esgotar o heap 
-	// na hora de movimentar o mouse.
-	// precisamos usar um buffer interno para
-	// essa estrutura.
-
+    // #todo: Podemos usar malloc?
     char buffer[512];
     char buffer2[512];
 
@@ -553,6 +550,15 @@ bmpDisplayBMP (
 	// Size. ( 2 bytes )
     unsigned short Size = *( unsigned short *) &bmp[2];
     bh->bmpSize = Size;
+
+
+    //#test
+    if ( bmp[0] != 'B' || bmp[1] != 'M' )
+    {
+        printf (">>>> %c %c\n",bmp[0],bmp[1]);
+        gde_debug_print ("bmpDisplayBMP: SIG FAIL \n");
+        goto fail;
+    }
 
 	
 	//
@@ -626,13 +632,22 @@ bmpDisplayBMP (
         //case 2: base = (0x36 + 0x40); break;
 
         // 4 bytes pra cada cor, 16 cores. Total 64 bytes.
-        case 4:  base = (0x36 + 0x40);  break; 
+        case 4:  
+            base = (0x36 + 0x40);  
+            gde_debug_print ("bmpDisplayBMP: bmpBitCount 4\n");  
+            break; 
 
         // 4 bytes pra cada cor, 256 cores. Total 1024 bytes.
-        case 8:  base = (0x36 + 0x400); break; 
+        case 8:  
+            base = (0x36 + 0x400); 
+            gde_debug_print ("bmpDisplayBMP: bmpBitCount 8\n");   
+            break; 
 
         // Default.
-        default:  base = 0x36;  break;
+        default:  
+            base = 0x36;
+            gde_debug_print ("bmpDisplayBMP: bmpBitCount fail\n");  
+            break;
     };
 
 

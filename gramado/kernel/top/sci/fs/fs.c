@@ -1711,7 +1711,7 @@ int sys_read_file ( char *file_name,  int flags, mode_t mode ){
     if (Status != 1){
          printf ("sys_read_file: File not found!\n");
          refresh_screen();
-         return -1;
+         return (int) (-1);
     }
 
 
@@ -1721,11 +1721,15 @@ int sys_read_file ( char *file_name,  int flags, mode_t mode ){
   
     p = (struct process_d *) processList[current_process];
 
-    if ( (void *) p == NULL )
+    if ( (void *) p == NULL ){
+        debug_print ("sys_read_file: p\n");
         return -1;
+    }
 
-    if ( p->used != 1 || p->magic != 1234 )
+    if ( p->used != 1 || p->magic != 1234 ){
+        debug_print ("sys_read_file: validation\n");
         return -1;
+    }
         
         
     for (__slot=0; __slot<32; __slot++)
@@ -1946,7 +1950,9 @@ __OK:
     // Vamos retornar o fd.
     // Pois essa rotina � usada por open();
     //      
-          
+
+    debug_print ("sys_read_file: done\n");
+                  
     return (int) __file->_file;
 }
 

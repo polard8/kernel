@@ -647,6 +647,70 @@ void create_taskbar (void)
 }
 
 
+void xxx_test_load_bmp(void);
+void xxx_test_load_bmp(void)
+{
+    //
+    // =======================================
+    //
+    
+    //#todo
+    //Trying to load and show a bmp file.
+    
+    char *bmp_buffer;
+    //char *file_name = "FOLDER  BMP";//"terminal.bmp";
+    char file_name[] = "terminal.bmp";
+    bmp_buffer = (char *) malloc(1024*128);
+    if ( (void *) bmp_buffer == NULL )
+        printf ("bmp_buffer fail\n");
+    
+    // ?? Onde fica o heap usado por esse malloc ??
+    printf ("bmp_buffer = %x\n", bmp_buffer);
+  
+        //stdio_fntos ( (char *) file_name ); //não precisa
+    
+    int r=-1;
+    r=gramado_system_call ( SYSTEMCALL_READ_FILE, 
+        (unsigned long) file_name, 
+        (unsigned long) bmp_buffer, 
+        (unsigned long) bmp_buffer );  
+
+    if(r<0)
+        printf("r fail\n");
+
+    //#test
+    if ( bmp_buffer[0] != 'B' || bmp_buffer[1] != 'M' )
+    {
+        printf (">>>> %c %c\n",&bmp_buffer[0],&bmp_buffer[1]);
+        gde_debug_print ("main: SIG FAIL \n");
+        while(1);
+    }
+
+          
+    bmpDisplayBMP ((char *) bmp_buffer, (unsigned long) 80, (unsigned long) 80);    
+    //gde_display_bmp((char *)bmp_buffer, (unsigned long) 80, (unsigned long) 80);
+    
+
+    /*
+     //ok isso funciona.
+    pixelBackBufferPutpixel ( (unsigned long) COLOR_RED, 
+         (unsigned long) 100, 
+         (unsigned long) 100 );
+
+    pixelBackBufferPutpixel ( (unsigned long) COLOR_RED, 
+         (unsigned long) 102, 
+         (unsigned long) 100 );
+
+    pixelBackBufferPutpixel ( (unsigned long) COLOR_RED, 
+         (unsigned long) 104, 
+         (unsigned long) 100 );
+    */
+    
+    //
+    // =======================================
+    //
+}
+
 
 /*
  ******************************
@@ -768,30 +832,6 @@ int main (int argc, char **argv){
     //#todo
     //listen()
 
-
-    //
-    // =======================================
-    //
-    
-    //#todo
-    //Trying to load and show a bmp file.
-    /*
-    void *bmp_buffer;
-    char *file_name = "terminal.bmp";
-    bmp_buffer = (void *) malloc(1024*128);
-        stdio_fntos ( (char *) file_name );
-    gramado_system_call ( SYSTEMCALL_READ_FILE, 
-        (unsigned long) file_name, 
-        (unsigned long) bmp_buffer, 
-        (unsigned long) bmp_buffer );  
-          
-    bmpDisplayBMP ((char *)bmp_buffer, (unsigned long) 80, (unsigned long) 80);    
-    //gde_display_bmp((char *)bmp_buffer, (unsigned long) 80, (unsigned long) 80);
-    */
-    
-    //
-    // =======================================
-    //
 
     //
     // Calling child.
