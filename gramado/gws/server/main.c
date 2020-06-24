@@ -904,14 +904,24 @@ int main (int argc, char **argv){
     //not used for now.
     connection_status = 1;
 
+    int newsockfd = -1;
+    
     // while (1)
     while (running == 1)
     {
         // Pinta ou não.
         if ( dirty_status == 1 )
             compositor();
-
+         
+         
+        //Accept actual connection from the client */
+        newsockfd = accept ( ____saved_server_fd, (struct sockaddr *) &addr, sizeof(addr) );
+        if (newsockfd < 0) {
+            gde_debug_print ("gws: ERROR on accept\n");
+ 
+        }else{
             handle_request (____saved_server_fd);
+        };
     };
 
 

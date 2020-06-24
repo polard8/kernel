@@ -556,8 +556,19 @@ int main (int argc, char **argv){
     // Inclusive a mensagem que pede para drenar input e 
     // via mensagens e repassar via socket. 
     
+    int newsockfd = -1;
+    
     while (1){
-        __socket_messages (____saved_server_fd);
+
+        //Accept actual connection from the client */
+        newsockfd = accept ( ____saved_server_fd, (struct sockaddr *) &addr, sizeof(addr) );
+        if (newsockfd < 0) {
+            gde_debug_print ("gns: ERROR on accept\n");
+ 
+        }else{
+            //__socket_messages (____saved_server_fd);
+            __socket_messages (newsockfd);
+        };
     };
 
 

@@ -1435,8 +1435,8 @@ sys_accept (
     }
 
     // #debug
-    printf ("process %d | family %d | len %d \n", 
-        current_process, addr->sa_family, addrlen  );
+    //printf ("sys_accept: process %d | family %d | len %d \n", 
+        //current_process, addr->sa_family, addrlen  );
 
  
     //#test
