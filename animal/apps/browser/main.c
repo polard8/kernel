@@ -48,6 +48,8 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <packet.h>
+
+// The client-side library.
 #include <gws.h>
 
 
@@ -226,14 +228,38 @@ response_loop:
         
     switch (msg){
 
-         //OK isso funcionou.
-        //case MSG_KEYDOWN:
-          case 20:  
+        //OK isso funcionou.
+        case MSG_KEYDOWN:
+          //case 20:
             //gws_debug_print ("MSG_KEYDOWN\n");
-            printf ("%c",long1);
-            fflush(stdout);
-            goto process_event;
+            switch (long1)
+            {
+                //case 0:
+                    //relax cpu
+                    //break; 
+                    
+                //case VK_RETURN:
+                    //goto process_event;
+                    //break;
+                  
+                //case VK_TAB:
+                //case VK_BACK:
+                
+                //...
+                
+                
+                // We are in the terminal ...
+                // We will not process the chars ...
+                // We need to send it to the client via file.
+                default:
+                    //terminal_write_char(long1) #todo
+                    printf ("%c",long1);
+                    fflush(stdout);
+                    goto process_event;
+                    break;
+            };
             break;
+
 
         //case MSG_KEYUP:
           case 21:  
@@ -241,6 +267,43 @@ response_loop:
             goto process_event;
             break;
 
+            
+        case MSG_SYSKEYDOWN:
+            switch (long1)
+            {
+                //case VK_F1:
+                default:
+                    goto process_event;
+                    break;
+            };
+            break;
+            
+
+        case MSG_SYSKEYUP:
+            switch (long1)
+            {
+                //case VK_F1:
+                default:
+                    goto process_event;
+                    break;
+            };
+            break;
+
+        // Commands.
+        case MSG_COMMAND:
+            switch (long1)
+            {
+                //case CMD_ABOUT:
+                    //printf ("terminal: CMD_ABOUT\n");
+                    //goto process_event;
+                    //break;
+                    
+                default:
+                    goto process_event;
+                    break;
+            };
+
+ 
         case SERVER_PACKET_TYPE_REQUEST:
             gws_yield ();
             goto response_loop;
@@ -802,8 +865,17 @@ int main ( int argc, char *argv[] ){
         browser_hello_response(client_fd);
     //}
 
-    browser_createwindow_request(client_fd, 80, 80, 480, 320, COLOR_PINK);
-    browser_createwindow_response(client_fd); 
+    // The main window.
+    // #todo: Can gws_create_window call these two functions? 
+    //browser_createwindow_request(client_fd, 80, 80, 480, 320, COLOR_PINK);
+    //browser_createwindow_response(client_fd); 
+
+    // Create window using the client-side gui.
+    //ok isso funcionou.
+    gws_create_window_using_socket (client_fd,
+        1,1,1,"no-name",
+        80,80,640,480,
+        0,0,COLOR_ORANGE, COLOR_ORANGE);
 
     //loop
     browser_loop(client_fd);

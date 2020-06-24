@@ -860,8 +860,8 @@ int main (int argc, char **argv){
     // Calling a child.
 
     //gde_clone_and_execute ("gwst.bin");  
-    gde_clone_and_execute ("terminal.bin"); 
-    //gde_clone_and_execute ("browser.bin"); 
+    //gde_clone_and_execute ("terminal.bin"); 
+    gde_clone_and_execute ("browser.bin"); 
     // ...
 
  

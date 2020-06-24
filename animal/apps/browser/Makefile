@@ -45,15 +45,8 @@ LIBGWSOBJ = ../../../lib/libgws/obj
 	##
 
 myObjects = crt0.o main.o stubs.o \
-ctype.o \
-stdio.o \
-fcntl.o \
-stdlib.o \
-string.o \
-unistd.o \
-termios.o \
-ioctl.o \
-socket.o \
+ctype.o stdio.o fcntl.o stdlib.o string.o unistd.o termios.o \
+ioctl.o socket.o \
 gws.o connect.o events.o rw.o    
 
 

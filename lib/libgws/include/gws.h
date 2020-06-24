@@ -32,6 +32,9 @@
 //#include "connect.h"
 
 
+#include "gws_pack.h"
+
+
 // Read and write from socket.
 #include "rw.h"
 
@@ -119,6 +122,23 @@ gws_create_window (
     unsigned long onde,        //10, Ambiente.( Está no desktop, barra, cliente ...)
     unsigned long clientcolor, //11, Cor da área de cliente
     unsigned long color );     //12, Color (bg) (para janela simples).
+
+
+void *
+gws_create_window_using_socket (
+    int fd, 
+    unsigned long type,        //1, Tipo de janela (popup,normal,...)
+    unsigned long status,      //2, Estado da janela (ativa ou nao)
+    unsigned long view,        //3, (min, max ...)
+    char *windowname,          //4, Título.                          
+    unsigned long x,           //5, Deslocamento em relação às margens do Desktop.                           
+    unsigned long y,           //6, Deslocamento em relação às margens do Desktop.
+    unsigned long width,       //7, Largura da janela.
+    unsigned long height,      //8, Altura da janela.
+    int parentwindow,  //9, Endereço da estrutura da janela mãe.
+    unsigned long onde,        //10, Ambiente.( Est� no desktop, barra, cliente ...)
+    unsigned long clientcolor, //11, Cor da área de cliente
+    unsigned long color );      //12, Color (bg) (para janela simples).
 
 
 // #bugbug:

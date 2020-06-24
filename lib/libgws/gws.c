@@ -34,6 +34,10 @@
 #include "include/gws.h"  
 
 
+// #test
+// Tentando deixar o buffer aqui e aproveitar em mais funções.
+char __gws_message_buffer[512];
+
 
 // System call.
 void *
@@ -87,7 +91,7 @@ int gws_initialize_library (void)
 // gws_createwindow_request e gws_createwindow_response
 //
 
-/*
+
 // create window support
 int 
 gws_createwindow_request (
@@ -107,7 +111,7 @@ gws_createwindow_request (
     unsigned long bg_color )
 {
     // Isso permite ler a mensagem na forma de longs.
-    unsigned long *message_buffer = (unsigned long *) &__buffer[0];   
+    unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];   
 
     int n_writes = 0;   // For sending requests.
 
@@ -151,7 +155,7 @@ gws_createwindow_request (
         // Se foi possível enviar, então saimos do loop.  
 
         // n_writes = write (fd, __buffer, sizeof(__buffer));
-        n_writes = send (fd, __buffer, sizeof(__buffer), 0);
+        n_writes = send (fd, __gws_message_buffer, sizeof(__gws_message_buffer), 0);
        
         if(n_writes>0)
            break;
@@ -160,16 +164,16 @@ gws_createwindow_request (
 
     return 0; 
 }
-*/
 
 
-/*
+
+
 //create window support.
 int gws_createwindow_response(int fd);
 //response
 int gws_createwindow_response(int fd)
 {
-    unsigned long *message_buffer = (unsigned long *) &__buffer[0];   
+    unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];   
     int n_reads = 0;    // For receiving responses.
 
     //
@@ -213,7 +217,7 @@ int gws_createwindow_response(int fd)
 response_loop:
 
     //n_reads = read ( fd, __buffer, sizeof(__buffer) );
-    n_reads = recv ( fd, __buffer, sizeof(__buffer), 0 );
+    n_reads = recv ( fd, __gws_message_buffer, sizeof(__gws_message_buffer), 0 );
     
     //if (n_reads<=0){
     //     gws_yield(); 
@@ -245,22 +249,22 @@ response_loop:
     
     switch (msg){
 
-        case SERVER_PACKET_TYPE_REQUEST:
+        case GWS_SERVER_PACKET_TYPE_REQUEST:
             gws_yield ();
             goto response_loop;
             break;
             
         // Reply!
-        case SERVER_PACKET_TYPE_REPLY:
+        case GWS_SERVER_PACKET_TYPE_REPLY:
             goto process_reply;
             break;
             
-        case SERVER_PACKET_TYPE_EVENT:
+        case GWS_SERVER_PACKET_TYPE_EVENT:
             goto process_event;
             //goto response_loop;
             break;
             
-        case SERVER_PACKET_TYPE_ERROR:
+        case GWS_SERVER_PACKET_TYPE_ERROR:
             gws_debug_print ("gws: SERVER_PACKET_TYPE_ERROR\n");
             goto response_loop;
             //exit (-1);
@@ -302,9 +306,40 @@ process_event:
     return 0;
 
 }
-*/
 
 
+
+// Talvez vamos retonar o descritor
+// dado pelo servidor.
+void *
+gws_create_window_using_socket (
+    int fd, 
+    unsigned long type,        //1, Tipo de janela (popup,normal,...)
+    unsigned long status,      //2, Estado da janela (ativa ou nao)
+    unsigned long view,        //3, (min, max ...)
+    char *windowname,          //4, Título.                          
+    unsigned long x,           //5, Deslocamento em relação às margens do Desktop.                           
+    unsigned long y,           //6, Deslocamento em relação às margens do Desktop.
+    unsigned long width,       //7, Largura da janela.
+    unsigned long height,      //8, Altura da janela.
+    int parentwindow,  //9, Endereço da estrutura da janela mãe.
+    unsigned long onde,        //10, Ambiente.( Est� no desktop, barra, cliente ...)
+    unsigned long clientcolor, //11, Cor da área de cliente
+    unsigned long color )      //12, Color (bg) (para janela simples).
+{
+
+    //#todo
+    // use more arguments.
+    gws_createwindow_request(fd, 
+        x, y, width, height, color);
+    gws_createwindow_response(fd); 
+    
+    return NULL;
+}    
+    
+    
+    
+    
 
 
 
