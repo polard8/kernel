@@ -8,8 +8,9 @@
 
 // Helper function to initialize system's component
 // after kernel initialization.
-int syssm_initialize_component( int n )
-{
+
+int syssm_initialize_component (int n){
+
 
     if(n<0)
         return -1;

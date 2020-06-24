@@ -34,12 +34,15 @@
 typedef int pid_t;
 
 
+//See: threadi.c
+int kfork (void);
+
 //#todo
 //https://www.mkssoftware.com/docs/man3/pathconf.3.asp
 long fpathconf (int fildes, int name);
 long pathconf (const char *pathname, int name);
 
-off_t sys_lseek(int fd, off_t offset, int whence);
+off_t sys_lseek (int fd, off_t offset, int whence);
 
 
 //See: network.c

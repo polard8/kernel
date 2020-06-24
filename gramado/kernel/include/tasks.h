@@ -91,11 +91,6 @@ unsigned long executa_tarefa(int id, unsigned long *task_address);
 
 void start_task(unsigned long id, unsigned long *task_address);
 
-//
-// Usadas durante a criação de threads e processos.
-//
-
-int fork (void);
 
  
 //

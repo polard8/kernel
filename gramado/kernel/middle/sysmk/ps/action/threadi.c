@@ -337,8 +337,10 @@ void *KiCreateRing0Idle (void){
  *
  */
 
-int fork (void){
-	
+int kfork (void){
+
+    debug_print ("threadi-kfork: [TODO]\n");
+
     //struct process_t *p;
 	
 	//p = (void *) processList[current_process];
@@ -351,7 +353,7 @@ int fork (void){
 	
 	//Ainda não implementada.
 	
-	return 0;     
+    return -1;
 }
 
 
@@ -368,7 +370,7 @@ int KiFork (void){
 	
 	//@todo Criar interface
 	
-	return (int) fork();
+    return (int) kfork();
 }
 
 
@@ -694,12 +696,12 @@ set_thread_priority ( struct thread_d *t,
     unsigned long OldPriority;
 
 
-	if ( (void *) t == NULL )
-	{
-	    return;
-		
-	}else{
-		
+    if ( (void *) t == NULL ){
+        //
+        return;
+
+    }else{
+	
         if ( t->used != 1 || t->magic != 1234 )
         {
 		    return;
@@ -737,13 +739,8 @@ set_thread_priority ( struct thread_d *t,
         };    
 		//...
 	};
-	
 
-
-	
-
-	
-
+    // ??
 }
 
 
@@ -759,18 +756,18 @@ SetThreadDirectory ( struct thread_d *thread,
                      unsigned long Address )
 {
 
-    if ( (void *) thread == NULL )
-	{
+    if ( (void *) thread == NULL ){
+        //
         return;
-        
-	}else{
+
+    }else{
 		
 		//@todo:
 		//Aqui podemos checar a validade da estrutura,
 		//antes de operarmos nela.
 		
 		thread->DirectoryPA = (unsigned long) Address;	
-	};
+    };
 }
 
 
@@ -782,21 +779,21 @@ SetThreadDirectory ( struct thread_d *thread,
  
 unsigned long GetThreadDirectory ( struct thread_d *thread ){
 	
-    if ( (void *) thread == NULL )
-	{
-		return (unsigned long) 0;    
-		
-	}else{
+    if ( (void *) thread == NULL ){
+		//
+        return (unsigned long) 0;    
+
+    }else{
 		
 		//@todo:
 		//Aqui podemos checar a validade da estrutura,
 		//antes de operarmos nela.
 		
 	    return (unsigned long) thread->DirectoryPA;		
-	};
+    };
 
 
-	return (unsigned long) 0;
+    return (unsigned long) 0;
 }
 
 
@@ -840,22 +837,23 @@ void show_tasks_parameters (void)
  */
  
 void release ( int tid ){
-	
+
     struct thread_d *Thread;
 	
 	
-	if ( tid < 0 || tid >= THREAD_COUNT_MAX ){
-	    
+    if ( tid < 0 || tid >= THREAD_COUNT_MAX )
+    {
+        //  
 		return; 
-	}
+    }
 	
-	Thread = (void *) threadList[tid];
-	
-	if ( (void *) Thread == NULL )
-	{
+    Thread = (void *) threadList[tid];
+
+    if ( (void *) Thread == NULL ){
+		//
 		return; 
 		
-	}else{
+    }else{
 		
         if ( Thread->magic != THREAD_MAGIC ){
 			
@@ -886,16 +884,16 @@ void exit_thread (int tid){
 
 
     // Nem existe.
-    if ( tid < 0 || tid >= THREAD_COUNT_MAX )
-    {
+    if ( tid < 0 || tid >= THREAD_COUNT_MAX ){
+        debug_print ("exit_thread: tid");
         return;
     }
 
 
-	
-	if ( (void *) ____IDLE == NULL )
-	{
+    // The idle thread.
+    if ( (void *) ____IDLE == NULL ){
 	    panic ("exit_thread: ____IDLE fail");
+
 	}else{
 
         if ( ____IDLE->used != 1 || ____IDLE->magic != 1234 )
@@ -954,8 +952,10 @@ void exit_thread (int tid){
 
 
 done:
+    debug_print ("exit_thread: done\n");
     return;
 }
+
 
 
 /*
@@ -966,39 +966,38 @@ done:
  */
 
 void kill_thread (int tid){
-	
+
     struct thread_d *__Thread;
 
 
-
-
 	//Limits.
-    if ( tid < 0 || tid >= THREAD_COUNT_MAX )
-    {
-       return;
+    if ( tid < 0 || tid >= THREAD_COUNT_MAX ){
+        debug_print ("kill_thread: tid");
+        return;
     }
 
 
-	
-	if ( (void *) ____IDLE == NULL )
-	{
-	    panic ("kill_thread: ____IDLE fail");
-	}else{
+    // #bugbug
+    // The IDLE thread.
+    
+    if ( (void *) ____IDLE == NULL ){
+        panic ("kill_thread: ____IDLE fail");
+    
+    }else{
 
         if ( ____IDLE->used != 1 || ____IDLE->magic != 1234 )
         {
-		    panic ("kill_thread: ____IDLE validation");
-	    }
-	    
+            panic ("kill_thread: ____IDLE validation");
+        }
+
 	    // Se queremos deletar a idle.
-	    if ( tid == ____IDLE->tid )
-	    {
-		    panic ("kill_thread: Sorry, we can't kill the idle thread!");
+        if ( tid == ____IDLE->tid )
+        {
+            panic ("kill_thread: Sorry, we can't kill the idle thread!");
 	    }
 
 	    // ...
-	};
-	
+    };
 
 	
 
@@ -1008,30 +1007,28 @@ void kill_thread (int tid){
 	//    Deve acordar o pai que está esperando o filho fechar.
 	//    Mas no caso estamos apenas fechando uma thread.
     //    Caso essa não seja a thread primária, isso não deve 
-	// causar o fechamento do processo.	
+    // causar o fechamento do processo.	
     //
-	
-	__Thread = (void *) threadList[tid];
-	
-	
+
+    __Thread = (void *) threadList[tid];
+
 	// A thread alvo nem existe,
 	// vamos apenas continuar.
-	if ( (void *) __Thread == NULL )
-	{
-		printf ("kill_thread: This thread doesn't exist!\n");
-		refresh_screen();
-		return;
-		
-	}else{
+
+    if ( (void *) __Thread == NULL ){
+        printf ("kill_thread: This thread doesn't exist!\n");
+        refresh_screen();
+        return;
+
+    }else{
 
         // #todo 
         // Pegar o id do pai e enviar um sinal e acorda-lo
         //se ele estiver esperando por filho.		
         __Thread->used = 0;
         __Thread->magic = 0; 		
-		__Thread->state = DEAD; 
-		//...
-		
+        __Thread->state = DEAD; 
+        // ...
 
 
 		//ProcessorBlock.threads_counter--;
@@ -1065,6 +1062,7 @@ void kill_thread (int tid){
 
 
 done:
+    debug_print ("kill_thread: done\n");
     return;
 }
 

@@ -89,7 +89,7 @@ int sys_ioctl ( int fd, unsigned long request, char *arg ){
     file *f;
 
 
-    debug_print ("sys_ioctl: TODO\n");
+    debug_print ("sys_ioctl: [TODO]\n");
 
     // fd must to be on open file descriptor.
     if ( fd<0 || fd>31 ){
@@ -100,11 +100,15 @@ int sys_ioctl ( int fd, unsigned long request, char *arg ){
 
     p = (struct process_d *) processList[current_process];
 
-    if ( (void *) p == NULL )
+    if ( (void *) p == NULL ){
+        debug_print("sys_ioctl: p fail\n");
         return -1;
+    }
         
-    if ( p->used != 1 || p->magic != 1234 )
+    if ( p->used != 1 || p->magic != 1234 ){
+        debug_print("sys_ioctl: validation fail\n");
         return -1;
+    }
         
         
     // pega o arquivo.
@@ -114,6 +118,9 @@ int sys_ioctl ( int fd, unsigned long request, char *arg ){
 
     f = (file *) p->Objects[fd];
     
+    
+    //#todo
+    // check file structure validation.
     
     // #todo
     // Now we can use a swit to call different
@@ -139,30 +146,44 @@ int sys_ioctl ( int fd, unsigned long request, char *arg ){
 
 
     //fail
+    debug_print ("sys_ioctl: fail\n");
     return -1;
 }
 
 
-int sys_fcntl ( int fd, int cmd, ... )
-{
+int sys_fcntl ( int fd, int cmd, ... ){
 
-    if ( fd < 0 )
+    debug_print ("sys_fcntl:\n");
+
+
+    if ( fd < 0 ){
+        debug_print ("sys_fcntl: fd\n");
         return -1;
-    
-    if ( cmd < 0 )
+    }
+ 
+    if ( cmd < 0 ){
+        debug_print ("sys_fcntl: cmd\n");
         return -1;
+    }
     
-    
-    switch(cmd)
+
+    switch (cmd)
     {
         // lock operation.
         case F_SETLK:
+            debug_print ("sys_fcntl: [TODO] F_SETLK\n");
+            return -1;
             break;
             
+        // ...
+            
         default:
+            debug_print ("sys_fcntl: default command\n");
             break;
     };
 
+
+    debug_print ("sys_fcntl: FAIL\n");
 
     return -1; //#todo
 }
@@ -1067,15 +1088,6 @@ fail:
 
 
 /*
-int sys_fcntl(unsigned int fd, unsigned int cmd, unsigned long arg);
-int sys_fcntl(unsigned int fd, unsigned int cmd, unsigned long arg)
-{
-    return -1;
-}
-*/
-
-
-/*
  *****************************************************
  * sys_create_process:
  *     Create process system interface.
@@ -1178,7 +1190,6 @@ sys_create_process (
         panic ("sys_create_process: p\n");
 
     }else{
-
         fs_initialize_process_pwd ( p->pid, "no-pwd" );
     };
     
@@ -1209,7 +1220,9 @@ sys_create_process (
                         p->pid, 
                         "control-thread" ); 
 
-    if ( (void *) t == NULL ){
+    if ( (void *) t == NULL )
+    {
+        debug_print ("sys_create_process: t fail\n");
         return NULL;
     }
 
@@ -1237,30 +1250,31 @@ int sys_getpid (void)
 // 81
 // Get the PID of the father.
 int sys_getppid (void){
-	
+
+    struct process_d *p;
     int pid = -1;
-	struct process_d *p;
 
 
-	pid = (int) current_process;
-	
-	if ( pid >= 0 && pid < PROCESS_COUNT_MAX )
-	{
-		p = (void *) processList[pid]; 		
-		
-		if ( (void *) p == NULL ){ 
+    pid = (int) current_process;
+
+    if ( pid >= 0 && pid < PROCESS_COUNT_MAX )
+    {
+        p = (void *) processList[pid];
+
+        if ( (void *) p == NULL )
+        { 
             return (int) -1; 
         }
-		
-		if ( p->used != 1 || p->magic != 1234 ){
-		    
+
+        if ( p->used != 1 || p->magic != 1234 )
+        {    
 			return (int) -1;	
-		}
+        }
 		
 		return (int) p->ppid;
-	}
+    }
 
-    return (int) -1;	
+    return (int) (-1);
 }
 
 
@@ -1273,9 +1287,14 @@ int sys_getppid (void){
  */
 
 // #todo 
-int sys_fork (void)
-{
-    return (int) fork ();
+int sys_fork (void){
+
+    debug_print ("sys_fork: \n");
+
+    // #todo
+    // We need to change this name. fork() will be used only on ring3.
+    // See: gramado/kernel/middle/sysmk/ps/action/threadi.c
+    return (int) kfork ();
 }
 
 

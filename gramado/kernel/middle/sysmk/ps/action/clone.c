@@ -1,11 +1,7 @@
 /*
- * File: clone.c 
- * 
+ * File: ps/action/clone.c 
  * 
  */
-
-
-// fork ?
 
 
 #include <kernel.h>

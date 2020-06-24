@@ -107,7 +107,7 @@ typedef enum {
  *                     // ( Vários tipos de rotinas podem ser realizadas durante o período
  *                     // que o processador estiver ocioso. O usuário pode configurar
  *                     // o que o sistema deve fazer nesses momentos de ociosidade).
- *					   
+ *
  *    TYPE_PERIODIC 3  // Tarefas periódicas. 
  *                     // (Rodam de tempos em tempos, como o deadthread collector).
  *
@@ -197,8 +197,8 @@ struct thread_d
 {
     object_type_t objectType;
     object_class_t objectClass;
-	
-	//object control
+
+    //object control
     struct object_d *object;
 
 	
@@ -207,7 +207,7 @@ struct thread_d
     //
 	// Identificadores.
 	//
-	
+
     int tid;                //c, thread ID.   	
     int ownerPID;           //ID do processo ao qual o thread pertencer. 
 
@@ -224,7 +224,8 @@ struct thread_d
     // (SYSTEM, PERIODIC, RR, IDLE).	
     thread_type_t type;
 
-    thread_state_t state;    //flag, Estado atual da tarefa. ( RUNNING, DEAD ...).	
+    //flag, Estado atual da tarefa. ( RUNNING, DEAD ...).
+    thread_state_t state;    
 
 
 	// flag. 
@@ -237,19 +238,19 @@ struct thread_d
 	//unsigned long error;
 	
 	//ext.
-	
+
     //plano de execução.
-	int plane;
-	
+    int plane;
+
 	//
 	// Names.
 	//
 	
 	//char *name;  //@todo: Usar isso.
-	unsigned long name_address;
-	unsigned long name_pointer;   	
-	char short_name[4];
-	char *cmd;
+    unsigned long name_address;
+    unsigned long name_pointer; 
+    char short_name[4];
+    char *cmd;
 
     //#test
     //Assim fica mais fácil enviar para o aplicativo.
@@ -262,10 +263,10 @@ struct thread_d
 	// ## CPU support ##
 	//
     
-	int cpuID;            //Qual processador.
-	int confined;         //Flag, confinado ou não.
-	int CurrentProcessor;
-	int NextProcessor;
+    int cpuID;            //Qual processador.
+    int confined;         //Flag, confinado ou não.
+    int CurrentProcessor;
+    int NextProcessor;
 	//int IdealProcessor;
 	
 	
@@ -290,12 +291,12 @@ struct thread_d
 	// HORA DO TASKSWITCH.
 
 	//unsigned long DirectoryVA;
-	unsigned long DirectoryPA;
+    unsigned long DirectoryPA;
 	
 	
 	//IOPL of the task. (ring).
 	//@todo: isso pode ser um char.
-	unsigned long iopl; 
+    unsigned long iopl; 
 	
 	
 	// Context. 
@@ -402,48 +403,48 @@ struct thread_d
 	
 	//Steps.
 	//Quantas vezes a tarefa usou o processador. 
-	unsigned long step; 
+    unsigned long step; 
 
 	// sys time inicial da thread.
 	// quando ela foi criada.
-	unsigned long initial_time_ms;
+    unsigned long initial_time_ms;
 	
 	//ms total..
-	unsigned long total_time_ms; 
+    unsigned long total_time_ms; 
 	
 	
 	//Quantum. (time-slice, igual cota) 
-	unsigned long quantum;         //tempo que a thread tem.
-	unsigned long quantum_limit;   //limite quando dado boost. tempo limite rodando. 		
+    unsigned long quantum;         //tempo que a thread tem.
+    unsigned long quantum_limit;   //limite quando dado boost. tempo limite rodando. 		
 	
 	//unsigned long  RemainingTime;  //??
 	
-	unsigned long standbyCount;
+    unsigned long standbyCount;
 	
 	//Contando tempo rodando.
 	//ticks rodando antes de parar.
-	unsigned long runningCount; 
+    unsigned long runningCount; 
 	
 	//ms rodando antes de parar.
-	unsigned long runningCount_ms; 
+    unsigned long runningCount_ms; 
 
 	//Obs: A soma das 3 esperas é a soma do tempo de espera
 	//depois que ela rodou pela primeira vez.
 	
     //Contando o tempo nos estados de espera.
-	unsigned long readyCount;   //tempo de espera para retomar a execução.
-	unsigned long ready_limit;
+    unsigned long readyCount;   //tempo de espera para retomar a execução.
+    unsigned long ready_limit;
 	
 	//Esperando por eventos.
-	unsigned long waitingCount; //tempo esperando algo.	
-	unsigned long waiting_limit;   //tempo limite que uma tarefa ready fica sem rodar.
+    unsigned long waitingCount; //tempo esperando algo.	
+    unsigned long waiting_limit;   //tempo limite que uma tarefa ready fica sem rodar.
     
-	unsigned long blockedCount;
-	unsigned long blocked_limit;
+    unsigned long blockedCount;
+    unsigned long blocked_limit;
 	
 	
 	//Ticks remaining. (tempo para a tarefa chegar ao fim, tempo total-tempo percorrito)
-	unsigned long ticks_remaining; //rt, quanto tempo a tarefa tem disponível para ser concluida.
+    unsigned long ticks_remaining; //rt, quanto tempo a tarefa tem disponível para ser concluida.
 
 
 	//
@@ -454,17 +455,17 @@ struct thread_d
 	
 	//quanto por cento do tempo o processo ficou rodando.
 	//é a soma do quanto ficou rodando todas as suas threads.
-	unsigned long profiler_percentage_running;
-	unsigned long profiler_percentage_running_res;
-	unsigned long profiler_percentage_running_mod;
-	unsigned long profiler_ticks_running;
-	unsigned long profiler_last_ticks;
+    unsigned long profiler_percentage_running;
+    unsigned long profiler_percentage_running_res;
+    unsigned long profiler_percentage_running_mod;
+    unsigned long profiler_ticks_running;
+    unsigned long profiler_last_ticks;
 
 	//unsigned long alarm;            //Tempo para o próximo alarme, dado em ticks.
 	
 	//??iopl??
 	//@todo: isso não precisa ser unsigned long.
-	unsigned long PreviousMode;	
+    unsigned long PreviousMode;
 
 	
 	/*
@@ -490,12 +491,12 @@ struct thread_d
 	// diferentes ??
 	//unsigned long standard_streams[3];
 	//unsigned long Streams[8];
-	
+
 	//Obs: Cada processo está atuando em um diretório,
 	// mas será cada thread precisa atuar em um diretório diferente??
 	//
 	//struct _iobuf *root;	// 4 root directory
-	struct _iobuf *pwd;	    // 5 (print working directory) 
+    struct _iobuf *pwd;	    // 5 (print working directory) 
 	//...
 		
 	
@@ -516,13 +517,14 @@ struct thread_d
     struct process_d *process; 
 
 
-	/*
-	 * Janela e procedimento.
-	 */
-	struct room_d *room;  //Window Station da thread.
-	struct desktop_d *desktop;         //Desktop da thread.
-	
-	unsigned long procedure; //Endereço do procedimento de janela da tarefa. 
+    // #importante
+    // Isso é usado para gerência de memória e ... 
+    struct room_d     *room;     // Window Station da thread.
+    struct desktop_d  *desktop;  // Desktop da thread.
+
+
+    // ?? procedimento de janela.
+    unsigned long procedure; //Endereço do procedimento de janela da tarefa. 
 	//unsigned long control_menu_procedure; //procedimento do control menu.
 
 	
@@ -598,9 +600,10 @@ struct thread_d
 	// Objeto pelo qual a thread está esperando.
 	// #todo: mudar esses nomes, pode confundir com o header no início da 
 	// estrutura. (waiting_object_type ... woType woClass )
-	object_type_t woType;   //obType;      //woType
-	object_class_t woClass; //obClass;	   //woClass
-		
+    object_type_t   woType;   //obType;      //woType
+    object_class_t  woClass; //obClass;	   //woClass
+
+
 	//#importante
 	//razões para esperar
 	//#todo: isso precisa ser inicializado.
@@ -613,27 +616,28 @@ struct thread_d
 	// 2 - esperando um processo finalizar. wait4pid
 	// 3 - esperando um objeto. (espera genérica)
 	// ...
-	
-	int wait_reason[10]; 
-	
-	int wait4pid;   //id do processo que a thread está esperando moorrer.
-	int wait4tid;   //id da thread que a thread está esperando moorrer.
-	
+
+    int wait_reason[10]; 
+
+    int wait4pid;   //id do processo que a thread está esperando morrer.
+    int wait4tid;   //id da thread que a thread está esperando morrer.
+
+
 	//
 	// ## Exit support ##
 	//
-		
+
     //Motivo da thread fechar.
-	int exit_code; 	
-	
+    int exit_code;
+
 
 	//Signal
-	unsigned long signal;
-	unsigned long signalMask;
+    unsigned long signal;
+    unsigned long signalMask;
 	
 	//Next: 
     //Um ponteiro para a próxima thread da lista linkada. 
-	struct thread_d *Next;
+    struct thread_d *Next;
 };
 
 
@@ -689,8 +693,6 @@ int conductorIndex;
 /*
  * threadList:
  * 
- * 
- * 
  */
 
 // #Atenção
@@ -703,19 +705,18 @@ unsigned long threadList[THREAD_COUNT_MAX];
 
 
 
-/* thread_list_d: */ 
-typedef struct thread_list_d thread_list_t; 
 struct thread_list_d 
-{   
-	struct thread_d *Threads;    //List.	
-	unsigned long priority;      //Prioridade.
-	//...
+{
+    struct thread_d *Threads;    //List.
+    unsigned long priority;      //Prioridade.
+    // ...
 };
-//thread_list_t DispatcherList[10]; //list
-//thread_list_t DispathcerPriorityQueue[10];
-//unsigned long DispatcherList[10];
 
+//struct thread_list_d *DispatcherList[10]; //list
+//struct thread_list_d *DispathcerPriorityQueue[10];
+//unsigned long DispatcherList[10];
 //DispatcherList[2].Threads[4].tid
+
 
 
 //clona uma thread e retorna o ponteira da clone.
@@ -723,16 +724,19 @@ struct thread_d *threadCopyThread ( struct thread_d *thread );
 
 
 /* 
+ ******************************
  * create_thread: 
+ *    Create thread.
  */ 
 
-struct thread_d *create_thread ( struct room_d *room,
-                                 struct desktop_d *desktop,
-                                 struct window_d *window,
-                                 unsigned long init_eip, 
-                                 unsigned long init_stack, 
-                                 int pid, 
-                                 char *name );
+struct thread_d *create_thread ( 
+    struct room_d *room,
+    struct desktop_d *desktop,
+    struct window_d *window,
+    unsigned long init_eip, 
+    unsigned long init_stack, 
+    int pid, 
+    char *name );
 
 
 void *GetCurrentThread (void);

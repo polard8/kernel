@@ -90,10 +90,10 @@ int __sethostname (const char *new_hostname){
     //
 
 
-    if ( (void *) HostInfo == NULL )
-    {
+    if ( (void *) HostInfo == NULL ){
         printf ("__sethostname: HostInfo\n");
         return (int) -1;
+ 
     }else{
 
         HostInfo->hostName_len = (size_t) strlen (new_hostname) + 1;

@@ -1,5 +1,5 @@
 /*
- * File: libcore/kstdio.c 
+ * File: syslib/kstdio.c 
  *
  *    i/o routines for the base kernel.
  *    ring 0.
@@ -12,8 +12,8 @@
  *     2015 - Create by Fred Nora.
  *     2019 - Revision.
  */
-  
- 
+
+
 #include <kernel.h>
 
 
