@@ -1,5 +1,8 @@
-//socket.h 
-
+/*
+ * File: sys/socket.h
+ * 
+ *     libc03.
+ */
 
 
 #ifndef _SOCKET_H
@@ -11,7 +14,6 @@
 
 //=========
 /* Supported address families. */
-
 
 #define AF_UNSPEC     0
 #define AF_UNIX       1     /* Unix domain sockets 		*/
@@ -48,79 +50,79 @@
 #define AF_MAX        34            /* For now.. ??? */
 #define AF_RS232      35            /* Serial socket (NEW!) */
 
+#define AF_GRAMADO    8000
 
-#define AF_GRAMADO 8000
 
 
 /* Protocol families, same as address families. */
-#define PF_UNSPEC	AF_UNSPEC
-#define PF_UNIX		AF_UNIX
-#define PF_LOCAL	AF_LOCAL
-#define PF_INET		AF_INET
-#define PF_AX25		AF_AX25
-#define PF_IPX		AF_IPX
-#define PF_APPLETALK	AF_APPLETALK
-#define	PF_NETROM	AF_NETROM
-#define PF_BRIDGE	AF_BRIDGE
-#define PF_ATMPVC	AF_ATMPVC
-#define PF_X25		AF_X25
-#define PF_INET6	AF_INET6
-#define PF_ROSE		AF_ROSE
-#define PF_DECnet	AF_DECnet
-#define PF_NETBEUI	AF_NETBEUI
-#define PF_SECURITY	AF_SECURITY
-#define PF_KEY		AF_KEY
-#define PF_NETLINK	AF_NETLINK
-#define PF_ROUTE	AF_ROUTE
-#define PF_PACKET	AF_PACKET
-#define PF_ASH		AF_ASH
-#define PF_ECONET	AF_ECONET
-#define PF_ATMSVC	AF_ATMSVC
-#define PF_SNA		AF_SNA
-#define PF_IRDA		AF_IRDA
-#define PF_PPPOX	AF_PPPOX
-#define PF_WANPIPE	AF_WANPIPE
-#define PF_LLC		AF_LLC
-#define PF_TIPC		AF_TIPC
-#define PF_BLUETOOTH	AF_BLUETOOTH
-#define PF_IUCV		AF_IUCV
-#define PF_RXRPC	AF_RXRPC
-#define PF_MAX		AF_MAX
-#define PF_RS232	AF_RS232
+#define PF_UNSPEC   AF_UNSPEC
+#define PF_UNIX     AF_UNIX
+#define PF_LOCAL    AF_LOCAL
+#define PF_INET     AF_INET
+#define PF_AX25     AF_AX25
+#define PF_IPX      AF_IPX
+#define PF_APPLETALK  AF_APPLETALK
+#define	PF_NETROM   AF_NETROM
+#define PF_BRIDGE   AF_BRIDGE
+#define PF_ATMPVC   AF_ATMPVC
+#define PF_X25      AF_X25
+#define PF_INET6    AF_INET6
+#define PF_ROSE     AF_ROSE
+#define PF_DECnet   AF_DECnet
+#define PF_NETBEUI  AF_NETBEUI
+#define PF_SECURITY AF_SECURITY
+#define PF_KEY      AF_KEY
+#define PF_NETLINK  AF_NETLINK
+#define PF_ROUTE    AF_ROUTE
+#define PF_PACKET   AF_PACKET
+#define PF_ASH      AF_ASH
+#define PF_ECONET   AF_ECONET
+#define PF_ATMSVC   AF_ATMSVC
+#define PF_SNA      AF_SNA
+#define PF_IRDA     AF_IRDA
+#define PF_PPPOX    AF_PPPOX
+#define PF_WANPIPE  AF_WANPIPE
+#define PF_LLC      AF_LLC
+#define PF_TIPC     AF_TIPC
+#define PF_BLUETOOTH  AF_BLUETOOTH
+#define PF_IUCV     AF_IUCV
+#define PF_RXRPC    AF_RXRPC
+#define PF_MAX      AF_MAX
+#define PF_RS232    AF_RS232
 
 
 /* Maximum queue length specifiable by listen.  */
-#define SOMAXCONN	128
+#define SOMAXCONN  128
 
 
 /* Flags we can use with send/ and recv. 
    Added those for 1003.1g not all are supported yet */
  
-#define MSG_OOB		1
-#define MSG_PEEK	2
-#define MSG_DONTROUTE	4
-#define MSG_TRYHARD     4       /* Synonym for MSG_DONTROUTE for DECnet */
-#define MSG_CTRUNC	8
-#define MSG_PROBE	0x10	/* Do not send. Only probe path f.e. for MTU */
-#define MSG_TRUNC	0x20
-#define MSG_DONTWAIT	0x40	/* Nonblocking io		 */
-#define MSG_EOR         0x80	/* End of record */
-#define MSG_WAITALL	0x100	/* Wait for a full request */
-#define MSG_FIN         0x200
-#define MSG_SYN		0x400
-#define MSG_CONFIRM	0x800	/* Confirm path validity */
-#define MSG_RST		0x1000
-#define MSG_ERRQUEUE	0x2000	/* Fetch message from error queue */
-#define MSG_NOSIGNAL	0x4000	/* Do not generate SIGPIPE */
-#define MSG_MORE	0x8000	/* Sender will send more */
-
-#define MSG_EOF         MSG_FIN
+#define MSG_OOB        1
+#define MSG_PEEK       2
+#define MSG_DONTROUTE  4
+#define MSG_TRYHARD    4     /* Synonym for MSG_DONTROUTE for DECnet */
+#define MSG_CTRUNC     8
+#define MSG_PROBE      0x10  /* Do not send. Only probe path f.e. for MTU */
+#define MSG_TRUNC      0x20
+#define MSG_DONTWAIT   0x40    /* Nonblocking io		 */
+#define MSG_EOR        0x80    /* End of record */
+#define MSG_WAITALL    0x100   /* Wait for a full request */
+#define MSG_FIN        0x200
+#define MSG_SYN        0x400
+#define MSG_CONFIRM    0x800   /* Confirm path validity */
+#define MSG_RST        0x1000
+#define MSG_ERRQUEUE   0x2000  /* Fetch message from error queue */
+#define MSG_NOSIGNAL   0x4000  /* Do not generate SIGPIPE */
+#define MSG_MORE       0x8000  /* Sender will send more */
+#define MSG_EOF        MSG_FIN
 
 #if defined(CONFIG_COMPAT)
-#define MSG_CMSG_COMPAT	0x80000000	/* This message needs 32 bit fixups */
+#define MSG_CMSG_COMPAT  0x80000000  /* This message needs 32 bit fixups */
 #else
-#define MSG_CMSG_COMPAT	0		/* We never have 32 bit fixups */
+#define MSG_CMSG_COMPAT  0           /* We never have 32 bit fixups */
 #endif
+
 
 
 /* Setsockoptions(2) level. Thanks to BSD these must match IPPROTO_xxx */
@@ -191,25 +193,22 @@
 #define SOCK_GRAMADO_MSG    8000    /* window, msg, long1, long2 */
 
 
-#define 	_NETINET_IN_H_
-#define 	IPPROTO_IP   	0	// Dummy for IP.
-#define 	IPPROTO_ICMP    1	// Control message protocol.
-#define 	IPPROTO_IGMP    2	// Group management protocol.
-#define 	IPPROTO_TCP     6	// Transmission control protocol.
-#define 	IPPROTO_UDP     17 	// User datagram protocol.
-#define 	IPPROTO_RAW   	255	// Raw IP packet.
-#define 	IPPROTO_MAX   	256     // Maximum protocol identifier.
-#define 	IPPORT_RESERVED 1024    // Last reserved port number.
-#define 	IPPORT_USERRESERVED   5000 // User reserved port number.
-#define 	INADDR_ANY   (unsigned long)0x00000000 // Any IP address.
-#define 	INADDR_BROADCAST   (unsigned long)0xffffffff // Broadcast IP address.
 
-
+#define  _NETINET_IN_H_
+#define  IPPROTO_IP       0     // Dummy for IP.
+#define  IPPROTO_ICMP     1     // Control message protocol.
+#define  IPPROTO_IGMP     2     // Group management protocol.
+#define  IPPROTO_TCP      6     // Transmission control protocol.
+#define  IPPROTO_UDP      17    // User datagram protocol.
+#define  IPPROTO_RAW      255   // Raw IP packet.
+#define  IPPROTO_MAX      256   // Maximum protocol identifier.
+#define  IPPORT_RESERVED  1024  // Last reserved port number.
+#define  IPPORT_USERRESERVED   5000  // User reserved port number.
+#define  INADDR_ANY        (unsigned long)0x00000000  // Any IP address.
+#define  INADDR_BROADCAST  (unsigned long)0xffffffff  // Broadcast IP address.
 
 
 typedef unsigned socklen_t;
-
-
 
 
 /* Device structure */
@@ -230,29 +229,16 @@ typedef struct socket_context {
 
 struct sockaddr
 {
-    unsigned short sa_family;
-    char sa_data[14];
+    unsigned short  sa_family;
+    char            sa_data[14];
 };
 
 
 
-/*
- //See: in.h
 typedef struct
 {
-    int sin_family;
-    int sin_port;
-
-    char *sin_addr;
-
-}sockaddr_in;
-*/
-
-
-typedef struct
-{
-    char *h_addr;
-    unsigned h_length;
+    char     *h_addr;
+    unsigned  h_length;
 
 }hostent;
 
@@ -269,12 +255,14 @@ struct ucred {
 
 
 
-struct iovec {                    /* Scatter/gather array items */
-    void  *iov_base;              /* Starting address */
-    size_t iov_len;               /* Number of bytes to transfer */
+struct iovec {           /* Scatter/gather array items */
+    void   *iov_base;    /* Starting address */
+    size_t  iov_len;     /* Number of bytes to transfer */
 };
 
+
 struct msghdr {
+
     void         *msg_name;       /* optional address */
     socklen_t     msg_namelen;    /* size of address */
     struct iovec *msg_iov;        /* scatter/gather array */
@@ -315,24 +303,26 @@ int socketpair (int domain, int type, int protocol, int sv[2]);
 
 
 int 
-connect ( int sockfd, 
-          const struct sockaddr *addr,
-          socklen_t addrlen );
+connect ( 
+    int sockfd, 
+    const struct sockaddr *addr,
+    socklen_t addrlen );
 
 
 int accept (int sockfd, struct sockaddr *addr, socklen_t *addrlen);
 
 
 int 
-bind ( int sockfd, 
-       const struct sockaddr *addr,
-       socklen_t addrlen );
+bind ( 
+    int sockfd, 
+    const struct sockaddr *addr,
+    socklen_t addrlen );
 
 
 // listen -	listen for connections on a socket
 // 4.4BSD,	POSIX.1-2001.	
 // The  listen()  function	call first appeared in 4.2BSD.
-int listen(int sockfd, int backlog);
+int listen (int sockfd, int backlog);
 
 
 
@@ -346,54 +336,65 @@ ssize_t send ( int sockfd, const void *buf, size_t len, int flags );
 
 
 ssize_t 
-sendto ( int sockfd, 
-         const void *buf, 
-         size_t len, 
-         int flags,
-         const struct sockaddr *dest_addr, 
-         socklen_t addrlen );
+sendto ( 
+    int sockfd, 
+    const void *buf, 
+    size_t len, 
+    int flags,
+    const struct sockaddr *dest_addr, 
+    socklen_t addrlen );
+
 
 ssize_t sendmsg (int sockfd, const struct msghdr *msg, int flags);
-       
-       
+
+
 //recv - receive a message from a socket
 ssize_t recv ( int sockfd, void *buf, size_t len, int flags );
 
-ssize_t 
-recvfrom ( int sockfd, 
-           void *buf, 
-           size_t len, 
-           int flags,
-           struct sockaddr *src_addr, 
-           socklen_t *addrlen );
-           
 
-ssize_t recvmsg(int sockfd, struct msghdr *msg, int flags);
+ssize_t 
+recvfrom ( 
+    int sockfd, 
+    void *buf, 
+    size_t len, 
+    int flags,
+    struct sockaddr *src_addr, 
+    socklen_t *addrlen );
+
+
+ssize_t recvmsg (int sockfd, struct msghdr *msg, int flags);
 
 
 
 int 
-getpeername ( int sockfd, 
-              struct sockaddr *addr, 
-              socklen_t *addrlen );
+getpeername ( 
+    int sockfd, 
+    struct sockaddr *addr, 
+    socklen_t *addrlen );
 
 
 int getsockname (int sockfd, struct sockaddr *addr, socklen_t *addrlen);
 
-//shutdown	- shut down part of a full-duplex connection
+
+/*
+ * shutdown: 
+ *     Shut down part of a full-duplex connection.
+ */
+
 //POSIX.1-2001, 
 //4.4BSD (the shutdown() function call  first  appeared  in 4.2BSD).
-int shutdown ( int	sockfd,	int how );
+int shutdown ( int sockfd, int how );
+
+
+#endif  //socket.h
+
+
+//
+// End.
+//
 
 
 
-
-
-
-
-
-
-#endif //socket.h
 
 
 

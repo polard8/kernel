@@ -858,13 +858,11 @@ int sys_socket ( int family, int type, int protocol ){
                                 AF_INET, type, protocol );
                break;
            
-           
-               
            // ...
            
            default:
-               debug_print ("sys_socket: default family\n");
-               return -1;
+               debug_print ("sys_socket: [FAIL] default family\n");
+               return (int) (-1);
                break;
         };
 
@@ -872,7 +870,7 @@ int sys_socket ( int family, int type, int protocol ){
     };
 
 
-    return -1;
+    return (int) (-1);
 }
 
 
@@ -1092,12 +1090,13 @@ sys_connect (
     // Devemos obter o número do processo alvo dado um endereço.
     // O tipo de endereço depende do tipo de domínio (família).
  
-    //tente inet ao menos que
-    //mudemos de planos por encontrarmos af_gramado.
-    int try_inet = 1;  
+    // Tente inet, ao menos que mudemos de planos por 
+    // encontrarmos af_gramado, af_unix ou af_local.
+    int ____in = 1;  
     
     // #importante
     // opções de domínio se o endereço é no estilo unix. 
+    // >>> sockaddr
     switch (addr->sa_family)
     {
         // AF_GRAMADO = 8000
@@ -1135,7 +1134,7 @@ sys_connect (
             printf (">>>> target pid %d \n", target_pid);
             
             // não tente inet, somos af_gramado
-            try_inet = 0;
+            ____in = 0;
             break;
         
         // #todo
@@ -1143,17 +1142,19 @@ sys_connect (
         // Pois se trata de uma conexão local.
         //case AF_LOCAL:
         case AF_UNIX:
-            debug_print ("sys_connect: AF_UNIX not supported\n");
+            // Essa conexão local usa endereços no sistema de arquivos.
+            // #todo: Implementar isso.
+            debug_print ("sys_connect: [TODO] AF_UNIX \n");
             //target_pid = -1;
             // não tente inet, somos af_unix
-            try_inet = 0;
+            ____in = 0;
 
-            return -1;
+            return (int) (-1);
             break;
     }
 
-
-    if( try_inet == 1 )
+    // >>> sockaddr_in
+    if ( ____in == 1 )
     {
       // opções de domínio se o endereço é no estilo internet.
       switch (addr_in->sin_family)
@@ -1162,9 +1163,7 @@ sys_connect (
         // Então precisamos usar localhost como ip.
             
         case AF_INET:
-            debug_print ("sys_connect: AF_INET [TESTING]\n");
-            //target_pid = -1;
-            
+            debug_print ("sys_connect: AF_INET\n");
             printf (" >>>>>>>>> port %d \n",addr_in->sin_port);
             
             // #test
@@ -1203,6 +1202,8 @@ sys_connect (
     }
 
 
+//__go:
+
     //
     // Sender process.
     //
@@ -1224,7 +1225,7 @@ sys_connect (
     f = (file *) p->Objects[sockfd];
 
     if ( (void *) f == NULL ){
-        printf ("sys_connect: *** f fail\n");
+        printf ("sys_connect: f fail\n");
         refresh_screen();
         return -1;
     }
@@ -1295,7 +1296,9 @@ sys_connect (
     // processo servidor.
     server_socket->conn = my_socket;
     
-    // acionando as flags que indicam a conecção.
+    // Acionando as flags que indicam a conecção.
+    // Nesse momento poderíamos usar a flag SOCKET_PENDING
+    // e a rotina accept() mudaria para SOCKET_CONNECTED. 
     my_socket->state = SOCKET_CONNECTED;
     server_socket->state = SOCKET_CONNECTED; 
   
@@ -1378,6 +1381,8 @@ sys_accept (
 
     struct socket_d *s;
 
+    
+    debug_print ("sys_accept:\n");
 
     // fd
     if ( sockfd < 0 || sockfd >= 32 ){
@@ -1421,6 +1426,8 @@ sys_accept (
     //
    
     // Check addr structure.
+    // #bugbug: Ainda não sabemos qual é a estrutura de
+    // endereços usada.
     if ( (void *) addr == NULL ){
         printf ("sys_accept: addr fail\n");
         refresh_screen();
@@ -1432,6 +1439,20 @@ sys_accept (
         current_process, addr->sa_family, addrlen  );
 
  
+    //#test
+    if ( s->state == SOCKET_CONNECTED ){
+        debug_print ("sys_accept: done\n");
+        return (int) sockfd;
+    }
+ 
+    //#test
+    if ( s->state == SOCKET_PENDING ){
+        s->state = SOCKET_CONNECTED;
+        debug_print ("sys_accept: done\n");
+        return (int) sockfd;
+    }
+
+
     printf ("sys_accept: [FIXME] TODO ...\n");
     refresh_screen();
     

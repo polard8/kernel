@@ -13,7 +13,8 @@
 #define SOCKET_NOT_CONNECTED    0
 #define SOCKET_CONNECTED        1 
 #define SOCKET_CONNECTING       2 
-//...
+#define SOCKET_PENDING          3
+// ...
 
 
 
@@ -29,23 +30,25 @@
 // AF_GRAMADO
 
 // ... gramado_ports[]
-#define GRAMADO_SH_PORT 8
-#define GRAMADO_WS_PORT 11
-#define GRAMADO_WM_PORT 12
-#define GRAMADO_NS_PORT 14   // network server.
+#define GRAMADO_SH_PORT  8   // shell ?? (server ??)
+#define GRAMADO_WS_PORT  11  // window server.
+#define GRAMADO_WM_PORT  12  // window manager ?? (server ??)
+#define GRAMADO_NS_PORT  14  // network server.
 // ...
 int gramado_ports[32];
 //--
 
 
-
-
-
+//#atenção. Variável global;
 int current_socket;
 
 
-
+/*
+ * create_socket:
+ * 
+ */
 struct socket_d *create_socket ( unsigned long ip, unsigned short port );
+
 
 unsigned long getSocketIP ( struct socket_d *socket );
 unsigned long getSocketPort ( struct socket_d *socket );
@@ -95,9 +98,6 @@ typedef	_BSD_SSIZE_T_	ssize_t;
 //=========
 /* Supported address families. */
 
-#define AF_GRAMADO 8000
-
-
 #define AF_UNSPEC     0
 #define AF_UNIX       1     /* Unix domain sockets 		*/
 #define AF_LOCAL      1     /* POSIX name for AF_UNIX	*/
@@ -132,6 +132,8 @@ typedef	_BSD_SSIZE_T_	ssize_t;
 #define AF_RXRPC      33            /* RxRPC sockets 		*/
 #define AF_MAX        34            /* For now.. ??? */
 #define AF_RS232      35            /* Serial socket (NEW!) */
+#define AF_GRAMADO    8000
+//#define AF_MAX        AF_GRAMADO  //#todo
 
 
 
@@ -180,19 +182,19 @@ typedef	_BSD_SSIZE_T_	ssize_t;
 /* Flags we can use with send/ and recv. 
    Added those for 1003.1g not all are supported yet */
  
-#define MSG_OOB		1
-#define MSG_PEEK	2
-#define MSG_DONTROUTE	4
-#define MSG_TRYHARD     4       /* Synonym for MSG_DONTROUTE for DECnet */
-#define MSG_CTRUNC	8
-#define MSG_PROBE	0x10	/* Do not send. Only probe path f.e. for MTU */
-#define MSG_TRUNC	0x20
-#define MSG_DONTWAIT	0x40	/* Nonblocking io		 */
-#define MSG_EOR         0x80	/* End of record */
-#define MSG_WAITALL	0x100	/* Wait for a full request */
-#define MSG_FIN         0x200
-#define MSG_SYN		0x400
-#define MSG_CONFIRM	0x800	/* Confirm path validity */
+#define MSG_OOB        1
+#define MSG_PEEK       2
+#define MSG_DONTROUTE  4
+#define MSG_TRYHARD    4       /* Synonym for MSG_DONTROUTE for DECnet */
+#define MSG_CTRUNC     8
+#define MSG_PROBE      0x10  /* Do not send. Only probe path f.e. for MTU */
+#define MSG_TRUNC      0x20
+#define MSG_DONTWAIT   0x40  /* Nonblocking io		 */
+#define MSG_EOR        0x80  /* End of record */
+#define MSG_WAITALL    0x100  /* Wait for a full request */
+#define MSG_FIN        0x200
+#define MSG_SYN        0x400
+#define MSG_CONFIRM    0x800  /* Confirm path validity */
 #define MSG_RST		0x1000
 #define MSG_ERRQUEUE	0x2000	/* Fetch message from error queue */
 #define MSG_NOSIGNAL	0x4000	/* Do not generate SIGPIPE */
