@@ -1138,6 +1138,9 @@ sys_connect (
             try_inet = 0;
             break;
         
+        // #todo
+        // Podemos usar isso no caso do  window server.
+        // Pois se trata de uma conexão local.
         //case AF_LOCAL:
         case AF_UNIX:
             debug_print ("sys_connect: AF_UNIX not supported\n");
@@ -1155,6 +1158,9 @@ sys_connect (
       // opções de domínio se o endereço é no estilo internet.
       switch (addr_in->sin_family)
       {
+        // Estamos usando inet em conexão local.
+        // Então precisamos usar localhost como ip.
+            
         case AF_INET:
             debug_print ("sys_connect: AF_INET [TESTING]\n");
             //target_pid = -1;
@@ -1164,7 +1170,7 @@ sys_connect (
             // #test
             // Se a porta for , então usaremos o pid do WS.
             if (addr_in->sin_port == 7547){
-                printf ("sys_connect: Connecting to the Window Server ...\n");
+                printf ("sys_connect: Connecting to the Window Server on port 7547 ...\n");
                 target_pid = (int) gramado_ports[GRAMADO_WS_PORT]; 
                 refresh_screen();
                 break;
@@ -1173,7 +1179,7 @@ sys_connect (
             // #test
             // Se a porta for , então usaremos o pid do NS.
             if (addr_in->sin_port == 7548){
-                printf ("sys_connect: Connecting to the Network Server ...\n");
+                printf ("sys_connect: Connecting to the Network Server on port 7548 ...\n");
                 target_pid = (int) gramado_ports[GRAMADO_NS_PORT]; 
                 refresh_screen();
                 break;
