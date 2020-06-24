@@ -222,8 +222,8 @@ void handle_request (int fd){
     
     // Lê a mensagem e coloca no buffer.
     
-    //n_reads = read ( fd, __buffer, sizeof(__buffer) );
-    n_reads = recv ( fd, __buffer, sizeof(__buffer), 0 );
+    n_reads = read ( fd, __buffer, sizeof(__buffer) );
+    //n_reads = recv ( fd, __buffer, sizeof(__buffer), 0 );
 
     if (n_reads <= 0)
         return;
@@ -310,14 +310,14 @@ void handle_request (int fd){
     // Sending reply.
     // 
      
-    gde_debug_print ("Sending response ...\n");  
+    //gde_debug_print ("Sending response ...\n");  
 
 __again:
 
     // #debug:
 
-    gde_debug_print ("Sending response ...\n");
-        
+    gde_debug_print ("gws: Sending response ...\n");
+    
                 
     // Primeiros longs do buffer.
     message_buffer[0] = next_response[0];         // Window ID.
@@ -330,13 +330,12 @@ __again:
     sprintf( m, "This is a response from GWS!\n");
 
 
-
     //
     // Send
     //
  
-    //n_writes = write ( fd, __buffer, sizeof(__buffer) );
-    n_writes = send ( fd, __buffer, sizeof(__buffer), 0 );
+    n_writes = write ( fd, __buffer, sizeof(__buffer) );
+    //n_writes = send ( fd, __buffer, sizeof(__buffer), 0 );
     
     if (n_writes<=0)
         goto __again;
@@ -353,8 +352,7 @@ __again:
     for(c=0; c<32; c++)
         next_response[c] = 0;
 
-
-    gde_debug_print ("Response sent\n");  
+    gde_debug_print ("gws: Response sent\n");  
 }
 
 
@@ -732,31 +730,26 @@ void xxx_test_load_bmp(void)
 
 int main (int argc, char **argv){
 
-    int i=0;
-    int _status = -1;
-
-
-    // Isso registra uma gramado port.
-    // a porta do ws.
-    // mas isso ja foi feito na rotina que registra o ws.
-    // nunca testado.
-    //gramado_system_call (7006, 11, getpid(), 0 );
-
     struct sockaddr addr;
     addr.sa_family = AF_GRAMADO;
     addr.sa_data[0] = 'w';
     addr.sa_data[1] = 's';   
     
-
     int server_fd = -1; 
     int bind_status = -1;
-    
+
 
     // Flag usada no loop.
     running = 1;
+    
+    int i=0;
+    int _status = -1;
+
 
     // Activate the compositor.
     dirty_status = 1;
+
+
 
     // #debug
     gde_debug_print ("---------------------\n");
@@ -771,13 +764,16 @@ int main (int argc, char **argv){
     // Let's create the traditional green background.
     create_background();
     create_taskbar();
+    
+    //
+    // Register.
+    //
  
 
     // Register.
     // Register window server as the current window server 
     // for this desktop.
     // See: connect.c
-
     _status = (int) register_ws();
 
     if (_status<0){
@@ -811,10 +807,9 @@ int main (int argc, char **argv){
         printf("gws: Couldn't create the server socket\n");
         exit(1);
     }
- 
     ____saved_server_fd = server_fd;
 
- 
+
     //
     // bind
     // 
@@ -867,7 +862,7 @@ int main (int argc, char **argv){
  
     printf ("gws: * yield \n");
 
-    for (i=0; i<11; i++)
+    for (i=0; i<15; i++)
         gws_yield ();
 
 
@@ -896,7 +891,6 @@ int main (int argc, char **argv){
     // para assim obtermos um novo da próxima vez.
     
 // loop:
-
     gde_debug_print ("gws: Entering main loop.\n");
 
     //#todo:
@@ -907,6 +901,8 @@ int main (int argc, char **argv){
     // + Socket requests.
     // + Normal messages. (It's like signals.)
  
+    //not used for now.
+    connection_status = 1;
 
     // while (1)
     while (running == 1)
@@ -915,25 +911,18 @@ int main (int argc, char **argv){
         if ( dirty_status == 1 )
             compositor();
 
-        // Status da conecção com os clientes.
-        // Pega mensagens de seus clientes.
-        // Presta vários serviços inclusive drenar input
-        // via mensagens tradicionais e repassar via socket.
-        if (connection_status == 1){
             handle_request (____saved_server_fd);
-
-        // Conexão desligada.
-        // Ela começa desligada.Ligamos com F1.
-        // Pega mensagens como um aplicativo normal.
-        }else{
-            handle_ipc_message(); 
-        };
     };
 
 
     //
     // =======================================
     //
+
+   //ipc message loop
+    while(1){
+        handle_ipc_message();
+    }
 
     // Done.
     

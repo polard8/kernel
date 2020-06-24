@@ -208,7 +208,7 @@ void __socket_messages (int fd){
     // Sending reply.
     // 
      
-    gde_debug_print ("Sending response ...\n");  
+    //gde_debug_print ("Sending response ...\n");  
 
 __again:
 
@@ -217,7 +217,7 @@ __again:
     // Talvez aqui possamos usar alguma função chamada post_message().
 
     // #debug: para a máquina real.
-    debug_print ("Sending response ...\n");
+    gde_debug_print ("gns: Sending response ...\n");
    
                 
     // Primeiros longs do buffer.
@@ -230,6 +230,9 @@ __again:
     char *m = (char *) (&__buffer[0] + 16);
     sprintf( m, "<html><head></head><body> Nothing ... </body></html>");
 
+    //
+    // Send
+    //
 
     n_writes = write ( fd, __buffer, sizeof(__buffer) );
     if (n_writes<=0)
@@ -249,7 +252,7 @@ __again:
         next_response[c] = 0;
 
 
-    gde_debug_print ("Response sent\n");  
+    gde_debug_print ("gns: Response sent\n");  
 }
 
 
@@ -428,41 +431,44 @@ gnsProcedure (
 
 int main (int argc, char **argv){
 
-    unsigned long w=0;
-    unsigned long h=0;
-
-
-    // Isso registra uma gramado port.
-    // a porta do ws.
-    // mas isso ja foi feito na rotina que registra o ws.
-    // nunca testado.
-    //gramado_system_call (7006, 11, getpid(), 0 );
-
     struct sockaddr addr;
     addr.sa_family = AF_GRAMADO;
     addr.sa_data[0] = 'n';
     addr.sa_data[1] = 's';
 
-
     int server_fd = -1; 
     int bind_status = -1;
-    
-    int i=0;
 
 
     // Flag usada no loop.
     running = 1;
-    
+
+    int i=0;
+    int _status = -1;
+     
+    unsigned long w=0;
+    unsigned long h=0;
+
 
     // Serial debug.
     gde_debug_print ("--------------------------\n");
     gde_debug_print ("gns: Initializing ...\n");
-
-    // #debug
     printf ("gns: gns is alive! \n");
 
+    //
+    // Register.
+    //
 
-    register_ns();
+    // Register this process as the network server.
+    // See: connect.c
+    _status = (int) register_ns();
+
+    if (_status<0){
+        gde_debug_print ("gns: Couldn't register the server \n");
+        printf ("gns: Couldn't register the server \n");
+        exit (1);
+    }
+    gde_debug_print ("gns: Registration ok \n");
 
 
     //
@@ -478,7 +484,6 @@ int main (int argc, char **argv){
         printf("gns: Couldn't create the server socket\n");
         exit(1);
     }
- 
     ____saved_server_fd = server_fd;
 
  
@@ -543,16 +548,16 @@ int main (int argc, char **argv){
     //
 
 // loop:
+    gde_debug_print ("gns: Entering main loop.\n");
 
-     while (1){
 
-        // Messages sended via sockets.
-        // Mensagens enviadas pelos clientes via socket.
-        // Inclusive a mensagem que pede para drenar input e 
-        // via mensagens e repassar via socket. (8080)
+    // Messages sended via sockets.
+    // Mensagens enviadas pelos clientes via socket.
+    // Inclusive a mensagem que pede para drenar input e 
+    // via mensagens e repassar via socket. 
+    
+    while (1){
         __socket_messages (____saved_server_fd);
-
-        //...
     };
 
 
