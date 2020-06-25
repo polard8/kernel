@@ -31,6 +31,8 @@
 #include <ctype.h>
 #include <fcntl.h>
 
+#include <errno.h>
+
 // System calls.
 #include <stubs/gramado.h> 
 
@@ -3853,10 +3855,20 @@ int stderr_printf (const char *format, ... ){
 // See: http://man7.org/linux/man-pages/man3/perror.3.html
 
 void perror (const char *str){
+	
+	// #todo
+	// Maybe we need to use stderr output;
 
-    //#todo: check errno, and the string for the current error.
-    printf ("FIXME: perror() \n");
-    printf (str);
+    // Vamos imprimir a string se ela for válida.
+    if ( (void *) str != NULL )
+    {
+        printf ("Error: %s, ",str);
+    }
+
+    //#bugbug
+    //There is a list of strings for errors.
+    printf ("The last error number is {%d} [TODO].\n",errno);
+    //printf ("The last is: {%s}.\n",errno_list[errno]);
 }
 
 
@@ -3865,7 +3877,7 @@ void perror (const char *str){
 void rewind (FILE *stream){
 
 
-    if( (void*) stream == NULL )
+    if ( (void *) stream == NULL )
         return;
         
     //:^)

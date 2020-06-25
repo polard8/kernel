@@ -47,6 +47,7 @@ int main ( int argc, char *argv[] ){
     fp = fopen ( (char *) argv[1], "r+" );
     if ( (void *) fp == NULL ){
         printf ("cat: fopen fail\n");
+        //perror ("cat: fopen fail  ... testing perror\n");
         exit(-1);
     }
 

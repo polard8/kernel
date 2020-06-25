@@ -11,8 +11,13 @@
  *
  */
 
+// See: 
+// https://man7.org/linux/man-pages/man3/errno.3.html
+
+
 #ifndef _ERRNO_H_
-#define	_ERRNO_H_
+#define  _ERRNO_H_
+
 
 /* All the headers include this file. */
 #include <_mingw.h>
@@ -69,6 +74,8 @@
 #define	ENOSYS		40	/* Function not implemented (88 in Cyg?) */
 #define	ENOTEMPTY	41	/* Directory not empty (90 in Cyg?) */
 #define	EILSEQ		42	/* Illegal byte sequence */
+
+
 
 
 //?? Isso provavelmente foi definido dentro da libc.
