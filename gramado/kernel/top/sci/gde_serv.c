@@ -2238,14 +2238,16 @@ gde_services (
         //pwd ...
         //Cada processo tem seu pr�prio pwd.
         //Essa rotina mostra o pathname usado pelo processo.	
-		case SYS_PWD:
-			fs_print_process_pwd (current_process);
-			break;	
-		
-		//171 - retorna o id do volume atual.
-		case SYS_GETCURRENTVOLUMEID:
-		    return (void *) current_volume;
-            break;	
+        case SYS_PWD:
+            debug_print ("175:\n");
+            fs_print_process_pwd (current_process);
+            break;
+
+
+        // 171 - retorna o id do volume atual.
+        case SYS_GETCURRENTVOLUMEID:
+            return (void *) current_volume;
+            break;
 
 		//172 - configura o id do volume atual.
 		//#bugbug: Estamos modificando, sem aplicar nenhum filtro.
@@ -2267,14 +2269,17 @@ gde_services (
                                 (unsigned long) arg3 );
             break;
 
-		//175
-		// cd.
-        //Atualiza o pathname na estrutura do processo atual.
-        //Atualiza o pathname na string global.
+
+        // 175 - 'cd' command support.
+        // +Atualiza o pathname na estrutura do processo atual.
+        // +Atualiza o pathname na string global.
+        // +Carrega o arquivo referente ao diretório atual.
         case 175:
+            debug_print ("175:\n");
             fsUpdateWorkingDiretoryString ( (char *) arg2 );
             fsLoadFileFromCurrentTargetDir ();
             break;
+
 
         // 176
         // Remove n nomes de diret�rio do pathname do processo 
@@ -2284,11 +2289,12 @@ gde_services (
             fs_pathname_backup ( current_process, (int) arg3 );
             break;
 
-		//177
-		//'dir'
-		//comando dir no shell.
-		//Listando arquivos em um diret�rio dado o nome.	
+
+        // 177 -  'dir' command.
+        // Comando dir no shell.
+        // Listando arquivos em um diretório dado seu nome.
         case 177:
+            debug_print ("177:\n");
             fsList ( (const char *) arg2 );
             break;
 

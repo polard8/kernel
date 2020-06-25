@@ -250,33 +250,47 @@ done:
 
 int fsList ( const char *dir_name ){
 
-    printf ("fsList:\n");
+    debug_print ("fsList:\n");
 
-    if ( current_target_dir.current_dir_address == 0 )
-    {
-        printf ("current_target_dir.current_dir_address fail, reseting\n");
-        refresh_screen ();
-        current_target_dir.current_dir_address = VOLUME1_ROOTDIR_ADDRESS; 
-    }
 
-    if ( dir_name == 0 )
-    {
+    // dir name.
+    if ( (void *) dir_name == NULL ){
+        debug_print ("fsList: dir_name fail\n");
+        
+        // usar o atual.
         dir_name = current_target_dir.name;
 
-        if ( dir_name == 0 ){
-            printf ("current_target_dir.name fail\n");
+        if ( (void *) dir_name == NULL ){
+            debug_print ("fsList: dir_name fail\n");
+            return -1;
         }
     }
 
 
-	// name, dir address, number of entries
+    // address.
+    if ( current_target_dir.current_dir_address == 0 ){
+        debug_print ("fsList: current_target_dir.current_dir_address fail\n");
+        debug_print ("fsList: using root dir [FIXME]\n");
+        current_target_dir.current_dir_address = VOLUME1_ROOTDIR_ADDRESS; 
+    }
 
-    fsFAT16ListFiles ( (const char *) dir_name,         
-        (unsigned short *) current_target_dir.current_dir_address, 
-        256 );
 
+    if ( (void *) dir_name != NULL && 
+         current_target_dir.current_dir_address != 0 )
+    {
+        // IN:
+        // name, dir address, number of entries;
+        fsFAT16ListFiles ( (const char *) dir_name,         
+            (unsigned short *) current_target_dir.current_dir_address, 
+            256 );
+        
+        debug_print ("fsList: done\n");
+        return 0;  
+    }
 
-    return 0;
+    //fail
+    debug_print ("fsList: fail\n");
+    return -1;
 }
 
 
@@ -1135,12 +1149,6 @@ fail:
  
 int fsInit (void){
 
-
-//#ifdef EXECVE_VERBOSE
-   // printf ("fsInit: Initializing..\n");
-//#endif 
-
-
     debug_print ("fsInit:\n");
 
 	// Type - Configura o tipo de sistema de arquivos usado. 
@@ -1159,7 +1167,7 @@ int fsInit (void){
 	// Configura o n�mero de setores por cluster.
 	// Nesse caso, s�o (512 bytes por setor, um setor por cluster).
 
-	set_spc (1);
+    set_spc (1);
 
 
 	// ## initialize currents ##
@@ -1311,18 +1319,20 @@ int fsInit (void){
 	// ## PWD ##
 	//
 
-	// Inicializa o pwd support.
+    // Inicializa o pwd support.
     fsInitializeWorkingDiretoryString ();
-	
+
 	//
 	// ## target dir struct ##
 	//
 	
-	//inicializa a estrutura de suporte ao target dir.
+    //inicializa a estrutura de suporte ao target dir.
     fsInitTargetDir ();
 
-    // Done.
 
+    // Done.
+    debug_print ("fsInit: done\n");
+    
     return 0;
 }
 
@@ -1344,14 +1354,18 @@ void fsInitializeWorkingDiretoryString (void){
 	// root:/volumeX
     char volume_string[8];   
 
-	volume_string[0] = 'v';
-	volume_string[1] = 'o';
-	volume_string[2] = 'l';
-	volume_string[3] = 'u';
-	volume_string[4] = 'm';
-	volume_string[5] = 'e';
-	volume_string[6] = (char)( '1' + (char) current_volume - (char) 1 );
-	volume_string[7] = '\0';
+
+    debug_print ("fsInitializeWorkingDiretoryString:\n");
+
+
+    volume_string[0] = 'v';
+    volume_string[1] = 'o';
+    volume_string[2] = 'l';
+    volume_string[3] = 'u';
+    volume_string[4] = 'm';
+    volume_string[5] = 'e';
+    volume_string[6] = (char)( '1' + (char) current_volume - (char) 1 );
+    volume_string[7] = '\0';
 
 
 	//'root:'
@@ -1415,6 +1429,8 @@ void fsInitializeWorkingDiretoryString (void){
 
 	//More ?...
     pwd_initialized = 1;
+
+    debug_print ("fsInitializeWorkingDiretoryString: done\n");
 }
 
 
@@ -1443,18 +1459,18 @@ int fs_initialize_process_pwd ( int pid, char *string ){
     int i=0;
 
 
-    if ( pwd_initialized == 0 ){
-        panic ("fs_initialize_process_pwd: pwd not initialized\n"); 
-    } 
-
-
-    if (pid<0)
+    if (pid<0){
+        debug_print ("fs_initialize_process_pwd: pid\n");
         return 1;
+    }
 
 
-    if ( (void *) string == NULL )
-        return 1; 
+    if ( (void *) string == NULL ){
+        debug_print ("fs_initialize_process_pwd: string\n");
+        return 1;
+    }
 
+    // Current process.
 
 	// #importante
 	// Vamos copiar a string para a estrutura do processo atual.
@@ -1490,14 +1506,15 @@ int fs_print_process_pwd (int pid){
 
     struct process_d *p;
 
-    if ( pwd_initialized == 0 ){
-        panic ("fs_print_process_pwd: pwd not initialized\n"); 
+
+    debug_print ("fs_print_process_pwd:\n");
+
+    if (pid<0){
+        debug_print ("fs_print_process_pwd: pid\n");
+        return 1;
     }
 
-
-    if (pid<0)
-        return 1;
-
+    // Process
 
     p = (struct process_d *) processList[pid];
 
@@ -1510,15 +1527,22 @@ int fs_print_process_pwd (int pid){
             panic ("fs_print_process_pwd: validation\n");
         }
 
-        printf ("\n PID=%d %s (%s) \n\n", p->pid, 
-            p->pwd_string, current_target_dir.name );
+        printf ("PWD:\n");
+        
+        if ( (void *) p->pwd_string != NULL )
+            printf ("> PID=%d %s \n", p->pid, p->pwd_string);
+            
+        if ( (void *) current_target_dir.name != NULL )
+            printf ("> PID=%d %s \n", p->pid, current_target_dir.name);
 
         refresh_screen ();
         return 0;
     };
 
 
-    //fail.
+    // fail.
+    debug_print ("fs_print_process_pwd: fail\n");
+    
     return -1;
 }
 
@@ -1539,15 +1563,21 @@ void fsUpdateWorkingDiretoryString ( char *string ){
 
     tmp = string;
 
+    debug_print ("fsUpdateWorkingDiretoryString:\n"); 
+
+    // Initialized ?
     if ( pwd_initialized == 0 ){
-        printf ("fsUpdateWorkingDiretoryString: pwd not initialized\n"); 
+        debug_print ("fsUpdateWorkingDiretoryString: pwd_initialized\n"); 
         return;
     }
 
-
-    if ( (void *) string == NULL )
+    // string
+    if ( (void *) string == NULL ){
+        debug_print ("fsUpdateWorkingDiretoryString: string\n"); 
         return;  
+    }
 
+    // Current process.
 
     p = (struct process_d *) processList[current_process];
 
@@ -1560,37 +1590,33 @@ void fsUpdateWorkingDiretoryString ( char *string ){
             panic ("fsUpdateWorkingDiretoryString: validation\n");
         }
 
-        if ( (void *) string == NULL ){
-            printf ("fsUpdateWorkingDiretoryString: string\n");
-            return;
-
-        } else {
-
-
-			//#importante
-			//Colocamos um novo nome no fim do path;
-			//atualiza a string do processo atual.
-			
+        // Atualiza a string do processo atual. Concatenando.
+        if ( (void *) string != NULL )
+        {
+            // Concatena string.
             strcat ( p->pwd_string, string );
 
-            // ## separador ##
+            // Concatena separador.
             strcat ( p->pwd_string, FS_PATHNAME_SEPARATOR );
 
-            //atualiza a string global.
-            //usando a string do processo atual.
-
+            // Atualiza a string global usando a string do 
+            // processo atual.
             for ( i=0; i<32; i++ ){
                 current_workingdiretory_string[i] = p->pwd_string[i];
             }
 
-            // Name.
+            // #bugbug: rever isso.
+            // Nome do diretório alvo atual.
             for ( i=0; i< 11; i++ ){
                 current_target_dir.name[i] = *tmp;
                 tmp++;
             }
         }
-    }
+    };
+
+    debug_print ("fsUpdateWorkingDiretoryString: done\n"); 
 }
+
 
 
 /* 
@@ -1974,7 +2000,7 @@ int fsLoadFileFromCurrentTargetDir (void){
     int i=0;
     unsigned long new_address;
 
-
+    debug_print ("fsLoadFileFromCurrentTargetDir: Loading dir \n");
 
 	//#bugbug
 	//Isso 'e um limite para o tamanho do arquivo (apenas dir).
@@ -1984,18 +2010,17 @@ int fsLoadFileFromCurrentTargetDir (void){
 	
     new_address = (unsigned long) kmalloc (4096);
 
-	if ( new_address == 0 )
-	{
-		return -1;
-	}
-	
-	//#bugbug
-	//tenta carregar o diret'orio que tem o endere�o indicado aqui, 
-	//se falhar carregue o root por enquanto.
-	
+    if ( new_address == 0 ){
+        debug_print ("fsLoadFileFromCurrentTargetDir: new_address\n");
+        return -1;
+    }
+
+
+    // ??
+    // Se o endereço atual falhar, resetamos ele.
     if ( current_target_dir.current_dir_address == 0 )
     {
-        printf("fsLoadCurrentTargetDir current_target_dir.current_dir_address fail \n");
+        debug_print ("fsLoadFileFromCurrentTargetDir: current_target_dir.current_dir_address\n");
 
         // reset.
         current_target_dir.current_dir_address = VOLUME1_ROOTDIR_ADDRESS;
@@ -2032,6 +2057,8 @@ int fsLoadFileFromCurrentTargetDir (void){
 	//   current_target_dir.name, current_target_dir.current_dir_address );
 
 
+    debug_print ("fsLoadFileFromCurrentTargetDir: done\n");
+    
     return (int) Ret;
 }
 

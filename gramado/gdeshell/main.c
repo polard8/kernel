@@ -1898,43 +1898,43 @@ do_compare:
     }
 
 
-	// cd - Change dir.
-	if ( strncmp ( prompt, "cd", 2 ) == 0 )
-	{	
-		i++;
-		token = (char *) tokenList[i];
-		
-		if( token == NULL )
-		{
-			printf("cd error: no arg\n");
-		}else{
-			
+    // cd - Change dir.
+    if ( strncmp ( prompt, "cd", 2 ) == 0 )
+    {
+        i++;
+        token = (char *) tokenList[i];
+
+        if ( token == NULL ){
+            printf ("cd: No arg\n");
+
+        }else{
+
 			//#bugbug: n�o � possivel fazer isso por enquanto,
 			//pois n�o estamos fazendo parse de char por char.
 			//if( gramado_strncmp( (char*) tokenList[i], ".", 2 ) == 0 )
 			//{}
-				
-			if( strncmp( (char*) tokenList[i], "..", 2 ) == 0 )
-			{
-				//Apaga o nome do �ltimo diret�rio.
-			    shell_pathname_backup ( current_workingdiretory_string, 1 ); 
+
+            //Apaga o nome do �ltimo diret�rio.
+            if ( strncmp( (char*) tokenList[i], "..", 2 ) == 0 ){
+                shell_pathname_backup ( current_workingdiretory_string, 1 ); 
                 goto exit_cmp;
-		    }
-			
-	        // updating the current working directory string.
-	        shellUpdateWorkingDiretoryString ( (char *) tokenList[i] );
-			
-			//@todo: podemos checar se o pathname � absoluto,
+            }
+
+            // Updating the current working directory string.
+            shellUpdateWorkingDiretoryString ( (char *) tokenList[i] );
+
+			// #todo: podemos checar se o pathname � absoluto,
 			//e onde se encontra o arquivo que queremos.
 			//shellDisplayBMP( (char*) tokenList[i] );
-		};
-		
+        };
+
 		// o que segue o comando cd � um pathname.
 		//@todo: podemos checar se o pathname � absoluto,
 		//e onde se encontra o arquivo que queremos.
 		//cd_buitins();
-	    goto exit_cmp;
-	}
+        goto exit_cmp;
+    }
+
 
 
     // close
@@ -1977,38 +1977,38 @@ do_compare:
     }
 
 
+    // dir and ls.
     // List files and folders.
     if ( gramado_strncmp ( prompt, "dir", 3 ) == 0 || 
          gramado_strncmp ( prompt, "ls", 2 ) == 0 )
     {
-        char dir_name[] = "volumeX";
+        i++;
+        token = (char *) tokenList[i];
 
-		i++;
-		token = (char *) tokenList[i];
-		
-		if ( token == NULL )
-		{
-			
-		    //listar os arquivos em um diret�rio dado o nome do diret�rio.
-			gde_enter_critical_section ();
-		    system_call ( 177,
-		             (unsigned long) dir_name,   //nome do diret�rio.
-                     (unsigned long) dir_name,   
-                     (unsigned long) dir_name ); 
-		    gde_exit_critical_section ();
-			
-		}else{
+        // Listar sem indicar o nome o diretório.
+        if ( token == NULL )
+        {
+            gde_enter_critical_section ();
+            system_call ( 177,
+                (unsigned long) 0,  //no name 
+                (unsigned long) 0, 
+                (unsigned long) 0 ); 
+            gde_exit_critical_section ();
 
-		    //listar os arquivos em um diret�rio dado o nome do diret�rio.
-			gde_enter_critical_section ();
-		    system_call ( 177,
-		             (unsigned long) tokenList[i],   //nome do diret�rio.
-                     (unsigned long) tokenList[i],   
-                     (unsigned long) tokenList[i] ); 
-		    gde_exit_critical_section ();
+
+        // Listar indicando o nome do diretório.
+        }else{
+
+            // Listar os arquivos em um diretório dado seu nome.
+            gde_enter_critical_section ();
+            system_call ( 177,
+                (unsigned long) tokenList[i], 
+                (unsigned long) tokenList[i], 
+                (unsigned long) tokenList[i] ); 
+            gde_exit_critical_section ();
 
 			//...
-		};
+        };
 
 		// o que segue o comando dir � um pathname.
 		//@todo: podemos checar se o pathname � absoluto,
@@ -3954,7 +3954,7 @@ int shellInit ( struct window_d *window ){
 	//
 
 	// Prompt string support
-   // shellInitializeWorkingDiretoryString ();
+    shellInitializeWorkingDiretoryString ();
 
 
 // Done.
@@ -5224,6 +5224,7 @@ void shellExit (int code){
 /*
  *****************************************
  * shellUpdateWorkingDiretoryString:
+ * 
  *     Atualiza a string do diret�rio de trabalho.
  * Essa � a string que ser� mostrada antes do prompt.
  * 'pwd'> 
@@ -5232,34 +5233,40 @@ void shellExit (int code){
  */
 
 void shellUpdateWorkingDiretoryString ( char *string ){
-	
-	if ( pwd_initialized == 0 )
-	{
-		goto fail;
-	}else{
-		
-        if( (void *) string == NULL )
-	    {
-		    goto fail;
-	    }else{
-	    
-	        // ## separador ##
-		    //strcat( current_workingdiretory_string, 
-			//    SHELL_PATHNAME_SEPARATOR );		
-		
-            // ## separador ##
+
+    if ( pwd_initialized == 0 ){
+        gde_debug_print ("shellUpdateWorkingDiretoryString: pwd_initialized\n");
+        goto fail;
+
+    }else{
+
+        if ( (void *) string == NULL ){
+            gde_debug_print ("shellUpdateWorkingDiretoryString: string\n");
+            goto fail;
+
+        }else{
+
+            //++
+            // Atualizando dentro do gdeshell
+
+            // concatenate string.
             strcat ( current_workingdiretory_string, string );
 
+            // concatenate separator.
             strcat ( current_workingdiretory_string, 
                 SHELL_PATHNAME_SEPARATOR );
 
-            //Atualizar no gerenciamento feito pelo kernel.
-            system_call( 175, (unsigned long) string,
-                (unsigned long) string, (unsigned long) string );
+            //++
+            // Atualizar no gerenciamento feito pelo kernel.
+            system_call( 175, 
+                (unsigned long) string,
+                (unsigned long) string, 
+                (unsigned long) string );
         };
     };
 
-	//...
+	// ...
+
 fail:
 
 done:
@@ -5278,7 +5285,10 @@ done:
  */
 
 void shellInitializeWorkingDiretoryString (){
-	
+
+
+    gde_debug_print ("shellInitializeWorkingDiretoryString: \n");
+ 
 	//get info
 	
 	//test: get current volume id.
