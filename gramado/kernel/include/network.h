@@ -107,7 +107,7 @@ int handle_ipv6 ( struct ipv6_header_d *header );
 
 // Send arp.
 void 
-SendARP ( 
+SendARP ( int op,   //operation 
     uint8_t source_ip[4], 
     uint8_t target_ip[4], 
     uint8_t target_mac[6] );

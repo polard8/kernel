@@ -254,8 +254,8 @@ int networkGetStatus (void)
 {
     return (int) network_status;
 }
- 
- 
+
+
 /*
  **********************************************************
  * networkInit:
@@ -265,6 +265,9 @@ int networkGetStatus (void)
 
 int networkInit (void){
 
+
+    debug_print ("networkInit:\n");
+    
     // Status.
     networkSetstatus (0);
 
@@ -316,10 +319,12 @@ int networkInit (void){
     socket_init();
 
 
-	// Status ?? No, not now!	
-	// networkSetstatus (1);
+	// Status
+    networkSetstatus (1);
 
 
+    debug_print ("networkInit: done\n");
+    
     return 0;
 }
 
@@ -524,6 +529,7 @@ int handle_ipv6 ( struct ipv6_header_d *header ){
 /*
  * Network_test:
  *     Debug routine.
+ *     Called by a ring3 process.
  */
 
 void network_test(void)
@@ -538,8 +544,9 @@ void network_test(void)
     debug_print("network_test: Show info\n");
     show_network_info();
 
-    refresh_screen();
+    //Done.
     debug_print("network_test: done\n");
+    refresh_screen();
 }
 
 
@@ -603,7 +610,8 @@ void testNIC (void){
 	// Tem que ter uma abstração que selecione o nic atual
 
     printf ("testNIC: Sending arp request \n");
-    SendARP ( source_ip_address, target_ip_address, 
+    SendARP ( ARP_OPC_REQUEST, 
+        source_ip_address, target_ip_address, 
         target_mac_address );
 
 
@@ -984,6 +992,7 @@ network_SendIPV4_UDP (
  *     It sends a ARP packet.
  * 
  * IN: 
+ *     op =  operation. request or reply
  *     source_ip. (It's in the layer 3 of the OSI model. network layer)
  *     target_ip. (It's in the layer 3 of the OSI model. network layer)
  *     target_mac. (It's in the layer 2 of the OSI model. data link layer)
@@ -996,7 +1005,7 @@ network_SendIPV4_UDP (
 // Change the return type to 'int'. 
 
 void 
-SendARP ( 
+SendARP ( int op,   //operation
     uint8_t source_ip[4], 
     uint8_t target_ip[4], 
     uint8_t target_mac[6] )
@@ -1093,8 +1102,16 @@ SendARP (
 
 		// Operation (OPER) (dois bytes invertidos)
 
+        //invalid operation
+        if (op != ARP_OPC_REQUEST && op != ARP_OPC_REPLY )
+        {
+            //#debug
+            panic ("SendARP: invalid operation");
+        }
+        h->op = ToNetByteOrder16(op);        
         //h->op = ToNetByteOrder16(ARP_OPC_REPLY);
-        h->op = ToNetByteOrder16(ARP_OPC_REQUEST);
+        //h->op = ToNetByteOrder16(ARP_OPC_REQUEST);
+
 
 
 		// mac
@@ -1252,8 +1269,9 @@ SendARP (
 	// Pois precisamos implementar algum contador no while para n�o
 	// ficarmos preso nele pra sempre.
 
-    printf ("SendARP: Sending broadcast ARP. *debug *while\n");
-    refresh_screen ();
+    debug_print ("SendARP: Sending broadcast ARP. *debug *while\n");
+    //printf ("SendARP: Sending broadcast ARP. *debug *while\n");
+    //refresh_screen ();
 
 	// #perigo:
 	// Status.
@@ -1267,8 +1285,8 @@ SendARP (
     {
          if ( (currentNIC->legacy_tx_descs[old].status & 0xFF) == 1 )
          {
-              printf ("Ok");
-              debug_print ("SendARP: done\n");
+              debug_print ("SendARP: done [timeout]\n");
+              //printf ("Ok");
               return;
          }
     }
@@ -1281,10 +1299,11 @@ SendARP (
     };
     */
     
-    printf (">>>> fail timeout.\n");
+
     debug_print ("SendARP: fail timeout.\n");    
-    
     debug_print ("SendARP: done\n");
+    
+    //printf (">>>> fail timeout.\n");
 }
 
 
@@ -1340,6 +1359,7 @@ network_driver_dialog (
             //break;
 
         // >>>> buffer full.
+        // 
         case 8000:
             debug_print ("network_driver_dialog: 8000. buffer full\n");
             //printf ("buffer=%x\n", long1);
@@ -1362,6 +1382,14 @@ network_driver_dialog (
         //esse buffer pode ter sido enviado por algum processo ou biblioteca.
         //case 8003:
            // break;
+           
+           
+        //#todo
+        //enviar o buffer para o gns.   
+        case 9000:
+            return -1;
+            break;
+
 
         default:
             return 1;
@@ -1557,6 +1585,8 @@ int do_ipv6 ( unsigned long buffer )
  */
  
 // Decodifica um pacote ARP.
+// See:
+// https://en.wikipedia.org/wiki/Address_Resolution_Protocol
 
 int do_arp ( unsigned long buffer ){
 
@@ -1636,21 +1666,26 @@ __request_received:
     // Vamos responter.
 
     // #debug
-    printf ("\n ARP REQUEST received \n");
+    //printf ("\n ARP REQUEST received \n");
+    //refresh_screen();
+
+    //#debug
+    
+    /*
+    printf ("\n ARP REQUEST received | ");
+    for ( i=0; i<6; i++){ printf("%x ",eh->src[i]); };
+
+    printf (" | ");
+    for ( i=0; i<6; i++){ printf("%x ",eh->dst[i]); };
+
+    printf (" | ");
+    for ( i=0; i<4; i++){ printf("%d ",ah->arp_spa[i]); };
+
+    printf (" | ");
+    for ( i=0; i<4; i++){ printf("%d ",ah->arp_tpa[i]); };
+
     refresh_screen();
-
-    // printf ("\n ARP REQUEST received | ");
-    // for ( i=0; i<6; i++){ printf("%x ",eh->src[i]); };
-
-    // printf (" | ");
-    // for ( i=0; i<6; i++){ printf("%x ",eh->dst[i]); };
-
-    // printf (" | ");
-    // for ( i=0; i<4; i++){ printf("%d ",arp_h->arp_spa[i]); };
-
-    // printf (" | ");
-    // for ( i=0; i<4; i++){ printf("%d ",arp_h->arp_tpa[i]); };
-
+    */
 
 	//cache
 	//cada controlador tem seu cache.
@@ -1677,8 +1712,22 @@ __request_received:
             }
         }
     };
+    
+    
+    //#test
+    //Tentando enviar um reply desse jeito.
+
+    debug_print ("do_arp: Sending arp replay \n");
+    //printf ("do_arp: Sending arp replay \n");
+    //refresh_screen();
+    SendARP ( ARP_OPC_REPLY, 
+        &eh->dst[0],          //source_ip_address 
+        &eh->src[0],          //target_ip_address
+        &ah->arp_spa[0] );    //target_mac_address 
 
 
+    /*
+    // old way - (backup)
     // ??
     // vamos responder.
     // Pra isso precisamos saber o tamanho do buffer.
@@ -1702,6 +1751,9 @@ __request_received:
     
     E1000Send ( (void *) currentNIC, 
         (uint32_t) arp_tx_len, (uint8_t *) buffer );
+
+    */
+
 
     //printf ("\n");
     //refresh_screen ();

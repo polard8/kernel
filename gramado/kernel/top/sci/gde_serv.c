@@ -780,15 +780,17 @@ gde_extra_services (
                             (unsigned long) arg3 );  //fd
     }
     
-    
-    // Testing network.
-    if (number == 968){
+
+    // 968 - Testing network.
+    if (number == 968)
+    {
         network_test();
         return NULL;
     }
 
 
-    // A interrup��o n�o conseguir� retornar para a mesma thread.
+    // 970 - Create request.
+    // A interrupção n�o conseguir� retornar para a mesma thread.
     // Chamar� o scheduler por conta pr�pria;
     // IN: reson, reason
     if ( number == 970 )

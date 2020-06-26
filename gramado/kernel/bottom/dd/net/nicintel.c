@@ -89,49 +89,46 @@ e1000_init_nic (
 {
 
     // pci info.
-    uint32_t data;
+    uint32_t data=0;
 
     unsigned long phy_address;
     unsigned short tmp16;
-    uint32_t i; 
+    uint32_t i=0; 
 
 
 	// #debug
-    printf ("e1000_init_nic:\n");
     debug_print ("e1000_init_nic:\n");
+    printf ("e1000_init_nic:\n");
 
 
-	//#importante
-	//devemos falhar antes de alocarmos memória para a estrutura.
+
+    //
+    // NIC Intel.
+    //
+
+	// #importante
+	// Devemos falhar antes de alocarmos memória para a estrutura.
+	// #todo
+	// Fazer uma lista de dispositivos Intel suportados por esse driver.
+	// +usar if else.
 
     data = (uint32_t) diskReadPCIConfigAddr ( bus, dev, fun, 0 );
 
     unsigned short Vendor = (unsigned short) (data       & 0xffff);
     unsigned short Device = (unsigned short) (data >> 16 & 0xffff);
 
-	
-	// #todo
-	// Fazer uma lista de dispositivos Intel suportados por esse driver.
-	// +usar if else.
-
-    if ( Vendor != 0x8086 || Device != 0x100E )
-    {
-		// #todo: 
-		// Criar mensagem aqui. 
-		// Pois essa rotina foi chamada porque encontramos
-		// esse dispositivo específicamente.
-
-        return -1;
+    if ( Vendor != 0x8086 || Device != 0x100E ){
+        debug_print ("e1000_init_nic: Device not found\n");
+        return (int) (-1);
     }
 
 	//#debug
-
     printf ("Vendor=%x \n", (data       & 0xffff) );
     printf ("Device=%x \n", (data >> 16 & 0xffff) );
 
 
 	//
-	// pci_device
+	// pci_device structure.
 	//
 
 
@@ -170,6 +167,10 @@ e1000_init_nic (
              pci_device->Device != 0x100E )
         {
             panic ("e1000_init_nic: 82540EM not found\n");
+            // #bugbug
+            // Maybe only return.
+            // debug_print ("e1000_init_nic: 82540EM not found\n");
+            // return -1;
         }
 
 
@@ -202,6 +203,10 @@ e1000_init_nic (
                                              dev, fun, 0x3D ); 
 
 
+        //
+        // The physical address!
+        //
+
 		// ##importante:
 		// Grab the Base I/O Address of the device
 		// Aqui nós pegamos o endereço dos registadores na BAR0,
@@ -212,6 +217,16 @@ e1000_init_nic (
 
         //...
     };
+    
+    if (phy_address == 0)
+    {
+        panic ("e1000_init_nic: Invalid physical address\n");
+        // #bugbug
+        // Maybe only return.
+        // debug_print ("e1000_init_nic: Invalid physical address\n");
+        // return -1;
+    }
+
 
 
 	//
@@ -224,7 +239,18 @@ e1000_init_nic (
 	// #bugbug: 
 	// Isso é um improviso. Ainda falta criar rotinas melhores.
 
-    unsigned long virt_address = mapping_nic1_device_address ( phy_address );
+    unsigned long virt_address = mapping_nic1_device_address (phy_address);
+
+    if (virt_address == 0)
+    {
+        panic ("e1000_init_nic: Invalid virtual address\n");
+        // #bugbug
+        // Maybe only return.
+        // debug_print ("e1000_init_nic: Invalid virtual address\n");
+        // return -1;
+    }
+
+
 
 	// Endereço base.
 	// Preparando a mesma base de duas maneiras.
@@ -375,10 +401,11 @@ e1000_init_nic (
  * xxxe1000handler:
  *     
  *     Esse é o handler da interrupção para o NIC intel 8086:100E.
- *     Esse é o driver do controlador, ele não atua sobre protocolos de rede,
- * então deve-se enviar uma mensagem para o servidor de rede para ele
- * analizar o conteúdo do buffer, para assim decidir qual é o protoco e 
- * redirecionar para a rotina de tratamento do protocolo específico.
+ *     Esse é o driver do controlador, ele não atua sobre protocolos 
+ * de rede, então deve-se enviar uma mensagem para o servidor de rede 
+ * para ele analizar o conteúdo do buffer, para assim decidir qual 
+ * é o protocolo e redirecionar para a rotina de tratamento do 
+ * protocolo específico.
  *     Esse é o driver do controlador, ele deve solicitar ao kernel
  * qual é o PID do processo que é o servidor de rede, e enviar
  * a mensagem para ele, contendo o endereço do buffer.
@@ -388,13 +415,14 @@ e1000_init_nic (
 
 void xxxe1000handler (void){
 
-    struct ether_header *eh;
-    struct ether_arp *arp_h;
-    struct ipv6_header_d *ipv6_h;
+    uint32_t status=0;
+    uint32_t val=0;
+    uint16_t old=0;
+    uint32_t len=0;
+
+
+    //debug_print ("xxxe1000handler: ");
     
-    int i=0;
-
-
     //
     // Profiler
     //
@@ -403,13 +431,12 @@ void xxxe1000handler (void){
     g_profiler_ints_irq9++;
 
 
+    
 	// #importante:
 	// #flag 
 	// Essa flag precisa ser acionada para a rotina funcionar.
 	// F6 tem acionado essa flag.
 
-    //printf ("xxxe1000handler: ");
-    //refresh_screen();
 
     if ( e1000_interrupt_flag != 1 ){
         printf ("xxxe1000handler: locked\n");
@@ -430,27 +457,27 @@ void xxxe1000handler (void){
 
 
     // Interrupt count.
-    if ( (void *) currentNIC != NULL ){
+    if ( (void *) currentNIC != NULL )
+    {
         currentNIC->interrupt_count++;
     }
-
-
-	// #debug
-	// printf("xxxe1000handler: #debug e1000\n");
-	// refresh_screen();
 
 
 	// Without this, the card may spam interrupts...
     E1000WriteCommand ( currentNIC, 0xD0, 1);
 
 
+    //
+    // Status.
+    //
+
     // Status
-    uint32_t status = E1000ReadCommand ( currentNIC, 0xC0 ); 
+    status = E1000ReadCommand ( currentNIC, 0xC0 ); 
 
     // 0x04 - Linkup
     if (status & 0x04) 
     {
-        uint32_t val = E1000ReadCommand ( currentNIC, 0 );
+        val = E1000ReadCommand ( currentNIC, 0 );
         E1000WriteCommand ( currentNIC, 0, val | 0x40 );
         return;
 
@@ -468,8 +495,8 @@ void xxxe1000handler (void){
    
         while ( (currentNIC->legacy_rx_descs[currentNIC->rx_cur].status & 0x01) == 0x01 ) 
         {
-             uint16_t old = currentNIC->rx_cur;
-             uint32_t len = currentNIC->legacy_rx_descs[old].length;
+             old = currentNIC->rx_cur;
+             len = currentNIC->legacy_rx_descs[old].length;
 
 			// Our Net layer should handle it
 			//NetHandlePacket(dev->ndev, len, (PUInt8)dev->rx_descs_virt[old]);
@@ -510,13 +537,19 @@ void xxxe1000handler (void){
     // Agora que temos o buffer podemos enviar para o servidor de rede.
     // Pois o driver do controlador não lida com protocolos.
     // See: network.c
+    // Estamos chamando um serviço no diálogo que decodifica o buffer.
+    // Mas poderíamos simplesmente chamar um serviço no diálogo
+    // que mandasse o buffer para o network server em ring3.
 
+     // 8000 - decode buffer.
      network_driver_dialog ( NULL, (int) 8000, 
-        (unsigned long) &buffer[0], (unsigned long) &buffer[0] ); 
+        (unsigned long) &buffer[0], (unsigned long) &buffer[0] );
 
-
-// done.
-     //return;
+     // #todo
+     // Enviar o buffer para o gns.bin.
+     // 9000 - send buffer.
+     //network_driver_dialog ( NULL, (int) 9000, 
+        //(unsigned long) &buffer[0], (unsigned long) &buffer[0] );
 }
 
 
