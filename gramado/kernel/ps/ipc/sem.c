@@ -34,19 +34,19 @@
 
 int init_semaphore ( struct semaphore_d *s, unsigned int count ){
 
-	if ( (void *) s == NULL )
-	{
-	    return (int) 1;    
-	}
-	
+    if ( (void *) s == NULL ){
+        debug_print ("init_semaphore: s\n");
+        return (int) 1; 
+    }
+
 	// Atribui algum valor ao semáforo. 
 	// Deve ser 1, para que o primeiro processo à solicitar o semáforo já 
 	// possa usá-lo.
-	
+
 	//1.
-	s->count = (unsigned int) count;    
+    s->count = (unsigned int) count;    
     
-	return (int) 0;
+    return 0;
 }
 
 

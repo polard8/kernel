@@ -254,50 +254,70 @@ all-c:
 
 
 	##
-	## ==== MIDDLE ==== 
+	## ==== LIB ==== 
 	##
 
-	# libcore
-	$(CC) -c middle/syslib/ctype.c   $(KINCLUDE) $(CFLAGS) -o ctype.o
-	$(CC) -c middle/syslib/kstdio.c  $(KINCLUDE) $(CFLAGS) -o kstdio.o
-	$(CC) -c middle/syslib/stdlib.c  $(KINCLUDE) $(CFLAGS) -o stdlib.o
-	$(CC) -c middle/syslib/string.c  $(KINCLUDE) $(CFLAGS) -o string.o
-	$(CC) -c middle/syslib/unistd.c  $(KINCLUDE) $(CFLAGS) -o unistd.o
-	$(CC) -c middle/syslib/syslib.c $(KINCLUDE) $(CFLAGS) -o syslib.o
+	# lib
+	$(CC) -c lib/ctype.c   $(KINCLUDE) $(CFLAGS) -o ctype.o
+	$(CC) -c lib/kstdio.c  $(KINCLUDE) $(CFLAGS) -o kstdio.o
+	$(CC) -c lib/stdlib.c  $(KINCLUDE) $(CFLAGS) -o stdlib.o
+	$(CC) -c lib/string.c  $(KINCLUDE) $(CFLAGS) -o string.o
+	$(CC) -c lib/unistd.c  $(KINCLUDE) $(CFLAGS) -o unistd.o
+	$(CC) -c lib/syslib.c  $(KINCLUDE) $(CFLAGS) -o syslib.o
+
+
+	##
+	## ==== MIDDLE (ps = process structure) ==== 
+	##
+
 
 
 	# ps/action
-	$(CC) -c  middle/sysmk/ps/action/dispatch.c  $(KINCLUDE)  $(CFLAGS) -o dispatch.o
-	$(CC) -c  middle/sysmk/ps/action/pheap.c     $(KINCLUDE)  $(CFLAGS) -o pheap.o
-	$(CC) -c  middle/sysmk/ps/action/process.c   $(KINCLUDE)  $(CFLAGS) -o process.o
-	$(CC) -c  middle/sysmk/ps/action/clone.c     $(KINCLUDE)  $(CFLAGS) -o clone.o
-	$(CC) -c  middle/sysmk/ps/action/queue.c     $(KINCLUDE)  $(CFLAGS) -o queue.o
-	$(CC) -c  middle/sysmk/ps/action/spawn.c     $(KINCLUDE)  $(CFLAGS) -o spawn.o
-	$(CC) -c  middle/sysmk/ps/action/tasks.c     $(KINCLUDE)  $(CFLAGS) -o tasks.o
-	$(CC) -c  middle/sysmk/ps/action/theap.c     $(KINCLUDE)  $(CFLAGS) -o theap.o
-	$(CC) -c  middle/sysmk/ps/action/thread.c    $(KINCLUDE)  $(CFLAGS) -o thread.o
-	$(CC) -c  middle/sysmk/ps/action/threadi.c   $(KINCLUDE)  $(CFLAGS) -o threadi.o
-	$(CC) -c  middle/sysmk/ps/action/ts.c        $(KINCLUDE)  $(CFLAGS) -o ts.o
-	$(CC) -c  middle/sysmk/ps/action/tstack.c    $(KINCLUDE)  $(CFLAGS) -o tstack.o
-	$(CC) -c  middle/sysmk/ps/action/execve.c    $(KINCLUDE)  $(CFLAGS) -o execve.o
+	$(CC) -c  ps/action/dispatch.c  $(KINCLUDE)  $(CFLAGS) -o dispatch.o
+	$(CC) -c  ps/action/pheap.c     $(KINCLUDE)  $(CFLAGS) -o pheap.o
+	$(CC) -c  ps/action/process.c   $(KINCLUDE)  $(CFLAGS) -o process.o
+	$(CC) -c  ps/action/clone.c     $(KINCLUDE)  $(CFLAGS) -o clone.o
+	$(CC) -c  ps/action/queue.c     $(KINCLUDE)  $(CFLAGS) -o queue.o
+	$(CC) -c  ps/action/spawn.c     $(KINCLUDE)  $(CFLAGS) -o spawn.o
+	$(CC) -c  ps/action/tasks.c     $(KINCLUDE)  $(CFLAGS) -o tasks.o
+	$(CC) -c  ps/action/theap.c     $(KINCLUDE)  $(CFLAGS) -o theap.o
+	$(CC) -c  ps/action/thread.c    $(KINCLUDE)  $(CFLAGS) -o thread.o
+	$(CC) -c  ps/action/threadi.c   $(KINCLUDE)  $(CFLAGS) -o threadi.o
+	$(CC) -c  ps/action/ts.c        $(KINCLUDE)  $(CFLAGS) -o ts.o
+	$(CC) -c  ps/action/tstack.c    $(KINCLUDE)  $(CFLAGS) -o tstack.o
+	$(CC) -c  ps/action/execve.c    $(KINCLUDE)  $(CFLAGS) -o execve.o
 
 	# ps/ipc
-	$(CC) -c  middle/sysmk/ps/ipc/callfar.c  $(KINCLUDE)  $(CFLAGS) -o callfar.o
-	$(CC) -c  middle/sysmk/ps/ipc/callout.c  $(KINCLUDE)  $(CFLAGS) -o callout.o
-	$(CC) -c  middle/sysmk/ps/ipc/ipc.c      $(KINCLUDE)  $(CFLAGS) -o ipc.o
-	$(CC) -c  middle/sysmk/ps/ipc/ipccore.c  $(KINCLUDE)  $(CFLAGS) -o ipccore.o
-	$(CC) -c  middle/sysmk/ps/ipc/sem.c      $(KINCLUDE)  $(CFLAGS) -o sem.o
+	$(CC) -c  ps/ipc/callfar.c  $(KINCLUDE)  $(CFLAGS) -o callfar.o
+	$(CC) -c  ps/ipc/callout.c  $(KINCLUDE)  $(CFLAGS) -o callout.o
+	$(CC) -c  ps/ipc/ipc.c      $(KINCLUDE)  $(CFLAGS) -o ipc.o
+	$(CC) -c  ps/ipc/ipccore.c  $(KINCLUDE)  $(CFLAGS) -o ipccore.o
+	$(CC) -c  ps/ipc/sem.c      $(KINCLUDE)  $(CFLAGS) -o sem.o
 
 	# ps/sched
-	$(CC) -c  middle/sysmk/ps/sched/preempt.c   $(KINCLUDE) $(CFLAGS) -o preempt.o
-	$(CC) -c  middle/sysmk/ps/sched/priority.c  $(KINCLUDE) $(CFLAGS) -o priority.o
-	$(CC) -c  middle/sysmk/ps/sched/sched.c     $(KINCLUDE) $(CFLAGS) -o sched.o
-	$(CC) -c  middle/sysmk/ps/sched/schedi.c    $(KINCLUDE) $(CFLAGS) -o schedi.o
+	$(CC) -c  ps/sched/preempt.c   $(KINCLUDE) $(CFLAGS) -o preempt.o
+	$(CC) -c  ps/sched/priority.c  $(KINCLUDE) $(CFLAGS) -o priority.o
+	$(CC) -c  ps/sched/sched.c     $(KINCLUDE) $(CFLAGS) -o sched.o
+	$(CC) -c  ps/sched/schedi.c    $(KINCLUDE) $(CFLAGS) -o schedi.o
 
-	# mk
-	$(CC) -c middle/sysmk/create.c  $(KINCLUDE)  $(CFLAGS) -o create.o
-	$(CC) -c middle/sysmk/mk.c      $(KINCLUDE)  $(CFLAGS) -o mk.o
-	$(CC) -c middle/sysmk/sysmk.c   $(KINCLUDE) $(CFLAGS) -o sysmk.o
+
+	#
+	# x86 - falling angels.
+	#
+	
+	#ps
+	$(CC) -c ps/x86/x86cont.c   $(KINCLUDE)  $(CFLAGS) -o x86cont.o
+	$(CC) -c ps/x86/x86fault.c  $(KINCLUDE)  $(CFLAGS) -o x86fault.o
+	$(CC) -c ps/x86/x86start.c  $(KINCLUDE)  $(CFLAGS) -o x86start.o
+	$(CC) -c ps/x86/memory.c    $(KINCLUDE)  $(CFLAGS) -o memory.o
+	$(CC) -c ps/x86/mminfo.c    $(KINCLUDE)  $(CFLAGS) -o mminfo.o
+	$(CC) -c ps/x86/mmpool.c    $(KINCLUDE)  $(CFLAGS) -o mmpool.o
+	$(CC) -c ps/x86/pages.c     $(KINCLUDE)  $(CFLAGS) -o pages.o
+
+	# ps
+	$(CC) -c ps/create.c  $(KINCLUDE)  $(CFLAGS) -o create.o
+	$(CC) -c ps/mk.c      $(KINCLUDE)  $(CFLAGS) -o mk.o
+	$(CC) -c ps/sysmk.c   $(KINCLUDE)  $(CFLAGS) -o sysmk.o
 
 
 
@@ -365,22 +385,7 @@ all-c:
 	$(CC) -c bottom/dd/ws/mouse.c     $(KINCLUDE) $(CFLAGS) -o mouse.o
 	$(CC) -c bottom/dd/ws/ps2mouse.c  $(KINCLUDE) $(CFLAGS) -o ps2mouse.o
 	$(CC) -c bottom/dd/ws/vsync.c     $(KINCLUDE) $(CFLAGS) -o vsync.o
-	
 
-
-
-	#
-	# falling angels.
-	#
-	
-	#ps
-	$(CC) -c bottom/ps/x86cont.c   $(KINCLUDE)  $(CFLAGS) -o x86cont.o
-	$(CC) -c bottom/ps/x86fault.c  $(KINCLUDE)  $(CFLAGS) -o x86fault.o
-	$(CC) -c bottom/ps/x86start.c  $(KINCLUDE)  $(CFLAGS) -o x86start.o
-	$(CC) -c bottom/ps/memory.c  $(KINCLUDE) $(CFLAGS) -o memory.o
-	$(CC) -c bottom/ps/mminfo.c  $(KINCLUDE) $(CFLAGS) -o mminfo.o
-	$(CC) -c bottom/ps/mmpool.c  $(KINCLUDE) $(CFLAGS) -o mmpool.o
-	$(CC) -c bottom/ps/pages.c   $(KINCLUDE) $(CFLAGS) -o pages.o
 
 
 	# x86 initialization

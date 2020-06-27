@@ -1,52 +1,29 @@
- 
-  This is the folder for the kernelbase's source code.
-  Everything here is gonna run in ring 0, 32bit protected mode.
 
-     It will generate the image KERNEL.BIN.
-
-
-	2020 - Fred Nora
+    The base kernel 
+    This is the folder for the base kernel's source code.
+    Everything here is gonna run in ring 0, 32bit protected mode.
+    It will generate the image KERNEL.BIN.
+    2020 - Fred Nora
  
  
- List of folders:
- ================
+Folders:
 
-boot/
-    The system's boot loader.
+bottom/
+    Low level components. It is hardware dependent.
 
 include/
     All the headers for the Kernel.
 
-init/
-    The Kernel's initialization.
-
-
-net/
-    Network support.
-
-security/
-    Security support.
-
-sci/
-    System Call Interface.
-
-
-sysio/
-    i/o support.
-
-syslib/
-    Kernel's libraries. 
-
-
-sysmk/
-    Microkernel module.
-    ps: ipc, mm, processes management.
-
-sysmm/
-    System management.
-
-
-
-
-    	    
+lib/
+    Libraries.
+ps/
+    Process structure.
+    process, thread, mm, ipc, scheduler.
+top/
+    High level components. It is hardware independent.
+    net support.
+    system management.
+    kgws - window server
+    kgwm - window manager
+    sci - system call inteface
 

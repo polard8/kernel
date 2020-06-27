@@ -115,7 +115,7 @@ ipc_send_to_ws (
 
 /*
  *********************
- * pty_send_message_to_process:
+ * ipc_send_message_to_process:
  * 
  *     Sends a message to a control thread of a given process.
  */
@@ -188,7 +188,7 @@ ipc_send_message_to_process (
 
 /*
  ****************
- * pty_send_message_to_thread:
+ * ipc_send_message_to_thread:
  * 
  *     Sends a message to a given thread.
  */
@@ -259,7 +259,7 @@ ipc_send_message_to_thread (
 
 /*
  *************************
- * init_ipc:
+ * ipc_init:
  */
 
 int ipc_init (void)
