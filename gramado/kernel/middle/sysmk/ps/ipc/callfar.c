@@ -1,6 +1,7 @@
 
-
-//callfar.c  chama uma rotina em um módulo do kernel base que esteja em kernel mode.
+// ??
+//callfar.c  
+// chama uma rotina em um módulo do kernel base que esteja em kernel mode.
 
 
 /*

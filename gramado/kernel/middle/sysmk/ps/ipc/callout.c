@@ -1,6 +1,7 @@
 /*
  * File: callout.c
  *     O Kernel chama uma rotina em user mode.
+ *     ?? isso acontece em 'unix signals' ??
  */
 
 

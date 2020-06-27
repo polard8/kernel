@@ -32,6 +32,9 @@ int ipcStatus;
  * 
  */
 
+// #bugbug
+// Now the window server is using unix-like sockets.
+
 // OUT:
 // <= 0 - The ws is present and we sent the message to it.
 // > 0  - The ws PID.
@@ -117,60 +120,58 @@ ipc_send_to_ws (
  *     Sends a message to a control thread of a given process.
  */
 
-void ipc_send_message_to_process ( unsigned long msg_buffer, int pid ){
+// #ok
+// This method is very good.
+// But we have some more methods.
 
-    struct process_d *p;
-    struct thread_d *t;
+void 
+ipc_send_message_to_process ( 
+    unsigned long msg_buffer, 
+    int pid )
+{
+    struct process_d  *p;
+    struct thread_d   *t;
+
 
 	//#debug
 	//printf ("ipc_send_message_to_process: PID=%d \n", pid );
 	//refresh_screen ();
 
     if ( pid < 0 || pid >= PROCESS_COUNT_MAX ){
-        // #debug
-        printf ("ipc_send_message_to_process: PID \n");
-        refresh_screen ();
+        debug_print ("ipc_send_message_to_process: pid \n");
         return;
     }
 
 
+    // Process structure.
+
     p = ( void *) processList[pid];
 
     if ( (void *) p == NULL ){
-        // #debug
-        printf ("ipc_send_message_to_process: struct \n");
-        refresh_screen ();
+        debug_print ("ipc_send_message_to_process: p \n");
         return;
 
     }else{
-	
-		 if ( p->used != 1 || p->magic != 1234 )
-		 {
-		     // #debug
-			 printf ("ipc_send_message_to_process: p validation \n");
-		     refresh_screen ();
-			 return;
-		 }
-		
+
+         if ( p->used != 1 || p->magic != 1234 ){
+             debug_print ("ipc_send_message_to_process: p validation \n");
+             return;
+         }
+
 		 //
 		 // Thread de controle.
 		 //
-		
-		 t = p->control; 
 
-		 if ( (void *) t == NULL )
-		 {
-		     // #debug
-			 printf ("ipc_send_message_to_process: t struct \n");
-		     refresh_screen ();
-			 return;
+         t = p->control; 
 
-		 }else{
+         if ( (void *) t == NULL ){
+             debug_print ("ipc_send_message_to_process: t \n");
+             return;
+
+         }else{
 
             if ( t->used != 1 || t->magic != 1234 ){
-                // #debug
-                printf ("ipc_send_message_to_process: t validation \n");
-                refresh_screen ();
+                debug_print ("ipc_send_message_to_process: t validation \n");
                 return;
             }
 
@@ -192,7 +193,11 @@ void ipc_send_message_to_process ( unsigned long msg_buffer, int pid ){
  *     Sends a message to a given thread.
  */
 
-void ipc_send_message_to_thread ( unsigned long msg_buffer, int tid ){
+void 
+ipc_send_message_to_thread ( 
+    unsigned long msg_buffer, 
+    int tid )
+{
 
     struct thread_d *t;
 
@@ -251,15 +256,17 @@ void ipc_send_message_to_thread ( unsigned long msg_buffer, int tid ){
 }
 
 
+
 /*
+ *************************
  * init_ipc:
  */
 
 int ipc_init (void)
-{  
+{
+    debug_print ("ipc_init: [TODO]\n");  
     return -1;   //#todo.
 }
-
 
 
 //
