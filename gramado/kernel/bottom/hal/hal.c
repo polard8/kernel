@@ -1,6 +1,6 @@
 /*
  * Gramado HAL - The main file for the hal module in the kernel base. 
- * (c) Copyright 2015-2016 Fred Nora.
+ * (c) Copyright Fred Nora.
  *
  *  File: hal/hal.c 
  *
@@ -15,6 +15,7 @@
  
 #include <kernel.h>
 //#include "hidata.h"  //Hal Internal Data.
+
 
 //unsigned char  HalName[] = "HAL LAYER";
 
@@ -54,12 +55,11 @@ void hal_default_handler (void)
 void hal_init_handlers_table (void)
 {
     int i=0;
-	int max = (256+8);
-	
-	for ( i=0; i<max; i++ )
-	{
-	    HANDLERS[i] = (unsigned long) &hal_default_handler;
-	}
+    int max = (256+8);
+
+    for ( i=0; i<max; i++ ){
+        HANDLERS[i] = (unsigned long) &hal_default_handler;
+    }
 }
 
 
@@ -128,27 +128,29 @@ extern unsigned long int216;
 
 
 
-
-void hal_setup_new_vectors_table_entry ( int number, unsigned long address )
+void 
+hal_setup_new_vectors_table_entry ( 
+    int number, 
+    unsigned long address )
 {
-    VECTORS[number] = (unsigned long) address;    
+    VECTORS[number] = (unsigned long) address; 
 }
 
 
-//Esses endereços foram configurados pelo assembler na inicialização.
-//Vamos salvá los na tabela em seus respectivos slots.
+// Esses endereços foram configurados pelo assembler na inicialização.
+// Vamos salvá los na tabela em seus respectivos slots.
 
 void hal_init_vectors_table (void)
 {
-	
+
 	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &fault_N0 );
 	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &fault_N1 );
 	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &fault_N2 );
 	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &fault_N3 );
 	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &fault_N4 );
 	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &fault_N5 );
-	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &fault_INTRUCAO_INVALIDA );	
-	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &fault_N7 );	
+	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &fault_INTRUCAO_INVALIDA );
+	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &fault_N7 );
 	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &fault_DOUBLE );
 	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &fault_N9 );
 	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &fault_N10 );
@@ -270,13 +272,20 @@ void hal_init_vectors_table (void)
  */
 
  
+ 
+ 
 /*
  * Beep support
  * #bugbug: Não quero comprometer a programação do PIT.
-void Beep::tone(int freq) {
+*/
+
+/*
+void ____Beep_tone (int freq){
+
     if (freq == 0) {
         int i = io_in8(0x61);
         io_out8(0x61, i & 0x0d);
+    
     } else {
         int i = 1193180000 / freq;
         io_out8(0x43, 0xb6);
@@ -289,11 +298,13 @@ void Beep::tone(int freq) {
 */ 
  
  
-//OUT 
-//Play sound using built in speaker
+// Speaker ON. 
+// OUT 
+// Play sound using built in speaker
+
 void hal_speaker_on (void){
 
-    uint8_t tmp;
+    uint8_t tmp=0;
 
     //And play the sound using the PC speaker
 
@@ -306,8 +317,9 @@ void hal_speaker_on (void){
 }
 
 
-//IN
-//make it shutup
+// Speaker OFF
+// IN
+// make it shutup
 void hal_speaker_off (void)
 {
     uint8_t tmp = in8(0x61) & 0xFC;
@@ -317,19 +329,23 @@ void hal_speaker_off (void)
  
  
 
-//testando o beep;
-void hal_test_speaker (void)
-{
-	int i;
+// Beep.
+void hal_test_speaker (void){
 
-    printf ("testing speaker ...\n");
-    refresh_screen();
+    int i=0;
 
+    debug_print ("Testing speaker ...\n");
+
+    //++
     hal_speaker_on ();
     
-    for( i=0; i<49000; i++){};
+    for( i=0; i<49000; i++)
+    {
+        // Nothing
+    }
 
     hal_speaker_off ();
+    //--
 } 
  
 
@@ -349,14 +365,15 @@ void hal_test_speaker (void)
 // IN: cor, x, y, 0
 
 void 
-hal_backbuffer_putpixel ( unsigned long ax, 
-                          unsigned long bx, 
-                          unsigned long cx, 
-                          unsigned long dx )
+hal_backbuffer_putpixel ( 
+    unsigned long ax, 
+    unsigned long bx, 
+    unsigned long cx, 
+    unsigned long dx )
 {
     asm volatile ( "\n" : : "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
 
-    swlib_backbuffer_putpixel ();	
+    swlib_backbuffer_putpixel ();
 }
 
 
@@ -371,10 +388,11 @@ hal_backbuffer_putpixel ( unsigned long ax,
 // IN: cor, x, y, 0
 
 void 
-hal_lfb_putpixel ( unsigned long ax, 
-                   unsigned long bx, 
-                   unsigned long cx, 
-                   unsigned long dx )
+hal_lfb_putpixel ( 
+    unsigned long ax, 
+    unsigned long bx, 
+    unsigned long cx, 
+    unsigned long dx )
 {
     asm volatile ( "\n" : : "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
 
@@ -403,8 +421,9 @@ hal_lfb_putpixel ( unsigned long ax,
  
  
 int hal_hardware_detect (void)
-{	
-    return 0;    //#todo	
+{
+    debug_print ("hal_hardware_detect: [TODO]\n");
+    return 0;    //#todo
 }
 
 
@@ -413,9 +432,11 @@ int hal_hardware_detect (void)
 //para obter acesso as informações em baixo nível.
 //@todo: rever os nomes das funções.
 
-int hal_showpciinfo (void)
-{	
-	return (int) pciInfo ();
+int hal_showpciinfo (void){
+
+    debug_print ("hal_showpciinfo:\n");
+
+    return (int) pciInfo();
 }
 
 
@@ -426,11 +447,14 @@ int hal_showpciinfo (void)
  *     Inicializa apenas o que for independente da arquitetura.
  *     @todo: Essa rotina pode ir para outro modulo do /hal. como cpu.c
  */
- 
+
+// #todo 
+// O retorno deve ser int, para refletir o status.
+    
 void init_cpu (void){
-	
-    int Status = 0;
-	
+
+    int Status=0;
+
 	// #bugbug
 	// Precisamos dar suporte à vários processadores,
 	// e nessa rotina estamos usando uma estrutura para 
@@ -440,43 +464,42 @@ void init_cpu (void){
 	//
 	// Processor struct
 	//
-	
-	processor = (void *) kmalloc ( sizeof(struct tagProcessor) );
-	
-	if ( (void *) processor == NULL )
-	{
-	    panic ("hal-init_cpu: processor");
-		
-	} else {
-	    
+
+    processor = (void *) kmalloc ( sizeof(struct tagProcessor) );
+
+    if ( (void *) processor == NULL ){
+        panic ("hal-init_cpu: processor");
+
+    } else {
+
 		//@todo: set processor id: escolhe o processador atual. ??
 	
 	    //Inicializa alguns valores da estrurura.
 		
-	    processor->Gdt = (unsigned long) getGdt ();
-	    processor->Idt = (unsigned long) getIdt ();
-	    processor->Tss = 0;  //getTss();
+        processor->Gdt = (unsigned long) getGdt();
+        processor->Idt = (unsigned long) getIdt();
+        processor->Tss = 0;  //getTss();
         
-		//...
-        
-		if ( (void *) Hardware != NULL )
-		{
-			Hardware->Processor = processor;
-		}
-		
-        //Nothing.		
-    };	
-	
+		// ...
+
+        if ( (void *) Hardware != NULL )
+        {
+            Hardware->Processor = processor;
+        }
+
+        // Nothing.
+    };
+
+
 	//sonda.
 	//Checa qual cpu é, e inicializa mais variáveis.
-	
-	Status = (int) hal_probe_cpu (); 
-	
-	if( Status != 0 )
-	{
-	    panic ("init_cpu: hal_probe_cpu Status \n");  		
-	};
-	
+
+    Status = (int) hal_probe_cpu(); 
+
+    if ( Status != 0 ){
+        panic ("init_cpu: hal_probe_cpu Status \n"); 
+    }
+
     //More?!	
 
 
@@ -486,17 +509,17 @@ void init_cpu (void){
 
     //#todo, o retorno deve ser int, para refletir o status.
     return;
-};
+}
 
 
-void hal_set_machine_type ( unsigned long type ){
-	
+void hal_set_machine_type ( unsigned long type )
+{
     g_machine_type = (unsigned long) type;
-};
+}
 
 
 unsigned long hal_get_machine_type (void)
-{	
+{
     return (unsigned long) g_machine_type;
 }
 
@@ -509,19 +532,22 @@ unsigned long hal_get_machine_type (void)
  */
  
 int hal_init_machine (void){
-	
+
+
+    debug_print ("hal_init_machine: [TODO]\n");  
+
 	// Limits for machine type.
-	
-	if ( g_machine_type < 0 || g_machine_type > 4)
-	{   
-		panic ("hal-hal_init_machine:");  
-	};
-	
-	
+
+    if ( g_machine_type < 0 || g_machine_type > 4)
+    {   
+        panic ("hal_init_machine:");  
+    }
+
+
 	// Type.
 	
-	switch (g_machine_type)    
-	{
+    switch (g_machine_type)    
+    {
 		//Unknow.
 	    case 0:
 		    //processor->Type = (unsigned char) 0;
@@ -545,11 +571,10 @@ int hal_init_machine (void){
 		//Unknow.
 		default:
 		    //processor->Type = (unsigned char) 0;
-	        printf("hal_init_machine: default type\n");
-            return (int) 0; 		
-			
-		    break;
-	};
+	        debug_print ("hal_init_machine: default type\n");
+            return 0;
+            break;
+    };
 
 	//More?!
 
@@ -558,13 +583,13 @@ int hal_init_machine (void){
 
 
 unsigned long getGdt (void)
-{	
+{
     return (unsigned long) &gdt; 
 }
 
 
 unsigned long getIdt (void)
-{	
+{
     return (unsigned long) &idt; 
 }
 
@@ -575,29 +600,39 @@ unsigned long getTss (){
     return (unsigned long) &tss; 
 }
 */
-	
-	
-//credits: levex		
-void hal_idt_register_interrupt ( unsigned long idt_location, unsigned char i, unsigned long callback )
+
+
+
+// Register interrupt.
+// credits: levex
+void 
+hal_idt_register_interrupt ( 
+    unsigned long idt_location, 
+    unsigned char i, 
+    unsigned long callback )
 {
+
+    debug_print ("hal_idt_register_interrupt: [TEST]\n");
+    
 	// Editando uma entrada na idt.
 	
 	//if(!__idt_setup) panic("Invalid IDT!");
-	
-	*(unsigned short*)(idt_location + 8*i + 0) = (unsigned short) (callback & 0x0000ffff);
-	*(unsigned short*)(idt_location + 8*i + 2) = (unsigned short) 0x8;
-	*(unsigned char*) (idt_location + 8*i + 4) = 0x00;
-	*(unsigned char*) (idt_location + 8*i + 5) = 0x8e;    //0 | IDT_32BIT_INTERRUPT_GATE | IDT_PRESENT;
-	*(unsigned short*)(idt_location + 8*i + 6) = (unsigned short)((callback & 0xffff0000) >> 16);
-	
+
+    *(unsigned short*)(idt_location + 8*i + 0) = (unsigned short) (callback & 0x0000ffff);
+    *(unsigned short*)(idt_location + 8*i + 2) = (unsigned short) 0x8;
+    *(unsigned char*) (idt_location + 8*i + 4) = 0x00;
+    *(unsigned char*) (idt_location + 8*i + 5) = 0x8e;    //0 | IDT_32BIT_INTERRUPT_GATE | IDT_PRESENT;
+    *(unsigned short*)(idt_location + 8*i + 6) = (unsigned short)((callback & 0xffff0000) >> 16);
+
+
 	//if(test_success) mprint("Registered INT#%d\n", i);
 	//return;
-}	
-	
+}
+
 
 // Monitor vertical sync.
 void hal_vsync (void)
-{	
+{
     vsync ();
 }
 
@@ -610,10 +645,10 @@ void hal_vsync (void)
  */
 
 void hal_reboot (void)
-{	
+{
+    debug_print ("hal_reboot:\n");
     asm_reboot (); 
-	
-	panic ("hal_reboot");
+    panic ("hal_reboot");
 }
 
 
@@ -625,9 +660,11 @@ void hal_reboot (void)
  *     máquina real e máquina virtual.
  *     #importante: Essa será a única função em hal para chamar shutdown.
  * quanquer outra interfce deve ficar fora do módulo hal.
+ 
  APM:
  ===
- This is the basic sequence of APM commands that must be given in order to shut down a computer.
+ This is the basic sequence of APM commands that must be given in 
+ order to shut down a computer.
  +Perform an installation check.
  +Disconnect any existing APM interface.
  +Connect the Real Mode interface.
@@ -646,16 +683,23 @@ void hal_reboot (void)
  The problem lies in the gathering of these values 
  especialy since the SLP_TYPa is in the \_S5 object 
  which is in the DSDT and therefore AML encoded.
+ 
  */
-	
-void hal_shutdown (void)
-{	
-	const char *shutdown_str;
-	
-    /* Bochs/QEMU poweroff */
-	shutdown_str = "Shutdown";
-    while (*shutdown_str) out8 (0x8900, *(shutdown_str++));
-	
+
+void hal_shutdown (void){
+
+    const char *shutdown_str;
+
+    debug_print ("hal_shutdown:\n");
+
+    /*
+    if (qemu____){
+        //Bochs/QEMU poweroff
+        shutdown_str = "Shutdown";
+        while (*shutdown_str) out8 (0x8900, *(shutdown_str++));
+    }
+    */
+
     panic ("hal_shutdown");
 }
 
@@ -668,20 +712,21 @@ void hal_shutdown (void)
  */
 
 int init_hal (void){
-	
+
     int Status = 0;
-	
+
+
 #ifdef KERNEL_VERBOSE	
-	printf("HAL:\n");
+    printf("HAL:\n");
 #endif	
-	
+
 	// CPU - Cria e inicializa a estrutura de cpu.
 #ifdef HAL_VERBOSE
-	printf("init_hal: cpu\n");
-#endif	
-	init_cpu();
+    printf("init_hal: cpu\n");
+#endif
+    init_cpu();
 
-		
+
 	// TIMER - Cria e inicializa estrutura do timer.
 #ifdef HAL_VERBOSE	
 	printf("init_hal: Timer\n");
@@ -702,11 +747,8 @@ int init_hal (void){
     early_timer_init ();
     
     
-
-	//
 	// Detecta fabricantes específicos suportados pelo núcleo.  
-	//
-	
+
 	hal_hardware_detect();
 	
 	//
@@ -729,9 +771,9 @@ int init_hal (void){
 	printf(">>>debug hang: after init");
 	refresh_screen(); 
 	while (1){ asm ("hlt"); }
-#endif	
-	
-	return (int) Status;
+#endif
+
+    return (int) Status;
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * File: ports.c
+ * File: portsx86.c
  *
  * Descrição:
  *     Interface de abstração para acesso as portas.
@@ -19,19 +19,20 @@
  *    Obs: Por enquanto a unica arquitetura suportada aqui
  *         é a arquitetura PC x86.
  *
- *   header em /hal/arch/x86/ports.h
+ *    ??
+ *    See: ports.h
  *
- * Versão 1.0, 2015, 2016.
+ *    2015 - Create by Fred Nora.
+ *    2019 - New function names for i/o stuff.
  */
 
+// goal:
+//     in8  in16  in32
+//     out8 out16 out32
 
 
 #include <kernel.h>
 
-
-// goal
-// in8 in16 in32
-// out8 out16 out32
 
 
 
@@ -108,50 +109,56 @@ unsigned long portsx86_IN ( int bits, unsigned long port ){
 
     switch (bits)
     {
-		case 8:
-			return (unsigned long) in8 ((int) port);
-			break;
-			
-		case 16:
-			return (unsigned long) in16 ( (int) port);
-			break;
-			
-		case 32:
-			return (unsigned long) in32 ( (int) port);
-			break;
-	
-		default:
-			return 0;
-			break;
-    }
+        case 8:
+            return (unsigned long) in8 ((int) port);
+            break;
+
+        case 16:
+            return (unsigned long) in16 ( (int) port);
+            break;
+
+        case 32:
+            return (unsigned long) in32 ( (int) port);
+            break;
+
+        default:
+            debug_print ("portsx86_IN: FAIL\n");
+            return 0;
+            break;
+    };
 }
 
 
-void portsx86_OUT ( int bits, unsigned long port, unsigned long value ){
+void 
+portsx86_OUT ( 
+    int bits, 
+    unsigned long port, 
+    unsigned long value )
+{
 
     switch (bits)
     {
         case 8:
-			out8 ( (int) port, (unsigned char) value );
-			return;
-			break;
-			
-        case 16:
-			out16 ( (int) port, (unsigned short) value );
-			return;
-			break;
-			
-        case 32:
-			out32 ( (int) port, (unsigned long) value );
-			return;
-			break;
-	
-        default:
-			return;
-			break;
-    }
-}
+            out8 ( (int) port, (unsigned char) value );
+            return;
+            break;
 
+        case 16:
+            out16 ( (int) port, (unsigned short) value );
+            return;
+            break;
+
+        case 32:
+            out32 ( (int) port, (unsigned long) value );
+            return;
+            break;
+
+        default:
+            debug_print ("portsx86_OUT: FAIL\n");
+            return;
+            break;
+    };
+}
 
 
 //

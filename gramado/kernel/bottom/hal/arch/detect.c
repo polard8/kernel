@@ -10,17 +10,16 @@
  *
  * In this file:
  *  + cpu_get_parameters
- *
  */
- 
+
 
 /*
- * @todo: cria a função init_cpu.
+ * todo: 
+ * cria a função init_cpu.
  */
- 
+
 
 #include <kernel.h>
-
 
 
 /*
@@ -34,7 +33,7 @@
  * Max feature id       = 0x80000000.
  * L2 cache information = 0x80000006.(Extended L2 Cache Features)
  * core per die         = 0x80000008.
- */ 
+ */
 
 // #todo:
 // apic
@@ -44,15 +43,17 @@
 void get_cpu_intel_parameters (void){
 
     // #todo:
-    // É mais seguro inicializar essas variáveis.
+    // Initialize this.
     unsigned long eax, ebx, ecx, edx;
 
     unsigned long name[32];
 
     int MASK_LSB_8 = 0xFF;
 
+    debug_print ("get_cpu_intel_parameters:\n");
 
-    //Vendor.
+
+    // Vendor.
     //eax = Maximum meaningful value for the InfoType parameter. @todo:
     //ebx = Identification String (part 1)
     //ecx = Identification String (part 3)
@@ -64,25 +65,24 @@ void get_cpu_intel_parameters (void){
     name[2] = ecx;
     name[3] = 0;
 
-	processor->Vendor[0] = ebx;
-	processor->Vendor[1] = edx;
-	processor->Vendor[2] = ecx;
-	processor->Vendor[3] = 0;
+    processor->Vendor[0] = ebx;
+    processor->Vendor[1] = edx;
+    processor->Vendor[2] = ecx;
+    processor->Vendor[3] = 0;
 
 
-	// Confere se é Intel.
-
+    // Intel?
     if ( ebx == CPUID_VENDOR_INTEL_1 && 
          edx == CPUID_VENDOR_INTEL_2 && 
          ecx == CPUID_VENDOR_INTEL_3 )
     {
-		//#todo: definir Intel como 1.
+        //#todo: definir Intel como 1.
         hal_set_machine_type (1);    
     }
 
 
 	//
-	//Output para argumento 1. 
+	// Output para argumento 1. 
 	//
 	
 	//eax:
@@ -90,10 +90,10 @@ void get_cpu_intel_parameters (void){
     //4-7 Model
 	//8-11 Family
 	//12-13 Processor Type
-	//14-15 Reserved
-	//16-19 Extended model
-	//20-27 Extended family
-	//28-31 Reserved
+   //14-15 Reserved
+    //16-19 Extended model
+    //20-27 Extended family
+    //28-31 Reserved
 
     //ebx:
 	//0-7 Brand Index
@@ -147,9 +147,9 @@ void get_cpu_intel_parameters (void){
 	//31 PBE Pend. Brk. En.
 	
 	
-	
-	cpuid ( 1, eax, ebx, ecx, edx );
-	
+
+    cpuid ( 1, eax, ebx, ecx, edx );
+
 	//eax:
 	//processor->xx = (unsigned long)( eax & 0xF);       //stepping
 	//processor->xx = (unsigned long)((eax >> 4) & 0xf); //model
@@ -170,7 +170,7 @@ void get_cpu_intel_parameters (void){
 	//edx:
 	// The CPUID.01h:EDX[bit 9] flag 
 	// specifies whether a CPU has a built-in local APIC. 
-	processor->isApic = (unsigned long)((edx >> 9) & 0x0001);
+    processor->isApic = (unsigned long)((edx >> 9) & 0x0001);
 	//processor->isApic = (unsigned long) edx;
 	
 	
@@ -190,67 +190,69 @@ void get_cpu_intel_parameters (void){
 	
    /*name part 1*/
     cpuid ( 0x80000002, eax, ebx, ecx, edx);
-	name[0] = eax; //Processor Brand String
-	name[1] = ebx; //Processor Brand String
-	name[2] = ecx; //Processor Brand String
-	name[3] = edx; //Processor Brand String
-    name[4] = 0;	    
-	//salva na estrutura.
-	processor->BrandName[0] = eax;	
-	processor->BrandName[1] = ebx;
-	processor->BrandName[2] = ecx;
-	processor->BrandName[3] = edx;
+    name[0] = eax;  //Processor Brand String
+    name[1] = ebx;  //Processor Brand String
+    name[2] = ecx;  //Processor Brand String
+    name[3] = edx;  //Processor Brand String
+    name[4] = 0;
+    //salva na estrutura.
+    processor->BrandName[0] = eax;
+    processor->BrandName[1] = ebx;
+    processor->BrandName[2] = ecx;
+    processor->BrandName[3] = edx;
 	//printf("CPU={%s", &name[0]);
 	//printf("%s",&name[0]);		
 
    /*name part 2*/
     cpuid ( 0x80000003, eax, ebx, ecx, edx);
-	name[0] = eax; //Processor Brand String, continued
-	name[1] = ebx; //Processor Brand String, continued
-	name[2] = ecx; //Processor Brand String, continued
-	name[3] = edx; //Processor Brand String, continued
-    name[4] = 0;	
+    name[0] = eax;  //Processor Brand String, continued
+    name[1] = ebx;  //Processor Brand String, continued
+    name[2] = ecx;  //Processor Brand String, continued
+    name[3] = edx;  //Processor Brand String, continued
+    name[4] = 0;
 	//salva na estrutura.	
-	processor->BrandName[4] = eax;	
-	processor->BrandName[5] = ebx;
-	processor->BrandName[6] = ecx;
-	processor->BrandName[7] = edx;
-	//printf("%s",&name[0]);	
+    processor->BrandName[4] = eax;
+    processor->BrandName[5] = ebx;
+    processor->BrandName[6] = ecx;
+    processor->BrandName[7] = edx;
+	//printf("%s",&name[0]);
 
    /*name part 3*/
     cpuid ( 0x80000004, eax, ebx, ecx, edx);
-	name[0] = eax; //Processor Brand String, continued
-	name[1] = ebx; //Processor Brand String, continued
-	name[2] = ecx; //Processor Brand String, continued
-	name[3] = edx; //Processor Brand String, continued
-    name[4] = 0;	
+    name[0] = eax; //Processor Brand String, continued
+    name[1] = ebx; //Processor Brand String, continued
+    name[2] = ecx; //Processor Brand String, continued
+    name[3] = edx; //Processor Brand String, continued
+    name[4] = 0;
 	//salva na estrutura.	
-	processor->BrandName[8]  = eax;	
-	processor->BrandName[9]  = ebx;
-	processor->BrandName[10] = ecx;
-	processor->BrandName[11] = edx;
+    processor->BrandName[8]  = eax;
+    processor->BrandName[9]  = ebx;
+    processor->BrandName[10] = ecx;
+    processor->BrandName[11] = edx;
 	//printf("%s}\n",&name[0]);	
 	
 	
 	//Max feature id.
     cpuid ( 0x80000000, eax, ebx, ecx, edx);
-	name[0] = eax; //Maximum meaningful value of InfoType for extended function CPUID information.
-	name[1] = ebx; //reserved
-	name[2] = ecx; //reserved
-	name[3] = edx; //reserved
-    name[4] = 0;   
-	processor->MaxFeatureId = (unsigned long)(eax & MASK_LSB_8);
+    name[0] = eax;  //Maximum meaningful value of InfoType for extended function CPUID information.
+    name[1] = ebx;  //reserved
+    name[2] = ecx;  //reserved
+    name[3] = edx;  //reserved
+    name[4] = 0; 
+    processor->MaxFeatureId = (unsigned long)(eax & MASK_LSB_8);
 	//printf("Max feature id ={%d}\n", (unsigned long) processor->MaxFeatureId);
-	
-    if ( processor->MaxFeatureId < 6)
-	{ 
-		//printf("Cache Extended Feature not supported\n");
-		//goto done;
-		
-		return;
-	};
-	
-	
+
+
+    if ( processor->MaxFeatureId < 6){
+        debug_print ("get_cpu_intel_parameters: Cache Extended Feature not supported\n");
+        //printf("Cache Extended Feature not supported\n");
+        //goto done;
+        return;
+    }
+
+
+
+
 	/*
      * L2 cache information (Intel)
 	 *
@@ -262,18 +264,19 @@ void get_cpu_intel_parameters (void){
 	 *     Bits 16-31: Cache size in 1K units.   
 	 * EDX Reserved
 	 */
+
     cpuid ( 0x80000006, eax, ebx, ecx, edx );
-	name[0] = eax;
-	name[1] = ebx;
-	name[2] = ecx;
-	name[3] = edx;
-    name[4] = 0;	
-	processor->L2LineSize      = (unsigned long)( ecx        & 0x00FF); //Bits 0-7: Cache Line Size.
+    name[0] = eax;
+    name[1] = ebx;
+    name[2] = ecx;
+    name[3] = edx;
+    name[4] = 0;
+    processor->L2LineSize      = (unsigned long)( ecx        & 0x00FF); //Bits 0-7: Cache Line Size.
     processor->L2Associativity = (unsigned long)((ecx >> 12) & 0x000F);	//Bits 12-15: L2 Associativity.
-	processor->L2Cachesize     = (unsigned long)((ecx >> 16) & 0xFFFF); //Bits 16-31: Cache size in 1K units.
+    processor->L2Cachesize     = (unsigned long)((ecx >> 16) & 0xFFFF); //Bits 16-31: Cache size in 1K units.
 	//printf("L2LineSize={%d Byte}\n",(unsigned long) processor->L2LineSize);	
 	//printf("L2Cachesize={%d KB}\n",(unsigned long) processor->L2Cachesize);
-		
+
     //EAX=80000007h: Advanced Power Management Information
 	
 	/*
@@ -281,20 +284,20 @@ void get_cpu_intel_parameters (void){
 	 */
 	
     //EAX=80000008h: 
-	//Virtual and Physical address Sizes	
+    //Virtual and Physical address Sizes	
     //Returns largest virtual and physical address sizes.
-	
-	cpuid ( 0x80000008, eax, ebx, ecx, edx );
-	name[0] = eax;    //Virtual and physical memory sizes.
-	name[1] = ebx;    //reserved
-	name[2] = ecx;    //reserved
-	name[3] = edx;    //reserved
-    name[4] = 0;	
-	processor->Physical_Address_Size = (unsigned long) ( eax       & 0x00FF); //7-0
-	processor->Virtual_Address_Size  = (unsigned long) ((eax >> 8) & 0x00FF); //15-8	
+
+    cpuid ( 0x80000008, eax, ebx, ecx, edx );
+    name[0] = eax;    //Virtual and physical memory sizes.
+    name[1] = ebx;    //reserved
+    name[2] = ecx;    //reserved
+    name[3] = edx;    //reserved
+    name[4] = 0;
+    processor->Physical_Address_Size = (unsigned long) ( eax       & 0x00FF); //7-0
+    processor->Virtual_Address_Size  = (unsigned long) ((eax >> 8) & 0x00FF); //15-8	
 	//printf("Physical_Address_Size={%d}\n",(unsigned long) processor->Physical_Address_Size);
 	//printf("Virtual_Address_Size={%d}\n", (unsigned long) processor->Virtual_Address_Size);
-};
+}
 
 
 
@@ -369,52 +372,56 @@ int KeTestCPU (void){
  */
 
 int hal_probe_cpu (void){
-	
-	unsigned long eax, ebx, ecx, edx;
-	
+
+    unsigned long eax, ebx, ecx, edx;
+
+    debug_print ("hal_probe_cpu:\n");
+
 #ifdef HAL_VERBOSE
-    printf("hal_probe_cpu:\n");	
+    printf ("hal_probe_cpu:\n");
 #endif
-	
-	// Check structure.	
-	if ( (void *) processor == NULL )
-	{
-	    panic ("hal_probe_cpu: struct\n");
-	}
-	
+
+    // Check processor structure.
+    if ( (void *) processor == NULL ){
+        panic ("hal_probe_cpu: struct\n");
+    }
+
+
     //Check vendor.
     cpuid ( 0, eax, ebx, ecx, edx ); 
 
-    //Confere se é intel.	
+    //Confere se é intel.
     //TestIntel:
 
-	if ( ebx == CPUID_VENDOR_INTEL_1 && 
-	     edx == CPUID_VENDOR_INTEL_2 && 
-		 ecx == CPUID_VENDOR_INTEL_3 )
-	{
-	    processor->Type = Processor_INTEL;
-		return (int) 0;
-	};
+    if ( ebx == CPUID_VENDOR_INTEL_1 && 
+         edx == CPUID_VENDOR_INTEL_2 && 
+         ecx == CPUID_VENDOR_INTEL_3 )
+    {
+        processor->Type = Processor_INTEL;
+        return 0;
+    }
 
-    //Confere se é Amd.	
+
+    //Confere se é Amd.
     //TestAmd:
-	
-	if ( ebx == CPUID_VENDOR_AMD_1 && 
-	     edx == CPUID_VENDOR_AMD_2 && 
-		 ecx == CPUID_VENDOR_AMD_3 )
-	{
-	    processor->Type = Processor_AMD;
-		return (int) 0;
-	};
 
-    //Desconhecido.	
-    //@todo: Aqui é um erro fatal.
-    //Fail:
-	
-	processor->Type = Processor_NULL;	
-    
-	panic ("hal_probe_cpu: Processor not supported");
-	//return (int) 1;
+    if ( ebx == CPUID_VENDOR_AMD_1 && 
+         edx == CPUID_VENDOR_AMD_2 && 
+         ecx == CPUID_VENDOR_AMD_3 )
+    {
+        processor->Type = Processor_AMD;
+        return 0;
+    }
+
+    // Desconhecido.
+    // todo: Aqui é um erro fatal.
+    // Fail:
+
+    processor->Type = Processor_NULL;
+
+    panic ("hal_probe_cpu: Processor not supported");
+
+    //return (int) (-1);
 }
 
 
@@ -424,46 +431,50 @@ int hal_probe_cpu (void){
  */
  
 int hal_probe_processor_type (void){
-	
+
+    unsigned long eax, ebx, ecx, edx;
+
+    unsigned long name[32];
+
     int MASK_LSB_8 = 0xFF;  
-	
-	unsigned long eax, ebx, ecx, edx;
-	unsigned long name[32];	
-		
+
+
+
 	//debug.
+    debug_print ("hal_probe_processor_type:\n");
 	//printf("Scaning x86 CPU ...\n");
 		
     //vendor
     cpuid( 0, eax, ebx, ecx, edx ); 
-	name[0] = ebx;
-	name[1] = edx;
-	name[2] = ecx;
-	name[3] = 0;	
+    name[0] = ebx;
+    name[1] = edx;
+    name[2] = ecx;
+    name[3] = 0;	
 	//salva na estrutura.
-	processor->Vendor[0] = ebx;
-	processor->Vendor[1] = edx;
-	processor->Vendor[2] = ecx;
-	processor->Vendor[3] = 0;	
-	
+    processor->Vendor[0] = ebx;
+    processor->Vendor[1] = edx;
+    processor->Vendor[2] = ecx;
+    processor->Vendor[3] = 0;
+
 	// Confere se é Intel.
-	if( ebx == CPUID_VENDOR_INTEL_1 && 
-	    edx == CPUID_VENDOR_INTEL_2 && 
-		ecx == CPUID_VENDOR_INTEL_3 )
-	{
-	    return (int) Processor_INTEL;    
-	};
-	
+    if ( ebx == CPUID_VENDOR_INTEL_1 && 
+         edx == CPUID_VENDOR_INTEL_2 && 
+         ecx == CPUID_VENDOR_INTEL_3 )
+    {
+        return (int) Processor_INTEL; 
+    }
+
 	// Confere se é AMD
-	if( ebx == CPUID_VENDOR_AMD_1 && 
-	    edx == CPUID_VENDOR_AMD_2 && 
-		ecx == CPUID_VENDOR_AMD_3 )
-	{
-	    return (int) Processor_AMD;    
-	};		
-	
+    if ( ebx == CPUID_VENDOR_AMD_1 && 
+         edx == CPUID_VENDOR_AMD_2 && 
+         ecx == CPUID_VENDOR_AMD_3 )
+    {
+        return (int) Processor_AMD; 
+    }
+
 	// Continua...
-	
-	return (int) Processor_NULL;	
+
+    return (int) Processor_NULL;
 }
 
 
@@ -481,26 +492,31 @@ const unsigned long CPUID_FLAG_MSR = (1 << 5);
  
 int cpuHasMSR (void)
 {
-   unsigned long a, b,c, d;   
-   
-   cpuid(1, a, b, c, d);
-   return (int) (d & CPUID_FLAG_MSR);
+    unsigned long a, b,c, d;
+
+    cpuid(1, a, b, c, d);
+    return (int) (d & CPUID_FLAG_MSR);
 }
 
 
-void cpuGetMSR(unsigned long msr, unsigned long *lo, unsigned long *hi)
+void 
+cpuGetMSR ( 
+    unsigned long msr, 
+    unsigned long *lo, 
+    unsigned long *hi )
 {
-   asm volatile("rdmsr" : "=a"(*lo), "=d"(*hi) : "c"(msr));
+    asm volatile ("rdmsr" : "=a"(*lo), "=d"(*hi) : "c"(msr));
 }
 
 
-void cpuSetMSR(unsigned long msr, unsigned long lo, unsigned long hi)
+void 
+cpuSetMSR ( 
+    unsigned long msr, 
+    unsigned long lo, 
+    unsigned long hi )
 {
-   asm volatile("wrmsr" : : "a"(lo), "d"(hi), "c"(msr));
+    asm volatile ("wrmsr" : : "a"(lo), "d"(hi), "c"(msr));
 }
-
-
-
 
 
 //

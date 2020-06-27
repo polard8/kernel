@@ -1,14 +1,13 @@
 /*
- * File: hal/arch/x86.c
+ * File: hal/arch/x86/x86.c
  *
- * 
  *    x86 misc support.
  *    #todo: Review all this thing.
  * 
  *    2005 - Created by Fred Nora.
  */
 
- 
+
 #include <kernel.h>
 
 
@@ -22,17 +21,16 @@
 
 
 typedef struct {
-	
-	//bool busy[NDYNSLOTS];
-	int busy[NDYNSLOTS];
-	size_t nslots;
-	
+
+    int busy[NDYNSLOTS];
+    //bool busy[NDYNSLOTS];
+
+    size_t nslots;
+
 } gdt_bitmap_t;
 
 /* bitmap of busy slots */
 static gdt_bitmap_t gdt_bitmap;
-
-
 
 
 
@@ -207,17 +205,25 @@ void cpux86_enable_caches (void){
 }
  
 
+
+/*
+ ******************* 
+ * setgate:
+ * 
+ */
+
 // Set gate.
 // Probably stolen from minix or netbsd.
-// See: sysio/hal/arch/x86/x86gdt.h
+// See: x86gdt.h
 
 void
-setgate ( struct gate_descriptor_d *gd, 
-          void *func, 
-          int args, 
-          int type, 
-          int dpl,
-          int sel )
+setgate ( 
+    struct gate_descriptor_d *gd, 
+    void *func, 
+    int args, 
+    int type, 
+    int dpl,
+    int sel )
 {
 
     gd->gd_looffset = (int)func;
@@ -250,31 +256,33 @@ void unsetgate (struct gate_descriptor_d *gd)
 
 // Set region.
 // Probably stolen from minix or netbsd.
-// See: sysio/hal/arch/x86/x86gdt.h
+// See: x86gdt.h
  
 void
-setregion ( struct region_descriptor_d *rd, 
-            void *base, 
-            size_t limit )
+setregion ( 
+    struct region_descriptor_d *rd, 
+    void *base, 
+    size_t limit )
 {
-    rd->rd_limit = (int)limit;
-    rd->rd_base = (int)base;
+    rd->rd_limit = (int) limit;
+    rd->rd_base = (int) base;
 }
 
 
 
 // Set segment.
 // Probably stolen from minix or netbsd.
-// See: sysio/hal/arch/x86/x86gdt.h
+// See: x86gdt.h
 
 void
-setsegment ( struct segment_descriptor_d *sd, 
-             const void *base, 
-             size_t limit,
-             int type, 
-             int dpl, 
-             int def32, 
-             int gran )
+setsegment ( 
+    struct segment_descriptor_d *sd, 
+    const void *base, 
+    size_t limit,
+    int type, 
+    int dpl, 
+    int def32, 
+    int gran )
 {
     sd->sd_lolimit = (int) limit;
     sd->sd_lobase = (int) base;
@@ -294,16 +302,17 @@ setsegment ( struct segment_descriptor_d *sd,
 // See: sysio/hal/arch/x86/x86gdt.h
 
 void
-setsegmentNR ( int number, 
-               const void *base, 
-               size_t limit,
-               int type, 
-               int dpl, 
-               int def32, 
-               int gran)
+setsegmentNR ( 
+    int number, 
+    const void *base, 
+    size_t limit,
+    int type, 
+    int dpl, 
+    int def32, 
+    int gran )
 {
 
-    setsegment ((struct segment_descriptor_d *)  &xxx_gdt[number] , 
+    setsegment ( (struct segment_descriptor_d *) &xxx_gdt[number], 
         base, limit, type, dpl, def32, gran );
 }
 
@@ -313,11 +322,8 @@ setsegmentNR ( int number,
  * init_gdt:
  * 
  *     It creates a TSS and sets up some entries in the GDT.
- *     
+ *     See: x86gdt.h
  */
-
-// See:
-// sysio/hal/arch/x86/x86gdt.h
 
 int init_gdt (void){
 
@@ -337,11 +343,9 @@ int init_gdt (void){
 
     }else{
  
-
         // Init TSS. 
         tss_init ( (struct i386tss_d *) tss, 
-            (void *) 0x003FFFF0, 
-            (void *) 0x401000 );
+            (void *) 0x003FFFF0, (void *) 0x401000 );
 
 
          // Setup current.
@@ -419,18 +423,22 @@ int init_gdt (void){
     load_gdt (&xxx_gdt_ptr);
 
 
-    //
     // Done!
-    //
-
+    
     return 0;
 }
 
 
+/*
+ * tss_init: 
+ *     ?? internal ??
+ */
 
-// ?? internal
 static void
-tss_init ( struct i386tss_d *tss, void *stack, void *func )
+tss_init ( 
+    struct i386tss_d *tss, 
+    void *stack, 
+    void *func )
 {
 	
 	//KASSERT(curcpu()->ci_pmap == pmap_kernel());
@@ -476,11 +484,15 @@ tss_init ( struct i386tss_d *tss, void *stack, void *func )
 	tss->__tss_cs = 0x1B; //GSEL(GUCODE_SEL, SEL_UPL); //GSEL(GCODE_SEL, SEL_KPL);
 	tss->__tss_ss = 0x23; //GSEL(GUDATA_SEL, SEL_UPL); //GSEL(GCODE_SEL, SEL_KPL);
 	tss->__tss_ds = 0x23; //GSEL(GUDATA_SEL, SEL_UPL); //GSEL(GCODE_SEL, SEL_KPL);
-	tss->tss_fs =  0x23; //GSEL(GUDATA_SEL, SEL_UPL); //GSEL(GDATA_SEL, SEL_KPL);  	//tss->tss_fs = GSEL(GCPU_SEL, SEL_KPL);	
+
+    //for fs
+    ////GSEL(GDATA_SEL, SEL_KPL);
+    //tss->tss_fs = GSEL(GCPU_SEL, SEL_KPL);
+	tss->tss_fs =  0x23; //GSEL(GUDATA_SEL, SEL_UPL);
+  
 	tss->tss_gs = 0x23;  // GSEL(GUDATA_SEL, SEL_UPL); //GSEL(GDATA_SEL, SEL_KPL);
 	tss->tss_ldt = 0x30; ////GSEL ( GLDT_SEL, SEL_KPL );
 	*/
-
 
     tss->tss_iobase = IOMAP_VALIDOFF << 16;
 }
@@ -506,13 +518,10 @@ void tss_set_kernel_stack (unsigned long stack_address )
  ***********************************************
  * init_intel:
  *     Inicializa processador Intel.
+ *     See: x86.h
  */
-
-// See:
-// sysio/hal/arch/x86/x86.h
  
 int init_intel (void){
-
 
     debug_print ("[x86] init_intel:");
 
@@ -527,12 +536,8 @@ int init_intel (void){
     // Get info.
     get_cpu_intel_parameters ();
 
+    // ...
 
-    //
-    // Done.
-    //
-    
-    
     return 0;
 }
  
@@ -567,35 +572,35 @@ void show_cpu_intel_parameters (void){
 	//Bits 0-7: Cache Line Size.
 	printf("    L2 line size: {%d Byte}\n", 
 	    (unsigned long) processor->L2LineSize ); 	
-	
 
-	// L2 Associativity. 	
-	
-	switch (processor->L2Associativity){
-		
-		//Bits 12-15: L2 Associativity.
-	    case 0x00:
-            printf("L2 Associativity: {Disabled}\n");
-		    break; 
-	    case 0x01:
-	        printf("L2 Associativity: {Direct mapped}\n");
-		    break; 
-	    case 0x02:
-	        printf("L2 Associativit: {2-way associative}\n");
-		    break; 
-	    case 0x04:
-	        printf("L2 Associativity: {4-way associative}\n");
-		    break; 
-	    case 0x06:
-	        printf("L2 Associativity: {8-way associative}\n");
-		    break; 
-	    case 0x08:
-	        printf("L2 Associativity: {16-way associative}\n");
-		    break; 
-	    case 0x0F:
-	        printf("L2 Associativity: {Fully associative}\n");
-		    break; 
-	};
+
+	// L2 Associativity. 
+
+    switch (processor->L2Associativity){
+
+        //Bits 12-15: L2 Associativity.
+        case 0x00:
+            printf ("L2 Associativity: {Disabled}\n");
+            break; 
+        case 0x01:
+            printf ("L2 Associativity: {Direct mapped}\n");
+            break; 
+        case 0x02:
+            printf ("L2 Associativit: {2-way associative}\n");
+            break; 
+        case 0x04:
+            printf ("L2 Associativity: {4-way associative}\n");
+            break; 
+        case 0x06:
+            printf ("L2 Associativity: {8-way associative}\n");
+            break; 
+        case 0x08:
+            printf ("L2 Associativity: {16-way associative}\n");
+            break; 
+        case 0x0F:
+            printf ("L2 Associativity: {Fully associative}\n");
+            break; 
+    };
 
 	//Bits 16-31: Cache size in 1K units.
 	printf("   L2 cache size: {%d KB}\n", 
@@ -624,7 +629,7 @@ void show_cpu_intel_parameters (void){
 	//Continua...
 
     //como não usa janelas devemos dar refresh na tela todo por enquanto.
-	
+
 	//#bugbug: isso é lento.
     refresh_screen();
 }
@@ -642,8 +647,6 @@ void x86_sse_init (void)
         "orl $0x600, %eax\n"
         "mov %eax, %cr4\n" );
 }
-
-
 
 
 //
