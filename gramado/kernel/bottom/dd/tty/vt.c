@@ -1,7 +1,11 @@
+/*
+ * File: vt.c
+ * 
+ *     2019 - Created by Fred Nora.
+ */
 
 
 #include <kernel.h>
-
 
 
 
@@ -18,16 +22,15 @@
 // precisamos de uma flag para vt vt_stdio_terminalmode_flag.
 
  
-void _vt_outbyte ( int c, struct tty_d *tty )
-{
+void _vt_outbyte ( int c, struct tty_d *tty ){
 
-    unsigned long i;
+    unsigned long i=0;
+    unsigned long x=0;
+    unsigned long y=0;
 
-    unsigned long x;
-    unsigned long y;
 
     //O caractere.
-	
+
     char ch = (char) c;
 
 
@@ -37,13 +40,14 @@ void _vt_outbyte ( int c, struct tty_d *tty )
     //
     
 
-    if ( (void *) tty == NULL )
-    {
+    if ( (void *) tty == NULL ){
+        debug_print ("_vt_outbyte: tty\n");
         return;
+        
     }else{
 
-         if ( tty->used != 1 || tty->magic != 1234 )
-         {
+         if ( tty->used != 1 || tty->magic != 1234 ){
+             debug_print ("_vt_outbyte: tty validation\n");
              return;
          }
          
@@ -52,23 +56,20 @@ void _vt_outbyte ( int c, struct tty_d *tty )
     };
 
 
-
-
-
 	// #test
 	// Tentando pegar as dimensões do char.
 	// #importante: 
 	// Não pode ser 0, pois poderíamos ter divisão por zero.
 	
-	
-	int cWidth = get_char_width ();
-	int cHeight = get_char_height ();
 
+    int cWidth = get_char_width();
+    int cHeight = get_char_height();
 
     if ( cWidth == 0 || cHeight == 0 ){
         debug_print ("_vt_outbyte: char w h");
         panic ("_vt_outbyte: fail w h ");
     }
+
 
 	// #bugbug
 	// Caso estejamos em modo texto.
@@ -86,9 +87,9 @@ void _vt_outbyte ( int c, struct tty_d *tty )
 
 
     // Caso estivermos em modo gráfico.
-	 
-	if ( VideoBlock.useGui == 1 )
-	{
+ 
+    if ( VideoBlock.useGui == 1 )
+    {
 
         //#importante: Essa rotina de pintura deveria ser exclusiva para 
         //dentro do terminal.
@@ -129,7 +130,7 @@ void _vt_outbyte ( int c, struct tty_d *tty )
      	
 		//goto done;
         //return;
-	};
+    };
 }
 
 
@@ -156,20 +157,20 @@ void vt_outbyte ( int c, struct tty_d *tty ){
     //
 
     if ( (void *) tty == NULL ){
+        debug_print ("vt_outbyte: tty\n");
         return;
 
     }else{
 
-         if ( tty->used != 1 || tty->magic != 1234 )
-         {
+         if ( tty->used != 1 || tty->magic != 1234 ){
+             debug_print ("vt_outbyte: tty validation\n");
              return;
          }
          
-         
          // tty ok.
-    };	
-	
-	
+    };
+
+
 	// Obs:
 	// Podemos setar a posição do curso usando método,
 	// simulando uma variável protegida.
@@ -291,7 +292,7 @@ void vt_outbyte ( int c, struct tty_d *tty ){
         tty->cursor_x = tty->cursor_left;  
         prev = c;
         return;    
-    }; 
+    }
 
 
     //#@todo#bugbug 
@@ -314,7 +315,7 @@ void vt_outbyte ( int c, struct tty_d *tty ){
         tty->cursor_x--; 
         prev = c;
         return;
-    };
+    }
 
 
 	//
@@ -359,7 +360,7 @@ void vt_outbyte ( int c, struct tty_d *tty ){
         vt_scroll (tty);
 
         tty->cursor_y = tty->cursor_bottom;
-    };
+    }
 
 	//
 	// Imprime os caracteres normais.
@@ -375,16 +376,13 @@ void vt_outbyte ( int c, struct tty_d *tty ){
 }
 
 
+
 // scroll no pseudo terminal
 // #bugbug
-void vt_scroll (struct tty_d *tty)
-{
 
-	// #debug
-	// opção de suspender.
-	//return;
+void vt_scroll (struct tty_d *tty){
 
-	// Salvar cursor.
+    // Salvar cursor.
     unsigned long OldX, OldY;
 
     int i=0;
@@ -395,20 +393,20 @@ void vt_scroll (struct tty_d *tty)
     //
     
 
-    if ( (void *) tty == NULL )
-    {
+    if ( (void *) tty == NULL ){
+        debug_print ("vt_scroll: tty\n");
         return;
+        
     }else{
 
          if ( tty->used != 1 || tty->magic != 1234 )
          {
+             debug_print ("vt_scroll: tty validation\n");
              return;
          }
          
-         
          // tty ok.
     };
-
 
 
 	
@@ -455,25 +453,35 @@ void vt_scroll (struct tty_d *tty)
 
 // Create a terminal for a window.
 // The father is creating a terminal in one of its windows.
-int vt_create (struct window_d *window, int father_pid)
+int 
+vt_create (
+    struct window_d *window, 
+    int father_pid )
 {
-	
+
     struct vt_d *terminal;
-
+    int i=0;  
+    
         
-    if ( father_pid < 0 )
+    if ( father_pid < 0 ){
+        debug_print ("vt_create: father_ip\n");
         return -1;
+    }
 
 
-    if ( (void *) window == NULL )
+    if ( (void *) window == NULL ){
+        debug_print ("vt_create: window\n");
         return -1;
+    }
 
     if ( window->used == 1 && window->magic == 1234 )
     {
          terminal = (struct vt_d *) kmalloc ( sizeof (struct vt_d) );
          
-         if ( (void *) terminal == NULL )
+         if ( (void *) terminal == NULL ){
+             debug_print ("vt_create: terminal\n");
              return -1;
+         }
              
          //terminal->id = ?;
          terminal->used = 1;
@@ -492,8 +500,7 @@ int vt_create (struct window_d *window, int father_pid)
     
     // register
     // Pra usar isso pela primeira vez tem que inicializar.
-    
-    int i;  
+
     for (i=0; i<32; i++)
     {
          if ( vtList[i] == 0 )
@@ -503,10 +510,8 @@ int vt_create (struct window_d *window, int father_pid)
              
              return i;
          } 
-    } 
-  
-  
-  
+    }; 
+
    //fail 
     panic ("vt_create: no slots");
 
@@ -515,27 +520,38 @@ int vt_create (struct window_d *window, int father_pid)
 
 
 // Set child pid given in a window structure.
-int vt_set_child ( struct window_d *window, int child_pid )
+int 
+vt_set_child ( 
+    struct window_d *window, 
+    int child_pid )
 {
 
-    if ( child_pid < 0)
+    if ( child_pid < 0){
+        debug_print ("vt_set_child: child_pid\n");
         return -1;
+    }
 
 
-    if ( (void *) window == NULL )
+    if ( (void *) window == NULL ){
+        debug_print ("vt_set_child: window\n");
         return -1;
+    }
 
 
-    if ( window->isTerminal != 1 )
+    if ( window->isTerminal != 1 ){
+        debug_print ("vt_set_child: not terminal\n");
         return -1;
+    }
 
-
-    if ( (void *) window->terminal == NULL )
+    if ( (void *) window->terminal == NULL ){
+        debug_print ("vt_set_child: terminal\n");
         return -1;
+    }
 
 
 
-    if ( window->terminal->used == 1 && window->terminal->magic == 1234 )
+    if ( window->terminal->used == 1 && 
+         window->terminal->magic == 1234 )
     {
         window->terminal->child_pid = child_pid;
         return 0;
@@ -548,11 +564,17 @@ int vt_set_child ( struct window_d *window, int child_pid )
 
 
 
-int vt_set_pty ( struct vt_d *terminal, struct tty_d *master, struct tty_d *slave)
+int 
+vt_set_pty ( 
+    struct vt_d *terminal, 
+    struct tty_d *master, 
+    struct tty_d *slave )
 {
 
-    if ( (void *) terminal == NULL )
+    if ( (void *) terminal == NULL ){
+        debug_print ("vt_set_pty: terminal\n");
         return -1;
+    }
 
 
     if ( terminal->used == 1 && terminal->magic == 1234 )
@@ -568,19 +590,29 @@ int vt_set_pty ( struct vt_d *terminal, struct tty_d *master, struct tty_d *slav
 
 
 //init module.
-int vt_init_module (void)
-{
-    int i;  
+int vt_init_module (void){
+
+    int i=0;  
     
-    
-    
+
+    debug_print("vt_init_module:\n");
+
+
     //init list
     for (i=0; i<32; i++)
         vtList[i] = (unsigned long) 0;
 
 
-    //..
+    // ...
     
     return 0;
 }
+
+
+//
+// End.
+//
+
+
+
 

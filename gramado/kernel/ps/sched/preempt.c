@@ -39,25 +39,22 @@ void preempt (void){
 
     t = (void *) threadList[Current];
 
-    if ( (void *) t == NULL )
-    {
-		// #bugbug: 
-		// Rever isso.
-		
-		current_thread = (int) next_thread;
+	// #bugbug: 
+	// Rever isso.
+    if ( (void *) t == NULL ){
+        current_thread = (int) next_thread;
         return;
 
     } else {
 
+		// #bugbug: 
+		// Rever isso.
         if ( t->used != 1 || t->magic != 1234 )
         {
-			// #bugbug: 
-			// Rever isso.
-		    
-			current_thread = (int) next_thread;
+            current_thread = (int) next_thread;
             return;
         }
-	    
+
 		//Checa se a tarefa atual pode entrar sofrer preempção, flag=1.
 		
 		if (t->preempted == 1)

@@ -19,12 +19,12 @@
  *  @todo: Cria funções para gerenciar ioBuffers.
  * The actual fileList modules lives in kernel space on Unix, and are 
  * installed (pushed) and removed (popped) by the ioctl system call.
- * Versão 1.0, 2016.
+ * 
+ *    2016 - Created by Fred Nora.
  */
- 
- 
-#include <kernel.h> 
 
+
+#include <kernel.h> 
 
 
 /*
@@ -34,14 +34,17 @@
  * ele pode desviar as chamadas para serem atendidas por essa rotina.
  */
 
-void *ioServices ( unsigned long number, 
-                   unsigned long arg2, 
-                   unsigned long arg3, 
-                   unsigned long arg4 )
+void *ioServices ( 
+    unsigned long number, 
+    unsigned long arg2, 
+    unsigned long arg3, 
+    unsigned long arg4 )
 {
 
     struct process_d *P;
-    int Caller_Process_ID;
+
+    int Caller_Process_ID=0;
+
 
 	// #todo: 
 	// O subsistema em user mode deve fazer algum tipo de filtragem
@@ -56,49 +59,49 @@ void *ioServices ( unsigned long number,
 	//
 
 
-	//@todo: Filtrar argumentos.
-	
-	
-	
-	Caller_Process_ID = (int) get_caller_process_id();
-	
-	if ( Caller_Process_ID <0 || Caller_Process_ID >= PROCESS_COUNT_MAX )
-	{
-		//@todo: Mensagem de erro.
-		return NULL;
-	};
-	
-	
-	P = (void *) processList[Caller_Process_ID];
-	//if( (void*) P == NULL )
-	//{
-	    //@todo: Mensagem de erro.	
-	//};
-	
+	// todo: 
+	// Filtrar argumentos.
+
+    Caller_Process_ID = (int) get_caller_process_id();
+
+    if ( Caller_Process_ID <0 || 
+         Caller_Process_ID >= PROCESS_COUNT_MAX )
+    {
+        debug_print ("ioServices: Caller_Process_ID\n");
+        return NULL;
+    }
+
+
+    P = (void *) processList[Caller_Process_ID];
+
+    if ( (void *) P == NULL )
+    {
+        debug_print ("ioServices: P\n");
+        return NULL;
+    }
+
 	//
 	// Chama o serviço solicitado.
 	//
 	
-	switch(number)
+	switch (number)
     {
-	    case 0:
+        case 0:
 		    //Nothing.
             break;
-			
+
         case 1:
             //Nothing.
             //sys_ioctl ( int fd, unsigned long request, char *arg );
             break; 
         //...
-		
-		default:
-		    //Nothing.
-		    break;
-	};
 
+        default:
+            debug_print ("ioServices: default\n");
+            break;
+    };
 
-	//...
-
+	// ...
 
     return NULL;
 }
@@ -106,17 +109,21 @@ void *ioServices ( unsigned long number,
 
 
 /*
+ ********************************
  * ioInit:
  *     Initialize i/o manager.
- */	
- 
-int ioInit (void){
-	
-	int Status = 0;
-	
-	//...
-	
-	return (int) Status;
+ */
+
+int ioInit(void){
+
+    int Status = 0;
+
+
+    debug_print ("ioInit: [TODO]\n");
+    
+    // ...
+
+    return (int) Status;
 }
 
 

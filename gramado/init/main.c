@@ -139,7 +139,7 @@ void enable_maskable_interrupts()
  * 
  */
 
-// See: sw.asm 
+// See: sw.asm in the kernel. 
 // O objetivo é chamar a interrupção 129.
 // Uma interrupção para habilitar as interrupções mascaráveis.
 // Só depois disso a interrupção de timer vai funcionar.

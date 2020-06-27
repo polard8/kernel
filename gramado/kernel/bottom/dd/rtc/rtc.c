@@ -78,12 +78,11 @@ void KiRtcIrq (void){
         return;
 
 
-
 	// Contando as interrupções desse tipo.
-	g_profiler_ints_irq8++;	
-	
+    g_profiler_ints_irq8++;
+
 	//...
-	
+
     rtc_irq ();
 }
  
@@ -96,20 +95,20 @@ void KiRtcIrq (void){
  */
 
 void rtc_irq (void){
-	
-	unsigned i;
 
-	g_ticks++;
-	
+    unsigned i=0;
+
+    g_ticks++;
+
 	//_BLINK; ??
 	
     // Save contents of I/O port 0x70.
-	i = in8 (0x70);
+    i = in8 (0x70);
     
 	// acknowledge IRQ 8 at the RTC by reading register C.
-	out8(0x70, 0x0C);
-	(void)in8(0x71); 
-	out8(0x70, i);
+    out8(0x70, 0x0C);
+    (void)in8(0x71); 
+    out8(0x70, i);
     
 	// @todo: Checar esse EOI.
 	// acknowledge IRQ 8 at the PICs
@@ -125,19 +124,19 @@ void rtc_irq (void){
  */
 
 unsigned long read_cmos_bcd ( unsigned reg ){
-	
-	unsigned long high_digit, low_digit;
 
-	out8 ( 0x70, ( in8(0x70) & 0x80) | (reg & 0x7F) );
-	high_digit = low_digit = in8(0x71);
+    unsigned long high_digit, low_digit;
+
+    out8 ( 0x70, ( in8(0x70) & 0x80) | (reg & 0x7F) );
+    high_digit = low_digit = in8(0x71);
 
 	// Converte BCD para binário. 
-	high_digit >>= 4;
+    high_digit >>= 4;
 
-	high_digit &= 0x0F;
-	low_digit  &= 0x0F;
+    high_digit &= 0x0F;
+    low_digit  &= 0x0F;
 
-	return (unsigned long) (10*high_digit) + low_digit;
+    return (unsigned long) (10*high_digit) + low_digit;
 }
 
 
@@ -149,24 +148,25 @@ unsigned long read_cmos_bcd ( unsigned reg ){
  *
  * todo: Essa função pode ser trabalhada sem riscos ao sistema.
  * STATUS: Não funciona muito bem. @todo: rever isso
- * Obs: Na verdade pode estar funcionando e o relógio da máquina virtual
+ * Obs: 
+ * Na verdade pode estar funcionando e o relógio da máquina virtual
  * está desatualizado.
  */
 
 unsigned long get_time (void){
-	
-	unsigned long time = 0;
 
-	time  = read_cmos_bcd(0);
-	time += read_cmos_bcd(2) * 60;
-	time += read_cmos_bcd(4) * (60*60);	
-	
-	return (unsigned long) time;
+    unsigned long time=0;
+
+    time  = read_cmos_bcd(0);
+    time += read_cmos_bcd(2) * 60;
+    time += read_cmos_bcd(4) * (60*60);	
+
+    return (unsigned long) time;
 }
 
 
 /*
- ***************************************************************
+ ***************************************************
  * get_date: 
  * Pega a data armazenada na CMOS. 
  * Formato(bytes): YYMD 
@@ -176,14 +176,14 @@ unsigned long get_time (void){
  */
 
 unsigned long get_date (void){
-	
-	unsigned long date = 0;
 
-	date  = read_cmos_bcd(9);
-	date += read_cmos_bcd(8) * 31;
-	date += read_cmos_bcd(7) * (31*12);
-	
-	return (unsigned long) date;
+    unsigned long date=0;
+
+    date  = read_cmos_bcd(9);
+    date += read_cmos_bcd(8) * 31;
+    date += read_cmos_bcd(7) * (31*12);
+
+    return (unsigned long) date;
 }
 
 
@@ -217,29 +217,30 @@ unsigned long get_date (void){
  */
 
 unsigned short rtcGetExtendedMemory (void){
-	
+
     unsigned short total = 0;
-    
-	unsigned char lowmem;
-	unsigned char highmem;
+
+    unsigned char lowmem;
+    unsigned char highmem;
  
     //Low. (Low extended memory byte)
-    out8(0x70, RTC_LOWBYTE_EXTENDEDMEMORY);
+    out8 (0x70, RTC_LOWBYTE_EXTENDEDMEMORY);
     lowmem = in8(0x71);
     
 	//High. (High extended memory byte)
-	out8(0x70, RTC_HIGHBYTE_EXTENDEDMEMORY);
+    out8 (0x70, RTC_HIGHBYTE_EXTENDEDMEMORY);
     highmem = in8(0x71);
-	
+
     //Total.
     total = lowmem | highmem << 8;
-	
+
+
     return (unsigned short) total;
 }
 
 
 /* 
- **************************************************************
+ ****************************************************
  * rtcGetBaseMemory:
  *     Get base memory info via CMOS. 
  *
@@ -305,43 +306,43 @@ unsigned short rtcGetBaseMemory (void){
 // na inicialização, depois somente atualizados os valores.
 
 void *get_cmos_info (void){
-	
-	Rtc = (void *) kmalloc ( sizeof(struct rtc_d) );
-	
-    if ( (void *) Rtc == NULL)
-	{
-	    printf ("get_cmos_info fail: Struct\n");
-		refresh_screen();
-		
-		//free(Rtc);
-		return NULL;
-	
-	}else{
-		
-	    //time
-	    Rtc->Seconds = read_cmos_bcd (0);  // Seconds.
-	    Rtc->Minutes = read_cmos_bcd (2);  // Minutes.
-	    Rtc->Hours   = read_cmos_bcd (4);  // Hours.
 
-	    //date.
-	    Rtc->Year = read_cmos_bcd(9);    
-	    Rtc->Year = (2000 + Rtc->Year);
-		Rtc->Month = read_cmos_bcd(8);    
-	    Rtc->DayOfMonth = read_cmos_bcd(7);    
+    //Global struct
+    
+    Rtc = (void *) kmalloc ( sizeof(struct rtc_d) );
+
+
+    if ( (void *) Rtc == NULL){
+        printf ("get_cmos_info fail: Struct\n");
+        refresh_screen();
+        //free(Rtc);
+        return NULL;
+
+    }else{
+
+        //time
+        Rtc->Seconds = read_cmos_bcd (0);  // Seconds.
+        Rtc->Minutes = read_cmos_bcd (2);  // Minutes.
+        Rtc->Hours   = read_cmos_bcd (4);  // Hours.
+
+        //date.
+        Rtc->Year = read_cmos_bcd(9);    
+        Rtc->Year = (2000 + Rtc->Year);
+        Rtc->Month = read_cmos_bcd(8);    
+        Rtc->DayOfMonth = read_cmos_bcd(7);    
     };
-	
-	//struct
-	if ( (void *) Hardware == NULL )
-	{
-		//erro
-	    printf("get_cmos_info: Hardware\n");
-		refresh_screen();
-		
-		//free(Rtc);
-		return NULL;		 
-	}else{
-		Hardware->Rtc = Rtc;	//Save.	
-	};
+
+    //struct
+    if ( (void *) Hardware == NULL ){
+        printf("get_cmos_info: Hardware\n");
+        refresh_screen();
+        //free(Rtc);
+        return NULL;
+
+    }else{
+        Hardware->Rtc = Rtc;    //Save.
+    };
+
 
 //show_message:
 	
@@ -349,13 +350,14 @@ void *get_cmos_info (void){
 	printf("Time=%d:%d:%d\n", Rtc->Hours, Rtc->Minutes, Rtc->Seconds );
 	printf("Date=%d/%d/%d\n", Rtc->DayOfMonth, Rtc->Month, Rtc->Year );
 #endif	
-	
-	return (void *) Rtc;
+
+
+    return (void *) Rtc;
 }
 
 
 /*
- ************************************************************
+ ****************************************************
  * init_clock: 
  *     Inicia a data e a hora do controlador.
  *
@@ -387,14 +389,15 @@ int init_clock (void){
 		  
 	//printf("CLOCK INFORMATION:\n");
 	//printf("Time=%d Date=%d\n", Time, Date);
-	
-	get_cmos_info();
-	
-    g_driver_rtc_initialized = (int) 1;	
-	
-	printf("Done!\n");	
-	
+
+    get_cmos_info();
+
+    g_driver_rtc_initialized = (int) 1;
+
+    printf("Done!\n");
+
     __breaker_rtc_initialized = 1;
+
 
     return 0;
 }

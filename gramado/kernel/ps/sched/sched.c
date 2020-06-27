@@ -203,7 +203,7 @@ prepare_next:
 
 
 /*
- ***************************************************************
+ *********************************************************
  * scheduler:
  *    Troca a thread atual, escolhe uma nova thread atual 
  * para rodar no momento.
@@ -227,13 +227,13 @@ prepare_next:
  *     O scheduler deve sempre pegar da fila do dispatcher.
  */
  
-//#todo
-//podemos contar os rounds;
+// #todo
+// Podemos contar os rounds.
 
 int scheduler (void){
 
-    int Index;
     struct thread_d *Thread;
+    int Index=0;
 
 
 #ifdef SERIAL_DEBUG_VERBOSE
@@ -359,18 +359,18 @@ int scheduler (void){
     {
         Thread = (void *) threadList[Index];
 
-		if ( (void *) Thread != NULL )
-		{
-			if ( Thread->used == 1 && 
-			     Thread->magic == 1234 && 
-				 Thread->state == READY )
-			{
-			    Conductor2 = (void *) Conductor2->Next; 
-				Conductor2->Next = (void *) Thread;
-			};
-		    //Nothing.
-		};
-		//Nothing.
+        if ( (void *) Thread != NULL )
+        {
+            if ( Thread->used == 1 && 
+                 Thread->magic == 1234 && 
+                 Thread->state == READY )
+            {
+                Conductor2 = (void *) Conductor2->Next; 
+                Conductor2->Next = (void *) Thread;
+            };
+            // Nothing.
+        };
+        // Nothing.
     };
 
 
@@ -378,13 +378,14 @@ int scheduler (void){
 	// Continua pegando os tipos diferente.
 	//
 
-  //#debug
-  // printf ("scheduler: 6\n");
+    //#debug
+    // printf ("scheduler: 6\n");
 
 	//finaliza a lista
     Conductor2 = (void *) Conductor2->Next; 
     Conductor2->Next = NULL;
-    
+
+
     return (int) Conductor2->tid;
 
     // #option:
@@ -401,23 +402,23 @@ int scheduler (void){
  *     +Torna IDLE a tarefa atual.
  *     //...
  *
- *     @todo: nao seria init_scheduler
- *     @todo: Mudar para schedulerInit,ou schedulerStart. ??
+ *    todo: nao seria init_scheduler
+ *    todo: Mudar para schedulerInit,ou schedulerStart. ??
  */
 
 void scheduler_start (void){
-	
+
 	//Lock Scheduler.
 	//Set current.
-	
+
     scheduler_lock ();  
 
     // #bugbug 
 	// Esse negócio de selecionar pelo impondo um ID dá problemas.
 	// Temos que saber qual é o ID da thread que queremos.
-	
-	set_current (IDLE);     
-	//...
+
+    set_current (IDLE);     
+    //...
 }
 
 
@@ -451,19 +452,7 @@ unsigned long scheduler_get_status (void)
 
 
 /*
- * new_task_scheduler: 
- *     ?? #deletar
- */
-
-/* CANCELADA !*/ 
-
-void new_task_scheduler (void)
-{   
-    return;
-}
-
-
-/*
+ ********************************
  * init_scheduler:
  *    Inicaliza o scheduler.
  *    @todo: Mudar para schedulerInit()
@@ -473,6 +462,7 @@ void new_task_scheduler (void)
 
 void init_scheduler (void)
 {
+    debug_print ("init_scheduler: [TODO]\n");
 	// #todo: 
 	// Implementar inicialização de variaveis do scheduler.
 	// O nome poderia ser schedulerInit().

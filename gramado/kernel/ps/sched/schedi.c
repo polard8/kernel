@@ -55,10 +55,16 @@ int do_waitpid (pid_t pid, int *status, int options){
     p = (struct process_d *) processList[current_process];
 
     if ( (void *) p == NULL ){
-        printf ("current process struct fail\n");
+        printf ("do_waitpid: Current process struct fail\n");
         return -1;
+   
     }else{
 
+        if ( p->used != 1 || p->magic != 1234 )
+        {
+            debug_print ("do_waitpid: validation\n");
+        }
+        
         if ( p->used == 1 && p->magic == 1234 )
         {
 
@@ -114,29 +120,36 @@ void wait_for_a_reason ( int tid, int reason ){
 
     struct thread_d *t;
 
+
     printf ("wait_for_a_reason: %d\n", reason);
 
-    if ( tid < 0 || tid >= THREAD_COUNT_MAX )
-    {
+    // tid
+    if ( tid < 0 || tid >= THREAD_COUNT_MAX ){
+        debug_print ("wait_for_a_reason: validation\n");
         return;
     } 
 
-
-    if ( reason < 0 || reason >= 10 )
-    {
+    //reason
+    if ( reason < 0 || reason >= 10 ){
+        debug_print ("wait_for_a_reason: limits\n");
         return;
     }
 
 
-	//thread
+    //thread
     t = (struct thread_d *) threadList[tid];
 
-    if ( (void *) t == NULL )
-    {
+    if ( (void *) t == NULL ){
+        debug_print ("wait_for_a_reason: t\n");
         return;
 
     } else {
 
+        if ( t->used != 1 || t->magic != 1234 )
+        {
+            debug_print ("wait_for_a_reason: t validation\n");
+        }
+        
         if ( t->used == 1 && t->magic == 1234 )
         {
 			t->wait_reason[reason] = 1;
@@ -168,26 +181,31 @@ void block_for_a_reason ( int tid, int reason ){
     struct thread_d *t;
 
 
-    if ( tid < 0 || tid >= THREAD_COUNT_MAX )
-    {
+    //tid
+    if ( tid < 0 || tid >= THREAD_COUNT_MAX ){
+        debug_print ("block_for_a_reason: tid\n");
         return;
     } 
 
-
-    if ( reason < 0 || reason >= 10 )
-    {
+    //reason
+    if ( reason < 0 || reason >= 10 ){
+        debug_print ("block_for_a_reason: limits\n");
         return;
     }
 
-
-	//thread
+    //thread
     t = (struct thread_d *) threadList[tid];
 
-    if ( (void *) t == NULL )
-    {
+    if ( (void *) t == NULL ){
+        debug_print ("block_for_a_reason: t\n");
         return;
 
     } else {
+
+        if ( t->used != 1 || t->magic != 1234 )
+        {
+            debug_print ("block_for_a_reason: t validation\n");
+        }
 
         if ( t->used == 1 && t->magic == 1234 )
         {
@@ -219,45 +237,43 @@ int wakeup_thread_reason ( int tid, int reason ){
     struct thread_d *t;
 
 
-    if ( tid < 0 || tid >= THREAD_COUNT_MAX )
-    {
+    // tid
+    if ( tid < 0 || tid >= THREAD_COUNT_MAX ){
+        debug_print ("wakeup_thread_reason: tid\n");
         goto fail;
     } 
 
-
-    if ( reason < 0 || reason >= 10 )
-    {
+    // reason
+    if ( reason < 0 || reason >= 10 ){
+        debug_print ("wakeup_thread_reason: reason\n");
         goto fail;
     }
 
-
-	//thread
+    //thread
     t = (struct thread_d *) threadList[tid];
 
-    if ( (void *) t == NULL )
-    {
+    if ( (void *) t == NULL ){
+        debug_print ("wakeup_thread_reason: t\n");
         goto fail;
 
     } else {
-		
-		if ( t->used != 1 || t->magic != 1234 )
-		{
-			goto fail;
-		}
-		
+
+        if ( t->used != 1 || t->magic != 1234 ){
+            debug_print ("wakeup_thread_reason: t validation\n");
+            goto fail;
+        }
+
 		// OK.
-		
-		if ( t->wait_reason[reason] != 1 )
-		{
-		    
-			goto fail;
-		
-		} else {
-			
+        if ( t->wait_reason[reason] != 1 ){
+            debug_print ("wakeup_thread_reason: status\n");
+            goto fail;
+
+        } else {
+
             //ok 
-			
-			switch (reason)
-			{
+
+            switch (reason)
+            {
 				//Esperando um processo morrer. Mas qual ??
 				case WAIT_REASON_WAIT4PID: 
 				    //se o processo que acabamos de fechar for o mesmo que 
@@ -316,26 +332,29 @@ done:
 
 int wakeup_scan_thread_reason ( int reason ){
 
-    int i;
+    int i=0;
 
     printf ("wakeup_scan_thread_reason: %d", reason);
     refresh_screen();
-    
-    if ( reason < 0 || reason >= 10 )
-    {
+
+
+    // reason
+    if ( reason < 0 || reason >= 10 ){
+        debug_print ("wakeup_scan_thread_reason: reason\n");
         goto fail;
     } 
 
 
-    for ( i=0; i<THREAD_COUNT_MAX; i++ )
-    {
+    for ( i=0; i<THREAD_COUNT_MAX; i++ ){
         wakeup_thread_reason ( i, reason );
     };
 
-done:
+//done:
     printf ("wakeup_scan_thread_reason: done\n");
     refresh_screen();
     return 0;
+
+// Fail
 
 fail:
     printf ("wakeup_scan_thread_reason: fail\n");
@@ -386,19 +405,17 @@ int KiScheduler (void){
 	// Check idle
 	//
 	
-	if ( (void *) ____IDLE == NULL )
-	{
-	    panic ("KiScheduler: ____IDLE fail");
-	}else{
+    if ( (void *) ____IDLE == NULL ){
+        panic ("KiScheduler: ____IDLE fail");
 
-        if ( ____IDLE->used != 1 || ____IDLE->magic != 1234 )
-        {
-		    panic ("KiScheduler: ____IDLE validation");
-	    }
+    }else{
+
+        if ( ____IDLE->used != 1 || ____IDLE->magic != 1234 ){
+            panic ("KiScheduler: ____IDLE validation");
+        }
+
 	    // ...
-	};
-    
-    
+    };
 
 	// Retornaremos se tivermos apenas um thread rodando.
 	// Pois não há o que trocar.
@@ -414,7 +431,7 @@ int KiScheduler (void){
 
     //Chama o Scheduler.
 
-    return (int) scheduler ();
+    return (int) scheduler();
 }
 
 
@@ -433,43 +450,12 @@ int KiSelectNextThread (int current ){
 
 	//@todo: Max.
 	
-    if (current < 0)
-    {
+    if (current < 0){
         current = next_thread;
     }
 
-
-    return (int) SelectNextThread (current);
+    return (int) SelectNextThread(current);
 }
-
-
-
-
-
- 
-/*
- * KiNewTaskScheduler:
- *     ??
- *    @todo: Mudar para KiSchedulerNewThread().
- */
-
-void KiNewTaskScheduler (void)
-{
-    // Cancelada.
-}
-
-
-/*
- * KiDispatchTask:
- *     Executa uma thread pronta pra rodar.
- *     @todo: Mudar para KiDispatchThread(int tid);
- */
-
-void KiDispatchTask (void)
-{    
-    //...
-}
-
 
 
 /*
@@ -568,8 +554,8 @@ void do_thread_initialized (int tid){
     struct thread_d *t; 
 
 
-    if (tid < 0 || tid >= THREAD_COUNT_MAX)
-    {
+    if (tid < 0 || tid >= THREAD_COUNT_MAX){
+        //todo message
         return;
     }
 
@@ -752,14 +738,14 @@ void do_thread_blocked (int tid){
 // cooperativo.
 // Muda o seu tempo executando para: Próximo de acabar.
 
-void yield (int tid)
-{
+void yield (int tid){
 
     struct thread_d *t; 
 
 
-    if (tid < 0 || tid >= THREAD_COUNT_MAX)
-    {
+    //tid
+    if (tid < 0 || tid >= THREAD_COUNT_MAX){
+        //debug_print ("yield: tid\n");
         return;
     }
 
@@ -795,8 +781,8 @@ void yield (int tid)
 
 void wakeup_thread (int tid){
 
-    int Status;
     struct thread_d *t;
+    int Status;
 	//...
 
 
@@ -811,9 +797,9 @@ void wakeup_thread (int tid){
 
     t = (void *) threadList[tid]; 
 
-    if ( (void *) t == NULL )
-    {
+    if ( (void *) t == NULL ){
         return;    
+   
     }else{
     
 		//Se o contexto não foi salvo. 

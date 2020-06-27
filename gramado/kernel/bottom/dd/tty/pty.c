@@ -163,8 +163,8 @@ int pty_create_link ( struct tty_d *tty )
 
 //Ligar duas tty dados os pids dos processos que possuem as tty.
 // isso será usado pelo terminal se ele tiver o pid do filho.
-int pty_link_by_pid ( int master_pid, int slave_pid )
-{
+int pty_link_by_pid ( int master_pid, int slave_pid ){
+
 	// O slave é o terminal. pts. remember ?!
 
     struct tty_d *__master;
@@ -298,22 +298,23 @@ fail:
 
 
 //#test
-int pty_unlink ( struct tty_d *tty )
-{
-	if ( (void *) tty == NULL )
-	{
-		return -1;
-	}
-	
-	tty->link = NULL;
-	
-	return 0;
+int pty_unlink ( struct tty_d *tty ){
+
+    if ( (void *) tty == NULL ){
+        debug_print ("pty_unlink: tty\n");
+        return -1;
+    }
+
+
+    tty->link = NULL;
+
+    return 0;
 }
 
 
 
-int ptmx_open (void)
-{
+int ptmx_open (void){
+
     int ptm_fd = -1;
     
     struct tty_d *master;
@@ -328,8 +329,11 @@ int ptmx_open (void)
     int status = -1;
     status = pty_link(master,slave);
 
-    if (status < 0)
+    if (status < 0){
+        debug_print ("ptmx_open: status\n");
         return -1;
+    }
+
 
     // +abre uma tty master e coloca na lista de arquivos abertos
     // pelo processo
@@ -338,6 +342,15 @@ int ptmx_open (void)
     
     return (int) ptm_fd;
 }
+
+
+//
+// End.
+//
+
+
+
+
 
 
 

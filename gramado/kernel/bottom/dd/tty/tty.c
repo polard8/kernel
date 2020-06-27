@@ -1,20 +1,20 @@
 /*
- * tty.c - Arquivo principal do Gerenciador de fluxo de caractere.
- *         Driver para interagir com os processos.
- *         O kernel recebeu o caractere de um dispositivo fisico
+ * File: tty.c
+ * 
+ * Arquivo principal do Gerenciador de fluxo de caractere.
+ * Driver para interagir com os processos.
+ * O kernel recebeu o caractere de um dispositivo fisico
  * e enviou esse caractere para o driver tty, então o driver tty deve 
  * enviar esse caractere para o processo adequado...
  *o inverso também, o processo envia o caractere para o driver tty e 
  * o driver tty deve enviar o caractere para o dispositivo de saíta adequado 
  * atravéz do kernel.
  *
- * #obs: Vamos montar dispositivos de terminal virtual em /DEV
+ * #obs: 
+ * Vamos montar dispositivos de terminal virtual em /DEV
  */
- 
-  
- 
- 
- 
+
+
 #include <kernel.h> 
 
 
@@ -72,10 +72,10 @@ tty_write_from_of ( unsigned int fd,
 
 // reads into ttyList[] descriptor.
 int 
-tty_read_ttyList ( unsigned int channel, 
-           char *buffer, 
-           int nr )
-
+tty_read_ttyList ( 
+    unsigned int channel, 
+    char *buffer, 
+    int nr )
 {
     struct tty_d *__tty;
     
@@ -95,9 +95,10 @@ tty_read_ttyList ( unsigned int channel,
 
 
 int 
-tty_write_ttyList ( unsigned int channel, 
-            char *buffer, 
-            int nr )
+tty_write_ttyList ( 
+    unsigned int channel, 
+    char *buffer, 
+    int nr )
 {
 
     struct tty_d *__tty;
@@ -109,10 +110,8 @@ tty_write_ttyList ( unsigned int channel,
         return -1;
     }
     
-        __tty = (struct tty_d *) ttyList[channel];
-        
- 
- 
+    __tty = (struct tty_d *) ttyList[channel];
+
     return (int) __tty_write ( (struct tty_d *) __tty, 
                      (char *) buffer, 
                      (int) nr );
@@ -121,16 +120,15 @@ tty_write_ttyList ( unsigned int channel,
             
 
 int 
-__tty_read ( struct tty_d *tty, 
-             char *buffer, 
-             int nr )
+__tty_read ( 
+    struct tty_d *tty, 
+    char *buffer, 
+    int nr )
 {
-
 
     if ( (void *) tty == NULL )
         return -1;
-    
-    
+   
     
     if ( nr <= 0 ){
         printf ("__tty_read: nr \n");
@@ -165,8 +163,7 @@ __tty_read ( struct tty_d *tty,
     // Isso então é um arquivo apontando pela tty.
     // Podemos usar o buffer da tty.   
             
-    if ( (void *) tty->_buffer == NULL )
-    {
+    if ( (void *) tty->_buffer == NULL ){
          printf ("__tty_read: Invalid tty _buffer\n");
          refresh_screen();
          return -1;
@@ -186,9 +183,7 @@ __tty_read ( struct tty_d *tty,
          return -1;
     }
 
-    
-    
-    
+
     // #todo
     // temos dois modos de leitura a serem considerados.
     // O raw e o canonical.
@@ -215,22 +210,21 @@ __tty_read ( struct tty_d *tty,
 
 
 
-
 // writes into ttyList[] descriptor.
 // Escrever no buffer de uma tty qualquer da ttyList
 // o descritor seleciona uma tty em ttyList[] e 
 // escreve em tty->stdout->_base
 
 int 
-__tty_write ( struct tty_d *tty, 
-              char *buffer, 
-              int nr )
+__tty_write ( 
+    struct tty_d *tty, 
+    char *buffer, 
+    int nr )
 {
 
     if ( (void *) tty == NULL )
         return -1;
 
-    
 
     if ( nr <= 0 ){
         printf ("__tty_write: nr \n");
@@ -396,13 +390,6 @@ __tty_write ( struct tty_d *tty,
 }
 
 
-/*
- * 
- * 
- * 
- */
-
-
 // Escreve na tty de um processo alvo e envia uma mensagem pra
 // ele saber o que fazer com o que ele ler no buffer.
 // Talvez seja possível fazer o mesmo
@@ -422,18 +409,18 @@ __tty_write ( struct tty_d *tty,
 // E implementá-las em outros módulos.
 
 int 
-tty_send_message ( int target_pid, 
-                   char *buffer, 
-                   int nr,
-                   int msg,
-                   unsigned long long1,
-                   unsigned long long2 )
+tty_send_message ( 
+    int target_pid, 
+    char *buffer, 
+    int nr,
+    int msg,
+    unsigned long long1,
+    unsigned long long2 )
 {
 
     struct process_d * __p;
     struct tty_d *tty;
-    
-    
+
     
     if ( target_pid<0 )
         return -1;
@@ -533,10 +520,8 @@ tty_send_message ( int target_pid,
     //#debug
     printf ( "debug_write >>>%s \n", tty->_buffer->_base );
     refresh_screen ();
-    
-    
 
-    
+
     //
     // alert!!
     //
@@ -564,10 +549,10 @@ tty_send_message ( int target_pid,
     
     unsigned long message_address[8];
  
-     message_address[0] = (unsigned long) 0; //w
-     message_address[1] = (unsigned long) msg;   // alerta que tem que ler na ttyList[] do processo indicado.
-     message_address[2] = (unsigned long) long1;
-     message_address[3] = (unsigned long) long2;   
+    message_address[0] = (unsigned long) 0; //w
+    message_address[1] = (unsigned long) msg;   // alerta que tem que ler na ttyList[] do processo indicado.
+    message_address[2] = (unsigned long) long1;
+    message_address[3] = (unsigned long) long2;   
 
     
     //send
@@ -595,8 +580,8 @@ tty_send_message ( int target_pid,
 
 // copia a estrutura de termios.
 // para o aplicativo em ring3 poder ler.
-int tty_gets ( struct tty_d *tty, struct termios *termiosp )
-{
+int tty_gets ( struct tty_d *tty, struct termios *termiosp ){
+
 
     if ( (void *) tty == NULL )
         return -1;
@@ -616,26 +601,35 @@ int tty_gets ( struct tty_d *tty, struct termios *termiosp )
 
 // channel is a fd in the file list of a process.
 int 
-tty_read ( unsigned int channel, 
-           char *buffer, 
-           int nr )
+tty_read ( 
+    unsigned int channel, 
+    char *buffer, 
+    int nr )
 {
+    debug_print ("tty_read: [TODO]\n");
     return -1;
 }
+
 
 // channel is a fd in the file list of a process.
 int 
-tty_write ( unsigned int channel, 
-            char *buffer, 
-            int nr )
+tty_write ( 
+    unsigned int channel, 
+    char *buffer, 
+    int nr )
 {
+    debug_print ("tty_write: [TODO]\n");
     return -1;
 }
 
 
 
- //copia de ring3 para o kernel.
-int tty_sets (struct tty_d *tty, int options, struct termios *termiosp )
+//copia de ring3 para o kernel.
+int 
+tty_sets ( 
+    struct tty_d *tty, 
+    int options, 
+    struct termios *termiosp )
 {
     int ret = -1;
 
@@ -681,8 +675,7 @@ int tty_sets (struct tty_d *tty, int options, struct termios *termiosp )
 // See: 
 // syslib/libcore/termios.h
 // syslib/libcore/sys/ioctls.h
-int tty_ioctl ( int fd, unsigned long request, char *arg )
-{
+int tty_ioctl ( int fd, unsigned long request, char *arg ){
 
     debug_print ("tty_ioctl: TODO\n");
     
@@ -826,7 +819,6 @@ void tty_intr (struct tty_d *tty, int signal)
 			//task[i]->signal |= 1<<(signal-1);
 }
 */
-
 
 
 
@@ -1077,17 +1069,15 @@ int tty_find_empty_slot (){
 struct ttyldisc_d *ttyldisc_create (void) 
 {
     struct ttyldisc_d *__ttyldisc;
-    
-    
-    
-    
+
+
     __ttyldisc = (struct ttyldisc_d *) kmalloc ( sizeof(struct ttyldisc_d) );
     
-    if ( (void *) __ttyldisc == NULL )
-    {
+    if ( (void *) __ttyldisc == NULL ){
+        //debug_print("...");
         return NULL;
+        
     }else{
-
         __ttyldisc->used = 1;
         __ttyldisc->magic = 1234;
     };
@@ -1099,12 +1089,14 @@ struct ttyldisc_d *ttyldisc_create (void)
 
 
 //#todo: deletar uma tty ldisc
-int ttyldisc_delete ( struct ttyldisc_d *tty_ldisc )
-{
+int ttyldisc_delete ( struct ttyldisc_d *tty_ldisc ){
+
+
     // Nothing to do.
-    if ( (void *) tty_ldisc == NULL )
-    {
+    if ( (void *) tty_ldisc == NULL ){
+        //debug_print("...");
         return -1;
+
     }else{
          
          //#bugbug: fast way
@@ -1121,15 +1113,16 @@ int ttyldisc_delete ( struct ttyldisc_d *tty_ldisc )
 
 
 //#todo criar uma tty driver.  
-struct ttydrv_d *ttydrv_create (void) 
-{
+struct ttydrv_d *ttydrv_create (void) {
+
     struct ttydrv_d *__ttydrv;
     
     __ttydrv = (struct ttydrv_d *) kmalloc ( sizeof(struct ttydrv_d) );
     
-    if ( (void *) __ttydrv == NULL )
-    {
+    if ( (void *) __ttydrv == NULL ){
+        //debug_print("...");
         return NULL;
+
     }else{
 
         __ttydrv->used = 1;
@@ -1143,12 +1136,13 @@ struct ttydrv_d *ttydrv_create (void)
 
 
 //#todo: deletar uma tty driver
-int ttydrv_delete ( struct ttydrv_d *tty_driver )
-{
+int ttydrv_delete ( struct ttydrv_d *tty_driver ){
+
     // Nothing to do.
-    if ( (void *) tty_driver == NULL )
-    {
+    if ( (void *) tty_driver == NULL ){
+        //debug_print("...");
         return -1;
+
     }else{
          
          //#bugbug: fast way
@@ -1165,11 +1159,10 @@ int ttydrv_delete ( struct ttydrv_d *tty_driver )
 
  
 //#todo criar uma tty. 
-struct tty_d *tty_create (void) 
-{
-    struct tty_d *__tty;
-    int i;
+struct tty_d *tty_create (void) {
 
+    struct tty_d *__tty;
+    int i=0;
 
     // Encontra slot um vazio.
     // Mas começando em 10.
@@ -1195,10 +1188,10 @@ _ok:
 
     __tty = (struct tty_d *) kmalloc ( sizeof(struct tty_d) );
     
-    if ( (void *) __tty == NULL )
-    {
+    if ( (void *) __tty == NULL ){
         panic ("tty_create: __tty kmalloc fail \n");   
         //return NULL;
+ 
     }else{
 
         // Object control;
@@ -1273,12 +1266,13 @@ _ok:
 
 
 //#todo: 
-int tty_delete ( struct tty_d *tty )
-{
+int tty_delete ( struct tty_d *tty ){
+
     // Nothing to do.
-    if ( (void *) tty == NULL )
-    {
+    if ( (void *) tty == NULL ){
+        //debug_print("...");
         return -1;
+ 
     }else{
          
          //#bugbug: fast way
@@ -1315,7 +1309,7 @@ int tty_delete ( struct tty_d *tty )
 
 int ttyInit (int tty_id){
 
-    int i;
+    int i=0;
 
     debug_print ("ttyInit:\n");
 
@@ -1344,15 +1338,14 @@ int ttyInit (int tty_id){
 
     CurrentTTY = (struct tty_d *) kmalloc ( sizeof(struct tty_d) );
 
-    if ( (void *) CurrentTTY == NULL )
-    {
+    if ( (void *) CurrentTTY == NULL ){
         panic ("ttyInit:");
+
     }else{
 
         CurrentTTY->index = tty_id;
         CurrentTTY->used = 1;
         CurrentTTY->magic = 1234;
-        
         
         CurrentTTY->user_session = usession0;
         CurrentTTY->room = room0;
@@ -1423,23 +1416,22 @@ int ttyInit (int tty_id){
 
 
 
+int tty_init_module (void){
+
+    int i=0;
 
 
-
-int tty_init_module (void)
-{
-	int i;
-	
-        for (i=0; i<256; i++)
-	    {
-		    ttyList[i] = 0;
-	    }
+    for (i=0; i<256; i++)
+    {
+        ttyList[i] = 0;
+    };
 
 
     //...
     
     return 0;
 }
+
 
 //
 // End.

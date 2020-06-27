@@ -1,7 +1,6 @@
 /*
- * File: bottom/init/x86/x86main.c 
- * 
- * 
+ * File: bottom/init/x86/x86init.c 
+ *
  * Description:
  *     It's is the initialization for x86 architechture.
  *     x86main was called by kernel/main.c
@@ -55,7 +54,6 @@ extern unsigned long kArg4;
 // Boot mode.
 extern unsigned long SavedBootMode;
 
-
 // Task switching support.
 extern void turn_task_switch_on (void);
 
@@ -100,9 +98,8 @@ void x86mainStartFirstThread (void){
         if ( Thread->used != 1 || Thread->magic != 1234){
             printf ("x86mainStartFirstThread: tid={%d} magic \n", 
                 Thread->tid);
-            die ();
+            die();
         }
-
 
         set_current ( Thread->tid );       
         // ...
@@ -112,7 +109,7 @@ void x86mainStartFirstThread (void){
     if ( Thread->state != STANDBY ){
         printf ("x86mainStartFirstThread: state tid={%d}\n", 
             Thread->tid);
-        die ();
+        die();
     }
 
     // * MOVEMENT 2 ( Standby --> Running)
@@ -245,8 +242,8 @@ void x86mainStartFirstThread (void){
 }
 
 
-
 /*
+ *********************************
  * __x86StartInit: 
  * 
  */
@@ -420,7 +417,7 @@ void x86main (void){
     // System initialization.
     // See: sm/system.c
 
-    Status = (int) systemInit ();
+    Status = (int) systemInit();
 
     if ( Status != 0 ){
         debug_print ("[x86] x86main: systemInit fail\n");

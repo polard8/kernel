@@ -16,22 +16,26 @@
  *            Criar scheduleriBalanceCurrentThreadPriority()
  */
 
+// Equilibra a prioridade.
+// #bugbug: Uma função com esse nome deveria ter um valor de entrada.
+
+//#todo: int set_priority (int priority){
+
 int set_priority (void){
 
     struct thread_d *Current; 
 
+
     Current = (void *) threadList[current_thread];
 
-
-    if ( (void *) Current == NULL )
-    {
-        return (int) 1;    //?? fail.
+    if ( (void *) Current == NULL ){
+        debug_print ("set_priority: Current\n");
+        return (int) 1; 
     }
 
 	// Nothing ?!
 
     set_thread_priority ( Current, PRIORITY_NORMAL);
-
 
     return 0; 
 }
@@ -58,16 +62,19 @@ int KiSetPriority (void)
  */
 int KiIncreasePriority (int pid)
 {
+    debug_print ("KiIncreasePriority: [TODO]\n");
     return 0;    //Nothing for now. 
 }
 
 
 /*
+ **************************************
  * find_higher_priority:
  *     Encontra uma thread de maior prioridade entre as threads de 
  * estado READY.
  *     Essa rotina é usado após a preempção, onde uma thread de 
- * baixa prioridade para de executar, para que rode uma de maior prioridade.
+ * baixa prioridade para de executar, para que rode uma de 
+ * maior prioridade.
  */
  
 int find_higher_priority (void){

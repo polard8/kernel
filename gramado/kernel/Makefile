@@ -254,16 +254,16 @@ all-c:
 
 
 	##
-	## ==== LIB ==== 
+	## ==== KLIB ==== 
 	##
 
-	# lib
-	$(CC) -c lib/ctype.c   $(KINCLUDE) $(CFLAGS) -o ctype.o
-	$(CC) -c lib/kstdio.c  $(KINCLUDE) $(CFLAGS) -o kstdio.o
-	$(CC) -c lib/stdlib.c  $(KINCLUDE) $(CFLAGS) -o stdlib.o
-	$(CC) -c lib/string.c  $(KINCLUDE) $(CFLAGS) -o string.o
-	$(CC) -c lib/unistd.c  $(KINCLUDE) $(CFLAGS) -o unistd.o
-	$(CC) -c lib/syslib.c  $(KINCLUDE) $(CFLAGS) -o syslib.o
+	# klib
+	$(CC) -c klib/ctype.c   $(KINCLUDE) $(CFLAGS) -o ctype.o
+	$(CC) -c klib/kstdio.c  $(KINCLUDE) $(CFLAGS) -o kstdio.o
+	$(CC) -c klib/stdlib.c  $(KINCLUDE) $(CFLAGS) -o stdlib.o
+	$(CC) -c klib/string.c  $(KINCLUDE) $(CFLAGS) -o string.o
+	$(CC) -c klib/unistd.c  $(KINCLUDE) $(CFLAGS) -o unistd.o
+	$(CC) -c klib/syslib.c  $(KINCLUDE) $(CFLAGS) -o syslib.o
 
 
 	##

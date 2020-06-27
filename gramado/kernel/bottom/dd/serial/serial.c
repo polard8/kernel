@@ -1,18 +1,21 @@
-// credits: Ítalo Lima Marconato Matias
+/*
+ * File: serial.c
+ *
+ * Credits: 
+ *     Chicago OS. (Ítalo Lima Marconato Matias). 
+ *    
+ *     2019 - Document created by Fred Nora.
+ */
 
 
 #include <kernel.h>
 
 
- 
-
-
-
 
 void serial1_handler (void)
 {
-	
-	// Se a porta não estiver inicializado !
+
+    // Se a porta não estiver inicializado !
     if ( __breaker_com1_initialized == 0 )
         return;
 	
@@ -22,7 +25,7 @@ void serial1_handler (void)
     //
     
 	// Contando as interrupções desse tipo.
-	g_profiler_ints_irq4++;
+    g_profiler_ints_irq4++;
 }
 
 
@@ -37,7 +40,7 @@ void serial2_handler (void)
     //
     
 	// Contando as interrupções desse tipo.
-	g_profiler_ints_irq3++;	
+    g_profiler_ints_irq3++;	
 }
 
 
@@ -47,7 +50,6 @@ void serial3_handler (void)
 	// Se a porta não estiver inicializado !
     if ( __breaker_com3_initialized == 0 )
         return;
-	
 }
 
 
@@ -64,35 +66,50 @@ void serial4_handler (void)
 
 
 void serial_write_char ( char data ) {
-	
-	while (( in8(COM1_PORT + 5) & 0x20 ) == 0) ;
-	
-	out8 (COM1_PORT, data);
+
+    while (( in8(COM1_PORT + 5) & 0x20 ) == 0) ;
+
+    out8 (COM1_PORT, data);
 }
 
 
+/*
+ * serial_init_port:
+ * 
+ */
+ 
 void serial_init_port ( uint16_t port ){
 
     // ??
     // Qual foi inicializada ??
     
-    out8 (port + 1, 0x00);								// Disable all interrupts
-    out8 (port + 3, 0x80);								// Enable DLAB (set baud rate divisor)
-    out8 (port + 0, 0x03);								// Set divisor to 3 (lo byte) 38400
-															// baud (hi byte)
-    out8 (port + 1, 0x00);
-    out8 (port + 3, 0x03);								// 8 bits, no parity, one stop bit
-    out8 (port + 2, 0xC7);								// Enable FIFO, clear then with
-															// 14-byte threshold
-    out8 (port + 4, 0x0B);								// IRQs enables, RTS/DSR set
+    out8 (port + 1, 0x00);  // Disable all interrupts
+    out8 (port + 3, 0x80);  // Enable DLAB (set baud rate divisor)
+    out8 (port + 0, 0x03);  // Set divisor to 3 (lo byte) 38400 baud (hi byte)
 
+
+    out8 (port + 1, 0x00);
+    out8 (port + 3, 0x03);  // 8 bits, no parity, one stop bit
+    out8 (port + 2, 0xC7);  // Enable FIFO, clear then with 14-byte threshold
+
+
+    out8 (port + 4, 0x0B);  // IRQs enables, RTS/DSR set
 }
 
 
-// inicializa todas as portas.
-int serial_init (void)
-{
 
+/*
+ ******************
+ * serial_init:
+ * 
+ */
+// inicializa todas as portas.
+
+int serial_init (void){
+
+
+    debug_print("serial_init:\n");
+    
     __breaker_com1_initialized = 0;
     __breaker_com2_initialized = 0;
     __breaker_com3_initialized = 0;
@@ -109,10 +126,14 @@ int serial_init (void)
     __breaker_com3_initialized = 1;
     __breaker_com4_initialized = 1;
 
+
     return 0;
 }
 
 
+//
+// End.
+//
 
 
 

@@ -129,9 +129,7 @@ void KiSwitchToUserMode (void);
 
 void KiSaveCurrentContext (void);
 
-void KiRestoreCurrentContext (void);	
-
-void KiNewTaskScheduler (void);
+void KiRestoreCurrentContext (void);
 
 int KiSetPriority (void);
 

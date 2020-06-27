@@ -723,15 +723,21 @@ void console_putchar ( int c, int console_number ){
 
 
 // No escape sequence support.
-ssize_t __console_write (int console_number, const void *buf, size_t count)
+ssize_t 
+__console_write ( 
+    int console_number, 
+    const void *buf, 
+    size_t count )
 {
-    char ch; 
-    size_t __i;
+    char ch=0; 
+    size_t __i=0;
     char *data = (char *) buf;
 
 
-    if ( console_number < 0 || console_number > 3 )
+    if ( console_number < 0 || console_number > 3 ){
+       debug_print ("__console_write: console_number\n");
        return -1;
+    }
 
  
     //#testing.
@@ -742,8 +748,10 @@ ssize_t __console_write (int console_number, const void *buf, size_t count)
     }
 
 
-    if (!count)
+    if (!count){
+        printf ("__console_write: count\n");
         return -1;
+    }
 
        
     //
@@ -754,14 +762,19 @@ ssize_t __console_write (int console_number, const void *buf, size_t count)
 
     for (__i=0; __i<count; __i++)
         console_putchar ( (int) data[__i], console_number);
-    
-    return count;
+
+
+    return (ssize_t) count;
 }
 
 
-
-ssize_t console_read (int console_number, const void *buf, size_t count)
+ssize_t 
+console_read ( 
+    int console_number, 
+    const void *buf, 
+    size_t count )
 {
+    debug_print ("console_read: [TODO]\n");
     return -1;  //todo
 }
 
@@ -769,16 +782,20 @@ ssize_t console_read (int console_number, const void *buf, size_t count)
 
 // Tem escape sequence
 // console number, buffer, size.
-ssize_t console_write (int console_number, const void *buf, size_t count)
+ssize_t 
+console_write ( 
+    int console_number, 
+    const void *buf, 
+    size_t count )
 {
 
     char ch; 
     int i;  
     char *data = (char *) buf;
 
-
-    if ( console_number < 0 || console_number > 3 )
-    {
+    //debug_print ("console_write: [test]\n");
+    
+    if ( console_number < 0 || console_number > 3 ){
         printf ("console_write: console_number\n");
         refresh_screen();
         return -1;
@@ -975,7 +992,7 @@ ssize_t console_write (int console_number, const void *buf, size_t count)
 					case 'u':
 						__local_restore_cur (console_number);
 						break;
-				};  
+                }; 
                 break;
 
             default:
@@ -984,15 +1001,12 @@ ssize_t console_write (int console_number, const void *buf, size_t count)
                 return -1;
                 break;
         };
-    };    
-
-
+    }; 
 
    //printf ("console_write: done\n");
    //refresh_screen();
 
-
-    return count;    
+    return count; 
 
 }
 
@@ -1003,9 +1017,10 @@ ssize_t console_write (int console_number, const void *buf, size_t count)
  * scroll:
  *     Isso pode ser útil em full screen e na inicialização do kernel.
  *
- * *Importante: Um (retângulo) num terminal deve ser o lugar onde o buffer 
- * de linhas deve ser pintado. Obs: Esse retãngulo pode ser configurado através 
- * de uma função.
+ * *Importante: 
+ * Um (retângulo) num terminal deve ser o lugar onde o buffer 
+ * de linhas deve ser pintado. Obs: Esse retãngulo pode ser 
+ * configurado através de uma função.
  *     Scroll the screen in text mode.
  *     Scroll the screen in graphical mode.
  *     @todo Poderiam ser duas funções: ex: gui_scroll(). 
@@ -1121,7 +1136,9 @@ int kclearClientArea (int color)
 // vamos copiar esse esquema do edito de textos em ring3.
 
 int insert_line ( char *string, int line ){
-	
+
+    debug_print ("insert_line:\n");
+
 	/*
 	
 	int l;
@@ -1159,6 +1176,8 @@ int insert_line ( char *string, int line ){
 		}
 	};
 	*/
+
+
     return (int) -1; 
 }
 
@@ -1167,6 +1186,7 @@ int insert_line ( char *string, int line ){
 /*
  *******************************************
  * REFRESH_STREAM:
+ * 
  *     #IMPORTANTE
  *     REFRESH SOME GIVEN STREAM INTO TERMINAL CLIENT WINDOW !!
  */
@@ -1175,24 +1195,24 @@ void REFRESH_STREAM ( FILE *stream ){
 
     char *c;
 
+    int i=0;
+    int j=0;
+
+
 	 //#debug
 	 //sprintf ( stream->_base, "TESTING STDOUT ..." );
 
-    int i;
-    int j;
 
     j = 80*25;
  
     c = stream->_base;
 
 
-    int cWidth = get_char_width ();
-    int cHeight = get_char_height ();
+    int cWidth = get_char_width();
+    int cHeight = get_char_height();
 
-
-    if ( cWidth == 0 || cHeight == 0 )
-    {
-		panic ("REFRESH_STREAM: char w h ");
+    if ( cWidth == 0 || cHeight == 0 ){
+        panic ("REFRESH_STREAM: char w h ");
     }
 
 
@@ -1291,23 +1311,28 @@ int console_can_write( void)
 */
 
 
+/*
+ **************** 
+ * console_ioctl:
+ * 
+ */
+
 // Podemos mudar as características de um console.
 
-int console_ioctl ( int fd, unsigned long request, char *arg )
+int 
+console_ioctl ( 
+    int fd, 
+    unsigned long request, 
+    char *arg )
 {
-
     debug_print ("console_ioctl: TODO\n");
     //switch(request){}
-
     return -1;
 }
 
 
-
-
-
-
-
-
+//
+// End.
+//
 
 

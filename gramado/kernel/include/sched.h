@@ -22,8 +22,8 @@
 //#define LAST_TASK ? 
 
 //Status do scheduler.
-#define LOCKED   0                            
-#define UNLOCKED 1  
+#define LOCKED    0
+#define UNLOCKED  1  
 
 //Tipo de scheduler.
 #define SCHEDULER_NULL   0
@@ -63,10 +63,6 @@ int KiScheduler (void);
 int KiFindHigherPriority (void); 
 
 int KiSelectNextThread (int current);
-
-void KiDispatchTask (void);	
-
-
 
 
 
@@ -123,8 +119,6 @@ int get_current (void);
 
 int get_current_task (void);
 
-void new_task_scheduler (void); //cancelada
-
 int set_priority (void);
 
 
@@ -134,30 +128,24 @@ void set_task_status (unsigned long status);
 unsigned long get_task_status (void);   //ts.c
 
 
+
 //0
 void do_thread_initialized (int tid);
-
 //1
 void do_thread_standby (int tid);
-
 //2
 void do_thread_zombie (int tid);
-
 //3
 void do_thread_dead (int tid);
-
 //4
 void do_thread_ready (int tid);
-
 //5
 void do_thread_running (int tid);
-
-
 //6
 void do_thread_waiting (int tid);
-
 //7
 void do_thread_blocked (int tid);
+
 
 
 // Desiste do tempo de processamento.
