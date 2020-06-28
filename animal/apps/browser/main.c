@@ -874,8 +874,8 @@ int main ( int argc, char *argv[] ){
     //ok isso funcionou.
     gws_create_window_using_socket (client_fd,
         1,1,1,"no-name",
-        80,80,640,480,
-        0,0,COLOR_ORANGE, COLOR_ORANGE);
+        160, 160, 480,320,
+        0,0,COLOR_GRAY, COLOR_GRAY);
 
     //loop
     browser_loop(client_fd);

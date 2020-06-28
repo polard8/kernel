@@ -117,6 +117,10 @@ all-c:
 
 
 	gcc  -c  _split.c    $(CFLAGS) -I. -I include/ -o _split.o
+	
+	
+	gcc  -c  linkaddr.c    $(CFLAGS) -I. -I include/ -o linkaddr.o
+	
 #...	
 
  
