@@ -91,7 +91,9 @@ int service_drain_input (void);
 int serviceCreateWindow ( void );
 int servicepixelBackBufferPutpixel (void);
 int servicelineBackbufferDrawHorizontalLine (void);
-int serviceDrawButton (void);
+int serviceDrawChar(void);
+int serviceDrawText(void);
+int serviceDrawButton (void); //??
 // ...
 
 
@@ -511,9 +513,13 @@ gwsProcedure (
             servicelineBackbufferDrawHorizontalLine();
             break;
     
-        // #bugbug:
-        // Agora usamos a função create window pra criar botões.
+
         case 1004:
+           serviceDrawChar();
+           break;
+
+        case 1005:
+           serviceDrawText();
            break;
     
         // ...
@@ -906,6 +912,9 @@ int main (int argc, char **argv){
 
     int newsockfd = -1;
     
+    socklen_t addr_len;
+    addr_len = sizeof(addr);
+    
     // while (1)
     while (running == 1)
     {
@@ -915,7 +924,7 @@ int main (int argc, char **argv){
          
          
         //Accept actual connection from the client */
-        newsockfd = accept ( ____saved_server_fd, (struct sockaddr *) &addr, sizeof(addr) );
+        newsockfd = accept ( ____saved_server_fd, (struct sockaddr *) &addr, (socklen_t *) addr_len);
         if (newsockfd < 0) {
             gde_debug_print ("gws: ERROR on accept\n");
  
@@ -1083,6 +1092,110 @@ int servicelineBackbufferDrawHorizontalLine (void)
 }
 
 
+//todo
+int serviceDrawChar(void)
+{
+
+	//o buffer é uma global nesse documento.
+    unsigned long *message_address = (unsigned long *) &__buffer[0];
+
+
+    struct gws_window_d *window;
+    int window_id = -1;
+    unsigned long x;
+    unsigned long y;
+    unsigned long color;
+    
+    int __char;
+    char *text_buffer;    // #todo
+
+
+    // #debug
+    gde_debug_print ("serviceDrawChar:\n");
+
+
+    // Get
+    
+    
+    window_id = message_address[4];
+    x         = message_address[5];
+    y         = message_address[6]; 
+    color     = message_address[7];
+    unsigned long C = (unsigned long) message_address[8];
+    //text_buffer =    //#todo
+   
+   //
+   // Draw
+   //
+   
+    //#todo
+    // Get the window structure given the id.
+    //window = (struct gws_window_d *) windowList[window_id];
+    
+    //#test
+    // Usando a janela screen por enquanto.
+    dtextDrawText ( (struct gws_window_d *) gui->screen,
+        x, y, color, 
+        (unsigned char *) C );
+
+   gws_show_backbuffer (); // for debug   
+   
+   return 0;
+}
+
+
+
+int serviceDrawText(void)
+{
+
+	//o buffer é uma global nesse documento.
+    unsigned long *message_address = (unsigned long *) &__buffer[0];
+
+
+    struct gws_window_d *window;
+    int window_id = -1;
+    unsigned long x;
+    unsigned long y;
+    unsigned long color;
+    
+    char *text_buffer;    // #todo
+
+
+    // #debug
+    gde_debug_print ("serviceDrawText:\n");
+
+
+    // Get
+    
+    
+    window_id = message_address[4];
+    x         = message_address[5];
+    y         = message_address[6]; 
+    color     = message_address[7];
+    //text_buffer =    //#todo
+   
+   //
+   // Draw
+   //
+   
+    //#todo
+    // Get the window structure given the id.
+    //window = (struct gws_window_d *) windowList[window_id];
+    
+    //#test
+    // Usando a janela screen por enquanto.
+    dtextDrawText ( (struct gws_window_d *) gui->screen,
+        x, y, color, 
+        "text-test" );
+
+   gws_show_backbuffer (); // for debug   
+   
+   return 0;
+}
+
+
+//#bugbug
+// Usaremos a função create window para desenhar botões.
 int serviceDrawButton(void)
 {
 	//o buffer é uma global nesse documento.

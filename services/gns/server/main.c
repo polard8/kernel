@@ -557,11 +557,14 @@ int main (int argc, char **argv){
     // via mensagens e repassar via socket. 
     
     int newsockfd = -1;
+
+    socklen_t addr_len;
+    addr_len = sizeof(addr);
     
     while (1){
 
         //Accept actual connection from the client */
-        newsockfd = accept ( ____saved_server_fd, (struct sockaddr *) &addr, sizeof(addr) );
+        newsockfd = accept ( ____saved_server_fd, (struct sockaddr *) &addr, (socklen_t *) addr_len );
         if (newsockfd < 0) {
             gde_debug_print ("gns: ERROR on accept\n");
  
