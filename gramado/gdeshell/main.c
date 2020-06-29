@@ -421,24 +421,26 @@ int wp_initialized = 0;
 
 //Arg: Endere�os dos buffers contendo os chars.
 int 
-SendARP ( unsigned long source_ip, 
-          unsigned long target_ip, 
-          unsigned long target_mac );
+SendARP ( 
+    unsigned long source_ip, 
+    unsigned long target_ip, 
+    unsigned long target_mac );
 
 
 void testSendARP ();
 
 
 int
-__SendMessageToProcess ( int pid, 
-                         struct window_d *window, 
-                         int message,
-                         unsigned long long1,
-                         unsigned long long2 );
+__SendMessageToProcess ( 
+    int pid, 
+    struct window_d *window, 
+    int message,
+    unsigned long long1,
+    unsigned long long2 );
 
 
 //
-// ===============================================================
+// ===========================================================
 //
 
 
@@ -464,38 +466,40 @@ void tty_test (void){
         //printf ("The tty for this process is %d\n", ____this_tty_id);
 
 
-        // link by pid
-        // #todo: Create the function link_by_pid()
-        gramado_system_call ( 267,
-            getpid(),    // master (shell?)
-            getppid(),   // slave pai (terminal?)
-            0 );
-            
-        //
-        // scr
-        //    
+    // link by pid
+    // #todo: Create the function link_by_pid()
+    gramado_system_call ( 267,
+        getpid(),    // master (shell?)
+        getppid(),   // slave pai (terminal? init?)
+        0 );
+
+    //
+    // scr
+    //    
         
         // Show tty for this process.            
-        ____this_tty_id = gramado_system_call ( 266, getpid(), 0, 0 );
-        printf ("The tty for this process is %d\n", ____this_tty_id);
+    ____this_tty_id = gramado_system_call ( 266, getpid(), 0, 0 );
+    printf ("The tty for this process is %d\n", ____this_tty_id);
         
         
-         //Escrevendo na tty desse processo e na tty slave pra leitura.
-         write_ttyList ( ____this_tty_id, 
-             __wbuf2, 
-             __w_size2 = sprintf (__wbuf2,"THIS IS A MAGIC STRING\n")  );
+    //Escrevendo na tty desse processo e na tty slave pra leitura.
+    write_ttyList ( ____this_tty_id, 
+        __wbuf2, 
+        __w_size2 = sprintf (__wbuf2,"THIS IS A MAGIC STRING\n")  );
 
-        //
-        // dst
-        //
+    //
+    // dst
+    //
  
-        //Obtem o tty id do pai. (terminal)
-         ____tty_id = gramado_system_call ( 266, getppid(), 0, 0 );
-        printf ("The tty for the father is %d\n", ____tty_id);
+    //Obtem o tty id do pai. (init.bin??)
+    ____tty_id = gramado_system_call ( 266, getppid(), 0, 0 );
+    printf ("The tty for the father is %d\n", ____tty_id);
 
-        //Lendo no tty do terminal
-        read_ttyList ( ____tty_id, __rbuf2, 32 );     
-        printf (__rbuf2);
+    //Lendo no tty do terminal
+    //Cuidado. Podemos simplesmente estar lendo o que nos mesmos
+    //colocamos antes no buffer aqui.
+    read_ttyList ( ____tty_id, __rbuf2, 32 );     
+    printf (__rbuf2);
 }
 
 
@@ -565,10 +569,13 @@ void fake_sleep (unsigned long t){
 //Arg: Endere�os dos buffers contendo os chars.
 
 int 
-SendARP ( unsigned long source_ip, 
-          unsigned long target_ip, 
-          unsigned long target_mac )
+SendARP ( 
+    unsigned long source_ip, 
+    unsigned long target_ip, 
+    unsigned long target_mac )
 {
+    gde_debug_print ("gdeshell-SendARP: [TODO]\n");
+
 	//#todo:
 	//filtrar argumentos.
 
@@ -608,12 +615,12 @@ void testSendARP (){
     int status = -1;
 
     status = (int) SendARP ( (unsigned long) &source_ip_address[0], 
-                     (unsigned long) &target_ip_address[0], 
-                     (unsigned long) &target_mac_address[0] );
+                       (unsigned long) &target_ip_address[0], 
+                       (unsigned long) &target_mac_address[0] );
 
     if (status != 0)
     {
-
+        //
     }
 
     printf ("done\n");
@@ -623,17 +630,21 @@ void testSendARP (){
 
 
 int
-__SendMessageToProcess ( int pid, 
-                         struct window_d *window, 
-                         int message,
-                         unsigned long long1,
-                         unsigned long long2 )
+__SendMessageToProcess ( 
+    int pid, 
+    struct window_d *window, 
+    int message,
+    unsigned long long1,
+    unsigned long long2 )
 {
-	unsigned long message_buffer[5];
 
-	
-    if (pid<0)
-		return -1;
+    unsigned long message_buffer[5];
+
+
+    if (pid<0){
+        // todo: message
+        return -1;
+    }
 	
 	message_buffer[0] = (unsigned long) window;
 	message_buffer[1] = (unsigned long) message;
@@ -679,8 +690,8 @@ void update_cpu_usage ()
 
 	unsigned long __idle_value;
 	unsigned long __value;
-		
 	int i;
+
 
     __count++;
 	//printf ("%d ",__count);
@@ -935,37 +946,41 @@ static inline void rep_nop (void){
 // Procedimento de janela principal do aplicativo.
 
 unsigned long 
-shellProcedure ( struct window_d *window, 
-                 int msg, 
- 			     unsigned long long1, 
-				 unsigned long long2 );
-				
-		
+shellProcedure ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 );
+
+
 // ??
 // di�logo para alimentar o terminal usado pelos aplicativos.
 
 int 
-feedterminalDialog ( struct window_d *window, 
-                     int msg, 
-				     unsigned long long1, 
-				     unsigned long long2 );
-							  
+feedterminalDialog ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 );
 
-// Procedimento de janela da topbar.							  
+
+
+// Procedimento de janela da topbar.
 
 unsigned long 
-shellTopbarProcedure ( struct window_d *window, 
-                       int msg, 
-			           unsigned long long1, 
-					   unsigned long long2 );
-					  
+shellTopbarProcedure ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 );
  
-void quit ( int status ){
-	
-	_running = 0;
+ 
+void quit ( int status )
+{
+    _running = 0;
 }
  
- 
+
 
 /*
 void reader_loop ();
@@ -1077,7 +1092,7 @@ shellProcedure (
     unsigned long compare_return;
     int q;
 
-    int c;
+    int c=0;
 
 
 
@@ -2836,9 +2851,7 @@ do_compare:
 		    NULL, MSG_TERMINALCOMMAND, 2000, 2000 );
 		goto exit_cmp;
 	}
-	
-	
- 
+
 
     // t19
     int xxx__PID;
@@ -6453,20 +6466,18 @@ int shell_save_file (){
 	// Lenght in bytes.
 	//
 	
-	len = (size_t) strlen (file_1);
+    len = (size_t) strlen (file_1);
 
-	if (len <= 0)
-	{
-	    printf ("shell_save_file:  Fail. Empty file.\n");
+    if (len <= 0){
+        printf ("shell_save_file:  Fail. Empty file.\n");
         return (int) 1;
-	}
-	
-	if (len > 2048)
-	{
-	    printf ("shell_save_file:  Limit Fail. The  file is too long.\n");
+    }
+
+    if (len > 2048){
+        printf ("shell_save_file:  Limit Fail. The  file is too long.\n");
         return (int) 1;
-	}
-	
+    }
+
     //
     // Number os sectors.
     //
@@ -6750,11 +6761,6 @@ void updateVisibleArea( int direction )
             break; 
     };
 }
-
-
-
-
- 
 
 
 /*
@@ -7558,15 +7564,15 @@ noArgs:
 	
 	
 	//++
-	gde_enter_critical_section ();    
+    gde_enter_critical_section ();    
     hWindow = shellCreateMainWindow (1);
-	
-	if ( (void *) hWindow == NULL )
-	{
-		printf ("shellCreateMainWindow FAIL!\n");
-		gde_exit_critical_section ();
-		while (1){}
-	}
+
+    if ( (void *) hWindow == NULL ){
+        printf ("shellCreateMainWindow FAIL!\n");
+        gde_exit_critical_section ();
+        while (1){}
+   }
+
 	//Registrar e mostrar.
 	
     gde_register_window (hWindow);
@@ -7599,12 +7605,12 @@ noArgs:
 	//#importante
 	//nesse momento estamos configurando os limites do terminal gerenciado pelo kernel.
 	
-	system_call ( SYSTEMCALL_SETTERMINALWINDOW, 
-	    (unsigned long) hWindow, 
-		(unsigned long) hWindow, 
-		(unsigned long) hWindow );
-		
-				 
+    system_call ( SYSTEMCALL_SETTERMINALWINDOW, 
+        (unsigned long) hWindow, 
+        (unsigned long) hWindow, 
+        (unsigned long) hWindow );
+
+ 
 	//salva ponteiro da janela principal e da janela do terminal. 
 	shell_info.main_window = ( struct window_d * ) hWindow;
 	shell_info.terminal_window = ( struct window_d * ) hWindow;
@@ -7704,9 +7710,7 @@ noArgs:
 	// Mas se o shell n�o for interativo, ent�o n�o pegaremos 
 	// mensagens de input de teclado.
 
-
-    if ( interactive != 1 )
-    {
+    if ( interactive != 1 ){
         printf ("gdeshell is not interactive\n");
         goto skip_input;
     }
@@ -7794,9 +7798,9 @@ read_and_execute:
 	   elementos da mensagem e depois zerar o buffer */
 	
 Mainloop:
-	
-	while (_running)
-	{
+
+    while (_running)
+    {
 		// #obs: 
 		// O retorno ser� 1 se tiver mensagem e 0 se n�o tiver.
 		
@@ -7836,8 +7840,8 @@ Mainloop:
 	// Entramos aqui se running for igual a 0.
 	//
 	
-	switch (ShellFlag)
-	{
+    switch (ShellFlag)
+    {
 	    // Sai do shell.
 		case SHELLFLAG_EXIT:
 		    goto end;
@@ -7849,10 +7853,10 @@ Mainloop:
 		// Sai do shell.	
         default:
             goto end;
-			break;		
-	};
+            break;
+    };
 
-	
+
 	//
 	// Pulamos a parte que pega mensgens de input de teclado 
 	// porque esse shell n�o est� configurado como interativo.
@@ -7862,7 +7866,7 @@ Mainloop:
 // # RunScript #	
 //
 
-skip_input:	
+skip_input:
 
     shellExecuteThisScript ( argv[3] );
 
@@ -7913,8 +7917,9 @@ end:
 	//exit (last_command_exit_value);	
 	
 	// Retornar para o crt0.
-	return 0;
+    return 0;
 }
+
 
 //
 // End.

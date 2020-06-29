@@ -16,39 +16,39 @@
 
 
 //credits: serenity os
-#define SIGINVAL 0
-#define SIGHUP 1
-#define SIGINT 2
-#define SIGQUIT 3
-#define SIGILL 4
-#define SIGTRAP 5
-#define SIGABRT 6
-#define SIGBUS 7
-#define SIGFPE 8
-#define SIGKILL 9
-#define SIGUSR1 10
-#define SIGSEGV 11
-#define SIGUSR2 12
-#define SIGPIPE 13
-#define SIGALRM 14
-#define SIGTERM 15
-#define SIGSTKFLT 16
-#define SIGCHLD 17
-#define SIGCONT 18
-#define SIGSTOP 19
-#define SIGTSTP 20
-#define SIGTTIN 21
-#define SIGTTOU 22
-#define SIGURG 23
-#define SIGXCPU 24
-#define SIGXFSZ 25
-#define SIGVTALRM 26
-#define SIGPROF 27
-#define SIGWINCH 28
-#define SIGIO 29
-#define SIGPWR 30
-#define SIGSYS 31
-#define NSIG 32
+#define SIGINVAL   0
+#define SIGHUP     1
+#define SIGINT     2
+#define SIGQUIT    3
+#define SIGILL     4
+#define SIGTRAP    5
+#define SIGABRT    6
+#define SIGBUS     7
+#define SIGFPE     8
+#define SIGKILL    9
+#define SIGUSR1    10
+#define SIGSEGV    11
+#define SIGUSR2    12
+#define SIGPIPE    13
+#define SIGALRM    14
+#define SIGTERM    15
+#define SIGSTKFLT  16
+#define SIGCHLD    17
+#define SIGCONT    18
+#define SIGSTOP    19
+#define SIGTSTP    20
+#define SIGTTIN    21
+#define SIGTTOU    22
+#define SIGURG     23
+#define SIGXCPU    24
+#define SIGXFSZ    25
+#define SIGVTALRM  26
+#define SIGPROF    27
+#define SIGWINCH   28
+#define SIGIO      29
+#define SIGPWR     30
+#define SIGSYS     31
+#define NSIG       32
 
 //int	(*signal())();
 //#define	SIG_DFL	(int (*)())0
@@ -107,8 +107,8 @@ struct sigevent
 {
     int          sigev_notify; /* Notification method */
     int          sigev_signo;  /* Notification signal */
-    
-	union sigval sigev_value;  /* Data passed with
+
+    union sigval sigev_value;  /* Data passed with
                                          notification */
     void       (*sigev_notify_function) (union sigval);
                             /* Function used for thread
@@ -119,6 +119,7 @@ struct sigevent
     pid_t        sigev_notify_thread_id;
                            /* ID of thread to signal (SIGEV_THREAD_ID) */
 };
+
 
 typedef struct siginfo {
     int      si_signo;     /* Signal number */
@@ -166,11 +167,12 @@ typedef struct sigaction {
     void  (*sa_restorer)(void);
 }sigaction_t;
 
+
 #ifndef _POSIX_SOURCE
-#define SA_ONSTACK	0x0001	/* take signal on signal stack */
-#define SA_RESTART	0x0002	/* do not restart system on signal return */
+#define SA_ONSTACK  0x0001  /* take signal on signal stack */
+#define SA_RESTART  0x0002  /* do not restart system on signal return */
 #endif
-#define SA_NOCLDSTOP	0x0004	/* do not generate SIGCHLD on child stop */
+#define SA_NOCLDSTOP  0x0004	/* do not generate SIGCHLD on child stop */
 
 
 
@@ -192,9 +194,10 @@ typedef struct sigaction {
 /*
  * Flags for sigprocmask:
  */
-#define	SIG_BLOCK	1	/* block specified signal set */
-#define	SIG_UNBLOCK	2	/* unblock specified signal set */
-#define	SIG_SETMASK	3	/* set specified signal set */
+#define	SIG_BLOCK    1  /* block specified signal set */
+#define	SIG_UNBLOCK  2  /* unblock specified signal set */
+#define	SIG_SETMASK  3  /* set specified signal set */
+
 
 /*
 #define SIG_BLOCK 0
@@ -210,10 +213,10 @@ typedef struct sigaction {
  * 4.3 compatibility:
  * Signal vector "template" used in sigvec call.
  */
-struct	sigvec {
-	void	(*sv_handler)();	/* signal handler */
-	int	sv_mask;		/* signal mask to apply */
-	int	sv_flags;		/* see signal options below */
+struct sigvec {
+    void  (*sv_handler)();  /* signal handler */
+    int     sv_mask;        /* signal mask to apply */
+    int     sv_flags;       /* see signal options below */
 };
 
 #define SV_ONSTACK	SA_ONSTACK
@@ -224,18 +227,19 @@ struct	sigvec {
  * Structure used in sigaltstack call.
  */
 struct	sigaltstack {
-	char	*ss_base;		/* signal stack base */
-	int	ss_len;			/* signal stack length */
-	int	ss_onstack;		/* current status */
+	char  *ss_base;     /* signal stack base */
+	int    ss_len;      /* signal stack length */
+	int    ss_onstack;  /* current status */
 };
 
 /*
  * Structure used in sigstack call.
  */
 struct	sigstack {
-	char	*ss_sp;			/* signal stack pointer */
-	int	ss_onstack;		/* current status */
+	char  *ss_sp;       /* signal stack pointer */
+	int    ss_onstack;  /* current status */
 };
+
 
 /*
  * Information pushed on stack when a signal is delivered.
@@ -245,14 +249,15 @@ struct	sigstack {
  * a non-standard exit is performed.
  */
 struct	sigcontext {
-	int	sc_onstack;		/* sigstack state to restore */
-	int	sc_mask;		/* signal mask to restore */
-	int	sc_sp;			/* sp to restore */
-	int	sc_fp;			/* fp to restore */
-	int	sc_ap;			/* ap to restore */
-	int	sc_pc;			/* pc to restore */
-	int	sc_ps;			/* psl to restore */
+	int	sc_onstack;  /* sigstack state to restore */
+	int	sc_mask;     /* signal mask to restore */
+	int	sc_sp;       /* sp to restore */
+	int	sc_fp;       /* fp to restore */
+	int	sc_ap;       /* ap to restore */
+	int	sc_pc;       /* pc to restore */
+	int	sc_ps;       /* psl to restore */
 };
+
 
 /*
  * Macro for converting signal number to a mask suitable for
@@ -263,13 +268,16 @@ struct	sigcontext {
 #define	BADSIG		(void (*)())-1
 #endif	/* _POSIX_SOURCE */
 
+
 //POSIX.1-2001, POSIX.1-2008, C89, C99.
 sighandler_t signal (int signum, sighandler_t handler);
 
+
 int 
-sigaction ( int signum, 
-            const struct sigaction *act,
-            struct sigaction *oldact );
+sigaction ( 
+    int signum, 
+    const struct sigaction *act,
+    struct sigaction *oldact );
     
 
 int kill(pid_t pid, int sig);                
@@ -283,4 +291,15 @@ int sigaddset(sigset_t *set, int signum);
 int sigdelset(sigset_t *set, int signum); 
 
 #endif
+
+
+//
+// End.
+//
+
+
+
+
+
+
 

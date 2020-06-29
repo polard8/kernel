@@ -126,8 +126,10 @@ __tty_read (
     int nr )
 {
 
-    if ( (void *) tty == NULL )
+    if ( (void *) tty == NULL ){
+        debug_print ("__tty_read: tty\n");
         return -1;
+    }
    
     
     if ( nr <= 0 ){
@@ -222,8 +224,10 @@ __tty_write (
     int nr )
 {
 
-    if ( (void *) tty == NULL )
+    if ( (void *) tty == NULL ){
+        debug_print ("__tty_write: tty\n");
         return -1;
+    }
 
 
     if ( nr <= 0 ){
@@ -1270,6 +1274,7 @@ int tty_delete ( struct tty_d *tty ){
 
     // Nothing to do.
     if ( (void *) tty == NULL ){
+        debug_print ("tty_delete: tty\n");
         //debug_print("...");
         return -1;
  

@@ -1,5 +1,12 @@
+/*
+ * netdb.h
+ * 
+ * 
+ */
+
+
 #ifndef _NETDB_H_
-#define	_NETDB_H_
+#define  _NETDB_H_
 
 
 /*
@@ -22,25 +29,25 @@ typedef  _BSD_SIZE_T_  size_t;
 
 #if defined(_NETBSD_SOURCE)
 #ifndef _PATH_HEQUIV
-#define	_PATH_HEQUIV	"/etc/hosts.equiv"
+#define	_PATH_HEQUIV  "/etc/hosts.equiv"
 #endif
 #ifndef _PATH_HOSTS
-#define	_PATH_HOSTS	"/etc/hosts"
+#define	_PATH_HOSTS  "/etc/hosts"
 #endif
 #ifndef _PATH_NETWORKS
-#define	_PATH_NETWORKS	"/etc/networks"
+#define	_PATH_NETWORKS  "/etc/networks"
 #endif
 #ifndef _PATH_PROTOCOLS
-#define	_PATH_PROTOCOLS	"/etc/protocols"
+#define	_PATH_PROTOCOLS  "/etc/protocols"
 #endif
 #ifndef _PATH_SERVICES
-#define	_PATH_SERVICES	"/etc/services"
+#define	_PATH_SERVICES  "/etc/services"
 #endif
 #ifndef _PATH_SERVICES_CDB
-#define	_PATH_SERVICES_CDB "/var/db/services.cdb"
+#define	_PATH_SERVICES_CDB  "/var/db/services.cdb"
 #endif
 #ifndef _PATH_SERVICES_DB
-#define	_PATH_SERVICES_DB "/var/db/services.db"
+#define	_PATH_SERVICES_DB  "/var/db/services.db"
 #endif
 #endif
 
@@ -49,20 +56,19 @@ typedef  _BSD_SIZE_T_  size_t;
 
 struct servent {
 
-    char  *s_name;      /*%< official service name */
+    char   *s_name;     /*%< official service name */
     char  **s_aliases;  /*%< alias list */
-    int   s_port;       /*%< port # */
-    char  *s_proto;     /*%< protocol to use */
+    int     s_port;     /*%< port # */
+    char   *s_proto;    /*%< protocol to use */
 };
 
 
 struct protoent {
 
-    char  *p_name;      /*%< official protocol name */
+    char   *p_name;     /*%< official protocol name */
     char  **p_aliases;  /*%< alias list */
-    int   p_proto;      /*%< protocol # */
+    int     p_proto;    /*%< protocol # */
 };
-
 
 
 //extern int h_errno;
@@ -147,16 +153,17 @@ struct protoent {
 #define	NI_MAXSERV	32
 #endif
 
+
 /*%
  * Flag values for getnameinfo()
  */
-#define	NI_NOFQDN	0x00000001
-#define	NI_NUMERICHOST	0x00000002
-#define	NI_NAMEREQD	0x00000004
-#define	NI_NUMERICSERV	0x00000008
-#define	NI_DGRAM	0x00000010
-#define	NI_WITHSCOPEID	0x00000020
-#define	NI_NUMERICSCOPE	0x00000040
+#define	NI_NOFQDN        0x00000001
+#define	NI_NUMERICHOST   0x00000002
+#define	NI_NAMEREQD      0x00000004
+#define	NI_NUMERICSERV   0x00000008
+#define	NI_DGRAM         0x00000010
+#define	NI_WITHSCOPEID   0x00000020
+#define	NI_NUMERICSCOPE  0x00000040
 
 
 /*%

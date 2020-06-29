@@ -39,7 +39,6 @@
  
  
 // Environment: 
-// atacama - libc03  
 // termios.h is needed.
  
 

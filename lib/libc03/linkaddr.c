@@ -34,35 +34,48 @@
 #include <net/if_dl.h>
 #include <string.h>
 
+
 static const char hexlist[] = "0123456789abcdef";
 
-char *
-link_ntoa(const struct sockaddr_dl *sdl)
+
+// #todo
+void link_addr(const char *addr, struct	sockaddr_dl *sdl)
 {
-	static char obuf[64];
-	char *out;
-	const u_char *in, *inlim;
-	int namelen, i, rem;
+    gde_debug_print ("link_addr: [TODO]\n");
+}
 
-	namelen = (sdl->sdl_nlen <= IFNAMSIZ) ? sdl->sdl_nlen : IFNAMSIZ;
 
-	out = obuf;
-	rem = sizeof(obuf);
-	if (namelen > 0) {
-		memcpy(out, sdl->sdl_data, namelen);
+char *link_ntoa (const struct sockaddr_dl *sdl){
+
+    static char obuf[64];
+    char *out;
+    const u_char *in, *inlim;
+    int namelen, i, rem;
+
+
+    namelen = (sdl->sdl_nlen <= IFNAMSIZ) ? sdl->sdl_nlen : IFNAMSIZ;
+
+    out = obuf;
+    rem = sizeof(obuf);
+    if (namelen > 0)
+    {
+        memcpy(out, sdl->sdl_data, namelen);
 		out += namelen;
 		rem -= namelen;
 		if (sdl->sdl_alen > 0) {
 			*out++ = ':';
 			rem--;
 		}
-	}
+    }
 
-	in = (const u_char *)sdl->sdl_data + sdl->sdl_nlen;
-	inlim = in + sdl->sdl_alen;
 
-	while (in < inlim && rem > 1) {
-		if (in != (const u_char *)sdl->sdl_data + sdl->sdl_nlen) {
+    in = (const u_char *)sdl->sdl_data + sdl->sdl_nlen;
+    inlim = in + sdl->sdl_alen;
+
+    while (in < inlim && rem > 1) 
+    {
+		if (in != (const u_char *)sdl->sdl_data + sdl->sdl_nlen)
+		{
 			*out++ = '.';
 			rem--;
 		}
@@ -79,7 +92,15 @@ link_ntoa(const struct sockaddr_dl *sdl)
 			*out++ = hexlist[i];
 			rem--;
 		}
-	}
-	*out = 0;
-	return (obuf);
+    };
+
+    *out = 0;
+
+    return (obuf);
 }
+
+
+//
+// End.
+//
+

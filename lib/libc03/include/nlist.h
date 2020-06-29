@@ -36,8 +36,9 @@
  *	@(#)nlist.h	8.2 (Berkeley) 1/21/94
  */
 
+
 #ifndef _NLIST_H_
-#define	_NLIST_H_
+#define  _NLIST_H_
 
 
 //#include <sys/cdefs.h>
@@ -80,25 +81,21 @@ struct nlist {
 #define N_SETV	0x1c		//  set vector symbol 
 #define	N_FN	0x1e		//  file name (N_EXT on) 
 #define	N_WARN	0x1e		//  warning message (N_EXT off) 
-
 #define	N_EXT	0x01		//  external (global) bit, OR'ed in 
 #define	N_TYPE	0x1e		//  mask for all the type bits 
 
-	unsigned char n_type;	//  type defines
-
-	char n_other;		    //  spare 
+    unsigned char  n_type;   //  type defines
+    char           n_other;  //  spare 
 
 //#define	n_hash	n_desc		//  used internally by ld(1); XXX 
 
-	short n_desc;		    //  used by stab entries 
-	unsigned long n_value;	//  address/value of the symbol 
+    short          n_desc;   //  used by stab entries 
+    unsigned long  n_value;  //  address/value of the symbol 
 };
 
 
-
-#define	N_FORMAT	"%08x"	//  namelist value format; XXX 
-#define	N_STAB		0x0e0	//  mask for debugger symbols -- stab(5) 
-
+#define N_FORMAT  "%08x"  //  namelist value format; XXX 
+#define N_STAB    0x0e0   //  mask for debugger symbols -- stab(5) 
 
 
 /*

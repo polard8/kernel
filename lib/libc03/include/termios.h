@@ -21,18 +21,18 @@
 
 
 /* Indices into c_cc array.  Default values in parentheses. POSIX Table 7-5. */
-#define VEOF           0	/* cc_c[VEOF] = EOF char (^D) */
-#define VEOL           1	/* cc_c[VEOL] = EOL char (undef) */
-#define VERASE         2	/* cc_c[VERASE] = ERASE char (^H) */
-#define VINTR          3	/* cc_c[VINTR] = INTR char (DEL) */
-#define VKILL          4	/* cc_c[VKILL] = KILL char (^U) */
-#define VMIN           5	/* cc_c[VMIN] = MIN value for timer */
-#define VQUIT          6	/* cc_c[VQUIT] = QUIT char (^\) */
-#define VTIME          7	/* cc_c[VTIME] = TIME value for timer */
-#define VSUSP          8	/* cc_c[VSUSP] = SUSP (^Z, ignored) */
-#define VSTART         9	/* cc_c[VSTART] = START char (^S) */
-#define VSTOP         10	/* cc_c[VSTOP] = STOP char (^Q) */
-#define VERASEWORD    14	/* cc_c[VERASEWORD] = ERASEWORD char (^W) */
+#define VEOF         0	/* cc_c[VEOF] = EOF char (^D) */
+#define VEOL         1	/* cc_c[VEOL] = EOL char (undef) */
+#define VERASE       2	/* cc_c[VERASE] = ERASE char (^H) */
+#define VINTR        3	/* cc_c[VINTR] = INTR char (DEL) */
+#define VKILL        4	/* cc_c[VKILL] = KILL char (^U) */
+#define VMIN         5	/* cc_c[VMIN] = MIN value for timer */
+#define VQUIT        6	/* cc_c[VQUIT] = QUIT char (^\) */
+#define VTIME        7	/* cc_c[VTIME] = TIME value for timer */
+#define VSUSP        8	/* cc_c[VSUSP] = SUSP (^Z, ignored) */
+#define VSTART       9	/* cc_c[VSTART] = START char (^S) */
+#define VSTOP       10	/* cc_c[VSTOP] = STOP char (^Q) */
+#define VERASEWORD  14	/* cc_c[VERASEWORD] = ERASEWORD char (^W) */
 
 /* Size of cc_c array, some extra space for extensions. */
 #define  NCCS  20  
@@ -78,16 +78,19 @@ tcflag_t c_cflag
 tcflag_t c_lflag
     A bit mask specifying flags for local modes; 
 cc_t c_cc[NCCS]
-    An array specifying which characters are associated with various control functions; 
+    An array specifying which characters are associated 
+    with various control functions; 
 */
 
-/*
 
+/*
 Data Type: tcflag_t
-    This is an unsigned integer type used to represent the various bit masks for terminal flags. 
+    This is an unsigned integer type used to represent the 
+    various bit masks for terminal flags. 
 
 Data Type: cc_t
-    This is an unsigned integer type used to represent characters associated with various terminal control functions. 
+    This is an unsigned integer type used to represent 
+    characters associated with various terminal control functions. 
 
 Macro: int NCCS
     The value of this macro is the number of elements in the c_cc array. 
@@ -104,10 +107,11 @@ cc_t     c_cc[NCCS];   // special characters
 
 
 struct winsize {
-	unsigned short ws_row;
-	unsigned short ws_col;
-	unsigned short ws_xpixel;
-	unsigned short ws_ypixel;
+
+    unsigned short ws_row;
+    unsigned short ws_col;
+    unsigned short ws_xpixel;
+    unsigned short ws_ypixel;
 };
 
 
@@ -158,7 +162,6 @@ struct termios
 
 
 
-
 /* Values for termios c_cflag bit map.  POSIX Table 7-3. */
 #define  CLOCAL  0x0001  /* ignore modem status lines */
 #define  CREAD   0x0002  /* enable receiver */
@@ -173,9 +176,6 @@ struct termios
 #define  PARODD  0x0080  /* use odd parity if set, else even */
 
 
-
-
-
 // Local mode flags.
 /* Values for termios c_lflag bit map.  POSIX Table 7-4. */
 #define  ECHO      0x0001  /* enable echoing of input characters */
@@ -187,11 +187,6 @@ struct termios
 #define  ISIG      0x0040  /* enable signals */
 #define  NOFLSH    0x0080  /* disable flush after interrupt or quit */
 #define  TOSTOP    0x0100  /* send SIGTTOU (job control, not implemented*/
-
-
-
-
-
 
 
 
@@ -246,65 +241,57 @@ struct termios
 
 /* flush accumulated input data */
 //flushes data received but not read. 
-#define TCIFLUSH           1
+#define TCIFLUSH    1
 
 /* flush accumulated output data */
 //flushes data written but not transmitted. 
-#define TCOFLUSH           2	
+#define TCOFLUSH    2
 
 /* flush accumulated input and output data */
 //flushes both data received but not read, and data written but not transmitted. 
-#define TCIOFLUSH          3	
+#define TCIOFLUSH    3
 
 
 /* Action values for tcflow().  POSIX Sec. 7.2.2.2. */
-#define TCOOFF             1	/* suspend output */
-#define TCOON              2	/* restart suspended output */
-#define TCIOFF             3	/* transmit a STOP character on the line */
-#define TCION              4	/* transmit a START character on the line */
-
-
+#define TCOOFF    1  /* suspend output */
+#define TCOON     2  /* restart suspended output */
+#define TCIOFF    3  /* transmit a STOP character on the line */
+#define TCION     4  /* transmit a START character on the line */
 
 
 //https://linux.die.net/man/3/tcgetattr
 //https://www.mkssoftware.com/docs/man3/tcsetattr.3.asp
 
 
-int tcflush (int fd, int queue_selector);
-int tcflow (int fd, int action);
-int tcdrain (int fd);
-
-int tcsendbreak (int fd, int duration);
-
-
 void cfmakeraw (struct termios *termios_p);
-
 speed_t cfgetispeed (const struct termios* tp);
 speed_t cfgetospeed (const struct termios* tp);
-
 int cfsetispeed (struct termios *termios_p, speed_t speed);
 int cfsetospeed (struct termios *termios_p, speed_t speed);
 int cfsetspeed (struct termios *termios_p, speed_t speed);
 
 
+int tcflush (int fd, int queue_selector);
+int tcflow (int fd, int action);
+int tcdrain (int fd);
+int tcsendbreak (int fd, int duration);
 int tcgetattr (int fd, struct termios *termios_p);
 
 int 
-tcsetattr ( int fd, 
-            int optional_actions,
-            const struct termios *termios_p );
-
-
-
+tcsetattr ( 
+    int fd, 
+    int optional_actions,
+    const struct termios *termios_p );
 
 
 pid_t tcgetpgrp ( int fd);
 int tcsetpgrp (int fd, pid_t pgrp);
 
 
-
-
-
-
 #endif /* _TERMIOS_H */
+
+//
+// End.
+//
+
 

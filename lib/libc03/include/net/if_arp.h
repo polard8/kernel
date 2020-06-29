@@ -31,8 +31,10 @@
  *	@(#)if_arp.h	8.1 (Berkeley) 6/10/93
  */
 
+
 #ifndef _NET_IF_ARP_H_
 #define _NET_IF_ARP_H_
+
 /*
  * Address Resolution Protocol.
  *
@@ -43,18 +45,23 @@
  * arp_tha and arp_tpa in that order, according to the lengths
  * specified.  Field names used correspond to RFC 826.
  */
-struct	arphdr {
-	uint16_t ar_hrd;	/* format of hardware address */
+
+struct arphdr {
+    
+    uint16_t ar_hrd;	/* format of hardware address */
+
 #define ARPHRD_ETHER 	1	/* ethernet hardware format */
 #define ARPHRD_IEEE802 	6	/* IEEE 802 hardware format */
 #define ARPHRD_ARCNET 	7	/* ethernet hardware format */
 #define ARPHRD_FRELAY 	15	/* frame relay hardware format */
 #define ARPHRD_STRIP 	23	/* Ricochet Starmode Radio hardware format */
 #define	ARPHRD_IEEE1394	24	/* IEEE 1394 (FireWire) hardware format */
-	uint16_t ar_pro;	/* format of protocol address */
-	uint8_t  ar_hln;	/* length of hardware address */
-	uint8_t  ar_pln;	/* length of protocol address */
-	uint16_t ar_op;		/* one of: */
+
+    uint16_t ar_pro;	/* format of protocol address */
+    uint8_t  ar_hln;	/* length of hardware address */
+    uint8_t  ar_pln;	/* length of protocol address */
+    uint16_t ar_op;		/* one of: */
+
 #define	ARPOP_REQUEST	1	/* request to resolve address */
 #define	ARPOP_REPLY	2	/* response to previous request */
 #define	ARPOP_REVREQUEST 3	/* request protocol address given hardware */
@@ -71,7 +78,10 @@ struct	arphdr {
 	uint8_t  ar_tha[];	/* target hardware address (!IEEE1394) */
 	uint8_t  ar_tpa[];	/* target protocol address */
 #endif
+
 } __packed;
+
+
 
 /*
 static __inline uint8_t *
@@ -132,12 +142,14 @@ struct arpreq {
 };
 */
 
+
 /*  arp_flags and at_flags field values */
-#define	ATF_INUSE	0x01	/* entry in use */
-#define ATF_COM		0x02	/* completed entry (enaddr valid) */
-#define	ATF_PERM	0x04	/* permanent entry */
-#define	ATF_PUBL	0x08	/* publish entry (respond for other host) */
-#define	ATF_USETRAILERS	0x10	/* has requested trailers */
+#define  ATF_INUSE        0x01	/* entry in use */
+#define  ATF_COM          0x02	/* completed entry (enaddr valid) */
+#define  ATF_PERM         0x04	/* permanent entry */
+#define  ATF_PUBL         0x08	/* publish entry (respond for other host) */
+#define  ATF_USETRAILERS  0x10	/* has requested trailers */
+
 
 /*
  * Kernel statistics about arp
@@ -166,8 +178,11 @@ struct arpreq {
 #define	ARP_STAT_DFRDROPPED	21	/* deferred, then dropped */
 #define	ARP_STAT_ALLOCFAIL	22	/* failures to allocate llinfo */
 
-#define	ARP_NSTATS		23
+#define  ARP_NSTATS    23
+
 
 //void arp_stat_add(int, uint64_t);
 
-#endif /* !_NET_IF_ARP_H_ */
+#endif    /* !_NET_IF_ARP_H_ */
+
+

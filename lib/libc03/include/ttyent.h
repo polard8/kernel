@@ -1,4 +1,7 @@
 
+// ttyent.h
+
+
 /*
 The fields are as follows:
 

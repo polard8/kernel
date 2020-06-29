@@ -1,19 +1,27 @@
+/*
+ * File: pty.c
+ * 
+ * 
+ */
+
 
 #include <sys/types.h>  
 #include <pty.h>
 
 
+
 //See: http://man7.org/linux/man-pages/man7/pty.7.html
 
 /*
-       A pseudoterminal (sometimes abbreviated "pty") is a pair of virtual
-       character devices that provide a bidirectional communication channel.
-       One end of the channel is called the master; the other end is called
-       the slave. 
+    A pseudoterminal (sometimes abbreviated "pty") is a pair of virtual
+    character devices that provide a bidirectional communication channel.
+    One end of the channel is called the master; the other end is called
+    the slave. 
 
-       The slave end of the pseudoterminal provides an interface
-       that behaves exactly like a classical terminal.
+    The slave end of the pseudoterminal provides an interface
+    that behaves exactly like a classical terminal.
 */
+
 
 /*
 The xterm program is a terminal emulator for the X Window System. 
@@ -32,30 +40,42 @@ terminals for programs that cannot use the window system directly.
  */
 //#todo
 
-int openpty (int *amaster, int *aslave, char *name,
-            const struct termios *termp,
-            const struct winsize *winp)
+int 
+openpty ( 
+    int *amaster, 
+    int *aslave, 
+    char *name,
+    const struct termios *termp,
+    const struct winsize *winp)
 {
+    gde_debug_print ("openpty: [TODO]\n");
     return -1;
 }
 
 
 /*
-       The forkpty() function combines openpty(), fork(2), and login_tty()
-       to create a new process operating in a pseudoterminal.  The file
-       descriptor of the master side of the pseudoterminal is returned in
-       amaster.  If name is not NULL, the buffer it points to is used to
-       return the filename of the slave.  The termp and winp arguments, if
-       not NULL, will determine the terminal attributes and window size of
-       the slave side of the pseudoterminal. 
+    The forkpty() function combines openpty(), fork(2), and login_tty()
+    to create a new process operating in a pseudoterminal.  The file
+    descriptor of the master side of the pseudoterminal is returned in
+    amaster.  If name is not NULL, the buffer it points to is used to
+    return the filename of the slave.  The termp and winp arguments, if
+    not NULL, will determine the terminal attributes and window size of
+    the slave side of the pseudoterminal. 
  */
-pid_t forkpty(int *amaster, char *name,
-              const struct termios *termp,
-              const struct winsize *winp)
+
+pid_t 
+forkpty (
+    int *amaster, 
+    char *name,
+    const struct termios *termp,
+    const struct winsize *winp)
 {
-	return -1;
+    gde_debug_print ("forkpty: [TODO]\n");
+    return -1;
 }
 
 
-
+//
+// End.
+//
 

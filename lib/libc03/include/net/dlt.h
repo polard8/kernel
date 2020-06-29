@@ -33,11 +33,14 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *      @(#)bpf.h       7.1 (Berkeley) 5/7/91
+ *    @(#)bpf.h       7.1 (Berkeley) 5/7/91
  */
+
 
 #ifndef _NET_DLT_H_
 #define _NET_DLT_H_
+
+
 /*
  * Link-layer header type codes.
  *
@@ -56,10 +59,12 @@
  * for detailed descriptions of some of these link-layer header types.
  */
 
+
 /*
  * These are the types that are the same on all platforms, and that
  * have been defined by <net/bpf.h> for ages.
  */
+ 
 #define DLT_NULL	0	/* BSD loopback encapsulation */
 #define DLT_EN10MB	1	/* Ethernet (10Mb) */
 #define DLT_EN3MB	2	/* Experimental Ethernet (3Mb) */
@@ -120,9 +125,11 @@
  *
  * Don't use 17 for anything else.
  */
+
 #if defined(__OpenBSD__) || defined(__NetBSD__)
 #define DLT_OLD_PFLOG	17
 #endif
+
 
 /*
  * 18 is used for DLT_PFSYNC in OpenBSD, NetBSD, DragonFly BSD and
@@ -386,13 +393,15 @@
  */
 #define DLT_SUNATM		123	/* Solaris+SunATM */
 
+
 /*
  * Reserved as per request from Kent Dahlgren <kent@praesum.com>
  * for private use.
  */
-#define DLT_RIO                 124     /* RapidIO */
-#define DLT_PCI_EXP             125     /* PCI Express */
-#define DLT_AURORA              126     /* Xilinx Aurora link layer */
+#define DLT_RIO        124    /* RapidIO */
+#define DLT_PCI_EXP    125    /* PCI Express */
+#define DLT_AURORA     126    /* Xilinx Aurora link layer */
+
 
 /*
  * Header for 802.11 plus a number of bits of link-layer information
@@ -409,7 +418,9 @@
  * with the packet, e.g. signal strength and channel
  * for 802.11 packets.
  */
-#define DLT_TZSP                128     /* Tazmen Sniffer Protocol */
+ 
+#define DLT_TZSP    128    /* Tazmen Sniffer Protocol */
+
 
 /*
  * BSD's ARCNET headers have the source host, destination host,
@@ -1423,7 +1434,9 @@
  * a member of that class.  A class value of 0 indicates a regular
  * DLT_/LINKTYPE_ value.
  */
-#define DLT_CLASS(x)		((x) & 0x03ff0000)
+#define DLT_CLASS(x)    ((x) & 0x03ff0000)
+
+
 
 /*
  * NetBSD-specific generic "raw" link type.  The class value indicates
@@ -1437,4 +1450,9 @@
 #define	DLT_NETBSD_RAWAF_AF(x)	((x) & 0x0000ffff)
 #define	DLT_IS_NETBSD_RAWAF(x)	(DLT_CLASS(x) == DLT_CLASS_NETBSD_RAWAF)
 
-#endif /* !_NET_DLT_H_ */
+
+#endif    /* !_NET_DLT_H_ */
+
+
+
+

@@ -6,38 +6,49 @@
 // Tem mais coisa no arquivo if.h See: openbsd.
 
 
+
 #include <sys/cdefs.h>
 
 
 /*
  * Structure used to query names of interface cloners.
  */
+
 struct if_clonereq {
-	int	ifcr_total;		/* total cloners (out) */
-	int	ifcr_count;		/* room for this many in user buffer */
-	char	*ifcr_buffer;		/* buffer for cloner names */
+
+    int    ifcr_total;   /* total cloners (out) */
+    int    ifcr_count;   /* room for this many in user buffer */
+    char  *ifcr_buffer;  /* buffer for cloner names */
 };
 
-#define MCLPOOLS	8		/* number of cluster pools */
+
+#define MCLPOOLS  8  /* number of cluster pools */
+
 
 struct if_rxring {
-	int     rxr_adjusted;
-	u_int	rxr_alive;
-	u_int	rxr_cwm;
-	u_int	rxr_lwm;
-	u_int	rxr_hwm;
+
+    int    rxr_adjusted;
+    u_int  rxr_alive;
+    u_int  rxr_cwm;
+    u_int  rxr_lwm;
+    u_int  rxr_hwm;
 };
 
+
 struct if_rxring_info {
-	char	ifr_name[16];		/* name of the ring */
-	u_int	ifr_size;		/* size of the packets on the ring */
-	struct if_rxring ifr_info;
+
+    char   ifr_name[16];  /* name of the ring */
+    u_int  ifr_size;      /* size of the packets on the ring */
+    
+    struct if_rxring ifr_info;
 };
+
 
 /* Structure used in SIOCGIFRXR request. */
 struct if_rxrinfo {
-	u_int	ifri_total;
-	struct if_rxring_info *ifri_entries;
+
+    u_int  ifri_total;
+    struct if_rxring_info *ifri_entries;
 };
 
 
@@ -45,12 +56,15 @@ struct if_rxrinfo {
  * Length of interface external name, including terminating '\0'.
  * Note: this is the same size as a generic device's external name.
  */
-#define	IF_NAMESIZE	16
+#define  IF_NAMESIZE    16
+
 
 struct if_nameindex {
-	unsigned int	if_index;
-	char		*if_name;
+
+    unsigned int  if_index;
+    char         *if_name;
 };
+
 
 
 /*
@@ -58,6 +72,7 @@ struct if_nameindex {
  * interface.
  */
 struct	if_data {
+
 	/* generic interface information */
 	u_char		ifi_type;		/* ethernet, tokenring, etc. */
 	u_char		ifi_addrlen;		/* media address length */
@@ -318,8 +333,8 @@ struct if_nameindex_msg {
  * interface groups
  */
 
-#define	IFG_ALL		"all"		/* group contains all interfaces */
-#define	IFG_EGRESS	"egress"	/* if(s) default route(s) point to */
+#define IFG_ALL     "all"     /* group contains all interfaces */
+#define IFG_EGRESS  "egress"  /* if(s) default route(s) point to */
 
 struct ifg_req {
 	union {

@@ -1,4 +1,5 @@
 
+// pthread.h
 
 /*
 #define PTHREAD_MUTEX_DEFAULT	0
@@ -25,3 +26,6 @@ typedef void* pthread_rwlockatrr_t;
 typedef void* pthread_spinlock_t;
 typedef void* pthread_condattr_t;
 */
+
+
+

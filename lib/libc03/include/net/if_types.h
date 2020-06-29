@@ -42,18 +42,18 @@
  * <URL:http://www.iana.org/assignments/smi-numbers>
  */
 
-#define	IFT_OTHER	0x1		/* none of the following */
-#define	IFT_1822	0x2		/* old-style arpanet imp */
-#define	IFT_HDH1822	0x3		/* HDH arpanet imp */
-#define	IFT_X25DDN	0x4		/* x25 to imp */
-#define	IFT_X25		0x5		/* PDN X25 interface (RFC877) */
-#define	IFT_ETHER	0x6		/* Ethernet CSMA/CD */
-#define	IFT_ISO88023	0x7		/* CSMA/CD */
-#define	IFT_ISO88024	0x8		/* Token Bus */
-#define	IFT_ISO88025	0x9		/* Token Ring */
-#define	IFT_ISO88026	0xa		/* MAN */
-#define	IFT_STARLAN	0xb
-#define	IFT_P10		0xc		/* Proteon 10MBit ring */
+#define	IFT_OTHER     0x1  /* none of the following */
+#define	IFT_1822      0x2  /* old-style arpanet imp */
+#define	IFT_HDH1822   0x3  /* HDH arpanet imp */
+#define	IFT_X25DDN    0x4  /* x25 to imp */
+#define	IFT_X25       0x5  /* PDN X25 interface (RFC877) */
+#define	IFT_ETHER     0x6  /* Ethernet CSMA/CD */
+#define	IFT_ISO88023  0x7  /* CSMA/CD */
+#define	IFT_ISO88024  0x8  /* Token Bus */
+#define	IFT_ISO88025  0x9  /* Token Ring */
+#define	IFT_ISO88026  0xa  /* MAN */
+#define	IFT_STARLAN   0xb
+#define	IFT_P10       0xc  /* Proteon 10MBit ring */
 #define	IFT_P80		0xd		/* Proteon 80MBit ring */
 #define	IFT_HY		0xe		/* Hyperchannel */
 #define	IFT_FDDI	0xf
@@ -258,14 +258,17 @@
 #define IFT_STF			   0xd7	/* 6to4 interface */
 
 /* not based on IANA assignments - how should we treat these? */
-#define IFT_GIF		0xf0
-#define IFT_PVC		0xf1
-#define IFT_FAITH	0xf2
-#define IFT_PFLOG	0xf5		/* Packet filter logging */
-#define IFT_PFSYNC	0xf6		/* Packet filter state syncing */
-#define IFT_L2TP	0xf7		/* L2TPv3 I/F */
-#define IFT_CARP	0xf8		/* Common Address Redundancy Protocol */
-#define IFT_IPSEC	0xf9		/* IPsec I/F */
-#define IFT_MBIM	0xfa		/* Mobile Broadband Interface Model */
+#define IFT_GIF     0xf0
+#define IFT_PVC     0xf1
+#define IFT_FAITH   0xf2
+#define IFT_PFLOG   0xf5  /* Packet filter logging */
+#define IFT_PFSYNC  0xf6  /* Packet filter state syncing */
+#define IFT_L2TP    0xf7  /* L2TPv3 I/F */
+#define IFT_CARP    0xf8  /* Common Address Redundancy Protocol */
+#define IFT_IPSEC   0xf9  /* IPsec I/F */
+#define IFT_MBIM    0xfa  /* Mobile Broadband Interface Model */
 
-#endif /* !_NET_IF_TYPES_H_ */
+
+#endif  /* !_NET_IF_TYPES_H_ */
+
+
