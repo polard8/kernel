@@ -101,7 +101,7 @@ int main (int argc, char *argv[]){
 	printf("Testando printf3, printf tradicional \n");	
 	TEST_PRINTF3();	 	
 	
-	printf("DONE.");	
+	printf("DONE.\n");	
 
 	return 0;
 }

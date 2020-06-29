@@ -799,6 +799,12 @@ new_message:
 }
 
 
+//interna
+int __terminal_clone_and_execute ( char *name )
+{
+    return (int) gramado_system_call ( 900, (unsigned long) name, 0, 0 );
+}
+
 
 // Testing new main.
 int main ( int argc, char *argv[] ){
@@ -871,11 +877,49 @@ int main ( int argc, char *argv[] ){
         terminal_hello_response(client_fd);
     //}
 
-    terminal_createwindow_request(client_fd, 40, 40, 320, 280, COLOR_ORANGE);
+    terminal_createwindow_request(client_fd, 100, 100, 480, 320, COLOR_BLACK);
     terminal_createwindow_response(client_fd); 
 
-    //loop
+    // loop
+    // This the loop that gets messages from the window server;
     terminal_loop(client_fd);
+    
+    
+    //
+    // ============== test start =======================
+    //
+    /*
+     
+    // #tet
+    // Let's try another loop;
+    // Let's call the shell and get input from the stdout.
+    
+    //
+    // Calling child
+    //
+    
+    //Precisamos de um loop aqui pra chamar o shell sempre que ele fechar.
+    __terminal_clone_and_execute ("true.bin"); 
+    
+    // talvez precisamos esperar ...
+    int c;
+    while(1)
+    {
+        //testing stdin
+        //fprintf(stdin,"terminal: Testing string ...\n");
+
+        // arquivo que o filho vai herdar.
+        //c = fgetc(stdout); 
+        //if( c != EOF){
+        //    printf ("[%c]",c);
+        //    fflush(stdout);
+        //}
+    }
+    
+    */
+    //
+    // ============== test end =======================
+    //
 
     debug_print ("terminal: bye\n"); 
     printf ("terminal: bye\n");

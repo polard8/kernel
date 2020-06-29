@@ -468,6 +468,10 @@ void tty_test (void){
 
     // link by pid
     // #todo: Create the function link_by_pid()
+    // Obs: Os sistemas costumam criar um tty e 'linkar'
+    // quando chamam fork, pois fork faz o filho herdar os 
+    // arquivos abertos.
+    
     gramado_system_call ( 267,
         getpid(),    // master (shell?)
         getppid(),   // slave pai (terminal? init?)
@@ -495,11 +499,29 @@ void tty_test (void){
     ____tty_id = gramado_system_call ( 266, getppid(), 0, 0 );
     printf ("The tty for the father is %d\n", ____tty_id);
 
-    //Lendo no tty do terminal
-    //Cuidado. Podemos simplesmente estar lendo o que nos mesmos
-    //colocamos antes no buffer aqui.
+    //Lendo no tty do pai
     read_ttyList ( ____tty_id, __rbuf2, 32 );     
     printf (__rbuf2);
+}
+
+
+//void xxx_tty_test(void);
+void xxx_tty_test(void)
+{
+    int ____this_tty_id = -1;
+    char buf[128]; 
+    
+    gde_clone_and_execute("true.bin");
+    
+    ____this_tty_id = gramado_system_call ( 266, getpid(), 0, 0 );
+    printf ("The tty for this process is %d\n", ____this_tty_id);
+
+    while(1)
+    {
+        read_ttyList ( ____this_tty_id, buf, 32 );     
+        printf (buf);
+        fflush(stdout);
+    }
 }
 
 
@@ -2945,6 +2967,14 @@ do_compare:
         tty_test();
         goto exit_cmp;
     }
+
+    // tty2
+    if ( gramado_strncmp ( prompt, "tty2", 4 ) == 0 ){
+        xxx_tty_test();
+        goto exit_cmp;
+    }
+
+
 
 
 	// tasklist - Lista informa��es sobre os processos.
