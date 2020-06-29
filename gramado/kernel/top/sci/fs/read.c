@@ -772,7 +772,7 @@ void fs_load_fat(void){
 // Aqui estamos falando de uma sequência de setores.
 // Isso serve para carregar o diretório raiz em fat16.
 
-void 
+int
 load_directory ( 
     unsigned long address, 
     unsigned long lba, 
@@ -788,7 +788,10 @@ load_directory (
         my_read_hd_sector ( address + b, lba + i, 0, 0 );
         b = (b +512);    
     };
+    
+    return 0;
 }
+
 
 
 /*
@@ -818,9 +821,20 @@ void fs_load_rootdir (void)
  * dado o índice da lista de streams do kernel.
  */
  
-void fs_load_dir ( unsigned long id )
+int 
+fs_load_dir ( 
+    unsigned long address, 
+    unsigned long lba, 
+    unsigned long sectors )
 {
-    debug_print ("fs_load_dir:[TODO]\n");
+    debug_print ("fs_load_dir:[Testing]\n");
+    
+    // #todo:
+    // Limits
+    
+    load_directory ( address, lba, sectors );
+    
+    return 0;
 }
 
 

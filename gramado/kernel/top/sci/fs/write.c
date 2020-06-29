@@ -722,9 +722,47 @@ int fs_save_fat (void){
  *     Salva um diretório.
  */
 
-void fs_save_dir (unsigned long id)
+int
+fs_save_dir ( 
+    char *file_name, 
+    unsigned long file_size,
+    unsigned long size_in_bytes,
+    char *file_address,
+    char flag )  
 {
-	//return;
+
+    debug_print ("fs_save_dir: [TODO]\n");
+    return -1;
+    
+    // #todo
+    // Usar a função que salva arquivo.
+    // Nunca testado.
+    
+    /*
+    return (int) fsSaveFile ( (char *) file_name,    
+                    (unsigned long) file_size,       
+                    (unsigned long) size_in_bytes,  
+                    (char *) file_address,          
+                    (char) flag );  
+    */
+}
+
+
+int
+fs_save_file ( 
+    char *file_name, 
+    unsigned long file_size,
+    unsigned long size_in_bytes,
+    char *file_address,
+    char flag )  
+{
+
+    debug_print ("fs_save_file: [Testing]\n");
+    return (int) fsSaveFile ( (char *) file_name,    
+                    (unsigned long) file_size,       
+                    (unsigned long) size_in_bytes,  
+                    (char *) file_address,          
+                    (char) flag );                  
 }
 
 

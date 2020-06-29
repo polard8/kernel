@@ -523,11 +523,13 @@ void fs_save_entry_on_root(unsigned long eid);
 // Carrega o diretório na memória, dados o endereço, 
 // o lba inicial e o número de setores.
 
-void 
+int
 load_directory ( 
     unsigned long address, 
     unsigned long lba, 
     unsigned long sectors );
+
+
 
 //
 // Read
@@ -602,9 +604,32 @@ void fs_show_dir(unsigned long id);
 
 void fs_set_entry(unsigned long id, unsigned long eid);
 void fs_get_entry(unsigned long id, unsigned long eid);
-void fs_load_dir(unsigned long id);
-void fs_save_dir(unsigned long id);
 
+
+
+int 
+fs_load_dir ( 
+    unsigned long address, 
+    unsigned long lba, 
+    unsigned long sectors );
+
+
+
+int
+fs_save_dir ( 
+    char *file_name, 
+    unsigned long file_size,
+    unsigned long size_in_bytes,
+    char *file_address,
+    char flag );  
+
+int
+fs_save_file ( 
+    char *file_name, 
+    unsigned long file_size,
+    unsigned long size_in_bytes,
+    char *file_address,
+    char flag );  
 
 void 
 fs_set_entry_status ( 

@@ -21,6 +21,26 @@
 #include <kernel.h>
 
 
+/*
+//#todo
+//Credits: Sirius OS.
+unsigned char fs_CheckSum83 (unsigned char *pFcbName);
+unsigned char fs_CheckSum83 (unsigned char *pFcbName)
+{
+	short FcbNameLen;
+	unsigned char Sum;
+	Sum = 0;
+
+	for (FcbNameLen=11; FcbNameLen!=0; FcbNameLen--) {
+		// NOTE: The operation is an unsigned char rotate right
+		Sum = ((Sum & 1) ? 0x80 : 0) + (Sum >> 1) + *pFcbName++;
+	}
+
+	return (Sum);
+}
+*/
+
+
 // Get free slot.
 int fs_get_mounted_free_slot (void)
 {
