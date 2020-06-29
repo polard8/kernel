@@ -964,21 +964,27 @@ int socket_connection_waiting_for_validation (struct socket_d *mysock, struct so
 */
 
 
-// Socket ioctl
+int socket_ioctl ( int fd, unsigned long request, char *arg ){
+
+    debug_print ("socket_ioctl: TODO\n");
+    return -1;
+}
+
+// socket_dialog
 // Serviços de soquetes da klibc
 // #todo: rever os números.
 // #todo: devemos mudar os argumentos 
 // para ficar no padrão da libc.
 // OUT: ?
 unsigned long 
-socket_ioctl ( 
+socket_dialog ( 
     unsigned long number, 
     unsigned long arg2, 
     unsigned long arg3, 
     unsigned long arg4 )
 {
 
-    printf ("socket_ioctl: number=%d \n", number);
+    printf ("socket_dialog: number=%d \n", number);
 
     if ( number < 7000 || number >= 8000 )
         return 0;
@@ -992,7 +998,7 @@ socket_ioctl (
 		//family, type, protocol
 		//vai retornar o descritor de uma stream.	
         case 7000:
-            debug_print ("socket_ioctl: 7000. sys_socket\n");
+            debug_print ("socket_dialog: 7000. sys_socket\n");
             return (unsigned long) sys_socket ( (int) arg2, 
                                        (int) arg3, (int) arg4 );
             break;
@@ -1005,8 +1011,8 @@ socket_ioctl (
 		//...
 			
         default:
-            debug_print ("socket_ioctl: default\n");
-            printf ("socket_ioctl: Default\n");
+            debug_print ("socket_dialog: default\n");
+            printf ("socket_dialog: Default\n");
             refresh_screen();
             break;
     };

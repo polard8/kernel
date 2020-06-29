@@ -8,6 +8,17 @@
 #include <kernel.h>
 
 
+int 
+vt_ioctl ( 
+    int fd, 
+    unsigned long request, 
+    char *arg )
+{
+    debug_print ("console_ioctl: TODO\n");
+    //switch(request){}
+    return -1;
+}
+
 
 /*
  ***************************************

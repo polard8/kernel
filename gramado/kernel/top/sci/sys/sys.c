@@ -133,22 +133,41 @@ int sys_ioctl ( int fd, unsigned long request, char *arg ){
     
     switch(f->____object)
     {
-        case ObjectTypeDevice:  //não usar isso.
+        // tty object
+        case ObjectTypeTTY: 
+            return (int) tty_ioctl ( (int) fd, 
+                            (unsigned long) request, 
+                            (char *) arg );
+            break;
+        
+        // socket object
+        case ObjectTypeSocket:
+            return (int) socket_ioctl ( (int) fd, 
+                            (unsigned long) request, 
+                            (char *) arg );
             break;
             
-        //case tty device:
-            //tty_ioctl(...)
+        // Console object    
+        case ObjectTypeVirtualConsole: 
+            return (int) console_ioctl ( (int) fd, 
+                            (unsigned long) request, 
+                            (char *) arg );
+            break; 
             
-            
-        //case console 
-            //console_ioctl(...)
-            
+
+        // Virtual Terminal object    
+        case ObjectTypeTerminal: 
+            return (int) vt_ioctl ( (int) fd, 
+                            (unsigned long) request, 
+                            (char *) arg );
+            break; 
+
         //...    
             
         default:
+            debug_print ("sys_ioctl: default object\n");
             break;
     }
-
 
     //fail
     debug_print ("sys_ioctl: fail\n");

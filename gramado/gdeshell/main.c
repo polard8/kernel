@@ -2975,6 +2975,12 @@ do_compare:
     }
 
 
+    // tty3
+    if ( gramado_strncmp ( prompt, "tty3", 4 ) == 0 ){
+        if ( isatty(fileno(stdout)) == 0 )
+            printf ("0\n");
+        goto exit_cmp;
+    }
 
 
 	// tasklist - Lista informa��es sobre os processos.

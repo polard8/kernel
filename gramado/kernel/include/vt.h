@@ -44,6 +44,11 @@ struct vt_d
 unsigned long vtList[32];
 
 
+int 
+vt_ioctl ( 
+    int fd, 
+    unsigned long request, 
+    char *arg );
 
 void _vt_outbyte ( int c, struct tty_d *tty );
 void vt_outbyte ( int c, struct tty_d *tty );

@@ -598,10 +598,12 @@ sock_socketpair (
     int usockvec[2] );
 
 
+int socket_ioctl ( int fd, unsigned long request, char *arg );
+
 // Essa rotina sera' chamada se os serviços 
 // forem superios a 7000 ou inferiores a 8000
 unsigned long 
-socket_ioctl ( 
+socket_dialog ( 
     unsigned long number, 
     unsigned long arg2, 
     unsigned long arg3, 
