@@ -109,11 +109,12 @@ void write_fntos (char *name){
 
 
 void 
-fatWriteCluster ( unsigned long sector, 
-                  unsigned long address, 
-                  unsigned long spc )
+fatWriteCluster ( 
+    unsigned long sector, 
+    unsigned long address, 
+    unsigned long spc )
 {
-    unsigned long i;
+    unsigned long i=0;
 
 	//Começa do primeiro setor do cluster.
 
@@ -142,7 +143,7 @@ fatWriteCluster ( unsigned long sector,
 void write_lba ( unsigned long address, unsigned long lba ){
 
 	// #todo: 
-	// Check limits.
+	// Check lba limits.
 
     if (address == 0){
         debug_print ("write_lba: limits\n");

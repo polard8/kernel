@@ -70,15 +70,19 @@ void fs_show_mounted_list(void)
 }
 
 
+// Pega um fs na lista de arquivos do processo, dado o PID.
 // Na lista de arquivos do processo.
 int fs_get_free_fd ( int pid )
 {
     struct process_d *p;
-    int __slot;
+    int __slot=0;
 
 
-    //if (pid<0 || pid >= max????)
+    //#todo max
+    if ( pid<0 ){
+        debug_print ("fs_get_free_fd: pid\n");
         //return -1;
+    }
 
     //
     // Process.
@@ -86,22 +90,25 @@ int fs_get_free_fd ( int pid )
   
     p = (struct process_d *) processList[pid];
 
-    if ( (void *) p == NULL )
+    if ( (void *) p == NULL ){
+        debug_print ("fs_get_free_fd: p\n");
         return -1;
+    }
 
-    if ( p->used != 1 || p->magic != 1234 )
+    if ( p->used != 1 || p->magic != 1234 ){
+        debug_print ("fs_get_free_fd: p validation\n");
         return -1;
+    }
         
         
     // Pick a free one.
     for (__slot=0; __slot<32; __slot++)
     {
-         if ( p->Objects[__slot] == 0 ){
-             return (int) __slot;
-         }
+         if ( p->Objects[__slot] == 0 ){ return (int) __slot; }
     };
  
-     return -1;
+ 
+    return -1;
 }
 
 
@@ -231,6 +238,7 @@ fsListFiles (
     if ( disk_id == -1 || volume_id == -1 || directory_id == -1 )
     {
         //#debug
+        //todo: message.
         goto fail;
     }
 
@@ -274,7 +282,8 @@ int fsList ( const char *dir_name ){
 
 
     // dir name.
-    if ( (void *) dir_name == NULL ){
+    if ( (void *) dir_name == NULL )
+    {
         debug_print ("fsList: dir_name fail\n");
         
         // usar o atual.
@@ -325,23 +334,26 @@ int fsList ( const char *dir_name ){
  */
  
 void 
-fsFAT16ListFiles ( const char *dir_name, 
-                   unsigned short *dir_address, 
-                   int number_of_entries )
+fsFAT16ListFiles ( 
+    const char *dir_name, 
+    unsigned short *dir_address, 
+    int number_of_entries )
 {
 	// #todo: 
 	// O n�mero de entradas � maior no diret�rio raiz.(512 ?)
 
-    int i = 0;
+    int i=0;
+    unsigned long j=0;  // Deslocamento
+    
     int max = number_of_entries;         // N�mero m�ximo de entradas.
-
-    unsigned long j = 0;  // Deslocamento
 
     unsigned short *DirBaseAddress = (unsigned short *) dir_address;
 
 
 
-    if ( number_of_entries <= 0 ){
+    if ( number_of_entries <= 0 )
+    {
+        //message
         return;
     }
 
@@ -385,6 +397,7 @@ void *get_file (int Index){
 	//@todo: max.
 
     if (Index < 0){
+        // ?? todo: message
         return NULL;
     }
 
@@ -399,8 +412,8 @@ void *get_file (int Index){
 
 void set_file ( void *file, int Index ){
 
-    if (Index < 0)
-    {
+    if (Index < 0){
+        // ?? todo: message
         return;
     }
 
@@ -411,6 +424,7 @@ void set_file ( void *file, int Index ){
 
     if ( (void *) file == NULL )
     {
+        // ?? todo: message
         return;
     }
 
@@ -706,8 +720,8 @@ void set_filesystem_type (int type)
 //Credits: Sirius OS.
 unsigned long path_count (unsigned char *path)
 {
-    unsigned long val = 0;
-    int i;
+    int i=0;
+    unsigned long val=0;
     int max = (80*25);
 
 
@@ -1026,7 +1040,7 @@ void fs_init_fat (void){
 
 void fs_init_structures (void){
 
-    int Type = 0;
+    int Type=0;
 
     //
     // The root file system.
@@ -1130,6 +1144,10 @@ void fs_show_root_fs_info(void)
     printf ("\n");
     printf ("fs_show_root_fs_info:\n");
 
+    //
+    // root structure.
+    //
+
     if ( (void *) root == NULL ){
         printf ("No root structure\n");
         goto fail;
@@ -1187,7 +1205,7 @@ int fsInit (void){
 	// Configura o n�mero de setores por cluster.
 	// Nesse caso, s�o (512 bytes por setor, um setor por cluster).
 
-    set_spc (1);
+    set_spc(1);
 
 
 	// ## initialize currents ##
@@ -2149,8 +2167,11 @@ int fs_create_empty_file ( char *file_name, int type ){
     
     f = (file *) kmalloc( sizeof(size_in_bytes) );
     
-    if( (void*) f == NULL )
+    if ( (void *) f == NULL ){
+        //todo: message
         return -1;
+    }
+        
         
     //f->type = type;
     // #todo: fd ...
@@ -2188,18 +2209,23 @@ int sys_create_empty_file ( char *file_name )
 
 int fs_create_empty_directory ( char *dir_name, int type )
 {
+    int __ret=0;
+
     file *f;
 
     char buffer[512];
     int number_of_sectors = 1;
     int size_in_bytes = 512;  
-    int __ret;
-    
+
+
     f = (file *) kmalloc( sizeof(size_in_bytes) );
     
-    if( (void*) f == NULL )
+    if ( (void *) f == NULL ){
+        //todo: message
         return -1;
-        
+    }
+   
+   
     //f->type = type;
     // #todo: fd ...
     
@@ -2211,18 +2237,19 @@ int fs_create_empty_directory ( char *dir_name, int type )
 
 
 
-    return __ret;
+    return (int) __ret;
 }
 
 
 
 int sys_create_empty_directory ( char *dir_name )
 {
+    int __ret=0;
     char buffer[512];
     int number_of_sectors = 1;
     int size_in_bytes = 512;  
-    int __ret;
     
+ 
     __ret = (int) fsSaveFile ( (char *) dir_name,    
                     (unsigned long) number_of_sectors,       
                     (unsigned long) size_in_bytes,  
@@ -2231,10 +2258,8 @@ int sys_create_empty_directory ( char *dir_name )
 
 
 
-    return __ret;
+    return (int) __ret;
 }
-
-
 
 
 

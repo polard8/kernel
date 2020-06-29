@@ -190,6 +190,9 @@ fatLoadCluster (
 void read_lba ( unsigned long address, unsigned long lba ){
 
 
+    // #todo
+    // Fazer algum filtro de argumentos ??
+
     // See: volume.h
     switch (g_currentvolume_fatbits){
 
@@ -320,9 +323,9 @@ fsLoadFile (
     unsigned long file_address )
 {
 
-    int Status;
+    int i=0;
+    int Status;  //??
 
-    int i = 0;
     int SavedDirEntry = 0;
     unsigned short next;
 
@@ -862,10 +865,11 @@ fs_load_dir (
 
 unsigned long fsGetFileSize ( unsigned char *file_name ){
 
-    unsigned long FileSize = 0;
+    unsigned long FileSize=0;
+    int i=0;
+    
+    int Status;   //??
 
-    int Status;
-    int i;
     unsigned short next;
 
     unsigned long max = 64;    //?? @todo: rever. Número máximo de entradas.
@@ -989,7 +993,7 @@ unsigned long fsGetFileSize ( unsigned char *file_name ){
 	//ATENÇÃO:
     //Na verdade a variável 'root' é do tipo short.	 
 
-    i = 0; 
+    i=0; 
 
 	// Procura o arquivo no diretório raiz.
 	

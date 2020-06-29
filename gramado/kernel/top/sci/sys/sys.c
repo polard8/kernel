@@ -20,9 +20,12 @@
 int sys_uname (struct utsname *ubuf){
 
 
-    if ( (void *) ubuf == NULL )
+    if ( (void *) ubuf == NULL ){
+        //#todo: message.
         return -1;
-    
+    }
+
+
     memcpy ( (void *)  ubuf->sysname, 
         (const void *) OS_NAME, 
         sizeof(OS_NAME) );    
@@ -53,6 +56,8 @@ int sys_uname (struct utsname *ubuf){
 // See: sm/debug/debug.c
 int sys_serial_debug_printk ( char *s )
 {
+    
+    //#todo
     //if ( (void *) s == NULL )
         //return -1;
         
@@ -204,9 +209,13 @@ int sys_fcntl ( int fd, int cmd, ... ){
 int sys_open (const char *pathname, int flags, mode_t mode ){
 
     struct process_d *p;
+    
     int __Status = -1;
     int Size = -1;
     
+    
+    // #todo
+    // Checar validade dos argumentos.
 
     // #steps
     // Change to uppercase.
@@ -817,9 +826,8 @@ int sys_write (unsigned int fd,char *ubuf,int count){
         goto fail;
     }
 
-        
-     
-    // todo: Check validation for the memoru region.    
+   
+    // todo: Check validation for the memory region.    
     if ( (char *) ubuf == (char *) 0 ){
         debug_print ("sys_write: invalid ubuf address\n");
         goto fail;
@@ -1304,8 +1312,10 @@ int sys_fork (void){
 
 void sys_exit_process ( int pid, int code ){
 	
-    if ( pid < 0 )
+    if ( pid < 0 ){
+        //todo: message
         return;
+    }
 
     exit_process ( pid, code );
 }
@@ -1347,9 +1357,11 @@ sys_create_thread (
 
     if ( (void *) t == NULL )
     {
+        //#todo
         //debug_print ("sys_create_thread: create_thread fail\n");
         return NULL;
     }
+
 
     SelectForExecution ( (struct thread_d *) t );
 
@@ -1361,8 +1373,10 @@ sys_create_thread (
 //exit thread.
 void sys_exit_thread (int tid){
 
-    if ( tid < 0 )
+    if ( tid < 0 ){
+        //todo: message
         return;
+    }
 
     exit_thread (tid);
 }
@@ -1441,7 +1455,11 @@ void sys_shutdown (void){
 // 178
 unsigned long sys_get_file_size ( char *path ){
 
-    unsigned long __size = 0;
+    unsigned long __size=0;
+    
+    //#todo
+    // Checar a validade do ponteiro de string
+    // passado via argumento.
     
     taskswitch_lock ();
     scheduler_lock ();
@@ -1459,8 +1477,11 @@ unsigned long sys_get_file_size ( char *path ){
 // Usada para debug.
 void sys_show_system_info ( int n ){
 
-    if (n<0)
+    if (n<0){
+        //todo: message
         return;
+    }
+
 
     switch (n)
     {
