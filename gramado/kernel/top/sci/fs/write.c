@@ -590,130 +590,19 @@ fail:
 done:
 
     // #debug
-    printf ("fsSaveFile: clusters saved\n");
+    debug_print ("fsSaveFile: clusters saved\n");
     
     
-    //
-    // Saving root into the disk
-    //
+    // #test
+    // Saving rood dir and FAT.
+    // OK. Funcionou no qemu.
     
-    // #obs:
-    // Não precisamos fazer isso o tempo todo.
-    // Podemos apenas sinalizar que a sincronização está pendente.
-    
-    printf ("Saving root..\n");
-    refresh_screen ();
+    fs_save_rootdir();
+    fs_save_fat();
 
+    printf ("fsSaveFile: done\n");
+    refresh_screen();
 
-    int r;
-    int roff = 0;
-    int rlbaoff = 0;
-
-	//int ticks = 1000;
-
-
-	// #bugbug: 
-	// Precisamos saber o tamanho do root ... 
-	// Precismos de estrututra de root
-
-
-    for ( r=0; r<32; r++ )
-    {
-        //reset_ide0 ();
-        
-        //printf("write_lba n={%d} \n",r); 
-        //refresh_screen();
-
-		//Wait interrupt!
-		//Isso funcionou.
-		disk_ata_wait_irq ();
-
-		// #bugbug: Não podemos determinar os valores. 
-		// Precisamos de estruturas.
-
-        my_write_hd_sector ( (unsigned long) VOLUME1_ROOTDIR_ADDRESS + roff, 
-            (unsigned long) ( VOLUME1_ROOTDIR_LBA + rlbaoff ), 0, 0  );
-
-        roff = (roff + 0x200);
-        rlbaoff = (rlbaoff + 1);
-
-	    //#bugbug
-		//?? Estamos esperando antes de gravarmos o próximo.
-		//wait irq
-    };
-
-    //reset_ide0 ();
-    //write_lba ( VOLUME1_ROOTDIR_ADDRESS, VOLUME1_ROOTDIR_LBA);
-
-	//reset_ide0 ();
-	//write_lba ( VOLUME1_ROOTDIR_ADDRESS + 0x200, VOLUME1_ROOTDIR_LBA + 1);
-    //write_lba( VOLUME1_ROOTDIR_ADDRESS + 0x400, VOLUME1_ROOTDIR_LBA + 2);
-    //write_lba( VOLUME1_ROOTDIR_ADDRESS + 0x600, VOLUME1_ROOTDIR_LBA + 3);
-
-	//........
-
-    //printf("write_lba\n");      
-    //refresh_screen();
-    
-    
-    //
-    // Saving fat into the disk
-    //
-    
-    // #obs:
-    // Não precisamos fazer isso o tempo todo.
-    // Podemos apenas sinalizar que a sincronização está pendente.
-    
-    
-
-    //#bugbug: Devemos salvar ela toda.	
-    //salva 4 setores da fat!       
-
-    printf ("Saving fat..\n");
-    refresh_screen ();
-
-    int f;
-    int off = 0;
-    int lbaoff = 0;
-
-
-	// #bugbug: 
-	// Precisamos saber o tamanho da fat ... 
-	// Precismos de estrututra de fat
-
-
-	//#obs: 
-	// Estamos salvando 32 setores da FAT,
-	// mas FAT na verdade tem 246 setores.
-	// #test: Vamos salvar todos os setores da FAT como teste.
-
-
-    for ( f=0; f<246; f++ )
-    {
-       //#bugbug:
-       //pelo jeito a rotina de salvamento precisa de 
-       //de um wait ... um sleep  ... eu checar a interrupção. 
- 
-       //printf("write_lba n={%d} \n",f);  
-       //refresh_screen();
-
-        disk_ata_wait_irq ();
-
-        //write_lba ( VOLUME1_FAT_ADDRESS + off, 
-        //            VOLUME1_FAT_LBA     + lbaoff );
-
-        my_write_hd_sector ( (unsigned long) VOLUME1_FAT_ADDRESS + off, 
-            (unsigned long) ( VOLUME1_FAT_LBA + lbaoff ), 0, 0  );
-
-        off = (off + 0x200);
-        lbaoff = (lbaoff + 1);
-    };
-
-
-    // #debug
-    debug_print ("fsSaveFile: Done\n");
-    printf ("fsSaveFile: done\n"); 
-    refresh_screen ();
 
     return 0;
 }
@@ -725,10 +614,107 @@ done:
  *     @todo: Identificar parâmetros do sistema de arquivos atual. 
  */
 
-void fs_save_rootdir (void)
-{
-	//return;
+int fs_save_rootdir (void){
+
+    int r=0;
+    int roff=0;
+    int rlbaoff=0;
+
+
+    // #obs:
+    // Não precisamos fazer isso o tempo todo.
+    // Podemos apenas sinalizar que a sincronização está pendente.
+    
+    debug_print ("fs_save_rootdir:\n");
+    printf ("Saving root..\n");
+    refresh_screen ();
+
+
+
+	// #bugbug: 
+	// Precisamos saber o tamanho do root ... 
+	// Precismos de estrututra de root
+
+
+    for ( r=0; r<32; r++ )
+    {
+        // #debug
+        //printf("write_lba n={%d} \n",r); 
+        //refresh_screen();
+
+        // Wait interrupt. Isso funcionou.
+        // #bugbug
+        // ?? Estamos esperando antes de gravarmos o próximo.
+        // wait irq
+        disk_ata_wait_irq ();
+
+        // #bugbug: 
+        // Não podemos determinar os valores. Precisamos de estruturas.
+
+        my_write_hd_sector ( (unsigned long) ( VOLUME1_ROOTDIR_ADDRESS + roff), 
+            (unsigned long) ( VOLUME1_ROOTDIR_LBA + rlbaoff ), 0, 0  );
+
+        roff = (roff + 0x200);
+        rlbaoff = (rlbaoff + 1);
+        
+        // ?? esperar
+    };
+
+
+    return 0;
 }
+
+
+int fs_save_fat (void){
+
+    int f=0;
+    int off=0;
+    int lbaoff=0;
+
+
+
+    debug_print ("fs_save_fat:\n");
+    printf ("Saving fat..\n");
+    refresh_screen ();
+
+
+
+	// #bugbug: 
+	// Precisamos saber o tamanho da fat ... 
+	// Precismos de estrututra de fat
+	//#obs: 
+	// Estamos salvando 246 setores da FAT,
+
+
+    for ( f=0; f<246; f++ )
+    {
+ 
+       //#debug
+       //printf("write_lba n={%d} \n",f);  
+       //refresh_screen();
+
+        // Esperando antes do próximo.
+        disk_ata_wait_irq ();
+
+
+        my_write_hd_sector ( (unsigned long) ( VOLUME1_FAT_ADDRESS + off), 
+            (unsigned long) ( VOLUME1_FAT_LBA + lbaoff ), 0, 0  );
+
+        off = (off + 0x200);
+        lbaoff = (lbaoff + 1);
+        
+        // esperar ??
+    };
+
+
+    // #debug
+    debug_print ("fs_save_fat: Done\n");
+    printf ("fs_save_fat: done\n"); 
+    refresh_screen ();
+
+    return 0;
+}
+
 
 
 /*

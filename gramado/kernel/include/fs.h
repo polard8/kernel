@@ -513,7 +513,10 @@ void fs_test_fat_vector (void);
 
 // root dir support
 void fs_load_rootdir (void);
-void fs_save_rootdir (void);
+
+int fs_save_rootdir (void);
+int fs_save_fat (void);
+
 void fs_save_entry_on_root(unsigned long eid);
 
 

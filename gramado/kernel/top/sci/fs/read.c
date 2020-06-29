@@ -306,7 +306,8 @@ const char *break_path (const char *pathname, char *filename)
 // Ou fs_Fat16_SFN_LoadFile()
 
 
-// IN: ??
+
+// IN: ?? #todo: Descrever os argumentos de entrada.
 // OUT: 
 //    1=fail 
 //    0=ok.
@@ -717,6 +718,10 @@ fail:
  * ela já está carregada, então não precisamos carregar novamente.
  */
 
+// #todo
+// Precisamos de uma estrutura com as informações sobre
+// a FAT atual.
+
 void fs_load_fat(void){
 
     unsigned long i=0;
@@ -791,8 +796,14 @@ load_directory (
  * fs_load_rootdir:
  * 
  */
+
 // Carrega o diretório raiz.
 // address, lba, number of sectors.
+
+// #todo
+// Precisamos de uma estrutura com as informações sobre
+// o diretório raiz atual.
+
 void fs_load_rootdir (void)
 {
     debug_print ("fs_load_rootdir:\n");
