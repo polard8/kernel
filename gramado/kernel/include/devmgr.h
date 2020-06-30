@@ -28,40 +28,33 @@
 #define ____DEVMGR_H
 
 
- 
-//
-// @todo: 
-//     Trocar para device. 
-//
-
-//#todo: deletar esse typedef
-//typedef struct device_d devices_t;
-
+// Device structure.
 struct device_d 
 {
-	object_type_t objectType;
-	object_class_t objectClass;
-	
-	//
-    // @todo
-	//
-	
-	int deviceId;
+    object_type_t objectType;
+    object_class_t objectClass;
 
-	int deviceUsed;
-	int deviceMagic;
-	
-	FILE *stream;
 
+    int deviceId;
+
+    int deviceUsed;
+    int deviceMagic;
+
+    file *__file;  //??
+
+    // #importante
+    // Isso deve ser um pathname 
+    // do mesmo tipo usado no sistema de arquivos.
     char *name;
+
 
     // char, block, network
     int __class;
 
-    //pci, legacy ...
+    // pci, legacy ...
     int type;
     
-    // se o tipo for pci.
+    // Se o tipo for pci.
     struct pci_device_d *pci_device;
     
     // se o dispositivo for do tipo legado,
@@ -73,31 +66,37 @@ struct device_d
     //estruturas para outros grupos de dispositivos.
 
     //?? why light - suspenso.
-	//Se o dispositivo petence ao grupo dos prioritários.
+    //Se o dispositivo petence ao grupo dos prioritários.
     //int Light;
-	
-	
-	//Fila de dispositivos que está esperando
-	//por esse dispositivo.
-	//Na verdade podemos usar uma lista linkada ou outro recurso.
-	//de gerenciamento.
-	//int pid;
-	//unsigned long queue[8];
-	//struct process_d *list;
 
 
+    //Fila de dispositivos que está esperando
+    //por esse dispositivo.
+    //Na verdade podemos usar uma lista linkada ou outro recurso.
+    //de gerenciamento.
+    //int pid;
+    //unsigned long queue[8];
+    //struct process_d *list;
+
+
+    // Driver.
+    // ?? Talvez pudesse ser 'device driver' e não 'tty driver'
+    // mas está bom assim.
     struct ttydrv_d *ttydrv;
 
-	//struct device_d *next;
-	
 	//
 	// Continua ...
 	//
-	
+
+    // maybe not.
+    //struct device_d *next;
 };
-struct device_d *devices;
-//struct device_d *CurrentDevice;
+
+struct device_d *devices;  //?? What
+// struct device_d *CurrentDevice;
 //...
+
+
 
 
 // #todo: 
@@ -110,29 +109,41 @@ struct device_d *devices;
 // Se o arquivo for um dispositivo então teremos
 // um ponteiro na lista deviceList.
 
+//
+// The list.
+//
+
 unsigned long deviceList[NUMBER_OF_FILES];    
+
 
 
 //
 // Protótipo de funções.
 //
 
+
 int devmgr_init_device_list(void);
+
 struct device_d *devmgr_device_object (void);
 
-int 
-devmgr_register_device ( FILE *stream, 
-                         char *name,
-                         int class, 
-                         int type,
-                         struct pci_device_d *pci_device,
-                         struct ttydrv_d *tty_driver );
 
+int 
+devmgr_register_device ( 
+    file *f, 
+    char *name,
+    int class,     // #bugbug Mudar esse nome de argumento.
+    int type,
+    struct pci_device_d *pci_device,
+    struct ttydrv_d *tty_driver );
+
+
+void devmgr_show_device_list(void);
 
 void init_device_manager (void);
 
 
 #endif    
+
 
 //
 // End.

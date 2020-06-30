@@ -276,40 +276,10 @@ void *systemLinkDriver( unsigned long arg1,
  *     melhor que seja a ordem alfabética.
  */
 
-void systemShowDevicesInfo (void){
-
-    // tmp device.
-    struct device_d *d;
-
-    int i;
-
-
-#ifdef KERNEL_VERBOSE
-	printf ("sm-systemShowDevicesInfo:\n");
-#endif
-
-    for (i=0; i<NUMBER_OF_FILES; i++)
-    {
-        d = ( struct device_d *) deviceList[i];
-
-        if ( (void *) d != NULL )
-        {
-			//dispositivo válido.
-            if ( d->deviceUsed == 1 && 
-                 d->deviceMagic == 1234 )
-            {
-				//#todo: more ...
-                printf ( "id=%d class=%d type=%d name=%s \n", 
-                    d->deviceId, d->__class, d->type, d->name );
-            }
-            
-            //printf (".");
-        }
-    };
-
-
-    printf ("Done\n");
-	refresh_screen();
+void systemShowDevicesInfo (void)
+{
+    // See: devmgr.c
+    devmgr_show_device_list();
 }
 
 
@@ -321,49 +291,53 @@ void systemShowDevicesInfo (void){
  */
 
 void systemSetupVersion (void){
-	
-	//Version.
+
+    // Version.
     Version = (void *) kmalloc( sizeof(struct version_d) );
-    
-	if ( (void *) Version == NULL )
-	{
+
         //#todo:
         //Isso deve ser considerado um erro fatal,
         //pois existem aplicações que dependem da versão do sistema 
         //para funcionarem corretamente.. 		
-	    panic("sm-system-systemSetupVersion: Version");
-          
-	} else {
-		
+
+    if ( (void *) Version == NULL ){
+        panic("systemSetupVersion: Version");
+
+    } else {
+
         Version->Major = SYSTEM_VERSION_MAJOR;
-		Version->Minor = SYSTEM_VERSION_MINOR;
-		Version->Revision = SYSTEM_VERSION_REVISION;
-		
-	};
-	
-	//VersionInfo.
+        Version->Minor = SYSTEM_VERSION_MINOR;
+        Version->Revision = SYSTEM_VERSION_REVISION;
+    };
+
+    // VersionInfo.
     VersionInfo = (void *) kmalloc ( sizeof(struct version_info_d) );
-	
-    if ( (void*) VersionInfo == NULL )
-	{	
+
         //#todo:
         //Isso deve ser considerado um erro fatal,
         //pois existem aplicações que dependem da versão do sistema 
-        //para funcionarem corretamente.. 	
-	    panic ("sm-system-systemSetupVersion: VersionInfo");
-		
-	}else{
-		
-		if ( (void *) Version != NULL  ){
-			
+        //para funcionarem corretamente.. 
+
+    if ( (void *) VersionInfo == NULL ){
+        panic ("sm-system-systemSetupVersion: VersionInfo");
+
+    }else{
+
+        // #todo
+        if ( (void *) Version != NULL  )
+        {
+
             //VersionInfo->version = (void *) Version;
             //...VersionInfo->string = (char*) ...;
             //... 			
         };
 		//...
-	};
-	
-	
+    };
+
+    //
+    // System
+    //
+
 	//
 	// Colocando na estrutura System se ela for válida.
 	//

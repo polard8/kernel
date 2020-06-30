@@ -1,6 +1,7 @@
 /*
- * File: devmgr/devmgr.c 
+ * File: bottom/devmgr.c 
  *
+ * 
  * Descrição: 
  *     Arquivo principal do device manager. 
  *     Device manager do kernel. 
@@ -9,6 +10,14 @@
  *
  * 2015 - Created by Fred Nora.
  */
+
+
+// #importante
+// Usado para gerenciar a tabela de montagem.
+// O nome do dispositivo é um pathname usado pelo
+// sistema de arquivos.
+// See: Olhar a estrutura de dispositivo 
+// e o elemento 'name'.
  
  
 #include <kernel.h>
@@ -59,13 +68,14 @@ typedef enum {
 
 
 
+// Initialize the list.
+int devmgr_init_device_list(void){
 
-int devmgr_init_device_list(void)
-{
-    int i;
+    int i=0;
 
-    for (i=0; i<NUMBER_OF_FILES; i++)
-    {
+    debug_print ("devmgr_init_device_list: Initializing the mount table. deviceList[].\n");
+
+    for (i=0; i<NUMBER_OF_FILES; i++){
         deviceList[i] = 0; 
     }
 
@@ -96,6 +106,8 @@ struct device_d *do_mount (int dev)
 */
 
 
+
+
 /*
 // Mount root device.
 int mount_root (void);
@@ -106,15 +118,23 @@ int mount_root (void)
 */
 
 
-// OUT: A pointer to a void mounted device.
-struct device_d *devmgr_device_object (void)
-{
+
+// OUT: 
+// A pointer to a void mounted device.
+// Retorna um ponteiro de estrutura do tipo dispositivo.
+
+struct device_d *devmgr_device_object (void){
+
     struct device_d *d;
     
     unsigned long __tmp;
-    int i;
+    int i=0;
     
-    
+    char __noname[] = "no-name";
+
+
+    // Procura um slot vazio.
+
     for (i=0; i<NUMBER_OF_FILES; i++)
     {
          __tmp = deviceList[i];
@@ -125,8 +145,8 @@ struct device_d *devmgr_device_object (void)
              
              d = (struct device_d *) kmalloc ( sizeof (struct device_d) );
              
-             if ( (void *) d == NULL )
-             {
+             // #debug
+             if ( (void *) d == NULL ){
                  panic ("devmgr_device_object: d"); 
              }
 
@@ -135,11 +155,21 @@ struct device_d *devmgr_device_object (void)
              d->deviceUsed = 1;
              d->deviceMagic = 1234;
              
+             // ?? name.
+             
+             d->name = (char *) &__noname[0];
+             //
+             // ...
+             //
+             
+             // Salva.
              deviceList[i] = (unsigned long) d;
              
+             // Done.
              return (struct device_d *) d;
          }
     };
+
 
     // fail
     return NULL;
@@ -151,69 +181,56 @@ struct device_d *devmgr_device_object (void)
 // Possivelmente ampliaremos o número de argumentos no futuro.
 
 int 
-devmgr_register_device ( FILE *stream, 
-                         char *name,
-                         int class, 
-                         int type,
-                         struct pci_device_d *pci_device,
-                         struct ttydrv_d *tty_driver )
+devmgr_register_device ( 
+    file *f, 
+    char *name,
+    int class, 
+    int type,
+    struct pci_device_d *pci_device,
+    struct ttydrv_d *tty_driver )
 {
-	int id;
+
     struct device_d *d;
+    int id= -1;
     
     
-    
-    if ( (void *) stream == NULL )
-    {
-		printf ("devmgr_register_device: stream \n");
-		die ();
-		//return -1;
+    debug_print ("devmgr_register_device:\n");
+
+
+    if ( (void *) f == NULL ){
+        panic ("devmgr_register_device: f \n");
+
     }else{
-		
-		if ( stream->used != 1 || stream->magic != 1234)
-		{
-		    printf ("devmgr_register_device: stream validation \n");
-		    die ();
-			//return -1;
-		}
-	    
-	    if ( stream->isDevice != 1 )
-	    {
-			//printf ("This stream is NOT a device!\n");
-		    printf ("devmgr_register_device: This stream is NOT a device!\n");
-		    die ();
-			//return -1;
-		}
-		
+
+        if ( f->used != 1 || f->magic != 1234){
+            panic("devmgr_register_device: f validation \n");
+        }
+
+        if ( f->isDevice != 1 ){
+            panic ("devmgr_register_device: This file is NOT a device!\n");
+        }
+
         
         d = (struct device_d *) devmgr_device_object ();
         
-        if ( (void *) d == NULL )
-        {
-		    printf ("devmgr_register_device: d\n");
-		    die ();
-			//return -1;
+        if ( (void *) d == NULL ){
+            panic ("devmgr_register_device: d\n");
+
         }else{
-			
-			if ( d->deviceUsed != 1 || d->deviceMagic != 1234 )
-			{
-		        printf ("devmgr_register_device: d validation \n");
-		        die ();				
-				//return -1;
-			}
-			
-			id = d->deviceId;
-            
-            if (id < 0 || id >= NUMBER_OF_FILES )
-            {
-		        printf ("devmgr_register_device: id limits \n");
-		        die ();				
-			    //return -1;
+
+            if ( d->deviceUsed != 1 || d->deviceMagic != 1234 ){
+                panic ("devmgr_register_device: d validation \n");
             }
 
-            stream->deviceId = d->deviceId; 
-			
-			d->stream = (FILE *) stream;
+            id = d->deviceId;
+            
+            if (id < 0 || id >= NUMBER_OF_FILES ){
+                panic ("devmgr_register_device: id limits \n");
+            }
+
+            f->deviceId = d->deviceId; 
+
+			d->__file = (file *) f;
 			d->__class = class;
 			d->type = type;
 			d->name = (char *) name;
@@ -227,16 +244,62 @@ devmgr_register_device ( FILE *stream,
         //...
 	};
 
+
     return 0;
 }
 
 
+// Show device list.
+void devmgr_show_device_list(void)
+{
+    struct device_d *d;
+    int i=0;
+
+
+//#ifdef KERNEL_VERBOSE
+	printf ("\n devmgr_show_device_list: \n");
+//#endif
+
+
+    for (i=0; i<NUMBER_OF_FILES; i++)
+    {
+        d = ( struct device_d *) deviceList[i];
+
+        if ( (void *) d != NULL )
+        {
+            //dispositivo válido.
+            if ( d->deviceUsed == 1 && 
+                 d->deviceMagic == 1234 )
+            {
+                //#todo: more ...
+                printf ( "id=%d class=%d type=%d name=%s \n", 
+                    d->deviceId, 
+                    d->__class, 
+                    d->type, 
+                    d->name );
+            }
+            
+            //printf (".");
+        }
+    };
+
+
+    printf ("Done\n");
+    refresh_screen();
+}
+
+
 /*
+ ********************************
  * init_device_manager:
+ * 
+ * 
  */
 
-void init_device_manager (void)
-{
+void init_device_manager (void){
+
+
+    debug_print ("init_device_manager:\n");
     devmgr_init_device_list ();
 
     //...

@@ -12,6 +12,7 @@
  *     2016 - Small changes.
  */
  
+ 
 /*
  Wikipedia:
      
@@ -1448,32 +1449,35 @@ pciHandleDevice ( unsigned char bus,
     // #importante: ele precisa de uma stream.
     //
     
-    FILE *__stream;
+    file *__file;
     
-    __stream = (FILE *) kmalloc ( sizeof(FILE) );
+    __file = (file *) kmalloc ( sizeof(file) );
     
-    if ( (void *) __stream == NULL )
-    {
-        panic ("pciHandleDevice: __stream fail, can't register device");
+    if ( (void *) __file == NULL ){
+        panic ("pciHandleDevice: __file fail, can't register device");
+    
     }else{
-    
-        __stream->used = 1;
-        __stream->magic = 1234;
-        __stream->isDevice = 1;
-        
-        //Tem que registrar em Streams[]
-        //__stream->_file   //id
-        
-        //__stream->deviceId ?
-        
-        devmgr_register_device ( (FILE *) __stream, 
+
+        __file->used = 1;
+        __file->magic = 1234;
+
+        __file->isDevice = 1;
+
+
+        //
+        // Register.
+        //
+
+
+        devmgr_register_device ( (file *) __file, 
              D->name,
-             __class,     //class (char, block, network)
-             1,           //type (pci, legacy
+             __class,                    //class (char, block, network)
+             1,                          //type (pci, legacy
              (struct pci_device_d *) D,  //pci device
              NULL );                     //tty driver
     
     };
+
 
     return 0;
 }

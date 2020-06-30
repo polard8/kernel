@@ -614,7 +614,7 @@ gde_extra_services (
     }
 
  
- 
+    // Show device list.
     if (number == 770){
         systemShowDevicesInfo ();
         return NULL;
