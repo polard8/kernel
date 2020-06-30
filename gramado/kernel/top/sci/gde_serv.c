@@ -193,9 +193,9 @@ gde_extra_services (
 
     // Create a terminal given the window.
     // IN: window, father's pid.
-    if ( number == 270 )
-    {
-         return (void *) vt_create ( (struct window_d *) arg2, (int) arg3 );
+    if ( number == 270 ){
+         return (void *) vt_create ( (struct window_d *) arg2, 
+                             (int) arg3 );
     }
     
     
@@ -537,8 +537,6 @@ gde_extra_services (
 
 
 
-
-
     // 600 - dup
     if ( number == 600 ){
         return (void *) sys_dup ( (int) arg2 );
@@ -615,19 +613,16 @@ gde_extra_services (
         return NULL; //fail
     }
 
-    
  
  
-    if (number == 770)
-    {
-		systemShowDevicesInfo ();
+    if (number == 770){
+        systemShowDevicesInfo ();
         return NULL;
     }
     
     // cpu usage for idle thread.
-    if (number == 777)
-    {
-		return (void *) profiler_percentage_idle_thread;
+    if (number == 777){
+        return (void *) profiler_percentage_idle_thread;
     }
     
  
@@ -641,27 +636,23 @@ gde_extra_services (
 
     
     //get host name
-    if ( number == 801 )
-    {
-		return (void *) __gethostname ( (char *) arg2);
+    if ( number == 801 ){
+        return (void *) __gethostname ( (char *) arg2);
     }
 
     //set host name
-    if ( number == 802 )
-    {
-		return (void *) __sethostname ( (const char *) arg2); 
+    if ( number == 802 ){
+        return (void *) __sethostname ( (const char *) arg2); 
     }
 
     //get user name
-    if ( number == 803 )
-    {
-		return (void *) __getusername ( (char *) arg2);
+    if ( number == 803 ){
+        return (void *) __getusername ( (char *) arg2);
     }
 
     //set user name
-    if ( number == 804 )
-    {
-		return (void *) __setusername ( (const char *) arg2); 
+    if ( number == 804 ){
+        return (void *) __setusername ( (const char *) arg2); 
     }
 
 
@@ -670,17 +661,17 @@ gde_extra_services (
     // get_ptsname
     // IN: fd do master, buffer em ring3 para o nome, buflen
     //
-    if ( number == 808 )
-    {
-		return (void *) __ptsname ( (int) arg2, (char *) arg3, (size_t) arg4  ); 
+    if ( number == 808 ){
+        return (void *) __ptsname ( (int) arg2, 
+                            (char *) arg3, (size_t) arg4  ); 
     }
     
     //#todo
     //supporting ptsname_r libc function
     //IN: fd do master, buffer e buflen.
-    if ( number == 809 )
-    {
-		return (void *) __ptsname ( (int) arg2, (char *) arg3, (size_t) arg4  ); 
+    if ( number == 809 ){
+        return (void *) __ptsname ( (int) arg2, 
+                            (char *) arg3, (size_t) arg4  ); 
     } 
     
     
@@ -764,8 +755,7 @@ gde_extra_services (
     
     // get main window.
     // #todo. checar validade
-    if ( number == 957 )
-    {
+    if ( number == 957 ){
         return (void *) gui->main;
     }    
 
@@ -782,8 +772,7 @@ gde_extra_services (
     
 
     // 968 - Testing network.
-    if (number == 968)
-    {
+    if (number == 968){
         network_test();
         return NULL;
     }
@@ -1059,8 +1048,7 @@ gde_extra_services (
     // See: sci/sys/sys.c    
     if ( number == 8001 )
     {
-        return NULL;
-        //return (void *) sys_fcntl ( ... #todo );
+        return (void *) sys_fcntl ((int) arg2, (int) arg3 );
     }
     
     
@@ -1075,30 +1063,30 @@ gde_extra_services (
     //raise window.
     if ( number == 9700 )
     {
-		return (void *) raise_window ( (struct window_d *) arg2 );
+        return (void *) raise_window ( (struct window_d *) arg2 );
     }
 
     //ps2 mouse controller dialog
     // msg, long1, long2
     if ( number == 9800 )
     {
-		return (void *) ps2_mouse_dialog ( (int) arg2, 
-		                    (unsigned long) arg3, 
-		                    (unsigned long) arg4 );
+        return (void *) ps2_mouse_dialog ( (int) arg2, 
+                            (unsigned long) arg3, 
+                            (unsigned long) arg4 );
     }
-    
+ 
     //button down
     //quando um bot�o � clicado ou pressionado,
     //ele ser� repintado com a apar�ncia de bot�o apertado.
     if ( number == 9900 )
     {
-		return (void *) button_down ( (struct window_d *) arg2 );
+        return (void *) button_down ( (struct window_d *) arg2 );
     }
 
     //#todo button_up
     if ( number == 9901 )
     {
-		return (void *) button_up ( (struct window_d *) arg2 );
+        return (void *) button_up ( (struct window_d *) arg2 );
     }
  
     // chamado por gde_get_pid na api.
@@ -1247,10 +1235,11 @@ gde_services (
     // =====================================
     //
 
-    if ( number > 256 )
-    {
-        return (void *) gde_extra_services ( number, arg2, arg3, arg4 );
+    if ( number > 256 ){
+        return (void *) gde_extra_services ( number, 
+                            arg2, arg3, arg4 );
     }
+
 
 
 	// Normal services.
@@ -1292,8 +1281,7 @@ gde_services (
         // IN: name, flags, mode
         case SYS_READ_FILE:
             return (void *) sys_read_file ( (char *) a2, 
-                                (int) arg3, 
-                                (mode_t) arg4 ); 
+                                (int) arg3, (mode_t) arg4 ); 
             break;
 
 
@@ -1315,6 +1303,7 @@ gde_services (
         // See: sci/sys/sys.c 
         case SYS_VSYNC:
             sys_vsync (); 
+            return NULL;
             break;
 
         // 6 - Put pixel. 
@@ -1383,6 +1372,7 @@ gde_services (
         //11, Coloca o conte�do do backbuffer no LFB.
         case SYS_REFRESHSCREEN: 
             refresh_screen ();
+            return NULL;
             break;
 
         //rede: 12,13,14,15	
@@ -1398,6 +1388,7 @@ gde_services (
         //pra carregar o arquivo.
         //e se for um dispositivo?
         case SYS_OPEN:
+            debug_print ("gde_serv: SYS_OPEN\n");
             return NULL;   
             break;
 
@@ -1765,22 +1756,22 @@ gde_services (
         // 86 - livre.
 
 
-		// 87 Down.
-		case SYS_SEMAPHORE_DOWN:
-		    return (void *) Down ( (struct semaphore_d *) arg2);
-		    break;
+        // 87 Down.
+        case SYS_SEMAPHORE_DOWN:
+            return (void *) Down ( (struct semaphore_d *) arg2);
+            break;
 
-		//Testa se o processo � v�lido
-        //se for v�lido retorna 1234		
-		//testando...
-		case SYS_88:   
+        //Testa se o processo � v�lido
+        //se for v�lido retorna 1234
+        //testando ...
+        case SYS_88:   
             return (void *) processTesting (arg2);
-			break;
+            break;
 
-		// 89 Up. 	
-		case SYS_SEMAPHORE_UP:
-		    return (void *) Up ( (struct semaphore_d *) arg2 );
-		    break;
+        // 89 Up. 
+        case SYS_SEMAPHORE_UP:
+            return (void *) Up ( (struct semaphore_d *) arg2 );
+            break;
 
  
         // 90
@@ -1793,14 +1784,15 @@ gde_services (
         // 91 92 93
 
 
-		//94	
-		//REAL (coloca a thread em standby para executar pela primeira vez.)
-		// * MOVEMENT 1 (Initialized --> Standby).
-		case SYS_STARTTHREAD:
-		    //t = (struct thread_d *) arg2;
+        // 94
+        //REAL (coloca a thread em standby para executar pela primeira vez.)
+        // * MOVEMENT 1 (Initialized --> Standby).
+        case SYS_STARTTHREAD:
+            //t = (struct thread_d *) arg2;
             //sys_SelectForExecution (t);
-			SelectForExecution ( (struct thread_d *) arg2 );
-			break;
+            SelectForExecution ( (struct thread_d *) arg2 );
+            return NULL;
+            break;
 
  
         //99: #todo: usar para manipulação de processos.
@@ -1883,13 +1875,13 @@ gde_services (
         // 116 - free slot.
 
 
-
-
         // 117.
         // Envia uma mensagem para uma thread, dado o tid.
+        // #todo: poderíamos retornar o retorno da função.
         case 117:
             ipc_send_message_to_thread ( (unsigned long) &message_address[0], 
                  (int) arg3 );
+            return NULL;
             break;
 
 
@@ -1918,6 +1910,7 @@ gde_services (
 		// #bugbug: Precisamos criar um request.
         case 124:
             kernel_request = KR_DEFERED_SYSTEMPROCEDURE;
+            return NULL;
             break;
 
 
@@ -1932,8 +1925,9 @@ gde_services (
 		// Permitindo que drivers e servidores em usermode acessem
 		// as portas.
         case SYS_USERMODE_PORT_IN:
-			//#bugbug
-			//#todo: Tem que resolver as quest�es de privil�gios.
+			// #bugbug
+			// #todo: 
+			// Tem que resolver as quest�es de privil�gios.
 			//bits, port
             return (void *) portsx86_IN ( (int) arg2, 
                                 (unsigned long) arg3 );
@@ -1945,7 +1939,8 @@ gde_services (
 		// as portas.
         case SYS_USERMODE_PORT_OUT:
 			//#bugbug
-			//#todo: Tem que resolver as quest�es de privil�gios.
+			//#todo: 
+			// Tem que resolver as quest�es de privil�gios.
 			//bits, port, value
             portsx86_OUT ( (int) arg2, 
                 (unsigned long) arg3, (unsigned long) arg4 );
@@ -2030,7 +2025,7 @@ gde_services (
 		// Isso funciona.
 		// #bugbug: Rever isso.
         case SYS_GETCH:  
-            return (void *) thread_getchar ();
+            return (void *) thread_getchar();
             break;
 
 
@@ -2041,32 +2036,32 @@ gde_services (
             return (void *) keyboardGetKeyState ( (unsigned char) arg2 );
             break;
 
-
         // 139
         case SYS_GETSCANCODE:
             return (void *) get_scancode ();
             break;
 
-
-        //140
+        // 140
         case SYS_SET_CURRENT_KEYBOARD_RESPONDER:
             set_current_keyboard_responder (arg2);
             break;
 
-		// 141
+        // 141
         case SYS_GET_CURRENT_KEYBOARD_RESPONDER:
             return (void *) get_current_keyboard_responder();
             break;
 
-		//142	
+        // 142
         case SYS_SET_CURRENT_MOUSE_RESPONDER:
-		    set_current_mouse_responder(arg2);
-			break;
-			
-		//143	
-		case SYS_GET_CURRENT_MOUSE_RESPONDER:
-		    return (void *) get_current_mouse_responder ();
-			break;
+            return NULL;
+            //set_current_mouse_responder(arg2);
+            break;
+
+        // 143
+        case SYS_GET_CURRENT_MOUSE_RESPONDER:
+            return NULL;
+            //return (void *) get_current_mouse_responder ();
+            break;
 
 
 		// 144
@@ -2130,34 +2125,34 @@ gde_services (
             break;
 
 
-		// 154 - get group id	
+        // 154 - get group id
         case SYS_GETCURRENTGROUPID:
             return (void *) current_group;
             break;
   
-        //156 - SYS_SHOWUSERINFO
+        // 156 - SYS_SHOWUSERINFO
         case 156:
             ShowUserInfo (current_user);
             return NULL;
             break;
 
-		//157 - get user session id	
+        // 157 - get user session id
         case SYS_GETCURRENTUSERSESSION:
             return (void *) current_usersession;
             break;
 
 
-		//158 - get window station id		
-		case SYS_GETCURRENTWINDOWSTATION:	
-		    return (void *) current_room; 
-			break;
+        // 158 - get window station id
+        case SYS_GETCURRENTWINDOWSTATION:
+            return (void *) current_room; 
+            break;
 
 
-		//159 - get desktop id
+        // 159 - get desktop id
         case SYS_GETCURRENTDESKTOP:
-		    return (void *) current_desktop; 
-			break;
-			
+            return (void *) current_desktop; 
+            break;
+
 		// 160
 		// Criar um socket e retornar o ponteiro para a estrutura.
 		// Gramado API socket support. (not libc)
@@ -2196,18 +2191,12 @@ gde_services (
 
         // 164 - livre. 
 
-
-		// #todo: 
-		// a chamada est� no shell em net.c	
-		// netSocket
+        // socket stuff
         case 165:
-            //IN: ( service, (unsigned long) socket, option, option );	
             break;
 
-		//#todo: a chamada est� no shell em net.c	
-		//netBuffer
+        // socket stuff
         case 166:
-            //IN:  ( service, buffer_address, option, option );	
             break;
 
  
@@ -2236,13 +2225,14 @@ gde_services (
            break;
 
 
-		//170
+        //170
         //pwd ...
         //Cada processo tem seu pr�prio pwd.
         //Essa rotina mostra o pathname usado pelo processo.	
         case SYS_PWD:
             debug_print ("175:\n");
             fs_print_process_pwd (current_process);
+            return NULL;
             break;
 
 
@@ -2253,15 +2243,17 @@ gde_services (
 
 		//172 - configura o id do volume atual.
 		//#bugbug: Estamos modificando, sem aplicar nenhum filtro.
-		case SYS_SETCURRENTVOLUMEID:
-		    current_volume = (int) arg2;
-            break;	
+        case SYS_SETCURRENTVOLUMEID:
+            current_volume = (int) arg2;
+            break;
 
-		//173 - Lista arquivos de um diret�rio, dado o n�mero do disco,
+        // 173
+        // Lista arquivos de um diret�rio, dado o n�mero do disco,
         //o n�mero do volume e o n�mero do diret�rio,
         //args in: disk id, volume id, directory id
         case SYS_LISTFILES:
             fsListFiles ( arg2, arg3, arg4 );  
+            return NULL;
             break;
 
 
@@ -2280,6 +2272,7 @@ gde_services (
             debug_print ("175:\n");
             fsUpdateWorkingDiretoryString ( (char *) arg2 );
             fsLoadFileFromCurrentTargetDir ();
+            return NULL;
             break;
 
 
@@ -2298,6 +2291,7 @@ gde_services (
         case 177:
             debug_print ("177:\n");
             fsList ( (const char *) arg2 );
+            return NULL;
             break;
 
 
@@ -2438,23 +2432,22 @@ gde_services (
 
 
         //223 - get sys time info.
-        // informa��es variadas sobre o sys time.		
-		case 223:
-		    return (void *) get_systime_info ( (int) arg2 );
-            break;		
-
-
-		//224 - get time	
-		case SYS_GETTIME:	
-		    return (void *) get_time ();
-			break;
-
-
-		//225 - get date
-		case SYS_GETDATE:
-		    return (void *) get_date ();
+        // informa��es variadas sobre o sys time.
+        case 223:
+            return (void *) get_systime_info ( (int) arg2 );
             break;
 
+
+        // 224 - get time
+        case SYS_GETTIME:	
+            return (void *) get_time();
+            break;
+
+
+        // 225 - get date
+        case SYS_GETDATE:
+            return (void *) get_date();
+            break;
 
         // Obs: 
         // #todo: 
@@ -2469,12 +2462,14 @@ gde_services (
         // 227 - close critical section	
         case SYS_CLOSE_KERNELSEMAPHORE:
             __spinlock_ipc = 0;
+            return NULL;
             break;
 
 
         // 228 - open critical section
         case SYS_OPEN_KERNELSEMAPHORE:
             __spinlock_ipc = 1;
+            return NULL;
             break;
 
 
@@ -2488,7 +2483,7 @@ gde_services (
 		// tty ... 236 237 238 239.	
 			
 		//236 - get tty id
-		case 236:	
+        case 236:	
 			return (void *) current_tty;
 			break;	
 		
@@ -2824,11 +2819,11 @@ void servicesPutChar ( int c )
  *     At function: _int133.
  */
 
-
-void *gde_133 ( unsigned long number, 
-                 unsigned long arg2, 
-                 unsigned long arg3, 
-                 unsigned long arg4 )
+void *gde_133 ( 
+    unsigned long number, 
+    unsigned long arg2, 
+    unsigned long arg3, 
+    unsigned long arg4 )
 {
     void *ret;
 

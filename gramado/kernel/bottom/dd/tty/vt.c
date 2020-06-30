@@ -14,7 +14,7 @@ vt_ioctl (
     unsigned long request, 
     char *arg )
 {
-    debug_print ("console_ioctl: TODO\n");
+    debug_print ("vt_ioctl: TODO\n");
     //switch(request){}
     return -1;
 }
@@ -193,8 +193,7 @@ void vt_outbyte ( int c, struct tty_d *tty ){
 
 
     //form feed - Nova tela.
-    if ( c == '\f' )
-    {
+    if ( c == '\f' ){
         tty->cursor_y = tty->cursor_top;
         tty->cursor_x = tty->cursor_left;
         return;
@@ -268,7 +267,7 @@ void vt_outbyte ( int c, struct tty_d *tty ){
 
 	//tab
 	//@todo: Criar a variável 'g_tab_size'.
-    if( c == '\t' )  
+    if ( c == '\t' )  
     {
         tty->cursor_x += (8);
         //g_cursor_x += (4); 

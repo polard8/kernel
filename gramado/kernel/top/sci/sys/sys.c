@@ -134,7 +134,8 @@ int sys_ioctl ( int fd, unsigned long request, char *arg ){
     switch(f->____object)
     {
         // tty object
-        case ObjectTypeTTY: 
+        case ObjectTypeTTY:
+            debug_print ("sys_ioctl: ObjectTypeTTY\n"); 
             return (int) tty_ioctl ( (int) fd, 
                             (unsigned long) request, 
                             (char *) arg );
@@ -142,6 +143,7 @@ int sys_ioctl ( int fd, unsigned long request, char *arg ){
         
         // socket object
         case ObjectTypeSocket:
+            debug_print ("sys_ioctl: ObjectTypeSocket\n");
             return (int) socket_ioctl ( (int) fd, 
                             (unsigned long) request, 
                             (char *) arg );
@@ -149,6 +151,7 @@ int sys_ioctl ( int fd, unsigned long request, char *arg ){
             
         // Console object    
         case ObjectTypeVirtualConsole: 
+            debug_print ("sys_ioctl: ObjectTypeVirtualConsole\n");
             return (int) console_ioctl ( (int) fd, 
                             (unsigned long) request, 
                             (char *) arg );
@@ -157,6 +160,7 @@ int sys_ioctl ( int fd, unsigned long request, char *arg ){
 
         // Virtual Terminal object    
         case ObjectTypeTerminal: 
+            debug_print ("sys_ioctl: ObjectTypeTerminal\n");
             return (int) vt_ioctl ( (int) fd, 
                             (unsigned long) request, 
                             (char *) arg );
