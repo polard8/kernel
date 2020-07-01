@@ -817,18 +817,17 @@ int sys_socket ( int family, int type, int protocol ){
 
     }else{
 
-        // #test
+        // family, type and protocol.
         __socket->family = family;
         __socket->type = type;
         __socket->protocol = protocol;
-    
-    
-       //__socket->addr = addr; //mudou para logo abaixo.
-       
+
+       // The private socket of a process.
        p->priv = __socket;
 
 
        // family
+       // Setup the addr.
 
        switch (family)
        {
@@ -838,8 +837,7 @@ int sys_socket ( int family, int type, int protocol ){
                return (int) socket_gramado ( __socket, 
                                 AF_GRAMADO, type, protocol );
                break;
-           
-           
+
            //case AF_LOCAL:
            case AF_UNIX:
                debug_print ("sys_socket: AF_UNIX\n");
@@ -857,7 +855,7 @@ int sys_socket ( int family, int type, int protocol ){
                return (int) socket_inet ( __socket, 
                                 AF_INET, type, protocol );
                break;
-           
+
            // ...
            
            default:
@@ -869,7 +867,7 @@ int sys_socket ( int family, int type, int protocol ){
         // ...
     };
 
-
+    //fail.
     return (int) (-1);
 }
 
@@ -1054,10 +1052,10 @@ sys_connect (
     struct process_d *p;   // Current process.
     struct process_d *tp;  // Target process.
 
-    struct file_d *f;
-    
     struct socket_d *my_socket;
     struct socket_d *server_socket; 
+
+    struct file_d *f;
 
     int target_pid = -1;
     
@@ -1067,16 +1065,23 @@ sys_connect (
     //vamos precisar de outra estrututura.
     struct sockaddr_in *addr_in;
 
-   addr_in = addr;
+
 
     
     printf ("sys_connect: PID %d | fd %d | \n",
         current_process, sockfd );
     
 
+    // ?? the address.
+    // #todo: type.
+    // da um problema na compilação.
+    //addr_in = (?) addr;
+    
+    addr_in = addr;
+
+
     //sockfd é um soquete de quem quer se conecta
     //o addr indica o alvo.
-
     if ( sockfd < 0 || sockfd >= 32 ){
         printf ("sys_connect: sockfd fail\n");
         refresh_screen();
@@ -1099,7 +1104,8 @@ sys_connect (
     // Tente inet, ao menos que mudemos de planos por 
     // encontrarmos af_gramado, af_unix ou af_local.
     int ____in = 1;  
-    
+
+
     // #importante
     // opções de domínio se o endereço é no estilo unix. 
     // >>> sockaddr
@@ -1287,13 +1293,22 @@ sys_connect (
      }
 
     // Esse é o socket do processo servidor.
-    
+    // Sim, porque é o cliente que está tentando se conectar.
+    // Dessa forma o alvo é o servidor.
+
     server_socket = (struct socket_d *) tp->priv;
+
     
     //
     // Connecting!
     //
-    
+
+    // #todo
+    // Temos que colocar os pedidos de conexão em uma fila.
+    // O tamanho dessa fila foi determinado pelo servidor
+    // com a chamada listen. Mas podemos ter um tamanho padrão.
+    // Talvez tamanho 1 para começar.
+
     // Conectando o socket do processo alvo ao ponto de
     // conecção do processo cliente.
     my_socket->conn = server_socket;
@@ -1305,10 +1320,11 @@ sys_connect (
     // Acionando as flags que indicam a conecção.
     // Nesse momento poderíamos usar a flag SOCKET_PENDING
     // e a rotina accept() mudaria para SOCKET_CONNECTED. 
-    my_socket->state = SOCKET_CONNECTED;
-    server_socket->state = SOCKET_CONNECTED; 
-  
-  
+    
+    my_socket->state     = SOCKET_PENDING;  //SOCKET_CONNECTED;
+    server_socket->state = SOCKET_PENDING;  //SOCKET_CONNECTED; 
+
+
     debug_print("sys_connect: connected\n");
     printf ("sys_connect: done.\n");
     refresh_screen();
@@ -1388,16 +1404,38 @@ sys_accept (
     struct socket_d *s;
 
     
+    // #todo
+    // O argumento dá o descritor para o socket do servidor.
+    // A função accept seleciona um dos sockets da lista
+    // de conexões pendentes criadas por listen() e conecta
+    // com o socket do servidor.
+    // Ao fim devemos retornar o descritor do socket selecionado
+    // na lista de conexões pendentes.
+
     debug_print ("sys_accept:\n");
 
     // fd
+    // ?? Esse é o socket do servidor.
     if ( sockfd < 0 || sockfd >= 32 ){
         printf ("sys_accept: sockfd fail\n");
         refresh_screen();
         return -1;
     }
+    
+    // Check addr structure.
+    // #bugbug: Ainda não sabemos qual é a estrutura de
+    // endereços usada.
+    // #bugbug: Ainda não estamos usando isso.
+    if ( (void *) addr == NULL ){
+        printf ("sys_accept: addr fail\n");
+        refresh_screen();
+        return -1;
+    }
 
-    // process
+    //
+    // Current process. (The server)
+    //
+    
     p = (struct process_d *) processList[current_process];
  
     if ( (void *) p == NULL ){
@@ -1405,6 +1443,8 @@ sys_accept (
         refresh_screen();
         return -1;
     }
+
+    // O objeto que se refere ao socket do servidor.
 
     // file
     // The socket is a file and belongs to the process.
@@ -1416,13 +1456,15 @@ sys_accept (
         return -1;
     }
     
- 
+
+    // O socket privado do servidor.
+
     // socket
     // Socket structure that belongs to the process.
     s = (struct socket_d *) p->priv;
 
     if ( (void *) s == NULL ){
-        printf ("sys_accept: s fail\n");
+        printf ("sys_accept: (priv socket) s fail\n");
         refresh_screen();
         return -1;
     }
@@ -1430,34 +1472,54 @@ sys_accept (
     //
     // Socket ok.
     //
-   
-    // Check addr structure.
-    // #bugbug: Ainda não sabemos qual é a estrutura de
-    // endereços usada.
-    if ( (void *) addr == NULL ){
-        printf ("sys_accept: addr fail\n");
-        refresh_screen();
-        return -1;
-    }
 
     // #debug
     //printf ("sys_accept: process %d | family %d | len %d \n", 
         //current_process, addr->sa_family, addrlen  );
 
  
-    //#test
+    // #test
+    // Se o socket do servidor já está conectado.
     if ( s->state == SOCKET_CONNECTED ){
         debug_print ("sys_accept: done\n");
         return (int) sockfd;
     }
  
-    //#test
-    if ( s->state == SOCKET_PENDING ){
-        s->state = SOCKET_CONNECTED;
-        debug_print ("sys_accept: done\n");
-        return (int) sockfd;
+    // #todo
+    // Na verdade precisamos pegar um da fila.
+    
+    // #test
+    // Se a conexão do socket do servidor está pendente.
+    // #bugbug
+    // Devemos retornar o descritor do socket cliente e
+    // não do socket do servidor.
+    // Mas como existe cópia durante o write,
+    // quando o servidor escrever em seu próprio socket
+    // a mensagem vai ser copiada no cliente.
+    // #todo: Para devolver um descritor para o servidor,
+    // então o socket do cliente deveria estar na lista de
+    // arquivos abertos pelo servidor.
+    // obs: Por enquanto fica assim. Devolvemos o
+    // descritor do proprio servidor. Mas ele está conectado e
+    // o cliente receberá a mensagem.
+ 
+    if ( s->state == SOCKET_PENDING )
+    {
+        debug_print ("sys_accept: CONNECTING !!\n");
+        // Se existe outro socket linkado ao socket do servidor.
+        if ( (void *) s->conn != NULL )
+        {
+            s->state       = SOCKET_CONNECTED;
+            s->conn->state = SOCKET_CONNECTED;
+            
+            debug_print ("sys_accept: done\n");
+            return (int) sockfd;
+        }
+        
+        //fail
+        debug_print ("sys_accept: fail pending connection\n");
+        return -1;
     }
-
 
     printf ("sys_accept: [FIXME] TODO ...\n");
     refresh_screen();
