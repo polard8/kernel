@@ -192,9 +192,20 @@ devmgr_register_device (
 
     struct device_d *d;
     int id= -1;
-    
+
     
     debug_print ("devmgr_register_device:\n");
+    
+    
+    //
+    // mount point
+    //
+    
+    char __tmp_mount_point[64];
+    char *new_mount_point = (char *) kmalloc (64);
+    if ( (void*) new_mount_point == NULL )
+        panic("devmgr_register_device: new_mount_point");
+                
 
 
     if ( (void *) f == NULL ){
@@ -233,7 +244,18 @@ devmgr_register_device (
 			d->__file = (file *) f;
 			d->__class = class;
 			d->type = type;
-			d->name = (char *) name;
+
+            //#test 
+            //Todo: create the file.
+            sprintf( (char *) &__tmp_mount_point[0], "/DEV%d", id);
+            strcpy (new_mount_point,__tmp_mount_point);
+
+            // /dev/tty0
+            d->mount_point = (char *) new_mount_point; 
+            
+            // DEV_8086_8086
+            d->name = (char *) name;
+
 			
 			d->pci_device = (struct pci_device_d *) pci_device;
 			d->ttydrv = (struct ttydrv_d *) tty_driver;
@@ -272,11 +294,12 @@ void devmgr_show_device_list(void)
                  d->deviceMagic == 1234 )
             {
                 //#todo: more ...
-                printf ( "id=%d class=%d type=%d name=%s \n", 
+                printf ( "id=%d class=%d type=%d name={%s} mount_point={%s} \n", 
                     d->deviceId, 
                     d->__class, 
                     d->type, 
-                    d->name );
+                    d->name,
+                    d->mount_point );  //#todo
             }
             
             //printf (".");

@@ -45,7 +45,12 @@ struct device_d
     // #importante
     // Isso deve ser um pathname 
     // do mesmo tipo usado no sistema de arquivos.
+    // /dev/tty0
+    char *mount_point;
+    
+    //name for pci devices: "/DEV_8086_8086"  
     char *name;
+    
 
 
     // char, block, network

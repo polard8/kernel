@@ -1522,6 +1522,7 @@ void sys_show_system_info ( int n ){
 
         case 4:
             systemShowDevicesInfo();
+            pciInfo();
             break;
             
         case 5:

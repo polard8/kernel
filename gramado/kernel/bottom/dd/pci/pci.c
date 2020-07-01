@@ -1444,9 +1444,25 @@ pciHandleDevice ( unsigned char bus,
 
 
     //
+    // name
+    //
+    
+    char __tmpname[64];
+    
+    //#test
+    // isso não é o ponto de montagem.
+    sprintf( (char *) &__tmpname[0], "/DEV_%x_%x", D->Vendor,D->Device );
+    
+    char *newname = (char *) kmalloc (64);
+    if ( (void*) newname == NULL )
+        panic("pciHandleDevice: newname");
+    strcpy (newname,__tmpname);
+
+
+    //
     // Agora registra o dispositivo pci na lista genérica
     // de dispositivos.
-    // #importante: ele precisa de uma stream.
+    // #importante: ele precisa de um arquivo 'file'.
     //
     
     file *__file;
@@ -1468,9 +1484,15 @@ pciHandleDevice ( unsigned char bus,
         // Register.
         //
 
-
+        // #importante
+        // Essa é a tabela de montagem de dispositivos.
+        // O nome do dispositivo deve ser um pathname.
+        // Mas podemos ter mais de um nome.
+        // vamos criar uma string aqui usando sprint e depois duplicala.
+     
+        
         devmgr_register_device ( (file *) __file, 
-             D->name,
+             newname, //D->name,                    
              __class,                    //class (char, block, network)
              1,                          //type (pci, legacy
              (struct pci_device_d *) D,  //pci device
