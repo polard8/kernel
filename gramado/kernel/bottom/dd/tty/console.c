@@ -1286,6 +1286,10 @@ void console_init_virtual_console (int n)
     // #bugbug
     // A estrutura tem mais elementos que podem ser inicializados.
     // Tivemos problemas ao tentar inicializa-los.
+    
+    //#bugbug
+    //sempre que tentamos aumentar essa função encontramos problemas
+    //de compilação.
 }
 
 

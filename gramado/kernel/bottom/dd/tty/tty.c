@@ -1256,14 +1256,95 @@ _ok:
         }
         
         ttyList[i] = (unsigned long) __tty;
-        
-        
-        return (struct tty_d *) __tty;
+       
+       
+       
+        goto __ok_register;
+        //return (struct tty_d *) __tty;
     };
 
 
     panic ("tty_create: Crazy error!\n");   
     //return NULL;
+
+
+
+//
+// ==========================================
+//
+
+__ok_register:
+
+
+    if ( (void*) __tty == NULL )
+        panic("tty_create: __tty");
+
+
+    //
+    // name
+    //
+    
+    char __tmpname[64];
+    
+    //#test
+    // isso não é o ponto de montagem.
+    sprintf( (char *) &__tmpname[0], "/DEV_TTY%d",__tty->index);
+    
+    char *newname = (char *) kmalloc (64);
+    if ( (void*) newname == NULL )
+        panic("tty_create: newname");
+    strcpy (newname,__tmpname);
+
+
+    //
+    // Agora registra o dispositivo pci na lista genérica
+    // de dispositivos.
+    // #importante: ele precisa de um arquivo 'file'.
+    //
+    
+    file *__file;
+    
+    __file = (file *) kmalloc ( sizeof(file) );
+    
+    if ( (void *) __file == NULL ){
+        panic ("tty_create: __file fail, can't register device");
+    
+    }else{
+
+        __file->used = 1;
+        __file->magic = 1234;
+
+        __file->isDevice = 1;
+
+
+        //
+        // Register.
+        //
+
+        // #importante
+        // Essa é a tabela de montagem de dispositivos.
+        // O nome do dispositivo deve ser um pathname.
+        // Mas podemos ter mais de um nome.
+        // vamos criar uma string aqui usando sprint e depois duplicala.
+     
+        
+        devmgr_register_device ( (file *) __file, 
+             newname,                    // device name.                  
+             0,                    //class (char, block, network)
+             1,                          //type (pci, legacy
+             (struct pci_device_d *) 0,  //pci device
+             NULL );                     //tty driver
+    
+    };
+
+
+
+//
+// ==========================================
+//
+
+        
+    return (struct tty_d *) __tty;
 }
 
 

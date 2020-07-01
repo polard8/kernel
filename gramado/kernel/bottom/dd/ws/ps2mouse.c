@@ -488,10 +488,10 @@ void ps2mouse_initialize_device (void){
 
         //m_has_wheel = true;
         ps2_mouse_has_wheel = 1;
-        kprintf ("mouse_install: Mouse wheel enabled!\n");
+        kprintf ("ps2mouse_initialize_device: Mouse wheel enabled!\n");
         
     } else {
-        kprintf ("mouse_install: No mouse wheel detected!\n");
+        kprintf ("ps2mouse_initialize_device: No mouse wheel detected!\n");
     };
 
     //=================================================
@@ -502,6 +502,78 @@ void ps2mouse_initialize_device (void){
     kbdc_wait (1);
     kbdc_wait (1);
     kbdc_wait (1);
+    
+    
+//
+// ==========================================
+//
+
+
+    //
+    // name
+    //
+    
+    char __tmpname[64];
+    
+    //#test
+    // isso não é o ponto de montagem.
+    sprintf( (char *) &__tmpname[0], "/DEV_I8042_MOUSE");
+    
+    char *newname = (char *) kmalloc (64);
+    if ( (void*) newname == NULL )
+        panic("ps2mouse_initialize_device: newname");
+    strcpy (newname,__tmpname);
+
+
+    //
+    // Agora registra o dispositivo pci na lista genérica
+    // de dispositivos.
+    // #importante: ele precisa de um arquivo 'file'.
+    //
+    
+    file *__file;
+    
+    __file = (file *) kmalloc ( sizeof(file) );
+    
+    if ( (void *) __file == NULL ){
+        panic ("ps2mouse_initialize_device: __file fail, can't register device");
+    
+    }else{
+
+        __file->used = 1;
+        __file->magic = 1234;
+
+        __file->isDevice = 1;
+
+
+        //
+        // Register.
+        //
+
+        // #importante
+        // Essa é a tabela de montagem de dispositivos.
+        // O nome do dispositivo deve ser um pathname.
+        // Mas podemos ter mais de um nome.
+        // vamos criar uma string aqui usando sprint e depois duplicala.
+     
+        
+        devmgr_register_device ( (file *) __file, 
+             newname,                    // device name.                  
+             0,                    //class (char, block, network)
+             1,                          //type (pci, legacy
+             (struct pci_device_d *) 0,  //pci device
+             NULL );                     //tty driver
+    
+    };
+
+
+
+//
+// ==========================================
+//
+
+    
+    
     
     __breaker_ps2mouse_initialized = 1;
 }

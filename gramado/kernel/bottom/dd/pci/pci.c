@@ -1492,7 +1492,7 @@ pciHandleDevice ( unsigned char bus,
      
         
         devmgr_register_device ( (file *) __file, 
-             newname, //D->name,                    
+             newname,                    // device name.                  
              __class,                    //class (char, block, network)
              1,                          //type (pci, legacy
              (struct pci_device_d *) D,  //pci device

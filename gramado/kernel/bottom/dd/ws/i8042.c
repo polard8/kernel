@@ -44,7 +44,7 @@ wait_then_write ( int port, int data ){
 /*
  ***************
  * ps2:
- *     Essa rotina de inicialização do controladro 
+ *     Essa rotina de inicialização do controlador 
  * poderá ter seu próprio módulo.
  *     Inicializa o controlador ps2.
  *     Inicializa a porta do teclado no controlador.
