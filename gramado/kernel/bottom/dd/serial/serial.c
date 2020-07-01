@@ -77,23 +77,50 @@ void serial_write_char ( char data ) {
  * serial_init_port:
  * 
  */
- 
+
+// #bugbug
+// #IMPORTANTE
+// Essa função apresenta problemas de compilação
+// quando incluímos mais código.
+
+// See:
+// See the type for the argument in the function out8.
+// gramado/kernel/bottom/hal/arch/x86/portsx86.c
+
 void serial_init_port ( uint16_t port ){
+
+    int PortBase=0;
+    
+    PortBase = (int) port;
+
+
+    debug_print ("serial_init_port:\n");
+
+    // Se não é alguma das bases possiveis.
+    // #todo: Existem máquinas com mais do que 4 portas seriais?
+    if ( PortBase != COM1_PORT &&
+         PortBase != COM2_PORT &&
+         PortBase != COM3_PORT &&
+         PortBase != COM4_PORT )
+    {
+        panic ("serial_init_port: PortBase fail\n");
+    }
+
 
     // ??
     // Qual foi inicializada ??
     
-    out8 (port + 1, 0x00);  // Disable all interrupts
-    out8 (port + 3, 0x80);  // Enable DLAB (set baud rate divisor)
-    out8 (port + 0, 0x03);  // Set divisor to 3 (lo byte) 38400 baud (hi byte)
+    out8 (PortBase + 1, 0x00);  // Disable all interrupts
+    out8 (PortBase + 3, 0x80);  // Enable DLAB (set baud rate divisor)
+    out8 (PortBase + 0, 0x03);  // Set divisor to 3 (lo byte) 38400 baud (hi byte)
 
 
-    out8 (port + 1, 0x00);
-    out8 (port + 3, 0x03);  // 8 bits, no parity, one stop bit
-    out8 (port + 2, 0xC7);  // Enable FIFO, clear then with 14-byte threshold
+    out8 (PortBase + 1, 0x00);
+    out8 (PortBase + 3, 0x03);  // 8 bits, no parity, one stop bit
+    out8 (PortBase + 2, 0xC7);  // Enable FIFO, clear then with 14-byte threshold
 
 
-    out8 (port + 4, 0x0B);  // IRQs enables, RTS/DSR set
+    out8 (PortBase + 4, 0x0B);  // IRQs enables, RTS/DSR set
 }
 
 

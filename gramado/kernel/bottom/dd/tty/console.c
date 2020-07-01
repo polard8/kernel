@@ -1260,28 +1260,40 @@ int console_get_current_virtual_console (void)
 }
 
 
-void console_init_virtual_console (int n)
-{
+// #bugbug
+// #IMPORTANTE
+// Essa função apresenta problemas de compilação
+// quando incluímos mais código.
+// See: console.h
+void console_init_virtual_console (int n){
 
-    if ( n < 0 )
+    int ConsoleIndex = -1;
+
+    ConsoleIndex = n;
+
+
+    debug_print ("console_init_virtual_console:\n");
+        
+    // Limits
+    if ( ConsoleIndex < 0 || ConsoleIndex > 3 )
     {
+        //#debug
+        debug_print ("console_init_virtual_console: ConsoleIndex\n");
+        
+        panic ("console_init_virtual_console: ConsoleIndex\n");
         return;
     }
-    
-    if ( n >= 4 )
-    {
-         return;
-    }
 
-    TTY[n].cursor_x = 0;
-    TTY[n].cursor_y = 0;
-    TTY[n].cursor_width = 80;
-    TTY[n].cursor_height = 80;
-    TTY[n].cursor_left = 0;
-    TTY[n].cursor_top = 0;
-    TTY[n].cursor_right = 80;
-    TTY[n].cursor_bottom = 80;
-    TTY[n].cursor_color = COLOR_GREEN; //COLOR_TERMINALTEXT;
+
+    TTY[ConsoleIndex].cursor_x = 0;
+    TTY[ConsoleIndex].cursor_y = 0;
+    TTY[ConsoleIndex].cursor_width = 80;
+    TTY[ConsoleIndex].cursor_height = 80;
+    TTY[ConsoleIndex].cursor_left = 0;
+    TTY[ConsoleIndex].cursor_top = 0;
+    TTY[ConsoleIndex].cursor_right = 80;
+    TTY[ConsoleIndex].cursor_bottom = 80;
+    TTY[ConsoleIndex].cursor_color = COLOR_GREEN; //COLOR_TERMINALTEXT;
     
     // #bugbug
     // A estrutura tem mais elementos que podem ser inicializados.
