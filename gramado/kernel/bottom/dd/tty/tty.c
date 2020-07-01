@@ -426,10 +426,13 @@ tty_send_message (
     struct tty_d *tty;
 
     
-    if ( target_pid<0 )
+    if ( target_pid<0 ){
+        debug_print ("tty_send_message: target_pid\n");
         return -1;
+    }
 
-   
+    // The process structure.
+
     __p = (struct process_d *) processList[target_pid];
     
     if ( (void *) __p == NULL )
@@ -580,30 +583,32 @@ tty_send_message (
 
 
 
-
-
-// copia a estrutura de termios.
+// Copia a estrutura de termios
 // para o aplicativo em ring3 poder ler.
 int tty_gets ( struct tty_d *tty, struct termios *termiosp ){
 
-
-    if ( (void *) tty == NULL )
+    if ( (void *) tty == NULL ){
+        debug_print("tty_gets: tty\n");
         return -1;
+    }
          
     
-    if ( (void *) termiosp == NULL )
+    if ( (void *) termiosp == NULL ){
+        debug_print("tty_gets: termiosp\n");
         return -1;
+    }
 
 
     // Copia a estrutura term da tty na estrutura de termios 
     // que está em ring3.
+
     memcpy ( termiosp, &tty->termios, sizeof(struct termios));
 
     return 0;
 }
 
 
-// channel is a fd in the file list of a process.
+// Channel is a fd in the file list of a process.
 int 
 tty_read ( 
     unsigned int channel, 
@@ -615,7 +620,7 @@ tty_read (
 }
 
 
-// channel is a fd in the file list of a process.
+// Channel is a fd in the file list of a process.
 int 
 tty_write ( 
     unsigned int channel, 
@@ -627,8 +632,7 @@ tty_write (
 }
 
 
-
-//copia de ring3 para o kernel.
+// Copia de ring3 para o kernel.
 int 
 tty_sets ( 
     struct tty_d *tty, 
@@ -638,16 +642,22 @@ tty_sets (
     int ret = -1;
 
 
-    if ( (void *) tty == NULL )
+    if ( (void *) tty == NULL ){
+        debug_print("tty_sets: tty\n");
         return -1;
-        
-    
-    if (options < 0)
+    }
+
+
+    if (options < 0){
+        debug_print("tty_sets: options\n");
         return -1;
-        
-    
-    if ( (void *) termiosp == NULL )
+    }
+
+
+    if ( (void *) termiosp == NULL ){
+        debug_print("tty_sets: termiosp\n");
         return -1;
+    }
 
     //
     // Options.
@@ -663,26 +673,41 @@ tty_sets (
 
         // ...
 
-		default:
-			//ret = -EINVAL;
-			ret = -1;
-			break;
+        default:
+            debug_print ("tty_sets: default\n");
+            //ret = -EINVAL;
+            ret = -1;
+            break;
     };
 
 
     return (ret);
 }
- 
- 
+
+
+
+/*
+ ******************************** 
+ * tty_ioctl:
+ * 
+ */
  
 // #todo
 // See: 
-// syslib/libcore/termios.h
-// syslib/libcore/sys/ioctls.h
+// termios.h
+// ioctls.h
+
 int tty_ioctl ( int fd, unsigned long request, char *arg ){
 
     debug_print ("tty_ioctl: TODO\n");
-    
+
+    if (fd<0){
+        debug_print ("tty_ioctl: fd\n");
+        return -1;
+    }
+
+
+
     switch (request)
     {
         case TCGETS:
@@ -703,20 +728,22 @@ int tty_ioctl ( int fd, unsigned long request, char *arg ){
             debug_print ("TCFLSH\n");
             return -1;
             break;
-            
+         
+         
+         // TIOCGWINSZ, TIOCSWINSZ, TIOCGPGRP, TIOCSPGRP, TIOCNOTTY
+         
         //case ?:
             //break;
         
       
         default:
+            debug_print ("tty_ioctl: default\n");
             return -1;
             break;
     };
-	    //cases:
-	    
-	    
-	    //ret = tty_clear(&tty);
-	
+
+
+    //fail.
     return -1;
 }
 
@@ -827,44 +854,65 @@ void tty_intr (struct tty_d *tty, int signal)
 
 
 
-void tty_stop (struct tty_d *tty)
-{
+void tty_stop (struct tty_d *tty){
 
-    if ( (void *) tty == NULL )
+    if ( (void *) tty == NULL ){
+        debug_print("tty_stop: tty\n");
         return;
+    }
 
     //se ela já está parada.
-    if (tty->stopped == 1)
+    if (tty->stopped == 1){
+        //debug_print("tty_stop: already stopped\n");
         return;
+    }
 
     tty->stopped = 1;
 }
 
 
-void tty_start (struct tty_d *tty)
-{
-    if ( (void *) tty == NULL )
+void tty_start (struct tty_d *tty){
+
+    if ( (void *) tty == NULL ){
+        debug_print("tty_start: tty\n");
         return;
+    }
 
     //Se não está parada.
-    if (tty->stopped == 0)
+    if (tty->stopped == 0){
+        //debug_print("tty_start: not stopped\n");
         return;
+    }
 
     tty->stopped = 0;
 }
 
 
+/*
+void termios_init(struct termios *tm);
+void termios_init(struct termios *tm)
+{}
+*/
 
-void tty_reset_termios ( struct tty_d *tty )
-{
-    //#todo: Limits messages
-    if ( (void *) tty == NULL )
+
+/*
+ * tty_reset_termios: 
+ * 
+ * 
+ */
+
+// Reset termios.
+// See: ttydef.h
+    
+void tty_reset_termios ( struct tty_d *tty ){
+
+    // #todo: Limits messages
+    if ( (void *) tty == NULL ){
+        debug_print("tty_reset_termios: tty\n");
         return;
+    }
 
 
-
-    // See: ttydef.h
-     
     tty->termios.c_iflag = BRKINT | ICRNL | IXON;
     tty->termios.c_oflag = OPOST;
     tty->termios.c_cflag = CREAD | CS8;
@@ -1070,24 +1118,29 @@ int tty_find_empty_slot (){
 
 
 //#todo criar uma tty ldisc. 
-struct ttyldisc_d *ttyldisc_create (void) 
-{
+struct ttyldisc_d *ttyldisc_create (void){
+
     struct ttyldisc_d *__ttyldisc;
 
 
     __ttyldisc = (struct ttyldisc_d *) kmalloc ( sizeof(struct ttyldisc_d) );
     
     if ( (void *) __ttyldisc == NULL ){
-        //debug_print("...");
+        debug_print("ttyldisc_create: __ttyldisc\n");
         return NULL;
-        
+ 
     }else{
         __ttyldisc->used = 1;
         __ttyldisc->magic = 1234;
+        
+        // ...
+        
+        // OK
+        return (struct ttyldisc_d *) __ttyldisc;
     };
 
-
-    return (struct ttyldisc_d *) __ttyldisc;
+    // fail
+    return (struct ttyldisc_d *) 0;
 }
 
 
@@ -1116,25 +1169,32 @@ int ttyldisc_delete ( struct ttyldisc_d *tty_ldisc ){
 
 
 
-//#todo criar uma tty driver.  
+// #todo criar uma tty driver.  
 struct ttydrv_d *ttydrv_create (void) {
 
     struct ttydrv_d *__ttydrv;
-    
+
+
+
     __ttydrv = (struct ttydrv_d *) kmalloc ( sizeof(struct ttydrv_d) );
     
     if ( (void *) __ttydrv == NULL ){
-        //debug_print("...");
+        debug_print ("ttydrv_create: __ttydrv\n");
         return NULL;
 
     }else{
 
         __ttydrv->used = 1;
         __ttydrv->magic = 1234;
+        
+        // ...
+
+        return (struct ttydrv_d *) __ttydrv;
     };
 
 
-    return (struct ttydrv_d *) __ttydrv;
+    // fail
+    return (struct ttydrv_d *) 0;
 }
 
 
@@ -1144,7 +1204,7 @@ int ttydrv_delete ( struct ttydrv_d *tty_driver ){
 
     // Nothing to do.
     if ( (void *) tty_driver == NULL ){
-        //debug_print("...");
+        debug_print ("ttydrv_delete: tty_driver\n");
         return -1;
 
     }else{
@@ -1154,15 +1214,26 @@ int ttydrv_delete ( struct ttydrv_d *tty_driver ){
          
          //reusar
          tty_driver->magic = 216;
+         
+         // ...
+         
+         // ok
+         return 0;
     };
-    
-    return 0;
+
+    // fail
+    return -1;
 }
 
 
 
- 
-//#todo criar uma tty. 
+/*
+ * tty_create: 
+ * 
+ * OUT:
+ *     pointer.
+ */
+
 struct tty_d *tty_create (void) {
 
     struct tty_d *__tty;
@@ -1266,7 +1337,6 @@ _ok:
 
     panic ("tty_create: Crazy error!\n");   
     //return NULL;
-
 
 
 //
@@ -1463,8 +1533,6 @@ int ttyInit (int tty_id){
         CurrentTTY->stdout_update_what = 0;	
 
 
-
-
 	    //
 	    // buffer circular.
 	    //
@@ -1491,29 +1559,28 @@ int ttyInit (int tty_id){
 	       
 	    // More ?    
     };
-    
-    
+
     
     //
-
 
     return 0;
 }
 
 
-
+// Init.
+// #todo: Maybe it is not a good name.
 int tty_init_module (void){
 
     int i=0;
 
 
-    for (i=0; i<256; i++)
-    {
+    // Initialise the list.
+    for (i=0; i<256; i++){
         ttyList[i] = 0;
     };
 
 
-    //...
+    // ...
     
     return 0;
 }
