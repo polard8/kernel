@@ -88,6 +88,10 @@ tty_read_ttyList (
     
      __tty = (struct tty_d *) ttyList[channel];
 
+    //#todo
+    //if ( (void *) __tty == NULL )
+        //return -1;
+
      return (int) __tty_read ( (struct tty_d *) __tty, 
                       (char *) buffer, 
                       (int) nr );
@@ -111,7 +115,11 @@ tty_write_ttyList (
     }
     
     __tty = (struct tty_d *) ttyList[channel];
-
+    
+    //#todo
+    //if ( (void *) __tty == NULL )
+        //return -1;
+        
     return (int) __tty_write ( (struct tty_d *) __tty, 
                      (char *) buffer, 
                      (int) nr );
@@ -126,33 +134,24 @@ __tty_read (
     int nr )
 {
 
+    // tty
     if ( (void *) tty == NULL ){
         debug_print ("__tty_read: tty\n");
         return -1;
     }
-   
-    
+
+    // buffer
+    if ( (char *) buffer == NULL ){
+         panic ("__tty_read: invalid buffer \n");
+    }
+
+    // nr
     if ( nr <= 0 ){
         printf ("__tty_read: nr \n");
         refresh_screen();
         return -1;
     }
 
-    
-    //
-    // Limits
-    //
-
-   
-    //
-    // Buffer NULL
-    //
-    
-    
-    if ( (char *) buffer == NULL ){
-         panic ("__tty_read: invalid buffer \n");
-    }
-    
  
     //
     // File   (stdin)
@@ -196,10 +195,11 @@ __tty_read (
     //
 
     // Copia da tty de leitura para o buffer indicado pelo aplicativo.
-           
+       
+    // #debug       
     printf ("__tty_read: Copiando para o buffer. \n");
     refresh_screen ();
- 
+     
     memcpy ( (void *) buffer, (const void *) tty->_buffer->_base, nr ); 
     
     
@@ -224,35 +224,23 @@ __tty_write (
     int nr )
 {
 
+    // tty
     if ( (void *) tty == NULL ){
         debug_print ("__tty_write: tty\n");
         return -1;
     }
 
+    // buffer
+    if ( (char *) buffer == NULL ){
+         panic ("__tty_write: invalid buf \n");
+    }
 
+    // nr
     if ( nr <= 0 ){
         printf ("__tty_write: nr \n");
         refresh_screen();
         return -1;
     }
-
-
-
-    //
-    // Limits
-    //
-
-
-
-    //
-    // Buffer NULL
-    //
-    
-    
-    if ( (char *) buffer == NULL ){
-         panic ("__tty_write: invalid buf \n");
-    }
-
 
    
         

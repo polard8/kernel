@@ -452,7 +452,16 @@ int file_write_buffer ( file *f, char *string, int len ){
     //
     // Copy!
     //
-
+    
+    // Socket file.
+    // Se o arquivo é um socket, então não concatenaremos 
+    // escrita ou leitura.
+    if ( f->____object == ObjectTypeSocket ){ 
+        memcpy ( (void *) f->_base, (const void *) string, len ); 
+        return len;
+    }
+    
+    // Normal file.
     // Tem que atualizar o ponteiro para que o próximo
     // write seja depois desse write.
     // Para isso o ponteiro precisa estar no base quando
@@ -460,14 +469,9 @@ int file_write_buffer ( file *f, char *string, int len ){
     // Mas se o write for usado num arquivo aberto com 
     // open(), então o ponteiro deve estar no fim do arquivo.
     
-    // Se o arquivo é um socket, então não concatenaremos escrita ou leitura.
-    if ( f->____object == ObjectTypeSocket )
-    { 
-        memcpy ( (void *) f->_base, (const void *) string, len ); 
-        return len;
-    }
-    
-    // Normal file.
+    //#todo: Normal file object
+    //if ( f->____object == ObjectTypeFile )
+        
     memcpy ( (void *) f->_p, (const void *) string, len ); 
     f->_p = f->_p + len;
     
@@ -520,6 +524,16 @@ int sys_read (unsigned int fd, char *ubuf, int count){
         goto fail;
     }
 
+    // buf.
+    // todo: Checar a validade da região de memória.
+    if ( (char *) ubuf == (char *) 0 ){
+        debug_print ("sys_read: invalid ubuf address\n");
+        
+        // #debug
+        printf ("sys_read: invalid ubuf address\n"); 
+        goto fail; 
+    }
+
     // count.
     if (count<=0){
         debug_print ("sys_read: count\n");
@@ -536,17 +550,6 @@ int sys_read (unsigned int fd, char *ubuf, int count){
     // #todo: Limits.    
     if (len > 512)
         len = 512;
-    
-
-    // buf.
-    // todo: Checar a validade da região de memória.
-    if ( (char *) ubuf == (char *) 0 ){
-        debug_print ("sys_read: invalid ubuf address\n");
-        
-        // #debug
-        printf ("sys_read: invalid ubuf address\n"); 
-        goto fail; 
-    }
     
 
     // Process.
@@ -804,24 +807,21 @@ fail:
  */
 
 // service 19.
-// copiar um buffer para uma stream.
-// dado o fd.
+// Copiar um buffer para um arquivo dado o descritor.
 // Aqui devemos selecionar o dispositivo à escrever.
 // See:
 // https://github.com/zavg/linux-0.01/blob/master/fs/read_write.c
 // https://linux.die.net/man/2/write
 // ...
-
 // #todo
-// We need to call one subfunctions for
-// each different kind of file intead of implementing
-// an internal sub-routine.
+// We need to call one subfunction for each different kind of file 
+// intead of implementing an internal sub-routine.
 
 // OUT:
 // 0 = Couldn't read.
 // -1 = Error.
 
-int sys_write (unsigned int fd,char *ubuf,int count){
+int sys_write (unsigned int fd, char *ubuf, int count){
 
     struct process_d *__P;
     
@@ -836,23 +836,22 @@ int sys_write (unsigned int fd,char *ubuf,int count){
     size_t ncopy = 0;
 
 
-
-
+    // fd
     if (fd<0 || fd>31){
         debug_print ("sys_write: fd\n");
         goto fail;
     }
 
-
-    if (count<=0){
-        debug_print ("sys_write: count\n");
-        goto fail;
-    }
-
-   
+    // ubuf
     // todo: Check validation for the memory region.    
     if ( (char *) ubuf == (char *) 0 ){
         debug_print ("sys_write: invalid ubuf address\n");
+        goto fail;
+    }
+
+    // count
+    if (count<=0){
+        debug_print ("sys_write: count\n");
         goto fail;
     }
 
@@ -871,17 +870,15 @@ int sys_write (unsigned int fd,char *ubuf,int count){
     // dispositivos de bloco.
     //if (len > 64 )
         //len = 64;
-    
 
     if (len > 512 )
         len = 512;
 
+
     //
     // Process pointer.
     //
-    
-    
-    
+
     __P = (struct process_d *) processList[current_process];
 
     if ( (void *) __P == NULL ){
@@ -930,22 +927,28 @@ int sys_write (unsigned int fd,char *ubuf,int count){
 
 
     //
-    // sockets
+    // Sockets
     //
     
     ncopy = count;
     
     // ==== Socket ===============================
     // Descobrindo o soquete que devemos copiar.
+    // Se o arquivo é do tipo socket, então devemos
+    // sabar onde está o buffer.
+    // #todo: Talvez podemos chamar a função socket_write().
     if ( __file->____object == ObjectTypeSocket )
     {
-        //pega a estrutura de soquete.
+        // Pega a estrutura de soquete do processo atual.
+        // #bugbug: 
+        // Um processo não pode escrever no socket de outro processo?
         s1 = __P->priv;
         if ( (void *) s1 == NULL){ 
             debug_print ("sys_write: s1 \n");
             goto fail;
         }    
-         
+        
+        // O socket tem um buffer, que é um arquivo. 
         if (__file != s1->private_file){
             debug_print ("sys_write: __file\n");
             goto fail;
@@ -955,36 +958,56 @@ int sys_write (unsigned int fd,char *ubuf,int count){
         //printf ("sys_write: (1) pid %d Writing in the socket file %d \n", 
             //current_process, __file->_file );
         //refresh_screen();
-                 
+
+        // Write!
+        // Write in the socket buffer.
         nbytes = (int) file_write_buffer ( (file *) __file, 
                            (char *) ubuf, (int) count );
-                            
+
+        // fail
         if (nbytes < 0){
             debug_print("sys_write: file_write_buffer fail \n");
             goto fail;
          }
          
-         // retorna sem mudar as flags do arquivo.
-         if (nbytes == 0){
-             return 0;
-         }
-            
+        // fail
+        // Retorna sem mudar as flags do arquivo.
+        if (nbytes == 0){ 
+            debug_print("sys_write: file_write_buffer fail 0\n");
+            return 0; 
+        }
+
+        // ok, write funcionou.
+        
         // #debug
-        //printf ("sys_write: written\n");
-        //refresh_screen();
+        // printf ("sys_write: written\n");
+        // refresh_screen();
      
-         //agora nosso arquivo esta pronto para leitura,
-         //pois esperamos uma resposta.    
-         //>>> nao posso ler  ... so poderei ler quando alguem mandar alguma coisa.
+         // Flags!
+         // Agora nosso arquivo esta pronto para leitura,
+         // pois esperamos uma resposta.    
+         // >>> nao posso ler ... 
+         // so poderei ler quando alguem mandar alguma coisa.
         __file->_flags |= __SRD;  
-         
+
          
         // Connected ??
-        // Esse ponteiro precisa ser inicializado
+        // Vamos checar se esse socket está conectado à outro socket.
+        // Nesse caso iremos escrever também no arquivo conectado.
+        // #todo #importante
+        // Precisamos de uma falg que nos diga que devemos
+        // escrever também no socket conectado.
+    
+        // #todo
+        // Retornaremos se não é para copiar para o socket conectado.
+        //if (__file->_copy_to_connected_socket != 1){ return 0; }
+        
+        // #obs: Esse ponteiro precisa ser inicializado
         // na criação da estrutura de socket.
+        
         if ( (void *) s1->conn == NULL){ 
             debug_print("sys_write: s1->conn fail. No connection\n");
-            //printf("sys_write: s1->conn fail. No connection\n");  //for real machine;
+            //printf("sys_write: s1->conn fail. No connection\n"); 
             goto fail;
         }    
          
@@ -992,7 +1015,7 @@ int sys_write (unsigned int fd,char *ubuf,int count){
          
         if ( (void *) s2 == NULL){    
             debug_print("sys_write: s2 fail. No connection\n");
-            //printf("sys_write: s2 fail. No connection\n");  //for real machine;
+            //printf("sys_write: s2 fail. No connection\n");  
             goto fail;
         }    
 
@@ -1017,17 +1040,19 @@ int sys_write (unsigned int fd,char *ubuf,int count){
          
             nbytes = (int) file_write_buffer ( (file *) __file2, 
                                (char *) ubuf, (int) ncopy );
-                               
 
+            // fail
             if (nbytes < 0){
                 debug_print("sys_write: file_write_buffer fail (2)\n");
                 goto fail;
             }
             
+            // fail
             // Não foi escrito ...
             // não mudamos flag, nem dormimos.
-            if (nbytes == 0){
-                return 0;
+            if (nbytes == 0){ 
+                debug_print("sys_write: file_write_buffer fail 0 (2)\n");
+                return 0; 
             }
        
             //printf ("sys_write: written\n");
@@ -1268,14 +1293,12 @@ sys_create_process (
 
 
 
-
-// 85
+// 85 
 // Get PID of the current process.
 int sys_getpid (void)
 {
     return (int) current_process;
 }
-
 
 
 // 81
@@ -1299,10 +1322,10 @@ int sys_getppid (void){
 
         if ( p->used != 1 || p->magic != 1234 )
         {    
-			return (int) -1;	
+            return (int) -1;	
         }
-		
-		return (int) p->ppid;
+
+        return (int) p->ppid;
     }
 
     return (int) (-1);

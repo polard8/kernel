@@ -1,8 +1,8 @@
 /*
  * File: main.c - gdeshell - bash 1.05 clone. (baseado no bash)
  * #todo Para esse aplicativo vou usar o prompt: [username@hostname] $
- * #todo: precisamos deletar a parte referente ao terminal e outros... deve ficar apenas 
- * a parte de shell.
+ * #todo: precisamos deletar a parte referente ao terminal e outros... 
+ * deve ficar apenas a parte de shell.
  *
  * #todo: a inten��o � que isso seja apenas um shell e n�o um terminal virtual.
  * devendo essa aplica��o rodar no terminal virtual quando chamada por ele, ou
@@ -505,6 +505,7 @@ void tty_test (void){
 }
 
 
+//tty2
 //void xxx_tty_test(void);
 void xxx_tty_test(void)
 {
@@ -516,11 +517,20 @@ void xxx_tty_test(void)
     ____this_tty_id = gramado_system_call ( 266, getpid(), 0, 0 );
     printf ("The tty for this process is %d\n", ____this_tty_id);
 
+
+    int nreads = -1;
+
+    // Read the message sended by true.bin.
     while(1)
     {
-        read_ttyList ( ____this_tty_id, buf, 32 );     
-        printf (buf);
-        fflush(stdout);
+        nreads = read_ttyList ( ____this_tty_id, buf, 32 );     
+        
+        if ( nreads > 0){
+            //printf ("=====Message:====\n");
+            printf (buf);
+            fflush(stdout);
+            //break;
+        }
     }
 }
 

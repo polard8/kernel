@@ -33,16 +33,22 @@ int main ( int argc, char *argv[] )
     ____this_tty_id = gramado_system_call ( 266, getpid(), 0, 0 );
     printf ("The tty for this process is %d\n", ____this_tty_id);
 
+    int nwrite = -1; // bytes escritos.
     size_t __w_size2;
     
     while(1)
     {
-    //Escrevendo na tty desse processo e na tty slave pra leitura.
-    write_ttyList ( ____this_tty_id, 
-        buf, 
-        __w_size2 = sprintf (buf,"THIS IS A MAGIC STRING\n")  );
+        // Escrevendo na tty desse processo e na tty slave pra leitura.
+        nwrite = write_ttyList ( ____this_tty_id, 
+                     buf, 
+                     __w_size2 = sprintf (buf,"THIS IS A MAGIC STRING\n")  );
+    
+        if (nwrite > 0)
+           goto __ok;
     }
 
+
+__ok:
 
 	/*
 	int c;
