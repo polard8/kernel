@@ -40,106 +40,121 @@
 #include <sys/types.h>
 
 typedef uint32_t tcp_seq;
+
+
 /*
+ ********************************
  * TCP header.
- * Per RFC 793, September, 1981.
- * Updated by RFC 3168, September, 2001.
+ * 
+ *     Per RFC 793, September, 1981.
+ *     Updated by RFC 3168, September, 2001.
  */
+
 struct tcphdr {
-	uint16_t th_sport;		/* source port */
-	uint16_t th_dport;		/* destination port */
-	tcp_seq	  th_seq;		/* sequence number */
-	tcp_seq	  th_ack;		/* acknowledgement number */
+
+    uint16_t  th_sport;  /* source port */
+    uint16_t  th_dport;  /* destination port */
+    tcp_seq   th_seq;    /* sequence number */
+    tcp_seq   th_ack;    /* acknowledgement number */
+
+
+// little endian
 #if BYTE_ORDER == LITTLE_ENDIAN
-	/*LINTED non-portable bitfields*/
-	uint8_t  th_x2:4,		/* (unused) */
-		  th_off:4;		/* data offset */
+    /*LINTED non-portable bitfields*/
+    uint8_t th_x2:4,		/* (unused) */
+            th_off:4;		/* data offset */
 #endif
+
+// big endian
 #if BYTE_ORDER == BIG_ENDIAN
-	/*LINTED non-portable bitfields*/
-	uint8_t  th_off:4,		/* data offset */
-		  th_x2:4;		/* (unused) */
+    /*LINTED non-portable bitfields*/
+    uint8_t th_off:4,		/* data offset */
+            th_x2:4;		/* (unused) */
 #endif
-	uint8_t  th_flags;
-#define	TH_FIN	  0x01		/* Final: Set on the last segment */
-#define	TH_SYN	  0x02		/* Synchronization: New conn with dst port */
-#define	TH_RST	  0x04		/* Reset: Announce to peer conn terminated */
-#define	TH_PUSH	  0x08		/* Push: Immediately send, don't buffer seg */
-#define	TH_ACK	  0x10		/* Acknowledge: Part of connection establish */
-#define	TH_URG	  0x20		/* Urgent: send special marked segment now */
-#define	TH_ECE	  0x40		/* ECN Echo */
-#define	TH_CWR	  0x80		/* Congestion Window Reduced */
-	uint16_t th_win;			/* window */
-	uint16_t th_sum;			/* checksum */
-	uint16_t th_urp;			/* urgent pointer */
+
+    uint8_t  th_flags;
+
+#define	TH_FIN    0x01		/* Final: Set on the last segment */
+#define	TH_SYN    0x02		/* Synchronization: New conn with dst port */
+#define	TH_RST    0x04		/* Reset: Announce to peer conn terminated */
+#define	TH_PUSH   0x08		/* Push: Immediately send, don't buffer seg */
+#define	TH_ACK    0x10		/* Acknowledge: Part of connection establish */
+#define	TH_URG    0x20		/* Urgent: send special marked segment now */
+#define	TH_ECE    0x40		/* ECN Echo */
+#define	TH_CWR    0x80		/* Congestion Window Reduced */
+
+    uint16_t th_win;		/* window */
+    uint16_t th_sum;		/* checksum */
+    uint16_t th_urp;		/* urgent pointer */
+
 } __packed;
 
-#define	TCPOPT_EOL		0
-#define	   TCPOLEN_EOL			1
-#define	TCPOPT_PAD		0
-#define	   TCPOLEN_PAD			1
-#define	TCPOPT_NOP		1
-#define	   TCPOLEN_NOP			1
-#define	TCPOPT_MAXSEG		2
-#define	   TCPOLEN_MAXSEG		4
-#define	TCPOPT_WINDOW		3
-#define	   TCPOLEN_WINDOW		3
-#define	TCPOPT_SACK_PERMITTED	4		/* Experimental */
-#define	   TCPOLEN_SACK_PERMITTED	2
-#define	TCPOPT_SACK		5		/* Experimental */
-#define	TCPOPT_TIMESTAMP	8
-#define	   TCPOLEN_TIMESTAMP		10
-#define	   TCPOLEN_TSTAMP_APPA		(TCPOLEN_TIMESTAMP+2) /* appendix A */
 
-#define TCPOPT_TSTAMP_HDR	\
+#define TCPOPT_EOL      0
+#define TCPOLEN_EOL     1
+#define TCPOPT_PAD      0
+#define TCPOLEN_PAD     1
+#define TCPOPT_NOP      1
+#define TCPOLEN_NOP     1
+#define TCPOPT_MAXSEG   2
+#define TCPOLEN_MAXSEG  4
+#define TCPOPT_WINDOW   3
+#define TCPOLEN_WINDOW  3
+#define TCPOPT_SACK_PERMITTED   4  /* Experimental */
+#define TCPOLEN_SACK_PERMITTED  2
+#define TCPOPT_SACK             5  /* Experimental */
+#define TCPOPT_TIMESTAMP        8
+#define TCPOLEN_TIMESTAMP       10
+#define TCPOLEN_TSTAMP_APPA  (TCPOLEN_TIMESTAMP+2)  /* appendix A */
+
+#define TCPOPT_TSTAMP_HDR  \
     (TCPOPT_NOP<<24|TCPOPT_NOP<<16|TCPOPT_TIMESTAMP<<8|TCPOLEN_TIMESTAMP)
 
-#define	TCPOPT_SIGNATURE	19		/* Keyed MD5: RFC 2385 */
-#define	   TCPOLEN_SIGNATURE		18
-#define    TCPOLEN_SIGLEN		(TCPOLEN_SIGNATURE+2) /* padding */
+#define TCPOPT_SIGNATURE   19  /* Keyed MD5: RFC 2385 */
+#define TCPOLEN_SIGNATURE  18
+#define TCPOLEN_SIGLEN  (TCPOLEN_SIGNATURE+2) /* padding */
 
-#define MAX_TCPOPTLEN	40	/* max # bytes that go in options */
+#define MAX_TCPOPTLEN  40  /* max # bytes that go in options */
+
 
 /*
  * Default maximum segment size for TCP.
  * This is defined by RFC 1112 Sec 4.2.2.6.
  */
-#define	TCP_MSS		536
-
-#define	TCP_MINMSS	216
-
-#define	TCP_MAXWIN	65535	/* largest value for (unscaled) window */
-
-#define	TCP_MAX_WINSHIFT	14	/* maximum window shift */
-
-#define	TCP_MAXBURST	4	/* maximum segments in a burst */
+#define TCP_MSS     536
+#define TCP_MINMSS  216
+#define TCP_MAXWIN  65535     /* largest value for (unscaled) window */
+#define TCP_MAX_WINSHIFT  14  /* maximum window shift */
+#define TCP_MAXBURST      4   /* maximum segments in a burst */
 
 #endif /* _NETBSD_SOURCE */
+
+
 
 /*
  * User-settable options (used with setsockopt).
  */
-#define	TCP_NODELAY	1	/* don't delay send to coalesce packets */
-#define	TCP_MAXSEG	2	/* set maximum segment size */
-#define	TCP_KEEPIDLE	3
+#define TCP_NODELAY   1  /* don't delay send to coalesce packets */
+#define TCP_MAXSEG    2  /* set maximum segment size */
+#define TCP_KEEPIDLE  3
 #ifdef notyet
-#define	TCP_NOPUSH	4	/* reserved for FreeBSD compat */
+#define TCP_NOPUSH    4  /* reserved for FreeBSD compat */
 #endif
-#define	TCP_KEEPINTVL	5
-#define	TCP_KEEPCNT	6
-#define	TCP_KEEPINIT	7
+#define TCP_KEEPINTVL  5
+#define TCP_KEEPCNT    6
+#define TCP_KEEPINIT   7
 #ifdef notyet
-#define	TCP_NOOPT	8	/* reserved for FreeBSD compat */
+#define TCP_NOOPT  8  /* reserved for FreeBSD compat */
 #endif
-#define	TCP_INFO	9	/* retrieve tcp_info structure */
-#define	TCP_MD5SIG	0x10	/* use MD5 digests (RFC2385) */
-#define	TCP_CONGCTL	0x20	/* selected congestion control */
+#define TCP_INFO     9     /* retrieve tcp_info structure */
+#define TCP_MD5SIG   0x10  /* use MD5 digests (RFC2385) */
+#define TCP_CONGCTL  0x20  /* selected congestion control */
 
-#define	TCPI_OPT_TIMESTAMPS	0x01
-#define	TCPI_OPT_SACK		0x02
-#define	TCPI_OPT_WSCALE		0x04
-#define	TCPI_OPT_ECN		0x08
-#define	TCPI_OPT_TOE		0x10
+#define	TCPI_OPT_TIMESTAMPS  0x01
+#define	TCPI_OPT_SACK        0x02
+#define	TCPI_OPT_WSCALE      0x04
+#define	TCPI_OPT_ECN         0x08
+#define	TCPI_OPT_TOE         0x10
 
 /*
  * The TCP_INFO socket option comes from the Linux 2.6 TCP API, and permits
@@ -150,12 +165,14 @@ struct tcphdr {
  * the Linux API, the same variable names and order have been adopted, and
  * padding left to make room for omitted fields in case they are added later.
  *
- * XXX: This is currently an unstable ABI/API, in that it is expected to
+ * XXX: 
+ * This is currently an unstable ABI/API, in that it is expected to
  * change.
  */
 struct tcp_info {
-	uint8_t		tcpi_state; /* TCP FSM state. */
-	uint8_t		__tcpi_ca_state;
+
+    uint8_t		tcpi_state; /* TCP FSM state. */
+    uint8_t		__tcpi_ca_state;
 	uint8_t		__tcpi_retransmits;
 	uint8_t		__tcpi_probes;
 	uint8_t		__tcpi_backoff;
@@ -209,4 +226,7 @@ struct tcp_info {
 	uint32_t	__tcpi_pad[26];		/* Padding. */
 };
 
+
 #endif /* !_NETINET_TCP_H_ */
+
+
