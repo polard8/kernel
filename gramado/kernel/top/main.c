@@ -35,7 +35,7 @@ extern unsigned long SavedBootMode;
 
 int kernel_main (int arch_type){
 
-    int Status = 0;
+    int Status = -1;
 
 
     // Current arch support.
@@ -53,28 +53,36 @@ int kernel_main (int arch_type){
     // serial debug.
     // video.
     // ...
-
-
-    // Virtual Console
-    // The kernel only have four virtual consoles.
-
-    console_set_current_virtual_console (0);
-    console_init_virtual_console (0);
-    console_init_virtual_console (1);
-    console_init_virtual_console (2);
-    console_init_virtual_console (3);
-
-
+    
     // Serial debug
     // Initialize all the ports.
-    serial_init ();
-
-
+    // ps: We can't use debug in this first initialization.
+    // See: bottom/dd/serial/serial.c
+    Status = serial_init();
+    if (Status != 0)
+    {
+        // #bugbug
+        // Não temos uma mensagem pra alertar que alguma coisa
+        // falhou na inicialização das portas seriais.
+        // Vamos continuar por enquanto.
+    }
+    
     debug_print ("============================================\n");
     debug_print ("== main.c: Architechture independent part ==\n");
     debug_print ("============================================\n");
     debug_print ("[Kernel] kernel_main: \n");
     debug_print ("[Kernel] kernel_main: Initializing the part in C ...\n");
+
+
+    // Virtual Console
+    // The kernel only have four virtual consoles.
+    debug_print ("[Kernel] kernel_main: Initializing virtual console...\n");
+    
+    console_set_current_virtual_console (0);
+    console_init_virtual_console (0);
+    console_init_virtual_console (1);
+    console_init_virtual_console (2);
+    console_init_virtual_console (3);
 
 
     switch (current_arch){
@@ -145,6 +153,8 @@ int kernel_main (int arch_type){
 	};
 
 
+    debug_print ("[Kernel] kernel_main: Initializing video support ...\n");
+    
 	//
 	// Verbose mode.
 	//
@@ -190,7 +200,7 @@ int kernel_main (int arch_type){
     debug_print ("[Kernel] kernel_main: Initializing runtime\n");
 
     Status = (int) KiInitRuntime ();
-
+    
     if ( Status != 0 ){
         debug_print ("[Kernel] kernel_main: Runtime fail. *hang\n");
         while (1){
@@ -216,10 +226,12 @@ int kernel_main (int arch_type){
 
     switch (current_arch){
 
-        // See: sci/arch/x86/entry/x86main.c
+        // See: bottom/init/x86/x86init.c
         case CURRENT_ARCH_X86:
             debug_print ("[Kernel] kernel_main: Initializing x86 arch ...\n");
-            x86main ();
+            Status = (int) x86main();
+            if (Status != 0)
+                panic("[Kernel] kernel_main: CURRENT_ARCH_X86 fail\n");
             break;
 
         // See:

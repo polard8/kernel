@@ -4,8 +4,8 @@
 ; Descrição:
 ;     Mensagens e variáveis do Shell do Boot Manager.
 ;
-; Histórico:
-;     2015 - Created.
+; History:
+;     2015 - Created by Fred Nora.
 ;     2017 - Revision.
 
 
@@ -14,7 +14,9 @@
 
 
 ; Struct.
-;     Estrtura de strings aleatórias para suporte ao shell do boot manager. 
+;     Estrtura de strings aleatórias para suporte ao shell 
+;     do boot manager. 
+
 
 SHELL:
     .volume:      db 0         ;Em que volume está o Shell.
@@ -37,23 +39,26 @@ file_flag db 0
 ; Command strings.
 ;
 
-;
-; @todo: 
-;     Incluir configurações de inicialização, 
-;     como as do menu16.
-;
+; #todo: 
+; Incluir configurações de inicialização, como as do menu16.
 
 ;Inicialização.
 boot_string       db     'boot', 0    ;Inicia com a configuração atual. 
 reboot_string     db   'reboot', 0    ;Reinicia o sistema.
-shutdown_string   db 'shutdown', 0    ;Desliga a máquina via APM.	
+shutdown_string   db 'shutdown', 0    ;Desliga a máquina via APM.
 make_boot_string  db 'makeboot', 0    ;Cria inicialização padrão. 
-;...
+; ...
+
 
 ;Operações com dispositivos.
-hd_string             db        'disk', 0    ;Visualiza as informaçções sobre um disco.  
-particao_string       db        'part', 0    ;Visualiza as informações sobre uma partição
-;;..
+
+;Visualiza as informaçções sobre um disco.
+hd_string          db    'disk', 0     
+
+;Visualiza as informações sobre uma partição 
+particao_string    db    'part', 0    
+
+;; ...
 
 ;Operações com arquivos.
 dir_string          db 'dir', 0    ;Exibe a lista de arquivos do diretório raiz.
@@ -64,10 +69,14 @@ open_dir_string     db  'od', 0     ;Open dir.
 make_dir_string     db  'md', 0     ;Make dir.
 delete_dir_string   db  'dd', 0     ;Delete dir.
 
-change_dir_string   db 'cd', 0     ;Change dir. (Change current working dir.)
-print_workingdir_string   db 'pwd', 0     ;pwd (print working directory) 
-ls_string                 db 'ls', 0     ;ls lista os arquivos.
-;...
+
+;Change dir. (Change current working dir.)
+change_dir_string  db    'cd', 0     
+
+print_workingdir_string   db 'pwd', 0  ;pwd (print working directory) 
+ls_string                 db 'ls', 0   ;ls lista os arquivos.
+; ...
+
 
 ;Outros.
 help_string           db        'help', 0
@@ -124,22 +133,19 @@ seleciona_p3  db  'p3', 0    ;Seleciona particao 3.
 
 version_msg:
 shellmsg_splash: 
-
-    db 'Gramado Boot Manager ',13,10, 
-    db 'Version ', BOOTMANAGER_VER, 
-    db ' (C) Copyright Fred Nora 2020',13,10,0
-
+    db 'Gramado Boot Manager ',     13, 10, 
+    db 'Version ', BOOTMANAGER_VER, 13, 10, 0  
 
 
 ;;
 ;; Prompt
 ;;
 
-prompt:              db 'BM/>', 0           ;Prompt padrão.
+prompt:              db 'BM/>', 0       ;Prompt padrão.
 msg_shell_prompt:    db 'BM/>', 0
 
 
-prompt_change_file:  db 'filename=', 0      ;Para declarar o nome do arquivo.
+prompt_change_file:  db 'filename=', 0  ;Para declarar o nome do arquivo.
 
 
 
@@ -174,32 +180,39 @@ dir1_upper_slash_string:   db '/BOOT',0
 
 ; File operation.
 msg_file_op0 db "Default operation on file", 13, 10 ,0
-msg_file_op1 db "Open file", 13, 10 ,0
+msg_file_op1 db "Open file",   13, 10 ,0
 msg_file_op2 db "Create file", 13, 10 ,0
 msg_file_op3 db "Delete file", 13, 10 ,0
-msg_file_op4 db "Open dir", 13, 10 ,0
-msg_file_op5 db "Create dir", 13, 10 ,0
-msg_file_op6 db "Delete dir", 13, 10 ,0
-msg_file_op7 db "Open app", 13, 10 ,0
-;...
+msg_file_op4 db "Open dir",    13, 10 ,0
+msg_file_op5 db "Create dir",  13, 10 ,0
+msg_file_op6 db "Delete dir",  13, 10 ,0
+msg_file_op7 db "Open app",    13, 10 ,0
+; ...
 
 
-not_found_msg:      db 'Command or file not found', 13, 10, 0
-hd_msg:             db 'Reading sector', 13, 10, 0
-dir_title1_string:  db "Current Directory:", 13, 10, 0
-dir_title2_string:  db "Name                     Cluster", 13, \
-                       "================================", 13, 0
+not_found_msg:      
+    db 'Command or file not found', 13, 10, 0
+
+hd_msg:             
+    db 'Reading sector', 13, 10, 0
+
+dir_title1_string:  
+    db "Current Directory:", 13, 10, 0
+
+
+dir_title2_string:  
+    db "Name                     Cluster", 13, \
+       "================================", 13, 0
+
 
 ;
 ; Help text.
 ;
 
-
 help_text:
     db 'boot, reboot, shutdown', 13, 10
-    db 'disk, part', 13, 10
-    db 'dir', 13, 10
-    db 'help, cls, ver', 13, 10, 0
+    db 'disk, part, dir',        13, 10
+    db 'help, cls, ver',         13, 10, 0
 
 
 ;

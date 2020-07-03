@@ -75,7 +75,7 @@ int devmgr_init_device_list(void){
 
     debug_print ("devmgr_init_device_list: Initializing the mount table. deviceList[].\n");
 
-    for (i=0; i<NUMBER_OF_FILES; i++){
+    for (i=0; i<DEVICE_LIST_MAX; i++){
         deviceList[i] = 0; 
     }
 
@@ -127,7 +127,7 @@ struct device_d *devmgr_device_object (void){
 
     struct device_d *d;
     
-    unsigned long __tmp;
+    unsigned long __tmp=0;
     int i=0;
     
     char __noname[] = "no-name";
@@ -135,9 +135,9 @@ struct device_d *devmgr_device_object (void){
 
     // Procura um slot vazio.
 
-    for (i=0; i<NUMBER_OF_FILES; i++)
+    for (i=0; i<DEVICE_LIST_MAX; i++)
     {
-         __tmp = deviceList[i];
+         __tmp = (unsigned long) deviceList[i];
     
          // slot livre.
          if ( __tmp == 0 )  //unsigned long
@@ -170,9 +170,9 @@ struct device_d *devmgr_device_object (void){
          }
     };
 
-
     // fail
-    return NULL;
+    panic ("devmgr_device_object: Overflow!");
+    //return NULL;
 }
 
 
@@ -225,7 +225,7 @@ devmgr_register_device (
         d = (struct device_d *) devmgr_device_object ();
         
         if ( (void *) d == NULL ){
-            panic ("devmgr_register_device: d\n");
+            panic ("devmgr_register_device: d. Couldn't create device object\n");
 
         }else{
 
@@ -235,7 +235,7 @@ devmgr_register_device (
 
             id = d->deviceId;
             
-            if (id < 0 || id >= NUMBER_OF_FILES ){
+            if (id < 0 || id >= DEVICE_LIST_MAX ){
                 panic ("devmgr_register_device: id limits \n");
             }
 
@@ -283,7 +283,7 @@ void devmgr_show_device_list(void)
 //#endif
 
 
-    for (i=0; i<NUMBER_OF_FILES; i++)
+    for (i=0; i<DEVICE_LIST_MAX; i++)
     {
         d = ( struct device_d *) deviceList[i];
 

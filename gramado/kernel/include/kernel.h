@@ -784,7 +784,7 @@ struct platform_d *Platform;
 int kernel_main (int arch_type);
 
 //inicialização da arquitetura x86.
-void x86main (void);
+int x86main (void);
 //...
 
 

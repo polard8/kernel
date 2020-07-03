@@ -1,5 +1,5 @@
 ;
-; File: lib16\s2fat16.inc
+; File: lib16/s2fat16.inc
 ;
 ; Descrição:
 ; Suporte à leitura de arquivo no sistema FAT16.
@@ -13,8 +13,9 @@
 ;     + s2fat16LOADIMAGE
 ;     + s2fat16ReadSectors
 ;
-; Versão 1.0, 2015.
+; 2015 - Created by Fred Nora.
 ;
+
 
 ;;
 ;; Salva o endereço do nome do arquivo a ser carregado.
@@ -31,7 +32,7 @@ s2_fat16_Selected_Drive_Number:
 	
 	
 
-;;=============================================================================
+;; ==================================================================
 ;; s2fat16ReadFile:
 ;;     Loads a file using fat16.    
 ;;     PS: We are in 16 bit real mode.
@@ -56,9 +57,9 @@ s2fat16ReadFile:
 
     pusha 
 
-	;Salva o endereço do nome do arquivo.
-    mov word [s2fat16_image_address], ax 	
-	
+    ;Salva o endereço do nome do arquivo.
+    mov word [s2fat16_image_address], ax 
+
 	;;
 	;; @todo:
 	;; Imperativo. Estamos testando se é HD MASTER.
@@ -70,64 +71,64 @@ s2fat16ReadFile:
 	;@todo: Trocar pelo bpb do stage 2.
 	
 	;hd slave
-    ;cmp byte [fat16_bpb.DriveNumber], byte 0x81	
+    ;cmp byte [fat16_bpb.DriveNumber], byte 0x81
     ;jne .fail
-	
-	;hd.master
-    cmp byte [fat16_bpb.DriveNumber], byte 0x80	
+
+    ;hd.master
+    cmp byte [fat16_bpb.DriveNumber], byte 0x80
     jne .fail
-	
+
 	;;...
-	
-.setupRegisters:	
+
+.setupRegisters:
     xor ax, ax  
     xor bx, bx
     xor cx, cx
     xor dx, dx
-	
-	;Message.
-	;mov si, msg_s2fat16_Loading  
+
+    ;Message.
+    ;mov si, msg_s2fat16_Loading  
     ;call DisplayMessage
-	
-    ;1 - Calcula o início da área de dados.		
+
+    ;1 - Calcula o início da área de dados.
 .getDataAreaInit:
 
-	;Message.
-	mov si, msg_s2fat16_step1  
-    call DisplayMessage		
-	call s2fat16_get_dataarea_init
-	
+    ; Message.
+    mov si, msg_s2fat16_step1  
+    call DisplayMessage
+    call s2fat16_get_dataarea_init
+
     ;2 - Carrega o rootdir.
-.loadRoot:	
+.loadRoot:
 	;Message.
-	mov si, msg_s2fat16_step2
-    call DisplayMessage	
-	call s2fat16LOADROOT
-	
-	;3 - Procura um nome de arquivo no diretório raiz.	
+    mov si, msg_s2fat16_step2
+    call DisplayMessage
+    call s2fat16LOADROOT
+
+    ;3 - Procura um nome de arquivo no diretório raiz.	
 .seachFileName:
 	;Message.
-	mov si, msg_s2fat16_step3  
+    mov si, msg_s2fat16_step3  
     call DisplayMessage
-	
-	mov ax, word [s2fat16_image_address]
-	call s2fat16SearchFileName
-	jc  .fail                       ;@todo: Erro. 
+
+    mov ax, word [s2fat16_image_address]
+    call s2fat16SearchFileName
+    jc  .fail                       ;@todo: Erro. 
 	
     mov word [.cluster], ax          ;Salva cluster inicial.
 
 
     ;4 - Carrega a FAT. 
 	
-	
-    ;Message.	
-	mov si, msg_s2fat16_step4  
+
+    ;Message.
+    mov si, msg_s2fat16_step4  
     call DisplayMessage	
 	
 	;load FAT.
-.loadFAT:	
-	call s2fat16LOADFAT
-	
+.loadFAT:
+    call s2fat16LOADFAT
+
     ;5 - Carrega o arquivo.	
 	
 	;Message.
@@ -139,13 +140,13 @@ s2fat16ReadFile:
     ;call DisplayMessage	
 	
     ;Load Image.	
-.loadImage:	
-	mov ax, word [.cluster]
-	call s2fat16LOADIMAGE	
-	
+.loadImage:
+    mov ax, word [.cluster]
+    call s2fat16LOADIMAGE
+
 	;*Se funcionou.
 .fat16_read_DONE:
-	
+
 	;Message.
 	;mov si, msg_s2fat16_Done
     ;call DisplayMessage	
@@ -172,15 +173,15 @@ s2fat16ReadFile:
 .fail:
     
 	;Message.
-	mov si, msg_s2fat16_diskfail
-    call DisplayMessage	
-	
+    mov si, msg_s2fat16_diskfail
+    call DisplayMessage
+
 	;#Debug
 	;jmp $
 	
-	popa
-	stc
-	ret	
+    popa
+    stc
+    ret
 .cluster: dw 0
 
 
@@ -190,8 +191,8 @@ s2fat16ReadFile:
 ;     *IMPORTANTE.
 ;
 s2fat16_get_dataarea_init:   
-	
-	pusha
+
+    pusha
     xor ax, ax  
     xor bx, bx
     xor cx, cx
@@ -201,31 +202,31 @@ s2fat16_get_dataarea_init:
     ;( 32 * 512 ) / 512
     ; quantidade de bytes / bytes por setor = número de setores.    
 	
-	xor ax, ax 
-    xor cx, cx	
-	mov ax, word 32                           ;32 bytes por entrada do diretório.         
+    xor ax, ax 
+    xor cx, cx
+    mov ax, word 32                           ;32 bytes por entrada do diretório.         
     mul WORD [fat16_bpb.MaxRootEntries]       ;512 - Número máximo de entradas.
     div WORD [fat16_bpb.BytesPerSector]       ;512 - bytes por setor.
     xchg ax, cx                               ;Salva o tamanho do diretório.
-	
+
 	;32
 	
 	;calcula a localização do diretorio raiz. ;(2*254) + (setores reservados) = "ax".	
-	xor ax, ax 
-	mov al, BYTE [fat16_bpb.TotalFATs]        ;2   - numero de fats.
+    xor ax, ax 
+    mov al, BYTE [fat16_bpb.TotalFATs]        ;2   - numero de fats.
     mul WORD [fat16_bpb.SectorsPerFAT]        ;246 - setores por FATs.
     add ax, WORD [fat16_bpb.ReservedSectors]  ;3   - setores reservados.
     add ax, 1                                 ;Quantidade de setores do VBR. (1) 
-	add ax, word FAT_LBA                ;63  - início da partição.
+    add ax, word FAT_LBA                ;63  - início da partição.
 
 	;Construindo o valor de 'fat16_datasector', o inicio da area de dados. 
-	mov WORD [fat16_datasector], ax           ;coloca 2 fats + setor reservado em 'ax'          
+    mov WORD [fat16_datasector], ax           ;coloca 2 fats + setor reservado em 'ax'          
     add WORD [fat16_datasector], cx           ;adiciona o tamanho do diretorio raiz. 
-	
+
 	;Obs:
 	;    O valor de data sector esta salvo em 'fat16_datasector'.
 	
-	popa
+    popa
     ret
 
 
@@ -236,38 +237,38 @@ s2fat16_get_dataarea_init:
 ; OUT: 
 ;     AX = Cluster.
 s2fat16SearchFileName:
-    
-	pusha	   
-	mov word [.name], ax    ;Save file name.
+
+    pusha
+    mov word [.name], ax    ;Save file name.
 	
 	;configurando a base.
-	xor ax, ax
-	mov ax, ROOT_SEGMENT  ;base para mbr,vbr,fat,root,data area. no stage 2.
-	mov es, ax
+    xor ax, ax
+    mov ax, ROOT_SEGMENT  ;base para mbr,vbr,fat,root,data area. no stage 2.
+    mov es, ax
 	
 	;Load Root Dir.
-	call s2fat16LOADROOT
-		
+    call s2fat16LOADROOT
+
     xor cx, cx
-	mov cx, WORD 512                ;16 ;[fat16_bpb.MaxRootEntries] contador de entradas  
+    mov cx, WORD 512                ;16 ;[fat16_bpb.MaxRootEntries] contador de entradas  
 	;@todo: isso é apenas o offset a base deve ser 7000h para teste.
-	mov di, ROOT_OFFSET  ;inicio do diretorio   
-	
+    mov di, ROOT_OFFSET  ;inicio do diretorio   
+
 ;++
 .loop_search_file:
     push cx
     mov cx, 0x000B            ;Eleven character name.
     
-	mov si, word [.name]    
+    mov si, word [.name]    
     push di
     rep cmpsb                  ;Test for entry match. 
-	pop di
+    pop di
     je .exit_arquivo_encontrado
-	
+
     pop cx
     add di, 0x0020            ;Queue next directory entry.	
-	LOOP .loop_search_file
-;--	
+    LOOP .loop_search_file
+;--
 
     ;mov esi, msg_file_not_found
 	;call os_output
@@ -280,43 +281,43 @@ s2fat16SearchFileName:
 .fail:
 
     ;message.
-	mov si, msg_s2fat16_Failure 
-	call DisplayMessage	
-	
-	popa
-	stc
-	ret	
-	
-.sf_root_fail:	
-    
-	;message.
-	mov si, msg_s2fat16_sf_root_fail
+    mov si, msg_s2fat16_Failure 
     call DisplayMessage
-    
-	popa
-	stc
-	ret	
-	
+
+    popa
+    stc
+    ret
+
+.sf_root_fail:
+
+    ;message.
+    mov si, msg_s2fat16_sf_root_fail
+    call DisplayMessage
+
+    popa
+    stc
+    ret
+
 .exit_arquivo_encontrado:
-	pop cx    	;Faltava o contador.
+    pop cx    ;Faltava o contador.
 
     ;message
-	mov si, msg_s2file_ok  
-	call DisplayMessage
+    mov si, msg_s2file_ok  
+    call DisplayMessage
 
 	
 	
 	;pega o valor do primeiro cluster do arquivo.
-	xor dx, dx
-	mov dx, WORD [di + 0x001A]   ;di= 200+20+1a.
+    xor dx, dx
+    mov dx, WORD [di + 0x001A]   ;di= 200+20+1a.
     mov WORD [s2fat16_fat16_cluster], dx  ;file's first cluster.
-	    
-	popa
-	
+
+    popa
+
 	;retorna cluster.
-	mov ax, WORD [s2fat16_fat16_cluster]
-	clc
-	ret
+    mov ax, WORD [s2fat16_fat16_cluster]
+    clc
+    ret
 
 .name: dw 0
 
@@ -328,29 +329,29 @@ s2fat16SearchFileName:
 ;;
 s2fat16LOADROOT:
     ;nop
-	call s2_fat16_load_root_first_sector
-	ret
-	
-	
+    call s2_fat16_load_root_first_sector
+    ret
+
+
 ;==================================================
 ; load_root_first_sector:
 ;     Carrega o primeiro setor do root no buffer.
 ;
 s2_fat16_load_root_first_sector:
-	
+
     ;cmp byte [s2_fat16_Selected_Drive_Number], 1
     ;jne .not_slave	
-.is_slave:	
-    
+.is_slave:
+
 	;Select and initialize slave.
-	;mov al, 1
+    ;mov al, 1
     ;call select_hd
     
 	;jmp .go
 	
 .not_slave:
     ;Select and initialize master.
-	;mov al, 0
+    ;mov al, 0
     ;call select_hd
 .go:	
 	
@@ -374,22 +375,22 @@ s2_fat16_load_root_first_sector:
 	mov bx, word ROOT_OFFSET	
 
 	;LBA a se lido.
-	mov ax, word ROOT_LBA        ;lba - (root dir) 
+    mov ax, word ROOT_LBA        ;lba - (root dir) 
 	
     ;Carregar apenas um setor na memória. O primeiro setor do diretório raiz.
 	; cx = Quantidade de setores a serem lidos.
     ; ax = Número do primeiro setor a ser lido.
     ; es:bx = Buffer. Localização na memória onde serão carregados os setores.	
 	;call hd0_read_sector
-	call s2fat16ReadSectors
+    call s2fat16ReadSectors
 	
 	;pop cx
 	;pop bx
 	;pop ax
 		
-	popa
+    popa
     ret
-	
+
 ;@todo: Checar se essa mensagem está sendo usada.	
 ;msg_s2fat16_load_root_fail db "load_root_first_sector fail: Dir.",13, 10,0	
 	
@@ -417,35 +418,35 @@ s2fat16LOADFAT:
 	pop ax
                    
     ;Calcula o tamanho da FAT e coloca em "cx",(número de setores.).
-	xor ax, ax
-	xor cx, cx	
+    xor ax, ax
+    xor cx, cx
     mov al, BYTE [fat16_bpb.TotalFATs] ;Número de FATs. 
     mul WORD [fat16_bpb.SectorsPerFAT] ;Setores por FAT. 
     
 	;Quantidade de setores na fat. (contador)
-	mov cx, ax      
-.loop:	
+    mov cx, ax      
+.loop:
 
     push cx
-	
+
     ;Quantidade
-	mov cx, 1
-	
+    mov cx, 1
+
 	;buffer. (es:bx)
-	xor ax, ax
-	mov ax, 0x7000  ;base para mbr,vbr,fat,root,data area. no stage 2.
-	mov es, ax
-	mov bx, word [.address]  ;buffer (offset)	
+    xor ax, ax
+    mov ax, 0x7000  ;base para mbr,vbr,fat,root,data area. no stage 2.
+    mov es, ax
+    mov bx, word [.address]  ;buffer (offset)	
 
 	;LBA a se lido.
-	mov ax, word  [.lba]      ;lba 
+    mov ax, word  [.lba]      ;lba 
 	
     ;Carregar apenas um setor na memória. O primeiro setor do diretório raiz.
 	; cx = Quantidade de setores a serem lidos.
     ; ax = Número do primeiro setor a ser lido.
     ; es:bx = Buffer. Localização na memória onde serão carregados os setores.	
 	;call hd0_read_sector
-	call s2fat16ReadSectors
+    call s2fat16ReadSectors
     
 	pop cx
 	
@@ -469,7 +470,7 @@ s2fat16LOADFAT:
 .fail:
    
     ;msg
-	;mov esi, msg_fat16_FatFail
+    ;mov esi, msg_fat16_FatFail
     ;call os_output
 
 	;msg
@@ -477,8 +478,8 @@ s2fat16LOADFAT:
 	;call lib32PrintString
 	
     popa
-	ret
-	
+    ret
+
 .done_load_fat:
     
 	;;
@@ -510,7 +511,8 @@ s2fat16LOADFAT:
 ; Esses são os argumentos da dunção s2fat16ReadSectors.
 ; cx = Quantidade de setores a serem lidos.
 ; ax = Número do primeiro setor (cluster) a ser lido. 
-; es:bx = Buffer. Localização na memória onde serão carregados os setores.
+; es:bx = Buffer. 
+; Localização na memória onde serão carregados os setores.
 ;
 s2fat16LOADIMAGE:
 	;pusha
@@ -525,9 +527,9 @@ s2fat16LOADIMAGE:
 	;;@todo: rever isso. Em que header esta essa definição??
 	;;devo colocar uma definição que esteja no header do stage 2.
     ;mov bx, word FAT16_IMAGE_ADDRESS      
-	push bx
-.next:	
-	pop bx                          ; buffer to read into
+    push bx
+.next:
+    pop bx                          ; buffer to read into
 
     ;converte cluster em lba.
 	xor ax, ax
@@ -538,23 +540,23 @@ s2fat16LOADIMAGE:
     mov word [.lba], ax             ;salva lba
     	
 	;quantidade de setores.
-	xor cx, cx
+    xor cx, cx
     mov cl, BYTE 1 ;[fat16_bpb.SectorsPerCluster]  ;1 =  setores por cluster 
-	;buffer
-	push bx      	
-	mov ax, bx ; coloca o buffer em 'eax' 
-	;lba
-	mov bx, word [.lba] ; coloca a lba em 'ebx'
-	call s2fat16ReadSectors
-    
     ;buffer
-	pop bx             ;pega o buffer.
+    push bx      	
+    mov ax, bx ; coloca o buffer em 'eax' 
+    ;lba
+    mov bx, word [.lba] ; coloca a lba em 'ebx'
+    call s2fat16ReadSectors
+
+    ;buffer
+    pop bx             ;pega o buffer.
     add bx, word 512  ;incrementa o buffer.	
-	push bx            ;coloca o buffer na pilha.
+    push bx            ;coloca o buffer na pilha.
     
-	;cluster atual
-    xor ax, ax	
-	mov ax, WORD [s2fat16_fat16_cluster]    ; identify current cluster
+    ;cluster atual
+    xor ax, ax
+    mov ax, WORD [s2fat16_fat16_cluster]    ; identify current cluster
     
 	;salva
 	xor cx, cx
@@ -568,21 +570,21 @@ s2fat16LOADIMAGE:
 	;mov bx, FAT16_FAT_ADDRESS  ; location of FAT in memory    
 	add bx, cx                ;adiciona deslocamento                 
 	add bx, cx                ;deslocamento dobrado para fat16 (vetores word)
-     
-	;lê uma entrada da FAT.
-	mov dx, WORD [bx]
+ 
+    ;lê uma entrada da FAT.
+    mov dx, WORD [bx]
     mov WORD [s2fat16_fat16_cluster], dx  ;salva	
-	
+
     ;barra de progresso
 	xor ax, ax
 	mov ax, dx              ;mostra o numero do cluster.
 	;call barra_de_progresso ;(nao altera os registradores)
 	
 	;testa
-	cmp dx, word 0xFFFF              
+    cmp dx, word 0xFFFF              
     jne .next
-	
-;--	
+
+;--
 .DONE:
     ;ajustar a pilha.
     pop bx 
@@ -612,7 +614,7 @@ s2fat16_msg_load_file_eof db "s2fat16LOADIMAGE: EOF.",13,10,0
 ;
 s2fat16_fat16_ClusterLBA:
     
-	sub ax, 0x0002  ;Zero base cluster number.
+    sub ax, 0x0002  ;Zero base cluster number.
     xor cx, cx
     mov cl, BYTE 1   ;[fat16_bpb.SectorsPerCluster] ;setores por cluster.
     mul cx
@@ -621,8 +623,8 @@ s2fat16_fat16_ClusterLBA:
 	;@todo: rever essa ocnstante, essa constante deve existir no header do stage  2.
 	;cmp WORD [s2fat16_fat16_datasector], word  FAT16_DATAAREA_LBA ;591 ; Partição 0 8MB.
 	jne .fail
-	
-	add ax, WORD [s2fat16_fat16_datasector]        ; Base data sector.
+
+    add ax, WORD [s2fat16_fat16_datasector]        ; Base data sector.
     ret
 	
 .fail:
@@ -680,7 +682,7 @@ s2_MAIN:
 	;mov     si, msg_progress
     ;call    displayMessage
     
-	pop cx
+    pop cx
     pop bx
     pop ax
     add bx, WORD [s2_bpb.BytesPerSector]    ;Queue next buffer.
@@ -698,10 +700,10 @@ s2_MAIN:
 ;
 s2_LBACHS:    
     xor dx, dx                           ;Prepare dx:ax for operation.               
-	div WORD [s2_bpb.SectorsPerTrack]    ;Divide por spt - 11h.
-	inc dl                               ;Adjust for sector 0.  
+    div WORD [s2_bpb.SectorsPerTrack]    ;Divide por spt - 11h.
+    inc dl                               ;Adjust for sector 0.  
     mov BYTE [s2_absoluteSector], dl
-	xor dx, dx                           ;Prepare dx:ax for operation.                 
+    xor dx, dx                           ;Prepare dx:ax for operation.                 
     div WORD [s2_bpb.NumHeads]               
     mov BYTE [s2_absoluteHead], dl
     mov BYTE [s2_absoluteTrack], al
@@ -715,3 +717,4 @@ s2_absoluteTrack  db 0x00
 ;
 ; End.
 ;
+

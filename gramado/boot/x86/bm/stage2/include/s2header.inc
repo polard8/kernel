@@ -10,17 +10,17 @@
 ; e s2header.inc que servirão de suporte para todos os outros modulos
 ; do stage2.
 ;
-; Version: 1.0, 2015.
+; 2015 - Created by Fred Nora.
 ;
 
 
 ;
-; SATA Controller Modes: IDE, AHCI, or RAID. Enabling RAID mode 
-;                        also enables the AHCI features.
+; SATA Controller Modes: 
+; IDE, AHCI, or RAID. Enabling RAID mode also enables 
+; the AHCI features.
 ;
-;
-; IDE mode is the simplest mode. In IDE mode, 
-; the hard drive is set to run as an IDE or Parallel ATA (PATA) hard drive.
+; IDE mode is the simplest mode. In IDE mode, the hard drive is set 
+; to run as an IDE or Parallel ATA (PATA) hard drive.
 ;
 ; AHCI:
 ; =====
@@ -33,19 +33,20 @@
 ;
 ;
 
-;Definições usadas apenas em 16bit.
+; Definições usadas apenas em 16bit.
+; #bugbug: Isso deveria ficar num arquivo mais global.
 %DEFINE BOOTMANAGER_VER '1.1'
 ;;...
 
 
 
+; Definições.
 
-;Definições.
-
-;
-; *#BUGBUG, Talvez o diretório raiz deva ser carregado em outro lugar quando
-; estamos em 16 bit. Em 32bit o boot manager utiliza endereços altos com facilidade.
-;; aqui em 16bit é mais difícil, se não impossível.
+;;
+;; #BUGBUG: 
+;; Talvez o diretório raiz deva ser carregado em outro lugar quando
+;; estamos em 16 bit. Em 32bit o boot manager utiliza endereços altos 
+;; com facilidade aqui em 16bit é mais difícil, se não impossível.
 ;; @todo: Encontrar novos endereços para esses elementos
 ;; que estejam dentro do limite de 1MB.
 ;; Vamos tentar em 70000h, fica bem depois do boot loader e antes da pilha em 90000.
@@ -80,10 +81,10 @@ BOOTMODE_GUI    EQU 2    ;GUI.
 
 ;@todo: bug bug (trocar)
 ;Esses Valores estão errados, o certo é 0x00100000.
-kernel_seg              equ 0900h
-kernel_off              equ 0h
-kernel_entry_point      equ 0x00008200
-		
+kernel_seg            equ 0900h
+kernel_off            equ 0h
+kernel_entry_point    equ 0x00008200
+
 ;
 ; FAT info:
 ; ========
@@ -93,9 +94,15 @@ FAT16_FILE_SEGMENT      equ 0x2000
 FAT16_FILE_OFFSET       equ 0x0000  
 
 ; Algumas definições.
-VGA_VIDEO_SEGMENT       equ  0A000h  ;VGA display memory segment.
-SCREEN_WIDTH_IN_BYTES   equ  044Ah   ;Offset of BIOS variable.
-FONT_CHARACTER_SIZE     equ  8       ;Bytes in each font char TESTANDO 16 PRA USAR ALGUMA FONT DA ROM.
+
+;VGA display memory segment.
+VGA_VIDEO_SEGMENT       equ  0A000h  
+
+;Offset of BIOS variable.
+SCREEN_WIDTH_IN_BYTES   equ  044Ah   
+
+;Bytes in each font char TESTANDO 16 PRA USAR ALGUMA FONT DA ROM.
+FONT_CHARACTER_SIZE     equ  8  
 
 ; VGA register equates.
 SC_INDEX                equ  3C4h    ;SC index register.
@@ -131,20 +138,20 @@ absoluteTrack           db 0x00
 datasector              dw 0x0000
 cluster                 dw 0x0000
 salva_carregar_cs       dw 0
-salva_carregar_ip       dw 0	
+salva_carregar_ip       dw 0
 salva2_carregar_cs      dw 0
-salva2_carregar_ip      dw 0	
+salva2_carregar_ip      dw 0
 ;s1 BPB.
 salva_s1_bpb            dw 0
 
 ;
 ; BPB pointers.
 ;
-g_Stage1BPB dw 0    ;Para rotinas de 16 bits.
-g_Stage2BPB dw 0    ;Para rotinas de 16 bits.
-g_Fat16BPB  dd 0    ;Para rotinas de 32 bits.
-;...	
-	
+g_Stage1BPB dw 0    ;Para rotinas de 16 bit.
+g_Stage2BPB dw 0    ;Para rotinas de 16 bit.
+g_Fat16BPB  dd 0    ;Para rotinas de 32 bit.
+; ...
+
 ;strings @todo: Mudar para inglês.
 ;kernel_nome  db "KERNEL  BIN", 0  
 
@@ -157,14 +164,18 @@ g_Fat16BPB  dd 0    ;Para rotinas de 32 bits.
 ;;
 
 msg_bm_splash:
-    db 'Gramado Boot Manager ',13,10, 
-    db 'Version ', BOOTMANAGER_VER, 
-    db ' (C) Copyright Fred Nora 2020',13,10,0
+    db 'Gramado Boot Manager ',     13, 10, 
+    db 'Version ', BOOTMANAGER_VER, 13, 10, 0 
 
+msg_s2_init: 
+    db 13, 10, "s2: Initializing stage 2", 13, 10, 0
 
-msg_s2_init                  db 13, 10, "s2: Initializing stage 2", 13, 10, 0
-msg_s2_activating_mode       db "s2: Activating mode", 13, 10, 0
-msg_s2_failure               db "s2: No sig", 13, 10, 0  
+msg_s2_activating_mode:       
+    db "s2: Activating mode", 13, 10, 0
+
+msg_s2_failure:               
+    db "s2: No sig", 13, 10, 0  
+
 ;msg
 msg_iniciando_bootmanager    db "s2: Initializing", 13, 10, 0
 msg_kernel_carregado         db "s2: Kernel carregado", 13, 10, 0

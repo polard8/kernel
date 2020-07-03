@@ -980,6 +980,7 @@ int init (void){
 
 
     debug_print ("==== init: done\n");
+    printf ("sm-init-init: done\n");
 
     return 0;  
 }

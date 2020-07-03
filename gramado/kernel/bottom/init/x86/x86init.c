@@ -371,9 +371,9 @@ void __x86StartInit (void){
 // Usar essa função para chamar uma sequência de funções.
 // Isso evita a dispersão das rotinas de inicialização.
 
-void x86main (void){
+int x86main (void){
 
-    int Status = 0;
+    int Status=0;
 
 
     // Arch.
@@ -415,8 +415,9 @@ void x86main (void){
 
 
     // System initialization.
-    // See: sm/system.c
-
+    // See: syssm/system/system.c
+    printf ("[x86] x86main: Calling systemInit\n");
+    
     Status = (int) systemInit();
 
     if ( Status != 0 ){
@@ -439,7 +440,8 @@ void x86main (void){
     // See: sysio/hal/arch/x86/x86.c
 
     debug_print ("[x86] x86main: Initializing GDT\n");
-    
+    printf ("[x86] x86main: Initializing GDT\n");
+        
     init_gdt ();
 
 
@@ -449,7 +451,7 @@ void x86main (void){
 
 
     debug_print ("[x86] x86main: processes and threads\n");
-
+    printf ("[x86] x86main: processes and threads\n");
 
 	//
 	// # Processes
@@ -472,6 +474,7 @@ void x86main (void){
     // IN: 
     // Room, Desktop, Window
     // base address, priority, ppid, name, iopl, page directory address.
+    // See: ps/action/process.c
     KernelProcess = (void *) create_process ( NULL, NULL, NULL, 
                                  (unsigned long) 0xC0000000, 
                                  PRIORITY_HIGH, 
@@ -566,7 +569,7 @@ void x86main (void){
 
 #ifdef  ENTRY_DEBUG_CHECK_VALIDATIONS
 
-    Status = (int) debug ();
+    Status = (int) debug();
 
     if ( Status != 0 ){
         printf ("[x86] x86main: debug\n");
@@ -620,7 +623,7 @@ void x86main (void){
     // Chamaremos essa inicialização básica nesse momento.
     // A inicialização completa será chamada pelo processo init.
     
-    early_ps2_init ();
+    early_ps2_init();
 
 
 	//
@@ -653,8 +656,8 @@ void x86main (void){
     // See: config/config.h
     gfontSize = DEFAULT_FONT_SIZE;
 
-    switch ( gfontSize )
-    {
+    switch (gfontSize){
+
         case FONT8X8:
             //gfontSize = FONT8X8;
             gwsInstallFont ("LIN8X8  FON");
@@ -755,7 +758,10 @@ done:
 
         printf ("[x86] x86main: No idle thread selected\n");
         goto fail;
-    };
+    }
+
+    // ok
+    return 0;
 
 fail:
 
@@ -766,6 +772,8 @@ fail:
 
     debug_print ("[x86] x86main: fail\n");
     refresh_screen ();
+    
+    return -1;
 }
 
 

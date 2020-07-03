@@ -1519,14 +1519,17 @@ void Removing_from_the_end (struct linkedlist_d *list){
  * 2015 - Created.
  * 2016 - Revisão.
  */
+ 
+//  Called by systemInit() in this document.
 
 int systemStartUp (void){
 
-    int Status = 0;
+    int Status=0;  //ok
 
 
     debug_print ("====\n");
     debug_print ("==== systemStartUp:\n");
+    printf("systemStartUp:\n");
 
     KeInitPhase = 0;    //Set Kernel phase.    
 
@@ -1538,10 +1541,9 @@ int systemStartUp (void){
 	// As mensagens do abort podem não funcionarem nesse caso.
 	// AINDA NÃO INICIALIZAMOS O RECURSO DE MENSAGENS.
 	
-    if ( KeInitPhase != 0 )
-    {
-		KiAbort ();
-		
+    if ( KeInitPhase != 0 ){
+        KiAbort ();
+
     }else{
 
 	    //Disable interrupts, lock taskswitch and scheduler.
@@ -1593,10 +1595,9 @@ int systemStartUp (void){
         // See: 
         // execve/sm/init.c
 
-        Status = (int) init (); 
+        Status = (int) init(); 
 
-        if ( Status != 0 )
-        {
+        if ( Status != 0 ){
             debug_print ("sm-systemStartUp: init fail\n");
             panic ("sm-systemStartUp error: init\n");
         }
@@ -1609,7 +1610,8 @@ int systemStartUp (void){
 
 	// System Version:
 	//     Configurando a versão do sistema.
-
+    printf("systemStartUp: Setup version\n");
+    
 	systemSetupVersion ();
 
 
@@ -1669,7 +1671,9 @@ done:
 	    Status = (int) 1; 
 	}
 
-
+    // ok
+    printf("systemStartUp: done\n");
+    
     return (int) Status;
 }
 
@@ -1679,6 +1683,8 @@ done:
  * systemInit:
  *     Inicializando algumas variáveis.
  */
+ 
+// Called by:??
 
 int systemInit (void){
 
@@ -1692,6 +1698,7 @@ int systemInit (void){
 
     debug_print ("====\n");
     debug_print ("====systemInit:\n");
+    printf("systemInit:\n");
 
 	//Colocando na variável global, a opção selecionada manualmente pelo 
 	//desenvolvedor.
@@ -1703,7 +1710,8 @@ int systemInit (void){
 	//a rotina de start up.
 
     Status = (int) systemStartUp ();
-
+    if (Status != 0)
+            panic("systemInit: systemStartUp fail\n");
 	
 #ifdef BREAKPOINT_TARGET_AFTER_SYSTEM
 
@@ -1727,6 +1735,7 @@ int systemInit (void){
     debug_print ("====systemInit: done\n");
     debug_print ("====\n");
 
+
     //#debug
 	//printf ("systemInit: *breakpoint :)");
 	//refresh_screen(); 
@@ -1737,7 +1746,8 @@ int systemInit (void){
 	// See: /kernel/arch/x86/entry/x86main.c
 	// See: ...
 	// See: ...
-
+    printf("systemInit: done\n");
+    
     return (int) Status;
 }
 

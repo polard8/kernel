@@ -1024,15 +1024,16 @@ done:
 // Cria uma estrutura de processo.
 // Cria uma tty pra esse processo.
 
-struct process_d *create_process ( struct room_d *room,
-                                   struct desktop_d *desktop,
-                                   struct window_d *window,
-                                   unsigned long base_address, 
-                                   unsigned long priority, 
-                                   int ppid, 
-                                   char *name, 
-                                   unsigned long iopl,
-                                   unsigned long directory_address )
+struct process_d *create_process ( 
+    struct room_d *room,
+    struct desktop_d *desktop,
+    struct window_d *window,
+    unsigned long base_address, 
+    unsigned long priority, 
+    int ppid, 
+    char *name, 
+    unsigned long iopl,
+    unsigned long directory_address )
 {
 
     pid_t PID;
@@ -1507,6 +1508,8 @@ get_next:
 
 
         // tty support
+        
+        printf ("create_process: calling tty_create[DEBUG]\n");
 
         Process->tty = ( struct tty_d *) tty_create ();         
         

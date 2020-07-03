@@ -1384,7 +1384,7 @@ __ok_register:
         // O nome do dispositivo deve ser um pathname.
         // Mas podemos ter mais de um nome.
         // vamos criar uma string aqui usando sprint e depois duplicala.
-     
+        // See: ??
         
         devmgr_register_device ( (file *) __file, 
              newname,                    // device name.                  

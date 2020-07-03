@@ -118,7 +118,9 @@ struct device_d *devices;  //?? What
 // The list.
 //
 
-unsigned long deviceList[NUMBER_OF_FILES];    
+#define DEVICE_LIST_MAX 512   //NUMBER_OF_FILES
+
+unsigned long deviceList[DEVICE_LIST_MAX];    
 
 
 

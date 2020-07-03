@@ -107,14 +107,13 @@
 ; Continua ...
 ;
 ; OBS: 
-;     O Boot Loader (BL.BIN) pode querer configurar o modo de v�deo. Ent�o ele 
-; salva o modo no metafile e reinicia a m�quina. Para isso o Boot Manager deve 
-; apenas pegar o valor que esta no metafile e n�o editar o metafile.
-;
-; Autor: Frederico Martins Nora - (frednora)
+;     O Boot Loader (BL.BIN) pode querer configurar o modo de v�deo. 
+; Ent�o ele salva o modo no metafile e reinicia a m�quina. Para isso 
+; o Boot Manager deve apenas pegar o valor que esta no metafile e 
+; n�o editar o metafile.
 ;
 ; History:
-;     (2005-2016) - Created by Fred Nora. 
+;     2005 - Created by Fred Nora. 
 ;---------------------------------------------------
 
 
@@ -243,12 +242,15 @@ G_START_GUI EQU 0  ;; 1= (YES) 0 = (NO)
 ;; Entrypoint do BM.BIN
 ;; Saltaremos a �rea de dados no in�cio do arquivo.
 
-bm_main:    
-
+bm_main:
     jmp START_AFTER_DATA
+
 
 ROOTDIRSTART EQU (bootmanagerOEM_ID)
 ROOTDIRSIZE  EQU (bootmanagerOEM_ID+4)
+
+;; #todo
+;; Change some names here!
 
 bootmanagerOEM_ID                db "QUASI-OS"
 bootmanagerBytesPerSector        dw 0x0200
@@ -301,7 +303,6 @@ START_AFTER_DATA:
     ; Code located at 0000:0x8000. 
     ; Stack located at 0000:0x6000.
 
-    
     cli
     mov ax, 0
     mov ds, ax
@@ -968,25 +969,25 @@ bootmanagermsgCRLF      db  0x0D, 0x0A, 0x00
 
 
 ; stage 2.
-CODE_SEGMENT       equ  0
-DATA_SEGMENT        equ  0
-STACK_SEGMENT      equ  0
-STACK_POINTER       equ  0x6000
+CODE_SEGMENT     equ  0
+DATA_SEGMENT     equ  0
+STACK_SEGMENT    equ  0
+STACK_POINTER    equ  0x6000
 
 ; vbr.
-VBR_SEGMENT         equ  8000H
-VBR_OFFSET            equ  7C00H
-VBR_LBA                  equ  63
+VBR_SEGMENT    equ  8000H
+VBR_OFFSET     equ  7C00H
+VBR_LBA        equ  63
 
 ; fat.
-FAT_SEGMENT         equ  6000H
-FAT_OFFSET            equ  0
-FAT_LBA                  equ  67
+FAT_SEGMENT    equ  6000H
+FAT_OFFSET     equ  0
+FAT_LBA        equ  67
 
 ; root.
-ROOT_SEGMENT     equ  4000H
-ROOT_OFFSET        equ  0
-ROOT_LBA              equ  559
+ROOT_SEGMENT    equ  4000H
+ROOT_OFFSET     equ  0
+ROOT_LBA        equ  559
 
 
 ;;========================
@@ -996,10 +997,10 @@ ROOT_LBA              equ  559
 ;; diret�rio raiz.
 ;;
 
-;Boot Loader.
-BL_SEGMENT         equ  2000H
-BL_OFFSET            equ  0
-BL_LBA                  equ  0
+; Boot Loader.
+BL_SEGMENT    equ  2000H
+BL_OFFSET     equ  0
+BL_LBA        equ  0
 
 
 ;--------------------------------------- 
@@ -1306,8 +1307,12 @@ stage2Shutdown:
 ;; ==== Messages. ====
 ;;
 
-stage2_msg_pe_sig db "BM:stage2Initializations: *PE SIG",0
-stage2_msg_pe_sigOK db "BM:stage2Initializations: SIG OK", 13, 10, 0
+stage2_msg_pe_sig: 
+    db "BM:stage2Initializations: *PE SIG",0
+    
+stage2_msg_pe_sigOK: 
+    db "BM:stage2Initializations: SIG OK", 13, 10, 0
+
 
 
 ;;

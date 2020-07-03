@@ -1,5 +1,5 @@
 /*
- * File: serial.c
+ * File: bottom/dd/serial/serial.c
  *
  * Credits: 
  *     Chicago OS. (Ítalo Lima Marconato Matias). 
@@ -87,14 +87,12 @@ void serial_write_char ( char data ) {
 // See the type for the argument in the function out8.
 // gramado/kernel/bottom/hal/arch/x86/portsx86.c
 
-void serial_init_port ( uint16_t port ){
+int serial_init_port ( uint16_t port ){
 
     int PortBase=0;
     
     PortBase = (int) port;
 
-
-    debug_print ("serial_init_port:\n");
 
     // Se não é alguma das bases possiveis.
     // #todo: Existem máquinas com mais do que 4 portas seriais?
@@ -103,7 +101,7 @@ void serial_init_port ( uint16_t port ){
          PortBase != COM3_PORT &&
          PortBase != COM4_PORT )
     {
-        panic ("serial_init_port: PortBase fail\n");
+        return -1;
     }
 
 
@@ -121,6 +119,8 @@ void serial_init_port ( uint16_t port ){
 
 
     out8 (PortBase + 4, 0x0B);  // IRQs enables, RTS/DSR set
+    
+    return 0;
 }
 
 
@@ -130,29 +130,43 @@ void serial_init_port ( uint16_t port ){
  * serial_init:
  * 
  */
+ 
 // inicializa todas as portas.
+
+// #IMPORTANT:
+// We can't use debug in this first initialization.
+// We can't use serial debug. It's because the serial port support
+// is not working yet. :)
 
 int serial_init (void){
 
-
-    debug_print("serial_init:\n");
+    int Status = -1;
     
     __breaker_com1_initialized = 0;
     __breaker_com2_initialized = 0;
     __breaker_com3_initialized = 0;
     __breaker_com4_initialized = 0;
-    
-    serial_init_port (COM1_PORT);
-    serial_init_port (COM2_PORT);
-    serial_init_port (COM3_PORT);
-    serial_init_port (COM4_PORT);
 
+    Status = serial_init_port (COM1_PORT);
+    if (Status != 0)
+        return -1;
+    
+    Status = serial_init_port (COM2_PORT);
+    if (Status != 0)
+        return -1;
+    
+    Status = serial_init_port (COM3_PORT);
+    if (Status != 0)
+        return -1;
+    
+    Status = serial_init_port (COM4_PORT);
+    if (Status != 0)
+        return -1;
 
     __breaker_com1_initialized = 1;
     __breaker_com2_initialized = 1;
     __breaker_com3_initialized = 1;
     __breaker_com4_initialized = 1;
-
 
     return 0;
 }

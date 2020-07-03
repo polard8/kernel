@@ -808,7 +808,7 @@ int init_logon (int argc, char *argv[]){
 
 
 
-    debug_print ("init_logon\n");
+    debug_print ("init_logon:\n");
 
 
     if (argc < 1){

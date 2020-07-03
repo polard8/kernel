@@ -23,7 +23,7 @@ void serial4_handler (void);
 void serial_write_char ( char data );
 
 // Method to init an serial port (for debugging)
-void serial_init_port ( uint16_t port );	
+int serial_init_port ( uint16_t port );	
 
 int serial_init (void);
 
