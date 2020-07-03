@@ -1,0 +1,3 @@
+
+    o objetivo é copiar o noraterm
+    então vamos criar as mesmas pastas.

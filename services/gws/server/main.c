@@ -513,12 +513,19 @@ gwsProcedure (
             servicelineBackbufferDrawHorizontalLine();
             break;
     
-
+        //Draw char
         case 1004:
-           serviceDrawChar();
+            gde_debug_print ("gws: Message number 1004\n");
+            serviceDrawChar();
+                       
+            //dtextDrawText ( (struct gws_window_d *) __mywindow,
+                //100, 100, COLOR_GREEN, "DRAW CHAR" );
+            //gws_show_backbuffer();
            break;
 
+        // Draw text
         case 1005:
+           //#todo: tem que testar isso!!!
            serviceDrawText();
            break;
     
@@ -1124,6 +1131,12 @@ int serviceDrawChar(void)
     unsigned long C = (unsigned long) message_address[8];
     //text_buffer =    //#todo
    
+    //lets create a fake string.
+    unsigned char _string[4];
+   
+   _string[0] = (unsigned char) C;
+   _string[1] = (unsigned char) 0;   
+   
    //
    // Draw
    //
@@ -1133,14 +1146,17 @@ int serviceDrawChar(void)
     //window = (struct gws_window_d *) windowList[window_id];
     
     //#test
+    //It is working
     // Usando a janela screen por enquanto.
     dtextDrawText ( (struct gws_window_d *) gui->screen,
-        x, y, color, 
-        (unsigned char *) C );
+        x, y, color, (unsigned char *) &_string[0] );
 
-   gws_show_backbuffer (); // for debug   
+    //It is working
+    //charBackbufferDrawcharTransparent ( x, y, color, C );
+        
+    gws_show_backbuffer (); // for debug   
    
-   return 0;
+    return 0;
 }
 
 

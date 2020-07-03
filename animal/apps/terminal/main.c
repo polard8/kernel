@@ -48,7 +48,12 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
+
+
+// #pertencem ao terminal ??
 #include <packet.h>
+#include <terminal.h>
+
 #include <gws.h>
 
 
@@ -250,8 +255,27 @@ response_loop:
                 // We need to send it to the client via file.
                 default:
                     //terminal_write_char(long1) #todo
-                    printf ("%c",long1);
-                    fflush(stdout);
+                    
+                    //isso funciona
+                    //printf ("%c",long1);
+                    //fflush(stdout);
+    
+                    //testing draw a char in a window.
+                    // Isso funciona. Precisamos das rotinas do noraterm
+                    //pra lidar com caracteres ... o x e o y.
+                    terminal_drawchar_request (
+                        (int) fd,//fd,
+                        (int) 0, //__response_wid, //window_id,
+                        (unsigned long) __tmp_x,//left,
+                        (unsigned long) __tmp_y,//top,
+                        (unsigned long) COLOR_RED,
+                        (unsigned long) long1 );
+
+                    terminal_drawchar_response((int) fd);                    
+                    
+                    //#test
+                    __tmp_x = __tmp_x + 8;
+                    
                     goto process_event;
                     break;
             };
@@ -384,11 +408,6 @@ int terminal_loop(int fd)
 }
 
 
-
-
-
-
-
 int 
 terminal_createwindow_request (
     int fd,
@@ -401,8 +420,25 @@ terminal_createwindow_request (
 int terminal_createwindow_response(int fd);
 
 
+
+int 
+terminal_drawchar_request (
+    int fd,
+    int window_id,
+    unsigned long left,
+    unsigned long top,
+    unsigned long color,
+    unsigned long c );
+    
+int terminal_drawchar_response(int fd);
+
 //...
 
+
+
+//
+// =====================================================
+//
 
 int 
 terminal_createwindow_request (
@@ -469,6 +505,7 @@ terminal_createwindow_request (
 }
 
 //response
+//#todo: the response needs to be unsigned long or void *.
 int terminal_createwindow_response(int fd)
 {
     unsigned long *message_buffer = (unsigned long *) &__buffer[0];   
@@ -597,7 +634,8 @@ process_reply:
     // Podemos usar a biblioteca e testarmos
     // vários serviços da biblioteca nesse momento.
 
-    return 0;
+    return (int) message_buffer[0];
+    //return 0;
 
 //
 // Process an event.
@@ -610,6 +648,213 @@ process_event:
 }
 
 
+
+int 
+terminal_drawchar_request (
+    int fd,
+    int window_id,
+    unsigned long left,
+    unsigned long top,
+    unsigned long color,
+    unsigned long c )
+{
+    // Isso permite ler a mensagem na forma de longs.
+    unsigned long *message_buffer = (unsigned long *) &__buffer[0];   
+
+    int n_writes = 0;   // For sending requests.
+
+
+
+    //char *name = "Window name 1";
+
+   
+
+    //
+    // Send request.
+    //
+
+
+    // #debug
+    gws_debug_print ("terminal: Writing ...\n");      
+
+    // Enviamos um request para o servidor.
+    // ?? Precisamos mesmo de um loop para isso. ??
+    // msg = 369 (get input event)
+
+    while (1)
+    {
+        // Create window    
+        message_buffer[0] = 0;       // window. 
+        message_buffer[1] = 1004;    // Draw char.
+        message_buffer[2] = 0;
+        message_buffer[3] = 0;
+        
+        message_buffer[4] = window_id;
+        message_buffer[5] = left; 
+        message_buffer[6] = top; 
+        message_buffer[7] = color; 
+        
+        message_buffer[8] = c;   // The 'char'.
+
+         
+        //...
+
+        // Write!
+        // Se foi possível enviar, então saimos do loop.  
+
+        // n_writes = write (fd, __buffer, sizeof(__buffer));
+        n_writes = send (fd, __buffer, sizeof(__buffer), 0);
+       
+        if(n_writes>0)
+           break;
+    }
+
+
+    return 0; 
+}
+
+
+
+//response
+int terminal_drawchar_response(int fd)
+{
+    unsigned long *message_buffer = (unsigned long *) &__buffer[0];   
+    int n_reads = 0;    // For receiving responses.
+
+    //
+    // Waiting for response. ==================
+    //
+
+    // Espera para ler a resposta. 
+    // Esperando com yield como teste.
+    // Isso demora, pois a resposta só será enviada depois de
+    // prestado o servido.
+    // obs: Nesse momento deveríamos estar dormindo.
+
+    // #debug
+    gws_debug_print ("terminal: Waiting ...\n");      
+
+    int y;
+    for(y=0; y<15; y++)
+        gws_yield();   // See: libgws/
+
+
+    // #todo
+    // Podemos checar antes se o fd 
+    // representa um objeto que permite leitura.
+    // Pode nem ser possível.
+    // Mas como sabemos que é um soquete,
+    // então sabemos que é possível ler.
+
+
+    //
+    // read
+    //
+
+    // #debug
+    gws_debug_print ("terminal: reading ...\n");      
+
+
+    // #caution
+    // Waiting for response.
+    // We can stay here for ever.
+
+response_loop:
+
+    //n_reads = read ( fd, __buffer, sizeof(__buffer) );
+    n_reads = recv ( fd, __buffer, sizeof(__buffer), 0 );
+    
+    //if (n_reads<=0){
+    //     gws_yield(); 
+    //    goto response_loop;
+    //}
+    
+    // Se retornou 0, podemos tentar novamente.
+    if (n_reads == 0){
+         gws_yield(); 
+        goto response_loop;
+    }
+    
+    // Se retornou -1 é porque algo está errado com o arquivo.
+    if (n_reads < 0){
+        gws_debug_print ("terminal: recv fail.\n");
+        printf ("terminal: recv fail.\n");
+        printf ("Something is wrong with the socket.\n");
+        exit (1);
+    }
+
+
+    //
+    // The msg index.
+    //
+    
+    // Get the message sended by the server.
+
+    int msg = (int) message_buffer[1];
+    
+    switch (msg){
+
+        case SERVER_PACKET_TYPE_REQUEST:
+            gws_yield ();
+            goto response_loop;
+            break;
+            
+        // Reply!
+        case SERVER_PACKET_TYPE_REPLY:
+            goto process_reply;
+            break;
+            
+        case SERVER_PACKET_TYPE_EVENT:
+            goto process_event;
+            //goto response_loop;
+            break;
+            
+        case SERVER_PACKET_TYPE_ERROR:
+            gws_debug_print ("terminal: SERVER_PACKET_TYPE_ERROR\n");
+            goto response_loop;
+            //exit (-1);
+            break;
+        
+        default:
+            goto response_loop;
+            break; 
+    };
+
+
+
+
+
+//
+// Process reply.
+//
+
+// A resposta tras o window id no início do buffer.
+    
+process_reply:
+
+    // #test
+    gws_debug_print ("terminal: Testing close() ...\n"); 
+    //close (fd);
+
+    //gws_debug_print ("terminal: bye\n"); 
+    //printf ("terminal: Window ID %d \n", message_buffer[0] );
+    //printf ("terminal: Bye\n");
+    
+    // #todo
+    // Podemos usar a biblioteca e testarmos
+    // vários serviços da biblioteca nesse momento.
+
+    //return 0;
+    return (int) message_buffer[0];
+
+//
+// Process an event.
+//
+
+process_event:
+    gws_debug_print ("terminal: We got an event\n"); 
+    return 0;
+}
 
 
 
@@ -815,7 +1060,7 @@ int main ( int argc, char *argv[] ){
     debug_print ("---------------------------\n");    
     debug_print ("terminal: Initializing ...\n");
 
-     //
+    //
     // socket
     // 
 
@@ -872,13 +1117,37 @@ int main ( int argc, char *argv[] ){
     // Mas como sabemos que é um soquete,
     // então sabemos que é possível ler.
 
-    //while(1){
-        terminal_hello_request(client_fd);
-        terminal_hello_response(client_fd);
-    //}
+   
+    // Testing hello message
+    terminal_hello_request(client_fd);
+    terminal_hello_response(client_fd);
 
-    terminal_createwindow_request(client_fd, 100, 100, 480, 320, COLOR_BLACK);
+    //Creating the main window
+    int __response_wid = 0;
+    __response_wid = terminal_createwindow_request(client_fd, 100, 100, 480, 320, COLOR_BLACK);
     terminal_createwindow_response(client_fd); 
+
+
+
+    __tmp_x = 40;
+    __tmp_y = 40;
+
+
+    //testing draw a char in a window.
+    terminal_drawchar_request (
+        (int) client_fd,//fd,
+    (int) __response_wid, //window_id,
+    (unsigned long) __tmp_x,//left,
+    (unsigned long) __tmp_y,//top,
+    (unsigned long) COLOR_RED,
+    (unsigned long) 'X' );
+    
+    terminal_drawchar_response((int) client_fd);
+    
+    //#debug
+    //hanging
+    //while(1){}
+
 
     // loop
     // This the loop that gets messages from the window server;

@@ -115,7 +115,6 @@ build-init \
 build-gdeshell \
 build-gns \
 build-gws \
-build-gterm \
 build-apps \
 build-cmd
 
@@ -156,11 +155,6 @@ build-gdeshell:
 	@echo " Compiling the gdeshell"
 	$(Q) $(MAKE) -C gramado/gdeshell   
 
-
-build-gterm:
-	@echo "==================="
-	@echo " Compiling the gterm"
-	$(Q) $(MAKE) -C gramado/gterm 
 
 build-gns:
 	@echo "==================="
@@ -261,9 +255,6 @@ vhd-copy-files:
 	-sudo cp gramado/base/tests/*.ASM    /mnt/gramadovhd
 	-sudo cp gramado/base/res/wall/ANIMAL.BMP   /mnt/gramadovhd
 
-	-sudo cp gramado/gterm/bin/GTERM.BIN   /mnt/gramadovhd
-	#-sudo cp gramado/gterm/bin/GTERMT.BIN   /mnt/gramadovhd
-	
 	-sudo cp services/gns/bin/GNS.BIN       /mnt/gramadovhd
 	-sudo cp services/gns/bin/GNST.BIN      /mnt/gramadovhd
 	-sudo cp services/gws/bin/GWS.BIN       /mnt/gramadovhd
@@ -343,7 +334,6 @@ clean-system-files:
 	-rm -rf gramado/kernel/KERNEL.BIN
 	-rm -rf gramado/init/*.BIN
 	-rm -rf gramado/gdeshell/*.BIN
-	-rm -rf gramado/gterm/bin/*.BIN
 
 	-rm -rf services/gns/bin/*.BIN
 	-rm -rf services/gws/bin/*.BIN
