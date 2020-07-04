@@ -50,13 +50,7 @@ uint16_t ntohs (uint16_t  w)
 }
 
 
-
-
-
-
 #endif  //inet.h
-
-
 
 
 

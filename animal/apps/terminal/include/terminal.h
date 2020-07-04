@@ -1,4 +1,8 @@
 
+#ifndef __TERMINAL__
+#define __TERMINAL__
+
+
 // isso será usado em terminal.bin
 // principalmente para gerenciamento de caracteres ... linhas 
 // é o básico.
@@ -420,5 +424,58 @@ int textMaxWheelDelta;  //máximo que se pode rolar o texto
      unsigned long __bartop;
      unsigned long __barwidth;
      unsigned long __barheight;
+
+
+
+//
+// prototypes.
+//
+
+void terminalInsertNextChar (char c);
+void terminalInsertNullTerminator ();
+void terminalInsertLF ();
+void terminalInsertCR ();
+
+void lf (void);
+void cr (void);
+void ri (void);
+void del (void);
+
+char 
+terminalGetCharXY ( unsigned long x, 
+                    unsigned long y );
+                    
+                    
+void 
+terminalInsertCharXY ( unsigned long x, 
+                       unsigned long y, 
+                       char c );
+                       
+
+static void save_cur (void);
+static void restore_cur (void);
+void terminalClearBuffer ();
+
+
+void textSetTopRow ( int number );
+int textGetTopRow ();
+
+
+void textSetBottomRow ( int number );
+int textGetBottomRow ();
+
+            
+void textSetCurrentRow ( int number );          
+int textGetCurrentRow ();           
+void textSetCurrentCol ( int number );           
+int textGetCurrentCol ();
+
+void move_to ( unsigned long x, unsigned long y );
+
+
+int pad_to (int count, char *string);
+                   
+#endif   
+
 
 

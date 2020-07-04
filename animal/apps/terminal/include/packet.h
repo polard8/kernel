@@ -1,4 +1,7 @@
 
+#ifndef __PACKET__
+#define __PACKET__
+
 
  // Socket packets.
  // Usados na troca de mensgens via socket.
@@ -30,6 +33,10 @@
 #define SERVER_PACKET_TYPE_REPLY      1001 
 #define SERVER_PACKET_TYPE_EVENT      1002
 #define SERVER_PACKET_TYPE_ERROR      1003
+
+
+#endif  
+
 
 
 

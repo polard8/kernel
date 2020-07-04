@@ -1,9 +1,13 @@
+/*
+ * File: window.c 
+ * 
+ * 
+ */
 
 
-   // window.c
-   
 #include <api.h>
 #include <gws.h>
+
 
 
 /*

@@ -40,21 +40,7 @@
 
 
 
-#include <types.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <netdb.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <sys/socket.h>
-
-
-// #pertencem ao terminal ??
-#include <packet.h>
-#include <terminal.h>
-
-#include <gws.h>
+#include "noraterm.h"
 
 
 // #test
@@ -85,6 +71,300 @@ int terminal_hello_response(int fd);
 int terminal_loop(int fd);
 int terminal_getmessage_request(int fd);
 int terminal_getmessage_response(int fd);
+
+
+
+
+
+
+//
+// =======================
+//
+
+
+/*
+ ***************************************************
+ * terminalInsertNextChar:
+ *     Coloca um char na próxima posição do buffer.
+ *     Memória de vídeo virtual, semelhante a vga.
+ *     #todo: Esse buffer poderia ser um arquivo que o kernel
+ * pudesse usar, ou o servidor de recursos gráficos pudesse usar.
+ */
+
+	//#importante:
+	//o refresh é chamado no default do procedimento de janela
+
+void terminalInsertNextChar (char c){
+	
+	// #todo
+	// para alguns caracteres temos que efetuar o flush.
+	// \n \r ... ??
+			
+	// Coloca no buffer.
+	
+	LINES[textCurrentRow].CHARS[textCurrentCol] = (char) c;
+}
+
+
+// # terminal stuff
+void terminalInsertNullTerminator (){
+	
+	terminalInsertNextChar ( (char) '\0' );
+}
+
+
+// # terminal stuff
+void terminalInsertLF (){
+	
+	terminalInsertNextChar ( (char) '\n' );
+}
+
+// # terminal stuff
+void terminalInsertCR (){
+    
+	terminalInsertNextChar ( (char) '\r' );
+}
+
+
+// # terminal stuff
+//line feed
+void lf (void){
+	
+	//enquanto for menor que o limite de linhas, avança.
+	if ( textCurrentRow+1 < __wlMaxRows )
+	{
+		textCurrentRow++; 
+		return;
+	}
+	
+	//#todo: Scroll up;
+	//scrup();
+}
+
+
+
+
+// # terminal stuff
+//carriege return
+void cr (void){
+	
+    textCurrentCol = 0;
+}
+
+
+// # terminal stuff
+// ??
+//voltando uma linha.
+void ri (void){
+	
+	//if ( screen_buffer_y > top ){
+		
+		// Volta uma linha.
+	//	screen_buffer_y--;
+	//	screen_buffer_pos = (screen_buffer_pos - columns); 
+	//	return;
+	//}
+	
+	//@todo:
+	//scrdown();
+}
+
+
+// # terminal stuff
+void del (void){
+	
+	LINES[textCurrentRow].CHARS[textCurrentCol] = (char) '\0';
+	LINES[textCurrentRow].ATTRIBUTES[textCurrentCol] = 7;
+}
+
+
+// # terminal stuff
+// Insere um caractere sentro do buffer.
+
+char 
+terminalGetCharXY ( unsigned long x, 
+                    unsigned long y )
+{	
+	if ( x >= __wlMaxColumns || y >= __wlMaxRows )
+	{	
+		return;
+	}
+
+	return (char) LINES[y].CHARS[x];
+}
+
+
+// # terminal stuff
+// Insere um caractere sentro do buffer.
+
+void 
+terminalInsertCharXY ( unsigned long x, 
+                       unsigned long y, 
+                       char c )
+{
+	if ( x >= __wlMaxColumns || y >= __wlMaxRows )
+	{	
+		return;
+	}
+
+	LINES[y].CHARS[x] = (char) c;
+	LINES[y].ATTRIBUTES[x] = 7;
+}
+
+
+
+
+
+
+// # terminal stuff
+static void save_cur (void){
+	
+	textSavedCol = textCurrentCol;
+	textSavedRow = textCurrentRow;
+}
+
+
+// # terminal stuff
+static void restore_cur (void){
+	
+	textCurrentCol = textSavedCol;
+	textCurrentRow = textSavedRow;
+}
+
+
+/*
+ ****************************************
+ * shellClearBuffer:
+ *     Limpa o buffer da tela.
+ *     Inicializamos com espaços.
+ */
+
+void terminalClearBuffer (){
+
+    int i=0;
+    int j=0;
+
+    for ( i=0; i<32; i++ )
+    {
+		for ( j=0; j<80; j++ )
+		{
+		    LINES[i].CHARS[j] = (char) ' ';
+		    LINES[i].ATTRIBUTES[j] = (char) 7;
+	    }
+		
+		LINES[i].left = 0;
+		LINES[i].right = 0;
+		LINES[i].pos = 0;
+    };
+}
+
+
+
+//Qual será a linha que estará no topo da janela.
+void textSetTopRow ( int number )
+{
+    textTopRow = (int) number; 	
+}
+
+
+int textGetTopRow ()
+{
+    return (int) textTopRow; 	
+}
+
+
+//Qual será a linha que estará na parte de baixo da janela.
+void textSetBottomRow ( int number )
+{
+    textBottomRow = (int) number; 	
+}
+
+
+int textGetBottomRow ()
+{
+    return (int) textBottomRow; 	
+}
+
+void textSetCurrentRow ( int number )
+{
+    textCurrentRow = (int) number; 	
+}
+
+
+int textGetCurrentRow ()
+{
+    return (int) textCurrentRow; 	
+}
+
+
+
+void textSetCurrentCol ( int number )
+{
+    textCurrentCol = (int) number; 	
+}
+
+
+int textGetCurrentCol ()
+{
+    return (int) textCurrentCol; 	
+}
+
+
+
+/*
+ * move_to:
+ *    Move o cursor de posição.
+ *    Assim o próximo char será em outro lugar da janela.
+ */
+
+void move_to ( unsigned long x, unsigned long y ){
+	
+	if ( x > __wlMaxColumns || y > __wlMaxRows )
+		return;
+	
+	//screen_buffer_x = x;
+	//screen_buffer_y = y;
+	
+	textCurrentCol = x;
+	textCurrentRow = y;
+	
+	//screen_buffer_pos = ( screen_buffer_y * __wlMaxColumns + screen_buffer_x ) ;
+}
+
+
+/* credits: bsd*/
+/* Pad STRING to COUNT characters by inserting blanks. */
+
+int pad_to (int count, char *string){
+	
+    register int i;
+
+    i = strlen (string);
+
+    if (i >= count)
+        string[i++] = ' ';
+    else
+    {
+        while (i < count)
+            string[i++] = ' ';
+    }
+    string[i] = '\0';
+
+    return (i);
+}
+
+
+
+
+
+
+//
+// =======================
+//
+
+
+
+
 
 int terminal_getmessage_request(int fd)
 {

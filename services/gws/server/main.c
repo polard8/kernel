@@ -526,6 +526,7 @@ gwsProcedure (
         // Draw text
         case 1005:
            //#todo: tem que testar isso!!!
+           gde_debug_print ("gws: Message number 1005\n");
            serviceDrawText();
            break;
     
@@ -1166,6 +1167,7 @@ int serviceDrawChar(void)
     // Draw
     //
 
+    // Ok it is working
     dtextDrawText ( (struct gws_window_d *) window,
         x, y, color, (unsigned char *) &_string[0] );
     

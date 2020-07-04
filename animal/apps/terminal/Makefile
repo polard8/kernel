@@ -54,9 +54,7 @@ unistd.o \
 termios.o \
 ioctl.o \
 socket.o \
-gws.o connect.o events.o rw.o    
-
-
+gws.o connect.o events.o rw.o     
 
 
 
@@ -69,7 +67,7 @@ all: main.o all-c hello-link finalize clean
 	@echo "Ok?"
 
 main.o:
-	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -I $(LIBGWS) -I include/ -I base/ -o main.o
+	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -I $(LIBGWS) -I include/ -o main.o
 
 all-c:
 
