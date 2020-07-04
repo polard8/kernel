@@ -31,6 +31,21 @@
 #define I8042_KEYBOARD_BUFFER 0x00
  */
 
+//vamos apenas carregar um arquivo qualquer.
+void __load_path_test(void)
+{
+    void *__address = 0;
+    
+    //endereço para carregar o arquivo
+    __address = (void *) kmalloc(400*1024);
+    //__address = (void *) kmalloc(600*1024);
+    
+    load_path ("/TMP/TMP2/ANIMAL.BMP",(unsigned long) __address);
+    //load_path ("/BOOT/BL.BIN",(unsigned long) __address);
+    //load_path ("/BOOT/KERNEL.BIN",(unsigned long) __address);
+}
+
+
 
 /*
 enum KYBRD_ENCODER_IO {
@@ -204,7 +219,8 @@ __local_ps2kbd_procedure (
 
                 // Test 1.
                 case VK_F7:
-                    bg_load_image();
+                    __load_path_test(); //local
+                    //bg_load_image(); //ok
                     //console_write (0, buffer,62);
                     //Status = (int) KiSearchFile ( "GRAMADO TXT", VOLUME1_ROOTDIR_ADDRESS );
                     //Status = (int) KiSearchFile ( "GRAMADOxTXT", VOLUME1_ROOTDIR_ADDRESS );

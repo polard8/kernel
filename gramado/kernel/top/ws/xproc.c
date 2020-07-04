@@ -482,9 +482,7 @@ system_procedure ( struct window_d *window,
 	//window é a janela com o foco de entrada, obtita pelo ldisc.c 
 	//e passada via argumento.
 
-    if ( (void *) window == NULL )
-    {
-
+    if ( (void *) window == NULL ){
         panic ("xproc-system_procedure: window");
 
     }else{
@@ -568,16 +566,12 @@ system_procedure ( struct window_d *window,
 
 				// O procedimento de janelas do sistema 
 				// normalmente ignora as teclas de digitação.
-                case VK_RETURN:
-                    goto done;
-                    break;
+                case VK_RETURN: goto done; break;
 
 
 				// O procedimento de janelas do sistema 
 				// normalmente ignora as teclas de digitação.
-                case VK_ESCAPE:
-                    goto done;
-                    break;
+                case VK_ESCAPE: goto done; break;
 
 
 
@@ -605,28 +599,17 @@ system_procedure ( struct window_d *window,
 				//	break;
 
 
-
-				// Avançar o cursor.
-                case VK_TAB:
-                    goto done;
-                    break;
-
-
-				// Voltar o cursor,
-                case VK_BACK:
-                    goto done;
-                    break;
-
-
-                case VK_PAUSE:
-                    goto done;
+                case VK_TAB: 
+                case VK_BACK: 
+                case VK_PAUSE: 
+                    goto done; 
                     break;
 
 
 				// O procedimento de janelas do sistema 
 				// normalmente ignora as teclas de digitação.
-                default:
-                    goto done;
+                default: 
+                    goto done; 
                     break; 
             };
             break;
@@ -659,7 +642,8 @@ system_procedure ( struct window_d *window,
 
                 // F1, F2, F3, F4
                 // Os testes que estavam aqui foram pra outro lugar.
-                // See: ps2kbd.c 
+                // __local_ps2kbd_procedure()
+                // See: dd/ws/ps2kbd.c 
                 case VK_F5:
                 case VK_F6:
                 case VK_F7:
@@ -676,19 +660,11 @@ system_procedure ( struct window_d *window,
 
                 // Nothing for now!
                 case VK_CAPITAL:
-                    break;
-
-                // Nothing for now!
                 case VK_LMENU:
-                    break;
-
-                // Nothing for now!
                 case VK_LCONTROL: 
-                    break;
-
-                // Nothing for now!
                 case VK_LSHIFT:   
                     break;
+
 
                 // Num Lock.
                 case VK_NUMLOCK:

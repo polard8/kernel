@@ -939,7 +939,18 @@ gde_extra_services (
         //return (void *) __fp->_base;
     }
     
-
+    //#test
+    //Load path. ex: "/BOOT/BM.BIN"
+    //See: fs.c
+    if ( number == 4004 )
+    {
+        debug_print ("service 4004:\n");
+        sys_load_path ( (unsigned char *) arg2, (unsigned long) arg3 );
+        refresh_screen();
+        return NULL;
+    }
+    
+    
     // Show root files system info.
     if ( number == 4444 ){
         fs_show_root_fs_info();

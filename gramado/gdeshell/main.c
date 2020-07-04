@@ -971,6 +971,28 @@ static inline void rep_nop (void){
 #define cpu_relax()  rep_nop()
 
 
+
+//vamos apenas carregar um arquivo qualquer.
+void __load_path_test(void)
+{
+
+    char __path[] = "/TMP/TMP2/ANIMAL.BMP";
+
+    void *__address = 0;
+    
+    //endereço para carregar o arquivo
+    __address = (void *) malloc(200*1024);
+    //__address = (void *) kmalloc(600*1024);
+    
+    gramado_system_call ( 4004, (unsigned long) __path, (unsigned long)__address, 0 );
+    //load_path ("/TMP/TMP2/ANIMAL.BMP",(unsigned long) __address);
+    //load_path ("/BOOT/BL.BIN",(unsigned long) __address);
+    //load_path ("/BOOT/KERNEL.BIN",(unsigned long) __address);
+}
+
+
+
+
 //
 // Prot�tipos para fun��es internas.
 //
@@ -2999,6 +3021,13 @@ do_compare:
         shellTaskList();
         goto exit_cmp;
     }
+
+    //test-path
+    if ( gramado_strncmp( prompt, "test-path", 9 ) == 0 ){
+        __load_path_test();
+        goto exit_cmp;
+    }
+    
 
 
 	// timer-test

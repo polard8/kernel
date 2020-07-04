@@ -282,6 +282,7 @@ vhd-copy-files:
 	-sudo mkdir /mnt/gramadovhd/MNT
 	-sudo mkdir /mnt/gramadovhd/SBIN
 	-sudo mkdir /mnt/gramadovhd/TMP
+	-sudo mkdir /mnt/gramadovhd/TMP/TMP2
 # ...
 
 
@@ -291,11 +292,12 @@ vhd-copy-files:
 	sudo cp gramado/boot/x86/bin/BL.BIN  /mnt/gramadovhd/BOOT
 	
 	-sudo cp gramado/base/res/wall/ANIMAL.BMP   /mnt/gramadovhd/BOOT
+	-sudo cp gramado/base/res/wall/ANIMAL.BMP   /mnt/gramadovhd/TMP/TMP2
 
 
 # ======== Files in the /TMP/ folder. ========
-	-sudo cp base/tests/TEST1.C  /mnt/gramadovhd/TMP
-
+#	-sudo cp base/tests/TEST1.C  /mnt/gramadovhd/TMP
+#	-sudo cp base/tests/TEST1.C  /mnt/gramadovhd/TMP/TMP2
 
 
 

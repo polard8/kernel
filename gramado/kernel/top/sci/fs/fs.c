@@ -747,8 +747,10 @@ unsigned long path_count (unsigned char *path)
  *     Carrega nesse endereço o arquivo que está nesse path.
  */
 
+// Ex:  ??? "/BIN/GDESHELL.BIN" ???
+
 // IN:
-// path de dois níveis, andereço onde carregar.
+// path de dois níveis, endereço onde carregar.
 
 //   0 ---> ok.
 // !=0 ---> fail
@@ -775,8 +777,16 @@ int load_path ( unsigned char *path, unsigned long address ){
 
 
 
+    // Address
+    if (address == 0){
+        panic ("load_path: address\n");
+    }
+
+    // File buffer.
     __file_buffer = (void *) address;
 
+
+    // Número de níveis.
     n_levels = path_count(path);
     
     if (n_levels==0){
@@ -784,20 +794,21 @@ int load_path ( unsigned char *path, unsigned long address ){
     }    
 
 
-    // Address
-    if (address == 0){
-        panic ("load_path: address\n");
-    }
-
-
+    // COmeçaremos do nível 0.
     level = 0;
 
+    // Path provisório.
     p = path;
 
-
     // Primeiro src =  root address;
+    // COmeçando com o kernel.
     __src_buffer = (void *) VOLUME1_ROOTDIR_ADDRESS;
 
+    
+    //
+    // loop: Carregar n levels.
+    //
+    
     for (l=0; l<n_levels; l++)
     {
 
@@ -811,6 +822,7 @@ int load_path ( unsigned char *path, unsigned long address ){
         p++; //pula o '/' 
 
         //i=0;
+        // avançando até 13 chars do nome.
         for ( i=0; i<12; i++ )
         {
             // #debug
@@ -826,16 +838,16 @@ int load_path ( unsigned char *path, unsigned long address ){
             if ( *p == '.' )
             {
                 if ( l != (n_levels-1) ){
-                    panic ("bl-load_path: Directory name with '.'\n");
+                    panic ("load_path: Directory name with '.'\n");
                 }
                 
                 //se o ponto está além do limite permitido.
                 if (i>=7){
-                    printf ("bl-load_path: '.' fail.\n");
+                    printf ("load_path: '.' fail.\n");
                     panic ("Name size bigger than 8.\n");
                 }
                 
-                // se o ponto for antes do nono slot.
+                // Se o ponto for antes do nono slot.
                 if (i<8)
                 {
                      // Nome tem no máqximo 8 chars.
@@ -872,7 +884,7 @@ int load_path ( unsigned char *path, unsigned long address ){
                 __dst_buffer = (void *) __file_buffer;
     
                 if ( (void *) __dst_buffer == NULL ){
-                    panic ("bl-load_path: __dir\n");
+                    panic ("load_path: __dir\n");
                 }
 
                       // IN: 
@@ -891,11 +903,12 @@ int load_path ( unsigned char *path, unsigned long address ){
                     // Esse nível tinha ponto, então deveria ser o último.
                     if ( l != (n_levels-1) )
                     {
-                        printf ("bl-load_path: Directory name with '.'\n");
+                        printf ("load_path: Directory name with '.'\n");
                         panic ("It needs to be the last level.\n");
                     }
 
                     // SUCCESS ?!!
+                    debug_print ("load_path: done\n");
                     return 0;
                      
                     //sai do for??
@@ -906,7 +919,6 @@ int load_path ( unsigned char *path, unsigned long address ){
                     panic ("load_path: fail loading level 0\n");
                 };
             }
-            
             
             
             // Se encontramos um indicador de próximo nível,
@@ -968,12 +980,19 @@ int load_path ( unsigned char *path, unsigned long address ){
     };   
     
 
-    //debug_print ("load_path: fail\n");
-    
+    debug_print ("load_path: fail\n");
     return (-1);
 }
 
 
+
+int sys_load_path ( unsigned char *path, unsigned long u_address )
+{
+    debug_print ("sys_load_path:\n");
+    
+    load_path ( (unsigned char *) path, (unsigned long) u_address );
+    return 0;
+}
 
 
 /*
@@ -1588,6 +1607,7 @@ int fs_print_process_pwd (int pid){
 /*
  *****************************************
  * fsUpdateWorkingDiretoryString:
+ * 
  *     +Atualiza o pathname na estrutura do processo atual.
  *     +Atualiza o pathname na string global. 
  */ 
@@ -2028,15 +2048,17 @@ __OK:
 /*
  ********************************
  * fsLoadFileFromCurrentTargetDir:
- *     Carrega o diret�rio que est� configurado como target dir 
- * em algum lugar qualquer da mem�ria. 
+ * 
+ *     Carrega o diretório que está configurado como 'target dir' 
+ * em algum lugar qualquer da memória. 
+ *     Usa-se a estrutura current_target_dir pra gerenciar isso.
  */
 
 int fsLoadFileFromCurrentTargetDir (void){
 
     int Ret = -1;
     int i=0;
-    unsigned long new_address;
+    unsigned long new_address = 0;
 
     debug_print ("fsLoadFileFromCurrentTargetDir: Loading dir \n");
 
@@ -2045,7 +2067,7 @@ int fsLoadFileFromCurrentTargetDir (void){
 	//precisamos expandir isso.
 	//aqui no m'aquimo o arquivo pode ter 4kb.
 	//acho ques estamos falando somente de diret'orio aqui.
-	
+
     new_address = (unsigned long) kmalloc (4096);
 
     if ( new_address == 0 ){

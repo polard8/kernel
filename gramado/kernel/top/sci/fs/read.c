@@ -835,9 +835,7 @@ fs_load_dir (
     // #todo:
     // Limits
     
-    load_directory ( address, lba, sectors );
-    
-    return 0;
+    return (int) load_directory ( address, lba, sectors );
 }
 
 

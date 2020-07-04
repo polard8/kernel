@@ -157,11 +157,15 @@ int fsSearchFile (unsigned char *file_name){
 
     char NameX[13];
     char *dir = (char *) VOLUME1_ROOTDIR_ADDRESS;    //rootDir->address;
- 
-	if ( file_name[0] == '/' || file_name[0] == 0 )
-	{
-		goto fail;
-	}
+
+
+
+    //#obs
+    // Não procura um nome começado com '/'
+    if ( file_name[0] == '/' || file_name[0] == 0 )
+    {
+        goto fail;
+    }
 
  
     //Obs:
@@ -174,19 +178,19 @@ int fsSearchFile (unsigned char *file_name){
     for ( i=0; i < NumberOfEntries; i++ )
     {
         // FAT_DIRECTORY_ENTRY_FREE
-		if ( dir[j] == (char) 0xE5 )
-		{
-		    j += 0x20;
+        if ( dir[j] == (char) 0xE5 )
+        {
+            j += 0x20;
             continue;
-		}
+        }
 
 		// diretório atual ou diretório pai.
 		// '.' ou '..'
-		if ( dir[j] == '.' )
-		{
-		    j += 0x20;
+        if ( dir[j] == '.' )
+        {
+            j += 0x20;
             continue;
-		}
+        }
 
 
         //#TODO
@@ -240,7 +244,8 @@ done:
 
 unsigned short fs_find_empty_entry ( char *fat_address )
 {
-	return (unsigned short) 0;
+    debug_print ("fs_find_empty_entry: [TODO]\n");
+    return (unsigned short) 0;
 }
 
 
@@ -254,8 +259,9 @@ unsigned short fs_find_empty_entry ( char *fat_address )
  */
 
 int 
-findEmptyDirectoryEntry ( unsigned long dir_address, 
-                          int number_of_entries )
+findEmptyDirectoryEntry ( 
+    unsigned long dir_address, 
+    int number_of_entries )
 {
     int i;
     int j=0;
@@ -265,25 +271,15 @@ findEmptyDirectoryEntry ( unsigned long dir_address,
 	// Filtrando limites.
 
 
-    if ( dir_address == 0 )
-    {
-        goto fail;
-    }
-
-    if ( number_of_entries < 0 )
-    {
-        goto fail;
-    }
+    if ( dir_address == 0 )     { goto fail; }
+    if ( number_of_entries < 0 ){ goto fail; }
 
 
     for ( i=0; i<number_of_entries; i++ )
     {
-		if ( dir[j] == 0 )
-		{
-			return (int) i;
-		}
+        if ( dir[j] == 0 ){ return (int) i; }
 
-		// Próxima entrada.
+        // Próxima entrada.
         j = j+32;
     };
 
@@ -311,10 +307,7 @@ unsigned short fs_find_n_empty_entries ( int n ){
     unsigned short empty;
 
 	// Limits.
-    if ( n < 0 || n > 1024 )
-    {
-        goto fail;
-    }
+    if ( n < 0 || n > 1024 ){ goto fail; }
 
 
 	// Loop ~ Procurar uma quantidade de entradas vazias.
@@ -323,13 +316,12 @@ unsigned short fs_find_n_empty_entries ( int n ){
 		//empty = (unsigned short) fs_find_empty_entry(?);
 		
 		// Preenche a lista de entradas vazias.	
-		if ( empty != 0 && empty < 1024 )
-		{
-		    file_cluster_list[l] = (unsigned short) empty;
+        if ( empty != 0 && empty < 1024 )
+        {
+            file_cluster_list[l] = (unsigned short) empty;
             l++;
-		}else{
-		    goto fail;
-		};
+        
+        }else{ goto fail; };
 
     };
 
