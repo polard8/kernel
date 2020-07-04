@@ -1137,19 +1137,43 @@ int serviceDrawChar(void)
    _string[0] = (unsigned char) C;
    _string[1] = (unsigned char) 0;   
    
-   //
-   // Draw
-   //
+    
+    //
+    // Window ID
+    //
    
+    // Limits
+    if ( window_id < 0 || window_id >= WINDOW_COUNT_MAX ){
+        gde_debug_print ("serviceDrawChar: window_id\n");
+        return -1;
+    }
+
     //#todo
     // Get the window structure given the id.
-    //window = (struct gws_window_d *) windowList[window_id];
+    window = (struct gws_window_d *) windowList[window_id];
+   
+    if ( (void *) window == NULL ){
+        gde_debug_print ("serviceDrawChar: window\n");
+        return -1;
+    }
+    
+    if ( window->used != 1 || window->magic != 1234 ){
+        gde_debug_print ("serviceDrawChar: validation\n");
+        return -1;
+    }
+    
+    //
+    // Draw
+    //
+
+    dtextDrawText ( (struct gws_window_d *) window,
+        x, y, color, (unsigned char *) &_string[0] );
     
     //#test
     //It is working
     // Usando a janela screen por enquanto.
-    dtextDrawText ( (struct gws_window_d *) gui->screen,
-        x, y, color, (unsigned char *) &_string[0] );
+    //dtextDrawText ( (struct gws_window_d *) gui->screen,
+        //x, y, color, (unsigned char *) &_string[0] );
 
     //It is working
     //charBackbufferDrawcharTransparent ( x, y, color, C );
