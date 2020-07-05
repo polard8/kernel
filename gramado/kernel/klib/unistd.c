@@ -30,20 +30,29 @@ off_t sys_lseek (int fd, off_t offset, int whence)
     file *f;
 
     
-    if (fd<0 || fd >= 32)
-        return -1; //#todo message
+    if (fd<0 || fd >= 32){
+        //#todo: message
+        return -1; 
+    }
     
+    //process
     
     p = (struct process_d *) processList[current_process];
     
-    if ( (void *) p == NULL )
+    if ( (void *) p == NULL ){
         return -1; //#todo message
+    }
+    
+    //#todo
+    //validation
     
     
     f = (file *) p->Objects[fd];
     
-    if ( (void *) f == NULL )
-        return -1; //#todo message
+    if ( (void *) f == NULL ){
+        //#todo: message
+        return -1; 
+    }
     
     k_fseek ( (file *) f, (long) offset, (int) whence );
 
@@ -62,10 +71,11 @@ int __gethostname (char *buffer){
 	//Estrutura default para informações sobre o host.
 	//host.h
 
-    if ( (void *) HostInfo == NULL )
-    {
+    if ( (void *) HostInfo == NULL ){
         printf ("__gethostname: HostInfo\n");
+        //refresh_screen();
         return (int) -1;
+ 
     }else{
 
                  //64 bytes
@@ -74,7 +84,7 @@ int __gethostname (char *buffer){
         return (int) HostInfo->hostName_len;
     };
 
-
+    //fail
     return (int) -1;
 }
 
@@ -101,19 +111,15 @@ int __sethostname (const char *new_hostname){
         //64 bytes
         strcpy ( HostInfo->__hostname, (const char *) new_hostname);
 
-		return 0;
-	};
+        return 0;
+    };
 
-
+    //fail
     return (int) -1;
 }
 
 
-
-
-
-
-
-
-
+//
+// End.
+//
 

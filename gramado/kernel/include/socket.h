@@ -510,11 +510,14 @@ struct socket_d
     int family;
     int type;
     int protocol;
+    
+    pid_t pid;  // Process
+    uid_t uid;  // User 
+    gid_t gid;  // Group
+
 
     unsigned long ip;
     unsigned short port;
-    
-    
 
     //
     // Connection
@@ -539,9 +542,7 @@ struct socket_d
     struct sockaddr addr;
 
     // usada em endereços AF_INET
-    struct sockaddr_in addr_in;   
-
-    pid_t owner;
+    struct sockaddr_in addr_in; 
 };
 struct socket_d *CurrentSocket;
 struct socket_d *LocalHostHTTPSocket;

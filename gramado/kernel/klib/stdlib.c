@@ -21,11 +21,12 @@ static int randseed = 1234;
 
 
 /* rand: 
- * Gera um número inteiro randômico. */
+ * Gera um número inteiro randômico. 
+ */
 
-int rand (void){
-	
-	return (int) ( randseed = randseed * 1234 + 5 );
+int rand (void)
+{
+    return (int) ( randseed = randseed * 1234 + 5 );
 }
 
 
@@ -45,28 +46,32 @@ void *slab_alloc (size_t size)
 
 void *kmalloc (size_t size){
 
-	void *h;
-	unsigned long s = ( unsigned long) size;
+    void *h;
+    unsigned long s = ( unsigned long) size;
 
 	//s = (s ? s : 1);	/* if s == 0, s = 1 */
 
-	if ( s < 0 ){
-		return NULL;
-	};
-	
-	if ( s == 0 ){
-		s=1;
-	};
+    if ( s < 0 ){
+        debug_print ("kmalloc: s\n");
+        return NULL;
+    }
 
-	//Alocar memória no heap do kernel.
+    if ( s == 0 ){
+        debug_print ("kmalloc: s ajust\n");
+        s=1;
+    }
 
-	h = (void *) heapAllocateMemory (s);
-	
-	if ( (void *) h == NULL )
-	{
-		return NULL;
-	}
-	
+    // Alocar memória no heap do kernel.
+    // ps/x86/memory.c
+    
+    h = (void *) heapAllocateMemory (s);
+
+    if ( (void *) h == NULL ){
+        debug_print ("kmalloc: h\n");
+        return NULL;
+    }
+
+    // Ok.
     return (void *) h; 
 }
 
@@ -76,8 +81,8 @@ void *kmalloc (size_t size){
  * kfree:
  *
  * >> #importante:
- * >> Tradicionalmente essa função só libera o que foi alocado pela última 
- * chamada de malloc. Mas estamos tentando algo diferente.
+ * >> Tradicionalmente essa função só libera o que foi alocado 
+ * pela última chamada de malloc. Mas estamos tentando algo diferente.
  *
  * The free() function frees the memory space pointed to by ptr, 
  * which must have been returned by a previous call 
@@ -94,11 +99,13 @@ void *kmalloc (size_t size){
  */
 
 void kfree (void *ptr){
-	
-	if ( (void *) ptr == NULL )
-	    return;
 
-	//memory.c
+    if ( (void *) ptr == NULL ){
+        debug_print ("kfree: ptr\n");
+        return;
+    }
+    
+    // ps/x86/memory.c
     FreeHeap (ptr);
 }
 
@@ -123,7 +130,7 @@ void *kcalloc (size_t count, size_t size)
 */
 
 
-// supporting the services 808 e 809.
+// Supporting the services 808 e 809.
 int __ptsname (int fd, char *buf, size_t buflen)
 {
      char *ptsname_buffer = (char *) buf;
@@ -133,12 +140,10 @@ int __ptsname (int fd, char *buf, size_t buflen)
     // 64 bytes limit
     strcpy ( ptsname_buffer, (const char *) test_str );
     
-    // lá na lib em ring3 a rotina retorna para o app o ponteiro para o buffer
+    // Lá na lib em ring3 a rotina retorna para o app o 
+    // ponteiro para o buffer
     return 0;  //ok
 }
-
-
-
 
 
 

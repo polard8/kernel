@@ -51,6 +51,10 @@ int k_fclose (file *f){
         f->used = 1;
         f->magic = 1234;
 
+        f->pid = (pid_t) 0;
+        f->uid = (uid_t) 0;
+        f->gid = (gid_t) 0;
+        
         f->_p = NULL;
         f->_cnt = 0;
         f->_base = NULL;
@@ -202,6 +206,10 @@ file *k_fopen ( const char *filename, const char *mode ){
 
         f->used = 1;
         f->magic = 1234;
+        
+        f->pid = (pid_t) current_process;
+        f->uid = (uid_t) current_user;
+        f->gid = (gid_t) current_group;
 
         f->_base = file_buffer;
         f->_bf._base = file_buffer;

@@ -479,20 +479,20 @@ unsigned long heapAllocateMemory ( unsigned long size ){
     // Se o tamanho desejado for igual a zero.
     // @todo: Aqui podemos converter o size para o tamanho mínimo.
     // não há problema nisso.
-	
-    if( size == 0 )
-	{
+
+    if ( size == 0 )
+    {
         //size = 1;
         printf("heapAllocateMemory error: size={0}\n");
         refresh_screen();
         
-		//?? NULL seria o retorno para esse caso ??
-		return (unsigned long) g_heap_pointer;
+        //?? NULL seria o retorno para esse caso ??
+        return (unsigned long) g_heap_pointer;
     }
 
 
     // Se o tamanho desejado é maior ou 
-	// igual ao espaço disponível.
+    // igual ao espaço disponível.
     if( size >= g_available_heap )
     {
         //
@@ -528,10 +528,10 @@ try_again:
     }
 
 
-	// #importante
+    // #importante
     // A variável 'Header', no header do bloco, 
-	// é o início da estrutura que o define. 'b->Header'. 
-	// Ou seja, o endereço da variável marca o início da
+    // é o início da estrutura que o define. 'b->Header'. 
+    // Ou seja, o endereço da variável marca o início da
     // estrutura.
     //
     // Pointer Limits:
@@ -570,12 +570,11 @@ try_again:
 		
 		//Havendo um last heap pointer válido.
 		//?? isso não faz sentido.
-		
-		g_heap_pointer = (unsigned long) (heap_pointer_last_valid + last_size);
 
-		goto try_again;
-	}
-	
+        g_heap_pointer = (unsigned long) (heap_pointer_last_valid + last_size);
+
+        goto try_again;
+    }
 
     // Agora temos um 'g_heap_pointer' válido, salvaremos ele.
     // 'heap_pointer_last_valid' NÃO é global. Fica nesse arquivo.
@@ -583,27 +582,27 @@ try_again:
     heap_pointer_last_valid = (unsigned long) g_heap_pointer;
     
 
-	// #importante:
+    // #importante:
     // Criando um bloco, que é uma estrutura mmblock_d.
     // Estrutura mmblock_d interna.
     // Configurando a estrutura para o bloco atual.
     //
     // Obs: A estutura deverá ficar lá no espaço reservado 
-	// para o header. (Antes da area alocada).
-	//
+    // para o header. (Antes da area alocada).
+    //
     // Current = (void*) g_heap_pointer;
 
     
 	// ## importante ##
 	// O endereço do ponteiro da estrutura será o pointer do heap.
-	
+
     Current = (void *) g_heap_pointer;    
 
     if ( (void *) Current != NULL )
     {
         // #importante:
-		// Obs: Perceba que 'Current' e 'Current->Header' 
-		// devem ser iguais. 
+        // obs: Perceba que 'Current' e 'Current->Header' 
+        // devem ser iguais. 
 
         // Identificadores básicos:
 		// Endereço onde começa o header.
@@ -611,8 +610,8 @@ try_again:
 		// Id do mmblock. (Índice na lista)
 		// used and magic flags.
 		// 0=not free 1=FREE (*SUPER IMPORTANTE)
-		
-		Current->Header = (unsigned long) g_heap_pointer;  
+
+        Current->Header = (unsigned long) g_heap_pointer;  
         Current->headerSize = MMBLOCK_HEADER_SIZE;         
         Current->Id = mmblockCount;                        
         Current->Used = 1;                
@@ -665,8 +664,8 @@ try_again:
         //}
 
 
-        // Obs: 
-		// O limite da contagem de blocos foi checado acima.
+        // obs: 
+        // O limite da contagem de blocos foi checado acima.
 
         //
         // Coloca o ponteiro na lista de blocos.
@@ -679,15 +678,15 @@ try_again:
 
         mm_prev_pointer  = (unsigned long) g_heap_pointer; 
 
-		
+
         // *****************************************************
         //                **** SUPER IMPORTANTE ****
         // *****************************************************
         // Atualiza o ponteiro. 
-		// Deve ser onde termina o último bloco configurado.
+        // Deve ser onde termina o último bloco configurado.
         // Isso significa que o próximo ponteiro onde começaremos 
-		// a próxima estrutura fica exatamente onde começa o footer 
-		// dessa estrutura.
+        // a próxima estrutura fica exatamente onde começa o footer 
+        // dessa estrutura.
         // Obs: O footer está aqui somente para isso. Para ajudar
         // a localizamarmos o início da próxima estrutura.
 
@@ -967,10 +966,10 @@ fail:
  
 int init_mm (void){
 
-    int Status = 0;
-    int i = 0;
+    int Status=0;
+    int i=0;
 
-	
+
 	// @todo: 
 	// Inicializar algumas variáveis globais.
 	// Chamar os construtores para inicializar o básico.
@@ -984,7 +983,7 @@ int init_mm (void){
 	//#importante:
 	//Inicializa heap e stack.
 
-    Status = (int) init_heap ();
+    Status = (int) init_heap();
 
     if (Status != 0){
         printf ("init_mm fail: Heap\n");
@@ -992,7 +991,7 @@ int init_mm (void){
         //return (int) 1;
     }
 
-    Status = (int) init_stack ();
+    Status = (int) init_stack();
 
     if (Status != 0){
         printf ("init_mm fail: Stack\n");
@@ -1016,10 +1015,10 @@ int init_mm (void){
 	//#importante:
 	//#inicializando o índice la lista de ponteiros 
 	//par estruturas de alocação.
-	
-	mmblockCount = 0;
-	
-	
+
+    mmblockCount = 0;
+
+
 	//
 	// MEMORY SIZES
 	//
@@ -1076,10 +1075,9 @@ int init_mm (void){
 
 
 
-
     // Inicializando o framepool (paged pool).
 
-    initializeFramesAlloc ();
+    initializeFramesAlloc();
 
 
 	// Continua...
@@ -1111,8 +1109,8 @@ int kernel_gc (void){
 
     struct mmblock_d *b;  //memory block.
     struct heap_d *h;     //heap.
-    int i = 0;
-    //...
+    int i=0;
+    // ...
 
     //#todo: Test this thing!
     //debug_print("kernel_gc: \n");
@@ -1133,19 +1131,19 @@ int kernel_gc (void){
 	    b = (void *) mmblockList[i];
 		
 		// Valid pointer.
-	    if( (void *) b != NULL )
-		{
+        if ( (void *) b != NULL )
+        {
 			// Sinalizado para o GC.
 			// #bugbug: rever a sinalização de 'free'.
-			if( b->Used == 216 && 
-				b->Magic == 4321 && 
-				b->Free == 1 )
-			{
-				goto clear_mmblock;
-			}
-		}
+            if ( b->Used == 216 && 
+                 b->Magic == 4321 && 
+                 b->Free == 1 )
+            {
+                goto clear_mmblock;
+            }
+        }
     };
-	
+
 	
 	//heapList[]
 	//Limpar a lista de heaps.
@@ -1182,7 +1180,7 @@ int kernel_gc (void){
 	
 clear_mmblock:	
     
-	if ( (void *) b != NULL )
+    if ( (void *) b != NULL )
     {
 		//Checar se a área alocada está dentro dos limites.
 	    //O inicio da área mais o tamanho dela tem que coincidir 
@@ -1203,14 +1201,14 @@ clear_mmblock:
 		};
 		
         //Nothing.		
-	};
-	goto done;
+    };
+    goto done;
 	//Nothing.
 	
 clear_heap:
 
     if ( (void *) h != NULL )
-	{
+    {
 		// ?? O que fazer aqui ??
 		
 		//Limparemos mas não deletaremos.
@@ -1230,9 +1228,9 @@ clear_heap:
 		//lista encadeada de blocos que formavam o heap.
 		//podemos apenas sinalizar todos os mmblocks dessa lista e depois o GC acaba com eles.
 		//para isso precisamos de um 'for'.
-		//h->mmblockListHead = NULL;		
-	};
-	goto done;
+		//h->mmblockListHead = NULL;
+    };
+    goto done;
 	//Nothing.
 
 	//

@@ -349,22 +349,21 @@ void *allocPages (int size){
     // Esse é o endereço virtual do início do pool de pageframes.
     unsigned long base = (unsigned long) g_pagedpool_va;
 
-
-    int __slot = 0;
-
+    int __slot=0;
 
 	//página inicial da lista
-	struct page_d *Ret;   
-	
-	struct page_d *Conductor;
-	struct page_d *p;
-	
-	
-	unsigned long va;
+    struct page_d *Ret;   
+
+    struct page_d *Conductor;
+    struct page_d *p;
+
+    unsigned long va;
     unsigned long pa;
-	
-	int Count = 0;
-	
+
+    int Count=0;
+
+    int __first_free_slot = -1;
+
 	//
 	// Checando limites.
 	//
@@ -374,60 +373,53 @@ void *allocPages (int size){
 //#endif
 
 	//problemas com o size.
-	if (size <= 0)
-	{
+    if (size <= 0)
+    {
 		//if debug
 		printf ("allocPages: size 0\n");
 		return NULL;
-	}
+    }
 	
-			
-    //Se é pra alocar apenas uma página.
-	if (size == 1)
-	{		
-		return (void *) newPage ();	
-	}	
-	
-	//se o size for maior que o limite.
+
+    // Se é pra alocar apenas uma página.
+    if (size == 1){
+        return (void *) newPage();
+    }
+
+    // Se o size for maior que o limite.
     if ( size > PAGE_COUNT_MAX )
-	{
+    {
 		//if debug
 		printf ("allocPages: size limits\n");
 		goto fail;
-	}
-	
-	
-	//
-	// Isso encontra slots o suficiente para alocarmos tudo o que queremos.
-	//
+    }
 
-    int __first_free_slot = -1;
 
-    __first_free_slot = (int) firstSlotForAList (size);
-
+    // Isso encontra slots o suficiente para alocarmos 
+    // tudo o que queremos.
     // PANIC !!
     // A memória para a locação acabou.
     // #todo:
     // Liberar páginas mandando para o disco conforme
     // critéria à definir ainda,
-    
+
+
+    __first_free_slot = (int) firstSlotForAList(size);
+
     if ( __first_free_slot == -1 ){
         debug_print ("mmpool-allocPages: No more free slots\n");
         panic ("mmpool-allocPages: No more free slots\n");
     }
 
 
-    //
     // Procurar slot vazio.
-    //
-
     // Começamos a contar do frame logo após o condutor.
 
 
     for ( __slot = __first_free_slot; __slot < (__first_free_slot+size+1); __slot++ )
     {
-	    p = (void *) pageAllocList[__slot];
-				
+        p = (void *) pageAllocList[__slot];
+
 		//Slot livre
 		if ( p == NULL )
 		{
@@ -436,12 +428,11 @@ void *allocPages (int size){
 			
 			p = (void *) kmalloc ( sizeof( struct page_d ) );
 			
-			if ( p == NULL )
-			{
-				printf ("allocPages: fail 2\n");
-				goto fail;
-			};
-			
+            if ( p == NULL ){
+                printf ("allocPages: fail 2\n");
+                goto fail;
+            }
+
 			//printf("#");
 			p->id = __slot;
 			
@@ -462,19 +453,18 @@ void *allocPages (int size){
 			va = (unsigned long) ( base + (p->id * 4096) );    
 			pa = (unsigned long) virtual_to_physical ( va, gKernelPageDirectoryAddress ); 
 			
-	
-			if ( ( pa % PAGE_SIZE) != 0 ) 
-			{		
-			    pa = pa - ( pa % PAGE_SIZE);			
-			}	 	
-			
-			p->frame_number = (pa / PAGE_SIZE);
-			
-			if ( pa == 0 )
-			{
-			    p->frame_number = 0;
-			}
-			
+
+            if ( ( pa % PAGE_SIZE) != 0 ) 
+            {
+                pa = pa - ( pa % PAGE_SIZE);
+            }
+
+            p->frame_number = (pa / PAGE_SIZE);
+
+            if ( pa == 0 ){
+                p->frame_number = 0;
+            }
+
 			//---
 			
 			pageAllocList[__slot] = ( unsigned long ) p; 
@@ -504,14 +494,11 @@ void *allocPages (int size){
 
 fail:
 
-
     printf ("allocPages: fail \n");
     debug_print ("mmpool-allocPages: fail \n");
 
     return NULL;
 }
-
-
 
 
 //

@@ -817,13 +817,18 @@ int sys_socket ( int family, int type, int protocol ){
 
     }else{
 
+        // The private socket of a process.
+        p->priv = __socket;
+
         // family, type and protocol.
         __socket->family = family;
         __socket->type = type;
         __socket->protocol = protocol;
 
-       // The private socket of a process.
-       p->priv = __socket;
+
+        __socket->pid = (pid_t) current_process;
+        __socket->uid = (uid_t) current_user;
+        __socket->gid = (gid_t) current_group;
 
 
        // family
@@ -1815,9 +1820,10 @@ create_socket (
         
         //s->addr = (struct sockaddr) 0;
         
-        s->owner = current_process;
         
-        
+        s->pid = (pid_t) current_process;
+        s->uid = (uid_t) current_user;
+        s->gid = (gid_t) current_group;
         
         
         // Initializing pointers.

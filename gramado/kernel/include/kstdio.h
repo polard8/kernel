@@ -551,19 +551,18 @@ struct __sbuf {
  
 struct file_d
 {
-
     // Indica qual tipo de objeto esse arquivo representa.
     // See: globals/gobject.h
     object_type_t ____object;
 
-
-	// #importante
-	// Vamos tornar a estrutura em kernel mode igual a estrutura de ring3;
-
     int used;
     int magic;
 
-    
+    pid_t pid;  // Process
+    uid_t uid;  // User 
+    gid_t gid;  // Group
+
+
     int iopl;
 
 	//Current position of file pointer (absolute address).
