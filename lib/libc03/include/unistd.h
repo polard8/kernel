@@ -372,6 +372,28 @@ char *getwd(char *buf);
 char *get_current_dir_name(void);
 
 
+//Count occurrences of a char.
+int 
+StrOcc (
+    unsigned char *src, 
+    int ch );
+
+
+//Point to 1st occurrence of marker set in str.
+unsigned char *
+StrFirstOcc (
+	unsigned char *src,
+	unsigned char *marker );
+	
+	
+	
+//Point to last occurrence of market set in str.
+unsigned char *
+StrLastOcc (
+	unsigned char *src,
+	unsigned char *marker);
+	
+
 #endif /* _UNISTD_H */
 
 

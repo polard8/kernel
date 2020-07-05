@@ -1701,6 +1701,65 @@ xxx_todo_int133 (
 
 
 
+    
+//Count occurrences of a char.
+int 
+StrOcc (
+    unsigned char *src, 
+    int ch )
+{
+ 
+    int i=0;
+  
+    if (!src) 
+        return 0; 
+
+    while (*src)
+        if (*src++==ch)
+            i++;
+    return (int) i;
+}
+
+
+	
+//Point to 1st occurrence of marker set in str.
+unsigned char *
+StrFirstOcc (
+	unsigned char *src,
+	unsigned char *marker )
+{
+
+    int ch;
+
+    while ( (ch=*src++) && !StrOcc(marker,ch) );
+    if (ch)
+       return src-1;
+    else
+        return NULL;
+}
+
+
+
+	
+//Point to last occurrence of market set in str.
+unsigned char *
+StrLastOcc (
+	unsigned char *src,
+	unsigned char *marker)
+{
+
+    int ch;
+
+    unsigned char *res=NULL;
+    
+    while (ch=*src++)
+        if (StrOcc(marker,ch))
+            res=src-1;
+   return res;
+}
+
+
+
 
 //
 // End.

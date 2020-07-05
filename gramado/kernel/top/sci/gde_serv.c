@@ -939,7 +939,7 @@ gde_extra_services (
         //return (void *) __fp->_base;
     }
     
-    //#test
+    //#test ok
     //Load path. ex: "/BOOT/BM.BIN"
     //See: fs.c
     if ( number == 4004 )
