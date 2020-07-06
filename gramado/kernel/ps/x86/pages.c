@@ -1,7 +1,6 @@
 /*
  * File: bottom/ps/pages.c
  *
- * Descri��o:
  *     Faz a configura��o da pagina��o de mem�ria e oferece rotinas de
  * suporte ao mapeamento de mem�ria f�sica.
  *     Faz parte do modulo /mm da classe ram.
@@ -167,7 +166,7 @@ int initialize_frame_table (void){
     // Cada página pode conter 4096 entradas de i byte
     FT.n_pages = (FT.total_frames/4096); 
 
-    FT.frame_table = (unsigned char *) allocPages (FT.n_pages);
+    FT.frame_table = (unsigned char *) allocPages(FT.n_pages);
 
     if ((void *) FT.frame_table ==NULL){
         panic("invalid FT.frame_table"); 
@@ -249,18 +248,18 @@ unsigned long table_pointer_heap_base = 0x1000;
 
 unsigned long get_table_pointer (void)
 {
-    table_pointer_heap_base =  table_pointer_heap_base + 0x1000;
-    
+    table_pointer_heap_base = (table_pointer_heap_base + 0x1000);
+
     if ( table_pointer_heap_base >= VM_BASE )
     {
         // #todo
         // Precisamos de uma nova origem.
         // Os primeiros 12bits precisam ser '0'.
-        panic ("pages-get_table_pointer: FIXME: limits.\n");
+        panic ("pages-get_table_pointer: FIXME: limits\n");
     }
 
 
-    return table_pointer_heap_base;
+    return (unsigned long) table_pointer_heap_base;
 }
 
 
@@ -283,19 +282,16 @@ void *clone_directory( unsigned long directory_va ){
     }
 
     unsigned long *src = (unsigned long *) directory_va;
-    unsigned long *dst = (unsigned long *) destAddressVA;  
+    unsigned long *dst = (unsigned long *) destAddressVA; 
 
     for ( i=0; i < 1024; i++ ){
-        dst[i] = (unsigned long) src[i];    
+        dst[i] = (unsigned long) src[i]; 
     };
 
-	//
-	// Done.
-	//
-	
-	// Retornamos o endere�o virtual do novo diret�rio de p�ginas.
-	
-	return (void *) destAddressVA;
+    // Done.
+    // The address of the new page diretory.
+
+    return (void *) destAddressVA;
 }
 
 
@@ -393,17 +389,14 @@ void *CloneKernelPageDirectory (void){
 	// para colocarmos no cr3.	
 	
     for ( i=0; i < 1024; i++ ){
-        dst[i] = (unsigned long) src[i];    
+        dst[i] = (unsigned long) src[i];
     };
 
 
-	//
-	// Done.
-	//
-	
-	// Retornamos o endere�o virtual do novo diret�rio de p�ginas.
-	
-	return (void *) destAddressVA;
+    // Done.
+    // The virtual address of the new pagedirectory. 
+
+    return (void *) destAddressVA;
 }
 
 
@@ -470,14 +463,14 @@ CreatePageTable (
 	// Precisamos do endere�o virtual do diret�rio para edit�-lo.
 
     if ( directory_address_va == 0 ){
-        panic ("CreatePageTable: directory_address_va\n");	
+        panic ("CreatePageTable: directory_address_va\n");
     }
 
-	
+
 	//
 	// ===========================
 	// ### pt  ###
-	//	
+	//
 	
 	// #importante:
 	// Endere�o virtual da tabela de p�ginas que vamos criar.
@@ -503,7 +496,7 @@ CreatePageTable (
 
     if ( ptVA == 0 ){
         kprintf ("CreatePageTable: ptVA #bugbug\n");
-    }	
+    }
 
 
     // O endereço virtual permite manipularmos a 
@@ -636,7 +629,7 @@ void x86_SetCR3 (unsigned long pa){
 
     // See: kernel/init/x86/headlib.asm
     asm volatile ("\n" :: "a"(pa) );
-    set_page_dir ();
+    set_page_dir();
 }
 
 
@@ -887,12 +880,12 @@ int SetUpPaging (void){
 	//                  ****    SMALL SYSTEMS    ****
 	//==============================================================
     SMALL_kernel_address = SMALLSYSTEM_KERNELADDRESS;
-    SMALL_kernel_base = SMALLSYSTEM_KERNELBASE;
-    SMALL_user_address = SMALLSYSTEM_USERBASE;
-    SMALL_vga_address = SMALLSYSTEM_VGA;
-    SMALL_frontbuffer_address = (unsigned long) SavedLFB;                    //frontbuffer
+    SMALL_kernel_base    = SMALLSYSTEM_KERNELBASE;
+    SMALL_user_address   = SMALLSYSTEM_USERBASE;
+    SMALL_vga_address    = SMALLSYSTEM_VGA;
+    SMALL_frontbuffer_address = (unsigned long) SavedLFB;                     //frontbuffer
     SMALL_backbuffer_address  = (unsigned long) SMALLSYSTEM_BACKBUFFER;       //backbuffer
-    SMALL_pagedpool_address   = (unsigned long) SMALLSYSTEM_PAGEDPOLL_START;   //PAGED POOL
+    SMALL_pagedpool_address   = (unsigned long) SMALLSYSTEM_PAGEDPOLL_START;  //PAGED POOL
     SMALL_heappool_address    = (unsigned long) SMALLSYSTEM_HEAPPOLL_START;
     SMALL_extraheap1_address  = (unsigned long) SMALLSYSTEM_EXTRAHEAP1_START;
     SMALL_extraheap2_address  = (unsigned long) SMALLSYSTEM_EXTRAHEAP2_START;
@@ -902,23 +895,23 @@ int SetUpPaging (void){
 	//                  ****    MEDIUM SYSTEMS    ****
 	//==============================================================
     MEDIUM_kernel_address = MEDIUMSYSTEM_KERNELADDRESS;
-    MEDIUM_kernel_base = MEDIUMSYSTEM_KERNELBASE;
-    MEDIUM_user_address = MEDIUMSYSTEM_USERBASE;
-    MEDIUM_vga_address = MEDIUMSYSTEM_VGA ;
+    MEDIUM_kernel_base    = MEDIUMSYSTEM_KERNELBASE;
+    MEDIUM_user_address   = MEDIUMSYSTEM_USERBASE;
+    MEDIUM_vga_address    = MEDIUMSYSTEM_VGA;
     MEDIUM_frontbuffer_address = (unsigned long) SavedLFB;
     MEDIUM_backbuffer_address  = (unsigned long) MEDIUMSYSTEM_BACKBUFFER;
-    MEDIUM_pagedpool_address   = (unsigned long) MEDIUMSYSTEM_PAGEDPOLL_START; 	
+    MEDIUM_pagedpool_address   = (unsigned long) MEDIUMSYSTEM_PAGEDPOLL_START;
     MEDIUM_heappool_address    = (unsigned long) MEDIUMSYSTEM_HEAPPOLL_START;
-    MEDIUM_extraheap1_address  = (unsigned long) MEDIUMSYSTEM_EXTRAHEAP1_START;	
+    MEDIUM_extraheap1_address  = (unsigned long) MEDIUMSYSTEM_EXTRAHEAP1_START;
     MEDIUM_extraheap2_address  = (unsigned long) MEDIUMSYSTEM_EXTRAHEAP2_START;
-    MEDIUM_extraheap3_address  = (unsigned long) MEDIUMSYSTEM_EXTRAHEAP3_START;	
+    MEDIUM_extraheap3_address  = (unsigned long) MEDIUMSYSTEM_EXTRAHEAP3_START;
 	//==============================================================
 	//                  ****    LARGE SYSTEMS    ****
-	//==============================================================	
+	//==============================================================
     LARGE_kernel_address = LARGESYSTEM_KERNELADDRESS;
-    LARGE_kernel_base = LARGESYSTEM_KERNELBASE;
-    LARGE_user_address = LARGESYSTEM_USERBASE;
-    LARGE_vga_address = LARGESYSTEM_VGA;
+    LARGE_kernel_base    = LARGESYSTEM_KERNELBASE;
+    LARGE_user_address   = LARGESYSTEM_USERBASE;
+    LARGE_vga_address    = LARGESYSTEM_VGA;
     LARGE_frontbuffer_address = (unsigned long) SavedLFB;
     LARGE_backbuffer_address  = (unsigned long) LARGESYSTEM_BACKBUFFER;
     LARGE_pagedpool_address   = (unsigned long) LARGESYSTEM_PAGEDPOLL_START;
@@ -938,10 +931,12 @@ int SetUpPaging (void){
 	// >> A imagem do kernel que come�a no primeiro mega.
 	// >> Endere�os da mem�ria f�sicas acess�veis em User Mode.
 	// >> VGA, VESA LFB, BACKBUFFER e PAGEDPOOL
-	// *Importante.
-    // Esse endere�o servir� para sistema de 32Mb e para sistemas com mais que 32Mb de RAM.
-	// Para um sistema de 32MB a �rea de pagedpool deve acabar em 0x01FFFFFF.
-	
+    // #Importante.
+    // Esse endere�o servir� para sistema de 32Mb e para sistemas 
+    // com mais que 32Mb de RAM.
+    // Para um sistema de 32MB a �rea de pagedpool deve acabar 
+    // em 0x01FFFFFF.
+
 	
 	//=====================================================
 	// A mem�ria f�sica � dividida em duas partes principais: 
@@ -1065,7 +1060,6 @@ int SetUpPaging (void){
     unsigned long *extraheap3_page_table = (unsigned long *) PAGETABLE_EXTRAHEAP3;
 
 
-
     //...
 
 	//
@@ -1075,7 +1069,6 @@ int SetUpPaging (void){
 
     //Criaremos por enquanto apenas uma pagetable com mem�ria paginada.
     //unsigned long *paged_page_table = (unsigned long *) ??;  //BUFFER_PAGETABLE.	
-
 
 
     // Message. (verbose).
@@ -1168,7 +1161,6 @@ int SetUpPaging (void){
 	// # PAGE TABLE, (Kernel image)
 	//
 
-
     //===============================================
     // kernel mode pages (0x00100000fis = 0xC0000000virt)
     // SMALL_kernel_base = 0x00100000 = KERNEL_BASE.
@@ -1196,10 +1188,10 @@ int SetUpPaging (void){
 
     for ( i=0; i < 1024; i++ )
     {
-        km2_page_table[i] = (unsigned long) SMALL_kernel_base | 3;     
-        SMALL_kernel_base = (unsigned long) SMALL_kernel_base + 4096;  
+        km2_page_table[i] = (unsigned long) SMALL_kernel_base | 3; 
+        SMALL_kernel_base = (unsigned long) SMALL_kernel_base + 4096; 
     };
-    page_directory[ENTRY_KERNELBASE_PAGES] = (unsigned long) &km2_page_table[0];       
+    page_directory[ENTRY_KERNELBASE_PAGES] = (unsigned long) &km2_page_table[0]; 
     page_directory[ENTRY_KERNELBASE_PAGES] = (unsigned long) page_directory[ENTRY_KERNELBASE_PAGES] | 3;  
 
 
@@ -1252,10 +1244,10 @@ int SetUpPaging (void){
 
     for ( i=0; i < 1024; i++ )
     {
-        um_page_table[i] = (unsigned long) SMALL_user_address | 7;     
+        um_page_table[i] = (unsigned long) SMALL_user_address | 7; 
         SMALL_user_address = (unsigned long) SMALL_user_address + 4096; 
     };
-    page_directory[ENTRY_USERMODE_PAGES] = (unsigned long) &um_page_table[0];      
+    page_directory[ENTRY_USERMODE_PAGES] = (unsigned long) &um_page_table[0]; 
     page_directory[ENTRY_USERMODE_PAGES] = (unsigned long) page_directory[ENTRY_USERMODE_PAGES] | 7; 
 
 
@@ -1305,10 +1297,10 @@ int SetUpPaging (void){
 
     for ( i=0; i < 1024; i++ )
     {
-        vga_page_table[i] = (unsigned long) SMALL_vga_address | 7;     
-        SMALL_vga_address = (unsigned long) SMALL_vga_address + 4096;  
+        vga_page_table[i] = (unsigned long) SMALL_vga_address | 7; 
+        SMALL_vga_address = (unsigned long) SMALL_vga_address + 4096; 
     };
-    page_directory[ENTRY_VGA_PAGES] = (unsigned long) &vga_page_table[0];     
+    page_directory[ENTRY_VGA_PAGES] = (unsigned long) &vga_page_table[0]; 
     page_directory[ENTRY_VGA_PAGES] = (unsigned long) page_directory[ENTRY_VGA_PAGES] | 7;  
 
 
@@ -1367,12 +1359,11 @@ int SetUpPaging (void){
 
     for ( i=0; i < 1024; i++ )
     {
-        frontbuffer_page_table[i] = (unsigned long) SMALL_frontbuffer_address | 7;     
-        SMALL_frontbuffer_address = (unsigned long) SMALL_frontbuffer_address + 4096;  
+        frontbuffer_page_table[i] = (unsigned long) SMALL_frontbuffer_address | 7; 
+        SMALL_frontbuffer_address = (unsigned long) SMALL_frontbuffer_address + 4096; 
     };
-    page_directory[ENTRY_FRONTBUFFER_PAGES] = (unsigned long) &frontbuffer_page_table[0];       
+    page_directory[ENTRY_FRONTBUFFER_PAGES] = (unsigned long) &frontbuffer_page_table[0]; 
     page_directory[ENTRY_FRONTBUFFER_PAGES] = (unsigned long) page_directory[ENTRY_FRONTBUFFER_PAGES] | 7; 
-
 
 
 	//
@@ -1424,10 +1415,10 @@ int SetUpPaging (void){
 
     for ( i=0; i < 1024; i++ )
     {
-        backbuffer_page_table[i] = (unsigned long) SMALL_backbuffer_address | 7;     
-        SMALL_backbuffer_address = (unsigned long) SMALL_backbuffer_address + 4096;  
+        backbuffer_page_table[i] = (unsigned long) SMALL_backbuffer_address | 7; 
+        SMALL_backbuffer_address = (unsigned long) SMALL_backbuffer_address + 4096; 
     };
-    page_directory[ENTRY_BACKBUFFER_PAGES] = (unsigned long) &backbuffer_page_table[0];      
+    page_directory[ENTRY_BACKBUFFER_PAGES] = (unsigned long) &backbuffer_page_table[0]; 
     page_directory[ENTRY_BACKBUFFER_PAGES] = (unsigned long) page_directory[ENTRY_BACKBUFFER_PAGES] | 7; 
 
 
@@ -1458,17 +1449,17 @@ int SetUpPaging (void){
 
 
     // 4096 KB = (4 MB).
-    mm_used_pagedpool = (1024 * 4);  
+    mm_used_pagedpool = (1024 * 4); 
 
     // #importante:
     // O endere�o f�sico e virtual s�o iguais para essa tabela.
 
     for ( i=0; i < 1024; i++ )
     {
-        pagedpool_page_table[i] = (unsigned long) SMALL_pagedpool_address | 7;  
-        SMALL_pagedpool_address = (unsigned long) SMALL_pagedpool_address + 4096;  
+        pagedpool_page_table[i] = (unsigned long) SMALL_pagedpool_address | 7; 
+        SMALL_pagedpool_address = (unsigned long) SMALL_pagedpool_address + 4096; 
     };
-    page_directory[ENTRY_PAGEDPOOL_PAGES] = (unsigned long) &pagedpool_page_table[0];      
+    page_directory[ENTRY_PAGEDPOOL_PAGES] = (unsigned long) &pagedpool_page_table[0]; 
     page_directory[ENTRY_PAGEDPOOL_PAGES] = (unsigned long) page_directory[ENTRY_PAGEDPOOL_PAGES] | 7; 
 
 
@@ -1496,10 +1487,10 @@ int SetUpPaging (void){
 
     for ( i=0; i < 1024; i++ )
     {
-        heappool_page_table[i] = (unsigned long) SMALL_heappool_address | 7;     
-        SMALL_heappool_address = (unsigned long) SMALL_heappool_address + 4096;  
+        heappool_page_table[i] = (unsigned long) SMALL_heappool_address | 7; 
+        SMALL_heappool_address = (unsigned long) SMALL_heappool_address + 4096; 
     };
-    page_directory[ENTRY_HEAPPOOL_PAGES] = (unsigned long) &heappool_page_table[0];      
+    page_directory[ENTRY_HEAPPOOL_PAGES] = (unsigned long) &heappool_page_table[0]; 
     page_directory[ENTRY_HEAPPOOL_PAGES] = (unsigned long) page_directory[ENTRY_HEAPPOOL_PAGES] | 7;  
 
 
@@ -1524,10 +1515,10 @@ int SetUpPaging (void){
     
     for ( i=0; i < 1024; i++ )
     {
-        extraheap1_page_table[i] = (unsigned long) SMALL_extraheap1_address | 7;     
-        SMALL_extraheap1_address = (unsigned long) SMALL_extraheap1_address + 4096;  
+        extraheap1_page_table[i] = (unsigned long) SMALL_extraheap1_address | 7; 
+        SMALL_extraheap1_address = (unsigned long) SMALL_extraheap1_address + 4096; 
     };
-    page_directory[ENTRY_EXTRAHEAP1_PAGES] = (unsigned long) &extraheap1_page_table[0];      
+    page_directory[ENTRY_EXTRAHEAP1_PAGES] = (unsigned long) &extraheap1_page_table[0]; 
     page_directory[ENTRY_EXTRAHEAP1_PAGES] = (unsigned long) page_directory[ENTRY_EXTRAHEAP1_PAGES] | 7;  
 
 
@@ -1548,10 +1539,10 @@ int SetUpPaging (void){
 
     for ( i=0; i < 1024; i++ )
     {
-        extraheap2_page_table[i] = (unsigned long) SMALL_extraheap2_address | 7;     
-        SMALL_extraheap2_address = (unsigned long) SMALL_extraheap2_address + 4096;  
+        extraheap2_page_table[i] = (unsigned long) SMALL_extraheap2_address | 7; 
+        SMALL_extraheap2_address = (unsigned long) SMALL_extraheap2_address + 4096; 
     };
-    page_directory[ENTRY_EXTRAHEAP2_PAGES] = (unsigned long) &extraheap2_page_table[0];      
+    page_directory[ENTRY_EXTRAHEAP2_PAGES] = (unsigned long) &extraheap2_page_table[0]; 
     page_directory[ENTRY_EXTRAHEAP2_PAGES] = (unsigned long) page_directory[ENTRY_EXTRAHEAP2_PAGES] | 7;  
 
 
@@ -1571,9 +1562,9 @@ int SetUpPaging (void){
     for ( i=0; i < 1024; i++ )
     {
         extraheap3_page_table[i] = (unsigned long) SMALL_extraheap3_address | 7; 
-        SMALL_extraheap3_address = (unsigned long) SMALL_extraheap3_address + 4096;  
+        SMALL_extraheap3_address = (unsigned long) SMALL_extraheap3_address + 4096; 
     };
-    page_directory[ENTRY_EXTRAHEAP3_PAGES] = (unsigned long) &extraheap3_page_table[0];  
+    page_directory[ENTRY_EXTRAHEAP3_PAGES] = (unsigned long) &extraheap3_page_table[0]; 
     page_directory[ENTRY_EXTRAHEAP3_PAGES] = (unsigned long) page_directory[ENTRY_EXTRAHEAP3_PAGES] | 7; 
 
     // ...
@@ -1769,7 +1760,7 @@ int SetUpPaging (void){
 #ifdef MK_VERBOSE
 
     printf ("Debug:\n");
-    printf ("Configurando CR3={%x}\n", (unsigned long) &page_directory[0]);
+    printf ("Setup CR3={%x}\n", (unsigned long) &page_directory[0]);
     printf ("Page={%x} \n", (unsigned long) &km_page_table[0]);
     printf ("Page={%x} \n", (unsigned long) &km2_page_table[0]);
     printf ("Page={%x} \n", (unsigned long) &um_page_table[0]);
@@ -1820,11 +1811,11 @@ int SetUpPaging (void){
 	//
 	// Inicializando a lista de pagetables..
 	//
-	
-	for ( Index=0; Index < PAGETABLE_COUNT_MAX; Index++ ){
-		
-	    pagetableList[Index] = (unsigned long) 0;
-	};
+
+    for ( Index=0; Index < PAGETABLE_COUNT_MAX; Index++ )
+    {
+        pagetableList[Index] = (unsigned long) 0;
+    };
 
     //Configurando manualmente as primeiras entradas da lista.
 	pagetableList[0] = (unsigned long) &km_page_table[0];
@@ -1840,11 +1831,11 @@ int SetUpPaging (void){
 	//
 	// Inicializando a lista de framepools. (parti��es)
 	//
-	
-	for ( Index=0; Index < FRAMEPOOL_COUNT_MAX; Index++ ){
-		
-	    framepoolList[Index] = (unsigned long) 0;
-	};
+
+    for ( Index=0; Index < FRAMEPOOL_COUNT_MAX; Index++ )
+    {
+        framepoolList[Index] = (unsigned long) 0;
+    };
 
 	//Configurando manualmente a lista de pageframes.
 	framepoolList[0] = (unsigned long) 0;
@@ -1856,15 +1847,15 @@ int SetUpPaging (void){
 	// Creating "Kernel Space Framepool". 
 	//
 
-	struct frame_pool_d *kfp;
+    struct frame_pool_d *kfp;
 
 	//kernel framepool.
-	kfp = (void *) kmalloc ( sizeof(struct frame_pool_d) );
+    kfp = (void *) kmalloc ( sizeof(struct frame_pool_d) );
 	
 	// #todo: e se falhar?
 	
-	if ( (void *) kfp != NULL  )
-	{
+    if ( (void *) kfp != NULL  )
+    {
 		kfp->id = 0;
 		
 		kfp->used = 1;
@@ -1883,23 +1874,23 @@ int SetUpPaging (void){
 		framepoolKernelSpace = (void *) kfp;
 
 		//Salva na lista.
-		framepoolList[0] = (unsigned long) kfp;
-	};
+        framepoolList[0] = (unsigned long) kfp;
+    };
 
 
     //
 	// Creating user space framepool for small systems.
 	//
 
-	struct frame_pool_d *small_fp;
+    struct frame_pool_d *small_fp;
 
 	//kernel framepool.
-	small_fp = (void *) kmalloc ( sizeof(struct frame_pool_d) );
+    small_fp = (void *) kmalloc ( sizeof(struct frame_pool_d) );
 	
 	// #todo: e se falhar.
 	
-	if( (void *) small_fp != NULL  )
-	{
+    if ( (void *) small_fp != NULL  )
+    {
 		small_fp->id = 1;
 		
 		small_fp->used = 1;
@@ -1917,9 +1908,9 @@ int SetUpPaging (void){
 		//salva e ponteiro global.
 		framepoolSmallSystemUserSpace = (void *) small_fp;
 
-		//Salva na lista.
-		framepoolList[1] = (unsigned long) small_fp;
-	};
+		// Salva na lista.
+        framepoolList[1] = (unsigned long) small_fp;
+    };
 
 
    //@todo: Outros indices, (2,3,4.)
@@ -1931,15 +1922,15 @@ int SetUpPaging (void){
 	// Creating pageble space framepool.
 	//
 
-	struct frame_pool_d *pageable_fp;
+    struct frame_pool_d *pageable_fp;
 	
 	//kernel framepool.
-	pageable_fp = (void *) kmalloc ( sizeof(struct frame_pool_d) );
+    pageable_fp = (void *) kmalloc ( sizeof(struct frame_pool_d) );
  
     //#todo e se falhar?
 
-	if( (void *) pageable_fp != NULL  )
-	{
+    if( (void *) pageable_fp != NULL  )
+    {
 		pageable_fp->id = 5;   //quinto �ndice.
 		
 		pageable_fp->used = 1;
@@ -1957,9 +1948,9 @@ int SetUpPaging (void){
 		//salva em ponteiro global.
 		framepoolPageableSpace = (void*) pageable_fp;
 
-		//Salva na lista.
-		framepoolList[5] = (unsigned long) pageable_fp;
-	};
+		// Salva na lista.
+        framepoolList[5] = (unsigned long) pageable_fp;
+    };
 
 
 
@@ -1979,7 +1970,7 @@ int SetUpPaging (void){
 
 
 
-//checar se a estrutura de p'agina � nula
+// Checar se a estrutura de p'agina � nula
 int pEmpty (struct page_d *p)
 {
     return p == NULL ? 1 : 0;
@@ -1995,9 +1986,7 @@ void freePage (struct page_d *p){
     }
 
     // Free it!
-    if ( p->used == 1 && p->magic == 1234 ){
-        p->free = 1;
-    }
+    if ( p->used == 1 && p->magic == 1234 ){ p->free = 1; }
 }
 
 
@@ -2010,9 +1999,7 @@ void notfreePage (struct page_d *p){
     }
  
     // Not free!
-    if ( p->used == 1 && p->magic == 1234 ){
-        p->free = 0;
-    }
+    if ( p->used == 1 && p->magic == 1234 ){ p->free = 0; }
 }
 
 
@@ -2053,7 +2040,7 @@ virtual_to_physical (
     unsigned long *pt = (unsigned long *) (tmp & 0xFFFFF000);
 
 
-	// Encontramos o endere�o base do page frame.
+	// Encontramos o endereço base do page frame.
     tmp = (unsigned long) pt[t];
 
     address = (tmp & 0xFFFFF000);
