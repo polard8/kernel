@@ -717,8 +717,12 @@ int tty_ioctl ( int fd, unsigned long request, char *arg ){
             return -1;
             break;
          
-         
+         // TCSETSF, TCSETSW, TCGETA, TCSETAF, TCSETAW, TCSETA, TCSBRK
+         // TCXONC
          // TIOCGWINSZ, TIOCSWINSZ, TIOCGPGRP, TIOCSPGRP, TIOCNOTTY
+         // TIOCEXCL, TIOCNXCL, TIOCSCTTY, TIOCGPGRP, TIOCSPGRP, TIOCOUTQ
+         // TIOCINQ, TIOCSTI, TIOCMGET, TIOCMBIS, TIOCMBIC, TIOCMSET,
+         // TIOCGSOFTCAR, TIOCSSOFTCAR
          
         //case ?:
             //break;

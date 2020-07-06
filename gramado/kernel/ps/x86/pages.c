@@ -165,12 +165,12 @@ int initialize_frame_table (void){
 
     // Número de páginas necessárias para termos uma tabela.
     // Cada página pode conter 4096 entradas de i byte
-    FT.n_pages = (FT.total_frames/4096) ; 
+    FT.n_pages = (FT.total_frames/4096); 
 
     FT.frame_table = (unsigned char *) allocPages (FT.n_pages);
 
     if ((void *) FT.frame_table ==NULL){
-        panic("invalid FT.frame_table");        
+        panic("invalid FT.frame_table"); 
     }
 
     //#todo: limits
@@ -516,20 +516,20 @@ CreatePageTable (
 	// ### dir_index  ###
 	//
 
-	//Limits.
-	if ( dir_index < 0 || dir_index >= 1024 )
-	{
-		panic ("CreatePageTable: offset\n");
-	}
+    // Limits.
+    if ( dir_index < 0 || dir_index >= 1024 )
+    {
+        panic ("CreatePageTable: offset\n");
+    }
 
 
-	
+
 	//
 	// ===============================
 	// ### region  ###
 	//
 
-	// Limits.
+    // Limits.
     if ( region_address == 0 ){
         panic ("CreatePageTable: region_address\n");
     }
@@ -554,23 +554,23 @@ CreatePageTable (
 	//#debug
 	//printf (">> region_address = %x \n",region_address);
 	
-	
-	for ( i=0; i < 1024; i++ )
+
+    for ( i=0; i < 1024; i++ )
     {
-	    newPT[i] = (unsigned long) region_address | 7;             
-	    region_address = (unsigned long) region_address + 4096; 
+        newPT[i] = (unsigned long) region_address | 7; 
+        region_address = (unsigned long) region_address + 4096; 
     };
-	
-	
+
+
 	//#debug
 	//printf (">> newPT[0] = %x \n", newPT[0]);
-	
-	
-	//
-	// ==================================
-    // ### pd  ###
-    //		
-	
+
+
+    //
+    // ==================================
+    // ## pd ##
+    //
+
 	// #importante:
 	// Agora vamos colocar o endere�o f�sico da nova pagetable em 
 	// uma das entradas do diret�rio de p�ginas. 
@@ -602,8 +602,8 @@ CreatePageTable (
         panic ("CreatePageTable: ptPA\n");
     }
 
-	PD[dir_index] = (unsigned long) ptPA;
-    PD[dir_index] = (unsigned long) PD[dir_index] | 7;      
+    PD[dir_index] = (unsigned long) ptPA;
+    PD[dir_index] = (unsigned long) PD[dir_index] | 7; 
 
 	// Done.
 	// Retornaremos o endere�o virtual da pagetable,
@@ -648,17 +648,16 @@ unsigned long mm_get_current_directory_pa (void){
     unsigned long __ret = 0;
 
     asm volatile ("mov %%cr3, %0" : "=r"(__ret));
-    return __ret;
+    return (unsigned long) __ret;
 }
-
 
 
 // #todo
 // It can be used to change different directories.
 // And then switch back to the current directory.
-void mm_switch_directory ( unsigned long dir){
+void mm_switch_directory (unsigned long dir){
 
-    if (dir == 0) {
+    if (dir == 0){
         // #debug ?
         return;
     }
@@ -785,7 +784,7 @@ mapping_nic1_device_address ( unsigned long pa )
 
     unsigned long *page_directory = (unsigned long *) gKernelPageDirectoryAddress;      
 
-    int i=0;    
+    int i=0; 
 
 	//##bugbug: 
 	//Esse endere�o � improvisado. Parece que n�o tem nada nesse endere�o.
@@ -872,8 +871,8 @@ mapping_nic1_device_address ( unsigned long pa )
 
 int SetUpPaging (void){
 
-    unsigned int i = 0;
-    int Index = 0;
+    unsigned int i=0;
+    int Index=0;
 
 
 	// #importante
@@ -892,13 +891,13 @@ int SetUpPaging (void){
     SMALL_user_address = SMALLSYSTEM_USERBASE;
     SMALL_vga_address = SMALLSYSTEM_VGA;
     SMALL_frontbuffer_address = (unsigned long) SavedLFB;                    //frontbuffer
-    SMALL_backbuffer_address = (unsigned long) SMALLSYSTEM_BACKBUFFER;       //backbuffer
-    SMALL_pagedpool_address = (unsigned long) SMALLSYSTEM_PAGEDPOLL_START;   //PAGED POOL
-    SMALL_heappool_address = (unsigned long) SMALLSYSTEM_HEAPPOLL_START;
-    SMALL_extraheap1_address = (unsigned long) SMALLSYSTEM_EXTRAHEAP1_START;
-    SMALL_extraheap2_address = (unsigned long) SMALLSYSTEM_EXTRAHEAP2_START;
-    SMALL_extraheap3_address = (unsigned long) SMALLSYSTEM_EXTRAHEAP3_START;
-	//...
+    SMALL_backbuffer_address  = (unsigned long) SMALLSYSTEM_BACKBUFFER;       //backbuffer
+    SMALL_pagedpool_address   = (unsigned long) SMALLSYSTEM_PAGEDPOLL_START;   //PAGED POOL
+    SMALL_heappool_address    = (unsigned long) SMALLSYSTEM_HEAPPOLL_START;
+    SMALL_extraheap1_address  = (unsigned long) SMALLSYSTEM_EXTRAHEAP1_START;
+    SMALL_extraheap2_address  = (unsigned long) SMALLSYSTEM_EXTRAHEAP2_START;
+    SMALL_extraheap3_address  = (unsigned long) SMALLSYSTEM_EXTRAHEAP3_START;
+    // ...
 	//==============================================================
 	//                  ****    MEDIUM SYSTEMS    ****
 	//==============================================================
@@ -907,12 +906,12 @@ int SetUpPaging (void){
     MEDIUM_user_address = MEDIUMSYSTEM_USERBASE;
     MEDIUM_vga_address = MEDIUMSYSTEM_VGA ;
     MEDIUM_frontbuffer_address = (unsigned long) SavedLFB;
-    MEDIUM_backbuffer_address = (unsigned long) MEDIUMSYSTEM_BACKBUFFER;
-    MEDIUM_pagedpool_address = (unsigned long) MEDIUMSYSTEM_PAGEDPOLL_START; 	
-    MEDIUM_heappool_address = (unsigned long) MEDIUMSYSTEM_HEAPPOLL_START;
-    MEDIUM_extraheap1_address = (unsigned long) MEDIUMSYSTEM_EXTRAHEAP1_START;	
-    MEDIUM_extraheap2_address = (unsigned long) MEDIUMSYSTEM_EXTRAHEAP2_START;
-    MEDIUM_extraheap3_address = (unsigned long) MEDIUMSYSTEM_EXTRAHEAP3_START;	
+    MEDIUM_backbuffer_address  = (unsigned long) MEDIUMSYSTEM_BACKBUFFER;
+    MEDIUM_pagedpool_address   = (unsigned long) MEDIUMSYSTEM_PAGEDPOLL_START; 	
+    MEDIUM_heappool_address    = (unsigned long) MEDIUMSYSTEM_HEAPPOLL_START;
+    MEDIUM_extraheap1_address  = (unsigned long) MEDIUMSYSTEM_EXTRAHEAP1_START;	
+    MEDIUM_extraheap2_address  = (unsigned long) MEDIUMSYSTEM_EXTRAHEAP2_START;
+    MEDIUM_extraheap3_address  = (unsigned long) MEDIUMSYSTEM_EXTRAHEAP3_START;	
 	//==============================================================
 	//                  ****    LARGE SYSTEMS    ****
 	//==============================================================	
@@ -921,13 +920,12 @@ int SetUpPaging (void){
     LARGE_user_address = LARGESYSTEM_USERBASE;
     LARGE_vga_address = LARGESYSTEM_VGA;
     LARGE_frontbuffer_address = (unsigned long) SavedLFB;
-    LARGE_backbuffer_address = (unsigned long) LARGESYSTEM_BACKBUFFER;
-    LARGE_pagedpool_address = (unsigned long) LARGESYSTEM_PAGEDPOLL_START; 	
-    LARGE_heappool_address = (unsigned long) LARGESYSTEM_HEAPPOLL_START;
-    LARGE_extraheap1_address = (unsigned long) LARGESYSTEM_EXTRAHEAP1_START;	
-    LARGE_extraheap2_address = (unsigned long) LARGESYSTEM_EXTRAHEAP2_START;
-    LARGE_extraheap3_address = (unsigned long) LARGESYSTEM_EXTRAHEAP3_START;	
-
+    LARGE_backbuffer_address  = (unsigned long) LARGESYSTEM_BACKBUFFER;
+    LARGE_pagedpool_address   = (unsigned long) LARGESYSTEM_PAGEDPOLL_START;
+    LARGE_heappool_address    = (unsigned long) LARGESYSTEM_HEAPPOLL_START;
+    LARGE_extraheap1_address  = (unsigned long) LARGESYSTEM_EXTRAHEAP1_START;
+    LARGE_extraheap2_address  = (unsigned long) LARGESYSTEM_EXTRAHEAP2_START;
+    LARGE_extraheap3_address  = (unsigned long) LARGESYSTEM_EXTRAHEAP3_START;
 
 
 	// ** bank 1 ** //
@@ -960,7 +958,7 @@ int SetUpPaging (void){
 	// A quantidade de bancos ser� contada em vari�veis globais.
 	
 	
-	//=========================================================================
+	//==================================================================
 	
 	//
 	// **** Endere�os iniciais �reas de mem�ria 'n�o paginada'.
@@ -971,7 +969,7 @@ int SetUpPaging (void){
     // ?? e se o sistema tiver 	
 	
 	
-	//=========================================================================
+	//==================================================================
 	// ### importante ###
 	// Essa rotina vai configurar s� o deiret�rio de p�ginas do processo kernel.
 	

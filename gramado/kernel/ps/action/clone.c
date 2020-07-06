@@ -381,7 +381,7 @@ do_clone:
         Clone->control->exit_code = 0;
         //====
 
-
+       //todo: tem outros elementos ...
        Clone->ppid = Current->pid; 
        Clone->uid  = Current->uid;
        Clone->gid  = Current->gid;
@@ -396,16 +396,16 @@ do_clone:
        Clone->bound_type = Current->bound_type;
        Clone->preempted = Current->preempted;
        Clone->usession = Current->usession;
-       Clone->room = Current->room;
-       Clone->desktop =Current->desktop;
+       Clone->room     = Current->room;
+       Clone->desktop  = Current->desktop;
        Clone->wait4pid = 0;
        Clone->exit_code = 0;
        Clone->nchildren = 0;
        
        Current->nchildren++;
        
-       //Clone->signal = 0;
-       Clone->signal_mask = Current->signal_mask;
+       //Clone->signal = 0;  //todo
+       Clone->umask = Current->umask;
        
        Clone->iopl = Current->iopl;
        //Clone->prev = NULL;

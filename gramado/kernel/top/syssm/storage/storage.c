@@ -102,6 +102,8 @@ void disk_show_info (void)
 }
 
 
+
+
 /*
  * disk_get_disk_handle:
  *     Obtem o ponteiro da estrutura dado o descritor.

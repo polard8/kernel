@@ -2354,6 +2354,10 @@ gde_services (
             signalSend ( (void *) a2, (int) arg3 );
             return NULL;
             break;
+            
+        //#todo: precismos criar o suporte a chamada signal()
+        // maybe sys_signal
+        //
 
 
         // ...

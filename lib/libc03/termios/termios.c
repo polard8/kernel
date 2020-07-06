@@ -22,11 +22,17 @@ tcgetwinsize(int fd, struct winsize *ws)
 }
 */
 
-
+/*
+The function tcgetpgrp() returns the process group ID of the 
+foreground process group on the terminal associated to fd, 
+which must be the controlling terminal of the calling process. 
+See: https://linux.die.net/man/3/tcsetpgrp
+*/
 pid_t tcgetpgrp (int fd){
 
     int s=0;
 
+    //#todo: work in ring0 to implement this.
     if ( ioctl(fd, TIOCGPGRP, &s) < 0 ){
         debug_print ("tcgetpgrp: error\n");
         return ((pid_t)-1);
@@ -36,13 +42,21 @@ pid_t tcgetpgrp (int fd){
 }
 
 
-
+/*
+The function tcsetpgrp() makes the process group with process 
+group ID pgrp the foreground process group on the terminal 
+associated to fd, which must be the controlling terminal 
+of the calling process, and still be associated with its session. 
+Moreover, pgrp must be a (nonempty) process group belonging 
+to the same session as the calling process.   
+See: https://linux.die.net/man/3/tcsetpgrp 
+ */
 int tcsetpgrp (int fd, pid_t pgrp){
 
     int s=0;
     s = pgrp;
 
-
+    //#todo: work in ring0 to implement this.
     return ( ioctl(fd, TIOCSPGRP, &s) );
 }
 

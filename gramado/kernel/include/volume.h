@@ -37,7 +37,7 @@ int g_currentvolume_fatbits;
 typedef enum {
 
 
-    VOLUME_TYPE_NULL,            
+    VOLUME_TYPE_NULL, 
 
     // Partição em disco físico.
     VOLUME_TYPE_DISK_PARTITION,  
@@ -88,16 +88,51 @@ struct volume_d
     object_type_t objectType;
     object_class_t objectClass;
 
-    volume_type_t volumeType;
-    
-    //filesystem_type_t filesystemType;
-
-    int id;
-
     int used;
     int magic;
 
+
+    int id;
+
+
+    // See the enum.
+    volume_type_t volumeType;
+
+    // Ponteiro para um buffer se o tipo permitir.
+    void *priv_buffer;
+    unsigned long buffer_size_in_sectors;
+    unsigned long sector_size;
+
+    // Primeira lba se o tipo permitir.
+    unsigned long __first_lba;
     
+    // Last lba se o tipo permitir.
+    unsigned long __last_lba;
+    
+
+    //filesystem_type_t filesystemType;
+
+
+    //#todo
+    // se está funcionando ... se está inicializado ...
+    //int status;
+    
+    //#todo
+    // que tipo de operação esta sendo realizada. ou nenhuma.
+    // se ele está ocupoado o escretor terá que esperar.
+    //int state;
+
+
+    // Se é um volume virtual e precisa ser salvo
+    // pois houve uma modificação.
+    int need_to_save;
+
+    // Qual processo está usando.
+    pid_t pid;
+
+    // #todo
+    // contador de processos usando o volume
+     
     //
     // strings
     //
@@ -118,8 +153,6 @@ struct volume_d
     // Se o volume tiver um sistema de arquivos.
     // See: fs.h
     struct filesystem_d *fs;
-
-
 
     struct disk_d *disk;
 

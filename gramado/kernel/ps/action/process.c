@@ -330,7 +330,7 @@ unsigned long __GetProcessStats ( int pid, int index )
             break;
            
         case 49:
-            return (unsigned long) p->signal_mask;
+            return (unsigned long) p->umask;   //signal_mask;
             break;
 
         case 50:
@@ -366,13 +366,14 @@ int getprocessname ( int pid, char *buffer ){
  
     p = (struct process_d *) processList[pid]; 
 
-    if ( (void *) p == NULL )
-    {
-		return -1;
+    if ( (void *) p == NULL ){
+        //todo: message
+        return -1;
     }else{
     
         if ( p->used != 1 || p->magic != 1234 )
         {
+            //todo message
             return -1;
         }
         
@@ -384,7 +385,6 @@ int getprocessname ( int pid, char *buffer ){
 
     return -1;
 }
-
 
 
 
@@ -1487,7 +1487,7 @@ get_next:
         Process->dialog_address = (unsigned long) &system_procedure;
 
         Process->signal = 0;
-        Process->signal_mask = 0;
+        Process->umask = 0;
 
 		//
 		// Msg

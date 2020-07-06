@@ -312,12 +312,25 @@ struct process_d
 	//UID, (User Identification),
 	//GID, (Group Identification),
 
+    //process
     pid_t  pid;
     pid_t  ppid;
+    //process group.
+    int pgrp;
+    
+    //user
     uid_t  uid;
+    uid_t  euid;
+    uid_t  ruid;
+    uid_t  suid;
+    
+    //group
     gid_t  gid;
+    gid_t  egid;    
+    gid_t  rgid;
+    gid_t  sgid;
 
-
+    
 	// State.
 	// flag ?
     process_state_t state; 
@@ -727,9 +740,9 @@ struct process_d
 
 	//User session, room (window station), desktop.
 	
-	struct usession_d *usession;    //user session
-	struct room_d *room;            //room (Window Station) do processo.  
-	struct desktop_d *desktop;      //Desktop do processo.        
+	struct usession_d  *usession;  //user session
+	struct room_d      *room;      //room (Window Station) do processo.  
+	struct desktop_d   *desktop;   //Desktop do processo.        
 	
 
 	//
@@ -793,7 +806,11 @@ struct process_d
 
     // Signal	
     unsigned long signal;
-    unsigned long signal_mask;
+    unsigned long umask;    //signal_mask;
+    //struct sigaction sigaction[32];  //#todo
+
+    
+    unsigned long alarm;
 
 
 

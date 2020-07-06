@@ -228,15 +228,32 @@ struct disk_d
     disk_type_t diskType;
     disk_class_t diskClass;
 
-
-    int id;                 // ID na lista.
-    char boot_disk_number;  // ID herado do boot block.
-
     int used;
     int magic;
 
+
+    int id;                 // ID na lista de discos.
+    char boot_disk_number;  // ID herado do boot block.
+
+
+    //#todo
+    // se está funcionando ... se está inicializado ...
+    //int status;
+    
+    //#todo
+    // que tipo de operação esta sendo realizada. ou nenhuma.
+    // se ele está ocupoado o escretor terá que esperar.
+    //int state;
+
+    // Qual processo está usando.
+    pid_t pid;
+
+
+    // #todo
+    // contador de processos usando o disco
+
 	// Ponteiro para o nome do disco,
-	// Talvez não precise ser um ponteiro, pode ser um array.
+    // Talvez não precise ser um ponteiro, pode ser um array.
     char *name;  
 
 
@@ -245,8 +262,6 @@ struct disk_d
     
     // Mais: bpb.
     // ...
-    
-
 
     struct disk_d *next;
 };
