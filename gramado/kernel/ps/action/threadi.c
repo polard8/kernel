@@ -103,41 +103,39 @@ void *KiCreateRing0Idle (void){
 
     struct thread_d *t;
 
-    char *ThreadName = "ring0-idle-thread";    // Name.
+    char *ThreadName = "ring0-idle-thread";  // Name.
 
-    void *ring0IdleStack;                    // Stack pointer. 
+    void *ring0IdleStack;  // Stack pointer. 
+
+    int r=0;    // Wait reason.
+    int q=0;    // Msg queue.
 
 
-    int r;    // Wait reason.
-    int q;    // Msg queue.
-
-
-    if ( (void *) KernelProcess == NULL )
-    {
+    if ( (void *) KernelProcess == NULL ){
         panic ("action-KiCreateRing0Idle: KernelProcess\n");
     }
 
 
     t = (void *) kmalloc( sizeof(struct thread_d) );
 
-    if ( (void *) t == NULL )
-    {
+    if ( (void *) t == NULL ){
         panic ("action-KiCreateRing0Idle: t \n");
+    
     }else{  
         //Indica à qual proesso a thread pertence.
         t->process = (void *) KernelProcess;
     };
 
 
-	//Stack.
-	//#bugbug
-	//estamos alocando uma stack dentro do heap do kernel.
-	//nesse caso serve para a thread idle em ring 0.
+	// Stack.
+	// #bugbug
+	// estamos alocando uma stack dentro do heap do kernel.
+	// nesse caso serve para a thread idle em ring 0.
+	// 8KB
 
     ring0IdleStack = (void *) kmalloc (8*1024);
 
-    if ( (void *) ring0IdleStack == NULL )
-    {
+    if ( (void *) ring0IdleStack == NULL ){
         panic ("action-KiCreateRing0Idle: ring0IdleStack\n");
     }
 
@@ -193,10 +191,7 @@ void *KiCreateRing0Idle (void){
     // Message queue.
     //
 
-    for ( q=0; q<32; q++ )
-    {
-        t->MsgQueue[q] = 0;
-    }
+    for ( q=0; q<32; q++ ){ t->MsgQueue[q] = 0; }
     t->MsgQueueHead = 0;
     t->MsgQueueTail = 0;
 
@@ -219,7 +214,7 @@ void *KiCreateRing0Idle (void){
 	//t->StackSize;
 
 	//Temporizadores.
-	t->step = 0;
+    t->step = 0;
     t->quantum = QUANTUM_BASE;
     t->quantum_limit = QUANTUM_LIMIT;
    
@@ -240,33 +235,31 @@ void *KiCreateRing0Idle (void){
 	t->waiting_limit = WAITING_LIMIT;
 	t->blockedCount = 0;    //Tempo bloqueada.
 	t->blocked_limit = BLOCKED_LIMIT;
-	
-
-	t->ticks_remaining = 1000;
-	
-	//signal
-	//Sinais para threads.
-	t->signal = 0;
-	t->signalMask = 0;
-	
 
 
+    t->ticks_remaining = 1000;
+
+    // Signal
+    t->signal = 0;
+    t->umask = 0;
 
 	// x86 Context.
 	// Isso deve ir para uma estrutura de contexto.
 	// Obs: eflags 0x0200.
 	// Queremos que esse thread rode em ring0.
 
-    t->ss  = 0x10 | 0; 
-    t->esp = (unsigned long) ( ring0IdleStack + (8*1024) );  //pilha. 
+    // Stack frame.
+    t->ss     = 0x10 | 0; 
+    t->esp    = (unsigned long) ( ring0IdleStack + (8*1024) );  //Stack
     t->eflags = 0x0200;    // # Atenção !!  
-    t->cs = 8 | 0; 
-    t->eip = (unsigned long) xxxRing0Idle; 
+    t->cs     = 8 | 0; 
+    t->eip    = (unsigned long) xxxRing0Idle; 
 
     t->ds = 0x10 | 0;
     t->es = 0x10 | 0;
     t->fs = 0x10 | 0; 
     t->gs = 0x10 | 0; 
+    
     t->eax = 0;
     t->ebx = 0;
     t->ecx = 0;
@@ -1074,31 +1067,28 @@ done:
  */
  
 void dead_thread_collector (void){
-	
-	register int i = 0;
+
+    register int i=0;
     
     struct process_d *p;         
-	struct thread_d *Thread;  
-	
-	
+    struct thread_d *Thread;  
+
+
 	//
 	// Check idle
 	//
-	
-	if ( (void *) ____IDLE == NULL )
-	{
-	    panic ("dead_thread_collector: ____IDLE fail");
-	}else{
+
+    if ( (void *) ____IDLE == NULL ){
+        panic ("dead_thread_collector: ____IDLE fail");
+
+    }else{
 
         if ( ____IDLE->used != 1 || ____IDLE->magic != 1234 )
         {
-		    panic ("dead_thread_collector: ____IDLE validation");
-	    }
-	    // ...
-	};
-	
-
-
+            panic ("dead_thread_collector: ____IDLE validation");
+        }
+        // ...
+    };
 
 
     // Scan
@@ -1114,11 +1104,10 @@ void dead_thread_collector (void){
 				 Thread->magic == 1234 )
 			{
 
-	            // Se queremos deletar a idle.
-	            if ( Thread->tid == ____IDLE->tid )
-	            {
-		            panic ("dead_thread_collector: Sorry, we can't kill the idle thread!");
-	            }
+                // Se queremos deletar a idle.
+                if ( Thread->tid == ____IDLE->tid ){
+                    panic ("dead_thread_collector: Sorry, we can't kill the idle thread!");
+                }
 
 				//kill_thread(Thread->tid);
 				Thread->used = 0;
@@ -1162,10 +1151,10 @@ void dead_thread_collector (void){
 
 void kill_all_threads (void){
 
-    register int i = 0;
+    register int i=0;
 
     for ( i=0; i < THREAD_COUNT_MAX; i++ )
-        kill_thread (i);
+        kill_thread(i);
 }
 
 

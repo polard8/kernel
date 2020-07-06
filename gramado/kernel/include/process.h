@@ -312,11 +312,12 @@ struct process_d
 	//UID, (User Identification),
 	//GID, (Group Identification),
 
+    //process group.
+    int pgrp;
+
     //process
     pid_t  pid;
     pid_t  ppid;
-    //process group.
-    int pgrp;
     
     //user
     uid_t  uid;
@@ -804,9 +805,10 @@ struct process_d
 	//   ## IPC ##
 	//
 
-    // Signal	
+
+    // Signal
     unsigned long signal;
-    unsigned long umask;    //signal_mask;
+    unsigned long umask;
     //struct sigaction sigaction[32];  //#todo
 
     

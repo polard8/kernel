@@ -26,9 +26,8 @@
 #include <kernel.h>
 
 
-
-unsigned long __GetThreadStats ( int tid, int index )
-{
+// Thread stats.
+unsigned long __GetThreadStats ( int tid, int index ){
 
     struct thread_d *t;
 
@@ -38,8 +37,8 @@ unsigned long __GetThreadStats ( int tid, int index )
 	//Struct.
     t = (void *) threadList[tid];
 
-    if ( (void *) t == NULL )
-    {
+    if ( (void *) t == NULL ){
+        // ?? refresh
         printf ("__GetThreadStats: struct \n");
         return 0; 
 
@@ -227,8 +226,12 @@ unsigned long __GetThreadStats ( int tid, int index )
             break;
 
         case 43:
-            return (unsigned long) t->signalMask;
+            return (unsigned long) t->umask;
             break;
+        
+        //#todo
+        //default:
+            //break;
     };
 
 
@@ -396,12 +399,19 @@ void thread_show_profiler_info (void)
  *     Usado no suporte a fork e execu��o de novos processos.
  */
 
+// OUT:
+// Pointer for the clone.
+
 struct thread_d *threadCopyThread ( struct thread_d *thread ){
-	
+
     struct thread_d *clone;
-	
-	
-	// A que vai ser copiada.
+
+    // Counters.
+    int w=0;
+    int q=0;
+
+
+    // A thread que vai ser copiada.
 
     if ( (void *) thread == NULL ){
         panic ("threadCopyThread: thread\n");
@@ -420,16 +430,15 @@ struct thread_d *threadCopyThread ( struct thread_d *thread ){
                                     current_process,       // pid.
                                     "clone-thread" );      // name
 
-	// The copy.
-
+    // The copy.
     if ( (void *) clone == NULL ){
         panic ("threadCopyThread: clone\n");
     }
 
 
-	// Salvando.
-
-	ClonedThread = clone;
+    // Saving.
+    // See: thread.h
+    ClonedThread = clone;
 
 	//
 	// Caracteristicas.
@@ -443,16 +452,16 @@ struct thread_d *threadCopyThread ( struct thread_d *thread ){
 	// ou ela pode rodar e falhar por n�o esta pronta,
 	// vamos testar op��es.
 
+    // Começando com o clone bloqueada ...
+    // Mas isso será mudado pela função que chamou essa.
+    // obs: Isso funcionou.
+    clone->state = BLOCKED;  
 
-    clone->state = BLOCKED;  //isso funcionou.
-    //clone->state = thread->state;  
-    //clone->state = READY;  
 
+	//Apenas Initialized, pois a fun��o SelectForExecution
+	//seleciona uma thread para a execu��o colocando ela no
+	//state Standby.	
 
-		//Apenas Initialized, pois a fun��o SelectForExecution
-		//seleciona uma thread para a execu��o colocando ela no
-		//state Standby.	
-		
 	// #todo: 
 	// ISSO DEVERIA VIR POR ARGUMENTO
     clone->plane = thread->plane;
@@ -464,8 +473,9 @@ struct thread_d *threadCopyThread ( struct thread_d *thread ){
 	// passada por argumento.
 	
     clone->base_priority = thread->base_priority; 
-    clone->priority = thread->priority;
-		
+    clone->priority      = thread->priority;
+
+
 	// IOPL.
 	// Se ela vai rodar em kernel mode ou user mode.
 	// #todo: 
@@ -487,28 +497,28 @@ struct thread_d *threadCopyThread ( struct thread_d *thread ){
     // quantum_limit - (9*2);  O boost n�o deve ultrapassar o limite. 
 
     clone->step = thread->step; 
-    clone->quantum = thread->quantum; 
+
+    clone->quantum       = thread->quantum; 
     clone->quantum_limit = thread->quantum_limit;
 
-		
 	// runningCount - Tempo rodando antes de parar.
-	// readyCount - Tempo de espera para retomar a execu��o.
+	// readyCount - Tempo de espera para retomar a execução.
 	// blockedCount - Tempo bloqueada.
-	
+
     clone->standbyCount = thread->standbyCount;
-    clone->runningCount = thread->runningCount;   
-		
+    clone->runningCount = thread->runningCount; 
+
     clone->initial_time_ms = thread->initial_time_ms;
-    clone->total_time_ms = thread->total_time_ms;
-	
+    clone->total_time_ms   = thread->total_time_ms;
+
     //quantidade de tempo rodadndo dado em ms.
     clone->runningCount_ms = thread->runningCount_ms;
 
-    clone->readyCount = thread->readyCount; 
-    clone->ready_limit = thread->ready_limit;
-    clone->waitingCount = thread->waitingCount;
+    clone->readyCount    = thread->readyCount; 
+    clone->ready_limit   = thread->ready_limit;
+    clone->waitingCount  = thread->waitingCount;
     clone->waiting_limit = thread->waiting_limit;
-    clone->blockedCount = thread->blockedCount; 
+    clone->blockedCount  = thread->blockedCount; 
     clone->blocked_limit = thread->blocked_limit;
 
     // Not used now. But it works fine.
@@ -519,7 +529,7 @@ struct thread_d *threadCopyThread ( struct thread_d *thread ){
     // Sinais para threads.
 
     clone->signal = thread->signal;
-    clone->signalMask = thread->signalMask;
+    clone->umask  = thread->umask;
 
 
 	// #todo: 
@@ -624,29 +634,26 @@ struct thread_d *threadCopyThread ( struct thread_d *thread ){
 		
 	//Thread->wait4pid =
 
-	//raz�es para esperar.
-	
-	int w;
 
-	for ( w=0; w<8; w++ )
-	{
-		clone->wait_reason[w] = thread->wait_reason[w];
-	}
-	
-	
-	int q;
-	for ( q=0; q<32; q++ )
+
+    // Razões para esperar.
+    for ( w=0; w<8; w++ ){
+        clone->wait_reason[w] = thread->wait_reason[w];
+    };
+
+    // Message
+    for ( q=0; q<32; q++ )
     {
          clone->window_list[q] = 0;
-         clone->msg_list[q] = 0;
-         clone->long1_list[q] = 0;
-         clone->long2_list[q] = 0;
-    }
+         clone->msg_list[q]    = 0;
+         clone->long1_list[q]  = 0;
+         clone->long2_list[q]  = 0;
+    };
     clone->head_pos = 0;
     clone->tail_pos = 0;
 
-	
-	
+
+
 	//...
     //@todo:
     //herdar o quantum do processo.
@@ -662,6 +669,9 @@ struct thread_d *threadCopyThread ( struct thread_d *thread ){
 	//refresh_screen();
 	
 	//while(1){}
+
+
+    // Returning the pointer for the clone.
 
     return (struct thread_d *) clone;
 }
@@ -699,8 +709,9 @@ done:
 */
 
 
+
 /*
- ***********************************************************************
+ ******************************************************************
  * create_thread:
  *     Cria um thread para rodar em user mode. (just Ring 3) 
  *
@@ -722,81 +733,81 @@ done:
  *
  * 2015, Created - Fred Nora.
  * 2016, Revis�o - FN.
- */		
- 
-struct thread_d *create_thread ( struct room_d *room,
-                                 struct desktop_d  *desktop,
-                                 struct window_d *window,
-                                 unsigned long init_eip, 
-                                 unsigned long init_stack, 
-                                 int pid, 
-                                 char *name)
+ */
+
+
+struct thread_d *create_thread ( 
+    struct room_d     *room,
+    struct desktop_d  *desktop,
+    struct window_d   *window,
+    unsigned long init_eip, 
+    unsigned long init_stack, 
+    int pid, 
+    char *name )
 {
-    //Structures.
-    
+
     struct process_d *Process;    //Process.
+
     struct thread_d *Thread;      //Thread.
     struct thread_d *Empty;       //Empty slot.
 
-
-	//Identificadores.
+    // Identificadores.
     int ProcessID;
+
+    // Counters.
     int i = USER_BASE_TID;
+    int w=0;
+    int q=0; 
 
-	//wait reasons
-    int w;
 
-    int q; //msg queue.
-	
 	// Limits da thread atual.
 	// #bugbug: 
 	// N�o sei pra que isso. 
 	// Pois a thread atual n�o importa.
 	// @todo: deletar isso. 
-	
-	
-	//#bugbug
-	//@deletar
-	if ( current_thread < 0 || 
-	     current_thread >= THREAD_COUNT_MAX )
-	{
-		return NULL;
-	}
-	
+
+
+    if ( current_thread < 0 || 
+         current_thread >= THREAD_COUNT_MAX )
+    {
+        debug_print ("create_thread: current_thread fail\n");
+        return NULL;
+    }
+
 	//@todo:
 	//Checar se a prioridade � um argumento v�lido.
 	//if( priority == 0 ){}
-	
+
 	
 	// Filtrar o processo ao qual a thread pertencer�.
 	
 	ProcessID = (int) pid;
 	
-	if( ProcessID < 0 || 
-	    ProcessID >= PROCESS_COUNT_MAX )
-	{
+    if( ProcessID < 0 || 
+        ProcessID >= PROCESS_COUNT_MAX )
+    {
 		// #bugbug:
 		// N�o sabemos a condi��o do processo atual para 
 		// permitirmos que ele seja o dono da thread.
 		ProcessID = current_process;
-	}
-	
+    }
+
 	// J� temos um PID para o processo que � dono da thread.
 
     Process = (void *) processList[ProcessID]; 
-    if ( (void *) Process == NULL )
-    {
+    
+    if ( (void *) Process == NULL ){
         panic ("create_thread: Process\n");
     }
 
 	//Alocando mem�ria para a estrutura da thread.
 	//Obs: Estamos alocando mem�ria dentro do heap do kernel.
-	
-	Thread = (void *) kmalloc ( sizeof(struct thread_d) );	
-	
-    if ( (void *) Thread == NULL )
-    {
+
+    Thread = (void *) kmalloc ( sizeof(struct thread_d) );
+
+    if ( (void *) Thread == NULL ){
         panic ("create_thread: Thread\n");
+  
     }else{  
         //Indica � qual proesso a thread pertence.
        //Thread->process = (void*) Process;
@@ -809,30 +820,31 @@ struct thread_d *create_thread ( struct room_d *room,
 get_next:	
 	
 	//BugBug: Isso pode virar um loop infinito!
-	
-	i++;
-	if( i >= THREAD_COUNT_MAX )
-	{
+
+    i++;
+    if ( i >= THREAD_COUNT_MAX )
+    {
 		// Recome�a o loop na base para id de usu�rios.
 		i = USER_BASE_TID;    
-	}
+    }
 
 
 	//Get empty.
 	Empty = (void *) threadList[i];
     
 	//Se o slot estiver ocupado.
-	if( (void *) Empty != NULL )
-	{
+    if ( (void *) Empty != NULL )
+    {
 		// Voltamos.
 		// #bugbug: Isso pode n�o parar nunca.
         goto get_next;
+    
     }else{
-		
+
 		//Object.
-		Thread->objectType = ObjectTypeThread;
+		Thread->objectType  = ObjectTypeThread;
 		Thread->objectClass = ObjectClassKernelObjects;
-	
+
 		// c,Put in list.
 		// Iniciamos em 100. 
 		Thread->tid = (int) i;
@@ -843,10 +855,11 @@ get_next:
 		
 		//ID do processo ao qual o thread pertence.
 		Thread->ownerPID = (int) pid; //#bugbug: Deve ser (ProcessID).  
-	    
-		Thread->used = 1;
-	    Thread->magic = 1234;
-		Thread->name_address = (unsigned long) name;  //Name.   
+
+        Thread->used = 1;
+        Thread->magic = 1234;
+
+        Thread->name_address = (unsigned long) name;  //Name.   
 		//@todo: Usar Thread->name. 
 		//Thread->cmd @todo.
 		
@@ -857,18 +870,19 @@ get_next:
 
         //Thread->process = (void*) Process;
 
-		// Procedimento de janela.
-	    Thread->procedure = (unsigned long) &system_procedure;
+        // #bugbug: Estamos repensando isso.
+         // Procedimento de janela.
+        Thread->procedure = (unsigned long) &system_procedure;
 
         //
         // Single message;
         //
 
 		// Msg support. //Argumentos.
-		Thread->window = NULL;        //arg1.
-	    Thread->msg = 0;              //arg2.
-	    Thread->long1 = 0;            //arg3.
-	    Thread->long2 = 0;            //arg4.
+        Thread->window = NULL;        //arg1.
+        Thread->msg = 0;              //arg2.
+        Thread->long1 = 0;            //arg3.
+        Thread->long2 = 0;            //arg4.
         //Thread->long
         //Thread->long
         //Thread->long
@@ -877,9 +891,9 @@ get_next:
         for ( q=0; q<32; q++ )
         {
             Thread->window_list[q] = 0;
-            Thread->msg_list[q] = 0;
-            Thread->long1_list[q] = 0;
-            Thread->long2_list[q] = 0;
+            Thread->msg_list[q]    = 0;
+            Thread->long1_list[q]  = 0;
+            Thread->long2_list[q]  = 0;
         }
         Thread->head_pos = 0;
         Thread->tail_pos = 0;
@@ -889,10 +903,7 @@ get_next:
         // Message queue.
         //
 
-        for ( q=0; q<32; q++ )
-        {
-            Thread->MsgQueue[q] = 0;
-        }
+        for ( q=0; q<32; q++ ){ Thread->MsgQueue[q] = 0; };
         Thread->MsgQueueHead = 0;
         Thread->MsgQueueTail = 0;
 
@@ -939,30 +950,29 @@ get_next:
 		// readyCount - Tempo de espera para retomar a execu��o.
 		// blockedCount - Tempo bloqueada.
         Thread->standbyCount = 0;
-	    
-		Thread->runningCount = 0;   
-		
-		Thread->initial_time_ms = get_systime_ms();
-		Thread->total_time_ms = 0;
-		
-		
-	    //quantidade de tempo rodadndo dado em ms.
-	    Thread->runningCount_ms = 0;
-		
-	    Thread->readyCount = 0;      
-	    Thread->ready_limit = READY_LIMIT;
-	    Thread->waitingCount = 0;
-	    Thread->waiting_limit = WAITING_LIMIT;
-	    Thread->blockedCount = 0; 
-	    Thread->blocked_limit = BLOCKED_LIMIT;
-		
-	    // Not used now. But it works fine.
-		Thread->ticks_remaining = 1000; 
 
-	    // Signal
-	    // Sinais para threads.
-	    Thread->signal = 0;
-        Thread->signalMask = 0;
+        Thread->runningCount = 0;   
+
+        Thread->initial_time_ms = get_systime_ms();
+        Thread->total_time_ms = 0;
+
+
+        // Quantidade de tempo rodadndo dado em ms.
+        Thread->runningCount_ms = 0;
+
+        Thread->readyCount = 0; 
+        Thread->ready_limit = READY_LIMIT;
+        Thread->waitingCount = 0;
+        Thread->waiting_limit = WAITING_LIMIT;
+        Thread->blockedCount = 0; 
+        Thread->blocked_limit = BLOCKED_LIMIT;
+
+        // Not used now. But it works fine.
+        Thread->ticks_remaining = 1000; 
+
+        // Signal
+        Thread->signal = 0;
+        Thread->umask = 0;
 
 
 		// @todo: 
@@ -997,11 +1007,12 @@ get_next:
         // cs (0x18 | 3)
         // eflags for ring3: (0x3200).
 
-        Thread->ss = 0x23;    
-        Thread->esp = (unsigned long) init_stack; 
+        Thread->ss     = 0x23;    
+        Thread->esp    = (unsigned long) init_stack; 
         Thread->eflags = 0x3200;
-        Thread->cs = 0x1B; 
-        Thread->eip = (unsigned long) init_eip; 
+        Thread->cs     = 0x1B; 
+        Thread->eip    = (unsigned long) init_eip; 
+
 
         //O endere�o incial, para controle.
         Thread->initial_eip = (unsigned long) init_eip; 
@@ -1120,15 +1131,14 @@ done:
 
 
 /*
- *********************************************
+ *****************************
  * GetCurrentThreadId
  *     Pega o id da thread atual.
- *     Obs: current_thread j� � o id.
  */
 
-int GetCurrentThreadId (void){
-	
-	return (int) current_thread;
+int GetCurrentThreadId (void)
+{
+    return (int) current_thread;
 }
 
 
@@ -1138,14 +1148,15 @@ int GetCurrentThreadId (void){
  */
 
 void *GetCurrentThread (void){
-	
+
     struct thread_d *Current;
-	
+
 	if (current_thread < 0 || current_thread >= THREAD_COUNT_MAX )
 	{
 		return NULL;
 	}
-	
+
+
 	Current = (void *) threadList[current_thread];	
 	
 	if ( (void *) Current == NULL ){
@@ -1153,7 +1164,7 @@ void *GetCurrentThread (void){
 	}
 
 
-	return (void *) Current;
+    return (void *) Current;
 }
 
 
@@ -1161,14 +1172,16 @@ void *GetCurrentThread (void){
  *******************************************************
  * FindReadyThread:
  *     Pega a primeira thread READY que encontrar.
- *     E se n�o encontrar nenhuma, retorna NULL.
+ *     E se não encontrar nenhuma, retorna NULL.
  */
+
+// OUT:
+// Return a pointer to the found thread.
 
 void *FindReadyThread (void){
 
     struct thread_d *Thread;  
-
-    int Index;
+    int Index=0;
 
 
     for ( Index=0; Index<THREAD_COUNT_MAX; Index++ )
@@ -1184,12 +1197,13 @@ void *FindReadyThread (void){
             {
 				//Done.
                 return (void *) Thread;
-            };
-        };
+            }
+        }
     };
 
 
     // Nenhuma foi encontrada.   
+    // #todo: Message ??
 
     return NULL;
 }
@@ -1198,11 +1212,12 @@ void *FindReadyThread (void){
 /*
  ********************************************************
  * SelectForExecution:
- *     Um thread entra em standby, sinalizando que est� pronto para entrar 
- * em execu��o.
- *     Nesse caso, durante a rotina de taskswitch, checar-se-a se existe um 
- * thread em estado standby, caso haja, a thread � colocada pra executar pelo 
- * m�todo spawn. 
+ *     Um thread entra em standby, sinalizando que está pronto 
+ * para entrar em execução.
+ * 
+ *     Nesse caso, durante a rotina de taskswitch, checar-se-a se 
+ * existe um thread em estado standby, caso haja, a thread é colocada 
+ * pra executar pelo método spawn. 
  * Esse m�todo de spawn j� foi testado, segundo a contagem, duas thread 
  * come�aram a rodas atrav�s desse m�todo de spawn. 
  * Provavelmente as threads 'shell' e 'taskman', pois a thread 'idle' � 
@@ -1213,11 +1228,16 @@ void *FindReadyThread (void){
  */
  
 void SelectForExecution ( struct thread_d *Thread ){
-	
-	if ( (void *) Thread == NULL)
-	{
+
+
+    if ( (void *) Thread == NULL){
+        debug_print ("SelectForExecution: Thread fail\n");
         return;
-	} 
+    } 
+    
+    // #todo
+    // Validation ??
+    
 
 	// @todo: if initialized ---> Standby.
 	// @todo: if zombie ---> Standby.
@@ -1228,22 +1248,23 @@ void SelectForExecution ( struct thread_d *Thread ){
 	// >> Uma thread no estado zombie pode entrar no estado standby.
 	// >> @todo: se uma thread estiver em qualquer um dos outros estados ela 
 	// n�o pode entrar em stadby.
-	
+
+
 //setState:
     
 	//*MOVIMENTO 1, (Initialized --> Standby).
     
-	Thread->state = (int) STANDBY;
-	queue_insert_data ( queue, (unsigned long) Thread, QUEUE_STANDBY );
+    Thread->state = (int) STANDBY;
+    queue_insert_data ( queue, (unsigned long) Thread, QUEUE_STANDBY );
 }
 
 
 //Get State. (Zero � tipo NULL?).
 int GetThreadState (struct thread_d *Thread){
 
-    if ( (void *) Thread == NULL )
-    {
-        return 0;
+    if ( (void *) Thread == NULL ){
+        // Message
+        return 0;   //#bugbug: This is a valid state.
     }
 
 
@@ -1254,9 +1275,9 @@ int GetThreadState (struct thread_d *Thread){
 //Get Type. (Zero � tipo NULL?).
 int GetThreadType (struct thread_d *Thread){
 
-    if ( (void *) Thread == NULL )
-    {
-        return 0;
+    if ( (void *) Thread == NULL ){
+        //Message
+        return 0;   // #bugbug: This is a valid type.
     }
   
     return (int) Thread->type;
@@ -1271,8 +1292,8 @@ int GetThreadType (struct thread_d *Thread){
  */
 
 void show_thread_information (void){
-	
-	struct thread_d *Current;	
+
+    struct thread_d *Current;
 
 
     printf ("show_thread_information:\n");		
@@ -1286,9 +1307,9 @@ void show_thread_information (void){
 	//Limits.
 	
 	if ( current_thread < 0 || current_thread >= THREAD_COUNT_MAX )
-	{	
-		return;
-	}
+    {
+        return;
+    }
 
 	Current = (void *) threadList[current_thread];
 	
@@ -1357,9 +1378,9 @@ void show_thread_information (void){
  */
 
 int init_threads (void){
-	
-	int i;
-	
+
+    int i=0;
+
 	//Globais.	 
 	current_thread = 0;                        //Atual. 
 	

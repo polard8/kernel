@@ -307,13 +307,14 @@ struct thread_d
 
 	//stack frame;
     unsigned short ss;
-    unsigned long esp;
-    unsigned long eflags;
+    unsigned long  esp;
+    unsigned long  eflags;
     unsigned short cs;
-    unsigned long eip;	//usado com o pd do processo
+    unsigned long  eip;    //usado com o pd do processo
+
 
 	// para o kernel saltar para o novo processo.
-    unsigned long ring0_eip;  //usado com o pd do kernel		
+    unsigned long ring0_eip;  //usado com o pd do kernel
     unsigned long eipPA;	
 
 
@@ -371,20 +372,20 @@ struct thread_d
 
     unsigned long saved;
 
-	
-	/*
-	 * HEAP and STACK:
-     * @todo: Usar a estrutura. 
-	 */
-	//struct heap_d *heap;
 
-    unsigned long  Heap;
-    unsigned long  Stack;
-    unsigned long  HeapSize;
-    unsigned long  StackSize;
+    //HEAP and STACK:
+    
+    //todo: Usar a estrutura. 
+    //struct heap_d *heap;
+
+    unsigned long Heap;
+    unsigned long HeapSize;
+    
+    unsigned long Stack;
+    unsigned long StackSize;
 
 
-	//endereço de um array contendo ponteiros para variso serviços
+	//Endereço de um array contendo ponteiros para variso serviços
 	//que a thread pode usar.
 	//unsigned long ServiceTable;
 	
@@ -495,8 +496,8 @@ struct thread_d
 	//Obs: Cada processo está atuando em um diretório,
 	// mas será cada thread precisa atuar em um diretório diferente??
 	//
-	//struct _iobuf *root;	// 4 root directory
-    struct _iobuf *pwd;	    // 5 (print working directory) 
+	//struct _iobuf *root;  // 4 root directory
+    struct _iobuf *pwd;     // 5 (print working directory) 
 	//...
 		
 	
@@ -519,8 +520,10 @@ struct thread_d
 
     // #importante
     // Isso é usado para gerência de memória e ... 
-    struct room_d     *room;     // Window Station da thread.
-    struct desktop_d  *desktop;  // Desktop da thread.
+    
+    //struct usession_d *usession;  //#todo
+    struct room_d     *room;        // (Window Station) da thread.
+    struct desktop_d  *desktop;     // Desktop da thread.
 
 
     // ?? procedimento de janela.
@@ -631,10 +634,11 @@ struct thread_d
     int exit_code;
 
 
-	//Signal
+    // Signal
     unsigned long signal;
-    unsigned long signalMask;
-	
+    unsigned long umask;
+
+
 	//Next: 
     //Um ponteiro para a próxima thread da lista linkada. 
     struct thread_d *Next;

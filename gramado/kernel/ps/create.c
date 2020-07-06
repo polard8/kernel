@@ -25,9 +25,8 @@ void *createCreateInitThread (void){
     // calculando stack.
     void *__initStack;   
 
-
-    int r;
-    int q;  //msg queue.
+    int r=0;
+    int q=0;  //msg queue.
 
 
     // Struct.
@@ -81,9 +80,10 @@ void *createCreateInitThread (void){
     // Stack.
     
     // #bugbug
-    // N�o estamos usando isso.
+    // Não estamos usando isso.
+    // 8KB.
 
-    __initStack = (void *) kmalloc (4*1024);
+    __initStack = (void *) kmalloc (8*1024);
 
     if ( (void *) __initStack == NULL ){
         panic ("createCreateInitThread: __initStack\n");
@@ -109,7 +109,7 @@ void *createCreateInitThread (void){
 
     InitThread->name_address = (unsigned long) ThreadName; 
 
-    // Obs: J� fizemos isso no in�cio da rotina.
+    // Obs: Já fizemos isso no início da rotina.
     InitThread->process = (void *) InitProcess;
 
 
@@ -148,9 +148,7 @@ void *createCreateInitThread (void){
     // Message queue.
     //
 
-    for ( q=0; q<32; q++ ){
-        InitThread->MsgQueue[q] = 0;
-    };
+    for ( q=0; q<32; q++ ){ InitThread->MsgQueue[q] = 0; };
     InitThread->MsgQueueHead = 0;
     InitThread->MsgQueueTail = 0;
 
@@ -178,26 +176,25 @@ void *createCreateInitThread (void){
     InitThread->runningCount = 0;    //Tempo rodando antes de parar.
     InitThread->readyCount = 0;      //Tempo de espera para retomar a execu��o.
 
-	InitThread->initial_time_ms = get_systime_ms ();
-	InitThread->total_time_ms = 0;
+    InitThread->initial_time_ms = get_systime_ms ();
+    InitThread->total_time_ms = 0;
 	
 	//quantidade de tempo rodando dado em ms.
-	InitThread->runningCount_ms = 0;
+    InitThread->runningCount_ms = 0;
 	
-	InitThread->ready_limit = READY_LIMIT;
-	InitThread->waitingCount  = 0;
-	InitThread->waiting_limit = WAITING_LIMIT;
-	InitThread->blockedCount = 0;    //Tempo bloqueada.
-	InitThread->blocked_limit = BLOCKED_LIMIT;
+    InitThread->ready_limit = READY_LIMIT;
+    InitThread->waitingCount  = 0;
+    InitThread->waiting_limit = WAITING_LIMIT;
+    InitThread->blockedCount = 0;    //Tempo bloqueada.
+    InitThread->blocked_limit = BLOCKED_LIMIT;
+
 	
-	
-	InitThread->ticks_remaining = 1000;
-	
-	//signal
-	//Sinais para threads.
-	InitThread->signal = 0;
-	InitThread->signalMask = 0;
-	
+    InitThread->ticks_remaining = 1000;
+
+	// Signal
+    InitThread->signal = 0;
+    InitThread->umask = 0;
+
 	//...
 	
 	//

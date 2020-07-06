@@ -296,10 +296,12 @@ do_clone:
             Clone->control->wait_reason[w] = (int) 0;
         }
 
-		Clone->control->ticks_remaining = Current->control->ticks_remaining;
-		Clone->control->signal          = Current->control->signal;
-		Clone->control->signalMask      = Current->control->signalMask;
-		
+        Clone->control->ticks_remaining = Current->control->ticks_remaining;
+        
+        Clone->control->signal = Current->control->signal;
+        Clone->control->umask  = Current->control->umask;
+
+
 		// CPU context
 
 
@@ -499,17 +501,16 @@ fail:
  ****************************************************
  * clone_and_execute_process:  
  * 
- *     servi�o 900.
+ *     Service 900.
+ * 
  *     Clona o processo atual e executa o processo filho.
  *     O processo pai continua rodando.
- *     Isso � usado pelo processo noraterm.
  *     #obs: Isso funciona.
  */
 
-	// 900
-	// Clona e executa o filho dado o nome do filho.
-	// O filho inicia sua execução do início da imagem.
-	// #bugbug: Isso às vezes falha na máquina real.
+
+// Clona e executa o filho dado o nome do filho.
+// O filho inicia sua execução do início da imagem.
 
 // Se o processo filho herdar o floxo padr�o, ent�o o processo filho
 // pode escrever no seu stdout e o processo pai pode ler no seu
@@ -523,11 +524,6 @@ fail:
 
 // IN: ??
 // OUT: ??
-
-// #bugbug
-// Isso pode estar falhando na máquina real ...
-// pode ser variáveis não inicializadas ou 
-// ponteiros nulos.
 
 pid_t clone_and_execute_process (char *filename){
 
@@ -549,28 +545,25 @@ pid_t clone_and_execute_process (char *filename){
     // Precisamos usar printf para verbose, pois não podemos
     // usar porta serial ainda.
 
-    // #debug: 
+    // #debug
     debug_print ("clone_and_execute_process: FIXME. It's a work in progress\n");
-    
-    // #debug: Para a máquina real.
     printf ("clone_and_execute_process:\n");
 
-    //
+
+
     // Convertendo o formato do nome do arquivo.
-    //
-    
     // >>> "12345678XYZ"
-    
+
     read_fntos ( (char *) filename );
 
 
     // Searching for the file only on the root dir.
 
     __Status = (int) KiSearchFile ( filename, VOLUME1_ROOTDIR_ADDRESS );
-    
+
     if (__Status != 1){
-         debug_print ("clone_and_execute_process: Not found!\n");
-         printf ("clone_and_execute_process: Not found!\n");
+         debug_print ("clone_and_execute_process: File not found\n");
+         printf ("clone_and_execute_process: File not found!\n");
          goto fail;
     }
 
@@ -610,11 +603,11 @@ pid_t clone_and_execute_process (char *filename){
 		//salvando o endere�o f�sico da imagem que existe no processo.
 		//old_image_pa = (unsigned long) virtual_to_physical ( Current->Image, gKernelPageDirectoryAddress ); 
 
-	    //#debug
-	    //printf(">>> check current process: %d %d \n", current_process, Current->pid );
-		goto do_clone;
-		//...
-	};
+        //#debug
+        //printf(">>> check current process: %d %d \n", current_process, Current->pid );
+        goto do_clone;
+        // ...
+    };
 
 
 	//
@@ -623,8 +616,7 @@ pid_t clone_and_execute_process (char *filename){
 
 do_clone:
 
-	// Cria uma estrutura do tipo processo, 
-	// mas não inicializada.
+	// Cria uma estrutura do tipo processo, mas não inicializada.
 
     Clone = (struct process_d *) processObject();
 
@@ -634,46 +626,45 @@ do_clone:
 
     } else {
 
-		// Obtêm um índice para um slot vazio na lista de processos.
-
+        // Obtêm um índice para um slot vazio na lista de processos.
+        // Precisa estar dentro do range válido para processos
+        // em ring3.
+        
         PID = (int) getNewPID();
 
-        if ( PID <= 0 ){
+        if ( PID < 0 || PID < USER_BASE_PID )
+        {
             printf ("clone_and_execute_process: getNewPID fail %d \n", 
                 PID );
             goto fail;
         }
 
-        Clone->pid = PID;
+        Clone->pid = (pid_t) PID;
+        Clone->uid = (uid_t) current_user;
+        Clone->gid = (gid_t) current_group;
+
         Clone->used = 1;
         Clone->magic = 1234;
         
         // Salvando na lista.
         processList[PID] = (unsigned long) Clone;
 
-		// #obs: 
-		// Na hora de copiar o processo, a estrutura do clone 
-		// receberá os valores da estrutura do processo atual,
-		// até mesmo o endereço do diretório de páginas.
-
-		//
-		// Copy memory
-		//
-
-        // Copia a memória usada pela imagem do processo.
+        // Copiando a memória e o processo.
+        // Copy memory:
+        // >> Copia a memória usada pela imagem do processo.
         // #bugbug: Esse é um momento crítico.
         // #todo: Precisamos do suporte a imagens ELF.
-
-        processCopyMemory ( Current );
-
-
-		//
-		// Clone the process. 
-		//
-
+        // >> Clone the process: 
         // Lets create the page directory for the Clone.
         // Now we need to map the physical addresses we got 
         // in the allocation routine.
+        // #obs: 
+        // Na hora de copiar o processo, a estrutura do clone 
+        // receberá os valores da estrutura do processo atual,
+        // até mesmo o endereço do diretório de páginas.
+        // See: process.c
+
+        processCopyMemory(Current);
 
         Ret = processCopyProcess ( Current->pid, Clone->pid );
 
@@ -682,29 +673,23 @@ do_clone:
         }
 
 
-		//
-		// Load file.
-		//
-
-
-        //#debug
-        //printf ("do_clone_execute_process: %s\n",filename);
-
-
+        // >> Load file:
         // #importante: 
-        // Carregando a imagem do porcesso filho.
-        // Se o carregamento falhar, temos que abortar a clonagem
-        // caso contr�rio executa a c�pia da imagem do pai.
-
+        // Carregando a imagem do processo filho.
+        // Se o carregamento falhar, temos que abortar a clonagem,
+        // caso contrário, executa a cópia da imagem do pai. ??
+        // #bugbug: Essa rotina começou a falhar aqui. Convertendo 
+        // num formato errado.
+        // Movemos essa conversão para o início dessa função,
+        // onde checaremos se o arquivo está no diretório.
         // #bugbug
-        // Essa rotina come�ou a falhar aqui.
-        // Convertendo num formato errado.
-        
-        // #test
-        // Movemos essa convers�o para o in�cio dessa fun��o,
-        // onde checaremos se o arquivo est� no diret�rio.
-        
+        // Se isso não está funcionando direito e uma thread 
+        // defeituosa fica remanescente quando digitamos um 
+        // comando errado então vamos matar a thread e o processo.
 
+        // #todo
+        // Num ambiente 'mp' precisaremos de um lock aqui.
+        
         //#debug
         //printf ("do_clone_execute_process: %s\n",filename);
         
@@ -713,12 +698,7 @@ do_clone:
                            filename, 
                            (unsigned long) Clone->Image );
 
-       // Se falhou o carregamento.
-       // #bugbug
-       // Isso não está funcionando direito.
-       // E uma thread defeituosa fica remanescente quando
-       // digitamos um comando errado.
-                
+       // Se falhou o carregamento. Vamos matar a thread e o processo.
        if ( Status != 0 )
        {
             // kill thread.
@@ -742,7 +722,8 @@ do_clone:
        // OK. O comando existe e o arquivo foi carregado, mas 
        // precisamos saber se a assinatura de ELF é válida.
        Status = (int) fsCheckELFFile ( (unsigned long) Clone->Image );
-       
+
+       // Assinatura ELF inválida. Vamos matar a thread e o processo.
        if ( Status != 0 )
        {
             // kill thread.
@@ -759,30 +740,28 @@ do_clone:
             goto fail;
         }
 
-        //
-        // Page table.
-        //
-
+        // >> Page table:
         // Remapeando a imagem, mas agora no diretório de páginas
         // do processo filho.
         // Lembrando que já criamos o diretório de páginas para o clone.
-        // ENTRY_USERMODE_PAGES, Esse número de entrada é para o 
+        // ENTRY_USERMODE_PAGES, esse número de entrada é para o 
         // endereço virtual padrão para aplicativos em ring3, 0x400000.
   
         CreatePageTable ( (unsigned long) Clone->DirectoryVA, 
             ENTRY_USERMODE_PAGES, Clone->ImagePA );
 
-        // Novo endereço virtual da imagem. Conseguimos isso por causa
-        // ca criação da pagetable, logo acima.
+        // Configurando o endereço virtual padrão para aplicativos.
+        // Novo endereço virtual da imagem. Conseguimos isso 
+        // por causa da criação da pagetable, logo acima.
         // # Caution
-        // Entry point and stack
+        // Entry point and stack.
         // We are clonning only the control thread.
         // The entry point in the start of the image. 0x401000.
-        // stack ??
+        // And the stack ??
 
-        Clone->Image = 0x400000; 
-        Clone->control->eip = CONTROLTHREAD_ENTRYPOINT;  //0x401000.
-               
+        Clone->Image = CONTROLTHREAD_BASE;               //0x400000 
+        Clone->control->eip = CONTROLTHREAD_ENTRYPOINT;  //0x401000
+ 
         // #bugbug
         // #todo
         // Ok mesma coisa precisa ser feito para o endereço
@@ -794,15 +773,15 @@ do_clone:
         // pra gerar um heap para ele.
         // Vamos tentar usar isso na rotina de clonagem.
 
-        Clone->Heap = (unsigned long) g_heappool_va + (g_heap_count * g_heap_size);
+        Clone->Heap     = (unsigned long) g_heappool_va + (g_heap_count * g_heap_size);
         Clone->HeapSize = (unsigned long) g_heap_size;
-        Clone->HeapEnd = (unsigned long) (Clone->Heap + Clone->HeapSize); 
+        Clone->HeapEnd  = (unsigned long) (Clone->Heap + Clone->HeapSize); 
         g_heap_count++;
 
 
-        // Stack for the clone.
-        Clone->control->esp = CONTROLTHREAD_STACK; 
-        Clone->Stack        = CONTROLTHREAD_STACK;  
+        // Stack for the clone. 
+        Clone->control->esp = CONTROLTHREAD_STACK;  //0x007FFFF0 
+        Clone->Stack        = CONTROLTHREAD_STACK;  //0x007FFFF0
         Clone->StackSize = (32*1024);    //isso foi usado na rotina de alocação.
         Clone->StackEnd = ( Clone->Stack - Clone->StackSize );
 
@@ -893,12 +872,12 @@ do_clone:
 	// Fail.
 
 fail:
-    refresh_screen ();
-    return (pid_t) -1;
+    refresh_screen();
+    return (pid_t) (-1);
 }
 
 
-
-
-
+//
+// End.
+//
 
