@@ -241,43 +241,41 @@ socket_gramado (
     int protocol )
 {
 
+    // Esse é o arquivo usado pelos aplicativos.
+    // Retornaremos seu fd.
     file *_file;
     
     struct process_d *Process;
 
-    //struct socket_d *__socket;
-
-
     // Procurar slot livres.
-    int __slot = -1;
     int i=0;
+    int __slot = -1;
+
+
+
+    debug_print ("socket_gramado:\n");
 
 
     //#todo
     //check sock arg.
 
 
-
-    //
-    // Process
-    //
-
+    // Process.
 
     Process = (void *) processList[current_process];
 
     if ( (void *) Process == NULL ){
         printf("Process\n");
         refresh_screen();
-        return -1;
+        return (int) (-1);
 
     }else{
 
         if ( Process->used != 1 || Process->magic != 1234 ){
             printf("Process validation\n");
             refresh_screen();
-            return -1;
+            return (int) (-1);
         }
-
         //ok
     };
 
@@ -296,36 +294,34 @@ socket_gramado (
 	// pode ser que peguemos os índices reservados.
 	// Para evitar, começaremos depois deles.
 
-    __slot = -1; //fail
-    
+
+    // Reserva um slot.
     for ( i=3; i< NUMBER_OF_FILES; i++ )
     {
-        if ( Process->Objects[i] == 0 ){
-            __slot = i;
-            break;
-        }
+        if ( Process->Objects[i] == 0 ){ __slot = i; break; }
     };
 
-
-    // Fail.
-    if ( __slot == -1 ){
-        Process->Objects[i] = (unsigned long) 0;
+    // Check slot validation. 
+    if ( __slot == -1 )
+    {
         printf ("socket_gramado: No free slots\n");
         refresh_screen();
-        return -1;
+        return (int) (-1);
     }
 
 
 	// buffer
 
-    char *buff = (char *) kmalloc (BUFSIZ);
-	//char *buff = (char *) newPage ();
+    char *buff = (char *) kmalloc(BUFSIZ);
+    //char *buff = (char *) newPage ();
 
-    if ( (void *) buff == NULL ){
+    if ( (void *) buff == NULL )
+    {
         Process->Objects[__slot] = (unsigned long) 0;
+
         printf ("socket_gramado: Buffer allocation fail\n");
         refresh_screen();
-        return -1;
+        return (int) (-1);
     }
 
 
@@ -335,58 +331,70 @@ socket_gramado (
 
     _file = (void *) kmalloc ( sizeof(file) );
 
-    if ( (void *) _file == NULL  ){
+    if ( (void *) _file == NULL  )
+    {
         Process->Objects[__slot] = (unsigned long) 0;
+        
         printf ("socket_gramado: _file fail\n");
         refresh_screen();
-        return -1;
+        return (int) (-1);
 
     }else{
-        
-        // This file represents a object of type socket.
-        
-        _file->____object = ObjectTypeSocket;
-
 
         _file->used = 1;
         _file->magic = 1234;
+
         
-        // fd.
-        _file->_file = __slot;
-        
+        _file->____object = ObjectTypeSocket;
+
+        // No name for now.
         _file->_tmpfname = NULL;
-        //socket_file->_tmpfname = "socket";       
+        //_file->_tmpfname = "socket";       
+        
 
-
-        // O buffer.
+        // buffer.
+        
         _file->_base = buff;
-        _file->_p = buff;
+        _file->_p    = buff;
+        
+        //buffer size.
+        _file->_lbfsize = BUFSIZ;          
+         
+        // Quanto falta.
+        _file->_cnt = _file->_lbfsize;         
+        
         _file->_r = 0;
         _file->_w = 0;
-        _file->_lbfsize = BUFSIZ; 
-        //quanto falta é igual ao tamanho.
-        _file->_cnt = _file->_lbfsize;
         
+        // Status do buffer do socket.   
         _file->socket_buffer_full = 0;  
 
+        // Socket pointer.
         _file->socket = sock;
-        
+
         // O arquivo do soquete, o buffer ?
         sock->private_file = (file *) _file; 
 
+        // Socket pointer.
         // Salvamos o ponteira para estrutura de soquete
         // na estrutura de processo do processo atual.
         Process->priv = (void *) sock;
+
+        // fd.
+        _file->_file = __slot;
         
         //Colocando na lista de arquivos abertos no processo.
         Process->Objects[__slot] = (unsigned long) _file;
+        
+        
+        debug_print ("socket_gramado: done\n");
 
         // Retornamos o fd na lista de arquivos abertos pelo processo.
         return (int) __slot;
     };
 
-
-    return -1;      
+    debug_print ("socket_gramado: fail\n");
+    return (int) (-1);      
 }
 
 
@@ -406,41 +414,38 @@ socket_unix (
     
     struct process_d *Process;
 
-    //struct socket_d *__socket;
-
-
     // Procurar slot livres.
-    int __slot = -1;
     int i=0;
+    int __slot = -1;
 
 
     //#todo
     //check sock arg.
 
 
+    debug_print ("socket_unix:\n");
 
-    //
-    // Process
-    //
 
+    // Process.
 
     Process = (void *) processList[current_process];
 
-    if ( (void *) Process == NULL ){
-        printf("Process\n");
+    if ( (void *) Process == NULL )
+    {
+        printf("socket_unix: Process\n");
         refresh_screen();
-        return -1;
+        return (int)(-1);
 
     }else{
 
         if ( Process->used != 1 || Process->magic != 1234 ){
-            printf("Process validation\n");
+            printf("socket_unix: validation\n");
             refresh_screen();
-            return -1;
+            return (int)(-1);
         }
-
         //ok
     };
+
 
 
 	//#todo
@@ -449,44 +454,43 @@ socket_unix (
 	//essa é afunção que estamos criando.
 	// process_find_empty_stream_slot ( struct process_d *process );
 
-
-
 	// #improvisando
 	// 0, 1, 2 são reservados para o fluxo padrão.
 	// Como ainda não temos rotinas par ao fluxo padrão,
 	// pode ser que peguemos os índices reservados.
 	// Para evitar, começaremos depois deles.
 
-    __slot = -1; //fail
-    
+    // Reserva um slot.
     for ( i=3; i< NUMBER_OF_FILES; i++ )
     {
-        if ( Process->Objects[i] == 0 ){
+        if ( Process->Objects[i] == 0 )
+        {
             __slot = i;
             break;
         }
     };
 
 
-    // Fail.
-    if ( __slot == -1 ){
-        Process->Objects[i] = (unsigned long) 0;
-        printf ("socket_gramado: No free slots\n");
+    // Check slot validation. 
+    if ( __slot == -1 )
+    {
+        printf ("socket_unix: No free slots\n");
         refresh_screen();
-        return -1;
+        return (int) (-1);
     }
 
 
 	// buffer
 
-    char *buff = (char *) kmalloc (BUFSIZ);
-	//char *buff = (char *) newPage ();
+    char *buff = (char *) kmalloc(BUFSIZ);
+    //char *buff = (char *) newPage ();
 
-    if ( (void *) buff == NULL ){
+    if ( (void *) buff == NULL )
+    {
         Process->Objects[__slot] = (unsigned long) 0;
-        printf ("socket_gramado: Buffer allocation fail\n");
+        printf ("socket_unix: Buffer allocation fail\n");
         refresh_screen();
-        return -1;
+        return (int) (-1);
     }
 
 
@@ -494,40 +498,48 @@ socket_unix (
 	// File.
 	//
 
-    _file = (void *) kmalloc ( sizeof(file) );
+    _file = (void *) kmalloc( sizeof(file) );
 
-    if ( (void *) _file == NULL  ){
+    if ( (void *) _file == NULL  )
+    {
         Process->Objects[__slot] = (unsigned long) 0;
-        printf ("socket_gramado: _file fail\n");
+        
+        printf ("socket_unix: _file fail\n");
         refresh_screen();
-        return -1;
+        return (int) (-1);
 
     }else{
-        
-        // This file represents a object of type socket.
-        
-        _file->____object = ObjectTypeSocket;
-
 
         _file->used = 1;
         _file->magic = 1234;
-        
-        // fd.
-        _file->_file = __slot;
-        
+
+        _file->____object = ObjectTypeSocket;
+
+
+        // No name for now.
+        // #bugbug: 
+        // unix sockets has names.
+        // it's like a normal fs pathname.
+
         _file->_tmpfname = NULL;
-        //socket_file->_tmpfname = "socket";       
+        //_file->_tmpfname = "/tmp/socketXXX";    
 
 
         // O buffer.
         _file->_base = buff;
-        _file->_p = buff;
+        _file->_p    = buff;
+        
+        // Buffer size.
+        _file->_lbfsize = BUFSIZ; 
+
+        // Quanto falta.
+        _file->_cnt = _file->_lbfsize;
+
+
         _file->_r = 0;
         _file->_w = 0;
-        _file->_lbfsize = BUFSIZ; 
-        //quanto falta é igual ao tamanho.
-        _file->_cnt = _file->_lbfsize;
-        
+
+
         _file->socket_buffer_full = 0;  
 
         _file->socket = sock;
@@ -538,7 +550,11 @@ socket_unix (
         // Salvamos o ponteira para estrutura de soquete
         // na estrutura de processo do processo atual.
         Process->priv = (void *) sock;
-        
+
+
+        // fd.
+        _file->_file = __slot;
+
         //Colocando na lista de arquivos abertos no processo.
         Process->Objects[__slot] = (unsigned long) _file;
 
@@ -788,6 +804,7 @@ int sys_socket ( int family, int type, int protocol ){
         return -1;
     }
 
+
     // Current process.
     
     p = (struct process_d *) processList[current_process];
@@ -831,8 +848,17 @@ int sys_socket ( int family, int type, int protocol ){
         __socket->gid = (gid_t) current_group;
 
 
+
+       //
+       // Create file!
+       //
+
        // family
        // Setup the addr.
+
+       // #importante
+       // As rotinas logo abaixo criarão o arquivo
+       // e retornarão o fd.
 
        switch (family)
        {

@@ -298,21 +298,23 @@ int sys_pipe ( int *pipefd, int flags ){
 
     debug_print ("sys_pipe:\n");
 
+    // Process.
 
     Process = (void *) processList[current_process];
 
     if ( (void *) Process == NULL ){
         debug_print("sys_pipe: Process\n");
+        //todo printf
         return (int) (-1);
 
     }else{
 
         if ( Process->used != 1 || Process->magic != 1234 ){
             debug_print("sys_pipe: validation\n");
+            //todo printf
             return (int) (-1);
         }
-
-		 //ok
+        //ok
     };
 
 
@@ -352,30 +354,30 @@ int sys_pipe ( int *pipefd, int flags ){
         }
     };
 
-    // Check slopts validation. 
+    // Check slots validation. 
     if ( slot1 == -1 || slot2 == -1 )
     {
-        Process->Objects[i] = (unsigned long) 0;
-        Process->Objects[i] = (unsigned long) 0;
-        
         debug_print("sys_pipe: slots alocation fail\n");
+        // todo: printf
         return (int) (-1);
     }
 
 
 	// buffer
 
-	char *buff = (char *) kmalloc (BUFSIZ);
-	//char *buff = (char *) newPage ();
+    char *buff = (char *) kmalloc (BUFSIZ);
+    //char *buff = (char *) newPage ();
 
     if ( (void *) buff == NULL )
     {
-        Process->Objects[i] = (unsigned long) 0;
-        Process->Objects[i] = (unsigned long) 0;
+        Process->Objects[slot1] = (unsigned long) 0;
+        Process->Objects[slot2] = (unsigned long) 0;
 
         debug_print("sys_pipe: buffer fail\n");
         return (int) (-1);
     }
+
+
 
     // File structures.
      
@@ -384,8 +386,8 @@ int sys_pipe ( int *pipefd, int flags ){
 
     if ( (void *) f1 == NULL || (void *) f2 == NULL )
     {
-        Process->Objects[i] = (unsigned long) 0;
-        Process->Objects[i] = (unsigned long) 0;
+        Process->Objects[slot1] = (unsigned long) 0;
+        Process->Objects[slot2] = (unsigned long) 0;
 
         debug_print("sys_pipe: structures fail\n");
         return (int) (-1);
@@ -422,9 +424,18 @@ int sys_pipe ( int *pipefd, int flags ){
         f1->_cnt = f1->_lbfsize;   
         f2->_cnt = f2->_lbfsize; 
 
+        f1->_r =0;
+        f2->_r =0;
+        f1->_w =0;
+        f2->_w =0;
+        
+        //fd
+        f1->_file = slot1;
+        f2->_file = slot2;
+        
         // Saving structure.
-        Process->Objects[i] = (unsigned long) f1;
-        Process->Objects[i] = (unsigned long) f2;
+        Process->Objects[slot1] = (unsigned long) f1;
+        Process->Objects[slot2] = (unsigned long) f2;
 
 		// #importante
 		// Esse é o retorno esperado.
@@ -436,8 +447,12 @@ int sys_pipe ( int *pipefd, int flags ){
         pipefd[1] = slot2; 
 
         //OK
+        debug_print("sys_pipe: done\n");
         return 0;
     };
+
+    debug_print("sys_pipe: fail\n");
+    return (int) (-1);
 }
 
 
