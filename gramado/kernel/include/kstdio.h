@@ -561,6 +561,9 @@ struct file_d
     pid_t pid;  // Process
     uid_t uid;  // User 
     gid_t gid;  // Group
+    
+    // If the file is a tty, we need a tty structure.
+    struct tty_d *tty;
 
 
     int iopl;

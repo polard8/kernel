@@ -680,6 +680,9 @@ tty_sets (
  * 
  */
  
+// See:
+// https://man7.org/linux/man-pages/man3/tcflush.3.html
+ 
 // #todo
 // See: 
 // termios.h
@@ -689,33 +692,79 @@ int tty_ioctl ( int fd, unsigned long request, char *arg ){
 
     debug_print ("tty_ioctl: TODO\n");
 
+
     if (fd<0){
         debug_print ("tty_ioctl: fd\n");
         return -1;
     }
 
 
+   // #todo
+   // podemos checar novamente se realmente se trata de
+   // um tty. Mas isso ja foi feito no wrapper sys_ioctl.
+   
+
+    //#test
+    struct tty_d *tty;
+    file *f;
+    struct process_d *p;
+     
+    p = ( struct process_d * ) processList[current_process];
+    
+    //#todo: check validation
+    
+    //objeto
+    f = (file*) p->Objects[fd];
+    
+    if ( (void *) f == NULL ){
+        debug_print ("tty_ioctl: bad file\n");    
+        return -1;
+    }
+    
+    //#test
+    if (f->____object != ObjectTypeTTY)
+        debug_print ("tty_ioctl: Not a tty file\n");
+        
+        
+    if (f->____object == ObjectTypeTTY)
+    {
+        tty = f->tty; 
+    }
 
     switch (request)
     {
         case TCGETS:
             debug_print ("TCGETS\n");
-            //ret = tty_gets(&tty, (struct termios *)arg);
-            return -1;
+            return (int) tty_gets( tty, (struct termios *) arg);
             break;
-
 
         case TCSETS:
             debug_print ("TCSETS\n");
-            //ret = tty_sets(&tty, IOCTL_MINOR(cmd), (struct termios *)arg);
-            return -1;
+            //#todo: argumento 2. (option)
+            return (int) tty_sets( tty, 0, (struct termios *) arg );
             break;
 
-
+        // ??
+        // Discards data written to the object referred to by fd .
         case TCFLSH:
-            debug_print ("TCFLSH\n");
+            debug_print ("TCFLSH [TODO]\n");
             return -1;
             break;
+            
+         case TCIFLUSH:
+            debug_print ("TCIFLUSH [TODO]\n");
+            return -1;
+             break;
+             
+         case TCOFLUSH:
+            debug_print ("TCOFLUSH [TODO]\n");
+            return -1;
+             break;
+             
+         case TCIOFLUSH:
+            debug_print ("TCIOFLUSH [TODO]\n");
+            return -1;
+             break;
          
          // TCSETSF, TCSETSW, TCGETA, TCSETAF, TCSETAW, TCSETA, TCSBRK
          // TCXONC
@@ -1262,7 +1311,7 @@ _ok:
     }else{
 
         // Object control;
-        __tty->objectType = ObjectTypeTTY;
+        __tty->objectType  = ObjectTypeTTY;
         __tty->objectClass = ObjectClassKernelObjects;
 
         __tty->index = i;
@@ -1373,11 +1422,19 @@ __ok_register:
     
     }else{
 
+
+        __file->____object = ObjectTypeTTY;
+
         __file->used = 1;
         __file->magic = 1234;
 
         __file->isDevice = 1;
 
+        // A estrutura de tty associada com esse arquivo.
+        __file->tty = __tty;
+        
+        // Esse é o arquivo que aponta para essa estrutura.
+        //__tty->_fp = __file;
 
         //
         // Register.

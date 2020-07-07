@@ -5,18 +5,27 @@
  */
 
 
+// #importante
+// Um dispositivo terminal virtual
+// usará o objeto tty para configurar suas características.
+
+
+
 #include <kernel.h>
 
 
+// Wrapper to tty_ioctl
 int 
 vt_ioctl ( 
     int fd, 
     unsigned long request, 
     char *arg )
 {
-    debug_print ("vt_ioctl: TODO\n");
-    //switch(request){}
-    return -1;
+    debug_print ("vt_ioctl:\n");
+    
+    return (int) tty_ioctl ( (int) fd, 
+                            (unsigned long) request, 
+                            (char *) arg );
 }
 
 

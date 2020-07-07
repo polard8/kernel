@@ -108,6 +108,7 @@ int sys_serial_debug_printk ( char *s )
 
 // See:
 // http://man7.org/linux/man-pages/man2/ioctl.2.html
+// https://en.wikipedia.org/wiki/Ioctl
 
 // The ioctl() system call manipulates the 
 // underlying device parameters of special files.
@@ -159,14 +160,29 @@ int sys_ioctl ( int fd, unsigned long request, char *arg ){
     //#todo
     // check file structure validation.
     
+    
+    // The TIOCSTI (terminal I/O control, 
+    // simulate terminal input) ioctl 
+    // function can push a character into a device stream
+
+    // ENOTTY -  "Not a typewriter"
+    
     // #todo
     // Now we can use a swit to call different
     // functions, as tty_ioctl etc.
     
     switch(f->____object)
     {
+        // Pode isso ??
+        //Normal file ???
+        case ObjectTypeFile:
+            debug_print ("sys_ioctl: ObjectTypeFile [TEST]\n");
+            return -1;    
+            break;
+       
         // tty object
         case ObjectTypeTTY:
+        //case ObjectTypeTerminal: 
             debug_print ("sys_ioctl: ObjectTypeTTY\n"); 
             return (int) tty_ioctl ( (int) fd, 
                             (unsigned long) request, 
@@ -188,15 +204,7 @@ int sys_ioctl ( int fd, unsigned long request, char *arg ){
                             (unsigned long) request, 
                             (char *) arg );
             break; 
-            
 
-        // Virtual Terminal object    
-        case ObjectTypeTerminal: 
-            debug_print ("sys_ioctl: ObjectTypeTerminal\n");
-            return (int) vt_ioctl ( (int) fd, 
-                            (unsigned long) request, 
-                            (char *) arg );
-            break; 
 
         //...    
             

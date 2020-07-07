@@ -102,6 +102,10 @@ struct tty_d
 
     int used;
     int magic;
+    
+    // #importante
+    // Esse é o arquivo que aponta para essa estrutura.
+    file *_fp;
 
     //char name[64];
     
