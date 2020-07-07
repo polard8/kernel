@@ -276,6 +276,8 @@ _strout (
     int fillch )
 {
 
+   //#todo: filtros.
+
     while (adjust < 0)
     {
         if (*string=='-' && fillch=='0')
@@ -313,30 +315,41 @@ int fflush (FILE *stream){
 
 // real flush.
 int __fflush (FILE *stream){
+	
+	
+    int nwrite = -1;
 
      //debug_print( "__fflush:\n");
 	
     // FIXME: fflush(NULL) should flush all open output streams.
     //ASSERT(stream);
-    if ( (void *) stream == NULL ){
+    
+    if ( (void *) stream == NULL )
+    {
         debug_print( "__fflush: stream\n");
-        return -1;
-    }
- 
+        return (int) (-1);
+    }else{
+
+        // Check something!
+    };
+
+
     //if ( !stream->_w )
         //return 0;
         
-        
-    if ( (void *) stream->_base == NULL ){
+    
+    // BUffer ?    
+    if ( (void *) stream->_base == NULL )
+    {
         debug_print( "__fflush: _base\n");
-        return -1;
+        return (int) (-1);
     } 
 
 
     if ( stream->_w <= 0 ){ 
         stream->_w = 0; 
         debug_print( "__fflush: _w\n");
-        return -1;
+        return (int) (-1);
     } 
 
 
@@ -346,7 +359,14 @@ int __fflush (FILE *stream){
     // que é um dispositivo do tipo console. O kernel escreverá no 
     // console 0.  
 
-    int rc = write ( fileno(stream), stream->_base, stream->_w );
+    nwrite = write ( fileno(stream), stream->_base, stream->_w );
+ 
+    if (nwrite <= 0)
+    {
+        printf ("__fflush: nwrite\n");
+        //stream->error = errno;
+        return EOF;
+    }
 
 
     // ISSO FUNCIONA.
@@ -359,10 +379,6 @@ int __fflush (FILE *stream){
     //stream->have_ungotten = false;
     //stream->ungotten = 0;
     
-    if (rc < 0){
-        //stream->error = errno;
-        return EOF;
-    }
 
 
     return 0;
@@ -385,17 +401,24 @@ int ____bfill (FILE *stream){
 
 
     // struct
-    if ( (void *) stream == NULL ){
+    if ( (void *) stream == NULL )
+    {
         debug_print("____bfill: struct\n");
         printf ("____bfill: struct\n");
-        return -1;
-    }
+        return (int) (-1);
+
+    }else{
+
+        // Check something!
+        // ...
+    };
+
 
     // buffer
     if ( stream->_lbfsize != BUFSIZ ){
         debug_print("____bfill: _lbfsize fail\n");
         printf ("____bfill: _lbfsize fail\n");
-        return -1;
+        return (int) (-1);
     }
 
 
@@ -783,11 +806,11 @@ int fclose (FILE *stream){
 FILE *fopen ( const char *filename, const char *mode ){
 
     FILE *__stream;   // Return this pointer.
-    
-    int fd;       /* File descriptor.  */
-    int flags;    /* Stream flags.     */
-    int oflags;   /* Flags for open(). */
-    
+    int fd;           // File descriptor.  
+    int flags;        // Stream flags.     
+    int oflags;       // Flags for open(). 
+
+
     // #todo:
     // The 'mode' passed via argment will give us the 'flags'
     // used in open().
@@ -826,23 +849,49 @@ FILE *fopen ( const char *filename, const char *mode ){
         return NULL;
     }
 
-    //
+
     // Stream
-    //
 
     __stream = (FILE *) malloc ( sizeof(FILE) );
     
     if ( (void *) __stream == NULL )
+    {
+        printf (" fopen: __stream fail\n");
         return NULL;
 
+    }else{
 
-    __stream->used = 1;
-    __stream->magic = 1234;
+        __stream->used = 1;
+        __stream->magic = 1234;
 
-    __stream->_file = fd;
-    __stream->_flags = flags;
+        // File name.
+        // Saving the name in ring3.
+        __stream->_tmpfname = (char *) strdup(filename);
 
-    __stream->_tmpfname = (char *) strdup(filename);
+        __stream->_flags = flags;
+        
+        
+        // Buffer size.
+        __stream->_lbfsize = BUFSIZ;
+
+        
+        // #bugbug
+        // Quanto falta ??
+        // Isso é um teste. Usaremos o tamanho do buffer
+        // pois foi isso que fizemos no kernel.
+        __stream->_cnt = BUFSIZ; 
+        //__stream->_cnt = 0; 
+        
+    
+        __stream->_r = 0;
+        __stream->_w = 0;
+
+        __stream->_file = fd;
+        
+        // #todo:
+        // Talvez colocar em uma lista usada pela libc.
+    };
+
 
 
 	// #importante:
@@ -850,26 +899,22 @@ FILE *fopen ( const char *filename, const char *mode ){
 	// leiam o conteúdo do arquivo no buffer.
 	// Então o aplicativo terá que usar read pra ler 
 	// o conteúdo no buffer em ring0.
-	
+
+    // Buffer
 
     __stream->_base = (char *) malloc (BUFSIZ); 
     
-     if ( (void *) __stream->_base == NULL ){
+     if ( (void *) __stream->_base == NULL )
+     {
           debug_print("fopen: stream buffer fail\n");
           printf("fopen: stream buffer fail\n");
           return NULL;
           //exit (-1)
      }
-    
     __stream->_p = __stream->_base; 
-    __stream->_lbfsize = BUFSIZ;
-    
-    __stream->_cnt = 0;        // ??
-    
-    __stream->_r = 0;
-    __stream->_w = 0;
 
-    return (__stream);
+
+    return (FILE *) __stream;
 }
 
 
@@ -890,13 +935,22 @@ FILE *fopen ( const char *filename, const char *mode ){
 FILE *fopen2 ( const char *filename, const char *mode ){
 
     FILE *__stream;
+    int fd = -1;
     
-    int f = -1;
+    
     
     __stream = (FILE *) malloc( sizeof(FILE) );
     
     if ( (void *) __stream == NULL )
+    {
+        printf("fopen2: __stream\n");
         return NULL;
+    }else{
+
+        //__stream->? 
+        
+        // ...
+    };
         
     
     
@@ -931,10 +985,11 @@ FILE *fopen2 ( const char *filename, const char *mode ){
                             0,
                             0 );
     
-    
-    if ( s <= 0 || s > 1024*1024 )
+    // #bugbug
+    // 1MB
+    if ( s <= 0 || s > (1024*1024) )
     {
-        printf ("fopen: size\n");
+        printf ("fopen2: size\n");
         return NULL;
     }
     
@@ -942,15 +997,16 @@ FILE *fopen2 ( const char *filename, const char *mode ){
     // ring 3.
     unsigned long address = (unsigned long) malloc(s);
     
-    if (address == 0){
-        printf ("fopen: address\n");
+    if (address == 0)
+    {
+        printf ("fopen2: address\n");
         return NULL;
     }
 
 
     // load the file into the address.
     // Vai retornar o fd.
-    int fd = -1;
+
     
     //IN: service, name, address, 0, 0 
     fd = (int) gramado_system_call ( 3, 
@@ -959,7 +1015,7 @@ FILE *fopen2 ( const char *filename, const char *mode ){
                   0 );
 
     if (fd < 0){
-        printf ("fopen: Couldn't load the file\n");
+        printf ("fopen2: Couldn't load the file\n");
         return NULL;
     }
 
@@ -983,10 +1039,10 @@ FILE *fopen2 ( const char *filename, const char *mode ){
     // Isso deve ser o retorno de open() ou creat()
     // Me parece que a chamada acima também retorna o fd.
     
-    __stream->_file = fd;    
+    __stream->_file = fd; 
 
 
-    //base.
+    // base.
     __stream->_base = (unsigned char *) address; 
     __stream->_p = __stream->_base;
         
@@ -2059,6 +2115,7 @@ void _outbyte ( int c ){
 	// #bugbug
 	// Essa funçao nao 'e usada ... NAO funciona.
 	// printf usa outra coisa (65).
+	// #bugbug: size = 8
 
     gramado_system_call ( 7, 
         8*g_cursor_x,  
@@ -4410,7 +4467,7 @@ number (
 }
 
 
-// It was taken from linux 0.01.
+// It was taken from linux 0.01. gpl
 // It works yet.
 // Just for fun. :^) 
 
@@ -4420,11 +4477,13 @@ Wirzenius_Torvalds_vsprintf (
     const char *fmt, 
     va_list args )
 {
-	int len;
-	int i;
-	char * str;
-	char *s;
-	int *ip;
+
+    int len;
+    int i;
+
+    char *str;
+    char *s;
+    int *ip;
 
 
     /* flags to number() */
@@ -4578,7 +4637,7 @@ Wirzenius_Torvalds_vsprintf (
 static char __printbuf[1024];
 
 
-// It was taken from linux 0.01.
+// It was taken from linux 0.01. gpl
 // It works yet.
 // Just for fun. :^) 
 
@@ -4794,28 +4853,36 @@ FILE *stdio_make_file( int fd, const char *mode ){
 // #test
 // Cria uma nova stream para o fd.
 // O fd foi obtido anteriormente,
-FILE *fdopen (int fd, const char *mode)
-{
-    if(fd<0)
-        return NULL;
+FILE *fdopen (int fd, const char *mode){
 
-        
-    return (FILE *) stdio_make_file (fd, (const char *) mode);
+    if (fd<0){
+        printf("fdopen: fd\n");
+        return NULL;
+    }
+    
+    return (FILE *) stdio_make_file(fd, (const char *) mode);
 }
 
 
-
-FILE *freopen (const char *pathname, const char *mode, FILE *stream)
+// freopen
+FILE *freopen (
+    const char *pathname, 
+    const char *mode, 
+    FILE *stream )
 {
 
     debug_print ("freopen: TODO: \n");
 
     if ( (void *) stream == NULL )
+    {
+       printf ("freopen: stream fail\n");
        return (FILE *) 0;
+    }
 
-
-
-	return (FILE *) 0;
+    // ??
+    // fopen() ??
+    
+    return (FILE *) 0;
 }
 
 

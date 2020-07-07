@@ -265,14 +265,14 @@ socket_gramado (
     Process = (void *) processList[current_process];
 
     if ( (void *) Process == NULL ){
-        printf("Process\n");
+        printf("socket_gramado: Process\n");
         refresh_screen();
         return (int) (-1);
 
     }else{
 
         if ( Process->used != 1 || Process->magic != 1234 ){
-            printf("Process validation\n");
+            printf("socket_gramado: Process validation\n");
             refresh_screen();
             return (int) (-1);
         }

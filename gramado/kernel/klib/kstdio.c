@@ -106,25 +106,54 @@ int k_fclose (file *f){
 file *k_fopen ( const char *filename, const char *mode ){
 
     file *f;
+    
+    struct process_d *Process;
 
 	// Buffer para armazenar o arquivo que vamos abrir.
     char *file_buffer;
 
     int i=0;    
+    int __slot = -1;
     unsigned long fileret;
 
 
+    debug_print ("k_fopen:\n");
+    
+    
+    // Process.
 
-    f = (file *) kmalloc( sizeof(file) );
+    Process = (void *) processList[current_process];
 
-    if ( (void *) f == NULL )
-    {
-        kprintf ("k_fopen: f\n");
+    if ( (void *) Process == NULL ){
+        printf("k_fopen: Process\n");
         refresh_screen();
-        return NULL;
+        return (file *) 0;
+
+    }else{
+
+        if ( Process->used != 1 || Process->magic != 1234 ){
+            printf("k_fopen: Process validation\n");
+            refresh_screen();
+            return (file *) 0;
+        }
+        //ok
+    };
+
+    // Reserva um slot.
+    for ( i=3; i< NUMBER_OF_FILES; i++ )
+    {
+        if ( Process->Objects[i] == 0 ){ __slot = i; break; }
+    };
+
+    // Check slot validation. 
+    if ( __slot == -1 )
+    {
+        printf ("k_fopen: No free slots\n");
+        refresh_screen();
+        return (file *) 0;
     }
 
-
+    
 
 	// #bugbug
 	// Estamos com problemas com a string de nome.
@@ -188,19 +217,28 @@ file *k_fopen ( const char *filename, const char *mode ){
 	
 
 
-	//file_buffer = (char *) newPage();
-    file_buffer = (char *) kmalloc (s);
 
-    if ( (char *) file_buffer == NULL ){
+    file_buffer = (char *) kmalloc(s);
+    //file_buffer = (char *) newPage();
+
+    if ( (char *) file_buffer == NULL )
+    {
+        Process->Objects[__slot] = (unsigned long) 0;
+        
         printf ("k_fopen: file_buffer \n");
         goto fail;
     }
 
 
-	// Configurando a estrutura.
+	// File structure.
 
-    if ( (void *) f == NULL ){
-        printf ("k_fopen: stream \n");
+    f = (file *) kmalloc( sizeof(file) );
+
+    if ( (void *) f == NULL )
+    {
+        Process->Objects[__slot] = (unsigned long) 0;
+        
+        printf ("k_fopen: f\n");
         goto fail;
 
     }else{
@@ -243,16 +281,10 @@ file *k_fopen ( const char *filename, const char *mode ){
         // #todo: Olhar a forma com que o pipe pega o id.
         // #todo: Olhar a forma com que o socket pega o id.
         
-        f->_file = 0; 
+        f->_file = __slot; 
 
+        Process->Objects[ __slot ] = (unsigned long) f;
 
-        // #BUGBUG
-        // #todo
-        // Talvez tenhamos que colocar o ponteiro em fileList[i]
-        //Colocando na lista de arquivos abertos no processo.
-        
-        // Process->Objects[ f->_file ] = (unsigned long) f;
-        
         debug_print ("k_fopen: [FIXME] Include file in the list\n");
     };
 
@@ -300,22 +332,25 @@ file *k_fopen ( const char *filename, const char *mode ){
         goto fail;
     }
 
-
-done:
+//done:
+    debug_print ("k_fopen: done\n");
     return (file *) f;
 
 fail:
-
+    debug_print ("k_fopen: fail\n");
     refresh_screen ();
     return (file *) 0;
 }
 
 
-
+// Wrapper
 int k_openat (int dirfd, const char *pathname, int flags){
 
     file *f;
     
+
+    debug_print ("k_openat: [FIXME]\n");
+
     // #todo
     // dirfd, flags.
 
@@ -324,16 +359,17 @@ int k_openat (int dirfd, const char *pathname, int flags){
     
     f = (file *) k_fopen ( (const char *) pathname, "r" );
 
-    if (!f){
-    	kprintf ("k_openat: f\n");
-    	refresh_screen();
-        return -1;
+    if ( (void *) f == NULL )
+    {
+        kprintf ("k_openat: f\n");
+        refresh_screen();
+        return (int) (-1);
     }
 
 
-    // #bugbug
-    // Esse número esta errado ??
-    return f->_file;
+    debug_print ("k_openat: done\n");
+    
+    return (int) f->_file;
 }
 
 
