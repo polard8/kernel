@@ -284,38 +284,38 @@ fail:
 // Isso precisa ter duas estruturas de arquivos,
 // dois descritores, mas apenas um buffer.
 
-int sys_pipe ( int *pipefd ){
-	
+int sys_pipe ( int *pipefd, int flags ){
+
     file *f1;
     file *f2;
 
     struct process_d *Process;
 
-    int i;
+    int i=0;
     int slot1 = -1;
-	int slot2 = -1;
+    int slot2 = -1;
 
 
-	Process = (void *) processList[current_process];
-	
-    if ( (void *) Process == NULL )
-    {
-        debug_print("sys_pipe:\n");
-		return -1;
+    debug_print ("sys_pipe:\n");
 
-	}else{
-	
-	    if ( Process->used != 1 || Process->magic != 1234 )
-		{
-			debug_print("sys_pipe:\n");
-		    return -1;
-		}
-		
+
+    Process = (void *) processList[current_process];
+
+    if ( (void *) Process == NULL ){
+        debug_print("sys_pipe: Process\n");
+        return (int) (-1);
+
+    }else{
+
+        if ( Process->used != 1 || Process->magic != 1234 ){
+            debug_print("sys_pipe: validation\n");
+            return (int) (-1);
+        }
+
 		 //ok
-	};
+    };
 
 
-	
 	//#todo
 	//temos que criar uma rotina que procure slots em Process->Streams[]
 	//e colocarmos em process.c
@@ -329,104 +329,115 @@ int sys_pipe ( int *pipefd ){
 	// Como ainda não temos rotinas par ao fluxo padrão,
 	// pode ser que peguemos os índices reservados.
 	// Para evitar, começaremos depois deles.
-	
-	for ( i=3; i< NUMBER_OF_FILES; i++ )
-	{
-	    if ( Process->Objects[i] == 0 )
-		{
-			//reserva.
-			Process->Objects[i] = 216;
-			
-		    slot1 = i;
-			break;
-		}
-	};	
+
+    // Reserva um slot.
+    for ( i=3; i< NUMBER_OF_FILES; i++ )
+    {
+        if ( Process->Objects[i] == 0 )
+        {
+            Process->Objects[i] = 216;
+            slot1 = i;
+            break;
+        }
+    };
+
+    // Reserva um slot.
+    for ( i=3; i< NUMBER_OF_FILES; i++ )
+    {
+        if ( Process->Objects[i] == 0 )
+        {
+            Process->Objects[i] = 216;
+            slot2 = i;
+            break;
+        }
+    };
+
+    // Check slopts validation. 
+    if ( slot1 == -1 || slot2 == -1 )
+    {
+        Process->Objects[i] = (unsigned long) 0;
+        Process->Objects[i] = (unsigned long) 0;
+        
+        debug_print("sys_pipe: slots alocation fail\n");
+        return (int) (-1);
+    }
 
 
-	for ( i=3; i< NUMBER_OF_FILES; i++ )
-	{
-	    if ( Process->Objects[i] == 0 )
-		{
-			//reserva.
-			Process->Objects[i] = 216;
-			
-		    slot2 = i;
-			break;
-		}
-	};	
-
-
-	if ( slot1 == -1 || slot2 == -1 ){
-		Process->Objects[i] = (unsigned long) 0;
-		Process->Objects[i] = (unsigned long) 0;
-		debug_print("sys_pipe: slots fail\n");
-	    return -1;
-	}
-
-	
 	// buffer
-	
+
 	char *buff = (char *) kmalloc (BUFSIZ);
 	//char *buff = (char *) newPage ();
-	
-    if ( (void *) buff == NULL ){
-		Process->Objects[i] = (unsigned long) 0;
-		Process->Objects[i] = (unsigned long) 0;		
-	    debug_print("sys_pipe: buffer fail\n");
-	    return -1;
-	}
-	
-	//estruturas 
-	f1 = (void *) kmalloc ( sizeof(file) );
-	f2 = (void *) kmalloc ( sizeof(file) );
-	
-	if ( (void *) f1 == NULL || (void *) f2 == NULL ){
-		Process->Objects[i] = (unsigned long) 0;
-		Process->Objects[i] = (unsigned long) 0;		
-	    debug_print("sys_pipe: structures fail\n");	    
-	    return -1;
 
-	}else{
+    if ( (void *) buff == NULL )
+    {
+        Process->Objects[i] = (unsigned long) 0;
+        Process->Objects[i] = (unsigned long) 0;
 
+        debug_print("sys_pipe: buffer fail\n");
+        return (int) (-1);
+    }
 
-		// As duas estruturas compartilham o mesmo buffer.
-		
-        f1->used = 1;
-		f1->magic = 1234;
-		f2->used = 1;
-		f2->magic = 1234;
-			
-		// THE SAME BUFFER !!	
-		f1->_base = buff;	
-	    f2->_base = buff;
-		f1->_p = buff;
-		f2->_p = buff;
-		
-		f1->_tmpfname = NULL;
-		f2->_tmpfname = NULL;
-		
-		f1->_lbfsize = BUFSIZ; 
-		f2->_lbfsize = BUFSIZ; 
-		
-		//quanto falta é igual ao tamanho.
-		f1->_cnt = f1->_lbfsize;   
-		f2->_cnt = f2->_lbfsize; 
-		
-		
-		Process->Objects[i] = (unsigned long) f1;
-		Process->Objects[i] = (unsigned long) f2;
-		
+    // File structures.
+     
+    f1 = (void *) kmalloc( sizeof(file) );
+    f2 = (void *) kmalloc( sizeof(file) );
+
+    if ( (void *) f1 == NULL || (void *) f2 == NULL )
+    {
+        Process->Objects[i] = (unsigned long) 0;
+        Process->Objects[i] = (unsigned long) 0;
+
+        debug_print("sys_pipe: structures fail\n");
+        return (int) (-1);
+
+    }else{
+
+       // As duas estruturas compartilham o mesmo buffer.
+
+        f1->used = 1;    
+        f1->magic = 1234;
+        
+        f2->used = 1;    
+        f2->magic = 1234;
+        
+        // File: object type.
+        f1->____object = ObjectTypePipe;
+        f2->____object = ObjectTypePipe;
+
+        // No name for now.
+        f1->_tmpfname = NULL;
+        f2->_tmpfname = NULL;
+
+        // The same buffer
+        f1->_base = buff;
+        f2->_base = buff;
+        f1->_p    = buff;
+        f2->_p    = buff;
+
+        // Buffer size.
+        f1->_lbfsize = BUFSIZ; 
+        f2->_lbfsize = BUFSIZ; 
+
+        // Quanto falta.
+        f1->_cnt = f1->_lbfsize;   
+        f2->_cnt = f2->_lbfsize; 
+
+        // Saving structure.
+        Process->Objects[i] = (unsigned long) f1;
+        Process->Objects[i] = (unsigned long) f2;
+
 		// #importante
 		// Esse é o retorno esperado.
 		// Esses índices representam o número do slot
 		// na lista de arquivos abertos na estrutura do processo atual.
-		
-		pipefd[0] = slot1;
-		pipefd[1] = slot2; 	
-		
-		//OK
-		return 0;
-	};
+
+        // Return.
+        pipefd[0] = slot1;
+        pipefd[1] = slot2; 
+
+        //OK
+        return 0;
+    };
 }
 
 

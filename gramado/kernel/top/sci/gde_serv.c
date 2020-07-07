@@ -2542,8 +2542,9 @@ gde_services (
 
 
         // 247 - pipe() support.
+        // IN: array, flags.
         case 247:
-            return (void *) sys_pipe ( (int *) arg2 ); 
+            return (void *) sys_pipe ( (int *) arg2, (int) arg3 ); 
             break;
 
 
