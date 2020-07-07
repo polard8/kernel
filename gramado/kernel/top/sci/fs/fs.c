@@ -1770,16 +1770,16 @@ void fs_pathname_backup ( int pid, int n ){
 int sys_read_file ( char *file_name,  int flags, mode_t mode ){
 
     file *__file;
-    
+ 
     struct process_d *p;
+
+    int __slot = -1;
     
     int Status = -1;
-    
-    int __slot = -1;
+
 
 
     debug_print ("sys_read_file:\n");
-
 
 
     // Convertendo o formato do nome do arquivo.    
@@ -1814,8 +1814,9 @@ int sys_read_file ( char *file_name,  int flags, mode_t mode ){
         debug_print ("sys_read_file: validation\n");
         return -1;
     }
-        
-        
+    
+    
+    // Procurando um slot livre.
     for (__slot=0; __slot<32; __slot++)
     {
          if ( p->Objects[__slot] == 0 ){ goto __OK; }
@@ -1830,24 +1831,50 @@ __OK:
     {
         printf ("sys_read_file: Slot fail\n");
         refresh_screen();
-        return -1;
+        return (int) (-1);
     }
-    
+ 
     // Struct
     
     __file = (file *) kmalloc ( sizeof(file) );
     
-    if ( (void *) __file == NULL ){
+    if ( (void *) __file == NULL )
+    {
         printf ("sys_read_file: __file\n");
         refresh_screen();
         return -1;
-    }
-    
-    
-    __file->_file = __slot;
-    __file->used = 1;
-    __file->magic = 1234;
+    }else{
 
+        
+        __file->used = 1;
+        __file->magic = 1234;
+     
+        __file->pid = (pid_t) current_process;
+        __file->uid = (uid_t) current_user;
+        __file->gid = (gid_t) current_group;
+        
+        
+        // todo: object
+        //__file->____object = ObjectTypeFile;
+        
+        // todo
+        //__file->_tmpfname = NULL;
+ 
+        // Buffer size
+        __file->_lbfsize = BUFSIZ;
+        
+        __file->_r = 0;
+        __file->_w = 0;
+
+        __file->_file = __slot;
+        
+        //Process->Objects[__slot] = (unsigned long) __file;
+    };
+    
+
+    //
+    // buffer
+    //
 
     // buffer padrão
     // #bugbug: open chama isso. E se o arquivo for maior que o buffer ?
@@ -1860,7 +1887,7 @@ __OK:
         refresh_screen();
         return -1;
     }
-    __file->_lbfsize = BUFSIZ;
+
     
     //
     // File size.
@@ -1977,48 +2004,41 @@ __OK:
      // Default ???
        
        
-      //if (mode == 0)
-      //{
-       debug_print ("sys_read_file: default mode\n");
-       __file->_p = __file->_base;
-      //}
+    //if (mode == 0)
+    //{
+          debug_print ("sys_read_file: default mode\n");
+          __file->_p = __file->_base;
+    //}
 
 
-      // The file is opened in append mode. 
-      // O offset fica no fim do arquivo.
-      if ( mode & O_APPEND)        
-      { 
-           debug_print ("sys_read_file: O_APPEND\n");
-            //__file->_p = __file->_base + s;
-      }
+    // The file is opened in append mode. 
+    // O offset fica no fim do arquivo.
+    if ( mode & O_APPEND)        
+    { 
+        debug_print ("sys_read_file: O_APPEND\n");
+        //__file->_p = __file->_base + s;
+    }
 
-      if ( mode & O_ASYNC )        
-      { 
-           debug_print ("sys_read_file: O_ASYNC\n");
-      }
+    if ( mode & O_ASYNC )        
+    { 
+         debug_print ("sys_read_file: O_ASYNC\n");
+    }
 
-      /* 
-      // Enable the close-on-exec flag for the new file descriptor.
-      if ( mode & O_CLOEXEC )        
-      { 
-           debug_print ("sys_read_file: O_CLOEXEC\n");
-      }
-      */
+    /* 
+    // Enable the close-on-exec flag for the new file descriptor.
+    if ( mode & O_CLOEXEC )        
+    { 
+         debug_print ("sys_read_file: O_CLOEXEC\n");
+    }
+    */
 
 
-      if ( mode & O_CREAT )        
-      { 
-           debug_print ("sys_read_file: O_CREAT\n");
-      }
+    if ( mode & O_CREAT )        
+    { 
+         debug_print ("sys_read_file: O_CREAT\n");
+    }
         
-           
-    
-     
-        
-    // salva o ponteiro.  
-    // ja checamos fd.
-    p->Objects[__slot] = (unsigned long) __file;
-        
+             
     
     // #importante
     // Se não liberarmos para leitura então read()
@@ -2026,6 +2046,12 @@ __OK:
     
     __file->_flags = (__file->_flags | __SRD);
         
+
+    // salva o ponteiro.  
+    // ja checamos fd.
+    p->Objects[__slot] = (unsigned long) __file;
+
+
     //printf ("done\n");
     //refresh_screen();
           
@@ -2039,8 +2065,6 @@ __OK:
                   
     return (int) __file->_file;
 }
-
-
 
 
 

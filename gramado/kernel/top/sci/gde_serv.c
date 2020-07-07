@@ -1281,7 +1281,7 @@ gde_services (
 
         // 3 
         // Carregar um arquivo do disco para a mem�ria.
-        // See: kernel/sysio/kservers/fs/fs.c
+        // See: fs/fs.c
 
         // #aten��o
         // Isso ser� usado por open(),
@@ -1299,7 +1299,7 @@ gde_services (
 
         // 4 
         // Save file.
-        // See: sysio/kservers/fs/fs.c
+        // See: fs/fs.c
         // IN: name, size in sectors, size in bytes, adress, flag.
         case SYS_WRITE_FILE:
             sys_write_file ( (char *) message_address[0],  
@@ -1406,13 +1406,13 @@ gde_services (
 
         // 17 - close()
         case SYS_CLOSE:
-            return (void *) sys_close ( (int) arg2 );
+            return (void *) sys_close( (int) arg2 );
             break;
 
 
         // 18 - read() 
         case SYS_READ:
-            return (void *) sys_read ( (unsigned int) arg2, 
+            return (void *) sys_read( (unsigned int) arg2, 
                                 (char *) arg3, (int) arg4 );  
             break;
 

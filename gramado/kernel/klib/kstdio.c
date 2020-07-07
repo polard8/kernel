@@ -117,7 +117,8 @@ file *k_fopen ( const char *filename, const char *mode ){
 
     f = (file *) kmalloc( sizeof(file) );
 
-    if ( (void*) f == NULL ){
+    if ( (void *) f == NULL )
+    {
         kprintf ("k_fopen: f\n");
         refresh_screen();
         return NULL;
@@ -210,31 +211,49 @@ file *k_fopen ( const char *filename, const char *mode ){
         f->pid = (pid_t) current_process;
         f->uid = (uid_t) current_user;
         f->gid = (gid_t) current_group;
+        
+        //#todo
+        //f->____object = ObjectTypeFile;
 
-        f->_base = file_buffer;
-        f->_bf._base = file_buffer;
-        f->_lbfsize = s;    // File size.
-        f->_r = 0;
-        f->_w = 0;
-        f->_p = f->_base;
-
-		//?? #todo: 
-		// precisamos de um id
-		// Esse ID é um indice da estrutura de processo.
-
-        f->_file = 0; 
-
+        // Name.
         f->_tmpfname = (char *) filename;
-
+  
+        // The buffer
+        f->_base = file_buffer;
+        f->_p = f->_base;
+        f->_bf._base = file_buffer;
+        
+        // Buffer size
+        f->_lbfsize = s;    // File size.
+ 
+        // #todo: Quanto falta.
+        //f->_cnt = f->_lbfsize;  
         // Quanto falta para acabar o arquivo.
         f->_cnt = s;
+      
+        
+        f->_r = 0;
+        f->_w = 0;
+        
+
+        // #bugbug
+        // ?? #todo: 
+        // precisamos de um id
+        // Esse ID é um indice da estrutura de processo.
+        // #todo: Olhar a forma com que o pipe pega o id.
+        // #todo: Olhar a forma com que o socket pega o id.
+        
+        f->_file = 0; 
 
 
+        // #BUGBUG
         // #todo
         // Talvez tenhamos que colocar o ponteiro em fileList[i]
-         
-		//...
-
+        //Colocando na lista de arquivos abertos no processo.
+        
+        // Process->Objects[ f->_file ] = (unsigned long) f;
+        
+        debug_print ("k_fopen: [FIXME] Include file in the list\n");
     };
 
 

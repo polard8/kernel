@@ -20,26 +20,31 @@
 //int vfsInit (){ 
 
 void vfsInit (void){
-	
-	int i;
-	
+
+    int i=0;
+
+
+    debug_print ("vfsInit: [FIXME]\n");
+
+
 	// Inicializando a estrutura do VFS.
 
 #ifdef KERNEL_VERBOSE	
-	printf("Initilizing VFS..\n");
-#endif	
-	
-	storage->vfs = kmalloc ( sizeof(struct vfs_d) );
-	
-	if ( (void *) storage->vfs == NULL )
-	{
-		panic ("vfsInit: storage->vfs");
-	}else{
+    printf("Initilizing VFS..\n");
+#endif
 
+    storage->vfs = kmalloc ( sizeof(struct vfs_d) );
+
+    if ( (void *) storage->vfs == NULL ){
+        panic ("vfsInit: storage->vfs");
+
+    }else{
 
         storage->vfs->used = 1;
         storage->vfs->magic = 1234;
 
+        // todo: object 
+        
         storage->vfs->status = VFSStatusInitialized;
         storage->vfs->name = "VFS NAME";
         storage->vfs->description = "VIRTUAL FILE SYSTEM";
@@ -48,10 +53,9 @@ void vfsInit (void){
 	    // ## root dir address  ##
 	    storage->vfs->rootdir_address = (unsigned long) kmalloc ( VFS_ROOTDIR_NUMBER_OF_ENTRIES * VFS_ROOTDIR_ENTRY_SIZE );
 	
-	    if ( storage->vfs->rootdir_address = 0 )
-	    {
-	        panic ("vfsInit: storage->vfs->rootdir_address\n");	
-	    }
+        if ( storage->vfs->rootdir_address = 0 ){
+            panic ("vfsInit: storage->vfs->rootdir_address\n");	
+        }
 	    
 		//...
 	};
@@ -61,41 +65,54 @@ void vfsInit (void){
 	//
 	
 	//foi definido em stdio.h
-	//FILE *vfs;
-	
-	vfs = (FILE *) kmalloc ( sizeof(FILE) );
-	
-	if ( (void *) vfs == NULL )
-	{
-		panic ("vfsInit: vfs fail");
-	}else{
-		
+	//file *vfs;
+
+    vfs = (file *) kmalloc ( sizeof(file) );
+
+    if ( (void *) vfs == NULL ){
+        panic ("vfsInit: vfs fail");
+
+    }else{
+
+        //#bugbug: Não usar o termo 'stream'.
         storage->vfs->stream = vfs;
 
         vfs->used = 1;
         vfs->magic = 1234;
+        
+        // todo: object
+        
         vfs->_base = (unsigned char *) storage->vfs->rootdir_address;
         vfs->_p = stdin->_base;
         vfs->_cnt = ( VFS_ROOTDIR_NUMBER_OF_ENTRIES * VFS_ROOTDIR_ENTRY_SIZE );
+        
+        
+        // #bugbug: 
+        // Precisamos de um index.
+        // Mas a lista é própria. fileList[]
+        
         vfs->_file = 0; //?
+        
         vfs->_tmpfname = "vfs-stream";
 
         fileList[__KERNEL_STREAM_VFS] = (unsigned long) vfs;
-	};
-	
+    };
+
 
 	//  selecionando o primeiro diretório,
 	// que deve ser o volume do vfs
-	current_directory = 0;
-	
+    current_directory = 0;
+
 	// #importante
 	// É possivel fazer mais inicializações.
 	
 #ifdef KERNEL_VERBOSE
 	printf("VFS Initialized\n");
 #endif	
-	
-};
+
+    debug_print("vfsInit: done\n");
+}
+
 
 
 /*
@@ -105,10 +122,11 @@ void vfsInit (void){
  */
 
 void vfs_show_handle_list (void){
-	
-	int i;
-	struct vfs_handle_d *h;
-	
+
+    int i=0;
+    struct vfs_handle_d *h;
+
+
 	printf("vfs_show_handle_list:\n\n");
 	
 	for ( i=0; i<VFS_HANDLE_MAX; i++ )
@@ -126,7 +144,7 @@ void vfs_show_handle_list (void){
 	};
 	
 	refresh_screen();
-};
+}
 
 
 /*
@@ -238,10 +256,12 @@ void vfsShowVFSInfo (void){
 
 //lista os nomes dos arquivos no diretório raiz do vfs.
 void vfsListFiles (void){
-	
+
     int i;
-	struct ext2_dir_entry_d *Entry;
-	
+    struct ext2_dir_entry_d *Entry;
+
+
+
 	printf("\n");
 	
 	for ( i=0; i<VFS_MAX_ENTRIES; i++ )

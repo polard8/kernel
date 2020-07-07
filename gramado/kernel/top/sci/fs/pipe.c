@@ -401,6 +401,14 @@ int sys_pipe ( int *pipefd, int flags ){
         
         f2->used = 1;    
         f2->magic = 1234;
+
+        f1->pid = (pid_t) current_process;
+        f1->uid = (uid_t) current_user;
+        f1->gid = (gid_t) current_group;
+
+        f2->pid = (pid_t) current_process;
+        f2->uid = (uid_t) current_user;
+        f2->gid = (gid_t) current_group;
         
         // File: object type.
         f1->____object = ObjectTypePipe;
