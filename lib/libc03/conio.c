@@ -1,5 +1,6 @@
 // conio.c
-// It is not part of the C standard library or ISO C, nor is it defined by POSIX.
+// It is not part of the C standard library or ISO C, 
+// nor is it defined by POSIX.
 
 
 #include <types.h> 

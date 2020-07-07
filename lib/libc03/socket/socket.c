@@ -47,7 +47,8 @@
 int socket ( int domain, int type, int protocol ){
 
     int __fd = -1;
-    
+
+
     __fd = (int) gramado_system_call ( 7000, 
                      (unsigned long) domain, 
                      (unsigned long) type, 

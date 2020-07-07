@@ -125,18 +125,20 @@ heapSetLibcHeap (
 	// Check limits.
 
     if (HeapStart == 0){
+        debug_print("heapSetLibcHeap: HeapStart\n");
         return;
     }
 
     if (HeapSize == 0){
+        debug_print("heapSetLibcHeap: HeapSize\n");
         return;
     }
 
 
 	// start, end, pointer, available.    
-	
-    heap_start = (unsigned long) HeapStart;                 
-    heap_end = (unsigned long) (HeapStart + HeapSize);
+
+    heap_start = (unsigned long) HeapStart; 
+    heap_end   = (unsigned long) (HeapStart + HeapSize);
 
     g_heap_pointer = (unsigned long) heap_start;            
     g_available_heap  = (unsigned long) (heap_end - heap_start); 
@@ -146,7 +148,7 @@ heapSetLibcHeap (
 	
 	//Configurando a estrutura.
     h->HeapStart = (unsigned long) heap_start;   
-    h->HeapEnd = (unsigned long) heap_end;
+    h->HeapEnd   = (unsigned long) heap_end;
 
     h->HeapPointer = (unsigned long) g_heap_pointer;      
     h->AvailableHeap = (unsigned long) g_available_heap; 
@@ -764,7 +766,12 @@ void *malloc ( size_t size ){
     void *ret;
     unsigned long s = ( unsigned long) size;
 
-    if ( s < 0 ){ return NULL; }
+
+
+    if ( s < 0 ){ 
+        debug_print ("malloc: size\n");
+        return NULL; 
+    }
 
     if ( s == 0 ){ s = 1; }
 
@@ -772,8 +779,8 @@ void *malloc ( size_t size ){
 	//s = (s ? s : 1);	/* if s == 0, s = 1 */
 
 	//??? @todo:
-	ret = (void *) heapAllocateMemory(s);
-	
+    ret = (void *) heapAllocateMemory(s);
+
     if ( (void *) ret == NULL ){
 	    //printf("malloc: falha ao alocar memoria!\n");
 		//refresh_screen();
@@ -923,17 +930,18 @@ void *calloc (size_t count, size_t size){
 
     size_t s = count * size;
 
-    void *value = malloc (s);
 
+
+    void *value = malloc(s);
 
     if ( (void *) value == NULL )
     {
-		//free (value);
-	    return NULL;
+        //free (value);
+        return NULL;
     }else{
 
         memset (value, 0, s);
-        return value;	
+        return value;
     }
 
 
@@ -1254,13 +1262,14 @@ char *nvmatch ( char *s1, char *s2 )
 //unix v7
 char *v7_getenv ( char *name )
 {
-	register char **p = environ;
-	register char *v;
+    register char **p = environ;
+    register char *v;
 
-	while (*p != NULL)
+
+    while (*p != NULL)
 		if ((v = nvmatch(name, *p++)) != NULL)
 			return(v);
-	return(NULL);
+    return(NULL);
 }
 
 
@@ -1275,31 +1284,28 @@ char *v7_getenv ( char *name )
 char *__findenv ( const char *name, int *offset ){
 
     size_t len;
-	const char *np;
-	char **p, *c;  //??
+    const char *np;
+    char **p, *c;  //??
 
-    if ( (void *) name == NULL )
-    {
+
+    if ( (void *) name == NULL ){
         printf ("__findenv: name NULL\n");
         return (char *) 0;
     }
 
-    if ( (char **) environ == 0 )
-    {	
+
+    if ( (char **) environ == 0 ){
         printf ("__findenv: environ is 0\n");
         return (char *) 0;
-        //return NULL;
-	}
+    }
 
 
-    //tamanho da string do argumento.
-	for (np = name; *np && *np != '='; ++np)
-	{	
-        continue;
-	};
-	len = (size_t) (np - name);
-	
-	//printf (">>> len  %d \n", len);
+    // Tamanho da string do argumento.
+    for (np = name; *np && *np != '='; ++np){ continue; };
+
+    len = (size_t) (np - name);
+
+    //printf (">>> len  %d \n", len);
     //return (char *) 0;
 
     int fail;
@@ -1364,8 +1370,8 @@ char *getenv (const char *name)
     //printf ("getenv2: %s \n", (const char *) name);
     //return NULL;
 
-    if ( (void *) name == NULL )
-    {
+    if ( (void *) name == NULL ){
+        debug_print ("getenv: name fail\n");
         return (char *) 0;
     }
 
@@ -1409,7 +1415,7 @@ int atoi (const char *str){
 
     /* skip till we find either a digit or '+' or '-' */
     while (*str) 
-	{
+    {
 	    if (*str <= '9' && *str >= '0')
 		    break;
 		
@@ -1417,18 +1423,18 @@ int atoi (const char *str){
 		    break;
 		
 	    str++;
-    }; 	  
+    }; 
 
     if (*str == '-')
 	    sign=1;
 
     // sign = (*s == '-');
     if (*str == '-' || *str == '+') 
-	    str++;
+        str++;
 
     while (*str && *str >= '0' && *str <= '9') 
-	{
-	    rv = (rv * 10) + (*str - '0');
+    {
+        rv = (rv * 10) + (*str - '0');
         str++;
     };
 
@@ -1474,18 +1480,21 @@ char *itoa (int i)
 
 /* 
  reverse:  
-     reverse string s in place */
+     reverse string s in place 
+*/
 
 void reverse (char s[]){
-	
+
      int i, j;
-     char c;
+     char c=0;
  
-     for (i = 0, j = strlen(s)-1; i<j; i++, j--) {
+     for (i = 0, j = strlen(s)-1; i<j; i++, j--)
+     {
          c = s[i];
+         
          s[i] = s[j];
          s[j] = c;
-     }
+     };
 }
 
 
@@ -1497,19 +1506,20 @@ void itoa (int n, char s[]){
 	
      int i, sign;
  
-     if ((sign = n) < 0)  /* record sign */
-         n = -n;          /* make n positive */
+    if ((sign = n) < 0)  /* record sign */
+        n = -n;          /* make n positive */
     i = 0;
     
-	do {       /* generate digits in reverse order */
+    do {       /* generate digits in reverse order */
          s[i++] = n % 10 + '0';   /* get next digit */
-     } while ((n /= 10) > 0);     /* delete it */
+    } while ((n /= 10) > 0);     /* delete it */
      
 	if (sign < 0)
          s[i++] = '-';
      s[i] = '\0';
-	
-     reverse(s);
+
+
+     reverse (s);
  }
 
 
@@ -1611,7 +1621,7 @@ strtod (char *str, char **ptr)
 
 
 // ok.
-int abs ( int j)
+int abs(int j)
 {
     return (j < 0 ? -j : j);
 }
@@ -1990,8 +2000,8 @@ void setprogname(const char *progname)
     debug_print("setprogname: [TODO]\n");
 }
 
-void *
-bsearch ( 
+
+void *bsearch ( 
     const void *key, 
     const void *base, 
     size_t nmemb,

@@ -228,8 +228,10 @@ ssize_t write_VC (int fd, const void *buf, size_t count)
 // Usam a lista de arquivos abertos do processo.
 ssize_t read (int fd, const void *buf, size_t count){
 
-    if (fd<0)
+    if (fd<0){
+        debug_print ("read: fd\n");
         return -1;
+    }
 
     return (ssize_t) gramado_system_call ( 18, 
                          (unsigned long) fd,
@@ -247,8 +249,10 @@ ssize_t read (int fd, const void *buf, size_t count){
 // Usam a lista de arquivos abertos do processo. 
 ssize_t write (int fd, const void *buf, size_t count){
 
-    if (fd<0)
+    if (fd<0){
+        debug_print ("write: fd\n");
         return -1;
+    }
 
     return (ssize_t) gramado_system_call ( 19, 
                          (unsigned long) fd,
@@ -260,6 +264,12 @@ ssize_t write (int fd, const void *buf, size_t count){
 ssize_t pread (int fd, void *buf, size_t count, off_t offset)
 {
     debug_print ("pread: [TODO]\n");
+
+    if (fd<0){
+        debug_print ("pread: fd\n");
+        return -1;
+    }
+
     return -1;
 
     /*   
@@ -281,7 +291,13 @@ pwrite (
     size_t count, 
     off_t offset )
 {
-    debug_print ("pread: [TODO]\n");
+
+    if (fd<0){
+        debug_print ("pwrite: fd\n");
+        return -1;
+    }
+
+    debug_print ("pwrite: [TODO]\n");
     return -1;
 }
 
@@ -294,8 +310,14 @@ int truncate(const char *path, off_t length)
 }
 
 
-int ftruncate(int fd, off_t length)
+int ftruncate (int fd, off_t length)
 { 
+
+    if (fd<0){
+        debug_print ("ftruncate: fd\n");
+        return -1;
+    }
+        
     debug_print ("ftrucate: [TODO]\n");
     return -1;
 }
@@ -447,9 +469,8 @@ gid_t getgid (void)
 {
 	//SYSTEMCALL_GETCURRENTGROUPID
 
-	return (gid_t) gramado_system_call ( 154, 0, 0, 0 );
+    return (gid_t) gramado_system_call ( 154, 0, 0, 0 );
 }
-
 
 
 char *getcwd(char *buf, size_t size)
@@ -499,6 +520,9 @@ void sysbeep()
 
 int dup (int oldfd){
 
+    //if ( oldfd < 0 ) 
+        //return -1;
+
     return (int) gramado_system_call ( (unsigned long) oldfd, 
                      0, 0, 0 );
 }
@@ -511,6 +535,9 @@ int dup (int oldfd){
 
 int dup2 (int oldfd, int newfd){
 
+    //if ( oldfd < 0 ) 
+        //return -1;
+
     return (int) gramado_system_call ( (unsigned long) oldfd, 
                      (unsigned long) newfd, 0, 0 );
 }
@@ -522,6 +549,12 @@ int dup2 (int oldfd, int newfd){
  */
 
 int dup3 (int oldfd, int newfd, int flags){
+
+    //if ( oldfd < 0 ) 
+        //return -1;
+
+    //if ( newfd < 0 ) 
+        //return -1;
 
     return (int) gramado_system_call ( (unsigned long) oldfd, 
                      (unsigned long) newfd, 
@@ -704,6 +737,12 @@ long sysconf (int name)
 int fsync (int fd)
 {
     debug_print ("fsync: [TODO]\n");
+    
+    if (fd<0){
+        debug_print ("fsync: fd\n");
+        return -1;
+    }    
+    
     return -1;    //#todo
 }
 
@@ -716,6 +755,11 @@ int fsync (int fd)
 int fdatasync (int fd)
 {
     debug_print ("fdatasync: [TODO]\n");
+
+    if (fd<0){
+        debug_print ("fdatasync: fd\n");
+        return -1;
+    }    
     return -1; //#todo
 }
 
@@ -733,6 +777,12 @@ void sync(void)
 int syncfs(int fd)
 {
     debug_print ("syncfs: [TODO]\n");
+
+    if (fd<0){
+        debug_print ("syncfs: fd\n");
+        return -1;
+    }    
+    
     return -1;
 }
 
@@ -755,6 +805,13 @@ int syncfs(int fd)
 int close (int fd){
 
     int __ret = -1;
+
+
+    
+    if (fd<0){
+        debug_print ("close: fd\n");
+        return -1;
+    }    
     
     __ret = (int) gramado_system_call ( 17, 
                      (unsigned long) fd, 
@@ -1025,6 +1082,11 @@ char *ttyname (int fd){
 
     static char buf[PATH_MAX];
     int rv=0;
+    
+    if (fd<0){
+        debug_print ("ttyname: fd\n");
+        return (char *) 0;
+    }    
 
     rv = (int) ttyname_r (fd, buf, sizeof(buf));
 
@@ -1161,16 +1223,15 @@ execvpe (
 }
 
 
-
-int chown(const char *pathname, uid_t owner, gid_t group)
+// Maybe it is easy.
+int chown (const char *pathname, uid_t owner, gid_t group)
 {
     debug_print ("chown: [TODO]\n");
     return -1; 
 }
 
 
-
-
+// Maybe it is easy.
 int fchown(int fd, uid_t owner, gid_t group)
 {
     debug_print ("fchown: [TODO]\n");
@@ -1178,8 +1239,7 @@ int fchown(int fd, uid_t owner, gid_t group)
 }
 
 
-
-
+// Maybe it is easy.
 int lchown (const char *pathname, uid_t owner, gid_t group)
 {
     debug_print ("lchown: [TODO]\n");
@@ -1384,9 +1444,7 @@ int tcreat ( int a)
 
 int eq (char *a, char *b){
 
-    int i;
-
-    i = 0;
+    int i=0;
 
 l:
     if (a[i] != b[i])

@@ -18,8 +18,7 @@
 
 
 // #todo
-void *
-mmap ( 
+void *mmap ( 
     void *addr, 
     size_t length, 
     int prot, 
@@ -28,6 +27,9 @@ mmap (
     off_t offset )
 {
     debug_print ("mmap: [TODO]\n");
+    
+    //if (fd<0){}
+    
     return NULL; 
 }
 

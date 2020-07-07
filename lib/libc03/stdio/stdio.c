@@ -30,7 +30,6 @@
 #include <stddef.h>
 #include <ctype.h>
 #include <fcntl.h>
-
 #include <errno.h>
 
 // System calls.
@@ -41,16 +40,12 @@
 char **environ;
 
 
-
 // #importante: 
 // Tem que inicializar isso.
 
 static int __libc_output_mode = 0;
 static int terminal___PID;
 
-
-
-// Testando define.
 
 #define  SYSTEMCALL_READ_LBA    1
 #define  SYSTEMCALL_WRITE_LBA   2
@@ -307,16 +302,15 @@ _strout (
 
 // #todo:
 // Se for NULL faz flush em todos.
-int fflush (FILE *stream){
-
-    return (int) __fflush (stream);
+int fflush (FILE *stream)
+{
+    return (int) __fflush(stream);
 }
 
 
 // real flush.
 int __fflush (FILE *stream){
-	
-	
+
     int nwrite = -1;
 
      //debug_print( "__fflush:\n");
@@ -324,10 +318,10 @@ int __fflush (FILE *stream){
     // FIXME: fflush(NULL) should flush all open output streams.
     //ASSERT(stream);
     
-    if ( (void *) stream == NULL )
-    {
+    if ( (void *) stream == NULL ){
         debug_print( "__fflush: stream\n");
         return (int) (-1);
+ 
     }else{
 
         // Check something!
@@ -625,7 +619,7 @@ int putc (int ch, FILE *stream){
 // See: unix v7
 int fgetc ( FILE *stream )
 {
-    return (int) getc (stream);
+    return (int) getc(stream);
 }
 
 
@@ -633,7 +627,7 @@ int fgetc ( FILE *stream )
 // See: unix v7
 int fputc ( int ch, FILE *stream )
 {
-    return (int) putc (ch, stream);
+    return (int) putc(ch,stream);
 }
 
 
@@ -644,7 +638,7 @@ int fputc ( int ch, FILE *stream )
 
 // don't change it
 int getchar (void){
-    return (int) getc (stdin);
+    return (int) getc(stdin);
 }
 
 // don't change it
@@ -734,7 +728,7 @@ int getw (FILE *stream){
 
     register i;
 
-    i = getc (stream);
+    i = getc(stream);
 
 	//#todo
 	//if (stream->_flags&_IOEOF)
@@ -773,6 +767,7 @@ int putw (int w, FILE *stream)
 int fclose (FILE *stream){
 
     int __ret = -1;
+
 
     if ( (void *) stream == NULL )
        return EOF;
@@ -941,10 +936,10 @@ FILE *fopen2 ( const char *filename, const char *mode ){
     
     __stream = (FILE *) malloc( sizeof(FILE) );
     
-    if ( (void *) __stream == NULL )
-    {
+    if ( (void *) __stream == NULL ){
         printf("fopen2: __stream\n");
         return NULL;
+        
     }else{
 
         //__stream->? 
@@ -1255,8 +1250,6 @@ size_t fwrite (const void *ptr, size_t size, size_t n, FILE *fp){
         return (size_t) -1;
     }
 
- 
-      
     // Quantidade de elementos.
     if ( n <= 0 ){
         printf ("fwrite: n \n");
@@ -1652,8 +1645,8 @@ int print ( char **out, int *varg ){
  
 // Padrão não tradicional, mas funciona. 
 
-int printf3 ( const char *format, ... ){
-
+int printf3 ( const char *format, ... )
+{
     register int *varg = (int *)(&format);
 
     return (int) print ( 0, varg );
@@ -1868,6 +1861,7 @@ int nlsprintf ( char *out, const char *format, ... ){
     tmp = (char *) stdio_nextline (out);
 
     if (tmp == NULL ){
+        // ?? message
         return -1;
     }
 
@@ -1890,32 +1884,30 @@ int nlsprintf ( char *out, const char *format, ... ){
 //opção 
 //int sprintf(char *str, const char *format, ...) ?? 
 
-int sprintf ( char *out, const char *format, ... ){
-
+int sprintf ( char *out, const char *format, ... )
+{
     register int *varg = (int *)(&format);
 
     return (int) print( &out, varg );
 }
 
 
-void printchar ( char **str, int c ){
-
+void printchar ( char **str, int c )
+{
     if (str) 
     {
         **str = c;
 
         ++(*str);
 
-    } else (void) putchar (c);
+    } else (void) putchar(c);
 }
 
 
 
-
-
-
 // Setup libc mode.
-void libc_set_output_mode ( int mode ){
+void libc_set_output_mode (int mode){
+
 
     switch (mode)
     { 
@@ -2142,19 +2134,19 @@ void _outbyte ( int c ){
 
 unsigned long input ( unsigned long ch ){
 
-	//save cursor position.
-	unsigned long tmpX, tmpY;
-	
+	// Save cursor position.
+    unsigned long tmpX, tmpY;
+
 	// Convert.
-	char c = (char) ch;    
+    char c = (char) ch;    
 
 
-	
+
 	// Ajust prompt max.
-	if ( prompt_max == 0 || prompt_max >= PROMPT_MAX_DEFAULT )
-	{
-		prompt_max = PROMPT_MAX_DEFAULT;
-	}
+    if ( prompt_max == 0 || prompt_max >= PROMPT_MAX_DEFAULT )
+    {
+        prompt_max = PROMPT_MAX_DEFAULT;
+    }
 	
 	//Filtra limite.
 	//retornar 1??
@@ -2413,27 +2405,32 @@ ssize_t getline(char** lineptr, size_t* n, FILE* stream)
 
 int ungetc ( int c, FILE *stream ){
 
-    //ASSERT(stream);
-    if ( (void *) stream == NULL )
-        return EOF;
-    
+
     if (c == EOF)
         return EOF;
-    
-    // Não precisamos mudar.
-    if (stream->have_ungotten)
+ 
+    if ( (void *) stream == NULL ){
+        debug_print ("unget: stream\n");
         return EOF;
-    
-    // Mudando.
-    stream->have_ungotten = TRUE;
-    
-    // Salva.
-    stream->ungotten = c;
-    
-    
-    stream->eof = FALSE;
+ 
+    }else{
 
-    return c;
+        // Não precisamos mudar.
+        if (stream->have_ungotten)
+            return EOF;
+
+        // Mudando.
+        stream->have_ungotten = TRUE;
+    
+        // Salva.
+        stream->ungotten = c;
+    
+        stream->eof = FALSE;
+        
+        return (int) c;
+    };
+
+    return EOF;
 }
 
 
@@ -2454,12 +2451,18 @@ static __inline__ off_t ftell(FILE *__f)
 //This function returns the current file position of the stream stream. 
 long ftell (FILE *stream){
 
-    if ( (void *) stream == NULL )
+    if ( (void *) stream == NULL ){
+        debug_print ("ftell: stream\n");
         return 0;
-        
-    fflush (stream);
     
-    return (long) lseek ( fileno(stream) , 0, SEEK_CUR);
+    }else{
+
+        fflush (stream);
+        
+        return (long) lseek ( fileno(stream) , 0, SEEK_CUR);    
+    };
+
+    return 0;
 }
 
 
@@ -2489,8 +2492,8 @@ int linux_fgetc (FILE *f){
   
     if ( (void *) f == NULL )
        return EOF;
-  
-    
+
+
     return ( fread (&ch, 1, 1, f) == 1) ? (int) ch : EOF;
 }
 
@@ -2511,26 +2514,25 @@ char *fgets2 (char *s, int count, FILE *fp){
 
     // Guard against count arg == INT_MIN. 
     while (count-- > 1) 
-    {		
-		ch = getc (fp);
+    {
+        ch = getc (fp);
 
-        if (ch == EOF){
-            break;
-        }
+        if (ch == EOF){ break; }
 
-		*p++ = ch;
-		
-		if (ch == '\n') { break; }
+        *p++ = ch;
+
+        if (ch == '\n') { break; }
+    };
+
+
+    if ( ferror(fp) || (s == p) ) 
+    {
+        return (char *) 0;
     }
-
-	if ( ferror(fp) || (s == p) ) 
-	{
-		return 0;
-	}
 
     *p = 0;
 
-    return s;
+    return (char *) s;
 }
 
 
@@ -2581,7 +2583,7 @@ char *gets2 (char *s){
 
     while (1)
     {
-        ch = (int) getchar ();
+        ch = (int) getchar();
 		
         if ( ch != -1 )
 		{
@@ -2637,8 +2639,10 @@ done:
 // isso deve escrever no arquivo, assim como
 // tudo em libc.
 
-//  wtf ??
-int puts2 ( const char *str ){
+// ??
+
+int puts2 ( const char *str )
+{
     return (int) printf ("%s",str);
 }
 
@@ -2654,23 +2658,17 @@ int puts2 ( const char *str ){
 
 int getchar2 (void){
 
-    int Ret = 0;
+    int Ret=0;
 
 	// #todo: 
 	// ? Já temos uma função para essa chamada ? 137.
 
 Loop:
-
     Ret = (int) gramado_system_call ( 137, 0, 0, 0 ); 
-
-    if (Ret > 0)
-    {
+    if (Ret > 0){
         return (int) Ret;    
     }
-
-
     goto Loop;
-    
 
     //if ( (void *) stdin == NULL )
        //return EOF;
@@ -3062,34 +3060,38 @@ int sscanf ( const char *str, const char *format, ... ){
     for ( ; *format != '\0'; format++ )
     {
 
-		if ( *format == '%' && format[1] == 'd' ){
-			
-			int positive;
-			int value;
-			int *valp;
-			
-			if (*str == '-') {
+        if ( *format == '%' && format[1] == 'd' ){
+
+            // #bugbug
+            // Podemos definir isso no início da função.
+            int positive;
+            int value;
+            int *valp;
+
+            if (*str == '-'){
 				positive = 0;
 				str++;
-			} else
+            } else
 				positive = 1;
 			if (!isdigit(*str))
 				break;
 			value = 0;
-			do {
+            do {
 				value = (value * 10) - (*str - '0');
 				str++;
-			} while (isdigit(*str));
+            } while (isdigit(*str));
+
 			if (positive)
 				value = -value;
 			valp = va_arg(args, int *);
 			*valp = value;
 			format++;
-		} else if (*format == *str) {
-			str++;
-		} else
-			break;
-	};
+
+        } else if (*format == *str) {
+            str++;
+        } else
+            break;
+    };
 
     va_end (args);
 
@@ -3144,15 +3146,17 @@ int sscanf ( const char *str, const char *format, ... ){
 //typedef long long intmax_t;
 //#else
 typedef unsigned int uintmax_t;
-typedef int intmax_t;
+typedef int          intmax_t;
 //#endif
-typedef unsigned char u_char;
-typedef unsigned int u_int;
-typedef unsigned long u_long;
+typedef unsigned char  u_char;
+typedef unsigned int   u_int;
+typedef unsigned long  u_long;
 typedef unsigned short u_short;
-typedef unsigned long long u_quad_t;
-typedef long long quad_t;
+
+typedef unsigned long long u_quad_t;  //#bugbug
+typedef long long quad_t;             //#bugbug
 typedef unsigned long uintptr_t;
+
 //typedef long ptrdiff_t;
 //#define NULL ((void*)0)
 #define NBBY    8               /* number of bits in a byte */
@@ -3191,14 +3195,14 @@ static size_t stdio_strlen (const char *s)
  * The buffer pointed to by `nbuf' must have length >= MAXNBUF.
  */
  
-static char *
-ksprintn ( 
+static char *ksprintn ( 
     char *nbuf, 
     uintmax_t num, 
     int base, 
     int *lenp, 
     int upper )
 {
+
     char *p, c;
 
 
@@ -3209,11 +3213,10 @@ ksprintn (
 
 
     do {
+        c = hex2ascii (num % base);
 
-		c = hex2ascii (num % base);
-		
-		*++p = upper ? toupper(c) : c;
-		
+        *++p = upper ? toupper(c) : c;
+
     } while (num /= base);
 
 
@@ -3337,30 +3340,30 @@ kvprintf (
 		zflag = 0;
 		
         reswitch:  
-    
-	    switch ( ch = (u_char) *fmt++ ){
-			
-		case '.':
+
+        switch ( ch = (u_char) *fmt++ ){
+
+        case '.':
 			dot = 1;
 			goto reswitch;
-			
-		case '#':
+
+        case '#':
 			sharpflag = 1;
 			goto reswitch;
-			
-		case '+':
+
+        case '+':
 			sign = 1;
 			goto reswitch;
-			
-		case '-':
+
+        case '-':
 			ladjust = 1;
 			goto reswitch;
-			
-		case '%':
+
+        case '%':
 			PCHAR(ch);
 			break;
-			
-		case '*':
+
+        case '*':
 			if (!dot) 
 			{
 				width = va_arg(ap, int);
@@ -3376,14 +3379,14 @@ kvprintf (
 				dwidth = va_arg(ap, int);
 			};
 			goto reswitch;
-			
-		case '0':
+
+        case '0':
 			if (!dot) 
 			{
 				padc = '0';
 				goto reswitch;
 			}
-			
+
 		case '1': 
 		case '2': 
 		case '3': 
@@ -3667,15 +3670,15 @@ kvprintf (
 		};
 	};
 #undef PCHAR
-};
+}
 
 
-static void xxxputchar ( int c, void *arg ){
-	
+static void xxxputchar ( int c, void *arg )
+{
 	/* add your putchar here */
 	
 	//printf("%c",c);
-    putchar ( (int) c );
+    putchar( (int) c );
 }
 
 
@@ -3758,8 +3761,6 @@ int printf_draw ( const char *fmt, ... ){
 	//reabilita o modo normal. Onde os caracteres serão colocados 
 	//no stdout.
 	libc_set_output_mode ( LIBC_NORMAL_MODE );
-
-
 
     return 0;
 }
@@ -3849,12 +3850,13 @@ vfprintf (
 
 int vprintf (const char *fmt, va_list ap){
 
-    if ( (void *) stdout == NULL )
+    if ( (void *) stdout == NULL ){
+       debug_print ("vprint: stdout\n");
        return EOF;
+    }
 
-    return vfprintf (stdout, fmt, ap);
+    return (int) vfprintf (stdout, fmt, ap);
 }
-
 
 
 //printf que escreve no stdout. 
@@ -3876,19 +3878,21 @@ int stdout_printf (const char *format, ...){
 }
 
 
-//printf que escreve no stderr. 
-//#bugbug: não devemos usar stream em ring3.
+// printf que escreve no stderr. 
 int stderr_printf (const char *format, ... ){
-	
+
     int done=0;
 
     va_list arg;
     va_start (arg, format);
-    
 
-    if ( (void *) stderr == NULL )
+    if ( (void *) stderr == NULL ){
+       debug_print ("stderr_printf: stderr\n");
        return EOF;
+    }
 
+    // Print!
+    
     done = vfprintf (stderr, format, arg);
 
     va_end (arg);
@@ -3986,9 +3990,12 @@ static void sized_buffer_putch(char*& bufptr, char ch)
 
 
 
+/*
+ * snprintf:
+ * 
+ *     #todo
+ */
 
-
-// #todo
 int snprintf ( char *str, size_t count, const char *fmt, ... ){
 
     size_t ret;
@@ -3996,6 +4003,8 @@ int snprintf ( char *str, size_t count, const char *fmt, ... ){
     va_list ap;
     va_start (ap, fmt);
 
+
+    debug_print ("snprintf: [TODO]\n");
 
 	//#todo 
 	//Isso parece fácil
@@ -4173,12 +4182,15 @@ _fwalk(int (*function)(FILE *))
 
 int libcStartTerminal (void){
 
-    int PID;
+    int PID=0;
+    
+    debug_print ("libcStartTerminal: [DEPRECATED]\n");
 
     // 'Clona' e executa o noraterm como processo filho. 
     //PID = (int) system_call ( 900, (unsigned long) "noraterm.bin", 0, 0 );
 
-    PID = (int) gramado_system_call ( 900, (unsigned long) "noraterm.bin", 0, 0 );
+    PID = (int) gramado_system_call ( 900, 
+                    (unsigned long) "noraterm.bin", 0, 0 );
 
     // Exibe o PID para debug.
     //printf ("PID = %d \n", PID);
@@ -4192,10 +4204,11 @@ int libcStartTerminal (void){
     //pega o pid do terminal atual
     PID = (int) gramado_system_call ( 1004, 0, 0, 0 ); 
 
-    if ( PID <= 0 ){
-		printf ("PID fail. We can't send the message\n");
-	    return -1;
-	}
+    if ( PID <= 0 )
+    {
+        printf ("PID fail. We can't send the message\n");
+        return -1;
+    }
 
 
 	//manda uma mensagem pedindo para o terminal dizer hello.
@@ -4215,8 +4228,8 @@ int libcStartTerminal (void){
 
 void setbuf (FILE *stream, char *buf)
 {
-    debug_print ("setbuf: [TODO]\n");
-    //setvbuf(stream, buf, buf ? _IOFBF : _IONBF, BUFSIZ);
+    debug_print ("setbuf: [FIXME]\n");
+    setvbuf(stream, buf, buf ? _IOFBF : _IONBF, BUFSIZ);
 }
 
 
@@ -4228,8 +4241,10 @@ void setbuf (FILE *stream, char *buf)
 
 void setbuffer (FILE *stream, char *buf, size_t size){
 
-    if ( (void *) stream == NULL )
+    if ( (void *) stream == NULL ){
+       debug_print ("setbuffer: stream\n");
        return;
+    }
 
     gramado_system_call ( 611, 
         (unsigned long) stream, 
@@ -4244,8 +4259,8 @@ void setbuffer (FILE *stream, char *buf, size_t size){
 
 void setlinebuf (FILE *stream)
 {
-    debug_print ("setlinebuf: [TODO]\n");
-    //setvbuf(stream, nullptr, _IOLBF, 0);
+    debug_print ("setlinebuf: [FIXME]\n");
+    setvbuf (stream, (char *) 0, _IOLBF, 0);
 }
 
 
@@ -4254,12 +4269,21 @@ void setlinebuf (FILE *stream)
 //a new buffer will be allocated on the next read or write operation. 
 // See: https://linux.die.net/man/3/setvbuf
 
-int setvbuf (FILE *stream, char *buf, int mode, size_t size){
+int 
+setvbuf (
+    FILE *stream, 
+    char *buf, 
+    int mode, 
+    size_t size )
+{
 
-    if (size <= 0)
-        return (-1);
+    // stream
+    if ( (void *) stream == NULL ){
+       debug_print ("setvbuf: stream\n");
+       return -1;
+    }
 
-
+    // mode
     // #bugbug
     // Esse tratamanto de bits pode estar errado.
     // unbuffered, line buffered, fully buffered 
@@ -4271,6 +4295,14 @@ int setvbuf (FILE *stream, char *buf, int mode, size_t size){
         //errno = EINVAL;
         return -1;
     }
+
+
+    //size
+    if (size <= 0){
+        debug_print ("setvbuf: size fail\n");
+        return (-1);
+    }
+
 
 
     /*
@@ -4326,10 +4358,12 @@ int setvbuf (FILE *stream, char *buf, int mode, size_t size){
 }
 
 
-unsigned int filesize (FILE * fp){
+unsigned int filesize (FILE *fp){
 
-    if (!fp) 
+    if (!fp){ 
+        debug_print ("filesize: fp\n");
         return 0;
+    }
 
     fseek (fp, 0, SEEK_END);
 
@@ -4337,25 +4371,24 @@ unsigned int filesize (FILE * fp){
 
     rewind (fp);
 
-
     return ret;
 }
 
 
+char *fileread (FILE *fp){
 
+    if (!fp){ 
+        debug_print ("fileread: fp\n");
+        return (char *) 0;
+    }
 
-char *fileread (FILE * fp){
+    unsigned int buffer_size = filesize(fp);
 
-    if (!fp) 
-        return 0;
-
-    unsigned int buffer_size = filesize (fp);
-
-    char *buff = (char *) malloc (buffer_size);
+    char *buff = (char *) malloc(buffer_size);
 
     fread (buff, sizeof(char), buffer_size, fp);
 
-    return buff;
+    return (char *) buff;
 }
 
 
@@ -4383,7 +4416,7 @@ int vdprintf (int fd, const char *format, va_list ap)
 
 static int skip_atoi(const char **s)
 {
-	int i=0;
+    int i=0;
 
 	while (__is_digit(**s))
 		i = i*10 + *((*s)++) - '0';
@@ -4406,8 +4439,7 @@ __asm__("divl %4":"=a" (n),"=d" (__res):"0" (n),"1" (0),"r" (base)); \
 __res; })
 
 
-static char *
-number ( 
+static char *number ( 
     char *str, 
     int num, 
     int base, 
@@ -4956,12 +4988,12 @@ int fgetpos (FILE *stream, fpos_t *pos ){
     }
     */
     
-    *pos = ftell (stream);
+    *pos = ftell(stream);
 
     if (*pos < 0L)
         return(-1);
  
-    return(0);
+    return 0;
 }
 
 
@@ -4970,7 +5002,7 @@ int fsetpos (FILE *stream, const fpos_t *pos){
     if ( (void *) stream == NULL )
        return EOF;
 
-    return fseek (stream, (long) *pos, SEEK_SET);
+    return (int) fseek (stream, (long) *pos, SEEK_SET);
 }
 
 

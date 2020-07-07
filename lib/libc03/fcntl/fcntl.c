@@ -27,7 +27,9 @@ int fcntl ( int fd, int cmd, ... )
 {
     debug_print("fcntl: [TODO]\n");
 
+
     if (fd<0) {
+        debug_print("fcntl: fd\n");
         return -1;
     }
 
@@ -49,13 +51,16 @@ int fcntl ( int fd, int cmd, ... )
 
 int openat (int dirfd, const char *pathname, int flags){
 
-
-    // #todo:
-    // firfd, Flags.
-
     int __ret = -1;
 
 
+    // #todo:
+    // firfd, Flags.
+    
+    //todo
+    //if ( dirfd < 0 ){ return -1; }
+    
+    
     if (!pathname) {
         //errno = EFAULT;
         return -1;
@@ -83,6 +88,9 @@ int openat (int dirfd, const char *pathname, int flags){
 // lista de arquivos abertos e retornar o índice. 
 
 int open (const char *pathname, int flags, mode_t mode){
+
+    int __fd = -1;
+
 
     //#bugbug
     // desse jeito não teremos um buffer em ring3. ??
@@ -116,8 +124,6 @@ int open (const char *pathname, int flags, mode_t mode){
     // A chamada não oferecerá um endereço em ring3,
     // pois não dá pra confiar na biblioteca,
     // o kernel não pode confiar na qualidade da libc.
-        
-    int __fd = -1;
     
     
     //IN: service, name, address, 0, 0 
