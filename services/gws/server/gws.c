@@ -131,9 +131,14 @@ int gwsInit (){
     gui->main = gui->screen;
 
     
+    
+    // #todo
+    // Configurar a estrutura de cliente.
+    // Inicializar a lista de clientes.
+    
     // #kgws.
+    // Isso usa o kernel.
     gde_show_backbuffer ();
-
 
     return 0;
 }
