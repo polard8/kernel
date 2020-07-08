@@ -1340,6 +1340,13 @@ int main ( int argc, char *argv[] ){
     debug_print ("---------------------------\n");    
     debug_print ("terminal: Initializing ...\n");
 
+
+    //#test
+    Terminal.pid = getpid();
+    Terminal.uid = getuid();
+    Terminal.gid = getgid();
+
+
     //
     // socket
     // 
@@ -1357,7 +1364,10 @@ int main ( int argc, char *argv[] ){
        printf ("terminal: Couldn't create socket\n");
        exit(1);
     }
-
+    
+    // Saving the fd in the main struct.
+    Terminal.client_fd = client_fd;
+    //...
 
     //porta para o Window Server 'ws' em gramado_ports[]
     struct sockaddr_in addr_in;
@@ -1397,17 +1407,35 @@ int main ( int argc, char *argv[] ){
     // Mas como sabemos que é um soquete,
     // então sabemos que é possível ler.
 
+
+    //
+    // Test 1
+    //
    
     // Testing hello message
     terminal_hello_request(client_fd);
     terminal_hello_response(client_fd);
+
+
+    //
+    // Test 2
+    //
+
 
     //Creating the main window
     int __response_wid = 0;
     __response_wid = terminal_createwindow_request(client_fd, 100, 100, 480, 320, COLOR_BLACK);
     terminal_createwindow_response(client_fd); 
 
+    // Saving the window id.
+    Terminal.window_id = __response_wid;
+    // ...
+    
 
+    //
+    // Test 3
+    //
+ 
 
     __tmp_x = 40;
     __tmp_y = 40;
@@ -1416,17 +1444,22 @@ int main ( int argc, char *argv[] ){
     //testing draw a char in a window.
     terminal_drawchar_request (
         (int) client_fd,//fd,
-    (int) __response_wid, //window_id,
-    (unsigned long) __tmp_x,//left,
-    (unsigned long) __tmp_y,//top,
-    (unsigned long) COLOR_RED,
-    (unsigned long) 'X' );
-    
+        (int) __response_wid, //window_id,
+        (unsigned long) __tmp_x,//left,
+        (unsigned long) __tmp_y,//top,
+        (unsigned long) COLOR_RED,
+        (unsigned long) 'X' );
+
     terminal_drawchar_response((int) client_fd);
     
     //#debug
     //hanging
     //while(1){}
+
+
+    //
+    // Loop!
+    //
 
 
     // loop

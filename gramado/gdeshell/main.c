@@ -1,3 +1,6 @@
+// A simple shell
+// This shell uses the virtual console, not the virtual terminal.
+
 /*
  * File: main.c - gdeshell - bash 1.05 clone. (baseado no bash)
  * #todo Para esse aplicativo vou usar o prompt: [username@hostname] $
@@ -3125,8 +3128,8 @@ do_compare:
 
 
 
-	// wait-test - Vamos esperar por qualquer um dos filhos.
-	int ___wait_status;
+    // wait-test - Vamos esperar por qualquer um dos filhos.
+    int ___wait_status;
     if ( gramado_strncmp( prompt, "wait-test", 9 ) == 0 )
     {
         //wait (&___wait_status);
@@ -3135,21 +3138,21 @@ do_compare:
     }
 
 
+    // Wait for a reason.
     if ( gramado_strncmp ( prompt, "wait-reason", 11 ) == 0)
     {
-	    printf ("gdeshell: child ...\n");
-        system_call ( 900, (unsigned long) "launcher.bin", 0, 0 );
+        printf ("gdeshell: child ...\n");
+        system_call ( 900, (unsigned long) "false.bin", 0, 0 );
     
         printf ("gdeshell: still alive 1 ...\n");
         
-		// wait for a reason. (current thread.)
-		gramado_system_call ( 970, 
-		    WAIT_REASON_TEST, 
-		    WAIT_REASON_TEST, 
-		    WAIT_REASON_TEST );
-		
-		printf ("gdeshell: still alive 2 ...\n");
+        // Wait for a reason. (current thread.)
+        gramado_system_call ( 970, 
+            WAIT_REASON_TEST, 
+            WAIT_REASON_TEST, 
+            WAIT_REASON_TEST );
 
+        printf ("gdeshell: still alive 2 ...\n");
         goto exit_cmp;
     }
 
@@ -3158,24 +3161,18 @@ do_compare:
 	//
 
 
-    // Se apertamos o enter e n�o encontramos um comando v�lido
-    // ent�o damos um aviso de comando inv�lido e reiniciamos o prompt 
-    // na pr�xima linha.
-	
-	//fail.
-	int Execve_Ret = 1;
-	
-    //unsigned long a1 = (unsigned long) tokenList[0];
-	
-	//char *a1 = tokenList[1];
-	//char *a1 = tokenList[2];
-	
-	
+    // Se apertamos o enter e não encontramos um comando válido.
+    // Então damos um aviso de comando inválido e 
+    // reiniciamos o prompt na próxima linha.
+
+    //fail.
+    int Execve_Ret = 1;
+
 doexec_first_command:
 
     //
-	// ## TEST ##
-	//
+    // ## TEST ##
+    //
 
 	// #importante:
 	// Se estamos aqui � porque o comando n�o corresponde a nenhuma das 
@@ -3191,50 +3188,52 @@ doexec_first_command:
 	// +Pathname relativo � somente aquele que � apenas um nome 
 	// de arquivo dentro do diret�rio atual. Como: 'name' ou name1/name2,
 	// sem barra ou ponto.
-	
+
+    // #bugbug
+    // It is wrong!
+
     absolute = absolute_pathname ( (char *) tokenList[0] );
-	
+
     switch (absolute)
-	{
+    {
 		//N�o � absoluto ou falhar
-		case 0:
+        case 0:
 		    //printf("doexec_first_command: not absolute pathname\n");
 		    break;
 			
 		//� absoluto	
-		case 1:
+        case 1:
 		    printf("doexec_first_command: absolute pathname\n");
 			
 			break;
 			
 		//falha	
-		case 2:
+        case 2:
 		default:
 		    printf("doexec_first_command: pathname fail\n");
 			break;
-	};   
+    }; 
 
     // Trata no caso de ser absoluto.
-	// + Eliminar ./ pois se trata de arquivo no diret�rio atual.
-	if (absolute == 1)
-	{
-		//#bugbug: Essa defini��o n�o deve ficar aqui.
-		char *t = (char *) tokenList[0];
-		
-		if ( *t == '.' )
-		{
-			t++;
-			
-		    if ( *t == '/' )
-			{	
-				t++;
-				tokenList[0] = (char *) t;
-			}
-	    };	
-	};
-		
-	
-	
+    // + Eliminar ./ pois se trata de arquivo no diret�rio atual.
+    if (absolute == 1)
+    {
+        // #bugbug: 
+        // Essa definição não deve ficar aqui.
+        char *t = (char *) tokenList[0];
+
+        if ( *t == '.' )
+        {
+            t++;
+            if ( *t == '/' ){
+                t++;
+                tokenList[0] = (char *) t;
+            }
+        }
+    }
+
+
+
 	//
 	// ## Executando um programa no formato ">test.bin"
 	//
@@ -3268,38 +3267,39 @@ doexec_first_command:
 		p++;
 	}
 	*/
-	
-	
-	//#todo: Colocar isso no in�cio dessa fun��o.
-	unsigned long buffer[5];
-	int z;
-	
-	// Colocamos todos os ponteiros no array.
-	for ( z=0; z<____token_count; z++ )
-	{
-	    buffer[z] = (unsigned long) tokenList[z];	
-	}
-	
-	
+
+
+
+
+    // #todo: 
+    // Colocar isso no início dessa função.
+    unsigned long buffer[5];
+    int z=0;
+
+
+
+    // Copiando todos os ponteiros para um array.
+    for ( z=0; z<____token_count; z++ ){
+        buffer[z] = (unsigned long) tokenList[z];
+    };
+
+
+
 	//
 	// Clone !
 	//
 
-    // #test
+    // Clonning the process!
     // Clone e executa o processo filho.
-    // O shell n�o sai ... o filho fica em background.
-    // poder�amos incluir o e comercial no fim da linha de comando. (&)  
+    // O shell não sai ... o filho fica em background.
+    // (&) podemos usar o 'e' comercial no fim da linha de comandos.  
 
     int fake_pid;
-    fake_pid = (int) system_call ( 900, (unsigned long) tokenList[0], 0, 0 ); 
-    //printf ("gdeshell: still alive!\n");
-
-
-    //#todo
-    // Precisamos pegar o comando para sabermos se o comando
-    // � inv�lido ou n�o. 
-    if (fake_pid < 0)
-    {
+    fake_pid = (int) system_call ( 900, 
+                         (unsigned long) tokenList[0], 0, 0 ); 
+    
+    if (fake_pid < 0){
+        debug_print ("gdeshell: system call 900 fail!\n");
         goto fail;
     }
 
@@ -3312,56 +3312,57 @@ doexec_first_command:
     
 //___wait:
 
-        
     // Se devemos rodar o comando em background.
-    // Isso significa que n�o precisamos esperar.
-    
-    if ( __background == 1 )
-    {
-        // Continuamos pegando comandos.
-        goto exit_cmp;
-    }else{
-		
-		printf ("Running in bg \n");
+    // Isso significa que não precisamos esperar.
 
-        // Bella!  
-        waitpid (-1,&Wait_status,0);
-        
-        //#debug
-        printf ("wait() ends\n");
+    // Continuamos pegando comandos. 
+    if ( __background == 1 ){
+        printf ("__background [OK]\n");
+        goto exit_cmp;
+
+    // Se o filho não vai rodar em bg, então devemos esperar.
+    }else{
+        printf ("__background [NO]\n");
         fake_sleep (8000);
+        fake_sleep (8000);
+        waitpid (-1,&Wait_status,0);
+        printf ("waitpid() ends\n");
+        //fake_sleep (8000);
+        //fake_sleep (8000);
         goto exit_cmp;
     };
 
+
     //
-    // Crazy shit!
+    // Crazy!
     //
     
+    debug_print ("gdeshell: Crazy fail\n");
     goto fail;
-    
+
     
 // ======
 dosh:
-    //#todo
+    debug_print ("gdeshell: [FAIL] dosh\n");
+    goto fail;
 dotry:
-    //#todo
+    debug_print ("gdeshell: [FAIL] dotry\n");
+    goto fail;
 dobin:
-    //#todo
-    
-    
+    debug_print ("gdeshell: [FAIL] dobin\n");
+    goto fail;    
     
 
-   //==========================================================
-   //                        fail 
-   //==========================================================
+
+   // ==================
+   //       fail 
+   // ==================
 
 fail:
-
     printf(" Unknown command!\n");
     ret_value=1;
     goto done;
-
-
+    
 
    //==========================================================
    //                          EXIT CMP 
@@ -3371,27 +3372,20 @@ exit_cmp:
 
     ret_value = 0;
 
-    // Done.
-    // Limpando a lista de argumentos.
-    // Um array de ponteiros.
-
-   //==========================================================
-   //                      done 
-   //==========================================================
+   // ===============
+   //      done 
+   // ================
 
 done:
-
-    for ( i=0; i<TOKENLIST_MAX_DEFAULT; i++ )
-    {
-        tokenList[i] = NULL;
-    };
-
+    
+    // Clean the list.
+    for ( i=0; i<TOKENLIST_MAX_DEFAULT; i++ ){ tokenList[i] = NULL; };
 
     shellPrompt ();
 
-
     return (unsigned long) ret_value;
 }
+
 
 
 
@@ -3406,11 +3400,10 @@ done:
 void shellInitSystemMetrics (){
 	//pegaremos todas as metricas de uma vez s�,
 	//se uma falhar, ent�o pegaremos tudo novamente.
-	
+
 	// Tamanho da tela.
-	smScreenWidth = gde_get_system_metrics (1);
+    smScreenWidth = gde_get_system_metrics (1);
     smScreenHeight = gde_get_system_metrics (2);
-     
 	smCursorWidth = gde_get_system_metrics (3);
 	smCursorHeight = gde_get_system_metrics (4);
 	smMousePointerWidth = gde_get_system_metrics (5);
@@ -3420,11 +3413,11 @@ void shellInitSystemMetrics (){
 	//...
 	
 	
-        //#debug  ok t� certo.
-        //printf("w={%d} h={%d}\n", smScreenWidth, smScreenHeight); 
-	    //while (1){ asm ("pause"); }	
-	
-	sm_initialized = 1;
+    //#debug  ok t� certo.
+    //printf("w={%d} h={%d}\n", smScreenWidth, smScreenHeight); 
+    //while (1){ asm ("pause"); }	
+
+    sm_initialized = 1;
 } 
 
 
@@ -4379,13 +4372,10 @@ void shellTree (){
 
 void shellPrompt (){
 
-    int i;
+    int i=0;
 
-    // Linpando o buffer de entrada.
-
-    for ( i=0; i<PROMPT_MAX_DEFAULT; i++ ){
-        prompt[i] = (char) '\0';
-    }
+    // Clean prompt buffer.
+    for ( i=0; i<PROMPT_MAX_DEFAULT; i++ ){ prompt[i] = (char) '\0'; };
 
     prompt[0] = (char) '\0';
     prompt_pos = 0;
@@ -4408,9 +4398,9 @@ void shellPrompt (){
     //printf ("$ ");
     //fflush (stdout);
     
-    putc('$',stdout);
-    putc(' ',stdout);
-	fflush (stdout);    
+    // Print '$ '
+    putc('$',stdout); putc(' ',stdout); fflush(stdout);    
+
 
 	// #test
 
@@ -4432,10 +4422,10 @@ void shellPrompt (){
  */
 
 void shellClearBuffer (){
-	
-	int i = 0;
-	int j = 0;
-	
+
+    int i = 0;
+    int j = 0;
+
 	//inicializamos com espa�os.
 	for ( i=0; i<32; i++ )
 	{
@@ -4480,15 +4470,15 @@ void shellShowScreenBuffer (){
  */
 
 void shellTestLoadFile (){
-	
-	FILE *f;
-	
-	int Ret;
+
+    FILE *f;
+
 	int i=0;
+	int Ret;
 	int ch_test;
-	
 	int pos;
-	
+
+
 	//#importante:
 	//precisa ser arquivo pequeno.
 	
@@ -4501,41 +4491,39 @@ void shellTestLoadFile (){
 	//grande
 	//f = fopen ("init.txt","rb");  	
 	
-    if( f == NULL )
-	{
-		printf("fopen fail\n");
-		return;
-	}else{
+    if( f == NULL ){
+        printf("shellTestLoadFile: f fail\n");
+        return;
+
+    }else{
 		//printf("fopen ok\n");
-	};	
-	
+    };
+
 	
 	//#test 
 	//testando com um arquivo com texto pequeno.
 	//enviando para o buffer de words, 
 	//obs: agora tem rotinas de refresh.
-	
-	while (1)
-	{
-		ch_test = (int) getc (f); 
-		
-		if( ch_test == EOF )
-		{
+
+
+    while (1){
+        ch_test = (int) getc(f); 
+
+        if ( ch_test == EOF ){
 			//printf("\n");
 			//printf("EOF reached :)\n");
 			goto done;
-		
-		}else{ 
-			shellInsertNextChar ( (char) ch_test );
+
+        }else{ 
+            shellInsertNextChar ( (char) ch_test );
         };
     };
 
- 
-done:
-    //
-
+    // fail
+    
 fail:
-
+    // Nothing.
+done:
     return;
 }
 
@@ -4621,9 +4609,8 @@ void shellTestThreads (){
                                 (unsigned long) (&threadstack1[0] + (2*1024) - 4), 
                                 "ThreadTest1" );
 
-    if ( (void *) ThreadTest1 == NULL )
-    {
-        printf ("shellTestThreads: apiCreateThread fail \n");	
+    if ( (void *) ThreadTest1 == NULL ){
+        printf ("shellTestThreads: apiCreateThread fail \n");
         die ("ThreadTest1");
     }
 
@@ -4662,20 +4649,17 @@ void shellClearScreen (){
 	
     //desabilita o cursor
     system_call ( 245, 
-        (unsigned long) 0, 
-        (unsigned long) 0, 
-        (unsigned long) 0 );
+        (unsigned long) 0, (unsigned long) 0, (unsigned long) 0 );
 
 
     shellClearBuffer ();
 
-	
-	w = (void *) shell_info.terminal_window;
-	
-	if ( (void *) w != NULL )
-	{
-		gde_redraw_window ( w, 1 );
-	};
+
+    w = (void *) shell_info.terminal_window;
+
+    if ( (void *) w != NULL ){
+        gde_redraw_window ( w, 1 );
+    }
 
 	
     left = (terminal_rect.left/smCharWidth);
@@ -4717,12 +4701,13 @@ void shellClearScreen (){
 
 void shellRefreshScreen (){
 
+	int i=0;
+	int j=0;
+
 	//desabilita o cursor
 	system_call ( 245, 
 	    (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);
 	
-	int i=0;
-	int j=0;
 	
 	for ( i=textTopRow; i<textBottomRow; i++ )
 	{
@@ -4746,14 +4731,15 @@ void shellRefreshScreen (){
 //#todo podemos fazer o mesmo para um char apenas.
 
 void shellRefreshLine ( int line_number ){
-	
-    
+
+	int col = 0;  
+
+
 	if ( line_number > wlMaxRows )
 		return;	
 	
 	int lin = (int) line_number; 
-	int col = 0;  
-	
+
 	
 #ifdef SHELL_VERBOSE		
 	//#debug
@@ -4905,15 +4891,16 @@ static void del (void){
 
 // Insere um caractere sentro do buffer.
 void 
-shellInsertCharXY ( unsigned long x, 
-                    unsigned long y, 
-				    char c )
+shellInsertCharXY ( 
+    unsigned long x, 
+    unsigned long y, 
+    char c )
 {
-	
-	if ( x >= wlMaxColumns || y >= wlMaxRows ){
-		
-		return;
-	}
+
+    if ( x >= wlMaxColumns || y >= wlMaxRows )
+    {
+        return;
+    }
 
 	LINES[y].CHARS[x] = (char) c;
 	LINES[y].ATTRIBUTES[x] = 7;
@@ -5660,20 +5647,21 @@ void shell_fntos (char *name){
  *******************************************************
  * shell_gramado_core_init_execve:
  *
- *     Essa � uma rotina alternativa que roda um processo usando os recursos 
- * do processo init.
+ *     Essa � uma rotina alternativa que roda um processo 
+ * usando os recursos do processo init.
  */
 
 // #bugbug
 // N�o usar mais esse m�todo no garden. usar apenas no gramado core.
 
 int 
-shell_gramado_core_init_execve ( const char *arg1,     // nome
-                                 const char *arg2,     // arg (endere�o da linha de comando)
-                                 const char *arg3 )    // env
+shell_gramado_core_init_execve ( 
+    const char *arg1,     // nome
+    const char *arg2,     // arg (endere�o da linha de comando)
+    const char *arg3 )    // env
 {
-	//erro.
 
+	//erro.
     int Status = 1;
 
 	//unsigned long arg_address = (unsigned long) &argv[0];
@@ -5820,10 +5808,11 @@ done:
  */
  
 int 
-feedterminalDialog ( struct window_d *window, 
-                     int msg, 
-                     unsigned long long1, 
-                     unsigned long long2 )
+feedterminalDialog ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 )
 {
 	//int q;
 

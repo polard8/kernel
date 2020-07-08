@@ -310,6 +310,30 @@ typedef enum terminal_api_message_number_d {
 }terminal_api_message_number_t;
 
 
+
+
+
+//
+// Main struct
+//
+
+struct terminal_d
+{
+    int client_fd;
+    
+    int window_id;
+ 
+    int pid;
+    int uid;
+    int gid;
+    
+    // ...
+};
+// The man structure.
+struct terminal_d Terminal;
+
+
+
 //
 // ## System Metrics ##
 //
