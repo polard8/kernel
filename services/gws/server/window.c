@@ -25,7 +25,18 @@ struct gws_window_d *gws_window_from_id (int id)
 }
 */
  
- 
+
+int gwsDefineInitialRootWindow ( struct gws_window_d *window )
+{
+    if ( (void *) window == NULL )
+        return -1;
+    
+    ROOT = window;
+    
+    // ...
+    
+    return 0;  //ok
+}
    
 /*
  *******************************************************

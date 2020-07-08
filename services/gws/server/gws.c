@@ -121,6 +121,9 @@ int gwsInit (){
                                            NULL, 0, xCOLOR_GRAY3, xCOLOR_GRAY3 );
 
     
+    //#test
+    gwsDefineInitialRootWindow (gui->screen);
+    
     
     // main window.
     // desktop area without the bars.

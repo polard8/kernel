@@ -29,6 +29,12 @@ unsigned long  ____BACKBUFFER_VA;
 #include "connect.h"
 
 
+// Client structure.
+// O proprio servidor poderia ser o cliente 0??
+#include "client.h"
+
+
+
 // ## button support ##
 #define GWS_COLOR_BUTTONFACE            0x00F0F0F0
 #define GWS_COLOR_BUTTONFACE2           0x00E0E0E0

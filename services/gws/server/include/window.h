@@ -888,8 +888,15 @@ struct gws_window_d
     int handle_status;
 };
 
+struct gws_window_d *ROOT;
 //struct gws_window_d *testxxxxxxx;   
 //...
+
+// #todo
+// We need to define the root window.
+// Maybe it will the the screen window.
+// Or each screen will have its own root window.
+
 
 
 //
@@ -1070,6 +1077,8 @@ gws_replace_window (
 
 void gwsWindowLock (struct gws_window_d *window);
 void gwsWindowUnlock (struct gws_window_d *window);
+
+int gwsDefineInitialRootWindow ( struct gws_window_d *window );
 
 
 

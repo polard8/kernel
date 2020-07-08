@@ -762,191 +762,222 @@ int main (int argc, char **argv){
 
     // Activate the compositor.
     dirty_status = 1;
-
-
-
-    // #debug
-    gde_debug_print ("---------------------\n");
-    gde_debug_print ("gws: Initializing ...\n");
-    printf ("gws: gws is alive !  \n");
-
-
-    // Init gws infrastructure.
-    gwsInit ();
-
-
-    // Let's create the traditional green background.
-    create_background();
-    create_taskbar();
     
-    //
-    // Register.
-    //
- 
 
-    // Register.
-    // Register window server as the current window server 
-    // for this desktop.
-    // See: connect.c
-    _status = (int) register_ws();
-
-    if (_status<0){
-        gde_debug_print ("gws: Couldn't register the server \n");
-        printf ("gws: Couldn't register the server \n");
-        exit (1);
-    }
-    gde_debug_print ("gws: Registration ok \n");
-
-
-
-    // #todo
-    // Daqui pra frente é conexão com cliente.
-    // Lembrando que o servidor vai se conectar à mais de um cliente.
-    // ...
-    
-    // #atenção
-    // socket() bind() e listen() ficam antes do loop.
-
-
-    //
-    // Socket
-    //
-
-    // #debug
-    printf ("gws: Creating socket\n");
-
-    server_fd = (int) socket(AF_GRAMADO, SOCK_STREAM, 0);
-    
-    if (server_fd<0){
-        printf("gws: Couldn't create the server socket\n");
-        exit(1);
-    }
-    ____saved_server_fd = server_fd;
-
-
-    //
-    // bind
-    // 
- 
-    // #debug
-    printf ("gws: bind\n");
- 
-    bind_status = bind ( server_fd, (struct sockaddr *) &addr, sizeof(addr) );
-
-    if (bind_status<0){
-        printf("gws: Couldn't bind to the socket\n");
-        exit(1);
-    }
-    
-    //#todo
-    //listen()
-
-
-    //
-    // Calling child.
-    //
-
-    dtextDrawText ( (struct gws_window_d *) gui->screen,
-        200, 80, COLOR_RED, "gws: Calling child" );
-
-    
-    // #atenção: 
-    // Na máquina real, isso mostrou a barra, 
-    // mas não mostrou a string criada na janela gui->screen.
-    //printf("$\n");
-    gws_show_backbuffer ();
-    //while(1);
-
-
-    printf ("gws: * Calling child \n");
-    
-    // #test
-    // Nesse test, s2 usará socket para se conectar
-    // AF_GRAMADO.
-
-
-    // #important:
-    // Calling a child.
-
-    //gde_clone_and_execute ("gwst.bin");  
-    gde_clone_and_execute ("terminal.bin"); 
-    //gde_clone_and_execute ("browser.bin"); 
-    // ...
-
- 
-    printf ("gws: * yield \n");
-
-    for (i=0; i<15; i++)
-        gws_yield ();
-
-
-    //
-    // =======================================
-    //
-
-     //
-     // Loop
-     //
-     
-    // #todo
-    // Isso é um teste.
-    // #atenção
-    // socket() bind() e listen() ficam antes do loop.
-    // Provavelmente precisamos de um loop
-    // contendo accept, read e write.
-    // Não presizamos criar o socket novamente,
-    // mas temos que refazer a conecção toda vez
-    // que enviarmos uma resposta.
-    // Então logo após enviarmos a resposta precisamos
-    // fechar o arquivo? Acabaria com o socket?
-    //#atenção:
-    // A função accept vai retornar o descritor do 
-    // socket que usaremos ... por isso poderemos fecha-lo
-    // para assim obtermos um novo da próxima vez.
-    
-// loop:
-    gde_debug_print ("gws: Entering main loop.\n");
-
-    //#todo:
-    // No loop precisamos de accept() read() e write();
-
-
-    // + Compositor. (Redraw dirty rectangles)    
-    // + Socket requests.
-    // + Normal messages. (It's like signals.)
- 
-    //not used for now.
-    connection_status = 1;
-
-    int newsockfd = -1;
-    
-    socklen_t addr_len;
-    addr_len = sizeof(addr);
-    
-    // while (1)
-    while (running == 1)
+    //++
+    //==================
+    // Main loop!
+    // This loop will make the server restart and
+    // call the childs again.
+    while(1)
     {
-        // Pinta ou não.
-        if ( dirty_status == 1 )
-            compositor();
-         
-         
-        //Accept actual connection from the client */
-        newsockfd = accept ( ____saved_server_fd, (struct sockaddr *) &addr, (socklen_t *) addr_len);
-        if (newsockfd < 0) {
-            gde_debug_print ("gws: ERROR on accept\n");
+        // #todo:
+        // Initialize all the OS dependent stuff.
+        // ex: OsInit();
+
+        // #debug
+        // Initializing or reinitializing
+        gde_debug_print ("---------------------\n");
+        gde_debug_print ("gws: Initializing ...\n");
+        printf ("gws: gws is alive !  \n");
+
+
+        // Init gws infrastructure.
+        gwsInit ();
+
+        // Let's create the traditional green background.
+        create_background();
+        create_taskbar();
+
+        // Register.
  
-        }else{
-            handle_request (____saved_server_fd);
+        // #bugbug
+        // I don't know if we can register more than one time.
+        // We can fix it!
+
+        // Register.
+        // Register window server as the current window server 
+        // for this desktop.
+        // See: connect.c
+        _status = (int) register_ws();
+
+        if (_status<0){
+            gde_debug_print ("gws: Couldn't register the server \n");
+            printf ("gws: Couldn't register the server \n");
+            exit (1);
+        }
+        gde_debug_print ("gws: Registration ok \n");
+
+        // #todo
+        // Daqui pra frente é conexão com cliente.
+        // Lembrando que o servidor vai se conectar à mais de um cliente.
+        // ...
+        
+        // #todo
+        // Aqui nos podemos criar vários sockets que serão usados
+        // pelo servidor.
+        //ex: CreateWellKnownSockets ();
+    
+        // #atenção
+        // socket() bind() e listen() ficam antes do loop.
+
+        //
+        // Socket
+        //
+
+        // #debug
+        printf ("gws: Creating socket\n");
+
+        server_fd = (int) socket(AF_GRAMADO, SOCK_STREAM, 0);
+
+        if (server_fd<0){
+            printf("gws: Couldn't create the server socket\n");
+            exit(1);
+        }
+        ____saved_server_fd = server_fd;
+
+        //
+        // bind
+        // 
+    
+        // #debug
+        printf ("gws: bind\n");
+ 
+        bind_status = bind ( server_fd, (struct sockaddr *) &addr, sizeof(addr) );
+
+        if (bind_status<0){
+            printf("gws: Couldn't bind to the socket\n");
+            exit(1);
+        }
+
+
+        //#todo
+        //listen()
+
+        //
+        // Calling child.
+        //
+
+        dtextDrawText ( (struct gws_window_d *) gui->screen,
+            200, 80, COLOR_RED, "gws: Calling child" );
+        
+        
+        // #atenção: 
+        // Na máquina real, isso mostrou a barra, 
+        // mas não mostrou a string criada na janela gui->screen.
+        //printf("$\n");
+        gws_show_backbuffer ();
+        //while(1);
+        
+        printf ("gws: * Calling child \n");        
+        
+
+        // #test
+        // Nesse test, s2 usará socket para se conectar
+        // AF_GRAMADO.
+
+        // #important:
+        // Calling a child.
+       
+        //gde_clone_and_execute ("gwst.bin");  
+        gde_clone_and_execute ("terminal.bin"); 
+        //gde_clone_and_execute ("browser.bin"); 
+        // ...        
+       
+        printf ("gws: * yield \n");       
+       
+       
+        for (i=0; i<15; i++)
+            gws_yield ();
+       
+
+        //
+        // =======================================
+        //
+
+        //
+        // Loop
+        //
+     
+        // #todo
+        // Isso é um teste.
+        // #atenção
+        // socket() bind() e listen() ficam antes do loop.
+        // Provavelmente precisamos de um loop
+        // contendo accept, read e write.
+        // Não presizamos criar o socket novamente,
+        // mas temos que refazer a conecção toda vez
+        // que enviarmos uma resposta.
+        // Então logo após enviarmos a resposta precisamos
+        // fechar o arquivo? Acabaria com o socket?
+        // #atenção:
+        // A função accept vai retornar o descritor do 
+        // socket que usaremos ... por isso poderemos fecha-lo
+        // para assim obtermos um novo da próxima vez.
+    
+        // loop:
+        gde_debug_print ("gws: Entering main loop.\n");
+
+        //#todo:
+        // No loop precisamos de accept() read() e write();
+
+        // + Compositor. (Redraw dirty rectangles)    
+        // + Socket requests.
+        // + Normal messages. (It's like signals.)
+ 
+        //not used for now.
+        connection_status = 1;
+
+        int newsockfd = -1;
+    
+        socklen_t addr_len;
+        addr_len = sizeof(addr);
+    
+        while (running == 1)
+        {
+            // Pinta ou não.
+            if ( dirty_status == 1 )
+                compositor();
+         
+         
+            //Accept actual connection from the client */
+            newsockfd = accept ( ____saved_server_fd, (struct sockaddr *) &addr, (socklen_t *) addr_len);
+            if (newsockfd < 0) {
+                gde_debug_print ("gws: ERROR on accept\n");
+ 
+            }else{
+                handle_request (____saved_server_fd);
+            };
         };
-    };
 
+        // #todo
+        // Bom, nesse momento precisamos liberar os recursos
+        // para que o loop reinicie o servidor.
+        
+        //close(____saved_server_fd);
+        
+        // ...
+        
+        //
+        // =======================================
+        //
+  
+    }; // Main loop
+    //====================
+    //--
 
     //
-    // =======================================
+    // Exited
     //
+    
+    // Well, if we are here so we exited from the main loop.
+    // The server will not call a client again.
+    // All we can do is exit.
 
-   //ipc message loop
+    // Messages from kernel.
+    // It is a kind of signal.
+    //ipc message loop
+    
     while(1){
         handle_ipc_message();
     }
@@ -963,12 +994,15 @@ int main (int argc, char **argv){
     // #debug
     // #bugbug:
     // Page fault  when exiting ... 
+    
     while(1){
         // HANG
     }
-    
+
+    //suspended.
     return 0; 
 }
+
 
 
 int service_drain_input (void)
