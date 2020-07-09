@@ -146,23 +146,38 @@ void enable_maskable_interrupts()
 
 int main ( int argc, char *argv[] ){
 
-
     char runlevel_string[128];
-    
-    
-    
+    char *_string = "init.bin: Init is alive! Calling int 129";
+
+
+    // Initialize with error value.
+    __current_runlevel = (int) -1; 
+ 
+
+    //
+    // Main loop
+    //
+
+    //++
+    while (1){
+
     debug_print ("---------------------------\n");    
     debug_print ("init.bin: Initializing ...\n");
 
+    // Using api.
     gde_draw_text ( NULL, 
-        0, 0, COLOR_YELLOW, 
-        "init.bin: Init is alive! Calling int 129" );
+        0, 0, COLOR_YELLOW, _string );
+
     gde_show_backbuffer ();
+
+    // #debug
+    // while(1){}
+
 
     //
     // Habilita as interrupções mascaraveis.
     //
-    
+   
     
     // #DEBUG
     // Olhando eflags.
@@ -200,10 +215,6 @@ int main ( int argc, char *argv[] ){
 		// Full multi-user graphical mode.
 		// 6 	Reboot 	Reboots the system. 
 
-
-    // Initialize with error value.
-    __current_runlevel = (int) -1; 
-
     // Get the current runlevel.
     __current_runlevel = (int) gramado_system_call ( 288, 0, 0, 0 );  
 
@@ -212,28 +223,53 @@ int main ( int argc, char *argv[] ){
     printf ("The current runlevel is %s \n",runlevel_string);
 
 
+    //
+    // Initializing in the selected runlevel.
+    //
+    
+    switch (__current_runlevel){
 
 
+       //case ?:
+           //gramado_system_call ( 900, (unsigned long) "gws.bin", 0, 0 ); 
+           //break;
 
 
+       //case ?:
+           //break;
+
+        //...
+        
+        // Usar esse por enquanto.
+        default:
+            gramado_system_call ( 900, (unsigned long) "gdeshell.bin", 0, 0 ); 
+            break;
+    };
 
     //
-    // Child process.
-    //    
+    // Hang (#debug)
+    //
 
-    // #todo
-    // In the future we're gonna initialize some servers here.
-
-    gramado_system_call ( 900, (unsigned long) "gdeshell.bin", 0, 0 ); 
-    //gramado_system_call ( 900, (unsigned long) "gramcode.bin", 0, 0 ); 
-    //gramado_system_call ( 900, (unsigned long) "launcher.bin", 0, 0 ); 
-
-
+    // Yield This thread.
     while (1){
         asm ("pause");
-        gramado_system_call (265,0,0,0);    //yield thread.
-    }   
+        gramado_system_call (265,0,0,0); 
+    };
+    
+    
+    };
+    // Main loop end.
+    //--
 }
+
+
+//
+// End.
+//
+
+
+
+
 
 
 //
