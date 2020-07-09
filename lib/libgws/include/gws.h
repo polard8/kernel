@@ -41,6 +41,24 @@
 // ...
 
 
+//
+// ==== Version ====
+//
+
+
+#define GWS_LIB_PROTOCOL       0
+#define GWS_PROTOCOL_REVISION  1
+
+struct libgws_version_d
+{
+    unsigned long majorVersion;
+    unsigned long minorVersion;
+    // ...
+};
+// Version struct.
+struct libgws_version_d libgwsVersion;
+
+
 
 
 

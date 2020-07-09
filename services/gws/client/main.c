@@ -585,17 +585,25 @@ int main ( int argc, char *argv[] ){
     { 
         gws_debug_print ("gwst: Connection Failed\n");
         printf ("gwst: Connection Failed \n"); 
-        return -1; 
+        close(client_fd);
+        return (int) (-1); 
     } 
+    
+    
+    //
+    // === Create Window ===
+    //
+    
+    gwst_createwindow_request(client_fd, 40, 40, 320, 280, COLOR_GRAY);
+    gwst_createwindow_response(client_fd);     
     
     
     //
     // === Event loop ===
     //
-
-    gwst_createwindow_request(client_fd, 40, 40, 320, 280, COLOR_GRAY);
-    gwst_createwindow_response(client_fd); 
+    
     gwst_loop(client_fd);    
+    
     
     //
     //  === Create Window ===

@@ -33,10 +33,15 @@ unsigned long  ____BACKBUFFER_VA;
 // O proprio servidor poderia ser o cliente 0??
 #include "client.h"
 
+
 #include "font.h"
 
+// Display structure ...
+// Following the steps of X.
+#include "display.h"
 
-
+//
+#include "event.h"
 
 
 // ## button support ##

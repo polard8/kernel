@@ -35,13 +35,25 @@ int ____gws_client_fd;         //socket fd
 char ____gws_io_buffer[512];   //buffer
 
 
-// OUT: 1 = Ok.  0 = fail.
+/*
+ * gws_connect:
+ * 
+ */
+
+// #todo
+// Return the fd.
+
+// OUT: newfd = Ok.  0 = fail.
 int gws_connect (void){
 
+    int fd = 0;
+    
     struct sockaddr addr;
     addr.sa_family = 8000; //AF_GRAMADO
     addr.sa_data[0] = 'w';
     addr.sa_data[1] = 's';    
+    
+    
     
     //
     // socket
@@ -53,31 +65,56 @@ int gws_connect (void){
     
     // cria o soquete.
     // AF_GRAMADO
-    ____gws_client_fd = socket ( 8000, SOCK_STREAM, 0 );
+    fd = socket ( 8000, SOCK_STREAM, 0 );
     
-    if ( ____gws_client_fd < 0 ){
+    if ( fd < 0 ){
        gws_debug_print ("libgws-gws_connect: Couldn't create socket\n");
+       // Saving
+       ____gws_connected = 0;  // Disconnected
+       ____gws_client_fd = 0;  // fail
        return -1;
     }
 
-       
+
     //
     // connect
     //   
+
+    int Status = 0;
+    Status = connect ( fd, 
+                 (struct sockaddr *) &addr, 
+                  sizeof(addr) );
     
-    ____gws_connected = connect ( ____gws_client_fd, 
-                            (struct sockaddr *) &addr, 
-                            sizeof(addr) );
-    
-    if ( ____gws_connected < 0 ){ 
+    if ( Status < 0 ){ 
         gws_debug_print ("libgws-gws_connect: Connection Failed \n"); 
-        return -1; 
+        close(fd);
+       // Saving
+       ____gws_connected = 0;  // Disconnected
+       ____gws_client_fd = 0;  // fail
+        return (int)(-1); 
     }    
 
+    // Ok.
+    // Saving
+    ____gws_connected = Status;
+    ____gws_client_fd = fd;
 
 
-    return (int) ____gws_connected;
+    // Return fd.
+    return (int) fd;
 }
+
+
+
+//#todo
+/*
+// Disconnect from server.
+void gws_disconnect ( int fd );
+void gws_disconnect ( int fd )
+{
+    close(fd);
+}
+*/
 
 
 
