@@ -133,13 +133,6 @@ build-boot:
 	$(Q) $(MAKE) -C gramado/boot/x86/bl/ 
 	
 build-lib:
-#	@echo "==================="
-#	@echo "Compiling gramado libs ..."
-#	make -C gramado/lib
-
-#	@echo "==================="
-#	@echo "Compiling animal libs ..."
-#	make -C animal/lib
 
 	@echo "==================="
 	@echo "Compiling libs ..."
@@ -148,12 +141,12 @@ build-lib:
 build-init:
 	@echo "==================="
 	@echo "Compiling init process ... [TODO]"
-	$(Q) $(MAKE) -C gramado/init
+	$(Q) $(MAKE) -C init/
 
 build-gdeshell:
 	@echo "==================="
 	@echo " Compiling the gdeshell"
-	$(Q) $(MAKE) -C gramado/gdeshell   
+	$(Q) $(MAKE) -C animal/gdeshell/   
 
 
 build-gns:
@@ -169,12 +162,12 @@ build-gws:
 build-apps:
 	@echo "==================="
 	@echo "Compiling apps ..."
-	$(Q) $(MAKE) -C animal/apps
+	$(Q) $(MAKE) -C shine/apps
 
 build-cmd:
 	@echo "==================="
 	@echo "Compiling cmd ..."
-	$(Q) $(MAKE) -C animal/cmd
+	$(Q) $(MAKE) -C shine/cmd
 	
 
 
@@ -225,10 +218,9 @@ vhd-copy-files:
 	sudo cp gramado/boot/x86/bin/BM.BIN    /mnt/gramadovhd
 	sudo cp gramado/boot/x86/bin/BL.BIN    /mnt/gramadovhd
 	sudo cp gramado/kernel/KERNEL.BIN      /mnt/gramadovhd
-	sudo cp gramado/gdeshell/GDESHELL.BIN  /mnt/gramadovhd 
-	#sudo cp gramado/install/ISHELL.BIN  /mnt/gramadovhd 
+
 	
-	sudo cp gramado/init/INIT.BIN        /mnt/gramadovhd
+
 	sudo cp gramado/base/GRAMADO.TXT     /mnt/gramadovhd
 	sudo cp gramado/base/ini/GUI.INI     /mnt/gramadovhd
 	sudo cp gramado/base/ini/INIT.INI    /mnt/gramadovhd
@@ -244,7 +236,14 @@ vhd-copy-files:
 	sudo cp gramado/base/res/icons/FOLDER.BMP    /mnt/gramadovhd
 	sudo cp gramado/base/res/icons/TERMINAL.BMP  /mnt/gramadovhd
 # ...
-	
+
+	sudo cp init/INIT.BIN            /mnt/gramadovhd
+
+
+	sudo cp animal/gdeshell/GDESHELL.BIN    /mnt/gramadovhd 
+	#sudo cp animal/install/ISHELL.BIN  /mnt/gramadovhd 
+# ...
+
 	# optional
 	-sudo cp docs/*.TXT        /mnt/gramadovhd
 	-sudo cp gramado/base/dev/LOOP0      /mnt/gramadovhd
@@ -260,8 +259,8 @@ vhd-copy-files:
 	-sudo cp services/gws/bin/GWS.BIN       /mnt/gramadovhd
 	-sudo cp services/gws/bin/GWST.BIN      /mnt/gramadovhd
 	
-	-sudo cp animal/apps/bin/*.BIN         /mnt/gramadovhd
-	-sudo cp animal/cmd/bin/*.BIN          /mnt/gramadovhd
+	-sudo cp shine/apps/bin/*.BIN         /mnt/gramadovhd
+	-sudo cp shine/cmd/bin/*.BIN          /mnt/gramadovhd
 # ...
 
 
@@ -323,25 +322,25 @@ clean2:
 	-rm *.VHD
 	
 clean3:
-	-rm animal/apps/bin/*.BIN
-	-rm animal/cmd/bin/*.BIN
+	-rm shine/apps/bin/*.BIN
+	-rm shine/cmd/bin/*.BIN
 	
 PHONY := clean-system-files
 clean-system-files:
 	@echo "==================="
 	@echo "Cleaning all system binaries ..."
 
-	-rm -rf gramado/boot/x86/bin/*.BIN
-	
-	-rm -rf gramado/kernel/KERNEL.BIN
-	-rm -rf gramado/init/*.BIN
-	-rm -rf gramado/gdeshell/*.BIN
 
+	-rm -rf gramado/boot/x86/bin/*.BIN
+	-rm -rf gramado/kernel/KERNEL.BIN
+	
+	-rm -rf init/*.BIN
+	-rm -rf animal/gdeshell/*.BIN
 	-rm -rf services/gns/bin/*.BIN
 	-rm -rf services/gws/bin/*.BIN
 	
-	-rm -rf animal/apps/bin/*.BIN
-	-rm -rf animal/cmd/bin/*.BIN
+	-rm -rf shine/apps/bin/*.BIN
+	-rm -rf shine/cmd/bin/*.BIN
 # ...
 
 clean-all: clean clean2 clean3 clean-system-files  
@@ -423,7 +422,6 @@ danger-hdd-clone-vhd:
 # Oracle Virtual Box 
 oracle-virtual-box-test:
 	VBoxManage startvm "Gramado"
-#	VBoxManage startvm "Animal"
 
 
 # qemu 

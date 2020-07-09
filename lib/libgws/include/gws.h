@@ -46,8 +46,9 @@
 //
 
 
-#define GWS_LIB_PROTOCOL       0
-#define GWS_PROTOCOL_REVISION  1
+#define GWS_LIB_PROTOCOL           0
+#define GWS_LIB_PROTOCOL_REVISION  1
+
 
 struct libgws_version_d
 {
