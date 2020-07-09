@@ -556,23 +556,32 @@ int main (int argc, char **argv){
     // Inclusive a mensagem que pede para drenar input e 
     // via mensagens e repassar via socket. 
     
-    int newsockfd = -1;
+
+    int newconn = -1;
+    int curconn = ____saved_server_fd;
+
 
     socklen_t addr_len;
     addr_len = sizeof(addr);
     
     while (1){
 
-        //Accept actual connection from the client */
-        newsockfd = accept ( ____saved_server_fd, (struct sockaddr *) &addr, (socklen_t *) addr_len );
-        if (newsockfd < 0) {
+        // Accept actual connection from the client 
+        newconn = accept( curconn, 
+                       (struct sockaddr *) &addr, 
+                       (socklen_t *) addr_len );
+        
+        if (newconn < 0) {
             gde_debug_print ("gns: ERROR on accept\n");
  
         }else{
-            //__socket_messages (____saved_server_fd);
-            __socket_messages (newsockfd);
+
+            // Request from the new connection
+            __socket_messages (newconn);
+            //__socket_messages (curconn);
         };
     };
+
 
 
     //

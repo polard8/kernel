@@ -4402,6 +4402,12 @@ void shellPrompt (){
     putc('$',stdout); putc(' ',stdout); fflush(stdout);    
 
 
+    // Print '$ '
+    //char __prompt_string[32];
+    //strcpy(__prompt_string, "$");
+    //strcat(__prompt_string, " ");
+    
+    
 	// #test
 
 	// Getting the prompt string from environ.

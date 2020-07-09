@@ -1346,6 +1346,9 @@ int main ( int argc, char *argv[] ){
     Terminal.uid = getuid();
     Terminal.gid = getgid();
 
+    //setreuid(-1, -1);
+    //setpgrp(0, getpid());
+
 
     //
     // socket

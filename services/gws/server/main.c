@@ -928,8 +928,10 @@ int main (int argc, char **argv){
         //not used for now.
         connection_status = 1;
 
-        int newsockfd = -1;
-    
+
+        int newconn = -1;
+        int curconn = ____saved_server_fd;
+        
         socklen_t addr_len;
         addr_len = sizeof(addr);
     
@@ -941,14 +943,21 @@ int main (int argc, char **argv){
          
          
             //Accept actual connection from the client */
-            newsockfd = accept ( ____saved_server_fd, (struct sockaddr *) &addr, (socklen_t *) addr_len);
-            if (newsockfd < 0) {
+            newconn = accept( curconn, 
+                          (struct sockaddr *) &addr, 
+                          (socklen_t *) addr_len );
+                          
+            if (newconn < 0) {
                 gde_debug_print ("gws: ERROR on accept\n");
  
             }else{
-                handle_request (____saved_server_fd);
+
+                // Request from the new connection
+                handle_request (newconn);
+                //handle_request (curconn);
             };
         };
+
 
         // #todo
         // Bom, nesse momento precisamos liberar os recursos
