@@ -169,16 +169,16 @@ all-c:
 	$(CC) -c top/sci/sys/sys.c   $(KINCLUDE) $(CFLAGS) -o sys.o
 
 	# fs
-	$(CC) -c top/sci/fs/fs.c      $(KINCLUDE) $(CFLAGS) -o fs.o
-	$(CC) -c top/sci/fs/vfs.c     $(KINCLUDE) $(CFLAGS) -o vfs.o
-	$(CC) -c top/sci/fs/cf.c      $(KINCLUDE) $(CFLAGS) -o cf.o
-	$(CC) -c top/sci/fs/read.c    $(KINCLUDE) $(CFLAGS) -o read.o
-	$(CC) -c top/sci/fs/write.c   $(KINCLUDE) $(CFLAGS) -o write.o
-	$(CC) -c top/sci/fs/search.c  $(KINCLUDE) $(CFLAGS) -o search.o
-	$(CC) -c top/sci/fs/format.c  $(KINCLUDE) $(CFLAGS) -o format.o
+	$(CC) -c fs/cf.c      $(KINCLUDE) $(CFLAGS) -o cf.o
+	$(CC) -c fs/format.c  $(KINCLUDE) $(CFLAGS) -o format.o
+	$(CC) -c fs/fs.c      $(KINCLUDE) $(CFLAGS) -o fs.o
+	$(CC) -c fs/pipe.c    $(KINCLUDE) $(CFLAGS) -o pipe.o
+	$(CC) -c fs/read.c    $(KINCLUDE) $(CFLAGS) -o read.o
+	$(CC) -c fs/search.c  $(KINCLUDE) $(CFLAGS) -o search.o
+	$(CC) -c fs/write.c   $(KINCLUDE) $(CFLAGS) -o write.o
 
-	# fs
-	$(CC) -c top/sci/fs/pipe.c    $(KINCLUDE) $(CFLAGS) -o pipe.o
+	# fs/vfs
+	$(CC) -c fs/vfs/vfs.c     $(KINCLUDE) $(CFLAGS) -o vfs.o
 
 	# Security
 	$(CC) -c top/security/desktop.c   $(KINCLUDE) $(CFLAGS) -o desktop.o
