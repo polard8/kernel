@@ -189,31 +189,32 @@ int main ( int argc, char *argv[] ){
 
     // #DEBUG
     // Olhando eflags.
-    //asm ("int $3 \n");
+    // asm ("int $3 \n");
 
 
 
     //
     // Runlevel
     // 
- 
-		// 0 	Halt 	
-		// Shuts down the system. 
-		// 1 	Single-user mode 	
-		// Mode for administrative tasks.
-		// 2 	Multi-user mode 	
-		// Does not configure network interfaces and 
-		// does not export networks services.
-		// 3 	Multi-user mode with networking 	
-		// Starts the system normally.
-        // Full multi-user text mode.
-		// 4 	Not used/user-definable 	
-		// For special purposes.
-		// 5 	Start the system normally with appropriate 
-		// display manager (with GUI) 	
-		// Same as runlevel 3 + display manager. 
-		// Full multi-user graphical mode.
-		// 6 	Reboot 	Reboots the system. 
+
+    // 0) Halt 
+    //    Shuts down the system. 
+    // 1) Single-user mode 
+    //    Mode for administrative tasks.
+    // 2) Multi-user mode 
+    //    Does not configure network interfaces and 
+    //    does not export networks services.
+    // 3) Multi-user mode with networking 
+    //    Starts the system normally.
+    //    Full multi-user text mode.
+    // 4) Not used/user-definable 
+    //    For special purposes.
+    // 5) Start the system normally with appropriate 
+    //    display manager (with GUI) 
+    //    Same as runlevel 3 + display manager. 
+    //    Full multi-user graphical mode.
+    // 6) Reboot 	Reboots the system. 
+
 
     // Get the current runlevel.
     __current_runlevel = (int) gramado_system_call ( 288, 0, 0, 0 );  
@@ -229,7 +230,17 @@ int main ( int argc, char *argv[] ){
     
     switch (__current_runlevel){
 
-
+       // 0) Halt 
+       //    Shuts down the system. 
+       //case 0:
+           //halt
+           //break;
+           
+       // 1) Single-user mode 
+       //    Mode for administrative tasks.
+       
+       
+           
        //case ?:
            //gramado_system_call ( 900, (unsigned long) "gws.bin", 0, 0 ); 
            //break;
@@ -237,14 +248,21 @@ int main ( int argc, char *argv[] ){
 
        //case ?:
            //break;
+           
+        // Reboot
+        //case 6:
+            //gde_reboot();
+            //break;
 
         //...
         
         // Usar esse por enquanto.
         default:
-            gramado_system_call ( 900, (unsigned long) "gdeshell.bin", 0, 0 ); 
+            gramado_system_call ( 900, 
+                (unsigned long) "gdeshell.bin", 0, 0 ); 
             break;
     };
+
 
     //
     // Hang (#debug)

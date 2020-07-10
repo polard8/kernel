@@ -1,1 +1,0 @@
-... gterm client side
