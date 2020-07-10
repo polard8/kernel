@@ -1,4 +1,0 @@
-
-#todo:
-
-     Incluir o suporte à scripts contidos na pasta /script.

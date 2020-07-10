@@ -113,6 +113,7 @@ build-boot \
 build-lib \
 build-init \
 build-gdeshell \
+build-setup \
 build-gns \
 build-gws \
 build-apps \
@@ -146,8 +147,12 @@ build-init:
 build-gdeshell:
 	@echo "==================="
 	@echo " Compiling the gdeshell"
-	$(Q) $(MAKE) -C animal/gdeshell/   
+	$(Q) $(MAKE) -C setup/gdeshell/   
 
+build-setup:
+	@echo "==================="
+	@echo " Compiling the gdeshell"
+	$(Q) $(MAKE) -C setup/   
 
 build-gns:
 	@echo "==================="
@@ -219,8 +224,7 @@ vhd-copy-files:
 	sudo cp gramado/boot/x86/bin/BL.BIN    /mnt/gramadovhd
 	sudo cp gramado/kernel/KERNEL.BIN      /mnt/gramadovhd
 
-	
-
+	# Base
 	sudo cp gramado/base/GRAMADO.TXT     /mnt/gramadovhd
 	sudo cp gramado/base/ini/GUI.INI     /mnt/gramadovhd
 	sudo cp gramado/base/ini/INIT.INI    /mnt/gramadovhd
@@ -237,11 +241,14 @@ vhd-copy-files:
 	sudo cp gramado/base/res/icons/TERMINAL.BMP  /mnt/gramadovhd
 # ...
 
+	# Init
 	sudo cp init/INIT.BIN            /mnt/gramadovhd
 
+	# gdeshell
+	sudo cp setup/gdeshell/GDESHELL.BIN    /mnt/gramadovhd
 
-	sudo cp animal/gdeshell/GDESHELL.BIN    /mnt/gramadovhd 
-	#sudo cp animal/install/ISHELL.BIN  /mnt/gramadovhd 
+	# Setup
+	-sudo cp setup/bin/*.BIN               /mnt/gramadovhd 
 # ...
 
 	# optional
@@ -330,15 +337,23 @@ clean-system-files:
 	@echo "==================="
 	@echo "Cleaning all system binaries ..."
 
-
+	# Gramado
 	-rm -rf gramado/boot/x86/bin/*.BIN
 	-rm -rf gramado/kernel/KERNEL.BIN
-	
+
+	# Init
 	-rm -rf init/*.BIN
-	-rm -rf animal/gdeshell/*.BIN
+
+	# Setup
+	-rm -rf setup/gdeshell/*.BIN
+	-rm -rf setup/bin/*.BIN
+	
+	# Services
 	-rm -rf services/gns/bin/*.BIN
 	-rm -rf services/gws/bin/*.BIN
-	
+	# ...
+
+	# Shine
 	-rm -rf shine/apps/bin/*.BIN
 	-rm -rf shine/cmd/bin/*.BIN
 # ...

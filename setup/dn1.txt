@@ -1,0 +1,17 @@
+	animal/
+	Apps using the system's API.
+	These apps needs to run without a loadable window server.
+	It uses the mini window server embedded into the base kernel.
+
+	Maybe it is good to run in full screen
+	this way we will not draw windows.
+
+	Maybe the animal/ folder could be used as a setup system environment.
+	used for the installation.
+
+	Use white font in a blue background.
+ 	Use gray font in a blue background.
+	Use yellow font in a blue background.
+	
+
+
