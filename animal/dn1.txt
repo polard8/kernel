@@ -1,0 +1,4 @@
+	animal/
+	Apps using the system's API.
+	These apps needs to run without a loadable window server.
+	It uses the mini window server embedded into the base kernel.
