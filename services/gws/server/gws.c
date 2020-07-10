@@ -91,6 +91,7 @@ int gwsInit (){
     
     __device_width =  gde_get_system_metrics (1);
     __device_height = gde_get_system_metrics (2);
+    
     SavedX = __device_width;
     SavedY = __device_height;
     
@@ -102,7 +103,18 @@ int gwsInit (){
     SavedBPP = (unsigned long) gde_get_system_metrics (9);
     
     
-     ____BACKBUFFER_VA = (unsigned long) gde_get_system_metrics (12);
+    //#obs:
+    //Se for possível vamos copiar do backbuffer para o front buffer
+    //daqui do gws e não chamaremos o kernel para isso.
+    
+    //ok
+    ____BACKBUFFER_VA = (unsigned long) gde_get_system_metrics (12);
+    
+    //#test
+    ____FRONTBUFFER_VA = (unsigned long) gde_get_system_metrics (11);
+    
+    
+    
     
     
     //
@@ -113,13 +125,19 @@ int gwsInit (){
     gui = (void *) malloc ( sizeof( struct gui_d) );
     
     
+    // #todo
+    // Checar validade
+    //if ( (void *) gui == NULL )
+    //{
+        //#todo
+    //}
+    
     // (root window)
     gui->screen = (struct gws_window_d *) createwCreateWindow ( WT_SIMPLE, 
                                           1, 1, "screen-window",  
                                           0, 0, 
                                           __device_width, __device_height,   
                                            NULL, 0, xCOLOR_GRAY3, xCOLOR_GRAY3 );
-
     
     //#test
     gwsDefineInitialRootWindow (gui->screen);

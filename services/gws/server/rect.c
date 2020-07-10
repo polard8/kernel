@@ -25,61 +25,47 @@ rectBackbufferDrawRectangle (
 {
 
     struct gws_rect_d rect;
-
+    
+    
+    unsigned long w_max = gws_get_device_width();
+    unsigned long h_max = gws_get_device_height();
    
     //Dimensions.
     rect.x = 0;  
     rect.y = 0;  
-    rect.width = width;  
+
+    //posicionamento
+    rect.left = x;    
+    rect.top  = y;
+    
+    rect.width  = width;  
     rect.height = height;  
 
+    if ( rect.width > (w_max - rect.left) ){
+        rect.width = (w_max - rect.left);
+    }
+    
+    if (rect.height > (h_max - rect.top) ){
+        rect.height > (h_max - rect.top);
+    }
+
     //Margins.
-    rect.left = x;    
-    rect.top = y;
-    rect.right = rect.left + rect.width;
-    rect.bottom = rect.top + rect.height; 
+    rect.right  = rect.left + rect.width;
+    rect.bottom = rect.top  + rect.height; 
 
     rect.bg_color = color;
 
 
-    //Limits.
-	//@todo: Repensar os limites para uma janela.
-	// Uma janela poderá ser maior que as dimensões de um dispositivo.
-	// mas não poderá ser maior que as dimensões do backbuffer.
-	// Ou seja: O dedicated buffer de uma janela deve ser menor que
-	// o backbuffer.
-	
-	//#todo: Usar variável para largura.
-
-
-    if ( rect.right > 800 )
-    {
-        rect.right = 800;
-    }
-
-
-    //if ( rect.right > SavedX )
-	//{
-    //    rect.right = SavedX;
-	//}	
-	
-
-	/* @todo:
-    if( rect->bottom > SavedY ){
-        rect->bottom = SavedY;
-	};
-    */	
-  	
     // Draw lines on backbuffer.
-	
-    while (height--)
+
+    while (rect.height--)
     {
         lineBackbufferDrawHorizontalLine ( rect.left, 
-            y, 
+            rect.top, 
             rect.right, 
             rect.bg_color );
        
-       y++;
+       rect.top++;
     };    
 }
 

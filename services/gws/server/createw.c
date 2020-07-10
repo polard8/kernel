@@ -508,7 +508,7 @@ createwCreateWindow2 (
 
 	//Alocando memória para a estrutura da janela.
 
-    window = (void *) malloc ( sizeof(struct window_d) );
+    window = (void *) malloc( sizeof(struct window_d) );
 
     if ( (void *) window == NULL )
     {
@@ -544,12 +544,9 @@ createwCreateWindow2 (
 		// Id. A janela recebe um id somente na hora de registrar.
 		// window->id = ??.
 
-		//Name.
-		window->name = windowname;
-
-		// Segurança.
-		window->used = 1;
-		window->magic = 1234;
+        window->name = windowname;
+        window->used = 1;
+        window->magic = 1234;
 
 		// Window type.
 		// Tipo é unsigned long pois poderá ser um conjunto de flags.
@@ -583,36 +580,36 @@ createwCreateWindow2 (
 		//??Qual é o status da janela, se ela é a janela ativa ou não.
 		//?? Devemos definir quais são os status possíveis da janela.
 		//
-		
-		//active 
-		if ( status == WINDOW_STATUS_ACTIVE )
-		{ 
-		    active_window = (int) window->id;  
+
+        // Active 
+        if ( status == WINDOW_STATUS_ACTIVE )
+        { 
+            active_window = (int) window->id;  
             //set_active_window(window); 
-		    //window->active = WINDOW_STATUS_ACTIVE;
-			//window->status = (unsigned long) WINDOW_STATUS_ACTIVE;
-			window->relationship_status = (unsigned long) WINDOW_REALATIONSHIPSTATUS_FOREGROUND; 
+            //window->active = WINDOW_STATUS_ACTIVE;
+            //window->status = (unsigned long) WINDOW_STATUS_ACTIVE;
+            window->relationship_status = (unsigned long) WINDOW_REALATIONSHIPSTATUS_FOREGROUND; 
             
             //#todo
             //window->z = 0;  //z_order_get_free_slot()
-			//...
-		};
+            //...
+        }
 
-		//inactive
-		if ( status == WINDOW_STATUS_INACTIVE )
-		{ 
-		    //window->active = WINDOW_STATUS_INACTIVE;
-			//window->status = (unsigned long) WINDOW_STATUS_INACTIVE;
-			window->relationship_status = (unsigned long) WINDOW_REALATIONSHIPSTATUS_BACKGROUND;
+        // Inactive
+        if ( status == WINDOW_STATUS_INACTIVE )
+        { 
+            //window->active = WINDOW_STATUS_INACTIVE;
+            //window->status = (unsigned long) WINDOW_STATUS_INACTIVE;
+            window->relationship_status = (unsigned long) WINDOW_REALATIONSHIPSTATUS_BACKGROUND;
             
             //todo
             //window->z = 0; //z_order_get_free_slot()
-			//...
-		};
+            //...
+        }
 
-		// Focus = No!
-		// Determinando que não temos o foco.
-		window->focus = 0; 
+        // Focus = No!
+        // Determinando que não temos o foco.
+        window->focus = 0; 
 
 		// @todo:
 		// Se for uma janela filha o posicionamento deve ser somado às margens 
@@ -623,15 +620,15 @@ createwCreateWindow2 (
 		// devem ser os valores para a janela, sem contar o frame, que 
 		// inclui as bordas e a barra de títulos.
 
-		// Dimensões.
+        // Dimensões.
         window->width = width;
         window->height = height;  
 
-		// Margens.
+        // Margens.
         window->left = x;    
         window->top = y;
-        window->right = (unsigned long) ( window->left + window->width );
-        window->bottom = (unsigned long) ( window->top + window->height ); 
+        window->right  = (unsigned long) ( window->left + window->width );
+        window->bottom = (unsigned long) ( window->top  + window->height ); 
 
 		// Deslocamentos em relação às margens.
 		// Os deslocamentos servem para inserir elementos na janela, 
@@ -643,10 +640,7 @@ createwCreateWindow2 (
 		//saveLeft = window->left;
 		//saveTop  = window->top;
 
-		//
-		//  ## color ##
-		//
-
+		// Color
 		// Background support.
 		window->bg_color = (unsigned long) color; 
 		window->clientrect_bg_color = (unsigned long) clientcolor;
@@ -655,13 +649,11 @@ createwCreateWindow2 (
 		// O retângulo da janela.
 		//window->rcWindow = NULL;
 		
-		//
-		// # Cursor support #
-		//
-		
-		window->CursorX = 0;
-		window->CursorY = 0;
-		window->CursorColor = COLOR_WINDOWTEXT; 
+
+		// Cursor support
+        window->CursorX = 0;
+        window->CursorY = 0;
+        window->CursorColor = COLOR_WINDOWTEXT; 
 		//@todo: As outras características do cursor.
 		//Características.
 		
@@ -690,8 +682,8 @@ createwCreateWindow2 (
 		//};
 
 		//cursores (parar de usar e começar usar apenas a estrutura.)
-		window->cursor_x = 0;
-		window->cursor_y = 0;
+        window->cursor_x = 0;
+        window->cursor_y = 0;
 
 		//Barras.
 		//As flags que representam a presença de cada uma das barras
@@ -700,10 +692,10 @@ createwCreateWindow2 (
 
 		//Current message.
 		//Msg support.
-		window->msg_window = (void *) window;
-		window->msg = 0;
-		window->long1 = 0;
-		window->long2 = 0;
+        window->msg_window = (void *) window;
+        window->msg = 0;
+        window->long1 = 0;
+        window->long2 = 0;
 
 		//Se tem ou não uma nova mensagem.
 		window->newmessageFlag = 0;
@@ -711,11 +703,11 @@ createwCreateWindow2 (
 		//Filas de mensagens.
 		//São dessas filas que os programas em user mode
 		//são pegar as mensagens, solicitando através de system call.
-		window->hwndList[0] = 0;
-		window->msgList[0] = 0;
+		window->hwndList[0]  = 0;
+		window->msgList[0]   = 0;
 		window->long1List[0] = 0;
 		window->long2List[0] = 0;
-		
+
 		//Offsets
 		window->sendOffset = 0;
 		window->receiveOffset = 0;
@@ -750,9 +742,9 @@ createwCreateWindow2 (
 		// Terminal support.
 		// Suporte não tradicional à terminais.
 		// manipulando variáveis ao invés de uma estrutura.
-		window->terminal_used = (int) 0;
+		window->terminal_used  = (int) 0;
 		window->terminal_magic = (int) 0;
-		window->terminal_tab = (int) 0;
+		window->terminal_tab   = (int) 0;
 		
 		//window->terminal_left = (unsigned long) 0;
 		//window->terminal_top = (unsigned long) 0;
@@ -799,9 +791,6 @@ createwCreateWindow2 (
 		//printf("config1 %s %d %d %d %d \n",
 		//    window->name, window->left, window->top, window->width, window->height );
 	};
-	
-	
-
 
 
     //Exemplos de tipos de janelas, segundo MS.	
@@ -839,15 +828,15 @@ createwCreateWindow2 (
             //return NULL; 
             //break;
 
-		// Simple window. (Sem barra de títulos).
+        // Simple window. (Sem barra de títulos).
         case WT_SIMPLE:
             Background = 1;
             window->backgroundUsed = 1;
             break;
 
 
-		// Edit box. (Simples + borda preta).
-		// editbox não tem sombra, tem bordas. 
+        // Edit box. (Simples + borda preta).
+        // Editbox não tem sombra, tem bordas. 
         case WT_EDITBOX:
             Background = 1;
             window->backgroundUsed = 1;
@@ -859,45 +848,45 @@ createwCreateWindow2 (
 		// Overlapped. (completa, para aplicativos).
 		// Sombra, bg, título + borda, cliente area ...
 		// #obs: Teremos recursividade para desenhar outras partes.
-		case WT_OVERLAPPED:
-	        Shadow = 1;
-		    window->shadowUsed = 1;
-	        Background = 1;
-		    window->backgroundUsed = 1;
-	        TitleBar = 1;
-		    window->titlebarUsed = 1;
-		    ClientArea = 1;
-		    window->clientAreaUsed = 1;
+        case WT_OVERLAPPED:
+            Shadow = 1;
+            window->shadowUsed = 1;
+            Background = 1;
+            window->backgroundUsed = 1;
+            TitleBar = 1;
+            window->titlebarUsed = 1;
+            ClientArea = 1;
+            window->clientAreaUsed = 1;
 
-			MinimizeButton = 1;   
-		    MaximizeButton = 1;   
-			CloseButton = 1;       
+            MinimizeButton = 1;   
+            MaximizeButton = 1;   
+            CloseButton = 1;       
 
-		    //MenuBar       = 1;    // Barra de menu. 
-	        //ButtonSysMenu = 1;    // System menu button. ??
+            //MenuBar       = 1;    // Barra de menu. 
+            //ButtonSysMenu = 1;    // System menu button. ??
 
 		    //set_active_window(window);
 		    break;
 
 
 		// Popup. (um tipo de overlapped mais simples).
-		case WT_POPUP:
-	        Shadow = 1;        
-		    window->shadowUsed = 1;	        
-	        Background = 1;
-		    window->backgroundUsed = 1;
-		    //if(titulo){} TitleBar = 1;    //titulo + borda
-		    break;
+        case WT_POPUP:
+            Shadow = 1; 
+            window->shadowUsed = 1;
+            Background = 1;
+            window->backgroundUsed = 1;
+            //if(titulo){} TitleBar = 1;    //titulo + borda
+            break;
  
  
-		// Check box. (Simples + borda preta).
+        // Check box. (Simples + borda preta).
         // Caixa de seleção. Caixa de verificação. Quadradinho.
-		case WT_CHECKBOX:
-	        Background = 1;    
-		    window->backgroundUsed = 1;
+        case WT_CHECKBOX:
+            Background = 1;    
+            window->backgroundUsed = 1;
             Border = 1;
  			//window->borderUsed = 1;@todo: isso ainda não existe na extrutura ??
-		    break;
+            break;
 			
 		// Scroll bar. Para ser usada como janela filha.
 		case WT_SCROLLBAR:
@@ -948,9 +937,10 @@ createwCreateWindow2 (
 		//Ainda não implementada.
         default:
             //return NULL; 
-                gde_message_box (3,"createwCreateWindow2","default");
-	         while(1){}
-		    break;
+            gde_message_box (3,"createwCreateWindow2","default");
+            debug_print("createwCreateWindow2: default\n");
+            while(1){}
+            break;
 	};
 
     //gde_message_box (3,"xxx","xxxx");
@@ -1141,9 +1131,8 @@ createwCreateWindow2 (
 
     if ( Shadow == 1 )
     {
-		//flag.
-		window->shadowUsed = 1;
-		
+        window->shadowUsed = 1;
+
 		//CurrentColorScheme->elements[??]
 		
 		//@todo: 
@@ -1164,10 +1153,10 @@ createwCreateWindow2 (
 			{ __tmp_color = xCOLOR_GRAY1; }    //mais escuro
 			if (window->focus == 0)
 			{ __tmp_color = xCOLOR_GRAY2; }    //mais claro
-			
-			rectBackbufferDrawRectangle ( window->left +1, window->top +1, 
-				window->width +1 +1, window->height +1 +1, 
-				__tmp_color );             
+
+        rectBackbufferDrawRectangle ( window->left +1, window->top +1, 
+            window->width +1 +1, window->height +1 +1, 
+            __tmp_color );             
         }
 
         // ??
@@ -1198,12 +1187,12 @@ createwCreateWindow2 (
 
 		// O argumento 'color' será a cor do bg para alguns tipos.
 		// Talvez não deva ser assim. Talvez tenha que se respeitar o tema instalado.
-        if ( (unsigned long) type == WT_SIMPLE ){ window->bg_color = color; }
-        if ( (unsigned long) type == WT_POPUP ){ window->bg_color = color; }
-        if ( (unsigned long) type == WT_EDITBOX){ window->bg_color = color; }
+        if ( (unsigned long) type == WT_SIMPLE ) { window->bg_color = color; }
+        if ( (unsigned long) type == WT_POPUP )  { window->bg_color = color; }
+        if ( (unsigned long) type == WT_EDITBOX) { window->bg_color = color; }
         if ( (unsigned long) type == WT_CHECKBOX){ window->bg_color = color; }
         //if ( (unsigned long) type == WT_SCROLLBAR){ window->bg_color = color; }
-        if ( (unsigned long) type == WT_ICON ){ window->bg_color = color; }
+        if ( (unsigned long) type == WT_ICON )   { window->bg_color = color; }
         //...
 
 		// Pintar o retângulo.

@@ -653,7 +653,7 @@ response_loop:
 process_reply:
 
     // #test
-    gws_debug_print ("terminal: Testing close() ...\n"); 
+    //gws_debug_print ("terminal: Testing close() ...\n"); 
     //close (fd);
 
     //gws_debug_print ("terminal: bye\n"); 
@@ -1113,7 +1113,7 @@ response_loop:
 process_reply:
 
     // #test
-    gws_debug_print ("terminal: Testing close() ...\n"); 
+    //gws_debug_print ("terminal: Testing close() ...\n"); 
     //close (fd);
 
     //gws_debug_print ("terminal: bye\n"); 
@@ -1364,6 +1364,7 @@ int main ( int argc, char *argv[] ){
     client_fd = socket ( AF_INET, SOCK_STREAM, 0 );
     
     if ( client_fd < 0 ){
+       debug_print ("terminal: Couldn't create socket\n");
        printf ("terminal: Couldn't create socket\n");
        exit(1);
     }
@@ -1392,6 +1393,7 @@ int main ( int argc, char *argv[] ){
     
     printf ("terminal: Connecting to the address via inet  ...\n");      
     if (connect (client_fd, (void *) &addr_in, sizeof(addr_in)) < 0){ 
+        debug_print ("terminal: connect() Fail \n"); 
         printf("terminal: Connection Failed \n"); 
         return -1; 
     } 

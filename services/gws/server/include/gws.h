@@ -11,6 +11,7 @@ unsigned long SavedBPP;
 
 
 unsigned long  ____BACKBUFFER_VA;
+unsigned long  ____FRONTBUFFER_VA;  //#test
 
 
 //...

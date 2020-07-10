@@ -1,98 +1,11 @@
 ;
 ; File: bm/main.asm 
-;
-; #todo
-; Refazer esses comentários. 
-;
-; Descri��o:
-;     Esse � o arquivo principal de BM.BIN.
-;     Foi carregado pelo MBR.  
-;     O objetivo � carregar BL.BIN na mem�ria e passar o comando para ele.
 ; 
-;     *** Importante: @todo: Um novo nome deve ser criado.
-;     Arquivo principal do System4Nora. (Come�a com o BM).
-;
-; *Importante:
-; + O arquivo main.asm faz uma sequ�ncia de inclus�es de m�dulos que comp�em 
-; o Boot manager, come�ando pelos m�dulos de 16bit e depois os m�dulos de 
-; 32bit. 
-; + O arquivo header32.inc deve ficar no in�cio das inclus�es dos m�dulos de 
-; 32bit, para que os m�dulos de 32bit possam utiliza-lo adequadamente.
-;
-;Sobre o sistema System4Nora: (#cancelado)
-;========================================
-;    O sistema � chamado SYSTEM.VHD.
-;    � um VHD de 32 MB feito em assembly. (NASM).
-;    Comt�m 4 programas compilados juntos.
-;    S�o eles:
-;    
-;       1, Boot Manager (16 e 32 bit).
-;       2, Boot Loader (32 bit). (@todo)
-;       3, Kernel (32 bit).      (@todo)
-;       4, Browser (32 bits).    (@todo)
-;       
-;    Obs: 
-;    ====
-;        *IMPORTANTE: Os 4 programas do System4Nora
-;                     podem usar as bibliotecas de 32bit
-;                     que pertencem ao Boot Manager.
-;
-;       *O System4Nora permite a inicializa��o no Modo Texto e
-;        e no Modo Gr�fico. A sele��o do modo � feita no arquivo stage2.inc.
-;        mas a sele��o do modo de iniciliza��o poder� ser feita pelo
-;        usu�rio administrador e pelo desenvolvedor.
-;
-;  1) Sobre o Boot Manager do System4Nora:
-;       Faz a inicializa��o em 16 bits.
-;
-;  2) Sobre o Boot Loader do System4Nora:
-;       � um Boot Loader interno que carrega o kernel interno
-;
-;  3) Sobre o Kernel do System4Nora:
-;         O Kernel � m�nimo, monotarefa.
-;         Tecnologia semelhante ao DPMI.
-;         Os recursos do System4Nora podem
-;         ser acessados atrav�s de um Shell interno.
-;         usado pelo desenvolvedor para gerenciamento de
-;         inicializa��o.         
-;       
-;  4) Sobre o Browser do System4Nora:
-;        O Browser � a interface gr�fica. � a �rea de trabalho onde
-;        aparecer�o as p�ginas em html, os atalhos para as aplica��es
-;        ou os gerenciadores do sistema.
-;        Essa inteface gr�fica assim como o shell interno ser�
-;        usada para gerenciamento de inicializa��o.
-;
-;Sobre o subsistema:
-;===================
-;    O subsistema � chamado SYSTEM.BIN.
-;    � um programa em user mode feito em C.
-;    Ser�o usados os c�digos do Boot Loader em C e
-;    do Kernel em C, j� feitos.
-;    A atribui��o do subsistema � ser uma interface
-;    entre as aplica��es em user mode e o kernel em assembly.
-;     
-; Sobre as aplica��es:
-; ===================
-;     As aplica��es s�o programas feitos em C 32bit.
-;     Rodam em user mode.
-;
-; @todo: Filtrar as informa�oes abaixo nesse coment�rio.
-;
-; Sobre o Boot Manager contido no System4Nora:
-; ============================================
-;     O Boot Manager � a primeira parte do System4Nora, ele come�a com um MBR 
-; em 16bit e stage 2 em 16bit depois muda pra 32bit.
-; 
-;     Arquivo principal do Boot Manager.
-;     M0 - M�dulos em ring0.
-;
-;     Boot Manager 16bit via BIOS.
-;     Para HD IDE.
-;     Tamanho = 32KB.
+;    Main file of Boot manager.
 ;
 ; Video modes:
 ; ============
+;
 ; VirtualBox:
 ; Oracle VirtualBox: 0x0112   640x480x24bpp
 ; Oracle VirtualBox: 0x0115   800x600x24BPP
@@ -102,15 +15,18 @@
 ; GeForce_8400_GS equ 0x06E4  
 ; GeForce 8400 GS: 0x0115   800x600x32BPP
 ;
-; Obs: A resolu��o usada por enquanto em 32bit � 800x600x24BPP.
+; Obs: 
+; A resolução usada por enquanto em 32bit é 800x600x24.
 ; 
 ; Continua ...
 ;
 ; OBS: 
-;     O Boot Loader (BL.BIN) pode querer configurar o modo de v�deo. 
-; Ent�o ele salva o modo no metafile e reinicia a m�quina. Para isso 
-; o Boot Manager deve apenas pegar o valor que esta no metafile e 
-; n�o editar o metafile.
+;     #todo #test
+;     O Boot Loader (BL.BIN) pode querer configurar o modo de vídeo. 
+; Então ele salva o modo no metafile e reinicia a máquina. 
+; Para isso o Boot Manager deve apenas pegar o valor que esta no 
+; metafile e não editar o metafile.
+;
 ;
 ; History:
 ;     2005 - Created by Fred Nora. 
@@ -209,11 +125,17 @@
 ; Nvidia GeForce:  
 ; GeForce 8400 GS: 0x0115   800x600x32BPP
 
+;;
+;; Selecting the mode.
+;;
 
+
+;; Well tested modes.
+;; ok on qemu.
 ;G_VIDEO_MODE EQU 0x0112     ;640x480
 G_VIDEO_MODE EQU 0x0115     ;800x600
 ;G_VIDEO_MODE EQU 0x0118     ;1024x768
-;..
+; ...
 
 
 
