@@ -1,5 +1,5 @@
 /*
- * File: kernel/include/window.h 
+ * File: window.h 
  *
  * 
  * Descrição:
@@ -939,12 +939,12 @@ struct window_d
     int toolbarUsed;
     int clientAreaUsed;
     int statusbarUsed;
-    int scrollbarUsed;
     int minimizebuttonUsed;
     int maximizebuttonUsed;
     int closebuttonUsed;
     int borderUsed;
 	// ...
+
 
 //==================================================
 
@@ -986,26 +986,12 @@ struct window_d
     //colocando a janela acima das outras.
     struct window_d *child_with_focus; 
 
-//==================================================
 
-	// scroll bar
-    struct window_d *scrollbar;
-    struct window_d *scrollbar_button1; // ^
-    struct window_d *scrollbar_button2; // =
-    struct window_d *scrollbar_button3; // V
-    
-    int isScrollBarButton1;
-    int isScrollBarButton2;
-    int isScrollBarButton3;
- 
  
 //==================================================
-
     struct window_d *statusbar;
-
-//==================================================
-
     struct window_d *toolbar;
+
 
 //==================================================
 
@@ -2217,83 +2203,102 @@ save_rect ( unsigned long x,
 //retângulo no backbuffer.
 
 int 
-show_saved_rect ( unsigned long x, 
-                  unsigned long y, 
-                  unsigned long width, 
-                  unsigned long height );
+show_saved_rect ( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long width, 
+    unsigned long height );
 
 
+//#todo: deprecated.
 void scroll_screen_rect (void);
 
 
 
 //
-//  ...
-//	
-	
-	
-//Pinta um pixel em um buffer de janela.
+// ...
+//
 
+
+
+
+// Pinta um pixel em um buffer de janela.
 void 
-pixelPutPixelWindowBuffer ( void* buffer, 
-                            unsigned long x, 
-						    unsigned long y, 
-						    unsigned long color );
-						  
+pixelPutPixelWindowBuffer ( 
+    void *buffer, 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long color );
+
+
+  
 /*
  * pixelPutPixelDedicatedWindowBuffer:
  *     Coloca um pixel no buffer da janela.
- *     Serve para pintar janelas que irão direto do seu buffer para o LFB da 
- * memória de vídeo, sem passar pelo back buffer. (OVERLAPPED)
+ *     Serve para pintar janelas que irão direto do seu buffer para 
+ * o LFB da memória de vídeo, sem passar pelo back buffer. (OVERLAPPED)
  */
 
 void 
-pixelPutPixelDedicatedWindowBuffer ( struct window_d *window, 
-                                     unsigned long x, 
-									 unsigned long y, 
-									 unsigned long color ); 	
-						 
-/*
-void my_buffer_put_pixel( unsigned long ax, 
-                          unsigned long bx, 
-						  unsigned long cx, 
-						  unsigned long dx );
-*/
-						  
-						  
+pixelPutPixelDedicatedWindowBuffer ( 
+    struct window_d *window, 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long color ); 
+
+
+
 //
-// ## putpixel ##
-//					
+// pixel
+//
+
 
 void 
-backbuffer_putpixel( unsigned long ax, 
-                     unsigned long bx, 
-				     unsigned long cx, 
-				     unsigned long dx );
+backbuffer_putpixel( 
+    unsigned long ax, 
+    unsigned long bx, 
+    unsigned long cx, 
+    unsigned long dx );
+
+
 void 
-lfb_putpixel ( unsigned long ax, 
-               unsigned long bx, 
-		       unsigned long cx, 
-		       unsigned long dx );
-	  
-						  
-						  
-void 
-my_buffer_horizontal_line ( unsigned long x1,
-                            unsigned long y, 
-							unsigned long x2,  
-							unsigned long color );
-								
-void 
-drawDataRectangle ( unsigned long x, 
-                    unsigned long y, 
-					unsigned long width, 
-					unsigned long height, 
-					unsigned long color );	
-						
-						
-void * rectStrCopyMemory32 ( unsigned long *dest, unsigned long *src, int count ); 
+lfb_putpixel ( 
+unsigned long ax, 
+    unsigned long bx, 
+    unsigned long cx, 
+    unsigned long dx );
+
+//
+// line
+//
  
+void 
+my_buffer_horizontal_line ( 
+    unsigned long x1,
+    unsigned long y, 
+    unsigned long x2,  
+    unsigned long color );
+
+
+// rectangle.
+
+void 
+drawDataRectangle ( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long width, 
+    unsigned long height, 
+    unsigned long color );
+
+
+
+void *rectStrCopyMemory32 ( 
+    unsigned long *dest, 
+    unsigned long *src, 
+    int count ); 
+
+
+
 //
 // Window support.
 // 
@@ -2303,7 +2308,6 @@ int init_window_manager (void);
 int init_windows (void);
 
 int RegisterWindow (struct window_d *window);
-
 
 void set_current_window (struct window_d *window);
 void *get_current_window (void);
@@ -2324,20 +2328,23 @@ int show_window_rect (struct window_d *window);
 
 
 int 
-resize_window( struct window_d *window, 
-               unsigned long cx, 
-			   unsigned long cy );
+resize_window ( 
+    struct window_d *window, 
+    unsigned long cx, 
+    unsigned long cy );
 
 
-int replace_window ( struct window_d *window, 
-                     unsigned long x, 
-			         unsigned long y ); 
+int 
+replace_window ( 
+    struct window_d *window, 
+    unsigned long x, 
+    unsigned long y ); 
 
-//coloca a janela acima das outras.
+
+// coloca a janela acima das outras.
 int raise_window ( struct window_d *window );
 
 int redraw_window (struct window_d *window, unsigned long flags );
-    
 
 //redraw all windows.
 int redraw_screen (void);                          
@@ -2346,11 +2353,8 @@ int is_window_full(struct window_d *window);
 int is_window_maximized(struct window_d *window);
 int is_window_minimized(struct window_d *window);
 
-
-
 void set_active_window (struct window_d *window);
 int get_active_window (void);
-
 
 void change_active_window (int id);
 
@@ -2413,10 +2417,11 @@ int windowCreateDedicatedBuffer (struct window_d *window);
 // Envia mensagem para a fila da janela com foco de entrada.
 
 void 
-windowSendMessage ( unsigned long arg1, 
-                    unsigned long arg2, 
-					unsigned long arg3, 
-					unsigned long arg4 );
+windowSendMessage ( 
+    unsigned long arg1, 
+    unsigned long arg2, 
+    unsigned long arg3, 
+    unsigned long arg4 );
 
 
 //
@@ -2439,28 +2444,34 @@ void windowSetUpColorScheme (int type);
 int windowSelectColorScheme ( int type );
 
 
-void guiSetUpMainWindow( unsigned long x, 
-                         unsigned long y, 
-						 unsigned long width, 
-						 unsigned long height );
-						 
-						 
+void 
+guiSetUpMainWindow ( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long width, 
+    unsigned long height );
+
+
 //
-//  ## timer support  ##
+// timer
 //
 
 int windowKillTimer ( struct window_d *window, int id );
-				 
+
+ 
+//janela
+//id do timer
+//tempo(medida indefinida ainda)
 int
-windowSetTimer ( struct window_d *window, //janela
-                 int id,                  //id do timer
-				 int time                //tempo(medida indefinida ainda)
-				);
-				
-				
-				
-//escaneia as janelas existentes procurando uma 
-//que contenha o posicionamento do cursor.				
+windowSetTimer ( 
+    struct window_d *window, 
+    int id, 
+    int time );
+
+
+
+// Escaneia as janelas existentes procurando uma 
+// que contenha o posicionamento do cursor.
 int windowScan ( unsigned long x, unsigned long y );
 
 int windowOverLappedScan ( unsigned long x, unsigned long y );
@@ -2474,61 +2485,71 @@ void windowUpdateWindow ( struct window_d *window );
 int windowSwitchFullScreen (void);
 
 
+int DrawIcon ( struct window_d *window, int n );
 
-int DrawTitleBar ( struct window_d *window,
-                unsigned long x,
-                unsigned long y,
-                unsigned long width,
-                unsigned long height,
-                int style,
-                char *string );
+int 
+DrawTitleBar ( 
+    struct window_d *window,
+    unsigned long x,
+    unsigned long y,
+    unsigned long width,
+    unsigned long height,
+    int style,
+    char *string );
 
 
-int DrawFrame ( struct window_d *window,
-                unsigned long x,
-                unsigned long y,
-                unsigned long width,
-                unsigned long height,
-                int style );
+int 
+DrawFrame ( 
+    struct window_d *window,
+    unsigned long x,
+    unsigned long y,
+    unsigned long width,
+    unsigned long height,
+    int style );
+
 
 /*
+ **********************************************
  * CreateWindow:
  *     Cria uma janela com base em um tipo.
  */
 
-void *CreateWindow ( unsigned long type,  //1 - tipo de janela (popup ..normal ...)
-          unsigned long status,           //2  - estado da janela (ativa ou nao)
-          unsigned long view,             //3  - (min, max ...)
-          char* windowname,               //4  - titulo                                
-          unsigned long x,                //5  - deslocamento em relação às margens do desktop(sua instancia)        
-          unsigned long y,                //6  - idem
-          unsigned long width,            //7  - largura da janela  
-          unsigned long height,           //8  - altura
-          struct window_d *pWindow,       //9  - id da janela mae, se for zero, essa é a janela mae.
-          int desktopid,                  //10 - desktop ID.
-          unsigned long clientcolor,            //11 - Client Area Color.
-          unsigned long color             //12 - cor do bg (para janelas simples, tipo 1)
+void *CreateWindow ( 
+    unsigned long type,         //1 - tipo de janela (popup ..normal ...)
+    unsigned long status,       //2  - estado da janela (ativa ou nao)
+    unsigned long view,         //3  - (min, max ...)
+    char *windowname,           //4  - titulo                                
+    unsigned long x,            //5  - deslocamento em relação às margens do desktop(sua instancia)        
+    unsigned long y,            //6  - idem
+    unsigned long width,        //7  - largura da janela  
+    unsigned long height,       //8  - altura
+    struct window_d *pWindow,   //9  - id da janela mae, se for zero, essa é a janela mae.
+    int desktopid,              //10 - desktop ID.
+    unsigned long clientcolor,  //11 - Client Area Color.
+    unsigned long color         //12 - cor do bg (para janelas simples, tipo 1)
 );
 
 
-// Essa será a função que atenderá a interrupção
-//esse é o serviço de criação da janela.
-// talvez ampliaremos o número de argumentos
 
-void *kgws_create_window ( unsigned long type, 
-                     unsigned long status, 
-                     unsigned long view, 
-                     char *windowname, 
-                     unsigned long x, 
-                     unsigned long y, 
-                     unsigned long width, 
-                     unsigned long height, 
-                     struct window_d *pWindow, 
-                     int desktopid, 
-                     unsigned long clientcolor, 
-                     unsigned long color );
+// #todo: 
+// Talvez deletar essa função e usar apenas CreateWindow.
+void *kgws_create_window ( 
+    unsigned long type, 
+    unsigned long status, 
+    unsigned long view, 
+    char *windowname, 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long width, 
+    unsigned long height, 
+    struct window_d *pWindow, 
+    int desktopid, 
+    unsigned long clientcolor, 
+    unsigned long color );
  
-int scroll_client_window ( struct window_d *window ); 			
+
+// #todo: deprecated.
+int scroll_client_window ( struct window_d *window );
 
 
 //

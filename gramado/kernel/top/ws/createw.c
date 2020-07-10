@@ -1,5 +1,4 @@
-/*
- 
+/* 
 #importante:
 
 >> o frame pertence à uma janela.
@@ -8,9 +7,8 @@
 -----
 primeiro cria-se uma janela...
 depois cria-se um frame para ela,
-quando for criar o frame então a rotina chama a função que cria a caption bar.
-
- 
+quando for criar o frame então a rotina chama a função que cria 
+a caption bar.
  */
 
 
@@ -102,10 +100,10 @@ extern unsigned long SavedBPP;
 
 
 
-int DrawIcon ( struct window_d *window, int n );
-int DrawIcon ( struct window_d *window, int n )
-{
-    //todo: checar validades.
+int DrawIcon ( struct window_d *window, int n ){
+
+    // todo: 
+    // Checar validades.
     
     // n = seleciona um icon de uma lista.
     // switch()
@@ -116,18 +114,21 @@ int DrawIcon ( struct window_d *window, int n )
 
 
 // #importante
-// >>> Criaremos a barra de títulos depois que a janela estiver pronta.
+// Criaremos a barra de títulos depois que a janela estiver pronta.
               
-int DrawTitleBar ( struct window_d *window,
-                unsigned long x,
-                unsigned long y,
-                unsigned long width,
-                unsigned long height,
-                int style,
-                char *string )         
+int 
+DrawTitleBar ( 
+    struct window_d *window,
+    unsigned long x,
+    unsigned long y,
+    unsigned long width,
+    unsigned long height,
+    int style,
+    char *string )         
 {
-	
-	unsigned long __tmp_color;
+
+    unsigned long __tmp_color;
+
 
     // podemos desenhar a string e os botões de controle.
     // Isso poderá ser chamado pelo wm.
@@ -155,8 +156,6 @@ int DrawTitleBar ( struct window_d *window,
 
 
 
-
-
 // #importante:
 // essa rotina será chamada depois que criarmos uma janela básica
 // mas só para alguns tipos de janelas
@@ -174,19 +173,21 @@ int DrawTitleBar ( struct window_d *window,
 // por exemplo: uma editbox tem um frame mas não tem uma caption bar;
 
 
-              
-int DrawFrame ( struct window_d *window,
-                unsigned long x,
-                unsigned long y,
-                unsigned long width,
-                unsigned long height,
-                int style )          //estilo do frame.
+int 
+DrawFrame ( 
+    struct window_d *window,
+    unsigned long x,
+    unsigned long y,
+    unsigned long width,
+    unsigned long height,
+    int style )          //estilo do frame.
 {
 
     unsigned long border_color;
     unsigned long border_size;
     unsigned long __tmp_color;  
-    
+
+
     // #todo
     // desenhar o frame e depois desenhar a barra de títulos
     // caso esse estilo de frame precise de uma barra.
@@ -304,9 +305,8 @@ int DrawFrame ( struct window_d *window,
 
 
 
-
 /*
- ***************************************************************************
+ ****************************************************************
  * CreateWindow: 
  *     Função secundária. Cria uma janela simples. Apenas alguns tipos.
  */
@@ -329,21 +329,24 @@ int DrawFrame ( struct window_d *window,
 // Essa rotina cria janelas simples, sem molduras, dos seguintes tipos:
 // WT_SIMPLE, WT_POPUP, WT_BUTTON, WT_STATUSBAR e WT_ICON
  
-void *CreateWindow ( unsigned long type, 
-                     unsigned long status, 
-                     unsigned long view, 
-                     char *windowname, 
-                     unsigned long x, 
-                     unsigned long y, 
-                     unsigned long width, 
-                     unsigned long height, 
-                     struct window_d *pWindow, 
-                     int desktopid, 
-                     unsigned long clientcolor, 
-                     unsigned long color ) 
-{	
-	// @todo: O argumento style está faltando.
-	//        cada tipo de tanela poderá ter vários estilos.
+void *CreateWindow ( 
+    unsigned long type, 
+    unsigned long status, 
+    unsigned long view, 
+    char *windowname, 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long width, 
+    unsigned long height, 
+    struct window_d *pWindow, 
+    int desktopid, 
+    unsigned long clientcolor, 
+    unsigned long color ) 
+{
+
+	// #todo: 
+	// O argumento style está faltando.
+	// cada tipo de tanela poderá ter vários estilos.
 	// Obs: Podemos ir usando apenas um estilo padrão por enquanto.
 	
 	// (min, max ...).
@@ -353,19 +356,18 @@ void *CreateWindow ( unsigned long type,
 	int Minimized; //
 
 	// Bars.
-	int TitleBar = 0;
-	int MenuBar = 0;
-	int ToolBar = 0;
+	int TitleBar  = 0;
+	int MenuBar   = 0;
+	int ToolBar   = 0;
 	int StatusBar = 0;
-	int ScrollBar = 0;
 	//...
-	
+
 	// Title bar buttons. [v] [X] 
 	int MinimizeButton = 0; 
 	int MaximizeButton = 0; 
 	int CloseButton = 0;    
     //..
-	
+
 	// Items.
 	int Background = 0;
 	int ClientArea = 0;
@@ -374,9 +376,9 @@ void *CreateWindow ( unsigned long type,
 	int ButtonUp = 0;   //??
 	int ButtonSysMenu = 0;  //system menu na barra de títulos.	
 	int Border = 0;         //New !!! usado no edit box.
-	//int ScrollBar;
 	//...
-	
+
+
 	// Desktop support.
 	int ParentWindowDesktopId;    //Id do desktop da parent window.
 	int WindowDesktopId;          //Id do desktop da janela a ser criada.
@@ -1116,15 +1118,21 @@ void *CreateWindow ( unsigned long type,
 
         window->bg_color = CurrentColorScheme->elements[csiWindowBackground]; 
 
-		// O argumento 'color' será a cor do bg para alguns tipos.
-		// Talvez não deva ser assim. Talvez tenha que se respeitar o tema instalado.
-        if ( (unsigned long) type == WT_SIMPLE ){ window->bg_color = color; }
-        if ( (unsigned long) type == WT_POPUP ){ window->bg_color = color; }
-        if ( (unsigned long) type == WT_EDITBOX){ window->bg_color = color; }
-        if ( (unsigned long) type == WT_CHECKBOX){ window->bg_color = color; }
-        //if ( (unsigned long) type == WT_SCROLLBAR){ window->bg_color = color; }
-        if ( (unsigned long) type == WT_ICON ){ window->bg_color = color; }
-        //...
+        // O argumento 'color' será a cor do bg para alguns tipos.
+        // Talvez não deva ser assim. Talvez tenha que se 
+        // respeitar o tema instalado.
+        if ( (unsigned long) type == WT_SIMPLE )
+        { window->bg_color = color; }
+        if ( (unsigned long) type == WT_POPUP ) 
+        { window->bg_color = color; }
+        if ( (unsigned long) type == WT_EDITBOX) 
+        { window->bg_color = color; }
+        if ( (unsigned long) type == WT_CHECKBOX)
+        { window->bg_color = color; }
+        if ( (unsigned long) type == WT_ICON )
+        { window->bg_color = color; }
+        // ...
+
 
 		// Pintar o retângulo.
 		// #todo: 
@@ -1410,40 +1418,26 @@ done:
 
 
 
-/*
- ***************************** 
- * kgws_create_window:
- *     
- *     Create a window.
- * 
- */
- 
-// # importante 
-// Essa será a função que atenderá a interrupção.
-// Esse é o serviço de criação da janela.
-// Talvez ampliaremos o número de argumentos.
-    
-//1. Começamos criando uma janela simples
-//2. depois criamos o frame, que decide se vai ter barra 
-//   de títulos ou nao.
-                  
-void *kgws_create_window ( unsigned long type, 
-                     unsigned long status, 
-                     unsigned long view, 
-                     char *windowname, 
-                     unsigned long x, 
-                     unsigned long y, 
-                     unsigned long width, 
-                     unsigned long height, 
-                     struct window_d *pWindow, 
-                     int desktopid, 
-                     unsigned long clientcolor, 
-                     unsigned long color ) 
+
+// #todo: talvez deletar essa função e usar CreateWindow.
+void *kgws_create_window ( 
+    unsigned long type, 
+    unsigned long status, 
+    unsigned long view, 
+    char *windowname, 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long width, 
+    unsigned long height, 
+    struct window_d *pWindow, 
+    int desktopid, 
+    unsigned long clientcolor, 
+    unsigned long color ) 
 {
 
     struct window_d *__w;
 
-    
+ 
     // No caso dos tipos com moldura então criaremos em duas etapas.
     // no futuro todas serão criadas em duas etapas e 
     // CreateWindow será mais imples.

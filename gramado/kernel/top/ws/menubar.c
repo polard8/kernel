@@ -59,7 +59,6 @@ void *create_menubar ( struct window_d *pwindow ){
     struct window_d *mWindow; 
     //struct linkedlist_d *mb_linkedlist;
    
-	
 	unsigned long x;
 	unsigned long y;
 	unsigned long width;
@@ -68,12 +67,11 @@ void *create_menubar ( struct window_d *pwindow ){
 	
 	// Parent window.	
 	
-	if( (void*) pwindow == NULL )
-	{
+	if( (void*) pwindow == NULL ){
 	    printf ("create_menubar: pwindow\n");
 		goto fail;
+	
     }else{
-		
         x = pwindow->left; 
         y = pwindow->top;
 	    
@@ -182,19 +180,20 @@ fail:
  */
 
 int 
-create_menubar_item ( struct menu_d *menu, 
-                      unsigned char *string, 
-                      int status )
+create_menubar_item ( 
+    struct menu_d *menu, 
+    unsigned char *string, 
+    int status )
 {
-	struct window_d *miWindow; 
-		
-	int Selected = 0;
-	unsigned long Color = COLOR_WINDOW;    
-	
 
-	
-    if ( (void *) menu == NULL )
-    {
+    struct window_d *miWindow; 
+    int Selected = 0;
+    unsigned long Color = COLOR_WINDOW;    
+
+
+
+    if ( (void *) menu == NULL ){
+        //message
         return (int) 1;
     }
 
@@ -337,11 +336,11 @@ strings:
 //errado: o certo seria mb_selectmenu()
 
 int select_menubar_item (int n){
-	
-    if (n < 0)
-    {
-	   return (int) 1;
-	}
+
+
+    if (n < 0){
+       return (int) 1;
+    }
 	
     gui->mb->Items[n].Selected = 1;
     
@@ -353,11 +352,11 @@ int select_menubar_item (int n){
 // errado: o certo seria mb_unselectmenu ()
 
 int unselect_menubar_item (int n){
-	
-    if (n < 0)
-    {
-	   return (int) 1;
-	}
+
+
+    if (n < 0){
+       return (int) 1;
+    }
 
     gui->mb->Items[n].Selected = 0;
 
@@ -369,13 +368,14 @@ int unselect_menubar_item (int n){
 // Rever o acesso a estrutura de Itens.
 
 int redraw_menubar_item (int n){
-	
-    int Selected;
-	
-    if (n<0)
-    {
-	    return (int) 1;
-	}
+
+
+    int Selected=0;
+
+
+    if (n<0){
+        return (int) 1;
+    }
 
     unsigned long x = (unsigned long) gui->mb->Items[n].x; 
     unsigned long y = (unsigned long) gui->mb->Items[n].y;
@@ -397,15 +397,14 @@ int redraw_menubar_item (int n){
 	draw_string ( gui->mb->Items[n].left, gui->mb->Items[n].top, 
 	    COLOR_WINDOWTEXT, gui->mb->Items[n].string );
 
-	return 0;
+    return 0;
 }
 
 
-int get_menubar_selected_item (void){
-	
-	// #todo: 
-    // Checar se a estrutura é válida.
-    
+// #todo: 
+// Checar se a estrutura é válida.
+int get_menubar_selected_item (void)
+{
     return (int) gui->mb->selectedItem;
 }
 
@@ -441,17 +440,16 @@ int kgws_create_menubar ( struct window_d *window){
 	// O handle da menubar window.
 
 	//if ( (void *) gui->screen == NULL )
-	if ( (void *) window == NULL )
-	{
+	if ( (void *) window == NULL ){
+		//message
         return (int) 1;
     
     }else{
 
         //gui->mbhWindow = (void *) create_menubar (gui->screen);
         gui->mbhWindow = (void *) create_menubar (window);
-        
-	    if ( (void *) gui->mbhWindow == NULL )
-	    {
+
+	    if ( (void *) gui->mbhWindow == NULL ){
 	        panic ("menubar-menubarX:");
 	    }
 
@@ -481,20 +479,24 @@ int kgws_create_menubar ( struct window_d *window){
  */
 
 unsigned long 
-MenuBarProcedure ( struct window_d *window, 
-                   int msg, 
-				   unsigned long long1, 
-				   unsigned long long2 ) 
+MenuBarProcedure ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 ) 
 {
-    int n;
-	
+
+    int n=0;
+
+
+
     n = (int) get_menubar_selected_item ();
-	
-	if (n < 0 || n >= 4)
-	{
+
+    if (n < 0 || n >= 4)
+    {
 		n = 0;
-	}
-		
+    }
+
 	unselect_menubar_item (n);
 	
 	//Talvez deva implementar esse filtro.
@@ -506,7 +508,7 @@ MenuBarProcedure ( struct window_d *window,
             switch (long1)
             {
                 case VK_ESCAPE:	
-				   //SetProcedure( (unsigned long) &system_procedure);						
+				   //SetProcedure( (unsigned long) &system_procedure);
 				   break;
 				   
                 //default:
@@ -553,21 +555,15 @@ MenuBarProcedure ( struct window_d *window,
 		   //menuAction(n);
 		   //break;
 	};
-	
-	
+
+
 // Done.
-//done:
     
     refresh_screen ();
     
 	return (unsigned long) 0;
 }
 
-
-/*
-int menubarInit()
-{}
-*/
 
 //
 // End.

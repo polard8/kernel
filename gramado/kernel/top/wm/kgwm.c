@@ -401,22 +401,22 @@ void create_gui (void){
  *
  */
  
-void SetGuiParameters(
-int refresh,         //Flag. Colocar ou não o backbuffer na tela.
-int screen,          //Tela do computador.
-int background,      //Background da area de trabalho. 
-int logo,            //Logo, Janela para imagem da área de trabalho.
-int taskbar,         //Barra de tarefas.(Ícones para programas).
-int main,            //Janela principal.(Desktop, ou Kernel Setup Utility). 
-int menu,            //Control menu da Área de trabalho.
-int infobox,         //Janelinha no canto, para alerta sobre sobre eventos ocorridos no sistema.
-int messagebox,      //O message box do kernel.(Cada app cria seu messagebox). 
-int debug,           //Janela do debug do kernel.(sonda por problemas).
-int navigationbar,   //Janela de navegação(Semelhante a navigation bar dos dispositivos mobile). 
-int grid             //Grid da janela principal.
-//Limites ...
-)
+void 
+SetGuiParameters(
+    int refresh,        //Flag. Colocar ou não o backbuffer na tela.
+    int screen,         //Tela do computador.
+    int background,     //Background da area de trabalho. 
+    int logo,           //Logo, Janela para imagem da área de trabalho.
+    int taskbar,        //Barra de tarefas.(Ícones para programas).
+    int main,           //Janela principal.(Desktop, ou Kernel Setup Utility). 
+    int menu,           //Control menu da Área de trabalho.
+    int infobox,        //Janelinha no canto, para alerta sobre sobre eventos ocorridos no sistema.
+    int messagebox,     //O message box do kernel.(Cada app cria seu messagebox). 
+    int debug,          //Janela do debug do kernel.(sonda por problemas).
+    int navigationbar,  //Janela de navegação(Semelhante a navigation bar dos dispositivos mobile). 
+    int grid )          //Grid da janela principal.
 { 
+
     //Passados via argumento.
 	
 	//
@@ -425,9 +425,10 @@ int grid             //Grid da janela principal.
 	
 	// Checa validade da estrutura.
 
-    if ( (void *) gui == NULL )
-    {
+    if ( (void *) gui == NULL ){
+        debug_print ("SetGuiParameters: gui\n");
         return;
+
     }else{
         gui->refresh = refresh; 
         gui->screenStatus = screen;
@@ -467,15 +468,16 @@ void gui_create_screen (void){
 
     unsigned long Left = (unsigned long) SCREEN_DEFAULT_LEFT;
     unsigned long Top  = (unsigned long) SCREEN_DEFAULT_TOP;
-    unsigned long Width = (unsigned long) screenGetWidth ();
+    
+    unsigned long Width  = (unsigned long) screenGetWidth ();
     unsigned long Height = (unsigned long) screenGetHeight ();
 
 
 	// #IMPORTANTE: 
 	// Não tem Parent Window!
 
-    if ( (void *) gui == NULL )
-    {
+    if ( (void *) gui == NULL ){
+        debug_print ("gui_create_screen: gui\n");
         return;
     }
 
@@ -487,22 +489,21 @@ void gui_create_screen (void){
                            Left, Top, Width, Height,
                            0, 0, 0, COLOR_BLACK );
 
-    if ( (void *) hWindow == NULL )
-    {
-         panic ("gui_create_screen:");
-    }else{
+    if ( (void *) hWindow == NULL ){
+         panic ("gui_create_screen: hWindow");
 
+    }else{
         RegisterWindow (hWindow);
         set_active_window (hWindow); 
 
-		// Isso impede que rotinas mudem as caracteríscicas da janela principal 
-		// sem antes destravar ou sem ter autorização para isso.
+        // Isso impede que rotinas mudem as caracteríscicas 
+        // da janela principal 
+        // sem antes destravar ou sem ter autorização para isso.
 
         windowLock (hWindow); 
 
 		// Estrutura gui.
-        if ( (void *) gui != NULL )
-        {
+        if ( (void *) gui != NULL ){
             gui->screen = (void *) hWindow;
         }
 
@@ -541,12 +542,13 @@ void gui_create_background (void){
 
     unsigned long Left = (unsigned long) SCREEN_DEFAULT_LEFT;
     unsigned long Top  = (unsigned long) SCREEN_DEFAULT_TOP;
-    unsigned long Width = (unsigned long) screenGetWidth ();
+    
+    unsigned long Width  = (unsigned long) screenGetWidth ();
     unsigned long Height = (unsigned long) screenGetHeight ();
 
 
-    if ( (void *) gui == NULL )
-    {
+    if ( (void *) gui == NULL ){
+        debug_print ("gui_create_background: gui\n");
         return;
     }
 
@@ -561,21 +563,18 @@ void gui_create_background (void){
                            Left, Top, Width, Height,
                            gui->screen, 0, 0, COLOR_BACKGROUND );
 
-    if ( (void *) hWindow == NULL )
-    {
-        printf ("gui_create_background:");
-        die ();
+
+    if ( (void *) hWindow == NULL ){
+        panic ("gui_create_background:");
 
     }else{
-
         RegisterWindow (hWindow);
         set_active_window (hWindow); 
         windowLock (hWindow);  
 
 
         //Estrutura gui.
-        if ( (void *) gui != NULL )
-        {
+        if ( (void *) gui != NULL ){
             gui->background = (void *) hWindow;
         }
 
@@ -607,12 +606,13 @@ void gui_create_taskbar (void){
 
     unsigned long Left = (unsigned long) SCREEN_DEFAULT_LEFT;
     unsigned long Top  = (unsigned long) SCREEN_DEFAULT_TOP;
-    unsigned long Width = (unsigned long) screenGetWidth ();
+    
+    unsigned long Width  = (unsigned long) screenGetWidth ();
     unsigned long Height = (unsigned long) screenGetHeight ();
 
 
-    if ( (void *) gui == NULL )
-    {
+    if ( (void *) gui == NULL ){
+        debug_print ("gui_create_taskbar: gui\n");
         return;
     }
 
@@ -625,13 +625,10 @@ void gui_create_taskbar (void){
                            Left, Top, Width, Height, 
                            gui->screen, 0, 0, COLOR_WINDOW );
 
-    if ( (void *) hWindow == NULL)
-    {
-        printf ("gui_create_taskbar:\n");
-        die ();
+    if ( (void *) hWindow == NULL){
+        panic ("gui_create_taskbar:\n");
 
     }else{
-
         RegisterWindow (hWindow);
         windowLock (hWindow); 
 
@@ -673,23 +670,20 @@ void gui_create_mainwindow (void){
 
     unsigned long Left = (unsigned long) SCREEN_DEFAULT_LEFT;
     unsigned long Top  = (unsigned long) SCREEN_DEFAULT_TOP;
-    unsigned long Width = (unsigned long) screenGetWidth ();
+    
+    unsigned long Width  = (unsigned long) screenGetWidth ();
     unsigned long Height = (unsigned long) screenGetHeight ();
 
 
 	//estrutura gui.
-    if ( (void *) gui == NULL )
-    {
-        printf ("gui_create_mainwindow: gui\n");
-        die ();
+    if ( (void *) gui == NULL ){
+        panic ("gui_create_mainwindow: gui\n");
     }
 
 
 	//janela taskbar.
-    if ( (void *) gui->taskbar == NULL )
-    {
-        printf ("gui_create_mainwindow: taskbar\n");
-        die ();
+    if ( (void *) gui->taskbar == NULL ){
+        panic ("gui_create_mainwindow: taskbar\n");
     }
 
 
@@ -712,10 +706,8 @@ void gui_create_mainwindow (void){
                            Left, Top, Width, Height,           
                            gui->screen, 0, 0, COLOR_WINDOW );   
 
-    if ( (void *) hWindow == NULL)
-    {
-        printf ("gui_create_mainwindow:\n");
-        die ();
+    if ( (void *) hWindow == NULL){
+        panic ("gui_create_mainwindow:\n");
 
      }else{   
 
@@ -726,8 +718,8 @@ void gui_create_mainwindow (void){
         //a janela pertence ao desktop 0
         //hWindow->desktop = (void*) desktop0;
 
-        if ( (void *) gui == NULL )
-        {
+        if ( (void *) gui == NULL ){
+            //message
             return;
         }else{
             gui->main = (void *) hWindow;
@@ -774,123 +766,18 @@ void gui_create_mainwindow (void){
 
 
 
-/*
- * gui_create_logo:
- *     Cria a janela para o logo da área de trabalho. 
- * O logo da área de trabalho é a imagem da área de trabalho.
- *
- * #todo: 
- * Cria buffer dedicado.
- */
 
-// # suspensa
-
-void gui_create_logo (void){ 
-
-
-/*
-    struct window_d *hWindow; 
-	
-	unsigned long Left = (unsigned long) SCREEN_DEFAULT_LEFT;
-	unsigned long Top  = (unsigned long) SCREEN_DEFAULT_TOP;
-	unsigned long Width = (unsigned long) screenGetWidth();
-	unsigned long Height = (unsigned long) screenGetHeight();
-	
-	if( (void*) gui == NULL ){
-        return;
-    };
-	
-	//Window:
-	//White. Pequena no meio. Pode ser usada na inicialização.
-	//O logo pertence ao desktop.
-	hWindow = (void*) CreateWindow( 1, 0, VIEW_MINIMIZED, "Logo", 
-	                                (Width/3), (Height/3), (Width/3), (Height/3), 
-							        gui->screen, 0, 0, COLOR_WINDOW );
-	if( (void*) hWindow == NULL )
-	{
-	    printf("gui_create_logo:");
-	    die();
-	}else{
-	    		
-		RegisterWindow(hWindow);
-		set_active_window(hWindow); 
-	    windowLock(hWindow); 
-		
-		//Estrutura gui.
-		if( (void*) gui != NULL ){
-	        gui->logo = (void*) hWindow;
-		};
-		
-		//Desktop.
-	    //A janela pertence ao desktop0.
-	    //hWindow->desktop = (void*) desktop0;
-		
-		//Nothing.
-	};
-
-	SetFocus(hWindow);
- */
-
+void gui_create_logo (void)
+{ 
+    debug_print ("gui_create_logo: deprecated\n");
 }
 
-
-
-/*
- * gui_create_controlmenu:
- *     Esse é o controlmenu da area de trabalho.
- * mesmo que nao esteja rodando o programa gerenciador de
- * deprogramas esse control menu existirá.
- */
-
-// # suspensa
 
 void gui_create_controlmenu (void)
 { 
-
-/*
-    struct window_d *cmWindow;
-	
-	if( (void*) gui == NULL ){
-        return;
-    };	
-
-	//Usando a janela anteriormente criada.
-    if( (void*) gui->screen == NULL ){
-        return;
-    };	
-	
-	//
-    // Cria a janela e o menu. 
-	// (o argumento é a janela mae)
-    //	
-	
-    cmWindow = (void *) create_menu(gui->screen,2,0,0,0);
-	if( (void *) cmWindow == NULL ){
-	    printf("gui_create_controlmenu:");
-		return;
-	}else{
-	    
-		//configura a janela do menu do sistema.
-	    set_current_menuwindow(desktop0, cmWindow);
-		
-		//configura o menu de sistema a ser usado no desktop.
-		set_current_sysMenu(desktop0, cmWindow->defaultMenu);
-		
-		//itens.(test)
-	    initmenuArray(cmWindow->defaultMenu,2);	
-	    create_menu_item(cmWindow->defaultMenu,"cmitem0",0);
-        create_menu_item(cmWindow->defaultMenu,"cmitem1",0);
-        //...
-
-        //gui->menu = (void*) cmWindow; //janela do control menu.
-	};			
-	
-done:
-    SetFocus(cmWindow);
-    refresh_screen();
-*/
-
+    debug_print ("gui_create_controlmenu: deprecated\n");
 }
+
 
 
 /*
@@ -903,11 +790,10 @@ done:
 
 void gui_create_infobox (void){
  
-    if ( (void *) gui == NULL )
-    {
+    if ( (void *) gui == NULL ){
+        debug_print ("gui_create_infobox: gui\n");
         return;
     }else{
-
         gui->infobox = NULL;
     };    
 }
@@ -919,8 +805,8 @@ void gui_create_infobox (void){
 
 void gui_create_messagebox (void){
  
-    if ( (void *) gui == NULL )
-    {
+    if ( (void *) gui == NULL ){
+        debug_print ("gui_create_messagebox: gui\n");
         return;
     }else{
 
@@ -937,8 +823,8 @@ void gui_create_messagebox (void){
 
 void gui_create_debug (void){
  
-    if ( (void *) gui == NULL )
-    {
+    if ( (void *) gui == NULL ){
+        debug_print ("gui_create_debug: gui\n");
         return;
     }else{
 
@@ -954,94 +840,10 @@ void gui_create_debug (void){
 }
 
 
-/*
- * gui_create_navigationbar:
- *     Barra de navegação. 
- *     Semelhante às barras encontradas nos dispositivos mobile. Usada para 
- * navegação simples. Fica em baixo e deve ser escura.
- *
- *	   Obs: A navigation bar pertence a janela principal. gui->screen.
- *     Obs: A navigation bar poderá mudar para dentro da janela do shell.
- * que funciona como um navegador.
- *  
- * @todo: Cria buffer dedicado.
- */
-
-// #suspensa
- 
-void gui_create_navigationbar (void){
-
-
-/*
-	struct window_d *hWindow;  
-	
-	unsigned long Left = (unsigned long) SCREEN_DEFAULT_LEFT;
-	unsigned long Top  = (unsigned long) SCREEN_DEFAULT_TOP;
-	unsigned long Width = (unsigned long) screenGetWidth();
-	unsigned long Height = (unsigned long) screenGetHeight();
-
-	if( (void*) gui == NULL ){
-        return;
-    };	    
-	
-	hWindow = (void*) CreateWindow( 1, 0, VIEW_MINIMIZED, "NavigationBar", 
-	                                Left, Height-(8*5), Width, (8*5), 
-							        gui->screen, 0, 0, COLOR_BLACK);  
-	if((void*) hWindow == NULL){
-	    MessageBox(gui->screen,1,"ERRO","Navigation Bar fail!");
-	}else{
-	    	    
-	    RegisterWindow(hWindow);
-	    windowLock(hWindow); 
-		set_active_window(hWindow); 
-
-	    
-		//hWindow->procedure = NULL;
-		
-		//@todo:
-		//a janela pertence ao desktop 0
-	    //hWindow->desktop = (void*) desktop0;
-		
-		if( (void*) gui == NULL ){
-		    return;
-		}else{
-	        gui->navigationbar = (void*) hWindow;
-		};
-
-	};
-    //Nothing.
-
-// Buttons.
-draw_buttons:
-	//Back.
-    draw_button( gui->navigationbar, "<",  1, 
-	             1*(Width/16), 8, 24, 24, COLOR_BLACK);
-	//Home.
-    draw_button( gui->navigationbar, "O", 1, 
-	             2*(Width/16), 8, 24, 24, COLOR_BLACK);
-	//TaskList, (lista os processos).
-    draw_button( gui->navigationbar,  "=", 1, 
-	             3*(Width/16), 8, 24, 24, COLOR_BLACK);
-	
-    // Text. 
-    //draw_text( gui->navigationbar, 1*(480/8), 8, COLOR_WINDOWTEXT, ".Desktop");
-	
-	
-
-//    * Text.   
-//  if( (void*) gui->navigationbar != NULL )
-//  {
-//        //draw_text( gui->navigationbar, 1*(800/8), 8, COLOR_WINDOWTEXT, "/WindowStation0/Desktop0 GUI");
-//        //draw_text( gui->navigationbar, 5*(800/8), 8, COLOR_WINDOWTEXT, "F1=HELP");
-//  };
-
-
-    // Continua ...
-    
-done:
-    SetFocus(hWindow); 
-*/ 
-
+// deletar
+void gui_create_navigationbar (void)
+{
+    debug_print ("gui_create_navigationbar: deprecated\n");
 }
 
 
@@ -1091,8 +893,8 @@ void *guiGetScreenWindow (void){
 
 void *guiGetDeveloperScreenWindow (void){
 
-    if ( (void *) gui == NULL)
-    {
+    if ( (void *) gui == NULL){
+        //message
         return NULL;
     }
 
@@ -1106,8 +908,8 @@ void *guiGetDeveloperScreenWindow (void){
 
 void *guiGetBackgroundWindow (void){
 
-    if ( (void *) gui == NULL)
-    {
+    if ( (void *) gui == NULL){
+        //message
         return NULL;
     }
 
@@ -1344,15 +1146,17 @@ void *guiGetShellClientWindowWindow (void){
 // reposiciona e muda o tamanho da gui->main window.
 // configura a área de trabalho.
 void 
-guiSetUpMainWindow ( unsigned long x, 
-                     unsigned long y, 
-                     unsigned long width, 
-                     unsigned long height )
+guiSetUpMainWindow ( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long width, 
+    unsigned long height )
 {
 
     unsigned long Left = (unsigned long) SCREEN_DEFAULT_LEFT;
     unsigned long Top  = (unsigned long) SCREEN_DEFAULT_TOP;
-    unsigned long Width = (unsigned long) screenGetWidth ();
+    
+    unsigned long Width  = (unsigned long) screenGetWidth ();
     unsigned long Height = (unsigned long) screenGetHeight ();
 
 
@@ -1422,7 +1226,9 @@ int register_wm_process ( pid_t pid ){
  */
 
 int init_gui (void){
-	
+
+    debug_print ("init_gui:\n");
+    
 	// ??
 	// Habilita taskswitch e scheduler.
 
@@ -1435,19 +1241,11 @@ int init_gui (void){
 	// A partir de agora o scheduler pode procurar por threads 
 	// no estado 'Initialized' e executar.
 
-
-    if ( (void *) gui == NULL )
-    {
-		// #obs:
-		// Incluímos o die() (23 nov 2019).
-		// Vamos parar caso a estrutura 'gui' seja inválida.
-
+    // #importante: estrututra vital.
+    if ( (void *) gui == NULL ){
         guiStatus = 0;
-        printf ("init_gui: gui struct\n"); 
-        die ();
-        //return (int) 1;    //Fail.
+        panic ("init_gui: gui struct\n"); 
     }
-
 
     gui->initialised = 1;
     guiStatus = 1;
@@ -1466,61 +1264,23 @@ int init_gui (void){
  */
 
 unsigned long
-kgwm_mouse_dialog ( struct window_d *window,
-                    int msg,
-                    unsigned long long1,
-                    unsigned long long2 )
+kgwm_mouse_dialog ( 
+    struct window_d *window,
+    int msg,
+    unsigned long long1,
+    unsigned long long2 )
 {
 
+    //#todo: No more mouse support for this window server.
+    debug_print("kgwm_mouse_dialog: [DEPRECATED]\n");
+    
     // #todo
     // Checar validade da estrutura.
     
-    if ( window->isControl == 1 )
-    {
+    if ( window->isControl == 1 ){
         return (unsigned long) kgwm_window_control_dialog ( window,
-                                   msg,
-                                   long1,
-                                   long2 ); 
+                                   msg, long1, long2 ); 
     } 
-
-    switch (msg)
-    {
-		// #teste
-		// testando quando o aplicativo chama o procedimento default,.
-		// o teste sera para o click do mouse.
-		// no nosso teste esse click é tratado pelo aplicativo,
-		// mas a mesnagem chegará aqui para tratarmos os botões gerenciados 
-		// pelo servidor kgws.
-
-		// #obs
-		// Vamos tratar aqui vários eventos de mouse;
-
-        case 30:
-        
-			//qual botão do mouse?
-			switch (long1)
-			{
-				//botão 1
-				case 1:
-					break;
-
-				case 2:
-					break;
-
-				case 3:
-					break;
-			}
-			break;
-
-        //#todo
-		//case 31:
-			//break;
-
-
-        default:
-            break;
-    }; //switch
-
 
     return 0;
 }
@@ -1528,22 +1288,21 @@ kgwm_mouse_dialog ( struct window_d *window,
 
 
 unsigned long
-kgwm_window_control_dialog ( struct window_d *window,
-                             int msg,
-                             unsigned long long1,
-                             unsigned long long2 )
+kgwm_window_control_dialog ( 
+    struct window_d *window,
+    int msg,
+    unsigned long long1,
+    unsigned long long2 )
 {
 
     //#bugbug
-    if ( window->isControl != 1 )
-    {
-		printf ("kgwm_window_control_dialog: isControl ?");
-		die ();
-		//return 0;
+    if ( window->isControl != 1 ){
+        panic ("kgwm_window_control_dialog: isControl ?");
     }
 
-	switch (msg)
-	{
+
+    switch (msg)
+    {
 
         // mouse button down
         case 30:
@@ -1607,28 +1366,7 @@ kgwm_window_control_dialog ( struct window_d *window,
                       window->control->long2 = 0;
                       window->control->newmessageFlag = 1;
                     }
-			        if ( window->isScrollBarButton1 == 1 )
-                    {
-                      window->control->window = window;   //afeta esse botão
-                      window->control->msg = MSG_VSCROLL; //8812; //scroll up.
-                      window->control->long1 = 1;  //up
-                      window->control->long2 = 0;
-                      window->control->newmessageFlag = 1;
-                    }
-                    if ( window->isScrollBarButton2 == 1 )
-                    {
-			            printf ("Scroll Bar: = \n"); 
-			            refresh_screen();
-                    }
-			        if ( window->isScrollBarButton3 == 1 )
-                    {
-                      window->control->window = window; //afeta esse botão
-                      window->control->msg = MSG_VSCROLL; //8811; //scroll down.
-                      window->control->long1 = 0;  //down
-                      window->control->long2 = 0;
-                      window->control->newmessageFlag = 1;
-                    }
-			        
+
 			        return 0;
 					}
 				    break;
@@ -1642,29 +1380,12 @@ kgwm_window_control_dialog ( struct window_d *window,
     return 0;
 }
 
-/*
-int guiInit()
-{}
-*/
-
- 
 
 int init_gramado (void)
 {
+    debug_print ("init_gramado: [DELETE THIS]\n");
     return 0;
 }
-
-
-
-/*
-int gwsInit();
-int gwsInit()
-{
-	printf ("GWS:")
-	//#todo:
-	
-}
-*/
 
 
 //

@@ -1,20 +1,11 @@
+// output.c
 
-//output.c
-
-// output size for terminal kserver
 
 //#include <kernel.h>
 
 
-
+// #bugbug
 int zzzzdummy;
-
-
-
-
-
-
-
 
 
 
