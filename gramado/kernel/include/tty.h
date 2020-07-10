@@ -107,11 +107,15 @@ struct tty_d
     // Esse é o arquivo que aponta para essa estrutura.
     file *_fp;
 
-    //char name[64];
-    
     char __ttyname[64];    // 
     size_t ttyName_len;    // len 
     
+
+    // process group.
+    // Usando quanto tiver uma itnerrupção de tty.
+    // Quais processos estão no mesmo grupo quanto tiver a interrupção.
+    // Vamos sinalizálos.
+    int pgrp;
     
     // linux-like
     short type;       // type of tty
@@ -407,8 +411,7 @@ __tty_write ( struct tty_d *tty,
 
 
 
-int 
-tty_ioctl ( int fd, unsigned long request, char *arg );
+int tty_ioctl ( int fd, unsigned long request,  unsigned long arg );
 
 void tty_reset_termios ( struct tty_d *tty );
 

@@ -121,7 +121,7 @@ int sys_serial_debug_printk ( char *s )
        
 // IN: fd, what to do, ?
 
-int sys_ioctl ( int fd, unsigned long request, char *arg ){
+int sys_ioctl ( int fd, unsigned long request, unsigned long arg ){
 
     struct process_d *p;
     file *f;
@@ -186,7 +186,7 @@ int sys_ioctl ( int fd, unsigned long request, char *arg ){
             debug_print ("sys_ioctl: ObjectTypeTTY\n"); 
             return (int) tty_ioctl ( (int) fd, 
                             (unsigned long) request, 
-                            (char *) arg );
+                            (unsigned long) arg );
             break;
         
         // socket object
@@ -194,15 +194,15 @@ int sys_ioctl ( int fd, unsigned long request, char *arg ){
             debug_print ("sys_ioctl: ObjectTypeSocket\n");
             return (int) socket_ioctl ( (int) fd, 
                             (unsigned long) request, 
-                            (char *) arg );
+                            (unsigned long) arg );
             break;
-            
+        
         // Console object    
         case ObjectTypeVirtualConsole: 
             debug_print ("sys_ioctl: ObjectTypeVirtualConsole\n");
             return (int) console_ioctl ( (int) fd, 
                             (unsigned long) request, 
-                            (char *) arg );
+                            (unsigned long) arg );
             break; 
 
 
@@ -219,7 +219,10 @@ int sys_ioctl ( int fd, unsigned long request, char *arg ){
 }
 
 
-int sys_fcntl ( int fd, int cmd, ... ){
+//#todo: rever esses argumentos.
+// SVr4, 4.3BSD, POSIX.1-2001. and more.
+//See: https://man7.org/linux/man-pages/man2/fcntl.2.html
+int sys_fcntl ( int fd, int cmd, unsigned long arg ){
 
     debug_print ("sys_fcntl:\n");
 
@@ -234,15 +237,65 @@ int sys_fcntl ( int fd, int cmd, ... ){
         return -1;
     }
     
-
+    //POSIX Table 6-1.
+    //See: fcntl.h
     switch (cmd)
     {
-        // lock operation.
+        //duplicate file descriptor
+        case F_DUPFD:
+            debug_print ("sys_fcntl: [TODO] F_DUPFD\n");
+            return -1;
+            break;
+
+        //get file descriptor flags
+        case F_GETFD:
+            debug_print ("sys_fcntl: [TODO] F_GETFD\n");
+            return -1;
+            break;
+
+        //set file descriptor flags
+        case F_SETFD:
+            debug_print ("sys_fcntl: [TODO] F_SETFD\n");
+            return -1;
+            break;
+
+        //get file status flags
+        case F_GETFL:
+            debug_print ("sys_fcntl: [TODO] F_GETFL\n");
+            return -1;
+            break;
+
+        //set file status flags
+        case F_SETFL:
+            debug_print ("sys_fcntl: [TODO] F_SETFL\n");
+            return -1;
+            break;
+
+        //get record locking information
+        case F_GETLK:
+            debug_print ("sys_fcntl: [TODO] F_GETLK\n");
+            return -1;
+            break;
+
+        // set record locking information
         case F_SETLK:
             debug_print ("sys_fcntl: [TODO] F_SETLK\n");
             return -1;
             break;
-            
+
+        //set record locking info; wait if blocked
+        case F_SETLKW:
+            debug_print ("sys_fcntl: [TODO] F_SETLKW\n");
+            return -1;
+            break;
+
+        //free a section of a regular file
+        case F_FREESP:
+            debug_print ("sys_fcntl: [TODO] F_FREESP\n");
+            return -1;
+            break;
+           
+        
         // ...
             
         default:

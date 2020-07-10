@@ -4,6 +4,9 @@
  * 2020 - Created by Fred Nora.
  */
 
+#include <sys/ioctl.h>
+#include <stdarg.h>
+
 
 #include <stddef.h>
 #include <types.h>
@@ -25,26 +28,35 @@
 
 int fcntl ( int fd, int cmd, ... )
 {
-    debug_print("fcntl: [TODO]\n");
-
+    int __ret = -1;
 
     if (fd<0) {
         debug_print("fcntl: fd\n");
         return -1;
     }
 
-    //#todo:
-    
-    /*
+    //++
     va_list ap;
-    va_start(ap, options);
-    //x = va_arg (ap, unsigned);
+    va_start(ap, cmd);
+    unsigned arg = va_arg(ap,int);
+
+    __ret = (int) gramado_system_call ( 8001,
+                      (unsigned long) fd,
+                      (unsigned long) cmd,
+                      (unsigned long) arg );
+
     va_end(ap);
-    
-    return gramado_system_call ( ?, fd, cmd,  0 );
-    */
+    //--    
   
-    return -1; //#todo
+    // #todo Error.
+    if (__ret < 0)
+    {
+        //errno = -__ret;
+        return (-1);
+    }
+
+
+    return (int) (__ret);
 }
 
 

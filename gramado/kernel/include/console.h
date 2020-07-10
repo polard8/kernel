@@ -48,7 +48,7 @@ void console_set_current_virtual_console ( int n );
 int console_get_current_virtual_console (void);
 void console_init_virtual_console (int n);
 
-int console_ioctl ( int fd, unsigned long request, char *arg );
+int console_ioctl ( int fd, unsigned long request, unsigned long arg );
 
 
 

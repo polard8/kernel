@@ -19,13 +19,13 @@ int
 vt_ioctl ( 
     int fd, 
     unsigned long request, 
-    char *arg )
+    unsigned long arg )
 {
     debug_print ("vt_ioctl:\n");
     
     return (int) tty_ioctl ( (int) fd, 
                             (unsigned long) request, 
-                            (char *) arg );
+                            (unsigned long) arg );
 }
 
 

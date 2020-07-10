@@ -1,11 +1,10 @@
  
- 
-//#include <sys/types.h>   
-#include <sys/ioctl.h>
 
+
+#include <sys/ioctl.h>
 #include <stdarg.h>
 
-//#include <termios.h>
+
 
 
 /*
@@ -37,25 +36,30 @@
 int ioctl (int fd, unsigned long request, ...){
 
     int __ret = -1;
+    
+    if (fd<0) {
+        debug_print("ioctl: fd\n");
+        return -1;
+    }
+
+    
+    //++
     va_list ap;
     va_start(ap, request);
-
     unsigned arg = va_arg(ap, unsigned long);
     
 
     __ret = (int) gramado_system_call ( 8000,
                       (unsigned long) fd,
                       (unsigned long) request,
-                       (unsigned long) arg );
-
+                      (unsigned long) arg );
     
-    // ?? util
-    // kvprintf ( fmt, xxxputchar, NULL, 10, ap );
-
     va_end (ap);
+    //--
     
 
-    // Error.
+ 
+    // #todo Error.
     if (__ret < 0)
     {
         //errno = -__ret;
@@ -63,7 +67,7 @@ int ioctl (int fd, unsigned long request, ...){
     }
 
 
-    return (__ret);
+    return (int) (__ret);
 }
 
 

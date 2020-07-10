@@ -1339,7 +1339,7 @@ int
 console_ioctl ( 
     int fd, 
     unsigned long request, 
-    char *arg )
+    unsigned long arg )
 {
     debug_print ("console_ioctl: TODO\n");
     //switch(request){}

@@ -1052,14 +1052,16 @@ gde_extra_services (
     {
         return (void *) sys_ioctl ( (int) arg2, 
                             (unsigned long) arg3, 
-                            (char *) arg4 );
+                            (unsigned long) arg4 );
     }
 
     // fcntl()
     // See: sci/sys/sys.c    
     if ( number == 8001 )
     {
-        return (void *) sys_fcntl ((int) arg2, (int) arg3 );
+        return (void *) sys_fcntl ((int) arg2, 
+                            (int) arg3, 
+                            (unsigned long) arg4 );
     }
     
     

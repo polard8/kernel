@@ -1006,11 +1006,13 @@ int socket_connection_waiting_for_validation (struct socket_d *mysock, struct so
 */
 
 
-int socket_ioctl ( int fd, unsigned long request, char *arg ){
+int socket_ioctl ( int fd, unsigned long request, unsigned long arg )
+{
 
     debug_print ("socket_ioctl: TODO\n");
     return -1;
 }
+
 
 // socket_dialog
 // Serviços de soquetes da klibc

@@ -7,10 +7,9 @@
 
 
 
-int sys_ioctl ( int fd, unsigned long request, char *arg );
 
-int sys_fcntl ( int fd, int cmd, ... );
-
+int sys_ioctl ( int fd, unsigned long request, unsigned long arg );
+int sys_fcntl ( int fd, int cmd, unsigned long arg);
 
 
 //SVr4,  4.3BSD,  POSIX.1-2001. 

@@ -688,7 +688,7 @@ tty_sets (
 // termios.h
 // ioctls.h
 
-int tty_ioctl ( int fd, unsigned long request, char *arg ){
+int tty_ioctl ( int fd, unsigned long request, unsigned long arg ){
 
     debug_print ("tty_ioctl: TODO\n");
 
