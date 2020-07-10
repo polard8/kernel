@@ -8,8 +8,9 @@
 //#define TEDITOR_VERBOSE 1
 
 
-#define GRID_HORIZONTAL 1000
-#define GRID_VERTICAL 2000
+#define GRID_HORIZONTAL    1000
+#define GRID_VERTICAL      2000
+
 
 
 //static int running = 1;
@@ -43,13 +44,12 @@ int running = 1;
  
 
 int 
-sysmonProcedure ( struct window_d *window, 
-                  int msg, 
-                  unsigned long long1, 
-                  unsigned long long2 );
+sysmonProcedure ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 );
  
-
-
 
 
 int __count;
@@ -59,11 +59,12 @@ unsigned long CPU_USAGE[32];
 // Usado para testar o timer.
 void update_cpu_usage ()
 {
+    unsigned long __idle_value;
+    unsigned long __value;
+    int i=0;
 
-	unsigned long __idle_value;
-	unsigned long __value;
-		
-	int i;
+
+
 
     __count++;
 	//printf ("%d ",__count);
@@ -502,23 +503,9 @@ int main ( int argc, char *argv[] ){
     left = 4;
     //top = deviceHeight/3;
     top = 4;
-
-    /*
-    if (deviceWidth > 600)
-    {
-        width = 300;
-    }else{
-        width = deviceWidth;
-    }
-    */
     
-    width = deviceWidth -20;
+    width  = (deviceWidth -20);
     height = (deviceHeight-20);
-    //height = (deviceHeight/2);
-    
-    
-    //width = deviceWidth/3;
-    //height = deviceHeight/3;
 
 
 //#ifdef TEDITOR_VERBOSE
@@ -560,27 +547,25 @@ int main ( int argc, char *argv[] ){
     //++
     gde_begin_paint (); 
     hWindow = (void *) gde_create_window (  WT_OVERLAPPED, 1, 1, 
-                           "System Monitor",
+                           "Setup: sysmon",
                            left, top, width, height,    
                            0, 0, 
-                           0xF5DEB3, 0x2d89ef );  
+                           COLOR_BLUE, COLOR_BLUE );  
 
-    if ( (void *) hWindow == NULL )
-    {
+    if ( (void *) hWindow == NULL ){
 		printf ("sysmon: hWindow fail\n");
 		gde_end_paint ();
-
 		goto fail;
-    }else{
 
+    }else{
 		//Registrar e mostrar.
         gde_register_window (hWindow);
         gde_show_window (hWindow);
-
         main_window = ( struct window_d *) hWindow;
     };
     gde_end_paint ();
     //--
+
 
 
 	//++

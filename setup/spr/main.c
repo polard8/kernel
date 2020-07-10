@@ -6427,17 +6427,16 @@ void shellSocketTest()
  */
  
 int main ( int argc, char *argv[] ){
-	
-	//int arg_index = 1;
-	
+
     FILE *default_input = stdin;
-    char *local_pending_command = (char *) NULL;	
-	
-	//char **internal;
-	char *filename;
-	register int i;
-	
-	// Obs: Esse não é um programa que roda em modo terminal,
+    char *local_pending_command = (char *) NULL;
+    char *filename;
+    register int i=0;
+
+
+
+	// Obs: 
+	// Esse não é um programa que roda em modo terminal,
 	// ele na verdade cria um terminal dentro de uma janela filha.
 	// isso pode servir para esse programa interpretar linguagem 
 	// basic por exemplo.
@@ -6465,8 +6464,7 @@ int main ( int argc, char *argv[] ){
 	
 	//struct message_d *m;
 
-	
-	int Status = 0;
+    int Status = 0;
 	//char *s;    //String	
 	
 	
@@ -6498,7 +6496,7 @@ int main ( int argc, char *argv[] ){
 	//#debug
 	printf ("Initializing ...\n ");
 	printf ("argc={%d}\n", argc );
-	
+
 	if ( argc >= 2 )
 	{
 	    printf ("arg[0]={%s}\n", argv[0] );
@@ -6546,13 +6544,13 @@ int main ( int argc, char *argv[] ){
 		    if ( strncmp ( (char *) argv[1], "--interactive", 13 ) == 0 )
 		    {	
 			    interactive = 1;
-            };
+            }
 
 		    //printf ("cmp 2\n");
 	        if ( strncmp ( (char *) argv[1], "--login", 7 ) == 0 )
 		    {	
 			    login_shell = 1;
-            };	
+            }
 			
 		}else{
 			
@@ -6601,37 +6599,38 @@ noArgs:
 	// Main window.
 	//
 	
-	wpWindowLeft = 40;
-	wpWindowTop = 40;
-	wsWindowWidth = 600;
-	wsWindowHeight = 480;
-	
+    wpWindowLeft   = 20;
+    wpWindowTop    = 20;
+    wsWindowWidth  = 600;
+    wsWindowHeight = 480;
+
 	//++
 	//cria, registra e mostra;
 	gde_enter_critical_section ();    
     printf ("Creating main window ...\n");
     //hWindow = shellCreateMainWindow (1);
-	hWindow = (void *) gde_create_window ( WT_OVERLAPPED, 1, 1, "Sprinkler", 
+	hWindow = (void *) gde_create_window ( WT_OVERLAPPED, 1, 1, "Setup: Sprinkler", 
                            wpWindowLeft, wpWindowTop, 
                            wsWindowWidth, wsWindowHeight, 
-                           0, 0, xCOLOR_GRAY2, xCOLOR_GRAY2 );
+                           0, 0, COLOR_BLUE, COLOR_BLUE );
 
-
-	if ( (void *) hWindow == NULL )
-	{
+    if ( (void *) hWindow == NULL ){
 		gde_exit_critical_section();
 		printf ("hWindow FAIL!");
 		while (1){}
+
 	}else{
-		
 		//Registrar e mostrar.
         gde_register_window (hWindow);
 	    gde_show_window (hWindow);
 	}
 	gde_exit_critical_section ();
 	//--
-	
-	// #IMPORTANTE #IMPORTANTE #IMPORTANTE #IMPORTANTE#IMPORTANTE
+
+
+
+
+	// #IMPORTANTE #IMPORTANTE #IMPORTANTE #IMPORTANTE #IMPORTANTE
 	
 	// #Debug
 	// Uma das janelas filhas cridas abaixo não está se regostrando direito,

@@ -337,16 +337,15 @@ int main ( int argc, char *argv[] ){
     gde_begin_paint ();
     hWindow = (void *) gde_create_window (  WT_OVERLAPPED, 1, 1, 
                            "Launcher",
-                           left, top, width, height,    
-                           0, 0, 0x44541C, 0xF9812A ); //0, 0, 0xF5DEB3, 0x2d89ef );  
+                           left, top, width, height,  
+                           0, 0, COLOR_BLUE, COLOR_BLUE ); 
 
-    if ( (void *) hWindow == NULL )
-    {
+    if ( (void *) hWindow == NULL ){
         printf ("launcher: hWindow fail\n");
         gde_end_paint ();
         goto fail;
+        
     }else{
-
         //Registrar e mostrar.
         gde_register_window  (hWindow);
         gde_show_window (hWindow);
@@ -556,7 +555,6 @@ int main ( int argc, char *argv[] ){
 	// #bugbug
 	// Talvez não precisemos disso.
 	//gde_show_backbuffer ();
-
 
 
 

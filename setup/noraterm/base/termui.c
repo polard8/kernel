@@ -497,7 +497,7 @@ void terminalCreateEditBox (){
 	//Registrar.
     gde_register_window (editboxWindow);
 
-	//terminalSetCursor ( 8, 8 );								   
+	//terminalSetCursor ( 8, 8 );
 }
 
 
@@ -537,34 +537,31 @@ struct window_d *terminalCreateMainWindow ( int status ){
 	wsWindowHeight = (__wlMaxRows*8)    +300;    //480;  
 
 
-	left = wpWindowLeft;
-	top = wpWindowTop;
-	width = wsWindowWidth;
+	left   = wpWindowLeft;
+	top    = wpWindowTop;
+	width  = wsWindowWidth;
 	height = wsWindowHeight;
 
 
 	//char colors:
 	//fg=COLOR_TERMINALTEXT, bg=COLOR_TERMINAL2 
-	
-	w = (void *) gde_create_window ( WT_OVERLAPPED, 1, VIEW_NORMAL, 
-	                 "noraterm-main",     
+
+    w = (void *) gde_create_window ( WT_OVERLAPPED, 1, VIEW_NORMAL, 
+                     "Setup: Noraterm",
                      left, top, width, height,
-                     0, 0, 0xC0C0C0, 0xC0C0C0  ); 
-                     //0, 0, COLOR_TERMINALTEXT, COLOR_TERMINAL2  );
-	
-	if ( (void *) w == NULL )
-	{	
-		printf ("terminalCreateMainWindow: Window fail");
-		
-		while (1){ asm ("pause"); }
-		//exit (0);
-	}
+                     0, 0, COLOR_BLUE, COLOR_BLUE ); 
 
-	// Registrar e mostrar.
+    if ( (void *) w == NULL ){
+        printf ("terminalCreateMainWindow: w fail\n");
+        while (1){ asm ("pause"); }
+        //exit (0);
+    }
+
+    // Registrar e mostrar.
     gde_register_window (w);
-	gde_show_window (w);
+    gde_show_window (w);
 
-	return w;
+    return w;
 }
 
 

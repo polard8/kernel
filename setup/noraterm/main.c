@@ -6691,22 +6691,19 @@ int main ( int argc, char *argv[] ){
 	
 	//#importante: Isso será definido somente uma vez.
 	__wlMaxColumns = DEFAULT_MAX_COLUMNS;
-	__wlMaxRows = DEFAULT_MAX_ROWS;
+	__wlMaxRows    = DEFAULT_MAX_ROWS;
 	
 	// Número máximo de colunas e linhas.
-	g_columns = __wlMaxColumns;  // 80;
-	g_rows = __wlMaxRows;        // 25;
+    g_columns = __wlMaxColumns;    // 80;
+    g_rows    = __wlMaxRows;       // 25;
 
-	
-	//int arg_index = 1;
-	
     FILE *default_input = stdin;
     char *local_pending_command = (char *) NULL;	
-	
+
 	//char **internal;
 	char *filename;
 	register int i;
-	
+
 	
 	int _quit = 0;
 	

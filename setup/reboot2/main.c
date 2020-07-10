@@ -7,13 +7,10 @@
 #include "reboot2.h"
 
 
+#define GRID_HORIZONTAL    1000
+#define GRID_VERTICAL      2000
 
-//#define TEDITOR_VERBOSE 1
 
-#define GRID_HORIZONTAL 1000
-#define GRID_VERTICAL 2000
-
-//static int running = 1;
 int running = 1;
 
 
@@ -411,11 +408,10 @@ int main ( int argc, char *argv[] ){
     int char_count = 0;
 
 
-    unsigned long left = 10;
-    unsigned long top = 10 +100;
-    unsigned long width = 480;
-    unsigned long height = 480;
-
+    unsigned long left   = 10;
+    unsigned long top    = 10;
+    unsigned long width  = 480;
+    unsigned long height = 320;
 
 //#ifdef TEDITOR_VERBOSE
 	//printf("\n");
@@ -452,18 +448,16 @@ int main ( int argc, char *argv[] ){
 	//++
     gde_begin_paint ();
     hWindow = (void *) gde_create_window ( WT_OVERLAPPED, 1, 1, 
-                           "Reboot2",
+                           "Setup: Reboot2",
                            left, top, width, height, 
-                           0, 0, 0xF5DEB3, 0x2d89ef );  
+                           0, 0, COLOR_BLUE, COLOR_BLUE );  
 
-    if ( (void *) hWindow == NULL )
-    {
+    if ( (void *) hWindow == NULL ){
         printf ("reboot2: hWindow fail");
         gde_end_paint ();
         goto fail;
         
     }else{
-
 		//Registrar e mostrar.
         gde_register_window (hWindow);
         gde_show_window (hWindow);
@@ -718,14 +712,14 @@ int main ( int argc, char *argv[] ){
 	//++
     gde_enter_critical_section (); 
     __icon1 = (void *) gde_create_window ( WT_ICON, 1, 1, " Icon ",  
-                           (100), (100), 
-                           (100), (100),   
+                           (10), (10), 
+                           (64), (64),   
                            hWindow, 0, xCOLOR_GRAY3, xCOLOR_GRAY3 );
-    if ( (void *) __icon1 == NULL )
-    {
+    if ( (void *) __icon1 == NULL ){
         printf ("Couldn't create icon\n");
         gde_exit_critical_section ();
         return 1;
+   
     }else{
 		
         gde_register_window (__icon1);
