@@ -1469,13 +1469,13 @@ int main ( int argc, char *argv[] ){
 
     // loop
     // This the loop that gets messages from the window server;
-    terminal_loop(client_fd);
+    //terminal_loop(client_fd);
     
     
     //
     // ============== test start =======================
     //
-    /*
+   
      
     // #tet
     // Let's try another loop;
@@ -1493,20 +1493,23 @@ int main ( int argc, char *argv[] ){
     while(1)
     {
         //testing stdin
-        //fprintf(stdin,"terminal: Testing string ...\n");
+        fseek(stderr, 0, SEEK_SET);   // seek back to beginning of file
+        fprintf(stderr,"terminal: Testing string ...\n");
 
         // arquivo que o filho vai herdar.
-        //c = fgetc(stdout); 
-        //if( c != EOF){
-        //    printf ("[%c]",c);
-        //    fflush(stdout);
-        //}
+        c = fgetc(stderr); 
+        if( c != EOF){
+            printf ("[%c]",c);
+            fflush(stdout);
+        }
     }
-    
-    */
     //
     // ============== test end =======================
     //
+
+
+
+    //done
 
     debug_print ("terminal: bye\n"); 
     printf ("terminal: bye\n");

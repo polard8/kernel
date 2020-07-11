@@ -12,7 +12,10 @@
 #include <sys/types.h>  
 #include <sys/socket.h>
 #include <sys/mman.h>
-//#include <sys/stat.h>   
+
+#include <fcntl.h>
+#include <sys/stat.h>   
+
 #include <fcntl.h>
 #include <unistd.h>
 #include <limits.h>
@@ -1144,36 +1147,35 @@ getopt (
 
 
 //sys/stat.h
-/*
-int fstat(int fd, struct stat *buf);
 int fstat(int fd, struct stat *buf)
 {
+    debug_print ("fstat: [TODO]\n");
 	return -1;
 }
-*/
 
 
 //sys/stat.h
-/*
-int lstat(const char *path, struct stat *buf);
-int lstat(const char *path, struct stat *buf)
-{
-	return (int) stat (path, buf);
-}
-*/
-
-
-//sys/stat.h
-/*
-int stat(const char *path, struct stat *buf);
 int stat(const char *path, struct stat *buf)
 {
-	int i = open(path, 0);
+
+    debug_print ("stat: [TODO]\n");
+    
+	int i = open(path, 0, 0);
 	int ret = fstat(i, buf);
 	close(i);
-	return ret;
+
+
+    return (int) ret;
 }
-*/
+
+
+//sys/stat.h
+int lstat(const char *path, struct stat *buf)
+{
+    debug_print ("lstat: [TODO]\n");
+    return (int) stat (path, buf);
+}
+
 
 
 // POSIX.1-2001, POSIX.1-2008, SVr4, 4.3BSD.

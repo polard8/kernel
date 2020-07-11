@@ -1,20 +1,22 @@
 /*
  * File: main.c
  *     Main file for 32bit app.
- *
+ *     gramc - c-like interpreter.
  */
-
 
 
 #include "gramc.h"
 
+
 #define __VERSION__ "0.1"
+
 
 
 #ifndef __COPYRIGHT__
 char copyright[] = "Copyright (c) Fred Nora.\n\
  All rights reserved.\n";
 #endif 
+
 
 
 /* While POSIX defines isblank(), it's not ANSI C. */
@@ -582,14 +584,14 @@ int main ( int argc, char *argv[] ){
     // Output file for compiler.
     FILE *____O;
 
-    register int i;
-    char *filename;
+    register int i=0;
 
+    char *filename;
 
     // Output string.
     char *o;	
 
-	//switches
+	// Switches
     
     int flagA = 0;
     int flagB = 0;
@@ -612,12 +614,13 @@ int main ( int argc, char *argv[] ){
 
 	// Initializing.
     gde_debug_print ("gramc: Initializing ...\n");  
+    
     printf ("\n");
     printf ("main: Initializing ..\n");
 
    
-    // Inicializa variáveis globais.
-    gramcInitialize ();
+    // Globals.
+    gramcInitialize();
 
 
     //printf ("*breakpoint");
@@ -659,9 +662,10 @@ int main ( int argc, char *argv[] ){
             printf("## %d flag -s ##\n",i);
             asm_flag = 1;
         }
-
+        
         //...
     };
+
 
     //
 	// # Arquivo de entrada #
@@ -680,23 +684,20 @@ int main ( int argc, char *argv[] ){
     char __buf[1024];
     int nreads = 0;
 
-
+    // gramc -c [filename]
     fp = fopen ( (char *) argv[2], "rb" );
 
-    if ( fp == NULL )
-    {
-        printf ("main: Couldn't open the input file \n");
-        usage(argv);
-        exit (1);
+    if ( fp == NULL ){
+        printf ("gramc: Couldn't open the input file \n");
+        usage (argv);
+        exit(1);
 
     }else{
 
          // Input file.
          // para que getc leia desse arquivo que carregamos.
-         stdin = fp;
-         finput = fp;
- 
-        
+         stdin = fp; finput = fp;
+         
         //#debug
         // Esse while está aqui para visualizarmos o arquivo carregado.
         
@@ -722,11 +723,11 @@ int main ( int argc, char *argv[] ){
     
     // It returns a pointer to the output file.
         
-    printf (">>>> main: Calling compiler\n");
-    ____O = (FILE *) compiler ();   
-    printf (">>>> main: compiler returned \n");
-    debug_print (">>>> main: compiler returned \n");
+    printf ("gramc: Calling compiler\n");
+    ____O = (FILE *) compiler();
 
+    printf ("gramc: compiler returned \n");
+    debug_print ("gramc: compiler returned \n");
 
     //#debug
     //printf ("*breakpoint");
@@ -754,9 +755,12 @@ int main ( int argc, char *argv[] ){
 	//#debug suspensa por enquanto.
 	//debugShowStat();
 
-
-    printf ("\n main: done \n.");
     gde_debug_print ("gramc: Done. :^) \n");    
+    
+    printf("\n");
+    printf ("gramc: done. \n");
+
+
     return 0;
 }
 

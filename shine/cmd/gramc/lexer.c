@@ -447,31 +447,31 @@ again:
 
             if ( c == '0' )
             {
-				// Coloca no buffer e pega o próximo.
+                // Coloca no buffer e pega o próximo.
                 *p = c;  p++;  c = getc (finput);
 
                 if ( c == 'x' || c == 'X' )
                 {
-					//base = 16;
+                    //base = 16;
                     *p = c;  p++;
 
                     while (1)
                     {
                         c = getc (finput);
 
-						// Se o próximo não for um digito hexadecimal.
+                        // Se o próximo não for um digito hexadecimal.
                         // Finaliza o buffer e devolve o char. 
                         if ( isxdigit (c) == 0 )
                         {
                             *p = 0;  ungetc(c,finput);
 
-						    value = TOKENCONSTANT;
-							constant_base_found = CONSTANT_BASE_HEX;
+                            value = TOKENCONSTANT;
+                            constant_base_found = CONSTANT_BASE_HEX;
                             //constant_type_found = //#todo tem que contar.                             
                             goto constant_done;
                         }
 
-						// Coloca no buffer se é hexa.
+                        // Coloca no buffer se é hexa.
                         *p = c;  p++;
                     };
                 }
@@ -481,7 +481,7 @@ again:
                 exit (1);
 
             }else{
-				
+
                 //base = 10.
 
                 *p++ = c; 
@@ -490,11 +490,11 @@ again:
                 {
                      c = getc (finput);
 
-					// Se não é digito, finaliza o buffer e devolve o char.
+                    // Se não é digito, finaliza o buffer e devolve o char.
                     if ( isdigit( c ) == 0 )
                     {
-						*p = 0;  ungetc(c,finput);
-							
+                        *p = 0;  ungetc(c,finput);
+
 						value = TOKENCONSTANT;
 						constant_base_found = CONSTANT_BASE_DEC;
                         //constant_type_found = //#todo tem que contar. 
@@ -657,9 +657,9 @@ done:
  */
 
 int lexerInit (){
-	
-    int i;
-    	
+
+    int i=0;
+
     printf ("lexerInit: Initializing ...\n");
 
 	//number_of_tokens = 0;
@@ -680,21 +680,20 @@ int lexerInit (){
     lexer_code = 0;
 
 
-	maxtoken = MAXTOKEN;
-	
+    maxtoken = MAXTOKEN;
+
 	// Clear buffer.
-	
-	for ( i=0; i<MAXTOKEN; i++ )
-	{
-	    real_token_buffer[i] = (char) '\0';	
-	}
+
+    for ( i=0; i<MAXTOKEN; i++ ){
+        real_token_buffer[i] = (char) '\0';
+    };
+
 
 	token_buffer = &real_token_buffer[0]; 
 
-	sprintf ( real_token_buffer, "uninitialized-token-string" );
+    sprintf ( real_token_buffer, "uninitialized-token-string" );
 
 	//...
-
 
 //done:
     return 0;
@@ -707,11 +706,13 @@ int lexer (){
 
     gde_debug_print ("lexer:\n");
     
-    Status = (int) lexerInit ();
+    Status = (int) lexerInit();
 
-    return Status;
+    if (Status<0)
+        gde_debug_print ("lexer: Initialization fail\n");
+
+    return (int) Status;
 }
-
 
 
 /*

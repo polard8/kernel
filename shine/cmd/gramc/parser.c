@@ -2116,7 +2116,8 @@ int parse (){
          // ERROR
          }
          else {
-            printf ("unknown instruction: opcode=%d! cycle = %d\n", inst, reg_cycle); 
+            printf ("unknown instruction: opcode=%d! cycle = %d\n", 
+                inst, reg_cycle); 
             exit(-1); 
          };
      };
@@ -2369,47 +2370,46 @@ int parse (){
  */
 
 int parserInit (){
-	
-	register int i=0;
-	
-	
-//#ifdef GRAMC_VERBOSE	
+
+    register int i=0;
+
+
     printf ("parserInit:\n");
-//#endif		
-	
+
+
 	//infile_size = 0;
 	//outfile_size = 0;
-	
-    //stack support
-	stack_flag = 0;
-	stack_count = 0;
-	stack_index = 0;
+
+    // Stack support
+    stack_flag  = 0;
+    stack_count = 0;
+    stack_index = 0;
 
 
-	
-	for ( i=0; i<8; i++ )
-		constant[i] = 0;
-	
-	for ( i=0; i<8; i++ )
-		return_info[i] = 0;
 
-	for ( i=0; i<512; i++ )
-		stack[i] = 0;
-	
+    for ( i=0; i<8; i++ )
+        constant[i] = 0;
+
+    for ( i=0; i<8; i++ )
+        return_info[i] = 0;
+
+    for ( i=0; i<512; i++ )
+        stack[i] = 0;
+
 	//...
-	
-	//esses endereços vão depender do arquivo de configuração do 
-	//linker ...
-	//#test: default em 0.
+
+	// Ssses endereços vão depender do arquivo de configuração do 
+	// linker ...
+	// #test: default em 0.
     
     program_header_address = 0;
-    program_text_address = 1*100;
-    program_data_address = 2*100;
-    program_bss_address  = 3*100;	
-	
-	//...
-	
-	return 0;
+    program_text_address   = (1*100);
+    program_data_address   = (2*100);
+    program_bss_address    = (3*100);
+
+    //...
+
+    return 0;
 }
 
 
@@ -2420,11 +2420,23 @@ int parser(){
     
     gde_debug_print ("parser:\n");
     
-    //initialize	
+    // initialize
     Status = (int) parserInit();
+
+    if (Status<0)
+        gde_debug_print ("parser: Initialization fail\n");
+
+
+    //
+    // The loop.
+    //
     
-    //parse it
-    Status = (int) parse ();
+    // Parse it
+    Status = (int) parse();
+
+    if (Status<0)
+        gde_debug_print ("parser: Loop fail\n");
+ 
     printf ("parser: parse() returned %d\n", Status); 
     
     return 0;

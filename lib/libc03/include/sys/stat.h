@@ -1,6 +1,12 @@
 
 /*MINIX 3 stuff */
 
+
+#ifndef __STAT_H
+#define __STAT_H
+
+
+
 //#include <sys/types.h>
 
 /* Traditional mask definitions for st_mode. */
@@ -52,7 +58,6 @@
 // #todo
 // We need to define some types here.
 
-/*
 struct stat {
 
     dev_t     st_dev;     // ID of device containing file 
@@ -69,11 +74,15 @@ struct stat {
     time_t    st_mtime;   // time of last modification 
     time_t    st_ctime;   // time of last status change 
 };
-*/
+
+
+int fstat(int fd, struct stat *buf);
+int stat(const char *path, struct stat *buf);
+int lstat(const char *path, struct stat *buf);
 
 
 
-
+#endif    
 
 
 

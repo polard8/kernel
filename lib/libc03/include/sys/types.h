@@ -39,6 +39,16 @@
 #define  _TYPES_H_
 
 
+
+//#test
+typedef int __int32_t;
+typedef __int32_t __blkcnt_t;
+typedef __int32_t __blksize_t;
+
+/* Standard system types */
+typedef __blkcnt_t  blkcnt_t;	/* blocks allocated for file */
+typedef __blksize_t blksize_t;	/* optimal blocksize for I/O */
+
 typedef unsigned int id_t;
 
 
@@ -47,8 +57,11 @@ typedef  unsigned short    u_short;
 typedef  unsigned int      u_int;
 typedef  unsigned long     u_long;
 
-typedef  unsigned short  ushort;    /* Sys V compatibility */
 
+typedef unsigned char	unchar;		/* Sys V compatibility */
+typedef	unsigned short	ushort;		/* Sys V compatibility */
+typedef	unsigned int	uint;		/* Sys V compatibility */
+typedef unsigned long	ulong;		/* Sys V compatibility */
 
 typedef  char    *caddr_t;    /* core address */
 typedef  long    daddr_t;     /* disk address */
