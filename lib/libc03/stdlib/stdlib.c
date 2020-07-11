@@ -1952,12 +1952,23 @@ ldiv_t ldiv(long numerator, long denominator)
 */
 
 
+/*
+ldiv_t ldiv(long num, long den);
+ldiv_t ldiv(long num, long den)
+{
+	return (ldiv_t){ num/den, num%den };
+}
+*/
+
+
+
 
 //posix_openpt - open a pseudoterminal device 
 //posix_openpt() is part of the UNIX 98 pseudoterminal support.
 //This function is specified in POSIX.1-2001. 
 int posix_openpt (int flags)
 {
+    debug_print("posix_openpt: [FIXME]\n"); 
     return (int) open ("/dev/ptmx", flags, 0);
 }
 
@@ -1979,6 +1990,74 @@ int unlockpt(int fd)
     debug_print("unlockpt: [TODO]\n"); 
     return -1; 
 }
+
+
+/*
+int gramado_unlockpt(int fd);
+int gramado_unlockpt(int fd)
+{
+	int unlock = 0;
+	return ioctl(fd, TIOCSPTLCK, &unlock);
+}
+*/
+
+
+/*
+uint32_t bswap_32(uint32_t x);
+uint32_t bswap_32(uint32_t x)
+{
+	return x>>24 | x>>16&0xff00 | x<<16&0xff0000 | x<<24;
+}
+*/
+
+// libgen stuff
+// from musl
+/*
+The functions dirname() and basename() break a null-terminated 
+ pathname string into directory and filename components.
+  In the usual case, dirname() returns the string up to, 
+ but not including, the final '/', and basename() returns the 
+ component following the final '/'. Trailing '/' characters are 
+ not counted as part of the pathname. 
+
+#todo: These two functions go to libgen
+See: https://linux.die.net/man/3/basename
+*/
+
+/*
+char *basename(char *s);
+char *basename(char *s)
+{
+	size_t i;
+	if (!s || !*s) return ".";
+	i = strlen(s)-1;
+	for (; i&&s[i]=='/'; i--) s[i] = 0;
+	for (; i&&s[i-1]!='/'; i--);
+	return s+i;
+}
+*/
+
+/*
+char *dirname(char *s);
+char *dirname(char *s)
+{
+	size_t i;
+	if (!s || !*s || !strchr(s, '/')) return ".";
+	i = strlen(s)-1;
+	for (; i&&s[i]=='/'; i--);
+	for (; i&&s[i-1]!='/'; i--);
+	for (; i&&s[i-1]=='/'; i--);
+	if (!i && *s=='/') i++;
+	s[i] = 0;
+	return s;
+}
+*/
+
+
+
+
+
+
 
 //getpt - open the pseudoterminal master (PTM) 
 //getpt() is glibc-specific; use posix_openpt(3) instead. 

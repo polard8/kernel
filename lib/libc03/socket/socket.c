@@ -74,7 +74,6 @@ int __socket_pipe ( int pipefd[2] ){
 
 
 
-
 // socketpair - create a pair of connected sockets
 // POSIX.1-2001, POSIX.1-2008, 4.4BSD.  socketpair() first appeared in
 // 4.2BSD.  It is generally portable to/from non-BSD systems supporting
@@ -114,6 +113,15 @@ int socketpair (int domain, int type, int protocol, int sv[2]){
 }
 
 
+// #todo
+// not tested.
+/*
+int gramado_socketpair (int fd[2]);
+int gramado_socketpair (int fd[2])
+{
+    return (int) socketpair ( AF_UNIX, SOCK_STREAM, 0, fd );
+}
+*/
 
 
 // POSIX.1-2001, POSIX.1-2008, SVr4, 4.4BSD, 
