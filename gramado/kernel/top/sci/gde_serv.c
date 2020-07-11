@@ -950,6 +950,17 @@ gde_extra_services (
         return NULL;
     }
     
+    // fstat support.
+    // 
+    if ( number == 4005 )
+    {
+        debug_print ("service 4005: [TODO]\n");
+        
+        //#todo
+        //IN: fd, stat struct pointer.
+        //xxx?( (int) arg2, (struct stat *) arg3 );
+        return NULL;
+    }
     
     // Show root files system info.
     if ( number == 4444 ){

@@ -1150,7 +1150,16 @@ getopt (
 int fstat(int fd, struct stat *buf)
 {
     debug_print ("fstat: [TODO]\n");
-	return -1;
+
+    if (fd<0){
+        debug_print ("fstat: fd\n");
+        return -1;
+    }
+
+    return (int) gramado_system_call ( 4005, 
+                    (unsigned long) fd,
+                    (unsigned long) buf,
+                    (unsigned long) buf );
 }
 
 
@@ -1160,10 +1169,9 @@ int stat(const char *path, struct stat *buf)
 
     debug_print ("stat: [TODO]\n");
     
-	int i = open(path, 0, 0);
-	int ret = fstat(i, buf);
-	close(i);
-
+	int _fd = open(path, 0, 0);
+	int ret = fstat(_fd, buf);
+	close(_fd);
 
     return (int) ret;
 }
