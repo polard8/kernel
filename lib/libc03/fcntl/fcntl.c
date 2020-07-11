@@ -103,24 +103,23 @@ int open (const char *pathname, int flags, mode_t mode){
 
     int __fd = -1;
 
-
-    //#bugbug
-    // desse jeito não teremos um buffer em ring3. ??
-    //return (int) gramado_system_call ( 16, 
-      //               (unsigned long) pathname, 
-      //               (unsigned long) flags, 
-      //               (unsigned long) mode );
+    char path[64];
+    
       
-
+    // #importante
+    // adaptando para fat16.
+    // #todo: devemos fazer isso em ring0, não aqui.
+    // isso funcionou.
+    stdio_fntos( (char *) pathname);
+    sprintf(path,pathname);
+    
     //
     // size
     //
     
-    stdio_fntos( (char *) pathname);
-    
-    // get file size
+    // Get file size.
     size_t s = (size_t) gramado_system_call ( 178, 
-                            (unsigned long) pathname,
+                            (unsigned long) path,
                             0,
                             0 );
     
@@ -141,7 +140,7 @@ int open (const char *pathname, int flags, mode_t mode){
     //IN: service, name, address, 0, 0 
 
     __fd = (int) gramado_system_call ( 3,  
-                     (unsigned long) pathname, 
+                     (unsigned long) path, 
                      (unsigned long) flags,  
                      (unsigned long) mode );
 

@@ -134,7 +134,8 @@ int stdio_atoi (char *s){
 
 void stdio_fntos (char *name){
 
-    int  i, ns = 0;
+    int i=0;
+    int ns=0;
 
     char ext[4];
 
@@ -199,6 +200,7 @@ void stdio_fntos (char *name){
 
 
     *name = '\0';
+    //*name = 0;
 }
 
 
@@ -849,13 +851,11 @@ FILE *fopen ( const char *filename, const char *mode ){
 
     __stream = (FILE *) malloc ( sizeof(FILE) );
     
-    if ( (void *) __stream == NULL )
-    {
-        printf (" fopen: __stream fail\n");
+    if ( (void *) __stream == NULL ){
+        printf ("fopen: __stream fail\n");
         return NULL;
 
     }else{
-
         __stream->used = 1;
         __stream->magic = 1234;
 

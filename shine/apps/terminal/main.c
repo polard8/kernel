@@ -1499,11 +1499,11 @@ int main ( int argc, char *argv[] ){
 
     // loop
     // This the loop that gets messages from the window server;
-    terminal_loop(client_fd);
+    //terminal_loop(client_fd);
     
-    debug_print ("terminal: bye\n"); 
-    printf ("terminal: bye\n");
-    return 0;
+    //debug_print ("terminal: bye\n"); 
+    //printf ("terminal: bye\n");
+    //return 0;
 
     //
     // ============== test start =======================
@@ -1523,6 +1523,7 @@ int main ( int argc, char *argv[] ){
     
     // talvez precisamos esperar ...
     
+    /*
      char __f[32];
      
      __f[0] = 'G';
@@ -1537,11 +1538,12 @@ int main ( int argc, char *argv[] ){
      __f[9] = 'X';
      __f[10] = 'T';
      __f[11] = 0;
-
+    */
 
     
      FILE *fp; 
-     fp = fopen ((char *) __f, "w+" );
+     //fp = fopen ((char *) __f, "w+" );
+     fp = fopen ("gramado.txt", "w+" );
      if(!fp){
 		 printf("cant open\n");
 		 return 1;
