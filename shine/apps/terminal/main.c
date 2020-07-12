@@ -1499,11 +1499,11 @@ int main ( int argc, char *argv[] ){
 
     // loop
     // This the loop that gets messages from the window server;
-    //terminal_loop(client_fd);
+    terminal_loop(client_fd);
     
-    //debug_print ("terminal: bye\n"); 
-    //printf ("terminal: bye\n");
-    //return 0;
+    debug_print ("terminal: bye\n"); 
+    printf ("terminal: bye\n");
+    return 0;
 
     //
     // ============== test start =======================
@@ -1519,57 +1519,42 @@ int main ( int argc, char *argv[] ){
     //
     
     //Precisamos de um loop aqui pra chamar o shell sempre que ele fechar.
-    //__terminal_clone_and_execute ("true.bin"); 
+    __terminal_clone_and_execute ("true.bin"); 
     
     // talvez precisamos esperar ...
-    
-    /*
-     char __f[32];
-     
-     __f[0] = 'G';
-     __f[1] = 'R';
-     __f[2] = 'A';
-     __f[3] = 'M';
-     __f[4] = 'A';
-     __f[5] = 'D';
-     __f[6] = 'O';
-     __f[7] = ' ';
-     __f[8] = 'T';
-     __f[9] = 'X';
-     __f[10] = 'T';
-     __f[11] = 0;
-    */
+
+
+     // #bugbug
+     // Nesse teste o arquivo é aberto duas vezes ...
+     //não é o mesmo arquivo, é uma instância.
 
     
      FILE *fp; 
-     //fp = fopen ((char *) __f, "w+" );
      fp = fopen ("gramado.txt", "w+" );
      if(!fp){
-		 printf("cant open\n");
-		 return 1;
+         printf("cant open\n");
+         return 1;
      }
 
     int c=0;
-    
     while(1)
     {
         //testing stdin
-        //fseek(fp, 0, SEEK_SET);   // seek back to beginning of file
+        fseek(fp, 0, SEEK_SET);   // seek back to beginning of file
         //fprintf(fp,"terminal: Testing string ...\n");
 
         // arquivo que o filho vai herdar.
         c = fgetc(fp); 
          
-        if( c == EOF) break;
+        //if( c == EOF) break;
         
         if( c != EOF)
         {
             //_draw(client_fd,c); //#bugbug
  
-            printf ("%c",c);
-            fflush(stdout);
+           printf ("%c",c);
+           fflush(stdout);
         }
-
         //printf ("[EOF]\n");
     }
     //

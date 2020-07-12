@@ -48,14 +48,38 @@ int main ( int argc, char *argv[] )
     
 //__ok:
 
+    FILE *fp;
+    
+    fp = fopen ("gramado.txt", "w+");
+    if(!fp){
+        printf("true: fp\n"); return 1;
+    }
+
 	printf ("true: test\n");
-	fseek(stderr, 0, SEEK_SET);   // seek back to beginning of file
+    char buf[512];
+    while(1){
+
+        //#bugbug
+        //Se não usar o fseek dá um bug sinistro ...
+        //provavelmente começamos escrever na memória para
+        //além do buffer da stream ...
+
+        fseek(fp, 0, SEEK_SET);   // seek back to beginning of file    
+        //fprintf(fp,"true: THIS IS A MAGIC STRING!\n");
+        sprintf(buf,"true: THIS IS A MAGIC STRING!\n");
+        fputs((const char *) buf,fp);
+    }
+	printf ("true: done\n");    
+    return 0;
+    
+    /*
     
     int c;
     while(1){
-	    fseek(stderr, 0, SEEK_SET);   // seek back to beginning of file
+		
+		fseek(fp, 0, SEEK_SET);   // seek back to beginning of file
         //printf ("test\n");
-        c = fgetc(stderr);
+        c = fgetc(fp);
         if(c != EOF){
             printf("%c",c);
             fflush(stdout);
@@ -64,6 +88,7 @@ int main ( int argc, char *argv[] )
     
     
     return 1;  //true.
+    */
 }
 
 

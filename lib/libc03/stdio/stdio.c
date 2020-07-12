@@ -2269,15 +2269,22 @@ int fprintf(FILE *fp, const char *fmt, ...)
 
 int fprintf ( FILE *stream, const char *format, ... ){
 
-
-    if ( (void *) stream == NULL )
-       return EOF;
-
+    int fd=-1;
     
-   debug_print ("fprintf: TODO. Not implemented yet\n");
-  
-   // Suspendendo a notificação do terminal.
-   return 0;
+    debug_print ("fprintf: TODO. Not implemented yet\n");
+    
+    if ( (void *) stream == NULL ){
+       debug_print ("fprintf: stream\n");
+       return EOF;
+    }
+    
+    fd = fileno(stream);
+
+
+
+ 
+    // Suspendendo a notificação do terminal.
+    return 0;
 }
 
 
