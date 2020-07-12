@@ -6,6 +6,9 @@
 #define ____CONSOLE_H
 
 
+//#define CONSOLE_COUNT_MIN    1
+//#define CONSOLE_COUNT_MAX    4
+
 
 //
 // output on the console device;
@@ -14,7 +17,6 @@
 //see: tty/console.c
 void _console_outbyte (int c, int console_number);
 void console_outbyte (int c, int console_number);
-
 void console_putchar ( int c, int console_number );
 
 

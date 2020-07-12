@@ -351,30 +351,21 @@ void csi_at (int nr, int console_number)
  
 
 void _console_outbyte (int c, int console_number){
-	
-    unsigned long i;
-	
-	unsigned long x;
-	unsigned long y;
-	
-    //O caractere.
-	
-	char ch = (char) c;	
-	
+
+
 	// #test
 	// Tentando pegar as dimensões do char.
 	// #importante: 
 	// Não pode ser 0, pois poderíamos ter divisão por zero.
 	
 	
-	int cWidth = get_char_width ();
-	int cHeight = get_char_height ();
-	
+    int cWidth  = get_char_width ();
+    int cHeight = get_char_height ();
 
-	if ( cWidth == 0 || cHeight == 0 ){
-		debug_print ("_console_outbyte: char w h");
-		panic ("_console_outbyte: fail w h ");
-	}
+    if ( cWidth == 0 || cHeight == 0 ){
+        debug_print ("_console_outbyte: char w h");
+        panic ("_console_outbyte: fail w h ");
+    }
 	
 	// #bugbug
 	// Caso estejamos em modo texto.
@@ -398,40 +389,37 @@ void _console_outbyte (int c, int console_number){
 	 
     if ( VideoBlock.useGui == 1 )
     {
+
+        // ## NÃO TRANPARENTE ##
+        // se estamos no modo terminal então usaremos as cores 
+        // configuradas na estrutura do terminal atual.
+        // Branco no preto é um padrão para terminal.
         if ( stdio_terminalmode_flag == 1 )
         {
-			
-			// ## NÃO TRANPARENTE ##
-            // se estamos no modo terminal então usaremos as cores 
-            // configuradas na estrutura do terminal atual.
-            // Branco no preto é um padrão para terminal.
-			
             draw_char ( cWidth * TTY[console_number].cursor_x, 
                        cHeight * TTY[console_number].cursor_y, 
                        c, 
                        COLOR_TERMINALTEXT, COLOR_TERMINAL2 );
 
-		}else{
-			
-			// ## TRANSPARENTE ##
-		    // se não estamos no modo terminal então usaremos
-		    // char transparente.
-            // Não sabemos o fundo. Vamos selecionar o foreground.
-			
-			drawchar_transparent ( 
-			    cWidth* TTY[console_number].cursor_x, 
-			    cHeight * TTY[console_number].cursor_y, 
-				TTY[console_number].cursor_color, 
-				c );
-		};
-		
+
+        // ## TRANSPARENTE ##
+        // se não estamos no modo terminal então usaremos
+        // char transparente.
+        // Não sabemos o fundo. Vamos selecionar o foreground.        
+        }else{
+            drawchar_transparent ( 
+                cWidth* TTY[console_number].cursor_x, 
+                cHeight * TTY[console_number].cursor_y, 
+                TTY[console_number].cursor_color, 
+                c );
+        };
 		// Nothing.
-	};
+    }
 }
 
 
 /*
- *******************************************************************
+ *********************************************
  * outbyte:
  *     Trata o caractere a ser imprimido e chama a rotina /_outbyte/
  * para efetivamente colocar o caractere na tela.
@@ -445,7 +433,7 @@ void console_outbyte (int c, int console_number){
     static char prev = 0;
 
 
-    unsigned long __cWidth = gwsGetCurrentFontCharWidth();
+    unsigned long __cWidth  = gwsGetCurrentFontCharWidth();
     unsigned long __cHeight = gwsGetCurrentFontCharHeight();
 
     if ( __cWidth == 0  ||  __cHeight == 0 ){
@@ -464,12 +452,12 @@ void console_outbyte (int c, int console_number){
 
 
     //form feed - Nova tela.
-    if ( c == '\f' )
-    {
+    if ( c == '\f' ){
         TTY[console_number].cursor_y = TTY[console_number].cursor_top;
         TTY[console_number].cursor_x = TTY[console_number].cursor_left;
         return;
     }
+
 
     // #m$. 
     // É normal \n retornar sem imprimir nada.
@@ -489,14 +477,13 @@ void console_outbyte (int c, int console_number){
             prev = c; 
 
         }else{
-
             TTY[console_number].cursor_y++;
             TTY[console_number].cursor_x = TTY[console_number].cursor_left;
             prev = c;
         };
 
         return;
-    };
+    }
 
 
     //Próxima linha no modo terminal.
@@ -538,7 +525,7 @@ void console_outbyte (int c, int console_number){
         };
 
         return;
-    };
+    }
 
 
 	//tab
@@ -561,7 +548,7 @@ void console_outbyte (int c, int console_number){
 		//Olha que coisa idiota, e se tOffset for 0.
 		//set_up_cursor( g_cursor_x +tOffset, g_cursor_y );
 		//return;        
-    };
+    }
 
 
 	//liberando esse limite.
@@ -573,8 +560,7 @@ void console_outbyte (int c, int console_number){
  
 
     // Apenas voltar ao início da linha.
-    if ( c == '\r' )
-    {
+    if ( c == '\r' ){
         TTY[console_number].cursor_x = TTY[console_number].cursor_left;  
         prev = c;
         return;    
@@ -595,8 +581,7 @@ void console_outbyte (int c, int console_number){
     
  
     // backspace ??
-    if ( c == 8 )  
-    {
+    if ( c == 8 ){
         TTY[console_number].cursor_x--; 
         prev = c;
         return;
@@ -627,13 +612,12 @@ void console_outbyte (int c, int console_number){
         TTY[console_number].cursor_x = TTY[console_number].cursor_left;
         TTY[console_number].cursor_y++;  
 
-    }else{   
-
-		// Incrementando.
-		// Apenas incrementa a coluna.
-
+    // Incrementando.
+    // Apenas incrementa a coluna.
+    }else{ 
         TTY[console_number].cursor_x++;  
     };
+
 
 	// #bugbug
 	// Tem um scroll logo acima que considera um valor
@@ -648,13 +632,11 @@ void console_outbyte (int c, int console_number){
         TTY[console_number].cursor_y = TTY[console_number].cursor_bottom;
     }
 
-	//
-	// Imprime os caracteres normais.
-	//
 
-	// Nesse momento imprimiremos os caracteres.
     // Imprime os caracteres normais.
-	// Atualisa o prev.
+    // Nesse momento imprimiremos os caracteres.
+    // Imprime os caracteres normais.
+    // Atualisa o prev.
 
     _console_outbyte (c, console_number);
 
@@ -678,11 +660,10 @@ void console_outbyte (int c, int console_number){
 // sincronização do retraço vertical e não a cada char.
 
 void console_putchar ( int c, int console_number ){
-	
+
     // Getting char info.
-	
-	int cWidth = get_char_width ();
-	int cHeight = get_char_height ();
+    int cWidth  = get_char_width ();
+    int cHeight = get_char_height ();
 
     if ( cWidth == 0 || cHeight == 0 ){
         panic ("console_putchar: char");
@@ -690,11 +671,10 @@ void console_putchar ( int c, int console_number ){
 
 
 	// flag on.
-	stdio_terminalmode_flag = 1;  
+    stdio_terminalmode_flag = 1;  
 
 
     //  Console limits
-
     if ( console_number < 0 || console_number >= 4 ){
         panic ("console_putchar: console_number");        
     }
@@ -794,19 +774,22 @@ console_write (
     char *data = (char *) buf;
 
     //debug_print ("console_write: [test]\n");
-    
+
+    // Console number.
     if ( console_number < 0 || console_number > 3 ){
         printf ("console_write: console_number\n");
         refresh_screen();
         return -1;
     }
 
+    // BUffer.
     if ( (void *) buf == NULL ){
         printf ("console_write: buf\n");
         refresh_screen();
         return -1;
     }
 
+    // Count.
     if (!count){
         printf ("console_write: count\n");
         refresh_screen();
@@ -820,122 +803,138 @@ console_write (
 
 
     // Inicializando.
-    // Dão dá mais pra confiar !
+    // Dão dá mais pra confiar!
+    // #bugbug: Onde isso está definido?
+    // Isso é uma flag para scape sequence?
     __state = 0; 
  
-    for (i=0; i<count; i++){
-
+ 
+    for (i=0; i<count; i++)
+    {
         ch = data[i];
-                
+
         switch (__state){
-                 
+            
+            
             // State 0
             case 0:
-            // #debug
-            //console_putchar ( '@',console_number);
-            //console_putchar ( '0',console_number);
-            //console_putchar ( '\n',console_number);
+                // #debug
+                //console_putchar ( '@',console_number);
+                //console_putchar ( '0',console_number);
+                //console_putchar ( '\n',console_number);
 
-               // Printable ?
-               if (ch >31 && ch <127) {
-
+               // Is printable?
+               if (ch >31 && ch <127){
                     console_putchar ( ch, console_number );
                
                // Escape.
-               } else if (ch==27) 
+               } else if (ch==27){ 
                    __state=1;
-               else if (ch==10 || ch==11 || ch==12)
+               
+               // ?? \n
+               }else if (ch==10 || ch==11 || ch==12){
                    console_putchar ( ch, console_number );  // \n ???
-               else if (ch==13)    
+               
+               // Enter ?
+               }else if (ch==13){ 
                    console_putchar ( ch, console_number );  //cr \n
-               else if (ch==8) {
+               
+               // backspace
+               }else if (ch==8) {
                    console_putchar ( ch, console_number );  // backspace.
+               
+               // Tab.S
                } else if (ch==9) {
                    console_putchar ( ch, console_number );  // horizontal tab
-               }
+               };
                break;
             
             
             // State 1
             case 1:
-            // #debug
-            //console_putchar ( '@',console_number);
-            //console_putchar ( '1',console_number);
-            //console_putchar ( '\n',console_number);
+                // #debug
+                //console_putchar ( '@',console_number);
+                //console_putchar ( '1',console_number);
+                //console_putchar ( '\n',console_number);
             
                 __state=0;
                 
-                if (ch=='[')
-					__state=2;
-				else if (ch=='E') 
-					__local_gotoxy ( 0, (TTY[console_number].cursor_y + 1), console_number );
-				else if (ch=='M')
-					__local_ri ();   //scroll. deixa pra depois. kkk
-				else if (ch=='D')
-					console_putchar ( ch, console_number );  //lf();
-				else if (ch=='Z')
-					__respond (console_number);    //test
-				else if ( TTY[console_number].cursor_x == '7')   //?? What L.T.
-					__local_save_cur (console_number);
-				else if ( TTY[console_number].cursor_x == '8' )  //?? What L.T.
-					__local_restore_cur (console_number);
-				break;
-			
-			
-			//State 2
-			case 2:
-            // #debug
-            //console_putchar ( '@',console_number);
-            //console_putchar ( '2',console_number);
-            //console_putchar ( '\n',console_number);
-            
-			    // Clean
-				for ( npar=0; npar<NPAR; npar++ )
-					par[npar]=0;
-				npar=0;
-				__state=3;  // Next state.
-				if ( ques = ( ch == '?' ) ) 
-					break;
-					
+                // Entra.
+                if (ch=='['){
+                    __state=2;
+                }else if (ch=='E'){ 
+                    __local_gotoxy ( 0, (TTY[console_number].cursor_y + 1), console_number );
+                }else if (ch=='M'){
+                    __local_ri ();   //scroll. deixa pra depois. kkk
+                }else if (ch=='D'){
+                    console_putchar ( ch, console_number );  //lf();
+                }else if (ch=='Z'){
+                    __respond (console_number);    //test
+                }else if ( TTY[console_number].cursor_x == '7'){   //?? What L.T.
+                    __local_save_cur (console_number);
+                }else if ( TTY[console_number].cursor_x == '8' ){  //?? What L.T.
+                    __local_restore_cur (console_number);
+                };
+                break;
+
+            //State 2
+            case 2:
+                // #debug
+                //console_putchar ( '@',console_number);
+                //console_putchar ( '2',console_number);
+                //console_putchar ( '\n',console_number);
+ 
+                // Clean
+                for ( npar=0; npar<NPAR; npar++ ){ par[npar]=0; };
+                npar=0;
+                __state=3;  // Next state.
+                if ( ques = ( ch == '?' ) ) 
+                    break;
+
             case 3:
-            // #debug
-            //console_putchar ( '@',console_number);
-            //console_putchar ( '3',console_number);
-            //console_putchar ( '\n',console_number);
+                // #debug
+                //console_putchar ( '@',console_number);
+                //console_putchar ( '3',console_number);
+                //console_putchar ( '\n',console_number);
             
 				if ( ch==';' && npar<NPAR-1) {
 					npar++;
-					break;
-				} else if ( ch >= '0' && ch <='9') {
+					break;  //#bugbug: Não moda de state??
+
+				} else if ( ch >= '0' && ch <='9'){
 					par[npar] = 10 * par[npar] + ch -'0';
 					break;
+					
 				} else __state=4;
 
-			case 4:
-            // #debug
-            //console_putchar ( '@',console_number);
-            //console_putchar ( '4',console_number);
-            //console_putchar ( '\n',console_number);
+
+            case 4:
+                // #debug
+                //console_putchar ( '@',console_number);
+                //console_putchar ( '4',console_number);
+                //console_putchar ( '\n',console_number);
             
-				__state=0;
-				switch (ch) {
-					case 'G': case '`':
+                __state=0;
+                
+                switch (ch){
+
+                    case 'G': case '`':
 						if (par[0]) par[0]--;
 						__local_gotoxy (par[0], TTY[console_number].cursor_y, console_number);
 						break;
-					case 'A':
+                    case 'A':
 						if (!par[0]) par[0]++;
 						__local_gotoxy ( TTY[console_number].cursor_x,  TTY[console_number].cursor_y - par[0], console_number);
 						break;
-					case 'B': case 'e':
+                    case 'B': case 'e':
 						if (!par[0]) par[0]++;
 						__local_gotoxy ( TTY[console_number].cursor_x, TTY[console_number].cursor_y + par[0], console_number);
 						break;
-					case 'C': case 'a':
+                    case 'C': case 'a':
 						if (!par[0]) par[0]++;
 						__local_gotoxy ( TTY[console_number].cursor_x + par[0], TTY[console_number].cursor_y, console_number);
 						break;
-					case 'D':
+                    case 'D':
 						if (!par[0]) par[0]++;
 						__local_gotoxy ( TTY[console_number].cursor_x - par[0], TTY[console_number].cursor_y, console_number);
 						break;
@@ -956,43 +955,33 @@ console_write (
 						if (par[1]) par[1]--;
 						__local_gotoxy (par[1],par[0], console_number);
 						break;
-					case 'J':
-						csi_J (par[0]);
-						break;
-					case 'K':
-						csi_K (par[0]);
-						break;
-					case 'L':
-						csi_L (par[0], console_number);
-						break;
-					case 'M':
-						csi_M (par[0], console_number );
-						break;
-					case 'P':
-						csi_P (par[0], console_number);
-						break;
-					case '@':
-						csi_at (par[0], console_number);
-						break;
-					case 'm':
-						csi_m ();
-						break;
+
+					case 'J': csi_J  (par[0]); break;
+					case 'K': csi_K  (par[0]); break;
+					case 'L': csi_L  (par[0], console_number); break;
+					case 'M': csi_M  (par[0], console_number); break;
+					case 'P': csi_P  (par[0], console_number); break;
+					case '@': csi_at (par[0], console_number); break;
+					case 'm': csi_m (); break;
+
 					case 'r':
 						if (par[0]) par[0]--;
-						if (!par[1]) par[1] = TTY[console_number].cursor_height;  //?? da fuck
+						if (!par[1]) par[1] = TTY[console_number].cursor_height;  //?? 
 						if (par[0] < par[1] &&
 						    par[1] <= TTY[console_number].cursor_height ) {
 							TTY[console_number].cursor_top =par[0];
 							TTY[console_number].cursor_bottom = par[1];
 						}
 						break;
-					case 's':
-					    __local_save_cur( console_number );
-						break;
-					case 'u':
-						__local_restore_cur (console_number);
-						break;
-                }; 
+
+                    case 's': 
+                        __local_save_cur( console_number ); 
+                        break;
+
+                    case 'u': 
+                        __local_restore_cur (console_number);
+                        break;
+                };
                 break;
 
             default:
@@ -1001,13 +990,13 @@ console_write (
                 return -1;
                 break;
         };
-    }; 
+    };  // FOR 
+
 
    //printf ("console_write: done\n");
    //refresh_screen();
 
-    return count; 
-
+    return count;
 }
 
 
@@ -1069,7 +1058,9 @@ void console_scroll (int console_number){
 
 
    // Limpa a últime linha.
-   for ( i = TTY[console_number].cursor_x; i < TTY[console_number].cursor_right; i++ )
+   for ( i = TTY[console_number].cursor_x; 
+         i < TTY[console_number].cursor_right; 
+         i++ )
    {
         _console_outbyte (' ',console_number); 
    };
@@ -1093,22 +1084,23 @@ void console_scroll (int console_number){
 int kclear (int color, int console_number)
 {
 
-	int Status = -1;
-	
-	if ( VideoBlock.useGui == 1 )
-	{
-		backgroundDraw ( COLOR_BLUE );
+    int Status = -1;
 
-		TTY[console_number].cursor_x = 0; 
-		TTY[console_number].cursor_y = 0; 
 
-		Status = 0;
+    if ( VideoBlock.useGui == 1 )
+    {
+        backgroundDraw ( COLOR_BLUE );
 
-	}else{
-		Status = -1;
-	};
+        TTY[console_number].cursor_x = 0; 
+        TTY[console_number].cursor_y = 0; 
 
-	return (int) Status;
+        Status = 0;
+        
+    }else{
+        Status = -1;
+    };
+
+    return (int) Status;
 }
 
 
@@ -1208,7 +1200,7 @@ void REFRESH_STREAM ( FILE *stream ){
     c = stream->_base;
 
 
-    int cWidth = get_char_width();
+    int cWidth  = get_char_width();
     int cHeight = get_char_height();
 
     if ( cWidth == 0 || cHeight == 0 ){
@@ -1222,14 +1214,14 @@ void REFRESH_STREAM ( FILE *stream ){
     stdio_terminalmode_flag = 1;  
     for ( i=0; i<j; i++ )
     {
-		printf ("%c", *c );
-		
-	    refresh_rectangle ( 
-	        TTY[current_vc].cursor_x * cWidth, 
-	        TTY[current_vc].cursor_y * cHeight,  
-		    cWidth, cHeight );
-		
-		c++;
+        printf ("%c", *c );
+
+        refresh_rectangle ( 
+            TTY[current_vc].cursor_x * cWidth, 
+            TTY[current_vc].cursor_y * cHeight,  
+            cWidth, cHeight );
+
+        c++;
     };
     stdio_terminalmode_flag = 0;  
     //--
@@ -1287,11 +1279,11 @@ void console_init_virtual_console (int n){
 
     TTY[ConsoleIndex].cursor_x = 0;
     TTY[ConsoleIndex].cursor_y = 0;
-    TTY[ConsoleIndex].cursor_width = 80;
+    TTY[ConsoleIndex].cursor_width  = 80;
     TTY[ConsoleIndex].cursor_height = 80;
     TTY[ConsoleIndex].cursor_left = 0;
-    TTY[ConsoleIndex].cursor_top = 0;
-    TTY[ConsoleIndex].cursor_right = 80;
+    TTY[ConsoleIndex].cursor_top  = 0;
+    TTY[ConsoleIndex].cursor_right  = 80;
     TTY[ConsoleIndex].cursor_bottom = 80;
     TTY[ConsoleIndex].cursor_color = COLOR_GREEN; //COLOR_TERMINALTEXT;
     

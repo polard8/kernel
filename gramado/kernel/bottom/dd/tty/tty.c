@@ -1216,6 +1216,7 @@ struct ttydrv_d *ttydrv_create (void) {
     struct ttydrv_d *__ttydrv;
 
 
+    debug_print ("ttydrv_create:\n");
 
     __ttydrv = (struct ttydrv_d *) kmalloc ( sizeof(struct ttydrv_d) );
     
@@ -1243,6 +1244,9 @@ struct ttydrv_d *ttydrv_create (void) {
 //#todo: deletar uma tty driver
 int ttydrv_delete ( struct ttydrv_d *tty_driver ){
 
+
+    debug_print ("ttydrv_delete:\n");
+
     // Nothing to do.
     if ( (void *) tty_driver == NULL ){
         debug_print ("ttydrv_delete: tty_driver\n");
@@ -1265,6 +1269,21 @@ int ttydrv_delete ( struct ttydrv_d *tty_driver ){
     // fail
     return -1;
 }
+
+
+
+// Return the pointer to a tty driver structure 
+// given the device descriptor.
+
+/*
+struct ttydrv_d *get_tty_driver( int fd );
+struct ttydrv_d *get_tty_driver( int fd )
+{
+    debug_print ("get_tty_driver: [TODO]\n");
+    return (struct ttydrv_d *) 0;
+}
+*/
+
 
 
 
@@ -1494,7 +1513,16 @@ int tty_delete ( struct tty_d *tty ){
     return 0;
 }
 
- 
+
+/*
+int initialize_tty_struct (struct tty_d *tty);
+int initialize_tty_struct (struct tty_d *tty)
+{
+    return -1;
+}
+*/
+
+
 /*
  ***********************************
  * ttyInit:
@@ -1531,8 +1559,7 @@ int ttyInit (int tty_id){
     // e terá vários pseudo terminais. pts. - Stands for pseudo terminal slave.
 
 
-    if ( tty_id < 0 || tty_id > 32 )
-    {
+    if ( tty_id < 0 || tty_id > 32 ){
         panic ("ttyInit: tty_id");
     }
 
