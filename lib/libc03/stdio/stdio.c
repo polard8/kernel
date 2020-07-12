@@ -2269,20 +2269,28 @@ int fprintf(FILE *fp, const char *fmt, ...)
 
 int fprintf ( FILE *stream, const char *format, ... ){
 
-    int fd=-1;
-    
-    debug_print ("fprintf: TODO. Not implemented yet\n");
+
+    debug_print ("fprintf: [FIXME]\n");
     
     if ( (void *) stream == NULL ){
        debug_print ("fprintf: stream\n");
        return EOF;
     }
+
+    //++
+    va_list ap;
+    va_start(ap, format);
     
-    fd = fileno(stream);
+    //#bugbug Talvez sem isso
+    //unsigned arg = va_arg(ap,unsigned long);
 
+    //#test.
+    //vfprintf ( stream, format, arg );
+    vfprintf ( stream, format, ap );
 
-
- 
+    va_end(ap);
+    //--
+     
     // Suspendendo a notificação do terminal.
     return 0;
 }
@@ -5064,23 +5072,31 @@ char *ctermid (char *s)
 
 void stdioInitialize (){
 
+    int status = 0;
+    int i=0;
+    
+    
+    // #bugbug
+    // Isso deve estar errado.
+    // provavelmente deveríamos apenas abrir os
+    // três arquivos herdados do processo pai.
+    // ?? Não sei se o processo init também terá um fluxo herdado.
 
-	// Buffers para as estruturas.
+
+    // Buffers para as estruturas.
     unsigned char buffer0[BUFSIZ];
     unsigned char buffer1[BUFSIZ];
     unsigned char buffer2[BUFSIZ];
 
-    // Buffers.
+    // Buffers usados pelos arquivos.
     unsigned char buffer0_data[BUFSIZ];
     unsigned char buffer1_data[BUFSIZ];
     unsigned char buffer2_data[BUFSIZ];
 
-
-    int status = 0;
-    int i=0;
-
-
-    //debug_print ("stdioInitialize: TODO: \n");  
+    // #debug
+    // #todo: Testar esse debug.
+    // debug_print ("stdioInitialize: TODO: \n");  
+    
     
     //
     // Pointers.
@@ -5090,8 +5106,17 @@ void stdioInitialize (){
     stdout = (FILE *) &buffer1[0];
     stderr = (FILE *) &buffer2[0];
 
+    //#test
+    //desse modo quem usar esses ponteiros
+    //estárá abrindo o descritor certo,
+    //herdado.
+    stdin->_file  = 0;
+    stdout->_file = 1;
+    stderr->_file = 2;
+
 
     // Buffers.
+    // Buffers dos arquivos.
     stdin->_base  = &buffer0_data[0];
     stdout->_base = &buffer1_data[0];
     stderr->_base = &buffer2_data[0];
@@ -5100,6 +5125,7 @@ void stdioInitialize (){
     stdin->_p  = stdin->_base;
     stdout->_p = stdout->_base;
     stderr->_p = stderr->_base;
+
 
     // cnt    
     //stdin->_cnt  = BUFSIZ;
@@ -5118,15 +5144,17 @@ void stdioInitialize (){
 
     stdin->_r  = 0;
     stdout->_r = 0;
-    stderr->_r = 0;    
+    stderr->_r = 0;
 
+    // #test: pegando o conteúdo do arquivo.
+    /*
+    int nreads=0; 
+    nreads = read(0,stdin->_base,  BUFSIZ-1);
+    nreads = read(1,stdout->_base, BUFSIZ-1);
+    nreads = read(2,stderr->_base, BUFSIZ-1);
+    */
     
-    // o kernel ainda não sabe disso.
-    stdin->_file = 0;
-    stdout->_file = 1;
-    stderr->_file = 2;
     
-	
 	//
 	// # libc mode #
 	//
@@ -5144,9 +5172,9 @@ void stdioInitialize (){
       // #importante:
       // Vamos conectar o processo filho ao processo pai
       // atraves das ttys dos processos.
-      // o processo pai eh o terminal.
+      // o processo pai é o terminal. (às vezes)
       // #bugbug:
-      // Esse metodo nao funcionara no caso
+      // Esse metodo não funcionara no caso
       // do processo filho do shell
       
       gramado_system_call ( 267,
@@ -5159,212 +5187,12 @@ void stdioInitialize (){
     __libc_tty_id = (int) gramado_system_call ( 266, getpid(), 0, 0 );        
 
 
-	// Alocando espaço para as estruturas.
-	// Mas não usaremos a estrutura em ring3, somente o ponteiro.
-	// O ponteiro apontará para um estrutura em ring0.
-
-	//stdin  = (FILE *) &buffer0[0];
-	//stdout = (FILE *) &buffer1[0];
-	//stderr = (FILE *) &buffer2[0];
-
-
-	// #bugbug
-	//precisamos usar ponteiros de arquivos
-	//que estão em ring0, senão fprintf não funcionará;
-	
-    //
-    // stdout.
-    //
-	
-	// Pegamos uma stdout
-	// Isso está pegando a stdout da tty atual. CurrentTTY->stdout.
-	// Mas deveríamos pegar o stdout na estrutura de processo.
-	
-
-    //_fp = (FILE *) gramado_system_call ( 1000, getpid(), 0, 0 );
-    
-    
-    // pegando s stream na lista de arquivos do processo.
-    // O ponteiro apontará para um estrutura em ring0.
-    // service, pid, fd, 0.
-    
-    //stdin  = (FILE *) gramado_system_call ( 167, getpid(), 0, 0 );
-    //stdout = (FILE *) gramado_system_call ( 167, getpid(), 1, 0 );
-    //stderr = (FILE *) gramado_system_call ( 167, getpid(), 2, 0 );
-
 
     // limpando o prompt;
     prompt_clean();
-
-
-	// #bugbug
-	// talvez seja melhor o aplicativo decidir se precisa de um terminal ou não.
-	// talvez o aplicativo ou o crt0.o precisam configurar o terminal
-	// o terminal será configurado de acordo com o tipo de crt0.o.
-	
-	/*
-	//Inicialziamos o terminal que serr'usado pelo aplicativo.
-	//terminal___PID = (int) apiStartTerminal ();
-	
-
-    // 'Clona' e executa o noraterm como processo filho. 
-    terminal___PID = (int) system_call ( 900, (unsigned long) "noraterm.bin", 0, 0 );
-
-
-		
-	// Exibe o PID para debug.
-	//printf ("PID = %d \n", PID);
-
-    //registra o terminal como terminal atual.
-	system_call ( 1003, terminal___PID, 0, 0 ); 
-		
-	//invalida a variável.
-	terminal___PID = -1;
-		
-	//pega o pid do terminal atual
-	terminal___PID = (int) system_call ( 1004, 0, 0, 0 ); 
-		
-    if ( terminal___PID <= 0 )
-	{
-        printf ("stdioInitialize: PID fail. We can't start terminal for this app *hang\n");
-		while(1){}
-    }
-	*/
-	
-	
-	
-	// # fluxo padrão.
-	// Aqui temos os ponteiros em ring3. Mas precisamos
-	// configurar os ponteiros que estão na estrutura do processo em ring0.
-
-    // #importante
-    // Esses arquivos em ring3 devem ser tratados como buffers.
-	// fflush deve copiar o conteúdo desses arquivos
-	// para os arquivos do fluxo padrão que são gerenciados pela
-	// estrutura do processo.
-
-	
-	
-	// #importante
-	// #teste:
-	// vamos chamar uma systemcall que coloca na
-	// estrutura do processo atual esses ponteiros
-	// para o fluxo padrão.
-	
-	
-
     
-	/*
-	status =  (int) gramado_system_call ( 700, 
-					(unsigned long) stdin, 
-					(unsigned long) stdout, 
-					(unsigned long) stderr ); 
-    */
-	
-	/* Initialize the Process Standard Streams */
-	
-	//status = stdio_initialize_standard_streams ();
-	
-	/*
-	//#todo
-	if (status != 0)
-    {
-	}
-	*/
-	
-	
-	/*
-	// >>>> #bugbug
-	//  Em ring 3 não temos acesso aos elementos da estrutura.
-
-	// A biblioteca tem 3 pequenos buffers,
-	// que serão usados como base para os stream.
-	// ?? Podemos almentar esses buffers ?? @todo: testar.
-
-	//stdin - Usando o buffer 'prompt[.]' como arquivo.
-	stdin->_base = &prompt[0];
-	
-	//stdin->_ptr = stdin->_base;
-	stdin->_p = stdin->_base;
-	
-	//stdin->_bufsiz = PROMPT_MAX_DEFAULT; 
-	stdin->_lbfsize = PROMPT_MAX_DEFAULT; 
-	
-	//stdin->_cnt = stdin->_bufsiz;
-	stdin->_cnt = stdin->_lbfsize;
-	
-	stdin->_file = 0;
-	stdin->_tmpfname = "stdin";
-	//...
-	*/
- 
-	
-	/*
-	stdout->_base = &prompt_out[0];
-	stdout->_p = stdout->_base;
-	stdout->_lbfsize = PROMPT_MAX_DEFAULT; 
-	*/
-	
-	
-	//stdin->_cnt = stdout->_lbfsize;	
-	
-	/*
-	stdout->_file = 1;
-	stdout->_tmpfname = "stdout";
-	*/
-	//...
-	
-	//stderr - Usando o buffer 'prompt_err[.]' como arquivo.
-	//stderr->_base = &prompt_err[0];
-	
-	//stderr->_ptr = stderr->_base;
-	//stderr->_p = stderr->_base;
-	
-	//stderr->_bufsiz = PROMPT_MAX_DEFAULT; 
-	//stderr->_lbfsize = PROMPT_MAX_DEFAULT; 	
-	
-	//stdin->_cnt = stderr->_bufsiz;
-	//stdin->_cnt = stderr->_lbfsize;	
-	//stderr->_file = 2;
-	//stderr->_tmpfname = "stderr";	
-	//...
-	
-	// Limpando os buffers.
     
-    /*
-	for ( i=0; i < BUFSIZ; i++ )
-	{
-	    stdin->_base[i] = (char) '\0';
-	    //stdout->_base[i] = (char) '\0';
-	    stderr->_base[i] = (char) '\0';
-	};
-	*/
-	
-    //stdin->_ptr = stdin->_base;	
-    //stdin->_p = stdin->_base;		
     
-	//stdin->_bufsiz = BUFSIZ; 
-    //stdin->_lbfsize = BUFSIZ; 
-	
-	
-	//stdin->_cnt = stdin->_bufsiz;
-	//stdin->_cnt = stdin->_lbfsize;
-	
-
-	/*
-    stdout->_p = stdout->_base;
-	stdout->_lbfsize = BUFSIZ; 
-	stdout->_cnt = stdout->_lbfsize;
-	*/
-	
-    //stderr->_ptr = stderr->_base;
-    //stderr->_p = stderr->_base;
-    //stderr->_bufsiz = BUFSIZ; 
-    //stderr->_lbfsize = BUFSIZ; 
-	
-	
-	//stderr->_cnt = stderr->_bufsiz;
-	//stderr->_cnt = stderr->_lbfsize;
 }
 
 

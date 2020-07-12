@@ -598,7 +598,8 @@ fail:
 int stdlibInitMM (){
 
     int Status = 0;
-    int i = 0;
+    int i=0;
+
 
 	// @todo: 
 	// Inicializar algumas variáveis globais.
@@ -609,7 +610,7 @@ int stdlibInitMM (){
 	// Criar mmClearBSS()
 
 	// Heap.
-    Status = (int) heapInit ();
+    Status = (int) heapInit();
 
     if ( Status != 0 ){
         printf ("stdlibInitMM fail: heapInit\n");
@@ -663,7 +664,9 @@ int libcInitRT (){
 
     int Status = -1;
 
-
+    //#debug
+    //debug_print ("libcInitRT:\n");
+        
     Status = (int) stdlibInitMM();
 
     if ( Status != 0 ){

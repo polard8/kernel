@@ -70,7 +70,7 @@ extern int main ( int argc, char *argv[] );
 
 // Esses aplicativos rodam no terminal.
 // Esses aplicativos escrevem em stdout.
-// >>> O terminal precisa conhecer esse stdout para ler.
+// O terminal precisa conhecer esse stdout para ler.
 
 
 //#todo
@@ -79,16 +79,18 @@ extern int main ( int argc, char *argv[] );
 
 int crt0 (){
 
-    environ = my_environ;
+    // Retorno de main().
+    int retval=0;
+    
 
     // Token support.
     char *tokenList[TOKENLIST_MAX_DEFAULT];
     char *token;
     int token_count;
-    int index;
+    int index=0;
 
 
-    int retval;
+
 
 	// #importante
 	// Linha de comandos passada pelo shell.
@@ -96,7 +98,13 @@ int crt0 (){
     char *shared_memory = (char *) (0xC0800000 -0x100);
 
 
+    // Environment.
+    environ = my_environ;
+
+
 /*
+ // #debug
+
 #ifdef TEDITOR_VERBOSE
 	printf ("\n");
 	printf ("crt0: Initializing ...\n");
@@ -112,6 +120,10 @@ int crt0 (){
 	//while(1){ asm ("pause"); }
 #endif
 */
+
+    //
+    // Tokenizing.
+    //
 
     // Criando o ambiente.
     // Transferindo os ponteiros do vetor para o ambiente.
@@ -147,6 +159,7 @@ int crt0 (){
 
 
 /*
+ #debug
 #ifdef TEDITOR_VERBOSE
 	// #debug 	
 	// Mostra a quantidade de argumentos. 
@@ -170,12 +183,17 @@ int crt0 (){
 */
 
 
-
+    //
     // Initialize the library.
-    // See: libc03/stdlib/stdlib.c
+    //
     
-    libcInitRT ();
-    stdioInitialize ();
+    // See: stdlib/stdlib.c
+    libcInitRT();
+    
+    // See: stdio/stdio.c
+    stdioInitialize();
+
+
 
     // #todo
     // Chamar esse ao invés de chamar os dois acima.
