@@ -2,7 +2,7 @@
 
 <p align=center>
   <a href="https://github.com/frednora/gramado">
-    <img alt="Gramado" src="https://github.com/gramado/img/blob/master/gramado-gramcode.png">
+    <img alt="Gramado" src="https://github.com/gramado/img/blob/master/gramado2.png">
   </a>
 </p>
 
