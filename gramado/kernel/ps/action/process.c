@@ -89,6 +89,56 @@ int caller_process_id;
 int processNewPID;   
 
 
+
+
+
+
+void process_enter_criticalsection(int pid)
+{
+    struct process_d *p;
+
+
+    p = (void *) processList[pid];
+
+    if ( (void *) p == NULL ){
+        panic ("process_enter_criticalsection: p \n");
+
+
+    } else {
+
+        // todo: validation
+        
+        __spinlock_ipc = 1;
+        criticalsection_pid = (pid_t) pid;
+        p->_critical = 1;
+    };
+
+}
+
+
+void process_exit_criticalsection(int pid)
+{
+    struct process_d *p;
+
+
+    p = (void *) processList[pid];
+
+    if ( (void *) p == NULL ){
+        panic ("process_exit_criticalsection: p \n");
+
+
+    } else {
+
+        // todo: validation
+        
+        __spinlock_ipc = 0;
+        criticalsection_pid = (pid_t) 0;
+        p->_critical = 0;
+    };
+}
+
+
+
 /*
 // Chamada pelo timer.c
 int process_profiler();
@@ -753,6 +803,9 @@ int processCopyProcess ( pid_t p1, pid_t p2 ){
     Process2->objectType  = Process1->objectType;
     Process2->objectClass = Process1->objectClass;
 
+    // O clone não inicializa na seção crítica, pois senão teríamos
+    // dois processos na sessão crítica.
+    Process2->_critical = 0;
 
     // Identificadores.
     Process2->pid  = (pid_t) p2;             // PID.  O pid do clone.
@@ -1173,6 +1226,8 @@ get_next:
         Process->uid  = (int) GetCurrentUserId (); 
         Process->gid  = (int) GetCurrentGroupId (); 
 
+        // sessão crítica.
+        Process->_critical = 0;
 
 		//State of process
 
@@ -1860,16 +1915,11 @@ void init_processes (void){
 
 void exit_process ( pid_t pid, int code ){
 
-    int i;
-
     struct process_d *Process;
-    
-    //tmp
     struct thread_d *__Thread;    
     
-    //lista.
+    //list;
     struct thread_d *Threads;
-    
     
     struct thread_d *Next;
 	//...
@@ -1891,7 +1941,10 @@ void exit_process ( pid_t pid, int code ){
         return;
     }
 
-
+    //
+    // Struct
+    // 
+	
 	// Pega o ponteiro para a estrutura, 
 	// muda o c�digo de sa�da e o status.
 
@@ -1910,8 +1963,7 @@ void exit_process ( pid_t pid, int code ){
  
     }else{
 
-        if ( Process->used != 1 || Process->magic != PROCESS_MAGIC )
-        {
+        if ( Process->used != 1 || Process->magic != PROCESS_MAGIC ){
             debug_print ("exit_process: Validation\n");
             return;
         }
@@ -1919,6 +1971,13 @@ void exit_process ( pid_t pid, int code ){
 
         Process->exit_code = (int) code; 
         Process->state = PROCESS_TERMINATED; 
+        
+        // #important
+        // Isso é para evitar deadlock.
+        // Não queremos que um processo feche estando na sua
+        // seção crítica.
+        process_exit_criticalsection(pid);
+        
         // ...
     };
 

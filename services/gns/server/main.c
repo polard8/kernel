@@ -263,18 +263,22 @@ void __ipc_message (void){
 
     unsigned long message_buffer[5];   
 
-    gde_enter_critical_section ();
+
+    // Get message.
+    gde_enter_critical_section();
     gramado_system_call ( 111,
             (unsigned long) &message_buffer[0],
             (unsigned long) &message_buffer[0],
             (unsigned long) &message_buffer[0] );
-    gde_exit_critical_section ();
+    gde_exit_critical_section();
 
-    //se não tem mensagem
-    if ( message_buffer[1] == 0 )
-         return;
+    // No message.
+    if ( message_buffer[1] == 0 ){
+        gramado_system_call (265,0,0,0);
+        return;
+    }
 
-        
+
     // Send message to the window procedure.
     gnsProcedure ( (void *) message_buffer[0], 
         (int) message_buffer[1], 

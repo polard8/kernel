@@ -7866,30 +7866,34 @@ read_and_execute:
 	
 	/* Nesse teste vamos enviar um ponteiro de array, pegarmos os quatro 
 	   elementos da mensagem e depois zerar o buffer */
-	
+
+    //
+    // Main loop.
+    //
+
 Mainloop:
+
+    // #obs: 
+    // ?? O retorno será 1 se tiver mensagem e 0 se não tiver.
+    // ?? Por enquanto vamos checar o message_buffer[1].
 
     while (_running)
     {
-		// #obs: 
-		// O retorno ser� 1 se tiver mensagem e 0 se n�o tiver.
-		
-		gde_enter_critical_section (); 
-		system_call ( 111,
-		    (unsigned long) &message_buffer[0],
-			(unsigned long) &message_buffer[0],
-			(unsigned long) &message_buffer[0] );
-		gde_exit_critical_section (); 
 
+        // Get message.
+        gde_enter_critical_section(); 
+        system_call ( 111,
+            (unsigned long) &message_buffer[0],
+            (unsigned long) &message_buffer[0],
+            (unsigned long) &message_buffer[0] );
+        gde_exit_critical_section(); 
 
-        if ( message_buffer[1] == 0 )
-        {
-            //printf(".");
-            //yield. test
-            gramado_system_call ( 265,0,0,0); 
-            //asm ("pause");
+        // No message.
+        if ( message_buffer[1] == 0 ){ 
+            gramado_system_call (265,0,0,0); 
         }
 
+        // We got message. Call procedure.
         if ( message_buffer[1] != 0 )
         {
             shellProcedure ( (struct window_d *) message_buffer[0], 

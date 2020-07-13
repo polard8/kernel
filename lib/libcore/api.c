@@ -874,22 +874,23 @@ int gde_dialog_box ( int type, char *string1, char *string2 ){
     {	
 	    // Com botão, considera o título.
 	    case 1:
-		    gde_begin_paint ();
-		    Button = 1;
-			//janela tipo simples.
-	        hWnd = (void*) gde_create_window (  WT_SIMPLE, 1, 1, string1, 
-			                x, y, cx, cy, NULL, 0, 
-							WindowClientAreaColor, WindowColor); 
-			if ( (void *) hWnd == NULL ){
-				printf("hWnd fail\n");
-			};
-			gde_end_paint ();
-            
-			gde_register_window (hWnd);
-            gde_set_active_window (hWnd);
-            gde_set_focus (hWnd);
-		    break;
-			
+
+            gde_begin_paint();
+            Button = 1;
+            //janela tipo simples.
+            hWnd = (void*) gde_create_window (  WT_SIMPLE, 1, 1, string1, 
+                               x, y, cx, cy, NULL, 0, 
+                               WindowClientAreaColor, WindowColor); 
+            if ( (void *) hWnd == NULL ){ 
+                printf("hWnd fail\n"); 
+            }
+            gde_end_paint ();
+
+            gde_register_window(hWnd);
+            gde_set_active_window(hWnd);
+            gde_set_focus(hWnd);
+            break;
+
 		// Sem botão, considera o título.	
 	    case 2:
 		    Button = 0;
@@ -1732,24 +1733,15 @@ void gde_start_thread (void *thread){
 
 void *gde_fopen (const char *filename, const char *mode){
 	
-    void *Ret;	
+    void *Ret;
 
-    // #bugbug
-    // Cuidado estamos entrando na sessão crítica.
-    // O aplicativo pode desejar fazer o mesmo.
 
     gde_debug_print ("gde_fopen:\n");
-
-    //#todo: deletar
-    gde_enter_critical_section();
 
     Ret = (void *) system_call ( SYSTEMCALL_READ_FILE, 
                        (unsigned long) filename, 
                        (unsigned long) mode, 
                        0 );
-
-	//#todo: deletar
-    gde_exit_critical_section (); 
     
     return (void *) Ret;
 }
@@ -1815,12 +1807,12 @@ int gde_create_empty_file ( char *file_name ){
 
     int __ret = 0;
     
-    gde_enter_critical_section ();
+    gde_enter_critical_section();
     
     __ret = (int) gramado_system_call ( 43, 
                       (unsigned long) file_name, 0, 0);
 
-    gde_exit_critical_section ();    
+    gde_exit_critical_section();    
     
     return __ret;
 }
@@ -1832,12 +1824,12 @@ int gde_create_empty_directory ( char *dir_name ){
     int __ret=0;
 
 
-    gde_enter_critical_section ();
+    gde_enter_critical_section();
     
     __ret = (int) gramado_system_call ( 44, 
                       (unsigned long) dir_name, 0, 0);
 
-    gde_exit_critical_section ();    
+    gde_exit_critical_section();    
 
 
     return (int) __ret;
@@ -1962,24 +1954,23 @@ fail:
 //P (Proberen) testar.
 void gde_enter_critical_section (){
 
-    int S;
+    int S=0;
 
-
+    // Pega o valor do spinlock rpincipal.
     while (1){
         S = (int) system_call ( SYSTEMCALL_GET_KERNELSEMAPHORE, 
                       0, 0, 0 );
-	    
-		//Se deixou de ser 0 então posso entrar.
-		//se ainda for 0, continuo no while.
-
-        if ( S == 1 ){
-            goto done;
-        }
-		//Nothing.
+                      
+		// Se deixou de ser 0 então posso entrar.
+		// Se ainda for 0, continuo no while.
+        if ( S == 1 ){ goto done; }
+        
+        //#wait
+        gramado_system_call (265,0,0,0); //yield thread.
     };
 
     //Nothing
-	
+
 done:
     //Muda para zero para que ninguém entre.
     system_call ( SYSTEMCALL_CLOSE_KERNELSEMAPHORE, 0, 0, 0 );
@@ -2022,13 +2013,13 @@ void gde_initialize_critical_section ()
 }
 
 
-void gde_begin_paint ()
+void gde_begin_paint()
 {
     gde_enter_critical_section ();
 }
 
 
-void gde_end_paint ()
+void gde_end_paint()
 {
     gde_exit_critical_section ();
 }
@@ -2124,7 +2115,7 @@ int gde_dialog ( const char *string ){
 
     while (1)
     {
-        ch = (int) gde_getchar ();
+        ch = (int) gde_getchar();
 
         if ( ch != -1 )
         {

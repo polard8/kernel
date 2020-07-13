@@ -249,12 +249,13 @@ void handle_request (int fd){
 
         // Pegar o input!
 
-        gde_enter_critical_section ();
+        // Get message from kernel.
+        gde_enter_critical_section();
         gramado_system_call ( 111,
             (unsigned long) &message_buffer[0],
             (unsigned long) &message_buffer[0],
             (unsigned long) &message_buffer[0] );
-        gde_exit_critical_section ();
+        gde_exit_critical_section();
         
         //message_buffer[1] = SERVER_PACKET_TYPE_EVENT;
         send ( fd, __buffer, sizeof(__buffer), 0 );
@@ -372,16 +373,20 @@ void handle_ipc_message (void){
     
     unsigned long message_buffer[5];   
 
-    gde_enter_critical_section ();
+
+    // Get message.
+    gde_enter_critical_section();
     gramado_system_call ( 111,
             (unsigned long) &message_buffer[0],
             (unsigned long) &message_buffer[0],
             (unsigned long) &message_buffer[0] );
-    gde_exit_critical_section ();
+    gde_exit_critical_section();
 
-    // Se não tem mensagem.
-    if ( message_buffer[1] == 0 )
-         return;
+    // No message
+    if ( message_buffer[1] == 0 ){
+        gramado_system_call (265,0,0,0);
+        return;
+    }
 
     // Send message to the window procedure.
     gwsProcedure ( (struct gws_window_d *) message_buffer[0], 

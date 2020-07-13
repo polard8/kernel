@@ -2480,7 +2480,7 @@ gde_services (
         // Obs: 
         // #todo: 
         // Poderia ser uma chamada para configurar o posicionamento 
-        // e outra para configurar as dimens�es.		
+        // e outra para configurar as dimens�es.
         //226 - get
         case SYS_GET_KERNELSEMAPHORE:
             return (void *) __spinlock_ipc;
@@ -2489,14 +2489,22 @@ gde_services (
 
         // 227 - close critical section	
         case SYS_CLOSE_KERNELSEMAPHORE:
-            __spinlock_ipc = 0;
+            //__spinlock_ipc = 0;
+            //criticalsection_pid = (pid_t) 0;
+            process_exit_criticalsection(current_process);
             return NULL;
             break;
 
 
         // 228 - open critical section
+        // #todo: Quando um processo fechar e estiver
+        // em sua sessão crítica, então devemos liberar
+        // essa flag. Isso fica mais fácil de lembrar se
+        // existir uma flag na estrutura de processo.
         case SYS_OPEN_KERNELSEMAPHORE:
-            __spinlock_ipc = 1;
+            //__spinlock_ipc = 1;
+            //criticalsection_pid = (pid_t) current_process;
+            process_enter_criticalsection(current_process);
             return NULL;
             break;
 

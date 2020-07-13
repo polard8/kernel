@@ -813,7 +813,13 @@ struct process_d
 
     
     unsigned long alarm;
-
+    
+    
+    // Critical section;
+    // Devemos checar isso quando um processo terminar,
+    // para que ele não fique em sua sessão crítica 
+    // evitando que outros possam entrar.
+    int _critical;
 
 
     // Quando um processo só pode receber mensagens de um 
@@ -1034,6 +1040,11 @@ void CloseAllProcesses (void);
  */
 
 void exit_process ( pid_t pid, int code );
+
+
+//critical section
+void process_enter_criticalsection(int pid);
+void process_exit_criticalsection(int pid);
 
 
 void set_caller_process_id (int pid);
