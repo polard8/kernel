@@ -537,12 +537,22 @@ int main ( int argc, char *argv[] ){
 
     int client_fd = -1;
 
+    // Vamos nos concetar com o processo identificado 
+    // com o nome 'ws'
+    // The port name is 'port:/ws'
+    struct sockaddr addr;
+    addr.sa_family = 8000; //AF_GRAMADO
+    addr.sa_data[0] = 'w';
+    addr.sa_data[1] = 's';  
+    
+    
+
     gws_debug_print ("--------------------------\n"); 
     gws_debug_print ("gwst.bin: Initializing ...\n");
-    //gws_debug_print ("gwst: Starting ...\n");
-    
+
+
     //
-    // socket
+    // Socket
     // 
 
     // #debug
@@ -557,21 +567,11 @@ int main ( int argc, char *argv[] ){
        exit(1);  //#bugbug Cuidado.
     }
 
-
-    // Vamos nos concetar com o processo identificado 
-    // com o nome 'ws'
-
-    // The port name is 'port:/ws'
-
-    struct sockaddr addr;
-    addr.sa_family = 8000; //AF_GRAMADO
-    addr.sa_data[0] = 'w';
-    addr.sa_data[1] = 's';  
     
 
     //
-    // connect
-    // 
+    // Connect
+    //
 
     //nessa hora colocamos no accept um fd.
     //então o servidor escreverá em nosso arquivo.
@@ -586,9 +586,10 @@ int main ( int argc, char *argv[] ){
         gws_debug_print ("gwst: Connection Failed\n");
         printf ("gwst: Connection Failed \n"); 
         close(client_fd);
-        return (int) (-1); 
+        exit(1);
+        //return (int) (-1); 
     } 
-    
+
     
     //
     // === Create Window ===

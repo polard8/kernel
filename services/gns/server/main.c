@@ -454,10 +454,14 @@ int main (int argc, char **argv){
     unsigned long h=0;
 
 
+
+
+
     // Serial debug.
     gde_debug_print ("--------------------------\n");
-    gde_debug_print ("gns: Initializing ...\n");
-    printf ("gns: gns is alive! \n");
+    gde_debug_print ("gns: Initializing...\n");
+    printf ("gns: Initializing...\n");
+
 
     //
     // Register.
@@ -470,7 +474,7 @@ int main (int argc, char **argv){
     if (_status<0){
         gde_debug_print ("gns: Couldn't register the server \n");
         printf ("gns: Couldn't register the server \n");
-        exit (1);
+        exit(1);
     }
     gde_debug_print ("gns: Registration ok \n");
 
@@ -490,7 +494,8 @@ int main (int argc, char **argv){
     }
     ____saved_server_fd = server_fd;
 
- 
+
+
     //
     // bind
     // 
@@ -515,33 +520,19 @@ int main (int argc, char **argv){
     // Calling child.
     //
 
-    //dtextDrawText ( (struct window_d *) gui->screen,
-        //8, 80, COLOR_RED, "gws: Calling child" );
-        
-    
-    printf ("Hello from gns\n");
-    
-    // #atenção: 
-    //na máquina real, isso mostrou a barra, 
-    //mas não mostrou a string criada na janela gui->screen..
-    //gws_show_backbuffer ();
+    printf ("gns: Calling child \n");
 
-
-
-
-    printf ("gns: * Calling child \n");
-    // #test
-    // Nesse test, s2 usará socket para se conectar
-    // AF_GRAMADO.
-
-
-    gde_clone_and_execute ("gnst.bin");  //client.  
+    gde_clone_and_execute ("gnst.bin"); 
     //gde_clone_and_execute ("??.bin");  
     //gde_clone_and_execute ("??.bin");  
     // ...
 
- 
-    printf ("gns: * yield \n");
+
+    //
+    // Wait
+    //
+
+    printf ("gns: [FIXME] yield \n");
 
     for (i=0; i<11; i++)
         gns_yield ();
@@ -570,22 +561,22 @@ int main (int argc, char **argv){
     
     while (1){
 
-        // Accept actual connection from the client 
+        // Accept connection from a client. 
         newconn = accept( curconn, 
-                       (struct sockaddr *) &addr, 
-                       (socklen_t *) addr_len );
-        
+                      (struct sockaddr *) &addr, 
+                      (socklen_t *) addr_len );
+
         if (newconn < 0) {
             gde_debug_print ("gns: ERROR on accept\n");
- 
-        }else{
 
-            // Request from the new connection
+        // Request from the new connection 
+        }else{
             __socket_messages (newconn);
             //__socket_messages (curconn);
+            
+            //close ?
         };
     };
-
 
 
     //

@@ -728,6 +728,28 @@ void xxx_test_load_bmp(void)
     //
 }
 
+//internal
+void InitGraphics(void)
+{
+    debug_print("InitGraphics:\n");
+    
+    gwsInit();
+    
+    dtextDrawText ( (struct gws_window_d *) gui->screen,
+            200, 80, COLOR_RED, "gws: Initializing graphics" );
+    
+    create_background();
+    create_taskbar();
+    
+    gws_show_backbuffer();
+    
+    debug_print("InitGraphics: done\n");
+
+    //#debug
+    //while(1){};
+}
+
+
 
 /*
  ******************************
@@ -783,16 +805,9 @@ int main (int argc, char **argv){
         // #debug
         // Initializing or reinitializing
         gde_debug_print ("---------------------\n");
-        gde_debug_print ("gws: Initializing ...\n");
-        printf ("gws: gws is alive !  \n");
+        gde_debug_print ("gws: Initializing...\n");
+        printf ("gws: Initializing... \n");
 
-
-        // Init gws infrastructure.
-        gwsInit ();
-
-        // Let's create the traditional green background.
-        create_background();
-        create_taskbar();
 
         // Register.
  
@@ -809,9 +824,10 @@ int main (int argc, char **argv){
         if (_status<0){
             gde_debug_print ("gws: Couldn't register the server \n");
             printf ("gws: Couldn't register the server \n");
-            exit (1);
+            exit(1);
         }
         gde_debug_print ("gws: Registration ok \n");
+
 
         // #todo
         // Daqui pra frente é conexão com cliente.
@@ -841,6 +857,8 @@ int main (int argc, char **argv){
         }
         ____saved_server_fd = server_fd;
 
+
+
         //
         // bind
         // 
@@ -856,45 +874,42 @@ int main (int argc, char **argv){
         }
 
 
+
         //#todo
         //listen()
+        
+        
+        //
+        // Draw !!!
+        //
+
+
+        // Init gws infrastructure.
+        // Let's create the traditional green background.
+        
+        InitGraphics();
+
 
         //
         // Calling child.
         //
 
-        dtextDrawText ( (struct gws_window_d *) gui->screen,
-            200, 80, COLOR_RED, "gws: Calling child" );
-        
-        
-        // #atenção: 
-        // Na máquina real, isso mostrou a barra, 
-        // mas não mostrou a string criada na janela gui->screen.
-        //printf("$\n");
-        gws_show_backbuffer ();
-        //while(1);
-        
-        printf ("gws: * Calling child \n");        
-        
+        printf ("gws: Calling child \n");  
 
-        // #test
-        // Nesse test, s2 usará socket para se conectar
-        // AF_GRAMADO.
-
-        // #important:
-        // Calling a child.
-       
         //gde_clone_and_execute ("gwst.bin");  
         gde_clone_and_execute ("terminal.bin"); 
         //gde_clone_and_execute ("browser.bin"); 
         // ...        
+
+        //
+        // Wait
+        //
+
+        printf ("gws: [FIXME] yield \n");
        
-        printf ("gws: * yield \n");       
-       
-       
-        for (i=0; i<15; i++)
+        for (i=0; i<11; i++)
             gws_yield ();
-       
+ 
 
         //
         // =======================================

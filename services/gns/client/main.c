@@ -273,42 +273,53 @@ new_message:
 }
 
 
+//internal
+void gnst_hello (int fd)
+{
+    if(fd<0)
+        debug_print("gnst_hello: fd\n");
+
+    gnst_hello_request(fd);
+    gnst_hello_response(fd);
+}
+
 
 // Testing new main.
 int main ( int argc, char *argv[] ){
 
     int client_fd = -1;
-    
-    //debug_print ("gnst: Starting ...\n");
-    debug_print ("---------------------------\n");    
-    debug_print ("gnst.bin: Initializing ...\n");
-
-     //
-    // socket
-    // 
-
-    // #debug
-    printf ("gnst: Creating socket\n");
-
-    // cria o soquete.
-    // AF_GRAMADO
-    //client_fd = socket ( 8000, SOCK_STREAM, 0 );
-    
-    client_fd = socket ( AF_INET, SOCK_STREAM, 0 );
-    
-    if ( client_fd < 0 ){
-       printf ("gnst: Couldn't create socket\n");
-       exit(1);
-    }
-
 
     struct sockaddr_in addr_in;
     addr_in.sin_family = AF_INET;
     addr_in.sin_port   = 7548;   //porta para o Network Server 'ns' em gramado_ports[]
     addr_in.sin_addr.s_addr = IP(192, 168, 1, 79); 
     
+
+    debug_print ("---------------------------\n");    
+    debug_print ("gnst.bin: Initializing ...\n");
+
+
     //
-    // connect
+    // Socket
+    // 
+
+    // #debug
+    printf ("gnst: Creating socket\n");
+
+
+    // cria o soquete.
+    client_fd = socket ( AF_INET, SOCK_STREAM, 0 );
+
+    if ( client_fd < 0 ){
+       gws_debug_print ("gnst: Couldn't create socket\n");
+       printf ("gnst: Couldn't create socket\n");
+       exit(1);
+    }
+
+
+
+    //
+    // Connect
     // 
 
 
@@ -319,34 +330,30 @@ int main ( int argc, char *argv[] ){
     //printf ("gnst: Connecting to the address 'ns' ...\n");      
     
     printf ("gnst: Connecting to the address via inet  ...\n");      
-    if (connect (client_fd, (void *) &addr_in, sizeof(addr_in)) < 0){ 
+    if (connect (client_fd, (void *) &addr_in, sizeof(addr_in)) < 0)
+    { 
+        gws_debug_print ("gnst: Connection Failed\n");
         printf("gnst: Connection Failed \n"); 
-        return -1; 
+        close(client_fd);
+        exit(1);
+        //return (int) (-1); 
     } 
- 
-    //
-    // messages
-    //
-   
-    // #test
-    // Testing loop; ok.
-    while(1){
-    gnst_hello_request(client_fd);
-    
-    // #todo
-    // Podemos checar antes se o fd 
-    // representa um objeto que permite leitura.
-    // Pode nem ser possível.
-    // Mas como sabemos que é um soquete,
-    // então sabemos que é possível ler.
 
-    gnst_hello_response(client_fd);
+
+    //
+    // Loop.
+    //
+
+    while(1){
+
+        // Hello.
+        gnst_hello(client_fd);
     }
+
 
     debug_print ("gnst: bye\n"); 
     printf ("gnst: bye\n");
 
-    
     return 0;
 }
 
