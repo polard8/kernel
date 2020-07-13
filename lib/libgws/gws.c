@@ -568,6 +568,17 @@ void gws_yield (void)
 }
 
 
+/*
+void gws_yield_n_times (unsigned long n);
+void gws_yield_n_times (unsigned long n)
+{
+    int i=0;
+    for(i=0;i<n;i++)
+        gws_system_call(265,0,0,0); 
+}
+*/
+
+
 //
 // End.
 //

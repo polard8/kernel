@@ -227,9 +227,10 @@ void handle_request (int fd){
     n_reads = read ( fd, __buffer, sizeof(__buffer) );
     //n_reads = recv ( fd, __buffer, sizeof(__buffer), 0 );
 
-    if (n_reads <= 0)
+    if (n_reads <= 0){
+        gws_yield();
         return;
-
+    }
 
 
     // Nesse momento lemos alguma coisa.   
@@ -237,8 +238,10 @@ void handle_request (int fd){
     //debug_print ("gws: request found on its own socket \n");  
             
     // Mensagem inválida  
-    if (message_buffer[1] == 0 )
+    if (message_buffer[1] == 0 ){
+        gws_yield();
         return;
+    }
 
 
     // #test
@@ -340,8 +343,10 @@ __again:
     n_writes = write ( fd, __buffer, sizeof(__buffer) );
     //n_writes = send ( fd, __buffer, sizeof(__buffer), 0 );
     
-    if (n_writes<=0)
+    if (n_writes<=0){
+        gws_yield();
         goto __again;
+    }
 
 
     // Cleaning
@@ -935,7 +940,7 @@ int main (int argc, char **argv){
         // socket que usaremos ... por isso poderemos fecha-lo
         // para assim obtermos um novo da próxima vez.
     
-        // loop:
+    // loop:
         gde_debug_print ("gws: Entering main loop.\n");
 
         //#todo:
@@ -970,11 +975,11 @@ int main (int argc, char **argv){
             if (newconn < 0) {
                 gde_debug_print ("gws: ERROR on accept\n");
  
+            // Request from the new connection
             }else{
-
-                // Request from the new connection
                 handle_request (newconn);
                 //handle_request (curconn);
+                // close??
             };
         };
 
@@ -1005,11 +1010,8 @@ int main (int argc, char **argv){
 
     // Messages from kernel.
     // It is a kind of signal.
-    //ipc message loop
-    
-    while(1){
-        handle_ipc_message();
-    }
+    // ipc message loop
+    // while(1){ handle_ipc_message(); }
 
     // Done.
     
@@ -1024,9 +1026,8 @@ int main (int argc, char **argv){
     // #bugbug:
     // Page fault  when exiting ... 
     
-    while(1){
-        // HANG
-    }
+    // HANG
+    while(1){ }
 
     //suspended.
     return 0; 

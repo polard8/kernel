@@ -2226,7 +2226,7 @@ struct socket_d
 typedef struct ApplicationInfo_d ApplicationInfo_t;
 struct ApplicationInfo_d
 {
-    int pid;	   //Process Id.
+    int pid;       //Process Id.
     char *name;    //Name.
     //...
 };
@@ -2318,12 +2318,12 @@ struct rect_d
 	//object_class_t objectClass;
 
     int used;
-	int magic;
-	
-	int flag;
+    int magic;
+
+    int flag;
 	
 	//estilo de design
-	int style;
+    int style;
 	
 	//int validated;
 	//int focus;
@@ -2338,20 +2338,19 @@ struct rect_d
     unsigned long width;
     unsigned long height;
 
-	unsigned long left;
-	unsigned long top;
-	unsigned long right;
-	unsigned long bottom;
-	
-	unsigned long bg_color; //color_bg;
+    unsigned long left;
+    unsigned long top;
+    unsigned long right;
+    unsigned long bottom;
+
+    unsigned long bg_color; //color_bg;
 	
 	//Essa é  ajanela à qual o retângulo pertence.
-	struct window_d *window;
+    struct window_d *window;
 	
-	struct rect_d *next;
+    struct rect_d *next;
 };
 //struct rect_d *rect;
-
 
 //
 // Window support.
@@ -2956,10 +2955,10 @@ struct api_receive_message_d
 #define BMP_TYPE 0x4D42             /* "MB" */
 
 //OFFSETS
-#define BMP_OFFSET_WIDTH 18
-#define BMP_OFFSET_HEIGHT 22
-#define BMP_OFFSET_BITPLANES 26
-#define BMP_OFFSET_BITCOUNT 28
+#define BMP_OFFSET_WIDTH      18
+#define BMP_OFFSET_HEIGHT     22
+#define BMP_OFFSET_BITPLANES  26
+#define BMP_OFFSET_BITCOUNT   28
 //...
 
 typedef struct bmp_header_d bmp_header_t;   
@@ -3003,7 +3002,7 @@ struct bmp_infoheader_d
 struct timer_d 
 {
     // Object.
-    object_type_t objectType;
+    object_type_t  objectType;
     object_class_t objectClass;
 
 

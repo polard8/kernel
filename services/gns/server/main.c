@@ -163,20 +163,24 @@ void __socket_messages (int fd){
     // o kernel copia para aquele arquivo ao qual esse estivere conectado.
     // olhando em accept[0]
 
-    n_reads = read ( fd, __buffer, sizeof(__buffer));
+    n_reads = read ( fd, __buffer, sizeof(__buffer) );
 
     // 
     // Se nao tem o que ler. saimos. 
-    if (n_reads <= 0)
+    if (n_reads <= 0){
+        gns_yield();
         return;
-        
+    }
+  
     // Nesse momento lemos alguma coisa.   
  
     //debug_print ("gws: request found on its own socket \n");  
             
     //  mensagem invalida  
-    if (message_buffer[1] == 0 )
+    if (message_buffer[1] == 0){
+        gns_yield();
         return;
+    }
 
 
     debug_print ("gns: Got a request!\n");
@@ -235,8 +239,10 @@ __again:
     //
 
     n_writes = write ( fd, __buffer, sizeof(__buffer) );
-    if (n_writes<=0)
+    if (n_writes<=0){
+        gns_yield();
         goto __again;
+    }
 
 
     // Cleaning
@@ -577,7 +583,6 @@ int main (int argc, char **argv){
             //close ?
         };
     };
-
 
     //
     // =======================================

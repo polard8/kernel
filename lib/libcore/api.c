@@ -1247,7 +1247,6 @@ int gde_close_window (struct window_d *window){
         return (int) 1;
 
     }else{
-
         return (int) system_call ( SYSTEMCALL_CLOSEWINDOW, 
                          (unsigned long) window, 
                          (unsigned long) window, 
@@ -1269,8 +1268,8 @@ int gde_set_focus (struct window_d *window){
     if ( (void *) window == NULL ){
         gde_debug_print ("gde_set_focus: fail\n");
         return (int) 1;
-    }else{
 
+    }else{
         return (int) system_call ( SYSTEMCALL_SETFOCUS, 
                         (unsigned long) window, 
                         (unsigned long) window, 
@@ -1536,20 +1535,19 @@ int gde_strncmp (char *s1, char *s2, int len){
 
     while (n > 0)
     {
-	    n--;
+         n--;
         
-		if (*s1 != *s2)
-		{
-            return (int) 1;
-        };
+        if (*s1 != *s2){ 
+            return (int) 1; 
+        }
 
-		*s1++;
-		*s2++;
+        *s1++;
+        *s2++;
     };
 
     if ( *s1 != '\0' || *s2 != '\0' )
-    {	
-	    return (int) 2;
+    {
+        return (int) 2;
     }
 
     return 0;
@@ -2750,6 +2748,9 @@ void gde_show_window (struct window_d *window){
 int gde_start_terminal (void){
 
     int PID = -1;
+    
+    
+    gde_debug_print("gde_start_terminal: [DEPRECATED]\n");
 
     // Clona e executa o noraterm como processo filho. 
 
@@ -2881,11 +2882,11 @@ int gde_getthreadname (int tid, char *name, size_t len){
                         (unsigned long) name,
                         (unsigned long) name );
 
-	if ( __len_ret < 0 || __len_ret > 64 ) //HOST_NAME_MAX
-	{
-	    printf ("gde_getthreadname: __len_ret\n");
-	    return -1;
-	}
+    //HOST_NAME_MAX
+    if ( __len_ret < 0 || __len_ret > 64 ){
+        printf ("gde_getthreadname: __len_ret\n");
+        return -1;
+    }
 
 	if ( __len_ret > len )
 	{
