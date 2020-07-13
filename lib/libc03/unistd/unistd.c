@@ -23,6 +23,10 @@
 #include <sys/resource.h>
 #include <pty.h>
 #include <utmp.h>
+
+#include <sys/ioctl.h>
+#include <sys/ioctls.h>
+
 #include <termios.h>
 #include <sys/utsname.h>
 
@@ -463,6 +467,68 @@ pid_t getppid (void){
 }
 
 
+
+/*
+The function tcgetpgrp() returns the process group ID of the 
+foreground process group on the terminal associated to fd, 
+which must be the controlling terminal of the calling process. 
+See: https://linux.die.net/man/3/tcsetpgrp
+*/
+pid_t tcgetpgrp (int fd){
+
+    int s=0;
+
+    //#todo: work in ring0 to implement this.
+    if ( ioctl(fd, TIOCGPGRP, &s) < 0 ){
+        debug_print ("tcgetpgrp: error\n");
+        return ((pid_t)-1);
+    }
+
+    return ((pid_t) s);
+}
+
+
+/*
+The function tcsetpgrp() makes the process group with process 
+group ID pgrp the foreground process group on the terminal 
+associated to fd, which must be the controlling terminal 
+of the calling process, and still be associated with its session. 
+Moreover, pgrp must be a (nonempty) process group belonging 
+to the same session as the calling process.   
+See: https://linux.die.net/man/3/tcsetpgrp 
+ */
+int tcsetpgrp (int fd, pid_t pgrp){
+
+    int s=0;
+    s = pgrp;
+
+    //#todo: work in ring0 to implement this.
+    return ( ioctl(fd, TIOCSPGRP, &s) );
+}
+
+int setpgid(pid_t pid, pid_t pgid)
+{
+    debug_print ("setpgid: [TODO]\n");
+
+    if(pid<0)
+        debug_print ("setpgid: pid\n");
+        
+    return -1;
+}
+
+
+pid_t getpgid(pid_t pid)
+{
+    debug_print ("getpgid: [TODO]\n");
+
+    if(pid<0)
+        debug_print ("getpgid: pid\n");
+        
+    return -1;
+}
+
+
+
 /*
  * getgid:
  *
@@ -476,17 +542,49 @@ gid_t getgid (void)
 }
 
 
+
+/* POSIX.1 version */
+pid_t getpgrp(void)
+{
+    debug_print ("getpgrp: [TODO]\n");
+    return -1;
+}
+
+
+/* BSD version */
+pid_t bsd_getpgrp(pid_t pid)
+{
+    debug_print ("bsd_getpgrp: [TODO]\n");
+
+    if(pid<0)
+        debug_print ("bsd_getpgrp: pid\n");
+    
+    return -1;
+}
+
+
 char *getcwd(char *buf, size_t size)
 {
     debug_print ("getcwd: [TODO]\n");
+
+    /*
+    if (!buffer) {
+        size = size ? size : PATH_MAX;
+        buffer = (char*)malloc(size);
+    }
+    */
+        
     return (char *) 0;
 }
 
 
 char *getwd(char *buf)
 {
-    debug_print ("getwd: [TODO]\n");
-    return (char *) 0;
+    debug_print ("getwd: [TESTING]\n");
+    
+    char *p = getcwd(buf, PATH_MAX);
+    
+    return (char *) p;
 }
 
 

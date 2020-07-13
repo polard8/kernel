@@ -271,6 +271,8 @@ int cfsetospeed (struct termios *termios_p, speed_t speed);
 int cfsetspeed (struct termios *termios_p, speed_t speed);
 
 
+
+
 int tcflush (int fd, int queue_selector);
 int tcflow (int fd, int action);
 int tcdrain (int fd);
@@ -283,9 +285,6 @@ tcsetattr (
     int optional_actions,
     const struct termios *termios_p );
 
-
-pid_t tcgetpgrp ( int fd);
-int tcsetpgrp (int fd, pid_t pgrp);
 
 
 #endif /* _TERMIOS_H */

@@ -367,6 +367,20 @@ xxx_todo_int133 (
 
 
 
+pid_t tcgetpgrp ( int fd);
+int tcsetpgrp (int fd, pid_t pgrp);
+
+
+int setpgid(pid_t pid, pid_t pgid);
+pid_t getpgid(pid_t pid); 
+
+/* POSIX.1 version */
+pid_t getpgrp(void);
+
+/* BSD version */
+pid_t bsd_getpgrp(pid_t pid); 
+
+
 char *getcwd(char *buf, size_t size);
 char *getwd(char *buf);
 char *get_current_dir_name(void);
