@@ -799,23 +799,30 @@ int fclose (FILE *stream){
 // The file was loaded in ring0 by fopen(), using open()
 // So, for now, we simply can't access the data of the file.
 // The only way is using read() and the fd given by open().
+// See: https://man7.org/linux/man-pages/man2/open.2.html
 
 FILE *fopen ( const char *filename, const char *mode ){
 
     FILE *__stream;   // Return this pointer.
     int fd;           // File descriptor.  
-    int flags;        // Stream flags.     
-    int oflags;       // Flags for open(). 
+    int flags=0;      // flags
+    
+    // mode #todo
+    // his argument must be supplied when
+    //          O_CREAT or O_TMPFILE is specified in flags;
+    
+    int oflags=0;     
 
 
     // #todo:
     // The 'mode' passed via argment will give us the 'flags'
     // used in open().
     
-    /*
-    int flags = 0;
-    // NOTE: rt is a non-standard mode which opens a file for read, explicitly
+   
+    // NOTE: 
+    // rt is a non-standard mode which opens a file for read, explicitly
     // specifying that it's a text file
+    
     if (!strcmp(mode, "r") || !strcmp(mode, "rb") || !strcmp(mode, "rt"))
         flags = O_RDONLY;
     else if (!strcmp(mode, "r+") || !strcmp(mode, "rb+"))
@@ -829,17 +836,16 @@ FILE *fopen ( const char *filename, const char *mode ){
     else if (!strcmp(mode, "a+") || !strcmp(mode, "ab+"))
         flags = O_RDWR | O_APPEND | O_CREAT;
     else {
-        fprintf(stderr, "FIXME(LibC): fopen('%s', '%s')\n", pathname, mode);
-        ASSERT_NOT_REACHED();
+        printf ("fopen: [FIXME] flags fail\n");
+        //fprintf(stderr, "FIXME(LibC): fopen('%s', '%s')\n", pathname, mode);
+        //ASSERT_NOT_REACHED();
     }
-    */
+    
+    //
+    // Open.
+    //
 
-
-    // Open the file. 
-    // No flags for now!
-
-    // fd = open (filename, oflags, MAY_READ | MAY_WRITE) )
-    fd = open (filename, 0, 0);  
+    fd = open (filename, flags, oflags);  
     
     if (fd < 0){
         printf (" fopen: open() fail\n");
@@ -897,10 +903,9 @@ FILE *fopen ( const char *filename, const char *mode ){
 
     // Buffer
 
-    __stream->_base = (char *) malloc (BUFSIZ); 
-    
-     if ( (void *) __stream->_base == NULL )
-     {
+    __stream->_base = (char *) malloc(BUFSIZ);
+
+     if ( (void *) __stream->_base == NULL ){
           debug_print("fopen: stream buffer fail\n");
           printf("fopen: stream buffer fail\n");
           return NULL;
