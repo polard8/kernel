@@ -961,6 +961,14 @@ gws_draw_button (
 
 
 
+
+void 
+gws_refresh_rectangle ( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long width, 
+    unsigned long height );
+
 void 
 rectBackbufferDrawRectangle ( 
     unsigned long x, 
@@ -969,7 +977,7 @@ rectBackbufferDrawRectangle (
     unsigned long height, 
     unsigned long color );
 
-
+int gws_show_window_rect (struct gws_window_d *window);
 
 // #importante
 // >>> Criaremos a barra de títulos depois que a janela estiver pronta.

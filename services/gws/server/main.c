@@ -746,7 +746,11 @@ void InitGraphics(void)
     create_background();
     create_taskbar();
     
-    gws_show_backbuffer();
+    //gws services
+    //gws_refresh_rectangle(0,0,400,400);
+    //gws_show_window_rect(gui->screen);
+    
+    gws_show_backbuffer();            
     
     debug_print("InitGraphics: done\n");
 

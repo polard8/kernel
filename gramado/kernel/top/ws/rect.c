@@ -305,11 +305,13 @@ setClientAreaRect ( unsigned long x,
 //É bem mais rápido com múltiplos de 4.
  
 void 
-refresh_rectangle ( unsigned long x, 
-                    unsigned long y, 
-                    unsigned long width, 
-                    unsigned long height )
+refresh_rectangle ( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long width, 
+    unsigned long height )
 {
+
 	void *p = (void *) FRONTBUFFER_ADDRESS;
 	const void *q = (const void*) BACKBUFFER_ADDRESS;
 
@@ -394,15 +396,18 @@ refresh_rectangle ( unsigned long x,
 
 
 // ??
-// A ideia aqui é efetuar o refresh de um retângulo que esteja em um dado buffer.
+// A ideia aqui é efetuar o refresh de um retângulo 
+// que esteja em um dado buffer.
+// ?? Not tested yet
 
 void 
-refresh_rectangle2 ( unsigned long x, 
-                     unsigned long y, 
-                     unsigned long width, 
-                     unsigned long height,
-                     unsigned long buffer1,
-                     unsigned long buffer2 )
+refresh_rectangle2 ( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long width, 
+    unsigned long height,
+    unsigned long buffer1,
+    unsigned long buffer2 )
 {    
 	void *p = (void *) buffer1;   // destino
 	const void *q = (const void *) buffer2;  //origem.

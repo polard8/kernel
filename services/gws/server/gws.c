@@ -33,9 +33,15 @@ unsigned long __device_height;
 
 void gws_show_backbuffer(void)
 {
-    // provisório.
-    // podemos usar uma systemcall para não usarmos mais a api.
-    gde_show_backbuffer();
+    // #debug
+    // Using the kernel service.
+    // gde_show_backbuffer();
+
+    if( (void *) gui->screen == NULL ){
+        debug_print("gws_show_backbuffer: [PANIC] screen window fail\n");
+        return;
+    }
+    gws_show_window_rect(gui->screen);
 }
 
 

@@ -11,6 +11,61 @@
 
 
 /*
+ ***********************************************
+ * show_window_rect:
+ *     Mostra o retângulo de uma janela que está no backbuffer.
+ *     Tem uma janela no backbuffer e desejamos enviar ela para o frontbuffer.
+ *     A rotina de refresh rectangle tem que ter o vsync
+ *     #todo: criar um define chamado refresh_window.
+ */
+
+int gws_show_window_rect (struct gws_window_d *window){
+
+
+    if ( (void *) window == NULL ){
+		debug_print ("show_window_rect: window\n");
+		return (int) 1;
+
+	} else {
+	
+        if ( window->used == 1 || window->magic == 1234 )
+        {
+			
+			//#shadow 
+			// ?? E se a janela tiver uma sombra, 
+			// então precisamos mostrar a sombra também. 
+			
+			//#bugbug
+			//Extranhamente essa checagem atraza a pintura da janela.
+			//Ou talvez o novo tamanho favoreça o refresh rectangle,
+			//ja que tem rotinas diferentes para larguras diferentes
+			
+			//if ( window->shadowUsed == 1 )
+			//{
+
+			    //window->width = window->width +4;
+				//window->height = window->height +4;
+			    
+				//refresh_rectangle ( window->left, window->top, 
+				//    window->width +2, window->height +2 ); 
+				//return (int) 0;
+			//}
+			
+            gws_refresh_rectangle ( window->left, window->top, 
+                window->width, window->height ); 
+
+			return 0;
+		}
+	};
+
+
+	//fail.
+    return (int) 1;
+}
+
+
+
+/*
 // #todo
 // Retorna o ponteiro de estrutura de janela
 // dado o id da janela.
@@ -200,7 +255,7 @@ gws_replace_window (
         //@todo: Checar limites.
 	
         window->left = (unsigned long) x;
-        window->top = (unsigned long) y;
+        window->top  = (unsigned long) y;
     };
 
     return 0;

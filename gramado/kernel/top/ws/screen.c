@@ -100,14 +100,15 @@ void screenSetSize( unsigned long width, unsigned long height )
 // Total size is wrong.
 // Esse é mais rápido.
 void refresh_screen (void){
-	
-	unsigned long *backbuffer = (unsigned long *) BACKBUFFER_VA;
-	unsigned long *frontbuffer = (unsigned long *) FRONTBUFFER_VA;
-	
-	int i=0;
-	
-	 vsync ();	
-	
+
+    int i=0;
+
+    unsigned long *backbuffer  = (unsigned long *) BACKBUFFER_VA;
+    unsigned long *frontbuffer = (unsigned long *) FRONTBUFFER_VA;
+
+
+    vsync();
+
 	//#test velocidade?
 	for ( i=0; i< SavedX*SavedY; i++ )
 		frontbuffer[i] = backbuffer[i];	
@@ -120,6 +121,7 @@ void refresh_screen (void){
 	//isso funciona.
     //refresh_rectangle ( 0, 0, SavedX, SavedY );
 }
+
 
 
 // #todo
