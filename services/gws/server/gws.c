@@ -73,6 +73,41 @@ int gwsInit (){
 
     int i=0;
     
+    
+    // #todo
+    // Configurar as estruturas em ordem:
+    // Current display, current screen, current root window.
+
+
+    CurrentDisplay = (void *) malloc (sizeof(struct gws_display_d));
+    if( (void*) CurrentDisplay == NULL){
+        debug_print("gwsInit: CurrentDisplay\n");
+        return -1;
+        //while(1);
+    }else{
+        CurrentDisplay->id = 0; //
+        CurrentDisplay->used = 1; //
+        CurrentDisplay->magic = 1234; //
+        
+        CurrentDisplay->fd = 0;
+        
+        //...
+    };
+    
+    
+    CurrentScreen  = (void *) malloc (sizeof(struct gws_screen_d));
+    if( (void*) CurrentScreen == NULL){
+        debug_print("gwsInit: CurrentScreen\n");
+        //while(1);
+    }else{
+        CurrentScreen->id = 0; //
+        CurrentScreen->used = 1; //
+        CurrentScreen->magic = 1234; //
+        //...
+    };
+
+
+    
     // Initializing the counter.
     windows_count = 0;
 
@@ -85,11 +120,16 @@ int gwsInit (){
     gws_currentfont_address = (unsigned long) &font_nelson_cole2[0]; 
     gfontSize = 8;
 
+    //CurrentScreen->font_size = gfontSize;
 
     // draw char support
     // #todo: Essa configuração ficará aqui, dependendo da fonte.
     gcharWidth = 8;   //gde_get_system_metrics (7);
     gcharHeight = 8;   //gde_get_system_metrics (8);
+    
+    
+    //CurrentScreen->char_width = gcharWidth;
+    //CurrentScreen->char_height = gcharHeight;
     
     //
     // Screen
@@ -100,6 +140,10 @@ int gwsInit (){
     
     SavedX = __device_width;
     SavedY = __device_height;
+    
+    
+    //CurrentScreen->width = __device_width;
+    //CurrentScreen-height = __device_height;
     
     //
     // bpp
@@ -130,13 +174,10 @@ int gwsInit (){
     // First level structure for the GUI.
     gui = (void *) malloc ( sizeof( struct gui_d) );
     
-    
-    // #todo
-    // Checar validade
-    //if ( (void *) gui == NULL )
-    //{
-        //#todo
-    //}
+    if ( (void *) gui == NULL ){
+        debug_print("gwsInit: gui\n");
+        return -1;
+    }
     
     // (root window)
     gui->screen = (struct gws_window_d *) createwCreateWindow ( WT_SIMPLE, 
@@ -144,7 +185,12 @@ int gwsInit (){
                                           0, 0, 
                                           __device_width, __device_height,   
                                            NULL, 0, xCOLOR_GRAY3, xCOLOR_GRAY3 );
-    
+
+    if( (void*) gui->screen == NULL){
+        debug_print("gwsInit: screen window\n");
+        return -1;    
+    }
+
     //#test
     gwsDefineInitialRootWindow (gui->screen);
     

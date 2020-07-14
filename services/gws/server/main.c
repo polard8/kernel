@@ -668,6 +668,26 @@ void create_taskbar (void)
     */
 }
 
+void xxx_test_load_icon(void);
+void xxx_test_load_icon(void)
+{
+	/*
+    FILE *fp;
+    char *buffer;
+    
+    buffer = (char *) malloc(128*1024);
+    
+    fp = fopen ("terminal.bmp", "r+" );
+
+    int nreads = read ( fileno(fp), buffer, (128*1024) );
+
+    bmpDisplayBMP ((char *) buffer, (unsigned long) 80, (unsigned long) 80);    
+
+     gws_show_backbuffer();
+     while(1);
+     */
+}
+
 
 void xxx_test_load_bmp(void);
 void xxx_test_load_bmp(void)
@@ -684,12 +704,23 @@ void xxx_test_load_bmp(void)
     char file_name[] = "terminal.bmp";
     bmp_buffer = (char *) malloc(1024*128);
     if ( (void *) bmp_buffer == NULL )
-        printf ("bmp_buffer fail\n");
+        printf ("xxx_test_load_bmp: bmp_buffer fail\n");
     
     // ?? Onde fica o heap usado por esse malloc ??
-    printf ("bmp_buffer = %x\n", bmp_buffer);
+    printf ("xxx_test_load_bmp: bmp_buffer = %x\n", bmp_buffer);
   
-        //stdio_fntos ( (char *) file_name ); //não precisa
+    //stdio_fntos ( (char *) file_name ); //não precisa
+    
+    // #bugbug
+    // Essa rotina pode NÃO ter usado o
+    // diretório de páginas do aplicativo.
+    // Portando o endereço que indicamos e pertence ao
+    // heap do aplicativo não é acessível ao kernel, pois
+    // o kernel usou seu próprio diretório de páginas.
+    // A solução seria essa rotina trocar o diretório de páginas
+    // provisóriamente.
+    // Outra solução seria ustilizarmos outras rotinas 
+    // de carregamento de arquivo.
     
     int r=-1;
     r=gramado_system_call ( SYSTEMCALL_READ_FILE, 
@@ -704,13 +735,22 @@ void xxx_test_load_bmp(void)
     if ( bmp_buffer[0] != 'B' || bmp_buffer[1] != 'M' )
     {
         printf (">>>> %c %c\n",&bmp_buffer[0],&bmp_buffer[1]);
-        gde_debug_print ("main: SIG FAIL \n");
+        gde_debug_print ("xxx_test_load_bmp: SIG FAIL \n");
+        //return;
+        
+        //#debug
+        gws_show_backbuffer();
         while(1);
     }
 
           
     bmpDisplayBMP ((char *) bmp_buffer, (unsigned long) 80, (unsigned long) 80);    
     //gde_display_bmp((char *)bmp_buffer, (unsigned long) 80, (unsigned long) 80);
+
+
+     //#debug
+     gws_show_backbuffer();
+     while(1);
     
 
     /*
@@ -736,15 +776,31 @@ void xxx_test_load_bmp(void)
 //internal
 void InitGraphics(void)
 {
+    int __init_status = -1;
+    
     debug_print("InitGraphics:\n");
     
-    gwsInit();
-    
-    dtextDrawText ( (struct gws_window_d *) gui->screen,
+    __init_status = gwsInit();
+
+    if(__init_status != 0)
+    {
+        debug_print("InitGraphics: [PANIC] Couldn't initialize the graphics\n");
+        printf("InitGraphics: [PANIC] Couldn't initialize the graphics\n");
+        while(1);
+    }
+
+    if( (void*) gui->screen != NULL){
+        dtextDrawText ( (struct gws_window_d *) gui->screen,
             200, 80, COLOR_RED, "gws: Initializing graphics" );
+    }
     
     create_background();
     create_taskbar();
+
+    // #test
+    // Precisamos encontrar uma rotina de carregamento apropriada.
+    // xxx_test_load_bmp();
+    // xxx_test_load_icon();
     
     //gws services
     //gws_refresh_rectangle(0,0,400,400);
@@ -755,7 +811,8 @@ void InitGraphics(void)
     debug_print("InitGraphics: done\n");
 
     //#debug
-    //while(1){};
+        //while(1){};
+  
 }
 
 

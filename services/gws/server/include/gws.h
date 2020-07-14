@@ -20,7 +20,15 @@ unsigned long  ____FRONTBUFFER_VA;  //#test
 #include "char.h"
 #include "line.h"
 #include "pixel.h"
+
+
+// X-like
 #include "window.h"
+#include "screen.h"
+#include "display.h"
+#include "gui.h"
+
+
 #include "packet.h"
 #include "bmp.h"
 
@@ -37,9 +45,8 @@ unsigned long  ____FRONTBUFFER_VA;  //#test
 
 #include "font.h"
 
-// Display structure ...
-// Following the steps of X.
-#include "display.h"
+
+
 
 //
 #include "event.h"
@@ -75,6 +82,17 @@ unsigned long g8x14fontAddress;         // 8x14,80×25,EGA
 unsigned long g8x16fontAddress;         // ??
 unsigned long g9x14fontAddress;         // 9x14,80×25,MDA, Hercules
 unsigned long g9x16fontAddress;         // 9x16,80×25,VGA
+
+
+
+// MAIN STRUCTURE
+
+struct gws_d 
+{
+    struct gui_d *gui;
+};
+struct gws_d GWS;
+
 
 
 

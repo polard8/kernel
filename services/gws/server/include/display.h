@@ -10,7 +10,7 @@ struct gws_display_d
 
     // #test
     //"host:display" string used on this connect
-    char *display_name;	
+    char *display_name;
     
     int fd;    // Network socket. 
     int lock;  // is someone in critical section?  
@@ -38,6 +38,8 @@ struct gws_display_d
 
     struct gws_display_d *next;
 };
+struct gws_display_d *CurrentDisplay;
+
 
 //#todo
 //#define GWS_DISPLAY_MAX 128;

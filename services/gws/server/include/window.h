@@ -921,15 +921,6 @@ unsigned long windowList[WINDOW_COUNT_MAX];
 
 
 
-struct gui_d 
-{
-	//...
-	
-    struct gws_window_d *screen;
-    struct gws_window_d *main;
-};
-struct gui_d *gui;
-
 
 
 
