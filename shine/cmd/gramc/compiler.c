@@ -28,13 +28,13 @@ FILE *compiler (){
 
     printf ("compiler: calling lexer ...\n");
     // Just initializing the lexer.
-    lexer_return = (int) lexer ();
+    lexer_return = (int) lexer();
     //analizar retorno
 
 
     printf ("compiler: calling parser ...\n");
     // The parser will call the yylex() a lot of times.
-    parser_return = (int) parser ();
+    parser_return = (int) parser();
 	//analizar retorno	
 
 

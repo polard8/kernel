@@ -16,25 +16,28 @@
 #define ____ANIMAL_H 1
 
 
+// #bugbug
+// We need to change the name of this document.
 
 //
 // utsname
 // 
 
 /* Operating system name (e.g., "Linux") */
-#define OS_NAME      "Animal"
+//#define OS_NAME      "Animal"
+#define OS_NAME      "Gramado"
 
 /* Name within "some implementation-defined network" */
-#define NODE_NAME    "Host1"
+#define NODE_NAME    "GRAMADO"
 
 /* Operating system release (e.g., "2.6.28") */
-#define RELEASE_NAME "1.xx"
+#define RELEASE_NAME "1.0"
 
 /* Operating system version */
-#define VERSION_NAME "1.xx"
+#define VERSION_NAME "1.0"
 
  /* Hardware identifier */
-#define MACHINE_NAME "This-machine"
+#define MACHINE_NAME "gigabyte-intel"
 
 
 

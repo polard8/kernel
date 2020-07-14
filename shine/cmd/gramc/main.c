@@ -156,25 +156,20 @@ file:
 #endif
 
 
-	//Page fault:
-	//
-    //fp = (FILE *) fopen( "init.txt", "r+");
-    //fp = fopen("init.txt","rb");
+	// #bugbug: Page fault.
 
-    //fp = fopen("test1.txt","rb");	
+    fp = fopen ( (char*) &argv[0],"r+");
 
-    fp = fopen ( (char*) &argv[0],"rb");
-
-    if (fp == NULL){
+    if ((void*) fp == NULL){
         printf("fopen fail\n");
         goto fail;
 
     }else{
 
 
-#ifdef GRAMC_VERBOSE			
-        printf(".\n");		
-        printf("..\n");		
+#ifdef GRAMC_VERBOSE
+        printf(".\n");
+        printf("..\n");
         printf("...\n");
 #endif 
 
@@ -198,7 +193,7 @@ Mainloop:
 
         while(running)
         {
-            ch = (int) getchar ();
+            ch = (int) getchar();
             
             if (ch == -1){
                 // printf("EOF reached! ?? \n");
@@ -214,7 +209,7 @@ Mainloop:
 			        //quit
 			    //    case 'q':
 			    //        goto hang;
-				//        break;				 
+				//        break;
 		        //};		   
              }
         };
@@ -613,10 +608,9 @@ int main ( int argc, char *argv[] ){
 
 
 	// Initializing.
-    gde_debug_print ("gramc: Initializing ...\n");  
-    
+    gde_debug_print ("gramc: Initializing ...\n"); 
     printf ("\n");
-    printf ("main: Initializing ..\n");
+    printf ("gramc: Initializing ..\n");
 
    
     // Globals.
@@ -685,7 +679,7 @@ int main ( int argc, char *argv[] ){
     int nreads = 0;
 
     // gramc -c [filename]
-    fp = fopen ( (char *) argv[2], "rb" );
+    fp = fopen ( (char *) argv[2], "r+" );
 
     if ( fp == NULL ){
         printf ("gramc: Couldn't open the input file \n");
@@ -720,6 +714,10 @@ int main ( int argc, char *argv[] ){
     //
     // Compiler.
     //
+    
+    // #bugbug
+    // Na verdade estamos criando um interpretador ...
+    // Mas nada impede desse programa fazer as duas coisas.
     
     // It returns a pointer to the output file.
         

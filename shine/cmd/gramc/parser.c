@@ -1760,7 +1760,7 @@ int parse (){
     // ...   
     //--
 
-    int i;
+    int i=0;
 
 
     //Se entramos em um desses corpos.
@@ -2081,6 +2081,7 @@ int parse (){
     printf ("\n");
     
     // Começamos com main.
+    // program counter.
     reg_pc = (int *) &idmain[ID_OPCODE];
 
     while (1)
@@ -2101,7 +2102,7 @@ int parse (){
          
          // NOP 
          if ( inst == OPCODE_NOP ){
-             printf ("OPCODE_NOP on cycle %d \n", reg_cycle); 
+             printf ("OPCODE_NOP: on cycle %d \n", reg_cycle); 
              break;
          
          

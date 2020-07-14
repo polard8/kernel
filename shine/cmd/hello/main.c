@@ -156,12 +156,18 @@ FILE *__stream;
 //interna
 void __serenity_put_string( char *string )
 {
-	int Index;
+    int Index=0;
     for ( Index=0; string[Index] != 0; Index++ )
         putc ( string[Index], __stream );
 }
 
 
+
+/*
+ * main:
+ * 
+ * 
+ */
 
 char _buf[1024];
 
@@ -219,9 +225,6 @@ int main ( int argc, char *argv[] )
     env_string = (char *) getenv ("LANG");
     printf(">>> %s .\n", env_string);
 
-
-    
-    
     
     //Torvalds_printf("hello.bin: \x1b[H Writing into the virtual console 0!\n");
     

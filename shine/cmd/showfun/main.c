@@ -22,12 +22,14 @@ void main (int argc, char **argv)
      
     fp = fopen(argv[1], "r");
 
-    if (fp == NULL)
-    {
+    if (fp == NULL){
        printf("\nFile unable to open");
        return;
-    }else
+ 
+    }else{
        printf("\nFile Opened to display function names :\n");
+    };
+
 
     while (1)
     {
@@ -91,22 +93,16 @@ void check(char *c, int p1, int p2)
 
      
 
-        if ((c[p1 + 1] == ')'))
-
-        {
-
+        if ((c[p1 + 1] == ')')){
             display(c, p1);
-
             return;
-
         }
 
-        for (i = p1 + 1; i < p2; i++)
 
+        for (i = p1 + 1; i < p2; i++)
         {
 
             if ((c[i] != ' ') || (c[i] == ')'))
-
             {
 
                 flag = 1;
@@ -157,6 +153,7 @@ void check(char *c, int p1, int p2)
 
         }
 }
+
 
 /* To display function name */
 void display(char *c,int p1)
