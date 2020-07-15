@@ -455,6 +455,7 @@ int textMaxWheelDelta;  //máximo que se pode rolar o texto
 // prototypes.
 //
 
+void terminal_write_char (int c);
 void terminalInsertNextChar (char c);
 void terminalInsertNullTerminator ();
 void terminalInsertLF ();
@@ -466,15 +467,17 @@ void ri (void);
 void del (void);
 
 char 
-terminalGetCharXY ( unsigned long x, 
-                    unsigned long y );
+terminalGetCharXY ( 
+    unsigned long x, 
+    unsigned long y );
                     
                     
 void 
-terminalInsertCharXY ( unsigned long x, 
-                       unsigned long y, 
-                       char c );
-                       
+terminalInsertCharXY ( 
+    unsigned long x, 
+    unsigned long y, 
+    char c );
+                   
 
 static void save_cur (void);
 static void restore_cur (void);

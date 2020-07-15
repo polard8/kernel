@@ -6598,8 +6598,8 @@ void response (){
  * #todo: Essa rotina pode ir para ./terminal ?
  */
 
-void terminal_write_char ( int c){
-	
+void terminal_write_char (int c){
+
 	//
 	//  Escape sequence.
 	//

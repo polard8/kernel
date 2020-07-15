@@ -82,6 +82,16 @@ int terminal_getmessage_response(int fd);
 //
 
 
+void terminal_write_char (int c)
+{
+    //coloca no buffer de linhas e colunas.
+    terminalInsertNextChar ( (char) c ); 
+    
+    // Refresh!
+    // Vamos escrever o char na tela usando o window server.
+    
+}
+
 /*
  ***************************************************
  * terminalInsertNextChar:
@@ -439,11 +449,16 @@ int terminal_getmessage_response(int fd)
     // obs: Nesse momento deveríamos estar dormindo.
 
     // #debug
-    gws_debug_print ("terminal: Waiting ...\n");      
+    // gws_debug_print ("terminal: Waiting ...\n");      
 
-    int y;
-    for(y=0; y<15; y++)
-        gws_yield();   // See: libgws/
+    
+    // #bugbug
+    // Talvez não precisamos disso, vamos testar sem isso.
+    // Tem um yield logo abaixo no write().
+    
+    //int y;
+    //for(y=0; y<15; y++)
+    //    gws_yield();   // See: libgws/
 
 
     // #todo
@@ -471,14 +486,9 @@ response_loop:
     //n_reads = read ( fd, __buffer, sizeof(__buffer) );
     n_reads = recv ( fd, __buffer, sizeof(__buffer), 0 );
     
-    //if (n_reads<=0){
-    //     gws_yield(); 
-    //    goto response_loop;
-    //}
-    
     // Se retornou 0, podemos tentar novamente.
     if (n_reads == 0){
-         gws_yield(); 
+        gws_yield(); 
         goto response_loop;
     }
     
@@ -489,7 +499,6 @@ response_loop:
         printf ("Something is wrong with the socket.\n");
         exit (1);
     }
-
 
     //
     // The msg index.
@@ -514,6 +523,12 @@ response_loop:
         case MSG_KEYDOWN:
           //case 20:
             //gws_debug_print ("MSG_KEYDOWN\n");
+            
+            // #importante:
+            // Temos um input
+            // Vamos colocar ele nos buffers de linha
+            // e imprimirmos na tela usando o window server.
+            
             switch (long1)
             {
                 //case 0:
@@ -539,7 +554,11 @@ response_loop:
                     //isso funciona
                     //printf ("%c",long1);
                     //fflush(stdout);
+                    
+                    // Colocando no buffer de linha
+                    terminal_write_char((int)long1);
     
+                    // Imprimindo o char na tela usando o window server.
                     // Testing draw a char in a window.
                     // Isso funciona. Precisamos das rotinas do noraterm
                     // pra lidar com caracteres ... o x e o y.
@@ -681,8 +700,8 @@ int terminal_loop(int fd)
 {
 	//while(___running){
     while(1){
-    terminal_getmessage_request(fd);
-    terminal_getmessage_response(fd);
+        terminal_getmessage_request(fd);
+        terminal_getmessage_response(fd);
     }
     return 0; 
 }
@@ -1330,6 +1349,8 @@ int __terminal_clone_and_execute ( char *name )
     return (int) gramado_system_call ( 900, (unsigned long) name, 0, 0 );
 }
 
+
+
 void _draw(int fd, int c)
 {
 
@@ -1361,7 +1382,12 @@ void _draw(int fd, int c)
                 terminal_drawchar_response((int) fd);
 }
 
-// Testing new main.
+
+
+//
+// Main
+//
+
 int main ( int argc, char *argv[] ){
 
     int client_fd = -1;
