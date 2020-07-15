@@ -8,8 +8,8 @@
 
 #ifndef ____FS_H
 #define ____FS_H
- 
-  
+
+
 
 // #order:
 // defines, variables, structures, prototypes.
@@ -47,13 +47,13 @@
 
 
 // ?? 
-#define SECTOR_SIZE 512  
-//#define SECTOR_SIZE 4096  
+#define SECTOR_SIZE    512  
+//#define SECTOR_SIZE  4096  
 
 
 
-//#define MBR_BOOTABLE                    0x80
-//#define MBR_SIGNATURE                   0xAA55
+//#define MBR_BOOTABLE        0x80
+//#define MBR_SIGNATURE       0xAA55
 
 
 
@@ -73,9 +73,23 @@
 
 
 
+#define CACHE_SAVED        1
+#define CACHE_NOT_SAVED    0
+
+
+#define CACHE_LOADED        1
+#define CACHE_NOT_LOADED    0
+
+
 //
 //    ====    Variables    ====
 //
+
+
+// Boot partition.
+int fat_cache_saved;
+int fat_cache_loaded;
+
 
 
 // gcc -Wall Defined but not used!

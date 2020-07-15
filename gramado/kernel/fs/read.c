@@ -747,9 +747,18 @@ void fs_load_fat(void){
 	//caso ja esteja na memória.
 	//obs: padronizaremos alguns endereços, e alocaremos outros.
 
+    //
+    // Check cache state.
+    //
+    
+    // Se ja está na memória, então não precisamos carregar novamente.
+    if (fat_cache_loaded==CACHE_LOADED){
+         debug_print("fs_load_fat: FAT cache already loaded!\n");
+         return;
+    }
+
 
 	// Carregar fat na memória.
-
     for ( i=0; i < szFat; i++ ){
         
         my_read_hd_sector ( 
@@ -761,6 +770,9 @@ void fs_load_fat(void){
         // Incrementa buffer para o próximo setor.
         b = (b +512);    
     };
+    
+    // Changing the status
+    fat_cache_loaded = CACHE_LOADED;
 }
 
 

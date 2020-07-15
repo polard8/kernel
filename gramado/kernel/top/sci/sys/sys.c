@@ -1573,9 +1573,37 @@ int sys_showpciinfo (void)
  *     Chamando uma rotina interna de reboot do sistema.
  */
 
-void sys_reboot (void){
+
+// The service 110.
+// It's called by gde_serv.c.
+// The higher level routine for reboot.
+// It's a wrapper, an interface.
+
+void sys_reboot (void)
+{
     debug_print("sys_reboot:\n");
-    reboot ();
+
+    // FAT cache.
+    // This is the FAT cache for the system disk.
+    // The boot partition.
+    
+    // Message
+    if(fat_cache_saved==CACHE_NOT_SAVED)
+        debug_print("sys_reboot: CACHE_NOT_SAVED\n");
+
+    
+    debug_print("sys_reboot: Saving FAT cache\n");
+    fs_save_fat();
+
+
+    //
+    // Reboot!
+    //
+
+    debug_print("sys_reboot: Rebooting...\n");
+    reboot();
+
+    panic("sys_reboot:");
 }
 
 

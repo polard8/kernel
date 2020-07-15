@@ -1846,8 +1846,11 @@ gde_services (
 
         // 110
         // See: sci/sys/sys.c
+        // The higher level routine for reboot.
+        // It's a wrapper, an interface.
         case SYS_REBOOT: 
-            sys_reboot ();
+            sys_reboot();
+            panic("gde_serv: SYS_REBOOT!");
             break;
 
 

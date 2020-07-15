@@ -599,7 +599,20 @@ done:
     // OK. Funcionou no qemu.
     
     fs_save_rootdir();
-    fs_save_fat();
+    
+    
+    // #bugbug
+    // Não vamos mais salvar a fat toda vez que salvarmos
+    // um arquivo.
+    // Vamos salvar a FAT apenas no fim da sessão.
+    // Como ainda não temos shutdown, então vamos salvar 
+    // quando chamarmos reboot.
+    
+    //fs_save_fat();
+    
+    // #important
+    // Updating the cache state.
+    fat_cache_saved = CACHE_NOT_SAVED;
 
     printf ("fsSaveFile: done\n");
     refresh_screen();

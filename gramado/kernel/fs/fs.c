@@ -1207,6 +1207,11 @@ fail:
 int fsInit (void){
 
     debug_print ("fsInit:\n");
+    
+    fat_cache_loaded = CACHE_NOT_LOADED;
+    fat_cache_saved = CACHE_NOT_SAVED;
+
+
 
 	// Type - Configura o tipo de sistema de arquivos usado. 
 	// No caso, (fat16).
@@ -1247,20 +1252,12 @@ int fsInit (void){
 	//current_volume = 0;   
 	//current_directory = 0;
 
-	// Structures and fat.
-
-//#ifdef EXECVE_VERBOSE
-	//printf("fsInit: Structures..\n");
-//#endif
-
-    fs_init_structures ();
 
 
-//#ifdef EXECVE_VERBOSE
-	//printf("fsInit: FAT..\n");
-//#endif
+    // Structures and fat.
 
-    fs_init_fat ();
+    fs_init_structures();
+    fs_init_fat();
 
 
 	//
@@ -1277,7 +1274,7 @@ int fsInit (void){
     //
 
     // Foi definido em stdio.h
-    volume1_rootdir = (FILE *) kmalloc ( sizeof(FILE) );
+    volume1_rootdir = (file *) kmalloc ( sizeof(file) );
 
     if ( (void *) volume1_rootdir == NULL ){
         panic ("fsInit: volume1_rootdir \n");
@@ -1310,7 +1307,7 @@ int fsInit (void){
 	//foi definido em stdio.h
 	//FILE *volume2_rootdir;
 
-    volume2_rootdir = (FILE *) kmalloc ( sizeof(FILE) );
+    volume2_rootdir = (file *) kmalloc ( sizeof(file) );
 
     if ( (void *) volume2_rootdir == NULL ){
         panic ("fsInit: volume2_rootdir\n");
@@ -1339,7 +1336,7 @@ int fsInit (void){
 	//gramado core init execve 
 	
 	//aloca mem�ria para a estrutura.
-    pipe_gramadocore_init_execve = (FILE *) kmalloc ( sizeof(FILE) );
+    pipe_gramadocore_init_execve = (file *) kmalloc ( sizeof(file) );
 
     if ( (void *) pipe_gramadocore_init_execve == NULL ){
         panic ("fsInit: pipe_gramadocore_init_execve\n");
@@ -1373,18 +1370,18 @@ int fsInit (void){
 
 
 	//
-	// ## PWD ##
+	// PWD
 	//
 
     // Inicializa o pwd support.
-    fsInitializeWorkingDiretoryString ();
+    fsInitializeWorkingDiretoryString();
 
 	//
-	// ## target dir struct ##
+	// target dir struct
 	//
-	
-    //inicializa a estrutura de suporte ao target dir.
-    fsInitTargetDir ();
+
+    // Inicializa a estrutura de suporte ao target dir.
+    fsInitTargetDir();
 
 
     // Done.
