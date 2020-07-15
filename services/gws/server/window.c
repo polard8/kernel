@@ -130,17 +130,17 @@ int gwsRegisterWindow (struct gws_window_d *window){
     }
 
 
-    // Search for empot slot
-    
-    
+    // Search for empty slot
     for (__slot=0; __slot<1024; __slot++)
     {
         tmp = (struct gws_window_d *) windowList[__slot];
 
         // Found!
-        if ( (void *) tmp == NULL ){
+        if ( (void *) tmp == NULL )
+        {
             windowList[__slot] = (unsigned long) window; 
             window->id = (int) __slot;
+            
             return (int) __slot;
         }
     };

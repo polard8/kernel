@@ -614,9 +614,14 @@ void create_background (void)
                                          COLOR_BACKGROUND, COLOR_BACKGROUND );    
 
 
-    if ( (void *) __bg_window == NULL ){
+    if ( (void *) __bg_window == NULL )
+    {
         gde_debug_print ("gws: __bg_window fail\n");  
+        return;
     }
+    
+    //#todo: register
+    
 }
 
 
@@ -640,6 +645,7 @@ void create_taskbar (void)
     if ( (void *) __taskbar_window == NULL ){
         gde_debug_print ("gws: __taskbar_window fail\n");  
     }
+    //#todo: register
 
     //
     // Button
@@ -659,6 +665,7 @@ void create_taskbar (void)
     if ( (void *) __taskbar_button == NULL ){
         gde_debug_print ("gws: task bar button fail\n");  
     }
+    //#todo: register
 
     /*
     gws_draw_button ("Button 1", 1, 1, 1, 
@@ -1152,8 +1159,8 @@ int serviceCreateWindow (void){
         gde_debug_print ("serviceCreateWindow: Couldn't register window\n");
         //return -1;
     }
-    
-  
+
+
     // preparando a resposta.
     // Ela será enviada depois pelo loop de socket.
     next_response[0] = (unsigned long) id; //window
@@ -1304,9 +1311,21 @@ int serviceDrawChar(void)
 
     //It is working
     //charBackbufferDrawcharTransparent ( x, y, color, C );
+    
+    //
+    // Refresh
+    //  
         
-    gws_show_backbuffer (); // for debug   
-   
+    //gws_show_backbuffer ();       // for debug   
+    //gws_show_window_rect(window);   // something faster for now.
+    //something faster.
+    gws_refresh_rectangle ( 
+        window->left +x, 
+        window->top  +y, 
+        8,   //char width 
+        8 ); // char height 
+
+
     return 0;
 }
 
