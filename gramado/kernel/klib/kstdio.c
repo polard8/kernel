@@ -37,13 +37,21 @@ extern unsigned long SavedBPP;
 
 /*
  *********************************************
- * fclose:
+ * k_fclose:
  *     Close a file. 
  */
 
+// #todo:
+// See: sys_close().
+
 int k_fclose (file *f){
 
+
+    debug_print("k_fclose: [FIXME]\n");
+
+
     if ( (void *) f == NULL ){
+        debug_print("k_fclose: f\n");
         return EOF;
 
     }else{

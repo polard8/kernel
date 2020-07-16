@@ -943,12 +943,39 @@ int processCopyProcess ( pid_t p1, pid_t p2 ){
     // #bugbug: 
     // Lembrando que o fd 1 tem sido usado como dispositivo 
     // console virtual.
+    
+    // #bugbug
+    // Imagine um processo que fechou um dos três arquivos e agora
+    // vamos clonar sem o fluxo padrão em ordem.
 
     for (i=0;i<32;i++)
     {
         Process2->Objects[i] = Process1->Objects[i];
     }
 
+    // Limpando fluxo.
+    // O filho herda os arquivos do pai, mas o fluxo 
+    // deve ser o padrão. Ou não ???
+    
+    for ( i=0; i<3; i++ ){ Process2->Objects[i] = 0; }
+
+    if ( (void *) stdin == NULL ){
+        panic ("processCopyProcess: [TEST] stdin");
+    }
+
+    if ( (void *) stdout == NULL ){
+        panic ("processCopyProcess: [TEST] stdout");
+    }
+        
+    if ( (void *) stderr == NULL ){
+        panic ("processCopyProcess: [TEST] stderr");
+    }
+        
+    // O fluxo padrão foi criando antes em klib/kstdio.c
+    // #todo: Checar as características desses arquivos.
+    Process2->Objects[0] = (unsigned long) stdin;
+    Process2->Objects[1] = (unsigned long) stdout;
+    Process2->Objects[2] = (unsigned long) stderr;
 
 
 	//
@@ -1268,10 +1295,21 @@ get_next:
         // Podemos colocar 3 arquivos em Objects[]
         // Ou seriam tty ? 
 
-        for ( i=0; i<64; i++ ){
-            Process->Objects[i] = 0;
+        // Limpando todos slots.
+        for ( i=0; i<32; i++ ){ Process->Objects[i] = 0; }
+
+        if ( (void *) stdin == NULL ){
+            panic ("create_process: [TEST] stdin");
         }
 
+        if ( (void *) stdout == NULL ){
+            panic ("create_process: [TEST] stdout");
+        }
+        
+        if ( (void *) stderr == NULL ){
+            panic ("create_process: [TEST] stderr");
+        }
+        
         // O fluxo padrão foi criando antes em klib/kstdio.c
         // #todo: Checar as características desses arquivos.
         Process->Objects[0] = (unsigned long) stdin;

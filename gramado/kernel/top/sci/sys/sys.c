@@ -401,6 +401,7 @@ int sys_open (const char *pathname, int flags, mode_t mode ){
 
 // See:
 // https://man7.org/linux/man-pages/man2/close.2.html
+// https://pubs.opengroup.org/onlinepubs/009695399/functions/close.html
 
 int sys_close ( int fd ){
 
@@ -408,7 +409,19 @@ int sys_close ( int fd ){
     struct process_d *p;
 
 
-    if ( fd < 0 || fd >= NUMBER_OF_FILES){
+    //#bugbug
+    // Pensaremos nessa possibilidade.
+    
+    /*
+    if (fd == 0 || fd == 1 || fd == 2 )
+    {
+        debug_print("sys_close: [FIXME] We can't close the standard stream\n");
+        return (int) (-1);
+    }
+    */
+
+    if ( fd < 0 || fd >= NUMBER_OF_FILES)
+    {
         debug_print("sys_close: fd\n");
         return (int) (-1);
     }

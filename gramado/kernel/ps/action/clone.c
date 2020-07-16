@@ -9,9 +9,9 @@
 
 
 
-pid_t sys_fork_process (void){
-
-    debug_print ("TODO: sys_fork_process\n");
+pid_t sys_fork_process (void)
+{
+    debug_print ("sys_fork_process: [TODO]\n");
     
     //return (pid_t) clone_process();
     return -1;
@@ -414,7 +414,7 @@ do_clone:
        Clone->next = NULL;
 
         // Objects.
-        for (i=0; i<64; i++){  
+        for (i=0; i<32; i++){  
             Clone->Objects[i] = Current->Objects[i]; 
         }
 

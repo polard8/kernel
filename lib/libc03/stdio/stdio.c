@@ -763,8 +763,14 @@ int putw (int w, FILE *stream)
  *     If work, return 0. 
  */
 
+// #todo
+// fclose() takes a stream, flushes it, and closes it.
+
 // linux klibc style
 // See: unistd.c for close().
+
+// #todo
+// Any buffered output is written and any buffered input is discarded.
 
 int fclose (FILE *stream){
 
@@ -775,21 +781,30 @@ int fclose (FILE *stream){
        return EOF;
 
 
+    //#todo
+    fflush(stream);
+
     // Isso deve fechar o arquivo na lista de arqquivo abertos.
     __ret = (int) close ( fileno(stream) );
 
 
-    stream->_base = NULL;
-    stream->_p = NULL;
-    
-    //?? What
-    //#todo
-    //stream->_flags &= ~(_IOREAD|_IOWRT|_IONBF|_IOMYBUF|_IOERR|_IOEOF);
+    if ( (void *) stream != NULL )
+    {
+        stream->_base = NULL;
+        stream->_p = NULL;
 
-    stream->_cnt = 0;
+        //?? What
+        //#todo
+        //stream->_flags &= ~(_IOREAD|_IOWRT|_IONBF|_IOMYBUF|_IOERR|_IOEOF);
+
+        stream->_cnt = 0;
+
+        return (int) __ret;
+    }
 
 
     return (int) __ret;
+    //return (int) EOF;
 }
 
 
