@@ -2785,16 +2785,27 @@ do_compare:
     // Saving a file.
     // It's running on qemu.
     // It's not running on real machine.
-    if ( gramado_strncmp ( prompt, "t5", 2 ) == 0 ){
+    if ( gramado_strncmp ( prompt, "t5", 2 ) == 0 )
+    {
         printf ("t5: Saving a file\n");
-        shell_save_file ();
+        //shell_save_file ();  //local
+        gde_test_save_file("FILE1UM TXT");  //api
         printf ("t5: Done :)\n");
         goto exit_cmp;
     }
 
 
     // t6 - cancelada
-
+    char _buftest[] = "DIRTYDIRTYDIRTYDIRTYDIRTY";
+    if ( gramado_strncmp ( prompt, "t6", 2 ) == 0 )
+    {
+        printf ("t6: Testing close()\n");
+        write(2,_buftest,sizeof(_buftest));
+        close(0); //regular file
+        close(1); //virtual console
+        close(2); //regular file
+        goto exit_cmp;
+    }
 
     // t7 - Testando estado das teclas.
     if ( gramado_strncmp( prompt, "KEYS", 4 ) == 0 ||

@@ -405,25 +405,24 @@ int sys_open (const char *pathname, int flags, mode_t mode ){
 int sys_close ( int fd ){
 
     file *object;
-
     struct process_d *p;
 
 
     if ( fd < 0 || fd >= NUMBER_OF_FILES){
         debug_print("sys_close: fd\n");
-        return -1;
+        return (int) (-1);
     }
 
     if ( current_process < 0 ){
         debug_print("sys_close: current_process\n");
-        return -1;
+        return (int) (-1);
     }
 
     p = (void *) processList[current_process];
 
     if ( (void *) p == NULL ){
         debug_print("sys_close: p\n");
-        return -1;
+        return (int) (-1);
 
     }else{
         
@@ -431,14 +430,69 @@ int sys_close ( int fd ){
 
         if ( (void *) object == NULL ){
             debug_print("sys_close: object\n");
-            return -1;
+            return (int) (-1);
 
         }else{
+
+            //socket
+            if ( object->____object == ObjectTypeSocket )
+            {
+                object = NULL;
+                p->Objects[fd] = (unsigned long) 0;
+                debug_print("sys_close: Done. socket closed!\n");
+                return 0;
+            }
+
+            //pipe
+            if ( object->____object == ObjectTypePipe )
+            {
+                object = NULL;
+                p->Objects[fd] = (unsigned long) 0;
+                debug_print("sys_close: Done. pipe closed!\n");
+                return 0;
+            }
+
+            // virtual console.
+            if ( object->____object == ObjectTypeVirtualConsole )
+            {
+                //object = NULL;
+                //p->Objects[fd] = (unsigned long) 0;
+                debug_print("sys_close: [FIXME] trying to close a virtual console.\n");
+                return 0;
+            }
  
+ 
+             // tty
+            if ( object->____object == ObjectTypeTTY )
+            {
+                object = NULL;
+                p->Objects[fd] = (unsigned long) 0;
+                debug_print("sys_close: Done. tty closed!\n");
+                return 0;
+            }
+
+            //#bugbug
+            //Poderemos ter problemas aqui com os diversos tipos
+            //de arquivos.
+
+            // #bugbug
+            // ugly test
+            debug_print("sys_close: [FIXME] fsSaveFile\n");
+            
+            if (object->_lbfsize < 512) 
+               object->_lbfsize = 512;
+            
+            fsSaveFile ( (char *) object->_tmpfname, 
+                    (unsigned long) (object->_lbfsize/512), //file_size, in sectors       
+                    (unsigned long) object->_lbfsize, //size_in_bytes,  
+                    (char *) object->_base, //address          
+                    (char) 0x20 );  //flag
+  
+            // regular file.
             object = NULL;
             p->Objects[fd] = (unsigned long) 0;
-
-            debug_print("sys_close: Done\n");
+            debug_print("sys_close: [FIXME] Done. Closing regular file\n");
+            
             
             // ok.
             return 0;

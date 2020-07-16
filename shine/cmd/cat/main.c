@@ -79,7 +79,10 @@ int main ( int argc, char *argv[] ){
         exit(-1);
     }
 
-
+    //#test: testing close()
+    //printf ("cat: Testing close()\n");
+    //close(fileno(fp));
+    
     // # testing libc
     // creat
     //int s = -1;
@@ -88,6 +91,7 @@ int main ( int argc, char *argv[] ){
     //    printf ("creat fail\n");
 
 
+    //printf ("cat: done\n");
     return 0;
 }
 

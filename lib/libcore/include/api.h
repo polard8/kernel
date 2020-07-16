@@ -3380,7 +3380,12 @@ gde_save_file (
     unsigned long file_size, 
     unsigned long size_in_bytes, 
     char *file_address, 
-    char flag ); 
+    char flag );
+    
+
+int gde_test_save_file(char *file_name);
+
+
 
 int gde_create_empty_file (char *file_name);
 

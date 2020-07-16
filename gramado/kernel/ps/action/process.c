@@ -1225,6 +1225,8 @@ get_next:
         Process->ppid = (int) ppid; 
         Process->uid  = (int) GetCurrentUserId (); 
         Process->gid  = (int) GetCurrentGroupId (); 
+        // ...
+        
 
         // sessão crítica.
         Process->_critical = 0;
@@ -1270,7 +1272,8 @@ get_next:
             Process->Objects[i] = 0;
         }
 
-        // O fluxo padr�o foi criando antes em kstdio.c
+        // O fluxo padrão foi criando antes em klib/kstdio.c
+        // #todo: Checar as características desses arquivos.
         Process->Objects[0] = (unsigned long) stdin;
         Process->Objects[1] = (unsigned long) stdout;
         Process->Objects[2] = (unsigned long) stderr;

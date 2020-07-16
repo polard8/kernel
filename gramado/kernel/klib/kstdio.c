@@ -1570,61 +1570,67 @@ int stdioInitialize (void){
     
     for ( i=0; i<PROMPT_SIZE; i++ )
     {
-		prompt[i]     = (char) '\0';
-		prompt_out[i] = (char) '\0';
-		prompt_err[i] = (char) '\0';
+        prompt[i]     = (char) '\0';
+        prompt_out[i] = (char) '\0';
+        prompt_err[i] = (char) '\0';
     };
-
+   
     prompt_pos = 0;
 
 
+    // #bugbug
+    // 0 - regular file.
+    // 1 - virtual console.
+    // 2 - regular file.
 
     // Configurando a estrutura de stdin. 
-	stdin->____object = ObjectTypeVirtualConsole;
-	stdin->used = 1;
-	stdin->magic = 1234;
-	stdin->_base = &prompt[0];    //See: include/kernel/stdio.h
-	stdin->_p =  &prompt[0];
-	stdin->_bf._base = stdin->_base;
-	stdin->_lbfsize = PROMPT_SIZE; //128; //#todo
-	stdin->_r = 0;
-	stdin->_w = 0;
-	stdin->_cnt = PROMPT_SIZE;
-	stdin->_file = 0;
-	stdin->_tmpfname = "kstdin";
-	//...
+    stdin->____object = ObjectTypeFile;
+    stdin->used = 1;
+    stdin->magic = 1234;
+    stdin->_base = &prompt[0];    //See: include/kernel/stdio.h
+    stdin->_p =  &prompt[0];
+    stdin->_bf._base = stdin->_base;
+    stdin->_lbfsize = PROMPT_SIZE; //128; //#todo
+    stdin->_r = 0;
+    stdin->_w = 0;
+    stdin->_cnt = PROMPT_SIZE;
+    stdin->_file = 0;
+    stdin->_tmpfname = "KSTDIN  TXT";
+    // ...
 
 
     // Configurando a estrutura de stdout.
+    // This is a virtual console device. Used to output
+    // directly into the virtual console.
     stdout->____object = ObjectTypeVirtualConsole;
-	stdout->used = 1;
-	stdout->magic = 1234;
-	stdout->_base = &prompt_out[0];  //See: include/kernel/stdio.h
-	stdout->_p = &prompt_out[0];
-	stdout->_bf._base = stdout->_base;
-	stdout->_lbfsize = PROMPT_SIZE; //128; //#todo
-	stdout->_r = 0;
-	stdout->_w = 0;
-	stdout->_cnt = PROMPT_SIZE;
-	stdout->_file = 1;
-	stdout->_tmpfname = "kstdout";
-	//...
+    stdout->used = 1;
+    stdout->magic = 1234;
+    stdout->_base = &prompt_out[0];  //See: include/kernel/stdio.h
+    stdout->_p = &prompt_out[0];
+    stdout->_bf._base = stdout->_base;
+    stdout->_lbfsize = PROMPT_SIZE; //128; //#todo
+    stdout->_r = 0;
+    stdout->_w = 0;
+    stdout->_cnt = PROMPT_SIZE;
+    stdout->_file = 1;
+    stdout->_tmpfname = "KSTDOUT DEV";
+    // ...
 
 
     // Configurando a estrutura de stderr.
-    stderr->____object = ObjectTypeVirtualConsole;
-	stderr->used = 1;
-	stderr->magic = 1234;
-	stderr->_base = &prompt_err[0];  //See: include/kernel/stdio.h
-	stderr->_p =  &prompt_err[0];
-	stderr->_bf._base = stderr->_base;
-	stderr->_lbfsize = PROMPT_SIZE; //128; //#todo
-	stderr->_r = 0;
-	stderr->_w = 0;
-	stderr->_cnt = PROMPT_SIZE;
-	stderr->_file = 2;
-	stderr->_tmpfname = "kstderr";
-	//...
+    stderr->____object = ObjectTypeFile;
+    stderr->used = 1;
+    stderr->magic = 1234;
+    stderr->_base = &prompt_err[0];  //See: include/kernel/stdio.h
+    stderr->_p =  &prompt_err[0];
+    stderr->_bf._base = stderr->_base;
+    stderr->_lbfsize = PROMPT_SIZE; //128; //#todo
+    stderr->_r = 0;
+    stderr->_w = 0;
+    stderr->_cnt = PROMPT_SIZE;
+    stderr->_file = 2;
+    stderr->_tmpfname = "KSTDERR TXT";
+    // ...
 
 
     // #importante
