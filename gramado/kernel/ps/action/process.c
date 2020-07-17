@@ -1310,6 +1310,11 @@ get_next:
             panic ("create_process: [TEST] stderr");
         }
         
+        // #bugbug
+        // precisamos colocar os arquivos também na lista
+        // global de arquivos abertos. openfileList[]
+        // See: fs.c
+     
         // O fluxo padrão foi criando antes em klib/kstdio.c
         // #todo: Checar as características desses arquivos.
         Process->Objects[0] = (unsigned long) stdin;

@@ -1831,6 +1831,14 @@ void fs_pathname_backup ( int pid, int n ){
 
 int sys_read_file ( char *file_name,  int flags, mode_t mode ){
 
+
+
+        // #bugbug
+        // precisamos colocar os arquivos também na lista
+        // global de arquivos abertos. openfileList[]
+        // See: fs.c
+
+
     file *__file;
  
     struct process_d *p;

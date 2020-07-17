@@ -1302,6 +1302,11 @@ gde_services (
         // N�o receberemos um endere�o em ring3, pois n�o d� 
         // pra confiar na libc.
 
+        // #bugbug
+        // precisamos colocar os arquivos também na lista
+        // global de arquivos abertos. openfileList[]
+        // See: fs.c
+
         // IN: name, flags, mode
         case SYS_READ_FILE:
             return (void *) sys_read_file ( (char *) a2, 
