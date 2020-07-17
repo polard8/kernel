@@ -1508,9 +1508,8 @@ int stdioInitialize (void){
 
 
 
-    int cWidth = get_char_width ();
-    int cHeight = get_char_height ();
-
+    int cWidth  = get_char_width();
+    int cHeight = get_char_height();
 
     if ( cWidth == 0 || cHeight == 0 ){
         panic ("klibc-stdioInitialize: Char info");
@@ -1645,6 +1644,19 @@ int stdioInitialize (void){
     // Salvando os ponteiros na lista de arquivos.
     // Essas estruturas estão em memória compartilhada ??
     // A libc em ring3 poderá acessar os elementos dessa estrutura ?
+
+    // Limpando a lista de arquivos usados pelo kernel.
+    // #bugbug: Alem dessa lista teremos a lista de arquivos
+    // abertos pelo processo kernel ... ela ficará na estrutura 
+    // do processo kernel.
+    for (i=0; i<NUMBER_OF_FILES;i++)
+        fileList[i] = 0;
+        
+    // Limpando a lista global de arquivos abertos
+    // no sistema. Mais de uma processo poderá abrir o mesmo arquivo.
+    for (i=0; i<NUMBER_OF_FILES;i++)
+        openfileList[i] = 0;
+     
 
     fileList[__KERNEL_STREAM_STDIN]  = (unsigned long) stdin;
     fileList[__KERNEL_STREAM_STDOUT] = (unsigned long) stdout;

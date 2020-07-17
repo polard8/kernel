@@ -591,10 +591,17 @@ int fsSearchFileName( unsigned char *name);
 
 int KiSearchFile( unsigned char *file_name, unsigned long address);
 
-void set_file( void *file, int Index);
+
+// manipulando a lista de arquivos do kernel.
 void *get_file(int Index);
+void set_file( void *file, int Index);
 
+// manipulando a lista global de arquivos abertos pelos processos.
+void *get_global_open_file (int Index);
+void set_global_open_file ( void *file, int Index );
 
+int get_free_slots_in_the_fileList(void);
+int get_free_slots_in_the_openfileList(void);
 
 //
 // Create

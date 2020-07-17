@@ -390,7 +390,7 @@ fsFAT16ListFiles (
  * get_file:
  *     Get the pointer given the index in fileList[].
  */
-
+// na lista de arquivos do kernel.
 void *get_file (int Index){
 	
 	//Limits.
@@ -409,7 +409,7 @@ void *get_file (int Index){
  * set_file:
  *     Put the pointer in the list, given the index.
  */
-
+// na lista de arquivos do kernel.
 void set_file ( void *file, int Index ){
 
     if (Index < 0){
@@ -433,6 +433,72 @@ void set_file ( void *file, int Index ){
 
      fileList[Index] = (unsigned long) file;
 }
+
+
+
+
+
+void *get_global_open_file (int Index){
+	
+	//Limits.
+	//@todo: max.
+
+    if (Index < 0){
+        // ?? todo: message
+        return NULL;
+    }
+
+    return (void *) openfileList[Index];
+}
+
+
+void set_global_open_file ( void *file, int Index ){
+
+    if (Index < 0){
+        // ?? todo: message
+        return;
+    }
+
+	// #todo:
+	// Limite m�ximo da lista.
+
+	// Structure.
+
+    if ( (void *) file == NULL )
+    {
+        // ?? todo: message
+        return;
+    }
+
+	// Include pointer in the list.
+
+
+     openfileList[Index] = (unsigned long) file;
+}
+
+
+//get free slots in the fileList[]
+int get_free_slots_in_the_fileList(void)
+{
+    int i=0;
+    for (i=0;i<NUMBER_OF_FILES; i++)
+    {
+        if ( (unsigned long) fileList[i] == 0 ){ return (int) i; }
+    }
+    return -1;
+}
+
+//get free slots in the openfileList[]
+int get_free_slots_in_the_openfileList(void)
+{
+    int i=0;
+    for (i=0;i<NUMBER_OF_FILES; i++)
+    {
+        if ( (unsigned long) openfileList[i] == 0 ){ return (int) i; }
+    }
+    return -1;
+}
+
 
 
 void fs_test_fat_vector (void)
@@ -535,8 +601,9 @@ void fsCheckMbrFile ( unsigned char *buffer ){
 	//#todo
 	//mudar os argumentos para chamarmos as portas ide.
 
+    int i=0;
     unsigned char *mbr = (unsigned char *) buffer; 
-    int i;
+
 
 	//setor 0.
     my_read_hd_sector ( (unsigned long) &mbr[0] , 0, 0 , 0 ); 
@@ -549,9 +616,8 @@ void fsCheckMbrFile ( unsigned char *buffer ){
 	// Checar uma estrutura do mbr do disco do sistema,
 	// para validar o acesso � ele.	
 
-	// Check signature.
-    if ( mbr[0x1FE] != 0x55 || mbr[0x1FF] != 0xAA )
-    {
+    // Check signature.
+    if ( mbr[0x1FE] != 0x55 || mbr[0x1FF] != 0xAA ){
         printf ("fsCheckMbrFile: Sig FAIL \n" );
         goto fail;
     }
@@ -607,8 +673,7 @@ void fsCheckVbrFile ( unsigned char *buffer ){
 
 	// Check signature.
 
-    if ( vbr[0x1FE] != 0x55 || vbr[0x1FF] != 0xAA )
-    {
+    if ( vbr[0x1FE] != 0x55 || vbr[0x1FF] != 0xAA ){
         printf ("fsCheckVbrFile: Sig Fail\n");
         goto fail;
     }

@@ -12,6 +12,17 @@
  
 int main ( int argc, char *argv[] )
 {
+
+    /*
+    char ____buf[512];
+    while(1)
+    {
+         fseek(stderr, 0, SEEK_SET);
+         sprintf(____buf,"true: THIS IS A MAGIC STRING!\n");
+         fputs((const char *) ____buf,stderr);
+    }
+    */
+
 	
     /*
     int ____this_tty_id = -1;

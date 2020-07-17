@@ -36,6 +36,8 @@
 // See:
 // https://wiki.osdev.org/Message_Passing_Tutorial
 // https://wiki.osdev.org/Synchronization_Primitives
+// https://devblogs.microsoft.com/commandline/
+// /windows-command-line-introducing-the-windows-pseudo-console-conpty/
 // ...
 
 
@@ -1531,6 +1533,11 @@ int main ( int argc, char *argv[] ){
     printf ("terminal: bye\n");
     return 0;
 
+
+
+
+
+
     //
     // ============== test start =======================
     //
@@ -1555,12 +1562,14 @@ int main ( int argc, char *argv[] ){
      //não é o mesmo arquivo, é uma instância.
 
     
+     
      FILE *fp; 
      fp = fopen ("gramado.txt", "w+" );
      if(!fp){
          printf("cant open\n");
          return 1;
      }
+     
 
     int c=0;
     while(1)

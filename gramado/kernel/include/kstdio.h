@@ -558,9 +558,19 @@ struct file_d
     int used;
     int magic;
 
+
+    // #bugbug
+    // Identificador do primeiro processo à abrir o arquivo
+    // ou o processo que tem as permissões.
+
     pid_t pid;  // Process
     uid_t uid;  // User 
     gid_t gid;  // Group
+
+
+    // #test
+    // COntador de processos que abriram esse arquivo.
+    int counter;
     
     // If the file is a tty, we need a tty structure.
     struct tty_d *tty;
@@ -734,22 +744,19 @@ file *file_pwd;         //23 - Diret�rio de trabalho. Diret�rio usado no com
 
 /*
  * ## Aprendendo sobre streams ##
+ * 
  * #importante 
  * Lista de endere�os de estruturas de streams.
  * Essas s�o as streas que pertencem ao processo kernel.
  * Array de ponteiros de estrutura.
  *
  *
+ * #importante
  * Isso poderia ser um array de acesso global,
- * contendo streams de todos os processos,
- * As primeiras sreasm seriam do processo kernel.
- * Obs: Quando um processo solicitar um descritor 
- * para a biblioteca C ele estar� usando um �ndice que 
- * seleciona o descritor real do arquivo, que ser� usado 
- * nessa lista.
- * V�rios processos selecionar�o o descritor '0',
- * mas esse descritor deve ser traduzido para 
- * um verdadeiro descritor usado nessa lista global.
+ * contendo streams de todos os processos.
+ * 
+ * As primeiras streams seriam do processo kernel.
+ * 
  *
  * ## IMPORTANTE ##
  * O kernel precisa gerenciar os recursos 
@@ -770,6 +777,27 @@ file *file_pwd;         //23 - Diret�rio de trabalho. Diret�rio usado no com
  
 unsigned long fileList[NUMBER_OF_FILES]; 
 
+
+//
+// Lista global de arquivos abertos.
+//
+
+// #importante
+// Por causa dessa lista global, então mais de um processo
+// poderá abrir o mesmo arquivo de estrutura 'file'
+// O indice para essa lista ficará na estrutura de arquivo 'file'
+// e o contador de readers também.
+// O arquivo só poderá ser fechado quando não houver mais leitores.
+// Se o arquivo ja está aberto então apenas incrementamos
+// o contador.
+// Precisamos usar o 'file->pathname' para procurarmos
+// arquivo na lista.
+// Ou poderíamos usar o identificador de arquivos indexados.
+// obs: entrada de diretório é semelhante a inode.
+
+//#bugbug
+// talvez esse array precise ser maior.
+unsigned long openfileList[NUMBER_OF_FILES]; 
 
 
 /*
