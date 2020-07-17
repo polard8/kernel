@@ -1,0 +1,8 @@
+
+	This subdirectories is for the 'domain' support.
+        we will suport more domains.
+
+        gramado domain
+        inet domain
+        local/unix domain
+        ...
