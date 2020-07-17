@@ -92,9 +92,9 @@ ifeq ($(ARCH),x86)
 	init.o system.o \
 	execve.o 
 	
-	HAL_OBJECTS := cpuamd.o portsx86.o syscall.o x86.o detect.o \
+	HAL_OBJECTS := cpuamd.o portsx86.o x86.o x86info.o detect.o \
 	hal.o 
-	
+
 	KDRIVERS_OBJECTS := ahci.o \
 	ata.o atadma.o atainit.o atairq.o atapci.o hdd.o \
 	channel.o network.o nicintel.o \
@@ -335,9 +335,9 @@ all-c:
 	$(CC) -c bottom/hal/arch/detect.c        $(KINCLUDE) $(CFLAGS) -o detect.o
 	$(CC) -c bottom/hal/arch/amd/cpuamd.c    $(KINCLUDE) $(CFLAGS) -o cpuamd.o
 	$(CC) -c bottom/hal/arch/x86/portsx86.c  $(KINCLUDE) $(CFLAGS) -o portsx86.o
-	$(CC) -c bottom/hal/arch/x86/syscall.c   $(KINCLUDE) $(CFLAGS) -o syscall.o
 	$(CC) -c bottom/hal/arch/x86/x86.c       $(KINCLUDE) $(CFLAGS) -o x86.o
-
+	$(CC) -c bottom/hal/arch/x86/x86info.c   $(KINCLUDE) $(CFLAGS) -o x86info.o   
+	
 	# rtc
 	$(CC) -c bottom/dd/rtc/rtc.c     $(KINCLUDE) $(CFLAGS) -o rtc.o
 

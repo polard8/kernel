@@ -51,7 +51,7 @@
 // processor info
 // #bugbug: This is only for Intel.
 
-struct tagProcessor   
+struct processor_d   
 {
 
     // Object
@@ -194,9 +194,9 @@ struct tagProcessor
 
 
 	// Next.
-    struct tagProcessor *next;
+    struct processor_d *next;
 };
-struct tagProcessor *processor;
+struct processor_d *processor;
  
 
 
@@ -231,8 +231,8 @@ struct ProcessorBlock_d
 
     // Processor Info. (Intel x86 only)
 
-    struct tagProcessor *processorInfo;
-    //struct tagProcessor *Intel_processorInfo;
+    struct processor_d *processorInfo;
+    //struct processor_d *Intel_processorInfo;
 
 	//
 	// ==== Process ====
@@ -300,9 +300,11 @@ int cpuHasMSR (void);
 void cpuGetMSR(unsigned long msr, unsigned long *lo, unsigned long *hi);
 void cpuSetMSR(unsigned long msr, unsigned long lo, unsigned long hi);
  
+void show_cpu_info(void);
 
 int cpu_get_parameters (void);
 
+unsigned long get_processor_feature(int i);
 
 //#bugbug
 //Esse nome não é apropriado.

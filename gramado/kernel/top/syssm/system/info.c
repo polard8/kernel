@@ -28,21 +28,6 @@ extern unsigned long bss_end;
 */
 
 
-/*
- * KeInformation: 
- *    @todo:
- *    Mostra em informa��es sobre o kernel.
- *    Chama m�dulo externo (Server em user mode) para
- *    mostrar informa��es sobre o kernel ou sobre o sistema.
- *    Obs: 
- *    As inform��es podem ser salvas em um arquivo de sa�da padr�o.
- */
-
-void KeInformation (void){
-	
-	//return;    //Ainda n�o implementada.
-}
-
 
 /*
  *********************************************************
@@ -120,27 +105,23 @@ void KiInformation (void){
     // ## Status ##
 
 	// Status do mecanismo de task switch.
-	switch ( task_switch_status )
-	{
+	switch ( task_switch_status ){
 	    case LOCKED:
-		    printf("Task switch is LOCKED\n");
+		    printf("Task switch LOCKED\n");
 			break; 
-	    
 		case UNLOCKED:
-		    printf("Task switch is UNLOCKED\n");
+		    printf("Task switch UNLOCKED\n");
 		    break; 
 	};
 
 
 	// Status do Scheduler.
-	switch ( g_scheduler_status )
-	{
+	switch ( g_scheduler_status ){
 	    case LOCKED:
-		    printf("Scheduler is LOCKED\n");
+		    printf("Scheduler LOCKED\n");
 		    break; 
-	    
 		case UNLOCKED:
-		    printf("Scheduler is UNLOCKED\n");
+		    printf("Scheduler UNLOCKED\n");
 		    break; 
 	};
 

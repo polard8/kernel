@@ -41,20 +41,43 @@ unsigned long g_machine_type;
 //....
 //
 
-//Hardware:
-//Estrutura para todos os componentes de hardware presentes.
-typedef struct hardware_d hardware_t;
+
+//
+//  VECTORS 
+//  (isr and irq address)
+//
+
+
+// Endereços das rotinas básicas chamadas pelos vetores de interrupções.
+// Essas rotinas devem chamar seus handlers específicos.
+// 256 interrupções
+unsigned long VECTORS[256];
+
+
+//
+// HANDLERS 
+// (callbacks??) 
+//
+
+
+// Endereços para as rotinas em C que tratam as interrupções.
+// Essas rotinas rodam depois da rotina básica em assembly.
+// 256 interrupções
+// 8 extras para handlers default.
+
+unsigned long HANDLERS[256+8];
+
+
+// Hardware:
+// Estrutura para todos os componentes de hardware presentes.
+
 struct hardware_d
 {
-	//
 	// MainBoard info.
-	//
 	struct motherboard_d *MotherBoard;
-	
-	//
+
 	// Processor info.
-	//
-	struct tagProcessor *Processor;   //@todo: mudar para processo_d
+	struct processor_d *Processor;   //@todo: mudar para processo_d
 	int ProcessorArchitecture;
 	int NumberOfProcessors;
 	
@@ -134,21 +157,20 @@ struct hardware_d
 	struct devices_d *Devices; //array de estruturas
 	
 	//continua ...
-};  
-hardware_t *Hardware;  
+};
+struct hardware_d *Hardware;  
+
 
 
 //Firmware:
 //Estrutura para todos os componentes de firmware presentes.
-typedef struct firmware_d firmware_t;
 struct firmware_d
 {
 	int dummy;
 	//bios
 	//...	
 };  
-firmware_t *Firmware;  
-
+struct firmware_d *Firmware;
 
 //
 //....
@@ -157,24 +179,24 @@ firmware_t *Firmware;
 
   
 //Estrutura de disco. @todo: Colocar em outro arquivo.  
-typedef struct tagDriveContext DriveContext_t;
-struct tagDriveContext 
+struct drive_context_d 
 {
-    ULONG Drive;
-    ULONG Cylinders;
-    ULONG Heads;
-    ULONG Sectors;
+    unsigned long Drive;
+
+    unsigned long Cylinders;
+    unsigned long Heads;
+    unsigned long Sectors;
 };
-DriveContext_t *DriveContext;
- 
-  
+struct drive_context_d *DriveContext;  
+
+
 //Estrutura para informações sobre a placa mãe.  
-typedef struct motherboard_d motherboard_t; 
 struct motherboard_d
 {
+	int mobodummy;
     //...	
 };  
-//motherboard_t *MotherBoard;  
+
 
 
   
@@ -202,17 +224,19 @@ void hal_test_speaker (void);
 // 
  
 void 
-hal_backbuffer_putpixel ( unsigned long ax, 
-                          unsigned long bx, 
-                          unsigned long cx, 
-                          unsigned long dx ); 
+hal_backbuffer_putpixel ( 
+    unsigned long ax, 
+    unsigned long bx, 
+    unsigned long cx, 
+    unsigned long dx ); 
 
 
 void 
-hal_lfb_putpixel ( unsigned long ax, 
-                   unsigned long bx, 
-                   unsigned long cx, 
-                   unsigned long dx ); 
+hal_lfb_putpixel ( 
+    unsigned long ax, 
+    unsigned long bx, 
+    unsigned long cx, 
+    unsigned long dx ); 
 
 
 
@@ -235,7 +259,10 @@ NSDumpMemory(
     }
 }
 */
-				
+
+
+
+
 /*
  * @todo: unsigned long bios_call(unsigned long a, b c d edi esi ebp);
  */
@@ -261,6 +288,9 @@ IoWritePartitionTable(
     ); 
 */				
  
+ 
+ 
+ 
 //Initialization support.
 
 int init_hal (void);
@@ -268,13 +298,7 @@ int init_hal (void);
 int init_amd (void);
 // ...
 
-int 
-jmp_address ( unsigned long arg1, 
-              unsigned long arg2, 
-              unsigned long arg3 , 
-              unsigned long arg4); 
-
-
+void x86_info (void);
 
 int hal_init_machine (void); 
 
@@ -285,7 +309,7 @@ unsigned long hal_get_machine_type (void);
 
 int hal_hardware_detect (void);	
 
-int hal_showpciinfo (void);		
+int hal_showpciinfo (void);
 
 void hal_vsync (void);
 
@@ -303,49 +327,30 @@ void hal_shutdown (void);
 //
 
 
-unsigned long getGdt (void);
-unsigned long getIdt (void);
+unsigned long getGdt(void);
+unsigned long getIdt(void);
 
-
-//
-//  VECTORS (isr and irq address)
-//
-
-
-
-// Endereços das rotinas básicas chamadas pelos vetores de interrupções.
-// Essas rotinas devem chamar seus handlers específicos.
-// 256 interrupções
-unsigned long VECTORS[256];
-
-
-
-void hal_setup_new_vectors_table_entry ( int number, unsigned long address );
-
-// vetores legados.
-//Inicializando a tabela de vetores com os endereços das rotinas usadas pelo assembler
-//na inicialização de alguns vetores de interrupção.
-void hal_init_vectors_table (void);
-
-
-
-//
-// HANDLERS - (callbacks) 
-//
-
-
-// Endereços para as rotinas em C que tratam as interrupções.
-// Essas rotinas rodam depois da rotina básica em assembly.
-// 256 interrupções
-// 8 extras para handlers default.
-
-unsigned long HANDLERS[256+8];
 
 
 void 
-hal_idt_register_interrupt ( unsigned long idt_location, 
-                             unsigned char i, 
-                             unsigned long callback );
+hal_setup_new_vectors_table_entry ( 
+    int number, 
+    unsigned long address 
+);
+
+
+// Vetores legados.
+// Inicializando a tabela de vetores com os endereços das rotinas 
+// usadas pelo assembler na inicialização de alguns 
+// vetores de interrupção.
+void hal_init_vectors_table (void);
+
+
+void 
+hal_idt_register_interrupt ( 
+    unsigned long idt_location, 
+    unsigned char i, 
+    unsigned long callback );
 
 
 void hal_default_handler (void);
@@ -356,7 +361,6 @@ void hal_setup_new_handler ( int number, unsigned long callback );
 void hal_invalidate_handler (int number);
 
 #endif   
-
 
 
 

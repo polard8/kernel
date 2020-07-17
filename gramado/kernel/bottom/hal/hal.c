@@ -465,7 +465,7 @@ void init_cpu (void){
 	// Processor struct
 	//
 
-    processor = (void *) kmalloc ( sizeof(struct tagProcessor) );
+    processor = (void *) kmalloc( sizeof(struct processor_d) );
 
     if ( (void *) processor == NULL ){
         panic ("hal-init_cpu: processor");
@@ -481,9 +481,11 @@ void init_cpu (void){
         processor->Tss = 0;  //getTss();
         
 		// ...
-
-        if ( (void *) Hardware != NULL )
-        {
+		
+        if ( (void *) Hardware == NULL )
+            panic ("hal-init_cpu: Hardware");
+        
+        if ( (void *) Hardware != NULL ){ 
             Hardware->Processor = processor;
         }
 

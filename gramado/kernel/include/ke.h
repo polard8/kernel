@@ -28,11 +28,9 @@
  
 #ifndef ____KE_H 
 #define ____KE_H
- 
- 
-// Informations about the base kernel.
-void KeInformation (void);   
 
+
+    int dummy_kexxxx;
 
 #endif
 

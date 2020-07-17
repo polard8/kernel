@@ -2026,17 +2026,19 @@ do_compare:
         goto exit_cmp;
     }
 
-
-    // copy
-    // Esse comando pode ser usado pra testar o fs.
+    // copy - Esse comando pode ser usado pra testar o fs.
     if ( strncmp( prompt, "copy", 4 ) == 0 ){
         copy_builtins ();
         goto exit_cmp;
     }
 
+    // cpu-info 
+    if ( strncmp( prompt, "cpu-info", 8 ) == 0 ){
+        gramado_system_call ( 47, 0, 0, 0 );
+        goto exit_cmp;
+    }
 
-    // del
-    // Esse comando pode ser usado pra testar o fs.
+    // del - Esse comando pode ser usado pra testar o fs.
     if ( gramado_strncmp( prompt, "del", 3 ) == 0 ){
         del_builtins();
         goto exit_cmp;

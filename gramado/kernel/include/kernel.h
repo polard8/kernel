@@ -737,7 +737,7 @@ struct kernel_d
     //
 
     //int processorCount;
-    //struct tagProcessor *processor;
+    //struct processor_d *processor;
     
 	
     //kernel_args_t

@@ -76,8 +76,9 @@ void get_cpu_intel_parameters (void){
          edx == CPUID_VENDOR_INTEL_2 && 
          ecx == CPUID_VENDOR_INTEL_3 )
     {
-        //#todo: definir Intel como 1.
-        hal_set_machine_type (1);    
+        // #todo: 
+        // definir Intel como 1.
+        hal_set_machine_type(1);    
     }
 
 
@@ -516,6 +517,90 @@ cpuSetMSR (
     unsigned long hi )
 {
     asm volatile ("wrmsr" : : "a"(lo), "d"(hi), "c"(msr));
+}
+
+
+
+void show_cpu_info(void)
+{
+    //#todo
+    //Ver a flag que indica qual processado encontramos.
+
+    //See: x86info.c
+    //if intel
+    show_cpu_intel_parameters();
+}
+
+
+
+
+// pega alguma informação da estrutura processor_d
+unsigned long get_processor_feature(int i)
+{
+    int Index = 0;
+    
+    Index = i;
+
+    
+    if( (void*) processor == NULL ){
+        panic("get_processor_feature: processor");
+    }else{
+        if( processor->used != 1 || processor->magic != 1234 )
+        {
+            panic("get_processor_feature: validation");
+        }
+        
+        
+        switch(Index)
+        {
+            //max feature id.
+            case 1:
+                return (unsigned long) processor->MaxFeatureId;
+                break;
+        
+            //l2 line size
+            case 2:
+                return (unsigned long) processor->L2LineSize;
+                break;        
+        
+            //ls associativity
+            case 3:
+                return (unsigned long) processor->L2Associativity;
+                break;
+                
+            //l2 cache size
+            case 4:
+                return (unsigned long) processor->L2Cachesize;
+                break;
+                
+            //physical address size
+            case 5:
+                return (unsigned long) processor->Physical_Address_Size;
+                break;
+
+            //virtual address size
+            case 6:
+                return (unsigned long) processor->Virtual_Address_Size;
+                break;
+                
+            case 7:
+                return (unsigned long) 0;
+                break;
+                
+            //case 8:
+                //return (unsigned long) 0;
+                //break;
+            
+            //...
+            
+            default:
+                debug_print("get_processor_feature: default\n");
+                break;        
+        };
+        
+    };
+    
+    return 0;
 }
 
 

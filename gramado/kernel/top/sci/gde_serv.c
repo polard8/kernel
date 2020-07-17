@@ -1518,6 +1518,7 @@ gde_services (
            
 
         // 42 - livre
+        // usar para manipulação de arquivo
 
         // Create an empty file.
         case 43:
@@ -1531,10 +1532,35 @@ gde_services (
 
 
         // 45 - livre
+        // usar para manipulação de arquivo ou diretório.
+        
+        
+        // 46 ~ 49 (usar para cpu support)
+        
         // 46 - livre
+        //see: detect.c
+        case 46:
+            return (void*) get_processor_feature((int)arg2);
+            break;
+            
         // 47 - livre
+        // Show cpu info.
+        case 47:
+            show_cpu_info();
+            return NULL;
+            break;
+
         // 48 - livre
+        case 48:
+            break;
+
         // 49 - livre
+        // Show system info
+        // See: sys.c
+        case 49:
+            sys_show_system_info ((int) arg2);
+            return NULL;
+            break;
 
 
         // 50 resize window (handle,x,y)
@@ -1741,7 +1767,7 @@ gde_services (
 		//#todo: Devemos chamar uma fun��o que mostre informa��es 
 		//apenas do processo atual. 
         case SYS_CURRENTPROCESSINFO:
-            show_currentprocess_info ();
+            show_currentprocess_info();
             break;
 
         // 81
@@ -2151,15 +2177,14 @@ gde_services (
             break;
 
 
-        //152 - get user id
-        case SYS_GETCURRENTUSERID:
-            return (void *) current_user;
+        // 152 - get uid
+        case SYS_GETCURRENTUSERID: 
+            return (void *) current_user; 
             break;
 
-
-        // 154 - get group id
-        case SYS_GETCURRENTGROUPID:
-            return (void *) current_group;
+        // 154 - get gid
+        case SYS_GETCURRENTGROUPID: 
+            return (void *) current_group; 
             break;
   
         // 156 - SYS_SHOWUSERINFO
@@ -2170,15 +2195,13 @@ gde_services (
 
         // 157 - get user session id
         case SYS_GETCURRENTUSERSESSION:
-            return (void *) current_usersession;
+            return (void *) current_usersession; 
             break;
 
-
-        // 158 - get window station id
+        // 158 - get room id (window station)
         case SYS_GETCURRENTWINDOWSTATION:
-            return (void *) current_room; 
+            return (void *) current_room;  
             break;
-
 
         // 159 - get desktop id
         case SYS_GETCURRENTDESKTOP:
@@ -2467,6 +2490,7 @@ gde_services (
             break;
 
 
+
         //223 - get sys time info.
         // informa��es variadas sobre o sys time.
         case 223:
@@ -2475,15 +2499,10 @@ gde_services (
 
 
         // 224 - get time
-        case SYS_GETTIME:	
-            return (void *) get_time();
-            break;
-
-
+        case SYS_GETTIME:  return (void *) get_time();  break;
         // 225 - get date
-        case SYS_GETDATE:
-            return (void *) get_date();
-            break;
+        case SYS_GETDATE:  return (void *) get_date();  break;
+
 
         // Obs: 
         // #todo: 
@@ -2523,42 +2542,36 @@ gde_services (
 		// 235 - livre
 
 
-			
-		// tty ... 236 237 238 239.	
-			
-		//236 - get tty id
-        case 236:	
-			return (void *) current_tty;
-			break;	
-		
-			
-		//240
-		case SYS_GETCURSORX:
-		    return (void *) get_cursor_x();
-		    break;
 
-		//241
-		case SYS_GETCURSORY:
-		    return (void *) get_cursor_y();
-		    break;
-			
+		// tty ... 236 237 238 239.
+
+        // 236 - get tty id
+        case 236:
+            return (void *) current_tty;
+            break;
+
+        //240
+        case SYS_GETCURSORX:  return (void *) get_cursor_x();  break;
+        //241
+        case SYS_GETCURSORY:  return (void *) get_cursor_y();  break;
+
+
 		//244 enable text cursor.	
 		case 244:
 		    timerEnableTextCursor ();
 		    //timerShowTextCursor = 1;
 		    //gwsEnableTextCursor ();
             break;		
-		
-		//245 disable text cursor.
-		case 245:
-		    timerDisableTextCursor ();
-		    //timerShowTextCursor = 0;
-		    //gwsDisableTextCursor ();
-            break;
-	
-	
-		//246 ~ 249 reservado para libc support.	
 
+        //245 disable text cursor.
+        case 245:
+            timerDisableTextCursor ();
+            //timerShowTextCursor = 0;
+            //gwsDisableTextCursor ();
+            break;
+
+        // =====================================
+        // 246 ~ 249 reservado para libc support.
 
 
         // 246
@@ -2567,8 +2580,6 @@ gde_services (
             return (void *) k_openat ( (int) arg2, 
                                 (const char *) arg3, (int) arg4 ); 
             break;
-
-
 
         // 247 - pipe() support.
         // IN: array, flags.
@@ -2592,9 +2603,11 @@ gde_services (
 
 
         // 249 - livre.
+        // #todo: Usar para algum tipo de exec, igual ao número acima.
 
 
-        // Info. (250 ~ 255).
+        // =====================================
+        // (250 ~ 255) - Info support.
 
         // 250
         // See: syssm/syssm.c
@@ -2604,35 +2617,24 @@ gde_services (
 
         // 251
         // See: sci/sys/sys.c
-        case SYS_SHOWDISKINFO:
-            sys_show_system_info (1);
-            break;
+        case SYS_SHOWDISKINFO:  sys_show_system_info(1);  break;
 
         // 252
         // See: sci/sys/sys.c
-        case SYS_SHOWVOLUMEINFO:
-            sys_show_system_info (2);
-            break;
+        case SYS_SHOWVOLUMEINFO: sys_show_system_info(2);  break;
 
         // 253
         // See: sci/sys/sys.c
-        case SYS_MEMORYINFO:
-            sys_show_system_info (3);
-            break;
+        case SYS_MEMORYINFO:  sys_show_system_info(3);  break;
 
 
         // 254
         // See: sci/sys/sys.c
-        case SYS_SHOWPCIINFO: 
-            sys_show_system_info (4);
-            break;
-
+        case SYS_SHOWPCIINFO:  sys_show_system_info(4);  break;
 
         // 255
         // See: sci/sys/sys.c
-        case SYS_SHOWKERNELINFO: 
-            sys_show_system_info (5);
-            break;
+        case SYS_SHOWKERNELINFO: sys_show_system_info(5);  break;
 
 
 		// #todo:

@@ -1739,7 +1739,12 @@ void sys_show_system_info ( int n ){
         case 5:
             KiInformation ();
             break;
-
+        
+        //See: detect.c
+        case 6:
+            show_cpu_info();
+            break;
+            
         // ...
     };
 

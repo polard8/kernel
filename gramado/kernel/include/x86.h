@@ -99,14 +99,16 @@ void cpux86_enable_caches (void);
 
 int init_intel (void);
 
+
 //
 // Debug support.
 //
 
-void show_cpu_intel_parameters (void);
+void show_cpu_intel_parameters(void);
 
 
-void x86_sse_init (void);
+// SEE feature support.
+void x86_sse_init(void);
 
 
 #endif   
