@@ -1467,6 +1467,7 @@ int network_decode_buffer ( unsigned long buffer_address ){
     // Provavelmente o buffer seja enviado para um
     // servidor de protocolos.
     // Um servidor só para todos os protocolos.
+    // See: https://en.wikipedia.org/wiki/EtherType
 
     uint16_t type = FromNetByteOrder16(eh->type);
     
@@ -1474,12 +1475,12 @@ int network_decode_buffer ( unsigned long buffer_address ){
     {
 
 
-		//::: IPV4
-		//0x0800	Internet Protocol version 4 (IPv4)
-		//Ok como test vamos notificar o processo atual
-		//de que recebemos um pacote ipv4
+        // ::: IPV4
+        // 0x0800	Internet Protocol version 4 (IPv4)
+        // Ok como test vamos notificar o processo atual
+        // de que recebemos um pacote ipv4
         case 0x0800:
-           
+        
            // #debug
             //printf ("IPV4 received\n");
             //refresh_screen ();
@@ -1496,12 +1497,11 @@ int network_decode_buffer ( unsigned long buffer_address ){
            return 0;
            break;
 
-		//::: ARP
-		//0x0806	Address Resolution Protocol (ARP)
-		//#todo: devemos chamar uma rotina para tratamento de ARP e n�o
-		//fazermos tudo aqui. kkk.
+        //::: ARP
+        //0x0806	Address Resolution Protocol (ARP)
+        //#todo: devemos chamar uma rotina para tratamento de ARP e n�o
+        //fazermos tudo aqui. kkk.
         case 0x0806:
-        
             // #debug
             //printf ("ARP received\n");
             //refresh_screen ();
@@ -1511,9 +1511,17 @@ int network_decode_buffer ( unsigned long buffer_address ){
             //refresh_screen ();
             return 0;
             break;
-
-		//::: IPV6
-		//0x86DD	Internet Protocol Version 6 (IPv6)
+            
+        //::: SNMP
+        // Simple Network Management Protocol.
+        case 0x814C:
+            return 0;
+            break;
+            
+        
+            
+        //::: IPV6
+        //0x86DD	Internet Protocol Version 6 (IPv6)
         case 0x86DD:
 
             // #debug
@@ -1525,6 +1533,15 @@ int network_decode_buffer ( unsigned long buffer_address ){
             //refresh_screen ();
             return 0;
             break;
+
+        //:::PPP
+        //Point-to-Point Protocol.
+        case 0x880B:
+            return 0;
+            break;
+
+        //0x8863	PPPoE, PPP Over Ethernet (Discovery Stage).
+        //0x8864	PPPoE, PPP Over Ethernet (PPP Session Stage).
 
 		//::: DEFAULT
         // Error: Default package type.
@@ -1556,7 +1573,25 @@ int network_decode_buffer ( unsigned long buffer_address ){
 int do_ipv4 ( unsigned long buffer )
 {
     debug_print ("do_ipv4: [TODO]\n");
-    //printf("IPv4 \n");    
+    //printf("IPv4 \n");  
+    //refresh_screen();
+ 
+    /*
+    //#todo
+    //Criar uma mensagem que o ns entenda.
+    int msg_status = (int) ipc_send_to_ws ( (struct window_d *) 0, //null
+                           (int) 1111, 
+                           (unsigned long) 0,
+                           (unsigned long) 0);
+        
+    // Se a mensagem foi enviada para o ws,
+    // então podemos retornar.
+    if ( msg_status == 0 ){
+        debug_print ("do_ipv4: >>>> to ns\n");        
+        return 0;
+    }
+    */
+
     return 0;
 }
 
@@ -1572,6 +1607,22 @@ int do_ipv6 ( unsigned long buffer )
 
     //handle_ipv6 ( (struct intel_nic_info_d *) currentNIC, 
     //  (struct ipv6_header_d *) ipv6_h );
+
+    /*
+    //#todo
+    //Criar uma mensagem que o ns entenda.
+    int msg_status = (int) ipc_send_to_ws ( (struct window_d *) 0, //null
+                           (int) 1111, 
+                           (unsigned long) 0,
+                           (unsigned long) 0);
+        
+    // Se a mensagem foi enviada para o ws,
+    // então podemos retornar.
+    if ( msg_status == 0 ){
+        debug_print ("do_ipv4: >>>> to ns\n");        
+        return 0;
+    }
+    */
 
     return 0;
 }

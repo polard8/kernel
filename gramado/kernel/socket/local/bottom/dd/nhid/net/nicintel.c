@@ -47,6 +47,12 @@ techniques:
 #include <kernel.h>
 
 
+// How many buffers.
+#define SEND_BUFFER_MAX       8
+#define RECEIVE_BUFFER_MAX   32
+
+
+
 // irq handler.
 void 
 PCIRegisterIRQHandler ( 
@@ -507,6 +513,7 @@ void xxxe1000handler (void){
             currentNIC->legacy_rx_descs[old].status = 0;
             
             // circula.
+            // RECEIVE_BUFFER_MAX = 32
             currentNIC->rx_cur = (currentNIC->rx_cur + 1) % 32;
 
             // ?? Provavelmente seleciona o buffer.
@@ -541,6 +548,20 @@ void xxxe1000handler (void){
     // Mas poderíamos simplesmente chamar um serviço no diálogo
     // que mandasse o buffer para o network server em ring3.
 
+
+     // #bugbug
+     // #todo
+     // Antes de chamarmos essa rotina de diálogo
+     // é bom checarmos a flag da inicialização do sistema.
+     // Pois senão seremos interrompidos muitas vezes durante a 
+     // inicialização ...
+     // bom seria que o processo init ou o network server acionasse
+     // a flag que libera esse diálogo.
+
+     //#todo
+
+     // if ( network_is_fully_working == 1 ) {
+
      // 8000 - decode buffer.
      network_driver_dialog ( NULL, (int) 8000, 
         (unsigned long) &buffer[0], (unsigned long) &buffer[0] );
@@ -550,7 +571,11 @@ void xxxe1000handler (void){
      // 9000 - send buffer.
      //network_driver_dialog ( NULL, (int) 9000, 
         //(unsigned long) &buffer[0], (unsigned long) &buffer[0] );
+
+
+     // }
 }
+
 
 
 
@@ -1139,7 +1164,8 @@ void E1000Send ( void *ndev, uint32_t len, uint8_t *data ){
     dev->legacy_tx_descs[old].cmd = 0x1B;
     dev->legacy_tx_descs[old].status = 0;
 
-    dev->tx_cur = ( dev->tx_cur + 1 ) % 8;
+    //SEND_BUFFER_MAX = 8
+    dev->tx_cur = ( dev->tx_cur + 1 ) % 8; 
 
     *( (volatile unsigned int *)(dev->mem_base + 0x3818)) = dev->tx_cur;
 

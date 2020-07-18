@@ -70,6 +70,9 @@ unsigned long kgws_delta_totalticks;
 // se o mouse está sobre alguma ... durante a rotina
 // são solicitadas informações diretamente no driver de mouse ps2.
 
+// #obs
+// Isso é chamado pelo mouse em ps2mouse.c
+
 int kgws_mouse_scan_windows (void){
 
 	// #importante:

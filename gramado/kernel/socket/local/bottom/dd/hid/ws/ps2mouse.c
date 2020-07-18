@@ -271,12 +271,10 @@ int ps2_mouse_globals_initialize (void){
 	//user.h
     ioControl_mouse = (struct ioControl_d *) kmalloc ( sizeof(struct ioControl_d) );
 
-    if ( (void *) ioControl_mouse == NULL )
-    {
+    if ( (void *) ioControl_mouse == NULL ){
         panic ("ps2_mouse_globals_initialize: ioControl_mouse fail\n");
 
     }else{
-
         ioControl_mouse->id = 0;
         ioControl_mouse->used = 1;
         ioControl_mouse->magic = 1234;
@@ -1213,11 +1211,18 @@ void mouseHandler (void){
             // Message.
             //
             
+            //#todo
+            // Mandar uma mensagem par o window server registrado
+            // caso exita um. Dai o ws scaneia suas janelas.
+            // obs: essa chamada tem um retorno.
+            // veja como o teclado fez.
+            //status = ipc_send_to_ws( .... );
+            
             //#bugbug
             // escaneando janelas.
             // O window server deveria fazer isso.
-            // kgws/kgws.c
-            kgws_mouse_scan_windows ();
+            // ws/kgws.c
+            kgws_mouse_scan_windows();
             
             // O driver precisa do old pra configurar a variável de ação.
             // #todo Talvez precise de outras
