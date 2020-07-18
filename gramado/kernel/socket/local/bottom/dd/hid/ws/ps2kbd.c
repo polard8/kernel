@@ -1145,10 +1145,8 @@ void ps2kbd_initialize_device (void){
         panic ("ps2kbd_initialize_device: __file fail, can't register device");
     
     }else{
-
         __file->used = 1;
         __file->magic = 1234;
-
         __file->isDevice = 1;
 
 

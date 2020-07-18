@@ -851,7 +851,7 @@ int sys_socket ( int family, int type, int protocol ){
 
         // family, type and protocol.
         __socket->family = family;
-        __socket->type = type;
+        __socket->type = type;  // DATAGRAM or STREAM 
         __socket->protocol = protocol;
 
 

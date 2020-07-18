@@ -74,6 +74,10 @@ struct network_info_d
 
 
 
+
+int ____network_late_flag;
+
+
 // Init.
 int networkInit (void);
 
@@ -135,6 +139,10 @@ network_driver_dialog (
 int network_decode_buffer ( unsigned long buffer_address );
 
 
+// Colocar um buffer numa lista de buffers.
+int network_buffer_in( void *buffer, int len );
+// Retirar um buffer de uma lista de buffers.
+int network_buffer_out (void);
 
 // Handling requests.
 int do_ipv4 ( unsigned long buffer );

@@ -168,12 +168,7 @@ all-c:
 	$(CC) -c panic.c    $(KINCLUDE) $(CFLAGS) -o panic.o
 	$(CC) -c reboot.c   $(KINCLUDE) $(CFLAGS) -o reboot.o
 
-	#
-	#  gramado
-	#
-	
-	$(CC) -c socket/gramado/channel.c        $(KINCLUDE) $(CFLAGS) -o channel.o
-	$(CC) -c socket/gramado/network.c        $(KINCLUDE) $(CFLAGS) -o network.o
+
 
 
 	#
@@ -186,6 +181,9 @@ all-c:
 	#
 	#  local
 	#
+
+	$(CC) -c socket/local/network/channel.c  $(KINCLUDE) $(CFLAGS) -o channel.o
+	$(CC) -c socket/local/network/network.c  $(KINCLUDE) $(CFLAGS) -o network.o
 
 
 	#  /sci - System Call Interface.

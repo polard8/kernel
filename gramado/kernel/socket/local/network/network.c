@@ -90,6 +90,40 @@ file *____network_file;
 
 
 
+
+// Colocar um buffer numa lista de buffers.
+// Vamos copiar o pacote para alguma fila de buffers.
+// A rotina de decodificar o pacote pegará o
+// pacote em alguma fila de buffers.
+// len: 
+//     Tamanho do pacote. Temos que considerar limites.
+// buffer:
+//     Endereço do pacote.
+// Copiamos se o comprimento está no limite.
+
+int network_buffer_in( void *buffer, int len )
+{
+	
+	// #todo
+	// MTU: maximim transmition unit.
+	// For ethernet is 1500 bytes.
+	
+    printf ("network_buffer_in: buffer_len %d\n",len);
+    refresh_screen();
+    
+   //memcpy( kbuf_list[?], buffer, len);
+   return -1;
+}
+
+
+// Retirar um buffer de uma lista de buffers.
+// O gns chamará essa rotina e copiará um buffer
+// para ring3, onde chamará as rotinas de protocolo.
+int network_buffer_out (void)
+{
+    return -1;
+}
+
 /*
  ************************************
  * network_procedure:
@@ -267,6 +301,13 @@ int networkInit (void){
 
 
     debug_print ("networkInit:\n");
+    
+    // #importante
+    // Essa é a flag que indica que a última inicialização foi feita.
+    // Aquela chamada por processos inicializadores em ring3.
+    // Com essa flag acionada o handler do nic poderá
+    // decodificar o buffer, caso contrário deve ignorar.
+    ____network_late_flag=0;
     
     // Status.
     networkSetstatus (0);
@@ -547,6 +588,9 @@ void network_test(void)
     //Done.
     debug_print("network_test: done\n");
     refresh_screen();
+    
+    // 
+    ____network_late_flag = 1;
 }
 
 
@@ -1573,9 +1617,10 @@ int network_decode_buffer ( unsigned long buffer_address ){
 int do_ipv4 ( unsigned long buffer )
 {
     debug_print ("do_ipv4: [TODO]\n");
-    //printf("IPv4 \n");  
-    //refresh_screen();
- 
+    printf("IPv4 \n");  
+    refresh_screen();
+
+
     /*
     //#todo
     //Criar uma mensagem que o ns entenda.

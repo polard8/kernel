@@ -261,7 +261,7 @@ e1000_init_nic (
 	// Endereço base.
 	// Preparando a mesma base de duas maneiras.
 
-    unsigned char *base_address = (unsigned char *) virt_address;
+    unsigned char *base_address   = (unsigned char *) virt_address;
     unsigned long *base_address32 = (unsigned long *) virt_address;
 
 	//
@@ -383,12 +383,11 @@ e1000_init_nic (
                        (unsigned char) 0x04 );
 
 
-    if ( (cmd & 0x04) != 0x04 ) 
-    {
+    if ( (cmd & 0x04) != 0x04 ){
+
         cmd |= 0x04;
 
-        // ??
-        // (bus, slot, func, PCI_COMMAND, cmd);
+        // ?? (bus, slot, func, PCI_COMMAND, cmd);
         diskWritePCIConfigAddr ( (int) bus, (int) dev, (int) fun, 
             (int) 0x04, (int) cmd ); 
     }
@@ -426,7 +425,9 @@ void xxxe1000handler (void){
     uint16_t old=0;
     uint32_t len=0;
 
-
+    unsigned char *buffer;
+    
+    
     //debug_print ("xxxe1000handler: ");
     
     //
@@ -463,14 +464,13 @@ void xxxe1000handler (void){
 
 
     // Interrupt count.
-    if ( (void *) currentNIC != NULL )
-    {
-        currentNIC->interrupt_count++;
+    if ( (void *) currentNIC != NULL ){ 
+        currentNIC->interrupt_count++; 
     }
 
 
-	// Without this, the card may spam interrupts...
-    E1000WriteCommand ( currentNIC, 0xD0, 1);
+    // Without this, the card may spam interrupts...
+    E1000WriteCommand( currentNIC, 0xD0, 1);
 
 
     //
@@ -478,16 +478,26 @@ void xxxe1000handler (void){
     //
 
     // Status
-    status = E1000ReadCommand ( currentNIC, 0xC0 ); 
+    status = E1000ReadCommand( currentNIC, 0xC0 ); 
 
     // 0x04 - Linkup
-    if (status & 0x04) 
-    {
+    // Start link.
+    if (status & 0x04){
+        printf ("Start link\n");
+        refresh_screen();
         val = E1000ReadCommand ( currentNIC, 0 );
         E1000WriteCommand ( currentNIC, 0, val | 0x40 );
         return;
 
-    // 0x80 - ?
+    // 0x10 - Good threshold (limite)
+    // Isso apresentou problemas. Pensaremos nisso no futuro.
+    //} else if (status & 0x10){
+    //    printf ("Good threshold\n");
+    //    refresh_screen();
+    //    return;
+
+
+    // 0x80 - Reveive.
     } else if (status & 0x80){
         //printf("xxxe1000handler: handler for NIC e1000");
         //printf("e1000 handler ");
@@ -504,76 +514,89 @@ void xxxe1000handler (void){
              old = currentNIC->rx_cur;
              len = currentNIC->legacy_rx_descs[old].length;
 
-			// Our Net layer should handle it
-			//NetHandlePacket(dev->ndev, len, (PUInt8)dev->rx_descs_virt[old]);
+             //#test: Apenas pegando o buffer para usarmos lodo adinate.
+             buffer = (unsigned char *) currentNIC->rx_descs_virt[old];
 
-			//printf(">"); 
+             //se a inicialização está completa.
+             //if(____network_late_flag == 1){
+             //    network_buffer_in ( (void *) buffer, (int) len );
+             //}  
+                  
+            //#bugbug: Não mais chamaremos a rotina de tratamento nesse momento.
+            //chamaremos logo adiante, usando o buffer que pegamos acima.
+
+            // Our Net layer should handle it
+            // NetHandlePacket(dev->ndev, len, (PUInt8)dev->rx_descs_virt[old]);
 
             // zera.
             currentNIC->legacy_rx_descs[old].status = 0;
             
-            // circula.
-            // RECEIVE_BUFFER_MAX = 32
-            currentNIC->rx_cur = (currentNIC->rx_cur + 1) % 32;
+            // circula. (32 buffers)
+            currentNIC->rx_cur = (currentNIC->rx_cur + 1) % RECEIVE_BUFFER_MAX; 
 
             // ?? Provavelmente seleciona o buffer.
             E1000WriteCommand ( currentNIC, 0x2818, old );
         };
+
+        //
+        // == ## Reagindo ## ===========================
+        //
+        
+        // Vamos copiar o pacote para alguma fila de buffers.
+        // A rotina de decodificar o pacote pegará o
+        // pacote em alguma fila de buffers.
+        
+        // len: 
+        //     Tamanho do pacote. Temos que considerar limites.
+        // buffer:
+        //     Endereço do pacote.
+        
+        //network_buffer_in ( (void *) buffer, (int) len );
+
+        // #importante
+        // Qual buffer?
+        // Atenção:
+        // Nesse momento checaremos se no início do buffer temos o header ethernet.
+        // Em seguida o 'switch' chama as rotinas apropriadas para cada tipo 
+        // de pacode.
+        // Os tipos são: IPV4, ARP, IPV6 e default.
+
+        //unsigned char *buffer = (unsigned char *) currentNIC->rx_descs_virt[old];
+        //buffer = (unsigned char *) currentNIC->rx_descs_virt[old];
+
+        // #importante
+        // Agora que temos o buffer podemos enviar para o servidor de rede.
+        // Pois o driver do controlador não lida com protocolos.
+        // See: network.c
+        // Estamos chamando um serviço no diálogo que decodifica o buffer.
+        // Mas poderíamos simplesmente chamar um serviço no diálogo
+        // que mandasse o buffer para o network server em ring3.
+
+        // #bugbug
+        // #todo
+        // Antes de chamarmos essa rotina de diálogo
+        // é bom checarmos a flag da inicialização do sistema.
+        // Pois senão seremos interrompidos muitas vezes durante a 
+        // inicialização ...
+        // bom seria que o processo init ou o network server acionasse
+        // a flag que libera esse diálogo.
+
+        //#todo
+        if(____network_late_flag == 1)
+        {
+            // Enfileirar o buffer
+            network_buffer_in ( (void *) buffer, (int) len );
+            
+            // Decodificar o buffer.
+            // 8000 - decode buffer.
+            //network_driver_dialog ( NULL, (int) 8000, 
+                //(unsigned long) &buffer[0], (unsigned long) &buffer[0] );
+        }
+
+        return;
     };
-
-
-
-
-	//
-	// =============== ## Reagir ## ===========================
-	//
-
-	// #importante
-	// Qual buffer?
-
-	// Atenção:
-	// Nesse momento checaremos se no início do buffer temos o header ethernet.
-	// Em seguida o 'switch' chama as rotinas apropriadas para cada tipo 
-	// de pacode.
-	// Os tipos são: IPV4, ARP, IPV6 e default.
-
-    unsigned char *buffer = (unsigned char *) currentNIC->rx_descs_virt[old];
     
-
-    // #importante
-    // Agora que temos o buffer podemos enviar para o servidor de rede.
-    // Pois o driver do controlador não lida com protocolos.
-    // See: network.c
-    // Estamos chamando um serviço no diálogo que decodifica o buffer.
-    // Mas poderíamos simplesmente chamar um serviço no diálogo
-    // que mandasse o buffer para o network server em ring3.
-
-
-     // #bugbug
-     // #todo
-     // Antes de chamarmos essa rotina de diálogo
-     // é bom checarmos a flag da inicialização do sistema.
-     // Pois senão seremos interrompidos muitas vezes durante a 
-     // inicialização ...
-     // bom seria que o processo init ou o network server acionasse
-     // a flag que libera esse diálogo.
-
-     //#todo
-
-     // if ( network_is_fully_working == 1 ) {
-
-     // 8000 - decode buffer.
-     network_driver_dialog ( NULL, (int) 8000, 
-        (unsigned long) &buffer[0], (unsigned long) &buffer[0] );
-
-     // #todo
-     // Enviar o buffer para o gns.bin.
-     // 9000 - send buffer.
-     //network_driver_dialog ( NULL, (int) 9000, 
-        //(unsigned long) &buffer[0], (unsigned long) &buffer[0] );
-
-
-     // }
+    // Outro status qualquer.
 }
 
 
@@ -831,12 +854,13 @@ int e1000_reset_controller (void){
 	//PCIRegisterIRQHandler ( bus, dev, fun, (unsigned long) E1000Handler, currentNIC );
 	
 	
-    /** Transmit Enable. */
+    /* Transmit Enable. */
     //#define E1000_REG_TCTL_EN	(1 << 1)
 
-    /** Pad Short Packets. */
+    /* Pad Short Packets. */
     //#define E1000_REG_TCTL_PSP	(1 << 3)
-	
+
+
    //#define E1000_ICR      0x000C0  /* Interrupt Cause Read - R/clr */
    //#define E1000_ITR      0x000C4  /* Interrupt Throttling Rate - RW */
    //#define E1000_ICS      0x000C8  /* Interrupt Cause Set - WO */
