@@ -723,6 +723,16 @@ gde_extra_services (
     }
 
  
+     //890 ~ 899 network stuff 
+     //get user name
+    if ( number == 890 ){
+        //ubuf,len
+        return (void *) ns_get_buffer ( (void *) arg2,(int) arg3);
+    }
+
+    //...
+
+ 
  
 	// 900
 	// Clona e executa o filho dado o nome do filho.

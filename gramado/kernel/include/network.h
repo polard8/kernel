@@ -20,7 +20,8 @@
 // Ethernet IPv4 TCP/UDP DATA FCS
 
 
-// See: https://en.wikipedia.org/wiki/EtherType
+// See: 
+// https://en.wikipedia.org/wiki/EtherType
 #define ETH_TYPE_IP    0x0800  
 #define ETH_TYPE_IPV4  0x0800  
 #define ETH_TYPE_ARP   0x0806
@@ -31,13 +32,46 @@
 
 
 // little endian ?
-#define ToNetByteOrder16(v) ((v >> 8) | (v << 8))
-#define ToNetByteOrder32(v) (((v >> 24) & 0xFF) | ((v << 8) & 0xFF0000) | ((v >> 8) & 0xFF00) | ((v << 24) & 0xFF000000))
+
+#define ToNetByteOrder16(v)  ((v >> 8) | (v << 8))
+#define ToNetByteOrder32(v)  (((v >> 24) & 0xFF) | ((v << 8) & 0xFF0000) | ((v >> 8) & 0xFF00) | ((v << 24) & 0xFF000000))
+
 #define FromNetByteOrder16(v) ((v >> 8) | (v << 8))
 #define FromNetByteOrder32(v) (((v >> 24) & 0xFF) | ((v << 8) & 0xFF0000) | ((v >> 8) & 0xFF00) | ((v << 24) & 0xFF000000))
 
 
 
+/*
+// Device
+// #test
+struct network_device_d 
+{
+    int id;
+	
+	void *priv; //??
+
+	char *dev_name;
+
+    unsigned char ipv4_address[4];
+    unsigned char mac_address[6];
+
+	//virtual
+	//Nope!
+	//Void (*send)(PVoid, UIntPtr, PUInt8);
+};
+*/
+
+struct network_buffer_d
+{
+    int receive_tail;
+    int receive_head;
+    unsigned long receive_buffer[32];
+
+    int send_tail;
+    int send_head;
+    unsigned long send_buffer[8];    
+};
+struct network_buffer_d NETWORK_BUFFER;
 
 
 
@@ -72,10 +106,14 @@ struct network_info_d
 };
 //struct network_info_d *Network;
 
-
-
-
+// Essa flag poderia ir para dentro da estrutura acima,
 int ____network_late_flag;
+
+
+
+//
+// Prototypes.
+//
 
 
 // Init.
@@ -143,6 +181,13 @@ int network_decode_buffer ( unsigned long buffer_address );
 int network_buffer_in( void *buffer, int len );
 // Retirar um buffer de uma lista de buffers.
 int network_buffer_out (void);
+
+//o ns pega o buffer no kernel.
+int ns_get_buffer(void *ubuf, int size);
+//o ns envia um buffer pra ser enviado para rede.
+int ns_set_buffer(void *ubuf, int size);
+
+
 
 // Handling requests.
 int do_ipv4 ( unsigned long buffer );

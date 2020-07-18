@@ -8,6 +8,10 @@
  *     2016 - Created by Fred Nora.
  */
 
+// See:
+// https://wiki.osdev.org/Network_Stack
+// https://wiki.osdev.org/Intel_Ethernet_i217
+
 
 /*
 uint16_t switch_endian16(uint16_t nb)
@@ -103,16 +107,80 @@ file *____network_file;
 
 int network_buffer_in( void *buffer, int len )
 {
-	
+    void *dst_buffer;
+    int tail = NETWORK_BUFFER.receive_tail;
+
+    //circula.
+    NETWORK_BUFFER.receive_tail++;
+    if (NETWORK_BUFFER.receive_tail >= 32)
+        NETWORK_BUFFER.receive_tail=0;
+
 	// #todo
 	// MTU: maximim transmition unit.
 	// For ethernet is 1500 bytes.
 	
     printf ("network_buffer_in: buffer_len %d\n",len);
     refresh_screen();
+
+
+    if(len>1500)
+        return -1;
+        
+    if(tail<0)
+        return -1;
+        
+    // Pega o destination buffer.
+    if (tail<32){
+        dst_buffer = NETWORK_BUFFER.receive_buffer[tail];
+       
+       if((void*)dst_buffer!= NULL)
+           memcpy( dst_buffer, buffer, len);        
     
-   //memcpy( kbuf_list[?], buffer, len);
+        printf("network_buffer_in: ok\n");
+        refresh_screen();
+        return 0;//ok
+    }
+
    return -1;
+}
+
+
+int ns_get_buffer(void *ubuf, int size)
+{
+    void *src_buffer;
+    //temos que pegar do head. primeiro da fila.
+    int head = NETWORK_BUFFER.receive_head;
+
+    //circula.
+    NETWORK_BUFFER.receive_head++;
+    if (NETWORK_BUFFER.receive_head >= 32)
+        NETWORK_BUFFER.receive_head=0;
+        
+    if(head<32){
+        src_buffer = NETWORK_BUFFER.receive_buffer[head];
+    
+        if((void*)ubuf== NULL){
+            printf("ns_get_buffer: ubuf fail\n");
+            refresh_screen();        
+            return -1;
+        }
+        
+        if((void*)src_buffer== NULL){
+            printf("ns_get_buffer: src_buffer fail\n");
+            refresh_screen();        
+            return -1;
+        }
+
+        //do kernel para user mode.
+        if((void*)ubuf!= NULL)
+            memcpy( ubuf, src_buffer, size);        
+
+        printf("ns_get_buffer: ok\n");
+        refresh_screen();
+        return 0;//ok
+    }
+ 
+    return -1;
 }
 
 
@@ -123,6 +191,16 @@ int network_buffer_out (void)
 {
     return -1;
 }
+
+
+/*
+//o ns envia um buffer pra ser enviado para rede.
+int ns_set_buffer(void *ubuf, int size)
+{
+    return -1;
+}
+*/
+
 
 /*
  ************************************
@@ -309,6 +387,39 @@ int networkInit (void){
     // decodificar o buffer, caso contrário deve ignorar.
     ____network_late_flag=0;
     
+    
+    //
+    // buffers
+    //
+    void *nbuffer;
+    int i=0;
+    
+    //receive buffers,
+    for(i=0;i<32;i++)
+    {
+        nbuffer = (void*) newPage();
+        if((void *)nbuffer == NULL)
+            panic("networkInit: receive nbuffer");
+    
+        NETWORK_BUFFER.receive_buffer[i] = (unsigned long) nbuffer;
+    }
+    NETWORK_BUFFER.receive_tail =0;
+    NETWORK_BUFFER.receive_head =0;
+    
+
+    //send buffers,
+    for(i=0;i<8;i++)
+    {
+        nbuffer = (void*) newPage();
+        if((void *)nbuffer == NULL)
+            panic("networkInit: send nbuffer");
+    
+        NETWORK_BUFFER.send_buffer[i] = (unsigned long) nbuffer;
+    }
+    NETWORK_BUFFER.send_tail =0;
+    NETWORK_BUFFER.send_head =0;
+
+
     // Status.
     networkSetstatus (0);
 

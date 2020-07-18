@@ -2479,8 +2479,12 @@ do_compare:
 
 
     // network
-    if ( gramado_strncmp( prompt, "network", 7 ) == 0 ){
+    if ( gramado_strncmp( prompt, "network", 7 ) == 0 )
+    {
+        // inicializa network
         gramado_system_call( 968,0,0,0);
+        //loop de leitura de buffer
+        network_test_buffer();
         goto exit_cmp;
     }
 
@@ -6938,6 +6942,20 @@ void shellSocketTest (){
     printf ("Done.\n");
 }
 
+//interna
+void network_test_buffer(void)
+{
+    char buf[4096];
+    
+    while(1){
+    gramado_system_call( 890, 
+        (unsigned long)&buf[0],   //buf
+        (unsigned long)1500,      //len
+        0);
+
+    printf("[begin]%s[end]\n",buf);
+    }
+}
 
 
 /*
