@@ -6942,18 +6942,176 @@ void shellSocketTest (){
     printf ("Done.\n");
 }
 
+
+struct gdeshell_ether_header {
+	
+	uint8_t dst[6];
+	uint8_t src[6];
+	uint16_t type;
+	
+} __attribute__((packed));
+
+#define gdeshell_FromNetByteOrder16(v) ((v >> 8) | (v << 8))
+
+//interna
+int gdeshell_decode_buffer ( unsigned long buffer_address ){
+
+    // Only the ethernet header.
+    struct gdeshell_ether_header *eh;
+
+
+    //#debug
+    debug_print ("gdeshell_decode_buffer:\n");
+    //printf ("network_decode_buffer:\n");
+
+
+    if ( buffer_address == 0 ){
+        printf ("gdeshell_decode_buffer: buffer\n");
+        return 1;
+    }
+    
+	//
+	// ## eth header ##
+	//
+	
+	//ethernet header
+	//eh = (void *) &buffer[0];
+    eh = (void *) buffer_address;
+
+    if ( (void *) eh == NULL ){
+        printf ("gdeshell_decode_buffer: eh\n");
+        //refresh_screen();
+        return 1;
+
+    }else{
+
+        //printf("src: ");
+        //for( i=0; i<6; i++)
+        //	printf("%x ",eh->src[i]);
+
+        //printf("dst: ");
+        //for( i=0; i<6; i++)
+        //	printf("%x ",eh->dst[i]);
+
+        //printf("type={%x} ",eh->type);
+    };
+
+
+    // #importante
+    // Provavelmente o buffer seja enviado para um
+    // servidor de protocolos.
+    // Um servidor só para todos os protocolos.
+    // See: https://en.wikipedia.org/wiki/EtherType
+
+    uint16_t type = gdeshell_FromNetByteOrder16(eh->type);
+    
+    switch ( (uint16_t) type)
+    {
+
+
+        // ::: IPV4
+        // 0x0800	Internet Protocol version 4 (IPv4)
+        // Ok como test vamos notificar o processo atual
+        // de que recebemos um pacote ipv4
+        case 0x0800:
+        
+           // #debug
+            printf ("IPV4 received\n");
+            //refresh_screen ();
+           
+           //#test
+           //notificando ...(ok funcionou.)
+           //network_procedure ( NULL, 3000, 0,0 ); 
+           
+           // #debug
+           //printf("todo: Internet Protocol version 4 (IPv4)\n");
+           //printf("IPv4 ");
+           //do_ipv4 ( (unsigned long) buffer_address );
+           //refresh_screen ();
+           return 0;
+           break;
+
+        //::: ARP
+        //0x0806	Address Resolution Protocol (ARP)
+        //#todo: devemos chamar uma rotina para tratamento de ARP e n�o
+        //fazermos tudo aqui. kkk.
+        case 0x0806:
+            // #debug
+            printf ("ARP received\n");
+            //refresh_screen ();
+                   
+            //printf("\nARP ");
+            //do_arp ((unsigned long) buffer_address );
+            //refresh_screen ();
+            return 0;
+            break;
+            
+        //::: SNMP
+        // Simple Network Management Protocol.
+        case 0x814C:
+            printf ("SNMP received\n");
+            return 0;
+            break;
+            
+        
+            
+        //::: IPV6
+        //0x86DD	Internet Protocol Version 6 (IPv6)
+        case 0x86DD:
+
+            // #debug
+            printf ("IPV6 received\n");
+            //refresh_screen ();
+        
+            //printf ("IPv6 ");
+            //do_ipv6 ( (unsigned long) buffer_address );
+            //refresh_screen ();
+            return 0;
+            break;
+
+        //:::PPP
+        //Point-to-Point Protocol.
+        case 0x880B:
+            printf ("SNMP received\n");
+            return 0;
+            break;
+
+        //0x8863	PPPoE, PPP Over Ethernet (Discovery Stage).
+        //0x8864	PPPoE, PPP Over Ethernet (PPP Session Stage).
+
+		//::: DEFAULT
+        // Error: Default package type.
+        default:
+
+            // #debug
+            //printf ("UNKNOWN received\n");
+            //refresh_screen ();
+
+            // #debug
+            //printf("default ethernet type\n");
+            //refresh_screen();
+            return 0;
+            break;
+
+    }
+
+    return 1;
+}
+
+
 //interna
 void network_test_buffer(void)
 {
     char buf[4096];
     
     while(1){
-    gramado_system_call( 890, 
-        (unsigned long)&buf[0],   //buf
-        (unsigned long)1500,      //len
-        0);
+        gramado_system_call( 890, 
+            (unsigned long)&buf[0],   //buf
+            (unsigned long)1500,      //len
+            0);
 
-    printf("[begin]%s[end]\n",buf);
+        //printf("[begin]%s[end]\n",buf);
+        gdeshell_decode_buffer((unsigned long) &buf[0]);
     }
 }
 

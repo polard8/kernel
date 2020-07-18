@@ -119,8 +119,8 @@ int network_buffer_in( void *buffer, int len )
 	// MTU: maximim transmition unit.
 	// For ethernet is 1500 bytes.
 	
-    printf ("network_buffer_in: buffer_len %d\n",len);
-    refresh_screen();
+    //printf ("network_buffer_in: buffer_len %d\n",len);
+    //refresh_screen();
 
 
     if(len>1500)
@@ -136,8 +136,8 @@ int network_buffer_in( void *buffer, int len )
        if((void*)dst_buffer!= NULL)
            memcpy( dst_buffer, buffer, len);        
     
-        printf("network_buffer_in: ok\n");
-        refresh_screen();
+        //printf("network_buffer_in: ok\n");
+        //refresh_screen();
         return 0;//ok
     }
 
@@ -175,11 +175,11 @@ int ns_get_buffer(void *ubuf, int size)
         if((void*)ubuf!= NULL)
             memcpy( ubuf, src_buffer, size);        
 
-        printf("ns_get_buffer: ok\n");
-        refresh_screen();
+        //printf("ns_get_buffer: ok\n");
+        //refresh_screen();
         return 0;//ok
     }
- 
+
     return -1;
 }
 
