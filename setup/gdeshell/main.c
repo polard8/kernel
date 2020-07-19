@@ -6953,6 +6953,37 @@ struct gdeshell_ether_header {
 
 #define gdeshell_FromNetByteOrder16(v) ((v >> 8) | (v << 8))
 
+
+//interna
+void 
+print_ethernet_header( 
+    const unsigned char *Buffer, 
+    int Size )
+{
+    struct gdeshell_ether_header *eth = (struct gdeshell_ether_header *)Buffer;
+     
+    //printf ("print_ethernet_header:\n");
+    printf("\n");
+    printf ("Ethernet Header\n");
+    printf ("   |-Destination Address : %.2X-%.2X-%.2X-%.2X-%.2X-%.2X \n", 
+        eth->dst[0] , 
+        eth->dst[1] , 
+        eth->dst[2] , 
+        eth->dst[3] , 
+        eth->dst[4] , 
+        eth->dst[5] );
+    printf ("   |-Source Address      : %.2X-%.2X-%.2X-%.2X-%.2X-%.2X \n", 
+        eth->src[0] , 
+        eth->src[1] , 
+        eth->src[2] , 
+        eth->src[3] , 
+        eth->src[4] , 
+        eth->src[5] );
+    printf ("   |-Protocol            : %u \n",
+        (unsigned short)eth->type);
+    //printf ("print_ethernet_header:done\n");
+}
+
 //interna
 int gdeshell_decode_buffer ( unsigned long buffer_address ){
 
@@ -6984,6 +7015,8 @@ int gdeshell_decode_buffer ( unsigned long buffer_address ){
         return 1;
 
     }else{
+
+        print_ethernet_header((const unsigned char*) buffer_address, 1500);
 
         //printf("src: ");
         //for( i=0; i<6; i++)
