@@ -114,8 +114,8 @@ build-lib \
 build-init \
 build-gdeshell \
 build-setup \
-build-gns \
-build-gws \
+build-gnssrv \
+build-gwssrv \
 build-apps \
 build-cmd
 
@@ -154,15 +154,15 @@ build-setup:
 	@echo " Compiling the gdeshell"
 	$(Q) $(MAKE) -C setup/   
 
-build-gns:
+build-gnssrv:
 	@echo "==================="
-	@echo " Compiling the gns"
-	$(Q) $(MAKE) -C services/gns   
+	@echo " Compiling the gnssrv"
+	$(Q) $(MAKE) -C services/gnssrv   
 
-build-gws:
+build-gwssrv:
 	@echo "==================="
-	@echo " Compiling the gws"
-	$(Q) $(MAKE) -C services/gws   
+	@echo " Compiling the gwssrv"
+	$(Q) $(MAKE) -C services/gwssrv   
 
 build-apps:
 	@echo "==================="
@@ -261,10 +261,10 @@ vhd-copy-files:
 	-sudo cp gramado/base/tests/*.ASM    /mnt/gramadovhd
 	-sudo cp gramado/base/res/wall/ANIMAL.BMP   /mnt/gramadovhd
 
-	-sudo cp services/gns/bin/GNS.BIN       /mnt/gramadovhd
-	-sudo cp services/gns/bin/GNST.BIN      /mnt/gramadovhd
-	-sudo cp services/gws/bin/GWS.BIN       /mnt/gramadovhd
-	-sudo cp services/gws/bin/GWST.BIN      /mnt/gramadovhd
+	-sudo cp services/gnssrv/bin/GNSSRV.BIN  /mnt/gramadovhd
+	-sudo cp services/gnssrv/bin/GNST.BIN    /mnt/gramadovhd
+	-sudo cp services/gwssrv/bin/GWSSRV.BIN  /mnt/gramadovhd
+	-sudo cp services/gwssrv/bin/GWST.BIN    /mnt/gramadovhd
 	
 	-sudo cp shine/apps/bin/*.BIN         /mnt/gramadovhd
 	-sudo cp shine/cmd/bin/*.BIN          /mnt/gramadovhd
@@ -349,8 +349,8 @@ clean-system-files:
 	-rm -rf setup/bin/*.BIN
 	
 	# Services
-	-rm -rf services/gns/bin/*.BIN
-	-rm -rf services/gws/bin/*.BIN
+	-rm -rf services/gnssrv/bin/*.BIN
+	-rm -rf services/gwssrv/bin/*.BIN
 	# ...
 
 	# Shine

@@ -1,7 +1,6 @@
 
-# gws - Gramado Window Server.
+# gns - Gramado Network Server.
 # 2020 - Created by Fred Nora.
-
 
 
 
@@ -59,9 +58,7 @@ GWS_INCLUDES  = include/
 	
 myObjects = crt0.o main.o stubs.o \
 ctype.o stdio.o stdlib.o string.o conio.o socket.o signal.o unistd.o \
-api.o \
-pixel.o line.o rect.o char.o dtext.o createw.o gws.o comp.o window.o \
-bmp.o connect.o button.o\
+api.o connect.o \
 termios.o ioctl.o fcntl.o    
 
 
@@ -72,30 +69,14 @@ all: main.o all-c gws-link finalize clean
 	@echo "Ok?"
 
 main.o:
-	gcc  -c  main.c -I $(LIBC) -I $(API02)  -I $(GWS_INCLUDES) -I . $(CFLAGS) -o main.o
+	gcc  -c  main.c     -I $(LIBC) -I $(API02)  -I $(GWS_INCLUDES) -I . $(CFLAGS) -o main.o
+
 
 all-c:
 
-	# gws
-	gcc  -c  char.c     -I $(LIBC) -I $(API02)   -I $(GWS_INCLUDES) -I . $(CFLAGS) -o char.o
-	gcc  -c  comp.c     -I $(LIBC) -I $(API02)   -I $(GWS_INCLUDES) -I . $(CFLAGS) -o comp.o
-	gcc  -c  createw.c  -I $(LIBC) -I $(API02)   -I $(GWS_INCLUDES) -I . $(CFLAGS) -o createw.o
-	gcc  -c  dtext.c    -I $(LIBC) -I $(API02)   -I $(GWS_INCLUDES) -I . $(CFLAGS) -o dtext.o
-	gcc  -c  line.c     -I $(LIBC) -I $(API02)   -I $(GWS_INCLUDES) -I . $(CFLAGS) -o line.o
-	gcc  -c  pixel.c    -I $(LIBC) -I $(API02)   -I $(GWS_INCLUDES) -I . $(CFLAGS) -o pixel.o
-	gcc  -c  rect.c     -I $(LIBC) -I $(API02)   -I $(GWS_INCLUDES) -I . $(CFLAGS) -o rect.o
-	gcc  -c  window.c   -I $(LIBC) -I $(API02)   -I $(GWS_INCLUDES) -I . $(CFLAGS) -o window.o
-	gcc  -c  bmp.c      -I $(LIBC) -I $(API02)   -I $(GWS_INCLUDES) -I . $(CFLAGS) -o bmp.o
-	gcc  -c  connect.c  -I $(LIBC) -I $(API02)   -I $(GWS_INCLUDES) -I . $(CFLAGS) -o connect.o
-	gcc  -c  button.c  -I $(LIBC) -I $(API02)   -I $(GWS_INCLUDES) -I . $(CFLAGS) -o button.o
-	# ...
+	gcc  -c  connect.c  -I $(LIBC) -I $(API02)  -I $(GWS_INCLUDES) -I . $(CFLAGS) -o connect.o
 	
-	
-
-
-	# base
-	gcc  -c  gws.c      -I $(LIBC) -I $(API02)   -I $(GWS_INCLUDES) -I . $(CFLAGS) -o gws.o
-
+# nothing for now.
 
 	# libc03
 	cp $(LIBCOBJ)/crt0.o .
@@ -112,21 +93,20 @@ all-c:
 	cp $(LIBCOBJ)/ioctl.o .
 	cp $(LIBCOBJ)/fcntl.o .
 
-
 	# libgui
 	cp $(APIOBJ)/api.o .
 
 
 
 gws-link:
-	ld -m elf_i386 -T ../link.ld -o GWS.BIN $(myObjects)    
+	ld -m elf_i386 -T ../link.ld -o GNSSRV.BIN $(myObjects)    
 
 
 finalize:
-	cp GWS.BIN ../bin
+	cp GNSSRV.BIN ../bin
 
 clean:
 	-rm *.o
-	-rm GWS.BIN 
+	-rm GNSSRV.BIN 
 	
 	
