@@ -1,36 +1,56 @@
-
 ; flat assembler core
 ; Copyright (c) 1999-2020, Tomasz Grysztar.
 ; All rights reserved.
 
+
+;;
+;; preprocessor.
+;; It's called by fasm_main:
+;;
+
+;; #bugbug
+;; Something is not working here.
+
 preprocessor:
-	mov	edi,characters
-	xor	al,al
-      make_characters_table:
-	stosb
-	inc	al
-	jnz	make_characters_table
+
+    mov edi, characters
+    xor	al, al
+    make_characters_table:
+    stosb
+    inc	al
+    jnz make_characters_table
+	
 	mov	esi,characters+'a'
 	mov	edi,characters+'A'
 	mov	ecx,26
-	rep	movsb
-	mov	edi,characters
-	mov	esi,symbol_characters+1
+	rep movsb
+	mov edi, characters
+	mov esi, symbol_characters+1
 	movzx	ecx,byte [esi-1]
 	xor	eax,eax
-      mark_symbol_characters:
-	lodsb
-	mov	byte [edi+eax],0
-	loop	mark_symbol_characters
-	mov	edi,locals_counter
-	mov	ax,1 + '0' shl 8
-	stos	word [edi]
-	mov	edi,[memory_start]
-	mov	[include_paths],edi
-	mov	esi,include_variable
-	call	get_environment_variable
-	xor	al,al
-	stos	byte [edi]
+
+mark_symbol_characters:
+    
+    lodsb
+    mov	byte [edi+eax],0
+    loop	mark_symbol_characters
+    mov edi,locals_counter
+    mov ax,1 + '0' shl 8
+    stos word [edi]
+    mov edi,[memory_start]
+    mov [include_paths],edi
+    
+    ;; #bugbug
+    ;; Calling getenv.
+    ;; But the app does not have an environment yet
+    ;; Como não encontra a variável INCLUDE ele retorna.
+    
+    mov esi, include_variable
+    call get_environment_variable
+
+
+    xor al, al
+    stos byte [edi]
 	mov	[memory_start],edi
 	mov	eax,[additional_memory]
 	mov	[free_additional_memory],eax
@@ -45,16 +65,18 @@ preprocessor:
 	mov	[current_line],eax
 	mov	esi,[initial_definitions]
 	test	esi,esi
-	jz	predefinitions_ok
-      process_predefinitions:
-	movzx	ecx,byte [esi]
-	test	ecx,ecx
-	jz	predefinitions_ok
+    jz predefinitions_ok
+
+process_predefinitions:
+    movzx ecx,byte [esi]
+    test	ecx,ecx
+    jz predefinitions_ok
+
 	inc	esi
 	lea	eax,[esi+ecx]
 	push	eax
 	mov	ch,10b
-	call	add_preprocessor_symbol
+    call add_preprocessor_symbol
 	pop	esi
 	mov	edi,[memory_start]
 	mov	[edx+8],edi
@@ -64,8 +86,9 @@ preprocessor:
 	lods	byte [esi]
 	or	al,al
 	jz	predefinition_converted
-	cmp	al,20h
-	je	convert_predefinition
+    cmp	al,20h
+    je	convert_predefinition
+
 	mov	ah,al
 	mov	ebx,characters
 	xlat	byte [ebx]
@@ -81,9 +104,10 @@ preprocessor:
 	stos	byte [edi]
 	mov	ebx,characters
 	xor	ecx,ecx
-      predefinition_symbol:
-	lods	byte [esi]
-	stos	byte [edi]
+
+predefinition_symbol:
+    lods	byte [esi]
+    stos	byte [edi]
 	xlat	byte [ebx]
 	or	al,al
 	loopnzd predefinition_symbol
@@ -93,13 +117,15 @@ preprocessor:
 	mov	ebx,edi
 	sub	ebx,ecx
 	mov	byte [ebx-2],cl
-      found_predefinition_separator:
+
+found_predefinition_separator:
 	dec	edi
 	mov	ah,[esi-1]
-      predefinition_separator:
+
+predefinition_separator:
 	xchg	al,ah
 	or	al,al
-	jz	predefinition_converted
+    jz	predefinition_converted
 	cmp	al,20h
 	je	convert_predefinition
 	cmp	al,3Bh
@@ -107,13 +133,15 @@ preprocessor:
 	cmp	al,5Ch
 	je	predefinition_backslash
 	stos	byte [edi]
-	jmp	convert_predefinition
-      predefinition_string:
-	mov	al,22h
+    jmp convert_predefinition
+
+predefinition_string:
+    
+    mov al, 22h
 	stos	byte [edi]
 	scas	dword [edi]
 	mov	ebx,edi
-      copy_predefinition_string:
+copy_predefinition_string:
 	lods	byte [esi]
 	stos	byte [edi]
 	or	al,al
@@ -128,9 +156,10 @@ preprocessor:
 	mov	eax,edi
 	sub	eax,ebx
 	mov	[ebx-4],eax
-	jmp	convert_predefinition
-      predefinition_backslash:
-	mov	byte [edi],0
+    jmp convert_predefinition
+
+predefinition_backslash:
+    mov	byte [edi],0
 	lods	byte [esi]
 	or	al,al
 	jz	invalid_definition
@@ -144,22 +173,29 @@ preprocessor:
 	mov	ax,5C01h
 	stos	word [edi]
 	dec	esi
-      group_predefinition_backslashes:
-	lods	byte [esi]
+
+group_predefinition_backslashes:
+    
+    lods byte [esi]
 	cmp	al,5Ch
 	jne	predefinition_backslashed_symbol
 	stos	byte [edi]
 	inc	byte [ecx]
-	jmp	group_predefinition_backslashes
-      predefinition_backslashed_symbol:
-	cmp	al,20h
-	je	invalid_definition
-	cmp	al,22h
-	je	invalid_definition
-	cmp	al,27h
-	je	invalid_definition
-	cmp	al,3Bh
-	je	invalid_definition
+    jmp group_predefinition_backslashes
+
+predefinition_backslashed_symbol:
+    cmp	al,20h
+    je	invalid_definition
+
+    cmp	al,22h
+    je	invalid_definition
+	
+    cmp	al,27h
+    je	invalid_definition
+
+    cmp	al,3Bh
+    je	invalid_definition
+
 	mov	ah,al
 	mov	ebx,characters
 	xlat	byte [ebx]
@@ -184,11 +220,14 @@ preprocessor:
 	mov	[memory_start],edi
 	sub	edi,[edx+8]
 	mov	[edx+12],edi
-	jmp	process_predefinitions
-      predefinitions_ok:
-	mov	esi,[input_file]
-	mov	edx,esi
-	call	open
+    jmp	process_predefinitions
+
+
+predefinitions_ok:
+    mov	esi,[input_file]
+    mov	edx,esi
+    call open                     ;;open()
+
 	jc	main_file_not_found
 	mov	edi,[memory_start]
 	call	preprocess_file
@@ -196,8 +235,9 @@ preprocessor:
 	je	process_postponed
 	mov	eax,[error_line]
 	mov	[current_line],eax
-	jmp	incomplete_macro
-      process_postponed:
+    jmp	incomplete_macro
+
+process_postponed:
 	mov	edx,hash_tree
 	mov	ecx,32
       find_postponed_list:
@@ -230,22 +270,23 @@ preprocessor:
       preprocessing_finished:
 	mov	[source_start],edi
 	ret
-      use_postponed_macro:
+
+use_postponed_macro:
 	lea	esi,[edi-1]
 	push	ecx esi
 	mov	[struc_name],0
-	jmp	use_macro
+    jmp use_macro
 
 preprocess_file:
-	push	[memory_end]
-	push	esi
-	mov	al,2
-	xor	edx,edx
-	call	lseek
-	push	eax
+    push [memory_end]
+    push esi
+	mov al,2
+	xor edx,edx
+    call lseek        ;; lseek()
+    push	eax
 	xor	al,al
 	xor	edx,edx
-	call	lseek
+    call lseek        ;; lseek()
 	pop	ecx
 	mov	edx,[memory_end]
 	dec	edx
@@ -256,12 +297,15 @@ preprocess_file:
 	cmp	edx,edi
 	jbe	out_of_memory
 	mov	[memory_end],edx
-	call	read
-	call	close
+    call read                   ;; read()
+
+    call close                  ;; close()
+
 	pop	edx
 	xor	ecx,ecx
 	mov	ebx,esi
-      preprocess_source:
+
+preprocess_source:
 	inc	ecx
 	mov	[current_line],edi
 	mov	eax,edx
@@ -277,23 +321,29 @@ preprocess_file:
 	call	convert_line
 	call	preprocess_line
 	pop	edx ebx
-      next_line:
-	cmp	byte [esi-1],0
-	je	file_end
+
+next_line:
+    
+    cmp byte [esi-1], 0
+    je file_end
+	
 	cmp	byte [esi-1],1Ah
 	jne	preprocess_source
-      file_end:
-	pop	[memory_end]
-	clc
-	ret
+
+file_end:
+    pop [memory_end]
+    clc
+    ret
 
 convert_line:
+
 	push	ecx
 	test	[macro_status],0Fh
 	jz	convert_line_data
 	mov	ax,3Bh
 	stos	word [edi]
-      convert_line_data:
+
+convert_line_data:
 	cmp	edi,[memory_end]
 	jae	out_of_memory
 	lods	byte [esi]
@@ -315,9 +365,10 @@ convert_line:
 	xchg	al,ah
 	stos	byte [edi]
 	mov	ebx,characters
-	xor	ecx,ecx
-      convert_symbol:
-	lods	byte [esi]
+    xor	ecx,ecx
+
+convert_symbol:
+    lods	byte [esi]
 	stos	byte [edi]
 	xlat	byte [ebx]
 	or	al,al
@@ -424,11 +475,13 @@ convert_line:
 	stos	byte [edi]
 	inc	byte [ecx]
 	jz	name_too_long
-	jmp	group_backslashes
-      no_end_quote:
-	mov	byte [ebx-5],0
-	jmp	missing_end_quote
-      backslashed_symbol:
+    jmp group_backslashes
+
+no_end_quote:
+    mov byte [ebx-5],0
+    jmp missing_end_quote
+
+backslashed_symbol:
 	cmp	al,1Ah
 	je	unexpected_end_of_file
 	or	al,al
@@ -461,8 +514,9 @@ convert_line:
 	inc	byte [ecx]
 	jz	name_too_long
 	lods	byte [esi]
-	jmp	convert_backslashed_symbol
-      backslashed_symbol_character:
+    jmp convert_backslashed_symbol
+
+backslashed_symbol_character:
 	mov	al,ah
 	stos	byte [edi]
 	inc	byte [ecx]
@@ -493,22 +547,25 @@ convert_line:
 	jz	concatenate_ok
 	cmp	al,1Ah
 	jne	find_concatenated_line
-	jmp	unexpected_end_of_file
-      concatenate_lf:
+    jmp unexpected_end_of_file
+
+concatenate_lf:
 	lods	byte [esi]
 	cmp	al,0Dh
 	je	concatenate_ok
 	dec	esi
-	jmp	concatenate_ok
-      concatenate_cr:
+    jmp concatenate_ok
+
+concatenate_cr:
 	lods	byte [esi]
 	cmp	al,0Ah
 	je	concatenate_ok
 	dec	esi
       concatenate_ok:
 	inc	dword [esp]
-	jmp	convert_line_data
-      ignore_comment:
+    jmp	convert_line_data
+
+ignore_comment:
 	lods	byte [esi]
 	cmp	al,0Ah
 	je	lf_character
@@ -521,27 +578,29 @@ convert_line:
       line_end:
 	xor	al,al
 	stos	byte [edi]
-	pop	ecx
-	ret
+    pop ecx
+    ret
 
 lower_case:
-	mov	edi,converted
-	mov	ebx,characters
-      convert_case:
+    mov edi,converted
+    mov ebx,characters
+
+convert_case:
 	lods	byte [esi]
 	xlat	byte [ebx]
 	stos	byte [edi]
 	loop	convert_case
-      case_ok:
-	ret
+case_ok:
+    ret
 
 get_directive:
-	push	edi
+    push	edi
 	mov	edx,esi
 	mov	ebp,ecx
 	call	lower_case
 	pop	edi
-      scan_directives:
+
+scan_directives:
 	mov	esi,converted
 	movzx	eax,byte [edi]
 	or	al,al
@@ -562,23 +621,27 @@ get_directive:
       next_directive:
 	mov	edi,ebx
 	add	edi,2
-	jmp	scan_directives
-      no_directive:
+    jmp scan_directives
+
+no_directive:
 	mov	esi,edx
 	mov	ecx,ebp
 	stc
 	ret
-      directive_found:
-	call	get_directive_handler_base
-      directive_handler:
+
+directive_found:
+    call get_directive_handler_base
+
+directive_handler:
 	lea	esi,[edx+ebp]
 	movzx	ecx,word [ebx]
 	add	eax,ecx
 	clc
 	ret
-      get_directive_handler_base:
-	mov	eax,[esp]
-	ret
+
+    get_directive_handler_base:
+    mov	eax,[esp]
+    ret
 
 preprocess_line:
 	mov	eax,esp
@@ -613,20 +676,24 @@ preprocess_line:
 	ror	eax,16
 	cmp	eax,'fix'
 	je	define_fix_constant
-      not_fix_constant:
-	call	process_fix_constants
-	jmp	initial_preprocessing_ok
-      macro_preprocessing:
-	call	process_macro_operators
-      initial_preprocessing_ok:
-	mov	esi,[current_line]
+
+not_fix_constant:
+    call process_fix_constants
+    jmp initial_preprocessing_ok
+
+macro_preprocessing:
+    call process_macro_operators
+
+initial_preprocessing_ok:
+    mov	esi,[current_line]
 	add	esi,16
 	mov	al,[macro_status]
 	test	al,2
 	jnz	skip_macro_block
 	test	al,1
 	jnz	find_macro_block
-      preprocess_instruction:
+
+preprocess_instruction:
 	mov	[current_offset],esi
 	lods	byte [esi]
 	movzx	ecx,byte [esi]
@@ -648,8 +715,9 @@ preprocess_line:
 	jc	not_macro
 	mov	byte [ebx-2],3Bh
 	mov	[struc_name],0
-	jmp	use_macro
-      not_macro:
+    jmp use_macro
+
+not_macro:
 	mov	[struc_name],esi
 	add	esi,ecx
 	lods	byte [esi]
@@ -731,20 +799,22 @@ preprocess_line:
 	mov	[edx+1],al
 	pop	esi edx
 	inc	esi
-	jmp	use_macro
-      preprocess_label:
+    jmp use_macro
+
+preprocess_label:
 	dec	esi
 	sub	esi,ecx
 	lea	ebp,[esi-2]
 	mov	ch,10b
-	call	get_preprocessor_symbol
+    call get_preprocessor_symbol
 	jnc	symbolic_constant_in_label
 	lea	esi,[esi+ecx+1]
 	cmp	byte [esi],':'
 	jne	preprocess_instruction
 	inc	esi
-	jmp	preprocess_instruction
-      symbolic_constant_in_label:
+    jmp preprocess_instruction
+
+symbolic_constant_in_label:
 	mov	ebx,[edx+8]
 	mov	ecx,[edx+12]
 	add	ecx,ebx
@@ -763,11 +833,13 @@ preprocess_line:
 	cmp	byte [ebx],':'
 	jne	check_for_broken_label
 	inc	ebx
-	jmp	check_for_broken_label
-      label_broken:
-	call	replace_symbolic_constant
-	jmp	line_preprocessed
-      label_constant_ok:
+    jmp check_for_broken_label
+
+label_broken:
+    call replace_symbolic_constant
+    jmp line_preprocessed
+
+label_constant_ok:
 	mov	ecx,edi
 	sub	ecx,esi
 	mov	edi,[edx+12]
@@ -779,8 +851,9 @@ preprocess_line:
 	je	replace_label
 	jb	move_rest_of_line_up
 	rep	movs byte [edi],[esi]
-	jmp	replace_label
-      move_rest_of_line_up:
+    jmp replace_label
+
+move_rest_of_line_up:
 	lea	esi,[esi+ecx-1]
 	lea	edi,[edi+ecx-1]
 	std
@@ -798,18 +871,20 @@ preprocess_line:
       not_preprocessor_symbol:
 	mov	esi,[current_offset]
 	call	process_equ_constants
-      line_preprocessed:
-	pop	esi ecx
-	ret
+
+line_preprocessed:
+    pop	esi ecx
+    ret
 
 get_preprocessor_symbol:
-	push	ebp edi esi
+    push	ebp edi esi
 	mov	ebp,ecx
 	shl	ebp,22
 	movzx	ecx,cl
 	mov	ebx,hash_tree
 	mov	edi,10
-      follow_hashes_roots:
+
+follow_hashes_roots:
 	mov	edx,[ebx]
 	or	edx,edx
 	jz	preprocessor_symbol_not_found
@@ -859,22 +934,25 @@ get_preprocessor_symbol:
 	ret
       preprocessor_symbol_found:
 	pop	ebx edi ebp
-	clc
-	ret
-      calculate_hash:
-	xor	ebx,ebx
-	mov	eax,2166136261
-	mov	ebp,16777619
-      fnv1a_hash:
+    clc
+    ret
+
+calculate_hash:
+    xor ebx, ebx
+    mov eax, 2166136261
+    mov ebp, 16777619
+
+fnv1a_hash:
 	xor	al,[esi+ebx]
 	mul	ebp
 	inc	bl
 	cmp	bl,cl
 	jb	fnv1a_hash
 	ret
+
 add_preprocessor_symbol:
-	push	edi esi
-	xor	eax,eax
+    push	edi esi
+    xor	eax,eax
 	or	cl,cl
 	jz	reshape_hash
 	cmp	ch,11b
@@ -959,14 +1037,15 @@ add_preprocessor_symbol:
 	mov	[ebx],edx
 	pop	esi edi
 	mov	[edx+4],esi
-	ret
+    ret
 
 define_fix_constant:
-	add	edx,5
+    add	edx,5
 	add	esi,2
 	push	edx
 	mov	ch,11b
 	jmp	define_preprocessor_constant
+
 define_equ_constant:
 	add	esi,3
 	push	esi
@@ -1319,12 +1398,15 @@ prepare_match:
 purge_macro:
 	xor	ch,ch
 	jmp	restore_preprocessor_symbol
+
 purge_struc:
 	mov	ch,1
 	jmp	restore_preprocessor_symbol
+
 restore_equ_constant:
 	mov	ch,10b
-      restore_preprocessor_symbol:
+
+restore_preprocessor_symbol:
 	push	ecx
 	lods	byte [esi]
 	cmp	al,1Ah
@@ -1349,6 +1431,7 @@ restore_equ_constant:
 process_fix_constants:
 	mov	[value_type],11b
 	jmp	process_symbolic_constants
+
 process_equ_constants:
 	mov	[value_type],10b
       process_symbolic_constants:
@@ -1362,12 +1445,14 @@ process_equ_constants:
 	je	check_brace
 	or	al,al
 	jnz	process_symbolic_constants
-	ret
-      ignore_string:
-	lods	dword [esi]
+    ret
+
+ignore_string:
+    lods	dword [esi]
 	add	esi,eax
 	jmp	process_symbolic_constants
-      check_brace:
+
+check_brace:
 	test	[value_type],80h
 	jz	process_symbolic_constants
 	ret

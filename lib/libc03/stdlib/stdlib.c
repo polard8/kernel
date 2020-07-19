@@ -1368,6 +1368,8 @@ char *getenv (const char *name)
     int offset;
     char *result;
 
+    debug_print ("getenv:\n");
+
 	//_DIAGASSERT(name != NULL);
 
     //printf ("getenv2: %s \n", (const char *) name);
@@ -1383,6 +1385,8 @@ char *getenv (const char *name)
     result = __findenv (name, &offset);
 	//rwlock_unlock(&__environ_lock);
 
+
+    debug_print ("getenv: done\n");
     return (char *) result;
 }
 

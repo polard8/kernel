@@ -17,16 +17,18 @@ extrn exit
 
 extrn 'write' as libc_write
 
+
 init_memory:
-	mov	eax,esp
-	and	eax,not 0FFFh
+    mov eax,esp
+    and eax,not 0FFFh
 	add	eax,1000h-10000h
 	mov	[stack_limit],eax
 	mov	ecx,[memory_setting]
 	shl	ecx,10
 	jnz	allocate_memory
 	mov	ecx,1000000h
-      allocate_memory:
+
+allocate_memory:
 	mov	[memory_setting],ecx
 	ccall	malloc,ecx
 	or	eax,eax
@@ -47,28 +49,44 @@ exit_program:
 	ccall	free,[additional_memory]
 	pop	eax
 	ccall	exit,eax
-	mov	esp,[stack_frame]
-	pop	ebp
-	ret
+    mov	esp,[stack_frame]
+    pop	ebp
+    ret
+
+;;
+;; Get environment variable.
+;;
+
+;;#bugbug
+;;maybe something is wrong here
 
 get_environment_variable:
-	ccall	getenv,esi
-	mov	esi,eax
-	or	eax,eax
-	jz	no_environment_variable
-      copy_variable_value:
+
+    ccall getenv, esi
+
+    mov esi, eax
+    or eax, eax
+    jz no_environment_variable
+
+copy_variable_value:
 	lodsb
 	cmp	edi,[memory_end]
 	jae	out_of_memory
 	stosb
 	or	al,al
 	jnz	copy_variable_value
-	dec	edi
-	ret
-      no_environment_variable:
-	stosb
-	dec	edi
-	ret
+    dec	edi
+    ret
+
+no_environment_variable:
+    stosb
+    dec edi
+    ret
+
+
+;;
+;; open()
+;;
 
 open:
 	push	esi edi ebp
@@ -80,7 +98,8 @@ open:
 	mov	ebx,eax
 	clc
 	ret
-    adapt_path:
+
+adapt_path:
 	mov	esi,edx
 	mov	edi,buffer
       copy_path:

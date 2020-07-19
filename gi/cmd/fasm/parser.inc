@@ -1,11 +1,17 @@
-
 ; flat assembler core
 ; Copyright (c) 1999-2020, Tomasz Grysztar.
 ; All rights reserved.
 
+
+;;
+;; parser
+;;
+
+
 parser:
-	mov	eax,[memory_end]
-	mov	[labels_list],eax
+
+    mov	eax,[memory_end]
+    mov	[labels_list],eax
 	mov	eax,[additional_memory]
 	mov	[free_additional_memory],eax
 	xor	eax,eax
@@ -17,8 +23,14 @@ parser:
 	mov	[parsed_lines],eax
 	mov	esi,[memory_start]
 	mov	edi,[source_start]
-      parser_loop:
-	mov	[current_line],esi
+
+;;
+;; Loop!
+;;
+
+parser_loop:
+
+    mov [current_line],esi
 	lea	eax,[edi+100h]
 	cmp	eax,[labels_list]
 	jae	out_of_memory
@@ -32,9 +44,10 @@ parser:
 	stos	dword [edi]
 	inc	[parsed_lines]
 	add	esi,16
-      parse_line:
-	mov	[formatter_symbols_allowed],0
-	mov	[decorator_symbols_allowed],0
+
+parse_line:
+    mov	[formatter_symbols_allowed],0
+    mov	[decorator_symbols_allowed],0
 	cmp	byte [esi],1Ah
 	jne	empty_instruction
 	push	edi
@@ -44,27 +57,33 @@ parser:
 	je	simple_label
 	cmp	byte [esi+ecx],'='
 	je	constant_label
-	call	get_instruction
+    
+    call get_instruction
 	jnc	main_instruction_identified
 	cmp	byte [esi+ecx],1Ah
 	jne	no_data_label
 	push	esi ecx
 	lea	esi,[esi+ecx+2]
 	movzx	ecx,byte [esi-1]
-	call	get_data_directive
+	
+    call get_data_directive
 	jnc	data_label
 	pop	ecx esi
-      no_data_label:
-	call	get_data_directive
-	jnc	main_instruction_identified
-	pop	edi
+
+no_data_label:
+    
+    call get_data_directive
+    jnc main_instruction_identified
+    
+    pop	edi
 	sub	esi,2
 	xor	bx,bx
-	call	parse_line_contents
-	jmp	parse_next_line
-      simple_label:
+    call parse_line_contents
+    jmp parse_next_line
+
+simple_label:
 	pop	edi
-	call	identify_label
+    call	identify_label
 	cmp	byte [esi+1],':'
 	je	block_label
 	mov	byte [edi],2
@@ -73,16 +92,18 @@ parser:
 	inc	esi
 	xor	al,al
 	stos	byte [edi]
-	jmp	parse_line
-      block_label:
+    jmp parse_line
+
+block_label:
 	mov	byte [edi],4
 	inc	edi
 	stos	dword [edi]
 	add	esi,2
-	jmp	parse_line
-      constant_label:
+    jmp parse_line
+
+constant_label:
 	pop	edi
-	call	get_label_id
+    call	get_label_id
 	mov	byte [edi],3
 	inc	edi
 	stos	dword [edi]
@@ -90,9 +111,10 @@ parser:
 	stos	byte [edi]
 	inc	esi
 	xor	bx,bx
-	call	parse_line_contents
-	jmp	parse_next_line
-      data_label:
+    call parse_line_contents
+    jmp parse_next_line
+
+data_label:
 	pop	ecx edx
 	pop	edi
 	push	eax ebx esi
@@ -105,7 +127,8 @@ parser:
 	pop	esi ebx eax
 	stos	byte [edi]
 	push	edi
-      main_instruction_identified:
+
+main_instruction_identified:
 	pop	edi
 	mov	dl,al
 	mov	al,1
@@ -126,10 +149,12 @@ parser:
 	je	parse_else
 	cmp	bx,assert_directive-instruction_handler
 	je	parse_assert
-      common_parse:
+
+common_parse:
 	call	parse_line_contents
 	jmp	parse_next_line
-      empty_instruction:
+
+empty_instruction:
 	lods	byte [esi]
 	or	al,al
 	jz	parse_next_line
@@ -139,14 +164,16 @@ parser:
 	mov	[parenthesis_stack],0
 	call	parse_argument
 	jmp	parse_next_line
-      empty_line:
+
+empty_line:
 	add	esi,16
       skip_rest_of_line:
 	call	skip_foreign_line
       parse_next_line:
 	cmp	esi,[source_start]
 	jb	parser_loop
-      source_parsed:
+
+source_parsed:
 	cmp	[blocks_stack],0
 	je	blocks_stack_ok
 	pop	eax
@@ -158,8 +185,9 @@ parser:
 	add	edi,0Fh
 	and	edi,not 0Fh
 	mov	[code_start],edi
-	ret
-      parse_block:
+    ret
+
+parse_block:
 	mov	eax,esp
 	sub	eax,[stack_limit]
 	cmp	eax,100h
@@ -186,10 +214,11 @@ parser:
 	pop	edi
 	jnc	parse_end_block
 	sub	esi,2
-	jmp	common_parse
-      parse_end_block:
-	mov	dl,al
-	mov	al,1
+    jmp common_parse
+
+parse_end_block:
+    mov	dl,al
+    mov	al,1
 	stos	byte [edi]
 	mov	ax,bx
 	stos	word [edi]
@@ -219,8 +248,10 @@ parser:
 	test	al,10000b
 	jnz	parse_next_line
 	sub	edi,8
-	jmp	parse_next_line
-      parse_if:
+    jmp	parse_next_line
+
+;; IF
+parse_if:
 	push	edi
 	call	parse_line_contents
 	xor	al,al
@@ -234,8 +265,10 @@ parser:
 	cmp	al,'1'
 	je	parse_true_condition_block
 	or	byte [esp],10000b
-	jmp	parse_next_line
-      parse_while:
+    jmp	parse_next_line
+
+;; WHILE
+parse_while:
 	push	edi
 	call	parse_line_contents
 	xor	al,al
@@ -253,12 +286,15 @@ parser:
       parse_false_condition_block:
 	or	byte [esp],1
 	sub	edi,4
-	jmp	skip_parsing
-      parse_true_condition_block:
+    jmp skip_parsing
+
+parse_true_condition_block:
 	or	byte [esp],100b
 	sub	edi,4
-	jmp	parse_next_line
-      parse_else:
+    jmp parse_next_line
+
+;; ELSE
+parse_else:
 	cmp	[blocks_stack],0
 	je	unexpected_instruction
 	cmp	word [esp+2],if_directive-instruction_handler
@@ -285,8 +321,9 @@ parser:
 	stos	word [edi]
 	mov	al,dl
 	stos	byte [edi]
-	jmp	parse_if
-      parse_assert:
+    jmp	parse_if
+
+parse_assert:
 	push	edi
 	call	parse_line_contents
 	xor	al,al
@@ -325,7 +362,7 @@ parser:
 	cmp	byte [esi+ecx],':'
 	je	skip_parsing_label
 	push	edi
-	call	get_instruction
+    call get_instruction
 	pop	edi
 	jnc	skip_parsing_instruction
 	add	esi,ecx

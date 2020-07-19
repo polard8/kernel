@@ -30,8 +30,8 @@ CFLAGS = -m32 \
 	
 LIBC    = ../../../lib/libc03/include/
 LIBCOBJ = ../../../lib/libc03/obj
-API     = ../../../lib/api02/include/
-APIOBJ  = ../../../lib/api02/obj
+API     = ../../../lib/libcore/include/
+APIOBJ  = ../../../lib/libcore/obj
 
 
 	##
@@ -39,18 +39,9 @@ APIOBJ  = ../../../lib/api02/obj
 	##
 
 myObjects = crt0.o main.o fasm.o \
-ctype.o \
-stdio.o \
-stdlib.o \
-string.o \
-time.o \
-unistd.o \
-termios.o \
-ioctl.o \
-fcntl.o \
+ctype.o stdio.o stdlib.o string.o time.o \
+unistd.o termios.o ioctl.o fcntl.o \
 stubs.o   
-
-
 
 
 .PHONY: all all-c cat-link finalize clean

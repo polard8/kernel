@@ -36,63 +36,139 @@ section '.text' executable align 16
 ;; main() needs to give us the arguments.
 
 fasm_main:
-	
-	
-	; argc
-	mov	ecx,[esp+4]
-	mov	[argc],ecx
-	
-	;argv
-	mov	ebx,[esp+8]
-	mov	[argv],ebx
+
+    ; argc
+    mov ecx,[esp+4]
+    mov [argc],ecx
+
+    ; argv
+    mov ebx,[esp+8]
+    mov [argv],ebx
 
 
-	push	ebp
-	mov	[stack_frame],esp
+    push ebp
+    mov [stack_frame], esp
+    mov [con_handle], 1
 
-	mov	[con_handle],1
-	mov	esi,_logo
-	call	display_string
 
-	call	get_params
-	jc	information
+    ;;
+    ;; Logo
+    ;;
 
-	call	init_memory
+    mov esi, _logo
+    call display_string
 
-	mov	esi,_memory_prefix
-	call	display_string
+
+    ;;
+    ;; Step 1
+    ;;
+
+    mov esi, __step1
+    call display_string
+
+    call get_params
+    jc information
+
+
+    ;;
+    ;; Step 2
+    ;;
+
+    mov esi, __step2
+    call display_string
+    call init_memory
+
+    ;;
+    ;; Step 3
+    ;;
+
+    mov esi, __step3
+    call display_string
+
+    mov esi,_memory_prefix
+    call display_string
+
 	mov	eax,[memory_end]
 	sub	eax,[memory_start]
 	add	eax,[additional_memory_end]
 	sub	eax,[additional_memory]
 	shr	eax,10
 	call	display_number
-	mov	esi,_memory_suffix
-	call	display_string
 
-	ccall	gettimeofday,buffer,0
-	mov	eax,dword [buffer]
-	mov	ecx,1000
-	mul	ecx
-	mov	ebx,eax
-	mov	eax,dword [buffer+4]
-	div	ecx
-	add	eax,ebx
-	mov	[start_time],eax
+    mov esi,_memory_suffix
+    call display_string
 
-	and	[preprocessing_done],0
-	call	preprocessor
-	or	[preprocessing_done],-1
-	call	parser
-	call	assembler
-	call	formatter
 
-	call	display_user_messages
-	movzx	eax,[current_pass]
-	inc	eax
-	call	display_number
-	mov	esi,_passes_suffix
-	call	display_string
+    ;;
+    ;; Step 4
+    ;;
+
+    mov esi, __step4
+    call display_string
+
+    ; Time of the day.
+    ccall gettimeofday,buffer,0
+
+
+    ;;
+    ;; Step 5
+    ;;
+
+    ;; #bugbug
+    ;; Something is not working in this step!
+    ;; See: preproce.inc
+
+    mov esi, __step5
+    call display_string
+
+    mov eax, dword [buffer]
+    mov ecx, 1000
+    mul ecx
+    mov ebx, eax
+    mov eax, dword [buffer+4]
+    div ecx
+    add eax, ebx
+    mov [start_time], eax
+
+    and [preprocessing_done], 0
+    call preprocessor
+    or [preprocessing_done], -1
+
+    ;;
+    ;; Parser.
+    ;;
+
+    mov esi, __step6
+    call display_string
+    call parser
+
+    ;;
+    ;; Assembler.
+    ;;
+
+    mov esi, __step7
+    call display_string
+    call assembler
+    
+    ;;
+    ;; Formater.
+    ;;
+    
+    mov esi, __step8
+    call display_string
+    call formatter
+
+
+    call display_user_messages
+
+    movzx	eax,[current_pass]
+    inc eax
+    call display_number
+
+    mov	esi,_passes_suffix
+    call	display_string
+	
+	
 	ccall	gettimeofday,buffer,0
 	mov	eax,dword [buffer]
 	mov	ecx,1000
@@ -335,11 +411,24 @@ _usage db 0xA
        db ' -d <name>=<value>  define symbolic variable',0xA
        db ' -s <file>          dump symbolic information for debugging',0xA
        db 0
-_memory_prefix  db '  (',0
-_memory_suffix  db ' kilobytes memory)',0xA,0
-_passes_suffix    db ' passes, ',0
+       
+_memory_prefix   db '  (',0
+_memory_suffix   db ' kilobytes memory)',0xA,0
+_passes_suffix   db ' passes, ',0
 _seconds_suffix  db ' seconds, ',0
-_bytes_suffix     db ' bytes.',0xA,0
+_bytes_suffix    db ' bytes.',0xA,0
+
+
+__step1 db 0xA
+        db 'Step1 ', 0xA,0
+__step2 db 'Step2 ', 0xA,0
+__step3 db 'Step3 ', 0xA,0
+__step4 db 'Step4 ', 0xA,0
+__step5 db 'Step5 ', 0xA,0
+__step6 db 'Step6 ', 0xA,0
+__step7 db 'Step7 ', 0xA,0
+__step8 db 'Step8 ', 0xA,0
+
 
 
 include '..\errors.inc'
