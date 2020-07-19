@@ -1,7 +1,7 @@
 # License: BSD License
 VERSION = 1
 PATCHLEVEL = 0
-SUBLEVEL = 53
+SUBLEVEL = 54
 EXTRAVERSION = 
 NAME = Gramado 1.0
 
@@ -127,11 +127,11 @@ build-boot:
 
 	@echo "==================="
 	@echo "Compiling BM ... "
-	$(Q) $(MAKE) -C gramado/boot/x86/bm/ 
+	$(Q) $(MAKE) -C gf/gramado/boot/x86/bm/ 
 
 	@echo "==================="
 	@echo "Compiling BL ... "
-	$(Q) $(MAKE) -C gramado/boot/x86/bl/ 
+	$(Q) $(MAKE) -C gf/gramado/boot/x86/bl/ 
 	
 build-lib:
 
@@ -142,37 +142,37 @@ build-lib:
 build-init:
 	@echo "==================="
 	@echo "Compiling init process ... [TODO]"
-	$(Q) $(MAKE) -C init/
+	$(Q) $(MAKE) -C gi/init/
 
 build-gdeshell:
 	@echo "==================="
 	@echo " Compiling the gdeshell"
-	$(Q) $(MAKE) -C setup/gdeshell/   
+	$(Q) $(MAKE) -C gi/setup/gdeshell/   
 
 build-setup:
 	@echo "==================="
 	@echo " Compiling the gdeshell"
-	$(Q) $(MAKE) -C setup/   
+	$(Q) $(MAKE) -C gi/setup/   
 
 build-gnssrv:
 	@echo "==================="
 	@echo " Compiling the gnssrv"
-	$(Q) $(MAKE) -C services/gnssrv   
+	$(Q) $(MAKE) -C gi/services/gnssrv   
 
 build-gwssrv:
 	@echo "==================="
 	@echo " Compiling the gwssrv"
-	$(Q) $(MAKE) -C services/gwssrv   
+	$(Q) $(MAKE) -C gi/services/gwssrv   
 
 build-apps:
 	@echo "==================="
 	@echo "Compiling apps ..."
-	$(Q) $(MAKE) -C shine/apps
+	$(Q) $(MAKE) -C gi/apps
 
 build-cmd:
 	@echo "==================="
 	@echo "Compiling cmd ..."
-	$(Q) $(MAKE) -C shine/cmd
+	$(Q) $(MAKE) -C gi/cmd
 	
 
 
@@ -182,7 +182,7 @@ KERNEL.BIN:
 	@echo "================================="
 	@echo "(Step 1) Creating the kernel image ..."
 
-	$(Q) $(MAKE) -C gramado/kernel   
+	$(Q) $(MAKE) -C gf/gramado/kernel   
 
 
 ## Step3 /mnt/gramadovhd    - Creating the directory to mount the VHD.
@@ -198,7 +198,7 @@ vhd-create:
 	@echo "================================="
 	@echo "(Step 4) Creating a VHD in Assembly language ..."
 
-	$(NASM) gramado/boot/x86/vhd/main.asm -I gramado/boot/x86/vhd/ -o GRAMADO.VHD   
+	$(NASM) gf/gramado/boot/x86/vhd/main.asm -I gf/gramado/boot/x86/vhd/ -o GRAMADO.VHD   
 	
 
 
@@ -220,57 +220,57 @@ vhd-copy-files:
 	# First of all
 	# bm, bl, kernel, init, gdeshell.
 
-	sudo cp gramado/boot/x86/bin/BM.BIN    /mnt/gramadovhd
-	sudo cp gramado/boot/x86/bin/BL.BIN    /mnt/gramadovhd
-	sudo cp gramado/kernel/KERNEL.BIN      /mnt/gramadovhd
+	sudo cp gf/gramado/boot/x86/bin/BM.BIN    /mnt/gramadovhd
+	sudo cp gf/gramado/boot/x86/bin/BL.BIN    /mnt/gramadovhd
+	sudo cp gf/gramado/kernel/KERNEL.BIN      /mnt/gramadovhd
 
 	# Base
-	sudo cp gramado/base/GRAMADO.TXT     /mnt/gramadovhd
-	sudo cp gramado/base/ini/GUI.INI     /mnt/gramadovhd
-	sudo cp gramado/base/ini/INIT.INI    /mnt/gramadovhd
-	sudo cp gramado/base/ini/USER.INI    /mnt/gramadovhd
-	sudo cp gramado/base/res/fonts/bin/NC2.FON        /mnt/gramadovhd
-	sudo cp gramado/base/res/fonts/bin/LIN8X8.FON     /mnt/gramadovhd
-	sudo cp gramado/base/res/fonts/bin/LIN8X16.FON    /mnt/gramadovhd
-	sudo cp gramado/base/res/cursors/CURSOR.BMP  /mnt/gramadovhd
-	sudo cp gramado/base/res/cursors/MOUSE.BMP   /mnt/gramadovhd
-	sudo cp gramado/base/res/icons/APP.BMP       /mnt/gramadovhd
-	sudo cp gramado/base/res/icons/BMP1.BMP      /mnt/gramadovhd
-	sudo cp gramado/base/res/icons/FILE.BMP      /mnt/gramadovhd
-	sudo cp gramado/base/res/icons/FOLDER.BMP    /mnt/gramadovhd
-	sudo cp gramado/base/res/icons/TERMINAL.BMP  /mnt/gramadovhd
+	sudo cp gf/gramado/base/GRAMADO.TXT     /mnt/gramadovhd
+	sudo cp gf/gramado/base/ini/GUI.INI     /mnt/gramadovhd
+	sudo cp gf/gramado/base/ini/INIT.INI    /mnt/gramadovhd
+	sudo cp gf/gramado/base/ini/USER.INI    /mnt/gramadovhd
+	sudo cp gf/gramado/base/res/fonts/bin/NC2.FON        /mnt/gramadovhd
+	sudo cp gf/gramado/base/res/fonts/bin/LIN8X8.FON     /mnt/gramadovhd
+	sudo cp gf/gramado/base/res/fonts/bin/LIN8X16.FON    /mnt/gramadovhd
+	sudo cp gf/gramado/base/res/cursors/CURSOR.BMP  /mnt/gramadovhd
+	sudo cp gf/gramado/base/res/cursors/MOUSE.BMP   /mnt/gramadovhd
+	sudo cp gf/gramado/base/res/icons/APP.BMP       /mnt/gramadovhd
+	sudo cp gf/gramado/base/res/icons/BMP1.BMP      /mnt/gramadovhd
+	sudo cp gf/gramado/base/res/icons/FILE.BMP      /mnt/gramadovhd
+	sudo cp gf/gramado/base/res/icons/FOLDER.BMP    /mnt/gramadovhd
+	sudo cp gf/gramado/base/res/icons/TERMINAL.BMP  /mnt/gramadovhd
 # ...
 
 	# Init
-	sudo cp init/INIT.BIN            /mnt/gramadovhd
+	sudo cp gi/init/INIT.BIN            /mnt/gramadovhd
 
 	# gdeshell
-	sudo cp setup/gdeshell/GDESHELL.BIN    /mnt/gramadovhd
+	sudo cp gi/setup/gdeshell/GDESHELL.BIN    /mnt/gramadovhd
 
 	# Setup
-	-sudo cp setup/bin/*.BIN               /mnt/gramadovhd 
+	-sudo cp gi/setup/bin/*.BIN               /mnt/gramadovhd 
 # ...
 
 	# optional
-	-sudo cp docs/*.TXT        /mnt/gramadovhd
-	-sudo cp gramado/base/dev/LOOP0      /mnt/gramadovhd
-	-sudo cp gramado/base/dev/NULL       /mnt/gramadovhd
-	-sudo cp gramado/base/dev/SDA        /mnt/gramadovhd
-	-sudo cp gramado/base/tests/*.CPP    /mnt/gramadovhd
-	-sudo cp gramado/base/tests/*.BAS    /mnt/gramadovhd
-	-sudo cp gramado/base/tests/*.ASM    /mnt/gramadovhd
-	-sudo cp gramado/base/res/wall/ANIMAL.BMP   /mnt/gramadovhd
+	-sudo cp docs/*.TXT    /mnt/gramadovhd
+	-sudo cp gf/gramado/base/dev/LOOP0      /mnt/gramadovhd
+	-sudo cp gf/gramado/base/dev/NULL       /mnt/gramadovhd
+	-sudo cp gf/gramado/base/dev/SDA        /mnt/gramadovhd
+	-sudo cp gf/gramado/base/tests/*.CPP    /mnt/gramadovhd
+	-sudo cp gf/gramado/base/tests/*.BAS    /mnt/gramadovhd
+	-sudo cp gf/gramado/base/tests/*.ASM    /mnt/gramadovhd
+	-sudo cp gf/gramado/base/res/wall/ANIMAL.BMP   /mnt/gramadovhd
 
 	# server and client.
-	-sudo cp services/gnssrv/bin/GNSSRV.BIN  /mnt/gramadovhd
-	-sudo cp services/gnssrv/bin/GNS.BIN     /mnt/gramadovhd
+	-sudo cp gi/services/gnssrv/bin/GNSSRV.BIN  /mnt/gramadovhd
+	-sudo cp gi/services/gnssrv/bin/GNS.BIN     /mnt/gramadovhd
 
 	# server and client.
-	-sudo cp services/gwssrv/bin/GWSSRV.BIN  /mnt/gramadovhd
-	-sudo cp services/gwssrv/bin/GWS.BIN     /mnt/gramadovhd
+	-sudo cp gi/services/gwssrv/bin/GWSSRV.BIN  /mnt/gramadovhd
+	-sudo cp gi/services/gwssrv/bin/GWS.BIN     /mnt/gramadovhd
 	
-	-sudo cp shine/apps/bin/*.BIN         /mnt/gramadovhd
-	-sudo cp shine/cmd/bin/*.BIN          /mnt/gramadovhd
+	-sudo cp gi/apps/bin/*.BIN         /mnt/gramadovhd
+	-sudo cp gi/cmd/bin/*.BIN          /mnt/gramadovhd
 # ...
 
 
@@ -296,12 +296,12 @@ vhd-copy-files:
 
 
 # ======== Files in the /BOOT/ folder. ========
-	sudo cp gramado/kernel/KERNEL.BIN    /mnt/gramadovhd/BOOT
-	sudo cp gramado/boot/x86/bin/BM.BIN  /mnt/gramadovhd/BOOT
-	sudo cp gramado/boot/x86/bin/BL.BIN  /mnt/gramadovhd/BOOT
+	sudo cp gf/gramado/kernel/KERNEL.BIN    /mnt/gramadovhd/BOOT
+	sudo cp gf/gramado/boot/x86/bin/BM.BIN  /mnt/gramadovhd/BOOT
+	sudo cp gf/gramado/boot/x86/bin/BL.BIN  /mnt/gramadovhd/BOOT
 	
-	-sudo cp gramado/base/res/wall/ANIMAL.BMP   /mnt/gramadovhd/BOOT
-	-sudo cp gramado/base/res/wall/ANIMAL.BMP   /mnt/gramadovhd/TMP/TMP2
+	-sudo cp gf/gramado/base/res/wall/ANIMAL.BMP   /mnt/gramadovhd/BOOT
+	-sudo cp gf/gramado/base/res/wall/ANIMAL.BMP   /mnt/gramadovhd/TMP/TMP2
 
 
 # ======== Files in the /TMP/ folder. ========
@@ -332,8 +332,8 @@ clean2:
 	-rm *.VHD
 	
 clean3:
-	-rm shine/apps/bin/*.BIN
-	-rm shine/cmd/bin/*.BIN
+	-rm gi/apps/bin/*.BIN
+	-rm gi/cmd/bin/*.BIN
 	
 PHONY := clean-system-files
 clean-system-files:
@@ -341,24 +341,24 @@ clean-system-files:
 	@echo "Cleaning all system binaries ..."
 
 	# Gramado
-	-rm -rf gramado/boot/x86/bin/*.BIN
-	-rm -rf gramado/kernel/KERNEL.BIN
+	-rm -rf gf/gramado/boot/x86/bin/*.BIN
+	-rm -rf gf/gramado/kernel/KERNEL.BIN
 
 	# Init
-	-rm -rf init/*.BIN
+	-rm -rf gi/init/*.BIN
 
 	# Setup
-	-rm -rf setup/gdeshell/*.BIN
-	-rm -rf setup/bin/*.BIN
+	-rm -rf gi/setup/gdeshell/*.BIN
+	-rm -rf gi/setup/bin/*.BIN
 	
 	# Services
-	-rm -rf services/gnssrv/bin/*.BIN
-	-rm -rf services/gwssrv/bin/*.BIN
+	-rm -rf gi/services/gnssrv/bin/*.BIN
+	-rm -rf gi/services/gwssrv/bin/*.BIN
 	# ...
 
-	# Shine
-	-rm -rf shine/apps/bin/*.BIN
-	-rm -rf shine/cmd/bin/*.BIN
+	# apps and cmd
+	-rm -rf gi/apps/bin/*.BIN
+	-rm -rf gi/cmd/bin/*.BIN
 # ...
 
 clean-all: clean clean2 clean3 clean-system-files  

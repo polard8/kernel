@@ -100,7 +100,9 @@ gws_createwindow_request (
     unsigned long top,
     unsigned long width,
     unsigned long height,
-    unsigned long bg_color );
+    unsigned long bg_color,
+    unsigned long type );
+
 int 
 gws_createwindow_request (
     int fd,
@@ -108,7 +110,8 @@ gws_createwindow_request (
     unsigned long top,
     unsigned long width,
     unsigned long height,
-    unsigned long bg_color )
+    unsigned long bg_color,
+    unsigned long type )
 {
     // Isso permite ler a mensagem na forma de longs.
     unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];   
@@ -116,8 +119,8 @@ gws_createwindow_request (
     int n_writes = 0;   // For sending requests.
 
 
-
-    char *name = "Window name 1";
+    //#todo: precisamos criar um buffer aqui e copiarmos em algum lugar...
+    char *name = "Window";
 
    
 
@@ -127,7 +130,7 @@ gws_createwindow_request (
 
 
     // #debug
-    gws_debug_print ("gwst: Writing ...\n");      
+    gws_debug_print ("libgws: Writing ...\n");      
 
     // Enviamos um request para o servidor.
     // ?? Precisamos mesmo de um loop para isso. ??
@@ -148,6 +151,7 @@ gws_createwindow_request (
         
         message_buffer[8] = bg_color; //xCOLOR_GRAY2; 
 
+        message_buffer[9] = type; //WT_SIMPLE;  //todo: type
          
         //...
 
@@ -331,7 +335,8 @@ gws_create_window_using_socket (
     //#todo
     // use more arguments.
     gws_createwindow_request(fd, 
-        x, y, width, height, color);
+        x, y, width, height, color, type);
+        
     gws_createwindow_response(fd); 
     
     return NULL;
