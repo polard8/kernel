@@ -100,15 +100,15 @@ all-c:
 	
 	
 hello-link:
-	ld -m elf_i386 -T ../link.ld -o GNST.BIN $(myObjects)    
+	ld -m elf_i386 -T ../link.ld -o GNS.BIN $(myObjects)    
 
 
 
 finalize:
-	cp GNST.BIN  ../bin
+	cp GNS.BIN  ../bin
 
 clean:
 	-rm *.o
-	-rm GNST.BIN 
-	
+	-rm GNS.BIN 
+
 	

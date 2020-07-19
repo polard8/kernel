@@ -88,15 +88,15 @@ all-c:
 	
 	
 hello-link:
-	ld -m elf_i386 -T ../link.ld -o GWST.BIN $(myObjects)    
+	ld -m elf_i386 -T ../link.ld -o GWS.BIN $(myObjects)    
 
 
 
 finalize:
-	cp GWST.BIN  ../bin
+	cp GWS.BIN  ../bin
 
 clean:
 	-rm *.o
-	-rm GWST.BIN 
+	-rm GWS.BIN 
 	
 	

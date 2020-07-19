@@ -528,7 +528,7 @@ int main (int argc, char **argv){
 
     printf ("gns: Calling child \n");
 
-    gde_clone_and_execute ("gnst.bin"); 
+    gde_clone_and_execute ("gns.bin"); 
     //gde_clone_and_execute ("??.bin");  
     //gde_clone_and_execute ("??.bin");  
     // ...

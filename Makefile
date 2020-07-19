@@ -261,10 +261,13 @@ vhd-copy-files:
 	-sudo cp gramado/base/tests/*.ASM    /mnt/gramadovhd
 	-sudo cp gramado/base/res/wall/ANIMAL.BMP   /mnt/gramadovhd
 
+	# server and client.
 	-sudo cp services/gnssrv/bin/GNSSRV.BIN  /mnt/gramadovhd
-	-sudo cp services/gnssrv/bin/GNST.BIN    /mnt/gramadovhd
+	-sudo cp services/gnssrv/bin/GNS.BIN     /mnt/gramadovhd
+
+	# server and client.
 	-sudo cp services/gwssrv/bin/GWSSRV.BIN  /mnt/gramadovhd
-	-sudo cp services/gwssrv/bin/GWST.BIN    /mnt/gramadovhd
+	-sudo cp services/gwssrv/bin/GWS.BIN     /mnt/gramadovhd
 	
 	-sudo cp shine/apps/bin/*.BIN         /mnt/gramadovhd
 	-sudo cp shine/cmd/bin/*.BIN          /mnt/gramadovhd
