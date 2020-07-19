@@ -130,7 +130,7 @@ void gns_send_error_response (int fd, int code, char *error_message)
 {
     // 500: internal server error!!
     //#todo
-    gde_debug_print ("gns: [TODO] gns_send_error_response\n");
+    gde_debug_print ("gnssrv: [TODO] gns_send_error_response\n");
 }
 
 
@@ -150,7 +150,7 @@ void __socket_messages (int fd){
 
 
     if (fd<0){
-        gde_debug_print ("__socket_messages: fd\n");
+        gde_debug_print ("gnssrv: __socket_messages fd\n");
         return;
     }
 
@@ -183,8 +183,8 @@ void __socket_messages (int fd){
     }
 
 
-    debug_print ("gns: Got a request!\n");
-    debug_print ("gns: Calling window procedure \n");
+    debug_print ("gnssrv: Got a request!\n");
+    debug_print ("gnssrv: Calling window procedure \n");
                 
     //#debug: para a máquina real.
     //printf ("gws: got a message!\n");
@@ -221,7 +221,7 @@ __again:
     // Talvez aqui possamos usar alguma função chamada post_message().
 
     // #debug: para a máquina real.
-    gde_debug_print ("gns: Sending response ...\n");
+    gde_debug_print ("gnssrv: Sending response ...\n");
    
                 
     // Primeiros longs do buffer.
@@ -258,7 +258,7 @@ __again:
         next_response[c] = 0;
 
 
-    gde_debug_print ("gns: Response sent\n");  
+    gde_debug_print ("gnssrv: Response sent\n");  
 }
 
 
@@ -283,7 +283,6 @@ void __ipc_message (void){
         gramado_system_call (265,0,0,0);
         return;
     }
-
 
     // Send message to the window procedure.
     gnsProcedure ( (void *) message_buffer[0], 
@@ -317,7 +316,7 @@ gnsProcedure (
     int my_pid = -1;
 
 
-    debug_print ("gwsProcedure:\n");
+    debug_print ("gnssrv: gnsProcedure\n");
   
     switch (msg)
     {
@@ -325,7 +324,7 @@ gnsProcedure (
         // então devemos drenar input usado loop de mensagens e
         // repassar para o cliente via socket.
         case 8080:
-            gde_debug_print ("gns: [TODO] 8080. drain messages ...\n");
+            gde_debug_print ("gnssrv: [TODO] 8080. drain messages ...\n");
             break;
 
         case MSG_SYSKEYUP:
@@ -347,7 +346,7 @@ gnsProcedure (
                 // Enviar a mensagem para o processo associado
                 // com a janela que tem o foco de entrada.
                 default:
-                    gde_debug_print ("gns: MSG_SYSKEYUP\n");
+                    gde_debug_print ("gnssrv: MSG_SYSKEYUP\n");
                     break;
             }    
             break;
@@ -361,12 +360,12 @@ gnsProcedure (
             //printf ("%c", (char) long1); 
             //gws_show_backbuffer ();
             
-            gde_debug_print ("gns: MSG_KEYDOWN\n");
+            gde_debug_print ("gnssrv: MSG_KEYDOWN\n");
             break;
 
         case 1000:
             printf ("\n");
-            printf ("gns: Hello from Gramado Network Server!\n");
+            printf ("gnssrv: Hello from Gramado Network Server!\n");
             printf ("\n"); 
             break;
 
@@ -400,7 +399,7 @@ gnsProcedure (
         // showdown.
         // Um cliente quer se desconectar.
         case 2010:
-            gde_debug_print ("gns: [2010] Disconnect\n");
+            gde_debug_print ("gnssrv: [2010] Disconnect\n");
             break;
 
 
@@ -465,8 +464,8 @@ int main (int argc, char **argv){
 
     // Serial debug.
     gde_debug_print ("--------------------------\n");
-    gde_debug_print ("gns: Initializing...\n");
-    printf ("gns: Initializing...\n");
+    gde_debug_print ("gnssrv: Initializing...\n");
+    printf ("gnssrv: Initializing...\n");
 
 
     //
@@ -478,11 +477,11 @@ int main (int argc, char **argv){
     _status = (int) register_ns();
 
     if (_status<0){
-        gde_debug_print ("gns: Couldn't register the server \n");
-        printf ("gns: Couldn't register the server \n");
+        gde_debug_print ("gnssrv: Couldn't register the server \n");
+        printf ("gnssrv: Couldn't register the server \n");
         exit(1);
     }
-    gde_debug_print ("gns: Registration ok \n");
+    gde_debug_print ("gnssrv: Registration ok \n");
 
 
     //
@@ -490,12 +489,12 @@ int main (int argc, char **argv){
     //
     
     // #debug
-    printf ("gns: Creating socket\n");
+    printf ("gnssrv: Creating socket\n");
 
     server_fd = (int) socket (AF_GRAMADO, SOCK_STREAM, 0);
     
     if (server_fd<0){
-        printf("gns: Couldn't create the server socket\n");
+        printf("gnssrv: Couldn't create the server socket\n");
         exit(1);
     }
     ____saved_server_fd = server_fd;
@@ -507,12 +506,12 @@ int main (int argc, char **argv){
     // 
  
     // #debug
-    printf ("gns: bind\n");
+    printf ("gnssrv: bind\n");
  
     bind_status = bind ( server_fd, (struct sockaddr *) &addr, sizeof(addr) );
 
     if (bind_status<0){
-        printf("gns: Couldn't bind to the socket\n");
+        printf("gnssrv: Couldn't bind to the socket\n");
         exit(1);
     }
 
@@ -526,7 +525,7 @@ int main (int argc, char **argv){
     // Calling child.
     //
 
-    printf ("gns: Calling child \n");
+    printf ("gnssrv: Calling child \n");
 
     gde_clone_and_execute ("gns.bin"); 
     //gde_clone_and_execute ("??.bin");  
@@ -538,7 +537,7 @@ int main (int argc, char **argv){
     // Wait
     //
 
-    printf ("gns: [FIXME] yield \n");
+    printf ("gnssrv: [FIXME] yield \n");
 
     for (i=0; i<11; i++)
         gns_yield ();
@@ -549,7 +548,7 @@ int main (int argc, char **argv){
     //
 
 // loop:
-    gde_debug_print ("gns: Entering main loop.\n");
+    gde_debug_print ("gnssrv: Entering main loop.\n");
 
 
     // Messages sended via sockets.
@@ -573,7 +572,7 @@ int main (int argc, char **argv){
                       (socklen_t *) addr_len );
 
         if (newconn < 0) {
-            gde_debug_print ("gns: ERROR on accept\n");
+            gde_debug_print ("gnssrv: ERROR on accept\n");
 
         // Request from the new connection 
         }else{
@@ -590,15 +589,15 @@ int main (int argc, char **argv){
 
     // Done.
     
-    gde_debug_print ("gns: exited. \n");
-    printf ("gns: exited. \n");
+    gde_debug_print ("gnssrv: exited. \n");
+    printf ("gnssrv: exited. \n");
     
     return 0; 
 }
 
 
-void gns_yield(void){
-	
+void gns_yield(void)
+{
     gramado_system_call (265,0,0,0); //yield thread.
 }
 

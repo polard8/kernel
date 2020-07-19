@@ -205,7 +205,7 @@ void handle_request (int fd){
     // para assim obtermos um novo da próxima vez.
 
     if (fd<0){
-        gde_debug_print ("handle_request: fd\n");
+        gde_debug_print ("gwssrv: handle_request fd\n");
         return;
     }
 
@@ -248,7 +248,7 @@ void handle_request (int fd){
     // Input solicitado.
     if (message_buffer[1] == 369)
     {
-        debug_print ("gws: [TEST] INPUT request !!! \n");
+        debug_print ("gwssrv: [TEST] INPUT request !!! \n");
 
         // Pegar o input!
 
@@ -266,8 +266,8 @@ void handle_request (int fd){
     }
 
 
-    debug_print ("gws: Got a request!\n");
-    debug_print ("gws: Calling window procedure \n");
+    debug_print ("gwssrv: Got a request!\n");
+    debug_print ("gwssrv: Calling window procedure \n");
     
     
     // #todo.
@@ -322,7 +322,7 @@ __again:
 
     // #debug:
 
-    gde_debug_print ("gws: Sending response ...\n");
+    gde_debug_print ("gwssrv: Sending response ...\n");
     
                 
     // Primeiros longs do buffer.
@@ -333,7 +333,7 @@ __again:
 
     //# it works.
     char *m = (char *) (&__buffer[0] + 16);
-    sprintf( m, "This is a response from GWS!\n");
+    sprintf( m, "gwssrv: This is a response from GWS!\n");
 
 
     //
@@ -360,7 +360,7 @@ __again:
     for(c=0; c<32; c++)
         next_response[c] = 0;
 
-    gde_debug_print ("gws: Response sent\n");  
+    gde_debug_print ("gwssrv: Response sent\n");  
 }
 
 
@@ -424,7 +424,7 @@ gwsProcedure (
     int my_pid = -1;
 
     // #debug
-    debug_print ("gwsProcedure:\n");
+    debug_print ("gwssrv: gwsProcedure\n");
   
     switch (msg)
     {
@@ -433,7 +433,7 @@ gwsProcedure (
         // ws recebe via mensagens tradicionais e passemos
         // pra ele via socket.
         case 8080:
-            gde_debug_print("gwsProcedure: 8080\n");
+            gde_debug_print("gwssrv: gwsProcedure 8080\n");
             service_drain_input();
             break;
 
@@ -442,7 +442,7 @@ gwsProcedure (
             {
                 // #debug
                 case VK_F1:
-                    gde_debug_print("gwsProcedure: VK_F1 Connection ON\n");
+                    gde_debug_print("gwssrv: gwsProcedure VK_F1 Connection ON\n");
                     connection_status = 1;
                     //gde_reboot ();
                     break;
@@ -451,21 +451,21 @@ gwsProcedure (
                 // mostrar informações sobre o socket 
                 // do gws.    
                 case VK_F2:
-                    gde_debug_print("gwsProcedure: VK_F2 Connection OFF\n");
+                    gde_debug_print("gwssrv: gwsProcedure VK_F2 Connection OFF\n");
                     connection_status = 0;
                     //my_pid = (int) getpid();
                     //gramado_system_call (7008,my_pid,0,0);
                     break;
 
                 case VK_F3:
-                    gde_debug_print ("F3\n");
+                    gde_debug_print ("gwssrv: F3\n");
                     bmpDisplayBMP (0,0,0); //#todo: test.
                     break;
 
                 // #test
                 // Die.
                 case VK_F4:
-                    gde_debug_print ("F4 [EXIT] Exiting the server ...\n");
+                    gde_debug_print ("gwssrv: F4 [EXIT] Exiting the server ...\n");
                     running = 0;
                     break;
 
@@ -474,7 +474,7 @@ gwsProcedure (
                 // Enviar a mensagem para o processo associado
                 // com a janela que tem o foco de entrada.
                 default:
-                    gde_debug_print ("gws: MSG_SYSKEYUP\n");
+                    gde_debug_print ("gwssrv: MSG_SYSKEYUP\n");
                     break;
             }    
             break;
@@ -488,19 +488,19 @@ gwsProcedure (
             //printf ("%c", (char) long1); 
             //gws_show_backbuffer ();
             
-            gde_debug_print ("gws: MSG_KEYDOWN\n");
+            gde_debug_print ("gwssrv: MSG_KEYDOWN\n");
             break;
 
         // Hello!
         case 1000:
-            gde_debug_print ("gws: Message number 1000\n");
+            gde_debug_print ("gwssrv: Message number 1000\n");
             
             // Draw text inside a window.
             // #bugbug: O window server não tem esse ponteiro de janela.
             // ele até aceitaria um handle.
             dtextDrawText ( (struct gws_window_d *) __mywindow,
                 long1, long2, COLOR_GREEN,
-                "Hello friend. This is the Window Server!" );
+                "gwssrv: Hello friend. This is the Window Server!" );
                 
             gws_show_backbuffer ();
             break;
@@ -525,7 +525,7 @@ gwsProcedure (
     
         //Draw char
         case 1004:
-            gde_debug_print ("gws: Message number 1004\n");
+            gde_debug_print ("gwssrv: Message number 1004\n");
             serviceDrawChar();
                        
             //dtextDrawText ( (struct gws_window_d *) __mywindow,
@@ -536,7 +536,7 @@ gwsProcedure (
         // Draw text
         case 1005:
            //#todo: tem que testar isso!!!
-           gde_debug_print ("gws: Message number 1005\n");
+           gde_debug_print ("gwssrv: Message number 1005\n");
            serviceDrawText();
            break;
     
@@ -566,7 +566,7 @@ gwsProcedure (
         // showdown.
         // Um cliente quer se desconectar.
         case 2010:
-            gde_debug_print ("gws: [2010] Disconnect\n");
+            gde_debug_print ("gwssrv: [2010] Disconnect\n");
             break;
             
         // Refresh screen 
@@ -584,7 +584,7 @@ gwsProcedure (
              
         
         default:
-            gde_debug_print ("gws: Default message number\n");
+            gde_debug_print ("gwssrv: Default message number\n");
             //printf ("msg=%d ",msg);
             break;
     }
@@ -604,24 +604,22 @@ void create_background (void)
     unsigned long w = gws_get_device_width();
     unsigned long h = gws_get_device_height();
 
-    gde_debug_print ("gws: create_background\n");
+    gde_debug_print ("gwssrv: create_background\n");
 
 
     __bg_window = (struct gws_window_d *) createwCreateWindow ( WT_SIMPLE, 
-                                         1, 1, "gws-bg",  
+                                         1, 1, "gwssrv-bg",  
                                          0, 0, w, h,   
                                          gui->screen, 0, 
                                          COLOR_BACKGROUND, COLOR_BACKGROUND );    
 
 
-    if ( (void *) __bg_window == NULL )
-    {
-        gde_debug_print ("gws: __bg_window fail\n");  
+    if ( (void *) __bg_window == NULL ){
+        gde_debug_print ("gwssrv: __bg_window fail\n");  
         return;
     }
     
     //#todo: register
-    
 }
 
 
@@ -634,16 +632,16 @@ void create_taskbar (void)
     // Bar
     //
 
-    gde_debug_print ("gws: create_taskbar:\n");
+    gde_debug_print ("gwssrv: create_taskbar:\n");
 
     __taskbar_window = (struct gws_window_d *) createwCreateWindow ( WT_SIMPLE, 
-                                               1, 1, "gws-taskbar",  
+                                               1, 1, "gwssrv-taskbar",  
                                                0, 0, w, 40,   
                                                gui->screen, 0, 
                                                xCOLOR_GRAY1, xCOLOR_GRAY1 );
     
     if ( (void *) __taskbar_window == NULL ){
-        gde_debug_print ("gws: __taskbar_window fail\n");  
+        gde_debug_print ("gwssrv: __taskbar_window fail\n");  
     }
     //#todo: register
 
@@ -654,7 +652,7 @@ void create_taskbar (void)
     // #test
     // Create button.
 
-    gde_debug_print ("gws: Create the button on task bar\n");
+    gde_debug_print ("gwssrv: Create the button on task bar\n");
 
     __taskbar_button = (struct gws_window_d *) createwCreateWindow ( WT_BUTTON, 
                                                1, 1, "button",  
@@ -663,7 +661,7 @@ void create_taskbar (void)
                                                xCOLOR_GRAY1, GWS_COLOR_BUTTONFACE3 );
     
     if ( (void *) __taskbar_button == NULL ){
-        gde_debug_print ("gws: task bar button fail\n");  
+        gde_debug_print ("gwssrv: task bar button fail\n");  
     }
     //#todo: register
 
@@ -711,10 +709,10 @@ void xxx_test_load_bmp(void)
     char file_name[] = "terminal.bmp";
     bmp_buffer = (char *) malloc(1024*128);
     if ( (void *) bmp_buffer == NULL )
-        printf ("xxx_test_load_bmp: bmp_buffer fail\n");
+        printf ("gwssrv: xxx_test_load_bmp bmp_buffer fail\n");
     
     // ?? Onde fica o heap usado por esse malloc ??
-    printf ("xxx_test_load_bmp: bmp_buffer = %x\n", bmp_buffer);
+    printf ("gwssrv: xxx_test_load_bmp bmp_buffer = %x\n", bmp_buffer);
   
     //stdio_fntos ( (char *) file_name ); //não precisa
     
@@ -736,13 +734,13 @@ void xxx_test_load_bmp(void)
         (unsigned long) bmp_buffer );  
 
     if(r<0)
-        printf("r fail\n");
+        printf("gwssrv: r fail\n");
 
     //#test
     if ( bmp_buffer[0] != 'B' || bmp_buffer[1] != 'M' )
     {
         printf (">>>> %c %c\n",&bmp_buffer[0],&bmp_buffer[1]);
-        gde_debug_print ("xxx_test_load_bmp: SIG FAIL \n");
+        gde_debug_print ("gwssrv: xxx_test_load_bmp SIG FAIL \n");
         //return;
         
         //#debug
@@ -785,20 +783,20 @@ void InitGraphics(void)
 {
     int __init_status = -1;
     
-    debug_print("InitGraphics:\n");
+    debug_print("gwssrv: InitGraphics\n");
     
     __init_status = gwsInit();
 
     if(__init_status != 0)
     {
-        debug_print("InitGraphics: [PANIC] Couldn't initialize the graphics\n");
-        printf("InitGraphics: [PANIC] Couldn't initialize the graphics\n");
+        debug_print("gwssrv: InitGraphics [PANIC] Couldn't initialize the graphics\n");
+        printf("gwssrv: InitGraphics [PANIC] Couldn't initialize the graphics\n");
         while(1);
     }
 
     if( (void*) gui->screen != NULL){
         dtextDrawText ( (struct gws_window_d *) gui->screen,
-            200, 80, COLOR_RED, "gws: Initializing graphics" );
+            200, 80, COLOR_RED, "gwssrv: Initializing graphics" );
     }
     
     create_background();
@@ -815,13 +813,11 @@ void InitGraphics(void)
     
     gws_show_backbuffer();            
     
-    debug_print("InitGraphics: done\n");
+    debug_print("gwssrv: InitGraphics done\n");
 
     //#debug
         //while(1){};
-  
 }
-
 
 
 /*
@@ -878,8 +874,8 @@ int main (int argc, char **argv){
         // #debug
         // Initializing or reinitializing
         gde_debug_print ("---------------------\n");
-        gde_debug_print ("gws: Initializing...\n");
-        printf ("gws: Initializing... \n");
+        gde_debug_print ("gwssrv: Initializing...\n");
+        printf ("gwssrv: Initializing... \n");
 
 
         // Register.
@@ -895,11 +891,11 @@ int main (int argc, char **argv){
         _status = (int) register_ws();
 
         if (_status<0){
-            gde_debug_print ("gws: Couldn't register the server \n");
-            printf ("gws: Couldn't register the server \n");
+            gde_debug_print ("gwssrv: Couldn't register the server \n");
+            printf ("gwssrv: Couldn't register the server \n");
             exit(1);
         }
-        gde_debug_print ("gws: Registration ok \n");
+        gde_debug_print ("gwssrv: Registration ok \n");
 
 
         // #todo
@@ -920,12 +916,12 @@ int main (int argc, char **argv){
         //
 
         // #debug
-        printf ("gws: Creating socket\n");
+        printf ("gwssrv: Creating socket\n");
 
         server_fd = (int) socket(AF_GRAMADO, SOCK_STREAM, 0);
 
         if (server_fd<0){
-            printf("gws: Couldn't create the server socket\n");
+            printf("gwssrv: Couldn't create the server socket\n");
             exit(1);
         }
         ____saved_server_fd = server_fd;
@@ -937,12 +933,12 @@ int main (int argc, char **argv){
         // 
     
         // #debug
-        printf ("gws: bind\n");
+        printf ("gwssrv: bind\n");
  
         bind_status = bind ( server_fd, (struct sockaddr *) &addr, sizeof(addr) );
 
         if (bind_status<0){
-            printf("gws: Couldn't bind to the socket\n");
+            printf("gwssrv: Couldn't bind to the socket\n");
             exit(1);
         }
 
@@ -967,9 +963,9 @@ int main (int argc, char **argv){
         // Calling child.
         //
 
-        printf ("gws: Calling child \n");  
+        printf ("gwssrv: Calling child \n");  
 
-        //gde_clone_and_execute ("gwst.bin");  
+        //gde_clone_and_execute ("gws.bin");  
         gde_clone_and_execute ("terminal.bin"); 
         //gde_clone_and_execute ("browser.bin"); 
         // ...        
@@ -978,7 +974,7 @@ int main (int argc, char **argv){
         // Wait
         //
 
-        printf ("gws: [FIXME] yield \n");
+        printf ("gwssrv: [FIXME] yield \n");
        
         for (i=0; i<11; i++)
             gws_yield ();
@@ -1009,7 +1005,7 @@ int main (int argc, char **argv){
         // para assim obtermos um novo da próxima vez.
     
     // loop:
-        gde_debug_print ("gws: Entering main loop.\n");
+        gde_debug_print ("gwssrv: Entering main loop.\n");
 
         //#todo:
         // No loop precisamos de accept() read() e write();
@@ -1041,7 +1037,7 @@ int main (int argc, char **argv){
                           (socklen_t *) addr_len );
                           
             if (newconn < 0) {
-                gde_debug_print ("gws: ERROR on accept\n");
+                gde_debug_print ("gwssrv: ERROR on accept\n");
  
             // Request from the new connection
             }else{
@@ -1083,8 +1079,8 @@ int main (int argc, char **argv){
 
     // Done.
     
-    gde_debug_print ("gws: exited. \n");
-    printf ("gws: exited. \n");
+    gde_debug_print ("gwssrv: exited. \n");
+    printf ("gwssrv: exited. \n");
     
     // #todo
     // The kernel needs to react when the window server closes.
@@ -1105,7 +1101,7 @@ int main (int argc, char **argv){
 
 int service_drain_input (void)
 {
-    gde_debug_print ("gws: service_drain_input [TODO]\n");
+    gde_debug_print ("gwssrv: service_drain_input [TODO]\n");
     //handle_ipc_message();
     return -1;
 }
@@ -1127,7 +1123,7 @@ int serviceCreateWindow (void){
     unsigned long x, y, w, h, color;
 
     
-    gde_debug_print("gws: serviceCreateWindow:\n");
+    gde_debug_print("gwssrv: serviceCreateWindow:\n");
     //printf ("serviceCreateWindow:\n");
 
     x=message_address[4];  //x
@@ -1147,7 +1143,7 @@ int serviceCreateWindow (void){
                                               COLOR_PINK, color ); 
 
     if ( (void *) __mywindow == NULL ){
-       gde_debug_print ("createwCreateWindow: fail\n");
+       gde_debug_print ("gwssrv: createwCreateWindow fail\n");
        //return -1;
     }
 
@@ -1156,7 +1152,7 @@ int serviceCreateWindow (void){
     id = gwsRegisterWindow ( __mywindow );
 
     if (id<0){
-        gde_debug_print ("serviceCreateWindow: Couldn't register window\n");
+        gde_debug_print ("gwssrv: serviceCreateWindow Couldn't register window\n");
         //return -1;
     }
 
@@ -1226,8 +1222,7 @@ int servicelineBackbufferDrawHorizontalLine (void)
    
    lineBackbufferDrawHorizontalLine ( x1, y, x2, color );
 
-
-   gws_show_backbuffer (); // for debug   
+   gws_show_backbuffer(); // for debug   
    return 0;
 }
 
@@ -1251,7 +1246,7 @@ int serviceDrawChar(void)
 
 
     // #debug
-    gde_debug_print ("serviceDrawChar:\n");
+    gde_debug_print ("gwssrv: serviceDrawChar\n");
 
 
     // Get
@@ -1277,7 +1272,7 @@ int serviceDrawChar(void)
    
     // Limits
     if ( window_id < 0 || window_id >= WINDOW_COUNT_MAX ){
-        gde_debug_print ("serviceDrawChar: window_id\n");
+        gde_debug_print ("gwssrv: serviceDrawChar window_id\n");
         return -1;
     }
 
@@ -1286,12 +1281,12 @@ int serviceDrawChar(void)
     window = (struct gws_window_d *) windowList[window_id];
    
     if ( (void *) window == NULL ){
-        gde_debug_print ("serviceDrawChar: window\n");
+        gde_debug_print ("gwssrv: serviceDrawChar window\n");
         return -1;
     }
     
     if ( window->used != 1 || window->magic != 1234 ){
-        gde_debug_print ("serviceDrawChar: validation\n");
+        gde_debug_print ("gwssrv: serviceDrawChar validation\n");
         return -1;
     }
     
@@ -1325,7 +1320,6 @@ int serviceDrawChar(void)
         8,   //char width 
         8 ); // char height 
 
-
     return 0;
 }
 
@@ -1348,7 +1342,7 @@ int serviceDrawText(void)
 
 
     // #debug
-    gde_debug_print ("serviceDrawText:\n");
+    gde_debug_print ("gwssrv: serviceDrawText\n");
 
 
     // Get
@@ -1401,7 +1395,7 @@ int serviceDrawButton(void)
         x, y, width, height, GWS_COLOR_BUTTONFACE3 );
 
 
-   gws_show_backbuffer (); // for debug   
+   gws_show_backbuffer(); // for debug   
    return 0;
 }
 

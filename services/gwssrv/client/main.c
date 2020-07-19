@@ -94,7 +94,7 @@ int gwst_getmessage_request(int fd)
 
 
     // #debug
-    gws_debug_print ("gwst: Writing ...\n");      
+    gws_debug_print ("gws: Writing ...\n");      
 
     // Enviamos um request para o servidor.
     // ?? Precisamos mesmo de um loop para isso. ??
@@ -128,7 +128,6 @@ int gwst_getmessage_request(int fd)
            break;
     }
 
-
     return 0; 
 }
 
@@ -148,7 +147,7 @@ int gwst_getmessage_response(int fd)
     // obs: Nesse momento deveríamos estar dormindo.
 
     // #debug
-    gws_debug_print ("gwst: Waiting ...\n");      
+    gws_debug_print ("gws: Waiting ...\n");      
 
     int y;
     for(y=0; y<15; y++)
@@ -168,7 +167,7 @@ int gwst_getmessage_response(int fd)
     //
 
     // #debug
-    gws_debug_print ("gwst: reading ...\n");      
+    gws_debug_print ("gws: reading ...\n");      
 
 
     // #caution
@@ -193,8 +192,8 @@ response_loop:
     
     // Se retornou -1 é porque algo está errado com o arquivo.
     if (n_reads < 0){
-        gws_debug_print ("gwst: recv fail.\n");
-        printf ("gwst: recv fail.\n");
+        gws_debug_print ("gws: recv fail.\n");
+        printf ("gws: recv fail.\n");
         printf ("Something is wrong with the socket.\n");
         exit (1);
     }
@@ -250,7 +249,7 @@ response_loop:
             break;
             
         case SERVER_PACKET_TYPE_ERROR:
-            gws_debug_print ("gwst: SERVER_PACKET_TYPE_ERROR\n");
+            gws_debug_print ("gws: SERVER_PACKET_TYPE_ERROR\n");
             goto response_loop;
             //exit (-1);
             break;
@@ -275,11 +274,11 @@ response_loop:
 process_reply:
 
     // #test
-    gws_debug_print ("gwst: Testing close() ...\n"); 
+    gws_debug_print ("gws: Testing close() ...\n"); 
     //close (fd);
 
     //gws_debug_print ("gwst: bye\n"); 
-    printf ("gwst: Window ID %d \n", message_buffer[0] );
+    printf ("gws: Window ID %d \n", message_buffer[0] );
     //printf ("gwst: Bye\n");
     
     // #todo
@@ -293,7 +292,7 @@ process_reply:
 //
 
 process_event:
-    gws_debug_print ("gwst: We got an event\n"); 
+    gws_debug_print ("gws: We got an event\n"); 
     return 0;
 }
 
@@ -303,9 +302,10 @@ int gwst_loop(int fd)
 {
 	//while(___running){
     while(1){
-    gwst_getmessage_request(fd);
-    gwst_getmessage_response(fd);
+        gwst_getmessage_request(fd);
+        gwst_getmessage_response(fd);
     }
+
     return 0; 
 }
 
@@ -350,7 +350,7 @@ gwst_createwindow_request (
 
 
     // #debug
-    gws_debug_print ("gwst: Writing ...\n");      
+    gws_debug_print ("gws: Writing ...\n");      
 
     // Enviamos um request para o servidor.
     // ?? Precisamos mesmo de um loop para isso. ??
@@ -407,7 +407,7 @@ int gwst_createwindow_response(int fd)
     // obs: Nesse momento deveríamos estar dormindo.
 
     // #debug
-    gws_debug_print ("gwst: Waiting ...\n");      
+    gws_debug_print ("gws: Waiting ...\n");      
 
     int y;
     for(y=0; y<15; y++)
@@ -427,7 +427,7 @@ int gwst_createwindow_response(int fd)
     //
 
     // #debug
-    gws_debug_print ("gwst: reading ...\n");      
+    gws_debug_print ("gws: reading ...\n");      
 
 
     // #caution
@@ -452,8 +452,8 @@ response_loop:
     
     // Se retornou -1 é porque algo está errado com o arquivo.
     if (n_reads < 0){
-        gws_debug_print ("gwst: recv fail.\n");
-        printf ("gwst: recv fail.\n");
+        gws_debug_print ("gws: recv fail.\n");
+        printf ("gws: recv fail.\n");
         printf ("Something is wrong with the socket.\n");
         exit (1);
     }
@@ -548,7 +548,7 @@ int main ( int argc, char *argv[] ){
     
 
     gws_debug_print ("--------------------------\n"); 
-    gws_debug_print ("gwst.bin: Initializing ...\n");
+    gws_debug_print ("gws: Initializing ...\n");
 
 
     //
@@ -556,14 +556,14 @@ int main ( int argc, char *argv[] ){
     // 
 
     // #debug
-    printf ("gwst: Creating socket\n");
+    printf ("gws: Creating socket\n");
 
     // Create a socket. AF_GRAMADO = 8000
     client_fd = socket ( 8000, SOCK_STREAM, 0 );
     
     if ( client_fd < 0 ){
-       gws_debug_print ("gwst: Couldn't create socket\n");
-       printf ("gwst: Couldn't create socket\n");
+       gws_debug_print ("gws: Couldn't create socket\n");
+       printf ("gws: Couldn't create socket\n");
        exit(1);  //#bugbug Cuidado.
     }
 
@@ -577,14 +577,14 @@ int main ( int argc, char *argv[] ){
     //então o servidor escreverá em nosso arquivo.
     
     // #debug
-    printf ("gwst: Connecting to the address 'ws' ...\n");      
+    printf ("gws: Connecting to the address 'ws' ...\n");      
 
     // Tentando nos conectar ao endereço indicado na estrutura
     // Como o domínio é AF_GRAMADO, então o endereço é "w","s".
     if ( connect (client_fd, (struct sockaddr *) &addr, sizeof(addr)) < 0 )
     { 
-        gws_debug_print ("gwst: Connection Failed\n");
-        printf ("gwst: Connection Failed \n"); 
+        gws_debug_print ("gws: Connection Failed\n");
+        printf ("gws: Connection Failed \n"); 
         close(client_fd);
         exit(1);
         //return (int) (-1); 
@@ -627,7 +627,7 @@ int main ( int argc, char *argv[] ){
     */
     
     
-    gws_debug_print ("gwst: bye :) \n");
+    gws_debug_print ("gws: bye :) \n");
     return 0;
 }
 
