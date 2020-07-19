@@ -7098,6 +7098,33 @@ int gdeshell_decode_buffer ( unsigned long buffer_address ){
     return 1;
 }
 
+uint8_t test_packet[] = 
+{
+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, /* eth dest (broadcast) */
+    0x52, 0x54, 0x00, 0x12, 0x34, 0x56, /* eth source */
+    0x08, 0x06, /* eth type */
+    0x00, 0x01, /* ARP htype */
+    0x08, 0x00, /* ARP ptype */
+    0x06, /* ARP hlen */
+    0x04, /* ARP plen */
+    0x00, 0x01, /* ARP opcode: ARP_REQUEST */
+    0x52, 0x54, 0x00, 0x12, 0x34, 0x56, /* ARP hsrc */
+    169, 254, 13, 37, /* ARP psrc */
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* ARP hdst */
+    192, 168, 0, 137, /* ARP pdst */
+};
+
+//interna
+void
+gdeshell_send_packet(void)
+{
+    while(1){
+        gramado_system_call( 891, 
+            (unsigned long)test_packet,   //buf
+            (unsigned long)1500,      //len
+            0);
+    }    
+}
 
 //interna
 void network_test_buffer(void)
@@ -7105,15 +7132,25 @@ void network_test_buffer(void)
     char buf[4096];
     
     while(1){
+        
+        //pega o pacote
         gramado_system_call( 890, 
             (unsigned long)&buf[0],   //buf
             (unsigned long)1500,      //len
             0);
 
         //printf("[begin]%s[end]\n",buf);
+        
+        //#test: OK
+        //decodifica o pacote.
         gdeshell_decode_buffer((unsigned long) &buf[0]);
+        
+        //#test: OK. o led indica que esta enviando.
+        //envia um pacote
+        //gdeshell_send_packet();
     }
 }
+
 
 
 /*

@@ -131,7 +131,7 @@ int network_buffer_in( void *buffer, int len )
         
     // Pega o destination buffer.
     if (tail<32){
-        dst_buffer = NETWORK_BUFFER.receive_buffer[tail];
+        dst_buffer = (void*) NETWORK_BUFFER.receive_buffer[tail];
        
        if((void*)dst_buffer!= NULL)
            memcpy( dst_buffer, buffer, len);        
@@ -144,8 +144,8 @@ int network_buffer_in( void *buffer, int len )
    return -1;
 }
 
-
-int ns_get_buffer(void *ubuf, int size)
+//serviço: 890
+int sys_network_receive(void *ubuf, int size)
 {
     void *src_buffer;
     //temos que pegar do head. primeiro da fila.
@@ -160,13 +160,13 @@ int ns_get_buffer(void *ubuf, int size)
         src_buffer = NETWORK_BUFFER.receive_buffer[head];
     
         if((void*)ubuf== NULL){
-            printf("ns_get_buffer: ubuf fail\n");
+            printf("sys_network_receive: ubuf fail\n");
             refresh_screen();        
             return -1;
         }
         
         if((void*)src_buffer== NULL){
-            printf("ns_get_buffer: src_buffer fail\n");
+            printf("sys_network_receive: src_buffer fail\n");
             refresh_screen();        
             return -1;
         }
@@ -187,19 +187,108 @@ int ns_get_buffer(void *ubuf, int size)
 // Retirar um buffer de uma lista de buffers.
 // O gns chamará essa rotina e copiará um buffer
 // para ring3, onde chamará as rotinas de protocolo.
-int network_buffer_out (void)
+// #importante
+//o kernel vai chamar essa rotina para que ela coloque o conteudo do
+//buffer no endreço de buffer indicado no argumento
+//o endereço do argumento será o endereço usado pelo controlador na hora do send.
+int network_buffer_out ( void *buffer, int len )
 {
-    return -1;
+    debug_print("network_buffer_out:\n");
+    
+    void *src_buffer;
+    //o kernel vai retirar do head ... 
+    //o que foi colocado pelo aplicativo em tail.
+    int head = NETWORK_BUFFER.send_head;
+
+    //circula.
+    NETWORK_BUFFER.send_head++;
+    if (NETWORK_BUFFER.send_head >= 8)
+        NETWORK_BUFFER.send_head=0;
+
+	// #todo
+	// MTU: maximim transmition unit.
+	// For ethernet is 1500 bytes.
+	
+    //printf ("network_buffer_in: buffer_len %d\n",len);
+    //refresh_screen();
+
+
+    if(len>1500)
+        return -1;
+        
+    if(head<0)
+        return -1;
+        
+    // Pega o destination buffer.
+    if (head<8){
+        src_buffer = (void*) NETWORK_BUFFER.send_buffer[head];
+       
+       if((void*)src_buffer!= NULL)
+           memcpy( buffer, src_buffer,len);        
+    
+        //printf("network_buffer_in: ok\n");
+        //refresh_screen();
+        return 0;//ok
+    }
+
+   return -1;
 }
 
 
-/*
+//serviço: 891
 //o ns envia um buffer pra ser enviado para rede.
-int ns_set_buffer(void *ubuf, int size)
+int sys_network_send(void *ubuf, int size)
 {
+    debug_print("sys_network_send:\n");
+    
+    void *src_buffer;
+    
+    char xxxbuffer[4096];
+    
+    //o aplicativo esta colocando no tail
+    int tail = NETWORK_BUFFER.send_tail;
+
+    //circula.
+    NETWORK_BUFFER.send_tail++;
+    if (NETWORK_BUFFER.send_tail >= 32)
+        NETWORK_BUFFER.send_tail=0;
+        
+    if(tail<8){
+        src_buffer = NETWORK_BUFFER.send_buffer[tail];
+    
+        if((void*)ubuf== NULL){
+            printf("sys_network_send: ubuf fail\n");
+            refresh_screen();        
+            return -1;
+        }
+        
+        if((void*)src_buffer== NULL){
+            printf("sys_network_send: src_buffer fail\n");
+            refresh_screen();        
+            return -1;
+        }
+
+        //do kernel para user mode.
+        if((void*)ubuf!= NULL)
+            memcpy( src_buffer,ubuf, size);    
+            
+        
+        //coloque nesse buffer o conteúdo do head
+        //na lista de buffers para enviar.
+        //depois enviaremos abaixo.
+        network_buffer_out(xxxbuffer,1500);    
+
+        //enviar
+        network_send_packet(xxxbuffer,1500); 
+        
+        //printf("ns_get_buffer: ok\n");
+        //refresh_screen();
+        return 0;//ok
+    }
+
     return -1;
 }
-*/
+
 
 
 /*
@@ -1141,6 +1230,103 @@ network_SendIPV4_UDP (
 }
 
 
+
+//IN: 
+//buffer: a packet sent by the user.
+void network_send_packet(void *ubuffer, int len)
+{
+    debug_print ("network_send_packet: done\n");
+    
+    if ( currentNIC == NULL ){
+        printf ("network_send_packet: currentNIC fail\n");
+        return;
+    }
+    
+    //#bugbug
+    //è esse o buffer certo para enviar???
+    uint16_t old = currentNIC->tx_cur;
+    unsigned char *dst_buf = (unsigned char *) currentNIC->tx_descs_virt[old];
+
+    currentNIC->legacy_tx_descs[old].length = (len);
+
+
+	//??
+	//cso
+	//currentNIC->legacy_tx_descs[0].cso
+
+
+	//??
+	//cmd ok
+	//currentNIC->legacy_tx_descs[0].cmd = TDESC_CMD_IFCS | TDESC_CMD_RS | TDESC_CMD_EOP;
+	//currentNIC->legacy_tx_descs[0].cmd = TDESC_EOP | TDESC_RS; //intel code
+
+	//cmd
+    currentNIC->legacy_tx_descs[old].cmd = 0x1B;
+
+	//status
+    currentNIC->legacy_tx_descs[old].status = 0;
+
+	// Current TX.
+	// Qual � o buffer atual para transmiss�o.
+    currentNIC->tx_cur = ( currentNIC->tx_cur + 1 ) % 8;
+
+
+	//css
+	//currentNIC->legacy_tx_descs[0].css
+
+
+	//??
+	//special ?
+	//currentNIC->legacy_tx_descs[0].special
+
+
+
+
+	//
+	// ==== # SEND # ======
+	//
+
+
+
+    // #importante: 
+    // Diga ao controlador qual é o índice do descritor a ser usado 
+    // para transmitir dados.
+
+	// TDH	= 0x3810,    /* Tx Descriptor Head */
+	// TDT	= 0x3818,    /* Tx Descriptor Tail */
+
+	// *( (volatile unsigned int *)(currentNIC->mem_base + 0x3810)) = 0;
+    *( (volatile unsigned int *)(currentNIC->mem_base + 0x3818)) = currentNIC->tx_cur;
+
+
+	// #debug
+	// Colocamos essa mensagem antes de entrarmos no while.
+	// Pois precisamos implementar algum contador no while para n�o
+	// ficarmos preso nele pra sempre.
+
+    int t;
+    for (t=0; t< 25000;t++)
+    {
+         if ( (currentNIC->legacy_tx_descs[old].status & 0xFF) == 1 )
+         {
+              debug_print ("network_send_packet: done [timeout]\n");
+              //printf ("Ok");
+              return;
+         }
+    }
+    
+    //#todo
+    /*
+    while ( !(currentNIC->legacy_tx_descs[old].status & 0xFF) )
+    {
+        // Nothing.
+    };
+    */
+
+    debug_print ("metwork_send_packet: done\n");
+}
+
+
 /*
  ***************************************************************
  * SendARP:
@@ -1327,7 +1513,7 @@ SendARP ( int op,   //operation
 
 	// ??
 	// Quem?
-	// Estamos pegando o offset que nos levar� ao endere�o do buffer.
+	// Estamos pegando o offset que nos levar ao endere�o do buffer.
 	// Usaremos esse offset logo abaixo.
 	// Pegamos esse offset na estrutura do controlador nic intel.
 

@@ -180,14 +180,14 @@ int network_decode_buffer ( unsigned long buffer_address );
 // Colocar um buffer numa lista de buffers.
 int network_buffer_in( void *buffer, int len );
 // Retirar um buffer de uma lista de buffers.
-int network_buffer_out (void);
+int network_buffer_out ( void *buffer, int len );
 
 //o ns pega o buffer no kernel.
-int ns_get_buffer(void *ubuf, int size);
+int sys_network_receive(void *ubuf, int size);
 //o ns envia um buffer pra ser enviado para rede.
-int ns_set_buffer(void *ubuf, int size);
+int sys_network_send(void *ubuf, int size);
 
-
+void network_send_packet(void *ubuffer, int len);
 
 // Handling requests.
 int do_ipv4 ( unsigned long buffer );

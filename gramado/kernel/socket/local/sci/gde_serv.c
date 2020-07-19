@@ -724,10 +724,19 @@ gde_extra_services (
 
  
      //890 ~ 899 network stuff 
-     //get user name
+    
+    // 890 - get network buffer
+    // O usuário recebe um buffer com um pacote.
     if ( number == 890 ){
         //ubuf,len
-        return (void *) ns_get_buffer ( (void *) arg2,(int) arg3);
+        return (void *) sys_network_receive ( (void *) arg2,(int) arg3);
+    }
+
+    //891 - set network buffer
+    // o usuário envia um buffer com um pacote.
+    if ( number == 891 ){
+        //ubuf,len
+        return (void *) sys_network_send ( (void *) arg2,(int) arg3);
     }
 
     //...
