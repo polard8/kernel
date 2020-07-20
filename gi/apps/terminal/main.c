@@ -1559,6 +1559,8 @@ int main ( int argc, char *argv[] ){
     
     //Precisamos de um loop aqui pra chamar o shell sempre que ele fechar.
     __terminal_clone_and_execute ("true.bin"); 
+    //gws_clone_and_execute("true.bin");
+    
     
     // talvez precisamos esperar ...
 

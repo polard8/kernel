@@ -167,6 +167,7 @@ void gws_reboot (void);
 
 void gws_yield(void);
 
+int gws_clone_and_execute ( char *name );
 
 //
 // End.

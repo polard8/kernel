@@ -584,6 +584,12 @@ void gws_yield_n_times (unsigned long n)
 */
 
 
+int gws_clone_and_execute ( char *name )
+{
+    return (int) gws_system_call ( 900, (unsigned long) name, 0, 0 );
+}
+
+
 //
 // End.
 //
