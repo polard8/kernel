@@ -1567,8 +1567,8 @@ sys_accept (
         return -1;
     }
 
-    printf ("sys_accept: [FIXME] TODO ...\n");
-    refresh_screen();
+    //printf ("sys_accept: [FIXME] TODO ...\n");
+    //refresh_screen();
     
     // #todo:
     // Are we already connected?

@@ -525,9 +525,9 @@ int main (int argc, char **argv){
     // Calling child.
     //
 
-    printf ("gnssrv: Calling child \n");
+    //printf ("gnssrv: Calling child \n");
 
-    gde_clone_and_execute ("gns.bin"); 
+    //gde_clone_and_execute ("gns.bin"); 
     //gde_clone_and_execute ("??.bin");  
     //gde_clone_and_execute ("??.bin");  
     // ...
@@ -567,7 +567,7 @@ int main (int argc, char **argv){
     while (1){
 
         // Accept connection from a client. 
-        newconn = accept( curconn, 
+        newconn = accept ( curconn, 
                       (struct sockaddr *) &addr, 
                       (socklen_t *) addr_len );
 

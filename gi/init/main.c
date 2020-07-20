@@ -260,6 +260,13 @@ int main ( int argc, char *argv[] ){
         default:
             gramado_system_call ( 900, 
                 (unsigned long) "gdeshell.bin", 0, 0 ); 
+            
+            //gramado_system_call ( 900, 
+                //(unsigned long) "gnssrv.bin", 0, 0 );      
+                
+            //gramado_system_call ( 900, 
+                //(unsigned long) "gwssrv.bin", 0, 0 );  
+                           
             break;
     };
 

@@ -183,9 +183,10 @@ int accept (int sockfd, struct sockaddr *addr, socklen_t *addrlen){
                      (unsigned long) addr, 
                      (unsigned long) addrlen );
 
-    if(__fd<0)
-        printf ("accept: Couldn't accept the connection\n");
-
+    if(__fd<0){
+        //printf ("accept: Couldn't accept the connection\n");
+        //debug_print ("accept: Couldn't accept the connection\n");
+    }
 
     return (int) __fd;
 }

@@ -592,11 +592,18 @@ int main ( int argc, char *argv[] ){
     // === Create Window ===
     //
     
+    /*
     gwst_createwindow_request (client_fd, 
         40, 40, 320, 280, COLOR_GRAY);
     gwst_createwindow_response(client_fd);     
-    
-    
+    */    
+
+    gws_create_window_using_socket (client_fd,
+        WT_SIMPLE,1,1,"gws-client",
+        0, 0, 4, 4,
+        0,0,COLOR_RED, COLOR_RED);
+
+ 
     //
     // === Event loop ===
     //
