@@ -169,6 +169,10 @@ void gws_yield(void);
 
 int gws_clone_and_execute ( char *name );
 
+
+unsigned long gws_get_system_metrics (int index);
+
+
 //
 // End.
 //

@@ -589,6 +589,21 @@ int gws_clone_and_execute ( char *name )
     return (int) gws_system_call ( 900, (unsigned long) name, 0, 0 );
 }
 
+unsigned long gws_get_system_metrics (int index){
+
+    //if (index<0){
+        //gde_debug_print ("gde_get_system_metrics: fail\n");
+        //return 0;
+    //}
+    
+    //#define	SYSTEMCALL_GETSYSTEMMETRICS  250
+    
+    return (unsigned long) gws_system_call ( 250, 
+                               (unsigned long) index, 
+                               (unsigned long) index, 
+                               (unsigned long) index );
+}
+
 
 //
 // End.

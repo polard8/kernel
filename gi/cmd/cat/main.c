@@ -33,7 +33,7 @@
 int main ( int argc, char *argv[] ){
 
     FILE *fp;
-    register int c;
+    register int c=0;
     
     char buffer[1024];
     int nreads = 0;
@@ -44,20 +44,22 @@ int main ( int argc, char *argv[] ){
     // Ok. O arquivo á carregado em ring0.
     // temos que ler com base do fd usando read();
     
-    fp = fopen ( (char *) argv[1], "r+" );
+    fp = fopen( (char *) argv[1], "r+" );
     if ( (void *) fp == NULL ){
         printf ("cat: fopen fail\n");
         //perror ("cat: fopen fail  ... testing perror\n");
         exit(-1);
     }
 
-    nreads = read ( fileno(fp), buffer, sizeof(buffer) );
+    nreads = read( fileno(fp), buffer, sizeof(buffer) );
 
     if (nreads <=0 ){
         printf ("cat: read fail\n");
         exit(-1);
     }
 
+    //finalizing buffer
+    //buffer[1023] = 0;
 
     //
     // Testing size.
@@ -72,7 +74,7 @@ int main ( int argc, char *argv[] ){
     //printf (">>>> %s \n",buffer);        
     
     // 1 = stdout = virtual console.
-    nwrites = write ( 1, buffer, sizeof(buffer) );
+    nwrites = write( 1, buffer, sizeof(buffer) );
 
     if (nwrites <=0 ){
         printf ("cat: write fail\n");

@@ -10,7 +10,7 @@
  *
  * 2020 - Created by Fred Nora.
  */
- 
+
 // Connecting via AF_INET.
 
 // tutorial example taken from. 
@@ -72,8 +72,12 @@ int terminal_getmessage_request(int fd);
 int terminal_getmessage_response(int fd);
 
 
-
-
+//constructor.
+void terminalTerminal ();
+void terminalInitWindowPosition();
+void terminalInitWindowSizes();
+void terminalInitWindowLimits ();
+void terminalInitSystemMetrics ();
 
 
 //
@@ -81,15 +85,45 @@ int terminal_getmessage_response(int fd);
 //
 
 
-void terminal_write_char (int c)
+void terminal_write_char (int fd, int c)
 {
-    //coloca no buffer de linhas e colunas.
-    terminalInsertNextChar ( (char) c ); 
-    
+
+    unsigned long x = (textCurrentCol*8);
+    unsigned long y = (textCurrentRow*8);
+
+
     // Refresh!
     // Vamos escrever o char na tela usando o window server.
+
+                    // Imprimindo o char na tela usando o window server.
+                    // Testing draw a char in a window.
+                    // Isso funciona. Precisamos das rotinas do noraterm
+                    // pra lidar com caracteres ... o x e o y.
+                    terminal_drawchar_request (
+                        (int) fd,             // fd,
+                        (int) 0,              // window id,
+                        (unsigned long) x,    // left,
+                        (unsigned long) y,    // top,
+                        (unsigned long) COLOR_RED,
+                        (unsigned long) c );
+
+                    terminal_drawchar_response((int) fd);  
+
+
+    // Coloca no buffer de linhas e colunas.
+    terminalInsertNextChar ( (char) c ); 
+    
+    //?? circula?
+    
+    textCurrentCol++;
+    if (textCurrentCol>__wlMaxColumns)
+    {
+        textCurrentRow++;    //próxima linha.
+        textCurrentCol=0;    //começo da linha
+    }
     
 }
+
 
 /*
  ***************************************************
@@ -191,15 +225,17 @@ void del (void){
 // Insere um caractere sentro do buffer.
 
 char 
-terminalGetCharXY ( unsigned long x, 
-                    unsigned long y )
-{	
-	if ( x >= __wlMaxColumns || y >= __wlMaxRows )
-	{	
-		return;
-	}
+terminalGetCharXY ( 
+    unsigned long x, 
+    unsigned long y )
+{
 
-	return (char) LINES[y].CHARS[x];
+    if ( x >= __wlMaxColumns || y >= __wlMaxRows )
+    {
+        return;
+    }
+
+    return (char) LINES[y].CHARS[x];
 }
 
 
@@ -207,37 +243,35 @@ terminalGetCharXY ( unsigned long x,
 // Insere um caractere sentro do buffer.
 
 void 
-terminalInsertCharXY ( unsigned long x, 
-                       unsigned long y, 
-                       char c )
+terminalInsertCharXY ( 
+    unsigned long x, 
+    unsigned long y, 
+    char c )
 {
-	if ( x >= __wlMaxColumns || y >= __wlMaxRows )
-	{	
-		return;
-	}
 
-	LINES[y].CHARS[x] = (char) c;
-	LINES[y].ATTRIBUTES[x] = 7;
-}
+    if ( x >= __wlMaxColumns || y >= __wlMaxRows )
+    {
+        return;
+    }
 
-
-
-
-
-
-// # terminal stuff
-static void save_cur (void){
-	
-	textSavedCol = textCurrentCol;
-	textSavedRow = textCurrentRow;
+    LINES[y].CHARS[x] = (char) c;
+    LINES[y].ATTRIBUTES[x] = 7;
 }
 
 
 // # terminal stuff
-static void restore_cur (void){
-	
-	textCurrentCol = textSavedCol;
-	textCurrentRow = textSavedRow;
+static void save_cur (void)
+{
+    textSavedCol = textCurrentCol;
+    textSavedRow = textCurrentRow;
+}
+
+
+// # terminal stuff
+static void restore_cur (void)
+{
+    textCurrentCol = textSavedCol;
+    textCurrentRow = textSavedRow;
 }
 
 
@@ -255,11 +289,11 @@ void terminalClearBuffer (){
 
     for ( i=0; i<32; i++ )
     {
-		for ( j=0; j<80; j++ )
-		{
+        for ( j=0; j<80; j++ )
+        {
 		    LINES[i].CHARS[j] = (char) ' ';
 		    LINES[i].ATTRIBUTES[j] = (char) 7;
-	    }
+        };
 		
 		LINES[i].left = 0;
 		LINES[i].right = 0;
@@ -272,50 +306,50 @@ void terminalClearBuffer (){
 //Qual será a linha que estará no topo da janela.
 void textSetTopRow ( int number )
 {
-    textTopRow = (int) number; 	
+    textTopRow = (int) number; 
 }
 
 
 int textGetTopRow ()
 {
-    return (int) textTopRow; 	
+    return (int) textTopRow;
 }
 
 
 //Qual será a linha que estará na parte de baixo da janela.
 void textSetBottomRow ( int number )
 {
-    textBottomRow = (int) number; 	
+    textBottomRow = (int) number; 
 }
 
 
 int textGetBottomRow ()
 {
-    return (int) textBottomRow; 	
+    return (int) textBottomRow; 
 }
 
 void textSetCurrentRow ( int number )
 {
-    textCurrentRow = (int) number; 	
+    textCurrentRow = (int) number; 
 }
 
 
 int textGetCurrentRow ()
 {
-    return (int) textCurrentRow; 	
+    return (int) textCurrentRow;
 }
 
 
 
 void textSetCurrentCol ( int number )
 {
-    textCurrentCol = (int) number; 	
+    textCurrentCol = (int) number; 
 }
 
 
 int textGetCurrentCol ()
 {
-    return (int) textCurrentCol; 	
+    return (int) textCurrentCol; 
 }
 
 
@@ -326,17 +360,18 @@ int textGetCurrentCol ()
  *    Assim o próximo char será em outro lugar da janela.
  */
 
-void move_to ( unsigned long x, unsigned long y ){
-	
-	if ( x > __wlMaxColumns || y > __wlMaxRows )
-		return;
-	
+void move_to ( unsigned long x, unsigned long y )
+{
+
+    if ( x > __wlMaxColumns || y > __wlMaxRows )
+        return;
+
 	//screen_buffer_x = x;
 	//screen_buffer_y = y;
 	
-	textCurrentCol = x;
-	textCurrentRow = y;
-	
+    textCurrentCol = x;
+    textCurrentRow = y;
+
 	//screen_buffer_pos = ( screen_buffer_y * __wlMaxColumns + screen_buffer_x ) ;
 }
 
@@ -345,18 +380,18 @@ void move_to ( unsigned long x, unsigned long y ){
 /* Pad STRING to COUNT characters by inserting blanks. */
 
 int pad_to (int count, char *string){
-	
-    register int i;
+
+    register int i=0;
 
     i = strlen (string);
 
-    if (i >= count)
+    if (i >= count){
         string[i++] = ' ';
-    else
-    {
+    }else{
+
         while (i < count)
             string[i++] = ' ';
-    }
+    };
     string[i] = '\0';
 
     return (i);
@@ -555,24 +590,27 @@ response_loop:
                     //fflush(stdout);
                     
                     // Colocando no buffer de linha
-                    terminal_write_char((int)long1);
+                    terminal_write_char( (int)fd, (int) long1 );
     
+                     
+                    /* Tentando mover essa rotina para dentro da função terminal_write_char
                     // Imprimindo o char na tela usando o window server.
                     // Testing draw a char in a window.
                     // Isso funciona. Precisamos das rotinas do noraterm
                     // pra lidar com caracteres ... o x e o y.
                     terminal_drawchar_request (
-                        (int) fd,//fd,
-                        (int) 0, //__response_wid, //window_id,
-                        (unsigned long) __tmp_x,//left,
-                        (unsigned long) __tmp_y,//top,
+                        (int) fd,                   // fd,
+                        (int) 0,                    // window id,
+                        (unsigned long) __tmp_x,    // left,
+                        (unsigned long) __tmp_y,    // top,
                         (unsigned long) COLOR_RED,
                         (unsigned long) long1 );
 
-                    terminal_drawchar_response((int) fd);                    
+                    terminal_drawchar_response((int) fd);  
                     
                     //#test
                     __tmp_x = __tmp_x + 8;
+                    */
                     
                     goto process_event;
                     break;
@@ -1392,6 +1430,12 @@ int main ( int argc, char *argv[] ){
 
     int client_fd = -1;
 
+    //porta para o Window Server 'ws' em gramado_ports[]
+    struct sockaddr_in addr_in;
+    addr_in.sin_family = AF_INET;
+    addr_in.sin_port   = 7547;   
+    addr_in.sin_addr.s_addr = IP(192, 168, 1, 112); 
+
 
     debug_print ("---------------------------\n");    
     debug_print ("terminal: Initializing ...\n");
@@ -1429,11 +1473,6 @@ int main ( int argc, char *argv[] ){
     Terminal.client_fd = client_fd;
     //...
 
-    //porta para o Window Server 'ws' em gramado_ports[]
-    struct sockaddr_in addr_in;
-    addr_in.sin_family = AF_INET;
-    addr_in.sin_port   = 7547;   
-    addr_in.sin_addr.s_addr = IP(192, 168, 1, 112); 
 
 
     //
@@ -1485,46 +1524,58 @@ int main ( int argc, char *argv[] ){
 
     //Creating the main window
     int __response_wid = 0;
-    __response_wid = terminal_createwindow_request(client_fd, 100, 100, 480, 320, COLOR_BLACK);
-    terminal_createwindow_response(client_fd); 
-
-    // Saving the window id.
-    Terminal.window_id = __response_wid;
-    // ...
     
+    //__response_wid = terminal_createwindow_request(client_fd, 100, 100, 480, 320, COLOR_BLACK);
+    //terminal_createwindow_response(client_fd); 
+
+     
 
      //#test
      //Creating a window using the libgws library.
      //Ok. it works.
-     //gws_create_window_using_socket (client_fd,
-        //WT_SIMPLE,1,1,"no-name",
-        //160, 160, 480,320,
-        //0,0,COLOR_GRAY, COLOR_GRAY);
+     __response_wid = gws_create_window_using_socket (client_fd,
+                          WT_SIMPLE, 1, 1, "Terminal",
+                          100, 100, 480,320,
+                          0,0,COLOR_GRAY,COLOR_BLACK);
+
+    // Saving the window id.
+    Terminal.window_id = __response_wid;
+ 
 
     //
     // Test 3
     //
  
-
+    /*
     __tmp_x = 40;
     __tmp_y = 40;
 
-
-    //testing draw a char in a window.
+    // Testing draw a char in a window.
     terminal_drawchar_request (
-        (int) client_fd,//fd,
-        (int) __response_wid, //window_id,
-        (unsigned long) __tmp_x,//left,
-        (unsigned long) __tmp_y,//top,
+        (int) client_fd,          //fd,
+        (int) __response_wid,     //window_id,
+        (unsigned long) __tmp_x,  //left,
+        (unsigned long) __tmp_y,  //top,
         (unsigned long) COLOR_RED,
         (unsigned long) 'X' );
 
     terminal_drawchar_response((int) client_fd);
+    */
     
+   
     //#debug
     //hanging
     //while(1){}
 
+
+    //initialize globals.
+	//#importante: Isso será definido somente uma vez.
+	__wlMaxColumns = DEFAULT_MAX_COLUMNS;
+	__wlMaxRows    = DEFAULT_MAX_ROWS;
+
+
+    //inicializações;
+    terminalTerminal();
 
     //
     // Loop!
@@ -1538,8 +1589,6 @@ int main ( int argc, char *argv[] ){
     debug_print ("terminal: bye\n"); 
     printf ("terminal: bye\n");
     return 0;
-
-
 
 
 
@@ -1614,6 +1663,260 @@ int main ( int argc, char *argv[] ){
 
     return 0;
 }
+
+
+
+
+/*
+ ******************************************
+ * terminalTerminal:
+ *     Constructor.
+ *     Não emite mensagens.
+ */
+
+// #bugbug
+// essas configurações são configurações de janela,
+// então estão mais para terminal do que para shell.
+
+
+void terminalTerminal (){
+	
+	int i=0;
+	int j=0;
+	
+	// Internas.
+	
+    //shellStatus = 0;
+    //shellError = 0;
+	
+	//
+	// ## Inicializando as estruturas de linha ##
+	//
+	
+	//inicializamos com espaços.
+	for ( i=0; i<32; i++ )
+	{
+		for ( j=0; j<80; j++ )
+		{
+		    LINES[i].CHARS[j] = (char) ' ';
+		    LINES[i].ATTRIBUTES[j] = (char) 7;
+	    }
+		
+		LINES[i].left = 0;
+		LINES[i].right = 0;
+		LINES[i].pos = 0;
+	};
+	
+	
+	
+	// Deve ser pequena, clara e centralizada.
+	// Para ficar mais rápido.
+	
+	// #importante:
+	// O aplicativo tem que confiar nas informações 
+	// retornadas pelo sistema.
+		
+	// Usar o get system metrics para pegar o 
+	// tamanho da tela.
+	
+	//inicializa as metricas do sistema.
+	terminalInitSystemMetrics ();
+	
+    //inicializa os limites da janela.
+	terminalInitWindowLimits ();
+	
+	//inicia o tamanho da janela.
+	terminalInitWindowSizes ();
+	
+	//inicializar a posição da janela.
+	terminalInitWindowPosition ();
+ 
+ 
+    //
+	// initialize visible area.
+	// #todo: criar função para isso
+	// É melhor que seja pequena por enquanto pra não ativar
+	// o scroll do kernel e só usar o scroll desse terminal.
+	
+	//textTopRow = 0;
+	//textBottomRow = 24;
+    //terminalNewVisibleArea ( 0, 19);
+
+
+	//...	
+
+	
+	// Obs:
+	// prompt[] - Aqui ficam as digitações. 
+
+	//terminalClearBuffer ();
+
+	
+	//shellBufferMaxColumns = DEFAULT_BUFFER_MAX_COLUMNS;
+	//shellBufferMaxRows    = DEFAULT_BUFFER_MAX_ROWS;
+	
+	//buffersize = (shellBufferMaxColumns * shellBufferMaxRows);
+	
+
+	
+	//
+	// @todo: E o fluxo padrão. Quem configurou os arquivos ???
+	//        o kernel configuroru???
+	//
+	
+    //...
+	
+	
+	//for ( i=0; i<WORKINGDIRECTORY_STRING_MAX; i++ ){
+	//	current_workingdiretory_string[i] = (char) '\0';
+	//};
+	
+    //sprintf ( current_workingdiretory_string, 
+	//    SHELL_UNKNOWNWORKINGDIRECTORY_STRING );    
+	
+	//...
+	
+//done:
+
+    //ShellFlag = SHELLFLAG_COMMANDLINE;
+	
+    //#bugbug
+	//Nossa referência é a moldura e não a área de cliente.
+	//@todo:usar a área de cliente como referência
+	//terminalSetCursor(0,0);
+    //terminalSetCursor(0,4);
+    
+	//@todo
+	//tentando posicionar o cursor dentro da janela
+	//terminalSetCursor( (shell_info.main_window->left/8) , (shell_info.main_window->top/8));	
+	
+	//shellPrompt();
+}
+
+
+void terminalInitSystemMetrics (){
+	
+	
+	//Tamanho da tela. (full screen)
+	smScreenWidth = gws_get_system_metrics (1);
+	smScreenHeight = gws_get_system_metrics (2); 
+	
+	//cursor
+	smCursorWidth = gws_get_system_metrics(3);
+	smCursorHeight = gws_get_system_metrics(4);
+	
+	//mouse
+	smMousePointerWidth = gws_get_system_metrics(5);
+	smMousePointerHeight = gws_get_system_metrics(6);
+	
+	//char
+	smCharWidth = gws_get_system_metrics(7);
+	smCharHeight = gws_get_system_metrics(8);
+	
+	
+	//#todo:
+	//vertical scroll size
+	//horizontal scroll size.
+	
+	//#importante
+	//#todo: pegar mais.
+	
+	//...
+	
+	//#todo: Temos que criar essa variável.
+	//InitSystemMetricsStatus = 1;
+} 
+
+
+void terminalInitWindowLimits (){
+	
+	// #todo
+	// Tem variáveis aqui que não podem ser '0'.
+	
+	//#todo: temos que criar essa variável.
+	/*
+	if (InitSystemMetricsStatus == 0)
+	{
+	    terminalInitSystemMetrics ();
+	}
+	*/
+	
+    //
+    // ## Window limits ##
+    //
+	
+	// problemas; 
+	//if ( smScreenWidth == 0 || smScreenHeight )
+	//{
+	//	 printf ...
+	//}
+
+    //full screen support
+    wlFullScreenLeft = 0;
+    wlFullScreenTop = 0;
+    wlFullScreenWidth = smScreenWidth;
+    wlFullScreenHeight = smScreenHeight;
+	
+    //limite de tamanho da janela.
+    wlMinWindowWidth = smCharWidth * 80;
+    wlMinWindowHeight = smCharWidth * 25;
+    wlMaxWindowWidth = wlFullScreenWidth;
+    wlMaxWindowHeight = wlFullScreenHeight;	
+	
+    //quantidade de linhas e colunas na área de cliente.
+    wlMinColumns = 80;
+    wlMinRows = 1;
+
+
+	
+	//dado em quantidade de linhas.
+    textMinWheelDelta = 1;  //mínimo que se pode rolar o texto
+    textMaxWheelDelta = 4;  //máximo que se pode rolar o texto	
+	textWheelDelta = textMinWheelDelta;
+	//...
+}
+
+
+void terminalInitWindowSizes()
+{
+	
+//
+//  ## Window size ##
+//
+
+    //wsWindowWidth = wlMinWindowWidth;
+    //wsWindowHeight = wlMinWindowHeight;	
+	
+	//Tamanho da janela do shell com base nos limites 
+    //que ja foram configurados.	
+	
+	wsWindowWidth =  WINDOW_WIDTH;
+	wsWindowHeight = WINDOW_HEIGHT;
+	
+	
+	if ( wsWindowWidth < wlMinWindowWidth )
+	{
+		wsWindowWidth = wlMinWindowWidth;
+	}
+	
+	if ( wsWindowHeight < wlMinWindowHeight )
+	{
+	    wsWindowHeight = wlMinWindowHeight;	
+	}
+}
+
+
+void terminalInitWindowPosition()
+{
+	
+	//window position
+	wpWindowLeft = WINDOW_LEFT;
+	wpWindowTop = WINDOW_TOP;
+	
+	//wpWindowLeft = (unsigned long) ( (smScreenWidth - wsWindowWidth)/2 );
+	//wpWindowTop = (unsigned long) ( (smScreenHeight - wsWindowHeight)/2 );  	
+}
+
 
 //
 // End.
