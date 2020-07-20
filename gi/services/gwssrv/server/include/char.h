@@ -3,6 +3,11 @@
 #define __CHAR_H
 
 
+// Draw char support
+int gcharWidth;
+int gcharHeight;
+
+
 
 void charSetCharWidth ( int width );
 void charSetCharHeight ( int height );
@@ -47,7 +52,9 @@ charBackbufferDrawchar (
     unsigned long c,
     unsigned long fgcolor,
     unsigned long bgcolor );
+    
 
+int gwssrv_init_char(void);
 
 #endif
 

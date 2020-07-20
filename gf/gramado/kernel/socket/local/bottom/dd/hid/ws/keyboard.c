@@ -150,7 +150,7 @@ void abnt2_keyboard_handler (void){
 	//não precisamos perguntar para o controlador se
 	//podemos ler, porque foi uma interrupção que nos trouxe aqui.
 
-    unsigned char __raw = in8 (0x60);
+    unsigned char __raw = in8(0x60);
 
 
     // #obs:
@@ -258,26 +258,25 @@ sc_again:
      // teclas do teclado extendido.
      // Nesse caso pegaremos dois sc da fila.
     
-     if ( __raw == 0xE0 )
-     {
-         __has_e0_prefix = 1;
-         goto sc_again;
-     }
-
-     if ( __raw == 0xE1 )
-     {
-          __has_e1_prefix = 1;
-          goto sc_again;
-     }
-
+     if ( __raw == 0xE0 ){ __has_e0_prefix = 1; goto sc_again; }
+     if ( __raw == 0xE1 ){ __has_e1_prefix = 1; goto sc_again; }
 
     // #obs:
     // O scancode é enviado para a rotina,
     // mas ela precisa conferir ke0 antes de construir a mensagem,
     // para assim usar o array certo.
     // See: ws/ps2kbd.c
+    
+    // #bugbug
+    // Esse tratamento do scancode não faz sentido quando temos um
+    // window server instalado. Nesse caso deveríamos deixar o
+    // window server pegar os scancodes.
+    // Mas por enquanto, essa rotina manda mensagens para o ws
+    // caso tenha um instalado.
 
-    KEYBOARD_SEND_MESSAGE (__raw);
+    //if( NO WS )
+        KEYBOARD_SEND_MESSAGE (__raw);
+
 
     // Clean the mess
     __has_e0_prefix = 0;

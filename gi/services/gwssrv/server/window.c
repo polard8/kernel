@@ -295,6 +295,24 @@ void gwsWindowUnlock (struct gws_window_d *window){
 }
 
 
+int gwssrv_init_windows(void)
+{
+    int i=0;
+    
+    //window.h
+    windows_count      =0;
+    window_with_focus  =0;
+    active_window      =0;
+    top_window         =0;
+    //...
+
+    for (i=0; i<1024; i++)
+        windowList[WINDOW_COUNT_MAX] = 0;
+
+
+    return 0;
+}
+
 //
 // End.
 //

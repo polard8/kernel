@@ -288,9 +288,9 @@ int KEYBOARD_SEND_MESSAGE ( unsigned char SC ){
     unsigned char scancode;
     unsigned char key;         //Tecla (uma parte do scancode).  
 
-    int message;               //arg2.
-    unsigned long ch;          //arg3 - (O caractere convertido para ascii).
-    unsigned long status;      //arg4.  
+    int message;             //arg2.
+    unsigned long ch;        //arg3 - (O caractere convertido para ascii).
+    unsigned long status;    //arg4.  
     
     int msg_status = -1;
     
@@ -561,7 +561,7 @@ int KEYBOARD_SEND_MESSAGE ( unsigned char SC ){
 			//}
 			
             //Nothing.
-        };
+        }
 		
 		// Uma tecla do sistema foi pressionada.
         if (message == MSG_SYSKEYDOWN)
@@ -585,16 +585,10 @@ int KEYBOARD_SEND_MESSAGE ( unsigned char SC ){
     
 done:
 
-	//
-	// Control + Alt + Del.
-	//
-
-
-
     // control + alt + del.
     if ( (ctrl_status == 1) && (alt_status == 1) && (ch == KEY_DELETE) )
     {
-        // debug_print("...[todo]");
+        debug_print ("KEYBOARD_SEND_MESSAGE: ctrl + alt + del\n");
         // reboot ();
     }
 
@@ -701,8 +695,6 @@ done:
 		// Como o scancode é um char, precisamos converte-lo em unsigned long.
 
 
-
-
     //
     // ws
     // 
@@ -711,7 +703,7 @@ done:
     // a fila de mensagem dele.
     // #isso funcionou.
     // O ws recebeu a mensagem de teclado, e é rápido.
-    
+     
     // Tentamos mandar a mensagem para ws, 
     // se der certo a gente retorna,
     // se não der certo então enviaremos para
@@ -732,18 +724,17 @@ done:
     }
  
         
-   // #importante
-   // Só chegaremos até aqui se o ws não está rodando.
-   
+    // #importante
+    // Só chegaremos até aqui se o ws não está rodando.
            
         
-   //
-   // Special message.
-   //
+    //
+    // Special message.
+    //
 
-        // F5 F6 F7 F8
-        // These messages are used by the developer.
-        // + Reboot system
+    // F5 F6 F7 F8
+    // These messages are used by the developer.
+    // + Reboot system
     // + Switch focus.
     // + Test 1
     // + Test 2
@@ -810,16 +801,18 @@ done:
  * 
  */
 
-// Esta função será usada para ler dados do teclado na porta 0x60, fora do IRQ1.
-uint8_t keyboard_read (void){
+// Esta função será usada para ler dados do teclado na 
+// porta 0x60, fora do IRQ1.
+uint8_t keyboard_read (void)
+{
  
-	kbdc_wait (0);
-	
-	uint8_t val = in8 (0x60);
+    kbdc_wait (0);
+
+    uint8_t val = in8 (0x60);
     
-	wait_ns (400);
+    wait_ns(400);
     
-	return (uint8_t) val;
+    return (uint8_t) val;
 }
 
 
@@ -829,14 +822,15 @@ uint8_t keyboard_read (void){
  * 
  */
  
-// Esta função será usada para escrever dados do teclado na porta 0x60, fora do IRQ1.
-void keyboard_write (uint8_t write){
-
+// Esta função será usada para escrever dados do teclado 
+// na porta 0x60, fora do IRQ1.
+void keyboard_write (uint8_t write)
+{
     kbdc_wait (1);
 
     out8 ( 0x60, write );
     
-    wait_ns (400);
+    wait_ns(400);
 }
 
 

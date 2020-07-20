@@ -2,16 +2,13 @@
 
 struct gws_screen_d
 {
-
     int id;
     int used;
     int magic;
     
-  
     unsigned long width;
     unsigned long height;
     //bpp?
-
 
     unsigned long font_size;
 
@@ -26,11 +23,8 @@ struct gws_screen_d
     
     struct gws_window_d *root;
 
-    //struct gws_screen_d *next;
+    struct gws_screen_d *next;
 };
 struct gws_screen_d *CurrentScreen;
-
-
-//unsigned long screenList[?];
 
 

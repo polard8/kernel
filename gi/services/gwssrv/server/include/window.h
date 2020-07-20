@@ -99,10 +99,10 @@
 //módulo /sm no procedimento de janela do sistema.
 //Todas as mensagens de console serão atencidas pelo procedimento de janela 
 //nessa mensagem.
-#define MSG_CONSOLE_COMMAND 49
-#define MSG_CONSOLE_SHUTDOWN 50
-#define MSG_CONSOLE_REBOOT   51
-#define MSG_DEVELOPER 52
+#define MSG_CONSOLE_COMMAND   49
+#define MSG_CONSOLE_SHUTDOWN  50
+#define MSG_CONSOLE_REBOOT    51
+#define MSG_DEVELOPER         52
 
 
 //UM TIMER SE ESGOTOU,
@@ -111,11 +111,25 @@
 //...
 
 
+
+
+//
+// Variables.
+//
+
+
+
+// Contagem de janelas existentes.
 // precisa ser inicializada.
 unsigned long windows_count;
 
+int window_with_focus;
 
+int active_window;
 
+int top_window;
+
+// ...
 
 
 
@@ -912,26 +926,13 @@ struct gws_window_d *ROOT;
 #define WINDOW_COUNT_MAX 1024
 
 unsigned long windowList[WINDOW_COUNT_MAX];
-//unsigned long gwsWindowList[1024]
+//unsigned long gwssrvWindowList[1024]
 
 
 //
 // ================================================================
 //
 
-
-
-
-
-
-
-//
-// variáveis 
-//
-
-int active_window;
-int top_window;
-// ...
 
 
 
@@ -1079,9 +1080,10 @@ void gwsWindowUnlock (struct gws_window_d *window);
 
 int gwsDefineInitialRootWindow ( struct gws_window_d *window );
 
+int gwssrv_init_windows(void);
 
 
-
-
-
+//
+// End.
+//
 

@@ -6,6 +6,10 @@
  */
 
 
+#ifndef __NC2_FONT_H
+#define __NC2_FONT_H
+
+
 static unsigned char font_nelson_cole2[128*8] = {
 	
 //0  
@@ -1305,6 +1309,7 @@ static unsigned char font_nelson_cole2[128*8] = {
 
 };
 
+#endif
 
 
 /*

@@ -21,15 +21,6 @@
 #include <gws.h>
 
 
-//fonts
-#include "nc2.h"
-
-
-
-
-unsigned long __device_width;
-unsigned long __device_height;
-
 
 void gws_show_backbuffer(void)
 {
@@ -59,7 +50,31 @@ unsigned long gws_get_device_height(void)
 
 
 
+int gwssrv_init_globals(void)
+{
+    // buffers
+    ____BACKBUFFER_VA  = (unsigned long) gde_get_system_metrics(12);
+    ____FRONTBUFFER_VA = (unsigned long) gde_get_system_metrics(11);
 
+
+    // Screen
+    SavedX = gde_get_system_metrics(1);
+    SavedY = gde_get_system_metrics(2);
+    __device_width  = SavedX;
+    __device_height = SavedY;
+
+
+    // bpp
+    SavedBPP = (unsigned long) gde_get_system_metrics(9);
+
+
+
+   
+    //...
+
+
+    return 0;
+}
 
 
 /*
@@ -68,11 +83,13 @@ unsigned long gws_get_device_height(void)
  *     Initialize the server. 
  *
  */
-
+//int gwsInit (void){
 int gwsInit (){
 
-    int i=0;
-    
+
+    // Initializing globals.
+    gwssrv_init_globals();
+
     
     // #todo
     // Configurar as estruturas em ordem:
@@ -100,107 +117,74 @@ int gwsInit (){
         debug_print("gwsInit: CurrentScreen\n");
         //while(1);
     }else{
-        CurrentScreen->id = 0; //
-        CurrentScreen->used = 1; //
-        CurrentScreen->magic = 1234; //
+        CurrentScreen->id = 0; 
+        CurrentScreen->used = 1; 
+        CurrentScreen->magic = 1234; 
+
+        // Serão configurados depois.
+        // Por enquanto estamos apenas limpando.
+        CurrentScreen->width = 0;
+        CurrentScreen->height = 0;
+        CurrentScreen->font_size = 0;
+        CurrentScreen->char_width  = 0;
+        CurrentScreen->char_height = 0;
+        CurrentScreen->backbuffer  = NULL;
+        CurrentScreen->frontbuffer = NULL;
         //...
+
     };
 
 
-    
-    // Initializing the counter.
-    windows_count = 0;
+    // font support.
+    gwssrv_init_font();
 
-   
-    for (i=0; i<1024; i++)
-        windowList[0] = 0;
+    // char support
+    gwssrv_init_char();
+    
 
+    //windows
+    gwssrv_init_windows();    
+            
 
-    // Fonte atual.
-    gws_currentfont_address = (unsigned long) &font_nelson_cole2[0]; 
-    gfontSize = 8;
-
-    //CurrentScreen->font_size = gfontSize;
-
-    // draw char support
-    // #todo: Essa configuração ficará aqui, dependendo da fonte.
-    gcharWidth = 8;   //gde_get_system_metrics (7);
-    gcharHeight = 8;   //gde_get_system_metrics (8);
-    
-    
-    //CurrentScreen->char_width = gcharWidth;
-    //CurrentScreen->char_height = gcharHeight;
-    
-    //
-    // Screen
-    //
-    
-    __device_width =  gde_get_system_metrics (1);
-    __device_height = gde_get_system_metrics (2);
-    
-    SavedX = __device_width;
-    SavedY = __device_height;
-    
-    
-    //CurrentScreen->width = __device_width;
-    //CurrentScreen-height = __device_height;
-    
-    //
-    // bpp
-    //
-    
-    //#test
-    SavedBPP = (unsigned long) gde_get_system_metrics (9);
-    
-    
-    //#obs:
-    //Se for possível vamos copiar do backbuffer para o front buffer
-    //daqui do gws e não chamaremos o kernel para isso.
-    
-    //ok
-    ____BACKBUFFER_VA = (unsigned long) gde_get_system_metrics (12);
-    
-    //#test
-    ____FRONTBUFFER_VA = (unsigned long) gde_get_system_metrics (11);
-    
-    
-    
-    
-    
     //
     // gui structure.
     //
     
     // First level structure for the GUI.
-    gui = (void *) malloc ( sizeof( struct gui_d) );
-    
-    if ( (void *) gui == NULL ){
+    gui = (void *) malloc( sizeof( struct gui_d) );
+    if ( (void *) gui == NULL )
+    {
         debug_print("gwsInit: gui\n");
         return -1;
     }
-    
-    // (root window)
-    gui->screen = (struct gws_window_d *) createwCreateWindow ( WT_SIMPLE, 
-                                          1, 1, "screen-window",  
-                                          0, 0, 
-                                          __device_width, __device_height,   
-                                           NULL, 0, xCOLOR_GRAY3, xCOLOR_GRAY3 );
 
-    if( (void*) gui->screen == NULL){
-        debug_print("gwsInit: screen window\n");
-        return -1;    
-    }
 
-    //#test
-    gwsDefineInitialRootWindow (gui->screen);
-    
-    
-    // main window.
-    // desktop area without the bars.
-    // For maximized apps.
-    gui->main = gui->screen;
+    if ( (void *) gui != NULL )
+    {
+        // (root window)
+        gui->screen = (struct gws_window_d *) createwCreateWindow ( WT_SIMPLE, 
+                                              1, 1, "screen-window",  
+                                              0, 0, 
+                                              __device_width, __device_height,   
+                                              NULL, 0, xCOLOR_GRAY3, xCOLOR_GRAY3 );
 
+        if ( (void*) gui->screen == NULL){
+            debug_print("gwsInit: screen window\n");
+            return -1;    
+        }
+
+        //#test
+        gwsDefineInitialRootWindow (gui->screen);
     
+        // main window.
+        // desktop area without the bars.
+        // For maximized apps.
+        gui->main = gui->screen;
+    } 
+
+    //
+    // Refresh
+    //
     
     // #todo
     // Configurar a estrutura de cliente.
@@ -208,7 +192,8 @@ int gwsInit (){
     
     // #kgws.
     // Isso usa o kernel.
-    gde_show_backbuffer ();
+    // #todo: Acho que nessa hora ja temos uma rotina própria válida.
+    gde_show_backbuffer();
 
     return 0;
 }

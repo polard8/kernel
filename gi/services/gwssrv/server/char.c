@@ -13,6 +13,19 @@
 #include <gws.h>
 
 
+int gwssrv_init_char(void)
+{
+
+    //char
+    gcharWidth  = 8;   //gde_get_system_metrics (7);
+    gcharHeight = 8;   //gde_get_system_metrics (8);
+
+    //...
+    
+    return 0;
+}
+
+
 // Constrói um caractere transparente 8x8 no buffer.
 void 
 charBackbufferCharBlt ( 
