@@ -45,19 +45,9 @@ LIBGWSOBJ = ../../../lib/libgws/obj
 	##
 
 myObjects = crt0.o main.o stubs.o \
-ctype.o \
-stdio.o \
-fcntl.o \
-stdlib.o \
-string.o \
-unistd.o \
-termios.o \
-ioctl.o \
-socket.o \
-gws.o connect.o events.o rw.o     
-
-
-
+ctype.o stdio.o fcntl.o stdlib.o string.o \
+unistd.o termios.o ioctl.o socket.o \
+connect.o events.o rw.o gws.o    
 
 
 
@@ -85,16 +75,15 @@ all-c:
 	cp $(LIBCOBJ)/ioctl.o  .
 	cp $(LIBCOBJ)/socket.o  .
 
-
+	# libgws
 	cp $(LIBGWSOBJ)/connect.o .
 	cp $(LIBGWSOBJ)/events.o .
-	cp $(LIBGWSOBJ)/gws.o .
 	cp $(LIBGWSOBJ)/rw.o .
-	
-	
+	cp $(LIBGWSOBJ)/gws.o .
+
+
 hello-link:
 	ld -m elf_i386 -T ../link.ld -o TERMINAL.BIN $(myObjects)    
-
 
 
 finalize:

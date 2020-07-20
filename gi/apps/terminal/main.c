@@ -59,9 +59,6 @@ char __buffer[512];
 
 
 
-void gnst_yield(void);
-
-
 // Hello!
 // Podemos isso na lib.
 int terminal_hello_request(int fd);
@@ -1179,15 +1176,6 @@ int gerar_numero(int lim_inf, int lim_sup)
 
 
 
-
-void gnst_yield(void){
-	
-    gramado_system_call (265,0,0,0); //yield thread.
-}
-
-
-
-
 //char *hello = "Hello there!\n";
 /*
 #define IP(a, b, c, d) (a << 24 | b << 16 | c << 8 | d)
@@ -1223,7 +1211,7 @@ int terminal_hello_response(int fd){
 
     int y;
     for(y=0; y<15; y++)
-        gnst_yield();
+        gws_yield();
 
 
 
@@ -1243,12 +1231,12 @@ __again:
     
     // Não vamos insistir num arquivo vazio.
     //if (n_reads<=0){
-    //     gnst_yield();        
+    //     gws_yield();        
     //    goto __again;
     //}
 
     if (n_reads == 0){
-         gnst_yield();        
+         gws_yield();        
         goto __again;
     }
     
@@ -1266,7 +1254,7 @@ __again:
     switch (msg)
     {
         case SERVER_PACKET_TYPE_REQUEST:
-            gnst_yield ();
+            gws_yield ();
             goto __again;
             break;
             

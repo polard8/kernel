@@ -157,7 +157,7 @@ gws_create_window_using_socket (
     int parentwindow,  //9, Endereço da estrutura da janela mãe.
     unsigned long onde,        //10, Ambiente.( Est� no desktop, barra, cliente ...)
     unsigned long clientcolor, //11, Cor da área de cliente
-    unsigned long color );      //12, Color (bg) (para janela simples).
+    unsigned long color );     //12, Color (bg) (para janela simples).
 
 
 // #bugbug:

@@ -69,9 +69,6 @@ char __buffer[512];
 
 
 
-void gnst_yield(void);
-
-
 // Hello!
 // Podemos isso na lib.
 int browser_hello_request(int fd);
@@ -617,15 +614,6 @@ int gerar_numero(int lim_inf, int lim_sup)
 
 
 
-
-void gnst_yield(void){
-	
-    gramado_system_call (265,0,0,0); //yield thread.
-}
-
-
-
-
 //char *hello = "Hello there!\n";
 /*
 #define IP(a, b, c, d) (a << 24 | b << 16 | c << 8 | d)
@@ -661,7 +649,7 @@ int browser_hello_response(int fd){
 
     int y;
     for(y=0; y<15; y++)
-        gnst_yield();
+        gws_yield();
 
 
 
@@ -681,12 +669,12 @@ __again:
     
     // Não vamos insistir num arquivo vazio.
     //if (n_reads<=0){
-    //     gnst_yield();        
+    //     gws_yield();        
     //    goto __again;
     //}
 
     if (n_reads == 0){
-         gnst_yield();        
+        gws_yield();        
         goto __again;
     }
     
@@ -704,7 +692,7 @@ __again:
     switch (msg)
     {
         case SERVER_PACKET_TYPE_REQUEST:
-            gnst_yield ();
+            gws_yield ();
             goto __again;
             break;
             
@@ -799,6 +787,12 @@ int main ( int argc, char *argv[] ){
 
     int client_fd = -1;
 
+    // Porta para o Window Server 'ws' em gramado_ports[]
+    struct sockaddr_in addr_in;
+    addr_in.sin_family = AF_INET;
+    addr_in.sin_port   = 7547;   
+    addr_in.sin_addr.s_addr = IP(192, 168, 1, 112); 
+
 
     debug_print ("---------------------------\n");    
     debug_print ("browser: Initializing ...\n");
@@ -813,7 +807,6 @@ int main ( int argc, char *argv[] ){
     // cria o soquete.
     // AF_GRAMADO
     //client_fd = socket ( 8000, SOCK_STREAM, 0 );
-    
     client_fd = socket ( AF_INET, SOCK_STREAM, 0 );
     
     if ( client_fd < 0 ){
@@ -822,11 +815,6 @@ int main ( int argc, char *argv[] ){
     }
 
 
-    //porta para o Window Server 'ws' em gramado_ports[]
-    struct sockaddr_in addr_in;
-    addr_in.sin_family = AF_INET;
-    addr_in.sin_port   = 7547;   
-    addr_in.sin_addr.s_addr = IP(192, 168, 1, 112); 
 
 
     //
@@ -870,12 +858,14 @@ int main ( int argc, char *argv[] ){
     //browser_createwindow_request(client_fd, 80, 80, 480, 320, COLOR_PINK);
     //browser_createwindow_response(client_fd); 
 
+    // libgws
     // Create window using the client-side gui.
-    //ok isso funcionou.
+    // Ok isso funcionou. 
     gws_create_window_using_socket (client_fd,
-        1,1,1,"no-name",
-        160, 160, 480,320,
+        WT_SIMPLE,1,1,"Browser",
+        40, 40, 640, 480,
         0,0,COLOR_GRAY, COLOR_GRAY);
+
 
     //loop
     browser_loop(client_fd);

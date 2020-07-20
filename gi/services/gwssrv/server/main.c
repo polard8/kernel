@@ -77,7 +77,7 @@ unsigned long next_response[32];
 // Prototypes.
 void create_background (void);
 void create_taskbar (void);
-void gws_yield (void);
+void gwssrv_yield (void);
 
 int 
 gwsProcedure ( 
@@ -228,7 +228,7 @@ void handle_request (int fd){
     //n_reads = recv ( fd, __buffer, sizeof(__buffer), 0 );
 
     if (n_reads <= 0){
-        gws_yield();
+        gwssrv_yield();
         return;
     }
 
@@ -239,7 +239,7 @@ void handle_request (int fd){
             
     // Mensagem inválida  
     if (message_buffer[1] == 0 ){
-        gws_yield();
+        gwssrv_yield();
         return;
     }
 
@@ -344,7 +344,7 @@ __again:
     //n_writes = send ( fd, __buffer, sizeof(__buffer), 0 );
     
     if (n_writes<=0){
-        gws_yield();
+        gwssrv_yield();
         goto __again;
     }
 
@@ -973,9 +973,11 @@ int main (int argc, char **argv){
         printf ("gwssrv: Calling child \n");  
 
         //gde_clone_and_execute ("gws.bin");  
-        gde_clone_and_execute ("terminal.bin"); 
-        //gde_clone_and_execute ("browser.bin"); 
+        //gde_clone_and_execute ("terminal.bin"); 
+        gde_clone_and_execute ("browser.bin"); 
         // ...        
+
+
 
         //
         // Wait
@@ -984,7 +986,7 @@ int main (int argc, char **argv){
         printf ("gwssrv: [FIXME] yield \n");
        
         for (i=0; i<11; i++)
-            gws_yield ();
+            gwssrv_yield ();
  
 
         //
@@ -1410,8 +1412,8 @@ int serviceDrawButton(void)
 
 
 
-void gws_yield(void){
-	
+void gwssrv_yield(void)
+{
     gramado_system_call (265,0,0,0); //yield thread.
 }
 

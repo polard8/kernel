@@ -47,8 +47,6 @@ main.o:
    # Porém acho que a api não usou recursos da libcore;
 
 all-c:
-
-
 	gcc -c connect.c  $(CFLAGS) $(LIBS) -o connect.o
 	gcc -c events.c   $(CFLAGS) $(LIBS) -o events.o
 	gcc -c rw.c       $(CFLAGS) $(LIBS) -o rw.o

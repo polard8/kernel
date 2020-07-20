@@ -87,7 +87,7 @@ all-c:
 	gcc  -c  window.c   -I $(LIBC) -I $(API02)   -I $(GWS_INCLUDES) -I . $(CFLAGS) -o window.o
 	gcc  -c  bmp.c      -I $(LIBC) -I $(API02)   -I $(GWS_INCLUDES) -I . $(CFLAGS) -o bmp.o
 	gcc  -c  connect.c  -I $(LIBC) -I $(API02)   -I $(GWS_INCLUDES) -I . $(CFLAGS) -o connect.o
-	gcc  -c  button.c  -I $(LIBC) -I $(API02)   -I $(GWS_INCLUDES) -I . $(CFLAGS) -o button.o
+	gcc  -c  button.c   -I $(LIBC) -I $(API02)   -I $(GWS_INCLUDES) -I . $(CFLAGS) -o button.o
 	# ...
 	
 	

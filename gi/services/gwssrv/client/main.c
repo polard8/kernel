@@ -340,7 +340,7 @@ gwst_createwindow_request (
 
 
 
-    char *name = "Window name 1";
+    char *name = "gws-client";
 
    
 
@@ -371,6 +371,7 @@ gwst_createwindow_request (
         
         message_buffer[8] = bg_color; //xCOLOR_GRAY2; 
 
+        message_buffer[9] = WT_SIMPLE;
          
         //...
 
@@ -485,7 +486,7 @@ response_loop:
             break;
             
         case SERVER_PACKET_TYPE_ERROR:
-            gws_debug_print ("gwst: SERVER_PACKET_TYPE_ERROR\n");
+            gws_debug_print ("gws: SERVER_PACKET_TYPE_ERROR\n");
             goto response_loop;
             //exit (-1);
             break;
@@ -494,10 +495,6 @@ response_loop:
             goto response_loop;
             break; 
     };
-
-
-
-
 
 //
 // Process reply.
@@ -508,12 +505,12 @@ response_loop:
 process_reply:
 
     // #test
-    gws_debug_print ("gwst: Testing close() ...\n"); 
+    gws_debug_print ("gws: Testing close() ...\n"); 
     //close (fd);
 
-    //gws_debug_print ("gwst: bye\n"); 
-    printf ("gwst: Window ID %d \n", message_buffer[0] );
-    //printf ("gwst: Bye\n");
+    //gws_debug_print ("gws: bye\n"); 
+    printf ("gws: Window ID %d \n", message_buffer[0] );
+    //printf ("gws: Bye\n");
     
     // #todo
     // Podemos usar a biblioteca e testarmos
@@ -526,7 +523,7 @@ process_reply:
 //
 
 process_event:
-    gws_debug_print ("gwst: We got an event\n"); 
+    gws_debug_print ("gws: We got an event\n"); 
     return 0;
 
 }
@@ -595,7 +592,8 @@ int main ( int argc, char *argv[] ){
     // === Create Window ===
     //
     
-    gwst_createwindow_request(client_fd, 40, 40, 320, 280, COLOR_GRAY);
+    gwst_createwindow_request (client_fd, 
+        40, 40, 320, 280, COLOR_GRAY);
     gwst_createwindow_response(client_fd);     
     
     
@@ -625,7 +623,6 @@ int main ( int argc, char *argv[] ){
     gwst_createwindow_response(client_fd);
     }
     */
-    
     
     gws_debug_print ("gws: bye :) \n");
     return 0;

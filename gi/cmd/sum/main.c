@@ -18,7 +18,7 @@ int main ( int argc, char *argv[] ){
     register long nbytes;
     int errflg = 0;
 
-    i = 1;
+    i=1;
 
     do {
     
@@ -28,13 +28,14 @@ int main ( int argc, char *argv[] ){
 				errflg += 10;
 				continue;
 			}
-		} else
+
+        } else
 			f = stdin;
 		sum = 0;
 		nbytes = 0;
-		
-		while ((c = getc(f)) != EOF)
-		{
+
+        while ((c = getc(f)) != EOF)
+        {
 			nbytes++;
 			if (sum&01)
 				sum = (sum>>1) + 0x8000;
@@ -46,7 +47,8 @@ int main ( int argc, char *argv[] ){
 		
 		if (ferror(f)) {
 			errflg++;
-			fprintf(stderr, "sum: read error on %s\n", argc>1?argv[i]:"-");
+			//fprintf(stderr, "sum: read error on %s\n", argc>1?argv[i]:"-");
+		    printf("sum: read error on %s\n", argc>1?argv[i]:"-");
 		}
 		
 		
