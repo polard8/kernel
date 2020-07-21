@@ -351,16 +351,27 @@ fail:
 }
 
 
+
+// #bugbug
+// openat - open a file relative to a directory file descriptor 
+// See: https://linux.die.net/man/2/openat
 // Wrapper
 int k_openat (int dirfd, const char *pathname, int flags){
 
     file *f;
     
-
     debug_print ("k_openat: [FIXME]\n");
 
-    // #todo
-    // dirfd, flags.
+
+    // The directory
+    if ( dirfd < 0 ){ 
+        debug_print("k_openat: [FAIL] dirfd\n");
+        return -1; 
+    }
+
+
+    //#todo:
+    //flags.
 
     // #bugbug
     // Improvisando com essa que funciona o carregamento.

@@ -60,29 +60,38 @@ int fcntl ( int fd, int cmd, ... )
 }
 
 
-
+// openat - open a file relative to a directory file descriptor 
+// See: https://linux.die.net/man/2/openat
 int openat (int dirfd, const char *pathname, int flags){
 
     int __ret = -1;
 
 
-    // #todo:
-    // firfd, Flags.
+    // The directory
+    if ( dirfd < 0 ){ 
+        debug_print("openat: [FAIL] dirfd\n");
+        return -1; 
+    }
     
-    //todo
-    //if ( dirfd < 0 ){ return -1; }
-    
-    
+    // path
     if (!pathname) {
+        debug_print("openat: [FAIL] pathname\n");
         //errno = EFAULT;
         return -1;
     }
     
     // Carrega um arquivo dado o nome e um modo.
    __ret = (int) gramado_system_call ( 246, 
-                     (unsigned long) pathname, 
-                     (unsigned long) flags,      // ??mode
-                     (unsigned long) flags );    // ??mode
+                     (unsigned long) dirfd, 
+                     (unsigned long) pathname,  
+                     (unsigned long) flags ); 
+
+    if ( __ret < 0 ){ 
+        debug_print("openat: [FAIL]\n");
+        //errno = EFAULT;
+        return -1; 
+    }
+
 
     return (int) __ret;
 }
@@ -101,32 +110,34 @@ int openat (int dirfd, const char *pathname, int flags){
 
 int open (const char *pathname, int flags, mode_t mode){
 
-    int __fd = -1;
+    int fd = -1;
+    size_t FileSize = -1;
 
-    char path[64];
-    
-      
+    char tmp_path[64];
+
+
+
     // #importante
     // adaptando para fat16.
     // #todo: devemos fazer isso em ring0, não aqui.
     // isso funcionou.
     stdio_fntos( (char *) pathname);
-    sprintf(path,pathname);
+    sprintf(tmp_path,pathname);
     
     //
     // size
     //
     
     // Get file size.
-    size_t s = (size_t) gramado_system_call ( 178, 
-                            (unsigned long) path,
-                            0,
-                            0 );
+    // Limits: 1MB.
     
-    
-    if ( s <= 0 || s > 1024*1024 ){
-        printf ("open: size\n");
-        return -1;
+    FileSize = (size_t) gramado_system_call ( 178, 
+                            (unsigned long) tmp_path, 0, 0 );
+
+    if ( FileSize <= 0 || FileSize >= (1024*1024) )
+    {
+        printf ("open: [FAIL] FileSize\n");
+        return (int) (-1);
     }
 
 
@@ -137,23 +148,19 @@ int open (const char *pathname, int flags, mode_t mode){
     // o kernel não pode confiar na qualidade da libc.
     
     
-    //IN: service, name, address, 0, 0 
+    //IN: service, pathname, flags, mode 
+    fd = (int) gramado_system_call ( 16,  
+                   (unsigned long) tmp_path, 
+                   (unsigned long) flags,  
+                   (unsigned long) mode );
 
-    __fd = (int) gramado_system_call ( 3,  
-                     (unsigned long) path, 
-                     (unsigned long) flags,  
-                     (unsigned long) mode );
-
-    if (__fd < 0){
-        printf ("open: Couldn't load the file. fd fail.\n");
-        return -1;
+    if (fd < 0){
+        printf ("open: [FAIL]\n");
+        return (int) (-1);
     }
 
-
-     // retornamos o fd do arquivo para fopen usar e colocar
-     // numa stream ?
-     
-     return (int) __fd;
+    // fopen() needs this. 
+    return (int) fd;
 }
 
 

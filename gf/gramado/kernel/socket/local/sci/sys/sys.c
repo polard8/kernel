@@ -322,72 +322,17 @@ int sys_fcntl ( int fd, int cmd, unsigned long arg ){
 // vamos retornar o indice da tabela de arquivos abertos 
 // do processo atual.
 
-int sys_open (const char *pathname, int flags, mode_t mode ){
+int 
+sys_open (
+    const char *pathname, 
+    int flags, 
+    mode_t mode )
+{
 
-    struct process_d *p;
-    
-    int __Status = -1;
-    int Size = -1;
-    
-    
-    // #todo
-    // Checar validade dos argumentos.
-
-    // #steps
-    // Change to uppercase.
-    // Search in the directory.
-    // Create the file if it doesn't exist and 
-    // we have the flag O_CREAT
-    // ...    
-    
-    // Ajust.
-    read_fntos ( (char *) pathname );
-
-
-    // Searching for the file only on the root dir.
-    __Status = (int) KiSearchFile ( (unsigned char *) pathname, 
-                         VOLUME1_ROOTDIR_ADDRESS );
-
-    // The file doesn't exist.
-    // #todo:
-    // Create the file if it doesn't exist and 
-    // we have the flag O_CREAT
-    
-    if (__Status != 1)
-    {
-         if (flags & O_CREAT)
-         {
-             //#todo: Create an empty file.
-             debug_print ("sys_open: [TODO] O_CREAT\n");
-         }
-         
-         //debug_print ("sys_open: not found\n");
-         printf ("sys_open: not found\n");
-         refresh_screen();
-         return -1;
-    }
-
-
-
-    // IN: name , address.
-    Size = (int) fsGetFileSize ( (unsigned char *) pathname ); 
-    
-    if( Size<=0 || Size> 1024*1024 )
-    {
-         printf("sys_open: Size\n");
-         refresh_screen();
-         return -1;
-    }
-
-
-    // Essa função funciona igual open().
-    // See: fs/fs.c
-    // #todo: flags e mode.
-    // IN: name, flags, mode;
-    // OUT: fd.
-    
-    return (int) sys_read_file ( (char *) pathname, 0, 0 );
+    // OUT: fd
+    return (int) sys_read_file ( (char *) pathname, flags, mode );
 }
+
 
 
 /*

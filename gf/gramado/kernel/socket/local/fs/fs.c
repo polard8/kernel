@@ -1847,9 +1847,13 @@ void fs_pathname_backup ( int pid, int n ){
 // e depois estamos usando o buffer em ring3 passado pelo usu�rio.
 // >>> vamos confiar no usu�rio e usarmos
 
-int sys_read_file ( char *file_name,  int flags, mode_t mode ){
 
-
+int 
+sys_read_file ( 
+    char *file_name, 
+    int flags, 
+    mode_t mode )
+{
 
         // #bugbug
         // precisamos colocar os arquivos também na lista

@@ -1315,17 +1315,6 @@ gde_services (
         // Carregar um arquivo do disco para a mem�ria.
         // See: fs/fs.c
 
-        // #aten��o
-        // Isso ser� usado por open(),
-        // Ent�o podemos usar argumentos que combinem com open.
-        // N�o receberemos um endere�o em ring3, pois n�o d� 
-        // pra confiar na libc.
-
-        // #bugbug
-        // precisamos colocar os arquivos também na lista
-        // global de arquivos abertos. openfileList[]
-        // See: fs.c
-
         // IN: name, flags, mode
         case SYS_READ_FILE:
             return (void *) sys_read_file ( (char *) a2, 
@@ -1427,22 +1416,20 @@ gde_services (
 
 
         // 16 - open()
-        // #obs
-        // Isso precisa abrir um arquivo, colocar o ponteiro na 
-        // lista de arquivos abertos e retornar o �ndice. 
-        // IN: pathname, flags, mode.
-        //#bugbug: o tratamento de open() em ring3 deve ser igual fizemos com fopen.
-        //#bugbug: open() em ring 3 est� usando outra chamada
-        //pra carregar o arquivo.
-        //e se for um dispositivo?
+        //See: sys.c
+        // IN: pathname, flags, mode
+        //OUT: fd
         case SYS_OPEN:
             debug_print ("gde_serv: SYS_OPEN\n");
-            return NULL;   
+            return (void *) sys_open( (const char *) arg2, 
+                                (int) arg3, (mode_t) arg4 ); 
             break;
 
-
         // 17 - close()
+        // See: sys.c
+        // IN: fd
         case SYS_CLOSE:
+            debug_print ("gde_serv: SYS_CLOSE\n");
             return (void *) sys_close( (int) arg2 );
             break;
 
@@ -2592,8 +2579,8 @@ gde_services (
         // =====================================
         // 246 ~ 249 reservado para libc support.
 
-
         // 246
+        // openat - open a file relative to a directory file descriptor 
         // IN: dirfd, pathname, flags.
         case 246:
             return (void *) k_openat ( (int) arg2, 
