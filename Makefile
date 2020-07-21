@@ -1,7 +1,7 @@
 # License: BSD License
 VERSION = 1
 PATCHLEVEL = 0
-SUBLEVEL = 55
+SUBLEVEL = 56
 EXTRAVERSION = 
 NAME = Gramado 1.0
 
