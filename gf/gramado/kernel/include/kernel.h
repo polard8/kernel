@@ -65,65 +65,70 @@ extern void do_executa_new_task (void);
 
 // =========================================================
 
+
+//
 // config
-//#include "gramado.h"    // product. 
-#include "animal.h"    // product. 
-#include "config.h"     // compiling.
+//
 
+#include "config/gramado.h"    // product. 
+#include "config/config.h"     // compiling.
+
+//
+// gramado
+//
+
+#include "gramado/limits.h"
+
+
+//
 // globals
-#include "gpa.h"
-#include "gva.h"
-#include "gentry.h"
-#include "gdef.h"
-#include "gdevice.h"
-#include "gobject.h"
-#include "gspin.h"
-#include "gwd.h"   //whatch dogs
+//
+
+#include "globals/gpa.h"
+#include "globals/gva.h"
+#include "globals/gentry.h"
+#include "globals/gdef.h"
+#include "globals/gdevice.h"
+#include "globals/gobject.h"
+#include "globals/gspin.h"
+#include "globals/gwd.h"   //whatch dogs
 
 
+//
+// klibc
+//
+
+#include "klibc/cdefs.h"
+#include "klibc/stddef.h"
+#include "klibc/types.h"   //todo: merge
+#include "klibc/types2.h"
+#include "klibc/limits.h"
+#include "klibc/kstdio.h"
 
 
-
-
-// libcore
-#include "cdefs.h"
-#include "stddef.h"
-#include "types.h"
-
-
-#include "types2.h"
-
-// libcore
-#include "limits.h"
-
-
-// libcore
-#include "kstdio.h"
 
 // kdrivers
 #include "console.h"
 
 
-// libcore
-#include "stdlib.h"
-#include "string.h"
-#include "ctype.h"
-#include "iso646.h"
-#include "signal.h"
-#include "unistd.h"
-#include "fcntl.h"
+//
+// klibc
+//
+
+#include "klibc/stdlib.h"
+#include "klibc/string.h"
+#include "klibc/ctype.h"
+#include "klibc/iso646.h"
+#include "klibc/signal.h"
+#include "klibc/unistd.h"
+#include "klibc/fcntl.h"
+#include "klibc/ioctl.h"
+#include "klibc/ioctls.h"
+#include "klibc/termios.h"
+#include "klibc/ttydef.h"
 
 
-//#net
-//#include "socket.h" //test ... tentando mudar para baixo logo apos os headers de network
 
-
-#include "ioctl.h"
-#include "ioctls.h"
-
-#include "termios.h"
-#include "ttydef.h"
-//...
 
 
 #include "mm.h"
@@ -149,21 +154,26 @@ extern void do_executa_new_task (void);
 #include "ascii.h" 
 
 
-#include "path.h"         // path.
-#include "fat.h"          // fat.
-
-//#test
-#include "inode.h"
 
 
-// elf
-#include "exec_elf.h"
 
 
-// sci/fs
-#include "pipe.h" 
-#include "fs.h"
-#include "vfs.h"
+
+
+
+//
+// fs
+//
+
+
+#include "fs/path.h"         // path.
+#include "fs/fat.h"          // fat16.
+#include "fs/inode.h"
+#include "fs/exec_elf.h"
+#include "fs/pipe.h" 
+#include "fs/fs.h"
+#include "fs/vfs.h"
+
 
 
 #include "prompt.h"
@@ -253,31 +263,30 @@ extern void do_executa_new_task (void);
 
 
 
-// sysmk (^)
-#include "x86cont.h"
+//
+// ps
+//
 
 
-#include "ts.h"
-#include "tasks.h"
-#include "image.h"
-#include "clone.h"
-#include "process.h"
-#include "thread.h"
+#include "ps/x86cont.h"
+#include "ps/ts.h"
+#include "ps/tasks.h"
+#include "ps/image.h"
+#include "ps/clone.h"
+#include "ps/process.h"
+#include "ps/thread.h"
+#include "ps/sched.h"
+#include "ps/ipc.h"
+#include "ps/ipccore.h"
+#include "ps/sem.h"
+#include "ps/queue.h"
+#include "ps/realtime.h"
+#include "ps/dispatch.h"
+#include "ps/event.h"
+#include "ps/ps.h"
+#include "ps/mk.h"
 
 
-#include "sched.h"
-#include "ipc.h"
-#include "ipccore.h"
-#include "sem.h"
-
-
-
-#include "queue.h"
-#include "realtime.h"
-#include "dispatch.h"
-#include "event.h"
-#include "ps.h"
-#include "mk.h"
 
 
 
@@ -296,10 +305,11 @@ extern void do_executa_new_task (void);
 // Security
 //
 
-#include "usession.h"
-#include "room.h"
-#include "desktop.h"
-#include "user.h"
+#include "security/usession.h"
+#include "security/room.h"
+#include "security/desktop.h"
+#include "security/user.h"
+
 
 
 #include "logon.h"
@@ -324,35 +334,28 @@ extern void do_executa_new_task (void);
 //    ==== NETWORK ====
 //
 
-#include "connect.h" 
-#include "host.h"
+#include "net/connect.h" 
+#include "net/host.h"
+#include "net/ethernet.h"
+#include "net/arp.h"
+#include "net/udp.h"
+#include "net/tcp.h"
+#include "net/nicintel.h"    //intel nic - network interface controller.
+#include "net/in.h"
+#include "net/un.h"
+#include "net/nports.h"     //(network) Network Ports  (sw)
+#include "net/ip.h"         //(network) IP info.      (sw)
+#include "net/ipv4.h" 
+//#include "net/ipv6.h" 
+#include "net/ipv4mac.h" 
+#include "net/icmp.h" 
+#include "net/packet.h"      // network packets.
+#include "net/channel.h"     //(network) Channel       (sw)
+#include "net/client.h"      //(network) Client process support. 
+#include "net/ns.h"          //(network) Network Server.
+#include "net/network.h"     //(network) Gerenciamento de rede.  
+#include "net/socket.h"      //last always
 
-#include "ethernet.h"
-#include "arp.h"
-#include "udp.h"
-#include "tcp.h"
-
-//intel nic - network interface controller.
-#include "nicintel.h"      
-
-#include "in.h"
-#include "un.h"
-#include "nports.h"     //(network) Network Ports  (sw)
-#include "ip.h"       //(network) IP info.      (sw)
-#include "ipv4.h" 
-//#include "ipv6.h" 
-#include "ipv4mac.h" 
-#include "icmp.h" 
-//...
-
-#include "packet.h"      // network packets.
-
-#include "channel.h"     //(network) Channel       (sw)
-#include "client.h"      //(network) Client process support. 
-#include "ns.h"          //(network) Network Server.
-#include "network.h"     //(network) Gerenciamento de rede.  
-
-#include "socket.h"
 
 
 //
