@@ -687,6 +687,12 @@ tty_sets (
 
 int tty_ioctl ( int fd, unsigned long request, unsigned long arg ){
 
+
+    struct tty_d *tty;
+    file *f;
+    struct process_d *p;
+
+
     debug_print ("tty_ioctl: TODO\n");
 
 
@@ -701,10 +707,7 @@ int tty_ioctl ( int fd, unsigned long request, unsigned long arg ){
    // um tty. Mas isso ja foi feito no wrapper sys_ioctl.
    
 
-    //#test
-    struct tty_d *tty;
-    file *f;
-    struct process_d *p;
+
      
     p = ( struct process_d * ) processList[current_process];
     
@@ -1283,7 +1286,6 @@ struct ttydrv_d *get_tty_driver( int fd )
 
 
 
-
 /*
  * tty_create: 
  * 
@@ -1577,8 +1579,9 @@ int ttyInit (int tty_id){
         CurrentTTY->magic = 1234;
         
         CurrentTTY->user_session = usession0;
-        CurrentTTY->room = room0;
-        CurrentTTY->desktop = desktop0;
+        CurrentTTY->room         = room0;
+        CurrentTTY->desktop      = desktop0;
+
 
         //
         // Window.
@@ -1596,14 +1599,13 @@ int ttyInit (int tty_id){
         // Standard stream. 
 
 
-
-        CurrentTTY->stdin = current_stdin;
+        CurrentTTY->stdin  = current_stdin;
         CurrentTTY->stdout = current_stdout;
         CurrentTTY->stderr = current_stderr;
 
 
         CurrentTTY->stdout_status = 0;
-        CurrentTTY->stdout_update_what = 0;	
+        CurrentTTY->stdout_update_what = 0;
 
 
 	    //

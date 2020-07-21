@@ -569,9 +569,9 @@ struct file_d
 
 
     // #test
-    // COntador de processos que abriram esse arquivo.
+    // Contador de processos que abriram esse arquivo.
     int counter;
-    
+
     // If the file is a tty, we need a tty structure.
     struct tty_d *tty;
 

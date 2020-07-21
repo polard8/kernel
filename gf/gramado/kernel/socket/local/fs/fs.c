@@ -435,13 +435,31 @@ void set_file ( void *file, int Index ){
 }
 
 
+/*
+//#todo
+file *getfile(void);
+file *getfile(void)
+{
+    file *_f;
+    int i=0;
+    
+    for(i=0;i<NUMBER_OF_FILES;i++)
+    {
+        _f = (void*) openfileList[i];
+        if( (void*) _f == NULL )
+            return (file *) _f;
+    };
 
+    //fail
+    return (file *) 0;
+}
+*/
 
 
 void *get_global_open_file (int Index){
-	
+
 	//Limits.
-	//@todo: max.
+	//@todo: max. NUMBER_OF_FILES
 
     if (Index < 0){
         // ?? todo: message

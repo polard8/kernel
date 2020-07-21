@@ -320,8 +320,9 @@ int ptmx_open (void){
     
     
     master = (struct tty_d *) tty_create();
-    slave = (struct tty_d *) tty_create();
-    
+    slave  = (struct tty_d *) tty_create();
+
+
     //#todo check validation
     
     int status = -1;

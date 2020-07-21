@@ -152,6 +152,8 @@ extern void do_executa_new_task (void);
 #include "path.h"         // path.
 #include "fat.h"          // fat.
 
+//#test
+#include "inode.h"
 
 
 // elf
