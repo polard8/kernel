@@ -567,6 +567,12 @@ struct file_d
     uid_t uid;  // User 
     gid_t gid;  // Group
 
+    // #importante
+    // Informação sobre o arquivo no disco.
+    // A estrutura de inode tem como elemento uma
+    // estrutura de entrada de fat.
+    struct inode_d *inode;
+
 
     // #test
     // Contador de processos que abriram esse arquivo.
@@ -688,58 +694,16 @@ typedef struct file_d file;
  +----------------+---------+-----------------------------------+
 */
 
-//
-//  ## ARQUIVOS DO PROCESSO KERNEL  ##
-//
 
-// Gramado Boot
+
 file *stdin;            //0
 file *stdout;           //1
 file *stderr;           //2
 file *vfs;              //3 - Diret�rio raiz do vfs. 
 file *volume1_rootdir;  //4 - Diret�rio raiz do volume de boot.
 file *volume2_rootdir;  //5 - Diret�rio raiz do volume do sistema. 
-file *file_InitTXT;     //6 - Arquivo de configura��o de inicializa��o. INIT.TXT.
-file *file_users;       //7 - Pasta para perfis de usu�rios. /users
-file *file_BootManager; //8 - Boot Manager. BM.BIN.
-file *file_BootLoader;  //9 - Boot Loader. BL.BIN.
 
-// Gramado Core
-file *file_Kernel;      //10 - Kernel base. KERNEL.BIN
-file *file_Init;        //11 - Init subsystem. INIT.BIN
-file *file_Shell;       //12 - Shell subsystem. SHELL.BIN
-file *file_TaskMan;     //13 - Task manager subsystem. TAKSMAN.BIN
 
-// Gramado Cali
-file *file_CS;          //14 California Shell. CS.BIN
-file *file_CFE;         //15 California File explorer. CFE.BIN
-file *file_CWE;         //16 California Web Explorer. CWE.BIN
-
-// Gramado LA
-file *file_LA;          //17 - Los Angeles Package Manager. LA.BIN  
-
-// System directories
-file *file_dd;          //18 - device drivers folder
-file *file_bin;         //19 - applications folder
-file *file_tmp;         //20 - tmp files folder
-file *file_download;    //21 - download files folder
-file *file_libs;        //22 - system libs folder
-
-// User directories
-file *file_pwd;         //23 - Diret�rio de trabalho. Diret�rio usado no comando 'pwd'. 
-
-//...
-
-//Array de estruturas.
-//FILE *_io_table[NUMBER_OF_FILES];
-
-// N� usaremos o array de estrutura.
-//#define stdin     (_io_table[0])	
-//#define stdout 	(_io_table[1])
-//#define stderr 	(_io_table[2])
-//#define stdin     (&_io_table[0])	
-//#define stdout 	(&_io_table[1])
-//#define stderr 	(&_io_table[2])
 
 
 /*
@@ -775,36 +739,20 @@ file *file_pwd;         //23 - Diret�rio de trabalho. Diret�rio usado no com
  * com o processo.
  */
  
-unsigned long fileList[NUMBER_OF_FILES]; 
+unsigned long file_table[NUMBER_OF_FILES]; 
 
 
-//
-// Lista global de arquivos abertos.
-//
 
-// #importante
-// Por causa dessa lista global, então mais de um processo
-// poderá abrir o mesmo arquivo de estrutura 'file'
-// O indice para essa lista ficará na estrutura de arquivo 'file'
-// e o contador de readers também.
-// O arquivo só poderá ser fechado quando não houver mais leitores.
-// Se o arquivo ja está aberto então apenas incrementamos
-// o contador.
-// Precisamos usar o 'file->pathname' para procurarmos
-// arquivo na lista.
-// Ou poderíamos usar o identificador de arquivos indexados.
-// obs: entrada de diretório é semelhante a inode.
-
-//#bugbug
-// talvez esse array precise ser maior.
-unsigned long openfileList[NUMBER_OF_FILES]; 
+// N� usaremos o array de estrutura.
+//#define stdin     (_io_table[0])	
+//#define stdout 	(_io_table[1])
+//#define stderr 	(_io_table[2])
+//#define stdin     (&_io_table[0])	
+//#define stdout 	(&_io_table[1])
+//#define stderr 	(&_io_table[2])
 
 
-/*
- * #importante 
- * ## suspenso ##
- */
-//unsigned long GlobalStreams[??]; 
+
 
 //
 // Pipes support

@@ -64,10 +64,17 @@ void vfsInit (void){
 	// ## STREAM ##
 	//
 	
+	int slot = -1;
+	
 	//foi definido em stdio.h
 	//file *vfs;
+	
+    // pega slot em file_table[] para
+    slot = get_free_slots_in_the_fileList();
+    if(slot<0 || slot >=NUMBER_OF_FILES)
+        panic("fsInit: slot");
+    vfs = file_table[slot];
 
-    vfs = (file *) kmalloc ( sizeof(file) );
 
     if ( (void *) vfs == NULL ){
         panic ("vfsInit: vfs fail");
@@ -83,7 +90,7 @@ void vfsInit (void){
         // todo: object
         
         vfs->_base = (unsigned char *) storage->vfs->rootdir_address;
-        vfs->_p = stdin->_base;
+        vfs->_p = vfs->_base;
         vfs->_cnt = ( VFS_ROOTDIR_NUMBER_OF_ENTRIES * VFS_ROOTDIR_ENTRY_SIZE );
         
         
@@ -91,11 +98,9 @@ void vfsInit (void){
         // Precisamos de um index.
         // Mas a lista é própria. fileList[]
         
-        vfs->_file = 0; //?
-        
+        vfs->_file = 0; //? 
         vfs->_tmpfname = "vfs-stream";
-
-        fileList[__KERNEL_STREAM_VFS] = (unsigned long) vfs;
+        vfs->counter =1;
     };
 
 

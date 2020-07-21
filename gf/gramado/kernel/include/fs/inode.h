@@ -27,3 +27,8 @@ struct inode_d
 };
 
 
+unsigned long inode_table[32];
+
+
+
+

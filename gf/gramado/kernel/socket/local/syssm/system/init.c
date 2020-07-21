@@ -459,28 +459,57 @@ done:
 
 void init_globals (void){
 
-#ifdef EXECVE_VERBOSE	
+
+    int i=0;
+
+
+#ifdef EXECVE_VERBOSE
     printf("sm-init-init_globals:\n");
-	debug_print("init_globals:\n");
+   debug_print("init_globals:\n");
 #endif
-	
-	//Outros.
-	errno = 0;
-	
-	//alocando memória para as estruturas do fluxo padrão.
-	//#bugbug: vamos deixar que stdioInitialize faça isso.
-	//stdin = (void *) kmalloc( sizeof(FILE) );
-	//stdout = (void *) kmalloc( sizeof(FILE) );
-	//stderr = (void *) kmalloc( sizeof(FILE) );
-	
-	//kstdin  = (void*) kmalloc( sizeof(FILE) );
-	//kstdout = (void*) kmalloc( sizeof(FILE) );
-	//kstderr = (void*) kmalloc( sizeof(FILE) );
-	
-    //inicializa as estruturas do fluxo padrão.	
-	stdioInitialize ();
-	
-	
+
+    //Outros.
+    errno = 0;
+
+    // file table
+    file *tmp;
+    for (i=0; i<NUMBER_OF_FILES;i++)
+    {
+        tmp = (void*) kmalloc (sizeof(file));
+        if ((void*)tmp==NULL)
+            panic("init_globals: tmp");
+            
+        tmp->used = 1;
+        tmp->magic = 1234;
+        tmp->counter = 0;
+        //...
+        
+        //salva
+        file_table[i] = (unsigned long) tmp; 
+    };
+
+    // inode table
+    struct inode_d *tmp_inode;    
+    for (i=0; i<32;i++)
+    {
+        tmp_inode = (void*) kmalloc (sizeof(struct inode_d));
+        if ((void*)tmp_inode==NULL)
+            panic("init_globals: tmp_inode");
+            
+        tmp_inode->used = 1;
+        tmp_inode->magic = 1234;
+        //...
+
+        //salva
+        inode_table[i] = (unsigned long) tmp_inode; 
+    };
+
+
+    // Inicializa as estruturas do fluxo padrão.
+    // Isso vai usar a file table.
+    stdioInitialize ();
+
+
 	//#importante
 	//>>> é a partir daqui que temos mensagens!!!
 	

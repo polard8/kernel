@@ -388,20 +388,21 @@ fsFAT16ListFiles (
 
 /*
  * get_file:
- *     Get the pointer given the index in fileList[].
+ *     Get the pointer given the index in file_table[].
  */
 // na lista de arquivos do kernel.
 void *get_file (int Index){
-	
+
 	//Limits.
 	//@todo: max.
 
-    if (Index < 0){
+    if (Index < 0)
+    {
         // ?? todo: message
         return NULL;
     }
 
-    return (void *) fileList[Index];
+    return (void *) file_table[Index];
 }
 
 
@@ -431,7 +432,7 @@ void set_file ( void *file, int Index ){
 	// Include pointer in the list.
 
 
-     fileList[Index] = (unsigned long) file;
+     file_table[Index] = (unsigned long) file;
 }
 
 
@@ -445,7 +446,7 @@ file *getfile(void)
     
     for(i=0;i<NUMBER_OF_FILES;i++)
     {
-        _f = (void*) openfileList[i];
+        _f = (void*) file_table[i];
         if( (void*) _f == NULL )
             return (file *) _f;
     };
@@ -466,7 +467,7 @@ void *get_global_open_file (int Index){
         return NULL;
     }
 
-    return (void *) openfileList[Index];
+    return (void *) file_table[Index];
 }
 
 
@@ -491,7 +492,7 @@ void set_global_open_file ( void *file, int Index ){
 	// Include pointer in the list.
 
 
-     openfileList[Index] = (unsigned long) file;
+     file_table[Index] = (unsigned long) file;
 }
 
 
@@ -499,12 +500,20 @@ void set_global_open_file ( void *file, int Index ){
 int get_free_slots_in_the_fileList(void)
 {
     int i=0;
+    file *tmp;
+    
     for (i=0;i<NUMBER_OF_FILES; i++)
     {
-        if ( (unsigned long) fileList[i] == 0 ){ return (int) i; }
+        tmp = (void*) file_table[i];
+        
+        if (tmp->used == 1 && tmp->magic == 1234 && tmp->counter == 0)
+        { 
+            return (int) i; 
+        }
     }
     return -1;
 }
+
 
 //get free slots in the openfileList[]
 int get_free_slots_in_the_openfileList(void)
@@ -512,7 +521,7 @@ int get_free_slots_in_the_openfileList(void)
     int i=0;
     for (i=0;i<NUMBER_OF_FILES; i++)
     {
-        if ( (unsigned long) openfileList[i] == 0 ){ return (int) i; }
+        if ( (unsigned long) file_table[i] == 0 ){ return (int) i; }
     }
     return -1;
 }
@@ -1292,7 +1301,7 @@ int fsInit (void){
     debug_print ("fsInit:\n");
     
     fat_cache_loaded = CACHE_NOT_LOADED;
-    fat_cache_saved = CACHE_NOT_SAVED;
+    fat_cache_saved  = CACHE_NOT_SAVED;
 
 
 
@@ -1351,13 +1360,17 @@ int fsInit (void){
 	// As anteriores foram inicializadas em stdio,
 	// pois s�o o fluxo padr�o.
 
-
+    int slot=-1;
+    
     //
     // Volume 1 root dir.  
     //
 
-    // Foi definido em stdio.h
-    volume1_rootdir = (file *) kmalloc ( sizeof(file) );
+    // pega slot em file_table[] para
+    slot = get_free_slots_in_the_fileList();
+    if(slot<0 || slot >=NUMBER_OF_FILES)
+        panic("fsInit: slot");
+    volume1_rootdir = file_table[slot];
 
     if ( (void *) volume1_rootdir == NULL ){
         panic ("fsInit: volume1_rootdir \n");
@@ -1368,12 +1381,11 @@ int fsInit (void){
         volume1_rootdir->magic = 1234;
 
         volume1_rootdir->_base = (unsigned char *) VOLUME1_ROOTDIR_ADDRESS;
-        volume1_rootdir->_p = (unsigned char *) VOLUME1_ROOTDIR_ADDRESS;
+        volume1_rootdir->_p    = (unsigned char *) VOLUME1_ROOTDIR_ADDRESS;
         volume1_rootdir->_cnt = (32 * 512) ;
-        volume1_rootdir->_file = 0; //?
+        volume1_rootdir->_file = 0;
         volume1_rootdir->_tmpfname = "volume1-stream";
-
-        fileList[__KERNEL_STREAM_VOL1_ROOTDIR] = (unsigned long) volume1_rootdir;
+        volume1_rootdir->counter = 1;
 
         // #bugbug: 
         // Validade da estrutura.
@@ -1387,10 +1399,11 @@ int fsInit (void){
     //
 
 
-	//foi definido em stdio.h
-	//FILE *volume2_rootdir;
-
-    volume2_rootdir = (file *) kmalloc ( sizeof(file) );
+    // pega slot em file_table[] para
+    slot = get_free_slots_in_the_fileList();
+    if(slot<0 || slot >=NUMBER_OF_FILES)
+        panic("fsInit: slot");
+    volume2_rootdir = file_table[slot];
 
     if ( (void *) volume2_rootdir == NULL ){
         panic ("fsInit: volume2_rootdir\n");
@@ -1402,12 +1415,11 @@ int fsInit (void){
         volume2_rootdir->magic = 1234;
 
         volume2_rootdir->_base = (unsigned char *) VOLUME2_ROOTDIR_ADDRESS;
-        volume2_rootdir->_p = (unsigned char *) VOLUME2_ROOTDIR_ADDRESS;
+        volume2_rootdir->_p    = (unsigned char *) VOLUME2_ROOTDIR_ADDRESS;
         volume2_rootdir->_cnt = (32 * 512) ;
         volume2_rootdir->_file = 0; //?
         volume2_rootdir->_tmpfname = "volume2-stream";
-
-        fileList[__KERNEL_STREAM_VOL2_ROOTDIR] = (unsigned long) volume2_rootdir;
+        volume2_rootdir->counter = 1;
     };
 
 

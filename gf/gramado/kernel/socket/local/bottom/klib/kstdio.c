@@ -1511,13 +1511,7 @@ int stdioInitialize (void){
 
     int Status = 0;
     int i=0;
-
-    // Buffers para as estruturas.
-    unsigned char *buffer0;
-    unsigned char *buffer1;
-    unsigned char *buffer2;
-
-
+    int slot=-1;
 
     int cWidth  = get_char_width();
     int cHeight = get_char_height();
@@ -1526,73 +1520,19 @@ int stdioInitialize (void){
         panic ("klibc-stdioInitialize: Char info");
     }
 
-
-    // printf ("%d %d \n",cWidth,cHeight);
-    
-    
-	// #bugbug:
-	//  4KB alocados para cada estrutura. Isso é muito.
-	//  Mas ao mesmo tempo estamos economizando o heap 
-	//  usado pelo kmalloc.
-	//  Podemos alocar 4KB para o buffer. 'prompt'
-	
-	
-	// Alocando uma página para cada buffer.
-	// 4KB size.
-	// #importante
-	// Obs: Essas páginas são alocadas em user mode.
-
-    // #obs:
-    // Esse alocador usou memória compartilhada ?
-
-	//4KB
-    buffer0 = (unsigned char *) newPage (); 
-    
-    if ( (unsigned char *) buffer0 == NULL ){
-        panic ("klibc-stdioInitialize: buffer0 \n");
-    }
-
-
-	//4KB
-    buffer1 = (unsigned char *) newPage ();
-
-    if ( (unsigned char *) buffer0 == NULL ){
-        panic ("klibc-stdioInitialize: buffer1 \n");
-    }
-
-
-	//4KB
-    buffer2 = (unsigned char *) newPage ();
-
-    if ( (unsigned char *) buffer0 == NULL ){
-        panic ("klibc-stdioInitialize: buffer2 \n");
-    }
-
-
-	// Alocando memória para o fluxo padrão do 
-	// processo kernel.
-	// Estamos apenas alocando memória para a estrutura.
-
-    stdin  = (file *) &buffer0[0];
-    stdout = (file *) &buffer1[0];
-    stderr = (file *) &buffer2[0];
-    
-    
-    //
+    // Os buffers dos arquivos acima.
     // prompt[]
-    //
-
     // Esses prompts são usados como arquivos.
     // São buffers para as streams.
-    //See: include/kernel/stdio.h
+    //See: kstdio.h
     
+    //limpando.
     for ( i=0; i<PROMPT_SIZE; i++ )
     {
         prompt[i]     = (char) '\0';
         prompt_out[i] = (char) '\0';
         prompt_err[i] = (char) '\0';
     };
-   
     prompt_pos = 0;
 
 
@@ -1601,6 +1541,13 @@ int stdioInitialize (void){
     // 1 - virtual console.
     // 2 - regular file.
 
+
+
+    // pega slot em file_table[] para stdin
+    slot = get_free_slots_in_the_fileList();
+    if(slot<0 || slot >=NUMBER_OF_FILES)
+        panic("klibc-stdioInitialize: slot");
+    stdin = file_table[slot];
     // Configurando a estrutura de stdin. 
     stdin->____object = ObjectTypeFile;
     stdin->used = 1;
@@ -1614,9 +1561,17 @@ int stdioInitialize (void){
     stdin->_cnt = PROMPT_SIZE;
     stdin->_file = 0;
     stdin->_tmpfname = "KSTDIN  TXT";
+    stdin->counter = 1;
     // ...
+    
+    
+    
 
-
+    // pega slot em file_table[] para stdout
+    slot = get_free_slots_in_the_fileList();
+    if(slot<0 || slot >=NUMBER_OF_FILES)
+        panic("klibc-stdioInitialize: slot");
+    stdout = file_table[slot];
     // Configurando a estrutura de stdout.
     // This is a virtual console device. Used to output
     // directly into the virtual console.
@@ -1632,9 +1587,15 @@ int stdioInitialize (void){
     stdout->_cnt = PROMPT_SIZE;
     stdout->_file = 1;
     stdout->_tmpfname = "KSTDOUT DEV";
+    stdout->counter = 1;
     // ...
 
 
+    // pega slot em file_table[] para stderr
+    slot = get_free_slots_in_the_fileList();
+    if(slot<0 || slot >=NUMBER_OF_FILES)
+        panic("klibc-stdioInitialize: slot");
+    stderr = file_table[slot];
     // Configurando a estrutura de stderr.
     stderr->____object = ObjectTypeFile;
     stderr->used = 1;
@@ -1648,37 +1609,8 @@ int stdioInitialize (void){
     stderr->_cnt = PROMPT_SIZE;
     stderr->_file = 2;
     stderr->_tmpfname = "KSTDERR TXT";
+    stderr->counter = 1;
     // ...
-
-
-    // #importante
-    // Salvando os ponteiros na lista de arquivos.
-    // Essas estruturas estão em memória compartilhada ??
-    // A libc em ring3 poderá acessar os elementos dessa estrutura ?
-
-    // Limpando a lista de arquivos usados pelo kernel.
-    // #bugbug: Alem dessa lista teremos a lista de arquivos
-    // abertos pelo processo kernel ... ela ficará na estrutura 
-    // do processo kernel.
-    for (i=0; i<NUMBER_OF_FILES;i++)
-        fileList[i] = 0;
-        
-    // Limpando a lista global de arquivos abertos
-    // no sistema. Mais de uma processo poderá abrir o mesmo arquivo.
-    for (i=0; i<NUMBER_OF_FILES;i++)
-        openfileList[i] = 0;
-     
-
-    fileList[__KERNEL_STREAM_STDIN]  = (unsigned long) stdin;
-    fileList[__KERNEL_STREAM_STDOUT] = (unsigned long) stdout;
-    fileList[__KERNEL_STREAM_STDERR] = (unsigned long) stderr;
-
-	//Os próximos são inicializados em fs.c
-	//fileList[3] volume0 root dir (vfs) 
-	//fileList[4] volume1 root dir (boot volume)
-	//fileList[5] volume2 root dir  (system volume)
-	//...
-
 
 
 
