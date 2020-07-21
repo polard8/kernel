@@ -80,6 +80,46 @@ void terminalInitWindowLimits ();
 void terminalInitSystemMetrics ();
 
 
+
+
+
+// interna
+// Isso chama o aplicativo true.bin
+// que se conecta a esse via tty e nos envia uma mensagem.
+void test_tty_support(int fd)
+{
+    char buffer[32];
+    int nread = 0;
+
+    int ____this_tty_id = (int) gramado_system_call ( 266, getpid(), 0, 0 );
+
+
+
+   // lançando um processo filho.  
+   gramado_system_call ( 900, 
+       (unsigned long) "true.bin", 0, 0 );
+
+    int i=0;
+    while(1){
+
+        nread = read_ttyList ( ____this_tty_id, buffer, 32 ); 
+        
+        if( nread>0){
+            
+            for(i=0;i<32;i++){
+                if( buffer[i] != 0)
+                    terminal_write_char(fd, buffer[i]);
+            }
+            return;
+        }
+        
+        //i++;
+        //if(i>20) i=0;
+    }
+}
+
+
+
 //
 // =======================
 //
@@ -628,7 +668,10 @@ response_loop:
         case MSG_SYSKEYDOWN:
             switch (long1)
             {
-                //case VK_F1:
+                case VK_F1:
+                    test_tty_support(fd);
+                    break;
+                    
                 default:
                     goto process_event;
                     break;

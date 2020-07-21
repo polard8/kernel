@@ -172,7 +172,7 @@ gde_extra_services (
 
 
     // read_ttyList em ring3 vai chamar isso.
-    // See: unistd.c em garden/lib/libcore.           
+    // See: unistd.c 
     if (number == 268)
     {
            // IN: fd, buf, count.         

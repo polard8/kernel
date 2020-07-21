@@ -256,8 +256,6 @@ int pty_link_by_pid ( int master_pid, int slave_pid ){
         return -1; 
     }
 
-        
-   
     // Link !
     return (int) pty_link ( __master, __slave );
 }

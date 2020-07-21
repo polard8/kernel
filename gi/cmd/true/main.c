@@ -24,9 +24,9 @@ int main ( int argc, char *argv[] )
     */
 
 	
-    /*
+    
     int ____this_tty_id = -1;
-    char buf[128]; 
+    char buf2[128]; 
     
     // link by pid
     // #todo: Create the function link_by_pid()
@@ -35,10 +35,11 @@ int main ( int argc, char *argv[] )
     // arquivos abertos.
     
     gramado_system_call ( 267,
-        getpid(),    // master (shell?)
-        getppid(),   // slave pai (terminal? init?)
+        getpid(), 
+        getppid(), //terminal
         0 );
-    
+
+
     ____this_tty_id = gramado_system_call ( 266, getpid(), 0, 0 );
     printf ("The tty for this process is %d\n", ____this_tty_id);
 
@@ -49,16 +50,21 @@ int main ( int argc, char *argv[] )
     {
         // Escrevendo na tty desse processo e na tty slave pra leitura.
         nwrite = write_ttyList ( ____this_tty_id, 
-                     buf, 
-                     __w_size2 = sprintf (buf,"THIS IS A MAGIC STRING\n")  );
+                     buf2, 
+                     __w_size2 = sprintf (buf2,"THIS IS A MAGIC STRING\n")  );
     
         if (nwrite > 0)
-           goto __ok;
+           return 0;//goto __ok;
     }
-    */
-    
-//__ok:
+ 
+ 
+ 
+    //
+    // ==================== cut =================
+    //
 
+//__ok:
+    /*
     FILE *fp;
     
     fp = fopen ("gramado.txt", "w+");
@@ -82,6 +88,7 @@ int main ( int argc, char *argv[] )
     }
 	printf ("true: done\n");    
     return 0;
+    */
     
     /*
     

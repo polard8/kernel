@@ -197,15 +197,15 @@ __tty_read (
     // Copia da tty de leitura para o buffer indicado pelo aplicativo.
        
     // #debug       
-    printf ("__tty_read: Copiando para o buffer. \n");
-    refresh_screen ();
+    //printf ("__tty_read: Copiando para o buffer. \n");
+    //refresh_screen ();
      
     memcpy ( (void *) buffer, (const void *) tty->_buffer->_base, nr ); 
     
     
     //#debug
-    printf ( "debug_read >>>%s \n", buffer );
-    refresh_screen ();
+    //printf ( "debug_read >>>%s \n", buffer );
+    //refresh_screen ();
            
     return nr; 
 }
@@ -277,18 +277,15 @@ __tty_write (
 
     // Copiando do buffer para o arquivo da tty de origem.
 
-    printf ("__tty_write: Copiando para tty->_buffer->_base \n");
-    refresh_screen();
+    //printf ("__tty_write: Copiando para tty->_buffer->_base \n");
+    //refresh_screen();
 
     memcpy ( (void *) tty->_buffer->_base, (const void *) buffer, nr ); 
-    
-    
 
     //#debug
-    printf ( "debug_write >>>%s \n", tty->_buffer->_base );
-    refresh_screen ();
-    
-    
+    //printf ( "debug_write >>>%s \n", tty->_buffer->_base );
+    //refresh_screen ();
+
     //
     // Send message to parent.
     //

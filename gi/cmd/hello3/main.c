@@ -656,7 +656,6 @@ done:
 
 
 
-
 /*
  * 
  * 
@@ -696,11 +695,12 @@ int main ( int argc, char *argv[] ){
         printf ("The tty for this process is %d\n", ____this_tty_id);
         
         
+        while(1){
          //Escrevendo na tty desse processo e na tty slave pra leitura.
          write_ttyList ( ____this_tty_id, 
              __wbuf2, 
              __w_size2 = sprintf (__wbuf2,"hello3:THIS IS A MAGIC STRING\n")  );
-       
+        }
        
        
  
