@@ -22,6 +22,18 @@
 
 
 
+// #todo
+// Sleep if there is no message in the queue.
+void gwssrv_wait_message(void)
+{
+    // #todo
+    // block()
+    
+    // #using this one for now.
+    gwssrv_yield();
+}
+
+
 void gws_show_backbuffer(void)
 {
     // #debug

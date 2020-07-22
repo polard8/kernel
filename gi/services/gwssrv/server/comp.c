@@ -20,5 +20,9 @@
 void compositor ()
 {
     // #todo.
+    
+    // #test
+    // Refresh the screen
+    //gws_show_backbuffer();
 }
 

@@ -77,7 +77,7 @@ unsigned long next_response[32];
 // Prototypes.
 void create_background (void);
 void create_taskbar (void);
-void gwssrv_yield (void);
+
 
 int 
 gwsProcedure ( 
@@ -239,13 +239,22 @@ void handle_request (int fd){
             
     // Mensagem inválida  
     if (message_buffer[1] == 0 ){
+        // gwssrv_wait_message() //todo: use this one. 
         gwssrv_yield();
         return;
     }
 
 
     // #test
-    // Input solicitado.
+    // Input solicitado por um cliente
+    // Isso deve acontecer quando o cliente chama alguma função
+    // do tipo: gws_get_next_event() da libgws.
+    // Em outro caso, no loop principal, esse servidor 
+    // deve pegar os inputs vindos do sistema e colocar 
+    // na fila de entrada do cliente com o foco de entrada.
+    // o cliente com o foco de entrada possui a janela com 
+    // o foco de entrada.
+    
     if (message_buffer[1] == 369)
     {
         debug_print ("gwssrv: [TEST] INPUT request !!! \n");
@@ -1036,11 +1045,24 @@ int main (int argc, char **argv){
         socklen_t addr_len;
         addr_len = sizeof(addr);
     
+        // #todo:
+        // Precisamos criar uma fila de mensagens para o sistema
+        // e uma fila de mensagens para cada aplicativo.
+        // a fila de mensagem dos aplicativos poderá ficar
+        // na estrutura de cliente, ja que cada cliente representa
+        // um apps.
+        // a fila do sistema é global.See: input.c
+        // ntuser faz isso também. tem dois inputs,
+        // um do sistema e outro dos apps.
+    
         while (running == 1)
         {
-            // Pinta ou não.
-            if ( dirty_status == 1 )
-                compositor();
+            // Se tem ou não retângulos sujos.
+            // #bugbug: Talvez isso seja trabalho do window manager.
+            // mas ele teria que chamar o window server pra efetuar o refresh
+            //dos retângulos.
+            //if ( dirty_status == 1 )
+                //compositor();
          
          
             //Accept actual connection from the client */
@@ -1053,9 +1075,15 @@ int main (int argc, char **argv){
  
             // Request from the new connection
             }else{
+
+                //mensagens de clientes.
                 handle_request (newconn);
                 //handle_request (curconn);
                 // close??
+                
+                //mensagens de sistema.
+                //afetarão a janela com o foco.
+                //gwssrv_get_system_message();
             };
         };
 

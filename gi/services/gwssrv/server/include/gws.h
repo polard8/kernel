@@ -66,6 +66,6 @@ void gws_show_backbuffer(void);
 
 int gwssrv_init_globals(void);
 
+void gwssrv_wait_message(void);
 
-
-
+void gwssrv_yield(void);

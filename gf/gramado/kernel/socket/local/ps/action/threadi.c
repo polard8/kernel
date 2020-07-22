@@ -517,10 +517,9 @@ void KiShowTasksParameters (void)
 
 void show_slots (){
 
-    int i;
-
     struct process_d *p;  
     struct thread_d  *t; 
+    int i=0;
 
 
 	//
@@ -564,7 +563,7 @@ void show_slots (){
              t->used == 1 && 
              t->magic == 1234 )
         {
-            show_slot (t->tid);
+            show_slot(t->tid);
         }
     };
 }
@@ -606,7 +605,7 @@ void show_slot (int tid){
             t->priority, 
             t->state,
             t->quantum,
-            t->total_time_ms,
+            t->total_time_ms,  //#bugbug
             t->initial_eip,
             t->eflags,
             t->name_address );

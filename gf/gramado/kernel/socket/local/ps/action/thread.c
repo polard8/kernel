@@ -1296,33 +1296,31 @@ void show_thread_information (void){
     struct thread_d *Current;
 
 
-    printf ("show_thread_information:\n");		
+    printf ("show_thread_information:\n");
 
-    
+
     //
     // Current thread.
     //
 
 
 	//Limits.
-	
-	if ( current_thread < 0 || current_thread >= THREAD_COUNT_MAX )
+    if ( current_thread < 0 || current_thread >= THREAD_COUNT_MAX )
     {
         return;
     }
 
-	Current = (void *) threadList[current_thread];
-	
-	if( (void *) Current == NULL )
-	{
-	    printf ("show_thread_information:\n");	
-	    return;
-		
-	} else {
-	    
+    Current = (void *) threadList[current_thread];
+
+    if( (void *) Current == NULL ){
+        printf ("show_thread_information: [FAIL]\n");
+        refresh_screen ();
+        return;
+
+    } else {
 		printf ("currentTID=%d\n", current_thread );
 		//...
-	};
+    };
 
 	//
 	// Check idle
@@ -1330,27 +1328,25 @@ void show_thread_information (void){
 
     if ( (void *) ____IDLE == NULL ){
         panic ("dead_thread_collector: ____IDLE fail");
+ 
     }else{
 
         if ( ____IDLE->used != 1 || ____IDLE->magic != 1234 )
         {
 		    panic ("dead_thread_collector: ____IDLE validation");
 	    }
-	    
+
 	   printf ("Idle thread = %d\n", ____IDLE->tid );
-	};
+    };
 
-	
 
-	
-	
 	//
 	// Slots.
 	//
 
 	//Mostra Slots. 
 	//threadi.c
-	
+
     show_slots ();    
 	
 	/*
@@ -1365,7 +1361,7 @@ void show_thread_information (void){
 	
 
     printf("Done\n");
-	refresh_screen ();
+    refresh_screen ();
 }
 
 

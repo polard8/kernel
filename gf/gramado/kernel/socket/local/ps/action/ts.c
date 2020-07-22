@@ -181,18 +181,28 @@ void task_switch (void){
     }
 
 
-	//...
+    //...
 
     //
-	//  ======== ## Conting ## ========
+    //  ======== ## Conting ## ========
     //
-	
-	
+
+    // 1 second = 1000 milliseconds
+    // sys_time_hz = 600 ticks per second.
+    //1/600 de segundo a cada tick
+    //1000/100 = 10 ms quando em 100HZ.
+    //1000/600 = 1.x ms quando em 600HZ.
+    //x = 0 + (x ms); 
+
 	// step: Quantas vezes ela já rodou no total.
 	// runningCount: Quanto tempo ela está rodando antes de parar.
 
 	Current->step++; 
 	Current->runningCount++;
+	
+
+	// #bugbug
+	// Rever essa contagem
 	
 	//quanto tempo em ms ele rodou no total.
 	Current->total_time_ms = (unsigned long) Current->total_time_ms + (1000/sys_time_hz);	

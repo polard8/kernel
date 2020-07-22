@@ -53,10 +53,11 @@ void do_pagefault (void);
  *     a que estava com problemas.  
  *    Por fim ainda temos o caso quando não iremos retornar.
  */
- 
+
 void faults ( unsigned long number ){
 
     struct thread_d *t;
+
 
     asm ("cli");
 
@@ -71,22 +72,21 @@ void faults ( unsigned long number ){
 	// #test
 	// Filtrar current_thread.
 	// #todo max.
-	
-	if ( current_thread < 0 )
-	{
-		printf ("x86fault-faults: current_thread fail\n");
-		goto fail;
-	}
 
-	t = (void *) threadList[current_thread];
-	
-	if( (void *) t == NULL )
-	{
-		printf ("x86fault-faults: t fail\n");
-		goto fail;
-	
+    if ( current_thread < 0 ){
+        printf ("x86fault-faults: current_thread fail\n");
+        goto fail;
+    }
+
+
+    t = (void *) threadList[current_thread];
+
+    if ( (void *) t == NULL ){
+        printf ("x86fault-faults: t fail\n");
+        goto fail;
+
     }else{
-        
+
 	    // Salva o contexto se a tarefa já esteve rodando.
 	    // #bugbug
         // Devemos salvar também quando ainda não rodou, pois
@@ -128,40 +128,44 @@ void faults ( unsigned long number ){
 
 	
 	// Mostra erro de acordo com o número.
-	
+
     switch (number)
-	{
-	    //EXCEPTION
-		case 1:
-		    printf("EXCEPTION\n");
-		    show_reg (current_thread);
-			break;
-		
-		// Debug breakpoint interrupt.
-		case 3:
+    {
+
+       //EXCEPTION
+       case 1:
+            printf("EXCEPTION\n");
+            show_reg (current_thread);
+            break;
+
+
+        // Debug breakpoint interrupt.
+        case 3:
 			printf("BREAKPOINT\n");
 			show_slot (current_thread);
 			show_reg (current_thread);
-		    break;
-		
-		//DOUBLE FAULT
-	    case 8:
-			printf("DOUBLE FAULT\n");
-			show_slot (current_thread);
-		    break;
+            break;
 
-	    //STACK
-	    case 12:
-			printf("STACK FAULT\n");
-			show_reg (current_thread);
-		    break;
 
-	    //GP
-	    case 13:
-		    printf("GP\n");
-			show_reg (current_thread);
-		    break;
-		
+        //DOUBLE FAULT
+        //#todo: dump tss
+        case 8:
+            printf("DOUBLE FAULT\n");
+            show_slot (current_thread);
+            break;
+
+        //STACK
+        case 12:
+            printf("STACK FAULT\n");
+            show_reg (current_thread);
+            break;
+
+        //GP
+        case 13:
+            printf("GP\n");
+            show_reg (current_thread);
+            break;
+
 		//PAGE FAULT
 		//Obs: é o contrário de page hit.
 	    case 14:
