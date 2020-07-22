@@ -983,10 +983,10 @@ int main (int argc, char **argv){
 
         //gde_clone_and_execute ("gws.bin");   
         //gwssrv_yield ();
-        gde_clone_and_execute ("terminal.bin");  
+        //gde_clone_and_execute ("terminal.bin");  
         //gwssrv_yield ();
         //gde_clone_and_execute ("browser.bin"); 
-        //gde_clone_and_execute ("gwm.bin");  //todo 
+        gde_clone_and_execute ("gwm.bin"); 
         // ...        
 
 
