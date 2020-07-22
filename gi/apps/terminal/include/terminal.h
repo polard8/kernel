@@ -3,6 +3,147 @@
 #define __TERMINAL__
 
 
+
+
+
+//#todo: fazer estrutura para gerenciar a sequencia.
+int __sequence_status = 0;
+
+//
+// CSI support
+// 
+
+//#test
+//Control Sequence Introducer
+
+#define CSI_BUFFER_SIZE 128
+char CSI_BUFFER[ CSI_BUFFER_SIZE ];
+
+int __csi_buffer_tail = 0;
+int __csi_buffer_head = 0;
+
+
+//
+// Structures
+//
+
+//#importante
+//vamos tentar copiar as estruturas usadas pelo terminal gramado/st
+
+enum term_mode {
+	MODE_WRAP	     = 1,
+	MODE_INSERT      = 2,
+	MODE_APPKEYPAD   = 4,
+	MODE_ALTSCREEN   = 8,
+	MODE_CRLF	     = 16,
+	MODE_MOUSEBTN    = 32,
+	MODE_MOUSEMOTION = 64,
+	MODE_MOUSE       = 32|64,
+	MODE_REVERSE     = 128,
+	MODE_KBDLOCK     = 256,
+	MODE_HIDE	     = 512,
+	MODE_ECHO	     = 1024,
+	MODE_APPCURSOR	 = 2048,
+	MODE_MOUSESGR    = 4096,
+};
+
+enum escape_state {
+	
+	ESC_START = 1,
+	ESC_CSI	= 2,
+	ESC_STR	= 4,         /* DSC, OSC, PM, APC */
+	ESC_ALTCHARSET = 8,
+	ESC_STR_END = 16,    /* a final string was encountered */
+	ESC_TEST = 32,       /* Enter in test mode */
+	
+};
+
+
+// #importante
+// Colocaremos aqui dentro elementos que apontem para
+//variáveis que já usavamos antes de criarmos essa estrutura.
+/* Internal representation of the screen */
+typedef struct {
+	
+	//int row;	/* nb row */
+	//int col;	/* nb col */
+	//Line *line;	/* screen */
+	//Line *alt;	/* alternate screen */
+	//bool *dirty;	/* dirtyness of lines */
+	//TCursor c;	/* cursor */
+	//int top;	/* top    scroll limit */
+	//int bot;	/* bottom scroll limit */
+	int mode;	/* terminal mode flags */
+	int esc;	/* escape state flags */
+	//bool numlock;	/* lock numbers in keyboard */
+	//bool *tabs;
+} Term;
+
+//Sem ponteiro.
+static Term term;
+
+
+
+#define ESC_BUF_SIZ 32 //(128*UTF_SIZ)
+#define ESC_ARG_SIZ 16
+#define STR_BUF_SIZ   ESC_BUF_SIZ
+#define STR_ARG_SIZ ESC_ARG_SIZ
+
+
+
+// 
+// Escape sequence
+//
+
+/* CSI Escape sequence structs */
+/* ESC '[' [[ [<priv>] <arg> [;]] <mode>] */
+typedef struct {
+
+    char buf[ESC_BUF_SIZ];    /* raw string */
+    int len;                  /* raw string length */
+    char priv;
+    int arg[ESC_ARG_SIZ];
+    int narg;                 /* nb of args */
+    char mode;
+
+} CSIEscape;
+
+static CSIEscape csiescseq;
+
+
+
+
+
+/* STR Escape sequence structs */
+/* ESC type [[ [<priv>] <arg> [;]] <mode>] ESC '\' */
+typedef struct {
+	char type;	     /* ESC type ... */
+	char buf[STR_BUF_SIZ]; /* raw string */
+	int len;	       /* raw string length */
+	char *args[STR_ARG_SIZ]; // ponteiro duplo.
+	int narg;	      /* nb of args */
+} STREscape;
+static STREscape strescseq;
+
+
+
+/*
+ * credits: linux 0.1.
+ * this is what the terminal answers to a ESC-Z or csi0c
+ * query (= vt100 response).
+ */
+#define RESPONSE "\033[?1;2c"
+
+#define VT102_ID "\033[?6c"
+
+
+
+
+
+
+
+//==============================================================
+
 // isso será usado em terminal.bin
 // principalmente para gerenciamento de caracteres ... linhas 
 // é o básico.
@@ -466,6 +607,12 @@ void lf (void);
 void cr (void);
 void ri (void);
 void del (void);
+
+//#test
+void tputc (int fd,char *c, int len);
+
+
+
 
 char 
 terminalGetCharXY ( 

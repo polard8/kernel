@@ -82,9 +82,19 @@ int TEST_PRINTF3(void);
  */
 
 int main (int argc, char *argv[]){
-	
+
+    //FILE *f;
+    
+    //f = fopen("syscalls.txt", "r+"); 
+    //f = fopen("kstdin.txt", "r+");
+    //stdout = f;
+    
+
 	printf("\n");
-	printf("Initilizing ...\n\n");
+	printf("tprintf.bin: Initilizing ...\n\n");
+
+
+    //perror("Testing perror!\n");
 
 	printf("\n");
 	printf("===============\n");

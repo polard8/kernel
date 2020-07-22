@@ -91,6 +91,10 @@ void test_tty_support(int fd)
     char buffer[32];
     int nread = 0;
 
+
+
+    gws_debug_print("test_tty_support:\n");
+
     int ____this_tty_id = (int) gramado_system_call ( 266, getpid(), 0, 0 );
 
 
@@ -107,6 +111,52 @@ void test_tty_support(int fd)
         if( nread>0){
             
             for(i=0;i<32;i++){
+                if( buffer[i] != 0)
+                    terminal_write_char(fd, buffer[i]);
+            }
+            return;
+        }
+        
+        //i++;
+        //if(i>20) i=0;
+    }
+}
+
+
+void test_standard_stream(int fd)
+{
+    char buffer[4096];
+    int nread = 0;
+    
+
+    gws_debug_print("test_standard_stream:\n");  
+
+    FILE *f;
+    f = fopen("syscalls.txt", "r+"); 
+    //f = fopen("kstderr.txt", "r+");
+    //f = fopen("g.txt", "r+");
+
+
+    // Testar   
+    //gramado_system_call ( 900, 
+        //(unsigned long) "tprintf.bin", 0, 0 );
+
+
+   //gramado_system_call ( 900, 
+     //  (unsigned long) "tprintf.bin", 0, 0 );
+
+   //gramado_system_call ( 900, 
+     //  (unsigned long) "tprintf.bin", 0, 0 );
+
+
+    int i=0;
+    while(1){
+
+        nread = read ( fileno(f), buffer, sizeof(buffer) ); 
+        
+        if( nread>0){
+            
+            for(i=0;i< sizeof(buffer) ;i++){
                 if( buffer[i] != 0)
                     terminal_write_char(fd, buffer[i]);
             }
@@ -259,6 +309,312 @@ void del (void){
 	LINES[textCurrentRow].CHARS[textCurrentCol] = (char) '\0';
 	LINES[textCurrentRow].ATTRIBUTES[textCurrentCol] = 7;
 }
+
+
+
+/*
+ ***************** 
+ * tputc:
+ * 
+ */
+
+// #todo
+// See: https://github.com/gramado/st/blob/tlvince/st.c
+
+		// #Atenção: A libc do app foi configurada dinamicamente
+		// para que printf coloque chars no arquivo. Mas 
+		// a libc desse terminal ainda não foi. Então a printf
+		// desse terminal escreve no backbuffer e exibe na tela.
+        // #bugbug: O problema é que dessa forma nada foi colocado no buffer de arquivo.
+        
+//#todo
+// fazer essa função colocar os chars no buffer de arquivo. Usaremos no scroll.
+
+void tputc (int fd, char *c, int len){
+	
+	 //int c = (int) *c;
+	 unsigned char ascii = *c;
+	 
+	 //control codes
+	 //bool control = ascii < '\x20' || ascii == 0177;
+     int control = ascii < '\x20' || ascii == 0177;
+	 
+	 
+	 //
+	 // #importante
+	 // Se não é controle é string ou escape sequence.
+	 //
+	 
+	 //??
+	 //if(iofd != -1) {}
+	 
+	 //string normal
+	 //if(term.esc & ESC_STR) 
+	 if (__sequence_status == 0)
+	 {
+		 switch (ascii)
+		 {
+			 //deixou de ser string normal e
+			 //entramos em uma sequência
+			 //logo abaixo esse char será tratado novamente.
+		     case '\033':
+		         term.esc = ESC_START;
+                 __sequence_status = 1;
+                 break;
+             
+             
+             //
+             // #importante
+             // 
+             
+             // Imprimindo caracteres normais.
+             // #todo: talvez possamos usar a API para isso.
+             // como acontece nos caracteres digitados no shell interno.
+             default:
+             
+                 // #importante
+                 // Isso vai exibir o caractere mas também
+                 // na colocar ele no buffer ba posição atual.
+                 
+                 //printf ("%c",ascii);
+                 terminal_write_char ( fd, (int) ascii); 
+                 return;
+         }
+	 }
+
+
+	 //control codes. (dentro de um range)
+	 if(control){
+		 
+		 switch(ascii)
+		 {
+
+		    //case '\v': /* VT */
+		    //case '\a': /* BEL */    
+		    		    		    
+		    case '\t': /* HT */
+		    case '\b': /* BS */
+		    case '\r': /* CR */
+		    case '\f': /* LF */
+            case '\n': /* LF */
+                //#deixa o kernel lidar com isso por enquanto.
+                //printf ("%c",ascii);
+                terminal_write_char (fd, (int) ascii);
+                return;	
+                break;
+		    
+		    //^[
+		    //case '\e':
+			//case '\033':
+		    case '\x1b':
+		        term.esc = ESC_START;
+		        __sequence_status = 1;
+		        //printf (" {ESCAPE} ");
+		        terminal_write_char ( fd, (int) '$');
+		        return;
+		        break;
+		        
+		    case '\016':	/* SO */
+            case '\017': /* SI */
+		        return;
+		        break;
+		        
+		    case '\032':	/* SUB */
+		    case '\030':	/* CAN */
+			    //csireset ();
+			    //printf (" {reset?} ");
+                terminal_write_char ( fd, (int) '$');
+                return;
+		        break;
+		            
+		    case '\005':	/* ENQ (IGNORED) */
+		    case '\000':	/* NUL (IGNORED) */
+		    case '\021':	/* XON (IGNORED) */
+		    case '\023':	/* XOFF (IGNORED) */
+		    //case 0177:	/* DEL (IGNORED) */
+                //Nothing;
+                return;
+                
+            //...    
+		 }
+		        
+		 //...	 
+		 
+	 // Um 1b já foi encontrado.
+	 } else if(term.esc & ESC_START) {
+	 
+	     // Um [ já foi encontrado.
+	     //#todo parse csi
+	     if(term.esc & ESC_CSI){
+		      
+		      switch(ascii)
+		      {
+		     	//quando acaba a sequencia.
+		     	case 'm':
+		     	    term.esc = 0;
+			        __sequence_status = 0;
+			        //printf (" {m} ");
+			        terminal_write_char (fd, (int) '$');
+			        return;
+			        break;  
+			     
+			     //Nothing??
+			     //case ';':
+			         //return;
+			         //break;
+			         
+			     //Vamos apenas colocar no buffer
+			     //para analizarmos depois.
+			     //Colocamos no tail e retiramos no head.
+		         default:
+		              //printf (" {.} ");
+		              terminal_write_char ( fd, (int) '$');
+		              CSI_BUFFER[__csi_buffer_tail] = ascii;
+		              __csi_buffer_tail++;
+		              if ( __csi_buffer_tail >= CSI_BUFFER_SIZE )
+		              {
+						  __csi_buffer_tail = 0;
+					  }
+		              return;
+		              break;
+		      }
+		 
+		 } else if(term.esc & ESC_STR_END){ 
+			 
+			 
+			 //...
+	 
+	     } else if(term.esc & ESC_ALTCHARSET){
+			 
+			 switch(ascii)
+			 {
+			      case 'A': /* UK (IGNORED) */
+			      case '<': /* multinational charset (IGNORED) */
+			      case '5': /* Finnish (IGNORED) */
+			      case 'C': /* Finnish (IGNORED) */
+			      case 'K': /* German (IGNORED) */
+                      break;
+			 }
+			 
+	     } else if(term.esc & ESC_TEST) {
+			 
+		    //...
+		    	 
+		 }else{
+			
+		   switch(ascii)
+		   {
+			 case '[':
+			     term.esc |= ESC_CSI;
+			     //printf (" {CSI} ");
+			     terminal_write_char ( fd, (int) '$');
+			     return;
+			     break; 
+			       
+			 case '#':
+			     term.esc |= ESC_TEST;
+			     break;
+			
+			case 'P': /* DCS -- Device Control String */
+			case '_': /* APC -- Application Program Command */
+			case '^': /* PM -- Privacy Message */
+			case ']': /* OSC -- Operating System Command */
+            case 'k': /* old title set compatibility */
+			     term.esc |= ESC_STR;
+			     break; 
+			     
+			case '(': /* set primary charset G0 */  
+			    term.esc |= ESC_ALTCHARSET;
+			    break;    
+			    
+			case ')': /* set secondary charset G1 (IGNORED) */
+			case '*': /* set tertiary charset G2 (IGNORED) */
+			case '+': /* set quaternary charset G3 (IGNORED) */
+				term.esc = 0;
+                __sequence_status = 0;
+                break;  
+                
+                
+             case 'D': /* IND -- Linefeed */
+                 term.esc = 0;
+                 //printf (" {IND} ");
+                 terminal_write_char ( fd,(int) '$');
+                 break;
+                 
+             case 'E': /* NEL -- Next line */
+                 term.esc = 0;
+                 //printf (" {NEL} ");
+                 terminal_write_char ( fd,(int) '$');
+                 break;
+                        			
+			   
+			 case 'H': /* HTS -- Horizontal tab stop */  
+                 term.esc = 0;
+                 //printf (" {HTS} ");
+                 terminal_write_char ( fd,(int) '$');
+                 break;
+                 
+ 			 case 'M': /* RI -- Reverse index */    
+                 term.esc = 0;
+                 //printf (" {RI} ");
+                 terminal_write_char ( fd,(int) '$');
+                 break;
+                 
+                 			     
+			  case 'Z': /* DECID -- Identify Terminal */   
+                 term.esc = 0;
+                 //printf (" {DECID} ");
+                 terminal_write_char (fd, (int) '$');
+                 break;
+                 
+                 			 
+			 case 'c': /* RIS -- Reset to inital state */
+                 term.esc = 0;
+                 //printf (" {reset?} ");
+                 terminal_write_char ( fd,(int) '$');
+                 break; 
+                 
+			 case '=': /* DECPAM -- Application keypad */
+                 term.esc = 0;
+                 //printf (" {=} ");
+                 terminal_write_char ( fd,(int) '$');
+                 break;
+                 			 
+			 case '>': /* DECPNM -- Normal keypad */
+                 term.esc = 0;
+                 //printf (" {>} ");
+                 terminal_write_char (fd, (int) '$');
+                 break;
+                 			 
+			 //case '7': /* DECSC -- Save Cursor */    
+               //  term.esc = 0;
+               //  break;
+                 			   
+			 //case '8': /* DECRC -- Restore Cursor */
+               //  term.esc = 0;
+                // break;
+                 
+			 //0x9C 	ST 	String Terminator ???
+			 //case '\\': /* ST -- Stop */  
+                 //term.esc = 0;
+                 //break;	           
+  
+  			 //erro    
+			 //default:
+			     //break;          
+		   }
+		};	 
+	    
+	     //...
+	     
+	     return;
+	 };
+	 
+	 //...
+}
+
+
+
 
 
 // # terminal stuff
@@ -630,8 +986,10 @@ response_loop:
                     //fflush(stdout);
                     
                     // Colocando no buffer de linha
-                    terminal_write_char( (int)fd, (int) long1 );
-    
+                    //terminal_write_char( (int)fd, (int) long1 );
+                    
+                    //#test
+                    tputc ((int) fd, (char *) long1, (int) 1);
                      
                     /* Tentando mover essa rotina para dentro da função terminal_write_char
                     // Imprimindo o char na tela usando o window server.
@@ -671,6 +1029,21 @@ response_loop:
                 case VK_F1:
                     test_tty_support(fd);
                     break;
+
+                // Test standard srteam                
+                case VK_F2:
+                    test_standard_stream(fd);
+                    break;
+
+                case VK_F3:
+                    break;
+
+
+                case VK_F4:
+                    break;
+                   
+                   
+                 //...
                     
                 default:
                     goto process_event;
