@@ -158,6 +158,7 @@ int gws_initialize_connection (void)
 {
     // Pega o id do desktop atual.
     // ?? Ou o qual o processo pertence ??
+    
     __gws__desktop__id = (int) gws_system_call (519,0,0,0);
    
     

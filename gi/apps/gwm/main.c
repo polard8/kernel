@@ -49,8 +49,13 @@
 #include <sys/socket.h>
 #include <packet.h>
 
+
+
 // The client-side library.
 #include <gws.h>
+
+
+#include <gwm.h>
 
 
 
@@ -75,11 +80,45 @@ int _hello_request(int fd);
 int _hello_response(int fd);
 void _hello(int fd);
 
-
 //message support
 int _loop(int fd);
 int _getmessage_request(int fd);
 int _getmessage_response(int fd);
+
+
+
+
+int gwm_init_globals(void)
+{
+    gws_debug_print("gwm_init_globals:\n");
+    
+    gScreenWidth = gws_get_system_metrics(1);
+    gScreenHeight = gws_get_system_metrics(2);
+    
+    
+    //...
+    
+    return 0;
+}
+
+int gwm_init_windows(void)
+{
+    int i=0;
+
+    gws_debug_print("gwm_init_windows:\n");
+    
+    for(i=0;i<WINDOW_COUNT_MAX;i++)
+    {
+        windowList[i] = 0;
+    };
+    
+    
+    
+    return 0;
+}
+
+
+
 
 int _getmessage_request(int fd)
 {
@@ -269,7 +308,24 @@ response_loop:
         case MSG_SYSKEYDOWN:
             switch (long1)
             {
-                //case VK_F1:
+                case VK_F1:
+                    printf ("gwm: VK_F1\n");
+                    break;
+
+                case VK_F2:
+                    printf ("gwm: VK_F2\n");
+                    break;
+                    
+                case VK_F3:
+                    printf ("gwm: VK_F3\n");
+                    break;
+                    
+                case VK_F4:
+                    printf ("gwm: VK_F4 reboot\n");
+                    gws_reboot();
+                    break;
+                    
+                    
                 default:
                     goto process_event;
                     break;
@@ -366,7 +422,8 @@ process_event:
 }
 
 
-//loop
+// loop
+// Loop de requests para o gws.
 int _loop(int fd)
 {
 	//while(___running){
@@ -376,6 +433,8 @@ int _loop(int fd)
     }
     return 0; 
 }
+
+
 
 
 
@@ -635,8 +694,13 @@ int main ( int argc, char *argv[] ){
     // Mas como sabemos que é um soquete,
     // então sabemos que é possível ler.
 
-
     _hello(client_fd);
+
+
+   
+    //
+    // Topbar
+    //
 
 
     // libgws
@@ -648,12 +712,48 @@ int main ( int argc, char *argv[] ){
         0,0,COLOR_GRAY, COLOR_GRAY);
 
 
-    //loop
-    _loop(client_fd);
+    //
+    // Loop
+    //
 
+    // Loop de requests para o gws.
+    _loop (client_fd);
+
+
+    // #importante
+    // Se não usarmos o loop acima, então podemos pegar
+    // as mensagens do sistema....
+    // O ws pode mandar mensagens de sistema para o
+    // wm registrado.
+
+
+    /*
+    struct gws_event_d *Event;
+     
+    for(;;){
+        
+        Event = (struct gws_event_d *) gws_next_event();
+        
+        if (Event.type == 0){
+           gws_debug_print("gwm: event 0\n");
+        
+        }else if (Event.type == 1){
+           gws_debug_print("gwm: event 1\n");
+        
+        }else if (Event.type == 2){
+           gws_debug_print("gwm: event 2\n");
+        
+        }else{
+           gws_debug_print("gwm: Not valid event!\n");
+        };
+    };
+    */
+
+
+
+// exit
     debug_print ("gwm: bye\n"); 
     printf ("gwm: bye\n");
-
 
     return 0;
 }

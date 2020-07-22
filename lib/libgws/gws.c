@@ -81,7 +81,16 @@ int gws_initialize_library (void)
         gws_debug_print("gws_initialize_library: fail\n");
         return -1;
     }
-
+    
+    
+    // #todo:
+    // #importante
+    // We need to alloc memory to the CurrentEvent struct.
+    // So we need the libc support. 
+    // Check the compilation and include the libc. ???
+    
+    //CurrentEvent = (void *) malloc(sizeof(struct gws_event_d));
+    
 
     return 0;
 }
@@ -452,7 +461,10 @@ gws_send_message_to_thread (
 void gws_reboot(void)
 {
    //#todo
-   gws_debug_print ("gws_reboot: [TODO]\n");
+   gws_debug_print ("gws_reboot: [FIXME]\n");
+   gws_system_call(110,0,0,0); 
+   gws_debug_print ("gws_reboot: unexpected return\n");
+   while (1){ asm("pause"); };
 }
 
 
@@ -603,6 +615,109 @@ unsigned long gws_get_system_metrics (int index){
                                (unsigned long) index, 
                                (unsigned long) index );
 }
+
+
+// Get next event
+struct gws_event_d *gws_next_event(void)
+{
+
+    unsigned long message_buffer[5];   
+
+
+    gws_debug_print("gws_next_event:[TODO]\n");
+
+    
+    if( (void *) CurrentEvent == NULL )
+        return (struct gws_event_d *) 0;
+    
+
+    // get system message.
+    // put the message into the event struct.
+
+    //
+    // Get system message.
+    //
+    
+    gws_enter_critical_section();
+    gws_system_call ( 111,
+            (unsigned long) &message_buffer[0],
+            (unsigned long) &message_buffer[0],
+            (unsigned long) &message_buffer[0] );
+    gws_exit_critical_section();
+
+    // No message
+    if ( message_buffer[1] == 0 ){
+        gws_system_call (265,0,0,0);
+        return;
+    }
+
+        
+     //
+     // put the message into the event struct.
+     //
+     
+     CurrentEvent->wid   = message_buffer[0]; // window id
+     CurrentEvent->msg   = message_buffer[1]; // msg (event type)
+     CurrentEvent->long1 = message_buffer[2]; // long1
+     CurrentEvent->long2 = message_buffer[3]; // long2
+     // ...
+
+
+     // clean the message buffer.
+     message_buffer[0] = 0;
+     message_buffer[1] = 0;
+     message_buffer[2] = 0;
+     message_buffer[3] = 0;
+     //...
+
+    
+
+
+    return (struct gws_event_d *) CurrentEvent;
+}
+
+
+
+//P (Proberen) testar.
+void gws_enter_critical_section (){
+
+//#define	SYSTEMCALL_GET_KERNELSEMAPHORE    226
+//#define	SYSTEMCALL_CLOSE_KERNELSEMAPHORE  227
+//#define	SYSTEMCALL_OPEN_KERNELSEMAPHORE   228
+
+    int S=0;
+
+    // Pega o valor do spinlock rpincipal.
+    while (1){
+        S = (int) gws_system_call ( 226,// SYSTEMCALL_GET_KERNELSEMAPHORE, 
+                      0, 0, 0 );
+                      
+		// Se deixou de ser 0 então posso entrar.
+		// Se ainda for 0, continuo no while.
+        if ( S == 1 ){ goto done; }
+        
+        //#wait
+        gws_system_call (265,0,0,0); //yield thread.
+    };
+
+    //Nothing
+
+done:
+    //Muda para zero para que ninguém entre.
+    gws_system_call ( 227,//SYSTEMCALL_CLOSE_KERNELSEMAPHORE, 
+        0, 0, 0 );
+    return;
+}
+
+
+//V (Verhogen)incrementar.
+void gws_exit_critical_section ()
+{
+	//Hora de sair. Mudo para 1 para que outro possa entrar.
+    gws_system_call ( 228,//SYSTEMCALL_OPEN_KERNELSEMAPHORE, 
+       0, 0, 0 );
+}
+
 
 
 //

@@ -54,6 +54,8 @@ all-c:
 	gcc -c gws.c      $(CFLAGS) $(LIBS) -o gws.o
 
 
+
+
 #create 'ar'
 gws-link:
 #nothing.
