@@ -615,19 +615,20 @@ video_driver_dialog ( int service,
  */ 
  
 int videoInit (void){
-	
-	int Status = 0;
-	
 
-	// Se o modo de video nao esta habilitado
-	if ( VideoBlock.useGui != 1 )
-	{
-	    panic ("videoInit");
-	}
-		
+    int Status=0;
+
+
+
+    // Se o modo de video nao esta habilitado
+    if ( VideoBlock.useGui != 1 ){
+        panic("videoInit:");
+    }
+
+
     g_useGUI = 1;
-	VideoBlock.useGui = 1;
-	
+    VideoBlock.useGui = 1;
+
 
     //
     // LFB

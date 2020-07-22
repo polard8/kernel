@@ -34,11 +34,12 @@
 //es estruturas serão reutilizáveis.
 
 void initialize_system_message_queue (void){
-	
-	struct message_d *m;
-	
-	int i;
-	
+
+    struct message_d *m;
+
+    int i=0;
+
+
 	for ( i=0; i<SYSTEM_MESSAGE_QUEUE_MAX; i++ )
 	{
 		
@@ -66,12 +67,12 @@ void initialize_system_message_queue (void){
 
 
 
-
 unsigned long 
-ldisc_dialog ( struct window_d *window, 
-              int msg, 
-              unsigned long long1, 
-              unsigned long long2 ) 
+ldisc_dialog ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 ) 
 {
     //# cancelada !!!
     return 0;	

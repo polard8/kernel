@@ -714,8 +714,9 @@ void xxx_test_load_bmp(void)
     //Trying to load and show a bmp file.
     
     char *bmp_buffer;
-    //char *file_name = "FOLDER  BMP";//"terminal.bmp";
-    char file_name[] = "terminal.bmp";
+    //char *file_name = "FOLDER  BMP";
+    char file_name[] = "FOLDER  BMP";
+    //char file_name[] = "terminal.bmp";
     bmp_buffer = (char *) malloc(1024*128);
     if ( (void *) bmp_buffer == NULL )
         printf ("gwssrv: xxx_test_load_bmp bmp_buffer fail\n");
@@ -736,14 +737,36 @@ void xxx_test_load_bmp(void)
     // Outra solução seria ustilizarmos outras rotinas 
     // de carregamento de arquivo.
     
-    int r=-1;
-    r=gramado_system_call ( SYSTEMCALL_READ_FILE, 
-        (unsigned long) file_name, 
-        (unsigned long) bmp_buffer, 
-        (unsigned long) bmp_buffer );  
 
-    if(r<0)
-        printf("gwssrv: r fail\n");
+    // #bugbug
+    // essa rotina não carrega no buffer.
+
+    int r=-1;
+    
+    /*
+    r = gramado_system_call ( SYSTEMCALL_READ_FILE, 
+        (unsigned long) file_name,   //name 
+        (unsigned long) 0,           //flags
+        (unsigned long) 0);          //mode
+    */
+
+    //if(r<0)
+        //printf("gwssrv: r fail\n");
+    
+    // #test
+    // [FAIL]
+    void *buf;
+    buf = (void*) gramado_system_call ( 9000, 
+                       (unsigned long) file_name,   //name 
+                       (unsigned long) 0,           
+                       (unsigned long) 0);          
+
+    if((void*)buf ==NULL){
+        printf("gwssrv: buf fail\n");
+        return;
+    }
+
+    bmp_buffer = buf;
 
     //#test
     if ( bmp_buffer[0] != 'B' || bmp_buffer[1] != 'M' )
@@ -752,6 +775,7 @@ void xxx_test_load_bmp(void)
         gde_debug_print ("gwssrv: xxx_test_load_bmp SIG FAIL \n");
         //return;
         
+        printf("xxx_test_load_bmp: *hang1\n");
         //#debug
         gws_show_backbuffer();
         while(1);
@@ -761,7 +785,7 @@ void xxx_test_load_bmp(void)
     bmpDisplayBMP ((char *) bmp_buffer, (unsigned long) 80, (unsigned long) 80);    
     //gde_display_bmp((char *)bmp_buffer, (unsigned long) 80, (unsigned long) 80);
 
-
+     printf("xxx_test_load_bmp: *hang2\n");
      //#debug
      gws_show_backbuffer();
      while(1);
@@ -820,7 +844,7 @@ void InitGraphics(void)
 
     // #test
     // Precisamos encontrar uma rotina de carregamento apropriada.
-    // xxx_test_load_bmp();
+    // xxx_test_load_bmp(); //[FAIL]
     // xxx_test_load_icon();
     
     //gws services

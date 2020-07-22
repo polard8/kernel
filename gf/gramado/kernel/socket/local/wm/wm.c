@@ -1,5 +1,5 @@
 /*
- * File: kgwm/kgwm/ww.c 
+ * File: wm/wm.c 
  *
  *  wm. - Window Manager.
  * 
@@ -20,32 +20,29 @@
  * o LFB,(FrontBuffer).
  *       
  *
- * Histórico:
- *     Versão: 1.0, 2013 - Esse arquivo foi criado por Fred Nora.
- *     Versão: 1.0, 2014 - Aprimoramento geral das rotinas básicas. 
- *     Versão: 1.0, 2015 - Revisão. 
- *     Versão: 1.0, 2016 - Revisão.
+ *    2013 - Created by Fred Nora.
  *     ...
  */
- 
-//#obs:
+
+
+// #obs:
 // Tem coisas aqui que pertencem ao window server e
-// coisas que pertencem ao window manager ou são de suporte ao window manager. 
+// coisas que pertencem ao window manager ou são de suporte ao 
+// window manager. 
 
  
 #include <kernel.h>
  
-//int window_getch_lock;
+
  
 // 
 // Argumentos passados pelo Boot Loader em head.s. 
 //
 
 extern unsigned long kArg1;    //Video Mode.	
-extern unsigned long kArg2;	   //LFB - Linear Frame Buffer.
-extern unsigned long kArg3;	   //??.
-extern unsigned long kArg4;	   //??.	
-
+extern unsigned long kArg2;    //LFB - Linear Frame Buffer.
+extern unsigned long kArg3;    //??.
+extern unsigned long kArg4;    //??.
 
 
 /*
@@ -97,7 +94,7 @@ int save_window (struct window_d *window){
 //wm.
 
 int show_saved_window (struct window_d *window){
-	
+
     if( (void *) window == NULL ){
 		return 1;
 

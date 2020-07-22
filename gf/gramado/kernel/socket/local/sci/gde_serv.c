@@ -1100,19 +1100,43 @@ gde_extra_services (
         fs_show_mounted_list();
         return NULL;
     }
+
+
     
+    // #test
+    // [FAIL]
+    //Special loader to load a file into a shared memory;
+    //this way we load a bmp in an address that ring3 apps can read.
+    //ex: See: bg_load_image: at ws/bg.c
+    //void *buf_to_r3;
+    /*
+    if(number == 9000)
+    {
+         
+         buf_to_r3 = (void*) allocPages (50); //50*4 = 200KB
+ 
+         //OUT: status
+         fsLoadFile ( VOLUME1_FAT_ADDRESS, 
+                      VOLUME1_ROOTDIR_ADDRESS, 
+                      (unsigned char*) arg2, //name 
+                       (unsigned long) buf_to_r3 ); //shared address.
+        
+        //return the shared address
+        return (void *) buf_to_r3;
+    }
+    */
+
+
 
     //test
     //raise window.
-    if ( number == 9700 )
-    {
+    if ( number == 9700 ){
         return (void *) raise_window ( (struct window_d *) arg2 );
     }
 
     //ps2 mouse controller dialog
     // msg, long1, long2
-    if ( number == 9800 )
-    {
+    if ( number == 9800 ){
         return (void *) ps2_mouse_dialog ( (int) arg2, 
                             (unsigned long) arg3, 
                             (unsigned long) arg4 );
@@ -1121,21 +1145,18 @@ gde_extra_services (
     //button down
     //quando um bot�o � clicado ou pressionado,
     //ele ser� repintado com a apar�ncia de bot�o apertado.
-    if ( number == 9900 )
-    {
+    if ( number == 9900 ){
         return (void *) button_down ( (struct window_d *) arg2 );
     }
 
     //#todo button_up
-    if ( number == 9901 )
-    {
+    if ( number == 9901 ){
         return (void *) button_up ( (struct window_d *) arg2 );
     }
  
     // chamado por gde_get_pid na api.
     // See: system.c
-    if ( number == 9999 )
-    {
+    if ( number == 9999 ){
         return (void *) system_get_pid ( (int) arg2 );
     }
 

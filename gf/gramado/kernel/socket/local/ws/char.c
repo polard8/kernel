@@ -28,10 +28,11 @@
  */
  
 void 
-my_buffer_char_blt ( unsigned long x, 
-                     unsigned long y, 
-                     unsigned long color, 
-                     unsigned long c )
+my_buffer_char_blt ( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long color, 
+    unsigned long c )
 {
     drawchar_transparent ( x, y, color, c );
 }
@@ -69,10 +70,11 @@ int get_char_height (void)
  */
 
 void 
-drawchar_transparent ( unsigned long x, 
-                       unsigned long y, 
-                       unsigned long color, 
-                       unsigned long c )
+drawchar_transparent ( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long color, 
+    unsigned long c )
 {
 	// #todo: rever isso.
 

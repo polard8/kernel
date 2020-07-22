@@ -154,15 +154,14 @@ void create_gui (void){
 
     gui = (void *) kmalloc ( sizeof(struct gui_d) );
 
-    if ( (void *) gui == NULL )
-    {
+    if ( (void *) gui == NULL ){
         panic ("create_gui:");
 
     } else {
 
 		// Set user session, room (Window Station), desktop. 
 		// window and menu.
-		
+
         current_usersession = 0;        
         current_room = 0;             
         current_desktop = 0;        

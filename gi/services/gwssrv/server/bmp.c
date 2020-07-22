@@ -464,7 +464,7 @@ fail:
  * carregada na memória. (pinta no backbuffer)
  * 
  * IN:
- *     address = endereço base
+ *     address = endereço base onde o bmp já está carregado.
  *     x       = posicionamento 
  *     y       = posicionamento
  *
