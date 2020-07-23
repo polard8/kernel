@@ -131,8 +131,10 @@ void test_standard_stream(int fd)
 
     gws_debug_print("test_standard_stream:\n");  
 
+
     FILE *f;
-    f = fopen("syscalls.txt", "r+"); 
+    //f = fopen("syscalls.txt", "r+"); 
+    f = fopen("gramado.txt", "r+"); 
     //f = fopen("kstderr.txt", "r+");
     //f = fopen("g.txt", "r+");
 
@@ -147,19 +149,37 @@ void test_standard_stream(int fd)
 
    //gramado_system_call ( 900, 
      //  (unsigned long) "tprintf.bin", 0, 0 );
+     
+    fseek(f, 0, SEEK_END);   // seek to end of file
+    size_t size = ftell(f);  // get current file pointer
+    fseek(f, 0, SEEK_SET);   // seek back to beginning of file
+    printf (">>>> size %d \n",size);  
 
+
+    //size_t size = (sizeof(buffer) - 1);
+    //buffer[4095] = 0;  
 
     int i=0;
     while(1){
 
-        nread = read ( fileno(f), buffer, sizeof(buffer) ); 
-        
+        //nread = read ( fileno(f), buffer, sizeof(buffer) ); 
+        nread = read ( fileno(f), buffer, size ); 
+         
         if( nread>0){
             
-            for(i=0;i< sizeof(buffer) ;i++){
-                if( buffer[i] != 0)
-                    terminal_write_char(fd, buffer[i]);
-            }
+            for(i=0;i< size ;i++){
+
+                if( buffer[i] == 0){ printf("FIM0\n"); return; }
+                
+                //eof
+                if( buffer[i] == EOF){ printf("FIM1\n"); return; }
+                
+                if( buffer[i] != 0){
+                    //terminal_write_char(fd, buffer[i]);
+                    tputc ((int) fd, (int) buffer[i], (int) 1); //com tratamento de escape sequence.
+                }
+            };
+            printf("FIM2\n");
             return;
         }
         
@@ -174,37 +194,63 @@ void test_standard_stream(int fd)
 // =======================
 //
 
+//int prev;
 
 void terminal_write_char (int fd, int c)
 {
+
+    static char prev = 0;
 
     unsigned long x = (textCurrentCol*8);
     unsigned long y = (textCurrentRow*8);
 
 
+    // #todo
+    // Ver no kernel esse tipo de rotina
+    // tab;
+    
+
+     if ( c == '\r' ){
+        textCurrentCol=0; //TTY[console_number].cursor_x = TTY[console_number].cursor_left;  
+        prev = c;
+        return;    
+    }
+    
+    //if ( c == '\n' && prev == '\r' ) 
+    if ( c == '\n')
+    {
+         //printf("NEWLINE\n");
+         textCurrentCol=0; // começo da linha ...(desnecessário)
+         textCurrentRow++;  //linha de baixo
+         //começo da linha
+         prev = c; 
+         return;
+    }
+
+
     // Refresh!
     // Vamos escrever o char na tela usando o window server.
 
-                    // Imprimindo o char na tela usando o window server.
-                    // Testing draw a char in a window.
-                    // Isso funciona. Precisamos das rotinas do noraterm
-                    // pra lidar com caracteres ... o x e o y.
-                    terminal_drawchar_request (
-                        (int) fd,             // fd,
-                        (int) 0,              // window id,
-                        (unsigned long) x,    // left,
-                        (unsigned long) y,    // top,
-                        (unsigned long) COLOR_RED,
-                        (unsigned long) c );
+    // Imprimindo o char na tela usando o window server.
+    // Testing draw a char in a window.
+    // Isso funciona. Precisamos das rotinas do noraterm
+    // pra lidar com caracteres ... o x e o y.
+    terminal_drawchar_request (
+        (int) fd,             // fd,
+        (int) 0,              // window id,
+        (unsigned long) x,    // left,
+        (unsigned long) y,    // top,
+        (unsigned long) COLOR_RED,
+        (unsigned long) c );
 
-                    terminal_drawchar_response((int) fd);  
+    terminal_drawchar_response((int) fd);  
 
 
     // Coloca no buffer de linhas e colunas.
     terminalInsertNextChar ( (char) c ); 
     
-    //?? circula?
     
+    //circula
     textCurrentCol++;
     if (textCurrentCol>__wlMaxColumns)
     {
@@ -330,11 +376,13 @@ void del (void){
 //#todo
 // fazer essa função colocar os chars no buffer de arquivo. Usaremos no scroll.
 
-void tputc (int fd, char *c, int len){
-	
+//void tputc (int fd, char *c, int len){
+void tputc (int fd, int c, int len){	
 	 //int c = (int) *c;
-	 unsigned char ascii = *c;
-	 
+	unsigned char ascii = (unsigned char) c;
+	
+	//unsigned char ascii = *c;
+
 	 //control codes
 	 //bool control = ascii < '\x20' || ascii == 0177;
      int control = ascii < '\x20' || ascii == 0177;
@@ -945,7 +993,7 @@ response_loop:
     //if(msg!=0)
         //printf ("%c",long1); //printf ("{%d%c} ",msg,long1);
         
-        
+    //char *c;
         
     switch (msg){
 
@@ -988,8 +1036,12 @@ response_loop:
                     // Colocando no buffer de linha
                     //terminal_write_char( (int)fd, (int) long1 );
                     
+                    //*c = (char *) long1;
                     //#test
-                    tputc ((int) fd, (char *) long1, (int) 1);
+                    // fd, buf, bufsize
+                    tputc ((int) fd, (int) long1, (int) 1);
+                     
+                     //gws_debug_print("$");
                      
                     /* Tentando mover essa rotina para dentro da função terminal_write_char
                     // Imprimindo o char na tela usando o window server.
@@ -1865,6 +1917,8 @@ int main ( int argc, char *argv[] ){
     //setreuid(-1, -1);
     //setpgrp(0, getpid());
 
+
+    __sequence_status = 0;
 
     //
     // socket

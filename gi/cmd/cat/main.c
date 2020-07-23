@@ -75,6 +75,7 @@ int main ( int argc, char *argv[] ){
     
     // 1 = stdout = virtual console.
     nwrites = write( 1, buffer, sizeof(buffer) );
+    //nwrites = write( 1, buffer, size );
 
     if (nwrites <=0 ){
         printf ("cat: write fail\n");

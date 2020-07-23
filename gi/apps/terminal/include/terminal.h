@@ -609,8 +609,8 @@ void ri (void);
 void del (void);
 
 //#test
-void tputc (int fd,char *c, int len);
-
+//void tputc (int fd,char *c, int len);
+void tputc (int fd, int c, int len);
 
 
 
