@@ -329,6 +329,7 @@ sys_open (
     mode_t mode )
 {
 
+    // See: fs.c
     // OUT: fd
     return (int) sys_read_file ( (char *) pathname, flags, mode );
 }

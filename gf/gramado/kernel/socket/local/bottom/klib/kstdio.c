@@ -1548,6 +1548,7 @@ int stdioInitialize (void){
     if(slot<0 || slot >=NUMBER_OF_FILES)
         panic("klibc-stdioInitialize: slot");
     stdin = file_table[slot];
+    stdin->filetable_index = slot;
     // Configurando a estrutura de stdin. 
     stdin->____object = ObjectTypeFile;
     stdin->used = 1;
@@ -1562,8 +1563,7 @@ int stdioInitialize (void){
     stdin->_file = 0;
     stdin->_tmpfname = "KSTDIN  TXT";
     stdin->fd_counter = 1;
-    // ...
-    
+    // ... 
     
     
 
@@ -1572,6 +1572,7 @@ int stdioInitialize (void){
     if(slot<0 || slot >=NUMBER_OF_FILES)
         panic("klibc-stdioInitialize: slot");
     stdout = file_table[slot];
+    stdout->filetable_index = slot;
     // Configurando a estrutura de stdout.
     // This is a virtual console device. Used to output
     // directly into the virtual console.
@@ -1596,6 +1597,7 @@ int stdioInitialize (void){
     if(slot<0 || slot >=NUMBER_OF_FILES)
         panic("klibc-stdioInitialize: slot");
     stderr = file_table[slot];
+    stderr->filetable_index = slot;
     // Configurando a estrutura de stderr.
     stderr->____object = ObjectTypeFile;
     stderr->used = 1;

@@ -1374,6 +1374,7 @@ int fsInit (void){
     if(slot<0 || slot >=NUMBER_OF_FILES)
         panic("fsInit: slot");
     volume1_rootdir = file_table[slot];
+    volume1_rootdir->filetable_index = slot;
 
     if ( (void *) volume1_rootdir == NULL ){
         panic ("fsInit: volume1_rootdir \n");
@@ -1407,6 +1408,7 @@ int fsInit (void){
     if(slot<0 || slot >=NUMBER_OF_FILES)
         panic("fsInit: slot");
     volume2_rootdir = file_table[slot];
+    volume2_rootdir->filetable_index = slot;
 
     if ( (void *) volume2_rootdir == NULL ){
         panic ("fsInit: volume2_rootdir\n");
@@ -1847,6 +1849,25 @@ void fs_pathname_backup ( int pid, int n ){
 }
 
 
+/*
+//#todo
+// temos que procurar um path na lista de inodes.
+// retorna o index se encontrarmos e -1 se falhar.
+int fs_search_inode_table( char *path )
+int fs_search_inode_table( char *path )
+{
+    //fail
+    return -1;
+}
+*/
+
+/*
+ ************************************* 
+ * sys_read_file: 
+ * 
+ *     This is called by sys_open()
+ */
+
 // usada por open()
 // tem que retornar o fd e colocar o ponteiro na lista de arquivos
 // abertos.
@@ -1863,18 +1884,18 @@ void fs_pathname_backup ( int pid, int n ){
 // >>> vamos confiar no usu�rio e usarmos
 
 
+    // #bugbug
+    // precisamos colocar os arquivos também na lista
+    // global de arquivos abertos. file_table[]
+    // E na lista de inodes. inode_table[]
+    // See: fs.c
+
 int 
 sys_read_file ( 
     char *file_name, 
     int flags, 
     mode_t mode )
 {
-
-        // #bugbug
-        // precisamos colocar os arquivos também na lista
-        // global de arquivos abertos. openfileList[]
-        // See: fs.c
-
 
     file *__file;
  
@@ -1895,9 +1916,17 @@ sys_read_file (
     read_fntos ( (char *) file_name );
 
 
+    // #bugbug
+    // We need to search in the inode list. inode_table[]
+    // If the file is found in the inode list, so we don't
+    // need to load it again, just increment the counter.
+
+    // #todo
+    // fs_search_inode_table(file_name);
+
     // Searching for the file only on the root dir.
 
-    Status = (int) KiSearchFile ( file_name, VOLUME1_ROOTDIR_ADDRESS );
+    Status = (int) KiSearchFile( file_name, VOLUME1_ROOTDIR_ADDRESS );
     
     if (Status != 1){
          printf ("sys_read_file: File not found!\n");
@@ -1945,11 +1974,11 @@ __OK:
     
     __file = (file *) kmalloc ( sizeof(file) );
     
-    if ( (void *) __file == NULL )
-    {
+    if ( (void *) __file == NULL ){
         printf ("sys_read_file: __file\n");
         refresh_screen();
         return -1;
+
     }else{
 
         
@@ -1975,7 +2004,20 @@ __OK:
 
         __file->_file = __slot;
         
-        //Process->Objects[__slot] = (unsigned long) __file;
+        // #todo
+        // temos que colocar nessa lista e atualizar o contador
+        // de descritores que usam essa estrutura.
+        // Process->Objects[__slot] = (unsigned long) __file;
+        __file->fd_counter = 1; //inicializando. 
+        
+        // #todo
+        // Se ele não foi encontrado na lista de inodes
+        // e tivemos que carrega-lo do disco, então
+        // precisamos colocar ele na lista de inodes.. inode_table[]
+        // Atenção: O arquivo será carregado logo abaixo.
+        
+        // #todo
+        // atualizar a tabela  global de arquivos. file_table[]
     };
     
 
@@ -1987,7 +2029,7 @@ __OK:
     // #bugbug: open chama isso. E se o arquivo for maior que o buffer ?
     // open() precisa alocar outro buffer.
         
-    __file->_base = (char *) kmalloc (BUFSIZ);
+    __file->_base = (char *) kmalloc(BUFSIZ);
     
     if ( (void *) __file->_base == NULL ){
         printf ("sys_read_file: buffer fail\n");
@@ -1999,6 +2041,7 @@ __OK:
     //
     // File size.
     //
+
 
     size_t s = (size_t) fsGetFileSize ( (unsigned char *) file_name );
     
@@ -2018,8 +2061,7 @@ __OK:
     if (s > __file->_lbfsize)
     {
         // limite - 1MB.
-        if (s > 1024*1024)
-        {
+        if (s > 1024*1024){
             printf ("sys_read_file: File size out of limits\n");
             printf ("%d bytes \n",s);
             refresh_screen();
@@ -2029,13 +2071,12 @@ __OK:
         // Allocate new buffer.
         __file->_base = (char *) kmalloc (s);
         
-        if ( (void *) __file->_base == NULL )
-        {
+        if ( (void *) __file->_base == NULL ){
             printf ("sys_read_file: Couldn't create a new buffer\n");
             refresh_screen();
             return -1;             
         }
-        
+ 
         // temos um novo buffer size.
         __file->_lbfsize = (int) s;
     }
@@ -2076,6 +2117,12 @@ __OK:
         refresh_screen();
         return -1;
     }
+    
+    
+    // #bugbug
+    // Agora é a hora de atualizarmos as tabelas ....
+    // Depois de carregarmos o arquivo.
+    
      
     //
     // Pointer. (mode)
@@ -2156,7 +2203,9 @@ __OK:
 
     // salva o ponteiro.  
     // ja checamos fd.
+    // Perigo: Validade dessa estrutura.
     p->Objects[__slot] = (unsigned long) __file;
+
 
 
     //printf ("done\n");
