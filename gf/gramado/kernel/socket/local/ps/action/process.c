@@ -959,9 +959,13 @@ int processCopyProcess ( pid_t p1, pid_t p2 ){
         // Updating the referency counter.
         // ??limits
         __f = (void*) Process2->Objects[i];
-        if((void*)__f!= NULL)
-            __f->counter++;
+        if ((void*)__f!= NULL)
+        {
+            // Quantos descritores de arquivo apontam para essa mesma estrutura.
+            __f->fd_counter++;
+        }
     }
+
 
     // O fluxo padrão foi criando antes em klib/kstdio.c
     // #todo: Checar as características desses arquivos.

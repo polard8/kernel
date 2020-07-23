@@ -100,7 +100,7 @@ void vfsInit (void){
         
         vfs->_file = 0; //? 
         vfs->_tmpfname = "vfs-stream";
-        vfs->counter =1;
+        vfs->fd_counter =1;
     };
 
 

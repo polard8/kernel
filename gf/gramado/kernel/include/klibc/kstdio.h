@@ -558,6 +558,13 @@ struct file_d
     int used;
     int magic;
 
+    // A estrutura de arquivos aponta para tabela global de 
+    // arquivos abertos.
+    int filetable_index;
+
+    // A estrutura de arquivos aponta para a tabela de inodes.
+    int inodetable_index;
+
 
     // #bugbug
     // Identificador do primeiro processo à abrir o arquivo
@@ -567,16 +574,9 @@ struct file_d
     uid_t uid;  // User 
     gid_t gid;  // Group
 
-    // #importante
-    // Informação sobre o arquivo no disco.
-    // A estrutura de inode tem como elemento uma
-    // estrutura de entrada de fat.
-    struct inode_d *inode;
 
-
-    // #test
-    // Contador de processos que abriram esse arquivo.
-    int counter;
+    // Contador de descritores de arquivo que usam essa mesma estrutura.
+    int fd_counter;
 
     // If the file is a tty, we need a tty structure.
     struct tty_d *tty;

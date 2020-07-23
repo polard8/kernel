@@ -496,21 +496,24 @@ void set_global_open_file ( void *file, int Index ){
 }
 
 
-//get free slots in the fileList[]
+//get free slots in the file_table
 int get_free_slots_in_the_fileList(void)
 {
-    int i=0;
     file *tmp;
+    int i=0;
+
     
     for (i=0;i<NUMBER_OF_FILES; i++)
     {
         tmp = (void*) file_table[i];
         
-        if (tmp->used == 1 && tmp->magic == 1234 && tmp->counter == 0)
+        // Nenhum file descritor está usando essa estrutura.
+        if (tmp->used == 1 && tmp->magic == 1234 && tmp->fd_counter == 0)
         { 
             return (int) i; 
         }
     }
+
     return -1;
 }
 
@@ -1385,7 +1388,7 @@ int fsInit (void){
         volume1_rootdir->_cnt = (32 * 512) ;
         volume1_rootdir->_file = 0;
         volume1_rootdir->_tmpfname = "volume1-stream";
-        volume1_rootdir->counter = 1;
+        volume1_rootdir->fd_counter = 1;
 
         // #bugbug: 
         // Validade da estrutura.
@@ -1419,7 +1422,7 @@ int fsInit (void){
         volume2_rootdir->_cnt = (32 * 512) ;
         volume2_rootdir->_file = 0; //?
         volume2_rootdir->_tmpfname = "volume2-stream";
-        volume2_rootdir->counter = 1;
+        volume2_rootdir->fd_counter = 1;
     };
 
 

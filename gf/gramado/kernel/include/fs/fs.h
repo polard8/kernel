@@ -108,12 +108,11 @@ int pwd_initialized;
 
 
 // ?? - Contagem de diretórios.
-int dirCount;  
+//int dirCount;  
 
 
-
-
-//list of clusters. 
+// List of clusters. 
+// Usado na rotina de carregamento de arquivo.
 unsigned short file_cluster_list[1024]; 
 
 
@@ -720,8 +719,7 @@ fsListFiles (
 
 
 
-// interna
-// procura uma entrada vazia no diretório 
+// Procura uma entrada vazia no diretório 
 int 
 findEmptyDirectoryEntry ( 
     unsigned long dir_address, 
@@ -749,11 +747,8 @@ void fs_show_mounted(int i);
 void fs_show_mounted_list(void);
 
 
-/*
- * fsInit:
- *     Initialization support.
- */
 
+// Initialization support.
 int fsInit (void);
 
 

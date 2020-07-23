@@ -1,5 +1,9 @@
-	gramado/gramado/    (Local)
-	    +lpc
+	gi/ ring 3
+	gf/ ring 0
 
-	gramado-nt/         (Remote) 
-	    +rpc
+
+	Ex:
+	"gi:something/something"
+	"gf:something/something"
+
+

@@ -481,7 +481,7 @@ void init_globals (void){
             
         tmp->used = 1;
         tmp->magic = 1234;
-        tmp->counter = 0;
+        tmp->fd_counter = 0;
         //...
         
         //salva
@@ -498,6 +498,7 @@ void init_globals (void){
             
         tmp_inode->used = 1;
         tmp_inode->magic = 1234;
+        tmp_inode->filestruct_counter = 0;
         //...
 
         //salva
@@ -507,7 +508,7 @@ void init_globals (void){
 
     // Inicializa as estruturas do fluxo padrão.
     // Isso vai usar a file table.
-    stdioInitialize ();
+    stdioInitialize();
 
 
 	//#importante

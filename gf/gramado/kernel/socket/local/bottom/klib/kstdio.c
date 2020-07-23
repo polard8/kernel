@@ -1561,7 +1561,7 @@ int stdioInitialize (void){
     stdin->_cnt = PROMPT_SIZE;
     stdin->_file = 0;
     stdin->_tmpfname = "KSTDIN  TXT";
-    stdin->counter = 1;
+    stdin->fd_counter = 1;
     // ...
     
     
@@ -1587,7 +1587,7 @@ int stdioInitialize (void){
     stdout->_cnt = PROMPT_SIZE;
     stdout->_file = 1;
     stdout->_tmpfname = "KSTDOUT DEV";
-    stdout->counter = 1;
+    stdout->fd_counter = 1;
     // ...
 
 
@@ -1609,7 +1609,7 @@ int stdioInitialize (void){
     stderr->_cnt = PROMPT_SIZE;
     stderr->_file = 2;
     stderr->_tmpfname = "KSTDERR TXT";
-    stderr->counter = 1;
+    stderr->fd_counter = 1;
     // ...
 
 
