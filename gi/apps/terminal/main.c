@@ -210,7 +210,7 @@ void terminal_write_char (int fd, int c)
     // tab;
     
 
-     if ( c == '\r' ){
+    if ( c == '\r' ){
         textCurrentCol=0; //TTY[console_number].cursor_x = TTY[console_number].cursor_left;  
         prev = c;
         return;    
@@ -273,42 +273,43 @@ void terminal_write_char (int fd, int c)
 	//#importante:
 	//o refresh é chamado no default do procedimento de janela
 
-void terminalInsertNextChar (char c){
-	
+void terminalInsertNextChar (char c)
+{
+
 	// #todo
 	// para alguns caracteres temos que efetuar o flush.
 	// \n \r ... ??
 			
 	// Coloca no buffer.
-	
-	LINES[textCurrentRow].CHARS[textCurrentCol] = (char) c;
+
+    LINES[textCurrentRow].CHARS[textCurrentCol] = (char) c;
 }
 
 
 // # terminal stuff
-void terminalInsertNullTerminator (){
-	
-	terminalInsertNextChar ( (char) '\0' );
+void terminalInsertNullTerminator ()
+{
+    terminalInsertNextChar ( (char) '\0' );
 }
 
 
 // # terminal stuff
-void terminalInsertLF (){
-	
-	terminalInsertNextChar ( (char) '\n' );
+void terminalInsertLF ()
+{
+    terminalInsertNextChar ( (char) '\n' );
 }
 
 // # terminal stuff
-void terminalInsertCR (){
-    
-	terminalInsertNextChar ( (char) '\r' );
+void terminalInsertCR ()
+{
+    terminalInsertNextChar ( (char) '\r' );
 }
 
 
 // # terminal stuff
 //line feed
-void lf (void){
-	
+void lf (void)
+{
 	//enquanto for menor que o limite de linhas, avança.
 	if ( textCurrentRow+1 < __wlMaxRows )
 	{
@@ -325,8 +326,8 @@ void lf (void){
 
 // # terminal stuff
 //carriege return
-void cr (void){
-	
+void cr (void)
+{
     textCurrentCol = 0;
 }
 
@@ -334,8 +335,8 @@ void cr (void){
 // # terminal stuff
 // ??
 //voltando uma linha.
-void ri (void){
-	
+void ri (void)
+{
 	//if ( screen_buffer_y > top ){
 		
 		// Volta uma linha.
@@ -350,10 +351,10 @@ void ri (void){
 
 
 // # terminal stuff
-void del (void){
-	
-	LINES[textCurrentRow].CHARS[textCurrentCol] = (char) '\0';
-	LINES[textCurrentRow].ATTRIBUTES[textCurrentCol] = 7;
+void del (void)
+{
+    LINES[textCurrentRow].CHARS[textCurrentCol] = (char) '\0';
+    LINES[textCurrentRow].ATTRIBUTES[textCurrentCol] = 7;
 }
 
 
@@ -375,290 +376,314 @@ void del (void){
         
 //#todo
 // fazer essa função colocar os chars no buffer de arquivo. Usaremos no scroll.
-
 //void tputc (int fd, char *c, int len){
-void tputc (int fd, int c, int len){	
-	 //int c = (int) *c;
-	unsigned char ascii = (unsigned char) c;
-	
-	//unsigned char ascii = *c;
 
-	 //control codes
-	 //bool control = ascii < '\x20' || ascii == 0177;
-     int control = ascii < '\x20' || ascii == 0177;
-	 
-	 
-	 //
-	 // #importante
-	 // Se não é controle é string ou escape sequence.
-	 //
-	 
-	 //??
-	 //if(iofd != -1) {}
-	 
-	 //string normal
-	 //if(term.esc & ESC_STR) 
-	 if (__sequence_status == 0)
-	 {
-		 switch (ascii)
-		 {
-			 //deixou de ser string normal e
-			 //entramos em uma sequência
-			 //logo abaixo esse char será tratado novamente.
-		     case '\033':
-		         term.esc = ESC_START;
-                 __sequence_status = 1;
-                 break;
-             
-             
-             //
+void 
+tputc ( 
+    int fd, 
+    int c, 
+    int len )
+{
+
+    unsigned char ascii = (unsigned char) c;
+    //unsigned char ascii = *c;
+
+
+    // Control codes
+    int control = ascii < '\x20' || ascii == 0177;
+    //bool control = ascii < '\x20' || ascii == 0177;
+
+ 
+    /*
+    if(fd<0){
+        printf("tputc: fd\n"); //debug
+        return;
+    }
+    */
+     
+    //??
+    //if(iofd != -1) {}
+
+ 
+    //
+    // #importante
+    // Se não é controle é string ou escape sequence.
+    //
+ 
+    //string normal
+    //if(term.esc & ESC_STR) 
+    if (__sequence_status == 0)
+    {
+        switch (ascii)
+        {
+            // [Esc]
+            // Deixou de ser string normal e entramos em uma sequência.
+            // Logo abaixo esse char será tratado novamente.
+            case '\033':
+                term.esc = ESC_START;
+                __sequence_status = 1;
+                break;
+
              // #importante
-             // 
-             
              // Imprimindo caracteres normais.
              // #todo: talvez possamos usar a API para isso.
              // como acontece nos caracteres digitados no shell interno.
+             // #importante
+             // Isso vai exibir o caractere mas também
+             // na colocar ele no buffer ba posição atual.
              default:
-             
-                 // #importante
-                 // Isso vai exibir o caractere mas também
-                 // na colocar ele no buffer ba posição atual.
-                 
-                 //printf ("%c",ascii);
                  terminal_write_char ( fd, (int) ascii); 
+                 //printf ("%c",ascii);  //debug
                  return;
-         }
-	 }
+         };
+    }
 
 
-	 //control codes. (dentro de um range)
-	 if(control){
-		 
-		 switch(ascii)
-		 {
+    // Control codes. 
+    // (dentro de um range)
 
-		    //case '\v': /* VT */
-		    //case '\a': /* BEL */    
-		    		    		    
-		    case '\t': /* HT */
-		    case '\b': /* BS */
-		    case '\r': /* CR */
-		    case '\f': /* LF */
-            case '\n': /* LF */
-                //#deixa o kernel lidar com isso por enquanto.
-                //printf ("%c",ascii);
+    if (control){
+ 
+        switch(ascii)
+        {
+            //case '\v':    /* VT */
+            //case '\a':    /* BEL */    
+            case '\t':      /* HT */
+            case '\b':      /* BS */
+            case '\r':      /* CR */
+            case '\f':      /* LF */
+            case '\n':      /* LF */
                 terminal_write_char (fd, (int) ascii);
-                return;	
-                break;
-		    
-		    //^[
-		    //case '\e':
-			//case '\033':
-		    case '\x1b':
-		        term.esc = ESC_START;
-		        __sequence_status = 1;
-		        //printf (" {ESCAPE} ");
-		        terminal_write_char ( fd, (int) '$');
-		        return;
-		        break;
-		        
-		    case '\016':	/* SO */
-            case '\017': /* SI */
-		        return;
-		        break;
-		        
-		    case '\032':	/* SUB */
-		    case '\030':	/* CAN */
-			    //csireset ();
-			    //printf (" {reset?} ");
-                terminal_write_char ( fd, (int) '$');
+                //printf ("%c",ascii); //debug
                 return;
-		        break;
-		            
-		    case '\005':	/* ENQ (IGNORED) */
-		    case '\000':	/* NUL (IGNORED) */
-		    case '\021':	/* XON (IGNORED) */
-		    case '\023':	/* XOFF (IGNORED) */
-		    //case 0177:	/* DEL (IGNORED) */
+                break;
+
+            //^[   (Esc)
+            //case '\e':
+            //case '\033':
+            case '\x1b':
+                term.esc = ESC_START;
+                __sequence_status = 1;
+                terminal_write_char ( fd, (int) '$');  //debug
+                //printf (" {ESCAPE} ");  //debug
+                return;
+                break;
+
+
+            case '\016':    /* SO */
+            case '\017':    /* SI */
+                return;
+                break;
+
+
+            case '\032':    /* SUB */
+            case '\030':    /* CAN */
+                //csireset ();
+                terminal_write_char ( fd, (int) '$'); //debug
+                //printf (" {reset?} "); //debug
+                return;
+                break;
+
+
+            case '\005':    /* ENQ (IGNORED) */
+            case '\000':    /* NUL (IGNORED) */
+            case '\021':    /* XON (IGNORED) */
+            case '\023':    /* XOFF (IGNORED) */
+            //case 0177:    /* DEL (IGNORED) */
                 //Nothing;
                 return;
-                
-            //...    
-		 }
-		        
-		 //...	 
-		 
-	 // Um 1b já foi encontrado.
-	 } else if(term.esc & ESC_START) {
-	 
-	     // Um [ já foi encontrado.
-	     //#todo parse csi
-	     if(term.esc & ESC_CSI){
-		      
-		      switch(ascii)
-		      {
-		     	//quando acaba a sequencia.
-		     	case 'm':
-		     	    term.esc = 0;
-			        __sequence_status = 0;
-			        //printf (" {m} ");
-			        terminal_write_char (fd, (int) '$');
-			        return;
-			        break;  
-			     
-			     //Nothing??
-			     //case ';':
-			         //return;
-			         //break;
-			         
-			     //Vamos apenas colocar no buffer
-			     //para analizarmos depois.
-			     //Colocamos no tail e retiramos no head.
-		         default:
-		              //printf (" {.} ");
-		              terminal_write_char ( fd, (int) '$');
-		              CSI_BUFFER[__csi_buffer_tail] = ascii;
-		              __csi_buffer_tail++;
-		              if ( __csi_buffer_tail >= CSI_BUFFER_SIZE )
-		              {
-						  __csi_buffer_tail = 0;
-					  }
-		              return;
-		              break;
-		      }
-		 
-		 } else if(term.esc & ESC_STR_END){ 
-			 
-			 
-			 //...
-	 
-	     } else if(term.esc & ESC_ALTCHARSET){
-			 
-			 switch(ascii)
-			 {
-			      case 'A': /* UK (IGNORED) */
-			      case '<': /* multinational charset (IGNORED) */
-			      case '5': /* Finnish (IGNORED) */
-			      case 'C': /* Finnish (IGNORED) */
-			      case 'K': /* German (IGNORED) */
-                      break;
-			 }
-			 
-	     } else if(term.esc & ESC_TEST) {
-			 
-		    //...
-		    	 
-		 }else{
-			
-		   switch(ascii)
-		   {
-			 case '[':
-			     term.esc |= ESC_CSI;
-			     //printf (" {CSI} ");
-			     terminal_write_char ( fd, (int) '$');
-			     return;
-			     break; 
-			       
-			 case '#':
-			     term.esc |= ESC_TEST;
-			     break;
-			
-			case 'P': /* DCS -- Device Control String */
-			case '_': /* APC -- Application Program Command */
-			case '^': /* PM -- Privacy Message */
-			case ']': /* OSC -- Operating System Command */
-            case 'k': /* old title set compatibility */
-			     term.esc |= ESC_STR;
-			     break; 
-			     
-			case '(': /* set primary charset G0 */  
-			    term.esc |= ESC_ALTCHARSET;
-			    break;    
-			    
-			case ')': /* set secondary charset G1 (IGNORED) */
-			case '*': /* set tertiary charset G2 (IGNORED) */
-			case '+': /* set quaternary charset G3 (IGNORED) */
-				term.esc = 0;
+
+            // ...
+        };
+
+        // ... 
+
+    // Um 1b já foi encontrado.
+    } else if (term.esc & ESC_START) {
+
+        // Um [ já foi encontrado.
+        // #todo parse csi
+        if(term.esc & ESC_CSI){
+
+            switch(ascii)
+            {
+                // Quando acaba a sequência.
+                case 'm':
+                    term.esc = 0;
+                    __sequence_status = 0;
+                    terminal_write_char (fd, (int) '$'); //debug
+                    //printf (" {m} "); //debug
+                    return;
+                    break;  
+
+                 // ??
+                 //case ';':
+                     //return;
+                     //break;
+
+
+                // Vamos apenas colocar no buffer
+                // para analizarmos depois.
+                // Colocamos no tail e retiramos no head.
+                default:
+                    terminal_write_char ( fd, (int) '$'); //debug
+                    //printf (" {.} "); //debug
+                    CSI_BUFFER[__csi_buffer_tail] = ascii;
+                    __csi_buffer_tail++;
+                    if ( __csi_buffer_tail >= CSI_BUFFER_SIZE )
+                    {
+                        __csi_buffer_tail = 0;
+                    }
+                    return;
+                    break;
+            };
+
+
+        } else if (term.esc & ESC_STR_END){ 
+ 
+            // ...
+
+        } else if (term.esc & ESC_ALTCHARSET){
+
+            switch(ascii)
+            {
+                case 'A':  /* UK (IGNORED) */
+                case '<':  /* multinational charset (IGNORED) */
+                case '5':  /* Finnish (IGNORED) */
+                case 'C':  /* Finnish (IGNORED) */
+                case 'K':  /* German (IGNORED) */
+                    break;
+            };
+
+
+        } else if (term.esc & ESC_TEST) {
+
+            // ...
+ 
+        }else{
+
+            switch (ascii){
+
+            case '[':
+                term.esc |= ESC_CSI;
+                terminal_write_char ( fd, (int) '$'); //debug
+                //printf (" {CSI} "); //debug
+                return;
+                break; 
+   
+            case '#':
+                 term.esc |= ESC_TEST;
+                 break;
+
+            case 'P':  /* DCS -- Device Control String */
+            case '_':  /* APC -- Application Program Command */
+            case '^':  /* PM -- Privacy Message */
+            case ']':  /* OSC -- Operating System Command */
+            case 'k':  /* old title set compatibility */
+                term.esc |= ESC_STR;
+                break; 
+
+            /* Set primary charset G0 */ 
+            case '(': 
+                term.esc |= ESC_ALTCHARSET;
+                break;    
+
+            case ')':  /* set secondary charset G1 (IGNORED) */
+            case '*':  /* set tertiary charset G2 (IGNORED) */
+            case '+':  /* set quaternary charset G3 (IGNORED) */
+                term.esc = 0;
                 __sequence_status = 0;
                 break;  
-                
-                
-             case 'D': /* IND -- Linefeed */
+
+
+            /* IND -- Linefeed */
+            case 'D': 
+                term.esc = 0;
+                terminal_write_char ( fd,(int) '$');  //debug
+                //printf (" {IND} ");  //debug
+                break;
+
+            /* NEL -- Next line */ 
+            case 'E': 
+                term.esc = 0;
+                terminal_write_char ( fd,(int) '$'); //debug
+                //printf (" {NEL} "); //debug
+                break;
+
+
+            /* HTS -- Horizontal tab stop */
+            case 'H':   
+                term.esc = 0;
+                terminal_write_char ( fd,(int) '$'); //debug
+                 //printf (" {HTS} "); //debug
+                break;
+
+
+            /* RI -- Reverse index */
+            case 'M':     
+                term.esc = 0;
+                terminal_write_char ( fd,(int) '$'); //debug
+                //printf (" {RI} "); //debug
+                break;
+
+            /* DECID -- Identify Terminal */
+            case 'Z':  
                  term.esc = 0;
-                 //printf (" {IND} ");
-                 terminal_write_char ( fd,(int) '$');
+                 terminal_write_char (fd, (int) '$'); //debug
+                 //printf (" {DECID} "); //debug
                  break;
-                 
-             case 'E': /* NEL -- Next line */
+
+
+            /* RIS -- Reset to inital state */
+            case 'c': 
                  term.esc = 0;
-                 //printf (" {NEL} ");
-                 terminal_write_char ( fd,(int) '$');
-                 break;
-                        			
-			   
-			 case 'H': /* HTS -- Horizontal tab stop */  
-                 term.esc = 0;
-                 //printf (" {HTS} ");
-                 terminal_write_char ( fd,(int) '$');
-                 break;
-                 
- 			 case 'M': /* RI -- Reverse index */    
-                 term.esc = 0;
-                 //printf (" {RI} ");
-                 terminal_write_char ( fd,(int) '$');
-                 break;
-                 
-                 			     
-			  case 'Z': /* DECID -- Identify Terminal */   
-                 term.esc = 0;
-                 //printf (" {DECID} ");
-                 terminal_write_char (fd, (int) '$');
-                 break;
-                 
-                 			 
-			 case 'c': /* RIS -- Reset to inital state */
-                 term.esc = 0;
-                 //printf (" {reset?} ");
-                 terminal_write_char ( fd,(int) '$');
+                 terminal_write_char ( fd,(int) '$'); //debug
+                 //printf (" {reset?} "); //debug
                  break; 
-                 
-			 case '=': /* DECPAM -- Application keypad */
+
+            /* DECPAM -- Application keypad */
+            case '=': 
                  term.esc = 0;
-                 //printf (" {=} ");
-                 terminal_write_char ( fd,(int) '$');
+                 terminal_write_char ( fd,(int) '$'); //debug
+                 //printf (" {=} "); //debug
                  break;
-                 			 
-			 case '>': /* DECPNM -- Normal keypad */
-                 term.esc = 0;
-                 //printf (" {>} ");
-                 terminal_write_char (fd, (int) '$');
-                 break;
-                 			 
-			 //case '7': /* DECSC -- Save Cursor */    
+
+            /* DECPNM -- Normal keypad */
+            case '>': 
+                term.esc = 0;
+                terminal_write_char (fd, (int) '$'); //debug
+                //printf (" {>} "); //debug
+                break;
+
+
+            /* DECSC -- Save Cursor */ 
+            //case '7':     
                //  term.esc = 0;
                //  break;
-                 			   
-			 //case '8': /* DECRC -- Restore Cursor */
+
+            /* DECRC -- Restore Cursor */ 
+            //case '8': 
                //  term.esc = 0;
-                // break;
-                 
-			 //0x9C 	ST 	String Terminator ???
-			 //case '\\': /* ST -- Stop */  
+               //  break;
+
+            /* ST -- Stop */
+            //0x9C ST String Terminator ???
+            //case '\\':   
                  //term.esc = 0;
-                 //break;	           
+                 //break;
   
-  			 //erro    
-			 //default:
-			     //break;          
-		   }
-		};	 
-	    
-	     //...
-	     
-	     return;
-	 };
-	 
-	 //...
+            //erro    
+            //default:
+                //break; 
+            };
+        };
+        
+        // ...
+
+        return;
+    };
+ 
+    // ...
 }
 
 
