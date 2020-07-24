@@ -345,14 +345,14 @@ void *teditorProcedure (
 
 				//#teste: Isso é um improviso.
 				//Criando o botão para salvar o arquivo.
-				case VK_F1: 
-				    debug_print(" [F1] ");
-				    saveCreateButton(); 
-				    break;
+                case VK_F1: 
+                    debug_print(" [F1] ");
+                    saveCreateButton(); 
+                    break;
 
-				case VK_F2: debug_print(" [F2] "); break;
-				case VK_F3: debug_print(" [F3] "); break;
-				case VK_F4: debug_print(" [F4] "); break;
+                case VK_F2: debug_print(" [F2] "); break;
+                case VK_F3: debug_print(" [F3] "); break;
+                case VK_F4: debug_print(" [F4] "); break;
 
 				default:
                     gde_debug_print("teditorProcedure: [MSG_SYSKEYDOWN] default message\n");

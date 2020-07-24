@@ -82,6 +82,58 @@ reboot2Procedure (
 
     switch (msg)
     {
+
+        case MSG_SYSKEYDOWN:
+            switch (long1)
+            {
+
+				case VK_F1:
+						printf ("disabling ps2 mouse\n");
+	                    system_call ( 9800,   //serviço. seleciona o diálogo 
+	                        (unsigned long) 4001, // (desabilita) mensagem par ao diálogo
+		                    (unsigned long) 0, 
+		                    (unsigned long) 0 );
+					break;
+
+
+                case VK_F2:
+ 						debug_print ("reboot2: Enabling ps2 mouse\n");
+	                    system_call ( 9800,   //serviço. seleciona o diálogo 
+	                        (unsigned long) 4000, // (habilita) mensagem par ao diálogo
+		                    (unsigned long) 0, 
+		                    (unsigned long) 0 );
+					break;
+
+
+                // Update button and return.
+                case VK_F3:
+                    debug_print ("reboot2: [F3] Rebooting ...");
+                    // button down
+                    gramado_system_call ( 9900,   
+                        (unsigned long) reboot_button, 
+                        (unsigned long) reboot_button, 
+                        (unsigned long) reboot_button );
+
+                    // button up
+                    gramado_system_call ( 9901,   
+                        (unsigned long) reboot_button, 
+                        (unsigned long) reboot_button, 
+                        (unsigned long) reboot_button );
+
+                    gde_reboot();
+                    debug_print ("reboot2: Unexpected return");
+                    goto done;
+                    break;
+            };
+            goto done;
+            break;
+
+
+        case MSG_SYSKEYUP:
+            goto done;
+            break;
+
+
         //vamos criar um botão.
         case MSG_CREATE:
         
@@ -145,6 +197,7 @@ reboot2Procedure (
             gde_exit_critical_section (); 
 	        //--
 	        */
+	        goto done;
             break;
 
 
@@ -161,57 +214,10 @@ reboot2Procedure (
                 gde_redraw_window (__icon1, 1);
                 gde_redraw_window (check_box_window, 1);
             }
+            goto done;
             break;
 
 
-        case MSG_SYSKEYDOWN:
-            switch (long1)
-            {
-				case VK_F1:
-						printf ("disabling ps2 mouse\n");
-	                    system_call ( 9800,   //serviço. seleciona o diálogo 
-	                        (unsigned long) 4001, // (desabilita) mensagem par ao diálogo
-		                    (unsigned long) 0, 
-		                    (unsigned long) 0 );
-					break;
-					
-				case VK_F2:
- 						printf ("enabling ps2 mouse\n");
-	                    system_call ( 9800,   //serviço. seleciona o diálogo 
-	                        (unsigned long) 4000, // (habilita) mensagem par ao diálogo
-		                    (unsigned long) 0, 
-		                    (unsigned long) 0 );
-					break;
-
-                case VK_F3:
-                    
-                    // button down
-                    gramado_system_call ( 9900,   
-                        (unsigned long) reboot_button, 
-                        (unsigned long) reboot_button, 
-                        (unsigned long) reboot_button );
-
-                    // button up
-                    gramado_system_call ( 9901,   
-                        (unsigned long) reboot_button, 
-                        (unsigned long) reboot_button, 
-                        (unsigned long) reboot_button );
-
-                    gde_reboot();
-                    break;
-
-
-				//...
-				
-                //full screen
-                //colocar em full screen somente a área de cliente. 
-		        case VK_F11:
-				    
-					break;
-					
-				//...
-			};
-			break;
 
 
 		// MSG_MOUSEKEYDOWN
@@ -275,6 +281,7 @@ reboot2Procedure (
 
 					break;
 			};
+			goto done;
 			break;
 
 
@@ -318,6 +325,7 @@ reboot2Procedure (
 					}
 				    break;
 			};
+			goto done;
 			break;
 
 
@@ -393,11 +401,13 @@ reboot2Procedure (
              break;
 
  
-		default:
-		    break;
+        default:
+            debug_print("reboot2: default message");
+            break;
 	};
 
 
+done:
     return (int) gde_system_procedure ( window, msg, long1, long2 );
 }
 
@@ -690,7 +700,7 @@ int main ( int argc, char *argv[] ){
 	//++
     gde_enter_critical_section (); 
     reboot_button = (void *) gde_create_window ( WT_BUTTON, 1, 1, 
-                                " Reboot ",  
+                                " Reboot [F3] ",  
                                 (width/3), ((height/4)*2), 
                                 (width/3), (height/8),   
                                 hWindow, 0, 
@@ -739,20 +749,16 @@ int main ( int argc, char *argv[] ){
     gde_exit_critical_section (); 
 	//--
 
-     
-     
-     
-     
-     
+
+    gde_set_focus(main_window);
      
      // #debug
-     // funcionou.
-     //gde_show_backbuffer ();
-     //while (1){}
+     // gde_show_backbuffer ();
+     // while (1){}
 
 
 	//
-	//  ## Loop ##
+	// == Loop =================================
 	//
 
     unsigned long message_buffer[5];
@@ -774,10 +780,10 @@ Mainloop:
             
         if ( message_buffer[1] != 0 )
         {
-	        reboot2Procedure ( (struct window_d *) message_buffer[0], 
-		        (int) message_buffer[1], 
-		        (unsigned long) message_buffer[2], 
-		        (unsigned long) message_buffer[3] );
+            reboot2Procedure ( (struct window_d *) message_buffer[0], 
+                (int) message_buffer[1], 
+                (unsigned long) message_buffer[2], 
+                (unsigned long) message_buffer[3] );
 
             message_buffer[0] = 0;
             message_buffer[1] = 0;
@@ -789,17 +795,11 @@ Mainloop:
 
 fail:
     printf ("fail.\n");
-	
+
 done:
-    
-	//running = 0;
-	
-	return 0;
+    //running = 0;
+    return 0;
 }
-
-
-
-
 
 
 
@@ -813,13 +813,12 @@ done:
 // A Topbar pode ficar no window manager.
  
 void topbarInitializeTopBar (){
-	
-	int i;
-	
-	unsigned long OldX, OldY;
 
-	//salva cursor antigo.
-	OldX = gde_get_cursor_x ();
+    int i=0;
+    unsigned long OldX, OldY;
+
+    //salva cursor antigo.
+    OldX = gde_get_cursor_x ();
     OldY = gde_get_cursor_y ();
 	
 	//posiciona.#teste
@@ -829,7 +828,8 @@ void topbarInitializeTopBar (){
 	{
 		printf(" ");
 	};
-	
+
+
 	gde_set_cursor( 8, 0 );	
 	printf("|TEDITOR");
 

@@ -231,50 +231,44 @@ void showinfo_button3()
  */
 
 int 
-sysmonProcedure ( struct window_d *window, 
-                  int msg, 
-                  unsigned long long1, 
-                  unsigned long long2 )
+sysmonProcedure ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 )
 {
-	
+
+
 	//salvaremos o nome do processo aqui.
    //char __processname_buffer[64];
    //char __tmp_buffer[64];
 
+
     switch (msg)
     {
-		
+
+        case MSG_SYSKEYDOWN:
+            switch (long1)
+            {  
+                case VK_F1: debug_print("sysmon: [F1]"); break;
+                case VK_F2: debug_print("sysmon: [F2]"); break;
+            };
+            goto done;
+            break;
+
+        case MSG_SYSKEYUP:
+            goto done;
+            break;
+
+
 		case MSG_CREATE:
 		    break;
-		    
-		        
+
+
 		case MSG_TIMER:
 		    update_cpu_usage ();
 		    break;
 
-		case MSG_SYSKEYDOWN:
-		    switch (long1)
-			{  
-				case VK_F1:
-					break;
-					
-				case VK_F2:
-					break;
-					
-				//case VK_F3:
-					//break;
-
-				//...
-	
-                //full screen
-                //colocar em full screen somente a área de cliente. 
-		        case VK_F11:    
-					break;
-
-				//...
-
-			};
-			break;
 
         case MSG_SETFOCUS:
             gde_redraw_window (main_window, 1);
@@ -287,6 +281,7 @@ sysmonProcedure ( struct window_d *window,
             
         case MSG_KILLFOCUS:
             break;
+
 
 		// MSG_MOUSEKEYDOWN
         case 30:
@@ -354,6 +349,7 @@ sysmonProcedure ( struct window_d *window,
 
 					break;
 			};
+			goto done;
 			break;
 
 
@@ -455,15 +451,17 @@ sysmonProcedure ( struct window_d *window,
 
 				    break;
 			};
+			goto done;
 			break;
 
 
         default:
+            debug_print ("sysmon: default message");
             break;
     };
 
 
-    //return 0;
+done:
     return (int) gde_system_procedure (window, msg, long1, long2);
 }
 
@@ -775,8 +773,10 @@ int main ( int argc, char *argv[] ){
 
 
 
+    gde_set_focus(hWindow);
+
 	//
-	//  Loop
+	// == Loop ===================
 	//
 
 

@@ -1507,18 +1507,18 @@ void initialize_buffer (void){
  *     LOCAL
  */
 
-void *noratermProcedure ( struct window_d *window, 
-                          int msg, 
-                          unsigned long long1, 
-                          unsigned long long2 )
+void *noratermProcedure ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 )
 {
-    unsigned long input_ret;
-    unsigned long compare_return;
-    int q;
 
-    int c;
-    
-    
+    unsigned long input_ret=0;
+    unsigned long compare_return=0;
+    int q=0;
+    int c=0;
+     
     //usado no read()
     int ____this_tty_id = -1;
     char __rbuf2[128]; //line ? read 
@@ -1536,35 +1536,138 @@ void *noratermProcedure ( struct window_d *window,
 
     switch (msg)
     {
-		// // alerta que tem que ler na ttyList[] do pid indicado em long1
-		case 444:
-                    printf("444: =)\n");
-                    fflush(stdout);
+
+        case MSG_SYSKEYDOWN:
+            //...
+            switch (long1)
+            {
+
+                case VK_F1:
+                    printf ("VK_F1:\n");
 
                     //pegando a tty desse processo pra poder ler.
-                    //long1 é o pid de quem vamos ler a tty.
-                    //____this_tty_id = (int) gramado_system_call ( 266, long1, 0, 0 );
                     ____this_tty_id = (int) gramado_system_call ( 266, getpid(), 0, 0 );
-                    printf ("NORATERM: The tty for the this process is %d \n", 
+                    printf ("NORATERM: The tty for THIS process is %d \n", 
+                          ____this_tty_id );
+
+                
+                    // lançando um processo filho.  
+                    gramado_system_call ( 900, 
+                        (unsigned long) "hello3.bin", 0, 0 );
+
+
+				    //textCurrentCol++;
+				    //terminalSetCursor ( textCurrentCol, textCurrentRow );
+				    //MessageBox ( 3, "Noraterm", "F1" ); 
+				    //shellSendMessage ( NULL, MSG_TERMINALCOMMAND, 2008, 0);
+		            //printf ("*SCROLL\n");
+		            //terminal_scroll_display ();
+		            //shellPrompt ();
+                    break;
+
+
+				//posiciona na proxima linha
+				case VK_F2:
+
+                    printf ("VK_F2:\n");
+  
+                    //pegando a tty desse processo pra poder ler.
+                    ____this_tty_id = (int) gramado_system_call ( 266, getpid(), 0, 0 );
+                    printf ("NORATERM: The tty for THIS process is %d \n", 
                           ____this_tty_id );
 
 
                     read_ttyList ( ____this_tty_id, __rbuf2, 32 );  
                     printf (__rbuf2);
-                    printf("444: =)\n");
+                    printf("VK_F2: =)\n");
                     fflush(stdout);
-		   break;
-		
-		
-		//Faz algumas inicializações de posicionamento e dimensões.
-		//case MSG_INITDIALOG:
-		//    break;
 
-		//Torna a janela visível.
-        //case MSG_SHOWWINDOW:
-		//    break; 
-		 
-		case MSG_KEYDOWN:
+				    //textCurrentRow++;
+				    //terminalSetCursor ( textCurrentCol, textCurrentRow );
+					//MessageBox ( 3, "Noraterm", "F2" );
+					//shellSendMessage ( NULL, MSG_TERMINALCOMMAND, 2020, 0);
+					break;
+
+                //posiciona no início da linha atual 
+				case VK_F3:
+				    textCurrentCol = 0;
+				    terminalSetCursor ( 0, textCurrentRow );
+				    //testChangeVisibleArea();
+				    //terminalRefreshVisibleArea();
+					//textSetCurrentRow ( (int) 0 );
+					//textSetCurrentCol ( (int) 0 );
+					//shellTestLoadFile ();
+					//inicializa a área visível.
+					//textTopRow = 0;
+	                //textBottomRow = 0 + 24;
+					break;
+
+				//posiciona no inpicio da área de cliente.	
+				case VK_F4:
+				    terminalSetCursor ( 0, 0 );
+				    break;
+
+                // #Caution
+                // f5,f6,f7,f8 belongs to the kernel.
+                // Do not touch'em!
+
+
+                case VK_F9:
+                    debug_print("F9");
+                    //MessageBox ( 3, "Noraterm", "F9" );
+                    shellSendMessage ( NULL, MSG_TERMINALCOMMAND, 2009, 0);
+                    break;
+                    
+                case VK_F10:
+                    //MessageBox ( 3, "Noraterm", "F10" );
+                    //shellSendMessage ( NULL, MSG_TERMINALCOMMAND, 2020, 0);
+                    //updateVisibleArea (0);
+                    //terminal_scroll_display ();
+                    terminal_scroll_down (); //funcionou.
+                    break;
+                
+                //full screen
+                //colocar em full screen somente a área de cliente. 
+		        case VK_F11:
+		            //MessageBox ( 3, "Noraterm", "F11" );
+					//shellSendMessage ( NULL, MSG_TERMINALCOMMAND, 2020, 0);
+					//updateVisibleArea (1);
+					//terminal_scroll_display ();
+					terminal_scroll_up ();
+					break;
+					
+				case VK_F12:
+				    //MessageBox ( 3, "Noraterm", "F12" );
+				    //shellSendMessage ( NULL, MSG_TERMINALCOMMAND, 2020, 0);
+				    terminal_write_char ('A');
+				    //terminalNewVisibleArea (0, 15); //fazer isso uma  vez.
+				    terminalNewVisibleArea (0, 20); //fazer isso uma  vez.
+				    break;
+				
+				//...
+
+            };
+            goto done;
+            break;
+
+		//Obs:
+		//essas teclas são tratadas pelo procedimento do sistema.
+		//mas alguma tecla personalizada pode ser  tratada pelo aplicativo,
+		//como o context menu [Application Key]
+		case MSG_SYSKEYUP:
+            switch (long1)
+			{		
+				//O MENU APPLICATION É O CONTEXT MENU.
+				case VK_APPS:
+				    gde_message_box ( 3, 
+				        "noraterm:", "VK_APPS Context Menu" );
+					break;
+            };
+            goto done;
+            break;
+
+ 
+        case MSG_KEYDOWN:
             switch (long1)
             {
 				//EOF
@@ -1659,155 +1762,50 @@ void *noratermProcedure ( struct window_d *window,
 					goto done;
                     break; 
             };
-        break;
-		
-		case MSG_KEYUP: 
-            // Nothing. 			
-		    break;
-		
-		//Não interceptaremos mensagens do sistema por enquanto.
-		//As mensagens do sistema são interceptadas primeiro pelo procedimento 
-		//do sistema.
-		
-        case MSG_SYSKEYDOWN:
-		    switch (long1)
-			{
+            goto done;
+            break;
 
 
-                case VK_F1:
-                
-                    printf ("VK_F1:\n");
-
-                    //pegando a tty desse processo pra poder ler.
-                    ____this_tty_id = (int) gramado_system_call ( 266, getpid(), 0, 0 );
-                    printf ("NORATERM: The tty for THIS process is %d \n", 
-                          ____this_tty_id );
-
-                
-                    // lançando um processo filho.  
-                    gramado_system_call ( 900, 
-                        (unsigned long) "hello3.bin", 0, 0 );
+       case MSG_KEYUP: 
+           return NULL;
+           break;
 
 
-				    //textCurrentCol++;
-				    //terminalSetCursor ( textCurrentCol, textCurrentRow );
-				    //MessageBox ( 3, "Noraterm", "F1" ); 
-				    //shellSendMessage ( NULL, MSG_TERMINALCOMMAND, 2008, 0);
-		            //printf ("*SCROLL\n");
-		            //terminal_scroll_display ();
-		            //shellPrompt ();
-                    break;
 
 
-				//posiciona na proxima linha
-				case VK_F2:
+        // alerta que tem que ler na ttyList[] do pid indicado em long1
+        case 444:
+            printf("444: =)\n");
+            fflush(stdout);
 
-                    printf ("VK_F2:\n");
-  
-                    //pegando a tty desse processo pra poder ler.
-                    ____this_tty_id = (int) gramado_system_call ( 266, getpid(), 0, 0 );
-                    printf ("NORATERM: The tty for THIS process is %d \n", 
-                          ____this_tty_id );
+            //pegando a tty desse processo pra poder ler.
+            //long1 é o pid de quem vamos ler a tty.
+            //____this_tty_id = (int) gramado_system_call ( 266, long1, 0, 0 );
+            ____this_tty_id = (int) gramado_system_call ( 266, getpid(), 0, 0 );
+            printf ("NORATERM: The tty for the this process is %d \n", 
+                ____this_tty_id );
 
 
-                    read_ttyList ( ____this_tty_id, __rbuf2, 32 );  
-                    printf (__rbuf2);
-                    printf("VK_F2: =)\n");
-                    fflush(stdout);
+            read_ttyList ( ____this_tty_id, __rbuf2, 32 );  
+            printf (__rbuf2);
+            printf("444: =)\n");
+            fflush(stdout);
+            goto done;
+            break;
 
-				    //textCurrentRow++;
-				    //terminalSetCursor ( textCurrentCol, textCurrentRow );
-					//MessageBox ( 3, "Noraterm", "F2" );
-					//shellSendMessage ( NULL, MSG_TERMINALCOMMAND, 2020, 0);
-					break;
 
-                //posiciona no início da linha atual 
-				case VK_F3:
-				    textCurrentCol = 0;
-				    terminalSetCursor ( 0, textCurrentRow );
-				    //testChangeVisibleArea();
-				    //terminalRefreshVisibleArea();
-					//textSetCurrentRow ( (int) 0 );
-					//textSetCurrentCol ( (int) 0 );
-					//shellTestLoadFile ();
-					//inicializa a área visível.
-					//textTopRow = 0;
-	                //textBottomRow = 0 + 24;
-					break;
-					
-				//posiciona no inpicio da área de cliente.	
-				case VK_F4:
-				    terminalSetCursor ( 0, 0 );
-				    break;
-					
-					
-					
-				// Não usar esses.
-				// No momento são gerenciados pelo procedimento de janelas
-				// do sistema.	
-				case VK_F5:
-				case VK_F6:
-				case VK_F7:
-				case VK_F8:
-				    // Nothing.
-				    break;
-					
-				//...
-				//??talvez esse tamb'em seja gerenciado pode procedimento do
-				//sistema,
-                case VK_F9:
-                    //MessageBox ( 3, "Noraterm", "F9" );
-                    shellSendMessage ( NULL, MSG_TERMINALCOMMAND, 2009, 0);
-                    break;
-                    
-                case VK_F10:
-                    //MessageBox ( 3, "Noraterm", "F10" );
-                    //shellSendMessage ( NULL, MSG_TERMINALCOMMAND, 2020, 0);
-                    //updateVisibleArea (0);
-                    //terminal_scroll_display ();
-                    terminal_scroll_down (); //funcionou.
-                    break;
-                
-                //full screen
-                //colocar em full screen somente a área de cliente. 
-		        case VK_F11:
-		            //MessageBox ( 3, "Noraterm", "F11" );
-					//shellSendMessage ( NULL, MSG_TERMINALCOMMAND, 2020, 0);
-					//updateVisibleArea (1);
-					//terminal_scroll_display ();
-					terminal_scroll_up ();
-					break;
-					
-				case VK_F12:
-				    //MessageBox ( 3, "Noraterm", "F12" );
-				    //shellSendMessage ( NULL, MSG_TERMINALCOMMAND, 2020, 0);
-				    terminal_write_char ('A');
-				    //terminalNewVisibleArea (0, 15); //fazer isso uma  vez.
-				    terminalNewVisibleArea (0, 20); //fazer isso uma  vez.
-				    break;
-				
-				//...
-				
-			};
-			break;
-		
-		//Obs:
-		//essas teclas são tratadas pelo procedimento do sistema.
-		//mas alguma tecla personalizada pode ser  tratada pelo aplicativo,
-		//como o context menu [Application Key]
-		case MSG_SYSKEYUP:
-            switch (long1)
-			{		
-				//O MENU APPLICATION É O CONTEXT MENU.
-				case VK_APPS:
-				    gde_message_box ( 3, 
-				        "noraterm:", "VK_APPS Context Menu" );
-					break;
-			}		
-		    break;
-		
-		
-		
+		//Faz algumas inicializações de posicionamento e dimensões.
+		//case MSG_INITDIALOG:
+		//    break;
+
+
+		//Torna a janela visível.
+        //case MSG_SHOWWINDOW:
+		//    break; 
+
+
+
+
 		//100 - Terminal communication
 		case MSG_TERMINALCOMMAND:
 			switch (long1)
@@ -2008,7 +2006,8 @@ void *noratermProcedure ( struct window_d *window,
 				    //break;
 				      
 					//...
-			}
+			};
+			goto done;
 			break;
 
         // Commands.		
@@ -2052,7 +2051,8 @@ void *noratermProcedure ( struct window_d *window,
 				
 				//default:
 				//break;
-			}
+			};
+			goto done;
 		    break; 
 
 
@@ -2060,14 +2060,14 @@ void *noratermProcedure ( struct window_d *window,
         case MSG_CLOSE:
             printf ("noraterm: MSG_CLOSE\n");
             gde_close_window (main_window);
-            gde_exit (0);
+            gde_exit(0);
             break;
 
 
 		//Essa mensagem pode ser acionada clidando um botão.
         case MSG_DESTROY:
             printf ("noraterm: MSG_DESTROY\n");
-            gde_exit (0);
+            gde_exit(0);
             break;
 
 
@@ -2198,18 +2198,13 @@ void *noratermProcedure ( struct window_d *window,
 					//windowcontrolSendMessage
 					
 					break;
-					
-				case 2:
-				    //#debug
-				    printf("button 2\n");
-				    break;
-					
-				case 3:
-				    //#debug
-				    printf("button 3\n");
-				    break;
-			};			
+
+				case 2: printf("button 2\n"); break;
+				case 3: printf("button 3\n"); break;
+            };
+            goto done;
             break;
+
 
 		// MSG_MOUSEKEYUP	
 		case 31:
@@ -2365,22 +2360,16 @@ void *noratermProcedure ( struct window_d *window,
 					}  
 					
 					break;
-					
-				case 2:
-				    printf("up button 2\n");
-				    break;
-					
-				case 3:
-				    printf("up button 3\n");
-				    break;
-			};		
-            break;	
+
+				case 2: debug_print("up button 2\n"); break;
+				case 3: debug_print("up button 3\n"); break;
+            };
+            goto done;
+            break;
 
 		// MSG_MOUSEMOVE	
-		case 32:
-            //APISetFocus(window);
-			//printf("m");
-            break;	
+        //case 32:
+            //break;
 
 		// MSG_MOUSEOVER	
 		case 33: 
@@ -2677,31 +2666,22 @@ void *noratermProcedure ( struct window_d *window,
 			
 		
 		//...
-			
-			
-		//Mensagem desconhecida.
-		default:
-		    //printf("shell procedure: mensagem desconhecida\n");
-		    goto done;
-		    break;	  
+
+       default:
+            debug_print("noraterm: default message");
+            goto done;
+            break;
     };
 
     // Nothing for now !
-	
+
 done:
 
-    if ( (void *) window == NULL )
-    {
-		return NULL;
-    }
+    if ( (void *) window == NULL ){ return NULL; }
 
-	// #bugbug
-	// Chamar o procedimento aqui deu problema.
-	// Mas essa chamada funciona em outro aplicativo.
-	//obs: essa rotina existe nas libs do projeto gramado.
-
-    return (void *) gde_system_procedure ( window, msg, long1, long2 );
+    return (void *) gde_system_procedure (window,msg,long1,long2);
 }
+
 
 
 /*

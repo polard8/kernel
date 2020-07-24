@@ -1155,37 +1155,9 @@ shellProcedure (
 
     switch (msg)
     {
-         // Receberemos uma mensagem vida do servidor de rede.
-         case MSG_AF_INET:
-             printf ("gdeshell: MSG_AF_INET\n");
-             break;
 
-
-         // Receberemos uma mensagem vida do servidor de rede.
-         case MSG_NET_DATA_IN:
-             printf ("gdeshell: MSG_NET_DATA_IN\n");
-             while ( (c = fgetc( (FILE *) long1)) >= 0 )
-                 printf ("%c", c); 
-             break;
-
-
-         // esse processo � notificado sobre o recebimento de um pacote ipv4    
-         //receberemos uma mensagem vida do servidor de rede.
-         case MSG_NETWORK_NOTIFY_PROCESS:
-             printf ("gdeshell: MSG_NETWORK_NOTIFY_PROCESS\n");
-              while ( (c = fgetc( (FILE *) long1)) >= 0 )
-                  printf ("%c", c); 
-             break;             
-
-		//Faz algumas inicializa��es de posicionamento e dimens�es.
-        //case MSG_INITDIALOG:
-        //    break;
-
-		//Torna a janela vis�vel.
-        //case MSG_SHOWWINDOW:
-		//    break; 
-		 
-		case MSG_KEYDOWN:
+        case MSG_KEYDOWN:
+            //...
             switch (long1)
             {
 				//EOF
@@ -1221,10 +1193,7 @@ shellProcedure (
 
 
                 // #test
-                case VK_TAB:
-                    printf ("\t");
-                    goto done;
-                    break;
+                case VK_TAB: printf ("\t"); goto done; break;
 
                 // #todo
                 // falta configurar prompt[] usado por input();
@@ -1257,19 +1226,23 @@ shellProcedure (
                     goto done;
                     break; 
             };
-        break;
-
-
-
-        // Não interceptaremos mensagens do sistema por enquanto.
-        // As mensagens do sistema são interceptadas primeiro pelo 
-        // procedimento do sistema.
-        case MSG_SYSKEYDOWN:
-            // Nothing for now!
+            goto done;
             break;
 
 
-        case MSG_KEYUP: 
+        case MSG_KEYUP:   
+            break;
+        
+        
+        case MSG_SYSKEYDOWN: 
+            switch (long1)
+            {
+                case VK_F1: debug_print(" [F1] "); break;
+                case VK_F2: debug_print(" [F2] "); break;
+                case VK_F3: debug_print(" [F3] "); break;
+                case VK_F4: debug_print(" [F4] "); break;
+            };
+            goto done;
             break;
 
 		//Obs:
@@ -1284,6 +1257,7 @@ shellProcedure (
                     gde_message_box ( 3, "gdeshell:", "VK_APPS" );
                     break;
             };
+            goto done;
             break;
 
 
@@ -1296,126 +1270,25 @@ shellProcedure (
                     break;
 
                 // Nothing for now!
-                default:
-                    break;
+                default: break;
             };
+            goto done;
             break;
 
 
-        case MSG_CLOSE:
-            printf ("MSG_CLOSE\n");
-            break;
-
-
-       case MSG_DESTROY:
-            printf ("MSG_DESTROY\n");
-            break;
+        case MSG_CLOSE:   printf ("MSG_CLOSE\n");   break;
+        case MSG_DESTROY: printf ("MSG_DESTROY\n"); break;
 
 
         // MSG_MOUSEKEYDOWN
         case 30:
-            switch (long1)
-            {
-                case 1:
-				
-				    //#obs: No keydown a gente s� abaixa o bot�o.
-					
-				    //#debug
-					//printf("button 1\n");     
-					
-                    //cima
-					if ( window == app1_button )
-                    {
-						updateVisibleArea( 0 );
-						shellRefreshVisibleArea(); 
-                        //shellScroll();
-						break;
-					}
-
-					//baixo
-					if ( window == app2_button )
-                    {
-                        updateVisibleArea( 1 );
-						shellRefreshVisibleArea();
-					    break;
-					}
-					
-					if ( window == editboxWindow )
-					{
-					    gde_set_focus (editboxWindow);
-					    //APIredraw_window (editboxWindow,1);
-						break;
-					}					
-					
-					gde_set_active_window (window);
-					//APIredraw_window ( window, 1 );
-					
-					//bot�o de close
-					//if ( window == close_button )
-				    //{
-					    //APIresize_window ( window, 200, 200 );
-					    //APIredraw_window ( window, 1 );
-					    //refresh_screen (); //n�o precisa isso	
-
-					//	_running = 0;
-                    //    ShellFlag = SHELLFLAG_EXIT;
-					//}    
-					break;
-
-                case 2:
-                    printf ("button 2\n");
-                    break;
-
-                case 3:
-                    printf ("button 3\n");
-                    break;
-            };
+            debug_print ("gdeshell: MSG_MOUSEKEYDOWN\n"); goto done;
             break;
 
         // MSG_MOUSEKEYUP
         case 31:
-            switch (long1)
-            {
-                case 1:
-				    //printf("up button 1\n");
-					if (window == menu_button)
-					{
-	                    shellTestButtons ();	
-		                gde_show_backbuffer ();
-					}
-					
-					
-					//bot�o de reboot;
-					if ( window == reboot_button )
-                    {
-					    printf("Rebooting...\n");
-		                system("reboot"); 	
-					}
-					
-					//bot�o de close
-					if ( window == close_button )
-				    {
-					    //APIresize_window ( window, 200, 200 );
-					    //APIredraw_window ( window, 1 );
-					    //refresh_screen (); //n�o precisa isso	
-
-						_running = 0;
-                        
-						ShellFlag = SHELLFLAG_EXIT;
-					}  
-					
-					break;
-
-                case 2:
-                    printf ("up button 2\n");
-                    break;
-
-                case 3:
-                    printf ("up button 3\n");
-                    break;
-            };
+            debug_print ("gdeshell: MSG_MOUSEKEYUP\n"); goto done;
             break;
-
 
 
         //Quando a aplicativo em user mode chama o kernel para 
@@ -1423,10 +1296,7 @@ shellProcedure (
         //ele faz uma chamada ao procedimento de janela do aplicativo com a mensagem 
         //MSG_CREATE, se o aplicativo retornar -1, ent�o a rotina em kernel mode que 
         //esta criando a janela, cancela a janela que est� criando e retorn NULL.		
-        case MSG_CREATE:
-            printf ("MSG_CREATE\n");
-            break;
-
+        case MSG_CREATE: printf ("MSG_CREATE\n"); break;
 
 		//#IMPORTANTE
 		// a API CHAMA ISSO DE TEMPOS EM TEMPOS DE ACORDO
@@ -1437,19 +1307,15 @@ shellProcedure (
             break; 
 
 
-        case MSG_SETFOCUS:
-            break;
-
-        case MSG_KILLFOCUS:
-            break;
+        //case MSG_SETFOCUS:   break;
+        //case MSG_KILLFOCUS:  break;
 
 
         // Isso pinta os elementos da �rea de cliente.
         // Essa mensagem � enviada para o aplicativo quando 
         // a fun��o 'update window' � chamada.
         // Como estamos em fullscreen, n�o h� o que fazer aqui.
-        case MSG_PAINT:
-            break;
+        //case MSG_PAINT: break;
 
         
         // o driver de rede notifica o aplicativo de que
@@ -1463,17 +1329,48 @@ shellProcedure (
            break;
 
 
-        // NOthing for now!
+         // Receberemos uma mensagem vida do servidor de rede.
+         case MSG_AF_INET:
+             printf ("gdeshell: MSG_AF_INET\n");
+             break;
+
+
+         // Receberemos uma mensagem vida do servidor de rede.
+         case MSG_NET_DATA_IN:
+             printf ("gdeshell: MSG_NET_DATA_IN\n");
+             while ( (c = fgetc( (FILE *) long1)) >= 0 )
+                 printf ("%c", c); 
+             break;
+
+
+         // esse processo � notificado sobre o recebimento de um pacote ipv4    
+         //receberemos uma mensagem vida do servidor de rede.
+         case MSG_NETWORK_NOTIFY_PROCESS:
+             printf ("gdeshell: MSG_NETWORK_NOTIFY_PROCESS\n");
+              while ( (c = fgetc( (FILE *) long1)) >= 0 )
+                  printf ("%c", c); 
+             break;             
+
+		//Faz algumas inicializa��es de posicionamento e dimens�es.
+        //case MSG_INITDIALOG:
+        //    break;
+
+        //Torna a janela vis�vel.
+        //case MSG_SHOWWINDOW:
+        //    break; 
+
+        // Nothing for now!
         default:
+            debug_print ("gdeshell: default message\n");
             break;
     };
 
 
     // Nothing for now !
 
-done:
-
     // Calling system procedure.
+
+done:
     return (unsigned long) gde_def_dialog (window,msg,long1,long2);
 }
 

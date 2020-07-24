@@ -64,28 +64,28 @@ launcherProcedure (
 
     switch (msg)
     {
+
 		// A janela principal é uma overlapped,
 		// então colocou uma mensagem na fila,
 		// e o app vai pegar quando entrar no loop.
-		case MSG_CREATE:
-		    printf ("MSG_CREATE:\n");
-		    break;
+        case MSG_CREATE: printf ("MSG_CREATE:\n"); break;
 
-		case MSG_SYSKEYDOWN:
-		    switch (long1)
-			{  
-				case VK_F1:
+        
+        case MSG_SYSKEYDOWN:
+            //...
+            switch (long1)
+            {  
+                case VK_F1:
                     gramado_system_call (900, "gdeshell.bin", 0, 0);
                     exit(0);   
-					break;
-					
-				case VK_F2:
-					break;
-					
-				case VK_F3:
-					break;
-			};
-			break;
+                    break;
+
+                case VK_F2: debug_print("F2"); break;
+                case VK_F3: debug_print("F3"); break;
+     
+            };
+            goto done;
+            break;
 
 
 		// MSG_MOUSEKEYDOWN
@@ -150,6 +150,7 @@ launcherProcedure (
 
 					break;
 			};
+			goto done;
 			break;
 
 
@@ -228,6 +229,7 @@ launcherProcedure (
                     }
                     break;
             };
+            goto done;
             break;
 
 
@@ -257,12 +259,14 @@ launcherProcedure (
             gde_exit (0);
             break;
 
+
         default:
-            //printf (".");
+            debug_print("launcher: default message");
             break;
     };
 
 
+done:
     return (int) gde_system_procedure (window,msg,long1,long2);
 }
 
@@ -295,7 +299,7 @@ int main ( int argc, char *argv[] ){
     unsigned long height;
     
 
-    unsigned long deviceWidth = gde_get_system_metrics (1); 
+    unsigned long deviceWidth  = gde_get_system_metrics (1); 
     unsigned long deviceHeight = gde_get_system_metrics (2);
 
 
@@ -642,12 +646,13 @@ int main ( int argc, char *argv[] ){
 
 
 
+    gde_set_focus(hWindow);
 
-
+    gde_show_backbuffer();
 
 
 	//
-	//  ## Loop ##
+	// == Loop ============================
 	//
 
 
@@ -680,18 +685,13 @@ Mainloop:
     };
 
 
-
 fail:
     printf ("fail.\n");
 
-
 done:
-    
-	//running = 0;
-
+    //running = 0;
     return 0;
 }
-
 
 
 

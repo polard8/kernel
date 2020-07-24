@@ -510,11 +510,14 @@ void quit ( int status ){
 //#test
 int navbar_button_status;
 
+
+
 unsigned long 
-shellProcedure ( struct window_d *window, 
-                 int msg, 
-                 unsigned long long1, 
-                 unsigned long long2 )
+shellProcedure ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 )
 {
     unsigned long input_ret;
     unsigned long compare_return;
@@ -624,49 +627,28 @@ shellProcedure ( struct window_d *window,
 					goto done;
                     break;               
             };
-        break;
+            goto done;
+            break;
 		
 		case MSG_KEYUP: 
 		    // printf("%c", (char) 'u');
             // printf("%c", (char) long1); 
+		    goto done;
 		    break;
 		
 		// Não interceptaremos mensagens do sistema por enquanto.
 		// As mensagens do sistema são interceptadas primeiro pelo 
 		// procedimento do sistema.
 
-		case MSG_SYSKEYDOWN:
-		    switch (long1)
-			{
-
-				case VK_F1:
-
-					//shellTestLoadFile ();
-					
-					//inicializa a área visível.
-					//textTopRow = 0;
-	                //textBottomRow = 0 + 24;
-					break;
-					
-				case VK_F2:
-				    //testChangeVisibleArea();
-					break;
-					
-				case VK_F3:
-				    //shellRefreshVisibleArea();
-					break;
-					
-				//...
-				
-                //full screen
-                //colocar em full screen somente a área de cliente. 
-		        case VK_F11:
-				    
-					break;
-					
-				//...
-			};
-			break;
+        case MSG_SYSKEYDOWN:
+            //...
+            switch (long1)
+            {
+                case VK_F1: debug_print ("spr: [F1]"); break;
+                case VK_F2: debug_print ("spr: [F2]"); break;
+            };
+            goto done;
+            break;
 
 
 		//Obs:
@@ -683,6 +665,7 @@ shellProcedure ( struct window_d *window,
 				        "VK_APPS Context Menu" );
 					break;
 			};
+			goto done;
 		    break;
 
 
@@ -721,7 +704,8 @@ shellProcedure ( struct window_d *window,
 				
 				//default:
 				//break;
-			}
+			};
+			goto done;
 		    break; 
 
 
@@ -812,7 +796,8 @@ shellProcedure ( struct window_d *window,
 				    //#debug
 				    printf("button 3\n");
 				    break;
-			};			
+			};
+			goto done;
             break;
 
 
@@ -887,8 +872,9 @@ shellProcedure ( struct window_d *window,
 				case 3:
 				    printf("up button 3\n");
 				    break;
-			};		
-            break;	
+			};
+			goto done;
+            break;
 
 		// MSG_MOUSEMOVE	
 		case 32:
@@ -904,7 +890,8 @@ shellProcedure ( struct window_d *window,
 						break;
 					}
 			      break;
-           }
+           };
+           goto done;
             //gde_set_focus(window);
 			//printf("m");
             break;	
@@ -1168,21 +1155,17 @@ shellProcedure ( struct window_d *window,
 
         //    };		
 		//    break;
-			
-		
-		
-		//Mensagem desconhecida.
-		default:
-		    //printf("shell procedure: mensagem desconhecida\n");
-		    goto done;
-		    break;	  
+
+
+        default:
+            debug_print("spr: default message");
+            break; 
     };
 
     // Nothing for now !
-
+    
 done:
-
-	return (int) gde_system_procedure (window,msg,long1,long2);
+    return (int) gde_system_procedure (window,msg,long1,long2);
 }
 
 
@@ -7187,42 +7170,18 @@ noArgs:
 
 	//@todo: 0,0 não está na área de cliente.
 	
- 
-	
-	//
-	// **** Mensagens  ****
-	//
-	
-	//printf("Tentando pegar mensagem enviada para o procedimento de janela.");
-	//refresh_screen();
-	
-	//isso é um teste pegar um valor por vez não é a melhor opção.
-	
-	//struct window_d *msg_Window;
-	int msg_Message;
-	void *msg_Long1;
-	void *msg_Long2;
-	
-	//struct shell_message_d *msg;
-	
 
-	// Get Message: 
-	// Systemcall get message
-	// Enviamos um ponteiro de estrutura de janela para que o Kernel possa 
-	// pegar a mensagem que esta dentro da estrutura. Essa estrtura fica 
-	// protegida no Kernel.
-		
-	// #bugbug: ??
-	// Na verdade essa rotina está pegando a mensagem na janela 
-	// com o foco de entrada. Esse argumento foi passado mas não foi usado.
-		
-	unsigned long message_buffer[5];	
-		
+    gde_set_focus(hWindow);
+
+    //
+    // == Loop =========================
+    //
+
+
+    unsigned long message_buffer[5];	
+
+
 Mainloop:
-
-
-	/* Nesse teste vamos enviar um ponteiro de array, pegarmos os quatro 
-	   elementos da mensagem e depois zerar o buffer */
 
     while (running)
     {
@@ -7233,15 +7192,10 @@ Mainloop:
 			(unsigned long) &message_buffer[0],
 			(unsigned long) &message_buffer[0] );
 		gde_exit_critical_section (); 
-			
-		if ( message_buffer[1] != 0 )
+
+        if ( message_buffer[1] != 0 )
         {
-            //printf(".");
-		}	
-		
-		if ( message_buffer[1] != 0 )
-		{
-	        shellProcedure ( (struct window_d *) message_buffer[0], 
+            shellProcedure ( (struct window_d *) message_buffer[0], 
 		        (int) message_buffer[1], 
 		        (unsigned long) message_buffer[2], 
 		        (unsigned long) message_buffer[3] );
@@ -7253,6 +7207,9 @@ Mainloop:
         };
     };
 
+    //
+    // Saiu do loop.
+    //
 
 	//
 	// Entramos aqui se running for igual a 0.
