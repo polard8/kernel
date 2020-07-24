@@ -249,17 +249,19 @@ void *teditorProcedure (
     unsigned long long2 )
 {
 
-    unsigned long input_ret;
-    unsigned long compare_return;
-    int q;
-
+    unsigned long input_ret=0;
+    unsigned long compare_return=0;
+    int q=0;
     int key_state = -1;
 
 
     switch (msg)
     {
 
-        case MSG_CREATE: saveCreateButton (); break;
+        case MSG_CREATE: 
+            saveCreateButton(); 
+            goto done;
+            break;
 
 
 		//Faz algumas inicializações de posicionamento e dimensões.
@@ -274,46 +276,31 @@ void *teditorProcedure (
             //...
             switch (long1)
             {
-				// Null key.
-				case 0:
-				break;
-				
-				case VK_RETURN:
-				    
-					//#test
-					printf("\r");
-					printf("\n"); //FLUSH
-					
+                // Null key.
+                case 0:
+                    // Nothing!
+                    break;
+
+                // [Enter]
+                case VK_RETURN:
+                    printf("\r");
+                    printf("\n");  // Flush.
                     break; 
 
-				//#test
                 case VK_TAB:
-					printf ("\t");
-				    break;
+                    printf ("\t");
+                    break;
 
-				//#todo	
-				case VK_BACK:
-				    
-					//#test
-					//o cursor do ldisc no kernel precisa ser atualizado tambem.
-					//textCurrentCol--;
-					//gde_set_cursor (textCurrentCol,textCurrentRow);
-					//teditorInsertNextChar ( (char) ' ' ); 	
-					
-					//MessageBox ( 3, "String1","String2" );
-					
-                    break;					
-				
+                case VK_BACK:
+                    //printf ("");
+                    break;
+
 				// #importante:
 				// Teclas de digitação.
-				
-				default:
-				    // Improvisando um salvamento de arquivo.
-				    if ( long1 == 's' )
-					{
-					    //#todo
-						//pegar o status de control.
-						//#todo: isso precisa ir para a API.(138)
+                default:
+                    // [Control + s]
+                    if ( long1 == 's' )
+                    {
 						key_state = (int) gramado_system_call ( 138, 
 						                      (unsigned long) VK_CONTROL, 
 						                      (unsigned long) VK_CONTROL, 
@@ -328,15 +315,16 @@ void *teditorProcedure (
 					}
 					//Colocando no buffer e exibindo na tela.
 				    teditorInsertNextChar ( (char) long1 );  
+				    goto done;
 				    break;
 			};
 			//...
-			return 0; //break;
+			return NULL; //break;
 
 
 		case MSG_SYSKEYDOWN:
 		    //...
-		    switch (long1)
+            switch (long1)
 			{
 				//#bugbug
 				//vamos testar usando as teclas de função.
@@ -347,7 +335,8 @@ void *teditorProcedure (
 				//Criando o botão para salvar o arquivo.
                 case VK_F1: 
                     debug_print(" [F1] ");
-                    saveCreateButton(); 
+                    //saveCreateButton();
+                    editor_save_file ();
                     break;
 
                 case VK_F2: debug_print(" [F2] "); break;
@@ -417,20 +406,16 @@ void *teditorProcedure (
 
     // done
 
+done:
+
     // Esse tratamento pode ir para essa chamada na api.
-    if ( (void *) window == NULL )
-    {
-		return NULL;
+    if ( (void *) window == NULL ){
+        return NULL;
     }
-
-
-	// #test
-	// Cuidado com isso. 
-	// Podemos chamar duas rotinas quando pressionarmos alguma tecla. 
-	// Por exemplo F1 chamaria uma rotina aqui e outra no kernel.
 
     return (void *) gde_system_procedure ( window, msg, long1, long2 );
 }
+
 
 
 /*
@@ -657,26 +642,25 @@ void teditorRefreshCurrentChar ()
  *
  */
 
-int saveCreateButton (){
+int saveCreateButton(){
 
-	// Tamanho da tela.
-    unsigned long ScreenWidth = gde_get_system_metrics (1);
-    unsigned long ScreenHeight = gde_get_system_metrics (2); 
+    // Device info
+    unsigned long ScreenWidth  = gde_get_system_metrics(1);
+    unsigned long ScreenHeight = gde_get_system_metrics(2); 
 
-
-    //printf ("Creating save button ... %d %d\n", ScreenWidth, ScreenHeight);
+    // #debug
+    // printf ("Creating save button ... %d %d\n", ScreenWidth, ScreenHeight);
 
 
     //++
     gde_enter_critical_section (); 
     save_button = (void *) gde_create_window ( WT_BUTTON, 1, 1, 
-                                " Save ",     
-                                4, 4, 80, 24,    
+                                " Save [F1] ", 
+                                4, 4, 100, 24,
                                 hWindow, 0, 
                                 xCOLOR_GRAY3, xCOLOR_GRAY3 );
 
-    if ( (void *) save_button == NULL )
-    {
+    if ( (void *) save_button == NULL ){
         gde_exit_critical_section ();
         printf ("Couldn't create save button\n");
         return 1;
@@ -686,24 +670,24 @@ int saveCreateButton (){
     gde_exit_critical_section ();
     //--
 
-
-	//refresh_screen();
-	return 0;
+    return 0;
 }
 
 //
 // ===============================================================
 //
 int
-__SendMessageToProcess ( int pid, 
-                         struct window_d *window, 
-                         int message,
-                         unsigned long long1,
-                         unsigned long long2 )
+__SendMessageToProcess ( 
+    int pid, 
+    struct window_d *window, 
+    int message,
+    unsigned long long1,
+    unsigned long long2 )
 {
-	unsigned long message_buffer[5];
 
-	
+    unsigned long message_buffer[5];
+
+
     if (pid<0)
         return -1;
 
@@ -732,7 +716,10 @@ __SendMessageToProcess ( int pid,
  
 int main ( int argc, char *argv[] ){
 
-
+    //The pointer for the main window is in the top of the document.
+    struct window_d *editbox_bg_Window;
+    struct window_d *editboxWindow;
+    
     FILE *fp;
 
     int ch;
@@ -822,14 +809,14 @@ skip_test:
 	
 	
 	
-	
-	
+
+
 #ifdef TEDITOR_VERBOSE
     gde_set_cursor (0,0);
-	printf("\n");
-	printf("Initializing Text Editor:\n");
-	printf("mainTextEditor: # argv0={%s} # \n", argv[0] );
-	printf("mainTextEditor: # argv1={%s} # \n", argv[1] );
+    printf("\n");
+    printf("Initializing Text Editor:\n");
+    printf("mainTextEditor: # argv0={%s} # \n", argv[0] );
+    printf("mainTextEditor: # argv1={%s} # \n", argv[1] );
 #endif
 
     //prompt_put_string("Testing ...");
@@ -860,7 +847,7 @@ skip_test:
 	
 	//#importante
 	//inicializa as variáveis antes de pintar.
-    teditorTeditor ();
+    teditorTeditor();
 	
 
 	//
@@ -877,28 +864,25 @@ skip_test:
                           wpWindowLeft, wpWindowTop, 
                           wsWindowWidth, wsWindowHeight,    
                           0, 0, 
-                          0x303030, 0x303030 );
+                          COLOR_BLUE, COLOR_BLUE); //0x303030, 0x303030 );
 
-    if ( (void *) hWindow == NULL )
-    {
+    if ( (void *) hWindow == NULL ){
         gde_end_paint ();
         printf ("gramcode: hWindow fail\n");
         goto fail;
 
     }else{
-
         gde_register_window (hWindow);
         gde_set_active_window (hWindow);       
         gde_show_window (hWindow);
     };
     gde_end_paint ();
     //--
-    
+
+
     //
     // Background
     //
-    
-    struct window_d *editbox_bg_Window;
 
 	//++
     gde_enter_critical_section ();  
@@ -909,8 +893,7 @@ skip_test:
                                     hWindow, 0, 
                                     0x303030, 0x303030 );
                                     
-    if ( (void *) editbox_bg_Window == NULL)
-    {
+    if ( (void *) editbox_bg_Window == NULL){
         gde_exit_critical_section (); 
         printf ("editbox_bg_Window fail");
         while(1){}
@@ -924,8 +907,6 @@ skip_test:
     //
     // Editbox.
     //
-    
-    struct window_d *editboxWindow;
 
 	//++
 	gde_enter_critical_section ();  
@@ -933,17 +914,16 @@ skip_test:
                                 1, 1, 
                                 wsWindowWidth -50, wsWindowHeight -80, 
                                 editbox_bg_Window, 0, 0x303030, 0x303030 );
-	if ( (void *) editboxWindow == NULL)
-	{	
-		gde_exit_critical_section ();  
-		printf ("editboxWindow fail");
-		while(1){}
-	}
-	gde_register_window (editboxWindow);
-	gde_set_focus (editboxWindow);
-	gde_show_window (editboxWindow);
-	gde_exit_critical_section ();  
-	//--
+    if ( (void *) editboxWindow == NULL){
+        gde_exit_critical_section ();  
+        printf ("editboxWindow fail");
+        while(1){}
+    }
+    gde_register_window (editboxWindow);
+    gde_set_focus (editboxWindow);
+    gde_show_window (editboxWindow);
+    gde_exit_critical_section ();  
+    //--
 
 
 
