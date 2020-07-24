@@ -12,29 +12,26 @@
 #define GRID_VERTICAL      2000
 
 
-
 //static int running = 1;
 int running = 1;
 
 
+// Janelas
+struct window_d *main_window;
+struct window_d *client_window;
+struct window_d *client_bar_Window;
+struct window_d *data_window;         //White.
 
-	// Janelas
-    struct window_d *main_window;
-    struct window_d *client_window;
-    struct window_d *client_bar_Window;
-    struct window_d *data_window;     //white.
 
-    // launcher buttons
-    struct window_d *launcher_button_1;
-    struct window_d *launcher_button_2;
+// bar buttons
+struct window_d *bar_button_1; 
+struct window_d *bar_button_2;
+struct window_d *bar_button_3;
 
-    // bar buttons
-    struct window_d *bar_button_1; 
-    struct window_d *bar_button_2;
-    struct window_d *bar_button_3;
+struct window_d *cpu_window;    //cpu usage test;
 
-    struct window_d *cpu_window;  //cpu usage test;
-
+int __count;
+unsigned long CPU_USAGE[32];
 
 
 //static char *dest_argv[] = { "-sujo0","-sujo1","-sujo2",NULL };
@@ -42,6 +39,11 @@ int running = 1;
 //static unsigned char dest_msg[512];
 
  
+/*
+ ************************** 
+ * sysmonProcedure:
+ * 
+ */
 
 int 
 sysmonProcedure ( 
@@ -49,47 +51,43 @@ sysmonProcedure (
     int msg, 
     unsigned long long1, 
     unsigned long long2 );
- 
 
 
-int __count;
-unsigned long CPU_USAGE[32];
 
 // Interna.
 // Usado para testar o timer.
 void update_cpu_usage ()
 {
-    unsigned long __idle_value;
-    unsigned long __value;
+    unsigned long __idle_value=0;
+    unsigned long __value=0;
     int i=0;
 
 
 
-
     __count++;
-	//printf ("%d ",__count);
-	
-	__idle_value = (unsigned long) gramado_system_call ( 777, 0, 0, 0);
-	
+    //printf ("%d ",__count);
+
+    __idle_value = (unsigned long) gramado_system_call ( 777, 0, 0, 0);
+
 	//__value = (100 - __idle_value);
 	//CPU_USAGE[__count] = __value;
-	CPU_USAGE[__count] = __idle_value;
-	
+    CPU_USAGE[__count] = __idle_value;
+
+
     if (__count >= 32)
     {
-	    __count = 0;
-		
+        __count = 0;
+
 		//limpa
 		gde_redraw_window ( cpu_window, 1 );
-		for (i=0; i<32; i++)
-		{
+        for (i=0; i<32; i++)
+        {
 			//printf ("%d ", (unsigned long) CPU_USAGE[i]);
-		
 		    gde_draw_text ( cpu_window, i*8, CPU_USAGE[i], COLOR_BLACK, "+");
-		}
-		gde_show_window (cpu_window);
+        };
+        gde_show_window (cpu_window);
     }
-	
+
 	//printf ("fim\n");
     //printf ("cpu usage: %d percent \n", __value);
 }
@@ -99,14 +97,13 @@ void update_cpu_usage ()
 // #todo: ordenar por pid
 void showinfo_button1()
 {
-
-    //salvaremos o nome do processo aqui.
+    // Salvaremos o nome do processo aqui.
     char __processname_buffer[64];
     char __tmp_buffer[64];
 
     unsigned long __process_priority;
                             
-    int i;
+    int i=0;
   
     //#todo
     //Criar um for para mostrar vários processos.
@@ -148,7 +145,7 @@ void showinfo_button2()
 
     unsigned long __process_priority;
                             
-    int i;
+    int i=0;
   
     //#todo
     //Criar um for para mostrar vários processos.
@@ -191,7 +188,7 @@ void showinfo_button3()
 
     unsigned long __process_priority;
                             
-    int i;
+    int i=0;
   
     //#todo
     //Criar um for para mostrar vários processos.
@@ -224,10 +221,64 @@ void showinfo_button3()
 
 
 
+void test_f1(struct window_d *window)
+{
+    debug_print("ftest_f1:");
+
+    //gramado_system_call ( 9901,   
+      //  (unsigned long) window, 
+      //  (unsigned long) window, 
+      //  (unsigned long) window );
+
+     //execve ( (const char *) "noraterm.bin", 
+        //(const char *) 0, (const char *) 0); 
+
+//====================================
+// # timer-test
+//
+// Essa rotina cria um objeto timer que gera um interrupção 
+// de tempos em tempos e é tratado pelo procedimento de janelas.
+
+    __count = 0;    //Tem que inicializar;
+
+    //printf("Creating timer\n");
+    //printf("%d Hz | sys time %d ms | ticks %d \n", 
+    //apiGetSysTimeInfo(1), 
+    //apiGetSysTimeInfo(2), 
+    //apiGetSysTimeInfo(3) );
+
+    //++
+    gde_enter_critical_section ();
+    cpu_window = (void *) gde_create_window ( 1, 1, 1, 
+                              "cpu-usage",  
+                               20 +4, (32 +2), 
+                               32*8, 100,    
+                               main_window, 0, 
+                               COLOR_YELLOW, COLOR_YELLOW );
+    gde_register_window (cpu_window);
+    gde_show_window (cpu_window);
+    gde_exit_critical_section ();
+    //--
+
+    // Atualizar à cada 2000 ms. 
+    //janela, 100 ms, tipo 2= intermitente.
+    //system_call ( 222, (unsigned long) window, 100, 2);
+
+    gde_create_timer ( (struct window_d *) window, 
+        (unsigned long) 2000, (int) 2 );
+
+    //printf ("done\n");
+
+//====================================
+}
+
+
+
+
 /*
  * *********************************
  * sysmonProcedure:
- *     Procedimento de janela.
+ *     Window procedure.
  */
 
 int 
@@ -238,10 +289,9 @@ sysmonProcedure (
     unsigned long long2 )
 {
 
-
-	//salvaremos o nome do processo aqui.
-   //char __processname_buffer[64];
-   //char __tmp_buffer[64];
+    //Salvaremos o nome do processo aqui.
+    //char __processname_buffer[64];
+    //char __tmp_buffer[64];
 
 
     switch (msg)
@@ -250,8 +300,17 @@ sysmonProcedure (
         case MSG_SYSKEYDOWN:
             switch (long1)
             {  
-                case VK_F1: debug_print("sysmon: [F1]"); break;
-                case VK_F2: debug_print("sysmon: [F2]"); break;
+                case VK_F1: 
+                    debug_print("sysmon: [F1]"); 
+                    //test_f1(window);
+                    test_f1(main_window);
+                    goto done;
+                    break;
+                    
+                case VK_F2: 
+                    debug_print("sysmon: [F2]"); 
+                    goto done;
+                    break;
             };
             goto done;
             break;
@@ -265,9 +324,11 @@ sysmonProcedure (
 		    break;
 
 
-		case MSG_TIMER:
-		    update_cpu_usage ();
-		    break;
+        case MSG_TIMER:
+            debug_print("sysmonProcedure: MSG_TIMER\n");
+            update_cpu_usage ();
+            return 0;
+            break;
 
 
         case MSG_SETFOCUS:
@@ -283,74 +344,8 @@ sysmonProcedure (
             break;
 
 
-		// MSG_MOUSEKEYDOWN
-        case 30:
-            switch (long1)
-            {
-				//botão 1.
-				case 1:
-				    if ( window == launcher_button_1 )
-				    {
-                        gramado_system_call ( 9900,   
-                            (unsigned long) window, 
-                            (unsigned long) window, 
-                            (unsigned long) window );
-						 break;
-					}
-
-				    if ( window == launcher_button_2 )
-				    {
-                        gramado_system_call ( 9900,   
-                            (unsigned long) window, 
-                            (unsigned long) window, 
-                            (unsigned long) window );
-						 break;
-					}
-					
-					if ( window == bar_button_1 )
-					{
-                        gramado_system_call ( 9900,   
-                            (unsigned long) window, 
-                            (unsigned long) window, 
-                            (unsigned long) window );
-						break;
-					}
-					
-					if ( window == bar_button_2 )
-					{
-                        gramado_system_call ( 9900,   
-                            (unsigned long) window, 
-                            (unsigned long) window, 
-                            (unsigned long) window );
-					    break;
-					}
-
-					if ( window == bar_button_3 )
-					{
-                        gramado_system_call ( 9900,   
-                            (unsigned long) window, 
-                            (unsigned long) window, 
-                            (unsigned long) window );
-					    break;
-					}
-
-
-
-					//se
-					if ( window == main_window )
-					{
-						gde_set_focus (window);
-						//raise window.
-	                     //system_call ( 9700, 
-	                         //(unsigned long) main_window, 
-		                     //(unsigned long) main_window, 
-		                     //(unsigned long) main_window );
-					}
-
-					break;
-			};
-			goto done;
-			break;
+        // MSG_MOUSEKEYDOWN
+        // case 30:  break;
 
 
         // Mouse button up
@@ -363,54 +358,6 @@ sysmonProcedure (
 						gde_set_focus (window);
 					    gde_redraw_window (window,1);
 					    // #todo: we need to redraw all other windows.
-					}
-				
-				    if ( window == launcher_button_1 )
-				    {
-                        gramado_system_call ( 9901,   
-                            (unsigned long) window, 
-                            (unsigned long) window, 
-                            (unsigned long) window );
-						//execve ( (const char *) "noraterm.bin", 
-                           //(const char *) 0, (const char *) 0); 
-						 //====================================
-	                     // timer-test
-	                     // Essa rotina cria um objeto timer que gera um interrupção 
-	                     // de tempos em tempos e é tratado pelo procedimento de janelas.
-		                 __count = 0; //tem que inicializar;
-		                 //printf("Creating timer\n");
-	                     //printf("%d Hz | sys time %d ms | ticks %d \n", 
-		                 //apiGetSysTimeInfo(1), 
-			             //apiGetSysTimeInfo(2), 
-			             //apiGetSysTimeInfo(3) );
-		                 gde_enter_critical_section ();
-		                 cpu_window = (void *) gde_create_window ( 1, 1, 1, 
-		                                         "cpu-usage",  
-                                                 20 +4, (32 +2), 
-                                                 32*8, 100,    
-                                                 main_window, 0, 
-                                                 COLOR_YELLOW, COLOR_YELLOW );
-                         gde_register_window (cpu_window);
-	                     gde_show_window (cpu_window);
-	                     gde_exit_critical_section ();
-	                     // Atualizar à cada 2000 ms. 
-		                 //janela, 100 ms, tipo 2= intermitente.
-		                 //system_call ( 222, (unsigned long) window, 100, 2);
-                         gde_create_timer ( (struct window_d *) window, 
-                            (unsigned long) 80, (int) 2 );
-                         //printf ("done\n");
-						 //====================================
-						 break;
-					}
-				    if ( window == launcher_button_2 )
-				    {
-                        gramado_system_call ( 9901,   
-                            (unsigned long) window, 
-                            (unsigned long) window, 
-                            (unsigned long) window );
-						 execve ( (const char *) "reboot2.bin",
-                            (const char *) 0, (const char *) 0);
-						 break;
 					}
 
                     //pid button.
@@ -494,8 +441,8 @@ int main ( int argc, char *argv[] ){
     unsigned long height;
     
 
-    unsigned long deviceWidth = gde_get_system_metrics (1); 
-    unsigned long deviceHeight = gde_get_system_metrics (2);
+    unsigned long deviceWidth  = gde_get_system_metrics(1); 
+    unsigned long deviceHeight = gde_get_system_metrics(2);
 
     //left = deviceWidth/2;
     left = 4;
@@ -542,7 +489,9 @@ int main ( int argc, char *argv[] ){
 	//client window = 0x2d89ef 
 	//...
 
+
     //++
+    // The main window.
     gde_begin_paint (); 
     hWindow = (void *) gde_create_window (  WT_OVERLAPPED, 1, 1, 
                            "Setup: sysmon",
@@ -551,12 +500,12 @@ int main ( int argc, char *argv[] ){
                            COLOR_BLUE, COLOR_BLUE );  
 
     if ( (void *) hWindow == NULL ){
-		printf ("sysmon: hWindow fail\n");
-		gde_end_paint ();
-		goto fail;
+        printf ("sysmon: hWindow fail\n");
+        gde_end_paint ();
+        goto fail;
 
     }else{
-		//Registrar e mostrar.
+        //Registrar e mostrar.
         gde_register_window (hWindow);
         gde_show_window (hWindow);
         main_window = ( struct window_d *) hWindow;
@@ -566,80 +515,30 @@ int main ( int argc, char *argv[] ){
 
 
 
-	//++
-    gde_enter_critical_section (); 
-    launcher_button_1 = (void *) gde_create_window ( WT_BUTTON, 1, 1, 
-                                     "1",  
-                                     20 + (32*8)  +10, 36 +10, 
-                                     40, 40,    
-                                     hWindow, 0, 
-                                     xCOLOR_GRAY3, xCOLOR_GRAY3 );
-
-    if ( (void *) launcher_button_1 == NULL )
-    {
-		printf ("Couldn't create button\n");
-		gde_exit_critical_section (); 
-		return 1;
-    }else{
-        gde_register_window (launcher_button_1);
-        gde_show_window (launcher_button_1);
-        gde_show_backbuffer ();
-    };
-    gde_exit_critical_section (); 
-	//--
-
-
-
-	//++
-    gde_enter_critical_section (); 
-    launcher_button_2 = (void *) gde_create_window ( WT_BUTTON, 1, 1, 
-                                     "2", 
-                                     20 + (32*8) +10 +40, 36 +10,
-                                     40, 40,   
-                                     hWindow, 0, 
-                                     xCOLOR_GRAY3, xCOLOR_GRAY3 );
-	
-	if ( (void *) launcher_button_2 == NULL )
-	{
-		printf ("Couldn't create button\n");
-		gde_exit_critical_section (); 
-		return 1;
-	}else{
-
-        gde_register_window (launcher_button_2);
-        gde_show_window (launcher_button_2);
-        gde_show_backbuffer ();
-	};
-    gde_exit_critical_section (); 
-	//--
-
-
-
-
     //
     // ========= Client background =====================
     //
 
-	//++
-	gde_enter_critical_section ();  
-	client_window = (void *) gde_create_window ( WT_SIMPLE, 1, 1, 
-	                            "client-bg",     
+    //++
+    // Client background.
+    gde_enter_critical_section ();  
+    client_window = (void *) gde_create_window ( WT_SIMPLE, 1, 1, 
+                                "client-bg",     
                                 20, 100 +36, 
                                 width -4 -42, height -36 -100 -40, 
                                 hWindow, 0, 
                                 0xF5DEB3, 0xF5DEB3 );
 
-    if ( (void *) client_window == NULL)
-    {
+    if ( (void *) client_window == NULL){
         printf ("client_window fail");
         gde_show_backbuffer();
         gde_exit_critical_section ();
         while(1){}
     }
-	gde_register_window (client_window);
-	gde_show_window (client_window);
-	gde_exit_critical_section ();  
-	//--
+    gde_register_window (client_window);
+    gde_show_window (client_window);
+    gde_exit_critical_section ();  
+    //--
 
 
     //
@@ -647,6 +546,7 @@ int main ( int argc, char *argv[] ){
     //
 
     //++
+    // Client bar.
     gde_enter_critical_section ();  
     client_bar_Window = (void *) gde_create_window ( WT_SIMPLE, 1, 1, 
                                     "client-bar",     
@@ -654,8 +554,8 @@ int main ( int argc, char *argv[] ){
                                     (width -10 -40), 40, 
                                     client_window, 0, 
                                     0x404040, 0x404040 );
-    if ( (void *) client_bar_Window == NULL)
-    {
+    
+    if ( (void *) client_bar_Window == NULL){
         printf ("client_bar_Window fail");
         gde_show_backbuffer();
         gde_exit_critical_section (); 
@@ -671,31 +571,31 @@ int main ( int argc, char *argv[] ){
     // ============ Bar buttons =========
     //
     
-	//++
+    //++
+    //bar button [PID]
     gde_enter_critical_section (); 
     bar_button_1 = (void *) gde_create_window ( WT_BUTTON, 1, 1, 
                                 "PID",  
-                                1, 1, 
-                                50, 32,    
+                                1, 1, 50, 32,    
                                 client_bar_Window, 0, 
                                 xCOLOR_GRAY3, xCOLOR_GRAY3 );
 
-    if ( (void *) bar_button_1 == NULL )
-    {
-		printf ("Couldn't create PID button\n");
-		gde_exit_critical_section ();
+    if ( (void *) bar_button_1 == NULL ){
+        printf ("Couldn't create PID button\n");
+        gde_exit_critical_section ();
         return 1;
+
     }else{
         gde_register_window (bar_button_1);
         gde_show_window (bar_button_1);
         gde_show_backbuffer ();
     };
     gde_exit_critical_section (); 
-	//--
+    //--
 
 
-    
-	//++
+    //++
+    //bar button [State]
     gde_enter_critical_section (); 
     bar_button_2 = (void *) gde_create_window ( WT_BUTTON, 1, 1, 
                                 "State", 
@@ -704,37 +604,36 @@ int main ( int argc, char *argv[] ){
                                 client_bar_Window, 0, 
                                 xCOLOR_GRAY3, xCOLOR_GRAY3 );
 
-    if ( (void *) bar_button_2 == NULL )
-    {
-		printf ("Couldn't create State button\n");
-		gde_exit_critical_section (); 
+    if ( (void *) bar_button_2 == NULL ){
+        printf ("Couldn't create State button\n");
+        gde_exit_critical_section (); 
         return 1;
-    }else{
 
+    }else{
         gde_register_window (bar_button_2);
         gde_show_window (bar_button_2);
         gde_show_backbuffer ();
     };
     gde_exit_critical_section (); 
-	//--
+    //--
 
 
-	//++
+    //++
     gde_enter_critical_section (); 
+    //bar button [Priority]
     bar_button_3 = (void *) gde_create_window ( WT_BUTTON, 1, 1, 
                                 "Priority", 
                                 50 +1 +100 +1, 1,
                                 200, 32,   
                                 client_bar_Window, 0, 
                                 xCOLOR_GRAY3, xCOLOR_GRAY3 );
-	
-    if ( (void *) bar_button_3 == NULL )
-    {
-		printf ("Couldn't create Priority button\n");
-		gde_exit_critical_section ();
-		return 1;
-    }else{
 
+    if ( (void *) bar_button_3 == NULL ){
+        printf ("Couldn't create Priority button\n");
+        gde_exit_critical_section ();
+        return 1;
+
+    }else{
         gde_register_window (bar_button_3);
         gde_show_window (bar_button_3);
         gde_show_backbuffer ();
@@ -750,26 +649,27 @@ int main ( int argc, char *argv[] ){
 
     // White window to show the data.
 
-	//++
-	gde_enter_critical_section ();  
-	data_window = (void *) gde_create_window ( WT_SIMPLE, 1, 1, 
-	                            "data_window",     
+    //++
+    // White window.
+    gde_enter_critical_section ();  
+    data_window = (void *) gde_create_window ( WT_SIMPLE, 1, 1, 
+                               "DataWindow",     
                                 4, 48, 
-                                width -4 -50, height -36 -100 -40 -50, 
+                                (width -4 -50), (height -36 -100 -40 -50), 
                                 client_window, 0, 
                                 COLOR_WHITE, COLOR_WHITE );
 
-    if ( (void *) data_window == NULL)
-    {
-        printf ("data_window fail");
+    if ( (void *) data_window == NULL){
+        printf ("DataWindow fail");
         gde_show_backbuffer();
         gde_exit_critical_section ();
         while(1){}
+ 
     }
-	gde_register_window (data_window);
-	gde_show_window (data_window);
-	gde_exit_critical_section ();  
-	//--
+    gde_register_window (data_window);
+    gde_show_window (data_window);
+    gde_exit_critical_section ();  
+    //--
 
 
 

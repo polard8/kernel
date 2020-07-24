@@ -438,150 +438,152 @@ void timerDisableTextCursor (void)
 
 
 int new_timer_id (void){
-	
-    int i;
-    unsigned long new;
-	
+
+    int i=0;
+    unsigned long new=0;
+
+
     for ( i=0; i<32; i++ )
     {
 		new = (unsigned long) timerList[i];
 		
-		if ( new == 0 )
-		{
-			return (int) i;
-		}
-	}		
+        if ( new == 0 ){ return (int) i; }
+	};
 	
 	//fail
 	return (int) -1;
 }
 
 
-//#todo 
-//precisamos pegar um slot na lista de timers.
 
-struct timer_d *create_timer ( struct window_d *window, 
-                               unsigned long ms, 
-                               int type  )
+/*
+ ******************** 
+ * create_timer:
+ * 
+ */
+
+struct timer_d *create_timer ( 
+    struct window_d *window, 
+    unsigned long ms, 
+    int type )
 {
-    struct timer_d *t;
+
+    struct timer_d *Timer;
     
     int ID = -1;  //erro;
 
 
+	// limits
+	// limite de 1 tick.
 
-	//limits
-	//limite de 1 tick.
-	
-	if (ms < (1000/sys_time_hz) )
-	{
-		printf("create_timer: ajust ms\n");
-		ms = (1000/sys_time_hz);
-	}
-	
-	if ( type < 1 || type > 10 )
-	{
-		panic ("create_timer: type fail\n");
-		
-		///printf("create_timer: type fail\n");
-		//refresh_screen ();
-		//return NULL;
-	}
+    // ms
+    if (ms < (1000/sys_time_hz) )
+    {
+        printf ("create_timer: Ajust ms\n");
+        ms = (1000/sys_time_hz);
+    }
 
-	
-	t = (void *) kmalloc ( sizeof(struct timer_d) );
-	
-	if ( (void *) t == NULL )
-	{
-		panic ("create_timer: t fail \n");
-		
-		//printf ("create_timer: t fail \n");
-		//refresh_screen ();
-		//return NULL; 
+    // type
+    if ( type < 1 || type > 10 )
+    {
+        panic ("create_timer: type fail\n");
+        //printf("create_timer: type fail\n");
+        //refresh_screen ();
+        //return NULL;
+    }
 
-	}else{
-		
-		ID = (int) new_timer_id ();
-		
-		//erro ao obter um novo id.
-		if (  ID < 0 || ID > 32 )
-		{
-		    panic ("create_timer: ID fail \n");
-		    
-		    //printf("create_timer: ID fail \n");
-		    //refresh_screen ();
-		    //return NULL;
-		}else{
-			
-			t->id = ID; 	
-		
-		    t->used = 1;
-		    t->magic = 1234;
-		
-		    // ms/(ms por tick)
-		    t->initial_count_down = (unsigned long) ( ms / (1000/sys_time_hz) );
-	 	    t->count_down = t->initial_count_down;
-		
-	        //1 = one shot 
-	        //2 = intermitent
-		    t->type = (int) type;
-		
-		    //colca na lista.
-		    timerList[ID] = (unsigned long) t;
-		};
-		
-		
-	    //thread.
-		
-		if ( (void *) window == NULL)
-		{
-		    printf("create_timer: window fail \n");
-		    refresh_screen ();
-		    return NULL;
-		}else{
-			
-			if ( window->used != 1 || window->magic != 1234 )
-			{
-				
-		        printf("create_timer: window validation fail \n");
-		        refresh_screen();
-			    return NULL;
-			}
-			
-			//temos uma janela válida 
-			t->window = window;
-			
-			if ( (void *) window->control == NULL )
-			{
-		        printf("create_timer: thread fail \n");
-		        refresh_screen();
-				return NULL;
-			}
-			
-			if ( window->control->used != 1 || 
-			     window->control->magic != 1234 )
-			{
+    //
+    // Structure.
+    //
 
-		        printf("create_timer: thread validation fail \n");
-		        refresh_screen ();
-			    return NULL;
-			}
-			
-			//#importante 
-			//agora o timer tem uma thread para enviar mensagens.
-			//quancdo o tempo se esgotar.
-			
-		    t->thread = (struct thread_d *) window->control;
-		};
-	};
+    Timer = (void *) kmalloc( sizeof(struct timer_d) );
+
+    if ( (void *) Timer == NULL ){
+        panic ("create_timer: Timer fail \n");
+        //printf ("create_timer: Timer fail \n");
+        //refresh_screen ();
+        //return NULL; 
+
+    }else{
+
+        // ??
+        // List?
+        ID = (int) new_timer_id();
+
+        // Erro ao obter um novo id.
+        if (  ID < 0 || ID > 32 ){
+            panic ("create_timer: ID fail \n");
+            //printf("create_timer: ID fail \n");
+            //refresh_screen ();
+            //return NULL;
+
+        }else{
+            Timer->id = ID;
+            Timer->used = 1;
+            Timer->magic = 1234;
+
+            // ms/(ms por tick)
+            Timer->initial_count_down = (unsigned long) ( ms / (1000/sys_time_hz) );
+            Timer->count_down = Timer->initial_count_down;
+
+            //1 = one shot 
+            //2 = intermitent
+            Timer->type = (int) type;
+
+            // Coloca na lista.
+            timerList[ID] = (unsigned long) Timer;
+        };
 
 
-	//#debug
-    //printf("create_timer: done \n");
-    //refresh_screen ();
+        // Thread.
+        // Checking the window associated with the thread.
+  
+        if ( (void *) window == NULL){
+            printf("create_timer: window fail \n");
+            refresh_screen ();
+            return NULL;
+
+        }else{
+
+            if ( window->used != 1 || window->magic != 1234 ){
+                printf("create_timer: window validation fail \n");
+                refresh_screen();
+                return NULL;
+            }
+
+            //Temos uma janela válida 
+            Timer->window = window;
+
+            if ( (void *) window->control == NULL ){
+                printf("create_timer: Control thread fail \n");
+                refresh_screen();
+                return NULL;
+            }
+
+            if ( window->control->used != 1 || 
+                 window->control->magic != 1234 )
+            {
+
+                printf("create_timer: Control thread validation fail \n");
+                refresh_screen ();
+                return NULL;
+            }
+
+			// #importante 
+			// Agora o timer tem uma thread para enviar mensagens
+			// quando o tempo se esgotar.
+            
+            Timer->thread = (struct thread_d *) window->control;
+        };
+    };
 
 
-    return (struct timer_d *) t;
+    // #debug
+    debug_print("create_timer: done\n");
+    // printf("create_timer: done \n");
+    // refresh_screen ();
+
+    return (struct timer_d *) Timer;
 }
 
 
