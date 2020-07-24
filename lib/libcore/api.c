@@ -2915,6 +2915,7 @@ struct window_d *gde_get_main_window (void)
 
 
 // Pega o nome do processo dado o pid.
+// OUT: name len ?
 int gde_getprocessname (int pid, char *name, size_t len){
 
     int __len_ret = 0;
@@ -2933,19 +2934,20 @@ int gde_getprocessname (int pid, char *name, size_t len){
                         (unsigned long) name,
                         (unsigned long) name );
 
-	if ( __len_ret < 0 || __len_ret > 64 ) //HOST_NAME_MAX
-	{
-	    printf ("gde_getprocessname: __len_ret\n");
-	    return -1;
-	}
-
-	if ( __len_ret > len )
-	{
-		__len_ret = len;
-	}
+    //HOST_NAME_MAX
+    if ( __len_ret < 0 || __len_ret > 64 ) 
+    {
+        printf ("gde_getprocessname: __len_ret\n");
+        return -1;
+    }
 
 
-    return 0;
+    if ( __len_ret > len )
+    {
+        __len_ret = len;
+    }
+
+    return __len_ret;
 }
 
 
@@ -2985,8 +2987,8 @@ int gde_getthreadname (int tid, char *name, size_t len){
 
 
 
-unsigned long gde_get_process_stats (int pid, int index){
-
+unsigned long gde_get_process_stats (int pid, int index)
+{
     return (unsigned long) system_call ( 880, 
                                (unsigned long) pid, 
                                (unsigned long) index, 

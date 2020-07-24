@@ -25,8 +25,6 @@ struct window_d *data_window;         //White.
 
 // bar buttons
 struct window_d *bar_button_1; 
-struct window_d *bar_button_2;
-struct window_d *bar_button_3;
 
 struct window_d *cpu_window;    //cpu usage test;
 
@@ -97,128 +95,72 @@ void update_cpu_usage ()
 // #todo: ordenar por pid
 void showinfo_button1()
 {
-    // Salvaremos o nome do processo aqui.
-    char __processname_buffer[64];
-    char __tmp_buffer[64];
 
-    unsigned long __process_priority;
-                            
+    char __pid_buffer[8];
+    char __processname_buffer[64];
+    char __priority_buffer[8];
+    char __state_buffer[8];
+    //...
+
     int i=0;
+    int name_len = 0;
+    unsigned long __process_priority=0;
+    unsigned long __state=0;
+
+ 
   
     //#todo
     //Criar um for para mostrar vários processos.
   
     //unsigned long x = 0;
-    unsigned long y = 4;
+    unsigned long y = 32;
+  
+    // Labels
+    gde_draw_text ( data_window,   4, 8, COLOR_BLACK, "PID" );
+    gde_draw_text ( data_window,  40, 8, COLOR_BLACK, "Name" );
+    gde_draw_text ( data_window, 140, 8, COLOR_BLACK, "Priority" );     
+    gde_draw_text ( data_window, 220, 8, COLOR_BLACK, "State" );     
+    //...
+
         
-    for ( i=100; i<104; i++)
+    //for ( i=100; i<104; i++ )
+    for ( i=100; i<110; i++ )
     {
         // get process name.
-        gde_getprocessname  ( i,  
-             __processname_buffer, 
-             sizeof(__processname_buffer) );
+        name_len = gde_getprocessname  ( i,  
+                       __processname_buffer, 
+                       sizeof(__processname_buffer) );
         
-        // get process priority
-        __process_priority = gde_get_process_stats ( i,33);      
-        itoa(__process_priority, __tmp_buffer);
+        if (name_len>0)
+        {
+            //Get PID string
+            itoa(i, __pid_buffer); 
+            
+            // get process priority
+            __process_priority = gde_get_process_stats (i,33);  
+            itoa(__process_priority, __priority_buffer);
+
+            // get process state
+            __state = gde_get_process_stats (i,5);  
+            itoa(__state, __state_buffer);
+
+            //...
         
-        gde_draw_text ( data_window,   4, y, COLOR_BLACK, "n" );
-        gde_draw_text ( data_window,  40, y, COLOR_BLACK, (char *) __processname_buffer );
-        gde_draw_text ( data_window, 200, y, COLOR_BLACK, (char *) __tmp_buffer ); 
+            gde_draw_text ( data_window,   4, y, COLOR_BLACK, (char *) __pid_buffer );
+            gde_draw_text ( data_window,  40, y, COLOR_BLACK, (char *) __processname_buffer );
+            gde_draw_text ( data_window, 140, y, COLOR_BLACK, (char *) __priority_buffer ); 
+            gde_draw_text ( data_window, 220, y, COLOR_BLACK, (char *) __state_buffer );      
+            //...
     
-        //update y
-        y = y + 10;
+            //update y
+            y = (y+10);
+         }
     };
+
 
     // refresh screen
     gde_show_backbuffer ();
 }
-
-// internal
-// #todo: ordenar por state
-void showinfo_button2()
-{
-
-    //salvaremos o nome do processo aqui.
-    char __processname_buffer[64];
-    char __tmp_buffer[64];
-
-    unsigned long __process_priority;
-                            
-    int i=0;
-  
-    //#todo
-    //Criar um for para mostrar vários processos.
-  
-    //unsigned long x = 0;
-    unsigned long y = 4;
-        
-    for ( i=100; i<104; i++)
-    {
-        // get process name.
-        gde_getprocessname  ( i,  
-             __processname_buffer, 
-             sizeof(__processname_buffer) );
-        
-        // get process priority
-        __process_priority = gde_get_process_stats ( i,33);      
-        itoa(__process_priority, __tmp_buffer);
-        
-        gde_draw_text ( data_window,   4, y, COLOR_BLACK, "n" );
-        gde_draw_text ( data_window,  40, y, COLOR_BLACK, (char *) __processname_buffer );
-        gde_draw_text ( data_window, 200, y, COLOR_BLACK, (char *) __tmp_buffer ); 
-    
-        //update y
-        y = y + 10;
-    };
-
-    // refresh screen
-    gde_show_backbuffer ();
-}
-
-
-// internal
-// #todo: ordenar por priority
-void showinfo_button3()
-{
-
-    //salvaremos o nome do processo aqui.
-    char __processname_buffer[64];
-    char __tmp_buffer[64];
-
-    unsigned long __process_priority;
-                            
-    int i=0;
-  
-    //#todo
-    //Criar um for para mostrar vários processos.
-  
-    //unsigned long x = 0;
-    unsigned long y = 4;
-        
-    for ( i=100; i<104; i++)
-    {
-        // get process name.
-        gde_getprocessname  ( i,  
-             __processname_buffer, 
-             sizeof(__processname_buffer) );
-        
-        // get process priority
-        __process_priority = gde_get_process_stats ( i,33);      
-        itoa(__process_priority, __tmp_buffer);
-        
-        gde_draw_text ( data_window,   4, y, COLOR_BLACK, "n" );
-        gde_draw_text ( data_window,  40, y, COLOR_BLACK, (char *) __processname_buffer );
-        gde_draw_text ( data_window, 200, y, COLOR_BLACK, (char *) __tmp_buffer ); 
-    
-        //update y
-        y = y + 10;
-    };
-
-    // refresh screen
-    gde_show_backbuffer ();
-}
-
 
 
 void test_f1(struct window_d *window)
@@ -302,15 +244,26 @@ sysmonProcedure (
             {  
                 case VK_F1: 
                     debug_print("sysmon: [F1]"); 
-                    //test_f1(window);
-                    test_f1(main_window);
+                    showinfo_button1();
                     goto done;
                     break;
-                    
+
                 case VK_F2: 
                     debug_print("sysmon: [F2]"); 
                     goto done;
                     break;
+
+                case VK_F3: 
+                    debug_print("sysmon: [F3]"); 
+                    goto done;
+                    break;
+
+                case VK_F4: 
+                    debug_print("sysmon: [F4]"); 
+                    test_f1(main_window);
+                    goto done;
+                    break;
+
             };
             goto done;
             break;
@@ -371,31 +324,6 @@ sysmonProcedure (
                         showinfo_button1();
                         break;
                     }
-
-                    //state button.
-                    if ( window == bar_button_2 )
-                    {
-                        gde_redraw_window (data_window,1);
-                        gramado_system_call ( 9901,   
-                            (unsigned long) window, 
-                            (unsigned long) window, 
-                            (unsigned long) window );
-                        showinfo_button2();
-                        break;
-                    }
-             
-                    //priority button
-                    if ( window == bar_button_3 )
-                    {
-                        gde_redraw_window (data_window,1);
-                        gramado_system_call ( 9901,   
-                            (unsigned long) window, 
-                            (unsigned long) window, 
-                            (unsigned long) window );
-                        showinfo_button3();
-                        break;
-                   }
-
 				    break;
 			};
 			goto done;
@@ -513,6 +441,11 @@ int main ( int argc, char *argv[] ){
     gde_end_paint ();
     //--
 
+     //Text
+     gde_draw_text ( main_window, 4, 4, 
+         COLOR_WHITE, "sysmon.bin: System information." );
+     gde_show_window (main_window);
+     //while(1){}
 
 
     //
@@ -570,13 +503,13 @@ int main ( int argc, char *argv[] ){
     //
     // ============ Bar buttons =========
     //
-    
+
     //++
-    //bar button [PID]
+    //bar button [ F1 ]
     gde_enter_critical_section (); 
     bar_button_1 = (void *) gde_create_window ( WT_BUTTON, 1, 1, 
-                                "PID",  
-                                1, 1, 50, 32,    
+                                " F1 ",  
+                                4, 4, 100, 32,    
                                 client_bar_Window, 0, 
                                 xCOLOR_GRAY3, xCOLOR_GRAY3 );
 
@@ -593,53 +526,6 @@ int main ( int argc, char *argv[] ){
     gde_exit_critical_section (); 
     //--
 
-
-    //++
-    //bar button [State]
-    gde_enter_critical_section (); 
-    bar_button_2 = (void *) gde_create_window ( WT_BUTTON, 1, 1, 
-                                "State", 
-                                50 +1, 1,
-                                100, 32,   
-                                client_bar_Window, 0, 
-                                xCOLOR_GRAY3, xCOLOR_GRAY3 );
-
-    if ( (void *) bar_button_2 == NULL ){
-        printf ("Couldn't create State button\n");
-        gde_exit_critical_section (); 
-        return 1;
-
-    }else{
-        gde_register_window (bar_button_2);
-        gde_show_window (bar_button_2);
-        gde_show_backbuffer ();
-    };
-    gde_exit_critical_section (); 
-    //--
-
-
-    //++
-    gde_enter_critical_section (); 
-    //bar button [Priority]
-    bar_button_3 = (void *) gde_create_window ( WT_BUTTON, 1, 1, 
-                                "Priority", 
-                                50 +1 +100 +1, 1,
-                                200, 32,   
-                                client_bar_Window, 0, 
-                                xCOLOR_GRAY3, xCOLOR_GRAY3 );
-
-    if ( (void *) bar_button_3 == NULL ){
-        printf ("Couldn't create Priority button\n");
-        gde_exit_critical_section ();
-        return 1;
-
-    }else{
-        gde_register_window (bar_button_3);
-        gde_show_window (bar_button_3);
-        gde_show_backbuffer ();
-    };
-    gde_exit_critical_section (); 
-	//--
 
 
 
