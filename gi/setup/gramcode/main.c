@@ -259,9 +259,7 @@ void *teditorProcedure (
     switch (msg)
     {
 
-        case MSG_CREATE:
-            saveCreateButton ();
-            break;
+        case MSG_CREATE: saveCreateButton (); break;
 
 
 		//Faz algumas inicializações de posicionamento e dimensões.
@@ -271,8 +269,9 @@ void *teditorProcedure (
 		//Torna a janela visível.
         //case MSG_SHOWWINDOW:
 		//    break; 
-		 
-		case MSG_KEYDOWN:
+
+        case MSG_KEYDOWN:
+            //...
             switch (long1)
             {
 				// Null key.
@@ -331,10 +330,12 @@ void *teditorProcedure (
 				    teditorInsertNextChar ( (char) long1 );  
 				    break;
 			};
-			break;
+			//...
+			return 0; //break;
 
 
 		case MSG_SYSKEYDOWN:
+		    //...
 		    switch (long1)
 			{
 				//#bugbug
@@ -344,27 +345,22 @@ void *teditorProcedure (
 
 				//#teste: Isso é um improviso.
 				//Criando o botão para salvar o arquivo.
-				case VK_F1:
-				   saveCreateButton ();
-				   break;
-				
-				
-				case VK_F2:
-				   break;
+				case VK_F1: 
+				    debug_print(" [F1] ");
+				    saveCreateButton(); 
+				    break;
 
-			
-				case VK_F3:
-				   break;
+				case VK_F2: debug_print(" [F2] "); break;
+				case VK_F3: debug_print(" [F3] "); break;
+				case VK_F4: debug_print(" [F4] "); break;
 
-				case VK_F4:
-				   break;
-				
 				default:
                     gde_debug_print("teditorProcedure: [MSG_SYSKEYDOWN] default message\n");
 				    break;
 
 			};
-			break;
+			//
+			return 0; //break;
 
 
 
@@ -383,13 +379,12 @@ void *teditorProcedure (
 					}
 					break;
 					
-				case 2:
-					break;
-					
-				case 3:
-					break;
+				//case 2: break;
+				//case 3: break;
 			};
-			break;
+			//...
+			return 0; //break;
+
 
         // mouse key up
 		case 31:
@@ -407,20 +402,19 @@ void *teditorProcedure (
 					}
 					break;
 					
-				case 2:
-					break;
-					
-				case 3:
-					break;
+				//case 2: break;
+				//case 3: break;
 			};
-			break;
+			//...
+			return 0; //break;
 
-		default:
+
+        default:
             gde_debug_print("teditorProcedure: [FIXME] default message\n");
-		    break;
-	};
+            break;
+    };
 
-	
+
     // done
 
     // Esse tratamento pode ir para essa chamada na api.
