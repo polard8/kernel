@@ -846,9 +846,16 @@ done:
 }
 
 
-// kgws:
+/*
+ *************************************************
+ * kgws_send_to_controlthread_of_currentwindow:
+ * 
+ * 
+ */
+
 // Send a message to the thread associated with the
 // window with focus.
+// Isso é chamado por: KEYBOARD_SEND_MESSAGE().
 
 int
 kgws_send_to_controlthread_of_currentwindow ( 
@@ -860,7 +867,11 @@ kgws_send_to_controlthread_of_currentwindow (
 
     struct window_d *w;
     struct thread_d *t;
-
+    
+    unsigned long tmp_msg=0;
+    unsigned long tmp_ch=0;
+    unsigned long tmp_sc=0;    
+    
    //
    // Window with focus.
    //
@@ -888,32 +899,36 @@ kgws_send_to_controlthread_of_currentwindow (
 
         if ( t->used != 1 || t->magic != 1234 ){
             panic ("kgws_send_to_controlthread_of_currentwindow: t validation \n");
-        }        
-    
+        } 
 
-        //
+
+        tmp_msg = (unsigned long) msg;
+        tmp_msg = (unsigned long) ( tmp_msg & 0x0000FFFF );
+
+        tmp_ch = (unsigned long) long1;
+        tmp_ch = (unsigned long) ( tmp_ch & 0x000000FF );
+   
         // Scan code.
-        //
-
-        unsigned long tmp_sc;
         tmp_sc = (unsigned long) long2;
         tmp_sc = (unsigned long) ( tmp_sc & 0x000000FF );
     
         
-        
+        //Send system message to the thread.
         t->window_list[ t->tail_pos ]  = window;
-        t->msg_list[ t->tail_pos ]     = msg;
-        t->long1_list[ t->tail_pos ]   = long1;
+        t->msg_list[ t->tail_pos ]     = tmp_msg;
+        t->long1_list[ t->tail_pos ]   = tmp_ch;
         t->long2_list[ t->tail_pos ]   = tmp_sc;
-
 
         t->tail_pos++;
         if ( t->tail_pos >= 31 )
             t->tail_pos = 0;
+    
+        //ok
+        return 0;
     };
 
-
-    return 0;
+    // fail
+    return -1;
 }
 
 

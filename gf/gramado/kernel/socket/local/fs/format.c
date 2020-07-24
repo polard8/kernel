@@ -1,24 +1,22 @@
 /*
- * File: fs\format.c
+ * File: fs/format.c
  *
+ * 
  * Descrição:
- *     Seviços de formatação de disco e volumes.
+ *     Serviços de formatação de disco e volumes.
  *     Formata a tabela de partições no mbr.
  *     Altera valores no mbr e metafile. 
  *
- * @todo:
+ * todo:
  *     Serviços de formatação podem ir para um aplicativo.
- * Histórico:
- *    Versão 1.0, 2015 - Esse arquivo foi criado por Fred Nora.
- *    Versão 1.0: 2016 - Revisão.
+ * 
+ * History:
+ *    2015 - Created by Fred Nora.
  *    ...
  */
  
 
 #include <kernel.h>
-
-
- 
 
 
 void fs_delete_entry ( unsigned long id, unsigned long eid )
@@ -33,40 +31,14 @@ void fs_delete_entry ( unsigned long id, unsigned long eid )
  *      Zera o buffer e grava zeros no hd.
  */
 
-void fsClearFat (void){
-	
-	//int i;
-    //unsigned char *fat_base = (unsigned char *) FAT16_FAT_ADDRESS;
-	
-	/*
-     * @todo: 
-	 *     O endereço da fat deveria estar definido em uma
-	 * variável global. Por enquanto esse endereço é improviso.
-	 */    
-    
-	/*
-     * Tamanho da fat.
-     *
-     * @todo: 
-	 *     O tamanho da fat deveria estar definido em uma
-	 * variável global. 
-	 */	
-    //i = (int) (512*4);
-	
-	//while(i > 0){
-    //    fat_base[i] = 0;    
-    //    i--;
-    //}; 
+// #todo
+// Cool!
 
-    //Salva  FAT ! 
-	//write_lba(FAT16_FAT_ADDRESS, FAT16_FAT_LBA);
+void fsClearFat (void)
+{
+    debug_print("fsClearFat: [TODO]\n");
+}
 
-	
-    //@todo: Usar while.      
-   
-done:   
-	return;
-};
 
 //
 // End.

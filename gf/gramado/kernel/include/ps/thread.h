@@ -536,7 +536,7 @@ struct thread_d
 	// utilização de canais e IPC.
 
     //
-    // Single message.
+    // Single system message.
     //
 
     // 4 argumentos padrão;

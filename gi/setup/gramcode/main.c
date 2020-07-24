@@ -22,7 +22,6 @@
 #define WINDOW_HEIGHT  480
 
 
-
     // main window.
     struct window_d *hWindow;
 
@@ -56,20 +55,21 @@ void teditorRefreshCurrentChar ();
 void gramcodeLinesInsertChar ( int line_number, int at, int c );
 
 
-void *teditorProcedure ( struct window_d *window, 
-                         int msg, 
-                         unsigned long long1, 
-                         unsigned long long2 );
+
+void *teditorProcedure ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 );
 
 
 int
-__SendMessageToProcess ( int pid, 
-                          struct window_d *window, 
-                          int message,
-                          unsigned long long1,
-                          unsigned long long2 );
-
-
+__SendMessageToProcess ( 
+    int pid, 
+    struct window_d *window, 
+    int message,
+    unsigned long long1,
+    unsigned long long2 );
 
 
 
@@ -242,11 +242,13 @@ int editor_save_file (){
  *      Procedimento de janela.
  */
  
-void *teditorProcedure ( struct window_d *window, 
-                         int msg, 
-                         unsigned long long1, 
-                         unsigned long long2 )
+void *teditorProcedure ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 )
 {
+
     unsigned long input_ret;
     unsigned long compare_return;
     int q;
@@ -330,7 +332,8 @@ void *teditorProcedure ( struct window_d *window,
 				    break;
 			};
 			break;
-			
+
+
 		case MSG_SYSKEYDOWN:
 		    switch (long1)
 			{
@@ -355,6 +358,10 @@ void *teditorProcedure ( struct window_d *window,
 
 				case VK_F4:
 				   break;
+				
+				default:
+                    gde_debug_print("teditorProcedure: [MSG_SYSKEYDOWN] default message\n");
+				    break;
 
 			};
 			break;
@@ -381,7 +388,7 @@ void *teditorProcedure ( struct window_d *window,
 					
 				case 3:
 					break;
-			}
+			};
 			break;
 
         // mouse key up
@@ -405,12 +412,11 @@ void *teditorProcedure ( struct window_d *window,
 					
 				case 3:
 					break;
-			}
+			};
 			break;
 
-
-
 		default:
+            gde_debug_print("teditorProcedure: [FIXME] default message\n");
 		    break;
 	};
 
@@ -486,20 +492,20 @@ void shellInitSystemMetrics (){
 	//se uma falhar, então pegaremos tudo novamente.
 	
 	// Tamanho da tela.	
-	smScreenWidth =  gde_get_system_metrics(1);
+    smScreenWidth =  gde_get_system_metrics(1);
     smScreenHeight = gde_get_system_metrics(2); 
-	
-	smCursorWidth =  gde_get_system_metrics(3);
-	smCursorHeight = gde_get_system_metrics(4);
-	
-	smMousePointerWidth =  gde_get_system_metrics(5);
-	smMousePointerHeight = gde_get_system_metrics(6);
-	
-	smCharWidth =  gde_get_system_metrics(7);
-	smCharHeight = gde_get_system_metrics(8);	
-	//...
-}
 
+    smCursorWidth =  gde_get_system_metrics(3);
+    smCursorHeight = gde_get_system_metrics(4);
+
+    smMousePointerWidth =  gde_get_system_metrics(5);
+    smMousePointerHeight = gde_get_system_metrics(6);
+
+    smCharWidth =  gde_get_system_metrics(7);
+    smCharHeight = gde_get_system_metrics(8);	
+    
+    //...
+}
 
 void shellInitWindowLimits (){
 	
@@ -737,7 +743,7 @@ int main ( int argc, char *argv[] ){
 
     int ch;
     int ch_test;    
-    int char_count = 0;	
+    int char_count = 0;
 
 
 
@@ -1126,14 +1132,16 @@ Mainloop:
 
     while (running)
     {
-        gde_enter_critical_section (); 
+        gde_enter_critical_section(); 
         gramado_system_call ( 111,
             (unsigned long) &message_buffer[0],
             (unsigned long) &message_buffer[0],
             (unsigned long) &message_buffer[0] );
-        gde_exit_critical_section (); 
+        gde_exit_critical_section(); 
 
-        
+        //if ( message_buffer[1] == 0 )
+            //gde_yield();
+            
         if ( message_buffer[1] != 0 )
         {
             teditorProcedure ( (struct window_d *) message_buffer[0], 
@@ -1143,8 +1151,8 @@ Mainloop:
 
             message_buffer[0] = 0;
             message_buffer[1] = 0;
+            message_buffer[2] = 0;
             message_buffer[3] = 0;
-            message_buffer[4] = 0;
         };
     };
 

@@ -106,9 +106,8 @@ void read_fntos ( char *name ){
     };
 
 
+// Acrescentamos ' ' até completarmos as oito letras do nome.
 _complete:
-
-	//Acrescentamos ' ' até completarmos as oito letras do nome.
 
     while (ns < 8)
     {
@@ -351,7 +350,7 @@ fsLoadFile (
     unsigned long SectorSize;
 
 
-    int Spc;
+    int Spc=0;
 
     // Updating fat address and __dir address.
 
@@ -405,10 +404,7 @@ fsLoadFile (
         //}
 
         Spc = root->spc;
-
-        if (Spc <= 0){
-            panic ("fsLoadFile: Spc\n");
-        }
+        if (Spc <= 0){ panic ("fsLoadFile: Spc\n"); }
 
         // Max entries 
         // Número de entradas no rootdir.
@@ -416,14 +412,10 @@ fsLoadFile (
         // Devemos ver o número de entradas no diretório corrente.
 
         max = root->rootdir_entries;
-
-        if (max <= 0){
-            panic ("fsLoadFile: max root entries \n");
-        }
+        if (max <= 0){ panic ("fsLoadFile: max root entries \n"); }
 
         // ...
     };
-
 
 
 	// Continua ... 
@@ -516,7 +508,7 @@ fsLoadFile (
     // Cada entrada tem 16 words.
     // (32/2) próxima entrada! (16 words) 512 vezes!
     
-    i = 0; 
+    i=0; 
     while ( i < max )
     {
         if ( __dir[z] != 0 )
@@ -524,10 +516,9 @@ fsLoadFile (
             memcpy ( tmpName, &__dir[z], size );
             tmpName[size] = 0;
 
-            Status = strncmp ( file_name, tmpName, size );
+            Status = strncmp( file_name, tmpName, size );
 
-            if ( Status == 0 )
-            {
+            if ( Status == 0 ){
                 SavedDirEntry = i; 
                 goto __found; 
             }
@@ -697,9 +688,9 @@ __loop_next_entry:
     //
 
 fail:
-
     printf ("fsLoadFile fail: file={%s}\n", file_name );
     refresh_screen ();
+    
     return (unsigned long) 1;
 }
 
@@ -898,11 +889,11 @@ unsigned long fsGetFileSize ( unsigned char *file_name ){
 	//mas se tivermos mai de uma partição também precisamos carregar a FAT 
 	//da partição atual.
 	//unsigned short *fat = (unsigned short *) VOLUME1_FAT_ADDRESS;
-    unsigned short cluster;    //Cluster inicial
+    unsigned short cluster=0;    //Cluster inicial
 
     //??
-    unsigned long S;  //Primeiro setor do cluster.
-    int Spc;
+    unsigned long S=0;  //Primeiro setor do cluster.
+    int Spc=0;
 
 	// #importante:
 	// Poderíamos usar malloc ou alocador de páginas ??
@@ -966,18 +957,12 @@ unsigned long fsGetFileSize ( unsigned char *file_name ){
 
         // Setores por cluster.
         Spc = root->spc;
+        if (Spc <= 0){ panic ("fsGetFileSize: Spc\n");}
 
-        if (Spc <= 0){
-            panic ("fsGetFileSize: Spc\n");
-        }
-	
 	    //Max entries ~ Número de entradas no rootdir.
 		//#bugbug: Devemos ver o número de entradas no diretório corrente.
-	    max = root->rootdir_entries;	
-		
-        if (max <= 0){
-            panic ("fsGetFileSize: max root entries\n");
-        }
+        max = root->rootdir_entries;
+        if (max <= 0){ panic ("fsGetFileSize: max root entries\n"); }
 
         // More?! 
         // ...

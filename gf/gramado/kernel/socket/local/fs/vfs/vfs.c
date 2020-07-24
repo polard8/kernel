@@ -22,14 +22,14 @@
 void vfsInit (void){
 
     int i=0;
-
+    int slot = -1;
 
     debug_print ("vfsInit: [FIXME]\n");
 
 
-	// Inicializando a estrutura do VFS.
+    // Inicializando a estrutura do VFS.
 
-#ifdef KERNEL_VERBOSE	
+#ifdef KERNEL_VERBOSE
     printf("Initilizing VFS..\n");
 #endif
 
@@ -39,32 +39,30 @@ void vfsInit (void){
         panic ("vfsInit: storage->vfs");
 
     }else{
-
+        // todo: object 
+        
         storage->vfs->used = 1;
         storage->vfs->magic = 1234;
 
-        // todo: object 
-        
         storage->vfs->status = VFSStatusInitialized;
         storage->vfs->name = "VFS NAME";
         storage->vfs->description = "VIRTUAL FILE SYSTEM";
         storage->vfs->help_string = "Virtual File System help string @todo";
 
-	    // ## root dir address  ##
-	    storage->vfs->rootdir_address = (unsigned long) kmalloc ( VFS_ROOTDIR_NUMBER_OF_ENTRIES * VFS_ROOTDIR_ENTRY_SIZE );
-	
+        // ## root dir address  ##
+        storage->vfs->rootdir_address = (unsigned long) kmalloc( VFS_ROOTDIR_NUMBER_OF_ENTRIES * VFS_ROOTDIR_ENTRY_SIZE );
+
         if ( storage->vfs->rootdir_address = 0 ){
             panic ("vfsInit: storage->vfs->rootdir_address\n");	
         }
-	    
-		//...
-	};
-	
+ 
+        // ...
+    };
+
 	//
 	// ## STREAM ##
 	//
-	
-	int slot = -1;
+
 	
 	//foi definido em stdio.h
 	//file *vfs;
@@ -74,7 +72,7 @@ void vfsInit (void){
     if(slot<0 || slot >=NUMBER_OF_FILES)
         panic("fsInit: slot");
     vfs = file_table[slot];
-
+    vfs->filetable_index = slot;
 
     if ( (void *) vfs == NULL ){
         panic ("vfsInit: vfs fail");

@@ -5,6 +5,9 @@
  *     ?? pipe() and mkfifo(). ??
  *     pipe() which "returns" two file descriptors. 
  *     Internally the pipe is (normally) a circular buffer/queue.
+ * 
+ * History:
+ *     2019 -  Created by Fred Nora.
  */
 
 
@@ -13,61 +16,64 @@
 
 // Máximo que um pipe pode ser,
 // quando não é super user.
+
 unsigned int pipe_max_size = 4096;
 
 
 // Duplicate a file stream.
 int sys_dup ( int oldfd ){
 
-	file *f_old;
-	file *f_new;
+    file *f_old;
+    file *f_new;
 
-	struct process_d *Process;
+    struct process_d *Process;
 
-    int i;
-    int slot = -1;	
+    int i=0;
+    int slot = -1;
 
 
-	Process = (void *) processList[current_process];
-	
-	if ( (void *) Process == NULL ){
-		return -1;
+    Process = (void *) processList[current_process];
 
-	}else{
-	
-	     if ( Process->used != 1 || Process->magic != 1234 )
-		 {
-		     return -1;
-		 }
-		
-		 //ok
-	};
-	
-	
-	for ( i=3; i< NUMBER_OF_FILES; i++ )
-	{
-	    if ( Process->Objects[i] == 0 )
-		{
+    if ( (void *) Process == NULL ){
+        debug_print("sys_dup:[FAIL]\n");
+        return -1;
+
+    }else{
+
+        if ( Process->used != 1 || Process->magic != 1234 ){
+            debug_print("sys_dup:[FAIL]\n");
+            return -1;
+        }
+
+        //ok
+    };
+
+
+
+    for ( i=3; i< NUMBER_OF_FILES; i++ )
+    {
+        if ( Process->Objects[i] == 0 )
+        {
 			//reserva.
 			Process->Objects[i] = 216;
 			
 		    slot = i;
 			break;
-		}
-	}	
-	
-	
-	if ( slot == -1 ){
-		Process->Objects[i] = (unsigned long) 0;
-	    return -1;
-	}	
-	
+        }
+    };
+
+
+    if ( slot == -1 ){
+        Process->Objects[i] = (unsigned long) 0;
+        return -1;
+    };
+
 
     // #todo: 
     // Filtrar oldfd
 
-	f_old = (file *) Process->Objects[oldfd];
-	
+    f_old = (file *) Process->Objects[oldfd];
+
     if ( (void *) f_old == NULL ){
         Process->Objects[i] = (unsigned long) 0;
         return -1;
@@ -75,16 +81,16 @@ int sys_dup ( int oldfd ){
     }else{
         
 		f_new = (void *) kmalloc ( sizeof(file) );
-		
+
 		if ( (void *) f_new == NULL ){
 		    Process->Objects[i] = (unsigned long) 0;
-	        return -1;			
+	        return -1;
 		}
 
 
         f_new->used = 1;
-		f_new->magic = 1234;	
-		
+        f_new->magic = 1234;
+
 		f_new->_base = f_old->_base;	
 		f_new->_p    = f_old->_p;
 		
@@ -96,18 +102,17 @@ int sys_dup ( int oldfd ){
 		f_new->_cnt = f_old->_cnt; 
 		
 
-		Process->Objects[slot] = (unsigned long) f_new;
-
+        Process->Objects[slot] = (unsigned long) f_new;
 
         return (int) slot;
-	}
+    };
 
 	// On success, these system calls return the new file descriptor.  
 	// On error, -1 is returned, and errno is set appropriately.	
 	
 fail:
 	//errno = ?;
-	return -1;
+    return -1;
  }
 
 
@@ -368,15 +373,12 @@ int sys_pipe ( int *pipefd, int flags ){
     char *buff = (char *) kmalloc (BUFSIZ);
     //char *buff = (char *) newPage ();
 
-    if ( (void *) buff == NULL )
-    {
+    if ( (void *) buff == NULL ){
         Process->Objects[slot1] = (unsigned long) 0;
         Process->Objects[slot2] = (unsigned long) 0;
-
         debug_print("sys_pipe: buffer fail\n");
         return (int) (-1);
     }
-
 
 
     // File structures.
@@ -392,20 +394,16 @@ int sys_pipe ( int *pipefd, int flags ){
         debug_print("sys_pipe: structures fail\n");
         return (int) (-1);
 
+    // As duas estruturas compartilham o mesmo buffer.
     }else{
-
-       // As duas estruturas compartilham o mesmo buffer.
-
-        f1->used = 1;    
+        f1->used = 1; 
         f1->magic = 1234;
-        
-        f2->used = 1;    
+        f2->used = 1; 
         f2->magic = 1234;
 
         f1->pid = (pid_t) current_process;
         f1->uid = (uid_t) current_user;
         f1->gid = (gid_t) current_group;
-
         f2->pid = (pid_t) current_process;
         f2->uid = (uid_t) current_user;
         f2->gid = (gid_t) current_group;

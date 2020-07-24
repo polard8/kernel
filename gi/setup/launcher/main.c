@@ -53,11 +53,15 @@ launcherProcedure ( struct window_d *window,
  */
 
 int 
-launcherProcedure ( struct window_d *window, 
-                    int msg, 
-                    unsigned long long1, 
-                    unsigned long long2 )
+launcherProcedure ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 )
 {
+
+
+
     switch (msg)
     {
 		// A janela principal é uma overlapped,
@@ -71,9 +75,14 @@ launcherProcedure ( struct window_d *window,
 		    switch (long1)
 			{  
 				case VK_F1:
+                    gramado_system_call (900, "gdeshell.bin", 0, 0);
+                    exit(0);   
 					break;
 					
 				case VK_F2:
+					break;
+					
+				case VK_F3:
 					break;
 			};
 			break;
@@ -665,8 +674,8 @@ Mainloop:
 
             message_buffer[0] = 0;
             message_buffer[1] = 0;
+            message_buffer[2] = 0;
             message_buffer[3] = 0;
-            message_buffer[4] = 0;
         };
     };
 

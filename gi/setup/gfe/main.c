@@ -442,8 +442,8 @@ Mainloop:
 			
 			message_buffer[0] = 0;
             message_buffer[1] = 0;
+            message_buffer[2] = 0;
             message_buffer[3] = 0;
-            message_buffer[4] = 0;
         };
 	};	
 	

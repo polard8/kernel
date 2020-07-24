@@ -53,26 +53,21 @@ reboot2Procedure ( struct window_d *window,
 /*
  * *********************************
  * reboot2Procedure:
- *     Procedimento de janela.
+ *     Dialog.
  */
- 
+
 int 
-reboot2Procedure ( struct window_d *window, 
-                   int msg, 
-                   unsigned long long1, 
-                   unsigned long long2 )
+reboot2Procedure ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 )
 {
-    
-    
-    //#tentando definiir globalmente.
-    //struct window_d *test_button;
-    //struct window_d *check_box_window;
-    
+
     unsigned long left = 300;
-    unsigned long top = 100;
-    unsigned long width = 480;
+    unsigned long top  = 100;
+    unsigned long width  = 480;
     unsigned long height = 480;
-    
 
 
 
@@ -83,10 +78,10 @@ reboot2Procedure ( struct window_d *window,
     char __wbuf2[128]; //line ?  write
     char __rbuf2[128]; //line ? read 
     int __w_size2 = 0;
-    
 
-	switch (msg)
-	{
+
+    switch (msg)
+    {
         //vamos criar um botão.
         case MSG_CREATE:
         
@@ -169,9 +164,9 @@ reboot2Procedure ( struct window_d *window,
             break;
 
 
-		case MSG_SYSKEYDOWN:
-		    switch (long1)
-			{  
+        case MSG_SYSKEYDOWN:
+            switch (long1)
+            {
 				case VK_F1:
 						printf ("disabling ps2 mouse\n");
 	                    system_call ( 9800,   //serviço. seleciona o diálogo 
@@ -187,11 +182,25 @@ reboot2Procedure ( struct window_d *window,
 		                    (unsigned long) 0, 
 		                    (unsigned long) 0 );
 					break;
-					
-				case VK_F3:
- 
-					break;
-					
+
+                case VK_F3:
+                    
+                    // button down
+                    gramado_system_call ( 9900,   
+                        (unsigned long) reboot_button, 
+                        (unsigned long) reboot_button, 
+                        (unsigned long) reboot_button );
+
+                    // button up
+                    gramado_system_call ( 9901,   
+                        (unsigned long) reboot_button, 
+                        (unsigned long) reboot_button, 
+                        (unsigned long) reboot_button );
+
+                    gde_reboot();
+                    break;
+
+
 				//...
 				
                 //full screen
@@ -404,7 +413,7 @@ int main ( int argc, char *argv[] ){
 
     FILE *fp;
 
-    int ch;
+    int ch=0;
     int char_count = 0;
 
 
@@ -412,6 +421,7 @@ int main ( int argc, char *argv[] ){
     unsigned long top    = 10;
     unsigned long width  = 480;
     unsigned long height = 320;
+
 
 //#ifdef TEDITOR_VERBOSE
 	//printf("\n");
@@ -749,8 +759,9 @@ int main ( int argc, char *argv[] ){
 
 Mainloop:
 
-	while (running)
-	{
+
+    while (running)
+    {
 		gde_enter_critical_section ();
 		system_call ( 111,
 		    (unsigned long) &message_buffer[0],
@@ -758,23 +769,25 @@ Mainloop:
 			(unsigned long) &message_buffer[0] );
         gde_exit_critical_section ();
 
-		if ( message_buffer[1] != 0 )
-		{
+        //if ( message_buffer[1] != 0 )
+            //gdeyield();
+            
+        if ( message_buffer[1] != 0 )
+        {
 	        reboot2Procedure ( (struct window_d *) message_buffer[0], 
 		        (int) message_buffer[1], 
 		        (unsigned long) message_buffer[2], 
 		        (unsigned long) message_buffer[3] );
-			
-			message_buffer[0] = 0;
+
+            message_buffer[0] = 0;
             message_buffer[1] = 0;
+            message_buffer[2] = 0;
             message_buffer[3] = 0;
-            message_buffer[4] = 0;	
-        };				
-	};	
-	
-	
+        }
+    };
+
+
 fail:
-	
     printf ("fail.\n");
 	
 done:

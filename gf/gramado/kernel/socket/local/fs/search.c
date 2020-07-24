@@ -204,13 +204,10 @@ int fsSearchFile (unsigned char *file_name){
 			memcpy ( NameX, &dir[j], 11 );
 			NameX[11] = 0;
 			
-		    Status = (int) strncmp ( file_name, NameX, 11 );
+            Status = (int) strncmp ( file_name, NameX, 11 );
 
-			if (Status == 0)
-			{ 
-			    goto done; 
-			}
-			
+            if (Status == 0){ goto done; }
+
 			//Nothing.
         };  
 
@@ -263,7 +260,7 @@ findEmptyDirectoryEntry (
     unsigned long dir_address, 
     int number_of_entries )
 {
-    int i;
+    int i=0;
     int j=0;
     unsigned char *dir = (unsigned char *) dir_address;
 
@@ -279,14 +276,52 @@ findEmptyDirectoryEntry (
     {
         if ( dir[j] == 0 ){ return (int) i; }
 
-        // Próxima entrada.
-        j = j+32;
+        // Next entry.
+        j = (j+32);
     };
 
 
 fail:
     return (int) (-1);
 }
+
+
+// #bugbug
+// Not tested yet.
+// OUT: index.
+int search_path_in_the_inode_table( const char *path )
+{
+
+    struct inode_d *tmp_inode;
+    
+    int i=0;
+    size_t PathSize = 0;
+    int Status = -1;
+    
+    
+    debug_print("search_path_in_the_inode_table: [FIXME] Not tested yet\n");
+    
+    PathSize = (size_t) strlen(path);
+    
+    for (i=0; i<32; i++)
+    {
+        if ( inode_table[i] != 0 )
+        {
+            tmp_inode = (struct inode_d *) inode_table[i];
+            if( (void*) tmp_inode != NULL)
+            {
+                //#todo validation
+                
+                //#bugbug: types = (const char *)
+                Status = strncmp( path, tmp_inode->path, PathSize );
+                if ( Status == 0 ){ return (int) i; }; //ok
+            }
+        } 
+    };
+    
+    return -1;
+}
+
 
 
 /*
@@ -300,11 +335,14 @@ fail:
  *  O retorno deve ser short, mesmo tipo do cluster.
  */
 
+// #bugbug
+// empty uninitialized.
+
 unsigned short fs_find_n_empty_entries ( int n ){
 
     int i = 0;
     int l = 0;
-    unsigned short empty;
+    unsigned short empty = 0;
 
 	// Limits.
     if ( n < 0 || n > 1024 ){ goto fail; }

@@ -754,36 +754,52 @@ done:
                         (int) message, 
                         (unsigned long) ch, 
                         (unsigned long) tmp_sc );
-                    debug_print ("KEYBOARD_SEND_MESSAGE: >>>> to system procedure\n");        
+                    debug_print ("KEYBOARD_SEND_MESSAGE: >>>> [MSG_SYSKEYUP] to system procedure\n");        
                     return 0;
+                    break;
+                
+                case VK_F1: 
+                case VK_F2: 
+                case VK_F3: 
+                case VK_F4:
+                case VK_F9: 
+                case VK_F10: 
+                case VK_F11: 
+                case VK_F12:
+                    kgws_send_to_controlthread_of_currentwindow ( w,
+                        (int) message, 
+                        (unsigned long) ch, 
+                        (unsigned long) tmp_sc );
+                    debug_print ("KEYBOARD_SEND_MESSAGE: >>>> [MSG_SYSKEYUP.function] to wwf\n");        
+                    return 0; 
                     break;
 
                 // kgws:
                 // Send a message to the thread associated with the
                 // window with focus.
-                // See: top/ws/kgws.c
+                // See: ws/kgws.c
                 default:
                     kgws_send_to_controlthread_of_currentwindow ( w,
                         (int) message, 
                         (unsigned long) ch, 
                         (unsigned long) tmp_sc );
-                    debug_print ("KEYBOARD_SEND_MESSAGE: >>>> to wwf\n");        
+                    debug_print ("KEYBOARD_SEND_MESSAGE: >>>> [MSG_SYSKEYUP.default] to wwf\n");        
                     return 0; 
                     break;
-            }
+            };
             break;
                 
         // Para todas as outras mensagens.
         // kgws:
         // Send a message to the thread associated with the
         // window with focus.
-        // See: top/ws/kgws.c
+        // See: ws/kgws.c
         default:
             kgws_send_to_controlthread_of_currentwindow ( w,
                 (int) message, 
                 (unsigned long) ch, 
                 (unsigned long) tmp_sc );
-            debug_print ("KEYBOARD_SEND_MESSAGE: >>>> to wwf\n");
+            debug_print ("KEYBOARD_SEND_MESSAGE: >>>> [default] to wwf\n");
             return 0;
             break;
     };
@@ -1760,9 +1776,9 @@ void *__do_35 ( unsigned long buffer ){
 /*
  *********************** 
  * __do_111: 
- *     Getting single message. No queue.
+ *     Getting single system message from the process queue.
  */
- 
+
 // Getting single message.
 // No queue.
 // See: thread structure.
@@ -1779,95 +1795,81 @@ void *__do_35 ( unsigned long buffer ){
 	// Se não houver mensagem na estrutura da thread, então tentaremos colocar alguma.
 	// Vamos colocar alguma coisa do buffer de teclado.
 
-void *__do_111 ( unsigned long buffer ){
+// #todo
+// Trocar por 'ubuf'
 
-    unsigned long *message_address = (unsigned long *) buffer;
-    
+void *__do_111 ( unsigned long buffer ){
 
     struct thread_d *t;
 
+    unsigned long *message_address = (unsigned long *) buffer;
+
+
     // Buffer
     // Se o buffer for inválido, não há o que fazer.
-   
-   // #deletar.
-   // refazemos isso logo abaixo.
-   if ( buffer == 0 ){
-       panic ("gde_serv-__do_111: buffer");
-   }
+    if ( buffer == 0 ){ 
+        panic ("__do_111: buffer"); 
+    }
 
 
-
-   // Se o buffer for inválido.
-   if ( &message_address[0] == 0 )
-   {
+   // Again. Se o buffer for inválido.
+   if ( &message_address[0] == 0 ){
        panic ("__do_111: buffer");
-   }else{
 
+   }else{
 
         t = (void *) threadList[current_thread];
 
         if ( (void *) t == NULL ){
             panic ("__do_111: Invalid thread calling \n");
-        }    
-        //{ return NULL; }
-            
+        }
+
         if ( t->used != 1 || t->magic != 1234 ){
             panic ("__do_111: Validation. Invalid thread calling \n");
-        }    
-        //{ return NULL; }
+        }
 
-
-		// Se não existe uma mensagem na thread, então vamos
-        // Vmaos voltar.
-
-        //if ( t->newmessageFlag != 1 ){
-            //return NULL;  
-        //}
-
-
-
-		//padrão
+        // Get system message.
         message_address[0] = (unsigned long) t->window_list[ t->head_pos ];
-        message_address[1] = (unsigned long)    t->msg_list[ t->head_pos ];
-        message_address[2] = (unsigned long)  t->long1_list[ t->head_pos ];
-        message_address[3] = (unsigned long)  t->long2_list[ t->head_pos ];
+        message_address[1] = (unsigned long) t->msg_list[ t->head_pos ];
+        message_address[2] = (unsigned long) t->long1_list[ t->head_pos ];
+        message_address[3] = (unsigned long) t->long2_list[ t->head_pos ];
+
+        // Extra. 
+        // Usado pelos servidores e drivers.
+        message_address[4] = (unsigned long) t->long3;
+        message_address[5] = (unsigned long) t->long4;
+        message_address[6] = (unsigned long) t->long5;
+        message_address[7] = (unsigned long) t->long6;
+        // ...
 
         // Clean
         t->window_list[ t->head_pos ] = NULL;
-        t->msg_list[ t->head_pos ] = 0;
-        t->long1_list[ t->head_pos ] = 0;
-        t->long2_list[ t->head_pos ] = 0;
+        t->msg_list[ t->head_pos ]    = 0;
+        t->long1_list[ t->head_pos ]  = 0;
+        t->long2_list[ t->head_pos ]  = 0;
+        //...
         
+
         // Circula
         t->head_pos++;
         if ( t->head_pos >= 31 )
             t->head_pos = 0;
 
- 
-		//padrão
-		//message_address[0] = (unsigned long) t->window;
-	    //message_address[1] = (unsigned long) t->msg;
-	    //message_address[2] = (unsigned long) t->long1;
-	    //message_address[3] = (unsigned long) t->long2;
 
-		//extra. Usado pelos servidores e drivers.
-		message_address[4] = (unsigned long) t->long3;
-		message_address[5] = (unsigned long) t->long4;
-		message_address[6] = (unsigned long) t->long5;
-		message_address[7] = (unsigned long) t->long6;
-		//...	
-                    
 		// sinalizamos que a mensagem foi consumida.
 		// #todo: 
 		// nesse momento a estrutura da thread também precisa ser limpa.
         //t->newmessageFlag = 0; 
    
-		//sinaliza que há mensagem
+        //Sinaliza que há mensagem
         return (void *) 1; 
     };
 
+    // No message.
     return NULL;
-}              
+} 
+
+
 
 
 

@@ -155,13 +155,13 @@ void write_lba ( unsigned long address, unsigned long lba ){
     switch (g_currentvolume_fatbits)
     {
         case 32:
-			printf ("write_lba: FAT32 not supported\n");
-			goto fail;
+            printf ("write_lba: FAT32 not supported\n");
+            goto fail;
             break;
 
+        //See: hdd.c
         case 16:
-           // hdd.c
-            my_write_hd_sector ( address, lba, 0, 0 );
+            my_write_hd_sector ( address, lba, 0, 0 ); 
             return;
             break;
 
@@ -179,7 +179,7 @@ void write_lba ( unsigned long address, unsigned long lba ){
     // Nothing.
 
 fail:
-    refresh_screen ();
+    refresh_screen();
     return;
 }
 
@@ -231,7 +231,10 @@ fsSaveFile (
 	// Buffer para a entrada de diretório.
     char Entry[32];
 
-
+    //Entry size in words.
+    int EntrySize = 0;
+    int Offset = 0;
+    int FreeIndex = -1;
 
 	// #bugbug: 
 	// Não vale esse determinismo. 
@@ -424,15 +427,15 @@ save_file:
 	
 	// First cluster. Low word.
 	// 0x1A and 0x1B
-	Entry[26] = (char) (first);        
-	Entry[27] = (char) (first >> 8);    
-	
+	Entry[26] = (char) (first); 
+	Entry[27] = (char) (first >> 8); 
+
 	// File size in bytes.
 	// (size_in_bytes)
 	// 4 bytes: (28,29,30,31)
 	
 	Entry[28] = (char) size_in_bytes;   
-	
+
 	size_in_bytes = (size_in_bytes >> 8);
 	Entry[29] = (char) size_in_bytes;
 	
@@ -457,34 +460,34 @@ save_file:
 
 	// IN: 
 	// Endereço do diretótio e número máximo de entradas.
-	// #todo: talvez possamos ampliar esse número para o máximo 
+	// #todo: 
+	// Talvez possamos ampliar esse número para o máximo 
 	// de entradas no diretório.
+	// #bugbug: A quantidade de entrada depende to diretório.
+	// See: search.c
 
-    int xxxx_entryindex = (int) findEmptyDirectoryEntry ( VOLUME1_ROOTDIR_ADDRESS, 128 );
-
-    if ( xxxx_entryindex == -1 ){
-        printf ("No empty entry\n");
+    //FreeIndex = (int) findEmptyDirectoryEntry( VOLUME1_ROOTDIR_ADDRESS, 128 );
+    FreeIndex = (int) findEmptyDirectoryEntry( VOLUME1_ROOTDIR_ADDRESS, FAT16_ROOT_ENTRIES );
+    
+    if ( FreeIndex == -1 ){
+        printf ("fsSaveFile: No empty entry\n");
         goto fail;
     }
 
 
-    int xxxx_entrysize = 16;
-
-
-	// xxxx =  Deslocamento dentro do diretório.
-	// representa o início da entrada que encontramos.
-	// Encontramos multiplicando o índice da entrada pelo tamanho da entrada.
-
-
-    int xxxx = (int) ( xxxx_entryindex * xxxx_entrysize );
-
-    //
+    // 32/2 = 16 words.
+    // Offset:
+    // Deslocamento dentro do diretório.
+    // representa o início da entrada que encontramos.
+    // Encontramos multiplicando o índice da entrada pelo 
+    // tamanho da entrada.
     // Copy entry into the root in the memory.
-    //
+    // Copia 32 bytes.
+ 
+    EntrySize = (FAT16_ENTRY_SIZE/2);
+    Offset = (int) ( FreeIndex * EntrySize );
 
-	//Copia 32 bytes.
-    memcpy ( &root[xxxx], Entry, 32 );
-
+    memcpy ( &root[Offset], Entry, 32 );
 
 // reset
 // Reiniciamos o controlador antes de usarmos.
@@ -557,17 +560,11 @@ save_file:
         //próximo valor da lista
         i++;
 
-
-        //
         // #bugbug
-        //
-
-        // #bugbug
-        // #test
-        // limite  
-        // limitando o tamanho do arquivo a 16 entradas.
+        // Limitando o tamanho do arquivo a 16 entradas.
 
         if (i > 16){
+            debug_print ("fsSaveFile: [FIXME] debug limits\n");
             goto fail;
         }
 
@@ -587,17 +584,16 @@ fail:
    //
 
     //Nesse momento já salvamos os clusters do arquivo.
+    // #test
+    // Saving rood dir and FAT.
+    // OK. Funcionou no qemu.
+
     
 done:
 
     // #debug
     debug_print ("fsSaveFile: clusters saved\n");
-    
-    
-    // #test
-    // Saving rood dir and FAT.
-    // OK. Funcionou no qemu.
-    
+
     fs_save_rootdir();
     
     
