@@ -22,15 +22,20 @@ static int __has_e1_prefix = 0;
 //...
 
 
-
 void abnt2_keyboard_handler (void);
-
 
 //Kernel Base driver.
 void KiKeyboard (void);    
 
-
 unsigned long get_scancode (void);
+
+
+unsigned long 
+__local_ps2kbd_procedure ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 ); 
 
 
 #endif   

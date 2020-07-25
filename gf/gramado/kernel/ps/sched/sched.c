@@ -64,11 +64,11 @@
 
 struct thread_d *pick_next_thread (void){
 
-    int i;      //id da fila selecionada
-    int old;    //salva id da current thread
-
     struct thread_d *t;
     struct thread_d *next;
+
+    int i=0;      //id da fila selecionada
+    int old=0;    //salva id da current thread
 
 
 	//salva antiga thread
@@ -77,13 +77,11 @@ struct thread_d *pick_next_thread (void){
 	
 	//se temos um ponteiro para fila de drivers.
     if ( QUEUES[0] != 0 ){
-
         i = 0;
 
 	//se temos um ponteiro para a fila de servidores.
 
     } else if ( QUEUES[1] != 0 ){
-
         i = 1;
 
 	//nos resta a fila de apps de usuário.
@@ -132,11 +130,9 @@ struct thread_d *pick_next_thread (void){
 	// Checando a thread selecionada.
 	//
 
-    if ( ( void *) t == NULL )
-    {
-	    //fail
+    if ( ( void *) t == NULL ){
 		next_thread = old;
-		
+
     }else{
 
         // #bugbug
@@ -175,7 +171,6 @@ prepare_next:
         die ();
 
     }else{
-	
 
         if ( next->used != 1 || next->magic != 1234 )
         {
@@ -189,8 +184,7 @@ prepare_next:
             die ();
         }
 
-        if ( next->state == READY )
-        {
+        if ( next->state == READY ){
             return (struct thread_d *) next;
         }
     };
@@ -229,11 +223,19 @@ prepare_next:
  
 // #todo
 // Podemos contar os rounds.
+// Obs: 
+// ## IMPORTANTE  ##
+// A thread idle somente é usada quando o sistema 
+// estiver ocioso ou quando ela for a única thread.
+// E é importante que a thread idle seja usada, pois 
+// ela tem as instruções sti/hlt que atenua a utilização 
+// da CPU, reduzindo o consumo de energia.
+
 
 int scheduler (void){
 
-    struct thread_d *Thread;
-    int Index=0;
+    struct thread_d *TmpThread;
+    int i=0;
 
 
 #ifdef SERIAL_DEBUG_VERBOSE
@@ -241,156 +243,43 @@ int scheduler (void){
 #endif
 
 
-	//#debug
-	//printf ("scheduler: Running Threads %d \n", ProcessorBlock.threads_counter );
-	//refresh_screen();
-	
-	// spiritual quote:
-	// "Constrói um caminho de vagões para o condutor andar".
+    // tmpConductor and it's next. 
+    tmpConductor       = (void *) rootConductor;
+    tmpConductor->Next = (void *) ____IDLE;
 
-	//Usado para task switch.
-	//Conductor = (void *) rootConductor;
-	//Inicia a lista.
- 	//Conductor2 = (void *) rootConductor;
-	//Next thread.
-	//Conductor2->Next = (void *) threadList[next_thread];  
-	
-	
-	//#importante 
-	//rootConductor é um ponteiro válido,
-	//mas a estrutura não foi inicializada.
-	
-	//Inicia a lista.
-	//marca o início, mas não usa esse ponteiro.
-  
-  //#debug
-  //printf ("scheduler: 1\n");
+    // The global conductor.
+    Conductor = (void *) tmpConductor->Next;
 
-    Conductor2 = (void *) rootConductor;
-
-	
-	//
-	// ## preparando 'next_thread' ##
-	//
-	
-	//Não sabemos quem está em next_thread.
-	//Checaremos a possibilidade de não termos filas configuradas.
-	//nesse caso a idle thread será a primeira trhead do round
-	//não havendo outra, pelo menos ela vai rodar.
-	
-  //#debug
-  //printf ("scheduler: 2\n");
-	
-  // #debug
-  // supendendo essa rotina que falhou em gigabyte/intel
-	// Vamos substituir a thread que a função retorna pela current_thread
-  // que esperamos que seja válida. Talvez isso resolva o problema por enquanto.
-  // Mas trabalharemos nessa função depois.
-  
-  //pick_next_thread ();
-	
-  // HACK HACK
-  //next_thread = current_thread;
-	
-	//
-	//  ## PRIMEIRO PONTEIRO VÁLIDO ##
-	//
-  
-   //#debug
- // printf ("scheduler: 3\n"); 
-	
-	
-	//Next thread.
-    //Conductor2->Next = (void *) threadList[next_thread];
-    Conductor2->Next = (void *) ____IDLE;
-    
-    
-    
-    
-	//
-	//  ## MARCADOR GLOBAL ##
-	//
-	
-  //#debug
- // printf ("scheduler: 4\n");
-  
-	//TID=0
-	//vamos começar a lista dessa aqui.
-    Conductor = (void *) Conductor2->Next;
-
-	
-	// Obs: 
-	// ## IMPORTANTE  ##
-	// Os primeiros tipos a se pegar são os de 
-	// prioridade maior.
-	// @todo: Elevar a prioridade da threads interativas,
-	// como teclado e mouse, e não elevar das threads de 
-	// i/o de disco.
-	// Elevar a prioridade da thread associada a janela 
-	// com o foco de entada.
-
-	// Obs: 
-	// ## IMPORTANTE  ##	
-	// A thread idle somente é usada quando o sistema 
-	// estiver ocioso ou quando ela for a única thread.
-	// E é importante que a thread idle seja usada, pois 
-	// ela tem as instruções sti/hlt que atenua a utilização 
-	// da CPU, reduzindo o consumo de energia.
-
-	// Agora, antes de tudo, devemos pegar as threads 
-	// nas listas onde estão as threads de maior prioridade.
-
-	//Encontra o id da thread de maior prioridade entre as 
-	// threads que estão no estado READY.
-	//KiFindHigherPriority();
-
-	// ## Importante  ##
-	// Daqui pra baixo pegaremos na lista threadList[] 
-	// onde estão todas as threads.
-
-    //@todo pegar primeiro por prioridade.
-	
-  //#debug
- // printf ("scheduler: 5\n");
-
-
-	//READY.
-    for ( Index=0; Index < THREAD_COUNT_MAX; Index++ )
+    // READY threads in the threadList[].
+    for ( i=0; i < THREAD_COUNT_MAX; i++ )
     {
-        Thread = (void *) threadList[Index];
+        TmpThread = (void *) threadList[i];
 
-        if ( (void *) Thread != NULL )
+        if ( (void *) TmpThread != NULL )
         {
-            if ( Thread->used == 1 && 
-                 Thread->magic == 1234 && 
-                 Thread->state == READY )
+            if ( TmpThread->used == 1 && 
+                 TmpThread->magic == 1234 && 
+                 TmpThread->state == READY )
             {
-                Conductor2 = (void *) Conductor2->Next; 
-                Conductor2->Next = (void *) Thread;
-            };
-            // Nothing.
-        };
-        // Nothing.
+                // The tmpConductor and it's next.
+                tmpConductor       = (void *) tmpConductor->Next; 
+                tmpConductor->Next = (void *) TmpThread;
+            }
+        }
     };
 
+    // #todo
+    // Let's try some other lists.
 
-	//
-	// Continua pegando os tipos diferente.
-	//
-
-    //#debug
-    // printf ("scheduler: 6\n");
-
-	//finaliza a lista
-    Conductor2 = (void *) Conductor2->Next; 
-    Conductor2->Next = NULL;
+    // Finalizing the list.
+    // The tmpConductor and it's next.
+    tmpConductor       = (void *) tmpConductor->Next; 
+    tmpConductor->Next = NULL;
 
 
-    return (int) Conductor2->tid;
-
-    // #option:
-    //Conductor2->Next = (void *) rootConductor; //circular infinita. 
-    //return (int) rootConductor->tid; //começando do início da lista.
+    return (int) rootConductor->tid;
+    //return (int) tmpConductor->tid;
+    //return (int) Conductor->tid;
 }
 
 

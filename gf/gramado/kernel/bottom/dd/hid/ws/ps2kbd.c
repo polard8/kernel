@@ -164,14 +164,6 @@ int BAT_TEST (void);
 
 
 
-unsigned long 
-__local_ps2kbd_procedure ( 
-    struct window_d *window, 
-    int msg, 
-    unsigned long long1, 
-    unsigned long long2 ); 
-
-
 // Local procedure.
 unsigned long 
 __local_ps2kbd_procedure ( 
@@ -276,21 +268,22 @@ __local_ps2kbd_procedure (
 
 int KEYBOARD_SEND_MESSAGE ( unsigned char SC ){
 
-    struct process_d *__p;
-    struct thread_d *t;
-    struct window_d *w;
+    struct process_d  *__p;
+    struct thread_d   *t;
+    struct window_d   *w;
 
 
     // Step 0 
     // Declarações de variáveis.
 
     //Variáveis para tecla digitada.
-    unsigned char scancode;
-    unsigned char key;         //Tecla (uma parte do scancode).  
+    unsigned char scancode=0;
+    unsigned char key=0;         //Tecla (uma parte do scancode).  
 
-    int message;             //arg2.
-    unsigned long ch;        //arg3 - (O caractere convertido para ascii).
-    unsigned long status;    //arg4.  
+    //int fakewin;           //arg1
+    int message=0;             //arg2.
+    unsigned long ch=0;        //arg3 - (O caractere convertido para ascii).
+    unsigned long status=0;    //arg4.  
     
     int msg_status = -1;
     
@@ -592,6 +585,13 @@ done:
         // reboot ();
     }
 
+    // #test
+    // control + f1.
+    // if ( (ctrl_status == 1) && (ch == VK_F1)
+    // {
+        //Call the kernel's console.
+    // }
+
 
 	// Nesse momento temos duas opções:
 	// Devemos saber se a janela com o foco de entrada é um terminal ou não ...
@@ -600,15 +600,15 @@ done:
 	// que é o procedimento de janela do sistema.
 	// *IMPORTANTE: ENQUANTO O PROCEDIMENTO DE JANELA DO SISTEMA TIVER ATIVO,
 	// MUITOS COMANDOS NÃO VÃO FUNCIONAR ATE QUE SAIAMOS DO MODO TERMINAL.
-	
+
 	// *importante:
 	// Passamos a mensagem de teclado para o procedimento de janela do sistema.
 	// que deverá passar chamar o procedimento de janela da janela com o focod eentrada.
-		
+
 	// *importante:
 	// Quem é o 'first responder' para evento de teclado.
 	// A janela com o foco de entrada é o first responder para 
-	// eventos de teclado, mas não para todo tipo de envento.		
+	// eventos de teclado, mas não para todo tipo de envento.
 
 	
 	// ## window ##
@@ -652,47 +652,42 @@ done:
 
 
 
-        // #importante
-        // Sobre o terminal virtual e o input nos seus processos filhos.
-        
-        // A libc não vai pegar digitações de teclado ... 
-        // mas as mensagens de teclado serão enviadas para a fila 
-        // de mensagens da thread associada com a janela que 
-        // tem o foco de entrada.
-        
-        // Quando a janela com o foco de entrada for a janela do 
-        // terminal, então as mensagens de janelas vão para a 
-        // fila de mensagens do processo terminal virtual .... 
-        // o terminal coloca essas digitações em um arquivo, 
-        // esse mesmo arquivo foi herdado pelo processo filho ... 
-        // o processo filho vai chamar esse arquivo de stdin
+    // #importante
+    // Sobre o terminal virtual e o input nos seus processos filhos.
+    // A libc não vai pegar digitações de teclado ... 
+    // mas as mensagens de teclado serão enviadas para a fila 
+    // de mensagens da thread associada com a janela que 
+    // tem o foco de entrada.
+    // Quando a janela com o foco de entrada for a janela do 
+    // terminal, então as mensagens de janelas vão para a 
+    // fila de mensagens do processo terminal virtual .... 
+    // o terminal coloca essas digitações em um arquivo, 
+    // esse mesmo arquivo foi herdado pelo processo filho ... 
+    // o processo filho vai chamar esse arquivo de stdin
+    // Por fim a libc deve ler no arquivo stdin herdado do 
+    // terminal virtual ... arquivo na qual o terminal está 
+    // colocando as digitações de teclado.
+    // Então se a janela do terminal virtual não tiver o foco 
+    // de entrada, então o terminal virtual não receberá as 
+    // digitações de teclado e não terá o que enviar para o 
+    // processo filho via arquivo herdado.
+    // Ainda é preciso abordar questões como par de ttys, 
+    // que é uma pty ... e pts que é o sistema de arquivos 
+    // pra multiplexar master ... e ptmx que é o multiplexador 
+    // de master. ... em pts ficarão os terminais virtuais 
+    // multiplexados por ptmx. pts/0 pts/1 ...
 
-        // Por fim a libc deve ler no arquivo stdin herdado do 
-        // terminal virtual ... arquivo na qual o terminal está 
-        // colocando as digitações de teclado.
 
-        // Então se a janela do terminal virtual não tiver o foco 
-        // de entrada, então o terminal virtual não receberá as 
-        // digitações de teclado e não terá o que enviar para o 
-        // processo filho via arquivo herdado.
+    //
+    // Message.
+    //
 
-        // Ainda é preciso abordar questões como par de ttys, 
-        // que é uma pty ... e pts que é o sistema de arquivos 
-        // pra multiplexar master ... e ptmx que é o multiplexador 
-        // de master. ... em pts ficarão os terminais virtuais 
-        // multiplexados por ptmx. pts/0 pts/1 ...
-        
-        
-        
-        //
-        // Message.
-        //
-
-		// #importante:
-		// A janela com o foco de entrada deve receber input de teclado.
-		// Então a mensagem vai para a thread associada com a janela que tem 
-		// o foco de entrada.
-		// Como o scancode é um char, precisamos converte-lo em unsigned long.
+    // #importante:
+    // A janela com o foco de entrada deve receber input de teclado.
+    // Então a mensagem vai para a thread associada com a janela 
+    // que tem o foco de entrada.
+    // Como o scancode é um char, precisamos converte-lo 
+    // em unsigned long.
 
 
     //
@@ -709,7 +704,7 @@ done:
     // se não der certo então enviaremos para
     // a thread de controle da janela com o foco
     // ou para um procedimento aqui nesse documento.
-    // See: middle/sysmk//ps/ipc/ipc.c
+    // See: ps/ipc/ipc.c
 
     msg_status = (int) ipc_send_to_ws ( (struct window_d *) w,
                            (int) message, 
@@ -723,7 +718,7 @@ done:
         return 0;
     }
  
-        
+
     // #importante
     // Só chegaremos até aqui se o ws não está rodando.
            

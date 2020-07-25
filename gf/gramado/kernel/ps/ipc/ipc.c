@@ -93,6 +93,36 @@ ipc_send_to_ws (
 
     // used ? magic ?
     
+  
+    switch (msg)
+    {
+        case MSG_SYSKEYUP:
+            
+            switch (long1){
+                
+                // #debug
+                // Nesse caso não mandaremos para o ws.
+                // Handle the message.
+                case VK_F5: 
+                case VK_F6: 
+                case VK_F7: 
+                case VK_F8:
+                    debug_print ("ipc_send_to_ws: >>>> [MSG_SYSKEYUP] to system procedure\n");  
+                    __local_ps2kbd_procedure ( window, 
+                        (int) msg, 
+                        (unsigned long) long1, 
+                        (unsigned long) long2 );  
+                    return 0;
+                    break;
+            };
+            break;
+    };
+    
+    
+    //
+    // Send
+    //
+    
     __p->control->window_list[ __p->control->tail_pos ] = window;
     __p->control->msg_list[ __p->control->tail_pos ]    = msg;
     __p->control->long1_list[ __p->control->tail_pos ]  = long1;

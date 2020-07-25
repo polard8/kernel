@@ -18,18 +18,19 @@
 
 //O primeiro índice na contagem das threads do sistema e o
 //primeiro índice na contagem das threads dos usuários.
-#define SYSTEM_BASE_TID 0  
-#define USER_BASE_TID 100  
+#define SYSTEM_BASE_TID  0  
+#define USER_BASE_TID    100  
+
 
 //
 // Preempt support.
 //
 
 //?? Se pode ou não entrar em preempção. 
-#define  PREEMPTABLE 1    //PODE ENTRAR
-#define  UNPREEMPTABLE 0  //NAO PODE ENTRAR EM PREEMPÇÃO
+#define PREEMPTABLE    1    //PODE ENTRAR
+#define UNPREEMPTABLE  0    //NAO PODE ENTRAR EM PREEMPÇÃO
 
-  
+
 // Identificadores de thread.
 #define IDLE_ID        0 
 #define IDLE           IDLE_ID 
@@ -47,9 +48,9 @@
 /*
  * Estruturas para threads.
  */
- 
- 
- 	//#importante
+
+
+	//#importante
 	//razões para esperar
 	//#todo: isso precisa ser inicializado.
 	//@todo: tem que fazer um enum para enumerar as razões.
@@ -677,10 +678,17 @@ struct thread_d *ClonedThread;
  * Listas encadeadas de threads.
  * Usadas no gerenciamento de rounds 
  */
+
+// The fixed conductor to mark the start.
 struct thread_d *Conductor;
-struct thread_d *Conductor2;
+// The flexible conductor to create the list.
+struct thread_d *tmpConductor;  //Conductor2;
+// The created root conductor.
 struct thread_d *rootConductor;
+
 int conductorIndex;
+
+
 
 
 

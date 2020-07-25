@@ -77,7 +77,6 @@ int dispatch_Default (void);
 
 void dispatcher ( int type ){
 
-    int Status;
     struct thread_d *dispatch_Pointer;
 
 
@@ -86,7 +85,6 @@ void dispatcher ( int type ){
 	// (Fase de teste). 
 	// Usando apenas um tipo de dispatcher. 
 	// Deteminando o tipo de dispacher por enquanto
-
 
     if ( type != DISPATCHER_CURRENT )
     {
@@ -237,19 +235,14 @@ do_dispatch:
 
     dispatch_Pointer = (void *) threadList[current_thread];
 
-    if ( (void *) dispatch_Pointer == NULL )
-    {
-        printf ("dispatch-dispatcher: struct\n");
-        die ();
+    if ( (void *) dispatch_Pointer == NULL ){
+        panic ("dispatch-dispatcher: struct\n");
     }
-
 
 	// Checa o 'state'.
 
-    if ( dispatch_Pointer->state != READY )
-    {
-        printf ("dispatch-dispatcher: State ERROR\n");
-        die ();
+    if ( dispatch_Pointer->state != READY ){
+        panic ("dispatch-dispatcher: State ERROR\n");
     }
 
 
@@ -285,8 +278,7 @@ do_dispatch:
 	// nas variáveis usadas pelo assembly para configurar os registradores 
 	// antes do iretd.
 
-    restore_current_context ();
-
+    restore_current_context();
 
 // #todo
 // Change the return type and return with error
@@ -911,7 +903,7 @@ fail:
  
 int init_dispatcher (void){
 
-    int i;
+    int i=0;
 
 	//
 	// Para um dispatcher na forma de array.
@@ -928,13 +920,11 @@ int init_dispatcher (void){
 
 	//inicializa a fila do dispacher.
 
-    for ( i=0; i <= PRIORITY_MAX; i++ )
-    {
+    for ( i=0; i <= PRIORITY_MAX; i++ ){
         dispatcherReadyList[i] = (unsigned long) 0;
     };
 
-
-	//Idle.
+	//Init
 	dispatcherReadyList[0] = (unsigned long) InitThread;
 
 
@@ -948,31 +938,35 @@ int init_dispatcher (void){
 	//
 
 //dispatcher_linked_list:
-	
-	// Inicializa o indice de condutores.
+
+    //
+    // == Conductor =============================
+    //
+    
+    // Inicializa o indice de condutores.
     conductorIndex = 0;
-	
-	//inicializa a lista
-	//Conductor = (void*) IdleThread;
-		
-    rootConductor = (void *) kmalloc ( sizeof(struct thread_d) );
-	
-    if ( (void *) rootConductor == NULL )
-    {
+
+    rootConductor = (void *) kmalloc( sizeof(struct thread_d) );
+
+    if ( (void *) rootConductor == NULL ){
         panic ("init_dispatcher: rootConductor");
     }
 
-	// Usado para task switch.
-    Conductor = (void *) rootConductor;
-
 	// #bugbug 
 	// Deveríamos iniciar com a idle thread e não com a thread 0.
+	// Inicia a lista.
+	// Usado para task switch.
 
-	//Inicia a lista.
+    //#test
+    rootConductor = (void *) InitThread;
 
-    Conductor2 = (void *) rootConductor;
-    Conductor2->Next = (void *) threadList[0]; 
+    Conductor = (void *) rootConductor;
+    
+    tmpConductor       = (void *) rootConductor;
+    tmpConductor->Next = (void *) threadList[0]; 
 
+    // #bugbug
+    // Check the threads validation.
 
     return 0;
 }

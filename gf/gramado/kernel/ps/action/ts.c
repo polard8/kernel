@@ -22,17 +22,6 @@
 //
   
 int lock_taskswitch;  
-//int __taskswitch_lock;
-//...
-
-
-  
-//  
-// Internal.  
-//
-
-void taskswitchRR (void);
-//...
 
 
 
@@ -83,7 +72,7 @@ void taskswitchFlushTLB(){
 */ 
  
 void KiTaskSwitch (void){
-	
+
 	//Limits.
 
 
@@ -135,16 +124,13 @@ void KiTaskSwitch (void){
  
 void task_switch (void){
 
-    int New;
-    int Max;
-
-    struct process_d *P;
-    struct thread_d *Current;
-
+    struct process_d  *P;
+    struct thread_d   *Current;
+    int New=0;
+    int Max=0;
 
 
     Max = PRIORITY_MAX;
-
 
 	// Current thread. 
 
@@ -168,15 +154,16 @@ void task_switch (void){
         panic ("ts-task_switch: P");
     }
 
+
     if ( (void *) P != NULL )
     {
-		if ( P->used == 1 && P->magic == 1234 )
-		{	
-			current_process = (int) P->pid;
-		}else{
+        if ( P->used == 1 && P->magic == 1234 ){
+            current_process = (int) P->pid;
+
+        }else{
 		    //??
 			//? fail ??
-		};
+        };
 		//...
     }
 
@@ -197,37 +184,35 @@ void task_switch (void){
 	// step: Quantas vezes ela já rodou no total.
 	// runningCount: Quanto tempo ela está rodando antes de parar.
 
-	Current->step++; 
-	Current->runningCount++;
-	
+    Current->step++; 
+    Current->runningCount++;
 
 	// #bugbug
 	// Rever essa contagem
 	
 	//quanto tempo em ms ele rodou no total.
-	Current->total_time_ms = (unsigned long) Current->total_time_ms + (1000/sys_time_hz);	
+    Current->total_time_ms = (unsigned long) Current->total_time_ms + (1000/sys_time_hz);	
 	
 	//incrementa a quantidade de ms que ela está rodando antes de parar.
 	//isso precisa ser zerado quando ela reiniciar no próximo round.
-	Current->runningCount_ms = (unsigned long) Current->runningCount_ms + (1000/sys_time_hz);	
+    Current->runningCount_ms = (unsigned long) Current->runningCount_ms + (1000/sys_time_hz);	
+
 
 
 	//
-	// ======== ## locked ## ========
+	// == locked ===============================
 	//
-	
-	// Taskswitch locked ?, Return without saving.
-	
-	if ( task_switch_status == LOCKED )
-	{    		
-		IncrementDispatcherCount (SELECT_CURRENT_COUNT);
-		return; 
-		
-	}; //FI LOCKED
 
-	
+    // Taskswitch locked ?, Return without saving.
+    if ( task_switch_status == LOCKED ){
+        IncrementDispatcherCount (SELECT_CURRENT_COUNT);
+        return; 
+    }  //FI LOCKED
+
+
+
 	//
-	// ======== ## unlocked ## ========
+	// == unlocked ==============================
 	//
 
     // Nesse momento a thread atual sofre preempção por tempo
@@ -238,9 +223,9 @@ void task_switch (void){
 		//
 		// ## SAVE CONTEXT ##
 		//
-		
-		save_current_context ();
-		Current->saved = 1;
+
+        save_current_context();
+        Current->saved = 1;
 
 		// #obs:
 		// A preempção acontecerá por dois possíveis motivos.
@@ -251,11 +236,11 @@ void task_switch (void){
 		// #importante:
 		// Se a thread ainda não esgotou seu quantum, 
 		// então ela continua usando o processador.
-		
-		if ( Current->runningCount < Current->quantum )
-		{
 
-            // yield support.
+        if ( Current->runningCount < Current->quantum )
+        {
+            // Yield support.
+            // Coloca no estado de pronto e limpa a flag.
             if ( Current->state == RUNNING && Current->_yield == 1 )
             {
                 Current->state = READY;
@@ -263,25 +248,25 @@ void task_switch (void){
                 goto try_next;
             }
 
-			IncrementDispatcherCount (SELECT_CURRENT_COUNT);
-			return; 
-		
+            IncrementDispatcherCount (SELECT_CURRENT_COUNT);
+            return; 
+
 		// #importante
 		// Nesse momento a thread [esgotou] seu quantum, 
 		// então sofrerá preempção e outra thread será colocada 
 		// para rodar de acordo com a ordem estabelecida 
 		// pelo escalonador.
 
-		}else{
-			
+        }else{
+
 			//
 			// ======== ## PREEMPT ## ========
 			//
 
 			// * MOVEMENT 3 (Running --> Ready).
-			
-			if ( Current->state == RUNNING )
-			{
+
+            if ( Current->state == RUNNING )
+            {
 				// Preempt.
 				// MOVEMENT 3 (running >> ready)  
 				
@@ -290,26 +275,25 @@ void task_switch (void){
 				// ->preempted permitisse. 
 				// talvez o certo seja ->preenptable.
 
-				Current->state = READY;    
+                Current->state = READY;    
 
-				if ( Current->preempted == PREEMPTABLE )
-				{
-					//debug_print (" preempt_q1 ");
-					queue_insert_head ( queue, (unsigned long) Current, 
-						QUEUE_READY );	
-				};
+                // Se pode sofrer preenpção vai para fila de prontos.
+                if ( Current->preempted == PREEMPTABLE )
+                {
+                    //debug_print (" preempt_q1 ");
+                    queue_insert_head ( queue, (unsigned long) Current, 
+                        QUEUE_READY );
+                }
 
-				if ( Current->preempted == UNPREEMPTABLE )
-				{
-					//debug_print (" preempt_q2 ");
-					queue_insert_data ( queue, (unsigned long) Current, 
-						QUEUE_READY );	
-				};
-			};
+                if ( Current->preempted == UNPREEMPTABLE )
+                {
+                    //debug_print (" preempt_q2 ");
+                    queue_insert_data ( queue, (unsigned long) Current, 
+                        QUEUE_READY );
+                }
+            }
 
             //debug_print (" ok ");
-
-
 
 
 			//
@@ -324,7 +308,7 @@ void task_switch (void){
 
             if (extra == 1)
             {
-                KiRequest ();
+                KiRequest();
 
 				// #todo: 
 				// Talvez possamos incluir mais atividades extras.
@@ -337,54 +321,52 @@ void task_switch (void){
 			// Dead thread collector
 			// Avalia se é necessário acordar a thread do dead thread collector.
 			// É uma thread em ring 0.
-			
 			// Só chamamos se ele ja estiver inicializado e rodando.
-            if (dead_thread_collector_status == 1)
-            {
-                check_for_dead_thread_collector ();
+            
+            if (dead_thread_collector_status == 1){
+                check_for_dead_thread_collector();
             }
 
-			
+
 			//
-			// ======== ## Spawn ? ## =========
+			// === Spawn ? =======================================
 			//
-			
+
 			// #importante:
-			// Checar se uma thread está em standby, esperando pra rodar pela 
-			// primeira vez. Nesse caso essa função não retornará.
-
-
+			// Checar se uma thread está em standby, esperando pra 
+			// rodar pela primeira vez. Nesse caso essa 
+			// função não retornará.
             // ts/sched/schedi.c
-            check_for_standby (); 
 
+            check_for_standby(); 
             goto try_next;
         };
-    }; //FI UNLOCKED
+    }  //FI UNLOCKED
 
 
     //
-    // ==== Crazy Fail ====
+    // == Crazy Fail ============================================
     //
-	
+
 	// #bugbug
 	// Não deveríamos estar aqui.
 	// Podemos abortar ou selecionar a próxima provisóriamente.
-	
+
 	//panic ("ts.c: crazy fail");
-	
-	goto dispatch_current; 
-	
-	
-	
-	
+
+    goto dispatch_current; 
+
+
+
+
 	//
-	// ======== ##  NEXT ## ========
+	// == NEXT ================================================
 	//
 
 try_next: 
 
 
-#ifdef SERIAL_DEBUG_VERBOSE	
+#ifdef SERIAL_DEBUG_VERBOSE
 	debug_print(" N ");
 #endif
 
@@ -393,16 +375,15 @@ try_next:
 	// Se tivermos apenas uma thread rodando.
 
 	//if (ProcessorBlock.threads_counter == 1)
-	if (UPProcessorBlock.threads_counter == 1)
-	{		
+    if (UPProcessorBlock.threads_counter == 1)
+    {
 		//debug_print(" JUSTONE ");
 		
 		// #bugbug: queremos ____IDLE;
 		//Conductor = InitThread;
         Conductor = ____IDLE;
-         
-		goto go_ahead;
-	}
+        goto go_ahead;
+    }
 
 
     //
@@ -432,9 +413,8 @@ try_next:
 #endif
 
 		//printf ("ts: scheduler 1\n");
-		KiScheduler ();
-		
-		goto go_ahead;
+        KiScheduler();
+        goto go_ahead;
     }
 
 
@@ -444,35 +424,28 @@ try_next:
 	// a próxima da lista.
 	// #BUGBUG: ISSO PODE SER UM >>> ELSE <<< DO IF ACIMA.
 
-	
     if ( (void *) Conductor->Next != NULL )
     {
-		Conductor = (void *) Conductor->Next;
-		
-		goto go_ahead;
+        Conductor = (void *) Conductor->Next;
+        goto go_ahead;
     }
 
-
-    //
-    // # bugbug
-    //
-
+    // #bugbug
     panic ("ts-task_switch: Unspected");
 
+
 	//
-	//    ======== # Go ahead ## ========
+	// == Go ahead ========================================
 	//
-	
+
 	// #importante:
 	// Nesse momento já temos uma thread selecionada,
 	// vamos checar a validade e executar ela.
-	
 	// #importante:
 	// Caso a thread selecionada não seja válida, temos duas opções,
 	// ou chamamos o escalonador, ou saltamos para o início dessa rotina
 	// para tentarmos outros critérios.
-	
-	
+
 go_ahead:
 
 	//###########################################//
@@ -485,11 +458,10 @@ go_ahead:
 
     if( (void *) Current == NULL ){ 
         debug_print ("task_switch: Struct \n");
-        KiScheduler ();
+        KiScheduler();
         goto try_next;
 
     }else{
-
 
         if ( Current->used != 1 || Current->magic != 1234 ){
             debug_print ("task_switch: val \n");
@@ -497,32 +469,29 @@ go_ahead:
             goto try_next;
         }
 
-
         if ( Current->state != READY ){
             debug_print ("task_switch: state \n");
             KiScheduler ();
             goto try_next;
         }
 
-
-		//
-		//  Dispatcher
-		//
+        //
+        // == Dispatcher =================================
+        //
 
         // Current selected.
         current_thread = (int) Current->tid;
-
         goto dispatch_current;
     }
 
+
 	//
-	// # fail #
+	// fail
 	//
-	
- 	
+
+
 //superCrazyFail:
-	
-	goto dispatch_current; 
+    goto dispatch_current; 
 
 
 
@@ -532,14 +501,14 @@ go_ahead:
 	// ======================================
 
 dispatch_current:
-	
-	
+
+
 #ifdef SERIAL_DEBUG_VERBOSE	
     debug_print (" DISPATCH_CURRENT \n");
 #endif
 
 
-	// Validation.
+    // Validation.
 
     Current = (void *) threadList[current_thread];
 
@@ -573,15 +542,16 @@ dispatch_current:
 	// * MOVEMENT 4 (Ready --> Running).
 	//
 
-    dispatcher (DISPATCHER_CURRENT); 
+    dispatcher(DISPATCHER_CURRENT); 
 
 	//
 	//  #### DONE ####
 	//
 
-done:
+//done:
 
-    if ( Current->ownerPID < 0 || Current->ownerPID >= THREAD_COUNT_MAX )
+    if ( Current->ownerPID < 0 || 
+         Current->ownerPID >= THREAD_COUNT_MAX )
     {
        printf ("ts-task_switch: ownerPID ERROR \n", 
             Current->ownerPID );
@@ -590,17 +560,15 @@ done:
 
 
 	//
-	//    ## PROCESS ## 
+	// ## PROCESS ## 
 	//
-	
 
     P = (void *) processList[Current->ownerPID];
 
     if ( (void *) P == NULL ){
         printf ("ts-task_switch: Process %s struct fail \n", P->name );
-        die ();
+        die();
     }
-
 
     if ( (void *) P != NULL )
     {
@@ -619,136 +587,16 @@ done:
             if ( (unsigned long) P->DirectoryPA == 0 ){
                 printf ("ts-task_switch: Process %s directory fail\n", 
                     P->name );
-                die ();
+                die();
             }
 
-
             current_process_pagedirectory_address = (unsigned long) P->DirectoryPA;
-            goto doneRET;
+            return;
         }
-
-
         panic ("ts-task_switch: * Struct * \n");
     }
-
-
+ 
     panic ("ts-task_switch: Unspected error\n");
-
-doneRET:
-    return; 
-}
-
-
-/*
- * taskswitchRR:
- *     Task switch usando Round Robin.
- *     Obs: Esse método ainda não foi habilitado.
- */
-
-void taskswitchRR (void)
-{
-	struct thread_d *Current; //Thread atual.
-	
-	int i;
-	
-	//int Max = (int) ProcessorBlock.threads_counter;
-	int Max = (int) UPProcessorBlock.threads_counter;	
-
-	
-	//Filtro.
-	//if(current_thread ...){}
-
-    Current = (void *) threadList[current_thread]; 
-    if ((void *) Current == NULL){
-        panic ("taskswitchRR error: Struct");
-    }
-
-
-	//
-	//todo: Checar se a estrutura é válida. 
-	//
-	
-	/*
-	 *    Incrementa.
-	 *     Continua na mesma tarefa enquanto a contagem de quantum for
-	 *     menor que o quantum limite da tarefa atual.
-	 *     Assim temos uma contagem de vezes que uma tarefa deve ficar
-     *     no processador sem sair.	 
-	 */	
-
-
-	//se o runningCount ainda é menor que a cota, dispacha.
-	//Obs: Cuidado !! A média é (PRIORITY_NORMAL*2)
-	if(Current->runningCount < Current->quantum){ 
-		goto dispatch_current;
-	}else{
-		
-        //?? @todo: Talvez aqui seja o movimento 3, running >> ready. Conferir.  		
-		Current->state = READY;
-		
-		//
-		// @todo: Nesse momento, colocar no fim da fila ready. tail
-		//
-		//queue_insert_data( queue, (unsigned long) Current, QUEUE_READY);
-		
-		//se ouver outra válida nos slots despacha.
-		i = (int) current_thread;
-				
-		do
-		{
-		    i++;
-			
-			//Contando++
-			if(i < Max)
-			{
-		        Current = (void *) threadList[i];
-		        if( (void *) Current != NULL )
-			    {
-			        if( Current->used == 1 && 
-					    Current->magic == 1234 && 
-						Current->state == READY)
-				    {
-				        Current->runningCount = 0;
-				        current_thread = (int) i;
-				        goto dispatch_current;
-				    };
-			    };
-			};
-			
-			// Overflow
-			if(i >= Max)
-			{ 
-			    i = 0; 
-				Current = (void *) threadList[i];
-			    if( (void *) Current != NULL )
-				{
-				    if( Current->used == 1 && 
-					    Current->magic == 1234 && 
-						Current->state == READY )
-					{
-					    Current->runningCount = 0;
-					    current_thread = (int) i;
-						goto dispatch_current;
-					};
-				};
-			};
-
-		}while(i < Max);
-			
-        panic("taskswitchRR error: *HANG");
-  			
-		//Use idle. Não havendo outra alem da idle usa ela.
-		//current_idle_thread.
-		//current_thread = (int) 0;
-		//goto dispatch_current;
-	}; 
-	
-//	
-// Done.
-//
-dispatch_current:	
-	dispatcher (DISPATCHER_CURRENT);	
-	return;
 }
 
 
@@ -767,7 +615,7 @@ void set_task_status( unsigned long status )
 {
     //#bugbug: Mudar para int.	
 	task_switch_status = (unsigned long) status;
-};
+}
 
 
 /*
@@ -790,8 +638,8 @@ unsigned long get_task_status (void)
  *     @todo: Mudar para taskswitchLock().
  */ 
 
-void taskswitch_lock (void){
-	
+void taskswitch_lock (void)
+{
     task_switch_status = (unsigned long) LOCKED;
 }
 
@@ -802,8 +650,8 @@ void taskswitch_lock (void){
  *     @todo: Mudar para taskswitchUnlock().
  */ 
 
-void taskswitch_unlock (void){
-	
+void taskswitch_unlock (void)
+{
     task_switch_status = (unsigned long) UNLOCKED;
 }
 
