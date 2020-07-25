@@ -1,5 +1,5 @@
 /*
- * File: mk/ps/action/ts.c
+ * File: ps/action/ts.c
  *
  *     Task Switching.
  *

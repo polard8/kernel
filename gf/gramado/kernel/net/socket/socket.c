@@ -854,11 +854,9 @@ int sys_socket ( int family, int type, int protocol ){
         __socket->type = type;  // DATAGRAM or STREAM 
         __socket->protocol = protocol;
 
-
         __socket->pid = (pid_t) current_process;
         __socket->uid = (uid_t) current_user;
         __socket->gid = (gid_t) current_group;
-
 
 
        //
@@ -912,6 +910,9 @@ int sys_socket ( int family, int type, int protocol ){
     };
 
     //fail.
+    
+//fail:
+    debug_print ("sys_socket: [FAIL] Something is wrong!\n");
     return (int) (-1);
 }
 
@@ -1527,10 +1528,11 @@ sys_accept (
     // #test
     // Se o socket do servidor já está conectado.
     if ( s->state == SOCKET_CONNECTED ){
-        debug_print ("sys_accept: done\n");
+        //debug_print ("sys_accept: Already connected!\n");
         return (int) sockfd;
     }
- 
+
+
     // #todo
     // Na verdade precisamos pegar um da fila.
     
@@ -1552,21 +1554,29 @@ sys_accept (
     if ( s->state == SOCKET_PENDING )
     {
         debug_print ("sys_accept: CONNECTING !!\n");
+        
         // Se existe outro socket linkado ao socket do servidor.
-        if ( (void *) s->conn != NULL )
-        {
+        if ( (void *) s->conn != NULL ){
+            //ok: usar isso só para debug
+            //debug_print ("sys_accept: done\n");
             s->state       = SOCKET_CONNECTED;
             s->conn->state = SOCKET_CONNECTED;
-            
-            debug_print ("sys_accept: done\n");
             return (int) sockfd;
         }
-        
+ 
         //fail
-        debug_print ("sys_accept: fail pending connection\n");
+        debug_print ("sys_accept: [FAIL] Pending connection\n");
         return -1;
     }
 
+
+// fail
+
+//fail:
+
+    debug_print ("sys_accept: [FAIL] Something is wrong!\n");
+
+    //real machine
     //printf ("sys_accept: [FIXME] TODO ...\n");
     //refresh_screen();
     
@@ -1574,11 +1584,6 @@ sys_accept (
     // Are we already connected?
     // So we need a flag to indicate this status.
 
-    // More ??
-
-
-    // #bugbug
-    // ?? why this value ??
     return -1;
 }   
 
@@ -1697,14 +1702,16 @@ sys_bind (
     // DEFAULT:
     printf ("sys_bind: fail. family not valid\n");
 
-fail:
-    debug_print ("sys_bind: fail\n"); 
-    printf ("sys_bind: fail\n");
-    refresh_screen();
-    
-    return -1;
-}   
 
+   // fail
+
+fail:
+
+    debug_print ("sys_bind: [FAIL] Something is wrong!\n");
+    printf ("sys_bind: [FAIL] Something is wrong!\n");
+    refresh_screen();
+    return (int) (-1);
+}   
 
 
 int 

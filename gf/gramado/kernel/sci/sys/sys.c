@@ -615,14 +615,14 @@ int sys_read (unsigned int fd, char *ubuf, int count){
     struct process_d *__P;
     
     file *__file;
-    
+    int nbytes=0;    
+        
     struct socket_d *s;
-    
-    int len;
-    int nbytes = 0;
+
+    int ubuf_len=0;
 
 
-    
+
     // fd.
     if (fd<0 || fd>31){
         debug_print ("sys_read: fd\n");
@@ -634,8 +634,6 @@ int sys_read (unsigned int fd, char *ubuf, int count){
     // todo: Checar a validade da região de memória.
     if ( (char *) ubuf == (char *) 0 ){
         debug_print ("sys_read: invalid ubuf address\n");
-        
-        // #debug
         printf ("sys_read: invalid ubuf address\n"); 
         goto fail; 
     }
@@ -648,34 +646,40 @@ int sys_read (unsigned int fd, char *ubuf, int count){
     }
 
     // Size of the buffer.
-    len = strlen( (const char *) ubuf );
-    if (len > count )
-        len = count;
+    ubuf_len = strlen( (const char *) ubuf );
 
+    //Se a quantidade desejada é maior que o buffer disponível,
+    //temos um problema.
+    if (count > ubuf_len){
+        //debug_print ("sys_read: [FIXME] count too large\n");
+    }
 
-    // #todo: Limits.    
-    if (len > 512)
-        len = 512;
-    
+    //Se o buffer disponível é maior que a quantidade desejada
+    //então não temos problemas, nem precisamos disso. 
+    if (ubuf_len > count )
+        ubuf_len = count;
+
+    //#fixme
+    if (ubuf_len > 512){
+        //debug_print ("sys_read: [FIXME] limiting ubuf_len \n");
+        ubuf_len = 512;
+    }
+
 
     // Process.
     __P = (struct process_d *) processList[current_process];
 
     if ( (void *) __P == NULL ){
         debug_print ("sys_read: __P\n");
-        
-        // #debug
         printf ("sys_read: __P\n");
         goto fail; 
     }
 
-
-    // file.
+    // File.
     __file = (file *) __P->Objects[fd];  
 
     if ( (void *) __file == NULL ){
         debug_print ("sys_read: __file not open\n");
-        
         printf ("sys_read: __file not open\n");
         goto fail; 
     }
@@ -737,14 +741,12 @@ int sys_read (unsigned int fd, char *ubuf, int count){
     if ( __file->____object == ObjectTypeSocket )
     {
 
-        
         // O socket do processo.
         // #bugbug
         // temos que inicializar essa variável, na hora da 
         // clonagem de processo e na hora da criação de processo.
         if ( (void *) __P->priv == NULL ){
             debug_print ("sys_read: __P->priv fail\n");
-            
             printf ("sys_read: __P->priv fail\n");
             goto fail;
         }
@@ -764,7 +766,6 @@ int sys_read (unsigned int fd, char *ubuf, int count){
         // criação do socket.
         if ( (void *) s->private_file == NULL ){
             debug_print ("sys_read: s->private_file fail\n");
-            
             printf ("sys_read: s->private_file fail\n");
             goto fail;
         }
@@ -772,7 +773,6 @@ int sys_read (unsigned int fd, char *ubuf, int count){
         // O arquivo do socket precisa ser esse arquivo.
         if (__file != s->private_file){
             debug_print ("sys_read: __file fail\n");
-            
             printf ("sys_read: __file fail\n");
             goto fail;
         }
@@ -808,6 +808,11 @@ int sys_read (unsigned int fd, char *ubuf, int count){
 
                 __file->socket_buffer_full = 0;
                 __file->_flags |= __SWR;
+                
+                // #test
+                // Acordar quem esperava por esse evento
+                do_thread_ready( __file->tid_waiting );
+                        
                 return (int) nbytes;
             }
 
@@ -830,9 +835,13 @@ int sys_read (unsigned int fd, char *ubuf, int count){
                 do_thread_waiting (current_thread);
                 __file->tid_waiting = current_thread;
                 __file->_flags |= __SWR;  //pode escrever      
-                scheduler();
-                return 0;
+                scheduler();  //#bugbug: Isso é um teste
+                return 0;   //not fail ... just waiting.
             }
+            
+            debug_print("sys_read: nbytes with a full buffer.\n");
+            goto fail;
+            
         } // if it's full.
          
          
@@ -844,7 +853,8 @@ int sys_read (unsigned int fd, char *ubuf, int count){
 
         //if (nbytes == 0)
         if (__file->socket_buffer_full == 0)
-        {    
+        { 
+            
             //#debug
             //printf ("thread %d is waiting now \n", current_thread);
             //refresh_screen();
@@ -853,7 +863,7 @@ int sys_read (unsigned int fd, char *ubuf, int count){
             __file->tid_waiting = current_thread;
             __file->_flags |= __SWR;  //pode escrever.
             scheduler();
-            return 0;
+            return 0;  //not fail ... just waiting.
         }  // if it's not full.
 
         panic ("sys_read: unexpected socket_buffer_full value \n");
@@ -861,7 +871,7 @@ int sys_read (unsigned int fd, char *ubuf, int count){
 
 
     //
-    // ==== Normal file ====
+    // ==== Regular file ====
     //
 
 
@@ -869,7 +879,21 @@ int sys_read (unsigned int fd, char *ubuf, int count){
     // Read a regular file.
     // See: unistd.c
     // #todo Tem que retornar a quantidade de bytes lido.
-    
+
+    //Se não pode ler.
+    if ( (__file->_flags & __SRD) == 0 )
+    {
+        debug_print("sys_read: [FLAGS] Can't read!\N");
+        
+        //Não conseguimos ler.
+        //nada de errado, apenas espera.
+        do_thread_waiting (current_thread);
+        __file->tid_waiting = current_thread;
+        //__file->_flags |= __SWR;  //pode escrever.
+        scheduler();
+        return 0;
+    }
+   
     // Se puder ler:
     // + Call a function to read a regular file.
     // + Sinalize that another process can write.
@@ -880,10 +904,27 @@ int sys_read (unsigned int fd, char *ubuf, int count){
         nbytes = (int) file_read_buffer ( (file *) __file, 
                            (char *) ubuf, (int) count );
 
-        // ok to write.
-        __file->_flags = __SWR;
-        return nbytes;
+        //Se conseguimos ler.
+        if( nbytes>0)
+        {
+            // ok to write.
+            __file->_flags = __SWR;
+        
+            // #test
+            // Acordar quem esperava por esse evento
+            do_thread_ready( __file->tid_waiting );
+            return (int) nbytes;        
+        }
+        
+        //Não conseguimos ler.
+        //nada de errado, apenas espera.
+        do_thread_waiting (current_thread);
+        __file->tid_waiting = current_thread;
+        //__file->_flags |= __SWR;  //pode escrever.
+        scheduler();
+        return 0;
     }
+
 
     //
     // Fail!
@@ -899,9 +940,17 @@ int sys_read (unsigned int fd, char *ubuf, int count){
 
 fail:
 
-    debug_print ("sys_read: fail\n");
+    debug_print ("sys_read: [FAIL] something is wrong!\n");
+    printf("sys_read: [FAIL] something is wrong!\n");
     refresh_screen();
-    return -1;
+
+    //bloqueando, autorizando a escrita e reescalonando.
+    do_thread_waiting (current_thread);
+    __file->tid_waiting = current_thread;
+    __file->_flags |= __SWR;  //pode escrever      
+    scheduler();  //#bugbug: Isso é um teste  
+
+    return (int) (-1); // fail !!! something is wrong!!!
 }
 
 
@@ -933,12 +982,13 @@ int sys_write (unsigned int fd, char *ubuf, int count){
     
     file *__file;
     file *__file2;
-    
+    int nbytes = 0;
+        
     struct socket_d *s1;
     struct socket_d *s2;
     
-    int len;
-    int nbytes = 0;
+    int ubuf_len=0;
+
     size_t ncopy = 0;
 
 
@@ -967,19 +1017,22 @@ int sys_write (unsigned int fd, char *ubuf, int count){
     //
 
     // len
-    len = strlen( (const char *) ubuf );
-    if (len > count )
-        len = count;
+    ubuf_len = strlen( (const char *) ubuf );
     
-    // #bugbug: 
-    // Precisamos da opção de salvarmos vários setores em
-    // dispositivos de bloco.
-    //if (len > 64 )
-        //len = 64;
+    //Se a quantidade desejada é maior que o buffer disponível.
+    if(count > ubuf_len){
+        //debug_print("sys_write: [FIXME] count too long!\n");
+    }
 
-    if (len > 512 )
-        len = 512;
-
+    // se o buffer é maior que a quantidade desejada, 
+    //então não temos problemas
+    if (ubuf_len > count ){
+        ubuf_len = count;
+    }
+    
+    //#debug: limits
+    if (ubuf_len > 512 )
+        ubuf_len = 512;
 
     //
     // Process pointer.
@@ -1183,8 +1236,12 @@ int sys_write (unsigned int fd, char *ubuf, int count){
             }
 
             //pode ler.
-            __file2->_flags |= __SRD;   
+            __file2->_flags |= __SRD; 
             
+            // #test
+            // Acordar quem esperava por esse evento de escrita.
+            do_thread_ready( __file2->tid_waiting );
+        
             return (int) nbytes;
         }
          
@@ -1206,36 +1263,54 @@ int sys_write (unsigned int fd, char *ubuf, int count){
     // Tem que retonar o tanto de bytes escritos.
     // Escreve em uma stream uma certa quantidade de chars.
     
-    
+    if ( (__file->_flags & __SWR) == 0)
+    {
+        debug_print("sys_write: [FLAGS] Can't write!");
+        // Não conseguimos escrever ... 
+        // nada de errado, apenas esperaremos.
+        do_thread_waiting (current_thread);
+        __file->tid_waiting = current_thread;
+        //__file->_flags |= __SWR;  //pode escrever.
+        scheduler();
+        return 0;
+    }
+
     //#todo: ainda não colocamos essa flag na criação do arquivo.
-    //if (fp->_flags & __SWR)
-        
-    // Normal file.
-    nbytes = (int) file_write_buffer ( (file *) __file, 
-                       (char *) ubuf, (int) count );
+    if (__file->_flags & __SWR)
+    {
+        // Regular file.
+        nbytes = (int) file_write_buffer ( (file *) __file, 
+                           (char *) ubuf, (int) count );
+
+        // Avisa que o arquivo não está mais no modo escrita,
+        // que agora pode ler.
+
+        // Adiciona o bit que permite a leitura.
+        // Assim o servidor pode ler o request.
+        // #todo: wait on write.
+        // #bugbug:
+        // A questão é que se o cliente está esperando por resposta,
+        // então ele lerá também.
+
+        if (nbytes>0)
+        { 
+            //Ja escrevemos, agora pode ler.
+            __file->_flags |= __SRD;
     
+            // #test
+            // Acordar quem esperava por esse evento de escrita.
+            do_thread_ready( __file->tid_waiting );
+            return (int) nbytes;
+        }
 
-    // #todo:
-    // Falha ao escrever num arquivo normal.
-    //if (nbytes<0){ goto fail; }
-    
-    // #todo
-    // Se o arquivo está bom, mas não escrevemos.
-    // Retornamos sem mudar a flag.
-    //if (nbytes==0){ return 0; }
-
-    // Avisa que o arquivo não está mais no modo escrita,
-    // que agora pode ler.
-
-    // Adiciona o bit que permite a leitura.
-    // Assim o servidor pode ler o request.
-    // #todo: wait on write.
-    // #bugbug:
-    // A questão é que se o cliente está esperando por resposta,
-    // então ele lerá também.
-    __file->_flags |= __SRD;
-
-    return (int) nbytes;
+        // Não conseguimos escrever ... 
+        // nada de errado, apenas esperaremos.
+        do_thread_waiting (current_thread);
+        __file->tid_waiting = current_thread;
+        //__file->_flags |= __SWR;  //pode escrever.
+        scheduler();
+        return 0;
+    }
 
 
     //
@@ -1243,9 +1318,17 @@ int sys_write (unsigned int fd, char *ubuf, int count){
     // 
 
 fail:
-    debug_print("sys_write: fail\n");
-    //refresh_screen();    
-    return -1;
+    debug_print("sys_write: [FAIL] Something is wrong!\n");
+    printf("sys_write: [FAIL] something is wrong!\n");
+    refresh_screen();
+
+    // Não conseguimos escrever ... 
+    // Estamos com problemas 
+    do_thread_waiting (current_thread);
+    __file->tid_waiting = current_thread;
+    //__file->_flags |= __SWR;  //pode escrever.
+    scheduler();
+    return (int) (-1);  // fail. something is wrong!!!!
 }
 
 
