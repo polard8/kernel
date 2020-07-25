@@ -159,12 +159,11 @@ G_START_GUI EQU 0  ;; 1= (YES) 0 = (NO)
 [bits 16]
 
 
-
-;; #importante
-;; Entrypoint do BM.BIN
-;; Saltaremos a �rea de dados no in�cio do arquivo.
+;; This is the entry point for the BM.BIN.
+;; Jump after the data area.
 
 bm_main:
+
     jmp START_AFTER_DATA
 
 
@@ -1059,6 +1058,7 @@ xxx_checkSig:
     call DisplayMessage
 
 .sigHalt:
+    cli
     hlt
     jmp .sigHalt
 
@@ -1070,11 +1070,10 @@ xxx_checkSig:
 
 ;; A assinatura foi encontrada ... 
 ;; prosseguimos com o stage2.
+;; message: 
+;; O arquivo esta presente na mem�ria.
 
 .sigFound:
-
-    ;; message: 
-    ;; O arquivo esta presente na mem�ria.
 
     mov si, stage2_msg_pe_sigOK
     call DisplayMessage
@@ -1174,25 +1173,34 @@ xxx_Config:
 
 ; gui mode.
 ;   ## SET UP BOOT MODE ##
-.xxxxGUI:	
+.xxxxGUI:
 
     mov word [META$FILE.VIDEO_MODE], G_VIDEO_MODE
 
     mov al, byte BOOTMODE_GUI
-    call set_boot_mode	    
+    call set_boot_mode
     jmp .xxxxGO
 
     ;;
     ;; Go!
     ;;
 
-.xxxxGO:
+;;
+;; == \o/ ============================================
+;;
 
     ; Ativar o modo escolhido.
-    ; (lib16\s2modes.inc)
+    ; (lib16/s2modes.inc)
+
+.xxxxGO:
 
     JMP s2modesActivateMode  
     JMP $
+
+;;
+;; == \o/ ============================================
+;;
+
 
 
 ;; ==================================
@@ -1266,56 +1274,56 @@ bootmanager_main:
     %include "header32.inc"
 
     ;13 - Headers. 
-    %include "system.inc"           ;Arquivo de configura��o do sistema.
-    %include "init.inc"                  ;Arquivo de configura��o da inicializa��o.
-    %include "sysvar32.inc"         ;Vari�veis do sistema.
-    %include "gdt32.inc"              ;Gdt.
-    %include "idt32.inc"               ;Idt.
-    %include "ldt32.inc"               ;Ldt.
-    %include "tss32.inc"               ;Tss.
-    %include "stacks32.inc"         ;Stacks.
-    %include "ints32.inc"              ;Handles para as interrup��es.
+    %include "system.inc"         ;Arquivo de configura��o do sistema.
+    %include "init.inc"           ;Arquivo de configura��o da inicializa��o.
+    %include "sysvar32.inc"       ;Vari�veis do sistema.
+    %include "gdt32.inc"          ;Gdt.
+    %include "idt32.inc"          ;Idt.
+    %include "ldt32.inc"          ;Ldt.
+    %include "tss32.inc"          ;Tss.
+    %include "stacks32.inc"       ;Stacks.
+    %include "ints32.inc"         ;Handles para as interrup��es.
     %include "fat16header.inc"    ;Headers para o sistema de arquivos fat16.
 
     ;12 - Monitor.
-    %include "screen32.inc"     ; Rotinas de screen em 32 bits.
-    %include "input32.inc"        ; Rotinas de input 2m 32 bits.
-    %include "string32.inc"       ; Rotinas de strings em 32 bits.
-    %include "font32.inc"          ; Fonte.
+    %include "screen32.inc"    ; Rotinas de screen em 32 bits.
+    %include "input32.inc"     ; Rotinas de input 2m 32 bits.
+    %include "string32.inc"    ; Rotinas de strings em 32 bits.
+    %include "font32.inc"      ; Fonte.
 
     ;11 - Hardware.
-    %include "cpuinfo.inc"         ;Rotinas de detec��o e configura��o de cpu.
-    %include "hardware.inc"     ;Rotinas de detec��o e configura��o de hardware.
+    %include "cpuinfo.inc"     ;Rotinas de detec��o e configura��o de cpu.
+    %include "hardware.inc"    ;Rotinas de detec��o e configura��o de hardware.
     ; ...
 
     ;10 - Irqs.
-    %include "timer.inc"           ; Irq 0, Timer.
-    %include "keyboard.inc"     ; Irq 1, Keyboard.
-    %include "fdc32.inc"           ; Irq 6, Fdc. (@todo: Suspender o suporte.)
-    %include "clock.inc"            ; Irq 8, Clock.
-    %include "hdd32.inc"          ; Irq 14/15, Hdd.
+    %include "timer.inc"       ; Irq 0, Timer.
+    %include "keyboard.inc"    ; Irq 1, Keyboard.
+    %include "fdc32.inc"       ; Irq 6, Fdc. (@todo: Suspender o suporte.)
+    %include "clock.inc"       ; Irq 8, Clock.
+    %include "hdd32.inc"       ; Irq 14/15, Hdd.
     ; ...
 
     ;9 - Tasks. (#no tasks)
-    %include "tasks32.inc"     ;Rotinas de inicializa��o do sistema de tarefas.
+    %include "tasks32.inc"    ;Rotinas de inicializa��o do sistema de tarefas.
 
     ;8 - lib32.
-    ;%include "lib32.inc"       ;Rotinas em 32 bits.
+    ;%include "lib32.inc"     ;Rotinas em 32 bits.
 
     ;7 - setup  
-    %include "setup.inc"       ;Inicializa arquitetura.
+    %include "setup.inc"      ;Inicializa arquitetura.
 
     ;6 - Disk.
     %include "fat12pm.inc"     ;FAT12 em 32 bits.
-    %include "fat16lib.inc"       ;FAT16 (rotinas).
-    %include "fat16.inc"           ;FAT16 (fun��es principais).
-    %include "ramfs.inc"          ;RamDisk fs.
-    %include "format.inc"        ;Formata.
-    %include "fs32.inc"            ;fs, (ger�ncia os sistemas de arquivos).
+    %include "fat16lib.inc"    ;FAT16 (rotinas).
+    %include "fat16.inc"       ;FAT16 (fun��es principais).
+    %include "ramfs.inc"       ;RamDisk fs.
+    %include "format.inc"      ;Formata.
+    %include "fs32.inc"        ;fs, (ger�ncia os sistemas de arquivos).
 
     ;5 - File.
-    %include "installer.inc"        ;Instala metafiles em LBAs espec�ficas.
-    %include "file.inc"                ;Opera��es com aquivos.
+    %include "installer.inc"     ;Instala metafiles em LBAs espec�ficas.
+    %include "file.inc"          ;Opera��es com aquivos.
     %include "bootloader.inc"    ;Carrega o Boot Loader (BL.BIN).
 
     ;4 - Debug.

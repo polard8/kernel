@@ -37,8 +37,7 @@ CFLAGS = -m32 \
 	## Objects 
 	##
 
-myObjects = head.o \
-main.o \
+myObjects = head.o main.o \
 loader.o \
 init.o \
 ports.o \
@@ -100,7 +99,7 @@ bl-x86:
 	gcc -c shell.c -I include/ $(CFLAGS) -o shell.o
 
     #fs
-	gcc -c fs/fs.c -I include/ $(CFLAGS) -o fs.o
+	gcc -c fs/fs.c     -I include/ $(CFLAGS) -o fs.o
 	gcc -c fs/loader.c -I include/ $(CFLAGS) -o loader.o
 
 

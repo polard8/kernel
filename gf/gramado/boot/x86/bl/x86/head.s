@@ -1,10 +1,9 @@
 ;
-; Gramado Boot Loader - a Boot Loader entry point for x86 processors.
-; It's a 32bit, kernel mode, system aplication used to load the kernel and 
-; some other files.
-; (c) Copyright 2015-2016 Fred Nora.
-;
 ; File: head.s 
+;
+; Gramado Boot Loader - a Boot Loader entry point for x86 processors.
+; It's a 32bit, kernel mode, system aplication used to load the 
+; kernel and some other files.
 ;
 ; Descri��o:
 ; Esse arquivo � o entrypoint do Boot Loader. (BL.BIN).
@@ -154,7 +153,7 @@ ____START:
     mov dword [_SavedY], eax
 
     xor eax, eax
-    mov al, byte [edx +12]     	
+    mov al, byte [edx +12] 
     mov dword [_SavedBPP], eax
 
 
@@ -174,16 +173,16 @@ ____START:
 
 	;Carrega GDT e IDT.
 	
-	lgdt [GDT_register]	
+	lgdt [GDT_register]
 	lidt [IDT_register]
 	
 	; Setup registers.
 	
 	mov ax, DATA_SEL 
-	mov ds, ax		 
+	mov ds, ax
 	mov es, ax 
 	;mov ax, NULL_SEL
-	;mov fs, ax		 
+	;mov fs, ax
 	;mov gs, ax 
 	mov ss, ax
 	mov eax, _bootloader_stack_start 
@@ -405,19 +404,19 @@ StartKernelEntry:
 	mov ebx, dword [_SavedLFB]   ;LFB address.
 
     ;Prepara o modo grafico.
-	xor eax, eax	
-	
+    xor eax, eax
+
     cmp dword [_SavedBootMode], 1    ;gui	
-	jne .nogui 
-	mov al, byte 'G'    ;Use GUI.
-	jmp .gui
+    jne .nogui 
+    mov al, byte 'G'    ;Use GUI.
+    jmp .gui
 
 .nogui:
 
-	mov al, byte 'T'    ;Use text mode.
+    mov al, byte 'T'    ;Use text mode.
 
-	; Debug.
-	; Text mode.
+    ; Debug.
+    ; Text mode.
 
     mov byte [0xb8000], byte "g"
     mov byte [0xb8001], byte 9
@@ -426,17 +425,25 @@ StartKernelEntry:
 
 .gui:
 
+
+;;
+;; == \o/ ==================================
+;;
+
 	;;
 	;; Go ! 
 	;; (Passa o comando para o Kernel.)
 	;;
 
-	; #obs:
-	; Sem o header do multiboot. 
-	
-	jmp CODE_SEL:0xC0001000 
-	jmp $
+    ; #obs:
+    ; Sem o header do multiboot. 
 
+    jmp  CODE_SEL:0xC0001000 
+    jmp  $
+
+;;
+;; == \o/ ==================================
+;;
 
 
 ;;===============================================================

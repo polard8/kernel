@@ -185,22 +185,22 @@ _fdc_main:
     
 	;salva a pilha para um retorno seguro.
 	mov dword [salva_esp], esp
-	
+
 	;salva argumentos a b c d.
-   	mov dword [salva_a], eax  ;setor
-   	mov dword [salva_b], ebx  ;trilha
-   	mov dword [salva_c], ecx  ;lado
-   	mov dword [salva_d], edx  ;endereço
-	
-	;zera
-    xor eax, eax				
-	mov ebx, eax
-    xor ecx, ecx				
-	mov edx, edx
-	
+    mov dword [salva_a], eax  ;setor
+    mov dword [salva_b], ebx  ;trilha
+    mov dword [salva_c], ecx  ;lado
+    mov dword [salva_d], edx  ;endereço
+
+    ;zera
+    xor eax, eax
+    mov ebx, eax
+    xor ecx, ecx
+    mov edx, edx
+
 	;uso interno
-	mov esp , dword 0x95000
-    
+    mov esp, dword 0x95000
+ 
 	;
 	; OBS: Não vou mexer na pilha. 
 	; (esp = 0x9fff0)
@@ -255,11 +255,11 @@ cold:
 	mov  eax, fdc_buffer*4                  
                                     
 	;buffer.
-	out 4, al                   
-    mov al, ah                  
+    out 4, al   
+    mov al, ah      
     out 4, al
 	
-    shr eax, 16                 
+    shr eax, 16   
     out 0x81, al
 	
 	;Quantidade. 
@@ -283,14 +283,15 @@ cold:
 ;
 ; O buffer do DMA é de tamanho fixo.
 ;
+
 .read_sector:	
 	;buffer
 	;cylinder 0 on addr 0
 	;xor edi, edi	
 	
 	;suja o buffer 3. (provisório) ... b00000h ?
-	mov edi, dword 0900000h     
-    
+    mov edi, dword 0900000h     
+ 
 	;seek.
 	;Read DMA 2.
 	mov AL, 16h 
@@ -431,8 +432,8 @@ sense_:
 	out 0xe1, al
 	cmp al, 0x80
 	ret
-	
-	
+
+
 ;----------------------------
 ; seek:
 ;     SEEK.
@@ -470,7 +471,7 @@ cmdi:
 Xcmdi:    
     call sense_  
     jz Xcmdi
-	RET
+    RET
 
  
 ;------------------------------------
@@ -528,7 +529,10 @@ fdc32Init:
     nop    ;; Nothing for now.
     ret
 
- 	
+ 
 ;
-;FIM.
+; End.
 ;
+
+
+

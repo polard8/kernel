@@ -67,15 +67,15 @@ DAPBuffer       dd 00000000h
 DAPStart        dq 0000000000000000h
 
 
-datasector 	dw 0x0000    ;Início da área de dados.
-cluster     dw 0x0000
+datasector  dw  0x0000    ;Início da área de dados.
+cluster     dw  0x0000
 
 
 ;absoluteSector db 0x00
 ;absoluteHead   db 0x00
 ;absoluteTrack  db 0x00
 
-;CylinderNumbers:  dd 0  ;;dword	
+;CylinderNumbers:  dd 0  ;;dword
 
 ;;
 ;; Mensagens.
@@ -102,29 +102,29 @@ START:
 ;Step1: 
 
     ; Code located at 0x7C00, adjust segment registers to 0x07C0:0.
+    ; Create stack.   0:6000h
+    
     cli
     mov  ax, 0x07C0
     mov  ds, ax
     mov  es, ax
-
-    ; Create stack.   0:6000h
     mov  ax, 0x0000
     mov  ss, ax
     mov  sp, 0x6000
     sti
 
-Step2:
 
+Step2:
     mov byte [DriveNumber], byte dl 
 
     ;cmp dl, byte 0x80
     ;jne FAILURE
 
-Step3:   
-
     ;;Clear the Screen.
+Step3: 
     mov ax, 02h
     int 010h
+
 
 ;Step4:
     ;@todo: Certificar que int 13h é suportada.	
@@ -448,16 +448,11 @@ __loop_LOAD_IMAGE:
     add bx, ax                ; index into FAT    
     mov dx, WORD [gs:bx]      ; read two bytes from FAT
 
-
+    ; Saving new cluster.
     ; Em 'dx', está o valor do próximo cluster.
 
 .DONE:
-
-    ; Saving new cluster.
     mov  WORD [cluster], dx 
-
- 
-.testEOF: 
 
     ; Test for end of file.
     ; Testamos para ver se é o último cluster. 
@@ -465,37 +460,34 @@ __loop_LOAD_IMAGE:
     ; 0xFFF8 ?
     ; Se esse foi o último cluster então prosseguiremos.
     ; Caso contrário volta para o loop.
-         
+
+.testEOF: 
     cmp  dx, END_OF_CLUSTER  
     jne  __loop_LOAD_IMAGE
-
 
     ;;
     ;; Done!
     ;;
 
 DONE:
-
     ;nop
-
-;Step8:
 
     ; Pass an argument to the next stage.
     ; Disk Number.
-    
+
+;Step8:
     mov dl, byte [DriveNumber]
-    
-;Step9:
+
 
     ; Passando o comando para o BM.BIN em 0:8000h.
+ 
+;Step9:
 
 .FLY:
 
-    PUSH WORD 0 
-    PUSH WORD 0x8000 
+    PUSH WORD  0 
+    PUSH WORD  0x8000 
     RETF
-
-
 
 
 
@@ -513,9 +505,9 @@ ReadSectors:
     mov WORD [DAPBuffer+2] ,es
     mov WORD [DAPStart]    ,ax
 
-.MAIN:
-
     ; Tentativas.
+    
+.MAIN:
     mov di, 0x0005  
 
 .SECTORLOOP:
@@ -707,17 +699,15 @@ P2: dd 0,0,0,0
 P3: dd 0,0,0,0  
 
 
-    ;;
-    ;; Signature.
-    ;;
+; Signature.
 
 MBR_SIG: 
 
     TIMES 510-($-$$) DB 0
     DW 0xAA55
     
-    
-    ;;
-    ;; End.
-    ;;
+  
+;;
+;; End.
+;;
     

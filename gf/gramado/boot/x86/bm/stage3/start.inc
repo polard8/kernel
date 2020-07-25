@@ -47,17 +47,17 @@
 ;
 
 start:
-    
+
 	;; #bugbug 
 	;; Esse valor pode estar errado durante a inicializa��o em modo texto.
-	
-	mov byte [BOOT.modo], al
-    
-	xor edx, edx
-	xor ecx, ecx
-	xor ebx, ebx
-	xor eax, eax
-	
+
+    mov byte [BOOT.modo], al
+
+    xor edx, edx
+    xor ecx, ecx
+    xor ebx, ebx
+    xor eax, eax
+
 
 
 ; ajusta_modo: 
@@ -203,18 +203,23 @@ startShellLoop:
 
     call fs32SaveMetafile  
 
-	mov esi, start_msg_rebooting
-	call os_output
-	jmp keyboardReboot
-	jmp $
-	
-;strings
-start_msg_saving_metafile  db 'start: Saving metafile..',13,10,0
-start_msg_rebooting        db 'start: Rebooting..',13,10,0
-	
-	
-	
-;==========================================================================
+    mov esi, start_msg_rebooting
+    call os_output
+
+    jmp keyboardReboot
+    jmp $
+
+
+;
+; Strings
+;
+
+start_msg_saving_metafile db 'start: Saving metafile..', 13,10,0
+start_msg_rebooting       db 'start: Rebooting..',       13,10,0
+
+
+
+;================================================================
 ; startGUI:
 ;     Initializes BL.BIN in graphycs mode.
 ;
@@ -241,7 +246,6 @@ start_msg_rebooting        db 'start: Rebooting..',13,10,0
 
 
 startGUI:
-
 
 	;;===============
 	;;setup machine
@@ -557,10 +561,10 @@ startGUI:
 
 
     ;;debug
-	mov esi, startMsgTest1   
-	call lib32PrintString
+    mov esi, startMsgTest1   
+    call lib32PrintString
     call _asm_refresh_screen
-	
+
 	; #debug 
 	; #todo: 
 	; Testando modos no geforce.
@@ -730,14 +734,21 @@ startGUI:
 .goBL:
 
 
+;;
+;; == \o/ =================================
+;;
+
     ; Go!
-	; Passa o comando para o entrypoint do Boot Loader. BL.BIN.
+    ; Passa o comando para o entrypoint do Boot Loader. BL.BIN.
+
+    jmp  8:IMAGE_ADDRESS_ENTRY_POINT
+    JMP  $
+
+;;
+;; == \o/ =================================
+;;
 
 
-	jmp 8:IMAGE_ADDRESS_ENTRY_POINT
-	JMP $
-
-	
 	;;
 	;; Fail.
 	;;
@@ -748,35 +759,25 @@ startGUI:
 .peFail:
 
     mov eax, 0x00ffff00
-	mov esi, msg_start_sig
-	call lib32PrintString
-	
+    mov esi, msg_start_sig
+    call lib32PrintString
+
     mov eax, 0x00ffff00
-	mov esi, 0x20000
-	call lib32PrintString
+    mov esi, 0x20000
+    call lib32PrintString
 
     call _asm_refresh_screen
-    
-    ;; #bugbug
-    ;; Temos que melhorar isso e colocarmos um cli/hlt.
-   
-    ;jmp $
+
 .peFailHalt:
     cli
     hlt
     jmp .peFailHalt
     
-    
-    
-	; #fim, 
-	; Come�am as rotinas internas do arquivo.
-	
 
-;;=======================================================================
-;;=======================================================================
-;;=======================================================================
-;;=======================================================================
+	; #fim 
+	; Começam as rotinas internas do arquivo.
 
+;; ================================================================
 
 
 
@@ -838,35 +839,20 @@ configura_buffer:
    	;mov edx, dword 0x01A00000		
 	;mov dword [VIDEO.buffer3], edx 
 	;pop edx
-	
-	ret
+
+    ret
 ;--
 
 
-
-;
 ; Start mensagens.
-;
 
-;usando em start.
-startMsgTest1        db "BM: start: startGUI:", 13, 10, 0
-msg_start_ok         db "BM:startGUI: OK", 13, 10, 0
-msg_start_jumping    db "BM:startGUI: Jumping to BL.BIN", 13, 10, 0
-msg_start_sig        db "BM:startGUI: PE sig fail", 13, 10, 0
+startMsgTest1      db "BM-start: startGUI:",            13, 10, 0
+msg_start_ok       db "BM-startGUI: OK",                13, 10, 0
+msg_start_jumping  db "BM-startGUI: Jumping to BL.BIN", 13, 10, 0
+msg_start_sig      db "BM-startGUI: PE sig fail",       13, 10, 0
 
-
-;filtrar.
-;msg_start_debug_hang db "BM: *start: Debug hang!", 13,10,0	
-;msg_start1           db "BM: Start1", 13,10,0	
-;msg_start2           db "BM: Start2", 13,10,0
-;msg_start3           db "BM: Start3", 13,10,0
-;msg_start4           db "BM: Start4", 13,10,0	
-;msg_start_loading    db "BM: Loading BL.BIN..", 13,10,0
-;msg_no_new_mode_todo db "BM: @todo: save new mode in a file.", 13,10,0	
-;msg_no_new_mode      db "BM error: video mode fail!", 13,10,0	
-;msg_iniciando_shell  db "BM: Starting Boot Manager Shell..", 13,10,0
-;...
 
 ;
 ; End.
 ;
+

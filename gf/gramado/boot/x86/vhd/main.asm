@@ -53,14 +53,13 @@
 [bits 16]
 
 
-System4Nora_BootManager:
 boot_main:
 
-    ;;===========================================
-    ;;    ****    Entry point do MBR    ****   ;;
-    ;;===========================================
+    ;;============================================
+    ;;    ****    Entry point do MBR    ****    ;;
+    ;;============================================
     ; Stage 1. Esse é o MBR. Carrega o stage 2.
-    
+
     %include "stage1.asm"
 
 ;;
@@ -75,10 +74,12 @@ boot_main:
 ;;     PS: The char 'b' is the number 62H                 ;
 ;;                                                        ;  
 eof:                                                      ; 
-	times (63*512) - (eof-boot_main) db 'b' ;63 sec.
+    times (63*512) - (eof-boot_main) db 'b' ;63 sec.
 ;;=========================================================
 
-	
+
+
+
 ;;=========================================================
 ;;                      ## VBR ##   #63
 ;;=========================================================
@@ -114,10 +115,10 @@ fs_hidden_sectors:
 ;;     Cada fat tem 246 setores
 ;;
 fs_fat16_fat1: 
-.firstSector:	
-	db 0xf8, 0xff, 0xff, 0xff
+.firstSector:
+    db 0xf8, 0xff, 0xff, 0xff
     times (512)-(4) db 0
-.allTheRest:	
+.allTheRest:
     times (245*512) db 0 
 
 
@@ -132,7 +133,7 @@ fs_fat16_fat1:
 ;;
 fs_fat16_fat2:
 .firstSector:
-	db 0xf8, 0xff, 0xff, 0xff
+    db 0xf8, 0xff, 0xff, 0xff
     times (512)-(4) db 0
 .allTheRest:
     times (245*512) db 0 
@@ -152,25 +153,24 @@ fs_fat16_rootdir:
     ;; ## Volume1 entry ##
     
     db 0x47, 0x52, 0x41, 0x4D, 0x41, 0x44, 0x4F, 0x20
-	db 0x20, 0x20, 0x20, 0x08, 0x00, 0x00, 0x00, 0x00 
-	db 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xEE, 0x7B
-	db 0x1B, 0x4B, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-    
+    db 0x20, 0x20, 0x20, 0x08, 0x00, 0x00, 0x00, 0x00 
+    db 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xEE, 0x7B
+    db 0x1B, 0x4B, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+
 	;; Completando o diretório raiz do volume de boot.
 	;; 512 entradas de 32 bytes cada.
-	
-	times (32*512) - (32) db 0    
+    times (32*512) - (32) db 0    
 
-	
+
 ;;
 ;;  ##  DATA AREA  ##
 ;;
 
-;;=========================================================================
-;; fs_fat16_data_area:                                                    ;
-;;     DATA AREA.               #591                                      ;
-;;                                                                        ;
-fs_fat16_data_area:                                                       
+;;=====================================================================
+;; fs_fat16_data_area:                                                ;
+;;     DATA AREA.               #591                                  ;
+;;                                                                    ;
+fs_fat16_data_area:                                                   
     
 	;; Essa área compreende o espaço entre o início da área de dados 
 	;; da primeira partição até o fim do disco virtual, onde deve ficar o 
@@ -186,17 +186,18 @@ fs_fat16_data_area:
 	;; menos 4 bytes de assinatura antes do footer.
 	
 	;Full data area with zeros.                                           
-	times  (32*1024*1024) -( fs_fat16_data_area - boot_main ) -(4) db 0  
-		
-.end_of_disk:                                                             
-    db '*EOD'  ;; ## END OF DISK ##                                       
-;;=========================================================================
+    times  (32*1024*1024) -( fs_fat16_data_area - boot_main ) -(4) db 0  
+
+.end_of_disk:    
+    db '*EOD'    ;; ## END OF DISK ##        
+;;====================================================================
 
 
 ;; VHD footer
-
     %include "footer1.asm"
 ;
 ; End
 ;
+
+
 

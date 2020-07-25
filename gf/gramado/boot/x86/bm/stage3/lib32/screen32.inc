@@ -11,7 +11,8 @@
 ; Screen Output Functions
 ; =============================================
 ;
-; Versão 1.0, 2015.
+; History:
+;     2015.
 ;
 
 
@@ -89,8 +90,8 @@ os_dec_cursor_done:
 ;     Posiciona o cursor no início da tela.
 ;
 reset_cursor:
-	mov word [os_Screen_Cursor_Col], 0
-	mov word [os_Screen_Cursor_Row], 0
+    mov word [os_Screen_Cursor_Col], 0
+    mov word [os_Screen_Cursor_Row], 0
     ret
 
 
@@ -135,10 +136,10 @@ os_output:
 	call os_output_chars
 	pop ecx
 	ret
-; -----------------------------------------------------------------------------
+; ----------------------------------------------------------------------
 
 
-; -----------------------------------------------------------------------------
+; ----------------------------------------------------------------------
 ; os_output_char -- Displays a char
 ;  IN:	AL  = char to display
 ; OUT:	All registers perserved
@@ -184,11 +185,11 @@ os_output_char_done:
 	pop edx
 	pop edi
 	ret
-; -----------------------------------------------------------------------------
+; ----------------------------------------------------------------------
 
 
 
-;; -----------------------------------------------------------------------------
+;; ---------------------------------------------------------------------
 ;; os_pixel 
 ;;     Put a pixel on the screen
 ;;
@@ -244,10 +245,10 @@ os_pixel_done:
 	pop edx
 	pop edi
 	ret
-; -----------------------------------------------------------------------------
+; ----------------------------------------------------------------------
 
 
-; -----------------------------------------------------------------------------
+; ----------------------------------------------------------------------
 ; os_glyph_put -- Put a glyph on the screen at the cursor location
 ;  IN:	EAX = Glyph
 ;	EBX = Color (AARRGGBB)
@@ -494,9 +495,9 @@ os_screen_clear_done:
 ; @param BH The column on screen, starts from 0
 ;=============================================
 boot_set_cursor:     
-    
-	pushfd   
-	push eax
+
+    pushfd   
+    push eax
     push ebx
     push ecx
     push edx
@@ -536,11 +537,8 @@ boot_set_cursor:
     pop ecx
     pop ebx
     pop eax
-	popfd
-	ret
-
-
-
+    popfd
+    ret
 
 
 ;;===========================================================
