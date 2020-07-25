@@ -883,7 +883,7 @@ int sys_read (unsigned int fd, char *ubuf, int count){
     //Se não pode ler.
     if ( (__file->_flags & __SRD) == 0 )
     {
-        debug_print("sys_read: [FLAGS] Can't read!\N");
+        debug_print("sys_read: [FLAGS] Can't read!\n");
         
         //Não conseguimos ler.
         //nada de errado, apenas espera.
