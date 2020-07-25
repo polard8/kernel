@@ -172,138 +172,136 @@ all-c:
 
 
 	#
-	#  inet
+	# net
 	#
 	
-	$(CC) -c socket/socket.c  $(KINCLUDE) $(CFLAGS) -o socket.o	
+	$(CC) -c net/socket/socket.c  $(KINCLUDE) $(CFLAGS) -o socket.o	
+	$(CC) -c net/network/channel.c  $(KINCLUDE) $(CFLAGS) -o channel.o
+	$(CC) -c net/network/network.c  $(KINCLUDE) $(CFLAGS) -o network.o
 
-
-	#
-	#  local
-	#
-
-	$(CC) -c socket/local/network/channel.c  $(KINCLUDE) $(CFLAGS) -o channel.o
-	$(CC) -c socket/local/network/network.c  $(KINCLUDE) $(CFLAGS) -o network.o
 
 
 	#  /sci - System Call Interface.
-	$(CC) -c socket/local/sci/gde_serv.c $(KINCLUDE) $(CFLAGS) -o gde_serv.o
-	$(CC) -c socket/local/sci/sys/sys.c   $(KINCLUDE) $(CFLAGS) -o sys.o
+	$(CC) -c sci/gde_serv.c $(KINCLUDE) $(CFLAGS) -o gde_serv.o
+	$(CC) -c sci/sys/sys.c   $(KINCLUDE) $(CFLAGS) -o sys.o
+
 
 	# fs
-	$(CC) -c socket/local/fs/cf.c      $(KINCLUDE) $(CFLAGS) -o cf.o
-	$(CC) -c socket/local/fs/format.c  $(KINCLUDE) $(CFLAGS) -o format.o
-	$(CC) -c socket/local/fs/fs.c      $(KINCLUDE) $(CFLAGS) -o fs.o
-	$(CC) -c socket/local/fs/pipe.c    $(KINCLUDE) $(CFLAGS) -o pipe.o
-	$(CC) -c socket/local/fs/read.c    $(KINCLUDE) $(CFLAGS) -o read.o
-	$(CC) -c socket/local/fs/search.c  $(KINCLUDE) $(CFLAGS) -o search.o
-	$(CC) -c socket/local/fs/write.c   $(KINCLUDE) $(CFLAGS) -o write.o
+	$(CC) -c fs/cf.c      $(KINCLUDE) $(CFLAGS) -o cf.o
+	$(CC) -c fs/format.c  $(KINCLUDE) $(CFLAGS) -o format.o
+	$(CC) -c fs/fs.c      $(KINCLUDE) $(CFLAGS) -o fs.o
+	$(CC) -c fs/pipe.c    $(KINCLUDE) $(CFLAGS) -o pipe.o
+	$(CC) -c fs/read.c    $(KINCLUDE) $(CFLAGS) -o read.o
+	$(CC) -c fs/search.c  $(KINCLUDE) $(CFLAGS) -o search.o
+	$(CC) -c fs/write.c   $(KINCLUDE) $(CFLAGS) -o write.o
 
 	# fs/vfs
-	$(CC) -c socket/local/fs/vfs/vfs.c     $(KINCLUDE) $(CFLAGS) -o vfs.o
+	$(CC) -c fs/vfs/vfs.c     $(KINCLUDE) $(CFLAGS) -o vfs.o
 
 	# Security
-	$(CC) -c socket/local/security/desktop.c   $(KINCLUDE) $(CFLAGS) -o desktop.o
-	$(CC) -c socket/local/security/room.c      $(KINCLUDE) $(CFLAGS) -o room.o
-	$(CC) -c socket/local/security/userenv.c   $(KINCLUDE) $(CFLAGS) -o userenv.o
-	$(CC) -c socket/local/security/usession.c  $(KINCLUDE) $(CFLAGS) -o usession.o
+	$(CC) -c security/desktop.c   $(KINCLUDE) $(CFLAGS) -o desktop.o
+	$(CC) -c security/room.c      $(KINCLUDE) $(CFLAGS) -o room.o
+	$(CC) -c security/userenv.c   $(KINCLUDE) $(CFLAGS) -o userenv.o
+	$(CC) -c security/usession.c  $(KINCLUDE) $(CFLAGS) -o usession.o
 
 
 	# storage
-	$(CC) -c socket/local/syssm/storage/storage.c   $(KINCLUDE) $(CFLAGS) -o storage.o
+	$(CC) -c sm/storage/storage.c   $(KINCLUDE) $(CFLAGS) -o storage.o
 
 	# system
-	$(CC) -c socket/local/syssm/system/abort.c    $(KINCLUDE) $(CFLAGS) -o abort.o
-	$(CC) -c socket/local/syssm/system/info.c     $(KINCLUDE) $(CFLAGS) -o info.o
-	$(CC) -c socket/local/syssm/system/init.c     $(KINCLUDE) $(CFLAGS) -o init.o
-	$(CC) -c socket/local/syssm/system/install.c  $(KINCLUDE) $(CFLAGS) -o install.o
-	$(CC) -c socket/local/syssm/system/modules.c  $(KINCLUDE) $(CFLAGS) -o modules.o
-	$(CC) -c socket/local/syssm/system/runtime.c  $(KINCLUDE) $(CFLAGS) -o runtime.o
-	$(CC) -c socket/local/syssm/system/signal.c   $(KINCLUDE) $(CFLAGS) -o signal.o
-	$(CC) -c socket/local/syssm/system/sm.c       $(KINCLUDE) $(CFLAGS) -o sm.o
-	$(CC) -c socket/local/syssm/system/system.c   $(KINCLUDE) $(CFLAGS) -o system.o
+	$(CC) -c sm/system/abort.c    $(KINCLUDE) $(CFLAGS) -o abort.o
+	$(CC) -c sm/system/info.c     $(KINCLUDE) $(CFLAGS) -o info.o
+	$(CC) -c sm/system/init.c     $(KINCLUDE) $(CFLAGS) -o init.o
+	$(CC) -c sm/system/install.c  $(KINCLUDE) $(CFLAGS) -o install.o
+	$(CC) -c sm/system/modules.c  $(KINCLUDE) $(CFLAGS) -o modules.o
+	$(CC) -c sm/system/runtime.c  $(KINCLUDE) $(CFLAGS) -o runtime.o
+	$(CC) -c sm/system/signal.c   $(KINCLUDE) $(CFLAGS) -o signal.o
+	$(CC) -c sm/system/sm.c       $(KINCLUDE) $(CFLAGS) -o sm.o
+	$(CC) -c sm/system/system.c   $(KINCLUDE) $(CFLAGS) -o system.o
 
 	# debug
-	$(CC) -c socket/local/syssm/debug/debug.c  $(KINCLUDE) $(CFLAGS) -o debug.o
+	$(CC) -c sm/debug/debug.c  $(KINCLUDE) $(CFLAGS) -o debug.o
 
 	# ob
-	$(CC) -c socket/local/syssm/ob/object.c  $(KINCLUDE) $(CFLAGS) -o object.o
+	$(CC) -c sm/ob/object.c  $(KINCLUDE) $(CFLAGS) -o object.o
 
-	$(CC) -c socket/local/syssm/syssm.c   $(KINCLUDE) $(CFLAGS) -o syssm.o
+	$(CC) -c sm/syssm.c   $(KINCLUDE) $(CFLAGS) -o syssm.o
 
 
 	# Window Manager.
-	$(CC) -c socket/local/wm/kgwm.c    $(KINCLUDE) $(CFLAGS) -o kgwm.o
-	$(CC) -c socket/local/wm/wm.c      $(KINCLUDE) $(CFLAGS) -o wm.o
-	$(CC) -c socket/local/wm/logon.c   $(KINCLUDE) $(CFLAGS) -o logon.o
-	$(CC) -c socket/local/wm/logoff.c  $(KINCLUDE) $(CFLAGS) -o logoff.o
+	$(CC) -c wm/kgwm.c    $(KINCLUDE) $(CFLAGS) -o kgwm.o
+	$(CC) -c wm/logoff.c  $(KINCLUDE) $(CFLAGS) -o logoff.o
+	$(CC) -c wm/logon.c   $(KINCLUDE) $(CFLAGS) -o logon.o
+	$(CC) -c wm/wm.c      $(KINCLUDE) $(CFLAGS) -o wm.o
+
 
 	# Window Server.
-	$(CC) -c socket/local/ws/bg.c        $(KINCLUDE) $(CFLAGS) -o bg.o
-	$(CC) -c socket/local/ws/bmp.c       $(KINCLUDE) $(CFLAGS) -o bmp.o
-	$(CC) -c socket/local/ws/button.c    $(KINCLUDE) $(CFLAGS) -o button.o
-	$(CC) -c socket/local/ws/char.c      $(KINCLUDE) $(CFLAGS) -o char.o
-	$(CC) -c socket/local/ws/createw.c   $(KINCLUDE) $(CFLAGS) -o createw.o
-	$(CC) -c socket/local/ws/dtext.c     $(KINCLUDE) $(CFLAGS) -o dtext.o
-	$(CC) -c socket/local/ws/font.c      $(KINCLUDE) $(CFLAGS) -o font.o
-	$(CC) -c socket/local/ws/grid.c      $(KINCLUDE) $(CFLAGS) -o grid.o
-	$(CC) -c socket/local/ws/line.c      $(KINCLUDE) $(CFLAGS) -o line.o
-	$(CC) -c socket/local/ws/menu.c      $(KINCLUDE) $(CFLAGS) -o menu.o
-	$(CC) -c socket/local/ws/menubar.c   $(KINCLUDE) $(CFLAGS) -o menubar.o
-	$(CC) -c socket/local/ws/pixel.c     $(KINCLUDE) $(CFLAGS) -o pixel.o
-	$(CC) -c socket/local/ws/rect.c      $(KINCLUDE) $(CFLAGS) -o rect.o
-	$(CC) -c socket/local/ws/sbar.c      $(KINCLUDE) $(CFLAGS) -o sbar.o
-	$(CC) -c socket/local/ws/toolbar.c   $(KINCLUDE) $(CFLAGS) -o toolbar.o
-	$(CC) -c socket/local/ws/input.c     $(KINCLUDE) $(CFLAGS) -o input.o
-	$(CC) -c socket/local/ws/output.c    $(KINCLUDE) $(CFLAGS) -o output.o
-	$(CC) -c socket/local/ws/terminal.c  $(KINCLUDE) $(CFLAGS) -o terminal.o
-	$(CC) -c socket/local/ws/kgws.c      $(KINCLUDE) $(CFLAGS) -o kgws.o
-	$(CC) -c socket/local/ws/xproc.c     $(KINCLUDE) $(CFLAGS) -o xproc.o
-	$(CC) -c socket/local/ws/screen.c    $(KINCLUDE) $(CFLAGS) -o screen.o
-	$(CC) -c socket/local/ws/video.c     $(KINCLUDE) $(CFLAGS) -o video.o
-	$(CC) -c socket/local/ws/ldisc.c     $(KINCLUDE) $(CFLAGS) -o ldisc.o
+	$(CC) -c ws/bg.c        $(KINCLUDE) $(CFLAGS) -o bg.o
+	$(CC) -c ws/bmp.c       $(KINCLUDE) $(CFLAGS) -o bmp.o
+	$(CC) -c ws/button.c    $(KINCLUDE) $(CFLAGS) -o button.o
+	$(CC) -c ws/char.c      $(KINCLUDE) $(CFLAGS) -o char.o
+	$(CC) -c ws/createw.c   $(KINCLUDE) $(CFLAGS) -o createw.o
+	$(CC) -c ws/dtext.c     $(KINCLUDE) $(CFLAGS) -o dtext.o
+	$(CC) -c ws/font.c      $(KINCLUDE) $(CFLAGS) -o font.o
+	$(CC) -c ws/grid.c      $(KINCLUDE) $(CFLAGS) -o grid.o
+	$(CC) -c ws/line.c      $(KINCLUDE) $(CFLAGS) -o line.o
+	$(CC) -c ws/menu.c      $(KINCLUDE) $(CFLAGS) -o menu.o
+	$(CC) -c ws/menubar.c   $(KINCLUDE) $(CFLAGS) -o menubar.o
+	$(CC) -c ws/pixel.c     $(KINCLUDE) $(CFLAGS) -o pixel.o
+	$(CC) -c ws/rect.c      $(KINCLUDE) $(CFLAGS) -o rect.o
+	$(CC) -c ws/sbar.c      $(KINCLUDE) $(CFLAGS) -o sbar.o
+	$(CC) -c ws/toolbar.c   $(KINCLUDE) $(CFLAGS) -o toolbar.o
+	$(CC) -c ws/input.c     $(KINCLUDE) $(CFLAGS) -o input.o
+	$(CC) -c ws/output.c    $(KINCLUDE) $(CFLAGS) -o output.o
+	$(CC) -c ws/terminal.c  $(KINCLUDE) $(CFLAGS) -o terminal.o
+	$(CC) -c ws/kgws.c      $(KINCLUDE) $(CFLAGS) -o kgws.o
+	$(CC) -c ws/xproc.c     $(KINCLUDE) $(CFLAGS) -o xproc.o
+	$(CC) -c ws/screen.c    $(KINCLUDE) $(CFLAGS) -o screen.o
+	$(CC) -c ws/video.c     $(KINCLUDE) $(CFLAGS) -o video.o
+	$(CC) -c ws/ldisc.c     $(KINCLUDE) $(CFLAGS) -o ldisc.o
+
 
 	# ps/action
-	$(CC) -c  socket/local/ps/action/dispatch.c  $(KINCLUDE)  $(CFLAGS) -o dispatch.o
-	$(CC) -c  socket/local/ps/action/pheap.c     $(KINCLUDE)  $(CFLAGS) -o pheap.o
-	$(CC) -c  socket/local/ps/action/process.c   $(KINCLUDE)  $(CFLAGS) -o process.o
-	$(CC) -c  socket/local/ps/action/clone.c     $(KINCLUDE)  $(CFLAGS) -o clone.o
-	$(CC) -c  socket/local/ps/action/queue.c     $(KINCLUDE)  $(CFLAGS) -o queue.o
-	$(CC) -c  socket/local/ps/action/spawn.c     $(KINCLUDE)  $(CFLAGS) -o spawn.o
-	$(CC) -c  socket/local/ps/action/tasks.c     $(KINCLUDE)  $(CFLAGS) -o tasks.o
-	$(CC) -c  socket/local/ps/action/theap.c     $(KINCLUDE)  $(CFLAGS) -o theap.o
-	$(CC) -c  socket/local/ps/action/thread.c    $(KINCLUDE)  $(CFLAGS) -o thread.o
-	$(CC) -c  socket/local/ps/action/threadi.c   $(KINCLUDE)  $(CFLAGS) -o threadi.o
-	$(CC) -c  socket/local/ps/action/ts.c        $(KINCLUDE)  $(CFLAGS) -o ts.o
-	$(CC) -c  socket/local/ps/action/tstack.c    $(KINCLUDE)  $(CFLAGS) -o tstack.o
-	$(CC) -c  socket/local/ps/action/execve.c    $(KINCLUDE)  $(CFLAGS) -o execve.o
+	$(CC) -c  ps/action/dispatch.c  $(KINCLUDE)  $(CFLAGS) -o dispatch.o
+	$(CC) -c  ps/action/pheap.c     $(KINCLUDE)  $(CFLAGS) -o pheap.o
+	$(CC) -c  ps/action/process.c   $(KINCLUDE)  $(CFLAGS) -o process.o
+	$(CC) -c  ps/action/clone.c     $(KINCLUDE)  $(CFLAGS) -o clone.o
+	$(CC) -c  ps/action/queue.c     $(KINCLUDE)  $(CFLAGS) -o queue.o
+	$(CC) -c  ps/action/spawn.c     $(KINCLUDE)  $(CFLAGS) -o spawn.o
+	$(CC) -c  ps/action/tasks.c     $(KINCLUDE)  $(CFLAGS) -o tasks.o
+	$(CC) -c  ps/action/theap.c     $(KINCLUDE)  $(CFLAGS) -o theap.o
+	$(CC) -c  ps/action/thread.c    $(KINCLUDE)  $(CFLAGS) -o thread.o
+	$(CC) -c  ps/action/threadi.c   $(KINCLUDE)  $(CFLAGS) -o threadi.o
+	$(CC) -c  ps/action/ts.c        $(KINCLUDE)  $(CFLAGS) -o ts.o
+	$(CC) -c  ps/action/tstack.c    $(KINCLUDE)  $(CFLAGS) -o tstack.o
+	$(CC) -c  ps/action/execve.c    $(KINCLUDE)  $(CFLAGS) -o execve.o
 
 	# ps/ipc
-	$(CC) -c  socket/local/ps/ipc/callfar.c  $(KINCLUDE)  $(CFLAGS) -o callfar.o
-	$(CC) -c  socket/local/ps/ipc/callout.c  $(KINCLUDE)  $(CFLAGS) -o callout.o
-	$(CC) -c  socket/local/ps/ipc/ipc.c      $(KINCLUDE)  $(CFLAGS) -o ipc.o
-	$(CC) -c  socket/local/ps/ipc/ipccore.c  $(KINCLUDE)  $(CFLAGS) -o ipccore.o
-	$(CC) -c  socket/local/ps/ipc/sem.c      $(KINCLUDE)  $(CFLAGS) -o sem.o
+	$(CC) -c  ps/ipc/callfar.c  $(KINCLUDE)  $(CFLAGS) -o callfar.o
+	$(CC) -c  ps/ipc/callout.c  $(KINCLUDE)  $(CFLAGS) -o callout.o
+	$(CC) -c  ps/ipc/ipc.c      $(KINCLUDE)  $(CFLAGS) -o ipc.o
+	$(CC) -c  ps/ipc/ipccore.c  $(KINCLUDE)  $(CFLAGS) -o ipccore.o
+	$(CC) -c  ps/ipc/sem.c      $(KINCLUDE)  $(CFLAGS) -o sem.o
 
 	# ps/sched
-	$(CC) -c  socket/local/ps/sched/preempt.c   $(KINCLUDE) $(CFLAGS) -o preempt.o
-	$(CC) -c  socket/local/ps/sched/priority.c  $(KINCLUDE) $(CFLAGS) -o priority.o
-	$(CC) -c  socket/local/ps/sched/sched.c     $(KINCLUDE) $(CFLAGS) -o sched.o
-	$(CC) -c  socket/local/ps/sched/schedi.c    $(KINCLUDE) $(CFLAGS) -o schedi.o
+	$(CC) -c  ps/sched/preempt.c   $(KINCLUDE) $(CFLAGS) -o preempt.o
+	$(CC) -c  ps/sched/priority.c  $(KINCLUDE) $(CFLAGS) -o priority.o
+	$(CC) -c  ps/sched/sched.c     $(KINCLUDE) $(CFLAGS) -o sched.o
+	$(CC) -c  ps/sched/schedi.c    $(KINCLUDE) $(CFLAGS) -o schedi.o
 
 	# ps -x86 - falling angels.
-	$(CC) -c socket/local/ps/x86/x86cont.c   $(KINCLUDE)  $(CFLAGS) -o x86cont.o
-	$(CC) -c socket/local/ps/x86/x86fault.c  $(KINCLUDE)  $(CFLAGS) -o x86fault.o
-	$(CC) -c socket/local/ps/x86/x86start.c  $(KINCLUDE)  $(CFLAGS) -o x86start.o
-	$(CC) -c socket/local/ps/x86/memory.c    $(KINCLUDE)  $(CFLAGS) -o memory.o
-	$(CC) -c socket/local/ps/x86/mminfo.c    $(KINCLUDE)  $(CFLAGS) -o mminfo.o
-	$(CC) -c socket/local/ps/x86/mmpool.c    $(KINCLUDE)  $(CFLAGS) -o mmpool.o
-	$(CC) -c socket/local/ps/x86/pages.c     $(KINCLUDE)  $(CFLAGS) -o pages.o
+	$(CC) -c ps/x86/x86cont.c   $(KINCLUDE)  $(CFLAGS) -o x86cont.o
+	$(CC) -c ps/x86/x86fault.c  $(KINCLUDE)  $(CFLAGS) -o x86fault.o
+	$(CC) -c ps/x86/x86start.c  $(KINCLUDE)  $(CFLAGS) -o x86start.o
+	$(CC) -c ps/x86/memory.c    $(KINCLUDE)  $(CFLAGS) -o memory.o
+	$(CC) -c ps/x86/mminfo.c    $(KINCLUDE)  $(CFLAGS) -o mminfo.o
+	$(CC) -c ps/x86/mmpool.c    $(KINCLUDE)  $(CFLAGS) -o mmpool.o
+	$(CC) -c ps/x86/pages.c     $(KINCLUDE)  $(CFLAGS) -o pages.o
 
 	# ps
-	$(CC) -c socket/local/ps/create.c  $(KINCLUDE)  $(CFLAGS) -o create.o
-	$(CC) -c socket/local/ps/mk.c      $(KINCLUDE)  $(CFLAGS) -o mk.o
-	$(CC) -c socket/local/ps/sysmk.c   $(KINCLUDE)  $(CFLAGS) -o sysmk.o
+	$(CC) -c ps/create.c  $(KINCLUDE)  $(CFLAGS) -o create.o
+	$(CC) -c ps/mk.c      $(KINCLUDE)  $(CFLAGS) -o mk.o
+	$(CC) -c ps/sysmk.c   $(KINCLUDE)  $(CFLAGS) -o sysmk.o
 
 
 	##
@@ -311,18 +309,18 @@ all-c:
 	##
 
 	# klib
-	$(CC) -c socket/local/bottom/klib/ctype.c   $(KINCLUDE) $(CFLAGS) -o ctype.o
-	$(CC) -c socket/local/bottom/klib/kstdio.c  $(KINCLUDE) $(CFLAGS) -o kstdio.o
-	$(CC) -c socket/local/bottom/klib/stdlib.c  $(KINCLUDE) $(CFLAGS) -o stdlib.o
-	$(CC) -c socket/local/bottom/klib/string.c  $(KINCLUDE) $(CFLAGS) -o string.o
-	$(CC) -c socket/local/bottom/klib/unistd.c  $(KINCLUDE) $(CFLAGS) -o unistd.o
-	$(CC) -c socket/local/bottom/klib/syslib.c  $(KINCLUDE) $(CFLAGS) -o syslib.o
+	$(CC) -c bottom/klib/ctype.c   $(KINCLUDE) $(CFLAGS) -o ctype.o
+	$(CC) -c bottom/klib/kstdio.c  $(KINCLUDE) $(CFLAGS) -o kstdio.o
+	$(CC) -c bottom/klib/stdlib.c  $(KINCLUDE) $(CFLAGS) -o stdlib.o
+	$(CC) -c bottom/klib/string.c  $(KINCLUDE) $(CFLAGS) -o string.o
+	$(CC) -c bottom/klib/unistd.c  $(KINCLUDE) $(CFLAGS) -o unistd.o
+	$(CC) -c bottom/klib/syslib.c  $(KINCLUDE) $(CFLAGS) -o syslib.o
 
 
 	# dd
-	$(CC) -c socket/local/bottom/dd/io.c      $(KINCLUDE) $(CFLAGS) -o io.o
-	$(CC) -c socket/local/bottom/dd/sysio.c   $(KINCLUDE) $(CFLAGS) -o sysio.o
-	$(CC) -c socket/local/bottom/dd/devmgr.c  $(KINCLUDE) $(CFLAGS) -o devmgr.o
+	$(CC) -c bottom/dd/io.c      $(KINCLUDE) $(CFLAGS) -o io.o
+	$(CC) -c bottom/dd/sysio.c   $(KINCLUDE) $(CFLAGS) -o sysio.o
+	$(CC) -c bottom/dd/devmgr.c  $(KINCLUDE) $(CFLAGS) -o devmgr.o
 
 
 	#
@@ -330,45 +328,45 @@ all-c:
 	#
 
 	# ahci 
-	$(CC) -c socket/local/bottom/dd/nhid/ahci/ahci.c  $(KINCLUDE) $(CFLAGS) -o ahci.o
+	$(CC) -c bottom/dd/nhid/ahci/ahci.c  $(KINCLUDE) $(CFLAGS) -o ahci.o
 	
 	# x86
-	$(CC) -c socket/local/bottom/dd/nhid/arch/x86/apic.c  $(KINCLUDE) $(CFLAGS) -o apic.o
-	$(CC) -c socket/local/bottom/dd/nhid/arch/x86/pic.c   $(KINCLUDE) $(CFLAGS) -o pic.o
-	$(CC) -c socket/local/bottom/dd/nhid/arch/x86/pit.c   $(KINCLUDE) $(CFLAGS) -o pit.o
+	$(CC) -c bottom/dd/nhid/arch/x86/apic.c  $(KINCLUDE) $(CFLAGS) -o apic.o
+	$(CC) -c bottom/dd/nhid/arch/x86/pic.c   $(KINCLUDE) $(CFLAGS) -o pic.o
+	$(CC) -c bottom/dd/nhid/arch/x86/pit.c   $(KINCLUDE) $(CFLAGS) -o pit.o
 	
 	# hal
-	$(CC) -c socket/local/bottom/dd/nhid/hal/hal.c                $(KINCLUDE) $(CFLAGS) -o hal.o
-	$(CC) -c socket/local/bottom/dd/nhid/hal/arch/detect.c        $(KINCLUDE) $(CFLAGS) -o detect.o
-	$(CC) -c socket/local/bottom/dd/nhid/hal/arch/amd/cpuamd.c    $(KINCLUDE) $(CFLAGS) -o cpuamd.o
-	$(CC) -c socket/local/bottom/dd/nhid/hal/arch/x86/portsx86.c  $(KINCLUDE) $(CFLAGS) -o portsx86.o
-	$(CC) -c socket/local/bottom/dd/nhid/hal/arch/x86/x86.c       $(KINCLUDE) $(CFLAGS) -o x86.o
-	$(CC) -c socket/local/bottom/dd/nhid/hal/arch/x86/x86info.c   $(KINCLUDE) $(CFLAGS) -o x86info.o   
+	$(CC) -c bottom/dd/nhid/hal/hal.c                $(KINCLUDE) $(CFLAGS) -o hal.o
+	$(CC) -c bottom/dd/nhid/hal/arch/detect.c        $(KINCLUDE) $(CFLAGS) -o detect.o
+	$(CC) -c bottom/dd/nhid/hal/arch/amd/cpuamd.c    $(KINCLUDE) $(CFLAGS) -o cpuamd.o
+	$(CC) -c bottom/dd/nhid/hal/arch/x86/portsx86.c  $(KINCLUDE) $(CFLAGS) -o portsx86.o
+	$(CC) -c bottom/dd/nhid/hal/arch/x86/x86.c       $(KINCLUDE) $(CFLAGS) -o x86.o
+	$(CC) -c bottom/dd/nhid/hal/arch/x86/x86info.c   $(KINCLUDE) $(CFLAGS) -o x86info.o   
 
 	# ide
-	$(CC) -c socket/local/bottom/dd/nhid/ide/ata.c      $(KINCLUDE) $(CFLAGS) -o ata.o
-	$(CC) -c socket/local/bottom/dd/nhid/ide/atadma.c   $(KINCLUDE) $(CFLAGS) -o atadma.o
-	$(CC) -c socket/local/bottom/dd/nhid/ide/atainit.c  $(KINCLUDE) $(CFLAGS) -o atainit.o
-	$(CC) -c socket/local/bottom/dd/nhid/ide/atairq.c   $(KINCLUDE) $(CFLAGS) -o atairq.o
-	$(CC) -c socket/local/bottom/dd/nhid/ide/atapci.c   $(KINCLUDE) $(CFLAGS) -o atapci.o
-	$(CC) -c socket/local/bottom/dd/nhid/ide/hdd.c      $(KINCLUDE) $(CFLAGS) -o hdd.o
+	$(CC) -c bottom/dd/nhid/ide/ata.c      $(KINCLUDE) $(CFLAGS) -o ata.o
+	$(CC) -c bottom/dd/nhid/ide/atadma.c   $(KINCLUDE) $(CFLAGS) -o atadma.o
+	$(CC) -c bottom/dd/nhid/ide/atainit.c  $(KINCLUDE) $(CFLAGS) -o atainit.o
+	$(CC) -c bottom/dd/nhid/ide/atairq.c   $(KINCLUDE) $(CFLAGS) -o atairq.o
+	$(CC) -c bottom/dd/nhid/ide/atapci.c   $(KINCLUDE) $(CFLAGS) -o atapci.o
+	$(CC) -c bottom/dd/nhid/ide/hdd.c      $(KINCLUDE) $(CFLAGS) -o hdd.o
 
 	# net
-	$(CC) -c socket/local/bottom/dd/nhid/net/nicintel.c  $(KINCLUDE) $(CFLAGS) -o nicintel.o
+	$(CC) -c bottom/dd/nhid/net/nicintel.c  $(KINCLUDE) $(CFLAGS) -o nicintel.o
 
 	# rtc
-	$(CC) -c socket/local/bottom/dd/nhid/rtc/rtc.c     $(KINCLUDE) $(CFLAGS) -o rtc.o
+	$(CC) -c bottom/dd/nhid/rtc/rtc.c     $(KINCLUDE) $(CFLAGS) -o rtc.o
 
 	# serial
-	$(CC) -c socket/local/bottom/dd/nhid/serial/serial.c  $(KINCLUDE) $(CFLAGS) -o serial.o
+	$(CC) -c bottom/dd/nhid/serial/serial.c  $(KINCLUDE) $(CFLAGS) -o serial.o
 
 	# pci
-	$(CC) -c socket/local/bottom/dd/nhid/pci/pci.c      $(KINCLUDE) $(CFLAGS) -o pci.o
-	$(CC) -c socket/local/bottom/dd/nhid/pci/pciinfo.c  $(KINCLUDE) $(CFLAGS) -o pciinfo.o
-	$(CC) -c socket/local/bottom/dd/nhid/pci/pciscan.c  $(KINCLUDE) $(CFLAGS) -o pciscan.o
+	$(CC) -c bottom/dd/nhid/pci/pci.c      $(KINCLUDE) $(CFLAGS) -o pci.o
+	$(CC) -c bottom/dd/nhid/pci/pciinfo.c  $(KINCLUDE) $(CFLAGS) -o pciinfo.o
+	$(CC) -c bottom/dd/nhid/pci/pciscan.c  $(KINCLUDE) $(CFLAGS) -o pciscan.o
 
 	# usb
-	$(CC) -c socket/local/bottom/dd/nhid/usb/usb.c   $(KINCLUDE) $(CFLAGS) -o usb.o
+	$(CC) -c bottom/dd/nhid/usb/usb.c   $(KINCLUDE) $(CFLAGS) -o usb.o
 
 
 	#
@@ -376,28 +374,28 @@ all-c:
 	# 
 	
 	# tty
-	$(CC) -c socket/local/bottom/dd/hid/tty/console.c $(KINCLUDE) $(CFLAGS) -o cedge.o
-	$(CC) -c socket/local/bottom/dd/hid/tty/pty.c     $(KINCLUDE) $(CFLAGS) -o pty.o
-	$(CC) -c socket/local/bottom/dd/hid/tty/tty.c     $(KINCLUDE) $(CFLAGS) -o tty.o
-	$(CC) -c socket/local/bottom/dd/hid/tty/vt.c      $(KINCLUDE) $(CFLAGS) -o vt.o
+	$(CC) -c bottom/dd/hid/tty/console.c $(KINCLUDE) $(CFLAGS) -o cedge.o
+	$(CC) -c bottom/dd/hid/tty/pty.c     $(KINCLUDE) $(CFLAGS) -o pty.o
+	$(CC) -c bottom/dd/hid/tty/tty.c     $(KINCLUDE) $(CFLAGS) -o tty.o
+	$(CC) -c bottom/dd/hid/tty/vt.c      $(KINCLUDE) $(CFLAGS) -o vt.o
 
 	# ws
-	$(CC) -c socket/local/bottom/dd/hid/ws/i8042.c     $(KINCLUDE) $(CFLAGS) -o i8042.o
-	$(CC) -c socket/local/bottom/dd/hid/ws/keyboard.c  $(KINCLUDE) $(CFLAGS) -o keyboard.o
-	$(CC) -c socket/local/bottom/dd/hid/ws/mouse.c     $(KINCLUDE) $(CFLAGS) -o mouse.o
-	$(CC) -c socket/local/bottom/dd/hid/ws/ps2kbd.c    $(KINCLUDE) $(CFLAGS) -o ps2kbd.o
-	$(CC) -c socket/local/bottom/dd/hid/ws/ps2mouse.c  $(KINCLUDE) $(CFLAGS) -o ps2mouse.o
-	$(CC) -c socket/local/bottom/dd/hid/ws/vsync.c     $(KINCLUDE) $(CFLAGS) -o vsync.o
+	$(CC) -c bottom/dd/hid/ws/i8042.c     $(KINCLUDE) $(CFLAGS) -o i8042.o
+	$(CC) -c bottom/dd/hid/ws/keyboard.c  $(KINCLUDE) $(CFLAGS) -o keyboard.o
+	$(CC) -c bottom/dd/hid/ws/mouse.c     $(KINCLUDE) $(CFLAGS) -o mouse.o
+	$(CC) -c bottom/dd/hid/ws/ps2kbd.c    $(KINCLUDE) $(CFLAGS) -o ps2kbd.o
+	$(CC) -c bottom/dd/hid/ws/ps2mouse.c  $(KINCLUDE) $(CFLAGS) -o ps2mouse.o
+	$(CC) -c bottom/dd/hid/ws/vsync.c     $(KINCLUDE) $(CFLAGS) -o vsync.o
 
 
 	# x86 initialization
-	$(CC) -c socket/local/bottom/init/x86/x86init.c  $(KINCLUDE) $(CFLAGS) -o x86init.o
+	$(CC) -c bottom/init/x86/x86init.c  $(KINCLUDE) $(CFLAGS) -o x86init.o
 
 	# x86 boot
-	$(NASM) socket/local/bottom/init/x86/boot.asm -I socket/local/bottom/init/x86/ -f elf -o boot.o
+	$(NASM) bottom/init/x86/boot.asm -I bottom/init/x86/ -f elf -o boot.o
 
-	
-	
+
+
 	#(CC) -c protocol ...
 
 
