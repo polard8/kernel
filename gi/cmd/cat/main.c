@@ -53,7 +53,7 @@ int main ( int argc, char *argv[] ){
 
     nreads = read( fileno(fp), buffer, sizeof(buffer) );
 
-    if (nreads <=0 ){
+    if ( nreads <= 0 ){
         printf ("cat: read fail\n");
         exit(-1);
     }
@@ -77,7 +77,7 @@ int main ( int argc, char *argv[] ){
     nwrites = write( 1, buffer, sizeof(buffer) );
     //nwrites = write( 1, buffer, size );
 
-    if (nwrites <=0 ){
+    if ( nwrites <= 0 ){
         printf ("cat: write fail\n");
         exit(-1);
     }
@@ -88,6 +88,7 @@ int main ( int argc, char *argv[] ){
     
     // # testing libc
     // creat
+    //printf("cat: Testing creat()\n");
     //int s = -1;
     //s = creat ( "nothing.txt", 0666);
     //if(s<=0)

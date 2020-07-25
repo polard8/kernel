@@ -111,9 +111,11 @@ int openat (int dirfd, const char *pathname, int flags){
 int open (const char *pathname, int flags, mode_t mode){
 
     int fd = -1;
-    size_t FileSize = -1;
-
     char tmp_path[64];
+    
+    //size_t FileSize = -1;
+
+
 
 
 
@@ -131,6 +133,7 @@ int open (const char *pathname, int flags, mode_t mode){
     // Get file size.
     // Limits: 1MB.
     
+    /*
     FileSize = (size_t) gramado_system_call ( 178, 
                             (unsigned long) tmp_path, 0, 0 );
 
@@ -139,9 +142,10 @@ int open (const char *pathname, int flags, mode_t mode){
         printf ("open: [FAIL] FileSize\n");
         return (int) (-1);
     }
+    */
 
 
-    // load the file into the address.
+    // Load the file into the address.
     // O arquivo será carregado no buffer em ring0,
     // A chamada não oferecerá um endereço em ring3,
     // pois não dá pra confiar na biblioteca,
@@ -192,7 +196,7 @@ int __open2(const char* path, int options, ...)
 
 int creat (const char *pathname, mode_t mode)
 {
-    return open (pathname, O_CREAT|O_WRONLY|O_TRUNC, mode);
+    return (int) open (pathname, O_CREAT|O_WRONLY|O_TRUNC, mode);
 }
 
 

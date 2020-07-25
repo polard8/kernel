@@ -209,7 +209,7 @@ unsigned short list[fat_range_max];
 
 // IN: 
 // name, size in sectors, size in bytes, adress, flag. 
-
+// OUT:
 int
 fsSaveFile ( 
     char *file_name, 

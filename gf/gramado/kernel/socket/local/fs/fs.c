@@ -1904,7 +1904,9 @@ sys_read_file (
     
     int Status = -1;
 
+    int __ret = -1;
 
+    void *buff;
 
     debug_print ("sys_read_file:\n");
 
@@ -1927,12 +1929,46 @@ sys_read_file (
 
     Status = (int) KiSearchFile( file_name, VOLUME1_ROOTDIR_ADDRESS );
     
-    if (Status != 1){
-         printf ("sys_read_file: File not found!\n");
+    if (Status != 1)
+    {
+         printf ("sys_read_file: [FIXME] File not found!\n");
          refresh_screen();
+         
+         // Create a new one.
+         if (flags & O_CREAT)
+         {
+             debug_print ("sys_read_file: [O_CREAT] Creating a new file\n"); 
+
+             buff = (void*) kmalloc(1024);
+             if((void*)buff==NULL){
+                 debug_print("sys_read_file: buff fail\n");
+                 return -1; 
+             }
+
+             //++
+             // See: sci/fs/write.c
+             taskswitch_lock ();
+             scheduler_lock ();
+
+             __ret = (int) fsSaveFile ( (char *) file_name,    
+                              (unsigned long) 2,      // size in sectors      
+                              (unsigned long) 1024,   // size in bytes  
+                              (char *) buff,          // buffer ?
+                              (char) 0x20 );          // flag                  
+
+              scheduler_unlock ();
+              taskswitch_unlock ();
+              //--
+              
+              // Ok
+              if (__ret == 0)
+                  goto __go;
+         }
+         
          return (int) (-1);
     }
 
+__go:
 
     //
     // Process.
@@ -1971,7 +2007,7 @@ __OK:
  
     // Struct
     
-    __file = (file *) kmalloc ( sizeof(file) );
+    __file = (file *) kmalloc( sizeof(file) );
     
     if ( (void *) __file == NULL ){
         printf ("sys_read_file: __file\n");
@@ -2336,7 +2372,6 @@ sys_write_file (
     taskswitch_lock ();
     scheduler_lock ();
 
-    //See: write.c
     __ret = (int) fsSaveFile ( (char *) file_name,    
                     (unsigned long) file_size,       
                     (unsigned long) size_in_bytes,  
