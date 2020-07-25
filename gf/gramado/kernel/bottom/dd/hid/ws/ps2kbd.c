@@ -740,16 +740,17 @@ done:
 
             switch (ch){
 
-                // Handle the message.
+                // Emergency keys.
+                // Sending these keys to the system procedure.
                 case VK_F5: 
                 case VK_F6: 
                 case VK_F7: 
                 case VK_F8:
+                    debug_print ("KEYBOARD_SEND_MESSAGE: >>>> [MSG_SYSKEYUP] to system procedure\n"); 
                     __local_ps2kbd_procedure ( w, 
                         (int) message, 
                         (unsigned long) ch, 
-                        (unsigned long) tmp_sc );
-                    debug_print ("KEYBOARD_SEND_MESSAGE: >>>> [MSG_SYSKEYUP] to system procedure\n");        
+                        (unsigned long) tmp_sc );       
                     return 0;
                     break;
                 

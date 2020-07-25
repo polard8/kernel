@@ -100,9 +100,8 @@ ipc_send_to_ws (
             
             switch (long1){
                 
-                // #debug
-                // Nesse caso não mandaremos para o ws.
-                // Handle the message.
+                // Emergency keys.
+                // Sending these keys to the system procedure.
                 case VK_F5: 
                 case VK_F6: 
                 case VK_F7: 
