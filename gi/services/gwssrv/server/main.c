@@ -1017,10 +1017,10 @@ int main (int argc, char **argv){
 
 
         //gde_clone_and_execute ("gwm.bin");    // window manager
-        //gde_clone_and_execute ("terminal.bin");  
+        gde_clone_and_execute ("terminal.bin");  
         //gde_clone_and_execute ("browser.bin"); 
         //gde_clone_and_execute ("gws.bin"); // client: serve para enviar comandos para o servidor.
-        gde_clone_and_execute ("s2.bin");    //#bugbug        
+        //gde_clone_and_execute ("s2.bin");    //#bugbug        
         //gde_clone_and_execute ("s3.bin");    //#bugbug        
         // ...        
 

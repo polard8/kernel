@@ -317,27 +317,29 @@ int main ( int argc, char *argv[] ){
     }
 
 
-
-    //
-    // Connect
-    // 
-
-
-    //nessa hora colocamos no accept um fd.
-    //então o servidor escreverá em nosso arquivo.
+    while(1){
     
-    // #debug
-    //printf ("gnst: Connecting to the address 'ns' ...\n");      
-    
-    printf ("gnst: Connecting to the address via inet  ...\n");      
-    if (connect (client_fd, (void *) &addr_in, sizeof(addr_in)) < 0)
-    { 
-        gws_debug_print ("gnst: Connection Failed\n");
-        printf("gnst: Connection Failed \n"); 
-        close(client_fd);
-        exit(1);
-        //return (int) (-1); 
-    } 
+        //
+        // Connect
+        // 
+
+        //nessa hora colocamos no accept um fd.
+        //então o servidor escreverá em nosso arquivo.
+        // #debug
+        gws_debug_print ("gnst: Connecting to ns via inet  ...\n");      
+        printf ("gnst: Connecting to ns via inet  ...\n");      
+        if (connect (client_fd, (void *) &addr_in, sizeof(addr_in)) < 0)
+        { 
+            gws_debug_print ("gnst: Connection Failed\n");
+            printf("gnst: Connection Failed \n"); 
+            //close(client_fd);
+            //exit(1);
+            //return (int) (-1); 
+         }else{break;}; 
+
+    };
+
+
 
 
     //

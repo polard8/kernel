@@ -165,21 +165,7 @@ new_message:
         message_buffer[7] = 20;   //h
         
         message_buffer[8] = ____color + ( rand() ); 
-
         message_buffer[9] = WT_SIMPLE;
-
-
-        /*
-        //line
-        message_buffer[0] = 0; //window. 
-        message_buffer[1] = 1003; //1000;  //msg = hello friend.
-        message_buffer[2] = 0;
-        message_buffer[3] = 0;
-        message_buffer[4] = 100;   //x1
-        message_buffer[5] = 100;   //y
-        message_buffer[6] = 200;       //x2
-        message_buffer[7] = 0x00FF00;   //color
-        */
 
         //...
 
