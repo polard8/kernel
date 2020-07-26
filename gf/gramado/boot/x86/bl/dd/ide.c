@@ -27,9 +27,9 @@
 
 
 //
-// ============================================================================
-//     ATA  - TESTANDO O SUPORTE A ATA DO NELSON...
-// ============================================================================
+// ====================================================================
+//     ATA - Created by Nelson Cole.
+// ====================================================================
 //
 
 
@@ -39,20 +39,20 @@ static _u32 ata_irq_invoked = 0;
 
 
 
-int disk_get_ata_irq_invoked (){
-
+int disk_get_ata_irq_invoked ()
+{
     return (int) ata_irq_invoked;
 }
 
 
-void disk_reset_ata_irq_invoked (){
-
+void disk_reset_ata_irq_invoked ()
+{
     ata_irq_invoked = 0;
 }
 
 
-void ata_wait (_i32 val){
-
+void ata_wait (_i32 val)
+{
     val /= 100;
 
     while(val--)io_delay();
@@ -64,8 +64,8 @@ void ata_wait (_i32 val){
 // Nelson, ao configurar os bits BUSY e DRQ. 
 // Devemos verificar retornos de erros.
 
-_u8 ata_wait_not_busy (){
-
+_u8 ata_wait_not_busy ()
+{
     while(ata_status_read() &ATA_SR_BSY)
     if(ata_status_read() &ATA_SR_ERR)
         return 1;
@@ -435,9 +435,10 @@ uint32_t  dev_next_pid = 0;  // O próximo ID de unidade disponível.
  *     Rotina de inicialização de dispositivo de armazenamento de dados.
  */
 
-void ide_mass_storage_initialize (){
+void ide_mass_storage_initialize ()
+{
 
-    int port;
+    int port=0;
 
     //
     // Vamos trabalhar na lista de dispositivos.
@@ -447,6 +448,8 @@ void ide_mass_storage_initialize (){
 	// Iniciando a lista.
 	ready_queue_dev = ( struct st_dev * ) malloc ( sizeof( struct st_dev) );
 
+    // #bugbug
+    // Check validation!
 
     current_dev = ( struct st_dev * ) ready_queue_dev;
     current_dev->dev_id      = dev_next_pid++;
@@ -458,7 +461,7 @@ void ide_mass_storage_initialize (){
 
 
 	// ??
-    ata_identify_dev_buf = ( _u16 * ) malloc (4096);
+    ata_identify_dev_buf = ( _u16 * ) malloc(4096);
 
 
 	//
@@ -482,28 +485,29 @@ void ide_mass_storage_initialize (){
 
 int ide_dev_init (char port){
 
-    int data;
+    int data=0;
 
     st_dev_t *new_dev;
 
+
+
     new_dev = ( struct st_dev * ) malloc ( sizeof( struct st_dev) );
     
-	if ( (void *) new_dev ==  NULL )
-	{
+    if ( (void *) new_dev ==  NULL ){
 		printf ("ide_dev_init: struct");
 		die ();
-	}; 
+    }
 
 
 	data = (int) ide_identify_device (port);
 
     if ( data == -1 )
-	{
+    {
 		//@todo: 
 		//   Message.
     
 		return (int) 1;
-	};
+    }
 
 
 	if ( data == 0 )
@@ -585,26 +589,31 @@ int ide_dev_init (char port){
 	// port
 	//
 
+    switch ( port ){
 
-    switch ( port )
-    {
-        case 0:
+        case 0:  
+            // Message
             dev_nport.dev0 = 0x81;
             break;
 
         case 1:
+            // Message
             dev_nport.dev1 = 0x82;
             break;
 
         case 2:
+            // Message
             dev_nport.dev2 = 0x83;
             break;
 
         case 3:
+            // Message
             dev_nport.dev3 = 0x84;
             break;
 
-        //?? default ?? 
+        default: 
+            // Message
+            break; 
     };
 
 
@@ -788,10 +797,15 @@ _u8 *dma_addr;
  * ata_set_device_and_sector:
  */
 
-static inline _void ata_set_device_and_sector ( _u32 count, _u64 addr,\
-                                                _i32 access_type, _i8 nport )
+static inline _void ata_set_device_and_sector ( 
+    _u32 count, 
+    _u64 addr,
+    _i32 access_type, 
+    _i8 nport )
 {
+
     ata_assert_dever(nport);
+
 
 	//
 	// Access type.
@@ -903,16 +917,22 @@ struct {
 }ide_dma_prdt[4];
 
 
-/* ide_dma_data: */
+/* 
+ * ide_dma_data: 
+ * 
+ */
 
 void 
-ide_dma_data ( void *addr, 
-               uint16_t byte_count,
-               uint8_t flg,
-               uint8_t nport )
+ide_dma_data ( 
+    void *addr, 
+    uint16_t byte_count,
+    uint8_t flg,
+    uint8_t nport )
 {
-    _u8 data;
-    uint32_t phy;
+
+    _u8 data=0;
+    uint32_t phy=0;
+
 
 	// @todo: 
 	// Check limits.
@@ -959,11 +979,13 @@ done:
  * ide_dma_start:
  */
 
-void ide_dma_start (){
-
+void ide_dma_start ()
+{
     _u8 data = in8 ( ata.bus_master_base_address + ide_dma_reg_cmd );
+
     out8( ata.bus_master_base_address + ide_dma_reg_cmd, data | 1);
 }
+
 
 
 /*
@@ -1373,8 +1395,10 @@ done:
 
 uint32_t diskPCIScanDevice ( int class ){
 
-    int bus, dev, fun;
- 
+    int bus=0; 
+    int dev=0; 
+    int fun=0;
+
     uint32_t data = -1;
 
 
@@ -1437,16 +1461,18 @@ uint32_t diskPCIScanDevice ( int class ){
  * Credits: Nelson Cole;
  */
 
-int diskATAInitialize ( int ataflag ){
+int diskATAInitialize ( int ataflag )
+{
+    _u8 bus=0;
+    _u8 dev=0;
+    _u8 fun=0;
 
     int Status = 1;  //error
-    int port;
+    int port=0;
 
-    _u32 data;
+    _u32 data=0;
 
-    _u8 bus;
-    _u8 dev;
-    _u8 fun;
+
 
 
 	//#importante HACK HACK
@@ -1506,8 +1532,7 @@ int diskATAInitialize ( int ataflag ){
     data = (_u32) diskATAPCIConfigurationSpace ( bus, dev, fun );
 
 	// Error.
-    if( data == PCI_MSG_ERROR )
-    {
+    if( data == PCI_MSG_ERROR ){
         printf ("diskATAInitialize: Error Driver [%X]\n", data );
 		Status = (int) 1;
 		goto fail;  
@@ -1626,11 +1651,11 @@ int diskATAInitialize ( int ataflag ){
 	    // Sondando dispositivos
 	
         // As primeiras quatro portas do controlador IDE.    
-	    for ( port=0; port < 4; port++ )
-	    {
+	    for ( port=0; port < 4; port++ ){
             ide_dev_init (port);
-	    };		
-		
+	    };
+
+
 		//
 		// Agora se for AHCI.
 		//
@@ -1708,11 +1733,15 @@ done:
  */
 
 int 
-diskATADialog ( int msg, 
-                unsigned long long1, 
-                unsigned long long2 )
+diskATADialog ( 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 )
 {
+
     int Status = 1;    //Error.
+
+
 
     switch (msg)
     {
@@ -1752,8 +1781,8 @@ done:
  *     irq 14 handler
  */
 
-void diskATAIRQHandler1 (){
-
+void diskATAIRQHandler1 ()
+{
     ata_irq_invoked = 1;  
 }
 
@@ -1764,8 +1793,8 @@ void diskATAIRQHandler1 (){
  *     irq 15 handler
  */
  
-void diskATAIRQHandler2 (){
-
+void diskATAIRQHandler2 ()
+{
     ata_irq_invoked = 1;   
 }
 
@@ -1779,7 +1808,8 @@ void diskATAIRQHandler2 (){
 
 void show_ide_info (){
 
-    int i;
+    int i=0;
+
 
     printf ("show_ide_info:\n");
 
@@ -1787,15 +1817,11 @@ void show_ide_info (){
     {
 		printf ("\n\n");
 		
-		printf ("id=%d\n", ide_ports[i].id );
-		
-		printf ("used=%d\n", ide_ports[i].used );
-		printf ("magic=%d\n", ide_ports[i].magic );
-		
-		printf ("type=%d\n", ide_ports[i].type );
-		
-		printf ("name=%s\n", ide_ports[i].name );
-		
+		printf ("id=%d\n",        ide_ports[i].id );
+		printf ("used=%d\n",      ide_ports[i].used );
+		printf ("magic=%d\n",     ide_ports[i].magic );
+		printf ("type=%d\n",      ide_ports[i].type );
+		printf ("name=%s\n",      ide_ports[i].name );
 		printf ("base_port=%x\n", ide_ports[i].base_port );
 	};
 
@@ -1848,7 +1874,7 @@ void show_ide_info (){
 int disk_ata_wait_irq (){
 
    _u32 tmp = 0x10000;
-   _u8 data;
+   _u8 data=0;
 
  
     while (!ata_irq_invoked)

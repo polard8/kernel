@@ -147,9 +147,15 @@ int kprintf ( char *message, unsigned int line, int color )
  *     Parte da função printf(). 
  */
 
-static int prints ( char **out, const char *string, int width, int pad ){
-	
+static int prints ( 
+    char **out, 
+    const char *string, 
+    int width, 
+    int pad )
+{
+
     register int pc = 0, padchar = ' ';
+
 
     if (width > 0) 
     {
@@ -198,12 +204,22 @@ done:
  *     Parte da função printf()
  */
  
-static int printi ( char **out, int i, int b, int sg, int width, int pad, int letbase)
+static int printi ( 
+   char **out, 
+   int i, 
+   int b, 
+   int sg, 
+   int width, 
+   int pad, 
+   int letbase )
 {
-	char print_buf[PRINT_BUF_LEN];
-	register char *s;
-	register int t, neg = 0, pc = 0;
-	register unsigned int u = i;
+
+    char print_buf[PRINT_BUF_LEN];
+
+    register char *s;
+    register int t, neg = 0, pc = 0;
+    register unsigned int u = i;
+
 
 	if (i == 0)
 	{
@@ -527,15 +543,17 @@ done:
 
 void _outbyte (int c){
 
-    unsigned long i;
+    unsigned long i=0;
 
-    unsigned long x;
-    unsigned long y;
+    unsigned long x=0;
+    unsigned long y=0;
 
     char ch = (char) c;
     char ch_atributo = (char) g_char_attrib;
 
     char *vm = (char *) 0x000B8000;  
+
+
 
     // Caso estivermos em modo gráfico.
 	if(VideoBlock.useGui == 1)
@@ -744,11 +762,13 @@ input_done:
  */
 
 void 
-my_buffer_horizontal_line ( unsigned long x1,
-                            unsigned long y, 
-                            unsigned long x2, 
-                            unsigned long color )
+my_buffer_horizontal_line ( 
+    unsigned long x1,
+    unsigned long y, 
+    unsigned long x2, 
+    unsigned long color )
 {
+
     while (x1 < x2)
     {
         my_buffer_put_pixel ( color, x1, y, 0 );
@@ -769,10 +789,11 @@ my_buffer_horizontal_line ( unsigned long x1,
 extern void gui_buffer_putpixel();
 
 void 
-my_buffer_put_pixel ( unsigned long ax, 
-                      unsigned long bx, 
-                      unsigned long cx, 
-                      unsigned long dx )
+my_buffer_put_pixel ( 
+    unsigned long ax, 
+    unsigned long bx, 
+    unsigned long cx, 
+    unsigned long dx )
 {
 
 	//asm volatile(" \n "
@@ -803,7 +824,7 @@ my_buffer_put_pixel ( unsigned long ax,
 	
 	// = 3; 
 	//24bpp
-	int bytes_count;
+	int bytes_count=0;
 	
 	switch (SavedBPP)
 	{
@@ -841,11 +862,13 @@ my_buffer_put_pixel ( unsigned long ax,
  */
 
 void 
-my_buffer_char_blt ( unsigned long x, 
-                     unsigned long y, 
-                     unsigned long color, 
-                     unsigned long c )
+my_buffer_char_blt ( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long color, 
+    unsigned long c )
 { 
+
     int x2, y2;
     unsigned char bit_mask = 0x80;
     char *work_char = (char*) 0x000FFA6E + (c * 8);    //char height.     
@@ -939,11 +962,13 @@ unsigned long get_cursor_y (){
  */
 
 void 
-carrega_bitmap_16x16 ( unsigned long ax, 
-                       unsigned long bx, 
-                       unsigned long cx, 
-                       unsigned long dx )
+carrega_bitmap_16x16 ( 
+    unsigned long ax, 
+    unsigned long bx, 
+    unsigned long cx, 
+    unsigned long dx )
 {
+
     asm volatile (" \n "
 		          : // no inputs
 		          : "a"(ax), "b"(bx), "c"(cx), "d"(dx) );

@@ -24,16 +24,13 @@ void *malloc (size_t size){
 
 	//s = (s ? s : 1);	/* if s == 0, s = 1 */
 
-    if ( s < 0 )
-    {
+    if ( s < 0 ){
+        //#todo: Message
         return NULL;
-    };
+    }
     
 
-	if ( s == 0 )
-	{
-		s=1;
-	};
+    if ( s == 0 ){ s=1; };
 
 
 	//Alocar memória no heap do kernel.
@@ -42,6 +39,7 @@ void *malloc (size_t size){
 	
 	if ( (void *) h == NULL )
 	{
+	    //#todo: message
 		return NULL;
 	}
 
@@ -74,6 +72,7 @@ void *malloc (size_t size){
 
 void free (void *ptr){
 
+    //#todo: message
     if ( (void *) ptr == NULL )
         return;
 

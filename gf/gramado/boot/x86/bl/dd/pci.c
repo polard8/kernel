@@ -1,5 +1,5 @@
 /*
- * File: x86/drivers/pci.c
+ * File: dd/pci.c
  *
  * Descrição:
  *     Rotinas de suporte à PCI.
@@ -30,14 +30,17 @@
  *  Ex: 0x80000000 | bus << 16 | device << 11 | function <<  8 | offset.
  */
 
-unsigned short 
-pciConfigReadWord ( unsigned char bus, 
-                    unsigned char slot, 
-                    unsigned char func, 
-                    unsigned char offset )
-{
-    unsigned long address;
 
+unsigned short 
+pciConfigReadWord ( 
+    unsigned char bus, 
+    unsigned char slot, 
+    unsigned char func, 
+    unsigned char offset )
+{
+
+    unsigned long address=0;
+    
     unsigned long lbus  = (unsigned long) bus;
     unsigned long lslot = (unsigned long) slot;
     unsigned long lfunc = (unsigned long) func;
@@ -72,25 +75,27 @@ pciConfigReadWord ( unsigned char bus,
  *     Check device, offset 2. 
  */
 
-unsigned short pciCheckDevice ( unsigned char bus, unsigned char slot ){
+unsigned short pciCheckDevice ( 
+    unsigned char bus, 
+    unsigned char slot )
+{
 
 	//Off 0.
 	//Offset 2 = device.
 
-    unsigned short Vendor;    
-    unsigned short Device;    
+    unsigned short Vendor=0;    
+    unsigned short Device=0;    
+
 
 	//Pega o vendor.
 	//PCI_OFFSET_VENDORID
 
     Vendor = pciConfigReadWord ( bus, slot, 0, 0 );    
 
-	//Vendor inválido.
-
-    if ( Vendor == PCI_INVALID_VENDORID )
-    {
+    if ( Vendor == PCI_INVALID_VENDORID ){
         return (unsigned short) 0;
     }
+
 
 	//Pega o device
 	//PCI_OFFSET_DEVICEID
@@ -107,32 +112,32 @@ unsigned short pciCheckDevice ( unsigned char bus, unsigned char slot ){
  */
 
 unsigned short 
-pciCheckVendor ( unsigned char bus, 
-                 unsigned char slot )
+pciCheckVendor ( 
+    unsigned char bus, 
+    unsigned char slot )
 {
 
 	//Offset 0.
 
-    unsigned short Vendor;    
+    unsigned short Vendor=0;    
 
 	//Pega o vendor.
 	//PCI_OFFSET_VENDORID
 
     Vendor = pciConfigReadWord ( bus, slot, 0, 0 );    
 
-    if ( Vendor == PCI_INVALID_VENDORID )
-    {
+    if ( Vendor == PCI_INVALID_VENDORID ){
         return (unsigned short) 0;
     }
-
 
     return (unsigned short) Vendor; 
 }
 
 
 unsigned char 
-pciGetClassCode ( unsigned char bus, 
-                  unsigned char slot )
+pciGetClassCode ( 
+    unsigned char bus, 
+    unsigned char slot )
 {
     unsigned char ClassCode;
 
@@ -153,17 +158,17 @@ pciGetClassCode ( unsigned char bus,
  
 int pciInfo (){
 
-    unsigned char i;
-    unsigned char j;
+    unsigned char i=0;
+    unsigned char j=0;
 
 	// Offset 0 e 2.
+	unsigned short Vendor=0; 
+	unsigned short Device=0; 
 
-	unsigned short Vendor;    
-	unsigned short Device;    
+
 
     printf ("PCI INFO: \n");
     printf ("========= \n");
-
 
 	// This allows up to 256 buses, 
 	// each with up to 32 devices, 

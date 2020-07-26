@@ -67,7 +67,11 @@ int hddError;
 
 
 // interna
-static void hdd_ata_pio_read ( int p, void *buffer, int bytes ){
+static void hdd_ata_pio_read ( 
+    int p, 
+    void *buffer, 
+    int bytes )
+{
 
     __asm__ __volatile__ (\
                 "cld;\
@@ -77,7 +81,12 @@ static void hdd_ata_pio_read ( int p, void *buffer, int bytes ){
 }
 
 
-void hdd_ata_pio_write ( int p, void *buffer, int bytes ){
+void 
+hdd_ata_pio_write ( 
+    int p, 
+    void *buffer, 
+    int bytes )
+{
 
     __asm__ __volatile__ (\
                 "cld;\
@@ -147,12 +156,14 @@ int hdd_ata_wait_no_drq (int p){
  */
 
 int 
-pio_rw_sector ( unsigned long buffer, 
-                unsigned long lba, 
-                int rw, 
-                int port,
-                int slave )
+pio_rw_sector ( 
+    unsigned long buffer, 
+    unsigned long lba, 
+    int rw, 
+    int port,
+    int slave )
 {
+
     unsigned long tmplba = (unsigned long) lba;
 
 	//#bugbug
@@ -310,12 +321,13 @@ again:
  * edx - null
  * Opção: void hddReadSector(....)
  */
- 
+
 void 
-my_read_hd_sector ( unsigned long ax, 
-                    unsigned long bx, 
-                    unsigned long cx, 
-                    unsigned long dx )
+my_read_hd_sector ( 
+    unsigned long ax, 
+    unsigned long bx, 
+    unsigned long cx, 
+    unsigned long dx )
 {
 
 	//====================== ATENÇAO ==============================
@@ -362,10 +374,11 @@ my_read_hd_sector ( unsigned long ax,
  */
 
 void 
-my_write_hd_sector ( unsigned long ax, 
-                     unsigned long bx, 
-                     unsigned long cx, 
-                     unsigned long dx )
+my_write_hd_sector ( 
+    unsigned long ax, 
+    unsigned long bx, 
+    unsigned long cx, 
+    unsigned long dx )
 {
 
 	// =========================== ATENÇAO ==============================
@@ -423,21 +436,6 @@ int init_hdd (){
 
     return 0;
 }
-
-
-
-/*
-int hddInit();
-int hddInit()
-{
-    hddStatus = 0;
-    hddError = 0;
-    //...
-
-	init_hdd();
-    return (int) 0;	
-};
-*/
 
 
 //

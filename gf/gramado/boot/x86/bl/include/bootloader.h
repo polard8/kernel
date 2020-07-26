@@ -8,16 +8,12 @@
  *     Oferecer o suporte necessário nessa fase de inicialização.
  *     ...
  * 
- * Histórico:
+ * History:
  * =========
- *     2013 - Esse arquivo foi criado por Fred Nora.
- *     2014 - Construção de rotinas básicas de suporte.
- *     2015 - Construção de mais rotinas básicas de suporte.
- *     2016 - Aprimoramento e Debug do que foi feito até aqui.
- *     ...
- *
- * Copyright (c) 2013 - 2019 Frederico Martins Nora (frednora).
+ *     2013 - Created by Fred Nora.
+ *     2020 - Revision.
  */
+
 
 //
 // Variáveis para habilitações de verbose pra debug.
@@ -185,10 +181,11 @@ extern void refresh_screen();
  * Disk constants.
  */ 
 
-#define MBR_SIGNATURE (0xAA55) 
-#define SECTOR_SIZE 512  
-#define INIT_SECTOR 20
+#define MBR_SIGNATURE  (0xAA55) 
+#define SECTOR_SIZE    512  
+#define INIT_SECTOR    20
 //...
+
 
 
 /*
@@ -663,14 +660,21 @@ int SetUpPaging();
 //
 void limpa_root(); //@todo: usar inglês.
 void limpa_fat();  //@todo: usar inglês.
-void my_read_hd_sector( unsigned long ax, 
-                        unsigned long bx, 
-						unsigned long cx, 
-						unsigned long dx);
-void my_write_hd_sector( unsigned long ax, 
-                         unsigned long bx, 
-						 unsigned long cx, 
-						 unsigned long dx);
+
+void 
+my_read_hd_sector ( 
+    unsigned long ax, 
+    unsigned long bx, 
+    unsigned long cx, 
+    unsigned long dx);
+    
+void 
+my_write_hd_sector ( 
+    unsigned long ax, 
+    unsigned long bx, 
+    unsigned long cx, 
+    unsigned long dx );
+    
 void write_lba( unsigned long address, unsigned long lba);
 void read_lba( unsigned long address, unsigned long lba);
 
@@ -685,30 +689,26 @@ int pciInfo();
 unsigned char pciGetClassCode(unsigned char bus, unsigned char slot);
 unsigned short pciCheckVendor(unsigned char bus, unsigned char slot);
 unsigned short pciCheckDevice(unsigned char bus, unsigned char slot);
-unsigned short pciConfigReadWord( unsigned char bus, 
-                                  unsigned char slot, 
-								  unsigned char func, 
-								  unsigned char offset );
+
+unsigned short 
+pciConfigReadWord ( 
+    unsigned char bus, 
+    unsigned char slot, 
+    unsigned char func, 
+    unsigned char offset );
+
 
 //
 // Boot Loader services.
 //
 		
 void system_services();
- 
- 
-
-
-//
-// Finalizations support.
-//
 
 
 void reboot();
+void abort();     //abort.c  //apresenta o tipo de erro.
+void die();       //main.c   //erro fatal.
 
-//erros
-void abort();  //abort.c  //apresenta o tipo de erro.
-void die();    //main.c   //erro fatal.
 
 //
 // End.

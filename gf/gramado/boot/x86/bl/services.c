@@ -14,10 +14,11 @@
 #include <bootloader.h>
 
 
-void *blServices ( unsigned long arg1, 
-                   unsigned long arg2,
-                   unsigned long arg3,
-                   unsigned long arg4 )
+void *blServices ( 
+    unsigned long arg1, 
+    unsigned long arg2,
+    unsigned long arg3,
+    unsigned long arg4 )
 {
 
     switch (arg1)

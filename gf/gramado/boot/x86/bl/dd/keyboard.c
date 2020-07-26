@@ -64,14 +64,14 @@ unsigned long quit_message = 1;
 static unsigned char map[128] = {
 
 /* scan  0- 7 */
-0   ,    //scancode 0 - ().       	
+0   ,    //scancode 0 - (). 
 033 ,    //scancode 1 - (). 
 '1' ,    //scancode 2 - (1).
 '2' ,    //scancode 3 - (2).
 '3' ,    //scancode 4 - (3).
 '4' ,    //scancode 5 - (4).
 '5' ,    //scancode 6 - (5).
-'6' ,    //scancode 7 - (6).	 	
+'6' ,    //scancode 7 - (6).
 
 /* scan  8-15 */
 '7' , 
@@ -242,20 +242,20 @@ void keyboardHandler (){
 
     // Variáveis para armazenar valores que pegaremos.
 
-    unsigned char scancode;
-    unsigned long status;
+    unsigned char scancode=0;
+    unsigned long status=0;
 
 	//@todo: ?? Por que esses valores ??
 	
     //Suporte ao envio de mensagens. 
 
     unsigned char *msg = (unsigned char *) 0x00090500;   
-    unsigned long mensagem; 
+    unsigned long mensagem=0; 
 
 	//Suporte ao envio de char.
 
     unsigned char *wParam  = ( unsigned char *) 0x00090120;       
-    unsigned long ch;
+    unsigned long ch=0;
 
 
 	// @todo: 
@@ -263,6 +263,8 @@ void keyboardHandler (){
 	
 	//Tela para debug.
     unsigned char *screen = (unsigned char *) 0x000B8000;   
+
+
 
 
     // Step1: 

@@ -82,9 +82,10 @@ unsigned short is_FAT16()
  */
  
 unsigned long 
-fatClustToSect ( unsigned short cluster, 
-                 unsigned long spc, 
-                 unsigned long first_data_sector )
+fatClustToSect ( 
+    unsigned short cluster, 
+    unsigned long spc, 
+    unsigned long first_data_sector )
 {
     unsigned long C = (unsigned long) cluster;
 
@@ -101,11 +102,13 @@ fatClustToSect ( unsigned short cluster,
 // SECTOR_SIZE = 512;
 
 void 
-fatLoadCluster ( unsigned long sector, 
-                 unsigned long address, 
-                 unsigned long spc )
+fatLoadCluster ( 
+    unsigned long sector, 
+    unsigned long address, 
+    unsigned long spc )
 {
-    unsigned long i;
+
+    unsigned long i=0;
 
     for ( i=0; i < spc; i++ )
     {
@@ -182,11 +185,12 @@ unsigned long fs_get_fat_entry (unsigned long n)
  */
  
 void 
-fs_create_entry ( char *name,  
-                  unsigned long id,
-                  unsigned long eid,
-                  unsigned long cluster,
-                  unsigned long size )
+fs_create_entry ( 
+    char *name,  
+    unsigned long id,
+    unsigned long eid,
+    unsigned long cluster,
+    unsigned long size )
 {
      // Nothing for now.
 }
@@ -198,9 +202,10 @@ fs_create_entry ( char *name,
  */
 
 void 
-fsCreateFileName ( char *name, 
-                   unsigned long id,
-                   unsigned long eid )
+fsCreateFileName ( 
+    char *name, 
+    unsigned long id,
+    unsigned long eid )
 {
      // Nothing for now.
 }
@@ -212,10 +217,11 @@ fsCreateFileName ( char *name,
  */
  
 void 
-fsSaveFileName ( unsigned char *name, 
-                 unsigned long id, 
-                 unsigned long eid, 
-                 unsigned long initial_cluster )
+fsSaveFileName ( 
+    unsigned char *name, 
+    unsigned long id, 
+    unsigned long eid, 
+    unsigned long initial_cluster )
 {        
      // Nothing for now.
 }
@@ -386,9 +392,10 @@ unsigned long fs_get_entry_status (unsigned long id, unsigned long eid){
 /* */
 
 void 
-fs_set_entry_status ( unsigned long id, 
-                      unsigned long eid, 
-                      unsigned long status )
+fs_set_entry_status ( 
+    unsigned long id, 
+    unsigned long eid, 
+    unsigned long status )
 {
     //return;    //Ainda não implementada.
 }
@@ -458,10 +465,12 @@ void fs_relood_dir (unsigned long id){
  */
  
 int 
-fsLoadFile ( unsigned char *name, 
-             unsigned long file_address, 
-             unsigned long dir_address )
+fsLoadFile ( 
+    unsigned char *name, 
+    unsigned long file_address, 
+    unsigned long dir_address )
 {
+
     int Status = 0;
 
 	//Declara variáveis.
@@ -701,7 +710,7 @@ done:
 unsigned long path_count (unsigned char *path)
 {
     unsigned long val = 0;
-    int i;
+    int i=0;
     int max = (80*25);
 
 
@@ -967,7 +976,7 @@ int load_path ( unsigned char *path, unsigned long address ){
  
 unsigned long fsSearchFile (unsigned char *name){
 
-    int Status;
+    int Status=0;
     unsigned long z = 0;        //Deslocamento no rootdir. 
     unsigned long n = 0;        //Deslocamento no nome.
     unsigned long max = 512;    //Número máximo de entradas no diretório raiz.
@@ -1067,7 +1076,7 @@ unsigned long fsSearchFileName ( unsigned char *name ){
  
 void fs_load_rootdirEx (){
 
-    unsigned long i;
+    unsigned long i=0;
     unsigned long n = 0;
     unsigned long root_size = 32;    //@todo: Pegar de estrutura. 
 
@@ -1096,7 +1105,7 @@ void fs_load_rootdirEx (){
 
 void fs_load_fatEx (){
 
-    unsigned long i;
+    unsigned long i=0;
     unsigned long n = 0;
 
 	//@todo: Pegar de estrutura.
@@ -1123,7 +1132,7 @@ void fs_load_fatEx (){
  
 void fs_put_list_on_fat (){
 
-    unsigned short i;
+    unsigned short i=0;
     unsigned short lista_size = 1024;
 
 
@@ -1153,9 +1162,9 @@ void fs_put_list_on_fat (){
  
 unsigned long fs_find_n_empty_entries (unsigned long n){
 
-    unsigned long i;
-    unsigned long l;
-    unsigned short empty;
+    unsigned long i=0;
+    unsigned long l=0;
+    unsigned short empty=0;
     unsigned short lista_size = 1024;
 
 
@@ -1252,9 +1261,10 @@ void write_lba ( unsigned long address, unsigned long lba )
  */
  
 unsigned long 
-fsSaveFile ( unsigned char *file_name, 
-             unsigned long file_size, 
-             unsigned long file_address )  
+fsSaveFile ( 
+    unsigned char *file_name, 
+    unsigned long file_size, 
+    unsigned long file_address )  
 {
 
 	//#suspensa.
@@ -1428,8 +1438,8 @@ unsigned long fsCreateDir ( char *name , unsigned long id ){
 
 unsigned long fsCreateFile ( char *name, unsigned long id ){
 	
-    unsigned long fat_entry;
-    unsigned long dir_entry;
+    unsigned long fat_entry=0;
+    unsigned long dir_entry=0;
 	unsigned long size = 1;
 	
 	//encontra uma entrada vazia na fat.
@@ -1512,8 +1522,8 @@ void fsClearFat ()
 
 int fsCheckFat (){
 	
-	unsigned long i;
-	unsigned long fat_entry;
+	unsigned long i=0;
+	unsigned long fat_entry=0;
 	
 	printf("\n");
 	
