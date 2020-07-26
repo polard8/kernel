@@ -308,11 +308,15 @@ void task_switch (void){
 
             if (extra == 1)
             {
+                // Kernel requests.
                 KiRequest();
+                
+                // Unix signals.
+                KiSignal();
 
-				// #todo: 
-				// Talvez possamos incluir mais atividades extras.
-				// Continua ...
+                // #todo: 
+                // Talvez possamos incluir mais atividades extras.
+                // Continua ...
 
                 extra = 0;
             }

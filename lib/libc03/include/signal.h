@@ -214,10 +214,14 @@ typedef struct sigaction {
  * Signal vector "template" used in sigvec call.
  */
 struct sigvec {
+	
+	//#bugbug: Cuidado!
     void  (*sv_handler)();  /* signal handler */
+    
     int     sv_mask;        /* signal mask to apply */
     int     sv_flags;       /* see signal options below */
 };
+
 
 #define SV_ONSTACK	SA_ONSTACK
 #define SV_INTERRUPT	SA_RESTART	/* same bit, opposite sense */
@@ -267,6 +271,13 @@ struct	sigcontext {
 
 #define	BADSIG		(void (*)())-1
 #endif	/* _POSIX_SOURCE */
+
+
+
+
+//
+// signal()
+//
 
 
 //POSIX.1-2001, POSIX.1-2008, C89, C99.

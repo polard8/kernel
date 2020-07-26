@@ -43,12 +43,12 @@ int running = 1;
  
 
 int 
-reboot2Procedure ( struct window_d *window, 
-                   int msg, 
-                   unsigned long long1, 
-                   unsigned long long2 );
+reboot2Procedure ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 );
  
-
 
 /*
  * *********************************
@@ -136,20 +136,20 @@ reboot2Procedure (
 
         //vamos criar um botão.
         case MSG_CREATE:
-        
+            return 0;
            // VAMOS TESTAR A CONCEXÃO COM O PROCESSO PAI.
            // que será o noraterm.
 
            // link by pid
            // #todo: Create the function link_by_pid()
-           gramado_system_call ( 267,
-               getpid(),    //master
-               getppid(),   //slave pai(terminal)
-               0 );
+           //gramado_system_call ( 267,
+           //    getpid(),    //master
+           //    getppid(),   //slave pai(terminal)
+           //    0 );
         
-           ____this_tty_id = gramado_system_call ( 266, getpid(), 0, 0 );        
+           //____this_tty_id = gramado_system_call ( 266, getpid(), 0, 0 );        
 
-           write ( ____this_tty_id, __wbuf2, __w_size2 = sprintf (__wbuf2,"writting from reboot2 ...\n") );    
+           //write ( ____this_tty_id, __wbuf2, __w_size2 = sprintf (__wbuf2,"writting from reboot2 ...\n") );    
 
            /*
             //++
@@ -418,6 +418,7 @@ done:
  */
 
 int main ( int argc, char *argv[] ){
+
 
     struct window_d *hWindow;
 
@@ -752,9 +753,9 @@ int main ( int argc, char *argv[] ){
 
     gde_set_focus(main_window);
      
-     // #debug
-     // gde_show_backbuffer ();
-     // while (1){}
+    // #debug
+    // gde_show_backbuffer ();
+    //while (1){}
 
 
 	//

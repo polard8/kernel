@@ -218,9 +218,9 @@ all-c:
 	$(CC) -c sm/system/install.c  $(KINCLUDE) $(CFLAGS) -o install.o
 	$(CC) -c sm/system/modules.c  $(KINCLUDE) $(CFLAGS) -o modules.o
 	$(CC) -c sm/system/runtime.c  $(KINCLUDE) $(CFLAGS) -o runtime.o
-	$(CC) -c sm/system/signal.c   $(KINCLUDE) $(CFLAGS) -o signal.o
 	$(CC) -c sm/system/sm.c       $(KINCLUDE) $(CFLAGS) -o sm.o
 	$(CC) -c sm/system/system.c   $(KINCLUDE) $(CFLAGS) -o system.o
+
 
 	# debug
 	$(CC) -c sm/debug/debug.c  $(KINCLUDE) $(CFLAGS) -o debug.o
@@ -318,6 +318,7 @@ all-c:
 	# klib
 	$(CC) -c klib/ctype.c   $(KINCLUDE) $(CFLAGS) -o ctype.o
 	$(CC) -c klib/kstdio.c  $(KINCLUDE) $(CFLAGS) -o kstdio.o
+	$(CC) -c klib/signal.c  $(KINCLUDE) $(CFLAGS) -o signal.o
 	$(CC) -c klib/stdlib.c  $(KINCLUDE) $(CFLAGS) -o stdlib.o
 	$(CC) -c klib/string.c  $(KINCLUDE) $(CFLAGS) -o string.o
 	$(CC) -c klib/syslib.c  $(KINCLUDE) $(CFLAGS) -o syslib.o

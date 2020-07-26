@@ -807,9 +807,10 @@ struct process_d
 
 
     // Signal
+    // See: include/klib/signal.h
     unsigned long signal;
     unsigned long umask;
-    //struct sigaction sigaction[32];  //#todo
+    struct sigaction sigaction[32];
 
     
     unsigned long alarm;

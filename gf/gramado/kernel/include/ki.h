@@ -19,8 +19,14 @@ int KiInitRuntime (void);
 // Informations support.
 void KiInformation (void); 
 
-// Requests support.   
-int KiRequest (void);  
+// Kernel request support.   
+// See: kernel/request.c
+int KiRequest(void);  
+
+// Unix signal support.
+// See: klib/signal.c
+int KiSignal(void);
+
 
 // Spawn support. Spawn a thread.
 void KiSpawnTask (int id);

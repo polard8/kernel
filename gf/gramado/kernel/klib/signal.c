@@ -113,39 +113,71 @@ int Signal;
 
 
 
+
+// Unix signal support.
+// This routine was called by the task switch as a extra service.
+// See: ts.c
+
+int KiSignal(void)
+{
+    // #todo
+    // Vamos olhar o supporte a sinais na estrutura do processo
+    // e chamarmos os tratadores adequados de acordo com o sinal recebido.
+    // ee: p->signal   p->umask  p->sigaction[]
+    
+    //debug_print("KiSignal: [TODO] Unix signal support.");
+    return 0;
+}
+
+
+
+
+
 /*
  * signalSend:
  *     Envia um sinal para um processo.
  */
  
-int signalSend ( struct process_d *process, int signal ){
-	
+int 
+signalSend ( 
+    struct process_d *process, 
+    int signal )
+{
+
 	//SIGNAL_COUNT_MAX
 	
 	//Limit
     //if(signal >= 32){
 	//	return 1;
 	//}
-	
-	if (signal == 0){
-		return 1;
-	};
-	
-	//struct fail
-	if ( (void *) process == NULL ){
-		return 1;
-	}		
-	
-	//Ok
-	if ( (void *) process != NULL )
-	{	
-		process->signal = (unsigned long) signal;
-		return 0; 
-	}
-	
-	//...
 
-	return (int) 1;	
+
+    if (signal < 0 || signal >= 32)
+    {
+        debug_print ("sendSignal: signal limits\n");
+        return 1;
+    }
+
+    if ( (void *) process == NULL ){
+        debug_print ("sendSignal: process\n");
+        return 1;
+        
+    }else{
+
+        // #todo:
+        // Check mask.
+        // Check sigaction structure. p->sigaction[32];
+
+        process->signal = (unsigned long) signal;
+        
+        //ok
+        return 0; 
+    };
+
+// fail
+    debug_print ("sendSignal: [FAIL] \n");
+        
+    return (int) -1;
 }
 
 

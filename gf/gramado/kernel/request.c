@@ -96,8 +96,14 @@ void do_request_12 ( int tid );
  * chamam as rotinas de tratamento dos requests.
  */
  
+// Kernel request support.
+// This routine was called by the task switch as a extra service.
+// See: ts.c
+
 int KiRequest (void){
 
+    //debug_print("KiRequest: [OK] Kernel request support.");
+ 
     if ( kernel_request < 0 || kernel_request > KERNEL_REQUEST_MAX )
     {
         // #debug
@@ -106,7 +112,7 @@ int KiRequest (void){
     }
 
 
-    return (int) request ();
+    return (int) request();
 }
 
 

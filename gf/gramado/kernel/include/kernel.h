@@ -62,6 +62,9 @@ extern void dispatch_context (void);
 extern void do_executa_new_task (void);
  
  
+//#test 
+//typedef int (*fn_ptr)();
+
 
 // =========================================================
 
