@@ -128,8 +128,9 @@ ifeq ($(ARCH),x86)
 	REQUEST_OBJECTS := request.o 
 	PANIC_OBJECTS := panic.o 
 	REBOOT_OBJECTS := reboot.o 
-	SYS_OBJECTS := sys.o sysio.o syslib.o sysmk.o syssm.o   
-	
+	SYS_OBJECTS := sys.o pump.o syslib.o sysmk.o syssm.o   
+
+
 	OBJECTS := $(ENTRY_OBJECTS) \
 	$(EXECVE_OBJECTS) \
 	$(HAL_OBJECTS) \
@@ -310,6 +311,10 @@ all-c:
 	## ==== HWI - Hardware Interface ==== 
 	##
 
+	$(CC) -c hwi/io.c    $(KINCLUDE) $(CFLAGS) -o io.o
+	$(CC) -c hwi/pump.c  $(KINCLUDE) $(CFLAGS) -o pump.o
+
+
 	# klib
 	$(CC) -c klib/ctype.c   $(KINCLUDE) $(CFLAGS) -o ctype.o
 	$(CC) -c klib/kstdio.c  $(KINCLUDE) $(CFLAGS) -o kstdio.o
@@ -320,8 +325,6 @@ all-c:
 
 
 	# dd
-	$(CC) -c hwi/dd/io.c      $(KINCLUDE) $(CFLAGS) -o io.o
-	$(CC) -c hwi/dd/sysio.c   $(KINCLUDE) $(CFLAGS) -o sysio.o
 	$(CC) -c hwi/dd/devmgr.c  $(KINCLUDE) $(CFLAGS) -o devmgr.o
 
 
@@ -338,12 +341,13 @@ all-c:
 	$(CC) -c hwi/dd/nhid/arch/x86/pit.c   $(KINCLUDE) $(CFLAGS) -o pit.o
 	
 	# hal
-	$(CC) -c hwi/dd/nhid/hal/hal.c                $(KINCLUDE) $(CFLAGS) -o hal.o
-	$(CC) -c hwi/dd/nhid/hal/arch/detect.c        $(KINCLUDE) $(CFLAGS) -o detect.o
-	$(CC) -c hwi/dd/nhid/hal/arch/amd/cpuamd.c    $(KINCLUDE) $(CFLAGS) -o cpuamd.o
-	$(CC) -c hwi/dd/nhid/hal/arch/x86/portsx86.c  $(KINCLUDE) $(CFLAGS) -o portsx86.o
-	$(CC) -c hwi/dd/nhid/hal/arch/x86/x86.c       $(KINCLUDE) $(CFLAGS) -o x86.o
-	$(CC) -c hwi/dd/nhid/hal/arch/x86/x86info.c   $(KINCLUDE) $(CFLAGS) -o x86info.o   
+	$(CC) -c hwi/hal/hal.c                $(KINCLUDE) $(CFLAGS) -o hal.o
+	$(CC) -c hwi/hal/arch/detect.c        $(KINCLUDE) $(CFLAGS) -o detect.o
+	$(CC) -c hwi/hal/arch/amd/cpuamd.c    $(KINCLUDE) $(CFLAGS) -o cpuamd.o
+	$(CC) -c hwi/hal/arch/x86/portsx86.c  $(KINCLUDE) $(CFLAGS) -o portsx86.o
+	$(CC) -c hwi/hal/arch/x86/x86.c       $(KINCLUDE) $(CFLAGS) -o x86.o
+	$(CC) -c hwi/hal/arch/x86/x86info.c   $(KINCLUDE) $(CFLAGS) -o x86info.o   
+
 
 	# ide
 	$(CC) -c hwi/dd/nhid/ide/ata.c      $(KINCLUDE) $(CFLAGS) -o ata.o
