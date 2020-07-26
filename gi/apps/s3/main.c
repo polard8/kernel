@@ -97,12 +97,18 @@ int main ( int argc, char *argv[] ){
 
     int s=-1;
     
-    s = connect (client_fd, (struct sockaddr *) &addr, sizeof(addr));
+    while(1){
+        
+        s = connect (client_fd, (struct sockaddr *) &addr, sizeof(addr));
    
-    if (s<0){ 
-        printf ("s3: Connection Failed \n"); 
-        return -1; 
-    } 
+        if (s<0){ 
+            debug_print ("s3: Connection Failed \n");
+            printf ("s3: Connection Failed \n"); 
+            //return -1; 
+            //try again
+        }else{break;}; 
+    
+    };
 
 
 round:
@@ -112,6 +118,8 @@ round:
 
     while (1)
     {
+        debug_print("s3: Sending request...\n");
+        
         // The message.
         message_buffer[0] = 0;       // window. 
         message_buffer[1] = 1000;    // msg=hello!

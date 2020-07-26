@@ -36,22 +36,18 @@
  
  
 #include <types.h>
-
 #include <stdio.h>
 #include <stdlib.h>
-
 #include <string.h>
-
 #include <netdb.h>
 #include <netinet/in.h>
-
 #include <arpa/inet.h>
-
 #include <sys/socket.h>
 
 
 //#test
 #include <gws.h>
+
 
 
 // tipos de pacotes.
@@ -79,7 +75,16 @@ int main ( int argc, char *argv[] ){
     int n_writes = 0;   // For sending requests.
     int n_reads = 0;    // For receiving responses.
 
-    int client_fd;
+    int client_fd=0;
+
+
+    // Vamos nos concetar com o processo identificado 
+    // com o nome 'ws'
+
+    struct sockaddr addr;
+    addr.sa_family = 8000; //AF_GRAMADO
+    addr.sa_data[0] = 'w';
+    addr.sa_data[1] = 's';  
 
 
     debug_print ("---------------------------\n");    
@@ -103,32 +108,28 @@ int main ( int argc, char *argv[] ){
        exit(1);
     }
     
-
-    // Vamos nos concetar com o processo identificado 
-    // com o nome 'ws'
-
-    struct sockaddr addr;
-    addr.sa_family = 8000; //AF_GRAMADO
-    addr.sa_data[0] = 'w';
-    addr.sa_data[1] = 's';  
     
+    while(1){
     
-    //
-    // connect
-    // 
+        //
+        // connect
+        // 
 
+        //nessa hora colocamos no accept um fd.
+        //então o servidor escreverá em nosso arquivo.
+        // #debug
+        printf ("s2: connecting ...\n");      
 
-    //nessa hora colocamos no accept um fd.
-    //então o servidor escreverá em nosso arquivo.
-    
-    // #debug
-    printf ("s2: connecting ...\n");      
+        if (connect (client_fd, (struct sockaddr *) &addr, sizeof(addr)) < 0){ 
+            
+            debug_print("s2: Connection Failed \n");
+            printf("s2: Connection Failed \n"); 
+            //return -1;
+            //try again
 
-    if (connect (client_fd, (struct sockaddr *) &addr, sizeof(addr)) < 0){ 
-        printf("s2: Connection Failed \n"); 
-        return -1; 
-    } 
+        }else{break;}; 
 
+    };
 
      //
      // Loop for new message.
@@ -143,26 +144,29 @@ new_message:
     // Write
     //
 
-    // #debug
-    debug_print ("s2: Writing ...\n");      
-
     // Enviamos um request para o servidor.
     // ?? Precisamos mesmo de um loop para isso. ??
 
     while (1)
     {
+
+        // #debug
+        debug_print ("s2: Sending request ...\n");      
+        
         // Create window        
         message_buffer[0] = 0;       // window. 
         message_buffer[1] = 1001;    // msg. Create window.
         message_buffer[2] = 0;
         message_buffer[3] = 0;
         
-        message_buffer[4] = 450;   //x
-        message_buffer[5] = 100;   //y
-        message_buffer[6] = 200;   //w
-        message_buffer[7] = 200;   //h
+        message_buffer[4] = 0;   //x
+        message_buffer[5] = 0;   //y
+        message_buffer[6] = 20;   //w
+        message_buffer[7] = 20;   //h
         
         message_buffer[8] = ____color + ( rand() ); 
+
+        message_buffer[9] = WT_SIMPLE;
 
 
         /*
@@ -201,7 +205,7 @@ new_message:
     // obs: Nesse momento deveríamos estar dormindo.
 
     // #debug
-    debug_print ("s2: Waiting ...\n");      
+    //debug_print ("s2: Waiting ...\n");      
 
     int y;
     for(y=0; y<15; y++)
@@ -220,14 +224,14 @@ new_message:
     // read
     //
 
-    // #debug
-    debug_print ("s2: reading ...\n");      
-
-
        //#caution
        //we cam stay here for ever.
        //it's a test yet.
-    __again:
+__again:
+
+    // #debug
+    debug_print ("s2: Reading response ...\n");      
+
     n_reads = read ( client_fd, __buffer, sizeof(__buffer) );
     // Não vamos insistir num arquivo vazio.
     if (n_reads<=0){

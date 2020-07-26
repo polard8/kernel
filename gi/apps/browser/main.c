@@ -97,16 +97,15 @@ int browser_getmessage_request(int fd)
     // Send request.
     //
 
-
-    // #debug
-    gws_debug_print ("browser: Writing ...\n");      
-
     // Enviamos um request para o servidor.
     // ?? Precisamos mesmo de um loop para isso. ??
     // msg = 369 (get input event)
 
     while (1)
     {
+        // #debug
+        gws_debug_print ("browser: Sending request ...\n");      
+    
         // Create window    
         message_buffer[0] = 0;       // window. 
         message_buffer[1] = 369;    //get message request  //1001;    // msg. Create window.
@@ -154,7 +153,7 @@ int browser_getmessage_response(int fd)
     // obs: Nesse momento deveríamos estar dormindo.
 
     // #debug
-    gws_debug_print ("browser: Waiting ...\n");      
+    //gws_debug_print ("browser: iting ...\n");      
 
     int y;
     for(y=0; y<15; y++)
@@ -173,15 +172,15 @@ int browser_getmessage_response(int fd)
     // read
     //
 
-    // #debug
-    gws_debug_print ("browser: reading ...\n");      
-
-
     // #caution
     // Waiting for response.
     // We can stay here for ever.
 
 response_loop:
+
+    // #debug
+    gws_debug_print ("browser: Getting response ...\n");      
+
 
     //n_reads = read ( fd, __buffer, sizeof(__buffer) );
     n_reads = recv ( fd, __buffer, sizeof(__buffer), 0 );
@@ -268,7 +267,10 @@ response_loop:
         case MSG_SYSKEYDOWN:
             switch (long1)
             {
-                //case VK_F1:
+                case VK_F1:
+                    gws_reboot();
+                    break;
+                    
                 default:
                     goto process_event;
                     break;
@@ -816,23 +818,29 @@ int main ( int argc, char *argv[] ){
 
 
 
+    while(1){
 
-    //
-    // connect
-    // 
+        //
+        // connect
+        // 
 
-
-    //nessa hora colocamos no accept um fd.
-    //então o servidor escreverá em nosso arquivo.
+        //nessa hora colocamos no accept um fd.
+        //então o servidor escreverá em nosso arquivo.
     
-    // #debug
-    //printf ("gnst: Connecting to the address 'ws' ...\n");      
-    
-    printf ("browser: Connecting to the address via inet  ...\n");      
-    if (connect (client_fd, (void *) &addr_in, sizeof(addr_in)) < 0){ 
-        printf("browser: Connection Failed \n"); 
-        return -1; 
-    } 
+        // #debug
+        //printf ("gnst: Connecting to the address 'ws' ...\n");      
+        printf ("browser: Connecting to the address via inet  ...\n");    
+      
+        if (connect (client_fd, (void *) &addr_in, sizeof(addr_in)) < 0){ 
+            
+            debug_print("browser: Connection Failed \n"); 
+            printf("browser: Connection Failed \n"); 
+            //return -1; 
+        
+        // try again
+        
+        }else{ break; }; 
+    };
  
  
     //

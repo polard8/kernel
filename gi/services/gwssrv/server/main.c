@@ -257,20 +257,30 @@ void handle_request (int fd){
     
     if (message_buffer[1] == 369)
     {
-        debug_print ("gwssrv: [TEST] INPUT request !!! \n");
+        debug_print ("gwssrv: [TEST] 369 INPUT request !!! \n");
 
         // Pegar o input!
 
         // Get message from kernel.
-        gde_enter_critical_section();
+        // #bugbug: Nesse momento podemos ficar enrroscados aqui.
+        // na entrada da seção crítica.
+        //gde_enter_critical_section();
         gramado_system_call ( 111,
             (unsigned long) &message_buffer[0],
             (unsigned long) &message_buffer[0],
             (unsigned long) &message_buffer[0] );
-        gde_exit_critical_section();
+        //gde_exit_critical_section();
         
         //message_buffer[1] = SERVER_PACKET_TYPE_EVENT;
-        send ( fd, __buffer, sizeof(__buffer), 0 );
+
+        debug_print("gwssrv: Sending response\n");
+        
+        n_writes = send ( fd, __buffer, sizeof(__buffer), 0 );
+        
+        if (n_writes<=0){
+             debug_print ("gwssrv: [FAIL] Couldn't send response!\n"); 
+        }
+        debug_print("gwssrv: response sent\n");
         return;
     }
 
@@ -1007,9 +1017,11 @@ int main (int argc, char **argv){
 
 
         //gde_clone_and_execute ("gwm.bin");    // window manager
-        gde_clone_and_execute ("terminal.bin");  
+        //gde_clone_and_execute ("terminal.bin");  
         //gde_clone_and_execute ("browser.bin"); 
         //gde_clone_and_execute ("gws.bin"); // client: serve para enviar comandos para o servidor.
+        gde_clone_and_execute ("s2.bin");    //#bugbug        
+        //gde_clone_and_execute ("s3.bin");    //#bugbug        
         // ...        
 
 
@@ -1018,7 +1030,7 @@ int main (int argc, char **argv){
         // Wait
         //
 
-        printf ("gwssrv: [FIXME] yield \n");
+        //printf ("gwssrv: [FIXME] yield \n");
        
         for (i=0; i<11; i++)
             gwssrv_yield ();

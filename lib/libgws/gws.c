@@ -153,14 +153,13 @@ gws_createwindow_request (
         message_buffer[2] = 0;
         message_buffer[3] = 0;
         
-        message_buffer[4] = left; //120;   //x
-        message_buffer[5] = top; //120;   //y
-        message_buffer[6] = width; //480;   //w
+        message_buffer[4] = left;   //120;   //x
+        message_buffer[5] = top;    //120;   //y
+        message_buffer[6] = width;  //480;   //w
         message_buffer[7] = height; //320;   //h
         
-        message_buffer[8] = bg_color; //xCOLOR_GRAY2; 
-
-        message_buffer[9] = type; //WT_SIMPLE;  //todo: type
+        message_buffer[8] = bg_color;  //xCOLOR_GRAY2; 
+        message_buffer[9] = type;      //WT_SIMPLE;  //todo: type
          
         //...
 
@@ -297,7 +296,7 @@ response_loop:
 process_reply:
 
     // #test
-    gws_debug_print ("gws: Testing close() ...\n"); 
+    //gws_debug_print ("gws: Testing close() ...\n"); 
     //close (fd);
 
     //gws_debug_print ("gwst: bye\n"); 

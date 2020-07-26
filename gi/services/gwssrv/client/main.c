@@ -564,28 +564,35 @@ int main ( int argc, char *argv[] ){
        exit(1);  //#bugbug Cuidado.
     }
 
+
+    while(1){
+
+        //
+        // Connect
+        //
+
+        //nessa hora colocamos no accept um fd.
+        //então o servidor escreverá em nosso arquivo.
     
+        // #debug
+        printf ("gws: Trying to connect to the address 'ws' ...\n");      
 
-    //
-    // Connect
-    //
-
-    //nessa hora colocamos no accept um fd.
-    //então o servidor escreverá em nosso arquivo.
-    
-    // #debug
-    printf ("gws: Connecting to the address 'ws' ...\n");      
-
-    // Tentando nos conectar ao endereço indicado na estrutura
-    // Como o domínio é AF_GRAMADO, então o endereço é "w","s".
-    if ( connect (client_fd, (struct sockaddr *) &addr, sizeof(addr)) < 0 )
-    { 
-        gws_debug_print ("gws: Connection Failed\n");
-        printf ("gws: Connection Failed \n"); 
-        close(client_fd);
-        exit(1);
-        //return (int) (-1); 
-    } 
+        // Tentando nos conectar ao endereço indicado na estrutura
+        // Como o domínio é AF_GRAMADO, então o endereço é "w","s".
+        if ( connect (client_fd, (struct sockaddr *) &addr, sizeof(addr)) < 0 )
+        { 
+            gws_debug_print ("gws: Connection Failed\n");
+            printf ("gws: Connection Failed \n"); 
+            //close(client_fd);
+            //exit(1);
+            //return (int) (-1); 
+            
+            //try again
+        }else{
+            
+            break;
+        };
+    };
 
     
     //
