@@ -52,13 +52,13 @@ pciConfigReadWord ( unsigned char bus,
 
 	// Write out the address.
 
-    outportl ( PCI_ADDRESS_PORT, address );
+    out32 ( PCI_ADDRESS_PORT, address );
 
 
 	// Read in the data port.
 
-	tmp = (unsigned short) ( ( inportl (PCI_DATA_PORT) >> ((offset & 2) * 8)) & 0xffff );
-	
+	tmp = (unsigned short) ( ( in32 (PCI_DATA_PORT) >> ((offset & 2) * 8)) & 0xffff );
+
 	
     // (offset & 2) * 8) = 0 
 	// Will choose the first word of the 32 bits register.  

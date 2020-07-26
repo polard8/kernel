@@ -27,10 +27,8 @@
 
 
 #include <config/config.h>  
-
-
 #include <gdef.h>  
- 
+
  
 /*
  * Variáveis importadas.
@@ -542,8 +540,8 @@ struct vesa_d
 {
     unsigned long mode_number;    //Número do modo.
     unsigned long x_res;          //Pixels por linha.
-	unsigned long y_res;          //Pixels por coluna.
-	unsigned long bpp;            //Bits per pixel.		
+    unsigned long y_res;          //Pixels por coluna.
+    unsigned long bpp;            //Bits per pixel.		
 	//Continua...
 };
 vesa_t vesa_mode;
@@ -561,8 +559,8 @@ struct procedure_d
 {
     unsigned long next;      //Endereço do procimo procedimento.     
     unsigned long status;    //Status do procedimento do sistema. 
-	unsigned long res1;      //Reservado.
-	unsigned long res2;      //Reservado.
+    unsigned long res1;      //Reservado.
+    unsigned long res2;      //Reservado.
     // ...        	
 };
 procedure_t procedure_info;
@@ -591,25 +589,16 @@ gdtr_t bl_gdtr;    //Sem ponteiro.
  * Ports support.
  */
 
-inline void bloutportb(unsigned int port,unsigned int value);
-inline unsigned char inportb(int port);
-//int inport8(int port,int data);
-char inb(int port);
-int outb(int port, int data);
-int outport8(int port,int data);
-int inport16(int port,int data);
-int outport16(int port,int data);
-int inport32(int port,int data); 
-int outport32(int port,int data);
-int outportb(int port, int data);
-int BlProcessorInPort8(int port,int data);      
-int BlProcessorOutPort8(int port,int data);     
-int BlProcessorInPort16(int port,int data);     
-int BlProcessorOutPort16(int port,int data);    
-int BlProcessorInPort32(int port,int data);     
-int BlProcessorOutPort32(int port,int data);    
-inline unsigned long inportl(unsigned long port);
-inline void outportl(unsigned long port, unsigned long value);
+
+unsigned char in8 (int port);
+unsigned short in16 (int port);
+unsigned long in32 (int port);
+void out8 ( int port, unsigned char data );
+void out16 (int port, unsigned short data);
+void out32 ( int port, unsigned long data );
+
+
+
 
 /*
  * CPU instructions support.

@@ -22,8 +22,8 @@
  *     Habilita as interrupções. 
  */ 
 
-void enable (){
-
+void enable ()
+{
     asm (" sti ");
 }
 
@@ -33,14 +33,14 @@ void enable (){
  *     Desabilita as interrupções.  
  */ 
 
-void disable (){
-
+void disable ()
+{
     asm (" cli ");
 }
 
 
-void stopCpu (){
-
+void stopCpu ()
+{
     asm ( " cli \n\t" 
           " hlt ");
 }
@@ -78,62 +78,28 @@ int setFlags (int variable)
 }
 
 
-int BlProcessorInPort8 ( int port, int data ){
-
-    asm ("inb %%dx, %%al" : "=a" (data) : "d" (port) );
-}
 
 
-int BlProcessorOutPort8 ( int port, int data ){
-
-    asm ("outb %%al, %%dx" : : "a" (data), "d" (port) );
-}
-
-
-int BlProcessorInPort16 (int port,int data){
-
-    asm ("inw %%dx, %%ax" : "=a" (data) : "d" (port) );
-}
-
-
-int BlProcessorOutPort16 ( int port, int data ){
-
-    asm ("outw %%ax, %%dx" :: "a" (data), "d" (port) );
-}
-
-
-int BlProcessorInPort32 ( int port, int data ){
-
-    asm ("inl %%dx, %%eax" : "=a" (data) : "d" (port) );
-}
-
-
-int BlProcessorOutPort32 ( int port,int data ){
-
-    asm ("outl %%eax, %%dx" : : "a" (data), "d" (port) );
-}
-
-
-int Push (int value){
-
+int Push (int value)
+{
     //__asm ("pushl %0" : : "r" (value) : "%esp" );
 }
 
 
-int Pop (int variable){
-
+int Pop (int variable)
+{
     //__asm ("popl %0" : "=r" (variable) : : "%esp" );
 }
 
 
-void pushRegs (){
-
+void pushRegs ()
+{
     //__asm ("pushal" : : : "%esp");
 }
 
 
-void popRegs (){
-
+void popRegs ()
+{
     //__asm ("popal" : : : "%esp");
 }
 

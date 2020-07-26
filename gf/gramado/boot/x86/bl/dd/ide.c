@@ -134,12 +134,12 @@ _u8 ata_wait_irq (){
 }
 
 
-void ata_soft_reset (){
+void ata_soft_reset ()
+{
+    _u8 data = in8 (ata.ctrl_block_base_address + 2);
 
-    _u8 data = inb (ata.ctrl_block_base_address + 2);
-
-    outb ( ata.ctrl_block_base_address, data | 0x4 );
-    outb ( ata.ctrl_block_base_address, data & 0xfb ); 
+    out8 ( ata.ctrl_block_base_address, data | 0x4 );
+    out8 ( ata.ctrl_block_base_address, data & 0xfb ); 
 }
 
 
@@ -147,18 +147,18 @@ void ata_soft_reset (){
 //Lê o status de um disco determinado, se os valores  
 //na estrutura estiverem certos.
 
-_u8 ata_status_read (){
-
-    return inb ( ata.cmd_block_base_address + ATA_REG_STATUS );
+_u8 ata_status_read()
+{
+    return in8 ( ata.cmd_block_base_address + ATA_REG_STATUS );
 }
 
 
-void ata_cmd_write (_i32 cmd_val){
-
+void ata_cmd_write (_i32 cmd_val)
+{
 	// no_busy 
 
     ata_wait_not_busy ();
-    outb ( ata.cmd_block_base_address + ATA_REG_CMD, cmd_val );
+    out8 ( ata.cmd_block_base_address + ATA_REG_CMD, cmd_val );
 
 
 	// Esperamos 400ns
@@ -228,14 +228,14 @@ int ide_identify_device ( uint8_t nport ){
     }
 
 
-    outb ( ata.cmd_block_base_address + ATA_REG_SECCOUNT, 0 );  // Sector Count 7:0
-    outb ( ata.cmd_block_base_address + ATA_REG_LBA0, 0 );      // LBA 7-0
-    outb ( ata.cmd_block_base_address + ATA_REG_LBA1, 0 );      // LBA 15-8
-    outb ( ata.cmd_block_base_address + ATA_REG_LBA2, 0 );      // LBA 23-16
+    out8 ( ata.cmd_block_base_address + ATA_REG_SECCOUNT, 0 );  // Sector Count 7:0
+    out8 ( ata.cmd_block_base_address + ATA_REG_LBA0, 0 );      // LBA 7-0
+    out8 ( ata.cmd_block_base_address + ATA_REG_LBA1, 0 );      // LBA 15-8
+    out8 ( ata.cmd_block_base_address + ATA_REG_LBA2, 0 );      // LBA 23-16
 
 
     // Select device,
-    outb ( ata.cmd_block_base_address + ATA_REG_DEVSEL, 0xE0 | ata.dev_num << 4 );
+    out8 ( ata.cmd_block_base_address + ATA_REG_DEVSEL, 0xE0 | ata.dev_num << 4 );
     ata_wait(400);
 
     // cmd
@@ -257,8 +257,8 @@ int ide_identify_device ( uint8_t nport ){
     }
 
 
-    lba1 = inb ( ata.cmd_block_base_address + ATA_REG_LBA1 );
-    lba2 = inb ( ata.cmd_block_base_address + ATA_REG_LBA2 );
+    lba1 = in8 ( ata.cmd_block_base_address + ATA_REG_LBA1 );
+    lba2 = in8 ( ata.cmd_block_base_address + ATA_REG_LBA2 );
 
     //
     //    ## type ## 
@@ -801,15 +801,15 @@ static inline _void ata_set_device_and_sector ( _u32 count, _u64 addr,\
     {
 		//Mode LBA28
         case 28:
-	        outb ( ata.cmd_block_base_address + ATA_REG_SECCOUNT, count );   // Sector Count 7:0
-	        outb ( ata.cmd_block_base_address + ATA_REG_LBA0, addr );		 // LBA 7-0   
-	        outb ( ata.cmd_block_base_address + ATA_REG_LBA1, addr >> 8 );   // LBA 15-8
-	        outb ( ata.cmd_block_base_address + ATA_REG_LBA2, addr >> 16 );  // LBA 23-16
+	        out8 ( ata.cmd_block_base_address + ATA_REG_SECCOUNT, count );   // Sector Count 7:0
+	        out8 ( ata.cmd_block_base_address + ATA_REG_LBA0, addr );		 // LBA 7-0   
+	        out8 ( ata.cmd_block_base_address + ATA_REG_LBA1, addr >> 8 );   // LBA 15-8
+	        out8 ( ata.cmd_block_base_address + ATA_REG_LBA2, addr >> 16 );  // LBA 23-16
             
 			// Modo LBA active, Select device, and LBA 27-24
-            outb ( ata.cmd_block_base_address + ATA_REG_DEVSEL, 
+            out8 ( ata.cmd_block_base_address + ATA_REG_DEVSEL, 
 			    0x40 | (ata.dev_num << 4) | (addr >> 24 &0x0f) );
-            
+     
 			// Verifique se e a mesma unidade para não esperar pelos 400ns.
 			
             if ( ata_record_dev != ata.dev_num && 
@@ -826,16 +826,16 @@ static inline _void ata_set_device_and_sector ( _u32 count, _u64 addr,\
 		//Mode LBA48
         case 48:
             
-            outb( ata.cmd_block_base_address + ATA_REG_SECCOUNT,0);	      // Sector Count 15:8
-	        outb( ata.cmd_block_base_address + ATA_REG_LBA0,addr >> 24);  // LBA 31-24   
-	        outb( ata.cmd_block_base_address + ATA_REG_LBA1,addr >> 32);  // LBA 39-32
-	        outb( ata.cmd_block_base_address + ATA_REG_LBA2,addr >> 40);  // LBA 47-40
-	        outb( ata.cmd_block_base_address + ATA_REG_SECCOUNT,count);   // Sector Count 7:0
-	        outb( ata.cmd_block_base_address + ATA_REG_LBA0,addr);		  // LBA 7-0   
-	        outb( ata.cmd_block_base_address + ATA_REG_LBA1,addr >> 8);   // LBA 15-8
-	        outb( ata.cmd_block_base_address + ATA_REG_LBA2,addr >> 16);  // LBA 23-16
+            out8( ata.cmd_block_base_address + ATA_REG_SECCOUNT,0);	      // Sector Count 15:8
+	        out8( ata.cmd_block_base_address + ATA_REG_LBA0,addr >> 24);  // LBA 31-24   
+	        out8( ata.cmd_block_base_address + ATA_REG_LBA1,addr >> 32);  // LBA 39-32
+	        out8( ata.cmd_block_base_address + ATA_REG_LBA2,addr >> 40);  // LBA 47-40
+	        out8( ata.cmd_block_base_address + ATA_REG_SECCOUNT,count);   // Sector Count 7:0
+	        out8( ata.cmd_block_base_address + ATA_REG_LBA0,addr);		  // LBA 7-0   
+	        out8( ata.cmd_block_base_address + ATA_REG_LBA1,addr >> 8);   // LBA 15-8
+	        out8( ata.cmd_block_base_address + ATA_REG_LBA2,addr >> 16);  // LBA 23-16
             
-			outb ( ata.cmd_block_base_address + ATA_REG_DEVSEL,
+			out8 ( ata.cmd_block_base_address + ATA_REG_DEVSEL,
 			    0x40 | ata.dev_num << 4 );   // Modo LBA active, Select device,        
             
 			// Verifique se e a mesma unidade para não esperar pelos 400ns.
@@ -924,13 +924,13 @@ ide_dma_data ( void *addr,
     phy = (uint32_t) &ide_dma_prdt[nport];
 
     // prds physical.
-    outportl ( ata.bus_master_base_address + ide_dma_reg_addr, phy );
+    out32 ( ata.bus_master_base_address + ide_dma_reg_addr, phy );
  
     // (bit 3 read/write)
     // 0 = Memory reads.
     // 1 = Memory writes.
 	
-    data = inb( ata.bus_master_base_address + ide_dma_reg_cmd ) &~8;
+    data = in8 ( ata.bus_master_base_address + ide_dma_reg_cmd ) &~8;
 
 	//
 	// TODO bit 8 Confilito no Oracle VirtualBox
@@ -939,13 +939,13 @@ ide_dma_data ( void *addr,
 	
     flg = 1;  
 	
-    outb( ata.bus_master_base_address + ide_dma_reg_cmd, data | flg << 3 );
+    out8( ata.bus_master_base_address + ide_dma_reg_cmd, data | flg << 3 );
 	
     // Limpar o bit de interrupção e 
 	// o bit de erro no registo de status.
 	
-    data = inb( ata.bus_master_base_address + ide_dma_reg_status );
-    outb( ata.bus_master_base_address + ide_dma_reg_status, data &~6 );
+    data = in8 ( ata.bus_master_base_address + ide_dma_reg_status );
+    out8( ata.bus_master_base_address + ide_dma_reg_status, data &~6 );
 
 // #todo: Deletar retorno.
 
@@ -961,8 +961,8 @@ done:
 
 void ide_dma_start (){
 
-    _u8 data = inb( ata.bus_master_base_address + ide_dma_reg_cmd );
-    outb( ata.bus_master_base_address + ide_dma_reg_cmd, data | 1);
+    _u8 data = in8 ( ata.bus_master_base_address + ide_dma_reg_cmd );
+    out8( ata.bus_master_base_address + ide_dma_reg_cmd, data | 1);
 }
 
 
@@ -970,13 +970,13 @@ void ide_dma_start (){
  * ide_dma_stop:
  */
 
-void ide_dma_stop (){
-	
-    _u8 data = inb( ata.bus_master_base_address + ide_dma_reg_cmd );  
-	outb( ata.bus_master_base_address + ide_dma_reg_cmd, data &~1);
-	
-    data = inb( ata.bus_master_base_address + ide_dma_reg_status );
-    outb( ata.bus_master_base_address + ide_dma_reg_status, data &~6);
+void ide_dma_stop ()
+{
+    _u8 data = in8 ( ata.bus_master_base_address + ide_dma_reg_cmd );  
+    out8( ata.bus_master_base_address + ide_dma_reg_cmd, data &~1);
+
+    data = in8 ( ata.bus_master_base_address + ide_dma_reg_status );
+    out8( ata.bus_master_base_address + ide_dma_reg_status, data &~6);
 
 
 // #todo: Deletar retorno.
@@ -991,9 +991,9 @@ done:
  *     DMA read status.
  */
 
-int ide_dma_read_status (){
-
-    return inb ( ata.bus_master_base_address + ide_dma_reg_status );
+int ide_dma_read_status ()
+{
+    return in8 ( ata.bus_master_base_address + ide_dma_reg_status );
 }
 
 
@@ -1043,14 +1043,15 @@ const char *pci_classes[] = {
  */
 
 uint32_t 
-diskReadPCIConfigAddr ( int bus, 
-                        int dev,
-                        int fun, 
-                        int offset )
+diskReadPCIConfigAddr ( 
+    int bus, 
+    int dev,
+    int fun, 
+    int offset )
 {
-    outportl( PCI_PORT_ADDR, CONFIG_ADDR( bus, dev, fun, offset ) );
+    out32 ( PCI_PORT_ADDR, CONFIG_ADDR( bus, dev, fun, offset ) );
 
-    return (uint32_t) inportl (PCI_PORT_DATA);
+    return (uint32_t) in32 (PCI_PORT_DATA);
 }
 
 
@@ -1060,14 +1061,15 @@ diskReadPCIConfigAddr ( int bus,
  */
 
 void 
-diskWritePCIConfigAddr ( int bus, 
-                         int dev,
-                         int fun, 
-                         int offset, 
-                         int data )
+diskWritePCIConfigAddr ( 
+    int bus, 
+    int dev,
+    int fun, 
+    int offset, 
+    int data )
 {
-    outportl ( PCI_PORT_ADDR, CONFIG_ADDR( bus, dev, fun, offset ) );
-    outportl ( PCI_PORT_DATA, data );
+    out32 ( PCI_PORT_ADDR, CONFIG_ADDR( bus, dev, fun, offset ) );
+    out32 ( PCI_PORT_DATA, data );
 }
 
 
@@ -1391,8 +1393,8 @@ uint32_t diskPCIScanDevice ( int class ){
         {
             for ( fun=0; fun < 8; fun++ )
             {
-                outportl( PCI_PORT_ADDR, CONFIG_ADDR( bus, dev, fun, 0x8) );
-                data = inportl(PCI_PORT_DATA);
+                out32 ( PCI_PORT_ADDR, CONFIG_ADDR( bus, dev, fun, 0x8) );
+                data = in32 (PCI_PORT_DATA);
                 
 				if ( ( data >> 24 &0xff ) == class )
 				{
@@ -1565,10 +1567,10 @@ int diskATAInitialize ( int ataflag ){
 
         //Soft Reset, defina IRQ
         
-		outb ( ATA_BAR1, 0xff );
-        outb ( ATA_BAR3, 0xff );
-        outb ( ATA_BAR1, 0x00 );
-        outb ( ATA_BAR3, 0x00 );
+        out8 ( ATA_BAR1, 0xff );
+        out8 ( ATA_BAR3, 0xff );
+        out8 ( ATA_BAR1, 0x00 );
+        out8 ( ATA_BAR3, 0x00 );
 
         ata_record_dev = 0xff;
         ata_record_channel = 0xff;

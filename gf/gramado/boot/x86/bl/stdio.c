@@ -894,18 +894,19 @@ void vsync (){
  */
 
 char gui_inb (int port){
-	
+
     char value = 0;
-	
-    value = inportb (port);
-	
+
+    value = in8 (port);
+
 	asm (" nop \n");
 	asm (" nop \n");
 	asm (" nop \n");
 	asm (" nop \n"); 
-	
-	return value;
+
+    return value;
 }
+
 
 //#bugbug
 //@todo: Rever isso.

@@ -3,128 +3,69 @@
  *
  * Descrição:
  *     Permite ao Boot Loader acessar as portas.
- * 
- * 2005 - Created by Fred Nora.
+ *
+ * History: 
+ *     2005 - Created by Fred Nora.
+ *     2020 - New standard.
  */
+
 
 
 #include <bootloader.h>
 
 
-/*
- * bloutportb: 
- *     Escreve um byte em uma determina porta.
- */
-
-inline void bloutportb ( unsigned int port, unsigned int value ){
-
-    asm volatile (" outb %%al, %%dx " : :"d" (port), "a" (value) );
-}
 
 
-int outb (int port, int data){
+//new
+unsigned char in8 (int port){
 
-    asm (" outb %%al, %%dx " : : "a" (data), "d" (port) );
-}
-
-
-inline unsigned char inportb (int port){
-
-    unsigned char ret; 
-
-    asm (" inb %%dx, %%al " : "=a"(ret): "d"(port) );
-
-    return ret;
-}
-
-
-int outportb (int port, int data){
-
-    asm ("outb %%al, %%dx " : : "a" (data), "d" (port) );
-}
-
-
-int inport8 (int port, int data){
-
-    asm ("inb %%dx, %%al" : "=a" (data) : "d" (port) );
-}
-
-
-int outport8 (int port, int data){
-
-    asm (" outb %%al, %%dx"  : : "a" (data), "d" (port) );
-}
-
-
-int inport16 (int port,int data){
-
-    asm (" inw %%dx, %%ax" : "=a" (data) : "d" (port) );
-}
-
-
-int outport16 (int port, int data){
-
-    asm (" outw %%ax, %%dx"  : : "a" (data), "d" (port) );
-}
-
-
-int inport32 (int port, int data){
-
-    asm (" inl %%dx, %%eax"  : "=a" (data) : "d" (port) );
-}
-
-
-int outport32 (int port,int data){
-
-    asm (" outl %%eax, %%dx"  : : "a" (data), "d" (port) );
-}
-
-
-/*
- * inb:
- *    Pega byte na porta. 
- *    É usada na sincronização do monitor.
- */
+    unsigned char ret;
  
-char inb (int port){
+    asm volatile ("inb %%dx, %%al" : "=a"(ret): "d"(port) );
 
-    char value = 0;
+    return (unsigned char) ret;
+}
 
-    value = inportb (port);
+//new
+unsigned short in16 (int port){
 
-    asm (" nop \n");
-    asm (" nop \n");
-    asm (" nop \n");
-    asm (" nop \n");
+    unsigned short ret;
 
-    return (char) value;
+    asm volatile ("inw %%dx, %%ax" : "=a" (ret) : "d" (port) );
+
+    return (unsigned short) ret;
+}
+
+//new
+unsigned long in32 (int port){
+
+    unsigned long ret;
+
+    asm volatile ("inl %%dx,%%eax" : "=a" (ret) : "d"(port) );
+
+    return (unsigned long) ret;
 }
 
 
-/*
- * inportl:
- *     Lê um dword de uma determina porta.
- */
+//new
+void out8 ( int port, unsigned char data ){
 
-inline unsigned long inportl (unsigned long port){
-
-    unsigned long Ret;
-
-    asm volatile (" inl %%dx,%%eax" : "=a" (Ret) : "d"(port) );
-
-    return Ret;
+    asm volatile ("outb %%al, %%dx" :: "a" (data), "d" (port) );
 }
 
 
-/*
- * outportl:
- *     Escreve um dword em uma determinada porta.
- */
-
-inline void outportl (unsigned long port, unsigned long value){
-
-    asm volatile ("outl %%eax,%%dx" :: "d" (port), "a" (value) );
+//new
+void out16 (int port, unsigned short data){
+    
+    asm volatile ("outw %%ax, %%dx" :: "a" (data), "d" (port) );
 }
+
+//new
+void out32 ( int port, unsigned long data ){
+
+    asm volatile ("outl %%eax, %%dx" :: "a" (data), "d" (port) );
+}
+
 
 
 //

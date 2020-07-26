@@ -268,7 +268,7 @@ void keyboardHandler (){
     // Step1: 
     // Pegar o scancode.       
 
-    scancode = inportb (0x60); 
+    scancode = in8 (0x60); 
 
     //
     // Step 2: Trata a mensagem.
@@ -395,7 +395,7 @@ void keyboardHandler (){
 	// Step 5: 
 	// EOI.
 
-    outportb ( 0x20, 0x20 );     
+    out8(0x20,0x20);     
 }
 
 
