@@ -1,5 +1,5 @@
 /*
- * File: syslib/kstdio.c 
+ * File: kstdio.c 
  *
  *    i/o routines for the base kernel.
  *    ring 0.

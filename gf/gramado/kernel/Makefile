@@ -5,7 +5,6 @@ ARCH ?= x86
 #ARCH ?= x86_64
 
 
-
 # Make variables (CC, etc...)
 AS	= as
 LD	= ld
@@ -180,6 +179,9 @@ all-c:
 	$(CC) -c net/network/network.c  $(KINCLUDE) $(CFLAGS) -o network.o
 
 
+	##
+	## SCI - System Call Interface
+	##
 
 	#  /sci - System Call Interface.
 	$(CC) -c sci/gde_serv.c $(KINCLUDE) $(CFLAGS) -o gde_serv.o
@@ -305,22 +307,22 @@ all-c:
 
 
 	##
-	## ==== BOTTOM ==== 
+	## ==== HWI - Hardware Interface ==== 
 	##
 
 	# klib
-	$(CC) -c bottom/klib/ctype.c   $(KINCLUDE) $(CFLAGS) -o ctype.o
-	$(CC) -c bottom/klib/kstdio.c  $(KINCLUDE) $(CFLAGS) -o kstdio.o
-	$(CC) -c bottom/klib/stdlib.c  $(KINCLUDE) $(CFLAGS) -o stdlib.o
-	$(CC) -c bottom/klib/string.c  $(KINCLUDE) $(CFLAGS) -o string.o
-	$(CC) -c bottom/klib/unistd.c  $(KINCLUDE) $(CFLAGS) -o unistd.o
-	$(CC) -c bottom/klib/syslib.c  $(KINCLUDE) $(CFLAGS) -o syslib.o
+	$(CC) -c klib/ctype.c   $(KINCLUDE) $(CFLAGS) -o ctype.o
+	$(CC) -c klib/kstdio.c  $(KINCLUDE) $(CFLAGS) -o kstdio.o
+	$(CC) -c klib/stdlib.c  $(KINCLUDE) $(CFLAGS) -o stdlib.o
+	$(CC) -c klib/string.c  $(KINCLUDE) $(CFLAGS) -o string.o
+	$(CC) -c klib/syslib.c  $(KINCLUDE) $(CFLAGS) -o syslib.o
+	$(CC) -c klib/unistd.c  $(KINCLUDE) $(CFLAGS) -o unistd.o
 
 
 	# dd
-	$(CC) -c bottom/dd/io.c      $(KINCLUDE) $(CFLAGS) -o io.o
-	$(CC) -c bottom/dd/sysio.c   $(KINCLUDE) $(CFLAGS) -o sysio.o
-	$(CC) -c bottom/dd/devmgr.c  $(KINCLUDE) $(CFLAGS) -o devmgr.o
+	$(CC) -c hwi/dd/io.c      $(KINCLUDE) $(CFLAGS) -o io.o
+	$(CC) -c hwi/dd/sysio.c   $(KINCLUDE) $(CFLAGS) -o sysio.o
+	$(CC) -c hwi/dd/devmgr.c  $(KINCLUDE) $(CFLAGS) -o devmgr.o
 
 
 	#
@@ -328,45 +330,45 @@ all-c:
 	#
 
 	# ahci 
-	$(CC) -c bottom/dd/nhid/ahci/ahci.c  $(KINCLUDE) $(CFLAGS) -o ahci.o
+	$(CC) -c hwi/dd/nhid/ahci/ahci.c  $(KINCLUDE) $(CFLAGS) -o ahci.o
 	
 	# x86
-	$(CC) -c bottom/dd/nhid/arch/x86/apic.c  $(KINCLUDE) $(CFLAGS) -o apic.o
-	$(CC) -c bottom/dd/nhid/arch/x86/pic.c   $(KINCLUDE) $(CFLAGS) -o pic.o
-	$(CC) -c bottom/dd/nhid/arch/x86/pit.c   $(KINCLUDE) $(CFLAGS) -o pit.o
+	$(CC) -c hwi/dd/nhid/arch/x86/apic.c  $(KINCLUDE) $(CFLAGS) -o apic.o
+	$(CC) -c hwi/dd/nhid/arch/x86/pic.c   $(KINCLUDE) $(CFLAGS) -o pic.o
+	$(CC) -c hwi/dd/nhid/arch/x86/pit.c   $(KINCLUDE) $(CFLAGS) -o pit.o
 	
 	# hal
-	$(CC) -c bottom/dd/nhid/hal/hal.c                $(KINCLUDE) $(CFLAGS) -o hal.o
-	$(CC) -c bottom/dd/nhid/hal/arch/detect.c        $(KINCLUDE) $(CFLAGS) -o detect.o
-	$(CC) -c bottom/dd/nhid/hal/arch/amd/cpuamd.c    $(KINCLUDE) $(CFLAGS) -o cpuamd.o
-	$(CC) -c bottom/dd/nhid/hal/arch/x86/portsx86.c  $(KINCLUDE) $(CFLAGS) -o portsx86.o
-	$(CC) -c bottom/dd/nhid/hal/arch/x86/x86.c       $(KINCLUDE) $(CFLAGS) -o x86.o
-	$(CC) -c bottom/dd/nhid/hal/arch/x86/x86info.c   $(KINCLUDE) $(CFLAGS) -o x86info.o   
+	$(CC) -c hwi/dd/nhid/hal/hal.c                $(KINCLUDE) $(CFLAGS) -o hal.o
+	$(CC) -c hwi/dd/nhid/hal/arch/detect.c        $(KINCLUDE) $(CFLAGS) -o detect.o
+	$(CC) -c hwi/dd/nhid/hal/arch/amd/cpuamd.c    $(KINCLUDE) $(CFLAGS) -o cpuamd.o
+	$(CC) -c hwi/dd/nhid/hal/arch/x86/portsx86.c  $(KINCLUDE) $(CFLAGS) -o portsx86.o
+	$(CC) -c hwi/dd/nhid/hal/arch/x86/x86.c       $(KINCLUDE) $(CFLAGS) -o x86.o
+	$(CC) -c hwi/dd/nhid/hal/arch/x86/x86info.c   $(KINCLUDE) $(CFLAGS) -o x86info.o   
 
 	# ide
-	$(CC) -c bottom/dd/nhid/ide/ata.c      $(KINCLUDE) $(CFLAGS) -o ata.o
-	$(CC) -c bottom/dd/nhid/ide/atadma.c   $(KINCLUDE) $(CFLAGS) -o atadma.o
-	$(CC) -c bottom/dd/nhid/ide/atainit.c  $(KINCLUDE) $(CFLAGS) -o atainit.o
-	$(CC) -c bottom/dd/nhid/ide/atairq.c   $(KINCLUDE) $(CFLAGS) -o atairq.o
-	$(CC) -c bottom/dd/nhid/ide/atapci.c   $(KINCLUDE) $(CFLAGS) -o atapci.o
-	$(CC) -c bottom/dd/nhid/ide/hdd.c      $(KINCLUDE) $(CFLAGS) -o hdd.o
+	$(CC) -c hwi/dd/nhid/ide/ata.c      $(KINCLUDE) $(CFLAGS) -o ata.o
+	$(CC) -c hwi/dd/nhid/ide/atadma.c   $(KINCLUDE) $(CFLAGS) -o atadma.o
+	$(CC) -c hwi/dd/nhid/ide/atainit.c  $(KINCLUDE) $(CFLAGS) -o atainit.o
+	$(CC) -c hwi/dd/nhid/ide/atairq.c   $(KINCLUDE) $(CFLAGS) -o atairq.o
+	$(CC) -c hwi/dd/nhid/ide/atapci.c   $(KINCLUDE) $(CFLAGS) -o atapci.o
+	$(CC) -c hwi/dd/nhid/ide/hdd.c      $(KINCLUDE) $(CFLAGS) -o hdd.o
 
 	# net
-	$(CC) -c bottom/dd/nhid/net/nicintel.c  $(KINCLUDE) $(CFLAGS) -o nicintel.o
+	$(CC) -c hwi/dd/nhid/net/nicintel.c  $(KINCLUDE) $(CFLAGS) -o nicintel.o
 
 	# rtc
-	$(CC) -c bottom/dd/nhid/rtc/rtc.c     $(KINCLUDE) $(CFLAGS) -o rtc.o
+	$(CC) -c hwi/dd/nhid/rtc/rtc.c     $(KINCLUDE) $(CFLAGS) -o rtc.o
 
 	# serial
-	$(CC) -c bottom/dd/nhid/serial/serial.c  $(KINCLUDE) $(CFLAGS) -o serial.o
+	$(CC) -c hwi/dd/nhid/serial/serial.c  $(KINCLUDE) $(CFLAGS) -o serial.o
 
 	# pci
-	$(CC) -c bottom/dd/nhid/pci/pci.c      $(KINCLUDE) $(CFLAGS) -o pci.o
-	$(CC) -c bottom/dd/nhid/pci/pciinfo.c  $(KINCLUDE) $(CFLAGS) -o pciinfo.o
-	$(CC) -c bottom/dd/nhid/pci/pciscan.c  $(KINCLUDE) $(CFLAGS) -o pciscan.o
+	$(CC) -c hwi/dd/nhid/pci/pci.c      $(KINCLUDE) $(CFLAGS) -o pci.o
+	$(CC) -c hwi/dd/nhid/pci/pciinfo.c  $(KINCLUDE) $(CFLAGS) -o pciinfo.o
+	$(CC) -c hwi/dd/nhid/pci/pciscan.c  $(KINCLUDE) $(CFLAGS) -o pciscan.o
 
 	# usb
-	$(CC) -c bottom/dd/nhid/usb/usb.c   $(KINCLUDE) $(CFLAGS) -o usb.o
+	$(CC) -c hwi/dd/nhid/usb/usb.c   $(KINCLUDE) $(CFLAGS) -o usb.o
 
 
 	#
@@ -374,25 +376,25 @@ all-c:
 	# 
 	
 	# tty
-	$(CC) -c bottom/dd/hid/tty/console.c $(KINCLUDE) $(CFLAGS) -o cedge.o
-	$(CC) -c bottom/dd/hid/tty/pty.c     $(KINCLUDE) $(CFLAGS) -o pty.o
-	$(CC) -c bottom/dd/hid/tty/tty.c     $(KINCLUDE) $(CFLAGS) -o tty.o
-	$(CC) -c bottom/dd/hid/tty/vt.c      $(KINCLUDE) $(CFLAGS) -o vt.o
+	$(CC) -c hwi/dd/hid/tty/console.c $(KINCLUDE) $(CFLAGS) -o cedge.o
+	$(CC) -c hwi/dd/hid/tty/pty.c     $(KINCLUDE) $(CFLAGS) -o pty.o
+	$(CC) -c hwi/dd/hid/tty/tty.c     $(KINCLUDE) $(CFLAGS) -o tty.o
+	$(CC) -c hwi/dd/hid/tty/vt.c      $(KINCLUDE) $(CFLAGS) -o vt.o
 
 	# ws
-	$(CC) -c bottom/dd/hid/ws/i8042.c     $(KINCLUDE) $(CFLAGS) -o i8042.o
-	$(CC) -c bottom/dd/hid/ws/keyboard.c  $(KINCLUDE) $(CFLAGS) -o keyboard.o
-	$(CC) -c bottom/dd/hid/ws/mouse.c     $(KINCLUDE) $(CFLAGS) -o mouse.o
-	$(CC) -c bottom/dd/hid/ws/ps2kbd.c    $(KINCLUDE) $(CFLAGS) -o ps2kbd.o
-	$(CC) -c bottom/dd/hid/ws/ps2mouse.c  $(KINCLUDE) $(CFLAGS) -o ps2mouse.o
-	$(CC) -c bottom/dd/hid/ws/vsync.c     $(KINCLUDE) $(CFLAGS) -o vsync.o
+	$(CC) -c hwi/dd/hid/ws/i8042.c     $(KINCLUDE) $(CFLAGS) -o i8042.o
+	$(CC) -c hwi/dd/hid/ws/keyboard.c  $(KINCLUDE) $(CFLAGS) -o keyboard.o
+	$(CC) -c hwi/dd/hid/ws/mouse.c     $(KINCLUDE) $(CFLAGS) -o mouse.o
+	$(CC) -c hwi/dd/hid/ws/ps2kbd.c    $(KINCLUDE) $(CFLAGS) -o ps2kbd.o
+	$(CC) -c hwi/dd/hid/ws/ps2mouse.c  $(KINCLUDE) $(CFLAGS) -o ps2mouse.o
+	$(CC) -c hwi/dd/hid/ws/vsync.c     $(KINCLUDE) $(CFLAGS) -o vsync.o
 
 
 	# x86 initialization
-	$(CC) -c bottom/init/x86/x86init.c  $(KINCLUDE) $(CFLAGS) -o x86init.o
+	$(CC) -c hwi/init/x86/x86init.c  $(KINCLUDE) $(CFLAGS) -o x86init.o
 
 	# x86 boot
-	$(NASM) bottom/init/x86/boot.asm -I bottom/init/x86/ -f elf -o boot.o
+	$(NASM) hwi/init/x86/boot.asm -I hwi/init/x86/ -f elf -o boot.o
 
 
 
