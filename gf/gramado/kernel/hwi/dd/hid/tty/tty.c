@@ -731,6 +731,9 @@ int tty_ioctl ( int fd, unsigned long request, unsigned long arg ){
         tty = f->tty; 
     }
 
+
+
+
     switch (request)
     {
         case TCGETS:
@@ -1337,6 +1340,12 @@ _ok:
         __tty->used = 1;
         __tty->magic = 1234;
         
+        __tty->pgrp = current_group;
+
+        //__tty->stopped = 0;
+        
+        //...
+        
         //
         // files
         //
@@ -1452,7 +1461,8 @@ __ok_register:
         __file->tty = __tty;
         
         // Esse é o arquivo que aponta para essa estrutura.
-        //__tty->_fp = __file;
+        __tty->_fp = __file;
+
 
         //
         // Register.
@@ -1484,6 +1494,26 @@ __ok_register:
     return (struct tty_d *) __tty;
 }
 
+
+
+/*
+//todo: open a tty device
+int tty_open (file *f, struct inode_d *inode);
+int tty_open (file *f, struct inode_d *inode)
+{
+    return -1;
+}
+*/
+
+
+//OUT: tty pointer.
+struct tty_d *file_tty (file *f)
+{
+    if ( (void *)f==NULL ){
+        return (struct tty_d *) 0;
+    }
+    return (struct tty_d *) f->tty;
+}
 
 
 

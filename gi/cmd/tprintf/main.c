@@ -78,17 +78,20 @@ int TEST_PRINTF3(void);
 
 
 /*
- * iNICIALIZAÇÃO GENÉRICA PARA TESTE DE APLICATIVO.
+ * INICIALIZAÇÃO GENÉRICA PARA TESTE DE APLICATIVO.
  */
 
 int main (int argc, char *argv[]){
 
     //FILE *f;
     
-    //f = fopen("syscalls.txt", "r+"); 
+    //f = fopen("create1.txt", "r+"); 
     //f = fopen("kstdin.txt", "r+");
     //stdout = f;
-    
+
+    //stdin é um arquivo normal, vamos escrever nele.
+    //assim o terminal poderá ler o stdout.
+    //stdout = f;
 
 	printf("\n");
 	printf("tprintf.bin: Initilizing ...\n\n");
@@ -100,8 +103,8 @@ int main (int argc, char *argv[]){
 	printf("===============\n");
 	printf("Testando printf, printf nao tradicional\n");	
 	TEST_PRINTF();
-    	
-	//printf("\n");	
+
+	//printf("\n");
 	//printf("===============\n");
 	//printf("Testando printf2, printf tradicional\n");	
 	//TEST_PRINTF2();	 
@@ -113,6 +116,9 @@ int main (int argc, char *argv[]){
 	
 	printf("DONE.\n");	
 
+
+    //close(fileno(f));
+    
 	return 0;
 }
 

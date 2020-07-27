@@ -1221,6 +1221,21 @@ int ttyslot (void)
 */
 
 
+
+/*
+// Credits: Fred Nora
+// Coloca a tty do processo no seguinte slot de arquivos abertos.
+int ttyto( int fd);
+int ttyto( int fd)
+{
+    return (int) gramado_system_call ( ?, 
+                    (unsigned long) fd,
+                    (unsigned long) fd,
+                    (unsigned long) fd );
+}
+*/
+
+
 // POSIX.1-2001, POSIX.1-2008, SVr4, 4.3BSD.
 // isatty - test whether a file descriptor refers to a terminal
 // This function returns 1 if filedes is a file descriptor associated 

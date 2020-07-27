@@ -43,9 +43,11 @@ int main ( int argc, char *argv[] )
     ____this_tty_id = gramado_system_call ( 266, getpid(), 0, 0 );
     printf ("The tty for this process is %d\n", ____this_tty_id);
 
-    int nwrite = -1; // bytes escritos.
-    size_t __w_size2;
+
+
     
+    int nwrite = -1; // bytes escritos.
+    size_t __w_size2=0;
     while(1)
     {
         // Escrevendo na tty desse processo e na tty slave pra leitura.
@@ -55,9 +57,26 @@ int main ( int argc, char *argv[] )
     
         if (nwrite > 0)
            return 0;//goto __ok;
+    
+        //yield
     }
- 
- 
+    
+
+    /*
+    int nread=-1;
+    size_t __r_size2=0;
+    while(1)
+    {
+        // Escrevendo na tty desse processo e na tty slave pra leitura.
+        nread = read_ttyList ( ____this_tty_id, 
+                     buf2, 
+                     sizeof(buf2) );
+    
+        if (nread > 0){
+            printf("%s\n",buf2);  //stdout
+        }
+    }
+    */
  
     //
     // ==================== cut =================

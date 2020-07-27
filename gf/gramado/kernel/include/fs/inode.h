@@ -63,9 +63,15 @@ struct inode_d
 
 unsigned long inode_table[32];
 
+
 // #bugbug
 // Not tested yet.
 int search_path_in_the_inode_table( const char *path );
+
+
+//OUT: inode structure.
+struct inode_d *file_inode (file *f);
+
 
 
 

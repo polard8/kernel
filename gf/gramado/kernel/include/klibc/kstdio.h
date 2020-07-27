@@ -565,6 +565,9 @@ struct file_d
     // A estrutura de arquivos aponta para a tabela de inodes.
     int inodetable_index;
 
+    //inode structure
+    struct inode_d *inode;
+
 
     // #bugbug
     // Identificador do primeiro processo à abrir o arquivo

@@ -103,6 +103,10 @@ void test_tty_support(int fd)
    gramado_system_call ( 900, 
        (unsigned long) "true.bin", 0, 0 );
 
+
+    gws_yield();
+    
+    
     int i=0;
     while(1){
 
@@ -116,11 +120,29 @@ void test_tty_support(int fd)
             }
             return;
         }
+        gws_yield();
         
         //i++;
         //if(i>20) i=0;
     }
+    
+   
+    /*
+    int nwrite = -1; // bytes escritos.
+    size_t __w_size2=0;
+    while(1)
+    {
+        // Escrevendo na tty desse processo e na tty slave pra leitura.
+        nwrite = write_ttyList ( ____this_tty_id, 
+                     buffer, 
+                     __w_size2 = sprintf (buffer,"THIS IS A MAGIC STRING\n")  );
+    
+        if (nwrite > 0)
+           return 0;//goto __ok;
+    }
+    */
 }
+
 
 
 void test_standard_stream(int fd)
@@ -159,12 +181,31 @@ void test_standard_stream(int fd)
     //size_t size = (sizeof(buffer) - 1);
     //buffer[4095] = 0;  
 
+   //escreve em stdout
+   //mas stdout não é um arquivo normal ...
+   //é um dispositivo. então não poderemos ler daqui.
+   //#?? talvez poderíamos ... se os bytes ficarem armazenados
+   // no buffer do dispositivo.
+   //gramado_system_call ( 900, 
+      // (unsigned long) "tprintf.bin", 0, 0 );
+
+
+
+    // redirecionamento.
+    // 
+    //stdout = f;  //ok
+    
+    
+
     int i=0;
     while(1){
 
-        //nread = read ( fileno(f), buffer, sizeof(buffer) ); 
-        nread = read ( fileno(f), buffer, size ); 
-         
+        nread = read ( fileno(f), buffer, sizeof(buffer) ); 
+        //nread = read ( fileno(f), buffer, size ); 
+        //nread = read ( fileno(stdin), buffer, size ); 
+        //nread = read ( fileno(stdout), buffer, size ); 
+ 
+     
         if( nread>0){
             
             for(i=0;i< size ;i++){

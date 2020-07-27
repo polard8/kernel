@@ -25,24 +25,25 @@
 
 
 //These bits are used in the flags field of the tty structure.
-#define TTY_THROTTLED 		0	/* Call unthrottle() at threshold min */
-#define TTY_IO_ERROR 		1	/* Cause an I/O error (may be no ldisc too) */
-#define TTY_OTHER_CLOSED 	2	/* Other side (if any) has closed */
-#define TTY_EXCLUSIVE 		3	/* Exclusive open mode */
-#define TTY_DEBUG 		4	/* Debugging */
-#define TTY_DO_WRITE_WAKEUP 	5	/* Call write_wakeup after queuing new */
-#define TTY_PUSH 		6	/* n_tty private */
-#define TTY_CLOSING 		7	/* ->close() in progress */
-#define TTY_LDISC 		9	/* Line discipline attached */
-#define TTY_LDISC_CHANGING 	10	/* Line discipline changing */
-#define TTY_LDISC_OPEN	 	11	/* Line discipline is open */
-#define TTY_HW_COOK_OUT 	14	/* Hardware can do output cooking */
-#define TTY_HW_COOK_IN 		15	/* Hardware can do input cooking */
-#define TTY_PTY_LOCK 		16	/* pty private */
-#define TTY_NO_WRITE_SPLIT 	17	/* Preserve write boundaries to driver */
-#define TTY_HUPPED 		18	/* Post driver->hangup() */
-#define TTY_FLUSHING		19	/* Flushing to ldisc in progress */
-#define TTY_FLUSHPENDING	20	/* Queued buffer flush pending */
+#define TTY_THROTTLED         0	/* Call unthrottle() at threshold min */
+#define TTY_IO_ERROR          1	/* Cause an I/O error (may be no ldisc too) */
+#define TTY_OTHER_CLOSED      2	/* Other side (if any) has closed */
+#define TTY_EXCLUSIVE         3	/* Exclusive open mode */
+#define TTY_DEBUG             4	/* Debugging */
+#define TTY_DO_WRITE_WAKEUP   5	/* Call write_wakeup after queuing new */
+#define TTY_PUSH              6	/* n_tty private */
+#define TTY_CLOSING           7	/* ->close() in progress */
+#define TTY_LDISC             9	/* Line discipline attached */
+#define TTY_LDISC_CHANGING   10	/* Line discipline changing */
+#define TTY_LDISC_OPEN       11	/* Line discipline is open */
+#define TTY_HW_COOK_OUT      14	/* Hardware can do output cooking */
+#define TTY_HW_COOK_IN       15	/* Hardware can do input cooking */
+#define TTY_PTY_LOCK         16	/* pty private */
+#define TTY_NO_WRITE_SPLIT   17	/* Preserve write boundaries to driver */
+#define TTY_HUPPED           18	/* Post driver->hangup() */
+#define TTY_FLUSHING         19	/* Flushing to ldisc in progress */
+#define TTY_FLUSHPENDING     20	/* Queued buffer flush pending */
+
 
  
 //Contador de linhas usados na hora da criação de linhas.
@@ -73,17 +74,17 @@ struct ttybuffer_d *CurrentTTYBUFFER;
 
 struct tty_line_d
 {
-	//int index;
-	
+    //int index;
+
     char CHARS[80];
     char ATTRIBUTES[80];  //Isso poderia ser unsigned long.	
-	
-	// Início e fim da string dentro da linha. O resto é espaço.
-	int left;
-	int right;
-	
-	//Posição do cursor dentro da linha.
-	int pos;
+
+    // Início e fim da string dentro da linha. O resto é espaço.
+    int left;
+    int right;
+
+    //Posição do cursor dentro da linha.
+    int pos;
 };
 
 
@@ -94,14 +95,25 @@ struct tty_line_d
 
 struct tty_d
 {
-
-    object_type_t objectType;
+    object_type_t  objectType;
     object_class_t objectClass;
 
     int index;
 
     int used;
     int magic;
+
+    // device driver, line discipline and termios.
+
+    //#todo: Indice do dispositivo.
+    //int device;
+    
+    struct ttydrv_d *driver;
+    
+    struct ttyldisc_d *ldisc;
+    
+    struct termios termios;
+
     
     // #importante
     // Esse é o arquivo que aponta para essa estrutura.
@@ -112,9 +124,9 @@ struct tty_d
     
 
     // process group.
-    // Usando quanto tiver uma itnerrupção de tty.
+    // Usando quanto tiver uma interrupção de tty.
     // Quais processos estão no mesmo grupo quanto tiver a interrupção.
-    // Vamos sinalizálos.
+    // Vamos sinalizá-los.
     int pgrp;
     
     // linux-like
@@ -129,10 +141,6 @@ struct tty_d
     
     //status
     int stopped;
-
-	// #importante: #TODO
-	// see: termios.h
-    struct termios termios;
 
 
 	//
@@ -274,14 +282,7 @@ struct tty_d
     //#test
     //canal de conexão; (network channel)
     struct channel_d *channel;
-    
-    // qual disciplina de linhas será usada.
-    // cada disciplina de linhas tem um conjunto de operações.
-    struct ttyldisc_d *ldisc;
-    
-    // com qual driver essa tty está trabalhando.
-    struct ttydrv_d *driver;
-    
+     
     // pty associa a tty 'to' com a tty 'from'
     // master/slave.
     struct tty_d *link;
@@ -322,25 +323,17 @@ unsigned long ttyList[256];
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 /* tty magic number */
 //#define TTY_MAGIC	0x0771
 
-
-
 //void *createTTYLine (void); 
+
+
+
+//OUT: tty pointer.
+struct tty_d *file_tty (file *f);
+
+
 
 struct ttyldisc_d *ttyldisc_create (void);  
 int ttyldisc_delete ( struct ttyldisc_d *tty_ldisc );
@@ -400,9 +393,10 @@ tty_write_ttyList ( unsigned int channel,
 
 
 int 
-__tty_read ( struct tty_d *tty, 
-             char *buffer, 
-             int nr );
+__tty_read ( 
+    struct tty_d *tty, 
+    char *buffer, 
+    int nr );
 
 int 
 __tty_write ( struct tty_d *tty, 
@@ -432,12 +426,13 @@ void tty_reset_termios ( struct tty_d *tty );
 // você quizer. Inclusive da pra enviar protocolos de rede.
 
 int 
-tty_send_message ( int target_pid, 
-                   char *buffer, 
-                   int nr,
-                   int msg,
-                   unsigned long long1,
-                   unsigned long long2 ); 
+tty_send_message ( 
+    int target_pid, 
+    char *buffer, 
+    int nr,
+    int msg,
+    unsigned long long1,
+    unsigned long long2 ); 
 
 
 int tty_init_module (void);

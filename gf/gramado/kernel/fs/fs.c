@@ -40,6 +40,17 @@ unsigned char fs_CheckSum83 (unsigned char *pFcbName)
 */
 
 
+//OUT: inode structure.
+struct inode_d *file_inode (file *f)
+{
+    if ( (void *)f==NULL ){
+        return (struct inode_d *) 0;
+    }
+    return (struct inode_d *) f->inode;
+}
+
+
+
 // Get free slot.
 int fs_get_mounted_free_slot (void)
 {
