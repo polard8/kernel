@@ -1,5 +1,5 @@
 /*
- * File: kernel/sci/syscall.h
+ * File: sci/syscall.h
  *
  * Descrição:
  *     SCI - System Call Interface header.
@@ -700,6 +700,9 @@ systemcall_t *CurrentSystemCall;
 
 
 
+//
+//  == Prototypes ====================================
+//
 
 
 /*
@@ -709,19 +712,21 @@ systemcall_t *CurrentSystemCall;
 
 // int 0x80
 // See: gde_serv.c
-void *gde_services ( unsigned long number, 
-                     unsigned long arg2, 
-                     unsigned long arg3, 
-                     unsigned long arg4 );
+void *gde_services ( 
+    unsigned long number, 
+    unsigned long arg2, 
+    unsigned long arg3, 
+    unsigned long arg4 );
 
 
 
 // int 133
 // See: gde_serv.c
-void *gde_133 ( unsigned long number, 
-                unsigned long arg2, 
-                unsigned long arg3, 
-                unsigned long arg4 );
+void *gde_133 ( 
+    unsigned long number, 
+    unsigned long arg2, 
+    unsigned long arg3, 
+    unsigned long arg4 );
 
 
 

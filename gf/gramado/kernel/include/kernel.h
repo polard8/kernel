@@ -410,32 +410,24 @@ extern void do_executa_new_task (void);
 #include "sub.h"       // gramado sub systems
 
 
+#include "utsname.h"
+
+
+// Globals. PIDs support.
+
+#include "gpid.h"
+
 
 //
 // sci - system call interface
 //
 
-#include "syscall.h"         //system calls.
-
-#include "sys.h"
-#include "sysio.h"
-#include "syslib.h" 
-#include "sysmk.h"
-#include "syssm.h" 
-
-
-#include "utsname.h"
-
-
-//
-// Globals.
-//
-
-
+// All the functions in this folder can be called
+// by the ring3 apps via system call.
 // This is the last #include. :^)
 
-#include "gpid.h"
-
+#include "sci/syscall.h"        
+#include "sci/sys.h"
 
 
 

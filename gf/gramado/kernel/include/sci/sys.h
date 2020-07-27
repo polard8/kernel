@@ -1,11 +1,18 @@
+// sys.h 
+// System call interface.
+// All the functions here can be called
+// by and ring3 app via system call.
+// Created by Fred Nora.
 
-//   sys.h 
+
+//
+// #todo
+// Organizar por ordem alfabética ou por grupo.
+//
 
 
 #ifndef ____SYS_H
 #define ____SYS_H
-
-
 
 
 int sys_ioctl ( int fd, unsigned long request, unsigned long arg );
@@ -35,8 +42,8 @@ int sys_write (unsigned int fd,char *ubuf,int count);
 //
 
 // 289
+// ??
 int sys_serial_debug_printk ( char *s );
-
 
 
 
@@ -47,16 +54,16 @@ int sys_serial_debug_printk ( char *s );
 
 
 // 73
-void *sys_create_process ( struct room_d *room,
-                           struct desktop_d  *desktop,
-                           struct window_d *window,
-                           unsigned long res1, 
-                           unsigned long priority, 
-                           int ppid, 
-                           char *name, 
-                           unsigned long iopl,
-                           unsigned long res2 );
-
+void *sys_create_process ( 
+    struct room_d     *room,
+    struct desktop_d  *desktop,
+    struct window_d   *window,   //#bugbug: Valid only for kgws.
+    unsigned long res1, 
+    unsigned long priority, 
+    int ppid, 
+    char *name, 
+    unsigned long iopl,
+    unsigned long res2 );
 
 
 int sys_getpid (void);
@@ -75,13 +82,14 @@ void sys_exit_process (int pid, int code);
 
 
 // 72
-void *sys_create_thread ( struct room_d *room,
-                          struct desktop_d  *desktop,
-                          struct window_d *window,
-                          unsigned long init_eip, 
-                          unsigned long priority, 
-                          int ppid, 
-                          char *name );
+void *sys_create_thread ( 
+    struct room_d     *room,
+    struct desktop_d  *desktop,
+    struct window_d   *window,    //#bugbug: Valid only for kgws.
+    unsigned long init_eip, 
+    unsigned long priority, 
+    int ppid, 
+    char *name );
 
 void sys_exit_thread (int tid);
 
@@ -99,22 +107,22 @@ void sys_showkernelinfo (void);
 int sys_showpciinfo (void);
 
 
-//
-// reboot and shutdown
-//
-
-void sys_reboot (void);
-void sys_shutdown (void);
-
-
 // 178
 unsigned long sys_get_file_size ( char *path );
+
 
 
 // Usada por vários serviços de debug.
 // Usada para debug.
 void sys_show_system_info ( int n );
 
+
+//
+// reboot and shutdown
+//
+
+void sys_reboot (void);
+void sys_shutdown (void);
 
 
 #endif    
