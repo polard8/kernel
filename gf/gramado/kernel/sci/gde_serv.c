@@ -319,7 +319,7 @@ gde_extra_services (
     // Isso poderá ser chamado pelo init.bin, pelo shell
     // ou qualquer outro.
     if ( number == 350 ){
-        return (void *) syssm_initialize_component ((int) arg2);
+        return (void *) sys_initialize_component ((int) arg2);
     }
     
     
@@ -2639,7 +2639,7 @@ gde_services (
         // 250
         // See: syssm/syssm.c
         case SYS_GETSYSTEMMETRICS:
-            return (void *) syssm_get_system_metrics ( (int) arg2 );
+            return (void *) sys_get_system_metrics ( (int) arg2 );
             break;
 
         // 251

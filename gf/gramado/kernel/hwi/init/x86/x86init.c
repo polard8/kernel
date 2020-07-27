@@ -519,7 +519,7 @@ int x86main (void){
 
         //RING0IDLEThread->ownerPID =  (int) KernelProcess->pid; 
 
-		RING0IDLEThread->tss = current_tss;
+        RING0IDLEThread->tss = current_tss;
 		
 		// priority and quantum.
 	    //set_thread_priority ( (struct thread_d *) RING0IDLEThread,
@@ -747,14 +747,14 @@ done:
         //
         // Starting idle thread.
         //
-        
-		printf("[x86] x86main: Initializing INIT ..\n");
+
+        printf("[x86] x86main: Initializing INIT ..\n");
         
 #ifdef KERNEL_VERBOSE
     refresh_screen();
-#endif        
-   
-		x86mainStartFirstThread ();        
+#endif
+
+        x86mainStartFirstThread ();        
 
         printf ("[x86] x86main: No idle thread selected\n");
         goto fail;

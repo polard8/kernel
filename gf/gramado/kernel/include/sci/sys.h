@@ -15,6 +15,13 @@
 #define ____SYS_H
 
 
+// Helper function to initialize system's component
+// after kernel initialization.
+int sys_initialize_component( int n );
+
+unsigned long sys_get_system_metrics ( int n );
+
+
 int sys_ioctl ( int fd, unsigned long request, unsigned long arg );
 int sys_fcntl ( int fd, int cmd, unsigned long arg);
 
