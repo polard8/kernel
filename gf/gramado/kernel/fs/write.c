@@ -190,7 +190,11 @@ fail:
  *     Salva um arquivo no disco.
  *     Somente no diretório raiz.
  */
- 
+
+// It was called by sys_write_file() in fs.c.
+// It was called by sys_read_file when the file does not exist.
+
+
 // #obs
 // Isso salva um arquivo.
 // Também poderia ser usado para criar um arquivo ou diretório ? 
@@ -254,10 +258,10 @@ fsSaveFile (
     // #debug:
     debug_print ("fsSaveFile:\n");
     printf ("fsSaveFile: name=%s  \n", file_name ); 
-    printf ("size=%d  \n", file_size );
-    printf ("nbytes=%d  \n", size_in_bytes );
-    printf ("address=%x  \n", file_address );
-    printf ("flag=%x \n", flag );
+    printf ("size=%d \n",              file_size );
+    printf ("nbytes=%d  \n",           size_in_bytes );
+    printf ("address=%x  \n",          file_address );
+    printf ("flag=%x \n",              flag );
 
 
 
@@ -449,15 +453,11 @@ save_file:
 	// #importante:
 	// Vamos encontrar uma entrada livre no diretório para
 	// salvarmos o nome do arquivo.
-	
 	// Copia o nome para dentro da entrada do diretório.
-	
 	// Obs: As entradas são de 32 bytes. Como root[] é um 
 	// array de short então faremos um deslocamento de 16 shorts.
-	
 	// root[]
 	// #importante: root[] é um array de short.	
-
 	// IN: 
 	// Endereço do diretótio e número máximo de entradas.
 	// #todo: 
@@ -467,7 +467,9 @@ save_file:
 	// See: search.c
 
     //FreeIndex = (int) findEmptyDirectoryEntry( VOLUME1_ROOTDIR_ADDRESS, 128 );
-    FreeIndex = (int) findEmptyDirectoryEntry( VOLUME1_ROOTDIR_ADDRESS, FAT16_ROOT_ENTRIES );
+    FreeIndex = (int) findEmptyDirectoryEntry ( 
+                          VOLUME1_ROOTDIR_ADDRESS, 
+                          FAT16_ROOT_ENTRIES );
     
     if ( FreeIndex == -1 ){
         printf ("fsSaveFile: No empty entry\n");
@@ -509,7 +511,7 @@ save_file:
 	//#debug 
 	//improvisando um endereço válido
 
-	unsigned long address = (unsigned long) file_address;
+    unsigned long address = (unsigned long) file_address;
 
 
     //
@@ -612,7 +614,6 @@ done:
 
     printf ("fsSaveFile: done\n");
     refresh_screen();
-
 
     return 0;
 }

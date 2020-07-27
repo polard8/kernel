@@ -1442,7 +1442,7 @@ gde_services (
         //OUT: fd
         case SYS_OPEN:
             debug_print ("gde_serv: SYS_OPEN\n");
-            return (void *) sys_open( (const char *) arg2, 
+            return (void *) sys_open ( (const char *) arg2, 
                                 (int) arg3, (mode_t) arg4 ); 
             break;
 

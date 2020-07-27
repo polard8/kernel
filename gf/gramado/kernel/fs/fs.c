@@ -1908,19 +1908,19 @@ sys_read_file (
 {
 
     file *__file;
- 
+    size_t FileSize=-1;
+    
     struct process_d *p;
 
     int __slot = -1;
-    
     int Status = -1;
-
     int __ret = -1;
 
     void *buff;
 
-    debug_print ("sys_read_file:\n");
 
+
+    debug_print ("sys_read_file:\n");
 
     // Convertendo o formato do nome do arquivo.    
     // >>> "12345678XYZ"
@@ -1938,10 +1938,11 @@ sys_read_file (
 
     // Searching for the file only on the root dir.
 
-    Status = (int) KiSearchFile( file_name, VOLUME1_ROOTDIR_ADDRESS );
-    
+    Status = (int) KiSearchFile ( file_name, VOLUME1_ROOTDIR_ADDRESS );
+
     if (Status != 1)
     {
+         //#debug
          printf ("sys_read_file: [FIXME] File not found!\n");
          refresh_screen();
          
@@ -2083,39 +2084,36 @@ __OK:
         return -1;
     }
 
-    
-    //
+
     // File size.
-    //
 
-
-    size_t s = (size_t) fsGetFileSize ( (unsigned char *) file_name );
+    FileSize = (size_t) fsGetFileSize( (unsigned char *) file_name );
     
-    if (s < 0){
+    if (FileSize < 0){
         printf ("sys_read_file: File size fail\n");
         refresh_screen();
-        return -1;
+        return (-1);
     }
 
-    if ( s < __file->_lbfsize )
-    {
-        s = __file->_lbfsize;
-    }
+    // Limits.
+    if ( FileSize < __file->_lbfsize ){ FileSize = __file->_lbfsize; }
 
+    // Limits.
     // Se o arquivo for maior que buffer dispon�vel.
     // Podemos almentar o buffer.
-    if (s > __file->_lbfsize)
+    if (FileSize > __file->_lbfsize)
     {
-        // limite - 1MB.
-        if (s > 1024*1024){
+        // #bugbug: Provisório.
+        // Limite - 1MB.
+        if (FileSize > 1024*1024){
             printf ("sys_read_file: File size out of limits\n");
-            printf ("%d bytes \n",s);
+            printf ("%d bytes \n",FileSize);
             refresh_screen();
-            return -1;
+            return (-1);
         }
         
         // Allocate new buffer.
-        __file->_base = (char *) kmalloc (s);
+        __file->_base = (char *) kmalloc(FileSize);
         
         if ( (void *) __file->_base == NULL ){
             printf ("sys_read_file: Couldn't create a new buffer\n");
@@ -2123,23 +2121,22 @@ __OK:
             return -1;             
         }
  
-        // temos um novo buffer size.
-        __file->_lbfsize = (int) s;
+        // Temos um novo buffer size.
+        __file->_lbfsize = (int) FileSize;
     }
 
     // #paranoia.
     // Checando os limites novamente.
-    
-    // limits - 1MB
-    if (s > 1024*1024){
+    // #bugbug: Provisório.
+    // Limits - 1MB
+    if (FileSize > 1024*1024){
         printf ("sys_read_file: File size out of limits\n");
         refresh_screen();
         return -1;
     }
 
-
-    //limits?
-    
+    // #paranoia.
+    // Checando base novamente.
     if ( (void *) __file->_base == NULL ){
         printf ("sys_read_file: buffer fail\n");
         refresh_screen();
@@ -2152,6 +2149,8 @@ __OK:
     //
     // Load.
     //
+    
+    // Carrega o arquivo na memória.
  
     Status = (int) fsLoadFile ( VOLUME1_FAT_ADDRESS, 
                        VOLUME1_ROOTDIR_ADDRESS, 
@@ -2163,6 +2162,8 @@ __OK:
         refresh_screen();
         return -1;
     }
+
+
     
     
     // #bugbug
@@ -2384,10 +2385,10 @@ sys_write_file (
     scheduler_lock ();
 
     __ret = (int) fsSaveFile ( (char *) file_name,    
-                    (unsigned long) file_size,       
-                    (unsigned long) size_in_bytes,  
-                    (char *) file_address,          
-                    (char) flag );                  
+                      (unsigned long) file_size,       
+                      (unsigned long) size_in_bytes,  
+                      (char *) file_address,          
+                      (char) flag );                  
 
     scheduler_unlock ();
     taskswitch_unlock ();

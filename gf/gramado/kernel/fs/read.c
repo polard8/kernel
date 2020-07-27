@@ -326,29 +326,26 @@ fsLoadFile (
     int Status;  //??
 
     int SavedDirEntry = 0;
-    unsigned short next;
-
+    unsigned short next=0;
     unsigned long max = 64;    //?? @todo: rever. Número máximo de entradas.
     unsigned long z = 0;       //Deslocamento do rootdir 
     unsigned long n = 0;       //Deslocamento no nome.
 
-
     char tmpName[13];
-
+    
+    size_t FileNameSize = 0;
 
     //int IsDirectory;
 
-
     // Cluster inicial
-    unsigned short cluster; 
+    unsigned short cluster=0; 
 
     // ?? 
     // Primeiro setor do cluster.
-    unsigned long S;  
+    unsigned long S=0;  
 
     // Usado junto com o endereço do arquivo.
-    unsigned long SectorSize;
-
+    unsigned long SectorSize=0;
 
     int Spc=0;
 
@@ -465,11 +462,12 @@ fsLoadFile (
     // name size.
     // Se o tamanho da string falhar, vamos ajustar.
 
-    size_t size = (size_t) strlen (file_name); 
+    FileNameSize = (size_t) strlen (file_name); 
 
-    if ( size > 11 ){
-         printf ("fsLoadFile: size [FAIL] %d\n", size ); 
-         size = 11;
+    if ( FileNameSize > 11 ){
+         printf ("fsLoadFile: size [FAIL] %d\n", FileNameSize ); 
+         FileNameSize = 11;
+         //return 1; //fail
     }
     
     
@@ -513,15 +511,12 @@ fsLoadFile (
     {
         if ( __dir[z] != 0 )
         {
-            memcpy ( tmpName, &__dir[z], size );
-            tmpName[size] = 0;
+            memcpy ( tmpName, &__dir[z], FileNameSize );
+            tmpName[FileNameSize] = 0;
 
-            Status = strncmp( file_name, tmpName, size );
+            Status = strncmp( file_name, tmpName, FileNameSize );
 
-            if ( Status == 0 ){
-                SavedDirEntry = i; 
-                goto __found; 
-            }
+            if ( Status == 0 ){ SavedDirEntry = i; goto __found; }
         }; 
         z += 16;    
         i++;        
@@ -602,6 +597,8 @@ __found:
     // usados pelo arquivo.
     // ?? Qual será o tamanho dessa tabela ??
     //unsigned short tmp_table[1024];
+    
+    //#todo: Use while()
 
 __loop_next_entry:
 
@@ -662,35 +659,31 @@ __loop_next_entry:
     // Ver se o cluster carregado era o último cluster do arquivo.
     // Vai para próxima entrada na FAT.
 
-    file_address = (unsigned long) file_address + SectorSize; 
+    file_address = (unsigned long) (file_address + SectorSize); 
 
     next = (unsigned short) fat[cluster];
 
     cluster = (unsigned short) next;
 
     // ?? done
-    if ( cluster == 0xFFFF || cluster == 0xFFF8 )
-    { 
-        // ?? message  
-        // salvar a tabela na estrutura de arquivo.
-        // Onde está a estrutura de arquivos ??
-        // Em que momento ela é criada ?
-        // #bugbug: tem arquivo carregado pelo kernel
-        // sem ter sido registrado na estrutura do processo kernel.
+    // ?? message  
+    // salvar a tabela na estrutura de arquivo.
+    // Onde está a estrutura de arquivos ??
+    // Em que momento ela é criada ?
+    // #bugbug: tem arquivo carregado pelo kernel
+    // sem ter sido registrado na estrutura do processo kernel.
+
+    if ( cluster == 0xFFFF || cluster == 0xFFF8 ){ 
         return (unsigned long) 0; 
     }
 
     goto __loop_next_entry;
 
-
-    //
     // Fail
-    //
 
 fail:
     printf ("fsLoadFile fail: file={%s}\n", file_name );
     refresh_screen ();
-    
     return (unsigned long) 1;
 }
 

@@ -4,10 +4,9 @@
  * 2020 - Created by Fred Nora.
  */
 
+
 #include <sys/ioctl.h>
 #include <stdarg.h>
-
-
 #include <stddef.h>
 #include <types.h>
 #include <sys/types.h>
@@ -112,10 +111,6 @@ int open (const char *pathname, int flags, mode_t mode){
 
     int fd = -1;
     char tmp_path[64];
-    
-    //size_t FileSize = -1;
-
-
 
 
 

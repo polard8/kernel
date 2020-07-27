@@ -2311,7 +2311,9 @@ do_compare:
 
     // mkfile - Create a new file, given it's name.
     if ( gramado_strncmp( prompt, "mkfile", 6 ) == 0 ){
-        gde_create_empty_file ( (char *) tokenList[1] );
+        //gde_create_empty_file ( (char *) tokenList[1] );
+        //creat("new.txt", 0666);
+        creat( (const char *) tokenList[1], 0666 );
         goto exit_cmp;
     }
 
