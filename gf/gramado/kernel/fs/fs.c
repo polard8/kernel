@@ -1468,6 +1468,7 @@ int fsInit (void){
 
         volume1_rootdir->used = 1;
         volume1_rootdir->magic = 1234;
+        volume1_rootdir->____object = ObjectTypeVolume;
 
         volume1_rootdir->_base = (unsigned char *) VOLUME1_ROOTDIR_ADDRESS;
         volume1_rootdir->_p    = (unsigned char *) VOLUME1_ROOTDIR_ADDRESS;
@@ -1521,7 +1522,8 @@ int fsInit (void){
 
         volume2_rootdir->used = 1;
         volume2_rootdir->magic = 1234;
-
+        volume2_rootdir->____object = ObjectTypeVolume;
+ 
         volume2_rootdir->_base = (unsigned char *) VOLUME2_ROOTDIR_ADDRESS;
         volume2_rootdir->_p    = (unsigned char *) VOLUME2_ROOTDIR_ADDRESS;
         volume2_rootdir->_cnt = (32 * 512) ;

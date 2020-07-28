@@ -357,25 +357,25 @@ void _console_outbyte (int c, int console_number){
 	// Tentando pegar as dimensões do char.
 	// #importante: 
 	// Não pode ser 0, pois poderíamos ter divisão por zero.
-	
-	
-    int cWidth  = get_char_width ();
-    int cHeight = get_char_height ();
+
+    int cWidth  = get_char_width();
+    int cHeight = get_char_height();
 
     if ( cWidth == 0 || cHeight == 0 ){
         debug_print ("_console_outbyte: char w h");
         panic ("_console_outbyte: fail w h ");
     }
-	
+
+
 	// #bugbug
 	// Caso estejamos em modo texto.
 	// Isso ainda não é suportado.
-	
-	if ( VideoBlock.useGui == 0 ){
-		debug_print ("_console_outbyte: kernel in text mode");
-	    panic ("_console_outbyte: kernel in text mode");
-	}
-	
+
+    if ( VideoBlock.useGui == 0 ){
+        debug_print ("_console_outbyte: kernel in text mode");
+        panic ("_console_outbyte: kernel in text mode");
+    }
+
 	
 	// #Importante: 
 	// Essa rotina não sabe nada sobre janela, ela escreve na tela como 
@@ -386,7 +386,7 @@ void _console_outbyte (int c, int console_number){
     // #importante: 
     // Essa rotina de pintura deveria ser exclusiva para dentro do terminal.
     // Então essa flag não faz sentido.		
-	 
+
     if ( VideoBlock.useGui == 1 )
     {
 
@@ -432,9 +432,9 @@ void console_outbyte (int c, int console_number){
 
     static char prev = 0;
 
-
     unsigned long __cWidth  = gwsGetCurrentFontCharWidth();
     unsigned long __cHeight = gwsGetCurrentFontCharHeight();
+
 
     if ( __cWidth == 0  ||  __cHeight == 0 ){
         panic ("console_outbyte: char size\n");
@@ -473,7 +473,6 @@ void console_outbyte (int c, int console_number){
             console_scroll (console_number);
 
             TTY[console_number].cursor_y = (TTY[console_number].cursor_bottom-1);
-
             prev = c; 
 
         }else{
@@ -662,8 +661,9 @@ void console_outbyte (int c, int console_number){
 void console_putchar ( int c, int console_number ){
 
     // Getting char info.
-    int cWidth  = get_char_width ();
-    int cHeight = get_char_height ();
+    int cWidth  = get_char_width();
+    int cHeight = get_char_height();
+
 
     if ( cWidth == 0 || cHeight == 0 ){
         panic ("console_putchar: char");
@@ -748,6 +748,11 @@ __console_write (
 }
 
 
+
+// #todo
+// Isso é importante.
+// Pegar input na estrutura de console do kernel.
+
 ssize_t 
 console_read ( 
     int console_number, 
@@ -769,9 +774,10 @@ console_write (
     size_t count )
 {
 
-    char ch; 
-    int i;  
+    char ch=0; 
+    int i=0;  
     char *data = (char *) buf;
+
 
     //debug_print ("console_write: [test]\n");
 
@@ -1027,15 +1033,17 @@ console_write (
 
 void console_scroll (int console_number){
 
-	// Salvar cursor.
-    unsigned long OldX, OldY;
+    // Salvar cursor.
+    unsigned long OldX=0;
+    unsigned long OldY=0;
 
     int i=0;
 
 
-    if ( VideoBlock.useGui != 1 )
-        panic ("console_scroll: no GUI");    
-
+    if ( VideoBlock.useGui != 1 ){
+        debug_print("console_scroll: no GUI");
+        panic("console_scroll: no GUI"); 
+    }
 
 	// copia o retângulo.
 	// #todo: olhar as rotinas de copiar retângulo.
@@ -1078,22 +1086,17 @@ void console_scroll (int console_number){
  ********************************
  * kclear:
  *     Limpa a tela em text mode.
- *     # isso não faz parte da lib c. Deletar.
  */
 
 int kclear (int color, int console_number)
 {
-
     int Status = -1;
 
 
-    if ( VideoBlock.useGui == 1 )
-    {
+    if ( VideoBlock.useGui == 1 ){
         backgroundDraw ( COLOR_BLUE );
-
         TTY[console_number].cursor_x = 0; 
         TTY[console_number].cursor_y = 0; 
-
         Status = 0;
         
     }else{
@@ -1129,7 +1132,7 @@ int kclearClientArea (int color)
 
 int insert_line ( char *string, int line ){
 
-    debug_print ("insert_line:\n");
+    debug_print ("insert_line: [FIXME]\n");
 
 	/*
 	
@@ -1191,14 +1194,6 @@ void REFRESH_STREAM ( FILE *stream ){
     int j=0;
 
 
-	 //#debug
-	 //sprintf ( stream->_base, "TESTING STDOUT ..." );
-
-
-    j = 80*25;
- 
-    c = stream->_base;
-
 
     int cWidth  = get_char_width();
     int cHeight = get_char_height();
@@ -1206,6 +1201,14 @@ void REFRESH_STREAM ( FILE *stream ){
     if ( cWidth == 0 || cHeight == 0 ){
         panic ("REFRESH_STREAM: char w h ");
     }
+
+
+    j = (80*25);
+
+    // #bugbug
+    // Tem que checar a validade da estrutura e do ponteiro base.
+
+    c = stream->_base;
 
 
     // Seleciona o modo terminal.
@@ -1228,20 +1231,13 @@ void REFRESH_STREAM ( FILE *stream ){
 }
 
 
-
-
-void console_set_current_virtual_console ( int n )
+void console_set_current_virtual_console(int n)
 {
-    if ( n < 0 )
-    {
+    if ( n < 0 || n >= 4 ){
+        debug_print("console_set_current_virtual_console: Limits\n");
         return;
     }
-    
-    if ( n >= 4 )
-    {
-         return;
-    }
-    
+
     current_vc = n;
 }
 

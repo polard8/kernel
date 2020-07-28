@@ -84,6 +84,7 @@ void vfsInit (void){
 
         vfs->used = 1;
         vfs->magic = 1234;
+        vfs->____object = ObjectTypeFileSystem;
         
         // todo: object
         

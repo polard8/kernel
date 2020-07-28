@@ -1549,10 +1549,11 @@ int stdioInitialize (void){
             
         tmp->used = 1;
         tmp->magic = 1234;
+        tmp->____object = ObjectTypeFile; //Regular file
         tmp->fd_counter = 0;
         tmp->_tmpfname = NULL;
         //...
-        
+ 
         //salva
         file_table[i] = (unsigned long) tmp; 
     };
@@ -1577,17 +1578,10 @@ int stdioInitialize (void){
 
 
 
-
-
-
-
-
-
     // #bugbug
     // 0 - regular file.
     // 1 - virtual console.
     // 2 - regular file.
-
 
 
     // pega slot em file_table[] para stdin
@@ -1597,7 +1591,7 @@ int stdioInitialize (void){
     stdin = file_table[slot];
     stdin->filetable_index = slot;
     // Configurando a estrutura de stdin. 
-    stdin->____object = ObjectTypeFile;
+    stdin->____object = ObjectTypeFile; //Regular file
     stdin->used = 1;
     stdin->magic = 1234;
     stdin->_base = &prompt[0];    //See: include/kernel/stdio.h

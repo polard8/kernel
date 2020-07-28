@@ -879,6 +879,10 @@ int sys_read (unsigned int fd, char *ubuf, int count){
     // Read a regular file.
     // See: unistd.c
     // #todo Tem que retornar a quantidade de bytes lido.
+    // #bugbug: Nem todos arquivos criados possuem essa flag configurada
+    //apropriadament...estamos fazendo isso.
+    //if ( __file->____object == ObjectTypeFile )
+    //{ ... }
 
     //Se não pode ler.
     if ( (__file->_flags & __SRD) == 0 )

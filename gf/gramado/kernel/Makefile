@@ -175,9 +175,13 @@ all-c:
 	# net
 	#
 	
-	$(CC) -c net/socket/socket.c  $(KINCLUDE) $(CFLAGS) -o socket.o	
-	$(CC) -c net/network/channel.c  $(KINCLUDE) $(CFLAGS) -o channel.o
-	$(CC) -c net/network/network.c  $(KINCLUDE) $(CFLAGS) -o network.o
+	# three layers support:
+	# socket, protocol and network interface.
+
+	$(CC) -c net/socket/socket.c  $(KINCLUDE) $(CFLAGS) -o socket.o
+	#$(CC) -c net/protocol ...
+	$(CC) -c net/network/channel.c   $(KINCLUDE) $(CFLAGS) -o channel.o
+	$(CC) -c net/network/network.c   $(KINCLUDE) $(CFLAGS) -o network.o
 
 
 	##

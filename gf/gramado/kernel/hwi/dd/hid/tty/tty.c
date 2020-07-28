@@ -70,7 +70,13 @@ tty_write_from_of ( unsigned int fd,
 
 
 
-// reads into ttyList[] descriptor.
+/*
+ *************** 
+ * tty_read_ttyList:
+ *     It uses the ttyList[] index, NOT the fd in the process struct.
+ * 
+ */
+
 int 
 tty_read_ttyList ( 
     unsigned int channel, 
@@ -97,6 +103,13 @@ tty_read_ttyList (
                       (int) nr );
 }
 
+
+/*
+ *************** 
+ * tty_write_ttyList:
+ *     It uses the ttyList[] index, NOT the fd in the process struct.
+ * 
+ */
 
 int 
 tty_write_ttyList ( 
@@ -125,7 +138,17 @@ tty_write_ttyList (
                      (int) nr );
 }
 
-            
+
+/*
+ *************************************************
+ * __tty_read:
+ *     Read n bytes from a tty.
+ * 
+ * IN:
+ *     tty    = Pointer to tty structure.
+ *     buffer = Buffer.
+ *     nr     = How many bytes.
+ */
 
 int 
 __tty_read ( 
@@ -212,10 +235,20 @@ __tty_read (
 
 
 
-// writes into ttyList[] descriptor.
-// Escrever no buffer de uma tty qualquer da ttyList
-// o descritor seleciona uma tty em ttyList[] e 
-// escreve em tty->stdout->_base
+/*
+ *************************************************
+ * __tty_read:
+ *     Write n bytes to a tty.
+ * 
+ * IN:
+ *     tty    = Pointer to tty structure.
+ *     buffer = Buffer.
+ *     nr     = How many bytes.
+ */
+
+// #bugbug
+// ?? Why
+// We are sending a message to a process.
 
 int 
 __tty_write ( 
