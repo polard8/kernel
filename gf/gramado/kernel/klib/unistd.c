@@ -32,7 +32,7 @@ off_t sys_lseek (int fd, off_t offset, int whence)
 
 
     if (fd<0 || fd >= 32){
-        //#todo: message
+        debug_print("sys_lseek: fd\n");
         return -1; 
     }
     
@@ -41,9 +41,10 @@ off_t sys_lseek (int fd, off_t offset, int whence)
     p = (struct process_d *) processList[current_process];
     
     if ( (void *) p == NULL ){
-        return -1; //#todo message
+        debug_print("sys_lseek: p\n");
+        return -1;
     }
-    
+
     //#todo
     //validation
     
@@ -51,7 +52,7 @@ off_t sys_lseek (int fd, off_t offset, int whence)
     f = (file *) p->Objects[fd];
     
     if ( (void *) f == NULL ){
-        //#todo: message
+        debug_print("sys_lseek: f\n");
         return -1; 
     }
     

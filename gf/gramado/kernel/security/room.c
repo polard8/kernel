@@ -1,5 +1,5 @@
 /*
- * File: kernel\gws\user\room.c
+ * File: security/room.c
  *
  * Descrição:
  *     Window Station Manager. (WSM).
@@ -14,7 +14,7 @@
  *    2015 - Created by Fred Nora.
  */
 
- 
+
 #include <kernel.h>
 
 
@@ -23,12 +23,9 @@
  */
 
 void *get_current_room (void){
-	
-    if ( current_room < 0 )
-	{
-	    return NULL;
-	};
-	
+
+    if ( current_room < 0 ){ return NULL; }
+
     return (void *) roomList[current_room];
 }
 
@@ -38,16 +35,13 @@ void *get_current_room (void){
  *
  */
 void set_current_room (struct room_d *room){
-	
+
     //Check.
-	
-	if ( (void *) room == NULL )
-	{
-	    return;
-    };  
+
+    if ( (void *) room == NULL ){ return; }  
     
-	current_room = (int) room->id;
-};
+    current_room = (int) room->id;
+}
 
 
 /*

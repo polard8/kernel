@@ -54,11 +54,10 @@ int sys_dup ( int oldfd ){
     {
         if ( Process->Objects[i] == 0 )
         {
-			//reserva.
-			Process->Objects[i] = 216;
-			
-		    slot = i;
-			break;
+            // reserva.
+            Process->Objects[i] = 216;
+            slot = i;
+            break;
         }
     };
 
@@ -79,28 +78,27 @@ int sys_dup ( int oldfd ){
         return -1;
  
     }else{
-        
-		f_new = (void *) kmalloc ( sizeof(file) );
+        f_new = (void *) kmalloc ( sizeof(file) );
 
-		if ( (void *) f_new == NULL ){
-		    Process->Objects[i] = (unsigned long) 0;
-	        return -1;
-		}
-
+        if ( (void *) f_new == NULL ){
+            Process->Objects[i] = (unsigned long) 0;
+            return -1;
+        }
 
         f_new->used = 1;
         f_new->magic = 1234;
+        
+        f_new->____object = f_old->____object;
 
-		f_new->_base = f_old->_base;	
-		f_new->_p    = f_old->_p;
-		
-		f_new->_tmpfname = f_old->_tmpfname;
-		
-		f_new->_lbfsize = f_old->_lbfsize; 
-		
-		//quanto falta é igual ao tamanho.
-		f_new->_cnt = f_old->_cnt; 
-		
+        f_new->_base = f_old->_base;
+        f_new->_p    = f_old->_p;
+
+        f_new->_tmpfname = f_old->_tmpfname;
+
+        f_new->_lbfsize = f_old->_lbfsize; 
+
+        //quanto falta é igual ao tamanho.
+        f_new->_cnt = f_old->_cnt; 
 
         Process->Objects[slot] = (unsigned long) f_new;
 
@@ -111,7 +109,7 @@ int sys_dup ( int oldfd ){
 	// On error, -1 is returned, and errno is set appropriately.	
 	
 fail:
-	//errno = ?;
+    //errno = ?;
     return -1;
  }
 
@@ -169,8 +167,9 @@ int sys_dup2 (int oldfd, int newfd){
 		}
 
         f_new->used = 1;
-        f_new->magic = 1234;			
-
+        f_new->magic = 1234;
+        f_new->____object = f_old->____object;
+        
 		f_new->_base = f_old->_base;	
 		f_new->_p    = f_old->_p;
 		
@@ -248,7 +247,8 @@ int sys_dup3 (int oldfd, int newfd, int flags){
 
         f_new->used = 1;
         f_new->magic = 1234;
-
+        f_new->____object = f_old->____object;
+        
 		f_new->_base = f_old->_base;	
 		f_new->_p = f_old->_p;
 		
@@ -401,6 +401,10 @@ int sys_pipe ( int *pipefd, int flags ){
         f2->used = 1; 
         f2->magic = 1234;
 
+        // File: object type.
+        f1->____object = ObjectTypePipe;
+        f2->____object = ObjectTypePipe;
+
         f1->pid = (pid_t) current_process;
         f1->uid = (uid_t) current_user;
         f1->gid = (gid_t) current_group;
@@ -408,9 +412,6 @@ int sys_pipe ( int *pipefd, int flags ){
         f2->uid = (uid_t) current_user;
         f2->gid = (gid_t) current_group;
         
-        // File: object type.
-        f1->____object = ObjectTypePipe;
-        f2->____object = ObjectTypePipe;
 
         // No name for now.
         f1->_tmpfname = NULL;

@@ -31,6 +31,10 @@
  *    +...
  */ 
 
+// #todo
+// We need to search in the file table first of all.
+// The structure found there will give us the inode structure pointer.
+
 // IN:
 // File name. "1234578XYZ"
 // Address of the directory.
@@ -38,7 +42,11 @@
 // OUT:
 // 1 = Found.
 
-int KiSearchFile ( unsigned char *file_name, unsigned long address ){
+int 
+KiSearchFile ( 
+    unsigned char *file_name, 
+    unsigned long address )
+{
 
     int Status = -1;
 
@@ -82,19 +90,11 @@ int KiSearchFile ( unsigned char *file_name, unsigned long address ){
     for ( i=0; i < NumberOfEntries; i++ )
     {
         // FAT_DIRECTORY_ENTRY_FREE
-        if ( dir[j] == (char) 0xE5 )
-        {
-            j += 0x20;
-            continue;
-        }
+        if ( dir[j] == (char) 0xE5 ){ j += 0x20; continue; }
 
         // diretório atual ou diretório pai.
         // '.' ou '..'
-        if ( dir[j] == '.' )
-        {
-            j += 0x20;
-            continue;
-        }
+        if ( dir[j] == '.' ){ j += 0x20; continue; }
 
         //#TODO
         //pegar o tamanho da string para determinar o quanto comparar.
@@ -106,13 +106,11 @@ int KiSearchFile ( unsigned char *file_name, unsigned long address ){
 			// Copia o nome e termina incluindo o char 0.
 			memcpy( NameX, &dir[j], 11 );
 			NameX[11] = 0;
-			
-		    Status = (int) strncmp ( file_name, NameX, 11 );
-			
+
+            Status = (int) strncmp ( file_name, NameX, 11 );
+
             // Found!
-            if (Status == 0){ 
-                return 1;   
-            }
+            if (Status == 0){ return 1; }
             
             //Nothing.
         };   
@@ -178,20 +176,11 @@ int fsSearchFile (unsigned char *file_name){
     for ( i=0; i < NumberOfEntries; i++ )
     {
         // FAT_DIRECTORY_ENTRY_FREE
-        if ( dir[j] == (char) 0xE5 )
-        {
-            j += 0x20;
-            continue;
-        }
+        if ( dir[j] == (char) 0xE5 ){ j += 0x20; continue; }
 
 		// diretório atual ou diretório pai.
 		// '.' ou '..'
-        if ( dir[j] == '.' )
-        {
-            j += 0x20;
-            continue;
-        }
-
+        if ( dir[j] == '.' ){ j += 0x20; continue; }
 
         //#TODO
         //pegar o tamanho da string para determinar o quanto comparar.

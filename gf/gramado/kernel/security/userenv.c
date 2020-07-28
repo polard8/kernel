@@ -180,7 +180,7 @@ void *CreateUser ( char *name, int type ){
     struct user_info_d *New;
 
     int Index = 0;
-    int i;
+    int i=0;
 
 
     New = (void *) kmalloc ( sizeof(struct user_info_d) ); 
@@ -190,9 +190,12 @@ void *CreateUser ( char *name, int type ){
  
     } else {
 
+		//New->ObjectType = ObjectTypeUser;
+		
 		New->used = 1;
 		New->magic = 1234;
-		
+
+
 		//New->path = ?
 	    
 	    New->userType = type;  
@@ -207,10 +210,7 @@ void *CreateUser ( char *name, int type ){
     
         // Inicializando a lista de objetos permitidos.
         // Proibindo tudo.
-        for (i=0; i<128; i++){
-            New->permissions[i]=0;
-        }
-       
+        for (i=0; i<128; i++){ New->permissions[i]=0; };
 
 	    //Inicializa tokens. (rever)
 	    //New->k_token = KERNEL_TOKEN_NULL;
@@ -259,7 +259,7 @@ void SetCurrentUserId (int user_id){
 	{
 		printf("user-userenv-SetCurrentUserId:\n");
 		return;
-	};
+	}
 	
     current_user = (int) user_id;
 }
@@ -282,7 +282,7 @@ void SetCurrentGroupId (int group_id){
 	{
 		printf("SetCurrentGroupId:\n");
 		return;
-	};
+	}
 	
     current_group = (int) group_id;
 }
@@ -294,7 +294,7 @@ void SetCurrentGroupId (int group_id){
  */
 
 int GetCurrentGroupId (void)
-{	
+{
     return (int) current_group;
 }
 
@@ -306,39 +306,37 @@ int GetCurrentGroupId (void)
  */
 
 void 
-UpdateUserInfo ( struct user_info_d *user, 
-                 int id, 
-                 char *name, 
-                 int type, 
-                 int user_session_id, 
-                 int room_id,
-                 int desktop_id )
+UpdateUserInfo ( 
+    struct user_info_d *user, 
+    int id, 
+    char *name, 
+    int type, 
+    int user_session_id, 
+    int room_id,
+    int desktop_id )
 {
 
-
-	if ( (void *) user == NULL )
-	{
+    if ( (void *) user == NULL ){
+        //todo: message.
         return;
-	
-	} else {
+
+    } else {
 		
 		//Estamos tentando atualizar uma estrutura válida.
 
-        if ( user->used != 1 || user->magic != 1234 )
-		{
-			//fail;
-			return;
-		}  	
-	    
-		user->userId = (int) id;                      //Id.     
+        if ( user->used != 1 || user->magic != 1234 ){
+			// todo: message
+            return;
+        } 
 
-		user->userType = type;                        //Type.
+        user->userId = (int) id;                      //Id.     
+        user->userType = type;                        //Type.
 
         user->usessionId = user_session_id;    //Session.
         user->roomId     = room_id;            //room (Window Station).
         user->desktopId  = desktop_id;         //Desktop.
 		//...
-	};
+    };
 }
 
 
@@ -384,17 +382,14 @@ void init_user_info (void){
 
     int Id = 0;
     int Index = 0;
-    int i;
+    int i=0;
 
 
     debug_print ("init_user_info:\n");
 
 
-
-	//Initialize list.
-    
-    while (Index < USER_COUNT_MAX)
-    {
+    //Initialize list.
+    while (Index < USER_COUNT_MAX){
         userList[Index] = (unsigned long) 0;
         Index++;
     };
@@ -410,21 +405,16 @@ void init_user_info (void){
 
     } else {
 
-
         if ( (void *) CurrentTTY == NULL ){
             panic ("init_user_info: CurrentTTY");
         }
 
         // Atualizando a lista de permissões.
         // Liberando tudo.
-        for (i=0; i<128; i++){
-            DefaultUser->permissions[i]=1;
-        }
+        for (i=0; i<128; i++){ DefaultUser->permissions[i]=1; }
  
-
         CurrentTTY->user_info = DefaultUser;
 
-		
 		//Coloca no início da lista.
 		//userList[0] = (unsigned long) SystemUser;    //System.
 		userList[1] = (unsigned long) DefaultUser;     //Default.
@@ -468,12 +458,11 @@ int __getusername (char *buffer){
 	//Estrutura default para informações sobre o host.
 	//host.h
 
-    if ( (void *) CurrentUser== NULL )
-    {
+    if ( (void *) CurrentUser== NULL ){
         printf ("__getusername: CurrentUser\n");
         return (int) -1;
+ 
     }else{
-
         
         //64 bytes
         strcpy ( login_buffer, (const char *) CurrentUser->__username );
@@ -501,14 +490,14 @@ int __setusername ( const char *new_username){
 
      // Estrutura de usuário.
 
-    if ( (void *) CurrentUser == NULL )
-    {
+    if ( (void *) CurrentUser == NULL ){
         printf ("__setusername: CurrentUser\n");
         return (int) -1;
+ 
     }else{
 
         CurrentUser->userName_len = (size_t) strlen (new_username) + 1;
-            
+
         //64 bytes
         strcpy ( CurrentUser->__username, (const char *) new_username);
         

@@ -1,5 +1,5 @@
 /*
- * File: kernel/gws/user/desktop.c
+ * File: security/desktop.c
  *
  * Descrição:
  *     Gerência a criação de desktops.
@@ -21,9 +21,10 @@
  * memória alocará memória para os processos pertencentes à um desktop
  * específico no próprio heap do desktop ao qual o processo pertence. 
  *
- * Histórico:
- *     Versão 1.0, 2015 - Esse arquivo foi criado por Fred Nora.
- *     Versão 1.0, 2016 - Revisão.
+ * 
+ * History
+ *     2015 - Created by Fred Nora.
+ *     2016 - Revision.
  *     ...
  */
 
@@ -54,30 +55,30 @@ int RegisterDesktop (struct desktop_d *d){
     int Offset = 0;
 
 
-    if ( (void *) d == NULL )
-    {
+    if ( (void *) d == NULL ){
+        //todo: messsage
         return (int) 1;  
-    };
+    }
 
 
 	// #bugbug: 
 	// Pode aparacer um loop infinito aqui.
 	// #todo: usar for.
-	
-	while ( Offset < DESKTOP_COUNT_MAX )
-	{
-       if ( (void *) desktopList[Offset] == NULL )
-	   {
+
+    while ( Offset < DESKTOP_COUNT_MAX )
+    {
+        if ( (void *) desktopList[Offset] == NULL )
+        {
             desktopList[Offset] = (unsigned long) d; 
             
             d->desktopId = Offset;
             
-			return 0;
-	   };
+            return 0;
+        }
 
-	   Offset++;
-    };		
-	
+       Offset++;
+    };
+
 	// Fail.
 	
     return (int) 1;
@@ -120,7 +121,7 @@ void *get_current_desktop (void){
 	     current_desktop >= DESKTOP_COUNT_MAX )
 	{
 	    return NULL;
-	};
+	}
     
 	return (void *) desktopList[current_desktop];
 }
@@ -137,16 +138,15 @@ int get_current_desktop_id (void)
  *     Inicializa o array de ponteiros de desktop.
  */
 
-void init_desktop_list (void){
-	
-    int i=0;		
-    
-	while ( i < DESKTOP_COUNT_MAX )
-	{
+void init_desktop_list (void)
+{
+    int i=0;
+
+
+    while ( i < DESKTOP_COUNT_MAX ){
         desktopList[i] = 0;
-		
-		i++; 
-	};
+        i++; 
+    };
 }
 
 
@@ -165,10 +165,10 @@ void *CreateDesktop ( struct room_d *room ){
 	
 	//Check.
     
-	if ( (void *) room == NULL ){ 
-	    
+	if ( (void *) room == NULL )
+	{ 
 		return NULL; 
-	};
+	}
 	
 	//
 	// @todo: O usuário precisa de permissão pra criar desktops.
@@ -178,9 +178,9 @@ void *CreateDesktop ( struct room_d *room ){
     
 	Current = (void *) kmalloc ( sizeof(struct desktop_d) );
 	
-	if ( (void *) Current == NULL )
-	{
+	if ( (void *) Current == NULL ){
 	    panic ("CreateDesktop:");
+
 	} else {
 	    
 		//section.
@@ -216,15 +216,17 @@ void *CreateDesktop ( struct room_d *room ){
  */
  
 void 
-set_current_menuwindow ( struct desktop_d *desktop, 
-                         struct window_d *window )
+set_current_menuwindow ( 
+    struct desktop_d *desktop, 
+    struct window_d *window )
 {
+
 	//Check.
 	
     if ( (void *) desktop == NULL || (void *) window == NULL )
     { 
         return; 
-    };  
+    }
 
     desktop->menuWindow = (void *) window;  
 }
@@ -236,15 +238,16 @@ set_current_menuwindow ( struct desktop_d *desktop,
  */
 
 void 
-set_current_foreground ( struct desktop_d *desktop, 
-                         struct window_d *window )
+set_current_foreground ( 
+    struct desktop_d *desktop, 
+    struct window_d *window )
 {
     //Check.
 	
     if ( (void *) desktop == NULL || (void *) window == NULL )
     { 
         return; 
-    };  
+    }  
     
     desktop->foregroundWindow = (void *) window;
 }
@@ -256,16 +259,16 @@ set_current_foreground ( struct desktop_d *desktop,
  */
  
 void 
-set_current_messagewindow ( struct desktop_d *desktop, 
-                            struct window_d *window )
+set_current_messagewindow ( 
+    struct desktop_d *desktop, 
+    struct window_d *window )
 {
     //Check.
 	
     if ( (void *) desktop == NULL || (void *) window == NULL )
     { 
         return; 
-    };  
-
+    }  
 
     desktop->messageWindow = (void *) window;
 }
@@ -277,15 +280,16 @@ set_current_messagewindow ( struct desktop_d *desktop,
  */
  
 void 
-set_current_traywindow ( struct desktop_d *desktop, 
-                         struct window_d *window )
+set_current_traywindow ( 
+    struct desktop_d *desktop, 
+    struct window_d *window )
 {
     //Check.
-	
+
     if ( (void *) desktop == NULL || (void *) window == NULL )
     { 
         return; 
-    };  
+    }  
 
     desktop->trayWindow = (void *) window; 
 }
@@ -297,15 +301,16 @@ set_current_traywindow ( struct desktop_d *desktop,
  */
 
 void 
-set_current_tooltipwindow ( struct desktop_d *desktop, 
-                            struct window_d *window )
+set_current_tooltipwindow ( 
+    struct desktop_d *desktop, 
+    struct window_d *window )
 {
     //Check.
 
     if ( (void *) desktop == NULL || (void *) window == NULL )
     { 
         return; 
-    };  
+    }  
 
     desktop->tooltipWindow = (void*) window;
 }
@@ -334,7 +339,7 @@ void change_foreground ( struct desktop_d *desktop ){
 	if ( (void *) fw == NULL )
 	{
 	    return;
-    };  
+    }
 
 	//Use a próxima janela indicada na estrutura da atual.
 	
@@ -357,15 +362,16 @@ void change_foreground ( struct desktop_d *desktop ){
  */
  
 void 
-set_current_sysMenu ( struct desktop_d *desktop, 
-                      struct menu_d *menu )
+set_current_sysMenu ( 
+    struct desktop_d *desktop, 
+    struct menu_d *menu )
 {
     //Check.
 
     if ( (void *) desktop == NULL || (void *) menu == NULL )
     { 
         return; 
-    };
+    }
 
 
     desktop->sysMenu = (void *) menu;
@@ -378,16 +384,16 @@ set_current_sysMenu ( struct desktop_d *desktop,
  */
 
 void 
-set_current_dialogsysMenu ( struct desktop_d *desktop, 
-                            struct menu_d *menu )
+set_current_dialogsysMenu ( 
+    struct desktop_d *desktop, 
+    struct menu_d *menu )
 {
 	//Check.
 	
     if ( (void *) desktop == NULL || (void *) menu == NULL )
     { 
         return; 
-    };
-
+    }
 
     desktop->dialogsysMenu = (void *) menu; 
 }
@@ -399,15 +405,16 @@ set_current_dialogsysMenu ( struct desktop_d *desktop,
  */
 
 void 
-set_current_menuHScroll ( struct desktop_d *desktop, 
-                          struct menu_d *menu )
+set_current_menuHScroll ( 
+    struct desktop_d *desktop, 
+    struct menu_d *menu )
 {
     //Check.
 	
     if ( (void *) desktop == NULL || (void *) menu == NULL )
     { 
         return; 
-    };
+    }
 
 
     desktop->menuHScroll = (void *) menu; 
@@ -420,15 +427,16 @@ set_current_menuHScroll ( struct desktop_d *desktop,
  */
 
 void 
-set_current_menuVScroll ( struct desktop_d *desktop, 
-                          struct menu_d *menu )
+set_current_menuVScroll ( 
+    struct desktop_d *desktop, 
+    struct menu_d *menu )
 {
     //Check.
 	
 	if ( (void *) desktop == NULL || (void *) menu == NULL )
 	{ 
         return; 
-	};
+	}
 
     desktop->menuVScroll = (void *) menu;
 }
@@ -459,15 +467,16 @@ void init_desktop (void){
 
     desktop0 = (void *) kmalloc ( sizeof(struct desktop_d) );
 
-    if ( (void *) desktop0 == NULL )
-    {
+    if ( (void *) desktop0 == NULL ){
         panic ("init_desktop: desktop0");
+
     }else{
-         
+
+        //todo: object
+                 
         desktops_count = 1;
  
         desktop0->desktopId = 0;
-
         desktop0->desktopUsed = 1;
         desktop0->desktopMagic = 1234;
     
@@ -477,6 +486,7 @@ void init_desktop (void){
 	    // Cada desktop terá sem ws e sua wm.
         desktop0->ws = -1;
         desktop0->wm = -1;
+        // ...
     
  
         // Registrando na lista
@@ -496,8 +506,6 @@ void init_desktop (void){
         set_current_menuHScroll (desktop0, NULL);
         set_current_menuVScroll (desktop0, NULL);
 
-        
-      
         //desktop0->room = NULL;
     };
 }

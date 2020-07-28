@@ -1,5 +1,5 @@
 /*
- * File: user/usession.c
+ * File: security/usession.c
  *
  * Descrição:
  *     User Session.
@@ -139,12 +139,9 @@ void close_user_session (void){
 	
 	
     CurrentUserSession->id = 0; 
-
     CurrentUserSession->used = 0; 
     CurrentUserSession->magic = 0; 
-	
     CurrentUserSession->uid = 0; 
-	
     CurrentUserSession->initialized = 0; 
 	
 	//...
