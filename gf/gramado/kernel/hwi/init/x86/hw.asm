@@ -387,7 +387,7 @@ _irq3:
 
     ;call _second_serial_port_Handler
 
-    ;; eoi
+    ;; EOI - Only the first PIC.
     mov al, 0x20
     out 0x20, al
 
@@ -412,6 +412,7 @@ _irq4:
 
     ;call _first_serial_port_Handler
 
+    ;; EOI - Only the first PIC.
     mov al, 0x20
     out 0x20, al
 

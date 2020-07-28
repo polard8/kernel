@@ -229,7 +229,14 @@ void test_standard_stream(int fd)
     }
 }
 
+void
+test_child_message(void)
+{
+   // lançando um processo filho.  
+   gramado_system_call ( 900, 
+       (unsigned long) "sh1.bin", 0, 0 );
 
+}
 
 //
 // =======================
@@ -1058,10 +1065,17 @@ response_loop:
     //#debug
     //if(msg!=0)
         //printf ("%c",long1); //printf ("{%d%c} ",msg,long1);
-        
+
     //char *c;
-        
+
     switch (msg){
+
+        // message from child
+        //case 7000:
+            //gws_debug_print("7000\n"); exit(0);
+            //tputc ((int) fd, (int) 'C', (int) 1);
+            //gws_reboot();
+            //break;
 
         //OK isso funcionou.
         case MSG_KEYDOWN:
@@ -1154,6 +1168,7 @@ response_loop:
                     break;
 
                 case VK_F3:
+                    test_child_message();
                     break;
 
 
