@@ -32,7 +32,6 @@ extern unsigned long SavedBPP;
 
 // Internas.
 
- 
 
 
 /*
@@ -1536,6 +1535,54 @@ int stdioInitialize (void){
     prompt_pos = 0;
 
 
+    //
+    // file_table and inode_table
+    //
+
+    // file table
+    file *tmp;
+    for (i=0; i<NUMBER_OF_FILES;i++)
+    {
+        tmp = (void*) kmalloc (sizeof(file));
+        if ((void*)tmp==NULL)
+            panic("init_globals: tmp");
+            
+        tmp->used = 1;
+        tmp->magic = 1234;
+        tmp->fd_counter = 0;
+        tmp->_tmpfname = NULL;
+        //...
+        
+        //salva
+        file_table[i] = (unsigned long) tmp; 
+    };
+
+    // inode table
+    struct inode_d *tmp_inode;    
+    for (i=0; i<32;i++)
+    {
+        tmp_inode = (void*) kmalloc (sizeof(struct inode_d));
+        if ((void*)tmp_inode==NULL)
+            panic("init_globals: tmp_inode");
+            
+        tmp_inode->used = 1;
+        tmp_inode->magic = 1234;
+        tmp_inode->filestruct_counter = 0;
+        tmp_inode->path[0] = 0;
+        //...
+
+        //salva
+        inode_table[i] = (unsigned long) tmp_inode; 
+    };
+
+
+
+
+
+
+
+
+
     // #bugbug
     // 0 - regular file.
     // 1 - virtual console.
@@ -1544,9 +1591,9 @@ int stdioInitialize (void){
 
 
     // pega slot em file_table[] para stdin
-    slot = get_free_slots_in_the_fileList();
+    slot = get_free_slots_in_the_file_table();
     if(slot<0 || slot >=NUMBER_OF_FILES)
-        panic("klibc-stdioInitialize: slot");
+        panic("klibc-stdioInitialize: file slot");
     stdin = file_table[slot];
     stdin->filetable_index = slot;
     // Configurando a estrutura de stdin. 
@@ -1563,12 +1610,26 @@ int stdioInitialize (void){
     stdin->_file = 0;
     stdin->_tmpfname = "KSTDIN  TXT";
     stdin->fd_counter = 1;
+    
+
+    // inode support.
+    // pega slot em inode_table[] 
+    slot = get_free_slots_in_the_inode_table();
+    if(slot<0 || slot >=32)
+        panic("klibc-stdioInitialize: stdin inode slot");
+    stdin->inode = inode_table[slot];
+    stdin->inodetable_index = slot;
+    if( (void*) stdin->inode == NULL ){
+        panic("klib-stdioInitialize: stdin inode struct");
+    }
+    stdin->inode->filestruct_counter = 1; //inicialize
+    memcpy( (void*) stdin->inode->path, (const void*) stdin->_tmpfname, sizeof( stdin->inode->path ) );
     // ... 
     
     
 
     // pega slot em file_table[] para stdout
-    slot = get_free_slots_in_the_fileList();
+    slot = get_free_slots_in_the_file_table();
     if(slot<0 || slot >=NUMBER_OF_FILES)
         panic("klibc-stdioInitialize: slot");
     stdout = file_table[slot];
@@ -1590,10 +1651,23 @@ int stdioInitialize (void){
     stdout->_tmpfname = "KSTDOUT DEV";
     stdout->fd_counter = 1;
     // ...
+    // inode support.
+    // pega slot em inode_table[] 
+    slot = get_free_slots_in_the_inode_table();
+    if(slot<0 || slot >=32)
+        panic("klibc-stdioInitialize: stdout inode slot");
+    stdout->inode = inode_table[slot];
+    stdout->inodetable_index = slot;
+    if( (void*) stdout->inode == NULL ){
+        panic("klib-stdioInitialize: stdout inode struct");
+    }
+    stdout->inode->filestruct_counter = 1; //inicialize
+    memcpy( (void*) stdout->inode->path, (const void*) stdout->_tmpfname, sizeof( stdout->inode->path ) );
+    // ... 
 
 
     // pega slot em file_table[] para stderr
-    slot = get_free_slots_in_the_fileList();
+    slot = get_free_slots_in_the_file_table();
     if(slot<0 || slot >=NUMBER_OF_FILES)
         panic("klibc-stdioInitialize: slot");
     stderr = file_table[slot];
@@ -1613,6 +1687,19 @@ int stdioInitialize (void){
     stderr->_tmpfname = "KSTDERR TXT";
     stderr->fd_counter = 1;
     // ...
+    // inode support.
+    // pega slot em inode_table[] 
+    slot = get_free_slots_in_the_inode_table();
+    if(slot<0 || slot >=32)
+        panic("klibc-stdioInitialize: stderr inode slot");
+    stderr->inode = inode_table[slot];
+    stderr->inodetable_index = slot;
+    if( (void*) stderr->inode == NULL ){
+        panic("klib-stdioInitialize: stderr inode struct");
+    }
+    stderr->inode->filestruct_counter = 1; //inicialize
+    memcpy( (void*) stderr->inode->path, (const void*) stderr->_tmpfname, sizeof( stderr->inode->path ) );
+    // ... 
 
 
 

@@ -506,8 +506,73 @@ void set_global_open_file ( void *file, int Index ){
 }
 
 
-//get free slots in the file_table
-int get_free_slots_in_the_fileList(void)
+void fs_show_file_info (file *f)
+{
+    if ((void*)f==NULL){
+        return;
+    }{
+        if(f->used==1){
+            
+            if( (void*) f->_tmpfname != NULL )
+                printf ("Name={%s}\n",f->_tmpfname);
+            //refresh_screen();
+        }
+    }; 
+}
+
+void fs_show_file_table(void)
+{
+    int i=0;
+    file *f;
+    
+    printf ("\nfile_table:\n");
+    
+    for(i=0; i<32; i++){
+        f=(file*)file_table[i];
+        if( (void*)f!=NULL )
+            fs_show_file_info(f);
+    };
+    
+    refresh_screen();
+}
+
+
+void fs_show_inode_info (struct inode_d *i)
+{
+    if ((void*)i==NULL){
+        return;
+    }{
+        
+        if(i->used==1){
+            
+            if( (void*)i->path != NULL )
+                printf ("Name={%s}\n",i->path);
+            //refresh_screen();
+        }
+    }; 
+}
+
+void fs_show_inode_table(void)
+{
+    int i=0;
+    struct inode_d *inode;
+
+    printf ("\ninode_table:\n");
+    
+    for(i=0; i<32; i++){
+        inode=(struct inode_d *)inode_table[i];
+        if( (void*)inode!=NULL )
+            fs_show_inode_info(inode);
+    };
+
+    refresh_screen();
+}
+
+
+
+
+//get free slots in the file_table[]
+int get_free_slots_in_the_file_table(void)
 {
     file *tmp;
     int i=0;
@@ -528,14 +593,24 @@ int get_free_slots_in_the_fileList(void)
 }
 
 
-//get free slots in the openfileList[]
-int get_free_slots_in_the_openfileList(void)
+//get free slots in the inode_table[]
+int get_free_slots_in_the_inode_table(void)
 {
+    struct inode_d *tmp;
     int i=0;
-    for (i=0;i<NUMBER_OF_FILES; i++)
+
+    
+    for (i=0;i<32; i++)
     {
-        if ( (unsigned long) file_table[i] == 0 ){ return (int) i; }
+        tmp = (void*) inode_table[i];
+        
+        // Nenhum descritor de estrutura de arquivo está usando essa estrutura inode.
+        if (tmp->used == 1 && tmp->magic == 1234 && tmp->filestruct_counter == 0)
+        { 
+            return (int) i; 
+        }
     }
+
     return -1;
 }
 
@@ -1380,7 +1455,7 @@ int fsInit (void){
     //
 
     // pega slot em file_table[] para
-    slot = get_free_slots_in_the_fileList();
+    slot = get_free_slots_in_the_file_table();
     if(slot<0 || slot >=NUMBER_OF_FILES)
         panic("fsInit: slot");
     volume1_rootdir = file_table[slot];
@@ -1398,12 +1473,30 @@ int fsInit (void){
         volume1_rootdir->_p    = (unsigned char *) VOLUME1_ROOTDIR_ADDRESS;
         volume1_rootdir->_cnt = (32 * 512) ;
         volume1_rootdir->_file = 0;
-        volume1_rootdir->_tmpfname = "volume1-stream";
+        volume1_rootdir->_tmpfname = "VOLUME1 VOL";
         volume1_rootdir->fd_counter = 1;
 
         // #bugbug: 
         // Validade da estrutura.
         
+        // ...
+        // inode support.
+        // pega slot em inode_table[] 
+        slot = get_free_slots_in_the_inode_table();
+        if(slot<0 || slot >=32)
+            panic("klibc-stdioInitialize: volume1_rootdir inode slot");
+        volume1_rootdir->inode = inode_table[slot];
+        volume1_rootdir->inodetable_index = slot;
+        if( (void*) volume1_rootdir->inode == NULL ){
+            panic("klib-stdioInitialize: volume1_rootdir inode struct");
+        }
+        volume1_rootdir->inode->filestruct_counter = 1; //inicialize
+        memcpy( (void*) volume1_rootdir->inode->path, 
+                (const void*) volume1_rootdir->_tmpfname, 
+                sizeof( volume1_rootdir->inode->path ) );
+        // ... 
+
+
         storage->__file = volume1_rootdir; 
     };
 
@@ -1414,7 +1507,7 @@ int fsInit (void){
 
 
     // pega slot em file_table[] para
-    slot = get_free_slots_in_the_fileList();
+    slot = get_free_slots_in_the_file_table();
     if(slot<0 || slot >=NUMBER_OF_FILES)
         panic("fsInit: slot");
     volume2_rootdir = file_table[slot];
@@ -1433,8 +1526,26 @@ int fsInit (void){
         volume2_rootdir->_p    = (unsigned char *) VOLUME2_ROOTDIR_ADDRESS;
         volume2_rootdir->_cnt = (32 * 512) ;
         volume2_rootdir->_file = 0; //?
-        volume2_rootdir->_tmpfname = "volume2-stream";
+        volume2_rootdir->_tmpfname = "VOLUME2 VOL";
         volume2_rootdir->fd_counter = 1;
+
+        // ...
+        // inode support.
+        // pega slot em inode_table[] 
+        slot = get_free_slots_in_the_inode_table();
+        if(slot<0 || slot >=32)
+            panic("klibc-stdioInitialize: volume2_rootdir inode slot");
+        volume2_rootdir->inode = inode_table[slot];
+        volume2_rootdir->inodetable_index = slot;
+        if( (void*) volume2_rootdir->inode == NULL ){
+            panic("klib-stdioInitialize: volume2_rootdir inode struct");
+        }
+        volume2_rootdir->inode->filestruct_counter = 1; //inicialize
+        memcpy( (void*) volume2_rootdir->inode->path, 
+                (const void*) volume2_rootdir->_tmpfname, 
+                sizeof( volume2_rootdir->inode->path ) );
+        // ... 
+
     };
 
 

@@ -68,7 +68,7 @@ void vfsInit (void){
 	//file *vfs;
 	
     // pega slot em file_table[] para
-    slot = get_free_slots_in_the_fileList();
+    slot = get_free_slots_in_the_file_table();
     if(slot<0 || slot >=NUMBER_OF_FILES)
         panic("fsInit: slot");
     vfs = file_table[slot];
@@ -97,8 +97,23 @@ void vfsInit (void){
         // Mas a lista é própria. fileList[]
         
         vfs->_file = 0; //? 
-        vfs->_tmpfname = "vfs-stream";
+        vfs->_tmpfname = "VFS1    VFS";
         vfs->fd_counter =1;
+  
+        // ...
+        // inode support.
+        // pega slot em inode_table[] 
+        slot = get_free_slots_in_the_inode_table();
+        if(slot<0 || slot >=32)
+            panic("klibc-stdioInitialize: vfs inode slot");
+        vfs->inode = inode_table[slot];
+        vfs->inodetable_index = slot;
+        if( (void*) vfs->inode == NULL ){
+            panic("klib-stdioInitialize: vfs inode struct");
+        }
+        vfs->inode->filestruct_counter = 1; //inicialize
+        memcpy( (void*) vfs->inode->path, (const void*) vfs->_tmpfname, sizeof( vfs->inode->path ) );
+        // ... 
     };
 
 
@@ -124,8 +139,10 @@ void vfsInit (void){
  *     Mostrar os elementos da lista de handles do VFS. 
  */
 
-void vfs_show_handle_list (void){
+void vfs_show_handle_list (void)
+{
 
+/*
     int i=0;
     struct vfs_handle_d *h;
 
@@ -145,7 +162,9 @@ void vfs_show_handle_list (void){
 			}
 		}			
 	};
-	
+*/
+
+    printf("vfs_show_handle_list: [FIXME] use file_table[]\n");
 	refresh_screen();
 }
 
@@ -258,8 +277,10 @@ void vfsShowVFSInfo (void){
 
 
 //lista os nomes dos arquivos no diretório raiz do vfs.
-void vfsListFiles (void){
+void vfsListFiles (void)
+{
 
+/*
     int i;
     struct ext2_dir_entry_d *Entry;
 
@@ -277,7 +298,8 @@ void vfsListFiles (void){
 			    Entry->inode, Entry->file_type, (const char*) Entry->name );
 		}
 	};
-	
+*/
+    printf("vfsListFile: [FIXME] use file_table[]\n");
 	refresh_screen();
 }
 

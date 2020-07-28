@@ -14,3 +14,7 @@
 //
 
 
+void gns_yield(void);
+
+
+

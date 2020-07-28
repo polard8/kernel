@@ -31,4 +31,11 @@ void gns_debug_print (char *string)
         (unsigned long) string );
 }
 
+void gns_yield(void)
+{
+    gns_system_call (265,0,0,0); //yield thread.
+}
+
+
+
 

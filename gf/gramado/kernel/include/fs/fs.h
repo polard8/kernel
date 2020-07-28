@@ -605,8 +605,19 @@ void set_file( void *file, int Index);
 void *get_global_open_file (int Index);
 void set_global_open_file ( void *file, int Index );
 
-int get_free_slots_in_the_fileList(void);
-int get_free_slots_in_the_openfileList(void);
+
+//info
+void fs_show_file_info (file *f);
+void fs_show_file_table(void);
+
+//info
+void fs_show_inode_info (struct inode_d *i);
+void fs_show_inode_table(void);
+
+
+
+int get_free_slots_in_the_file_table(void);
+int get_free_slots_in_the_inode_table(void);
 
 //
 // Create

@@ -116,9 +116,8 @@ struct ext2_inode_d
 
 
 
-#define VFS_MAX_INODES 512
-
-unsigned long inode_list[VFS_MAX_INODES];
+//#define VFS_MAX_INODES 512
+//unsigned long inode_list[VFS_MAX_INODES];
 
 
 
@@ -145,12 +144,11 @@ struct ext2_dir_entry_d
 
 
 
-#define VFS_MAX_ENTRIES 512
+//#define VFS_MAX_ENTRIES 512
+//unsigned long directory_entry_list[VFS_MAX_ENTRIES];
 
-unsigned long directory_entry_list[VFS_MAX_ENTRIES];
 
 /*****************************************************************/
-#define VFS_HANDLE_MAX 512
 
 
 // manipulador das entradas de diretório do vfs.
@@ -182,8 +180,9 @@ struct vfs_handle_d
 	struct ext2_dir_entry_d *directory_entry; 	
 };
 
-unsigned long vfs_handle_list[VFS_HANDLE_MAX];
 
+//#define VFS_HANDLE_MAX 512
+//unsigned long vfs_handle_list[VFS_HANDLE_MAX];
 
 
 

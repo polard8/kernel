@@ -211,7 +211,14 @@ __local_ps2kbd_procedure (
 
                 // Test 1.
                 case VK_F7:
-                    __load_path_test(); //local
+                    //fs_show_file_info(stdin);
+                    //fs_show_file_info(stdout);
+                    //fs_show_file_info(stderr);
+                    fs_show_file_table();
+                    fs_show_inode_table();
+                    
+                    //__load_path_test(); //local ok
+                    
                     //bg_load_image(); //ok
                     //console_write (0, buffer,62);
                     //Status = (int) KiSearchFile ( "GRAMADO TXT", VOLUME1_ROOTDIR_ADDRESS );

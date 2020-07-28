@@ -416,14 +416,16 @@ void procTestF6 (void){
 // Cada uma para seu respectivo diálogo.
 
 unsigned long 
-system_procedure ( struct window_d *window, 
-                   int msg, 
-                   unsigned long long1, 
-                   unsigned long long2 ) 
+system_procedure ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 ) 
 {
 
-	// @todo: *importante:
-	//        Não rpecisa dar refresh_screen para todos os casos.
+	// #todo: 
+	// importante:
+	//        Não precisa dar refresh_screen para todos os casos.
 	//        Cada caso é diferente ... 
 	//        ?? Quem deve chamar esse refresh dos elentos gráficos ??
 	//        O aplicativo ?? acionando a flag através de ShowWindow por exemplo??
@@ -446,7 +448,7 @@ system_procedure ( struct window_d *window,
 
 
 	//Get status.
-    AltStatus = (int) get_alt_status(); 
+    AltStatus  = (int) get_alt_status(); 
     CtrlStatus = (int) get_ctrl_status();
     //ShiftStatus = (int) get_shift_status();
 	//...

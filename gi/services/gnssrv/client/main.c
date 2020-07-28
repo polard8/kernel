@@ -98,8 +98,8 @@ int gerar_numero(int lim_inf, int lim_sup)
 
 
 
-void gnst_yield(void){
-	
+void gnst_yield(void)
+{
     gramado_system_call (265,0,0,0); //yield thread.
 }
 

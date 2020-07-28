@@ -471,41 +471,6 @@ void init_globals (void){
     //Outros.
     errno = 0;
 
-    // file table
-    file *tmp;
-    for (i=0; i<NUMBER_OF_FILES;i++)
-    {
-        tmp = (void*) kmalloc (sizeof(file));
-        if ((void*)tmp==NULL)
-            panic("init_globals: tmp");
-            
-        tmp->used = 1;
-        tmp->magic = 1234;
-        tmp->fd_counter = 0;
-        //...
-        
-        //salva
-        file_table[i] = (unsigned long) tmp; 
-    };
-
-    // inode table
-    struct inode_d *tmp_inode;    
-    for (i=0; i<32;i++)
-    {
-        tmp_inode = (void*) kmalloc (sizeof(struct inode_d));
-        if ((void*)tmp_inode==NULL)
-            panic("init_globals: tmp_inode");
-            
-        tmp_inode->used = 1;
-        tmp_inode->magic = 1234;
-        tmp_inode->filestruct_counter = 0;
-        //...
-
-        //salva
-        inode_table[i] = (unsigned long) tmp_inode; 
-    };
-
-
     // Inicializa as estruturas do fluxo padrão.
     // Isso vai usar a file table.
     stdioInitialize();
