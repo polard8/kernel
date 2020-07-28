@@ -1,5 +1,6 @@
 /*
- * File: hal\memory.h 
+ * File: hal/mm.h
+ * 
  * 
  * Descrição:
  *    Header para o driver do placa de memória.
@@ -11,9 +12,9 @@
  *    devem ir para um módulo de gerenciamento de memoria 
  *    dentro do executive, chamado mm.h
  *
- * Versão 1.0. 2015, 2016.
+ * 2015 - Created by Fred Nora.
  */
- 
+
 
 #ifndef ____MEMORY_H
 #define ____MEMORY_H
@@ -26,18 +27,20 @@
  *     Informações sobre o hardware do cartão de memória.
  *
  */ 
-typedef struct memory_d memory_t;
+
 struct memory_d 
 {
-    object_type_t objectType;
-	object_class_t objectClass;
-	
+
+    object_type_t  objectType;
+    object_class_t objectClass;
+
 	//callback ;d
-		
-	int type;             //ddr2, ddr3 ...
-	unsigned long size;   //
-	int channel;          // single ou dual.
-	unsigned long nb_frequency;	
+
+
+    int type;             //ddr2, ddr3 ...
+    unsigned long size;   //
+    int channel;          // single ou dual.
+    unsigned long nb_frequency;	
 	//fsb:dram
 	//cas latency cl
 	//ras to cas delay
@@ -55,9 +58,7 @@ struct memory_d
 	//week/ year
 	//
 };
-//memory_t *Memory;
-//memory_t *MemoryCardInfo;
-//...
+
 
 #endif   
 

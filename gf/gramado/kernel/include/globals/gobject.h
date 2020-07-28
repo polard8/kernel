@@ -47,92 +47,110 @@ typedef enum {
 
     ObjectTypeNull,               //0 Null. (Free)
     
-    ObjectTypeASpace,             //1 Address Space. (memory address)
-    ObjectTypeDSpace,             //2 Disk Space.
-    ObjectTypeBank,               //3 Bank. (banco de dados).
-    ObjectTypeChannel,            //4 executive sm.
-    ObjectTypeDirectory,          //5 diretório de arquivos. executive sm.
-    ObjectTypeHeap,               //6 heap executive sm
-    ObjectTypeIoBuffer,           //7 i/o buffer executive sm
-    ObjectTypeIpAddress,          //8 ip address executivesm.
-    ObjectTypeProcessMemoryInfo,  //9 process memory info, executive sm.
-    ObjectTypePhysicalMemoryInfo, //10 physical memory info, executive sm.
-    ObjectTypeMemoryInfo,         //11 memory info, executive sm.
-    ObjectTypeMemoryBlock,        //12 ????? @todo: Ver se esse pode ser Criado sem prejudicar a alocação dinâmica. executive sm mm.	
-    ObjectTypePageDirectory,      //13 page directory. executive sm, mm.	
-    ObjectTypePageTable,          //14 pagepool , page table, executive ,sm,mm.	
-    ObjectTypePageFrame,          //15 page frame ,executive ,sm,mm.
-    ObjectTypeFramePool,          //16
-    ObjectTypeSocket,             //17 sockets, executive, sm.
-    ObjectTypeUserInfo,           //18 userinfo, executive, sm.
-    ObjectTypeDesktop,            //19 desktop, executive,uigm.	
-    ObjectTypeMenuItem,           //20 menuitem, executive uigm.
-    ObjectTypeMenu,               //21 menu, executive uigm.	
-    ObjectTypeUserSession,        //22 User session, executive, uigm.	
-    ObjectTypeWindowProcedure,    //23 window procedure, executive, uigm.	
-    ObjectTypeRectangle,          //24 rectangle, executive, uigm. 	
-    ObjectTypeRGBA,               //25 rgba, executive, uigm. 
-    ObjectTypeWindow,             //26 window, executive ,uigm.
-    ObjectTypeRoom,               //27 desktop pool. room window station, executive, uigm.
-    ObjectTypeTerminal,           //28 console, executive, uitm.
-    ObjectTypeLine,               //29 console line, executive, uitm.
-    ObjectTypeTerminal2,          //30 Terminal, executive, uitm. //TODO MUDAR
-    ObjectTypeProcess,    //31 Process, microkernel.
-    ObjectTypeSemaphore,  //32 semaphore, microkernel.	
-    ObjectTypeThread,     //33 thread, microkernel.
-    ObjectTypeCpu,  //34
-    ObjectTypeDma,  //35
-    ObjectTypeProcessor,  //36 processor, hal (talvez isso devesse ir para io de microkernel.)
-    ObjectTypeDevice,         //37 device, hal
-    ObjectTypeDiskInfo,       //38 disk info, hal.
-    ObjectTypeProcessorBlock, //39 processor block hal...(pode ir para io,microkernel)
-    ObjectTypeHostInfo,    // 40 HostInfo, hal. 
-    ObjectTypeKeyboard,    // 41 keyboard, hal.
-    ObjectTypeMacAddress,  // 42 MAC Address, hal.
-    ObjectTypeMemory,      // 43 memory card info, hal.
-    ObjectTypePciDevice,   // 44 PCI device info, hal.
-    ObjectTypePciDeviceDriver,   //45 PCI device driver info, hal.
-    ObjectTypePIC,       //46 pic controller, hal.
-    ObjectTypeRTC,       //47 rtc controller, hal.
-    ObjectTypeScreen,    //48 Screen, hal.
-    ObjectTypeTimer,     //49 ?? timer ,hal.	
-    ObjectTypeVideo,     //50 video ,hal.
-    ObjectTypeVolume,    //51 disk volume ,hal.
-    ObjectTypeCursor,    //52 /include.
-    ObjectTypeRequest,   //53 request de kernel /include.
-    ObjectTypeSignal,    //54
-    ObjectTypeFile,      //55 (Regular file) #bugbug duplicata?? 
-    ObjectTypeMetafile,  //56 
-    ObjectTypeMutex,     //57
-    ObjectTypeToken,     //58 Token de acesso à objetos. (access token)
-    ObjectTypeFont,      //59
-    ObjectTypeIcon,      //60
-    ObjectTypePipe,      //61
-    ObjectTypeGroup,     //62
-    ObjectTypeUser,      //63
-    ObjectTypeComputer,       //64
-    ObjectTypeCpuRegister,    //65
-    ObjectTypeDisk,           //66
-    ObjectTypeDiskPartition,  //67 //info struct
-    ObjectTypeGDT,            //68
-    ObjectTypeLDT,            //69
-    ObjectTypeIDT,            //70
-    ObjectTypeTSS,            //71
-    ObjectTypePort,           //72 (i/o port)
-    ObjectTypeController,     //73
-    ObjectTypeKM,             //74
-    ObjectTypeUM,             //75
-    ObjectTypeColorScheme,    //76
-    ObjectTypeButton,         //77
-    ObjectTypeGrid,           //78
-    ObjectTypeMessage,        //79
-    ObjectTypeTTY,            //80
-    ObjectTypeVirtualConsole, //81
-    ObjectTypeCharDev,         //82
-    ObjectTypeBlockDev,        //83
-    ObjectTypeNetworkDev,      //84
-    ObjectTypeFileSystem,     //85
-    ObjectTypeGeneric
+    // fs/
+    ObjectTypeDirectory,          // diretório de arquivos
+    ObjectTypeFile,               // (Regular file)
+    ObjectTypePipe,               //
+    ObjectTypeFileSystem,  
+    ObjectTypeMetafile, 
+
+    // hwi/
+    ObjectTypeDevice,         // device ??
+    ObjectTypeDisk,           //
+    ObjectTypeDiskInfo,       // disk info,
+    ObjectTypeDiskPartition,  // info struct    
+    ObjectTypeVolume,         // disk volume 
+    ObjectTypeTerminal,       // 
+    ObjectTypeLine,           //  
+    ObjectTypeTTY,            //
+    ObjectTypePTY,            //
+    ObjectTypeVirtualConsole, //
+    ObjectTypeCharDev,        //
+    ObjectTypeBlockDev,       //
+    ObjectTypeNetworkDev,     //
+    ObjectTypeVideo,          // video
+    ObjectTypeCpu,           
+    ObjectTypeDma,  
+    ObjectTypeProcessor,      // processor
+    ObjectTypeProcessorBlock, // processor block 
+    ObjectTypeMemory,         // memory card info.
+    ObjectTypePIC,            // pic controller.
+    ObjectTypeTimer,          // PIT timer
+    ObjectTypeRTC,            // rtc controller, clock
+    ObjectTypeKeyboard,       // keyboard device.
+    ObjectTypeMouse,          // mouse device.
+    ObjectTypeComputer,       //
+    ObjectTypeCpuRegister,    //
+    ObjectTypeGDT,            //
+    ObjectTypeLDT,            //
+    ObjectTypeIDT,            //
+    ObjectTypeTSS,            //
+    ObjectTypePort,           // (i/o port) generic
+    ObjectTypeController,     //
+    ObjectTypePciDevice,        // PCI device info generic
+    ObjectTypePciDeviceDriver,  // PCI device driver info.
+    ObjectTypeScreen,           // Screen.
+
+    // klib/
+    ObjectTypeSignal,     // unix signal object ??
+
+    // net/
+    ObjectTypeHostInfo,     // HostInfo. 
+    ObjectTypeProtocol,     // protocol
+    ObjectTypeSocket,       // sockets.
+    ObjectTypeIpAddress,    // IP address.
+    ObjectTypeMacAddress,   // MAC Address.
+    ObjectTypeChannel,      // channel = two sockets.
+
+    // ps/ 
+    ObjectTypeProcess,            // Process.
+    ObjectTypeThread,             // Thread.
+    ObjectTypePageDirectory,      // page directory
+    ObjectTypePageTable,          // page table
+    ObjectTypePageFrame,          // page frame
+    ObjectTypeFramePool,          // frame pool
+    ObjectTypeASpace,             // Address Space. (memory address)
+    ObjectTypeDSpace,             // Disk Space.
+    ObjectTypeBank,               // Bank. (banco de dados).
+    ObjectTypeHeap,               // heap
+    ObjectTypeIoBuffer,           // i/o buffer
+    ObjectTypeProcessMemoryInfo,  // process memory info
+    ObjectTypePhysicalMemoryInfo, // physical memory info
+    ObjectTypeMemoryInfo,         // memory info
+    ObjectTypeMemoryBlock,        // memory block. Usado para swap.
+    ObjectTypeSemaphore,          // Semaphore
+    ObjectTypeMutex, 
+
+    // security/
+    ObjectTypeUser,               // user ??
+    ObjectTypeUserInfo,           // userinfo ??
+    ObjectTypeGroup,              // user group
+    ObjectTypeUserSession,        // User session
+    ObjectTypeRoom,               // room = (window station), desktop pool.
+    ObjectTypeDesktop,            // desktop.
+    ObjectTypeToken,              // Token de acesso à objetos. (access token)
+
+    // ws/
+    ObjectTypeWindow,             // window 
+    ObjectTypeRectangle,          // rectangle
+    ObjectTypeMenu,               // menu
+    ObjectTypeMenuItem,           // menuitem
+    ObjectTypeButton,    
+    ObjectTypeGrid,     
+    ObjectTypeColorScheme,  
+    ObjectTypeFont,  
+    ObjectTypeIcon,  
+    ObjectTypeRGBA,               // rgba 
+    ObjectTypeWindowProcedure,    // window procedure
+    ObjectTypeCursor, 
+    ObjectTypeMessage,            // system message
+
+    //kernel/
+    ObjectTypeRequest,        // request de kernel.
+    ObjectTypeKM,             // ??
+    ObjectTypeUM,             // ??
+
+    ObjectTypeGeneric       
 
 	// todo: 
 	// precisamos criar um tipo genérico
