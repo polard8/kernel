@@ -383,19 +383,20 @@ global _irq3
 _irq3:
 
     cli
-	pushad
-	
-	;call _second_serial_port_Handler
-	mov al, 0x20
-    ;out 0xA0, al  
+    pushad
+
+    ;call _second_serial_port_Handler
+
+    ;; eoi
+    mov al, 0x20
     out 0x20, al
 
-	
-	popad
-	sti
-    iretd	
+    popad
+    sti
+    iretd
 
-	
+
+
 ;====================================================
 ; IRQ 4 - serial port controller for serial port 1 
 ;(shared with serial port 3, if present)
@@ -407,16 +408,17 @@ global _irq4
 _irq4:
 
     cli
-	pushad
-	
-	;call _first_serial_port_Handler
-	mov al, 0x20
-    ;out 0xA0, al  
-    out 0x20, al	
-	
+    pushad
+
+    ;call _first_serial_port_Handler
+
+    mov al, 0x20
+    out 0x20, al
+
     popad
-	sti
-    iretd	
+    sti
+    iretd
+
 
 
 ;--------------
@@ -452,30 +454,30 @@ _irq4:
 
 global _irq7
 _irq7:
-    cli
-	pushad
 
+    cli
+    pushad
 
     ;call _first_parallel_port_Handler
 
     ;; ++
     ;; ================================================
     ;; #test
-    ;; testando o tratamento de interrupção espúria.
+    ;; Testing the spurious interrupt management.
 
     xor eax, eax
-    mov  al, 03h    ; PIC.OCW3 set function to read ISR (In Service Register)
-    out  23h, al    ; write to PIC.OCW3 master
-    in   al, 20h    ; read ISR master.
-    test al, 80h         ; if the in-service register does not have IR7 bit set
-    jz short __RETURN_Spurious   ; this would be a spurious interrupt.
+    mov  al, 03h                ; PIC.OCW3 set function to read ISR (In Service Register)
+    out  23h, al                ; write to PIC.OCW3 master
+    in   al, 20h                ; read ISR master.
+    test al, 80h                ; if the in-service register does not have IR7 bit set
+    jz short __RETURN_Spurious  ; this would be a spurious interrupt.
     
     ;; ================================================
     ;; --
 
 ;; Not spurious
 
-    ;; master.
+    ;; EOI. Master.
     ;; for irq7
     mov al, 0x20
     out 0x20, al   
@@ -491,76 +493,82 @@ __RETURN_Spurious:
 
 
 
-
-
-
-
-
 ;================================================
 ; _irq8:
 ;     System CMOS, Realtime clock.
 ;     IRQ 8 - real-time clock (RTC)
 ;
+
 global _irq8
 _irq8:
 
     cli
-	pushad
-		
-	call _KiRtcIrq
-	
-	mov al, 0x20
+    pushad
+
+    call _KiRtcIrq
+
+    ;; EOI.
+    ;; Order: Second, first.
+    mov al, 0x20
     out 0xA0, al  
     out 0x20, al
 
-	
-	popad
-	sti
-	iret
-	
-	
-;=========================================================	
-;IRQ 9
+    popad
+    sti
+    iret
+
+
+
+;=========================================================
+; IRQ 9
 
 extern _xxxe1000handler
 
 global _irq9
 _irq9:
+
     cli
-	pushad
-	
-	;jmp _asm_reboot
-	;call _xxxe1000handler
-	
-	;call _acpiHandler
-	mov al, 0x20
+    pushad
+
+    ;jmp _asm_reboot
+    ;call _xxxe1000handler
+
+    ;call _acpiHandler
+
+    ;; EOI.
+    ;; Order: Second, first.
+    mov al, 0x20
     out 0xA0, al  
     out 0x20, al
 
-	
-	popad
-	sti
-    iretd	
+    popad
+    sti
+    iretd
 
-;========================================================	
-;IRQ 10 – The Interrupt is left open for the use 
-;of peripherals (open interrupt/available, SCSI or NIC)
-;nvidia
+
+;========================================================
+; IRQ 10 – The Interrupt is left open for the use 
+; of peripherals (open interrupt/available, SCSI or NIC)
+; nvidia
+
 global _irq10
 _irq10:
+
     cli
-	pushad
-	
-	;call _KiPciHandler1
-	mov al, 0x20
+    pushad
+
+    ;call _KiPciHandler1
+
+    ;; EOI.
+    ;; Order: Second, first.
+    mov al, 0x20
     out 0xA0, al  
     out 0x20, al
 
-	
-	popad
-	sti
+    popad
+    sti
     iretd
-	
+
 
 
 ;;===============================================
@@ -574,6 +582,8 @@ _nic_handler:
 
     call _xxxe1000handler
 
+    ;; EOI.
+    ;; Order: Second, first.
     mov al, 0x20
     out 0xA0, al  
     out 0x20, al
@@ -585,16 +595,19 @@ _nic_handler:
 
 
 ;=======================================
-;IRQ 11 – The Interrupt is left open for 
-;the use of peripherals (open interrupt/available, SCSI or NIC)
-;audio.
+; IRQ 11 - The Interrupt is left open for 
+; the use of peripherals (open interrupt/available, SCSI or NIC)
+; audio.
 global _irq11
 _irq11:
 
     cli
     pushad
-	
-	;call _KiPciHandler2
+
+    ;call _KiPciHandler2
+
+    ;; EOI.
+    ;; Order: Second, first.
     mov al, 0x20
     out 0xA0, al  
     out 0x20, al
@@ -603,44 +616,47 @@ _irq11:
     sti
 
     iretd
-	
-	
-	
+
+
+
 ;=======================================
-;IRQ 12 mouse on PS/2 connector
+; IRQ 12 - mouse on PS/2 connector
+;
+
 global _irq12
 _irq12:
-    
+
     cli
 
-	pushad
-	push ds
-	push es
-	push fs
-	push gs
-	push ss 
+    pushad
+    push ds
+    push es
+    push fs
+    push gs
+    push ss 
 
-	;mouse.c
     call _mouse_handler
 
+    ;; EOI.
+    ;; Order: Second, first.
     mov al, 0x20
     out 0xA0, al 
     IODELAY 
     out 0x20, al
     IODELAY 
-	
-	pop ss
-	pop gs 
-	pop fs 
-	pop es 
-	pop ds
-	popad
+
+    pop ss
+    pop gs 
+    pop fs 
+    pop es 
+    pop ds
+    popad
 
     sti
-
     iretd
-	
-	
+
+
+
 ;;============================================================	
 ; IRQ 13 
 ; CPU co-processor  or  integrated floating point unit  
@@ -654,6 +670,9 @@ _irq13:
     push ax 
 
     ;call _coprocessorHandler
+
+    ;; EOI.
+    ;; Order: Second, first.
     mov al, 0x20
     out 0xA0, al  
     out 0x20, al
@@ -662,8 +681,8 @@ _irq13:
     sti
 
     iretd
-	
-	
+
+
 ;=================================================	
 ; _irq14:
 ;     Tratador de interrupções para unidade master.
@@ -683,6 +702,8 @@ _irq14:
 
     call _ata_handler1
 
+    ;; EOI.
+    ;; Order: Second, first.
     MOV AL,020h
     OUT 0A0h,AL
     IODELAY
@@ -730,6 +751,8 @@ _irq15:
     ;; Spurious int for irq15.
     ;; It's different from irq7
 
+    ;; EOI.
+    ;; Order: Second, first.
     MOV AL, 020h
     OUT 0A0h, AL
     IODELAY
