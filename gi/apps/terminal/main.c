@@ -178,34 +178,33 @@ void test_standard_stream(int fd)
     printf (">>>> size %d \n",size);  
 
 
-    //size_t size = (sizeof(buffer) - 1);
-    //buffer[4095] = 0;  
+      
+    //fseek(stdin, 0, SEEK_SET); 
+    //fseek(stdout, 0, SEEK_SET); 
+    fseek(stderr, 0, SEEK_SET); 
 
-   //escreve em stdout
-   //mas stdout não é um arquivo normal ...
-   //é um dispositivo. então não poderemos ler daqui.
-   //#?? talvez poderíamos ... se os bytes ficarem armazenados
-   // no buffer do dispositivo.
-   //gramado_system_call ( 900, 
-      // (unsigned long) "tprintf.bin", 0, 0 );
+    //#bugbug
+    //Não podemos escrever usando o tamanho do buffer
+    //porque o arquivo é menor que isso.
+    write(fileno(stdin), prompt, 10);//#bugbug sizeof(prompt));    
+    write(fileno(stdout),prompt, 10);//#bugbug sizeof(prompt)); 
+    write(fileno(stderr),prompt, 10);//#bugbug sizeof(prompt)); 
 
+    gramado_system_call ( 900, 
+      (unsigned long) "tprintf.bin", 0, 0 );
 
-
-    // redirecionamento.
-    // 
-    //stdout = f;  //ok
+    while(1);
     
-    
+
 
     int i=0;
     while(1){
 
-        nread = read ( fileno(f), buffer, sizeof(buffer) ); 
-        //nread = read ( fileno(f), buffer, size ); 
+        //nread = read ( fileno(f), buffer, sizeof(buffer) ); 
+        nread = read ( fileno(f), buffer, size ); 
         //nread = read ( fileno(stdin), buffer, size ); 
         //nread = read ( fileno(stdout), buffer, size ); 
- 
-     
+
         if( nread>0){
             
             for(i=0;i< size ;i++){
@@ -223,11 +222,9 @@ void test_standard_stream(int fd)
             printf("FIM2\n");
             return;
         }
-        
-        //i++;
-        //if(i>20) i=0;
-    }
+    };
 }
+
 
 void
 test_child_message(void)
@@ -1093,9 +1090,12 @@ response_loop:
                     //relax cpu
                     //break; 
                     
-                //case VK_RETURN:
+                case VK_RETURN:
                     //goto process_event;
-                    //break;
+                    tputc ((int) fd, (int) '\r', (int) 1);
+                    tputc ((int) fd, (int) '\n', (int) 1);
+                    input('\0');
+                    break;
                   
                 //case VK_TAB:
                 //case VK_BACK:
@@ -1117,6 +1117,8 @@ response_loop:
                     //terminal_write_char( (int)fd, (int) long1 );
                     
                     //*c = (char *) long1;
+                    
+                    input( (unsigned long) long1 );
                     //#test
                     // fd, buf, bufsize
                     tputc ((int) fd, (int) long1, (int) 1);

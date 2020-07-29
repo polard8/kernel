@@ -247,10 +247,7 @@ sc_again:
      //unsigned ch = raw & 0x7f;
      //int pressed = !(raw & 0x80);
             
-     if ( __raw == 0 ){ 
-         return; 
-     }
-
+     if ( __raw == 0 ){ return; }
 
      // #bugbug
      // [Enter] in the numerical keyboard isn't working.
@@ -316,8 +313,7 @@ void KiKeyboard (void){
 
 
 	// Contando as interrupções desse tipo.
-	g_profiler_ints_irq1++;
-
+    g_profiler_ints_irq1++;
 
 
     // #debug
@@ -340,16 +336,12 @@ void KiKeyboard (void){
     // current_stdin os scancodes obtidos na digitação.
 
     // pt-br keyboard.
-    if (abnt2 == 1)
-    {
-        abnt2_keyboard_handler ();
+    if (abnt2 == 1){
+        abnt2_keyboard_handler();
         return;
     }
 
-    if (abnt2 != 1)
-    {
-        panic ("KiKeyboard: not abnt2\n");
-    }
+    if (abnt2 != 1){ panic("KiKeyboard: not abnt2\n"); }
 }
 
 

@@ -92,10 +92,31 @@ int main (int argc, char *argv[]){
     //stdin é um arquivo normal, vamos escrever nele.
     //assim o terminal poderá ler o stdout.
     //stdout = f;
+    printf("\n");
+    printf("tprintf.bin: Initilizing ...\n\n");
+    printf("prompt={%s}*hang\n",prompt);
 
-	printf("\n");
-	printf("tprintf.bin: Initilizing ...\n\n");
+    //get size.
+    //fseek(stderr, 0, SEEK_END);   // seek to end of file
+    //size_t size = ftell(stderr);  // get current file pointer
+    //fseek(stderr, 0, SEEK_SET);   // seek back to beginning of file
+    //printf (">>>> size %d \n",size);  
 
+
+    fseek(stdin, 0, SEEK_SET);   
+    fseek(stderr, 0, SEEK_SET);   
+    int i=0;
+    for(i=0;i<10;i++){
+        int c = getc(stdin);
+        
+        if (c != 0 || c != -1)
+            printf("%c\n",c);
+        
+        if (c == 0) break;
+    };
+
+    //fflush(stderr);
+    while(1);
 
     //perror("Testing perror!\n");
 

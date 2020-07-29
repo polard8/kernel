@@ -495,11 +495,10 @@ int __getc ( FILE *stream ){
         // #todo:
         // We need this routine to call getc() after fopen().
   
-        // coloque bytes no buffer dessa stream.
-        nreads = (int) ____bfill (stream);
-                  
-            //nreads = read (fileno(stream), stream->_p, 1 );
-            
+        // Coloque bytes no buffer dessa stream.
+        nreads = (int) ____bfill(stream);
+       //nreads = read (fileno(stream), stream->_p, 1 );
+
         // fail.
         if (nreads <= 0){
             debug_print ("__getc: [BUFFER?] ____bfill fail\n");
@@ -585,6 +584,8 @@ int __putc (int ch, FILE *stream){
     } 
     
     stream->_base[stream->_w++] = ch;
+
+    //#bugbug: _cnt++ ???
 
     if (stream->_w >= BUFSIZ){
         fflush (stream);
@@ -5147,16 +5148,16 @@ void stdioInitialize (){
     stderr->_p = stderr->_base;
 
 
-    // cnt    
-    //stdin->_cnt  = BUFSIZ;
-    //stdout->_cnt = BUFSIZ;
-    //stderr->_cnt = BUFSIZ;    
-    
-    
     //#todo
-    //stdin->_lbfsize  = 128;
-    //stdout->_lbfsize = 128;
-    //stderr->_lbfsize = 128;    
+    stdin->_lbfsize  = BUFSIZ;
+    stdout->_lbfsize = BUFSIZ;
+    stderr->_lbfsize = BUFSIZ;    
+
+    // cnt    
+    stdin->_cnt  = 0;//BUFSIZ;
+    stdout->_cnt = 0;// BUFSIZ;
+    stderr->_cnt = 0;// BUFSIZ;    
+
 
     stdin->_w  = 0;
     stdout->_w = 0;
@@ -5166,15 +5167,7 @@ void stdioInitialize (){
     stdout->_r = 0;
     stderr->_r = 0;
 
-    // #test: pegando o conteúdo do arquivo.
-    /*
-    int nreads=0; 
-    nreads = read(0,stdin->_base,  BUFSIZ-1);
-    nreads = read(1,stdout->_base, BUFSIZ-1);
-    nreads = read(2,stderr->_base, BUFSIZ-1);
-    */
-    
-    
+
 	//
 	// # libc mode #
 	//
@@ -5203,16 +5196,11 @@ void stdioInitialize (){
            0 );
 
 
-    
     __libc_tty_id = (int) gramado_system_call ( 266, getpid(), 0, 0 );        
 
 
-
-    // limpando o prompt;
+    // Limpando o prompt[];
     prompt_clean();
-    
-    
-    
 }
 
 

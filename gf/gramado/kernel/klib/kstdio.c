@@ -1550,6 +1550,7 @@ int stdioInitialize (void){
         tmp->used = 1;
         tmp->magic = 1234;
         tmp->____object = ObjectTypeFile; //Regular file
+        tmp->_flags = 0; // (__SWR | __SRD); 
         tmp->fd_counter = 0;
         tmp->_tmpfname = NULL;
         //...
@@ -1594,6 +1595,7 @@ int stdioInitialize (void){
     stdin->____object = ObjectTypeFile; //Regular file
     stdin->used = 1;
     stdin->magic = 1234;
+    stdin->_flags = (__SWR | __SRD); 
     stdin->_base = &prompt[0];    //See: include/kernel/stdio.h
     stdin->_p =  &prompt[0];
     stdin->_bf._base = stdin->_base;
@@ -1634,6 +1636,7 @@ int stdioInitialize (void){
     stdout->____object = ObjectTypeVirtualConsole;
     stdout->used = 1;
     stdout->magic = 1234;
+    stdout->_flags = (__SWR | __SRD); 
     stdout->_base = &prompt_out[0];  //See: include/kernel/stdio.h
     stdout->_p = &prompt_out[0];
     stdout->_bf._base = stdout->_base;
@@ -1670,6 +1673,7 @@ int stdioInitialize (void){
     stderr->____object = ObjectTypeFile;
     stderr->used = 1;
     stderr->magic = 1234;
+    stderr->_flags = (__SWR | __SRD); 
     stderr->_base = &prompt_err[0];  //See: include/kernel/stdio.h
     stderr->_p =  &prompt_err[0];
     stderr->_bf._base = stderr->_base;

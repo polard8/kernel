@@ -891,10 +891,10 @@ int sys_read (unsigned int fd, char *ubuf, int count){
         
         //Não conseguimos ler.
         //nada de errado, apenas espera.
-        do_thread_waiting (current_thread);
-        __file->tid_waiting = current_thread;
+        //do_thread_waiting (current_thread);
+        //__file->tid_waiting = current_thread;
         //__file->_flags |= __SWR;  //pode escrever.
-        scheduler();
+        //scheduler();
         return 0;
     }
    
@@ -916,16 +916,16 @@ int sys_read (unsigned int fd, char *ubuf, int count){
         
             // #test
             // Acordar quem esperava por esse evento
-            do_thread_ready( __file->tid_waiting );
+            //do_thread_ready( __file->tid_waiting );
             return (int) nbytes;        
         }
         
         //Não conseguimos ler.
         //nada de errado, apenas espera.
-        do_thread_waiting (current_thread);
-        __file->tid_waiting = current_thread;
+        //do_thread_waiting (current_thread);
+        //__file->tid_waiting = current_thread;
         //__file->_flags |= __SWR;  //pode escrever.
-        scheduler();
+        //scheduler();
         return 0;
     }
 
@@ -949,10 +949,10 @@ fail:
     refresh_screen();
 
     //bloqueando, autorizando a escrita e reescalonando.
-    do_thread_waiting (current_thread);
-    __file->tid_waiting = current_thread;
-    __file->_flags |= __SWR;  //pode escrever      
-    scheduler();  //#bugbug: Isso é um teste  
+    //do_thread_waiting (current_thread);
+    //__file->tid_waiting = current_thread;
+    //__file->_flags |= __SWR;  //pode escrever      
+    //scheduler();  //#bugbug: Isso é um teste  
 
     return (int) (-1); // fail !!! something is wrong!!!
 }
@@ -1254,7 +1254,8 @@ int sys_write (unsigned int fd, char *ubuf, int count){
         //printf ("sys_write:  fail. target is not a socket.\n");
         //refresh_screen();
         return 0;
-    }   
+        
+    }  //socket file 
 
 
     //
@@ -1266,57 +1267,66 @@ int sys_write (unsigned int fd, char *ubuf, int count){
 
     // Tem que retonar o tanto de bytes escritos.
     // Escreve em uma stream uma certa quantidade de chars.
-    
-    if ( (__file->_flags & __SWR) == 0)
+
+    if ( __file->____object == ObjectTypeFile )
     {
-        debug_print("sys_write: [FLAGS] Can't write!");
-        // Não conseguimos escrever ... 
-        // nada de errado, apenas esperaremos.
-        do_thread_waiting (current_thread);
-        __file->tid_waiting = current_thread;
-        //__file->_flags |= __SWR;  //pode escrever.
-        scheduler();
-        return 0;
-    }
-
-    //#todo: ainda não colocamos essa flag na criação do arquivo.
-    if (__file->_flags & __SWR)
-    {
-        // Regular file.
-        nbytes = (int) file_write_buffer ( (file *) __file, 
-                           (char *) ubuf, (int) count );
-
-        // Avisa que o arquivo não está mais no modo escrita,
-        // que agora pode ler.
-
-        // Adiciona o bit que permite a leitura.
-        // Assim o servidor pode ler o request.
-        // #todo: wait on write.
-        // #bugbug:
-        // A questão é que se o cliente está esperando por resposta,
-        // então ele lerá também.
-
-        if (nbytes>0)
-        { 
-            //Ja escrevemos, agora pode ler.
-            __file->_flags |= __SRD;
-    
-            // #test
-            // Acordar quem esperava por esse evento de escrita.
-            do_thread_ready( __file->tid_waiting );
-            return (int) nbytes;
+        //can't write!
+        if ( (__file->_flags & __SWR) == 0)
+        {
+             debug_print("sys_write: [FLAGS] Can't write!\n");
+             // Não conseguimos escrever ... 
+             // nada de errado, apenas esperaremos.
+             //do_thread_waiting (current_thread);
+             //__file->tid_waiting = current_thread;
+             //__file->_flags |= __SWR;  //pode escrever.
+             //scheduler();
+             return 0;
         }
 
-        // Não conseguimos escrever ... 
-        // nada de errado, apenas esperaremos.
-        do_thread_waiting (current_thread);
-        __file->tid_waiting = current_thread;
-        //__file->_flags |= __SWR;  //pode escrever.
-        scheduler();
-        return 0;
-    }
+        //#todo: ainda não colocamos essa flag na criação do arquivo.
+        if (__file->_flags & __SWR)
+        {
+            // Regular file.
+            nbytes = (int) file_write_buffer ( (file *) __file, 
+                           (char *) ubuf, (int) count );
 
+            // Avisa que o arquivo não está mais no modo escrita,
+            // que agora pode ler.
 
+            // Adiciona o bit que permite a leitura.
+            // Assim o servidor pode ler o request.
+            // #todo: wait on write.
+            // #bugbug:
+            // A questão é que se o cliente está esperando por resposta,
+            // então ele lerá também.
+
+            if (nbytes>0)
+            { 
+                //Ja escrevemos, agora pode ler.
+                __file->_flags |= __SRD;
+    
+                // #test
+                // Acordar quem esperava por esse evento de escrita.
+                do_thread_ready( __file->tid_waiting );
+                return (int) nbytes;
+            }
+
+            //suspenso.
+            // Não conseguimos escrever ... 
+            // nada de errado, apenas esperaremos.
+            //do_thread_waiting (current_thread);
+            //__file->tid_waiting = current_thread;
+            //__file->_flags |= __SWR;  //pode escrever.
+            //scheduler();
+        
+            debug_print ("sys_write: [FAIL] file_write_buffer fail!\n");
+            return 0;
+        }
+ 
+        debug_print ("sys_write: [FAIL] Something is wrong!\n");
+    } //regular file.
+    
+    
     //
     // fail.
     // 
@@ -1328,10 +1338,10 @@ fail:
 
     // Não conseguimos escrever ... 
     // Estamos com problemas 
-    do_thread_waiting (current_thread);
-    __file->tid_waiting = current_thread;
+    //do_thread_waiting (current_thread);
+    //__file->tid_waiting = current_thread;
     //__file->_flags |= __SWR;  //pode escrever.
-    scheduler();
+    //scheduler();
     return (int) (-1);  // fail. something is wrong!!!!
 }
 
