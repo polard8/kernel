@@ -148,56 +148,48 @@ struct tty_d
 	//
 
     struct user_info_d *user_info;
-	
-	//
-	// user session, room, desktop;
-	//
 
-    struct usession_d *user_session;
-    struct room_d *room;
-    struct desktop_d *desktop;
 
-	//
-	// Window.
-	//
+    // Security
+    // user session, room, desktop;
+    struct usession_d  *user_session;
+    struct room_d      *room;
+    struct desktop_d   *desktop;
 
+    // Window.
+    // When we are using the kgws.
     struct window_d *window;
 
-	// Quantas objetos associados a essa tty?
+    // ??
+    // Quantos objetos associados a essa tty?
     int count;
 
-	// id do terminal associado a essa tty.
+    // id do terminal associado a essa tty.
     int terminal_id;  //tdo deletar.
     int terminal_pid;  //todo: usar esse
 
 
-  
 
     // Owner process.
     struct process_d *process;
 
-
-	// Thread de input.
+    // Thread de input.
     struct thread_d *thread;
- 
-	//
-	// FILE
-	//
-	
+
+    //
+    // Buffers.
+    //
+
+    // Standard stream
     file *stdin;
     file *stdout;
     file *stderr;
 
-
-    //
-    // buffer 
-    //
-   
-    // Buffer na forma de arquivo.
-    // Usado par aleitura e escrita
-    //Assim o pai pode escrever no tty do processo filho.
-
+    // Raw input buffer.
     file *_buffer;
+
+    // Canonical buffer.
+    file *_cbuffer;
 
 
 	//
@@ -215,15 +207,13 @@ struct tty_d
     unsigned char *stderr_limit;
 
 
-
 	// status
 	// 0 = não repinte stdout no tty atual
 	// 1 = repinte stdout no tty atual
-	int stdout_status;
-	int stdout_update_what; //char, linha, coluna.
+    int stdout_status;
+    int stdout_update_what; //char, linha, coluna.
 
-	int print_pending;
-	
+    int print_pending;
 
     int LinMax;
     int ColMax;
@@ -289,14 +279,12 @@ struct tty_d
 
 };
 
-//
-// Consoles virtuais
-//
 
+// Consoles virtuais
 // Consoles virtuais em full screen.
 // Criados a unha pelo kernel.
 
-
+//#define MAX_KERNEL_VIRTUAL_CONSOLES 4
 int current_vc;
 struct tty_d TTY[4];
 
@@ -306,7 +294,6 @@ struct tty_d TTY[4];
 // Pseudo terminais.
 //
 
-
 struct tty_d *CurrentTTY;
 
 
@@ -315,24 +302,13 @@ struct tty_d *CurrentTTY;
 //int current_pts;
 
 
-//unsigned long ttyList[64]; 
-
+//#define TTY_COUNT_MAX 256
 unsigned long ttyList[256]; 
 
 
-
-
-
-/* tty magic number */
-//#define TTY_MAGIC	0x0771
-
-//void *createTTYLine (void); 
-
-
-
+// Get the tty pointer.
 //OUT: tty pointer.
 struct tty_d *file_tty (file *f);
-
 
 
 struct ttyldisc_d *ttyldisc_create (void);  
@@ -348,6 +324,7 @@ int tty_delete ( struct tty_d *tty );
 int ttyInit (int tty_id);
 
 
+
 /*
 int pty_write(struct tty_d *tty, const char *buf, int c);
 int pty_write(struct tty_d *tty, const char *buf, int c)
@@ -356,40 +333,52 @@ int pty_write(struct tty_d *tty, const char *buf, int c)
 
 
 
-
 void tty_stop (struct tty_d *tty);
 void tty_start (struct tty_d *tty);
 
 
-
-int tty_gets ( struct tty_d *tty, struct termios *termiosp );
-int tty_sets (struct tty_d *tty, int options, struct termios *termiosp );
-
-
-// channel is a fd in the file list of a process.
 int 
-tty_read ( unsigned int channel, 
-           char *buffer, 
-           int nr );
- 
-// channel is a fd in the file list of a process.
-int 
-tty_write ( unsigned int channel, 
-            char *buffer, 
-            int nr );
+tty_gets ( 
+    struct tty_d *tty, 
+    struct termios *termiosp );
 
 int 
-tty_read_ttyList ( unsigned int channel, 
-           char *buffer, 
-           int nr );
+tty_sets ( 
+    struct tty_d *tty, 
+    int options, 
+    struct termios *termiosp );
 
 
-// o descritor seleciona uma tty em ttyList e escreve em tty->stdout->_base
+// Channel is a fd in the open file list of a process.
 int 
-tty_write_ttyList ( unsigned int channel, 
-            char *buffer, 
-            int nr );
+tty_read ( 
+   int fd, 
+   char *buffer, 
+   int n );
 
+
+// Channel is a fd in the open file list of a process.
+int 
+tty_write ( 
+    int fd, 
+    char *buffer, 
+    int n );
+
+
+int 
+tty_read_ttyList ( 
+    unsigned int channel, 
+    char *buffer, 
+    int nr );
+
+
+// O descritor seleciona uma tty em ttyList e 
+// escreve em tty->stdout->_base
+int 
+tty_write_ttyList ( 
+    unsigned int channel, 
+    char *buffer, 
+    int nr );
 
 
 int 

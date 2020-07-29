@@ -241,9 +241,9 @@ devmgr_register_device (
 
             f->deviceId = d->deviceId; 
 
-			d->__file = (file *) f;
-			d->__class = class;
-			d->type = type;
+            d->__file = (file *) f;
+            d->__class = class;
+            d->type = type;
 
             //#test 
             //Todo: create the file.
@@ -256,16 +256,13 @@ devmgr_register_device (
             // DEV_8086_8086
             d->name = (char *) name;
 
-			
-			d->pci_device = (struct pci_device_d *) pci_device;
-			d->ttydrv = (struct ttydrv_d *) tty_driver;
-		
-		    // continua ...
-		};
-        
-        //...
-	};
+            d->pci_device = (struct pci_device_d *) pci_device;
+            d->ttydrv = (struct ttydrv_d *) tty_driver;
 
+            // continua ...
+        };
+        //...
+    };
 
     return 0;
 }

@@ -626,24 +626,23 @@ int tty_gets ( struct tty_d *tty, struct termios *termiosp ){
 }
 
 
-// Channel is a fd in the file list of a process.
+
 int 
 tty_read ( 
-    unsigned int channel, 
+    int fd, 
     char *buffer, 
-    int nr )
+    int n )
 {
     debug_print ("tty_read: [TODO]\n");
     return -1;
 }
 
 
-// Channel is a fd in the file list of a process.
 int 
 tty_write ( 
-    unsigned int channel, 
+    int fd, 
     char *buffer, 
-    int nr )
+    int n )
 {
     debug_print ("tty_write: [TODO]\n");
     return -1;
@@ -1492,7 +1491,13 @@ __ok_register:
 
         // A estrutura de tty associada com esse arquivo.
         __file->tty = __tty;
-        
+
+
+        //Todo: create the file name.
+        //__file->_tmpfname = "TTYX    TTY";
+        //sprintf( (char *) __file->_tmpfname, "TTY%d", ?? );
+        //strcpy (?,__file->_tmpfname);
+
         // Esse é o arquivo que aponta para essa estrutura.
         __tty->_fp = __file;
 
