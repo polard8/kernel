@@ -627,26 +627,124 @@ int tty_gets ( struct tty_d *tty, struct termios *termiosp ){
 
 
 
+// IN: fd = indice na lista de arquivos abertos pelo processo.
 int 
 tty_read ( 
     int fd, 
     char *buffer, 
     int n )
 {
-    debug_print ("tty_read: [TODO]\n");
-    return -1;
+    struct tty_d *__tty;
+    struct process_d *p;
+    file *f;
+    
+
+    debug_print ("tty_read: [FIXME]\n");
+
+    //Limits
+    if ( fd < 0 || fd > 32 ){
+        printf ("tty_read: invalid fd\n");
+        refresh_screen();
+        return -1;
+    }
+
+
+    p = (struct process_d *) processList[fd];
+
+    if ((void*) p == NULL){
+        debug_print("tty_read: p\n");
+        return -1;
+    }
+
+    // Pega o arquivo.
+    f = (file *) p->Objects[fd];
+
+    if ((void*) f == NULL){
+        debug_print("tty_read: f\n");
+        return -1;
+    }
+    
+    
+    if( f->____object != ObjectTypeTTY ){
+        debug_print("tty_read: ____object\n");
+        return -1;
+    }
+
+    //pega a tty representada pelo arquivo
+    __tty = (struct tty_d *) f->tty;
+    
+    if ( (void*) __tty == NULL ){
+        debug_print("tty_read: __tty\n");
+        return -1;
+    }
+
+    // Read tty.
+
+     return (int) __tty_read ( (struct tty_d *) __tty, 
+                      (char *) buffer, 
+                      (int) n );
 }
 
 
+// IN: fd = indice na lista de arquivos abertos pelo processo.
 int 
 tty_write ( 
     int fd, 
     char *buffer, 
     int n )
 {
-    debug_print ("tty_write: [TODO]\n");
-    return -1;
+    struct tty_d *__tty;
+    struct process_d *p;
+    file *f;
+    
+
+    debug_print ("tty_write: [FIXME]\n");
+
+    //Limits
+    if ( fd < 0 || fd > 32 ){
+        printf ("tty_write: invalid fd\n");
+        refresh_screen();
+        return -1;
+    }
+
+
+    p = (struct process_d *) processList[fd];
+
+    if ((void*) p == NULL){
+        debug_print("tty_write: p\n");
+        return -1;
+    }
+
+    // Pega o arquivo.
+    f = (file *) p->Objects[fd];
+
+    if ((void*) f == NULL){
+        debug_print("tty_write: f\n");
+        return -1;
+    }
+    
+    
+    if( f->____object != ObjectTypeTTY ){
+        debug_print("tty_write: ____object\n");
+        return -1;
+    }
+
+    //pega a tty representada pelo arquivo
+    __tty = (struct tty_d *) f->tty;
+    
+    if ( (void*) __tty == NULL ){
+        debug_print("tty_write: __tty\n");
+        return -1;
+    }
+
+    // Read tty.
+
+    return (int) __tty_write ( (struct tty_d *) __tty, 
+                     (char *) buffer, 
+                     (int) n );
 }
+
+
 
 
 // Copia de ring3 para o kernel.
