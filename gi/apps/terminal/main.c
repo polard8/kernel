@@ -144,6 +144,24 @@ void test_tty_support(int fd)
 }
 
 
+void send_again()
+{
+    fseek(stdin, 0, SEEK_SET); 
+    fseek(stdout, 0, SEEK_SET); 
+    fseek(stderr, 0, SEEK_SET); 
+
+    //#bugbug
+    //Não podemos escrever usando o tamanho do buffer
+    //porque o arquivo é menor que isso.
+    write(fileno(stdin), prompt, 10);//#bugbug sizeof(prompt));    
+    write(fileno(stdout),prompt, 10);//#bugbug sizeof(prompt)); 
+    write(fileno(stderr),prompt, 10);//#bugbug sizeof(prompt)); 
+
+    fseek(stdin, 0, SEEK_SET); 
+    fseek(stdout, 0, SEEK_SET); 
+    fseek(stderr, 0, SEEK_SET); 
+
+}
 
 void test_standard_stream(int fd)
 {
@@ -179,8 +197,8 @@ void test_standard_stream(int fd)
 
 
       
-    //fseek(stdin, 0, SEEK_SET); 
-    //fseek(stdout, 0, SEEK_SET); 
+    fseek(stdin, 0, SEEK_SET); 
+    fseek(stdout, 0, SEEK_SET); 
     fseek(stderr, 0, SEEK_SET); 
 
     //#bugbug
@@ -190,9 +208,15 @@ void test_standard_stream(int fd)
     write(fileno(stdout),prompt, 10);//#bugbug sizeof(prompt)); 
     write(fileno(stderr),prompt, 10);//#bugbug sizeof(prompt)); 
 
+    fseek(stdin, 0, SEEK_SET); 
+    fseek(stdout, 0, SEEK_SET); 
+    fseek(stderr, 0, SEEK_SET); 
+
+
     gramado_system_call ( 900, 
       (unsigned long) "tprintf.bin", 0, 0 );
 
+    return;
     while(1);
     
 
@@ -1094,7 +1118,9 @@ response_loop:
                     //goto process_event;
                     tputc ((int) fd, (int) '\r', (int) 1);
                     tputc ((int) fd, (int) '\n', (int) 1);
+                    input('\n');
                     input('\0');
+                    prompt_pos = 0;
                     break;
                   
                 //case VK_TAB:
@@ -1175,6 +1201,7 @@ response_loop:
 
 
                 case VK_F4:
+                    send_again();
                     break;
                    
                    

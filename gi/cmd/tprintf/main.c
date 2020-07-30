@@ -102,9 +102,16 @@ int main (int argc, char *argv[]){
     //fseek(stderr, 0, SEEK_SET);   // seek back to beginning of file
     //printf (">>>> size %d \n",size);  
 
-
+   int s =-1;
+   
+//loop:
+    
+    printf("$: "); fflush(stdout);
     fseek(stdin, 0, SEEK_SET);   
-    fseek(stderr, 0, SEEK_SET);   
+    size_t size = ftell(stderr);
+    printf (">>>> size %d \n",size);
+    fseek(stdin, 0, SEEK_SET);   
+    
     int i=0;
     for(i=0;i<10;i++){
         int c = getc(stdin);
@@ -112,11 +119,18 @@ int main (int argc, char *argv[]){
         if (c != 0 || c != -1)
             printf("%c\n",c);
         
-        if (c == 0) break;
+        if (c=='\n') 
+            printf("N"); fflush(stdout); 
+        
+        if (c==0)
+            printf("0"); fflush(stdout);
     };
-
-    //fflush(stderr);
+    
+    
+    //goto loop;
     while(1);
+
+
 
     //perror("Testing perror!\n");
 

@@ -1016,18 +1016,21 @@ int k_fseek ( file *f, long offset, int whence ){
         case SEEK_SET:
 		    //printf ("SEEK_SET\n");   
             f->_p = (f->_base + offset); 
+            f->_cnt = (f->_lbfsize - offset);
 			goto done;
 			break;
-			
+
         case SEEK_CUR:
 		    //printf ("SEEK_CUR\n");
 		    f->_p = (f->_p + offset);
+		    f->_cnt = (f->_cnt - offset); 
 		    goto done;
 			break;
 
         case SEEK_END:
 		    //printf ("SEEK_END stream->_lbfsize=%d \n",stream->_lbfsize);
 		    f->_p = ((f->_base + f->_lbfsize) + offset); 
+		    f->_cnt = 0;
 		    goto done;
 			break;
 

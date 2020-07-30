@@ -22,6 +22,8 @@ long pathconf (const char *pathname, int name)
 } 
 
 
+//#todo:
+//OUT: ??
 off_t sys_lseek (int fd, off_t offset, int whence)
 {
     file *f;    
@@ -56,6 +58,7 @@ off_t sys_lseek (int fd, off_t offset, int whence)
         return -1; 
     }
     
+    // See: kstdio.c
     k_fseek ( (file *) f, (long) offset, (int) whence );
 
     return (off_t) ( f->_p - f->_base ); 

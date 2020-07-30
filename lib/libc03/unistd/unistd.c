@@ -1429,7 +1429,10 @@ void swab (const void *from, void *to, ssize_t n)
 off_t lseek (int fd, off_t offset, int whence)
 { 
     //debug_print ("lseek: [TODO]\n");
-    
+ 
+    // #isso muda o posicionamento dentro do arquivo lá no kernel.
+    // isso está certo, pois precisamos disso pra sabermos
+    //o tamanho do arquivo.
     return (off_t) gramado_system_call ( 603, 
                (unsigned long) fd,
                (unsigned long) offset,

@@ -2493,8 +2493,8 @@ long ftell (FILE *stream){
     
     }else{
 
-        fflush (stream);
-        
+
+        //fflush (stream);
         return (long) lseek ( fileno(stream) , 0, SEEK_CUR);    
     };
 
@@ -2813,13 +2813,12 @@ int fseek ( FILE *stream, long offset, int whence ){
     return 0;
     */
     
-    if ( (void*) stream == NULL )
-    {
+    if ( (void*) stream == NULL ){
         debug_print ("fseek: stream \n");
         return -1;
     }
-    
-    //fflush(stream);    
+ 
+
     off_t off = lseek( fileno(stream), offset, whence);
     if (off < 0){
         debug_print ("fseek: lseek fail \n");
@@ -2830,7 +2829,7 @@ int fseek ( FILE *stream, long offset, int whence ){
     //stream->error = 0;
     stream->have_ungotten = FALSE;
     stream->ungotten = 0;
-    return -1;
+    return off;
 }
 
 
