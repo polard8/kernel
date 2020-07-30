@@ -303,7 +303,7 @@ struct tty_d *CurrentTTY;
 
 
 //#define TTY_COUNT_MAX 256
-unsigned long ttyList[256]; 
+//unsigned long ttyList[256]; 
 
 
 // Get the tty pointer.
@@ -364,21 +364,6 @@ tty_write (
     char *buffer, 
     int n );
 
-
-int 
-tty_read_ttyList ( 
-    unsigned int channel, 
-    char *buffer, 
-    int nr );
-
-
-// O descritor seleciona uma tty em ttyList e 
-// escreve em tty->stdout->_base
-int 
-tty_write_ttyList ( 
-    unsigned int channel, 
-    char *buffer, 
-    int nr );
 
 
 int 

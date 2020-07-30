@@ -12,6 +12,11 @@
  
 int main ( int argc, char *argv[] )
 {
+	return 1;
+	
+
+    //#todo
+    //undefined references.
 
     /*
     char ____buf[512];
@@ -23,7 +28,7 @@ int main ( int argc, char *argv[] )
     }
     */
 
-	
+	/*
     
     int ____this_tty_id = -1;
     char buf2[128]; 
@@ -60,7 +65,7 @@ int main ( int argc, char *argv[] )
     
         //yield
     }
-    
+    */
 
     /*
     int nread=-1;

@@ -169,26 +169,12 @@ gde_extra_services (
     }
     
 
+    // deprecated
+    if (number == 268){ return NULL; }
 
+    // deprecated
+    if (number == 269){ return NULL; }
 
-    // read_ttyList em ring3 vai chamar isso.
-    // See: unistd.c 
-    if (number == 268)
-    {
-           // IN: fd, buf, count.         
-           return (void *) tty_read_ttyList ( (unsigned int) arg2,  //channel 
-                               (char *) arg3,                //buf
-                               (int) arg4 );                 //nr
-    }
-
-    // write_ttyList em ring3  vai chamar isso.
-    if (number == 269)
-    {
-        // IN: fd, buf, count.         
-        return (void *) tty_write_ttyList ( (unsigned int) arg2,  //channel 
-                            (char *) arg3,                //buf
-                            (int) arg4 );                 //nr
-    }
 
 
     // Create a terminal given the window.

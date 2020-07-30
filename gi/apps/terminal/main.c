@@ -88,6 +88,10 @@ void terminalInitSystemMetrics ();
 // que se conecta a esse via tty e nos envia uma mensagem.
 void test_tty_support(int fd)
 {
+    gws_debug_print("test_tty_support: [FIXME] undefined reference\n");
+    return;
+    
+    /*
     char buffer[32];
     int nread = 0;
 
@@ -125,7 +129,7 @@ void test_tty_support(int fd)
         //i++;
         //if(i>20) i=0;
     }
-    
+    */
    
     /*
     int nwrite = -1; // bytes escritos.

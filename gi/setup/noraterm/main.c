@@ -1577,7 +1577,7 @@ void *noratermProcedure (
                           ____this_tty_id );
 
 
-                    read_ttyList ( ____this_tty_id, __rbuf2, 32 );  
+                    //read_ttyList ( ____this_tty_id, __rbuf2, 32 );  
                     printf (__rbuf2);
                     printf("VK_F2: =)\n");
                     fflush(stdout);
@@ -1786,7 +1786,7 @@ void *noratermProcedure (
                 ____this_tty_id );
 
 
-            read_ttyList ( ____this_tty_id, __rbuf2, 32 );  
+            //read_ttyList ( ____this_tty_id, __rbuf2, 32 );  
             printf (__rbuf2);
             printf("444: =)\n");
             fflush(stdout);

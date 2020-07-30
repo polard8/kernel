@@ -447,9 +447,13 @@ __SendMessageToProcess (
 //
 
 
-void tty_test (void){
+void tty_test (void)
+{
 
-
+    debug_print("tty_test:[FIXME]\n");
+    return;
+    
+    /*
     // Virtual Console and tty.
     int __current_virtual_console = -1;
     int ____tty_id = -1;
@@ -505,6 +509,7 @@ void tty_test (void){
     //Lendo no tty do pai
     read_ttyList ( ____tty_id, __rbuf2, 32 );     
     printf (__rbuf2);
+    */
 }
 
 
@@ -512,6 +517,11 @@ void tty_test (void){
 //void xxx_tty_test(void);
 void xxx_tty_test(void)
 {
+
+    debug_print ("xxx_tty_test: [FIXME]\n");
+    return;
+    
+    /*
     int ____this_tty_id = -1;
     char buf[128]; 
     
@@ -535,6 +545,7 @@ void xxx_tty_test(void)
             //break;
         }
     }
+    */
 }
 
 

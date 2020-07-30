@@ -70,73 +70,6 @@ tty_write_from_of ( unsigned int fd,
 
 
 
-/*
- *************** 
- * tty_read_ttyList:
- *     It uses the ttyList[] index, NOT the fd in the process struct.
- * 
- */
-
-int 
-tty_read_ttyList ( 
-    unsigned int channel, 
-    char *buffer, 
-    int nr )
-{
-    struct tty_d *__tty;
-    
-    // Não leremos os Consoles virtuais 
-    if ( channel < 4 ){
-        printf ("tty_read_ttyList: invalid channel\n");
-        refresh_screen();
-        return -1;
-    }
-    
-     __tty = (struct tty_d *) ttyList[channel];
-
-    //#todo
-    //if ( (void *) __tty == NULL )
-        //return -1;
-
-     return (int) __tty_read ( (struct tty_d *) __tty, 
-                      (char *) buffer, 
-                      (int) nr );
-}
-
-
-/*
- *************** 
- * tty_write_ttyList:
- *     It uses the ttyList[] index, NOT the fd in the process struct.
- * 
- */
-
-int 
-tty_write_ttyList ( 
-    unsigned int channel, 
-    char *buffer, 
-    int nr )
-{
-
-    struct tty_d *__tty;
-    
-    // Não leremos os Consoles virtuais 
-    if ( channel < 4 ){
-        printf ("tty_write_ttyList: invalid channel\n");
-        refresh_screen();
-        return -1;
-    }
-    
-    __tty = (struct tty_d *) ttyList[channel];
-    
-    //#todo
-    //if ( (void *) __tty == NULL )
-        //return -1;
-        
-    return (int) __tty_write ( (struct tty_d *) __tty, 
-                     (char *) buffer, 
-                     (int) nr );
-}
 
 
 /*
@@ -1426,8 +1359,14 @@ struct ttydrv_d *get_tty_driver( int fd )
  *     pointer.
  */
 
-struct tty_d *tty_create (void) {
+struct tty_d *tty_create (void) 
+{
+    //#todo
+    // Não pegaremos mais o indice de uma lista global e sim 
+    // na lista de arquivos abertos pelo processo.
 
+
+/*
     struct tty_d *__tty;
     int i=0;
 
@@ -1628,6 +1567,8 @@ __ok_register:
 
         
     return (struct tty_d *) __tty;
+
+    */
 }
 
 
@@ -1795,7 +1736,11 @@ int ttyInit (int tty_id){
         //for (i=0; i<256; i++)
 	    //{ ttyList[i] = 0;}
 	
-	    ttyList[tty_id] = (unsigned long) CurrentTTY;
+	    
+	    // #bugbug
+	    // precisamos registrar na lista de arquivos abertos pelo processo. 
+	    
+	    //ttyList[tty_id] = (unsigned long) CurrentTTY;
 	       
 	       
 	    // More ?    
@@ -1815,11 +1760,14 @@ int tty_init_module (void){
     int i=0;
 
 
+
+    /*
     // Initialise the list.
     for (i=0; i<256; i++){
         ttyList[i] = 0;
     };
-
+    */
+    
 
     // ...
     

@@ -236,14 +236,6 @@ int pipe ( int pipefd[2] );
 
 
 
-
-//
-// ttyList
-//
-
-ssize_t write_ttyList (int fd, const void *buf, size_t count);
-ssize_t read_ttyList (int fd, const void *buf, size_t count);
-
 //
 // tty
 //
