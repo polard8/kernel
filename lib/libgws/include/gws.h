@@ -232,8 +232,8 @@ gws_send_message_to_thread (
 // Talvez vamos retonar o descritor
 // dado pelo servidor.
 
-void *
-gws_create_window ( 
+void *gws_create_window ( 
+    int fd,
     unsigned long type,        //1, Tipo de janela (popup,normal,...)
     unsigned long status,      //2, Estado da janela (ativa ou nao)
     unsigned long view,        //3, (min, max ...)

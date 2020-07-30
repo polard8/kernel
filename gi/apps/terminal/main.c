@@ -2125,11 +2125,17 @@ int main ( int argc, char *argv[] ){
      //#test
      //Creating a window using the libgws library.
      //Ok. it works.
-     __response_wid = gws_create_window_using_socket (client_fd,
+     //__response_wid = gws_create_window_using_socket (client_fd,
+     //                     WT_SIMPLE, 1, 1, "Terminal",
+     //                     100, 100, 480,320,
+     //                     0,0,COLOR_GRAY,COLOR_BLACK);
+
+    //#test
+     __response_wid = gws_create_window (client_fd,
                           WT_SIMPLE, 1, 1, "Terminal",
                           100, 100, 480,320,
                           0,0,COLOR_GRAY,COLOR_BLACK);
-
+                          
     // Saving the window id.
     Terminal.window_id = __response_wid;
  
@@ -2181,81 +2187,7 @@ int main ( int argc, char *argv[] ){
     debug_print ("terminal: bye\n"); 
     printf ("terminal: bye\n");
     return 0;
-
-
-
-
-    //
-    // ============== test start =======================
-    //
-   
-     
-    // #tet
-    // Let's try another loop;
-    // Let's call the shell and get input from the stdout.
-    
-    //
-    // Calling child
-    //
-    
-    //Precisamos de um loop aqui pra chamar o shell sempre que ele fechar.
-    __terminal_clone_and_execute ("true.bin"); 
-    //gws_clone_and_execute("true.bin");
-    
-    
-    // talvez precisamos esperar ...
-
-
-     // #bugbug
-     // Nesse teste o arquivo é aberto duas vezes ...
-     //não é o mesmo arquivo, é uma instância.
-
-    
-     
-     FILE *fp; 
-     fp = fopen ("gramado.txt", "w+" );
-     if(!fp){
-         printf("cant open\n");
-         return 1;
-     }
-     
-
-    int c=0;
-    while(1)
-    {
-        //testing stdin
-        fseek(fp, 0, SEEK_SET);   // seek back to beginning of file
-        //fprintf(fp,"terminal: Testing string ...\n");
-
-        // arquivo que o filho vai herdar.
-        c = fgetc(fp); 
-         
-        //if( c == EOF) break;
-        
-        if( c != EOF)
-        {
-            //_draw(client_fd,c); //#bugbug
- 
-           printf ("%c",c);
-           fflush(stdout);
-        }
-        //printf ("[EOF]\n");
-    }
-    //
-    // ============== test end =======================
-    //
-
-
-
-    //done
-
-    debug_print ("terminal: bye\n"); 
-    printf ("terminal: bye\n");
-
-
-    return 0;
 }
-
 
 
 
@@ -2386,12 +2318,12 @@ void terminalTerminal (){
 }
 
 
-void terminalInitSystemMetrics (){
-	
-	
+void terminalInitSystemMetrics(){
+
+
 	//Tamanho da tela. (full screen)
-	smScreenWidth = gws_get_system_metrics (1);
-	smScreenHeight = gws_get_system_metrics (2); 
+	smScreenWidth = gws_get_system_metrics(1);
+	smScreenHeight = gws_get_system_metrics(2); 
 	
 	//cursor
 	smCursorWidth = gws_get_system_metrics(3);
@@ -2445,16 +2377,17 @@ void terminalInitWindowLimits (){
 
     //full screen support
     wlFullScreenLeft = 0;
-    wlFullScreenTop = 0;
-    wlFullScreenWidth = smScreenWidth;
+    wlFullScreenTop  = 0;
+    wlFullScreenWidth  = smScreenWidth;
     wlFullScreenHeight = smScreenHeight;
 	
     //limite de tamanho da janela.
-    wlMinWindowWidth = smCharWidth * 80;
-    wlMinWindowHeight = smCharWidth * 25;
-    wlMaxWindowWidth = wlFullScreenWidth;
-    wlMaxWindowHeight = wlFullScreenHeight;	
-	
+    wlMinWindowWidth  = (smCharWidth * 80);
+    wlMinWindowHeight = (smCharWidth * 25);
+    wlMaxWindowWidth  = wlFullScreenWidth;
+    wlMaxWindowHeight = wlFullScreenHeight;
+
+
     //quantidade de linhas e colunas na área de cliente.
     wlMinColumns = 80;
     wlMinRows = 1;
@@ -2464,14 +2397,14 @@ void terminalInitWindowLimits (){
 	//dado em quantidade de linhas.
     textMinWheelDelta = 1;  //mínimo que se pode rolar o texto
     textMaxWheelDelta = 4;  //máximo que se pode rolar o texto	
-	textWheelDelta = textMinWheelDelta;
+    textWheelDelta = textMinWheelDelta;
 	//...
 }
 
 
 void terminalInitWindowSizes()
 {
-	
+
 //
 //  ## Window size ##
 //
@@ -2486,14 +2419,12 @@ void terminalInitWindowSizes()
 	wsWindowHeight = WINDOW_HEIGHT;
 	
 	
-	if ( wsWindowWidth < wlMinWindowWidth )
-	{
+	if ( wsWindowWidth < wlMinWindowWidth ){
 		wsWindowWidth = wlMinWindowWidth;
 	}
 	
-	if ( wsWindowHeight < wlMinWindowHeight )
-	{
-	    wsWindowHeight = wlMinWindowHeight;	
+	if ( wsWindowHeight < wlMinWindowHeight ){
+	    wsWindowHeight = wlMinWindowHeight;
 	}
 }
 
@@ -2503,7 +2434,7 @@ void terminalInitWindowPosition()
 	
 	//window position
 	wpWindowLeft = WINDOW_LEFT;
-	wpWindowTop = WINDOW_TOP;
+	wpWindowTop  = WINDOW_TOP;
 	
 	//wpWindowLeft = (unsigned long) ( (smScreenWidth - wsWindowWidth)/2 );
 	//wpWindowTop = (unsigned long) ( (smScreenHeight - wsWindowHeight)/2 );  	
@@ -2513,9 +2444,6 @@ void terminalInitWindowPosition()
 //
 // End.
 //
-
-
-
 
 
 
