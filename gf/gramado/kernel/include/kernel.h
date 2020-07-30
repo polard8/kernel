@@ -110,8 +110,8 @@ extern void do_executa_new_task (void);
 
 
 
-// kdrivers
-#include "console.h"
+//mudando la pra baixo, perto da tty;
+//#include "console.h"
 
 
 //
@@ -320,12 +320,19 @@ extern void do_executa_new_task (void);
 #include "kgws.h"
 
 
-// kdrivers (^)
-#include "ttyldisc.h"
-#include "ttydrv.h"
-#include "tty.h"
-#include "pty.h"
-#include "vt.h"
+// 
+// tty/
+//
+
+#include "tty/ttyldisc.h"
+#include "tty/ttydrv.h"
+#include "tty/tty.h"
+#include "tty/pty.h"
+#include "tty/vt.h"
+#include "tty/console.h"
+
+
+
 
 
 #include "i8042.h"

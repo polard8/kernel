@@ -1290,6 +1290,14 @@ void console_init_virtual_console (int n){
     //#bugbug
     //sempre que tentamos aumentar essa função encontramos problemas
     //de compilação.
+
+    // #test
+    // Cuidado, tivemos problemas de compilação nessa função
+    
+    //#todo
+    // Local mode flags.
+    //TTY[ConsoleIndex].termios.c_lflag = ECHO;
+
 }
 
 
