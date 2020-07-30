@@ -109,11 +109,6 @@ extern void do_executa_new_task (void);
 #include "klibc/kstdio.h"
 
 
-
-//mudando la pra baixo, perto da tty;
-//#include "console.h"
-
-
 //
 // klibc
 //
@@ -141,23 +136,20 @@ extern void do_executa_new_task (void);
 #include "intelmm.h"
 
 
-// kdrivers
-#include "display.h"
-
-
-//video
-#include "screen.h"
-#include "video.h"
-#include "virtcon.h"
-
-
-// kservers
-#include "fonts.h"
-
-#include "ascii.h" 
 
 
 
+// ws - window server, and beyond
+#include "ws/display.h"
+#include "ws/screen.h"
+#include "ws/video.h"
+#include "ws/fonts.h"
+#include "ws/ascii.h" 
+
+
+
+//tty
+#include "tty/virtcon.h"
 
 
 
@@ -178,9 +170,10 @@ extern void do_executa_new_task (void);
 #include "fs/vfs.h"
 
 
+// ws - window server, and beyond
+#include "ws/prompt.h"
+#include "ws/bmp2.h"
 
-#include "prompt.h"
-#include "bmp2.h"
 
 
 // hal
@@ -204,26 +197,35 @@ extern void do_executa_new_task (void);
 
 
 #include "serial.h"
-#include "mac.h"
+
+
+
+//todo: podemos mover isso de lugar para perto de net/
+#include "net/mac.h"
+
+
 
 #include "portsx86.h"
 
-// kdrivers
-#include "ata.h"
 
 
-// syssm
-#include "volume.h"
-#include "disk.h"       
-#include "storage.h"          
+// storage
+#include "storage/ata.h"
+#include "storage/volume.h"
+#include "storage/disk.h"       
+#include "storage/storage.h"          
+
+
 
 
 // kdrivers serial
 #include "serial2.h"
 
-// kdrivers ps2
-#include "ps2.h"
 
+
+// ws - window server, and beyond
+// ps2 controller.
+#include "ws/ps2.h"
 
 
 // kdrivers x86
@@ -234,25 +236,32 @@ extern void do_executa_new_task (void);
 
 
 #include "rtc.h"
-#include "floppy.h"
 
 
-//x
-#include "xproc.h"
+//storage
+#include "storage/floppy.h"
 
-//x
-#include "keyboard.h"
-#include "vk.h"
-#include "kbdabnt2.h"
-#include "ldisc.h"
 
-#include "ide.h"
+// ws - window server, and beyond
+#include "ws/xproc.h"
+#include "ws/keyboard.h"
+#include "ws/vk.h"
+#include "ws/kbdabnt2.h"
+#include "ws/ldisc.h"
+
+
+//storage
+#include "storage/ide.h"
+
+//pci
 #include "pci.h"
 
-#include "ahci.h"
-#include "sata.h"
+//storage
+#include "storage/ahci.h"
+#include "storage/sata.h"
 
 
+//usb bus.
 #include "usb.h"
 
 
@@ -290,34 +299,30 @@ extern void do_executa_new_task (void);
 #include "ps/mk.h"
 
 
+// ws - window server, and beyond
 
+#include "ws/kgwm.h"
+#include "ws/ws.h"
+#include "ws/window.h"
+#include "ws/menu.h"
+#include "ws/grid.h"
+#include "ws/bmp.h"
+#include "ws/line.h"
+#include "ws/terminal.h"
+#include "ws/guiconf.h"
 
-
-#include "kgwm.h"
-#include "ws.h"
-#include "window.h"
-#include "menu.h"
-#include "grid.h"
-#include "bmp.h"
-#include "line.h"
-#include "terminal.h"
-#include "guiconf.h"
-
-
-//
 // Security
-//
-
 #include "security/usession.h"
 #include "security/room.h"
 #include "security/desktop.h"
 #include "security/user.h"
 
+// ws - window server, and beyond
+#include "ws/logon.h"
+#include "ws/logoff.h"
+#include "ws/kgws.h"
 
 
-#include "logon.h"
-#include "logoff.h"
-#include "kgws.h"
 
 
 // 
@@ -332,12 +337,11 @@ extern void do_executa_new_task (void);
 #include "tty/console.h"
 
 
+// ws - window server, and beyond
+#include "ws/i8042.h"
+#include "ws/ps2mouse.h"
+#include "ws/ps2kbd.h"
 
-
-
-#include "i8042.h"
-#include "ps2mouse.h"
-#include "ps2kbd.h"
 
 
 //
@@ -395,13 +399,18 @@ extern void do_executa_new_task (void);
 #include "bank.h"      // Bank. database
 #include "x86mm.h"     // mm, memory manager support.
 
-// kservers
-#include "cursor.h"
+
+
+// ws - window server, and beyond
+#include "ws/cursor.h"
+
+
+
 #include "messages.h"
 #include "events.h"
-
 #include "object.h"
 #include "ss.h"
+
 
 // profiler
 #include "pints.h"
