@@ -55,8 +55,7 @@
 #include <gws.h>
 
 
-#include <gwm.h>
-
+#include <fileman.h>
 
 
 
@@ -88,24 +87,25 @@ int _getmessage_response(int fd);
 
 
 
-int gwm_init_globals(void)
+int fileman_init_globals(void)
 {
-    gws_debug_print("gwm_init_globals:\n");
+    gws_debug_print("fileman_init_globals:\n");
     
-    gScreenWidth = gws_get_system_metrics(1);
+    gScreenWidth  = gws_get_system_metrics(1);
     gScreenHeight = gws_get_system_metrics(2);
-    
+
     
     //...
     
     return 0;
 }
 
-int gwm_init_windows(void)
+
+int fileman_init_windows(void)
 {
     int i=0;
 
-    gws_debug_print("gwm_init_windows:\n");
+    gws_debug_print("fileman_init_windows:\n");
     
     for(i=0;i<WINDOW_COUNT_MAX;i++)
     {
@@ -182,6 +182,7 @@ int _getmessage_response(int fd)
 {
     unsigned long *message_buffer = (unsigned long *) &__buffer[0];   
     int n_reads = 0;    // For receiving responses.
+    int y=0;
 
     //
     // Waiting for response. ==================
@@ -196,9 +197,8 @@ int _getmessage_response(int fd)
     // #debug
     gws_debug_print ("gwm: Waiting ...\n");      
 
-    int y;
     for(y=0; y<15; y++)
-        gws_yield();   // See: libgws/
+        gws_yield();
 
 
     // #todo
@@ -242,7 +242,7 @@ response_loop:
         gws_debug_print ("gwm: recv fail.\n");
         printf ("gwm: recv fail.\n");
         printf ("Something is wrong with the socket.\n");
-        exit (1);
+        exit(1);
     }
 
 
@@ -260,15 +260,14 @@ response_loop:
     //#debug
     //if(msg!=0)
         //printf ("%c",long1); //printf ("{%d%c} ",msg,long1);
-        
-        
-        
+
+
+
+
     switch (msg){
 
-        //OK isso funcionou.
         case MSG_KEYDOWN:
-          //case 20:
-            //gws_debug_print ("MSG_KEYDOWN\n");
+            // ...
             switch (long1)
             {
                 //case 0:
@@ -290,15 +289,14 @@ response_loop:
                 // We need to send it to the client via file.
                 default:
                     //terminal_write_char(long1) #todo
-                    printf ("%c",long1);
-                    fflush(stdout);
+                    printf ("%c",long1); fflush(stdout);
                     goto process_event;
                     break;
             };
             break;
 
 
-        //case MSG_KEYUP:
+          //case MSG_KEYUP:
           case 21:  
             //gws_debug_print ("MSG_KEYUP\n");
             goto process_event;
@@ -426,15 +424,14 @@ process_event:
 // Loop de requests para o gws.
 int _loop(int fd)
 {
-	//while(___running){
+
     while(1){
         _getmessage_request(fd);
         _getmessage_response(fd);
-    }
+    };
+
     return 0; 
 }
-
-
 
 
 
@@ -713,9 +710,9 @@ int main ( int argc, char *argv[] ){
     // libgws
     // Create window using the client-side gui.
     gws_create_window_using_socket (client_fd,
-        WT_SIMPLE,1,1,"gwm-topbar",
-        0, 0, w, 32,
-        0,0,COLOR_GRAY, COLOR_GRAY);
+        WT_SIMPLE,1,1,"Fileman",
+        40, 40, 640, 320,
+        0, 0, COLOR_WHITE, COLOR_WHITE );
 
 
     //

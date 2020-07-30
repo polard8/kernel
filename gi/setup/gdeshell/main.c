@@ -2383,7 +2383,7 @@ do_compare:
 
     // mounted
     if ( gramado_strncmp( prompt, "mounted", 7 ) == 0 ){
-        gramado_system_call( 8500,0,0,0);
+        gramado_system_call(8500,0,0,0);
         goto exit_cmp;
     }
 
@@ -2392,7 +2392,7 @@ do_compare:
     if ( gramado_strncmp( prompt, "network", 7 ) == 0 )
     {
         // inicializa network
-        gramado_system_call( 968,0,0,0);
+        gramado_system_call(968,0,0,0);
         //loop de leitura de buffer
         network_test_buffer();
         goto exit_cmp;
