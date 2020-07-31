@@ -90,7 +90,7 @@ gws_draw_button (
 
         b->x = x;
         b->y = y;
-        b->width = width;
+        b->width  = width;
         b->height = height;
  
         b->color = color; 
@@ -195,8 +195,9 @@ gws_draw_button (
 	//
 	// ## bg ##
 	//
-	
-	rectBackbufferDrawRectangle ( x, y, width, height, color );
+
+    rectBackbufferDrawRectangle ( x, y, width, height, color );
+
 
 	//
 	// ## 4 bordas ##
@@ -236,8 +237,7 @@ gws_draw_button (
     unsigned long offset = ( ( (unsigned long) width - ( (unsigned long) tmp_size * (unsigned long) gcharWidth) ) / 2 );
 
 	// Button label
-    if (Selected == 1)
-    {
+    if (Selected == 1){
         dtextDrawString ( x +offset,y +8, COLOR_WHITE, string );
 
     }else{

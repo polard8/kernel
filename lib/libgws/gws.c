@@ -302,24 +302,11 @@ response_loop:
     
 process_reply:
 
-    // #test
-    //gws_debug_print ("gws: Testing close() ...\n"); 
-    //close (fd);
-
-    //gws_debug_print ("gwst: bye\n"); 
-    printf ("gws: Window ID %d \n", message_buffer[0] );
-    //printf ("gwst: Bye\n");
-    
-    // #todo
-    // Podemos usar a biblioteca e testarmos
-    // vários serviços da biblioteca nesse momento.
-
+    //#debug importnate
+    //printf ("gws: Window ID %d \n", message_buffer[0] );
 
     //OUT: wid
     return (int) message_buffer[0];
-    //return 0;
-
-
 
 //
 // Process an event.

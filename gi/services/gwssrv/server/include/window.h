@@ -989,13 +989,13 @@ createwDrawTitleBar (
 // In: style = estilo do frame.
 int 
 createwDrawFrame ( 
+    struct gws_window_d *parent,
     struct gws_window_d *window,
     unsigned long x,
     unsigned long y,
     unsigned long width,
     unsigned long height,
     int style );          
-
 
 
 void *
