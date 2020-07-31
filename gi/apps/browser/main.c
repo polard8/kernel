@@ -866,13 +866,33 @@ int main ( int argc, char *argv[] ){
     //browser_createwindow_request(client_fd, 80, 80, 480, 320, COLOR_PINK);
     //browser_createwindow_response(client_fd); 
 
+
+    //#todo: salvar em global
+    //por enquanto aqui
+    int main_window;
+    int client_window;
+    int toolbar_window;
+
+
     // libgws
-    // Create window using the client-side gui.
-    // Ok isso funcionou. 
-    gws_create_window_using_socket (client_fd,
+  
+    //main window
+    main_window = gws_create_window (client_fd,
         WT_SIMPLE,1,1,"Browser",
         40, 40, 640, 480,
         0,0,COLOR_GRAY, COLOR_GRAY);
+
+    // client window (White)
+    client_window = gws_create_window (client_fd,
+        WT_SIMPLE,1,1,"w1",
+        4, 40, 640-8, 480 - 40 - 4,
+        main_window,0,COLOR_WHITE, COLOR_WHITE);
+
+    //toolbar (gray)
+    toolbar_window = gws_create_window (client_fd,
+        WT_SIMPLE,1,1,"w2",
+        4, 4, 640-80, 32,
+        main_window,0,COLOR_PINK, COLOR_PINK);
 
 
     //loop

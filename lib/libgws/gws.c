@@ -39,6 +39,28 @@
 char __gws_message_buffer[512];
 
 
+//
+// prototyes (internals)
+//
+
+
+int 
+gws_createwindow_request (
+    int fd,
+    unsigned long left,
+    unsigned long top,
+    unsigned long width,
+    unsigned long height,
+    unsigned long bg_color,
+    unsigned long type,
+    unsigned long parent );
+    
+int gws_createwindow_response(int fd);
+
+
+
+
+
 // System call.
 void *
 gws_system_call ( 
@@ -101,16 +123,7 @@ int gws_initialize_library (void)
 //
 
 
-// create window support
-int 
-gws_createwindow_request (
-    int fd,
-    unsigned long left,
-    unsigned long top,
-    unsigned long width,
-    unsigned long height,
-    unsigned long bg_color,
-    unsigned long type );
+
 
 int 
 gws_createwindow_request (
@@ -120,7 +133,8 @@ gws_createwindow_request (
     unsigned long width,
     unsigned long height,
     unsigned long bg_color,
-    unsigned long type )
+    unsigned long type,
+    unsigned long parent )
 {
     // Isso permite ler a mensagem na forma de longs.
     unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];   
@@ -149,7 +163,7 @@ gws_createwindow_request (
     {
         // Create window    
         message_buffer[0] = 0;       // window. 
-        message_buffer[1] = 1001;    // msg. Create window.
+        message_buffer[1] = 1001;    // msg. Create window REQUEST!
         message_buffer[2] = 0;
         message_buffer[3] = 0;
         
@@ -161,6 +175,8 @@ gws_createwindow_request (
         message_buffer[8] = bg_color;  //xCOLOR_GRAY2; 
         message_buffer[9] = type;      //WT_SIMPLE;  //todo: type
          
+       //test
+        message_buffer[10] = parent; 
         //...
 
         // Write!
@@ -173,20 +189,17 @@ gws_createwindow_request (
            break;
     }
 
-
     return 0; 
 }
 
 
-
-
-//create window support.
-int gws_createwindow_response(int fd);
 //response
 int gws_createwindow_response(int fd)
 {
     unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];   
     int n_reads = 0;    // For receiving responses.
+    int y=0;
+
 
     //
     // Waiting for response. ==================
@@ -201,7 +214,6 @@ int gws_createwindow_response(int fd)
     // #debug
     gws_debug_print ("gwst: Waiting ...\n");      
 
-    int y;
     for(y=0; y<15; y++)
         gws_yield();   // See: libgws/
 
@@ -230,25 +242,21 @@ response_loop:
 
     //n_reads = read ( fd, __buffer, sizeof(__buffer) );
     n_reads = recv ( fd, __gws_message_buffer, sizeof(__gws_message_buffer), 0 );
-    
-    //if (n_reads<=0){
-    //     gws_yield(); 
-    //    goto response_loop;
-    //}
-    
-    // Se retornou 0, podemos tentar novamente.
-    if (n_reads == 0){
-         gws_yield(); 
-        goto response_loop;
-    }
-    
+
     // Se retornou -1 é porque algo está errado com o arquivo.
     if (n_reads < 0){
-        gws_debug_print ("gwst: recv fail.\n");
-        printf ("gwst: recv fail.\n");
+        gws_debug_print ("gws_create_window_response: recv fail.\n");
+        printf ("gws_create_window_response: recv fail.\n");
         printf ("Something is wrong with the socket.\n");
         exit (1);
     }
+
+    // Se retornou 0, podemos tentar novamente.
+    if (n_reads == 0){
+        gws_yield(); 
+        goto response_loop;
+    }
+
 
 
     //
@@ -263,18 +271,15 @@ response_loop:
 
         case GWS_SERVER_PACKET_TYPE_REQUEST:
             gws_yield ();
+            gws_debug_print ("gws_create_window_response: [FIXME] packet\n");
             goto response_loop;
             break;
             
-        // Reply!
-        case GWS_SERVER_PACKET_TYPE_REPLY:
-            goto process_reply;
-            break;
-            
-        case GWS_SERVER_PACKET_TYPE_EVENT:
-            goto process_event;
-            //goto response_loop;
-            break;
+        // reply
+        case GWS_SERVER_PACKET_TYPE_REPLY: goto process_reply; break;
+        
+        // event
+        case GWS_SERVER_PACKET_TYPE_EVENT: goto process_event; break;
             
         case GWS_SERVER_PACKET_TYPE_ERROR:
             gws_debug_print ("gws: SERVER_PACKET_TYPE_ERROR\n");
@@ -282,10 +287,12 @@ response_loop:
             //exit (-1);
             break;
         
-        default:
-            goto response_loop;
+        default: 
+            gws_debug_print ("gws_create_window_response: [FIXME] default\n");
+            goto response_loop; 
             break; 
     };
+
 
 //
 // Process reply.
@@ -307,7 +314,12 @@ process_reply:
     // Podemos usar a biblioteca e testarmos
     // vários serviços da biblioteca nesse momento.
 
-    return 0;
+
+    //OUT: wid
+    return (int) message_buffer[0];
+    //return 0;
+
+
 
 //
 // Process an event.
@@ -343,7 +355,7 @@ gws_create_window_using_socket (
     //#todo
     // use more arguments.
     gws_createwindow_request(fd, 
-        x, y, width, height, color, type);
+        x, y, width, height, color, type, parentwindow);
         
     gws_createwindow_response(fd); 
     
@@ -469,7 +481,8 @@ void gws_reboot(void)
 
 // Talvez vamos retonar o descritor
 // dado pelo servidor.
-void *gws_create_window ( 
+int
+gws_create_window ( 
     int fd,
     unsigned long type,        //1, Tipo de janela (popup,normal,...)
     unsigned long status,      //2, Estado da janela (ativa ou nao)
@@ -494,11 +507,11 @@ void *gws_create_window (
     //#todo
     // use more arguments.
     gws_createwindow_request(fd, 
-        x, y, width, height, color, type);
+        x, y, width, height, color, type, parentwindow);
         
-    gws_createwindow_response(fd); 
+    int wid = (int) gws_createwindow_response(fd); 
     
-    return NULL;
+    return (int) wid;
 }
 
 
@@ -666,6 +679,24 @@ gws_refresh_rectangle(
    return -1;
 }
 */
+
+
+// constructor
+// Create the structure, given only a type.
+/*
+int gws_window ( int fd, int type );
+int gws_window ( int fd, int type )
+{
+    int wid;
+    wid = gws_create_window_socket (client_fd,
+        WT_SIMPLE,1,1,"Browser",
+        40, 40, 640, 480,
+        0,0,COLOR_GRAY, COLOR_GRAY);
+
+    return wid;
+}
+*/
+
 
 //
 // End.

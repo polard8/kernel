@@ -528,7 +528,7 @@ gwsProcedure (
             break;
 
 
-        // Create Window.
+        // Create Window REQUEST!
         // Usará o buffer global
         // case MSG_CREATE_WINDOW:
         case 1001:
@@ -632,7 +632,14 @@ void create_background (void)
         return;
     }
     
-    //#todo: register
+    //#test
+    int id = -1;
+    id = gwsRegisterWindow ( __bg_window );
+
+    if (id<0){
+        gde_debug_print ("create_background: Couldn't register window\n");
+        //return -1;
+    }
 }
 
 
@@ -953,9 +960,9 @@ int main (int argc, char **argv){
 
 
         //gde_clone_and_execute ("gwm.bin");    // window manager
-        gde_clone_and_execute ("terminal.bin");  
+        //gde_clone_and_execute ("terminal.bin");  
         //gde_clone_and_execute ("fileman.bin");  
-        //gde_clone_and_execute ("browser.bin"); 
+        gde_clone_and_execute ("browser.bin"); 
         //gde_clone_and_execute ("s2.bin");    //#bugbug        
         //gde_clone_and_execute ("s3.bin");    //#bugbug        
         // ...        
@@ -1138,9 +1145,13 @@ int serviceCreateWindow (void){
 
     unsigned long x, y, w, h, color, type;
 
-
     
-    gde_debug_print("gwssrv: serviceCreateWindow:\n");
+    int pw=0;
+    struct gws_window_d *parent;
+
+
+
+    gde_debug_print("serviceCreateWindow: serviceCreateWindow:\n");
     //printf ("serviceCreateWindow:\n");
 
     x     = message_address[4]; 
@@ -1151,15 +1162,42 @@ int serviceCreateWindow (void){
     type  = message_address[9];
 
 
-    // #todo
-    // type passed by message.
+    //#test
+    //parent window ID.
+    pw = message_address[10];   
+    
+    //Limits
+    if(pw<0 ||pw>WINDOW_COUNT_MAX)
+    {
+        gde_debug_print("serviceCreateWindow: parent window id fail\n");
+        pw=0;
+        exit(1); //test
+    }
+    
+    //get parent window structure pointer.
+    parent = (struct gws_window_d *) windowList[pw];    
 
-     //__mywindow = (struct gws_window_d *) createwCreateWindow ( WT_OVERLAPPED, 
-     __mywindow = (struct gws_window_d *) createwCreateWindow ( type, 
+    //ajuste improvidsado
+    if( (void *) parent == NULL ){
+        gde_debug_print("serviceCreateWindow: parent window struct fail\n");
+        parent = gui->screen;
+        exit(1); //test
+    }
+
+
+    //draw
+    //__mywindow = (struct gws_window_d *) createwCreateWindow ( type, 
+    //                                          1, 1, "No-Name",  
+    //                                          x, y, w, h,   
+    //                                          gui->screen, 0, 
+    //                                          COLOR_PINK, color ); 
+
+    __mywindow = (struct gws_window_d *) createwCreateWindow ( type, 
                                               1, 1, "No-Name",  
                                               x, y, w, h,   
-                                              gui->screen, 0, 
+                                              parent, 0, 
                                               COLOR_PINK, color ); 
+
 
     if ( (void *) __mywindow == NULL ){
        gde_debug_print ("gwssrv: createwCreateWindow fail\n");

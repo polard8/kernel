@@ -315,8 +315,7 @@ createwDrawFrame (
 //12 - color (bg) (para janela simples)
 
 
-void *
-createwCreateWindow2 ( 
+void *createwCreateWindow2 ( 
     unsigned long type, 
     unsigned long status, 
     unsigned long view, 
@@ -1154,9 +1153,35 @@ createwCreateWindow2 (
 			if (window->focus == 0)
 			{ __tmp_color = xCOLOR_GRAY2; }    //mais claro
 
-        rectBackbufferDrawRectangle ( window->left +1, window->top +1, 
-            window->width +1 +1, window->height +1 +1, 
-            __tmp_color );             
+            
+            //ok funciona
+            //rectBackbufferDrawRectangle ( window->left +1, window->top +1, 
+            //    window->width +1 +1, window->height +1 +1, 
+            //    __tmp_color ); 
+            
+            //test
+            //remeber: the first window do not have a parent.
+            if ( (void*) Parent == NULL )
+            { 
+                gde_debug_print ("createwCreateWindow2: [Shadow] Parent"); 
+                //exit(1); 
+                rectBackbufferDrawRectangle ( 
+                    (window->left +1), 
+                    (window->top +1), 
+                    (window->width +1 +1), 
+                    (window->height +1 +1), 
+                    __tmp_color ); 
+            }
+            
+            if ( (void*) Parent != NULL ){
+                rectBackbufferDrawRectangle ( 
+                    (Parent->left   + window->left +1), 
+                    (Parent->top    + window->top +1), 
+                    (window->width +1 +1), 
+                    (window->height +1 +1), 
+                    __tmp_color ); 
+            }
+
         }
 
         // ??
@@ -1216,13 +1241,31 @@ createwCreateWindow2 (
         // 
         // * Draw!
         //
-         
-        rectBackbufferDrawRectangle ( window->left, window->top, 
-            window->width, window->height, window->bg_color );
 
+        //#bugbug
+        //Remember: The first window do not have a parent.
+        if ( (void*) Parent == NULL ){ 
+            gde_debug_print ("createwCreateWindow2: [Background] Parent\n"); 
+            //exit(1); 
+            rectBackbufferDrawRectangle ( 
+                window->left, 
+                window->top, 
+                window->width, 
+                window->height, 
+                window->bg_color );
+        }  
+        
+        if ( (void*) Parent != NULL ){
+            rectBackbufferDrawRectangle ( 
+                (Parent->left   + window->left), 
+                (Parent->top    + window->top), 
+                (window->width), 
+                (window->height), 
+                window->bg_color );
+        }
         //?? More ...
     }
-    
+
     
     //gde_message_box (3,"xxx","xxxx");
 	//while(1){}
