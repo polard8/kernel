@@ -73,11 +73,9 @@ struct gws_window_d *__mywindow;    // Generic, for tests.
 // No início desse array fica o header.
 unsigned long next_response[32];
 
-
+//
 // Prototypes.
-void create_background (void);
-void create_taskbar (void);
-
+//
 
 int 
 gwsProcedure ( 
@@ -85,16 +83,22 @@ gwsProcedure (
     int msg, 
     unsigned long long1, 
     unsigned long long2 );
- 
 
+
+void InitGraphics(void);
+void create_background (void);
 int service_drain_input (void);
 int serviceCreateWindow ( void );
 int servicepixelBackBufferPutpixel (void);
 int servicelineBackbufferDrawHorizontalLine (void);
 int serviceDrawChar(void);
 int serviceDrawText(void);
-int serviceDrawButton (void); //??
+int serviceDrawButton (void); 
+int serviceRefreshRectangle(void);
+void xxx_test_load_icon(void);
+void xxx_test_load_bmp(void);
 // ...
+
 
 
 //??
@@ -442,6 +446,7 @@ gwsProcedure (
 
     int my_pid = -1;
 
+
     // #debug
     debug_print ("gwssrv: gwsProcedure\n");
   
@@ -511,17 +516,15 @@ gwsProcedure (
             break;
 
         // Hello!
+        // Draw text inside a window.
+        // #bugbug: O window server não tem esse ponteiro de janela.
+        // ele até aceitaria um handle.
         case 1000:
             gde_debug_print ("gwssrv: Message number 1000\n");
-            
-            // Draw text inside a window.
-            // #bugbug: O window server não tem esse ponteiro de janela.
-            // ele até aceitaria um handle.
             dtextDrawText ( (struct gws_window_d *) __mywindow,
                 long1, long2, COLOR_GREEN,
-                "gwssrv: Hello friend. This is the Window Server!" );
-                
-            gws_show_backbuffer ();
+                "gwssrv: Hello friend. This is the Gramado Window Server!");
+            gws_show_backbuffer();
             break;
 
 
@@ -534,7 +537,7 @@ gwsProcedure (
 
         // backbuffer putpixel
         case 1002:
-            servicepixelBackBufferPutpixel(); //pixel
+            servicepixelBackBufferPutpixel(); 
             break;
 
         // backbuffer draw horizontal line
@@ -542,19 +545,15 @@ gwsProcedure (
             servicelineBackbufferDrawHorizontalLine();
             break;
     
-        //Draw char
+        // Draw char
         case 1004:
             gde_debug_print ("gwssrv: Message number 1004\n");
             serviceDrawChar();
-                       
-            //dtextDrawText ( (struct gws_window_d *) __mywindow,
-                //100, 100, COLOR_GREEN, "DRAW CHAR" );
-            //gws_show_backbuffer();
            break;
 
         // Draw text
+        // #todo: tem que testar isso!!!
         case 1005:
-           //#todo: tem que testar isso!!!
            gde_debug_print ("gwssrv: Message number 1005\n");
            serviceDrawText();
            break;
@@ -569,20 +568,15 @@ gwsProcedure (
             break;
  
  
-        case 2001:
-            break;
-             
-        case 2002:
-            break;
-
-        case 2003:
-            break;
+        //case 2001: break;
+        //case 2002: break;
+        //case 2003: break;
 
         // ...
 
 
         // Disconnect.
-        // showdown.
+        // shutdown.
         // Um cliente quer se desconectar.
         case 2010:
             gde_debug_print ("gwssrv: [2010] Disconnect\n");
@@ -591,16 +585,17 @@ gwsProcedure (
         // Refresh screen 
         // refresh screen using kgws service. 
         case 2020:
-            gws_show_backbuffer ();
+            gws_show_backbuffer();
             break;
              
 
         // Refresh rectangle ... 
         case 2021:
+            serviceRefreshRectangle();
             break;
 
         // ...
-             
+
         
         default:
             gde_debug_print ("gwssrv: Default message number\n");
@@ -623,15 +618,14 @@ void create_background (void)
     unsigned long w = gws_get_device_width();
     unsigned long h = gws_get_device_height();
 
-    gde_debug_print ("gwssrv: create_background\n");
 
+    gde_debug_print ("gwssrv: create_background\n");
 
     __bg_window = (struct gws_window_d *) createwCreateWindow ( WT_SIMPLE, 
                                          1, 1, "gwssrv-bg",  
                                          0, 0, w, h,   
                                          gui->screen, 0, 
                                          COLOR_BACKGROUND, COLOR_BACKGROUND );    
-
 
     if ( (void *) __bg_window == NULL ){
         gde_debug_print ("gwssrv: __bg_window fail\n");  
@@ -642,57 +636,7 @@ void create_background (void)
 }
 
 
-void create_taskbar (void)
-{
-    unsigned long w = gws_get_device_width();
-    unsigned long h = gws_get_device_height();
 
-    //
-    // Bar
-    //
-
-    gde_debug_print ("gwssrv: create_taskbar:\n");
-
-    __taskbar_window = (struct gws_window_d *) createwCreateWindow ( WT_SIMPLE, 
-                                               1, 1, "gwssrv-taskbar",  
-                                               0, 0, w, 40,   
-                                               gui->screen, 0, 
-                                               xCOLOR_GRAY1, xCOLOR_GRAY1 );
-    
-    if ( (void *) __taskbar_window == NULL ){
-        gde_debug_print ("gwssrv: __taskbar_window fail\n");  
-    }
-    //#todo: register
-
-    //
-    // Button
-    //
-    
-    // #test
-    // Create button.
-
-    gde_debug_print ("gwssrv: Create the button on task bar\n");
-
-    __taskbar_button = (struct gws_window_d *) createwCreateWindow ( WT_BUTTON, 
-                                               1, 1, "button",  
-                                               2, 2, 100, 36,   
-                                               __taskbar_window, 0, 
-                                               xCOLOR_GRAY1, GWS_COLOR_BUTTONFACE3 );
-    
-    if ( (void *) __taskbar_button == NULL ){
-        gde_debug_print ("gwssrv: task bar button fail\n");  
-    }
-    //#todo: register
-
-    /*
-    gws_draw_button ("Button 1", 1, 1, 1, 
-        __taskbar_window->left +2, 
-        __taskbar_window->top  +2, 
-        100, 36, GWS_COLOR_BUTTONFACE3 );
-    */
-}
-
-void xxx_test_load_icon(void);
 void xxx_test_load_icon(void)
 {
 	/*
@@ -713,7 +657,6 @@ void xxx_test_load_icon(void)
 }
 
 
-void xxx_test_load_bmp(void);
 void xxx_test_load_bmp(void)
 {
     //
@@ -821,35 +764,30 @@ void xxx_test_load_bmp(void)
     //
 }
 
-//internal
-void InitGraphics(void)
-{
+
+void InitGraphics(void){
+
     int __init_status = -1;
-    
+
+
     debug_print("gwssrv: InitGraphics\n");
     
     __init_status = gwsInit();
 
-    if(__init_status != 0)
-    {
+    if (__init_status != 0){
         debug_print("gwssrv: InitGraphics [PANIC] Couldn't initialize the graphics\n");
         printf("gwssrv: InitGraphics [PANIC] Couldn't initialize the graphics\n");
         while(1);
     }
 
+
     if( (void*) gui->screen != NULL){
         dtextDrawText ( (struct gws_window_d *) gui->screen,
             200, 80, COLOR_RED, "gwssrv: Initializing graphics" );
     }
+
     
     create_background();
-    
-    // #bugbug
-    // The ws will not create the top bar.
-    // The wm will create the top bar.
-    // The ws will not create frames or controls.
-    // The wm will create frames and controls.
-    //create_taskbar();
 
 
     // #test
@@ -864,10 +802,8 @@ void InitGraphics(void)
     gws_show_backbuffer();            
     
     debug_print("gwssrv: InitGraphics done\n");
-
-    //#debug
-        //while(1){};
 }
+
 
 
 /*
@@ -1017,13 +953,17 @@ int main (int argc, char **argv){
 
 
         //gde_clone_and_execute ("gwm.bin");    // window manager
-        //gde_clone_and_execute ("terminal.bin");  
-        gde_clone_and_execute ("fileman.bin");  
+        gde_clone_and_execute ("terminal.bin");  
+        //gde_clone_and_execute ("fileman.bin");  
         //gde_clone_and_execute ("browser.bin"); 
-        //gde_clone_and_execute ("gws.bin"); // client: serve para enviar comandos para o servidor.
         //gde_clone_and_execute ("s2.bin");    //#bugbug        
         //gde_clone_and_execute ("s3.bin");    //#bugbug        
         // ...        
+
+
+        // client: serve para enviar comandos para o servidor.
+        //vai ser um cliente sem janelas.
+        //gde_clone_and_execute ("gws.bin"); 
 
 
 
@@ -1198,14 +1138,15 @@ int serviceCreateWindow (void){
 
     unsigned long x, y, w, h, color, type;
 
+
     
     gde_debug_print("gwssrv: serviceCreateWindow:\n");
     //printf ("serviceCreateWindow:\n");
 
-    x=message_address[4];  //x
-    y=message_address[5];  //y
-    w=message_address[6];  //w
-    h=message_address[7];  //h
+    x     = message_address[4]; 
+    y     = message_address[5]; 
+    w     = message_address[6]; 
+    h     = message_address[7]; 
     color = message_address[8];
     type  = message_address[9];
 
@@ -1269,19 +1210,34 @@ int servicepixelBackBufferPutpixel(void)
 
     unsigned long x,y,color;
       
-    x=message_address[4];  // x
-    y=message_address[5];  // y
-    color=message_address[6];  // color
+    x     = message_address[4];  // x
+    y     = message_address[5];  // y
+    color = message_address[6];  // color
 
     pixelBackBufferPutpixel ( color, x, y );
-
 
     gws_show_backbuffer (); // for debug
     return 0;
 }
 
 
+int serviceRefreshRectangle(void)
+{
 
+	//o buffer é uma global nesse documento.
+    unsigned long *message_address = (unsigned long *) &__buffer[0];
+
+    unsigned long left,top,width,height;
+      
+    left   = message_address[4];  
+    top    = message_address[5];  
+    width  = message_address[6];  
+    height = message_address[7];  
+
+    gws_refresh_rectangle (left,top,
+        width,height);
+    return 0;
+}
 
 
 int servicelineBackbufferDrawHorizontalLine (void)
@@ -1297,11 +1253,13 @@ int servicelineBackbufferDrawHorizontalLine (void)
     y  = message_address[5];   // 
     x2 = message_address[6];  // 
     color = message_address[7];
-   
-   lineBackbufferDrawHorizontalLine ( x1, y, x2, color );
 
-   gws_show_backbuffer(); // for debug   
-   return 0;
+
+
+    lineBackbufferDrawHorizontalLine ( x1, y, x2, color );
+    
+    gws_show_backbuffer(); // for debug   
+    return 0;
 }
 
 
@@ -1456,16 +1414,19 @@ int serviceDrawText(void)
 // Usaremos a função create window para desenhar botões.
 int serviceDrawButton(void)
 {
-	//o buffer é uma global nesse documento.
+    //O buffer é uma global nesse documento.
     unsigned long *message_address = (unsigned long *) &__buffer[0];
 
+    unsigned long x=0;
+    unsigned long y=0;
+    unsigned long width=0;
+    unsigned long height=0;
 
-    unsigned long x,y,width,height;
-      
-    x      = message_address[4];  // 
-    y      = message_address[5];  // 
-    width  = message_address[6];  // 
-    height = message_address[7];  //
+
+    x      = message_address[4]; 
+    y      = message_address[5]; 
+    width  = message_address[6]; 
+    height = message_address[7]; 
     // ...
 
 
@@ -1473,15 +1434,16 @@ int serviceDrawButton(void)
         x, y, width, height, GWS_COLOR_BUTTONFACE3 );
 
 
-   gws_show_backbuffer(); // for debug   
+   // for debug 
+   gws_show_backbuffer(); 
    return 0;
 }
 
 
-
+//yield thread.
 void gwssrv_yield(void)
 {
-    gramado_system_call (265,0,0,0); //yield thread.
+    gramado_system_call(265,0,0,0);
 }
 
 

@@ -710,7 +710,7 @@ int main ( int argc, char *argv[] ){
     // libgws
     // Create window using the client-side gui.
     gws_create_window_using_socket (client_fd,
-        WT_SIMPLE,1,1,"Fileman",
+        WT_SIMPLE,1,1,"File Manager",
         40, 40, 640, 320,
         0, 0, COLOR_WHITE, COLOR_WHITE );
 

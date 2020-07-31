@@ -541,14 +541,18 @@ unsigned long gws_get_system_metrics (int index){
 }
 
 
+// #bugbug
+// isso deveria se chamar 'get next system message'.
+// Porque o evento pegaremos do window server e não
+// diretamente do kernel.
 // Get next event
-struct gws_event_d *gws_next_event(void)
+struct gws_event_d *gws_next_system_message(void)
 {
 
     unsigned long message_buffer[5];   
 
 
-    gws_debug_print("gws_next_event:[TODO]\n");
+    gws_debug_print("gws_next_system_message:[TODO]\n");
 
     
     if( (void *) CurrentEvent == NULL )
@@ -593,9 +597,6 @@ struct gws_event_d *gws_next_event(void)
      message_buffer[2] = 0;
      message_buffer[3] = 0;
      //...
-
-    
-
 
     return (struct gws_event_d *) CurrentEvent;
 }
@@ -642,7 +643,29 @@ void gws_exit_critical_section ()
        0, 0, 0 );
 }
 
+/*
+//refresh raw rectangle
+//refresh raw rectangle
+int 
+gws_refresh_rectangle(
+    unsigned long left,
+    unsigned long top,
+    unsigned long width,
+    unsigned long height);
+int 
+gws_refresh_rectangle(
+    unsigned long left,
+    unsigned long top,
+    unsigned long width,
+    unsigned long height)
+{
 
+   //todo
+   //call request function (it uses 2021 service)
+   //call response function
+   return -1;
+}
+*/
 
 //
 // End.

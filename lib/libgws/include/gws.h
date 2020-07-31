@@ -274,16 +274,15 @@ void gws_yield(void);
 
 int gws_clone_and_execute ( char *name );
 
-
 unsigned long gws_get_system_metrics (int index);
 
-
-
 // Get next event
-struct gws_event_d *gws_next_event(void);
+struct gws_event_d *gws_next_system_message(void);
 
-void gws_enter_critical_section ();
-void gws_exit_critical_section ();
+void gws_enter_critical_section();
+void gws_exit_critical_section();
+
+
 
 
 //
