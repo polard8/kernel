@@ -399,55 +399,80 @@ int ____bfill (FILE *stream){
     // struct
     if ( (void *) stream == NULL )
     {
-        debug_print("____bfill: struct\n");
-        printf ("____bfill: struct\n");
+        debug_print ("____bfill: [FAIL] struct \n");
+        printf      ("____bfill: [FAIL] struct \n");
+        
+        stream->_cnt = 0;
         return (int) (-1);
 
     }else{
 
-        // Check something!
+        // Check buffer size.
+        if ( stream->_lbfsize != BUFSIZ )
+        {
+            debug_print ("____bfill: [FAIL] _lbfsize \n");
+            printf      ("____bfill: [FAIL] _lbfsize \n");
+
+            stream->_cnt = 0; 
+            return (int) (-1);
+        }
         // ...
     };
 
 
-    // buffer
-    if ( stream->_lbfsize != BUFSIZ ){
-        debug_print("____bfill: _lbfsize fail\n");
-        printf ("____bfill: _lbfsize fail\n");
-        return (int) (-1);
-    }
-
-
     //
-    // # Read!
+    // == Read file ============================
     //
-    
+
+    // #importante:
+    // Colocaremos no offset e não na base. 
+    // Pois esse é o local onde __getc vai pegar.
+    // Só podemos colocar o quanto ainda cabe no buffer.
+ 
+    // O tamanho do buffer menos o quanto ja foi consumido.
+    size_t how_much = ( stream->_lbfsize - (stream->_p - stream->_base) );
+
+    if ( how_much <= 0 || how_much >= stream->_lbfsize )
+    {
+        debug_print ("____bfill: [BUGBUG] buffer fail\n");
+        printf      ("____bfill: [BUGBUG] buffer fail\n");
+        
+        stream->_cnt = 0;
+        return EOF;
+    } 
+
     nbyte = (int) read ( fileno(stream), 
-                     stream->_p, 
-                     stream->_lbfsize );
+                     stream->_p,            // Offset 
+                     how_much );    
 
-    
-    if (nbyte<0){
-        debug_print("____bfill: [DANGER] read fail\n");
-        printf ("____bfill: [DANGER] read fail\n");
-        return -1;
-    }
-
-
-    if (nbyte == 0){
-        debug_print ("____bfill: [DEBUG] eof? empty file ?\n");
-        printf ("____bfill: [DEBUG] eof? empty file ?\n");
+    // Read fail.
+    if (nbyte<0)
+    {
+        debug_print ("____bfill: [FAIL] read fail!\n");
+        printf      ("____bfill: [FAIL] read fail!\n");
+        
+        stream->_cnt = 0;
         return EOF;
     }
 
+    // Couldn't read.
+    if (nbyte == 0)
+    {
+        debug_print ("____bfill: [FAIL] read fail. Zero bytes\n");
+        printf      ("____bfill: [FAIL] read fail. Zero bytes\n");
+        
+        stream->_cnt = 0;
+        return 0;
+        //return EOF;
+    }
 
-    // OK. 
-    // Read funcionou. 
-    // :^)
-
+    // Read funcionou.
+    // O buffer tem um novo conteúdo colocado à partir do offset.
+    // Atualizamos o quanto falta para acabar o buffer.
     
-    // Estamos cheios.
-    stream->_cnt = BUFSIZ;
+    stream->_cnt = how_much;    // NOT BUFSIZ!
+
+    // Retornamos a quentidade lida.
     
     return (int) nbyte;
 }
@@ -474,95 +499,115 @@ int __getc ( FILE *stream ){
     int ch = 0;
     int nreads = 0;
 
+    // What?
+    // Vamos ler do buffer da stream, em ring3.
 
-    // struct
-    if ( (void *) stream == NULL ){
-        debug_print ("__getc: stream struct fail\n");
-        printf ("__getc: stream struct fail\n");
+    if ( (void *) stream == NULL )
+    {
+        debug_print ("__getc: [FAIL] stream \n");
+        printf      ("__getc: [FAIL] stream \n");
         return EOF;   
     }
 
 
-	// Se acabou o buffer!!
-	// cnt decrementou e chegou a zero.
-	// Não há mais caracteres disponíveis entre 
+	// Se acabou o buffer, ou estava vazio.
+	// O _cnt decrementou e chegou a zero.
+	// Significa que: Não há mais caracteres disponíveis entre 
 	// stream->_ptr e o tamanho do buffer.
+	// Então vamos encher o buffer em ring3 dessa stream.
 
     if ( stream->_cnt <= 0 )
     {
-        debug_print("__getc: [EMPTY BUFFER?] _cnt\n");
-        
-        // #todo:
-        // We need this routine to call getc() after fopen().
-  
+        debug_print("__getc: [DEBUG] ring3 buffer is empty\n");
+
         // Coloque bytes no buffer dessa stream.
         nreads = (int) ____bfill(stream);
-       //nreads = read (fileno(stream), stream->_p, 1 );
 
-        // fail.
-        if (nreads <= 0){
-            debug_print ("__getc: [BUFFER?] ____bfill fail\n");
+        // Se falhou ou se nada foi lido.
+        if (nreads <= 0)
+        {
+            debug_print ("__getc: [DEBUG] ____bfill fail\n");
+            printf      ("__getc: [DEBUG] ____bfill fail\n");
+            
             stream->_flags = (stream->_flags | _IOEOF); 
             stream->_cnt = 0;
+            
             return EOF;
         }
-        
+
         // Ok
-        // Temos bytes no buffer.
-        // Então vamos pegar um.
+        // Temos bytes no buffer dessa stream. Então vamos pegar um.
+        // #importante: Eles foram colocados no offset e não na base.
         
         ch = (int) *stream->_p;
+        
+        // Atualiza.
         stream->_p++;
         stream->_cnt--;
-    
+
+        // Retorna o buffer que pegamos do buffer em ring3.
         return (int) ch;
     }
 
-
-    //
-    // Ok. 
-    // Vamos ler o buffer, porque ele está cheio.
-    //
 
     // Se o ponteiro de leitura for inválido.
     // Não podemos acessar um ponteiro nulo ... 
     // no caso endereço.
     
-    if ( stream->_p == 0 ){
-        debug_print ("__getc: [BUFFER POINTER] stream struct fail\n");
-        printf ("__getc: stream struct fail\n");
+    if ( stream->_p == 0 )
+    {
+        debug_print ("__getc: [BUGBUG] invalid offset\n");
+        printf      ("__getc: [BUGBUG] invalid offset\n");
+        
+        //stream->_base = stream->_p;
+        
         return EOF;
     }
 
+
     //
-    // # Read!
+    // == Read ring3 buffer ====================
     //
+
+
+    // Ok. 
+    // Vamos ler o buffer, porque ele está cheio.
+
+
+    // have ungotten ?
+    // Pegamos o ungotten.
+    // não mexemos nos contadores.
     
-    
-    // #test
-    // have ungotten ??
     if ( stream->have_ungotten == TRUE )
     {
-        // Pegamos o ungotten.
         ch = (int) stream->ungotten;
         
-        // não mexemos nos contadores.
-        //stream->_p++;
-        //stream->_cnt--;
-        
         stream->have_ungotten = FALSE;
-        
-        return (int) ch;
-    }
-    
-    // Pega o char no posicionamento absoluto do arquivo.
-    // Ajust file.
-        
-    ch = (int) *stream->_p;
-    stream->_p++;
-    stream->_cnt--;
 
-    return (int) ch;
+        return (int) ch;
+    
+    
+    // Do NOT have forgotten!
+    }else{
+
+        // Pega o char no posicionamento absoluto do arquivo.
+        // Ajust file.
+        // Return the char.
+        
+        ch = (int) *stream->_p;
+        
+        stream->_p++;
+        stream->_cnt--;
+
+        return (int) ch;
+    };
+
+    // #bugbug
+    // FAIL!
+
+    debug_print ("__getc: [BUGBUG] Unexpected return\n");
+    printf      ("__getc: [BUGBUG] Unexpected return\n");
+    return EOF;
 }
 
 

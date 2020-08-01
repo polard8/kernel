@@ -75,6 +75,39 @@ int TEST_PRINTF2(void);
 int TEST_PRINTF3(void);
 
 
+/*
+ * Reads a command line.
+ */
+static int readline(char *line, int length, FILE *stream)
+{
+	int fd;   /* File descriptor.                */
+	int size; /* # of characters left in buffer. */
+	char *p;  /* Write pointer.                  */
+
+	fd = fileno(stream);
+	size = length;
+	p =  line;
+
+    while (size > 0)
+    {
+		unsigned char ch;
+		
+		/* Nothing read. */
+		//if (read(fd, &ch, 1) != 1)
+			//return (-1);
+
+        ch = fgetc(stream);
+
+        if( ch==-1) exit(1);
+        
+        if( ch == '\n' ){ *p++ = '\n'; return ch; }
+
+       *p++ = ch;
+        
+        size--;
+    }
+}
+
 
 
 /*
@@ -106,12 +139,13 @@ int main (int argc, char *argv[]){
    
 //loop:
     
-    printf("$: "); fflush(stdout);
-    fseek(stdin, 0, SEEK_SET);   
-    size_t size = ftell(stderr);
-    printf (">>>> size %d \n",size);
-    fseek(stdin, 0, SEEK_SET);   
+    //printf("$: "); fflush(stdout);
+    //fseek(stdin, 0, SEEK_SET);   
+    //size_t size = ftell(stderr);
+    //printf (">>>> size %d \n",size);
+    //fseek(stdin, 0, SEEK_SET);   
     
+    /*
     int i=0;
     for(i=0;i<10;i++){
         int c = getc(stdin);
@@ -125,8 +159,44 @@ int main (int argc, char *argv[]){
         if (c==0)
             printf("0"); fflush(stdout);
     };
+    */
     
+
+    char char_buffer[2];
+    char line_buffer[128];
+    char *str;
+    int ch=0;
+    int i=0;
+    int nreads = 0;
     
+    fseek(stdin, 0, SEEK_SET); 
+    
+    char_buffer[0] = 0;
+    line_buffer[0] = 0;
+    
+    while(1){
+
+        fseek(stdin, 0, SEEK_SET); 
+    
+        //leia 1.
+        nreads = read( fileno(stdin), line_buffer, 128);
+    
+        // Se não lemos o byte
+        if (nreads > 0)
+        {
+            printf("Line={%s}",line_buffer); 
+            printf("\n");
+            fflush(stdout);
+            
+            if ( strncmp ( line_buffer, "exit", 4 ) == 0 )
+            {
+                exit(0);
+            } 
+            //...
+        }
+      };    
+
+
     //goto loop;
     while(1);
 

@@ -147,7 +147,7 @@ void test_tty_support(int fd)
     */
 }
 
-
+//f4
 void send_again()
 {
     fseek(stdin, 0, SEEK_SET); 
@@ -161,12 +161,30 @@ void send_again()
     write(fileno(stdout),prompt, 10);//#bugbug sizeof(prompt)); 
     write(fileno(stderr),prompt, 10);//#bugbug sizeof(prompt)); 
 
-    fseek(stdin, 0, SEEK_SET); 
-    fseek(stdout, 0, SEEK_SET); 
-    fseek(stderr, 0, SEEK_SET); 
+    //fseek(stdin, 0, SEEK_SET); 
+    //fseek(stdout, 0, SEEK_SET); 
+    //fseek(stderr, 0, SEEK_SET); 
 
+    int ii=0;
+    prompt_pos = 0;
+    for(ii=0;ii<32;ii++) {prompt[ii]=0;}
 }
 
+
+/*
+void send_one_char(void)
+{
+    int i=0;
+
+    fseek(stdin, 0, SEEK_SET);
+    write(fileno(stdin), prompt, 8);
+    
+    prompt_pos = 0;
+    for(i=0;i<8;i++) {prompt[i]=0;}
+}
+*/
+
+//f2
 void test_standard_stream(int fd)
 {
     char buffer[4096];
@@ -205,23 +223,33 @@ void test_standard_stream(int fd)
     fseek(stdout, 0, SEEK_SET); 
     fseek(stderr, 0, SEEK_SET); 
 
+
+    input('\n');
+    input('\0');
+    //input(-1);
+
     //#bugbug
     //Não podemos escrever usando o tamanho do buffer
     //porque o arquivo é menor que isso.
-    write(fileno(stdin), prompt, 10);//#bugbug sizeof(prompt));    
-    write(fileno(stdout),prompt, 10);//#bugbug sizeof(prompt)); 
-    write(fileno(stderr),prompt, 10);//#bugbug sizeof(prompt)); 
+    write(fileno(stdin), prompt, 20);//#bugbug sizeof(prompt));    
+    write(fileno(stdout),prompt, 20);//#bugbug sizeof(prompt)); 
+    write(fileno(stderr),prompt, 20);//#bugbug sizeof(prompt)); 
 
-    fseek(stdin, 0, SEEK_SET); 
-    fseek(stdout, 0, SEEK_SET); 
-    fseek(stderr, 0, SEEK_SET); 
+    //fseek(stdin, 0, SEEK_SET); 
+    //fseek(stdout, 0, SEEK_SET); 
+    //fseek(stderr, 0, SEEK_SET); 
 
+
+
+    int ii=0;
+    prompt_pos = 0;
+    for(ii=0;ii<32;ii++) {prompt[ii]=0;}
 
     gramado_system_call ( 900, 
       (unsigned long) "tprintf.bin", 0, 0 );
 
     return;
-    while(1);
+    //while(1);
     
 
 
@@ -1092,7 +1120,7 @@ response_loop:
         //printf ("%c",long1); //printf ("{%d%c} ",msg,long1);
 
     //char *c;
-
+    
     switch (msg){
 
         // message from child
@@ -1124,7 +1152,9 @@ response_loop:
                     tputc ((int) fd, (int) '\n', (int) 1);
                     input('\n');
                     input('\0');
-                    prompt_pos = 0;
+                    
+                    send_again();
+                    
                     break;
                   
                 //case VK_TAB:
@@ -1295,14 +1325,14 @@ process_reply:
     //close (fd);
 
     //gws_debug_print ("terminal: bye\n"); 
-    printf ("terminal: Window ID %d \n", message_buffer[0] );
+//    printf ("terminal: Window ID %d \n", message_buffer[0] );
     //printf ("terminal: Bye\n");
     
     // #todo
     // Podemos usar a biblioteca e testarmos
     // vários serviços da biblioteca nesse momento.
 
-    return 0;
+    return message_buffer[0];
 
 //
 // Process an event.
