@@ -621,6 +621,57 @@ void _hello(int fd)
 }
 
 
+/*
+//internal
+void scan_windows(int fd)
+{
+    int max=0;  //how many windows.
+    int wList[1024];
+    int wid=0;
+    int tail=0;
+    
+    max = gws_window_list(fd);
+    
+    for(i=0; i<max; i++){
+
+        //get the window id of a given index.
+        wid = gws_is_window(fd,i);    
+        if ( wid >= 0 && wid < 1024 ){
+            wList[tail] = wid;
+            tail++;
+            if(tail > 1024){
+                gws_debug_print("fail\n");
+                return;
+            }
+        }
+    };
+}
+*/
+
+/*
+void draw_client( struct wm_client_d *c);
+void draw_client( struct wm_client_d *c)
+{
+    if ( (void*) c == NULL ) return;
+    
+    if ( c == c_topbar )
+    {
+        //todo
+        return;
+    }
+
+    if ( c == c_taskbar )
+    {
+        //todo
+        return;
+    }
+
+    // draw title window
+    // draw title
+}
+*/
+
+
 // Testing new main.
 int main ( int argc, char *argv[] ){
 
@@ -704,19 +755,105 @@ int main ( int argc, char *argv[] ){
     _hello(client_fd);
 
 
-   
-    //
-    // Topbar
-    //
-
-
-    // libgws
-    // Create window using the client-side gui.
-    gws_create_window_using_socket (client_fd,
+    //provisorio
+    int topbar_window=-1;
+    int taskbar_window=-1;
+    int button1_window=-1;   
+    
+    int tester_window=-1;
+    int tester_title_window=-1;
+    int tester_button=-1;
+    
+    
+    //topbar
+    topbar_window = gws_create_window (client_fd,
         WT_SIMPLE,1,1,"gwm-topbar",
         0, 0, w, 32,
         0,0,COLOR_GRAY, COLOR_GRAY);
 
+    //taskbar
+    taskbar_window = gws_create_window (client_fd,
+        WT_SIMPLE,1,1,"gwm-taskbar",
+        0, (h-32), w, 32,
+        topbar_window,0,COLOR_GRAY, COLOR_GRAY);
+
+     // button
+     button1_window = gws_create_window (client_fd,
+         WT_BUTTON,1,1,"gwm-button",
+         2, 2, 100, 32,
+         taskbar_window,0,COLOR_GRAY, COLOR_GRAY);
+    
+    //
+    // Tester
+    // 
+    
+    //tester
+    tester_window = gws_create_window (client_fd,
+        WT_SIMPLE,1,1,"gwm-tester",
+        200, 200, 320, 110,
+        0,0, COLOR_PINK, COLOR_PINK);
+        
+    //tester title window
+    tester_title_window = gws_create_window (client_fd,
+        WT_SIMPLE,1,1,"gwm-tester-title",
+        200, 200-32, 320, 32,
+        0,0, COLOR_BLUE, COLOR_BLUE);
+
+
+    //tester title window
+    tester_button = gws_create_window (client_fd,
+       WT_BUTTON,1,1,"x", //#bugbug: pagefault. the size of the string overflows the button size.
+       2, 2, 100, 24,
+       tester_title_window, 0, COLOR_RED, COLOR_RED);
+     
+
+    // == clients =====================
+
+
+    // Topbar
+    gws_debug_print ("gwm: Create c_topbar client\n");
+    c_topbar = (struct wm_client_d *) malloc ( sizeof(struct wm_client_d) );
+    if( (void *)c_topbar == NULL){
+        gws_debug_print ("gwm: c_topbar fail\n");
+        exit(1);
+    
+    }else{
+        c_topbar->window = topbar_window;
+        c_topbar->title_window = -1;  //todo;
+        wmclientList[0] = (unsigned long) c_topbar;
+    };
+
+
+    // Taskbar
+    gws_debug_print ("gwm: Create c_taskbar client\n");
+    c_taskbar = (struct wm_client_d *) malloc ( sizeof(struct wm_client_d) );
+    if( (void *)c_taskbar == NULL){
+        gws_debug_print ("gwm: c_taskbar fail\n");
+        exit(1);
+    
+    }else{
+         c_taskbar->window = taskbar_window;
+         c_taskbar->title_window = -1;  //todo 
+         wmclientList[1] = (unsigned long) c_taskbar;
+    };
+
+
+    // Tester
+    gws_debug_print ("gwm: Create c_tester client\n");
+    c_tester = (struct wm_client_d *) malloc ( sizeof(struct wm_client_d) );
+    if( (void *)c_tester == NULL){
+        gws_debug_print ("gwm: c_tester fail\n");
+        exit(1);
+    
+    }else{
+         c_tester->window = tester_window;
+         c_tester->title_window = -1;  //todo 
+         wmclientList[2] = (unsigned long) c_tester;
+    };
+
+
+    gws_debug_print ("gwm: draw done!\n");
+    //while(1){}
 
     //
     // Loop

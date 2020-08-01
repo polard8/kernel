@@ -1459,7 +1459,8 @@ sys_accept (
     // Ao fim devemos retornar o descritor do socket selecionado
     // na lista de conexões pendentes.
 
-    debug_print ("sys_accept:\n");
+    // #debug
+    //debug_print ("sys_accept:\n");
 
     // fd
     // ?? Esse é o socket do servidor.

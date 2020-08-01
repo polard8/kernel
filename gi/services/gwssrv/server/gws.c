@@ -36,9 +36,15 @@ void gwssrv_wait_message(void)
 
 void gws_show_backbuffer(void)
 {
+
     // #debug
-    // Using the kernel service.
+    // [Deprecated] Using the kernel service.
     // gde_show_backbuffer();
+
+    // #todo:
+    // Create this flag. 
+    // if (!paint_ready) return;
+
 
     if( (void *) gui->screen == NULL ){
         debug_print("gws_show_backbuffer: [PANIC] screen window fail\n");
@@ -80,7 +86,7 @@ int gwssrv_init_globals(void)
     SavedBPP = (unsigned long) gde_get_system_metrics(9);
 
 
-
+    //background_color = xCOLOR_GRAY3;
    
     //...
 
@@ -97,6 +103,8 @@ int gwssrv_init_globals(void)
  */
 //int gwsInit (void){
 int gwsInit (){
+
+    //paint_ready = FALSE;
 
 
     // Initializing globals.
@@ -205,8 +213,11 @@ int gwsInit (){
     // #kgws.
     // Isso usa o kernel.
     // #todo: Acho que nessa hora ja temos uma rotina própria válida.
-    gde_show_backbuffer();
 
+    //paint_ready = TRUE;
+    
+    gde_show_backbuffer();
+    
     return 0;
 }
 
