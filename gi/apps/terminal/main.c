@@ -1253,6 +1253,17 @@ response_loop:
                     break;
                    
                    
+                case VK_F9:
+                    gws_draw_text (
+                        (int) fd,             // fd,
+                        (int) 0,              // window id,
+                        (unsigned long) 30,    // left,
+                        (unsigned long) 30,    // top,
+                        (unsigned long) COLOR_BLUE,
+                        "Terminal: [F9] Testing gws_draw_text");
+                     break;
+                   
+                   
                  //...
                     
                 default:

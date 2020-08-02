@@ -238,7 +238,14 @@ gws_draw_char (
     unsigned long color,
     unsigned long c );
     
-    
+int 
+gws_draw_text (
+    int fd, 
+    int window,
+    unsigned long x,
+    unsigned long y,
+    unsigned long color,
+    char *string );
 
 // Talvez vamos retonar o descritor
 // dado pelo servidor.

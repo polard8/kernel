@@ -502,6 +502,12 @@ gwsProcedure (
                     gde_debug_print ("gwssrv: F4 [EXIT] Exiting the server ...\n");
                     running = 0;
                     break;
+                    
+                    
+                case VK_F9:
+                    gde_debug_print ("gwssrv: F9\n");
+                    //gws_draw_text(
+                    break;
 
                 // ...
                   
@@ -1423,7 +1429,7 @@ int serviceDrawText(void)
     unsigned long y;
     unsigned long color;
     
-    char *text_buffer;    // #todo
+
 
 
     // #debug
@@ -1437,7 +1443,18 @@ int serviceDrawText(void)
     x         = message_address[5];
     y         = message_address[6]; 
     color     = message_address[7];
-    //text_buffer =    //#todo
+
+
+    //size 256 bytes
+    unsigned char *text_buffer = (unsigned char *) &message_address[MSG_OFFSET_LONGSTRING];  
+   
+    int s = sizeof(text_buffer);
+   
+    if(s<0 || s>= 256)
+    {
+        gde_debug_print ("gwssrv: serviceDrawText [DEBUG]   SIZE \n");
+        exit(1);
+    }
    
    //
    // Draw
@@ -1449,9 +1466,15 @@ int serviceDrawText(void)
     
     //#test
     // Usando a janela screen por enquanto.
+    
     dtextDrawText ( (struct gws_window_d *) gui->screen,
         x, y, color, 
         "text-test" );
+        
+    //dtextDrawText ( (struct gws_window_d *) gui->screen,
+        //x, y, color, 
+        //(unsigned char *) &message_address[MSG_OFFSET_LONGSTRING] );
+
 
    gws_show_backbuffer (); // for debug   
    
