@@ -267,7 +267,7 @@ gws_create_window (
     unsigned long color );     //12, Color (bg) (para janela simples).
 
 
-void *
+int
 gws_create_window_using_socket (
     int fd, 
     unsigned long type,        //1, Tipo de janela (popup,normal,...)

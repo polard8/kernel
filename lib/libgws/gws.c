@@ -49,7 +49,7 @@ char __gws_message_buffer[512];
 //
 
 int 
-gws_createwindow_request (
+__gws_createwindow_request (
     int fd,
     unsigned long left,
     unsigned long top,
@@ -58,7 +58,7 @@ gws_createwindow_request (
     unsigned long bg_color,
     unsigned long type,
     unsigned long parent );
-int gws_createwindow_response(int fd);
+int __gws_createwindow_response(int fd);
 
 
 //
@@ -67,14 +67,14 @@ int gws_createwindow_response(int fd);
 
 
 int 
-gws_drawchar_request (
+__gws_drawchar_request (
     int fd,
     int window_id,
     unsigned long left,
     unsigned long top,
     unsigned long color,
     unsigned long c );
-int gws_drawchar_response(int fd);
+int __gws_drawchar_response(int fd);
 
 
 //
@@ -82,14 +82,14 @@ int gws_drawchar_response(int fd);
 //
 
 int 
-gws_drawtext_request (
+__gws_drawtext_request (
     int fd,
     int window_id,
     unsigned long left,
     unsigned long top,
     unsigned long color,
     char *string );
-int gws_drawtext_response(int fd);
+int __gws_drawtext_response(int fd);
 
 
 //
@@ -155,17 +155,10 @@ int gws_initialize_library (void)
     return 0;
 }
 
-// #todo
-// Criar a função gws_create_window usando as funções:
-// gws_createwindow_request e gws_createwindow_response
-//
-
-
-
 
     
 int 
-gws_drawchar_request (
+__gws_drawchar_request (
     int fd,
     int window_id,
     unsigned long left,
@@ -231,7 +224,7 @@ gws_drawchar_request (
 
 
 //response
-int gws_drawchar_response(int fd)
+int __gws_drawchar_response(int fd)
 {
     unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];   
     int n_reads = 0;    // For receiving responses.
@@ -387,7 +380,7 @@ gws_draw_char (
     int response =0;
 
     gws_debug_print("gws_draw_char: request\n");
-    gws_drawchar_request (
+    __gws_drawchar_request (
         (int) fd,             // fd,
         (int) window,         // window id,
         (unsigned long) x,    // left,
@@ -396,7 +389,7 @@ gws_draw_char (
         (unsigned long) c );
 
     gws_debug_print("gws_draw_char: response\n");
-    response = gws_drawchar_response((int) fd);  
+    response = __gws_drawchar_response((int) fd);  
 
     gws_debug_print("gws_draw_char: done\n");
     return (int) response;
@@ -408,7 +401,7 @@ gws_draw_char (
 //
 
 int 
-gws_drawtext_request (
+__gws_drawtext_request (
     int fd,
     int window_id,
     unsigned long left,
@@ -495,7 +488,7 @@ gws_drawtext_request (
 
 
 //response
-int gws_drawtext_response(int fd)
+int __gws_drawtext_response(int fd)
 {
     unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];   
     int n_reads = 0;    // For receiving responses.
@@ -650,7 +643,7 @@ gws_draw_text (
     int response =0;
 
     gws_debug_print("gws_draw_text: request\n");
-    gws_drawtext_request (
+    __gws_drawtext_request (
         (int) fd,             // fd,
         (int) window,         // window id,
         (unsigned long) x,    // left,
@@ -659,7 +652,7 @@ gws_draw_text (
         (char *) string );
 
     gws_debug_print("gws_draw_text: response\n");
-    response = gws_drawtext_response((int) fd);  
+    response = __gws_drawtext_response((int) fd);  
 
     gws_debug_print("gws_draw_text: done\n");
     return (int) response;
@@ -670,12 +663,8 @@ gws_draw_text (
 
 
 
-
-
-
-
 int 
-gws_createwindow_request (
+__gws_createwindow_request (
     int fd,
     unsigned long left,
     unsigned long top,
@@ -743,7 +732,7 @@ gws_createwindow_request (
 
 
 //response
-int gws_createwindow_response(int fd)
+int __gws_createwindow_response(int fd)
 {
     unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];   
     int n_reads = 0;    // For receiving responses.
@@ -869,9 +858,7 @@ process_event:
 
 
 
-// Talvez vamos retonar o descritor
-// dado pelo servidor.
-void *
+int
 gws_create_window_using_socket (
     int fd, 
     unsigned long type,        //1, Tipo de janela (popup,normal,...)
@@ -890,12 +877,12 @@ gws_create_window_using_socket (
 
     //#todo
     // use more arguments.
-    gws_createwindow_request(fd, 
+    __gws_createwindow_request(fd, 
         x, y, width, height, color, type, parentwindow);
         
-    gws_createwindow_response(fd); 
+    int response = (int) __gws_createwindow_response(fd); 
     
-    return NULL;
+    return (int) response;
 }    
     
     
@@ -1042,10 +1029,10 @@ gws_create_window (
 
     //#todo
     // use more arguments.
-    gws_createwindow_request(fd, 
+    __gws_createwindow_request(fd, 
         x, y, width, height, color, type, parentwindow);
         
-    int wid = (int) gws_createwindow_response(fd); 
+    int wid = (int) __gws_createwindow_response(fd); 
     
     return (int) wid;
 }
