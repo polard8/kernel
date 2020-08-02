@@ -18,17 +18,13 @@
  */
 
 int strcmp (char *s1, char *s2){
-	
-    int i;
+
+    int i=0;
 
 	for ( i=0; s1[i] == s2[i]; i++ )
 	{
-		if (s1[i] == '\0') 
-		{
-			return 0;
-		}
+		if (s1[i] == '\0') { return 0; }
 	};
-
 
 	return ( (int) (s1[i] - s2[i]) );
 }

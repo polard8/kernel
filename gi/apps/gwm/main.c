@@ -49,11 +49,8 @@
 #include <sys/socket.h>
 #include <packet.h>
 
-
-
 // The client-side library.
 #include <gws.h>
-
 
 #include <gwm.h>
 
@@ -61,8 +58,20 @@
 
 
 // #test
-// Tentando deixar o buffer aqui e aproveitar em mais funções.
-char __buffer[512];
+#define MSG_OFFSET_SHORTSTRING  64
+#define SHORTSTRING_SIZE        64
+#define MSG_OFFSET_LONGSTRING  128
+#define LONGSTRING_SIZE        256
+// ...
+
+// O buffer para  as mensagens recebidas via socket.
+#define MSG_BUFFER_SIZE 512
+char __buffer[MSG_BUFFER_SIZE];   
+
+
+
+
+
 
 #define IP(a, b, c, d) (a << 24 | b << 16 | c << 8 | d)
 

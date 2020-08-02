@@ -25,9 +25,9 @@ extern unsigned long SavedBootMode;
  * set_up_color:
  *     Configura cor padrão para o sistema. */
 
-void set_up_color (unsigned long color){   
-	
-	g_system_color = (unsigned long) color;	
+void set_up_color (unsigned long color)
+{   
+    g_system_color = (unsigned long) color;
 }
 
 
@@ -44,8 +44,9 @@ void set_up_color (unsigned long color){
  */
 
 void 
-set_up_text_color ( unsigned char forecolor, 
-                    unsigned char backcolor )
+set_up_text_color ( 
+    unsigned char forecolor, 
+    unsigned char backcolor )
 {
     g_char_attrib = (backcolor << 4) | (forecolor & 0x0F);
 }
@@ -101,9 +102,9 @@ int init (){
 
     //Selecionando modo de vídeo.	
 
-    if (SavedBootMode == 1)
-    {
+    if (SavedBootMode == 1){
         VideoBlock.useGui = 1;
+
     }else{
         VideoBlock.useGui = 0;
     };

@@ -336,6 +336,8 @@ void terminal_write_char (int fd, int c)
     // Testing draw a char in a window.
     // Isso funciona. Precisamos das rotinas do noraterm
     // pra lidar com caracteres ... o x e o y.
+    
+    /*
     terminal_drawchar_request (
         (int) fd,             // fd,
         (int) 0,              // window id,
@@ -345,8 +347,20 @@ void terminal_write_char (int fd, int c)
         (unsigned long) c );
 
     terminal_drawchar_response((int) fd);  
-
-
+    */
+    
+    
+    //Testing libgws: OK
+    
+    gws_draw_char (
+        (int) fd,             // fd,
+        (int) 0,              // window id,
+        (unsigned long) x,    // left,
+        (unsigned long) y,    // top,
+        (unsigned long) COLOR_WHITE,
+        (unsigned long) c );
+    
+        
     // Coloca no buffer de linhas e colunas.
     terminalInsertNextChar ( (char) c ); 
     

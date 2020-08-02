@@ -2,8 +2,8 @@
  * File: loader.c
  *
  * Descrição:
- *     Rotinas para carregar o Kernel, os programas do sistema e os arquivos 
- * de inicialização.
+ *     Rotinas para carregar o Kernel, os programas do sistema e os 
+ * arquivos de inicialização.
  *
  * Obs: Por enquanto o módulo loader somente carrega imagens do tipo PE. (M$)
  * @todo: Incluir suporte a imgens do tipo ELF.
@@ -12,7 +12,7 @@
  *     + load_kernel: Carrega o KERNEL.BIN.
  *     + load_files: 
  *
- * Históry:
+ * History:
  *     2015 - Created by Fred Nora.
  *     2016 - Revision.
  *     ...
@@ -52,15 +52,15 @@ void updateProgressBar();
  * load_kernel: 
  *     Carrega o KERNEL.BIN na memória. 
  */
+
+    // Address.
+    // pa = 0x00100000.
+    // va = 0xC0000000.
  
 int load_kernel (){
 
     int Status = -1;
 
-    // Address.
-    // pa = 0x00100000.
-    // va = 0xC0000000.
-    
     unsigned long kernel_pa = KERNEL_ADDRESS;  
     unsigned long kernel_va = KERNEL_VA;      
 
@@ -122,11 +122,9 @@ int load_kernel (){
 	// Check for .ELF file. 0x7f 0x45 0x4c 0x46 (.ELF)	
 
     if ( kernel[0] != 0x7F || 
-         kernel[1] != 'E' || 
-         kernel[2] != 'L' || 
-         kernel[3] != 'F' )
+         kernel[1] != 'E' || kernel[2] != 'L' || kernel[3] != 'F' )
     {
-        printf ("load_kernel fail: %s Validation\n", kernel_name );  
+        printf ("load_kernel: [FAIL] %s ELF image validation\n", kernel_name );  
         goto fail;
     }
 

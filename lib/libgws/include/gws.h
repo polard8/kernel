@@ -228,6 +228,17 @@ gws_send_message_to_thread (
 
 
 
+//draw a char
+int 
+gws_draw_char (
+    int fd, 
+    int window,
+    unsigned long x,
+    unsigned long y,
+    unsigned long color,
+    unsigned long c );
+    
+    
 
 // Talvez vamos retonar o descritor
 // dado pelo servidor.

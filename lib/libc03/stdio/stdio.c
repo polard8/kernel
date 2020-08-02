@@ -617,38 +617,57 @@ int __putc (int ch, FILE *stream){
     //assert (stream);
     //assert (stream->_w < stream->_lbfsize);
     
-    if ( (void *) stream == NULL ){   
-       debug_print( "__putc: stream\n");
+    if ( (void *) stream == NULL )
+    {
+       debug_print("__putc: [FAIL] stream \n");
+       printf     ("__putc: [FAIL] stream \n");
        return -1;
     } 
 
+    //#bugbug
+    // O buffer precisa já estar inicializado.
+    
     //if (stream->_w > stream->_lbfsize)
-    if (stream->_w > BUFSIZ){   
-       debug_print( "__putc: overflow\n");
+    if (stream->_w > BUFSIZ)
+    {   
+       debug_print("__putc: [FAIL] Overflow\n");
+       printf     ("__putc: [FAIL] Overflow\n");
+       stream->_cnt = 0;
        return -1;
     } 
-    
+
+    // Coloca no buffer.
+ 
     stream->_base[stream->_w++] = ch;
 
-    //#bugbug: _cnt++ ???
+    // #bugbug: 
+    // _cnt++ ?
 
-    if (stream->_w >= BUFSIZ){
+    if (stream->_w >= BUFSIZ)
+    {
+        debug_print("__putc: [BUGBUG] Overflow 2\n");
+        printf     ("__putc: [BUGBUG] Overflow 2\n");
+        stream->_cnt = 0;
         fflush (stream);
         return ch;
     }
-    
+
+
     //if (stream->_flags == _IONBF || (stream->_flags == _IOLBF && ch == '\n'))
-    if ( ch == '\n'){ 
-        fflush (stream);
+    if ( ch == '\n')
+    { 
+        fflush(stream);
         return ch;
     }
 
 
     //if (stream->eof || stream->error)
         //return EOF;
-    
+ 
+ 
     return ch;
 }
+
 
 
 // don't change it
@@ -865,7 +884,7 @@ int fclose (FILE *stream){
 FILE *fopen ( const char *filename, const char *mode ){
 
     FILE *__stream;   // Return this pointer.
-    int fd;           // File descriptor.  
+    int fd=0;         // File descriptor.  
     int flags=0;      // flags
     
     // mode #todo
@@ -5197,10 +5216,15 @@ void stdioInitialize (){
     stdout->_lbfsize = BUFSIZ;
     stderr->_lbfsize = BUFSIZ;    
 
-    // cnt    
-    stdin->_cnt  = 0;//BUFSIZ;
-    stdout->_cnt = 0;// BUFSIZ;
-    stderr->_cnt = 0;// BUFSIZ;    
+    // cnt (Funciona)
+    //stdin->_cnt  = 0;
+    //stdout->_cnt = 0;
+    //stderr->_cnt = 0;    
+
+    //#test Cuidado!
+    stdin->_cnt  = BUFSIZ;
+    stdout->_cnt = BUFSIZ;
+    stderr->_cnt = BUFSIZ;    
 
 
     stdin->_w  = 0;
@@ -5265,6 +5289,10 @@ int unix_get (int ifile)
     
     //printf ("$");
     //fflush(stdout);
+    
+    //#todo
+    //if (ifile<0){return -1;}    
+    
 
     if(--__unix_get_nread)
     {
@@ -5273,19 +5301,23 @@ int unix_get (int ifile)
 
     if (__unix_get_nread = read (ifile, __unix_get_buf, 512, 0 ) )
     {
-        if(__unix_get_nread < 0)goto err;
+        if (__unix_get_nread < 0) { goto err; }
         
         ibuf = __unix_get_buf;
-        return (*ibuf++);
+        
+        return (int) (*ibuf++);
     }
 
     __unix_get_nread = 1;
+    
     return (-1);
 
+
 err:
-  __unix_get_nread = 1;
-  printf ("unix_get: read error\n");
-  return (-1);
+    __unix_get_nread = 1;
+    
+    printf ("unix_get: [FAIL] read error\n");
+    return (-1);
 }
 
 

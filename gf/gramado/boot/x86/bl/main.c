@@ -40,6 +40,97 @@ void BlLoadKernel ();
 void BlSetupPaging ();
 
 
+void
+blShowMenu(void)
+{
+    int i=0;
+
+
+    g_cursor_x = 0;
+    g_cursor_y = 0;
+    clear_backbuffer(); //black
+    
+    for(i=0; i<8; i++)
+    {
+        printf ("\n");
+        
+        if (MENU[i].used == 1)
+        {
+            if( i == menu_highlight){
+                printf ("* %s \n",MENU[i].string);
+            }else{
+                printf ("  %s \n",MENU[i].string);
+            };
+        }
+    };
+    
+    refresh_screen(); 
+}
+
+
+
+void
+BlMenu(void)
+{
+    
+    char Key=0;
+    
+    
+    // prepara o menu.
+    
+    MENU[0].used = 1;
+    MENU[1].used = 1;
+    MENU[2].used = 0;
+    MENU[3].used = 0;
+    MENU[4].used = 0;
+    MENU[5].used = 0;
+    MENU[6].used = 0;
+    MENU[7].used = 0;
+
+    menu_highlight = 1;
+        
+    sprintf( MENU[0].string, "menu item 0");
+    sprintf( MENU[1].string, "menu item 1");    
+    
+    
+    //mostra o menu.
+    //blShowMenu(); 
+    
+    while(1)
+    {
+        blShowMenu();
+        
+        Key = keyboard_wait_key();
+    
+        switch (Key)
+        {
+			
+			case 'x': goto ____go; break;
+
+            case '\n':
+                //goto do_execute_item;
+                break;    
+                
+            // UP
+            case 'e':
+                //blMenuUP();
+                break;
+            
+            // DOWN
+            case 'd':
+                //blMenuDOWN();
+                break;    
+
+            default:
+                // Nothing
+                break;
+        };
+    };
+    
+
+____go:
+    return;
+}
 
 
 /*
@@ -147,7 +238,8 @@ void BlMain (){
 #endif
 
 
-    if (g_initialized != 1){
+    if (g_initialized != 1)
+    {
         printf ("BlMain:");
         die ();
     }
@@ -180,21 +272,39 @@ void BlMain (){
 
 	// Ok isso deu certo.
 
-    fs_load_rootdirEx ();
-    fs_load_fatEx ();
+    fs_load_rootdirEx();
+    fs_load_fatEx();
 
 
     g_fat16_root_status = 1;
     g_fat16_fat_status = 1;
 
 
+
+    // #todo
+    // Podemos mostrar o menu de opções
+    // imediatamente antes da opção de carregarmos o kernel.
+    // Dessa forma o boot loader carregará o kernel adequado
+    // de acordo com o ítem selecionado no menu, que pode ser
+    // uma aplicação ou modo diferente de inicialização.
+
+    /*
+     #bugbug: It hangs the system.
+    BlMenu();
+    printf("hang\n"); 
+    refresh_screen();
+    while(1){}
+    */
+    
+    
+    
     //
     // Loading files.
     //
 
 
    // Loading kernel image.
-    BlLoadKernel ();
+    BlLoadKernel();
 
 
     // ?? maybe.

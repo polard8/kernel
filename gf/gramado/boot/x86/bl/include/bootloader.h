@@ -580,6 +580,25 @@ gdtr_t bl_gdtr;    //Sem ponteiro.
  *  Boot Loader prototypes.
  */
  
+ 
+ 
+struct menuitem_d
+{
+    int id;
+    int used;
+    int magic;
+    
+    char string[80];
+    
+    char image_path[128];    // "/BOOT/KERNEL.BIN"
+    unsigned long image_address;
+    
+};
+
+int menu_highlight;
+
+struct menuitem_d MENU[8];
+
 
 
 /*

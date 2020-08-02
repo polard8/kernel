@@ -393,11 +393,49 @@ void keyboardHandler (){
         (unsigned long) ch, 
         (unsigned long) status );
 
+   
+    // put into the queue.
+
+    keyboard_queue[keyboard_queue_tail] = ch;
+    
+    keyboard_queue_tail++;
+    if( keyboard_queue_tail > 8 )
+        keyboard_queue_tail = 0;
+   
+
+    //avisa que uma tecla foi digitada.
+    keyboard_flag = 1;
 
 	// Step 5: 
 	// EOI.
 
     out8(0x20,0x20);     
+}
+
+
+
+char keyboad_get_char(void)
+{
+	char ch=0;
+	
+	ch = keyboard_queue[keyboard_queue_head];
+	
+    keyboard_queue_head++;
+    if( keyboard_queue_head > 8 )
+        keyboard_queue_head = 0;
+
+    keyboard_flag = 0;
+}
+
+
+char keyboard_wait_key(void)
+{
+    while(keyboard_flag != 1)
+    {
+         //nothing
+    };
+    
+    return keyboad_get_char();
 }
 
 

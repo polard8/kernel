@@ -117,11 +117,18 @@ void editorClearScreen (){
  */
 
 int editor_save_file (){
-	
 
-	// #importante:
-	// Não podemos chamar a API sem que todos os argumentos estejam corretos.
-	
+    char file_1_name[] = "FILE1234TXT";
+    int Ret=0;
+    unsigned long number_of_sectors = 0;
+    size_t len = 0;
+
+
+
+    // #importante:
+    // Não podemos chamar a API sem que todos os argumentos 
+    // estejam corretos.
+
 	// #obs:
 	// Vamos impor o limite de 4 setores por enquanto. 
 	// 512*4 = 2048  (4 setores) 2KB
@@ -155,33 +162,27 @@ int editor_save_file (){
 
 
 
-    int Ret;
-
-    unsigned long number_of_sectors = 0;
-    size_t len = 0;
-
-    char file_1_name[] = "FILE1234TXT";	
-    //char file_1[] = "Arquivo \n escrito \n em \n user mode no editor de textos teditor.bin :) \n";
-
- 
-	//Initializing ...
+    //Initializing ...
+    printf ("\n");
+    printf ("\n");
     printf ("editor_save_file: Saving ...\n");
 
 
 	// Lenght in bytes.
-	
+
 	//len = (size_t) strlen (file_1);
     len = (size_t) strlen ( RAW_TEXT );
 
 
-    if (len <= 0){
-        printf ("editor_save_file:  Fail. Empty file.\n");
+    if (len <= 0)
+    {
+        printf ("editor_save_file: [FAIL] Empty file.\n");
         return (int) 1;
     }
 
-
-    if (len > 2048){
-        printf ("editor_save_file:  Limit Fail. The  file is too long.\n");
+    if (len > 2048)
+    {
+        printf ("editor_save_file: [FAIL] Limits. The  file is too long.\n");
         return (int) 1;
     }
 
@@ -199,12 +200,10 @@ int editor_save_file (){
         number_of_sectors = 1; 
     }
 
-
     if ( number_of_sectors == 0 ){
         printf ("editor_save_file:  Limit Fail. (0) sectors to save.\n");
         return (int) 1;
     }
-
 
     // limite de teste.
     // Se tivermos que salvar mais que 4 setores.

@@ -224,10 +224,21 @@
 
 
 
+// keyboard queue
+int keyboard_queue_tail;
+int keyboard_queue_head;
+char keyboard_queue[8];
+
+//avisa que uma tecla foi digitada.
+int keyboard_flag;
+
 
 //
 // Prototypes.
 //
+
+char keyboad_get_char(void);
+char keyboard_wait_key(void);
 
 //Keyboard handler.
 void keyboardHandler();

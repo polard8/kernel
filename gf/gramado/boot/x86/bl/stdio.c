@@ -30,8 +30,8 @@ extern void my_buffer_load_bitmap_16x16();
  *     @todo: Change system color to red.
  */
  
-void panic (const char *msg){
-	
+void panic (const char *msg)
+{
     printf ("panic: (BL.BIN) %s", msg );
     die ();
 }
@@ -931,20 +931,54 @@ char gui_inb (int port){
 }
 
 
+/*
+void refresh_screen2();
+void refresh_screen2()
+{
+    unsigned char *backbuffer  = (unsigned char *) (0x1000000 - 0x800000); 
+    unsigned char *frontbuffer = (unsigned char *) g_lbf_pa; 
+
+    int i=0;
+    for(i=0; i<(800*600*6); i++)
+        frontbuffer[i] = backbuffer[i];
+}
+*/
+
+
+void
+clear_backbuffer(void)
+{
+    unsigned char *backbuffer  = (unsigned char *) (0x1000000 - 0x800000); 
+
+    int i=0;
+    for(i=0; i<(800*600*6); i++)
+        backbuffer[i]=0;  //color black
+}
+
+
+
 //#bugbug
 //@todo: Rever isso.
-unsigned long get_cursor_x (){  
-	
-    unsigned long *int_args  = (unsigned long *) 0x0090000;
-    return   int_args[4];
+//    g_cursor_x = 0;
+//    g_cursor_y = 0;
+unsigned long get_cursor_x ()
+{  
+    //unsigned long *int_args  = (unsigned long *) 0x0090000;
+    //return   int_args[4];
+    
+    return g_cursor_x;
 }
 
 //#bugbug
 //@todo: Rever isso.
-unsigned long get_cursor_y (){ 
-	
-    unsigned long *int_args  = (unsigned long *) 0x0090000;
-    return  int_args[8]; 
+//    g_cursor_x = 0;
+//    g_cursor_y = 0;
+unsigned long get_cursor_y ()
+{ 
+    //unsigned long *int_args  = (unsigned long *) 0x0090000;
+    //return  int_args[8]; 
+    
+    return g_cursor_y;
 }
 
 

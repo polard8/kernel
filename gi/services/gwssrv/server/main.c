@@ -46,8 +46,18 @@ int running = 0;
 
 int ____saved_server_fd = -1;
 
+
+// #test
+#define MSG_OFFSET_SHORTSTRING  64
+#define SHORTSTRING_SIZE        64
+#define MSG_OFFSET_LONGSTRING  128
+#define LONGSTRING_SIZE        256
+// ...
+
+
 // O buffer para  as mensagens recebidas via socket.
-char __buffer[512];   
+#define MSG_BUFFER_SIZE 512
+char __buffer[MSG_BUFFER_SIZE];   
 
 
 

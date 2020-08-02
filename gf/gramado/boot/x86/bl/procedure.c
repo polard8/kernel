@@ -25,10 +25,11 @@
  */
 
 unsigned long 
-bl_procedure ( unsigned long window, 
-               int msg, 
-               unsigned long long1, 
-               unsigned long long2 ) 
+bl_procedure ( 
+    unsigned long window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 ) 
 { 
 
     //printf("Procedure do bootloader!\n");  
