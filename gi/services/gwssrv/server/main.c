@@ -1470,34 +1470,21 @@ int serviceDrawText(void)
     //#test
     // Usando a janela screen por enquanto.
     
-    //ok funcionou
-    //dtextDrawText ( (struct gws_window_d *) gui->screen,
-    //    x, y, color, 
-    //    "text-test" );
+    // OK. string funcionou.
         
-    // ok funcionou.
-    //text_buffer[0] = 'D';
-    //text_buffer[32] = 0; //finalizando ... provisorio
-    //dtextDrawText ( (struct gws_window_d *) gui->screen,
-    //    x, y, color, 
-    //    text_buffer ); //(unsigned char *) &message_address[MSG_OFFSET_LONGSTRING] );
-
-    //message_address[MSG_OFFSET_LONGSTRING] = 'D';
-    //message_address[MSG_OFFSET_LONGSTRING+32] = 0;
+    unsigned char buf[256+1];
+    int i=0;
+    int string_off=8;
+    for(i=0; i<256; i++)
+    {
+         buf[i] = message_address[string_off];
+         string_off++;
+    }
+    buf[i] = 0;
     
-    unsigned char buf[256];
-    
-    buf[0] = (unsigned char) message_address[8];
-    buf[1] = (unsigned char) message_address[9];
-    buf[2] = (unsigned char) message_address[10];
-    buf[3] = (unsigned char) message_address[11];
-    buf[32] = 0;
     
     dtextDrawText ( (struct gws_window_d *) gui->screen,
-        x, y, color, 
-        buf); //(unsigned char *) &message_address[8] );
-
-
+        x, y, color, buf ); 
 
 
    gws_show_backbuffer (); // for debug   

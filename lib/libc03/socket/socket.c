@@ -305,7 +305,13 @@ int listen (int sockfd, int backlog){
  * send:
  */
 
-ssize_t send ( int sockfd, const void *buf, size_t len, int flags ){
+ssize_t 
+send ( 
+    int sockfd, 
+    const void *buf, 
+    size_t len, 
+    int flags )
+{
 
     //#todo: Usar esse.
     //return (ssize_t) sendto ( (int) sockfd, 
@@ -348,7 +354,13 @@ ssize_t sendmsg (int sockfd, const struct msghdr *msg, int flags)
  * recv:
  */
 
-ssize_t recv ( int sockfd, void *buf, size_t len, int flags ){
+ssize_t 
+recv ( 
+    int sockfd, 
+    void *buf, 
+    size_t len, 
+    int flags )
+{
 
     // #todo: Usar esse.
     //return (ssize_t) recvfrom ( (int) sockfd, 

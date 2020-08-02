@@ -470,14 +470,19 @@ __gws_drawtext_request (
         message_buffer[6] = top; 
         message_buffer[7] = color; 
         
+        // OK funcionou string.
+                
+        char buf[256];
+        int i=0;
+        int string_off=8;
+        for(i=0; i<250; i++)
+        {
+            message_buffer[string_off] = *string;
+            string_off++; string++;
+        }
+        message_buffer[string_off] = 0;
+        //message_buffer[256] = 0;
 
-        message_buffer[8]  = 'f';
-        message_buffer[9]  = 'r';
-        message_buffer[10] = 'e';
-        message_buffer[11] = 'd';
-        message_buffer[32] = 0;
-        
-        //...
 
         // Write!
         // Se foi possível enviar, então saimos do loop.  
