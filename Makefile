@@ -1,14 +1,13 @@
 # License: BSD License
 VERSION = 1
 PATCHLEVEL = 0
-SUBLEVEL = 72
+SUBLEVEL = 73
 EXTRAVERSION = 
 NAME = Gramado 1.0
 
 # Documentation.
 # See: docs/
 # To see the targets execute "make help".
-
 
 # That's our default target when none is given on the command line.
 PHONY := _all
