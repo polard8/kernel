@@ -412,13 +412,37 @@ __gws_drawtext_request (
     // Isso permite ler a mensagem na forma de longs.
     unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];   
 
+    //unsigned long *string_buffer = (unsigned long *) &__gws_message_buffer[128];   
+
     int n_writes = 0;   // For sending requests.
 
 
-
-    //char *name = "Window name 1";
-
-   
+    
+    //#test
+    //Tentando colocar a string no buffer de mensagem
+    // no offset certo.
+    /*
+    int StringSize =0;
+            
+    StringSize = sizeof( string );
+        
+    if( StringSize<0 || StringSize >= 256){
+        gws_debug_print("gws_drawtext_request: StringSize fail\n");
+        exit(1);
+    }
+        
+   //#define MSG_OFFSET_LONGSTRING  128
+        
+    strncpy( 
+       (char *) string_buffer, 
+       (const char *) string,
+       StringSize );
+    
+    sprintf(string_buffer,"Testing .........."); 
+    string_buffer[0] = 'X';
+    string_buffer[1] = 'X';
+    string_buffer[StringSize+1] = 0; //finalizing
+    */
 
     //
     // Send request.
@@ -432,13 +456,12 @@ __gws_drawtext_request (
     // ?? Precisamos mesmo de um loop para isso. ??
     // msg = 369 (get input event)
 
-    int StringSize =0;
 
     while (1)
     {
         // Create window    
         message_buffer[0] = 0;       // window. 
-        message_buffer[1] = 1004;    // Draw char.
+        message_buffer[1] = 1005;    // Draw text.
         message_buffer[2] = 0;
         message_buffer[3] = 0;
         
@@ -447,27 +470,12 @@ __gws_drawtext_request (
         message_buffer[6] = top; 
         message_buffer[7] = color; 
         
-        //message_buffer[8] = c;   // The 'char'.
 
-        //#test
-        //Tentando colocar a string no buffer de mensagem
-        // no offset certo.
-        
-        StringSize = sizeof( string );
-        
-        if( StringSize<0 || StringSize >= 256){
-            gws_debug_print("gws_drawtext_request: StringSize fail\n");
-            exit(1);
-        }
-        
-        //#define MSG_OFFSET_LONGSTRING  128
-        
-        strncpy( 
-            (char *) &message_buffer[128], 
-            (const char *) string,
-            StringSize );
-        
-        message_buffer[128 + StringSize] = 0; //finalizing
+        message_buffer[8]  = 'f';
+        message_buffer[9]  = 'r';
+        message_buffer[10] = 'e';
+        message_buffer[11] = 'd';
+        message_buffer[32] = 0;
         
         //...
 

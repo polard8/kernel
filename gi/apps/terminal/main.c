@@ -1260,7 +1260,7 @@ response_loop:
                         (unsigned long) 30,    // left,
                         (unsigned long) 30,    // top,
                         (unsigned long) COLOR_BLUE,
-                        "Terminal: [F9] Testing gws_draw_text");
+                        "Terminal: [F9]");
                      break;
                    
                    

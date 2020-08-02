@@ -329,10 +329,11 @@ void handle_request (int fd){
  
                 
     // Realiza o serviço.
-    gwsProcedure ( (struct gws_window_d *) message_buffer[0], 
-       (int) message_buffer[1], 
-       (unsigned long) message_buffer[2], 
-       (unsigned long) message_buffer[3] );
+    gwsProcedure ( 
+       (struct gws_window_d *) message_buffer[0], 
+       (int)                   message_buffer[1], 
+       (unsigned long)         message_buffer[2], 
+       (unsigned long)         message_buffer[3] );
 
 
     // #todo
@@ -390,7 +391,7 @@ __again:
 
     // Cleaning
     int c=0;
-    for(c=0; c<32; c++)
+    for(c=0; c<32; c++)  //todo: 512
         next_response[c] = 0;
 
     gde_debug_print ("gwssrv: Response sent\n");  
@@ -1445,6 +1446,7 @@ int serviceDrawText(void)
     color     = message_address[7];
 
 
+    /*
     //size 256 bytes
     unsigned char *text_buffer = (unsigned char *) &message_address[MSG_OFFSET_LONGSTRING];  
    
@@ -1455,6 +1457,7 @@ int serviceDrawText(void)
         gde_debug_print ("gwssrv: serviceDrawText [DEBUG]   SIZE \n");
         exit(1);
     }
+    */
    
    //
    // Draw
@@ -1467,13 +1470,34 @@ int serviceDrawText(void)
     //#test
     // Usando a janela screen por enquanto.
     
+    //ok funcionou
+    //dtextDrawText ( (struct gws_window_d *) gui->screen,
+    //    x, y, color, 
+    //    "text-test" );
+        
+    // ok funcionou.
+    //text_buffer[0] = 'D';
+    //text_buffer[32] = 0; //finalizando ... provisorio
+    //dtextDrawText ( (struct gws_window_d *) gui->screen,
+    //    x, y, color, 
+    //    text_buffer ); //(unsigned char *) &message_address[MSG_OFFSET_LONGSTRING] );
+
+    //message_address[MSG_OFFSET_LONGSTRING] = 'D';
+    //message_address[MSG_OFFSET_LONGSTRING+32] = 0;
+    
+    unsigned char buf[256];
+    
+    buf[0] = (unsigned char) message_address[8];
+    buf[1] = (unsigned char) message_address[9];
+    buf[2] = (unsigned char) message_address[10];
+    buf[3] = (unsigned char) message_address[11];
+    buf[32] = 0;
+    
     dtextDrawText ( (struct gws_window_d *) gui->screen,
         x, y, color, 
-        "text-test" );
-        
-    //dtextDrawText ( (struct gws_window_d *) gui->screen,
-        //x, y, color, 
-        //(unsigned char *) &message_address[MSG_OFFSET_LONGSTRING] );
+        buf); //(unsigned char *) &message_address[8] );
+
+
 
 
    gws_show_backbuffer (); // for debug   
