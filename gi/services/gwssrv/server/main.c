@@ -689,81 +689,79 @@ void xxx_test_load_bmp(void)
     
     //#todo
     //Trying to load and show a bmp file.
+    //char *file_name = "FOLDER  BMP";
+    //char file_name[] = "FOLDER  BMP";
     
     char *bmp_buffer;
-    //char *file_name = "FOLDER  BMP";
-    char file_name[] = "FOLDER  BMP";
+
+    
     //char file_name[] = "terminal.bmp";
-    bmp_buffer = (char *) malloc(1024*128);
-    if ( (void *) bmp_buffer == NULL )
+    //bmp_buffer = (char *) malloc(1024*128);
+    bmp_buffer = (char *) malloc(1024*512);
+    
+    if ( (void *) bmp_buffer == NULL ){
         printf ("gwssrv: xxx_test_load_bmp bmp_buffer fail\n");
+        return;
+    }
     
     // ?? Onde fica o heap usado por esse malloc ??
     printf ("gwssrv: xxx_test_load_bmp bmp_buffer = %x\n", bmp_buffer);
   
+  
     //stdio_fntos ( (char *) file_name ); //não precisa
     
-    // #bugbug
-    // Essa rotina pode NÃO ter usado o
-    // diretório de páginas do aplicativo.
-    // Portando o endereço que indicamos e pertence ao
-    // heap do aplicativo não é acessível ao kernel, pois
-    // o kernel usou seu próprio diretório de páginas.
-    // A solução seria essa rotina trocar o diretório de páginas
-    // provisóriamente.
-    // Outra solução seria ustilizarmos outras rotinas 
-    // de carregamento de arquivo.
+    FILE *fp;
     
+    fp = fopen("folder.bmp","r+");    
+    //fp = fopen("dennis2.bmp","r+");    
 
-    // #bugbug
-    // essa rotina não carrega no buffer.
 
-    int r=-1;
+    int nreads=0;
+    //nreads = read( fileno(fp), bmp_buffer, (1024*128) );
+    nreads = read( fileno(fp), bmp_buffer, (1024*512) );
     
-    /*
-    r = gramado_system_call ( SYSTEMCALL_READ_FILE, 
-        (unsigned long) file_name,   //name 
-        (unsigned long) 0,           //flags
-        (unsigned long) 0);          //mode
-    */
-
-    //if(r<0)
-        //printf("gwssrv: r fail\n");
-    
-    // #test
-    // [FAIL]
-    void *buf;
-    buf = (void*) gramado_system_call ( 9000, 
-                       (unsigned long) file_name,   //name 
-                       (unsigned long) 0,           
-                       (unsigned long) 0);          
-
-    if((void*)buf ==NULL){
-        printf("gwssrv: buf fail\n");
-        return;
+    if(nreads <= 0)
+    { 
+        printf("read fail\n"); 
+        return; 
     }
 
-    bmp_buffer = buf;
+   //#bugbug
+   //So estava lendo 4 bytes por causa do size of usado erradamente logo acima..
+
+    printf ("nreads={%d}\n",nreads);
+
+
+    int i=0;
 
     //#test
     if ( bmp_buffer[0] != 'B' || bmp_buffer[1] != 'M' )
     {
         printf (">>>> %c %c\n",&bmp_buffer[0],&bmp_buffer[1]);
         gde_debug_print ("gwssrv: xxx_test_load_bmp SIG FAIL \n");
-        //return;
-        
         printf("xxx_test_load_bmp: *hang1\n");
-        //#debug
         gws_show_backbuffer();
         while(1);
     }
 
-          
-    bmpDisplayBMP ((char *) bmp_buffer, (unsigned long) 80, (unsigned long) 80);    
-    //gde_display_bmp((char *)bmp_buffer, (unsigned long) 80, (unsigned long) 80);
+    if ( bmp_buffer[0] == 'B' && bmp_buffer[1] == 'M' )
+    {
+        printf("xxx_test_load_bmp: BMP signature OK\n");
+        
+        //#flags
+        bmp_change_color_flag = BMP_CHANGE_COLOR_TRANSPARENT;
+        //bmp_change_color_flag = BMP_CHANGE_COLOR_SUBSTITUTE;
+        //bmp_change_color_flag = BMP_CHANGE_COLOR_NULL;
+        bmp_selected_color = COLOR_WHITE;
 
-     printf("xxx_test_load_bmp: *hang2\n");
+ 
+        bmpDisplayBMP ((char *) bmp_buffer, (unsigned long) 4, (unsigned long) 4);    
+        //gde_display_bmp((char *)bmp_buffer, (unsigned long) 80, (unsigned long) 80);
+    }          
+
+
      //#debug
+     printf("xxx_test_load_bmp: *hang2\n");
      gws_show_backbuffer();
      while(1);
     
@@ -816,7 +814,7 @@ void InitGraphics(void){
 
     // #test
     // Precisamos encontrar uma rotina de carregamento apropriada.
-    // xxx_test_load_bmp(); //[FAIL]
+    xxx_test_load_bmp(); //[FAIL]
     // xxx_test_load_icon();
     
     //gws services
@@ -825,7 +823,9 @@ void InitGraphics(void){
     
     gws_show_backbuffer();            
     
-    debug_print("gwssrv: InitGraphics done\n");
+    debug_print("gwssrv: InitGraphics done *hang\n");
+    
+    //while(1){}
 }
 
 

@@ -660,9 +660,10 @@ int sys_read (unsigned int fd, char *ubuf, int count){
         ubuf_len = count;
 
     //#fixme
-    if (ubuf_len > 512){
-        //debug_print ("sys_read: [FIXME] limiting ubuf_len \n");
-        ubuf_len = 512;
+    if (ubuf_len > 512)
+    {
+        debug_print ("sys_read: [FIXME] limiting ubuf_len \n");
+        //ubuf_len = 512;
     }
 
 

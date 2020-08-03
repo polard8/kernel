@@ -480,8 +480,8 @@ bmpDisplayBMP (
     // Endereço base do BMP que foi carregado na memória
     unsigned char *bmp = (unsigned char *) address;
 
-    struct gws_bmp_header_d *bh;
-    struct gws_bmp_infoheader_d *bi;
+    struct gws_bmp_header_d      *bh;
+    struct gws_bmp_infoheader_d  *bi;
 
     int i, j, base, offset;
 
@@ -496,7 +496,7 @@ bmpDisplayBMP (
     unsigned long pal_address;
 
     // Variável para salvar rgba.
-    unsigned char *c = (unsigned char *) &color;
+    unsigned char *c  = (unsigned char *) &color;
     unsigned char *c2 = (unsigned char *) &color2;
 
     unsigned long *palette       = (unsigned long *) (address + 0x36);
@@ -513,112 +513,151 @@ bmpDisplayBMP (
 
 
     // Limits.
-    if ( x > xLimit || y > yLimit ){
+    if ( x > xLimit || y > yLimit )
+    {
         gde_debug_print ("bmpDisplayBMP: Limits \n");
-        printf("bmpDisplayBMP: Limits \n");
+        printf          ("bmpDisplayBMP: Limits \n");
         goto fail;
     }
 
-	// #todo:
-	// Testar validade do endereço.
-    if ( address == 0 ){
+
+    // #todo:
+    // Testar validade do endereço.
+    if ( address == 0 )
+    {
         gde_debug_print ("bmpDisplayBMP: address fail \n");
+        printf          ("bmpDisplayBMP: address fail \n");
         goto fail;
     }
 
 
-    
+
 	//
 	// struct for Info header
 	//
 
-    // #todo: Podemos usar malloc?
-    char buffer[512];
-    char buffer2[512];
+    // #todo: 
+    // Podemos usar malloc?
+    
+    // Buffer para as estruturas.
+    //char buffer[512];
+    //char buffer2[512];
 
-    //bh = (struct bmp_header_d *) malloc( sizeof(struct bmp_header_d) );
-    bh = (struct gws_bmp_header_d *) &buffer[0];
-    if ( (void *) bh == NULL ){
+
+    bh = (struct gws_bmp_header_d *) malloc( sizeof(struct gws_bmp_header_d) );
+    //bh = (struct gws_bmp_header_d *) &buffer[0];
+    if ( (void *) bh == NULL )
+    {
         gde_debug_print ("bmpDisplayBMP: bh fail \n");
+        printf          ("bmpDisplayBMP: bh fail \n");
         goto fail;
     }
 
-	// Signature.
-    sig = *( unsigned short* ) &bmp[0];
+
+    // Signature.
+    sig = *(unsigned short *) &bmp[0];
     bh->bmpType = sig;
+    printf ("sig={%x}\n",sig);
 
-	// Size. ( 2 bytes )
-    unsigned short Size = *( unsigned short *) &bmp[2];
-    bh->bmpSize = Size;
-
-
-    //#test
+    // #test
+    // Signature
     if ( bmp[0] != 'B' || bmp[1] != 'M' )
     {
-        printf (">>>> %c %c\n",bmp[0],bmp[1]);
         gde_debug_print ("bmpDisplayBMP: SIG FAIL \n");
+        printf          ("bmpDisplayBMP: SIG FAIL >>>> %c %c\n", 
+            bmp[0], bmp[1]);
         goto fail;
     }
 
-	
+
+
+    // Size. ( 2 bytes )
+    unsigned short Size = *(unsigned short *) &bmp[2];
+    bh->bmpSize = Size;
+    printf ("Size={%x}\n",Size);
+
+
+
+
 	//
 	// struct for Info header
 	//
-	
+
 	//Windows bmp.
-	//bi = (struct bmp_infoheader_d *) malloc( sizeof(struct bmp_infoheader_d) );
-    bi = (struct gws_bmp_infoheader_d *)  &buffer2[0];
-    if ( (void *) bi == NULL ){
+	bi = (struct gws_bmp_infoheader_d *) malloc( sizeof(struct gws_bmp_infoheader_d) );
+    //bi = (struct gws_bmp_infoheader_d *)  &buffer2[0];
+    if ( (void *) bi == NULL )
+    {
         gde_debug_print ("bmpDisplayBMP: bi fail \n");
+        printf          ("bmpDisplayBMP: bi fail \n");
         goto fail;
     }
 
-    //The size of this header.
-    bi->bmpSize = *( unsigned long* ) &bmp[14];
+    // The size of this header.
+    bi->bmpSize = *( unsigned long * ) &bmp[14];
+    printf ("HeaderSize={%x}\n",bi->bmpSize);
+
 
     // Width and height.
     Width  = *( unsigned long * ) &bmp[18];
     Height = *( unsigned long * ) &bmp[22];
 
-	// #todo: 
-	// Checar validade da altura e da largura encontrada.
-
-	// Salvar.
+    // Salvar.
     bi->bmpWidth  = (unsigned long) Width;
     bi->bmpHeight = (unsigned long) Height;
 
+    printf ("w=%d h=%d\n",Width,Height);
 
-	// Number of bits per pixel.
-	// 1, 4, 8, 16, 24 and 32.
+
+
+
+    // Number of bits per pixel.
+    // 1, 4, 8, 16, 24 and 32.
     bi->bmpBitCount = *( unsigned short * ) &bmp[28];
 
-	// 24
-	//if( bi->bmpBitCount != 24 ){
-	//	//fail
-	//}
-	
-	
-	// 0 = Nenhuma compressão.
-    if ( bi->bmpCompression != 0 ){
+    printf ("Count={%d}\n", bi->bmpBitCount );
+    
+    
+    
+    //#limits
+    //if( bi->bmpBitCount != 24 )
+    //{
+    //    printf("bmpDisplayBMP: Count fail\n");
+    //    goto fail;
+    // }
+
+
+
+    // 0 = Nenhuma compressão.
+    if ( bi->bmpCompression != 0 )
+    {
         gde_debug_print ("bmpDisplayBMP: bmpCompression fail \n");
+        printf          ("bmpDisplayBMP: bmpCompression fail \n");
     }
 
 
-	//
-	// Draw
-	//
+    //
+    // Draw
+    //
+
+    gde_debug_print ("bmpDisplayBMP: Draw!\n");
+    printf          ("bmpDisplayBMP: Draw!\n");
 
 
-//DrawBMP:
+    // Top, Left, Bottom.
 
-    left = x;    
-    top = y; 
+    left = x; 
+    top  = y; 
     bottom = ( top + bi->bmpHeight );
 
+
 	// Início da área de dados do BMP.
-	
+
+
 	// #importante:
 	// A base é diferente para os tipos? 
+
+    // bpp
 
     switch ( bi->bmpBitCount )
     {
@@ -641,12 +680,31 @@ bmpDisplayBMP (
         case 8:  
             base = (0x36 + 0x400); 
             gde_debug_print ("bmpDisplayBMP: bmpBitCount 8\n");   
-            break; 
+            break;
+        
+        // #todo: Onde fica a base??
+        case 16:
+            base = 0x36;
+            gde_debug_print ("bmpDisplayBMP: [FIXME] bmpBitCount 16\n"); 
+            break;
+
+        // #todo: Onde fica a base??
+        case 24:
+            base = 0x36;
+            gde_debug_print ("bmpDisplayBMP: [FIXME] bmpBitCount 24\n"); 
+            break;
+
+        // #todo: Onde fica a base??
+        case 32:
+            base = 0x36;
+            gde_debug_print ("bmpDisplayBMP: [FIXME] bmpBitCount 32\n"); 
+            break;
 
         // Default.
+        // #todo: Onde fica a base??
         default:  
             base = 0x36;
-            gde_debug_print ("bmpDisplayBMP: bmpBitCount fail\n");  
+            gde_debug_print ("bmpDisplayBMP: [FAIL] bmpBitCount fail\n"); 
             break;
     };
 
@@ -661,6 +719,10 @@ bmpDisplayBMP (
 //24    - 24 bpp (True color)
 //32    - 32 bpp (True color, RGB)
 //320   - 32 bpp (True color, RGBA)	
+
+
+    gde_debug_print ("bmpDisplayBMP: for\n");
+    printf          ("bmpDisplayBMP: for\n");
 
 
     for ( i=0; i < bi->bmpHeight; i++ )
@@ -787,7 +849,8 @@ bmpDisplayBMP (
                 case BMP_CHANGE_COLOR_TRANSPARENT:
                     if ( color != bmp_selected_color )
                     {
-                        pixelBackBufferPutpixel ( (unsigned long) color, 
+                        pixelBackBufferPutpixel ( 
+                            (unsigned long) color, 
                             (unsigned long) left, 
                             (unsigned long) bottom );
 
@@ -882,6 +945,12 @@ bmpDisplayBMP (
         left = x;    
     };
 
+
+
+
+
+
+
 	// ## test palette 
 	//int p;
 	
@@ -899,12 +968,13 @@ bmpDisplayBMP (
 done:
 	//Debug
     gde_debug_print ("bmpDisplayBMP: done \n");
+    printf          ("bmpDisplayBMP: done \n");
 	//printf("w={%d} h={%d}\n", bi->bmpWidth, bi->bmpHeight );
     return 0;
 
 fail:
     gde_debug_print ("bmpDisplayBMP: fail \n");
-    //printf("fail");
+    printf          ("bmpDisplayBMP: fail \n");
     return (int) 1;
 }
 
