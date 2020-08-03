@@ -764,27 +764,8 @@ void xxx_test_load_bmp(void)
      printf("xxx_test_load_bmp: *hang2\n");
      gws_show_backbuffer();
      while(1);
-    
-
-    /*
-     //ok isso funciona.
-    pixelBackBufferPutpixel ( (unsigned long) COLOR_RED, 
-         (unsigned long) 100, 
-         (unsigned long) 100 );
-
-    pixelBackBufferPutpixel ( (unsigned long) COLOR_RED, 
-         (unsigned long) 102, 
-         (unsigned long) 100 );
-
-    pixelBackBufferPutpixel ( (unsigned long) COLOR_RED, 
-         (unsigned long) 104, 
-         (unsigned long) 100 );
-    */
-    
-    //
-    // =======================================
-    //
 }
+
 
 
 void InitGraphics(void){
@@ -814,8 +795,23 @@ void InitGraphics(void){
 
     // #test
     // Precisamos encontrar uma rotina de carregamento apropriada.
-    xxx_test_load_bmp(); //[FAIL]
+    //xxx_test_load_bmp(); //OK
     // xxx_test_load_icon();
+    
+    // OK.
+    // Testando ...
+    // Tentar carregar todos, falha!.
+    gwssrv_load_and_decode_small_icon ("bmp1.bmp",  4,4);
+    //gwssrv_load_and_decode_small_icon ("file.bmp", 50,4);
+    //gwssrv_load_and_decode_small_icon ("folder.bmp",100,4);
+    //gwssrv_load_and_decode_small_icon ("terminal.bmp",150,4);
+    //gwssrv_load_and_decode_small_icon ("app.bmp",200,4);
+    //gwssrv_load_and_decode_small_icon ("cursor.bmp",250,4);
+    //gwssrv_load_and_decode_small_icon ("mouse.bmp",300,4);
+    //gwssrv_load_and_decode_small_icon ("folder.bmp",350,4);
+    //gwssrv_load_and_decode_small_icon ("folder.bmp",400,4);
+
+    
     
     //gws services
     //gws_refresh_rectangle(0,0,400,400);
@@ -823,8 +819,8 @@ void InitGraphics(void){
     
     gws_show_backbuffer();            
     
-    debug_print("gwssrv: InitGraphics done *hang\n");
-    
+    debug_print("gwssrv: InitGraphics done\n");
+    //printf     ("gwssrv: InitGraphics done *hang\n");
     //while(1){}
 }
 

@@ -90,17 +90,23 @@ struct gws_bmp_infoheader_d
  *     address = endereço base
  *     x       = posicionamento 
  *     y       = posicionamento
- *
  */
-int bmpDisplayBMP( char *address, 
-                   unsigned long x, 
-				   unsigned long y );
+ 
+int 
+bmpDisplayBMP ( 
+    char *address, 
+    unsigned long x, 
+    unsigned long y );
+
+
+void 
+gwssrv_load_and_decode_small_icon ( 
+    char *filename, 
+    unsigned long x, 
+    unsigned long y );
 
 
 
-
-					
-						   
 //
 // End.
 //
