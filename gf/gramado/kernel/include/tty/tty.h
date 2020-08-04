@@ -185,10 +185,16 @@ struct tty_d
     file *stdout;
     file *stderr;
 
-    // Raw input buffer.
-    file *_buffer;
 
+    // Canonical. (cooked mode)
+    // Applications programs reading from the terminal 
+    // receive entire lines, after line editing has been 
+    // completed by the user pressing return.
+
+    // Raw input buffer.
     // Canonical buffer.
+
+    file *_rbuffer;
     file *_cbuffer;
 
 
@@ -321,7 +327,7 @@ int ttydrv_delete ( struct ttydrv_d *tty_driver );
 struct tty_d *tty_create (void); 
 int tty_delete ( struct tty_d *tty );
 
-int ttyInit (int tty_id);
+
 
 
 

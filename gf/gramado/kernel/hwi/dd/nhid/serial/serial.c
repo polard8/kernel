@@ -64,13 +64,50 @@ void serial4_handler (void)
 
 
 
+/*
+ * serial_write_char:
+ *     #bugbug:
+ *     It writes only in the port COM1_PORT.
+ *     Maybe we can select the port.
+ */
 
-void serial_write_char ( char data ) {
+void 
+serial_write_char ( char data ) 
+{
 
-    while (( in8(COM1_PORT + 5) & 0x20 ) == 0) ;
+    while (( in8(COM1_PORT + 5) & 0x20 ) == 0);
 
     out8 (COM1_PORT, data);
 }
+
+/*
+void 
+serial_write_char ( int port, char data ) 
+{
+
+    //#check
+    //if ( port ...
+
+    while (( in8(port + 5) & 0x20 ) == 0) ;
+    
+    out8 (port, data);
+}
+*/
+
+
+/*
+// Write something from tty to a serial port.
+void serial_write ( struct tty_d * tty, int port );
+void serial_write ( struct tty_d * tty, int port )
+{
+    char data;
+    
+    //#todo: Get char from tty.
+    //data = tty->
+    
+    serial_write_char ( (int) port, (char) data ); 
+}
+*/
 
 
 /*

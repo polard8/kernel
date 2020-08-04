@@ -1257,19 +1257,19 @@ void console_init_virtual_console (int n){
 
     int ConsoleIndex = -1;
 
-    ConsoleIndex = n;
-
 
     debug_print ("console_init_virtual_console:\n");
+    
+
+
+    ConsoleIndex = n;
         
     // Limits
     if ( ConsoleIndex < 0 || ConsoleIndex > 3 )
     {
-        //#debug
-        debug_print ("console_init_virtual_console: ConsoleIndex\n");
-        
-        panic ("console_init_virtual_console: ConsoleIndex\n");
-        return;
+        debug_print ("console_init_virtual_console: [FAIL] ConsoleIndex\n");
+        panic       ("console_init_virtual_console: [FAIL] ConsoleIndex\n");
+        //return;
     }
 
 
@@ -1283,6 +1283,12 @@ void console_init_virtual_console (int n){
     TTY[ConsoleIndex].cursor_bottom = 80;
     TTY[ConsoleIndex].cursor_color = COLOR_GREEN; //COLOR_TERMINALTEXT;
     
+
+    //#todo
+    // Buffers !!!
+    //TTY[ConsoleIndex]._rbuffer ...
+    //TTY[ConsoleIndex]._cbuffer ...    
+
     // #bugbug
     // A estrutura tem mais elementos que podem ser inicializados.
     // Tivemos problemas ao tentar inicializa-los.
@@ -1293,11 +1299,11 @@ void console_init_virtual_console (int n){
 
     // #test
     // Cuidado, tivemos problemas de compilação nessa função
-    
+
+
     //#todo
     // Local mode flags.
-    //TTY[ConsoleIndex].termios.c_lflag = ECHO;
-
+    TTY[ConsoleIndex].termios.c_lflag = ECHO;
 }
 
 

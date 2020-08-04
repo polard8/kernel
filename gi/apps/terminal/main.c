@@ -11,6 +11,16 @@
  * 2020 - Created by Fred Nora.
  */
 
+
+// The POSIX terminal interface.
+// Raw or Canonical?
+// See:
+// https://www.gnu.org/software/libc/manual/html_node/Canonical-or-Not.html
+// https://en.wikipedia.org/wiki/POSIX_terminal_interface
+// https://en.wikipedia.org/wiki/Computer_terminal
+// ...
+
+
 // Connecting via AF_INET.
 
 // tutorial example taken from. 

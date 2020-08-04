@@ -1,5 +1,5 @@
 /*
- * File: kgws/logon/logon.c
+ * File: logon.c
  *
  * Descrição:
  *     Kernel Mode Logon Support Routines.
@@ -162,22 +162,18 @@ void create_logon (void){
 	    //Assim essas informaç~oes ficar~ao na estrutura de tty.
 	    //assim saberemos qual usu'ario est'a usando a tty0
 	    // deve ser o 'root'.
-	
-	    //iniciar a tty 0.
-	
-        printf ("create_logon: ttyInit\n");
-        
-        //limpa a lista
-        tty_init_module ();
-        
-        // Os primeiros tty são reservados para os consoles virtuais.
-        ttyInit (10);  
-        
-        
-        //limpa a lista de terminais virtuais também.
-        vt_init_module ();
 
-		
+
+        // Limpa a lista
+        printf ("create_logon: Initializing tty module\n");
+        tty_init_module();
+
+        // Limpa a lista de terminais virtuais também.
+        printf ("create_logon: Initializing vt module\n");
+        vt_init_module();
+
+
+
 	// =========
 	//
 	// @todo: Usuário e sessão devem ser independentes do modo de vídeo. 

@@ -288,163 +288,46 @@ int init_architecture_independent (void){
 #ifdef EXECVE_VERBOSE
     printf ("init_architecture_independent: Initializing Gramado..\n");
 #endif
-	
-	Status = init_gramado ();
 
-    if (Status != 0){
-	    panic ("init-init_architecture_independent: init_gramado\n"); 
+   
+    // #bugbug
+    // Deprecated?
+
+    Status = init_gramado();
+    if (Status != 0)
+    {
+        panic ("init-init_architecture_independent: init_gramado\n"); 
     }
-	
-	
-	
-	
-	
-	/*
-	//
-	// TTY
-	//
-	
-	
-	// tty support.
-	// As mensagens do kernel precisam usar esses par^ametros.
-	// o kernel usa a tty0.
-	
-	//#importante
-	//Logo antes user session, room e desktop.
-	//Assim essas informaç~oes ficar~ao na estrutura de tty.
-	//assim saberemos qual usu'ario est'a usando a tty0
-	// deve ser o 'root'.
-	
-	//iniciar a tty 0.
-	
-	ttyInit (0);	
-	*/
 
-	
-	
-	
-	
-	/*
-	// User Info:
-	// =========
-	//
-	// @todo: Usuário e sessão devem ser independentes do modo de vídeo. 
-	//        Text ou Graphics.
-	// @todo: Essas informações são independentes da arquitetura,
-	//      Essa rotina pode ir pra outro lugar.
-	
-//UserInfo:
-	
-#ifdef EXECVE_VERBOSE	  
-    printf ("init-init_architecture_independent: init_user_info\n");
-#endif
-	
-	//initialize user info structure.
-    init_user_info ();  
-	*/
-    
-	// User Session, Window Station and Desktop.
-	// @todo: Essas informações são independentes da arquitetura,
-	//      Essa rotina pode ir pra outro lugar.
-	
-	
-	
-	/*
-//UserSession:
-	
-#ifdef EXECVE_VERBOSE	
-    printf ("init-init_architecture_independent: init_user_session\n");   
-#endif
-	
-	//initialize user session.
-	init_user_session ();   	 
-	*/
-	
-	
-	
-	/*
-	// (ROOM)
-	
-//WindowStation:
-	
-#ifdef EXECVE_VERBOSE
-    printf ("init-init_architecture_independent: init_room_manager\n");   
-#endif  
-	
-	init_room_manager ();
-    */
-	
-	
-	/*
-	// DESKTOP
-	
-//Desktop:
-	
-#ifdef EXECVE_VERBOSE
-    printf ("init-init_architecture_independent: init_desktop\n");   
-#endif    
-	
-	init_desktop (); 
-	*/
- 
-	
-	//
-	//  ## WINDOWS ##
-	//
-	
-	// Window manager. 
-	// (Inicializa janelas e cria o logon).
-	// @todo: 
-	// Essas informações são independentes da arquitetura,
-	// Essa rotina pode ir pra outro lugar.
-	
-//WindowManager:	
+
+    // Initializing window manager.
 
 
     // Text mode not supported.
-    if (g_useGUI != 1){
-        debug_print ("init_architecture_independent: PANIC: No GUI!\n");
-        die();
+    if (g_useGUI != 1)
+    {
+        panic ("init_architecture_independent: PANIC: No GUI!\n");
     }
 
-        
-		// Window manager.
-#ifdef EXECVE_VERBOSE	    
-	printf ("init-init_architecture_independent: init_window_manager\n");
+// Window manager.
+#ifdef EXECVE_VERBOSE
+    printf ("init-init_architecture_independent: init_window_manager\n");
 #endif
 
-	init_window_manager ();
+    init_window_manager();
 
 
-	
-	
-	// tty support.
-	// As mensagens do kernel precisam usar esses par^ametros.
-	// o kernel usa a tty0.
-	//ttyInit ();
-
-	
-	
-	//
-	// terminal support.
-	//
-	
-	//init_system_terminal();
+    // More? ...
 
 
-    // Continua ...	 
-	
-	
-	
-done:
-	
+//done:
+
 #ifdef EXECVE_VERBOSE
-    //debug
     printf ("init_architecture_independent: Done\n");
-	refresh_screen();
+    refresh_screen();
     //while(1){}
-#endif	
-	
+#endif
+
     return 0;
 }
 
