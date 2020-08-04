@@ -1,7 +1,6 @@
 /*
- * File: user/userenv.c 
+ * File: SECURITY/userenv.c 
  *
- * Descrição:
  *
  * User Environment Manager, (UEM).
  *
@@ -24,6 +23,7 @@
  *     2016 - Revision.
  */
 
+ 
  
 #include <kernel.h>
 
@@ -377,7 +377,8 @@ UpdateUserInfo (
  * /root/user/config.txt
  * ...
  */
- 
+
+
 void init_user_info (void){
 
     int Id = 0;
@@ -393,10 +394,10 @@ void init_user_info (void){
         userList[Index] = (unsigned long) 0;
         Index++;
     };
-	
-    
-	//Configurando a estrutura global.
-	// Create default user. (default,interactive)
+
+
+    // Configurando a estrutura global.
+    // Create default user. (default,interactive)
 
     DefaultUser = (void *) CreateUser (default_user_name, USER_TYPE_INTERACTIVE);
 
@@ -405,15 +406,11 @@ void init_user_info (void){
 
     } else {
 
-        if ( (void *) CurrentTTY == NULL ){
-            panic ("init_user_info: CurrentTTY");
-        }
 
         // Atualizando a lista de permissões.
         // Liberando tudo.
         for (i=0; i<128; i++){ DefaultUser->permissions[i]=1; }
  
-        CurrentTTY->user_info = DefaultUser;
 
 		//Coloca no início da lista.
 		//userList[0] = (unsigned long) SystemUser;    //System.
@@ -444,8 +441,13 @@ void init_user_info (void){
 
 
 
-int __getusername (char *buffer){
+/*
+ * __getusername:
+ * 
+ */
 
+int __getusername (char *buffer)
+{
 
     char *login_buffer = (char *) buffer;
 
@@ -514,28 +516,21 @@ int __setusername ( const char *new_username){
  *    Inicializa o User Environment Manager. (UEM). 
  */
 
-int init_user_environment_manager ( int argc, char *argv[] ){
-	
-	//...
-	
+// #bugbug
+// Deletar essa função ou não usar esses argumentos.
+
+int 
+init_user_environment_manager ( int argc, char *argv[] )
+{
+
+    //...
+
     //g_module_uem_initialized = 1;
     userenvironmentStatus = 1;
-	
+
 	return 0;
 }
 
-
-/*
- * Construtor
-void userenvironmentUserEnvironment()
-{}
-*/
-
-
-/*
-int userenvironmentInit()
-{}
-*/
 
 //
 // End.

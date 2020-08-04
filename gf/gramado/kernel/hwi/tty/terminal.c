@@ -8,20 +8,13 @@
 #include <kernel.h>
 
 
-//todo
-//set_terminal_pid
-//set_terminal_tid
-
-
-//todo
-//criar um diálogo consistente com o servidor de terminal.
-//assim ele pode ser chamado e oferecer vários serviços.
-
+// Deprecated!
 unsigned long 
-terminal_dialog ( struct window_d *window, 
-                  int msg, 
-                  unsigned long long1, 
-                  unsigned long long2 ) 
+terminal_dialog ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 ) 
 {
     //# todo
     return 0;	
@@ -244,43 +237,7 @@ void systemSetTerminalWindow ( struct window_d *window ){
 		die ();
 	}
 	*/
-	
-	
-	if ( (void *) CurrentTTY != NULL )
-	{
-	    if ( CurrentTTY->used == 1 && CurrentTTY->magic == 1234 )
-		{
-		    CurrentTTY->terminal_id = current_terminal;
-			
-		    current_tty = CurrentTTY->index;
-			
-			
-			CurrentTTY->window = window;
-	        
-	        //CurrentTTY->left = window->rcClient->left;
-	        //CurrentTTY->top = window->rcClient->top;
-	        //CurrentTTY->width = window->rcClient->width;
-	        //CurrentTTY->height = window->rcClient->height;
 
-	        CurrentTTY->left   = window->left;
-	        CurrentTTY->top    = window->top;
-	        CurrentTTY->width  = window->width;
-	        CurrentTTY->height = window->height;
-
-
-            //cursor support.
-            CurrentTTY->cursor_x = TTY[current_vc].cursor_x;
-            CurrentTTY->cursor_y = TTY[current_vc].cursor_y;
-            CurrentTTY->cursor_width = TTY[current_vc].cursor_width;    //??
-            CurrentTTY->cursor_height = TTY[current_vc].cursor_height;   //??
-            CurrentTTY->cursor_color = TTY[current_vc].cursor_color;
-            CurrentTTY->cursor_left = TTY[current_vc].cursor_left;      // margem esquerda dada em linhas
-            CurrentTTY->cursor_top = TTY[current_vc].cursor_top;        // margem superior dada em linhas
-            CurrentTTY->cursor_right = TTY[current_vc].cursor_right;    // margem direita dada em linhas
-            CurrentTTY->cursor_bottom = TTY[current_vc].cursor_bottom;  // margem inferior dada em linhas
-			
-		}
-	}
 
     // continua ...
 }
@@ -298,10 +255,11 @@ int systemGetTerminalWindow (void){
 //@todo: precisamos de argumentos.
 //configuramos o retângulo do terminal virtual corrente.. 
 void 
-systemSetTerminalRectangle ( unsigned long left,
-                             unsigned long top,
-							 unsigned long width,
-							 unsigned long height )
+systemSetTerminalRectangle ( 
+    unsigned long left,
+    unsigned long top,
+    unsigned long width,
+    unsigned long height )
 {
 	
 	//

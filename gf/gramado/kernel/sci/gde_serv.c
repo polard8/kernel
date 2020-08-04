@@ -659,30 +659,22 @@ gde_extra_services (
         return (void *) __ptsname ( (int) arg2, 
                             (char *) arg3, (size_t) arg4  ); 
     } 
-    
-    
-    // copia o prompt[] do terminal para o buffer do tty atual.
-    //size_t __prompt_size = 0;
+
+    // Deprecated!
     if ( number == 810 )
     {
-        //__prompt_size = (size_t) strlen (__prompt_size) + 1
-        
-        //copiando.
-        //strcpy ( CurrentTTY->stdout->_base, (const char *) arg3 );
-        memcpy ( (void *) CurrentTTY->stdout->_base, (const void *) arg3, 64 ); 
+        debug_print ("gde_serv.c: [810] Deprecated\n");
         return NULL;
     }
-    
-    // copia do buffer do tty atual para o buffer do child do terminal.
+
+    // Deprecated!
     if ( number == 811 )
     {
-
-        //copiando.
-        //strcpy ( arg3,  (const char *) CurrentTTY->stdout->_base );
-        memcpy ( (void *) arg3, (const void *) CurrentTTY->stdout->_base, 64 );         
+        debug_print ("gde_serv.c: [811] Deprecated\n");
         return NULL;
     }
-    
+
+
     // Get process stats given pid
     // IN: pid, number
     if ( number == 880 )
@@ -804,122 +796,64 @@ gde_extra_services (
     }
 
 
-	// t18
-	// O arg2 � o PID.
-	// Devemos retornar o ponteiro para o stdout do terminal
-	// associado com o aplicativo.
-	
-	//#bugbug: N�o usar mais isso.
+    // Deprecated!
     if ( number == 1000 )
     {
-        return (void *) CurrentTTY->stdout;
+        debug_print ("gde_serv.c: [1000] Deprecated\n");
+        return NULL;
     }
 
-
-	// 1002
-	// Pega um char em CurrentTTY->stdout.
-	// o �ltimo que foi pego CurrentTTY->stdout,
-
-    int __xxx_ch;
+    // Deprecated!
     if ( number == 1002 )
     {
-        __xxx_ch = (int) *CurrentTTY->stdout_last_ptr;
-
-		//apaga.
-        *CurrentTTY->stdout_last_ptr = 0;
-
-		//incrementa e circula
-        CurrentTTY->stdout_last_ptr++;
-        if ( CurrentTTY->stdout_last_ptr >= CurrentTTY->stdout_limit )
-        {
-            CurrentTTY->stdout_last_ptr = CurrentTTY->stdout->_base;
-        }
-
-		//retorna o que pegou.
-        return (void *) __xxx_ch;
+        debug_print ("gde_serv.c: [1002] Deprecated\n");
+        return NULL;
     }
 
-
-
-    // #importante
-    // Set terminal PID for the current TTY.
+    // Deprecated!
     if ( number == 1003 )
     {
-        CurrentTTY->terminal_pid = (int) arg2;
+        debug_print ("gde_serv.c: [1003] Deprecated\n");
         return NULL;
     }
 
-
-    // #importante
-    // Set terminal PID for the current TTY.
+    // Deprecated!
     if ( number == 1004 )
     {
-        return (void *) CurrentTTY->terminal_pid;
-    }
-
-    // #importante
-    // Isso � usado por terminal/child por enquanto.
-    // Inicializa o stdout da CurrentTTY.
-    // #bugbug: Isso est� fazendo o mesmo que 1001.
-    if ( number == 1005 )
-    {
-		//#todo: Checar a validade
-        CurrentTTY->stdout = stdout;
-        //fprintf (stdout, "dirty\n"); //debug
+        debug_print ("gde_serv.c: [1004] Deprecated\n");
         return NULL;
     }
 
+    // Deprecated!
+    if ( number == 1005 )
+    {
+        debug_print ("gde_serv.c: [1005] Deprecated\n");
+        return NULL;
+    }
 
-	 //get sdtout
+    // Deprecated!
     if ( number == 1006 )
     {
-		//#todo: Checar a validade
-        return (void *) CurrentTTY->stdout;
-        //return (void *) stdout;
+        debug_print ("gde_serv.c: [1006] Deprecated\n");
+        return NULL;
     }
 
-
-    //#todo: Testar isso.
-    /*
-    // Agora vamos ler de uma tty indicada pelo processo.
-    int __xxx_ch;
-    int __tty_id;
-    if ( number == 1007 )
-    {
-		//
-		__tty_id = (int) arg2;
-		CurrentTTY = (struct tty_d *) ptsList[ __tty_id ]
-		
-		//pega
-        __xxx_ch = (int) *CurrentTTY->stdout_last_ptr;
-
-		//apaga.
-        *CurrentTTY->stdout_last_ptr = 0;
-
-		//incrementa e circula
-        CurrentTTY->stdout_last_ptr++;
-        if ( CurrentTTY->stdout_last_ptr >= CurrentTTY->stdout_limit )
-        {
-            CurrentTTY->stdout_last_ptr = CurrentTTY->stdout->_base;
-        }
-
-		//retorna o que pegou.
-        return (void *) __xxx_ch;
-    } 
-    */
-
-    // retorna o id da tty atual.
+    // Deprecated!
     if (number == 1008)
     {
-        return (void *) CurrentTTY->index;
+        debug_print ("gde_serv.c: [1008] Deprecated\n");
+        return NULL;
     }
+    
+    
     
     /*
     // retorna o id da tty do processo atualatual.
+    // todo criar uma função para isso.
     struct process_d * __P;
     if (number == 1009)
     {
-		__P = (struct process_d *)processList[current_process];
+        __P = (struct process_d *)processList[current_process];
 
         return (void *) __P->tty->index;
     }

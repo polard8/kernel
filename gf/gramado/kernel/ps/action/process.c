@@ -1,7 +1,6 @@
 /*
  * File: ps/action/process.c 
  *
- * Descri��o:
  *     Gerenciamento de processos.
  *     PM - Process Manager (Parte fundamental do Kernel Base).
  *     Interfaces para o kernel chamar as rotinas de gerenciamento de
@@ -2523,16 +2522,18 @@ int process_get_tty ( int pid )
 
 /*
  *******************************************
- *
+ * process_execve
  */
  
 // IN: name, argv, envp.
 
 int 
-process_execve ( const char *arg1, 
-                 const char *arg2, 
-                 const char *arg3 ) 
+process_execve ( 
+    const char *arg1, 
+    const char *arg2, 
+    const char *arg3 ) 
 {
+
     int Status = 1;    // fail.
 
     struct process_d *process;
@@ -2546,7 +2547,7 @@ process_execve ( const char *arg1,
 
 	// Usados gerenciamento de arquivo.
 
-    size_t l;                        //lenght.
+    size_t l=0;                        //lenght.
     char bin_string[] = ".bin";
     //char bin2_string[] = ".BIN";
 
@@ -2741,12 +2742,10 @@ process_execve ( const char *arg1,
 
     Status = (int) fsCheckELFFile ( (unsigned long) process->Image );
 
-    if ( Status == 0 )
-    {
+    if ( Status == 0 ){
         goto format_ok;
+ 
     }else{
-
-		// #debug
 		panic ("do_execve: It's not a valid ELF file\n");
 		//goto fail;
     };
@@ -2885,10 +2884,10 @@ format_ok:
 
     Thread = (struct thread_d *) threadList[current_thread];
 
-    if ( (void *) Thread == NULL )
-    {
+    if ( (void *) Thread == NULL ){
         panic ("do_execve: Thread fail\n");
-		//goto fail;
+        //goto fail;
+
     }else{
 
 		// #importante:
@@ -2928,34 +2927,6 @@ format_ok:
 
         Thread->plane = Plane;
 
-		//#test
-		// Vamos associar ao primeiro tty, mesmo que seja um aplicatibo GUI.
-		// Se ele for um aplicativo GUI ele ir� atualizar o foco.
-		// Se for um aplicativo de terminal ent�o ter� uma janela 
-		// para rodar. Pois o ldisc manda mensagens para a thread de controle 
-		// da janela com foco de entrada. Vamos fazer isso manualmente.
-
-        if ( (void *) CurrentTTY != NULL )
-        {
-            if ( CurrentTTY->used == 1 && CurrentTTY->magic == 1234 )
-            {
-                current_tty = CurrentTTY->index;
-
-                Thread->tty_id = current_tty;
-
-				// #terminal window.
-                window_with_focus = CurrentTTY->window->id;
-                terminal_window = CurrentTTY->window->id;
-
-				//#importante
-				//a thread de controle da janela, para qual
-				//ser�o enviadas as mensagens pelo ldisc
-                CurrentTTY->window->control = Thread;
-            }
-
-        }else{
-            //Thread->tty_id = 0; //-1
-        };
 
 		// Context.
 		// #todo: 
@@ -2965,20 +2936,20 @@ format_ok:
 
         Thread->ss = 0x23; 
         //Thread->esp = (unsigned long) 0x0044FFF0; 
-        Thread->esp = (unsigned long) process->Image + 0x4FFF0; 
+        Thread->esp = (unsigned long) ( process->Image + 0x4FFF0); 
         Thread->eflags = 0x3200; 
         Thread->cs = 0x1B; 
         //Thread->eip = (unsigned long) 0x00401000; 
-        Thread->eip = (unsigned long) process->Image + 0x1000;
+        Thread->eip = (unsigned long) (process->Image + 0x1000);
 
 
-		// Segment registers.
+        // Segment registers.
         Thread->ds = 0x23; 
         Thread->es = 0x23; 
         Thread->fs = 0x23; 
         Thread->gs = 0x23; 
 
-		// Outros.
+        // Outros.
         Thread->eax = 0;
         Thread->ebx = 0;
         Thread->ecx = 0;
@@ -3051,9 +3022,6 @@ done:
     return (int) Status;
 }
 
-                 
-               
-    
 
 //
 // End.

@@ -1252,15 +1252,16 @@ void printchar (char **str, int c){
     if (str)
     {
         if ( c == '\n' ){
-            CurrentTTY->print_pending = 1;
+            // tty->print_pending = 1;
         }
 
         **str = c;
 
         ++(*str);
 
-    } else (void) putchar (c);
+    } else (void) putchar(c);
 }
+
 
 
 /*

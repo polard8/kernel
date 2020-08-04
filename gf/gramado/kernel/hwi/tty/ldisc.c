@@ -1,5 +1,5 @@
 /*
- * File: x/i8042ldisc.c
+ * File: ldisc.c
  *
  * Descrição:
  *    Esse será o gerenciador de Line Discipline.
@@ -66,7 +66,7 @@ void initialize_system_message_queue (void){
 }
 
 
-
+//Deprecated
 unsigned long 
 ldisc_dialog ( 
     struct window_d *window, 
@@ -74,8 +74,7 @@ ldisc_dialog (
     unsigned long long1, 
     unsigned long long2 ) 
 {
-    //# cancelada !!!
-    return 0;	
+    return 0;
 }
 
 

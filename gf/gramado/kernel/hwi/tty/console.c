@@ -1130,49 +1130,9 @@ int kclearClientArea (int color)
 // Incluir uma linha no buffer de linhas da estrutura do tty atual.
 // vamos copiar esse esquema do edito de textos em ring3.
 
-int insert_line ( char *string, int line ){
-
-    debug_print ("insert_line: [FIXME]\n");
-
-	/*
-	
-	int l;
-	struct tty_line_d *Line;
-	
-	//if ( (void *) string == NULL )
-	//	return -1;
-	
-    if ( (void *) CurrentTTY != NULL )
-	{
-        if ( CurrentTTY->used == 1 && CurrentTTY->magic == 1234 )
-		{
-			//Linha atual para se escrever no stdout do current tty
-		    l = CurrentTTY->current_line;
-			
-			//Pega o ponteiro para estrutura de linha da linha atual.
-			Line = (struct tty_line_d *) CurrentTTY->lines[l];
-			
-			if ( (void *) Line == NULL )
-				return -1;
-			
-			//Buffer pra colocar chars.
-		    //Line->CHARS[0]  
-			//Line->ATTRIBUTES[0] 
-				
-			//inicio do texto dentro da linha atual
-		    //CurrentTTY->left
-			
-			//fim do texto dentro da linha atual
-			//CurrentTTY->right
-			
-			//posição do ponteiro dentro da linha atual.
-			//CurrentTTY->pos
-		
-		}
-	};
-	*/
-
-
+int insert_line ( char *string, int line )
+{
+    debug_print ("insert_line: [TODO]\n");
     return (int) -1; 
 }
 

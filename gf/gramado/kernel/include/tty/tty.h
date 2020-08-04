@@ -300,16 +300,11 @@ struct tty_d TTY[4];
 // Pseudo terminais.
 //
 
-struct tty_d *CurrentTTY;
-
 
 // Usado pelos aplicativos para criarem terminais virtuais.
 // Criadas com ponteiros e alocadas com kmalloc.
 //int current_pts;
 
-
-//#define TTY_COUNT_MAX 256
-//unsigned long ttyList[256]; 
 
 
 // Get the tty pointer.

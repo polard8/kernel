@@ -1105,137 +1105,6 @@ void tty_reset_termios ( struct tty_d *tty ){
 }
 
 
-
-
-/*
-//#cancelado. Deletar isso.
-// Checar no tty atual se tem que atualizar a tela,
-// a linha ou o char.
-// mostrar o conteúdo do arquivo stdout.
-void check_CurrentTTY (void);
-void check_CurrentTTY (void){
-
-	int refresh = 0;
-	
-	int i;
-	int len = 0;
-	
-	//se devemos pintar alguma coisa ou não.
-	if ( CurrentTTY->stdout_status == 1 )
-	{
-		// stdout
-		// Não há o que pintar para stdout
-		if (CurrentTTY->stdout_last_ptr == stdout->_p )
-		{
-			//printf ("check_CurrentTTY: ptr error nada pra pintar\n");
-			//refresh_screen ();			
-		    goto done;
-		}
-		
-		//#debug
-		//printf ("last = %x ", CurrentTTY->stdout_last_ptr);
-		//printf ("ptr = %x  \n", stdout->_ptr);
-		
-		//pintar de que jeito?
-	    switch (CurrentTTY->stdout_update_what)
-		{
-			// update char	
-			//case 1:	
-			//	printf ("%c", *CurrentTTY->stdout_last_ptr);
-			//	CurrentTTY->stdout_last_ptr++;
-			//	CurrentTTY->stdout_last_ptr = stdout->_ptr;
-				//printf ("%c", stdout->_ptr);
-				//refresh_rectangle ( g_cursor_x, g_cursor_y, 20, 20 ); 
-			//	refresh = 1;
-			//	break;
-				
-			// update line	
-			//case 2:	
-			//	break;
-				
-			// update window. file	
-			default:
-			//case 3:
-				//calcula quantos chars devemos pintar.
-				len = (stdout->_p - CurrentTTY->stdout_last_ptr);
-				//pintamos todos os chars.
-				for (i=0; i<len; i++)
-				{
-					//Isso funciona.
-				    printf ("%c", *CurrentTTY->stdout_last_ptr);
-				    CurrentTTY->stdout_last_ptr++;				
-				}
-				CurrentTTY->stdout_last_ptr = stdout->_p;
-				CurrentTTY->print_pending = 0; //não temos mais print pendente
-				
-				refresh = 1;
-				break;
-				
-			// nothing
-			//default:
-			    //break;	
-		}
-		
-		int status = 0;
-		// refresh tty window
-		if (refresh == 1)
-		{
-		    status = show_window_rect (CurrentTTY->window);
-			
-			if (status == 1)
-			{
-				printf ("check_CurrentTTY: invalid tty window\n");
-				refresh_screen ();
-			}
-		}
-	}
-
-//#todo: delete label.	
-done:
-
-	//reset
-    CurrentTTY->stdout_status = 0;
-    CurrentTTY->stdout_update_what = 0;
-}
-*/
-
-
-
-/*
-int set_current_tty (int tty_id);
-int set_current_tty (int tty_id){
-	
-	struct tty_d *tty;
-	
-	if ( tty_id < 0 || tty_id > 7 )
-	{
-	    panic ("set_current_tty: tty_id");
-		//return -1;
-	}
-	
-	tty = (struct tty_d *)  ptsList[tty_id];
-	
-	if ( (void *) tty == NULL )
-	{
-		panic ("set_current_tty: tty");
-		//return -1;
-	}else{
-	
-	    if ( tty->used != 1 || tty->magic != 1234 )
-		{
-			panic ("set_current_tty: validation");
-			//return -1;
-		}
-		
-		//OK
-		CurrentTTY = tty;
-	}
-	
-	return 0;
-}
-*/
-
-
 /*
 void reset_tty ( struct tty_d *tty );
 void reset_tty ( struct tty_d *tty ){
@@ -1629,56 +1498,34 @@ int initialize_tty_struct (struct tty_d *tty)
 // #todo: Maybe it is not a good name.
 int tty_init_module (void){
 
-    int i=0;
-    
     // #bugbug
-    // We do NOT have a tty list.
-    // We are gonna use the file support and the file table.
+    // Created but not used!
+    // Podemos colocar como tty do processo atual.
+    struct tty_d *tty;
 
-    int ttyID = 10; 
+
+    int i=0;
 
 
 
     debug_print ("tty_init_module:\n");
-    
+ 
 
 
-    // #todo
-    // Rever esse limite.
-    // Todos os drivers de dispositivos precisarão de tty.
-    // todos os terminais virtuais.
-    // O linux usa terminais virtuais que vão até ctl+al+f7. 
-    // Mas ttys tem muitas.
+    tty = (struct tty_d *) kmalloc ( sizeof(struct tty_d) );
 
-    // #importante
-    // O sistema terá 8 terminais
-    // e terá vários pseudo terminais. pts. - Stands for pseudo terminal slave.
-
-
-    if ( ttyID < 0 || ttyID > 32 )
-    {
-        panic ("ttyInit: tty_id");
-    }
-
-
-	//
-	// CurrentTTY
-	//
-
-    CurrentTTY = (struct tty_d *) kmalloc ( sizeof(struct tty_d) );
-
-    if ( (void *) CurrentTTY == NULL ){
-        panic ("ttyInit: CurrentTTY");
+    if ( (void *) tty == NULL ){
+        panic ("ttyInit: tty");
 
     }else{
-        CurrentTTY->index = ttyID;
-        CurrentTTY->used = 1;
-        CurrentTTY->magic = 1234;
+        tty->index = 0;  //#bugbug!!!
+        tty->used = 1;
+        tty->magic = 1234;
         
         // Security
-        CurrentTTY->user_session = usession0;
-        CurrentTTY->room         = room0;
-        CurrentTTY->desktop      = desktop0;
+        tty->user_session = usession0;
+        tty->room         = room0;
+        tty->desktop      = desktop0;
 
 
         //
@@ -1690,33 +1537,31 @@ int tty_init_module (void){
         // #todo: Delete this element from the tty struct.
         // Configurando uma janela básica, pra não ficar null.
         
-        CurrentTTY->window = NULL;
+        tty->window = NULL;
 
-        CurrentTTY->left = 0; 
-        CurrentTTY->top = 0;
-        //CurrentTTY->width = 0;
-        //CurrentTTY->height = 0;	
+        tty->left = 0; 
+        tty->top = 0;
 
 
         // Standard stream. 
-        CurrentTTY->stdin  = current_stdin;
-        CurrentTTY->stdout = current_stdout;
-        CurrentTTY->stderr = current_stderr;
+        tty->stdin  = current_stdin;
+        tty->stdout = current_stdout;
+        tty->stderr = current_stderr;
 
         // Raw buffer and Canonical buffer.
-        //CurrentTTY->rbuffer ...
-        //CurrentTTY->cbuffer ...
+        //tty->rbuffer ...
+        //tty->cbuffer ...
 
         
-        CurrentTTY->stdout_status = 0;
-        CurrentTTY->stdout_update_what = 0;
+        tty->stdout_status = 0;
+        tty->stdout_update_what = 0;
 
 
         // buffer circular.
         // case e limite.
 
-        CurrentTTY->stdout_last_ptr = CurrentTTY->stdout->_p;
-        CurrentTTY->stdout_limit = (CurrentTTY->stdout->_p + CurrentTTY->stdout->_lbfsize);
+        tty->stdout_last_ptr = tty->stdout->_p;
+        tty->stdout_limit    = (tty->stdout->_p + tty->stdout->_lbfsize);
 
     };
 

@@ -4,7 +4,6 @@
 ARCH ?= x86
 #ARCH ?= x86_64
 
-
 # Make variables (CC, etc...)
 AS	= as
 LD	= ld
@@ -21,9 +20,6 @@ PYTHON	= python
 PYTHON2	= python2
 PYTHON3	= python3
 RUBY	= ruby
-
-
-
 
 
 ifeq ($(ARCH),x86)
@@ -260,12 +256,10 @@ all-c:
 	$(CC) -c ws/toolbar.c   $(KINCLUDE) $(CFLAGS) -o toolbar.o
 	$(CC) -c ws/input.c     $(KINCLUDE) $(CFLAGS) -o input.o
 	$(CC) -c ws/output.c    $(KINCLUDE) $(CFLAGS) -o output.o
-	$(CC) -c ws/terminal.c  $(KINCLUDE) $(CFLAGS) -o terminal.o
 	$(CC) -c ws/kgws.c      $(KINCLUDE) $(CFLAGS) -o kgws.o
 	$(CC) -c ws/xproc.c     $(KINCLUDE) $(CFLAGS) -o xproc.o
 	$(CC) -c ws/screen.c    $(KINCLUDE) $(CFLAGS) -o screen.o
 	$(CC) -c ws/video.c     $(KINCLUDE) $(CFLAGS) -o video.o
-	$(CC) -c ws/ldisc.c     $(KINCLUDE) $(CFLAGS) -o ldisc.o
 
 
 	# ps/action
@@ -383,12 +377,15 @@ all-c:
 	#
 	# ==== hid ====
 	# 
-	
+
 	# tty
-	$(CC) -c hwi/dd/hid/tty/console.c $(KINCLUDE) $(CFLAGS) -o cedge.o
-	$(CC) -c hwi/dd/hid/tty/pty.c     $(KINCLUDE) $(CFLAGS) -o pty.o
-	$(CC) -c hwi/dd/hid/tty/tty.c     $(KINCLUDE) $(CFLAGS) -o tty.o
-	$(CC) -c hwi/dd/hid/tty/vt.c      $(KINCLUDE) $(CFLAGS) -o vt.o
+	$(CC) -c hwi/tty/console.c   $(KINCLUDE) $(CFLAGS) -o cedge.o
+	$(CC) -c hwi/tty/pty.c       $(KINCLUDE) $(CFLAGS) -o pty.o
+	$(CC) -c hwi/tty/tty.c       $(KINCLUDE) $(CFLAGS) -o tty.o
+	$(CC) -c hwi/tty/vt.c        $(KINCLUDE) $(CFLAGS) -o vt.o
+	$(CC) -c hwi/tty/terminal.c  $(KINCLUDE) $(CFLAGS) -o terminal.o
+	$(CC) -c hwi/tty/ldisc.c     $(KINCLUDE) $(CFLAGS) -o ldisc.o
+	
 
 	# ws
 	$(CC) -c hwi/dd/hid/ws/i8042.c     $(KINCLUDE) $(CFLAGS) -o i8042.o
