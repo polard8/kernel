@@ -1208,6 +1208,7 @@ int isatty (int fd)
 { 
     struct termios t;
     return ( tcgetattr(fd, &t) != -1 ); 
+    //return ( tcgetattr(fd, &t) == 0);
 }
 
 

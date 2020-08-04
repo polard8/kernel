@@ -330,11 +330,22 @@ int __fflush (FILE *stream){
     };
 
 
+
+	//Not buffered. 
+	//if (stream->_flags & _IONBF)
+		//return (0);
+
+	//Not writable. 
+	//if (!(stream->flags & _IOWRITE))
+		//return (0);
+
+
+
     //if ( !stream->_w )
         //return 0;
         
     
-    // BUffer ?    
+    // Buffer ?    
     if ( (void *) stream->_base == NULL )
     {
         debug_print( "__fflush: _base\n");
@@ -342,9 +353,10 @@ int __fflush (FILE *stream){
     } 
 
 
-    if ( stream->_w <= 0 ){ 
+    if ( stream->_w <= 0 )
+    { 
         stream->_w = 0; 
-        debug_print( "__fflush: _w\n");
+        debug_print( "__fflush: [FAIL] _w\n");
         return (int) (-1);
     } 
 
@@ -359,7 +371,8 @@ int __fflush (FILE *stream){
  
     if (nwrite <= 0)
     {
-        printf ("__fflush: nwrite\n");
+        printf ("__fflush: [FAIL] nwrite\n");
+        //stream->_flags |= _IOERROR; //#todo
         //stream->error = errno;
         return EOF;
     }
@@ -846,30 +859,28 @@ int fclose (FILE *stream){
        return EOF;
 
 
-    //#todo
     fflush(stream);
 
     // Isso deve fechar o arquivo na lista de arqquivo abertos.
     __ret = (int) close ( fileno(stream) );
+    
+    //fail
+    if (__ret<0)
+        return EOF;
 
 
     if ( (void *) stream != NULL )
     {
         stream->_base = NULL;
         stream->_p = NULL;
-
-        //?? What
-        //#todo
-        //stream->_flags &= ~(_IOREAD|_IOWRT|_IONBF|_IOMYBUF|_IOERR|_IOEOF);
-
+        stream->_flags = 0;
         stream->_cnt = 0;
 
-        return (int) __ret;
+        return 0;
     }
 
-
-    return (int) __ret;
-    //return (int) EOF;
+    //fail
+    return EOF;
 }
 
 

@@ -60,17 +60,18 @@
 #define VK_ALTGR       0x38  //56 abnt //100 //56
 
 #define VK_SPACE       0x39  //57  //Space.
-#define VK_CAPITAL	   0x3A  //58  //20  
-#define VK_F1	0x3B  //59   // No DOS é 0x170.  
-#define VK_F2	0x3C  //60 
-#define VK_F3	0x3D  //61 
-#define VK_F4	0x3E  //62 
-#define VK_F5	0x3F  //63 
-#define VK_F6	0x40  //64 
-#define VK_F7	0x41  //65 
-#define VK_F8	0x42  //66 
-#define VK_F9	0x43  //67 
-#define VK_F10	0x44  //68
+#define VK_CAPITAL     0x3A  //58  //20  
+
+#define VK_F1    0x3B  //59   // No DOS é 0x170.  
+#define VK_F2    0x3C  //60 
+#define VK_F3    0x3D  //61 
+#define VK_F4    0x3E  //62 
+#define VK_F5    0x3F  //63 
+#define VK_F6    0x40  //64 
+#define VK_F7    0x41  //65 
+#define VK_F8    0x42  //66 
+#define VK_F9    0x43  //67 
+#define VK_F10   0x44  //68
 #define VK_NUMLOCK  0x45  //69 //0x90
 #define VK_SCROLL	0x46  //70 //0x91
 #define VK_HOME	  0x47    //71          
