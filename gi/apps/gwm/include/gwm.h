@@ -9,6 +9,9 @@
 
 struct wm_client_d
 {
+    int used;
+    int magic;
+    
     int window;
     int title_window;
     

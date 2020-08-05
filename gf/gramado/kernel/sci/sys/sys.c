@@ -605,10 +605,14 @@ fail:
 // each different kind of file intead of implementing
 // an internal sub-routine.
 
+// #todo
+// Isso deveria ser apenas um wrapper,
+// chamando as rotinas apropriadas para cada tipo 
+// de arquivo.
+
 // OUT:
 // 0 = Couldn't read.
 // -1 = Error.
-
 
 int sys_read (unsigned int fd, char *ubuf, int count){
 
@@ -868,11 +872,11 @@ int sys_read (unsigned int fd, char *ubuf, int count){
         }  // if it's not full.
 
         panic ("sys_read: unexpected socket_buffer_full value \n");
-    }  
+    } //-- socket file  
 
 
     //
-    // ==== Regular file ====
+    // == Regular file ====================================
     //
 
 
@@ -881,54 +885,64 @@ int sys_read (unsigned int fd, char *ubuf, int count){
     // See: unistd.c
     // #todo Tem que retornar a quantidade de bytes lido.
     // #bugbug: Nem todos arquivos criados possuem essa flag configurada
-    //apropriadament...estamos fazendo isso.
-    //if ( __file->____object == ObjectTypeFile )
-    //{ ... }
-
-    //Se não pode ler.
-    if ( (__file->_flags & __SRD) == 0 )
-    {
-        debug_print("sys_read: [FLAGS] Can't read!\n");
-        
-        //Não conseguimos ler.
-        //nada de errado, apenas espera.
-        //do_thread_waiting (current_thread);
-        //__file->tid_waiting = current_thread;
-        //__file->_flags |= __SWR;  //pode escrever.
-        //scheduler();
-        return 0;
-    }
-   
-    // Se puder ler:
-    // + Call a function to read a regular file.
-    // + Sinalize that another process can write.
-    // #todo: wake the one that was waiting to write.
-
-    if ( __file->_flags & __SRD )
-    {     
-        nbytes = (int) file_read_buffer ( (file *) __file, 
-                           (char *) ubuf, (int) count );
-
-        //Se conseguimos ler.
-        if( nbytes>0)
+    // apropriadamente ...estamos fazendo isso.
+    
+    // #hackhack
+    // We will open all the other kind of object
+    // with this IF right here.
+    // We need to fix it in the open() routines
+    // to give us the correct type.
+    
+    if ( __file->____object == ObjectTypeFile )
+    { 
+        //Se não pode ler.
+        if ( (__file->_flags & __SRD) == 0 )
         {
-            // ok to write.
-            __file->_flags = __SWR;
+            debug_print("sys_read: [FLAGS] Can't read!\n");
         
-            // #test
-            // Acordar quem esperava por esse evento
-            //do_thread_ready( __file->tid_waiting );
-            return (int) nbytes;        
+            //Não conseguimos ler.
+            //nada de errado, apenas espera.
+            //do_thread_waiting (current_thread);
+            //__file->tid_waiting = current_thread;
+            //__file->_flags |= __SWR;  //pode escrever.
+            //scheduler();
+            return 0;
         }
+   
+        // Se puder ler:
+        // + Call a function to read a regular file.
+        // + Sinalize that another process can write.
+        // #todo: wake the one that was waiting to write.
+
+        if ( __file->_flags & __SRD )
+        {     
+            nbytes = (int) file_read_buffer ( (file *) __file, 
+                               (char *) ubuf, (int) count );
+
+            // Se conseguimos ler.
+            if ( nbytes>0)
+            {
+                // ok to write.
+                __file->_flags = __SWR;
         
-        //Não conseguimos ler.
-        //nada de errado, apenas espera.
-        //do_thread_waiting (current_thread);
-        //__file->tid_waiting = current_thread;
-        //__file->_flags |= __SWR;  //pode escrever.
-        //scheduler();
-        return 0;
-    }
+                // #test
+                // Acordar quem esperava por esse evento
+                //do_thread_ready( __file->tid_waiting );
+                return (int) nbytes;        
+            }
+        
+            //Não conseguimos ler.
+            //nada de errado, apenas espera.
+            //do_thread_waiting (current_thread);
+            //__file->tid_waiting = current_thread;
+            //__file->_flags |= __SWR;  //pode escrever.
+            //scheduler();
+            return 0;
+        }
+
+    } //-- regular file.
+
+    debug_print ("sys_read: [FAIL] Unknown object type\n");
 
 
     //
@@ -944,9 +958,8 @@ int sys_read (unsigned int fd, char *ubuf, int count){
 // Zero representará fim de arquivo. 
 
 fail:
-
     debug_print ("sys_read: [FAIL] something is wrong!\n");
-    printf("sys_read: [FAIL] something is wrong!\n");
+    printf      ("sys_read: [FAIL] something is wrong!\n");
     refresh_screen();
 
     //bloqueando, autorizando a escrita e reescalonando.
@@ -976,6 +989,11 @@ fail:
 // #todo
 // We need to call one subfunction for each different kind of file 
 // intead of implementing an internal sub-routine.
+
+// #todo
+// Isso deveria ser apenas um wrapper,
+// chamando as rotinas apropriadas para cada tipo 
+// de arquivo.
 
 // OUT:
 // 0 = Couldn't read.
@@ -1263,7 +1281,7 @@ int sys_write (unsigned int fd, char *ubuf, int count){
     // Arquivos normais (regular)
     //
     
-    // ==== Regular file ===============================
+    // == Regular file ===============================
     
 
     // Tem que retonar o tanto de bytes escritos.
@@ -1326,7 +1344,9 @@ int sys_write (unsigned int fd, char *ubuf, int count){
  
         debug_print ("sys_write: [FAIL] Something is wrong!\n");
     } //regular file.
-    
+
+
+    debug_print ("sys_write: [FAIL] Unknown object type!\n");
     
     //
     // fail.
@@ -1384,8 +1404,8 @@ sys_create_process (
    // deletar esse argumento. outra coisa no lugar.
    // o argumento init_eip também ta errado.
 
-    struct process_d *p;
-    struct thread_d *t;
+    struct process_d  *p;
+    struct thread_d   *t;
     
     
    //
@@ -1519,14 +1539,11 @@ int sys_getppid (void){
     {
         p = (void *) processList[pid];
 
-        if ( (void *) p == NULL )
-        { 
-            return (int) -1; 
-        }
+        if ( (void *) p == NULL ){ return (int) -1; }
 
         if ( p->used != 1 || p->magic != 1234 )
-        {    
-            return (int) -1;	
+        {
+            return (int) -1;
         }
 
         return (int) p->ppid;
@@ -1552,7 +1569,7 @@ int sys_fork (void){
     // #todo
     // We need to change this name. fork() will be used only on ring3.
     // See: gramado/kernel/middle/sysmk/ps/action/threadi.c
-    return (int) kfork ();
+    return (int) kfork();
 }
 
 
@@ -1724,9 +1741,10 @@ void sys_reboot (void)
  *     Chama uma rotina interna para desligar a máquina.
  */
 
-void sys_shutdown (void){
-    debug_print("sys_shutdown:\n");
-    hal_shutdown ();
+void sys_shutdown (void)
+{
+    debug_print("sys_shutdown: [TODO]\n");
+    hal_shutdown();
 }
 
 

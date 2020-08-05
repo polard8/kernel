@@ -116,7 +116,7 @@ file *k_fopen ( const char *filename, const char *mode ){
     
     struct process_d *Process;
 
-	// Buffer para armazenar o arquivo que vamos abrir.
+    // Buffer para armazenar o arquivo que vamos abrir.
     char *file_buffer;
 
     int i=0;    
@@ -249,45 +249,31 @@ file *k_fopen ( const char *filename, const char *mode ){
         goto fail;
 
     }else{
-
         f->used = 1;
         f->magic = 1234;
-        
         f->pid = (pid_t) current_process;
         f->uid = (uid_t) current_user;
         f->gid = (gid_t) current_group;
         
-        //#todo
-        //f->____object = ObjectTypeFile;
+        // #bugbug [FIXME]
+        // We need a type in read().
+        
+        f->____object = ObjectTypeFile;
 
-        // Name.
+        // #bugbug
+        // We need to get the filename in the inode.
+        
         f->_tmpfname = (char *) filename;
-  
-        // The buffer
+
+
         f->_base = file_buffer;
         f->_p = f->_base;
         f->_bf._base = file_buffer;
-        
-        // Buffer size
-        f->_lbfsize = s;    // File size.
- 
-        // #todo: Quanto falta.
-        //f->_cnt = f->_lbfsize;  
-        // Quanto falta para acabar o arquivo.
+        f->_lbfsize = s;             // File size.
         f->_cnt = s;
-      
-        
         f->_r = 0;
         f->_w = 0;
-        
 
-        // #bugbug
-        // ?? #todo: 
-        // precisamos de um id
-        // Esse ID é um indice da estrutura de processo.
-        // #todo: Olhar a forma com que o pipe pega o id.
-        // #todo: Olhar a forma com que o socket pega o id.
-        
         f->_file = __slot; 
 
         Process->Objects[ __slot ] = (unsigned long) f;
@@ -338,6 +324,12 @@ file *k_fopen ( const char *filename, const char *mode ){
         f = NULL;
         goto fail;
     }
+    
+    // #todo
+    // We need to check the file type in the inode
+    // to set the object type in the file structure.
+    // read() will need this.
+    debug_print ("k_fopen: [FIXME] We need the object type found in the inode\n");
 
 //done:
     debug_print ("k_fopen: done\n");

@@ -101,6 +101,9 @@ int service_drain_input (void);
 int serviceCreateWindow ( void );
 int servicepixelBackBufferPutpixel (void);
 int servicelineBackbufferDrawHorizontalLine (void);
+
+int serviceRefreshWindow(void);
+
 int serviceDrawChar(void);
 int serviceDrawText(void);
 int serviceDrawButton (void); 
@@ -574,6 +577,12 @@ gwsProcedure (
            gde_debug_print ("gwssrv: Message number 1005\n");
            serviceDrawText();
            break;
+
+        // Refresh window
+        case 1006:
+           gde_debug_print ("gwssrv: Message number 1006\n");
+           serviceRefreshWindow();
+           break;
     
         // ...
                
@@ -972,8 +981,8 @@ int main (int argc, char **argv){
         //printf ("gwssrv: Calling child \n");  
 
 
-        //gde_clone_and_execute ("gwm.bin");    // window manager
-        gde_clone_and_execute ("terminal.bin");  
+        gde_clone_and_execute ("gwm.bin");    // window manager
+        //gde_clone_and_execute ("terminal.bin");  
         //gde_clone_and_execute ("fileman.bin");  
         //gde_clone_and_execute ("browser.bin"); 
         //gde_clone_and_execute ("launch1.bin"); 
@@ -1155,13 +1164,13 @@ int serviceCreateWindow (void){
 	// O buffer é uma global nesse documento.
     unsigned long *message_address = (unsigned long *) &__buffer[0];
         
-    struct gws_window_d *__mywindow;
+    struct gws_window_d *Window;
 
     unsigned long x, y, w, h, color, type;
 
     
     int pw=0;
-    struct gws_window_d *parent;
+    struct gws_window_d *Parent;
 
 
 
@@ -1189,12 +1198,12 @@ int serviceCreateWindow (void){
     }
     
     //get parent window structure pointer.
-    parent = (struct gws_window_d *) windowList[pw];    
+    Parent = (struct gws_window_d *) windowList[pw];    
 
     //ajuste improvidsado
-    if( (void *) parent == NULL ){
+    if( (void *) Parent == NULL ){
         gde_debug_print("serviceCreateWindow: parent window struct fail\n");
-        parent = gui->screen;
+        Parent = gui->screen;
         exit(1); //test
     }
 
@@ -1206,27 +1215,28 @@ int serviceCreateWindow (void){
     //                                          gui->screen, 0, 
     //                                          COLOR_PINK, color ); 
 
-    __mywindow = (struct gws_window_d *) createwCreateWindow ( type, 
+    Window = (struct gws_window_d *) createwCreateWindow ( type, 
                                               1, 1, "No-Name",  
                                               x, y, w, h,   
-                                              parent, 0, 
+                                              Parent, 0, 
                                               COLOR_PINK, color ); 
 
 
-    if ( (void *) __mywindow == NULL ){
+    if ( (void *) Window == NULL ){
        gde_debug_print ("gwssrv: createwCreateWindow fail\n");
-       //return -1;
+       next_response[1] = 0;
+       return -1;
     }
 
 
     int id = -1;
-    id = gwsRegisterWindow ( __mywindow );
+    id = gwsRegisterWindow ( Window );
 
     if (id<0){
         gde_debug_print ("gwssrv: serviceCreateWindow Couldn't register window\n");
-        //return -1;
+        next_response[1] = 0;
+        return -1;
     }
-
 
     // preparando a resposta.
     // Ela será enviada depois pelo loop de socket.
@@ -1236,7 +1246,11 @@ int serviceCreateWindow (void){
     next_response[3] = 0;
 
 
-    gws_show_backbuffer (); //for debug    
+    gws_show_window_rect(Window);
+    //gws_show_backbuffer (); //for debug 
+    
+
+       
     return 0; //todo
 }
 
@@ -1313,6 +1327,80 @@ int servicelineBackbufferDrawHorizontalLine (void)
     gws_show_backbuffer(); // for debug   
     return 0;
 }
+
+
+
+//todo
+int serviceRefreshWindow(void)
+{
+
+	//o buffer é uma global nesse documento.
+    unsigned long *message_address = (unsigned long *) &__buffer[0];
+
+
+    struct gws_window_d *window;
+    int window_id = -1;
+    
+    //unsigned long x;
+    //unsigned long y;
+    //unsigned long color;
+    //int __char;
+    //char *text_buffer;    // #todo
+
+
+    // #debug
+    gde_debug_print ("gwssrv: serviceRefreshWindow\n");
+
+
+    // Get
+    
+    
+    window_id = message_address[4];
+    
+    
+    //
+    // Window ID
+    //
+   
+    // Limits
+    if ( window_id < 0 || window_id >= WINDOW_COUNT_MAX ){
+        gde_debug_print ("gwssrv: serviceRefreshWindow window_id\n");
+        return -1;
+    }
+
+    //#todo
+    // Get the window structure given the id.
+    window = (struct gws_window_d *) windowList[window_id];
+   
+    if ( (void *) window == NULL ){
+        gde_debug_print ("gwssrv: serviceRefreshWindow window\n");
+        return -1;
+    }
+    
+    if ( window->used != 1 || window->magic != 1234 ){
+        gde_debug_print ("gwssrv: serviceRefreshWindow validation\n");
+        return -1;
+    }
+
+    gws_show_window_rect(window);
+    
+    //
+    // Refresh
+    //  
+        
+    //gws_show_backbuffer ();       // for debug   
+    //gws_show_window_rect(window);   // something faster for now.
+    //something faster.
+    //gws_refresh_rectangle ( 
+    //    window->left +x, 
+    //    window->top  +y, 
+    //    8,   //char width 
+    //    8 ); // char height 
+
+    return 0;
+}
+
+
 
 
 //todo

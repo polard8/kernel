@@ -860,10 +860,11 @@ gde_extra_services (
     */
 
 
-     //api - load file (string ???)
-     //#todo: Tem que retornar algum identificador para a api.
-     //poderia ser um indice na tabela de arquivos abertos pelo processo.
+     // api - load file (string ???)
+     // #todo: Tem que retornar algum identificador para a api.
+     // poderia ser um indice na tabela de arquivos abertos pelo processo.
      // #todo: rever.
+     // See: kstdio.c
     if ( number == 4002 ){
         return (void *) k_fopen ( (const char *) arg2, "r+" );
     }

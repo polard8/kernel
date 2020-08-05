@@ -850,8 +850,8 @@ int sys_socket ( int family, int type, int protocol ){
         p->priv = __socket;
 
         // family, type and protocol.
-        __socket->family = family;
-        __socket->type = type;  // DATAGRAM or STREAM 
+        __socket->family   = family;
+        __socket->type     = type;      // DATAGRAM or STREAM 
         __socket->protocol = protocol;
 
         __socket->pid = (pid_t) current_process;

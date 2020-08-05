@@ -625,18 +625,19 @@ void *createwCreateWindow2 (
 		// inclui as bordas e a barra de títulos.
 
         // Dimensões.
-        window->width = width;
+        window->width  = width;
         window->height = height;  
 
         // Margens.
         window->left = x;    
-        window->top = y;
+        window->top  = y;
         window->right  = (unsigned long) ( window->left + window->width );
         window->bottom = (unsigned long) ( window->top  + window->height ); 
 
 		// Deslocamentos em relação às margens.
 		// Os deslocamentos servem para inserir elementos na janela, 
 		// como barras, botões e textos.
+
         window->x = 0;
         window->y = 0;
 

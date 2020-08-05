@@ -2080,7 +2080,7 @@ sys_read_file (
              debug_print ("sys_read_file: [O_CREAT] Creating a new file\n"); 
 
              buff = (void*) kmalloc(1024);
-             if((void*)buff==NULL){
+             if ((void*)buff==NULL){
                  debug_print("sys_read_file: buff fail\n");
                  return -1; 
              }
@@ -2155,36 +2155,30 @@ __OK:
         return -1;
 
     }else{
-
-        
         __file->used = 1;
         __file->magic = 1234;
-     
         __file->pid = (pid_t) current_process;
         __file->uid = (uid_t) current_user;
         __file->gid = (gid_t) current_group;
         
-        
-        // todo: object
-        //__file->____object = ObjectTypeFile;
-        
-        // todo
+        // #bugbug [FIXME]
+        // We need a type in read().
+
+        __file->____object = ObjectTypeFile;
+  
+  
+        // #todo:
+        // We need to get the name in the inode.
         //__file->_tmpfname = NULL;
  
-        // Buffer size
+
         __file->_lbfsize = BUFSIZ;
-        
         __file->_r = 0;
         __file->_w = 0;
-
         __file->_file = __slot;
-        
-        // #todo
-        // temos que colocar nessa lista e atualizar o contador
-        // de descritores que usam essa estrutura.
-        // Process->Objects[__slot] = (unsigned long) __file;
         __file->fd_counter = 1; //inicializando. 
-        
+
+
         // #todo
         // Se ele não foi encontrado na lista de inodes
         // e tivemos que carrega-lo do disco, então
@@ -2376,9 +2370,8 @@ __OK:
     __file->_flags = (__file->_flags | __SRD);
         
 
-    // salva o ponteiro.  
-    // ja checamos fd.
-    // Perigo: Validade dessa estrutura.
+    // Salva o ponteiro.  
+    // Ja checamos fd.
     p->Objects[__slot] = (unsigned long) __file;
 
 

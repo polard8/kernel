@@ -247,6 +247,9 @@ gws_draw_text (
     unsigned long color,
     char *string );
 
+
+int gws_refresh_window (int fd, int window );
+
 // Talvez vamos retonar o descritor
 // dado pelo servidor.
 

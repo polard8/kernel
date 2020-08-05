@@ -50,13 +50,23 @@ int gws_show_window_rect (struct gws_window_d *window){
 				//    window->width +2, window->height +2 ); 
 				//return (int) 0;
 			//}
-			
-            gws_refresh_rectangle ( window->left, window->top, 
-                window->width, window->height ); 
 
-			return 0;
-		}
-	};
+
+            // #bugbug
+            // Se a janela for do tipo botão, 
+            // seu deslocamento estará em outro ludar.
+            // Precisa de adições para encontrar o 
+            // deslocamento certo dos botões.
+
+            gws_refresh_rectangle ( 
+                window->left, 
+                window->top, 
+                window->width, 
+                window->height ); 
+
+            return 0;
+        }
+    };
 
 
 	//fail.
