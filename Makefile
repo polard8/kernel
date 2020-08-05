@@ -214,23 +214,29 @@ vhd-copy-files:
 	@echo "================================="
 	@echo "(Step 6) Copying files into the mounted VHD ..."
 
-# ======== Files in the root dir. ========
+#
+# == "/" ====================================================
+#
 
-	# First of all
+	# 1) First of all
 	# bm, bl, kernel, init, gdeshell.
-
 	sudo cp gf/gramado/boot/x86/bin/BM.BIN    /mnt/gramadovhd
 	sudo cp gf/gramado/boot/x86/bin/BL.BIN    /mnt/gramadovhd
 	sudo cp gf/gramado/kernel/KERNEL.BIN      /mnt/gramadovhd
+	sudo cp gi/init/INIT.BIN                  /mnt/gramadovhd
+	sudo cp gi/setup/gdeshell/GDESHELL.BIN    /mnt/gramadovhd
 
-	# Base
-	sudo cp gf/gramado/base/GRAMADO.TXT     /mnt/gramadovhd
+	# 2) .INI
 	sudo cp gf/gramado/base/ini/GUI.INI     /mnt/gramadovhd
 	sudo cp gf/gramado/base/ini/INIT.INI    /mnt/gramadovhd
 	sudo cp gf/gramado/base/ini/USER.INI    /mnt/gramadovhd
-	sudo cp gf/gramado/base/res/fonts/bin/NC2.FON        /mnt/gramadovhd
-	sudo cp gf/gramado/base/res/fonts/bin/LIN8X8.FON     /mnt/gramadovhd
-	sudo cp gf/gramado/base/res/fonts/bin/LIN8X16.FON    /mnt/gramadovhd
+
+	# 3) .FON
+	sudo cp gf/gramado/base/res/fonts/bin/NC2.FON      /mnt/gramadovhd
+	sudo cp gf/gramado/base/res/fonts/bin/LIN8X8.FON   /mnt/gramadovhd
+	sudo cp gf/gramado/base/res/fonts/bin/LIN8X16.FON  /mnt/gramadovhd
+
+	# 4) .BMP
 	sudo cp gf/gramado/base/res/cursors/CURSOR.BMP  /mnt/gramadovhd
 	sudo cp gf/gramado/base/res/cursors/MOUSE.BMP   /mnt/gramadovhd
 	sudo cp gf/gramado/base/res/icons/APP.BMP       /mnt/gramadovhd
@@ -238,46 +244,36 @@ vhd-copy-files:
 	sudo cp gf/gramado/base/res/icons/FILE.BMP      /mnt/gramadovhd
 	sudo cp gf/gramado/base/res/icons/FOLDER.BMP    /mnt/gramadovhd
 	sudo cp gf/gramado/base/res/icons/TERMINAL.BMP  /mnt/gramadovhd
-# ...
+	# ...
 
-	# Init
-	sudo cp gi/init/INIT.BIN            /mnt/gramadovhd
+	# 5) .TXT
+	sudo cp gf/gramado/base/GRAMADO.TXT     /mnt/gramadovhd
 
-	# gdeshell
-	sudo cp gi/setup/gdeshell/GDESHELL.BIN    /mnt/gramadovhd
 
-	# Setup
-	-sudo cp gi/setup/bin/*.BIN               /mnt/gramadovhd 
-# ...
-
-	# optional
-	-sudo cp docs/*.TXT    /mnt/gramadovhd
-	-sudo cp gf/gramado/base/dev/LOOP0      /mnt/gramadovhd
-	-sudo cp gf/gramado/base/dev/NULL       /mnt/gramadovhd
-	-sudo cp gf/gramado/base/dev/SDA        /mnt/gramadovhd
-	-sudo cp gf/gramado/base/tests/*.CPP    /mnt/gramadovhd
-	-sudo cp gf/gramado/base/tests/*.BAS    /mnt/gramadovhd
-	-sudo cp gf/gramado/base/tests/*.ASM    /mnt/gramadovhd
-	-sudo cp gf/gramado/base/res/wall/ANIMAL.BMP   /mnt/gramadovhd
-
-	# server and client.
+	# 6) Services
+	-sudo cp gi/services/gwssrv/bin/GWSSRV.BIN  /mnt/gramadovhd
+	-sudo cp gi/services/gwssrv/bin/GWS.BIN     /mnt/gramadovhd
 	-sudo cp gi/services/gnssrv/bin/GNSSRV.BIN  /mnt/gramadovhd
 	-sudo cp gi/services/gnssrv/bin/GNS.BIN     /mnt/gramadovhd
 
-	# server and client.
-	-sudo cp gi/services/gwssrv/bin/GWSSRV.BIN  /mnt/gramadovhd
-	-sudo cp gi/services/gwssrv/bin/GWS.BIN     /mnt/gramadovhd
-	
-	-sudo cp gi/apps/bin/*.BIN         /mnt/gramadovhd
-	-sudo cp gi/cmd/bin/*.BIN          /mnt/gramadovhd
-# ...
+	# 7) Apps
+	-sudo cp gi/apps/bin/*.BIN    /mnt/gramadovhd
+
+	# 8) Cmd
+	-sudo cp gi/cmd/bin/*.BIN     /mnt/gramadovhd
+
+
+	# 9) Setup
+	-sudo cp gi/setup/bin/*.BIN               /mnt/gramadovhd 
+	# ...
+
 
 
 #
-# ======== Creating the all the folders in root dir ========
-#		
+# == Creating folders ======================================
+#
 
-# Creating standard folders
+	# Creating standard folders
 	-sudo mkdir /mnt/gramadovhd/BIN
 	-sudo mkdir /mnt/gramadovhd/BOOT
 	-sudo mkdir /mnt/gramadovhd/DEV
@@ -290,17 +286,43 @@ vhd-copy-files:
 	-sudo mkdir /mnt/gramadovhd/MNT
 	-sudo mkdir /mnt/gramadovhd/SBIN
 	-sudo mkdir /mnt/gramadovhd/TMP
-	-sudo mkdir /mnt/gramadovhd/TMP/TMP2
-# ...
+	# ...
+
+	# Test lfn
+	# -sudo mkdir /mnt/gramadovhd/BREAD-AND-WINE
 
 
-# ======== Files in the /BOOT/ folder. ========
-	sudo cp gf/gramado/kernel/KERNEL.BIN    /mnt/gramadovhd/BOOT
-	sudo cp gf/gramado/boot/x86/bin/BM.BIN  /mnt/gramadovhd/BOOT
-	sudo cp gf/gramado/boot/x86/bin/BL.BIN  /mnt/gramadovhd/BOOT
+#
+# == "/BOOT" ====================================================
+#
+
+
+	sudo cp gf/gramado/boot/x86/bin/BM.BIN    /mnt/gramadovhd/BOOT
+	sudo cp gf/gramado/boot/x86/bin/BL.BIN    /mnt/gramadovhd/BOOT
+	sudo cp gf/gramado/kernel/KERNEL.BIN      /mnt/gramadovhd/BOOT
 	
-	-sudo cp gf/gramado/base/res/wall/ANIMAL.BMP   /mnt/gramadovhd/BOOT
-	-sudo cp gf/gramado/base/res/wall/ANIMAL.BMP   /mnt/gramadovhd/TMP/TMP2
+	-sudo cp gf/gramado/base/res/wall/ANIMAL.BMP  /mnt/gramadovhd/BOOT
+
+
+#
+# == "/ETC" =============================================
+#
+
+	# 
+	-sudo cp docs/*.TXT    /mnt/gramadovhd/ETC
+
+	-sudo cp gf/gramado/base/tests/*.CPP    /mnt/gramadovhd/ETC
+	-sudo cp gf/gramado/base/tests/*.BAS    /mnt/gramadovhd/ETC
+	-sudo cp gf/gramado/base/tests/*.ASM    /mnt/gramadovhd/ETC
+
+	-sudo cp gf/gramado/base/res/wall/ANIMAL.BMP   /mnt/gramadovhd/ETC
+
+
+#
+# == "/TMP" =============================================
+#
+
+	-sudo cp gf/gramado/base/res/wall/ANIMAL.BMP   /mnt/gramadovhd/TMP
 
 
 # ======== Files in the /TMP/ folder. ========

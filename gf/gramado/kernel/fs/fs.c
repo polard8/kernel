@@ -40,6 +40,21 @@ unsigned char fs_CheckSum83 (unsigned char *pFcbName)
 */
 
 
+/*
+unsigned char lfn_checksum(const unsigned char *pFCBName);
+unsigned char lfn_checksum(const unsigned char *pFCBName)
+{
+   int i;
+   unsigned char sum = 0;
+
+   for (i = 11; i; i--)
+      sum = ((sum & 1) << 7) + (sum >> 1) + *pFCBName++;
+
+   return sum;
+}
+*/
+
+
 //OUT: inode structure.
 struct inode_d *file_inode (file *f)
 {

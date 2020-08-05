@@ -28,3 +28,5 @@ Folders:
 /servers  - Ring3 loadable servers.
 /user     - User config files and user ideas.
 
+
+online hex editor: https://hexed.it/

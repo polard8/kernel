@@ -113,6 +113,7 @@
 // 1Ah      2 bytes   Starting cluster
 // 1Ch      4 bytes   File size in bytes
 
+// SFN Entry
 struct fat16_directory_entry_d 
 {
     unsigned char   FileName[11];       //8.3   
@@ -131,6 +132,24 @@ struct fat16_directory_entry_d
 
     unsigned long   FileSize; 
 };  
+
+
+
+/*
+ #todo
+// LFN Entry
+struct fat16_lfn_directory_entry_d 
+{
+    unsigned char ordinal_field;    // 0x4?
+    unsigned short name1[5];        // name part1
+    unsigned char flag_byte;        // Flag
+    unsigned char reserved;         // Reserved
+    unsigned char checksum;         // Checksum.
+    unsigned short name2[6];        // name part2
+    unsigned short thing;           // ??
+    unsigned short name3[2];        // name part3
+};
+*/
 
 
 // Gerenciar informações sobre um diretório
