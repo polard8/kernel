@@ -22,6 +22,8 @@
 int gws_show_window_rect (struct gws_window_d *window){
 
 
+    struct gws_window_d *p;
+
     if ( (void *) window == NULL ){
 		debug_print ("show_window_rect: window\n");
 		return (int) 1;
@@ -52,17 +54,37 @@ int gws_show_window_rect (struct gws_window_d *window){
 			//}
 
 
-            // #bugbug
-            // Se a janela for do tipo botão, 
-            // seu deslocamento estará em outro ludar.
-            // Precisa de adições para encontrar o 
-            // deslocamento certo dos botões.
+            
+            p = window->parent;
+            
+            if ((void*)p==NULL)
+            {
+                gde_debug_print("gws_show_window_rect: No parent");
+                
+                gws_refresh_rectangle ( 
+                    window->left, 
+                    window->top, 
+                    window->width, 
+                    window->height ); 
 
-            gws_refresh_rectangle ( 
-                window->left, 
-                window->top, 
-                window->width, 
-                window->height ); 
+                return 0;
+            }
+            
+            if ((void*)p!=NULL)
+            {
+                //gde_debug_print("gws_show_window_rect: parent ok");
+                
+                gws_refresh_rectangle ( 
+                    (p->left + window->left), 
+                    (p->top  + window->top), 
+                    window->width, 
+                    window->height ); 
+
+                return 0;
+            }
+
+                
+             
 
             return 0;
         }

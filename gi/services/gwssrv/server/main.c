@@ -1222,7 +1222,8 @@ int serviceCreateWindow (void){
                                               COLOR_PINK, color ); 
 
 
-    if ( (void *) Window == NULL ){
+    if ( (void *) Window == NULL )
+    {
        gde_debug_print ("gwssrv: createwCreateWindow fail\n");
        next_response[1] = 0;
        return -1;
@@ -1248,8 +1249,6 @@ int serviceCreateWindow (void){
 
     gws_show_window_rect(Window);
     //gws_show_backbuffer (); //for debug 
-    
-
        
     return 0; //todo
 }

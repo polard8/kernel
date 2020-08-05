@@ -259,13 +259,8 @@ createwDrawFrame (
     {
         gde_debug_print ("[DEBUG]: desenha o frame do botao\n");
         
-        gws_draw_button (window->name, 1,1,1, 
-            (parent->left + window->left +x), 
-            (parent->top  + window->top  +y), 
-            width, 
-            height, 
-            GWS_COLOR_BUTTONFACE3 );
-        
+        //todo frame or not
+        //just like the edit box.        
         return 0;
     }
 
@@ -555,6 +550,10 @@ void *createwCreateWindow2 (
 		// Window type.
 		// Tipo é unsigned long pois poderá ser um conjunto de flags.
         window->type = (unsigned long) type;
+        
+        
+        //#test
+        window->parent = Parent;
 
 		//@todo: Criar instância.
 
@@ -1276,21 +1275,107 @@ void *createwCreateWindow2 (
         //?? More ...
     }
 
-    
-    //gde_message_box (3,"xxx","xxxx");
-	//while(1){}
+    //Termina de desenhar o botão, mas não é frame
+    //é só o botão...
+    //caso o botão tenha algum frame, será alguma borda extra.
+    int Focus;    //(precisa de borda)
+    int Selected;
+    unsigned long border1;
+    unsigned long border2;
 
+    if ( (unsigned long) type == WT_BUTTON )
+    {
+
+        //border color
+        //o conceito de status e state
+        //está meio misturado. ja que estamos usando
+        //a função de criar janela para criar botão.
+        //#bugbug
+        switch( status )
+        {
+            case BS_FOCUS:
+                border1 = COLOR_BLUE;
+                border2 = COLOR_BLUE;
+                break;
+
+            case BS_PRESS:
+                Selected = 1;
+                border1 = GWS_COLOR_BUTTONHIGHLIGHT3;
+                border2 = GWS_COLOR_BUTTONSHADOW3;
+                break;
+
+            case BS_HOVER:
+                break;
+                    
+            case BS_DISABLED:
+                border1 = COLOR_GRAY;
+                border2 = COLOR_GRAY;
+                break;
+
+            case BS_PROGRESS:
+                break;
+
+            case BS_DEFAULT:
+            default: 
+                Selected = 0;
+                border1 = GWS_COLOR_BUTTONHIGHLIGHT3;
+                border2 = GWS_COLOR_BUTTONSHADOW3;
+                break;
+        };
+
+
+        if ( (void*) Parent == NULL )
+        {
+            gde_debug_print ("createwCreateWindow2: [WT_BUTTON] Parent NULL\n"); 
+        }
+        
+        if ( (void*) Parent != NULL )
+        {
+
+            //board1, borda de cima e esquerda.
+            rectBackbufferDrawRectangle ( 
+                (Parent->left   + window->left), 
+                (Parent->top    + window->top), 
+                (window->width), 
+                1, 
+                border1 );
+                
+            rectBackbufferDrawRectangle ( 
+                (Parent->left   + window->left), 
+                (Parent->top    + window->top), 
+                1, 
+                (window->height),
+                 border1 );
+
+             //board2, borda direita e baixo.
+             rectBackbufferDrawRectangle ( 
+                 (Parent->left   + window->left) + (window->width) -1, 
+                 (Parent->top    + window->top), 
+                 1, 
+                 (window->height), 
+                 border2 );
+                 
+             rectBackbufferDrawRectangle ( 
+                 (Parent->left   + window->left), 
+                 (Parent->top    + window->top) + (window->height) -1, 
+                 (window->width), 
+                 1, 
+                 border2 );
+        }
     
+          //todo
+          // configurar a estrutura de botão 
+          // e apontar ela como elemento da estrutura de janela.
+          //window->button->?
+    }
     return window;
 
 
-    //
-    //  ======   cut here =========
-    //
 
-    //
-    //  ======   cut here =========
-    //
+
+
+
+
 
     //
     //  ======   cut here =========
@@ -2248,7 +2333,7 @@ createwCreateWindow (
                            (char *) windowname, 
                            x, y, width, height, 
                            (struct gws_window_d *) pWindow, 
-                           desktopid, clientcolor, color );      
+                           desktopid, clientcolor, color ); 
 
         //pintamos simples, mas a tipagem será  overlapped
         __w->type = WT_BUTTON;   
