@@ -1288,41 +1288,38 @@ struct tty_d *tty_create (void)
 
         //__tty->stopped = 0;
 
-        
-        // standard stream. ??
-        __tty->stdin  = (file *) newPage (); 
-        __tty->stdout = (file *) newPage (); 
-        __tty->stderr = (file *) newPage (); 
-        
+
+
+        // Ponteiros para estruturas de arquivos.
+        // Esses arquivos servem de buffers.
 
         // Buffers.        
         // Raw and canonical.
         __tty->_rbuffer = (file *) newPage();
         __tty->_cbuffer = (file *) newPage();
         
+        //output buffer.
+        __tty->_obuffer = (file *) newPage ();   
         
         
         if ( (void *) __tty->_rbuffer == NULL ||
              (void *) __tty->_cbuffer == NULL ||
-             (void *) __tty->stdin == NULL   ||
-             (void *) __tty->stdout == NULL  ||
-             (void *) __tty->stderr == NULL  )
+             (void *) __tty->_obuffer == NULL   )
         {
             panic ("tty_create: [FAIL] Buffers!\n");
         }
 
         // Precisa validar
         __tty->_rbuffer->used = 1;
-        __tty->_rbuffer->magic = 1234;         
+        __tty->_rbuffer->magic = 1234;  
+               
         __tty->_cbuffer->used = 1;
         __tty->_cbuffer->magic = 1234;         
-        __tty->stdin->used = 1;
-        __tty->stdin->magic = 1234;
-        __tty->stdout->used = 1;
-        __tty->stdout->magic = 1234;
-        __tty->stderr->used = 1;
-        __tty->stderr->magic = 1234;
         
+        __tty->_obuffer->used = 1;
+        __tty->_obuffer->magic = 1234;
+        
+      
 
         //
         // o buffer do arquivo. (_base)
@@ -1330,10 +1327,12 @@ struct tty_d *tty_create (void)
         
         __tty->_rbuffer->_base  = (char *) newPage (); 
         __tty->_cbuffer->_base  = (char *) newPage (); 
-                
-        __tty->stdin->_base  = (char *) newPage (); 
-        __tty->stdout->_base = (char *) newPage (); 
-        __tty->stderr->_base = (char *) newPage (); 
+        __tty->_obuffer->_base  = (char *) newPage (); 
+        
+        // #bugbug
+        // Temos que completar as estruturas.
+        // São muitos elementos ...
+        //
 
         // ...
                
@@ -1494,77 +1493,13 @@ int initialize_tty_struct (struct tty_d *tty)
 */
 
 
-// Init.
-// #todo: Maybe it is not a good name.
-int tty_init_module (void){
 
-    // #bugbug
-    // Created but not used!
-    // Podemos colocar como tty do processo atual.
-    struct tty_d *tty;
-
-
-    int i=0;
-
-
+int tty_init_module (void)
+{
+    // Nothing for now!
 
     debug_print ("tty_init_module:\n");
- 
-
-
-    tty = (struct tty_d *) kmalloc ( sizeof(struct tty_d) );
-
-    if ( (void *) tty == NULL ){
-        panic ("ttyInit: tty");
-
-    }else{
-        tty->index = 0;  //#bugbug!!!
-        tty->used = 1;
-        tty->magic = 1234;
-        
-        // Security
-        tty->user_session = usession0;
-        tty->room         = room0;
-        tty->desktop      = desktop0;
-
-
-        //
-        // Window.
-        //
-        
-        // #bugbug
-        // We dont need this anymore ... 
-        // #todo: Delete this element from the tty struct.
-        // Configurando uma janela básica, pra não ficar null.
-        
-        tty->window = NULL;
-
-        tty->left = 0; 
-        tty->top = 0;
-
-
-        // Standard stream. 
-        tty->stdin  = current_stdin;
-        tty->stdout = current_stdout;
-        tty->stderr = current_stderr;
-
-        // Raw buffer and Canonical buffer.
-        //tty->rbuffer ...
-        //tty->cbuffer ...
-
-        
-        tty->stdout_status = 0;
-        tty->stdout_update_what = 0;
-
-
-        // buffer circular.
-        // case e limite.
-
-        tty->stdout_last_ptr = tty->stdout->_p;
-        tty->stdout_limit    = (tty->stdout->_p + tty->stdout->_lbfsize);
-
-    };
-
+    
     // ...
         
     return 0;

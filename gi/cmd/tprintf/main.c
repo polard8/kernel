@@ -161,8 +161,7 @@ int main (int argc, char *argv[]){
     };
     */
     
-
-    char char_buffer[2];
+char char_buffer[2];
     char line_buffer[128];
     char *str;
     int ch=0;
@@ -195,7 +194,7 @@ int main (int argc, char *argv[]){
             //...
         }
       };    
-
+    
 
     //goto loop;
     while(1);

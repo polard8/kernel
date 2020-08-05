@@ -157,42 +157,31 @@ void test_tty_support(int fd)
     */
 }
 
-//f4
+
+// f4
+// Send the content of prompt[] to stdin.
+// The child process will read this.
+// This is why the stdin needs to be a tty.
+// (Canonical) 
+// If the child is a shell it will read a line.
+// (Raw) 
+// If the child is a text editor it will read a single char.
+// Maybe the shell can change stdin for it's child.
+// For now, the shell will need a line.
 void send_again()
 {
+    // There is a '\n' terminated line in prompt[].
+    // #bugbug: Não podemos mandar uma linha sem '\n'.
     fseek(stdin, 0, SEEK_SET); 
-    fseek(stdout, 0, SEEK_SET); 
-    fseek(stderr, 0, SEEK_SET); 
-
-    //#bugbug
-    //Não podemos escrever usando o tamanho do buffer
-    //porque o arquivo é menor que isso.
-    write(fileno(stdin), prompt, 10);//#bugbug sizeof(prompt));    
-    write(fileno(stdout),prompt, 10);//#bugbug sizeof(prompt)); 
-    write(fileno(stderr),prompt, 10);//#bugbug sizeof(prompt)); 
-
-    //fseek(stdin, 0, SEEK_SET); 
-    //fseek(stdout, 0, SEEK_SET); 
-    //fseek(stderr, 0, SEEK_SET); 
-
-    int ii=0;
-    prompt_pos = 0;
-    for(ii=0;ii<32;ii++) {prompt[ii]=0;}
-}
-
-
-/*
-void send_one_char(void)
-{
-    int i=0;
-
-    fseek(stdin, 0, SEEK_SET);
-    write(fileno(stdin), prompt, 8);
+    write ( fileno(stdin), prompt, 80);
     
-    prompt_pos = 0;
-    for(i=0;i<8;i++) {prompt[i]=0;}
+    // Clear prompt.
+    // #todo: Create a helper function.
+    prompt_pos = 0;    
+    int i=0;
+    for(i=0; i<80; i++){ prompt[i]=0; }
 }
-*/
+
 
 //f2
 void test_standard_stream(int fd)

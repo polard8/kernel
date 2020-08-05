@@ -180,12 +180,6 @@ struct tty_d
     // Buffers.
     //
 
-    // Standard stream
-    file *stdin;
-    file *stdout;
-    file *stderr;
-
-
     // Canonical. (cooked mode)
     // Applications programs reading from the terminal 
     // receive entire lines, after line editing has been 
@@ -196,6 +190,11 @@ struct tty_d
 
     file *_rbuffer;
     file *_cbuffer;
+    
+    // Output buffer.
+    file *_obuffer;
+
+
 
 
 	//
@@ -293,6 +292,7 @@ struct tty_d
 //#define MAX_KERNEL_VIRTUAL_CONSOLES 4
 int current_vc;
 struct tty_d TTY[4];
+
 
 
 

@@ -213,119 +213,19 @@ typedef enum {
 
  
 
-
-
-
-
- 
- 
 /*
  * ?? Se há um usuário configurado conforme registrado em arquivo de configuração.
  */ 
 int userconfig_Status;
  
  
-//
-// Escalonamento de teclado.
-// Fila de threads que desejam receber input 
-// de teclado. 
-// 
-//
 
-// Escalonamento de dispositivo.
-// Todo dispositivo tem uma fila de threads esperando 
-// para usar o dispositivo.
-// Nessas variáveis colocaremos qual é a thread que 
-// está usando o dispositivo no momento.
-// #bugbug essa informações deve estar na estrutura de dispositivo.
-//
-//
-// ## input control 
-//
-
-// #bugbug
-// Por que iss está aqui?
-
-typedef struct ioControl_d ioControl_t;
-struct ioControl_d
-{
-	int id;
-	
-	int used;
-	int magic;
-	
-	int did; //identificação do dispisitivo
-	
-	//
-	// Aqui identificaremos qual a thread que está 
-	// usando o dispositivo no momento.
-	//
-	
-	int tid; //identificação da thread.
-	
-	int wid;  // a janela que esta usando o dispositivo.
-	
-};
-ioControl_t *ioControl_keyboard;   //0
-ioControl_t *ioControl_mouse;      //1
-//ioControl_t *ioControl_systemdisk; //2
-//...
-
-unsigned long ioControl[32];
+ 
  
  
 //
-// ## keybuffer ##
-//
- 
-int keybuffer_index; 
-int keybuffer_head;
-int keybuffer_tail;
-char keybuffer[128];
-
-int keyboard_message_head;
-int keyboard_message_tail;
-
-
-// Current stdin.
-// Podemos mudar isso toda vez que o 
-// processo com foco de entrada mudar.
-// ?? tty struct ??
-
-// #bugbug
-// Por que isso está aqui ?
-
-file *current_stdin;
-file *current_stdout;
-file *current_stderr;
-
- 
-//estrutura para enviar mensagens de teclado do kernel para 
-//um aplicativo em user mode. 
-typedef struct keyboard_message_d keyboard_message_t; 
-struct keyboard_message_d
-{
-	//manipuladores.
-	int used;
-	int magic;
-
-	//identificadores.
-	struct process_d *receiver_process;
-	struct process_d *receiver_thread;
-	struct window_d *receiver_window;	
-	
-	//dados.
-	struct window_d *window;
-	int msg;
-	unsigned long long1;
-	unsigned long long2;
-}; 
- 
-keyboard_message_t keyboard_queue[8]; 
- 
- 
-//
-// @todo: Revendo: para cada grupo pode ter 2 tipos, major e minor.
+// @todo: 
+// Revendo: para cada grupo pode ter 2 tipos, major e minor.
 // 
  
  
@@ -551,13 +451,14 @@ int GetCurrentGroupId (void);
 
 
 void 
-UpdateUserInfo ( struct user_info_d *user, 
-                 int id, 
-                 char *name, 
-                 int type, 
-                 int user_session_id, 
-                 int room_id,
-                 int desktop_id );
+UpdateUserInfo ( 
+    struct user_info_d *user, 
+    int id, 
+    char *name, 
+    int type, 
+    int user_session_id, 
+    int room_id,
+    int desktop_id );
 
 
 void ShowUserInfo (int user_id);

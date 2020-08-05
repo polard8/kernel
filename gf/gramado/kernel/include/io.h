@@ -41,6 +41,45 @@ struct ioBuffer_d *CurrentIOBuffer;
 // ... 
 
  
+ 
+ // Escalonamento de dispositivo.
+// Todo dispositivo tem uma fila de threads esperando 
+// para usar o dispositivo.
+// Nessas variáveis colocaremos qual é a thread que 
+// está usando o dispositivo no momento.
+// #bugbug essa informações deve estar na estrutura de dispositivo.
+//
+// ## input control 
+//
+
+struct ioControl_d
+{
+
+    int id;
+    int used;
+    int magic;
+
+    //identificação do dispisitivo
+    int did; 
+
+	// Aqui identificaremos qual a thread que está 
+	// usando o dispositivo no momento.
+
+    //identificação da thread.
+    int tid; 
+
+    // a janela que esta usando o dispositivo.
+    int wid;  
+};
+
+struct ioControl_d *ioControl_keyboard;   //0
+struct ioControl_d *ioControl_mouse;      //1
+
+unsigned long ioControl[32];
+
+
+
+ 
 //
 // Prototypes.
 // 

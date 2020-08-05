@@ -80,22 +80,44 @@ unsigned long get_scancode (void){
 
 
 
-    SC = (unsigned char) current_stdin->_base[keybuffer_head];
+    SC = (unsigned char) PS2keyboardTTY._rbuffer->_base[keybuffer_head];
 
 
-    current_stdin->_base[keybuffer_head] = 0;
+    PS2keyboardTTY._rbuffer->_base[keybuffer_head] = 0;
 
     keybuffer_head++;
 
-    if ( keybuffer_head >= current_stdin->_lbfsize )
+    if ( keybuffer_head >= PS2keyboardTTY._rbuffer->_lbfsize )
     { 
         keybuffer_head = 0; 
     }
 
-
     return (unsigned long) SC; 
 }
 
+
+void put_scancode( char c )
+{
+    // #todo: 
+    // Aqui podemos retornar.
+    // Pois vamos precisar dessa estrutura para o buffer.
+    
+    if ( (void *) PS2keyboardTTY._rbuffer == NULL )
+    {
+        panic ("put_scancode: PS2keyboardTTY._rbuffer \n");
+    }
+
+    // #bugbug
+    // Checar a validade.
+
+    PS2keyboardTTY._rbuffer->_base[keybuffer_tail++] = (char) c;
+    
+    if ( keybuffer_tail >= PS2keyboardTTY._rbuffer->_lbfsize )
+    {
+        keybuffer_tail = 0;
+    }
+
+}
 
 
 
@@ -147,15 +169,13 @@ void abnt2_keyboard_handler (void){
         //return;
 
 
-	//não precisamos perguntar para o controlador se
-	//podemos ler, porque foi uma interrupção que nos trouxe aqui.
-
-    unsigned char __raw = in8(0x60);
-
-
+    //não precisamos perguntar para o controlador se
+    //podemos ler, porque foi uma interrupção que nos trouxe aqui.
     // #obs:
     // O byte pode ser uma resposta à um comando ou 
     // um scancode.
+
+    unsigned char __raw = in8(0x60);
 
     switch (__raw)
     {
@@ -173,60 +193,10 @@ void abnt2_keyboard_handler (void){
     };
 
 
-
-
-
 //__queue:
 
-    // #todo: 
-    // Aqui podemos retornar.
-    // Pois vamos precisar dessa estrtuura pora o buffer.
-    if ( (void *) current_stdin == NULL ){
-        panic ("abnt2_keyboard_handler: current_stdin \n");
-    }
-
-    // #bugbug
-    // Checar a validade.
-
-    current_stdin->_base[keybuffer_tail++] = (char) __raw;
+    put_scancode(__raw);    
     
-    if ( keybuffer_tail >= current_stdin->_lbfsize ){
-        keybuffer_tail = 0;
-    }
-    
-    
-    // #bugbug
-    // Porque estamos usando estrutura de thread dentro do driver.
-    // #todo
-    // Indicaremos a thread se precisarmos enviar esses dados.
-    // Mas o driver de i8042 vai ficar dentro do kernel base
-    // por enquanto.
-    
-    
-//__thread:
-
-    // #bugbug
-    // Não é a thread atual e sim a thread
-    // da janela com o foco de entrada.
-    // Porém quando estivermos usando o gws,
-    // a mensagem vai para ele.
-    // Isso aqui era um jeito da thread atual pegar o input ?
-    // Esta errado.
-
-    struct thread_d *t;
-    
-    t = (void *) threadList[current_thread];
-
-    if ( (void *) t == NULL ){
-        panic ("abnt2_keyboard_handler: Invalid thread calling \n");
-    }    
-    //{ return NULL; }
-            
-    if ( t->used != 1 || t->magic != 1234 ){
-        panic ("abnt2_keyboard_handler: Validation. Invalid thread calling \n");
-    }    
-    //{ return NULL; }
-
 
 	// Se não existe uma mensagem na thread, então vamos
 	// pegar uma mensagem de teclado no buffer de teclado (stdin).
@@ -237,12 +207,13 @@ void abnt2_keyboard_handler (void){
 	// pegar o próximo scancode para termos uma mensagem.
 
 
-            // #bugbug
-            // Podemos ter loop infinito ?
+      // #bugbug
+      // Podemos ter loop infinito ?
+      
 sc_again:
 
      // Get char from current_stdin.
-     __raw = (unsigned char) get_scancode ();
+     __raw = (unsigned char) get_scancode();
 
      //unsigned ch = raw & 0x7f;
      //int pressed = !(raw & 0x80);

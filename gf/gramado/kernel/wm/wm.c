@@ -851,152 +851,44 @@ windowSendMessage (
 			//fail.
 		};
 	};
-};
+}
 
 
-/*
- **********************************************************************
- * windowGetHandleWindow:
- *     Pega uma mensagem na estrutura da janela com o foco de entrada.
- *     #importante: Não devemos nos preocupar em saber qual foi o dispositivo 
- *                  gerador do evento, apenas pegar a mensagem na fila da    
- *                  janela com o foco de entrada.
- *
- * Obs: 
- *     Esse mecanismo deve ser reproduzido para os parametros hwnd, long1 e long2.
- *     As funções precisam ser criadas ainda. semelhantes a essa.
- *     Mas o que nos importa agora é somente o parâmetro 'msg'.
- * @todo: Quem chamou essa rotina, deseja pegar a mensagem de qualquer janela 
- *ou somente a da janela com o foco de entreada.???
- * @todo: Criar uma rotina semelhante, mas exclusivamente para a janela com foco de entrada.
- * Ex: void *windowGetMessageWWF()
- */
 
-//#suspensa: deletar.
- 
+
+
+// ++
+// #todo
+// Deletar essas 4 funções que pegavam a mensagem em partes.
+
 void *windowGetHandleWindow (struct window_d *window)
 {
     debug_print ("windowGetHandleWindow: deprecated\n");
     return NULL;
 }
 
-
-/*
- * windowGetMessage:
- *     Pega uma mensagem na estrutura da janela com o foco de entrada.
- *
- * Obs: 
- *     Esse mecanismo deve ser reproduzido para os parametros hwnd, long1 e long2.
- *     As funções precisam ser criadas ainda. semelhantes a essa.
- *     Mas o que nos importa agora é somente o parâmetro 'msg'.
- * @todo: Quem chamou essa rotina, deseja pegar a mensagem de qualquer janela 
- *ou somente a da janela com o foco de entreada.???
- * @todo: Criar uma rotina semelhante, mas exclusivamente para a janela com foco de entrada.
- * Ex: void *windowGetMessageWWF()
- */
- 
-//#suspensa ?
-void *windowGetMessage (struct window_d *window){
-	
-	unsigned char SC;
-	//fast way 
-	//@todo: melhorar isso
-	struct window_d *wFocus;
-	
-	
-	//if( window_getch_lock == 1){
-	//	return NULL;
-	//}
-	
-	//
-	// E se nesse momento já existe uma mensagem para 
-	// ser consumida, que foi colocada por outro 
-	// dispositivo de input. ??
-	//
-	
-	
-	//
-	// ## Keyboard ##
-	//
-	
-	//#bugbug:
-	//Obs: Isso deve ser feito em outra ocasião,
-	// Talvez a interrupção de teclado pode 
-	//acinar um 'request' dizendo que o 
-	//kernel deve enviar uma mensagem da fila de teclado 
-	// para a janela com o foco de entrada.
-	//
-	SC = (unsigned char) keybuffer[keybuffer_head];
-	
-	//Limpa.
-	keybuffer[keybuffer_head] = 0;
-	
-	keybuffer_head++;
-	
-	if ( keybuffer_head >= 128 ){
-	    keybuffer_head = 0;
-	}
-		
-	//#bugbug
-	//alguma coisa está imprimindo o char duas vezes ...
-	//Talvez o próprio aplicativo esteja imprimeiro também.
-	//
-	
-    //isso coloca a mensagem na fila da thread atual.
-	
-	KEYBOARD_SEND_MESSAGE ( SC );	
-	
-
-	
-	wFocus = (void *) windowList[window_with_focus];
-	
-	if( wFocus->newmessageFlag == 0 ){
-		return NULL;
-	}
-	
-	return (void *) wFocus->msg;
-	
-	//Nothing.
-
-//fail:
-
+void *windowGetMessage (struct window_d *window)
+{
+    debug_print ("windowGetMessage: deprecated\n");
     return NULL;
 }
 
-
-//#suspensa ?
 void *windowGetLong1(struct window_d *window)
 {
-	//fast way 
-	//@todo: melhorar isso
-	struct window_d *wFocus;
-	
-	
-	//if( window_getch_lock == 1){
-	//	return NULL;
-	//}
-
-	
-	wFocus = (void *) windowList[window_with_focus];
-	
-	if( wFocus->newmessageFlag == 0 ){
-		return NULL;
-	}
-	return (void*) wFocus->long1;
-	
-	//Nothing.
-
-fail:
+    debug_print ("windowGetLong1: deprecated\n");
     return NULL;
 }
 
-
-//#suspensa: deletar.
 void *windowGetLong2 (struct window_d *window)
 {
     debug_print ("windowGetLong2: deprecated\n");
     return NULL;
 }
+//--
+
+
+
+
 
 
 /*
@@ -1016,90 +908,10 @@ void *windowGetLong2 (struct window_d *window)
 //pode ser que esse aplicativo não tenha janela,
 //mas esteja rodando na janela do shell.
 	 
-int window_getch (void){
-
-	struct window_d *wFocus;
-	unsigned char SC;
-	int save;
-	
-	// Bloqueia pra que nenhum aplicativo pegue mensagens 
-	// na estrutura de janela até que window_getch termine.
-	
-	//window_getch_lock = 1;
-	
-	// Pegamos um scancode na fila do teclado,
-	// transformamos ela em mensagem e colocamos a 
-	// mensagem na estrutura da janela com o foco de entrada.
-	
-	// #bugbug
-	// Rever esse buffer. Talvez as coisas mudaram um pouco por lá.
-
-	SC = (unsigned char) keybuffer[keybuffer_head];
-	
-	//Limpa o offset na fila de teclado 
-	//onde pegamos o scancode.
-	
-	keybuffer[keybuffer_head] = 0;
-	
-	//Circulamos a fila de teclado.
-	
-	keybuffer_head++;
-	
-	if ( keybuffer_head >= 128 )
-	{
-	    keybuffer_head = 0;	
-	}
-
- 
-    //isso coloca a mensagem na fila da thread atual.
-	
-	KEYBOARD_SEND_MESSAGE ( SC );	
-
-	
-	// Agora vamos pegar a somente a parte da mensagem 
-	// que nos interessa, que é o caractere armazenado em long1.
-	// Obs: Somente queremos o KEYDOWN. Vamos ignorar as outras 
-	// digitações.
-	
-	//fast way 
-	//@todo: melhorar isso
-	
-	wFocus = (void *) windowList[window_with_focus];
-	
-	if ( (void *) wFocus == NULL )
-	{
-		//fail 
-		//free(wFocus);
-		goto fail;
-	
-	} else {
-		
-		if ( wFocus->msg != MSG_KEYDOWN )
-		{
-		    goto fail;	
-		}
-		
-		save = (int) wFocus->long1;
-			
-		wFocus->msg_window = 0;
-		wFocus->msg = 0;
-		wFocus->long1 = 0;
-		wFocus->long2 = 0;
-			
-	    //sinaliza que a mensagem foi lida, e que não temos nova mensagem.
-	    wFocus->newmessageFlag = 0;
-	
-	    //window_getch_lock = 0;
-		return (int) save;
-	};
-
-	
-fail:
-  //
-done:
-
-   // window_getch_lock = 0;
-	return (int) -1;    //erro
+int window_getch (void)
+{
+    debug_print("window_getch: Deprecated!\n");
+    return (int) -1; 
 }
 
 
@@ -1458,7 +1270,7 @@ void windowShowWindowList (void){
         //set_up_cursor(g_cursor_left,g_cursor_top); 
 
 
-		StatusBar ( hWindow, "Esc=EXIT","Enter=?" );
+		//StatusBar ( hWindow, "Esc=EXIT","Enter=?" );
 		//Nothing.
 	};	   
 
@@ -3385,9 +3197,11 @@ int init_windows (void){
 	//
 	
 	//@todo: Create SetCharParam(.,.)
-	gcharWidth = (int) 8;
-	gcharHeight = (int) 8;	
-	
+
+    gcharWidth  = (int) 8;
+    gcharHeight = (int) 8;
+
+
 	//...	
 	
 	//
@@ -3454,37 +3268,42 @@ int init_windows (void){
 // Backbuffer support. (espelho da memória de video)
 //
 
+
 //BackBufferSupport:
-	
-	BackBufferInfo = (void *) kmalloc ( sizeof(struct backbufferinfo_d) );
-    
-	if ( (void *) BackBufferInfo == NULL )
-	{
-	    //goto fail;
-	}else{
-		
-	    BackBufferInfo->used = 1;
+
+    BackBufferInfo = (void *) kmalloc ( sizeof(struct backbufferinfo_d) );
+
+    if ( (void *) BackBufferInfo == NULL ){
+        debug_print("init_windows: BackBufferInfo\n");
+        //goto fail;
+
+    }else{
+
+        BackBufferInfo->used  = 1;
         BackBufferInfo->magic = 1234;
         //BackBufferInfo->start = ?
         //BackBufferInfo->end = ?
         //BackBufferInfo->size = ?
         //...		
-	};		
-	
+    };
+
+
 
 //
 // Frontbuffer support. (memória de vídeo)
 //
-	
+
+
 //FrontBufferSupport:
 
-	FrontBufferInfo = (void *) kmalloc ( sizeof(struct frontbufferinfo_d) );
+    FrontBufferInfo = (void *) kmalloc ( sizeof(struct frontbufferinfo_d) );
     
-	if ( (void *) FrontBufferInfo == NULL )
-	{	
-	     //goto fail;	
-	}else{
-		
+    if ( (void *) FrontBufferInfo == NULL ){
+        debug_print("init_windows: FrontBufferInfo\n");
+        //goto fail;
+
+    }else{
+
 		//Algumas informações foram enviadas pelo boot loader.
 	    FrontBufferInfo->used = 1;
         FrontBufferInfo->magic = 1234;
@@ -3512,18 +3331,11 @@ int init_windows (void){
 	 
 	 
 	keyboard_message_head = 0;
-    keyboard_message_tail = 0;	
+    keyboard_message_tail = 0;
 	
     //inicializando fila de teclado.
-	
-	//#todo:
-	//size max.
-	
-	for ( k=0; k<128; k++ )
-	{
-		keybuffer[k] = 0; 
-	}
-	
+
+
 	keybuffer_tail = 0;
 	keybuffer_head = 0;
 
@@ -3577,7 +3389,8 @@ int get_zorder ( struct window_d *window )
 //pegando a o id da janela que está no topo da lista de uma janela.
 // wm
 
-struct window_d *getTopWindow (struct window_d *window){
+struct window_d *getTopWindow (struct window_d *window)
+{
 	
 	if ( (void *) window == NULL )
 	{

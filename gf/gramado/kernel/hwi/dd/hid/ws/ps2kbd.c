@@ -910,7 +910,7 @@ int BAT_TEST (void){
 int ps2kbd_globals_initialize (void){
 
 
-    int i;
+    int i=0;
     
 	//user.h
     ioControl_keyboard = (struct ioControl_d *) kmalloc ( sizeof(struct ioControl_d) );
@@ -968,26 +968,110 @@ int ps2kbd_globals_initialize (void){
 	//printf ("ps2_keyboard_initialize: 2\n");
 	//refresh_screen();	
 
-	
-	
-	// #test
-	// Inicializando o buffer de teclado.
-	// #bugbug: Não sabemos se nesse momento a estrutura de stream já é válida.
-	
 
-	
-    for ( i=0; i< current_stdin->_cnt; i++ )
-    {
+
+
+    int slot=-1;  //slot na file table.
+
+
+
+    //
+    // == _rbuffer =========================================
+    //
+
+    // Raw input buffer.
+    
+    file *current_stdin;
+
+    slot = get_free_slots_in_the_file_table();
+    if(slot<0 || slot >=NUMBER_OF_FILES)
+        panic("ps2kbd_globals_initialize: current_stdin file slot");
+   
+    current_stdin = file_table[slot];
+    current_stdin->filetable_index = slot;
+    current_stdin->____object = ObjectTypeFile; //Regular file (tty buffer)
+    current_stdin->used = 1;
+    current_stdin->magic = 1234;
+    current_stdin->_flags = (__SWR | __SRD); 
+    
+    // Struct.
+    // Allocate memory for the struct.
+    unsigned char *current_stdin_struct_buffer;
+    current_stdin_struct_buffer = (unsigned char *) newPage ();
+    current_stdin = (file *) &current_stdin_struct_buffer[0];
+
+    // Buffer.
+    // Allocate memory for the buffer.
+    unsigned char *current_stdin_data_buffer;
+    current_stdin_data_buffer   = (unsigned char *) newPage ();
+    current_stdin->_base = (unsigned char *) &current_stdin_data_buffer[0];
+    current_stdin->_bf._base = current_stdin->_base;
+    current_stdin->_lbfsize = 128;
+    current_stdin->_p = (unsigned char *) &current_stdin_data_buffer[0];    
+    current_stdin->_r = 0;
+    current_stdin->_w = 0;
+    current_stdin->_cnt = 128;  //Limitando. na verdade e' 4KB.
+    current_stdin->_tmpfname = "KBDIN   TXT";
+    current_stdin->fd_counter = 1;
+
+    // #test
+    // Inicializando o buffer de teclado.
+    // #bugbug Esses offsets são inicializados em wm também.
+    // Elees deveriam estar dentro da estrutura de tty.
+    for ( i=0; i< current_stdin->_cnt; i++ ){
         current_stdin->_base[i] = (char) 0;
     };
-
-    for ( i=0; i<128; i++ )
-    {
-        keybuffer[i] = 0;
-    };
-
     keybuffer_head = 0;
     keybuffer_tail = 0;
+
+
+    // Exportando o buffer para o driver usar.
+    // Acessível através da tty.
+    PS2keyboardTTY._rbuffer = current_stdin;
+
+
+
+    //
+    // == _obuffer =========================================
+    //
+    
+    // Output buffer.
+
+    file *current_stdout;
+
+    slot = get_free_slots_in_the_file_table();
+    if(slot<0 || slot >=NUMBER_OF_FILES)
+        panic("ps2kbd_globals_initialize: current_stdout file slot");
+   
+    current_stdout = file_table[slot];
+    current_stdout->filetable_index = slot;
+    current_stdout->____object = ObjectTypeFile; //Regular file (tty buffer)
+    current_stdout->used = 1;
+    current_stdout->magic = 1234;
+    current_stdout->_flags = (__SWR | __SRD); 
+    
+    // Struct.
+    // Allocate memory for the struct.
+    unsigned char *current_stdout_struct_buffer;
+    current_stdout_struct_buffer = (unsigned char *) newPage ();
+    current_stdout = (file *) &current_stdout_struct_buffer[0];
+
+    // Buffer.
+    // Allocate memory for the buffer.
+    unsigned char *current_stdout_data_buffer;
+    current_stdout_data_buffer   = (unsigned char *) newPage ();
+    current_stdout->_base = (unsigned char *) &current_stdout_data_buffer[0];
+    current_stdout->_bf._base = current_stdout->_base;
+    current_stdout->_lbfsize = 128;
+    current_stdout->_p = (unsigned char *) &current_stdout_data_buffer[0];    
+    current_stdout->_r = 0;
+    current_stdout->_w = 0;
+    current_stdout->_cnt = 128;  //Limitando. na verdade e' 4KB.
+    current_stdout->_tmpfname = "KBDOUT  TXT";
+    current_stdout->fd_counter = 1;
+
+    PS2keyboardTTY._obuffer = current_stdout;
+
 
 
 	//
