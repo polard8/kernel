@@ -165,170 +165,153 @@ all-c:
 	$(CC) -c reboot.c   $(KINCLUDE) $(CFLAGS) -o reboot.o
 
 
-
-
 	#
-	# net
+	# == SCI - System Call Interface ==============================
 	#
+
+	# posix - (Interface to give ring0 support for posix libc)
+	$(CC) -c sci/posix/ctype.c   $(KINCLUDE) $(CFLAGS) -o ctype.o
+	$(CC) -c sci/posix/kstdio.c  $(KINCLUDE) $(CFLAGS) -o kstdio.o
+	$(CC) -c sci/posix/signal.c  $(KINCLUDE) $(CFLAGS) -o signal.o
+	$(CC) -c sci/posix/stdlib.c  $(KINCLUDE) $(CFLAGS) -o stdlib.o
+	$(CC) -c sci/posix/string.c  $(KINCLUDE) $(CFLAGS) -o string.o
+	$(CC) -c sci/posix/syslib.c  $(KINCLUDE) $(CFLAGS) -o syslib.o
+	$(CC) -c sci/posix/unistd.c  $(KINCLUDE) $(CFLAGS) -o unistd.o
+
+	$(CC) -c sci/sys/sys.c   $(KINCLUDE) $(CFLAGS) -o sys.o
+
+	$(CC) -c sci/gde_serv.c $(KINCLUDE) $(CFLAGS) -o gde_serv.o
+
+	# fs/vfs
+	$(CC) -c sci/fs/vfs/vfs.c     $(KINCLUDE) $(CFLAGS) -o vfs.o
 	
+	# fs
+	$(CC) -c sci/fs/cf.c      $(KINCLUDE) $(CFLAGS) -o cf.o
+	$(CC) -c sci/fs/format.c  $(KINCLUDE) $(CFLAGS) -o format.o
+	$(CC) -c sci/fs/fs.c      $(KINCLUDE) $(CFLAGS) -o fs.o
+	$(CC) -c sci/fs/pipe.c    $(KINCLUDE) $(CFLAGS) -o pipe.o
+	$(CC) -c sci/fs/read.c    $(KINCLUDE) $(CFLAGS) -o read.o
+	$(CC) -c sci/fs/search.c  $(KINCLUDE) $(CFLAGS) -o search.o
+	$(CC) -c sci/fs/write.c   $(KINCLUDE) $(CFLAGS) -o write.o
+
+	# net
 	# three layers support:
 	# socket, protocol and network interface.
 
-	$(CC) -c net/socket/socket.c  $(KINCLUDE) $(CFLAGS) -o socket.o
-	#$(CC) -c net/protocol ...
-	$(CC) -c net/network/channel.c   $(KINCLUDE) $(CFLAGS) -o channel.o
-	$(CC) -c net/network/network.c   $(KINCLUDE) $(CFLAGS) -o network.o
+	$(CC) -c sci/net/socket/socket.c  $(KINCLUDE) $(CFLAGS) -o socket.o
+	#$(CC) -c sci/net/protocol ...
+	$(CC) -c sci/net/network/channel.c   $(KINCLUDE) $(CFLAGS) -o channel.o
+	$(CC) -c sci/net/network/network.c   $(KINCLUDE) $(CFLAGS) -o network.o
 
-
-	##
-	## SCI - System Call Interface
-	##
-
-	#  /sci - System Call Interface.
-	$(CC) -c sci/gde_serv.c $(KINCLUDE) $(CFLAGS) -o gde_serv.o
-	$(CC) -c sci/sys/sys.c   $(KINCLUDE) $(CFLAGS) -o sys.o
-
-
-	# fs
-	$(CC) -c fs/cf.c      $(KINCLUDE) $(CFLAGS) -o cf.o
-	$(CC) -c fs/format.c  $(KINCLUDE) $(CFLAGS) -o format.o
-	$(CC) -c fs/fs.c      $(KINCLUDE) $(CFLAGS) -o fs.o
-	$(CC) -c fs/pipe.c    $(KINCLUDE) $(CFLAGS) -o pipe.o
-	$(CC) -c fs/read.c    $(KINCLUDE) $(CFLAGS) -o read.o
-	$(CC) -c fs/search.c  $(KINCLUDE) $(CFLAGS) -o search.o
-	$(CC) -c fs/write.c   $(KINCLUDE) $(CFLAGS) -o write.o
-
-	# fs/vfs
-	$(CC) -c fs/vfs/vfs.c     $(KINCLUDE) $(CFLAGS) -o vfs.o
-
-	# Security
-	$(CC) -c security/desktop.c   $(KINCLUDE) $(CFLAGS) -o desktop.o
-	$(CC) -c security/room.c      $(KINCLUDE) $(CFLAGS) -o room.o
-	$(CC) -c security/userenv.c   $(KINCLUDE) $(CFLAGS) -o userenv.o
-	$(CC) -c security/usession.c  $(KINCLUDE) $(CFLAGS) -o usession.o
-
-
-	# storage
-	$(CC) -c sm/storage/storage.c   $(KINCLUDE) $(CFLAGS) -o storage.o
-
-	# system
-	$(CC) -c sm/system/abort.c    $(KINCLUDE) $(CFLAGS) -o abort.o
-	$(CC) -c sm/system/info.c     $(KINCLUDE) $(CFLAGS) -o info.o
-	$(CC) -c sm/system/init.c     $(KINCLUDE) $(CFLAGS) -o init.o
-	$(CC) -c sm/system/install.c  $(KINCLUDE) $(CFLAGS) -o install.o
-	$(CC) -c sm/system/modules.c  $(KINCLUDE) $(CFLAGS) -o modules.o
-	$(CC) -c sm/system/runtime.c  $(KINCLUDE) $(CFLAGS) -o runtime.o
-	$(CC) -c sm/system/sm.c       $(KINCLUDE) $(CFLAGS) -o sm.o
-	$(CC) -c sm/system/system.c   $(KINCLUDE) $(CFLAGS) -o system.o
-
-
-	# debug
-	$(CC) -c sm/debug/debug.c  $(KINCLUDE) $(CFLAGS) -o debug.o
-
-	# ob
-	$(CC) -c sm/ob/object.c  $(KINCLUDE) $(CFLAGS) -o object.o
-
-	$(CC) -c sm/syssm.c   $(KINCLUDE) $(CFLAGS) -o syssm.o
-
-
+    #Window system ring 0 support.
 	# Window Manager.
-	$(CC) -c wm/kgwm.c    $(KINCLUDE) $(CFLAGS) -o kgwm.o
-	$(CC) -c wm/logoff.c  $(KINCLUDE) $(CFLAGS) -o logoff.o
-	$(CC) -c wm/logon.c   $(KINCLUDE) $(CFLAGS) -o logon.o
-	$(CC) -c wm/wm.c      $(KINCLUDE) $(CFLAGS) -o wm.o
-
-
+	$(CC) -c sci/windows/kgwm.c    $(KINCLUDE) $(CFLAGS) -o kgwm.o
+	$(CC) -c sci/windows/logoff.c  $(KINCLUDE) $(CFLAGS) -o logoff.o
+	$(CC) -c sci/windows/logon.c   $(KINCLUDE) $(CFLAGS) -o logon.o
+	$(CC) -c sci/windows/wm.c      $(KINCLUDE) $(CFLAGS) -o wm.o
 	# Window Server.
-	$(CC) -c ws/bg.c        $(KINCLUDE) $(CFLAGS) -o bg.o
-	$(CC) -c ws/bmp.c       $(KINCLUDE) $(CFLAGS) -o bmp.o
-	$(CC) -c ws/button.c    $(KINCLUDE) $(CFLAGS) -o button.o
-	$(CC) -c ws/char.c      $(KINCLUDE) $(CFLAGS) -o char.o
-	$(CC) -c ws/createw.c   $(KINCLUDE) $(CFLAGS) -o createw.o
-	$(CC) -c ws/dtext.c     $(KINCLUDE) $(CFLAGS) -o dtext.o
-	$(CC) -c ws/font.c      $(KINCLUDE) $(CFLAGS) -o font.o
-	$(CC) -c ws/grid.c      $(KINCLUDE) $(CFLAGS) -o grid.o
-	$(CC) -c ws/line.c      $(KINCLUDE) $(CFLAGS) -o line.o
-	$(CC) -c ws/menu.c      $(KINCLUDE) $(CFLAGS) -o menu.o
-	$(CC) -c ws/menubar.c   $(KINCLUDE) $(CFLAGS) -o menubar.o
-	$(CC) -c ws/pixel.c     $(KINCLUDE) $(CFLAGS) -o pixel.o
-	$(CC) -c ws/rect.c      $(KINCLUDE) $(CFLAGS) -o rect.o
-	$(CC) -c ws/sbar.c      $(KINCLUDE) $(CFLAGS) -o sbar.o
-	$(CC) -c ws/toolbar.c   $(KINCLUDE) $(CFLAGS) -o toolbar.o
-	$(CC) -c ws/input.c     $(KINCLUDE) $(CFLAGS) -o input.o
-	$(CC) -c ws/output.c    $(KINCLUDE) $(CFLAGS) -o output.o
-	$(CC) -c ws/kgws.c      $(KINCLUDE) $(CFLAGS) -o kgws.o
-	$(CC) -c ws/xproc.c     $(KINCLUDE) $(CFLAGS) -o xproc.o
-	$(CC) -c ws/screen.c    $(KINCLUDE) $(CFLAGS) -o screen.o
-	$(CC) -c ws/video.c     $(KINCLUDE) $(CFLAGS) -o video.o
+	$(CC) -c sci/windows/bg.c        $(KINCLUDE) $(CFLAGS) -o bg.o
+	$(CC) -c sci/windows/bmp.c       $(KINCLUDE) $(CFLAGS) -o bmp.o
+	$(CC) -c sci/windows/button.c    $(KINCLUDE) $(CFLAGS) -o button.o
+	$(CC) -c sci/windows/char.c      $(KINCLUDE) $(CFLAGS) -o char.o
+	$(CC) -c sci/windows/createw.c   $(KINCLUDE) $(CFLAGS) -o createw.o
+	$(CC) -c sci/windows/dtext.c     $(KINCLUDE) $(CFLAGS) -o dtext.o
+	$(CC) -c sci/windows/font.c      $(KINCLUDE) $(CFLAGS) -o font.o
+	$(CC) -c sci/windows/grid.c      $(KINCLUDE) $(CFLAGS) -o grid.o
+	$(CC) -c sci/windows/line.c      $(KINCLUDE) $(CFLAGS) -o line.o
+	$(CC) -c sci/windows/menu.c      $(KINCLUDE) $(CFLAGS) -o menu.o
+	$(CC) -c sci/windows/menubar.c   $(KINCLUDE) $(CFLAGS) -o menubar.o
+	$(CC) -c sci/windows/pixel.c     $(KINCLUDE) $(CFLAGS) -o pixel.o
+	$(CC) -c sci/windows/rect.c      $(KINCLUDE) $(CFLAGS) -o rect.o
+	$(CC) -c sci/windows/sbar.c      $(KINCLUDE) $(CFLAGS) -o sbar.o
+	$(CC) -c sci/windows/toolbar.c   $(KINCLUDE) $(CFLAGS) -o toolbar.o
+	$(CC) -c sci/windows/kgws.c      $(KINCLUDE) $(CFLAGS) -o kgws.o
+	$(CC) -c sci/windows/xproc.c     $(KINCLUDE) $(CFLAGS) -o xproc.o
+
+
+	#
+	# == System =================================================
+	#
+
+
+	$(CC) -c system/security/desktop.c   $(KINCLUDE) $(CFLAGS) -o desktop.o
+	$(CC) -c system/security/room.c      $(KINCLUDE) $(CFLAGS) -o room.o
+	$(CC) -c system/security/userenv.c   $(KINCLUDE) $(CFLAGS) -o userenv.o
+	$(CC) -c system/security/usession.c  $(KINCLUDE) $(CFLAGS) -o usession.o
+
+	$(CC) -c system/debug/debug.c      $(KINCLUDE) $(CFLAGS) -o debug.o
+
+	$(CC) -c system/ob/object.c        $(KINCLUDE) $(CFLAGS) -o object.o
+
+	$(CC) -c system/storage/storage.c  $(KINCLUDE) $(CFLAGS) -o storage.o
+	$(CC) -c system/abort.c    $(KINCLUDE) $(CFLAGS) -o abort.o
+	$(CC) -c system/info.c     $(KINCLUDE) $(CFLAGS) -o info.o
+	$(CC) -c system/init.c     $(KINCLUDE) $(CFLAGS) -o init.o
+	$(CC) -c system/install.c  $(KINCLUDE) $(CFLAGS) -o install.o
+	$(CC) -c system/modules.c  $(KINCLUDE) $(CFLAGS) -o modules.o
+	$(CC) -c system/runtime.c  $(KINCLUDE) $(CFLAGS) -o runtime.o
+	$(CC) -c system/sm.c       $(KINCLUDE) $(CFLAGS) -o sm.o
+	$(CC) -c system/system.c   $(KINCLUDE) $(CFLAGS) -o system.o
+	$(CC) -c system/syssm.c   $(KINCLUDE) $(CFLAGS) -o syssm.o
 
 
 	# ps/action
-	$(CC) -c  ps/action/dispatch.c  $(KINCLUDE)  $(CFLAGS) -o dispatch.o
-	$(CC) -c  ps/action/pheap.c     $(KINCLUDE)  $(CFLAGS) -o pheap.o
-	$(CC) -c  ps/action/process.c   $(KINCLUDE)  $(CFLAGS) -o process.o
-	$(CC) -c  ps/action/clone.c     $(KINCLUDE)  $(CFLAGS) -o clone.o
-	$(CC) -c  ps/action/queue.c     $(KINCLUDE)  $(CFLAGS) -o queue.o
-	$(CC) -c  ps/action/spawn.c     $(KINCLUDE)  $(CFLAGS) -o spawn.o
-	$(CC) -c  ps/action/tasks.c     $(KINCLUDE)  $(CFLAGS) -o tasks.o
-	$(CC) -c  ps/action/theap.c     $(KINCLUDE)  $(CFLAGS) -o theap.o
-	$(CC) -c  ps/action/thread.c    $(KINCLUDE)  $(CFLAGS) -o thread.o
-	$(CC) -c  ps/action/threadi.c   $(KINCLUDE)  $(CFLAGS) -o threadi.o
-	$(CC) -c  ps/action/ts.c        $(KINCLUDE)  $(CFLAGS) -o ts.o
-	$(CC) -c  ps/action/tstack.c    $(KINCLUDE)  $(CFLAGS) -o tstack.o
-	$(CC) -c  ps/action/execve.c    $(KINCLUDE)  $(CFLAGS) -o execve.o
+	$(CC) -c  system/ps/action/dispatch.c  $(KINCLUDE)  $(CFLAGS) -o dispatch.o
+	$(CC) -c  system/ps/action/pheap.c     $(KINCLUDE)  $(CFLAGS) -o pheap.o
+	$(CC) -c  system/ps/action/process.c   $(KINCLUDE)  $(CFLAGS) -o process.o
+	$(CC) -c  system/ps/action/clone.c     $(KINCLUDE)  $(CFLAGS) -o clone.o
+	$(CC) -c  system/ps/action/queue.c     $(KINCLUDE)  $(CFLAGS) -o queue.o
+	$(CC) -c  system/ps/action/spawn.c     $(KINCLUDE)  $(CFLAGS) -o spawn.o
+	$(CC) -c  system/ps/action/tasks.c     $(KINCLUDE)  $(CFLAGS) -o tasks.o
+	$(CC) -c  system/ps/action/theap.c     $(KINCLUDE)  $(CFLAGS) -o theap.o
+	$(CC) -c  system/ps/action/thread.c    $(KINCLUDE)  $(CFLAGS) -o thread.o
+	$(CC) -c  system/ps/action/threadi.c   $(KINCLUDE)  $(CFLAGS) -o threadi.o
+	$(CC) -c  system/ps/action/ts.c        $(KINCLUDE)  $(CFLAGS) -o ts.o
+	$(CC) -c  system/ps/action/tstack.c    $(KINCLUDE)  $(CFLAGS) -o tstack.o
+	$(CC) -c  system/ps/action/execve.c    $(KINCLUDE)  $(CFLAGS) -o execve.o
 
 	# ps/ipc
-	$(CC) -c  ps/ipc/callfar.c  $(KINCLUDE)  $(CFLAGS) -o callfar.o
-	$(CC) -c  ps/ipc/callout.c  $(KINCLUDE)  $(CFLAGS) -o callout.o
-	$(CC) -c  ps/ipc/ipc.c      $(KINCLUDE)  $(CFLAGS) -o ipc.o
-	$(CC) -c  ps/ipc/ipccore.c  $(KINCLUDE)  $(CFLAGS) -o ipccore.o
-	$(CC) -c  ps/ipc/sem.c      $(KINCLUDE)  $(CFLAGS) -o sem.o
+	$(CC) -c  system/ps/ipc/callfar.c  $(KINCLUDE)  $(CFLAGS) -o callfar.o
+	$(CC) -c  system/ps/ipc/callout.c  $(KINCLUDE)  $(CFLAGS) -o callout.o
+	$(CC) -c  system/ps/ipc/ipc.c      $(KINCLUDE)  $(CFLAGS) -o ipc.o
+	$(CC) -c  system/ps/ipc/ipccore.c  $(KINCLUDE)  $(CFLAGS) -o ipccore.o
+	$(CC) -c  system/ps/ipc/sem.c      $(KINCLUDE)  $(CFLAGS) -o sem.o
 
 	# ps/sched
-	$(CC) -c  ps/sched/preempt.c   $(KINCLUDE) $(CFLAGS) -o preempt.o
-	$(CC) -c  ps/sched/priority.c  $(KINCLUDE) $(CFLAGS) -o priority.o
-	$(CC) -c  ps/sched/sched.c     $(KINCLUDE) $(CFLAGS) -o sched.o
-	$(CC) -c  ps/sched/schedi.c    $(KINCLUDE) $(CFLAGS) -o schedi.o
+	$(CC) -c  system/ps/sched/preempt.c   $(KINCLUDE) $(CFLAGS) -o preempt.o
+	$(CC) -c  system/ps/sched/priority.c  $(KINCLUDE) $(CFLAGS) -o priority.o
+	$(CC) -c  system/ps/sched/sched.c     $(KINCLUDE) $(CFLAGS) -o sched.o
+	$(CC) -c  system/ps/sched/schedi.c    $(KINCLUDE) $(CFLAGS) -o schedi.o
 
 	# ps -x86 - falling angels.
-	$(CC) -c ps/x86/x86cont.c   $(KINCLUDE)  $(CFLAGS) -o x86cont.o
-	$(CC) -c ps/x86/x86fault.c  $(KINCLUDE)  $(CFLAGS) -o x86fault.o
-	$(CC) -c ps/x86/x86start.c  $(KINCLUDE)  $(CFLAGS) -o x86start.o
-	$(CC) -c ps/x86/memory.c    $(KINCLUDE)  $(CFLAGS) -o memory.o
-	$(CC) -c ps/x86/mminfo.c    $(KINCLUDE)  $(CFLAGS) -o mminfo.o
-	$(CC) -c ps/x86/mmpool.c    $(KINCLUDE)  $(CFLAGS) -o mmpool.o
-	$(CC) -c ps/x86/pages.c     $(KINCLUDE)  $(CFLAGS) -o pages.o
+	$(CC) -c system/ps/x86/x86cont.c   $(KINCLUDE)  $(CFLAGS) -o x86cont.o
+	$(CC) -c system/ps/x86/x86fault.c  $(KINCLUDE)  $(CFLAGS) -o x86fault.o
+	$(CC) -c system/ps/x86/x86start.c  $(KINCLUDE)  $(CFLAGS) -o x86start.o
+	$(CC) -c system/ps/x86/memory.c    $(KINCLUDE)  $(CFLAGS) -o memory.o
+	$(CC) -c system/ps/x86/mminfo.c    $(KINCLUDE)  $(CFLAGS) -o mminfo.o
+	$(CC) -c system/ps/x86/mmpool.c    $(KINCLUDE)  $(CFLAGS) -o mmpool.o
+	$(CC) -c system/ps/x86/pages.c     $(KINCLUDE)  $(CFLAGS) -o pages.o
 
 	# ps
-	$(CC) -c ps/create.c  $(KINCLUDE)  $(CFLAGS) -o create.o
-	$(CC) -c ps/mk.c      $(KINCLUDE)  $(CFLAGS) -o mk.o
-	$(CC) -c ps/sysmk.c   $(KINCLUDE)  $(CFLAGS) -o sysmk.o
+	$(CC) -c system/ps/create.c  $(KINCLUDE)  $(CFLAGS) -o create.o
+	$(CC) -c system/ps/mk.c      $(KINCLUDE)  $(CFLAGS) -o mk.o
+	$(CC) -c system/ps/sysmk.c   $(KINCLUDE)  $(CFLAGS) -o sysmk.o
 
 
 	##
-	## ==== HWI - Hardware Interface ==== 
+	## == HWI - Hardware Interface ======================= 
 	##
 
 	$(CC) -c hwi/io.c    $(KINCLUDE) $(CFLAGS) -o io.o
 	$(CC) -c hwi/pump.c  $(KINCLUDE) $(CFLAGS) -o pump.o
 
-
-	# klib
-	$(CC) -c klib/ctype.c   $(KINCLUDE) $(CFLAGS) -o ctype.o
-	$(CC) -c klib/kstdio.c  $(KINCLUDE) $(CFLAGS) -o kstdio.o
-	$(CC) -c klib/signal.c  $(KINCLUDE) $(CFLAGS) -o signal.o
-	$(CC) -c klib/stdlib.c  $(KINCLUDE) $(CFLAGS) -o stdlib.o
-	$(CC) -c klib/string.c  $(KINCLUDE) $(CFLAGS) -o string.o
-	$(CC) -c klib/syslib.c  $(KINCLUDE) $(CFLAGS) -o syslib.o
-	$(CC) -c klib/unistd.c  $(KINCLUDE) $(CFLAGS) -o unistd.o
-
-
 	# dd
 	$(CC) -c hwi/dd/devmgr.c  $(KINCLUDE) $(CFLAGS) -o devmgr.o
 
 
+
 	#
-	# ==== nhid ====
+	# == nhid ====
 	#
 
 	# ahci 
@@ -387,13 +370,17 @@ all-c:
 	$(CC) -c hwi/tty/ldisc.c     $(KINCLUDE) $(CFLAGS) -o ldisc.o
 	
 
-	# ws
-	$(CC) -c hwi/dd/hid/ws/i8042.c     $(KINCLUDE) $(CFLAGS) -o i8042.o
-	$(CC) -c hwi/dd/hid/ws/keyboard.c  $(KINCLUDE) $(CFLAGS) -o keyboard.o
-	$(CC) -c hwi/dd/hid/ws/mouse.c     $(KINCLUDE) $(CFLAGS) -o mouse.o
-	$(CC) -c hwi/dd/hid/ws/ps2kbd.c    $(KINCLUDE) $(CFLAGS) -o ps2kbd.o
-	$(CC) -c hwi/dd/hid/ws/ps2mouse.c  $(KINCLUDE) $(CFLAGS) -o ps2mouse.o
-	$(CC) -c hwi/dd/hid/ws/vsync.c     $(KINCLUDE) $(CFLAGS) -o vsync.o
+	# ws - Window system.
+	$(CC) -c hwi/dd/hid/i8042.c     $(KINCLUDE) $(CFLAGS) -o i8042.o
+	$(CC) -c hwi/dd/hid/keyboard.c  $(KINCLUDE) $(CFLAGS) -o keyboard.o
+	$(CC) -c hwi/dd/hid/mouse.c     $(KINCLUDE) $(CFLAGS) -o mouse.o
+	$(CC) -c hwi/dd/hid/ps2kbd.c    $(KINCLUDE) $(CFLAGS) -o ps2kbd.o
+	$(CC) -c hwi/dd/hid/ps2mouse.c  $(KINCLUDE) $(CFLAGS) -o ps2mouse.o
+	$(CC) -c hwi/dd/hid/vsync.c     $(KINCLUDE) $(CFLAGS) -o vsync.o
+	$(CC) -c hwi/dd/hid/input.c     $(KINCLUDE) $(CFLAGS) -o input.o
+	$(CC) -c hwi/dd/hid/output.c    $(KINCLUDE) $(CFLAGS) -o output.o
+	$(CC) -c hwi/dd/hid/screen.c    $(KINCLUDE) $(CFLAGS) -o screen.o
+	$(CC) -c hwi/dd/hid/video.c     $(KINCLUDE) $(CFLAGS) -o video.o
 
 
 	# x86 initialization

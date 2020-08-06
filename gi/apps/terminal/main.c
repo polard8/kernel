@@ -1123,11 +1123,12 @@ response_loop:
     
     // Get the message sended by the server.
 
-    int window          = (int) message_buffer[0];
-    int msg             = (int) message_buffer[1];
+    int          window =           (int) message_buffer[0];
+    int             msg =           (int) message_buffer[1];
     unsigned long long1 = (unsigned long) message_buffer[2];
     unsigned long long2 = (unsigned long) message_buffer[3];
-    
+
+
     //#debug
     //if(msg!=0)
         //printf ("%c",long1); //printf ("{%d%c} ",msg,long1);
@@ -1135,6 +1136,19 @@ response_loop:
     //char *c;
     
     switch (msg){
+
+        // Criar a janela de terminal.
+        // ? Poderia estar funcionando antes mesmo de ter criado uma ?
+        // ? Why not ?
+        //case MSG_CREATE_TERMINAL_WINDOW:
+            //break;
+        
+        // Sair.
+        //case MSG_QUIT:
+            // Sinaliza que o loop principal pode terminar.
+            // gQuit = 1;
+            //break;
+
 
         // message from child
         //case 7000:
