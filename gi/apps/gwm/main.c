@@ -733,7 +733,8 @@ int create_taskbar_client(int fd)
     //
     
     int button1_window=-1;   
-
+    int button2_window=-1;   
+    
     // Taskbar
     gws_debug_print ("gwm: Create c_taskbar client\n");
     c_taskbar = (struct wm_client_d *) malloc ( sizeof(struct wm_client_d) );
@@ -757,10 +758,16 @@ int create_taskbar_client(int fd)
          
          c_taskbar->title_window = -1;  //todo 
 
-         // button
+         // button1
          button1_window = gws_create_window (fd,
-                              WT_BUTTON,1,1,"gwm-button",
-                              2, 2, 100, 32,
+                              WT_BUTTON,1,1,"App1",
+                              2, 2, 120, 28,
+                              c_taskbar->window, 0,COLOR_GRAY, COLOR_GRAY);
+
+         // button2
+         button2_window = gws_create_window (fd,
+                              WT_BUTTON,1,1,"App2",
+                              2 + 120 + 2, 2, 120, 28,
                               c_taskbar->window, 0,COLOR_GRAY, COLOR_GRAY);
 
          wmclientList[1] = (unsigned long) c_taskbar;
@@ -796,7 +803,7 @@ int create_tester_client(int fd)
         
         tester_client->window = gws_create_window (fd,
                                     WT_SIMPLE,1,1,"Tester",
-                                    200, 200, 320, 110,
+                                    100, 100, 480, 320,
                                     0,0, COLOR_PINK, COLOR_PINK);
         
         if( (void *) tester_client->window < 0){
@@ -808,7 +815,7 @@ int create_tester_client(int fd)
         
         tester_client->title_window = gws_create_window (fd,
                                           WT_SIMPLE,1,1,"Tester Title",
-                                          200, 200-32, 320, 32,
+                                          100, 100-32, 480, 32,
                                           0,0, COLOR_BLUE, COLOR_BLUE);
 
         if( (void *) tester_client->title_window < 0 ){
@@ -819,8 +826,8 @@ int create_tester_client(int fd)
     
         //Tester title window
         tester_button = gws_create_window (fd,
-             WT_BUTTON,1,1,"x", //#bugbug: pagefault. the size of the string overflows the button size.
-             2, 2, 100, 24,
+             WT_BUTTON,1,1,"X", //#bugbug: pagefault. the size of the string overflows the button size.
+             (480-80-2), 2, 80, 28, //2, 2, 80, 28,
              tester_client->title_window, 0, COLOR_RED, COLOR_RED);
              
         wmclientList[2] = (unsigned long) tester_client;

@@ -1167,8 +1167,7 @@ int serviceCreateWindow (void){
     struct gws_window_d *Window;
 
     unsigned long x, y, w, h, color, type;
-
-    
+ 
     int pw=0;
     struct gws_window_d *Parent;
 
@@ -1187,7 +1186,23 @@ int serviceCreateWindow (void){
 
     //#test
     //parent window ID.
-    pw = message_address[10];   
+    pw = message_address[10]; 
+
+    //string support    
+    
+    unsigned char buf[256+1];
+    int i=0;
+    int string_off=  14; //8;
+    for(i=0; i<256; i++)
+    {
+         buf[i] = message_address[string_off];
+         string_off++;
+    }
+    buf[i] = 0;
+    
+    
+    
+    
     
     //Limits
     if(pw<0 ||pw>WINDOW_COUNT_MAX)
@@ -1216,7 +1231,7 @@ int serviceCreateWindow (void){
     //                                          COLOR_PINK, color ); 
 
     Window = (struct gws_window_d *) createwCreateWindow ( type, 
-                                              1, 1, "No-Name",  
+                                              1, 1, buf, //"No-Name",  
                                               x, y, w, h,   
                                               Parent, 0, 
                                               COLOR_PINK, color ); 
@@ -1512,8 +1527,6 @@ int serviceDrawText(void)
     unsigned long x;
     unsigned long y;
     unsigned long color;
-    
-
 
 
     // #debug
@@ -1521,8 +1534,7 @@ int serviceDrawText(void)
 
 
     // Get
-    
-    
+
     window_id = message_address[4];
     x         = message_address[5];
     y         = message_address[6]; 

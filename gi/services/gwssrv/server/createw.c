@@ -1324,6 +1324,11 @@ void *createwCreateWindow2 (
         };
 
 
+        size_t tmp_size = (size_t) strlen ( (const char *) windowname );
+        unsigned long offset = 
+        ( ( (unsigned long) window->width - ( (unsigned long) tmp_size * (unsigned long) gcharWidth) ) / 2 );
+       
+
         if ( (void*) Parent == NULL )
         {
             gde_debug_print ("createwCreateWindow2: [WT_BUTTON] Parent NULL\n"); 
@@ -1361,12 +1366,29 @@ void *createwCreateWindow2 (
                  (window->width), 
                  1, 
                  border2 );
+                 
+                 
+            // Button label
+            if (Selected == 1){
+                dtextDrawString ( 
+                    (Parent->left   + window->left) + offset,
+                    (Parent->top    + window->top)  +8, 
+                    COLOR_WHITE, windowname );
+            }else{
+                // (largura do botão, menos a largura da string)/2
+                // #debug: Rotina provisória
+                //dtextDrawString ( x +20, y +20, COLOR_TERMINALTEXT, string );
+                dtextDrawString ( 
+                    (Parent->left   + window->left) +offset, 
+                    (Parent->top    + window->top)  +8, 
+                    COLOR_TERMINALTEXT, windowname );
+            };
         }
-    
-          //todo
-          // configurar a estrutura de botão 
-          // e apontar ela como elemento da estrutura de janela.
-          //window->button->?
+
+      //todo
+      // configurar a estrutura de botão 
+      // e apontar ela como elemento da estrutura de janela.
+      //window->button->?
     }
     return window;
 

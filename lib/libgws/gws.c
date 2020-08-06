@@ -68,7 +68,8 @@ __gws_createwindow_request (
     unsigned long height,
     unsigned long bg_color,
     unsigned long type,
-    unsigned long parent );
+    unsigned long parent,
+    char *name );
 int __gws_createwindow_response(int fd);
 
 
@@ -894,7 +895,8 @@ __gws_createwindow_request (
     unsigned long height,
     unsigned long bg_color,
     unsigned long type,
-    unsigned long parent )
+    unsigned long parent,
+    char *name )
 {
     // Isso permite ler a mensagem na forma de longs.
     unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];   
@@ -903,9 +905,8 @@ __gws_createwindow_request (
 
 
     //#todo: precisamos criar um buffer aqui e copiarmos em algum lugar...
-    char *name = "Window";
+    //char *name = "label";
 
-   
 
     //
     // Send request.
@@ -938,6 +939,20 @@ __gws_createwindow_request (
        //test
         message_buffer[10] = parent; 
         //...
+
+        //string support.
+        
+        char buf[256];
+        int i=0;
+        int string_off= 14; // 8;
+        for(i=0; i<250; i++)
+        {
+            message_buffer[string_off] = *name; //#todo: Temos que receber esse ponteiro via argumento
+            string_off++; name++;
+        }
+        message_buffer[string_off] = 0;
+
+
 
         // Write!
         // Se foi possível enviar, então saimos do loop.  
@@ -1100,7 +1115,7 @@ gws_create_window_using_socket (
     //#todo
     // use more arguments.
     __gws_createwindow_request(fd, 
-        x, y, width, height, color, type, parentwindow);
+        x, y, width, height, color, type, parentwindow, windowname);
         
     int response = (int) __gws_createwindow_response(fd); 
     
@@ -1252,7 +1267,7 @@ gws_create_window (
     //#todo
     // use more arguments.
     __gws_createwindow_request(fd, 
-        x, y, width, height, color, type, parentwindow);
+        x, y, width, height, color, type, parentwindow, windowname);
         
     int wid = (int) __gws_createwindow_response(fd); 
     
