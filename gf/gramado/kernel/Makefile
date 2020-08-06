@@ -370,7 +370,8 @@ all-c:
 	$(CC) -c hwi/tty/ldisc.c     $(KINCLUDE) $(CFLAGS) -o ldisc.o
 	
 
-	# ws - Window system.
+	# hid - Human Interface Devices.
+	# video, mouse, keyboard.
 	$(CC) -c hwi/dd/hid/i8042.c     $(KINCLUDE) $(CFLAGS) -o i8042.o
 	$(CC) -c hwi/dd/hid/keyboard.c  $(KINCLUDE) $(CFLAGS) -o keyboard.o
 	$(CC) -c hwi/dd/hid/mouse.c     $(KINCLUDE) $(CFLAGS) -o mouse.o
