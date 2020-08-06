@@ -115,6 +115,26 @@ static int readline(char *line, int length, FILE *stream)
  */
 
 int main (int argc, char *argv[]){
+	
+	
+	//++
+	//#test
+	
+	//
+	// tty test
+	//
+	
+    // Conectando a tty dos dois processos
+    // Retornaremos o fd do arquivo que aponta para a tty.
+    int tprintf_tty_fd = -1;
+    gramado_system_call ( 267,
+        getpid(),    //master
+        getppid(),   //slave pai(terminal)
+        0 );
+    tprintf_tty_fd = (int) gramado_system_call ( 266, getpid(), 0, 0 );        
+    //--
+
+
 
     //FILE *f;
     

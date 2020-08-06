@@ -468,16 +468,22 @@ int ____bfill (FILE *stream){
     stream->_w =0;
     stream->_r =0;
     
-    nbyte = (int) read ( fileno(stream), 
-                     stream->_p,            // Offset 
-                     stream->_cnt );    
+    // cnt tem a quantidade disponível para
+    // leitura.
+    // Read vai ler, la no kernel, a partir da última posição.
+    // A intenção dessa rotina é reencher o buffer em ring3,
+    // pegando uma nova parte do arquivo que está em ring0.
+
+    stream->_cnt = (int) read ( fileno(stream), 
+                             stream->_p,        // Buffer. 
+                             stream->_cnt );    
 
     // Read fail.
     // ou fim do arquivo
-    if (nbyte<0)
+    if (stream->_cnt < 0)
     {
-        debug_print ("____bfill: [FAIL] read fail!\n");
-        printf      ("____bfill: [FAIL] read fail!\n");
+        debug_print ("____bfill: [FAIL] read fail, nothing to read!\n");
+        printf      ("____bfill: [FAIL] read fail, nothing to read!\n");
         //stream->_cnt = 0;
         return EOF;
     }
@@ -485,7 +491,7 @@ int ____bfill (FILE *stream){
     // Couldn't read.
     // nada foi lido. Mas pode não ser ruin ... pois o arquivo
     // pode existir e estar vazio eu chegado ao fim.
-    if (nbyte == 0)
+    if (stream->_cnt == 0)
     {
         debug_print ("____bfill: [FAIL] read fail. Zero bytes\n");
         printf      ("____bfill: [FAIL] read fail. Zero bytes\n");
@@ -493,21 +499,19 @@ int ____bfill (FILE *stream){
         return EOF;
     }
     
-    if(nbyte > BUFSIZ-1)
+    // Overflow
+    // Isso pode corromper memória.
+    if(stream->_cnt > BUFSIZ-1)
     {
-        debug_print ("____bfill: [FAIL] read fail. too much bytes\n");
-        printf      ("____bfill: [FAIL] read fail. too much bytes\n");
+        debug_print ("____bfill: [BUGBUG] read fail. too much bytes\n");
+        printf      ("____bfill: [BUGBUG] read fail. too much bytes\n");
         exit(1);
     }    
-
-    //atualizamos o quanto falta.
-    //é o quanto tinha menos o quanto foi incluido com read.
-    //normalmente encheremos obuffer e cnt será 0.
-    stream->_cnt = (stream->_cnt - nbyte); 
     
-    // Retornamos a quantidade lida.
+    // Retornamos a quantidade disponível para leitura.
+    // Isso será usado por __getc.
     
-    return (int) nbyte;
+    return (int) stream->_cnt;
 }
 
 
@@ -560,29 +564,24 @@ int __getc ( FILE *stream ){
         // Se falhou ou se nada foi lido do arquivo para o buffer.
         // Então __getc não tem um char para oferecer.
         // Retornamos EOF.
-        
         if (nreads <= 0)
         {
             //debug_print ("__getc: [DEBUG] ____bfill fail\n");
             //printf      ("__getc: [DEBUG] ____bfill fail\n");
-            
             stream->_flags = (stream->_flags | _IOEOF); 
             stream->_cnt = 0;
-         
             return EOF;
         }
 
         // Ok
         // Temos bytes no buffer dessa stream. Então vamos pegar um.
         // #importante: Eles foram colocados no offset e não na base.
+        // Atualiza.
+        // Retorna o buffer que pegamos do buffer em ring3.
         
         ch = (int) *stream->_p;
-        
-        // Atualiza.
         stream->_p++;
         stream->_cnt--;
-
-        // Retorna o buffer que pegamos do buffer em ring3.
         return (int) ch;
     }
 
@@ -595,9 +594,7 @@ int __getc ( FILE *stream ){
     {
         debug_print ("__getc: [BUGBUG] invalid offset\n");
         printf      ("__getc: [BUGBUG] invalid offset\n");
-        
         //stream->_base = stream->_p;
-        
         return EOF;
     }
 
@@ -614,30 +611,23 @@ int __getc ( FILE *stream ){
     // have ungotten ?
     // Pegamos o ungotten.
     // não mexemos nos contadores.
-    
     if ( stream->have_ungotten == TRUE )
     {
         ch = (int) stream->ungotten;
-        
         stream->have_ungotten = FALSE;
-
         return (int) ch;
-    
     
     // Do NOT have forgotten!
+    // Pega o char no posicionamento absoluto do arquivo.
+    // Ajust file.
+    // Return the char.
     }else{
-
-        // Pega o char no posicionamento absoluto do arquivo.
-        // Ajust file.
-        // Return the char.
-        
         ch = (int) *stream->_p;
-        
         stream->_p++;
         stream->_cnt--;
-
         return (int) ch;
     };
+
 
     // #bugbug
     // FAIL!
@@ -4166,6 +4156,8 @@ int
 stdio_initialize_standard_streams (void)
 {
 
+   debug_print("stdio_initialize_standard_streams: [FIXME] What is this?\n");
+
     return (int) gramado_system_call ( 700, 
                      (unsigned long) stdin, 
                      (unsigned long) stdout, 
@@ -5312,21 +5304,24 @@ void stdioInitialize (){
 	
 	//Os caracteres são pintados na tela.
 	__libc_output_mode = LIBC_DRAW_MODE;
-	
+
 
       // #importante:
       // Vamos conectar o processo filho ao processo pai
-      // atraves das ttys dos processos.
+      // atraves das ttys privadas dos processos.
       // o processo pai é o terminal. (às vezes)
       // #bugbug:
       // Esse metodo não funcionara no caso
       // do processo filho do shell
-      
+ 
+      // #bugbug
+      // Deveria ser o contrário.
+      // O pai ser master e o filho slave.
+ 
       gramado_system_call ( 267,
            getpid(),    //master
            getppid(),   //slave pai(terminal)
            0 );
-
 
     __libc_tty_id = (int) gramado_system_call ( 266, getpid(), 0, 0 );        
 

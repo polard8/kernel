@@ -546,9 +546,8 @@ pid_t clone_and_execute_process (char *filename){
     // usar porta serial ainda.
 
     // #debug
-    debug_print ("clone_and_execute_process: FIXME. It's a work in progress\n");
-    printf ("clone_and_execute_process:\n");
-
+    debug_print ("clone_and_execute_process: [FIXME] It's a work in progress\n");
+    printf      ("clone_and_execute_process:\n");
 
 
     // Convertendo o formato do nome do arquivo.
@@ -562,8 +561,8 @@ pid_t clone_and_execute_process (char *filename){
     __Status = (int) KiSearchFile ( filename, VOLUME1_ROOTDIR_ADDRESS );
 
     if (__Status != 1){
-         debug_print ("clone_and_execute_process: File not found\n");
-         printf ("clone_and_execute_process: File not found!\n");
+         debug_print ("clone_and_execute_process: File not found!\n");
+         printf      ("clone_and_execute_process: File not found!\n");
          goto fail;
     }
 
@@ -642,7 +641,6 @@ do_clone:
         Clone->pid = (pid_t) PID;
         Clone->uid = (uid_t) current_user;
         Clone->gid = (gid_t) current_group;
-
         Clone->used = 1;
         Clone->magic = 1234;
         
@@ -712,9 +710,8 @@ do_clone:
             Clone->magic = 0;  
             Clone = NULL;
             
-            printf ("clone_and_execute_process: Couldn't load the file %s\n", 
+            printf ("clone_and_execute_process: [FAIL] Couldn't load the file %s\n", 
                 filename );
-                
             goto fail;
        }
        
@@ -736,7 +733,7 @@ do_clone:
             Clone->magic = 0;            
             Clone = NULL;
             
-            printf ("clone_and_execute_process: ELF fail \n");
+            printf ("clone_and_execute_process: [FAIL] ELF fail \n");
             goto fail;
         }
 
@@ -851,9 +848,9 @@ do_clone:
 
 
         // #debug: Para a máquina real.
-        printf ("clone_and_execute_process: returning to father [Debug]\n");
+        printf ("clone_and_execute_process: [DEBUG] Returning to father.\n");
         refresh_screen ();
-    
+
 		//
 		// Return.
 		//
@@ -863,8 +860,8 @@ do_clone:
 		// Igual acontece no fork().
 		
 		//pai
-        current_thread = Current->control->tid;
         current_process = Current->pid;
+        current_thread  = Current->control->tid;
 
         return (pid_t) Clone->pid;
     };

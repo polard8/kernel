@@ -161,15 +161,16 @@ int pty_create_link ( struct tty_d *tty )
 
 
 
-//Ligar duas tty dados os pids dos processos que possuem as tty.
+// Ligar duas tty dados os pids dos processos que possuem as tty.
 // isso será usado pelo terminal se ele tiver o pid do filho.
+// Serviço: 267
 int pty_link_by_pid ( int master_pid, int slave_pid )
 {
 
     debug_print("pty_link_by_pid: [FIXME] \n");
-    return -1;
+    //return -1;
 
-/*
+
 	// O slave é o terminal. pts. remember ?!
 
     struct tty_d *__master;
@@ -240,8 +241,9 @@ int pty_link_by_pid ( int master_pid, int slave_pid )
         return -1; 
     }
 
-
-    __master = ( struct tty_d *) ttyList[master_tty_id];
+    file *f_master;
+    f_master = (file*) pm->Objects[master_tty_id];
+    __master = ( struct tty_d *) f_master->tty; 
  
     if ( (void *) __master == NULL ) 
     {
@@ -250,9 +252,9 @@ int pty_link_by_pid ( int master_pid, int slave_pid )
         return -1; 
     }
 
-        
-        
-    __slave = ( struct tty_d *) ttyList[slave_tty_id];
+    file *f_slave;
+    f_slave = (file*) ps->Objects[slave_tty_id];
+    __slave = ( struct tty_d *) f_slave->tty; 
  
     if ( (void *) __slave == NULL ) 
     {
@@ -261,9 +263,8 @@ int pty_link_by_pid ( int master_pid, int slave_pid )
         return -1; 
     }
 
-    // Link !
+    // Link!
     return (int) pty_link ( __master, __slave );
-    */
 }
 
 

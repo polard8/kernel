@@ -161,8 +161,8 @@ gde_extra_services (
     }
 
 
-    // Ligar duas tty dados os pids dos processos que possuem as tty.
-    // kdrivers/tty/pty/pty.c
+    // Ligar duas tty, dados os pids dos processos que possuem as tty.
+    // tty/pty.c
     // IN: master pid, slave pid.
     if (number == 267){
         return (void *) pty_link_by_pid ( (int) arg2, (int) arg3 );

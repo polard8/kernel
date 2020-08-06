@@ -739,26 +739,23 @@ int processCopyProcess ( pid_t p1, pid_t p2 ){
 
     struct process_d *Process1;
     struct process_d *Process2;
-    
     int Status=0;
     int i=0;
 
 
+    if ( p1 == p2 ){
+        printf ("processCopyProcess: [FAIL] same PID\n");  goto fail;
+    }
 
     if ( p1 < 0 ){
-        printf ("processCopyProcess: p1 limits\n"); 
-        goto fail;
+        printf ("processCopyProcess: [FAIL] p1 limits\n"); goto fail;
     }
 
     if ( p2 < 0 ){
-        printf ("processCopyProcess: p2 limits\n"); 
-        goto fail;
+        printf ("processCopyProcess: [FAIL] p2 limits\n"); goto fail;
     }
 
-    if ( p1 == p2 ){
-        printf ("processCopyProcess: same PID\n"); 
-        goto fail;
-    }
+
 
     // ===========================
     // Check process 1.
@@ -766,8 +763,7 @@ int processCopyProcess ( pid_t p1, pid_t p2 ){
 
     // Check Process1
     if ( (void *) Process1 == NULL ){
-        printf ("processCopyProcess: Process1\n");
-        goto fail;
+        printf ("processCopyProcess: Process1\n"); goto fail;
 
     }else{
 
@@ -783,8 +779,7 @@ int processCopyProcess ( pid_t p1, pid_t p2 ){
     Process2 = (struct process_d *) processList[p2];
 
     if ( (void *) Process2 == NULL ){
-        printf ("processCopyProcess: Process1\n");
-        goto fail;
+        printf ("processCopyProcess: Process1\n"); goto fail;
     
     }else{
 
@@ -809,23 +804,17 @@ int processCopyProcess ( pid_t p1, pid_t p2 ){
     Process2->_critical = 0;
 
     // Identificadores.
-    Process2->pid  = (pid_t) p2;             // PID.  O pid do clone.
-    Process2->ppid = (pid_t) Process1->pid;  // PPID. O parent do clone é o pid do pai. 
-    
-    Process2->uid   = (uid_t) Process1->uid;   // UID. 
-    Process2->euid  = (uid_t) Process1->euid;  // EUID. 
-    Process2->ruid  = (uid_t) Process1->ruid;  // RUID. 
-    Process2->suid  = (uid_t) Process1->suid;  // SUID. 
-    
-    
-    Process2->gid   = (gid_t) Process1->gid;   // GID. 
-    Process2->egid  = (gid_t) Process1->egid;  // EGID. 
-    Process2->rgid  = (gid_t) Process1->rgid;  // RGID. 
-    Process2->sgid  = (gid_t) Process1->sgid;  // SGID. 
-    
+    Process2->pid  = (pid_t) p2;               // PID.  O pid do clone.
+    Process2->ppid = (pid_t) Process1->pid;    // PPID. O parent do clone é o pid do pai. 
+    Process2->uid  = (uid_t) Process1->uid;   // UID. 
+    Process2->euid = (uid_t) Process1->euid;  // EUID. 
+    Process2->ruid = (uid_t) Process1->ruid;  // RUID. 
+    Process2->suid = (uid_t) Process1->suid;  // SUID. 
+    Process2->gid  = (gid_t) Process1->gid;   // GID. 
+    Process2->egid = (gid_t) Process1->egid;  // EGID. 
+    Process2->rgid = (gid_t) Process1->rgid;  // RGID. 
+    Process2->sgid = (gid_t) Process1->sgid;  // SGID. 
     Process2->pgrp = Process1->pgrp;
-
-
 
     // validation.
     Process2->used = Process1->used;
@@ -1026,7 +1015,6 @@ int processCopyProcess ( pid_t p1, pid_t p2 ){
 
     Process2->control->DirectoryPA = Process2->DirectoryPA;
 
-
     Process2->control->ownerPID = Process2->pid;
 
 
@@ -1046,23 +1034,45 @@ int processCopyProcess ( pid_t p1, pid_t p2 ){
     //Process2->long2  = Process1->long2;     //arg4.
 
 
-    /*
+    //
+    // == TTY ======================
+    //
+    
+    // Vamos criar uma tty para o processo clone.
+    // Ela será uma tty privada, mas precisa ter um
+    // uma estrutura de arquivo que aponte para ela
+    // e um fd na lista de objetos abertos pelo processo.
+  
     //++
-    // tty support
-    Process2->tty = ( struct tty_d *) tty_create ();  
-       
+    Process2->tty = ( struct tty_d *) tty_create();  
+
     if ( (void *) Process2->tty == NULL ){
-         panic ("processCopyProcess: Couldn't create tty\n");
+         panic ("processCopyProcess: Couldn't create TTY\n");
     }
     tty_start (Process2->tty);
     //--
-    */
+
     
-    // #test
-    // No caso da clonagem, vamos herdar a tty,
-    // talvezz isso facilite a comunicação.
+    // Procurando um slot livre.
+    int __slot=0;
+    for (__slot=0; __slot<32; __slot++)
+    {
+         if ( Process2->Objects[__slot] == 0 ){ goto __OK; }
+    };
     
-    Process2->tty = Process1->tty;
+    Process2->tty->_fp->_file = __slot;
+    Process2->tty->index      = __slot;
+    
+__OK:
+    
+
+    // #bugbug
+    // Cada processo precisa ter sua própria tty.
+    // Assim poderemos usar elas como master e slave ...
+    // Assim como faz o multiplexer.
+    // o Conteúdo precisa ser copiado no write.
+    
+    //Process2->tty = Process1->tty;
 
 
     Process2->exit_code = Process1->exit_code;
@@ -2464,22 +2474,20 @@ __execute_new_process ( const char *filename,
     //return __pid;
     //...
 }
-      
- 
 
-// Pega o n�mero da tty de um processo, dado o pid.
+
+// Pega o número da tty de um processo, dado o pid.
+// Serviço: 266.
 int process_get_tty ( int pid )
 {
     // Usada para debug.
-
-    
+  
     struct process_d *p;
     struct tty_d *tty;
 
-
-    //3debug
-	//printf ("process_get_tty: pid %d \n", pid);
-	//refresh_screen();
+    //#debug
+    //printf ("process_get_tty: pid %d \n", pid);
+    //refresh_screen();
 
 
     // #todo
@@ -2487,33 +2495,45 @@ int process_get_tty ( int pid )
     
     if ( pid < 0 )
     {
-		//printf ("pid fail\n");
-		//refresh_screen();
+        debug_print ("process_get_tty: pid \n");
+        //printf ("pid fail\n");
+        //refresh_screen();
         return -1;
     }
+
 
     p = (struct process_d *) processList[pid];
 
     if ( (void *) p == NULL )
     {
-		//printf ("p fail\n");
-		//refresh_screen();
+        debug_print ("process_get_tty: p \n");
+        //printf ("p fail\n");
+        //refresh_screen();
         return -1;
     }
 
+    // Get the private tty.
+    
     tty = p->tty;    
-
 
     if ( (void *) tty == NULL )
     {
-		//printf ("tty fail\n");
-		//refresh_screen();
+        debug_print ("process_get_tty: tty fail\n");
+        //printf ("tty fail\n");
+        //refresh_screen();
         return -1;
     }
 
 
     //printf ("tty %d belongs to %d\n", tty->index, p->pid );
     //refresh_screen ();
+
+    // #bugbug
+    // Isso precisa ser o fd na lista de arquivos abertos 
+    // pelo processo.
+    //file *f;
+    
+    //f = ()
 
     return (int) tty->index;
 }                   

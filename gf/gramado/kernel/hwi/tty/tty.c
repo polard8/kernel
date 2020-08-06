@@ -1251,7 +1251,9 @@ struct ttydrv_d *get_tty_driver( int fd )
 
 
 /*
+ ***********************************
  * tty_create: 
+ *     Cria um estrutura de tty e retorna o ponteiro.
  * 
  * OUT:
  *     pointer.
@@ -1355,7 +1357,6 @@ __ok_register:
     if ( (void*) __tty == NULL )
         panic("tty_create: __tty");
 
-
     //
     // name
     //
@@ -1406,7 +1407,14 @@ __ok_register:
 
         // Esse é o arquivo que aponta para essa estrutura.
         __tty->_fp = __file;
-
+        
+        
+        // #todo
+        // precisamos pegar um slot livre na lista de objetos abertos pelo processo.
+        // O indice da tty é fd do arquivo que aponta para a tty.
+        //__tty->index = __file->_file;
+        __tty->index = -1;
+        
 
         //
         // Register.
