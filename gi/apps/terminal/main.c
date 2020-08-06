@@ -171,9 +171,9 @@ void test_tty_support(int fd)
 
 void __send_to_child (void)
 {
-    //char *shared_memory = (char *) (0xC0800000 -0x100);
-    char *shared_flag   = (char *) (0xC0800000 -0x210);  //test
-    char *shared_memory = (char *) (0xC0800000 -0x200);  //test
+    char *shared_flag   = (char *) (0xC0800000 -0x210);   // flag
+    char *shared_memory = (char *) (0xC0800000 -0x200);   // input
+    //char *shared_memory = (char *) (0xC0800000 -0x100); // output
    
    
     // There is a '\n' terminated line in prompt[].
@@ -2264,10 +2264,16 @@ int main ( int argc, char *argv[] ){
     //inicializações;
     terminalTerminal();
 
+
+    //inicializando prompt[]
+    //chamando o shell.bin
+    input('\n');
+    input('\0');
+    test_standard_stream(client_fd);
+
     //
     // Loop!
     //
-
 
     // loop
     // This the loop that gets messages from the window server;

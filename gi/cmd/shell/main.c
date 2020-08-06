@@ -13,10 +13,13 @@
 char *__get_commandline (void);
 char *__get_commandline (void)
 {
-    //char *shared_memory = (char *) (0xC0800000 -0x100);
-    char *shared_flag   = (char *) (0xC0800000 -0x210);  //test
-    char *shared_memory = (char *) (0xC0800000 -0x200);  //test
 
+    char *shared_flag   = (char *) (0xC0800000 -0x210);   // flag
+    char *shared_memory = (char *) (0xC0800000 -0x200);   // input
+    //char *shared_memory = (char *) (0xC0800000 -0x100); // output
+    
+    
+    
     // check flag.
     char FlagStatus = -1;
     
