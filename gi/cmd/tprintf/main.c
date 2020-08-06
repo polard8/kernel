@@ -109,6 +109,31 @@ static int readline(char *line, int length, FILE *stream)
 }
 
 
+//internal
+//check the flag and read the lines.
+char *__get_commandline (void)
+{
+    //char *shared_memory = (char *) (0xC0800000 -0x100);
+    char *shared_flag   = (char *) (0xC0800000 -0x210);  //test
+    char *shared_memory = (char *) (0xC0800000 -0x200);  //test
+
+    // check flag.
+    char FlagStatus = -1;
+    
+    FlagStatus = (char) shared_flag[0];
+    
+    if (FlagStatus != 0){
+        shared_flag[0] = 0; //cleaning the flag.
+        //todo: clear the command line.
+        return (char *) shared_memory;
+    }
+    
+fail:
+    if (FlagStatus == 0)
+        return (char *) 0;
+}
+
+
 
 /*
  * INICIALIZAÇÃO GENÉRICA PARA TESTE DE APLICATIVO.
@@ -117,13 +142,12 @@ static int readline(char *line, int length, FILE *stream)
 int main (int argc, char *argv[]){
 	
 	
+	/*
 	//++
 	//#test
-	
 	//
 	// tty test
 	//
-	
     // Conectando a tty dos dois processos
     // Retornaremos o fd do arquivo que aponta para a tty.
     int tprintf_tty_fd = -1;
@@ -133,7 +157,7 @@ int main (int argc, char *argv[]){
         0 );
     tprintf_tty_fd = (int) gramado_system_call ( 266, getpid(), 0, 0 );        
     //--
-
+    */
 
 
     //FILE *f;
@@ -217,7 +241,7 @@ int main (int argc, char *argv[]){
       };    
     */  
 
-
+    /*
     char line_buffer[512];
     char *cmd;
     
@@ -238,8 +262,28 @@ int main (int argc, char *argv[]){
         // Nothing
         // if ( (void *) cmd == NULL ) 
     };
+    */
+    
+    
+    //shared memory
+   
+    char *buf;  
+    
+    while (1){
+ 
+        buf = __get_commandline();
+        
+        //Temos uma linha de comando.
+        if ((void *)buf != NULL)
+        {
+            printf("CommandLine={%s}\n",buf);
+        }
+    
+        //try again
+        //até que aflag mude.
+    }
 
-
+    
     //goto loop;
     while(1);
 

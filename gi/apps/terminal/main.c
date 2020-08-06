@@ -75,12 +75,12 @@ int terminal_hello_request(int fd);
 int terminal_hello_response(int fd);
 
 
-
 //message support
-int terminal_loop(int fd);
+void __send_to_child (void);
+int __get_system_message(int fd);
 int terminal_getmessage_request(int fd);
 int terminal_getmessage_response(int fd);
-
+int terminal_loop(int fd);
 
 //constructor.
 void terminalTerminal ();
@@ -168,19 +168,36 @@ void test_tty_support(int fd)
 // If the child is a text editor it will read a single char.
 // Maybe the shell can change stdin for it's child.
 // For now, the shell will need a line.
-void send_again()
+
+void __send_to_child (void)
 {
+    //char *shared_memory = (char *) (0xC0800000 -0x100);
+    char *shared_flag   = (char *) (0xC0800000 -0x210);  //test
+    char *shared_memory = (char *) (0xC0800000 -0x200);  //test
+   
+   
     // There is a '\n' terminated line in prompt[].
     // #bugbug: Não podemos mandar uma linha sem '\n'.
     fseek(stdin, 0, SEEK_SET); 
     write ( fileno(stdin), prompt, 80);
     
-    // Clear prompt.
-    // #todo: Create a helper function.
-    prompt_pos = 0;    
+
+    //copy to shared memory
+    //send a system message.(maybe)
+    //flag?
+
+
     int i=0;
+    // Send the command line to the shared memory.
+    for(i=0; i<80; i++){ shared_memory[i] = prompt[i]; }
+    // Clear prompt.
     for(i=0; i<80; i++){ prompt[i]=0; }
+    prompt_pos = 0; 
+    
+    // Notify the child that it has a message in the shared memory.
+    shared_flag[0] = 1; 
 }
+
 
 
 //f2
@@ -989,10 +1006,328 @@ int pad_to (int count, char *string){
 // =======================
 //
 
+/*
+ * __get_system_message:
+ *      Building the command line.
+ *      One byte at time. Using input() into the prompt[] buffer.
+ */
+
+// The window server sent us a system message
+// as a response for our request.
+// Let's get that message reading the socket.
+// This routine will process that message ...
+// Maybe include the keyboard message into a queue.
+// We have a input() building the prompt[] string.
+// That prompt string is the command line.
+
+int __get_system_message(int fd)
+{
+    unsigned long *message_buffer = (unsigned long *) &__buffer[0];   
+    int n_reads = 0;    // For receiving responses.
+
+    //
+    // Waiting for response. ==================
+    //
+
+    // Espera para ler a resposta. 
+    // Esperando com yield como teste.
+    // Isso demora, pois a resposta só será enviada depois de
+    // prestado o servido.
+    // obs: Nesse momento deveríamos estar dormindo.
+
+    // #debug
+    // gws_debug_print ("terminal: Waiting ...\n");      
+
+    
+    // #bugbug
+    // Talvez não precisamos disso, vamos testar sem isso.
+    // Tem um yield logo abaixo no write().
+    
+    //int y;
+    //for(y=0; y<15; y++)
+    //    gws_yield();   // See: libgws/
+
+
+    // #todo
+    // Podemos checar antes se o fd 
+    // representa um objeto que permite leitura.
+    // Pode nem ser possível.
+    // Mas como sabemos que é um soquete,
+    // então sabemos que é possível ler.
+
+
+    //
+    // read
+    //
+
+    // #debug
+    gws_debug_print ("__get_system_message: Reading ...\n");      
+
+
+    // #caution
+    // Waiting for response.
+    // We can stay here for ever.
+
+response_loop:
+
+    //n_reads = read ( fd, __buffer, sizeof(__buffer) );
+    n_reads = recv ( fd, __buffer, sizeof(__buffer), 0 );
+    
+    // Se retornou 0, podemos tentar novamente.
+    if (n_reads == 0){
+        gws_yield(); 
+        goto response_loop;
+    }
+    
+    // Se retornou -1 é porque algo está errado com o arquivo.
+    if (n_reads < 0){
+        gws_debug_print ("terminal: recv fail.\n");
+        printf ("terminal: recv fail.\n");
+        printf ("Something is wrong with the socket.\n");
+        exit (1);
+    }
+
+    //
+    // The msg index.
+    //
+    
+    // Get the message sended by the server.
+
+    int           MsgWindow =           (int) message_buffer[0];
+    int           MsgMsg    =           (int) message_buffer[1];
+    unsigned long MsgLong1  = (unsigned long) message_buffer[2];
+    unsigned long MsgLong2  = (unsigned long) message_buffer[3];
 
 
 
+    //#debug
+    //if(msg!=0)
+        //printf ("%c",long1); //printf ("{%d%c} ",msg,long1);
 
+    //char *c;
+    
+    switch (MsgMsg){
+
+        // Criar a janela de terminal.
+        // ? Poderia estar funcionando antes mesmo de ter criado uma ?
+        // ? Why not ?
+        //case MSG_CREATE_TERMINAL_WINDOW:
+            //break;
+        
+        // Sair.
+        //case MSG_QUIT:
+            // Sinaliza que o loop principal pode terminar.
+            // gQuit = 1;
+            //break;
+
+
+        // message from child
+        //case 7000:
+            //gws_debug_print("7000\n"); exit(0);
+            //tputc ((int) fd, (int) 'C', (int) 1);
+            //gws_reboot();
+            //break;
+
+        //OK isso funcionou.
+        case MSG_KEYDOWN:
+          //case 20:
+            //gws_debug_print ("MSG_KEYDOWN\n");
+            
+            // #importante:
+            // Temos um input
+            // Vamos colocar ele nos buffers de linha
+            // e imprimirmos na tela usando o window server.
+            
+            switch (MsgLong1)
+            {
+                //case 0:
+                    //relax cpu
+                    //break; 
+                
+                
+                // '\n':
+                // Finalizing the command line.
+                // Let's include the '\n' char in the end of the command line.
+                // #todo: Send the command line to the child.
+                // Maybe we need to wakeup the child.
+                // Maybe the child is in a loop waiting for some system message.
+                // Maybe the system message can notify the child to read 
+                // the command line in the shared memory.
+                case VK_RETURN:
+                    //goto process_event;
+                    tputc ((int) fd, (int) '\r', (int) 1);
+                    tputc ((int) fd, (int) '\n', (int) 1);
+                    input('\n');
+                    input('\0');
+                    
+                    __send_to_child();  //#test
+                    break;
+
+
+                //case VK_TAB:
+                //case VK_BACK:
+                
+                //...
+                 
+                // Normal chars.
+                // We are building a command line in the prompt[] buffer.
+                
+                default:
+                    // Put normal char.                    
+                    input( (unsigned long) MsgLong1 );
+                    
+                    // Draw the char in the Terminal's client window.
+                    // Building the escape sequence.
+                    // fd, ch, bufsize
+                    tputc((int) fd, (int) MsgLong1, (int) 1);
+                    
+                    goto process_event;
+                    break;
+            };
+            break;
+
+
+
+        //case MSG_KEYUP:
+          case 21:  
+            //gws_debug_print ("MSG_KEYUP\n");
+            goto process_event;
+            break;
+            
+            
+        case MSG_SYSKEYDOWN:
+            switch (MsgLong1)
+            {
+                case VK_F1:
+                    test_tty_support(fd);
+                    break;
+
+                // Test standard srteam                
+                case VK_F2:
+                    test_standard_stream(fd);
+                    break;
+
+                case VK_F3:
+                    test_child_message();
+                    break;
+
+                case VK_F4:
+                    break;
+                   
+                case VK_F9:
+                    gws_draw_text (
+                        (int) fd,             // fd,
+                        (int) 0,              // window id,
+                        (unsigned long) 30,    // left,
+                        (unsigned long) 30,    // top,
+                        (unsigned long) COLOR_BLUE,
+                        "Terminal: [F9]");
+                     break;
+                   
+                 //...
+                    
+                default:
+                    goto process_event;
+                    break;
+            };
+            break;
+            
+
+        case MSG_SYSKEYUP:
+            switch (MsgLong1)
+            {
+                //case VK_F1:
+                default:
+                    goto process_event;
+                    break;
+            };
+            break;
+
+        // Commands.
+        case MSG_COMMAND:
+            switch (MsgLong1)
+            {
+                //case CMD_ABOUT:
+                    //printf ("terminal: CMD_ABOUT\n");
+                    //goto process_event;
+                    //break;
+                    
+                default:
+                    goto process_event;
+                    break;
+            };
+
+        
+		//case MSG_TERMINALCOMMAND:
+			//switch (long1)
+			//{
+			// CMD_XXX ??
+		    //};
+
+
+        case SERVER_PACKET_TYPE_REQUEST:
+            gws_yield ();
+            goto response_loop;
+            break;
+            
+        // Reply!
+        case SERVER_PACKET_TYPE_REPLY:
+            goto process_reply;
+            break;
+            
+        case SERVER_PACKET_TYPE_EVENT:
+            goto process_event;
+            //goto response_loop;
+            break;
+            
+        case SERVER_PACKET_TYPE_ERROR:
+            gws_debug_print ("terminal: SERVER_PACKET_TYPE_ERROR\n");
+            goto response_loop;
+            //exit (-1);
+            break;
+        
+        default:
+            gws_debug_print ("@");
+            goto process_event;
+            //goto response_loop;
+            break; 
+    };
+
+
+//
+// Process reply.
+//
+
+// A resposta tras o window id no início do buffer.
+    
+process_reply:
+
+    // #test
+    //gws_debug_print ("terminal: Testing close() ...\n"); 
+    //close (fd);
+
+    //gws_debug_print ("terminal: bye\n"); 
+//    printf ("terminal: Window ID %d \n", message_buffer[0] );
+    //printf ("terminal: Bye\n");
+    
+    // #todo
+    // Podemos usar a biblioteca e testarmos
+    // vários serviços da biblioteca nesse momento.
+
+    return message_buffer[0];
+
+//
+// Process an event.
+//
+
+process_event:
+    gws_debug_print ("terminal: We got an event\n"); 
+    return 0;
+}
+
+
+
+// Request
 int terminal_getmessage_request(int fd)
 {
     // Isso permite ler a mensagem na forma de longs.
@@ -1050,335 +1385,18 @@ int terminal_getmessage_request(int fd)
     return 0; 
 }
 
+
+// Response
+// The window server sent us a system message
+// as a response for our request.
+// Let's get that message reading the socket.
+// This routine will process that message ...
+// Maybe include the keyboard message into a queue.
+// We have a input() building the prompt[] string.
+// That prompt string is the command line.
 int terminal_getmessage_response(int fd)
-{
-    unsigned long *message_buffer = (unsigned long *) &__buffer[0];   
-    int n_reads = 0;    // For receiving responses.
-
-    //
-    // Waiting for response. ==================
-    //
-
-    // Espera para ler a resposta. 
-    // Esperando com yield como teste.
-    // Isso demora, pois a resposta só será enviada depois de
-    // prestado o servido.
-    // obs: Nesse momento deveríamos estar dormindo.
-
-    // #debug
-    // gws_debug_print ("terminal: Waiting ...\n");      
-
-    
-    // #bugbug
-    // Talvez não precisamos disso, vamos testar sem isso.
-    // Tem um yield logo abaixo no write().
-    
-    //int y;
-    //for(y=0; y<15; y++)
-    //    gws_yield();   // See: libgws/
-
-
-    // #todo
-    // Podemos checar antes se o fd 
-    // representa um objeto que permite leitura.
-    // Pode nem ser possível.
-    // Mas como sabemos que é um soquete,
-    // então sabemos que é possível ler.
-
-
-    //
-    // read
-    //
-
-    // #debug
-    gws_debug_print ("terminal: reading ...\n");      
-
-
-    // #caution
-    // Waiting for response.
-    // We can stay here for ever.
-
-response_loop:
-
-    //n_reads = read ( fd, __buffer, sizeof(__buffer) );
-    n_reads = recv ( fd, __buffer, sizeof(__buffer), 0 );
-    
-    // Se retornou 0, podemos tentar novamente.
-    if (n_reads == 0){
-        gws_yield(); 
-        goto response_loop;
-    }
-    
-    // Se retornou -1 é porque algo está errado com o arquivo.
-    if (n_reads < 0){
-        gws_debug_print ("terminal: recv fail.\n");
-        printf ("terminal: recv fail.\n");
-        printf ("Something is wrong with the socket.\n");
-        exit (1);
-    }
-
-    //
-    // The msg index.
-    //
-    
-    // Get the message sended by the server.
-
-    int          window =           (int) message_buffer[0];
-    int             msg =           (int) message_buffer[1];
-    unsigned long long1 = (unsigned long) message_buffer[2];
-    unsigned long long2 = (unsigned long) message_buffer[3];
-
-
-    //#debug
-    //if(msg!=0)
-        //printf ("%c",long1); //printf ("{%d%c} ",msg,long1);
-
-    //char *c;
-    
-    switch (msg){
-
-        // Criar a janela de terminal.
-        // ? Poderia estar funcionando antes mesmo de ter criado uma ?
-        // ? Why not ?
-        //case MSG_CREATE_TERMINAL_WINDOW:
-            //break;
-        
-        // Sair.
-        //case MSG_QUIT:
-            // Sinaliza que o loop principal pode terminar.
-            // gQuit = 1;
-            //break;
-
-
-        // message from child
-        //case 7000:
-            //gws_debug_print("7000\n"); exit(0);
-            //tputc ((int) fd, (int) 'C', (int) 1);
-            //gws_reboot();
-            //break;
-
-        //OK isso funcionou.
-        case MSG_KEYDOWN:
-          //case 20:
-            //gws_debug_print ("MSG_KEYDOWN\n");
-            
-            // #importante:
-            // Temos um input
-            // Vamos colocar ele nos buffers de linha
-            // e imprimirmos na tela usando o window server.
-            
-            switch (long1)
-            {
-                //case 0:
-                    //relax cpu
-                    //break; 
-                    
-                case VK_RETURN:
-                    //goto process_event;
-                    tputc ((int) fd, (int) '\r', (int) 1);
-                    tputc ((int) fd, (int) '\n', (int) 1);
-                    input('\n');
-                    input('\0');
-                    
-                    send_again();
-                    
-                    break;
-                  
-                //case VK_TAB:
-                //case VK_BACK:
-                
-                //...
-                
-                
-                // We are in the terminal ...
-                // We will not process the chars ...
-                // We need to send it to the client via file.
-                default:
-                    //terminal_write_char(long1) #todo
-                    
-                    //isso funciona
-                    //printf ("%c",long1);
-                    //fflush(stdout);
-                    
-                    // Colocando no buffer de linha
-                    //terminal_write_char( (int)fd, (int) long1 );
-                    
-                    //*c = (char *) long1;
-                    
-                    input( (unsigned long) long1 );
-                    //#test
-                    // fd, buf, bufsize
-                    tputc ((int) fd, (int) long1, (int) 1);
-                     
-                     //gws_debug_print("$");
-                     
-                    /* Tentando mover essa rotina para dentro da função terminal_write_char
-                    // Imprimindo o char na tela usando o window server.
-                    // Testing draw a char in a window.
-                    // Isso funciona. Precisamos das rotinas do noraterm
-                    // pra lidar com caracteres ... o x e o y.
-                    terminal_drawchar_request (
-                        (int) fd,                   // fd,
-                        (int) 0,                    // window id,
-                        (unsigned long) __tmp_x,    // left,
-                        (unsigned long) __tmp_y,    // top,
-                        (unsigned long) COLOR_RED,
-                        (unsigned long) long1 );
-
-                    terminal_drawchar_response((int) fd);  
-                    
-                    //#test
-                    __tmp_x = __tmp_x + 8;
-                    */
-                    
-                    goto process_event;
-                    break;
-            };
-            break;
-
-
-        //case MSG_KEYUP:
-          case 21:  
-            //gws_debug_print ("MSG_KEYUP\n");
-            goto process_event;
-            break;
-            
-            
-        case MSG_SYSKEYDOWN:
-            switch (long1)
-            {
-                case VK_F1:
-                    test_tty_support(fd);
-                    break;
-
-                // Test standard srteam                
-                case VK_F2:
-                    test_standard_stream(fd);
-                    break;
-
-                case VK_F3:
-                    test_child_message();
-                    break;
-
-
-                case VK_F4:
-                    send_again();
-                    break;
-                   
-                   
-                case VK_F9:
-                    gws_draw_text (
-                        (int) fd,             // fd,
-                        (int) 0,              // window id,
-                        (unsigned long) 30,    // left,
-                        (unsigned long) 30,    // top,
-                        (unsigned long) COLOR_BLUE,
-                        "Terminal: [F9]");
-                     break;
-                   
-                   
-                 //...
-                    
-                default:
-                    goto process_event;
-                    break;
-            };
-            break;
-            
-
-        case MSG_SYSKEYUP:
-            switch (long1)
-            {
-                //case VK_F1:
-                default:
-                    goto process_event;
-                    break;
-            };
-            break;
-
-        // Commands.
-        case MSG_COMMAND:
-            switch (long1)
-            {
-                //case CMD_ABOUT:
-                    //printf ("terminal: CMD_ABOUT\n");
-                    //goto process_event;
-                    //break;
-                    
-                default:
-                    goto process_event;
-                    break;
-            };
-
-        
-		//case MSG_TERMINALCOMMAND:
-			//switch (long1)
-			//{
-			// CMD_XXX ??
-		    //};
-
-
-        case SERVER_PACKET_TYPE_REQUEST:
-            gws_yield ();
-            goto response_loop;
-            break;
-            
-        // Reply!
-        case SERVER_PACKET_TYPE_REPLY:
-            goto process_reply;
-            break;
-            
-        case SERVER_PACKET_TYPE_EVENT:
-            goto process_event;
-            //goto response_loop;
-            break;
-            
-        case SERVER_PACKET_TYPE_ERROR:
-            gws_debug_print ("terminal: SERVER_PACKET_TYPE_ERROR\n");
-            goto response_loop;
-            //exit (-1);
-            break;
-        
-        default:
-            gws_debug_print ("@");
-            goto process_event;
-            //goto response_loop;
-            break; 
-    };
-
-
-
-
-
-//
-// Process reply.
-//
-
-// A resposta tras o window id no início do buffer.
-    
-process_reply:
-
-    // #test
-    //gws_debug_print ("terminal: Testing close() ...\n"); 
-    //close (fd);
-
-    //gws_debug_print ("terminal: bye\n"); 
-//    printf ("terminal: Window ID %d \n", message_buffer[0] );
-    //printf ("terminal: Bye\n");
-    
-    // #todo
-    // Podemos usar a biblioteca e testarmos
-    // vários serviços da biblioteca nesse momento.
-
-    return message_buffer[0];
-
-//
-// Process an event.
-//
-
-process_event:
-    gws_debug_print ("terminal: We got an event\n"); 
-    return 0;
+{    
+    return (int) __get_system_message(fd);
 }
 
 

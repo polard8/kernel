@@ -8,22 +8,17 @@
  
 Folders:
 
-bottom/
+hwi/
     Low level components. It is hardware dependent.
 
 include/
     All the headers for the Kernel.
 
-lib/
-    Libraries.
-ps/
+
+system/ps/
     Process structure.
     process, thread, mm, ipc, scheduler.
-top/
-    High level components. It is hardware independent.
-    net support.
-    system management.
-    kgws - window server
-    kgwm - window manager
-    sci - system call inteface
+
+sci/ 
+    system call inteface
 
