@@ -2,6 +2,7 @@
 
 #todo
 all:
+	make -C ./shell
 	make -C ./cat
 	make -C ./cmp
 	make -C ./echo

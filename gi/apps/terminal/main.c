@@ -261,8 +261,11 @@ void test_standard_stream(int fd)
     prompt_pos = 0;
     for(ii=0;ii<32;ii++) {prompt[ii]=0;}
 
+    //gramado_system_call ( 900, 
+      //(unsigned long) "tprintf.bin", 0, 0 );
+
     gramado_system_call ( 900, 
-      (unsigned long) "tprintf.bin", 0, 0 );
+      (unsigned long) "shell.bin", 0, 0 );
 
     return;
     //while(1);

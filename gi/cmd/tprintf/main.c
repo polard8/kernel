@@ -127,10 +127,12 @@ char *__get_commandline (void)
         //todo: clear the command line.
         return (char *) shared_memory;
     }
-    
+
 fail:
-    if (FlagStatus == 0)
+    if (FlagStatus == 0){
+        gramado_system_call(265,0,0,0); //yield 
         return (char *) 0;
+    }
 }
 
 
