@@ -267,7 +267,9 @@ int main (int argc, char *argv[]){
     
     //shared memory
    
-    char *buf;  
+    char *buf; 
+    char cmd[32];
+    int i=0; 
     
     while (1){
  
@@ -276,7 +278,29 @@ int main (int argc, char *argv[]){
         //Temos uma linha de comando.
         if ((void *)buf != NULL)
         {
+            
             printf("CommandLine={%s}\n",buf);
+            for(i=0; i<20; i++)
+            {   cmd[i] = (char) *buf; buf++; }
+             
+            printf("Char0={%c} ", cmd[0]);
+            printf("Char1={%c} ", cmd[1]);
+            printf("Char2={%c} ", cmd[2]);
+            printf("Char3={%c} ", cmd[3]);
+            fflush(stdout);
+             
+            //if ( strncmp ( (const char *) cmd, "exit", 4 ) == 0 )
+            //{ printf ("OK\n"); exit(0); } 
+
+            if ( memcmp ( (const char *) cmd, "exit", 4 ) == 0 )
+            { printf ("OK\n"); exit(0); } 
+            
+            
+            
+            // ...
+            
+            printf ("Unknown command\n");
+            printf ("$ "); fflush(stdout);
         }
     
         //try again
