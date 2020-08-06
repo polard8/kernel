@@ -86,7 +86,7 @@ int crt0 (){
     // Token support.
     char *tokenList[TOKENLIST_MAX_DEFAULT];
     char *token;
-    int token_count;
+    int token_count=0;
     int index=0;
 
 

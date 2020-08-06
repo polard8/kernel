@@ -981,8 +981,8 @@ int main (int argc, char **argv){
         //printf ("gwssrv: Calling child \n");  
 
 
-        gde_clone_and_execute ("gwm.bin");    // window manager
-        //gde_clone_and_execute ("terminal.bin");  
+        //gde_clone_and_execute ("gwm.bin");    // window manager
+        gde_clone_and_execute ("terminal.bin");  
         //gde_clone_and_execute ("fileman.bin");  
         //gde_clone_and_execute ("browser.bin"); 
         //gde_clone_and_execute ("launch1.bin"); 

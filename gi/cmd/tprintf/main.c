@@ -135,7 +135,7 @@ int main (int argc, char *argv[]){
     //fseek(stderr, 0, SEEK_SET);   // seek back to beginning of file
     //printf (">>>> size %d \n",size);  
 
-   int s =-1;
+   //int s =-1;
    
 //loop:
     
@@ -161,7 +161,8 @@ int main (int argc, char *argv[]){
     };
     */
     
-char char_buffer[2];
+    /*
+    char char_buffer[2];
     char line_buffer[128];
     char *str;
     int ch=0;
@@ -194,7 +195,30 @@ char char_buffer[2];
             //...
         }
       };    
+    */  
+
+
+    char line_buffer[512];
+    char *cmd;
     
+    while (1)
+    {
+        // Vamos ler doinício do arquivo que está no kernel.
+        fseek(stdin, 0, SEEK_SET); 
+    
+        cmd = gets(line_buffer); 
+
+        // Se pegamos uma linha do arquivo.
+        if ( (void *) cmd != NULL )
+        {
+            printf ("%s",cmd);
+            fflush(stdout);
+        }
+        
+        // Nothing
+        // if ( (void *) cmd == NULL ) 
+    };
+
 
     //goto loop;
     while(1);

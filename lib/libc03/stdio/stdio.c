@@ -424,10 +424,10 @@ int ____bfill (FILE *stream){
         if ( stream->_lbfsize != BUFSIZ )
         {
             debug_print ("____bfill: [FAIL] _lbfsize \n");
-            printf      ("____bfill: [FAIL] _lbfsize \n");
-
+            printf      ("____bfill: [FAIL] _lbfsize %d *hang\n",stream->_lbfsize);
             stream->_cnt = 0; 
-            return (int) (-1);
+            exit(1); //debug
+            //return EOF;
         }
         // ...
     };
@@ -443,49 +443,69 @@ int ____bfill (FILE *stream){
     // Só podemos colocar o quanto ainda cabe no buffer.
  
     // O tamanho do buffer menos o quanto ja foi consumido.
-    size_t how_much = ( stream->_lbfsize - (stream->_p - stream->_base) );
+    //size_t how_much = ( stream->_lbfsize - (stream->_p - stream->_base) );
+    
+    // cnt deve ser 0, pois ____bfill foi chamado
+    // quando o buffer acabou. então vamos encher o buffer novamente
+    // e atualizarmos o cnt.
+    //size_t how_much = stream->_lbfsize;
 
-    if ( how_much <= 0 || how_much >= stream->_lbfsize )
-    {
-        debug_print ("____bfill: [BUGBUG] buffer fail\n");
-        printf      ("____bfill: [BUGBUG] buffer fail\n");
-        
-        stream->_cnt = 0;
-        return EOF;
-    } 
-
+    //if ( how_much <= 0 || how_much > BUFSIZ )
+    //{
+    //    debug_print ("____bfill: [BUGBUG] buffer fail\n");
+    //    printf      ("____bfill: [BUGBUG] buffer fail how_much=%d\n", how_much);
+    //    stream->_cnt = 0; 
+    //    exit(1); //debug
+        //return EOF;
+    //}
+    
+    // #importante
+    // Se o buffer acabou é porque o ponteiro se deslocou até o fim.
+    // Temos que reiniciar.
+    
+    stream->_cnt = BUFSIZ-1;
+    stream->_p = stream->_base;
+    stream->_w =0;
+    stream->_r =0;
+    
     nbyte = (int) read ( fileno(stream), 
                      stream->_p,            // Offset 
-                     how_much );    
+                     stream->_cnt );    
 
     // Read fail.
+    // ou fim do arquivo
     if (nbyte<0)
     {
         debug_print ("____bfill: [FAIL] read fail!\n");
         printf      ("____bfill: [FAIL] read fail!\n");
-        
-        stream->_cnt = 0;
+        //stream->_cnt = 0;
         return EOF;
     }
 
     // Couldn't read.
+    // nada foi lido. Mas pode não ser ruin ... pois o arquivo
+    // pode existir e estar vazio eu chegado ao fim.
     if (nbyte == 0)
     {
         debug_print ("____bfill: [FAIL] read fail. Zero bytes\n");
         printf      ("____bfill: [FAIL] read fail. Zero bytes\n");
-        
-        stream->_cnt = 0;
-        return 0;
-        //return EOF;
+        //stream->_cnt = 0;
+        return EOF;
     }
-
-    // Read funcionou.
-    // O buffer tem um novo conteúdo colocado à partir do offset.
-    // Atualizamos o quanto falta para acabar o buffer.
     
-    stream->_cnt = how_much;    // NOT BUFSIZ!
+    if(nbyte > BUFSIZ-1)
+    {
+        debug_print ("____bfill: [FAIL] read fail. too much bytes\n");
+        printf      ("____bfill: [FAIL] read fail. too much bytes\n");
+        exit(1);
+    }    
 
-    // Retornamos a quentidade lida.
+    //atualizamos o quanto falta.
+    //é o quanto tinha menos o quanto foi incluido com read.
+    //normalmente encheremos obuffer e cnt será 0.
+    stream->_cnt = (stream->_cnt - nbyte); 
+    
+    // Retornamos a quantidade lida.
     
     return (int) nbyte;
 }
@@ -523,28 +543,32 @@ int __getc ( FILE *stream ){
     }
 
 
-	// Se acabou o buffer, ou estava vazio.
+	// Se acabou o buffer.
 	// O _cnt decrementou e chegou a zero.
 	// Significa que: Não há mais caracteres disponíveis entre 
 	// stream->_ptr e o tamanho do buffer.
-	// Então vamos encher o buffer em ring3 dessa stream.
+	// Então vamos encher o buffer NOVAMENTE em ring3 dessa stream
+	// e atualizarmos o cnt.
 
     if ( stream->_cnt <= 0 )
     {
-        debug_print("__getc: [DEBUG] ring3 buffer is empty\n");
+        //debug_print("__getc: [DEBUG] ring3 buffer is empty\n");
 
         // Coloque bytes no buffer dessa stream.
         nreads = (int) ____bfill(stream);
 
-        // Se falhou ou se nada foi lido.
+        // Se falhou ou se nada foi lido do arquivo para o buffer.
+        // Então __getc não tem um char para oferecer.
+        // Retornamos EOF.
+        
         if (nreads <= 0)
         {
-            debug_print ("__getc: [DEBUG] ____bfill fail\n");
-            printf      ("__getc: [DEBUG] ____bfill fail\n");
+            //debug_print ("__getc: [DEBUG] ____bfill fail\n");
+            //printf      ("__getc: [DEBUG] ____bfill fail\n");
             
             stream->_flags = (stream->_flags | _IOEOF); 
             stream->_cnt = 0;
-            
+         
             return EOF;
         }
 
@@ -767,20 +791,29 @@ int puts (const char *s){
 //s n iop
 char *fgets (char *s, int size, FILE *stream){
 
+    //int c=0;
     register c;
     register char *cs;
 
     cs = s;
-    while (--size>0 && (c = getc(stream))>=0) 
+    
+    // Maior ou igual a 0.
+    while ( --size > 0 && 
+            (c = getc(stream)) >= 0 ) 
     {
         *cs++ = c;
-        if (c=='\n')
-            break;
+        
+        if (c=='\n') { break; }
     };
 
-    if (c<0 && cs==s)
-        return (NULL);
+    // Nesse momento, acabou o size, ou
+    // encontramos um '\n'.
     
+    // Se o último char for EOF
+    // e não pegamos char algum. 
+    if ( c<0 && cs==s ) { return (NULL); }
+    
+    // Finalizamos a string construída.
     *cs++ = '\0';
 
     return (s);
@@ -5179,14 +5212,14 @@ void stdioInitialize (){
 
 
     // Buffers para as estruturas.
-    unsigned char buffer0[BUFSIZ];
-    unsigned char buffer1[BUFSIZ];
-    unsigned char buffer2[BUFSIZ];
+    //unsigned char buffer0[BUFSIZ];
+    //unsigned char buffer1[BUFSIZ];
+    //unsigned char buffer2[BUFSIZ];
 
     // Buffers usados pelos arquivos.
-    unsigned char buffer0_data[BUFSIZ];
-    unsigned char buffer1_data[BUFSIZ];
-    unsigned char buffer2_data[BUFSIZ];
+    //unsigned char buffer0_data[BUFSIZ];
+    //unsigned char buffer1_data[BUFSIZ];
+    //unsigned char buffer2_data[BUFSIZ];
 
     // #debug
     // #todo: Testar esse debug.
@@ -5197,54 +5230,74 @@ void stdioInitialize (){
     // Pointers.
     //    
     
-    stdin  = (FILE *) &buffer0[0];
-    stdout = (FILE *) &buffer1[0];
-    stderr = (FILE *) &buffer2[0];
+    //stdin  = (FILE *) &buffer0[0];
+    //stdout = (FILE *) &buffer1[0];
+    //stderr = (FILE *) &buffer2[0];
 
-    //#test
-    //desse modo quem usar esses ponteiros
-    //estárá abrindo o descritor certo,
-    //herdado.
-    stdin->_file  = 0;
-    stdout->_file = 1;
-    stderr->_file = 2;
+    stdin = (FILE *) malloc( sizeof(FILE) );
+    if( (void*) stdin == NULL ){
+        printf ("stdioInitialize: stdin fail\n");
+        exit(1);
+    }
+    
+    stdout = (FILE *) malloc( sizeof(FILE) );
+    if( (void*) stdout == NULL ){
+        printf ("stdioInitialize: stdout fail\n");
+        exit(1);
+    }
+
+    stderr = (FILE *) malloc( sizeof(FILE) );
+    if( (void*) stderr == NULL ){
+        printf ("stdioInitialize: stderr fail\n");
+        exit(1);
+    }
 
 
     // Buffers.
     // Buffers dos arquivos.
-    stdin->_base  = &buffer0_data[0];
-    stdout->_base = &buffer1_data[0];
-    stderr->_base = &buffer2_data[0];
+    //stdin->_base  = &buffer0_data[0];
+    //stdout->_base = &buffer1_data[0];
+    //stderr->_base = &buffer2_data[0];
 
-    // p
-    stdin->_p  = stdin->_base;
-    stdout->_p = stdout->_base;
-    stderr->_p = stderr->_base;
-
-
-    //#todo
+    stdin->_base = (char *) malloc(BUFSIZ);
+    if( (void*) stdin->_base == NULL ){
+        printf ("stdioInitialize: stdin->_base fail\n");
+        exit(1);
+    }
     stdin->_lbfsize  = BUFSIZ;
-    stdout->_lbfsize = BUFSIZ;
-    stderr->_lbfsize = BUFSIZ;    
-
-    // cnt (Funciona)
-    //stdin->_cnt  = 0;
-    //stdout->_cnt = 0;
-    //stderr->_cnt = 0;    
-
-    //#test Cuidado!
-    stdin->_cnt  = BUFSIZ;
-    stdout->_cnt = BUFSIZ;
-    stderr->_cnt = BUFSIZ;    
-
-
+    stdin->_p  = stdin->_base;
+    stdin->_cnt  = BUFSIZ-1;
     stdin->_w  = 0;
-    stdout->_w = 0;
-    stderr->_w = 0;    
-
-    stdin->_r  = 0;
+    stdin->_r  = 0;  
+    stdin->_file  = 0;      
+      
+    stdout->_base = (char *) malloc(BUFSIZ);
+    if( (void*) stdout->_base == NULL ){
+        printf ("stdioInitialize: stdout->_base fail\n");
+        exit(1);
+    }
+    stdout->_lbfsize = BUFSIZ;
+    stdout->_p = stdout->_base;
+    stdout->_cnt = BUFSIZ-1;    
+    stdout->_w = 0;    
     stdout->_r = 0;
+    stdout->_file = 1;
+        
+            
+    stderr->_base = (char *) malloc(BUFSIZ);
+    if( (void*) stderr->_base == NULL ){
+        printf ("stdioInitialize: stderr->_base fail\n");
+        exit(1);
+    }
+    stderr->_lbfsize = BUFSIZ;    
+    stderr->_p = stderr->_base;
+    stderr->_cnt = BUFSIZ-1;    
+    stderr->_w = 0;    
     stderr->_r = 0;
+    stderr->_file = 2;
+
+
+
 
 
 	//
