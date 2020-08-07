@@ -1,44 +1,61 @@
+/*
+ * File: colours.h
+ * 
+ *     Colours support for libgws.
+ * 
+ */
 
 
 //
 //  ## COLOR DEFINES ##
 // 
- 
- 
-//CORES BÁSICAS.
-#define rgbBlack   0x000000
-#define rgbBlue    0x0000FF
-#define rgbCyan    0x00FFFF
-#define rgbGreen   0x00FF00
-#define rgbMagenta 0xFF00FF
-#define rgbRed     0xFF0000
-#define rgbYellow  0xFFFF00
-#define rgbWhite   0xFFFFFF 
 
-// ## blue support ##
-#define COLOR_BLUE1 0x067AB5
-#define COLOR_BLUE2CYAN   0x1BA1E2
-#define COLOR_BLUE3COBALT 0x0050EF
-#define COLOR_BLUE4INDIGO 0x6A00FF
+
+// Basics.
+#define rgbBlack    0x000000
+#define rgbBlue     0x0000FF
+#define rgbCyan     0x00FFFF
+#define rgbGreen    0x00FF00
+#define rgbMagenta  0xFF00FF
+#define rgbRed      0xFF0000
+#define rgbYellow   0xFFFF00
+#define rgbWhite    0xFFFFFF 
+
+
+
+//
+// == Blue ==============================
+//
+
+#define COLOR_BLUE1        0x067AB5
+#define COLOR_BLUE2CYAN    0x1BA1E2
+#define COLOR_BLUE3COBALT  0x0050EF
+#define COLOR_BLUE4INDIGO  0x6A00FF
+
+
+
+//
+// == Gray ==============================
+//
 
 // ## gray support ## 
 //cinza para pintar janela
 //a janela tem camadas que vai do mais escuro para o mais claro.
-#define xCOLOR_BLACK 0x000000  //preto
-#define xCOLOR_GRAY1 0x202020  //cinza mais escuro
-#define xCOLOR_GRAY2 0x404040  //cinza
-#define xCOLOR_GRAY3 0x606060  //cinza
-#define xCOLOR_GRAY4 0x808080  //cinza
-#define xCOLOR_GRAY5 0xa0a0a0  //cinza
-#define xCOLOR_GRAY6 0xc0c0c0  //cinza
-#define xCOLOR_GRAY7 0xe0e0e0  //cinza mais clarinho
-#define xCOLOR_WHITE 0xffffff  //branco  
- 
-
-//WIN23 - TRÊS TIPOS DE CINZA.
+#define xCOLOR_BLACK  0x000000  //preto
+#define xCOLOR_GRAY1  0x202020  //cinza mais escuro
+#define xCOLOR_GRAY2  0x404040  //cinza
+#define xCOLOR_GRAY3  0x606060  //cinza
+#define xCOLOR_GRAY4  0x808080  //cinza
+#define xCOLOR_GRAY5  0xa0a0a0  //cinza
+#define xCOLOR_GRAY6  0xc0c0c0  //cinza
+#define xCOLOR_GRAY7  0xe0e0e0  //cinza mais clarinho
+#define xCOLOR_WHITE  0xffffff  //branco  
+// WIN23 - TRÊS TIPOS DE CINZA.
 #define COLOR_LITBUTTON  0xE0E0E0
 #define COLOR_LTGRAY     0xC0C0C0
 #define COLOR_GRAY       0x808080 
+
+
 
 
 // ## black support ##
@@ -56,8 +73,8 @@
 //0%    #000000
 
 
-//w2k - system colors
-//#bugbug delete;
+
+// w2k - system colors
 #define COLOR_TEST_0  0x8080FF  // COLOR_BACKGROUND
 #define COLOR_TEST_1  0x80FFFF  // COLOR_APPWORKSPACE, MDIWINDOW 
 #define COLOR_TEST_2  0x80FF80  // COLOR_WINDOW, CLIENT
@@ -105,11 +122,10 @@
 #define COLOR_TEST_44 0x808040 
 #define COLOR_TEST_45 0xC0C0C0  //silver
 #define COLOR_TEST_46 0x400040 
- 
-//outros teste
 #define COLOR_TEST_47 0x3366FF  //azul claro
 
-    
+
+
 // # testes #
 #define COLOR_ALICEBLUE           0xF0F8FF
 #define COLOR_ANTIQUEWHITE        0xFAEBD7
@@ -281,14 +297,15 @@
 #define COLOR_ACTIVEBORDER        0xB4B4B4
 
 #define COLOR_ACTIVECAPTION       0x99B4D1
-#define COLOR_ACTIVECAPTION_TEXT   0x000000
+#define COLOR_ACTIVECAPTION_TEXT  0x000000
 
 #define COLOR_APPWORKSPACE  COLOR_SILVER 
 
-// A cor padrão para o Bg é azul quase escuro,
-// o azul escuro é usado em seleção de item.
+//
+// == Background =================================
+//
 
-#define COLOR_BACKGROUND  0x008080  
+#define COLOR_BACKGROUND      0x008080  
 #define COLOR_BACKGROUNDTEXT  COLOR_TEXT  
 
 #define COLOR_BORDER  COLOR_SILVER 
@@ -296,78 +313,79 @@
 
 
 // ## button support ##
-#define COLOR_BUTTONFACE 0xF0F0F0
-#define COLOR_BUTTONFACE2 0xE0E0E0
-#define COLOR_BUTTONFACE3 0xD0D0D0
-#define COLOR_BUTTONHIGHLIGHT 0xFFFFFF
-#define COLOR_BUTTONHIGHLIGHT2 0x404040
-#define COLOR_BUTTONHIGHLIGHTTEXT COLOR_WHITE
+#define COLOR_BUTTONFACE           0xF0F0F0
+#define COLOR_BUTTONFACE2          0xE0E0E0
+#define COLOR_BUTTONFACE3          0xD0D0D0
+#define COLOR_BUTTONHIGHLIGHT      0xFFFFFF
+#define COLOR_BUTTONHIGHLIGHT2     0x404040
+#define COLOR_BUTTONHIGHLIGHTTEXT  COLOR_WHITE
 #define COLOR_BUTTONHIGHLIGHTTEXT2 COLOR_WHITE //@todo: branco menos intenso.
-#define COLOR_BUTTONSHADOW 0xA0A0A0
-#define COLOR_BUTTONSHADOW2 0x303030  
-#define COLOR_BUTTONTEXT COLOR_TEXT
+#define COLOR_BUTTONSHADOW         0xA0A0A0
+#define COLOR_BUTTONSHADOW2        0x303030  
+#define COLOR_BUTTONTEXT           COLOR_TEXT
+
 
 
 // # control support #
-#define COLOR_CONTROL             0xF0F0F0
-#define COLOR_CONTROLTEXT COLOR_TEXT
-#define COLOR_CONTROLDARK         0xA0A0A0
-#define COLOR_CONTROLDARKDARK     0x696969
-#define COLOR_CONTROLLIGHT        0xE3E3E3
-#define COLOR_CONTROLLIGHTLIGHT   0xFFFFFF
+#define COLOR_CONTROL               0xF0F0F0
+#define COLOR_CONTROLTEXT           COLOR_TEXT
+#define COLOR_CONTROLDARK           0xA0A0A0
+#define COLOR_CONTROLDARKDARK       0x696969
+#define COLOR_CONTROLLIGHT          0xE3E3E3
+#define COLOR_CONTROLLIGHTLIGHT     0xFFFFFF
 #define COLOR_CONTROLLIGHTLIGHTTEXT COLOR_WHITE
 
-#define COLOR_DESKTOP  0x000000
 
-#define COLOR_FOCUS_TOPBAR  0x7FFF00
+#define COLOR_DESKTOP       0x000000
+#define COLOR_FOCUS_TOPBAR  0x7FFF00 //verde claro
 
 
 
 //TEXT SUPPORT
-#define COLOR_GRAYTEXT  0x808080
-#define COLOR_HIGHLIGHT           0x3399FF
-#define COLOR_HIGHLIGHTTEXT       0xFFFFFF
+#define COLOR_GRAYTEXT         0x808080
+#define COLOR_HIGHLIGHT        0x3399FF  //azul claro
+#define COLOR_HIGHLIGHTTEXT    0xFFFFFF
 
 
-#define COLOR_INACTIVEBORDER      0xF4F7FC
-#define COLOR_INACTIVECAPTION     0xBFCDDB
-#define COLOR_INACTIVECAPTIONTEXT 0x434E54
+#define COLOR_INACTIVEBORDER       0xF4F7FC
+#define COLOR_INACTIVECAPTION      0xBFCDDB
+#define COLOR_INACTIVECAPTIONTEXT  0x434E54
 
-#define COLOR_INFO  0xFFFFE1
+#define COLOR_INFO      0xFFFFE1
 #define COLOR_INFOTEXT  TEXT_COLOR
 
-#define COLOR_MENU  COLOR_GRAY
+#define COLOR_MENU      COLOR_GRAY
 #define COLOR_MENUTEXT  COLOR_TEXT
 
-#define COLOR_MENUITEM  COLOR_WHITE
+#define COLOR_MENUITEM      COLOR_WHITE
 #define COLOR_MENUITEMTEXT  COLOR_TEXT
 
-#define COLOR_MENUITEMSELECTED  COLOR_BLUE
+#define COLOR_MENUITEMSELECTED      COLOR_BLUE
 #define COLOR_MENUITEMSELECTEDTEXT  COLOR_WHITE
 
-#define COLOR_MENUBAR  COLOR_GRAY
+#define COLOR_MENUBAR      COLOR_GRAY
 #define COLOR_MENUBARTEXT  COLOR_TEXT
 
-#define COLOR_MENUHIGHLIGHT  0x003399FF
+#define COLOR_MENUHIGHLIGHT      0x003399FF  //azul claro
 #define COLOR_MENUHIGHLIGHTTEXT  COLOR_WHITE
 
-#define COLOR_NAVIGATIONBAR       COLOR_BLACK
+#define COLOR_NAVIGATIONBAR      COLOR_BLACK
 #define COLOR_NAVIGATIONBARTEXT  COLOR_WHITE
 
 //status bar
-#define COLOR_STATUSBAR  COLOR_WINDOW   //branca
-#define COLOR_STATUSBAR2 xCOLOR_GRAY6   //cinza
-#define COLOR_STATUSBAR3 0x83FCFF       //verde
+#define COLOR_STATUSBAR   COLOR_WINDOW   //branca
+#define COLOR_STATUSBAR2  xCOLOR_GRAY6   //cinza
+#define COLOR_STATUSBAR3  0x83FCFF       //verde
 //...
 #define COLOR_STATUSBARTEXT      COLOR_TEXT
 
-#define COLOR_TASKBAR             COLOR_WINDOW
-#define COLOR_TASKBARTEXT        COLOR_TEXT
+#define COLOR_TASKBAR      COLOR_WINDOW
+#define COLOR_TASKBARTEXT  COLOR_TEXT
 
-#define COLOR_TITLEBAR            COLOR_BLUE
-#define COLOR_TITLEBARTEXT       COLOR_TEXT
+#define COLOR_TITLEBAR      COLOR_BLUE
+#define COLOR_TITLEBARTEXT  COLOR_TEXT
 
-#define COLOR_TOPBAR  0x83F52C
+#define COLOR_TOPBAR      0x83F52C
 #define COLOR_TOPBARTEXT  COLOR_TEXT
 
 #define COLOR_WINDOWFRAME  COLOR_GRAY
@@ -378,18 +396,20 @@
 #define COLOR_WINDOWTEXT COLOR_TEXT  
 
 //area de trabalho
-#define COLOR_WORKSPACE 0x0000FF00 
-#define COLOR_WORKSPACETEXT COLOR_TEXT
+#define COLOR_WORKSPACE      0x0000FF00 
+#define COLOR_WORKSPACETEXT  COLOR_TEXT
 
 
-// ## virtual terminal support ##
-#define COLOR_TERMINAL  COLOR_BLACK
-#define COLOR_TERMINAL2 0x303030
+//
+// == Terminal =================
+//
+
+#define COLOR_TERMINAL       COLOR_BLACK
+#define COLOR_TERMINAL2      0x303030
+#define COLOR_TERMINALTEXT   COLOR_WHITE
+#define COLOR_TERMINALTEXT2  xCOLOR_GRAY7
 //...
 
-#define COLOR_TERMINALTEXT COLOR_WHITE
-#define COLOR_TERMINALTEXT2 xCOLOR_GRAY7
-//...
 
 //
 // ========
@@ -405,6 +425,19 @@
  
  
 #define COLOR_KERNEL_BACKGROUND COLOR_BLUE   
+
+#define WINDOW1000 0xF5DEB3
+#define BLUE1000   0x2d89ef
+#define BLUE1001   0x0277bd
+#define SOFT_WHITE 0xFFFBF0
+#define SKYBLUE    0xA6CAF0
+
+
+
+
+
+
+
 
 
 

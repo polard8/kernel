@@ -687,7 +687,8 @@ int create_topbar_client(int fd)
     unsigned long w = gws_get_system_metrics(1);
     unsigned long h = gws_get_system_metrics(2);
 
-
+    int button1_window=-1;   
+    
     //
     // == Topbar (Client) ==================================
     // 
@@ -705,7 +706,7 @@ int create_topbar_client(int fd)
         c_topbar->window = gws_create_window (fd,
             WT_SIMPLE,1,1,"Topbar",
             0, 0, w, 32,
-            0,0,COLOR_GRAY, COLOR_GRAY);
+            0,0,xCOLOR_GRAY3, xCOLOR_GRAY3);
         
         if( (void *) c_topbar->window < 0){
             printf ("gwm: c_topbar->window fail\n");
@@ -713,6 +714,12 @@ int create_topbar_client(int fd)
         }
         printf ("w={%x}\n",c_topbar->window);
         gws_refresh_window(fd,c_topbar->window);
+
+         // button1 (system menu)
+         button1_window = gws_create_window (fd,
+                              WT_BUTTON,1,1,"=",
+                              2, 2, 32, 28,
+                              c_topbar->window, 0,COLOR_GRAY, COLOR_GRAY);
         
         c_topbar->title_window = -1;  //todo;
         wmclientList[0] = (unsigned long) c_topbar;
@@ -804,7 +811,7 @@ int create_tester_client(int fd)
         tester_client->window = gws_create_window (fd,
                                     WT_SIMPLE,1,1,"Tester",
                                     100, 100, 480, 320,
-                                    0,0, COLOR_PINK, COLOR_PINK);
+                                    0,0, 0xF5DEB3, 0xF5DEB3);
         
         if( (void *) tester_client->window < 0){
             printf ("gwm: tester_client->window fail\n");
@@ -816,7 +823,7 @@ int create_tester_client(int fd)
         tester_client->title_window = gws_create_window (fd,
                                           WT_SIMPLE,1,1,"Tester Title",
                                           100, 100-32, 480, 32,
-                                          0,0, COLOR_BLUE, COLOR_BLUE);
+                                          0,0, 0x2d89ef, 0x2d89ef);
 
         if( (void *) tester_client->title_window < 0 ){
             printf ("gwm: tester_client->title_window fail\n");
@@ -827,7 +834,7 @@ int create_tester_client(int fd)
         //Tester title window
         tester_button = gws_create_window (fd,
              WT_BUTTON,1,1,"X", //#bugbug: pagefault. the size of the string overflows the button size.
-             (480-80-2), 2, 80, 28, //2, 2, 80, 28,
+             (480-36-2), 2, 36, 28, //2, 2, 80, 28,
              tester_client->title_window, 0, COLOR_RED, COLOR_RED);
              
         wmclientList[2] = (unsigned long) tester_client;

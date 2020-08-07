@@ -814,7 +814,7 @@ void InitGraphics(void){
     //gwssrv_load_and_decode_small_icon ("file.bmp", 50,4);
     //gwssrv_load_and_decode_small_icon ("folder.bmp",100,4);
     //gwssrv_load_and_decode_small_icon ("terminal.bmp",150,4);
-    gwssrv_load_and_decode_small_icon ("app.bmp",200,4);
+    gwssrv_load_and_decode_small_icon ("app.bmp", 4, 100);
     //gwssrv_load_and_decode_small_icon ("cursor.bmp",250,4);
     //gwssrv_load_and_decode_small_icon ("mouse.bmp",300,4);
     //gwssrv_load_and_decode_small_icon ("folder.bmp",350,4);
@@ -981,8 +981,8 @@ int main (int argc, char **argv){
         //printf ("gwssrv: Calling child \n");  
 
 
-        //gde_clone_and_execute ("gwm.bin");    // window manager
-        gde_clone_and_execute ("terminal.bin");  
+        gde_clone_and_execute ("gwm.bin");    // window manager
+        //gde_clone_and_execute ("terminal.bin");  
         //gde_clone_and_execute ("fileman.bin");  
         //gde_clone_and_execute ("browser.bin"); 
         //gde_clone_and_execute ("launch1.bin"); 

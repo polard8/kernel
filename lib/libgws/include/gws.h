@@ -19,7 +19,7 @@
 #include "wt.h"
 
 // Colors.
-#include "colors.h"
+#include "colours.h"
 
 // Windows.
 #include "window.h"
