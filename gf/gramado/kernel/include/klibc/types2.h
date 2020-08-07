@@ -33,18 +33,22 @@
  *	@(#)types.h	7.17 (Berkeley) 5/6/91
  */
 
-#ifndef _TYPES_H_
-#define	_TYPES_H_
+
+
+
+#ifndef ____TYPES2_H
+#define ____TYPES2_H    1
 
 
 /* BSD types. */
-typedef	unsigned char	u_char;
-typedef	unsigned short	u_short;
-typedef	unsigned int	u_int;
-typedef	unsigned long	u_long;
+typedef  unsigned char    u_char;
+typedef  unsigned short   u_short;
+typedef  unsigned int     u_int;
+typedef  unsigned long    u_long;
+
 
 /* Sys V compatibility */
-typedef unsigned short    ushort;
+typedef  unsigned short    ushort;
 
 typedef int __off_t;
 
@@ -57,6 +61,7 @@ typedef long     off_t;    /* file offset (should be a quad) */
 typedef u_short  nlink_t;  /* link count */
 typedef long     swblk_t;  /* swap offset */
 typedef long     segsz_t;  /* segment size */
+
 
 
 // #bugbug
@@ -75,9 +80,12 @@ typedef  short      pid_t;    //process id
 // #bugbug: Como no bsd encontramos valores de 32bit
 // vamos mudar isso.
 //typedef	u_short	mode_t;			/* permissions */
-typedef ulong mode_t;
+typedef ulong    mode_t;
 
-typedef u_long  fixpt_t;		/* fixed point number */
+typedef u_long    fixpt_t;		/* fixed point number */
+
+
+
 
 #ifndef _POSIX_SOURCE
 typedef  struct _uquad  { u_long val[2]; } u_quad;
@@ -88,6 +96,8 @@ typedef  long   *qaddr_t;	/* should be typedef quad * qaddr_t; */
 #define	minor(x)	((int)((x)&0xff))		/* minor number */
 #define	makedev(x,y)	((dev_t)(((x)<<8) | (y)))	/* create dev_t */
 #endif
+
+
 
 /*
 #include <machine/ansi.h>
@@ -120,18 +130,19 @@ typedef	_TIME_T_	time_t;
 
 #ifndef _SSIZE_T
 #define _SSIZE_T
-typedef int ssize_t;
+typedef int  ssize_t;
 #endif
 
 #ifndef _TIME_T
 #define _TIME_T
-typedef long time_t;		   /* time in sec since 1 Jan 1970 0000 GMT */
+typedef long  time_t;    // time in sec since 1 Jan 1970 0000 GMT.
 #endif
 
 #ifndef _CLOCK_T
 #define _CLOCK_T
-typedef long clock_t;		   /* unit for system accounting */
+typedef long  clock_t;    // unit for system accounting.
 #endif
+
 
 
 /* 
@@ -141,23 +152,23 @@ typedef long clock_t;		   /* unit for system accounting */
 
 #ifndef __UID_T
 #define __UID_T 
-typedef int uid_t;
+typedef int  uid_t;
 #endif 
 
 #ifndef __PID_T
 #define __PID_T 
-typedef int pid_t;
+typedef int  pid_t;
 #endif 
-
 
 #ifndef __GID_T
 #define __GID_T 
-typedef int gid_t;
+typedef int  gid_t;
 #endif
 
 
+
 #ifndef _POSIX_SOURCE
-#define	NBBY	8		/* number of bits in a byte */
+#define NBBY  8    /* number of bits in a byte */
 
 /*
  * Select uses bit masks of file descriptors in longs.  These macros
@@ -207,7 +218,10 @@ struct	uio;
 
 
 #endif /* !_POSIX_SOURCE */
-#endif /* !_TYPES_H_ */
+
+
+#endif    //____TYPES2_H
+
 
 
 

@@ -4,7 +4,11 @@
  * Descrição:
  *     Definições padrão da linguagem C, versão C99.
  */
- 
+
+
+
+#ifndef ____STDDEF_H
+#define ____STDDEF_H    1
 
  
  
@@ -71,4 +75,11 @@ typedef int size_t;
  
 //#define offsetof(st, m) ((size_t)&(((st *)0)->m))
 //#define offset_of(tp, member) (((char*) &((tp*)0)->member) - (char*)0)
+
+
+#endif    //____STDDEF_H
+
+
+
+
 

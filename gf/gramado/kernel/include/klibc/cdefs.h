@@ -34,6 +34,13 @@
  *	cdefs.h,v 1.4 1993/05/26 14:52:56 cgd Exp
  */
 
+
+#ifndef ____CDEFS_H
+#define ____CDEFS_H    1
+
+
+
+
 #ifndef	_SYS_CDEFS_H_
 #define	_SYS_CDEFS_H_
 
@@ -63,18 +70,19 @@
 #define	__STRING(x)	"x"
 
 #ifdef __GNUC__
-#define	const		__const		/* GCC: ANSI C with -traditional */
-#define	inline		__inline
-#define	signed		__signed
-#define	volatile	__volatile
+#define  const     __const		/* GCC: ANSI C with -traditional */
+#define  inline    __inline
+#define  signed    __signed
+#define  volatile  __volatile
 
 #else	/* !__GNUC__ */
-#define	const				/* delete ANSI C keywords */
-#define	inline
-#define	signed
-#define	volatile
+#define  const				/* delete ANSI C keywords */
+#define  inline
+#define  signed
+#define  volatile
 #endif	/* !__GNUC__ */
 #endif	/* !(__STDC__ || __cplusplus) */
+
 
 /*
  * GCC has extensions for declaring functions as `pure' (always returns
@@ -93,5 +101,10 @@
 #endif
 
 #endif /* !_SYS_CDEFS_H_ */
+
+
+#endif  //____CDEFS_H
+
+
 
 

@@ -3,6 +3,12 @@
 
 //see: sys/ioctls.h
 
+
+#ifndef ____IOCTL_H
+#define ____IOCTL_H    1
+
+
+
 /*
  * Window/terminal size structure.  This information is stored by the kernel
  * in order to provide a consistent interface, but is not used by the kernel.
@@ -79,4 +85,8 @@ struct ttysize {
 
 
  
+#endif //____IOCTL_H
+
+
+
 

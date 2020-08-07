@@ -1,5 +1,10 @@
 
 
+#ifndef ____FCNTL_H
+#define ____FCNTL_H    1
+
+
+
 /* These values are used for cmd in fcntl().  POSIX Table 6-1.  */
 #define F_DUPFD            0	/* duplicate file descriptor */
 #define F_GETFD            1	/* get file descriptor flags */
@@ -13,8 +18,6 @@
 // ...
 
 
-
-
 /* File descriptor flags used for fcntl().  POSIX Table 6-2. */
 #define FD_CLOEXEC         1	/* close on exec flag for third arg of fcntl */
 
@@ -23,7 +26,6 @@
 #define F_RDLCK            1	/* shared or read lock */
 #define F_WRLCK            2	/* exclusive or write lock */
 #define F_UNLCK            3	/* unlock */
-
 
 
 //
@@ -91,6 +93,10 @@ struct flock {
 
 };
 
+
+
+
+#endif  //____FCNTL_H
 
 
 //

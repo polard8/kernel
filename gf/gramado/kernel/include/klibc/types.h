@@ -5,6 +5,14 @@
  *     Define tipos de variáveis.
  *     Obs: System types. 
  */
+ 
+ 
+
+#ifndef ____TYPES_H
+#define ____TYPES_H    1 
+
+
+
 
 
 #define NULL ((void *)0)
@@ -135,6 +143,10 @@ typedef  unsigned int        __uint32_t;
 //typedef  unsigned long long  __uint64_t;
 //...
 
+
+
+
+#endif    //____TYPES_H
 
 
 

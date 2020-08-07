@@ -1,50 +1,14 @@
 /*
- * Gramado Operating System - The main header for the kernel base. 
- * (c) Coppyright 2019 - Fred Nora.
- *
- * File: kernel.h 
- *
- * This is the header file kernel base.
- * This is a hybrid kernel.
- *
- * The base kernel has 4 layers: 
- *     HAL, MICROKERNEL, EXECUTIVE and GRAMADO.
- *
- * *****************************************
- * *                                       *
- * * ;----------------------------------;  *
- * * ;                                  ;  *
- * * ;              kgws                ;  *
- * * ;                                  ;  *
- * * ;----------------------------------;  *
- * * ;----------------------------------;  *
- * * ;                                  ;  *
- * * ;             execve               ;  *
- * * ;                                  ;  *
- * * ;----------------------------------;  *
- * *                                       *
- * * ;----------------------------------;  *
- * * ;              mk                  ;  *
- * * ;----------------------------------;  *
- * *                                       *
- * * ;----------------------------------;  *
- * * ;              hal                 ;  *
- * * ;----------------------------------;  *
- * *                                       *
- * *****************************************
- *
- *
+ * File: kernel.h
+ * 
+ *     This is the main header for the bse kernel.
+ * 
  * History:
  *     2013 - Created by Fred Nora.
  *     2014~2018 - Resision.
  */
 
 
-//#ifndef ____KERNEL_H
-//#define ____KERNEL_H    
-
-
- 
 //
 // Externs.
 //
@@ -69,24 +33,15 @@ extern void do_executa_new_task (void);
 // =========================================================
 
 
-//
+
 // config
-//
+#include "config/gramado.h"    // Product. 
+#include "config/config.h"     // Compiling.
 
-#include "config/gramado.h"    // product. 
-#include "config/config.h"     // compiling.
-
-//
 // gramado
-//
-
 #include "gramado/limits.h"
 
-
-//
 // globals
-//
-
 #include "globals/gpa.h"
 #include "globals/gva.h"
 #include "globals/gentry.h"
@@ -97,22 +52,13 @@ extern void do_executa_new_task (void);
 #include "globals/gwd.h"   //whatch dogs
 
 
-//
 // klibc
-//
-
 #include "klibc/cdefs.h"
 #include "klibc/stddef.h"
-#include "klibc/types.h"   //todo: merge
+#include "klibc/types.h"
 #include "klibc/types2.h"
 #include "klibc/limits.h"
 #include "klibc/kstdio.h"
-
-
-//
-// klibc
-//
-
 #include "klibc/stdlib.h"
 #include "klibc/string.h"
 #include "klibc/ctype.h"
@@ -127,14 +73,10 @@ extern void do_executa_new_task (void);
 
 
 
-
-
+// memory management support.
 #include "mm.h"
-
-// sysmk
 #include "memmap.h" 
 #include "intelmm.h"
-
 
 
 
@@ -152,15 +94,7 @@ extern void do_executa_new_task (void);
 #include "tty/virtcon.h"
 
 
-
-
-
-
-//
 // fs
-//
-
-
 #include "fs/path.h"         // path.
 #include "fs/fat.h"          // fat16.
 #include "fs/inode.h"
@@ -177,49 +111,33 @@ extern void do_executa_new_task (void);
 
 
 // hal
-#include "halvid.h"
-#include "halmm.h"
-#include "cpu.h"
+#include "hal/portsx86.h"
+#include "hal/halvid.h"
+#include "hal/halmm.h"
+#include "hal/cpu.h"
+#include "hal/pte.h"
+#include "hal/tss.h" 
+#include "hal/cputypes.h"
+#include "hal/x86pte.h"
+#include "hal/x86.h"
+#include "hal/x86iv.h"
+#include "hal/x86gdt.h"
+#include "hal/cpuamd.h"
+#include "hal/detect.h"
 
 
-
-#include "pte.h"
-#include "tss.h" 
-
-//hal
-#include "cputypes.h"
-#include "x86pte.h"
-#include "x86.h"
-#include "x86iv.h"
-#include "x86gdt.h"
-#include "cpuamd.h"
-#include "detect.h"
-
-
+// drivers
 #include "serial.h"
-
 
 
 //todo: podemos mover isso de lugar para perto de net/
 #include "net/mac.h"
-
-
-
-#include "portsx86.h"
-
-
 
 // storage
 #include "storage/ata.h"
 #include "storage/volume.h"
 #include "storage/disk.h"       
 #include "storage/storage.h"          
-
-
-
-
-// kdrivers serial
-#include "serial2.h"
 
 
 
@@ -242,7 +160,7 @@ extern void do_executa_new_task (void);
 #include "storage/floppy.h"
 
 
-// ws - window server, and beyond
+// ws - window server, and beyond. low level
 #include "ws/xproc.h"
 #include "ws/keyboard.h"
 #include "ws/vk.h"
@@ -265,21 +183,15 @@ extern void do_executa_new_task (void);
 #include "usb.h"
 
 
-
 // hal (^)
-#include "up.h"
-#include "mp.h"
-#include "breaker.h"
-#include "hal.h"
+#include "hal/up.h"
+#include "hal/mp.h"
+#include "hal/breaker.h"
+#include "hal/hal.h"
 
 
 
-
-//
 // ps
-//
-
-
 #include "ps/x86cont.h"
 #include "ps/ts.h"
 #include "ps/tasks.h"
@@ -300,7 +212,6 @@ extern void do_executa_new_task (void);
 
 
 // ws - window server, and beyond
-
 #include "ws/kgwm.h"
 #include "ws/ws.h"
 #include "ws/window.h"
@@ -324,11 +235,7 @@ extern void do_executa_new_task (void);
 
 
 
-
-// 
-// tty/
-//
-
+// tty
 #include "tty/ttyldisc.h"
 #include "tty/ttydrv.h"
 #include "tty/tty.h"
@@ -345,7 +252,7 @@ extern void do_executa_new_task (void);
 
 
 //
-//    ==== NETWORK ====
+//  ==== NETWORK ====
 //
 
 #include "net/connect.h" 
@@ -373,7 +280,7 @@ extern void do_executa_new_task (void);
 
 
 //
-//    ==== DEVICES ====
+// ==== DEVICES ====
 //
 
 
@@ -381,7 +288,6 @@ extern void do_executa_new_task (void);
 #include "devices.h"
 #include "devmgr.h"       
 #include "io.h"               //io.
-
 
 
 #include "modules.h"     //module manager.
@@ -863,8 +769,6 @@ void abort (void);    //abort.c
 void die (void);      //system.c
 
 
-
-//#endif   
 
 //
 // End.

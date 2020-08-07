@@ -12,19 +12,16 @@
 **********************************************************************/
 
 
-#ifndef ____ANIMAL_H
-#define ____ANIMAL_H 1
 
+#ifndef ____GRAMADO_H
+#define ____GRAMADO_H 1
 
-// #bugbug
-// We need to change the name of this document.
 
 //
 // utsname
 // 
 
 /* Operating system name (e.g., "Linux") */
-//#define OS_NAME      "Animal"
 #define OS_NAME      "Gramado"
 
 /* Name within "some implementation-defined network" */

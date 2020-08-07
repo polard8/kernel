@@ -20,6 +20,10 @@
  */
  
  
+#ifndef ____UNISTD_H 
+#define ____UNISTD_H    1
+ 
+ 
 /* FreeBSD stuff */
 #define  STDIN_FILENO   0	/* standard input file descriptor */
 #define  STDOUT_FILENO  1	/* standard output file descriptor */
@@ -31,7 +35,8 @@
  Process IDentifier 
  posix.  
  */
-typedef int pid_t;
+typedef int    pid_t;
+
 
 
 //See: threadi.c
@@ -44,10 +49,13 @@ long pathconf (const char *pathname, int name);
 
 off_t sys_lseek (int fd, off_t offset, int whence);
 
-
 //See: network.c
 int __sethostname (const char *new_hostname);
 int __gethostname (char * buffer);
+
+
+
+#endif    //____UNISTD_H
 
 
 

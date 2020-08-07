@@ -230,72 +230,77 @@ all-c:
 
 
 	#
-	# == System =================================================
+	# == Gramado Core =================================================
 	#
+	
+	# Architecture independent layer.
 
 
-	$(CC) -c system/security/desktop.c   $(KINCLUDE) $(CFLAGS) -o desktop.o
-	$(CC) -c system/security/room.c      $(KINCLUDE) $(CFLAGS) -o room.o
-	$(CC) -c system/security/userenv.c   $(KINCLUDE) $(CFLAGS) -o userenv.o
-	$(CC) -c system/security/usession.c  $(KINCLUDE) $(CFLAGS) -o usession.o
+	$(CC) -c core/security/desktop.c   $(KINCLUDE) $(CFLAGS) -o desktop.o
+	$(CC) -c core/security/room.c      $(KINCLUDE) $(CFLAGS) -o room.o
+	$(CC) -c core/security/userenv.c   $(KINCLUDE) $(CFLAGS) -o userenv.o
+	$(CC) -c core/security/usession.c  $(KINCLUDE) $(CFLAGS) -o usession.o
 
-	$(CC) -c system/debug/debug.c      $(KINCLUDE) $(CFLAGS) -o debug.o
+	$(CC) -c core/debug/debug.c      $(KINCLUDE) $(CFLAGS) -o debug.o
 
-	$(CC) -c system/ob/object.c        $(KINCLUDE) $(CFLAGS) -o object.o
+	$(CC) -c core/ob/object.c        $(KINCLUDE) $(CFLAGS) -o object.o
 
-	$(CC) -c system/storage/storage.c  $(KINCLUDE) $(CFLAGS) -o storage.o
-	$(CC) -c system/abort.c    $(KINCLUDE) $(CFLAGS) -o abort.o
-	$(CC) -c system/info.c     $(KINCLUDE) $(CFLAGS) -o info.o
-	$(CC) -c system/init.c     $(KINCLUDE) $(CFLAGS) -o init.o
-	$(CC) -c system/install.c  $(KINCLUDE) $(CFLAGS) -o install.o
-	$(CC) -c system/modules.c  $(KINCLUDE) $(CFLAGS) -o modules.o
-	$(CC) -c system/runtime.c  $(KINCLUDE) $(CFLAGS) -o runtime.o
-	$(CC) -c system/sm.c       $(KINCLUDE) $(CFLAGS) -o sm.o
-	$(CC) -c system/system.c   $(KINCLUDE) $(CFLAGS) -o system.o
-	$(CC) -c system/syssm.c   $(KINCLUDE) $(CFLAGS) -o syssm.o
-
+	$(CC) -c core/storage/storage.c  $(KINCLUDE) $(CFLAGS) -o storage.o
+	$(CC) -c core/abort.c    $(KINCLUDE) $(CFLAGS) -o abort.o
+	$(CC) -c core/info.c     $(KINCLUDE) $(CFLAGS) -o info.o
+	$(CC) -c core/init.c     $(KINCLUDE) $(CFLAGS) -o init.o
+	$(CC) -c core/install.c  $(KINCLUDE) $(CFLAGS) -o install.o
+	$(CC) -c core/modules.c  $(KINCLUDE) $(CFLAGS) -o modules.o
+	$(CC) -c core/runtime.c  $(KINCLUDE) $(CFLAGS) -o runtime.o
+	$(CC) -c core/sm.c       $(KINCLUDE) $(CFLAGS) -o sm.o
+	$(CC) -c core/system.c   $(KINCLUDE) $(CFLAGS) -o system.o
+	$(CC) -c core/syssm.c   $(KINCLUDE) $(CFLAGS) -o syssm.o
 
 	# ps/action
-	$(CC) -c  system/ps/action/dispatch.c  $(KINCLUDE)  $(CFLAGS) -o dispatch.o
-	$(CC) -c  system/ps/action/pheap.c     $(KINCLUDE)  $(CFLAGS) -o pheap.o
-	$(CC) -c  system/ps/action/process.c   $(KINCLUDE)  $(CFLAGS) -o process.o
-	$(CC) -c  system/ps/action/clone.c     $(KINCLUDE)  $(CFLAGS) -o clone.o
-	$(CC) -c  system/ps/action/queue.c     $(KINCLUDE)  $(CFLAGS) -o queue.o
-	$(CC) -c  system/ps/action/spawn.c     $(KINCLUDE)  $(CFLAGS) -o spawn.o
-	$(CC) -c  system/ps/action/tasks.c     $(KINCLUDE)  $(CFLAGS) -o tasks.o
-	$(CC) -c  system/ps/action/theap.c     $(KINCLUDE)  $(CFLAGS) -o theap.o
-	$(CC) -c  system/ps/action/thread.c    $(KINCLUDE)  $(CFLAGS) -o thread.o
-	$(CC) -c  system/ps/action/threadi.c   $(KINCLUDE)  $(CFLAGS) -o threadi.o
-	$(CC) -c  system/ps/action/ts.c        $(KINCLUDE)  $(CFLAGS) -o ts.o
-	$(CC) -c  system/ps/action/tstack.c    $(KINCLUDE)  $(CFLAGS) -o tstack.o
-	$(CC) -c  system/ps/action/execve.c    $(KINCLUDE)  $(CFLAGS) -o execve.o
+	$(CC) -c  core/ps/action/dispatch.c  $(KINCLUDE)  $(CFLAGS) -o dispatch.o
+	$(CC) -c  core/ps/action/pheap.c     $(KINCLUDE)  $(CFLAGS) -o pheap.o
+	$(CC) -c  core/ps/action/process.c   $(KINCLUDE)  $(CFLAGS) -o process.o
+	$(CC) -c  core/ps/action/clone.c     $(KINCLUDE)  $(CFLAGS) -o clone.o
+	$(CC) -c  core/ps/action/queue.c     $(KINCLUDE)  $(CFLAGS) -o queue.o
+	$(CC) -c  core/ps/action/spawn.c     $(KINCLUDE)  $(CFLAGS) -o spawn.o
+	$(CC) -c  core/ps/action/tasks.c     $(KINCLUDE)  $(CFLAGS) -o tasks.o
+	$(CC) -c  core/ps/action/theap.c     $(KINCLUDE)  $(CFLAGS) -o theap.o
+	$(CC) -c  core/ps/action/thread.c    $(KINCLUDE)  $(CFLAGS) -o thread.o
+	$(CC) -c  core/ps/action/threadi.c   $(KINCLUDE)  $(CFLAGS) -o threadi.o
+	$(CC) -c  core/ps/action/ts.c        $(KINCLUDE)  $(CFLAGS) -o ts.o
+	$(CC) -c  core/ps/action/tstack.c    $(KINCLUDE)  $(CFLAGS) -o tstack.o
+	$(CC) -c  core/ps/action/execve.c    $(KINCLUDE)  $(CFLAGS) -o execve.o
 
 	# ps/ipc
-	$(CC) -c  system/ps/ipc/callfar.c  $(KINCLUDE)  $(CFLAGS) -o callfar.o
-	$(CC) -c  system/ps/ipc/callout.c  $(KINCLUDE)  $(CFLAGS) -o callout.o
-	$(CC) -c  system/ps/ipc/ipc.c      $(KINCLUDE)  $(CFLAGS) -o ipc.o
-	$(CC) -c  system/ps/ipc/ipccore.c  $(KINCLUDE)  $(CFLAGS) -o ipccore.o
-	$(CC) -c  system/ps/ipc/sem.c      $(KINCLUDE)  $(CFLAGS) -o sem.o
+	$(CC) -c  core/ps/ipc/callfar.c  $(KINCLUDE)  $(CFLAGS) -o callfar.o
+	$(CC) -c  core/ps/ipc/callout.c  $(KINCLUDE)  $(CFLAGS) -o callout.o
+	$(CC) -c  core/ps/ipc/ipc.c      $(KINCLUDE)  $(CFLAGS) -o ipc.o
+	$(CC) -c  core/ps/ipc/ipccore.c  $(KINCLUDE)  $(CFLAGS) -o ipccore.o
+	$(CC) -c  core/ps/ipc/sem.c      $(KINCLUDE)  $(CFLAGS) -o sem.o
 
 	# ps/sched
-	$(CC) -c  system/ps/sched/preempt.c   $(KINCLUDE) $(CFLAGS) -o preempt.o
-	$(CC) -c  system/ps/sched/priority.c  $(KINCLUDE) $(CFLAGS) -o priority.o
-	$(CC) -c  system/ps/sched/sched.c     $(KINCLUDE) $(CFLAGS) -o sched.o
-	$(CC) -c  system/ps/sched/schedi.c    $(KINCLUDE) $(CFLAGS) -o schedi.o
+	$(CC) -c  core/ps/sched/preempt.c   $(KINCLUDE) $(CFLAGS) -o preempt.o
+	$(CC) -c  core/ps/sched/priority.c  $(KINCLUDE) $(CFLAGS) -o priority.o
+	$(CC) -c  core/ps/sched/sched.c     $(KINCLUDE) $(CFLAGS) -o sched.o
+	$(CC) -c  core/ps/sched/schedi.c    $(KINCLUDE) $(CFLAGS) -o schedi.o
 
 	# ps -x86 - falling angels.
-	$(CC) -c system/ps/x86/x86cont.c   $(KINCLUDE)  $(CFLAGS) -o x86cont.o
-	$(CC) -c system/ps/x86/x86fault.c  $(KINCLUDE)  $(CFLAGS) -o x86fault.o
-	$(CC) -c system/ps/x86/x86start.c  $(KINCLUDE)  $(CFLAGS) -o x86start.o
-	$(CC) -c system/ps/x86/memory.c    $(KINCLUDE)  $(CFLAGS) -o memory.o
-	$(CC) -c system/ps/x86/mminfo.c    $(KINCLUDE)  $(CFLAGS) -o mminfo.o
-	$(CC) -c system/ps/x86/mmpool.c    $(KINCLUDE)  $(CFLAGS) -o mmpool.o
-	$(CC) -c system/ps/x86/pages.c     $(KINCLUDE)  $(CFLAGS) -o pages.o
+	$(CC) -c core/ps/x86/x86cont.c   $(KINCLUDE)  $(CFLAGS) -o x86cont.o
+	$(CC) -c core/ps/x86/x86fault.c  $(KINCLUDE)  $(CFLAGS) -o x86fault.o
+	$(CC) -c core/ps/x86/x86start.c  $(KINCLUDE)  $(CFLAGS) -o x86start.o
+	$(CC) -c core/ps/x86/memory.c    $(KINCLUDE)  $(CFLAGS) -o memory.o
+	$(CC) -c core/ps/x86/mminfo.c    $(KINCLUDE)  $(CFLAGS) -o mminfo.o
+	$(CC) -c core/ps/x86/mmpool.c    $(KINCLUDE)  $(CFLAGS) -o mmpool.o
+	$(CC) -c core/ps/x86/pages.c     $(KINCLUDE)  $(CFLAGS) -o pages.o
 
 	# ps
-	$(CC) -c system/ps/create.c  $(KINCLUDE)  $(CFLAGS) -o create.o
-	$(CC) -c system/ps/mk.c      $(KINCLUDE)  $(CFLAGS) -o mk.o
-	$(CC) -c system/ps/sysmk.c   $(KINCLUDE)  $(CFLAGS) -o sysmk.o
+	$(CC) -c core/ps/create.c  $(KINCLUDE)  $(CFLAGS) -o create.o
+	$(CC) -c core/ps/mk.c      $(KINCLUDE)  $(CFLAGS) -o mk.o
+	$(CC) -c core/ps/sysmk.c   $(KINCLUDE)  $(CFLAGS) -o sysmk.o
+
+
+
+
 
 
 	##
