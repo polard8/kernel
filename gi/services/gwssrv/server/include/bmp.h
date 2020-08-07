@@ -76,6 +76,13 @@ struct gws_bmp_infoheader_d
  
 
 
+//
+// Pointer.
+//
+
+char *gwssrv_bmp_cursor_pointer;
+char *gwssrv_bmp_mouse_pointer;
+// ...
 
 
 
@@ -105,6 +112,23 @@ gwssrv_load_and_decode_small_icon (
     unsigned long x, 
     unsigned long y );
 
+
+
+char *
+gwssrv_load_small_icon ( 
+    char *filename, 
+    unsigned long x, 
+    unsigned long y );
+
+int
+gwssrv_decode_small_icon (
+    char *address,
+    char *filename, 
+    unsigned long x, 
+    unsigned long y );
+    
+
+void xxx_test_load_bmp(void);
 
 
 //

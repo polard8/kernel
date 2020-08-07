@@ -109,7 +109,7 @@ int serviceDrawText(void);
 int serviceDrawButton (void); 
 int serviceRefreshRectangle(void);
 void xxx_test_load_icon(void);
-void xxx_test_load_bmp(void);
+
 // ...
 
 
@@ -689,91 +689,6 @@ void xxx_test_load_icon(void)
      */
 }
 
-
-void xxx_test_load_bmp(void)
-{
-    //
-    // =======================================
-    //
-    
-    //#todo
-    //Trying to load and show a bmp file.
-    //char *file_name = "FOLDER  BMP";
-    //char file_name[] = "FOLDER  BMP";
-    
-    char *bmp_buffer;
-
-    
-    //char file_name[] = "terminal.bmp";
-    //bmp_buffer = (char *) malloc(1024*128);
-    bmp_buffer = (char *) malloc(1024*512);
-    
-    if ( (void *) bmp_buffer == NULL ){
-        printf ("gwssrv: xxx_test_load_bmp bmp_buffer fail\n");
-        return;
-    }
-    
-    // ?? Onde fica o heap usado por esse malloc ??
-    printf ("gwssrv: xxx_test_load_bmp bmp_buffer = %x\n", bmp_buffer);
-  
-  
-    //stdio_fntos ( (char *) file_name ); //não precisa
-    
-    FILE *fp;
-    
-    fp = fopen("folder.bmp","r+");    
-    //fp = fopen("dennis2.bmp","r+");    
-
-
-    int nreads=0;
-    //nreads = read( fileno(fp), bmp_buffer, (1024*128) );
-    nreads = read( fileno(fp), bmp_buffer, (1024*512) );
-    
-    if(nreads <= 0)
-    { 
-        printf("read fail\n"); 
-        return; 
-    }
-
-   //#bugbug
-   //So estava lendo 4 bytes por causa do size of usado erradamente logo acima..
-
-    printf ("nreads={%d}\n",nreads);
-
-
-    int i=0;
-
-    //#test
-    if ( bmp_buffer[0] != 'B' || bmp_buffer[1] != 'M' )
-    {
-        printf (">>>> %c %c\n",&bmp_buffer[0],&bmp_buffer[1]);
-        gde_debug_print ("gwssrv: xxx_test_load_bmp SIG FAIL \n");
-        printf("xxx_test_load_bmp: *hang1\n");
-        gws_show_backbuffer();
-        while(1);
-    }
-
-    if ( bmp_buffer[0] == 'B' && bmp_buffer[1] == 'M' )
-    {
-        printf("xxx_test_load_bmp: BMP signature OK\n");
-        
-        //#flags
-        bmp_change_color_flag = BMP_CHANGE_COLOR_TRANSPARENT;
-        //bmp_change_color_flag = BMP_CHANGE_COLOR_SUBSTITUTE;
-        //bmp_change_color_flag = BMP_CHANGE_COLOR_NULL;
-        bmp_selected_color = COLOR_WHITE;
-
- 
-        bmpDisplayBMP ((char *) bmp_buffer, (unsigned long) 4, (unsigned long) 4);    
-        //gde_display_bmp((char *)bmp_buffer, (unsigned long) 80, (unsigned long) 80);
-    }          
-
-
-     //#debug
-     printf("xxx_test_load_bmp: *hang2\n");
-     gws_show_backbuffer();
-     while(1);
-}
 
 
 
