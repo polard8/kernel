@@ -368,6 +368,7 @@ struct gws_window_d
 
 
     // Margins. (position)
+    // Deslocamento em relação à tela. (screen)
     unsigned long left;        //margem esquerda 
     unsigned long top;         //margem superior
     unsigned long right;       //margem direita  
@@ -380,11 +381,18 @@ struct gws_window_d
 
     // Offset inside the window.
     // Can be used by the rectangles.
-    unsigned long x;           //deslocamento x
-    unsigned long y;           //deslocamento y 
+    // Deslocamento em relação a janela mãe.
+    unsigned long x;
+    unsigned long y; 
+
 
     // Windows's bg.
     unsigned long bg_color; 
+    
+    
+    // #todo    
+    //unsigned long border_color;
+    //unsigned long border_width;
 
 
 // 

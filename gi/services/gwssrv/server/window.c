@@ -8,6 +8,226 @@
 #include <api.h>
 #include <gws.h>
 
+/*
+ * =====================================================
+ * windowSetUpColorScheme:
+ *     Isso configura os esquemas de cores utilizados 
+ * pelo sistema.
+ *     Essa rotina é chamada apenas uma vez na inicialização
+ * do kernel.
+ *     O esquema de cores a ser utilizado deve estar 
+ * salvo no perfil do usuário que fez o logon.
+ * Os dois esquemas padrão chamam-se: 'humility' e 'pride'.
+ * + O esquema 'humility' são cores com tema cinza, 
+ * lembrando interfaces antigas.
+ * + O esquema 'pride' são cores modernas 
+ *   ( Aquele verde e preto e cinza, das primeiras versões, 
+ * com imagens publicadas. )
+ * @todo: é preciso criar rotinas que selecionem entre os 
+ * modo criados e habilitados.
+ * É preciso criar rotinas que permitam que aplicativos 
+ * em user mode criem esquemas de cores e habilite eles.
+ */
+
+
+void 
+gwssrv_initialize_color_schemes (int selected_type)
+{
+
+    struct gws_color_scheme_d *humility;
+    struct gws_color_scheme_d *pride;
+
+	//
+	// * HUMILITY
+	//
+	
+    //Criando o esquema de cores humility. (cinza)
+    humility = (void *) malloc ( sizeof(struct gws_color_scheme_d) );
+    
+	if( (void *) humility == NULL ){
+		gde_debug_print ("gwssrv_initialize_color_schemes: humility\n");
+		
+	}else{
+		
+		//Object.
+		//humility->objectType = ObjectTypeColorScheme;
+		//humility->objectClass = ObjectClassGuiObjects;
+		
+
+		humility->used = 1;
+		humility->magic = 1234;
+		humility->name = "Humility";
+		
+		//Colors
+		//Definidas em ws.h
+		humility->elements[csiNull] = 0;                             //0
+        humility->elements[csiDesktop] = HUMILITY_COLOR_BACKGROUND;  //1		
+		humility->elements[csiWindow] = HUMILITY_COLOR_WINDOW;       //2
+        humility->elements[csiWindowBackground] = HUMILITY_COLOR_WINDOW_BACKGROUND;	 //3	
+		humility->elements[csiActiveWindowBorder] = HUMILITY_COLOR_ACTIVE_WINDOW_BORDER;  //4
+        humility->elements[csiInactiveWindowBorder] = HUMILITY_COLOR_INACTIVE_WINDOW_BORDER;  //5		
+		humility->elements[csiActiveWindowTitleBar] = HUMILITY_COLOR_ACTIVE_WINDOW_TITLEBAR;  //6
+        humility->elements[csiInactiveWindowTitleBar] = HUMILITY_COLOR_INACTIVE_WINDOW_TITLEBAR;  //7	 	
+		humility->elements[csiMenuBar] = HUMILITY_COLOR_MENUBAR;                //8
+        humility->elements[csiScrollBar] = HUMILITY_COLOR_SCROLLBAR;            //9  
+		humility->elements[csiStatusBar] = HUMILITY_COLOR_STATUSBAR;            //10
+        humility->elements[csiMessageBox] = HUMILITY_COLOR_MESSAGEBOX;		    //11
+		humility->elements[csiSystemFontColor] = HUMILITY_COLOR_SYSTEMFONT;		//12
+		humility->elements[csiTerminalFontColor] = HUMILITY_COLOR_TERMINALFONT;	//13
+		//...
+		
+		//Sanvando na estrutura padrão para o esquema humility.
+		GWSHumilityColorScheme = (void*) humility;
+	};	
+	
+	//
+	// * PRIDE 
+	//
+	
+    //Criando o esquema de cores PRIDE. (colorido)
+    pride = (void *) malloc ( sizeof(struct gws_color_scheme_d) );
+    
+    if ( (void *) pride == NULL ){
+        gde_debug_print ("gwssrv_initialize_color_schemes: pride\n");
+
+    }else{
+		
+		//Object.
+		//pride->objectType  = ObjectTypeColorScheme;
+		//pride->objectClass = ObjectClassGuiObjects;
+
+		pride->used = 1;
+		pride->magic = 1234;
+		pride->name = "Pride";
+		
+		//Colors
+		//Definidas em ws.h
+		pride->elements[csiNull] = 0;
+        pride->elements[csiDesktop] = PRIDE_COLOR_BACKGROUND;  
+		pride->elements[csiWindow] = PRIDE_COLOR_WINDOW;
+        pride->elements[csiWindowBackground] = PRIDE_COLOR_WINDOW_BACKGROUND;
+		pride->elements[csiActiveWindowBorder] = PRIDE_COLOR_ACTIVE_WINDOW_BORDER;  
+        pride->elements[csiInactiveWindowBorder] = PRIDE_COLOR_INACTIVE_WINDOW_BORDER;  
+		pride->elements[csiActiveWindowTitleBar] = PRIDE_COLOR_ACTIVE_WINDOW_TITLEBAR;    
+        pride->elements[csiInactiveWindowTitleBar] = PRIDE_COLOR_INACTIVE_WINDOW_TITLEBAR;		
+		pride->elements[csiMenuBar] = PRIDE_COLOR_MENUBAR;
+        pride->elements[csiScrollBar] = PRIDE_COLOR_SCROLLBAR;  		
+		pride->elements[csiStatusBar] = PRIDE_COLOR_STATUSBAR;    
+        pride->elements[csiMessageBox] = PRIDE_COLOR_MESSAGEBOX;
+		pride->elements[csiSystemFontColor] = PRIDE_COLOR_SYSTEMFONT;    //12
+		pride->elements[csiTerminalFontColor] = PRIDE_COLOR_TERMINALFONT;  //13		
+		//...
+		
+		//Sanvando na estrutura padrão para o esquema pride.
+		GWSPrideColorScheme = (void *) pride;
+	};	
+		
+	
+	// Configurando qual será o esquema padrão.
+	// @todo; Criar uma função que selecione qual dois esquemas serão usados
+	//        apenas selecionando o ponteiro da estrutura.  
+	
+    switch (selected_type){
+		
+		case ColorSchemeNull:
+		    GWSCurrentColorScheme = (void *) humility;
+		    break;
+		
+		case ColorSchemeHumility:
+		    GWSCurrentColorScheme = (void *) humility;
+		    break;
+		
+		case ColorSchemePride:
+	        GWSCurrentColorScheme = (void *) pride; 
+		    break;
+		
+		default:
+		    GWSCurrentColorScheme = (void *) humility;
+			break;
+	};	
+}
+
+
+//seleciona o tipo ...isso é um serviço.
+int gwssrv_select_color_scheme (int type){
+	//#debug
+	//printf("windowSelectColorScheme: type={%d} \n", type);
+	
+    switch (type)
+	{
+		case ColorSchemeHumility:
+		    goto do_humility;
+		    break;
+			
+		case ColorSchemePride:
+		    goto do_pride;
+			break;
+			
+		default:
+		    gde_debug_print("windowSelectColorScheme: Type not defined\n");
+			goto fail;
+			break;
+	};
+
+	
+do_humility:
+
+    if ( (void *) GWSHumilityColorScheme == NULL )
+    {
+		gde_debug_print("HumilityColorScheme fail\n");
+        goto fail;  
+           	    	
+	}else{
+		
+	    if ( GWSHumilityColorScheme->used != 1 || 
+		     GWSHumilityColorScheme->magic != 1234 )
+		{
+			gde_debug_print("HumilityColorScheme sig fail\n");
+			goto fail;
+		}
+		
+		gde_debug_print("Humility selected\n");
+	    GWSCurrentColorScheme = GWSHumilityColorScheme;	
+	    goto done;
+	};		
+	
+	
+do_pride:	
+
+    if ( (void *) GWSPrideColorScheme == NULL )
+    {
+		gde_debug_print("GWSPrideColorScheme fail\n");
+        goto fail; 
+            	    	
+	}else{
+	    if( GWSPrideColorScheme->used != 1 || 
+		    GWSPrideColorScheme->magic != 1234 )
+		{
+			gde_debug_print("PrideColorScheme sig fail\n");
+			goto fail;
+		}
+		
+	    gde_debug_print ("Pride selected\n"); 
+		GWSCurrentColorScheme = GWSPrideColorScheme;	
+	    goto done;
+	};		
+
+done:
+
+    return 0;	
+    
+fail:
+
+    gde_debug_print ("fail\n");
+    return 1;
+}
+
+
+
+
+
+
+
 
 
 /*
@@ -57,6 +277,7 @@ int gws_show_window_rect (struct gws_window_d *window){
             
             p = window->parent;
             
+            //#todo: delete
             if ((void*)p==NULL)
             {
                 gde_debug_print("gws_show_window_rect: No parent");
@@ -75,8 +296,8 @@ int gws_show_window_rect (struct gws_window_d *window){
                 //gde_debug_print("gws_show_window_rect: parent ok");
                 
                 gws_refresh_rectangle ( 
-                    window->left, //(p->left + window->left), 
-                    window->top,  //(p->top  + window->top), 
+                    window->left,
+                    window->top,
                     window->width, 
                     window->height ); 
 
@@ -246,18 +467,17 @@ gws_resize_window (
     unsigned long cy )
 {
 
-    if ( (void *) window == NULL ){
-        //gde_debug_print("gws_resize_window:\n"); 
-        return (int) (-1); 
+    if ( (void *) window == NULL )
+        return -1;
 
-    } else {
-    
-		//@todo: Checar limites.
 
+    // Só precisa mudar se for diferente.
+    if ( window->width  != cx ||
+         window->height != cy )
+    {
         window->width  = (unsigned long) cx;
         window->height = (unsigned long) cy;
-    };
-
+    }
 
     return 0;
 }
@@ -276,16 +496,16 @@ gws_replace_window (
     unsigned long y )
 {
 
-    if ( (void *) window == NULL ){
-        return (int) (-1);
+    if ( (void *) window == NULL )
+        return -1;
 
-    } else {
 
-        //@todo: Checar limites.
-	
+    if ( window->left != x ||
+         window->top  != y )
+    {
         window->left = (unsigned long) x;
         window->top  = (unsigned long) y;
-    };
+    }
 
     return 0;
 }

@@ -611,7 +611,9 @@ typedef enum {
 	ColorSchemePride,     // 2 - Colorful.
 	//...
 }ColorSchemeType;	 
- 
+
+
+
 /*
  ******************************************************
  * ColorSchemeIndex:

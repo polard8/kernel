@@ -88,6 +88,11 @@ int gwssrv_init_globals(void)
 
     //background_color = xCOLOR_GRAY3;
    
+   
+   gwssrv_initialize_color_schemes(ColorSchemeHumility);
+   gwssrv_select_color_scheme(ColorSchemeHumility);
+   
+   
     //...
 
 

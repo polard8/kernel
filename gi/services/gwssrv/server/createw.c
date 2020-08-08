@@ -1202,8 +1202,8 @@ void *createwCreateWindow2 (
             if ( (void*) Parent != NULL ){
 
                 rectBackbufferDrawRectangle ( 
-                    (Parent->left   + window->left +1), 
-                    (Parent->top    + window->top +1), 
+                    (window->left +1), //(Parent->left   + window->left +1), 
+                    (window->top +1),  //(Parent->top    + window->top +1), 
                     (window->width +1 +1), 
                     (window->height +1 +1), 
                     __tmp_color ); 
@@ -2432,9 +2432,9 @@ draw_frame:
             0, 0, width, height, 
             1 );  //style
         
-        return (void *) __w;   
     }
-
+    
+    return (void *) __w;   
 }
 
 
