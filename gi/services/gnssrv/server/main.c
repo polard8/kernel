@@ -214,25 +214,25 @@ void __socket_messages (int fd){
      
     //gde_debug_print ("Sending response ...\n");  
 
-__again:
+    //# it works.
+    char *m = (char *) (&__buffer[0] + 16);
+    sprintf( m, "<html><head></head><body> Nothing ... </body></html>");
 
-
-    // #todo:
-    // Talvez aqui possamos usar alguma função chamada post_message().
-
-    // #debug: para a máquina real.
-    gde_debug_print ("gnssrv: Sending response ...\n");
-   
-                
     // Primeiros longs do buffer.
     message_buffer[0] = next_response[0];         //  Window ID.
     message_buffer[1] = SERVER_PACKET_TYPE_REPLY; //next_response[1] 
     message_buffer[2] = next_response[2];         // Return value (long1)
     message_buffer[3] = next_response[3];         // Return value (long2)
 
-    //# it works.
-    char *m = (char *) (&__buffer[0] + 16);
-    sprintf( m, "<html><head></head><body> Nothing ... </body></html>");
+    // #todo:
+    // Talvez aqui possamos usar alguma função chamada post_message().
+
+__again:
+
+    // #todo:
+    // while(1){...}
+    
+    gde_debug_print ("gnssrv: Sending response ...\n");
 
     //
     // Send

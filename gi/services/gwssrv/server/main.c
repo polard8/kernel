@@ -197,7 +197,7 @@ void set_client_id ( int id )
  */
 
 // internal.
-// Messages sended via socket.
+// Messages sent via socket.
 // obs: read and write use the buffer '__buffer'
 // in the top of this file.
 
@@ -355,28 +355,27 @@ void handle_request (int fd){
      
     //gde_debug_print ("Sending response ...\n");  
 
-__again:
-
-    // #debug:
-
-    gde_debug_print ("gwssrv: Sending response ...\n");
+    //# it works.
+    char *m = (char *) (&__buffer[0] + 16);
+    sprintf( m, "gwssrv: This is a response from GWS!\n");
     
-                
     // Primeiros longs do buffer.
     message_buffer[0] = next_response[0];         // Window ID.
     message_buffer[1] = SERVER_PACKET_TYPE_REPLY; // next_response[1] 
     message_buffer[2] = next_response[2];         // Return value (long1)
     message_buffer[3] = next_response[3];         // Return value (long2)
 
-    //# it works.
-    char *m = (char *) (&__buffer[0] + 16);
-    sprintf( m, "gwssrv: This is a response from GWS!\n");
+__again:
 
+    // #todo:
+    // while(1){...}
+    
+    gde_debug_print ("gwssrv: Sending response ...\n");
 
     //
     // Send
     //
- 
+
     n_writes = write ( fd, __buffer, sizeof(__buffer) );
     //n_writes = send ( fd, __buffer, sizeof(__buffer), 0 );
     
