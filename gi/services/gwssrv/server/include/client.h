@@ -38,7 +38,8 @@ struct gws_client_d
     // Queue. (list)
     //
 
-    struct window_d  *window_list[32];
+    //struct gws_window_d  *window_list[32];
+    int               window_list[32];
     int               msg_list[32];
     unsigned long     long1_list[32];
     unsigned long     long2_list[32];

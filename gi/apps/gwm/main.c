@@ -95,6 +95,7 @@ int _getmessage_request(int fd);
 int _getmessage_response(int fd);
 
 
+int create_main_menu( int fd );
 
 
 int gwm_init_globals(void)
@@ -319,10 +320,12 @@ response_loop:
             {
                 case VK_F1:
                     printf ("gwm: VK_F1\n");
+                    create_main_menu(fd);
                     break;
 
                 case VK_F2:
                     printf ("gwm: VK_F2\n");
+                    create_tester_client(fd);
                     break;
                     
                 case VK_F3:
@@ -689,6 +692,11 @@ int create_topbar_client(int fd)
 
     int button1_window=-1;   
     
+    
+    //if (fd<0)
+        //return -1;
+
+
     //
     // == Topbar (Client) ==================================
     // 
@@ -742,6 +750,11 @@ int create_taskbar_client(int fd)
     int button1_window=-1;   
     int button2_window=-1;   
     
+    
+    //if (fd<0)
+        //return -1;
+
+    
     // Taskbar
     gws_debug_print ("gwm: Create c_taskbar client\n");
     c_taskbar = (struct wm_client_d *) malloc ( sizeof(struct wm_client_d) );
@@ -794,6 +807,11 @@ int create_tester_client(int fd)
     // 
 
     int tester_button=-1;
+    
+    
+    //if (fd<0)
+        //return -1;
+
     
     //gws_enter_critical_section();
     gws_debug_print ("gwm: Create tester_client client\n");
@@ -893,6 +911,70 @@ int create_tester_client(int fd)
 }
 
 
+//internal
+int create_main_menu( int fd )
+{
+    struct gws_menu_d *menu;
+
+
+    if (fd<0)
+        return -1;
+
+    if ( (void *) c_topbar == NULL )
+        return -1;
+    
+    if ( c_topbar->window < 0 )
+        return -1;
+
+
+    // #testing (NEW)
+    menu = gws_create_menu (
+               (int) fd,
+               (int) c_topbar->window,
+               (int) 0, //highlight
+               (int) 4,   //count
+               (unsigned long) 20, //x
+               (unsigned long) 20,
+               (unsigned long) 200,
+               (unsigned long) 200,
+               (unsigned long) COLOR_WHITE );
+
+    if ( (void*) menu != NULL )
+    {
+               //menu item
+               gws_create_menu_item (
+                  (int) fd,
+                  (char *) "Item0",
+                  (int) 0,
+                  (struct gws_menu_d *) menu );
+
+               //menu item
+               gws_create_menu_item (
+                  (int) fd,
+                  (char *) "Item1",
+                  (int) 1,
+                  (struct gws_menu_d *) menu );
+
+               //menu item
+               gws_create_menu_item (
+                  (int) fd,
+                  (char *) "Item2",
+                  (int) 2,
+                  (struct gws_menu_d *) menu );
+
+               //menu item
+               gws_create_menu_item (
+                  (int) fd,
+                  (char *) "Item3",
+                  (int) 3,
+                  (struct gws_menu_d *) menu );
+
+    }
+
+
+    return 0;
+}
+
 // Testing new main.
 int main ( int argc, char *argv[] ){
 
@@ -951,29 +1033,18 @@ int main ( int argc, char *argv[] ){
     };
 
 
- 
- 
-    //
-    // messages
-    //
-   
-    // #test
-    // Testing loop; ok.
-    // #todo
-    // Podemos checar antes se o fd 
-    // representa um objeto que permite leitura.
-    // Pode nem ser possível.
-    // Mas como sabemos que é um soquete,
-    // então sabemos que é possível ler.
-
+    // Testing server.
     _hello(client_fd);
 
-
+    // Create clients.
     create_topbar_client(client_fd);
-    
     create_taskbar_client(client_fd);
+    // ...
     
-    create_tester_client(client_fd);
+
+    // Press F2.
+    //create_tester_client(client_fd);
+
 
 
     gws_debug_print ("gwm: draw done!\n");

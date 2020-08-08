@@ -29,9 +29,6 @@
 // or (libcon)
 #include "connect.h"
 
-// Client structure.
-// O proprio servidor poderia ser o cliente 0??
-#include "client.h"
 
 #include "font.h"
 
@@ -40,6 +37,10 @@
 
 #include "event.h"
 
+
+// Client structure.
+// O proprio servidor poderia ser o cliente 0??
+#include "client.h"
 
 
 
