@@ -24,6 +24,10 @@
 // Windows.
 #include "window.h"
 
+
+#include "menu.h"
+
+
 // Events.
 #include "events.h"
 
@@ -305,7 +309,24 @@ void gws_enter_critical_section();
 void gws_exit_critical_section();
 
 
+//menu
+struct gws_menu_d *gws_create_menu (
+    int fd,
+    int parent,
+    int highlight,
+    int count,
+    unsigned long x,
+    unsigned long y,
+    unsigned long width,
+    unsigned long height,
+    unsigned long color );
 
+//menu item
+struct gws_menu_item_d *gws_create_menu_item (
+    int fd,
+    char *label,
+    int id,
+    struct gws_menu_d *menu);
 
 //
 // End.

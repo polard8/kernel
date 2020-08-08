@@ -1458,6 +1458,124 @@ int gws_window ( int fd, int type )
 */
 
 
+struct gws_menu_d *gws_create_menu (
+    int fd,
+    int parent,
+    int highlight,
+    int count,
+    unsigned long x,
+    unsigned long y,
+    unsigned long width,
+    unsigned long height,
+    unsigned long color )
+{
+
+    struct gws_menu_d *menu;
+    int window;
+
+    menu = (struct gws_menu_d *) malloc( sizeof(struct gws_menu_d) );
+
+    if ( (void *) menu == NULL ){
+        return (struct gws_menu_d *) 0;
+    }
+
+
+    menu->x = x;
+    menu->y = y;
+    menu->width=width;
+    menu->height=height;
+    
+    menu->color=color;
+    
+    menu->highlight = highlight;
+    
+    menu->itens_count = count;
+
+
+    window = gws_create_window ( fd,
+                 WT_SIMPLE,1,1,"Menu",
+                 x, y, width, height,
+                 parent, 0, color, color );
+
+
+    if (window<=0)
+    { 
+        menu->window = 0;  //#bugbug !!!!
+        return (struct gws_menu_d *) 0;
+    }
+
+    //primeiro salva.
+        
+    menu->window = window; //bugbug
+    menu->parent = parent;
+ 
+    
+    return (struct gws_menu_d *) menu;
+}
+
+
+struct gws_menu_item_d *gws_create_menu_item (
+    int fd,
+    char *label,
+    int id,
+    struct gws_menu_d *menu)
+{
+    int window; //menu item window
+    
+    struct gws_menu_item_d *item;
+    
+    
+    if ( (void *) menu == NULL ){
+        return (struct gws_menu_item_d *) 0;
+    }
+    
+    //create menu item.
+    item = (struct gws_menu_item_d *) malloc( sizeof(struct gws_menu_item_d) );
+
+    if ( (void *) item == NULL ){
+        return (struct gws_menu_item_d *) 0;
+    }
+
+    //provisório
+    if(id>5 || id>menu->itens_count)
+        return (struct gws_menu_item_d *) 0;
+
+
+    item->id = id;
+
+    item->width  = menu->width;
+    item->height = (menu->height / menu->itens_count);
+    item->x = 2;
+    item->y = (item->height*id);
+    
+
+   if( menu->window > 0 )
+   {
+        window = gws_create_window ( fd,
+                     WT_BUTTON,1,1, label,
+                     item->x, 
+                     item->y, 
+                     item->width, 
+                     item->height,
+                     menu->window,  // #bugbug 
+                     0, COLOR_GRAY, COLOR_GRAY );
+                     
+        //debug
+        gws_draw_char (
+            fd, 
+             menu->window, // #bugbug
+              0,
+              0,
+              COLOR_RED,
+              'x');
+
+         item->window = window;
+    }
+
+    return (struct gws_menu_item_d *) item;
+}
+
+
 //
 // End.
 //

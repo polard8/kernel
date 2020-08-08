@@ -628,7 +628,7 @@ void *createwCreateWindow2 (
         window->height = height;  
 
         // Margens.
-        window->left = x;    
+        window->left = x; 
         window->top  = y;
         window->right  = (unsigned long) ( window->left + window->width );
         window->bottom = (unsigned long) ( window->top  + window->height ); 
@@ -1182,12 +1182,14 @@ void *createwCreateWindow2 (
             }
             
             if ( (void*) Parent != NULL ){
+
                 rectBackbufferDrawRectangle ( 
                     (Parent->left   + window->left +1), 
                     (Parent->top    + window->top +1), 
                     (window->width +1 +1), 
                     (window->height +1 +1), 
                     __tmp_color ); 
+                 
             }
 
         }
@@ -1271,6 +1273,7 @@ void *createwCreateWindow2 (
                 (window->width), 
                 (window->height), 
                 window->bg_color );
+                
         }
         //?? More ...
     }

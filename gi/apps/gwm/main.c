@@ -787,6 +787,8 @@ int create_taskbar_client(int fd)
 //interna
 int create_tester_client(int fd)
 {
+    struct gws_menu_d *menu;
+
     //
     // == Tester (Client) ==================================
     // 
@@ -836,6 +838,45 @@ int create_tester_client(int fd)
              WT_BUTTON,1,1,"X", //#bugbug: pagefault. the size of the string overflows the button size.
              (480-36-2), 2, 36, 28, //2, 2, 80, 28,
              tester_client->title_window, 0, COLOR_RED, COLOR_RED);
+             
+             
+             
+        //#testing (NEW)
+        menu = gws_create_menu (
+                (int) fd,
+                (int) tester_client->window,
+                (int) 0, //highlight
+                (int) 4,   //count
+                (unsigned long) 2, //x
+                (unsigned long) 2,
+                (unsigned long) 200,
+                (unsigned long) 200,
+                (unsigned long) COLOR_WHITE );
+
+          if( (void*) menu != NULL )
+          {
+               //menu item
+               gws_create_menu_item (
+                  (int) fd,
+                  (char *) "Item1",
+                  (int) 1,
+                  (struct gws_menu_d *) menu );
+
+               //menu item
+               gws_create_menu_item (
+                  (int) fd,
+                  (char *) "Item2",
+                  (int) 2,
+                  (struct gws_menu_d *) menu );
+
+               //menu item
+               gws_create_menu_item (
+                  (int) fd,
+                  (char *) "Item3",
+                  (int) 3,
+                  (struct gws_menu_d *) menu );
+
+           }
              
         wmclientList[2] = (unsigned long) tester_client;
     } 
