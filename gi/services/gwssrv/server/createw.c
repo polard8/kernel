@@ -396,6 +396,15 @@ void *createwCreateWindow2 (
     unsigned long border_color = COLOR_BORDER;
 	
     unsigned long __tmp_color;
+    
+
+    //test
+    unsigned long WindowX = x;
+    unsigned long WindowY = y; 
+    unsigned long WindowWidth  = width; 
+    unsigned long WindowHeight = height; 
+
+
 
 	//salvar para depois restaurar os valores originais no fim da rotina.
 	//unsigned long saveLeft;
@@ -624,21 +633,30 @@ void *createwCreateWindow2 (
 		// inclui as bordas e a barra de títulos.
 
         // Dimensões.
-        window->width  = width;
-        window->height = height;  
+        window->width  = WindowWidth;
+        window->height = WindowHeight;
 
+        // Deslocamento em relação a janela mãe.
+        window->x = WindowX;
+        window->y = WindowY;
+
+        //++
         // Margens.
-        window->left = x; 
-        window->top  = y;
+        // Deslocamento em relação a tela. (Screen)
+        if ( window->parent != NULL )
+        {
+            window->left = (window->parent->left + window->x); //x; 
+            window->top  = (window->parent->top  + window->y); //y;
+            
+        // No caso da primeira janela de todas.
+        }else{
+            window->left = window->x;
+            window->top  = window->y; 
+        };
         window->right  = (unsigned long) ( window->left + window->width );
         window->bottom = (unsigned long) ( window->top  + window->height ); 
+        //--
 
-		// Deslocamentos em relação às margens.
-		// Os deslocamentos servem para inserir elementos na janela, 
-		// como barras, botões e textos.
-
-        window->x = 0;
-        window->y = 0;
 
 		// ?? saving.
 		//saveLeft = window->left;
@@ -1268,8 +1286,8 @@ void *createwCreateWindow2 (
         
         if ( (void*) Parent != NULL ){
             rectBackbufferDrawRectangle ( 
-                (Parent->left   + window->left), 
-                (Parent->top    + window->top), 
+                window->left,//(Parent->left   + window->left), 
+                window->top, //(Parent->top    + window->top), 
                 (window->width), 
                 (window->height), 
                 window->bg_color );
@@ -1332,40 +1350,41 @@ void *createwCreateWindow2 (
         ( ( (unsigned long) window->width - ( (unsigned long) tmp_size * (unsigned long) gcharWidth) ) / 2 );
        
 
-        if ( (void*) Parent == NULL )
-        {
+        //#debug
+        if ( (void*) Parent == NULL ){
             gde_debug_print ("createwCreateWindow2: [WT_BUTTON] Parent NULL\n"); 
         }
-        
+
+
         if ( (void*) Parent != NULL )
         {
 
             //board1, borda de cima e esquerda.
             rectBackbufferDrawRectangle ( 
-                (Parent->left   + window->left), 
-                (Parent->top    + window->top), 
+                window->left,//(Parent->left   + window->left), 
+                window->top,//(Parent->top    + window->top), 
                 (window->width), 
                 1, 
                 border1 );
                 
             rectBackbufferDrawRectangle ( 
-                (Parent->left   + window->left), 
-                (Parent->top    + window->top), 
+                window->left, //(Parent->left   + window->left), 
+                window->top, //(Parent->top    + window->top), 
                 1, 
                 (window->height),
                  border1 );
 
              //board2, borda direita e baixo.
              rectBackbufferDrawRectangle ( 
-                 (Parent->left   + window->left) + (window->width) -1, 
-                 (Parent->top    + window->top), 
+                 (window->left) + (window->width) -1,//(Parent->left   + window->left) + (window->width) -1, 
+                 window->top,//(Parent->top    + window->top), 
                  1, 
                  (window->height), 
                  border2 );
                  
              rectBackbufferDrawRectangle ( 
-                 (Parent->left   + window->left), 
-                 (Parent->top    + window->top) + (window->height) -1, 
+                 window->left,//(Parent->left   + window->left), 
+                 (window->top) + (window->height) -1, //(Parent->top    + window->top) + (window->height) -1, 
                  (window->width), 
                  1, 
                  border2 );
@@ -1374,16 +1393,16 @@ void *createwCreateWindow2 (
             // Button label
             if (Selected == 1){
                 dtextDrawString ( 
-                    (Parent->left   + window->left) + offset,
-                    (Parent->top    + window->top)  +8, 
+                    (window->left) + offset, //(Parent->left   + window->left) + offset,
+                    (window->top)  +8, //(Parent->top    + window->top)  +8, 
                     COLOR_WHITE, windowname );
             }else{
                 // (largura do botão, menos a largura da string)/2
                 // #debug: Rotina provisória
                 //dtextDrawString ( x +20, y +20, COLOR_TERMINALTEXT, string );
                 dtextDrawString ( 
-                    (Parent->left   + window->left) +offset, 
-                    (Parent->top    + window->top)  +8, 
+                    (window->left) +offset, //(Parent->left   + window->left) +offset, 
+                    (window->top)  +8, //(Parent->top    + window->top)  +8, 
                     COLOR_TERMINALTEXT, windowname );
             };
         }
@@ -2334,9 +2353,7 @@ createwCreateWindow (
     {
         // Podemos usar o esquema padrão de cores ...
         __w = (void *) createwCreateWindow2 ( WT_SIMPLE, 
-                           status, 
-                           view, 
-                           (char *) windowname, 
+                           status, view, (char *) windowname, 
                            x, y, width, height, 
                            (struct gws_window_d *) pWindow, 
                            desktopid, clientcolor, color );      
@@ -2353,9 +2370,7 @@ createwCreateWindow (
         gde_debug_print ("[DEBUG]: createwCreateWindow WT_BUTTON\n");
         // Podemos usar o esquema padrão de cores ...
         __w = (void *) createwCreateWindow2 ( WT_BUTTON, 
-                           status, 
-                           view, 
-                           (char *) windowname, 
+                           status, view, (char *) windowname, 
                            x, y, width, height, 
                            (struct gws_window_d *) pWindow, 
                            desktopid, clientcolor, color ); 
@@ -2370,9 +2385,7 @@ createwCreateWindow (
     if ( type == WT_SIMPLE )
     {
         __w = (void *) createwCreateWindow2 ( type, 
-                       status, 
-                       view, 
-                       (char *) windowname, 
+                       status, view, (char *) windowname, 
                        x, y, width, height, 
                        (struct gws_window_d *) pWindow, 
                        desktopid, clientcolor, color );  

@@ -847,14 +847,21 @@ int create_tester_client(int fd)
                 (int) tester_client->window,
                 (int) 0, //highlight
                 (int) 4,   //count
-                (unsigned long) 2, //x
-                (unsigned long) 2,
+                (unsigned long) 1, //x
+                (unsigned long) 1,
                 (unsigned long) 200,
                 (unsigned long) 200,
                 (unsigned long) COLOR_WHITE );
 
           if( (void*) menu != NULL )
           {
+               //menu item
+               gws_create_menu_item (
+                  (int) fd,
+                  (char *) "Item0",
+                  (int) 0,
+                  (struct gws_menu_d *) menu );
+
                //menu item
                gws_create_menu_item (
                   (int) fd,

@@ -1480,10 +1480,12 @@ struct gws_menu_d *gws_create_menu (
     }
 
 
+    // Deslocamento em relação a janela mãe.
     menu->x = x;
     menu->y = y;
-    menu->width=width;
-    menu->height=height;
+
+    menu->width  = width;
+    menu->height = height;
     
     menu->color=color;
     
@@ -1494,7 +1496,10 @@ struct gws_menu_d *gws_create_menu (
 
     window = gws_create_window ( fd,
                  WT_SIMPLE,1,1,"Menu",
-                 x, y, width, height,
+                 menu->x,  //Deslocamento em relação a janela mãe. 
+                 menu->y,  //Deslocamento em relação a janela mãe. 
+                 width, 
+                 height,
                  parent, 0, color, color );
 
 
@@ -1543,9 +1548,10 @@ struct gws_menu_item_d *gws_create_menu_item (
 
     item->id = id;
 
-    item->width  = menu->width;
+
+    item->width  = (menu->width -8);
     item->height = (menu->height / menu->itens_count);
-    item->x = 2;
+    item->x = 4;
     item->y = (item->height*id);
     
 
@@ -1561,13 +1567,13 @@ struct gws_menu_item_d *gws_create_menu_item (
                      0, COLOR_GRAY, COLOR_GRAY );
                      
         //debug
-        gws_draw_char (
-            fd, 
-             menu->window, // #bugbug
-              0,
-              0,
-              COLOR_RED,
-              'x');
+        //gws_draw_char (
+            //fd, 
+             //menu->window, // #bugbug
+              //0,
+              //0,
+              //COLOR_RED,
+              //'x');
 
          item->window = window;
     }

@@ -25,14 +25,14 @@ int gws_show_window_rect (struct gws_window_d *window){
     struct gws_window_d *p;
 
     if ( (void *) window == NULL ){
-		debug_print ("show_window_rect: window\n");
-		return (int) 1;
+        debug_print ("show_window_rect: window\n");
+        return (int) 1;
 
-	} else {
-	
+    }else{
+
         if ( window->used == 1 || window->magic == 1234 )
         {
-			
+
 			//#shadow 
 			// ?? E se a janela tiver uma sombra, 
 			// então precisamos mostrar a sombra também. 
@@ -75,16 +75,13 @@ int gws_show_window_rect (struct gws_window_d *window){
                 //gde_debug_print("gws_show_window_rect: parent ok");
                 
                 gws_refresh_rectangle ( 
-                    (p->left + window->left), 
-                    (p->top  + window->top), 
+                    window->left, //(p->left + window->left), 
+                    window->top,  //(p->top  + window->top), 
                     window->width, 
                     window->height ); 
 
                 return 0;
             }
-
-                
-             
 
             return 0;
         }
