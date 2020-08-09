@@ -6,6 +6,16 @@
  *     It uses the libgws library.
  * 
  */
+ 
+ 
+
+// Hot spot for the mouse pointer or system menu.
+struct wm_hot_spot
+{
+    int x;
+    int y;
+};
+ 
 
 struct wm_client_d
 {
