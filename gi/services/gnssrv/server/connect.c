@@ -1,7 +1,8 @@
 // connect.c
 
-#include <api.h>
-//#include <gws.h>
+
+
+#include <gns.h>
 
 
 

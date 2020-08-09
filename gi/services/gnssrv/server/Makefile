@@ -58,7 +58,7 @@ GWS_INCLUDES  = include/
 	
 myObjects = crt0.o main.o stubs.o \
 ctype.o stdio.o stdlib.o string.o conio.o socket.o signal.o unistd.o \
-api.o connect.o \
+api.o connect.o decode.o \
 termios.o ioctl.o fcntl.o    
 
 
@@ -75,7 +75,9 @@ main.o:
 all-c:
 
 	gcc  -c  connect.c  -I $(LIBC) -I $(API02)  -I $(GWS_INCLUDES) -I . $(CFLAGS) -o connect.o
-	
+	gcc  -c  decode.c   -I $(LIBC) -I $(API02)  -I $(GWS_INCLUDES) -I . $(CFLAGS) -o decode.o
+
+
 # nothing for now.
 
 	# libc03

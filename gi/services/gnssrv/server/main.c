@@ -66,17 +66,10 @@ See: https://wiki.osdev.org/Graphics_stack
  */
 
 
-#include <sys/cdefs.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
 
-#include <packet.h>
 #include <gns.h>
 
-#include <api.h>
 
-#include <sys/socket.h>
 
 
 
@@ -105,8 +98,15 @@ int ____saved_server_fd = -1;
 unsigned long next_response[32];
 
 
-void gns_yield(void);
 
+
+//
+// == Prototypes =========================
+//
+
+
+void gns_yield(void);
+int serviceInitializeNetwork(void);
 
 
 
@@ -220,7 +220,7 @@ void __socket_messages (int fd){
 
     // Primeiros longs do buffer.
     message_buffer[0] = next_response[0];         //  Window ID.
-    message_buffer[1] = SERVER_PACKET_TYPE_REPLY; //next_response[1] 
+    message_buffer[1] = SERVER_PACKET_TYPE_REPLY; // next_response[1] 
     message_buffer[2] = next_response[2];         // Return value (long1)
     message_buffer[3] = next_response[3];         // Return value (long2)
 
@@ -370,6 +370,7 @@ gnsProcedure (
             break;
 
         case 1001:
+            serviceInitializeNetwork();
             break; 
             
             
@@ -601,6 +602,12 @@ void gns_yield(void)
     gramado_system_call (265,0,0,0); //yield thread.
 }
 
+
+int serviceInitializeNetwork(void)
+{
+    // Ring0 routine to initialize network infrastructure.
+    gramado_system_call (968,0,0,0);
+}
 
 
 

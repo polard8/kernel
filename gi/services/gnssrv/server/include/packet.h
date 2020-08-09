@@ -1,5 +1,10 @@
 
 
+#ifndef ____PACKET_H
+#define ____PACKET_H    1
+
+
+
  // Socket packets.
  // Usados na troca de mensgens via socket.
  
@@ -32,6 +37,7 @@
 #define SERVER_PACKET_TYPE_ERROR      1003
 
 
+#endif    
 
 
- 
+
