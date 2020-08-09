@@ -1,0 +1,16 @@
+Shell é uma aplicação do sistema. é um prompt de comandos
+no estilo unix.
+
+é uma aplicação em user mode 32bit.
+
+
+ /cmds
+
+  A pasta /cmds contém os programas principais que
+são chamados pelo shell quando executa comandos comuns.
+  Programas bem simples podem ser criado e ficarão nessa pasta.
+
+
+ls.bin
+format.bin
+//...

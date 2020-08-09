@@ -1,0 +1,5 @@
+
+
+    basic apps for the regular user:
+
+    text editor, paint, clock ...

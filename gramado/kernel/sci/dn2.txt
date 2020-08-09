@@ -1,0 +1,10 @@
+sci/sys
+As rotinas de implementação das sys call ficarão todas na mesma pasta.
+Usarei funções wrappers começadas com sys_
+---
+Esses wrappers chamarão rotinas que ficam em pastas que representam grupos:
+sysio/   - Para i/o.
+syslib/  - Para bibliotecas do kernel.
+sysmk/ - Para rotinas relativas à processos.
+syssm/ - Para gerenciamento do sistema.
+----

@@ -1,0 +1,5 @@
+
+  Design Note 1.
+
+      Essa é a libC para o Boot Loader.
+      @todo: Portar para Boot Loader mais funções da libC.
