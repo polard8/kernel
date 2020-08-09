@@ -1,7 +1,6 @@
 
 
 all:
-	make -C browser
 	make -C fileman
 	make -C gwm
 	make -C launch1

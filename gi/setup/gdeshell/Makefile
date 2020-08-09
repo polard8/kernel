@@ -38,10 +38,10 @@ CFLAGS = -m32 \
 
 
 # depois vamos mudar  alib de lugar.
-LIB     = ../../../lib/libc03/include/
-LIBOBJ  = ../../../lib/libc03/obj
-API     = ../../../lib/libcore/include/
-APIOBJ  = ../../../lib/libcore/obj
+LIB     = ../../lib/libc03/include/
+LIBOBJ  = ../../lib/libc03/obj
+API     = ../../lib/libcore/include/
+APIOBJ  = ../../lib/libcore/obj
 
 
 	##
@@ -107,15 +107,15 @@ all-c:
 
 
 shell-link:
-	ld -m elf_i386 -T link.ld -o GDESHELL.BIN $(myObjects)    
-	
+	ld -m elf_i386 -T ../link.ld -o GDESHELL.BIN $(myObjects)    
+
 	
 
 finalize:
-#	cp GDESHELL.BIN ../bin
+	cp GDESHELL.BIN ../bin
 
 clean:
 	-rm *.o
-#	-rm GDESHELL.BIN 
+	-rm GDESHELL.BIN 
 	
 	

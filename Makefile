@@ -111,12 +111,11 @@ build-system-files: /usr/local/gramado-build \
 build-boot \
 build-lib \
 build-init \
-build-gdeshell \
 build-setup \
 build-gnssrv \
 build-gwssrv \
-build-apps \
-build-cmd
+build-shell    
+
 
 
 /usr/local/gramado-build:
@@ -136,21 +135,16 @@ build-lib:
 
 	@echo "==================="
 	@echo "Compiling libs ..."
-	$(Q) $(MAKE) -C lib
+	$(Q) $(MAKE) -C gi/lib
 
 build-init:
 	@echo "==================="
 	@echo "Compiling init process ... [TODO]"
 	$(Q) $(MAKE) -C gi/init/
 
-build-gdeshell:
-	@echo "==================="
-	@echo " Compiling the gdeshell"
-	$(Q) $(MAKE) -C gi/setup/gdeshell/   
-
 build-setup:
 	@echo "==================="
-	@echo " Compiling the gdeshell"
+	@echo " Compiling Setup"
 	$(Q) $(MAKE) -C gi/setup/   
 
 build-gnssrv:
@@ -163,16 +157,12 @@ build-gwssrv:
 	@echo " Compiling the gwssrv"
 	$(Q) $(MAKE) -C gi/services/gwssrv   
 
-build-apps:
+build-shell:
 	@echo "==================="
-	@echo "Compiling apps ..."
-	$(Q) $(MAKE) -C gi/apps
-
-build-cmd:
-	@echo "==================="
-	@echo "Compiling cmd ..."
-	$(Q) $(MAKE) -C gi/cmd
-	
+	@echo "Compiling Shell ..."
+	$(Q) $(MAKE) -C gi/shell/apps
+	$(Q) $(MAKE) -C gi/shell/cmd
+	$(Q) $(MAKE) -C gi/shell/net
 
 
 
@@ -220,11 +210,12 @@ vhd-copy-files:
 
 	# 1) First of all
 	# bm, bl, kernel, init, gdeshell.
-	sudo cp gf/gramado/boot/x86/bin/BM.BIN    /mnt/gramadovhd
-	sudo cp gf/gramado/boot/x86/bin/BL.BIN    /mnt/gramadovhd
-	sudo cp gf/gramado/kernel/KERNEL.BIN      /mnt/gramadovhd
-	sudo cp gi/init/INIT.BIN                  /mnt/gramadovhd
-	sudo cp gi/setup/gdeshell/GDESHELL.BIN    /mnt/gramadovhd
+	sudo cp gf/gramado/boot/x86/bin/BM.BIN  /mnt/gramadovhd
+	sudo cp gf/gramado/boot/x86/bin/BL.BIN  /mnt/gramadovhd
+	sudo cp gf/gramado/kernel/KERNEL.BIN    /mnt/gramadovhd
+	sudo cp gi/init/INIT.BIN                /mnt/gramadovhd
+	sudo cp gi/setup/bin/GDESHELL.BIN       /mnt/gramadovhd
+
 
 	# 2) .INI
 	sudo cp gf/gramado/base/ini/GUI.INI     /mnt/gramadovhd
@@ -256,14 +247,13 @@ vhd-copy-files:
 	-sudo cp gi/services/gnssrv/bin/GNSSRV.BIN  /mnt/gramadovhd
 	-sudo cp gi/services/gnssrv/bin/GNS.BIN     /mnt/gramadovhd
 
-	# 7) Apps
-	-sudo cp gi/apps/bin/*.BIN    /mnt/gramadovhd
+	# 7) Shell
+	-sudo cp gi/shell/apps/bin/*.BIN  /mnt/gramadovhd
+	-sudo cp gi/shell/cmd/bin/*.BIN   /mnt/gramadovhd
+	-sudo cp gi/shell/net/bin/*.BIN   /mnt/gramadovhd
 
-	# 8) Cmd
-	-sudo cp gi/cmd/bin/*.BIN     /mnt/gramadovhd
 
-
-	# 9) Setup
+	# 8) Setup
 	-sudo cp gi/setup/bin/*.BIN               /mnt/gramadovhd 
 	# ...
 
@@ -351,11 +341,13 @@ clean:
 clean2:
 	-rm *.ISO
 	-rm *.VHD
-	
+
 clean3:
-	-rm gi/apps/bin/*.BIN
-	-rm gi/cmd/bin/*.BIN
-	
+	-rm gi/shell/apps/bin/*.BIN
+	-rm gi/shell/cmd/bin/*.BIN
+	-rm gi/shell/net/bin/*.BIN
+
+
 PHONY := clean-system-files
 clean-system-files:
 	@echo "==================="
@@ -369,7 +361,6 @@ clean-system-files:
 	-rm -rf gi/init/*.BIN
 
 	# Setup
-	-rm -rf gi/setup/gdeshell/*.BIN
 	-rm -rf gi/setup/bin/*.BIN
 	
 	# Services
@@ -377,10 +368,12 @@ clean-system-files:
 	-rm -rf gi/services/gwssrv/bin/*.BIN
 	# ...
 
-	# apps and cmd
-	-rm -rf gi/apps/bin/*.BIN
-	-rm -rf gi/cmd/bin/*.BIN
+	# Shell
+	-rm -rf gi/shell/apps/bin/*.BIN
+	-rm -rf gi/shell/cmd/bin/*.BIN
+	-rm -rf gi/shell/net/bin/*.BIN
 # ...
+
 
 clean-all: clean clean2 clean3 clean-system-files  
 

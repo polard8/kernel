@@ -38,10 +38,10 @@ CFLAGS = -m32 \
 	
 
 
-LIBC      = ../../../../lib/libc03/include/
-LIBCOBJ   = ../../../../lib/libc03/obj
-LIBGWS    = ../../../../lib/libgws/include/
-LIBGWSOBJ = ../../../../lib/libgws/obj
+LIBC      = ../../../lib/libc03/include/
+LIBCOBJ   = ../../../lib/libc03/obj
+LIBGWS    = ../../../lib/libgws/include/
+LIBGWSOBJ = ../../../lib/libgws/obj
 
 
 

@@ -1,7 +1,7 @@
 
 
 all:
-	# make -C gdeshell
+	make -C gdeshell
 	make -C gfe
 	make -C gramcode
 	make -C launcher
