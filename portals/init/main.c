@@ -69,24 +69,11 @@ int idleStatus;
 int idleError;
 //...
 
-//
-//  ## Status do servidor INIT ##
-//
-
-int ServerStatus;
-//...
 
 
-/*
-struct idle
-{
-	struct thread_d *current_idle_thread;
-	//int
-}
-*/
 
 //
-// Protótipos.
+// == Prototypes =============================================
 //
 
 
@@ -102,23 +89,22 @@ void enable_maskable_interrupts();
 //
 
 
-static inline void pause2 (void){
-	
-    asm volatile("pause" ::: "memory"); 
-}; 
+static inline void pause2 (void)
+{
+    asm volatile ("pause" ::: "memory"); 
+} 
 
 
 /* REP NOP (PAUSE) is a good thing to insert into busy-wait loops. */
-static inline void rep_nop (void){
-	
+static inline void rep_nop (void)
+{
     asm volatile ("rep;nop": : :"memory");
-};
+}
 
 
 #define cpu_relax()  rep_nop()
 
 
- 
 
 
 // interna
@@ -158,24 +144,25 @@ int main ( int argc, char *argv[] ){
     // Main loop
     //
 
+
     //++
     while (1){
 
-    debug_print ("---------------------------\n");    
-    debug_print ("init.bin: Initializing ...\n");
+    debug_print ("---------------------------\n"); 
+    debug_print ("init.bin: Initializing Portals ...\n");
 
     // Using api.
     gde_draw_text ( NULL, 
         0, 0, COLOR_YELLOW, _string );
 
-    gde_show_backbuffer ();
+    gde_show_backbuffer();
 
     // #debug
     // while(1){}
 
 
     //
-    // Habilita as interrupções mascaraveis.
+    // Habilita as interrupções mascaráveis.
     //
    
     
@@ -185,7 +172,6 @@ int main ( int argc, char *argv[] ){
     
     enable_maskable_interrupts ();
     //asm ("int $129 \n");
-    
 
     // #DEBUG
     // Olhando eflags.
@@ -194,7 +180,7 @@ int main ( int argc, char *argv[] ){
 
 
     //
-    // Runlevel
+    // == Runlevel ======================================
     // 
 
     // 0) Halt 

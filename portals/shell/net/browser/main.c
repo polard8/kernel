@@ -10,7 +10,8 @@
  *
  * 2020 - Created by Fred Nora.
  */
- 
+
+
 // Connecting via AF_INET.
 
 // tutorial example taken from. 
@@ -61,12 +62,12 @@ char __buffer[512];
 
 #define IP(a, b, c, d) (a << 24 | b << 16 | c << 8 | d)
 
+
 // tipos de pacotes.
 //#define SERVER_PACKET_TYPE_REQUEST    1000 
 //#define SERVER_PACKET_TYPE_REPLY      1001 
 //#define SERVER_PACKET_TYPE_EVENT      1002
 //#define SERVER_PACKET_TYPE_ERROR      1003
-
 
 
 // Hello!
@@ -75,10 +76,24 @@ int browser_hello_request(int fd);
 int browser_hello_response(int fd);
 
 
-//message support
-int browser_loop(int fd);
+int 
+browser_createwindow_request (
+    int fd,
+    unsigned long left,
+    unsigned long top,
+    unsigned long width,
+    unsigned long height,
+    unsigned long bg_color );
+int browser_createwindow_response(int fd);
+
+
+
+// message support
 int browser_getmessage_request(int fd);
 int browser_getmessage_response(int fd);
+int browser_loop(int fd);
+
+
 
 int browser_getmessage_request(int fd)
 {
@@ -131,7 +146,6 @@ int browser_getmessage_request(int fd)
         if(n_writes>0)
            break;
     }
-
 
     return 0; 
 }
@@ -331,10 +345,6 @@ response_loop:
             break; 
     };
 
-
-
-
-
 //
 // Process reply.
 //
@@ -367,31 +377,23 @@ process_event:
 }
 
 
-//loop
+
+
+/*
+ ************************* 
+ * browser_loop:
+ * 
+ */
+
 int browser_loop(int fd)
 {
 	//while(___running){
     while(1){
-    browser_getmessage_request(fd);
-    browser_getmessage_response(fd);
+        browser_getmessage_request(fd);
+        browser_getmessage_response(fd);
     }
     return 0; 
 }
-
-
-
-
-
-int 
-browser_createwindow_request (
-    int fd,
-    unsigned long left,
-    unsigned long top,
-    unsigned long width,
-    unsigned long height,
-    unsigned long bg_color );
-    
-int browser_createwindow_response(int fd);
 
 
 //...
@@ -411,16 +413,11 @@ browser_createwindow_request (
 
     int n_writes = 0;   // For sending requests.
 
-
-
     char *name = "Window name 1";
-
-   
 
     //
     // Send request.
     //
-
 
     // #debug
     gws_debug_print ("browser: Writing ...\n");      
@@ -566,10 +563,6 @@ response_loop:
             break; 
     };
 
-
-
-
-
 //
 // Process reply.
 //
@@ -652,7 +645,6 @@ int browser_hello_response(int fd){
     int y;
     for(y=0; y<15; y++)
         gws_yield();
-
 
 
     //
@@ -739,12 +731,14 @@ int browser_hello_request(int fd){
     unsigned long *message_buffer = (unsigned long *) &__buffer[0];   
 
     int n_writes = 0;   // For sending requests.
+    unsigned long ____color = 0x00FF00;
+
 
      //
      // Loop for new message.
      //
 
-    unsigned long ____color = 0x00FF00;
+
 
 // loop:
 new_message:
@@ -784,7 +778,12 @@ new_message:
 
 
 
-// Testing new main.
+/*
+ ********************************* 
+ * main: 
+ * 
+ */
+ 
 int main ( int argc, char *argv[] ){
 
     int client_fd = -1;
@@ -817,12 +816,11 @@ int main ( int argc, char *argv[] ){
     }
 
 
+    //
+    // connect
+    // 
 
     while(1){
-
-        //
-        // connect
-        // 
 
         //nessa hora colocamos no accept um fd.
         //então o servidor escreverá em nosso arquivo.
@@ -834,7 +832,7 @@ int main ( int argc, char *argv[] ){
         if (connect (client_fd, (void *) &addr_in, sizeof(addr_in)) < 0){ 
             
             debug_print("browser: Connection Failed \n"); 
-            printf("browser: Connection Failed \n"); 
+            printf     ("browser: Connection Failed \n"); 
             //return -1; 
         
         // try again
@@ -869,18 +867,22 @@ int main ( int argc, char *argv[] ){
 
     //#todo: salvar em global
     //por enquanto aqui
-    int main_window;
-    int client_window;
-    int toolbar_window;
+    int main_window=0;
+    int client_window=0;
+    int toolbar_window=0;
 
 
     // libgws
-  
+
+
     //main window
     main_window = gws_create_window (client_fd,
         WT_SIMPLE,1,1,"Browser",
         40, 40, 640, 480,
         0,0,COLOR_GRAY, COLOR_GRAY);
+
+    if ( main_window < 0 )             
+        debug_print("browser: main_window fail\n"); 
 
     // client window (White)
     client_window = gws_create_window (client_fd,
@@ -888,18 +890,25 @@ int main ( int argc, char *argv[] ){
         4, 40, 640-8, 480 - 40 - 4,
         main_window,0,COLOR_WHITE, COLOR_WHITE);
 
+    if ( main_window < 0 )             
+        debug_print("browser: client_window fail\n"); 
+
+
     //toolbar (gray)
     toolbar_window = gws_create_window (client_fd,
         WT_SIMPLE,1,1,"w2",
         4, 4, 640-80, 32,
         main_window,0,COLOR_PINK, COLOR_PINK);
 
+    if ( main_window < 0 )             
+        debug_print("browser: toolbar_window fail\n"); 
+
 
     //loop
     browser_loop(client_fd);
 
     debug_print ("browser: bye\n"); 
-    printf ("browser: bye\n");
+    printf      ("browser: bye\n");
 
 
     return 0;

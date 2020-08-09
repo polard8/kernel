@@ -182,11 +182,11 @@ vhd-copy-files:
 
 	# 1) First of all
 	# bm, bl, kernel, init, gdeshell.
-	sudo cp gramado/boot/x86/bin/BM.BIN  /mnt/gramadovhd
-	sudo cp gramado/boot/x86/bin/BL.BIN  /mnt/gramadovhd
-	sudo cp gramado/kernel/KERNEL.BIN    /mnt/gramadovhd
-	sudo cp portals/init/INIT.BIN                /mnt/gramadovhd
-	sudo cp portals/setup/bin/GDESHELL.BIN       /mnt/gramadovhd
+	sudo cp gramado/boot/x86/bin/BM.BIN     /mnt/gramadovhd
+	sudo cp gramado/boot/x86/bin/BL.BIN     /mnt/gramadovhd
+	sudo cp gramado/kernel/KERNEL.BIN       /mnt/gramadovhd
+	sudo cp portals/init/INIT.BIN           /mnt/gramadovhd
+	sudo cp portals/setup/bin/GDESHELL.BIN  /mnt/gramadovhd
 
 
 	# 2) .INI
@@ -213,20 +213,15 @@ vhd-copy-files:
 	sudo cp gramado/base/GRAMADO.TXT     /mnt/gramadovhd
 
 
-	# 6) Services
+	# 6) Portals (The system)
 	-sudo cp portals/services/gwssrv/bin/GWSSRV.BIN  /mnt/gramadovhd
 	-sudo cp portals/services/gwssrv/bin/GWS.BIN     /mnt/gramadovhd
 	-sudo cp portals/services/gnssrv/bin/GNSSRV.BIN  /mnt/gramadovhd
 	-sudo cp portals/services/gnssrv/bin/GNS.BIN     /mnt/gramadovhd
-
-	# 7) Shell
 	-sudo cp portals/shell/apps/bin/*.BIN  /mnt/gramadovhd
 	-sudo cp portals/shell/cmd/bin/*.BIN   /mnt/gramadovhd
 	-sudo cp portals/shell/net/bin/*.BIN   /mnt/gramadovhd
-
-
-	# 8) Setup
-	-sudo cp portals/setup/bin/*.BIN               /mnt/gramadovhd 
+	-sudo cp portals/setup/bin/*.BIN       /mnt/gramadovhd 
 	# ...
 
 
@@ -266,7 +261,6 @@ vhd-copy-files:
 # == "/BOOT" ====================================================
 #
 
-
 	sudo cp gramado/boot/x86/bin/BM.BIN    /mnt/gramadovhd/BOOT
 	sudo cp gramado/boot/x86/bin/BL.BIN    /mnt/gramadovhd/BOOT
 	sudo cp gramado/kernel/KERNEL.BIN      /mnt/gramadovhd/BOOT
@@ -301,6 +295,11 @@ vhd-copy-files:
 #
 # == "/PROGRAMS" ====================================================
 #
+	# The applications.
+	#-sudo cp portals/shell/apps/bin/*.BIN  /mnt/gramadovhd/PROGRAMS
+	#-sudo cp portals/shell/cmd/bin/*.BIN   /mnt/gramadovhd/PROGRAMS
+	#-sudo cp portals/shell/net/bin/*.BIN   /mnt/gramadovhd/PROGRAMS
+	#-sudo cp portals/setup/bin/*.BIN       /mnt/gramadovhd/PROGRAMS 
 
 
 #
@@ -318,6 +317,10 @@ vhd-copy-files:
 	sudo cp portals/init/INIT.BIN           /mnt/gramadovhd/PORTALS
 	sudo cp portals/setup/bin/GDESHELL.BIN  /mnt/gramadovhd/PORTALS
 
+	#-sudo cp portals/services/gwssrv/bin/GWSSRV.BIN  /mnt/gramadovhd/PORTALS
+	#-sudo cp portals/services/gwssrv/bin/GWS.BIN     /mnt/gramadovhd/PORTALS
+	#-sudo cp portals/services/gnssrv/bin/GNSSRV.BIN  /mnt/gramadovhd/PORTALS
+	#-sudo cp portals/services/gnssrv/bin/GNS.BIN     /mnt/gramadovhd/PORTALS
 
 
 
