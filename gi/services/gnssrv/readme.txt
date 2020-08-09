@@ -1,4 +1,0 @@
-	gns - gramado network server.
-
-
-     

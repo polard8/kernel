@@ -1,4 +1,4 @@
-# Gramado: unix-like operating system
+# Portals 1.0
 
 <p align=center>
   <a href="https://github.com/frednora/gramado">
@@ -22,10 +22,10 @@
 - [Gramado on Github](https://github.com/frednora/gramado)
 
 
-## What is Gramado?
+## What is Portals?
 
-    Gramado (c) is a 32 bit multithreaded operating system.
-
+    Portals (c) is a 32 bit multithreaded operating system.
+    Gramado (c) is the core system for Portals.
 
 ## Kernel features.
 

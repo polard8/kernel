@@ -1,1 +1,0 @@
-	gns server-side.

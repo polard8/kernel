@@ -1,7 +1,0 @@
-	hwi/ Hardware Interface
-
-	dd/   - Device drivers inside the base kernel.
-	hal/  - Hardware abstraction layer used by the drivers.
-	init/ - Low level assembly initialization.
-
-	pump.c - Pumping up and pumping down the the data.

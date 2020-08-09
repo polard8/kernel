@@ -1,3 +1,0 @@
-	A organização dos prefixos deve começar nessa pasta.
-
-      kernel.h é o header principal.

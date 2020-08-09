@@ -1,1 +1,0 @@
-todo: describe kernel initialization.

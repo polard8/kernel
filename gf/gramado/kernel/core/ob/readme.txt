@@ -1,4 +1,0 @@
-  
-
-
-    ob - object manager.
