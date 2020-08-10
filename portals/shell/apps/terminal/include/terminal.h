@@ -596,7 +596,7 @@ int textMaxWheelDelta;  //máximo que se pode rolar o texto
 // prototypes.
 //
 
-void terminal_write_char (int fd, int c);
+void terminal_write_char (int fd, int window, int c);
 
 void terminalInsertNextChar (char c);
 void terminalInsertNullTerminator ();
@@ -610,7 +610,7 @@ void del (void);
 
 //#test
 //void tputc (int fd,char *c, int len);
-void tputc (int fd, int c, int len);
+void tputc (int fd, int window, int c, int len);
 
 
 

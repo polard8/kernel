@@ -271,6 +271,7 @@ void test_standard_stream(int fd)
     //while(1);
     
 
+    /*
 
     int i=0;
     while(1){
@@ -291,13 +292,14 @@ void test_standard_stream(int fd)
                 
                 if( buffer[i] != 0){
                     //terminal_write_char(fd, buffer[i]);
-                    tputc ((int) fd, (int) buffer[i], (int) 1); //com tratamento de escape sequence.
+                    tputc ((int) fd, window, (int) buffer[i], (int) 1); //com tratamento de escape sequence.
                 }
             };
             printf("FIM2\n");
             return;
         }
     };
+    */
 }
 
 
@@ -316,7 +318,7 @@ test_child_message(void)
 
 //int prev;
 
-void terminal_write_char (int fd, int c)
+void terminal_write_char (int fd, int window, int c)
 {
 
     static char prev = 0;
@@ -370,16 +372,16 @@ void terminal_write_char (int fd, int c)
     
     
     //Testing libgws: OK
-    
+ 
     gws_draw_char (
         (int) fd,             // fd,
-        (int) 0,              // window id,
+        (int) window,              // window id,
         (unsigned long) x,    // left,
         (unsigned long) y,    // top,
         (unsigned long) COLOR_WHITE,
         (unsigned long) c );
-    
-        
+
+
     // Coloca no buffer de linhas e colunas.
     terminalInsertNextChar ( (char) c ); 
     
@@ -391,8 +393,8 @@ void terminal_write_char (int fd, int c)
         textCurrentRow++;    //próxima linha.
         textCurrentCol=0;    //começo da linha
     }
-    
 }
+
 
 
 /*
@@ -515,6 +517,7 @@ void del (void)
 void 
 tputc ( 
     int fd, 
+    int window,
     int c, 
     int len )
 {
@@ -566,7 +569,7 @@ tputc (
              // Isso vai exibir o caractere mas também
              // na colocar ele no buffer ba posição atual.
              default:
-                 terminal_write_char ( fd, (int) ascii); 
+                 terminal_write_char ( fd, window, (int) ascii); 
                  //printf ("%c",ascii);  //debug
                  return;
          };
@@ -587,7 +590,7 @@ tputc (
             case '\r':      /* CR */
             case '\f':      /* LF */
             case '\n':      /* LF */
-                terminal_write_char (fd, (int) ascii);
+                terminal_write_char (fd, window, (int) ascii);
                 //printf ("%c",ascii); //debug
                 return;
                 break;
@@ -598,7 +601,7 @@ tputc (
             case '\x1b':
                 term.esc = ESC_START;
                 __sequence_status = 1;
-                terminal_write_char ( fd, (int) '$');  //debug
+                terminal_write_char ( fd, window, (int) '$');  //debug
                 //printf (" {ESCAPE} ");  //debug
                 return;
                 break;
@@ -613,7 +616,7 @@ tputc (
             case '\032':    /* SUB */
             case '\030':    /* CAN */
                 //csireset ();
-                terminal_write_char ( fd, (int) '$'); //debug
+                terminal_write_char ( fd, window, (int) '$'); //debug
                 //printf (" {reset?} "); //debug
                 return;
                 break;
@@ -645,7 +648,7 @@ tputc (
                 case 'm':
                     term.esc = 0;
                     __sequence_status = 0;
-                    terminal_write_char (fd, (int) '$'); //debug
+                    terminal_write_char (fd, window, (int) '$'); //debug
                     //printf (" {m} "); //debug
                     return;
                     break;  
@@ -660,7 +663,7 @@ tputc (
                 // para analizarmos depois.
                 // Colocamos no tail e retiramos no head.
                 default:
-                    terminal_write_char ( fd, (int) '$'); //debug
+                    terminal_write_char ( fd, window, (int) '$'); //debug
                     //printf (" {.} "); //debug
                     CSI_BUFFER[__csi_buffer_tail] = ascii;
                     __csi_buffer_tail++;
@@ -700,7 +703,7 @@ tputc (
 
             case '[':
                 term.esc |= ESC_CSI;
-                terminal_write_char ( fd, (int) '$'); //debug
+                terminal_write_char ( fd, window, (int) '$'); //debug
                 //printf (" {CSI} "); //debug
                 return;
                 break; 
@@ -733,14 +736,14 @@ tputc (
             /* IND -- Linefeed */
             case 'D': 
                 term.esc = 0;
-                terminal_write_char ( fd,(int) '$');  //debug
+                terminal_write_char ( fd, window, (int) '$');  //debug
                 //printf (" {IND} ");  //debug
                 break;
 
             /* NEL -- Next line */ 
             case 'E': 
                 term.esc = 0;
-                terminal_write_char ( fd,(int) '$'); //debug
+                terminal_write_char ( fd, window, (int) '$'); //debug
                 //printf (" {NEL} "); //debug
                 break;
 
@@ -748,7 +751,7 @@ tputc (
             /* HTS -- Horizontal tab stop */
             case 'H':   
                 term.esc = 0;
-                terminal_write_char ( fd,(int) '$'); //debug
+                terminal_write_char ( fd, window, (int) '$'); //debug
                  //printf (" {HTS} "); //debug
                 break;
 
@@ -756,14 +759,14 @@ tputc (
             /* RI -- Reverse index */
             case 'M':     
                 term.esc = 0;
-                terminal_write_char ( fd,(int) '$'); //debug
+                terminal_write_char ( fd, window, (int) '$'); //debug
                 //printf (" {RI} "); //debug
                 break;
 
             /* DECID -- Identify Terminal */
             case 'Z':  
                  term.esc = 0;
-                 terminal_write_char (fd, (int) '$'); //debug
+                 terminal_write_char (fd, window, (int) '$'); //debug
                  //printf (" {DECID} "); //debug
                  break;
 
@@ -771,21 +774,21 @@ tputc (
             /* RIS -- Reset to inital state */
             case 'c': 
                  term.esc = 0;
-                 terminal_write_char ( fd,(int) '$'); //debug
+                 terminal_write_char ( fd, window, (int) '$'); //debug
                  //printf (" {reset?} "); //debug
                  break; 
 
             /* DECPAM -- Application keypad */
             case '=': 
                  term.esc = 0;
-                 terminal_write_char ( fd,(int) '$'); //debug
+                 terminal_write_char ( fd, window, (int) '$'); //debug
                  //printf (" {=} "); //debug
                  break;
 
             /* DECPNM -- Normal keypad */
             case '>': 
                 term.esc = 0;
-                terminal_write_char (fd, (int) '$'); //debug
+                terminal_write_char (fd, window, (int) '$'); //debug
                 //printf (" {>} "); //debug
                 break;
 
@@ -1085,10 +1088,11 @@ response_loop:
     // Se retornou -1 é porque algo está errado com o arquivo.
     if (n_reads < 0){
         gws_debug_print ("terminal: recv fail.\n");
-        printf ("terminal: recv fail.\n");
+        printf          ("terminal: recv fail.\n");
         printf ("Something is wrong with the socket.\n");
         exit (1);
     }
+
 
     //
     // The msg index.
@@ -1102,6 +1106,7 @@ response_loop:
     unsigned long MsgLong2  = (unsigned long) message_buffer[3];
 
 
+    int window = MsgWindow;
 
     //#debug
     //if(msg!=0)
@@ -1158,8 +1163,8 @@ response_loop:
                 // the command line in the shared memory.
                 case VK_RETURN:
                     //goto process_event;
-                    tputc ((int) fd, (int) '\r', (int) 1);
-                    tputc ((int) fd, (int) '\n', (int) 1);
+                    tputc ((int) fd, Terminal.window_id, (int) '\r', (int) 1);
+                    tputc ((int) fd, Terminal.window_id, (int) '\n', (int) 1);
                     input('\n');
                     input('\0');
                     
@@ -1182,7 +1187,7 @@ response_loop:
                     // Draw the char in the Terminal's client window.
                     // Building the escape sequence.
                     // fd, ch, bufsize
-                    tputc((int) fd, (int) MsgLong1, (int) 1);
+                    tputc((int) fd, Terminal.window_id, (int) MsgLong1, (int) 1);
                     
                     goto process_event;
                     break;
@@ -1415,6 +1420,7 @@ int terminal_loop(int fd)
 }
 
 
+/*
 int 
 terminal_createwindow_request (
     int fd,
@@ -1423,11 +1429,12 @@ terminal_createwindow_request (
     unsigned long width,
     unsigned long height,
     unsigned long bg_color );
-    
 int terminal_createwindow_response(int fd);
+*/
 
 
 
+/*
 int 
 terminal_drawchar_request (
     int fd,
@@ -1436,8 +1443,8 @@ terminal_drawchar_request (
     unsigned long top,
     unsigned long color,
     unsigned long c );
-    
 int terminal_drawchar_response(int fd);
+*/
 
 //...
 
@@ -1447,6 +1454,7 @@ int terminal_drawchar_response(int fd);
 // =====================================================
 //
 
+/*
 int 
 terminal_createwindow_request (
     int fd,
@@ -1520,7 +1528,10 @@ terminal_createwindow_request (
 
     return 0; 
 }
+*/
 
+
+/*
 //response
 //#todo: the response needs to be unsigned long or void *.
 int terminal_createwindow_response(int fd)
@@ -1627,10 +1638,6 @@ response_loop:
             break; 
     };
 
-
-
-
-
 //
 // Process reply.
 //
@@ -1663,9 +1670,11 @@ process_event:
     return 0;
 
 }
+*/
 
 
 
+/*
 int 
 terminal_drawchar_request (
     int fd,
@@ -1681,10 +1690,7 @@ terminal_drawchar_request (
     int n_writes = 0;   // For sending requests.
 
 
-
     //char *name = "Window name 1";
-
-   
 
     //
     // Send request.
@@ -1726,12 +1732,12 @@ terminal_drawchar_request (
            break;
     }
 
-
     return 0; 
 }
+*/
 
 
-
+/*
 //response
 int terminal_drawchar_response(int fd)
 {
@@ -1837,10 +1843,6 @@ response_loop:
             break; 
     };
 
-
-
-
-
 //
 // Process reply.
 //
@@ -1872,6 +1874,8 @@ process_event:
     gws_debug_print ("terminal: We got an event\n"); 
     return 0;
 }
+*/
+
 
 
 
@@ -2063,7 +2067,7 @@ int __terminal_clone_and_execute ( char *name )
 void _draw(int fd, int c)
 {
 
-   unsigned long x;
+   //unsigned long x;
    //x=0x65666768; //last
    
 
@@ -2071,14 +2075,26 @@ void _draw(int fd, int c)
     //fflush(stdout);
     //return;
    
-
+   
+                  /*
                     terminal_drawchar_request (
                         (int) fd,//fd,
                         (int) 0, //__response_wid, //window_id,
                         (unsigned long) __tmp_x,//left,
                         (unsigned long) __tmp_y,//top,
                         (unsigned long) COLOR_RED,
-                        (unsigned long) x );  
+                        (unsigned long) x ); 
+                        */
+                    
+                  gws_draw_char (
+                      (int) fd,             // fd,
+                      (int) 0,              // window id,
+                      (unsigned long) __tmp_x,    // left,
+                      (unsigned long) __tmp_y,    // top,
+                      (unsigned long) COLOR_WHITE,
+                      (unsigned long) c );
+      
+                    
                         
                  __tmp_x = __tmp_x + 8;
                  
@@ -2088,7 +2104,7 @@ void _draw(int fd, int c)
                  //    __tmp_x = 0;
                  //}
                  
-                terminal_drawchar_response((int) fd);
+                //terminal_drawchar_response((int) fd);
 }
 
 
@@ -2147,11 +2163,11 @@ int main ( int argc, char *argv[] ){
     //...
 
 
-    while (1){
+    //
+    // connect
+    // 
 
-        //
-        // connect
-        // 
+    while (1){
 
         //nessa hora colocamos no accept um fd.
         //então o servidor escreverá em nosso arquivo.
@@ -2227,6 +2243,9 @@ int main ( int argc, char *argv[] ){
                           
     // Saving the window id.
     Terminal.window_id = __response_wid;
+    
+    if (Terminal.window_id<0)
+        gws_debug_print ("terminal: [FAIL] main window fail\n");
  
 
     //
@@ -2280,7 +2299,7 @@ int main ( int argc, char *argv[] ){
     terminal_loop(client_fd);
     
     debug_print ("terminal: bye\n"); 
-    printf ("terminal: bye\n");
+    printf      ("terminal: bye\n");
     return 0;
 }
 
