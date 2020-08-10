@@ -171,7 +171,6 @@ gde_extra_services (
 
     // deprecated
     if (number == 268){ return NULL; }
-
     // deprecated
     if (number == 269){ return NULL; }
 
@@ -727,26 +726,23 @@ gde_extra_services (
 	// See: See: ps/action/clone.c
 
     // IN: name, dir address.
-    if ( number == 900 ){ 
+    if ( number == 900 ){
+
         return (void *) clone_and_execute_process( 
-                            (char *) arg2, 
-                            VOLUME1_ROOTDIR_ADDRESS );
+                            (char *) arg2 );
     }
 
 
     // 901
     // Trying another fork() implementation. 
     // Nothing for now.
-    if ( number == 901 ){
-        return NULL;
-    }
+    if ( number == 901 ){ return NULL; }
     
     // get screen window.
     // #todo. checar validade
     if ( number == 955 ){
         return (void *) gui->screen;
     }    
-
 
     if ( number == 956 ){
         return (void *) gui->background;
@@ -799,50 +795,43 @@ gde_extra_services (
 
 
     // Deprecated!
-    if ( number == 1000 )
-    {
+    if ( number == 1000 ){
         debug_print ("gde_serv.c: [1000] Deprecated\n");
         return NULL;
     }
 
     // Deprecated!
-    if ( number == 1002 )
-    {
+    if ( number == 1002 ){
         debug_print ("gde_serv.c: [1002] Deprecated\n");
         return NULL;
     }
 
     // Deprecated!
-    if ( number == 1003 )
-    {
+    if ( number == 1003 ){
         debug_print ("gde_serv.c: [1003] Deprecated\n");
         return NULL;
     }
 
     // Deprecated!
-    if ( number == 1004 )
-    {
+    if ( number == 1004 ){
         debug_print ("gde_serv.c: [1004] Deprecated\n");
         return NULL;
     }
 
     // Deprecated!
-    if ( number == 1005 )
-    {
+    if ( number == 1005 ){
         debug_print ("gde_serv.c: [1005] Deprecated\n");
         return NULL;
     }
 
     // Deprecated!
-    if ( number == 1006 )
-    {
+    if ( number == 1006 ){
         debug_print ("gde_serv.c: [1006] Deprecated\n");
         return NULL;
     }
 
     // Deprecated!
-    if (number == 1008)
-    {
+    if (number == 1008){
         debug_print ("gde_serv.c: [1008] Deprecated\n");
         return NULL;
     }
@@ -926,7 +915,6 @@ gde_extra_services (
     // connect()
     // fd, sockaddr struct pointer, addr len.
     if ( number == 7001 ){
-
         return (void *) sys_connect ( (int) arg2, 
                             (const struct sockaddr *) arg3,
                             (socklen_t) arg4 );
@@ -937,7 +925,6 @@ gde_extra_services (
     // accept()
     // fd, sockaddr struct pointer, addr len pointer.
     if ( number == 7002 ){
-    
         return (void *) sys_accept ( (int) arg2, 
                             (struct sockaddr *) arg3, 
                             (socklen_t *) arg4 ); 
@@ -946,7 +933,6 @@ gde_extra_services (
     // bind()
     // fd, sockaddr struct pointer, addr len.
     if ( number == 7003 ){
-
         return (void *) sys_bind ( (int) arg2, 
                             (const struct sockaddr *) arg3,
                             (socklen_t) arg4 );
@@ -977,7 +963,6 @@ gde_extra_services (
     // sys_getsockname()
     // fd, sockaddr struct pointer, addr len.
     if ( number == 7007 ){
-
         return (void *) sys_getsockname ( (int) arg2, 
                             (struct sockaddr *) arg3,
                             (socklen_t *) arg4 );
@@ -1001,8 +986,7 @@ gde_extra_services (
     // IN: fd, request, arg
     // See: sci/sys/sys.c    
     
-    if ( number == 8000 )
-    {
+    if ( number == 8000 ){
         return (void *) sys_ioctl ( (int) arg2, 
                             (unsigned long) arg3, 
                             (unsigned long) arg4 );
@@ -1010,8 +994,7 @@ gde_extra_services (
 
     // fcntl()
     // See: sci/sys/sys.c    
-    if ( number == 8001 )
-    {
+    if ( number == 8001 ){
         return (void *) sys_fcntl ((int) arg2, 
                             (int) arg3, 
                             (unsigned long) arg4 );
@@ -1082,6 +1065,7 @@ gde_extra_services (
     if ( number == 9999 ){
         return (void *) system_get_pid ( (int) arg2 );
     }
+
 
 //fail
     return NULL;  

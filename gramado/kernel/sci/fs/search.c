@@ -14,6 +14,14 @@
 #include <kernel.h>
 
 
+
+
+int search_in_root ( char *filename )
+{
+    return (int) KiSearchFile ( filename, VOLUME1_ROOTDIR_ADDRESS );
+}
+
+
 /*
  **********************************************************************
  * KiSearchFile:

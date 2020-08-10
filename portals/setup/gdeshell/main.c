@@ -3095,7 +3095,13 @@ do_compare:
     //fail.
     int Execve_Ret = 1;
 
-doexec_first_command:
+    // #todo: 
+    // Colocar isso no início dessa função.
+    unsigned long buffer[5];
+    int z=0;
+
+
+//doexec_first_command:
 
     //
     // ## TEST ##
@@ -3119,6 +3125,7 @@ doexec_first_command:
     // #bugbug
     // It is wrong!
 
+    /*
     absolute = absolute_pathname ( (char *) tokenList[0] );
 
     switch (absolute)
@@ -3140,9 +3147,12 @@ doexec_first_command:
 		    printf("doexec_first_command: pathname fail\n");
 			break;
     }; 
+    */
+
 
     // Trata no caso de ser absoluto.
     // + Eliminar ./ pois se trata de arquivo no diret�rio atual.
+    /*
     if (absolute == 1)
     {
         // #bugbug: 
@@ -3158,6 +3168,7 @@ doexec_first_command:
             }
         }
     }
+    */
 
 
 
@@ -3194,14 +3205,6 @@ doexec_first_command:
 		p++;
 	}
 	*/
-
-
-
-
-    // #todo: 
-    // Colocar isso no início dessa função.
-    unsigned long buffer[5];
-    int z=0;
 
 
 

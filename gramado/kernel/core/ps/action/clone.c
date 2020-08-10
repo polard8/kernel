@@ -531,8 +531,7 @@ fail:
 
 pid_t 
 clone_and_execute_process (
-    char *filename, 
-    unsigned long dir_address )
+    char *filename )
 {
 
     struct process_d *Current;
@@ -546,7 +545,11 @@ clone_and_execute_process (
 
     int Status = -1;
     int __Status = -1;
+    
+    unsigned long dir_address = 0;
 
+
+   
 
     // # sobre debug:
     // Essa rotina está falhando na máquina real às vezes.
@@ -558,21 +561,111 @@ clone_and_execute_process (
     printf      ("clone_and_execute_process:\n");
 
 
+    char *path;
+    char *name;
+    
+    path = filename;
+    name = filename;
+
+
+    // from cwd?
+    if (path[0] == '.' && path[1] == '/')
+    {
+        debug_print ("clone_and_execute_process: [FIXME] Can't execute from cwd \n");
+        printf      ("clone_and_execute_process: [FIXME] Can't execute from cwd \n");
+        goto fail;
+    }
+
+    // Principais diretórios para execução de programas.
+    // no disco do sistema.
+    // Os dois pontos significa que o pathname é simplificado.
+    // e contém quatro caracteres que selecionam um 
+    // dos subdiretórios do diretório raiz, que podem muito bem
+    // terem seus endereços na memória pre-definidos para facilitar.
+    
+    // ::r/ = "/"
+    // ::b/ = "/BIN/"
+    // ::s/ = "/SBIN/"
+    // ::./ = "cwd"
+
+
+    // execute from root.
+    if (path[0] == ':' &&
+        path[1] == ':' &&
+        path[2] == 'r' &&
+        path[3] == '/' )
+    {
+        //#bugbug: Nesse momento podemos ter vários níveis de diretórios.
+        debug_print ("clone_and_execute_process: [FIXME] Pathname starts from root.\n");
+        path++;
+        path++; 
+        path++; 
+        path++;
+        name=path;
+        dir_address = VOLUME1_ROOTDIR_ADDRESS;
+    }
+
+
+    // execute from /BIN/.
+    if (path[0] == ':' &&
+        path[1] == ':' &&
+        path[2] == 'b' &&
+        path[3] == '/' )
+    {
+        //#bugbug: Nesse momento podemos ter vários níveis de diretórios.
+        debug_print ("clone_and_execute_process: [FIXME] Pathname starts from /BIN/.\n");
+        goto fail;
+        //path++; 
+        //path++; 
+        //path++; 
+        //path++;
+        //name=path;
+        //dir_address = VOLUME1_ROOTDIR_ADDRESS;
+    }
+
+    // execute from /SBIN/.
+    if (path[0] == ':' &&
+        path[1] == ':' &&
+        path[2] == 's' &&
+        path[3] == '/' )
+    {
+        //#bugbug: Nesse momento podemos ter vários níveis de diretórios.
+        debug_print ("clone_and_execute_process: [FIXME] Pathname starts from /SBIN/\n");
+        goto fail;
+        //path++; 
+        //path++; 
+        //path++; 
+        //path++;
+        //name=path;
+        //dir_address = VOLUME1_ROOTDIR_ADDRESS;
+    }
+
+
+
     // Convertendo o formato do nome do arquivo.
     // >>> "12345678XYZ"
 
-    read_fntos ( (char *) filename );
+    //read_fntos ( (char *) filename );
+    read_fntos ( (char *) name );
 
 
-    // Searching for the file only on the root dir.
+    // Search in root dir. ("/")
+    dir_address = VOLUME1_ROOTDIR_ADDRESS;
 
     //__Status = (int) KiSearchFile ( filename, VOLUME1_ROOTDIR_ADDRESS );
-    __Status = (int) KiSearchFile ( filename, dir_address );
+    //__Status = (int) KiSearchFile ( filename, dir_address );
+    __Status = (int) KiSearchFile ( name, dir_address );
 
-    if (__Status != 1){
+    if (__Status != 1)
+    {
          debug_print ("clone_and_execute_process: File not found!\n");
          printf      ("clone_and_execute_process: File not found!\n");
          goto fail;
+         
+         //("/BIN/")
+         //dir_address = VOLUME1_BIN_ADDRESS;
+         //__Status = (int) KiSearchFile ( filename, dir_address );
+         //if (__Status != 1){ goto fail; }
     }
 
 
@@ -706,10 +799,16 @@ do_clone:
         //                   filename, 
         //                   (unsigned long) Clone->Image );
 
+        //Status = (int) fsLoadFile ( 
+        //                   VOLUME1_FAT_ADDRESS, 
+        //                   dir_address, 
+        //                   filename, 
+        //                   (unsigned long) Clone->Image );
+
         Status = (int) fsLoadFile ( 
                            VOLUME1_FAT_ADDRESS, 
                            dir_address, 
-                           filename, 
+                           name, 
                            (unsigned long) Clone->Image );
                            
        // Se falhou o carregamento. Vamos matar a thread e o processo.

@@ -76,13 +76,12 @@
 #define CACHE_SAVED        1
 #define CACHE_NOT_SAVED    0
 
-
 #define CACHE_LOADED        1
 #define CACHE_NOT_LOADED    0
 
 
 //
-//    ====    Variables    ====
+//  == Variables =================================
 //
 
 
@@ -91,20 +90,53 @@ int fat_cache_saved;
 int fat_cache_loaded;
 
 
-
 // gcc -Wall Defined but not used!
 static char *____root_name = "/";
-
 
 
 //
 // pwd
 //
 
-// a stringo do diretório de trabalho.
-char current_workingdiretory_string[WORKINGDIRECTORY_STRING_MAX];
 
+// A string do diretório de trabalho.
+char current_workingdiretory_string[WORKINGDIRECTORY_STRING_MAX];
 int pwd_initialized;
+
+
+//
+// == Search path ================================
+//
+
+// See:
+// https://en.wikipedia.org/wiki/PATH_(variable)
+// ...
+
+// #importante
+// + Quando uma função para eecutar uma programa é chamada
+// o kernel deve tomar suas decisões sobre qual diretório
+// procurar. Não é seguro obedecer o search path indicado pelo
+// processo que chamou a função.
+// Então o kernel pode começar procurando em /BIN/ e /USER/BIN/.
+// O kernel só vai procurar no cwd se o pathname desejado começar
+// explicitamente com "./". 
+
+
+// Multics originated the idea of a search path. 
+// The early Unix shell only looked for program names in /bin, 
+// but by Version 3 Unix the directory was too large and /usr/bin, 
+// and a search path, became part of the operating system.
+
+
+//char search_path[?];
+unsigned long search_path_dir_address;
+unsigned long search_path_dir_entries;
+
+
+
+
+
+
 
 
 // ?? - Contagem de diretórios.
@@ -119,7 +151,7 @@ unsigned short file_cluster_list[1024];
 
 
 //
-//    ====    Structures    ====
+// == Structures ====================================
 //
 
 
@@ -591,9 +623,11 @@ fsSaveFile (
     char flag );
 
 
+
 int fsSearchFile( unsigned char *file_name);
 int fsSearchFileName( unsigned char *name);
 
+int search_in_root ( char *filename );
 int KiSearchFile( unsigned char *file_name, unsigned long address);
 
 

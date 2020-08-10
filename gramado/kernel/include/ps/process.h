@@ -756,15 +756,23 @@ struct process_d
 
 	//ponteiros para as streams do fluxo padr�o.
 	unsigned long standard_streams[3];
-	
-	struct _iobuf *root;	// 4 root directory
-	struct _iobuf *pwd;	    // 5 (print working directory) 
+
+
+    struct _iobuf  *root;    // 4 root directory
+    struct _iobuf  *pwd;     // 5 (print working directory) 
 	//...
 
+	// #todo: 
+	// Esse tamanho deve ser igual ao encontrado no m�dulo /fs.
+	char pwd_string[32];
 
-	//#todo: esse tamanho deve ser igual ao encontrado no m�dulo /fs.	
-	char pwd_string[32];	
-	
+    // The search paths for a process.
+    // It's a list of pointer to strings.
+    // Each string has a path for a different directory.
+
+    //char **search_paths;
+
+
 	// @todo:
 	// Outros:
 	//tempo de cpu.

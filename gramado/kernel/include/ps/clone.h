@@ -3,8 +3,7 @@
 // Clona e executa o filho dado o nome do filho.
 pid_t 
 clone_and_execute_process (
-    char *filename, 
-    unsigned long dir_address );
+    char *filename );
 
 pid_t sys_fork_process (void);
 
