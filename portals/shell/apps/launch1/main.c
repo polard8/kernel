@@ -76,7 +76,7 @@ int browser_hello_response(int fd);
 
 
 //message support
-int browser_loop(int fd);
+int _loop(int fd);
 int browser_getmessage_request(int fd);
 int browser_getmessage_response(int fd);
 
@@ -368,12 +368,12 @@ process_event:
 
 
 //loop
-int browser_loop(int fd)
+int _loop(int fd)
 {
 	//while(___running){
     while(1){
-    browser_getmessage_request(fd);
-    browser_getmessage_response(fd);
+        browser_getmessage_request(fd);
+        browser_getmessage_response(fd);
     }
     return 0; 
 }
@@ -382,6 +382,7 @@ int browser_loop(int fd)
 
 
 
+/*
 int 
 browser_createwindow_request (
     int fd,
@@ -390,13 +391,12 @@ browser_createwindow_request (
     unsigned long width,
     unsigned long height,
     unsigned long bg_color );
-    
 int browser_createwindow_response(int fd);
-
+*/
 
 //...
 
-
+/*
 int 
 browser_createwindow_request (
     int fd,
@@ -414,8 +414,6 @@ browser_createwindow_request (
 
 
     char *name = "Window name 1";
-
-   
 
     //
     // Send request.
@@ -460,7 +458,9 @@ browser_createwindow_request (
 
     return 0; 
 }
+*/
 
+/*
 //response
 int browser_createwindow_response(int fd)
 {
@@ -566,10 +566,6 @@ response_loop:
             break; 
     };
 
-
-
-
-
 //
 // Process reply.
 //
@@ -601,7 +597,7 @@ process_event:
     return 0;
 
 }
-
+*/
 
 
 
@@ -797,14 +793,14 @@ int main ( int argc, char *argv[] ){
 
 
     debug_print ("---------------------------\n");    
-    debug_print ("browser: Initializing ...\n");
+    debug_print ("launch1: Initializing ...\n");
 
      //
     // socket
     // 
 
     // #debug
-    printf ("browser: Creating socket\n");
+    printf ("launch1: Creating socket\n");
 
     // cria o soquete.
     // AF_GRAMADO
@@ -812,29 +808,31 @@ int main ( int argc, char *argv[] ){
     client_fd = socket ( AF_INET, SOCK_STREAM, 0 );
     
     if ( client_fd < 0 ){
-       printf ("browser: Couldn't create socket\n");
+       printf ("launch1: Couldn't create socket\n");
        exit(1);
     }
 
 
 
-    while(1){
 
         //
         // connect
         // 
+
+    while(1){
+
 
         //nessa hora colocamos no accept um fd.
         //então o servidor escreverá em nosso arquivo.
     
         // #debug
         //printf ("gnst: Connecting to the address 'ws' ...\n");      
-        printf ("browser: Connecting to the address via inet  ...\n");    
+        printf ("launch1: Connecting to the address via inet  ...\n");    
       
         if (connect (client_fd, (void *) &addr_in, sizeof(addr_in)) < 0){ 
             
-            debug_print("browser: Connection Failed \n"); 
-            printf("browser: Connection Failed \n"); 
+            debug_print ("launch1: Connection Failed \n"); 
+            printf      ("launch1: Connection Failed \n"); 
             //return -1; 
         
         // try again
@@ -881,32 +879,34 @@ int main ( int argc, char *argv[] ){
         WT_SIMPLE,1,1,"Launch1",
         40, 40, 120, 480,
         0,0,COLOR_GRAY, COLOR_GRAY);
+        
+    if (main_window >0 && main_window < 1024){ 
 
-    // button
-    button1_window = gws_create_window (client_fd,
-        WT_BUTTON,1,1,"button1",
-        4, 100, 100, 32,
-        main_window,0,COLOR_RED, COLOR_RED);
+        // button
+        button1_window = gws_create_window (client_fd,
+            WT_BUTTON,1,1,"button1",
+            4, 100, 100, 32,
+            main_window,0,COLOR_GRAY, COLOR_GRAY);
 
-    // button
-    button1_window = gws_create_window (client_fd,
-        WT_BUTTON,1,1,"button2",
-        4, 150, 100, 32,
-        main_window,0,COLOR_RED, COLOR_RED);
+       // button
+        button1_window = gws_create_window (client_fd,
+            WT_BUTTON,1,1,"button2",
+            4, 150, 100, 32,
+            main_window,0,COLOR_GRAY, COLOR_GRAY);
 
-    // button
-    button1_window = gws_create_window (client_fd,
-        WT_BUTTON,1,1,"button3",
-        4, 200, 100, 32,
-        main_window,0,COLOR_RED, COLOR_RED);
-
+        // button
+        button1_window = gws_create_window (client_fd,
+            WT_BUTTON,1,1,"button3",
+            4, 200, 100, 32,
+            main_window,0,COLOR_GRAY, COLOR_GRAY);
+    }
 
 
     //loop
-    browser_loop(client_fd);
+    _loop(client_fd);
 
-    debug_print ("browser: bye\n"); 
-    printf ("browser: bye\n");
+    debug_print ("launch1: bye\n"); 
+    printf      ("launch1: bye\n");
 
 
     return 0;

@@ -658,11 +658,12 @@ int main ( int argc, char *argv[] ){
     }
 
 
-    while(1){
-
         //
         // connect
         // 
+
+    while(1){
+
 
         //nessa hora colocamos no accept um fd.
         //então o servidor escreverá em nosso arquivo.
@@ -702,13 +703,12 @@ int main ( int argc, char *argv[] ){
 
 
    
-    //
-    // Topbar
-    //
 
 
     // libgws
     // Create window using the client-side gui.
+
+    // main window.
     gws_create_window_using_socket (client_fd,
         WT_SIMPLE,1,1,"File Manager",
         40, 40, 640, 320,
