@@ -522,16 +522,24 @@ fail:
 // ( * N�o * ) mexa pois ainda estamos
 // trabalahndo os outros m�todos.
 
+// It loads a file of a given directory address.
+// #todo: We need some info about this directory,
+// We need to use the dir entry structure as the argument.
+
 // IN: ??
 // OUT: ??
 
-pid_t clone_and_execute_process (char *filename){
+pid_t 
+clone_and_execute_process (
+    char *filename, 
+    unsigned long dir_address )
+{
 
     struct process_d *Current;
     struct process_d *Clone;
 
     unsigned long *dir;
-    unsigned long old_dir_entry1;
+    unsigned long old_dir_entry1=0;
 
     int PID = -1;
     int Ret = -1;
@@ -558,7 +566,8 @@ pid_t clone_and_execute_process (char *filename){
 
     // Searching for the file only on the root dir.
 
-    __Status = (int) KiSearchFile ( filename, VOLUME1_ROOTDIR_ADDRESS );
+    //__Status = (int) KiSearchFile ( filename, VOLUME1_ROOTDIR_ADDRESS );
+    __Status = (int) KiSearchFile ( filename, dir_address );
 
     if (__Status != 1){
          debug_print ("clone_and_execute_process: File not found!\n");
@@ -663,8 +672,8 @@ do_clone:
         // See: process.c
 
         processCopyMemory(Current);
-
-        Ret = processCopyProcess ( Current->pid, Clone->pid );
+        
+        Ret = processCopyProcess( Current->pid, Clone->pid );
 
         if ( Ret != 0 ){
             panic ("clone_and_execute_process: processCopyProcess fail\n");
@@ -691,11 +700,18 @@ do_clone:
         //#debug
         //printf ("do_clone_execute_process: %s\n",filename);
         
-        Status = (int) fsLoadFile ( VOLUME1_FAT_ADDRESS, 
-                           VOLUME1_ROOTDIR_ADDRESS, 
+        //Status = (int) fsLoadFile ( 
+        //                   VOLUME1_FAT_ADDRESS, 
+        //                   VOLUME1_ROOTDIR_ADDRESS, 
+        //                   filename, 
+        //                   (unsigned long) Clone->Image );
+
+        Status = (int) fsLoadFile ( 
+                           VOLUME1_FAT_ADDRESS, 
+                           dir_address, 
                            filename, 
                            (unsigned long) Clone->Image );
-
+                           
        // Se falhou o carregamento. Vamos matar a thread e o processo.
        if ( Status != 0 )
        {
@@ -756,8 +772,9 @@ do_clone:
         // The entry point in the start of the image. 0x401000.
         // And the stack ??
 
-        Clone->Image = CONTROLTHREAD_BASE;               //0x400000 
-        Clone->control->eip = CONTROLTHREAD_ENTRYPOINT;  //0x401000
+        Clone->Image        = CONTROLTHREAD_BASE;        // 0x400000 
+        Clone->control->eip = CONTROLTHREAD_ENTRYPOINT;  // 0x401000
+ 
  
         // #bugbug
         // #todo
@@ -829,7 +846,7 @@ do_clone:
 
 		// [filho]
 		Clone->control->saved = 0;
-		SelectForExecution (Clone->control);
+		SelectForExecution(Clone->control);
 
 
         // Se o processo filho herdar o floxo padr�o, ent�o o 

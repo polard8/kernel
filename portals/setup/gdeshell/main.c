@@ -3221,10 +3221,10 @@ doexec_first_command:
     // O shell não sai ... o filho fica em background.
     // (&) podemos usar o 'e' comercial no fim da linha de comandos.  
 
-    int fake_pid;
+    int fake_pid=-1;
     fake_pid = (int) system_call ( 900, 
                          (unsigned long) tokenList[0], 0, 0 ); 
-    
+
     if (fake_pid < 0){
         debug_print ("gdeshell: system call 900 fail!\n");
         goto fail;
@@ -3235,7 +3235,7 @@ doexec_first_command:
     // Wait support   
     //
 
-    int Wait_status;
+    int Wait_status=0;
     
 //___wait:
 
@@ -3308,7 +3308,7 @@ done:
     // Clean the list.
     for ( i=0; i<TOKENLIST_MAX_DEFAULT; i++ ){ tokenList[i] = NULL; };
 
-    shellPrompt ();
+    shellPrompt();
 
     return (unsigned long) ret_value;
 }

@@ -719,16 +719,18 @@ gde_extra_services (
 
     //...
 
- 
- 
 	// 900
 	// Clona e executa o filho dado o nome do filho.
 	// O filho inicia sua execução do início da imagem.
 	// #bugbug: Isso às vezes falha na máquina real.
+	// #todo: Use more arguments.
 	// See: See: ps/action/clone.c
 
+    // IN: name, dir address.
     if ( number == 900 ){ 
-        return (void *) clone_and_execute_process ( (char *) arg2 );
+        return (void *) clone_and_execute_process( 
+                            (char *) arg2, 
+                            VOLUME1_ROOTDIR_ADDRESS );
     }
 
 
