@@ -174,33 +174,33 @@ createwDrawFrame (
             if ( window->focus == 1 )
             {
                 border_color = COLOR_BLUE;
-                border_size = 2;
+                border_size = 4;
             }else{
-                border_color = COLOR_PINK;  // COLOR_INACTIVEBORDER;
-                border_size = 1;
+                border_color = COLOR_BLACK;  // COLOR_INACTIVEBORDER;
+                border_size = 2;
             };
         
         // board1, borda de cima e esquerda.
         rectBackbufferDrawRectangle( 
-            (parent->left  + window->left), 
-            (parent->top   + window->top), 
+            window->left, //(parent->left  + window->left), 
+            window->top,  //(parent->top   + window->top), 
             window->width, 
             border_size, border_color );
 
         rectBackbufferDrawRectangle( 
-            (parent->left +window->left), 
-            (parent->top  +window->top), 
+            window->left, //(parent->left +window->left), 
+            window->top,  //(parent->top  +window->top), 
             border_size, window->height, border_color );
 
         // board2, borda direita e baixo.
         rectBackbufferDrawRectangle( 
-            (parent->left + window->left + window->width -1), 
-            (parent->top + window->top), 
+            (window->left + window->width -1),//(parent->left + window->left + window->width -1), 
+            window->top, //(parent->top + window->top), 
             border_size, window->height, border_color );
 
         rectBackbufferDrawRectangle ( 
-            (parent->left + window->left), 
-            parent->top + window->top + window->height -1, 
+            window->left, //(parent->left + window->left), 
+            window->top + window->height -1, //parent->top + window->top + window->height -1, 
             window->width, border_size, border_color );
 
         return 0;

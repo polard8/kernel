@@ -76,6 +76,8 @@ int browser_hello_request(int fd);
 int browser_hello_response(int fd);
 
 
+
+/*
 int 
 browser_createwindow_request (
     int fd,
@@ -85,6 +87,8 @@ browser_createwindow_request (
     unsigned long height,
     unsigned long bg_color );
 int browser_createwindow_response(int fd);
+*/
+
 
 
 
@@ -398,7 +402,7 @@ int browser_loop(int fd)
 
 //...
 
-
+/*
 int 
 browser_createwindow_request (
     int fd,
@@ -457,7 +461,9 @@ browser_createwindow_request (
 
     return 0; 
 }
+*/
 
+/*
 //response
 int browser_createwindow_response(int fd)
 {
@@ -594,7 +600,7 @@ process_event:
     return 0;
 
 }
-
+*/
 
 
 
@@ -868,8 +874,9 @@ int main ( int argc, char *argv[] ){
     //#todo: salvar em global
     //por enquanto aqui
     int main_window=0;
+    int addressbar_window=0;    
     int client_window=0;
-    int toolbar_window=0;
+    int button=0;
 
 
     // libgws
@@ -884,24 +891,54 @@ int main ( int argc, char *argv[] ){
     if ( main_window < 0 )             
         debug_print("browser: main_window fail\n"); 
 
+
+    // address bar
+    addressbar_window = gws_create_window (client_fd,
+        WT_EDITBOX,1,1,"address-bar",
+        4, 4, 
+        (640-32-4-4-4), 32,
+        main_window,0,COLOR_WHITE, COLOR_WHITE);
+
+    if ( addressbar_window < 0 )             
+        debug_print("browser: addressbar_window fail\n"); 
+        
+     
+     gws_draw_text (
+        (int) client_fd,             // fd,
+        (int) addressbar_window,              // window id,
+        (unsigned long) 8,    // left,
+        (unsigned long) 8,    // top,
+        (unsigned long) COLOR_BLACK,
+        "http://www.google.com");
+
+    // button
+    button = gws_create_window (client_fd,
+        WT_BUTTON,1,1,">",
+        (640-32-4), 4, 
+        32, 32,
+        main_window,0,COLOR_GRAY, COLOR_GRAY);
+
+    if ( button < 0 )             
+        debug_print("browser: button fail\n"); 
+
+
+
     // client window (White)
     client_window = gws_create_window (client_fd,
-        WT_SIMPLE,1,1,"w1",
+        WT_SIMPLE,1,1,"client",
         4, 40, 640-8, 480 - 40 - 4,
         main_window,0,COLOR_WHITE, COLOR_WHITE);
 
-    if ( main_window < 0 )             
+    if ( client_window < 0 )             
         debug_print("browser: client_window fail\n"); 
 
-
-    //toolbar (gray)
-    toolbar_window = gws_create_window (client_fd,
-        WT_SIMPLE,1,1,"w2",
-        4, 4, 640-80, 32,
-        main_window,0,COLOR_PINK, COLOR_PINK);
-
-    if ( main_window < 0 )             
-        debug_print("browser: toolbar_window fail\n"); 
+     gws_draw_text (
+        (int) client_fd,             // fd,
+        (int) client_window,              // window id,
+        (unsigned long) 40,    // left,
+        (unsigned long) 40,    // top,
+        (unsigned long) COLOR_BLACK,
+        "Hello, from Google!...  (Ok, I'm lying.)");
 
 
     //loop

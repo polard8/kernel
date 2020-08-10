@@ -895,10 +895,10 @@ int main (int argc, char **argv){
         //printf ("gwssrv: Calling child \n");  
 
 
-        gde_clone_and_execute ("gwm.bin");    // window manager
+        //gde_clone_and_execute ("gwm.bin");    // window manager
         //gde_clone_and_execute ("terminal.bin");  
         //gde_clone_and_execute ("fileman.bin");  
-        //gde_clone_and_execute ("browser.bin"); 
+        gde_clone_and_execute ("browser.bin"); 
         //gde_clone_and_execute ("launch1.bin"); 
         //gde_clone_and_execute ("s2.bin");    //#bugbug        
         //gde_clone_and_execute ("s3.bin");    //#bugbug        
@@ -1492,8 +1492,26 @@ int serviceDrawText(void)
     buf[i] = 0;
     
     
-    dtextDrawText ( (struct gws_window_d *) gui->screen,
-        x, y, color, buf ); 
+    //dtextDrawText ( (struct gws_window_d *) gui->screen,
+        //x, y, color, buf ); 
+
+
+    if (window_id>0 && window_id < WINDOW_COUNT_MAX)
+    {
+
+        window = (struct gws_window_d *) windowList[window_id];
+        
+        if((void*)window!=NULL){
+            dtextDrawText ( (struct gws_window_d *) window,
+                x, y, color, buf );
+        }
+    
+    //#debug
+    }else{
+        
+        dtextDrawText ( (struct gws_window_d *) gui->screen,
+            x, y, color, buf ); 
+    };
 
 
    gws_show_backbuffer (); // for debug   

@@ -684,6 +684,36 @@ void draw_client( struct wm_client_d *c)
 */
 
 
+
+/*
+int draw_frame ( int fd, struct wm_client_d * client, int type );
+int draw_frame ( int fd, struct wm_client_d * client, int type )
+{
+    if( (void*) client == NULL)
+        return -1;
+
+    if (client->window < 0)
+        return -1;
+        
+    // #todo
+    // We need the window's metrics.
+    // Ask the window server.
+    
+    //title window
+    client->title_window = gws_create_window (fd,
+                               WT_SIMPLE,1,1,"title",
+                               100, 100-32, 480, 32,     //#todo
+                               0, 0, 0x2d89ef, 0x2d89ef);
+
+
+    if(client->title_window<0)
+        return -1;
+
+    return 0;
+}
+*/
+
+
 //interna
 int create_topbar_client(int fd)
 {
