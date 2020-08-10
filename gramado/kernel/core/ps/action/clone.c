@@ -576,17 +576,33 @@ clone_and_execute_process (
         goto fail;
     }
 
+
+    // Shotcuts to execute programs.
+    
     // Principais diretórios para execução de programas.
     // no disco do sistema.
     // Os dois pontos significa que o pathname é simplificado.
     // e contém quatro caracteres que selecionam um 
     // dos subdiretórios do diretório raiz, que podem muito bem
     // terem seus endereços na memória pre-definidos para facilitar.
-    
+
+    // root
     // ::r/ = "/"
-    // ::b/ = "/BIN/"
-    // ::s/ = "/SBIN/"
-    // ::./ = "cwd"
+    
+    // unix-like
+    // ::b/ = "/BIN/"       (user apps)
+    // ::s/ = "/SBIN/"      (system apps)
+    
+    // gramado-like
+    // ::p/ = "/PROGRAMS/"  (user apps)
+    // ::?/ = "/PORTALS/"   (system apps)
+    
+    // Setup environments.
+    // ::x/ = "/SETUP1/"    (Setup environment. The installer)
+    // ::y/ = "/SETUP2/"    (Setup environment. The installer)
+    // ::z/ = "/SETUP3/"    (Setup environment. The installer)
+
+
 
 
     // execute from root.

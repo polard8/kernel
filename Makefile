@@ -248,9 +248,16 @@ vhd-copy-files:
 
 	# Not unix-like
 	# Portals project.
-	sudo mkdir /mnt/gramadovhd/PROGRAMS
 	sudo mkdir /mnt/gramadovhd/USERS
+	# ::p/ ::?/
+	sudo mkdir /mnt/gramadovhd/PROGRAMS
 	sudo mkdir /mnt/gramadovhd/PORTALS
+
+	# Setup environments.
+	# ::x/  ::y/   ::z/
+	sudo mkdir /mnt/gramadovhd/SETUP1
+	sudo mkdir /mnt/gramadovhd/SETUP2
+	sudo mkdir /mnt/gramadovhd/SETUP3
 
 
 	# Test lfn
@@ -291,20 +298,18 @@ vhd-copy-files:
 #	-sudo cp base/tests/TEST1.C  /mnt/gramadovhd/TMP/TMP2
 
 
+#
+# == "/USERS" ====================================================
+#
+
 
 #
 # == "/PROGRAMS" ====================================================
 #
 	# The applications.
 	#-sudo cp portals/shell/apps/bin/*.BIN  /mnt/gramadovhd/PROGRAMS
-	#-sudo cp portals/shell/cmd/bin/*.BIN   /mnt/gramadovhd/PROGRAMS
+	-sudo cp portals/shell/cmd/bin/*.BIN   /mnt/gramadovhd/PROGRAMS
 	#-sudo cp portals/shell/net/bin/*.BIN   /mnt/gramadovhd/PROGRAMS
-	#-sudo cp portals/setup/bin/*.BIN       /mnt/gramadovhd/PROGRAMS 
-
-
-#
-# == "/USERS" ====================================================
-#
 
 
 #
@@ -316,6 +321,13 @@ vhd-copy-files:
 	sudo cp gramado/kernel/KERNEL.BIN       /mnt/gramadovhd/PORTALS
 	sudo cp portals/init/INIT.BIN           /mnt/gramadovhd/PORTALS
 	sudo cp portals/setup/bin/GDESHELL.BIN  /mnt/gramadovhd/PORTALS
+
+#
+# == "/SETUP1" ====================================================
+#
+
+	-sudo cp portals/setup/bin/*.BIN       /mnt/gramadovhd/SETUP1
+
 
 	#-sudo cp portals/services/gwssrv/bin/GWSSRV.BIN  /mnt/gramadovhd/PORTALS
 	#-sudo cp portals/services/gwssrv/bin/GWS.BIN     /mnt/gramadovhd/PORTALS
