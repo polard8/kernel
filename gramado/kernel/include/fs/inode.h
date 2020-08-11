@@ -40,9 +40,15 @@ struct inode_d
     struct fat16_directory_entry_d fat16_dirent;
 
 
+    // Onde foi carregado o arquivo ou diretorio.
+    void *buffer;
+
+
     // Isso já existe na fat16 entry ... mas talvez seja útil
     // quando for outro tipo de arquivo.
     unsigned long size_in_bytes;
+
+
 
     //
     // Blocks

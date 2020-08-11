@@ -85,14 +85,14 @@ struct vbr_d *vbr;
 
 struct volume_d
 {
-    object_type_t objectType;
+    object_type_t  objectType;
     object_class_t objectClass;
 
+    int id;
     int used;
     int magic;
 
-
-    int id;
+    struct superblock_d super;
 
 
     // See the enum.

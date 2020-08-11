@@ -270,6 +270,51 @@ const char *break_path (const char *pathname, char *filename)
 */
 
 
+// #todo
+// Caregar um arquivo na memoria e retornar seu inode.
+// ? registrar a estrutura de inode na inode_table[] ?
+// ? registrar a estrutura de arquivo na file_table[] ?
+struct inode_d *fs_load_file (char *pathname)
+{
+    struct inode_d *inode;
+
+
+    debug_print ("fs_load_file: [TODO] It's a work in progress\n");
+
+    inode = (struct inode_d *) kmalloc( sizeof(struct inode_d) );
+    if( (void*) inode == NULL ){
+        debug_print ("fs_load_file: [FAIL] inode\n");
+        return (struct inode_d *) 0;
+
+    }else{
+        
+        //inode->id ?
+        inode->used = 1;
+        inode->magic = 1234;
+        
+        //todo: copiar em path
+        //inode->path[]
+        
+        inode->uid = current_user;
+        inode->gid = current_group;
+        
+        //inode->____object (todo: inode structure)
+        
+        
+        inode->isfat16 = 0;
+        inode->fat16_dirent.FileSize = 0;
+        //...
+        
+        inode->size_in_bytes = 0;
+        
+        //...
+        
+        inode->next = NULL;
+    };
+
+
+    return (struct inode_d *) 0;
+}
 
 
 /*
@@ -529,7 +574,8 @@ fsLoadFile (
     // O arquivo não foi encontrado.
 
 //notFound:
-    printf ("fsLoadFile 1: %s not found\n", file_name );  
+    debug_print ("fsLoadFile: file not found\n");
+    printf      ("fsLoadFile 1: %s not found\n", file_name );  
     goto fail;
 
 
@@ -563,8 +609,10 @@ __found:
 
     cluster = __dir[ z+13 ];
 
-    if ( cluster <= 0 || cluster > 0xFFF0 ){
-        printf ("fsLoadFile: Cluster limits %x \n", cluster );
+    if ( cluster <= 0 || cluster > 0xFFF0 )
+    {
+        debug_print ("fsLoadFile: Cluster limits\n");
+        printf      ("fsLoadFile: Cluster limits %x \n", cluster );
         goto fail;
     }
 
@@ -673,16 +721,15 @@ __loop_next_entry:
     // #bugbug: tem arquivo carregado pelo kernel
     // sem ter sido registrado na estrutura do processo kernel.
 
-    if ( cluster == 0xFFFF || cluster == 0xFFF8 ){ 
-        return (unsigned long) 0; 
-    }
+    if ( cluster == 0xFFFF || cluster == 0xFFF8 ){ return (unsigned long) 0; }
 
     goto __loop_next_entry;
 
     // Fail
 
 fail:
-    printf ("fsLoadFile fail: file={%s}\n", file_name );
+    debug_print("fsLoadFile: [FAIL] \n");
+    printf     ("fsLoadFile: [FAIL] file={%s}\n", file_name );
     refresh_screen ();
     return (unsigned long) 1;
 }

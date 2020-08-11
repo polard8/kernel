@@ -37,14 +37,14 @@ pid_t clone_process (void){
     //unsigned long old_image_pa; //usado para salvamento.
 
     int Ret = -1;
-    int i;
-    int w;
+    int i=0;
+    int w=0;
 
 
 
     // #debug: 
-    debug_print ("clone-clone_process: FIXME. It's a work in progress!\n");
-    printf ("clone-clone_process: Cloning the current process..\n");
+    debug_print ("clone-clone_process: [FIXME] Cloning the current process..\n");
+    printf      ("clone-clone_process: [FIXME] Cloning the current process..\n");
 
 
 	//
@@ -52,21 +52,21 @@ pid_t clone_process (void){
 	//
 
     // Validation.
-	
+
     if ( current_process < 0 ){
         printf("clone_process: current_process\n");
         goto fail;
     } 
 
     Current = (struct process_d *) processList[current_process];
-	
+
     if ( (void *) Current == NULL ){
         printf ("clone_process: Current struct \n");
         goto fail;
-	
+
     }else{
-		
-        if ( Current->used != 1 || Current->magic != 1234 ){    
+
+        if ( Current->used != 1 || Current->magic != 1234 ){
             printf ("clone_process: Current validation \n");
             goto fail;
         }
@@ -86,7 +86,7 @@ pid_t clone_process (void){
 	    // printf(">>> check current process: %d %d \n", current_process, Current->pid );		
 		goto do_clone;
 		//...
-	};
+    };
 
 
 	//
@@ -567,6 +567,13 @@ clone_and_execute_process (
     path = filename;
     name = filename;
 
+    
+    
+    // #todo
+    // Essas rotinas de procura e garregamento podem ir para outro lugar.
+    // #bugbug
+    // O maior problema aqui eh o tamanho do diretorio, pois estamos pre-alocando
+    // memoria para conter o diretorio.
 
     // from cwd?
     if (path[0] == '.' && path[1] == '/')
@@ -585,105 +592,152 @@ clone_and_execute_process (
     // e contém quatro caracteres que selecionam um 
     // dos subdiretórios do diretório raiz, que podem muito bem
     // terem seus endereços na memória pre-definidos para facilitar.
-
-    // root
-    // ::r/ = "/"
-    
-    // unix-like
-    // ::b/ = "/BIN/"       (user apps)
-    // ::s/ = "/SBIN/"      (system apps)
-    
     // gramado-like
-    // ::p/ = "/PROGRAMS/"  (user apps)
-    // ::?/ = "/PORTALS/"   (system apps)
-    
-    // Setup environments.
-    // ::x/ = "/SETUP1/"    (Setup environment. The installer)
-    // ::y/ = "/SETUP2/"    (Setup environment. The installer)
-    // ::z/ = "/SETUP3/"    (Setup environment. The installer)
-
+    // ::p/ = "/PORTALS/"   (system apps)
 
 
 
     // execute from root.
     if (path[0] == ':' &&
         path[1] == ':' &&
-        path[2] == 'r' &&
+        path[2] == 'p' &&
         path[3] == '/' )
     {
-        //#bugbug: Nesse momento podemos ter vários níveis de diretórios.
-        debug_print ("clone_and_execute_process: [FIXME] Pathname starts from root.\n");
+
         path++;
         path++; 
         path++; 
         path++;
         name=path;
-        dir_address = VOLUME1_ROOTDIR_ADDRESS;
-    }
-
-
-    // execute from /BIN/.
-    if (path[0] == ':' &&
-        path[1] == ':' &&
-        path[2] == 'b' &&
-        path[3] == '/' )
-    {
-        //#bugbug: Nesse momento podemos ter vários níveis de diretórios.
-        debug_print ("clone_and_execute_process: [FIXME] Pathname starts from /BIN/.\n");
-        goto fail;
-        //path++; 
-        //path++; 
-        //path++; 
-        //path++;
-        //name=path;
         //dir_address = VOLUME1_ROOTDIR_ADDRESS;
+        dir_address = (unsigned long) kmalloc( 32*128 );
+        if (dir_address == 0){ 
+            debug_print("clone_and_execute_process: [FAIL] dir_address allocation fail\n");
+            kfree(dir_address); 
+            goto fail;
+        }
+
+        //load portals/ dir.
+        debug_print ("clone_and_execute_process: [FIXME] Loading /PORTALS/ diretory \n");
+        // IN: 
+        // fat address, dir address, filename, file address.
+        // OUT: 0=OK
+        Status = fsLoadFile ( (unsigned long) VOLUME1_FAT_ADDRESS,  // fat address
+                     (unsigned long) VOLUME1_ROOTDIR_ADDRESS,       // dir address. onde procurar.  
+                     (unsigned char *) "PORTALS    ",               // dir name 
+                     (unsigned long) dir_address );                 // addr. Onde carregar. 
+        if(Status!=0){ 
+            debug_print("clone_and_execute_process: [FAIL] Couldn't load file\n");
+            kfree(dir_address); 
+            goto fail;
+        }
+        // Procure dentro do diretorio carregado.
+        goto __search;
     }
 
-    // execute from /SBIN/.
-    if (path[0] == ':' &&
-        path[1] == ':' &&
-        path[2] == 's' &&
-        path[3] == '/' )
-    {
-        //#bugbug: Nesse momento podemos ter vários níveis de diretórios.
-        debug_print ("clone_and_execute_process: [FIXME] Pathname starts from /SBIN/\n");
-        goto fail;
-        //path++; 
-        //path++; 
-        //path++; 
-        //path++;
-        //name=path;
-        //dir_address = VOLUME1_ROOTDIR_ADDRESS;
-    }
 
-
-
-    // Convertendo o formato do nome do arquivo.
-    // >>> "12345678XYZ"
-
-    //read_fntos ( (char *) filename );
-    read_fntos ( (char *) name );
-
-
+    // No caso de nenhum dos atalhos acima.
     // Search in root dir. ("/")
     dir_address = VOLUME1_ROOTDIR_ADDRESS;
 
-    //__Status = (int) KiSearchFile ( filename, VOLUME1_ROOTDIR_ADDRESS );
-    //__Status = (int) KiSearchFile ( filename, dir_address );
-    __Status = (int) KiSearchFile ( name, dir_address );
 
-    if (__Status != 1)
-    {
-         debug_print ("clone_and_execute_process: File not found!\n");
-         printf      ("clone_and_execute_process: File not found!\n");
-         goto fail;
-         
-         //("/BIN/")
-         //dir_address = VOLUME1_BIN_ADDRESS;
-         //__Status = (int) KiSearchFile ( filename, dir_address );
-         //if (__Status != 1){ goto fail; }
+//
+// Loop.
+//
+
+__search:
+
+
+    // Search
+    // Convertendo o formato do nome do arquivo.
+    // >>> "12345678XYZ"
+    //read_fntos ( (char *) filename );
+    read_fntos ( (char *) name );
+    
+
+    // Procura o nome no diretorio carregado anteriormente.
+    // pode ser root ou portals.
+    __Status = (int) KiSearchFile ( name, dir_address );
+    if (__Status == 1){ goto __found; }
+
+
+
+
+
+    //
+    // == Search in BIN/ ====================================================
+    //
+
+    //load bin/ dir.
+    debug_print ("clone_and_execute_process: [FIXME] Loading BIN diretory \n");
+        // IN: 
+        // fat address, dir address, filename, file address.
+        // OUT: 0=OK
+    Status = fsLoadFile ( (unsigned long) VOLUME1_FAT_ADDRESS,  // fat address
+                     (unsigned long) VOLUME1_ROOTDIR_ADDRESS,       // dir address. onde procurar.  
+                     (unsigned char *) "BIN        ",               // dir name 
+                     (unsigned long) dir_address );                 // addr. Onde carregar. 
+    if(Status!=0){ 
+        debug_print("clone_and_execute_process: [FAIL] Couldn't load BIN folder\n");
+        kfree(dir_address); 
+        goto fail;
     }
 
+    // Procura o nome no diretorio carregado
+    __Status = (int) KiSearchFile ( name, dir_address );
+    if (__Status == 1){ goto __found; }
+
+
+
+
+
+
+
+    /*
+    //
+    // == Search in SBIN/ =======================================================
+    //
+
+    //load bin/ dir.
+    debug_print ("clone_and_execute_process: [FIXME] Loading SBIN directory \n");
+        // IN: 
+        // fat address, dir address, filename, file address.
+        // OUT: 0=OK
+    Status = fsLoadFile ( (unsigned long) VOLUME1_FAT_ADDRESS,  // fat address
+                     (unsigned long) VOLUME1_ROOTDIR_ADDRESS,       // dir address. onde procurar.  
+                     (unsigned char *) "SBIN       ",               // dir name 
+                     (unsigned long) dir_address );                 // addr. Onde carregar. 
+    if(Status!=0){ 
+        debug_print("clone_and_execute_process: [FAIL] Couldn't load SBIN folder\n");
+        kfree(dir_address); 
+        goto fail;
+    }
+
+    // Procura o nome no diretorio carregado
+    __Status = (int) KiSearchFile ( name, dir_address );
+    if (__Status == 1){ goto __found; }
+    */
+
+
+
+
+
+
+    //
+    // == Fail =====================================
+    //
+    
+    // Falhou a busca em todos os diretorios procurados.
+    
+    debug_print ("clone_and_execute_process: [FAIL] File not found!\n");
+    printf      ("clone_and_execute_process: [FAIL] File not found!\n");
+    goto fail;
+
+    //
+    // == go ====================================
+    //
+
+__found:
 
 	//unsigned long old_image_pa; //usado para salvamento.
 

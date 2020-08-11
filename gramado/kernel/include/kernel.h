@@ -135,9 +135,11 @@ extern void do_executa_new_task (void);
 
 // storage
 #include "storage/ata.h"
+#include "storage/super.h"
 #include "storage/volume.h"
-#include "storage/disk.h"       
-#include "storage/storage.h"          
+#include "storage/disk.h"  
+#include "storage/storage.h" 
+
 
 
 

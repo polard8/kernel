@@ -152,32 +152,6 @@ struct fat16_lfn_directory_entry_d
 */
 
 
-// Gerenciar informações sobre um diretório
-// como por exemplo o número de entradas.
-struct fat16_directory_d
-{
-    int id;
-    
-    int used;
-    int magic;
-    
-    // The file structure.
-    file *_file;
-    
-    // The inode structure.
-    struct inode_d *inode;
-
-    int number_of_entries;
-    
-    // ...
-    
-    struct fat16_directory_d *next;
-};
-
-
-
-
-
 
 //
 // End.

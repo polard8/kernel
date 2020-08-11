@@ -20,6 +20,41 @@
 #include <kernel.h>
 
 
+
+// Cria uma nova estrutura de entrada de diretorio para fat16.
+struct fat16_directory_entry_d *fs_new_fat16_directory_entry(void)
+{
+    struct fat16_directory_entry_d *new;
+
+    new = (struct fat16_directory_entry_d *) kmalloc ( sizeof(struct fat16_directory_entry_d) );
+    
+    if ( (void*) new == NULL ){
+        debug_print("fs_new_fat16_directory_entry: [FAIL]\n");
+        return (struct fat16_directory_entry_d *) 0;
+    }
+    return (struct fat16_directory_entry_d *) new;
+}
+
+
+/*
+struct fat16_lfn_directory_entry_d *fs_new_fat16_lfn_directory_entry(void);
+struct fat16_lfn_directory_entry_d *fs_new_fat16_lfn_directory_entry(void)
+{
+    struct fat16_lfn_directory_entry_d *new;
+
+    new = (struct fat16_lfn_directory_entry_d *) kmalloc ( sizeof(struct fat16_lfn_directory_entry_d) );
+    
+    if ( (void*) new == NULL ){
+        debug_print("fs_new_fat16_lfn_directory_entry: [FAIL]\n");
+        return (struct fat16_lfn_directory_entry_d *) 0;
+    }
+    return (struct fat16_lfn_directory_entry_d *) new;
+}
+*/
+
+
+
+
 /*
 //#todo
 //Credits: Sirius OS.
@@ -194,9 +229,6 @@ int fsCheckELFFile ( unsigned long address ){
 
     unsigned char *buffer = (unsigned char *) address;
 
-	// #todo: Error message.
-    //if ( (void *) address == NULL )
-        //return -1;
 
     if ( buffer[0] != 0x7F ||
          buffer[1] != 0x45 ||
@@ -214,33 +246,12 @@ int fsCheckELFFile ( unsigned long address ){
 }
 
 
-
-
-// Checando a validade de arquivos bin�rios no formato PE.
-// #bugbug: Isso n�o deve ficar no kernel, pois PE � propriet�rio.
-// Nem usaremos PE no futuro.
-
-int fsCheckPEFile ( unsigned long address ){
-
-    unsigned char *buffer = (unsigned char *) address;
-
-	// #todo: Error message.
-    //if ( (void *) address == NULL )
-        //return -1;
-
-	//i386
-    if ( buffer[0] != 0x4C || buffer[1] != 0x01 )
-    {
-        printf ("fsCheckPEFile: Sig \n");
-        return 1;
-    }
-
-	//i486
-
-	//Continua...
-
-
-    return 0;
+// Deprecated!
+int fsCheckPEFile ( unsigned long address )
+{
+    debug_print ("fsCheckPEFile: [Deprecated]\n");
+    printf      ("fsCheckPEFile: [Deprecated]\n");
+    return -1; 
 }
 
 
@@ -250,6 +261,9 @@ int fsCheckPEFile ( unsigned long address ){
  *     Lista os arquivos em um diret�rio, dados os �ndices de disco, 
  * volume e diret�rio.
  */
+
+// #bugbug
+// Do not list this in ring0.
 
 void 
 fsListFiles ( 
@@ -262,8 +276,7 @@ fsListFiles (
 
     if ( disk_id == -1 || volume_id == -1 || directory_id == -1 )
     {
-        //#debug
-        //todo: message.
+        debug_print ("fsListFiles: [FAIL]\n");
         goto fail;
     }
 
@@ -537,12 +550,14 @@ void fs_show_file_info (file *f)
 
 void fs_show_file_table(void)
 {
-    int i=0;
     file *f;
-    
+    int i=0;
+
+
     printf ("\nfile_table:\n");
     
-    for(i=0; i<32; i++){
+    for (i=0; i<32; i++)
+    {
         f=(file*)file_table[i];
         if( (void*)f!=NULL )
             fs_show_file_info(f);
@@ -598,11 +613,13 @@ int get_free_slots_in_the_file_table(void)
         tmp = (void*) file_table[i];
         
         // Nenhum file descritor está usando essa estrutura.
-        if (tmp->used == 1 && tmp->magic == 1234 && tmp->fd_counter == 0)
+        if (tmp->used == 1 && 
+            tmp->magic == 1234 && 
+            tmp->fd_counter == 0)
         { 
             return (int) i; 
         }
-    }
+    };
 
     return -1;
 }
@@ -620,7 +637,9 @@ int get_free_slots_in_the_inode_table(void)
         tmp = (void*) inode_table[i];
         
         // Nenhum descritor de estrutura de arquivo está usando essa estrutura inode.
-        if (tmp->used == 1 && tmp->magic == 1234 && tmp->filestruct_counter == 0)
+        if (tmp->used == 1 && 
+            tmp->magic == 1234 && 
+            tmp->filestruct_counter == 0)
         { 
             return (int) i; 
         }
@@ -731,8 +750,8 @@ void fsCheckMbrFile ( unsigned char *buffer ){
 	//#todo
 	//mudar os argumentos para chamarmos as portas ide.
 
-    int i=0;
     unsigned char *mbr = (unsigned char *) buffer; 
+    int i=0;
 
 
 	//setor 0.
@@ -965,10 +984,10 @@ int load_path ( unsigned char *path, unsigned long address ){
     unsigned char *p;
 
 
-    //onde carregaremos o diretório.
-    void *__src_buffer; 
-    void *__dst_buffer; 
-    void *__file_buffer;      
+    // Onde carregaremos o diretório.
+    void *__src_buffer;
+    void *__dst_buffer;
+    void *__file_buffer;
 
 
 
@@ -1138,6 +1157,8 @@ int load_path ( unsigned char *path, unsigned long address ){
                 // Load
                 //
 
+                // #bugbug
+                // E se o arquivo for maior que a area alocada.
                 // Alocando memória para carregar o diretório.
                 __dst_buffer = (void *) kmalloc (512*32);
     
@@ -1268,14 +1289,11 @@ void fs_init_structures (void){
         panic ("fs_init_structures: Couldn't create the root structure.\n");
 
     }else{
-
-
-        root->used = 1;
+        root->objectType  = ObjectTypeFileSystem;
+        root->objectClass = ObjectClassKernelObjects;
+        root->used  = 1;
         root->magic = 1234;
 
-        root->objectType = ObjectTypeFileSystem;
-        root->objectClass = ObjectClassKernelObjects;
-        
         
         root->name = (char *) ____root_name;
         
@@ -1306,8 +1324,7 @@ void fs_init_structures (void){
         panic ("fs_init_structures error: Type");
 
     }else{
-            root->type = (int) Type;
-    
+        root->type = (int) Type;
     };
 
 
@@ -1316,26 +1333,26 @@ void fs_init_structures (void){
         case FS_TYPE_FAT16:
 
 			//Rootdir.
-			root->rootdir_address = VOLUME1_ROOTDIR_ADDRESS;
-	        root->rootdir_lba = VOLUME1_ROOTDIR_LBA;
-	        
+            root->rootdir_address = VOLUME1_ROOTDIR_ADDRESS;
+            root->rootdir_lba = VOLUME1_ROOTDIR_LBA;
+
 			//Fat.
 			root->fat_address = VOLUME1_FAT_ADDRESS;
 	        root->fat_lba = VOLUME1_FAT_LBA;
 	        
 			//Dataarea.
 			//filesystem->dataarea_address = ??;
-	        root->dataarea_lba = VOLUME1_DATAAREA_LBA;
-	        
+            root->dataarea_lba = VOLUME1_DATAAREA_LBA;
+
 			//sectors per cluster.
-			root->spc = (int) get_spc(); //vari�vel
-	        root->rootdir_entries = FAT16_ROOT_ENTRIES;
-	        root->entry_size = FAT16_ENTRY_SIZE;
-            
+            root->spc = (int) get_spc(); //vari�vel
+            root->rootdir_entries = FAT16_ROOT_ENTRIES;
+            root->entry_size = FAT16_ENTRY_SIZE;
+       
             // ...
 
 		    break;
-			
+
 	    case FS_TYPE_EXT2:
 		    //nothing for now.
 		    break;
@@ -1373,14 +1390,12 @@ void fs_show_root_fs_info(void)
              goto fail;
         }
 
-        printf ("name = %s \n",root->name );
-                
-        printf ("Object type %d \n",root->objectType );
-        printf ("Object class %d \n",root->objectClass );
-        
-        printf ("type = %d \n",root->type );
-        printf ("Root dir entries %d \n",root->rootdir_entries );
-        printf ("Entry size %d \n",root->entry_size );
+        printf ("name = %s \n",           root->name );
+        printf ("Object type %d \n",      root->objectType );
+        printf ("Object class %d \n",     root->objectClass );
+        printf ("type = %d \n",           root->type );
+        printf ("Root dir entries %d \n", root->rootdir_entries );
+        printf ("Entry size %d \n",       root->entry_size );
         //printf ("",root-> );
 
         refresh_screen();
@@ -1732,10 +1747,10 @@ void fsInitializeWorkingDiretoryString (void){
  *     Para inicializarmos o sistema ja' com um alvo, no caso o root dir. 
  */
 
-void fsInitTargetDir (void){
-	
-	current_target_dir.current_dir_address = VOLUME1_ROOTDIR_ADDRESS;
-	//current_target_dir.name = ?;
+void fsInitTargetDir (void)
+{
+    current_target_dir.current_dir_address = VOLUME1_ROOTDIR_ADDRESS;
+    //current_target_dir.name = ?;
 }
 
 
@@ -2090,11 +2105,11 @@ sys_read_file (
              taskswitch_lock ();
              scheduler_lock ();
 
-             __ret = (int) fsSaveFile ( (char *) file_name,    
-                              (unsigned long) 2,      // size in sectors      
+             __ret = (int) fsSaveFile ( (char *) file_name, 
+                              (unsigned long) 2,      // size in sectors 
                               (unsigned long) 1024,   // size in bytes  
                               (char *) buff,          // buffer ?
-                              (char) 0x20 );          // flag                  
+                              (char) 0x20 );          // flag 
 
               scheduler_unlock ();
               taskswitch_unlock ();

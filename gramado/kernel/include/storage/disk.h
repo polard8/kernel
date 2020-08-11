@@ -69,7 +69,7 @@ int g_spc;               //sectors per cluster.(spc é variável.)
  
 typedef enum {
 
-    DISK_TYPE_NULL,        	
+    DISK_TYPE_NULL, 
     DISK_TYPE_PATA,
     DISK_TYPE_PATAPI,
     DISK_TYPE_SATA,
@@ -93,6 +93,30 @@ typedef enum {
 }disk_class_t;
 
 
+
+// bios parameter block
+struct bpb_d
+{
+    int id;
+    int used;
+    int magic;
+    
+    //...
+
+    struct bpb_d *next;
+};
+
+
+struct boot_block_d
+{
+    int id;
+    int used;
+    int magic;
+    
+    struct bpb_d bpb;
+
+    struct boot_block_d *next;
+};
 
 
 
@@ -169,12 +193,12 @@ struct mbr_d *mbr;
  */ 
 struct partition_table_d
 {    
-    unsigned char boot_indicator; //80h active
+    unsigned char boot_indicator;  //80h active
     unsigned char start_chs[3];
     unsigned char partition_type;
     unsigned char end_chs[3];
     unsigned long start_sector;
-    unsigned long partition_size; //in sectors.
+    unsigned long partition_size;  //in sectors.
 };
 struct partition_table_d *partition; 
 
@@ -183,33 +207,30 @@ struct partition_table_d *partition;
 //As informações na partition table apresentadas na forma de 'char'.  
 struct partition_table_chars_d
 { 
-    unsigned char BootFlag;                // Bootable or not
+    unsigned char BootFlag;         // Bootable or not
     
-    unsigned char StartingCHS0;            // Not used
-    unsigned char StartingCHS1;            // Not used
-    unsigned char StartingCHS2;            // Not used
+    unsigned char StartingCHS0;     // Not used
+    unsigned char StartingCHS1;     // Not used
+    unsigned char StartingCHS2;     // Not used
     
-    unsigned char PartitionType;            // 
+    unsigned char PartitionType;     
     
-    unsigned char EndingCHS0;              // Not used
-    unsigned char EndingCHS1;              // Not used
-    unsigned char EndingCHS2;              // Not used
+    unsigned char EndingCHS0;       // Not used
+    unsigned char EndingCHS1;       // Not used
+    unsigned char EndingCHS2;       // Not used
     
-    unsigned char StartingSector0;       // Hidden sectors
+    unsigned char StartingSector0;  // Hidden sectors
     unsigned char StartingSector1;
     unsigned char StartingSector2;
     unsigned char StartingSector3;
     
-    unsigned char PartitionLength0;      // Sectors in this partition
+    unsigned char PartitionLength0;  // Sectors in this partition
     unsigned char PartitionLength1;
     unsigned char PartitionLength2;
     unsigned char PartitionLength3; 
+ 
 };
 struct partition_table_chars_d *partition_chars; 
-
-
-
-
 
 
 
@@ -222,10 +243,10 @@ struct partition_table_chars_d *partition_chars;
 
 struct disk_d
 { 
-    object_type_t objectType;
+    object_type_t  objectType;
     object_class_t objectClass;
 
-    disk_type_t diskType;
+    disk_type_t  diskType;
     disk_class_t diskClass;
 
     int used;
@@ -234,6 +255,10 @@ struct disk_d
 
     int id;                 // ID na lista de discos.
     char boot_disk_number;  // ID herado do boot block.
+
+	// Ponteiro para o nome do disco,
+    // Talvez não precise ser um ponteiro, pode ser um array.
+    char *name;  
 
 
     //#todo
@@ -247,25 +272,31 @@ struct disk_d
 
     // Qual processo está usando.
     pid_t pid;
+    gid_t gid;
+
+
+    //#todo
+    //struct mbr_d mbr;
+    //struct bpb_d bpb;
+    //struct partition_table_d        partition_table;
+    //struct partition_table_chars_d  partition_table_chars;
 
 
     // #todo
     // contador de processos usando o disco
 
-	// Ponteiro para o nome do disco,
-    // Talvez não precise ser um ponteiro, pode ser um array.
-    char *name;  
 
 
     uint8_t channel;
     uint8_t dev_num;
     
-    // Mais: bpb.
+    //#todo
+    //volume list.
+
     // ...
 
     struct disk_d *next;
 };
-
 struct disk_d *____boot____disk;
 
 
@@ -276,9 +307,13 @@ unsigned long diskList[DISK_COUNT_MAX];
 
 
 
+
+//
+// == Prototypes ==================================
+//
+
 //show info for all disks in the list.
 void disk_show_info (void);
-
 
 void diskShowCurrentDiskInfo (void);
 

@@ -199,8 +199,7 @@ struct dir_entry_d
 
 
 /*
- * File: execve\fs\fs.h 
- *
+ * 
  * Obs: Dentro do kernel base somente teremos primitivas
  *      Operações complexas devem ir para servidores utilitários.
  *
@@ -255,9 +254,6 @@ struct softlink_d
 	int magic;
 	//..
 };
-
-
-
 
 
  
@@ -430,6 +426,7 @@ struct file_access_d *CurrentFileAccess;
 //
 
 
+struct fat16_directory_entry_d *fs_new_fat16_directory_entry(void);
 
 int fs_get_free_fd ( int pid );
 
@@ -582,6 +579,12 @@ load_directory (
     unsigned long sectors );
 
 
+
+// #todo
+// Caregar um arquivo na memoria e retornar seu inode.
+// ? registrar a estrutura de inode na inode_table[] ?
+// ? registrar a estrutura de arquivo na file_table[] ?
+struct inode_d *fs_load_file (char *pathname);
 
 //
 // Read
