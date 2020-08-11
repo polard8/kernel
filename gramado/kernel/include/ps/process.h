@@ -758,8 +758,8 @@ struct process_d
 	unsigned long standard_streams[3];
 
 
-    struct _iobuf  *root;    // 4 root directory
-    struct _iobuf  *pwd;     // 5 (print working directory) 
+    //struct _iobuf  *root;    // 4 root directory
+    //struct _iobuf  *pwd;     // 5 (print working directory) 
 	//...
 
 	// #todo: 

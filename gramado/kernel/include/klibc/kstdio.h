@@ -530,8 +530,8 @@ typedef __off_t fpos_t;
 
 /* stdio buffers */
 
-struct __sbuf {
-
+struct __sbuf 
+{
     unsigned char *_base;
     int _size;
 };

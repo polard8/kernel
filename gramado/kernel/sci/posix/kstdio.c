@@ -186,7 +186,7 @@ file *k_fopen ( const char *filename, const char *mode ){
 	//#test
 	//temos que fazer isso de um jeito melhor
 
-    size_t s = (size_t) fsGetFileSize ( (unsigned char *) filename );
+    size_t s = (size_t) fsRootDirGetFileSize ( (unsigned char *) filename );
 
     if ( s <= 0 ){
         printf ("k_fopen: file size \n");

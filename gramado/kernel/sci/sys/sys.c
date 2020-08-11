@@ -1760,7 +1760,7 @@ unsigned long sys_get_file_size ( char *path ){
     taskswitch_lock ();
     scheduler_lock ();
     
-    __size = (unsigned long) fsGetFileSize ( (unsigned char *) path ); 
+    __size = (unsigned long) fsRootDirGetFileSize ( (unsigned char *) path ); 
     
     scheduler_unlock ();
     taskswitch_unlock ();

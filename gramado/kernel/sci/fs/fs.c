@@ -21,6 +21,47 @@
 
 
 
+//#todo
+/*
+// Carrega um arquivo dado a estrutura do diretorio ao qual ele pertence
+// Retorna a estrutura de acesso ao arquivo, que tem muitas informaçoes
+// sobre o arquivo.
+struct file_access_d *fs_load_file_and_get_access( 
+    struct dir_d *directory,
+    char *filename );
+struct file_access_d *fs_load_file_and_get_access ( 
+    struct dir_d *directory,
+    char *filename )
+{
+
+    struct file_access_d *file_access;
+
+    file_access = (struct file_access_d *) kmalloc( sizeof(struct file_access_d) );
+    if ( (void*) file_access == NULL )
+    {
+        debug_print ("fs_load_file_and_get_access: [FAIL] Couldn't allocate\n");
+        return (struct file_access_d *) 0;
+    }else{
+
+        file_access->Directory = (struct dir_d *) directory;
+        
+        // ...
+
+
+    };  
+    
+    // #todo
+    // Load the file and fill the file access structure.
+    
+    // ...
+
+    debug_print ("fs_load_file_and_get_access: [TODO]\n");
+    return (struct file_access_d *) 0;
+}
+*/
+
+
+
 // Cria uma nova estrutura de entrada de diretorio para fat16.
 struct fat16_directory_entry_d *fs_new_fat16_directory_entry(void)
 {
@@ -844,50 +885,11 @@ done:
 }
 
 
-/*
- **************************************************
- * MountShortFileName:
- *     This function parses a directory entry name 
- * which is in the form of "FILE   EXT" and puts it in Buffer 
- * in the form of "FILE.TXT".
- *
- * @todo fsMountShortFileName(...)
- */
- 
-void 
-MountShortFileName ( 
-    char *buffer, 
-    struct dir_entry_d *entry )
-{
-    int i=0;
 
-    // Get the file name.
-    while (i < 8)
-    {
-        if ( entry->FileName[i] == ' '){ break; }
+// set_spc:
+// Configura spc, 'Sector Per Cluster' em vari�vel global.
+// ?? #bugbug: De qual disco ?? 
 
-        buffer[i] = entry->FileName[i];
-        i++;
-    }
-
-
-    // Get extension.
-    if ( (entry->FileName[8] != ' ') )
-    {
-        buffer[i++] = '.';
-        buffer[i++] = (entry->FileName[ 8] == ' ') ? '\0' : entry->FileName[ 8];
-        buffer[i++] = (entry->FileName[ 9] == ' ') ? '\0' : entry->FileName[ 9];
-        buffer[i++] = (entry->FileName[10] == ' ') ? '\0' : entry->FileName[10];
-    }
-}
-
-
-/*
- * set_spc:
- *     Configura spc, 'Sector Per Cluster' em vari�vel global.
- *     ?? #bugbug: De qual disco ?? 
- */
- 
 void set_spc (int spc)
 {
     g_spc = (int) spc;
@@ -1160,7 +1162,10 @@ int load_path ( unsigned char *path, unsigned long address ){
                 // #bugbug
                 // E se o arquivo for maior que a area alocada.
                 // Alocando memória para carregar o diretório.
-                __dst_buffer = (void *) kmalloc (512*32);
+                
+                unsigned long BUGBUG_OVERFLOW = (512*32);
+                
+                __dst_buffer = (void *) kmalloc (    BUGBUG_OVERFLOW    ); 
     
                 if ( (void *) __dst_buffer == NULL ){
                     panic ("load_path: __dir\n");
@@ -2224,7 +2229,7 @@ __OK:
 
     // File size.
 
-    FileSize = (size_t) fsGetFileSize( (unsigned char *) file_name );
+    FileSize = (size_t) fsRootDirGetFileSize( (unsigned char *) file_name );
     
     if (FileSize < 0){
         printf ("sys_read_file: File size fail\n");

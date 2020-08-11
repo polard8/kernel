@@ -534,6 +534,13 @@ clone_and_execute_process (
     char *filename )
 {
 
+
+    // #bugbug
+    // We need to get the directory size to allocate a buffer
+    // to this directory.
+    
+    
+
     struct process_d *Current;
     struct process_d *Clone;
 
@@ -609,8 +616,16 @@ clone_and_execute_process (
         path++; 
         path++;
         name=path;
+
+        // #bugbug
+        // We need to get the directory size to allocate a buffer
+        // to this directory.
+
+        unsigned long BUGBUG_OVERFLOW = ( 32*128 );
+        
         //dir_address = VOLUME1_ROOTDIR_ADDRESS;
-        dir_address = (unsigned long) kmalloc( 32*128 );
+        dir_address = (unsigned long) kmalloc(     BUGBUG_OVERFLOW     );
+        
         if (dir_address == 0){ 
             debug_print("clone_and_execute_process: [FAIL] dir_address allocation fail\n");
             kfree(dir_address); 
@@ -668,6 +683,10 @@ __search:
     // == Search in BIN/ ====================================================
     //
 
+        // #bugbug
+        // We need to get the directory size to allocate a buffer
+        // to this directory.
+
     //load bin/ dir.
     debug_print ("clone_and_execute_process: [FIXME] Loading BIN diretory \n");
         // IN: 
@@ -697,6 +716,11 @@ __search:
     //
     // == Search in SBIN/ =======================================================
     //
+
+        // #bugbug
+        // We need to get the directory size to allocate a buffer
+        // to this directory.
+
 
     //load bin/ dir.
     debug_print ("clone_and_execute_process: [FIXME] Loading SBIN directory \n");

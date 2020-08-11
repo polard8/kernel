@@ -367,6 +367,13 @@ fsLoadFile (
     unsigned long file_address )
 {
 
+
+	// #bugbug
+	// We have a buffer but we don't know the buffer size.
+	// It can overflow when loading a file on it.
+	// We need a buffer structure to handle the max allowed.
+
+
     int i=0;
     int Status;  //??
 
@@ -904,42 +911,32 @@ fs_load_dir (
 // #bugbug
 // Estamos com problemas na string do nome.
 
-unsigned long fsGetFileSize ( unsigned char *file_name ){
+// #bubug
+// Only on rootdir.
+
+unsigned long fsRootDirGetFileSize ( unsigned char *file_name ){
 
     unsigned long FileSize=0;
-    int i=0;
     
-    int Status;   //??
-
-    unsigned short next;
-
+    int i=0;
     unsigned long max = 64;    //?? @todo: rever. Número máximo de entradas.
     unsigned long z = 0;       //Deslocamento do rootdir 
     unsigned long n = 0;       //Deslocamento no nome.
 
     // #bugbug
     // Estamos com problemas na string do nome.
-    
-    //??Nome. 
+ 
     char NameX[13];
+    int CmpStatus = (-1);
 
-	// #importante:
-	// Poderíamos usar malloc ou alocador de páginas ??	
-	// A FAT permanece a mesma para a situaçãod e termos apenas uma partição.
-	//mas se tivermos mai de uma partição também precisamos carregar a FAT 
-	//da partição atual.
-	//unsigned short *fat = (unsigned short *) VOLUME1_FAT_ADDRESS;
-    unsigned short cluster=0;    //Cluster inicial
-
-    //??
-    unsigned long S=0;  //Primeiro setor do cluster.
     int Spc=0;
 
 	// #importante:
 	// Poderíamos usar malloc ou alocador de páginas ??
-	// #todo: Devemos carregar o diretório atual.
+	// #todo: 
+	// Devemos carregar o diretório alvo.
 
-    unsigned short *root_dir = (unsigned short *) VOLUME1_ROOTDIR_ADDRESS;
+    unsigned short *Dir = (unsigned short *) VOLUME1_ROOTDIR_ADDRESS;
 
 	// #todo: Devemos carregar o diretório atual.
 	//unsigned long current_dir_address = (unsigned long) Newpage();
@@ -966,17 +963,18 @@ unsigned long fsGetFileSize ( unsigned char *file_name ){
 	//Carrega o diretório raiz na memória.
 	
 //#ifdef KERNEL_VERBOSE	
-	//printf ("fsGetFileSize: Loading root..\n"); 
+	//printf ("fsRootDirGetFileSize: Loading root..\n"); 
 //#endif	
 	
 	//#bugbug
     //pega o tamanho de um arquivo que está no diretório raiz.
     //#todo: 
     //podemos alterar para pegar de um arquivo que esteja no diretório alvo.	
-	
-	//carregando o diretório raiz.
-	load_directory ( VOLUME1_ROOTDIR_ADDRESS, VOLUME1_ROOTDIR_LBA, 32 );	
-	//fs_load_rootdirEx ();
+
+
+	// Carregando o diretório raiz.
+	load_directory ( VOLUME1_ROOTDIR_ADDRESS, VOLUME1_ROOTDIR_LBA, 32 );
+
 	
 	//#todo:
 	//precisamos na verdade carregarmos o diretório corrente.
@@ -989,20 +987,27 @@ unsigned long fsGetFileSize ( unsigned char *file_name ){
     //A intenção é obtermos a quantidade de entradas no diretório raiz.
 	//#bugbug: Mas isso deveria ser feito para o diretório atual.
 
+    //
+    // == root filesystem structure ===============================
+    //
 
-    if ( (void *) root == NULL ){
-        panic ("fsGetFileSize: No root file system\n");
+
+    if ( (void *) root == NULL )
+    {
+        panic ("fsRootDirGetFileSize: [FAIL] No root file system!\n");
 
     }else{
 
         // Setores por cluster.
         Spc = root->spc;
-        if (Spc <= 0){ panic ("fsGetFileSize: Spc\n");}
+        if (Spc <= 0){ panic ("fsRootDirGetFileSize: [FAIL] Spc\n"); }
 
-	    //Max entries ~ Número de entradas no rootdir.
-		//#bugbug: Devemos ver o número de entradas no diretório corrente.
+        // Max entries ~ Número de entradas no rootdir.
+        // #bugbug: 
+        // Devemos ver o número de entradas no diretório alvo.
+
         max = root->rootdir_entries;
-        if (max <= 0){ panic ("fsGetFileSize: max root entries\n"); }
+        if (max <= 0){ panic ("fsRootDirGetFileSize: [FAIL] max root entries\n"); }
 
         // More?! 
         // ...
@@ -1028,7 +1033,7 @@ unsigned long fsGetFileSize ( unsigned char *file_name ){
 	//ATENÇÃO:
     //Na verdade a variável 'root' é do tipo short.	 
 
-    i=0; 
+
 
 	// Procura o arquivo no diretório raiz.
 	
@@ -1038,74 +1043,68 @@ unsigned long fsGetFileSize ( unsigned char *file_name ){
     // file name limit.
     //
 
-    size_t size = (size_t) strlen (file_name); 
+    size_t szFileName = (size_t) strlen (file_name); 
     
     // o tamanho da string falhou
     //vamos ajustar.
-    if ( size > 11 ){
-        printf ("fsGetFileSize: name size fail %d\n",size );   
-        size = 11;
+    if ( szFileName > 11 )
+    {
+        printf ("fsGetFileSize: [FIXME] name size fail %d\n",
+        szFileName );   
+        szFileName = 11;
     }
 
+    // Compare.
+    // Copia o nome e termina incluindo o char 0.
+    // Compara 11 caracteres do nome desejado, 
+    // com o nome encontrado na entrada atual.
 
-	//
-	// Compare.
-	//
-	
-	while ( i < max )
-	{
-		//Se a entrada não for vazia.
-		if ( root_dir[z] != 0 )
+    i=0; 
+
+    while ( i < max )
+    {
+        // Se a entrada não for vazia.
+        if ( Dir[z] != 0 )
         {
-			// Copia o nome e termina incluindo o char 0.
-			memcpy ( NameX, &root_dir[z], size );
-			NameX[size] = 0;
-			
-            // Compara 11 caracteres do nome desejado, 
-			// com o nome encontrado na entrada atual.
-			Status = strncmp ( file_name, NameX, size );
-			
-            if ( Status == 0 ){ goto found; }
-			// Nothing.
+            memcpy ( NameX, &Dir[z], szFileName );
+            NameX[szFileName] = 0;
+
+            CmpStatus = strncmp ( file_name, NameX, szFileName );
+
+            if ( CmpStatus == 0 ){ goto found; }
+            // Nothing.
         }; 
-		
-		//(32/2) próxima entrada! (16 words) 512 vezes!
+
+        // Next entry.
+        // (32/2)  (16 words) 512 times!
+
         z += 16;    
         i++;        
     }; 
-	
-	// Sai do while. 
-	// O arquivo não foi encontrado.
-		
-//notFound:
 
-    //#debug
-    printf ("fsGetFileSize: %s not found\n", file_name );  
-	printf ("fsGetFileSize: %s not found\n", NameX );  
+    // Not found!
 
-//Falha ao carregar o arquivo.
+    printf ("fsGetFileSize: %s not found\n", file_name );
+    printf ("fsGetFileSize: %s not found\n", NameX );
+
 fail:
-    printf ("fsGetFileSize: file={%s}\n", file_name );	
+
+    printf ("fsGetFileSize: file={%s}\n", file_name );
     refresh_screen ();
-	return (unsigned long) 0;
-	
-	//
-	// Found !
-	//
-	
+    return (unsigned long) 0;
+
+    // Found!
+
 found:
 
     // #debug
     // printf("arquivo encontrado\n");
     // refresh_screen();
-	// while(1){}
-	
-    //Pega o cluster inicial. (word)
-	//cluster = root[ z+13 ];    //(0x1A/2) = 13.	
-	
-	//#debug
-	//pegando o tamanho do arquivo.
-    // 28 29 30 31
+    // while(1){}
+
+    // #debug
+    // Pegando o tamanho do arquivo.
+    // Offsets: 28 29 30 31
 
     FileSize = *(unsigned long*) (VOLUME1_ROOTDIR_ADDRESS + (z*2) + 28 );
 	
@@ -1116,11 +1115,10 @@ found:
 	//#debug
 	//refresh_screen();
 	//while(1){ asm("hlt"); }
-	
-	//#debug
-	printf ("fsGetFileSize: FileSize=%d \n" , FileSize);
-    refresh_screen ();
 
+    //#debug
+    printf ("fsGetFileSize: FileSize=%d \n" , FileSize );
+    refresh_screen ();
 
     return (unsigned long) FileSize;
 }

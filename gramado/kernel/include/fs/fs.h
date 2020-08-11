@@ -136,9 +136,6 @@ unsigned long search_path_dir_entries;
 
 
 
-
-
-
 // ?? - Contagem de diretórios.
 //int dirCount;  
 
@@ -153,49 +150,6 @@ unsigned short file_cluster_list[1024];
 //
 // == Structures ====================================
 //
-
-
-
-/*
- * dir_entry_d:
- *     Entrada de diretório.
- *     @todo: Qual é o sistema de arquivos. ??!
- *     fat16
-
-Structure of the Directory Entries
-Offset	Size	 Description
-  00h	8 bytes	 Filename
-  08h	3 bytes	 Filename Extension
-  0Bh	1 bytes	 Attribute Byte
-  0Ch	1 bytes	 Reserved for Windows NT
-  0Dh	1 bytes	 Creation - Millisecond stamp (actual 100th of a second)
-  0Eh	2 bytes	 Creation Time
-  10h	2 bytes	 Creation Date
-  12h	2 bytes	 Last Access Date
-  14h	2 bytes	 Reserved for FAT32
-  16h	2 bytes	 Last Write Time
-  18h	2 bytes	 Last Write Date
-  1Ah	2 bytes	 Starting cluster
-  1Ch	4 bytes	 File size in bytes
-*/
-
-typedef struct dir_entry_d dir_entry_t; 
-struct dir_entry_d
-{
-    char           FileName[11];      // Filename + extension.
-    unsigned char  Attr;              // File attributes.
-    unsigned char  ReservedNT;        // Reserved for use by Windows NT.
-    unsigned char  TimeInTenths;      // Millisecond stamp at file creation.
-    unsigned short CreateTime;        // Time file was created.
-    unsigned short CreateDate;        // Date file was created.
-    unsigned short LastAccessDate;    // Date file was last accessed.
-    unsigned short ClusterHigh;       // High word of this entry's start cluster.
-    unsigned short Time;              // Time last modified.
-    unsigned short Date;              // Date last modified.
-    unsigned short ClusterLow;        // First cluster number low word.
-    unsigned long  Size;              // File size.
-};
-
 
 
 /*
@@ -281,47 +235,42 @@ struct dir_d
 {
 
     int id;
-
     int used;
     int magic;
 
-	// Parte principal da estrutura
-    file *stream;   //deletar.
-	//file *__file;   //usar esse.
-	
-	
-    // @todo: Incluir informações extras sobre o diretório,
-	//        como se está ou não carregado na memória, endereço,
-	//        privilégios ...
-	
-	//struct user_info_d *OwnerUser;	
-	//struct process_d *OwnerProcess;
-	
-	
-	// número de bytes em uma entrada.
+
+    // #todo: Precisaremos dessas coisas.
+    struct inode_d *inode;
+    file *_file;
+
+    pid_t pid;
+    uid_t uid;
+    gid_t gid;
+
+
+    // número de bytes em uma entrada.
     int entry_size_in_bytes;
-	
-	//numero total de bytes no diretório.
+
+    //numero total de bytes no diretório.
     int totalentries_size_in_bytes;
-	
+
+
+    int number_of_entries;
 
     // Númetro máximo de arquivos em um diretório.
     int fileMax;
 
-
 	// Número total de arquivos presentes no diretório.
     int fileTotal;
-	
 
 	//Endreço onde o arquivo foi carregado.
-	unsigned long address;
+    unsigned long address;
    
 
     //flag, se esta ou nao na memoria.
     int inMemory;
 
-	// Um ponteiro pra estrutura da entrada atual.
-    struct dir_entry_d *current;
+    struct dir_d *next;
 };
 
 
@@ -335,7 +284,7 @@ struct filesystem_d
 {
     // Object info.
 
-    object_type_t objectType;
+    object_type_t  objectType;
     object_class_t objectClass;
 
 
@@ -389,6 +338,10 @@ struct filesystem_d *root;
  
 struct file_access_d
 {
+    pid_t pid;
+    uid_t uid;
+    gid_t gid;
+
     //disk
     struct diskinfo_d *Disk;
     
@@ -398,19 +351,22 @@ struct file_access_d
     //filesystem
     struct filesystem_d *FileSystem;
     
+       
     //directory
     struct dir_d *Directory;
-    struct dir_entry_d *current;
 
-    //file	
-    struct file_d *File;
-    struct _iobuf *FileInfo; //FILE (C99)	
+    struct inode_d *inode;
+    file *File;
 
 
     //flags
     //int flag;	
+
+    // ...
+    
+    struct file_access_d *next;
 };
-struct file_access_d *CurrentFileAccess;
+
 
 
 
@@ -608,9 +564,12 @@ fsLoadFile (
     unsigned long file_address );
 
 
+
+// #bugbug
 // Get file size.
-// precisa melhorar.
-unsigned long fsGetFileSize ( unsigned char *file_name );
+// Only on root dir!
+unsigned long fsRootDirGetFileSize ( unsigned char *file_name );
+
 
 
 //
@@ -748,12 +707,6 @@ fatWriteCluster (
     unsigned long sector, 
     unsigned long address, 
     unsigned long spc );
-
-
-void 
-MountShortFileName ( 
-    char *buffer, 
-    struct dir_entry_d *entry );
 
 
 int fsList ( const char *dir_name );

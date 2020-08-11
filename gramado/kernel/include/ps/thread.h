@@ -498,7 +498,7 @@ struct thread_d
 	// mas será cada thread precisa atuar em um diretório diferente??
 	//
 	//struct _iobuf *root;  // 4 root directory
-    struct _iobuf *pwd;     // 5 (print working directory) 
+    //struct _iobuf *pwd;     // 5 (print working directory) 
 	//...
 		
 	
