@@ -101,9 +101,8 @@ int service_drain_input (void);
 int serviceCreateWindow ( void );
 int servicepixelBackBufferPutpixel (void);
 int servicelineBackbufferDrawHorizontalLine (void);
-
 int serviceRefreshWindow(void);
-
+int serviceRedrawWindow(void);
 int serviceDrawChar(void);
 int serviceDrawText(void);
 int serviceDrawButton (void); 
@@ -582,6 +581,18 @@ gwsProcedure (
            gde_debug_print ("gwssrv: Message number 1006\n");
            serviceRefreshWindow();
            break;
+           
+
+        // Redraw window
+        case 1007:
+           gde_debug_print ("gwssrv: Message number 1007\n");
+           serviceRedrawWindow();
+           break;
+           
+       
+        // #todo:
+        // resize window
+        // replace window
     
         // ...
                
@@ -1234,6 +1245,11 @@ int serviceRefreshRectangle(void)
 }
 
 
+
+
+
+
+
 int servicelineBackbufferDrawHorizontalLine (void)
 {
 
@@ -1258,7 +1274,7 @@ int servicelineBackbufferDrawHorizontalLine (void)
 
 
 
-//todo
+
 int serviceRefreshWindow(void)
 {
 
@@ -1328,6 +1344,66 @@ int serviceRefreshWindow(void)
     return 0;
 }
 
+
+
+
+
+
+
+
+int serviceRedrawWindow(void)
+{
+
+	//o buffer é uma global nesse documento.
+    unsigned long *message_address = (unsigned long *) &__buffer[0];
+
+
+    struct gws_window_d *window;
+    int window_id = -1;
+    unsigned long flags = 0;
+
+
+    // #debug
+    gde_debug_print ("gwssrv: serviceRedrawWindow\n");
+
+
+    // Get
+    
+    window_id = message_address[4];  //wid
+    flags     = message_address[5];  //flag (show or not)
+    
+    //
+    // Window ID
+    //
+   
+    // Limits
+    if ( window_id < 0 || window_id >= WINDOW_COUNT_MAX ){
+        gde_debug_print ("gwssrv: serviceRefreshWindow window_id\n");
+        return -1;
+    }
+
+    //#todo
+    // Get the window structure given the id.
+    window = (struct gws_window_d *) windowList[window_id];
+   
+    if ( (void *) window == NULL ){
+        gde_debug_print ("gwssrv: serviceRefreshWindow window\n");
+        return -1;
+    }
+    
+    if ( window->used != 1 || window->magic != 1234 ){
+        gde_debug_print ("gwssrv: serviceRefreshWindow validation\n");
+        return -1;
+    }
+
+    // redraw!
+    
+    gwssrv_redraw_window (
+        (struct gws_window_d *) window, 
+        (unsigned long) flags );
+
+    return 0;
+}
 
 
 

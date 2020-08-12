@@ -365,6 +365,8 @@ struct gws_window_d
 
 	// Estado: (Full,Maximized,Minimized...)
     int view; 
+    
+    int status;
 
 
     // Margins. (position)
@@ -1081,7 +1083,9 @@ gws_replace_window (
     struct gws_window_d *window, 
     unsigned long x, 
     unsigned long y );
-    
+
+
+int gwssrv_redraw_window (struct gws_window_d *window, unsigned long flags ); 
 
 void gwsWindowLock (struct gws_window_d *window);
 void gwsWindowUnlock (struct gws_window_d *window);

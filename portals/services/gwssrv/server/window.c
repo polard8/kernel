@@ -8,6 +8,316 @@
 #include <api.h>
 #include <gws.h>
 
+
+// Let's redraw the window.
+// IN: window pointer, show or not.
+
+int gwssrv_redraw_window (struct gws_window_d *window, unsigned long flags )
+{
+
+    unsigned long __tmp_color=0;
+
+
+    if ( (void*) window == NULL ) return -1;
+    
+
+	//  ## Shadow ##
+	//
+	// Sombra:
+	//     A sombra pertence à janela e ao frame.
+	//     A sombra é maior que a própria janela.
+	//     ?? Se estivermos em full screen não tem sombra ??
+
+    if ( window->shadowUsed == 1 )
+    {
+
+
+		//CurrentColorScheme->elements[??]
+		
+		//@todo: 
+		// ?? Se tiver barra de rolagem a largura da 
+		// sombra deve ser maior. ?? Não ...
+		//if()
+		
+        // @todo: Adicionar a largura das bordas verticais 
+		// e barra de rolagem se tiver.
+		// @todo: Adicionar as larguras das 
+		// bordas horizontais e da barra de títulos.
+		// Cinza escuro.  CurrentColorScheme->elements[??] 
+		// @TODO: criar elemento sombra no esquema. 
+		
+		if ( (unsigned long) window->type == WT_OVERLAPPED )
+		{
+			if (window->focus == 1)
+			{ __tmp_color = xCOLOR_GRAY1; }    //mais escuro
+			if (window->focus == 0)
+			{ __tmp_color = xCOLOR_GRAY2; }    //mais claro
+
+            
+            //ok funciona
+            //rectBackbufferDrawRectangle ( window->left +1, window->top +1, 
+            //    window->width +1 +1, window->height +1 +1, 
+            //    __tmp_color ); 
+            
+            //test
+            //remeber: the first window do not have a parent.
+            if ( (void*) window->parent == NULL )
+            { 
+                gde_debug_print ("gwssrv_redraw_window: [Shadow] Parent"); 
+                //exit(1); 
+                rectBackbufferDrawRectangle ( 
+                    (window->left +1), 
+                    (window->top +1), 
+                    (window->width +1 +1), 
+                    (window->height +1 +1), 
+                    __tmp_color ); 
+            }
+            
+            if ( (void*) window->parent != NULL ){
+
+                rectBackbufferDrawRectangle ( 
+                    (window->left +1), //(Parent->left   + window->left +1), 
+                    (window->top +1),  //(Parent->top    + window->top +1), 
+                    (window->width +1 +1), 
+                    (window->height +1 +1), 
+                    __tmp_color ); 
+                 
+            }
+
+        }
+
+        // ??
+        // E os outros tipos, não tem sombra ??
+        // Os outros tipos devem ter escolha para sombra ou não ??
+        // Flat design pode usar sombra para definir se o botão 
+        // foi pressionado ou não.
+
+       // ...
+    } //fim do shadow
+  
+
+    // ## Background ##
+    // Background para todo o espaço ocupado pela janela e pelo seu frame.
+    // O posicionamento do background depende do tipo de janela.
+    // Um controlador ou um editbox deve ter um posicionamento relativo
+    // à sua janela mãe. Já uma overlapped pode ser relativo a janela 
+    // gui->main ou relativo à janela mãe.
+
+    if ( window->backgroundUsed == 1 )
+    {
+
+        window->bg_color = COLOR_PINK;
+        //window->bg_color = CurrentColorScheme->elements[csiWindowBackground]; 
+
+        // O argumento 'color' será a cor do bg para alguns tipos.
+        // Talvez não deva ser assim. Talvez tenha que se respeitar o tema instalado.
+        //if ( (unsigned long) window->type == WT_SIMPLE ) { window->bg_color = color; }
+        //if ( (unsigned long) window->type == WT_POPUP )  { window->bg_color = color; }
+        //if ( (unsigned long) window->type == WT_EDITBOX) { window->bg_color = color; }
+        //if ( (unsigned long) window->type == WT_CHECKBOX){ window->bg_color = color; }
+        //if ( (unsigned long) window->type == WT_SCROLLBAR){ window->bg_color = color; }
+        //if ( (unsigned long) window->type == WT_ICON )   { window->bg_color = color; }
+        //if ( (unsigned long) window->type == WT_BUTTON ) { window->bg_color = color; }
+        // ...
+
+		// Pintar o retângulo.
+		// #todo: 
+		// ?? width Adicionar a largura da bordas bordas verticais.
+		// #todo: 
+		// ?? height Adicionar as larguras das bordas horizontais e da barra de títulos.
+
+        /*
+        if ( (unsigned long) type == WT_STATUSBAR )
+        {
+            drawDataRectangle ( window->left, window->top, 
+                window->width -1, window->height, window->bg_color ); 
+
+            dtextDrawString ( window->left +8, window->top +8, 
+                COLOR_TEXT, window->name ); 
+            goto done;
+        }
+        */
+
+        // 
+        // Draw background!
+        //
+
+        //#bugbug
+        //Remember: The first window do not have a parent.
+        if ( (void*) window->parent == NULL ){ 
+            gde_debug_print ("gwssrv_redraw_window: [Background] Parent\n"); 
+            //exit(1); 
+            rectBackbufferDrawRectangle ( 
+                window->left, 
+                window->top, 
+                window->width, 
+                window->height, 
+                window->bg_color );
+        }  
+        
+        if ( (void*) window->parent != NULL ){
+            rectBackbufferDrawRectangle ( 
+                window->left,//(Parent->left   + window->left), 
+                window->top, //(Parent->top    + window->top), 
+                (window->width), 
+                (window->height), 
+                window->bg_color );
+                
+        }
+        //?? More ...
+    }//fim do background
+    
+    
+    
+    //
+    // botao
+    //
+    
+    //Termina de desenhar o botão, mas não é frame
+    //é só o botão...
+    //caso o botão tenha algum frame, será alguma borda extra.
+    int Focus;    //(precisa de borda)
+    int Selected;
+    unsigned long border1;
+    unsigned long border2;
+
+    if ( (unsigned long) window->type == WT_BUTTON )
+    {
+
+        //border color
+        //o conceito de status e state
+        //está meio misturado. ja que estamos usando
+        //a função de criar janela para criar botão.
+        //#bugbug
+        switch( window->status )
+        {
+            case BS_FOCUS:
+                border1 = COLOR_BLUE;
+                border2 = COLOR_BLUE;
+                break;
+
+            case BS_PRESS:
+                Selected = 1;
+                border1 = GWS_COLOR_BUTTONHIGHLIGHT3;
+                border2 = GWS_COLOR_BUTTONSHADOW3;
+                break;
+
+            case BS_HOVER:
+                break;
+                    
+            case BS_DISABLED:
+                border1 = COLOR_GRAY;
+                border2 = COLOR_GRAY;
+                break;
+
+            case BS_PROGRESS:
+                break;
+
+            case BS_DEFAULT:
+            default: 
+                Selected = 0;
+                border1 = GWS_COLOR_BUTTONHIGHLIGHT3;
+                border2 = GWS_COLOR_BUTTONSHADOW3;
+                break;
+        };
+
+
+        size_t tmp_size = (size_t) strlen ( (const char *) window->name );
+        unsigned long offset = 
+        ( ( (unsigned long) window->width - ( (unsigned long) tmp_size * (unsigned long) gcharWidth) ) / 2 );
+       
+
+        //#debug
+        if ( (void*) window->parent == NULL ){
+            gde_debug_print ("gwssrv_redraw_window: [WT_BUTTON] Parent NULL\n"); 
+        }
+
+
+        if ( (void*) window->parent != NULL )
+        {
+
+            //board1, borda de cima e esquerda.
+            rectBackbufferDrawRectangle ( 
+                window->left,//(Parent->left   + window->left), 
+                window->top,//(Parent->top    + window->top), 
+                (window->width), 
+                1, 
+                border1 );
+                
+            rectBackbufferDrawRectangle ( 
+                window->left, //(Parent->left   + window->left), 
+                window->top, //(Parent->top    + window->top), 
+                1, 
+                (window->height),
+                 border1 );
+
+             //board2, borda direita e baixo.
+             rectBackbufferDrawRectangle ( 
+                 (window->left) + (window->width) -1,//(Parent->left   + window->left) + (window->width) -1, 
+                 window->top,//(Parent->top    + window->top), 
+                 1, 
+                 (window->height), 
+                 border2 );
+                 
+             rectBackbufferDrawRectangle ( 
+                 window->left,//(Parent->left   + window->left), 
+                 (window->top) + (window->height) -1, //(Parent->top    + window->top) + (window->height) -1, 
+                 (window->width), 
+                 1, 
+                 border2 );
+                 
+                 
+            // Button label
+            if (Selected == 1){
+                dtextDrawString ( 
+                    (window->left) + offset, //(Parent->left   + window->left) + offset,
+                    (window->top)  +8, //(Parent->top    + window->top)  +8, 
+                    COLOR_WHITE, window->name );
+            }else{
+                // (largura do botão, menos a largura da string)/2
+                // #debug: Rotina provisória
+                //dtextDrawString ( x +20, y +20, COLOR_TERMINALTEXT, string );
+                dtextDrawString ( 
+                    (window->left) +offset, //(Parent->left   + window->left) +offset, 
+                    (window->top)  +8, //(Parent->top    + window->top)  +8, 
+                    COLOR_TERMINALTEXT, window->name );
+            };
+        }
+
+      //todo
+      // configurar a estrutura de botão 
+      // e apontar ela como elemento da estrutura de janela.
+      //window->button->?
+    }
+
+
+
+draw_frame:
+
+
+
+    if ( window->type == WT_OVERLAPPED || 
+         window->type == WT_EDITBOX || 
+         window->type == WT_BUTTON )
+    {
+        createwDrawFrame ( 
+            (struct gws_window_d *) window->parent,  //parent.
+            (struct gws_window_d *) window,      //bg do botão em relação à sua parent. 
+            0, 0, window->width, window->height, 
+            1 );  //style
+        
+    }
+
+    if(flags == 1)
+        gws_show_window_rect(window);
+
+    return 0;
+}
+
+
+
+
+
 /*
  * =====================================================
  * windowSetUpColorScheme:
