@@ -36,6 +36,7 @@ void bg_load_image (void)
     int status = -1;
     
 	// 512*4096 = 2MB
+	unsigned long tmp_size = (512*4096);
     void *__buffer = (void *) allocPages ( 512 );
 
     
@@ -48,8 +49,12 @@ void bg_load_image (void)
     if (status < 0)
     {
         // See: read.c
-        status = (int) fsLoadFile ( VOLUME1_FAT_ADDRESS, VOLUME1_ROOTDIR_ADDRESS, 
-            "ANIMAL  BMP", (unsigned long) __buffer );
+        status = (int) fsLoadFile ( VOLUME1_FAT_ADDRESS, 
+                           VOLUME1_ROOTDIR_ADDRESS, 
+                           32, //#bugbug: Number of entries.
+                           "ANIMAL  BMP", 
+                           (unsigned long) __buffer,
+                           tmp_size );
         
         if (status != 0)
         {

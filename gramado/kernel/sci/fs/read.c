@@ -363,10 +363,16 @@ unsigned long
 fsLoadFile ( 
     unsigned long fat_address,
     unsigned long dir_address,
+    int dir_entries,
     unsigned char *file_name, 
-    unsigned long file_address )
+    unsigned long file_address,
+    unsigned long buffer_limit )
 {
 
+    // #bugbug
+    // Se estamos considerando o endereço de quanquer diretorio
+    // entao devemos considerar o numero de entradas nesse dado
+    // diretorio.
 
 	// #bugbug
 	// We have a buffer but we don't know the buffer size.
@@ -379,7 +385,21 @@ fsLoadFile (
 
     int SavedDirEntry = 0;
     unsigned short next=0;
-    unsigned long max = 64;    //?? @todo: rever. Número máximo de entradas.
+    
+    // #todo: 
+    // Rever. Número máximo de entradas.
+    
+    unsigned long MaxEntries = (unsigned long) dir_entries;
+    
+    // #bugbug: 
+    // Esse eh o numero de entradas no diretorio raiz.
+    MaxEntries = 512;      
+    
+    
+    
+    unsigned long BufferLimit = (unsigned long) buffer_limit;
+    
+    
     unsigned long z = 0;       //Deslocamento do rootdir 
     unsigned long n = 0;       //Deslocamento no nome.
 
@@ -432,7 +452,28 @@ fsLoadFile (
 
 //load_DIR:
     debug_print ("fsLoadFile:\n");
+    
+    if ( MaxEntries == 0 ){
+        panic("fsLoadFile: MaxEntries\n");
+    }
 
+    if ( MaxEntries > 512 ){
+        panic("fsLoadFile: MaxEntries limits\n");
+    }
+    
+
+    if ( BufferLimit == 0 ){
+        panic("fsLoadFile: [FAIL] BufferLimit fail\n");
+    }
+
+    // limite maximo de uma imagem de processo.
+    if ( BufferLimit > (512*4096) ){
+        panic("fsLoadFile: [FAIL] BufferLimit\n");
+    }
+    
+    
+   
+   
 
     // File system structure.
     // + Checa se é válida a estrutura do sistema de arquivos.
@@ -441,7 +482,8 @@ fsLoadFile (
     //    máximo de entradas.
     // ...
 
-    if ( (void *) root == NULL ){
+    if ( (void *) root == NULL )
+    {
         panic ("fsLoadFile: No root file system.\n");
 
     }else{
@@ -460,8 +502,8 @@ fsLoadFile (
         // #bugbug: 
         // Devemos ver o número de entradas no diretório corrente.
 
-        max = root->rootdir_entries;
-        if (max <= 0){ panic ("fsLoadFile: max root entries \n"); }
+        //max = root->rootdir_entries;
+        if (MaxEntries <= 0){ panic ("fsLoadFile: max root entries \n"); }
 
         // ...
     };
@@ -517,11 +559,44 @@ fsLoadFile (
     FileNameSize = (size_t) strlen (file_name); 
 
     if ( FileNameSize > 11 ){
-         printf ("fsLoadFile: size [FAIL] %d\n", FileNameSize ); 
+         printf ("fsLoadFile: [FAIL] name size %d\n", FileNameSize ); 
          FileNameSize = 11;
          //return 1; //fail
     }
     
+    
+    //
+    // File size.
+    //
+    
+    // Pegar o tamanho do arquivo e comparar com o limite do buffer.
+    // #bugbug: Essa rotina s'o pega o tamanho dos arquivos que
+    // estao no diretorio raiz.
+    
+    unsigned long FileSize = 0;
+    
+    FileSize = fsRootDirGetFileSize( (unsigned char *) file_name );
+    if(FileSize==0){
+        debug_print ("fsLoadFile: [FIXME] FileSize fail\n");
+    }
+
+
+    // Comparando nosso tamanho obtido com o tamanho do buffer.
+    // Como a rotina de pegar o tamanho so pega no diretorio raiz
+    // por enquanto, entao vamos apenas emitir um alerta que 
+    // o tamanho do arquivo eh maior que o buffer, servira para debug.
+    // Isso porque em todas as tentativas de pegar o tamanho do arquivo
+    // fora do root, retornara 0.
+    
+    //#todo
+    //Precisamos usar as estruturas de diretorio e as estruturas de buffer.
+
+    if ( FileSize > BufferLimit )
+    {
+        debug_print ("fsLoadFile: [=========== BUGBUG =============] Buffer Overflow!\n");
+    }
+
+
     
     // We are opening the root dir.
     //if ( file_name[0] == '/' && size == 1 )
@@ -559,7 +634,7 @@ fsLoadFile (
     // (32/2) próxima entrada! (16 words) 512 vezes!
     
     i=0; 
-    while ( i < max )
+    while ( i < MaxEntries )
     {
         if ( __dir[z] != 0 )
         {

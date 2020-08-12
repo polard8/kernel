@@ -644,12 +644,12 @@ int load_mouse_bmp (void){
 
     // Alocando duas páginas para um BMP pequeno. 8KB.
 
-	mouseBMPBuffer = (void *) allocPages (2);
-	//mouseBMPBuffer = (void *) allocPages (10);
+    unsigned long tmp_size = (2*4096);
+    mouseBMPBuffer = (void *) allocPages (2);
 
 
-    if ( (void *) mouseBMPBuffer == NULL )
-    {
+
+    if ( (void *) mouseBMPBuffer == NULL ){
         printf ("load_mouse_bmp: mouseBMPBuffer\n");
         goto fail;
     }
@@ -667,8 +667,10 @@ int load_mouse_bmp (void){
 
     fileret = (unsigned long) fsLoadFile ( VOLUME1_FAT_ADDRESS,
                                   VOLUME1_ROOTDIR_ADDRESS, 
+                                  32, //#bugbug: Number of entries.
                                   "MOUSE   BMP", 
-                                  (unsigned long) mouseBMPBuffer );
+                                  (unsigned long) mouseBMPBuffer,
+                                  tmp_size );
 
     if ( fileret != 0 )
     {

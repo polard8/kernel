@@ -334,7 +334,7 @@ void testingPageAlloc (void){
     //Ret = (void*) allocPages(500);  
 	
 	//8KB. Para imagem pequena.
-	
+	unsigned long tmp_size = (2*4096);
 	RetAddress = (void *) allocPages (2); 
 	
 	if ( (void *) RetAddress == NULL )
@@ -351,13 +351,9 @@ void testingPageAlloc (void){
     {  
         p = (void *) pageAllocList[Index]; 
 		
-		if ( (void *) p == NULL )
-		{
-		    printf("null\n");	 
-		}
-	    
-		if ( (void *) p != NULL )
-		{
+		if ( (void *) p == NULL ){ printf("null\n"); }
+
+		if ( (void *) p != NULL ){
 		    printf ("id={%d} used={%d} magic={%d} free={%d} handle={%x} next={%x}\n", 
 				p->id, p->used, p->magic, p->free, p, p->next ); 	
 		}
@@ -365,9 +361,13 @@ void testingPageAlloc (void){
 
 
     //===================================
-	 
-	fileret = fsLoadFile (  VOLUME1_FAT_ADDRESS, VOLUME1_ROOTDIR_ADDRESS, 
-	              "BMP1    BMP", (unsigned long) RetAddress ); 
+
+    fileret = fsLoadFile (  VOLUME1_FAT_ADDRESS, 
+                  VOLUME1_ROOTDIR_ADDRESS, 
+                  32, //#bugbug: Number of entries. 
+                  "BMP1    BMP", 
+                  (unsigned long) RetAddress,
+                  tmp_size ); 
 
 	if (fileret != 0)
 	{
@@ -382,12 +382,11 @@ void testingPageAlloc (void){
 		
 	    bmpDisplayBMP ( (char *) RetAddress, 20, 20 );	
 	    refresh_rectangle ( 20, 20, 16, 16 );
-	};
+    };
     //===================================	
-	
-	
-	printf ("pc-mm-testingPageAlloc: *hang\n");
-    die ();
+
+
+    panic ("mminfo-testingPageAlloc: *hang\n");
 
 
 done:
@@ -402,8 +401,10 @@ fail:
 //mostra as estruturas de pagina usadas para paginação no pagedpool.
 void showFreepagedMemory ( int max ){
 
-    int Index;
+
     struct page_d *p;
+    int Index=0;
+
 
 
     if (max < 0 || max >= 1024 )

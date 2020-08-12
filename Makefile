@@ -232,13 +232,17 @@ vhd-copy-files:
 	sudo cp gramado/base/GRAMADO.TXT     /mnt/gramadovhd
 
 
-	# 6) from Portals to root. Apps, not system services.
+	# 6) from Portals to root.
 	-sudo cp portals/services/gwssrv/bin/GWS.BIN     /mnt/gramadovhd
+	-sudo cp portals/services/gwssrv/bin/GWSSRV.BIN  /mnt/gramadovhd
 	-sudo cp portals/services/gnssrv/bin/GNS.BIN     /mnt/gramadovhd
+	-sudo cp portals/services/gnssrv/bin/GNSSRV.BIN  /mnt/gramadovhd
 	-sudo cp portals/shell/apps/bin/*.BIN            /mnt/gramadovhd
 	#-sudo cp portals/shell/cmd/bin/*.BIN             /mnt/gramadovhd
 	-sudo cp portals/shell/net/bin/*.BIN             /mnt/gramadovhd
 	#-sudo cp portals/setup/bin/*.BIN                 /mnt/gramadovhd 
+	-sudo cp portals/shell/cmd/bin/REBOOT.BIN         /mnt/gramadovhd
+	-sudo cp portals/shell/cmd/bin/CAT.BIN            /mnt/gramadovhd
 	# ...
 
 

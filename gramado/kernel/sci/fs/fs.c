@@ -1016,9 +1016,14 @@ int load_path ( unsigned char *path, unsigned long address ){
     // Path provisório.
     p = path;
 
+
+    // #bugbug
+    // Overflow quando colocarmos um diretorio maior que
+    // o buffer.
+
     // Primeiro src =  root address;
-    // COmeçando com o kernel.
     __src_buffer = (void *) VOLUME1_ROOTDIR_ADDRESS;
+    unsigned long limits = (512*32);
 
     
     //
@@ -1092,9 +1097,6 @@ int load_path ( unsigned char *path, unsigned long address ){
                 //
                 // Load
                 //
-
-                // Alocando memória para carregar o diretório.
-                //__dst_buffer = (void *) malloc (512*32);
     
                 // Como esse é o último, então vamos usar o endereço desejado pelo usuário.
                 __dst_buffer = (void *) __file_buffer;
@@ -1106,9 +1108,11 @@ int load_path ( unsigned char *path, unsigned long address ){
                       // IN: 
                       // fat address, dir address, filename, file address.
                 Ret = fsLoadFile ( (unsigned long) VOLUME1_FAT_ADDRESS,  // fat address
-                          (unsigned long) __src_buffer,                  // dir address. onde procurar.  
+                          (unsigned long) __src_buffer,                  // dir address. onde procurar. 
+                          32, //#bugbug: Number of entries. 
                           (unsigned char *) buffer,                      // nome 
-                          (unsigned long) __dst_buffer );                // addr. Onde carregar. 
+                          (unsigned long) __dst_buffer, // addr. Onde carregar.
+                          limits );    // tamanho do buffer onde carregar.             
 
                 // ok.
                 if ( Ret == 0 )
@@ -1164,6 +1168,7 @@ int load_path ( unsigned char *path, unsigned long address ){
                 // Alocando memória para carregar o diretório.
                 
                 unsigned long BUGBUG_OVERFLOW = (512*32);
+                limits = BUGBUG_OVERFLOW;
                 
                 __dst_buffer = (void *) kmalloc (    BUGBUG_OVERFLOW    ); 
     
@@ -1173,9 +1178,11 @@ int load_path ( unsigned char *path, unsigned long address ){
                           
                       //IN: fat address, dir address, filename, file address.
                 Ret = fsLoadFile ( (unsigned long) VOLUME1_FAT_ADDRESS,  // fat address
-                          (unsigned long) __src_buffer,                  // dir address. onde procurar.  
+                          (unsigned long) __src_buffer,                  // dir address. onde procurar.
+                          32, //#bugbug: Number of entries.  
                           (unsigned char *) buffer,                      // nome 
-                          (unsigned long) __dst_buffer );                // addr. Onde carregar. 
+                          (unsigned long) __dst_buffer,
+                          limits );                // addr. Onde carregar. 
                           
                           
                 // ok.
@@ -2228,10 +2235,10 @@ __OK:
 
 
     // File size.
-
+    // #bugbug: OUT: 'unsigned long'
     FileSize = (size_t) fsRootDirGetFileSize( (unsigned char *) file_name );
     
-    if (FileSize < 0){
+    if (FileSize <= 0){
         printf ("sys_read_file: File size fail\n");
         refresh_screen();
         return (-1);
@@ -2296,17 +2303,17 @@ __OK:
  
     Status = (int) fsLoadFile ( VOLUME1_FAT_ADDRESS, 
                        VOLUME1_ROOTDIR_ADDRESS, 
+                       32, //#bugbug: Number of entries.
                        file_name, 
-                       (unsigned long) __file->_base );
-   
+                       (unsigned long) __file->_base,
+                       __file->_lbfsize );
+
     if ( Status != 0 ){
         printf ("sys_read_file: fsLoadFile fail\n");
         refresh_screen();
         return -1;
     }
 
-
-    
     
     // #bugbug
     // Agora é a hora de atualizarmos as tabelas ....
@@ -2471,8 +2478,10 @@ int fsLoadFileFromCurrentTargetDir (void){
 
     Ret = (int) fsLoadFile ( VOLUME1_FAT_ADDRESS,  
                     current_target_dir.current_dir_address,    //src dir address 
+                    32, //#bugbug: Number of entries.
                     (unsigned char *) current_target_dir.name, 
-                    (unsigned long) new_address );             //dst dir address
+                    (unsigned long) new_address,
+                    4096 );             //dst dir address
 
     scheduler_unlock ();
     taskswitch_unlock ();

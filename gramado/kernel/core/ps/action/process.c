@@ -2389,18 +2389,21 @@ file *get_stream_from_fd ( int pid, int fd )
 // pra só depois mapear no endereço certo e no diretório certo.
 
 int 
-__execute_new_process ( const char *filename, 
-                        char *argv[], 
-                        char *envp[] )
+__execute_new_process ( 
+    const char *filename, 
+    char *argv[], 
+    char *envp[] )
 {
-    struct process_d *p;
-    struct thread_d *t;
+
+    struct process_d  *p;
+    struct thread_d   *t;
     
     
-    debug_print ("process-__execute_new_process: FIXME, it's a work in progress!\n");
+    debug_print ("process-__execute_new_process: [FIXME] It's a work in progress!\n");
     return -1;
     
     
+    /*
     int __pid = (int) getNewPID ();
     if (__pid < 0){
         panic ("__execute_new_process: pid");
@@ -2446,8 +2449,9 @@ __execute_new_process ( const char *filename,
     
     fileret = (unsigned long) fsLoadFile ( VOLUME1_FAT_ADDRESS, 
                                   VOLUME1_ROOTDIR_ADDRESS, 
+                                  32, //#bugbug: Number of entries.
                                   (unsigned char *) filename, 
-                                  (unsigned long) 0x00400000 );
+                                  (unsigned long) 0x00400000, ?? );
 
 
     if ( fileret != 0 )
@@ -2473,6 +2477,7 @@ __execute_new_process ( const char *filename,
     return 0;
     //return __pid;
     //...
+    */
 }
 
 
@@ -2556,8 +2561,8 @@ process_execve (
 
     int Status = 1;    // fail.
 
-    struct process_d *process;
-    struct thread_d *Thread;
+    struct process_d  *process;
+    struct thread_d   *Thread;
 
 	//??
 	//Esse � o primeiro argumento.
@@ -2744,17 +2749,26 @@ process_execve (
     //memcpy (process->name_address, arg1, 11);
     //memcpy (process->name, arg1, 11);
     //process->name = (char *) arg1; 
+    
+    // #bugbug
+    // What is the image size ??????????????????????????????
+    // Vamos estipular um limite provisorio de 512 KB,
+    // pois ate o momento somente o kernel tem mais que isso.
+
+    unsigned long BUGBUG_IMAGE_SIZE_LIMIT = (512 * 4096);
 
     Status = (int) fsLoadFile ( VOLUME1_FAT_ADDRESS, 
                        VOLUME1_ROOTDIR_ADDRESS, 
+                       32, //#bugbug: Number of entries.
                        (unsigned char *) arg1, 
-                       (unsigned long) process->Image );
+                       (unsigned long) process->Image, 
+                       BUGBUG_IMAGE_SIZE_LIMIT );
 
-    if ( Status == 1 )
-    {
+    if ( Status == 1 ){
         printf ("do_execve: Couldn't load file\n");
         goto fail;
     }
+
 
 	// Check ELF signature.
 	// OK. O comando existe e o arquivo foi carregado, mas 

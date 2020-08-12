@@ -259,15 +259,18 @@ void __x86StartInit (void){
     //
     // INIT.BIN
     //
-
+    
+    
+    unsigned long BUGBUG_IMAGE_SIZE_LIMIT = (512 * 4096);
 
 	// loading image.
     
     fileret = (unsigned long) fsLoadFile ( VOLUME1_FAT_ADDRESS, 
                                   VOLUME1_ROOTDIR_ADDRESS, 
+                                  32, //#bugbug: Number of entries.
                                   "INIT    BIN", 
-                                  (unsigned long) 0x00400000 );
-
+                                  (unsigned long) 0x00400000,
+                                  BUGBUG_IMAGE_SIZE_LIMIT );
 
     // Coldn't load init.bin
     if ( fileret != 0 ){

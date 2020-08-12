@@ -1425,7 +1425,11 @@ sys_create_process (
     
     debug_print ("sys_create_process:\n");
 
-    //? kb 1024*?/4096 = 
+
+    // #bugbug
+    
+    // 40 * 4096
+    unsigned long tmp_size = (40 * 4096);
     tmp_va = (unsigned long) allocPages(40); //40 páginas;
 
     //#todo: validation
@@ -1439,22 +1443,25 @@ sys_create_process (
 
     fileret = (unsigned long) fsLoadFile ( VOLUME1_FAT_ADDRESS, 
                                   VOLUME1_ROOTDIR_ADDRESS, 
+                                  32, //#bugbug: Number of entries.
                                   name, 
-                                  (unsigned long) tmp_va );
+                                  (unsigned long) tmp_va,
+                                  tmp_size );
 
 
     // Se não encontramos init.bin
     if ( fileret != 0 )
     {
-        fileret = (unsigned long) fsLoadFile ( VOLUME1_FAT_ADDRESS, 
-                                      VOLUME1_ROOTDIR_ADDRESS, 
-                                      name, 
-                                      (unsigned long) tmp_va );
+        //fileret = (unsigned long) fsLoadFile ( VOLUME1_FAT_ADDRESS, 
+        //                              VOLUME1_ROOTDIR_ADDRESS, 
+        //                              32, //#bugbug: Number of entries.
+        //                              name, 
+        //                              (unsigned long) tmp_va, tmp_size );
 
         
-        if ( fileret != 0 ){
-            panic ("sys_create_process: fileret \n");
-        }
+        //if ( fileret != 0 ){
+            panic ("sys_create_process: [FILE] fileret. Couldn't load init.bin \n");
+        //}
     }
  
 

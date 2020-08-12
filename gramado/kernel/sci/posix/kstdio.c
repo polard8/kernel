@@ -313,9 +313,11 @@ file *k_fopen ( const char *filename, const char *mode ){
 	//printf ("before_fsLoadFile: %s\n", filename );
 
     fileret = fsLoadFile ( VOLUME1_FAT_ADDRESS, 
-                  current_target_dir.current_dir_address, 
+                  current_target_dir.current_dir_address,
+                  32, //#bugbug: Number of entries.
                   (unsigned char *) filename, 
-                  (unsigned long) f->_base );
+                  (unsigned long) f->_base,
+                  f->_lbfsize );
 
 	//printf ("after_fsLoadFile: %s\n", filename );  
 

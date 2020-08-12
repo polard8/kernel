@@ -63,15 +63,15 @@ int gwsInstallFont ( char *file_name ){
 
     unsigned long fileret;
 
-	// 14KB
+	// 
 	// #todo: 
 	// Rever esse tamanho.
 
+    unsigned long tmp_size = (8*4096);
     void *font_buffer = (void *) allocPages (8);
 
 
-    if ( (void *) font_buffer == NULL )
-    {
+    if ( (void *) font_buffer == NULL ){
         panic ("gwsInstallFont: font_buffer\n");
     }
 
@@ -81,19 +81,17 @@ int gwsInstallFont ( char *file_name ){
 
     fileret = (unsigned long) fsLoadFile ( VOLUME1_FAT_ADDRESS, 
                                   VOLUME1_ROOTDIR_ADDRESS, 
+                                  32, //#bugbug: Number of entries.
                                   (unsigned char *) file_name, 
-                                  (unsigned long) font_buffer );
+                                  (unsigned long) font_buffer,
+                                  tmp_size );
 
-
-    if ( fileret != 0 )
-    {
+    if ( fileret != 0 ){
         panic ("gwsInstallFont: fileret\n");
     }
 
-
 	// Configurando o endereço da fonte atual.
     gwsSetCurrentFontAddress ( (unsigned long) (font_buffer + 0x2000) );
-
 
     return 0;
 }

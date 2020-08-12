@@ -603,7 +603,11 @@ clone_and_execute_process (
     // ::p/ = "/PORTALS/"   (system apps)
 
 
-
+    // para 32 entradas.
+    unsigned long BUGBUG_OVERFLOW = ( 32*128 );
+    
+    
+    /* 
     // execute from root.
     if (path[0] == ':' &&
         path[1] == ':' &&
@@ -620,8 +624,6 @@ clone_and_execute_process (
         // #bugbug
         // We need to get the directory size to allocate a buffer
         // to this directory.
-
-        unsigned long BUGBUG_OVERFLOW = ( 32*128 );
         
         //dir_address = VOLUME1_ROOTDIR_ADDRESS;
         dir_address = (unsigned long) kmalloc(     BUGBUG_OVERFLOW     );
@@ -638,9 +640,11 @@ clone_and_execute_process (
         // fat address, dir address, filename, file address.
         // OUT: 0=OK
         Status = fsLoadFile ( (unsigned long) VOLUME1_FAT_ADDRESS,  // fat address
-                     (unsigned long) VOLUME1_ROOTDIR_ADDRESS,       // dir address. onde procurar.  
+                     (unsigned long) VOLUME1_ROOTDIR_ADDRESS,       // dir address. onde procurar. 
+                     32, //#bugbug: Number of entries.  
                      (unsigned char *) "PORTALS    ",               // dir name 
-                     (unsigned long) dir_address );                 // addr. Onde carregar. 
+                     (unsigned long) dir_address,                   // addr. Onde carregar.
+                      BUGBUG_OVERFLOW );                  
         if(Status!=0){ 
             debug_print("clone_and_execute_process: [FAIL] Couldn't load file\n");
             kfree(dir_address); 
@@ -649,7 +653,7 @@ clone_and_execute_process (
         // Procure dentro do diretorio carregado.
         goto __search;
     }
-
+    */
 
     // No caso de nenhum dos atalhos acima.
     // Search in root dir. ("/")
@@ -671,14 +675,14 @@ __search:
     
 
     // Procura o nome no diretorio carregado anteriormente.
-    // pode ser root ou portals.
+    // Que eh o diretorio raiz
+
     __Status = (int) KiSearchFile ( name, dir_address );
     if (__Status == 1){ goto __found; }
 
 
 
-
-
+    /*
     //
     // == Search in BIN/ ====================================================
     //
@@ -694,8 +698,10 @@ __search:
         // OUT: 0=OK
     Status = fsLoadFile ( (unsigned long) VOLUME1_FAT_ADDRESS,  // fat address
                      (unsigned long) VOLUME1_ROOTDIR_ADDRESS,       // dir address. onde procurar.  
+                     32, //#bugbug: Number of entries. 
                      (unsigned char *) "BIN        ",               // dir name 
-                     (unsigned long) dir_address );                 // addr. Onde carregar. 
+                     (unsigned long) dir_address,                  // addr. Onde carregar.
+                     BUGBUG_OVERFLOW );                  
     if(Status!=0){ 
         debug_print("clone_and_execute_process: [FAIL] Couldn't load BIN folder\n");
         kfree(dir_address); 
@@ -705,8 +711,8 @@ __search:
     // Procura o nome no diretorio carregado
     __Status = (int) KiSearchFile ( name, dir_address );
     if (__Status == 1){ goto __found; }
-
-
+    */
+ 
 
 
 
@@ -887,6 +893,8 @@ do_clone:
         //#debug
         //printf ("do_clone_execute_process: %s\n",filename);
         
+       unsigned long BUGBUG_IMAGE_SIZE_LIMIT = (512 * 4096);
+        
         //Status = (int) fsLoadFile ( 
         //                   VOLUME1_FAT_ADDRESS, 
         //                   VOLUME1_ROOTDIR_ADDRESS, 
@@ -899,11 +907,12 @@ do_clone:
         //                   filename, 
         //                   (unsigned long) Clone->Image );
 
-        Status = (int) fsLoadFile ( 
-                           VOLUME1_FAT_ADDRESS, 
-                           dir_address, 
+        Status = (int) fsLoadFile ( VOLUME1_FAT_ADDRESS, 
+                           dir_address,
+                           32, //#bugbug: Number of entries. 
                            name, 
-                           (unsigned long) Clone->Image );
+                           (unsigned long) Clone->Image,
+                           BUGBUG_IMAGE_SIZE_LIMIT );
                            
        // Se falhou o carregamento. Vamos matar a thread e o processo.
        if ( Status != 0 )

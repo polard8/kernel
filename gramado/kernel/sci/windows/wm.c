@@ -3510,18 +3510,20 @@ int windowLoadGramadoIcons (void){
 	// ## size ##
 	// Vamos carregar ícones pequenos.
 	//@todo checar a validade dos ponteiros.
+	
+	unsigned long tmp_size = (4*4096);
 
 	appIconBuffer      = (void *) allocPages (4);
 	fileIconBuffer     = (void *) allocPages (4);
 	folderIconBuffer   = (void *) allocPages (4);
 	terminalIconBuffer = (void *) allocPages (4);
 	cursorIconBuffer   = (void *) allocPages (4);
-	//...
+	// ...
 
-	if ( (void *) appIconBuffer == NULL )
-	{
-		panic ("init_windows: appIconBuffer\n");
-	}
+
+    if ( (void *) appIconBuffer == NULL ){
+       panic ("init_windows: appIconBuffer\n");
+    }
 
 	if ( (void *) fileIconBuffer == NULL )
 	{
@@ -3548,49 +3550,59 @@ int windowLoadGramadoIcons (void){
 	//
 
     fRet = (unsigned long) fsLoadFile ( VOLUME1_FAT_ADDRESS,
-							   VOLUME1_ROOTDIR_ADDRESS, 
-						       "APP     BMP", 
-	                           (unsigned long) appIconBuffer );	
-    if ( fRet != 0 )
-	{
-		panic ("init_windows: APP.BMP\n");
-	}
-    
-	fRet = (unsigned long) fsLoadFile ( VOLUME1_FAT_ADDRESS,
-						       VOLUME1_ROOTDIR_ADDRESS, 
-							   "FILE    BMP", 
-	                           (unsigned long) fileIconBuffer );
-    if ( fRet != 0 )
-	{
-		panic ("init_windows: FILE.BMP\n");
-	}
+                               VOLUME1_ROOTDIR_ADDRESS, 
+                               32, //#bugbug: Number of entries.
+                               "APP     BMP", 
+                               (unsigned long) appIconBuffer,
+                               tmp_size );
+    if ( fRet != 0 ){
+        panic ("init_windows: APP.BMP\n");
+    }
 
-	fRet = (unsigned long) fsLoadFile ( VOLUME1_FAT_ADDRESS, 
-						       VOLUME1_ROOTDIR_ADDRESS, 
-							   "FOLDER  BMP", 
-	                           (unsigned long) folderIconBuffer );
-    if ( fRet != 0 )
-	{
-		panic ("init_windows: FOLDER.BMP\n");
-	}
-	
-	fRet = (unsigned long) fsLoadFile ( VOLUME1_FAT_ADDRESS, 
-						       VOLUME1_ROOTDIR_ADDRESS, 
-							   "TERMINALBMP", 
-	                           (unsigned long) terminalIconBuffer );
-    if ( fRet != 0 )
-	{
-		panic ("init_windows: TERMINAL.BMP\n");
-	}	
-	
-	fRet = (unsigned long) fsLoadFile ( VOLUME1_FAT_ADDRESS, 
-						       VOLUME1_ROOTDIR_ADDRESS, 
-							   "CURSOR  BMP", 
-	                           (unsigned long) cursorIconBuffer );
-    if ( fRet != 0 )
-	{
-		panic ("init_windows: CURSOR.BMP\n");
-	}
+
+    fRet = (unsigned long) fsLoadFile ( VOLUME1_FAT_ADDRESS,
+                               VOLUME1_ROOTDIR_ADDRESS, 
+                               32, //#bugbug: Number of entries.
+                               "FILE    BMP", 
+                               (unsigned long) fileIconBuffer,
+                               tmp_size );
+    if ( fRet != 0 ){
+        panic ("init_windows: FILE.BMP\n");
+    }
+
+
+    fRet = (unsigned long) fsLoadFile ( VOLUME1_FAT_ADDRESS, 
+                               VOLUME1_ROOTDIR_ADDRESS, 
+                               32, //#bugbug: Number of entries.
+                               "FOLDER  BMP", 
+                               (unsigned long) folderIconBuffer,
+                               tmp_size );
+    if ( fRet != 0 ){
+        panic ("init_windows: FOLDER.BMP\n");
+    }
+
+
+    fRet = (unsigned long) fsLoadFile ( VOLUME1_FAT_ADDRESS, 
+                               VOLUME1_ROOTDIR_ADDRESS, 
+                               32, //#bugbug: Number of entries.
+                               "TERMINALBMP", 
+                               (unsigned long) terminalIconBuffer,
+                               tmp_size );
+    if ( fRet != 0 ){
+        panic ("init_windows: TERMINAL.BMP\n");
+    }
+
+
+    fRet = (unsigned long) fsLoadFile ( VOLUME1_FAT_ADDRESS, 
+                               VOLUME1_ROOTDIR_ADDRESS, 
+                               32, //#bugbug: Number of entries.
+                               "CURSOR  BMP", 
+                               (unsigned long) cursorIconBuffer,
+                               tmp_size );
+    if ( fRet != 0 ){
+        panic ("init_windows: CURSOR.BMP\n");
+    }
+
 
 	// More ?
 
