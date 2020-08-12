@@ -64,6 +64,11 @@ unsigned long kgws_delta_totalticks;
  */
 
 // #bugbug
+// Essa funçao perdeu seu proposito aqui no ws dentro do kernel
+// Podemos copiar ela para o gwssrv.bin em ring3.
+
+
+// #bugbug
 // Algumas variáveis usadas aqui estão no driver de mouse ps2
 // Precisamos delas aqui, pois não possuem utilidade lá.
 // aqui o servidor de janelas escaneia as janelas para saber 
@@ -97,23 +102,21 @@ int kgws_mouse_scan_windows (void){
     // Temos que pegar um pacote com todas as informações de uma vez.
 
     // Pegando as informações.
-    kgws_mouse_event_saved_mouse_x = ps2_mouse_get_info (1);
-    kgws_mouse_event_saved_mouse_y = ps2_mouse_get_info (2);
-    kgws_mouse_event_mouse_x = ps2_mouse_get_info (3);
-    kgws_mouse_event_mouse_y = ps2_mouse_get_info (4);
-    kgws_mouse_event_moving = ps2_mouse_get_info (5);
-    //kgws_mouse_event_drag_status = ps2_mouse_get_info (6);
-    kgws_mouse_event_button_action = ps2_mouse_get_info (7);
-    kgws_mouse_event_mouse_buttom_1 = ps2_mouse_get_info (8);
-    kgws_mouse_event_mouse_buttom_2 = ps2_mouse_get_info (9);
-    kgws_mouse_event_mouse_buttom_3 =  ps2_mouse_get_info (10);
+    kgws_mouse_event_saved_mouse_x      = ps2_mouse_get_info (1);
+    kgws_mouse_event_saved_mouse_y      = ps2_mouse_get_info (2);
+    kgws_mouse_event_mouse_x            = ps2_mouse_get_info (3);
+    kgws_mouse_event_mouse_y            = ps2_mouse_get_info (4);
+    kgws_mouse_event_moving             = ps2_mouse_get_info (5);
+    //kgws_mouse_event_drag_status      = ps2_mouse_get_info (6);
+    kgws_mouse_event_button_action      = ps2_mouse_get_info (7);
+    kgws_mouse_event_mouse_buttom_1     = ps2_mouse_get_info (8);
+    kgws_mouse_event_mouse_buttom_2     = ps2_mouse_get_info (9);
+    kgws_mouse_event_mouse_buttom_3     = ps2_mouse_get_info (10);
     kgws_mouse_event_old_mouse_buttom_1 = ps2_mouse_get_info (11);
-    kgws_mouse_event_old_mouse_buttom_2 =  ps2_mouse_get_info (12);
-    kgws_mouse_event_old_mouse_buttom_3 =  ps2_mouse_get_info (13);
-    //kgws_mouse_event_button_pressed =  ps2_mouse_get_info (14);
-    //...
-
-
+    kgws_mouse_event_old_mouse_buttom_2 = ps2_mouse_get_info (12);
+    kgws_mouse_event_old_mouse_buttom_3 = ps2_mouse_get_info (13);
+    //kgws_mouse_event_button_pressed   = ps2_mouse_get_info (14);
+    // ...
 
 
     //printf ("b=%d ",kgws_mouse_event_mouse_buttom_1);
@@ -820,7 +823,8 @@ int kgws_mouse_scan_windows (void){
 
 // ?? Not used yet ??
 // Registrar um window server.
-int kgwsRegisterWindowServer ( int pid ){
+int kgwsRegisterWindowServer (int pid)
+{
 
     int Status = 0;
 

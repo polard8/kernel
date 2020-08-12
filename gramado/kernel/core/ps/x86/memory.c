@@ -773,7 +773,6 @@ void FreeHeap (void *ptr){
 
     unsigned long UserAreaStart = (unsigned long) ptr; 
 
-
     Header = (void *) ( UserAreaStart - MMBLOCK_HEADER_SIZE );
 
     if ( (void *) Header == NULL ){
@@ -790,7 +789,7 @@ void FreeHeap (void *ptr){
 
         // Checa
         if ( mmblockList[mmblockCount] == (unsigned long) Header && 
-            Header->Id == mmblockCount )
+             Header->Id == mmblockCount )
         {
             mmblockList[mmblockCount] = 0;
             mmblockCount--;
@@ -799,7 +798,7 @@ void FreeHeap (void *ptr){
         // Isso invalida a estrutura, para evitar mal uso.
         Header->Used = 0;
         Header->Magic = 0;
-
+        
         g_heap_pointer = (unsigned long) Header;
     };
 }
@@ -1128,8 +1127,8 @@ int kernel_gc (void){
 
     for ( i=0; i<MMBLOCK_COUNT_MAX; i++ )
     {
-	    b = (void *) mmblockList[i];
-		
+        b = (void *) mmblockList[i];
+
 		// Valid pointer.
         if ( (void *) b != NULL )
         {

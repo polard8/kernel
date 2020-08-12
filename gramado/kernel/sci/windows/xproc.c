@@ -226,8 +226,12 @@ XPROC_SEND_MESSAGE ( struct window_d *window,
 
 
 // ??
-void xxxtestSHELLServer (void){
-
+void xxxtestSHELLServer (void)
+{
+    debug_print ("xxxtestSHELLServer:deprecated!\n");
+    return;
+    
+    /*
    //#atenção:
    //antes precisa inicializar o servidor.
    //+por enquanto vamos usar o comando 'gws' para isso.
@@ -259,6 +263,7 @@ void xxxtestSHELLServer (void){
     
 	//sinalizamos que temos uma mensagem.
 	t->newmessageFlag = 1; 
+	*/
 }
 
 
@@ -266,7 +271,10 @@ void xxxtestSHELLServer (void){
 // #IMPORTANTE
 // REFRESH STDOUT
 
-void xxxtestlibcSTDOUT (void){
+void xxxtestlibcSTDOUT (void)
+{
+    debug_print ("xxxtestlibcSTDOUT:deprecated!\n");
+    return;
 
     /*
      

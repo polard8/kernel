@@ -266,7 +266,11 @@ response_loop:
     int msg             = (int) message_buffer[1];
     unsigned long long1 = (unsigned long) message_buffer[2];
     unsigned long long2 = (unsigned long) message_buffer[3];
-    
+
+    // #extra
+    unsigned long long3 = (unsigned long) message_buffer[4];
+    unsigned long long4 = (unsigned long) message_buffer[5];
+
     //#debug
     //if(msg!=0)
         //printf ("%c",long1); //printf ("{%d%c} ",msg,long1);
@@ -275,6 +279,15 @@ response_loop:
         
     switch (msg){
 
+
+        // #test
+        // Testando mensagem de mouse.
+        // A mensagem tem um pacote com 3 valores a serem decodificados.
+        // Raw mouse input!!!
+        case 4567:
+            printf("gwm-4567: [TEST] Mouse raw input\n");
+            break;
+        
         //OK isso funcionou.
         case MSG_KEYDOWN:
           //case 20:
@@ -327,9 +340,13 @@ response_loop:
                     printf ("gwm: VK_F2\n");
                     create_tester_client(fd);
                     break;
-                    
+
+                // This sistem call is able to initialize a lot
+                // of system's components.
+                // IN: 1 = full initialization os ps2.
                 case VK_F3:
                     printf ("gwm: VK_F3\n");
+                    gramado_system_call ( 350, 1, 0, 0 );
                     break;
                     
                 case VK_F4:

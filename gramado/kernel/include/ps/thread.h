@@ -545,34 +545,36 @@ struct thread_d
     int msg;                    //arg2.
     unsigned long long1;        //arg3.
     unsigned long long2;        //arg4.
-
-    // Argumentos extra usados pelos drivers e servidores.
-    unsigned long long3;
-    unsigned long long4;
-    unsigned long long5;
-    unsigned long long6;
-    unsigned long long7;
-    unsigned long long8;
-    unsigned long long9;
-    unsigned long long10;
-    unsigned long long11;
-    unsigned long long12;
-    // ...
-
     // Flag avisando que tem nova mensagem.
     int newmessageFlag;         
+
 
 
     //
     // Queue. (list)
     //
 
+    // #todo
+    // Essas longs extras podem ajudar ...
+    // Por exemplo: O mouse pode mandar um pacote com 3 longs
+    // para o ws em ring3.
+    // Mas ser'a que a system call consegue pegar todos esses argumentos ???
+    
     struct window_d *window_list[32];
     int msg_list[32];
     unsigned long long1_list[32];
     unsigned long long2_list[32];
+    unsigned long long3_list[32];
+    unsigned long long4_list[32];
     int tail_pos;
     int head_pos;
+
+    // Vamos alocar um buffer do tamanho de uma pagina.
+    // Se esse buffer estiver no espaço de memmoria
+    // do processo, entao o processo podera ler, sem precisar copiar
+    // mas copiar n~ao seir uma problema.
+    
+    //void *msg_buffer;
 
 
     //

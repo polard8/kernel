@@ -1756,7 +1756,7 @@ void *__do_35 ( unsigned long buffer ){
 
     unsigned long *message_address = (unsigned long *) buffer;
     
-    unsigned char SC;
+    unsigned char SC=0;
     
     struct thread_d *t;
     
@@ -1885,6 +1885,10 @@ void *__do_35 ( unsigned long buffer ){
 // #todo
 // Trocar por 'ubuf'
 
+// #bugbug
+// Isso eh valido para todos os tipos de mensagens nao somente teclado
+// isso deveria sair daqui desse arquivo.
+
 void *__do_111 ( unsigned long buffer ){
 
     struct thread_d *t;
@@ -1923,17 +1927,16 @@ void *__do_111 ( unsigned long buffer ){
 
         // Extra. 
         // Usado pelos servidores e drivers.
-        message_address[4] = (unsigned long) t->long3;
-        message_address[5] = (unsigned long) t->long4;
-        message_address[6] = (unsigned long) t->long5;
-        message_address[7] = (unsigned long) t->long6;
-        // ...
+        message_address[4] = (unsigned long) t->long3_list[ t->head_pos ];
+        message_address[5] = (unsigned long) t->long4_list[ t->head_pos ];
 
         // Clean
         t->window_list[ t->head_pos ] = NULL;
         t->msg_list[ t->head_pos ]    = 0;
         t->long1_list[ t->head_pos ]  = 0;
         t->long2_list[ t->head_pos ]  = 0;
+        t->long3_list[ t->head_pos ]  = 0;
+        t->long4_list[ t->head_pos ]  = 0;
         //...
         
 

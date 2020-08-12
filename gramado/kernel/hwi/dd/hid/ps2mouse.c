@@ -1115,7 +1115,8 @@ void ps2mouse_parse_data_packet (void)
  * Temos externs no início desse arquivo.
  */
 
-void mouseHandler (void){
+void mouseHandler (void)
+{
 
 	// #importante:
 	// Essa será a thread que receberá a mensagem.
@@ -1132,8 +1133,6 @@ void mouseHandler (void){
     //#test
     //int last_wID;
 
-
-
 	// Coordenadas do mouse.
 	// Obs: Isso pode ser global.
 	// ?? O tratador em assembly tem as variáveis globais do posicionamento.
@@ -1144,6 +1143,9 @@ void mouseHandler (void){
 
 	// Lendo um char no controlador.
     char *_byte;
+    
+    
+    int msg_status=-1;
 
 
     //#todo: Isso é um teste.
@@ -1170,28 +1172,24 @@ void mouseHandler (void){
 
 	// #obs:
 	// Lendo um char no controlador.
-
-    *_byte = (char) mouse_read ();
-
-
 	// #importante:
 	// Contagem de interruções:
-	// Obs: Precisamos esperar 3 interrupções.
+	// #obs: 
+	// Precisamos esperar 3 interrupções.
+	// #obs: 
+	// count_mouse é global. Provavelmente nesse arquivo mesmo.
 
+    *_byte = (char) mouse_read();
 
-	//#obs: count_mouse é global. Provavelmente nesse arquivo mesmo.
-
-    switch ( count_mouse )
+    switch (count_mouse)
     {
 
 		// > Essa foi a primeira interrupção.
         case 0:
             //Pegamos o primeiro char.
             buffer_mouse[0] = (char) *_byte;
-            if (*_byte & MOUSE_V_BIT)
-                count_mouse++;
+            if (*_byte & MOUSE_V_BIT){ count_mouse++; }
             break;
-
 
 		// >> Essa foi a segunda interrupção.
         case 1:
@@ -1207,31 +1205,56 @@ void mouseHandler (void){
             buffer_mouse[2] = (char) *_byte;
             count_mouse = 0;
             
-            ps2mouse_parse_data_packet();
             
             //
             // Message.
             //
             
-            //#todo
+            // #todo
             // Mandar uma mensagem par o window server registrado
             // caso exita um. Dai o ws scaneia suas janelas.
             // obs: essa chamada tem um retorno.
-            // veja como o teclado fez.
-            //status = ipc_send_to_ws( .... );
+            // veja como o teclado faz.
+            // #bugbug:
+            // O pacote tem 3 longs ..., com esse metodo so conseguimos
+            // mandar duas.
             
-            //#bugbug
-            // escaneando janelas.
-            // O window server deveria fazer isso.
-            // ws/kgws.c
-            kgws_mouse_scan_windows();
+            //msg_status = (int) ipc_send_to_ws ( (struct window_d *) 0,  // Deprecated!
+            //                      (int) MSG_MOUSE_PACKET,               // A mensagem comtem um pacote. 
+            //                      (unsigned long) buffer_mouse[0],      //
+            //                      (unsigned long) buffer_mouse[1]);
+
+            msg_status = (int) ipc_send_longmessage_to_ws ( (struct window_d *) 0,  // Deprecated!
+                                  (int) 4567, //MSG_MOUSE_PACKET,               // A mensagem comtem um pacote. 
+                                  (unsigned long) buffer_mouse[0],      //
+                                  (unsigned long) buffer_mouse[1],
+                                  (unsigned long) buffer_mouse[2],
+                                   0);
+            //Se a mensagem nao foi enviada para o ws.
+            if(msg_status!=0)
+            {
+                // #todo
+                // Nao precisamos fazer esse parse aqui ...
+                // apenas mandar o pacote para o window server em ring3
+                // na forma de mensagens.
+                // Tambem nao precisamos escanear janelas ... o ws fara isso.
+                ps2mouse_parse_data_packet();
+            
+                //#bugbug
+                // escaneando janelas.
+                // O window server deveria fazer isso.
+                // sci/windows/kgws.c
+                kgws_mouse_scan_windows();
+            }
             
             // O driver precisa do old pra configurar a variável de ação.
             // #todo Talvez precise de outras
+            
             old_mouse_buttom_1 = mouse_buttom_1;
             old_mouse_buttom_2 = mouse_buttom_2;
             old_mouse_buttom_3 = mouse_buttom_3;
             break;
+
 
 
         // Problemas na contagem de interrupções.
@@ -1243,11 +1266,13 @@ void mouseHandler (void){
 }
 
 
-void expect_ack  (void){
-
+void expect_ack(void)
+{
+    // #bugbug
+    // ? loop infinito  
+    
     while ( mouse_read() != 0xFA);
 }
-
 
 
 
@@ -1263,11 +1288,20 @@ int get_ps2_mouse_status(void)
 }
 
 
+
+/*
+ * 
+ * 
+ * 
+ */
 unsigned long 
-ps2_mouse_dialog ( int msg,
-                   unsigned long long1,
-                   unsigned long long2 )
+ps2_mouse_dialog ( 
+    int msg,
+    unsigned long long1,
+    unsigned long long2 )
 {
+
+
     switch (msg)
     {
 		//habilitar
@@ -1286,13 +1320,12 @@ ps2_mouse_dialog ( int msg,
 
         //#test
         // reinicializar ??
-        case 4002:
-            break;
+        //case 4002:
+            //break;
             
         default:
             break;
     };
-
 
     return 0;
 }

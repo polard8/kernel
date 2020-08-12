@@ -1,5 +1,5 @@
 /*
- * File: bottom/ps/mminfo.c
+ * File: mminfo.c
  *
  * Informações sobre a gerência de memória.
  * Valores em variáveis e estruturas.
@@ -61,13 +61,13 @@ void mmShowPDEForAllProcesses (int entry_number){
             // Mostra a entrada 1, que se refere ao endereço lógico 0x400000
 		    if ( p->DirectoryVA != 0 ){
 		        printf ("Process %d: ", i);
-			    mmShowPDE ( entry_number, (unsigned long) p->DirectoryVA );	
+			    mmShowPDE ( entry_number, (unsigned long) p->DirectoryVA );
 		    }		
 		}
-	}
+	};
 
 
-	refresh_screen ();
+    refresh_screen();
 }
 
 
@@ -312,11 +312,11 @@ void show_memory_structs (void){
 
 void testingPageAlloc (void){
 
-    int Index;
+    int Index=0;
     struct page_d *p;
 
     void *RetAddress;
-    unsigned long fileret;
+    unsigned long fileret=0;
 
 
 	//#bugbug .;;;: mais que 100 dá erro ...

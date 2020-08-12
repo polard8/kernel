@@ -2441,10 +2441,12 @@ do_compare:
     // This sistem call is able to initialize a lot
     // of system's components.
     // IN: 1 = full initialization os ps2.
-    if ( gramado_strncmp ( prompt, "ps2-init", 8 ) == 0 ){
+    if ( gramado_strncmp ( prompt, "ps2-init", 8 ) == 0 )
+    {
         gramado_system_call ( 350, 1, 0, 0 );
         goto exit_cmp; 
     }
+
 
     // pwd 
     // Print working directory.

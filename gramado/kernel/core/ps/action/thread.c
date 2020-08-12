@@ -894,6 +894,8 @@ get_next:
             Thread->msg_list[q]    = 0;
             Thread->long1_list[q]  = 0;
             Thread->long2_list[q]  = 0;
+            Thread->long3_list[q]  = 0;
+            Thread->long4_list[q]  = 0;
         }
         Thread->head_pos = 0;
         Thread->tail_pos = 0;

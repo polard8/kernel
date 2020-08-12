@@ -31,17 +31,16 @@
 void mouse_handler (void)
 {
 
-
 	// Se o mouse ps2 não estiver inicializado !
     if ( __breaker_ps2mouse_initialized == 0 )
         return;
 
 
 	// Contando as interrupções desse tipo.
-	g_profiler_ints_irq12++;
-	
-	 mouseHandler ();
-	 
+    g_profiler_ints_irq12++;
+
+    mouseHandler ();
+
 	 
 	 //#bugbug
 	 /*
@@ -52,7 +51,6 @@ void mouse_handler (void)
     //if ( status == 1 )
     //   mouseHandler ();
     */
-
 }
 
 

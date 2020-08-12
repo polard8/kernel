@@ -186,6 +186,22 @@ void *KiCreateRing0Idle (void){
     //t->long
     //t->long
     //...
+    
+    // #todo: 
+    // Falta limpar a outra fila de mensagens.
+        int z=0;
+        for ( z=0; z<32; z++ )
+        {
+            t->window_list[z] = 0;
+            t->msg_list[z]    = 0;
+            t->long1_list[z]  = 0;
+            t->long2_list[z]  = 0;
+            t->long3_list[z]  = 0;
+            t->long4_list[z]  = 0;
+        }
+        t->head_pos = 0;
+        t->tail_pos = 0;
+
 
     //
     // Message queue.

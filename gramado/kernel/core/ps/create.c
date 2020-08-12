@@ -143,6 +143,21 @@ void *createCreateInitThread (void){
     //InitThread->long
     //...
 
+    // #todo: 
+    // Falta limpar a outra fila de mensagens.
+        int z=0;
+        for ( z=0; z<32; z++ )
+        {
+            InitThread->window_list[z] = 0;
+            InitThread->msg_list[z]    = 0;
+            InitThread->long1_list[z]  = 0;
+            InitThread->long2_list[z]  = 0;
+            InitThread->long3_list[z]  = 0;
+            InitThread->long4_list[z]  = 0;
+        }
+        InitThread->head_pos = 0;
+        InitThread->tail_pos = 0;
+
 
     //
     // Message queue.

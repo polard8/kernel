@@ -1,5 +1,5 @@
 /*
- * File: bottom/ps/pages.c
+ * File: pages.c
  *
  *     Faz a configura��o da pagina��o de mem�ria e oferece rotinas de
  * suporte ao mapeamento de mem�ria f�sica.
@@ -173,7 +173,7 @@ int initialize_frame_table (void){
     }
 
     //#todo: limits
-    if( FT.frame_table_size_in_bytes == 0 ){
+    if ( FT.frame_table_size_in_bytes == 0 ){
         panic("frame_table_size_in_bytes");
     }
 
@@ -216,7 +216,7 @@ unsigned long get_new_frame (void){
             FT.frame_table[i] = 1; // não free.
             return (unsigned long) ( FT.frame_table_start + (i * 4096) ); 
         }
-    }
+    };
 
     //fail;
     return 0;
@@ -317,7 +317,7 @@ void *clone_directory( unsigned long directory_va ){
 
 void *CloneKernelPageDirectory (void){
 
-    unsigned long destAddressVA;  
+    unsigned long destAddressVA=0; 
     int i=0;
 
 
@@ -618,8 +618,8 @@ CreatePageTable (
 // Usar o outro presente nesse documento.
 // mm_switch_directory.
 
-void x86_SetCR3 (unsigned long pa){
-
+void x86_SetCR3 (unsigned long pa)
+{
 
     // N�o podemos usar um diret�rio de p�ginas que esteja
     // no in�cio da mem�ria RAM.
@@ -629,6 +629,7 @@ void x86_SetCR3 (unsigned long pa){
 
     // See: kernel/init/x86/headlib.asm
     asm volatile ("\n" :: "a"(pa) );
+    
     set_page_dir();
 }
 
@@ -636,11 +637,12 @@ void x86_SetCR3 (unsigned long pa){
 
 // Get the physical address from cr3.
 
-unsigned long mm_get_current_directory_pa (void){
-
+unsigned long mm_get_current_directory_pa (void)
+{
     unsigned long __ret = 0;
 
     asm volatile ("mov %%cr3, %0" : "=r"(__ret));
+    
     return (unsigned long) __ret;
 }
 
@@ -648,7 +650,8 @@ unsigned long mm_get_current_directory_pa (void){
 // #todo
 // It can be used to change different directories.
 // And then switch back to the current directory.
-void mm_switch_directory (unsigned long dir){
+void mm_switch_directory (unsigned long dir)
+{
 
     if (dir == 0){
         // #debug ?

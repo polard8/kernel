@@ -1,5 +1,5 @@
 /*
- * File: bottom/ps/mmpool.c 
+ * File: mmpool.c 
  *
  * g_pagedpool_va é o endereço virtual de uma área de memória 
  * pré alocada de onde tiraremos páginas para o alocador.
@@ -108,8 +108,8 @@ void *page (void){
             // ?? panic ??
             if ( New == NULL )
             {
-                printf ("mmpool-page:\n");
                 debug_print ("mmpool-page:\n");
+                printf      ("mmpool-page:\n");
 
                 // #todo: free() ??
                 goto fail;
@@ -141,9 +141,7 @@ void *page (void){
     
 
 fail:
-
-    //#debug ??
-    
+    // Message?
     return NULL; 
 }
 
@@ -175,13 +173,13 @@ void *newPage (void){
 
     unsigned long base = (unsigned long) g_pagedpool_va;
 
-    unsigned long va;
-    unsigned long pa;
+    unsigned long va=0;
+    unsigned long pa=0;
 
 
 	// Cria e registra uma estrutura de página.
 
-    New = (void *) page ();
+    New = (void *) page();
 
     if ( New == NULL ){
         //printf ("mmpool-newPage: New\n");
@@ -262,25 +260,25 @@ void *newPage (void){
 
 
 fail:
-
+    // message?
     return NULL;
 }
 
 
 // Allocate single page.
-void *mm_alloc_single_page (void){
-
-    return (void *) newPage ();
+void *mm_alloc_single_page (void)
+{
+    return (void *) newPage();
     //return (void *) allocPages (1);
 }
 
 // Allocate n contiguous pages.
-void *mm_alloc_contig_pages ( size_t size ){
-
+void *mm_alloc_contig_pages ( size_t size )
+{
     if (size<=0)
        panic("mm_alloc_contig_pages: FIXME, invalid size");
        
-    return (void *) allocPages (size);
+    return (void *) allocPages(size);
 }
 
 
@@ -311,15 +309,13 @@ tryAgain:
 			Base = Base+Count;
 			Base++;
 			Count = 0;
-			goto tryAgain;			
+			goto tryAgain;
         }
-		
-		Count++; 
-		
-		if (Count >= size){
-			return (int) Base;
-		}
-	};
+
+        Count++; 
+
+        if (Count >= size){ return (int) Base; }
+    };
 
 
     return (int) -1;
@@ -336,7 +332,8 @@ tryAgain:
  * estamos usando uma page table toda já mapeada. 4MB.
  * @TODO: ESSA ROTINA ESTÁ INCOMPLETA ... REVISAR. #bugbug
  *
- * #bugbug: se estamos lidando com o endereço base vitual, então estamos 
+ * #bugbug: 
+ * Se estamos lidando com o endereço base vitual, então estamos 
  * lidando com páginas pre alocadas e não pageframes.
  */
  
@@ -357,8 +354,8 @@ void *allocPages (int size){
     struct page_d *Conductor;
     struct page_d *p;
 
-    unsigned long va;
-    unsigned long pa;
+    unsigned long va=0;
+    unsigned long pa=0;
 
     int Count=0;
 
@@ -493,10 +490,8 @@ void *allocPages (int size){
 
 
 fail:
-
-    printf ("allocPages: fail \n");
     debug_print ("mmpool-allocPages: fail \n");
-
+    printf      ("mmpool-allocPages: fail \n");
     return NULL;
 }
 
