@@ -88,11 +88,11 @@ struct gws_d GWS;
 int service_drain_input (void);
 
 
+void gwssrv_debug_print (char *string);
 
+int gwssrv_clone_and_execute ( char *name );
+unsigned long gwssrv_get_system_metrics (int index);
 
-void gswsrv_debug_print (char *string);
-int gswsrv_clone_and_execute ( char *name );
-unsigned long gswsrv_get_system_metrics (int index);
 
 void gwssrv_enter_critical_section (void);
 void gwssrv_exit_critical_section (void);

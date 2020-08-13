@@ -33,7 +33,7 @@ int serviceCreateWindow (void){
 
 
 
-    gswsrv_debug_print("serviceCreateWindow: serviceCreateWindow:\n");
+    gwssrv_debug_print("serviceCreateWindow: serviceCreateWindow:\n");
     //printf ("serviceCreateWindow:\n");
 
     x     = message_address[4]; 
@@ -67,7 +67,7 @@ int serviceCreateWindow (void){
     //Limits
     if(pw<0 ||pw>WINDOW_COUNT_MAX)
     {
-        gswsrv_debug_print("serviceCreateWindow: parent window id fail\n");
+        gwssrv_debug_print("serviceCreateWindow: parent window id fail\n");
         pw=0;
         exit(1); //test
     }
@@ -77,7 +77,7 @@ int serviceCreateWindow (void){
 
     //ajuste improvidsado
     if( (void *) Parent == NULL ){
-        gswsrv_debug_print("serviceCreateWindow: parent window struct fail\n");
+        gwssrv_debug_print("serviceCreateWindow: parent window struct fail\n");
         Parent = gui->screen;
         exit(1); //test
     }
@@ -99,7 +99,7 @@ int serviceCreateWindow (void){
 
     if ( (void *) Window == NULL )
     {
-       gswsrv_debug_print ("gwssrv: createwCreateWindow fail\n");
+       gwssrv_debug_print ("gwssrv: createwCreateWindow fail\n");
        next_response[1] = 0;
        return -1;
     }
@@ -109,7 +109,7 @@ int serviceCreateWindow (void){
     id = gwsRegisterWindow ( Window );
 
     if (id<0){
-        gswsrv_debug_print ("gwssrv: serviceCreateWindow Couldn't register window\n");
+        gwssrv_debug_print ("gwssrv: serviceCreateWindow Couldn't register window\n");
         next_response[1] = 0;
         return -1;
     }
@@ -146,7 +146,7 @@ int serviceChangeWindowPosition(void)
 
 
     // #debug
-    gswsrv_debug_print ("gwssrv: serviceChangeWindowPosition\n");
+    gwssrv_debug_print ("gwssrv: serviceChangeWindowPosition\n");
 
 
     // Get
@@ -163,7 +163,7 @@ int serviceChangeWindowPosition(void)
    
     // Limits
     if ( window_id < 0 || window_id >= WINDOW_COUNT_MAX ){
-        gswsrv_debug_print ("gwssrv: serviceChangeWindowPosition window_id\n");
+        gwssrv_debug_print ("gwssrv: serviceChangeWindowPosition window_id\n");
         return -1;
     }
 
@@ -172,12 +172,12 @@ int serviceChangeWindowPosition(void)
     window = (struct gws_window_d *) windowList[window_id];
    
     if ( (void *) window == NULL ){
-        gswsrv_debug_print ("gwssrv: serviceChangeWindowPosition window\n");
+        gwssrv_debug_print ("gwssrv: serviceChangeWindowPosition window\n");
         return -1;
     }
     
     if ( window->used != 1 || window->magic != 1234 ){
-        gswsrv_debug_print ("gwssrv: serviceChangeWindowPosition validation\n");
+        gwssrv_debug_print ("gwssrv: serviceChangeWindowPosition validation\n");
         return -1;
     }
 
@@ -206,7 +206,7 @@ int serviceResizeWindow(void)
 
 
     // #debug
-    gswsrv_debug_print ("gwssrv: serviceChangeWindowPosition\n");
+    gwssrv_debug_print ("gwssrv: serviceChangeWindowPosition\n");
 
 
     // Get
@@ -223,7 +223,7 @@ int serviceResizeWindow(void)
    
     // Limits
     if ( window_id < 0 || window_id >= WINDOW_COUNT_MAX ){
-        gswsrv_debug_print ("gwssrv: serviceChangeWindowPosition window_id\n");
+        gwssrv_debug_print ("gwssrv: serviceChangeWindowPosition window_id\n");
         return -1;
     }
 
@@ -232,12 +232,12 @@ int serviceResizeWindow(void)
     window = (struct gws_window_d *) windowList[window_id];
    
     if ( (void *) window == NULL ){
-        gswsrv_debug_print ("gwssrv: serviceChangeWindowPosition window\n");
+        gwssrv_debug_print ("gwssrv: serviceChangeWindowPosition window\n");
         return -1;
     }
     
     if ( window->used != 1 || window->magic != 1234 ){
-        gswsrv_debug_print ("gwssrv: serviceChangeWindowPosition validation\n");
+        gwssrv_debug_print ("gwssrv: serviceChangeWindowPosition validation\n");
         return -1;
     }
 
@@ -299,7 +299,7 @@ int serviceRedrawWindow(void)
 
 
     // #debug
-    gswsrv_debug_print ("gwssrv: serviceRedrawWindow\n");
+    gwssrv_debug_print ("gwssrv: serviceRedrawWindow\n");
 
 
     // Get
@@ -315,7 +315,7 @@ int serviceRedrawWindow(void)
    
     // Limits
     if ( window_id < 0 || window_id >= WINDOW_COUNT_MAX ){
-        gswsrv_debug_print ("gwssrv: serviceRefreshWindow window_id\n");
+        gwssrv_debug_print ("gwssrv: serviceRefreshWindow window_id\n");
         return -1;
     }
 
@@ -324,12 +324,12 @@ int serviceRedrawWindow(void)
     window = (struct gws_window_d *) windowList[window_id];
    
     if ( (void *) window == NULL ){
-        gswsrv_debug_print ("gwssrv: serviceRefreshWindow window\n");
+        gwssrv_debug_print ("gwssrv: serviceRefreshWindow window\n");
         return -1;
     }
     
     if ( window->used != 1 || window->magic != 1234 ){
-        gswsrv_debug_print ("gwssrv: serviceRefreshWindow validation\n");
+        gwssrv_debug_print ("gwssrv: serviceRefreshWindow validation\n");
         return -1;
     }
 
@@ -380,7 +380,7 @@ int serviceRefreshWindow(void)
 
 
     // #debug
-    gswsrv_debug_print ("gwssrv: serviceRefreshWindow\n");
+    gwssrv_debug_print ("gwssrv: serviceRefreshWindow\n");
 
 
     // Get
@@ -395,7 +395,7 @@ int serviceRefreshWindow(void)
    
     // Limits
     if ( window_id < 0 || window_id >= WINDOW_COUNT_MAX ){
-        gswsrv_debug_print ("gwssrv: serviceRefreshWindow window_id\n");
+        gwssrv_debug_print ("gwssrv: serviceRefreshWindow window_id\n");
         return -1;
     }
 
@@ -404,12 +404,12 @@ int serviceRefreshWindow(void)
     window = (struct gws_window_d *) windowList[window_id];
    
     if ( (void *) window == NULL ){
-        gswsrv_debug_print ("gwssrv: serviceRefreshWindow window\n");
+        gwssrv_debug_print ("gwssrv: serviceRefreshWindow window\n");
         return -1;
     }
     
     if ( window->used != 1 || window->magic != 1234 ){
-        gswsrv_debug_print ("gwssrv: serviceRefreshWindow validation\n");
+        gwssrv_debug_print ("gwssrv: serviceRefreshWindow validation\n");
         return -1;
     }
 
@@ -442,18 +442,22 @@ int serviceRefreshWindow(void)
 
 
 
-
-
 // Let's redraw the window.
 // IN: window pointer, show or not.
 
-int gwssrv_redraw_window (struct gws_window_d *window, unsigned long flags )
+int 
+gwssrv_redraw_window ( 
+    struct gws_window_d *window, 
+    unsigned long flags )
 {
 
     unsigned long __tmp_color=0;
 
 
-    if ( (void*) window == NULL ) return -1;
+    if ( (void*) window == NULL ){ 
+        gwssrv_debug_print ("gwssrv_redraw_window: window\n");
+        return -1; 
+    }
     
 
 	//  ## Shadow ##
@@ -498,7 +502,7 @@ int gwssrv_redraw_window (struct gws_window_d *window, unsigned long flags )
             //remeber: the first window do not have a parent.
             if ( (void*) window->parent == NULL )
             { 
-                gswsrv_debug_print ("gwssrv_redraw_window: [Shadow] Parent"); 
+                gwssrv_debug_print ("gwssrv_redraw_window: [Shadow] Parent"); 
                 //exit(1); 
                 rectBackbufferDrawRectangle ( 
                     (window->left +1), 
@@ -541,7 +545,7 @@ int gwssrv_redraw_window (struct gws_window_d *window, unsigned long flags )
     if ( window->backgroundUsed == 1 )
     {
 
-        window->bg_color = COLOR_PINK;
+        //window->bg_color = COLOR_PINK;
         //window->bg_color = CurrentColorScheme->elements[csiWindowBackground]; 
 
         // O argumento 'color' será a cor do bg para alguns tipos.
@@ -580,7 +584,7 @@ int gwssrv_redraw_window (struct gws_window_d *window, unsigned long flags )
         //#bugbug
         //Remember: The first window do not have a parent.
         if ( (void*) window->parent == NULL ){ 
-            gswsrv_debug_print ("gwssrv_redraw_window: [Background] Parent\n"); 
+            gwssrv_debug_print ("gwssrv_redraw_window: [Background] Parent\n"); 
             //exit(1); 
             rectBackbufferDrawRectangle ( 
                 window->left, 
@@ -664,7 +668,7 @@ int gwssrv_redraw_window (struct gws_window_d *window, unsigned long flags )
 
         //#debug
         if ( (void*) window->parent == NULL ){
-            gswsrv_debug_print ("gwssrv_redraw_window: [WT_BUTTON] Parent NULL\n"); 
+            gwssrv_debug_print ("gwssrv_redraw_window: [WT_BUTTON] Parent NULL\n"); 
         }
 
 
@@ -790,7 +794,7 @@ gwssrv_initialize_color_schemes (int selected_type)
     humility = (void *) malloc ( sizeof(struct gws_color_scheme_d) );
     
 	if( (void *) humility == NULL ){
-		gswsrv_debug_print ("gwssrv_initialize_color_schemes: humility\n");
+		gwssrv_debug_print ("gwssrv_initialize_color_schemes: humility\n");
 		
 	}else{
 		
@@ -833,7 +837,7 @@ gwssrv_initialize_color_schemes (int selected_type)
     pride = (void *) malloc ( sizeof(struct gws_color_scheme_d) );
     
     if ( (void *) pride == NULL ){
-        gswsrv_debug_print ("gwssrv_initialize_color_schemes: pride\n");
+        gwssrv_debug_print ("gwssrv_initialize_color_schemes: pride\n");
 
     }else{
 		
@@ -909,7 +913,7 @@ int gwssrv_select_color_scheme (int type){
 			break;
 			
 		default:
-		    gswsrv_debug_print("windowSelectColorScheme: Type not defined\n");
+		    gwssrv_debug_print("windowSelectColorScheme: Type not defined\n");
 			goto fail;
 			break;
 	};
@@ -919,7 +923,7 @@ do_humility:
 
     if ( (void *) GWSHumilityColorScheme == NULL )
     {
-		gswsrv_debug_print("HumilityColorScheme fail\n");
+		gwssrv_debug_print("HumilityColorScheme fail\n");
         goto fail;  
            	    	
 	}else{
@@ -927,11 +931,11 @@ do_humility:
 	    if ( GWSHumilityColorScheme->used != 1 || 
 		     GWSHumilityColorScheme->magic != 1234 )
 		{
-			gswsrv_debug_print("HumilityColorScheme sig fail\n");
+			gwssrv_debug_print("HumilityColorScheme sig fail\n");
 			goto fail;
 		}
 		
-		gswsrv_debug_print("Humility selected\n");
+		gwssrv_debug_print("Humility selected\n");
 	    GWSCurrentColorScheme = GWSHumilityColorScheme;	
 	    goto done;
 	};		
@@ -941,18 +945,18 @@ do_pride:
 
     if ( (void *) GWSPrideColorScheme == NULL )
     {
-		gswsrv_debug_print("GWSPrideColorScheme fail\n");
+		gwssrv_debug_print("GWSPrideColorScheme fail\n");
         goto fail; 
             	    	
 	}else{
 	    if( GWSPrideColorScheme->used != 1 || 
 		    GWSPrideColorScheme->magic != 1234 )
 		{
-			gswsrv_debug_print("PrideColorScheme sig fail\n");
+			gwssrv_debug_print("PrideColorScheme sig fail\n");
 			goto fail;
 		}
 		
-	    gswsrv_debug_print ("Pride selected\n"); 
+	    gwssrv_debug_print ("Pride selected\n"); 
 		GWSCurrentColorScheme = GWSPrideColorScheme;	
 	    goto done;
 	};		
@@ -963,7 +967,7 @@ done:
     
 fail:
 
-    gswsrv_debug_print ("fail\n");
+    gwssrv_debug_print ("fail\n");
     return 1;
 }
 
@@ -1025,7 +1029,7 @@ int gws_show_window_rect (struct gws_window_d *window){
             //#todo: delete
             if ((void*)p==NULL)
             {
-                gswsrv_debug_print("gws_show_window_rect: No parent");
+                gwssrv_debug_print("gws_show_window_rect: No parent");
                 
                 gws_refresh_rectangle ( 
                     window->left, 
@@ -1038,7 +1042,7 @@ int gws_show_window_rect (struct gws_window_d *window){
             
             if ((void*)p!=NULL)
             {
-                //gswsrv_debug_print("gws_show_window_rect: parent ok");
+                //gwssrv_debug_print("gws_show_window_rect: parent ok");
                 
                 gws_refresh_rectangle ( 
                     window->left,
@@ -1141,7 +1145,7 @@ int gwsRegisterWindow (struct gws_window_d *window){
     };
 
 // fail
-    //gswsrv_debug_print("No more slots\n");
+    //gwssrv_debug_print("No more slots\n");
     return (int) (-1);
 }
 

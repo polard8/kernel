@@ -521,13 +521,13 @@ bmpDisplayBMP (
     yLimit = 600;
 
 
-    gswsrv_debug_print ("bmpDisplayBMP:\n");
+    gwssrv_debug_print ("bmpDisplayBMP:\n");
 
 
     // Limits.
     if ( x > xLimit || y > yLimit )
     {
-        gswsrv_debug_print ("bmpDisplayBMP: Limits \n");
+        gwssrv_debug_print ("bmpDisplayBMP: Limits \n");
         printf          ("bmpDisplayBMP: Limits \n");
         goto fail;
     }
@@ -537,7 +537,7 @@ bmpDisplayBMP (
     // Testar validade do endereço.
     if ( address == 0 )
     {
-        gswsrv_debug_print ("bmpDisplayBMP: address fail \n");
+        gwssrv_debug_print ("bmpDisplayBMP: address fail \n");
         printf          ("bmpDisplayBMP: address fail \n");
         goto fail;
     }
@@ -560,7 +560,7 @@ bmpDisplayBMP (
     //bh = (struct gws_bmp_header_d *) &buffer[0];
     if ( (void *) bh == NULL )
     {
-        gswsrv_debug_print ("bmpDisplayBMP: bh fail \n");
+        gwssrv_debug_print ("bmpDisplayBMP: bh fail \n");
         printf          ("bmpDisplayBMP: bh fail \n");
         goto fail;
     }
@@ -575,7 +575,7 @@ bmpDisplayBMP (
     // Signature
     if ( bmp[0] != 'B' || bmp[1] != 'M' )
     {
-        gswsrv_debug_print ("bmpDisplayBMP: SIG FAIL \n");
+        gwssrv_debug_print ("bmpDisplayBMP: SIG FAIL \n");
         printf          ("bmpDisplayBMP: SIG FAIL >>>> %c %c\n", 
             bmp[0], bmp[1]);
         goto fail;
@@ -600,7 +600,7 @@ bmpDisplayBMP (
     //bi = (struct gws_bmp_infoheader_d *)  &buffer2[0];
     if ( (void *) bi == NULL )
     {
-        gswsrv_debug_print ("bmpDisplayBMP: bi fail \n");
+        gwssrv_debug_print ("bmpDisplayBMP: bi fail \n");
         printf          ("bmpDisplayBMP: bi fail \n");
         goto fail;
     }
@@ -643,7 +643,7 @@ bmpDisplayBMP (
     // 0 = Nenhuma compressão.
     if ( bi->bmpCompression != 0 )
     {
-        gswsrv_debug_print ("bmpDisplayBMP: bmpCompression fail \n");
+        gwssrv_debug_print ("bmpDisplayBMP: bmpCompression fail \n");
         printf          ("bmpDisplayBMP: bmpCompression fail \n");
     }
 
@@ -652,7 +652,7 @@ bmpDisplayBMP (
     // Draw
     //
 
-    gswsrv_debug_print ("bmpDisplayBMP: Draw!\n");
+    gwssrv_debug_print ("bmpDisplayBMP: Draw!\n");
     printf          ("bmpDisplayBMP: Draw!\n");
 
 
@@ -685,38 +685,38 @@ bmpDisplayBMP (
         // 4 bytes pra cada cor, 16 cores. Total 64 bytes.
         case 4:  
             base = (0x36 + 0x40);  
-            gswsrv_debug_print ("bmpDisplayBMP: bmpBitCount 4\n");  
+            gwssrv_debug_print ("bmpDisplayBMP: bmpBitCount 4\n");  
             break; 
 
         // 4 bytes pra cada cor, 256 cores. Total 1024 bytes.
         case 8:  
             base = (0x36 + 0x400); 
-            gswsrv_debug_print ("bmpDisplayBMP: bmpBitCount 8\n");   
+            gwssrv_debug_print ("bmpDisplayBMP: bmpBitCount 8\n");   
             break;
         
         // #todo: Onde fica a base??
         case 16:
             base = 0x36;
-            gswsrv_debug_print ("bmpDisplayBMP: [FIXME] bmpBitCount 16\n"); 
+            gwssrv_debug_print ("bmpDisplayBMP: [FIXME] bmpBitCount 16\n"); 
             break;
 
         // #todo: Onde fica a base??
         case 24:
             base = 0x36;
-            gswsrv_debug_print ("bmpDisplayBMP: [FIXME] bmpBitCount 24\n"); 
+            gwssrv_debug_print ("bmpDisplayBMP: [FIXME] bmpBitCount 24\n"); 
             break;
 
         // #todo: Onde fica a base??
         case 32:
             base = 0x36;
-            gswsrv_debug_print ("bmpDisplayBMP: [FIXME] bmpBitCount 32\n"); 
+            gwssrv_debug_print ("bmpDisplayBMP: [FIXME] bmpBitCount 32\n"); 
             break;
 
         // Default.
         // #todo: Onde fica a base??
         default:  
             base = 0x36;
-            gswsrv_debug_print ("bmpDisplayBMP: [FAIL] bmpBitCount fail\n"); 
+            gwssrv_debug_print ("bmpDisplayBMP: [FAIL] bmpBitCount fail\n"); 
             break;
     };
 
@@ -733,7 +733,7 @@ bmpDisplayBMP (
 //320   - 32 bpp (True color, RGBA)	
 
 
-    gswsrv_debug_print ("bmpDisplayBMP: for\n");
+    gwssrv_debug_print ("bmpDisplayBMP: for\n");
     printf          ("bmpDisplayBMP: for\n");
 
 
@@ -979,13 +979,13 @@ bmpDisplayBMP (
 
 done:
 	//Debug
-    gswsrv_debug_print ("bmpDisplayBMP: done \n");
+    gwssrv_debug_print ("bmpDisplayBMP: done \n");
     printf          ("bmpDisplayBMP: done \n");
 	//printf("w={%d} h={%d}\n", bi->bmpWidth, bi->bmpHeight );
     return 0;
 
 fail:
-    gswsrv_debug_print ("bmpDisplayBMP: fail \n");
+    gwssrv_debug_print ("bmpDisplayBMP: fail \n");
     printf          ("bmpDisplayBMP: fail \n");
     return (int) 1;
 }
@@ -1140,7 +1140,7 @@ gwssrv_load_and_decode_small_icon (
     if ( bmp_buffer[0] != 'B' || bmp_buffer[1] != 'M' )
     {
         printf (">>>> %c %c\n",&bmp_buffer[0],&bmp_buffer[1]);
-        gswsrv_debug_print ("gwssrv: xxx_test_load_bmp SIG FAIL \n");
+        gwssrv_debug_print ("gwssrv: xxx_test_load_bmp SIG FAIL \n");
         printf("xxx_test_load_bmp: *hang1\n");
         gws_show_backbuffer();
         while(1);
@@ -1253,7 +1253,7 @@ gwssrv_decode_small_icon (
     if ( bmp_buffer[0] != 'B' || bmp_buffer[1] != 'M' )
     {
         printf (">>>> %c %c\n",&bmp_buffer[0],&bmp_buffer[1]);
-        gswsrv_debug_print ("gwssrv: gwssrv_decode_small_icon SIG FAIL \n");
+        gwssrv_debug_print ("gwssrv: gwssrv_decode_small_icon SIG FAIL \n");
         printf("xxx_test_load_bmp: *hang1\n");
         gws_show_backbuffer();
         while(1);
@@ -1347,7 +1347,7 @@ void xxx_test_load_bmp(void)
     if ( bmp_buffer[0] != 'B' || bmp_buffer[1] != 'M' )
     {
         printf (">>>> %c %c\n",&bmp_buffer[0],&bmp_buffer[1]);
-        gswsrv_debug_print ("gwssrv: xxx_test_load_bmp SIG FAIL \n");
+        gwssrv_debug_print ("gwssrv: xxx_test_load_bmp SIG FAIL \n");
         printf("xxx_test_load_bmp: *hang1\n");
         gws_show_backbuffer();
         while(1);

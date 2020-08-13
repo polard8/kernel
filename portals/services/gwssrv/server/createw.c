@@ -109,7 +109,7 @@ createwDrawTitleBar (
                                               COLOR_PINK, xCOLOR_GRAY3 ); 
 
     if ( (void *) __mybutton == NULL ){
-       gswsrv_debug_print ("createwDrawTitleBar: __mybutton fail\n");
+       gwssrv_debug_print ("createwDrawTitleBar: __mybutton fail\n");
        //return -1;
     }
     */
@@ -260,7 +260,7 @@ createwDrawFrame (
     //button
     if ( window->type == WT_BUTTON )
     {
-        gswsrv_debug_print ("[DEBUG]: desenha o frame do botao\n");
+        gwssrv_debug_print ("[DEBUG]: desenha o frame do botao\n");
         
         //todo frame or not
         //just like the edit box.        
@@ -1195,7 +1195,7 @@ void *createwCreateWindow2 (
             //remeber: the first window do not have a parent.
             if ( (void*) Parent == NULL )
             { 
-                gswsrv_debug_print ("createwCreateWindow2: [Shadow] Parent"); 
+                gwssrv_debug_print ("createwCreateWindow2: [Shadow] Parent"); 
                 //exit(1); 
                 rectBackbufferDrawRectangle ( 
                     (window->left +1), 
@@ -1280,7 +1280,7 @@ void *createwCreateWindow2 (
         //#bugbug
         //Remember: The first window do not have a parent.
         if ( (void*) Parent == NULL ){ 
-            gswsrv_debug_print ("createwCreateWindow2: [Background] Parent\n"); 
+            gwssrv_debug_print ("createwCreateWindow2: [Background] Parent\n"); 
             //exit(1); 
             rectBackbufferDrawRectangle ( 
                 window->left, 
@@ -1360,7 +1360,7 @@ void *createwCreateWindow2 (
 
         //#debug
         if ( (void*) Parent == NULL ){
-            gswsrv_debug_print ("createwCreateWindow2: [WT_BUTTON] Parent NULL\n"); 
+            gwssrv_debug_print ("createwCreateWindow2: [WT_BUTTON] Parent NULL\n"); 
         }
 
 
@@ -1519,7 +1519,7 @@ createwCreateWindow (
     //button
     if ( type == WT_BUTTON )
     {
-        gswsrv_debug_print ("[DEBUG]: createwCreateWindow WT_BUTTON\n");
+        gwssrv_debug_print ("[DEBUG]: createwCreateWindow WT_BUTTON\n");
         // Podemos usar o esquema padrão de cores ...
         __w = (void *) createwCreateWindow2 ( WT_BUTTON, 
                            status, view, (char *) windowname, 
@@ -1543,14 +1543,14 @@ createwCreateWindow (
                        desktopid, clientcolor, color );  
 
          if ( (void *) __w == NULL )
-            gswsrv_debug_print ("createwCreateWindow: createwCreateWindow2 fail \n");
+            gwssrv_debug_print ("createwCreateWindow: createwCreateWindow2 fail \n");
     
 
         __w->type = WT_SIMPLE;
         return (void *) __w;
     }
 
-    gswsrv_debug_print ("createwCreateWindow: [FAIL] type \n");
+    gwssrv_debug_print ("createwCreateWindow: [FAIL] type \n");
     return NULL;
     
     

@@ -36,7 +36,7 @@ int serviceDrawChar(void)
 
 
     // #debug
-    gswsrv_debug_print ("serviceDrawChar: \n");
+    gwssrv_debug_print ("serviceDrawChar: \n");
 
 
     // Get
@@ -62,11 +62,11 @@ int serviceDrawChar(void)
    
     // Limits
     if ( window_id < 0 || window_id >= WINDOW_COUNT_MAX ){
-        gswsrv_debug_print ("gwssrv: serviceDrawChar window_id\n");
+        gwssrv_debug_print ("gwssrv: serviceDrawChar window_id\n");
         return -1;
     }
 
-    //gswsrv_debug_print ("serviceDrawChar: get window pointer\n");
+    //gwssrv_debug_print ("serviceDrawChar: get window pointer\n");
     
     //#todo
     // Get the window structure given the id.
@@ -76,7 +76,7 @@ int serviceDrawChar(void)
     // O ponteiro eh nao nulo, mas esta numa regiao invalida.
     // why??
     
-    //gswsrv_debug_print ("serviceDrawChar: [debug] cheching pointer validation\n");
+    //gwssrv_debug_print ("serviceDrawChar: [debug] cheching pointer validation\n");
     //printf ("[debug] window id      = %d \n",window_id);
     //printf ("[debug] window pointer = %x *hang\n",window);
     //while(1){}
@@ -85,14 +85,14 @@ int serviceDrawChar(void)
     
     
     if ( (void *) window == NULL ){
-        gswsrv_debug_print ("gwssrv: serviceDrawChar window\n");
+        gwssrv_debug_print ("gwssrv: serviceDrawChar window\n");
         return -1;
     }
 
-    //gswsrv_debug_print ("serviceDrawChar: pointer not null\n");
+    //gwssrv_debug_print ("serviceDrawChar: pointer not null\n");
     
     if ( window->used != 1 || window->magic != 1234 ){
-        gswsrv_debug_print ("gwssrv: serviceDrawChar validation\n");
+        gwssrv_debug_print ("gwssrv: serviceDrawChar validation\n");
         return -1;
     }
     
@@ -100,7 +100,7 @@ int serviceDrawChar(void)
     // Draw
     //
     
-    gswsrv_debug_print ("serviceDrawChar: Draw !!!\n");
+    gwssrv_debug_print ("serviceDrawChar: Draw !!!\n");
     
     // Ok it is working
     dtextDrawText ( (struct gws_window_d *) window,
@@ -129,7 +129,7 @@ int serviceDrawChar(void)
         8 ); // char height 
 
 
-    gswsrv_debug_print ("gwssrv: serviceDrawChar done\n");
+    gwssrv_debug_print ("gwssrv: serviceDrawChar done\n");
     
     return 0;
 }

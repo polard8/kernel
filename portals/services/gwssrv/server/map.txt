@@ -120,9 +120,9 @@ Linker script and memory map
  .text          0x0000000000401000      0x107 crt0.o
                 0x0000000000401000                _crt0
  .text          0x0000000000401107      0xa67 main.o
-                0x0000000000401107                _gswsrv_debug_print
-                0x0000000000401129                _gswsrv_clone_and_execute
-                0x0000000000401146                _gswsrv_get_system_metrics
+                0x0000000000401107                _gwssrv_debug_print
+                0x0000000000401129                _gwssrv_clone_and_execute
+                0x0000000000401146                _gwssrv_get_system_metrics
                 0x0000000000401167                _gwssrv_enter_critical_section
                 0x00000000004011bc                _gwssrv_exit_critical_section
                 0x00000000004011d8                _gwssrv_show_backbuffer
@@ -517,7 +517,7 @@ Linker script and memory map
                 0x000000000040b1c4                _serverInit
  .text          0x000000000040b1e1        0x6 comp.o
                 0x000000000040b1e1                _compositor
- .text          0x000000000040b1e7     0x101b window.o
+ .text          0x000000000040b1e7     0x1021 window.o
                 0x000000000040b1e7                _serviceCreateWindow
                 0x000000000040b3e5                _serviceChangeWindowPosition
                 0x000000000040b4cb                _serviceResizeWindow
@@ -526,61 +526,61 @@ Linker script and memory map
                 0x000000000040b704                _serviceRefreshRectangle
                 0x000000000040b750                _serviceRefreshWindow
                 0x000000000040b813                _gwssrv_redraw_window
-                0x000000000040bbfa                _gwssrv_initialize_color_schemes
-                0x000000000040bdfb                _gwssrv_select_color_scheme
-                0x000000000040bf16                _gws_show_window_rect
-                0x000000000040bfe8                _gwsDefineInitialRootWindow
-                0x000000000040c007                _gwsRegisterWindow
-                0x000000000040c09b                _get_active_window
-                0x000000000040c0a5                _set_active_window
-                0x000000000040c0bb                _get_zorder
-                0x000000000040c0d6                _get_top_window
-                0x000000000040c0e0                _set_top_window
-                0x000000000040c0ee                _gws_resize_window
-                0x000000000040c12d                _gwssrv_change_window_position
-                0x000000000040c16c                _gwsWindowLock
-                0x000000000040c187                _gwsWindowUnlock
-                0x000000000040c1a2                _gwssrv_init_windows
- .text          0x000000000040c202      0xb17 bmp.o
-                0x000000000040c202                _bmpDisplayBMP
-                0x000000000040c8b9                _gwssrv_load_and_decode_small_icon
-                0x000000000040ca12                _gwssrv_load_small_icon
-                0x000000000040cabf                _gwssrv_decode_small_icon
-                0x000000000040cb9b                _xxx_test_load_bmp
- .text          0x000000000040cd19       0x9a connect.o
-                0x000000000040cd19                _register_ws
- .text          0x000000000040cdb3      0x2ac button.o
-                0x000000000040cdb3                _gws_draw_button
- .text          0x000000000040d05f       0x1e font.o
-                0x000000000040d05f                _gwssrv_init_font
- .text          0x000000000040d07d      0x274 termios.o
-                0x000000000040d07d                _tcgetattr
-                0x000000000040d09b                _tcsetattr
-                0x000000000040d11d                _tcsendbreak
-                0x000000000040d13a                _tcdrain
-                0x000000000040d157                _tcflush
-                0x000000000040d174                _tcflow
-                0x000000000040d191                _cfmakeraw
-                0x000000000040d21d                _cfgetispeed
-                0x000000000040d248                _cfgetospeed
-                0x000000000040d273                _cfsetispeed
-                0x000000000040d29d                _cfsetospeed
-                0x000000000040d2c7                _cfsetspeed
- .text          0x000000000040d2f1       0x6f ioctl.o
-                0x000000000040d2f1                _ioctl
- .text          0x000000000040d360      0x198 fcntl.o
-                0x000000000040d360                _fcntl
-                0x000000000040d3d1                _openat
-                0x000000000040d456                _open
-                0x000000000040d4bd                _creat
-                0x000000000040d4db                _flock
+                0x000000000040bc00                _gwssrv_initialize_color_schemes
+                0x000000000040be01                _gwssrv_select_color_scheme
+                0x000000000040bf1c                _gws_show_window_rect
+                0x000000000040bfee                _gwsDefineInitialRootWindow
+                0x000000000040c00d                _gwsRegisterWindow
+                0x000000000040c0a1                _get_active_window
+                0x000000000040c0ab                _set_active_window
+                0x000000000040c0c1                _get_zorder
+                0x000000000040c0dc                _get_top_window
+                0x000000000040c0e6                _set_top_window
+                0x000000000040c0f4                _gws_resize_window
+                0x000000000040c133                _gwssrv_change_window_position
+                0x000000000040c172                _gwsWindowLock
+                0x000000000040c18d                _gwsWindowUnlock
+                0x000000000040c1a8                _gwssrv_init_windows
+ .text          0x000000000040c208      0xb17 bmp.o
+                0x000000000040c208                _bmpDisplayBMP
+                0x000000000040c8bf                _gwssrv_load_and_decode_small_icon
+                0x000000000040ca18                _gwssrv_load_small_icon
+                0x000000000040cac5                _gwssrv_decode_small_icon
+                0x000000000040cba1                _xxx_test_load_bmp
+ .text          0x000000000040cd1f       0x9a connect.o
+                0x000000000040cd1f                _register_ws
+ .text          0x000000000040cdb9      0x2ac button.o
+                0x000000000040cdb9                _gws_draw_button
+ .text          0x000000000040d065       0x1e font.o
+                0x000000000040d065                _gwssrv_init_font
+ .text          0x000000000040d083      0x274 termios.o
+                0x000000000040d083                _tcgetattr
+                0x000000000040d0a1                _tcsetattr
+                0x000000000040d123                _tcsendbreak
+                0x000000000040d140                _tcdrain
+                0x000000000040d15d                _tcflush
+                0x000000000040d17a                _tcflow
+                0x000000000040d197                _cfmakeraw
+                0x000000000040d223                _cfgetispeed
+                0x000000000040d24e                _cfgetospeed
+                0x000000000040d279                _cfsetispeed
+                0x000000000040d2a3                _cfsetospeed
+                0x000000000040d2cd                _cfsetspeed
+ .text          0x000000000040d2f7       0x6f ioctl.o
+                0x000000000040d2f7                _ioctl
+ .text          0x000000000040d366      0x198 fcntl.o
+                0x000000000040d366                _fcntl
+                0x000000000040d3d7                _openat
+                0x000000000040d45c                _open
+                0x000000000040d4c3                _creat
+                0x000000000040d4e1                _flock
                 0x000000000040e000                . = ALIGN (0x1000)
- *fill*         0x000000000040d4f8      0xb08 
+ *fill*         0x000000000040d4fe      0xb02 
 
 .iplt           0x000000000040e000        0x0
  .iplt          0x000000000040e000        0x0 crt0.o
 
-.rodata         0x000000000040e000     0x309b
+.rodata         0x000000000040e000     0x30bb
  .rodata        0x000000000040e000       0x8a crt0.o
  *fill*         0x000000000040e08a        0x2 
  .rodata        0x000000000040e08c      0x607 main.o
@@ -605,117 +605,117 @@ Linker script and memory map
  *fill*         0x0000000000410543        0x1 
  .rodata        0x0000000000410544       0xe5 gws.o
  *fill*         0x0000000000410629        0x3 
- .rodata        0x000000000041062c      0x46f window.o
- *fill*         0x0000000000410a9b        0x1 
- .rodata        0x0000000000410a9c      0x421 bmp.o
- *fill*         0x0000000000410ebd        0x3 
- .rodata        0x0000000000410ec0       0x3d connect.o
- *fill*         0x0000000000410efd        0x3 
- .rodata        0x0000000000410f00       0x60 button.o
- .rodata        0x0000000000410f60       0xc9 termios.o
- .rodata        0x0000000000411029        0xb ioctl.o
- .rodata        0x0000000000411034       0x67 fcntl.o
+ .rodata        0x000000000041062c      0x48f window.o
+ *fill*         0x0000000000410abb        0x1 
+ .rodata        0x0000000000410abc      0x421 bmp.o
+ *fill*         0x0000000000410edd        0x3 
+ .rodata        0x0000000000410ee0       0x3d connect.o
+ *fill*         0x0000000000410f1d        0x3 
+ .rodata        0x0000000000410f20       0x60 button.o
+ .rodata        0x0000000000410f80       0xc9 termios.o
+ .rodata        0x0000000000411049        0xb ioctl.o
+ .rodata        0x0000000000411054       0x67 fcntl.o
 
-.eh_frame       0x000000000041109c     0x37d8
- .eh_frame      0x000000000041109c       0x34 crt0.o
- .eh_frame      0x00000000004110d0      0x1cc main.o
+.eh_frame       0x00000000004110bc     0x37d8
+ .eh_frame      0x00000000004110bc       0x34 crt0.o
+ .eh_frame      0x00000000004110f0      0x1cc main.o
                                         0x1e4 (size before relaxing)
- .eh_frame      0x000000000041129c       0x24 stubs.o
+ .eh_frame      0x00000000004112bc       0x24 stubs.o
                                          0x3c (size before relaxing)
- .eh_frame      0x00000000004112c0      0xf74 stdio.o
+ .eh_frame      0x00000000004112e0      0xf74 stdio.o
                                         0xf8c (size before relaxing)
- .eh_frame      0x0000000000412234      0x6a8 stdlib.o
+ .eh_frame      0x0000000000412254      0x6a8 stdlib.o
                                         0x6c0 (size before relaxing)
- .eh_frame      0x00000000004128dc      0x5c0 string.o
+ .eh_frame      0x00000000004128fc      0x5c0 string.o
                                         0x5d8 (size before relaxing)
- .eh_frame      0x0000000000412e9c       0xa0 conio.o
+ .eh_frame      0x0000000000412ebc       0xa0 conio.o
                                          0xb8 (size before relaxing)
- .eh_frame      0x0000000000412f3c      0x200 socket.o
+ .eh_frame      0x0000000000412f5c      0x200 socket.o
                                         0x218 (size before relaxing)
- .eh_frame      0x000000000041313c      0x14c signal.o
+ .eh_frame      0x000000000041315c      0x14c signal.o
                                         0x164 (size before relaxing)
- .eh_frame      0x0000000000413288      0xb80 unistd.o
+ .eh_frame      0x00000000004132a8      0xb80 unistd.o
                                         0xb98 (size before relaxing)
- .eh_frame      0x0000000000413e08       0x60 pixel.o
+ .eh_frame      0x0000000000413e28       0x60 pixel.o
                                          0x78 (size before relaxing)
- .eh_frame      0x0000000000413e68       0x40 line.o
+ .eh_frame      0x0000000000413e88       0x40 line.o
                                          0x58 (size before relaxing)
- .eh_frame      0x0000000000413ea8       0x68 rect.o
+ .eh_frame      0x0000000000413ec8       0x68 rect.o
                                          0x80 (size before relaxing)
- .eh_frame      0x0000000000413f10      0x120 char.o
+ .eh_frame      0x0000000000413f30      0x120 char.o
                                         0x138 (size before relaxing)
- .eh_frame      0x0000000000414030       0x60 dtext.o
+ .eh_frame      0x0000000000414050       0x60 dtext.o
                                          0x78 (size before relaxing)
- .eh_frame      0x0000000000414090       0x90 createw.o
+ .eh_frame      0x00000000004140b0       0x90 createw.o
                                          0xa8 (size before relaxing)
- .eh_frame      0x0000000000414120      0x104 gws.o
+ .eh_frame      0x0000000000414140      0x104 gws.o
                                         0x11c (size before relaxing)
- .eh_frame      0x0000000000414224       0x20 comp.o
+ .eh_frame      0x0000000000414244       0x20 comp.o
                                          0x38 (size before relaxing)
- .eh_frame      0x0000000000414244      0x2f0 window.o
+ .eh_frame      0x0000000000414264      0x2f0 window.o
                                         0x308 (size before relaxing)
- .eh_frame      0x0000000000414534       0xa0 bmp.o
+ .eh_frame      0x0000000000414554       0xa0 bmp.o
                                          0xb8 (size before relaxing)
- .eh_frame      0x00000000004145d4       0x20 connect.o
+ .eh_frame      0x00000000004145f4       0x20 connect.o
                                          0x38 (size before relaxing)
- .eh_frame      0x00000000004145f4       0x20 button.o
+ .eh_frame      0x0000000000414614       0x20 button.o
                                          0x38 (size before relaxing)
- .eh_frame      0x0000000000414614       0x20 font.o
+ .eh_frame      0x0000000000414634       0x20 font.o
                                          0x38 (size before relaxing)
- .eh_frame      0x0000000000414634      0x180 termios.o
+ .eh_frame      0x0000000000414654      0x180 termios.o
                                         0x198 (size before relaxing)
- .eh_frame      0x00000000004147b4       0x20 ioctl.o
+ .eh_frame      0x00000000004147d4       0x20 ioctl.o
                                          0x38 (size before relaxing)
- .eh_frame      0x00000000004147d4       0xa0 fcntl.o
+ .eh_frame      0x00000000004147f4       0xa0 fcntl.o
                                          0xb8 (size before relaxing)
 
-.rel.dyn        0x0000000000414874        0x0
- .rel.got       0x0000000000414874        0x0 crt0.o
- .rel.iplt      0x0000000000414874        0x0 crt0.o
- .rel.text      0x0000000000414874        0x0 crt0.o
+.rel.dyn        0x0000000000414894        0x0
+ .rel.got       0x0000000000414894        0x0 crt0.o
+ .rel.iplt      0x0000000000414894        0x0 crt0.o
+ .rel.text      0x0000000000414894        0x0 crt0.o
 
-.data           0x0000000000414880     0x4780
-                0x0000000000414880                data = .
-                0x0000000000414880                _data = .
-                0x0000000000414880                __data = .
+.data           0x00000000004148a0     0x4760
+                0x00000000004148a0                data = .
+                0x00000000004148a0                _data = .
+                0x00000000004148a0                __data = .
  *(.data)
- .data          0x0000000000414880       0x50 crt0.o
- *fill*         0x00000000004148d0       0x10 
- .data          0x00000000004148e0      0x404 main.o
-                0x0000000000414ce0                _____saved_server_fd
- .data          0x0000000000414ce4        0x0 stubs.o
- .data          0x0000000000414ce4        0x0 ctype.o
- .data          0x0000000000414ce4        0x4 stdio.o
-                0x0000000000414ce4                ___unix_get_nread
- .data          0x0000000000414ce8        0x8 stdlib.o
-                0x0000000000414ce8                __infinity
- .data          0x0000000000414cf0        0x0 string.o
- .data          0x0000000000414cf0        0x0 conio.o
- .data          0x0000000000414cf0        0x0 socket.o
- *fill*         0x0000000000414cf0       0x10 
- .data          0x0000000000414d00       0x80 signal.o
-                0x0000000000414d00                _sys_siglist
- .data          0x0000000000414d80        0x0 unistd.o
- .data          0x0000000000414d80      0x400 pixel.o
- .data          0x0000000000415180      0x400 line.o
- .data          0x0000000000415580      0x400 rect.o
- .data          0x0000000000415980      0x400 char.o
- .data          0x0000000000415d80      0x400 dtext.o
- .data          0x0000000000416180      0x400 createw.o
- .data          0x0000000000416580      0x400 gws.o
- .data          0x0000000000416980      0x400 comp.o
- .data          0x0000000000416d80      0x400 window.o
- .data          0x0000000000417180      0x400 bmp.o
- .data          0x0000000000417580      0x404 connect.o
-                0x0000000000417980                ___ws_registerd
- *fill*         0x0000000000417984       0x1c 
- .data          0x00000000004179a0      0x400 button.o
- .data          0x0000000000417da0      0x400 font.o
- .data          0x00000000004181a0        0x0 termios.o
- .data          0x00000000004181a0        0x0 ioctl.o
- .data          0x00000000004181a0        0x0 fcntl.o
+ .data          0x00000000004148a0       0x50 crt0.o
+ *fill*         0x00000000004148f0       0x10 
+ .data          0x0000000000414900      0x404 main.o
+                0x0000000000414d00                _____saved_server_fd
+ .data          0x0000000000414d04        0x0 stubs.o
+ .data          0x0000000000414d04        0x0 ctype.o
+ .data          0x0000000000414d04        0x4 stdio.o
+                0x0000000000414d04                ___unix_get_nread
+ .data          0x0000000000414d08        0x8 stdlib.o
+                0x0000000000414d08                __infinity
+ .data          0x0000000000414d10        0x0 string.o
+ .data          0x0000000000414d10        0x0 conio.o
+ .data          0x0000000000414d10        0x0 socket.o
+ *fill*         0x0000000000414d10       0x10 
+ .data          0x0000000000414d20       0x80 signal.o
+                0x0000000000414d20                _sys_siglist
+ .data          0x0000000000414da0        0x0 unistd.o
+ .data          0x0000000000414da0      0x400 pixel.o
+ .data          0x00000000004151a0      0x400 line.o
+ .data          0x00000000004155a0      0x400 rect.o
+ .data          0x00000000004159a0      0x400 char.o
+ .data          0x0000000000415da0      0x400 dtext.o
+ .data          0x00000000004161a0      0x400 createw.o
+ .data          0x00000000004165a0      0x400 gws.o
+ .data          0x00000000004169a0      0x400 comp.o
+ .data          0x0000000000416da0      0x400 window.o
+ .data          0x00000000004171a0      0x400 bmp.o
+ .data          0x00000000004175a0      0x404 connect.o
+                0x00000000004179a0                ___ws_registerd
+ *fill*         0x00000000004179a4       0x1c 
+ .data          0x00000000004179c0      0x400 button.o
+ .data          0x0000000000417dc0      0x400 font.o
+ .data          0x00000000004181c0        0x0 termios.o
+ .data          0x00000000004181c0        0x0 ioctl.o
+ .data          0x00000000004181c0        0x0 fcntl.o
                 0x0000000000419000                . = ALIGN (0x1000)
- *fill*         0x00000000004181a0      0xe60 
+ *fill*         0x00000000004181c0      0xe40 
 
 .got            0x0000000000419000        0x0
  .got           0x0000000000419000        0x0 crt0.o

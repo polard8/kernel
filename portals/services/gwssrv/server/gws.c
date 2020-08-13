@@ -26,7 +26,7 @@
 
 int service_drain_input (void)
 {
-    gswsrv_debug_print ("gwssrv: service_drain_input [TODO]\n");
+    gwssrv_debug_print ("gwssrv: service_drain_input [TODO]\n");
     //handle_ipc_message();
     return -1;
 }
@@ -85,19 +85,19 @@ unsigned long gws_get_device_height(void)
 int gwssrv_init_globals(void)
 {
     // buffers
-    ____BACKBUFFER_VA  = (unsigned long) gswsrv_get_system_metrics(12);
-    ____FRONTBUFFER_VA = (unsigned long) gswsrv_get_system_metrics(11);
+    ____BACKBUFFER_VA  = (unsigned long) gwssrv_get_system_metrics(12);
+    ____FRONTBUFFER_VA = (unsigned long) gwssrv_get_system_metrics(11);
 
 
     // Screen
-    SavedX = gswsrv_get_system_metrics(1);
-    SavedY = gswsrv_get_system_metrics(2);
+    SavedX = gwssrv_get_system_metrics(1);
+    SavedY = gwssrv_get_system_metrics(2);
     __device_width  = SavedX;
     __device_height = SavedY;
 
 
     // bpp
-    SavedBPP = (unsigned long) gswsrv_get_system_metrics(9);
+    SavedBPP = (unsigned long) gwssrv_get_system_metrics(9);
 
 
     //background_color = xCOLOR_GRAY3;

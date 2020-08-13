@@ -113,7 +113,7 @@ void xxx_test_load_icon(void);
 //
 
 
-void gswsrv_debug_print (char *string){
+void gwssrv_debug_print (char *string){
 
     gramado_system_call ( 289, 
         (unsigned long) string,
@@ -122,14 +122,14 @@ void gswsrv_debug_print (char *string){
 }
 
 
-int gswsrv_clone_and_execute ( char *name )
+int gwssrv_clone_and_execute ( char *name )
 {
     return (int) gramado_system_call ( 900, (unsigned long) name, 0, 0 );
 }
 
 
 
-unsigned long gswsrv_get_system_metrics (int index){
+unsigned long gwssrv_get_system_metrics (int index){
 
     //if (index<0){
         //gde_debug_print ("gswsrv_get_system_metrics: fail\n");
@@ -315,7 +315,7 @@ void handle_request (int fd){
     // para assim obtermos um novo da próxima vez.
 
     if (fd<0){
-        gswsrv_debug_print ("gwssrv: handle_request fd\n");
+        gwssrv_debug_print ("gwssrv: handle_request fd\n");
         return;
     }
 
@@ -446,7 +446,7 @@ void handle_request (int fd){
     // Sending reply.
     // 
      
-    //gswsrv_debug_print ("Sending response ...\n");  
+    //gwssrv_debug_print ("Sending response ...\n");  
 
     //# it works.
     char *m = (char *) (&__buffer[0] + 16);
@@ -463,7 +463,7 @@ __again:
     // #todo:
     // while(1){...}
     
-    gswsrv_debug_print ("gwssrv: Sending response ...\n");
+    gwssrv_debug_print ("gwssrv: Sending response ...\n");
 
     //
     // Send
@@ -489,7 +489,7 @@ __again:
     for(c=0; c<32; c++)  //todo: 512
         next_response[c] = 0;
 
-    gswsrv_debug_print ("gwssrv: Response sent\n");  
+    gwssrv_debug_print ("gwssrv: Response sent\n");  
 }
 
 
@@ -563,7 +563,7 @@ gwsProcedure (
         // ws recebe via mensagens tradicionais e passemos
         // pra ele via socket.
         case 8080:
-            gswsrv_debug_print("gwssrv: gwsProcedure 8080\n");
+            gwssrv_debug_print("gwssrv: gwsProcedure 8080\n");
             service_drain_input();
             break;
 
@@ -572,7 +572,7 @@ gwsProcedure (
             {
                 // #debug
                 case VK_F1:
-                    gswsrv_debug_print("gwssrv: gwsProcedure VK_F1 Connection ON\n");
+                    gwssrv_debug_print("gwssrv: gwsProcedure VK_F1 Connection ON\n");
                     connection_status = 1;
                     //gde_reboot ();
                     break;
@@ -581,27 +581,27 @@ gwsProcedure (
                 // mostrar informações sobre o socket 
                 // do gws.    
                 case VK_F2:
-                    gswsrv_debug_print("gwssrv: gwsProcedure VK_F2 Connection OFF\n");
+                    gwssrv_debug_print("gwssrv: gwsProcedure VK_F2 Connection OFF\n");
                     connection_status = 0;
                     //my_pid = (int) getpid();
                     //gramado_system_call (7008,my_pid,0,0);
                     break;
 
                 case VK_F3:
-                    gswsrv_debug_print ("gwssrv: F3\n");
+                    gwssrv_debug_print ("gwssrv: F3\n");
                     bmpDisplayBMP (0,0,0); //#todo: test.
                     break;
 
                 // #test
                 // Die.
                 case VK_F4:
-                    gswsrv_debug_print ("gwssrv: F4 [EXIT] Exiting the server ...\n");
+                    gwssrv_debug_print ("gwssrv: F4 [EXIT] Exiting the server ...\n");
                     running = 0;
                     break;
                     
                     
                 case VK_F9:
-                    gswsrv_debug_print ("gwssrv: F9\n");
+                    gwssrv_debug_print ("gwssrv: F9\n");
                     //gws_draw_text(
                     break;
 
@@ -610,7 +610,7 @@ gwsProcedure (
                 // Enviar a mensagem para o processo associado
                 // com a janela que tem o foco de entrada.
                 default:
-                    gswsrv_debug_print ("gwssrv: MSG_SYSKEYUP\n");
+                    gwssrv_debug_print ("gwssrv: MSG_SYSKEYUP\n");
                     break;
             }    
             break;
@@ -624,7 +624,7 @@ gwsProcedure (
             //printf ("%c", (char) long1); 
             //gws_show_backbuffer ();
             
-            gswsrv_debug_print ("gwssrv: MSG_KEYDOWN\n");
+            gwssrv_debug_print ("gwssrv: MSG_KEYDOWN\n");
             break;
 
         // Hello!
@@ -632,7 +632,7 @@ gwsProcedure (
         // #bugbug: O window server não tem esse ponteiro de janela.
         // ele até aceitaria um handle.
         case 1000:
-            gswsrv_debug_print ("gwssrv: Message number 1000\n");
+            gwssrv_debug_print ("gwssrv: Message number 1000\n");
             dtextDrawText ( (struct gws_window_d *) __mywindow,
                 long1, long2, COLOR_GREEN,
                 "gwssrv: Hello friend. This is the Gramado Window Server!");
@@ -644,7 +644,7 @@ gwsProcedure (
         // Usará o buffer global
         // case MSG_CREATE_WINDOW:
         case 1001:
-            gswsrv_debug_print ("gwssrv: [FIXME] Message number 1001\n");
+            gwssrv_debug_print ("gwssrv: [FIXME] Message number 1001\n");
             serviceCreateWindow (); 
             break; 
 
@@ -660,39 +660,39 @@ gwsProcedure (
     
         // Draw char
         case 1004:
-            gswsrv_debug_print ("gwssrv: Message number 1004\n");
+            gwssrv_debug_print ("gwssrv: Message number 1004\n");
             serviceDrawChar();
             break;
 
         // Draw text
         // #todo: tem que testar isso!!!
         case 1005:
-           gswsrv_debug_print ("gwssrv: Message number 1005\n");
+           gwssrv_debug_print ("gwssrv: Message number 1005\n");
            serviceDrawText();
            break;
 
         // Refresh window
         case 1006:
-           gswsrv_debug_print ("gwssrv: Message number 1006\n");
+           gwssrv_debug_print ("gwssrv: Message number 1006\n");
            serviceRefreshWindow();
            break;
            
 
         // Redraw window
         case 1007:
-           gswsrv_debug_print ("gwssrv: Message number 1007\n");
+           gwssrv_debug_print ("gwssrv: Message number 1007\n");
            serviceRedrawWindow();
            break;
 
         // Resize window
         case 1008:
-           gswsrv_debug_print ("gwssrv: Message number 1008\n");
+           gwssrv_debug_print ("gwssrv: Message number 1008\n");
            serviceResizeWindow();
            break;
 
 
         case 1009:
-           gswsrv_debug_print ("gwssrv: Message number 1009\n");
+           gwssrv_debug_print ("gwssrv: Message number 1009\n");
            serviceChangeWindowPosition();
            break;
 
@@ -718,7 +718,7 @@ gwsProcedure (
         // shutdown.
         // Um cliente quer se desconectar.
         case 2010:
-            gswsrv_debug_print ("gwssrv: [2010] Disconnect\n");
+            gwssrv_debug_print ("gwssrv: [2010] Disconnect\n");
             break;
             
         // Refresh screen 
@@ -737,7 +737,7 @@ gwsProcedure (
 
         
         default:
-            gswsrv_debug_print ("gwssrv: Default message number\n");
+            gwssrv_debug_print ("gwssrv: Default message number\n");
             //printf ("msg=%d ",msg);
             break;
     }
@@ -758,7 +758,7 @@ void create_background (void)
     unsigned long h = gws_get_device_height();
 
 
-    gswsrv_debug_print ("gwssrv: create_background\n");
+    gwssrv_debug_print ("gwssrv: create_background\n");
 
     __bg_window = (struct gws_window_d *) createwCreateWindow ( WT_SIMPLE, 
                                          1, 1, "gwssrv-bg",  
@@ -767,7 +767,7 @@ void create_background (void)
                                          COLOR_BACKGROUND, COLOR_BACKGROUND );    
 
     if ( (void *) __bg_window == NULL ){
-        gswsrv_debug_print ("gwssrv: __bg_window fail\n");  
+        gwssrv_debug_print ("gwssrv: __bg_window fail\n");  
         return;
     }
     
@@ -776,7 +776,7 @@ void create_background (void)
     id = gwsRegisterWindow ( __bg_window );
 
     if (id<0){
-        gswsrv_debug_print ("create_background: Couldn't register window\n");
+        gwssrv_debug_print ("create_background: Couldn't register window\n");
         //return -1;
     }
 }
@@ -916,8 +916,8 @@ int main (int argc, char **argv){
 
         // #debug
         // Initializing or reinitializing
-        gswsrv_debug_print ("---------------------\n");
-        gswsrv_debug_print ("gwssrv: Initializing...\n");
+        gwssrv_debug_print ("---------------------\n");
+        gwssrv_debug_print ("gwssrv: Initializing...\n");
         printf ("gwssrv: Initializing... \n");
 
 
@@ -934,11 +934,11 @@ int main (int argc, char **argv){
         _status = (int) register_ws();
 
         if (_status<0){
-            gswsrv_debug_print ("gwssrv: Couldn't register the server \n");
+            gwssrv_debug_print ("gwssrv: Couldn't register the server \n");
             printf ("gwssrv: Couldn't register the server \n");
             exit(1);
         }
-        gswsrv_debug_print ("gwssrv: Registration ok \n");
+        gwssrv_debug_print ("gwssrv: Registration ok \n");
 
 
         // #todo
@@ -1009,14 +1009,14 @@ int main (int argc, char **argv){
         //printf ("gwssrv: Calling child \n");  
 
 
-        //gswsrv_clone_and_execute ("gws.bin"); 
-        gswsrv_clone_and_execute ("gwm.bin");    // window manager
-        //gswsrv_clone_and_execute ("terminal.bin");  
-        //gswsrv_clone_and_execute ("fileman.bin");  
-        //gswsrv_clone_and_execute ("browser.bin"); 
-        //gswsrv_clone_and_execute ("launch1.bin"); 
-        //gswsrv_clone_and_execute ("s2.bin");    //#bugbug        
-        //gswsrv_clone_and_execute ("s3.bin");    //#bugbug        
+        //gwssrv_clone_and_execute ("gws.bin"); 
+        gwssrv_clone_and_execute ("gwm.bin");    // window manager
+        //gwssrv_clone_and_execute ("terminal.bin");  
+        //gwssrv_clone_and_execute ("fileman.bin");  
+        //gwssrv_clone_and_execute ("browser.bin"); 
+        //gwssrv_clone_and_execute ("launch1.bin"); 
+        //gwssrv_clone_and_execute ("s2.bin");    //#bugbug        
+        //gwssrv_clone_and_execute ("s3.bin");    //#bugbug        
         // ...        
 
 
@@ -1082,7 +1082,7 @@ int main (int argc, char **argv){
         // para assim obtermos um novo da próxima vez.
     
     // loop:
-        gswsrv_debug_print ("gwssrv: Entering main loop.\n");
+        gwssrv_debug_print ("gwssrv: Entering main loop.\n");
 
         //#todo:
         // No loop precisamos de accept() read() e write();
@@ -1127,7 +1127,7 @@ int main (int argc, char **argv){
                           (socklen_t *) addr_len );
                           
             if (newconn < 0) {
-                gswsrv_debug_print ("gwssrv: ERROR on accept\n");
+                gwssrv_debug_print ("gwssrv: ERROR on accept\n");
  
             // Request from the new connection
             }else{
@@ -1175,7 +1175,7 @@ int main (int argc, char **argv){
 
     // Done.
     
-    gswsrv_debug_print ("gwssrv: exited. \n");
+    gwssrv_debug_print ("gwssrv: exited. \n");
     printf ("gwssrv: exited. \n");
     
     // #todo

@@ -26,7 +26,7 @@ int serviceDrawText(void)
 
 
     // #debug
-    gswsrv_debug_print ("gwssrv: serviceDrawText\n");
+    gwssrv_debug_print ("gwssrv: serviceDrawText\n");
 
 
     // Get
@@ -45,7 +45,7 @@ int serviceDrawText(void)
    
     if(s<0 || s>= 256)
     {
-        gswsrv_debug_print ("gwssrv: serviceDrawText [DEBUG]   SIZE \n");
+        gwssrv_debug_print ("gwssrv: serviceDrawText [DEBUG]   SIZE \n");
         exit(1);
     }
     */
