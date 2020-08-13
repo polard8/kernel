@@ -1079,7 +1079,7 @@ gws_resize_window (
 
 
 int 
-gws_replace_window ( 
+gwssrv_change_window_position ( 
     struct gws_window_d *window, 
     unsigned long x, 
     unsigned long y );

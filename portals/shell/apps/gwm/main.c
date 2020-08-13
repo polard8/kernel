@@ -954,6 +954,18 @@ int create_tester_client(int fd)
     } 
     //gws_exit_critical_section();
 
+
+    // Testing more things ....
+    
+    
+    gws_change_window_position(fd,tester_client->window, 10,10);
+    
+    //funcionou.
+    gws_redraw_window(fd,tester_client->window,1);
+    
+    
+    
+
     return 0;
 }
 

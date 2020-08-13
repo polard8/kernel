@@ -1,7 +1,7 @@
 # License: BSD License
 VERSION = 1
 PATCHLEVEL = 0
-SUBLEVEL = 84
+SUBLEVEL = 85
 EXTRAVERSION = 
 NAME = Portals 1.0
 

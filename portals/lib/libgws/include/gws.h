@@ -252,7 +252,15 @@ gws_draw_text (
     char *string );
 
 
+
+int 
+gws_redraw_window(int fd, int window, unsigned long flags);
+
+
 int gws_refresh_window (int fd, int window );
+
+int gws_change_window_position (int fd, int window, unsigned long x, unsigned long y );
+
 
 // Talvez vamos retonar o descritor
 // dado pelo servidor.

@@ -109,6 +109,9 @@ int serviceDrawButton (void);
 int serviceRefreshRectangle(void);
 void xxx_test_load_icon(void);
 
+
+int serviceChangeWindowPosition(void);
+
 // ...
 
 
@@ -588,11 +591,16 @@ gwsProcedure (
            gde_debug_print ("gwssrv: Message number 1007\n");
            serviceRedrawWindow();
            break;
-           
-       
+
+        /// 1008
         // #todo:
         // resize window
-        // replace window
+
+        case 1009:
+           gde_debug_print ("gwssrv: Message number 100\n");
+           serviceChangeWindowPosition();
+           break;
+
     
         // ...
                
@@ -1369,9 +1377,11 @@ int serviceRedrawWindow(void)
 
     // Get
     
-    window_id = message_address[4];  //wid
-    flags     = message_address[5];  //flag (show or not)
-    
+    window_id = message_address[0];  //wid
+    //msg
+    flags     = message_address[2];  //flag (show or not)
+ 
+ 
     //
     // Window ID
     //
@@ -1404,6 +1414,68 @@ int serviceRedrawWindow(void)
 
     return 0;
 }
+
+
+
+int serviceChangeWindowPosition(void)
+{
+
+	//o buffer é uma global nesse documento.
+    unsigned long *message_address = (unsigned long *) &__buffer[0];
+
+
+    struct gws_window_d *window;
+    int window_id = -1;
+    
+    unsigned long x = 0;
+    unsigned long y = 0;
+
+
+    // #debug
+    gde_debug_print ("gwssrv: serviceChangeWindowPosition\n");
+
+
+    // Get
+    
+    window_id = message_address[0];  //wid
+    // msg
+    x         = message_address[2];  
+    y         = message_address[3];  
+
+
+    //
+    // Window ID
+    //
+   
+    // Limits
+    if ( window_id < 0 || window_id >= WINDOW_COUNT_MAX ){
+        gde_debug_print ("gwssrv: serviceChangeWindowPosition window_id\n");
+        return -1;
+    }
+
+    //#todo
+    // Get the window structure given the id.
+    window = (struct gws_window_d *) windowList[window_id];
+   
+    if ( (void *) window == NULL ){
+        gde_debug_print ("gwssrv: serviceChangeWindowPosition window\n");
+        return -1;
+    }
+    
+    if ( window->used != 1 || window->magic != 1234 ){
+        gde_debug_print ("gwssrv: serviceChangeWindowPosition validation\n");
+        return -1;
+    }
+
+    gwssrv_change_window_position ( 
+        (struct gws_window_d *) window, 
+        (unsigned long) x, 
+        (unsigned long) y );
+
+    return 0;
+}
+
+
 
 
 
