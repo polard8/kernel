@@ -21,12 +21,11 @@
 
 
 
- 
 
 
 int main ( int argc, char *argv[] );
 
-int saveCreateButton ();
+int saveCreateButton (void);
 
 
 

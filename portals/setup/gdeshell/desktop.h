@@ -1,6 +1,6 @@
 
 
 
-int desktopInitialize();
+int desktopInitialize(void);
 
 

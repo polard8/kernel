@@ -477,7 +477,7 @@ done:
 // o tipo dois funciona.
 // testando colocar o ponteiro no edit box. setar foco.
 
-void terminalCreateEditBox (){
+void terminalCreateEditBox (void){
     
 	editboxWindow = (void *) gde_create_window ( WT_EDITBOX, 1, 1, 
 	                           "editbox1",     
@@ -566,7 +566,7 @@ struct window_d *terminalCreateMainWindow ( int status ){
 
 
 
-void terminalCreateWindow (){
+void terminalCreateWindow (void){
 	
 	struct window_d *hWindow;
 	
@@ -749,7 +749,7 @@ loadFile:
  *     Devemos usar a função oferecida pela api.
  */
 
-void terminalTestDisplayBMP (){
+void terminalTestDisplayBMP (void){
 	
 	
 	// #bugbug @todo: Aumenta o tamanho do heap do processo.
@@ -897,7 +897,7 @@ bmpDisplayBMP ( void *address,
  *
  */
 
-int terminalCreateTaskBar (){
+int terminalCreateTaskBar (void){
 	
 	//suspensa;
 /*
@@ -955,7 +955,7 @@ int terminalCreateTaskBar (){
 //quando clicamos no menu da barra de tarefas.
 //todo mudar o nome da função.
 
-int terminalTestButtons (){
+int terminalTestButtons (void){
 		
 	// Tamanho da tela.	
 	unsigned long ScreenWidth = gde_get_system_metrics(1);

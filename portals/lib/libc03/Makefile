@@ -25,8 +25,23 @@ TARGETOS ?= gramado
 # Gramado!
 ifeq ($(TARGETOS),gramado)
 
-	CFLAGS = -m32 \
-	--std=gnu89 \
+#	CFLAGS = -m32 \
+#	--std=gnu89 \
+#	-nodefaultlibs \
+#	-nostdinc \
+#	-nostdlib \
+#	-static \
+#	-fgnu89-inline \
+#	-ffreestanding \
+#	-fno-builtin \
+#	-fno-pie \
+#	-no-pie \
+#	-fno-stack-protector \
+#	-s
+
+
+CFLAGS = -m32 \
+	-std=gnu89 \
 	-nodefaultlibs \
 	-nostdinc \
 	-nostdlib \
@@ -35,9 +50,13 @@ ifeq ($(TARGETOS),gramado)
 	-ffreestanding \
 	-fno-builtin \
 	-fno-pie \
-	-no-pie \
+	-fleading-underscore \
 	-fno-stack-protector \
-	-s
+	-s \
+	-Werror=strict-prototypes    
+	
+
+
 	
 endif
 

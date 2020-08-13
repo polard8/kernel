@@ -1032,22 +1032,22 @@ int main ( int argc, char *argv[] );
 // Screen support.
 //
 
-void shellClearScreen ();
+void shellClearScreen (void);
 
 //copia o conteúdo do buffer para a tela. (dentro da janela)
-void shellRefreshScreen (); 
+void shellRefreshScreen (void); 
 
 void shellRefreshLine ( int line_number );
 
 void shellRefreshChar ( int line_number, int col_number );
 
 //refresh do char que está na posição usada pelo input.
-void shellRefreshCurrentChar (); 
+void shellRefreshCurrentChar (void); 
 
 
 
 //scroll dentro da screen_buffer. (VGA emulada)
-void shellScroll ();
+void shellScroll (void);
 //...
 
 
@@ -1055,8 +1055,8 @@ void shellScroll ();
 // Buffer support.
 //
 
-void shellClearBuffer();
-void shellShowScreenBuffer ();
+void shellClearBuffer(void);
+void shellShowScreenBuffer (void);
 //...
 
 
@@ -1064,16 +1064,17 @@ void shellShowScreenBuffer ();
 // Typing support.
 //
 
-void shellInsertCR ();
-void shellInsertLF ();
-void shellInsertNullTerminator ();
+void shellInsertCR (void);
+void shellInsertLF (void);
+void shellInsertNullTerminator (void);
 void shellInsertNextChar (char c);
 
 void shellInsertCharXY (unsigned long x, unsigned long y, char c);
 
 char 
-shellGetCharXY ( unsigned long x, 
-                 unsigned long y );
+shellGetCharXY ( 
+    unsigned long x, 
+    unsigned long y );
  
 static void lf (void);
 static void ri (void);
@@ -1097,43 +1098,46 @@ static void restore_cur (void);
 // Reset prompt.
 //
 
-void shellPrompt ();
+void shellPrompt (void);
 
 
 //cmd
 //Funções chamadas pelos comandos.
-void shellHelp ();
-void shellTree ();
-void shellThread ();
-void shellTestLoadFile ();
-void shellTestThreads ();
-void shellTestMBR ();
+void shellHelp (void);
+void shellTree (void);
+void shellThread (void);
+void shellTestLoadFile (void);
+void shellTestThreads (void);
+void shellTestMBR (void);
 
 
 //int test_operators();
 
-void shellShowWindowInfo ();
-void shellShowInfo ();
-void shellShowMetrics ();
-void shellShowSystemInfo ();
+void shellShowWindowInfo (void);
+void shellShowInfo (void);
+void shellShowMetrics (void);
+void shellShowSystemInfo (void);
+
 
 unsigned long 
-shellSendMessage ( struct window_d *window, 
-                   int msg, 
-				   unsigned long long1, 
-				   unsigned long long2 );
-//...
+shellSendMessage ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 );
+// ...
+
 
 // Wait for commands.
 //Isso não é usado, temos um while.
-void shellWaitCmd ();             
+void shellWaitCmd (void);             
  
  // Compare comands.
 unsigned long shellCompare (struct window_d *window);   
  
 // Initialization. 
 int shellInit ( struct window_d *window );    // Init.
-void shellShell ();                           // Constructor. 
+void shellShell (void);                           // Constructor. 
  
 // Finalizing ... 
 // ??exit, die... 
@@ -1145,38 +1149,42 @@ void shellShell ();                           // Constructor.
 
 // copia bytes	
 void 
-shell_memcpy_bytes ( unsigned char *Dest, 
-                     unsigned char *Source,
-                     unsigned long Length );
+shell_memcpy_bytes ( 
+    unsigned char *Dest, 
+    unsigned char *Source,
+    unsigned long Length );
 
 
 void shellUpdateCurrentDirectoryID ( int id ); 
 void shellUpdateWorkingDiretoryString ( char *string );
 
-void shellInitializeWorkingDiretoryString ();
+void shellInitializeWorkingDiretoryString (void);
 
 //lista informações sobre os processos.
-void shellTaskList ();
+void shellTaskList (void);
 
-void shellShowPID ();
-void shellShowPPID ();
+void shellShowPID (void);
+void shellShowPPID (void);
+void shellShowUID (void);
+void shellShowGID (void);
 
-void shellShowUID ();
-void shellShowGID ();
 
-void shellShowUserSessionID ();
-void shellShowWindowStationID ();
-void shellShowDesktopID ();
+void shellShowUserSessionID (void);
+void shellShowWindowStationID (void);
+void shellShowDesktopID (void);
 
-void shellShowProcessHeapPointer ();
-void shellShowKernelHeapPointer ();
 
-void shellShowDiskInfo ();
-void shellShowVolumeInfo ();
+void shellShowProcessHeapPointer (void);
+void shellShowKernelHeapPointer (void);
 
-void shellShowMemoryInfo ();
-void shellShowPCIInfo ();
-void shellShowKernelInfo ();
+
+void shellShowDiskInfo (void);
+void shellShowVolumeInfo (void);
+
+
+void shellShowMemoryInfo (void);
+void shellShowPCIInfo (void);
+void shellShowKernelInfo (void);
 
 
 /*
@@ -1186,40 +1194,43 @@ void shellShowKernelInfo ();
  */
 
 int 
-shell_gramado_core_init_execve ( const char *arg1, 
-                                 const char *arg2, 
-                                 const char *arg3 );
+shell_gramado_core_init_execve ( 
+    const char *arg1, 
+    const char *arg2, 
+    const char *arg3 );
 
 
 //
 // shelui.c
 //
 
-void shellCreateEditBox();
+void shellCreateEditBox(void);
 
 
 struct window_d *shellCreateMainWindow( int status );
 //struct window_d *shellCreatemainWindow ();
 
 
-
 int shellDisplayBMP ( char *file_name );
 
 int shellDisplayBMPEx (char *file_name, int size );
 
-void shellTestDisplayBMP ();
+void shellTestDisplayBMP (void);
+
 
 void 
-bmpDisplayBMP ( void* address, 
-                unsigned long x, 
-				unsigned long y, 
-				int width, 
-				int height );	
-				
+bmpDisplayBMP ( 
+    void* address, 
+    unsigned long x, 
+    unsigned long y, 
+    int width, 
+    int height );
+    
 
 //um comando no shell aponta o script para executar.
 int shellExecuteThisScript ( char* script_name );
-					
+
+
 /*
  **************************************
  * absolute_pathname:
@@ -1237,13 +1248,13 @@ int absolute_pathname ( char *string );
 
 
 //inicializaremos o supporte a pathname
-int shellInitPathname ();
-
+int shellInitPathname (void);
 
 //inicializaremos o supporte a filename
-int shellInitFilename ();
+int shellInitFilename (void);
 
-void shellExit (int code);	
+void shellExit (int code);
+
 
 /* 
  Remove the last N directories from PATH.  
@@ -1263,16 +1274,16 @@ int is_bin ( char *cmd );
 /* Check if it's a .sh1 file */
 int is_sh1 ( char *cmd );
 
-int shellCheckPassword ();
 
+int shellCheckPassword (void);
 
 //testando botão.
-int shellTestButtons ();
-
+int shellTestButtons (void);
 
 //tests
-void testCreateWindow ();
-			
+void testCreateWindow (void);
+
+
 //
 // End.
 //

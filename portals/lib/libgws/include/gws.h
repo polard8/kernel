@@ -313,8 +313,8 @@ unsigned long gws_get_system_metrics (int index);
 // Get next event
 struct gws_event_d *gws_next_system_message(void);
 
-void gws_enter_critical_section();
-void gws_exit_critical_section();
+void gws_enter_critical_section(void);
+void gws_exit_critical_section(void);
 
 
 //menu

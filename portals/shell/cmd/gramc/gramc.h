@@ -46,7 +46,7 @@
 // #bugbug: O lugar disso é no crt0.c. deletar.
 int main ( int argc, char *argv[] );
 
-int gramcInitialize ();
+int gramcInitialize (void);
 
 
 

@@ -17,7 +17,7 @@ EXTRAVERSION =
 
 
 CFLAGS = -m32 \
-	--std=gnu89 \
+	-std=gnu89 \
 	-nodefaultlibs \
 	-nostdinc \
 	-nostdlib \
@@ -26,9 +26,11 @@ CFLAGS = -m32 \
 	-ffreestanding \
 	-fno-builtin \
 	-fno-pie \
-	-no-pie \
+	-fleading-underscore \
 	-fno-stack-protector \
-	-s
+	-s \
+	-Werror=strict-prototypes    
+	
 
 
 
@@ -69,13 +71,11 @@ all: main.o all-c gws-link finalize clean
 	@echo "Ok?"
 
 main.o:
-	gcc  -c  main.c     -I $(LIBC) -I $(API02)  -I $(GWS_INCLUDES) -I . $(CFLAGS) -o main.o
-
+	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -I $(API02)  -I $(GWS_INCLUDES) -I . -o main.o
 
 all-c:
-
-	gcc  -c  connect.c  -I $(LIBC) -I $(API02)  -I $(GWS_INCLUDES) -I . $(CFLAGS) -o connect.o
-	gcc  -c  decode.c   -I $(LIBC) -I $(API02)  -I $(GWS_INCLUDES) -I . $(CFLAGS) -o decode.o
+	gcc  -c  connect.c  $(CFLAGS) -I $(LIBC) -I $(API02)  -I $(GWS_INCLUDES) -I . -o connect.o
+	gcc  -c  decode.c   $(CFLAGS) -I $(LIBC) -I $(API02)  -I $(GWS_INCLUDES) -I . -o decode.o
 
 
 # nothing for now.

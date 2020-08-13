@@ -5,6 +5,39 @@
  *     2020 - Created by Fred Nora.
  */
 
+
+
+//apresentação.
+#define VIEW_NULL      0
+#define VIEW_FULL      1000
+#define VIEW_MAXIMIZED 1001
+#define VIEW_MINIMIZED 1002
+#define VIEW_NORMAL    1003 //Normal (restaurada)
+//...
+
+//botões
+#define BN_CLICKED  200
+#define BN_DOWN     1
+#define BN_UP       2
+#define BN_SELECTED 3
+//...
+ 
+//
+// ## botoes  ##
+//
+
+//button state
+#define BS_NULL 0 
+#define BS_DEFAULT 1
+#define BS_FOCUS   2
+#define BS_PRESS   3
+#define BS_HOVER   4
+#define BS_DISABLED 5
+#define BS_PROGRESS 6
+//...
+
+
+
 #define WINDOW_LOCKED    1
 #define WINDOW_UNLOCKED  0
 
@@ -142,8 +175,8 @@ int top_window;
 
 struct gws_button_d
 {
-    object_type_t   objectType;
-    object_class_t  objectClass;
+    //object_type_t   objectType;
+    //object_class_t  objectClass;
 
     int used;
     int magic;
@@ -944,7 +977,18 @@ unsigned long windowList[WINDOW_COUNT_MAX];
 //
 
 
+int serviceCreateWindow ( void );
+int serviceChangeWindowPosition(void);
 
+int serviceDrawButton (void); 
+int serviceRedrawWindow(void);
+int serviceRefreshRectangle(void);
+int serviceRefreshWindow(void);
+
+
+//
+// ================================================================
+//
 
 
 // #todo
@@ -1065,11 +1109,12 @@ dtextDrawText (
        
        
 int gwsRegisterWindow (struct gws_window_d *window);
-int get_active_window ();
+int get_active_window (void);
 void set_active_window (int id);
-int get_zorder ( struct window_d *window );
-int get_top_window ();
+int get_zorder ( struct gws_window_d *window );
+int get_top_window (void);
 void set_top_window (int id);
+
 
 int 
 gws_resize_window ( 

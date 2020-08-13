@@ -23,7 +23,10 @@
 // do window manager.
 
 
-#include <api.h>
+
+
+//#include <api.h>
+
 #include <gws.h>
 
 
@@ -106,7 +109,7 @@ createwDrawTitleBar (
                                               COLOR_PINK, xCOLOR_GRAY3 ); 
 
     if ( (void *) __mybutton == NULL ){
-       gde_debug_print ("createwDrawTitleBar: __mybutton fail\n");
+       gswsrv_debug_print ("createwDrawTitleBar: __mybutton fail\n");
        //return -1;
     }
     */
@@ -257,7 +260,7 @@ createwDrawFrame (
     //button
     if ( window->type == WT_BUTTON )
     {
-        gde_debug_print ("[DEBUG]: desenha o frame do botao\n");
+        gswsrv_debug_print ("[DEBUG]: desenha o frame do botao\n");
         
         //todo frame or not
         //just like the edit box.        
@@ -516,7 +519,7 @@ void *createwCreateWindow2 (
 
 	//Alocando memória para a estrutura da janela.
 
-    window = (void *) malloc( sizeof(struct window_d) );
+    window = (void *) malloc( sizeof(struct gws_window_d) );
 
     if ( (void *) window == NULL )
     {
@@ -527,12 +530,13 @@ void *createwCreateWindow2 (
         // Erro.
         debug_print ("createwCreateWindow2: window struct \n");
         printf ("createwCreateWindow2: window struct \n");
-        gde_show_backbuffer ();
+        gwssrv_show_backbuffer ();
     
        // Using the kgws. The window server inside the kernel.
-       gde_message_box ( 3,
-           "createwCreateWindow2:",
-           "window struct fail!" );
+       //gde_message_box ( 3,
+         //  "createwCreateWindow2:",
+          // "window struct fail!" );
+       printf("createwCreateWindow2: window struct fail!\n");
        while(1){}
  
        //return NULL; 
@@ -960,7 +964,7 @@ void *createwCreateWindow2 (
         //Ainda não implementada.
         default:
             //return NULL; 
-            gde_message_box (3,"createwCreateWindow2","default");
+            //gde_message_box (3,"createwCreateWindow2","default");
             debug_print("createwCreateWindow2: default\n");
             while(1){}
             break;
@@ -1191,7 +1195,7 @@ void *createwCreateWindow2 (
             //remeber: the first window do not have a parent.
             if ( (void*) Parent == NULL )
             { 
-                gde_debug_print ("createwCreateWindow2: [Shadow] Parent"); 
+                gswsrv_debug_print ("createwCreateWindow2: [Shadow] Parent"); 
                 //exit(1); 
                 rectBackbufferDrawRectangle ( 
                     (window->left +1), 
@@ -1276,7 +1280,7 @@ void *createwCreateWindow2 (
         //#bugbug
         //Remember: The first window do not have a parent.
         if ( (void*) Parent == NULL ){ 
-            gde_debug_print ("createwCreateWindow2: [Background] Parent\n"); 
+            gswsrv_debug_print ("createwCreateWindow2: [Background] Parent\n"); 
             //exit(1); 
             rectBackbufferDrawRectangle ( 
                 window->left, 
@@ -1356,7 +1360,7 @@ void *createwCreateWindow2 (
 
         //#debug
         if ( (void*) Parent == NULL ){
-            gde_debug_print ("createwCreateWindow2: [WT_BUTTON] Parent NULL\n"); 
+            gswsrv_debug_print ("createwCreateWindow2: [WT_BUTTON] Parent NULL\n"); 
         }
 
 
@@ -1515,7 +1519,7 @@ createwCreateWindow (
     //button
     if ( type == WT_BUTTON )
     {
-        gde_debug_print ("[DEBUG]: createwCreateWindow WT_BUTTON\n");
+        gswsrv_debug_print ("[DEBUG]: createwCreateWindow WT_BUTTON\n");
         // Podemos usar o esquema padrão de cores ...
         __w = (void *) createwCreateWindow2 ( WT_BUTTON, 
                            status, view, (char *) windowname, 
@@ -1539,14 +1543,14 @@ createwCreateWindow (
                        desktopid, clientcolor, color );  
 
          if ( (void *) __w == NULL )
-            gde_debug_print ("createwCreateWindow: createwCreateWindow2 fail \n");
+            gswsrv_debug_print ("createwCreateWindow: createwCreateWindow2 fail \n");
     
 
         __w->type = WT_SIMPLE;
         return (void *) __w;
     }
 
-    gde_debug_print ("createwCreateWindow: [FAIL] type \n");
+    gswsrv_debug_print ("createwCreateWindow: [FAIL] type \n");
     return NULL;
     
     

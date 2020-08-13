@@ -22,13 +22,12 @@ char *secondary_desktop_folder = SDESKTOPFOLDER;
 
 
 
-int desktopInitialize (){
-	
-	printf("Initializing desktop ...\n");
-	printf("%s\n",primary_desktop_folder);
-    printf("%s\n",secondary_desktop_folder);	
-	
-	return 0;
+int desktopInitialize (void)
+{
+    printf("Initializing desktop ...\n");
+    printf("%s\n",primary_desktop_folder);
+    printf("%s\n",secondary_desktop_folder);
+    return 0;
 }
 
 

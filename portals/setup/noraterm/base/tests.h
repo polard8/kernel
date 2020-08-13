@@ -5,9 +5,9 @@
 
 
 
-void testScrollChar();
+void testScrollChar(int c);
 
-void testsTimerUpdateObject ();
+void testsTimerUpdateObject (void);
 
 void testsInitTimer (struct window_d * window);
 

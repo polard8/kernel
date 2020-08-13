@@ -1,7 +1,7 @@
 
 
-int testtest_main();
-unsigned long tree_eval ();
+int testtest_main(void);
+unsigned long tree_eval (void);
 
 
 

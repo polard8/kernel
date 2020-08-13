@@ -208,7 +208,7 @@ gde_print_string (
  *     Sincroniza o retraço vertical do monitor.  (rever) 
  */
 
-int gde_vsync ()
+int gde_vsync (void)
 {
     return (int) gramado_system_call ( SYSTEMCALL_VSYNC, 0, 0, 0 );
 }
@@ -311,7 +311,7 @@ gde_load_bitmap_16x16 (
  *     Shutdown the machine.
  */
 
-void gde_shutdown ()
+void gde_shutdown (void)
 {
     gde_debug_print ("gde_shutdown: [TODO]\n");
     //gramado_system_call ( ??, 0, 0, 0 );
@@ -329,7 +329,7 @@ void gde_shutdown ()
  *     Initialize default background configuration.  (rever) 
  */
 
-void gde_init_background ()
+void gde_init_background (void)
 {
     gde_debug_print ("gde_init_background: [DEPRECATED]\n");
     //todo: Implementar.	
@@ -1285,7 +1285,7 @@ int gde_set_focus (struct window_d *window){
  *     Get Focus. 
  */
 
-int gde_get_focus ()
+int gde_get_focus (void)
 {
     return (int) system_call ( SYSTEMCALL_GETFOCUS, 0, 0, 0 );
 }
@@ -1351,7 +1351,7 @@ int gde_set_active_window (struct window_d *window){
 
 // deprecated
 
-int gde_get_active_window ()
+int gde_get_active_window (void)
 {
     return (int) system_call ( SYSTEMCALL_GETACTIVEWINDOW, 0, 0, 0 );
 }
@@ -1362,8 +1362,8 @@ int gde_get_active_window ()
  *     Mostra informações sobre o processo atual.
  */
 
-void gde_show_current_process_info (){
-	
+void gde_show_current_process_info (void)
+{
 	// @todo: Essa rotina devira apenas pegar os valores via system call
 	//        e imprimir os valores obtidos usando rotinas em user mode.
 	
@@ -1443,9 +1443,9 @@ void gde_update_window (struct window_d *window){
 }
 
 
-void *gde_get_foregroung_window (){
-	
-	system_call ( SYSTEMCALL_GETFOREGROUNDWINDOW, 0, 0, 0 );	
+void *gde_get_foregroung_window (void)
+{
+    system_call ( SYSTEMCALL_GETFOREGROUNDWINDOW, 0, 0, 0 );	
 }
 
 
@@ -1508,7 +1508,7 @@ void gde_kill (int exit_code)
 
 // What a cool thing !
 
-void gde_dead_thread_collector (){
+void gde_dead_thread_collector (void){
 
     system_call ( SYSTEMCALL_DEAD_THREAD_COLLECTOR, 
         (unsigned long) 0, 
@@ -1561,7 +1561,7 @@ int gde_strncmp (char *s1, char *s2, int len){
  *     Passa o conteúdo do backbuffer para o lfb. 
  */
 
-void gde_show_backbuffer ()
+void gde_show_backbuffer (void)
 {
     // #todo
     // trocar o nome dessa systemcall.
@@ -1585,7 +1585,7 @@ void gde_show_backbuffer ()
 	// as camadas de software de mais alto nível antes
 	// de efetuar o reboot de hardware propriamente dito. 
 
-void gde_reboot ()
+void gde_reboot (void)
 {
     gramado_system_call ( SYSTEMCALL_REBOOT, 0, 0, 0 );
 
@@ -1617,21 +1617,18 @@ void gde_get_cursor ( unsigned long *x, unsigned long *y )
  * gde_get_cursor_x:
  *     Get cursor x. 
  */
-
-unsigned long gde_get_cursor_x (){
-
+unsigned long gde_get_cursor_x (void)
+{
     return (unsigned long) gramado_system_call ( SYSTEMCALL_GETCURSORX, 
                                0, 0, 0 );
 }
-
 
 /*
  * gde_get_cursor_y:
  *     Get cursor y.
  */
-
-unsigned long gde_get_cursor_y (){
-
+unsigned long gde_get_cursor_y (void)
+{
     return (unsigned long) gramado_system_call (SYSTEMCALL_GETCURSORY, 
                                0, 0, 0 );
 }
@@ -1642,8 +1639,8 @@ unsigned long gde_get_cursor_y (){
  *     Get client area rect.
  */
 
-void *gde_get_client_area_rect (){
-	
+void *gde_get_client_area_rect (void)
+{
     return (void *) system_call ( SYSTEMCALL_GETCLIENTAREARECT, 0, 0, 0 );
 }
 
@@ -2036,7 +2033,7 @@ fail:
 
 
 //P (Proberen) testar.
-void gde_enter_critical_section (){
+void gde_enter_critical_section (void){
 
     int S=0;
 
@@ -2063,8 +2060,8 @@ done:
 
 
 //V (Verhogen)incrementar.
-void gde_exit_critical_section (){
-	
+void gde_exit_critical_section (void)
+{
 	//Hora de sair. Mudo para 1 para que outro possa entrar.
     system_call ( SYSTEMCALL_OPEN_KERNELSEMAPHORE, 0, 0, 0 );
 }
@@ -2073,14 +2070,14 @@ void gde_exit_critical_section (){
 
 
 // P (Proberen) testar.
-void gde_p ()
+void gde_p (void)
 {
     gde_debug_print ("gde_p: [TODO]\n");
     //gde_enter_critical_section ();         
 }
 
 // V (Verhogen) incrementar.
-void gde_v ()
+void gde_v (void)
 {
     gde_debug_print ("gde_v: [TODO]\n");
     //gde_exit_critical_section ();          
@@ -2091,19 +2088,19 @@ void gde_v ()
 //Inicializa em 1 o semáforo do kernel para que 
 //o primeiro possa usar.
 
-void gde_initialize_critical_section ()
+void gde_initialize_critical_section (void)
 {
     system_call ( SYSTEMCALL_OPEN_KERNELSEMAPHORE, 0, 0, 0 );
 }
 
 
-void gde_begin_paint()
+void gde_begin_paint(void)
 {
     gde_enter_critical_section ();
 }
 
 
-void gde_end_paint()
+void gde_end_paint(void)
 {
     gde_exit_critical_section ();
 }
@@ -2235,7 +2232,7 @@ int gde_dialog ( const char *string ){
 
 // #todo
 // Descrever o método usdo por essa rotina.
-int gde_getchar ()
+int gde_getchar (void)
 {
     return (int) gramado_system_call ( 137, 0, 0, 0 );
 }
@@ -2757,13 +2754,13 @@ gde_draw_text (
 
 
 // ?
-struct window_d *gde_get_ws_screen_window ()
+struct window_d *gde_get_ws_screen_window (void)
 {
     return (struct window_d *) system_call ( 146 , 0, 0, 0 );
 }
 
 // ?
-struct window_d *gde_get_ws_main_window ()
+struct window_d *gde_get_ws_main_window (void)
 {
     return (struct window_d *) system_call ( 147 , 0, 0, 0 );
 }

@@ -4,7 +4,7 @@
 #include <stddef.h>
 
 //Using some system resources.
-#include <api.h>
+//#include <api.h>
 
 // window server routines.
 #include <gws.h>
@@ -17,7 +17,7 @@
 // Repintar os retângulos e as janelas marcadas como dirty.
 // Respeitando a z-order.
 
-void compositor ()
+void compositor (void)
 {
     // #todo.
     

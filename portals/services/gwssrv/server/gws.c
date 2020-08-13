@@ -15,10 +15,24 @@
 #include <stddef.h>
 
 //Using some system resources.
-#include <api.h>
+//#include <api.h>
 
 // window server routines.
 #include <gws.h>
+
+
+
+
+
+int service_drain_input (void)
+{
+    gswsrv_debug_print ("gwssrv: service_drain_input [TODO]\n");
+    //handle_ipc_message();
+    return -1;
+}
+
+
+
 
 
 
@@ -39,7 +53,7 @@ void gws_show_backbuffer(void)
 
     // #debug
     // [Deprecated] Using the kernel service.
-    // gde_show_backbuffer();
+    // gwssrv_show_backbuffer();
 
     // #todo:
     // Create this flag. 
@@ -71,19 +85,19 @@ unsigned long gws_get_device_height(void)
 int gwssrv_init_globals(void)
 {
     // buffers
-    ____BACKBUFFER_VA  = (unsigned long) gde_get_system_metrics(12);
-    ____FRONTBUFFER_VA = (unsigned long) gde_get_system_metrics(11);
+    ____BACKBUFFER_VA  = (unsigned long) gswsrv_get_system_metrics(12);
+    ____FRONTBUFFER_VA = (unsigned long) gswsrv_get_system_metrics(11);
 
 
     // Screen
-    SavedX = gde_get_system_metrics(1);
-    SavedY = gde_get_system_metrics(2);
+    SavedX = gswsrv_get_system_metrics(1);
+    SavedY = gswsrv_get_system_metrics(2);
     __device_width  = SavedX;
     __device_height = SavedY;
 
 
     // bpp
-    SavedBPP = (unsigned long) gde_get_system_metrics(9);
+    SavedBPP = (unsigned long) gswsrv_get_system_metrics(9);
 
 
     //background_color = xCOLOR_GRAY3;
@@ -107,7 +121,9 @@ int gwssrv_init_globals(void)
  *
  */
 //int gwsInit (void){
-int gwsInit (){
+
+int gwsInit(void)
+{
 
     //paint_ready = FALSE;
 
@@ -221,7 +237,7 @@ int gwsInit (){
 
     //paint_ready = TRUE;
     
-    gde_show_backbuffer();
+    gwssrv_show_backbuffer();
     
     return 0;
 }
@@ -231,10 +247,14 @@ int gwsInit (){
 
 // Função padrão para todos os servidores ???
 // #todo: temos que criar isso.
-int serverInit (){
-	
-	printf ("serverInit: Initializing gws server ...\n");
-	
+int serverInit (void)
+{
+    printf ("serverInit: Initializing gws server ...\n");
+
     return (int) gwsInit();
 }
+
+
+
+
 

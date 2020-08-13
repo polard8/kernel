@@ -15,8 +15,22 @@ EXTRAVERSION =
 #todo:
 #We need to simplify these flags
 
+#CFLAGS = -m32 \
+#	--std=gnu89 \
+#	-nodefaultlibs \
+#	-nostdinc \
+#	-nostdlib \
+#	-static \
+#	-fgnu89-inline \
+#	-ffreestanding \
+#	-fno-builtin \
+#	-fno-pie \
+#	-no-pie \
+#	-fno-stack-protector \
+#	-s
+
 CFLAGS = -m32 \
-	--std=gnu89 \
+	-std=gnu89 \
 	-nodefaultlibs \
 	-nostdinc \
 	-nostdlib \
@@ -25,9 +39,12 @@ CFLAGS = -m32 \
 	-ffreestanding \
 	-fno-builtin \
 	-fno-pie \
-	-no-pie \
+	-fleading-underscore \
 	-fno-stack-protector \
-	-s
+	-s \
+	-Werror=strict-prototypes    
+
+
 
 
 
@@ -64,10 +81,11 @@ all: main.o all-c gfe-link finalize clean
 	@echo "Ok?"
 
 main.o:
-	gcc  -c  main.c    $(CFLAGS) -I $(LIBC) -I $(API) -o main.o
-	gcc  -c  status.c  $(CFLAGS) -I $(LIBC) -I $(API) -o status.o
+	gcc  -c  main.c     $(CFLAGS) -I $(LIBC) -I $(API) -o main.o
+	gcc  -c  status.c   $(CFLAGS) -I $(LIBC) -I $(API) -o status.o
 	gcc  -c  addrbar.c  $(CFLAGS) -I $(LIBC) -I $(API) -o addrbar.o
-	
+
+
 all-c:
 	cp $(LIBCOBJ)/crt0.o   .
 	

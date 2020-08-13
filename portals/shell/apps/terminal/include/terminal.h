@@ -599,9 +599,9 @@ int textMaxWheelDelta;  //máximo que se pode rolar o texto
 void terminal_write_char (int fd, int window, int c);
 
 void terminalInsertNextChar (char c);
-void terminalInsertNullTerminator ();
-void terminalInsertLF ();
-void terminalInsertCR ();
+void terminalInsertNullTerminator (void);
+void terminalInsertCR (void);
+void terminalInsertLF (void);
 
 void lf (void);
 void cr (void);
@@ -629,21 +629,17 @@ terminalInsertCharXY (
 
 static void save_cur (void);
 static void restore_cur (void);
-void terminalClearBuffer ();
+void terminalClearBuffer (void);
 
 
 void textSetTopRow ( int number );
-int textGetTopRow ();
-
-
+int textGetTopRow (void);
 void textSetBottomRow ( int number );
-int textGetBottomRow ();
-
-            
+int textGetBottomRow (void);    
 void textSetCurrentRow ( int number );          
-int textGetCurrentRow ();           
+int textGetCurrentRow (void);           
 void textSetCurrentCol ( int number );           
-int textGetCurrentCol ();
+int textGetCurrentCol (void);
 
 void move_to ( unsigned long x, unsigned long y );
 

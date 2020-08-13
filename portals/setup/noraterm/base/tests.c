@@ -20,7 +20,7 @@ int deltaValue = 1;
 
 //usdo para testar o timer.
 
-void testsTimerUpdateObject (){
+void testsTimerUpdateObject (void){
    
     //RECT rc;
     //GetClientRect(hwnd, &rc);
@@ -94,7 +94,7 @@ void testsInitTimer (struct window_d * window){
 
 void testScrollChar ( int c ){
 	
-    int i;
+    int i=0;
 	
     for ( i=0; i < (__wlMaxColumns*26); i++ )
 	{

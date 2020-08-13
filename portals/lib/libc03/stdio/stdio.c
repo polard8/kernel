@@ -67,8 +67,8 @@ static int terminal___PID;
 // estamos falando do posicionamento do cursor dentro da janela 
 // e não dentro do terminal. 
 void stdioSetCursor( unsigned long x, unsigned long y );
-unsigned long stdioGetCursorX(); 
-unsigned long stdioGetCursorY(); 
+unsigned long stdioGetCursorX(void); 
+unsigned long stdioGetCursorY(void); 
 static size_t stdio_strlen (const char *s);
 //--
 
@@ -1481,7 +1481,7 @@ int prompt_flush ( int con_id )
 }
 
 
-void prompt_clean (){
+void prompt_clean (void){
 
     int i=0;
 
@@ -3012,7 +3012,7 @@ void stdioSetCursor ( unsigned long x, unsigned long y )
  *     e não dentro do terminal.
  */ 
 
-unsigned long stdioGetCursorX ()
+unsigned long stdioGetCursorX (void)
 {
     return (unsigned long) gramado_system_call ( 240, 0, 0, 0 );
 }
@@ -3025,7 +3025,7 @@ unsigned long stdioGetCursorX ()
  *     e não dentro do terminal. 
  */
 
-unsigned long stdioGetCursorY ()
+unsigned long stdioGetCursorY (void)
 {
     return (unsigned long) gramado_system_call ( 241, 0, 0, 0 );
 }
@@ -5190,7 +5190,7 @@ char *ctermid (char *s)
 // Precisamos usar os arquivos herdados do processo pai.
 // Eles estão na estrutura de processo desse processo.
 
-void stdioInitialize (){
+void stdioInitialize(void){
 
     int status = 0;
     int i=0;

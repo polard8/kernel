@@ -672,7 +672,7 @@ int main ( int argc, char *argv[] );
 
 
 //scroll dentro da screen_buffer. (VGA emulada)
-void shellScroll();
+void shellScroll(void);
 //...
 
 
@@ -689,42 +689,45 @@ void shellScroll();
 // Reset prompt.
 //
 
-void shellPrompt();
+void shellPrompt(void);
 
 
 //cmd
 //Funções chamadas pelos comandos.
 
-void shellShowExperienceMenu();
-void shellShowTestsMenu();
+void shellShowExperienceMenu(void);
+void shellShowTestsMenu(void);
+void shellShowInfo(void);
+void shellShowMetrics(void);
+void shellShowSystemInfo(void);
 
-void shellTree();
-void shellThread();
-void shellTestLoadFile();
-void shellTestThreads();
-void shellTestMBR();
+
+void shellTree(void);
+void shellThread(void);
+
+void shellTestLoadFile(void);
+void shellTestThreads(void);
+void shellTestMBR(void);
 
 
 //int test_operators();
 
-void terminalShowWindowInfo ();
+void terminalShowWindowInfo (void);
 
 
-void shellShowInfo();
-void shellShowMetrics();
-void shellShowSystemInfo();
 
 unsigned long 
-shellSendMessage ( struct window_d *window, 
-                   int msg, 
-				   unsigned long long1, 
-				   unsigned long long2 );
+shellSendMessage ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 );
 //...
 
 
 // Wait for commands.
 // Isso não é usado, temos um while.
-void shellWaitCmd ();             
+void shellWaitCmd (void);             
  
  // Compare comands.
 unsigned long shellCompare (struct window_d *window);   
@@ -740,7 +743,7 @@ int terminalInit ( struct window_d *window );
 
 
 //Constructor.
-void terminalTerminal ();                
+void terminalTerminal (void);                
 
 
 // Finalizing ... 
@@ -753,42 +756,41 @@ void terminalTerminal ();
 
 // copia bytes	
 void 
-shell_memcpy_bytes ( unsigned char *Dest, 
-                     unsigned char *Source,
-                     unsigned long Length );
+shell_memcpy_bytes ( 
+    unsigned char *Dest, 
+    unsigned char *Source,
+    unsigned long Length );
  
  
 void shellUpdateCurrentDirectoryID( int id ); 
 void shellUpdateWorkingDiretoryString( char *string );
 
-void shellInitializeWorkingDiretoryString ();
+void shellInitializeWorkingDiretoryString (void);
 
 //lista informações sobre os processos.
-void shellTaskList();
+void shellTaskList(void);
 
 
 //
 // shell.c
 //
 
-void ShowPID ();
-void ShowPPID ();
-void ShowUID ();
-void ShowGID ();
+void ShowPID (void);
+void ShowPPID (void);
+void ShowUID (void);
+void ShowGID (void);
+void ShowUserSessionID(void);
+void ShowWindowStationID(void);  //room
+void ShowDesktopID(void);
 
-void ShowUserSessionID();
-void ShowWindowStationID();  //room
-void ShowDesktopID();
+void shellShowProcessHeapPointer(void);
+void shellShowKernelHeapPointer(void);
+void shellShowDiskInfo(void);
+void shellShowVolumeInfo(void);
+void shellShowMemoryInfo(void);
+void shellShowPCIInfo(void);
+void shellShowKernelInfo(void);
 
-void shellShowProcessHeapPointer();
-void shellShowKernelHeapPointer();
-
-void shellShowDiskInfo();
-void shellShowVolumeInfo();
-
-void shellShowMemoryInfo();
-void shellShowPCIInfo();
-void shellShowKernelInfo();
 
 
 /*
@@ -796,11 +798,14 @@ void shellShowKernelInfo();
  * Executa um programa exclusivamente dentro 
  * do ambiente Gramado Core no lugar do processo init.bin.
  */
-int shell_gramado_core_init_execve( const char *arg1, 
-                                    const char *arg2, 
-                                    const char *arg3 );
 
-		
+int 
+shell_gramado_core_init_execve( 
+    const char *arg1, 
+    const char *arg2, 
+    const char *arg3 );
+
+
 
 //um comando no shell aponta o script para executar.
 int shellExecuteThisScript ( char* script_name );
@@ -822,12 +827,9 @@ int absolute_pathname ( char *string );
 
 
 //inicializaremos o supporte a pathname
-int shellInitPathname ();
-
-
+int shellInitPathname (void);
 //inicializaremos o supporte a filename
-int shellInitFilename ();
-
+int shellInitFilename (void);
 
 
 void shellExit (int code);	
@@ -851,11 +853,11 @@ int is_bin ( char *cmd );
 /* Check if it's a .sh1 file */
 int is_sh1 ( char *cmd );
 
-int shellCheckPassword ();
+int shellCheckPassword (void);
 
-void shellPipeTest ();
+void shellPipeTest (void);
 
 //não é o soquete da libc.
-void shellSocketTest ();
+void shellSocketTest (void);
 
 

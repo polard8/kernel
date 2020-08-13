@@ -97,7 +97,7 @@ int check_newline ()
 
 // Skipping white spaces.
 
-int skip_white_space (){
+int skip_white_space (void){
     
     register int c;
     register int inside;
@@ -282,7 +282,7 @@ begin:
  *     copiando do gcc 0.9
  */
  
-int yylex (){
+int yylex (void){
 
     register int c;
     register char *p;
@@ -656,7 +656,7 @@ done:
  *     Inicializando o lexer.
  */
 
-int lexerInit (){
+int lexerInit (void){
 
     int i=0;
 
@@ -700,7 +700,7 @@ int lexerInit (){
 }
 
 
-int lexer (){
+int lexer (void){
 
     int Status = -1;
 

@@ -216,7 +216,7 @@ typedef struct sigaction {
 struct sigvec {
 	
 	//#bugbug: Cuidado!
-    void  (*sv_handler)();  /* signal handler */
+    void  (*sv_handler)(void);  /* signal handler */
     
     int     sv_mask;        /* signal mask to apply */
     int     sv_flags;       /* see signal options below */

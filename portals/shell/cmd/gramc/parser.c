@@ -1741,7 +1741,7 @@ void stmt(void)
  *     Pegando tokens com o lexer e fazendo coisas ...
  */
  
-int parse (){
+int parse (void){
 
     int running = 1;
 
@@ -2370,7 +2370,7 @@ int parse (){
  *     Initializing parser.
  */
 
-int parserInit (){
+int parserInit (void){
 
     register int i=0;
 
@@ -2414,7 +2414,7 @@ int parserInit (){
 }
 
 
-int parser(){
+int parser(void){
 
     int Status = -1;
     

@@ -55,21 +55,21 @@ void terminalInsertNextChar (char c){
 
 
 // # terminal stuff
-void terminalInsertNullTerminator (){
+void terminalInsertNullTerminator (void){
 	
 	terminalInsertNextChar ( (char) '\0' );
 }
 
 
 // # terminal stuff
-void terminalInsertLF (){
+void terminalInsertLF (void){
 	
 	terminalInsertNextChar ( (char) '\n' );
 }
 
 
 // # terminal stuff
-void terminalInsertCR (){
+void terminalInsertCR (void){
     
 	terminalInsertNextChar ( (char) '\r' );
 }
@@ -209,7 +209,7 @@ static void restore_cur (void){
 // #test
 // Vamos tentar imprimir na tela usando a api.
 
-void terminalRefreshCurrentChar2 (){
+void terminalRefreshCurrentChar2 (void){
 	
 	int c = (int) LINES[textCurrentRow].CHARS[textCurrentCol];
 
@@ -263,7 +263,7 @@ void terminalRefreshCurrentChar2 (){
 // #importante: No nosso caso vamos usar a api e impimir na tela.
 
 
-void terminalRefreshCurrentChar (){
+void terminalRefreshCurrentChar (void){
 	
 	//#usar api.
 	printf ("%c", LINES[textCurrentRow].CHARS[textCurrentCol] );
@@ -360,7 +360,7 @@ void terminalRefreshLine ( int line_number ){
  * para sabermos a cor do caractere e de seu background.
  */
 
-void terminalRefreshScreen (){
+void terminalRefreshScreen (void){
 
     int i=0;
     int j=0;
@@ -428,7 +428,7 @@ void terminalRefreshScreen (){
  *     Usada pelo comando 'cls'.
  */
  
-void terminalClearScreen (){
+void terminalClearScreen (void){
 
 	unsigned long left, top, right, bottom;
 	
@@ -547,7 +547,8 @@ void terminalSetCursor ( unsigned long x, unsigned long y ){
  *     Inicializamos com espaços.
  */
 
-void terminalClearBuffer (){
+
+void terminalClearBuffer (void){
 
     int i=0;
     int j=0;
@@ -582,8 +583,8 @@ void terminalClearBuffer (){
 // vamos mostrar todo o buffer de words, a partir 
 // da posição atual do cursor, forçando um scroll
 
-void terminalShowScreenBuffer (){
-	
+void terminalShowScreenBuffer (void)
+{
 	// Mostra a área visível dentro do buffer de linhas.
     terminalRefreshVisibleArea ();
 }
@@ -628,7 +629,7 @@ non_blank_line ( int row,
 
 
 // Mostra a área visível dentro do buffer de linhas.
-void terminalRefreshVisibleArea (){
+void terminalRefreshVisibleArea (void){
 
     unsigned long left, top, right, bottom;
     int i=0;
@@ -739,7 +740,7 @@ void terminalNewVisibleArea ( int text_top_row, int text_bottom_row )
 }
 
 
-void testChangeVisibleArea()
+void testChangeVisibleArea(void)
 {
 	textTopRow += textWheelDelta;
 	textBottomRow += textWheelDelta;	
@@ -755,7 +756,7 @@ void testChangeVisibleArea()
  * mostrada na tela.    
  */
 
-void testShowLines (){
+void testShowLines (void){
 	
 	//enterCriticalSection (); 
 	
@@ -818,7 +819,7 @@ void textSetTopRow ( int number )
 }
 
 
-int textGetTopRow ()
+int textGetTopRow (void)
 {
     return (int) textTopRow; 	
 }
@@ -831,7 +832,7 @@ void textSetBottomRow ( int number )
 }
 
 
-int textGetBottomRow ()
+int textGetBottomRow (void)
 {
     return (int) textBottomRow; 	
 }
@@ -844,7 +845,7 @@ void textSetCurrentRow ( int number )
 }
 
 
-int textGetCurrentRow ()
+int textGetCurrentRow (void)
 {
     return (int) textCurrentRow; 	
 }
@@ -857,7 +858,7 @@ void textSetCurrentCol ( int number )
 }
 
 
-int textGetCurrentCol ()
+int textGetCurrentCol (void)
 {
     return (int) textCurrentCol; 	
 }
@@ -917,9 +918,9 @@ void reset_terminal(){
 //funcionou
 // preencher com espaços do início da linha
 //até a coluna atual
-void terminal_clear_from_startofline ()
+void terminal_clear_from_startofline (void)
 {
-    int i;
+    int i=0;
     unsigned long OldX, OldY;
 
     char temp;
@@ -948,10 +949,10 @@ void terminal_clear_from_startofline ()
 
 //funcionou
 //preenche com espaço da coluna atual até o fim da linha.
-void terminal_clear_to_endofline ()
+void terminal_clear_to_endofline (void)
 {
 
-    int i;
+    int i=0;
     unsigned long OldX, OldY;
 
     char temp;
@@ -976,7 +977,7 @@ void terminal_clear_to_endofline ()
 
 
 // Isso funcionou pacialmente ... 
-void terminal_clear_to_endofdisplay ()
+void terminal_clear_to_endofdisplay (void)
 {
     unsigned long x, y;
     
@@ -1064,7 +1065,7 @@ void terminal_clear_to_endofdisplay ()
     // copia o conteúdo do buffer na tela limpa.
     // #importante: Mostra apenas a área visível do buffer de arquivo.
     // Não meche no cursor.
-void terminalCopyToScroll (){
+void terminalCopyToScroll (void){
 
     unsigned long left, top, right, bottom;
 
@@ -1127,9 +1128,9 @@ void terminalCopyToScroll (){
 
 
 
-void terminal_scroll_display ()
+void terminal_scroll_display (void)
 {
-    int i;
+    int i=0;
     unsigned long OldX, OldY;
     
     char temp;
@@ -1178,14 +1179,14 @@ void terminal_scroll_display ()
 
 
 
-void terminal_scroll_down ()
+void terminal_scroll_down (void)
 {
     updateVisibleArea (0);
     terminal_scroll_display ();
 }
 
 
-void terminal_scroll_up ()
+void terminal_scroll_up (void)
 {
     updateVisibleArea (1);
     terminal_scroll_display ();

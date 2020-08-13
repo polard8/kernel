@@ -1,5 +1,0 @@
-
-spr
-
-sprinkler web browser
-

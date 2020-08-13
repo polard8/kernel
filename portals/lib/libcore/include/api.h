@@ -3128,7 +3128,7 @@ gde_load_bitmap_16x16 (
 
 
 //int 0x80 - serviço 241.
-void gde_init_background ();
+void gde_init_background (void);
 
 int gde_message_box ( int type, char *string1, char *string2 );
 
@@ -3190,7 +3190,7 @@ int gde_close_window (struct window_d *window);
 int gde_set_focus (struct window_d *window);
 
 //Get Focus.
-int gde_get_focus ();
+int gde_get_focus (void);
 
 //Kill Focus.
 int gde_kill_focus (struct window_d *window);
@@ -3199,10 +3199,10 @@ int gde_kill_focus (struct window_d *window);
 int gde_set_active_window (struct window_d *window);
 
 //Get Active Window.
-int gde_get_active_window ();
+int gde_get_active_window (void);
 
 //Client area.
-void *gde_get_client_area_rect ();
+void *gde_get_client_area_rect (void);
 void gde_set_client_area_rect (struct rect_d *r);
 
 
@@ -3248,7 +3248,7 @@ void gde_update_window (struct window_d *window);
 
 
 // foreground window.
-void *gde_get_foregroung_window ();
+void *gde_get_foregroung_window (void);
 void gde_set_foregroung_window (struct window_d *window);
 
 
@@ -3307,16 +3307,18 @@ void gde_refresh_buffer (unsigned long n);
 
 // refresh backbuffer.
 // Copy the backbuffer in the lfb.
-void gde_show_backbuffer ();
+void gde_show_backbuffer (void);
 
 //int 0x80 - serviço 15. 
-int gde_vsync ();
+int gde_vsync (void);
 
-// Shutdown support.
-void gde_shutdown ();
 
 // Reboot support.
-void gde_reboot ();
+void gde_reboot (void);
+
+// Shutdown support.
+void gde_shutdown (void);
+
 
 
 //
@@ -3325,8 +3327,8 @@ void gde_reboot ();
 
 void gde_set_cursor ( unsigned long x, unsigned long y );
 void gde_get_cursor ( unsigned long *x, unsigned long *y );
-unsigned long gde_get_cursor_x ();
-unsigned long gde_get_cursor_y ();
+unsigned long gde_get_cursor_x(void);
+unsigned long gde_get_cursor_y(void);
 
 
 //
@@ -3357,7 +3359,7 @@ gde_create_thread (
 
 
 //Mostra informações sobre o processo atual.
-void gde_show_current_process_info ();
+void gde_show_current_process_info (void);
 
 // Torna zombie a thread atual.
 void gde_exit (int exit_code);
@@ -3365,7 +3367,7 @@ void gde_exit (int exit_code);
 //Destrói a thread atual.
 void gde_kill (int exit_code);
 
-void gde_dead_thread_collector ();
+void gde_dead_thread_collector (void);
 
 //coloca no estado standby para executar pela primeira vez.
 void gde_start_thread (void *thread); 
@@ -3412,19 +3414,19 @@ void gde_up (struct semaphore_d *s);
 
 
 // Critical section support.
-void gde_enter_critical_section ();  // P (Proberen) testar.
-void gde_exit_critical_section ();   // V (Verhogen) incrementar.
-void gde_p ();                       // P (Proberen) 
-void gde_v ();                       // V (Verhogen) 
+void gde_enter_critical_section (void);  // P (Proberen) testar.
+void gde_exit_critical_section (void);   // V (Verhogen) incrementar.
+void gde_p (void);                       // P (Proberen) 
+void gde_v (void);                       // V (Verhogen) 
 
 
 //Inicializa em 1
-void gde_initialize_critical_section ();    
+void gde_initialize_critical_section (void);    
 
 
 //Paint support.
-void gde_begin_paint ();
-void gde_end_paint ();
+void gde_begin_paint (void);
+void gde_end_paint (void);
 
 void gde_put_char (int c);
 
@@ -3451,7 +3453,7 @@ unsigned long gde_get_system_metrics ( int index );
 
 int gde_dialog ( const char *string );
 
-int gde_getchar ();
+int gde_getchar (void);
 
 
 int 
@@ -3500,8 +3502,8 @@ gde_draw_text (
 
 
 // ?
-struct window_d *gde_get_ws_screen_window ();
-struct window_d *gde_get_ws_main_window ();
+struct window_d *gde_get_ws_screen_window (void);
+struct window_d *gde_get_ws_main_window (void);
 
 
 // Create timer;

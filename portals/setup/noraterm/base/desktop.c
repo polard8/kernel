@@ -25,22 +25,22 @@ int desktop_running = 0;
 
 
 
-int desktopInitialize (){
-	
-	printf("Initializing desktop ...\n");
-	printf("%s\n",primary_desktop_folder);
+int desktopInitialize (void){
+
+    printf("Initializing desktop ...\n");
+    printf("%s\n",primary_desktop_folder);
     printf("%s\n",secondary_desktop_folder);	
-	
-	return 0;
+
+    return 0;
 }
 
 
-
 // Procedimento de janela do modo desktop.
-void *desktopProcedure ( struct window_d *window, 
-                         int msg, 
- 			             unsigned long long1, 
-				         unsigned long long2 )
+void *desktopProcedure ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 )
 {
 	
 	printf ("Desktop procedure \n");
@@ -51,7 +51,7 @@ void *desktopProcedure ( struct window_d *window,
 }
 
 
-int shellStartDesktopMode (){
+int shellStartDesktopMode (void){
 
 	printf ("shellStartDesktopMode: Initializing desktop mode ...\n");
 		

@@ -13,7 +13,7 @@ EXTRAVERSION =
 
 
 CFLAGS = -m32 \
-	--std=gnu89 \
+	-std=gnu89 \
 	-nodefaultlibs \
 	-nostdinc \
 	-nostdlib \
@@ -22,13 +22,10 @@ CFLAGS = -m32 \
 	-ffreestanding \
 	-fno-builtin \
 	-fno-pie \
-	-no-pie \
+	-fleading-underscore \
 	-fno-stack-protector \
-	-s
-
-#	-fleading-underscore \
-#	-fno-stack-protector \
-#	-s
+	-s \
+	-Werror=strict-prototypes    
 
 
 

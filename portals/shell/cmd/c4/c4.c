@@ -47,7 +47,7 @@ enum { CHAR, INT, PTR };
 // identifier offsets (since we can't create an ident struct)
 enum { Tk, Hash, Name, Class, Type, Val, HClass, HType, HVal, Idsz };
 
-void next()
+void next(void)
 {
   char *pp;
 
@@ -283,7 +283,7 @@ void expr(int lev)
   }
 }
 
-void stmt()
+void stmt(void)
 {
   int *a, *b;
 

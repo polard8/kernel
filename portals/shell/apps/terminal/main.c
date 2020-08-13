@@ -83,11 +83,11 @@ int terminal_getmessage_response(int fd);
 int terminal_loop(int fd);
 
 //constructor.
-void terminalTerminal ();
-void terminalInitWindowPosition();
-void terminalInitWindowSizes();
-void terminalInitWindowLimits ();
-void terminalInitSystemMetrics ();
+void terminalTerminal (void);
+void terminalInitWindowPosition(void);
+void terminalInitWindowSizes(void);
+void terminalInitWindowLimits (void);
+void terminalInitSystemMetrics (void);
 
 
 
@@ -423,20 +423,20 @@ void terminalInsertNextChar (char c)
 
 
 // # terminal stuff
-void terminalInsertNullTerminator ()
+void terminalInsertNullTerminator (void)
 {
     terminalInsertNextChar ( (char) '\0' );
 }
 
 
 // # terminal stuff
-void terminalInsertLF ()
+void terminalInsertLF (void)
 {
     terminalInsertNextChar ( (char) '\n' );
 }
 
 // # terminal stuff
-void terminalInsertCR ()
+void terminalInsertCR (void)
 {
     terminalInsertNextChar ( (char) '\r' );
 }
@@ -888,7 +888,7 @@ static void restore_cur (void)
  *     Inicializamos com espaços.
  */
 
-void terminalClearBuffer (){
+void terminalClearBuffer (void){
 
     int i=0;
     int j=0;
@@ -916,7 +916,7 @@ void textSetTopRow ( int number )
 }
 
 
-int textGetTopRow ()
+int textGetTopRow (void)
 {
     return (int) textTopRow;
 }
@@ -929,7 +929,7 @@ void textSetBottomRow ( int number )
 }
 
 
-int textGetBottomRow ()
+int textGetBottomRow (void)
 {
     return (int) textBottomRow; 
 }
@@ -940,7 +940,7 @@ void textSetCurrentRow ( int number )
 }
 
 
-int textGetCurrentRow ()
+int textGetCurrentRow (void)
 {
     return (int) textCurrentRow;
 }
@@ -953,7 +953,7 @@ void textSetCurrentCol ( int number )
 }
 
 
-int textGetCurrentCol ()
+int textGetCurrentCol (void)
 {
     return (int) textCurrentCol; 
 }
@@ -2317,7 +2317,7 @@ int main ( int argc, char *argv[] ){
 // então estão mais para terminal do que para shell.
 
 
-void terminalTerminal (){
+void terminalTerminal (void){
 	
 	int i=0;
 	int j=0;
@@ -2432,7 +2432,7 @@ void terminalTerminal (){
 }
 
 
-void terminalInitSystemMetrics(){
+void terminalInitSystemMetrics(void){
 
 
 	//Tamanho da tela. (full screen)
@@ -2466,7 +2466,7 @@ void terminalInitSystemMetrics(){
 } 
 
 
-void terminalInitWindowLimits (){
+void terminalInitWindowLimits (void){
 	
 	// #todo
 	// Tem variáveis aqui que não podem ser '0'.
@@ -2516,7 +2516,7 @@ void terminalInitWindowLimits (){
 }
 
 
-void terminalInitWindowSizes()
+void terminalInitWindowSizes(void)
 {
 
 //
@@ -2543,7 +2543,7 @@ void terminalInitWindowSizes()
 }
 
 
-void terminalInitWindowPosition()
+void terminalInitWindowPosition(void)
 {
 	
 	//window position

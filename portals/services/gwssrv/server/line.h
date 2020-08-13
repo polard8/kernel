@@ -6,6 +6,9 @@
  */
 
 
+int servicelineBackbufferDrawHorizontalLine (void);
+
+
 /* 
  * lineBackbufferDrawHorizontalLine:
  *     Draw a horizontal line on backbuffer. 

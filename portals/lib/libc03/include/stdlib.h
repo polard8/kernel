@@ -110,12 +110,11 @@ typedef struct {
 //#define	MB_CUR_MAX	__mb_cur_max
 
 
-void *stdlib_system_call ( unsigned long ax, 
-                           unsigned long bx, 
-                           unsigned long cx, 
-                           unsigned long dx );
-
-
+void *stdlib_system_call ( 
+    unsigned long ax, 
+    unsigned long bx, 
+    unsigned long cx, 
+    unsigned long dx );
 
 
 const char	*getprogname(void);
@@ -278,10 +277,10 @@ int abs( int j);
 
 //rt support
 //pegando informações sobre o heap usado pela biblioteca C99 em user mode.
-unsigned long rtGetHeapStart();
-unsigned long rtGetHeapEnd();
-unsigned long rtGetHeapPointer();
-unsigned long rtGetAvailableHeap();
+unsigned long rtGetHeapStart(void);
+unsigned long rtGetHeapEnd(void);
+unsigned long rtGetHeapPointer(void);
+unsigned long rtGetAvailableHeap(void);
 //...
 
 
@@ -293,7 +292,7 @@ unsigned long rtGetAvailableHeap();
  * seja usada.
  * Obs: Pode haver uma chamada à ela em crt0.s por exemplo.
  */
-int libcInitRT();
+int libcInitRT(void);
 
 
 #endif  /*stdlib.h*/

@@ -194,7 +194,8 @@ struct node* insert ( struct node* node, int key )
       //4+3 - 2*5 = 12
 
 
-int bst_main (){
+
+int bst_main (void){
 
 
     printf("bst_main:\n");
@@ -447,7 +448,7 @@ int eval ( int *str ){
  *     #imoprtante: Provavelmente essa rotina não é usada.
  */
 
-int testtest_main (){
+int testtest_main (void){
 
     printf ("testtest_main: [FIXME] Not used ??");
     while(1){}
@@ -497,7 +498,7 @@ int testtest_main (){
  
 // Calcula a expressão e retorna o valor;
 
-unsigned long tree_eval (){
+unsigned long tree_eval (void){
 
 
 	//#todo:

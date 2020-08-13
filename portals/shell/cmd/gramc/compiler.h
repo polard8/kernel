@@ -1,4 +1,4 @@
 
-FILE *compiler ();
+FILE *compiler (void);
 
 

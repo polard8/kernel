@@ -18,8 +18,23 @@ EXTRAVERSION =
 #todo:
 #We need to simplify these flags
 
+#CFLAGS = -m32 \
+#	--std=gnu89 \
+#	-nodefaultlibs \
+#	-nostdinc \
+#	-nostdlib \
+#	-static \
+#	-fgnu89-inline \
+#	-ffreestanding \
+#	-fno-builtin \
+#	-fno-pie \
+#	-no-pie \
+#	-fno-stack-protector \
+#	-s
+
+
 CFLAGS = -m32 \
-	--std=gnu89 \
+	-std=gnu89 \
 	-nodefaultlibs \
 	-nostdinc \
 	-nostdlib \
@@ -28,13 +43,12 @@ CFLAGS = -m32 \
 	-ffreestanding \
 	-fno-builtin \
 	-fno-pie \
-	-no-pie \
+	-fleading-underscore \
 	-fno-stack-protector \
-	-s
+	-s \
+	-Werror=strict-prototypes    
+	
 
-#	-fleading-underscore \
-#	-fno-stack-protector \
-#	-s
 
 
 # depois vamos mudar  alib de lugar.
@@ -81,10 +95,10 @@ main.o:
 
 all-c:
 
-	gcc  -c  shellui.c   -I $(LIB) -I $(API)  $(CFLAGS) -o shellui.o
-	gcc  -c  builtins.c  -I $(LIB) -I $(API)  $(CFLAGS) -o builtins.o
-	gcc  -c  desktop.c   -I $(LIB) -I $(API)  $(CFLAGS) -o desktop.o
-	gcc  -c  net.c       -I $(LIB) -I $(API)  $(CFLAGS) -o net.o
+	gcc  -c  shellui.c    $(CFLAGS) -I $(LIB) -I $(API)  -o shellui.o
+	gcc  -c  builtins.c   $(CFLAGS) -I $(LIB) -I $(API)  -o builtins.o
+	gcc  -c  desktop.c    $(CFLAGS) -I $(LIB) -I $(API)  -o desktop.o
+	gcc  -c  net.c        $(CFLAGS) -I $(LIB) -I $(API)  -o net.o
 
 
 # Getting objects from libcore.

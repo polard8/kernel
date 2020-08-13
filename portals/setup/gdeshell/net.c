@@ -227,7 +227,7 @@ __SendARP (
 
 // Testing ARP.
 // Sending arp.
-void __shellTestARP (){
+void __shellTestARP (void){
 
     printf ("\n\n ==== gdeshell: __shellTestARP ==== \n\n"); 
 

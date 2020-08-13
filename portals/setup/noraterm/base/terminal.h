@@ -414,51 +414,53 @@ int textMaxWheelDelta;  //máximo que se pode rolar o texto
 
 
 
-// Procedimento de janela da topbar.							  
-void *terminalTopbarProcedure ( struct window_d *window, 
-                             int msg, 
-			                 unsigned long long1, 
-					         unsigned long long2 );
+// Procedimento de janela da topbar.  
+void *terminalTopbarProcedure ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 );
 
 
-void terminalCreateEditBox ();
-
+void terminalCreateEditBox (void);
 
 
 struct window_d *terminalCreateMainWindow (int status);
  
 
 //tests
-void terminalCreateWindow ();
+void terminalCreateWindow (void);
 
 int terminalDisplayBMP (char *file_name);
 
 int terminalDisplayBMPEx (char *file_name, int size );
 
-void terminalTestDisplayBMP ();
+void terminalTestDisplayBMP (void);
 
 
 void 
-bmpDisplayBMP ( void* address, 
-                unsigned long x, 
-				unsigned long y, 
-				int width, 
-				int height );
+bmpDisplayBMP ( 
+    void* address, 
+    unsigned long x, 
+    unsigned long y, 
+    int width, 
+    int height );
 
 
-int terminalCreateTaskBar ();
+int terminalCreateTaskBar (void);
 
 //testando botão.
-int terminalTestButtons ();
+int terminalTestButtons (void);
 
 //
 // Typing support.
 //
 
 void terminalInsertNextChar (char c);
-void terminalInsertNullTerminator ();
-void terminalInsertLF ();
-void terminalInsertCR ();
+void terminalInsertNullTerminator (void);
+
+void terminalInsertCR (void);
+void terminalInsertLF (void);
 
 void lf (void);
 void cr (void);
@@ -467,22 +469,20 @@ void del (void);
 
 
 char 
-terminalGetCharXY ( unsigned long x, 
-                 unsigned long y );
+terminalGetCharXY ( 
+    unsigned long x, 
+    unsigned long y );
 
 void terminalInsertCharXY (unsigned long x, unsigned long y, char c);
 
  
-
-
 static void save_cur(void);
 static void restore_cur(void);
 
 
-void terminalRefreshCurrentChar2 ();
-
 //refresh do char que está na posição usada pelo input.
-void terminalRefreshCurrentChar (); 
+void terminalRefreshCurrentChar (void); 
+void terminalRefreshCurrentChar2 (void);
 
 
 void terminalRefreshChar ( int line_number, int col_number );
@@ -495,9 +495,8 @@ void terminalRefreshLine ( int line_number );
 
 
 //copia o conteúdo do buffer para a tela. (dentro da janela)
-void terminalRefreshScreen(); 
-
-void terminalClearScreen ();
+void terminalRefreshScreen(void); 
+void terminalClearScreen (void);
 
 //
 // Cursor support.
@@ -510,30 +509,24 @@ void terminalSetCursor (unsigned long x, unsigned long y);
 // buffer
 //
 
-void terminalClearBuffer();
-
-void terminalShowScreenBuffer();
+void terminalClearBuffer(void);
+void terminalShowScreenBuffer(void);
 
 
 //
 // visible area
 //
 
-void terminalRefreshVisibleArea ();
-
+void terminalRefreshVisibleArea (void);
 void updateVisibleArea ( int direction );
-
-void testChangeVisibleArea();
+void testChangeVisibleArea(void);
 
 
 //
 // lines
 //
-	
 
-
-void testShowLines();
-
+void testShowLines(void);
 void clearLine ( int line_number );
 
 
@@ -543,12 +536,10 @@ void clearLine ( int line_number );
 
 
 void textSetTopRow ( int number );
-
 void textSetBottomRow ( int number );
+int textGetTopRow (void);
+int textGetBottomRow (void);
 
-int textGetTopRow ();
-
-int textGetBottomRow ();
 
 
 //
@@ -556,12 +547,9 @@ int textGetBottomRow ();
 //
 
 void textSetCurrentRow ( int number );
-
-int textGetCurrentRow ();
-
+int textGetCurrentRow (void);
 void textSetCurrentCol ( int number );
-
-int textGetCurrentCol ();
+int textGetCurrentCol (void);
 
 
 
@@ -574,20 +562,18 @@ int pad_to (int count, char *string);
 
 
 
-void terminal_clear_to_endofline ();
-void terminal_clear_from_startofline ();
-void terminal_clear_to_endofdisplay ();
-void terminal_scroll_display ();
-void terminalCopyToScroll ();
+void terminal_clear_to_endofline (void);
+void terminal_clear_from_startofline (void);
+void terminal_clear_to_endofdisplay (void);
+void terminal_scroll_display (void);
+void terminalCopyToScroll (void);
 
 
-
- 
 void terminalNewVisibleArea ( int text_top_row, int text_bottom_row );
 
 
-void terminal_scroll_down ();
-void terminal_scroll_up ();
+void terminal_scroll_down (void);
+void terminal_scroll_up (void);
 
 
 

@@ -17,8 +17,24 @@ EXTRAVERSION =
 #NAME = GWS
 
 
+#CFLAGS = -m32 \
+#	--std=gnu89 \
+#	-nodefaultlibs \
+#	-nostdinc \
+#	-nostdlib \
+#	-static \
+#	-fgnu89-inline \
+#	-ffreestanding \
+#	-fno-builtin \
+#	-fno-pie \
+#	-no-pie \
+#	-fno-stack-protector \
+#	-s
+
+
+
 CFLAGS = -m32 \
-	--std=gnu89 \
+	-std=gnu89 \
 	-nodefaultlibs \
 	-nostdinc \
 	-nostdlib \
@@ -27,9 +43,15 @@ CFLAGS = -m32 \
 	-ffreestanding \
 	-fno-builtin \
 	-fno-pie \
-	-no-pie \
+	-fleading-underscore \
 	-fno-stack-protector \
-	-s
+	-s \
+	-Werror=strict-prototypes    
+	
+	
+	
+	
+
 
 
 
@@ -38,11 +60,12 @@ CFLAGS = -m32 \
 
 LIBC    = ../../../lib/libc03/include/
 LIBCOBJ = ../../../lib/libc03/obj
-API02   = ../../../lib/libcore/include/
-APIOBJ  = ../../../lib/libcore/obj
+
+#API02   = ../../../lib/libcore/include/
+#APIOBJ  = ../../../lib/libcore/obj
 
 
-GWS_INCLUDES  = include/    
+#GWS_INCLUDES  = include/    
 
 
 #RENDERER = renderer/include/  
@@ -59,7 +82,6 @@ GWS_INCLUDES  = include/
 	
 myObjects = crt0.o main.o stubs.o \
 ctype.o stdio.o stdlib.o string.o conio.o socket.o signal.o unistd.o \
-api.o \
 pixel.o line.o rect.o char.o dtext.o createw.o gws.o comp.o window.o \
 bmp.o connect.o button.o font.o\
 termios.o ioctl.o fcntl.o    
@@ -72,30 +94,27 @@ all: main.o all-c gws-link finalize clean
 	@echo "Ok?"
 
 main.o:
-	gcc  -c  main.c -I $(LIBC) -I $(API02)  -I $(GWS_INCLUDES) -I . $(CFLAGS) -o main.o
+	gcc  -c  main.c $(CFLAGS) -I $(LIBC) -I $(API02)  -I include/ -I . -o main.o
 
 all-c:
 
 	# gws
-	gcc  -c  char.c     -I $(LIBC) -I $(API02)   -I $(GWS_INCLUDES) -I . $(CFLAGS) -o char.o
-	gcc  -c  comp.c     -I $(LIBC) -I $(API02)   -I $(GWS_INCLUDES) -I . $(CFLAGS) -o comp.o
-	gcc  -c  createw.c  -I $(LIBC) -I $(API02)   -I $(GWS_INCLUDES) -I . $(CFLAGS) -o createw.o
-	gcc  -c  dtext.c    -I $(LIBC) -I $(API02)   -I $(GWS_INCLUDES) -I . $(CFLAGS) -o dtext.o
-	gcc  -c  line.c     -I $(LIBC) -I $(API02)   -I $(GWS_INCLUDES) -I . $(CFLAGS) -o line.o
-	gcc  -c  pixel.c    -I $(LIBC) -I $(API02)   -I $(GWS_INCLUDES) -I . $(CFLAGS) -o pixel.o
-	gcc  -c  rect.c     -I $(LIBC) -I $(API02)   -I $(GWS_INCLUDES) -I . $(CFLAGS) -o rect.o
-	gcc  -c  window.c   -I $(LIBC) -I $(API02)   -I $(GWS_INCLUDES) -I . $(CFLAGS) -o window.o
-	gcc  -c  bmp.c      -I $(LIBC) -I $(API02)   -I $(GWS_INCLUDES) -I . $(CFLAGS) -o bmp.o
-	gcc  -c  connect.c  -I $(LIBC) -I $(API02)   -I $(GWS_INCLUDES) -I . $(CFLAGS) -o connect.o
-	gcc  -c  button.c   -I $(LIBC) -I $(API02)   -I $(GWS_INCLUDES) -I . $(CFLAGS) -o button.o
-	gcc  -c  font.c    -I $(LIBC) -I $(API02)   -I $(GWS_INCLUDES) -I . $(CFLAGS) -o font.o
+	gcc  -c  char.c     $(CFLAGS) -I $(LIBC) -I include/ -I .  -o char.o
+	gcc  -c  comp.c     $(CFLAGS) -I $(LIBC) -I include/ -I .  -o comp.o
+	gcc  -c  createw.c  $(CFLAGS) -I $(LIBC) -I include/ -I .  -o createw.o
+	gcc  -c  dtext.c    $(CFLAGS) -I $(LIBC) -I include/ -I .  -o dtext.o
+	gcc  -c  line.c     $(CFLAGS) -I $(LIBC) -I include/ -I .  -o line.o
+	gcc  -c  pixel.c    $(CFLAGS) -I $(LIBC) -I include/ -I .  -o pixel.o
+	gcc  -c  rect.c     $(CFLAGS) -I $(LIBC) -I include/ -I .  -o rect.o
+	gcc  -c  window.c   $(CFLAGS) -I $(LIBC) -I include/ -I .  -o window.o
+	gcc  -c  bmp.c      $(CFLAGS) -I $(LIBC) -I include/ -I .  -o bmp.o
+	gcc  -c  connect.c  $(CFLAGS) -I $(LIBC) -I include/ -I .  -o connect.o
+	gcc  -c  button.c   $(CFLAGS) -I $(LIBC) -I include/ -I .  -o button.o
+	gcc  -c  font.c     $(CFLAGS) -I $(LIBC) -I include/ -I .  -o font.o
 	# ...
 
-	
-
-
 	# base
-	gcc  -c  gws.c      -I $(LIBC) -I $(API02)   -I $(GWS_INCLUDES) -I . $(CFLAGS) -o gws.o
+	gcc  -c  gws.c $(CFLAGS) -I $(LIBC) -I include/ -I . -o gws.o
 
 
 	# libc03
@@ -115,12 +134,12 @@ all-c:
 
 
 	# libgui
-	cp $(APIOBJ)/api.o .
-
+	#cp $(APIOBJ)/api.o .
 
 
 gws-link:
-	ld -m elf_i386 -T ../link.ld -o GWSSRV.BIN $(myObjects)    
+	ld -m elf_i386 -T ../link.ld -o GWSSRV.BIN $(myObjects) -Map=map.txt   
+	 
 
 
 finalize:

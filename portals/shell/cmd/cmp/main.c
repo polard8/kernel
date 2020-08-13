@@ -11,7 +11,7 @@ long	chr	= 0;
 long	skip1;
 long	skip2;
 
-long	otoi();
+long otoi(char *s);
 
 
 
@@ -108,8 +108,8 @@ earg:
 	exit(1);
 }
 
-long otoi(s)
-char *s;
+
+long otoi(char *s)
 {
 	long v;
 	int base;

@@ -5,8 +5,382 @@
  */
 
 
-#include <api.h>
+//#include <api.h>
+
 #include <gws.h>
+
+
+//
+//===================================================================
+//
+// service: Create a window.
+// It's a wrapper.
+// Chamaremos a função que cria a janela
+// com base nos argumentos que estão no buffer
+// que é uma variável global nesse documento.
+
+int serviceCreateWindow (void){
+
+	// O buffer é uma global nesse documento.
+    unsigned long *message_address = (unsigned long *) &__buffer[0];
+        
+    struct gws_window_d *Window;
+
+    unsigned long x, y, w, h, color, type;
+ 
+    int pw=0;
+    struct gws_window_d *Parent;
+
+
+
+    gswsrv_debug_print("serviceCreateWindow: serviceCreateWindow:\n");
+    //printf ("serviceCreateWindow:\n");
+
+    x     = message_address[4]; 
+    y     = message_address[5]; 
+    w     = message_address[6]; 
+    h     = message_address[7]; 
+    color = message_address[8];
+    type  = message_address[9];
+
+
+    //#test
+    //parent window ID.
+    pw = message_address[10]; 
+
+    //string support    
+    
+    unsigned char buf[256+1];
+    int i=0;
+    int string_off=  14; //8;
+    for(i=0; i<256; i++)
+    {
+         buf[i] = message_address[string_off];
+         string_off++;
+    }
+    buf[i] = 0;
+    
+    
+    
+    
+    
+    //Limits
+    if(pw<0 ||pw>WINDOW_COUNT_MAX)
+    {
+        gswsrv_debug_print("serviceCreateWindow: parent window id fail\n");
+        pw=0;
+        exit(1); //test
+    }
+    
+    //get parent window structure pointer.
+    Parent = (struct gws_window_d *) windowList[pw];    
+
+    //ajuste improvidsado
+    if( (void *) Parent == NULL ){
+        gswsrv_debug_print("serviceCreateWindow: parent window struct fail\n");
+        Parent = gui->screen;
+        exit(1); //test
+    }
+
+
+    //draw
+    //__mywindow = (struct gws_window_d *) createwCreateWindow ( type, 
+    //                                          1, 1, "No-Name",  
+    //                                          x, y, w, h,   
+    //                                          gui->screen, 0, 
+    //                                          COLOR_PINK, color ); 
+
+    Window = (struct gws_window_d *) createwCreateWindow ( type, 
+                                              1, 1, buf, //"No-Name",  
+                                              x, y, w, h,   
+                                              Parent, 0, 
+                                              COLOR_PINK, color ); 
+
+
+    if ( (void *) Window == NULL )
+    {
+       gswsrv_debug_print ("gwssrv: createwCreateWindow fail\n");
+       next_response[1] = 0;
+       return -1;
+    }
+
+
+    int id = -1;
+    id = gwsRegisterWindow ( Window );
+
+    if (id<0){
+        gswsrv_debug_print ("gwssrv: serviceCreateWindow Couldn't register window\n");
+        next_response[1] = 0;
+        return -1;
+    }
+
+    // preparando a resposta.
+    // Ela será enviada depois pelo loop de socket.
+    next_response[0] = (unsigned long) id; //window
+    next_response[1] = SERVER_PACKET_TYPE_REPLY; //msg 
+    next_response[2] = 0;
+    next_response[3] = 0;
+
+
+    gws_show_window_rect(Window);
+    //gws_show_backbuffer (); //for debug 
+       
+    return 0; //todo
+}
+
+
+
+
+int serviceChangeWindowPosition(void)
+{
+
+	//o buffer é uma global nesse documento.
+    unsigned long *message_address = (unsigned long *) &__buffer[0];
+
+
+    struct gws_window_d *window;
+    int window_id = -1;
+    
+    unsigned long x = 0;
+    unsigned long y = 0;
+
+
+    // #debug
+    gswsrv_debug_print ("gwssrv: serviceChangeWindowPosition\n");
+
+
+    // Get
+    
+    window_id = message_address[0];  //wid
+    // msg
+    x         = message_address[2];  
+    y         = message_address[3];  
+
+
+    //
+    // Window ID
+    //
+   
+    // Limits
+    if ( window_id < 0 || window_id >= WINDOW_COUNT_MAX ){
+        gswsrv_debug_print ("gwssrv: serviceChangeWindowPosition window_id\n");
+        return -1;
+    }
+
+    //#todo
+    // Get the window structure given the id.
+    window = (struct gws_window_d *) windowList[window_id];
+   
+    if ( (void *) window == NULL ){
+        gswsrv_debug_print ("gwssrv: serviceChangeWindowPosition window\n");
+        return -1;
+    }
+    
+    if ( window->used != 1 || window->magic != 1234 ){
+        gswsrv_debug_print ("gwssrv: serviceChangeWindowPosition validation\n");
+        return -1;
+    }
+
+    gwssrv_change_window_position ( 
+        (struct gws_window_d *) window, 
+        (unsigned long) x, 
+        (unsigned long) y );
+
+    return 0;
+}
+
+
+
+
+//#bugbug
+// Usaremos a função create window para desenhar botões.
+// #deletar !!!
+
+int serviceDrawButton(void)
+{
+    //O buffer é uma global nesse documento.
+    unsigned long *message_address = (unsigned long *) &__buffer[0];
+
+    unsigned long x=0;
+    unsigned long y=0;
+    unsigned long width=0;
+    unsigned long height=0;
+
+
+    x      = message_address[4]; 
+    y      = message_address[5]; 
+    width  = message_address[6]; 
+    height = message_address[7]; 
+    // ...
+
+
+    gws_draw_button ("Label", 1,1,1, 
+        x, y, width, height, GWS_COLOR_BUTTONFACE3 );
+
+
+   // for debug 
+   gws_show_backbuffer(); 
+   return 0;
+}
+
+
+
+int serviceRedrawWindow(void)
+{
+
+	//o buffer é uma global nesse documento.
+    unsigned long *message_address = (unsigned long *) &__buffer[0];
+
+
+    struct gws_window_d *window;
+    int window_id = -1;
+    unsigned long flags = 0;
+
+
+    // #debug
+    gswsrv_debug_print ("gwssrv: serviceRedrawWindow\n");
+
+
+    // Get
+    
+    window_id = message_address[0];  //wid
+    //msg
+    flags     = message_address[2];  //flag (show or not)
+ 
+ 
+    //
+    // Window ID
+    //
+   
+    // Limits
+    if ( window_id < 0 || window_id >= WINDOW_COUNT_MAX ){
+        gswsrv_debug_print ("gwssrv: serviceRefreshWindow window_id\n");
+        return -1;
+    }
+
+    //#todo
+    // Get the window structure given the id.
+    window = (struct gws_window_d *) windowList[window_id];
+   
+    if ( (void *) window == NULL ){
+        gswsrv_debug_print ("gwssrv: serviceRefreshWindow window\n");
+        return -1;
+    }
+    
+    if ( window->used != 1 || window->magic != 1234 ){
+        gswsrv_debug_print ("gwssrv: serviceRefreshWindow validation\n");
+        return -1;
+    }
+
+    // redraw!
+    
+    gwssrv_redraw_window (
+        (struct gws_window_d *) window, 
+        (unsigned long) flags );
+
+    return 0;
+}
+
+
+int serviceRefreshRectangle(void)
+{
+
+	//o buffer é uma global nesse documento.
+    unsigned long *message_address = (unsigned long *) &__buffer[0];
+
+    unsigned long left,top,width,height;
+      
+    left   = message_address[4];  
+    top    = message_address[5];  
+    width  = message_address[6];  
+    height = message_address[7];  
+
+    gws_refresh_rectangle (left,top,
+        width,height);
+    return 0;
+}
+
+
+int serviceRefreshWindow(void)
+{
+
+	//o buffer é uma global nesse documento.
+    unsigned long *message_address = (unsigned long *) &__buffer[0];
+
+
+    struct gws_window_d *window;
+    int window_id = -1;
+    
+    //unsigned long x;
+    //unsigned long y;
+    //unsigned long color;
+    //int __char;
+    //char *text_buffer;    // #todo
+
+
+    // #debug
+    gswsrv_debug_print ("gwssrv: serviceRefreshWindow\n");
+
+
+    // Get
+    
+    
+    window_id = message_address[4];
+    
+    
+    //
+    // Window ID
+    //
+   
+    // Limits
+    if ( window_id < 0 || window_id >= WINDOW_COUNT_MAX ){
+        gswsrv_debug_print ("gwssrv: serviceRefreshWindow window_id\n");
+        return -1;
+    }
+
+    //#todo
+    // Get the window structure given the id.
+    window = (struct gws_window_d *) windowList[window_id];
+   
+    if ( (void *) window == NULL ){
+        gswsrv_debug_print ("gwssrv: serviceRefreshWindow window\n");
+        return -1;
+    }
+    
+    if ( window->used != 1 || window->magic != 1234 ){
+        gswsrv_debug_print ("gwssrv: serviceRefreshWindow validation\n");
+        return -1;
+    }
+
+    gws_show_window_rect(window);
+    
+    //
+    // Refresh
+    //  
+        
+    //gws_show_backbuffer ();       // for debug   
+    //gws_show_window_rect(window);   // something faster for now.
+    //something faster.
+    //gws_refresh_rectangle ( 
+    //    window->left +x, 
+    //    window->top  +y, 
+    //    8,   //char width 
+    //    8 ); // char height 
+
+    return 0;
+}
+
+
+
+
+
+//
+//===================================================================
+//
+
+
+
+
 
 
 // Let's redraw the window.
@@ -63,7 +437,7 @@ int gwssrv_redraw_window (struct gws_window_d *window, unsigned long flags )
             //remeber: the first window do not have a parent.
             if ( (void*) window->parent == NULL )
             { 
-                gde_debug_print ("gwssrv_redraw_window: [Shadow] Parent"); 
+                gswsrv_debug_print ("gwssrv_redraw_window: [Shadow] Parent"); 
                 //exit(1); 
                 rectBackbufferDrawRectangle ( 
                     (window->left +1), 
@@ -145,7 +519,7 @@ int gwssrv_redraw_window (struct gws_window_d *window, unsigned long flags )
         //#bugbug
         //Remember: The first window do not have a parent.
         if ( (void*) window->parent == NULL ){ 
-            gde_debug_print ("gwssrv_redraw_window: [Background] Parent\n"); 
+            gswsrv_debug_print ("gwssrv_redraw_window: [Background] Parent\n"); 
             //exit(1); 
             rectBackbufferDrawRectangle ( 
                 window->left, 
@@ -229,7 +603,7 @@ int gwssrv_redraw_window (struct gws_window_d *window, unsigned long flags )
 
         //#debug
         if ( (void*) window->parent == NULL ){
-            gde_debug_print ("gwssrv_redraw_window: [WT_BUTTON] Parent NULL\n"); 
+            gswsrv_debug_print ("gwssrv_redraw_window: [WT_BUTTON] Parent NULL\n"); 
         }
 
 
@@ -355,7 +729,7 @@ gwssrv_initialize_color_schemes (int selected_type)
     humility = (void *) malloc ( sizeof(struct gws_color_scheme_d) );
     
 	if( (void *) humility == NULL ){
-		gde_debug_print ("gwssrv_initialize_color_schemes: humility\n");
+		gswsrv_debug_print ("gwssrv_initialize_color_schemes: humility\n");
 		
 	}else{
 		
@@ -398,7 +772,7 @@ gwssrv_initialize_color_schemes (int selected_type)
     pride = (void *) malloc ( sizeof(struct gws_color_scheme_d) );
     
     if ( (void *) pride == NULL ){
-        gde_debug_print ("gwssrv_initialize_color_schemes: pride\n");
+        gswsrv_debug_print ("gwssrv_initialize_color_schemes: pride\n");
 
     }else{
 		
@@ -474,7 +848,7 @@ int gwssrv_select_color_scheme (int type){
 			break;
 			
 		default:
-		    gde_debug_print("windowSelectColorScheme: Type not defined\n");
+		    gswsrv_debug_print("windowSelectColorScheme: Type not defined\n");
 			goto fail;
 			break;
 	};
@@ -484,7 +858,7 @@ do_humility:
 
     if ( (void *) GWSHumilityColorScheme == NULL )
     {
-		gde_debug_print("HumilityColorScheme fail\n");
+		gswsrv_debug_print("HumilityColorScheme fail\n");
         goto fail;  
            	    	
 	}else{
@@ -492,11 +866,11 @@ do_humility:
 	    if ( GWSHumilityColorScheme->used != 1 || 
 		     GWSHumilityColorScheme->magic != 1234 )
 		{
-			gde_debug_print("HumilityColorScheme sig fail\n");
+			gswsrv_debug_print("HumilityColorScheme sig fail\n");
 			goto fail;
 		}
 		
-		gde_debug_print("Humility selected\n");
+		gswsrv_debug_print("Humility selected\n");
 	    GWSCurrentColorScheme = GWSHumilityColorScheme;	
 	    goto done;
 	};		
@@ -506,18 +880,18 @@ do_pride:
 
     if ( (void *) GWSPrideColorScheme == NULL )
     {
-		gde_debug_print("GWSPrideColorScheme fail\n");
+		gswsrv_debug_print("GWSPrideColorScheme fail\n");
         goto fail; 
             	    	
 	}else{
 	    if( GWSPrideColorScheme->used != 1 || 
 		    GWSPrideColorScheme->magic != 1234 )
 		{
-			gde_debug_print("PrideColorScheme sig fail\n");
+			gswsrv_debug_print("PrideColorScheme sig fail\n");
 			goto fail;
 		}
 		
-	    gde_debug_print ("Pride selected\n"); 
+	    gswsrv_debug_print ("Pride selected\n"); 
 		GWSCurrentColorScheme = GWSPrideColorScheme;	
 	    goto done;
 	};		
@@ -528,7 +902,7 @@ done:
     
 fail:
 
-    gde_debug_print ("fail\n");
+    gswsrv_debug_print ("fail\n");
     return 1;
 }
 
@@ -590,7 +964,7 @@ int gws_show_window_rect (struct gws_window_d *window){
             //#todo: delete
             if ((void*)p==NULL)
             {
-                gde_debug_print("gws_show_window_rect: No parent");
+                gswsrv_debug_print("gws_show_window_rect: No parent");
                 
                 gws_refresh_rectangle ( 
                     window->left, 
@@ -603,7 +977,7 @@ int gws_show_window_rect (struct gws_window_d *window){
             
             if ((void*)p!=NULL)
             {
-                //gde_debug_print("gws_show_window_rect: parent ok");
+                //gswsrv_debug_print("gws_show_window_rect: parent ok");
                 
                 gws_refresh_rectangle ( 
                     window->left,
@@ -706,18 +1080,18 @@ int gwsRegisterWindow (struct gws_window_d *window){
     };
 
 // fail
-    //gde_debug_print("No more slots\n");
+    //gswsrv_debug_print("No more slots\n");
     return (int) (-1);
 }
+
+
 
 /*
  * get_active_window:
  *     Obtem o id da janela ativa.
  *     @todo: Mudar para windowGetActiveWindowId().
  */
-
-
-int get_active_window ()
+int get_active_window (void)
 {
     return (int) active_window;  
 }
@@ -739,7 +1113,7 @@ void set_active_window (int id){
 
 
 // Pegando a z-order de uma janela.
-int get_zorder ( struct window_d *window ){
+int get_zorder ( struct gws_window_d *window ){
 
     if ( (void *) window != NULL ){
         return (int) window->zIndex;
@@ -750,15 +1124,15 @@ int get_zorder ( struct window_d *window ){
 
 
 
-int get_top_window (){
-
+int get_top_window (void)
+{
     return (int) top_window;
 }
 
 
 //Setando a top window.
-void set_top_window (int id){
-
+void set_top_window (int id)
+{
     top_window = (int) id;
 }
 
@@ -866,11 +1240,12 @@ int gwssrv_init_windows(void)
     //...
 
     for (i=0; i<1024; i++)
-        windowList[WINDOW_COUNT_MAX] = 0;
-
+        windowList[i] = 0;
 
     return 0;
 }
+
+
 
 //
 // End.

@@ -6,10 +6,12 @@
 
 /* statusInitializeStatusBar: */
 
-void statusInitializeStatusBar (){
-	
-	int i;
+void statusInitializeStatusBar (void){
+
+
+	int i=0;
 	unsigned long OldX, OldY;
+
 
 	//salva cursor antigo.
     OldX = gde_get_cursor_x ();

@@ -77,7 +77,9 @@ extern int main ( int argc, char *argv[] );
 //int crt0 ( int argc, char **argv, char **envp ){
 //    environ = envp;
 
-int crt0 (){
+
+
+int crt0 (void){
 
     // Retorno de main().
     int retval=0;

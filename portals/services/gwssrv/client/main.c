@@ -542,10 +542,13 @@ int main ( int argc, char *argv[] ){
     addr.sa_data[0] = 'w';
     addr.sa_data[1] = 's';  
     
-    
+
 
     gws_debug_print ("--------------------------\n"); 
     gws_debug_print ("gws: Initializing ...\n");
+
+    printf ("--------------------------\n"); 
+    printf ("gws: Initializing ...\n");
 
 
     //
@@ -594,22 +597,39 @@ int main ( int argc, char *argv[] ){
         };
     };
 
+
+
+
+
+    gws_draw_char (
+        client_fd, 
+        0, //window
+        10, //x
+        10, //y
+        COLOR_RED,  //COLOR
+        'x');
+
+
     
     //
     // === Create Window ===
     //
+  
     
     /*
     gwst_createwindow_request (client_fd, 
         40, 40, 320, 280, COLOR_GRAY);
     gwst_createwindow_response(client_fd);     
-    */    
+    */
 
-    gws_create_window_using_socket (client_fd,
+    
+    gws_create_window (client_fd,
         WT_SIMPLE,1,1,"gws-client",
         0, 0, 4, 4,
         0,0,COLOR_RED, COLOR_RED);
-
+    
+  
+ 
  
     //
     // === Event loop ===

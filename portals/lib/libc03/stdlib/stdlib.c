@@ -51,7 +51,7 @@ unsigned long mm_prev_pointer;    //Endereço da úntima estrutura alocada.
 //
 
 
-int stdlibInitMM ();
+int stdlibInitMM (void);
 
 
 /*
@@ -81,25 +81,25 @@ unsigned long heap_set_new_handler( unsigned long address )
 
 
 
-unsigned long rtGetHeapStart ()
+unsigned long rtGetHeapStart (void)
 {
     return (unsigned long) heap_start;
 }
 
 
-unsigned long rtGetHeapEnd ()
+unsigned long rtGetHeapEnd (void)
 {
     return (unsigned long) heap_end;
 }
 
 
-unsigned long rtGetHeapPointer ()
+unsigned long rtGetHeapPointer (void)
 {
     return (unsigned long) g_heap_pointer;
 }
 
 
-unsigned long rtGetAvailableHeap ()
+unsigned long rtGetAvailableHeap (void)
 {
     return (unsigned long) g_available_heap;
 }
@@ -468,7 +468,8 @@ unsigned long FreeHeap ( unsigned long size )
  *     Essa é uma função interna.
  */
 
-int heapInit (){
+int heapInit(void)
+{
 
 	//Internas.
     int i = 0;
@@ -595,7 +596,7 @@ fail:
  * Essa é uma função local.
  */
 
-int stdlibInitMM (){
+int stdlibInitMM (void){
 
     int Status = 0;
     int i=0;
@@ -660,7 +661,7 @@ int stdlibInitMM (){
  */
 
 
-int libcInitRT (){
+int libcInitRT (void){
 
     int Status = -1;
 

@@ -50,17 +50,20 @@ extern int main ( int argc, char *argv[] );
 // O crt0 deve pegar a string na memória compartilhada,
 // pois alguns argumentos determinam como o shell deve inicializar.
 
-void crt0 (){
+void crt0 (void){
 	
-    int ExitCode;	
-	
+    int ExitCode=0;	
+
+
     // Inicializando o suporte a alocação dinâmica de memória.
-	// Inicializando o suporte ao fluxo padrão.
+    // Inicializando o suporte ao fluxo padrão.
     // Call main().	
-	
-	libcInitRT ();
-	stdioInitialize ();	
-	
+
+
+    libcInitRT();
+    stdioInitialize();
+
+
 	ExitCode = (int) main ( 3, argv ); 
 											
 	// Chama kill ou exit de acordo com o problema ocorrido em main.

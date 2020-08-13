@@ -9,8 +9,134 @@
  */
 
 
-#include <api.h>
+//#include <api.h>
+
 #include <gws.h>
+
+
+
+
+
+//todo
+int serviceDrawChar(void)
+{
+
+	//o buffer é uma global nesse documento.
+    unsigned long *message_address = (unsigned long *) &__buffer[0];
+
+
+    struct gws_window_d *window;
+    int window_id = -1;
+    unsigned long x;
+    unsigned long y;
+    unsigned long color;
+    
+    int __char;
+    char *text_buffer;    // #todo
+
+
+    // #debug
+    gswsrv_debug_print ("serviceDrawChar: \n");
+
+
+    // Get
+    
+    
+    window_id = message_address[4];
+    x         = message_address[5];
+    y         = message_address[6]; 
+    color     = message_address[7];
+    unsigned long C = (unsigned long) message_address[8];
+    //text_buffer =    //#todo
+   
+    //lets create a fake string.
+    unsigned char _string[4];
+   
+   _string[0] = (unsigned char) C;
+   _string[1] = (unsigned char) 0;   
+   
+    
+    //
+    // Window ID
+    //
+   
+    // Limits
+    if ( window_id < 0 || window_id >= WINDOW_COUNT_MAX ){
+        gswsrv_debug_print ("gwssrv: serviceDrawChar window_id\n");
+        return -1;
+    }
+
+    //gswsrv_debug_print ("serviceDrawChar: get window pointer\n");
+    
+    //#todo
+    // Get the window structure given the id.
+    window = (struct gws_window_d *) windowList[window_id];
+
+    // #bugbug
+    // O ponteiro eh nao nulo, mas esta numa regiao invalida.
+    // why??
+    
+    //gswsrv_debug_print ("serviceDrawChar: [debug] cheching pointer validation\n");
+    //printf ("[debug] window id      = %d \n",window_id);
+    //printf ("[debug] window pointer = %x *hang\n",window);
+    //while(1){}
+    
+    
+    
+    
+    if ( (void *) window == NULL ){
+        gswsrv_debug_print ("gwssrv: serviceDrawChar window\n");
+        return -1;
+    }
+
+    //gswsrv_debug_print ("serviceDrawChar: pointer not null\n");
+    
+    if ( window->used != 1 || window->magic != 1234 ){
+        gswsrv_debug_print ("gwssrv: serviceDrawChar validation\n");
+        return -1;
+    }
+    
+    //
+    // Draw
+    //
+    
+    gswsrv_debug_print ("serviceDrawChar: Draw !!!\n");
+    
+    // Ok it is working
+    dtextDrawText ( (struct gws_window_d *) window,
+        x, y, color, (unsigned char *) &_string[0] );
+    
+    //#test
+    //It is working
+    // Usando a janela screen por enquanto.
+    //dtextDrawText ( (struct gws_window_d *) gui->screen,
+        //x, y, color, (unsigned char *) &_string[0] );
+
+    //It is working
+    //charBackbufferDrawcharTransparent ( x, y, color, C );
+    
+    //
+    // Refresh
+    //  
+        
+    //gws_show_backbuffer ();       // for debug   
+    //gws_show_window_rect(window);   // something faster for now.
+    //something faster.
+    gws_refresh_rectangle ( 
+        window->left +x, 
+        window->top  +y, 
+        8,   //char width 
+        8 ); // char height 
+
+
+    gswsrv_debug_print ("gwssrv: serviceDrawChar done\n");
+    
+    return 0;
+}
+
+
+
+
 
 
 int gwssrv_init_char(void)
@@ -51,13 +177,13 @@ void charSetCharHeight ( int height )
 }
 
 
-int charGetCharWidth ()
+int charGetCharWidth (void)
 {
     return (int) gcharWidth;
 }
 
 
-int charGetCharHeight ()
+int charGetCharHeight (void)
 {
     return (int) gcharHeight;
 }

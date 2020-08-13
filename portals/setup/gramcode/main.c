@@ -38,22 +38,30 @@ int running = 1;
 //static unsigned char *dest_envp[] = { "-sujo", NULL };
 //static unsigned char dest_msg[512];
 
-void editorClearScreen(); 
-int editor_save_file ();
 
-void teditorTeditor ();
 
-void shellInitSystemMetrics();
-void shellInitWindowLimits();
-void shellInitWindowSizes();
-void shellInitWindowPosition();
+
+//
+// internal
+//
+
+
+void editorClearScreen(void); 
+int editor_save_file (void);
+
+void teditorTeditor (void);
+
+void shellInitSystemMetrics(void);
+void shellInitWindowLimits(void);
+void shellInitWindowPosition(void);
+void shellInitWindowSizes(void);
+
 
 
 void teditorInsertNextChar (char c);
-void teditorRefreshCurrentChar (); 
+void teditorRefreshCurrentChar (void); 
 
 void gramcodeLinesInsertChar ( int line_number, int at, int c );
-
 
 
 void *teditorProcedure ( 
@@ -78,7 +86,7 @@ __SendMessageToProcess (
  * #todo: poderemos limpara a tela do mesmo modo que o shell faz.    
  */
 
-void editorClearScreen (){
+void editorClearScreen (void){
 	
 	int lin, col;    
 
@@ -116,7 +124,7 @@ void editorClearScreen (){
  * Estamos usando a API.
  */
 
-int editor_save_file (){
+int editor_save_file (void){
 
     char file_1_name[] = "FILE1234TXT";
     int Ret=0;
@@ -423,11 +431,10 @@ done:
  *     Contrutor e inicialização.
  */
  
-void teditorTeditor (){
+void teditorTeditor (void){
 
     int i=0;
     int j=0;
-
 
 	//
 	// ## Inicializando as estruturas de linha ##
@@ -464,7 +471,7 @@ void teditorTeditor (){
 }
 
 
-void shellInitSystemMetrics (){
+void shellInitSystemMetrics (void){
 	
 	//pegaremos todas as metricas de uma vez só,
 	//se uma falhar, então pegaremos tudo novamente.
@@ -485,7 +492,7 @@ void shellInitSystemMetrics (){
     //...
 }
 
-void shellInitWindowLimits (){
+void shellInitWindowLimits (void){
 	
     //
     // ## Window limits ##
@@ -523,8 +530,8 @@ void shellInitWindowLimits (){
 
 
 
-void shellInitWindowSizes (){
-	
+void shellInitWindowSizes (void)
+{
     //
     //  ## Window size ##
     //
@@ -551,8 +558,9 @@ void shellInitWindowSizes (){
 }
 
 
-void shellInitWindowPosition (){
-	
+void shellInitWindowPosition (void)
+{
+
 	//window position
 	wpWindowLeft = WINDOW_LEFT;
 	wpWindowTop = WINDOW_TOP;
@@ -628,7 +636,7 @@ gramcodeLinesInsertChar ( int line_number,
 
 // refresh do char que está na posição usada pelo input.
 
-void teditorRefreshCurrentChar ()
+void teditorRefreshCurrentChar (void)
 {
     printf ("%c", LINES[textCurrentRow].CHARS[textCurrentCol] );
     fflush(stdout);
@@ -641,7 +649,7 @@ void teditorRefreshCurrentChar ()
  *
  */
 
-int saveCreateButton(){
+int saveCreateButton(void){
 
     // Device info
     unsigned long ScreenWidth  = gde_get_system_metrics(1);

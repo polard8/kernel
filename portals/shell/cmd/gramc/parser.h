@@ -356,17 +356,16 @@ static enum rid rid[] = {
 */
 
 
-int parse();
 
-// Vamos inicializar o parser.
-int parserInit();
+int parse(void);
+int parserInit(void);
+int parser(void);
 
-//int parserCreateMain( char **list );
 
-//parse uma função.
-//void parseFunction( char *s );
 
-//int parserMain();
 
-int parser();
+
+
+
+
 

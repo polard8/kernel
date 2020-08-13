@@ -7,7 +7,6 @@ all:
 	make -C launcher
 	make -C noraterm
 	make -C reboot2
-	make -C spr
 	make -C sysmon
 # ...
 

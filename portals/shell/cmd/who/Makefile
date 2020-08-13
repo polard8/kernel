@@ -13,8 +13,9 @@ EXTRAVERSION =
 #todo:
 #We need to simplify these flags
 
+
 CFLAGS = -m32 \
-	--std=gnu89 \
+	-std=gnu89 \
 	-nodefaultlibs \
 	-nostdinc \
 	-nostdlib \
@@ -23,9 +24,10 @@ CFLAGS = -m32 \
 	-ffreestanding \
 	-fno-builtin \
 	-fno-pie \
-	-no-pie \
+	-fleading-underscore \
 	-fno-stack-protector \
-	-s
+	-s \
+	-Werror=strict-prototypes    
 	
 	
 LIBC    = ../../../lib/libc03/include/

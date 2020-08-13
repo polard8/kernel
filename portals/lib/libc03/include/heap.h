@@ -86,7 +86,7 @@ unsigned long heapList[HEAP_COUNT_MAX];
 // Protótipos.
 //
 
-int heapInit();
+int heapInit(void);
 void heapSetLibcHeap( unsigned long HeapStart, unsigned long HeapSize);
 
 

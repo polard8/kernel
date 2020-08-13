@@ -491,7 +491,7 @@ done:
 // o tipo dois funciona.
 // testando colocar o ponteiro no edit box. setar foco.
 
-void shellCreateEditBox (){
+void shellCreateEditBox (void){
 
 
 //suspenso;
@@ -602,11 +602,9 @@ struct window_d *shellCreateMainWindow ( int status ){
 }
 
 
-void testCreateWindow (){
+void testCreateWindow (void){
 	
 	struct window_d *hWindow;	
-
-
 
     //++
 	gde_begin_paint ();
@@ -788,8 +786,8 @@ loadFile:
  *     Devemos usar a função oferecida pela api.
  */
 
-void shellTestDisplayBMP (){
-	
+void shellTestDisplayBMP (void){
+
 	
 	// #bugbug @todo: Aumenta o tamanho do heap do processo.
 	// Esse heap é gerenciando nas bibliotecas ou na API.
@@ -933,7 +931,8 @@ bmpDisplayBMP ( void *address,
 //quando clicamos no menu da barra de tarefas.
 //todo mudar o nome da função.
 
-int shellTestButtons (){
+int shellTestButtons (void)
+{
 
 	// Tamanho da tela.	
 	unsigned long ScreenWidth = gde_get_system_metrics (1);

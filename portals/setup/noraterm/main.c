@@ -691,14 +691,11 @@ int argbuf_index;
 // escreve um char no backbuffer e exibe na tela
 // usando o cursor gerenciado pelo sistema,
 void terminal_write_char ( int c);
+void terminalInitSystemMetrics (void);
+void terminalInitWindowLimits (void);
+void terminalInitWindowSizes (void);
+void terminalInitWindowPosition (void);
 
-void terminalInitSystemMetrics ();
-
-void terminalInitWindowLimits ();
-
-void terminalInitWindowSizes ();
-
-void terminalInitWindowPosition ();
 
 void csidump (void);
 void csireset (void);
@@ -721,42 +718,45 @@ void error ( char *msg, char *arg1, char *arg2 );
 void fatal ( char *msg, char *arg1, char *arg2 );
 char *concat ( char *s1, char *s2, char *s3 );
 char *save_string ( char *s, int len );
-int shell_save_file ();
+int shell_save_file (void);
 int save_string2 ( char string[], char file_name[] );
 
 
 
 
 int
-__PostMessageToProcess ( int pid, 
-                          struct window_d *window, 
-                          int message,
-                          unsigned long long1,
-                          unsigned long long2 );
+__PostMessageToProcess ( 
+    int pid, 
+    struct window_d *window, 
+    int message,
+    unsigned long long1,
+    unsigned long long2 );
 
 
 
 //diálogo para alimentar o terminal usado pelos aplicativos.
-int feedterminalDialog( struct window_d *window, 
-                      int msg, 
-				      unsigned long long1, 
-				      unsigned long long2 );
+int feedterminalDialog ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 );
 
 
 
-int process_input ();
+int process_input (void);
 
 
 
 
 // Procedimento de janela principal do aplicativo.
-void *noratermProcedure ( struct window_d *window, 
-                          int msg, 
-                          unsigned long long1, 
-                          unsigned long long2 );
+void *noratermProcedure ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 );
 
 
-void terminal_test_write ();
+void terminal_test_write (void);
 // ...
 
 
@@ -2690,7 +2690,7 @@ done:
  *     Espera completar o comando com um [ENTER]. ##suspensa
  */
 
-void shellWaitCmd (){
+void shellWaitCmd (void){
 		
 	// @todo: Cuidado com loop infinito.
 
@@ -4837,7 +4837,7 @@ void terminalInitWindowPosition()
 // então estão mais para terminal do que para shell.
 
 
-void terminalTerminal (){
+void terminalTerminal (void){
 	
 	int i=0;
 	int j=0;
@@ -5296,15 +5296,15 @@ done:
  * shellTestLoadFile:
  *     Carrega um arquivo de texto no buffer e mostra na tela.
  */
-void shellTestLoadFile (){
+void shellTestLoadFile (void){
 	
 	FILE *f;
 	
-	int Ret;
+	int Ret=0;
 	int i=0;
 	int ch_test;
 	
-	int pos;
+	int pos=0;
 	
 	//#importante:
 	//precisa ser arquivo pequeno.
@@ -5364,7 +5364,7 @@ fail:
  *     @todo: na hora de criar a thread precisamos passar o PID desse processo.
  */
  
-void shellTestThreads (){
+void shellTestThreads (void){
 	
     //void *T;	
 	
@@ -5475,7 +5475,7 @@ void shellTestThreads (){
  * em alguma biblioteca, servidor ou kernel.
  */
 
-void shellScroll (){
+void shellScroll (void){
 	
 	//reajustando a área visível do buffer 
  
@@ -5506,7 +5506,7 @@ void shellScroll (){
  *     Testaremos o setor do mbr.
  */
 
-void shellTestMBR (){
+void shellTestMBR (void){
 
 // suspenso.
 /*
@@ -5553,7 +5553,7 @@ void shellTestMBR (){
 
 
 //show shell info
-void shellShowInfo (){
+void shellShowInfo (void){
 	
 	int PID, PPID;
 	
@@ -5579,7 +5579,7 @@ void shellShowInfo (){
 
 
 //metrics
-void shellShowMetrics (){
+void shellShowMetrics (void){
 	
     //reinicializa as metricas do sistema.
 	//isso pega os valores e coloca nas variáveis globais.
@@ -5601,10 +5601,10 @@ void shellShowMetrics (){
 
 
 //show system info
-void shellShowSystemInfo (){
+void shellShowSystemInfo (void){
 	
-	int ActiveWindowId;
-	int WindowWithFocusId;
+	int ActiveWindowId=0;
+	int WindowWithFocusId=0;
 	
 	printf (" # shellShowSystemInfo: #\n");
 	
@@ -5633,9 +5633,9 @@ void shellShowSystemInfo (){
 
 
 //mostrar informações sobre janelas.
-void terminalShowWindowInfo (){
+void terminalShowWindowInfo (void){
 	
-    int wID;	
+    int wID=0;	
 	//
 	// #bugbug.
 	// Testando a estrutura de janela.
@@ -5793,7 +5793,7 @@ done:
  * ex: root:/volume0>
  */
 
-void shellInitializeWorkingDiretoryString (){
+void shellInitializeWorkingDiretoryString (void){
 	
 	//get info
 	
@@ -5842,7 +5842,7 @@ void shellUpdateCurrentDirectoryID ( int id ){
 
 
 //lista informações sobre os processos.
-void shellTaskList (){
+void shellTaskList (void){
 	
 	// opções:
 	// +podemos pedir para o kernel listar as informações.
@@ -5856,7 +5856,7 @@ void shellTaskList (){
 	// testando posicionamento de strings
 	
 	unsigned long X, Y;
-	int PID;
+	int PID=0;
 
 	//Pega o PID do processo atual.
     PID = (int) system_call ( SYSTEMCALL_GETPID, 0, 0, 0 );
@@ -6540,7 +6540,7 @@ int save_string2 ( char string[], char file_name[] ){
  * Give version information about this shell.  
  */
 
-void show_shell_version (){
+void show_shell_version (void){
 
     printf ("%s, version %s.%s \n", 
         shell_name, dist_version, build_version );

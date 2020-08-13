@@ -20,7 +20,7 @@ It is created by newversion.aux.
 #define BUILDVERSION "0001"
 
 
-void show_shell_version ();
+void show_shell_version (void);
 
 
 

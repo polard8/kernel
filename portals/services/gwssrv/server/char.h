@@ -9,10 +9,17 @@ int gcharHeight;
 
 
 
+
+int serviceDrawChar(void);
+
+
+
+
+
 void charSetCharWidth ( int width );
 void charSetCharHeight ( int height );
-int charGetCharWidth ();
-int charGetCharHeight ();
+int charGetCharWidth (void);
+int charGetCharHeight (void);
 
 
 

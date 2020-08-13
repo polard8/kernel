@@ -14,7 +14,10 @@ struct statusbar_d
 };
 struct statusbar_d STATUSBAR;
 
-void statusInitializeStatusBar();
+
+
+
+void statusInitializeStatusBar(void);
 void update_statuts_bar( char *string1, char *string2 );
 
 

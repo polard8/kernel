@@ -1,17 +1,18 @@
 
 
 
-int desktopInitialize ();
+int desktopInitialize (void);
 
 
-int shellStartDesktopMode ();
+int shellStartDesktopMode (void);
 
 
 // Procedimento de janela do modo desktop.
-void *desktopProcedure ( struct window_d *window, 
-                         int msg, 
- 			             unsigned long long1, 
-				         unsigned long long2 );
+void *desktopProcedure ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 );
 
 
 

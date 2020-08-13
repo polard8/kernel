@@ -1809,7 +1809,7 @@ struct gws_event_d *gws_next_system_message(void)
 
 
 //P (Proberen) testar.
-void gws_enter_critical_section (){
+void gws_enter_critical_section (void){
 
 //#define	SYSTEMCALL_GET_KERNELSEMAPHORE    226
 //#define	SYSTEMCALL_CLOSE_KERNELSEMAPHORE  227
@@ -1841,7 +1841,7 @@ done:
 
 
 //V (Verhogen)incrementar.
-void gws_exit_critical_section ()
+void gws_exit_critical_section (void)
 {
 	//Hora de sair. Mudo para 1 para que outro possa entrar.
     gws_system_call ( 228,//SYSTEMCALL_OPEN_KERNELSEMAPHORE, 

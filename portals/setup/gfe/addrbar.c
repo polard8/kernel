@@ -24,8 +24,8 @@
 // A Topbar pode ficar no window manager.
  
 void topbarInitializeTopBar (){
-	
-	int i;
+
+	int i=0;
 	
 	unsigned long OldX, OldY;
 

@@ -1,0 +1,4 @@
+
+
+int serviceDrawText(void);
+

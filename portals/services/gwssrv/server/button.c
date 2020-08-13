@@ -5,7 +5,8 @@
  */
 
 
-#include <api.h>
+//#include <api.h>
+
 #include <gws.h>
 
 
@@ -64,7 +65,7 @@ gws_draw_button (
     b = (void *) malloc ( sizeof(struct gws_button_d) );
 
     if ( (void *) b == NULL ){
-        gde_debug_print ("gws: draw_button. b fail\n");
+        gswsrv_debug_print ("gws: draw_button. b fail\n");
         return NULL;
 
     }else{
@@ -231,7 +232,7 @@ gws_draw_button (
 	//}
 	
 
-    gde_debug_print ("button: >>> text\n");
+    gswsrv_debug_print ("button: >>> text\n");
 
 	// (a largura do botão menos a largura da string)/2
     unsigned long offset = ( ( (unsigned long) width - ( (unsigned long) tmp_size * (unsigned long) gcharWidth) ) / 2 );
@@ -253,7 +254,7 @@ gws_draw_button (
     };
 
 
-    gde_debug_print ("button: >>> text ok\n");
+    gswsrv_debug_print ("button: >>> text ok\n");
     
 	//Retornando o ponteiro para a estrutura do botão.
     return (void *) b;  

@@ -19,14 +19,14 @@ extern int login_status;
 // então vamos valorizar essa rotina.
 // Somente um shell interativo tem login.
 
-int loginCheckPassword (){
-	
+int loginCheckPassword (void){
+
 	// #importante
 	// Suspenso, problemas no input de char,
 	//return -1;
 	
 
-	int i;
+	int i=0;
 	
     // Buffer para o arquivo todo.
 	

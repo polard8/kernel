@@ -18,3 +18,4 @@ pixelBackBufferPutpixel (
     
     
     
+int servicepixelBackBufferPutpixel (void);

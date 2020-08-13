@@ -3,7 +3,8 @@
 
 
 
-#include <api.h>
+//#include <api.h>
+
 #include <gws.h>
 
 
@@ -19,6 +20,26 @@
 // Talvez possamos escrever diretamente no lfb.
 // Precisamos de memória compartilhada.
 //
+
+
+
+int servicepixelBackBufferPutpixel(void)
+{
+	//o buffer é uma global nesse documento.
+    unsigned long *message_address = (unsigned long *) &__buffer[0];
+
+    unsigned long x,y,color;
+      
+    x     = message_address[4];  // x
+    y     = message_address[5];  // y
+    color = message_address[6];  // color
+
+    pixelBackBufferPutpixel ( color, x, y );
+
+    gws_show_backbuffer (); // for debug
+    return 0;
+}
+
 
 
 
@@ -96,7 +117,8 @@ pixelBackBufferPutpixel (
 
         default:
 		    //panic ("backbuffer_putpixel: SavedBPP");
-            gde_message_box (3,"xxx","backbuffer_putpixel: SavedBPP");
+            //gde_message_box (3,"xxx","backbuffer_putpixel: SavedBPP");
+            printf("backbuffer_putpixel: SavedBPP\n");
             break;
     };
 

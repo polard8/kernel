@@ -1,6 +1,7 @@
 // connect.c
 
-#include <api.h>
+//#include <api.h>
+
 #include <gws.h>
 
 
@@ -34,7 +35,7 @@ int register_ws (void){
     __ws_desktop = (struct desktop_d *) gramado_system_call (519,0,0,0);
     
     if ( (void *) __ws_desktop == NULL ){
-        gde_debug_print ("register_ws: __ws_desktop fail\n");
+        gswsrv_debug_print ("register_ws: __ws_desktop fail\n");
         return (int) (-1);
     }
 
@@ -42,7 +43,7 @@ int register_ws (void){
     __ws_pid = (int) getpid();
 
     if ( __ws_pid < 0 ){
-        gde_debug_print ("register_ws: __ws_pid fail \n");
+        gswsrv_debug_print ("register_ws: __ws_pid fail \n");
         return (int) (-1);
     }
 

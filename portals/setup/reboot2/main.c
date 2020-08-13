@@ -813,7 +813,7 @@ done:
 // Ainda refletindo de esse apps deve ou não criar uma topbar.
 // A Topbar pode ficar no window manager.
  
-void topbarInitializeTopBar (){
+void topbarInitializeTopBar (void){
 
     int i=0;
     unsigned long OldX, OldY;
@@ -848,9 +848,9 @@ void topbarInitializeTopBar (){
  *
  */
  
-void statusInitializeStatusBar (){
-	
-	int i;
+void statusInitializeStatusBar (void){
+
+	int i=0;
 	unsigned long OldX, OldY;
 
 	//salva cursor antigo.
@@ -879,7 +879,7 @@ void statusInitializeStatusBar (){
 
 void update_statuts_bar ( char *string1, char *string2 ){
 	
-	int i;
+	int i=0;
 	unsigned long OldX, OldY;
 
 	//salva cursor antigo.

@@ -21,6 +21,7 @@ It is created by newversion.aux.
 
 
 void 
-show_shell_version();
+show_shell_version(void);
+
 
 

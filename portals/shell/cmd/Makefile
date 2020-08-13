@@ -24,7 +24,9 @@ all:
 	
 	make -C ./bazic   
 	
-	make -C ./fasm  
+# flags na compilaçao ... o assembly chama funcoes sem '_'
+# e nos usaremos underline.
+#	make -C ./fasm  
 	
 #	make -C ./unknown 
 #	make -C ./miniyacc 

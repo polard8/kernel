@@ -1,10 +1,6 @@
 // Suporte a top bar.
 
 
-
- 
-
-
 #include "launcher.h"
 
 
@@ -17,9 +13,9 @@
 // Ainda refletindo de esse apps deve ou não criar uma topbar.
 // A Topbar pode ficar no window manager.
  
-void topbarInitializeTopBar (){
+void topbarInitializeTopBar (void){
 	
-	int i;
+	int i=0;
 	
 	unsigned long OldX, OldY;
 

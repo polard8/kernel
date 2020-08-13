@@ -18,8 +18,9 @@ EXTRAVERSION =
 #todo:
 #We need to simplify these flags
 
+
 CFLAGS = -m32 \
-	--std=gnu89 \
+	-std=gnu89 \
 	-nodefaultlibs \
 	-nostdinc \
 	-nostdlib \
@@ -28,20 +29,17 @@ CFLAGS = -m32 \
 	-ffreestanding \
 	-fno-builtin \
 	-fno-pie \
-	-no-pie \
+	-fleading-underscore \
 	-fno-stack-protector \
-	-s
-
-#	-fleading-underscore \
-#	-fno-stack-protector \
-#	-s
-	
+	-s \
+	-Werror=strict-prototypes    
 
 
 LIBC      = ../../../lib/libc03/include/
 LIBCOBJ   = ../../../lib/libc03/obj
-LIBGWS    = ../../../lib/libgws/include/
-LIBGWSOBJ = ../../../lib/libgws/obj
+
+#LIBGWS    = ../../../lib/libgws/include/
+#LIBGWSOBJ = ../../../lib/libgws/obj
 
 
 
@@ -58,12 +56,7 @@ string.o \
 unistd.o \
 termios.o \
 ioctl.o \
-socket.o \
-gws.o connect.o events.o rw.o    
-
-
-
-
+socket.o   
 
 
 
@@ -74,7 +67,8 @@ all: main.o all-c hello-link finalize clean
 	@echo "Ok?"
 
 main.o:
-	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -I $(LIBGWS) -I include/ -o main.o
+	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -I include/ -o main.o
+
 
 all-c:
 
@@ -92,11 +86,6 @@ all-c:
 	cp $(LIBCOBJ)/ioctl.o  .
 	cp $(LIBCOBJ)/socket.o  .
 
-
-	cp $(LIBGWSOBJ)/connect.o .
-	cp $(LIBGWSOBJ)/events.o .
-	cp $(LIBGWSOBJ)/gws.o .
-	cp $(LIBGWSOBJ)/rw.o .
 	
 	
 hello-link:

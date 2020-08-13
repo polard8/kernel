@@ -10,37 +10,33 @@
 #include "noraterm.h" 
 
 
-void cd_buitins (){
+void cd_buitins (void){
 	
 	printf ("cd_buitins:\n");
 }
 
-
 // cls
-void cls_builtins (){
+void cls_builtins (void){
 	
     terminalClearScreen ();
 }
 
-
-void copy_builtins (){
+void copy_builtins (void){
 	
 	printf ("copy_builtins:\n");		
 }
 
-
-void date_builtins (){
+void date_builtins (void){
 
 	printf ("date_builtins:\n");				
 }
 
 
-void del_builtins()
+void del_builtins(void)
 {	
 }
 
-
-void dir_builtins (){
+void dir_builtins (void){
 	
 	//
 	// @todo: get set disk id e directory id.
@@ -68,42 +64,42 @@ void echo_builtins (char *list[]){
 }
 
 
-void exec_builtins (){
-	
+void exec_builtins (void)
+{
     printf ("@todo: ~exec\n");	
 }
 
 
-void exit_builtins (){
-	
+void exit_builtins (void)
+{
 	printf ("noraterm: Exiting ...\n");
 	exit (0);	
 }
 
 
-int getpid_builtins (){
-	
-    ShowPID ();	
+int getpid_builtins (void)
+{
+    ShowPID ();
 	return 0; 
 }
 
 
-int getppid_builtins (){
+int getppid_builtins (void){
 	
 	ShowPPID ();
 	return 0;
 }
 
 
-int getuid_builtins (){
+int getuid_builtins (void){
 	
 	ShowUID ();
 	return 0;
 }
 
 
-int getgid_builtins (){
-	
+int getgid_builtins (void)
+{
 	ShowGID ();
 	return 0;
 }
@@ -149,8 +145,9 @@ void help_builtins (int arg){
 }
 
 
-void pwd_builtins (){
-	
+void pwd_builtins (void)
+{
+
     //printf("~pwd - print working directory\n");
     system_call ( 170, 0, 0, 0 );		
 }

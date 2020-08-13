@@ -12,9 +12,9 @@
  *
  */
  
-void statusInitializeStatusBar (){
+void statusInitializeStatusBar (void){
 
-    int i;
+    int i=0;
     unsigned long OldX, OldY;
 
     //salva cursor antigo.

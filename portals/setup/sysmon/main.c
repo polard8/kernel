@@ -54,7 +54,7 @@ sysmonProcedure (
 
 // Interna.
 // Usado para testar o timer.
-void update_cpu_usage ()
+void update_cpu_usage (void)
 {
     unsigned long __idle_value=0;
     unsigned long __value=0;
@@ -93,7 +93,7 @@ void update_cpu_usage ()
 
 // internal
 // #todo: ordenar por pid
-void showinfo_button1()
+void showinfo_button1(void)
 {
 
     char __pid_buffer[8];
@@ -352,7 +352,7 @@ int main ( int argc, char *argv[] ){
 
     FILE *fp;
 
-    int ch;
+    int ch=0;
     int char_count = 0;
 
     //#bugbug

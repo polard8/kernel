@@ -6,7 +6,8 @@
 
 
 
-#include <api.h>
+//#include <api.h>
+
 #include <gws.h>
 
 void *rect_memcpy32 ( void *v_dst, const void *v_src, unsigned long c );

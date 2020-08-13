@@ -648,7 +648,7 @@ int prompt_putchar ( int c, int con_id );
 int prompt_put_string ( char *string );
 int prompt_strcat (char *string);
 int prompt_flush ( int con_id );
-void prompt_clean ();
+void prompt_clean (void);
 
 
 
@@ -725,7 +725,7 @@ int unix_get (int ifile);
 int libcStartTerminal (void);
 
 /*Inicialização da biblioteca*/
-void stdioInitialize ();
+void stdioInitialize(void);
 
 
 #endif    //__STDIO_H__

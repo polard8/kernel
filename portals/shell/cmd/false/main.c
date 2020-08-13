@@ -11,7 +11,7 @@
 //#include <unistd.h> 
  
 
-void cleanPrompt (){
+void cleanPrompt (void){
 
     int i;
 

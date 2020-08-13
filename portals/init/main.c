@@ -81,7 +81,7 @@ int idleError;
 
 
 //...
-void enable_maskable_interrupts();
+void enable_maskable_interrupts(void);
 
 
 //
@@ -111,7 +111,7 @@ static inline void rep_nop (void)
 // Uma interrupção para habilitar as interrupções mascaráveis.
 // Só depois disso a interrupção de timer vai funcionar.
 
-void enable_maskable_interrupts()
+void enable_maskable_interrupts(void)
 {
     asm ("int $129 \n");
 }

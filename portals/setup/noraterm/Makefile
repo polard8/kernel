@@ -17,8 +17,25 @@ EXTRAVERSION = -rc0
 #NAME = Noraterm for gde.
 
 
+#CFLAGS = -m32 \
+#	--std=gnu89 \
+#	-nodefaultlibs \
+#	-nostdinc \
+#	-nostdlib \
+#	-static \
+#	-fgnu89-inline \
+#	-ffreestanding \
+#	-fno-builtin \
+#	-fno-pie \
+#	-no-pie \
+#	-fno-stack-protector \
+#	-s
+
+
+
+
 CFLAGS = -m32 \
-	--std=gnu89 \
+	-std=gnu89 \
 	-nodefaultlibs \
 	-nostdinc \
 	-nostdlib \
@@ -27,9 +44,13 @@ CFLAGS = -m32 \
 	-ffreestanding \
 	-fno-builtin \
 	-fno-pie \
-	-no-pie \
+	-fleading-underscore \
 	-fno-stack-protector \
-	-s
+	-s \
+	-Werror=strict-prototypes    
+	
+	
+
 
 
 #mudaremos a lib de lugar
@@ -69,10 +90,10 @@ head.o:
 
 crt0.o:
 #todo: cancelar o uso desse e usar o que está na libcore.
-	gcc  -c  crt0.c -I $(LIBC) -I $(API) -I . $(CFLAGS) -o crt0.o
+	gcc  -c  crt0.c $(CFLAGS) -I $(LIBC) -I $(API) -I .  -o crt0.o
 
 main.o:
-	gcc  -c  main.c -I $(LIBC) -I $(API)   -I . $(CFLAGS) -o main.o
+	gcc  -c  main.c $(CFLAGS) -I $(LIBC) -I $(API) -I .  -o main.o
 
 all-c:
 
@@ -89,20 +110,20 @@ all-c:
 #	gcc  -c  base/renderer.c     -I $(LIBC) -I $(API) -I $(TERMINAL) -I $(GWS) -I . $(CFLAGS) -o renderer.o
 	
 #cmdline
-	gcc  -c  base/cmdline.c   -I $(LIBC) -I $(API)    -I . $(CFLAGS) -o cmdline.o
-	gcc  -c  base/builtins.c  -I $(LIBC) -I $(API)    -I . $(CFLAGS) -o builtins.o
-	gcc  -c  base/tests.c     -I $(LIBC) -I $(API)    -I . $(CFLAGS) -o tests.o
-	gcc  -c  base/login.c     -I $(LIBC) -I $(API)    -I . $(CFLAGS) -o login.o
+	gcc  -c  base/cmdline.c   $(CFLAGS) -I $(LIBC) -I $(API)  -I .  -o cmdline.o
+	gcc  -c  base/builtins.c  $(CFLAGS) -I $(LIBC) -I $(API)  -I .  -o builtins.o
+	gcc  -c  base/tests.c     $(CFLAGS) -I $(LIBC) -I $(API)  -I .  -o tests.o
+	gcc  -c  base/login.c     $(CFLAGS) -I $(LIBC) -I $(API)  -I .  -o login.o
 
 
 #host
-	gcc  -c  base/input.c  -I $(LIBC) -I $(API)    -I . $(CFLAGS) -o input.o
+	gcc  -c  base/input.c  $(CFLAGS) -I $(LIBC) -I $(API)    -I . -o input.o
 #	gcc  -c  base/output.c  -I $(LIBC) -I $(API)   -I . $(CFLAGS) -o output.o
 	
 #terminal
-	gcc  -c  base/terminal.c  -I $(LIBC) -I $(API)    -I . $(CFLAGS) -o terminal.o
-	gcc  -c  base/termui.c    -I $(LIBC) -I $(API)    -I . $(CFLAGS) -o termui.o
-	gcc  -c  base/desktop.c   -I $(LIBC) -I $(API)    -I . $(CFLAGS) -o desktop.o	
+	gcc  -c  base/terminal.c  $(CFLAGS) -I $(LIBC) -I $(API) -I . -o terminal.o
+	gcc  -c  base/termui.c    $(CFLAGS) -I $(LIBC) -I $(API) -I . -o termui.o
+	gcc  -c  base/desktop.c   $(CFLAGS) -I $(LIBC) -I $(API) -I . -o desktop.o	
 
 	
 #more

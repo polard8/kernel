@@ -311,7 +311,7 @@ int main ( int argc, char *argv[] ){
     client_fd = socket ( AF_INET, SOCK_STREAM, 0 );
 
     if ( client_fd < 0 ){
-       gws_debug_print ("gnst: Couldn't create socket\n");
+       //gws_debug_print ("gnst: Couldn't create socket\n");
        printf ("gnst: Couldn't create socket\n");
        exit(1);
     }
@@ -326,11 +326,11 @@ int main ( int argc, char *argv[] ){
         //nessa hora colocamos no accept um fd.
         //então o servidor escreverá em nosso arquivo.
         // #debug
-        gws_debug_print ("gnst: Connecting to ns via inet  ...\n");      
+        //gws_debug_print ("gnst: Connecting to ns via inet  ...\n");      
         printf ("gnst: Connecting to ns via inet  ...\n");      
         if (connect (client_fd, (void *) &addr_in, sizeof(addr_in)) < 0)
         { 
-            gws_debug_print ("gnst: Connection Failed\n");
+            //gws_debug_print ("gnst: Connection Failed\n");
             printf("gnst: Connection Failed \n"); 
             //close(client_fd);
             //exit(1);

@@ -430,7 +430,7 @@ SendARP (
     unsigned long target_mac );
 
 
-void testSendARP ();
+void testSendARP (void);
 
 
 int
@@ -636,7 +636,7 @@ SendARP (
 
 
 // testando o envio de um arp request usando os servi�os do kernel.
-void testSendARP (){
+void testSendARP (void){
 
 	uint8_t source_ip_address[4];
 	source_ip_address[0] = 192;
@@ -727,16 +727,16 @@ int deltaValue = 1;
 
 
 
-int __count;
+int __count=0;
 unsigned long CPU_USAGE[32];
 
 // Usado para testar o timer.
-void update_cpu_usage ()
+void update_cpu_usage (void)
 {
 
-	unsigned long __idle_value;
-	unsigned long __value;
-	int i;
+	unsigned long __idle_value=0;
+	unsigned long __value=0;
+	int i=0;
 
 
     __count++;
@@ -765,7 +765,7 @@ void update_cpu_usage ()
 
 
 // Usado para testar o timer.
-void updateObject ()
+void updateObject (void)
 {
    //RECT rc;
    //GetClientRect(hwnd, &rc);
@@ -848,7 +848,7 @@ xmas_tree_create ( char *file_name)
 //interna
 //voce a janela
 void
-xmas_tree ()
+xmas_tree (void)
 {
    //RECT rc;
    //GetClientRect(hwnd, &rc);
@@ -932,33 +932,36 @@ void fatal ( char *msg, char *arg1, char *arg2 );
 char *concat ( char *s1, char *s2, char *s3 );
 char *save_string ( char *s, int len );
 
-int shell_save_file ();
 
-void shellInitSystemMetrics ();
-void shellInitWindowLimits ();
-void shellInitWindowSizes ();
-void shellInitWindowPosition ();
+
+int shell_save_file (void);
+
+void shellInitSystemMetrics (void);
+void shellInitWindowLimits (void);
+void shellInitWindowPosition (void);
+void shellInitWindowSizes (void);
 
 // testes de scroll.
-void testScrollChar ();
+void testScrollChar (int c);
 
 // row support
 
 void textSetTopRow ( int number );
 void textSetBottomRow ( int number );
-int textGetTopRow ();
-int textGetBottomRow ();
+int textGetTopRow (void);
+int textGetBottomRow (void);
 
 
 void clearLine ( int line_number );
-void testShowLines ();
+void testShowLines (void);
 
-void testChangeVisibleArea ();
+
+void testChangeVisibleArea (void);
 void updateVisibleArea ( int direction );
-void shellRefreshVisibleArea ();
+void shellRefreshVisibleArea (void);
 
 
-void shellSocketTest ();
+void shellSocketTest (void);
 
 
 //
@@ -1387,7 +1390,7 @@ done:
 
 
 // #todo: Delete
-void shellWaitCmd ()
+void shellWaitCmd (void)
 {
 	// Nothing.
 }
@@ -3329,7 +3332,7 @@ done:
  
 	// step1
 	//inicializa as metricas do sistema.
-void shellInitSystemMetrics (){
+void shellInitSystemMetrics (void){
 	//pegaremos todas as metricas de uma vez s�,
 	//se uma falhar, ent�o pegaremos tudo novamente.
 
@@ -3355,7 +3358,7 @@ void shellInitSystemMetrics (){
 
 	// step2
     //inicializa os limites da janela.
-void shellInitWindowLimits(){
+void shellInitWindowLimits(void){
 	
     //
     // ## Window limits ##
@@ -3401,7 +3404,7 @@ void shellInitWindowLimits(){
 
 	// step3
 	//inicia o tamanho da janela.
-void shellInitWindowSizes (){
+void shellInitWindowSizes (void){
 	
     if ( wl_initialized != 1 )
     {
@@ -3418,7 +3421,7 @@ void shellInitWindowSizes (){
 
 	// step4
 	//inicializar a posi��o da janela.
-void shellInitWindowPosition (){
+void shellInitWindowPosition (void){
 	
 	//window position
 	wpWindowLeft = WINDOW_LEFT;
@@ -3442,7 +3445,7 @@ void shellInitWindowPosition (){
 // #aten��o
 // Isso deve ser chamado antes de criarmos a janela principal. 
  
-void shellShell (){
+void shellShell (void){
 
     int i=0;
     int j=0;
@@ -4044,8 +4047,9 @@ done:
 }
 
 
-int shellCheckPassword (){
-	
+int shellCheckPassword (void)
+{
+
     char buffer[512];	
 	
 	// Se o shell n�o for interativo n�o tem login.
@@ -4254,7 +4258,7 @@ void shellSetCursor ( unsigned long x, unsigned long y ){
  * shellThread:
  *     Um thread dentro para testes.
  */
-void shellThread (){
+void shellThread (void){
 	
 	printf("\n");
 	printf("$\n");
@@ -4281,14 +4285,14 @@ void shellThread (){
 
 
 //help message
-void shellHelp (){
-	
+void shellHelp (void)
+{
     printf (help_banner);	
 }
 
 
 //drawing a tree
-void shellTree (){
+void shellTree (void){
 
     printf (tree_banner);
 }
@@ -4302,7 +4306,7 @@ void shellTree (){
  *    prompt foi definido como stdin->_base.
  */
 
-void shellPrompt (){
+void shellPrompt (void){
 
     int i=0;
 
@@ -4359,7 +4363,7 @@ void shellPrompt (){
  *     Limpa o buffer da tela.
  */
 
-void shellClearBuffer (){
+void shellClearBuffer (void){
 
     int i = 0;
     int j = 0;
@@ -4396,8 +4400,8 @@ void shellClearBuffer (){
 
 //Isso � s� um teste.
 
-void shellShowScreenBuffer (){
-	
+void shellShowScreenBuffer (void)
+{
     shellRefreshVisibleArea ();
 }
 
@@ -4407,14 +4411,14 @@ void shellShowScreenBuffer (){
  *     Carrega um arquivo de texto no buffer e mostra na tela.
  */
 
-void shellTestLoadFile (){
+void shellTestLoadFile (void){
 
     FILE *f;
 
 	int i=0;
-	int Ret;
-	int ch_test;
-	int pos;
+	int Ret=0;
+	int ch_test=0;
+	int pos=0;
 
 
 	//#importante:
@@ -4474,7 +4478,7 @@ done:
  *     @todo: na hora de criar a thread precisamos passar o PID desse processo.
  */
  
-void shellTestThreads (){
+void shellTestThreads (void){
 	
     void *T;	
 	
@@ -4579,9 +4583,8 @@ void shellTestThreads (){
  *     usada pelo comando 'cls'.
  */
  
-void shellClearScreen (){
+void shellClearScreen (void){
 
-	
 	struct window_d *w;
 	unsigned long left, top, right, bottom;
 	
@@ -4637,7 +4640,7 @@ void shellClearScreen (){
  * para sabermos a cor do caractere e de seu background.
  */
 
-void shellRefreshScreen (){
+void shellRefreshScreen (void){
 
 	int i=0;
 	int j=0;
@@ -4732,7 +4735,7 @@ void shellRefreshChar ( int line_number, int col_number ){
 // #bugbug: Aqui, por enquanto, esse printf envia ele mesmo
 // os chars para a tela.
 
-void shellRefreshCurrentChar ()
+void shellRefreshCurrentChar (void)
 {
     printf ("%c", LINES[textCurrentRow].CHARS[textCurrentCol] );
 }
@@ -4749,7 +4752,7 @@ void shellRefreshCurrentChar ()
  * em alguma biblioteca, servidor ou kernel.
  */
 
-void shellScroll (){
+void shellScroll (void){
 	
 	//reajustando a �rea vis�vel do buffer 
  
@@ -4883,9 +4886,8 @@ void shellFillOutputBuffer( char element, int element_type )
 //imprime varias vezes o char indicado.
 
 void testScrollChar ( int c ){
-	
-    int i;
 
+    int i=0;
 
     for ( i=0; i < (wlMaxColumns*26); i++ )
     {
@@ -4942,19 +4944,19 @@ void shellInsertNextChar (char c){
 }
 
 
-void shellInsertCR (){
+void shellInsertCR (void){
     
 	shellInsertNextChar ( (char) '\r' );		
 }
 
 
-void shellInsertLF (){
+void shellInsertLF (void){
 	
 	shellInsertNextChar ( (char) '\n' );
 }
 
 
-void shellInsertNullTerminator (){
+void shellInsertNullTerminator (void){
 	
 	shellInsertNextChar ( (char) '\0' );	
 }
@@ -4967,7 +4969,7 @@ void shellInsertNullTerminator (){
  *     Testaremos o setor do mbr.
  */
 
-void shellTestMBR (){
+void shellTestMBR (void){
 	
     unsigned char buffer[512];
 
@@ -5026,7 +5028,7 @@ void move_to ( unsigned long x, unsigned long y )
 
 
 //show shell info
-void shellShowInfo (){
+void shellShowInfo (void){
 	
 	int PID, PPID;
 	
@@ -5058,7 +5060,7 @@ void shellShowInfo (){
 
 
 //metrics
-void shellShowMetrics (){
+void shellShowMetrics (void){
 	
     //reinicializa as metricas do sistema.
 	//isso pega os valores e coloca nas vari�veis globais.
@@ -5088,10 +5090,10 @@ void shellShowMetrics (){
 
 
 //show system info
-void shellShowSystemInfo (){
+void shellShowSystemInfo (void){
 	
-	int ActiveWindowId;
-	int WindowWithFocusId;
+	int ActiveWindowId=0;
+	int WindowWithFocusId=0;
 	
 
 	printf ("shellShowSystemInfo:\n");
@@ -5123,9 +5125,9 @@ void shellShowSystemInfo (){
 
 
 //mostrar informa��es sobre janelas.
-void shellShowWindowInfo (){
+void shellShowWindowInfo (void){
 	
-    int wID;	
+    int wID=0;	
 	
 	// #bugbug.
 	// Testando a estrutura de janela.
@@ -5297,7 +5299,7 @@ done:
  * ex: root:/volume0>
  */
 
-void shellInitializeWorkingDiretoryString (){
+void shellInitializeWorkingDiretoryString (void){
 
 
     gde_debug_print ("shellInitializeWorkingDiretoryString: \n");
@@ -5372,12 +5374,12 @@ void shellUpdateCurrentDirectoryID ( int id )
 // Devemos considerar aqui o que � trabalho do shell e o que �
 // trabalho do terminal virtual.
 
-void shellTaskList (){
+void shellTaskList (void){
 		
 	// testando posicionamento de strings
 	
 	unsigned long X, Y;
-	int PID;
+	int PID=0;
 
 	//Pega o PID do processo atual.
     PID = (int) system_call ( SYSTEMCALL_GETPID, 0, 0, 0 );
@@ -5413,54 +5415,51 @@ void shellTaskList (){
 }
 
 
-void shellShowPID ()
+void shellShowPID (void)
 {
     printf (" ~ Current PID %d\n", (int) getpid () );
 }
 
-
-void shellShowPPID ()
+void shellShowPPID (void)
 {
     printf (" ~ Current PPID %d\n", (int) getppid () );
 }
 
-
-void shellShowUID ()
+void shellShowUID (void)
 {
     printf (" ~ Current UID %d\n", (int) getuid () );
 }
 
-
-void shellShowGID ()
+void shellShowGID (void)
 {
     printf (" ~ Current GID %d\n", (int) getgid () );
 }
 
 
-void shellShowUserSessionID ()
+void shellShowUserSessionID (void)
 {
     printf ("Current user session %d\n", 
         (int) system_call( SYSTEMCALL_GETCURRENTUSERSESSION, 0, 0, 0) );
 }
 
 
-void shellShowWindowStationID ()
+void shellShowWindowStationID (void)
 {
     printf ("Current room %d\n", 
         (int) system_call( SYSTEMCALL_GETCURRENTWINDOWSTATION, 0, 0, 0) );
 }
 
 
-void shellShowDesktopID ()
+void shellShowDesktopID (void)
 {
     printf ("Current desktop %d\n", 
         (int) system_call( SYSTEMCALL_GETCURRENTDESKTOP, 0, 0, 0) );
 }
 
 
-void shellShowProcessHeapPointer (){
+void shellShowProcessHeapPointer (void){
 
-    unsigned long heap_pointer;
+    unsigned long heap_pointer=0;
     
 	//int id = (int) system_call ( SYSTEMCALL_GETPID, 0, 0, 0); 
     int id = (int) getpid(); 
@@ -5473,9 +5472,9 @@ void shellShowProcessHeapPointer (){
 }
 
 
-void shellShowKernelHeapPointer (){
+void shellShowKernelHeapPointer (void){
 
-    unsigned long heap_pointer;
+    unsigned long heap_pointer=0;
 
 	//??
 	//Id do processo kernel.
@@ -5490,7 +5489,7 @@ void shellShowKernelHeapPointer (){
 
 
 //mostra informa��es sobre o disco atual.
-void shellShowDiskInfo ()
+void shellShowDiskInfo (void)
 {
 	//@todo: atualizar api.h
     system_call ( 251, 0, 0, 0 );
@@ -5498,7 +5497,8 @@ void shellShowDiskInfo ()
 
 
 //mostra informa��es sobre o volume atual.
-void shellShowVolumeInfo (){
+void shellShowVolumeInfo (void)
+{
 	
 	//@todo: atualizar api.h
 	system_call ( 252, 0, 0, 0 );
@@ -5506,21 +5506,21 @@ void shellShowVolumeInfo (){
 
 
 //mostrar informa��es gerais sobre a mem�ria.
-void shellShowMemoryInfo ()
+void shellShowMemoryInfo (void)
 {
     system_call ( SYSTEMCALL_MEMORYINFO, 0, 0, 0 );
 }
 
 
 //mostrar informa��es gerais sobre a mem�ria.
-void shellShowPCIInfo ()
+void shellShowPCIInfo (void)
 {
     system_call ( SYSTEMCALL_SHOWPCIINFO, 0, 0, 0 );
 }
 
 
 //mostrar informa��es gerais sobre a mem�ria.
-void shellShowKernelInfo ()
+void shellShowKernelInfo (void)
 {
     system_call ( SYSTEMCALL_SHOWKERNELINFO, 0, 0, 0 );
 }
@@ -6166,9 +6166,9 @@ int absolute_pathname ( char *string ){
 
 
 //inicializaremos o supporte a pathname
-int shellInitPathname (){
+int shellInitPathname (void){
 
-    int i;
+    int i=0;
 
     if (pathname_initilized == 1)
     {
@@ -6193,9 +6193,9 @@ int shellInitPathname (){
 
  
 //inicializaremos o supporte a filename
-int shellInitFilename (){
+int shellInitFilename (void){
 
-    int i;
+    int i=0;
 
     if (filename_initilized == 1)
     {
@@ -6423,8 +6423,8 @@ int is_sh1 ( char *cmd ){
  * Give version information about this shell. 
  */
 
-void show_shell_version (){
-
+void show_shell_version (void)
+{
     if ( (void *) shell_name != NULL &&
          (void *) dist_version != NULL &&
          (void *) build_version != NULL )
@@ -6451,9 +6451,9 @@ void show_shell_version (){
 	// 512*4 = 2048  (4 setores) 2KB
 	// Se a quantidade de bytes for '0'. ???
 
-int shell_save_file (){
+int shell_save_file (void){
 
-	int Ret;
+	int Ret=0;
 	
 	char file_1[] = "t5: Arquivo \n escrito \n em \n user mode. \n";
 	char file_1_name[] = "FILE1UM TXT";
@@ -6611,7 +6611,7 @@ void textSetTopRow ( int number )
 }
 
 
-int textGetTopRow ()
+int textGetTopRow (void)
 {
     return (int) textTopRow; 
 }
@@ -6624,7 +6624,7 @@ void textSetBottomRow ( int number )
 }
 
 
-int textGetBottomRow ()
+int textGetBottomRow (void)
 {
     return (int) textBottomRow; 
 }
@@ -6633,7 +6633,7 @@ int textGetBottomRow ()
 void clearLine ( int line_number ){
 	
     int lin = (int) line_number; 
-	int col;  
+	int col=0;  
 	
 	int Offset = 0; //Deslocamento dentro do screen buffer.
 	
@@ -6660,7 +6660,7 @@ void clearLine ( int line_number ){
 
 
 //um teste mostrando todas as linhas do boffer de linhas.
-void testShowLines (){
+void testShowLines (void){
 	
 	//desabilita o cursor
     system_call ( 245, 
@@ -6689,7 +6689,7 @@ void testShowLines (){
 
 
 //mostra a �rea vis�vel dentro do buffer de linhas.
-void shellRefreshVisibleArea (){
+void shellRefreshVisibleArea (void){
 	
 	//desabilita o cursor
     system_call ( 245, 
@@ -6741,8 +6741,8 @@ void shellRefreshVisibleArea (){
 }
 
 
-void testChangeVisibleArea (){
-
+void testChangeVisibleArea (void)
+{
     textTopRow += textWheelDelta;
     textBottomRow += textWheelDelta;
 }
@@ -6774,13 +6774,13 @@ void updateVisibleArea( int direction )
 
 //rotina de testes de socket
 
-void shellSocketTest (){
+void shellSocketTest (void){
 
 	//#todo: isso precisa ser um porteiro de estrutura.
 	void *ClientHandle;
 	
-	unsigned long iplong;
-	unsigned long port; //short
+	unsigned long iplong=0;
+	unsigned long port=0; //short
 	
 	unsigned char ip[4];
 	
