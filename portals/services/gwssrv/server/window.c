@@ -191,6 +191,67 @@ int serviceChangeWindowPosition(void)
 
 
 
+int serviceResizeWindow(void)
+{
+
+	//o buffer é uma global nesse documento.
+    unsigned long *message_address = (unsigned long *) &__buffer[0];
+
+
+    struct gws_window_d *window;
+    int window_id = -1;
+    
+    unsigned long w = 0;
+    unsigned long h = 0;
+
+
+    // #debug
+    gswsrv_debug_print ("gwssrv: serviceChangeWindowPosition\n");
+
+
+    // Get
+    
+    window_id = message_address[0];  //wid
+    // msg
+    w         = message_address[2];  
+    h         = message_address[3];  
+
+
+    //
+    // Window ID
+    //
+   
+    // Limits
+    if ( window_id < 0 || window_id >= WINDOW_COUNT_MAX ){
+        gswsrv_debug_print ("gwssrv: serviceChangeWindowPosition window_id\n");
+        return -1;
+    }
+
+    //#todo
+    // Get the window structure given the id.
+    window = (struct gws_window_d *) windowList[window_id];
+   
+    if ( (void *) window == NULL ){
+        gswsrv_debug_print ("gwssrv: serviceChangeWindowPosition window\n");
+        return -1;
+    }
+    
+    if ( window->used != 1 || window->magic != 1234 ){
+        gswsrv_debug_print ("gwssrv: serviceChangeWindowPosition validation\n");
+        return -1;
+    }
+
+    //do!
+    
+    gws_resize_window ( 
+        (struct gws_window_d *) window, 
+        (unsigned long) w, 
+        (unsigned long) h );
+
+    return 0;
+}
+
+
 
 //#bugbug
 // Usaremos a função create window para desenhar botões.

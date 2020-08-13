@@ -957,12 +957,12 @@ int create_tester_client(int fd)
 
     // Testing more things ....
     
-    
-    gws_change_window_position(fd,tester_client->window, 10,10);
-    
-    //funcionou.
-    gws_redraw_window(fd,tester_client->window,1);
-    
+    int i=0;
+    for(i=0; i<16; i++){
+        gws_change_window_position(fd,tester_client->window, i*10, i*10);
+        gws_resize_window(fd,tester_client->window, i*20, i*20);
+        gws_redraw_window(fd,tester_client->window,1); 
+    };
     
     
 

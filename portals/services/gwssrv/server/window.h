@@ -979,11 +979,15 @@ unsigned long windowList[WINDOW_COUNT_MAX];
 
 int serviceCreateWindow ( void );
 int serviceChangeWindowPosition(void);
+int serviceResizeWindow(void);
+
+
 
 int serviceDrawButton (void); 
 int serviceRedrawWindow(void);
 int serviceRefreshRectangle(void);
 int serviceRefreshWindow(void);
+
 
 
 //

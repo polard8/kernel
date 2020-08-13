@@ -684,12 +684,15 @@ gwsProcedure (
            serviceRedrawWindow();
            break;
 
-        /// 1008
-        // #todo:
-        // resize window
+        // Resize window
+        case 1008:
+           gswsrv_debug_print ("gwssrv: Message number 1008\n");
+           serviceResizeWindow();
+           break;
+
 
         case 1009:
-           gswsrv_debug_print ("gwssrv: Message number 100\n");
+           gswsrv_debug_print ("gwssrv: Message number 1009\n");
            serviceChangeWindowPosition();
            break;
 
