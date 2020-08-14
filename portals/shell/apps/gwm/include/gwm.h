@@ -39,14 +39,22 @@ struct wm_client_d
 
     char name[256];
 
+    //test
+    int dirty;
+    
+    int focus;
 
     struct wm_client_d *next;
 };
 
 struct wm_client_d  *c_topbar;
 struct wm_client_d  *c_taskbar;
-struct wm_client_d  *c_tester;   // Usado para fazer testes de pintura e posicionamento.
+//struct wm_client_d  *c_tester;   // Usado para fazer testes de pintura e posicionamento.
+struct wm_client_d *tester_client;
 // ...
+
+
+
 
 unsigned long wmclientList[1024];
 

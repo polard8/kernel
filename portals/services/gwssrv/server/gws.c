@@ -85,8 +85,8 @@ unsigned long gws_get_device_height(void)
 int gwssrv_init_globals(void)
 {
     // buffers
-    ____BACKBUFFER_VA  = (unsigned long) gwssrv_get_system_metrics(12);
     ____FRONTBUFFER_VA = (unsigned long) gwssrv_get_system_metrics(11);
+    ____BACKBUFFER_VA  = (unsigned long) gwssrv_get_system_metrics(12);
 
 
     // Screen

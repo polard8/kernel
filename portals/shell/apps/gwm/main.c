@@ -56,6 +56,9 @@
 
 
 
+//struct wm_client_d *tester_client;
+
+
 
 // #test
 #define MSG_OFFSET_SHORTSTRING  64
@@ -90,12 +93,78 @@ int _hello_response(int fd);
 void _hello(int fd);
 
 //message support
-int _loop(int fd);
+int run(int fd);
 int _getmessage_request(int fd);
 int _getmessage_response(int fd);
 
 
+
+int fullscreen_client (int fd, struct wm_client_d *c);
+int center_client (int fd, struct wm_client_d *c);
+
+
+int gwm_init_globals(void);
+int gwm_init_windows(void);
 int create_main_menu( int fd );
+
+
+
+
+
+int fullscreen_client (int fd, struct wm_client_d *c)
+{
+    unsigned long w = gws_get_system_metrics(1);
+    unsigned long h = gws_get_system_metrics(2);
+    
+    if ( (void *) c != NULL )
+    {
+        if(c->used == 1)
+        {
+            gws_change_window_position(fd,c->window, 0, 0);  //x,y
+            gws_resize_window(fd,c->window, w, h);     //w,h
+            gws_redraw_window(fd,c->window,1); 
+        }  
+    }
+
+    return 0;
+}
+
+
+
+
+int center_client (int fd, struct wm_client_d *c)
+{
+    //screen
+    unsigned long sw = gws_get_system_metrics(1);
+    unsigned long sh = gws_get_system_metrics(2);
+    
+    //window
+    unsigned long ww= sw/3;
+    unsigned long wh= sh/3;
+ 
+ 
+    if ( (void *) c != NULL )
+    {
+        if(c->used == 1)
+        {
+
+            //resize
+            gws_resize_window(fd,c->window, ww, wh );     //w,h
+            
+            //position
+            gws_change_window_position(fd,c->window, 
+                ((sw-ww)/2), 
+                ((sh-wh)/2) );  
+            
+            //redraw and show
+            gws_redraw_window(fd,c->window,1); 
+        }  
+    }
+
+    return 0;
+}
+
+
 
 
 int gwm_init_globals(void)
@@ -451,15 +520,50 @@ process_event:
 }
 
 
+/*
+void
+update_all_windows(int fd);
+void
+update_all_windows(int fd);
+{
+    struct wm_client_d  *c;
+    int i=0;
+    
+    for (i=0; i<9; i++)
+    {    
+        c = (struct wm_client_d  *) wmclientList[i];
+            
+        if ( (void*) c != NULL )
+        {
+            if(c->used == 1)
+            {
+                if(c->focus == 1)
+                {
+                    gws_redraw_window(fd,c->window,1); 
+                }else{
+                    gws_redraw_window(fd,c->window,1);
+                };
+            }
+        }
+    };
+}
+*/
+
+
 // loop
 // Loop de requests para o gws.
-int _loop(int fd)
+int run(int fd)
 {
+    struct wm_client_d  *c;
+    
+
+    
 	//while(___running){
     while(1){
         _getmessage_request(fd);
-        _getmessage_response(fd);
-    }
+        _getmessage_response(fd);    
+    };
+
     return 0; 
 }
 
@@ -862,7 +966,7 @@ int create_tester_client(int fd)
     
     //gws_enter_critical_section();
     gws_debug_print ("gwm: Create tester_client client\n");
-    struct wm_client_d *tester_client;
+    //struct wm_client_d *tester_client;
     tester_client = (struct wm_client_d *) malloc( sizeof(struct wm_client_d ) );
 
     if( (void *) tester_client == NULL){
@@ -957,14 +1061,27 @@ int create_tester_client(int fd)
 
     // Testing more things ....
     
+    
     int i=0;
     for(i=0; i<16; i++){
+
         gws_change_window_position(fd,tester_client->window, i*10, i*10);
-        gws_resize_window(fd,tester_client->window, i*20, i*20);
+        gws_change_window_position(fd,tester_client->title_window, i*10, i*10);
+        
+        //gws_resize_window(fd,tester_client->window, i*20, i*20);
+        
         gws_redraw_window(fd,tester_client->window,1); 
+        gws_redraw_window(fd,tester_client->title_window,1); 
+         
     };
     
     
+    //full screen
+    // ok
+    //fullscreen_client (fd,tester_client);
+    
+    //put in the center.
+    //center_client (fd, tester_client);
 
     return 0;
 }
@@ -1117,7 +1234,7 @@ int main ( int argc, char *argv[] ){
     //
 
     // Loop de requests para o gws.
-    _loop (client_fd);
+    run (client_fd);
 
 
     // #importante
