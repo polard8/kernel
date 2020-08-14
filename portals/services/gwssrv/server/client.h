@@ -25,12 +25,14 @@ struct gws_client_d
     int used;
     int magic;
     
+    // Socket for this client.
+    int fd;
 
-    
-    // ??
+
     // The PID of the client.
-    int pid; //pid_t
-    
+    pid_t pid; 
+    gid_t gid;
+
     
     //Message queue.
 
@@ -46,9 +48,45 @@ struct gws_client_d
     int tail_pos;
     int head_pos;
 
-
     // ...
 };
+
+struct gws_client_d *serverClient;
+struct gws_client_d *currentClient;
+// ...
+
+#define CLIENT_COUNT_MAX 32
+unsigned long gwsClientList[CLIENT_COUNT_MAX];
+
+
+#define SERVER_CLIENT_INDEX 0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

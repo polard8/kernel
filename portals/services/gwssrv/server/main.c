@@ -93,9 +93,9 @@ void InitGraphics(void);
 void create_background (void);
 
 
-
-
-
+void
+gwssrv_init_client_support(void);
+void init_client_struct ( struct gws_client_d *c );
 
 
 
@@ -279,6 +279,91 @@ void set_client_id ( int id )
     //____client_id = id;
 }
 */
+
+
+
+
+
+/*
+int
+__WriteToClient ( 
+    struct gws_client_d *who, 
+    char *buf, 
+    int count );
+int
+__WriteToClient ( 
+    struct gws_client_d *who, 
+    char *buf, 
+    int count )
+{
+    return -1;
+}
+*/
+    
+
+
+
+/*
+int WriteToClient (int fd);
+int WriteToClient (int fd)
+{
+    unsigned long *message_buffer = (unsigned long *) &__buffer[0];   
+    int n_writes = 0;    // For responses.
+    
+    char *m = (char *) (&__buffer[0] + 16);
+    sprintf( m, "gwssrv: This is a response from GWS!\n");
+
+    // Primeiros longs do buffer.
+    message_buffer[0] = next_response[0];         // Window ID.
+    message_buffer[1] = SERVER_PACKET_TYPE_REPLY; // next_response[1] 
+    message_buffer[2] = next_response[2];         // Return value (long1)
+    message_buffer[3] = next_response[3];         // Return value (long2)
+
+
+    if (fd<0)
+        return 0;
+
+   // #bugbug
+   // How many times ?
+   
+__again:
+
+    // #todo:
+    // while(1){...}
+    
+    gwssrv_debug_print ("gwssrv: Sending response ...\n");
+
+    //
+    // Send
+    //
+
+    n_writes = write ( fd, __buffer, sizeof(__buffer) );
+    //n_writes = send ( fd, __buffer, sizeof(__buffer), 0 );
+    
+    if (n_writes<=0){
+        gwssrv_yield();
+        goto __again;
+    }
+
+
+    // Cleaning
+    message_buffer[0] = 0;
+    message_buffer[1] = 0;
+    message_buffer[2] = 0;
+    message_buffer[3] = 0;
+
+    // Cleaning
+    int c=0;
+    for(c=0; c<32; c++)  //todo: 512
+        next_response[c] = 0;
+
+    gwssrv_debug_print ("gwssrv: Response sent\n");  
+    
+    return (int) n_writes;
+}
+*/
+
+    
 
 
 
@@ -863,6 +948,84 @@ void InitGraphics(void){
 
 
 
+void
+gwssrv_init_client_support(void)
+{
+    int i=0;
+    
+    
+    for(i=0; i<CLIENT_COUNT_MAX; i++)
+        gwsClientList[i] = 0;
+    
+    
+    currentClient = (struct gws_client_d *) 0;
+    
+    serverClient = (struct gws_client_d *) malloc ( sizeof( struct gws_client_d ) );
+    if ( (void *) serverClient == NULL )
+    {
+        gwssrv_debug_print ("gwssrv_init_client_support: [FATAL] Couldn't create serverClient\n");
+        printf             ("gwssrv_init_client_support: [FATAL] Couldn't create serverClient\n");
+        exit(1);
+    
+    }else{
+        
+        serverClient->id = 0;
+        serverClient->used = 1;
+        serverClient->magic = 1234;
+        
+        serverClient->fd = -1;
+        
+        serverClient->pid = getpid();
+        serverClient->gid = getgid();
+        
+        // ...
+        
+        // #todo
+        // Limpar a fila de mensagens para esse cliente.
+        
+        for (i=0; i<32; i++)
+        {
+            serverClient->window_list[i] = 0;
+            serverClient->msg_list[i]    = 0;
+            serverClient->long1_list[i]  = 0;
+            serverClient->long2_list[i]  = 0;
+        };
+        serverClient->tail_pos = 0;
+        serverClient->head_pos = 0;
+        
+        // ...
+    };
+}
+
+
+void init_client_struct ( struct gws_client_d *c )
+{
+    int i=0;
+    
+    if ( (void*) c == NULL )
+        return;
+    
+    c->id = -1;  //fail
+    c->used = 1;
+    c->magic = 1234;
+    
+    c->fd = -1;
+    c->pid = -1;
+    c->gid = -1;
+ 
+    for (i=0; i<32; i++)
+    {
+        c->window_list[i] = 0;
+        c->msg_list[i]    = 0;
+        c->long1_list[i]  = 0;
+        c->long2_list[i]  = 0;
+    };
+    c->tail_pos = 0;
+    c->head_pos = 0;
+}
+
+
+
 /*
  ******************************
  * main: 
@@ -883,10 +1046,10 @@ void InitGraphics(void){
 
 int main (int argc, char **argv){
 
-    struct sockaddr addr;
-    addr.sa_family = AF_GRAMADO;
-    addr.sa_data[0] = 'w';
-    addr.sa_data[1] = 's';   
+    struct sockaddr gramsock;  //addr;
+    gramsock.sa_family = AF_GRAMADO;
+    gramsock.sa_data[0] = 'w';
+    gramsock.sa_data[1] = 's';   
     
     int server_fd = -1; 
     int bind_status = -1;
@@ -898,10 +1061,16 @@ int main (int argc, char **argv){
     int i=0;
     int _status = -1;
 
+    int newconn = -1;
+    int curconn = -1;
+
+
 
     // Activate the compositor.
     dirty_status = 1;
-    
+
+
+
 
     //++
     //==================
@@ -919,7 +1088,10 @@ int main (int argc, char **argv){
         gwssrv_debug_print ("---------------------\n");
         gwssrv_debug_print ("gwssrv: Initializing...\n");
         printf ("gwssrv: Initializing... \n");
-
+        
+        
+        // Inicializa a lista de clientes.
+        gwssrv_init_client_support();
 
         // Register.
  
@@ -930,12 +1102,16 @@ int main (int argc, char **argv){
         // Register.
         // Register window server as the current window server 
         // for this desktop.
+        // #bugbug: Se tentarmos reiniciar o servidor, talvez
+        // nao consigamos registrar novamente, pois ja tem um registrado.
+        // Precisamos a opcao de desregistrar, para tentarmos 
+        // mais de um window server.
         // See: connect.c
         _status = (int) register_ws();
 
         if (_status<0){
             gwssrv_debug_print ("gwssrv: Couldn't register the server \n");
-            printf ("gwssrv: Couldn't register the server \n");
+            printf             ("gwssrv: Couldn't register the server \n");
             exit(1);
         }
         gwssrv_debug_print ("gwssrv: Registration ok \n");
@@ -963,13 +1139,16 @@ int main (int argc, char **argv){
 
         server_fd = (int) socket(AF_GRAMADO, SOCK_STREAM, 0);
 
-        if (server_fd<0){
-            printf("gwssrv: Couldn't create the server socket\n");
+        if (server_fd<0)
+        {
+            gwssrv_debug_print ("gwssrv: [FATAL] Couldn't create the server socket\n");
+            printf             ("gwssrv: [FATAL] Couldn't create the server socket\n");
             exit(1);
         }
+
+        serverClient->fd    = server_fd;
         ____saved_server_fd = server_fd;
-
-
+        
 
         //
         // bind
@@ -978,38 +1157,32 @@ int main (int argc, char **argv){
         // #debug
         printf ("gwssrv: bind\n");
  
-        bind_status = bind ( server_fd, (struct sockaddr *) &addr, sizeof(addr) );
+        bind_status = bind ( server_fd, (struct sockaddr *) &gramsock, sizeof(gramsock) );
 
-        if (bind_status<0){
-            printf("gwssrv: Couldn't bind to the socket\n");
+        if (bind_status<0)
+        {
+            gwssrv_debug_print ("gwssrv: [FATAL] Couldn't bind to the socket\n");
+            printf             ("gwssrv: [FATAL] Couldn't bind to the socket\n");
             exit(1);
         }
 
 
+        // #todo
+        // It will setup how many connection the kernel
+        // is able to have in the list.
+        // 5 clients in the list.
+        // listen(server_fd,5);
 
-        //#todo
-        //listen()
-        
-        
-        //
         // Draw !!!
-        //
-
-
         // Init gws infrastructure.
         // Let's create the traditional green background.
-        
+
         InitGraphics();
 
-
-        //
         // Calling child.
-        //
-
         //printf ("gwssrv: Calling child \n");  
 
-
-        //gwssrv_clone_and_execute ("gws.bin"); 
+        //gwssrv_clone_and_execute ("gws.bin");  // command gws.bin
         gwssrv_clone_and_execute ("gwm.bin");    // window manager
         //gwssrv_clone_and_execute ("terminal.bin");  
         //gwssrv_clone_and_execute ("fileman.bin");  
@@ -1020,43 +1193,35 @@ int main (int argc, char **argv){
         // ...        
 
 
-    //#test 
-    /*
-    //++
-    struct gws_window_d *Window;
-    Window = (struct gws_window_d *) createwCreateWindow ( WT_SIMPLE, 
-        1, 1, "no-name",  
-        10, 10, 100, 100,   
-        gui->screen, 0, 
-        COLOR_PINK, COLOR_PINK ); 
-    gws_show_window_rect(Window);
-    //--
-    */
+        //#test 
+        /*
+        //++
+        struct gws_window_d *Window;
+        Window = (struct gws_window_d *) createwCreateWindow ( WT_SIMPLE, 
+            1, 1, "no-name",  10, 10, 100, 100,   
+            gui->screen, 0, COLOR_PINK, COLOR_PINK ); 
+        gws_show_window_rect(Window);
+        //--
+        */
 
-    // #tests
-    // Isso funciona.
-    //pixelBackBufferPutpixel ( COLOR_RED,   100, 250 );
-    //pixelBackBufferPutpixel ( COLOR_GREEN, 105, 250 );
-    //pixelBackBufferPutpixel ( COLOR_BLUE,  110, 250 );
-    //charBackbufferDrawcharTransparent ( 250,       250, COLOR_RED,   (unsigned long) 'R');
-    //charBackbufferDrawcharTransparent ( 250 +8,    250, COLOR_GREEN, (unsigned long) 'G');
-    //charBackbufferDrawcharTransparent ( 250 +8 +8, 250, COLOR_BLUE,  (unsigned long) 'B');
-    //charBackbufferDrawchar ( 300, 300, (unsigned long) 'X', COLOR_YELLOW, COLOR_RED );
-    //lineBackbufferDrawHorizontalLine ( 400, 88, 500, COLOR_PINK );
-    //rectBackbufferDrawRectangle ( 200, 400, 100, 60, COLOR_YELLOW );
+        // #tests
+        // Isso funciona.
+        //pixelBackBufferPutpixel ( COLOR_RED,   100, 250 );
+        //pixelBackBufferPutpixel ( COLOR_GREEN, 105, 250 );
+        //pixelBackBufferPutpixel ( COLOR_BLUE,  110, 250 );
+        //charBackbufferDrawcharTransparent ( 250,       250, COLOR_RED,   (unsigned long) 'R');
+        //charBackbufferDrawcharTransparent ( 250 +8,    250, COLOR_GREEN, (unsigned long) 'G');
+        //charBackbufferDrawcharTransparent ( 250 +8 +8, 250, COLOR_BLUE,  (unsigned long) 'B');
+        //charBackbufferDrawchar ( 300, 300, (unsigned long) 'X', COLOR_YELLOW, COLOR_RED );
+        //lineBackbufferDrawHorizontalLine ( 400, 88, 500, COLOR_PINK );
+        //rectBackbufferDrawRectangle ( 200, 400, 100, 60, COLOR_YELLOW );
 
 
-
-        //
         // Wait
-        //
-
-        //printf ("gwssrv: [FIXME] yield \n");
-       
+        // printf ("gwssrv: [FIXME] yield \n");
         for (i=0; i<11; i++)
-            gwssrv_yield ();
+            gwssrv_yield();
  
-
         //
         // =======================================
         //
@@ -1094,12 +1259,13 @@ int main (int argc, char **argv){
         //not used for now.
         connection_status = 1;
 
+        //curconn = ____saved_server_fd;
+        curconn = serverClient->fd;
+        newconn = -1;
 
-        int newconn = -1;
-        int curconn = ____saved_server_fd;
-        
+        // struct len. Used in accept().  
         socklen_t addr_len;
-        addr_len = sizeof(addr);
+        addr_len = sizeof(gramsock);
     
         // #todo:
         // Precisamos criar uma fila de mensagens para o sistema
@@ -1122,8 +1288,8 @@ int main (int argc, char **argv){
          
          
             //Accept actual connection from the client */
-            newconn = accept( curconn, 
-                          (struct sockaddr *) &addr, 
+            newconn = accept ( curconn, 
+                          (struct sockaddr *) &gramsock, 
                           (socklen_t *) addr_len );
                           
             if (newconn < 0) {
@@ -1132,10 +1298,21 @@ int main (int argc, char **argv){
             // Request from the new connection
             }else{
 
+                // current_connection = newconn;
+                // What is the client for this connection?
+                // Getting the struct pointer for the client with this fd.
+                // currentClient = getClient(newconn);
+                
                 //mensagens de clientes.
                 handle_request (newconn);
                 //handle_request (curconn);
                 // close??
+                
+                // We do not have a current client anymore.
+                // We need to accept a new one.
+                // The kernel will give us a new one from the list
+                // of connections when we call accept().
+                //currentClient = (struct gws_client_d *) 0;
                 
                 //mensagens de sistema.
                 //afetarão a janela com o foco.
@@ -1147,6 +1324,7 @@ int main (int argc, char **argv){
         // #todo
         // Bom, nesse momento precisamos liberar os recursos
         // para que o loop reinicie o servidor.
+        // 
         
         //close(____saved_server_fd);
         
@@ -1176,7 +1354,7 @@ int main (int argc, char **argv){
     // Done.
     
     gwssrv_debug_print ("gwssrv: exited. \n");
-    printf ("gwssrv: exited. \n");
+    printf             ("gwssrv: exited. \n");
     
     // #todo
     // The kernel needs to react when the window server closes.
