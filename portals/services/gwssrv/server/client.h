@@ -1,4 +1,10 @@
 
+
+#ifndef ____CLIENT_H
+#define ____CLIENT_H    1
+
+
+
 // Nesse arquivo fica a estrutura de cliente.
 // Essa estrutura vai conter as informações
 // e características dos clientes.
@@ -19,12 +25,18 @@ int current_client;
 
 struct gws_client_d
 {
+
     int id;
-    
-    // structure validation
     int used;
     int magic;
-    
+
+
+    // host, display, screen
+    struct gws_host_d     host;
+    struct gws_display_d  display;  
+    struct gws_screen_d   screen;
+
+
     // Socket for this client.
     int fd;
 
@@ -60,11 +72,7 @@ unsigned long gwsClientList[CLIENT_COUNT_MAX];
 #define SERVER_CLIENT_INDEX 0
 
 
-
-
-
-
-
+#endif    
 
 
 

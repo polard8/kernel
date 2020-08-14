@@ -29,11 +29,13 @@
 #include "window.h"
 #include "screen.h"
 #include "display.h"
+#include "host.h"
 #include "gui.h"
 
 
-#include "comp.h"
 
+
+#include "comp.h"
 
 #include "packet.h"
 #include "bmp.h"

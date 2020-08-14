@@ -7,6 +7,13 @@
  *        2020 - Created by Fred Nora. 
  */
 
+// hostname:D.S
+// [host]:<display>[.screen]
+// [host]:<display>.[screen]
+
+
+
+
 
 // main.c
 // Arquivo principal do gws.
@@ -43,10 +50,16 @@ See: https://wiki.osdev.org/Graphics_stack
 #include <gws.h>
 
 
+//h:d.s
+char *hostName;
+char *displayNum;
+char *screenNum;
+
+
 
 int running = 0;
-
 int ____saved_server_fd = -1;
+
 
 
 // #test
@@ -1067,6 +1080,19 @@ int main (int argc, char **argv){
     int newconn = -1;
     int curconn = -1;
 
+
+    /*
+    //#test
+    char display[100];
+    hostName    = "gramado";
+    displayNum  = ":0";
+    screenNum   = ".0";
+    strcpy(display, hostName);
+    strcat(display, displayNum);
+    strcat(display, screenNum);
+    printf("DISPLAY={%s}\n",display);
+    while(1){}
+    */
 
 
     // Activate the compositor.

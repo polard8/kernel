@@ -1,10 +1,12 @@
 
+#ifndef ____DISPLAY_H
+#define ____DISPLAY_H    1
 
 
 struct gws_display_d
 {
+
     int id;
-    
     int used;
     int magic;
 
@@ -47,7 +49,6 @@ struct gws_display_d *CurrentDisplay;
 
 
 
-
-
+#endif    
 
 

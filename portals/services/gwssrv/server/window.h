@@ -5,6 +5,9 @@
  *     2020 - Created by Fred Nora.
  */
 
+#ifndef ____WINDOW_H
+#define ____WINDOW_H    1
+
 
 
 //apresentação.
@@ -382,15 +385,16 @@ struct gws_window_class_d
 struct gws_window_d 
 {
 
-    unsigned long id;    //Window Id. 
+    int id;   //unsigned long id;    //Window Id. 
+    int used;
+    int magic;
+
 
     char *name;          //Window name.
 
     unsigned long type;  //tipo ... (editbox, normal, ...)  style???
 
-    // Security and memory management.
-    int used;
-    int magic;
+
 
 
 	// Características dessa janela..
@@ -1142,6 +1146,11 @@ void gwsWindowUnlock (struct gws_window_d *window);
 int gwsDefineInitialRootWindow ( struct gws_window_d *window );
 
 int gwssrv_init_windows(void);
+
+
+
+#endif    
+
 
 
 //
