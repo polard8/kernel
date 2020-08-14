@@ -499,7 +499,7 @@ struct sockcred {
 
 struct socket_d
 {
-    object_type_t objectType;
+    object_type_t  objectType;
     object_class_t objectClass;
 
 
@@ -516,12 +516,19 @@ struct socket_d
     gid_t gid;  // Group
 
 
-    unsigned long ip;
+    unsigned long  ip;
     unsigned short port;
 
     //
     // Connection
     //
+    
+    // The list of pending connections
+    // updated by listen
+    int backlog_max;
+    int backlog_pos;
+    int pending_connections[32];
+
     
     
     struct socket_d *conn;

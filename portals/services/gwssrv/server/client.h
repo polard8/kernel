@@ -33,53 +33,31 @@ struct gws_client_d
     pid_t pid; 
     gid_t gid;
 
-    
-    //Message queue.
 
     //
     // Queue. (list)
     //
 
-    //struct gws_window_d  *window_list[32];
-    int               window_list[32];
-    int               msg_list[32];
-    unsigned long     long1_list[32];
-    unsigned long     long2_list[32];
+    int            window_list[32];
+    int            msg_list[32];
+    unsigned long  long1_list[32];
+    unsigned long  long2_list[32];
     int tail_pos;
     int head_pos;
 
     // ...
 };
 
-struct gws_client_d *serverClient;
-struct gws_client_d *currentClient;
+struct gws_client_d  *serverClient;
+struct gws_client_d  *currentClient;
 // ...
+
 
 #define CLIENT_COUNT_MAX 32
 unsigned long gwsClientList[CLIENT_COUNT_MAX];
 
 
 #define SERVER_CLIENT_INDEX 0
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

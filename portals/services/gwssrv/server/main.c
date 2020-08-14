@@ -994,6 +994,9 @@ gwssrv_init_client_support(void)
         serverClient->head_pos = 0;
         
         // ...
+        
+        //gwsClientList[0] = (unsigned long) serverClient;
+        gwsClientList[SERVER_CLIENT_INDEX] = (unsigned long) serverClient;
     };
 }
 

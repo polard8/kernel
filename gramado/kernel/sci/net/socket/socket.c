@@ -839,8 +839,8 @@ int sys_socket ( int family, int type, int protocol ){
     __socket = (struct socket_d *) create_socket ( ip, port );
   
     if ( (void *) __socket == NULL ){
-        debug_print ("sys_socket: __socket fail\n");
-        printf ("sys_socket: __socket fail\n");
+        debug_print ("sys_socket: [FAIL] __socket fail\n");
+        printf      ("sys_socket: [FAIL] __socket fail\n");
         refresh_screen();
         return -1;
 
@@ -1464,8 +1464,10 @@ sys_accept (
 
     // fd
     // ?? Esse é o socket do servidor.
-    if ( sockfd < 0 || sockfd >= 32 ){
-        printf ("sys_accept: sockfd fail\n");
+    if ( sockfd < 0 || sockfd >= 32 )
+    {
+        debug_print ("sys_accept: [FAIL] sockfd\n");
+        printf      ("sys_accept: [FAIL] sockfd\n");
         refresh_screen();
         return -1;
     }
@@ -1474,11 +1476,14 @@ sys_accept (
     // #bugbug: Ainda não sabemos qual é a estrutura de
     // endereços usada.
     // #bugbug: Ainda não estamos usando isso.
-    if ( (void *) addr == NULL ){
-        printf ("sys_accept: addr fail\n");
+    if ( (void *) addr == NULL )
+    {
+        debug_print ("sys_accept: [FAIL]addr\n");
+        printf      ("sys_accept: [FAIL]addr\n");
         refresh_screen();
         return -1;
     }
+
 
     //
     // Current process. (The server)
@@ -1486,11 +1491,14 @@ sys_accept (
     
     p = (struct process_d *) processList[current_process];
  
-    if ( (void *) p == NULL ){
-        printf ("sys_accept: p fail\n");
+    if ( (void *) p == NULL )
+    {
+        debug_print ("sys_accept: [FAIL] p\n");
+        printf      ("sys_accept: [FAIL] p\n");
         refresh_screen();
         return -1;
     }
+
 
     // O objeto que se refere ao socket do servidor.
 
@@ -1498,7 +1506,9 @@ sys_accept (
     // The socket is a file and belongs to the process.
     f = (file *) p->Objects[sockfd];
 
-    if ( (void *) f == NULL ){
+    if ( (void *) f == NULL )
+    {
+        debug_print ("sys_accept: f fail\n");
         printf ("sys_accept: f fail\n");
         refresh_screen();
         return -1;
@@ -1511,15 +1521,37 @@ sys_accept (
     // Socket structure that belongs to the process.
     s = (struct socket_d *) p->priv;
 
-    if ( (void *) s == NULL ){
-        printf ("sys_accept: (priv socket) s fail\n");
+    if ( (void *) s == NULL )
+    {
+        debug_print ("sys_accept: [FAIL] (priv socket) s fail\n");
+        printf      ("sys_accept: [FAIL] (priv socket) s fail\n");
         refresh_screen();
         return -1;
     }
  
     //
-    // Socket ok.
+    // Socket ok!
     //
+    
+    
+    // #todo
+    // Essa funcao nos enviou o fd do socket do servidor.
+    // Agora vamos olhar na lista de conexoes existentes nesse
+    // socket e pegarmos um dos fd da lista. Em ordem round robing
+
+    /*
+    // get next!
+    int i=0;
+    int max=1;
+    //max = s->backlog_max;
+    return (int) s->pending_connections[ s->backlog_pos ];
+    */
+    
+
+    // O que segue abaixo eh um improviso,
+    // ja que listen ainda nao funciona
+    
+
 
     // #debug
     //printf ("sys_accept: process %d | family %d | len %d \n", 
@@ -1528,7 +1560,8 @@ sys_accept (
  
     // #test
     // Se o socket do servidor já está conectado.
-    if ( s->state == SOCKET_CONNECTED ){
+    if ( s->state == SOCKET_CONNECTED )
+    {
         //debug_print ("sys_accept: Already connected!\n");
         return (int) sockfd;
     }
@@ -1573,7 +1606,7 @@ sys_accept (
 
 // fail
 
-//fail:
+fail:
 
     debug_print ("sys_accept: [FAIL] Something is wrong!\n");
 
@@ -1590,11 +1623,16 @@ sys_accept (
 
 
 /*
-  When a socket is created with socket(), it exists in a 
-  name space (address family) but has no address assigned to it. 
-  bind() assigns the address specified by addr to the socket 
-  referred to by the file descriptor sockfd.
+ ********************************
+ * sys_bind:
+ *    When a socket is created with socket(), it exists in a 
+ *    name space (address family) but has no address assigned to it. 
+ *    bind() assigns the address specified by addr to the socket 
+ *    referred to by the file descriptor sockfd.
  */
+
+// See:
+// https://man7.org/linux/man-pages/man2/bind.2.html
 
 int 
 sys_bind ( 
@@ -1602,29 +1640,33 @@ sys_bind (
     const struct sockaddr *addr,
     socklen_t addrlen )
 {
-    struct process_d *p;
-    
-    struct file_d *f;
-    
-    struct socket_d *s;
+
+    struct process_d  *p;   // Process
+    struct file_d     *f;   // File
+    struct socket_d   *s;   // Socket
 
     int i=0;
 
 
-    printf ("sys_bind: PID %d | fd %d | \n",
+    // #debug
+    debug_print ("sys_bind:\n");
+    printf      ("sys_bind: PID %d | fd %d | \n",
         current_process, sockfd );
 
 
     // fd
-    if ( sockfd < 0 || sockfd >= 32 ){
-        printf ("sys_bind: sockfd fail\n");
+    if ( sockfd < 0 || sockfd >= 32 )
+    {
+        debug_print ("sys_bind: sockfd fail\n");
+        printf      ("sys_bind: sockfd fail\n");
         goto fail;
     }
 
-
     // Check addr structure.
-    if ( (void *) addr == NULL ){
-        printf ("sys_bind: addr fail\n");
+    if ( (void *) addr == NULL )
+    {
+        debug_print ("sys_bind: addr fail\n");
+        printf      ("sys_bind: addr fail\n");
         goto fail;
     }
 
@@ -1632,8 +1674,10 @@ sys_bind (
     // process
     p = (struct process_d *) processList[current_process];
  
-    if ( (void *) p == NULL ){
-        printf ("sys_bind: p fail\n");
+    if ( (void *) p == NULL )
+    {
+        debug_print ("sys_bind: p fail\n");
+        printf      ("sys_bind: p fail\n");
         goto fail;
     }
  
@@ -1642,8 +1686,10 @@ sys_bind (
     // O objeto do tipo socket.
     f = (file *) p->Objects[sockfd];
 
-    if ( (void *) f == NULL ){
-        printf ("sys_bind: f fail\n");
+    if ( (void *) f == NULL )
+    {
+        debug_print ("sys_bind: f fail\n");
+        printf      ("sys_bind: f fail\n");
         goto fail;
     }
     
@@ -1653,8 +1699,10 @@ sys_bind (
     // objeto do tipo socket.
     s = (struct socket_d *) f->socket;
 
-    if ( (void *) s == NULL ){
-        printf ("sys_bind: s fail\n");
+    if ( (void *) s == NULL )
+    {
+        debug_print ("sys_bind: s fail\n");
+        printf      ("sys_bind: s fail\n");
         goto fail; 
     }
 
@@ -1664,55 +1712,66 @@ sys_bind (
     //
     
     // Everything is ok.
+    // Binding the name to the socket.
     // So now we need to include the 'name' into the socket structure
     // respecting the socket's family.
+    // Each family has a different size?
 
+    //++
     // AF_GRAMADO
     if (s->addr.sa_family == AF_GRAMADO){
-        // Binding the name to the socket.
         printf ("~Binding the name to the socket.\n");
-        
+
         // Always 14.
-        for (i=0; i<14; i++){ 
-            s->addr.sa_data[i] = addr->sa_data[i];
-        }; 
+        for (i=0; i<14; i++){ s->addr.sa_data[i] = addr->sa_data[i]; }; 
 
         printf ("process %d ; family %d ; len %d \n", 
             current_process, addr->sa_family, addrlen  );
-        
+
         debug_print ("sys_bind: bind ok\n");
         return 0;
     }
+    //--
 
+
+    //++
     // AF_UNIX ou AF_LOCAL
     // See: http://man7.org/linux/man-pages/man7/unix.7.html
     if (s->addr.sa_family == AF_UNIX){
         debug_print ("sys_bind: AF_UNIX not supported yet\n");
+        //for (i=0; i<14; i++){ s->addr.sa_data[i] = addr->sa_data[i]; }; 
         return -1;
-    }    
+    }
+    //--    
 
+
+    //++
     // AF_INET
     if (s->addr.sa_family == AF_INET){
         debug_print ("sys_bind: AF_INET not supported yet\n");
+        //for (i=0; i<14; i++){ s->addr.sa_data[i] = addr->sa_data[i]; }; 
         return -1;    
     } 
-  
+    //--
+
+
     // #fail
     // A família é de um tipo não suportado.
   
     // DEFAULT:
-    printf ("sys_bind: fail. family not valid\n");
-
+    debug_print ("sys_bind: [FAIL] family not valid\n");
+    printf      ("sys_bind: [FAIL] family not valid\n");
 
    // fail
 
 fail:
 
     debug_print ("sys_bind: [FAIL] Something is wrong!\n");
-    printf ("sys_bind: [FAIL] Something is wrong!\n");
+    printf      ("sys_bind: [FAIL] Something is wrong!\n");
     refresh_screen();
     return (int) (-1);
 }   
+
 
 
 int 
@@ -1813,12 +1872,77 @@ sys_getsockname (
 
 
 
-int sys_listen (int sockfd, int backlog)      
+/*
+ ************************** 
+ * sys_listen:
+ * 
+ */
+
+/*
+ The backlog argument defines the maximum length to which the queue of
+ pending connections for sockfd may grow.  If a connection request
+ arrives when the queue is full, the client may receive an error with
+ an indication of ECONNREFUSED or, if the underlying protocol supports
+ retransmission, the request may be ignored so that a later reattempt
+ at connection succeed
+*/
+
+// See:
+// https://man7.org/linux/man-pages/man2/listen.2.html
+
+// IN:
+// sockfd  = The fd of the server's socket.
+// backlog = The server tell us the the 'size of the list'.
+
+int sys_listen (int sockfd, int backlog) 
 {
-    printf ("sys_listen: [TODO]\n");
+    int n=0;
+
+    debug_print ("sys_listen: [TODO]\n");
+    printf      ("sys_listen: [TODO]\n");
+
+
+    if( sockfd < 0 )
+    {
+        debug_print ("sys_listen: [FAIL] fd\n");
+        printf      ("sys_listen: [FAIL] fd\n");
+        goto fail;
+    }
+
+    // Wrong n. Ajusting to default.
+    if( backlog <= 0 ){ n=1; }
+
+    // #hackhack
+    // We need to do something
+    if( backlog > 8 )
+    { 
+        debug_print ("sys_listen: [FIXME] backlog too long\n");
+        n=1; 
+    }
+
+
+    //
+    // TODO !!!
+    //
+    
+    /*
+    // We need to get the socket structure in the process structure.
+    // We need to clean the list.
+    //int i=0;
+    //for(i=0; i<32; i++) { s->pending_connections[i] = 0;};
+    // Updating the list support.
+    //s->backlog_max = backlog;  //max
+    //s->backlog_pos = 0;        //current 
+    */
+
+
+fail:
+    debug_print ("sys_listen: [FAIL]\n");
+    printf      ("sys_listen: [FAIL]\n");
     refresh_screen();
     return -1;
 }
+
 
 
 /*

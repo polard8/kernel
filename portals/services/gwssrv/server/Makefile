@@ -53,26 +53,16 @@ CFLAGS = -m32 \
 	
 
 
-
-
 #todo
 #path longo. vamos mudar  as libs de lugar para gramado/libs.
 
 LIBC    = ../../../lib/libc03/include/
 LIBCOBJ = ../../../lib/libc03/obj
 
-#API02   = ../../../lib/libcore/include/
-#APIOBJ  = ../../../lib/libcore/obj
-
-
 #GWS_INCLUDES  = include/    
-
-
-#RENDERER = renderer/include/  
-#CMDLINE = cmdline/include/   
-#TERMINAL  = terminal/include/   
-
-
+#RENDERER      = renderer/include/  
+#CMDLINE       = cmdline/include/   
+#TERMINAL      = terminal/include/   
 
 
 	##
@@ -133,14 +123,9 @@ all-c:
 	cp $(LIBCOBJ)/fcntl.o .
 
 
-	# libgui
-	#cp $(APIOBJ)/api.o .
-
-
 gws-link:
-	ld -m elf_i386 -T ../link.ld -o GWSSRV.BIN $(myObjects) -Map=map.txt   
-	 
-
+	ld -m elf_i386 -T ../link.ld -o GWSSRV.BIN $(myObjects)  
+	
 
 finalize:
 	cp GWSSRV.BIN ../bin
