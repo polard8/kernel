@@ -60,6 +60,9 @@
 #include "client.h"
 
 
+#include "services.h"
+
+
 
 // O buffer para  as mensagens recebidas via socket.
 #define MSG_BUFFER_SIZE 512

@@ -79,13 +79,10 @@ int connection_status = 0;
 
 
 // Window.
-struct gws_window_d *__bg_window;
-struct gws_window_d *__taskbar_window; 
-struct gws_window_d *__taskbar_button; 
-//struct gws_window_d *__mywindow;    // Generic, for tests.
+struct gws_window_d  *__bg_window;
+struct gws_window_d  *__taskbar_window; 
+struct gws_window_d  *__taskbar_button; 
 // ...
-
-
 
 
 //
@@ -107,7 +104,6 @@ void create_background (void);
 void
 gwssrv_init_client_support(void);
 void init_client_struct ( struct gws_client_d *c );
-
 
 
 void xxx_test_load_icon(void);

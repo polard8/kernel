@@ -1,4 +1,6 @@
 
 
-int serviceDrawText(void);
+int dummydtext; 
+
+
 

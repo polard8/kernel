@@ -17,5 +17,3 @@ pixelBackBufferPutpixel (
     unsigned long y );
     
     
-    
-int servicepixelBackBufferPutpixel (void);
