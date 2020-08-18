@@ -25,7 +25,7 @@
 ## What is Portals?
 
     Gramado (c) is a 32 bit multithreaded operating system.
-    Portals (c) is the Desktop environment for Gramado.
+    Portals (c) is the Desktop Environment for Gramado.
 
 ## Kernel features.
 
