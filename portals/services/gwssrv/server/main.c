@@ -82,10 +82,8 @@ int connection_status = 0;
 struct gws_window_d *__bg_window;
 struct gws_window_d *__taskbar_window; 
 struct gws_window_d *__taskbar_button; 
-struct gws_window_d *__mywindow;    // Generic, for tests.
+//struct gws_window_d *__mywindow;    // Generic, for tests.
 // ...
-
-
 
 
 
@@ -727,13 +725,17 @@ gwsProcedure (
 
         // Hello!
         // Draw text inside a window.
-        // #bugbug: O window server não tem esse ponteiro de janela.
+        // #bugbug: 
+        // O window server não tem esse ponteiro de janela.
         // ele até aceitaria um handle.
+        // #bugbug: Something is very wrong with this routine.
         case 1000:
             gwssrv_debug_print ("gwssrv: Message number 1000\n");
-            dtextDrawText ( (struct gws_window_d *) __mywindow,
+            if ( (void*) gui->screen != NULL){
+            dtextDrawText ( (struct gws_window_d *) gui->screen,
                 long1, long2, COLOR_GREEN,
                 "gwssrv: Hello friend. This is the Gramado Window Server!");
+            } 
             gws_show_backbuffer();
             break;
 

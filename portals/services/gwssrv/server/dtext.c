@@ -173,12 +173,16 @@ dtextDrawText (
 { 
 
     struct gws_window_d * __w;
-
     __w = (struct gws_window_d *) gui->screen;
+
 
     if ( (void *) window == NULL )
     {
-        dtextDrawString ( __w->left +x, __w->top +y, color, string );
+        if( (void*)__w != NULL ){
+            dtextDrawString ( __w->left +x, __w->top +y, color, string );
+            return;
+        }
+        gwssrv_debug_print("dtextDrawText: __w\n");
         return;
         
     }else{
