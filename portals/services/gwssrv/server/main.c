@@ -725,6 +725,7 @@ gwsProcedure (
         // O window server não tem esse ponteiro de janela.
         // ele até aceitaria um handle.
         // #bugbug: Something is very wrong with this routine.
+        //MSG_GWS_HELLO
         case 1000:
             gwssrv_debug_print ("gwssrv: Message number 1000\n");
             if ( (void*) gui->screen != NULL){
@@ -739,22 +740,26 @@ gwsProcedure (
         // Create Window REQUEST!
         // Usará o buffer global
         // case MSG_CREATE_WINDOW:
+        //MSG_GWS_CREATEWINDOW
         case 1001:
             gwssrv_debug_print ("gwssrv: [FIXME] Message number 1001\n");
             serviceCreateWindow (); 
             break; 
 
         // backbuffer putpixel
+        //MSG_GWS_BACKBUFFERPUTPIXEL
         case 1002:
             servicepixelBackBufferPutpixel(); 
             break;
 
         // backbuffer draw horizontal line
+        //MSG_GWS_BACKBUFFERHORIZONTALLINE
         case 1003:
             servicelineBackbufferDrawHorizontalLine();
             break;
     
         // Draw char
+        //MSG_GWS_DRAWCHAR
         case 1004:
             gwssrv_debug_print ("gwssrv: Message number 1004\n");
             serviceDrawChar();
@@ -762,12 +767,14 @@ gwsProcedure (
 
         // Draw text
         // #todo: tem que testar isso!!!
+        //MSG_GWS_DRAWTEXT
         case 1005:
            gwssrv_debug_print ("gwssrv: Message number 1005\n");
            serviceDrawText();
            break;
 
         // Refresh window
+        //MSG_GWS_REFRESHWIDNOW
         case 1006:
            gwssrv_debug_print ("gwssrv: Message number 1006\n");
            serviceRefreshWindow();
@@ -775,18 +782,20 @@ gwsProcedure (
            
 
         // Redraw window
+        //MSG_GWS_REDRAWWINDOW
         case 1007:
            gwssrv_debug_print ("gwssrv: Message number 1007\n");
            serviceRedrawWindow();
            break;
 
         // Resize window
+        //MSG_GWS_RESIZEWINDOW
         case 1008:
            gwssrv_debug_print ("gwssrv: Message number 1008\n");
            serviceResizeWindow();
            break;
 
-
+        //MSG_GWS_CHANGEWINDOWPOSITION
         case 1009:
            gwssrv_debug_print ("gwssrv: Message number 1009\n");
            serviceChangeWindowPosition();
@@ -813,32 +822,41 @@ gwsProcedure (
         // Disconnect.
         // shutdown.
         // Um cliente quer se desconectar.
+        //MSG_GWS_SHUTDOWN
         case 2010:
             gwssrv_debug_print ("gwssrv: [2010] Disconnect\n");
             break;
             
         // Refresh screen 
         // refresh screen using kgws service. 
+        //MSG_GWS_REFRESHSCREEN
         case 2020:
             gws_show_backbuffer();
             break;
              
 
         // Refresh rectangle ... 
+        //MSG_GWS_REFRESHRECTANGLE
         case 2021:
             serviceRefreshRectangle();
             break;
 
         // When a client send us an event
+        //MSG_GWS_CLIENTEVENT
         case 2030:
             gwssrv_debug_print ("gwssrv: [2030] serviceClientEvent\n");
             //serviceClientEvent();
             break;
 
         // When a client get the next event from it's own queue.
+        // MSG_GWS_NEXTEVENT
         case 2031:
             gwssrv_debug_print ("gwssrv: [2031] serviceNextEvent\n");
             //serviceNextEvent();
+            break;
+        
+        //MSG_GWS_PROTOCOL
+        case 3000:
             break;
             
         // ...
@@ -1291,8 +1309,8 @@ int main (int argc, char **argv){
         // Calling child.
         //printf ("gwssrv: Calling child \n");  
 
-        //gwssrv_clone_and_execute ("gws.bin");  // command gws.bin
-        gwssrv_clone_and_execute ("gwm.bin");    // window manager
+        //gwssrv_clone_and_execute ("gws.bin");      // command gws.bin
+        gwssrv_clone_and_execute ("gwm.bin");      // window manager
         //gwssrv_clone_and_execute ("terminal.bin");  
         //gwssrv_clone_and_execute ("fileman.bin");  
         //gwssrv_clone_and_execute ("browser.bin"); 

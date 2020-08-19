@@ -146,7 +146,29 @@
 #define MSG_TIMER 53   
 //...
 
+//
+// Socket messages
+//
 
+#define MSG_GWS_HELLO               1000 
+#define MSG_GWS_CREATEWINDOW        1001
+#define MSG_GWS_BACKBUFFERPUTPIXEL  1002
+#define MSG_GWS_BACKBUFFERHORIZONTALLINE 1003
+#define MSG_GWS_DRAWCHAR       1004
+#define MSG_GWS_DRAWTEXT       1005
+#define MSG_GWS_REFRESHWIDNOW  1006
+#define MSG_GWS_REDRAWWINDOW   1007
+#define MSG_GWS_RESIZEWINDOW   1008
+#define MSG_GWS_CHANGEWINDOWPOSITION 1009
+//...
+#define MSG_GWS_SHUTDOWN          2010  //SOCKET
+#define MSG_GWS_REFRESHSCREEN     2020
+#define MSG_GWS_REFRESHRECTANGLE  2021
+#define MSG_GWS_CLIENTEVENT       2030
+#define MSG_GWS_NEXTEVENT         2031
+// The buffer has a protocol starting in the 5th long.
+// buffer[4] = ethernet header.
+#define MSG_GWS_PROTOCOL          3000   
 
 
 //

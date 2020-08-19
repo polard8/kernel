@@ -30,10 +30,11 @@
 // AF_GRAMADO
 
 // ... gramado_ports[]
-#define GRAMADO_SH_PORT  8   // shell ?? (server ??)
+
 #define GRAMADO_WS_PORT  11  // window server.
-#define GRAMADO_WM_PORT  12  // window manager ?? (server ??)
 #define GRAMADO_NS_PORT  14  // network server.
+#define GRAMADO_FS_PORT  16  // file system
+
 // ...
 int gramado_ports[32];
 //--

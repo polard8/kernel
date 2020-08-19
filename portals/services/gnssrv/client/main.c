@@ -40,17 +40,12 @@
  
  
 #include <types.h>
-
 #include <stdio.h>
 #include <stdlib.h>
-
 #include <string.h>
-
 #include <netdb.h>
 #include <netinet/in.h>
-
 #include <arpa/inet.h>
-
 #include <sys/socket.h>
 
 
@@ -58,6 +53,17 @@
 //#include <gws.h>
 
 #include <packet.h>
+
+//
+// == ports ====================================
+//
+
+#define PORTS_WS 4040
+#define PORTS_NS 4041
+#define PORTS_FS 4042
+// ...
+
+
 
 
 // #test
@@ -291,7 +297,7 @@ int main ( int argc, char *argv[] ){
 
     struct sockaddr_in addr_in;
     addr_in.sin_family = AF_INET;
-    addr_in.sin_port   = 7548;   //porta para o Network Server 'ns' em gramado_ports[]
+    addr_in.sin_port   = PORTS_NS;   //porta para o Network Server 'ns' em gramado_ports[]
     addr_in.sin_addr.s_addr = IP(192, 168, 1, 79); 
     
 

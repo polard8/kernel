@@ -54,6 +54,16 @@
 #include <gws.h>
 
 
+//
+// == ports ====================================
+//
+
+#define PORTS_WS 4040
+#define PORTS_NS 4041
+#define PORTS_FS 4042
+// ...
+
+
 
 
 // #test
@@ -797,14 +807,14 @@ int main ( int argc, char *argv[] ){
     // Porta para o Window Server 'ws' em gramado_ports[]
     struct sockaddr_in addr_in;
     addr_in.sin_family = AF_INET;
-    addr_in.sin_port   = 7547;   
+    addr_in.sin_port   = PORTS_WS;   
     addr_in.sin_addr.s_addr = IP(192, 168, 1, 112); 
 
 
     debug_print ("---------------------------\n");    
     debug_print ("browser: Initializing ...\n");
 
-     //
+    //
     // socket
     // 
 

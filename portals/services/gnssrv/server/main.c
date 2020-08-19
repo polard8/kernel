@@ -83,8 +83,6 @@ char __buffer[512];
 int running = 0;
 
 
-// Window.
-struct window_d *__mywindow; 
 
 
 int ____saved_server_fd = -1;
@@ -363,12 +361,16 @@ gnsProcedure (
             gde_debug_print ("gnssrv: MSG_KEYDOWN\n");
             break;
 
+
+        //MSG_GNS_HELLO
         case 1000:
             printf ("\n");
             printf ("gnssrv: Hello from Gramado Network Server!\n");
             printf ("\n"); 
             break;
 
+
+        //MSG_GNS_INITIALIZENETWORK
         case 1001:
             serviceInitializeNetwork();
             break; 
@@ -396,23 +398,23 @@ gnsProcedure (
         case 2003:
             break;
 
-        // Disconnect.
-        // showdown.
-        // Um cliente quer se desconectar.
+
+        //MSG_GNS_SHUTDOWN
         case 2010:
             gde_debug_print ("gnssrv: [2010] Disconnect\n");
             break;
 
-
-        // Refresh screen 
-        // refresh screen using kgws service. 
         case 2020:
-             //gws_show_backbuffer ();
              break;
              
 
         // Refresh rectangle ... 
         case 2021:
+            break;
+            
+            
+        //MSG_GNS_PROTOCOL
+        case 3000:
             break;
 
         // ...
@@ -461,12 +463,10 @@ int main (int argc, char **argv){
 
 
 
-
-
     // Serial debug.
     gde_debug_print ("--------------------------\n");
     gde_debug_print ("gnssrv: Initializing...\n");
-    printf ("gnssrv: Initializing...\n");
+    printf          ("gnssrv: Initializing...\n");
 
 
     //
@@ -495,7 +495,7 @@ int main (int argc, char **argv){
     server_fd = (int) socket (AF_GRAMADO, SOCK_STREAM, 0);
     
     if (server_fd<0){
-        printf("gnssrv: Couldn't create the server socket\n");
+        printf("gnssrv: [FAIL] Couldn't create the server socket\n");
         exit(1);
     }
     ____saved_server_fd = server_fd;
