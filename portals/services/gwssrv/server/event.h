@@ -33,7 +33,6 @@ struct gws_event_d
     //unsigned long long6;
 
     
-    
     struct gws_keyboard_event_d  kEvent;
     struct gws_mouse_event_d     mEvent;
     struct gws_window_event_d    wEvent;

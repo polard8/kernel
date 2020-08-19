@@ -829,7 +829,20 @@ gwsProcedure (
             serviceRefreshRectangle();
             break;
 
+        // When a client send us an event
+        case 2030:
+            gwssrv_debug_print ("gwssrv: [2030] serviceClientEvent\n");
+            //serviceClientEvent();
+            break;
+
+        // When a client get the next event from it's own queue.
+        case 2031:
+            gwssrv_debug_print ("gwssrv: [2031] serviceNextEvent\n");
+            //serviceNextEvent();
+            break;
+            
         // ...
+        
 
         
         default:
@@ -1036,6 +1049,75 @@ void init_client_struct ( struct gws_client_d *c )
     };
     c->tail_pos = 0;
     c->head_pos = 0;
+}
+
+
+// When a client send us an event
+int serviceClientEvent(void)
+{
+    //O buffer é uma global nesse documento.
+    unsigned long *message_address = (unsigned long *) &__buffer[0];
+
+    unsigned long window =0;
+    unsigned long msg    =0;
+    unsigned long long1  =0;
+    unsigned long long2  =0;
+
+
+    //struct gws_client_d *client;
+    //struct gws_window_d *hWindow;
+    //struct gws_event_d  *event;
+    //...
+
+
+    window  = message_address[0]; 
+    msg     = message_address[1]; 
+    long1   = message_address[2]; 
+    long2   = message_address[3]; 
+
+    //z      = message_address[4]; 
+    //z      = message_address[5]; 
+    //z      = message_address[6]; 
+    //z      = message_address[7]; 
+    // ...
+
+    // ...
+
+    return -1;
+}
+
+// When a client get the next event from it's own queue.
+int serviceNextEvent(void)
+{
+    //O buffer é uma global nesse documento.
+    unsigned long *message_address = (unsigned long *) &__buffer[0];
+
+    unsigned long window =0;
+    unsigned long msg    =0;
+    unsigned long long1  =0;
+    unsigned long long2  =0;
+
+
+    //struct gws_client_d *client;
+    //struct gws_window_d *hWindow;
+    //struct gws_event_d  *event;
+    //...
+
+
+    window  = message_address[0]; 
+    msg     = message_address[1]; 
+    long1   = message_address[2]; 
+    long2   = message_address[3]; 
+
+    //z      = message_address[4]; 
+    //z      = message_address[5]; 
+    //z      = message_address[6]; 
+    //z      = message_address[7]; 
+    // ...
+
+    // ...
+
+    return -1;
 }
 
 

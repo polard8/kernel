@@ -90,12 +90,12 @@ char __buffer[MSG_BUFFER_SIZE];
 // Podemos isso na lib.
 int _hello_request(int fd);
 int _hello_response(int fd);
-void _hello(int fd);
+void hello(int fd);
 
 //message support
-int run(int fd);
 int _getmessage_request(int fd);
 int _getmessage_response(int fd);
+int run(int fd);
 
 
 
@@ -484,10 +484,6 @@ response_loop:
             break; 
     };
 
-
-
-
-
 //
 // Process reply.
 //
@@ -554,9 +550,8 @@ update_all_windows(int fd);
 // Loop de requests para o gws.
 int run(int fd)
 {
-    struct wm_client_d  *c;
+    //struct wm_client_d  *c;
     
-
     
 	//while(___running){
     while(1){
@@ -743,7 +738,7 @@ new_message:
 }
 
 
-void _hello(int fd)
+void hello(int fd)
 {
     if(fd<0)return;
     
@@ -1210,7 +1205,7 @@ int main ( int argc, char *argv[] ){
 
 
     // Testing server.
-    _hello(client_fd);
+    hello(client_fd);
 
     // Create clients.
     create_topbar_client(client_fd);

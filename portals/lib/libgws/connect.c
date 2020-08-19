@@ -1,8 +1,6 @@
 
-
-
-   // Os cpodigos da libgws vão precisar disso 
-   // pra se conectarem com o Window Server. gws
+// Os codigos da libgws vão precisar disso 
+// pra se conectarem com o Window Server. gws
    
 
 // libc03
@@ -12,12 +10,10 @@
 #include <string.h>
 #include <sys/socket.h>
 
-
 //#bugbug
 //#include <netdb.h>
 //#include <netinet/in.h>
 //#include <arpa/inet.h>
-
 
 // libgws
 #include "include/connect.h"  

@@ -1960,67 +1960,6 @@ unsigned long gws_get_system_metrics (int index){
 }
 
 
-// #bugbug
-// isso deveria se chamar 'get next system message'.
-// Porque o evento pegaremos do window server e não
-// diretamente do kernel.
-// Get next event
-struct gws_event_d *gws_next_system_message(void)
-{
-
-    unsigned long message_buffer[5];   
-
-
-    gws_debug_print("gws_next_system_message:[TODO]\n");
-
-    
-    if( (void *) CurrentEvent == NULL )
-        return (struct gws_event_d *) 0;
-    
-
-    // get system message.
-    // put the message into the event struct.
-
-    //
-    // Get system message.
-    //
-    
-    gws_enter_critical_section();
-    gws_system_call ( 111,
-            (unsigned long) &message_buffer[0],
-            (unsigned long) &message_buffer[0],
-            (unsigned long) &message_buffer[0] );
-    gws_exit_critical_section();
-
-    // No message
-    if ( message_buffer[1] == 0 ){
-        gws_system_call (265,0,0,0);
-        return;
-    }
-
-        
-     //
-     // put the message into the event struct.
-     //
-     
-     CurrentEvent->wid   = message_buffer[0]; // window id
-     CurrentEvent->msg   = message_buffer[1]; // msg (event type)
-     CurrentEvent->long1 = message_buffer[2]; // long1
-     CurrentEvent->long2 = message_buffer[3]; // long2
-     // ...
-
-
-     // clean the message buffer.
-     message_buffer[0] = 0;
-     message_buffer[1] = 0;
-     message_buffer[2] = 0;
-     message_buffer[3] = 0;
-     //...
-
-    return (struct gws_event_d *) CurrentEvent;
-}
-
-
 
 //P (Proberen) testar.
 void gws_enter_critical_section (void){

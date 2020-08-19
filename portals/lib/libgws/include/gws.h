@@ -21,8 +21,17 @@
 // Colors.
 #include "colours.h"
 
+
+
+
 // Windows.
 #include "window.h"
+
+//h:d.s
+#include "screen.h"
+#include "display.h"
+#include "host.h"
+
 
 
 #include "menu.h"
@@ -64,107 +73,8 @@ struct libgws_version_d
 struct libgws_version_d libgwsVersion;
 
 
-struct gws_keyboard_event_d
-{
-    int dummy;
-};
-
-struct gws_mouse_event_d
-{
-    int dummy;
-};
 
 
-struct gws_window_event_d
-{
-    int dummy;
-};
-
-
-struct gws_event_d
-{
-
-    //standard msg block
-    int wid;    // window id.
-    int msg;   // msg. (event type).
-    unsigned long long1;
-    unsigned long long2;
-
-    // extra
-    //unsigned long long3;
-    //unsigned long long4;
-    //unsigned long long5;
-    //unsigned long long6;
-    
-    
-    
-    struct gws_keyboard_event_d kEvent;
-    struct gws_mouse_event_d    mEvent;
-    struct gws_window_event_d   wEvent;
-    // ...
-    
-    struct gws_event_d *next;
-};
-struct gws_event_d *CurrentEvent;
-
-
-
-struct gws_screen_d
-{
-    int id;
-    int used;
-    int magic;
-    
-    unsigned long width;
-    unsigned long height;
-    //bpp?
-
-    unsigned long font_size;
-
-    unsigned long char_width; 
-    unsigned long char_height;
-    
-    void *backbuffer;
-    void *frontbuffer;
-
-    // Belongs to this display.
-    struct gws_display_d *display;
-
-    struct gws_screen_d *next;
-};
-
-
-
-struct gws_display_d
-{
-    int id;
-    
-    int used;
-    int magic;
-
-    // #test
-    //"host:display" string used on this connect
-    char *display_name;
-    
-    int fd;    // Network socket. 
-    int lock;  // is someone in critical section?  
- 
-    //#test
-    //char *buffer;		//Output buffer starting address. 
-    //char *bufptr;		//Output buffer index pointer. 
-    //char *bufmax;		//Output buffer maximum+1 address. 
-    
-    //#test
-    //only one screen for now.
-    //struct gws_screen_d *screen;
-    
-
-    
-    
-    //...
-
-    struct gws_display_d *next;
-};
 
 
 
@@ -315,9 +225,6 @@ int gws_clone_and_execute ( char *name );
 
 unsigned long gws_get_system_metrics (int index);
 
-// Get next event
-struct gws_event_d *gws_next_system_message(void);
-
 void gws_enter_critical_section(void);
 void gws_exit_critical_section(void);
 
@@ -340,6 +247,27 @@ struct gws_menu_item_d *gws_create_menu_item (
     char *label,
     int id,
     struct gws_menu_d *menu);
+
+
+// get next event.
+// the window server return the next event
+// from the queue of a client.
+struct gws_event_d *gws_next_event(int fd);
+
+
+
+
+// Send event.
+// It is gonna be used by the window manager to send 
+// events to the window server.
+// Remember: The window manager gets the system messages
+// end sends window events to the window server.
+void 
+gws_send_event ( 
+    int fd, 
+    int window, 
+    struct gws_event_d *event );
+
 
 //
 // End.
