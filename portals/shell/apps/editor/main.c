@@ -738,23 +738,32 @@ int main ( int argc, char *argv[] ){
 
     //main window
     main_window = gws_create_window (client_fd,
-        WT_SIMPLE,1,1,"Fileman",
+        WT_SIMPLE,1,1,"Editor",
         40, 40, 640, 480,
         0,0,COLOR_GRAY, COLOR_GRAY);
 
     if ( main_window < 0 )             
-        debug_print("fileman: main_window fail\n"); 
+        debug_print("Editor: main_window fail\n"); 
+
+
+     gws_draw_text (
+        (int) client_fd,             // fd,
+        (int) main_window,              // window id,
+        (unsigned long) 50,    // left,
+        (unsigned long) 8,    // top,
+        (unsigned long) COLOR_BLACK,
+        "Name");
 
 
     // address bar
     addressbar_window = gws_create_window (client_fd,
         WT_EDITBOX,1,1,"address-bar",
-        4, 4, 
-        (640-32-4-4-4), 32,
+        100, 4, 
+        (640-300), 32,
         main_window,0,COLOR_WHITE, COLOR_WHITE);
 
     if ( addressbar_window < 0 )             
-        debug_print("fileman: addressbar_window fail\n"); 
+        debug_print("Editor: addressbar_window fail\n"); 
         
      
      gws_draw_text (
@@ -763,28 +772,28 @@ int main ( int argc, char *argv[] ){
         (unsigned long) 8,    // left,
         (unsigned long) 8,    // top,
         (unsigned long) COLOR_BLACK,
-        "file://text.txt");
+        "text.txt");
 
     // button
     button = gws_create_window (client_fd,
-        WT_BUTTON,1,1,">",
-        (640-32-4), 4, 
-        32, 32,
+        WT_BUTTON,1,1,"Save",
+        (640-100), 4, 
+        80, 32,
         main_window,0,COLOR_GRAY, COLOR_GRAY);
 
     if ( button < 0 )             
-        debug_print("fileman: button fail\n"); 
+        debug_print("Editor: button fail\n"); 
 
 
 
     // client window (White)
     client_window = gws_create_window (client_fd,
-        WT_SIMPLE,1,1,"client",
+        WT_EDITBOX,1,1,"client",
         4, 40, 640-8, 480 - 40 - 4,
         main_window,0,COLOR_WHITE, COLOR_WHITE);
 
     if ( client_window < 0 )             
-        debug_print("fileman: client_window fail\n"); 
+        debug_print("Editor: client_window fail\n"); 
 
      gws_draw_text (
         (int) client_fd,             // fd,
@@ -792,7 +801,7 @@ int main ( int argc, char *argv[] ){
         (unsigned long) 40,    // left,
         (unsigned long) 40,    // top,
         (unsigned long) COLOR_BLACK,
-        "Hello, from File Manager!");
+        "Hello, from Editor!");
 
 
 

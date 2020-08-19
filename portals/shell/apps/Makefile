@@ -1,6 +1,7 @@
 
 
 all:
+	make -C editor
 	make -C fileman
 	make -C gwm
 	make -C launch1

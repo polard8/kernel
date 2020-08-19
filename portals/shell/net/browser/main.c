@@ -889,9 +889,6 @@ int main ( int argc, char *argv[] ){
     int button=0;
 
 
-    // libgws
-
-
     //main window
     main_window = gws_create_window (client_fd,
         WT_SIMPLE,1,1,"Browser",
@@ -951,7 +948,12 @@ int main ( int argc, char *argv[] ){
         "Hello, from Google!...  (Ok, I'm lying.)");
 
 
-    //loop
+
+    //
+    // Loop.
+    //
+
+
     browser_loop(client_fd);
 
     debug_print ("browser: bye\n"); 
