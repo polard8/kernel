@@ -711,9 +711,9 @@ done:
     // se não der certo então enviaremos para
     // a thread de controle da janela com o foco
     // ou para um procedimento aqui nesse documento.
-    // See: ps/ipc/ipc.c
+    // See: si/siws.c
 
-    msg_status = (int) ipc_send_to_ws ( (struct window_d *) w,
+    msg_status = (int) si_send_to_ws ( (struct window_d *) w,
                            (int) message, 
                            (unsigned long) ch,
                            (unsigned long) tmp_sc);

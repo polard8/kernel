@@ -124,7 +124,7 @@ ifeq ($(ARCH),x86)
 	REQUEST_OBJECTS := request.o 
 	PANIC_OBJECTS := panic.o 
 	REBOOT_OBJECTS := reboot.o 
-	SYS_OBJECTS := sys.o pump.o syslib.o sysmk.o syssm.o   
+	SYS_OBJECTS := sys.o pump.o sifs.o siws.o sins.o   
 
 
 	OBJECTS := $(ENTRY_OBJECTS) \
@@ -166,6 +166,16 @@ all-c:
 
 
 	#
+	# == SI - Service Interface ==============================
+	#
+
+	$(CC) -c si/sifs.c  $(KINCLUDE) $(CFLAGS) -o sifs.o
+	$(CC) -c si/sins.c  $(KINCLUDE) $(CFLAGS) -o sins.o
+	$(CC) -c si/siws.c  $(KINCLUDE) $(CFLAGS) -o siws.o
+	#...
+
+
+	#
 	# == SCI - System Call Interface ==============================
 	#
 
@@ -175,7 +185,6 @@ all-c:
 	$(CC) -c sci/posix/signal.c  $(KINCLUDE) $(CFLAGS) -o signal.o
 	$(CC) -c sci/posix/stdlib.c  $(KINCLUDE) $(CFLAGS) -o stdlib.o
 	$(CC) -c sci/posix/string.c  $(KINCLUDE) $(CFLAGS) -o string.o
-	$(CC) -c sci/posix/syslib.c  $(KINCLUDE) $(CFLAGS) -o syslib.o
 	$(CC) -c sci/posix/unistd.c  $(KINCLUDE) $(CFLAGS) -o unistd.o
 
 	$(CC) -c sci/sys/sys.c   $(KINCLUDE) $(CFLAGS) -o sys.o
@@ -254,7 +263,7 @@ all-c:
 	$(CC) -c core/runtime.c  $(KINCLUDE) $(CFLAGS) -o runtime.o
 	$(CC) -c core/sm.c       $(KINCLUDE) $(CFLAGS) -o sm.o
 	$(CC) -c core/system.c   $(KINCLUDE) $(CFLAGS) -o system.o
-	$(CC) -c core/syssm.c   $(KINCLUDE) $(CFLAGS) -o syssm.o
+
 
 	# ps/action
 	$(CC) -c  core/ps/action/dispatch.c  $(KINCLUDE)  $(CFLAGS) -o dispatch.o
@@ -296,7 +305,6 @@ all-c:
 	# ps
 	$(CC) -c core/ps/create.c  $(KINCLUDE)  $(CFLAGS) -o create.o
 	$(CC) -c core/ps/mk.c      $(KINCLUDE)  $(CFLAGS) -o mk.o
-	$(CC) -c core/ps/sysmk.c   $(KINCLUDE)  $(CFLAGS) -o sysmk.o
 
 
 

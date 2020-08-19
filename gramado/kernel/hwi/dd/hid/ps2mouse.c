@@ -1219,12 +1219,12 @@ void mouseHandler (void)
             // O pacote tem 3 longs ..., com esse metodo so conseguimos
             // mandar duas.
             
-            //msg_status = (int) ipc_send_to_ws ( (struct window_d *) 0,  // Deprecated!
+            //msg_status = (int) si_send_to_ws ( (struct window_d *) 0,  // Deprecated!
             //                      (int) MSG_MOUSE_PACKET,               // A mensagem comtem um pacote. 
             //                      (unsigned long) buffer_mouse[0],      //
             //                      (unsigned long) buffer_mouse[1]);
 
-            msg_status = (int) ipc_send_longmessage_to_ws ( (struct window_d *) 0,  // Deprecated!
+            msg_status = (int) si_send_longmessage_to_ws ( (struct window_d *) 0,  // Deprecated!
                                   (int) 4567, //MSG_MOUSE_PACKET,               // A mensagem comtem um pacote. 
                                   (unsigned long) buffer_mouse[0],      //
                                   (unsigned long) buffer_mouse[1],

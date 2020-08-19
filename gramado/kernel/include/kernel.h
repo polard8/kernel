@@ -355,6 +355,16 @@ extern void do_executa_new_task (void);
 
 
 
+//
+// si - services interfce
+//
+
+#include "si/sifs.h"
+#include "si/sins.h"
+#include "si/siws.h"
+
+
+
 //keyboard suppport 
 //abnt2 flag.
 int abnt2;
