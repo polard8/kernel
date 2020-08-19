@@ -977,6 +977,11 @@ gde_extra_services (
         return NULL;
     }
     
+    // libc: shutdown() IN: fd, how
+    if ( number == 7009 ){
+        sys_socket_shutdown( (int) arg2, (int) arg3 );
+        return NULL;
+    }
     
     //...
     

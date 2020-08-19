@@ -1112,9 +1112,9 @@ int main (int argc, char **argv){
 
         // #debug
         // Initializing or reinitializing
-        gwssrv_debug_print ("---------------------\n");
+        gwssrv_debug_print ("-----------------------\n");
         gwssrv_debug_print ("gwssrv: Initializing...\n");
-        printf ("gwssrv: Initializing... \n");
+        printf             ("gwssrv: Initializing...\n");
         
         
         // Inicializa a lista de clientes.
@@ -1198,7 +1198,7 @@ int main (int argc, char **argv){
         // It will setup how many connection the kernel
         // is able to have in the list.
         // 5 clients in the list.
-        // listen(server_fd,5);
+        listen(server_fd,5);
 
         // Draw !!!
         // Init gws infrastructure.
@@ -1314,7 +1314,10 @@ int main (int argc, char **argv){
                 //compositor();
          
          
-            //Accept actual connection from the client */
+            // Accept actual connection from the client.
+            // No metodo gramado o retorno sera o fd do servidor
+            // se der certo, pois nosso write copia do servidor para
+            // o cliente conectado.
             newconn = accept ( curconn, 
                           (struct sockaddr *) &gramsock, 
                           (socklen_t *) addr_len );

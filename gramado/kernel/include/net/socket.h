@@ -595,6 +595,11 @@ socket_inet ( struct socket_d *sock,
 
 int sys_socket ( int family, int type, int protocol );
 
+// libc shutdown() function.
+int sys_socket_shutdown (int socket, int how);
+
+
+
 struct socket_d *get_socket_from_fd (int fd);
 
 

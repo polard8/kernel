@@ -743,7 +743,7 @@ socket_inet (
 
 /*
  ********************** 
- *  socket:
+ *  sys_socket:
  *       Essa é função oferece suporte à função socket da libc.
  *       Estamos na klibc dentro do kernel base.
  */
@@ -765,28 +765,30 @@ int sys_socket ( int family, int type, int protocol ){
     // Socket structure.
     struct socket_d *__socket;
 
+
     // Socket address structure.
-    // usado em AF_GRAMADO
+    // Usado em AF_GRAMADO
     struct sockaddr addr;
-    addr.sa_family = family;
+    addr.sa_family  = family;
     addr.sa_data[0] = 'x'; 
     addr.sa_data[1] = 'x';
-    
-    //internet style for inet.
-    //usado em AF_INET
+
+
+    // Internet style for inet.
+    // Usado em AF_INET
     struct sockaddr_in addr_in;
-    addr_in.sin_family = AF_INET;
-    addr_in.sin_port = 11369;
-    //addr_in.sin_addr = SYS_SOCKET_IP(192, 168, 1, 112); //errado
-    //addr_in->sin_addr.s_addr = inet_addr("127.0.0.1");  //todo: inet_addr see netbsd
+    addr_in.sin_family      = AF_INET;
+    addr_in.sin_port        = 11369;
     addr_in.sin_addr.s_addr = SYS_SOCKET_IP(192, 168, 1, 112);
-    
+    //addr_in.sin_addr      = SYS_SOCKET_IP(192, 168, 1, 112); //errado
+    //addr_in->sin_addr.s_addr = inet_addr("127.0.0.1");  //todo: inet_addr see netbsd
+
     
     // Current process.
     struct process_d *p;  
 
     // ip:port used in the socket struture.
-    unsigned long ip = 0x00000000;
+    unsigned long ip    = 0x00000000;
     unsigned short port = 0x0000;
 
 
@@ -1381,6 +1383,92 @@ sys_connect (
 }   
 
 
+// libc shutdown() function.
+// See: https://linux.die.net/man/3/shutdown
+int sys_socket_shutdown (int socket, int how)
+{
+    // #todo
+    // desconectar dois sockets.
+    // mas nao destruir o socket ...
+
+
+    debug_print ("sys_socket_shutdown: [TODO]\n");
+    printf      ("sys_socket_shutdown: [TODO] fd=%d how=%d\n",socket,how);
+
+    if ( socket < 0 )
+    {
+        debug_print ("sys_socket_shutdown: [FAIL] fd\n");
+        printf      ("sys_socket_shutdown: [FAIL] fd\n");
+        goto fail;
+    }
+    
+
+    struct process_d *p;
+    file *f;
+    struct socket_d *s;
+    
+    p = (struct process_d *) processList[current_process];
+ 
+    if ( (void *) p == NULL )
+    {
+        debug_print ("sys_socket_shutdown: p fail\n");
+        printf      ("sys_socket_shutdown: p fail\n");
+        goto fail;
+    }
+ 
+    // sender's file
+    // Objeto do tipo socket.
+    f = (file *) p->Objects[socket];
+
+    if ( (void *) f == NULL )
+    {
+        debug_print ("sys_socket_shutdown: f fail\n");
+        printf      ("sys_socket_shutdown: f fail\n");
+        goto fail;
+    }
+
+    //is socket??
+    
+    int __is = -1;
+    
+    __is = is_socket ((file *)f);
+    if(__is != 1)
+    {
+        debug_print ("sys_socket_shutdown: f is not a socket\n");
+        printf      ("sys_socket_shutdown: f is not a socket\n");
+        goto fail;
+    }
+
+
+    // Pega a estrutura de socket associada ao arquivo.
+    // socket structure in the senders file.
+    //s = (struct socket_d *) p->priv; 
+    s = (struct socket_d *) f->socket;   
+    
+    if ( (void *) s == NULL )
+    {
+        debug_print ("sys_socket_shutdown: s fail\n");
+        printf      ("sys_socket_shutdown: s fail\n");
+        goto fail;
+        
+    }else{
+
+        s->conn = (struct socket_d *) 0;
+        s->state = SOCKET_NOT_CONNECTED; 
+        //ok
+        return 0;
+
+    };
+
+
+    // ...
+
+fail:
+    debug_print ("sys_socket_shutdown: [FAIL]\n");
+    printf      ("sys_socket_shutdown: [FAIL]\n");
+    return -1;
+}
+
 
 // #test
 // ??
@@ -1444,11 +1532,10 @@ sys_accept (
     struct sockaddr *addr, 
     socklen_t *addrlen )
 {
-    struct process_d *p;
 
-    struct file_d *f;
-
-    struct socket_d *s;
+    struct process_d  *p;
+    file              *f;
+    struct socket_d  *s;
 
     
     // #todo
@@ -1557,6 +1644,18 @@ sys_accept (
     //printf ("sys_accept: process %d | family %d | len %d \n", 
         //current_process, addr->sa_family, addrlen  );
 
+
+    // #bugbug
+    // Wrong, wrong, wrong !!!
+    // Se retornarmos o fd do cliente vai falhar,
+    // porque nosso write copia de um socket para outro,
+    // entao copiaria do cliente para o servidor.
+    // Estamos retornando o fd do servidor,
+    // entao o write esta copiando no socket do cliente.
+    // sys_accept deve apenas pegar um fd da lista de conexoes
+    // pending_connections[].
+    // Lembre-se que o fd do cliente estah numa lista em outro processo.
+
  
     // #test
     // Se o socket do servidor já está conectado.
@@ -1590,11 +1689,13 @@ sys_accept (
         debug_print ("sys_accept: CONNECTING !!\n");
         
         // Se existe outro socket linkado ao socket do servidor.
-        if ( (void *) s->conn != NULL ){
+        if ( (void *) s->conn != NULL )
+        {
             //ok: usar isso só para debug
             //debug_print ("sys_accept: done\n");
             s->state       = SOCKET_CONNECTED;
             s->conn->state = SOCKET_CONNECTED;
+            
             return (int) sockfd;
         }
  
@@ -1898,11 +1999,12 @@ int sys_listen (int sockfd, int backlog)
 {
     int n=0;
 
+
     debug_print ("sys_listen: [TODO]\n");
-    printf      ("sys_listen: [TODO]\n");
+    printf      ("sys_listen: [TODO] fd=%d backlog=%d\n",sockfd,backlog);
 
 
-    if( sockfd < 0 )
+    if ( sockfd < 0 )
     {
         debug_print ("sys_listen: [FAIL] fd\n");
         printf      ("sys_listen: [FAIL] fd\n");
@@ -1910,7 +2012,11 @@ int sys_listen (int sockfd, int backlog)
     }
 
     // Wrong n. Ajusting to default.
-    if( backlog <= 0 ){ n=1; }
+    if( backlog <= 0 )
+    { 
+        debug_print ("sys_listen: [FIXME] backlog fail\n");
+        n=1; 
+    }
 
     // #hackhack
     // We need to do something
@@ -1924,10 +2030,15 @@ int sys_listen (int sockfd, int backlog)
     //
     // TODO !!!
     //
-    
+
+//
+// ==============================================
+//
+
+   
     /*
     // We need to get the socket structure in the process structure.
-    // We need to clean the list.
+    // We need to clean the list. Not here. when creating the socket.
     //int i=0;
     //for(i=0; i<32; i++) { s->pending_connections[i] = 0;};
     // Updating the list support.
@@ -1935,11 +2046,76 @@ int sys_listen (int sockfd, int backlog)
     //s->backlog_pos = 0;        //current 
     */
 
+    struct process_d *p;
+    file *f;
+    struct socket_d *s;
+    
+    p = (struct process_d *) processList[current_process];
+ 
+    if ( (void *) p == NULL )
+    {
+        debug_print ("sys_listen: p fail\n");
+        printf      ("sys_listen: p fail\n");
+        goto fail;
+    }
+ 
+    // sender's file
+    // Objeto do tipo socket.
+    f = (file *) p->Objects[sockfd];
+
+    if ( (void *) f == NULL )
+    {
+        debug_print ("sys_listen: f fail\n");
+        printf      ("sys_listen: f fail\n");
+        goto fail;
+    }
+
+    //is socket??
+    
+    int __is = -1;
+    
+    __is = is_socket ((file *)f);
+    if(__is != 1)
+    {
+        debug_print ("sys_listen: f is not a socket\n");
+        printf      ("sys_listen: f is not a socket\n");
+        goto fail;
+    }
+
+
+    // Pega a estrutura de socket associada ao arquivo.
+    // socket structure in the senders file.
+    //s = (struct socket_d *) p->priv; 
+    s = (struct socket_d *) f->socket;   
+    
+    if ( (void *) s == NULL )
+    {
+        debug_print ("sys_listen: s fail\n");
+        printf      ("sys_listen: s fail\n");
+        goto fail;
+        
+    }else{
+
+        s->backlog_max = backlog;
+    };
+
+    // ...
+
+    debug_print ("sys_listen: [TODO] continue...\n");
+    printf      ("sys_listen: [TODO] continue...\n");
+
+
+//
+// ==============================================
+//
+
 
 fail:
     debug_print ("sys_listen: [FAIL]\n");
     printf      ("sys_listen: [FAIL]\n");
     refresh_screen();
+    //while(1){}
+    
     return -1;
 }
 
@@ -1962,6 +2138,7 @@ create_socket (
 {
 
     struct socket_d *s;
+    int i=0;
 
 
     s = (void *) kmalloc ( sizeof( struct socket_d ) );
@@ -2007,7 +2184,12 @@ create_socket (
         s->conn = (struct socket_d *) 0;
         // ...
         
-        
+        s->backlog_max=1;
+        s->backlog_pos=0;
+        for(i=0; i<32; i++){
+            s->pending_connections[i]=0;
+        }
+          
         //...
         
     };

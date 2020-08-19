@@ -452,7 +452,22 @@ int shutdown ( int sockfd, int how )
     // chamar agora e não uma system call.
 
     debug_print ("shutdown: [TODO]\n");
-    return -1; 
+    //return -1; 
+
+    int __status = -1;
+
+
+    __status = (int) gramado_system_call ( 7009, 
+                         (unsigned long) sockfd, 
+                         (unsigned long) how, 
+                         (unsigned long) how );
+
+    if(__status<0)
+        printf ("shutdown: fail\n");
+     
+     
+    return (int) __status;
+
 }
 
 
