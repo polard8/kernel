@@ -7,9 +7,8 @@
  *     
  */
 
-
-// Devemos incluir o objeto gws.o nos aplicativos para fazermos
-// as chamadas ao servidor.
+// Devemos incluir o objeto gws.o nos aplicativos 
+// para fazermos as chamadas ao servidor.
 
 
 // #todo
@@ -40,67 +39,42 @@ char __gws_message_buffer[512];
 
 
 //
-// prototyes (internals)
+// == prototyes (internals) ==========================================
 //
 
 
-
-
-
-
-//
 // == Change window position ==========================
-//
-
 int 
-__gws_change_window_position_request ( int fd, int window, unsigned long x, unsigned long y );
-
+__gws_change_window_position_request ( 
+    int fd, int window, unsigned long x, unsigned long y );
 int 
 __gws_change_window_position_reponse ( int fd );
 
 
 
-
-//
 // == Resize window ==========================
-//
-
 int 
-__gws_resize_window_request ( int fd, int window, unsigned long w, unsigned long h );
-
+__gws_resize_window_request ( 
+    int fd, int window, unsigned long w, unsigned long h );
 int 
 __gws_resize_window_reponse ( int fd );
 
 
-
-
-//
 // == Redraw window ==========================
-//
-
-
+int 
+__gws_redraw_window_request ( int fd, int window, unsigned long flags );
 int 
 __gws_redraw_window_reponse ( int fd );
 
-int 
-__gws_redraw_window_request ( int fd, int window, unsigned long flags );
 
-
-//
 // == Refresh Window ==========================
-//
-
 int 
 __gws_refresh_window_request ( int fd, int window );
 int 
 __gws_refresh_window_reponse ( int fd );
 
 
-
-//
 // == Create Window ==========================
-//
-
 int 
 __gws_createwindow_request (
     int fd,
@@ -115,11 +89,7 @@ __gws_createwindow_request (
 int __gws_createwindow_response(int fd);
 
 
-//
 // == Draw Char ==========================
-//
-
-
 int 
 __gws_drawchar_request (
     int fd,
@@ -131,10 +101,7 @@ __gws_drawchar_request (
 int __gws_drawchar_response(int fd);
 
 
-//
 // == Draw text ==========================
-//
-
 int 
 __gws_drawtext_request (
     int fd,
@@ -146,24 +113,25 @@ __gws_drawtext_request (
 int __gws_drawtext_response(int fd);
 
 
-//
+
 // == ... ==========================
+
+
+
 //
-
-
+// == Functions ====================================================
+//
 
 
 // System call.
-void *
-gws_system_call ( 
+    //System interrupt.
+void *gws_system_call ( 
     unsigned long a, 
     unsigned long b, 
     unsigned long c, 
     unsigned long d )
 {
     int __Ret = 0;
-
-    //System interrupt.
 
     asm volatile ( " int %1 \n"
                  : "=a"(__Ret)
@@ -173,7 +141,7 @@ gws_system_call (
 }
 
 
-// Debug vai serial port. (COM1)
+// Debug via serial port. (COM1)
 void gws_debug_print (char *string)
 {
     gws_system_call ( 289, 
@@ -188,7 +156,7 @@ int gws_initialize_library (void)
 {
     int status = -1;
     
-    
+
     status = gws_initialize_connection();    
 
     if(status<0){
@@ -209,6 +177,9 @@ int gws_initialize_library (void)
     return 0;
 }
 
+//
+// == Helper functions ====================================================
+//
 
 
 int 
@@ -219,16 +190,11 @@ __gws_refresh_window_request ( int fd, int window )
 
     int n_writes = 0;   // For sending requests.
 
-
-
     //char *name = "Window name 1";
-
-   
 
     //
     // Send request.
     //
-
 
     // #debug
     gws_debug_print ("__gws_refresh_window_request: Writing ...\n");      
@@ -239,24 +205,23 @@ __gws_refresh_window_request ( int fd, int window )
 
     while (1)
     {
-        // Create window    
         message_buffer[0] = window;  // window. 
         message_buffer[1] = 1006;    // Refresh window
         message_buffer[2] = 0;
         message_buffer[3] = 0;
-         
         //...
 
         // Write!
         // Se foi possível enviar, então saimos do loop.  
 
         // n_writes = write (fd, __buffer, sizeof(__buffer));
-        n_writes = send (fd, __gws_message_buffer, sizeof(__gws_message_buffer), 0);
+        n_writes = send (fd, 
+                       __gws_message_buffer, 
+                       sizeof(__gws_message_buffer), 
+                       0 );
        
-        if(n_writes>0)
-           break;
+        if(n_writes>0){ break; }
     }
-
 
     return 0; 
 }
@@ -281,10 +246,9 @@ __gws_refresh_window_reponse ( int fd )
     // #debug
     gws_debug_print ("__gws_refresh_window_reponse: Waiting ...\n");      
 
-    int y;
+    int y=0;
     for(y=0; y<15; y++)
         gws_yield();   // See: libgws/
-
 
     // #todo
     // Podemos checar antes se o fd 
@@ -299,7 +263,7 @@ __gws_refresh_window_reponse ( int fd )
     //
 
     // #debug
-    gws_debug_print ("__gws_refresh_window_reponse: Reading ...\n");      
+    gws_debug_print ("__gws_refresh_window_reponse: Reading ...\n"); 
 
 
     // #caution
@@ -309,8 +273,11 @@ __gws_refresh_window_reponse ( int fd )
 response_loop:
 
     //n_reads = read ( fd, __buffer, sizeof(__buffer) );
-    n_reads = recv ( fd, __gws_message_buffer, sizeof(__gws_message_buffer), 0 );
-    
+    n_reads = recv ( fd, 
+                  __gws_message_buffer, 
+                  sizeof(__gws_message_buffer), 
+                  0 );
+
     //if (n_reads<=0){
     //     gws_yield(); 
     //    goto response_loop;
@@ -318,10 +285,10 @@ response_loop:
     
     // Se retornou 0, podemos tentar novamente.
     if (n_reads == 0){
-         gws_yield(); 
+        gws_yield(); 
         goto response_loop;
     }
-    
+
     // Se retornou -1 é porque algo está errado com o arquivo.
     if (n_reads < 0){
         gws_debug_print ("__gws_refresh_window_reponse: recv fail.\n");
@@ -400,8 +367,6 @@ process_event:
 }
 
 
-
-
 int 
 __gws_redraw_window_request ( int fd, int window, unsigned long flags )
 {
@@ -410,14 +375,11 @@ __gws_redraw_window_request ( int fd, int window, unsigned long flags )
 
     int n_writes = 0;   // For sending requests.
 
-
-
     //char *name = "Window name 1";
 
     //
     // Send request.
     //
-
 
     // #debug
     gws_debug_print ("__gws_redraw_window_request: Writing ...\n");      
@@ -428,24 +390,23 @@ __gws_redraw_window_request ( int fd, int window, unsigned long flags )
 
     while (1)
     {
-        // Create window    
         message_buffer[0] = window;  // window. 
         message_buffer[1] = 1007;    // Redraw window
         message_buffer[2] = flags;
         message_buffer[3] = 0;
-         
         //...
 
         // Write!
         // Se foi possível enviar, então saimos do loop.  
 
         // n_writes = write (fd, __buffer, sizeof(__buffer));
-        n_writes = send (fd, __gws_message_buffer, sizeof(__gws_message_buffer), 0);
+        n_writes = send ( fd, 
+                       __gws_message_buffer, 
+                       sizeof(__gws_message_buffer), 
+                       0 );
        
-        if(n_writes>0)
-           break;
+        if(n_writes>0){ break; }
     }
-
 
     return 0; 
 }
@@ -470,10 +431,9 @@ __gws_redraw_window_reponse ( int fd )
     // #debug
     gws_debug_print ("__gws_redraw_window_reponse: Waiting ...\n");      
 
-    int y;
+    int y=0;
     for(y=0; y<15; y++)
         gws_yield();   // See: libgws/
-
 
     // #todo
     // Podemos checar antes se o fd 
@@ -482,14 +442,12 @@ __gws_redraw_window_reponse ( int fd )
     // Mas como sabemos que é um soquete,
     // então sabemos que é possível ler.
 
-
     //
     // read
     //
 
     // #debug
     gws_debug_print ("__gws_redraw_window_reponse: Reading ...\n");      
-
 
     // #caution
     // Waiting for response.
@@ -498,8 +456,11 @@ __gws_redraw_window_reponse ( int fd )
 response_loop:
 
     //n_reads = read ( fd, __buffer, sizeof(__buffer) );
-    n_reads = recv ( fd, __gws_message_buffer, sizeof(__gws_message_buffer), 0 );
-    
+    n_reads = recv ( fd, 
+                  __gws_message_buffer, 
+                  sizeof(__gws_message_buffer), 
+                  0 );
+
     //if (n_reads<=0){
     //     gws_yield(); 
     //    goto response_loop;
@@ -507,7 +468,7 @@ response_loop:
     
     // Se retornou 0, podemos tentar novamente.
     if (n_reads == 0){
-         gws_yield(); 
+        gws_yield(); 
         goto response_loop;
     }
     
@@ -590,7 +551,11 @@ process_event:
 
 
 int 
-__gws_change_window_position_request ( int fd, int window, unsigned long x, unsigned long y )
+__gws_change_window_position_request ( 
+    int fd, 
+    int window, 
+    unsigned long x, 
+    unsigned long y )
 {
     // Isso permite ler a mensagem na forma de longs.
     unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];   
@@ -603,7 +568,6 @@ __gws_change_window_position_request ( int fd, int window, unsigned long x, unsi
     // Send request.
     //
 
-
     // #debug
     gws_debug_print ("__gws_change_window_position_request: Writing ...\n");      
 
@@ -613,24 +577,23 @@ __gws_change_window_position_request ( int fd, int window, unsigned long x, unsi
 
     while (1)
     {
-        // Create window    
         message_buffer[0] = window;  // window. 
         message_buffer[1] = 1009;    // Refresh window
         message_buffer[2] = x;       // x
         message_buffer[3] = y;       // y
-       
         //...
 
         // Write!
         // Se foi possível enviar, então saimos do loop.  
 
         // n_writes = write (fd, __buffer, sizeof(__buffer));
-        n_writes = send (fd, __gws_message_buffer, sizeof(__gws_message_buffer), 0);
-       
-        if(n_writes>0)
-           break;
-    }
+        n_writes = send ( fd,
+                        __gws_message_buffer, 
+                        sizeof(__gws_message_buffer), 
+                        0 );
 
+        if (n_writes>0){ break; }
+    }
 
     return 0; 
 }
@@ -656,7 +619,7 @@ __gws_change_window_position_reponse ( int fd )
     // #debug
     gws_debug_print ("__gws_change_window_position_reponse: Waiting ...\n");      
 
-    int y;
+    int y=0;
     for(y=0; y<15; y++)
         gws_yield();   // See: libgws/
 
@@ -667,7 +630,6 @@ __gws_change_window_position_reponse ( int fd )
     // Pode nem ser possível.
     // Mas como sabemos que é um soquete,
     // então sabemos que é possível ler.
-
 
     //
     // read
@@ -684,7 +646,10 @@ __gws_change_window_position_reponse ( int fd )
 response_loop:
 
     //n_reads = read ( fd, __buffer, sizeof(__buffer) );
-    n_reads = recv ( fd, __gws_message_buffer, sizeof(__gws_message_buffer), 0 );
+    n_reads = recv ( fd, 
+                  __gws_message_buffer, 
+                  sizeof(__gws_message_buffer), 
+                  0 );
     
     //if (n_reads<=0){
     //     gws_yield(); 
@@ -693,7 +658,7 @@ response_loop:
     
     // Se retornou 0, podemos tentar novamente.
     if (n_reads == 0){
-         gws_yield(); 
+        gws_yield(); 
         goto response_loop;
     }
     
@@ -780,10 +745,12 @@ process_event:
 // ======================================================
 //
 
-
-
 int 
-__gws_resize_window_request ( int fd, int window, unsigned long w, unsigned long h )
+__gws_resize_window_request ( 
+    int fd, 
+    int window, 
+    unsigned long w, 
+    unsigned long h )
 {
     // Isso permite ler a mensagem na forma de longs.
     unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];   
@@ -796,7 +763,6 @@ __gws_resize_window_request ( int fd, int window, unsigned long w, unsigned long
     // Send request.
     //
 
-
     // #debug
     gws_debug_print ("__gws_resize_window_request: Writing ...\n");      
 
@@ -806,24 +772,23 @@ __gws_resize_window_request ( int fd, int window, unsigned long w, unsigned long
 
     while (1)
     {
-        // Create window    
         message_buffer[0] = window;  // window. 
         message_buffer[1] = 1008;    // Resize window
         message_buffer[2] = w;       // x
         message_buffer[3] = h;       // y
-       
         //...
 
         // Write!
         // Se foi possível enviar, então saimos do loop.  
 
         // n_writes = write (fd, __buffer, sizeof(__buffer));
-        n_writes = send (fd, __gws_message_buffer, sizeof(__gws_message_buffer), 0);
+        n_writes = send ( fd, 
+                       __gws_message_buffer, 
+                       sizeof(__gws_message_buffer), 
+                       0 );
        
-        if(n_writes>0)
-           break;
+        if(n_writes>0){ break; }
     }
-
 
     return 0; 
 }
@@ -849,10 +814,9 @@ __gws_resize_window_reponse ( int fd )
     // #debug
     gws_debug_print ("__gws_resize_window_reponse: Waiting ...\n");      
 
-    int y;
+    int y=0;
     for(y=0; y<15; y++)
         gws_yield();   // See: libgws/
-
 
     // #todo
     // Podemos checar antes se o fd 
@@ -860,7 +824,6 @@ __gws_resize_window_reponse ( int fd )
     // Pode nem ser possível.
     // Mas como sabemos que é um soquete,
     // então sabemos que é possível ler.
-
 
     //
     // read
@@ -877,7 +840,10 @@ __gws_resize_window_reponse ( int fd )
 response_loop:
 
     //n_reads = read ( fd, __buffer, sizeof(__buffer) );
-    n_reads = recv ( fd, __gws_message_buffer, sizeof(__gws_message_buffer), 0 );
+    n_reads = recv ( fd, 
+                  __gws_message_buffer, 
+                  sizeof(__gws_message_buffer), 
+                  0 );
     
     //if (n_reads<=0){
     //     gws_yield(); 
@@ -886,7 +852,7 @@ response_loop:
     
     // Se retornou 0, podemos tentar novamente.
     if (n_reads == 0){
-         gws_yield(); 
+        gws_yield(); 
         goto response_loop;
     }
     
@@ -986,9 +952,7 @@ __gws_drawchar_request (
     unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];   
 
     int n_writes = 0;   // For sending requests.
-
-
-
+    
     //char *name = "Window name 1";
 
 
@@ -1006,30 +970,27 @@ __gws_drawchar_request (
 
     while (1)
     {
-        // Create window    
         message_buffer[0] = 0;       // window. 
         message_buffer[1] = 1004;    // Draw char.
         message_buffer[2] = 0;
         message_buffer[3] = 0;
-        
         message_buffer[4] = window_id;
         message_buffer[5] = left; 
         message_buffer[6] = top; 
         message_buffer[7] = color; 
-        
-        message_buffer[8] = c;   // The 'char'.
-
-         
+        message_buffer[8] = c;        // The 'char'.
         //...
 
         // Write!
         // Se foi possível enviar, então saimos do loop.  
 
         // n_writes = write (fd, __buffer, sizeof(__buffer));
-        n_writes = send (fd, __gws_message_buffer, sizeof(__gws_message_buffer), 0);
+        n_writes = send ( fd, 
+                       __gws_message_buffer, 
+                       sizeof(__gws_message_buffer), 
+                       0 );
        
-        if(n_writes>0)
-           break;
+        if(n_writes>0){ break; }
     }
 
     return 0; 
@@ -1056,7 +1017,7 @@ int __gws_drawchar_response(int fd)
     // #debug
     gws_debug_print ("gws_drawchar_response: Waiting ...\n");      
 
-    int y;
+    int y=0;
     for(y=0; y<15; y++)
         gws_yield();   // See: libgws/
 
@@ -1067,7 +1028,6 @@ int __gws_drawchar_response(int fd)
     // Pode nem ser possível.
     // Mas como sabemos que é um soquete,
     // então sabemos que é possível ler.
-
 
     //
     // read
@@ -1084,7 +1044,10 @@ int __gws_drawchar_response(int fd)
 response_loop:
 
     //n_reads = read ( fd, __buffer, sizeof(__buffer) );
-    n_reads = recv ( fd, __gws_message_buffer, sizeof(__gws_message_buffer), 0 );
+    n_reads = recv ( fd, 
+                  __gws_message_buffer, 
+                  sizeof(__gws_message_buffer), 
+                  0 );
     
     //if (n_reads<=0){
     //     gws_yield(); 
@@ -1093,7 +1056,7 @@ response_loop:
     
     // Se retornou 0, podemos tentar novamente.
     if (n_reads == 0){
-         gws_yield(); 
+        gws_yield(); 
         goto response_loop;
     }
     
@@ -1238,19 +1201,16 @@ __gws_drawtext_request (
 
     while (1)
     {
-        // Create window    
         message_buffer[0] = 0;       // window. 
         message_buffer[1] = 1005;    // Draw text.
         message_buffer[2] = 0;
         message_buffer[3] = 0;
-        
         message_buffer[4] = window_id;
         message_buffer[5] = left; 
         message_buffer[6] = top; 
         message_buffer[7] = color; 
         
         // OK funcionou string.
-                
         char buf[256];
         int i=0;
         int string_off=8;
@@ -1267,12 +1227,13 @@ __gws_drawtext_request (
         // Se foi possível enviar, então saimos do loop.  
 
         // n_writes = write (fd, __buffer, sizeof(__buffer));
-        n_writes = send (fd, __gws_message_buffer, sizeof(__gws_message_buffer), 0);
+        n_writes = send ( fd, 
+                       __gws_message_buffer, 
+                       sizeof(__gws_message_buffer), 
+                       0 );
        
-        if(n_writes>0)
-           break;
+        if(n_writes>0){ break; }
     }
-
 
     return 0; 
 }
@@ -1298,7 +1259,7 @@ int __gws_drawtext_response(int fd)
     // #debug
     gws_debug_print ("gws_drawtext_response: Waiting ...\n");      
 
-    int y;
+    int y=0;
     for(y=0; y<15; y++)
         gws_yield();   // See: libgws/
 
@@ -1309,7 +1270,6 @@ int __gws_drawtext_response(int fd)
     // Pode nem ser possível.
     // Mas como sabemos que é um soquete,
     // então sabemos que é possível ler.
-
 
     //
     // read
@@ -1326,8 +1286,11 @@ int __gws_drawtext_response(int fd)
 response_loop:
 
     //n_reads = read ( fd, __buffer, sizeof(__buffer) );
-    n_reads = recv ( fd, __gws_message_buffer, sizeof(__gws_message_buffer), 0 );
-    
+    n_reads = recv ( fd, 
+                  __gws_message_buffer, 
+                  sizeof(__gws_message_buffer), 
+                  0 );
+
     //if (n_reads<=0){
     //     gws_yield(); 
     //    goto response_loop;
@@ -1335,7 +1298,7 @@ response_loop:
     
     // Se retornou 0, podemos tentar novamente.
     if (n_reads == 0){
-         gws_yield(); 
+        gws_yield(); 
         goto response_loop;
     }
     
@@ -1454,26 +1417,20 @@ __gws_createwindow_request (
 
     while (1)
     {
-        // Create window    
-        message_buffer[0] = 0;       // window. 
-        message_buffer[1] = 1001;    // msg. Create window REQUEST!
-        message_buffer[2] = 0;
-        message_buffer[3] = 0;
-        
-        message_buffer[4] = left;   //120;   //x
-        message_buffer[5] = top;    //120;   //y
-        message_buffer[6] = width;  //480;   //w
-        message_buffer[7] = height; //320;   //h
-        
-        message_buffer[8] = bg_color;  //xCOLOR_GRAY2; 
-        message_buffer[9] = type;      //WT_SIMPLE;  //todo: type
-         
-       //test
+        message_buffer[0]  = 0;         // window. 
+        message_buffer[1]  = 1001;      // msg. Create window REQUEST!
+        message_buffer[2]  = 0;         //long1
+        message_buffer[3]  = 0;         //long2
+        message_buffer[4]  = left;
+        message_buffer[5]  = top;
+        message_buffer[6]  = width;
+        message_buffer[7]  = height;
+        message_buffer[8]  = bg_color;  //xCOLOR_GRAY2; 
+        message_buffer[9]  = type;      //WT_SIMPLE;  //todo: type
         message_buffer[10] = parent; 
         //...
 
         //string support.
-        
         char buf[256];
         int i=0;
         int string_off= 14; // 8;
@@ -1484,16 +1441,16 @@ __gws_createwindow_request (
         }
         message_buffer[string_off] = 0;
 
-
-
         // Write!
         // Se foi possível enviar, então saimos do loop.  
 
         // n_writes = write (fd, __buffer, sizeof(__buffer));
-        n_writes = send (fd, __gws_message_buffer, sizeof(__gws_message_buffer), 0);
+        n_writes = send (fd, 
+                       __gws_message_buffer, 
+                       sizeof(__gws_message_buffer), 
+                       0 );
        
-        if(n_writes>0)
-           break;
+        if(n_writes>0){ break; }
     }
 
     return 0; 
@@ -1507,7 +1464,6 @@ int __gws_createwindow_response(int fd)
     int n_reads = 0;    // For receiving responses.
     int y=0;
 
-
     //
     // Waiting for response. ==================
     //
@@ -1519,7 +1475,7 @@ int __gws_createwindow_response(int fd)
     // obs: Nesse momento deveríamos estar dormindo.
 
     // #debug
-    gws_debug_print ("gwst: Waiting ...\n");      
+    gws_debug_print ("libgws: Waiting ...\n");      
 
     for(y=0; y<15; y++)
         gws_yield();   // See: libgws/
@@ -1538,7 +1494,7 @@ int __gws_createwindow_response(int fd)
     //
 
     // #debug
-    gws_debug_print ("gwst: reading ...\n");      
+    gws_debug_print ("libgws: reading ...\n");      
 
 
     // #caution
@@ -1548,12 +1504,15 @@ int __gws_createwindow_response(int fd)
 response_loop:
 
     //n_reads = read ( fd, __buffer, sizeof(__buffer) );
-    n_reads = recv ( fd, __gws_message_buffer, sizeof(__gws_message_buffer), 0 );
+    n_reads = recv ( fd, 
+                  __gws_message_buffer, 
+                  sizeof(__gws_message_buffer), 
+                  0 );
 
     // Se retornou -1 é porque algo está errado com o arquivo.
     if (n_reads < 0){
-        gws_debug_print ("gws_create_window_response: recv fail.\n");
-        printf ("gws_create_window_response: recv fail.\n");
+        gws_debug_print ("libgws: recv fail.\n");
+        printf          ("libgws: recv fail.\n");
         printf ("Something is wrong with the socket.\n");
         exit (1);
     }
@@ -1578,7 +1537,7 @@ response_loop:
 
         case GWS_SERVER_PACKET_TYPE_REQUEST:
             gws_yield ();
-            gws_debug_print ("gws_create_window_response: [FIXME] packet\n");
+            gws_debug_print ("libgws: [FIXME] packet\n");
             goto response_loop;
             break;
             
@@ -1589,13 +1548,13 @@ response_loop:
         case GWS_SERVER_PACKET_TYPE_EVENT: goto process_event; break;
             
         case GWS_SERVER_PACKET_TYPE_ERROR:
-            gws_debug_print ("gws: SERVER_PACKET_TYPE_ERROR\n");
+            gws_debug_print ("libgws: SERVER_PACKET_TYPE_ERROR\n");
             goto response_loop;
             //exit (-1);
             break;
         
         default: 
-            gws_debug_print ("gws_create_window_response: [FIXME] default\n");
+            gws_debug_print ("libgws: [FIXME] default\n");
             goto response_loop; 
             break; 
     };
@@ -1619,14 +1578,14 @@ process_reply:
 //
 
 process_event:
-    gws_debug_print ("gws: We got an event\n"); 
+    gws_debug_print ("libgws: We got an event\n"); 
     return 0;
 
 }
 
 
 //
-// =============================================================
+// == Functions =======================================================
 //
 
 // Draw char.
@@ -1715,22 +1674,18 @@ gws_create_window_using_socket (
     
     return (int) response;
 }    
-    
-    
-    
-    
-
 
 
 // Services.
 // IN: service number, ...
-void *
-gws_services ( 
+void *gws_services ( 
     int service,
     unsigned long arg2,
     unsigned long arg3,
     unsigned long arg4 )
 {
+
+    gws_debug_print("gws_services: [TODO]\n");
 
    if (service<0)
        return NULL;
@@ -1743,7 +1698,6 @@ gws_services (
             
             break;
     };
-
 
     return NULL;
 }
@@ -2068,14 +2022,11 @@ struct gws_menu_d *gws_create_menu (
     // Deslocamento em relação a janela mãe.
     menu->x = x;
     menu->y = y;
-
     menu->width  = width;
     menu->height = height;
     
     menu->color=color;
-    
     menu->highlight = highlight;
-    
     menu->itens_count = count;
 
 
@@ -2098,7 +2049,6 @@ struct gws_menu_d *gws_create_menu (
         
     menu->window = window; //bugbug
     menu->parent = parent;
- 
     
     return (struct gws_menu_d *) menu;
 }
@@ -2132,7 +2082,6 @@ struct gws_menu_item_d *gws_create_menu_item (
 
 
     item->id = id;
-
 
     item->width  = (menu->width -8);
     item->height = (menu->height / menu->itens_count);

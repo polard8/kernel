@@ -94,8 +94,7 @@ struct libgws_version_d libgwsVersion;
 
 // System call.
 
-void *
-gws_system_call ( 
+void *gws_system_call ( 
     unsigned long a, 
     unsigned long b, 
     unsigned long c, 
@@ -162,20 +161,25 @@ gws_draw_text (
     char *string );
 
 
-
 int 
 gws_redraw_window(int fd, int window, unsigned long flags);
 
-
 int gws_refresh_window (int fd, int window );
 
-int gws_change_window_position (int fd, int window, unsigned long x, unsigned long y );
+int 
+gws_change_window_position (
+    int fd, 
+    int window, 
+    unsigned long x, 
+    unsigned long y );
+
 int 
 gws_resize_window( 
     int fd, 
     int window, 
     unsigned long w, 
     unsigned long h );
+
 
 // Talvez vamos retonar o descritor
 // dado pelo servidor.
@@ -214,9 +218,7 @@ gws_create_window_using_socket (
     unsigned long color );     //12, Color (bg) (para janela simples).
 
 
-// #bugbug:
-// Nessa biblioteca devem ficar apenas as rotinas
-// Que lidam com o window server.
+
 void gws_reboot (void);
 
 void gws_yield(void);
@@ -229,7 +231,7 @@ void gws_enter_critical_section(void);
 void gws_exit_critical_section(void);
 
 
-//menu
+// menu
 struct gws_menu_d *gws_create_menu (
     int fd,
     int parent,
@@ -253,7 +255,6 @@ struct gws_menu_item_d *gws_create_menu_item (
 // the window server return the next event
 // from the queue of a client.
 struct gws_event_d *gws_next_event(int fd);
-
 
 
 
