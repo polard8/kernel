@@ -160,8 +160,9 @@ createwDrawFrame (
     unsigned long border_color=0;
     unsigned long border_size=0;
     
+
+    gwssrv_debug_print ("createwDrawFrame:\n");
     
-    //struct gws_window_d *__mybutton;
     
     // #todo
     // Desenhar o frame e depois desenhar a barra de títulos

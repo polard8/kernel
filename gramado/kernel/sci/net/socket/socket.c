@@ -964,7 +964,6 @@ fail:
 struct socket_d *get_socket_from_fd (int fd){
 
     struct process_d *p;
-
     file *_file;
     
     
@@ -997,30 +996,32 @@ sock_socketpair (
     int usockvec[2] )
 {
 
-    int fd1, fd2;
+    int fd1 = -1; 
+    int fd2 = -1;
     struct socket_d *sock1;
     struct socket_d *sock2;
 
 
     fd1 = sys_socket(family,type,protocol);
     sock1 = get_socket_from_fd(fd1);
-    if( (void*) sock1 == NULL)
+    if( (void*) sock1 == NULL){
+        debug_print("sock_socketpair: sock1\n");
         return -1;
-
+    }
 
     fd2 = sys_socket(family,type,protocol);
     sock2 = get_socket_from_fd(fd2);    
-    if( (void*) sock2 == NULL)
+    if( (void*) sock2 == NULL){
+        debug_print("sock_socketpair: sock2\n");
         return -1;
+    }
 
-    
     // #todo
     // Antes é preciso verificar a área de memória.
-    
-    usockvec[0] = fd1; 
-    usockvec[1] = fd2;    
-    
-    // ok
+
+    usockvec[0] = fd1;
+    usockvec[1] = fd2;
+
     return 0;
 }
 
@@ -1051,7 +1052,6 @@ int socket_connection_waiting_for_validation (struct socket_d *mysock, struct so
 
 int socket_ioctl ( int fd, unsigned long request, unsigned long arg )
 {
-
     debug_print ("socket_ioctl: TODO\n");
     return -1;
 }
@@ -1073,8 +1073,10 @@ socket_dialog (
 
     printf ("socket_dialog: number=%d \n", number);
 
-    if ( number < 7000 || number >= 8000 )
+    if ( number < 7000 || number >= 8000 ){
+        //message
         return 0;
+    }
 
 
 	// número do serviço.
@@ -1096,14 +1098,13 @@ socket_dialog (
 		//	break;
 
 		//...
-			
+
         default:
             debug_print ("socket_dialog: default\n");
-            printf ("socket_dialog: Default\n");
+            printf      ("socket_dialog: default\n");
             refresh_screen();
             break;
     };
-
 
     // Fail.
     return 0;
@@ -1155,8 +1156,6 @@ sys_connect (
     struct sockaddr_in *addr_in;
 
 
-
-    
     printf ("sys_connect: PID %d | fd %d | \n",
         current_process, sockfd );
     
@@ -1591,7 +1590,7 @@ sys_accept (
 
     struct process_d  *p;
     file              *f;
-    struct socket_d  *s;
+    struct socket_d   *s;
 
     
     // #todo
@@ -1652,7 +1651,7 @@ sys_accept (
     if ( (void *) f == NULL )
     {
         debug_print ("sys_accept: f fail\n");
-        printf ("sys_accept: f fail\n");
+        printf      ("sys_accept: f fail\n");
         refresh_screen();
         return -1;
     }
@@ -1877,12 +1876,12 @@ sys_bind (
     //++
     // AF_GRAMADO
     if (s->addr.sa_family == AF_GRAMADO){
-        printf ("~Binding the name to the socket.\n");
+        printf ("sys_bind: Binding the name to the socket.\n");
 
         // Always 14.
         for (i=0; i<14; i++){ s->addr.sa_data[i] = addr->sa_data[i]; }; 
 
-        printf ("process %d ; family %d ; len %d \n", 
+        printf ("sys_bind: process %d ; family %d ; len %d \n", 
             current_process, addr->sa_family, addrlen  );
 
         debug_print ("sys_bind: bind ok\n");
@@ -1998,7 +1997,7 @@ sys_getsockname (
     if (s->addr.sa_family == AF_GRAMADO)
     {
         // Binding the name to the socket.
-        printf ("~Getting the name and the size\n");
+        printf ("sys_getsockname: Getting the name and the size\n");
         
         addrlen[0] = n;
         
@@ -2018,7 +2017,7 @@ sys_getsockname (
     //if ( ...
     // ...
     
-    printf ("process %d ; family %d ; len %d \n", 
+    printf ("sys_getsockname: process %d ; family %d ; len %d \n", 
         current_process, addr->sa_family, addrlen  );
  
      
@@ -2260,9 +2259,7 @@ unsigned long getSocketIP ( struct socket_d *socket ){
     if ( (void *) socket ==  NULL ){
         return 0;
 
-    }else{
-        return (unsigned long) socket->ip;
-    };
+    }else{ return (unsigned long) socket->ip; };
 }
 
 
@@ -2271,9 +2268,7 @@ unsigned long getSocketPort ( struct socket_d *socket ){
     if ( (void *) socket ==  NULL ){
         return 0;
 
-    }else{
-        return (unsigned long) socket->port;
-    };
+    }else{ return (unsigned long) socket->port; };
 }
 
 
@@ -2289,7 +2284,7 @@ update_socket (
         return (int) 1;
 
     }else{
-        socket->ip = (unsigned long) ip;
+        socket->ip   = (unsigned long)  ip;
         socket->port = (unsigned short) port;
         return 0;
     };
@@ -2338,12 +2333,10 @@ int socket_set_gramado_port (int port, int pid){
 int is_socket (file *f){
 
     // Fail
-    if ( (void *) f == NULL )
-        return (int) (-1);
+    if ( (void *) f == NULL ){ return (int) (-1); }
 
     // Yes
-    if ( f->____object == ObjectTypeSocket )
-        return (int) 1; 
+    if ( f->____object == ObjectTypeSocket ){ return (int) 1; } 
         
     // No
     return 0;
@@ -2353,12 +2346,10 @@ int is_socket (file *f){
 int is_virtual_console (file *f){
 
     // Fail
-    if ( (void *) f == NULL )
-        return (int) (-1);
+    if ( (void *) f == NULL ){ return (int) (-1); }
 
     // Yes
-    if ( f->____object == ObjectTypeVirtualConsole )
-        return (int) 1; 
+    if ( f->____object == ObjectTypeVirtualConsole ){ return (int) 1; } 
    
     // No
     return 0;

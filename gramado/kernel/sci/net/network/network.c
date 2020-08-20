@@ -243,6 +243,8 @@ int sys_network_send(void *ubuf, int size)
     
     void *src_buffer;
     
+    // #bugbug
+    // Do not use this buffer here.
     char xxxbuffer[4096];
     
     //o aplicativo esta colocando no tail
@@ -442,7 +444,8 @@ network_procedure (
 
 
 
-void networkSetstatus (int status){
+void networkSetstatus (int status)
+{
 
     if ( status < 0 || status > 1 )
         return;
@@ -1304,7 +1307,7 @@ void network_send_packet(void *ubuffer, int len)
 	// Pois precisamos implementar algum contador no while para n�o
 	// ficarmos preso nele pra sempre.
 
-    int t;
+    int t=0;
     for (t=0; t< 25000;t++)
     {
          if ( (currentNIC->legacy_tx_descs[old].status & 0xFF) == 1 )
@@ -1621,7 +1624,7 @@ SendARP ( int op,   //operation
 	// Poderia ter um timemout?.
 
 
-    int t;
+    int t=0;
     for (t=0; t< 25000;t++)
     {
          if ( (currentNIC->legacy_tx_descs[old].status & 0xFF) == 1 )
@@ -1709,14 +1712,10 @@ network_driver_dialog (
             break;
 
         //inicializar 
-        case 8001:
-            return 1;
-            break;
+        case 8001: return 1; break;
 
         //finalizar
-        case 8002:
-            return 1;
-            break;
+        case 8002: return 1; break;
 
         //send.
         //enviar um pacote que esta num buffer indicado em long1.
@@ -1727,9 +1726,7 @@ network_driver_dialog (
            
         //#todo
         //enviar o buffer para o gns.   
-        case 9000:
-            return -1;
-            break;
+        case 9000: return -1; break;
 
 
         default:
@@ -1914,9 +1911,8 @@ int network_decode_buffer ( unsigned long buffer_address ){
 int do_ipv4 ( unsigned long buffer )
 {
     debug_print ("do_ipv4: [TODO]\n");
-    printf("IPv4 \n");  
+    printf ("IPv4 \n");  
     refresh_screen();
-
 
     /*
     //#todo
@@ -1985,7 +1981,6 @@ int do_arp ( unsigned long buffer ){
 
     struct ether_header  *eh;
     struct ether_arp     *ah;
-    
     int i=0;
 
 

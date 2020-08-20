@@ -288,13 +288,12 @@ int serviceDrawButton(void)
 
 int serviceRedrawWindow(void)
 {
-
-	//o buffer é uma global nesse documento.
+    //O buffer é uma global nesse documento.
     unsigned long *message_address = (unsigned long *) &__buffer[0];
-
 
     struct gws_window_d *window;
     int window_id = -1;
+
     unsigned long flags = 0;
 
 
@@ -302,11 +301,9 @@ int serviceRedrawWindow(void)
     gwssrv_debug_print ("gwssrv: serviceRedrawWindow\n");
 
 
-    // Get
-    
-    window_id = message_address[0];  //wid
-    //msg
-    flags     = message_address[2];  //flag (show or not)
+    // Get wid and flag.
+    window_id = message_address[0]; 
+    flags     = message_address[2];
  
  
     //
@@ -322,24 +319,30 @@ int serviceRedrawWindow(void)
     //#todo
     // Get the window structure given the id.
     window = (struct gws_window_d *) windowList[window_id];
-   
-    if ( (void *) window == NULL ){
+
+    if ( (void *) window == NULL )
+    {
         gwssrv_debug_print ("gwssrv: serviceRefreshWindow window\n");
         return -1;
-    }
-    
-    if ( window->used != 1 || window->magic != 1234 ){
-        gwssrv_debug_print ("gwssrv: serviceRefreshWindow validation\n");
-        return -1;
-    }
+        
+    }else{
 
-    // redraw!
-    
-    gwssrv_redraw_window (
-        (struct gws_window_d *) window, 
-        (unsigned long) flags );
+        if ( window->used != 1 || window->magic != 1234 )
+        {
+            gwssrv_debug_print ("gwssrv: serviceRefreshWindow validation\n");
+            return -1;
+        }
 
-    return 0;
+        // redraw!
+    
+        gwssrv_redraw_window (
+            (struct gws_window_d *) window, 
+            (unsigned long) flags );
+
+        return 0;
+    };
+    
+    return -1;
 }
 
 
@@ -440,9 +443,8 @@ int serviceRefreshWindow(void)
 //
 
 
-
-
 // Let's redraw the window.
+// Called by serviceRedrawWindow().
 // IN: window pointer, show or not.
 
 int 
@@ -454,10 +456,16 @@ gwssrv_redraw_window (
     unsigned long __tmp_color=0;
 
 
-    if ( (void*) window == NULL ){ 
+    gwssrv_debug_print ("gwssrv_redraw_window:\n");
+        
+    if ( (void *) window == NULL )
+    { 
         gwssrv_debug_print ("gwssrv_redraw_window: window\n");
         return -1; 
     }
+    
+    // #todo:
+    // Validation?
     
 
 	//  ## Shadow ##
@@ -467,9 +475,9 @@ gwssrv_redraw_window (
 	//     A sombra é maior que a própria janela.
 	//     ?? Se estivermos em full screen não tem sombra ??
 
+    gwssrv_debug_print ("gwssrv_redraw_window: Shadow\n");
     if ( window->shadowUsed == 1 )
     {
-
 
 		//CurrentColorScheme->elements[??]
 		
@@ -541,7 +549,7 @@ gwssrv_redraw_window (
     // Um controlador ou um editbox deve ter um posicionamento relativo
     // à sua janela mãe. Já uma overlapped pode ser relativo a janela 
     // gui->main ou relativo à janela mãe.
-
+    gwssrv_debug_print ("gwssrv_redraw_window: Background\n");
     if ( window->backgroundUsed == 1 )
     {
 
@@ -615,11 +623,12 @@ gwssrv_redraw_window (
     //Termina de desenhar o botão, mas não é frame
     //é só o botão...
     //caso o botão tenha algum frame, será alguma borda extra.
-    int Focus;    //(precisa de borda)
-    int Selected;
-    unsigned long border1;
-    unsigned long border2;
+    int Focus=0;    //(precisa de borda)
+    int Selected=0;
+    unsigned long border1=0;
+    unsigned long border2=0;
 
+    gwssrv_debug_print ("gwssrv_redraw_window: Type Button\n");
     if ( (unsigned long) window->type == WT_BUTTON )
     {
 
@@ -671,7 +680,7 @@ gwssrv_redraw_window (
             gwssrv_debug_print ("gwssrv_redraw_window: [WT_BUTTON] Parent NULL\n"); 
         }
 
-
+        gwssrv_debug_print ("gwssrv_redraw_window: Button Border\n"); 
         if ( (void*) window->parent != NULL )
         {
 
@@ -707,6 +716,8 @@ gwssrv_redraw_window (
                  
                  
             // Button label
+            gwssrv_debug_print ("gwssrv_redraw_window: [FIXME] Button label\n"); 
+            /*
             if (Selected == 1){
                 dtextDrawString ( 
                     (window->left) + offset, //(Parent->left   + window->left) + offset,
@@ -721,6 +732,8 @@ gwssrv_redraw_window (
                     (window->top)  +8, //(Parent->top    + window->top)  +8, 
                     COLOR_TERMINALTEXT, window->name );
             };
+            */
+            
         }
 
       //todo
@@ -729,11 +742,17 @@ gwssrv_redraw_window (
       //window->button->?
     }
 
+    //#todo:
+    if ( (unsigned long) window->type == WT_EDITBOX )
+    {
+        gwssrv_debug_print ("gwssrv_redraw_window: [TODO] Type Editbox\n");
+        //...
+    }
+    
+    // more types ?...
 
 
 draw_frame:
-
-
 
     if ( window->type == WT_OVERLAPPED || 
          window->type == WT_EDITBOX || 
@@ -1245,17 +1264,30 @@ gwssrv_change_window_position (
     unsigned long y )
 {
 
+    // #??
+    // Isso deve mudar apenas o deslocamento em relacao
+    // a margem e nao a margem ?
+
     if ( (void *) window == NULL )
+    {
+        gwssrv_debug_print("gwssrv_change_window_position: window\n");
         return -1;
+    }
 
-
+    /*
     if ( window->left != x ||
          window->top  != y )
     {
         window->left = (unsigned long) x;
         window->top  = (unsigned long) y;
     }
-
+    */
+    
+    window->x = x;
+    window->y = y;
+    window->left = (window->parent->left + window->x); 
+    window->top  = (window->parent->top  + window->y); 
+    
     return 0;
 }
 

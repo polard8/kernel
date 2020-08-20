@@ -1004,17 +1004,7 @@ int create_tester_client(int fd)
             printf ("gwm: tester_client->title_window fail\n");
             exit(1);
         }
-    
-        //#bugbug
-        //gws_draw_text (
-        //    (int) fd,                           // fd,
-        //    (int) tester_client->title_window,  // window id,
-        //    (unsigned long) 100,    // left,
-        //    (unsigned long) 8,    // top,
-        //    (unsigned long) COLOR_BLACK,
-        //    "Tester");
 
-    
         //Tester title window
         tester_button = gws_create_window (fd,
              WT_BUTTON,1,1,"X", //#bugbug: pagefault. the size of the string overflows the button size.
@@ -1074,25 +1064,39 @@ int create_tester_client(int fd)
 
     // Testing more things ....
     
-    
+    // Ok. Not bad!
+    // Need to fix the button's labal redraw!
     int i=0;
     for(i=0; i<16; i++){
 
+        // #bugbug
+        // We can't change it in buttons.
+        
         gws_change_window_position(fd,tester_client->window, i*10, i*10);
         gws_change_window_position(fd,tester_client->title_window, i*10, i*10);
+        gws_change_window_position(fd,tester_button, 1, 1);
         
         //gws_resize_window(fd,tester_client->window, i*20, i*20);
         
         gws_redraw_window(fd,tester_client->window,1); 
         gws_redraw_window(fd,tester_client->title_window,1); 
-         
+        gws_redraw_window(fd,tester_button,1); 
+        //...
     };
     
     
-    //full screen
+    // #test
+    // button
+    // Ok, but the label fails.
+    //gws_change_window_position(fd,tester_button, (480-36-2), 2); //1, 1);
+    //gws_redraw_window(fd,tester_button,1); 
+
+
+    // full screen
     // ok
     //fullscreen_client (fd,tester_client);
-    
+
+
     //put in the center.
     //center_client (fd, tester_client);
 
