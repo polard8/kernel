@@ -1005,6 +1005,15 @@ int create_tester_client(int fd)
             exit(1);
         }
     
+        //#bugbug
+        //gws_draw_text (
+        //    (int) fd,                           // fd,
+        //    (int) tester_client->title_window,  // window id,
+        //    (unsigned long) 100,    // left,
+        //    (unsigned long) 8,    // top,
+        //    (unsigned long) COLOR_BLACK,
+        //    "Tester");
+
     
         //Tester title window
         tester_button = gws_create_window (fd,
@@ -1163,8 +1172,11 @@ int main ( int argc, char *argv[] ){
     // Porta para o Window Server 'ws' em gramado_ports[]
     struct sockaddr_in addr_in;
     addr_in.sin_family = AF_INET;
+    
+    // Connecting to the window server in this machine.
     addr_in.sin_port   = PORTS_WS;   
-    addr_in.sin_addr.s_addr = IP(192, 168, 1, 112); 
+    addr_in.sin_addr.s_addr = IP(127,0,0,1); 
+
 
 
 
@@ -1183,7 +1195,8 @@ int main ( int argc, char *argv[] ){
     // cria o soquete.
     // AF_GRAMADO
     //client_fd = socket ( 8000, SOCK_STREAM, 0 );
-    client_fd = socket ( AF_INET, SOCK_STREAM, 0 );
+    //client_fd = socket ( AF_INET, SOCK_STREAM, 0 );
+    client_fd = socket ( AF_INET, SOCK_RAW, 0 );
     
     if ( client_fd < 0 ){
        printf ("gwm: Couldn't create socket\n");

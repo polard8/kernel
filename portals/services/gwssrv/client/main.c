@@ -549,18 +549,16 @@ int main ( int argc, char *argv[] ){
     // Vamos nos concetar com o processo identificado 
     // com o nome 'ws'
     // The port name is 'port:/ws'
-    struct sockaddr addr;
+    struct sockaddr addr; 
     addr.sa_family = 8000; //AF_GRAMADO
     addr.sa_data[0] = 'w';
     addr.sa_data[1] = 's';  
-    
 
 
-    gws_debug_print ("--------------------------\n"); 
-    gws_debug_print ("gws: Initializing ...\n");
-
-    printf ("--------------------------\n"); 
-    printf ("gws: Initializing ...\n");
+    gws_debug_print ("-------------------------\n"); 
+    printf          ("-------------------------\n"); 
+    gws_debug_print ("gws.bin: Initializing ...\n");
+    printf          ("gws.bin: Initializing ...\n");
 
 
     //
@@ -573,23 +571,23 @@ int main ( int argc, char *argv[] ){
     // Create a socket. AF_GRAMADO = 8000
     client_fd = socket ( 8000, SOCK_STREAM, 0 );
     
-    if ( client_fd < 0 ){
-       gws_debug_print ("gws: Couldn't create socket\n");
-       printf ("gws: Couldn't create socket\n");
+    if ( client_fd < 0 )
+    {
+       gws_debug_print ("gws: [FAIL] Couldn't create socket\n");
+       printf          ("gws: [FAIL] Couldn't create socket\n");
        exit(1);  //#bugbug Cuidado.
     }
 
 
+    //
+    // Connect
+    //
+
+    //nessa hora colocamos no accept um fd.
+    //então o servidor escreverá em nosso arquivo.
+
     while(1){
 
-        //
-        // Connect
-        //
-
-        //nessa hora colocamos no accept um fd.
-        //então o servidor escreverá em nosso arquivo.
-    
-        // #debug
         printf ("gws: Trying to connect to the address 'ws' ...\n");      
 
         // Tentando nos conectar ao endereço indicado na estrutura
@@ -601,18 +599,12 @@ int main ( int argc, char *argv[] ){
             //close(client_fd);
             //exit(1);
             //return (int) (-1); 
-            
-            //try again
-        }else{
-            
-            break;
-        };
+
+        }else{ break; };
     };
 
 
-
-
-
+    //#test: Draw char.
     gws_draw_char (
         client_fd, 
         0, //window
@@ -621,55 +613,20 @@ int main ( int argc, char *argv[] ){
         COLOR_RED,  //COLOR
         'x');
 
-
-    
-    //
-    // === Create Window ===
-    //
-  
-    
-    /*
-    gwst_createwindow_request (client_fd, 
-        40, 40, 320, 280, COLOR_GRAY);
-    gwst_createwindow_response(client_fd);     
-    */
-
-    
+    //#test: Create a lil window in the top left corner.
     gws_create_window (client_fd,
         WT_SIMPLE,1,1,"gws-client",
         0, 0, 4, 4,
         0,0,COLOR_RED, COLOR_RED);
-    
-  
- 
- 
+
+
     //
     // === Event loop ===
     //
     
     gwst_loop(client_fd);    
     
-    
-    //
-    //  === Create Window ===
-    //
-
-    /*
-    int i=0;
-    int l=80;
-    int t=80;
-    int c=100;
-    
-    for (i=0; i<16;i++){
-    //request
-    gwst_createwindow_request(client_fd, l, t, 200, 200, COLOR_BLUE+c);
-    l += 10; t += 10; c += 100;
-    
-    //response
-    gwst_createwindow_response(client_fd);
-    }
-    */
-    
+    // exit
     gws_debug_print ("gws: bye :) \n");
     return 0;
 }

@@ -243,7 +243,6 @@ socket_gramado (
     // Esse é o arquivo usado pelos aplicativos.
     // Retornaremos seu fd.
     file *_file;
-    
     struct process_d *Process;
 
     // Procurar slot livres.
@@ -259,7 +258,8 @@ socket_gramado (
     if ( (void*) sock == NULL )
     {
         debug_print ("socket_gramado: [FAIL] sock\n");
-        return -1;
+        goto fail;
+        //return -1;
     }
     
 
@@ -270,15 +270,17 @@ socket_gramado (
 
     if ( (void *) Process == NULL ){
         printf("socket_gramado: [FAIL] Process\n");
-        refresh_screen();
-        return (int) (-1);
+        goto fail;
+        //refresh_screen();
+        //return (int) (-1);
 
     }else{
 
         if ( Process->used != 1 || Process->magic != 1234 ){
             printf("socket_gramado: [FAIL] Process validation\n");
-            refresh_screen();
-            return (int) (-1);
+            goto fail;
+            //refresh_screen();
+            //return (int) (-1);
         }
         //ok
     };
@@ -309,23 +311,27 @@ socket_gramado (
     if ( __slot == -1 )
     {
         printf ("socket_gramado: [FAIL] No free slots\n");
-        refresh_screen();
-        return (int) (-1);
+        goto fail;
+        //refresh_screen();
+        //return (int) (-1);
     }
 
-
-	// buffer
-
-    char *buff = (char *) kmalloc(BUFSIZ);
+    //
+    // == Buffer ========================
+    //
+    
     //char *buff = (char *) newPage ();
+    char *buff = (char *) kmalloc(BUFSIZ);
 
     if ( (void *) buff == NULL )
     {
         Process->Objects[__slot] = (unsigned long) 0;
 
-        printf ("socket_gramado: Buffer allocation fail\n");
-        refresh_screen();
-        return (int) (-1);
+        debug_print ("socket_gramado: [FAIL] Buffer allocation fail\n");
+        printf      ("socket_gramado: [FAIL] Buffer allocation fail\n");
+        goto fail;
+        //refresh_screen();
+        //return (int) (-1);
     }
 
 
@@ -339,20 +345,18 @@ socket_gramado (
     {
         Process->Objects[__slot] = (unsigned long) 0;
         
-        printf ("socket_gramado: _file fail\n");
-        refresh_screen();
-        return (int) (-1);
+        debug_print ("socket_gramado: [FAIL] _file fail\n");
+        printf      ("socket_gramado: [FAIL] _file fail\n");
+        goto fail;
+        //refresh_screen();
+        //return (int) (-1);
 
     }else{
-
         _file->used = 1;
         _file->magic = 1234;
-
         _file->pid = (pid_t) current_process;
         _file->uid = (uid_t) current_user;
         _file->gid = (gid_t) current_group;
-
-
         _file->____object = ObjectTypeSocket;
 
         // No name for now.
@@ -360,14 +364,11 @@ socket_gramado (
         //_file->_tmpfname = "socket";       
         
 
-        // buffer.
-        
-        _file->_base = buff;
-        _file->_p    = buff;
-        
-        //buffer size.
+        // Buffer.
+        _file->_base    = buff;
+        _file->_p       = buff;
         _file->_lbfsize = BUFSIZ;          
-         
+      
         // Quanto falta.
         _file->_cnt = _file->_lbfsize;         
         
@@ -397,13 +398,14 @@ socket_gramado (
         
         debug_print ("socket_gramado: done\n");
 
+        // ok.
         // Retornamos o fd na lista de arquivos abertos pelo processo.
         return (int) __slot;
     };
 
-
 fail:
     debug_print ("socket_gramado: [FAIL]\n");
+    refresh_screen();
     return (int) (-1);      
 }
 
@@ -421,7 +423,6 @@ socket_unix (
 {
 
     file *_file;
-    
     struct process_d *Process;
 
     // Procurar slot livres.
@@ -439,7 +440,8 @@ socket_unix (
     if ( (void*) sock == NULL )
     {
         debug_print ("socket_unix: [FAIL] sock\n");
-        return -1;
+        goto fail;
+        //return -1;
     }
 
 
@@ -450,15 +452,17 @@ socket_unix (
     if ( (void *) Process == NULL )
     {
         printf("socket_unix: Process\n");
-        refresh_screen();
-        return (int)(-1);
+        goto fail;
+        //refresh_screen();
+        //return (int)(-1);
 
     }else{
 
         if ( Process->used != 1 || Process->magic != 1234 ){
             printf("socket_unix: validation\n");
-            refresh_screen();
-            return (int)(-1);
+            goto fail;
+            //refresh_screen();
+            //return (int)(-1);
         }
         //ok
     };
@@ -480,11 +484,7 @@ socket_unix (
     // Reserva um slot.
     for ( i=3; i< NUMBER_OF_FILES; i++ )
     {
-        if ( Process->Objects[i] == 0 )
-        {
-            __slot = i;
-            break;
-        }
+        if ( Process->Objects[i] == 0 ){ __slot = i; break; }
     };
 
 
@@ -492,12 +492,15 @@ socket_unix (
     if ( __slot == -1 )
     {
         printf ("socket_unix: No free slots\n");
-        refresh_screen();
-        return (int) (-1);
+        goto fail;
+        //refresh_screen();
+        //return (int) (-1);
     }
 
 
-	// buffer
+    //
+    // == Buffer ================
+    //
 
     char *buff = (char *) kmalloc(BUFSIZ);
     //char *buff = (char *) newPage ();
@@ -505,9 +508,12 @@ socket_unix (
     if ( (void *) buff == NULL )
     {
         Process->Objects[__slot] = (unsigned long) 0;
-        printf ("socket_unix: Buffer allocation fail\n");
-        refresh_screen();
-        return (int) (-1);
+        
+        debug_print ("socket_unix: [FAIL] Buffer allocation fail\n");
+        printf      ("socket_unix: [FAIL] Buffer allocation fail\n");
+        goto fail;
+        //refresh_screen();
+        //return (int) (-1);
     }
 
 
@@ -522,18 +528,16 @@ socket_unix (
         Process->Objects[__slot] = (unsigned long) 0;
         
         printf ("socket_unix: _file fail\n");
-        refresh_screen();
-        return (int) (-1);
+        goto fail;
+        //refresh_screen();
+        //return (int) (-1);
 
     }else{
-
         _file->used = 1;
         _file->magic = 1234;
-
         _file->pid = (pid_t) current_process;
         _file->uid = (uid_t) current_user;
         _file->gid = (gid_t) current_group;
-
         _file->____object = ObjectTypeSocket;
 
 
@@ -546,16 +550,13 @@ socket_unix (
         //_file->_tmpfname = "/tmp/socketXXX";    
 
 
-        // O buffer.
+        // Buffer.
         _file->_base = buff;
         _file->_p    = buff;
-        
-        // Buffer size.
         _file->_lbfsize = BUFSIZ; 
 
         // Quanto falta.
         _file->_cnt = _file->_lbfsize;
-
 
         _file->_r = 0;
         _file->_w = 0;
@@ -581,11 +582,15 @@ socket_unix (
 
          debug_print ("socket_unix: done\n");
          
+        //ok.
         // Retornamos o fd na lista de arquivos abertos pelo processo.
         return (int) __slot;
     };
 
+
+fail:
     debug_print ("socket_unix: fail\n");
+    refresh_screen();
     return (int) (-1);  
 }
 
@@ -604,7 +609,6 @@ socket_inet (
 {
 
     file *_file;
-    
     struct process_d *Process;
 
     // Procurar slot livres.
@@ -612,11 +616,11 @@ socket_inet (
     int __slot = -1;
 
 
-
     if ( (void*) sock == NULL )
     {
         debug_print ("socket_unix: [FAIL] sock\n");
-        return -1;
+        goto fail;
+        //return -1;
     }
 
 
@@ -627,15 +631,17 @@ socket_inet (
     if ( (void *) Process == NULL )
     {
         printf("socket_inet: Process\n");
-        refresh_screen();
-        return (int) (-1);
+        goto fail;
+        //refresh_screen();
+        //return (int) (-1);
 
     }else{
 
         if ( Process->used != 1 || Process->magic != 1234 ){
             printf("socket_inet: validation\n");
-            refresh_screen();
-            return (int) (-1);
+            goto fail;
+            //refresh_screen();
+            //return (int) (-1);
         }
         //ok
     };
@@ -665,23 +671,28 @@ socket_inet (
     if ( __slot == -1 )
     {
         printf ("socket_inet: No free slots\n");
-        refresh_screen();
-        return (int) (-1);
+        goto fail;
+        //refresh_screen();
+        //return (int) (-1);
     }
 
 
-	// buffer
-
+    //
+    // == Buffer ==========================
+    //
+    
     char *buff = (char *) kmalloc(BUFSIZ);
     //char *buff = (char *) newPage ();
 
     if ( (void *) buff == NULL )
     {
         Process->Objects[__slot] = (unsigned long) 0;
-        
-        printf ("socket_inet: Buffer allocation fail\n");
-        refresh_screen();
-        return (int) (-1);
+
+        debug_print ("socket_inet: [FAIL] Buffer allocation fail\n");
+        printf      ("socket_inet: [FAIL] Buffer allocation fail\n");
+        goto fail;
+        //refresh_screen();
+        //return (int) (-1);
     }
 
 	//
@@ -695,18 +706,16 @@ socket_inet (
         Process->Objects[__slot] = (unsigned long) 0;
         
         printf ("socket_inet: _file fail\n");
-        refresh_screen();
-        return (int) (-1);
+        goto fail;
+        //refresh_screen();
+        //return (int) (-1);
 
     }else{
-
         _file->used = 1;
         _file->magic = 1234;
-
         _file->pid = (pid_t) current_process;
         _file->uid = (uid_t) current_user;
         _file->gid = (gid_t) current_group;
-
         _file->____object = ObjectTypeSocket;
 
 
@@ -714,12 +723,9 @@ socket_inet (
         _file->_tmpfname = NULL;
         //_file->_tmpfname = "socket";       
 
-
-        // buffer.
-        _file->_base = buff;
-        _file->_p    = buff;
-        
-        // The buffer size.
+        // Buffer.
+        _file->_base    = buff;
+        _file->_p       = buff;
         _file->_lbfsize = BUFSIZ; 
         
         // Quanto falta.
@@ -748,11 +754,15 @@ socket_inet (
         
         debug_print ("socket_inet: done\n");
 
+        // ok
         // Retornamos o fd na lista de arquivos abertos pelo processo.
         return (int) __slot;
     };
 
-    debug_print ("socket_inet: fail\n");
+
+fail:
+    debug_print ("socket_inet: [FAIL]\n");
+    refresh_screen();
     return (int) (-1);
 }
 
@@ -767,6 +777,11 @@ socket_inet (
  
 //libc socket interface.
 //See: https://www.gnu.org/software/libc/manual/html_node/Sockets.html
+
+// #example:
+// tcp_socket = socket(AF_INET, SOCK_STREAM, 0);
+// udp_socket = socket(AF_INET, SOCK_DGRAM, 0);
+// raw_socket = socket(AF_INET, SOCK_RAW, protocol);
 
 // #todo
 // Fazer um switch para tratar os vários tipos.
@@ -795,8 +810,8 @@ int sys_socket ( int family, int type, int protocol ){
     // Usado em AF_INET
     struct sockaddr_in addr_in;
     addr_in.sin_family      = AF_INET;
-    addr_in.sin_port        = 11369;
-    addr_in.sin_addr.s_addr = SYS_SOCKET_IP(192, 168, 1, 112);
+    addr_in.sin_port        = 11369;  //??
+    addr_in.sin_addr.s_addr = SYS_SOCKET_IP(127,0,0,1);
     //addr_in.sin_addr      = SYS_SOCKET_IP(192, 168, 1, 112); //errado
     //addr_in->sin_addr.s_addr = inet_addr("127.0.0.1");  //todo: inet_addr see netbsd
 
@@ -821,18 +836,21 @@ int sys_socket ( int family, int type, int protocol ){
 	//
 
     if (family < 0){
-        debug_print ("sys_socket: family not supported\n");
-        return -1;
+        debug_print ("sys_socket: [FAIL] family not supported\n");
+        goto fail;
+        //return -1;
     }
 
     if (type < 0){
-        debug_print ("sys_socket: type not supported\n");
-        return -1;
+        debug_print ("sys_socket: [FAIL] type not supported\n");
+        goto fail;
+        //return -1;
     }
 
     if (protocol < 0){
-        debug_print ("sys_socket: protocol not supported\n");
-        return -1;
+        debug_print ("sys_socket: [FAIL] protocol not supported\n");
+        goto fail;
+        //return -1;
     }
 
 
@@ -840,11 +858,13 @@ int sys_socket ( int family, int type, int protocol ){
     
     p = (struct process_d *) processList[current_process];
      
-    if ( (void *) p == NULL ){
+    if ( (void *) p == NULL )
+    {
         debug_print ("sys_socket: p fail\n");
-        printf ("sys_socket: p fail\n");
-        refresh_screen();
-        return -1;
+        printf      ("sys_socket: p fail\n");
+        goto fail;
+        //refresh_screen();
+        //return -1;
     }
 
 
@@ -860,8 +880,9 @@ int sys_socket ( int family, int type, int protocol ){
     if ( (void *) __socket == NULL ){
         debug_print ("sys_socket: [FAIL] __socket fail\n");
         printf      ("sys_socket: [FAIL] __socket fail\n");
-        refresh_screen();
-        return -1;
+        goto fail;
+        //refresh_screen();
+        //return -1;
 
     }else{
 
@@ -921,7 +942,8 @@ int sys_socket ( int family, int type, int protocol ){
            default:
                debug_print ("sys_socket: [FAIL] default family\n");
                debug_print ("sys_socket: Couldn't create the file\n");
-               return (int) (-1);
+               goto fail;
+               //return (int) (-1);
                break;
         };
 
@@ -930,8 +952,9 @@ int sys_socket ( int family, int type, int protocol ){
 
     //fail.
     
-//fail:
+fail:
     debug_print ("sys_socket: [FAIL] Something is wrong!\n");
+    refresh_screen();
     return (int) (-1);
 }
 
@@ -1542,6 +1565,10 @@ int sys_accept_sender (int n){
  * sys_accept:
  * 
  */
+
+// The accept() system call causes the process to block 
+// until a client connects to the server. 
+//  It returns a new file descriptor.
 
 // #todo:
 // Aceitar uma conecção.

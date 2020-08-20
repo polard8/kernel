@@ -797,9 +797,15 @@ int main ( int argc, char *argv[] ){
     // Porta para o Window Server 'ws' em gramado_ports[]
     struct sockaddr_in addr_in;
     addr_in.sin_family = AF_INET;
+    
+    // Connecting to the window server in this machine.
     addr_in.sin_port   = PORTS_WS;   
-    addr_in.sin_addr.s_addr = IP(192, 168, 1, 112); 
+    addr_in.sin_addr.s_addr = IP(127,0,0,1); 
 
+    //#todo
+    //addr_in.sin_addr.s_addr = inet_addr("127.0.0.1");
+    
+    
 
     debug_print ("---------------------------\n");    
     debug_print ("launch1: Initializing ...\n");
@@ -809,12 +815,13 @@ int main ( int argc, char *argv[] ){
     // 
 
     // #debug
-    printf ("launch1: Creating socket\n");
+    printf ("launch1: Creating raw socket\n");
 
     // cria o soquete.
     // AF_GRAMADO
     //client_fd = socket ( 8000, SOCK_STREAM, 0 );
-    client_fd = socket ( AF_INET, SOCK_STREAM, 0 );
+    //client_fd = socket ( AF_INET, SOCK_STREAM, 0 );
+    client_fd = socket ( AF_INET, SOCK_RAW, 0 );
     
     if ( client_fd < 0 ){
        printf ("launch1: Couldn't create socket\n");

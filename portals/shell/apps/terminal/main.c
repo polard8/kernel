@@ -2131,8 +2131,10 @@ int main ( int argc, char *argv[] ){
     //porta para o Window Server 'ws' em gramado_ports[]
     struct sockaddr_in addr_in;
     addr_in.sin_family = AF_INET;
+    
+    // Connecting to the window server in this machine.
     addr_in.sin_port   = PORTS_WS;   
-    addr_in.sin_addr.s_addr = IP(192, 168, 1, 112); 
+    addr_in.sin_addr.s_addr = IP(127,0,0,1); 
 
 
     debug_print ("---------------------------\n");    

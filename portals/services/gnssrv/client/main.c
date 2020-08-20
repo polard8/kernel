@@ -251,7 +251,7 @@ new_message:
     //
 
     // #debug
-    debug_print ("gnst: Writing ...\n");      
+    debug_print ("gns.bin: Writing ...\n");      
 
     // Enviamos um request para o servidor.
     // ?? Precisamos mesmo de um loop para isso. ??
@@ -297,12 +297,13 @@ int main ( int argc, char *argv[] ){
 
     struct sockaddr_in addr_in;
     addr_in.sin_family = AF_INET;
-    addr_in.sin_port   = PORTS_NS;   //porta para o Network Server 'ns' em gramado_ports[]
-    addr_in.sin_addr.s_addr = IP(192, 168, 1, 79); 
     
+    // Connecting to the network server in this machine.
+    addr_in.sin_port   = PORTS_NS; 
+    addr_in.sin_addr.s_addr = IP(127,0,0,1); 
 
     debug_print ("---------------------------\n");    
-    debug_print ("gnst.bin: Initializing ...\n");
+    debug_print ("gns.bin: Initializing ...\n");
 
 
     //
@@ -310,15 +311,16 @@ int main ( int argc, char *argv[] ){
     // 
 
     // #debug
-    printf ("gnst: Creating socket\n");
+    printf ("gns.bin: Creating socket\n");
 
 
     // cria o soquete.
     client_fd = socket ( AF_INET, SOCK_STREAM, 0 );
 
-    if ( client_fd < 0 ){
+    if ( client_fd < 0 )
+    {
        //gws_debug_print ("gnst: Couldn't create socket\n");
-       printf ("gnst: Couldn't create socket\n");
+       printf ("gns.bin: [FAIL] Couldn't create socket\n");
        exit(1);
     }
 
@@ -333,11 +335,11 @@ int main ( int argc, char *argv[] ){
         //então o servidor escreverá em nosso arquivo.
         // #debug
         //gws_debug_print ("gnst: Connecting to ns via inet  ...\n");      
-        printf ("gnst: Connecting to ns via inet  ...\n");      
+        printf ("gns.bin: Connecting to ns via inet  ...\n");      
         if (connect (client_fd, (void *) &addr_in, sizeof(addr_in)) < 0)
         { 
             //gws_debug_print ("gnst: Connection Failed\n");
-            printf("gnst: Connection Failed \n"); 
+            printf("gns.bin: Connection Failed \n"); 
             //close(client_fd);
             //exit(1);
             //return (int) (-1); 
@@ -352,19 +354,15 @@ int main ( int argc, char *argv[] ){
     // Loop.
     //
 
+    // Hello.
     while(1){
-
-        // Hello.
         gnst_hello(client_fd);
-    }
+    };
 
-
-    debug_print ("gnst: bye\n"); 
-    printf ("gnst: bye\n");
-
+    debug_print ("gns.bin: bye\n"); 
+    printf      ("gns.bin: bye\n");
     return 0;
 }
-
 
 
 

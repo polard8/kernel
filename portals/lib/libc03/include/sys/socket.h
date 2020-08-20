@@ -182,30 +182,45 @@
        SOCK_PACKET     Obsolete and should not be used in new programs;
 */
 
-#define SOCK_STREAM     1    /* stream (connection) socket	*/
-#define SOCK_DGRAM      2    /* datagram (conn.less) socket	*/
-#define SOCK_RAW        3    /* raw socket			        */
-#define SOCK_RDM        4    /* reliably-delivered message	*/
-#define SOCK_SEQPACKET  5    /* sequential packet socket	*/
-#define SOCK_PACKET    10    /* linux specified 		    */
-
-//#test
-#define SOCK_GRAMADO_MSG    8000    /* window, msg, long1, long2 */
+#define SOCK_STREAM       1     /* stream (connection) socket	*/
+#define SOCK_DGRAM        2     /* datagram (conn.less) socket	*/
+#define SOCK_RAW          3     /* raw socket			        */
+#define SOCK_RDM          4     /* reliably-delivered message	*/
+#define SOCK_SEQPACKET    5     /* sequential packet socket	*/
+#define SOCK_PACKET       10    /* linux specified 		    */
+#define SOCK_GRAMADO_MSG  8000  /* window, msg, long1, long2 */
 
 
 
 #define  _NETINET_IN_H_
-#define  IPPROTO_IP       0     // Dummy for IP.
-#define  IPPROTO_ICMP     1     // Control message protocol.
-#define  IPPROTO_IGMP     2     // Group management protocol.
-#define  IPPROTO_TCP      6     // Transmission control protocol.
-#define  IPPROTO_UDP      17    // User datagram protocol.
-#define  IPPROTO_RAW      255   // Raw IP packet.
-#define  IPPROTO_MAX      256   // Maximum protocol identifier.
-#define  IPPORT_RESERVED  1024  // Last reserved port number.
-#define  IPPORT_USERRESERVED   5000  // User reserved port number.
-#define  INADDR_ANY        (unsigned long)0x00000000  // Any IP address.
-#define  INADDR_BROADCAST  (unsigned long)0xffffffff  // Broadcast IP address.
+#define  IPPROTO_IP           0     // Dummy for IP.
+#define  IPPROTO_ICMP         1     // Control message protocol.
+#define  IPPROTO_IGMP         2     // Group management protocol.
+#define  IPPROTO_TCP          6     // Transmission control protocol.
+#define  IPPROTO_UDP          17    // User datagram protocol.
+#define  IPPROTO_RAW          255   // Raw IP packet.
+#define  IPPROTO_MAX          256   // Maximum protocol identifier.
+#define  IPPORT_RESERVED      1024  // Last reserved port number.
+#define  IPPORT_USERRESERVED  5000  // User reserved port number.
+
+
+
+// See:
+// https://man7.org/linux/man-pages/man7/ip.7.html
+
+// Any IP address.
+#define  INADDR_ANY        (unsigned long) 0x00000000  
+
+// Broadcast IP address.
+#define  INADDR_BROADCAST  (unsigned long) 0xffffffff  
+
+
+
+/*
+//Address to loopback in software to local host.  
+#define	INADDR_LOOPBACK		0x7f000001	 127.0.0.1  
+#define	IN_LOOPBACK(a)		((((long int) (a)) & 0xff000000) == 0x7f000000)
+*/
 
 
 typedef unsigned socklen_t;
@@ -288,6 +303,11 @@ struct msghdr {
 // comments credits: freebsd.org	 
 // See: http://man7.org/linux/man-pages/man2/socket.2.html
 //POSIX.1-2001, POSIX.1-2008, 4.4BSD.
+
+// #example:
+// tcp_socket = socket(AF_INET, SOCK_STREAM, 0);
+// udp_socket = socket(AF_INET, SOCK_DGRAM, 0);
+// raw_socket = socket(AF_INET, SOCK_RAW, protocol);
 
 //int socket ( int family, int type, int protocol );
 int socket ( int domain, int type, int protocol );
@@ -374,6 +394,21 @@ getpeername (
 
 
 int getsockname (int sockfd, struct sockaddr *addr, socklen_t *addrlen);
+
+
+
+
+/*
+struct hostent *gethostbyaddr(
+    const void *addr,
+    socklen_t len, int type);
+struct hostent *gethostbyaddr(
+    const void *addr,
+    socklen_t len, int type)
+{
+    return (struct hostent *) 0;
+}
+*/
 
 
 /*

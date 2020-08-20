@@ -175,6 +175,22 @@ struct protoent {
 #endif /* (_POSIX_C_SOURCE - 0) >= 200112L || ... */
 
 
+
+
+/*
+//#todo
+struct hostent *gethostbyname(const char *name);
+struct hostent *gethostbyname(const char *name)
+{
+    debug_print("gethostbyname: todo\n");
+    return (struct hostent *) 0;
+}
+*/
+
+
+
+
+
 #endif /* !_NETDB_H_ */
 
 

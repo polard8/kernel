@@ -55,7 +55,7 @@ int socket ( int domain, int type, int protocol ){
                      (unsigned long) protocol );
 
     if(__fd<0)
-        printf ("socket: Couldn't create the socket!\n");
+        printf ("socket: [FAIL] Couldn't create the socket!\n");
         
     return (int) __fd;
 }
