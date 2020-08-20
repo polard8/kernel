@@ -5,7 +5,8 @@
  *     Define tipos de variáveis.
  *     Tipos usados na biblioteca C99 32bit em user mode.
  *
- * Versão 1.0, 2015~2016.
+ * History:
+ *     2015 - Created by Fred Nora.
  */
 
  
@@ -48,21 +49,29 @@ typedef unsigned int      uint32_t;
 
 // bsd stuff
 /* 7.18.1.1 Exact-width integer types */
-typedef	signed char		__int8_t;
-typedef	unsigned char		__uint8_t;
-typedef	short			__int16_t;
-typedef	unsigned short		__uint16_t;
-typedef	int			__int32_t;
-typedef	unsigned int		__uint32_t;
+typedef	signed char     __int8_t;
+typedef	unsigned char   __uint8_t;
+typedef	short           __int16_t;
+typedef	unsigned short  __uint16_t;
+typedef	int             __int32_t;
+typedef	unsigned int    __uint32_t;
 //typedef	long long		__int64_t;
 //typedef	unsigned long long	__uint64_t;
 
 
+
 /* BSD-style unsigned bits types */
-typedef	__uint8_t	u_int8_t;
-typedef	__uint16_t	u_int16_t;
-typedef	__uint32_t	u_int32_t;
+typedef __uint8_t   u_int8_t;
+typedef __uint16_t  u_int16_t;
+typedef __uint32_t  u_int32_t;
 //typedef	__uint64_t	u_int64_t;
+
+
+
+#define __packed        __attribute__((packed))
+#define __aligned(x)    __attribute__((aligned(x)))
+#define __optional      __attribute__((weak))
+
 
 
 //

@@ -20,11 +20,11 @@
 
 struct ether_arp {
 
-    uint16_t type;   // Hardware type (HTYPE)
-    uint16_t proto;  // Protocol type (PTYPE)
-    uint8_t hlen;    // Hardware address length 
-    uint8_t plen;    // Protocol address length 
-    uint16_t op;     // Operation (OPER)
+    uint16_t  type;   // Hardware type (HTYPE)
+    uint16_t  proto;  // Protocol type (PTYPE)
+    uint8_t   hlen;   // Hardware address length 
+    uint8_t   plen;   // Protocol address length 
+    uint16_t  op;     // Operation (OPER)
 
     // src
     uint8_t arp_sha[6];  // sender hardware address mac 

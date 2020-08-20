@@ -59,8 +59,8 @@ struct if_rxrinfo {
 #define  IF_NAMESIZE    16
 
 
-struct if_nameindex {
-
+struct if_nameindex 
+{
     unsigned int  if_index;
     char         *if_name;
 };
@@ -68,20 +68,23 @@ struct if_nameindex {
 
 
 /*
- * Structure defining statistics and other data kept regarding a network
- * interface.
+ * Structure defining statistics and 
+ * other data kept regarding a network interface.
  */
-struct	if_data {
+
+struct if_data 
+{
 
 	/* generic interface information */
-	u_char		ifi_type;		/* ethernet, tokenring, etc. */
-	u_char		ifi_addrlen;		/* media address length */
-	u_char		ifi_hdrlen;		/* media header length */
-	u_char		ifi_link_state;		/* current link state */
+	u_char  ifi_type;		/* ethernet, tokenring, etc. */
+	u_char  ifi_addrlen;		/* media address length */
+	u_char  ifi_hdrlen;		/* media header length */
+	u_char  ifi_link_state;		/* current link state */
 	//u_int32_t	ifi_mtu;		/* maximum transmission unit */
 	//u_int32_t	ifi_metric;		/* routing metric (external only) */
 	//u_int32_t	ifi_rdomain;		/* routing instance */
-	
+
+
 	//
 	// #bugbug #todo   64bit ??
 	//
@@ -134,11 +137,13 @@ struct	if_data {
 /*
  * Status bit descriptions for the various interface types.
  */
-struct if_status_description {
-	u_char	ifs_type;
-	u_char	ifs_state;
+struct if_status_description 
+{
+	u_char      ifs_type;
+	u_char      ifs_state;
 	const char *ifs_string;
 };
+
 
 #define LINK_STATE_DESC_MATCH(_ifs, _t, _s)				\
 	(((_ifs)->ifs_type == (_t) || (_ifs)->ifs_type == 0) &&		\

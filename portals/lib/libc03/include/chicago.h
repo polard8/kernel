@@ -1,6 +1,5 @@
 // chicago.h
-// Definições usadas no sistema operacional Chicago by Italo M.
-// #todo
+// Chicago OS: Italo M.
 
 
 #ifndef __CHICAGO_H__

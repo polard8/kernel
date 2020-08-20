@@ -434,6 +434,102 @@ gnsProcedure (
 }
 
 
+//char *
+//eth_broadcast_addr = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
+//char *
+//eth_null_addr = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
+/*
+void gnssrv_print_mac (char *string);
+void gnssrv_print_mac (char *string)
+{
+    char *ptr = (char *) string;
+    printf("MAC { %x:%x:%x:%x:%x:%x } \n", 
+        ptr[0], 
+        ptr[1], 
+        ptr[2], 
+        ptr[3], 
+        ptr[4],
+        ptr[5] );
+}
+*/
+
+
+/*
+int gnssrv_maccmp(char *a, char *b);
+int gnssrv_maccmp(char *a, char *b)
+{
+    char *__a = a;
+    char *__b = b;
+    int i=0;
+
+    for ( i=0; i<6; i++ )
+    {
+        if (__a[i] != __b[i]){ return (int) 1; }
+    };
+
+    return 0;
+}
+*/
+
+/*
+void
+gnssrv_print_ip_addr(uint32_t ip);
+void
+gnssrv_print_ip_addr(uint32_t ip)
+{
+    char *__ip = (char *) &ip;
+    print ("%d.%d.%d.%d \n", 
+        (uint8_t) __ip[0], 
+        (uint8_t) __ip[1], 
+        (uint8_t) __ip[2], 
+        (uint8_t) __ip[3]);
+}
+*/
+
+/*
+void
+gnssrv_print_le_ip_addr(uint32_t ip);
+void
+gnssrv_print_le_ip_addr(uint32_t ip)
+{
+    char *__ip = (char *) &ip;
+    print ("%d.%d.%d.%d \n", 
+        (uint8_t) __ip[3], 
+        (uint8_t) __ip[2], 
+        (uint8_t) __ip[1], 
+        (uint8_t) __ip[0]);
+}
+*/
+
+
+/*
+uint16_t
+ip_calculate_checksum(void *ip);
+uint16_t
+ip_calculate_checksum(void *ip)
+{
+    uint16_t *buffer = (uint16_t *) ip;
+    uint32_t sum = 0;
+    int i;
+    int len = 20; //FIXME: get it from ip_ihl 
+
+    for (i = 0; i < len / sizeof(uint16_t); i ++)
+        sum += (buffer[i]);
+
+    while (sum > 0xffff) {
+        uint16_t val = (sum & 0xffff0000) >> 16;
+        sum &= 0x0000ffff;
+        sum += val;
+    }
+
+    sum = ~sum;
+
+    return (sum);
+}
+*/
+
+
 
 /*
  ******************************

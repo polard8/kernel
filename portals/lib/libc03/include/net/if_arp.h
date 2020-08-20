@@ -35,6 +35,8 @@
 #ifndef _NET_IF_ARP_H_
 #define _NET_IF_ARP_H_
 
+
+
 /*
  * Address Resolution Protocol.
  *
@@ -46,9 +48,11 @@
  * specified.  Field names used correspond to RFC 826.
  */
 
-struct arphdr {
-    
-    uint16_t ar_hrd;	/* format of hardware address */
+struct arphdr 
+{
+    /* format of hardware address */
+    // // Hardware type (HTYPE)
+    uint16_t ar_hrd;
 
 #define ARPHRD_ETHER 	1	/* ethernet hardware format */
 #define ARPHRD_IEEE802 	6	/* IEEE 802 hardware format */
@@ -57,21 +61,34 @@ struct arphdr {
 #define ARPHRD_STRIP 	23	/* Ricochet Starmode Radio hardware format */
 #define	ARPHRD_IEEE1394	24	/* IEEE 1394 (FireWire) hardware format */
 
-    uint16_t ar_pro;	/* format of protocol address */
-    uint8_t  ar_hln;	/* length of hardware address */
-    uint8_t  ar_pln;	/* length of protocol address */
-    uint16_t ar_op;		/* one of: */
+    /* format of protocol address */
+    // Protocol type (PTYPE)
+    uint16_t ar_pro;	
+    
+    /* length of hardware address */
+    // Hardware address length 
+    uint8_t  ar_hln;
+    
+    /* length of protocol address */
+    // Protocol address length
+    uint8_t  ar_pln;
+    
+    /* one of: */
+    // Operation (OPER)
+    uint16_t ar_op;		
 
-#define	ARPOP_REQUEST	1	/* request to resolve address */
-#define	ARPOP_REPLY	2	/* response to previous request */
-#define	ARPOP_REVREQUEST 3	/* request protocol address given hardware */
-#define	ARPOP_REVREPLY	4	/* response giving protocol address */
-#define	ARPOP_INVREQUEST 8 	/* request to identify peer */
-#define	ARPOP_INVREPLY	9	/* response identifying peer */
-/*
- * The remaining fields are variable in size,
- * according to the sizes above.
- */
+
+#define	ARPOP_REQUEST     1  /* request to resolve address */
+#define	ARPOP_REPLY       2  /* response to previous request */
+#define	ARPOP_REVREQUEST  3  /* request protocol address given hardware */
+#define	ARPOP_REVREPLY    4  /* response giving protocol address */
+#define	ARPOP_INVREQUEST  8  /* request to identify peer */
+#define	ARPOP_INVREPLY    9  /* response identifying peer */
+
+
+// The remaining fields are variable in size,
+// according to the sizes above.
+
 #ifdef COMMENT_ONLY
 	uint8_t  ar_sha[];	/* sender hardware address */
 	uint8_t  ar_spa[];	/* sender protocol address */
