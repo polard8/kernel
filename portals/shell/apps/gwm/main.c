@@ -116,7 +116,16 @@ int gwm_init_globals(void);
 int gwm_init_windows(void);
 int create_main_menu( int fd );
 
+//
+// Clients
+//
 
+int create_bg_client(int fd);
+int create_topbar_client(int fd);
+int create_taskbar_client(int fd);
+int create_tester_client(int fd);
+
+int update(int fd);
 
 
 
@@ -410,12 +419,12 @@ response_loop:
             switch (long1)
             {
                 case VK_F1:
-                    printf ("gwm: VK_F1\n");
+                    //printf ("gwm: VK_F1\n");
                     create_main_menu(fd);
                     break;
 
                 case VK_F2:
-                    printf ("gwm: VK_F2\n");
+                    //printf ("gwm: VK_F2\n");
                     create_tester_client(fd);
                     break;
 
@@ -423,15 +432,31 @@ response_loop:
                 // of system's components.
                 // IN: 1 = full initialization os ps2.
                 case VK_F3:
-                    printf ("gwm: VK_F3\n");
+                    //printf ("gwm: VK_F3\n");
                     gramado_system_call ( 350, 1, 0, 0 );
                     break;
                     
                 case VK_F4:
-                    printf ("gwm: VK_F4 reboot\n");
+                    //printf ("gwm: VK_F4 reboot\n");
                     gws_reboot();
                     break;
                     
+                case VK_F9:
+                    //printf ("gwm: VK_F9 update\n");
+                    update(fd);
+                    break;
+
+                case VK_F10:
+                    gws_clone_and_execute("editor.bin");
+                    break;
+
+                case VK_F11:
+                    gws_clone_and_execute("launch1.bin");
+                    break;
+
+                case VK_F12:
+                    gws_clone_and_execute("terminal.bin");
+                    break;
                     
                 default:
                     goto process_event;
@@ -839,6 +864,50 @@ int draw_frame ( int fd, struct wm_client_d * client, int type )
 */
 
 
+
+int create_bg_client(int fd)
+{
+    unsigned long w = gws_get_system_metrics(1);
+    unsigned long h = gws_get_system_metrics(2);
+    
+    
+    //if (fd<0)
+        //return -1;
+
+
+    //
+    // == bg (Client) ==================================
+    // 
+    
+    // Topbar
+    gws_debug_print ("gwm: Create c_topbar client\n");
+    c_bg = (struct wm_client_d *) malloc ( sizeof(struct wm_client_d) );
+    if( (void *) c_bg == NULL){
+        printf ("gwm: c_bg fail\n");
+        exit(1);
+    
+    }else{
+
+        //c_bg
+        c_bg->window = gws_create_window (fd,
+            WT_SIMPLE,1,1,"BG",
+            0, 0, w, h,
+            0,0,COLOR_WHITE, COLOR_WHITE);
+        
+        if( (void *) c_bg->window < 0){
+            printf ("gwm: c_bg->window fail\n");
+            exit(1);
+        }
+        //printf ("w={%x}\n",c_bg->window);
+        gws_refresh_window(fd,c_bg->window);
+
+        wmclientList[0] = (unsigned long) c_bg;
+    };
+    
+    return 0;
+}
+
+
 //interna
 int create_topbar_client(int fd)
 {
@@ -878,14 +947,14 @@ int create_topbar_client(int fd)
         printf ("w={%x}\n",c_topbar->window);
         gws_refresh_window(fd,c_topbar->window);
 
-         // button1 (system menu)
-         button1_window = gws_create_window (fd,
-                              WT_BUTTON,1,1,"=",
-                              2, 2, 32, 28,
-                              c_topbar->window, 0,COLOR_GRAY, COLOR_GRAY);
+        // button1 (system menu)
+        button1_window = gws_create_window (fd,
+                             WT_BUTTON,1,1,"=",
+                             2, 2, 32, 28,
+                             c_topbar->window, 0,COLOR_GRAY, COLOR_GRAY);
         
         c_topbar->title_window = -1;  //todo;
-        wmclientList[0] = (unsigned long) c_topbar;
+        wmclientList[1] = (unsigned long) c_topbar;
     };
     
     return 0;
@@ -945,7 +1014,7 @@ int create_taskbar_client(int fd)
                               2 + 120 + 2, 2, 120, 28,
                               c_taskbar->window, 0,COLOR_GRAY, COLOR_GRAY);
 
-         wmclientList[1] = (unsigned long) c_taskbar;
+         wmclientList[2] = (unsigned long) c_taskbar;
     };
 
     return 0;
@@ -969,39 +1038,39 @@ int create_tester_client(int fd)
 
     
     //gws_enter_critical_section();
-    gws_debug_print ("gwm: Create tester_client client\n");
+    gws_debug_print ("gwm: Create c_tester client\n");
     //struct wm_client_d *tester_client;
-    tester_client = (struct wm_client_d *) malloc( sizeof(struct wm_client_d ) );
+    c_tester = (struct wm_client_d *) malloc( sizeof(struct wm_client_d ) );
 
-    if( (void *) tester_client == NULL){
-         printf ("gwm: tester_client fail\n");
+    if( (void *) c_tester == NULL){
+         printf ("gwm: c_tester fail\n");
          exit(1);
     }
 
-    if ( (void *) tester_client != NULL )
+    if ( (void *) c_tester != NULL )
     {
-        tester_client->used = 1;
-        tester_client->magic = 1234;
+        c_tester->used = 1;
+        c_tester->magic = 1234;
         
-        tester_client->window = gws_create_window (fd,
+        c_tester->window = gws_create_window (fd,
                                     WT_SIMPLE,1,1,"Tester",
                                     100, 100, 480, 320,
                                     0,0, 0xF5DEB3, 0xF5DEB3);
         
-        if( (void *) tester_client->window < 0){
-            printf ("gwm: tester_client->window fail\n");
+        if( (void *) c_tester->window < 0){
+            printf ("gwm: c_tester->window fail\n");
             exit(1);
         }
-        printf ("w={%x}\n",tester_client->window);
-        gws_refresh_window(fd,tester_client->window);
+        printf ("w={%x}\n",c_tester->window);
+        gws_refresh_window(fd,c_tester->window);
         
-        tester_client->title_window = gws_create_window (fd,
+        c_tester->title_window = gws_create_window (fd,
                                           WT_SIMPLE,1,1,"Tester Title",
                                           100, 100-32, 480, 32,
                                           0,0, 0x2d89ef, 0x2d89ef);
 
-        if( (void *) tester_client->title_window < 0 ){
-            printf ("gwm: tester_client->title_window fail\n");
+        if( (void *) c_tester->title_window < 0 ){
+            printf ("gwm: c_tester->title_window fail\n");
             exit(1);
         }
 
@@ -1009,14 +1078,14 @@ int create_tester_client(int fd)
         tester_button = gws_create_window (fd,
              WT_BUTTON,1,1,"X", //#bugbug: pagefault. the size of the string overflows the button size.
              (480-36-2), 2, 36, 28, //2, 2, 80, 28,
-             tester_client->title_window, 0, COLOR_RED, COLOR_RED);
+             c_tester->title_window, 0, COLOR_RED, COLOR_RED);
              
              
              
         //#testing (NEW)
         menu = gws_create_menu (
                 (int) fd,
-                (int) tester_client->window,
+                (int) c_tester->window,
                 (int) 0, //highlight
                 (int) 4,   //count
                 (unsigned long) 1, //x
@@ -1057,13 +1126,14 @@ int create_tester_client(int fd)
 
            }
              
-        wmclientList[2] = (unsigned long) tester_client;
+        wmclientList[3] = (unsigned long) c_tester;
     } 
     //gws_exit_critical_section();
 
 
     // Testing more things ....
     
+    /*
     // Ok. Not bad!
     // Need to fix the button's labal redraw!
     int i=0;
@@ -1072,18 +1142,18 @@ int create_tester_client(int fd)
         // #bugbug
         // We can't change it in buttons.
         
-        gws_change_window_position(fd,tester_client->window, i*10, i*10);
-        gws_change_window_position(fd,tester_client->title_window, i*10, i*10);
+        gws_change_window_position(fd,c_tester->window, i*10, i*10);
+        gws_change_window_position(fd,c_tester->title_window, i*10, i*10);
         gws_change_window_position(fd,tester_button, 1, 1);
         
-        //gws_resize_window(fd,tester_client->window, i*20, i*20);
+        //gws_resize_window(fd,c_tester->window, i*20, i*20);
         
-        gws_redraw_window(fd,tester_client->window,1); 
-        gws_redraw_window(fd,tester_client->title_window,1); 
+        gws_redraw_window(fd,c_tester->window,1); 
+        gws_redraw_window(fd,c_tester->title_window,1); 
         gws_redraw_window(fd,tester_button,1); 
         //...
     };
-    
+    */
     
     // #test
     // button
@@ -1094,11 +1164,11 @@ int create_tester_client(int fd)
 
     // full screen
     // ok
-    //fullscreen_client (fd,tester_client);
+    //fullscreen_client (fd,c_tester);
 
 
     //put in the center.
-    //center_client (fd, tester_client);
+    //center_client (fd, c_tester);
 
     return 0;
 }
@@ -1168,6 +1238,40 @@ int create_main_menu( int fd )
     return 0;
 }
 
+
+
+// Update all
+int update(int fd)
+{
+    struct wm_client_d *c;
+    int i=0;
+    
+    if ( (void*) c_bg != NULL ){
+        gws_redraw_window(fd,c_bg->window,1);
+        if ( (void*) c_topbar != NULL ){
+            gws_redraw_window(fd,c_topbar->window,1);
+            if ( (void*) c_taskbar != NULL ){
+                gws_redraw_window(fd,c_taskbar->window,1);
+                goto _more;
+            }
+        }
+    }
+    return -1;
+
+_more:
+    //0=bg 1=topbar 2=taskbar
+    for( i=3; i<32; i++ )
+    {
+        c = (struct wm_client_d *) wmclientList[i];
+        if ( (void*) c != NULL ){
+            gws_redraw_window(fd,c->window,1);
+        }
+    };
+    return 0;
+}
+
+
+
 // Testing new main.
 int main ( int argc, char *argv[] ){
 
@@ -1234,10 +1338,11 @@ int main ( int argc, char *argv[] ){
     hello(client_fd);
 
     // Create clients.
+    create_bg_client(client_fd);
     create_topbar_client(client_fd);
     create_taskbar_client(client_fd);
     // ...
-    
+
 
     // Press F2.
     //create_tester_client(client_fd);
