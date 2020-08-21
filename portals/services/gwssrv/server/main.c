@@ -88,9 +88,9 @@ struct gws_window_d  *__taskbar_button;
 //
 
 // Get system message from the thread's queue.
-void xxxGetNextSystemMessage (void);
+void xxxHandleNextSystemMessage (void);
 // Get client's request from socket.
-void xxxGetNextClientRequest (int fd);
+void xxxHandleNextClientRequest (int fd);
 
 
 int 
@@ -393,7 +393,7 @@ __again:
 //#todo:
 // No loop precisamos de accept() read() e write();
 // Get client's request from socket.
-void xxxGetNextClientRequest (int fd){
+void xxxHandleNextClientRequest (int fd){
 
     // Isso permite ler a mensagem na forma de longs.
     unsigned long *message_buffer = (unsigned long *) &__buffer[0];   
@@ -410,7 +410,7 @@ void xxxGetNextClientRequest (int fd){
     // para assim obtermos um novo da próxima vez.
 
     if (fd<0){
-        gwssrv_debug_print ("gwssrv: xxxGetNextClientRequest fd\n");
+        gwssrv_debug_print ("gwssrv: xxxHandleNextClientRequest fd\n");
         return;
     }
 
@@ -450,7 +450,7 @@ void xxxGetNextClientRequest (int fd){
     // Invalid request.
     if (message_buffer[1] == 0 )
     {
-        gwssrv_debug_print ("xxxGetNextClientRequest: Invalid request!\n");
+        gwssrv_debug_print ("xxxHandleNextClientRequest: Invalid request!\n");
         gwssrv_yield();
         return;
     }
@@ -620,7 +620,7 @@ void ____get_system_message( unsigned long buffer )
 // internal
 // System ipc messages. (It's like a signal)
 // Get system message from the thread's queue.
-void xxxGetNextSystemMessage (void){
+void xxxHandleNextSystemMessage (void){
     
     unsigned long message_buffer[5];   
 
@@ -1460,9 +1460,9 @@ int main (int argc, char **argv){
                 // currentClient = getClient(newconn);
                 
                 //mensagens de clientes.
-                xxxGetNextClientRequest (newconn);
-                //xxxGetNextClientRequest (curconn);
-                // close??
+                xxxHandleNextClientRequest (newconn);
+                //xxxHandleNextClientRequest (curconn);
+                // close?? no!! this is our fd.
                 
                 // We do not have a current client anymore.
                 // We need to accept a new one.
