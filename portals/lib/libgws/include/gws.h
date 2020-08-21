@@ -223,6 +223,14 @@ void gws_reboot (void);
 
 void gws_yield(void);
 
+
+
+void *
+gws_create_thread ( 
+    unsigned long init_eip, 
+    unsigned long init_stack, 
+    char *name );
+
 int gws_clone_and_execute ( char *name );
 
 unsigned long gws_get_system_metrics (int index);

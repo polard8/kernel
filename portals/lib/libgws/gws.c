@@ -1892,6 +1892,31 @@ void gws_yield_n_times (unsigned long n)
 }
 */
 
+/*
+ **************************
+ * gws_create_thread:
+ *     Create a thread.
+ *     #todo: 
+ *     Precisamos uma função que envie mais argumentos.
+ *     Essa será uma rotina de baixo nível para pthreads.
+ */
+
+void *
+gws_create_thread ( 
+    unsigned long init_eip, 
+    unsigned long init_stack, 
+    char *name )
+{
+    //#define	SYSTEMCALL_CREATETHREAD     72
+    gws_debug_print ("gws_create_thread:\n");
+    return (void *) gws_system_call ( 72, //SYSTEMCALL_CREATETHREAD, 
+                        init_eip, 
+                        init_stack, 
+                        (unsigned long) name );
+}
+
+
+
 
 int gws_clone_and_execute ( char *name )
 {

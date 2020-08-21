@@ -656,9 +656,8 @@ void xxxHandleNextSystemMessage (void){
  **********************************
  * gwsProcedure:
  *     Main dialog.
- * 
  */
- 
+
 int 
 gwsProcedure ( 
     struct gws_window_d *window, 
@@ -721,6 +720,8 @@ gwsProcedure (
                     gwssrv_debug_print ("gwssrv: F9\n");
                     //gws_draw_text(
                     break;
+                    
+                  
 
                 // ...
                   
@@ -867,7 +868,7 @@ gwsProcedure (
             break;
 
         // When a client send us an event
-        //MSG_GWS_CLIENTEVENT
+        // MSG_GWS_CLIENTEVENT
         case 2030:
             gwssrv_debug_print ("gwssrv: [2030] serviceClientEvent\n");
             //serviceClientEvent();
@@ -1164,7 +1165,6 @@ int serviceNextEvent(void)
 }
 
 
-
 /*
  ******************************
  * main: 
@@ -1223,7 +1223,6 @@ int main (int argc, char **argv){
 
 
 
-
     //++
     //==================
     // Main loop!
@@ -1244,6 +1243,7 @@ int main (int argc, char **argv){
         
         // Inicializa a lista de clientes.
         gwssrv_init_client_support();
+         
 
         // Register.
  
@@ -1374,6 +1374,7 @@ int main (int argc, char **argv){
         // printf ("gwssrv: [FIXME] yield \n");
         for (i=0; i<11; i++)
             gwssrv_yield();
+            
  
         //
         // =======================================
@@ -1439,6 +1440,7 @@ int main (int argc, char **argv){
             //if ( dirty_status == 1 )
                 //compositor();
          
+            //if (isTimeToQuit == 1) { break; };
          
             // Accept actual connection from the client.
             // No metodo gramado o retorno sera o fd do servidor

@@ -2657,7 +2657,7 @@ do_compare:
 
     // t3 - Test thread
     if ( gramado_strncmp( prompt, "t3", 2 ) == 0 ||
-        gramado_strncmp( prompt, "test-thread", 11 ) == 0)
+         gramado_strncmp( prompt, "test-thread", 11 ) == 0)
     {
         shellTestThreads ();
         goto exit_cmp;
@@ -4551,11 +4551,11 @@ void shellTestThreads (void){
                                 (unsigned long) (&threadstack1[0] + (2*1024) - 4), 
                                 "ThreadTest1" );
 
-    if ( (void *) ThreadTest1 == NULL ){
+    if ( (void *) ThreadTest1 == NULL )
+    {
         printf ("shellTestThreads: apiCreateThread fail \n");
-        die ("ThreadTest1");
+        die ("shellTestThreads: ThreadTest1");
     }
-
 
 	// # executando #
 	
@@ -4563,13 +4563,13 @@ void shellTestThreads (void){
 	// L� no kernel, isso deve selecionar a thread para 
 	// execuss�o colocando ela no estado standby.
 	// Logo em seguida a rotinad e taskswitch efetua o spawn.
-	
-	gde_start_thread (ThreadTest1);
-	
+
+    gde_start_thread (ThreadTest1);
     gde_exit_critical_section ();
     //--
-	
-	
+
+
+
 	printf ("gdeshell: Tentando executar um thread [ok]..\n");
 	
 	//permitir que o shell continue.

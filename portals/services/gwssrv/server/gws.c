@@ -21,6 +21,191 @@
 #include <gws.h>
 
 
+/*
+ *******************************************
+ * xxxThread:
+ *     Um thread dentro para testes.
+ */
+void xxxThread (void){
+	printf("\n");
+	printf("$\n");
+	printf("$$\n");
+	//printf("$$$\n");
+    printf("#### This is a thread ####\n");
+	//printf("$$$\n");
+	printf("$$\n");
+	printf("$\n");
+    printf("\n");
+	
+    gws_show_backbuffer ();
+
+    //while(1){}
+    while(1)
+    {
+        printf("$"); fflush(stdout);
+		asm ( "pause" );
+		asm ( "pause" );
+		asm ( "pause" );
+		asm ( "pause" );
+    }
+}
+
+
+
+/*
+ *************************************************************
+ * shellTestThreads:
+ *     Cria um thread e executa.
+ *     #bugbug ...j� funcionou uma vez, mas agora est� com problemas.
+ *     @todo: na hora de criar a thread precisamos passar o PID desse processo.
+ */
+
+void ____test_threads (void){
+
+    void *T;	
+	
+	// Obs: 
+	// As threads criadas aqui s�o atribu�das ao processo PID=0.
+	// @todo: 
+	// No kernel, quando criar uma thread ela deve ser atribu�da
+    // ao processo que chamou a rotina de cria��o.	
+	
+	printf ("____test_threads: Creating threads..\n");
+	//apiCreateThread((unsigned long)&shellThread, 0x004FFFF0,"TestShellThread1");
+	//apiCreateThread((unsigned long)&shellThread, 0x004FFFF0,"TestShellThread2");
+	//apiCreateThread((unsigned long)&shellThread, 0x004FFFF0,"TestShellThread3");
+	//apiCreateThread((unsigned long)&shellThread, 0x004FFFF0,"TestShellThread4");
+	//...
+	
+	//
+	// # Criar e executar #
+	//
+	
+	// Tentando executar um thread.
+	// *******************************
+    // OBS: 
+	// ISSO J� FUNCIONOU. 
+	// ESTAMOS SUSPENDENDO PORQUE PRECISAMOS AUMENTAR O 
+	// TAMANHO DO HEAP USADO PELO PROCESSO PARA 
+	// ALOCA��O DIN�MICA, ELE N�O T� DANDO CONTA 
+    // DE TODA A DEMANDA POR MEM�RIA.		  
+	
+	//>>Dessa vez pegaremos o retorno, 
+	// que deve ser o ponteiro para a estrutura da thread.
+	// Obs: N�o podemos usar a estrutura porque ela est� 
+	// em ring0.
+	//>>Chamaremos a system_call que executa essa thread 
+	// que temos o ponteiro da estrutura.
+    
+	void *ThreadTest1;	
+	
+	//#bugbug: 
+	// N�o temos mais espa�o no heap do preocesso 
+	// para alocar mem�ria pois gastamos o heap com 
+	// a imagem bmp. (isso aconteceu kkk).
+
+	unsigned long *threadstack1;
+	
+
+    //++
+    gwssrv_enter_critical_section();
+	
+	// #importante:
+	// Como a torina de thread � bem pequena e o 
+	// alocador tem pouqu�ssimo heap, vamos alocar o m�nimo.
+	// Isso � apenas um teste, vamos var se a thread funciona 
+	// com um a pilha bem pequena. 2KB.
+	
+	threadstack1 = (unsigned long *) malloc (2*1024);
+	
+	//Ajuste para o in�cio da pilha.
+	//threadstack1 = ( threadstack1 + (2*1024) - 4 ); 
+	
+	//
+	// # Criando a thread #
+	//
+	
+//creating:
+
+    printf ("____test_threads: Tentando executar uma thread..\n");	
+
+    //ThreadTest1  = (void *) gde_create_thread ( (unsigned long) &xxxThread, 
+    //                            (unsigned long) (&threadstack1[0] + (2*1024) - 4), 
+    //                            "ThreadTest1" );
+
+    ThreadTest1  = (void *) gwssrv_create_thread ( 
+                                (unsigned long) &xxxThread, 
+                                (unsigned long) (&threadstack1[0] + (2*1024) - 4), 
+                                "ThreadTest1" );
+
+    if ( (void *) ThreadTest1 == NULL )
+    {
+        printf ("____test_threads: apiCreateThread fail \n");
+        printf ("____test_threads: ThreadTest1");
+        exit(1);
+    }
+
+	// # executando #
+	
+	// #importante:
+	// L� no kernel, isso deve selecionar a thread para 
+	// execuss�o colocando ela no estado standby.
+	// Logo em seguida a rotinad e taskswitch efetua o spawn.
+
+    gwssrv_start_thread (ThreadTest1);
+    gwssrv_exit_critical_section ();
+    //--
+
+
+	printf ("____test_threads: Tentando executar um thread [ok]..\n");
+	
+	//permitir que o shell continue.
+}
+
+
+    
+/*
+ **************************
+ * gwssrv_create_thread:
+ *     Create a thread.
+ *     #todo: 
+ *     Precisamos uma função que envie mais argumentos.
+ *     Essa será uma rotina de baixo nível para pthreads.
+ */
+
+void *
+gwssrv_create_thread ( 
+    unsigned long init_eip, 
+    unsigned long init_stack, 
+    char *name )
+{
+    //#define	SYSTEMCALL_CREATETHREAD     72
+    gwssrv_debug_print ("gwssrv_create_thread:\n");
+    return (void *) gramado_system_call ( 72, //SYSTEMCALL_CREATETHREAD, 
+                        init_eip, 
+                        init_stack, 
+                        (unsigned long) name );
+}
+
+
+/*
+ ****************************************************************
+ * gwssrv_start_thread:
+ *     Coloca no estado standby para executar pela primeira vez
+ */
+
+void gwssrv_start_thread (void *thread)
+{
+
+    //#define	SYSTEMCALL_STARTTHREAD  94 
+    gramado_system_call ( 94, //SYSTEMCALL_STARTTHREAD, 
+        (unsigned long) thread, 
+        (unsigned long) thread, 
+        (unsigned long) thread );
+}
+
+
+
 
 
 

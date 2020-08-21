@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #include <stddef.h>
 
+#include <stdio.h>
 
 //...
 
@@ -88,6 +89,20 @@ struct gws_d
     struct gui_d *gui;
 };
 struct gws_d GWS;
+
+
+
+void xxxThread (void);
+void ____test_threads (void);
+
+
+void *
+gwssrv_create_thread ( 
+    unsigned long init_eip, 
+    unsigned long init_stack, 
+    char *name );
+
+void gwssrv_start_thread (void *thread);
 
 
 

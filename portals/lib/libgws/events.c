@@ -18,6 +18,9 @@
 #include "include/gws.h"  
 
 
+char __gws_events_message_buffer[512];
+
+
 // get next event.
 // the window server return the next event
 // from the queue of a client.
@@ -38,7 +41,63 @@ gws_send_event (
     int window, 
     struct gws_event_d *event )
 {
-}
 
+    // Isso permite ler a mensagem na forma de longs.
+    unsigned long *message_buffer = (unsigned long *) &__gws_events_message_buffer[0];   
+
+    int n_writes = 0;   // For sending requests.
+
+    int wid=-1;
+    int msg=-1;
+    unsigned long long1=0; 
+    unsigned long long2=0;
+
+
+
+    if ( (void*) event == NULL )
+    {
+        gws_debug_print ("gws_send_event: fail\n");
+        return; 
+        
+    }else{
+
+        wid = (int)              event->wid;
+        msg    = (int)           event->msg;    
+        long1  = (unsigned long) event->long1;
+        long2  = (unsigned long) event->long2;
+    };
+    
+    
+    gws_debug_print ("gws_send_event: Writing ...\n"); 
+    
+    while (1)
+    {
+        message_buffer[0] = (unsigned long) 0;     // Nothing 
+        message_buffer[1] = (unsigned long) 2030;  // The service number. 
+        message_buffer[2] = (unsigned long) 0;     // Nothing 
+        message_buffer[3] = (unsigned long) 0;     // Nothing
+
+        // The standard stack.
+        message_buffer[4] = (unsigned long) wid;   //  
+        message_buffer[5] = (unsigned long) msg;   //  
+        message_buffer[6] = (unsigned long)long1;  // 
+        message_buffer[7] = (unsigned long)long2;  // 
+        //...
+
+
+        // Write!
+        // Se foi possível enviar, então saimos do loop.  
+
+        // n_writes = write (fd, __buffer, sizeof(__buffer));
+        n_writes = send ( fd,
+                        __gws_events_message_buffer, 
+                        sizeof(__gws_events_message_buffer), 
+                        0 );
+
+        if (n_writes>0){ break; }
+    }
+
+    return;         
+}
 
 
