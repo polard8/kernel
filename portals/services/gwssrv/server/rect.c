@@ -10,7 +10,18 @@
 
 #include <gws.h>
 
-void *rect_memcpy32 ( void *v_dst, const void *v_src, unsigned long c );
+
+
+
+int is_rect_empty( struct gws_rect_d *rect )
+{
+    if ( (void*) rect == NULL )
+        return -1;
+        
+    return (int) ((rect->left >= rect->right) || (rect->top >= rect->bottom));
+}
+
+
 void *rect_memcpy32 ( void *v_dst, const void *v_src, unsigned long c )
 {
 	

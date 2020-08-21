@@ -1026,6 +1026,9 @@ gws_draw_button (
     unsigned long color );
 
 
+int is_rect_empty( struct gws_rect_d *rect );
+
+void *rect_memcpy32 ( void *v_dst, const void *v_src, unsigned long c );
 
 
 void 

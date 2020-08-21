@@ -224,19 +224,15 @@ int _getmessage_request(int fd)
 
     int n_writes = 0;   // For sending requests.
 
-
-
     //char *name = "Window name 1";
 
-   
 
     //
     // Send request.
     //
 
-
     // #debug
-    gws_debug_print ("gwm: Writing ...\n");      
+    //gws_debug_print ("gwm: Writing ...\n");      
 
     // Enviamos um request para o servidor.
     // ?? Precisamos mesmo de um loop para isso. ??
@@ -244,21 +240,11 @@ int _getmessage_request(int fd)
 
     while (1)
     {
-        // Create window    
-        message_buffer[0] = 0;       // window. 
-        message_buffer[1] = 369;    //get message request  //1001;    // msg. Create window.
-        message_buffer[2] = 0;
-        message_buffer[3] = 0;
- 
-        //message_buffer[4] = left; //120;   //x
-        //message_buffer[5] = top; //120;   //y
-        //message_buffer[6] = width; //480;   //w
-        //message_buffer[7] = height; //320;   //h
-        
-        //message_buffer[8] = bg_color; //xCOLOR_GRAY2; 
-
-         
-        //...
+        message_buffer[0] = 0;    // wid 
+        message_buffer[1] = 369;  // msg
+        message_buffer[2] = 0;    // long1
+        message_buffer[3] = 0;    // long2
+        // ...
 
         // Write!
         // Se foi possível enviar, então saimos do loop.  
@@ -266,10 +252,8 @@ int _getmessage_request(int fd)
         // n_writes = write (fd, __buffer, sizeof(__buffer));
         n_writes = send (fd, __buffer, sizeof(__buffer), 0);
        
-        if(n_writes>0)
-           break;
+        if (n_writes>0){ break; }
     }
-
 
     return 0; 
 }
@@ -279,6 +263,15 @@ int _getmessage_response(int fd)
 {
     unsigned long *message_buffer = (unsigned long *) &__buffer[0];   
     int n_reads = 0;    // For receiving responses.
+
+
+    int window          = -1;
+    int msg             = 0; 
+    unsigned long long1 = 0;
+    unsigned long long2 = 0;
+    unsigned long long3 = 0;
+    unsigned long long4 = 0;
+
 
     //
     // Waiting for response. ==================
@@ -291,9 +284,12 @@ int _getmessage_response(int fd)
     // obs: Nesse momento deveríamos estar dormindo.
 
     // #debug
-    gws_debug_print ("gwm: Waiting ...\n");      
+    //gws_debug_print ("gwm: Waiting ...\n");      
 
-    int y;
+    // #bugbug
+    // Do we need this ??
+
+    int y=0;
     for(y=0; y<15; y++)
         gws_yield();   // See: libgws/
 
@@ -305,14 +301,12 @@ int _getmessage_response(int fd)
     // Mas como sabemos que é um soquete,
     // então sabemos que é possível ler.
 
-
     //
     // read
     //
 
     // #debug
-    gws_debug_print ("gwm: reading ...\n");      
-
+    //gws_debug_print ("gwm: reading ...\n");      
 
     // #caution
     // Waiting for response.
@@ -322,50 +316,38 @@ response_loop:
 
     //n_reads = read ( fd, __buffer, sizeof(__buffer) );
     n_reads = recv ( fd, __buffer, sizeof(__buffer), 0 );
-    
-    //if (n_reads<=0){
-    //     gws_yield(); 
-    //    goto response_loop;
-    //}
-    
-    // Se retornou 0, podemos tentar novamente.
-    if (n_reads == 0){
-         gws_yield(); 
-        goto response_loop;
-    }
-    
+
     // Se retornou -1 é porque algo está errado com o arquivo.
-    if (n_reads < 0){
-        gws_debug_print ("gwm: recv fail.\n");
-        printf ("gwm: recv fail.\n");
-        printf ("Something is wrong with the socket.\n");
+    if (n_reads < 0)
+    {
+        gws_debug_print ("gwm-_getmessage_response: [FATAL] recv fail.\n");
+        printf          ("gwm-_getmessage_response: [FATAL] recv fail.\n");
+        //printf ("Something is wrong with the socket.\n");
         exit (1);
     }
 
+    // Se retornou 0, podemos tentar novamente.
+    if (n_reads == 0){ gws_yield(); goto response_loop; }
 
-    //
-    // The msg index.
-    //
-    
+
+    // Ok. Lemos alguma coisa.
+    // Vamos pegar a mensagem no buffer.
     // Get the message sended by the server.
 
-    int window          = (int) message_buffer[0];
-    int msg             = (int) message_buffer[1];
-    unsigned long long1 = (unsigned long) message_buffer[2];
-    unsigned long long2 = (unsigned long) message_buffer[3];
+    window  = (int)           message_buffer[0];
+    msg     = (int)           message_buffer[1];
+    long1   = (unsigned long) message_buffer[2];
+    long2   = (unsigned long) message_buffer[3];
+    long3   = (unsigned long) message_buffer[4];
+    long4   = (unsigned long) message_buffer[5];
 
-    // #extra
-    unsigned long long3 = (unsigned long) message_buffer[4];
-    unsigned long long4 = (unsigned long) message_buffer[5];
 
     //#debug
     //if(msg!=0)
         //printf ("%c",long1); //printf ("{%d%c} ",msg,long1);
-        
-        
+    
         
     switch (msg){
-
 
         // #test
         // Testando mensagem de mouse.
@@ -448,17 +430,21 @@ response_loop:
 
                 case VK_F10:
                     gws_clone_and_execute("editor.bin");
+                    return 0;
                     break;
 
                 case VK_F11:
                     gws_clone_and_execute("launch1.bin");
+                    return 0;
                     break;
 
                 case VK_F12:
                     gws_clone_and_execute("terminal.bin");
+                    return 0;
                     break;
                     
                 default:
+                    gws_debug_print("gwm: default MSG_SYSKEYDOWN \n");
                     goto process_event;
                     break;
             };
@@ -470,6 +456,7 @@ response_loop:
             {
                 //case VK_F1:
                 default:
+                    gws_debug_print("gwm: default MSG_SYSKEYUP \n");
                     goto process_event;
                     break;
             };
@@ -523,11 +510,11 @@ response_loop:
 //
 
 // A resposta tras o window id no início do buffer.
-    
+
 process_reply:
 
     // #test
-    gws_debug_print ("gwm: Testing close() ...\n"); 
+    //gws_debug_print ("gwm: Testing close() ...\n"); 
     //close (fd);
 
     //gws_debug_print ("gwst: bye\n"); 
@@ -545,7 +532,7 @@ process_reply:
 //
 
 process_event:
-    gws_debug_print ("gwm: We got an event\n"); 
+    gws_debug_print ("gwm: We've got an system message from ws!\n"); 
     return 0;
 }
 
@@ -586,18 +573,19 @@ int run(int fd)
 {
     //struct wm_client_d  *c;
     
+    // Getting event messages from window server.
     
 	//while(___running){
     while(1){
+ 
         _getmessage_request(fd);
-        _getmessage_response(fd);    
+        _getmessage_response(fd); 
+        
+        //if(isTimeToShutdown == 1) { break; }
     };
 
     return 0; 
 }
-
-
-
 
 
 //...
@@ -1311,16 +1299,15 @@ int main ( int argc, char *argv[] ){
        exit(1);
     }
 
+    //
+    // connect
+    // 
+
+    // Nessa hora colocamos no accept um fd.
+    // então o servidor escreverá em nosso arquivo.
 
     while(1){
 
-        //
-        // connect
-        // 
-
-        //nessa hora colocamos no accept um fd.
-        //então o servidor escreverá em nosso arquivo.
-    
         // #debug
         //printf ("gnst: Connecting to the address 'ws' ...\n");      
         printf ("gwm: Connecting to ws via inet  ...\n");   
@@ -1356,7 +1343,7 @@ int main ( int argc, char *argv[] ){
     //while(1){}
 
     //
-    // Loop
+    // == Loop ==============================
     //
 
     // Loop de requests para o gws.

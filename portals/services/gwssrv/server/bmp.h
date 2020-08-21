@@ -128,7 +128,7 @@ gwssrv_decode_small_icon (
     unsigned long y );
     
 
-void xxx_test_load_bmp(void);
+void __test_load_bmp(void);
 
 
 //

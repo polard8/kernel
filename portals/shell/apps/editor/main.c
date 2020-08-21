@@ -150,7 +150,7 @@ int _getmessage_request(int fd)
 
 
     // #debug
-    gws_debug_print ("gwm: Writing ...\n");      
+    //gws_debug_print ("gwm: Writing ...\n");      
 
     // Enviamos um request para o servidor.
     // ?? Precisamos mesmo de um loop para isso. ??
@@ -206,7 +206,7 @@ int _getmessage_response(int fd)
     // obs: Nesse momento deveríamos estar dormindo.
 
     // #debug
-    gws_debug_print ("gwm: Waiting ...\n");      
+    //gws_debug_print ("gwm: Waiting ...\n");      
 
     for(y=0; y<15; y++)
         gws_yield();
@@ -225,7 +225,7 @@ int _getmessage_response(int fd)
     //
 
     // #debug
-    gws_debug_print ("gwm: reading ...\n");      
+    //gws_debug_print ("gwm: reading ...\n");      
 
 
     // #caution
@@ -250,8 +250,8 @@ response_loop:
     
     // Se retornou -1 é porque algo está errado com o arquivo.
     if (n_reads < 0){
-        gws_debug_print ("gwm: recv fail.\n");
-        printf ("gwm: recv fail.\n");
+        gws_debug_print ("editor: recv fail.\n");
+        printf ("editor: recv fail.\n");
         printf ("Something is wrong with the socket.\n");
         exit(1);
     }
@@ -318,19 +318,19 @@ response_loop:
             switch (long1)
             {
                 case VK_F1:
-                    printf ("gwm: VK_F1\n");
+                    printf ("editor: VK_F1\n");
                     break;
 
                 case VK_F2:
-                    printf ("gwm: VK_F2\n");
+                    printf ("editor: VK_F2\n");
                     break;
                     
                 case VK_F3:
-                    printf ("gwm: VK_F3\n");
+                    printf ("editor: VK_F3\n");
                     break;
                     
                 case VK_F4:
-                    printf ("gwm: VK_F4 reboot\n");
+                    printf ("editor: VK_F4 reboot\n");
                     gws_reboot();
                     break;
                     
@@ -383,7 +383,7 @@ response_loop:
             break;
             
         case SERVER_PACKET_TYPE_ERROR:
-            gws_debug_print ("gwm: SERVER_PACKET_TYPE_ERROR\n");
+            gws_debug_print ("editor: SERVER_PACKET_TYPE_ERROR\n");
             goto response_loop;
             //exit (-1);
             break;
@@ -408,12 +408,12 @@ response_loop:
 process_reply:
 
     // #test
-    gws_debug_print ("gwm: Testing close() ...\n"); 
+    gws_debug_print ("editor: Testing close() ...\n"); 
     //close (fd);
 
     //gws_debug_print ("gwst: bye\n"); 
-    printf ("gwm: Window ID %d \n", message_buffer[0] );
-    //printf ("gwm: Bye\n");
+    printf ("editor: Window ID %d \n", message_buffer[0] );
+    //printf ("editor: Bye\n");
     
     // #todo
     // Podemos usar a biblioteca e testarmos
@@ -426,7 +426,7 @@ process_reply:
 //
 
 process_event:
-    gws_debug_print ("gwm: We got an event\n"); 
+    gws_debug_print ("editor: We got an event\n"); 
     return 0;
 }
 
@@ -481,7 +481,7 @@ int _hello_response(int fd){
     // obs: Nesse momento deveríamos estar dormindo.
 
     // #debug
-    debug_print ("gwm: Waiting ...\n");      
+    debug_print ("editor: Waiting ...\n");      
 
 
     int y;
@@ -495,7 +495,7 @@ int _hello_response(int fd){
     //
 
     // #debug
-    debug_print ("gwm: Reading ...\n");      
+    debug_print ("editor: Reading ...\n");      
 
 
        //#caution
@@ -516,7 +516,7 @@ __again:
     }
     
     if (n_reads < 0){
-        printf ("gwm: recv fail.\n");
+        printf ("editor: recv fail.\n");
         printf ("Something is wrong with the socket.\n");
         exit (1);
     }
@@ -534,7 +534,7 @@ __again:
             break;
             
         case SERVER_PACKET_TYPE_REPLY:
-            debug_print ("gwm: SERVER_PACKET_TYPE_REPLY received\n"); 
+            debug_print ("editor: SERVER_PACKET_TYPE_REPLY received\n"); 
             goto process_reply;
             break;
             
@@ -544,7 +544,7 @@ __again:
             break;
             
         case SERVER_PACKET_TYPE_ERROR:
-            debug_print ("gwm: SERVER_PACKET_TYPE_ERROR\n");
+            debug_print ("editor: SERVER_PACKET_TYPE_ERROR\n");
             goto __again;
             //exit (-1);
             break;
@@ -590,7 +590,7 @@ new_message:
     //
 
     // #debug
-    debug_print ("gwm: Writing ...\n");      
+    debug_print ("editor: Writing ...\n");      
 
     // Enviamos um request para o servidor.
     // ?? Precisamos mesmo de um loop para isso. ??
@@ -648,7 +648,7 @@ int main ( int argc, char *argv[] ){
 
 
     debug_print ("---------------------------\n");    
-    debug_print ("gwm: Initializing ...\n");
+    debug_print ("editor: Initializing ...\n");
 
 
 
@@ -657,7 +657,7 @@ int main ( int argc, char *argv[] ){
     // 
 
     // #debug
-    printf ("gwm: Creating socket\n");
+    printf ("editor: Creating socket\n");
 
     // cria o soquete.
     // AF_GRAMADO
@@ -665,38 +665,31 @@ int main ( int argc, char *argv[] ){
     client_fd = socket ( AF_INET, SOCK_STREAM, 0 );
     
     if ( client_fd < 0 ){
-       printf ("gwm: Couldn't create socket\n");
+       printf ("editor: Couldn't create socket\n");
        exit(1);
     }
 
 
-        //
-        // connect
-        // 
+    //
+    // connect
+    // 
 
-    while(1){
+    //nessa hora colocamos no accept um fd.
+    //então o servidor escreverá em nosso arquivo.
 
-
-        //nessa hora colocamos no accept um fd.
-        //então o servidor escreverá em nosso arquivo.
+    while (1){
     
         // #debug
         //printf ("gnst: Connecting to the address 'ws' ...\n");      
-        printf ("gwm: Connecting to ws via inet  ...\n");   
+        printf ("editor: Connecting to ws via inet  ...\n");   
 
         if (connect (client_fd, (void *) &addr_in, sizeof(addr_in)) < 0){ 
-            gws_debug_print("gwm: Connection Failed \n");
-            printf("gwm: Connection Failed \n"); 
-            //return -1;
-            
-            //try again 
-        }else{
-            break;
-        }; 
+            gws_debug_print("editor: Connection Failed \n");
+            printf         ("editor: Connection Failed \n"); 
+        
+        }else{ break; }; 
     };
 
-
- 
  
     //
     // messages
@@ -748,10 +741,10 @@ int main ( int argc, char *argv[] ){
 
 
      gws_draw_text (
-        (int) client_fd,             // fd,
-        (int) main_window,              // window id,
+        (int) client_fd,       // fd,
+        (int) main_window,     // window id,
         (unsigned long) 50,    // left,
-        (unsigned long) 8,    // top,
+        (unsigned long) 8,     // top,
         (unsigned long) COLOR_BLACK,
         "Name");
 
@@ -806,13 +799,6 @@ int main ( int argc, char *argv[] ){
 
 
 
-
-
-
-
-
-
-
     //
     // Loop
     //
@@ -853,8 +839,9 @@ int main ( int argc, char *argv[] ){
 
 
 // exit
+
     debug_print ("gwm: bye\n"); 
-    printf ("gwm: bye\n");
+    printf      ("gwm: bye\n");
 
     return 0;
 }

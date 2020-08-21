@@ -13,8 +13,6 @@
 
 
 
-
-
 // main.c
 // Arquivo principal do gws.
 // As funções começam com o nome do módulo
@@ -89,6 +87,12 @@ struct gws_window_d  *__taskbar_button;
 // Prototypes.
 //
 
+// Get system message from the thread's queue.
+void xxxGetNextSystemMessage (void);
+// Get client's request from socket.
+void xxxGetNextClientRequest (int fd);
+
+
 int 
 gwsProcedure ( 
     struct gws_window_d *window, 
@@ -106,7 +110,7 @@ gwssrv_init_client_support(void);
 void init_client_struct ( struct gws_client_d *c );
 
 
-void xxx_test_load_icon(void);
+void __test_load_icon(void);
 
 
 
@@ -376,7 +380,7 @@ __again:
 
 /*
  ****************************
- * handle_request:
+ * xxxGetNextClientRequest:
  * 
  * 
  */
@@ -388,9 +392,8 @@ __again:
 
 //#todo:
 // No loop precisamos de accept() read() e write();
-
-//void handle_request (int fd);
-void handle_request (int fd){
+// Get client's request from socket.
+void xxxGetNextClientRequest (int fd){
 
     // Isso permite ler a mensagem na forma de longs.
     unsigned long *message_buffer = (unsigned long *) &__buffer[0];   
@@ -407,7 +410,7 @@ void handle_request (int fd){
     // para assim obtermos um novo da próxima vez.
 
     if (fd<0){
-        gwssrv_debug_print ("gwssrv: handle_request fd\n");
+        gwssrv_debug_print ("gwssrv: xxxGetNextClientRequest fd\n");
         return;
     }
 
@@ -428,20 +431,26 @@ void handle_request (int fd){
     
     n_reads = read ( fd, __buffer, sizeof(__buffer) );
     //n_reads = recv ( fd, __buffer, sizeof(__buffer), 0 );
-
-    if (n_reads <= 0){
-        gwssrv_yield();
-        return;
-    }
+    
+    // Different kind of errors!
+    
+    // Precisamos fechar o client e yield.
+    if (n_reads < 0) { gwssrv_yield(); return; }
+    
+    // Sem problemas, nao precisamos fechar o client.
+    if (n_reads == 0){ gwssrv_yield(); return; }
 
 
     // Nesse momento lemos alguma coisa.   
  
-    //debug_print ("gws: request found on its own socket \n");  
-            
-    // Mensagem inválida  
-    if (message_buffer[1] == 0 ){
-        // gwssrv_wait_message() //todo: use this one. 
+    //
+    // == Processing the request =============================
+    //
+ 
+    // Invalid request.
+    if (message_buffer[1] == 0 )
+    {
+        gwssrv_debug_print ("xxxGetNextClientRequest: Invalid request!\n");
         gwssrv_yield();
         return;
     }
@@ -513,7 +522,7 @@ void handle_request (int fd){
                 
     //#debug: para a máquina real.
     //printf ("gws: got a message!\n");
-    //printf ("gws: handle_request: calling window procedure \n");
+    //printf ("gws: xxxGetNextClientRequest: calling window procedure \n");
  
                 
     // Realiza o serviço.
@@ -585,17 +594,33 @@ __again:
 }
 
 
+
+/*
+ //#test
+void ____get_system_message( unsigned long buffer );
+void ____get_system_message( unsigned long buffer )
+{
+    // Get message.
+    gwssrv_enter_critical_section();
+    gramado_system_call ( 111,
+            (unsigned long) buffer,
+            (unsigned long) buffer,
+            (unsigned long) buffer );
+    gwssrv_exit_critical_section();
+}
+*/
+
 /*
  ********************************** 
- * handle_ipc_message: 
+ * xxxGetNextSystemMessage: 
  * 
  * 
  */
 
 // internal
 // System ipc messages. (It's like a signal)
-//void handle_ipc_message (void);
-void handle_ipc_message (void){
+// Get system message from the thread's queue.
+void xxxGetNextSystemMessage (void){
     
     unsigned long message_buffer[5];   
 
@@ -910,7 +935,7 @@ void create_background (void)
 
 
 
-void xxx_test_load_icon(void)
+void __test_load_icon(void)
 {
 	/*
     FILE *fp;
@@ -959,8 +984,8 @@ void InitGraphics(void){
 
     // #test
     // Precisamos encontrar uma rotina de carregamento apropriada.
-    //xxx_test_load_bmp(); //OK
-    // xxx_test_load_icon();
+    //__test_load_bmp(); //OK
+    // __test_load_icon();
     
     // OK.
     // Testando ...
@@ -1435,8 +1460,8 @@ int main (int argc, char **argv){
                 // currentClient = getClient(newconn);
                 
                 //mensagens de clientes.
-                handle_request (newconn);
-                //handle_request (curconn);
+                xxxGetNextClientRequest (newconn);
+                //xxxGetNextClientRequest (curconn);
                 // close??
                 
                 // We do not have a current client anymore.
@@ -1480,7 +1505,7 @@ int main (int argc, char **argv){
     // Messages from kernel.
     // It is a kind of signal.
     // ipc message loop
-    // while(1){ handle_ipc_message(); }
+    // while(1){ xxxGetNextSystemMessage(); }
 
     // Done.
     

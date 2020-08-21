@@ -1290,7 +1290,7 @@ gwssrv_decode_small_icon (
 
 
 
-void xxx_test_load_bmp(void)
+void __test_load_bmp(void)
 {
     //
     // =======================================
@@ -1309,12 +1309,12 @@ void xxx_test_load_bmp(void)
     bmp_buffer = (char *) malloc(1024*512);
     
     if ( (void *) bmp_buffer == NULL ){
-        printf ("gwssrv: xxx_test_load_bmp bmp_buffer fail\n");
+        printf ("gwssrv: __test_load_bmp: bmp_buffer fail\n");
         return;
     }
     
     // ?? Onde fica o heap usado por esse malloc ??
-    printf ("gwssrv: xxx_test_load_bmp bmp_buffer = %x\n", bmp_buffer);
+    printf ("gwssrv: __test_load_bmp bmp_buffer = %x\n", bmp_buffer);
   
   
     //stdio_fntos ( (char *) file_name ); //não precisa
@@ -1347,15 +1347,15 @@ void xxx_test_load_bmp(void)
     if ( bmp_buffer[0] != 'B' || bmp_buffer[1] != 'M' )
     {
         printf (">>>> %c %c\n",&bmp_buffer[0],&bmp_buffer[1]);
-        gwssrv_debug_print ("gwssrv: xxx_test_load_bmp SIG FAIL \n");
-        printf("xxx_test_load_bmp: *hang1\n");
+        gwssrv_debug_print ("gwssrv: __test_load_bmp SIG FAIL \n");
+        printf("__test_load_bmp: *hang1\n");
         gws_show_backbuffer();
         while(1);
     }
 
     if ( bmp_buffer[0] == 'B' && bmp_buffer[1] == 'M' )
     {
-        printf("xxx_test_load_bmp: BMP signature OK\n");
+        printf("__test_load_bmp: BMP signature OK\n");
         
         //#flags
         bmp_change_color_flag = BMP_CHANGE_COLOR_TRANSPARENT;
@@ -1370,7 +1370,7 @@ void xxx_test_load_bmp(void)
 
 
      //#debug
-     printf("xxx_test_load_bmp: *hang2\n");
+     printf("__test_load_bmp: *hang2\n");
      gws_show_backbuffer();
      while(1);
 }

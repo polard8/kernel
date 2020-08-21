@@ -1148,7 +1148,9 @@ sys_connect (
 
     struct process_d *cProcess;  // Client process.
     struct process_d *sProcess;  // Server process.
-
+    
+    int target_pid = -1;
+    
     struct socket_d *client_socket;
     struct socket_d *server_socket;
     
@@ -1156,8 +1158,6 @@ sys_connect (
 
     struct file_d *f;
 
-    int target_pid = -1;
-    
 
     //#importante
     //no caso de endereços no estilo inet
@@ -1331,7 +1331,7 @@ sys_connect (
  
     if ( (void *) cProcess == NULL ){
         debug_print ("sys_connect: cProcess fail\n");
-        printf ("sys_connect: cProcess fail\n");
+        printf      ("sys_connect: cProcess fail\n");
         goto fail;
     }
 
@@ -1424,6 +1424,7 @@ sys_connect (
 
     client_socket->state = SOCKET_PENDING;
     server_socket->state = SOCKET_PENDING;
+
 
     debug_print("sys_connect: Connected!\n");
     printf     ("sys_connect: Connected!\n");
