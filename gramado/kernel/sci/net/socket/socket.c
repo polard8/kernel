@@ -1139,11 +1139,20 @@ sys_connect (
     socklen_t addrlen )
 {
 
-    struct process_d *p;   // Current process.
-    struct process_d *tp;  // Target process.
+    // #todo
+    // O socket do cliente precisa de um arquivo aberto no
+    // processo alvo.
+    // #bugbug:
+    // Se nao fecharmos o arquivo ao fim da conexao, entao
+    // a lista de arquivos abertos se esgotara rapidamente.
 
-    struct socket_d *my_socket;
-    struct socket_d *server_socket; 
+    struct process_d *cProcess;  // Client process.
+    struct process_d *sProcess;  // Server process.
+
+    struct socket_d *client_socket;
+    struct socket_d *server_socket;
+    
+    int client_socket_fd = -1;
 
     struct file_d *f;
 
@@ -1156,8 +1165,11 @@ sys_connect (
     struct sockaddr_in *addr_in;
 
 
-    printf ("sys_connect: PID %d | fd %d | \n",
-        current_process, sockfd );
+    client_socket_fd = sockfd;
+
+
+    printf ("sys_connect: PID %d | Client socket fd %d | \n",
+        current_process, client_socket_fd );
     
 
     // ?? the address.
@@ -1168,11 +1180,11 @@ sys_connect (
     addr_in = addr;
 
 
-    //sockfd é um soquete de quem quer se conecta
+    //client_socket_fd é um soquete de quem quer se conecta
     //o addr indica o alvo.
-    if ( sockfd < 0 || sockfd >= 32 )
+    if ( client_socket_fd < 0 || client_socket_fd >= 32 )
     {
-        printf ("sys_connect: sockfd fail\n");
+        printf ("sys_connect: client_socket_fd fail\n");
         goto fail;
     }
 
@@ -1308,24 +1320,25 @@ sys_connect (
 //__go:
 
     //
-    // Sender process.
+    // == Client process =============================
     //
     
     // Vamos obter o arquivo do tipo soquete
     // que pertence ao sender.
     
     // sender's process
-    p = (struct process_d *) processList[current_process];
+    cProcess = (struct process_d *) processList[current_process];
  
-    if ( (void *) p == NULL )
-    {
-        printf ("sys_connect: p fail\n");
+    if ( (void *) cProcess == NULL ){
+        debug_print ("sys_connect: cProcess fail\n");
+        printf ("sys_connect: cProcess fail\n");
         goto fail;
     }
- 
+
     // sender's file
     // Objeto do tipo socket.
-    f = (file *) p->Objects[sockfd];
+    // O cliente criou esse socket antes de chamar o connect().
+    f = (file *) cProcess->Objects[client_socket_fd];
 
     if ( (void *) f == NULL )
     {
@@ -1348,17 +1361,17 @@ sys_connect (
     // Pega a estrutura de socket associada ao arquivo.
     // socket structure in the senders file.
     //s = (struct socket_d *) p->priv; 
-    my_socket = (struct socket_d *) f->socket;   
+    client_socket = (struct socket_d *) f->socket;   
     
-    if ( (void *) my_socket == NULL )
+    if ( (void *) client_socket == NULL )
     {
-        printf ("sys_connect: [FAIL] my_socket fail\n");
+        printf ("sys_connect: [FAIL] client_socket fail\n");
         goto fail;
     }
  
  
      //
-     // target process
+     // == Server process ===============================
      //
  
      // target pid.
@@ -1375,12 +1388,11 @@ sys_connect (
      // então pegaremos agora o processo alvo,
      // que é um servidor.
      
-     tp = (struct process_d *) processList[target_pid];
+     sProcess = (struct process_d *) processList[target_pid];
  
-     if ( (void *) tp == NULL )
-     {
-         debug_print ("sys_connect: tp fail\n");
-         printf      ("sys_connect: tp fail\n");
+     if ( (void *) sProcess == NULL ){
+         debug_print ("sys_connect: sProcess fail\n");
+         printf      ("sys_connect: sProcess fail\n");
          goto fail;
      }
 
@@ -1388,11 +1400,10 @@ sys_connect (
     // Sim, porque é o cliente que está tentando se conectar.
     // Dessa forma o alvo é o servidor.
 
-    server_socket = (struct socket_d *) tp->priv;
-
+    server_socket = (struct socket_d *) sProcess->priv;
     
     //
-    // Connecting!
+    // == Connecting! ======================================
     //
 
     // #todo
@@ -1400,28 +1411,25 @@ sys_connect (
     // O tamanho dessa fila foi determinado pelo servidor
     // com a chamada listen. Mas podemos ter um tamanho padrão.
     // Talvez tamanho 1 para começar.
-
     // Conectando o socket do processo alvo ao ponto de
     // conecção do processo cliente.
-    my_socket->conn = server_socket;
-    
     // Conectando o socket do cliente ao ponto de conecção do
     // processo servidor.
-    server_socket->conn = my_socket;
-    
     // Acionando as flags que indicam a conecção.
     // Nesse momento poderíamos usar a flag SOCKET_PENDING
     // e a rotina accept() mudaria para SOCKET_CONNECTED. 
     
-    my_socket->state     = SOCKET_PENDING;  //SOCKET_CONNECTED;
-    server_socket->state = SOCKET_PENDING;  //SOCKET_CONNECTED; 
+    client_socket->conn = server_socket;
+    server_socket->conn = client_socket;
 
+    client_socket->state = SOCKET_PENDING;
+    server_socket->state = SOCKET_PENDING;
 
-    debug_print("sys_connect: connected\n");
-    printf ("sys_connect: done.\n");
+    debug_print("sys_connect: Connected!\n");
+    printf     ("sys_connect: Connected!\n");
+    
+    //ok.
     refresh_screen();
-
-    //ok
     return 0;
 
 //fail
@@ -1620,8 +1628,8 @@ sys_accept (
     // #bugbug: Ainda não estamos usando isso.
     if ( (void *) addr == NULL )
     {
-        debug_print ("sys_accept: [FAIL]addr\n");
-        printf      ("sys_accept: [FAIL]addr\n");
+        debug_print ("sys_accept: [FAIL] addr\n");
+        printf      ("sys_accept: [FAIL] addr\n");
         refresh_screen();
         return -1;
     }
@@ -1657,20 +1665,35 @@ sys_accept (
     }
     
 
+    
+    
     // O socket privado do servidor.
 
     // socket
     // Socket structure that belongs to the process.
-    s = (struct socket_d *) p->priv;
-
+    // s = (struct socket_d *) p->priv;
+    
+    s = f->socket;
+    
     if ( (void *) s == NULL )
     {
-        debug_print ("sys_accept: [FAIL] (priv socket) s fail\n");
-        printf      ("sys_accept: [FAIL] (priv socket) s fail\n");
+        debug_print ("sys_accept: [FAIL] s\n");
+        printf      ("sys_accept: [FAIL] s\n");
         refresh_screen();
         return -1;
     }
- 
+
+    /*
+    // #test
+    // The indicated socket need to be the same of the privete socket.
+    if( f->socket != s )
+    {
+        //#debug Testing ...
+        panic("sys_accept: [FIXME] Check the original socket in the process %d!",
+            current_process);
+    }
+    */
+
     //
     // Socket ok!
     //
@@ -1714,6 +1737,10 @@ sys_accept (
  
     // #test
     // Se o socket do servidor já está conectado.
+    // Se ele jah esta conectado, entao o seu slave tem um arquivo e esse
+    // arquivo deve ir para a lista de arquivos abertos pelo processo?
+    // Estamos retornando o fd do proprio servidor porque o write() 
+    // copia de um socket para o outro. Mas a intençao nao eh essa.
     if ( s->state == SOCKET_CONNECTED )
     {
         //debug_print ("sys_accept: Already connected!\n");
