@@ -555,7 +555,9 @@ clone_and_execute_process (
     
     unsigned long dir_address = 0;
 
-
+    //indice usado na inicializaçao da lista de 
+    //conexoes pendentes do processo servidor.
+    int sIndex=0;
    
 
     // # sobre debug:
@@ -1006,6 +1008,18 @@ do_clone:
         Clone->processName_len = (size_t) strlen ( (const char *) filename );
         strcpy ( Clone->__processname, (const char *) filename );   
 
+        //
+        // Socket ============
+        //
+        
+        for(sIndex=0; sIndex<32; sIndex++)
+            Clone->socket_pending_list[sIndex] = 0; 
+        
+        Clone->socket_pending_list_head =0;
+        Clone->socket_pending_list_tail =0;
+        Clone->socket_pending_list_max = 0; //atualizado pelo listen();
+
+        //#bugbug: The priv socket ??
 
         //
         // Debug

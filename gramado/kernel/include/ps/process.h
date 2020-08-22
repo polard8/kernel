@@ -841,14 +841,32 @@ struct process_d
 	// importante no caso de servidores e drivers
 	unsigned long dialog_address;
 	
-	
+
+    //
+    // == Socket ================================== 
+    //
+
     // list of sockets to accept connection.
     int accept[5];
     file *file_accept;   //aceitando através de ponteiro de arquivo.
     
+
     // Vamos colocar aqui a estrutura de socket.
     void *priv;
-    
+
+
+    // #todo
+    // Precisamos de uma lista de conexoes pendentes.
+    // O cliente invocou a conexao apenas uma vez
+    // e precisa uasr o servidor varias vezes
+    // Lista de ponteiros para estruturas de sockets.
+    // max =  32 cliente com conexoes pendentes.
+    unsigned long socket_pending_list[32];
+    int socket_pending_list_head;  
+    int socket_pending_list_tail;
+    int socket_pending_list_max; //listen() will setup this thing.
+
+
 
 	// Navigation:
 	// Prev and Next.

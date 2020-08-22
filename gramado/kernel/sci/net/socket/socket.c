@@ -1138,6 +1138,19 @@ sys_connect (
     const struct sockaddr *addr,
     socklen_t addrlen )
 {
+    
+    // #??
+    // connect() eh chamado uma vez pelo cliente quando
+    // ele inicializa. Essa chamada fornece o fd do cliente.
+    // O servidor quando chama accept() seleciona um dos
+    // clientes conectados. 
+    // O servidor nao pode simplesmente aceitar
+    // o ultimo que se conectou.
+    // #bugbug: lembrando que nosso write copia de um socket para outro.
+    // Entao podemoriamos deixar as conexoes pendentes e selecionarmos
+    // somete uma a cada accept. 
+    // O write ira falhar se nao estiver conectado?
+
 
     // #todo
     // O socket do cliente precisa de um arquivo aberto no
@@ -1405,7 +1418,15 @@ sys_connect (
     //
     // == Connecting! ======================================
     //
-
+    
+    // #bugbug
+    // connect() eh chamado somente uma vez pelo cliente.
+    // a conexao deve ficar pendente e o accept
+    // seleciona uma delas.
+    // #test: Pra começar vamos deixar apenas uma pendente
+    // e o accept() selecionara ela.
+ 
+ 
     // #todo
     // Temos que colocar os pedidos de conexão em uma fila.
     // O tamanho dessa fila foi determinado pelo servidor
@@ -1424,11 +1445,18 @@ sys_connect (
 
     client_socket->state = SOCKET_PENDING;
     server_socket->state = SOCKET_PENDING;
-
-
-    debug_print("sys_connect: Connected!\n");
-    printf     ("sys_connect: Connected!\n");
+    debug_print("sys_connect: Pending connection\n");
+    printf     ("sys_connect: Pending connection\n");
+ 
     
+    // #todo
+    // Precisamos de uma lista de conexoes pendentes.
+    // O cliente invocou a conexao apenas uma vez
+    // e precisa uasr o servidor varias vezes
+    // #obs: Isso funcionou. Vamos tentar com lista.
+    sProcess->socket_pending_list[0] = (unsigned long) client_socket;
+    
+ 
     //ok.
     refresh_screen();
     return 0;
@@ -1597,10 +1625,11 @@ sys_accept (
     socklen_t *addrlen )
 {
 
-    struct process_d  *p;
+    struct process_d  *sProcess; //server process
     file              *f;
-    struct socket_d   *s;
 
+    struct socket_d   *sSocket;  //server socket
+    struct socket_d   *cSocket;  //client socket
     
     // #todo
     // O argumento dá o descritor para o socket do servidor.
@@ -1640,12 +1669,12 @@ sys_accept (
     // Current process. (The server)
     //
     
-    p = (struct process_d *) processList[current_process];
+    sProcess = (struct process_d *) processList[current_process];
  
-    if ( (void *) p == NULL )
+    if ( (void *) sProcess == NULL )
     {
-        debug_print ("sys_accept: [FAIL] p\n");
-        printf      ("sys_accept: [FAIL] p\n");
+        debug_print ("sys_accept: [FAIL] sProcess\n");
+        printf      ("sys_accept: [FAIL] sProcess\n");
         refresh_screen();
         return -1;
     }
@@ -1655,7 +1684,7 @@ sys_accept (
 
     // file
     // The socket is a file and belongs to the process.
-    f = (file *) p->Objects[sockfd];
+    f = (file *) sProcess->Objects[sockfd];
 
     if ( (void *) f == NULL )
     {
@@ -1665,21 +1694,20 @@ sys_accept (
         return -1;
     }
     
-
     
     
-    // O socket privado do servidor.
+    // O socket privado do Servidor.
 
     // socket
     // Socket structure that belongs to the process.
     // s = (struct socket_d *) p->priv;
     
-    s = f->socket;
+    sSocket = f->socket;
     
-    if ( (void *) s == NULL )
+    if ( (void *) sSocket == NULL )
     {
-        debug_print ("sys_accept: [FAIL] s\n");
-        printf      ("sys_accept: [FAIL] s\n");
+        debug_print ("sys_accept: [FAIL] sSocket\n");
+        printf      ("sys_accept: [FAIL] sSocket\n");
         refresh_screen();
         return -1;
     }
@@ -1742,7 +1770,7 @@ sys_accept (
     // arquivo deve ir para a lista de arquivos abertos pelo processo?
     // Estamos retornando o fd do proprio servidor porque o write() 
     // copia de um socket para o outro. Mas a intençao nao eh essa.
-    if ( s->state == SOCKET_CONNECTED )
+    if ( sSocket->state == SOCKET_CONNECTED )
     {
         //debug_print ("sys_accept: Already connected!\n");
         return (int) sockfd;
@@ -1767,23 +1795,39 @@ sys_accept (
     // descritor do proprio servidor. Mas ele está conectado e
     // o cliente receberá a mensagem.
  
-    if ( s->state == SOCKET_PENDING )
+    if ( sSocket->state == SOCKET_PENDING )
     {
         debug_print ("sys_accept: CONNECTING !!\n");
-        
+
+        //Server socket. Pre-connect.
+        //precisamos mudar no caso de erro no cliente.
+        sSocket->state = SOCKET_CONNECTED;
+             
         // Se existe outro socket linkado ao socket do servidor.
-        if ( (void *) s->conn != NULL )
+        cSocket = (struct socket_d *) sProcess->socket_pending_list[0];
+        if ( (void*) cSocket == NULL )
+        {
+            debug_print ("sys_accept: [FAIL] cSocket\n");
+            sSocket->state = SOCKET_PENDING;  //anula.
+            return -1;
+        }
+
+        // Valid Client socket
+        if ( (void *) cSocket != NULL )
         {
             //ok: usar isso só para debug
             //debug_print ("sys_accept: done\n");
-            s->state       = SOCKET_CONNECTED;
-            s->conn->state = SOCKET_CONNECTED;
+
+            cSocket->state = SOCKET_CONNECTED;
             
+            //retornamos o fd do proprio servidor, pois nosso write copia
+            //entre os buffers dos sockets conectados.
             return (int) sockfd;
         }
  
         //fail
         debug_print ("sys_accept: [FAIL] Pending connection\n");
+        sSocket->state = SOCKET_PENDING;  //anula.
         return -1;
     }
 
@@ -1793,7 +1837,7 @@ sys_accept (
 fail:
 
     debug_print ("sys_accept: [FAIL] Something is wrong!\n");
-
+    
     //real machine
     //printf ("sys_accept: [FIXME] TODO ...\n");
     //refresh_screen();

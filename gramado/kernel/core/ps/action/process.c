@@ -1154,6 +1154,11 @@ struct process_d *create_process (
     struct process_d *Empty; 
     
     int i=0;
+
+    //indice usado na inicializaçao da lista de 
+    //conexoes pendentes do processo servidor.
+    int sIndex=0;
+
     
     debug_print ("process-create_process: It's a work in progress!\n");
 
@@ -1252,19 +1257,16 @@ get_next:
         
 		// Identificadores.
 		// PID. PPID. UID. GID.
-
         Process->pid  = (int) PID; 
         Process->ppid = (int) ppid; 
         Process->uid  = (int) GetCurrentUserId (); 
         Process->gid  = (int) GetCurrentGroupId (); 
         // ...
-        
 
         // sessão crítica.
         Process->_critical = 0;
 
 		//State of process
-
         Process->state = INITIALIZED;  
 
 		//@TODO: ISSO DEVERIA VIR POR ARGUMENTO
@@ -1277,7 +1279,6 @@ get_next:
 		Process->name = (char *) name; //@todo: usar esse.
 		//Process->cmd = NULL;  //nome curto que serve de comando.
         //Process->pathname = NULL;
-        
         
         //#test
         //64 bytes m�x.
@@ -1636,6 +1637,16 @@ get_next:
         //Process->long2 = 0;        //arg4.
 
 
+        //
+        // == Socket ===================================
+        //
+
+        for(sIndex=0; sIndex<32; sIndex++)
+            Process->socket_pending_list[sIndex] = 0; 
+        
+        Process->socket_pending_list_head =0;
+        Process->socket_pending_list_tail =0;
+        Process->socket_pending_list_max = 0; //atualizado pelo listen();
 
 
         // tty support
