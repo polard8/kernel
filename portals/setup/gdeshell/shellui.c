@@ -3,17 +3,20 @@
  *
  * Shell User Interface.
  *     Suporte às rotinas gráficas do aplicativo shell.
- *     #importante: A intenção é usar esse módulo do aplicativo shell 
- *                  para construir e testar os recursos gráicos do sistema.
- *                  Aqui é um campo de testes. 
- * @frednora
+ *     #importante: 
+ *     A intenção é usar esse módulo do aplicativo shell 
+ *     para construir e testar os recursos gráicos do sistema.
+ *     Aqui é um campo de testes. 
+ * 
+ * 2017 - Fred Nora.
  */
- 
- 
+
+
 #include "shell.h"
 
 
 extern int ShellFlag;
+
 
 #define SHELLFLAG_NULL 0
 #define SHELLFLAG_COMMANDLINE 1
@@ -25,46 +28,49 @@ extern int ShellFlag;
 //...
 
 
-void shellui_fntos (char *name){
-	
+// Credits: L.
+void shellui_fntos (char *name)
+{
     int  i, ns = 0;
     char ext[4];
     //const char ext[4];
-	
+
     //transforma em maiúscula
-	while ( *name && *name != '.' )
-	{
+    while ( *name && *name != '.' )
+    {
         if ( *name >= 'a' && *name <= 'z' )
             *name -= 0x20;
 
         name++;
         ns++;
-		
-		// ##bugbug: E se não encontrarmos o ponto??
-    }
+
+        // ##bugbug: 
+        // E se não encontrarmos o ponto??
+    };
 
     // aqui name[0] é o ponto.
 	// então constroi a extensão.
-	for ( i=0; i < 3 && name[i+1]; i++ )
-	{
+    for ( i=0; i < 3 && name[i+1]; i++ )
+    {
         if ( name[i+1] >= 'a' && name[i+1] <= 'z' )
             name[i+1] -= 0x20;
 
         ext[i] = name[i+1];
-    }
+    };
 
     while (ns < 8)
-	{
+    {
         *name++ = ' ';
         ns++;
-    }
+    };
 
-    for ( i=0; i < 3; i++ )
+    for ( i=0; i < 3; i++ ){
         *name++ = ext[i];
+    };
 
     *name = '\0';
 }
-	
+
 
 /*
  ***********************************************
@@ -74,30 +80,21 @@ void shellui_fntos (char *name){
  */
 
 unsigned long 
-shellTopbarProcedure ( struct window_d *window, 
-                       int msg, 
-				       unsigned long long1, 
-				       unsigned long long2 )
+shellTopbarProcedure ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 )
 {
-    unsigned long input_ret;
-    unsigned long compare_return;	
-	
-	
-	//if( msg == COMMAND_INITIALIZE_SHELL ){
-		//...
-	//}
-	
+
+    unsigned long input_ret=0;
+    unsigned long compare_return=0;
+
+
     switch (msg)
     {
-		//Faz algumas inicializações de posicionamento e dimensões.
-        //case MSG_INITDIALOG:
-        //    break;
-
-		//Torna a janela visível.
-        //case MSG_SHOWWINDOW:
-		//    break; 
-		 
-		case MSG_KEYDOWN:
+ 
+        case MSG_KEYDOWN:
             switch (long1)
             {
 				// Null key.
@@ -134,16 +131,14 @@ shellTopbarProcedure ( struct window_d *window,
                     break;               
             };
         break;
-		
-		case MSG_KEYUP: 
-		    // printf("%c", (char) 'u');
-            // printf("%c", (char) long1);  			
-		    break;
-		
+
+        //case MSG_KEYUP: 
+            //break;
+
 		//Não interceptaremos mensagens do sistema por enquanto.
 		//As mensagens do sistema são interceptadas primeiro pelo procedimento 
 		//do sistema.
-		
+
 		case MSG_SYSKEYDOWN:
 		    switch(long1)
 			{
@@ -260,45 +255,13 @@ shellTopbarProcedure ( struct window_d *window,
 		case MSG_CREATE:
 		    printf("SHELL.BIN:Topbar  MSG_CREATE\n");
 		    break;
-		
-		// # recebemos essa mensagem depois que o foco é setado.
-		case MSG_SETFOCUS:
-			break;
-			
-		case MSG_KILLFOCUS:
-            break;
 
-		//isso pinta os elementos da área de cliente.	
-        case MSG_PAINT:
-            break;
 
-		//@todo: isso ainda não existe na biblioteca. criar.	
-        //case MSG_CLS:
-            //limparemos o retãngulo da área de cliente,
-			//mesmo que estejamos em full screen. 
-		//	break;		
-		
-		//mudaremos o curso usando long1 e long2.
-		//case MSG_SETCURSOR:
-		//    break;
-		
-		//case MSG_HSCROLL:
-		//    break;
-		//case MSG_VSCROLL:
-		//    break;
-		
-		
-		//case MSG_FULLSCREEN:
-		//    break;
-		
-		
-		//case COMMAND_SET_WINDOW_SIZE:
-		//    break;
-		
-		//case COMMAND_HIDE_WINDOW:
-        //    break; 
+        //case MSG_SETFOCUS:  break;
+        //case MSG_KILLFOCUS: break;
+        //case MSG_PAINT:     break;
 
-		
+
 		//#importante
 		// os caracteres de controle encontrados na tabela ascii.
 		//@todo: Essa mensagem precis ser criada, tanto no kernel 
@@ -460,13 +423,13 @@ shellTopbarProcedure ( struct window_d *window,
         //    };		
 		//    break;
 			
-		
-		
+
+
 		//Mensagem desconhecida.
 		default:
 		    //printf("shell procedure: mensagem desconhecida\n");
 		    goto done;
-		    break;	  
+		    break;
     };
 
     // Nothing for now !
@@ -491,31 +454,9 @@ done:
 // o tipo dois funciona.
 // testando colocar o ponteiro no edit box. setar foco.
 
-void shellCreateEditBox (void){
-
-
-//suspenso;
-/*
-	editboxWindow = (void *) APICreateWindow ( WT_EDITBOX, 1, 1, "shell-editbox1",     
-                                10, 600-100, 300, 24,    
-                                0, 0, COLOR_WINDOW, COLOR_WINDOW );
-									   
-									   
-	if ( (void *) editboxWindow == NULL)
-	{	
-		printf("shellCreateEditBox: fail");
-		
-		refresh_screen();
-		while(1){}
-		//exit(0);
-	};
-	
-	//Registrar.
-    APIRegisterWindow (editboxWindow);
-*/
-
-
-	//shellSetCursor ( 8, 8 );								   
+void shellCreateEditBox (void)
+{
+    //Deprecated!
 }
 
 
@@ -535,9 +476,9 @@ void shellCreateEditBox (void){
 // Vamos criar a main window do tamanho da tela. get system metrics. 
  
 struct window_d *shellCreateMainWindow ( int status ){
-	
-	struct window_d *w;
-		
+
+    struct window_d *w;
+
      //#bugbug
      //shellShell já inicializou isso com a métrica do sistema.
       	
@@ -581,8 +522,8 @@ struct window_d *shellCreateMainWindow ( int status ){
     // Draw.
     //
 
-	w = (void *) gde_create_window ( 1, 1, 1, 
-	                "gdeshell-main",     
+    w = (void *) gde_create_window ( 1, 1, 1, 
+                    "gdeshell-main",     
                      wpWindowLeft, wpWindowTop, 
                      wsWindowWidth, wsWindowHeight,    
                      0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
@@ -595,16 +536,15 @@ struct window_d *shellCreateMainWindow ( int status ){
 		printf ("shellCreateMainWindow: taskbar Window fail *breakpoint");
 		while (1){ asm ("pause"); }
 	    return NULL;
-	};
+	}
 
-
-	return w;
+    return (struct window_d *) w;
 }
 
 
 void testCreateWindow (void){
-	
-	struct window_d *hWindow;	
+
+    struct window_d *hWindow;	
 
     //++
 	gde_begin_paint ();
@@ -620,7 +560,7 @@ void testCreateWindow (void){
 		gde_end_paint ();
 		while(1){}
 		
-		die ("shell.bin: hWindow fail");
+		//die ("shell.bin: hWindow fail");
 	}
 	
 	//Registrar e mostrar.
@@ -850,80 +790,14 @@ loadFile:
  */
 
 void 
-bmpDisplayBMP ( void *address, 
-                unsigned long x, 
-				unsigned long y, 
-				int width, 
-				int height )
+bmpDisplayBMP ( 
+    void *address, 
+    unsigned long x, 
+    unsigned long y, 
+    int width, 
+    int height )
 {
     gde_display_bmp ( (char *) address, x, y ); 
-    
-	/*
-	int i, j, base, offset;	
-	unsigned long left, top, bottom;
-	unsigned long color;
-	
-	//início da área de dados do bmp
-	base = 0x36;  
-	
-	//limits
-	//@todo: Refazer isso
-	if ( x > 800 ){ return; }
-	if ( y > 600 ){ return; }
-	if ( width > 800 ){ return; }
-	if ( height > 600 ){ return; }
-	
-	if (address == 0){
-	    return;
-	}
-	
-	left = x;    
-	top = y; 
-	
-	bottom = top + height;
-	
-	//base do bmp carregado na memória
-	unsigned char *bmp = (unsigned char *) address;
-	unsigned char *c = (unsigned char *) &color;
-	
-	for ( i=0; i<height; i++ )
-	{
-		for ( j=0; j<width; j++ )
-		{	
-			//construindo o char.
-			
-			offset = base;
-			c[1] = bmp[offset];
-			
-			offset = base+1;
-			c[2] = bmp[offset];
-			
-			offset = base+2;
-			c[3] = bmp[offset];
-			
-			c[0] = 0;
-			
-			base = base + 3;
-			
-			//put pixel.
-			//number,cor,x,y
-			system_call ( SYSTEMCALL_BUFFER_PUTPIXEL, (unsigned long) color, 
-				(unsigned long) left, (unsigned long) bottom );
-						 
-			//my_buffer_put_pixel( (unsigned long) color, (unsigned long) left, (unsigned long) bottom, 0);
-			
-			//próximo pixel.
-			left++; 
-		}
-		
-		//vamos para a linha anterior.
-		bottom = bottom-1;
-		left = x;    //reiniciamos o x.
-	};
-	
-	*/
-	
-	return;
 }
 
 
@@ -935,9 +809,8 @@ int shellTestButtons (void)
 {
 
 	// Tamanho da tela.	
-	unsigned long ScreenWidth = gde_get_system_metrics (1);
+    unsigned long ScreenWidth = gde_get_system_metrics (1);
     unsigned long ScreenHeight = gde_get_system_metrics (2); 
-	
 
 	unsigned long app1Left = ((ScreenWidth/8) * 2);
 	unsigned long app2Left = ((ScreenWidth/8) * 3);
@@ -960,7 +833,7 @@ int shellTestButtons (void)
 	                            "(CIMA)",     
                                 app1Left, app1Top, 80, 24,    
                                 0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
-								
+
     gde_register_window (app1_button);
 
 

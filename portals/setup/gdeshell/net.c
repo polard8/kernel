@@ -8,8 +8,6 @@
 #include "net.h"
 
 
-
-
 // Temporary. 
 // We need a system function to get this number.
 
@@ -39,6 +37,14 @@ unsigned char host_mac_address[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 //Criar um pacote arp com ethernet e arp e enviar 
 //o ponteiro do buffer para o kernel
 
+ //
+ // Enviar um pacote ARP.
+ //
+
+ // IN: 
+ //    source_ip. (It's in the layer 3 of the OSI model. network layer)
+ //    target_ip. (It's in the layer 3 of the OSI model. network layer)
+ //    target_mac. (It's in the layer 2 of the OSI model. data link layer)
 
 void 
 __SendARP ( 
@@ -46,23 +52,12 @@ __SendARP (
     uint8_t target_ip[4], 
     uint8_t target_mac[6] )
 {
-     
-    //
-    // Enviar um pacote ARP.
-    //
 
+    struct ether_header  *eh;
+    struct ether_arp     *h;  
 
-
- // IN: 
- //    source_ip. (It's in the layer 3 of the OSI model. network layer)
- //    target_ip. (It's in the layer 3 of the OSI model. network layer)
- //    target_mac. (It's in the layer 2 of the OSI model. data link layer)
-  
     int i=0;
-
-    struct ether_header *eh;
-    struct ether_arp *h;  
-  
+      
     //==============================================
     // # ethernet header #
     //

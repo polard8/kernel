@@ -3,9 +3,11 @@
 // 2016 - Created by Fred Nora.
 //
 
-
 //Setup current compiler 
 #include "compiler.h"
+
+#include <sys/ioctl.h>
+#include <sys/ioctls.h>
 
 #include <types.h>
 #include <stddef.h>
@@ -30,39 +32,23 @@
 #include "alias.h"
 #include "ndir.h"
 #include "version.h"
-
-//...
  
 #include <sys/wait.h> 
- 
-//
-// botões
-// 
-
-//janela da taskbar
-struct window_d *taskbarWindow;  //task bar.
-
-//menu iniciar.
-struct window_d *menu_button;
-
- 
 //...
 
-//grid de aplicativos.
+
+//#define SHELL_VERBOSE 1
+ 
+
+struct window_d *taskbarWindow; 
+struct window_d *menu_button;
 struct window_d *app1_button;
 struct window_d *app2_button;
 struct window_d *app3_button;
 struct window_d *app4_button;
-
-struct window_d *editboxWindow;  //edit box.
-
- //outros.
+struct window_d *editboxWindow;  
 struct window_d *reboot_button;
 struct window_d *close_button;
- 
- 
- 
-//#define SHELL_VERBOSE 1
 
 
 /* Values that can be returned by execute_command (). */

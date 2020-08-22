@@ -8,21 +8,17 @@
 
 
 
-#include <sys/ioctl.h>
-#include <sys/ioctls.h>
 #include "shell.h"
-//#include <sys/wait.h> 
 
 
-
-// porque deletamos libcore
+// #hackhack
+// Porque deletamos libcore
 #define gramado_strncmp strncmp 
 
 
-
-
-//para que o procedimento possa acessalo.
-char __net_buffer[4096]; // #bugbug size
+// Para que o procedimento possa acessa-lo.
+// #bugbug: size
+char __net_buffer[4096];
 
 // A janela principal do aplicativo.
 struct window_d *hWindow;  
@@ -33,17 +29,19 @@ struct window_d *cpu_window;  //cpu usage test;
 
 
 // Input flags.
-#define SHELLFLAG_NULL 0
-#define SHELLFLAG_COMMANDLINE 1
-#define SHELLFLAG_SCRIPT 2
-#define SHELLFLAG_HELP 3
-#define SHELLFLAG_VERSION 4
-#define SHELLFLAG_USAGE 5
-#define SHELLFLAG_TOPBAR 6
-#define SHELLFLAG_FEEDTERMINAL 7
-#define SHELLFLAG_EXIT 8
-//...
+#define SHELLFLAG_NULL          0
+#define SHELLFLAG_COMMANDLINE   1
+#define SHELLFLAG_SCRIPT        2
+#define SHELLFLAG_HELP          3
+#define SHELLFLAG_VERSION       4
+#define SHELLFLAG_USAGE         5
+#define SHELLFLAG_TOPBAR        6
+#define SHELLFLAG_FEEDTERMINAL  7
+#define SHELLFLAG_EXIT          8
+// ...
 
+
+//#define MIN(x,y) ((x < y) ? x : y)
 
 
 // Ser� configurado na inicializa��o.
@@ -51,48 +49,6 @@ int __stdin_fd;
 int __stdout_fd;
 int __stderr_fd;
 
-
-/*
-
- //para ficar igual a do Nelson;
-
-struct shell_command {
-	
-    char *name;
-    void *fun;
-    char *help;
-	
-};
-
-//extern struct command cmd_table[];
-struct shell_command cmd_table[];
-
-struct command cmd_table[] = {
-    {"?",           cmd_help,           "This help"                                     },
-    {"cd",          cmd_cd,             "Change current directory"                      },
-    {"cls",         cmd_cls,            "Clear screen"                                  },
-    {"copy",        cmd_copy,           "Copy file or directory"                        },
-    {"date",        cmd_date,           "Date"                                          },
-    {"del",         cmd_del,            "Delete file or directory"                      },
-    {"dir",         cmd_dir,            "List directory"                                },
-    {"echo",        cmd_echo,           "This ---"                                      },
-    {"exit",        cmd_exit,           "Exit shell"                                    },
-    {"help",        cmd_help,           "This help"                                     },
-    {"mov",         cmd_mov,            "Move file or directory"                        },
-    {"new",         cmd_new,            "New file or directory"                         },
-    {"reboot",      cmd_reboot,         "Reboot system"                                 },
-    {"rename",      cmd_rename,         "Rename file or directory"                      },
-    {"shutdown",    cmd_shutdown,       "Shutdown your computer locally or remotely"    },
-    {"time",        cmd_time,           "Time"                                          },
-    {"version",     cmd_version,        "Shell version"                                 },
-};
-
-*/
-
- 
- 
-
-//#define MIN(x,y) ((x < y) ? x : y)
 
 int ShellFlag = 0;
 
@@ -746,6 +702,8 @@ xmas_tree_create ( char *file_name)
                                     10, 10, 90, 130,    
                                     0, 0, COLOR_GREEN, COLOR_GREEN );
     
+    if ( (void *) xmas_tree_window == NULL ){ return; }
+    
     gde_register_window ( (struct window_d *) xmas_tree_window );
     
 
@@ -899,14 +857,12 @@ static inline void pause (void){
  is a good thing to insert into busy-wait loops. 
  */
 
-static inline void rep_nop (void){
-	
-    __asm__ __volatile__ ("rep;nop": : :"memory");
-};
-
+static inline void rep_nop (void)
+{
+    asm volatile ("rep;nop": : :"memory");
+}
 
 #define cpu_relax()  rep_nop()
-
 
 
 //vamos apenas carregar um arquivo qualquer.
@@ -4028,38 +3984,11 @@ void shellPrompt (void){
     prompt_status = 0;
     prompt_max = PROMPT_MAX_DEFAULT;  
 
-
-    //printf("Gramado Setup");
-    //printf("\n");
-    //printf("=============");
-    //printf("\n");
-    //printf("\n");
-    //fflush(stdout);
-
     // Prompt.
     printf("\n");
-    putc('$',stdout); 
-    putc(' ',stdout); 
-    fflush(stdout);    
-
-
-    // Print '$ '
-    //char __prompt_string[32];
-    //strcpy(__prompt_string, "$");
-    //strcat(__prompt_string, " ");
-    
-    
-	// #test
-
-	// Getting the prompt string from environ.
-    // #bugbug: Me parece que na máquina real, esse getenv falha
-	// logo após chamarmos um comando.
-	//char *env_string;
-	//env_string = getenv("PS0");
-	// #todo: Criar um if, para o caso de o ponteiro falhar.
-	//putc(*env_string,stdout);
-	//putc(' ',stdout);
-	//fflush (stdout);    
+    putc('$',stdout);
+    putc(' ',stdout);
+    fflush(stdout);
 }
 
 
@@ -4068,10 +3997,10 @@ void shellPrompt (void){
  *     Limpa o buffer da tela.
  */
 
-void shellClearBuffer (void){
-
-    int i = 0;
-    int j = 0;
+void shellClearBuffer (void)
+{
+    int i=0;
+    int j=0;
 
 	//inicializamos com espa�os.
 	for ( i=0; i<32; i++ )
@@ -4418,15 +4347,22 @@ void shellRefreshLine ( int line_number ){
 // #bugbug: Aqui, por enquanto, esse printf envia ele mesmo
 // os chars para a tela.
 
-void shellRefreshChar ( int line_number, int col_number ){
-	
-	if ( col_number > wlMaxColumns || line_number > wlMaxRows )
-		return;
-	
-	shellSetCursor ( col_number, line_number );
+void 
+shellRefreshChar ( 
+    int line_number, 
+    int col_number )
+{
+
+    if ( col_number > wlMaxColumns || 
+         line_number > wlMaxRows )
+    { 
+        return; 
+    }
+
+    shellSetCursor(col_number,line_number);
 
 	//Mostra um char do screen buffer.
-	printf ("%c", LINES[line_number].CHARS[col_number] );	
+    printf ("%c", LINES[line_number].CHARS[col_number] );
 }
 
 
@@ -4475,15 +4411,15 @@ void shellScroll (void){
 }
 
 
-static void save_cur (void){
-	
+static void save_cur (void)
+{
 	textSavedCol = textCurrentCol;
 	textSavedRow = textCurrentRow;
 }
 
 
-static void restore_cur (void){
-	
+static void restore_cur (void)
+{
 	textCurrentCol = textSavedCol;
 	textCurrentRow = textSavedRow;
 }
@@ -4506,7 +4442,8 @@ static void lf (void){
 
 // ??
 //voltando uma linha.
-static void ri (void){
+static void ri (void)
+{
 	
 	//if ( screen_buffer_y > top ){
 		
@@ -4522,16 +4459,16 @@ static void ri (void){
 
 
 //carriege return
-static void cr (void){
-	
+static void cr (void)
+{
     textCurrentCol = 0;
 }
 
 
-static void del (void){
-	
-	LINES[textCurrentRow].CHARS[textCurrentCol] = (char) '\0';
-	LINES[textCurrentRow].ATTRIBUTES[textCurrentCol] = 7;
+static void del (void)
+{
+    LINES[textCurrentRow].CHARS[textCurrentCol] = (char) '\0';
+    LINES[textCurrentRow].ATTRIBUTES[textCurrentCol] = 7;
 }
 
 
@@ -4553,18 +4490,16 @@ shellInsertCharXY (
 }
 
 
- // Insere um caractere sentro do buffer.
+// Insere um caractere sentro do buffer.
 char 
-shellGetCharXY ( unsigned long x, 
-                 unsigned long y )
+shellGetCharXY ( 
+    unsigned long x, 
+    unsigned long y )
 {
 
-	if ( x >= wlMaxColumns || y >= wlMaxRows )
-	{
-		return;
-	}
+    if ( x >= wlMaxColumns || y >= wlMaxRows ){ return; }
 
-	return (char) LINES[y].CHARS[x];
+    return (char) LINES[y].CHARS[x];
 }
 
 
@@ -4934,10 +4869,10 @@ void shell_write_to_screen( struct shell_screen_d *screen,
 //todo: 
 //Criar rotina de sa�da do shell.
 
-void shellExit (int code){
-	
-	//@todo ...
-	exit (code);
+void shellExit (int code)
+{
+	//#todo ...
+    exit (code);
 }
  
 
@@ -5590,44 +5525,32 @@ void error ( char *msg, char *arg1, char *arg2 ){
 
 /* fatal error */
 
-void fatal ( char *msg, char *arg1, char *arg2 ){
-	
+void 
+fatal ( 
+    char *msg, 
+    char *arg1, 
+    char *arg2 )
+{
     error ( msg, arg1, arg2 );
-	
     //delete_temp_files ();
-  
     exit (1);
 }
 
 
-char *save_string ( char *s, int len ){
-	
-  register char *result = (char *) xmalloc (len + 1);
+char *save_string ( char *s, int len )
+{
+   register char *result = (char *) xmalloc (len + 1);
 
     bcopy (s, result, len);
     
-	result[len] = 0;
+    result[len] = 0;
   
     return result;
 }
-
-
-/*
-void 
-reader_loop()
-{
-	while( !EOF_Reached )
-	{
-		//...
-		
-	};
-}
-*/
-
  
 
 /*
- **********************************************************
+ *****************************************************
  * shellExecuteThisScript:
  *     Aqui temos que carregar o arquivo de script indicado 
  * nos argumentos.
@@ -6335,13 +6258,13 @@ int textGetBottomRow (void)
 }
 
 
-void clearLine ( int line_number ){
-	
+void clearLine ( int line_number )
+{
     int lin = (int) line_number; 
-	int col=0;  
-	
-	int Offset = 0; //Deslocamento dentro do screen buffer.
-	
+    int col=0;  
+
+    int Offset = 0; //Deslocamento dentro do screen buffer.
+
 	//cursor apontando par ao in�cio da janela.
 	//usado pelo printf.
 	//@todo: podemos colocar o cursor no 
