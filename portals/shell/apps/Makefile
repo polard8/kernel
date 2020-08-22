@@ -8,7 +8,6 @@ all:
 	make -C s2  
 	make -C s3
 	make -C terminal
-	make -C sh1
 	
 # ...
 

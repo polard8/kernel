@@ -83,58 +83,59 @@ int main ( int argc, char *argv[] ){
     int n_writes = 0;   // For sending requests.
     int n_reads = 0;    // For receiving responses.
 
-    int client_fd;
+    int client_fd=0;
+
+    int s=-1;
 
 
-    // AF_GRAMADO = 8000
-    client_fd = socket ( 8000, SOCK_STREAM, 0 );
-    
-    if ( client_fd < 0 ){
+    // Socket
+
+    client_fd = socket ( AF_GRAMADO, SOCK_STREAM, 0 );
+
+    if ( client_fd < 0 )
+    {
        printf ("s3: Couldn't create socket\n");
        exit(1);
     }
 
-
-    int s=-1;
+    // Connect
     
-    while(1){
+    while (1){
         
         s = connect (client_fd, (struct sockaddr *) &addr, sizeof(addr));
    
         if (s<0){ 
             debug_print ("s3: Connection Failed \n");
-            printf ("s3: Connection Failed \n"); 
-            //return -1; 
-            //try again
+            printf      ("s3: Connection Failed \n"); 
+            // #bugbug: Try agin forever. 
+            
         }else{break;}; 
-    
     };
 
-
-round:
 
     // Enviamos um request para o servidor.
     // ?? Precisamos mesmo de um loop para isso. ??
 
+round:
+
+    debug_print("s3: Sending request...\n");
+    
     while (1)
     {
-        debug_print("s3: Sending request...\n");
-        
-        // The message.
         message_buffer[0] = 0;       // window. 
         message_buffer[1] = 1000;    // msg=hello!
-        message_buffer[2] = 10;
-        message_buffer[3] = 10;
+        message_buffer[2] = 40;
+        message_buffer[3] = 40;
 
         n_writes = write (client_fd, __buffer, sizeof(__buffer));
        
-        if(n_writes>0)
-           break;
-    }
+        if(n_writes>0){ break; }
+    };
 
-
-    // response.
-
+    //
+    // Get response.
+    //
+ 
 __again:
 
     n_reads = read ( client_fd, __buffer, sizeof(__buffer) );
@@ -156,6 +157,7 @@ __again:
             break;
         
         default:
+            debug_print ("s3: default reply\n");
             goto __again;
             break; 
     };
@@ -164,7 +166,6 @@ __again:
    // process reply.
 
 process_reply:
-
     printf ("s3: We got a respose!\n");
     printf ("s3: bye\n");
     return 0;

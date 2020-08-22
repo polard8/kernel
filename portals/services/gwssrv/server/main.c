@@ -1334,15 +1334,16 @@ int main (int argc, char **argv){
         // Calling child.
         //printf ("gwssrv: Calling child \n");  
 
+
         //gwssrv_clone_and_execute ("gws.bin");      // command gws.bin
-        gwssrv_clone_and_execute ("gwm.bin");      // window manager
+          gwssrv_clone_and_execute ("gwm.bin");      // window manager
         //gwssrv_clone_and_execute ("terminal.bin");  
         //gwssrv_clone_and_execute ("fileman.bin");  
         //gwssrv_clone_and_execute ("browser.bin");
         //gwssrv_clone_and_execute ("editor.bin");   
         //gwssrv_clone_and_execute ("launch1.bin"); 
-        //gwssrv_clone_and_execute ("s2.bin");    //#bugbug        
-        //gwssrv_clone_and_execute ("s3.bin");    //#bugbug        
+        //gwssrv_clone_and_execute ("s2.bin");      // shell  
+        //gwssrv_clone_and_execute ("s3.bin");    // hello        
         // ...        
 
 

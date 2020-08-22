@@ -1,13 +1,16 @@
 /*
  * File: s2.c
  *
+ *    Small shell.
+ *    This is client of gwssrv.
+ *    Calling the server directly. With no virtual terminal
+ * 
  *    Using socket to connect with gws.
  *    AF_GRAMADO family.
  *
  * 2020 - Created by Fred Nora.
  */
  
-
 
 // tutorial example taken from. 
 // https://www.tutorialspoint.com/unix_sockets/socket_server_example.htm
@@ -44,9 +47,8 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 
-
-//#test
 #include <gws.h>
+
 
 
 
@@ -57,17 +59,25 @@
 #define SERVER_PACKET_TYPE_ERROR      1003
 
 
-
+/*
 // gerar número aleatório dentro de uma faixa.
 int gerar_numero(int lim_inf, int lim_sup)
 {
     return (lim_inf + (rand() % lim_sup));
 }
+*/
 
+char __buffer[512];
+
+//
+// main:
+//
+
+//    Small shell.
+//    This is client of gwssrv.
+//    Calling the server directly. With no virtual terminal
 
 int main ( int argc, char *argv[] ){
-
-    char __buffer[512];
 
     // Isso permite ler a mensagem na forma de longs.
     unsigned long *message_buffer = (unsigned long *) &__buffer[0];   
@@ -88,57 +98,69 @@ int main ( int argc, char *argv[] ){
 
 
     debug_print ("---------------------------\n");    
-    debug_print ("s2.bin: Initializing ...\n");
-
-
+    debug_print ("s2.bin: Small shell for gwssrv.\n");
 
     //
     // socket
     // 
 
     // #debug
+    printf ("s2.bin: Small shell for gwssrv.\n");
     printf ("s2: Creating socket\n");
 
-    // cria o soquete.
-    // AF_GRAMADO
-    client_fd = socket ( 8000, SOCK_STREAM, 0 );
-    
+
+    //
+    // Socket
+    //
+
+    client_fd = socket ( AF_GRAMADO, SOCK_STREAM, 0 );
+
     if ( client_fd < 0 ){
        printf ("s2: Couldn't create socket\n");
        exit(1);
     }
-    
+
+
+    //
+    // Connect
+    // 
+
+    //nessa hora colocamos no accept um fd.
+    //então o servidor escreverá em nosso arquivo.
     
     while(1){
-    
-        //
-        // connect
-        // 
-
-        //nessa hora colocamos no accept um fd.
-        //então o servidor escreverá em nosso arquivo.
         // #debug
         printf ("s2: connecting ...\n");      
 
-        if (connect (client_fd, (struct sockaddr *) &addr, sizeof(addr)) < 0){ 
-            
-            debug_print("s2: Connection Failed \n");
-            printf("s2: Connection Failed \n"); 
-            //return -1;
-            //try again
+        if ( connect (client_fd, (struct sockaddr *) &addr, sizeof(addr)) < 0 )
+        { 
+            debug_print ("s2: Connection Failed \n");
+            printf      ("s2: Connection Failed \n");
+            // Try again forever.
 
         }else{break;}; 
-
     };
 
-     //
-     // Loop for new message.
-     //
 
-    unsigned long ____color = 0x00FF00;
+    //
+    // Loop.
+    //
 
+    // Green
+    //unsigned long ____color = 0x00FF00;
+    
+    // Black (fake terminal)
+    unsigned long ____color = 0x000000;
+ 
+ 
 // loop:
 new_message:
+
+    // #todo
+    // Small shell.
+    // This is client of gwssrv.
+    // Calling the server directly. With no virtual terminal.
+
 
     //
     // Write
@@ -149,24 +171,21 @@ new_message:
 
     while (1)
     {
-
         // #debug
         debug_print ("s2: Sending request ...\n");      
         
         // Create window        
-        message_buffer[0] = 0;       // window. 
-        message_buffer[1] = 1001;    // msg. Create window.
+        message_buffer[0] = 0;     // window. ?? 
+        message_buffer[1] = 1001;  // msg. Create window.
         message_buffer[2] = 0;
         message_buffer[3] = 0;
-        
         message_buffer[4] = 0;   //x
         message_buffer[5] = 0;   //y
-        message_buffer[6] = 20;   //w
-        message_buffer[7] = 20;   //h
-        
-        message_buffer[8] = ____color + ( rand() ); 
+        message_buffer[6] = 640;  //w
+        message_buffer[7] = 480;  //h
+        message_buffer[8] = ____color; //____color + ( rand() ); 
         message_buffer[9] = WT_SIMPLE;
-
+        // #bugbug: Arg missing!
         //...
 
         // Write!
@@ -175,13 +194,12 @@ new_message:
 
         n_writes = write (client_fd, __buffer, sizeof(__buffer));
        
-        if(n_writes>0)
-           break;
+        if(n_writes>0){ break; }
     }
 
 
     //
-    // waiting
+    // Waiting
     //
 
     // Espera para ler a resposta. 
@@ -193,7 +211,7 @@ new_message:
     // #debug
     //debug_print ("s2: Waiting ...\n");      
 
-    int y;
+    int y=0;
     for(y=0; y<15; y++)
         gws_yield();
 
@@ -210,24 +228,29 @@ new_message:
     // read
     //
 
-       //#caution
-       //we cam stay here for ever.
-       //it's a test yet.
-__again:
+   //#caution
+   //we cam stay here forever.
+   //it's a test yet.
 
     // #debug
     debug_print ("s2: Reading response ...\n");      
 
+
+__again:
+
     n_reads = read ( client_fd, __buffer, sizeof(__buffer) );
-    // Não vamos insistir num arquivo vazio.
-    if (n_reads<=0){
-         gws_yield();        
+    
+    if (n_reads<=0)
+    {
+        gws_yield();        
         goto __again;
     }
     
+    // Now we got a message!    
     // Get the message sended by the server.
     int msg = (int) message_buffer[1];
-    
+
+
     switch (msg)
     {
         case SERVER_PACKET_TYPE_REQUEST:
@@ -236,47 +259,47 @@ __again:
             break;
             
         case SERVER_PACKET_TYPE_REPLY:
-            goto process_reply;
+            goto do_exit;
             break;
             
         case SERVER_PACKET_TYPE_EVENT:
             //todo: call procedure.
+            gws_yield ();
             goto __again;
             break;
             
         case SERVER_PACKET_TYPE_ERROR:
             debug_print ("gws: SERVER_PACKET_TYPE_ERROR\n");
+            gws_yield ();
             goto __again;
             //exit (-1);
             break;
         
         default:
+            ____color = rand();
             goto __again;
             break; 
     };
 
 
-process_reply:
-
     //
     // done:
     //
+    
+do_exit:
 
-    //printf("%d bytes readed\n",n_reads);
-    //printf("RESPONSE: {%s} \n",__buffer+16);
+    printf("%d bytes readed\n",n_reads);
+    printf("RESPONSE: {%s} \n",__buffer+16);
     
     // A resposta tras o window id no inpicio do buffer.
-    // printf ("s2: Window ID %d \n", message_buffer[0] );
+    printf ("s2: Window ID %d \n", message_buffer[0] );
 
-    ____color = rand();
-    
-    debug_print ("s2: new message\n");
-    goto new_message;
-    
-    
+
     debug_print ("s2: bye\n"); 
-    printf ("s2: bye\n");
+    printf      ("s2: bye\n");
 
     return 0;
 }
+
+
 
