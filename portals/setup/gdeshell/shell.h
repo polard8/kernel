@@ -1,12 +1,11 @@
-
-// sh.h 
-
-//onde ficarão todos os header se possível. 
+//
+// File: shell.h 
+// 2016 - Created by Fred Nora.
+//
 
 
 //Setup current compiler 
 #include "compiler.h"
-
 
 #include <types.h>
 #include <stddef.h>
@@ -14,18 +13,14 @@
 #include <stdio.h>  
 #include <stdlib.h>  
 #include <string.h>
-
-
 #include <termios.h>
-
 #include <sys/socket.h>
+
 
 //shell stuff 
 #include "globals.h"
 #include "builtins.h"
-
 #include <api.h>
-
 #include "desktop.h"
 
 //# bash 1.05 stuff #
@@ -35,32 +30,10 @@
 #include "alias.h"
 #include "ndir.h"
 #include "version.h"
+
 //...
-
-
-/*
- *
- * Descrição:
- *     Header principal do Shell.
- *     SHELL.BIN (32bit User Mode) 
- *
- * Obs: 
- * Para atender os comandos do usuário o Shell chamará vários programas, assim 
- * como terá rotinas internas que atendem os comandos. Para isso, esse 
- * diretório deve ter várias pastas, uma para cada um dos comandos principais, 
- * como shutdown. Cda pasta é um programa que o Shell vai chamar.
- *
- * O kernel que gerencia a estrutura de processo deve criar o fluxo padrão ?
- * 
- *
- * History:
- *     2016 - Created by Fred Nora.
- *     2017 - procedure and command stuff.
- *     2018 - Add some bash 1.05 stuff. 
- */
  
- 
- 
+#include <sys/wait.h> 
  
 //
 // botões
@@ -1264,8 +1237,11 @@ void shellExit (int code);
  */
 void shell_pathname_backup ( char *path, int n ); 
 
-//isso vai ser usado pelo echo.
-void shell_print_tokenList ( char *token_list[], char *separator );	
+// Isso vai ser usado pelo echo.
+void 
+shell_print_tokenList ( 
+    char *token_list[], 
+    char *separator );
 
 
 /* Check if it's a .bin file */
