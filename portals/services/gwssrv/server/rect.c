@@ -156,7 +156,6 @@ rectBackbufferDrawRectangle (
 
     struct gws_rect_d rect;
     
-    
     unsigned long w_max = gws_get_device_width();
     unsigned long h_max = gws_get_device_height();
    
@@ -167,21 +166,23 @@ rectBackbufferDrawRectangle (
     //posicionamento
     rect.left = x;    
     rect.top  = y;
-    
+     
     rect.width  = width;  
     rect.height = height;  
 
-    if ( rect.width > (w_max - rect.left) ){
+    if ( rect.width > (w_max - rect.left) )
+    {
         rect.width = (w_max - rect.left);
     }
     
-    if (rect.height > (h_max - rect.top) ){
+    if (rect.height > (h_max - rect.top) )
+    {
         rect.height > (h_max - rect.top);
     }
 
     //Margins.
-    rect.right  = rect.left + rect.width;
-    rect.bottom = rect.top  + rect.height; 
+    rect.right  = (rect.left + rect.width);
+    rect.bottom = (rect.top  + rect.height); 
 
     rect.bg_color = color;
 
@@ -190,7 +191,8 @@ rectBackbufferDrawRectangle (
 
     while (rect.height--)
     {
-        lineBackbufferDrawHorizontalLine ( rect.left, 
+        lineBackbufferDrawHorizontalLine ( 
+            rect.left, 
             rect.top, 
             rect.right, 
             rect.bg_color );
@@ -198,5 +200,6 @@ rectBackbufferDrawRectangle (
        rect.top++;
     };    
 }
+
 
 

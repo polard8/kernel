@@ -790,14 +790,16 @@ int main ( int argc, char *argv[] ){
         debug_print("Editor: client_window fail\n"); 
 
      gws_draw_text (
-        (int) client_fd,             // fd,
-        (int) client_window,              // window id,
+        (int) client_fd,       // fd,
+        (int) client_window,   // window id,
         (unsigned long) 40,    // left,
         (unsigned long) 40,    // top,
         (unsigned long) COLOR_BLACK,
         "Hello, from Editor!");
 
 
+    // Show main window.
+    gws_refresh_window(client_fd,main_window);
 
     //
     // Loop

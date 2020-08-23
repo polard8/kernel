@@ -119,36 +119,42 @@ dtextDrawString (
 
     int Index=0;
 
-    int cWidth = 8;   //#bugbug  determinando
-
-
+    //#bugbug:  Determinando
+    int cWidth = 8;   
 	//int cWidth = get_char_width ();
 	//int cHeight = get_char_height ();
-	
+
+
 	//if ( cWidth == 0 || cHeight == 0 )
     if ( cWidth == 0 )
     {
-		//panic ("dtext-draw_string: cWidth");
-	    
-	    //#debug
+        //panic ("dtext-draw_string: cWidth");
+    
+        //#debug
         //gde_message_box (3, "xxx","dtext-draw_string: cWidth");
         printf("dtext-draw_string: cWidth\n");
         while(1){}
     }
       
+      
+    //int size = sizeof(string);  
+    //for ( Index=0; Index<size; Index++ )
+    
     for ( Index=0; string[Index] != 0; Index++ )
     {
-		//@todo: 
-		//   Conflito de tipo no argumento 4.
-		//   gcharWidth.
-		//my_buffer_char_blt( x, y, color, string[Index]);
-        
+        charBackbufferDrawcharTransparent ( 
+            x, y, 
+            color, string[Index] );
+
+        //#todo: 
+        //   Conflito de tipo no argumento 4.
+        //   gcharWidth.
+        //my_buffer_char_blt( x, y, color, string[Index]);
         //drawchar_transparent ( x, y, color, string[Index] );
-        charBackbufferDrawcharTransparent ( x, y, color, string[Index] );
         
-        
-		//#todo: Tamanho do char. Usr variável.
-		
+		//#todo: 
+		//Tamanho do char. Usar variável.
+
         x += cWidth;
     };
 }
