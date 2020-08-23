@@ -451,8 +451,8 @@ int new_timer_id (void){
  * create_timer:
  * 
  */
- 
-// IN: window pointer, ms, type
+
+// IN: pid, ms, type
 
 struct timer_d *create_timer ( 
     pid_t pid, 

@@ -2417,12 +2417,12 @@ gde_services (
         case SYS_DESTROYTERMINAL:
             break; 
  
-       //220 - reboot             #todo
-       //221 - execute a program. #todo
+         //220 - reboot             #todo
+         //221 - execute a program. #todo
 
 
         // 222 - Create timer.
-        // IN: window pointer, ms, type
+        // IN: pid, ms, type
         case 222:
             return (void *) create_timer ( 
                                 (pid_t) arg2, 

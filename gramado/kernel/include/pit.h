@@ -225,7 +225,7 @@ void timerDisableTextCursor (void);
 unsigned long get_systime_info (int n);
 
 
-
+// IN: pid, ms, type
 struct timer_d *create_timer ( 
     pid_t pid, 
     unsigned long ms, 

@@ -2774,7 +2774,7 @@ struct window_d *gde_get_ws_main_window (void)
  *     Create timer.
  */
 
-// IN: window pointer, ms, type
+// IN: pid, ms, type
 
 struct timer_d *gde_create_timer ( 
     int pid, 
