@@ -2422,12 +2422,13 @@ gde_services (
 
 
         // 222 - Create timer.
-        // IN: window, ms e tipo
+        // IN: window pointer, ms, type
         case 222:
-            return (void *) create_timer ( (struct window_d *) arg2, 
-                                (unsigned long) arg3, (int) arg4 );
+            return (void *) create_timer ( 
+                                (pid_t) arg2, 
+                                (unsigned long) arg3, 
+                                (int) arg4 );
             break;
-
 
 
         //223 - get sys time info.

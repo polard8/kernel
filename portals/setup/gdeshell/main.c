@@ -630,7 +630,8 @@ void update_cpu_usage (void)
 		
 		//limpa
 		gde_redraw_window ( cpu_window, 1 );
-		for (i=0; i<32; i++)
+		//for (i=0; i<32; i++)
+		for (i=1; i<32; i++)
 		{
 		    gde_draw_text ( cpu_window, 
 		        i*smCharHeight, CPU_USAGE[i], COLOR_BLACK, "+");
@@ -1035,14 +1036,17 @@ shellProcedure (
     unsigned long long2 )
 {
 
-    unsigned long input_ret;
-    unsigned long compare_return;
-    int q;
+    unsigned long input_ret=0;
+    unsigned long compare_return=0;
+    int q=0;
 
     int c=0;
 
 
-
+    // #bugbug
+    // switch sempre da problemas de compilacao ...
+    // corrija os problemas ... use returns.
+    
     switch (msg)
     {
 
@@ -1123,7 +1127,6 @@ shellProcedure (
         case MSG_KEYUP:   
             break;
         
-        
         case MSG_SYSKEYDOWN: 
             switch (long1)
             {
@@ -1186,16 +1189,17 @@ shellProcedure (
         //ele faz uma chamada ao procedimento de janela do aplicativo com a mensagem 
         //MSG_CREATE, se o aplicativo retornar -1, ent�o a rotina em kernel mode que 
         //esta criando a janela, cancela a janela que est� criando e retorn NULL.		
-        case MSG_CREATE: printf ("MSG_CREATE\n"); break;
+        case MSG_CREATE: 
+            printf ("MSG_CREATE\n"); 
+            break;
 
-		//#IMPORTANTE
+        //#IMPORTANTE
 		// a API CHAMA ISSO DE TEMPOS EM TEMPOS DE ACORDO
 		//COM A CONFIGURA��O FEITA ANTES POR ESSE APP.
-		//MSG_TIMER ;;#TODO INCLUIR ISS0 NA API.	
-        case 53:
-            // update_cpu_usage ();
+        case MSG_TIMER:
+            //printf("TIMER\n");
+            update_cpu_usage ();
             break; 
-
 
         //case MSG_SETFOCUS:   break;
         //case MSG_KILLFOCUS:  break;
@@ -2846,30 +2850,30 @@ do_compare:
 	// de tempos em tempos e � tratado pelo procedimento de janelas.
     if ( gramado_strncmp( prompt, "timer-test", 10 ) == 0 )
     {
-        __count = 0; //tem que uinicializar;
+        __count = 0; //tem que Inicializar;
 
         printf("timer-test: Creating timer\n");
         printf("%d Hz | sys time %d ms | ticks %d \n", 
             gde_get_systime_info (1), 
             gde_get_systime_info (2), 
             gde_get_systime_info (3) );
-			
-		gde_enter_critical_section ();
-		cpu_window = (void *) gde_create_window ( 1, 1, 1, "shell-main",     
-                                 10, 10, 32*8, 100,    
-                     0, 0, COLOR_YELLOW, COLOR_YELLOW );
+
+        gde_enter_critical_section ();
+        cpu_window = (void *) gde_create_window ( 1, 
+                                 1, 1, "shell-main",     
+                                 400, 40, 32*8, 100,    
+                     0, 0, COLOR_WHITE, COLOR_WHITE );
         gde_register_window (cpu_window);
         gde_show_window (cpu_window);
-        gde_exit_critical_section ();	
+        gde_exit_critical_section ();
 
-					
 		//janela, 100 ms, tipo 2= intermitente.
 		//system_call ( 222, (unsigned long) window, 100, 2);
-			
-        gde_create_timer ( (struct window_d *) window, 
-            (unsigned long) 30, // interval.
-            (int) 2 );
 
+        gde_create_timer ( 
+            getpid(), 
+            (unsigned long) 30, // interval. count down.
+            (int) 2 );
 
 		//inicializando.
         objectX = 0;

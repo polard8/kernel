@@ -1580,7 +1580,6 @@ process_reply:
 process_event:
     gws_debug_print ("libgws: We got an event\n"); 
     return 0;
-
 }
 
 
@@ -1867,7 +1866,8 @@ gws_create_window (
     //#todo
     // use more arguments.
     __gws_createwindow_request(fd, 
-        x, y, width, height, color, type, parentwindow, windowname);
+        x, y, width, height, 
+        color, type, parentwindow, windowname);
         
     int wid = (int) __gws_createwindow_response(fd); 
     

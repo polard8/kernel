@@ -1049,7 +1049,7 @@ int create_tester_client(int fd)
             printf ("gwm: c_tester->window fail\n");
             exit(1);
         }
-        printf ("w={%x}\n",c_tester->window);
+        printf ("tester window = {%d}\n",c_tester->window);
         gws_refresh_window(fd,c_tester->window);
         
         c_tester->title_window = gws_create_window (fd,

@@ -3510,7 +3510,7 @@ struct window_d *gde_get_ws_main_window (void);
 
 struct timer_d *
 gde_create_timer ( 
-    struct window_d *window, 
+    int pid, 
     unsigned long ms, 
     int type );
 

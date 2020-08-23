@@ -1903,8 +1903,10 @@ void *__do_111 ( unsigned long buffer ){
     }
 
 
-   // Again. Se o buffer for inválido.
-   if ( &message_address[0] == 0 ){
+   // Again. 
+   // Se o buffer for inválido.
+   if ( &message_address[0] == 0 )
+   {
        panic ("__do_111: buffer");
 
    }else{
@@ -1944,12 +1946,6 @@ void *__do_111 ( unsigned long buffer ){
         t->head_pos++;
         if ( t->head_pos >= 31 )
             t->head_pos = 0;
-
-
-		// sinalizamos que a mensagem foi consumida.
-		// #todo: 
-		// nesse momento a estrutura da thread também precisa ser limpa.
-        //t->newmessageFlag = 0; 
    
         //Sinaliza que há mensagem
         return (void *) 1; 

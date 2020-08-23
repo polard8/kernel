@@ -155,13 +155,17 @@ struct timer_d
 	
 	//1 = one shot 
 	//2 = intermitent
-	
 	int type;
-	
-	//owner.
-    struct process_d *process;
-	struct thread_d *thread;
-	struct window_d *window;
+
+
+    //owner.
+    struct process_d  *process;
+    struct thread_d   *thread;
+
+    int pid;
+    int tid;
+
+	struct window_d   *window;
 
 	
 	int count_down;     //--
@@ -220,7 +224,13 @@ void timerDisableTextCursor (void);
 
 unsigned long get_systime_info (int n);
 
-struct timer_d *create_timer ( struct window_d *window, unsigned long ms, int type  );
+
+
+struct timer_d *create_timer ( 
+    pid_t pid, 
+    unsigned long ms, 
+    int type  );
+
 //#todo destroy timer.
 
 int new_timer_id (void);

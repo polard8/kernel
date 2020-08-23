@@ -165,11 +165,11 @@ void timer (void){
     // Timers.
     int i = 0;
 
-    struct timer_d *t;
+    struct timer_d  *t;
+    struct thread_d *Thread;
 
 
-
-    unsigned long __cWidth = gwsGetCurrentFontCharWidth();
+    unsigned long __cWidth  = gwsGetCurrentFontCharWidth();
     unsigned long __cHeight = gwsGetCurrentFontCharHeight();
 
     if ( __cWidth == 0  ||  __cHeight == 0 ){
@@ -177,9 +177,10 @@ void timer (void){
     }
 
 
-
-
-
+    //#bugbug
+    //This is just for test
+    //mensagem para todas as threads quando estao rodando.
+    //Thread = (struct thread_d *) threadList[current_thread];
 
     //
     // Jiffies.
@@ -289,14 +290,10 @@ void timer (void){
     // #todo
     // Podemos fazer isso com menos frequência.
 
-    if ( jiffies % 100 == 0 )
-    {
-        extra = 1;
-    }
-
+    if ( jiffies % 100 == 0 ){ extra = 1; }
 
 	//
-	// ## mouse blink ##
+	// ## cursor blink ##
 	//
 	
 	//#todo:
@@ -323,7 +320,7 @@ void timer (void){
                     16, 16 );
 
                 timerTextCursorStatus = 1;
-                goto mouseExit;
+                goto cursorExit;
             }
 
             // Acende.
@@ -334,14 +331,13 @@ void timer (void){
                     TTY[current_vc].cursor_y * __cHeight );
          
                 timerTextCursorStatus = 0;
-                goto mouseExit;
+                goto cursorExit;
             }
         };
     };
 
 
-
-mouseExit:
+cursorExit:
 
     // Lista de timers.
     // Podemos percorrer a lista de timer e decrementar,
@@ -370,19 +366,27 @@ mouseExit:
 						//enviamos a mensagem para a thread que é dona do timer.
 						//#todo: podemos usar uma função para isso.
 						
+						//Thread = (struct thread_d *) t->thread;
+						Thread = (struct thread_d *) threadList[ t->tid ];
+						
 						//se a thread for válida.
-						if ( (void *) t->thread != NULL )
+						//if ( (void *) t->thread != NULL )
+						if ( (void *) Thread != NULL )
 						{
-							if ( t->thread->used == 1 && t->thread->magic == 1234 )
+							if ( Thread->used == 1 && Thread->magic == 1234 )
 							{
-								
-		                        t->thread->window = t->window;
-		                        t->thread->msg = (int) MSG_TIMER;    
-		                        t->thread->long1 = t->times;   //quantas vezes esse timer se esgotou.      
-		                        t->thread->long2 = t->status;  //?/status.     
-		
-		                        t->thread->newmessageFlag = 1;			
-								
+                                //Send system message to the thread.
+                                Thread->window_list[ Thread->tail_pos ] = t->window; //#bugbug:fail
+                                Thread->msg_list[ Thread->tail_pos ]    = MSG_TIMER;    
+                                Thread->long1_list[ Thread->tail_pos ]  = t->times;   //quantas vezes esse timer se esgotou.
+                                Thread->long2_list[ Thread->tail_pos ]  = t->status;  //?/status.
+
+                                Thread->tail_pos++;
+                                if ( Thread->tail_pos >= 31 )
+                                    Thread->tail_pos = 0;
+
+                                //#debug ok
+                                //printf("*"); refresh_screen();
 							}
 							
 						}
@@ -391,37 +395,23 @@ mouseExit:
 						//dependendo do tipo, devemos parar ou recomeçar.
 						
 						//one shot
-						if ( t->type == 1 )
-						{
-						   t->count_down = 0;	
-						}
-						
+                        if ( t->type == 1 ){ t->count_down = 0; }
 						//intermitente
-						if ( t->type == 2 )
-						{
-						   t->count_down = t->initial_count_down;	
-						}
-						
-                        //...						
-					}						
+                        if ( t->type == 2 ){t->count_down = t->initial_count_down;}
+                        
+                        //...
+					}	
 				}
 			    
-			};
-		};			
-		
+			}
+		}
 		//nothing
 	};
 	
 	
 
 done:
-    	
-	//#todo
-	//if(time_out > 0){
-	//	time_out--;
-	//};
-	
-	return;
+    return;
 }
 
 
@@ -461,16 +451,46 @@ int new_timer_id (void){
  * create_timer:
  * 
  */
+ 
+// IN: window pointer, ms, type
 
 struct timer_d *create_timer ( 
-    struct window_d *window, 
+    pid_t pid, 
     unsigned long ms, 
     int type )
 {
 
-    struct timer_d *Timer;
-    
+    struct timer_d   *Timer;
+    struct process_d *Process;
+    struct thread_d  *Thread;
+
+
     int ID = -1;  //erro;
+
+
+    debug_print("===================\n");
+    debug_print("create_timer:\n");
+    printf     ("create_timer: pid=%d ms=%d type=%d\n",
+        pid,ms,type);
+
+    if (pid<0){
+        debug_print("create_timer: [FAIL] pid\n");
+        return NULL;
+    }
+    
+    Process = (struct process_d *) processList[pid];
+    if ( (void*) Process == NULL ){
+        debug_print("create_timer: [FAIL] Process\n");
+        return NULL;
+    }
+
+    // Thread de controle.
+    //Thread = (struct thread_d *) Process->control;
+    Thread = (struct thread_d *) threadList[current_thread];
+    if ( (void*) Thread == NULL ){
+        debug_print("create_timer: [FAIL] Thread\n");
+        return NULL;
+    }
 
 
 	// limits
@@ -529,61 +549,31 @@ struct timer_d *create_timer (
             //1 = one shot 
             //2 = intermitent
             Timer->type = (int) type;
+            
+            // Pegamos logo acima.
+            Timer->process = (struct process_d *) Process;
+            Timer->thread  = (struct thread_d *) Thread;
+            Timer->pid = pid;
+            Timer->tid = current_thread;
+            
+            printf("create_timer: done t={%d} :) \n",
+                Timer->initial_count_down);
 
             // Coloca na lista.
             timerList[ID] = (unsigned long) Timer;
         };
-
-
-        // Thread.
-        // Checking the window associated with the thread.
-  
-        if ( (void *) window == NULL){
-            printf("create_timer: window fail \n");
-            refresh_screen ();
-            return NULL;
-
-        }else{
-
-            if ( window->used != 1 || window->magic != 1234 ){
-                printf("create_timer: window validation fail \n");
-                refresh_screen();
-                return NULL;
-            }
-
-            //Temos uma janela válida 
-            Timer->window = window;
-
-            if ( (void *) window->control == NULL ){
-                printf("create_timer: Control thread fail \n");
-                refresh_screen();
-                return NULL;
-            }
-
-            if ( window->control->used != 1 || 
-                 window->control->magic != 1234 )
-            {
-
-                printf("create_timer: Control thread validation fail \n");
-                refresh_screen ();
-                return NULL;
-            }
-
-			// #importante 
-			// Agora o timer tem uma thread para enviar mensagens
-			// quando o tempo se esgotar.
-            
-            Timer->thread = (struct thread_d *) window->control;
-        };
     };
-
 
     // #debug
     debug_print("create_timer: done\n");
-    // printf("create_timer: done \n");
-    // refresh_screen ();
-
+    refresh_screen ();
     return (struct timer_d *) Timer;
+
+fail:
+    debug_print("create_timer: [FAIL]\n");
+    printf     ("create_timer: [FAIL]\n");
+    refresh_screen ();
+    return NULL;
 }
 
 
@@ -834,17 +824,18 @@ int timerInit (void){
 
     __breaker_timer_initialized = 0;
 
-    int i;
-	
+
+    int i=0;
+
 	//Constructor.
-	timerTimer();
-	
-	
-	for ( i=0; i<32; i++ ){
-		timerList[i] = (unsigned long) 0;
-	}
-	
-	
+    timerTimer();
+
+
+    for ( i=0; i<32; i++ ){
+        timerList[i] = (unsigned long) 0;
+    }
+
+
     // timerLock = 0;
 
     //set handler.

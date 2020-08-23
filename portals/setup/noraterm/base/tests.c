@@ -76,7 +76,8 @@ void testsInitTimer (struct window_d * window){
 		//janela, 100 ms, tipo 2= intermitente.
 		//system_call ( 222, (unsigned long) window, 100, 2);	
 			
-        gde_create_timer ( (struct window_d *) window, 
+        gde_create_timer ( 
+            getpid(), 
             (unsigned long) 50, (int) 2 );			
 		
 		//inicializando.

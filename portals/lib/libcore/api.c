@@ -2774,15 +2774,16 @@ struct window_d *gde_get_ws_main_window (void)
  *     Create timer.
  */
 
-struct timer_d *
-gde_create_timer ( 
-    struct window_d *window, 
+// IN: window pointer, ms, type
+
+struct timer_d *gde_create_timer ( 
+    int pid, 
     unsigned long ms, 
     int type )
 {
     gde_debug_print ("gde_create_timer:\n");
     return (struct timer_d *) gramado_system_call ( 222, 
-                                  (unsigned long) window, 
+                                  (unsigned long) pid, 
                                   (unsigned long) ms, 
                                   (unsigned long) type );
 }
