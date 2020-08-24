@@ -841,7 +841,12 @@ int sys_socket ( int family, int type, int protocol ){
         //return -1;
     }
 
-    if (type < 0){
+    // Check if this is a valid type.
+    //if (type < 0){
+    if ( type != SOCK_STREAM &&
+         type != SOCK_DGRAM  &&
+         type != SOCK_RAW)
+    {
         debug_print ("sys_socket: [FAIL] type not supported\n");
         goto fail;
         //return -1;
@@ -1385,8 +1390,12 @@ sys_connect (
         printf ("sys_connect: [FAIL] client_socket fail\n");
         goto fail;
     }
- 
- 
+
+    if (client_socket->state != SOCKET_NOT_CONNECTED) {
+        printf ("sys_connect: socket not SOCKET_NOT_CONNECTED\n");
+        goto fail;
+    }
+
     //
     // == Server process ===============================
     //
@@ -1548,6 +1557,9 @@ int sys_socket_shutdown (int socket, int how)
         goto fail;
     }
 
+    //
+    // == socket =====================
+    //
 
     // Pega a estrutura de socket associada ao arquivo.
     // socket structure in the senders file.
@@ -1562,8 +1574,12 @@ int sys_socket_shutdown (int socket, int how)
         
     }else{
 
+        s->conn->state = SOCKET_NOT_CONNECTED;
+        s->conn->conn = (struct socket_d *) 0;
+        
+        s->state = SOCKET_NOT_CONNECTED;
         s->conn = (struct socket_d *) 0;
-        s->state = SOCKET_NOT_CONNECTED; 
+
         //ok
         return 0;
 
@@ -1579,42 +1595,16 @@ fail:
 }
 
 
-// #test
-// ??
-// Checar o accept[].
-// Vamos pegar um descritor que aponta para um arquivo do tipo soquete 
-// que deseja se concetar.
-// #todo: mudar o tipo do retorno para pid_t
 
-int sys_accept_sender (int n){
-
-    int __pid = -1;
-    struct process_d *p;
- 
- 
-    if(n<0 || n>4)
-        return -1;
-
-    p = (struct process_d *) processList[current_process];
-    if( (void *) p == NULL)
-        return -1;
-
-    //todo: validation.
-
-    //todo: tem 5 possíveis conexões.
-    
-    // #bugbug
-    // Isso poderia ser um array de sockets ??
-    // Desse modo o servidor ser conectaria a 5 sockets
-    // vindos de qualquer máquina.
-
-    __pid = (int) p->accept[n];
-
-    p->accept[n] = 0;
-
-
-    return (int) __pid;
+// Deprecated!
+int sys_accept_sender (int n)
+{
+    debug_print ("sys_accept_sender: [DEPRECATED]\n");
+    printf      ("sys_accept_sender: [DEPRECATED]\n");
+    return -1;
 }
+
+
 
 
 /*
@@ -1645,6 +1635,33 @@ sys_accept (
     struct sockaddr *addr, 
     socklen_t *addrlen )
 {
+
+
+    //
+    // == todo =========================
+    //
+
+    // #solution
+    // We create a new socket and connect this 
+    // new socket with the client.
+    // This way we can return the fd of the socket.
+    // When the write() writes in the new socket, the data
+    // will be copied to the client socket.
+    
+    /*
+     * From Linux 0.98.1:
+     * 
+     * For accept, 
+     * we attempt to create a new socket, 
+     * set up the link with the client, 
+     * wake up the client, then 
+     * return the new connected fd.
+     */
+     
+     // #todo
+     // We need to create a new socket. Only this way the process
+     // will have a new file in p->Objects[].
+
 
     struct process_d  *sProcess; //server process
     file              *f;
@@ -1732,6 +1749,18 @@ sys_accept (
         refresh_screen();
         return -1;
     }
+
+    // Isso significa que o cliente chamou connect antes mesmo 
+    // do servidor chamar accept ??
+    /*
+    if (sSocket->state == SOCKET_CONNECTED) 
+    {
+        printf("sys_accept: [FAIL] socket is already SOCKET_CONNECTED\n");
+        refresh_screen();
+        return -1;
+    }
+    */
+
 
     /*
     // #test
