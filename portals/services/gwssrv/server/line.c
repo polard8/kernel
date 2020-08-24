@@ -12,6 +12,55 @@
 
 #include <gws.h>
 
+// ...
+//dx = x2 − x1
+//dy = y2 − y1
+//for x from x1 to x2 do
+//    y = y1 + dy × (x − x1) / dx
+//    plot(x, y)
+// See: https://en.wikipedia.org/wiki/Line_drawing_algorithm
+
+void
+A_naive_line_drawing_algorithm(
+    unsigned long x1,
+    unsigned long x2, 
+    unsigned long y1, 
+    unsigned long y2, 
+    unsigned long color)
+{
+    unsigned long dx =  x2 - x1;
+    unsigned long dy =  y2 - y1;
+    unsigned long x=0;
+    unsigned long y=0;
+    
+    for ( x = x1; x < x2; x++ )
+    {
+         y = (y1 + dy * (x - x1) / dx);
+         
+         pixelBackBufferPutpixel ( color, x, y );
+    }; 
+    
+    //gwssrv_show_backbuffer();
+}
+
+
+void test_draw_line(void)
+{
+    int g=0;
+
+    for( g=0; g<400; g++ )
+    {
+            A_naive_line_drawing_algorithm ( 
+                8, 750, 
+                8, (50 + (g*4)) , 
+                COLOR_YELLOW );
+     };
+
+    gwssrv_show_backbuffer();
+    //while(1){}
+}
+
+
 
 
 

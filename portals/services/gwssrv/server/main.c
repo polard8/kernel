@@ -115,9 +115,6 @@ void __test_load_icon(void);
 
 
 
-// ...
-
-
 
 //
 //===================================================================
@@ -1330,6 +1327,11 @@ int main (int argc, char **argv){
         // Let's create the traditional green background.
 
         InitGraphics();
+        
+        
+        //test_draw_line();
+        //while(1){}
+        
 
         // Calling child.
         //printf ("gwssrv: Calling child \n");  
