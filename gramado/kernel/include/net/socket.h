@@ -540,12 +540,17 @@ struct socket_d
     int backlog_pos;
     int pending_connections[32];
 
-    
+    // flag
+    // write() copy the data to the connected socket.
+    int conn_copy; 
     
     struct socket_d *conn;
     int state;   // SOCKET_CONNECTED, SOCKET_NOT_CONNECTED
 
-
+    // The server finds a place in the server_process->Objects[i].
+    int clientfd_on_server;
+    
+    
     // Nosso arquivo, nosso buffer ?
     file *private_file;
 

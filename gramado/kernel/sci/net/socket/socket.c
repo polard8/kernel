@@ -1129,6 +1129,10 @@ socket_dialog (
 // mas estará ouvindo a apenas um por vez. Ou precisaremos 
 // de instâncias.
 
+
+// #todo
+// O socket do cliente precisa ter um fd no processo servidor.
+
 // IN: client fd, address, address len
 // OUT: 0=ok <0=fail
 
@@ -1383,31 +1387,48 @@ sys_connect (
     }
  
  
-     //
-     // == Server process ===============================
-     //
+    //
+    // == Server process ===============================
+    //
+
+    // #todo
+    // O socket do cliente precisa ter um fd no processo servidor.
  
-     // target pid.
-     if (target_pid<0)
-     {
+    // target pid.
+    if (target_pid<0)
+    {
         debug_print ("sys_connect: [FAIL] target_pid\n");
         printf      ("sys_connect: [FAIL] target_pid\n");
         goto fail;
-     }
+    }
 
- 
-     // process
-     // O processo cliente chamou essa função e
-     // então pegaremos agora o processo alvo,
-     // que é um servidor.
+
+    // process
+    // O processo cliente chamou essa função e
+    // então pegaremos agora o processo alvo,
+    // que é um servidor.
      
-     sProcess = (struct process_d *) processList[target_pid];
+    sProcess = (struct process_d *) processList[target_pid];
  
-     if ( (void *) sProcess == NULL ){
-         debug_print ("sys_connect: sProcess fail\n");
-         printf      ("sys_connect: sProcess fail\n");
-         goto fail;
-     }
+    if ( (void *) sProcess == NULL ){
+        debug_print ("sys_connect: sProcess fail\n");
+        printf      ("sys_connect: sProcess fail\n");
+        goto fail;
+    }
+
+
+    
+    // Procurando um slot livre.
+    int __slot=0;
+    for (__slot=0; __slot<32; __slot++)
+    {
+         if ( sProcess->Objects[__slot] == 0 ){ goto __OK_new_slot; }
+    };
+    panic ("sys_connect: [FIXME] We need a slot in the server\n");
+__OK_new_slot:
+    client_socket->clientfd_on_server = __slot;
+
+
 
     // Esse é o socket do processo servidor.
     // Sim, porque é o cliente que está tentando se conectar.
@@ -2303,12 +2324,18 @@ create_socket (
         s->gid = (gid_t) current_group;
         
         
+        s->conn_copy = 1;  //YES, copy!
+        
         // Initializing pointers.
         // We don't want this kinda crash in the real machine.
         
         // Connection ponter.
         // Its a pointer to another socket. Is it?
         s->conn = (struct socket_d *) 0;
+        
+       // The server finds a place in the server_process->Objects[i].
+        s->clientfd_on_server = -1;
+        
         // ...
         
         s->backlog_max=1;
