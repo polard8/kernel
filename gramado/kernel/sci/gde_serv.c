@@ -2150,10 +2150,13 @@ gde_services (
 		// 160
 		// Criar um socket e retornar o ponteiro para a estrutura.
 		// Gramado API socket support. (not libc)
+		// Essa chamada passa argumentos ... ip e porta.
 		// See:
         case 160:
-            return (void *) create_socket ( (unsigned long) arg2, 
-                                (unsigned short) arg3 );
+            printf ("160: [FIXME] create socket!\n"); 
+            refresh_screen();
+            //create_socket_object ();
+            return NULL;
             break;
 
 

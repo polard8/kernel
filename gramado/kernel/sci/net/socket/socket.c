@@ -12,6 +12,10 @@
 #include <kernel.h>
 
 
+//interna
+#define SYS_SOCKET_IP(a, b, c, d) (a << 24 | b << 16 | c << 8 | d)
+
+
 
 void show_socket_for_a_process(int pid){
 
@@ -768,6 +772,182 @@ fail:
 
 
 
+
+/*
+struct socket_d *create_socket ( 
+    int family, 
+    int type, 
+    int protocol );
+struct socket_d *create_socket ( 
+    int family, 
+    int type, 
+    int protocol )
+{
+
+    struct socket_d *new_socket;
+  
+  
+    // Socket address structure.
+    // Usado em AF_GRAMADO
+    struct sockaddr addr;
+    addr.sa_family  = family;
+    addr.sa_data[0] = 'x'; 
+    addr.sa_data[1] = 'x';
+
+
+    // Internet style for inet.
+    // Usado em AF_INET
+    struct sockaddr_in addr_in;
+    addr_in.sin_family      = AF_INET;
+    addr_in.sin_port        = 11369;  //??
+    addr_in.sin_addr.s_addr = SYS_SOCKET_IP(127,0,0,1);
+    //addr_in.sin_addr      = SYS_SOCKET_IP(192, 168, 1, 112); //errado
+    //addr_in->sin_addr.s_addr = inet_addr("127.0.0.1");  //todo: inet_addr see netbsd
+ 
+    // Current process.
+    struct process_d *p;  
+    
+    int fd = -1; 
+    
+	//
+	// Filtros
+	//
+
+    if (family < 0){
+        debug_print ("sys_socket: [FAIL] family not supported\n");
+        goto fail;
+        //return -1;
+    }
+
+    // Check if this is a valid type.
+    //if (type < 0){
+    if ( type != SOCK_STREAM &&
+         type != SOCK_DGRAM  &&
+         type != SOCK_RAW)
+    {
+        debug_print ("sys_socket: [FAIL] type not supported\n");
+        goto fail;
+        //return -1;
+    }
+
+    if (protocol < 0){
+        debug_print ("sys_socket: [FAIL] protocol not supported\n");
+        goto fail;
+        //return -1;
+    }
+
+
+    // Current process.
+    
+    p = (struct process_d *) processList[current_process];
+     
+    if ( (void *) p == NULL )
+    {
+        debug_print ("sys_socket: p fail\n");
+        printf      ("sys_socket: p fail\n");
+        goto fail;
+        //refresh_screen();
+        //return -1;
+    }
+
+    new_socket = (struct socket_d *) create_socket_object();
+
+    if ( (void *) new_socket == NULL )
+    {
+        debug_print ("create_socket: [FAIL] __socket fail\n");
+        printf      ("create_socket: [FAIL] __socket fail\n");
+        goto fail;
+
+    }else{
+
+        // The private socket of a process.
+        //p->priv = __socket;
+
+        // family, type and protocol.
+        new_socket->family   = family;
+        new_socket->type     = type;      // DATAGRAM or STREAM 
+        new_socket->protocol = protocol;
+
+        // #Initialized with '0'.
+        new_socket->ip   = 0;
+        new_socket->port = 0;
+
+        new_socket->pid = (pid_t) current_process;
+        new_socket->uid = (uid_t) current_user;
+        new_socket->gid = (gid_t) current_group;
+
+
+       //
+       // Create file!
+       //
+
+       // family
+       // Setup the addr.
+
+       // #importante
+       // As rotinas logo abaixo criarão o arquivo
+       // e retornarão o fd.
+
+       switch (family)
+       {
+           case AF_GRAMADO:
+               debug_print ("sys_socket: AF_GRAMADO\n");
+               new_socket->addr = addr;
+               fd = socket_gramado ( new_socket, 
+                                AF_GRAMADO, type, protocol );
+               
+               return (struct socket_d *) new_socket;
+               break;
+
+           //case AF_LOCAL:
+           case AF_UNIX:
+               debug_print ("sys_socket: AF_UNIX\n");
+               new_socket->addr =  addr;
+               fd = socket_unix ( new_socket, 
+                                AF_UNIX, type, protocol );
+               return (struct socket_d *) new_socket;
+               break;
+
+           //#bugbug: 
+           //talvez precisamos rever sockaddr 
+           //para essa função, e usarmos outra estrutura.               
+           case AF_INET:
+               debug_print ("sys_socket: AF_INET\n");
+               new_socket->addr_in = addr_in;
+               
+               
+               
+               fd = socket_inet ( new_socket, 
+                                AF_INET, type, protocol );
+               
+      
+               return (struct socket_d *) new_socket;
+               break;
+
+           // ...
+           
+           default:
+               debug_print ("sys_socket: [FAIL] default family\n");
+               debug_print ("sys_socket: Couldn't create the file\n");
+               goto fail;
+               //return (int) (-1);
+               break;
+        };
+
+        // ...
+    };
+
+    //fail.
+    
+fail:
+    debug_print ("sys_socket: [FAIL] Something is wrong!\n");
+    refresh_screen();
+    return NULL;
+}
+*/
+
+
+
 /*
  ********************** 
  *  sys_socket:
@@ -790,9 +970,13 @@ fail:
 
 // OUT: ?
 
-#define SYS_SOCKET_IP(a, b, c, d) (a << 24 | b << 16 | c << 8 | d)
-
 int sys_socket ( int family, int type, int protocol ){
+
+
+    //#todo
+    // call create_socket(...)
+    // it will return a pointer.
+
 
     // Socket structure.
     struct socket_d *__socket;
@@ -877,20 +1061,26 @@ int sys_socket ( int family, int type, int protocol ){
     // Socket structure.
     //
     
+    // #todo:
+    // Create a helper function to do this job.
+    // This functions need to create the object and need to have this switch
+    // for different families. create_socket( family, type, protocol)
+    // it returns the socket structure pointer.
+    
     // Criamos um socket vazio.
     // IN: ip and port.
 
-    __socket = (struct socket_d *) create_socket ( ip, port );
+    __socket = (struct socket_d *) create_socket_object();
   
-    if ( (void *) __socket == NULL ){
+    if ( (void *) __socket == NULL )
+    {
         debug_print ("sys_socket: [FAIL] __socket fail\n");
         printf      ("sys_socket: [FAIL] __socket fail\n");
         goto fail;
-        //refresh_screen();
-        //return -1;
 
     }else{
 
+        // #bugbug
         // The private socket of a process.
         p->priv = __socket;
 
@@ -898,6 +1088,10 @@ int sys_socket ( int family, int type, int protocol ){
         __socket->family   = family;
         __socket->type     = type;      // DATAGRAM or STREAM 
         __socket->protocol = protocol;
+
+        // #Initialized with '0'.
+        __socket->ip   = ip;
+        __socket->port = port;
 
         __socket->pid = (pid_t) current_process;
         __socket->uid = (uid_t) current_user;
@@ -2300,7 +2494,7 @@ fail:
 
 /*
  ******************************************
- * create_socket: 
+ * create_socket_object: 
  *     It creates a socket structure.
  *     Every process has its own socket structure.
  *     The status is: NOT CONNECTED.
@@ -2308,11 +2502,7 @@ fail:
 
 // IN: ip and port.
 
-struct socket_d *
-create_socket ( 
-    unsigned long ip, 
-    unsigned short port )
-{
+struct socket_d *create_socket_object (void){
 
     struct socket_d *s;
     int i=0;
@@ -2321,7 +2511,7 @@ create_socket (
     s = (void *) kmalloc ( sizeof( struct socket_d ) );
 
     if ( (void *) s ==  NULL ){
-        printf ( "create_socket: allocation fail \n");
+        printf ( "create_socket_object: allocation fail \n");
         refresh_screen();
         return NULL;
 
@@ -2338,8 +2528,8 @@ create_socket (
         s->type = 0;
         s->protocol = 0;
         
-        s->ip = ip;
-        s->port = port;
+        //s->ip = ip;
+        //s->port = port;
         
         s->state = SS_UNCONNECTED;
         

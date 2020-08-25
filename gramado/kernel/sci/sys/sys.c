@@ -1246,11 +1246,10 @@ int sys_write (unsigned int fd, char *ubuf, int count){
         // Precisamos de uma falg que nos diga que devemos
         // escrever também no socket conectado.
     
+        // NO, don't copy!
         // #todo
         // Retornaremos se não é para copiar para o socket conectado.
-        // NO, don't copy!
-        if (s1->conn_copy != 1)
-        {
+        if (s1->conn_copy != 1){
             panic ("sys_write: [FIXME] Working to not copy the data from s1 to s2.");
         }
         

@@ -54,11 +54,15 @@ int gramado_ports[32];
 int current_socket;
 
 
+
+
 /*
  * create_socket:
  * 
  */
-struct socket_d *create_socket ( unsigned long ip, unsigned short port );
+
+struct socket_d *create_socket_object (void);
+
 
 
 unsigned long getSocketIP ( struct socket_d *socket );

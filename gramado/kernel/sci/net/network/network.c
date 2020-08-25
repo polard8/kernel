@@ -8,6 +8,7 @@
  *     2016 - Created by Fred Nora.
  */
 
+
 // See:
 // https://wiki.osdev.org/Network_Stack
 // https://wiki.osdev.org/Intel_Ethernet_i217
@@ -463,15 +464,16 @@ int networkGetStatus (void)
 /*
  **********************************************************
  * networkInit:
- *     It only initializes the some network structures. Not the 
- * adapters.
+ * 
+ * It only initializes the some network structures. 
+ * Not the adapters.
  */ 
 
 int networkInit (void){
 
 
     debug_print ("networkInit:\n");
-    
+
     // #importante
     // Essa é a flag que indica que a última inicialização foi feita.
     // Aquela chamada por processos inicializadores em ring3.
@@ -490,6 +492,7 @@ int networkInit (void){
     for(i=0;i<32;i++)
     {
         nbuffer = (void*) newPage();
+        
         if((void *)nbuffer == NULL)
             panic("networkInit: receive nbuffer");
     
@@ -500,9 +503,10 @@ int networkInit (void){
     
 
     //send buffers,
-    for(i=0;i<8;i++)
+    for (i=0;i<8;i++)
     {
         nbuffer = (void*) newPage();
+        
         if((void *)nbuffer == NULL)
             panic("networkInit: send nbuffer");
     
@@ -512,17 +516,19 @@ int networkInit (void){
     NETWORK_BUFFER.send_head =0;
 
 
+
     // Status.
-    networkSetstatus (0);
+    networkSetstatus(0);
 
 
 	// Host info struct. 
 	// See: host.h
 
-    HostInfo = (struct host_info_d *) kmalloc ( sizeof( struct host_info_d ) ); 
+    HostInfo = (struct host_info_d *) kmalloc( sizeof( struct host_info_d ) ); 
 
-    if ( (void *) HostInfo == NULL ){
-        panic ("networkInit: HostInfo");
+    if ( (void *) HostInfo == NULL )
+    {
+        panic("networkInit: HostInfo");
 
     }else{
 
@@ -545,17 +551,30 @@ int networkInit (void){
     };
 
 
+    //
+    // == Socket =============================================
+    //
+
 	// Criando socket para local host porta 80;
 	// Localhost (127.0.0.1):80 
 	// Configurando soquete atual.
 
-    LocalHostHTTPSocket = (struct socket_d *) create_socket (0,0);  
+    LocalHostHTTPSocket = (struct socket_d *) create_socket_object();  
 
-    //if ( (void *) LocalHostHTTPSocket == NULL )
+    if ( (void *) LocalHostHTTPSocket == NULL )
+    {
+        panic ("networkInit: Couldn't create LocalHostHTTPSocket");
         //return -1;
+    
+    }else{
 
+        LocalHostHTTPSocket->ip = 0;
+        LocalHostHTTPSocket->port = 0;
+        // ...
+        
+        CurrentSocket = (struct socket_d *) LocalHostHTTPSocket;
+    };
 
-    CurrentSocket = (struct socket_d *) LocalHostHTTPSocket;
 
 	// ...
 
