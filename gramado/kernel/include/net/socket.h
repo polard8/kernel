@@ -9,12 +9,12 @@
 
 
 
-//socket state.
-#define SOCKET_NOT_CONNECTED    0
-#define SOCKET_CONNECTED        1 
-#define SOCKET_CONNECTING       2 
-#define SOCKET_PENDING          3
-// ...
+// Socket state.
+#define SS_NULL           0
+#define SS_UNCONNECTED    1
+#define SS_CONNECTING     2
+#define SS_CONNECTED      3
+#define SS_DISCONNECTING  4
 
 
 

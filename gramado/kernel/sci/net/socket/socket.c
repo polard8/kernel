@@ -1044,8 +1044,8 @@ int socket_connection_waiting_for_validation (struct socket_d *mysock, struct so
     if( (void*) servsock == NULL)
         return -1;
 
-    mysock->state   = SOCKET_CONNECTING;
-    servsock->state = SOCKET_CONNECTING;
+    mysock->state   = SS_CONNECTING;
+    servsock->state = SS_CONNECTING;
 
     mysock->conn = servsock;
     servsock->conn = mysock
@@ -1391,8 +1391,8 @@ sys_connect (
         goto fail;
     }
 
-    if (client_socket->state != SOCKET_NOT_CONNECTED) {
-        printf ("sys_connect: socket not SOCKET_NOT_CONNECTED\n");
+    if (client_socket->state != SS_UNCONNECTED) {
+        printf ("sys_connect: socket not SS_UNCONNECTED\n");
         goto fail;
     }
 
@@ -1467,14 +1467,14 @@ __OK_new_slot:
     // Conectando o socket do cliente ao ponto de conecção do
     // processo servidor.
     // Acionando as flags que indicam a conecção.
-    // Nesse momento poderíamos usar a flag SOCKET_PENDING
-    // e a rotina accept() mudaria para SOCKET_CONNECTED. 
+    // Nesse momento poderíamos usar a flag SS_CONNECTING
+    // e a rotina accept() mudaria para SS_CONNECTED. 
     
     client_socket->conn = server_socket;
     server_socket->conn = client_socket;
 
-    client_socket->state = SOCKET_PENDING;
-    server_socket->state = SOCKET_PENDING;
+    client_socket->state = SS_CONNECTING;
+    server_socket->state = SS_CONNECTING;
     debug_print("sys_connect: Pending connection\n");
     printf     ("sys_connect: Pending connection\n");
  
@@ -1574,10 +1574,10 @@ int sys_socket_shutdown (int socket, int how)
         
     }else{
 
-        s->conn->state = SOCKET_NOT_CONNECTED;
+        s->conn->state = SS_UNCONNECTED;
         s->conn->conn = (struct socket_d *) 0;
         
-        s->state = SOCKET_NOT_CONNECTED;
+        s->state = SS_UNCONNECTED;
         s->conn = (struct socket_d *) 0;
 
         //ok
@@ -1753,9 +1753,9 @@ sys_accept (
     // Isso significa que o cliente chamou connect antes mesmo 
     // do servidor chamar accept ??
     /*
-    if (sSocket->state == SOCKET_CONNECTED) 
+    if (sSocket->state == SS_CONNECTED) 
     {
-        printf("sys_accept: [FAIL] socket is already SOCKET_CONNECTED\n");
+        printf("sys_accept: [FAIL] socket is already SS_CONNECTED\n");
         refresh_screen();
         return -1;
     }
@@ -1820,7 +1820,7 @@ sys_accept (
     // arquivo deve ir para a lista de arquivos abertos pelo processo?
     // Estamos retornando o fd do proprio servidor porque o write() 
     // copia de um socket para o outro. Mas a intençao nao eh essa.
-    if ( sSocket->state == SOCKET_CONNECTED )
+    if ( sSocket->state == SS_CONNECTED )
     {
         //debug_print ("sys_accept: Already connected!\n");
         return (int) sockfd;
@@ -1845,20 +1845,20 @@ sys_accept (
     // descritor do proprio servidor. Mas ele está conectado e
     // o cliente receberá a mensagem.
  
-    if ( sSocket->state == SOCKET_PENDING )
+    if ( sSocket->state == SS_CONNECTING )
     {
         debug_print ("sys_accept: CONNECTING !!\n");
 
         //Server socket. Pre-connect.
         //precisamos mudar no caso de erro no cliente.
-        sSocket->state = SOCKET_CONNECTED;
+        sSocket->state = SS_CONNECTED;
              
         // Se existe outro socket linkado ao socket do servidor.
         cSocket = (struct socket_d *) sProcess->socket_pending_list[0];
         if ( (void*) cSocket == NULL )
         {
             debug_print ("sys_accept: [FAIL] cSocket\n");
-            sSocket->state = SOCKET_PENDING;  //anula.
+            sSocket->state = SS_CONNECTING;  //anula.
             return -1;
         }
 
@@ -1868,7 +1868,7 @@ sys_accept (
             //ok: usar isso só para debug
             //debug_print ("sys_accept: done\n");
 
-            cSocket->state = SOCKET_CONNECTED;
+            cSocket->state = SS_CONNECTED;
             
             //retornamos o fd do proprio servidor, pois nosso write copia
             //entre os buffers dos sockets conectados.
@@ -1877,7 +1877,7 @@ sys_accept (
  
         //fail
         debug_print ("sys_accept: [FAIL] Pending connection\n");
-        sSocket->state = SOCKET_PENDING;  //anula.
+        sSocket->state = SS_CONNECTING;  //anula.
         return -1;
     }
 
@@ -2341,7 +2341,7 @@ create_socket (
         s->ip = ip;
         s->port = port;
         
-        s->state = SOCKET_NOT_CONNECTED;
+        s->state = SS_UNCONNECTED;
         
         s->private_file = (file *) 0;
         
