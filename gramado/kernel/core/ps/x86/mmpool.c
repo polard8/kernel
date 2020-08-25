@@ -364,10 +364,11 @@ void *allocPages (int size){
 	//
 	// Checando limites.
 	//
-	
-//#ifdef MK_VERBOSE
-    //printf ("allocPages: Initializing ...\n");	
+
+//#ifdef PS_VERBOSE
+    //printf ("allocPages: Initializing ...\n");
 //#endif
+
 
 	//problemas com o size.
     if (size <= 0)

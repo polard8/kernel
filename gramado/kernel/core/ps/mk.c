@@ -289,7 +289,7 @@ int init_microkernel (void){
     Initialization.microkernel = 1;
 
 
-#ifdef MK_VERBOSE
+#ifdef PS_VERBOSE
     printf ("Done\n");
 #endif
 

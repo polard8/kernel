@@ -1989,7 +1989,7 @@ void exit_process ( pid_t pid, int code ){
 
     //debug_print ("exit_process:\n");
 
-//#ifdef MK_VERBOSE
+//#ifdef PS_VERBOSE
 	// Debug:
     printf ("exit_process: Terminating process %d\n", pid );
     refresh_screen ();
@@ -2051,7 +2051,7 @@ void exit_process ( pid_t pid, int code ){
     // ...
  
 
-//#ifdef MK_VERBOSE
+//#ifdef PS_VERBOSE
 	//Debug:
 	printf ("exit_process: Terminating threads..\n");
 	refresh_screen ();
@@ -2109,9 +2109,10 @@ void exit_process ( pid_t pid, int code ){
 
         }else{
     
-#ifdef MK_VERBOSE    
+#ifdef PS_VERBOSE    
 		    //fecha a thread.
-		    printf ("exit_process: Killing thread %d\n", __Thread->tid );
+            printf ("exit_process: Killing thread %d\n", 
+                __Thread->tid );
 #endif
 
             // Kill!

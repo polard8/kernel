@@ -892,7 +892,7 @@ int init_heap (void){
 
 // Done.
 
-#ifdef MK_VERBOSE
+#ifdef PS_VERBOSE
     printf ("Done\n");
 #endif
 

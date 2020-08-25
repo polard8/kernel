@@ -1,5 +1,5 @@
 /*
- * File: rt/runtime.c
+ * File: runtime.c
  *
  * Descrição:
  *     Arquivo principal do módulo '/rt' do kernel base.
@@ -19,10 +19,6 @@
 #include <kernel.h>
 
 
-//Variáveis internas.
-//int runtimeStatus;
-//...
-
 
 /*
  *********************************
@@ -34,6 +30,9 @@
 
 int init_runtime (void){
 
+
+    int Status = 0;
+    debug_print ("init_runtime:\n");
 
     debug_print ("[Kernel] init_runtime: Initializing runtime ...\n");
 
@@ -62,7 +61,7 @@ int init_runtime (void){
         case CURRENT_ARCH_X86_64:
             debug_print ("[x86_64] init_runtime: Initializing mm ...\n");
             debug_print ("[x86_64] init_runtime: Current arch not supported !\n *hang");
-            return -1;
+            goto fail;
             break;
 
         // armmain (); ??
@@ -70,8 +69,8 @@ int init_runtime (void){
         // ...
 
         default:
-            debug_print ("[Kernel] kernel_main: Current arch not defined!\n *hang");
-            return -1;
+            debug_print ("[Kernel] init_runtime: Current arch not defined!\n *hang");
+            goto fail;
             break; 
     };
 
@@ -81,42 +80,6 @@ int init_runtime (void){
     // The video support is using the boot loader configuration yet.
 
 
-    //
-    // Done!
-    //
-
-    return 0; 
-}
-
-
-/*
- ********************************
- * KiInitRuntime: 
- *     Init runtime.
- *     +Clear bss segment.
- *     +Init heap, malloc.
- *     +...
- *     @todo: 
- *         Criar aqui, apenas a interface que chama a rotina 
- *         de inicialização da runtime.
- */
-
-int KiInitRuntime (void){
-
-    int Status = 0;
-
-    debug_print ("KiInitRuntime:\n");
-
-
-	//#todo 
-	//preparar a tela para as mensagens;
-	//mas somente se a flag de debug estiver acionada.
-
-    Status = (int) init_runtime ();
-
-    if (Status<0)
-        debug_print ("KiInitRuntime: init_runtime fail.\n");
-
 
 	// #### importante ####
 	// provavelmente aqui é o primeiro lugar onde as mensagens funcionam.
@@ -125,9 +88,9 @@ int KiInitRuntime (void){
 	//mas temos um problema no Y.
 
 	//#bugbug
-#ifdef EXECVE_VERBOSE
-	backgroundDraw ( (unsigned long) COLOR_BLUE ); 
-#endif
+//#ifdef EXECVE_VERBOSE
+	//backgroundDraw ( (unsigned long) COLOR_BLUE ); 
+//#endif
 
 
 	//#todo:
@@ -137,26 +100,34 @@ int KiInitRuntime (void){
     //#debug 
 	//a primeira mensagem só aparece após a inicialização da runtime.
 	//por isso não deu pra limpar a tela antes.
-	printf (">>>debug hang: after runtime initialization");
+	printf (">>>debug hang init_runtime: after runtime initialization");
 	refresh_screen(); 
 	while (1){ asm ("hlt"); };
 #endif
 
+
     //
-    // Done!
+    // == Done ===========================================
     //
 
     g_module_runtime_initialized = 1;
 
-    return (int) Status;
+    return 0; 
+
+fail:
+    debug_print ("[Kernel] init_runtime: Runtime fail\n");
+    return -1;
 }
 
 
-/*
-int runtimeInit(){
-	;
-};
-*/
+
+// DEPRECATED!
+int KiInitRuntime (void)
+{
+    debug_print ("KiInitRuntime: [DEPRECATED] \n");
+    return (int) -1;
+}
+
 
 
 //

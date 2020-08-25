@@ -179,17 +179,25 @@ sixth..     ide5, usually PCI, probed
 // Set up what kind of debug message we wanna see.
 //
 
-//Esse é usado para exibir somente os marcadores pprincipais,
+
+// #bugbug
+// Essas flags perderam o sentido
+// precisamos renomear ou usarmos apenas a principal.
+
+//Esse é usado para exibir somente os marcadores principais,
 //que são mesnagens escritas em maiúculas.
 //fnciona como uma visão panorâmica, usa espinha dorsal, um esqueleto.
 #define KERNEL_VERBOSE 1
-//Esse é usado para trabalhar a rotina de entrypoint da arquitetura alvo.
-#define ENTRY_VERBOSE 1
+
+//Esse é usado para trabalhar a rotina de 
+// entrypoint da arquitetura alvo.
+#define ENTRY_VERBOSE  1
+
 //Esses quatro são as camadas principais.
-#define HAL_VERBOSE 1
-#define MK_VERBOSE 1
+#define HAL_VERBOSE    1
+#define PS_VERBOSE     1
 #define EXECVE_VERBOSE 1  
-#define GWS_VERBOSE 1
+#define GWS_VERBOSE    1
 
 
 

@@ -1,5 +1,5 @@
 /*
- * File: bottom/init/x86/x86init.c 
+ * File: init/x86/x86init.c 
  *
  * Description:
  *     It's is the initialization for x86 architechture.
@@ -380,9 +380,10 @@ int x86main (void){
 
 
     // Arch.
-    if (current_arch != CURRENT_ARCH_X86){
+    if (current_arch != CURRENT_ARCH_X86)
+    {
         debug_print ("[x86] x86main: Arch fail\n");
-        panic ("[x86] x86main: Arch fail\n"); 
+        panic       ("[x86] x86main: Arch fail\n"); 
     }
 
 
@@ -418,14 +419,14 @@ int x86main (void){
 
 
     // System initialization.
-    // See: syssm/system/system.c
+    // See: core/system.c
     printf ("[x86] x86main: Calling systemInit\n");
-    
+
     Status = (int) systemInit();
 
     if ( Status != 0 ){
         debug_print ("[x86] x86main: systemInit fail\n");
-        printf ("[x86] x86main: systemInit fail\n");
+        printf      ("[x86] x86main: systemInit fail\n");
         KernelStatus = KERNEL_ABORTED;
         goto fail;
     }
@@ -440,10 +441,10 @@ int x86main (void){
     // Lets create a TSS and setup a GDT.
     // This way we can use 'current_tss' when we create threads.
     // This function creates a TSS and sets up a GDT.
-    // See: sysio/hal/arch/x86/x86.c
+    // See: hal/arch/x86/x86.c
 
     debug_print ("[x86] x86main: Initializing GDT\n");
-    printf ("[x86] x86main: Initializing GDT\n");
+    printf      ("[x86] x86main: Initializing GDT\n");
         
     init_gdt ();
 
@@ -454,7 +455,7 @@ int x86main (void){
 
 
     debug_print ("[x86] x86main: processes and threads\n");
-    printf ("[x86] x86main: processes and threads\n");
+    printf      ("[x86] x86main: processes and threads\n");
 
 	//
 	// # Processes
@@ -649,7 +650,7 @@ int x86main (void){
 	// Só que somente nesse momento temos recursos 
 	// suficientes para essa rotina funcionar.
 
-    windowLoadGramadoIcons ();
+    windowLoadGramadoIcons();
 
 
     //

@@ -1076,7 +1076,7 @@ int SetUpPaging (void){
 
     // Message. (verbose).
 
-#ifdef MK_VERBOSE
+#ifdef PS_VERBOSE
     printf ("SetUpPaging: Initializing Pages..\n");
 #endif
 
@@ -1760,21 +1760,19 @@ int SetUpPaging (void){
 	//     #verbose.
 
 
-#ifdef MK_VERBOSE
-
+#ifdef PS_VERBOSE
     printf ("Debug:\n");
     printf ("Setup CR3={%x}\n", (unsigned long) &page_directory[0]);
-    printf ("Page={%x} \n", (unsigned long) &km_page_table[0]);
-    printf ("Page={%x} \n", (unsigned long) &km2_page_table[0]);
-    printf ("Page={%x} \n", (unsigned long) &um_page_table[0]);
-    printf ("Page={%x} \n", (unsigned long) &vga_page_table[0]);
-    printf ("Page={%x} \n", (unsigned long) &frontbuffer_page_table[0]);
-    printf ("Page={%x} \n", (unsigned long) &backbuffer_page_table[0]);
-    printf ("Page={%x} \n", (unsigned long) &pagedpool_page_table[0]);
+    printf ("Page={%x} \n",     (unsigned long) &km_page_table[0]);
+    printf ("Page={%x} \n",     (unsigned long) &km2_page_table[0]);
+    printf ("Page={%x} \n",     (unsigned long) &um_page_table[0]);
+    printf ("Page={%x} \n",     (unsigned long) &vga_page_table[0]);
+    printf ("Page={%x} \n",     (unsigned long) &frontbuffer_page_table[0]);
+    printf ("Page={%x} \n",     (unsigned long) &backbuffer_page_table[0]);
+    printf ("Page={%x} \n",     (unsigned long) &pagedpool_page_table[0]);
     // ...
 	//refresh_screen();
 	//while(1){};
-
 #endif
 
 

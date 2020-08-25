@@ -1593,7 +1593,7 @@ int systemStartUp (void){
         //  
 
         // See: 
-        // execve/sm/init.c
+        // init.c
 
         Status = (int) init(); 
 
@@ -1665,11 +1665,11 @@ done:
 
     //printf("systemStartUp: Done!\n");
 	//refresh_screen();
-	
-	if (KeInitPhase != 3)
-	{ 
-	    Status = (int) 1; 
-	}
+
+
+    // #todo: Use '-1'.
+    if (KeInitPhase != 3){ Status = (int) -1; }
+
 
     // ok
     printf("systemStartUp: done\n");
@@ -1688,8 +1688,8 @@ done:
 
 int systemInit (void){
 
-    int Status;
-    
+    int Status = 0;
+
     //
     // Flag.
     //
@@ -1698,7 +1698,7 @@ int systemInit (void){
 
     debug_print ("====\n");
     debug_print ("====systemInit:\n");
-    printf("systemInit:\n");
+    printf ("systemInit:\n");
 
 	//Colocando na variável global, a opção selecionada manualmente pelo 
 	//desenvolvedor.
@@ -1709,22 +1709,21 @@ int systemInit (void){
 	// Podemos fazer algumas inicializações antes de chamarmos 
 	//a rotina de start up.
 
-    Status = (int) systemStartUp ();
-    if (Status != 0)
+    Status = (int) systemStartUp();
+    if (Status < 0)
             panic("systemInit: systemStartUp fail\n");
-	
-#ifdef BREAKPOINT_TARGET_AFTER_SYSTEM
 
 	//#debug 
 	//a primeira mensagem só aparece após a inicialização da runtime.
 	//por isso não deu pra limpar a tela antes.
-	
-	printf ("systemInit: *breakpoint\n");
-	refresh_screen(); 
-	while (1){ asm ("hlt"); }
+
+#ifdef BREAKPOINT_TARGET_AFTER_SYSTEM
+    printf ("systemInit: *breakpoint\n");
+    refresh_screen(); 
+    while (1){ asm ("hlt"); }
 #endif
-	
-	
+
+
     // #debug:  
     // Esperamos alcaçarmos esse alvo.
     // Isso funcionou gigabyte/intel
@@ -1753,25 +1752,7 @@ int systemInit (void){
 
 
 /*
- ******************************************
- * systemSystem:
- *     Construtor.
- * Não tem valor de retorno, tem o mesmo nome que a classe.
- * Uma chamada à um construtor criaria uma estrutura com seu nome e 
- * o construtor pode inicializar alguma variável. 
- */
-
-/*
-void systemSystem (void)
-{
-    gSystemStatus = 1;
-}
-*/
-
-
-
-/*
- ************************************************
+ *******************************
  * init_executive:
  *
  *     Initialize the kernel executive.

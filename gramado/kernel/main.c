@@ -1,5 +1,5 @@
 /*
- * File: kernel/top/main.c 
+ * File: kernel/main.c 
  * 
  *     This is the main file for the kernel.
  *     It's architecture independent.
@@ -195,13 +195,13 @@ int kernel_main (int arch_type){
     // #bugbug:
     // We need the runtime initialization for the messages.
     // What about to initialize it early?!
-    // See: sm/rt/runtime.c
+    // See: core/runtime.c
 
     debug_print ("[Kernel] kernel_main: Initializing runtime\n");
 
-    Status = (int) KiInitRuntime ();
-    
-    if ( Status != 0 ){
+    Status = (int) init_runtime();
+
+    if ( Status < 0 ){
         debug_print ("[Kernel] kernel_main: Runtime fail. *hang\n");
         while (1){
             asm ("cli \n");
@@ -230,7 +230,7 @@ int kernel_main (int arch_type){
         case CURRENT_ARCH_X86:
             debug_print ("[Kernel] kernel_main: Initializing x86 arch ...\n");
             Status = (int) x86main();
-            if (Status != 0)
+            if (Status < 0)
                 panic("[Kernel] kernel_main: CURRENT_ARCH_X86 fail\n");
             break;
 
@@ -238,6 +238,7 @@ int kernel_main (int arch_type){
         case CURRENT_ARCH_X86_64:
             debug_print ("[Kernel] kernel_main: Initializing x86_64 arch ...\n");
             debug_print ("[Kernel] kernel_main: Current arch not supported !\n *hang");
+            //Status = (int) x86_64main();
             goto fail;
             break;
 

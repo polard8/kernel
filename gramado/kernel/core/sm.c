@@ -1,5 +1,5 @@
 /*
- * File: sm/sys/sm.c  
+ * File: core/sm.c  
  *
  *     Server Manager 
  *
