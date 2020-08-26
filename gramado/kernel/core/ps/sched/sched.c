@@ -245,10 +245,10 @@ int scheduler (void){
 
     // tmpConductor and it's next. 
     tmpConductor       = (void *) rootConductor;
-    tmpConductor->Next = (void *) ____IDLE;
+    tmpConductor->next = (void *) ____IDLE;
 
     // The global conductor.
-    Conductor = (void *) tmpConductor->Next;
+    Conductor = (void *) tmpConductor->next;
 
     // READY threads in the threadList[].
     for ( i=0; i < THREAD_COUNT_MAX; i++ )
@@ -262,8 +262,8 @@ int scheduler (void){
                  TmpThread->state == READY )
             {
                 // The tmpConductor and it's next.
-                tmpConductor       = (void *) tmpConductor->Next; 
-                tmpConductor->Next = (void *) TmpThread;
+                tmpConductor       = (void *) tmpConductor->next; 
+                tmpConductor->next = (void *) TmpThread;
             }
         }
     };
@@ -273,8 +273,8 @@ int scheduler (void){
 
     // Finalizing the list.
     // The tmpConductor and it's next.
-    tmpConductor       = (void *) tmpConductor->Next; 
-    tmpConductor->Next = NULL;
+    tmpConductor       = (void *) tmpConductor->next; 
+    tmpConductor->next = NULL;
 
 
     return (int) rootConductor->tid;
@@ -348,29 +348,16 @@ unsigned long scheduler_get_status (void)
  *    #burbug: faz o mesmo que scheduler_start.
  */
 
-
-void init_scheduler (void)
-{
-    debug_print ("init_scheduler: [TODO]\n");
 	// #todo: 
 	// Implementar inicialização de variaveis do scheduler.
 	// O nome poderia ser schedulerInit().
 	// Formato de classes.Init é um método. 
-}
 
-
-/*
- constructor.
-int schedulerScheduler()
+void init_scheduler (void)
 {
+    debug_print ("init_scheduler: [TODO]\n");
+    // ...
 }
-*/
-
-/*
-int schedulerInit()
-{
-}
-*/
 
 
 //

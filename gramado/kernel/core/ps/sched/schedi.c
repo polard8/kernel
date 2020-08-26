@@ -887,10 +887,10 @@ int SelectNextThread (int current){
     }else{
 
         //Se não existe indicação de próxima.
-        if ( (void *) t->Next == NULL )
+        if ( (void *) t->next == NULL )
         {
 		    //Procura a próxima tarefa, de acordo com a prioridade.
-		    Next = (int) find_higher_priority ();
+		    Next = (int) find_higher_priority();
 
 		    n = (void *) threadList[Next];
 
@@ -907,19 +907,19 @@ int SelectNextThread (int current){
 		//Aceita a indicação de próxima.
         }else{
 
-            n = (void *) t->Next;
+            n = (void *) t->next;
 
-            if ( (void *) n == NULL ){
-				Next = next_thread;
-			    return (int) Next;
+            if ( (void *) n == NULL )
+            {
+                Next = next_thread;
+                return (int) Next;
 
             }else{
-			    Next = (int) n->tid;    //Pega o tid.
-				t->Next = NULL;
+                Next = (int) n->tid;    //Pega o tid.
+                t->next = NULL;
                 return (int) Next;
             };
-
-			//Nothing.
+            //Nothing.
         };
         //Nothing.
     };

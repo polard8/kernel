@@ -2099,8 +2099,8 @@ void exit_process ( pid_t pid, int code ){
 		refresh_screen ();
 		
 		// Salva o ponteiro para o pr�ximo thread.
-		Next = (void *) __Thread->Next;
-		
+		Next = (void *) __Thread->next;
+
 		// Confere se chegamos ao fim da lista.
 		// 'Thread' fecha agora.
 		
@@ -2222,8 +2222,7 @@ unsigned long GetProcessHeapStart ( pid_t pid ){
 
 	//Limits.
 
-    if ( pid < 0 || pid >= PROCESS_COUNT_MAX )
-    {
+    if ( pid < 0 || pid >= PROCESS_COUNT_MAX ){
         goto fail; 
     }
 
@@ -3004,9 +3003,8 @@ format_ok:
         Thread->edi = 0;
         Thread->ebp = 0;
 
-
-		// Next thread.
-        Thread->Next = NULL;
+        // Next thread.
+        Thread->next = NULL;
 
 		// Thread queue.
         queue_insert_data ( queue, 
@@ -3019,7 +3017,6 @@ format_ok:
 		// Isso permitira que o taskswitch selecione ela pra rodar.
 
         SelectForExecution (Thread); 
-        
 
         
         // #debug

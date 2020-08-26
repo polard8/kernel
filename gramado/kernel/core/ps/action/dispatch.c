@@ -637,17 +637,17 @@ fail:
 // It's not implemented.
 
 int dispatch_Default (void){
-	
+
 	struct thread_d *New;
 	struct thread_d *Current;
-	
+
 	Current = NULL;
 	
 	
 	/*
 	 * Fase1 - Tenta tarefa de quantum vencido.
 	 */
-	int qNext;
+	int qNext=0;
     qNext = (int) check_quantum();
     if(qNext != 0)
 	{
@@ -655,12 +655,12 @@ int dispatch_Default (void){
 	    
 		// todo: check structure.
 		
-		New->Next = (void*) Current;
+		New->next = (void *) Current;
 		New->quantum = 0;
 	    
 		return (int) qNext;
-    };		
-	
+    }
+
 
 	
 	/*
@@ -706,15 +706,13 @@ int dispatch_Default (void){
 	 * mas antes coloca no fim da fila uma de menor prioridade.
 	 * e coloca no fim da fila de ready.
 	 */
-	int nextId; 
+	int nextId=0; 
 	nextId = find_higher_priority();
 	if( nextId > 0 )
 	{
 	    New = (void *) threadList[nextId]; 
-		if( (void*) New == NULL )
-		{
-		    printf("scheduler fail: findhigerpriority return null");
-			die();
+		if( (void*) New == NULL ){
+		    panic ("dispatch_Default: findhigerpriority return null");
 		}
 		//inicio da fila, lifo
 		if( New->state == READY)
@@ -723,12 +721,12 @@ int dispatch_Default (void){
 			if( New->tid != 0)
 			{
 			    New->quantum = 0;
-				New->Next = (void*) Current;
+				New->next = (void *) Current;
 			    return (int) New->tid;
-			};
-		};       		
-	};
-	
+			}
+		}
+	}
+
 	
 	
 	/*
@@ -738,10 +736,10 @@ int dispatch_Default (void){
 	//se existe uma proxima tarefa. pega ela.
 	//se ela estiver no estado ready o scheduler retorna.
 	//se estiver no estado initialized, da spawn.
-	if( (void*) Current->Next != NULL )
+	if( (void*) Current->next != NULL )
     {
-	    New = (void*) Current->Next;
-        Current->Next = NULL; //zera o indicador.
+        New = (void*) Current->next;
+        Current->next = NULL; //zera o indicador.
 		
 		if(New->state == READY)
 		{
@@ -749,12 +747,12 @@ int dispatch_Default (void){
 			if(New->tid != 0)
 			{
 			    New->quantum = 0;
-			    New->Next = (void *) Current;
+			    New->next = (void *) Current;
 				return (int) New->tid;
-            };				
-		};	
-    };	
-	
+            }
+		}
+    }
+
 	 
 	/*
 	 * Fase 4: Pega a idle.
@@ -765,10 +763,15 @@ int dispatch_Default (void){
 	if ( (void *) New != NULL )
 	{
 	    New->quantum = 0;
-		New->Next = (void *) Current;
+		New->next = (void *) Current;
 		
 		return (int) New->tid;
-	};
+    }
+    
+fail:
+     //#todo: test this return.
+     panic ("dispatch_Default: return not tested");
+     return -1;
 }
 
 
@@ -847,9 +850,9 @@ void dispatch_thread (struct thread_d *thread){
 	 *     Dispacha de acordo com o status.
 	 *     +Spawn no caso de INITIALIZED.
 	 */
-	 
- 	switch (thread->state)
-	{
+ 
+    switch (thread->state)
+    {
 	    //Se vai rodar pela primeira vez
 		case INITIALIZED:
 		    thread->saved = 0;
@@ -862,14 +865,12 @@ void dispatch_thread (struct thread_d *thread){
 		default:
             printf("dispatch_thread fail: State!\n");
 		    break;
-	};
+    };
 
 
 fail:
-    printf ("dispatch-dispatch_thread: fail");
-    die ();
+    panic ("dispatch-dispatch_thread: fail");
 }
-
 
 
 /*
@@ -963,7 +964,7 @@ int init_dispatcher (void){
     Conductor = (void *) rootConductor;
     
     tmpConductor       = (void *) rootConductor;
-    tmpConductor->Next = (void *) threadList[0]; 
+    tmpConductor->next = (void *) threadList[0]; 
 
     // #bugbug
     // Check the threads validation.

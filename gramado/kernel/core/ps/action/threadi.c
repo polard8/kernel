@@ -299,18 +299,20 @@ void *KiCreateRing0Idle (void){
 	//t->confined = 1;           //Flag, confinado ou não.
 	//t->CurrentProcessor = 0;   //Qual processador.
 	//t->NextProcessor = 0;      //Próximo processador. 
-	
-	//Coloca na lista de estruturas.
+
+    //Coloca na lista de estruturas.
     threadList[ t->tid ] = (unsigned long) t;
 
-	t->Next = NULL;
-	
+
+    t->next = NULL;
+
 	//
 	// Setup idle.
 	//
-	
-	____IDLE = (struct thread_d *) t;
-	
+
+    ____IDLE = (struct thread_d *) t;
+
+
 	//
 	// Running tasks.
 	//
@@ -326,15 +328,16 @@ void *KiCreateRing0Idle (void){
     queue_insert_data (queue, (unsigned long) t, QUEUE_INITIALIZED);
     
 	// * MOVEMENT 1 (Initialized --> Standby).
-	SelectForExecution (t);    
-    
-	return (void *) t;
+    SelectForExecution (t);    
+
+    return (void *) t;
 }
 
 
 
 /*
- * fork: 
+ ************************************
+ * kfork: 
  *
  * @todo:
  *     Semelhante ao unix, isso deve criar um processo filho fazendo uma cópia 
@@ -343,8 +346,8 @@ void *KiCreateRing0Idle (void){
  * físico diferente da imagem do processo pai.
  * Essa não precisa ser a rotina, pode ser apenas uma interface, que chama a 
  * rotina dofork() e outras se necessário.
- *
  */
+
 
 int kfork (void){
 
@@ -367,21 +370,24 @@ int kfork (void){
 
 
 /*
+ **************************************
  * KiFork:
  *    Inicio do módulo interno que chama a função fork.
  *    Isso é uma interface para a chamada à rotina fork.
- *    @todo: As funções relativas às rotinas de fork
- *           podem ir para um arquivo que será compilado junto com o kernel.
- *           ex: fork.c
+ *    #todo: 
+ *    As funções relativas às rotinas de fork
+ *    podem ir para um arquivo que será compilado junto com o kernel.
+ *    ex: fork.c
  */
 
-int KiFork (void){
-	
-	//@todo Criar interface
-	
+int KiFork (void)
+{
+
+    // #todo 
+    // Criar interface
+
     return (int) kfork();
 }
-
 
 
 /*
@@ -402,9 +408,10 @@ void KiShowPreemptedTask (void)
 
 void KiSetTaskStatus (unsigned long status)
 {
-    //@todo: criar interface para mudanca de status.
-	
-	set_task_status (status);
+    // #todo: 
+    // Criar interface para mudanca de status.
+
+    set_task_status (status);
 }
 
 
@@ -414,9 +421,9 @@ void KiSetTaskStatus (unsigned long status)
  * #bugbgu task não é um termo usado.
  */
 
-unsigned long KiGetTaskStatus (void){
-	
-    return (unsigned long) get_task_status (); 
+unsigned long KiGetTaskStatus (void)
+{
+    return (unsigned long) get_task_status(); 
 }
 
 
@@ -428,48 +435,50 @@ unsigned long KiGetTaskStatus (void){
  * ?? isso está muito estranho !!
  */
  
-void KiSaveContextOfNewTask ( int id, unsigned long *task_address ){
-	
-    //return;
+void KiSaveContextOfNewTask ( 
+    int id, 
+    unsigned long *task_address )
+{
+    debug_print ("KiSaveContextOfNewTask: [DEPRECATED] \n");
 }
 
 
- 
-
 
 /* #todo: ?? de quem ?? processo ou thread */
-void KiSetQuantum (unsigned long q){
-    
-    //return;
+void KiSetQuantum (unsigned long q)
+{
+    debug_print ("KiSetQuantum: [DEPRECATED] \n");
 }
 
 
 unsigned long KiGetQuantum (void)
-{	
+{
+    debug_print ("KiGetQuantum: [DEPRECATED] \n");
     return (unsigned long) 0; 
 }
 
 
 /* #todo: ?? de quem ?? processo ou thread */
-void KiSetCurrentQuantum (unsigned long q){
-	
-    //return;
+void KiSetCurrentQuantum (unsigned long q)
+{
+    debug_print ("KiSetCurrentQuantum: [DEPRECATED] \n");
 }
 
 
 /* #todo: ?? de quem ?? processo ou thread */
 
 unsigned long KiGetCurrentQuantum (void)
-{	
+{
+    debug_print ("KiGetCurrentQuantum: [DEPRECATED] \n");
     return (unsigned long) 0; 
 }
 
 
 /* #todo: ?? de quem ?? processo ou thread */
-void KiSetNextQuantum ( unsigned long q ){
-	
-    //return;
-};
+void KiSetNextQuantum ( unsigned long q )
+{
+    debug_print ("KiSetNextQuantum: [DEPRECATED] \n");
+}
 
 
 /* 
@@ -479,28 +488,23 @@ void KiSetNextQuantum ( unsigned long q ){
   */
 
 unsigned long KiGetNextQuantum (void)
-{	
+{
+    debug_print ("KiGetNextQuantum: [DEPRECATED] \n");
     return (unsigned long) 0; 
 }
 
 
-/* #todo: ?? de quem ?? processo ou thread */
-void KiSetFocus (int pid){
-	
-	//return;
+void KiSetFocus (int pid)
+{
+    debug_print ("KiSetFocus: [DEPRECATED] \n");
 }
 
 
-/* 
- #todo: 
- ?? de quem ?? 
- processo ou thread 
- janela ???
- */
 
 int KiGetFocus (void)
-{	
-    return 0;  //#bugbug 
+{
+    debug_print ("KiGetFocus: [DEPRECATED] \n");
+    return 0;   //#bugbug: Use -1;
 }
 
 
@@ -508,20 +512,17 @@ int KiGetFocus (void)
  #todo: 
  chamar função em debug.c 
  */
-
 void KiDebugBreakpoint (void)
 {
-	//
+    debug_print ("KiDebugBreakpoint: [DEPRECATED] \n");
 }
 
 
 /* #deletar */
 void KiShowTasksParameters (void)
-{	
-    //return;
+{
+    debug_print ("KiShowTasksParameters: [DEPRECATED] \n");
 }
-
-
 
 
 
@@ -596,7 +597,8 @@ void show_slot (int tid){
     struct thread_d *t;
 
 
-    if ( tid < 0 || tid >= THREAD_COUNT_MAX ){
+    if ( tid < 0 || tid >= THREAD_COUNT_MAX )
+    {
         printf ("show_slot: tid\n");
         goto fail;
     }
@@ -604,10 +606,10 @@ void show_slot (int tid){
 
     t = (void *) threadList[tid];
 
-    if ( (void *) t == NULL )
-    {
+    if ( (void *) t == NULL ){
         printf ("show_slot: t\n");
         goto fail;
+
     }else{
 
         // Show one slot.
@@ -663,11 +665,11 @@ void show_reg (int tid){
 
 	// Structure.
     t = (void *) threadList[tid];
-	
-	if ( (void *) t == NULL )
-	{
-		printf ("fail\n");
-		return;
+
+    if ( (void *) t == NULL ){
+        printf ("fail\n");
+        return;
+
 	} else {
 		
 
@@ -697,14 +699,16 @@ void show_reg (int tid){
 // Muda a prioridade e o quantum de acordo com a prioridade.
 
 void 
-set_thread_priority ( struct thread_d *t, 
-                      unsigned long priority )
+set_thread_priority ( 
+    struct thread_d *t, 
+    unsigned long priority )
 {
 
-    unsigned long OldPriority;
+    unsigned long OldPriority=0;
 
 
-    if ( (void *) t == NULL ){
+    if ( (void *) t == NULL )
+    {
         //
         return;
 
@@ -760,8 +764,9 @@ set_thread_priority ( struct thread_d *t,
  */
  
 void 
-SetThreadDirectory ( struct thread_d *thread, 
-                     unsigned long Address )
+SetThreadDirectory ( 
+    struct thread_d *thread, 
+    unsigned long Address )
 {
 
     if ( (void *) thread == NULL ){
@@ -818,17 +823,13 @@ unsigned long GetThreadDirectory ( struct thread_d *thread ){
 
 void show_preempted_task (void)
 {
-	//return;
+    debug_print("show_preempted_task: [DEPRECATED]\n");
 }
 
-
-/* 
- #deletar 
- */
-
+/*  #deletar  */
 void show_tasks_parameters (void)
 {
-	// 
+    debug_print("show_tasks_parameters: [DEPRECATED]\n");
 }
 
 
@@ -847,8 +848,8 @@ void show_tasks_parameters (void)
 void release ( int tid ){
 
     struct thread_d *Thread;
-	
-	
+
+
     if ( tid < 0 || tid >= THREAD_COUNT_MAX )
     {
         //  
@@ -1034,7 +1035,7 @@ void kill_thread (int tid){
         // Pegar o id do pai e enviar um sinal e acorda-lo
         //se ele estiver esperando por filho.		
         __Thread->used = 0;
-        __Thread->magic = 0; 		
+        __Thread->magic = 0; 
         __Thread->state = DEAD; 
         // ...
 
@@ -1085,7 +1086,7 @@ void dead_thread_collector (void){
 
     register int i=0;
     
-    struct process_d *p;         
+    struct process_d *p; 
     struct thread_d *Thread;  
 
 

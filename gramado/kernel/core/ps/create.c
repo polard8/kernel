@@ -268,22 +268,22 @@ void *createCreateInitThread (void){
 	//Coloca na lista de estruturas.
 	threadList[ InitThread->tid ] = (unsigned long) InitThread;
 	
-	rootConductor = (struct thread_d *) InitThread;
+    rootConductor = (struct thread_d *) InitThread;
 	
 	// #importante
 	// # current idle thread #
 	//current_idle_thread = IdleThread->tid;
-	
-	//Pr�xima thread.
-	InitThread->Next = NULL;
-	//InitThread->Next = (void *) InitThread;    //Op��o.
 
 
-	// #importante
+    InitThread->next = NULL;
+    //InitThread->Next = (void *) InitThread;  //maybe
+
+
+    // #importante
     // Contador de threads
     // Vamos atualizar o contador de threads, 
-	// pois mais uma thread existe, mesmo que n�o esteja rodando ainda.
-	
+    // pois mais uma thread existe, mesmo que n�o esteja rodando ainda.
+
 	//#importante 
 	//nesse caso o contador foi configurado manualmente. 
 	//isso acontece com as threads do gramado core.

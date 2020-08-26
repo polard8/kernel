@@ -71,21 +71,26 @@ unsigned long __GetThreadStats ( int tid, int index ){
         case 5:
             return (unsigned long) t->plane;
             break;                      
-           
+        
+        
+        // Current cpu
         case 6:
-            return (unsigned long) t->cpuID;
+            return (unsigned long) t->cpu;
             break;              
-           
+        
+        // See: https://en.wikipedia.org/wiki/Processor_affinity
         case 7:
-            return (unsigned long) t->confined;
-            break;              
+            return (unsigned long) t->affinity;
+            break;
 
+        // Current cpu
+        // #bugbug: see 'case 6'.
         case 8:
-            return (unsigned long) t->CurrentProcessor;
+            return (unsigned long) t->cpu;
             break;              
 
         case 9:
-            return (unsigned long) t->NextProcessor;
+            return (unsigned long) t->next_cpu;
             break;              
 
         
@@ -239,27 +244,28 @@ unsigned long __GetThreadStats ( int tid, int index ){
 }
 
 
-
-//pega o nome do thread.
+// Get thread name.
 int getthreadname ( int tid, char *buffer )
 {
-	struct thread_d *t;
-	
+    struct thread_d *t;
+
     char *name_buffer = (char *) buffer;
+
 
     //#todo
     //checar validade dos argumentos.
  
     t = (struct thread_d *) threadList[tid]; 
 
-    if ( (void *) t == NULL )
-    {
-		return -1;
+    if ( (void *) t == NULL ){
+        // msg
+        return -1;
+
     }else{
     
-        if ( t->used != 1 || t->magic != 1234 )
-        {
-             return -1;
+        if ( t->used != 1 || t->magic != 1234 ){
+            //msg
+            return -1;
         }
         
         // 64 bytes
@@ -267,22 +273,20 @@ int getthreadname ( int tid, char *buffer )
         
         return (int) t->threadName_len;
     };
+
     return -1;
 }
 
 
-
-
-
+// ??
 // Chamada pelo timer.c
-int thread_profiler( int service )
-{
-    struct thread_d *__current;
-    struct thread_d *__tmp;
+int thread_profiler( int service ){
 
-    int i;
+    struct thread_d  *__current;
+    struct thread_d  *__tmp;
+
+    int i=0;
     unsigned long __total = 0; //todas inclusive idle.
-    
     
     
     __current = (struct thread_d *) threadList[current_thread];
@@ -363,10 +367,11 @@ thread_get_profiler_percentage ( struct thread_d *thread)
 
 void thread_show_profiler_info (void)
 {
-	struct thread_d *thread;
-	
-	int i;
-	
+
+    struct thread_d *thread;
+    int i=0;
+
+
 	printf ("\n");
 	
 	for (i=0; i<THREAD_COUNT_MAX; i++)
@@ -386,7 +391,6 @@ void thread_show_profiler_info (void)
 			}
         }
 	};
-
 
     refresh_screen();
 }
@@ -752,7 +756,7 @@ struct thread_d *create_thread (
     struct thread_d *Empty;       //Empty slot.
 
     // Identificadores.
-    int ProcessID;
+    int ProcessID = -1;
 
     // Counters.
     int i = USER_BASE_TID;
@@ -792,7 +796,7 @@ struct thread_d *create_thread (
 		ProcessID = current_process;
     }
 
-	// J� temos um PID para o processo que � dono da thread.
+	// Ja temos um PID para o processo que � dono da thread.
 
     Process = (void *) processList[ProcessID]; 
     
@@ -1015,8 +1019,7 @@ get_next:
         Thread->cs     = 0x1B; 
         Thread->eip    = (unsigned long) init_eip; 
 
-
-        //O endere�o incial, para controle.
+        //O endereço incial, para controle.
         Thread->initial_eip = (unsigned long) init_eip; 
 
         // (0x20 | 3)
@@ -1094,16 +1097,16 @@ get_next:
         //herdar a afinidade do processo.(cpu affinity) 
 
         Thread->exit_code = 0;
-	    
+
 
 		//@todo: Incrementar a contagem de threads no processo.
 		//Process->threadCount++;
-		
-		//Pr�xima thread da lista.
-		Thread->Next = NULL;
+
+		//Proxima thread da lista.
+        Thread->next = NULL;
 		
 		//Coloca na lista.
-		threadList[ Thread->tid ] = (unsigned long) Thread;	
+		threadList[ Thread->tid ] = (unsigned long) Thread;
 	};
 
  
@@ -1121,11 +1124,11 @@ get_next:
     }
 
 
-done:
-    
 	// Warning !!! 
 	// ( N�O COLOCAR PARA EXECU��O, 
 	//   OUTRA FUN��O DEVE COLOCAR PARA EXECU��O )
+
+done:
 
     //SelectForExecution(t);  //***MOVEMENT 1 (Initialized ---> Standby)
     return (void *) Thread;
@@ -1153,25 +1156,26 @@ void *GetCurrentThread (void){
 
     struct thread_d *Current;
 
-	if (current_thread < 0 || current_thread >= THREAD_COUNT_MAX )
-	{
-		return NULL;
-	}
 
-
-	Current = (void *) threadList[current_thread];	
-	
-	if ( (void *) Current == NULL ){
+    if (current_thread < 0 || 
+        current_thread >= THREAD_COUNT_MAX )
+    {
         return NULL;
-	}
+    }
 
+    Current = (void *) threadList[current_thread];
+
+    if ( (void *) Current == NULL )
+    {
+        return NULL;
+    }
 
     return (void *) Current;
 }
 
 
 /*
- *******************************************************
+ ************************
  * FindReadyThread:
  *     Pega a primeira thread READY que encontrar.
  *     E se não encontrar nenhuma, retorna NULL.
@@ -1182,7 +1186,7 @@ void *GetCurrentThread (void){
 
 void *FindReadyThread (void){
 
-    struct thread_d *Thread;  
+    struct thread_d *Thread;
     int Index=0;
 
 
@@ -1379,8 +1383,9 @@ int init_threads (void){
 
     int i=0;
 
-	//Globais.	 
-	current_thread = 0;                        //Atual. 
+
+	//Globais.
+	current_thread = 0;  //Atual. 
 	
 	//ProcessorBlock.threads_counter = (int) 0;  //N�mero de threads no processador.	
 	UPProcessorBlock.threads_counter = (int) 0;  //N�mero de threads no processador.	
@@ -1427,19 +1432,23 @@ int init_threads (void){
  *     Isso funciona.
  */
 
+// ??
+// Rever isso.
+
 int thread_getchar (void){
-	
-	unsigned char SC;
-	int save;
-	
+
+    unsigned char SC=0;
+    int save=0;
+
 	// #bugbug
 	// Pode ser que esse aplicativo n�o tenha janela,
 	// mas esteja rodando na janela do shell.
 
-	struct window_d *w;
-	
-	struct thread_d *t;
-	
+    struct window_d *w;
+
+    struct thread_d *t;
+
+
 	//
 	// Bloqueia pra que nenhum aplicativo pegue mensagens 
 	// na estrutura de janela at� que window_getch termine.
@@ -1450,12 +1459,12 @@ int thread_getchar (void){
 	//pega o char em current_stdin.
 	//isso est� em kdrivers/x/i8042/keyboard.c
 	
-	SC = (unsigned char) get_scancode ();
+	SC = (unsigned char) get_scancode();
 	
 	// Isso coloca a mensagem na thread de controle da janela com o foco de entrada.
 	
-	KEYBOARD_SEND_MESSAGE ( SC );	
-	
+	KEYBOARD_SEND_MESSAGE ( SC );
+
 	
 	// #importante
 	// Deve ser a thread da janela com o foco de entrada.
@@ -1463,17 +1472,12 @@ int thread_getchar (void){
 	
 	
 	w = (void *) windowList[window_with_focus];
-	
-	if ( (void *) w == NULL )
-	{
-	    //fail
+
+	if ( (void *) w == NULL ){
 		panic ("thread_getchar: w");
-		
+
 	}else{
-	
-	    if ( w->used != 1 || w->magic != 1234 )
-	    {
-	        //fail
+	    if ( w->used != 1 || w->magic != 1234 ){
 	        panic ("thread_getchar: w validation");
 		}
 		
@@ -1484,18 +1488,21 @@ int thread_getchar (void){
 		
 		t = (void *) w->control;
 	};
-	
+
+
 	//
 	// Check thread,
 	//
-			    
-	if ( (void *) t == NULL )
+    
+    if ( (void *) t == NULL )
 	{
+         //msg
 	     goto fail;
 	}	
 	
 	if ( t->newmessageFlag != 1 )
 	{
+		//msg
 	    goto fail;
 	}
 	
@@ -1521,97 +1528,24 @@ int thread_getchar (void){
 	//===============
 	// Retorna o char.
 	//===============
-	
-	return (int) save;	
-	
+
+//#todo: Create this label.
+//done:
+    return (int) save;
+
+// ?? 
 fail:
+// ?? delete this label.
 done:
-	
+
    // window_getch_lock = 0;
-	
+
 	// =============
 	// Retorna erro
 	// =============
-	
-	return (int) -1; //erro	
+
+    return (int) -1; //erro
 }
-
-
-/*
- *Constructor.
-int threadmanagerProcessmanager()
-{};
-*/
-
-/*
-int threadmanagerInit()
-{};
-*/
-
-
-/*
-int 
-thread_queue_put ( struct thread_d *thread,
-                   struct mdg_d *msg );
-                   
-int 
-thread_queue_put ( struct thread_d *thread,
-                   struct mdg_d *msg )
-{
-
-    if ( (void *) thread == NULL )
-        return -1;
-        
-
-    if ( (void *) msg == NULL )
-        return -1;
-        
-    //coloca no tail    
-    thread->MsgQueue[thread->MsgQueueTail] = (unsigned long) msg;
-        
-    //circula
-    if ( thread->MsgQueueTail >= 32 )
-        thread->MsgQueueTail = 0;
-    
-    
-    // O processo n�o est� respondendo.
-    //if ( thread->MsgQueueTail == thread->MsgQueueHead )
-        //return -1;
-        
-    // Ok;
-    return 0
-}
-*/
-
-
-/*
-struct msg_d *
-thread_queue_get ( struct thread_d *thread );
-
-struct msg_d * 
-thread_queue_get ( struct thread_d *thread )
-{
-
-    struct msg_d *msg;
-
-    if ( (void *) thread == NULL )
-        return NULL;
-        
-
-      
-    //pega de head    
-    msg = (struct msg_d *) thread->MsgQueue[thread->MsgQueueHead];
-        
-    //circula
-    if ( thread->MsgQueueHead >= 32 )
-        thread->MsgQueueHead = 0;
-    
-    
- 
-    // Ok;
-    return (struct msg_d *) msg;
-}
-*/
 
 
 //

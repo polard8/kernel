@@ -1,10 +1,7 @@
 /*
  * File: thread.h
  *
- * 
- * Description:
- *     Header para threads.
- *     Pertence ao módulo microkernel, dentro do kernel.
+ *    Thread support.
  *
  * History:
  *     2015 - Created by Fred Nora.
@@ -31,6 +28,8 @@
 #define UNPREEMPTABLE  0    //NAO PODE ENTRAR EM PREEMPÇÃO
 
 
+// ??
+// #bugbug: rever isso!
 // Identificadores de thread.
 #define IDLE_ID        0 
 #define IDLE           IDLE_ID 
@@ -69,7 +68,7 @@
 // Com limite de 10 por enquanto.
 
 typedef enum {
-	
+
 	WAIT_REASON_NULL,
 	WAIT_REASON_LOOP,           
 	WAIT_REASON_EXIT,
@@ -127,7 +126,7 @@ typedef enum {
  */
  
 typedef enum {
-	
+
 	TYPE_NULL,
 	TYPE_SYSTEM,     // first-come-first-served.
 	TYPE_IDLE,       // 
@@ -180,49 +179,47 @@ typedef enum {
 
 }thread_state_t;
 
- 
+
 /*
  ***********************************************************
  * thread_d: 
  *
  *    TCB - Thread Control Block.
- *
- * A estrutura onde guarda informações sobre a thread.
- * #todo: 
- * Começar com informações sobre disco e arquivos.
- * #obs: 
- * Deve ficar por último o que for referenciado com menos frequência.
+ *    In the end of the struct we find the elements 
+ *    not frequently used.
  */
 
 struct thread_d 
 {
-    object_type_t objectType;
-    object_class_t objectClass;
+    
+    // Object control.
 
-    //object control
+    object_type_t  objectType;
+    object_class_t objectClass;
+    
     struct object_d *object;
 
-	
-	//call back //d
-	
+
+    int used;
+    int magic;
+
+
     //
-	// Identificadores.
-	//
+    // Identifiers
+    //
 
-    int tid;                //c, thread ID.   	
-    int ownerPID;           //ID do processo ao qual o thread pertencer. 
+    // Thread id and owner process id.
 
+    int tid;
 
-	//#importante:
-	//Isso pode ser unsigne long mesmo.
-	// #todo: Change to int.
-    unsigned long used;     
-    unsigned long magic;    
+    // Owner process.    
+    struct process_d *process; 
+    int ownerPID;
 
 
     // type: 
     // Tipo de tarefa.
-    // (SYSTEM, PERIODIC, RR, IDLE).	
+    // (SYSTEM, PERIODIC, RR, IDLE).
     thread_type_t type;
 
     //flag, Estado atual da tarefa. ( RUNNING, DEAD ...).
@@ -244,10 +241,10 @@ struct thread_d
     int plane;
 
 	//
-	// Names.
+	// Names
 	//
-	
-	//char *name;  //@todo: Usar isso.
+
+    //char *name;  //@todo: Usar isso.
     unsigned long name_address;
     unsigned long name_pointer; 
     char short_name[4];
@@ -259,20 +256,24 @@ struct thread_d
     size_t threadName_len;    // len 
 
 
-
     //
-	// ## CPU support ##
-	//
+    // == CPU =========================================
+    //
+
+    // What processor the thread is running.
+    int cpu;
     
-    int cpuID;            //Qual processador.
-    int confined;         //Flag, confinado ou não.
-    int CurrentProcessor;
-    int NextProcessor;
-	//int IdealProcessor;
-	
-	
+    // What will be the next processor for this thread.
+    int next_cpu;
+    
+    // Processor affinity.
+    // See: https://en.wikipedia.org/wiki/Processor_affinity
+    int affinity;
+
+
 	//
-	// ORDEM: O que segue é referenciado durante a interrupção de timer.
+	// ORDEM: 
+	// O que segue é referenciado durante a interrupção de timer.
 	//
 
 	
@@ -283,23 +284,22 @@ struct thread_d
 	// O que segue é referenciado durante o processo de task switch.
 	//
 	
-	
-	//
-	//  ## Directory ##
-	//	
-	
-    // COLOCAR O DIRETÓRIO DE PÁGINAS QUE A THREAD USA, ISSO AJUDA NA 
-	// HORA DO TASKSWITCH.
 
-	//unsigned long DirectoryVA;
+	//
+	// == Directory =======================================
+	//
+
+    // COLOCAR O DIRETÓRIO DE PÁGINAS QUE A THREAD USA, 
+    // ISSO AJUDA NA HORA DO TASKSWITCH.
+
     unsigned long DirectoryPA;
-	
-	
-	//IOPL of the task. (ring).
-	//@todo: isso pode ser um char.
-    unsigned long iopl; 
-	
-	
+
+
+    // ring.
+    unsigned long iopl;
+    unsigned long PreviousMode;
+
+
 	// Context. 
 	// #todo: 
 	// Usars uma estrutura.
@@ -316,8 +316,7 @@ struct thread_d
 
 	// para o kernel saltar para o novo processo.
     unsigned long ring0_eip;  //usado com o pd do kernel
-    unsigned long eipPA;	
-
+    unsigned long eipPA;
 
     unsigned short ds;
     unsigned short es;
@@ -331,25 +330,29 @@ struct thread_d
     unsigned long esi;
     unsigned long edi;
     unsigned long ebp;
-	//continua o contexto ...	
-	
+	//continua o contexto ...
+
 	//O endereço incial, para controle.
     unsigned long initial_eip;
 
 	//#todo
 	//isso é muito necessário.
     struct i386tss_d *tss;
-	
+
 	//
 	// ORDEM: 
 	// O que segue é referenciado durante o processo de scheduler.
 	//
 
-	// Poderia ser base_priority e dinamic_priority.
+
+    //
+    // == Priority =====================================
+    //
+
+    // Poderia ser base_priority e dinamic_priority.
     unsigned long base_priority;    //Prioridade básica.
     unsigned long priority;         //Prioridade dinâmica.
-	
-	
+
 	
 	/*
 	 * preempted:
@@ -363,25 +366,34 @@ struct thread_d
     unsigned long preempted;
 
 	//
-	// ORDEM: O que segue é referenciado durante o processo de dispatch.
+	// ORDEM: 
+	// O que segue é referenciado durante o processo de dispatch.
 	//
-	
+
 	/*
-	 * save ~ Sinaliza que a tarefa teve o seu contexto salvo.
-	 @todo: isso pode ser int, bool ou char.
+	 * save 
+	 * Sinaliza que a tarefa teve o seu contexto salvo.
+	 * #todo: 
+	 * Isso pode ser int, bool ou char.
 	 */
 
     unsigned long saved;
 
 
-    //HEAP and STACK:
-    
-    //todo: Usar a estrutura. 
-    //struct heap_d *heap;
+    //
+    //  == Heap ==========================================
+    //
 
     unsigned long Heap;
     unsigned long HeapSize;
-    
+
+    //todo: Usar a estrutura. 
+    //struct heap_d *heap;
+
+    //
+    //  == Stack ==========================================
+    //
+
     unsigned long Stack;
     unsigned long StackSize;
 
@@ -389,20 +401,22 @@ struct thread_d
 	//Endereço de um array contendo ponteiros para variso serviços
 	//que a thread pode usar.
 	//unsigned long ServiceTable;
-	
+
     //
-	// ## Temporizadores  ##
-	//
-	
-	//
-    // @todo: Ticks and Deadline.
-	//
+    // == Time ===================================
+    //
+
+    //
+    // #todo: 
+    // Ticks and Deadline.
+    //
+
 	// Quanto tempo passou, mesmo quando a tarefa não esteve rodando.
 	// Quando tempo a tarefa tem para que ela complete a sua execução.
 	//
 	//unsigned long Ticks;
     //unsigned long DeadLine.
-	
+
 	//Steps.
 	//Quantas vezes a tarefa usou o processador. 
     unsigned long step; 
@@ -436,48 +450,39 @@ struct thread_d
     //Contando o tempo nos estados de espera.
     unsigned long readyCount;   //tempo de espera para retomar a execução.
     unsigned long ready_limit;
-	
-	//Esperando por eventos.
+
+    //Esperando por eventos.
     unsigned long waitingCount; //tempo esperando algo.	
     unsigned long waiting_limit;   //tempo limite que uma tarefa ready fica sem rodar.
     
     unsigned long blockedCount;
     unsigned long blocked_limit;
-	
-	
-	//Ticks remaining. (tempo para a tarefa chegar ao fim, tempo total-tempo percorrito)
+
+    //Ticks remaining. (tempo para a tarefa chegar ao fim, tempo total-tempo percorrito)
     unsigned long ticks_remaining; //rt, quanto tempo a tarefa tem disponível para ser concluida.
 
 
-	//
-	// Working set support.
-	// 
-	
-	//profiler support 
-	
-	//quanto por cento do tempo o processo ficou rodando.
-	//é a soma do quanto ficou rodando todas as suas threads.
+    //
+    // == Profiler ==================================
+    //
+
+
+    //quanto por cento do tempo o processo ficou rodando.
+    //é a soma do quanto ficou rodando todas as suas threads.
     unsigned long profiler_percentage_running;
     unsigned long profiler_percentage_running_res;
     unsigned long profiler_percentage_running_mod;
     unsigned long profiler_ticks_running;
     unsigned long profiler_last_ticks;
 
-	//unsigned long alarm;            //Tempo para o próximo alarme, dado em ticks.
-	
-	//??iopl??
-	//@todo: isso não precisa ser unsigned long.
-    unsigned long PreviousMode;
 
-	
-	/*
-     * @todo: afinidade e ligação entre tarefas.
-	 */
-    //int idealprocessornumber;
-		
-		
+    //Tempo para o próximo alarme, dado em ticks.
+    //unsigned long alarm; 
+
+
 	//
-	// ORDEM: O que segue é referenciado com pouca frequencia.
+	// ORDEM: 
+	// O que segue é referenciado com pouca frequencia.
 	//
 	
 	//lista de arquivos ??
@@ -512,11 +517,6 @@ struct thread_d
 
     // ID da tty usada.
     int tty_id;
-
-    // process.
-    // À qual processo pertence a thread.
-    // #bugbug: Isso já existe no início da estrutura.
-    struct process_d *process; 
 
 
     // #importante
@@ -597,18 +597,15 @@ struct thread_d
 
 
 
-
 	//?? mensagens pendentes.
 	//struct thread_d *sendersList; //Lista encadeada de threads querendo enviar mensagem
 	//struct thread_d *nextSender;  //próxima thread a enviar mensagem.
 	
 
-	// Objeto pelo qual a thread está esperando.
-	// #todo: mudar esses nomes, pode confundir com o header no início da 
-	// estrutura. (waiting_object_type ... woType woClass )
-    object_type_t   woType;   //obType;      //woType
-    object_class_t  woClass; //obClass;	   //woClass
 
+    //
+    // == Wait ======================================
+    //
 
 	//#importante
 	//razões para esperar
@@ -628,23 +625,31 @@ struct thread_d
     int wait4pid;   //id do processo que a thread está esperando morrer.
     int wait4tid;   //id da thread que a thread está esperando morrer.
 
+	// Objeto pelo qual a thread está esperando.
+	// #todo: mudar esses nomes, pode confundir com o header no início da 
+	// estrutura. (waiting_object_type ...  woType woClass )
+    object_type_t   woType;   //obType;   //woType
+    object_class_t  woClass;  //obClass;  //woClass
 
-	//
-	// ## Exit support ##
-	//
+
+    //
+    // == Signal ======================================
+    //
+    
+    unsigned long signal;
+    unsigned long umask;
+
+    //
+    // == Exit ======================================
+    //
 
     //Motivo da thread fechar.
     int exit_code;
 
+    // Navigation
 
-    // Signal
-    unsigned long signal;
-    unsigned long umask;
-
-
-	//Next: 
-    //Um ponteiro para a próxima thread da lista linkada. 
-    struct thread_d *Next;
+    struct thread_d *prev;
+    struct thread_d *next;
 };
 
 

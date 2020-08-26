@@ -159,7 +159,7 @@ void spawn_thread (int id){
 		// Configura a pr�xima.
 		// A next ser� a antiga current salva anteriormente.
 
-        spawn_Pointer->Next = (void *) Current;        
+        spawn_Pointer->next = (void *) Current;        
 
 
 		// * MOVEMENT 2 (Standby --> Running).
@@ -173,12 +173,11 @@ void spawn_thread (int id){
                 (unsigned long) spawn_Pointer, QUEUE_RUNNING );
         }
 
-		
 		// Destrava o mecanismo de taskswitch.
 		// Destrava o Scheduler.
-		
-		set_task_status(UNLOCKED);    
-	    scheduler_unlock();        
+
+        set_task_status(UNLOCKED);
+        scheduler_unlock(); 
 
 	    //@todo: Continua ...
     };
@@ -305,9 +304,8 @@ void spawn_thread (int id){
 	// #importante
 	// Precismos disso pois foi o irq0 quem nos trouxe aqui.
 
-	asm ("movb $0x20, %al \n");
-	asm ("outb %al, $0x20 \n");
-
+    asm ("movb $0x20, %al \n");
+    asm ("outb %al, $0x20 \n");
 
 	//
 	// Fly!

@@ -379,7 +379,8 @@ do_clone:
         // mesma tss
         Clone->control->tss = Current->control->tss;
 
-        Clone->control->Next = NULL;
+        Clone->control->next = NULL;
+
         Clone->control->exit_code = 0;
         //====
 

@@ -409,14 +409,14 @@ try_next:
 	// Então chamamos o scheduler para reescalonar as threads.
 
 
-    if ( (void *) Conductor->Next == NULL )
+    if ( (void *) Conductor->next == NULL )
     {
 
 #ifdef SERIAL_DEBUG_VERBOSE
-		debug_print(" LAST ");
+        debug_print(" LAST ");
 #endif
 
-		//printf ("ts: scheduler 1\n");
+        //printf ("ts: scheduler 1\n");
         KiScheduler();
         goto go_ahead;
     }
@@ -428,9 +428,9 @@ try_next:
 	// a próxima da lista.
 	// #BUGBUG: ISSO PODE SER UM >>> ELSE <<< DO IF ACIMA.
 
-    if ( (void *) Conductor->Next != NULL )
+    if ( (void *) Conductor->next != NULL )
     {
-        Conductor = (void *) Conductor->Next;
+        Conductor = (void *) Conductor->next;
         goto go_ahead;
     }
 
@@ -460,20 +460,23 @@ go_ahead:
 
     Current = (void *) Conductor;
 
-    if( (void *) Current == NULL ){ 
+    if( (void *) Current == NULL )
+    { 
         debug_print ("task_switch: Struct \n");
         KiScheduler();
         goto try_next;
 
     }else{
 
-        if ( Current->used != 1 || Current->magic != 1234 ){
+        if ( Current->used != 1 || Current->magic != 1234 )
+        {
             debug_print ("task_switch: val \n");
             KiScheduler ();
             goto try_next;
         }
 
-        if ( Current->state != READY ){
+        if ( Current->state != READY )
+        {
             debug_print ("task_switch: state \n");
             KiScheduler ();
             goto try_next;
@@ -628,11 +631,11 @@ void set_task_status( unsigned long status )
  * @todo: Mudar o nome dessa função para taskswitchGetStatus();.
  */
 
+    //#bugbug: Mudar para int.
+    
 unsigned long get_task_status (void)
 {
-    //#bugbug: Mudar para int.		
-    
-	return (unsigned long) task_switch_status;
+    return (unsigned long) task_switch_status;
 }
 
 

@@ -868,11 +868,10 @@ struct process_d
 
 
 
-	// Navigation:
-	// Prev and Next.
+    // Navigation
 
-	struct process_d *prev;
-	struct process_d *next;
+    struct process_d *prev;
+    struct process_d *next;
 };
 
 //Os quatro principais processos.
