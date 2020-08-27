@@ -58,28 +58,17 @@ API     = ../../lib/libcore/include/
 APIOBJ  = ../../lib/libcore/obj
 
 
-	##
-	## Objects
-	##
+	#
+	# == Objects =================================
+	#
 
-myObjects = crt0.o main.o net.o \
-shellui.o \
+myObjects = crt0.o main.o net.o shellui.o \
 api.o \
-ctype.o \
-stdio.o \
-stdlib.o \
-string.o \
-conio.o \
+ctype.o stdio.o stdlib.o string.o conio.o \
 builtins.o \
-desktop.o \
-unistd.o \
-socket.o \
-wait.o \
-termios.o \
-ioctl.o \
-fcntl.o \
+tests.o \
+unistd.o socket.o wait.o termios.o ioctl.o fcntl.o \
 stubs.o    
-
 
 
 
@@ -95,10 +84,10 @@ main.o:
 
 all-c:
 
-	gcc  -c  shellui.c    $(CFLAGS) -I $(LIB) -I $(API)  -o shellui.o
-	gcc  -c  builtins.c   $(CFLAGS) -I $(LIB) -I $(API)  -o builtins.o
-	gcc  -c  desktop.c    $(CFLAGS) -I $(LIB) -I $(API)  -o desktop.o
-	gcc  -c  net.c        $(CFLAGS) -I $(LIB) -I $(API)  -o net.o
+	gcc  -c  shellui.c   $(CFLAGS) -I $(LIB) -I $(API)  -o shellui.o
+	gcc  -c  builtins.c  $(CFLAGS) -I $(LIB) -I $(API)  -o builtins.o
+	gcc  -c  tests.c     $(CFLAGS) -I $(LIB) -I $(API)  -o tests.o
+	gcc  -c  net.c       $(CFLAGS) -I $(LIB) -I $(API)  -o net.o
 
 
 # Getting objects from libcore.

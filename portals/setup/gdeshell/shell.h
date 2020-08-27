@@ -23,7 +23,7 @@
 #include "globals.h"
 #include "builtins.h"
 #include <api.h>
-#include "desktop.h"
+
 
 //# bash 1.05 stuff #
 #include "variables.h"
@@ -35,6 +35,10 @@
  
 #include <sys/wait.h> 
 //...
+
+
+#include "tests.h"
+
 
 
 //#define SHELL_VERBOSE 1

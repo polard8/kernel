@@ -7,6 +7,11 @@
  *     2018 - Created by Fred Nora.
  */
  
+
+#ifndef __GLOBALS_H 
+#define __GLOBALS_H 1
+
+
 //"global command" stuff 
 #define glob_percent_sign '%' 
 #define glob_underscore '_'
@@ -322,5 +327,9 @@ static unsigned long screen_buffer_saved_y = 0;
 //cores do texto. 
 unsigned long backgroung_color;  //pano de fundo.
 unsigned long foregroung_color;  //texto.
+
+
+#endif    
+
 
 

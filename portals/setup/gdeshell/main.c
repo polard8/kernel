@@ -11,8 +11,9 @@
 #include "shell.h"
 
 
+
+
 // #hackhack
-// Porque deletamos libcore
 #define gramado_strncmp strncmp 
 
 
@@ -286,6 +287,28 @@ int sm_initialized = 0;
 int wl_initialized = 0;
 int ws_initialized = 0;
 int wp_initialized = 0;
+
+
+
+
+
+//
+// ===============================================================
+//
+
+//
+// ## timer ##
+//
+
+int objectX;
+int objectY;
+int deltaX;
+int deltaY;
+//int deltaValue = 4;
+int deltaValue = 1;
+int __count=0;
+unsigned long CPU_USAGE[32];
+
 
 
 //
@@ -586,57 +609,43 @@ __SendMessageToProcess (
 
 
 
-//
-// ===============================================================
-//
-
-//
-// ## timer ##
-//
-
-int objectX;
-int objectY;
-int deltaX;
-int deltaY;
-//int deltaValue = 4;
-int deltaValue = 1;
-
-
-
-int __count=0;
-unsigned long CPU_USAGE[32];
-
 // Usado para testar o timer.
 void update_cpu_usage (void)
 {
-
-	unsigned long __idle_value=0;
-	unsigned long __value=0;
-	int i=0;
+    unsigned long __idle_value=0;
+    unsigned long __value=0;
+    int i=0;
 
 
     __count++;
-	//printf ("%d ",__count);
-	
-	__idle_value = (unsigned long) gramado_system_call( 777, 0, 0, 0);
-	
-	//__value = (100 - __idle_value);
-	//CPU_USAGE[__count] = __value;
-	CPU_USAGE[__count] = __idle_value;
-	
-    if (__count >= 32)
-    {
-	    __count = 0;
-		
-		//limpa
-		gde_redraw_window ( cpu_window, 1 );
-		//for (i=0; i<32; i++)
-		for (i=1; i<32; i++)
-		{
-		    gde_draw_text ( cpu_window, 
-		        i*smCharHeight, CPU_USAGE[i], COLOR_BLACK, "+");
-		}
-		gde_show_window (cpu_window);
+    //printf ("%d ",__count);
+
+    __idle_value = (unsigned long) gramado_system_call( 777, 0, 0, 0);
+
+    //__value = (100 - __idle_value);
+    //CPU_USAGE[__count] = __value;
+    CPU_USAGE[__count] = __idle_value;
+    
+    if (__count < 32){
+        return;
+    }else{
+
+        __count = 0;
+
+        // Clean
+        gde_redraw_window ( cpu_window, 1 );
+
+        // Draw
+        for (i=1; i<32; i++)
+        {
+            // IN:
+            gde_draw_text ( cpu_window, 
+                (i*smCharHeight), CPU_USAGE[i], 
+                 COLOR_BLACK, "+");
+        };
+
+        // Show
+        gde_show_window (cpu_window);
     };
 }
 
@@ -673,21 +682,19 @@ void updateObject (void)
 
     
 	//
-	// ## test ##
+	// == Draw char ==============================
 	//
-	
-	//update.
-	//textCurrentRow = objectX;
-    //textCurrentCol = objectY;
-   
-    //putchar.
-	//shellInsertNextChar ( (char) 'T' );  
-	
-	shellSetCursor ( objectX, objectY );
-	
-	printf ("%c", (char) 'X');
-}
 
+    //update.
+    //textCurrentRow = objectX;
+    //textCurrentCol = objectY;
+
+    //putchar.
+    //shellInsertNextChar ( (char) 'T' );  
+
+    shellSetCursor ( objectX, objectY );
+    printf ("%c", (char) 'X');
+}
 
 
 
@@ -708,14 +715,15 @@ xmas_tree_create ( char *file_name)
     gde_register_window ( (struct window_d *) xmas_tree_window );
     
 
-	// testando malloc.
+    // testando malloc.
     xmas_tree_buffer = (void *) malloc (1024*50); 
-	
-	//existe um buffer
+
+    //existe um buffer
     shellui_fntos ( (char *) file_name );
 
-    //@todo: Usar alguma rotina da API espec�fica para carregar arquivo.
-	// na verdade tem que fazer essas rotinas na API.
+    // #todo: 
+    // Usar alguma rotina da API especifica para carregar arquivo.
+    // na verdade tem que fazer essas rotinas na API.
 
     gramado_system_call ( SYSTEMCALL_READ_FILE, 
         (unsigned long) file_name, 
@@ -773,8 +781,6 @@ xmas_tree (void)
 	//printf ("%c", (char) 'X');
 	//shellDisplayBMPEx ( (char *) tokenList[i], (int) (200) );
 	
-    
-        
     gde_replace_window ( (struct window_d *) xmas_tree_window, 
         objectX, objectY );
     
@@ -1193,13 +1199,17 @@ shellProcedure (
             printf ("MSG_CREATE\n"); 
             break;
 
-        //#IMPORTANTE
-		// a API CHAMA ISSO DE TEMPOS EM TEMPOS DE ACORDO
-		//COM A CONFIGURA��O FEITA ANTES POR ESSE APP.
+
+        // #IMPORTANTE
+        // A API CHAMA ISSO DE TEMPOS EM TEMPOS 
+        // DE ACORDO COM A CONFIGURACAO FEITA ANTES POR ESSE APP.
         case MSG_TIMER:
             //printf("TIMER\n");
-            update_cpu_usage ();
+            update_cpu_usage();  // cpu usage viwer.
+            //updateObject();    // moving char.
+            //xmas_tree();       // moving image.
             break; 
+
 
         //case MSG_SETFOCUS:   break;
         //case MSG_KILLFOCUS:  break;
@@ -2854,9 +2864,9 @@ do_compare:
 
         printf("timer-test: Creating timer\n");
         printf("%d Hz | sys time %d ms | ticks %d \n", 
-            gde_get_systime_info (1), 
-            gde_get_systime_info (2), 
-            gde_get_systime_info (3) );
+            gde_get_systime_info(1), 
+            gde_get_systime_info(2), 
+            gde_get_systime_info(3) );
 
         gde_enter_critical_section ();
         cpu_window = (void *) gde_create_window ( 1, 
@@ -2884,6 +2894,7 @@ do_compare:
         printf ("timer-test: done\n");
         goto exit_cmp;
     }
+
 
 
     // user info

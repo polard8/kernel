@@ -132,8 +132,8 @@ void enable_maskable_interrupts(void)
 
 int main ( int argc, char *argv[] ){
 
-    char runlevel_string[128];
     char *_string = "init.bin: Init is alive! Calling int 129";
+    char runlevel_string[128];
 
 
     // Initialize with error value.

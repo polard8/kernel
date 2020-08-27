@@ -1,24 +1,16 @@
-// gerenciamento do desktop,
-// manipulação dos ícones no desktop.
-
 
 #include "shell.h"
 
 
-//desktop folders.
 
 #ifndef PDESKTOPFOLDER
 #define PDESKTOPFOLDER "/tmp/volume0"
 #endif
 char *primary_desktop_folder = PDESKTOPFOLDER;
-
-
 #ifndef SDESKTOPFOLDER
 #define SDESKTOPFOLDER "/tmp/volume1/users/fred/desktop"
 #endif
 char *secondary_desktop_folder = SDESKTOPFOLDER;
-
-
 int desktopInitialize (void)
 {
     printf ("Initializing desktop ...\n");
@@ -26,5 +18,11 @@ int desktopInitialize (void)
     printf ("%s\n",secondary_desktop_folder);
     return 0;
 }
+
+
+//
+// =================================================
+//
+
 
 
