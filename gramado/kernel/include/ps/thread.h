@@ -417,8 +417,8 @@ struct thread_d
 	//unsigned long Ticks;
     //unsigned long DeadLine.
 
-	//Steps.
-	//Quantas vezes a tarefa usou o processador. 
+    // step: 
+    // Quantas vezes ela já rodou no total.
     unsigned long step; 
 
 	// sys time inicial da thread.
@@ -436,11 +436,11 @@ struct thread_d
 	//unsigned long  RemainingTime;  //??
 	
     unsigned long standbyCount;
-	
-	//Contando tempo rodando.
-	//ticks rodando antes de parar.
+
+    // runningCount: 
+    // Quanto tempo ela está rodando antes de parar.
     unsigned long runningCount; 
-	
+
 	//ms rodando antes de parar.
     unsigned long runningCount_ms; 
 

@@ -657,24 +657,37 @@ int x86main (void){
     // Fonts.
     //
     
+    // #bugbug
+    // Font is independent from the x86 archtechture.
+    // We can do this in some other place. Maybe :)
+ 
     // See: config/config.h
     gfontSize = DEFAULT_FONT_SIZE;
 
     switch (gfontSize){
 
+        //case FONT8X8:
+            //gfontSize = FONT8X8;
+            //gwsInstallFont ("NC2     FON");
+            //gwsSetCurrentFontCharWidth(8);
+            //gwsSetCurrentFontCharHeight(8);
+            //break;
+
+
         case FONT8X8:
             //gfontSize = FONT8X8;
             gwsInstallFont ("LIN8X8  FON");
-            gwsSetCurrentFontCharWidth (8);
-            gwsSetCurrentFontCharHeight (8);
+            gwsSetCurrentFontCharWidth(8);
+            gwsSetCurrentFontCharHeight(8);
             break;
+
 
         // #bugbug: fullscreen scroll.
         case FONT8X16:
             //gfontSize = FONT8X16;
             gwsInstallFont ("LIN8X16 FON");      
-            gwsSetCurrentFontCharWidth (8);
-            gwsSetCurrentFontCharHeight (16);
+            gwsSetCurrentFontCharWidth(8);
+            gwsSetCurrentFontCharHeight(16);
             break;
 
         //...
@@ -683,8 +696,8 @@ int x86main (void){
         default:
             gfontSize = FONT8X8;
             gwsInstallFont ("LIN8X8  FON");
-            gwsSetCurrentFontCharWidth (8);
-            gwsSetCurrentFontCharHeight (8);
+            gwsSetCurrentFontCharWidth(8);
+            gwsSetCurrentFontCharHeight(8);
             debug_print ("[x86] x86main: FIXME: Using default font.\n");            
             break;
     };

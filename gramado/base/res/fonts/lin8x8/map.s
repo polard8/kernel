@@ -59,9 +59,9 @@ Linker script and memory map
 LOAD lin8x8.o
 OUTPUT(LIN8X8.FON elf32-i386)
 
-.comment        0x0000000000000000       0x11
- .comment       0x0000000000000000       0x11 lin8x8.o
-                                         0x12 (size before relaxing)
+.comment        0x0000000000000000       0x29
+ .comment       0x0000000000000000       0x29 lin8x8.o
+                                         0x2a (size before relaxing)
 
 .note.GNU-stack
                 0x0000000000000000        0x0

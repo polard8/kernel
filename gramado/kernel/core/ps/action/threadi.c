@@ -532,49 +532,23 @@ void KiShowTasksParameters (void)
  *     Show info about all threads.
  */
 
-void show_slots (){
+void show_slots(){
 
-    struct process_d *p;  
-    struct thread_d  *t; 
+    struct process_d *p;
+    struct thread_d  *t;
     int i=0;
 
 
-	//
-	// Testando o for para process.
-	//
-	
-	/*
-	printf(" \n\n ** Process info ** \n\n");
-	
-	for( i=0; i<PROCESS_COUNT_MAX; i++)
-    {
-	    p = (void *) processList[i];
-	    
-		//Mostra as tarefas válidas, mesmo que estejam com problemas.
-		if( (void*)p != NULL && 
-		        p->used == 1 && 
-				p->magic == 1234 )
-	    {
-			//@todo: Mostrar quem é o processo pai.
-		    printf("PID={%d} Directory={%x} Name={%s} \n",p->pid ,p->Directory ,p->name_address);
-	    };
-    };
-	*/
-	
-	//
-	// Testando o for para threads.
-	//
 
     printf ("\nThread info:\n");
 
 
-//Scan:
+    // Loop.
+    // Mostra as tarefas válidas, mesmo que estejam com problemas.
 
     for ( i=0; i<THREAD_COUNT_MAX; i++ )
     {
         t = (void *) threadList[i];
-
-		//Mostra as tarefas válidas, mesmo que estejam com problemas.
 
         if ( (void *) t != NULL && 
              t->used == 1 && 
@@ -614,8 +588,8 @@ void show_slot (int tid){
 
         // Show one slot.
         printf ("\n");
-        printf ("TID   PID   pdPA  Prio  State Quan ms    initial_eip eflags   tName \n");
-        printf ("====  ====  ====  ====  ===== ==== ====  ==========  ======  ===== \n");
+        printf ("TID   PID   pdPA  Prio  State Quan jiffies initial_eip eflags   tName \n");
+        printf ("====  ====  ====  ====  ===== ==== ====    ==========  ======  ===== \n");
         printf ("%d    %d    %x    %d    %d    %d   %d    %x          %x      %s \n", 
             t->tid, 
             t->ownerPID,
@@ -623,7 +597,7 @@ void show_slot (int tid){
             t->priority, 
             t->state,
             t->quantum,
-            t->total_time_ms,  //#bugbug
+            t->step, //t->total_time_ms,  //#bugbug
             t->initial_eip,
             t->eflags,
             t->name_address );

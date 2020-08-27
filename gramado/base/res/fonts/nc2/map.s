@@ -59,9 +59,9 @@ Linker script and memory map
 LOAD nc2.o
 OUTPUT(NC2.FON elf32-i386)
 
-.comment        0x0000000000000000       0x11
- .comment       0x0000000000000000       0x11 nc2.o
-                                         0x12 (size before relaxing)
+.comment        0x0000000000000000       0x29
+ .comment       0x0000000000000000       0x29 nc2.o
+                                         0x2a (size before relaxing)
 
 .note.GNU-stack
                 0x0000000000000000        0x0

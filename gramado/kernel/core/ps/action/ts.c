@@ -181,21 +181,46 @@ void task_switch (void){
     //1000/600 = 1.x ms quando em 600HZ.
     //x = 0 + (x ms); 
 
-	// step: Quantas vezes ela já rodou no total.
-	// runningCount: Quanto tempo ela está rodando antes de parar.
 
+    // step: 
+    // Quantas vezes ela já rodou no total.
     Current->step++; 
+
+    // runningCount: 
+    // Quanto tempo ela está rodando antes de parar.
     Current->runningCount++;
+
+    //
+    // == #bugbug ==============================================
+    //
 
 	// #bugbug
 	// Rever essa contagem
-	
+/*
+The variables i have are:
+Current->step = How many timer the thread already ran.
+sys_time_hz = The timer frequency. (600Hz).
+No double type, no float type.
+----------
+600Hz means that we have 600 ticks per second.
+With 100 Hz we have 10 milliseconds per tick. ((1000/100)=10)
+With 600Hz we have 1.66666666667 milliseconds per tick.   ((1000/600)=1)
+------
+Maybe i will try 500Hz.
+With 600Hz we have 2 milliseconds per tick.   ((1000/500)=2)
+----
+This is a very poor incrementation method:
+Current->total_time_ms = Current->total_time_ms + (1000/sys_time_hz);
+The remainder ??
+----
+*/
+
 	//quanto tempo em ms ele rodou no total.
-    Current->total_time_ms = (unsigned long) Current->total_time_ms + (1000/sys_time_hz);	
-	
+    Current->total_time_ms = (unsigned long) Current->total_time_ms + (1000/sys_time_hz);
+
 	//incrementa a quantidade de ms que ela está rodando antes de parar.
 	//isso precisa ser zerado quando ela reiniciar no próximo round.
-    Current->runningCount_ms = (unsigned long) Current->runningCount_ms + (1000/sys_time_hz);	
+    Current->runningCount_ms = (unsigned long) Current->runningCount_ms + (1000/sys_time_hz);
 
 
 
