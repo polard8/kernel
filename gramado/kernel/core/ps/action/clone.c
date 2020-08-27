@@ -1006,8 +1006,9 @@ do_clone:
 
 
         // name.
-        Clone->processName_len = (size_t) strlen ( (const char *) filename );
         strcpy ( Clone->__processname, (const char *) filename );   
+        //Clone->processName_len = (size_t) strlen ( (const char *) filename );
+        Clone->processName_len = (size_t) sizeof(Clone->__processname);
 
         //
         // Socket ============

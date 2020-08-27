@@ -3148,11 +3148,11 @@ do_compare:
 
     // Se o filho não vai rodar em bg, então devemos esperar.
     }else{
-        printf ("__background [NO]\n");
+        debug_print ("__background [NO]\n");
         fake_sleep (8000);
         fake_sleep (8000);
         waitpid (-1,&Wait_status,0);
-        printf ("waitpid() ends\n");
+        debug_print("gdeshell: waitpid() ends\n");
         //fake_sleep (8000);
         //fake_sleep (8000);
         goto exit_cmp;

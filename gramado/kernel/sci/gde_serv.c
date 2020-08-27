@@ -689,6 +689,7 @@ gde_extra_services (
 
 
     // Get process name
+    // IN: PID, ubuffer.
     if ( number == 882 ){
         return (void *) getprocessname ( (int) arg2, (char *) arg3);
     }

@@ -78,10 +78,15 @@ void update_cpu_usage (void)
 
 		//limpa
 		gde_redraw_window ( cpu_window, 1 );
-        for (i=0; i<32; i++)
+        //for (i=0; i<32; i++)
+        for (i=1; i<32; i++)
         {
 			//printf ("%d ", (unsigned long) CPU_USAGE[i]);
-		    gde_draw_text ( cpu_window, i*8, CPU_USAGE[i], COLOR_BLACK, "+");
+            gde_draw_text( 
+                cpu_window, 
+                (i*8), 
+                CPU_USAGE[i], 
+                COLOR_BLACK, "+");
         };
         gde_show_window (cpu_window);
     }
@@ -90,82 +95,19 @@ void update_cpu_usage (void)
     //printf ("cpu usage: %d percent \n", __value);
 }
 
-
-// internal
-// #todo: ordenar por pid
-void showinfo_button1(void)
+void test_cpu(struct window_d *window)
 {
+    debug_print("test_cpu:");
 
-    char __pid_buffer[8];
-    char __processname_buffer[64];
-    char __priority_buffer[8];
-    char __state_buffer[8];
-    //...
-
-    int i=0;
-    int name_len = 0;
-    unsigned long __process_priority=0;
-    unsigned long __state=0;
-
- 
-  
-    //#todo
-    //Criar um for para mostrar vários processos.
-  
-    //unsigned long x = 0;
-    unsigned long y = 32;
-  
-    // Labels
-    gde_draw_text ( data_window,   4, 8, COLOR_BLACK, "PID" );
-    gde_draw_text ( data_window,  40, 8, COLOR_BLACK, "Name" );
-    gde_draw_text ( data_window, 140, 8, COLOR_BLACK, "Priority" );     
-    gde_draw_text ( data_window, 220, 8, COLOR_BLACK, "State" );     
-    //...
-
-        
-    //for ( i=100; i<104; i++ )
-    for ( i=100; i<110; i++ )
-    {
-        // get process name.
-        name_len = gde_getprocessname  ( i,  
-                       __processname_buffer, 
-                       sizeof(__processname_buffer) );
-        
-        if (name_len>0)
-        {
-            //Get PID string
-            itoa(i, __pid_buffer); 
-            
-            // get process priority
-            __process_priority = gde_get_process_stats (i,33);  
-            itoa(__process_priority, __priority_buffer);
-
-            // get process state
-            __state = gde_get_process_stats (i,5);  
-            itoa(__state, __state_buffer);
-
-            //...
-        
-            gde_draw_text ( data_window,   4, y, COLOR_BLACK, (char *) __pid_buffer );
-            gde_draw_text ( data_window,  40, y, COLOR_BLACK, (char *) __processname_buffer );
-            gde_draw_text ( data_window, 140, y, COLOR_BLACK, (char *) __priority_buffer ); 
-            gde_draw_text ( data_window, 220, y, COLOR_BLACK, (char *) __state_buffer );      
-            //...
-    
-            //update y
-            y = (y+10);
-         }
-    };
+    unsigned long deviceWidth  = gde_get_system_metrics(1); 
+    unsigned long deviceHeight = gde_get_system_metrics(2);
 
 
-    // refresh screen
-    gde_show_backbuffer ();
-}
+    if ( (void*) window == NULL ){
+        debug_print("test_cpu: window\n");
+        return;
+    }
 
-
-void test_f1(struct window_d *window)
-{
-    debug_print("ftest_f1:");
 
     //gramado_system_call ( 9901,   
       //  (unsigned long) window, 
@@ -193,9 +135,9 @@ void test_f1(struct window_d *window)
     gde_enter_critical_section ();
     cpu_window = (void *) gde_create_window ( 1, 1, 1, 
                               "cpu-usage",  
-                               20 +4, (32 +2), 
+                               (deviceWidth - (32*8) -4 ), 2, 
                                32*8, 100,    
-                               main_window, 0, 
+                               window, 0, 
                                COLOR_YELLOW, COLOR_YELLOW );
     gde_register_window (cpu_window);
     gde_show_window (cpu_window);
@@ -208,13 +150,91 @@ void test_f1(struct window_d *window)
 
     gde_create_timer ( 
         getpid(), 
-        (unsigned long) 2000, (int) 2 );
-
+        (unsigned long) 50, 
+        (int) 2 );
+        
     //printf ("done\n");
 
 //====================================
 }
 
+
+
+
+// internal
+// #todo: ordenar por pid
+void showinfo_button1(void)
+{
+
+    char __pid_buffer[8];
+    char __processname_buffer[64];
+    char __priority_buffer[8];
+    char __state_buffer[8];
+    //...
+
+    int i=0;
+    int name_len = 0;
+    unsigned long __process_priority=0;
+    unsigned long __state=0;
+
+ 
+  
+    //#todo
+    //Criar um for para mostrar vários processos.
+  
+    //unsigned long x = 0;
+    unsigned long y = 32;
+  
+    // Labels
+    gde_draw_text ( data_window,    4, 8, COLOR_BLACK, "PID" );
+    gde_draw_text ( data_window,   50, 8, COLOR_BLACK, "Name" );
+    gde_draw_text ( data_window,  200, 8, COLOR_BLACK, "Priority" );     
+    gde_draw_text ( data_window,  300, 8, COLOR_BLACK, "State" );     
+    //...
+
+        
+    //for ( i=100; i<104; i++ )
+    for ( i=100; i<110; i++ )
+    {
+        // get process name.
+        name_len = gde_getprocessname  ( i,  
+                       __processname_buffer, 
+                       sizeof(__processname_buffer) );
+        
+        if (name_len>0)
+        {
+            //Get PID string
+            itoa(i, __pid_buffer); 
+            
+            // get process priority
+            __process_priority = gde_get_process_stats (i,33);  
+            itoa(__process_priority, __priority_buffer);
+
+            // get process state
+            __state = gde_get_process_stats (i,5);  
+            itoa(__state, __state_buffer);
+
+            //...
+        
+            gde_draw_text ( data_window,   4, y, 
+                COLOR_BLACK, (char *) __pid_buffer );
+            gde_draw_text ( data_window,  50, y, 
+                COLOR_BLACK, (char *) __processname_buffer );
+            gde_draw_text ( data_window, 200, y, 
+                COLOR_BLACK, (char *) __priority_buffer ); 
+            gde_draw_text ( data_window, 300, y, 
+                COLOR_BLACK, (char *) __state_buffer );      
+            //...
+    
+            //update y
+            y = (y+10);
+         }
+    };
+
+
+    // refresh screen
+    gde_show_backbuffer ();
+}
 
 
 
@@ -261,7 +281,8 @@ sysmonProcedure (
 
                 case VK_F4: 
                     debug_print("sysmon: [F4]"); 
-                    test_f1(main_window);
+                    // IN: parent window.
+                    test_cpu(main_window);
                     goto done;
                     break;
 
@@ -269,13 +290,12 @@ sysmonProcedure (
             goto done;
             break;
 
-        case MSG_SYSKEYUP:
+        case MSG_SYSKEYUP:  
             goto done;
             break;
 
 
-		case MSG_CREATE:
-		    break;
+        //case MSG_CREATE:  break;
 
 
         case MSG_TIMER:
@@ -356,28 +376,17 @@ int main ( int argc, char *argv[] ){
     int ch=0;
     int char_count = 0;
 
-    //#bugbug
-    //Ele falha se a largura for pouco.
-
-    //unsigned long left = 600;
-    //unsigned long top = 100;
-    //unsigned long width = 320;
-    //unsigned long height = 480;
-    
-    unsigned long left;
-    unsigned long top;
-    unsigned long width;
-    unsigned long height;
-    
 
     unsigned long deviceWidth  = gde_get_system_metrics(1); 
     unsigned long deviceHeight = gde_get_system_metrics(2);
-
-    //left = deviceWidth/2;
-    left = 4;
-    //top = deviceHeight/3;
-    top = 4;
     
+    unsigned long left=0;
+    unsigned long top=0;
+    unsigned long width=0;
+    unsigned long height=0;
+    
+    left = 4;  //deviceWidth/2;
+    top = 4;  //deviceHeight/3;
     width  = (deviceWidth -20);
     height = (deviceHeight-20);
 
@@ -450,7 +459,7 @@ int main ( int argc, char *argv[] ){
 
 
     //
-    // ========= Client background =====================
+    // == Client background =====================
     //
 
     //++
@@ -458,9 +467,9 @@ int main ( int argc, char *argv[] ){
     gde_enter_critical_section ();  
     client_window = (void *) gde_create_window ( WT_SIMPLE, 1, 1, 
                                 "client-bg",     
-                                20, 100 +36, 
-                                width -4 -42, height -36 -100 -40, 
-                                hWindow, 0, 
+                                16, 16, 
+                                width -16 -16, height -16 -16, 
+                                main_window, 0, 
                                 0xF5DEB3, 0xF5DEB3 );
 
     if ( (void *) client_window == NULL){
@@ -485,7 +494,7 @@ int main ( int argc, char *argv[] ){
     client_bar_Window = (void *) gde_create_window ( WT_SIMPLE, 1, 1, 
                                     "client-bar",     
                                     2, 2, 
-                                    (width -10 -40), 40, 
+                                    ((width -16 -16) -2 -2), 40, 
                                     client_window, 0, 
                                     0x404040, 0x404040 );
     
@@ -531,7 +540,7 @@ int main ( int argc, char *argv[] ){
 
 
     //
-    // ========= Data window ===================
+    // == Data window ===================
     //
 
     // White window to show the data.
@@ -542,7 +551,7 @@ int main ( int argc, char *argv[] ){
     data_window = (void *) gde_create_window ( WT_SIMPLE, 1, 1, 
                                "DataWindow",     
                                 4, 48, 
-                                (width -4 -50), (height -36 -100 -40 -50), 
+                                ((width -16 -16) -4 -4), ((height*2)/3), 
                                 client_window, 0, 
                                 COLOR_WHITE, COLOR_WHITE );
 
@@ -596,15 +605,13 @@ Mainloop:
     };
 
 
-
 fail:
-    printf ("Fail!\n");
+    printf ("sysmon: Exit with error\n");
     return -1;
 
 done:
+    printf ("sysmon: Exit\n");
     return 0;
 }
-
-
 
 

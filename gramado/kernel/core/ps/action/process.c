@@ -402,8 +402,8 @@ unsigned long __GetProcessStats ( int pid, int index )
 }
 
 
-
-//pega o nome do processo.
+// Systemcall 882.
+// Pega o nome do processo.
 int getprocessname ( int pid, char *buffer ){
 
     struct process_d *p;
@@ -412,23 +412,34 @@ int getprocessname ( int pid, char *buffer ){
 
     //#todo
     //checar validade dos argumentos.
+
+    if(pid<0){
+        debug_print ("getprocessname: [FAIL] pid\n");
+        return -1;
+    }
+ 
+ 
+    //#todo
+    //buffer validation
+ 
  
     p = (struct process_d *) processList[pid]; 
 
     if ( (void *) p == NULL ){
-        //todo: message
+        debug_print ("getprocessname: [FAIL] p\n");
         return -1;
+        
     }else{
-    
-        if ( p->used != 1 || p->magic != 1234 )
-        {
-            //todo message
+        if ( p->used != 1 || p->magic != 1234 ){
+            debug_print ("getprocessname: [FAIL] VALIDATION\n");
             return -1;
         }
         
         // 64 bytes
         strcpy ( name_buffer, (const char *) p->__processname );  
         
+        
+        //#bugbug: Provavelmente isso ainda nem foi calculado.
         return (int) p->processName_len;
     };
 
@@ -1283,6 +1294,8 @@ get_next:
         //#test
         //64 bytes m�x.
         strcpy ( Process->__processname, (const char *) name); 
+        
+        Process->processName_len = sizeof(Process->__processname);
         
 
 		// Lista de streams ...

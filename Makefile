@@ -1,7 +1,7 @@
 # License: BSD License
 VERSION = 1
 PATCHLEVEL = 0
-SUBLEVEL = 96
+SUBLEVEL = 97
 EXTRAVERSION = 
 NAME = Gramado 1.0
 
@@ -207,6 +207,9 @@ vhd-copy-files:
 	sudo cp portals/init/INIT.BIN           /mnt/gramadovhd
 	sudo cp portals/setup/bin/GDESHELL.BIN  /mnt/gramadovhd
 
+	# EXTRA: Used for tests.
+	sudo cp portals/setup/bin/SYSMON.BIN  /mnt/gramadovhd
+	# ...
 
 	# 2) .INI
 	sudo cp gramado/base/ini/GUI.INI     /mnt/gramadovhd

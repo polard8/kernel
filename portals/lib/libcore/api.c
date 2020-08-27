@@ -2926,24 +2926,25 @@ int gde_getprocessname (int pid, char *name, size_t len){
     }
 
 
-    //coloca no buffer interno
+    // Coloca no buffer interno
     __len_ret = (int) gramado_system_call ( 882, 
                         (unsigned long) pid,
                         (unsigned long) name,
                         (unsigned long) name );
 
-    //HOST_NAME_MAX
+    // HOST_NAME_MAX
+    // Isso nao significa erro de medida do nome, 
+    // pois se chamarmos com um pid invalido
+    // vai retornar -1.
+
     if ( __len_ret < 0 || __len_ret > 64 ) 
     {
-        printf ("gde_getprocessname: __len_ret\n");
+        debug_print ("gde_getprocessname: __len_ret \n");
         return -1;
     }
 
-
-    if ( __len_ret > len )
-    {
-        __len_ret = len;
-    }
+    // Se o nome do processo eh maior que o buffer em ring3.
+    if ( __len_ret > len ){ __len_ret = len; }
 
     return __len_ret;
 }

@@ -470,8 +470,9 @@ struct timer_d *create_timer (
 
     debug_print("===================\n");
     debug_print("create_timer:\n");
-    printf     ("create_timer: pid=%d ms=%d type=%d\n",
-        pid,ms,type);
+    
+    //printf     ("create_timer: pid=%d ms=%d type=%d\n",
+    //    pid,ms,type);
 
     if (pid<0){
         debug_print("create_timer: [FAIL] pid\n");
@@ -556,8 +557,8 @@ struct timer_d *create_timer (
             Timer->pid = pid;
             Timer->tid = current_thread;
             
-            printf("create_timer: done t={%d} :) \n",
-                Timer->initial_count_down);
+            //printf("create_timer: done t={%d} :) \n",
+            //    Timer->initial_count_down);
 
             // Coloca na lista.
             timerList[ID] = (unsigned long) Timer;
