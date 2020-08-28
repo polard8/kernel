@@ -12,10 +12,11 @@
 // Hot spot for the mouse pointer or system menu.
 struct wm_hot_spot
 {
-    int x;
-    int y;
+    unsigned long x;
+    unsigned long y;
 };
- 
+struct wm_hot_spot hot_spot;
+
 
 struct wm_client_d
 {

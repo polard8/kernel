@@ -863,6 +863,11 @@ int create_bg_client(int fd)
         //return -1;
 
 
+    //Setup hot spot.
+    hot_spot.x = (w/2);
+    hot_spot.y = (h/2);
+
+
     //
     // == bg (Client) ==================================
     // 
@@ -1171,21 +1176,21 @@ int create_main_menu( int fd )
     if (fd<0)
         return -1;
 
-    if ( (void *) c_topbar == NULL )
+    if ( (void *) c_bg == NULL )
         return -1;
     
-    if ( c_topbar->window < 0 )
+    if ( c_bg->window < 0 )
         return -1;
 
 
     // #testing (NEW)
     menu = gws_create_menu (
                (int) fd,
-               (int) c_topbar->window,
-               (int) 0, //highlight
+               (int) c_bg->window,
+               (int) 0,   //highlight
                (int) 4,   //count
-               (unsigned long) 20, //x
-               (unsigned long) 20,
+               (unsigned long) 2, //x
+               (unsigned long) 2+32,
                (unsigned long) 200,
                (unsigned long) 200,
                (unsigned long) COLOR_WHITE );
@@ -1195,28 +1200,28 @@ int create_main_menu( int fd )
                //menu item
                gws_create_menu_item (
                   (int) fd,
-                  (char *) "Item0",
+                  (char *) "Nothing",
                   (int) 0,
                   (struct gws_menu_d *) menu );
 
                //menu item
                gws_create_menu_item (
                   (int) fd,
-                  (char *) "Item1",
+                  (char *) "Editor F10",
                   (int) 1,
                   (struct gws_menu_d *) menu );
 
                //menu item
                gws_create_menu_item (
                   (int) fd,
-                  (char *) "Item2",
+                  (char *) "Terminal F12",
                   (int) 2,
                   (struct gws_menu_d *) menu );
 
                //menu item
                gws_create_menu_item (
                   (int) fd,
-                  (char *) "Item3",
+                  (char *) "Reboot F4",
                   (int) 3,
                   (struct gws_menu_d *) menu );
 
@@ -1323,6 +1328,7 @@ int main ( int argc, char *argv[] ){
 
     // Testing server.
     hello(client_fd);
+
 
     // Create clients.
     create_bg_client(client_fd);
