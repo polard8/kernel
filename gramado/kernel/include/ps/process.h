@@ -299,6 +299,10 @@ struct process_d
 
     int used;  
     int magic; 
+    
+    // Other process can't take some actions on this process 
+    // if it is protected. ex: It can't be killed by another process.
+    int _protected;
 
 
     // Arquivos abertos.

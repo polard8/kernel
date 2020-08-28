@@ -1005,6 +1005,18 @@ void kill_thread (int tid){
 
     }else{
 
+
+        /*
+        // This process can't be killed by another process.
+        if ( __Thread->_protected == 1 )
+        {
+            debug_print("exit_process: [FAIL] This thread can't be killed\n");
+            debug_print("This is a protected thread!\n");
+            return;  
+        }
+        */
+
+
         // #todo 
         // Pegar o id do pai e enviar um sinal e acorda-lo
         //se ele estiver esperando por filho.		

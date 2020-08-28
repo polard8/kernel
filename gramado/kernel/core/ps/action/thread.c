@@ -862,6 +862,10 @@ get_next:
 
         Thread->used = 1;
         Thread->magic = 1234;
+        
+        // Not a protected thread!
+        Thread->_protected = 0;
+
 
         Thread->name_address = (unsigned long) name;  //Name.   
 		//@todo: Usar Thread->name. 

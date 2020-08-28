@@ -203,6 +203,10 @@ struct thread_d
     int used;
     int magic;
 
+    // Other process can't take some actions on this thread
+    // if it is protected. ex: It can't be killed by another process.
+    int _protected;
+
 
     //
     // Identifiers

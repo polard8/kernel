@@ -1263,6 +1263,8 @@ get_next:
         Process->used = 1;
         Process->magic = 1234;
 
+        // Not a protected process!
+        Process->_protected = 0;
 
         processNewPID = (int) PID;
         
@@ -2042,7 +2044,16 @@ void exit_process ( pid_t pid, int code ){
             debug_print ("exit_process: Validation\n");
             return;
         }
-
+        
+        /*
+        // This process can't be killed by another process.
+        if ( Process->_protected == 1 )
+        {
+            debug_print("exit_process: [FAIL] This process can't be killed\n");
+            debug_print("This is a protected process!\n");
+            return;  
+        }
+        */
 
         Process->exit_code = (int) code; 
         Process->state = PROCESS_TERMINATED; 
