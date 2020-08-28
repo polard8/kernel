@@ -17,6 +17,9 @@ unsigned long g9x14fontAddress;         // 9x14,80×25,MDA, Hercules
 unsigned long g9x16fontAddress;         // 9x16,80×25,VGA
 
 
+unsigned long gws_eye_sprite_address;
+
+
 int gwssrv_init_font(void);
 
 

@@ -998,13 +998,16 @@ void InitGraphics(void){
     //gwssrv_load_and_decode_small_icon ("folder.bmp",350,4);
     //gwssrv_load_and_decode_small_icon ("folder.bmp",400,4);
 
-
     
+  
     //gws services
     //gws_refresh_rectangle(0,0,400,400);
     //gws_show_window_rect(gui->screen);
     
-    gws_show_backbuffer();            
+    gws_show_backbuffer();              
+
+  
+  
     
     debug_print("gwssrv: InitGraphics done\n");
     //printf     ("gwssrv: InitGraphics done *hang\n");

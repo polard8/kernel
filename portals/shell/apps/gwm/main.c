@@ -1124,6 +1124,49 @@ int create_tester_client(int fd)
     //gws_exit_critical_section();
 
 
+
+
+    /*
+    //
+    // == Sprite =================================
+    //
+    int thechar = 1;
+    int thecharx = 10;
+    int thechary = 10;
+    while(1){
+ 
+        //redrawtitle window and button.
+        gws_redraw_window(fd,c_tester->title_window,1); 
+        //gws_redraw_window(fd,tester_button,1); 
+
+        gws_draw_char (
+            (int) fd,             // fd,
+            (int) c_tester->title_window,              // window id,
+            (unsigned long) thecharx,    // left,
+            (unsigned long) thechary,    // top,
+            (unsigned long) COLOR_RED,
+            (unsigned long) thechar );  //CHAR
+    
+        thechar++;
+        if( thechar>4 )
+        {
+            thechar=1;
+
+            thecharx = (thecharx + 8);
+            if ( thecharx > 400 )
+                thecharx = 10;
+        }
+        
+        gws_yield();
+        gws_yield();
+        gws_yield();
+        gws_yield();
+    };
+    */
+    
+    
+    
+
     // Testing more things ....
     
     /*
@@ -1335,11 +1378,6 @@ int main ( int argc, char *argv[] ){
     create_topbar_client(client_fd);
     create_taskbar_client(client_fd);
     // ...
-
-
-    // Press F2.
-    //create_tester_client(client_fd);
-
 
 
     gws_debug_print ("gwm: draw done!\n");
