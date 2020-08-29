@@ -278,6 +278,8 @@ gws_send_event (
     struct gws_event_d *event );
 
 
+unsigned long gws_explode_byte (unsigned char data);
+
 //
 // End.
 //

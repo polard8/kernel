@@ -2141,6 +2141,13 @@ struct gws_menu_item_d *gws_create_menu_item (
 }
 
 
+
+unsigned long gws_explode_byte (unsigned char data)
+{
+    return (unsigned long) (data << 24 | data << 16 | data << 8 | data);
+}
+
+
 //
 // End.
 //

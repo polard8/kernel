@@ -269,15 +269,16 @@ struct ucred {
 */
 
 
-
-struct iovec {           /* Scatter/gather array items */
-    void   *iov_base;    /* Starting address */
-    size_t  iov_len;     /* Number of bytes to transfer */
+/* Scatter/gather array items */
+struct iovec 
+{
+    void   *iov_base;  /* Starting address */
+    size_t  iov_len;   /* Number of bytes to transfer */
 };
 
 
-struct msghdr {
-
+struct msghdr 
+{
     void         *msg_name;       /* optional address */
     socklen_t     msg_namelen;    /* size of address */
     struct iovec *msg_iov;        /* scatter/gather array */
@@ -320,18 +321,6 @@ int socket ( int domain, int type, int protocol );
 //POSIX.1-2001, POSIX.1-2008, 4.4BSD. 
 int socketpair (int domain, int type, int protocol, int sv[2]);
 
-
-
-int 
-connect ( 
-    int sockfd, 
-    const struct sockaddr *addr,
-    socklen_t addrlen );
-
-
-int accept (int sockfd, struct sockaddr *addr, socklen_t *addrlen);
-
-
 int 
 bind ( 
     int sockfd, 
@@ -344,6 +333,24 @@ bind (
 // The  listen()  function	call first appeared in 4.2BSD.
 int listen (int sockfd, int backlog);
 
+int accept (int sockfd, struct sockaddr *addr, socklen_t *addrlen);
+
+int 
+connect ( 
+    int sockfd, 
+    const struct sockaddr *addr,
+    socklen_t addrlen );
+
+
+/*
+ * shutdown: 
+ *     Shut down part of a full-duplex connection.
+ */
+
+//POSIX.1-2001, 
+//4.4BSD (the shutdown() function call  first  appeared  in 4.2BSD).
+int shutdown ( int sockfd, int how );
+
 
 
 //send
@@ -351,9 +358,8 @@ int listen (int sockfd, int backlog);
 //POSIX.1-2001   describes	  only	 the   MSG_OOB	 and   MSG_EOR	flags.
 //POSIX.1-2008 adds a specification  of  MSG_NOSIGNAL.   The  MSG_CONFIRM
 //flag is a Linux extension.
-// comments credits: freebsd.org	 
+// comments credits: freebsd.org
 ssize_t send ( int sockfd, const void *buf, size_t len, int flags );
-
 
 ssize_t 
 sendto ( 
@@ -364,13 +370,12 @@ sendto (
     const struct sockaddr *dest_addr, 
     socklen_t addrlen );
 
-
 ssize_t sendmsg (int sockfd, const struct msghdr *msg, int flags);
+
 
 
 //recv - receive a message from a socket
 ssize_t recv ( int sockfd, void *buf, size_t len, int flags );
-
 
 ssize_t 
 recvfrom ( 
@@ -381,20 +386,20 @@ recvfrom (
     struct sockaddr *src_addr, 
     socklen_t *addrlen );
 
-
 ssize_t recvmsg (int sockfd, struct msghdr *msg, int flags);
 
 
+int 
+getsockname (
+    int sockfd, 
+    struct sockaddr *addr, 
+    socklen_t *addrlen );
 
 int 
 getpeername ( 
     int sockfd, 
     struct sockaddr *addr, 
     socklen_t *addrlen );
-
-
-int getsockname (int sockfd, struct sockaddr *addr, socklen_t *addrlen);
-
 
 
 
@@ -409,16 +414,6 @@ struct hostent *gethostbyaddr(
     return (struct hostent *) 0;
 }
 */
-
-
-/*
- * shutdown: 
- *     Shut down part of a full-duplex connection.
- */
-
-//POSIX.1-2001, 
-//4.4BSD (the shutdown() function call  first  appeared  in 4.2BSD).
-int shutdown ( int sockfd, int how );
 
 
 #endif  //socket.h

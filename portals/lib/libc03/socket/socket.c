@@ -54,12 +54,12 @@ int socket ( int domain, int type, int protocol ){
                      (unsigned long) type, 
                      (unsigned long) protocol );
 
-    if(__fd<0)
+    if (__fd<0){
         printf ("socket: [FAIL] Couldn't create the socket!\n");
-        
+    }
+
     return (int) __fd;
 }
-
 
 
 //interna
@@ -108,7 +108,6 @@ int socketpair (int domain, int type, int protocol, int sv[2]){
         };
     }
 
-
     return (int) (-1);
 }
 
@@ -123,39 +122,60 @@ int gramado_socketpair (int fd[2])
 }
 */
 
+//  bind a name to a socket.
+// “assigning a name to a socket”.
+//  POSIX.1-2001, POSIX.1-2008, SVr4, 
+//  4.4BSD (bind() first appeared in 4.2BSD).
 
-// POSIX.1-2001, POSIX.1-2008, SVr4, 4.4BSD, 
-//(connect() first appeared in 4.2BSD).
-// initiate a connection on a socket
-
-// If the connection or binding succeeds, zero is returned.  
+// On success, zero is returned.  
 // On error, -1 is returned, and errno is set appropriately.
 
-
 int 
-connect ( 
+bind ( 
     int sockfd, 
     const struct sockaddr *addr,
     socklen_t addrlen )
 {
     int __status = -1;
 
-
-    __status = (int) gramado_system_call ( 7001, 
+    __status = (int) gramado_system_call ( 7003, 
                      (unsigned long) sockfd, 
                      (unsigned long) addr, 
                      (unsigned long) addrlen );
 
-    if(__status<0)
-        printf ("connect: Couldn't connect\n");
-     
+    if (__status<0){
+        printf ("bind: [FAIL] Couldn't bind\n");
+    }
 
     return (int) __status;
 }
-           
-           
-           
-           
+
+
+
+/*
+ * listen:
+ */
+
+// On success, zero is returned.  
+// On error, -1 is returned, and errno is set appropriately.     
+
+int listen (int sockfd, int backlog){
+
+    int __status = -1;
+
+    __status = (int) gramado_system_call ( 7004, 
+                     (unsigned long) sockfd, 
+                     (unsigned long) backlog, 
+                     (unsigned long) 0 );
+
+    if (__status<0){
+        printf ("connect: [FAIL] Couldn't listen\n");
+    }
+
+    return (int) __status;
+}
+
+
 /*
   The accept() system call is used with connection-based socket 
   types (SOCK_STREAM, SOCK_SEQPACKET).  
@@ -167,12 +187,10 @@ connect (
   The original socket sockfd is unaffected by this call.
 */
 
-
 //  On success, these system calls return a nonnegative integer 
 //  that is a file descriptor for the accepted socket.  
 // On error, -1 is returned, errno is set appropriately, 
 // and addrlen is left unchanged.
-
 
 int accept (int sockfd, struct sockaddr *addr, socklen_t *addrlen){
 
@@ -189,6 +207,74 @@ int accept (int sockfd, struct sockaddr *addr, socklen_t *addrlen){
     }
 
     return (int) __fd;
+}
+
+
+
+// POSIX.1-2001, POSIX.1-2008, SVr4, 4.4BSD, 
+//(connect() first appeared in 4.2BSD).
+// initiate a connection on a socket
+
+// If the connection or binding succeeds, zero is returned.  
+// On error, -1 is returned, and errno is set appropriately.
+
+int 
+connect ( 
+    int sockfd, 
+    const struct sockaddr *addr,
+    socklen_t addrlen )
+{
+    int __status = -1;
+
+
+    __status = (int) gramado_system_call ( 7001, 
+                     (unsigned long) sockfd, 
+                     (unsigned long) addr, 
+                     (unsigned long) addrlen );
+
+    if (__status<0){
+        printf ("connect: [FAIL] Couldn't connect\n");
+    }
+
+    return (int) __status;
+}
+
+
+/*
+ * shutdown:
+ *     shut down part of a full-duplex connection    
+ */
+
+// See:
+// https://linux.die.net/man/3/shutdown
+
+// how: 
+// Muda as flags do arquivo. 
+// Alterando permissões de leitura ou escrita.
+
+int shutdown ( int sockfd, int how )
+{
+    // #todo
+    // Deve existir uma rotina na libc que mude
+    // as permissões de um arquivo. Então é ela que devemos
+    // chamar agora e não uma system call.
+
+    debug_print ("shutdown: [TODO]\n");
+    //return -1; 
+
+    int __status = -1;
+
+
+    __status = (int) gramado_system_call ( 7009, 
+                         (unsigned long) sockfd, 
+                         (unsigned long) how, 
+                         (unsigned long) how );
+
+    if (__status<0){
+        printf ("shutdown: fail\n");
+    }
+    
+    return (int) __status;
 }
 
 
@@ -240,65 +326,7 @@ int pselect(int nfds, fd_set *readfds, fd_set *writefds,
             fd_set *exceptfds, const struct timespec *timeout,
             const sigset_t *sigmask)
 { return -1; }
-*/            
-            
-            
-            
-
-//  bind a name to a socket.
-// “assigning a name to a socket”.
-//  POSIX.1-2001, POSIX.1-2008, SVr4, 
-//  4.4BSD (bind() first appeared in 4.2BSD).
-
-// On success, zero is returned.  
-// On error, -1 is returned, and errno is set appropriately.
-
-int 
-bind ( 
-    int sockfd, 
-    const struct sockaddr *addr,
-    socklen_t addrlen )
-{
-    int __status = -1;
-
-    __status = (int) gramado_system_call ( 7003, 
-                     (unsigned long) sockfd, 
-                     (unsigned long) addr, 
-                     (unsigned long) addrlen );
-
-    if(__status<0)
-        printf ("bind: Couldn't bind\n");
-     
-     
-    return (int) __status;
-}
-
-
-
-
-/*
- * listen:
- */
-
-// On success, zero is returned.  
-// On error, -1 is returned, and errno is set appropriately.     
-
-int listen (int sockfd, int backlog){
-
-    int __status = -1;
-
-    __status = (int) gramado_system_call ( 7004, 
-                     (unsigned long) sockfd, 
-                     (unsigned long) backlog, 
-                     (unsigned long) 0 );
-
-    if(__status<0)
-        printf ("connect: Couldn't listen\n");
-     
-
-    return (int) __status;
-}
-
+*/             
 
 
 /*
@@ -372,7 +400,6 @@ recv (
 }
 
 
-
 ssize_t 
 recvfrom ( 
     int sockfd, 
@@ -394,7 +421,6 @@ ssize_t recvmsg (int sockfd, struct msghdr *msg, int flags)
 }
 
 
-
 int 
 getpeername ( 
     int sockfd, 
@@ -406,9 +432,8 @@ getpeername (
 }
 
 
-
-//POSIX.1-2001, POSIX.1-2008, SVr4, 4.4BSD (getsockname() first
-//appeared in 4.2BSD).
+//POSIX.1-2001, POSIX.1-2008, SVr4, 4.4BSD 
+//(getsockname() first appeared in 4.2BSD).
 
 int 
 getsockname ( 
@@ -424,53 +449,12 @@ getsockname (
                          (unsigned long) addr, 
                          (unsigned long) addrlen );
 
-    if(__status<0)
+    if (__status<0){
         printf ("getsockname: fail\n");
-     
-     
+    }
+
     return (int) __status;
 }
-
-
-/*
- * shutdown:
- *     shut down part of a full-duplex connection    
- */
-
-// See:
-// https://linux.die.net/man/3/shutdown
-
-// how: 
-// Muda as flags do arquivo. 
-// Alterando permissões de leitura ou escrita.
-
-int shutdown ( int sockfd, int how )
-{
-    // #todo
-    // Deve existir uma rotina na libc que mude
-    // as permissões de um arquivo. Então é ela que devemos
-    // chamar agora e não uma system call.
-
-    debug_print ("shutdown: [TODO]\n");
-    //return -1; 
-
-    int __status = -1;
-
-
-    __status = (int) gramado_system_call ( 7009, 
-                         (unsigned long) sockfd, 
-                         (unsigned long) how, 
-                         (unsigned long) how );
-
-    if(__status<0)
-        printf ("shutdown: fail\n");
-     
-     
-    return (int) __status;
-
-}
-
-
 
 
 //

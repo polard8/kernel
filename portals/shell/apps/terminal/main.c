@@ -211,7 +211,7 @@ void __send_to_child (void)
 
 
 
-//f2
+// Write something in the standard stream and call shell.bin.
 void test_standard_stream(int fd)
 {
     char buffer[4096];
@@ -221,9 +221,9 @@ void test_standard_stream(int fd)
     gws_debug_print("test_standard_stream:\n");  
 
 
-    FILE *f;
+    //FILE *f;
     //f = fopen("syscalls.txt", "r+"); 
-    f = fopen("gramado.txt", "r+"); 
+    //f = fopen("gramado.txt", "r+"); 
     //f = fopen("kstderr.txt", "r+");
     //f = fopen("g.txt", "r+");
 
@@ -239,13 +239,12 @@ void test_standard_stream(int fd)
    //gramado_system_call ( 900, 
      //  (unsigned long) "tprintf.bin", 0, 0 );
      
-    fseek(f, 0, SEEK_END);   // seek to end of file
-    size_t size = ftell(f);  // get current file pointer
-    fseek(f, 0, SEEK_SET);   // seek back to beginning of file
-    printf (">>>> size %d \n",size);  
+    //fseek(f, 0, SEEK_END);   // seek to end of file
+    //size_t size = ftell(f);  // get current file pointer
+    //fseek(f, 0, SEEK_SET);   // seek back to beginning of file
+    //printf (">>>> size %d \n",size);  
 
 
-      
     fseek(stdin, 0, SEEK_SET); 
     fseek(stdout, 0, SEEK_SET); 
     fseek(stderr, 0, SEEK_SET); 
@@ -265,7 +264,6 @@ void test_standard_stream(int fd)
     //fseek(stdin, 0, SEEK_SET); 
     //fseek(stdout, 0, SEEK_SET); 
     //fseek(stderr, 0, SEEK_SET); 
-
 
 
     int ii=0;
@@ -343,7 +341,8 @@ void terminal_write_char (int fd, int window, int c)
     // tab;
     
 
-    if ( c == '\r' ){
+    if ( c == '\r' )
+    {
         textCurrentCol=0; //TTY[console_number].cursor_x = TTY[console_number].cursor_left;  
         prev = c;
         return;    
@@ -457,13 +456,14 @@ void terminalInsertCR (void)
 //line feed
 void lf (void)
 {
-	//enquanto for menor que o limite de linhas, avança.
-	if ( textCurrentRow+1 < __wlMaxRows )
-	{
-		textCurrentRow++; 
-		return;
-	}
-	
+    // Enquanto for menor que o limite de linhas, avança.
+
+    if ( textCurrentRow+1 < __wlMaxRows )
+    {
+        textCurrentRow++; 
+        return;
+    }
+
 	//#todo: Scroll up;
 	//scrup();
 }
@@ -515,15 +515,16 @@ void del (void)
 // #todo
 // See: https://github.com/gramado/st/blob/tlvince/st.c
 
-		// #Atenção: A libc do app foi configurada dinamicamente
-		// para que printf coloque chars no arquivo. Mas 
-		// a libc desse terminal ainda não foi. Então a printf
-		// desse terminal escreve no backbuffer e exibe na tela.
-        // #bugbug: O problema é que dessa forma nada foi colocado no buffer de arquivo.
-        
+// #Atenção: A libc do app foi configurada dinamicamente
+// para que printf coloque chars no arquivo. Mas 
+// a libc desse terminal ainda não foi. Então a printf
+// desse terminal escreve no backbuffer e exibe na tela.
+// #bugbug: 
+// O problema é que dessa forma nada foi colocado no buffer de arquivo.
 //#todo
-// fazer essa função colocar os chars no buffer de arquivo. Usaremos no scroll.
-//void tputc (int fd, char *c, int len){
+// fazer essa função colocar os chars no buffer de arquivo. 
+// Usaremos no scroll.
+// void tputc (int fd, char *c, int len){
 
 void 
 tputc ( 
@@ -537,8 +538,9 @@ tputc (
     //unsigned char ascii = *c;
 
 
+    // ?? #bugbug
     // Control codes
-    int control = ascii < '\x20' || ascii == 0177;
+    int control = (ascii < '\x20' || ascii == 0177);
     //bool control = ascii < '\x20' || ascii == 0177;
 
  
@@ -1218,27 +1220,49 @@ response_loop:
             switch (MsgLong1)
             {
                 case VK_F1:
-                    test_tty_support(fd);
-                    break;
-
-                // Test standard srteam                
-                case VK_F2:
-                    test_standard_stream(fd);
-                    break;
-
-                case VK_F3:
-                    test_child_message();
-                    break;
-
-                case VK_F4:
-                    break;
-                   
-                case VK_F9:
+                    //test_tty_support(fd);
                     gws_draw_text (
                         (int) fd,             // fd,
                         (int) 0,              // window id,
                         (unsigned long) 30,    // left,
                         (unsigned long) 30,    // top,
+                        (unsigned long) COLOR_BLUE,
+                        "Terminal: [F1]");
+                    break;
+
+                // Test standard srteam                
+                case VK_F2:
+                    //test_standard_stream(fd);
+                    gws_draw_text (
+                        (int) fd,             // fd,
+                        (int) 0,              // window id,
+                        (unsigned long) 40,    // left,
+                        (unsigned long) 40,    // top,
+                        (unsigned long) COLOR_BLUE,
+                        "Terminal: [F2]");
+                    break;
+
+                case VK_F3:
+                    //test_child_message();
+                    break;
+
+                case VK_F4:
+                    gws_draw_text (
+                        (int) fd,              // fd,
+                        (int) 0,               // window id,
+                        (unsigned long) 80,    // left,
+                        (unsigned long) 80,    // top,
+                        (unsigned long) COLOR_BLUE,
+                        "Terminal: [F4] Exiting ...");
+                    exit(0);
+                    break;
+
+                case VK_F9:
+                    gws_draw_text (
+                        (int) fd,             // fd,
+                        (int) 0,              // window id,
+                        (unsigned long) 100,    // left,
+                        (unsigned long) 100,    // top,
                         (unsigned long) COLOR_BLUE,
                         "Terminal: [F9]");
                      break;
@@ -2159,15 +2183,12 @@ int main ( int argc, char *argv[] ){
     // #debug
     printf ("terminal: Creating socket\n");
 
-    // cria o soquete.
-    // AF_GRAMADO
-    //client_fd = socket ( 8000, SOCK_STREAM, 0 );
-    
+    //client_fd = socket ( AF_GRAMADO, SOCK_STREAM, 0 );
     client_fd = socket ( AF_INET, SOCK_STREAM, 0 );
     
     if ( client_fd < 0 ){
        debug_print ("terminal: Couldn't create socket\n");
-       printf ("terminal: Couldn't create socket\n");
+       printf      ("terminal: Couldn't create socket\n");
        exit(1);
     }
     
@@ -2180,26 +2201,24 @@ int main ( int argc, char *argv[] ){
     // connect
     // 
 
-    while (1){
+    // Nessa hora colocamos no accept um fd.
+    // então o servidor escreverá em nosso arquivo.
 
-        //nessa hora colocamos no accept um fd.
-        //então o servidor escreverá em nosso arquivo.
+    while (1){
     
-        // #debug
-        //printf ("gnst: Connecting to the address 'ws' ...\n");  
+        //printf ("terminal: Connecting to the address 'ws' ...\n");  
         printf ("terminal: Connecting to ws via inet  ...\n");  
         
-        if (connect (client_fd, (void *) &addr_in, sizeof(addr_in)) < 0){ 
-            debug_print ("terminal: connect() Fail \n"); 
-            printf("terminal: Connection Failed \n"); 
+        if (connect (client_fd, (void *) &addr_in, sizeof(addr_in)) < 0)
+        { 
+            debug_print ("terminal: Connection Failed \n"); 
+            printf      ("terminal: Connection Failed \n"); 
             //close(client_fd);
             //exit(1);
             //return -1; 
          
-             //try again.
-         }else{
-             break;
-         };
+         //try again forever.
+         }else{ break; };
     };
 
  
@@ -2257,9 +2276,9 @@ int main ( int argc, char *argv[] ){
     // Saving the window id.
     Terminal.window_id = __response_wid;
     
-    if (Terminal.window_id<0)
-        gws_debug_print ("terminal: [FAIL] main window fail\n");
- 
+    if (Terminal.window_id<0){
+        gws_debug_print ("terminal: [FAIL] create main window return fail\n");
+    }
 
     //
     // Test 3
@@ -2287,18 +2306,18 @@ int main ( int argc, char *argv[] ){
     //while(1){}
 
 
-    //initialize globals.
-	//#importante: Isso será definido somente uma vez.
-	__wlMaxColumns = DEFAULT_MAX_COLUMNS;
-	__wlMaxRows    = DEFAULT_MAX_ROWS;
+    // initialize globals.
+    // #importante: 
+    // Isso será definido somente uma vez.
+    __wlMaxColumns = DEFAULT_MAX_COLUMNS;
+    __wlMaxRows    = DEFAULT_MAX_ROWS;
 
-
-    //inicializações;
+    // Initializtions.
     terminalTerminal();
 
 
-    //inicializando prompt[]
-    //chamando o shell.bin
+    // Inicializando prompt[].
+    // Write something in the standard stream and call shell.bin.
     input('\n');
     input('\0');
     test_standard_stream(client_fd);
@@ -2310,6 +2329,8 @@ int main ( int argc, char *argv[] ){
     // loop
     // This the loop that gets messages from the window server;
     terminal_loop(client_fd);
+    
+//exit:
     
     debug_print ("terminal: bye\n"); 
     printf      ("terminal: bye\n");

@@ -118,12 +118,9 @@ int fileman_init_windows(void)
 
     gws_debug_print("fileman_init_windows:\n");
     
-    for(i=0;i<WINDOW_COUNT_MAX;i++)
-    {
+    for (i=0; i<WINDOW_COUNT_MAX; i++){
         windowList[i] = 0;
     };
-    
-    
     
     return 0;
 }
@@ -138,12 +135,9 @@ int _getmessage_request(int fd)
 
     int n_writes = 0;   // For sending requests.
 
-
-
     //char *name = "Window name 1";
 
    
-
     //
     // Send request.
     //
@@ -180,10 +174,8 @@ int _getmessage_request(int fd)
         // n_writes = write (fd, __buffer, sizeof(__buffer));
         n_writes = send (fd, __buffer, sizeof(__buffer), 0);
        
-        if(n_writes>0)
-           break;
+        if (n_writes>0){ break; }
     }
-
 
     return 0; 
 }
@@ -244,10 +236,10 @@ response_loop:
     
     // Se retornou 0, podemos tentar novamente.
     if (n_reads == 0){
-         gws_yield(); 
+        gws_yield(); 
         goto response_loop;
     }
-    
+
     // Se retornou -1 é porque algo está errado com o arquivo.
     if (n_reads < 0){
         gws_debug_print ("editor: recv fail.\n");
@@ -271,8 +263,6 @@ response_loop:
     //#debug
     //if(msg!=0)
         //printf ("%c",long1); //printf ("{%d%c} ",msg,long1);
-
-
 
 
     switch (msg){
@@ -318,20 +308,35 @@ response_loop:
             switch (long1)
             {
                 case VK_F1:
-                    printf ("editor: VK_F1\n");
+                    //printf ("editor: VK_F1\n");
+                    gws_draw_text (
+                        (int) fd,             // fd,
+                        (int) 0,              // window id,
+                        (unsigned long) 40,    // left,
+                        (unsigned long) 40,    // top,
+                        (unsigned long) COLOR_BLUE,
+                        "Terminal: [F1]");
                     break;
 
                 case VK_F2:
-                    printf ("editor: VK_F2\n");
+                    //printf ("editor: VK_F2\n");
                     break;
                     
                 case VK_F3:
-                    printf ("editor: VK_F3\n");
+                    //printf ("editor: VK_F3\n");
                     break;
                     
                 case VK_F4:
-                    printf ("editor: VK_F4 reboot\n");
-                    gws_reboot();
+                    //printf ("editor: VK_F4 reboot\n");
+                    //gws_reboot();
+                    gws_draw_text (
+                        (int) fd,             // fd,
+                        (int) 0,              // window id,
+                        (unsigned long) 80,    // left,
+                        (unsigned long) 80,    // top,
+                        (unsigned long) COLOR_BLUE,
+                        "Terminal: [F4] Exiting ...");
+                    exit(0);
                     break;
                     
                     
@@ -346,7 +351,7 @@ response_loop:
             switch (long1)
             {
                 //case VK_F1:
-                default:
+                default: 
                     goto process_event;
                     break;
             };
@@ -395,10 +400,6 @@ response_loop:
             break; 
     };
 
-
-
-
-
 //
 // Process reply.
 //
@@ -436,14 +437,13 @@ process_event:
 int _loop(int fd)
 {
 
-    while(1){
+    while (1){
         _getmessage_request(fd);
         _getmessage_response(fd);
     };
 
     return 0; 
 }
-
 
 
 //...
@@ -610,8 +610,8 @@ new_message:
         // ...
 
         n_writes = write (fd, __buffer, sizeof(__buffer));
-        if(n_writes>0)
-           break;
+        
+        if (n_writes>0){ break; }
     };
 
     return 0;
@@ -649,7 +649,6 @@ int main ( int argc, char *argv[] ){
 
     debug_print ("---------------------------\n");    
     debug_print ("editor: Initializing ...\n");
-
 
 
     //
@@ -824,16 +823,16 @@ int main ( int argc, char *argv[] ){
         Event = (struct gws_event_d *) gws_next_event();
         
         if (Event.type == 0){
-           gws_debug_print("gwm: event 0\n");
+           gws_debug_print("editor: event 0\n");
         
         }else if (Event.type == 1){
-           gws_debug_print("gwm: event 1\n");
+           gws_debug_print("editor: event 1\n");
         
         }else if (Event.type == 2){
-           gws_debug_print("gwm: event 2\n");
+           gws_debug_print("editor: event 2\n");
         
         }else{
-           gws_debug_print("gwm: Not valid event!\n");
+           gws_debug_print("editor: Not valid event!\n");
         };
     };
     */
@@ -842,8 +841,8 @@ int main ( int argc, char *argv[] ){
 
 // exit
 
-    debug_print ("gwm: bye\n"); 
-    printf      ("gwm: bye\n");
+    debug_print ("editor: bye\n"); 
+    printf      ("editor: bye\n");
 
     return 0;
 }
