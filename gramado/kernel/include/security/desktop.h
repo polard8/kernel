@@ -206,11 +206,11 @@ struct desktop_info_d
 
 
 
-/*
- * Contagem de desktops.
- */
-//movido para gws.h 
-//int desktops_count;  
+
+//
+// variables.
+//
+
 
 
 

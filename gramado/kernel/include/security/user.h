@@ -1,5 +1,5 @@
 /*
- * Arquivo: user.h
+ * File: user.h
  *
  * Descrição:
  *     Header para rotinas de configuração o ambiente do usuário.
@@ -7,7 +7,7 @@
  *     DESKTOP -> WINDOW STATION -> USER SECTION.
  *
  *     USER -> USER SECTION.
- *     USER -> WINDOW STATION.
+ *     USER -> ROOM (Window station).
  *     USER -> DESKTOP. 
  *
  *     PROCESS -> WINDOW STATION. 
@@ -18,7 +18,8 @@
  *
  * @todo: Criar um utilitário em user mode que mostre informações sobre o usuário.
  *
- * 2015 - Created by Fred Nora.
+ * History:
+ *     2015 - Created by Fred Nora.
  */
 
 
@@ -36,44 +37,22 @@
  Isso significa que para um usuário inicializar os recursos gráficos do servidor gws ele
  precisa estar em modo terminal usando o kgws.
  */
- 
-
-#define USER_COUNT_MAX 16  //User count.
-#define GROUP_COUNT_MAX 4  //Group count.
 
 
+#define USER_COUNT_MAX     16    //User count.
+#define GROUP_COUNT_MAX    4     //Group count.
 
 
-#define USER_ADMIN          "admin" 
-#define USER_ALL            "all" 
-#define USER_DEFAULT        "default" 
-#define USER_SUPERUSER      "su" 
-#define USER_SYSTEM         "system" 
+
+#define USER_ADMIN        "admin" 
+#define USER_ALL          "all" 
+#define USER_DEFAULT      "default" 
+#define USER_SUPERUSER    "su" 
+#define USER_SYSTEM       "system" 
 //...
 
 
-//
-// super user ID.
-//
 
-//int __su_id;
-
-
-//
-// DESKTOP
-// Estrutura principal de suporte ao desktop atual (principal)
-//
-//
-
-//typedef struct DESKTOP_D DESKTOPINFO; 
-//typedef struct DESKTOP_D DESKTOP_T; 
-typedef struct DESKTOP_D DESKTOP; 
-struct DESKTOP_D
-{
-	// @todo
-	// estrutura principal. Contém muitos elementos gráficos.
-    struct gui_d *gui;
-};
 
  
 //User types.  
@@ -81,7 +60,7 @@ typedef enum {
     USER_TYPE_NULL,            //0 
     USER_TYPE_INTERACTIVE,     //1
     USER_TYPE_NONINTERACTIVE,  //2
-	//...
+    // ...
 }user_type_t;
 
 
@@ -97,10 +76,10 @@ typedef enum {
  */
 
 typedef enum {
-	USER_DISPLAY_MODE_NULL,
+    USER_DISPLAY_MODE_NULL,
     USER_DISPLAY_MODE_TERMINAL,     // Modo gráfico com um terminal em full screen.
-	USER_DISPLAY_MODE_GRAPHICAL    // Modo gráfico usando um servidor de recursos gráficos.
-	//...	
+    USER_DISPLAY_MODE_GRAPHICAL    // Modo gráfico usando um servidor de recursos gráficos.
+    // ...
 }user_display_mode_t;
 
 
@@ -109,9 +88,10 @@ typedef enum {
 //
 
 
-//window events
+// window events
+// #todo: move to another place.
 typedef enum {
-	WINDOW_EVENTS_NULL, 
+    WINDOW_EVENTS_NULL, 
     WINDOW_EVENTS_ONAFTERPRINT,
     WINDOW_EVENTS_ONBEFOREPRINT,
     WINDOW_EVENTS_ONDEBOREUNLOAD,
@@ -121,22 +101,24 @@ typedef enum {
     WINDOW_EVENTS_ONMESSAGE,
     WINDOW_EVENTS_ONOFFLINE,
     WINDOW_EVENTS_ONPAGEHIDE,
-	WINDOW_EVENTS_ONPAGESHOW,
-	WINDOW_EVENTS_ONPOPSTATE,
-	WINDOW_EVENTS_ONREDO,
-	WINDOW_EVENTS_ONRESIZE,
-	WINDOW_EVENTS_ONSTORAGE,
-	WINDOW_EVENTS_ONUNDO,
-	WINDOW_EVENTS_ONUNLOAD,
-	//...    
+    WINDOW_EVENTS_ONPAGESHOW,
+    WINDOW_EVENTS_ONPOPSTATE,
+    WINDOW_EVENTS_ONREDO,
+    WINDOW_EVENTS_ONRESIZE,
+    WINDOW_EVENTS_ONSTORAGE,
+    WINDOW_EVENTS_ONUNDO,
+    WINDOW_EVENTS_ONUNLOAD,
+    // ...    
 }window_events_t; 
- 
+
+
 //form eventes 
+// #todo: move to another place.
 typedef enum { 
     FORM_EVENTS_NULL,
     FORM_EVENTS_ONBLUR,
     FORM_EVENTS_ONCHANGE,
-	FORM_EVENTS_ONCONTEXTMENU,
+    FORM_EVENTS_ONCONTEXTMENU,
     FORM_EVENTS_ONFOCUS,
     FORM_EVENTS_ONFORMCHANGE,
     FORM_EVENTS_ONFORMINPUT,
@@ -150,36 +132,44 @@ typedef enum {
  
  
 // keybaord events. 
+// #todo: move to another place.
 typedef enum {
     KEYBOARD_EVENTS_NULL,
-	KEYBOARD_EVENTS_ONKEYDOWN,
-	KEYBOARD_EVENTS_ONKEYPRESS,
-	KEYBOARD_EVENTS_ONKEYUP
-	//...
+    KEYBOARD_EVENTS_ONKEYDOWN,
+    KEYBOARD_EVENTS_ONKEYPRESS,
+    KEYBOARD_EVENTS_ONKEYUP
+    //...
 }keyboard_events_t;  
  
-// mouse eventes 
-typedef enum {
-	MOUSE_EVENTS_NULL,
-	MOUSE_EVENTS_ONCLICK,
-	MOUSE_EVENTS_ONDBLCLICK,
-    MOUSE_EVENTS_ONDRAG,
-	MOUSE_EVENTS_ONDRAGEND,
-	MOUSE_EVENTS_ONDRAGENTER,
-	MOUSE_EVENTS_ONDRAGLEAVE,
-	MOUSE_EVENTS_ONDRAGOVER,
-	MOUSE_EVENTS_ONDRAGSTART,
-	MOUSE_EVENTS_ONDROP,
-	MOUSE_EVENTS_ONMOUSEDOWN,
-	MOUSE_EVENTS_ONMOUSEMOVE,	
-	MOUSE_EVENTS_ONMOUSEOUT,
-	MOUSE_EVENTS_ONMOUSEOVER,
-	MOUSE_EVENTS_ONMOUSEUP,
-	MOUSE_EVENTS_ONMOUSEWHEEL,
-	MOUSE_EVENTS_ONSCROLL
-	//...
-}mouse_events_t; 
  
+// mouse eventes 
+// #todo: move to another place.
+typedef enum {
+    MOUSE_EVENTS_NULL,
+    MOUSE_EVENTS_ONCLICK,
+    MOUSE_EVENTS_ONDBLCLICK,
+    MOUSE_EVENTS_ONDRAG,
+    MOUSE_EVENTS_ONDRAGEND,
+    MOUSE_EVENTS_ONDRAGENTER,
+    MOUSE_EVENTS_ONDRAGLEAVE,
+    MOUSE_EVENTS_ONDRAGOVER,
+    MOUSE_EVENTS_ONDRAGSTART,
+    MOUSE_EVENTS_ONDROP,
+    MOUSE_EVENTS_ONMOUSEDOWN,
+    MOUSE_EVENTS_ONMOUSEMOVE,
+    MOUSE_EVENTS_ONMOUSEOUT,
+    MOUSE_EVENTS_ONMOUSEOVER,
+    MOUSE_EVENTS_ONMOUSEUP,
+    MOUSE_EVENTS_ONMOUSEWHEEL,
+    MOUSE_EVENTS_ONSCROLL
+    //...
+}mouse_events_t; 
+
+
+
+// mouse stuff
+// #todo: move to another place.
+
 // protótipos para métodos que gerenciam eventos de janela.
 //...
 
@@ -318,8 +308,9 @@ struct user_info_d
     int magic;
 
 
-
+    //??
     char *path;             // '/root/user/(name)'
+    
     char __username[64];    // HOSTNAME_BUFFER_SIZE
     size_t userName_len;    // len 
     
@@ -328,7 +319,6 @@ struct user_info_d
     // Indica quais os tipos de objetos permitidos para esse usuário.
     // See: globals/gobject.h
     int permissions[128];
-
 
 
 	//

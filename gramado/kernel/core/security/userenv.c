@@ -1,5 +1,5 @@
 /*
- * File: SECURITY/userenv.c 
+ * File: security/userenv.c 
  *
  *
  * User Environment Manager, (UEM).
@@ -50,7 +50,7 @@
 //...
 
 
-//Internas.
+//Internal.
 void config_user (void);
 
 
@@ -64,42 +64,48 @@ void config_user (void);
  *     Cria um ambiente com janelas para usuário do tipo interativo.
  *     Obs: Isso não é realmente o ambiente que o usuário vai usar, mas sim 
  * as janelas principais onde o aplicativo 'file manager' (explorer e taskbar) 
- * vão criar juas janelas.
+ * vão criar suas janelas.
  * 
  * Mudar o nome para userenvironmentStart(int argc, char* argv[]).
  */
 
+
+// #bugbug
+// Do not use this kind of arguments.
+
 int startUserEnvironment ( int argc, char* argv[] ){
-	
+
     int Status = 0;
-	
+
+
+    debug_print ("startUserEnvironment:\n");
+
 	//
 	// GUI support.
 	//
 
     //Cria as principais janelas que servirão de base para 
     //a interface gráfica.
-    create_gui ();
+    debug_print ("startUserEnvironment: Creating GUI\n");
+    create_gui();
 
     //Inicializa.
-    init_gui (); 
-	
-	//
-	// Keyboard support.
-	//
-	
-	ldisc_init_modifier_keys ();
-	ldisc_init_lock_keys ();
-	
-	
-	// #importante
-	// Obs: Precisamos inicializar todos os elementos 
-	// de interação que o usuário vai precisar.
-	
-	//
-	// ...
-	//
+    debug_print ("startUserEnvironment: Initializing GUI\n");
+    init_gui(); 
 
+
+    // Keyboard support.
+    // #todo: Maybe move this to another place.
+    debug_print ("startUserEnvironment: Setup keyboard keys\n");
+    ldisc_init_modifier_keys();
+    ldisc_init_lock_keys();
+
+
+    // ...
+
+
+    debug_print ("startUserEnvironment: done\n");
+    
     return (int) Status;
 }
 
@@ -191,22 +197,25 @@ void *CreateUser ( char *name, int type ){
     } else {
 
 		//New->ObjectType = ObjectTypeUser;
-		
-		New->used = 1;
-		New->magic = 1234;
 
+        New->used = 1;
+        New->magic = 1234;
 
-		//New->path = ?
-	    
-	    New->userType = type;  
+        New->path = NULL;
+        
+        strcpy( New->__username, (const char *) name);
+        New->userName_len = strlen(name);
+ 
+
+        New->userType = type;  
 
  		//Session.
         //Window Station. (Desktop pool).
         //Desktop.		 
 	
-	    New->usessionId = current_usersession;           
-	    New->roomId = current_room;  //->roomID  
-	    New->desktopId = current_desktop;   
+	    New->usessionId = current_usersession; 
+	    New->roomId     = current_room;   
+	    New->desktopId  = current_desktop;   
     
         // Inicializando a lista de objetos permitidos.
         // Proibindo tudo.
@@ -229,7 +238,7 @@ void *CreateUser ( char *name, int type ){
 		{
 		    //User Id. 
 			New->userId = Index;     
-						
+
 		    userList[Index] = (unsigned long) New;
 
             //printf("CreateUser: Done.\n"); 
@@ -396,34 +405,36 @@ void init_user_info (void){
     };
 
 
-    // Configurando a estrutura global.
-    // Create default user. (default,interactive)
+    // Create default user. 
+    // It's a global structure. 
+    // (default,interactive)
 
-    DefaultUser = (void *) CreateUser (default_user_name, USER_TYPE_INTERACTIVE);
+    //DefaultUser = (void *) CreateUser (default_user_name, USER_TYPE_INTERACTIVE);
+    DefaultUser = (void *) CreateUser (USER_DEFAULT, USER_TYPE_INTERACTIVE);
 
-    if ( (void *) DefaultUser == NULL ){
-        panic ("init_user_info:");
+    if ( (void *) DefaultUser == NULL )
+    {
+        panic ("init_user_info: DefaultUser");
 
-    } else {
-
+    }else{
 
         // Atualizando a lista de permissões.
         // Liberando tudo.
         for (i=0; i<128; i++){ DefaultUser->permissions[i]=1; }
  
+        //Coloca no início da lista.
 
-		//Coloca no início da lista.
-		//userList[0] = (unsigned long) SystemUser;    //System.
-		userList[1] = (unsigned long) DefaultUser;     //Default.
-		userList[2] = (unsigned long) 0;               //0.
-		//userList[3] = (unsigned long) 0;             //0.
-		//...
-		
-		//Configura o usuário atual.
-		Id = (int) DefaultUser->userId;
-		SetCurrentUserId (Id);
-		CurrentUser = (void *) DefaultUser;
-		
+        //userList[0] = (unsigned long) SystemUser;    //System.
+        userList[1] = (unsigned long) DefaultUser;     //Default.
+        //userList[2] = (unsigned long) 0;               //0.
+        //userList[3] = (unsigned long) 0;             //0.
+        //...
+
+        //Configura o usuário atual.
+        Id = (int) DefaultUser->userId;
+        SetCurrentUserId (Id);
+        CurrentUser = (void *) DefaultUser;
+
 		//Configura o grupo atual ao qual o usuário pertence.
 		SetCurrentGroupId (0);
 		

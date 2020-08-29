@@ -93,27 +93,26 @@ struct paint_d PAINT;
 
 struct screen_d 
 {
-	object_type_t objectType;
-	object_class_t objectClass;
-	
-    //unsigned long callback; //d
-	
-	
-	unsigned long left; //c
-    unsigned long top;  //b
-    unsigned long width; //a
-    unsigned long height;  //g
-	
-	
-	unsigned long flag; //f
-	unsigned long error;  //e
+    object_type_t  objectType;
+    object_class_t objectClass;
 
-	//ext...
-	
-    //int Id;    //
-	
-	
-	//Navigation.
+    int used;
+    int magic;
+    
+    int id;
+
+    struct display_d *display;
+
+    unsigned long left;
+    unsigned long top;  
+    unsigned long width; 
+    unsigned long height; 
+
+    unsigned long flag; 
+    unsigned long error;  
+
+
+    //Navigation.
     struct screen_d *next; 
 };
 struct screen_d *Screen;

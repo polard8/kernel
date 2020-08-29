@@ -224,11 +224,18 @@ extern void do_executa_new_task (void);
 #include "ws/terminal.h"
 #include "ws/guiconf.h"
 
-// Security
+
+//
+// == Security ===============================
+//
+
 #include "security/usession.h"
 #include "security/room.h"
 #include "security/desktop.h"
 #include "security/user.h"
+#include "security/security.h"
+
+
 
 // ws - window server, and beyond
 #include "ws/logon.h"
@@ -414,11 +421,6 @@ int current_arch;
 // Organização de usuários.
 int current_user; 
 int current_group; 
-
-// Organização dos ambientes.
-//int current_user_session;
-//int current_room;
-//int current_desktop;
 
 
 

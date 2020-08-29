@@ -1,5 +1,5 @@
 /*
- * File kgws/kgws/ws.h
+ * File ws/ws.h
  *
  *     KGWS - kernel Gramado Window Server
  *
@@ -693,16 +693,13 @@ struct color_scheme_d* PrideColorScheme;    // Colorido.
 // # Principais variáveis globais #
 //
 
-
-int current_display;    // monitor.
-int current_screen;     // tela. 
-
-
-//user 
-int current_usersession;    //gws/user
-int current_room;           //gws/user
-int current_desktop;        //gws/user
-
+// monitor. (hardware)
+int current_display; 
+   
+// superficie.
+// Um monitor pode ter varias screens
+// e uma screen pode estar em mais de um monitor
+int current_screen;      
 
 
 

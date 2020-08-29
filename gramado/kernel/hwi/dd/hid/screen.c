@@ -188,15 +188,22 @@ void screenRefresh (void)
  *     Inicializando o gerenciamento de tela.
  */ 
 
+// #bugbug
+// Screen is a reagion in the display, or in many displays.
+// Display is a monitor, or a set o hid in a given host.
+
 int screenInit (void){
-	
-    //Configura globais com base nos valores passados pelo Boot Loader.
-	
-	screenSetSize ( (unsigned long) SavedX, (unsigned long) SavedY );
-	
-	// Setup Screen structure.
 
 
+    debug_print ("screenInit:\n");
+
+    // Configura globais com base nos valores passados pelo Boot Loader.
+
+    screenSetSize ( (unsigned long) SavedX, (unsigned long) SavedY );
+
+    // Setup Screen structure.
+    // See: screen.h
+    
     Screen = (void *) kmalloc ( sizeof(struct screen_d) );
     
     if ( (void *) Screen == NULL ){
@@ -204,14 +211,22 @@ int screenInit (void){
         
     }else{
 
+        Screen->used = 1;
+        Screen->magic = 1234;
+        
+        Screen->id = 0;
+         
         Screen->left = SCREEN_DEFAULT_LEFT;
-        Screen->top = SCREEN_DEFAULT_TOP; 
-        Screen->width = (unsigned long) screenGetWidth ();
-        Screen->height = (unsigned long) screenGetHeight ();
+        Screen->top  = SCREEN_DEFAULT_TOP; 
+        Screen->width  = (unsigned long) screenGetWidth();
+        Screen->height = (unsigned long) screenGetHeight();
+        
+        
+        Screen->next = NULL;
         //...
  
         // salvando o ponteiro da estrutura. 
-        ScreenInfo = (void *) Screen;
+        ScreenInfo    = (void *) Screen;
         CurrentScreen = (void *) Screen;
         //...
     };
