@@ -1516,6 +1516,20 @@ get_next:
         // #test: A stack de um process recem criado
         // poderia ficar no fim de seu heap ???
 
+        if (g_heappool_va == 0)
+            panic("clone_and_execute_process: g_heappool_va");
+
+        // Ignoraremos esse pois vai falhar na criacao do primeiro heap.
+        //if (g_heap_count == 0)
+            //panic("clone_and_execute_process: g_heap_count");
+
+        if (g_heap_size == 0)
+            panic("clone_and_execute_process: g_heap_size");
+            
+        // #bugbug
+        // There is a limit here. End we will have a huge problem 
+        // when reach it.
+
         Process->Heap = (unsigned long) g_heappool_va + (g_heap_count * g_heap_size);
         Process->HeapSize = (unsigned long) g_heap_size;
         Process->HeapEnd = (unsigned long) (Process->Heap + Process->HeapSize); 

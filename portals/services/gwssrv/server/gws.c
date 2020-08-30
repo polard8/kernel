@@ -381,7 +381,9 @@ int gwsInit(void)
     if ( (void *) gui == NULL )
     {
         debug_print("gwsInit: gui\n");
-        return -1;
+        printf     ("gwsInit: gui\n");
+        exit(1);
+        //return -1;
     }
 
 
@@ -394,11 +396,17 @@ int gwsInit(void)
                                               __device_width, __device_height,   
                                               NULL, 0, xCOLOR_GRAY3, xCOLOR_GRAY3 );
 
-        if ( (void*) gui->screen == NULL){
-            debug_print("gwsInit: screen window\n");
-            return -1;    
+        if ( (void*) gui->screen == NULL)
+        {
+            debug_print("gwsInit: [FAIL] screen window\n");
+            printf     ("gwsInit: [FAIL] screen window\n");
+            exit(1);
+            //return -1;    
         }
 
+        gui->screen->used = 1;
+        gui->screen->magic = 1234;
+        
         //#test
         gwsDefineInitialRootWindow (gui->screen);
     

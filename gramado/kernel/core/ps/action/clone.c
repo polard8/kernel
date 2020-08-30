@@ -992,6 +992,19 @@ do_clone:
         // pra gerar um heap para ele.
         // Vamos tentar usar isso na rotina de clonagem.
 
+        if (g_heappool_va == 0)
+            panic("clone_and_execute_process: g_heappool_va");
+
+        if (g_heap_count == 0)
+            panic("clone_and_execute_process: g_heap_count");
+
+        if (g_heap_size == 0)
+            panic("clone_and_execute_process: g_heap_size");
+
+        // #bugbug
+        // There is a limit here. End we will have a huge problem 
+        // when reach it.
+
         Clone->Heap     = (unsigned long) g_heappool_va + (g_heap_count * g_heap_size);
         Clone->HeapSize = (unsigned long) g_heap_size;
         Clone->HeapEnd  = (unsigned long) (Clone->Heap + Clone->HeapSize); 

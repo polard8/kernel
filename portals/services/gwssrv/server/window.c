@@ -1102,7 +1102,12 @@ struct gws_window_d *gws_window_from_id (int id)
 int gwsDefineInitialRootWindow ( struct gws_window_d *window )
 {
     if ( (void *) window == NULL )
-        return -1;
+    {
+        debug_print("gwsInit: [FAIL] screen window\n");
+        printf     ("gwsInit: [FAIL] screen window\n");
+        exit(1);
+        //return -1;
+    }
     
     ROOT = window;
     
