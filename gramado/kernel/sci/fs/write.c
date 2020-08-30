@@ -9,7 +9,6 @@
  *
  * History:
  *    2015 - Created by Fred Nora.
- *    2016 - 
  *    ...
  */
 
@@ -31,22 +30,26 @@
 
 void write_fntos (char *name){
 
-    int  i, ns = 0;
-    char ext[4];
-
-	ext[0] = 0;
-	ext[1] = 0;
-	ext[2] = 0;
-	ext[3] = 0;
+    int i=0; 
+    int ns = 0;
 
     //const char ext[4];
+    char ext[4];
+    ext[0] = 0;
+    ext[1] = 0;
+    ext[2] = 0;
+    ext[3] = 0;
+
+
 
     //Transforma em maiúscula enquanto não achar um ponto.
 
     while ( *name && *name != '.' )
     {
         if ( *name >= 'a' && *name <= 'z' )
+        {
             *name -= 0x20;
+        }
 
         name++;
         ns++;
@@ -67,13 +70,13 @@ void write_fntos (char *name){
 
 	    //#testando
 	    //Se não for letra então não colocamos no buffer de extensão;
-		if (name[i+1] >= 'a' && name[i+1] <= 'z')
-		{
-			name[i+1] -= 0x20;
-		    ext[i] = name[i+1];
-		}
-
+        if (name[i+1] >= 'a' && name[i+1] <= 'z')
+        {
+            name[i+1] -= 0x20;
+            ext[i] = name[i+1];
+        }
     };
+
 
 	//Acrescentamos ' ' até completarmos as oito letras do nome.
 
@@ -85,11 +88,15 @@ void write_fntos (char *name){
 
 	//Acrescentamos a extensão
 
-    for (i=0; i < 3; i++)
+    for (i=0; i<3; i++)
+    {
         *name++ = ext[i];
+    };
+
 
     *name = '\0';
 }
+
 
 
 /*
@@ -102,11 +109,11 @@ void write_fntos (char *name){
  *   spc     ~ Número de setores por cluster.
  */
 
+	//Começa do primeiro setor do cluster.
 
 //int fatWriteCluster ( unsigned long sector, 
 //                      unsigned long address, 
 //                      int spc )
-
 
 void 
 fatWriteCluster ( 
@@ -116,19 +123,18 @@ fatWriteCluster (
 {
     unsigned long i=0;
 
-	//Começa do primeiro setor do cluster.
 
     for ( i=0; i < spc; i++ )
     {
-        write_lba ( address, sector + i );
-
-        address = address +512; 
+        write_lba ( address, (sector + i) );
+        address = (address +512); 
     };
 
 
-	//...
+    //...
 
     return;
+    //return 0;  //#todo
 }
 
 
@@ -145,8 +151,9 @@ void write_lba ( unsigned long address, unsigned long lba ){
 	// #todo: 
 	// Check lba limits.
 
-    if (address == 0){
-        debug_print ("write_lba: limits\n");
+    if (address == 0)
+    {
+        debug_print ("write_lba: Limits\n");
         goto fail;
     }
 
@@ -205,12 +212,21 @@ fail:
 // A FAT tem 246 setores, 123 KB
 
 
+
+//
+// == Cluster list =================================================
+//
+
 // Lista de clusters.
 // Isso permite salvar um arquivo com 32 mil clusters ??
+
 #define  fat_range_max (1024*32)  
+
 unsigned short list[fat_range_max];
  
 
+// ======================================
+// fsSaveFile:
 // IN: 
 // name, size in sectors, size in bytes, adress, flag. 
 // OUT:
@@ -228,12 +244,12 @@ fsSaveFile (
     unsigned long j = 0;    // Deslocamento na lista, tem que ser zero.
     unsigned long c = 0;    // Deslocamento na FAT.
 
-    unsigned short first;
-    unsigned short next;
-    unsigned short sector;
+    unsigned short first=0;
+    unsigned short next=0;
+    unsigned short sector=0;
 
-	// Buffer para a entrada de diretório.
-    char Entry[32];
+    // Directory entry buffer.
+    char DirEntry[32];
 
     //Entry size in words.
     int EntrySize = 0;
@@ -256,19 +272,29 @@ fsSaveFile (
 	// me parece que todas as informações estão chegando aqui corretas.
 
     // #debug:
+    
     debug_print ("fsSaveFile:\n");
-    printf ("fsSaveFile: name=%s  \n", file_name ); 
-    printf ("size=%d \n",              file_size );
-    printf ("nbytes=%d  \n",           size_in_bytes );
-    printf ("address=%x  \n",          file_address );
-    printf ("flag=%x \n",              flag );
-
-
+    printf      ("fsSaveFile:\n");
+    
+    printf ("name    = %s \n", file_name ); 
+    printf ("size    = %d \n", file_size );       // Size in sectors.
+    printf ("nbytes  = %d \n", size_in_bytes );
+    printf ("address = %x \n", file_address );
+    printf ("flag    = %x \n", flag );
 
 	// file_size
 	// #todo: 
 	// precisamos implementar um limite para o tamanho do arquivo,
 	// principamente nessa fase de teste.
+
+    // #bugbug
+    // Limite provisorio
+    if ( file_size > 16 )
+    {
+        debug_print ("fsSaveFile: [FIXME] Size in sectors\n");
+        printf      ("fsSaveFile: [FIXME] Size in sectors = %d \n", file_size ); 
+        goto fail;
+    }
 
 
     // Load root dir and FAT.
@@ -277,10 +303,13 @@ fsSaveFile (
 
 
 
-	// Procurando cluster livre na fat.
-	// Nesse momento construimos uma lista de clusters livres.
-	// #todo: Essa lista já devia existir e agora somente 
-	// usaríamos.
+    // Procurando cluster livre na fat.
+    // Nesse momento construimos uma lista de clusters livres.
+    // #todo: 
+    // Essa lista já devia existir e agora somente 
+    // usaríamos.
+    // #todo: Essa rotina poderia seruma helper function?
+
 
 //SearchEmptyEntries:
  
@@ -297,9 +326,13 @@ fsSaveFile (
             // Encontrado todos os espaços livres 
             // que o arquivo precisa.
             // Marca o fim.
-            //#importante: Se der certo, saímos do loop.
-            if (file_size == 0){
-                list[j] = (unsigned short) 0xfff8;   
+            // #importante: 
+            // Se der certo, saímos do loop.
+            // #bugbug: Esse size deve ter um limite.
+            // file_size = file size in sectors, (clusters??)
+            if (file_size == 0)
+            {
+                list[j] = (unsigned short) 0xfff8; 
                 goto save_file;
             }
 
@@ -344,7 +377,6 @@ out_of_range:
     // Save!
     // 
 
-
 save_file:
 
     //#debug
@@ -371,85 +403,84 @@ save_file:
 
 	// #debug
 	// printf("first={%x}\n",first);
-	
-//CreateEntry:
-	
-	// Name.
-    Entry[0] = (char) file_name[0];
-    Entry[1] = (char) file_name[1];
-    Entry[2] = (char) file_name[2];
-    Entry[3] = (char) file_name[3];
-    Entry[4] = (char) file_name[4];
-    Entry[5] = (char) file_name[5];
-    Entry[6] = (char) file_name[6];
-    Entry[7] = (char) file_name[7];
 
-	// Ext.
-    Entry[8]  = (char) file_name[8];
-    Entry[9]  = (char) file_name[9];
-    Entry[10] = (char) file_name[10];
+
+    //
+    // == Create directory entry ==================================
+    //
+
+    // Name/ext 8.3
+    DirEntry[0]  = (char) file_name[0];
+    DirEntry[1]  = (char) file_name[1];
+    DirEntry[2]  = (char) file_name[2];
+    DirEntry[3]  = (char) file_name[3];
+    DirEntry[4]  = (char) file_name[4];
+    DirEntry[5]  = (char) file_name[5];
+    DirEntry[6]  = (char) file_name[6];
+    DirEntry[7]  = (char) file_name[7];
+    DirEntry[8]  = (char) file_name[8];
+    DirEntry[9]  = (char) file_name[9];
+    DirEntry[10] = (char) file_name[10];
 
 
     // Flag. (attributes ?)
+    //====================
     // 0x01: read only
     // 0x02: hidden
     // 0x04: system
     // 0x08: volume label
-    // 0x10: directory
-    // 0x20: archive
-    Entry[11] = flag; 
+    // 0x10: * Directory
+    // 0x20: * Archive
+ 
+    DirEntry[11] = flag; 
 
     // Reserved.
-    Entry[12] = 0;       
+    DirEntry[12] = 0;       
 
-	// Creation time. 14 15 16
-    Entry[13] = 0x08; 
-    Entry[14] = 0x08; 
-    Entry[15] = 0xb6;
-	
-	// Creation date.
-    Entry[16] = 0xb6;
-    Entry[17] = 0x4c;
+    // Creation time. 14 15 16
+    DirEntry[13] = 0x08; 
+    DirEntry[14] = 0x08; 
+    DirEntry[15] = 0xb6;
 
-	// Access date.
-	Entry[18] = 0xb8;
-	Entry[19] = 0x4c;
-	
+    // Creation date.
+    DirEntry[16] = 0xb6;
+    DirEntry[17] = 0x4c;
+
+    // Access date.
+    DirEntry[18] = 0xb8;
+    DirEntry[19] = 0x4c;
+
 	// ??
 	// First cluster. 
 	// 0 para fat12 ou 16
-	Entry[20] = 0;
-	Entry[21] = 0;
-	
-	// Modifield time.
-	Entry[22] = 0xa8;
-	Entry[23] = 0x49;
-	
-	// Modifield date.
-	Entry[24] = 0xb8;
-	Entry[25] = 0x4c;
-	
-	// First cluster. Low word.
-	// 0x1A and 0x1B
-	Entry[26] = (char) (first); 
-	Entry[27] = (char) (first >> 8); 
+    DirEntry[20] = 0;
+    DirEntry[21] = 0;
 
-	// File size in bytes.
-	// (size_in_bytes)
-	// 4 bytes: (28,29,30,31)
-	
-	Entry[28] = (char) size_in_bytes;   
+    // Modifield time.
+    DirEntry[22] = 0xa8;
+    DirEntry[23] = 0x49;
 
-	size_in_bytes = (size_in_bytes >> 8);
-	Entry[29] = (char) size_in_bytes;
-	
-	size_in_bytes = (size_in_bytes >> 8);
-	Entry[30] = (char) size_in_bytes;
-	
-	size_in_bytes = (size_in_bytes >> 8);
-	Entry[31] = (char) size_in_bytes;
+    // Modifield date.
+    DirEntry[24] = 0xb8;
+    DirEntry[25] = 0x4c;
 
-	
+    // First cluster. Low word.
+    // 0x1A and 0x1B
+    DirEntry[26] = (char) (first); 
+    DirEntry[27] = (char) (first >> 8); 
+
+    // size_in_bytes - File size in bytes.
+    // 4 bytes: (28,29,30,31)
+
+    DirEntry[28] = (char) size_in_bytes;   
+    size_in_bytes = (size_in_bytes >> 8);
+    DirEntry[29] = (char) size_in_bytes;
+    size_in_bytes = (size_in_bytes >> 8);
+    DirEntry[30] = (char) size_in_bytes;
+    size_in_bytes = (size_in_bytes >> 8);
+    DirEntry[31] = (char) size_in_bytes;
+
+
 	// #importante:
 	// Vamos encontrar uma entrada livre no diretório para
 	// salvarmos o nome do arquivo.
@@ -471,8 +502,9 @@ save_file:
                           VOLUME1_ROOTDIR_ADDRESS, 
                           FAT16_ROOT_ENTRIES );
     
-    if ( FreeIndex == -1 ){
-        printf ("fsSaveFile: No empty entry\n");
+    if ( FreeIndex == -1 )
+    {
+        printf ("fsSaveFile: [FAIL] No empty entry\n");
         goto fail;
     }
 
@@ -489,7 +521,8 @@ save_file:
     EntrySize = (FAT16_ENTRY_SIZE/2);
     Offset = (int) ( FreeIndex * EntrySize );
 
-    memcpy ( &root[Offset], Entry, 32 );
+    // FAT16_DIRENTRY_SIZE = 32
+    memcpy ( &root[Offset], DirEntry, 32 );
 
 // reset
 // Reiniciamos o controlador antes de usarmos.
@@ -523,28 +556,37 @@ save_file:
 
 //SavingFile:
 
+    // Routine:
+    // +Pega um conteúdo da lista.
+    // +Encontrada a assinatura na lista!
+    // ...
+
+    // #bugbug
+    // E se o primeiro for um marcador de fim de arquivo?
+
+    //next = list[0];
+    //if (next == 0xFFF8)
+        //what??
+    
     while (1)
     { 
-        //Pega um conteúdo da lista.
         next = list[i];
 
-		//#debug.
-        printf ("next={%x}\n", next );
+        // #debug.
+        printf ("next={%x}\n", next);
 
-        //encontrada a assinatura na lista!
-        if ( next == 0xfff8 ){
-
+        if ( next == 0xFFF8 )
+        {
             next = list[i-1];
-            fat[next] = 0xfff8;  
-            goto done;         
-        
+            fat[next] = 0xFFF8; 
+            goto do_save_dir_and_fat;    //goto done; 
+
+        // Se não é assinatura ainda.
         }else{
 
-            //não é assinatura ainda
-
-			//grava na fat o endereço do próximo cluster
+            // Grava na fat o endereço do próximo cluster
             fat[next] = list[i+1];
-            
+ 
             //#debug 
             //printf("write_lba\n");
             //refresh_screen();
@@ -559,63 +601,74 @@ save_file:
             address += 512; 
         }; 
 
-        //próximo valor da lista
+        //Próximo valor da lista.
         i++;
 
         // #bugbug
         // Limitando o tamanho do arquivo a 16 entradas.
+        // Why??
 
-        if (i > 16){
-            debug_print ("fsSaveFile: [FIXME] debug limits\n");
+        // #bugbug
+        // Limite provisorio.
+        if (i > 16)
+        {
+            debug_print ("fsSaveFile: [FIXME] write sectors limit\n");
+            printf      ("fsSaveFile: [FIXME] write sectors limit\n");
             goto fail;
         }
 
         // ??
     };
 
+    //
+    // FAIL
+    //
 
-fail:
-    debug_print ("fsSaveFile: fail\n");
-    printf ("~FAIL\n");
-    refresh_screen ();
-    return (int) 1;
-
+    debug_print ("fsSaveFile: Loop fail\n");
+    goto fail;
    
-   //
-   // Done!
-   //
+    //
+    // == done ========================================
+    //
 
-    //Nesse momento já salvamos os clusters do arquivo.
-    // #test
     // Saving rood dir and FAT.
+    // Nesse momento já salvamos os clusters do arquivo.
     // OK. Funcionou no qemu.
-
-    
-done:
-
-    // #debug
-    debug_print ("fsSaveFile: clusters saved\n");
-
-    fs_save_rootdir();
-    
-    
     // #bugbug
     // Não vamos mais salvar a fat toda vez que salvarmos
     // um arquivo.
     // Vamos salvar a FAT apenas no fim da sessão.
     // Como ainda não temos shutdown, então vamos salvar 
     // quando chamarmos reboot.
-    
-    //fs_save_fat();
-    
     // #important
     // Updating the cache state.
+
+do_save_dir_and_fat:
+
+    debug_print ("fsSaveFile: [DEBUG] do_save_dir_and_fat\n");
+    
+    // Root
+    fs_save_rootdir();
+    
+    // FAT
+    //fs_save_fat();
     fat_cache_saved = CACHE_NOT_SAVED;
 
-    printf ("fsSaveFile: done\n");
+    debug_print ("fsSaveFile: done\n");
+    printf      ("fsSaveFile: done\n");
     refresh_screen();
-
     return 0;
+
+    //
+    // == fail ========================================
+    //
+
+fail:
+    debug_print ("fsSaveFile: [FAIL]\n");
+    printf      ("fsSaveFile: [FAIL]\n");
+    refresh_screen ();
+    return (int) 1;
+
 }
 
 

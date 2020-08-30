@@ -1839,7 +1839,7 @@ do_compare:
         goto exit_cmp;
     }
 
-    // del - Esse comando pode ser usado pra testar o fs.
+    // del - Delete a file or directory. ??
     if ( gramado_strncmp( prompt, "del", 3 ) == 0 ){
         del_builtins();
         goto exit_cmp;

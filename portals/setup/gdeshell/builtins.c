@@ -31,6 +31,7 @@ void date_builtins(void)
 
 void del_builtins(void)
 {
+    printf ("~del: Delete ... \n");
 }
 
 void dir_builtins (void)

@@ -10,11 +10,19 @@
 // Application entry point prototype
 //
 
-int portals_main (int argc, char *argv[]);
+//int portals_main (int argc, char *argv[]);
 
 //
 //  System information
 //
 
+
+//int portals_get_portals_directory( ?? buffer );
+//int portals_get_system_directory( ?? buffer );
+
 // ...
 
+// Portals flags
+
+//#define PF_GRAMADO 0x00000001    // Running on gramado kernel.
+//#define PF_...

@@ -2,8 +2,7 @@
  * File: fs/cf.c 
  *
  * Descrição: 
- *     Create File.
- *     Rotinas criação de arquivos.
+ *     Create File routines.
  * 
  * History:
  *    2015 - Created by Fred Nora.
@@ -26,6 +25,8 @@
 
 int fs_create_file ( char *name )
 {
+    //char empty_buffer[1024+1];
+    
     debug_print("fs_create_file: [TODO]\n");
 
     /*
@@ -36,7 +37,7 @@ int fs_create_file ( char *name )
                      (char *) file_address, // address
                      (char) 0x20 );         // flags  
     */                 
-                     
+
     return -1;
 }
 
@@ -48,9 +49,20 @@ int fs_create_file ( char *name )
 
 unsigned long fs_create_dir ( char *name, unsigned long id )
 {
+    //char empty_buffer[1024+1];
+    
     debug_print("fs_create_dir: [TODO]\n");
-    //return fs_create_file( name, id ); 
-    return 1;
+
+    /*
+    return (int) fsSaveFile ( 
+                     (char *) name, 
+                     (unsigned long) 2,     // sectors
+                     (unsigned long) 1024,  // bytes
+                     (char *) file_address, // address
+                     (char) 0x10 );         // flags  ??? #bugbug: Conferir.
+    */                 
+
+    return -1;
 }
 
 
