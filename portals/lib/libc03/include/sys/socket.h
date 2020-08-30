@@ -333,7 +333,13 @@ bind (
 // The  listen()  function	call first appeared in 4.2BSD.
 int listen (int sockfd, int backlog);
 
+// alternative way
+int accept2 (int sockfd, struct sockaddr *addr, socklen_t *addrlen);
+
+// accept
+// #todo: standard unix-like
 int accept (int sockfd, struct sockaddr *addr, socklen_t *addrlen);
+
 
 int 
 connect ( 

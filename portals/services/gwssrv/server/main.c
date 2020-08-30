@@ -1452,12 +1452,12 @@ int main (int argc, char **argv){
             // No metodo gramado o retorno sera o fd do servidor
             // se der certo, pois nosso write copia do servidor para
             // o cliente conectado.
-            newconn = accept ( curconn, 
+            newconn = accept2 ( curconn, 
                           (struct sockaddr *) &gramsock, 
                           (socklen_t *) addr_len );
                           
             if (newconn < 0) {
-                gwssrv_debug_print ("gwssrv: ERROR on accept\n");
+                gwssrv_debug_print ("gwssrv: ERROR on accept2\n");
  
             // Request from the new connection
             }else{

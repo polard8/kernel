@@ -76,6 +76,7 @@ int sm_unregister_ws(void)
 //
 // == register ns =====================
 //
+//See: gde_serv: 521
 /*
 int sm_register_ns(int pid);
 int sm_register_ns(int pid)

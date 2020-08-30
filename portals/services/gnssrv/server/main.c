@@ -664,12 +664,12 @@ int main (int argc, char **argv){
     while (1){
 
         // Accept connection from a client. 
-        newconn = accept ( curconn, 
+        newconn = accept2 ( curconn, 
                       (struct sockaddr *) &addr, 
                       (socklen_t *) addr_len );
 
         if (newconn < 0) {
-            gde_debug_print ("gnssrv: ERROR on accept\n");
+            gde_debug_print ("gnssrv: ERROR on accept2\n");
 
         // Request from the new connection 
         }else{

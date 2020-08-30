@@ -403,11 +403,13 @@ response_loop:
                 case VK_F1:
                     //printf ("gwm: VK_F1\n");
                     create_main_menu(fd);
+                    return 0;
                     break;
 
                 case VK_F2:
                     //printf ("gwm: VK_F2\n");
                     create_tester_client(fd);
+                    return 0;
                     break;
 
                 // This sistem call is able to initialize a lot
@@ -426,6 +428,7 @@ response_loop:
                 case VK_F9:
                     //printf ("gwm: VK_F9 update\n");
                     update(fd);
+                    return 0;
                     break;
 
                 case VK_F10:
@@ -1047,6 +1050,7 @@ int create_tester_client(int fd)
         c_tester->used = 1;
         c_tester->magic = 1234;
         
+        // Window.
         c_tester->window = gws_create_window (fd,
                                     WT_SIMPLE,1,1,"Tester",
                                     100, 100, 480, 320,
@@ -1059,6 +1063,7 @@ int create_tester_client(int fd)
         printf ("tester window = {%d}\n",c_tester->window);
         gws_refresh_window(fd,c_tester->window);
         
+        // Title window.
         c_tester->title_window = gws_create_window (fd,
                                           WT_SIMPLE,1,1,"Tester Title",
                                           100, 100-32, 480, 32,
@@ -1069,10 +1074,12 @@ int create_tester_client(int fd)
             exit(1);
         }
 
-        //Tester title window
+        // Tester title window
+        // #bugbug: 
+        // pagefault. The size of the string overflows the button size.
         tester_button = gws_create_window (fd,
-             WT_BUTTON,1,1,"X", //#bugbug: pagefault. the size of the string overflows the button size.
-             (480-36-2), 2, 36, 28, //2, 2, 80, 28,
+             WT_BUTTON,1,1,"X", 
+             (480-36-2), 2, 36, 28, 
              c_tester->title_window, 0, COLOR_RED, COLOR_RED);
              
              
@@ -1081,45 +1088,45 @@ int create_tester_client(int fd)
         menu = gws_create_menu (
                 (int) fd,
                 (int) c_tester->window,
-                (int) 0, //highlight
-                (int) 4,   //count
-                (unsigned long) 1, //x
+                (int) 0,            //highlight
+                (int) 4,            //count
+                (unsigned long) 1,  //x
                 (unsigned long) 1,
                 (unsigned long) 200,
                 (unsigned long) 200,
                 (unsigned long) COLOR_WHITE );
 
-          if( (void*) menu != NULL )
-          {
-               //menu item
-               gws_create_menu_item (
-                  (int) fd,
-                  (char *) "Item0",
-                  (int) 0,
-                  (struct gws_menu_d *) menu );
+        if ((void*) menu != NULL)
+        {
+            //menu item
+            gws_create_menu_item (
+                (int) fd,
+                (char *) "Item0",
+                (int) 0,
+                (struct gws_menu_d *) menu );
 
-               //menu item
-               gws_create_menu_item (
-                  (int) fd,
-                  (char *) "Item1",
-                  (int) 1,
-                  (struct gws_menu_d *) menu );
+            //menu item
+            gws_create_menu_item (
+                (int) fd,
+                (char *) "Item1",
+                (int) 1,
+                (struct gws_menu_d *) menu );
 
-               //menu item
-               gws_create_menu_item (
-                  (int) fd,
-                  (char *) "Item2",
-                  (int) 2,
-                  (struct gws_menu_d *) menu );
+            //menu item
+            gws_create_menu_item (
+                (int) fd,
+                (char *) "Item2",
+                (int) 2,
+                (struct gws_menu_d *) menu );
 
-               //menu item
-               gws_create_menu_item (
-                  (int) fd,
-                  (char *) "Item3",
-                  (int) 3,
-                  (struct gws_menu_d *) menu );
+            //menu item
+            gws_create_menu_item (
+                (int) fd,
+                (char *) "Item3",
+                (int) 3,
+                (struct gws_menu_d *) menu );
 
-           }
+        }
              
         wmclientList[3] = (unsigned long) c_tester;
     } 

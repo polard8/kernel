@@ -649,10 +649,24 @@ sys_connect (
     int sockfd, 
     const struct sockaddr *addr,
     socklen_t addrlen );
-              
-              
-int sys_accept (int sockfd, struct sockaddr *addr, socklen_t *addrlen);             
 
+
+
+// Alternative way.
+// It returns the fd of the server and write() will copy the data.  
+int 
+sys_accept2 (
+    int sockfd, 
+    struct sockaddr *addr, 
+    socklen_t *addrlen); 
+
+// #todo
+// standard unix-like way
+int 
+sys_accept (
+    int sockfd, 
+    struct sockaddr *addr, 
+    socklen_t *addrlen );
 
 int 
 sys_bind ( 

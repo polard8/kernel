@@ -1823,8 +1823,11 @@ int sys_accept_sender (int n)
 // OUT: ?? Retornamos o fd do socket aceito.
 // provavelmente o que iremos ouvir.
 
+// Alternative way.
+// It returns the fd of the server and write() will copy the data.  
+
 int 
-sys_accept (
+sys_accept2 (
     int sockfd, 
     struct sockaddr *addr, 
     socklen_t *addrlen )
@@ -1878,8 +1881,8 @@ sys_accept (
     // ?? Esse é o socket do servidor.
     if ( sockfd < 0 || sockfd >= 32 )
     {
-        debug_print ("sys_accept: [FAIL] sockfd\n");
-        printf      ("sys_accept: [FAIL] sockfd\n");
+        debug_print ("sys_accept2: [FAIL] sockfd\n");
+        printf      ("sys_accept2: [FAIL] sockfd\n");
         refresh_screen();
         return -1;
     }
@@ -1890,8 +1893,8 @@ sys_accept (
     // #bugbug: Ainda não estamos usando isso.
     if ( (void *) addr == NULL )
     {
-        debug_print ("sys_accept: [FAIL] addr\n");
-        printf      ("sys_accept: [FAIL] addr\n");
+        debug_print ("sys_accept2: [FAIL] addr\n");
+        printf      ("sys_accept2: [FAIL] addr\n");
         refresh_screen();
         return -1;
     }
@@ -1905,8 +1908,8 @@ sys_accept (
  
     if ( (void *) sProcess == NULL )
     {
-        debug_print ("sys_accept: [FAIL] sProcess\n");
-        printf      ("sys_accept: [FAIL] sProcess\n");
+        debug_print ("sys_accept2: [FAIL] sProcess\n");
+        printf      ("sys_accept2: [FAIL] sProcess\n");
         refresh_screen();
         return -1;
     }
@@ -1920,8 +1923,8 @@ sys_accept (
 
     if ( (void *) f == NULL )
     {
-        debug_print ("sys_accept: f fail\n");
-        printf      ("sys_accept: f fail\n");
+        debug_print ("sys_accept2: f fail\n");
+        printf      ("sys_accept2: f fail\n");
         refresh_screen();
         return -1;
     }
@@ -1938,8 +1941,8 @@ sys_accept (
     
     if ( (void *) sSocket == NULL )
     {
-        debug_print ("sys_accept: [FAIL] sSocket\n");
-        printf      ("sys_accept: [FAIL] sSocket\n");
+        debug_print ("sys_accept2: [FAIL] sSocket\n");
+        printf      ("sys_accept2: [FAIL] sSocket\n");
         refresh_screen();
         return -1;
     }
@@ -2041,7 +2044,7 @@ sys_accept (
  
     if ( sSocket->state == SS_CONNECTING )
     {
-        debug_print ("sys_accept: CONNECTING !!\n");
+        debug_print ("sys_accept2: CONNECTING !!\n");
 
         //Server socket. Pre-connect.
         //precisamos mudar no caso de erro no cliente.
@@ -2051,7 +2054,7 @@ sys_accept (
         cSocket = (struct socket_d *) sProcess->socket_pending_list[0];
         if ( (void*) cSocket == NULL )
         {
-            debug_print ("sys_accept: [FAIL] cSocket\n");
+            debug_print ("sys_accept2: [FAIL] cSocket\n");
             sSocket->state = SS_CONNECTING;  //anula.
             return -1;
         }
@@ -2070,7 +2073,7 @@ sys_accept (
         }
  
         //fail
-        debug_print ("sys_accept: [FAIL] Pending connection\n");
+        debug_print ("sys_accept2: [FAIL] Pending connection\n");
         sSocket->state = SS_CONNECTING;  //anula.
         return -1;
     }
@@ -2080,7 +2083,7 @@ sys_accept (
 
 fail:
 
-    debug_print ("sys_accept: [FAIL] Something is wrong!\n");
+    debug_print ("sys_accept2: [FAIL] Something is wrong!\n");
     
     //real machine
     //printf ("sys_accept: [FIXME] TODO ...\n");
@@ -2093,6 +2096,17 @@ fail:
     return -1;
 }   
 
+
+int 
+sys_accept (
+    int sockfd, 
+    struct sockaddr *addr, 
+    socklen_t *addrlen )
+{
+    debug_print("sys_accept: [TODO] Work in progress\n");
+    printf     ("sys_accept: [TODO] Work in progress\n");
+    return -1;
+}
 
 /*
  ********************************
