@@ -27,7 +27,6 @@ void cpu_set_apic_base(unsigned long apic);
 unsigned long cpu_get_apic_base(void); 
 
 
-
 // apic stuffs for x86.
 static inline void imcr_pic_to_apic (void);
 static inline void imcr_apic_to_pic (void);

@@ -133,7 +133,10 @@ extern void do_executa_new_task (void);
 //todo: podemos mover isso de lugar para perto de net/
 #include "net/mac.h"
 
+
+
 // storage
+#include "storage/floppy.h"
 #include "storage/ata.h"
 #include "storage/super.h"
 #include "storage/volume.h"
@@ -142,24 +145,19 @@ extern void do_executa_new_task (void);
 
 
 
-
 // ws - window server, and beyond
 // ps2 controller.
 #include "ws/ps2.h"
 
 
-// kdrivers x86
-#include "pit.h"
-#include "pic.h"
-#include "apic.h"
-#include "cpuid.h"
 
+// hal
+#include "hal/pit.h"
+#include "hal/pic.h"
+#include "hal/apic.h"
+#include "hal/cpuid.h"
+#include "hal/rtc.h"
 
-#include "rtc.h"
-
-
-//storage
-#include "storage/floppy.h"
 
 
 // ws - window server, and beyond. low level
@@ -170,13 +168,15 @@ extern void do_executa_new_task (void);
 #include "ws/ldisc.h"
 
 
-//storage
+
+//storage (^)
 #include "storage/ide.h"
 
 //pci
 #include "pci.h"
 
-//storage
+
+//storage (^)
 #include "storage/ahci.h"
 #include "storage/sata.h"
 
