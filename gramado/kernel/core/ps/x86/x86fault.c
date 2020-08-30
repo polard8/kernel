@@ -42,6 +42,8 @@ int fatal_error_flag;
 void do_pagefault (void);
 
 
+
+
 /*
  *****************************************
  * faults:
@@ -243,11 +245,11 @@ void KiCpuFaults ( unsigned long number ){
  *     14 PAGE FAULT.
  *     Obs: Podemos apenas fechar a thread atual e retomar o sistema.
  */
- 
+
 void do_pagefault (void){
-    
-	unsigned long page_fault_address;
-	
+
+    unsigned long page_fault_address=0;
+
 	// We can't close idle thread.
 	// Se a thread que apresentou problemas foi a idle.
 	// uma opção é tentar recriá-la.
@@ -267,8 +269,8 @@ void do_pagefault (void){
 	// do carregamento ...
     // Pois assim a rotina de pagefault poderá saber se deve 
 	// realizar a paginação sob demanda ou fechar a thread.
-    
-	printf ("do_pagefault:\n");
+
+    printf ("do_pagefault:\n");
 	
 	// #todo:
 	// +Checar se a current é uma thread válida.
@@ -277,11 +279,11 @@ void do_pagefault (void){
 	// +Realizar o mapeamento da página faltante.
 	
 	//Page Fault Linear Address - PFLA.
-	
-	page_fault_address = (unsigned long) get_page_fault_adr ();
 
-	printf ("Address={%x}\n", (unsigned long) page_fault_address);
-	
+    page_fault_address = (unsigned long) get_page_fault_adr ();
+
+    printf ("Address={%x}\n", (unsigned long) page_fault_address);
+
     //
     // Mostra registradores.
     //
@@ -290,8 +292,8 @@ void do_pagefault (void){
 	// Precisamos mudar os nomes.
 	
     show_reg (current_thread);
-	show_slots ();
-	
+    show_slots ();
+
 	/*
 	// Se o endereço for igual a 0 é porque o eip está perdido.
 	// Devemos fechar a thread.
@@ -306,6 +308,17 @@ void do_pagefault (void){
 		return;	
 	}
 	*/
+	
+	
+	// #todo
+	// podemos checar se o processo atual eh um processo em ring3
+	// e tentar fechar ele.
+	// Se ele for window server, entao precisamos desregistrar
+	// o window server para que as mensagens do sistema
+	// possam ir para os outros processos. Depois podemos
+	// reabilitar o ws.
+	// Mesma coisa para o network server ...
+	//
 	
 }
 

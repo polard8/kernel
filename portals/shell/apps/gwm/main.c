@@ -434,7 +434,9 @@ response_loop:
                     break;
 
                 case VK_F11:
+                    //gws_clone_and_execute("init.bin");
                     gws_clone_and_execute("launch1.bin");
+                    //exit(0);
                     return 0;
                     break;
 

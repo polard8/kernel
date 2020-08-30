@@ -1,34 +1,11 @@
 /*
- * File: core/sm.c  
+ * File: sm.c  
  *
  *     Server Manager 
  *
- *     Gerenciamento de servidores feito pelo kernel base.
- *     #importante: Um aplicativo gerenciador de servidores 
- * deverá invocar esse módulo para pegar informações sobre 
- * os servidores do sistema. Pois o kernel base vai gerenciar
- * as estruturas com informações sobre eles, deixando os dados 
- * protegidos em na memória em kernel mode.
- *
- * Descrição:
- *      Gerenciamento de servidores.
- *      Gerencia os processos servidores que estão em user mode.
- *      @todo: Essas são as rotinas de gerenciamento de servidores 
- * oferecida pelo kernel base, porém o gerenciador de servidores
- * poderá ser um utilitário em user mode, que poderá usar as rotinas
- * oferecidads aqui.
- *      O Kernel faz ponte entre Clientes em user mode e servidores
- *      em user mode. O cliente em user mode solicita ao kernel serviços
- *      oferecidos por servidores que estão em user mode.
- *
- *      O kernel estabelece essa conexão cliente/servidor
- *      atravéz de mensagens. via interrupção.
- *      a interrupção é a 200. e é tratada pelo arquivo services.c.
- *
- *      Um forma de trocar mensagens de dados é atravéz dos canais. 
- *
- * Versão 1.0, 2015, 2016. 
+ *  
  */
+
 
 /*
 A basic set of servers for a general-purpose microkernel includes 
@@ -52,6 +29,90 @@ int xx_server();
 #include <kernel.h>
 
 
+
+//
+// == register ws =====================
+//
+
+/*
+//See: gde_serv: 513
+int sm_register_ws(int pid);
+int sm_register_ws(int pid)
+{
+        __desktop = ( struct desktop_d *) arg2;
+        if ( (void *) __desktop != NULL )
+        {
+            if ( __desktop->desktopUsed == 1 && 
+                 __desktop->desktopMagic == 1234 )
+            {
+                __desktop->ws = (int) arg3;
+                
+                
+                // What is the process listen to the port 11.
+                gramado_ports[GRAMADO_WS_PORT] = (int) current_process;
+                
+                // returning ok.
+                // But, we could return the port number.
+                return (void *) 1;  //ok 
+            }
+        }
+        return NULL; //fail
+}
+*/
+
+
+
+//
+// == unregister ws =====================
+//
+
+/*
+int sm_unregister_ws(void);
+int sm_unregister_ws(void)
+{
+}
+*/
+
+//
+// == register ns =====================
+//
+/*
+int sm_register_ns(int pid);
+int sm_register_ns(int pid)
+{
+        __desktop = ( struct desktop_d *) arg2;
+        if ( (void *) __desktop != NULL )
+        {
+            if ( __desktop->desktopUsed == 1 && 
+                 __desktop->desktopMagic == 1234 )
+            {
+                __desktop->ns = (int) arg3;
+                
+                
+                // What is the process listen to the port 11.
+                gramado_ports[GRAMADO_NS_PORT] = (int) current_process;
+                
+                // returning ok.
+                // But, we could return the port number.
+                return (void *) 1;  //ok 
+            }
+        }
+        return NULL; //fail
+}
+*/
+
+//
+// == unregister ns =====================
+//
+/*
+int sm_unregister_ns(void);
+int sm_unregister_ns(void)
+{
+}
+*/
+
+
+
 /*
  * init_systemserver:
  *     System server supprt.
@@ -59,17 +120,11 @@ int xx_server();
 
 int init_systemserver (void)
 {
+    debug_print ("init_systemserver: [TODO] Not used yet\n");
     return 0;  //Ainda não implementada.
 }
 
 
-/*
-int serverInit();
-int serverInit()
-{
-	return 0;
-}
-*/
 
 
 //

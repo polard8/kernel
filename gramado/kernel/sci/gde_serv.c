@@ -474,9 +474,9 @@ gde_extra_services (
     }
 
     // network server
-	// 521 - set ns PID for a given desktop
-	// Register a window server.
-	// gramado_ports[11] = ws_pid
+    // 521 - set ns PID for a given desktop
+    // Register a network server.
+    // gramado_ports[11] = ws_pid
 
     if ( number == 521 )
     {
