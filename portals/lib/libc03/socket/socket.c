@@ -11,7 +11,8 @@
 #include <sys/types.h>  
 #include <sys/select.h>
 #include <sys/socket.h>
-//#include <unistd.h>
+
+
 
 
 
@@ -477,6 +478,125 @@ getsockname (
     }
 
     return (int) __status;
+}
+
+
+//
+// ===========
+//
+
+int inet_aton(const char *cp, struct in_addr *inp)
+{
+    return -1;
+}
+
+in_addr_t inet_addr(const char *cp)
+{
+    printf ("inet_addr: [TODO]\n");
+    return (in_addr_t) 0;
+}
+
+
+in_addr_t inet_network(const char *cp)
+{
+    return (in_addr_t) 0;
+}
+
+
+/*
+ * Convert network-format internet address
+ * to base 256 d.d.d.d representation.
+ */
+/*const*/ 
+char *inet_ntoa ( struct in_addr in ) 
+{
+    /*
+    static char ret[18];
+
+    strlcpy(ret, "[inet_ntoa error]", sizeof(ret));
+    (void) inet_ntop(AF_INET, &in, ret, (socklen_t)sizeof ret);
+
+    return ret;
+    */
+
+    return (char *) 0;
+}
+
+/*
+ * Formulate an Internet address from network + host.  Used in
+ * building addresses stored in the ifnet structure.
+ */
+struct in_addr
+inet_makeaddr(in_addr_t net, in_addr_t host)
+{
+    
+	in_addr_t addr;
+	struct in_addr ret;
+
+    printf("inet_makeaddr: [BUGBUG] Not implemented!\n");
+
+	/*
+	if (net < 128)
+		addr = (net << IN_CLASSA_NSHIFT) | (host & IN_CLASSA_HOST);
+	else if (net < 65536)
+		addr = (net << IN_CLASSB_NSHIFT) | (host & IN_CLASSB_HOST);
+	else if (net < 16777216L)
+		addr = (net << IN_CLASSC_NSHIFT) | (host & IN_CLASSC_HOST);
+	else
+		addr = net | host;
+	ret.s_addr = htonl(addr);
+	*/
+	
+	return ret;
+}
+
+
+/*
+ * Return the local network address portion of an
+ * internet address; handles class a/b/c network
+ * number formats.
+ */
+in_addr_t
+inet_lnaof(struct in_addr in)
+{
+    printf("inet_lnaof: [BUGBUG] Not implemented!\n");
+    return 0;
+    
+   /*
+	in_addr_t i = ntohl(in.s_addr);
+
+	if (IN_CLASSA(i))
+		return ((i)&IN_CLASSA_HOST);
+	else if (IN_CLASSB(i))
+		return ((i)&IN_CLASSB_HOST);
+	else
+		return ((i)&IN_CLASSC_HOST);
+
+    */
+}
+
+/*
+ * Return the network number from an internet
+ * address; handles class a/b/c network #'s.
+ */
+in_addr_t
+inet_netof(struct in_addr in)
+{
+    printf("inet_netof: [BUGBUG] Not implemented!\n");
+    return 0;
+
+
+   /*
+	in_addr_t i = ntohl(in.s_addr);
+
+	if (IN_CLASSA(i))
+		return (((i)&IN_CLASSA_NET) >> IN_CLASSA_NSHIFT);
+	else if (IN_CLASSB(i))
+		return (((i)&IN_CLASSB_NET) >> IN_CLASSB_NSHIFT);
+	else
+		return (((i)&IN_CLASSC_NET) >> IN_CLASSC_NSHIFT);
+   */
+
 }
 
 

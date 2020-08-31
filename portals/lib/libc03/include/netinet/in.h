@@ -67,7 +67,6 @@ typedef __uint32_t  uint32_t;
 #endif
 
 
-
 #ifndef in_addr_t
 typedef __in_addr_t in_addr_t;
 #define in_addr_t  __in_addr_t
@@ -179,21 +178,20 @@ typedef __sa_family_t  sa_family_t;
  * Internet address (a structure for historical reasons)
  */
 
-struct in_addr {
-
+struct in_addr 
+{
     in_addr_t s_addr;
+
 } __packed;
 
- 
- 
 
 /*
  * sockaddr_in:
  *     Socket address, internet style.
  */
 
-struct sockaddr_in {
-    
+struct sockaddr_in 
+{
     // len + family = 16bit
     uint8_t           sin_len;      // 8
     sa_family_t       sin_family;   // 8
