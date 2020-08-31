@@ -703,19 +703,25 @@ gde_extra_services (
  
      //890 ~ 899 network stuff 
     
-    // 890 - get network buffer
+    // 890 - Receive.
     // O usuário recebe um buffer com um pacote.
+    // See: net/network/network.c
+    // IN: ubuf, len.
     if ( number == 890 ){
-        //ubuf,len
-        return (void *) sys_network_receive ( (void *) arg2,(int) arg3);
+        return (void *) sys_network_receive ( 
+                            (void *) arg2, (int) arg3 );
     }
 
-    //891 - set network buffer
-    // o usuário envia um buffer com um pacote.
+
+    // 891 - Send.
+    // O usuário envia um buffer com um pacote.
+    // See: net/network/network.c
+    // IN: ubuf, len.
     if ( number == 891 ){
-        //ubuf,len
-        return (void *) sys_network_send ( (void *) arg2,(int) arg3);
+        return (void *) sys_network_send ( 
+                            (void *) arg2, (int) arg3 );
     }
+
 
     //...
 

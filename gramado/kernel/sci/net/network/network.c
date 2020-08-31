@@ -145,42 +145,68 @@ int network_buffer_in( void *buffer, int len )
    return -1;
 }
 
-//serviço: 890
-int sys_network_receive(void *ubuf, int size)
+
+/*
+ ******************************************
+ * sys_network_receive:
+ *     Service 890.
+ *     The app receives a packet from the system.
+ */
+
+int 
+sys_network_receive (
+    void *ubuf, 
+    int size )
 {
+
     void *src_buffer;
-    //temos que pegar do head. primeiro da fila.
+
+
+    debug_print("sys_network_receive:\n");
+    
+    
+    // Pega do head. 
+    // Primeiro da fila.
     int head = NETWORK_BUFFER.receive_head;
 
-    //circula.
+
+    // Round the buffer.
     NETWORK_BUFFER.receive_head++;
     if (NETWORK_BUFFER.receive_head >= 32)
+    { 
         NETWORK_BUFFER.receive_head=0;
-        
-    if(head<32){
+    }
+
+
+    if (head<32)
+    {
         src_buffer = NETWORK_BUFFER.receive_buffer[head];
     
         if((void*)ubuf== NULL){
-            printf("sys_network_receive: ubuf fail\n");
-            refresh_screen();        
-            return -1;
+            printf("sys_network_receive: [FAIL] ubuf\n");
+            goto fail;
         }
         
         if((void*)src_buffer== NULL){
-            printf("sys_network_receive: src_buffer fail\n");
-            refresh_screen();        
-            return -1;
+            printf("sys_network_receive: [FAIL] src_buffer\n");
+            goto fail;
         }
 
-        //do kernel para user mode.
-        if((void*)ubuf!= NULL)
-            memcpy( ubuf, src_buffer, size);        
+        //
+        // Copy.
+        //
+        
+        // Copia do kernel para user mode.
+        if ( (void *) ubuf != NULL ){
+            memcpy( ubuf, src_buffer, size);
+        }        
 
-        //printf("ns_get_buffer: ok\n");
-        //refresh_screen();
-        return 0;//ok
+        // OK.
+        return 0;
     }
 
+fail:
+    refresh_screen();        
     return -1;
 }
 
@@ -235,60 +261,74 @@ int network_buffer_out ( void *buffer, int len )
    return -1;
 }
 
+/*
+ *************************************************
+ * sys_network_send:
+ *     Service 891. 
+ *     Envia um buffer pra ser enviado para rede.
+ */
 
-//serviço: 891
-//o ns envia um buffer pra ser enviado para rede.
-int sys_network_send(void *ubuf, int size)
+int 
+sys_network_send ( 
+    void *ubuf, 
+    int size )
 {
-    debug_print("sys_network_send:\n");
-    
+
     void *src_buffer;
     
     // #bugbug
     // Do not use this buffer here.
     char xxxbuffer[4096];
-    
-    //o aplicativo esta colocando no tail
+
+    debug_print("sys_network_send:\n");
+
+
+    //O aplicativo esta colocando no tail.
     int tail = NETWORK_BUFFER.send_tail;
 
-    //circula.
+    // Round buffer.
     NETWORK_BUFFER.send_tail++;
     if (NETWORK_BUFFER.send_tail >= 32)
+    {
         NETWORK_BUFFER.send_tail=0;
-        
-    if(tail<8){
+    }
+ 
+     
+    if (tail<8)
+    {
         src_buffer = NETWORK_BUFFER.send_buffer[tail];
     
-        if((void*)ubuf== NULL){
-            printf("sys_network_send: ubuf fail\n");
-            refresh_screen();        
-            return -1;
+        if ((void*)ubuf== NULL){
+            printf("sys_network_send: [FAIL] ubuf\n");
+            goto fail;
         }
-        
+
         if((void*)src_buffer== NULL){
-            printf("sys_network_send: src_buffer fail\n");
-            refresh_screen();        
-            return -1;
+            printf("sys_network_send: [FAIL] src_buffer\n");
+            goto fail;
         }
 
         //do kernel para user mode.
-        if((void*)ubuf!= NULL)
-            memcpy( src_buffer,ubuf, size);    
-            
+        if ( (void *) ubuf != NULL ){
+            memcpy( src_buffer,ubuf, size); 
+        }
         
-        //coloque nesse buffer o conteúdo do head
-        //na lista de buffers para enviar.
-        //depois enviaremos abaixo.
-        network_buffer_out(xxxbuffer,1500);    
+        //
+        // Send.
+        //
+                
+        // Coloque nesse buffer o conteúdo do head
+        // na lista de buffers para enviar.
+        // depois enviaremos abaixo.
+        network_buffer_out(xxxbuffer,1500);
+        network_send_packet(xxxbuffer,1500);
 
-        //enviar
-        network_send_packet(xxxbuffer,1500); 
-        
-        //printf("ns_get_buffer: ok\n");
-        //refresh_screen();
-        return 0;//ok
+        // OK.
+        return 0;
     }
 
+fail:
+    refresh_screen();
     return -1;
 }
 
