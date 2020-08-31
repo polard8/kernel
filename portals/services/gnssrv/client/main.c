@@ -58,11 +58,10 @@
 // == ports ====================================
 //
 
-#define PORTS_WS 4040
-#define PORTS_NS 4041
-#define PORTS_FS 4042
+#define PORTS_WS  4040
+#define PORTS_NS  4041
+#define PORTS_FS  4042
 // ...
-
 
 
 
@@ -72,12 +71,12 @@ char __buffer[512];
 
 #define IP(a, b, c, d) (a << 24 | b << 16 | c << 8 | d)
 
+
 // tipos de pacotes.
 //#define SERVER_PACKET_TYPE_REQUEST    1000 
 //#define SERVER_PACKET_TYPE_REPLY      1001 
 //#define SERVER_PACKET_TYPE_EVENT      1002
 //#define SERVER_PACKET_TYPE_ERROR      1003
-
 
 
 void gnst_yield(void);
@@ -244,8 +243,6 @@ int gnst_hello_request(int fd){
 // loop:
 new_message:
 
-    
-     
     //
     // Write
     //
@@ -299,8 +296,8 @@ int main ( int argc, char *argv[] ){
     addr_in.sin_family = AF_INET;
     
     // Connecting to the network server in this machine.
-    addr_in.sin_port   = PORTS_NS; 
-    addr_in.sin_addr.s_addr = IP(127,0,0,1); 
+    addr_in.sin_port = PORTS_NS;              // htons(PORTS_NS);
+    addr_in.sin_addr.s_addr = IP(127,0,0,1);  // inet_addr("192.168.0.101");
 
     debug_print ("---------------------------\n");    
     debug_print ("gns.bin: Initializing ...\n");

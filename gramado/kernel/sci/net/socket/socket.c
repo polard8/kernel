@@ -1492,30 +1492,65 @@ sys_connect (
             printf      ("sys_connect: AF_INET port %d \n", 
                 addr_in->sin_port);
             
-            // #test
+            // WS
             // Se a porta for , então usaremos o pid do WS.
-            //4040
+            // 4040
             if (addr_in->sin_port == PORTS_WS){
                 printf ("sys_connect: Connecting to the Window Server on port %d ...\n",
-                    PORTS_WS);
-                target_pid = (int) gramado_ports[GRAMADO_WS_PORT]; 
+                    addr_in->sin_port);
+                printf("sys_connect: IP {%x}\n",
+                    addr_in->sin_addr.s_addr );
                 refresh_screen();
+                target_pid = (int) gramado_ports[GRAMADO_WS_PORT]; 
                 break;
             }
      
-            // #test
+            // NS
             // Se a porta for , então usaremos o pid do NS.
-            //4041
+            // 4041
             if (addr_in->sin_port == PORTS_NS){
                 printf ("sys_connect: Connecting to the Network Server on port %d...\n",
-                    PORTS_NS);
-                target_pid = (int) gramado_ports[GRAMADO_NS_PORT]; 
+                    addr_in->sin_port);
+                printf("sys_connect: IP {%x}\n",
+                    addr_in->sin_addr.s_addr );
                 refresh_screen();
+                //while(1){}
+                target_pid = (int) gramado_ports[GRAMADO_NS_PORT]; 
                 break;
             }
             
             //PORTS_FS
 
+            // FTP
+            if (addr_in->sin_port == 21){
+                printf("$$$$ FTP $$$$\n");
+                refresh_screen();
+                goto fail;
+            }
+
+            // Telnet
+            if (addr_in->sin_port == 23){
+                printf("$$$$ Telnet $$$$\n");
+                refresh_screen();
+                goto fail;
+            }
+
+            // DHCP
+            if (addr_in->sin_port == 67){
+                printf("$$$$ DHCP $$$$\n");
+                refresh_screen();
+                goto fail;
+            }
+            
+            // HTTP
+            if (addr_in->sin_port == 80){
+                printf("$$$$ HTTP $$$$\n");
+                refresh_screen();
+                goto fail;
+            }
+
+            // Drop!
+            
             printf("sys_connect: [FAIL] Port not valid {%d}\n",
                 addr_in->sin_port);
             goto fail;

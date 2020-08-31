@@ -6697,10 +6697,10 @@ gdeshell_decode_buffer ( unsigned long buffer_address )
             return 0;
             break;
 
-        //0x8863	PPPoE, PPP Over Ethernet (Discovery Stage).
-        //0x8864	PPPoE, PPP Over Ethernet (PPP Session Stage).
+        // 0x8863 PPPoE, PPP Over Ethernet (Discovery Stage).
+        // 0x8864 PPPoE, PPP Over Ethernet (PPP Session Stage).
 
-		//::: DEFAULT
+        //::: DEFAULT
         // Error: Default package type.
         default:
             printf ("[0x%x]: protocol received\n",Type);
