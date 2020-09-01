@@ -212,27 +212,27 @@ vhd-copy-files:
 	# ...
 
 	# 2) .INI
-	sudo cp gramado/base/ini/GUI.INI     /mnt/gramadovhd
-	sudo cp gramado/base/ini/INIT.INI    /mnt/gramadovhd
-	sudo cp gramado/base/ini/USER.INI    /mnt/gramadovhd
+	sudo cp gramado/infobase/ini/GUI.INI     /mnt/gramadovhd
+	sudo cp gramado/infobase/ini/INIT.INI    /mnt/gramadovhd
+	sudo cp gramado/infobase/ini/USER.INI    /mnt/gramadovhd
 
 	# 3) .FON
-	sudo cp gramado/base/res/fonts/bin/NC2.FON      /mnt/gramadovhd
-	sudo cp gramado/base/res/fonts/bin/LIN8X8.FON   /mnt/gramadovhd
-	sudo cp gramado/base/res/fonts/bin/LIN8X16.FON  /mnt/gramadovhd
+	sudo cp gramado/infobase/res/fonts/bin/NC2.FON      /mnt/gramadovhd
+	sudo cp gramado/infobase/res/fonts/bin/LIN8X8.FON   /mnt/gramadovhd
+	sudo cp gramado/infobase/res/fonts/bin/LIN8X16.FON  /mnt/gramadovhd
 
 	# 4) .BMP
-	sudo cp gramado/base/res/cursors/CURSOR.BMP  /mnt/gramadovhd
-	sudo cp gramado/base/res/cursors/MOUSE.BMP   /mnt/gramadovhd
-	sudo cp gramado/base/res/icons/APP.BMP       /mnt/gramadovhd
-	sudo cp gramado/base/res/icons/BMP1.BMP      /mnt/gramadovhd
-	sudo cp gramado/base/res/icons/FILE.BMP      /mnt/gramadovhd
-	sudo cp gramado/base/res/icons/FOLDER.BMP    /mnt/gramadovhd
-	sudo cp gramado/base/res/icons/TERMINAL.BMP  /mnt/gramadovhd
+	sudo cp gramado/infobase/res/cursors/CURSOR.BMP  /mnt/gramadovhd
+	sudo cp gramado/infobase/res/cursors/MOUSE.BMP   /mnt/gramadovhd
+	sudo cp gramado/infobase/res/icons/APP.BMP       /mnt/gramadovhd
+	sudo cp gramado/infobase/res/icons/BMP1.BMP      /mnt/gramadovhd
+	sudo cp gramado/infobase/res/icons/FILE.BMP      /mnt/gramadovhd
+	sudo cp gramado/infobase/res/icons/FOLDER.BMP    /mnt/gramadovhd
+	sudo cp gramado/infobase/res/icons/TERMINAL.BMP  /mnt/gramadovhd
 	# ...
 
 	# 5) .TXT
-	sudo cp gramado/base/GRAMADO.TXT     /mnt/gramadovhd
+	sudo cp gramado/infobase/GRAMADO.TXT     /mnt/gramadovhd
 
 
 	# 6) from Portals to root.
@@ -264,7 +264,7 @@ vhd-copy-files:
 	sudo cp gramado/boot/x86/bin/BM.BIN    /mnt/gramadovhd/BOOT
 	sudo cp gramado/boot/x86/bin/BL.BIN    /mnt/gramadovhd/BOOT
 	sudo cp gramado/kernel/KERNEL.BIN      /mnt/gramadovhd/BOOT
-#	-sudo cp gramado/base/res/wall/ANIMAL.BMP  /mnt/gramadovhd/BOOT
+#	-sudo cp gramado/infobase/res/wall/ANIMAL.BMP  /mnt/gramadovhd/BOOT
 
 
 #
@@ -273,10 +273,10 @@ vhd-copy-files:
 
 	# 
 	-sudo cp docs/*.TXT    /mnt/gramadovhd/ETC
-#	-sudo cp gramado/base/tests/*.CPP    /mnt/gramadovhd/ETC
-#	-sudo cp gramado/base/tests/*.BAS    /mnt/gramadovhd/ETC
-#	-sudo cp gramado/base/tests/*.ASM    /mnt/gramadovhd/ETC
-#	-sudo cp gramado/base/res/wall/ANIMAL.BMP   /mnt/gramadovhd/ETC
+#	-sudo cp gramado/infobase/tests/*.CPP    /mnt/gramadovhd/ETC
+#	-sudo cp gramado/infobase/tests/*.BAS    /mnt/gramadovhd/ETC
+#	-sudo cp gramado/infobase/tests/*.ASM    /mnt/gramadovhd/ETC
+#	-sudo cp gramado/infobase/res/wall/ANIMAL.BMP   /mnt/gramadovhd/ETC
 
 
 #
@@ -321,7 +321,7 @@ vhd-copy-files:
 # == "/TMP" =============================================
 #
 
-#	-sudo cp gramado/base/res/wall/ANIMAL.BMP   /mnt/gramadovhd/TMP
+#	-sudo cp gramado/infobase/res/wall/ANIMAL.BMP   /mnt/gramadovhd/TMP
 
 
 

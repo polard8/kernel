@@ -103,7 +103,7 @@ int crt0 (void){
     // So. We are using the top of the front buffer
     // as a shared memory. No problem for now.
     
-    char *shared_memory = (char *) (0xC0800000 -0x100);
+    char *shared_info = (char *) (0xC0800000 -0x100);
 
 
     // Environment.
@@ -119,7 +119,7 @@ int crt0 (void){
 	//printf("\n");
 	//printf(".\n");
 	printf ("..\n");
-	printf ("# MESSAGE={%s} #\n", shared_memory );
+	printf ("# MESSAGE={%s} #\n", shared_info );
 	printf ("..\n");
 	//printf(".\n");
 	//printf("\n");
@@ -136,7 +136,7 @@ int crt0 (void){
     // Criando o ambiente.
     // Transferindo os ponteiros do vetor para o ambiente.
 
-    tokenList[0] = strtok ( &shared_memory[0], LSH_TOK_DELIM );
+    tokenList[0] = strtok ( &shared_info[0], LSH_TOK_DELIM );
 
     // Salva a primeira palavra digitada.
     token = (char *) tokenList[0];
