@@ -600,14 +600,22 @@ int processSendSignal (struct process_d *p, unsigned long signal){
 // Stack de 32KB.              (ok)
 // 
 
+// Explicando:
+// Copia a imagem do processo atual e salva o endereço
+// da copia num elemento da estrutura passada como argumento.
+
+// OUT:
+// 
+
 int processCopyMemory ( struct process_d *process ){
 
     unsigned long __new_base=0;    // base
     unsigned long __new_stack=0;   // stack
 
 
-    if ( (void *) process == NULL ){
-        printf ("processCopyMemory: process \n");
+    if ( (void *) process == NULL )
+    {
+        printf ("processCopyMemory: [FAIL] process \n");
         refresh_screen();
         return (int) (-1);
     }
@@ -647,7 +655,8 @@ int processCopyMemory ( struct process_d *process ){
     // Mas usaremos apenas o endereço físico extraído desse endereço.
     __new_base = (unsigned long) allocPages ( (1024*200)/4096 ); 
 
-    if ( __new_base == 0 ){
+    if ( __new_base == 0 )
+    {
         printf ("processCopyMemory: __new_base fail\n");
         refresh_screen();
         return (int) (-1);
@@ -665,29 +674,31 @@ int processCopyMemory ( struct process_d *process ){
     // Retorna um endereço virtual.
     // Mas usaremos apenas o endereço físico extraído desse endereço.
     
-    __new_stack = (unsigned long) allocPages ( (1024*32)/4096 ); 
+    __new_stack = (unsigned long) allocPages( (1024*32)/4096 ); 
 
-    if ( __new_stack == 0 ){
+    if ( __new_stack == 0 )
+    {
         printf ("processCopyMemory: __new_stack fail\n");
         refresh_screen();
         return (int) (-1);
     }
 
 
-
     //
-    // Copying memory.
+    // == Copying memory ======================================
     //
 
     // Copying base and stack.
     // Copiando do processo atual para o buffer que alocamos
     // logo acima.
 
+
     // Copia do início da imagem. 200KB.
     memcpy ( (void *) __new_base,  
         (const void *) CONTROLTHREAD_ENTRYPOINT, 
         ( 1024 * 200 ) );
-    
+
+
     // Copia do fim da stack. 32KB.
     memcpy ( (void *) __new_stack, 
         (const void *) ( CONTROLTHREAD_STACK-( 1024*32 ) ), 
@@ -696,8 +707,19 @@ int processCopyMemory ( struct process_d *process ){
 
     // Getting the physical addresses.
     // Obtendo o edereço físico da base da imagem e da pilha.
-    unsigned long new_base_PA = (unsigned long) virtual_to_physical ( __new_base, gKernelPageDirectoryAddress ); 
+    unsigned long new_base_PA  = (unsigned long) virtual_to_physical ( __new_base, gKernelPageDirectoryAddress ); 
     unsigned long new_stack_PA = (unsigned long) virtual_to_physical ( __new_base, gKernelPageDirectoryAddress ); 
+
+
+    // #todo
+    // check validation.
+
+    if ( new_base_PA == 0 )
+        panic("processCopyMemory: new_base_PA\n");
+
+    if ( new_stack_PA == 0 )
+        panic("processCopyMemory: new_stack_PA\n");
+
 
     // #todo
     // Agora temos que fazer esses endereços físicos serem
@@ -743,13 +765,19 @@ int processCopyMemory ( struct process_d *process ){
  *     Isso � chamado por do_fork_process.
  */
  
-// 1 = atual.
-// 2 = clone. 
- 
+// IN:
+// p1 = atual.
+// p2 = clone. 
+
+// OUT:
+// 0 = ok
+// 1 = fail
+
 int processCopyProcess ( pid_t p1, pid_t p2 ){
 
     struct process_d *Process1;
     struct process_d *Process2;
+    
     int Status=0;
     int i=0;
 
@@ -1010,8 +1038,6 @@ int processCopyProcess ( pid_t p1, pid_t p2 ){
         panic ("processCopyProcess: threadCopyThread fail");
     }
 
-
-
     //
     // Directory.
     //
@@ -1038,7 +1064,7 @@ int processCopyProcess ( pid_t p1, pid_t p2 ){
 
     //#bugbug
     //deleta isso.
-	//message support.
+    //message support.
     //Process2->window = Process1->window;    //arg1. 
     //Process2->msg    = Process1->msg;       //arg2.
     //Process2->long1  = Process1->long1;     //arg3.
@@ -1055,7 +1081,7 @@ int processCopyProcess ( pid_t p1, pid_t p2 ){
     // e um fd na lista de objetos abertos pelo processo.
   
     //++
-    Process2->tty = ( struct tty_d *) tty_create();  
+    Process2->tty = ( struct tty_d *) tty_create();
 
     if ( (void *) Process2->tty == NULL ){
          panic ("processCopyProcess: Couldn't create TTY\n");
@@ -1063,45 +1089,25 @@ int processCopyProcess ( pid_t p1, pid_t p2 ){
     tty_start (Process2->tty);
     //--
 
-    
-    // Procurando um slot livre.
-    int __slot=0;
-    for (__slot=0; __slot<32; __slot++)
-    {
-         if ( Process2->Objects[__slot] == 0 ){ goto __OK; }
-    };
-    
-    Process2->tty->_fp->_file = __slot;
-    Process2->tty->index      = __slot;
-    
+
+    // panic()
+    debug_print ("processCopyProcess: [FIXME] No slot for tty\n");
+ 
 __OK:
-    
-
-    // #bugbug
-    // Cada processo precisa ter sua própria tty.
-    // Assim poderemos usar elas como master e slave ...
-    // Assim como faz o multiplexer.
-    // o Conteúdo precisa ser copiado no write.
-    
-    //Process2->tty = Process1->tty;
-
 
     Process2->exit_code = Process1->exit_code;
 
     Process2->prev = Process1->prev; 
     Process2->next = Process1->next; 
 
-    Status = 0;
-    goto done;
+    //Status = 0;
+    return (int) 0;
 
-
+// Fail
 
 fail:
-    Status = 1;
-    printf ("processCopyProcess: fail\n");
-
-
-done:
+    Status = 1;  //-1 ??
+    printf ("processCopyProcess: Fail\n");
     return (int) Status;
 }
 

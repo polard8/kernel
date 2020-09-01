@@ -39,13 +39,14 @@ _um_buffer_putpixel:
 global _swlib_backbuffer_putpixel
 _swlib_backbuffer_putpixel:
     jmp _gui_buffer_putpixel 
-	
+
+
 global _swlib_lfb_putpixel
 _swlib_lfb_putpixel:
     jmp _gui_buffer_putpixel2 
 
-	
-	
+
+
 ;===================================================================
 ; _gui_buffer_putpixel:
 ;     Coloca um pixel no backbuffer.
@@ -325,54 +326,59 @@ _background:
 
 ;=================================================
 ;  _asm_refresh_screen: 
-;      Passa o conteúdo do buffer1 para a tela.
-;      A tela toda.
+;      Copy the backbuffer into the front buffer.
+;      #bugbug: Only this >>> 800x600x32
+;      It calls the vsync.
 ;
-; #todo: 
-; Essa rotina poderia se chamar _softwarelibRefreshScreen.
-;
+
+; Origem  - BackBuffer.
+; Destino - LFB.
+; s = Endereço lógico do backbuffer.
+; d = Endereço lógico do LFB. Configurado no bootloader.
+    
+; #maybe:
+; global _swlibRefreshScreen
+; _swlibRefreshScreen:
 
 global _asm_refresh_screen
 _asm_refresh_screen:
 
+    ;;#test
+    pushad 
+    
+    ;; #bugbug
+    ;; Dirty register for this vsync stuff ?
+    ;; See: hwi/dd/hid/vsync.c
+
     ;Sincroniza o retraço vertical.  
     call _vsync  
 
-    push esi
-    push edi
-    push ecx
-    push edx
+    ;push esi
+    ;push edi
+    ;push ecx
+    ;push edx
 
-    ;
-    ; Origem  - BackBuffer.
-    ; Destino - LFB.
-    ; s = Endereço lógico do backbuffer.
-    ; d = Endereço lógico do LFB. Configurado no bootloader.
     mov esi, dword 0xC0800000    
     mov edx, dword 0xC0400000    
     mov edi, edx
 
-    ;;largura * altura
+    ;; largura * altura
     ;; Estamos movendo de 4 em 4 bytes.
+
+    ;; #bugbug
+    ;; It will not work for bigger resolutions.
 
     mov ecx, dword (800*600)      
     rep movsd   
 
-    pop edx
-    pop ecx
-    pop edi
-    pop esi 
+    ;pop edx
+    ;pop ecx
+    ;pop edi
+    ;pop esi 
+    
+    popad 
+    
     RET
-
-
-;-------------------
-; write_char:
-;     Escreve um caractere no modo texto.
-;
-
-write_char:
-    ;; Nothing for now.
-    ret
 
 
 ;

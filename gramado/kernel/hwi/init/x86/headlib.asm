@@ -11,33 +11,34 @@
 ;
 
 ;
-; Variáveis globais..
+; Global variables.
 ;
 
 
 ;Se o kernel está inicializado ou não.
 global _KernelStatus
 _KernelStatus: 
-    dd 0	
-	
-;Variável sera usada pelo scheduler.	
-global	_task_switch_salva_esp
+    dd 0
+
+
+;Variável sera usada pelo scheduler.
+global _task_switch_salva_esp
 _task_switch_salva_esp: 
-    dd 0		
-	
-	
+    dd 0
+
+
 ;
 ; Variáveis locais.
-;	
-	
+;
+
 current:       dd 0    ;current.
 scr_loc:       dd 0    ;coisa da memória de vídeo.
 bl_video_mode: db 0 
 bl_lfb:        db 0  
-	
+
 
 ;
-; @todo:
+; #todo:
 ; Nota sobre a pilha em ring0 configurada na tss:
 ; O valor atual é 0x00200000. Mas não é o que queremos,
 ; o que queremos é o equivalente físico à 0xC03FFFF0.
@@ -50,7 +51,7 @@ bl_lfb:        db 0
 ; pool de memória física padronizado.
 ;
 ;
-	
+
 ;
 ; TSS. 
 ;
@@ -66,60 +67,60 @@ ring0_ghost_task:
 ;; ?? o que é isso. ??
 
 dd 0
-dd 0	
+dd 0
 tss0:
-	dd 0 ;;0x401000             ;back link
+	dd 0                    ;back link (0x401000)
 	dd 0x003FFFF0           ;esp0    (pilha do kernel), endereço físico.
 	dd 0x10                 ;ss0     (ss da pilha do kernel)
 	dd 0                    ;esp1
-	dd 0                    ;ss1	
+	dd 0                    ;ss1
 	dd 0                    ;esp2
-	dd 0                    ;ss2	
+	dd 0                    ;ss2
 	dd 0x9C000              ;cr3  #bugbug: Isso deve ser o cr3 do processo em ring3.
-	dd ring0_ghost_task         ;0x401000             ;eip   
-	dd 0x00000200 ;0x00003200           ;eflags  (CPL = 3, interrupções habilitadas)	
+	dd ring0_ghost_task     ;eip  ;0x401000  
+	dd 0x00000200           ;eflags  (CPL = 3, interrupções habilitadas) ;0x00003200
 	dd 0                    ;eax
 	dd 0                    ;ecx
 	dd 0                    ;edx
-	dd 0                    ;ebx	
-	dd 0x0044FFF0  ;;0x43ffff             ;esp   (stack em user mode)
+	dd 0                    ;ebx
+	dd 0x0044FFF0           ;esp   (stack em user mode) (;;0x43ffff)
 	dd 0                    ;ebp
 	dd 0                    ;esi
 	dd 0                    ;edi
-	dd 0x10 ;0x23                 ;es 
-	dd 0xB  ;0x1B                 ;cs 
-	dd 0x10 ;0x23                 ;ss
-	dd 0x10 ;0x23                 ;ds
-	dd 0x10 ;0x23                 ;fs
-	dd 0x10 ;0x23                 ;gs 
-	dw LDT_TEST_SEL, 0	    ;LDT, reserved
-	dw 0, tss0_iopb - tss0  ;debug, IO permission bitmap (none)	
+	dd 0x10                 ;es  ;0x23 
+	dd 0xB                  ;cs  ;0x1B 
+	dd 0x10                 ;ss  ;0x23
+	dd 0x10                 ;ds  ;0x23
+	dd 0x10                 ;fs  ;0x23
+	dd 0x10                 ;gs  ;0x23 
+	dw LDT_TEST_SEL, 0      ;LDT, reserved
+	dw 0, tss0_iopb - tss0  ;debug, IO permission bitmap (none)
 tss0_iopb:
     times 8192 db 0FFh    ;#bugbug: Isso é realmente necessário.
 tss0_end:
-	
-    
-    
+
+
+
 ;=====================================================
 ;tss1
 dd 0
 dd 0
-tss1:		          
-	dd 0x401000 ;;_task0               ;back link  #bugbug tá certo isso ??
+tss1:
+	dd 0x401000             ;back link  _task0 #bugbug 
 	dd 0x003FFFF0           ;esp0    (pilha do kernel), endereço físico.
 	dd 0x10                 ;ss0      (ss da pilha do kernel)   
 	dd 0                    ;esp1
-	dd 0                    ;ss1	
+	dd 0                    ;ss1
 	dd 0                    ;esp2
-	dd 0                    ;ss2	
+	dd 0                    ;ss2
 	dd 0x9C000              ;cr3 #bugbug: Isso deve ser o cr3 do processo em ring3.
 	dd 0x401000             ;eip   
-	dd 0x00003200           ;eflags  (CPL = 3, interrupções habilitadas)	
+	dd 0x00003200           ;eflags  (CPL = 3, interrupções habilitadas)
 	dd 0                    ;eax
 	dd 0                    ;ecx
 	dd 0                    ;edx
-	dd 0                    ;ebx	
-	dd 0x0044FFF0  ;;0x43ffff             ;esp (stack em user mode)
+	dd 0                    ;ebx
+	dd 0x0044FFF0           ;esp (stack em user mode) ;;0x43ffff
 	dd 0                    ;ebp
 	dd 0                    ;esi
 	dd 0                    ;edi
@@ -129,41 +130,40 @@ tss1:
 	dd 0x23                 ;ds
 	dd 0x23                 ;fs
 	dd 0x23                 ;gs 
-	dw LDT_TEST_SEL, 0	    ;LDT, reserved
+	dw LDT_TEST_SEL, 0      ;LDT, reserved
 	dw 0, tss1_iopb - tss1  ;debug, IO permission bitmap (none)	
 tss1_iopb:
-    times 8192 db 0FFh    ;@todo: Isso é realmente necessário.
+    times 8192 db 0FFh      ;#todo: Isso é realmente necessário.?
 tss1_end:
-;
-;fim
-;
+;;--
 
-;
-; LDTs.
-;
+
+;;
+;; == LDTs ============================================
+;;
+
  
 ;
 ;ldt 0.
 dd 0
 dd 0
-ldt0:	
+ldt0:
 	dq 0x0000000000000000    ;null 
-	dq 0x00c0fa01000003ff    ;0x0f, base = 0x10000	
+	dq 0x00c0fa01000003ff    ;0x0f, base = 0x10000
 	dq 0x00c0f201000003ff    ;0x17
-	
+
 ;
 ;ldt 1.
 dd 0
 dd 0
-ldt1:	
+ldt1:
 	dq 0x0000000000000000   ;null
 	dq 0x00c0fa01000003ff   ;0x0f, base = 0x10000
-    dq 0x00c0f201000003ff   ;0x17	
-;
-;fim.
-;
-	
-	
+    dq 0x00c0f201000003ff   ;0x17
+;;--
+
+
+
 
 ;;==================================================================
 ; _setup_system_interrupt: 
@@ -177,41 +177,42 @@ ldt1:
 
 global _setup_system_interrupt
 _setup_system_interrupt:
-    
-    ;cli
-	pushad
+
+    pushad
 
     mov dword [.address], eax    ;endereço.
     mov dword  [.number], ebx    ;número do vetor.
-	
-	;calcula o deslocamaneto
-	mov eax, dword 8
-	mov ebx, dword [.number]
-	mul ebx
-	;resuldado em eax
-	
-	;adiciona o deslocamento à base.
-	mov edi, dword _idt               
-	add edi, eax
-	
-	mov edx, dword [.address] 
-	
-	mov eax, dword 0x00080000    ;/* selector = 0x001B = user cs */	
-	mov ax, dx		             ;uma parte do endereço
-	mov dx, word 0xEE00	         ;/* interrupt gate - dpl=3, present */
-	
-	;coloca o vetor na idt
-	mov dword [edi+0], eax
-	mov dword [edi+4], edx
-	
- 	;recarrega a nova idt
-	;lidt [IDT_register]	
-	
-	popad
-	;sti  ;; #cuidado.    
-	ret
+
+    ;Calcula o deslocamaneto
+    mov eax, dword 8
+    mov ebx, dword [.number]
+    mul ebx
+    ;resuldado em eax
+
+    ;Adiciona o deslocamento à base.
+    mov edi, dword _idt               
+    add edi, eax
+
+    mov edx, dword [.address] 
+
+    mov eax, dword 0x00080000    ; /* selector = 0x001B = user cs */
+    mov ax, dx                   ; uma parte do endereço
+    mov dx, word 0xEE00          ; /* interrupt gate - dpl=3, present */
+
+    ;Coloca o vetor na idt
+    mov dword [edi+0], eax
+    mov dword [edi+4], edx
+
+    ; Do not load.
+    ;recarrega a nova idt
+    ;lidt [IDT_register]
+
+    popad
+    ret
+
 .address: dd 0
 .number: dd 0
+;;--
 
 
 ;=============================================
@@ -220,19 +221,20 @@ _setup_system_interrupt:
 ;
 
 setup_faults:
-	push eax
-	push ebx
-	
+
+    push eax
+    push ebx
+
 	;#0  
-	mov eax, dword _fault_N0
-	mov ebx, dword 0
-	call _setup_system_interrupt	
-	
+    mov eax, dword _fault_N0
+    mov ebx, dword 0
+    call _setup_system_interrupt
+
 	;#1  
-	mov eax, dword _fault_N1
-	mov ebx, dword 1
-	call _setup_system_interrupt	
-	
+    mov eax, dword _fault_N1
+    mov ebx, dword 1
+    call _setup_system_interrupt
+
 	;#2  
 	mov eax, dword _fault_N2
 	mov ebx, dword 2
@@ -381,29 +383,30 @@ setup_faults:
 	;#31 
 	mov eax, dword _fault_N31
 	mov ebx, dword 31
-	call _setup_system_interrupt	
-	
+	call _setup_system_interrupt
+
 	pop ebx
 	pop eax
-	ret	
-	
+    ret
+
+
 
 ;=====================================
 ; setup_vectors:
 ;    Configura alguns vetores da idt.
-;	
+;
 
 setup_vectors:
-	push eax
-	push ebx 
-	
+
+    push eax
+    push ebx 
 
 	;32
 	;Timer.
 	;Iniciamos um timer provisório, depois o main() inicia o definitivo.
 	mov eax, dword _timer_test    
 	mov ebx, dword 32
-	call _setup_system_interrupt	
+	call _setup_system_interrupt
 
 	;33
 	;Keyboard.
@@ -421,32 +424,33 @@ setup_vectors:
 	;Mouse.
 	mov eax, dword  _irq12
 	mov ebx, dword 44
-	call _setup_system_interrupt	
+	call _setup_system_interrupt
 	
 	;46
 	;ide
-	mov eax,  dword _irq14     
+	mov eax,  dword _irq14 
 	mov ebx, dword 46
-	call _setup_system_interrupt	
+	call _setup_system_interrupt
 
 	;47
 	;ide
-	mov eax,  dword _irq15     
+	mov eax,  dword _irq15 
 	mov ebx, dword 47
-	call _setup_system_interrupt	
-	
-    
+	call _setup_system_interrupt
+
+
     ;;
-    ;; system calls.
+    ;; == System calls ===========================
     ;;
 
     ;128 - 0x80
 	;A interrupção de sistema.
 	;#obs: 
 	;Utilizamos uma chamada diferente para configurar essa interrupção.
-	mov eax, dword _int128
-	mov ebx, dword 128
-	call _setup_system_interrupt  
+
+    mov eax, dword _int128
+    mov ebx, dword 128
+    call _setup_system_interrupt  
 
 
     ;;#test
@@ -454,13 +458,13 @@ setup_vectors:
     ;; quem usará isso será a thread primária do processo init.
     ;; apenas uma vez.
     
-	mov eax, dword _int129
-	mov ebx, dword 129
-	call _setup_system_interrupt  
+    mov eax, dword _int129
+    mov ebx, dword 129
+    call _setup_system_interrupt  
 
 
     ;;test
-	;;fork
+    ;;fork
 	mov eax, dword _int133
 	mov ebx, dword 133
 	call _setup_system_interrupt  
@@ -468,23 +472,22 @@ setup_vectors:
     ;213
 	;Executa nova tarefa.
 	mov eax, dword _int213
-	mov ebx, dword 213        
-	call _setup_system_interrupt	
+	mov ebx, dword 213   
+	call _setup_system_interrupt
 	
 	
     ;216
 	;Fast Create Window.
 	mov eax, dword _int216
 	mov ebx, dword 216        
-	call _setup_system_interrupt	
-	
-	;; ...	
-	
+	call _setup_system_interrupt
+
+	;; ...
+
     
 	pop ebx
 	pop eax
-	ret
-
+    ret
 
 
 
@@ -543,21 +546,25 @@ _asm_nic_create_new_idt_entry:
 ;  _contextCS      -  user code + RPL
 ;  _contextEIP*    -  *** entry point da tarefa.
 ;
-; PS:. Essa rotina é chamada pelo kernel depois de 
+; PS: 
+; Essa rotina é chamada pelo kernel depois de 
 ; salvo o contexto da thread interrompida.
 ;
+
+;; #bugbug
+;; What is this?
 
 global _do_executa_new_task
 _do_executa_new_task:	
 
-    ;ajusta segmentos e RPL
-	xor eax, eax	
-    mov ax, 0x23        
-    mov ds, ax                 
+    ;Ajusta segmentos e RPL
+    xor eax, eax
+    mov ax, 0x23
+    mov ds, ax 
     mov es, ax
-    mov fs, ax ;Mudar para 0. ??
-    mov gs, ax ;Mudar para 0. ??
-  
+    mov fs, ax ;0
+    mov gs, ax ;0
+
 	;ss   USER_DATA_SEL+RPL
 	xor eax, eax
 	mov ax, word 0x23    ;user data com rpl = 3.
@@ -580,12 +587,13 @@ _do_executa_new_task:
 	
     mov al, 0x20
     out 0x20, al 
-	sti	
-	iretd
 
-	
+    sti
+    iretd
+
+
 ;--------------------------------------------
-; set_base:	
+; set_base:
 ;     ??
 ;
 ; in: 
@@ -594,54 +602,59 @@ _do_executa_new_task:
 ;    ecx - table addr. 
 ;    edi - descriptors offset.
 ;
+
 set_base:
-	add eax, ebx
-	add edi, ecx
-	mov [edi+2], word ax
-	
-	ror eax, 16
-	
-	mov [edi + 4], al
-	mov [edi +7],  ah
-	ror eax, 16
-	ret
-	
+
+    add eax, ebx
+    add edi, ecx
+    mov [edi+2], word ax
+
+    ror eax, 16
+
+    mov [edi + 4], al
+    mov [edi +7],  ah
+    ror eax, 16
+    ret
+
 
 ;------------------------------------------------------------
 ; _test_cpuid_support:
 ;     Testar via eflags se a cpu suporta a instrução cpuid. 
-; @todo: Essa rotina poderia se chamar _headlibTestCPUIDSupport.
 ;
-global _test_cpuid_support	
-_test_cpuid_support:	
-	
-	;cpuid supported?
+; cpuid supported?
+;
+
+global _test_cpuid_support
+_test_cpuid_support:
+
     pushfd                  ;push the flags onto the stack.
     pop eax                 ;pop them back out, into EAX.
-    
-	mov ebx, eax            ;keep original.
-    
-	xor eax, 00200000h      ;turn bit 21 on.
-    
-	push eax                ;put altered EAX on stack.
+
+    mov ebx, eax            ;keep original.
+
+    xor eax, 00200000h      ;turn bit 21 on.
+
+    push eax                ;put altered EAX on stack.
     popfd                   ;pop stack into flags.
-	
-	pushfd                  ;push flags back onto stack.
+
+    pushfd                  ;push flags back onto stack.
     pop eax                 ;put them back into EAX.
     
-	cmp eax, ebx
-    jnz @CPUID_SUPPORTED    ;COOL.
+    cmp eax, ebx
+    jnz _CPUID_SUPPORTED    ;COOL.
                 
-	mov eax, dword 1
-	;blah                   ;booo.
-	stc
-	RET
-@CPUID_SUPPORTED:
+    mov eax, dword 1
+    ;blah                   ;booo.
+    stc
+    RET
+ 
+_CPUID_SUPPORTED:
     mov eax, dword 0
     clc 
-	RET
-	
-	
+    RET
+
+
+
 ;==========================================================
 ; _get_page_dir:
 ;     Pega o valor de cr3.

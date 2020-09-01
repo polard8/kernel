@@ -536,48 +536,40 @@ clone_and_execute_process (
 {
 
 
-    // #bugbug
-    // We need to get the directory size to allocate a buffer
-    // to this directory.
-    
+    // #bugbug (fs)
+    // We need to get the fs directory size to allocate a buffer
+    // to this fs directory.
     
 
     struct process_d *Current;
     struct process_d *Clone;
 
+    int Status = -1;
+    int PID = -1;
+
     unsigned long *dir;
     unsigned long old_dir_entry1=0;
 
-    int PID = -1;
-    int Ret = -1;
 
-    int Status = -1;
-    int __Status = -1;
-    
+    // File support.
     unsigned long dir_address = 0;
 
+    char *path;
+    char *name;
+
+    // Socket support.
     //indice usado na inicializaçao da lista de 
     //conexoes pendentes do processo servidor.
     int sIndex=0;
-   
 
-    // # sobre debug:
-    // Essa rotina está falhando na máquina real às vezes.
-    // Precisamos usar printf para verbose, pois não podemos
-    // usar porta serial ainda.
 
     // #debug
     debug_print ("clone_and_execute_process: [FIXME] It's a work in progress\n");
     printf      ("clone_and_execute_process:\n");
 
 
-    char *path;
-    char *name;
-    
     path = filename;
     name = filename;
-
-    
     
     // #todo
     // Essas rotinas de procura e garregamento podem ir para outro lugar.
@@ -680,8 +672,8 @@ __search:
     // Procura o nome no diretorio carregado anteriormente.
     // Que eh o diretorio raiz
 
-    __Status = (int) KiSearchFile ( name, dir_address );
-    if (__Status == 1){ goto __found; }
+    Status = (int) KiSearchFile ( name, dir_address );
+    if (Status == 1){ goto __found; }
 
 
 
@@ -804,19 +796,21 @@ __found:
         old_dir_entry1 = dir[1]; //salvando
 
 
-		//salvando o endere�o f�sico da imagem que existe no processo.
-		//old_image_pa = (unsigned long) virtual_to_physical ( Current->Image, gKernelPageDirectoryAddress ); 
+        // Salvando o endereço fisico da imagem 
+        // que existe no processo.
+        // old_image_pa = (unsigned long) virtual_to_physical ( Current->Image, gKernelPageDirectoryAddress ); 
 
         //#debug
         //printf(">>> check current process: %d %d \n", current_process, Current->pid );
+        
         goto do_clone;
         // ...
     };
 
 
-	//
-	// Clone.
-	//
+    //
+    // == Clone =========================================
+    //
 
 do_clone:
 
@@ -867,12 +861,18 @@ do_clone:
         // até mesmo o endereço do diretório de páginas.
         // See: process.c
 
-        processCopyMemory(Current);
-        
-        Ret = processCopyProcess( Current->pid, Clone->pid );
+        // Explicando:
+        // Copia a imagem do processo atual e salva o endereço
+        // da copia num elemento da estrutura passada como argumento.
 
-        if ( Ret != 0 ){
-            panic ("clone_and_execute_process: processCopyProcess fail\n");
+        Status = processCopyMemory(Current);
+        if ( Status != 0 ){
+            panic ("clone_and_execute_process: [FAIL] processCopyMemory\n");
+        }
+
+        Status = processCopyProcess( Current->pid, Clone->pid );
+        if ( Status != 0 ){
+            panic ("clone_and_execute_process: [FAIL] processCopyProcess\n");
         }
 
 
@@ -1072,12 +1072,12 @@ do_clone:
 		//#hackhack
 
 		// [pai]
-		Current->control->state = READY;
+        Current->control->state = READY;
 
 
 		// [filho]
-		Clone->control->saved = 0;
-		SelectForExecution(Clone->control);
+        Clone->control->saved = 0;
+        SelectForExecution(Clone->control);
 
 
         // Se o processo filho herdar o floxo padr�o, ent�o o 

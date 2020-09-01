@@ -1732,28 +1732,33 @@ void *sys_create_thread (
     int ppid, 
     char *name )
 {
-    struct thread_d *t;
+    struct thread_d *Thread;
 
 
     debug_print ("sys_create_thread:\n");
 
-	//@todo filtros, para ponteiros NULL.
-
-	// Create thread.
-    t = (struct thread_d *) create_thread ( room, desktop, window, 
-                        init_eip, priority, ppid, name ); 
-
-    if ( (void *) t == NULL )
-    {
-        //#todo
-        //debug_print ("sys_create_thread: create_thread fail\n");
+    // #todo:
+    // Filtros, para ponteiros NULL.
+    
+    if ( init_eip == 0 ){
+        debug_print ("sys_create_thread: [FAIL] init_eip\n");
         return NULL;
     }
 
 
-    SelectForExecution ( (struct thread_d *) t );
+    // Create thread.
+    
+    Thread = (struct thread_d *) create_thread ( room, desktop, window, 
+                        init_eip, priority, ppid, name ); 
 
-    return (struct thread_d *) t;
+    if ( (void *) Thread == NULL ){
+        debug_print ("sys_create_thread: [FAIL] Thread\n");
+        return NULL;
+    }
+
+    SelectForExecution ( (struct thread_d *) Thread );
+
+    return (struct thread_d *) Thread;
 }
 
 

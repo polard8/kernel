@@ -1,5 +1,5 @@
 ;
-; File: x86/head/hw.inc 
+; File: x86/hw.inc 
 ;
 ; Descrição:
 ;     Interrupções de hardware.
@@ -95,6 +95,7 @@ extern _current_process_pagedirectory_address
 ;;...
 
 
+
 ;;=====================================================
 ;;  ## TIMER ##
 ;;=====================================================
@@ -112,11 +113,11 @@ _irq0:
     ;; == Save context ====================
     
     ;; Stack frame. (all double)
-    pop dword [_contextEIP]     ; eip 
-    pop dword [_contextCS]      ; cs  
-    pop dword [_contextEFLAGS]  ; eflags 
-    pop dword [_contextESP]     ; esp 
-    pop dword [_contextSS]      ; ss  
+    pop dword [_contextEIP]     ; eip
+    pop dword [_contextCS]      ; cs
+    pop dword [_contextEFLAGS]  ; eflags
+    pop dword [_contextESP]     ; esp
+    pop dword [_contextSS]      ; ss
 
     mov dword [_contextEDX], edx 
     mov dword [_contextECX], ecx 
@@ -140,23 +141,25 @@ _irq0:
     ;; #todo
     ;; Media, float pointers, debug.
 
-
+    ;; #important:
+    ;; We are using the kernel segment registers.
     ;; Kernel data segments and stack.
+
     xor eax, eax
     mov ax, word 0x10
     mov ds, ax
     mov es, ax
-    mov fs, ax 
-    mov gs, ax 
+    mov fs, ax
+    mov gs, ax
     mov ss, ax
     mov eax, 0x003FFFF0 
-    mov esp, eax 
+    mov esp, eax
 
     ;; Timer support. No task switch.
-    call _KiTimer  
+    call _KiTimer
 
     ;; Task switching.
-    call _KiTaskSwitch 
+    call _KiTaskSwitch
 
     ;Flush TLB.
     jmp dummy_flush
@@ -193,8 +196,8 @@ dummy_flush:
     mov edx, dword [_contextEDX] 
 
     ;; Stack frame. (all double)
-    push dword [_contextSS]      ; ss 
-    push dword [_contextESP]     ; esp 
+    push dword [_contextSS]      ; ss
+    push dword [_contextESP]     ; esp
     push dword [_contextEFLAGS]  ; eflags
     push dword [_contextCS]      ; cs
     push dword [_contextEIP]     ; eip
@@ -207,7 +210,8 @@ dummy_flush:
     mov eax, dword [_contextEAX]
 
     ;; #bugbug
-    ;; We don't need the sti. The flags in the eflags will reenable it.
+    ;; We do NOT need the 'sti'. 
+    ;; The flags in the 'eflags' will reenable it.
     ;; sti
 
     iretd

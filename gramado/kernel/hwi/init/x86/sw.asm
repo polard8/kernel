@@ -1,5 +1,5 @@
 ;
-; File: bottom/init/sw.inc 
+; File: x86/sw.inc 
 ;
 ; Descri��o:
 ;     Interrup��es de software.
@@ -247,31 +247,150 @@ __int133Ret: dd 0
 
 
 
+;======================================
+; 
+; Isso eh uma segunda opcao de interrupcao de sistema.
+; A intencao aqui eh entrarmos no kernel usando os registradores
+; de segmento do kernel e depois configurarmos novamente os
+; registradores de segmento do processo, sem trocarmos de processo
+;
+
+;; #todo
+;; Created, but not tested yet.
+;; We need to create the handler yet.
+
+global _new_system_interrupt
+_new_system_interrupt:
+
+    cli
+
+    ;; == Save context ====================
+    
+    ;; Stack frame. (all double)
+    pop dword [_contextEIP]     ; eip
+    pop dword [_contextCS]      ; cs
+    pop dword [_contextEFLAGS]  ; eflags
+    pop dword [_contextESP]     ; esp
+    pop dword [_contextSS]      ; ss
+
+    mov dword [_contextEDX], edx 
+    mov dword [_contextECX], ecx 
+    mov dword [_contextEBX], ebx 
+    mov dword [_contextEAX], eax 
+    mov dword [_contextEBP], ebp 
+    mov dword [_contextEDI], edi 
+    mov dword [_contextESI], esi 
+
+    ; Segments
+    xor eax, eax
+    mov ax, gs
+    mov word [_contextGS], ax
+    mov ax, fs
+    mov word [_contextFS], ax
+    mov ax, es
+    mov word [_contextES], ax
+    mov ax, ds
+    mov word [_contextDS], ax
+
+    ;; #todo
+    ;; Media, float pointers, debug.
+
+    ;; #important:
+    ;; We are using the kernel segment registers.
+    ;; Kernel data segments and stack.
+
+    xor eax, eax
+    mov ax, word 0x10
+    mov ds, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
+    mov ss, ax
+    mov eax, 0x003FFFF0 
+    mov esp, eax
+
+    ; #todo
+    ; We need to create and import this function.
+    
+    ;call _NewServiceHandler
+
+
+    ;Flush TLB.
+    jmp new_dummy_flush
+    ;; NOP
+new_dummy_flush:
+    mov EAX, CR3  
+    IODELAY 
+    nop
+    nop
+    nop
+    nop
+    nop
+    mov CR3, EAX  
+
+    ;; == Restore context ====================
+
+    ; Segments (It belongs to the process)
+    xor eax, eax
+    mov ax, word [_contextDS]
+    mov ds, ax
+    mov ax, word [_contextES]
+    mov es, ax
+    mov ax, word [_contextFS]
+    mov fs, ax
+    mov ax, word [_contextGS]
+    mov gs, ax
+
+    mov esi, dword [_contextESI] 
+    mov edi, dword [_contextEDI] 
+    mov ebp, dword [_contextEBP] 
+    mov eax, dword [_contextEAX] 
+    mov ebx, dword [_contextEBX] 
+    mov ecx, dword [_contextECX] 
+    mov edx, dword [_contextEDX] 
+
+    ;; Stack frame. (all double)
+    push dword [_contextSS]      ; ss
+    push dword [_contextESP]     ; esp
+    push dword [_contextEFLAGS]  ; eflags
+    push dword [_contextCS]      ; cs
+    push dword [_contextEIP]     ; eip
+
+
+    ;; No EOI.
+    
+    ; Acumulator.
+    mov eax, dword [_contextEAX]
+
+    sti
+    
+    iretd
+
+
+
 
 
 ;======================================
 ; _int128:  0x80
-;    Interrup��o de SISTEMA. (padr�o).
+;
+;    System interrupt
 ;
 ; eax = ;arg1 (numero)
 ; ebx = ;arg2 (arg2)
 ; ecx = ;arg3 (arg3)
 ; edx = ;arg4 (arg4)
 ; ...  
-; _systemcall_entry
-; _systemcall_services
 ; 
-; @todo: Pelo jeito � natural entrar com muito mais argumentos.
-;        passados pelos registradores ebp, esi, edi.
+; #todo: 
+; Pelo jeito eh natural entrar com muito mais argumentos, 
+; passados pelos registradores ebp, esi, edi.
+; See: gde_serv.c
 ;++
 
 extern _gde_services
 
-;;
 global _int128
-_int128:  
-
-;;_system_call:
+_int128: 
 
     cli 
     pushad 
@@ -282,71 +401,51 @@ _int128:
     push gs
 
 
-	;;#bugbug
-	;;precisamos fazer isso, mas como fica depois ???
-	;;teste: esperamos que os pops restaurem os registradores de segmento.
-	
-	;;#importante
-	;;a quest�o � que o kernel est� usando a pilha do aplicativo,
-	;;se mudamos a pilha como faremos o pop.
-	;;se mudarmos a pilha para pilha do kernel, ent�o temos que fazer isso antes do push
-	;;e recuperarmos a pilha depois do pop .... isso seria um inferno.
-	;;##bugbug pelo jeito o kernel usa a pilha do aplicativo mesmo.
-	
-	;;-------------------
-	;;##bugbug: como pegaremos as mensagens de aplicativo se mudarmos o 
-	;;os registradores de segmento.	
-	;;no caso da interrup��o de timer isso talvez n�o seja problema,
-	;;pois todos os registradores s�o salvos.
-	;;--------------------
-	
+    ;; #bugbug
+    ;; We are not changing the segment registers.
+    ;; This way the kernel is able to access all the user data.
+    ;; Normally it is preserved only the register 'fs' to access
+    ;; the user data.
 
-;
-	;preparando os registradores, para funcionarem em kernel mode.
-	;xor eax, eax
-	;mov ax, word 0x10    ;Kernel mode segment.	
-	;mov ds, ax
-	;mov es, ax
-	;mov fs, ax  ;Usar seletor 0.
-	;mov gs, ax  ;Usar seletor 0.
-
-    ;Argumentos.	
+    ;;---------------
+    
+    ; Push arguments.
     push dword edx    ;arg4.
     push dword ecx    ;arg3. 
     push dword ebx    ;arg2. 
-    push dword eax    ;arg1 = {N�mero do servi�o}.
-	
+    push dword eax    ;arg1. {Service number}.
 
-	;;O handler padr�o � gde_services, que � um wrapper para os outros di�logos.
-	call _gde_services
-	
-	mov dword [.int128Ret], eax    
-    
-;; ret_from_interrupt:
-;; resume_userspace:
+    call _gde_services
 
-	;Argumentos.
+    mov dword [.int128Ret], eax    
+
+    ;; Pop arguments.
     pop eax
     pop ebx
     pop ecx
     pop edx 
-
+    
+    ;;---------------
 
     pop gs
     pop fs
     pop es
     pop ds
 
-    ;; #importante
-    ;; N�o pode ter eoi.
-
-    popad	
-    mov eax, dword [.int128Ret] 
+    ;; No EOI!
     
+    popad
+    mov eax, dword [.int128Ret] 
     sti
+
+    ; Fly!
+
     iretd
+    
 .int128Ret: dd 0
 ;--  
+
+
   
 
 ;;==========================

@@ -154,7 +154,11 @@ void *clone_kernel_page_directory (void){
 */
 
 
-
+/*
+ * initialize_frame_table:
+ *     What is this?
+ */
+ 
 int initialize_frame_table (void){
 
     int i=0;
@@ -263,16 +267,21 @@ unsigned long get_table_pointer (void)
 }
 
 
+/*
+ *********************************** 
+ * clone_directory:
+ *     Clone a given page directory.
+ * 
+ */
 
 // Para clonar um diretório.
 // Queremos clonar o diretório atual,
-// para que o processo filho tenha o memso diretório
-// do processo pai. 
+// para que o processo filho tenha o memso diretório do processo pai. 
 
 void *clone_directory( unsigned long directory_va ){
 
-    unsigned long destAddressVA; 
     int i=0;
+    unsigned long destAddressVA=0; 
 
 
     destAddressVA = (unsigned long) get_table_pointer(); 
@@ -283,6 +292,8 @@ void *clone_directory( unsigned long directory_va ){
 
     unsigned long *src = (unsigned long *) directory_va;
     unsigned long *dst = (unsigned long *) destAddressVA; 
+
+    // Copy.
 
     for ( i=0; i < 1024; i++ ){
         dst[i] = (unsigned long) src[i]; 
@@ -299,99 +310,36 @@ void *clone_directory( unsigned long directory_va ){
  **************************************************
  * CloneKernelPageDirectory:
  *
- *     Cria um page directory para um processo.
- *     Vamos clonar o diret�rio de p�ginas do kernel
- *
- * #importante:
- * Deve retornar o endere�o do diret�rio de p�ginas criado,
- * que � um clone do diret�rio de p�ginas do kernel.
- *
- * #importante:
- * Retornaremos o endere�o virtual, para que a fun��o create_process 
- * possa usar tanto o endere�o virtual quanto o f�sico.
+ *    Clone the kernel page diretory.
+ *    OUT: The virtual address of the new directory.
  */
-
-
-// Clonando o diret�rio do kernel.
-// Isso aparentemente est� funcionando bem,
 
 void *CloneKernelPageDirectory (void){
 
-    unsigned long destAddressVA=0; 
     int i=0;
+    unsigned long destAddressVA=0; 
 
 
-	// virtual address.
-	// Alocaremos uma p�gina apenas, pois tem 4KB.	
-
-    //
-    //  # PERIGO.
-    //
-
-	// #BUGBUG
-	// #PERIGO.
-	// Isso deu certo.
-	// >>> O endere�o precisa ter 12 bits zerados para flags,
-	// ent�o essa aloca��o � de 4KB em 4KB.
-
-
-	//destAddressVA = (unsigned long) newPage (); 
-    destAddressVA = (unsigned long) get_table_pointer();  //ok
+    //destAddressVA = (unsigned long) newPage (); 
+    destAddressVA = (unsigned long) get_table_pointer(); 
 
     if ( destAddressVA == 0 ){
         panic ("CreatePageDirectory: destAddressVA\n");
     }
 
 
-
-	// Talvez devamos limpar.
-	//memset ( destAddressVA, 0, sizeof(1024*4) );
-	
-	//
-	// 'src' and 'dest'
-	//	
-
-	// src.
-	// O endere�o do diret�rio de p�ginas do kernel.
-	// #importante: 
-	// Os endere�os f�sico e virtual dessa tabela s�o iguais.
-	
-	// dst.
-	// O endere�o do diret�rio de p�ginas clone.
-	// #importante:
-    // Precisamos usar o endere�o virtual para manipularmos os dados,
-	// pois estamos no esquema de mem�ria do kernel base.
-
+    // The virtual address of the kernel page directory and
+    // the virtual address of the new page directory.
+    // #bugbug: What directory we are using right now? kernel?
 
     unsigned long *src = (unsigned long *) gKernelPageDirectoryAddress;  
     unsigned long *dst = (unsigned long *) destAddressVA;  
 
-	
-	//
-	// ## Copiar ##
-	//
-
-	// #obs:
-    // Nesse momento j� temos o endere�o da origem e do destino.
-    // O endere�o l�gico e f�sico do diret�rio de p�ginas do kernel 
-    // s�o iguais, por�m os endere�os f�sico e virtual do diret�rio 
-    // de p�ginas clone s�o diferentes.
-    // #importante: 
-	// A rotina de c�pia do conte�do entre os buffers precisa usar 
-    // endere�os l�gicos, pois estamos usando o kernel base e sua 
-    // configura��o de mem�ria.	
-	
-	// Agora vamos apenas copiar o diret�rio de p�ginas do kernel 
-	// para o diret�rio de p�ginas clone. S�o 1024 dwords.	
-	
-	// #importante
-	// Retornamos um endere�o l�gico, que ser� transformado em f�sico
-	// para colocarmos no cr3.	
-	
+    // Copy.
+    
     for ( i=0; i < 1024; i++ ){
         dst[i] = (unsigned long) src[i];
     };
-
 
     // Done.
     // The virtual address of the new pagedirectory. 
@@ -448,9 +396,8 @@ CreatePageTable (
     unsigned long region_address )
 {
 
-    unsigned long *PD = (unsigned long *) directory_address_va;
-
     int i=0;
+    unsigned long *PD = (unsigned long *) directory_address_va;
 
 
 	//
@@ -493,7 +440,6 @@ CreatePageTable (
 	//unsigned long ptVA = (unsigned long) kmalloc(4096);  //bug (precisa 12bits zerados)
 	//unsigned long ptVA = (unsigned long) 0x1000;               //ok
 	unsigned long ptVA = (unsigned long) get_table_pointer();  //ok
-	
 
     if ( ptVA == 0 ){
         kprintf ("CreatePageTable: ptVA #bugbug\n");
@@ -628,7 +574,7 @@ void x86_SetCR3 (unsigned long pa)
         panic ("x86_SetCR3: 0 is not a valid address!");
     }
 
-    // See: kernel/init/x86/headlib.asm
+    // See: x86/headlib.asm
     asm volatile ("\n" :: "a"(pa) );
     
     set_page_dir();
@@ -718,10 +664,10 @@ unsigned long
 mapping_ahci1_device_address ( unsigned long pa )
 {
 
+    int i=0;
     unsigned long *page_directory = (unsigned long *) gKernelPageDirectoryAddress;      
 
-    int i=0;
-	
+
 	//##bugbug: 
 	//Esse endere�o � improvisado. Parece que n�o tem nada nesse endere�o.
 	//#todo: temos que alocar mem�ria e converter o endere�o l�gico em f�sico.
@@ -749,7 +695,7 @@ mapping_ahci1_device_address ( unsigned long pa )
     for ( i=0; i < 1024; i++ )
     {
         ahci1_page_table[i] = (unsigned long) pa | 0x1B; 
-        pa = (unsigned long) pa + 4096;  
+        pa = (unsigned long) (pa + 4096);
     };
 
 
@@ -779,9 +725,9 @@ unsigned long
 mapping_nic1_device_address ( unsigned long pa )
 {
 
-    unsigned long *page_directory = (unsigned long *) gKernelPageDirectoryAddress;      
-
     int i=0; 
+    unsigned long *page_directory = (unsigned long *) gKernelPageDirectoryAddress; 
+
 
 	//##bugbug: 
 	//Esse endere�o � improvisado. Parece que n�o tem nada nesse endere�o.
@@ -810,7 +756,7 @@ mapping_nic1_device_address ( unsigned long pa )
     for ( i=0; i < 1024; i++ )
     {
         nic0_page_table[i] = (unsigned long) pa | 0x1B;
-        pa = (unsigned long) pa + 4096;  
+        pa = (unsigned long) (pa + 4096); 
     };
 
 
@@ -859,12 +805,10 @@ mapping_nic1_device_address ( unsigned long pa )
  * PARTE BAIXA DA MEM�RIA F�SICA, OS PROGRAMAS EM USER MODE MANIPULAR�O
  * APENAS A MEM�RIA QUE LHES FOR CONCEDIDA.
  *
- * Hist�rico:
- *     2015 - Essa fun��o foi criada por Fred Nora.
- *     2016 - Revis�o.
+ * History:
+ *     2015 - Created by Fred Nora.
  *     ...
  */
-//int pagesSetUpPaging() 
 
 int SetUpPaging (void){
 
