@@ -1901,7 +1901,6 @@ do_compare:
     }
 
 
-
     // exec - Executa um programa fechando o shell.
     // o que segue o comando exec � um pathname.
     //@todo: podemos checar se o pathname � absoluto,
@@ -2529,27 +2528,27 @@ do_compare:
     // Test file
     // Carrega um arquivo no buffer de words 
     // depois exibe todo o buffer mantendo o posicionamento 
-    //no cursor. Isso for�a um scroll.
+    // no cursor. Isso for�a um scroll.
     if ( gramado_strncmp( prompt, "t1", 2 ) == 0 ){
         shellTestLoadFile ();
         goto exit_cmp;
     }
 
 
-	// t2 - Test bmp
-    if ( gramado_strncmp( prompt, "t2", 2 ) == 0 )
+    // t2 - Test fork()
+    if ( gramado_strncmp( prompt, "t2", 2 ) == 0 || 
+         gramado_strncmp( prompt, "test-fork", 9 ) == 0 )
     {
-        shellTestDisplayBMP ();
-        //refresh_screen();
+        shellTestFork();
         goto exit_cmp;
     }
 
 
     // t3 - Test thread
     if ( gramado_strncmp( prompt, "t3", 2 ) == 0 ||
-         gramado_strncmp( prompt, "test-thread", 11 ) == 0)
+         gramado_strncmp( prompt, "test-thread", 11 ) == 0 )
     {
-        shellTestThreads ();
+        shellTestThreads();
         goto exit_cmp;
     }
 
@@ -4124,6 +4123,22 @@ done:
 }
 
 
+void shellTestFork(void)
+{
+    int pid = -1;
+
+
+    debug_print("shellTestFork:\n");
+    
+    printf ("father pid = %d\n",getpid());
+
+    pid = fork();
+
+    printf ("return pid = %d\n",pid);
+    while(1){}
+}
+
+
 /*
  *************************************************************
  * shellTestThreads:
@@ -4131,102 +4146,81 @@ done:
  *     #bugbug ...j� funcionou uma vez, mas agora est� com problemas.
  *     @todo: na hora de criar a thread precisamos passar o PID desse processo.
  */
- 
-void shellTestThreads (void){
-	
-    void *T;	
-	
-	// Obs: 
-	// As threads criadas aqui s�o atribu�das ao processo PID=0.
-	// @todo: 
-	// No kernel, quando criar uma thread ela deve ser atribu�da
-    // ao processo que chamou a rotina de cria��o.	
-	
-	printf ("shellTestThreads: Creating threads..\n");
-	//apiCreateThread((unsigned long)&shellThread, 0x004FFFF0,"TestShellThread1");
-	//apiCreateThread((unsigned long)&shellThread, 0x004FFFF0,"TestShellThread2");
-	//apiCreateThread((unsigned long)&shellThread, 0x004FFFF0,"TestShellThread3");
-	//apiCreateThread((unsigned long)&shellThread, 0x004FFFF0,"TestShellThread4");
-	//...
-	
-	//
-	// # Criar e executar #
-	//
-	
-	// Tentando executar um thread.
-	// *******************************
-    // OBS: 
-	// ISSO J� FUNCIONOU. 
-	// ESTAMOS SUSPENDENDO PORQUE PRECISAMOS AUMENTAR O 
-	// TAMANHO DO HEAP USADO PELO PROCESSO PARA 
-	// ALOCA��O DIN�MICA, ELE N�O T� DANDO CONTA 
-    // DE TODA A DEMANDA POR MEM�RIA.		  
-	
-	//>>Dessa vez pegaremos o retorno, 
-	// que deve ser o ponteiro para a estrutura da thread.
-	// Obs: N�o podemos usar a estrutura porque ela est� 
-	// em ring0.
-	//>>Chamaremos a system_call que executa essa thread 
-	// que temos o ponteiro da estrutura.
+
+    // #obs: 
+    // As threads criadas aqui sao atribuidas ao processo PID=0.
+    // #todo: 
+    // No kernel, quando criar uma thread ela deve ser atribuida
+    // ao processo que chamou a rotina de criacao.
+
+
+// 'shellThread' is the function that is gonna run.
+
+// Status:
+// It is working.
+// We can create and run a thread in this test.
+
+void shellTestThreads (void)
+{
+
+    void *T;
     
-	void *ThreadTest1;	
-	
-	//#bugbug: 
-	// N�o temos mais espa�o no heap do preocesso 
-	// para alocar mem�ria pois gastamos o heap com 
-	// a imagem bmp. (isso aconteceu kkk).
+    void *Thread;
+    unsigned long *StackAddress;
 
-	unsigned long *threadstack1;
-	
 
+    printf ("shellTestThreads: \n");
+
+
+
+    //===================================================
     //++
-    gde_enter_critical_section ();
-	
-	// #importante:
-	// Como a torina de thread � bem pequena e o 
-	// alocador tem pouqu�ssimo heap, vamos alocar o m�nimo.
-	// Isso � apenas um teste, vamos var se a thread funciona 
-	// com um a pilha bem pequena. 2KB.
-	
-	threadstack1 = (unsigned long *) malloc (2*1024);
-	
-	//Ajuste para o in�cio da pilha.
-	//threadstack1 = ( threadstack1 + (2*1024) - 4 ); 
-	
-	//
-	// # Criando a thread #
-	//
-	
-//creating:
+    gde_enter_critical_section();
 
-    printf ("shellTestThreads: Tentando executar uma thread..\n");	
-
-    ThreadTest1  = (void *) gde_create_thread ( (unsigned long) &shellThread, 
-                                (unsigned long) (&threadstack1[0] + (2*1024) - 4), 
-                                "ThreadTest1" );
-
-    if ( (void *) ThreadTest1 == NULL )
-    {
-        printf ("shellTestThreads: apiCreateThread fail \n");
-        die ("shellTestThreads: ThreadTest1");
+    // Stack
+    StackAddress = (unsigned long *) malloc (2*1024);
+    
+    if ( (void *) StackAddress == NULL ){
+        printf ("shellTestThreads: [FAIL] StackAddress\n");
+        goto fail;
     }
 
-	// # executando #
-	
+
+    printf ("shellTestThreads: Creating the thread.\n");
+
+    Thread  = (void *) gde_create_thread ( (unsigned long) &shellThread, 
+                                (unsigned long) (&StackAddress[0] + (2*1024) - 4), 
+                                "ThreadTest1" );
+
+    if ( (void *) Thread == NULL ){
+        printf ("shellTestThreads: [FAIL] Thread\n");
+        goto fail;
+    }
+
 	// #importante:
-	// L� no kernel, isso deve selecionar a thread para 
-	// execuss�o colocando ela no estado standby.
-	// Logo em seguida a rotinad e taskswitch efetua o spawn.
-
-    gde_start_thread (ThreadTest1);
-    gde_exit_critical_section ();
+	// La no kernel, isso deve selecionar a thread para execussao, 
+	// colocando no estado standby.
+	// Logo em seguida a rotina de taskswitch efetua o spawn.
+    
+    printf ("shellTestThreads: Starting the thread.\n");
+    
+    gde_start_thread (Thread);
+    
+    gde_exit_critical_section();
     //--
+    //===================================================
 
+    printf ("gdeshell: done \n");
+    
+    // Permitir que o shell continue.
+    return;
 
+fail:
+    gde_exit_critical_section();
 
-	printf ("gdeshell: Tentando executar um thread [ok]..\n");
-	
-	//permitir que o shell continue.
+    printf ("gdeshell: Fail\n");
+    // Permitir que o shell continue.
+    return;
 }
 
 

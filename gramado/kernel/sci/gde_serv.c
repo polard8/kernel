@@ -1677,8 +1677,9 @@ gde_services (
         // obs: Não teremos fork na libcore. 
         // Talvez alguma variante.
         // A libcore porde virar algum tipo de api.
-        // See: action/fork.c
-        case SYS_FORK: 
+        // See: core/ps/action/clone.c
+        case SYS_FORK:
+            debug_print("[71]: SYS_FORK\n");
             return (void *) sys_fork_process();
             break;
 

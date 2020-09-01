@@ -8,22 +8,11 @@
 
 
 
-
-pid_t sys_fork_process (void)
-{
-    debug_print ("sys_fork_process: [TODO]\n");
-    
-    //return (pid_t) clone_process();
-    return -1;
-}
-
-
 /*
  ***************************************
  * clone_process 
  *     used for fork();
  */
- 
 
 pid_t clone_process (void){
 
@@ -39,7 +28,6 @@ pid_t clone_process (void){
     int Ret = -1;
     int i=0;
     int w=0;
-
 
 
     // #debug: 
@@ -83,37 +71,38 @@ pid_t clone_process (void){
 		//old_image_pa = (unsigned long) virtual_to_physical ( Current->Image, gKernelPageDirectoryAddress ); 		
 		
 	    // #debug
-	    // printf(">>> check current process: %d %d \n", current_process, Current->pid );		
+	    // printf(">>> check current process: %d %d \n", current_process, Current->pid );
 		goto do_clone;
 		//...
     };
 
 
-	//
-	// # Clone.
-	//
+    //
+    // == Clone ===============================================
+    //
 
-	// Cria uma estrutura do tipo processo, mas n�o inicializada.
-	
+	// Cria uma estrutura do tipo processo, mas nao inicializada.
+
 do_clone:
 
     // Creating a struct of type process.
     // It's not initialized yet.
 
-    Clone = (struct process_d *) processObject ();
+    Clone = (struct process_d *) processObject();
 
-    if ( (void *) Clone == NULL ){
-        printf ("clone_process: Clone struct fail \n");
+    if ( (void *) Clone == NULL )
+    {
+        printf ("clone_process: [FAIL] Clone\n");
         goto fail;
 
     } else {
 
         // Get a empty slot in the list of processes.
 
-        PID = (int) getNewPID ();
+        PID = (int) getNewPID();
 
         if ( PID <= 0 ){
-            printf ("clone_process: getNewPID fail %d \n", PID );
+            printf ("clone_process: [FAIL] getNewPID \n");
             goto fail;
         }
 
@@ -125,7 +114,7 @@ do_clone:
         processList[PID] = (unsigned long) Clone;
 
         //
-        // # Copy memory.
+        // == Copy image memory ===============================
         //
 
         // Copy memory.
@@ -133,9 +122,10 @@ do_clone:
         // Save the address in: 
         // Current->childImage and Current->childImage_PA.
 
-        processCopyMemory ( Current );
-
-
+        Ret = processCopyMemory (Current);
+        if ( Ret != 0 ){
+            panic ("clone_process: processCopyMemory\n");
+        }
 
         //
         // #debug 
@@ -159,16 +149,15 @@ do_clone:
 
 
         //
-        // Copy structure.
+        // == Copy process structure ===========================
         //
 
         // Creating a page directory for the child, and
         // Copying the father's structure.
 
         Ret = processCopyProcess ( Current->pid, Clone->pid );
-
         if ( Ret != 0 ){
-            panic ("clone_process: processCopyProcess fail\n");
+            panic ("clone_process: processCopyProcess\n");
         }
 
         // Creating a new pagetable for the child process's image.
@@ -191,8 +180,8 @@ do_clone:
         // Porém não resolve a pilha, que foi alocada em um endereço diferente.
         // Salvamos esse endereço precisamos mapear;
 
-       // Talvez mapear a pilha em outra pagetable
-       // possa ser uma solução.
+        // Talvez mapear a pilha em outra pagetable
+        // possa ser uma solução.
 
         //
         // # debug.
@@ -247,50 +236,46 @@ do_clone:
 		//
 		// Load child image.
 		//
-		
-		// #importante: 
-	    // Carregando a image do processo filho.
-		
-		
-        //fsLoadFile ( VOLUME1_FAT_ADDRESS, VOLUME1_ROOTDIR_ADDRESS, 
-	     //   "GDESHELL BIN", (unsigned long) Clone->Image );
-		
 
-		
-		
-		// Clonando manualmente a thread de controle.
-		// S� a imagem ... falta a pilha.
+        // #importante: 
+        // Carregando a image do processo filho.
+
+        //fsLoadFile ( VOLUME1_FAT_ADDRESS, VOLUME1_ROOTDIR_ADDRESS, 
+        //   "GDESHELL BIN", (unsigned long) Clone->Image );
+
+        // Clonando manualmente a thread de controle.
+        // S� a imagem ... falta a pilha.
 
         // #bugbug: size ???
         // Ja n�o fizemos isso quando chamamos processCopyMemory ???
         // l� copiamos 200kb
-	//	memcpy ( (void *) Clone->Image, (const void *) Current->Image, ( 0x50000 ) ); 
-		//memcpy ( (void *) Clone->Image, (const void *) Current->Image, (1024*200) );  //bugbug
+        // memcpy ( (void *) Clone->Image, (const void *) Current->Image, ( 0x50000 ) ); 
+        // memcpy ( (void *) Clone->Image, (const void *) Current->Image, (1024*200) );  //bugbug
 
         //====
-		Clone->control->ownerPID      = Clone->pid;
-		Clone->control->type          = Current->control->type; 
-		Clone->control->plane         = Current->control->plane;
-		Clone->control->base_priority = Current->control->base_priority;
-		Clone->control->priority      = Current->control->priority;
-		Clone->control->iopl          = Current->control->iopl;
-		Clone->control->preempted     = Current->control->preempted;
-		Clone->control->step          = 0;//Current->control->step;
-		Clone->control->quantum       = Current->control->quantum;
-		Clone->control->quantum_limit = Current->control->quantum_limit;
-		
-		// A thread do processo clone ainda n�o rodou.
-		Clone->control->standbyCount = 0;
-		Clone->control->runningCount = 0;
-		Clone->control->initial_time_ms = get_systime_ms();
-		Clone->control->total_time_ms = 0;
-		Clone->control->runningCount_ms = 0;
-		Clone->control->readyCount = 0;
-		Clone->control->ready_limit = READY_LIMIT;
-		Clone->control->waitingCount = 0;
-		Clone->control->waiting_limit = WAITING_LIMIT;
-		Clone->control->blockedCount = 0;
-		Clone->control->blocked_limit = BLOCKED_LIMIT;
+        Clone->control->ownerPID      = Clone->pid;
+        Clone->control->type          = Current->control->type; 
+        Clone->control->plane         = Current->control->plane;
+        Clone->control->base_priority = Current->control->base_priority;
+        Clone->control->priority      = Current->control->priority;
+        Clone->control->iopl          = Current->control->iopl;
+        Clone->control->preempted     = Current->control->preempted;
+        Clone->control->step          = 0;//Current->control->step;
+        Clone->control->quantum       = Current->control->quantum;
+        Clone->control->quantum_limit = Current->control->quantum_limit;
+
+        // A thread do processo clone ainda nao rodou.
+        Clone->control->standbyCount = 0;
+        Clone->control->runningCount = 0;
+        Clone->control->initial_time_ms = get_systime_ms();
+        Clone->control->total_time_ms = 0;
+        Clone->control->runningCount_ms = 0;
+        Clone->control->readyCount = 0;
+        Clone->control->ready_limit = READY_LIMIT;
+        Clone->control->waitingCount = 0;
+        Clone->control->waiting_limit = WAITING_LIMIT;
+        Clone->control->blockedCount = 0;
+        Clone->control->blocked_limit = BLOCKED_LIMIT;
 
         for ( w=0; w<8; w++ ){
             Clone->control->wait_reason[w] = (int) 0;
@@ -302,11 +287,8 @@ do_clone:
         Clone->control->umask  = Current->control->umask;
 
 
-		// CPU context
-
-
         //
-        // Stack frame.
+        // == Stack frame =========================================
         //
 
         // # Caution
@@ -352,28 +334,33 @@ do_clone:
         Clone->control->eflags = Current->control->eflags;
         Clone->control->cs     = Current->control->cs;
         
-        Clone->control->eip    = Current->control->eip;  // mesmo do pai.
-        //Clone->control->eip = 0x401000; //teste: para o clone começar do início.
+        //
+        // == EIP ==================================
+        //
+
+        printf (">> father eip = %x\n",Current->control->eip);
+        printf (">> child eip  = %x\n",Clone->control->eip);
+
+        // mesmo do pai.
+        Clone->control->eip = Current->control->eip;  
+
+        // O filho vai começar de onde parou o pai.
+        // Essa variavel eh so um salvamento.
+        Clone->control->initial_eip = Clone->control->eip;
 
 
-        Clone->control->initial_eip = Current->control->initial_eip;
-
-        printf (">> %x\n",Current->control->eip);
-        printf (">> %x\n",Clone->control->eip);
-
-
-		// more registers.
-		Clone->control->ds = Current->control->ds;
-		Clone->control->es = Current->control->es;
-		Clone->control->fs = Current->control->fs;
-		Clone->control->gs = Current->control->gs;
-		Clone->control->eax = 0;                       // Retornamos 0 para o filho.
-		Clone->control->ebx = Current->control->ebx;
-		Clone->control->ecx = Current->control->ecx;
-		Clone->control->edx = Current->control->edx;
-		Clone->control->esi = Current->control->esi;
-		Clone->control->edi = Current->control->edi;
-		Clone->control->ebp = Current->control->ebp;
+        // More registers.
+        Clone->control->ds = Current->control->ds;
+        Clone->control->es = Current->control->es;
+        Clone->control->fs = Current->control->fs;
+        Clone->control->gs = Current->control->gs;
+        Clone->control->eax = 0;                       // Retornamos 0 para o filho.
+        Clone->control->ebx = Current->control->ebx;
+        Clone->control->ecx = Current->control->ecx;
+        Clone->control->edx = Current->control->edx;
+        Clone->control->esi = Current->control->esi;
+        Clone->control->edi = Current->control->edi;
+        Clone->control->ebp = Current->control->ebp;
 
         // tss
         // mesma tss
@@ -384,35 +371,35 @@ do_clone:
         Clone->control->exit_code = 0;
         //====
 
-       //todo: tem outros elementos ...
-       Clone->ppid = Current->pid; 
-       Clone->uid  = Current->uid;
-       Clone->gid  = Current->gid;
-       Clone->tty  = Current->tty;
-       //strncpy(proc->name, curr_proc->name, NAME_MAX);
-       Clone->plane = Current->plane;
-       Clone->personality = Clone->personality;
-       Clone->base_priority = Current->base_priority;       
-       Clone->priority = Current->priority;
-       Clone->step = 0;
-       Clone->quantum = Current->quantum;
-       Clone->bound_type = Current->bound_type;
-       Clone->preempted = Current->preempted;
-       Clone->usession = Current->usession;
-       Clone->room     = Current->room;
-       Clone->desktop  = Current->desktop;
-       Clone->wait4pid = 0;
-       Clone->exit_code = 0;
-       Clone->nchildren = 0;
+        //todo: tem outros elementos ...
+        Clone->ppid = Current->pid; 
+        Clone->uid  = Current->uid;
+        Clone->gid  = Current->gid;
+        Clone->tty  = Current->tty;
+        //strncpy(proc->name, curr_proc->name, NAME_MAX);
+        Clone->plane = Current->plane;
+        Clone->personality = Clone->personality;
+        Clone->base_priority = Current->base_priority;       
+        Clone->priority = Current->priority;
+        Clone->step = 0;
+        Clone->quantum = Current->quantum;
+        Clone->bound_type = Current->bound_type;
+        Clone->preempted = Current->preempted;
+        Clone->usession = Current->usession;
+        Clone->room     = Current->room;
+        Clone->desktop  = Current->desktop;
+        Clone->wait4pid = 0;
+        Clone->exit_code = 0;
+        Clone->nchildren = 0;
        
-       Current->nchildren++;
+        Current->nchildren++;
        
-       //Clone->signal = 0;  //todo
-       Clone->umask = Current->umask;
+        //Clone->signal = 0;  //todo
+        Clone->umask = Current->umask;
        
-       Clone->iopl = Current->iopl;
-       //Clone->prev = NULL;
-       Clone->next = NULL;
+        Clone->iopl = Current->iopl;
+        //Clone->prev = NULL;
+        Clone->next = NULL;
 
         // Objects.
         for (i=0; i<32; i++){  
@@ -443,12 +430,11 @@ do_clone:
         //refresh_screen();
         //while(1){}
 
-		
 		// #importante
 		// O dispatcher precisa disso na hora que restaura
 		// o contexto.
 		// Mas isso ja foi feito antes quando copiamos o processo.
-		
+
         //#debug
         //printf("Directory PA %x \n",Clone->DirectoryPA);
         //refresh_screen();
@@ -456,11 +442,11 @@ do_clone:
 
         Clone->control->DirectoryPA = Clone->DirectoryPA;
 
-
         // [pai]
         Current->control->quantum = 30;
         Current->control->saved = 1;
         Current->control->state = READY;
+
 
         // [filho]
         // Esse é o melhor jeito.
@@ -469,22 +455,24 @@ do_clone:
         Clone->control->saved = 1;        // Está salvo
         Clone->control->state = READY;    // Está pronta para ser escalonada. 
 
-
         //
         // return
         //
 
+        // #importante:
+        // Retornamos para o processo pai o PID do filho.
 
-		// #importante:
-		// Retornamos para o processo pai o PID do filho.
-		
-		//pai
-		current_thread = Current->control->tid;
-		current_process = Current->pid;
-		
-		// Isso retornou corretamente para o processo pai
-		// o pid do filho.
+        // pai
+        current_process = Current->pid;
+        current_thread = Current->control->tid;
+
+        // #test
+        // Isso retornou corretamente para o processo pai
+        // o pid do filho.
+
         Current->control->eax = (unsigned long) Clone->pid;
+
+        debug_print ("clone_process: done\n");
         return (pid_t) Clone->pid;
     };
 
@@ -492,10 +480,35 @@ do_clone:
     // Fail.
 
 fail:
-
+    debug_print ("clone_process: Fail\n");
+    printf      ("clone_process: Fail\n");
+    refresh_screen();
+    
     return (pid_t) -1;
 }
 
+
+/*
+ *******************************************************
+ * sys_fork_process:
+ *     Service 71.
+ *     Iimplementation of the fork() system call.
+ */
+
+// #todo
+// It's not working.
+
+pid_t sys_fork_process (void)
+{
+    pid_t _pid = -1;
+    
+    debug_print ("sys_fork_process: [FIXME]\n");
+    
+    _pid = (pid_t) clone_process();
+
+    debug_print ("sys_fork_process: done\n");
+    return _pid;
+}
 
 
 /*
@@ -534,7 +547,6 @@ pid_t
 clone_and_execute_process (
     char *filename )
 {
-
 
     // #bugbug (fs)
     // We need to get the fs directory size to allocate a buffer

@@ -1070,6 +1070,7 @@ void shellHelp (void);
 void shellTree (void);
 void shellThread (void);
 void shellTestLoadFile (void);
+void shellTestFork(void);
 void shellTestThreads (void);
 void shellTestMBR (void);
 

@@ -351,23 +351,26 @@ void exit (int status)
 /*
  **************
  * fork:
- *
+ *     #define  UNISTD_SYSTEMCALL_FORK     71  
  */
 
 pid_t fork (void)
 {
     pid_t __ret = -1;
 
+    debug_print("fork: \n");
 
-    __ret = (pid_t) gramado_system_call( UNISTD_SYSTEMCALL_FORK, 
+    __ret = (pid_t) gramado_system_call ( UNISTD_SYSTEMCALL_FORK, 
                         0, 0, 0 );
     
-    if(__ret<0)
+    if (__ret<0)
     {
-         //errno = -__ret;
-         return (-1);
+        debug_print("fork: [FAIL]\n");
+        //errno = -__ret;
+        return (__ret);
     }
-    
+
+    debug_print("fork: Done\n");
     return (__ret);
 }
 
