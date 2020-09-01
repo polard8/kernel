@@ -409,7 +409,8 @@ void *CloneKernelPageDirectory (void){
  *     + Precisa ser um endere�o f�sico.
  *     + O diret�rio precisa ser um diret�rio v�lido.
  *
- * Argumentos:
+ * =====================================
+ * IN:
  *
  *     [directory_address]
  *         O endere�o do diret�rio onde colocaremos o endere�o 

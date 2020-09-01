@@ -1663,17 +1663,15 @@ void gde_set_client_area_rect (struct rect_d *r){
  *     Create a process.
  */
 
-void *
-gde_create_process ( 
-    unsigned long process_eip, 
-    unsigned long process_priority, 
-    char *name )
+void *gde_create_process ( 
+    char *name,
+    unsigned long process_priority )
 {
     gde_debug_print ("gde_create_process:\n");
     return (void *) system_call ( SYSTEMCALL_CREATEPROCESS, 
-                        process_eip, 
-                        process_priority, 
-                        (unsigned long) name );
+                        (unsigned long) name, 
+                        (unsigned long) process_priority, 
+                        (unsigned long) 0 );
 }
 
 

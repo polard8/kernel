@@ -2675,19 +2675,24 @@ do_compare:
 	// t16 - cancelado.
 
 
-	// t17 - create process
+    // t17 - create process
+    // #todo:
+    // No kernel, precisamos criar mais rotinas de suporte
+    // a criacao de processos.
+    // Temos poucas opçoes e tudo esta meio fora de ordem ainda.
+    
     void *P;
     if ( gramado_strncmp( prompt, "t17", 3 ) == 0 )
     {
-        printf (" Creating process\n");
+        printf ("t17: [FIXME] Creating process\n");
         
         // ?? critical session ??
         //#bugbug: O primeiro argumento está errado.
-        P = (void *) gde_create_process ( 0x400000, 
-                        PRIORITY_HIGH, "REBOOT2 BIN" );
-        if ( (void *) P == NULL ){
-            printf ("Fail creating process\n");
-        }
+        P = (void *) gde_create_process ( "SYSMON  BIN", PRIORITY_HIGH ); 
+                       
+        if ( (void *) P == NULL ){ printf ("Fail creating process\n"); }
+        
+        printf ("t17: Done\n");
         goto exit_cmp;
     }
 

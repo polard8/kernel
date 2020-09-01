@@ -29,6 +29,7 @@ struct gws_screen_d
 
     struct gws_window_d *root;
 };
+
 struct gws_screen_d *CurrentScreen;
 
 

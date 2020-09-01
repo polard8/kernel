@@ -69,8 +69,7 @@ void *sys_create_process (
     unsigned long priority, 
     int ppid, 
     char *name, 
-    unsigned long iopl,
-    unsigned long res2 );
+    unsigned long iopl );
 
 
 int sys_getpid (void);

@@ -3338,12 +3338,9 @@ unsigned long gde_get_cursor_y(void);
 
 // Create process.
 // #todo: This function needs more parameters.
-void *
-gde_create_process ( 
-    unsigned long process_eip, 
-    unsigned long process_priority, 
-    char *name );
-
+void *gde_create_process ( 
+    char *name,
+    unsigned long process_priority );
 
 //
 // Thread support

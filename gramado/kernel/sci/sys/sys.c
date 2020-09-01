@@ -1448,13 +1448,17 @@ sys_create_process (
     struct room_d     *room,
     struct desktop_d  *desktop,
     struct window_d   *window,
-    unsigned long res1, 
+    unsigned long res1,          //nothing
     unsigned long priority, 
     int ppid, 
     char *name,
-    unsigned long iopl, 
-    unsigned long res2 )
+    unsigned long iopl ) 
 {
+
+    // #todo: 
+    // Esse ultimo argumento eh o endereço do diretorio de paginas.
+    // Nao precisamos clonar novamente.
+     
 
    //#bugbug
    // o argumento directory_address está errado.
@@ -1480,33 +1484,54 @@ sys_create_process (
     
     
     
-    debug_print ("sys_create_process:\n");
+    debug_print ("sys_create_process: [FIXME]\n");
 
+
+    //
+    // == #bugbug ===============================================
+    //
+   
+    // This is a virtual address using the kernel page directory!
 
     // #bugbug
+    // (40 * 4096)  160KB  ??
     
-    // 40 * 4096
-    unsigned long tmp_size = (40 * 4096);
-    tmp_va = (unsigned long) allocPages(40); //40 páginas;
+    unsigned long tmp_image_size = (40 * 4096);   
+    tmp_va = (unsigned long) allocPages(40);   // 40 pages;
 
-    //#todo: validation
+
+    if ( tmp_va == 0 )
+        panic ("sys_create_process: [FAIL] tmp_va");
+            
+
+    //
+    // == Physical address ==============================
+    //
 
     tmp_pa = (unsigned long) virtual_to_physical ( tmp_va, 
                                  gKernelPageDirectoryAddress ); 
 
-            
-            
-	// loading image.
+    if ( tmp_pa == 0 )
+        panic ("sys_create_process: [FAIL] tmp_pa");
+ 
+
+    // loading image.
+    // Loading the image in the virtual address of the 
+    // kernel's page directory.
+    // Com base no endereço fisico criaremos uma pagetable com
+    // endereço virtual começando em 0x400000 como desejado.
+    
+    //printf ("sys_create_process: Loading the image in the address %x\n", tmp_va);
 
     fileret = (unsigned long) fsLoadFile ( VOLUME1_FAT_ADDRESS, 
                                   VOLUME1_ROOTDIR_ADDRESS, 
                                   32, //#bugbug: Number of entries.
                                   name, 
-                                  (unsigned long) tmp_va,
-                                  tmp_size );
+                                  (unsigned long) tmp_va,      // virtual base address
+                                  tmp_image_size );            // image size
 
 
-    // Se não encontramos init.bin
+    // Se não encontramos a imagem
     if ( fileret != 0 )
     {
         //fileret = (unsigned long) fsLoadFile ( VOLUME1_FAT_ADDRESS, 
@@ -1517,44 +1542,69 @@ sys_create_process (
 
         
         //if ( fileret != 0 ){
-            panic ("sys_create_process: [FILE] fileret. Couldn't load init.bin \n");
+            panic ("sys_create_process: [FILE] fileret. Couldn't load the image \n");
         //}
     }
+
+
+    //
+    // == Create process! ===================================
+    //
  
+    // Criamos um processo no endereço virtual 0x00400000
+    // de seu proprio diretorio de paginas, que eh um clone do
+    // diretorio do kernel.
 
     p = (void *) create_process ( room, desktop, window, 
                       (unsigned long) 0x00400000, //base
                       priority, 
                       ppid, 
                       name, 
-                      RING3, //iopl??
+                      RING3, 
                       (unsigned long ) CloneKernelPageDirectory() );
 
     if ( (void *) p == NULL ){
-        panic ("sys_create_process: p\n");
+        panic ("sys_create_process: [FAIL] p\n");
 
     }else{
         fs_initialize_process_pwd ( p->pid, "no-pwd" );
     };
     
     
+     //
+     // == page table =========================
+     //
+    
      // #bugbug
      // Precisa alocar um endereço físico para a nova imagem
      // mapear esse endereço em 0x400000 do diretorio do processo que
-     // acabamos de criar;
+     // acabamos de criar.
      
+     // Salvando o endereço fisico.
      p->ImagePA = tmp_pa;
 
+     // Criando uma pagetable
+     // #bugbug: ?? Nesse momento esse endereço virtual eh valido??
+     // Estamos usando qual diretorio de paginas ... ??
+     
+     // #bugbug
+     // Essa funcao nao sabera onde sta o diretorio de paginas
+     // pois esse argumento esta errado.
+     
+     // Isso fara com que o endereço 0x400000 aponte para o 
+     // endereço fisico de onde carregamos a imagem.
+     
      CreatePageTable ( (unsigned long) p->DirectoryVA, 
-            ENTRY_USERMODE_PAGES, p->ImagePA );
+         ENTRY_USERMODE_PAGES, 
+         p->ImagePA );
             
      // Com base no endereço físico, usamos a função acima
      // para atribuírmos um novo endereço virtual para a imagem.
      p->Image = 0x400000; // com base na entrada escolhida (ENTRY_USERMODE_PAGES)            
  
-    
+
     //
-    // Thread.
+    // == Thread ===================================
     //
 
 	// Create thread.
@@ -1567,7 +1617,7 @@ sys_create_process (
     if ( (void *) t == NULL )
     {
         debug_print ("sys_create_process: t fail\n");
-        return NULL;
+        goto fail;
     }
 
     // Marca ela como thread de cotnrole.
@@ -1575,8 +1625,16 @@ sys_create_process (
     
     SelectForExecution ( (struct thread_d *) t );
 
-
+    //ok
+    debug_print ("sys_create_process: Done\n");
+    printf      ("sys_create_process: Done\n");
+    refresh_screen();
     return (struct process_d *) p;
+
+fail:
+    printf ("sys_create_process: [FAIL]\n");
+    refresh_screen();
+    return NULL;
 }
 
 
@@ -1665,8 +1723,7 @@ void sys_exit_process ( int pid, int code ){
     // Enviar os argumentos via buffer.
 
 
-void *
-sys_create_thread ( 
+void *sys_create_thread ( 
     struct room_d     *room,
     struct desktop_d  *desktop,
     struct window_d   *window,

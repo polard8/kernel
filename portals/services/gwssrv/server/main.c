@@ -751,10 +751,15 @@ gwsProcedure (
         //MSG_GWS_HELLO
         case 1000:
             gwssrv_debug_print ("gwssrv: Message number 1000\n");
-            if ( (void*) gui->screen != NULL){
-            dtextDrawText ( (struct gws_window_d *) gui->screen,
-                long1, long2, COLOR_GREEN,
-                "gwssrv: Hello friend. This is the Gramado Window Server!");
+            //#bugbug: Esse endereço de estrutura esta mudando para um valor
+            //que nao podemos acessar em ring3.
+            if ( (void*) gui->screen != NULL)
+            {
+                //if ( gui->screen->used == 1 && gui->screen->magic == 1234 ){
+                    dtextDrawText ( (struct gws_window_d *) gui->screen,
+                        long1, long2, COLOR_GREEN,
+                       "gwssrv: Hello friend. This is the Gramado Window Server!");
+                //}
             } 
             gws_show_backbuffer();
             break;

@@ -96,7 +96,13 @@ int crt0 (void){
 
 	// #importante
 	// Linha de comandos passada pelo shell.
-
+	// See:
+	// globals/gva.h
+    // #define FRONTBUFFER_VA    0xC0400000
+    // #define BACKBUFFER_VA     0xC0800000
+    // So. We are using the top of the front buffer
+    // as a shared memory. No problem for now.
+    
     char *shared_memory = (char *) (0xC0800000 -0x100);
 
 

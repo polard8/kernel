@@ -1700,14 +1700,34 @@ gde_services (
         // 73
         // See: sci/sys/sys.c
         // Cria um processo e coloca a thread primária pra rodar.
-        case SYS_CREATEPROCESS:
-            return (void *) sys_create_process ( NULL, NULL, NULL, 
-                                arg2, arg3, 
-                                0, (char *) a4, 
-                                RING3, 
-                                (unsigned long ) CloneKernelPageDirectory() ); 
-            break;
+        // #bugbug: 
+        // Na inicializacao do kernel, nos criamos um processo
+        // usando create_process. Mas nesse momento estavamos usando
+        // o diretorio de paginas do kernel e os registradores de segmento
+        // pertenciam ao kernel.
+        // Nessa tentativa de criarmos um processo usando create_process
+        // as coisas estao um pouco diferentes ... provavelmente
+        // estamos usando o diretorio de paginas do processo e os
+        // registradores de segmento podem estar em ring3.
+        // ?? Talvez poderiamos criar um request, da mesma maneira 
+        // que fazemos com a criaçao de threads e o spawn.
 
+        // #todo
+        // Aqui no kernel, precisamos criar mais rotinas de suporte
+        // a criacao de processos.
+        // Temos poucas opçoes e tudo esta meio fora de ordem ainda.
+
+        // syscall: 
+        // arg2 = name
+        // arg3 = process priority
+        // arg4 = nothing
+        case SYS_CREATEPROCESS:
+            debug_print ("[73]: [FIXME] SYS_CREATEPROCESS\n");
+            return (void *) sys_create_process ( NULL, NULL, NULL, 
+                                0, arg3,        //res, priority
+                                0, (char *) a2, //ppid, name
+                                RING3 ); 
+            break;
 
 
 		//80 Show current process info.
