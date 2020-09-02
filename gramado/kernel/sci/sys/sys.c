@@ -1443,8 +1443,8 @@ fail:
         // qual é o processo atual e determina que ele será o 
         // processo pai. 
 
-void *
-sys_create_process ( 
+
+void *sys_create_process ( 
     struct room_d     *room,
     struct desktop_d  *desktop,
     struct window_d   *window,

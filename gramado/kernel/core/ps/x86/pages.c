@@ -389,8 +389,8 @@ void *CloneKernelPageDirectory (void){
 // #bugbug:
 // Isso aparentemente est� com problema. #testando ...
 
-void *
-CreatePageTable ( 
+
+void *CreatePageTable ( 
     unsigned long directory_address_va, 
     int dir_index, 
     unsigned long region_address )
@@ -441,8 +441,9 @@ CreatePageTable (
 	//unsigned long ptVA = (unsigned long) 0x1000;               //ok
 	unsigned long ptVA = (unsigned long) get_table_pointer();  //ok
 
-    if ( ptVA == 0 ){
-        kprintf ("CreatePageTable: ptVA #bugbug\n");
+    if ( ptVA == 0 )
+    {
+        panic ("CreatePageTable: ptVA\n");
     }
 
 
@@ -546,7 +547,7 @@ CreatePageTable (
     PD[dir_index] = (unsigned long) PD[dir_index] | 7; 
 
 	// Done.
-	// Retornaremos o endere�o virtual da pagetable,
+	// Retornaremos o endereço virtual da pagetable,
 	// para que a tabela possa ser manipulada pelo kernel.
 
     return (void *) ptVA;
