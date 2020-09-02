@@ -411,15 +411,13 @@ int fsList ( const char *dir_name ){
  *     dir_address = Ponteiro para um endere�o de mem�ria 
  *                   onde foi carregado o diret�rio. 
  */
- 
+
 void 
 fsFAT16ListFiles ( 
     const char *dir_name, 
     unsigned short *dir_address, 
     int number_of_entries )
 {
-	// #todo: 
-	// O n�mero de entradas � maior no diret�rio raiz.(512 ?)
 
     int i=0;
     unsigned long j=0;  // Deslocamento
@@ -432,36 +430,44 @@ fsFAT16ListFiles (
 
     if ( number_of_entries <= 0 )
     {
-        //message
+        debug_print ("fsFAT16ListFiles: [FAIL] number_of_entries\n");
         return;
     }
 
-    printf ("fsFAT16ListFiles: Listing names in [%s]\n\n", dir_name );
+    if ( number_of_entries >= 512 )
+    {
+        debug_print ("fsFAT16ListFiles: [FAIL] number_of_entries is too big\n");
+        return;
+    }
 
-	// Mostra.
+
+    if ( (void *) dir_name != NULL ){
+        printf ("fsFAT16ListFiles: Listing names in [%s]\n\n", 
+            dir_name );
+    }
+
+	// Mostra o nao vazio.
 
     i=0; 
     while (i < max)
     {
-		// Diferente de vazio.
-		if ( DirBaseAddress[j] != 0 )
-		{
-			//O problema � a termina��o da string '\0'
-			printf ("%s\n", &DirBaseAddress[j] );
+        if ( DirBaseAddress[j] != 0 )
+        {
+            //#bugbug
+            printf ("%s\n", &DirBaseAddress[j] );
         } 
-		
-		//(32/2) pr�xima entrada! (16 words) 512 vezes!
+
+        // (32/2) proxima entrada! 
+        // (16 words) 512 vezes!
+        
         j += 16;  
         i++;  
     }; 
 
+    // ...
 
-	//...
-	
-	//printf ("Done\n");
-	refresh_screen();
+    refresh_screen();
 }
-
 
 
 

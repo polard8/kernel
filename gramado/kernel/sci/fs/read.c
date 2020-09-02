@@ -891,17 +891,18 @@ void fs_load_fat(void){
 
 /*
  ***********************************************************
- * load_directory:
- *    Carrega o diretório na memória,
+ * load_sequential_directory:
+ *    Carrega um diretorio sequencial diretório na memória,
  * dados o endereço, o lba inicial e o número de setores.
  */
 
 // #bugbug
 // Aqui estamos falando de uma sequência de setores.
 // Isso serve para carregar o diretório raiz em fat16.
+// Mas nao server para carregar subdiretorios.
 
 int
-load_directory ( 
+__load_sequential_sectors ( 
     unsigned long address, 
     unsigned long lba, 
     unsigned long sectors )
@@ -922,6 +923,31 @@ load_directory (
 
 
 
+// Load metafile
+void 
+fs_load_metafile (
+    unsigned long buffer, 
+    unsigned long first_lba, 
+    unsigned long size )
+{
+
+    debug_print ("fs_load_metafile:\n");
+    
+    if (buffer == 0)
+        return;
+
+    if ( size == 0 )
+        return;
+    
+   
+    __load_sequential_sectors ( 
+        buffer, 
+        first_lba, 
+        size );
+}
+
+
+
 /*
  ****************************** 
  * fs_load_rootdir:
@@ -938,32 +964,12 @@ load_directory (
 void fs_load_rootdir (void)
 {
     debug_print ("fs_load_rootdir:\n");
-    load_directory ( VOLUME1_ROOTDIR_ADDRESS, VOLUME1_ROOTDIR_LBA, 32 );
-}
-
-
-
-/*
- * fs_load_dir:
- *     Carrega um dado diretório da lista de arquivos, 
- * dado o índice da lista de streams do kernel.
- */
- 
-int 
-fs_load_dir ( 
-    unsigned long address, 
-    unsigned long lba, 
-    unsigned long sectors )
-{
-    debug_print ("fs_load_dir:[Testing]\n");
     
-    // #todo:
-    // Limits
-    
-    return (int) load_directory ( address, lba, sectors );
+    __load_sequential_sectors ( 
+        VOLUME1_ROOTDIR_ADDRESS, 
+        VOLUME1_ROOTDIR_LBA, 
+        32 );
 }
-
-
 
 
 /*
@@ -1048,7 +1054,8 @@ unsigned long fsRootDirGetFileSize ( unsigned char *file_name ){
 
 
 	// Carregando o diretório raiz.
-	load_directory ( VOLUME1_ROOTDIR_ADDRESS, VOLUME1_ROOTDIR_LBA, 32 );
+    fs_load_rootdir();
+    //__load_sequential_sectors ( VOLUME1_ROOTDIR_ADDRESS, VOLUME1_ROOTDIR_LBA, 32 );
 
 	
 	//#todo:

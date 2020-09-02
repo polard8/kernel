@@ -516,6 +516,14 @@ void fs_set_fat_entry(unsigned long n, unsigned long value);
 unsigned long fs_check_fat (void);
 void fs_test_fat_vector (void);
 
+
+//Load metafile.
+void 
+fs_load_metafile (
+    unsigned long buffer, 
+    unsigned long first_lba, 
+    unsigned long size );
+
 // root dir support
 void fs_load_rootdir (void);
 
@@ -529,7 +537,7 @@ void fs_save_entry_on_root(unsigned long eid);
 // o lba inicial e o número de setores.
 
 int
-load_directory ( 
+__load_sequential_sectors ( 
     unsigned long address, 
     unsigned long lba, 
     unsigned long sectors );
@@ -641,13 +649,13 @@ void fs_set_entry(unsigned long id, unsigned long eid);
 void fs_get_entry(unsigned long id, unsigned long eid);
 
 
-
+/*
 int 
 fs_load_dir ( 
     unsigned long address, 
     unsigned long lba, 
     unsigned long sectors );
-
+*/
 
 
 int
