@@ -10,7 +10,7 @@
  *
  * 2020 - Created by Fred Nora.
  */
- 
+
 // Connecting via AF_INET.
 
 // tutorial example taken from. 
@@ -54,6 +54,158 @@
 
 #include <gwm.h>
 
+
+int MOUSE_WINDOW = -1;
+
+// i8042 mouse status bit.
+#define MOUSE_LEFT_BTN    0x01
+#define MOUSE_RIGHT_BTN   0x02
+#define MOUSE_MIDDLE_BTN  0x04
+#define MOUSE_X_SIGN      0x10
+#define MOUSE_Y_SIGN      0x20
+#define MOUSE_X_OVERFLOW  0x40
+#define MOUSE_Y_OVERFLOW  0x80
+
+
+
+long mouse_x = 0;
+long mouse_y = 0;
+
+char mouse_packet_data = 0;
+char mouse_packet_x = 0;
+char mouse_packet_y = 0;
+char mouse_packet_scroll = 0;
+
+char saved_mouse_x =0;
+char saved_mouse_y =0;
+
+
+/*
+ * =====================================================
+ * update_mouse:
+ *     Updates the mouse position.
+ */
+
+void update_mouse (void){
+
+//======== X ==========
+// Testando o sinal de x.
+// Do the x pos first.
+
+//pega o delta x
+//testa o sinal para x
+do_x:
+
+    if ( mouse_packet_data & MOUSE_X_SIGN ) 
+    {
+        goto x_neg;
+    }
+
+
+//Caso x seja positivo.
+x_pos:
+
+    mouse_x += mouse_packet_x;
+    goto do_y;
+
+
+//Caso x seja negativo.
+x_neg:
+
+    mouse_x -= ( ~mouse_packet_x + 1 );
+
+    if (mouse_x > 0)
+    {
+        goto do_y;
+    }
+    mouse_x = 0;
+ 
+ 
+//======== Y ==========
+// Testando o sinal de x. 
+// Do the same for y position.
+
+//Pega o delta y.
+//Testa o sinal para y.
+do_y:
+
+    if ( mouse_packet_data & MOUSE_Y_SIGN )
+    {
+        goto y_neg;
+    }
+
+
+//Caso y seja positivo.
+y_pos:
+
+    mouse_y -= mouse_packet_y;
+
+    if ( mouse_y > 0 )
+    {
+        goto quit;
+    }
+
+    mouse_y = 0;
+    goto quit;
+
+
+//Caso y seja negativo. 
+y_neg:
+
+    mouse_y += ( ~mouse_packet_y + 1 );
+
+// Quit
+quit:
+    return;
+}
+
+
+
+void parse_data_packet (int fd, char data, char x, char y)
+{
+
+    if (fd<0) 
+        return;
+
+	// A partir de agora já temos os três chars.
+	// Colocando os três chars em variáveis globais.
+	// Isso ficará assim caso não haja overflow.
+    // acho que isso sera usado na rotina de update.
+    
+    mouse_packet_data = (char) data;    // Primeiro char
+    mouse_packet_x    = (char) x;    // Segundo char.
+    mouse_packet_y    = (char) y;    // Terceiro char.
+
+	// Salvando o antigo antes de atualizar.
+	// Para poder apagar daqui a pouco.
+	// Atualizando.
+    saved_mouse_x = mouse_x;
+    saved_mouse_y = mouse_y;
+    
+    //
+    // == Update mouse position ====================
+    //
+    
+    update_mouse (); 
+    
+    // Agora vamos manipular os valores obtidos através da 
+    // função de atualização dos valores.
+    // A função de atualização atualizou os valores de
+    // mouse_x e mouse_y.
+    mouse_x = (mouse_x & 0x000003FF );
+    mouse_y = (mouse_y & 0x000003FF );
+
+
+
+        if ( MOUSE_WINDOW > 0 ){
+
+            gws_change_window_position(fd,MOUSE_WINDOW, mouse_x, mouse_y);
+            //gws_change_window_position(fd,c_tester->title_window, i*10, i*10);
+
+            gws_redraw_window(fd,MOUSE_WINDOW,1); 
+            //gws_redraw_window(fd,c_tester->title_window,1); 
+        }
+}
 
 
 
@@ -349,14 +501,23 @@ response_loop:
         
     switch (msg){
 
+        //
+        // == Mouse ===============================
+        //
+        
         // #test
         // Testando mensagem de mouse.
         // A mensagem tem um pacote com 3 valores a serem decodificados.
         // Raw mouse input!!!
         case 4567:
-            printf("gwm-4567: [TEST] Mouse raw input\n");
+            //printf("gwm-4567: [TEST] Mouse raw input\n");
+            parse_data_packet( fd,
+                (char) long1,    //data
+                (char) long2,    //x
+                (char) long3 );  //y
             break;
-        
+
+
         //OK isso funcionou.
         case MSG_KEYDOWN:
           //case 20:
@@ -523,7 +684,7 @@ process_reply:
     //close (fd);
 
     //gws_debug_print ("gwst: bye\n"); 
-    printf ("gwm: Window ID %d \n", message_buffer[0] );
+    //printf ("gwm: Window ID %d \n", message_buffer[0] );
     //printf ("gwm: Bye\n");
     
     // #todo
@@ -892,7 +1053,7 @@ int create_bg_client(int fd)
             0, 0, w, h,
             0,0,COLOR_WHITE, COLOR_WHITE);
         
-        if( (void *) c_bg->window < 0){
+        if (c_bg->window < 0){
             printf ("gwm: c_bg->window fail\n");
             exit(1);
         }
@@ -901,6 +1062,26 @@ int create_bg_client(int fd)
 
         wmclientList[0] = (unsigned long) c_bg;
     };
+    
+    
+
+    //
+    // == Mouse window ==================
+    //
+    
+        // Window.
+        MOUSE_WINDOW = gws_create_window (fd,
+                                    WT_SIMPLE,1,1,"Tester",
+                                    hot_spot.x, hot_spot.y, 
+                                    8, 8,
+                                    0,0, COLOR_BLACK, COLOR_BLACK);
+        
+        if( MOUSE_WINDOW < 0){
+            printf ("gwm: MOUSE_WINDOW fail\n");
+            exit(1);
+        }
+
+    
     
     return 0;
 }
@@ -938,7 +1119,7 @@ int create_topbar_client(int fd)
             0, 0, w, 32,
             0,0,xCOLOR_GRAY3, xCOLOR_GRAY3);
         
-        if( (void *) c_topbar->window < 0){
+        if(c_topbar->window < 0){
             printf ("gwm: c_topbar->window fail\n");
             exit(1);
         }
@@ -991,7 +1172,7 @@ int create_taskbar_client(int fd)
                                  0, (h-32), w, 32,
                                  0,0,COLOR_GRAY, COLOR_GRAY);
 
-        if( (void *) c_taskbar->window < 0){
+        if( c_taskbar->window < 0){
             printf ("gwm: c_taskbar->window fail\n");
             exit(1);
         }
@@ -1053,10 +1234,10 @@ int create_tester_client(int fd)
         // Window.
         c_tester->window = gws_create_window (fd,
                                     WT_SIMPLE,1,1,"Tester",
-                                    100, 100, 480, 320,
-                                    0,0, 0xF5DEB3, 0xF5DEB3);
+                                    100, 100, 480, 100,
+                                    0,0, COLOR_GRAY, COLOR_GRAY);//0xF5DEB3, 0xF5DEB3);
         
-        if( (void *) c_tester->window < 0){
+        if( c_tester->window < 0){
             printf ("gwm: c_tester->window fail\n");
             exit(1);
         }
@@ -1069,7 +1250,7 @@ int create_tester_client(int fd)
                                           100, 100-32, 480, 32,
                                           0,0, 0x2d89ef, 0x2d89ef);
 
-        if( (void *) c_tester->title_window < 0 ){
+        if( c_tester->title_window < 0 ){
             printf ("gwm: c_tester->title_window fail\n");
             exit(1);
         }
@@ -1249,28 +1430,28 @@ int create_main_menu( int fd )
 
     if ( (void*) menu != NULL )
     {
-               //menu item
+               //menu item 0
                gws_create_menu_item (
                   (int) fd,
-                  (char *) "Nothing",
+                  (char *) "Test mouse F3",
                   (int) 0,
                   (struct gws_menu_d *) menu );
 
-               //menu item
+               //menu item 1
                gws_create_menu_item (
                   (int) fd,
                   (char *) "Editor F10",
                   (int) 1,
                   (struct gws_menu_d *) menu );
 
-               //menu item
+               //menu item 2
                gws_create_menu_item (
                   (int) fd,
                   (char *) "Terminal F12",
                   (int) 2,
                   (struct gws_menu_d *) menu );
 
-               //menu item
+               //menu item 3
                gws_create_menu_item (
                   (int) fd,
                   (char *) "Reboot F4",
@@ -1386,6 +1567,8 @@ int main ( int argc, char *argv[] ){
     create_bg_client(client_fd);
     create_topbar_client(client_fd);
     create_taskbar_client(client_fd);
+    
+
     // ...
 
 
