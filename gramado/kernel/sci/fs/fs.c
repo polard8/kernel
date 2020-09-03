@@ -1008,15 +1008,14 @@ int load_path ( unsigned char *path, unsigned long address ){
     __file_buffer = (void *) address;
 
 
-    // Número de níveis.
+    // Counting the levels.
     n_levels = path_count(path);
     
     if (n_levels==0){
         panic ("load_path: n_levels\n");
     }    
 
-
-    // COmeçaremos do nível 0.
+    // Start with 0.
     level = 0;
 
     // Path provisório.
@@ -1035,28 +1034,28 @@ int load_path ( unsigned char *path, unsigned long address ){
     //
     // loop: Carregar n levels.
     //
-    
+
     for (l=0; l<n_levels; l++)
     {
 
         printf ("\n[LEVEL %d]\n\n",l);
         
-        // O level tem que começar o level com '/',
-        // mesmo que seja o primeiro.
+        // The level needs to start with '/', even the first one.
         if ( p[0] != '/' ){
             panic ("load_path: All levels need to start with '/' \n");
         }
-        p++; //pula o '/' 
+        
+        //Skip the '/'.
+        p++;  
 
-        //i=0;
-        // avançando até 13 chars do nome.
+        // Walk 13 chars in the same level.
         for ( i=0; i<12; i++ )
         {
             // #debug
             printf ("%c", (char) *p);
 
             // Copia o char para o buffer até que o char seja '/'
-            // indicando próximo nível.
+            // indicando inicio do próximo nível.
             
             buffer[i] = (char) *p;
             
@@ -1068,40 +1067,41 @@ int load_path ( unsigned char *path, unsigned long address ){
                     panic ("load_path: Directory name with '.'\n");
                 }
                 
-                //se o ponto está além do limite permitido.
+                // Se o ponto está além do limite permitido.
+                //if (i>7){
                 if (i>=7){
                     printf ("load_path: '.' fail.\n");
                     panic ("Name size bigger than 8.\n");
                 }
                 
-                // Se o ponto for antes do nono slot.
+                // Se o ponto for antes do nono slot. OK.
                 if (i<8)
                 {
-                     // Nome tem no máqximo 8 chars.
-                     // completamos com espaço;
-                     while(i<=7)
-                     {
-                          buffer[i] = ' ';
-                          i++;
-                     }
+                     // Nome tem no máximo 8 chars.
+                     // Completamos com espaço, pois queremos o formato:
+                     // "FILE    123"
+                     while (i<=7){ buffer[i] = ' '; i++; };
 
-                     p++;   // pulamos o ponto.
                      
-                     // Colocamos a extensão
-                     while(i<=11)
+                     // Skip the dot '.'.
+                     // Yes it is a dot. See the IF statement above.
+                     p++;
+                     
+                     // Add the extension.
+                     while (i<=11)
                      {
                          buffer[i] = (char) *p;
                          i++;
                          p++;
                      } 
                        
-                     // Finaliza a string no buffer. 8+3=11
+                     // Finalize the string.
                      buffer[11] = 0;   
                 }
 
 
                 //
-                // Load
+                // Load file.
                 //
     
                 // Como esse é o último, então vamos usar o endereço desejado pelo usuário.
@@ -1136,11 +1136,7 @@ int load_path ( unsigned char *path, unsigned long address ){
                     // SUCCESS ?!!
                     debug_print ("load_path: done\n");
                     return 0;
-                     
-                    //sai do for??
-                    break;
-                    
-                    
+
                 }else{
                     panic ("load_path: fail loading level 0\n");
                 };
@@ -1154,19 +1150,23 @@ int load_path ( unsigned char *path, unsigned long address ){
             
             if ( *p == '/' )
             {
-                // Vamos completar o nome com espaços e finalizar.
+                // Encontramos o indicador de proximo nivel,
+                // o buffer ja tem chars que foram colocados um a um.
+                // Nao encontramos ponto nesse nivel.
+                // Vamos completar o nome do diretorio com espaços e finalizar.
                 if (i<11)
                 {
-                    while (i<=11)
-                    {
-                        buffer[i] = ' ';   
-                        i++;    
-                    } 
+                    // Adicionando espaços.
+                    // O formato desejado eh: "DIRXDIRX   "
+                    // Nome do diretorio sem extensao.
+                    while (i<=11){ buffer[i] = ' '; i++; }
                 }
+                
+                // Finalize the string.
                 buffer[11] = 0;
 
                 //
-                // Load
+                // Load directory.
                 //
 
                 // #bugbug
@@ -1201,8 +1201,7 @@ int load_path ( unsigned char *path, unsigned long address ){
                     __src_buffer = __dst_buffer;
                     
                     break;
-                    
-                    
+
                 }else{
                     panic ("load_path: fail loading level 0\n");
                 };
@@ -1212,20 +1211,32 @@ int load_path ( unsigned char *path, unsigned long address ){
             p++;
         };
     };   
-    
 
-    debug_print ("load_path: fail\n");
+
+fail:
+    debug_print ("load_path: Fail\n");
+    printf      ("load_path: Fail\n");
+    refresh_screen();
     return (-1);
 }
 
 
+/*
+ ****************************************
+ * sys_load_path:
+ *     Load file given a pathname.
+ */
 
 int sys_load_path ( unsigned char *path, unsigned long u_address )
 {
+    int status = -1;
+
+
     debug_print ("sys_load_path:\n");
     
-    load_path ( (unsigned char *) path, (unsigned long) u_address );
-    return 0;
+    status = load_path ( (unsigned char *) path, (unsigned long) u_address );
+    
+    return (int) status;
 }
 
 

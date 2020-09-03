@@ -305,6 +305,19 @@ gde_load_bitmap_16x16 (
 }
 
 
+int gde_load_path ( char *path, unsigned long buffer, unsigned long buffer_len )
+{
+    int status = -1;
+    
+     status = (int) gramado_system_call ( 4004, 
+                        (unsigned long) path, 
+                        (unsigned long) buffer, 
+                        (unsigned long) buffer_len );
+
+    return (int) status;
+}
+
+
 /*
  **********************
  * gde_shutdown:

@@ -3127,6 +3127,8 @@ gde_load_bitmap_16x16 (
     unsigned long y );
 
 
+int gde_load_path ( char *path, unsigned long buffer, unsigned long buffer_len );
+
 //int 0x80 - serviço 241.
 void gde_init_background (void);
 

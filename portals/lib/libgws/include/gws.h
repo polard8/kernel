@@ -221,12 +221,14 @@ gws_create_window_using_socket (
 
 void gws_reboot (void);
 
+int gws_load_path ( char *path, unsigned long buffer, unsigned long buffer_len );
+
+
 void gws_yield(void);
 
 
 
-void *
-gws_create_thread ( 
+void *gws_create_thread ( 
     unsigned long init_eip, 
     unsigned long init_stack, 
     char *name );

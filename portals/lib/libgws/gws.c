@@ -1786,6 +1786,22 @@ void gws_reboot(void)
 }
 
 
+int gws_load_path ( char *path, unsigned long buffer, unsigned long buffer_len )
+{
+    int status = -1;
+    
+     status = (int) gws_system_call ( 4004, 
+                        (unsigned long) path, 
+                        (unsigned long) buffer, 
+                        (unsigned long) buffer_len );
+
+    return (int) status;
+}
+
+
+
+
+
 // Window position.
 int 
 gws_change_window_position ( 

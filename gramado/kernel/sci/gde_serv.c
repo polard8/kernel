@@ -877,19 +877,23 @@ gde_extra_services (
         //return (void *) __fp->_base;
     }
     
-    //#test ok
-    //Load path. ex: "/BOOT/BM.BIN"
-    //See: fs.c
+
+    // Load path. ex: "/BOOT/BM.BIN"
+    // See: fs.c
+    // #todo 
+    // args: 
+    // (arg2=path)  (arg3=user buffer) (arg4 = buffer size)
     if ( number == 4004 )
     {
         debug_print ("service 4004:\n");
         sys_load_path ( (unsigned char *) arg2, (unsigned long) arg3 );
+        // #todo; sys_load_path ( (unsigned char *) arg2, (unsigned long) arg3, (unsigned long) arg4 );
         refresh_screen();
         return NULL;
     }
-    
+
+
     // fstat support.
-    // 
     if ( number == 4005 )
     {
         debug_print ("service 4005: [TODO]\n");
