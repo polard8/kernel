@@ -1425,81 +1425,51 @@ fail:
     return;
 }
 
-
 /*
  ********************************************************
  * fsInit:
  *     Inicializa o file system manager.
  */
- 
-int fsInit (void){
 
+
+// #todo
+// Essa funcao deve ter acesso as informacoes herdadas do boot.
+// Talvez uma estrutura de 'BootInfo'.
+
+int fsInit (void)
+{
+    int slot = -1;
+    
+    
+    
     debug_print ("fsInit:\n");
     
-    fat_cache_loaded = CACHE_NOT_LOADED;
-    fat_cache_saved  = CACHE_NOT_SAVED;
+ 
+    // Undefined fs!
+    set_filesystem_type(FS_TYPE_NULL);
 
 
+    //
+    // Initialize fat16 support for the system's volume.
+    //
 
-	// Type - Configura o tipo de sistema de arquivos usado. 
-	// No caso, (fat16).
-	//
-	// @todo: Deve-se checar o volume ativo e ver qual sistema de arquivos est�
-	//        sendo usado, ent�o depois definir configurar o tipo.
-	//        O sistema operacional pode salvar o tipo usado. Nesse caso 
-	//        apenas checar se ouve altera��es nas configura��es de sistema de arquivos.
-	//        O registro de configura��es de disco pode ser armazenado em arquivos de metadados.
+    // #todo: 
+    // Devemos checar o tipo da partiçao de but. Se nao aqui, depois!
 
-    set_filesystem_type (FS_TYPE_FAT16);
+    fat16Init();
 
-
-	// SPC 
-	// Configura o n�mero de setores por cluster.
-	// Nesse caso, s�o (512 bytes por setor, um setor por cluster).
-
-    set_spc(1);
-
-
-	// ## initialize currents ##
-
-
-	//selecionando disco, volume e diret�rio.
-	//estamos resetando tudo e selecionando o diret�rio raiz 
-	//do vfs ... mas na verdade o diret�rio selecionado 
-	//deveria ser o diret�rio onde ficam a maioria dos aplicativos.
-	//para que o usu�rio possa chamar o maior n�mero de apps usando 
-	//apenas comandos simples.
-	//#bugbug: isso deveria se passado pelo boot ??	
-
-
-	//#bugbug: 
-	//Deixaremos cada m�dulo inicializar sua vari�vel.
-	//Mas aqui podemos zerar esses valores.
-	
-	//current_disk = 0;
-	//current_volume = 0;   
-	//current_directory = 0;
-
-
-
-    // Structures and fat.
-
-    fs_init_structures();
-    fs_init_fat();
 
 
 	//
-	// ==================== ## fileList ## =========================
+	// == fileList =========================
 	//
 
 	// Agora inicialzamos as stream 4 e 5.
 	// As anteriores foram inicializadas em stdio,
 	// pois s�o o fluxo padr�o.
 
-    int slot=-1;
-    
     //
-    // Volume 1 root dir.  
+    // == volume1_rootdir =========================================== 
     //
 
     // pega slot em file_table[] para
@@ -1520,7 +1490,7 @@ int fsInit (void){
 
         volume1_rootdir->_base = (unsigned char *) VOLUME1_ROOTDIR_ADDRESS;
         volume1_rootdir->_p    = (unsigned char *) VOLUME1_ROOTDIR_ADDRESS;
-        volume1_rootdir->_cnt = (32 * 512) ;
+        volume1_rootdir->_cnt = (32 * 512);
         volume1_rootdir->_file = 0;
         volume1_rootdir->_tmpfname = "VOLUME1 VOL";
         volume1_rootdir->fd_counter = 1;
@@ -1533,11 +1503,11 @@ int fsInit (void){
         // pega slot em inode_table[] 
         slot = get_free_slots_in_the_inode_table();
         if(slot<0 || slot >=32)
-            panic("klibc-stdioInitialize: volume1_rootdir inode slot");
+            panic("fsInit: volume1_rootdir inode slot");
         volume1_rootdir->inode = inode_table[slot];
         volume1_rootdir->inodetable_index = slot;
         if( (void*) volume1_rootdir->inode == NULL ){
-            panic("klib-stdioInitialize: volume1_rootdir inode struct");
+            panic("fsInit: volume1_rootdir inode struct");
         }
         volume1_rootdir->inode->filestruct_counter = 1; //inicialize
         memcpy( (void*) volume1_rootdir->inode->path, 
@@ -1546,12 +1516,13 @@ int fsInit (void){
         // ... 
 
 
+        // File that represents the system volume.
         storage->__file = volume1_rootdir; 
     };
 
 
     //
-    // Volume 2 root dir.
+    // == volume2_rootdir =========================================== 
     //
 
 
@@ -1584,11 +1555,11 @@ int fsInit (void){
         // pega slot em inode_table[] 
         slot = get_free_slots_in_the_inode_table();
         if(slot<0 || slot >=32)
-            panic("klibc-stdioInitialize: volume2_rootdir inode slot");
+            panic("fsInit: volume2_rootdir inode slot");
         volume2_rootdir->inode = inode_table[slot];
         volume2_rootdir->inodetable_index = slot;
         if( (void*) volume2_rootdir->inode == NULL ){
-            panic("klib-stdioInitialize: volume2_rootdir inode struct");
+            panic("fsInit: volume2_rootdir inode struct");
         }
         volume2_rootdir->inode->filestruct_counter = 1; //inicialize
         memcpy( (void*) volume2_rootdir->inode->path, 
@@ -1597,6 +1568,11 @@ int fsInit (void){
         // ... 
 
     };
+
+
+    //
+    // == pipe_gramadocore_init_execve ================================ 
+    //
 
 
 	//
@@ -1654,9 +1630,81 @@ int fsInit (void){
     // Inicializa a estrutura de suporte ao target dir.
     fsInitTargetDir();
 
-
+    
     // Done.
     debug_print ("fsInit: done\n");
+
+    
+    return 0;
+}
+
+
+
+/*
+ *****************************************************
+ * fat16Init:
+ *     Initialize fat16 fs support.
+ *     This is used by the system's volume.
+ */
+
+int fat16Init (void){
+
+    debug_print ("fat16Init:\n");
+    
+    fat_cache_loaded = CACHE_NOT_LOADED;
+    fat_cache_saved  = CACHE_NOT_SAVED;
+
+
+
+	// Type - Configura o tipo de sistema de arquivos usado. 
+	// No caso, (fat16).
+	//
+	// @todo: Deve-se checar o volume ativo e ver qual sistema de arquivos est�
+	//        sendo usado, ent�o depois definir configurar o tipo.
+	//        O sistema operacional pode salvar o tipo usado. Nesse caso 
+	//        apenas checar se ouve altera��es nas configura��es de sistema de arquivos.
+	//        O registro de configura��es de disco pode ser armazenado em arquivos de metadados.
+
+    set_filesystem_type (FS_TYPE_FAT16);
+
+
+	// SPC 
+	// Configura o n�mero de setores por cluster.
+	// Nesse caso, s�o (512 bytes por setor, um setor por cluster).
+
+    set_spc(1);
+
+
+	// ## initialize currents ##
+
+
+	//selecionando disco, volume e diret�rio.
+	//estamos resetando tudo e selecionando o diret�rio raiz 
+	//do vfs ... mas na verdade o diret�rio selecionado 
+	//deveria ser o diret�rio onde ficam a maioria dos aplicativos.
+	//para que o usu�rio possa chamar o maior n�mero de apps usando 
+	//apenas comandos simples.
+	//#bugbug: isso deveria se passado pelo boot ??	
+
+
+	//#bugbug: 
+	//Deixaremos cada m�dulo inicializar sua vari�vel.
+	//Mas aqui podemos zerar esses valores.
+	
+	//current_disk = 0;
+	//current_volume = 0;   
+	//current_directory = 0;
+
+
+
+    // Structures and fat.
+
+    fs_init_structures();
+    fs_init_fat();
+
+
+    // Done.
+    debug_print ("fat16Init: done\n");
     
     return 0;
 }

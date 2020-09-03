@@ -152,6 +152,8 @@ struct fat16_lfn_directory_entry_d
 */
 
 
+int fat16Init (void);
+
 
 //
 // End.

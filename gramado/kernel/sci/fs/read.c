@@ -701,7 +701,7 @@ __found:
 
 
     // FAT
-    //Carrega fat na memória.
+    // Carrega fat na memória.
     // #bugbug: 
     // Não devemos carregar a FAT na memória toda vez que 
     // formos carregar um arquivo. 
@@ -729,6 +729,15 @@ __found:
     //unsigned short tmp_table[1024];
     
     //#todo: Use while()
+    
+    // #todo
+    // Create a helper function like this one.
+    // int fsReadClusterChain ( char *file_address, short first_cluster, char *fat_address ){}
+
+
+    //
+    // == Load cluster chain ===================================
+    //
 
 __loop_next_entry:
 

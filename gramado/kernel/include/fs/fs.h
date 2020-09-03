@@ -21,7 +21,8 @@
 
 
 // Filesystem types.
-#define  FS_TYPE_GVFS   1000  // Gramado File System.
+#define  FS_TYPE_NULL   0
+#define  FS_TYPE_GVFS   1000  // Gramado Virtual File System.
 #define  FS_TYPE_VFS    1001
 #define  FS_TYPE_FAT12  1002 
 #define  FS_TYPE_FAT16  1003 
