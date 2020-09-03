@@ -2080,27 +2080,8 @@ do_compare:
          gramado_strncmp( prompt, "help", 4 ) == 0 || 
          gramado_strncmp( prompt, "?", 1 ) == 0 )
     {
-		i++;
-		token = (char *) tokenList[i];
-		
-		if( token == NULL )
-		{
-			help_builtins (1);
-
-		}else{
-
-			if ( gramado_strncmp( (char*) tokenList[i], "--all", 5 ) == 0 )
-			{ 
-                help_builtins (1); 
-			}
-			
-			if ( gramado_strncmp( (char*) tokenList[i], "--min", 5 ) == 0 )
-			{
-                help_builtins (2);
-			}
-			//...
-		};
-		goto exit_cmp;
+        help_builtins();
+        goto exit_cmp;
     }
 
 
@@ -2204,21 +2185,37 @@ do_compare:
         goto exit_cmp;
     }
 
-
-    // mkdir - Create a new directory, given it's name.
-    if ( gramado_strncmp( prompt, "mkdir", 5 ) == 0 ){
+    // newdir - api
+    // Create a new directory, given it's name.
+    if ( gramado_strncmp( prompt, "newdir", 6 ) == 0 ){
         gde_create_empty_directory ( (char *) tokenList[1] );
         goto exit_cmp;
     }
 
+    // newfile - api
+    // Create a new file, given it's name.
+    if ( gramado_strncmp( prompt, "newfile", 7 ) == 0 ){
+        gde_create_empty_file ( (char *) tokenList[1] );
+        goto exit_cmp;
+    }
 
-    // mkfile - Create a new file, given it's name.
-    if ( gramado_strncmp( prompt, "mkfile", 6 ) == 0 ){
-        //gde_create_empty_file ( (char *) tokenList[1] );
+    // creat (libc)
+    // Create a file using the libc.
+    if ( gramado_strncmp( prompt, "creat", 5 ) == 0 ){
         //creat("new.txt", 0666);
         creat( (const char *) tokenList[1], 0666 );
         goto exit_cmp;
     }
+
+
+    // mkdir (libc)
+    // Create a directory using the libc.
+    if ( gramado_strncmp( prompt, "mkdir", 5 ) == 0 ){
+        mkdir( (const char *) tokenList[1], 0666 );
+        goto exit_cmp;
+    }
+
+
 
     // mm-info
     if ( gramado_strncmp( prompt, "mm-info", 7 ) == 0 ){

@@ -504,7 +504,8 @@ int sys_close ( int fd ){
             if (object->_lbfsize < 512) 
                object->_lbfsize = 512;
             
-            fsSaveFile ( (char *) object->_tmpfname, 
+            fsSaveFile ( VOLUME1_FAT_ADDRESS, VOLUME1_ROOTDIR_ADDRESS, FAT16_ROOT_ENTRIES,
+                    (char *) object->_tmpfname, 
                     (unsigned long) (object->_lbfsize/512), //file_size, in sectors       
                     (unsigned long) object->_lbfsize, //size_in_bytes,  
                     (char *) object->_base, //address          

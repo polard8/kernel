@@ -227,17 +227,22 @@ unsigned short list[fat_range_max];
 
 // ======================================
 // fsSaveFile:
+//     Salva um arquivo. Onde? #todo vamos fornecer o endereço do diretorio.
 // IN: 
 // name, size in sectors, size in bytes, adress, flag. 
 // OUT:
 int
 fsSaveFile ( 
+    unsigned long fat_address,
+    unsigned long dir_address,
+    int dir_entries,
     char *file_name, 
     unsigned long file_size,
     unsigned long size_in_bytes,
     char *file_address,
     char flag )  
 {
+
     int Status = 0;
 
     unsigned long i = 0; 
@@ -256,31 +261,53 @@ fsSaveFile (
     int Offset = 0;
     int FreeIndex = -1;
 
-	// #bugbug: 
-	// Não vale esse determinismo. 
-	// Temos que saber qual é o disco atual e o volume atual.
-	// Precisamos saber se o root dir já está na memória e se
-	// a fat já está na memória.
-
-    unsigned short *root = (unsigned short *) VOLUME1_ROOTDIR_ADDRESS;
-    unsigned short *fat  = (unsigned short *) VOLUME1_FAT_ADDRESS;
-
-    //unsigned long endereco = file_address;
-
-
-	// info
-	// me parece que todas as informações estão chegando aqui corretas.
 
     // #debug:
-    
     debug_print ("fsSaveFile:\n");
     printf      ("fsSaveFile:\n");
+
+
+    // Updating fat address and dir address.
+    
+    if ( fat_address == 0 ){
+        panic("fsSaveFile: [FAIL] fat_address\n");
+    }
+
+    if ( dir_address == 0 ){
+        panic("fsSaveFile: [FAIL] dir_address\n");
+    }
+
+    unsigned short *fat   = (unsigned short *) fat_address; //VOLUME1_FAT_ADDRESS;
+    unsigned short *__dir = (unsigned short *) dir_address; //VOLUME1_ROOTDIR_ADDRESS;
+
+
+    // #debug
+    // We only support one address for now.
+    if ( fat_address != VOLUME1_FAT_ADDRESS ){
+        panic("fsSaveFile: [FIXME] Sorry. We only support ONE fat address for now!\n");
+    }
+
+
+    if ( (void*) file_name == NULL )
+    {
+        debug_print ("fsSaveFile: [FIXME] No filename\n");
+        printf      ("fsSaveFile: [FIXME] No filename\n"); 
+        goto fail;
+    }
+
     
     printf ("name    = %s \n", file_name ); 
     printf ("size    = %d \n", file_size );       // Size in sectors.
     printf ("nbytes  = %d \n", size_in_bytes );
     printf ("address = %x \n", file_address );
     printf ("flag    = %x \n", flag );
+    printf ("entries = %d \n", dir_entries );
+
+    if ( dir_entries == 0 || dir_entries > FAT16_ROOT_ENTRIES )
+    {
+        panic ("fsSaveFile: [FAIL] max dir entries");
+    }
+
 
 	// file_size
 	// #todo: 
@@ -292,7 +319,8 @@ fsSaveFile (
     if ( file_size > 16 )
     {
         debug_print ("fsSaveFile: [FIXME] Size in sectors\n");
-        printf      ("fsSaveFile: [FIXME] Size in sectors = %d \n", file_size ); 
+        printf      ("fsSaveFile: [FIXME] Size in sectors = %d \n", 
+            file_size ); 
         goto fail;
     }
 
@@ -497,11 +525,16 @@ save_file:
 	// #bugbug: A quantidade de entrada depende to diretório.
 	// See: search.c
 
-    //FreeIndex = (int) findEmptyDirectoryEntry( VOLUME1_ROOTDIR_ADDRESS, 128 );
-    FreeIndex = (int) findEmptyDirectoryEntry ( 
-                          VOLUME1_ROOTDIR_ADDRESS, 
-                          FAT16_ROOT_ENTRIES );
+    // IN: directory address, max number of entries.
+
+    //FreeIndex = (int) findEmptyDirectoryEntry ( 
+    //                      VOLUME1_ROOTDIR_ADDRESS, 
+    //                      FAT16_ROOT_ENTRIES );
     
+    FreeIndex = (int) findEmptyDirectoryEntry ( 
+                          dir_address, 
+                          dir_entries );
+
     if ( FreeIndex == -1 )
     {
         printf ("fsSaveFile: [FAIL] No empty entry\n");
@@ -522,7 +555,7 @@ save_file:
     Offset = (int) ( FreeIndex * EntrySize );
 
     // FAT16_DIRENTRY_SIZE = 32
-    memcpy ( &root[Offset], DirEntry, 32 );
+    memcpy ( &__dir[Offset], DirEntry, 32 );
 
 // reset
 // Reiniciamos o controlador antes de usarmos.
@@ -647,10 +680,14 @@ do_save_dir_and_fat:
 
     debug_print ("fsSaveFile: [DEBUG] do_save_dir_and_fat\n");
     
-    // Root
+    // Save root
+    // #bugbug: We need to save a directory, not the root.
+
+    //if ( dir_address == ROO...
     fs_save_rootdir();
     
-    // FAT
+    // Save FAT
+    
     //fs_save_fat();
     fat_cache_saved = CACHE_NOT_SAVED;
 
@@ -803,7 +840,8 @@ fs_save_dir (
     // Nunca testado.
     
     /*
-    return (int) fsSaveFile ( (char *) file_name,    
+    return (int) fsSaveFile ( VOLUME1_FAT_ADDRESS, VOLUME1_ROOTDIR_ADDRESS, FAT16_ROOT_ENTRIES,
+                    (char *) file_name,    
                     (unsigned long) file_size,       
                     (unsigned long) size_in_bytes,  
                     (char *) file_address,          
@@ -822,7 +860,8 @@ fs_save_file (
 {
 
     debug_print ("fs_save_file: [Testing]\n");
-    return (int) fsSaveFile ( (char *) file_name,    
+    return (int) fsSaveFile ( VOLUME1_FAT_ADDRESS, VOLUME1_ROOTDIR_ADDRESS, FAT16_ROOT_ENTRIES, 
+                    (char *) file_name,    
                     (unsigned long) file_size,       
                     (unsigned long) size_in_bytes,  
                     (char *) file_address,          

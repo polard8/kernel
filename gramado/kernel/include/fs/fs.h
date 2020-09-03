@@ -588,6 +588,9 @@ unsigned long fsRootDirGetFileSize ( unsigned char *file_name );
 
 int
 fsSaveFile ( 
+    unsigned long fat_address,
+    unsigned long dir_address,
+    int dir_entries,
     char *file_name, 
     unsigned long file_size,
     unsigned long size_in_bytes, 

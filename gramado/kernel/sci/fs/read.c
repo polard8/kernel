@@ -320,44 +320,25 @@ struct inode_d *fs_load_file (char *pathname)
 /*
  **************
  * fsLoadFile:
- *    Carrega um arquivo na memória dado o nome e o endereço.
- *    Apenas FAT16.
+ *    Carrega um arquivo na memória.
  *
- *  @todo: 
- *      Deve-se alocar memória dinamicamente para o root dir e 
- * para a fat caso eles não estejam carregados e não tenham seus 
- * endereços salvos.
- * Obs: Pode existir uma estrutura pra dizer se o root dir e fat estão 
- * carregados na memória e qual o endereço o tipo o tamanho etc.
- * + O argumento nome poderia ser const char* para compatibilidade 
- * com a libC.
- *
- * #obs: A fat deve estar o tempo todo na memória, mas precisamos carregar 
- * na memória o dretório atual para lermos um arquivo.
- * Essa função de leitura não precisa carregar a FAT toda vez que for chamada.
- * ela deve apenas checar se a fat está na memória através de uma flag.
- * Mas essa função precisa carregar o diretório atual na memória para 
- * procurar pelo nome indicado.
- * #bugbug: No momento estamos apenas procurando no diretório raiz, 
- * então devemos substituir o ponteiro *root por *current_dir.
+ * 
  * IN:
- *     Endereço do diretório, 
- *     Nome do arquivo, 
- *     Endereço do arquivo.
+ *     fat_address  = FAT address.
+ *     dir_addresss = Directory address.
+ *     dir_entries  = Number of entries in the given directory.
+ *     file_name    = File name.
+ *     buffer_limit = Maximum buffer size.
+ * 
+ * OUT: 
+ *    1=fail 
+ *    0=ok.
  */
-
 
 // #obs
 // Rotina específica para FAT16.
 // Podemos mudar o nome para fsFat16LoadFile().
 // Ou fs_Fat16_SFN_LoadFile()
-
-
-
-// IN: ?? #todo: Descrever os argumentos de entrada.
-// OUT: 
-//    1=fail 
-//    0=ok.
 
 unsigned long 
 fsLoadFile ( 
@@ -369,34 +350,19 @@ fsLoadFile (
     unsigned long buffer_limit )
 {
 
-    // #bugbug
-    // Se estamos considerando o endereço de quanquer diretorio
-    // entao devemos considerar o numero de entradas nesse dado
-    // diretorio.
-
-	// #bugbug
-	// We have a buffer but we don't know the buffer size.
-	// It can overflow when loading a file on it.
-	// We need a buffer structure to handle the max allowed.
-
-
+    int Status=-1;
     int i=0;
-    int Status;  //??
-
     int SavedDirEntry = 0;
     unsigned short next=0;
     
     // #todo: 
     // Rever. Número máximo de entradas.
-    
-    unsigned long MaxEntries = (unsigned long) dir_entries;
-    
     // #bugbug: 
     // Esse eh o numero de entradas no diretorio raiz.
+
+    unsigned long MaxEntries = (unsigned long) dir_entries;
     MaxEntries = 512;      
-    
-    
-    
+
     unsigned long BufferLimit = (unsigned long) buffer_limit;
     
     
@@ -406,6 +372,7 @@ fsLoadFile (
     char tmpName[13];
     
     size_t FileNameSize = 0;
+    unsigned long FileSize = 0;
 
     //int IsDirectory;
 
@@ -421,11 +388,28 @@ fsLoadFile (
 
     int Spc=0;
 
-    // Updating fat address and __dir address.
+    // #debug:
+    debug_print ("fsLoadFile:\n");
+    printf      ("fsLoadFile:\n");
+
+    // Updating fat address and dir address.
+
+    if ( fat_address == 0 ){
+        panic("fsLoadFile: [FAIL] fat_address\n");
+    }
+
+    if ( dir_address == 0 ){
+        panic("fsLoadFile: [FAIL] dir_address\n");
+    }
 
     unsigned short *  fat = (unsigned short *) fat_address;
     unsigned short *__dir = (unsigned short *) dir_address;
 
+    // #debug
+    // We only support one address for now.
+    if ( fat_address != VOLUME1_FAT_ADDRESS ){
+        panic("fsLoadFile: [FIXME] Sorry. We only support ONE fat address for now!\n");
+    }
 
 
     //
@@ -451,16 +435,12 @@ fsLoadFile (
     // Esperamos que nesse endereço tenha um diretório carregado.
 
 //load_DIR:
-    debug_print ("fsLoadFile:\n");
-    
-    if ( MaxEntries == 0 ){
-        panic("fsLoadFile: MaxEntries\n");
+
+    if ( MaxEntries == 0 || MaxEntries > FAT16_ROOT_ENTRIES )
+    {
+        panic ("fsLoadFile: [FAIL] max dir entries");
     }
 
-    if ( MaxEntries > 512 ){
-        panic("fsLoadFile: MaxEntries limits\n");
-    }
-    
 
     if ( BufferLimit == 0 ){
         panic("fsLoadFile: [FAIL] BufferLimit fail\n");
@@ -470,12 +450,8 @@ fsLoadFile (
     if ( BufferLimit > (512*4096) ){
         panic("fsLoadFile: [FAIL] BufferLimit\n");
     }
-    
-    
-   
-   
 
-    // File system structure.
+    // Root file system structure.
     // + Checa se é válida a estrutura do sistema de arquivos.
     // + Pega a quantidade de setores por cluster.
     // + Pega o tamanho do diretório raiz. Ou seja, pega o número 
@@ -570,30 +546,33 @@ fsLoadFile (
     //
     
     // Pegar o tamanho do arquivo e comparar com o limite do buffer.
-    // #bugbug: Essa rotina s'o pega o tamanho dos arquivos que
-    // estao no diretorio raiz.
     
-    unsigned long FileSize = 0;
-    
-    FileSize = fsRootDirGetFileSize( (unsigned char *) file_name );
-    if(FileSize==0){
-        debug_print ("fsLoadFile: [FIXME] FileSize fail\n");
-    }
-
-
+    // #bugbug: 
+    // Essa rotina so pega o tamanho dos arquivos que estao 
+    // no diretorio raiz.
     // Comparando nosso tamanho obtido com o tamanho do buffer.
     // Como a rotina de pegar o tamanho so pega no diretorio raiz
     // por enquanto, entao vamos apenas emitir um alerta que 
     // o tamanho do arquivo eh maior que o buffer, servira para debug.
     // Isso porque em todas as tentativas de pegar o tamanho do arquivo
     // fora do root, retornara 0.
+    // #todo
+    // Precisamos usar as estruturas de diretorio e 
+    // as estruturas de buffer.
     
-    //#todo
-    //Precisamos usar as estruturas de diretorio e as estruturas de buffer.
+    FileSize = fsRootDirGetFileSize( (unsigned char *) file_name );
+    if (FileSize==0)
+    {
+        debug_print ("fsLoadFile: [FIXME] FileSize\n");
+        printf      ("fsLoadFile: [FIXME] FileSize\n");
+        goto fail;
+    }
 
     if ( FileSize > BufferLimit )
     {
-        debug_print ("fsLoadFile: [=========== BUGBUG =============] Buffer Overflow!\n");
+        debug_print ("fsLoadFile: [FAIL] Buffer Overflow\n");
+        debug_print ("fsLoadFile: [FAIL] Buffer Overflow\n");
+        goto fail;
     }
 
 

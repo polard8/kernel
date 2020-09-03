@@ -2171,7 +2171,8 @@ sys_read_file (
              taskswitch_lock ();
              scheduler_lock ();
 
-             __ret = (int) fsSaveFile ( (char *) file_name, 
+             __ret = (int) fsSaveFile ( VOLUME1_FAT_ADDRESS, VOLUME1_ROOTDIR_ADDRESS, FAT16_ROOT_ENTRIES, 
+                              (char *) file_name, 
                               (unsigned long) 2,      // size in sectors 
                               (unsigned long) 1024,   // size in bytes  
                               (char *) buff,          // buffer ?
@@ -2588,7 +2589,8 @@ sys_write_file (
     taskswitch_lock ();
     scheduler_lock ();
 
-    __ret = (int) fsSaveFile ( (char *) file_name,    
+    __ret = (int) fsSaveFile ( VOLUME1_FAT_ADDRESS, VOLUME1_ROOTDIR_ADDRESS, FAT16_ROOT_ENTRIES,
+                      (char *) file_name,    
                       (unsigned long) file_size,       
                       (unsigned long) size_in_bytes,  
                       (char *) file_address,          
@@ -2628,7 +2630,8 @@ int fs_create_empty_file ( char *file_name, int type ){
     //f->type = type;
     // #todo: fd ...
     
-    __ret = (int) fsSaveFile ( (char *) file_name,    
+    __ret = (int) fsSaveFile ( VOLUME1_FAT_ADDRESS, VOLUME1_ROOTDIR_ADDRESS, FAT16_ROOT_ENTRIES,
+                    (char *) file_name,    
                     (unsigned long) number_of_sectors,       
                     (unsigned long) size_in_bytes,  
                     (char *) &buffer[0],          
@@ -2646,7 +2649,8 @@ int sys_create_empty_file ( char *file_name )
     int size_in_bytes = 512;  
     int __ret;
     
-    __ret = (int) fsSaveFile ( (char *) file_name,    
+    __ret = (int) fsSaveFile ( VOLUME1_FAT_ADDRESS, VOLUME1_ROOTDIR_ADDRESS, FAT16_ROOT_ENTRIES,
+                    (char *) file_name,    
                     (unsigned long) number_of_sectors,       
                     (unsigned long) size_in_bytes,  
                     (char *) &buffer[0],          
@@ -2681,7 +2685,8 @@ int fs_create_empty_directory ( char *dir_name, int type )
     //f->type = type;
     // #todo: fd ...
     
-    __ret = (int) fsSaveFile ( (char *) dir_name,    
+    __ret = (int) fsSaveFile ( VOLUME1_FAT_ADDRESS, VOLUME1_ROOTDIR_ADDRESS, FAT16_ROOT_ENTRIES,
+                    (char *) dir_name,    
                     (unsigned long) number_of_sectors,       
                     (unsigned long) size_in_bytes,  
                     (char *) &buffer[0],          
@@ -2702,7 +2707,8 @@ int sys_create_empty_directory ( char *dir_name )
     int size_in_bytes = 512;  
     
  
-    __ret = (int) fsSaveFile ( (char *) dir_name,    
+    __ret = (int) fsSaveFile ( VOLUME1_FAT_ADDRESS, VOLUME1_ROOTDIR_ADDRESS, FAT16_ROOT_ENTRIES,
+                    (char *) dir_name,    
                     (unsigned long) number_of_sectors,       
                     (unsigned long) size_in_bytes,  
                     (char *) &buffer[0],          

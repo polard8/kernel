@@ -697,8 +697,19 @@ int pause (void)
 
 int mkdir (const char *pathname, mode_t mode)
 {
+    int __ret=0;
+
+
     debug_print ("mkdir: [TODO]\n");
-    return -1; //#todo
+
+    //gde_enter_critical_section();
+    
+    __ret = (int) gramado_system_call ( 44, 
+                      (unsigned long) pathname, 0, 0);
+
+    //gde_exit_critical_section();    
+
+    return (int) __ret;
 }
 
 

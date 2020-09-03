@@ -93,15 +93,13 @@ int getgid_builtins (void)
     shellShowGID ();  return 0;
 }
 
+
 // Help.
-void help_builtins (int arg)
+void help_builtins (void)
 {
-    putc('*',stdout);
-    putc(' ',stdout);
-    fflush (stdout);    
-    
-    printf ("gdeshell: cls, ls, reboot \n");
+    printf ("gdeshell: cls, ls, reboot, newfile, newdir, creat, mkdir \n");
 }
+
 
 void pwd_builtins (void)
 {
