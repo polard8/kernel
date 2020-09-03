@@ -1897,7 +1897,7 @@ int gde_create_empty_file ( char *file_name ){
 }
 
 
-// ?? FS
+// (fs)
 int gde_create_empty_directory ( char *dir_name ){
 
     int __ret=0;

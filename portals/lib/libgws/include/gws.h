@@ -239,6 +239,10 @@ void gws_enter_critical_section(void);
 void gws_exit_critical_section(void);
 
 
+int gws_create_empty_file ( char *file_name );
+int gws_create_empty_directory ( char *dir_name );
+
+
 // menu
 struct gws_menu_d *gws_create_menu (
     int fd,

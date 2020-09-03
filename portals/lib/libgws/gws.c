@@ -2148,6 +2148,39 @@ unsigned long gws_explode_byte (unsigned char data)
 }
 
 
+
+int gws_create_empty_file ( char *file_name ){
+
+    int __ret = 0;
+    
+    //gde_enter_critical_section();
+    
+    __ret = (int) gramado_system_call ( 43, 
+                      (unsigned long) file_name, 0, 0);
+
+    //gde_exit_critical_section();    
+    
+    return __ret;
+}
+
+
+int gws_create_empty_directory ( char *dir_name ){
+
+    int __ret=0;
+
+
+    //gde_enter_critical_section();
+    
+    __ret = (int) gramado_system_call ( 44, 
+                      (unsigned long) dir_name, 0, 0);
+
+    //gde_exit_critical_section();    
+
+
+    return (int) __ret;
+}
+
+
 //
 // End.
 //
