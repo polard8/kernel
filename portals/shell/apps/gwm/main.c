@@ -5,7 +5,6 @@
  *    Using socket to connect with gns.
  *    AF_GRAMADO family.
  * 
- * 
  *       O propósito é testar o servidor gns.
  *
  * 2020 - Created by Fred Nora.
@@ -65,8 +64,6 @@ int MOUSE_WINDOW = -1;
 #define MOUSE_Y_SIGN      0x20
 #define MOUSE_X_OVERFLOW  0x40
 #define MOUSE_Y_OVERFLOW  0x80
-
-
 
 long mouse_x = 0;
 long mouse_y = 0;
@@ -511,10 +508,21 @@ response_loop:
         // Raw mouse input!!!
         case 4567:
             //printf("gwm-4567: [TEST] Mouse raw input\n");
-            parse_data_packet( fd,
-                (char) long1,    //data
-                (char) long2,    //x
-                (char) long3 );  //y
+            //parse_data_packet( fd,
+            //    (char) long1,    //data
+             //   (char) long2,    //x
+             //   (char) long3 );  //y
+            break;
+            
+        
+        //mensagem de mouse ja processada
+        //provisorio
+        case 4568:
+            //printf("gwm-4568: Mouse processed input x=%d y=%d\n", long1, long2);
+            //if ( MOUSE_WINDOW > 0 ){
+            //    gws_change_window_position(fd,MOUSE_WINDOW, long1, long2);
+            //    gws_redraw_window(fd,MOUSE_WINDOW,1); 
+            //}
             break;
 
 
@@ -1069,19 +1077,17 @@ int create_bg_client(int fd)
     // == Mouse window ==================
     //
     
-        // Window.
-        MOUSE_WINDOW = gws_create_window (fd,
-                                    WT_SIMPLE,1,1,"Tester",
+    // Window.
+    MOUSE_WINDOW = gws_create_window (fd,
+                                    WT_SIMPLE,1,1,"Mouse",
                                     hot_spot.x, hot_spot.y, 
-                                    8, 8,
+                                    4, 4,
                                     0,0, COLOR_BLACK, COLOR_BLACK);
         
-        if( MOUSE_WINDOW < 0){
-            printf ("gwm: MOUSE_WINDOW fail\n");
-            exit(1);
-        }
-
-    
+    if ( MOUSE_WINDOW < 0){
+        printf ("gwm: MOUSE_WINDOW fail\n");
+        exit(1);
+    }
     
     return 0;
 }

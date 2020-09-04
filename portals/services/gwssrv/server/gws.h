@@ -70,8 +70,6 @@ struct gws_window_d *keyboard_window;
 struct gws_window_d *mouse_window;
 struct gws_window_d *cursor_window;  // Where cursor came from.
 struct gws_window_d *button_window;  // Where button was pressed.
-unsigned long mouse_x;
-unsigned long mouse_y;
 
 
 
