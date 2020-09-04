@@ -17,9 +17,13 @@
 #define gramado_strncmp strncmp 
 
 
+// buffer usado para criar um arquivo de configuracao.
+char __setup_buffer[512];
+
 // Para que o procedimento possa acessa-lo.
 // #bugbug: size
 char __net_buffer[4096];
+
 
 // A janela principal do aplicativo.
 struct window_d *hWindow;  
@@ -341,6 +345,7 @@ __SendMessageToProcess (
     unsigned long long2 );
 
 
+int gdeshell_save_config_file (void);
 //
 // ===========================================================
 //
@@ -2403,6 +2408,15 @@ do_compare:
         goto exit_cmp;
     }
 
+    // setup
+    // #test: Saving the config file.
+    if ( gramado_strncmp( prompt, "setup", 5 ) == 0 ){
+        
+        //Initializing the buffer.
+        sprintf(__setup_buffer,"This is the setup file");
+        gdeshell_save_config_file();
+        goto exit_cmp;
+    }
 
 
 	// socket
@@ -6762,6 +6776,132 @@ void network_initialize(void)
     printf     ("network_initialize: Initializing the ring0 network manager...\n");
     gramado_system_call(968,0,0,0);
 }
+
+
+/*
+ *====================================
+ * gdeshell_save_config_file:
+ *     Vamos salvar o arquivo de configuracao criado com as
+ * configuracoes selecionadas pelo usuario com o prompt de comandos.
+ *  
+ * Testando a rotina de salvar um arquivo.
+ * Estamos usando a API.
+ */
+
+int gdeshell_save_config_file (void){
+
+    char file_1_name[] = "SETUP   TXT";
+    int Ret=0;
+    unsigned long number_of_sectors = 0;
+    size_t len = 0;
+
+
+    // #importante:
+    // Não podemos chamar a API sem que todos os argumentos 
+    // estejam corretos.
+
+	// #obs:
+	// Vamos impor o limite de 4 setores por enquanto. 
+	// 512*4 = 2048  (4 setores) 2KB
+	// Se a quantidade de bytes for '0'. ???
+	
+	
+	//preparando o arquivo para salvar.
+	//precisamos colocar no buffer
+	
+	//isso é um teste.
+	
+	
+	//strcat( __setup_buffer, "initializing file ...");
+	
+	/*
+	int l; //linha
+	int c; //coluna
+	int p = 0; //posição dentro do buffer.
+	
+	for ( l=0; l<16; l++ )
+	{
+		for ( c=0; c<80; c++ )
+		{
+			//pega um char.
+			__setup_buffer[p] = (char) LINES[l].CHARS[c];
+			p++;
+		}
+	};
+	*/
+
+
+
+
+    //Initializing ...
+    printf ("\n");
+    printf ("\n");
+    printf ("gdeshell_save_config_file: Saving ...\n");
+
+
+	// Lenght in bytes.
+
+	//len = (size_t) strlen (file_1);
+    len = (size_t) strlen ( __setup_buffer );
+
+
+    if (len <= 0)
+    {
+        printf ("gdeshell_save_config_file: [FAIL] Empty file.\n");
+        return (int) 1;
+    }
+
+    if (len > 2048)
+    {
+        printf ("gdeshell_save_config_file: [FAIL] Limits. The  file is too long.\n");
+        return (int) 1;
+    }
+
+
+    //
+    // Number os sectors.
+    //
+
+
+    number_of_sectors = (unsigned long) ( len / 512 );
+
+
+    if ( len > 0 && len < 512 )
+    {
+        number_of_sectors = 1; 
+    }
+
+    if ( number_of_sectors == 0 ){
+        printf ("gdeshell_save_config_file:  Limit Fail. (0) sectors to save.\n");
+        return (int) 1;
+    }
+
+    // limite de teste.
+    // Se tivermos que salvar mais que 4 setores.
+
+    if ( number_of_sectors > 4 )
+    {
+        printf ("gdeshell_save_config_file:  Limit Fail. (%d) sectors to save.\n",
+            number_of_sectors );
+        return (int) 1;
+    }
+
+	//
+	// Save
+	//
+
+    // name, number of sectors, size in bytes, address, flag.
+
+    Ret = (int) gde_save_file ( file_1_name, 
+                    number_of_sectors, len,            
+                    &__setup_buffer[0], 
+                    0x20 );    
+
+    printf ("done\n");
+
+    return (int) Ret;
+}
+
 
 
 /*

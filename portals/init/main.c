@@ -176,7 +176,27 @@ int main ( int argc, char *argv[] ){
     // Product
     
     initialize_product_type();
-
+    
+    
+    // #todo:
+    // initialization/installation/upgrade???
+    // Precisamos checar se um perfil de usuario ja existe.
+    // Caso ja exista, apenas inicializamos, caso nao exista,
+    // entao estamos configurando o primeiro uso. Isso acontece
+    // depois de uma instalacao ou upgrade ... 
+    // 
+    
+    // call setup(), for configuration or product upgrade/installation.
+    // Create: user session, room and desktops.
+    // ex: initUserSession->initRoom->initDesktop ...
+    // Switch to a desktop.
+    // profiles: Setup user environment, create user's folders, etc ...
+    // Setup groups.
+    // Setup some environment variables.
+    // Delete /tmp files. 
+    // Delete ?/history files
+    
+    
     //
     // == Main loop ==============================================
     //
@@ -279,7 +299,10 @@ int main ( int argc, char *argv[] ){
 
         //...
         
-        // Usar esse por enquanto.
+        // gdeshell:
+        // Used to setup the system.
+        // In initialization/installation/upgrade.
+        // "Initialize in terminal mode"?
         default:
             gramado_system_call ( 900, 
                 (unsigned long) "gdeshell.bin", 0, 0 ); 

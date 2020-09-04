@@ -223,12 +223,9 @@ int editor_save_file (void){
         return (int) 1;
     }
 
-
-
 	//
 	// Save
 	//
-
 
     // name, number of sectors, size in bytes, address, flag.
 
