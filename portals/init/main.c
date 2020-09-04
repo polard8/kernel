@@ -82,6 +82,10 @@ int __product_type;
 // Variáveis internas.
 //
 
+
+int gReboot = 0;
+int gShutdown = 0;
+
 //Idle application support.
 int idleStatus;
 int idleError;
@@ -152,6 +156,45 @@ initialize_product_type(void)
 
 }
 
+
+void Reboot(void)
+{
+    printf ("init.bin: Reboot()\n");
+    
+    // ...
+    
+    gde_reboot();
+}
+
+void Shutdown(void)
+{
+    printf ("init.bin: Reboot()\n");
+
+    // ...
+    
+    gde_shutdown();
+}
+
+
+void Logoff(void)
+{
+    printf ("init.bin: Logoff()\n");
+
+
+
+
+    if (gReboot == 1)
+    {
+        //Reboot();
+    }
+
+    if (gShutdown == 1)
+    {
+         //Shutdown()
+    }
+}
+
+
 /*
  ********************** 
  * main:
@@ -169,14 +212,22 @@ int main ( int argc, char *argv[] ){
     char runlevel_string[128];
 
 
+    debug_print ("---------------------------\n"); 
+    debug_print ("init.bin: Initializing Portals environment ...\n");
+
+
     // Initialize with error value.
     __current_runlevel = (int) -1; 
  
+    // Reboot and shutdown flags.
+    gReboot = 0;
+    gShutdown = 0;
 
     // Product
-    
     initialize_product_type();
     
+   
+
     
     // #todo:
     // initialization/installation/upgrade???
@@ -195,18 +246,7 @@ int main ( int argc, char *argv[] ){
     // Setup some environment variables.
     // Delete /tmp files. 
     // Delete ?/history files
-    
-    
-    //
-    // == Main loop ==============================================
-    //
-
-
-    //++
-    while (1){
-
-    debug_print ("---------------------------\n"); 
-    debug_print ("init.bin: Initializing Portals environment ...\n");
+   
 
     // Using api.
     gde_draw_text ( NULL, 
@@ -258,6 +298,11 @@ int main ( int argc, char *argv[] ){
     //    Full multi-user graphical mode.
     // 6) Reboot 	Reboots the system. 
 
+
+    // #todo
+    // Do not call the kernel!
+    // Load the file runlevel.txt
+    // Get the value in the file.
 
     // Get the current runlevel.
     __current_runlevel = (int) gramado_system_call ( 288, 0, 0, 0 );  
@@ -318,32 +363,80 @@ int main ( int argc, char *argv[] ){
 
 
     //
-    // Hang (#debug)
+    // == Main loop ==============================================
     //
 
+
+    /*
     // Yield This thread.
     while (1){
         asm ("pause");
-        gramado_system_call (265,0,0,0); 
+        gramado_system_call (265,0,0,0);
         //if (gShutdown == 1){ goto shutdown; };
     };
+    */
     
+    
+    //
+    // == Get system message ==============================
+    //
+
+    // Buffer.
+    unsigned long message_buffer[5];
+
+    //
+    // == Main loop =================================================
+    //
+
+Mainloop:
+
+
+    while (TRUE)
+    {
+        // Get message.
+        gde_enter_critical_section(); 
+        gramado_system_call ( 111,
+            (unsigned long) &message_buffer[0],
+            (unsigned long) &message_buffer[0],
+            (unsigned long) &message_buffer[0] );
+        gde_exit_critical_section(); 
+
+        // No message. Yield.
+        if ( message_buffer[1] == 0 ){ 
+            gramado_system_call (265,0,0,0); 
+        }
+
+        // We've got a message. Call the procedure.
+        
+        if ( message_buffer[1] == 9216 )
+        {
+            gReboot   = message_buffer[2];
+            gShutdown = message_buffer[3];
+            goto logoff; 
+        }
+
+        // ...
+        
+        message_buffer[0] = 0;
+        message_buffer[1] = 0;
+        message_buffer[2] = 0;
+        message_buffer[3] = 0;
     };
-    // Main loop end.
-    //--
 
-//shutdown:
-    //gde_shutdown(...);
+    //
+    // Logoff
+    //
+
+logoff:
+    printf ("init: logoff\n");
+    Logoff();
+
+fail:
+    printf ("init: [FAIL] Rebooting ...\n");
+    Reboot();
+    while(1){}
+    //return 0;
 }
-
-
-//
-// End.
-//
-
-
-
-
 
 
 //

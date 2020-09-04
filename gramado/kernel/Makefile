@@ -417,7 +417,8 @@ link-kernel:
 	@echo "(Step 2) Linking the kernel image ..."
 
 	$(LD) $(LDFLAGS) -T link.ld -o KERNEL.BIN $(OBJECTS)    
-	
+
+
 
 clean:
 	rm -rf *.o   
