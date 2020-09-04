@@ -15,14 +15,14 @@ all:
 	make -C ./uname
 	
 	# gramc thing.    
-	make -C ./gramc
+#	make -C ./gramc
 #	make -C ./gramcnf
 	
 	# c4 thing.
-	make -C ./c4  
-	make -C ./gramc4
+#	make -C ./c4  
+#	make -C ./gramc4
 	
-	make -C ./bazic   
+#	make -C ./bazic   
 	
 # flags na compilaçao ... o assembly chama funcoes sem '_'
 # e nos usaremos underline.

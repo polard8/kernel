@@ -246,6 +246,8 @@ vhd-copy-files:
 	#-sudo cp portals/setup/bin/*.BIN                 /mnt/gramadovhd 
 	-sudo cp portals/shell/cmd/bin/REBOOT.BIN         /mnt/gramadovhd
 	-sudo cp portals/shell/cmd/bin/CAT.BIN            /mnt/gramadovhd
+#	-sudo cp portals/shell/cmd/bin/TRUE.BIN           /mnt/gramadovhd
+#	-sudo cp portals/shell/cmd/bin/FALSE.BIN          /mnt/gramadovhd
 	# ...
 
 

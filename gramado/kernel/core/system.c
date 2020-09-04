@@ -912,14 +912,7 @@ void *systemGetSystemMetric (int number){
         case SM_SCREENHEIGHT:
             //pegar uma global
 			break;
-        
-		//Essa é uma versão para o desenvolvedor??
-        case SM_DEVELOPER_EDITION:
-            if(gSystemEdition == SYSTEM_DEVELOPER_EDITION)
-            {
-				return (void *) 1; //Sim, essa é uma versão para o desenvolvedor.
-			}else{ return NULL; }; //Não, essa não é uma versão para o desenvolvedor.
-		    break;
+		    
 			
             //Continuar ... 
 
@@ -1612,38 +1605,13 @@ int systemStartUp (void){
 	//     Configurando a versão do sistema.
     printf("systemStartUp: Setup version\n");
     
-	systemSetupVersion ();
+    
+   // #todo
+   // Talvez o init deva chamar essa rotina,
+   // para configurar a versao e o produto
+   systemSetupVersion();
 
 
-	// Product ?
-	// Inicializa a edição do sistema.
-	// Define um tipo de destinação para a versão do 
-	// sistema operacional.
-
-
-    switch (SYSTEM_EDITION)
-    {
-        case SYSTEM_DEVELOPER_EDITION:
-		    gSystemEdition = SYSTEM_DEVELOPER_EDITION; 
-		    break;
-
-		case SYSTEM_WORKSTATION_EDITION:
-		    gSystemEdition = SYSTEM_WORKSTATION_EDITION;
-		    break;
-
-		case SYSTEM_SERVER_EDITION:
-		    gSystemEdition = SYSTEM_SERVER_EDITION;
-			break;
-
-		case SYSTEM_IOT_EDITION:
-		    gSystemEdition = SYSTEM_SERVER_EDITION;
-			break;
-
-        //...
-        default:
-		    gSystemEdition = 0;
-            break; 
-    };
 
 
 // Done: 
@@ -1700,10 +1668,12 @@ int systemInit (void){
     debug_print ("====systemInit:\n");
     printf ("systemInit:\n");
 
-	//Colocando na variável global, a opção selecionada manualmente pelo 
-	//desenvolvedor.
 
-    gSystemEdition = SYSTEM_EDITION;
+   // #todo
+   // Talvez o init deva chamar essa rotina,
+   // para configurar a versao e o produto
+
+    gSystemEdition = 0;
     //...
 
 	// Podemos fazer algumas inicializações antes de chamarmos 

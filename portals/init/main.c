@@ -60,6 +60,24 @@ ID 	Name 	Description
 
 int __current_runlevel;
 
+
+//=================================
+
+// Enterprise machines to access the business server.
+#define PT_GRAMADO_WORKSTATION    1000
+
+// The business server.
+#define PT_GRAMADO_SERVER         2000
+
+// Regular desktop machine.
+#define PT_GRAMADO_DESKTOP        3000 
+
+// iot machine
+#define PT_GRAMADO_IOT            4000 
+
+int __product_type;
+
+
 //
 // Variáveis internas.
 //
@@ -117,7 +135,22 @@ void enable_maskable_interrupts(void)
 }
 
 
+void
+initialize_product_type(void)
+{
+    debug_print ("init.bin: Initializing product type ...\n");
+    
+    //
+    // This is the only product we have for now!
+    //
+    
+    __product_type = PT_GRAMADO_DESKTOP;
 
+    // #todo:
+    // Call the kernel to setup the product identification.
+    // ex: gde_setup_product(...)
+
+}
 
 /*
  ********************** 
@@ -140,8 +173,12 @@ int main ( int argc, char *argv[] ){
     __current_runlevel = (int) -1; 
  
 
+    // Product
+    
+    initialize_product_type();
+
     //
-    // Main loop
+    // == Main loop ==============================================
     //
 
 
@@ -149,7 +186,7 @@ int main ( int argc, char *argv[] ){
     while (1){
 
     debug_print ("---------------------------\n"); 
-    debug_print ("init.bin: Initializing Portals ...\n");
+    debug_print ("init.bin: Initializing Portals environment ...\n");
 
     // Using api.
     gde_draw_text ( NULL, 
@@ -265,12 +302,15 @@ int main ( int argc, char *argv[] ){
     while (1){
         asm ("pause");
         gramado_system_call (265,0,0,0); 
+        //if (gShutdown == 1){ goto shutdown; };
     };
-    
     
     };
     // Main loop end.
     //--
+
+//shutdown:
+    //gde_shutdown(...);
 }
 
 
