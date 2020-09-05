@@ -301,13 +301,8 @@ all-c:
 	$(CC) -c  core/ps/ts.c        $(KINCLUDE)  $(CFLAGS) -o ts.o
 	$(CC) -c  core/ps/tstack.c    $(KINCLUDE)  $(CFLAGS) -o tstack.o
 	$(CC) -c  core/ps/execve.c    $(KINCLUDE)  $(CFLAGS) -o execve.o
-
-	# ps
-	$(CC) -c core/ps/create.c  $(KINCLUDE)  $(CFLAGS) -o create.o
-	$(CC) -c core/ps/mk.c      $(KINCLUDE)  $(CFLAGS) -o mk.o
-
-
-
+	$(CC) -c core/ps/create.c     $(KINCLUDE)  $(CFLAGS) -o create.o
+	$(CC) -c core/ps/mk.c         $(KINCLUDE)  $(CFLAGS) -o mk.o
 
 
 
