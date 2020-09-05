@@ -710,22 +710,23 @@ int videoInit (void){
 	gwsSetCurrentFontAddress ( VIDEO_BIOS_FONT8X8_ADDRESS );		
  
 	//#todo: usar a função que configura essas variáveis.
-	gcharWidth = VIDEO_BIOS_FONT8X8_WIDTH;
-	gcharHeight = VIDEO_BIOS_FONT8X8_HEIGHT;		
-	gfontSize = FONT8X8;
-			    
+	gcharWidth  = VIDEO_BIOS_FONT8X8_WIDTH;
+	gcharHeight = VIDEO_BIOS_FONT8X8_HEIGHT;
+	gfontSize   = FONT8X8;
+
+
 	//Cursor. 
-	TTY[current_vc].cursor_x = 0; //g_cursor_x = 0;
-	TTY[current_vc].cursor_y = 8; //g_cursor_y = 8;
+	TTY[current_vc].cursor_x = 0;       //g_cursor_x = 0;
+	TTY[current_vc].cursor_y = 8;        //g_cursor_y = 8;
 	TTY[current_vc].cursor_width = 8;    //g_cursor_width = 8;
 	TTY[current_vc].cursor_height = 8;   //g_cursor_height = 8;
-	TTY[current_vc].cursor_color = COLOR_TERMINALTEXT;
-        
-        
+	TTY[current_vc].cursor_color = COLOR_WHITE;
+
+
 	//@todo; Criar defines para default.
-	TTY[current_vc].cursor_left = 0;      // Margem esquerda dada em linhas.
+    TTY[current_vc].cursor_left = 0;      // Margem esquerda dada em linhas.
     TTY[current_vc].cursor_top = 0;       // Margem superior dada em linhas.
-	TTY[current_vc].cursor_right  = 256;  // Margem direita dada em linhas.
+    TTY[current_vc].cursor_right  = 256;  // Margem direita dada em linhas.
     TTY[current_vc].cursor_bottom = 256;  // Margem inferior dada em linhas.
 		
 	set_up_cursor(0,0);    //Cursor.

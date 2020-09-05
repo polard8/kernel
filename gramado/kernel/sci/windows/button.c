@@ -25,20 +25,22 @@
 // Atualizando as características do botão antes de repintá-lo.
 
 void 
-update_button ( struct button_d *button,
-                unsigned char *string,
-                int style,
-                int state,
-                int type,
-                unsigned long x, 
-                unsigned long y, 
-                unsigned long width, 
-                unsigned long height, 
-                unsigned long color )
+update_button ( 
+    struct button_d *button,
+    unsigned char *string,
+    int style,
+    int state,
+    int type,
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long width, 
+    unsigned long height, 
+    unsigned long color )
 {
-	
-	struct window_d *window;
-	
+
+    struct window_d *window;
+
+
     if ( (void *) button == NULL )
     {
 		//printf ("update_button\n");
@@ -92,8 +94,8 @@ update_button ( struct button_d *button,
         //Não pressionado.
 		case BS_DEFAULT:
 			button->selected = 0;
-            button->border1 = COLOR_BUTTONHIGHLIGHT3;
-			button->border2 = COLOR_BUTTONSHADOW3;
+            button->border1 = 0x00008080;
+			button->border2 = 0x00202020;
 			break;
 
 		case BS_FOCUS:
@@ -104,8 +106,8 @@ update_button ( struct button_d *button,
          // Pressionado.
         case BS_PRESS:
 			button->selected = 1;
-			button->border1 = COLOR_BUTTONSHADOW3;
-			button->border2 = COLOR_BUTTONHIGHLIGHT3;
+			button->border1 = 0x00202020;
+			button->border2 = 0x00008080;
             break;
 			
 		case BS_HOVER:
@@ -251,10 +253,10 @@ draw_button (
 		case BS_DEFAULT:
 		    Selected = 0;
 			b->selected = 0;
-		    border1 = COLOR_BUTTONHIGHLIGHT3;
-			border2 = COLOR_BUTTONSHADOW3;
-			b->border1 = COLOR_BUTTONHIGHLIGHT3;
-			b->border2 = COLOR_BUTTONSHADOW3;
+		    border1 = 0x00008080;
+			border2 = 0x00202020;
+			b->border1 = 0x00008080;
+			b->border2 = 0x00202020;
 			break;
 
 		case BS_FOCUS:
@@ -268,10 +270,10 @@ draw_button (
         case BS_PRESS:
 		    Selected = 1;
 			b->selected = 1;
-		    border1 = COLOR_BUTTONHIGHLIGHT3;
-			border2 = COLOR_BUTTONSHADOW3;
-			b->border1 = COLOR_BUTTONSHADOW3;
-			b->border2 = COLOR_BUTTONHIGHLIGHT3;
+		    border1 = 0x00008080;
+			border2 = 0x00202020;
+			b->border1 = 0x00202020;
+			b->border2 = 0x00008080;
             break;
 			
 		case BS_HOVER:
@@ -354,7 +356,9 @@ draw_button (
 	//button label
     if (Selected == 1)
     {
-        draw_string ( x +offset,y +8, COLOR_WHITE, string );
+        draw_string (
+            (x +offset), (y +8), 
+            COLOR_WHITE, string );
 
     }else{
 
@@ -364,9 +368,11 @@ draw_button (
 		// (window->left +x) left 
 		// (largura do botão, menos a largura da string)/2
 
-        draw_string ( x +offset, y +8, COLOR_TERMINALTEXT, string );
-
+        draw_string ( 
+            (x +offset), (y +8), 
+            COLOR_WHITE, string );
     };
+
 
 	//Retornando o ponteiro para a estrutura do botão.
     return (void *) b;  
@@ -471,8 +477,9 @@ int redraw_button ( struct button_d *button ){
         //draw_string ( w->left + button->x +offset, w->top  + button->y +8, 
             //COLOR_TERMINALTEXT, button->string );
 
-        draw_string ( button->x +offset, button->y +8, 
-            COLOR_TERMINALTEXT, button->string );
+        draw_string ( 
+            (button->x +offset), (button->y +8), 
+            COLOR_WHITE, button->string );
     };
 
 

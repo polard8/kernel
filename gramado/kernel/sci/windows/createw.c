@@ -144,12 +144,15 @@ DrawTitleBar (
 	 { __tmp_color = window->bg_color; }    // escolhida pelo aplicativo;
       
       //retângulo da barra de títulos.
-     drawDataRectangle ( window->left +2, window->top +2, 
-           window->width -4, 30, __tmp_color );        
+     drawDataRectangle ( 
+         (window->left +2), (window->top +2), 
+         (window->width -4), 30, __tmp_color );        
         
 	// String
-    draw_string ( window->left +16 +8 +8, window->top +(32/3), 
-        COLOR_TERMINALTEXT2, window->name );  
+    draw_string ( 
+        (window->left +16 +8 +8), ( window->top + (32/3) ), 
+        xCOLOR_GRAY7, window->name );  
+
 
      return 0;
 }
@@ -233,7 +236,7 @@ DrawFrame (
                 border_color = COLOR_BLUE;
                 border_size = 3;
             }else{
-                border_color = COLOR_INACTIVEBORDER;
+                border_color = 0xF4F7FC;
                 border_size = 2;
             };
             
@@ -352,8 +355,8 @@ void *CreateWindow (
 	// (min, max ...).
 	//int View;
 
-	int Maximized; //??
-	int Minimized; //
+    int Maximized=0;
+    int Minimized=0;
 
 	// Bars.
 	int TitleBar  = 0;
@@ -400,15 +403,14 @@ void *CreateWindow (
 	struct desktop_d *Desktop;
 	struct rect_d *clientRect;  //rect
 
-	
+
 	// #improvisando uma largura de borda.
 	// @todo: isso deve ir para outro lugar.
-	unsigned long border_size = 0;
-	unsigned long border_color = COLOR_BORDER;
-	
-	
-	unsigned long __tmp_color;
-	
+    unsigned long border_size = 0;
+    unsigned long border_color = 0xC0C0C0;
+    unsigned long __tmp_color=0;
+
+
 	//salvar para depois restaurar os valores originais no fim da rotina.
 	//unsigned long saveLeft;
 	//unsigned long saveTop;
@@ -510,7 +512,7 @@ void *CreateWindow (
 
 	//Alocando memória para a estrutura da janela.
 
-	window = (void *) kmalloc ( sizeof(struct window_d) );
+    window = (void *) kmalloc ( sizeof(struct window_d) );
 
 	if ( (void *) window == NULL )
 	{
@@ -531,9 +533,9 @@ void *CreateWindow (
 		// Agora vamos inicializar os elementos da estrutura de acordo 
 		// com os parâmetros passados via argumento.
 
-		// Object support.
-		window->objectType = ObjectTypeWindow;
-		window->objectClass = ObjectClassGuiObjects;
+        // Object support.
+        window->objectType  = ObjectTypeWindow;
+        window->objectClass = ObjectClassGuiObjects;
 
 		// #importante
 		// Id. A janela recebe um id somente na hora de registrar.
@@ -652,7 +654,7 @@ void *CreateWindow (
 		
 		window->CursorX = 0;
 		window->CursorY = 0;
-		window->CursorColor = COLOR_WINDOWTEXT; 
+		window->CursorColor = 0x00333333; 
 		//@todo: As outras características do cursor.
 		//Características.
 		
@@ -1145,13 +1147,13 @@ void *CreateWindow (
             drawDataRectangle ( window->left, window->top, 
                 window->width -1, window->height, window->bg_color ); 
 
-            draw_string ( window->left +8, window->top +8, 
-                COLOR_TEXT, window->name ); 
+            draw_string ( (window->left +8), (window->top +8), 
+                0x00333333, window->name ); 
             goto done;
         }
 
         // 
-        // * Draw!
+        // Draw!
         //
          
         drawDataRectangle ( window->left, window->top, 
@@ -1405,10 +1407,11 @@ void *CreateWindow (
     if (window->type == WT_ICON)
     {
         bmpDisplayBMP ( appIconBuffer, 
-            window->left +8, window->top +8 );
+            (window->left +8), (window->top +8) );
             
-        draw_string ( window->left +8, window->top +16 +8 +8, 
-            COLOR_TERMINALTEXT2, window->name );  
+        draw_string ( 
+            (window->left +8), (window->top +16 +8 +8), 
+            xCOLOR_GRAY7, window->name );  
     }
 
 

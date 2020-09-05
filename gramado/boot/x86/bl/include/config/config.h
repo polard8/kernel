@@ -7,15 +7,13 @@
 
 
 
-//Debug flags.
-//Testando desligado.
+//
+// Debug flag.
+//
+
+//#define BL_VERBOSE 1  
 
 
-// #BUGBUG
-// Nao usar por enquanto.
-// usar essa flag esta ativando alguma rotina
-// defeituosa.
-// #define BL_VERBOSE 1  
 
 //
 // ## IMPORNTANTE ##
@@ -27,7 +25,7 @@
 
 // Portas bases encontradas nas BARs.
 //BAR0 = base port 1F0   ( channel 0 primary master) (channel 0 primary slave) 
-//BAR1 = base port 3F6	 channel ??
+//BAR1 = base port 3F6   channel ??
 //BAR2 = base port 170   (channel 1 secondary master) (channel 1 secondary slave)
 //BAR3 = base port 376   channel ??
 

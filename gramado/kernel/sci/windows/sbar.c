@@ -62,10 +62,10 @@ UpdateStatusBar (
 			
 			//write.
             draw_text ( w, 0* ( w->width/2), 1* (w->height/3), 
-                COLOR_WINDOWTEXT, string1 );
+                0x00333333, string1 );
 
             draw_text ( w, 1* (w->width/2), 1* (w->height/3), 
-                COLOR_WINDOWTEXT, string2 );
+                0x00333333, string2 );
 		
 		
 		    show_window_rect ( (struct window_d *) w );
@@ -216,10 +216,10 @@ struct window_d *StatusBar (
         RegisterWindow (hWnd);
 
         draw_text ( hWnd, 0* (width/2), 1* (height/3), 
-            COLOR_WINDOWTEXT, string1 );
+            0x00333333, string1 );
 
         draw_text ( hWnd, 1* (width/2), 1* (height/3), 
-            COLOR_WINDOWTEXT, string2 );
+            0x00333333, string2 );
 
 		
 		//
@@ -233,20 +233,18 @@ struct window_d *StatusBar (
 		// ... ?
 		
 	    goto done;
-	};	 
+	};
 	
 	goto fail;
 	
 	// More ?!
-	
-done:
 
-	return (struct window_d *) hWnd;
+done:
+    return (struct window_d *) hWnd;
 
 fail:
-
     //printf ("fail\n");
-	return NULL;
+    return NULL;
 }
 
 

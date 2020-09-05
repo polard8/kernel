@@ -17,9 +17,9 @@ extern void refresh_screen();
 /* abort: 
    Função principal para abortar o Boot Loader. */ 
 
-void abort (){
+void abort (void){
 
-    printf ("BL.BIN abort");
+    printf ("BL.BIN: [ABORT] * System halted\n");
     refresh_screen ();
 
     while (1){

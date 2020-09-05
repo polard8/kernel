@@ -1350,16 +1350,14 @@ void windowShowWindowList (void){
 
 int redraw_window (struct window_d *window, unsigned long flags ){
 
-    int Status; 
+    int Status=0; 
     unsigned long border_size = 0;
-    unsigned long border_color = COLOR_BORDER;
+    unsigned long border_color = 0xC0C0C0;
+    unsigned long __tmp_color=0;
 
-    unsigned long __tmp_color;
 
-	
-	
-    if ( (void *) window == NULL )
-    {
+    if ( (void *) window == NULL ){
+        //msg
 		goto fail;
 		
     }else{
@@ -1523,7 +1521,7 @@ int redraw_window (struct window_d *window, unsigned long flags ){
 				border_color = COLOR_BLUE;
 			    border_size = 2;
 			}else{
-			    border_color = COLOR_INACTIVEBORDER;	
+			    border_color = 0xF4F7FC;	
 			    border_size = 1;
 			}
 		};
@@ -1536,7 +1534,7 @@ int redraw_window (struct window_d *window, unsigned long flags ){
 				border_color = COLOR_BLUE;
 			    border_size = 2;
 			}else{
-			    border_color = COLOR_INACTIVEBORDER;	
+			    border_color = 0xF4F7FC;	
 			    border_size = 1;
 			}
 		};		
@@ -1554,7 +1552,7 @@ int redraw_window (struct window_d *window, unsigned long flags ){
 				}
 				
 			}else{
-			    border_color = COLOR_INACTIVEBORDER;	
+			    border_color = 0xF4F7FC;	
 			    border_size = 1;
 			}
 		};	
@@ -1567,10 +1565,10 @@ int redraw_window (struct window_d *window, unsigned long flags ){
 				border_color = COLOR_GRAY;
 			    border_size = 2;
 			}else{
-			    border_color = COLOR_INACTIVEBORDER;	
+			    border_color = 0xF4F7FC;	
 			    border_size = 1;
 			}
-		};		
+		};
 		
 		//board1, borda de cima e esquerda.    
 		drawDataRectangle ( window->left, window->top, 
@@ -1639,17 +1637,21 @@ int redraw_window (struct window_d *window, unsigned long flags ){
 			if (window->focus == 0)
 			{ __tmp_color = window->bg_color; }    // escolhida pelo aplicativo;
         
-        drawDataRectangle ( window->left +2, window->top +2, 
+        drawDataRectangle ( 
+            (window->left +2), (window->top +2), 
             window->width -4, 30, 
             __tmp_color );        
 
 
 		//@todo: 
 		//string da barra de títulos.
-		//Se estivermos em full screen, não teremos string.				   
-		draw_string ( window->left +8 +16 +8, window->top +8 +4, 
-			COLOR_TERMINALTEXT2, window->name );  		 
-		
+		//Se estivermos em full screen, não teremos string.
+
+        draw_string ( 
+            (window->left +8 +16 +8), (window->top +8 +4), 
+            xCOLOR_GRAY7, window->name ); 
+
+
 		//#debug
 		//printf ("* real machine breakpoint");
 		//refresh_screen();
@@ -1784,7 +1786,7 @@ int redraw_window (struct window_d *window, unsigned long flags ){
 
 
 	//status bar
-	if (window->statusbarUsed == 1)
+    if (window->statusbarUsed == 1)
     {
 	    if ( window->statusbar != NULL )
 		{
@@ -1799,10 +1801,10 @@ int redraw_window (struct window_d *window, unsigned long flags ){
 
 		        draw_string ( window->statusbar->left +8, 
 		            window->statusbar->top +8, 
-		            COLOR_TEXT, window->statusbar->name ); 
+		            0x00333333, window->statusbar->name ); 
 			}
 		}
-	}
+    }
 
        //funcionou ate aqui na maquina real
 		//#debug
@@ -1841,13 +1843,13 @@ int redraw_window (struct window_d *window, unsigned long flags ){
 							break;
 							
 						case BS_PRESS:
-						    window->button->border1 = COLOR_BUTTONHIGHLIGHT2;
-						    window->button->border2 = COLOR_BUTTONSHADOW2; 
+						    window->button->border1 = 0x00404040;
+						    window->button->border2 = 0x00303030; 
 							break;
 							
 						case BS_DEFAULT:
-						    window->button->border1 = COLOR_BUTTONSHADOW2;
-						    window->button->border2 = COLOR_BUTTONHIGHLIGHT2; 
+						    window->button->border1 = 0x00303030;
+						    window->button->border2 = 0x00404040; 
 							break;
 								
 						case BS_DISABLED:
@@ -1902,25 +1904,25 @@ int redraw_window (struct window_d *window, unsigned long flags ){
 					
                     if ( window->button->selected == 0 )
                     {
-					    draw_string ( window->left +8, 
-					        window->top +8, 
-			                COLOR_TERMINALTEXT, window->button->string );
-					}						
-				}				
+                        draw_string ( 
+                            (window->left +8), (window->top  +8), 
+                            COLOR_WHITE, window->button->string );
+                    }
+				}
 			}
-		}			
+		}
 	};
-
 
 
     // Icon.
     if (window->type == WT_ICON)
     {
         bmpDisplayBMP ( appIconBuffer, 
-            window->left +8, window->top +8 );
+            (window->left +8), (window->top +8) );
             
-        draw_string ( window->left +8, window->top +16 +8 +8, 
-            COLOR_TERMINALTEXT2, window->name );  
+        draw_string ( 
+            (window->left +8), (window->top +16 +8 +8), 
+            xCOLOR_GRAY7, window->name );  
     }
 
 

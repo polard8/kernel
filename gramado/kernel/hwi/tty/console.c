@@ -399,7 +399,7 @@ void _console_outbyte (int c, int console_number){
             draw_char ( cWidth * TTY[console_number].cursor_x, 
                        cHeight * TTY[console_number].cursor_y, 
                        c, 
-                       COLOR_TERMINALTEXT, COLOR_TERMINAL2 );
+                       COLOR_WHITE, 0x303030 );
 
 
         // ## TRANSPARENTE ##

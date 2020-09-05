@@ -207,21 +207,22 @@ void systemSetTerminalWindow ( struct window_d *window ){
     }
 
     if ( TTY[current_vc].cursor_bottom > 600 )
-	{
+    {
          TTY[current_vc].cursor_bottom = 595;
     }
 
 
-
-	//
+    //
     // Cursor.
     //
-	
-	TTY[current_vc].cursor_width = 8; 
+
+    TTY[current_vc].cursor_width  = 8; 
     TTY[current_vc].cursor_height = 8; 
-    TTY[current_vc].cursor_color = COLOR_TERMINALTEXT;
-	
-	
+    TTY[current_vc].cursor_color  = COLOR_WHITE;
+
+
+
+
 	//
 	// Terminal struct
 	//

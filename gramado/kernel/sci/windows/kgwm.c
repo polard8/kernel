@@ -560,7 +560,7 @@ void gui_create_background (void){
 
     hWindow = (void *) CreateWindow ( 1, 0, VIEW_MINIMIZED, "Background", 
                            Left, Top, Width, Height,
-                           gui->screen, 0, 0, COLOR_BACKGROUND );
+                           gui->screen, 0, 0, 0x00008080 );
 
 
     if ( (void *) hWindow == NULL ){
@@ -622,7 +622,7 @@ void gui_create_taskbar (void){
 
     hWindow = (void *) CreateWindow ( 1, 0, VIEW_MINIMIZED, "taskbar", 
                            Left, Top, Width, Height, 
-                           gui->screen, 0, 0, COLOR_WINDOW );
+                           gui->screen, 0, 0, COLOR_WHITE );
 
     if ( (void *) hWindow == NULL){
         panic ("gui_create_taskbar:\n");
@@ -701,9 +701,9 @@ void gui_create_mainwindow (void){
 	//É onde ficam as janelas dos aplicativos.
 	//A janela principal perence ao desktop
 
-    hWindow = (void *) CreateWindow ( 1, 0, VIEW_MINIMIZED, "gramado desktop window", 
+    hWindow = (void *) CreateWindow ( 1, 0, VIEW_MINIMIZED, "desktop window", 
                            Left, Top, Width, Height,           
-                           gui->screen, 0, 0, COLOR_WINDOW );   
+                           gui->screen, 0, 0, COLOR_WHITE );   
 
     if ( (void *) hWindow == NULL){
         panic ("gui_create_mainwindow:\n");
@@ -738,7 +738,7 @@ void gui_create_mainwindow (void){
     /*
 	gui->desktop = (void*) CreateWindow( 1, 0, VIEW_MINIMIZED, "Desktop Window", 
 	                                0, 16, 800, 600-16-16, 
-							        gui->screen, 0, 0, COLOR_WINDOW ); 
+							        gui->screen, 0, 0, COLOR_WHITE ); 
 	*/
 
 

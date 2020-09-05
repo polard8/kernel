@@ -126,9 +126,10 @@ void _vt_outbyte ( int c, struct tty_d *tty ){
             //draw_char ( cWidth * TTY[console_number].cursor_x, cHeight * TTY[console_number].cursor_y, c, 
 				//COLOR_TERMINALTEXT, COLOR_TERMINAL2 );
 				
-            draw_char ( cWidth * tty->cursor_x, cHeight * tty->cursor_y, 
-                c, COLOR_TERMINALTEXT, COLOR_TERMINAL2 );
-			
+            draw_char ( 
+                (cWidth * tty->cursor_x), (cHeight * tty->cursor_y), 
+                c, COLOR_WHITE, 0x303030 );
+
 		}else{
 			
 			// ## TRANSPARENTE ##
@@ -140,9 +141,9 @@ void _vt_outbyte ( int c, struct tty_d *tty ){
 			    //cWidth* TTY[console_number].cursor_x, cHeight * TTY[console_number].cursor_y, 
 				//TTY[console_number].cursor_color, c );
 				
-			drawchar_transparent ( 
-			    cWidth* tty->cursor_x, cHeight * tty->cursor_y, 
-				tty->cursor_color, c );
+            drawchar_transparent ( 
+                (cWidth * tty->cursor_x), (cHeight * tty->cursor_y), 
+                tty->cursor_color, c );
 		};
 		
 		//#testando ...

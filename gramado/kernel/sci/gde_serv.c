@@ -1152,8 +1152,8 @@ gde_services (
 	// Window stuffs:
     struct window_d *hWnd;
     struct window_d *focusWnd;   //Janela com foco de entrada.
-    unsigned long WindowColor = COLOR_WINDOW;  
-    unsigned long WindowClientAreaColor = COLOR_WINDOW;  
+    unsigned long WindowColor = COLOR_WHITE;  
+    unsigned long WindowClientAreaColor = COLOR_WHITE;  
 
 
 	//Window.
@@ -2700,8 +2700,8 @@ unsigned long serviceCreateWindow ( char *message_buffer ){
     unsigned long WindowY = (2*(600/20));    //100;   V                
     unsigned long WindowHeight = 480;  
 
-    unsigned long WindowClientAreaColor = COLOR_WINDOW;  
-    unsigned long WindowColor = COLOR_WINDOW;  
+    unsigned long WindowClientAreaColor = COLOR_WHITE;  
+    unsigned long WindowColor = COLOR_WHITE;  
 
 
 	//#todo: Checar a validade da esturtura,

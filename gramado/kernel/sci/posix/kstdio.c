@@ -1707,8 +1707,7 @@ int stdioInitialize (void){
 	// # Multiplas linhas.
 
 	
-	g_inputmode = INPUT_MODE_MULTIPLE_LINES;
-	
+    g_inputmode = INPUT_MODE_MULTIPLE_LINES;
 
     //
     // Virtual console.
@@ -1729,11 +1728,9 @@ int stdioInitialize (void){
         TTY[i].cursor_right  = (SavedX/cWidth);    
         TTY[i].cursor_bottom = (SavedY/cHeight);  
 
-        TTY[i].cursor_color = COLOR_TERMINALTEXT;  
+        TTY[i].cursor_color = COLOR_WHITE;  
     };
 
-
-    
     
 	// Done !
 

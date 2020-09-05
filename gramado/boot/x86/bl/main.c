@@ -36,8 +36,10 @@
 // Prototypes.
 
 unsigned long init_testing_memory_size (int mb);
-void BlLoadKernel ();
-void BlSetupPaging ();
+
+void BlLoadKernel(void);
+
+void BlSetupPaging(void);
 
 
 void
@@ -136,11 +138,13 @@ ____go:
 /*
  ************************************************
  * BlMain:
+ * 
  *     This is the entrypoint for the C part of the boot loader.
  *     Initializes, loads the kernel image and returns to head.s.
  */
  
 //void BlMain( int argc, char *argv[], char *envp[] ) 
+
 void BlMain (){
 
     int Status = -1;
@@ -150,15 +154,16 @@ void BlMain (){
     // VideoBlock.useGui = 0;
 
     // Init.
-    Status = (int) init ();
+    
+    Status = (int) init();
 
     if (Status != 0 ){
-    // #todo
+        // #todo
     }
 
 
 //
-// ========================== memory ===============================
+// == Memory size ===============================
 //
 
     // #test
@@ -217,10 +222,10 @@ void BlMain (){
 
     // Initializes heap;
     // Used for malloc() and ide driver.
-    init_heap ();
+    init_heap();
 
     // Initializes ide support.
-    init_hdd ();
+    init_hdd();
 
 
     // #todo: 
@@ -230,18 +235,16 @@ void BlMain (){
     // Welcome Message.
     // banner
 
+
 #ifdef BL_VERBOSE
     printf ("BlMain: Starting Boot Loader..\n");
-    //Debug:
-    //kprintf( "BlMain: Boot Loader 32 bits em C (TEXT Mode) #test. #hang", 9, 9 );
-    //while(1){}
 #endif
 
 
     if (g_initialized != 1)
     {
-        printf ("BlMain:");
-        die ();
+        printf("BlMain:");
+        die();
     }
 
 
@@ -259,7 +262,7 @@ void BlMain (){
 
 
 	//Carrega arquivos.
-#ifdef BL_VERBOSE	
+#ifdef BL_VERBOSE
     printf ("BlMain: Loading files..\n");
     refresh_screen ();
 #endif
@@ -326,9 +329,10 @@ void BlMain (){
 #ifdef BL_VERBOSE	
 	printf ("BlMain: Initializing pages..\n");
 	//refresh_screen();
-#endif	
-	
-    BlSetupPaging ();
+#endif
+
+
+    BlSetupPaging();
 
 
 	//@todo: Atualizar status.
@@ -341,12 +345,12 @@ void BlMain (){
 
 	// Debug message.
 
-#ifdef BL_VERBOSE	
+#ifdef BL_VERBOSE
     printf ("BlMain: Done\n");
     //printf ("BlMain: LFB={%x} \n",g_lbf_pa);
     //printf ("#DEBUG: *HANG\n");
     refresh_screen ();
-    //while(1){};
+    while(1){};
 #endif
 
 }
@@ -359,14 +363,16 @@ void BlMain (){
  *     The entry point is at 0x00101000.
  */ 
 
-void BlLoadKernel (){
+void BlLoadKernel(void){
 
     int Status = -1;
 
-    Status = (int) load_kernel ();
-    if ( Status != 0 ){
+    Status = (int) load_kernel();
+
+    if ( Status != 0 )
+    {
         printf ("BlLoadKernel:\n");
-        die ();
+        die();
     }
 }
 
@@ -381,7 +387,8 @@ void BlLoadKernel (){
  *
  * @diretorio:
  *   page_directory = 0x9C000
- *   OBS: Esse diret�rio criado ser� usado pelas primeiros processos durante
+ *   OBS: 
+ * Esse diret�rio criado ser� usado pelas primeiros processos durante
  * essa fase de constru��o do sistema.
  *        O ideal � um diret�rio por processo.
  *        Toda vez que o kernel iniciar a execu��o de um processo ele deve 
@@ -402,9 +409,10 @@ void BlLoadKernel (){
  * da pagina��o. 
  */
 
-void BlSetupPaging (){
-
-    SetUpPaging ();
+// See: pages.c
+void BlSetupPaging(void)
+{
+    SetUpPaging();
 }
 
 
@@ -559,10 +567,12 @@ unsigned long init_testing_memory_size (int mb)
  *     No return!
  */
 
-void die (){
+// See: bootloader.h
 
-    printf ("die: (BL.BIN) * System Halted");
-    refresh_screen ();
+void die(void){
+
+    printf ("BL.BIN: [DIE] * System Halted\n");
+    refresh_screen();
 
     while (1){
         asm ("cli");
