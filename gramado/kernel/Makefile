@@ -334,14 +334,15 @@ all-c:
 	$(CC) -c hwi/dd/nhid/arch/x86/apic.c  $(KINCLUDE) $(CFLAGS) -o apic.o
 	$(CC) -c hwi/dd/nhid/arch/x86/pic.c   $(KINCLUDE) $(CFLAGS) -o pic.o
 	$(CC) -c hwi/dd/nhid/arch/x86/pit.c   $(KINCLUDE) $(CFLAGS) -o pit.o
-	
+
+
 	# hal
-	$(CC) -c hwi/hal/hal.c                $(KINCLUDE) $(CFLAGS) -o hal.o
-	$(CC) -c hwi/hal/arch/detect.c        $(KINCLUDE) $(CFLAGS) -o detect.o
-	$(CC) -c hwi/hal/arch/amd/cpuamd.c    $(KINCLUDE) $(CFLAGS) -o cpuamd.o
-	$(CC) -c hwi/hal/arch/x86/portsx86.c  $(KINCLUDE) $(CFLAGS) -o portsx86.o
-	$(CC) -c hwi/hal/arch/x86/x86.c       $(KINCLUDE) $(CFLAGS) -o x86.o
-	$(CC) -c hwi/hal/arch/x86/x86info.c   $(KINCLUDE) $(CFLAGS) -o x86info.o   
+	$(CC) -c hwi/hal/hal.c             $(KINCLUDE) $(CFLAGS) -o hal.o
+	$(CC) -c hwi/hal/detect.c          $(KINCLUDE) $(CFLAGS) -o detect.o
+	$(CC) -c hwi/hal/amd/cpuamd.c      $(KINCLUDE) $(CFLAGS) -o cpuamd.o
+	$(CC) -c hwi/hal/x86/portsx86.c    $(KINCLUDE) $(CFLAGS) -o portsx86.o
+	$(CC) -c hwi/hal/x86/x86.c         $(KINCLUDE) $(CFLAGS) -o x86.o
+	$(CC) -c hwi/hal/x86/x86info.c     $(KINCLUDE) $(CFLAGS) -o x86info.o   
 
 
 	# ide

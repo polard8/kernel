@@ -1,18 +1,17 @@
 
 #
-# Compiling Gramado 0.13 Boot Loader 
+# Compiling Gramado Boot Loader 1.0 
 # BSD License 
 #
 # 2018 - Created by Fred Nora.
 #      - Adapted from Matheus Castello's script.
-#      - Ported from build.bat.
 #
 
-VERSION = 0
-PATCHLEVEL = 3
+VERSION = 1
+PATCHLEVEL = 0
 SUBLEVEL = 0
 EXTRAVERSION = 
-NAME = Style
+NAME = Graload
 
 
 # we do not need these flags. 
@@ -113,12 +112,12 @@ bl-x86:
 
 	
 link-x86:
-	ld -m i386pe -T link.ld -o BL.BIN $(myObjects) -Map blmap.s
-	
-	
+	ld -m i386pe -T link.ld -o BL.BIN $(myObjects)    
+
+
 finalize:
 	cp BL.BIN ../bin/
-	
+
 
 clean:
 	find . -type f -name '*.o' -delete
