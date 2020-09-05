@@ -264,22 +264,6 @@ all-c:
 	$(CC) -c core/sm.c       $(KINCLUDE) $(CFLAGS) -o sm.o
 	$(CC) -c core/system.c   $(KINCLUDE) $(CFLAGS) -o system.o
 
-
-	# ps/action
-	$(CC) -c  core/ps/action/dispatch.c  $(KINCLUDE)  $(CFLAGS) -o dispatch.o
-	$(CC) -c  core/ps/action/pheap.c     $(KINCLUDE)  $(CFLAGS) -o pheap.o
-	$(CC) -c  core/ps/action/process.c   $(KINCLUDE)  $(CFLAGS) -o process.o
-	$(CC) -c  core/ps/action/clone.c     $(KINCLUDE)  $(CFLAGS) -o clone.o
-	$(CC) -c  core/ps/action/queue.c     $(KINCLUDE)  $(CFLAGS) -o queue.o
-	$(CC) -c  core/ps/action/spawn.c     $(KINCLUDE)  $(CFLAGS) -o spawn.o
-	$(CC) -c  core/ps/action/tasks.c     $(KINCLUDE)  $(CFLAGS) -o tasks.o
-	$(CC) -c  core/ps/action/theap.c     $(KINCLUDE)  $(CFLAGS) -o theap.o
-	$(CC) -c  core/ps/action/thread.c    $(KINCLUDE)  $(CFLAGS) -o thread.o
-	$(CC) -c  core/ps/action/threadi.c   $(KINCLUDE)  $(CFLAGS) -o threadi.o
-	$(CC) -c  core/ps/action/ts.c        $(KINCLUDE)  $(CFLAGS) -o ts.o
-	$(CC) -c  core/ps/action/tstack.c    $(KINCLUDE)  $(CFLAGS) -o tstack.o
-	$(CC) -c  core/ps/action/execve.c    $(KINCLUDE)  $(CFLAGS) -o execve.o
-
 	# ps/ipc
 	$(CC) -c  core/ps/ipc/callfar.c  $(KINCLUDE)  $(CFLAGS) -o callfar.o
 	$(CC) -c  core/ps/ipc/callout.c  $(KINCLUDE)  $(CFLAGS) -o callout.o
@@ -301,6 +285,22 @@ all-c:
 	$(CC) -c core/ps/x86/mminfo.c    $(KINCLUDE)  $(CFLAGS) -o mminfo.o
 	$(CC) -c core/ps/x86/mmpool.c    $(KINCLUDE)  $(CFLAGS) -o mmpool.o
 	$(CC) -c core/ps/x86/pages.c     $(KINCLUDE)  $(CFLAGS) -o pages.o
+
+
+	# ps
+	$(CC) -c  core/ps/dispatch.c  $(KINCLUDE)  $(CFLAGS) -o dispatch.o
+	$(CC) -c  core/ps/pheap.c     $(KINCLUDE)  $(CFLAGS) -o pheap.o
+	$(CC) -c  core/ps/process.c   $(KINCLUDE)  $(CFLAGS) -o process.o
+	$(CC) -c  core/ps/clone.c     $(KINCLUDE)  $(CFLAGS) -o clone.o
+	$(CC) -c  core/ps/queue.c     $(KINCLUDE)  $(CFLAGS) -o queue.o
+	$(CC) -c  core/ps/spawn.c     $(KINCLUDE)  $(CFLAGS) -o spawn.o
+	$(CC) -c  core/ps/tasks.c     $(KINCLUDE)  $(CFLAGS) -o tasks.o
+	$(CC) -c  core/ps/theap.c     $(KINCLUDE)  $(CFLAGS) -o theap.o
+	$(CC) -c  core/ps/thread.c    $(KINCLUDE)  $(CFLAGS) -o thread.o
+	$(CC) -c  core/ps/threadi.c   $(KINCLUDE)  $(CFLAGS) -o threadi.o
+	$(CC) -c  core/ps/ts.c        $(KINCLUDE)  $(CFLAGS) -o ts.o
+	$(CC) -c  core/ps/tstack.c    $(KINCLUDE)  $(CFLAGS) -o tstack.o
+	$(CC) -c  core/ps/execve.c    $(KINCLUDE)  $(CFLAGS) -o execve.o
 
 	# ps
 	$(CC) -c core/ps/create.c  $(KINCLUDE)  $(CFLAGS) -o create.o
