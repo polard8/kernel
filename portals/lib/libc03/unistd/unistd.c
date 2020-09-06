@@ -1956,7 +1956,74 @@ posix_spawnp (
 
 
 
+/*
+pid_t 
+spawn ( 
+    const char * path,
+    int fd_count, 
+    const int fd_map[ ], 
+    const struct inheritance * inherit, 
+    char * const argv[ ], 
+    char * const envp[ ] );
+pid_t 
+spawn ( 
+    const char * path,
+    int fd_count, 
+    const int fd_map[ ], 
+    const struct inheritance * inherit, 
+    char * const argv[ ], 
+    char * const envp[ ] )
+{
+    return -1;
+}
+*/
 
+
+
+int spawnv(int mode, char *cmd, char **argv)
+{
+    debug_print ("spawnv: [FIXME] It's a work in progress.\n"); 
+    return (int) gramado_system_call ( 900, (unsigned long) cmd, 0, 0 );
+}
+
+
+
+int spawnve(int mode, char *path, char *argv[], char *envp[])
+{
+    debug_print ("spawnv: [FIXME] It's a work in progress.\n"); 
+    return (int) gramado_system_call ( 900, (unsigned long) path, 0, 0 );
+}
+
+
+
+int spawnvp(int mode, char *path, char *argv[])
+{
+    debug_print ("spawnv: [FIXME] It's a work in progress.\n"); 
+    return (int) gramado_system_call ( 900, (unsigned long) path, 0, 0 );
+}
+
+
+
+int spawnvpe(int mode, char *path, char *argv[], char *envp[])
+{
+    debug_print ("spawnv: [FIXME] It's a work in progress.\n"); 
+    return (int) gramado_system_call ( 900, (unsigned long) path, 0, 0 );
+}
+
+
+
+int spawnveg(const char* command, char** argv, char** envv, pid_t pgid)
+{
+    debug_print ("spawnv: [FIXME] It's a work in progress.\n"); 
+    return (int) gramado_system_call ( 900, (unsigned long) command, 0, 0 );
+}
+
+
+
+
+
+
+ 
 
 
 //
