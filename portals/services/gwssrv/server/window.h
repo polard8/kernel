@@ -983,20 +983,24 @@ struct gws_window_d *ROOT;
 
 
 //
-// Window list.
+// == Window list =============================
 //
 
 // This is gonna be used to register the windows.
 // These indexes will be returned to the caller.
-
-// #bugbug
-// Is it enough ?
 
 #define WINDOW_COUNT_MAX 1024
 
 unsigned long windowList[WINDOW_COUNT_MAX];
 //unsigned long gwssrvWindowList[1024]
 
+//
+// == z order list =============================
+//
+
+#define ZORDER_MAX 1024
+
+unsigned long zList[ZORDER_MAX];
 
 //
 // ================================================================

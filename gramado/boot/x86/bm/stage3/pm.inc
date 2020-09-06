@@ -29,22 +29,24 @@
 
 ;====================================================================
 ; pmInit:
+;
 ;     Switching to Protected Mode.
+;
 ;     Obs: Talvez essa rotina deva receber argumentos. 
 ;     *Na inicialização essa rotina é chamada em modo texto.
 
 pmInit:
 
-	; Pega o modo no metafile e poe em BL.
-	; retorno em 'AL'.
-	
-	call get_boot_mode  
-	
+    ; Pega o modo no metafile e poe em BL.
+    ; retorno em 'AL'.
+
+    call get_boot_mode  
+
 	; #saving boot mode.
-	
-	xor bx, bx
-	mov bl, al    
-	
+
+    xor bx, bx
+    mov bl, al    
+
 	
 	;pusha
     ;call Window.StatusBar
@@ -79,18 +81,17 @@ trampoline:
 	;; GDTR
 	;;
 
-	;Carrega o gdtr do stage 2.
-	lgdt [stage2_gdtr]
+    ; Carrega o gdtr do stage 2.
+    lgdt [stage2_gdtr]
 
 	;;
 	;; CR0 - PE
 	;;
 
-	;Muda PE.
+    ;Muda PE.
     mov eax, cr0
     or al, 1
     mov cr0, eax
-
 
 
 	;;
@@ -98,15 +99,18 @@ trampoline:
 	;;
 
 
-	;CS.
+;CS.
+
 pmFlushPipeline:
+
     jmp stage2_CODE_SEL:pm32 
-	
+
 	;;
 	;; ## 32 BIT START ##
 	;;
-	
-	[BITS 32]
+
+    [BITS 32]
+
 pm32:
 
 
@@ -124,9 +128,9 @@ pm32:
 	; Provavelmente podemos deletar isso.
 	; É preciso conferir se não usamos essa variável 
 	; logo a frente.
-	
+
 	; Aqui estamos selecionando o modo '0'.
-	mov byte [BOOT.modo], bl
+    mov byte [BOOT.modo], bl
 
 	;;
 	;; Reconfigurando registradores.
@@ -140,7 +144,7 @@ pm32:
 	; Directory = 9C000.  
 
 	; Set up registers.
-	
+
 	mov ax, stage2_DATA_SEL 
 	mov ds, ax
 	mov es, ax
@@ -270,47 +274,53 @@ pm32:
 rmShutdown:
 
     mov ax, DATA_SEL    
-	mov ds,ax
-	mov es,ax
-	;mov fs,ax
-	;mov gs,ax
-	
-	mov ss,ax
-	mov esp, dword 0x0009FFFC
+    mov ds,ax
+    mov es,ax
+    ;mov fs,ax
+    ;mov gs,ax
+
+    mov ss,ax
+    mov esp, dword 0x0009FFFC
 
 
 	;; *Importante:
 	;; Daqui pra frente não usaremos mais o seletor para 32bit, 
 	;; somente o seletor para modo protegido de 16bit.
 
-	;;Pula para o o modo protegido de 16bit, usando o seletor de 16bit.
-	
-	jmp RM_Code_Sel:pmode_16bit
-	
+    ;; Pula para o o modo protegido de 16bit, 
+    ;; usando o seletor de 16bit.
+
+    jmp RM_Code_Sel:pmode_16bit
+
 [BITS 16]
 
 pmode_16bit:
 
-	; Ajusta os seletores de c'odigo para modo protegido de 16 bits.
-	
-	mov ax, RM_Data_Sel
-	mov ss, ax
-	mov ds, ax
-	mov es, ax
+	; Ajusta os seletores de codigo 
+	; para modo protegido de 16 bits.
+
+    mov ax, RM_Data_Sel
+    mov ss, ax
+    mov ds, ax
+    mov es, ax
 	;mov	fs, ax
 	;mov	gs, ax
 
 	;Carrega ivt = 0:0
-	
-	lidt [ivtr_rm] 
-	
-;5. Clear the PE flag in the CR0 register to switch to real-address mode.
+
+    lidt [ivtr_rm] 
+
+; 5. 
+; Clear the PE flag in the CR0 register 
+; to switch to real-address mode.
+
    mov eax, cr0
    and al, 0xFE
    mov cr0, eax
    
-;########################################################################
-;6. Execute a far JMP instruction to jump to a real-address mode program. 
+;######################################
+;6. 
+; Execute a far JMP instruction to jump to a real-address mode program. 
 ; This operation flushes the instruction queue and loads the appropriate 
 ; base and access rights values in the CS register.
 
@@ -319,19 +329,20 @@ pmode_16bit:
     ;;
 do_rm:
     
-	;7. Load the SS, DS, ES, FS, and GS registers as needed by the 
-	; real-address mode code. If any of the registers are not going 
-	; to be used in real-address mode, write 0s to them.
-	
-	cli
-	
-	;;segmento 0
+    ; 7. 
+    ; Load the SS, DS, ES, FS, and GS registers as needed by the 
+    ; real-address mode code. If any of the registers are not going 
+    ; to be used in real-address mode, write 0s to them.
+
+    cli
+
+    ;;segmento 0
     mov ax, 0x0000        
     mov ds, ax
     mov es, ax
     mov fs, ax
     mov gs, ax
-	
+
     ; Create stack
     mov ax, 0x0000
     mov ss, ax
@@ -367,10 +378,9 @@ do_rm:
 	; Mask off all interrupts for now. 
 	; PERMITE TODAS AS INTS.
 
-	mov al, 0
-	out 0x21, al
-	out 0xA1, al
-
+    mov al, 0
+    out 0x21, al
+    out 0xA1, al
 
     ; #importante:
     ; Enable interrupts
@@ -381,18 +391,16 @@ do_rm:
 
 .enableTextMode:
 
-	; set text mode for screen
+    ; set text mode for screen
 
     mov ax, 0x0003 
     int 0x10
 
-
 	 ; Importante:
 	 ; Mensagem em modo real.
 
-	mov si, rm_shutdown_msg1
-	call DisplayMessage
-
+    mov si, rm_shutdown_msg1
+    call DisplayMessage
 
 .stop:
 
@@ -407,24 +415,23 @@ do_rm:
 
 
 .doShutdown:
-	call stage2Shutdown
-	jmp $
+    call stage2Shutdown
+    jmp $
 
 
 ;;Mensagens para a rotina de shut down.
-rm_shutdown_msg1 db 'pm.inc: RM, Press a key to shutdown',13 ,10 ,0
+rm_shutdown_msg1 db 'pm.inc: [RM] Press a key to shutdown', 13, 10, 0
 ;rm_shutdown_msg2 db '*',13,10,0
 ;rm_shutdown_msg3 db '.',13,10,0
 ;rm_shutdown_msg4 db '.',13,10,0
-;...
-
+; ...
 
 ;;
 ;; =========================================================================
 ;;
 
 
-;; Temos que mdar para 32bit [bits 32]
+;; Temos que mudar para 32bit [bits 32]
 ;; para não estragar codigos subsequêntes.
 
 [bits 32]   
@@ -633,14 +640,15 @@ do_rm_startgui:
 
 
 ;;Mensagens para a rotina de shut down.	
-rm_startgui_msg1 db 'pm.inc: RM, Press a key to start GUI',13 ,10 ,0
+rm_startgui_msg1 db 'pm.inc: [RM] Press a key to start GUI', 13, 10, 0
 ;rm_startgui_msg2 db '*',13,10,0
 ;rm_startgui_msg3 db '.',13,10,0
 ;rm_startgui_msg4 db '.',13,10,0
 ; ...
 
+
 ;;
-;; =========================================================================
+;; ===========================================================
 ;;
 
 

@@ -26,10 +26,9 @@
 ; Assim a rotina exit decidirá se salva o metafile antes de iniciar ou não.
 ; '1' significa salvar o metafile e '0' significa não salvar.
 ;     
-; Histórico: 
+; History: 
 ;     Original - (BareMetal, Return Infinity).
-;     2015 - Adapted by Fred Nora.
-;     2017 - Revision.
+;     2015     - Adapted by Fred Nora.
 ;
 
 
@@ -782,10 +781,12 @@ shellPrintShellVersion:
 	
 	;Calls.
 	%include "shcalls.inc"    ;Chamadas dos comandos.
+	
 	;Lib.
 	%include "shlib.inc"      ;Lib de funções do Shell.
+	
 	;Msg.
-	%include "shmsg.inc"      ;Mensagens e variáveis do Shell.			
+	%include "shmsg.inc"      ;Mensagens e variáveis do Shell.
 	
 	; More ?!
 	

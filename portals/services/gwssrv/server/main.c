@@ -86,14 +86,24 @@ struct gws_window_d  *__taskbar_button;
 
 int MOUSE_WINDOW = -1;
 
+
 // i8042 mouse status bit.
 #define MOUSE_LEFT_BTN    0x01
 #define MOUSE_RIGHT_BTN   0x02
 #define MOUSE_MIDDLE_BTN  0x04
 #define MOUSE_X_SIGN      0x10
 #define MOUSE_Y_SIGN      0x20
-#define MOUSE_X_OVERFLOW  0x40
-#define MOUSE_Y_OVERFLOW  0x80
+//#define MOUSE_X_OVERFLOW  0x40
+//#define MOUSE_Y_OVERFLOW  0x80
+
+// Generic PS/2 Mouse Packet Bits
+#define  MOUSE_LEFT_BUTTON    0x01
+#define  MOUSE_RIGHT_BUTTON   0x02
+#define  MOUSE_MIDDLE_BUTTON  0x04
+#define  MOUSE_X_DATA_SIGN    0x10
+#define  MOUSE_Y_DATA_SIGN    0x20
+#define  MOUSE_X_OVERFLOW     0x40
+#define  MOUSE_Y_OVERFLOW     0x80
 
 long mouse_x = 0;
 long mouse_y = 0;
@@ -107,6 +117,51 @@ char saved_mouse_x =0;
 char saved_mouse_y =0;
 
 
+//Estado dos botões do mouse
+int mouse_buttom_1; 
+int mouse_buttom_2;
+int mouse_buttom_3;
+
+//Estado anterior dos botões do mouse.
+int old_mouse_buttom_1; 
+int old_mouse_buttom_2;
+int old_mouse_buttom_3;
+
+//se ouve alguma modificação no estado 
+//dos botões.
+int mouse_button_action;
+
+
+//=============================
+//mouse control
+
+// habilitar e desabilitar o mouse.
+// usada pelos aplicativos.
+int ps2_mouse_status;
+
+int ps2_mouse_has_wheel;
+
+//1= pressionado 0=liberado
+int ps2_button_pressed;
+
+int ps2_mouse_moving;
+int ps2_mouse_drag_status;
+//int ps2_mouse_drop_status;
+
+int window_mouse_over;
+
+//
+// == prototypes ===================================
+//
+
+
+
+void update_mouse (void);
+void parse_data_packet ( char data, char x, char y);
+int top_at ( int x, int y );
+int mouse_scan_windows (void);
+
+
 /*
  * =====================================================
  * update_mouse:
@@ -114,7 +169,6 @@ char saved_mouse_y =0;
  */
 
 
-void update_mouse (void);
 void update_mouse (void){
 
 //======== X ==========
@@ -186,7 +240,7 @@ quit:
     return;
 }
 
-void parse_data_packet ( char data, char x, char y);
+
 void parse_data_packet ( char data, char x, char y)
 {
 
@@ -222,17 +276,248 @@ void parse_data_packet ( char data, char x, char y)
     mouse_y = (mouse_y & 0x000003FF );
 
 
+    // Limits
+    //if ( mouse_x < 1 ){ mouse_x = 1; }
+    //if ( mouse_y < 1 ){ mouse_y = 1; }
+    //if ( mouse_x > (SavedX-16) ){ mouse_x = (SavedX-16); }
+    //if ( mouse_y > (SavedY-16) ){ mouse_y = (SavedY-16); }
 
-        if ( MOUSE_WINDOW > 0 ){
+    /*
+    // Comparando o novo com o antigo, pra saber se o mouse se moveu.
+    // #obs: Pra quem mandaremos a mensagem de moving ??
+    if ( saved_mouse_x != mouse_x || saved_mouse_y != mouse_y )
+    {
+		// flag: o mouse está se movendo.
+		// usaremos isso no keydown.
+		// >> na hora de enviarmos uma mensagem de mouse se movendo
+		// se o botão estiver pressionado então temos um drag (carregar.)
+		// um release cancela o carregar.
+		
+        ps2_mouse_moving = 1;
 
-            //gws_change_window_position(fd,MOUSE_WINDOW, mouse_x, mouse_y);
-            //gws_change_window_position(fd,c_tester->title_window, i*10, i*10);
+       // draw
 
-            //gws_redraw_window(fd,MOUSE_WINDOW,1); 
-            //gws_redraw_window(fd,c_tester->title_window,1); 
-        }
+       // Apaga o antigo.
+       // + Copia no LFB um retângulo do backbuffer 
+       // para apagar o ponteiro antigo.
+       refresh_rectangle ( saved_mouse_x, saved_mouse_y, 20, 20 );
+                
+       // Acende o novo.
+       //+ Decodifica o mouse diretamente no LFB.
+       // Copiar para o LFB o antigo retângulo  
+       // para apagar o ponteiro que está no LFB.
+       bmpDisplayMousePointerBMP ( mouseBMPBuffer, mouse_x, mouse_y );   
+                         
+    }else{
+		
+		// Não redesenhamos quando o evento for um click, sem movimento.
+        ps2_mouse_moving = 0;
+    }; 
+    */
+
+
+	//Apenas obtendo o estado dos botões.
+    mouse_buttom_1 = 0;
+    mouse_buttom_2 = 0;
+    mouse_buttom_3 = 0;
+
+
+	// ## LEFT ##
+    if ( ( mouse_packet_data & MOUSE_LEFT_BUTTON ) == 0 )
+    {
+		//liberada.
+        mouse_buttom_1 = 0;
+        ps2_button_pressed = 0;
+        
+        //mudamos sempre que pressionar.
+        //todo: mudaremos sempre que pressionar numa title bar.
+        //refresh_rectangle ( saved_mouse_x, saved_mouse_y, 20, 20 );
+        //bmpDisplayMousePointerBMP ( mouseBMPBuffer, mouse_x, mouse_y ); 
+
+    }else if( ( mouse_packet_data & MOUSE_LEFT_BUTTON ) != 0 )
+     {
+		    //pressionada.
+		    //Não tem como pressionar mais de um botão por vez.
+            mouse_buttom_1 = 1;
+            mouse_buttom_2 = 0;
+            mouse_buttom_3 = 0;
+            ps2_button_pressed = 1;
+            
+            //mudamos sempre que pressionar.
+            //todo: mudaremos sempre que pressionar numa title bar.
+            //refresh_rectangle ( saved_mouse_x, saved_mouse_y, 20, 20 );
+            //bmpDisplayMousePointerBMP ( appIconBuffer, mouse_x, mouse_y ); 
+     };
+     
+     
+     
+	// ## RIGHT ##
+    if ( ( mouse_packet_data & MOUSE_RIGHT_BUTTON ) == 0 )
+    {
+	    //liberada.
+        mouse_buttom_2 = 0;
+        ps2_button_pressed = 0;
+
+    }else if( ( mouse_packet_data & MOUSE_RIGHT_BUTTON ) != 0 )
+        {
+		    //pressionada.
+		    //Não tem como pressionar mais de um botão por vez.
+            mouse_buttom_1 = 0;
+            mouse_buttom_2 = 1;
+            mouse_buttom_3 = 0;
+            ps2_button_pressed = 1;
+        };
+
+     
+     
+	// ## MIDDLE ##
+    if ( ( mouse_packet_data & MOUSE_MIDDLE_BUTTON ) == 0 )
+    {
+	    //liberada.
+        mouse_buttom_3 = 0;
+        ps2_button_pressed = 0;
+
+    }else if( ( mouse_packet_data & MOUSE_MIDDLE_BUTTON ) != 0 )
+        {
+	        //pressionada.
+	        //Não tem como pressionar mais de um botão por vez.
+	        mouse_buttom_1 = 0;
+	        mouse_buttom_2 = 0;
+	        mouse_buttom_3 = 1;
+	        ps2_button_pressed = 1;
+        };
+   
+     
+	// ===
+	// Confrontando o estado atual com o estado anterior para saber se ouve 
+	// alguma alteração ou não.
+	// 1 = ouve alteração.
+
+    if ( mouse_buttom_1 != old_mouse_buttom_1 ||
+         mouse_buttom_2 != old_mouse_buttom_2 ||
+         mouse_buttom_3 != old_mouse_buttom_3 )
+    {
+        mouse_button_action = 1;
+
+    }else{
+        mouse_button_action = 0;
+    };
+    
+    
+    //#isso ainda eh um teste.
+    old_mouse_buttom_1 = mouse_buttom_1;
+    old_mouse_buttom_2 = mouse_buttom_2;
+    old_mouse_buttom_3 = mouse_buttom_3;
 }
 
+
+/*
+ **************** 
+ * top_at: 
+ * 
+ */
+
+// #todo
+// z order not initialized yet.
+
+
+// pega a janela que está mais ao topo da zorder e que
+// corresponda às cordenadas do mouse.
+// retorna window id
+
+int top_at ( int x, int y )
+{
+    int z = 0;
+    int wID = -1;
+    struct gws_window_d *__last_found;
+    struct gws_window_d *tmp;
+
+  
+    //max 1024 janelas.
+    for ( z=0; z<ZORDER_MAX; z++ )
+    {
+        //pega a próxima na zorderlist;
+        tmp = (struct gws_window_d *) zList[z];
+        
+        //check
+        if ( (void *) tmp != NULL )
+        {
+            if ( tmp->used == 1 && tmp->magic == 1234 )
+            {
+
+                 // #importante
+                 // Checando coordenadas.
+                  if ( x > (tmp->left)  && 
+                       x < (tmp->left + tmp->width)  && 
+                       y > (tmp->top)  &&
+                       y < (tmp->top + tmp->height)  )
+                 {
+					 //printf ("%d",z);
+                      // salva essa.
+                      __last_found = (struct gws_window_d *) tmp;
+                 }
+            }
+        }
+
+    };
+
+__found:
+
+    window_mouse_over = __last_found->id;
+
+    return (int) __last_found->id;
+}
+
+
+
+int mouse_scan_windows (void)
+{
+    struct gws_window_d *Window;
+    int wID = -1;
+
+    wID = (int) top_at ( mouse_x, mouse_y );
+
+
+    //================
+    // -1 = Se não temos uma janela.
+    if ( wID < -1 ) //( wID == -1 )
+    { 
+		//... 
+    }
+
+    //============================ 
+    // Se estamos sobre uma janela válida.
+    if ( wID >= 0 )  //if ( wID > -1 )
+    { 
+        Window = (struct gws_window_d *) windowList[wID];
+
+        if ( (void *) Window == NULL ) { return -1; }
+        if ( Window->used != 1 || Window->magic != 1234){ return -1; }
+
+        //===============================================
+        // ***Se houve mudança em relação ao estado anterior.
+        // Nesse momento um drag pode terminar
+        //if ( mouse_button_action == 1 )
+        //{ ... }
+
+
+        //===============================================
+        // *** Se NÃO ouve alteração no estado dos botões, então apenas 
+        // enviaremos a mensagem de movimento do mouse e sinalizamos 
+        // qual é a janela que o mouse está em cima.
+        // Não houve alteração no estado dos botões, mas o mouse
+        // pode estar se movendo com o botão pressionado.
+        //a não ser que quando pressionamos o botão ele envie várias
+        //interrupções, igual no teclado.
+        //if ( mouse_button_action == 0 )
+        //{ ... }
+        
+    }
+
+
+
+    return -1;
+}
 
 
 

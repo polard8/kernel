@@ -1,21 +1,22 @@
 ;-----------------------------------------------------
 ; File: stage3/start.inc 
 ;
-; Descri��o: 
-;     In�cio do modo protegido. 
-;     O modo protegido j� foi configurado e come�am aqui as rotinas em 32bit. 
+; Descricao: 
+;     Inicio do modo protegido. 
+;     O modo protegido ja foi configurado e 
+; começam aqui as rotinas em 32 bit. 
 ;
-; Atribui��es: 
-;     +Efetivar a escolha do modo de inicializa��o.
+; Atribuiçoes: 
+;     +Efetivar a escolha do modo de inicializaçao.
 ;     +Passar o comando para Shell do Boot Manager
 ;      se essa for a escolha.
 ;     +Carregar o Boot Loader e passar o comando 
 ;      pra ele se essa for a escolha.
 ;
-; Op��es de inicializa��o:
+; Opçoes de inicializaçao:
 ; ========================
 ; +1 - Inicia o Shell do Boot Manager no modo texto.
-; +2 - Inicia o Boot Loader (BL.BIN) no modo GR�FICO. (GUI).
+; +2 - Inicia o Boot Loader (BL.BIN) no modo GRAFICO. (GUI).
 ;
 ; Contexto dos registradores:
 ; ===========================
@@ -38,18 +39,19 @@
 
 ;=======================================================
 ; start:
-;     In�cio do modo protegido.
+;     Inicio do modo protegido de 32 bit
 ; IN:
 ;     AL = New mode.  (o modo a ser inicializado)
 ;
-; Pega o modo de v�deo passado pelo stage 2 atrav�s de AL e salva no contexto 
-; de 32 bits.
+; Pega o modo de video passado pelo stage 2 atraves de AL e 
+; salva no contexto de 32 bits.
 ;
 
 start:
 
 	;; #bugbug 
-	;; Esse valor pode estar errado durante a inicializa��o em modo texto.
+	;; Esse valor pode estar errado durante a 
+	;; inicializaçao em modo texto.
 
     mov byte [BOOT.modo], al
 
@@ -131,20 +133,21 @@ startCLI:
 	
 	;Limpa a tela em modo texto.
 	;call clear_screen
-	
-	
-    ;Habilita todas interrup��es.
+
+
+    ; Enable all the interrupts.
+
 .enableInterrupts:
 
-	mov al, 0
-	out 0xA1, al 
-	out 0x21, al 
-	sti 
-	
-	
-    ;;
-    ;; ======== SHELL LOOP ========
-    ;;
+    mov al, 0
+    out 0xA1, al 
+    out 0x21, al 
+    sti 
+
+
+;;
+;; == Shell loop =================================================
+;;
 
 	;; #importante
 	;; O shell est� em msm/shell
@@ -167,7 +170,7 @@ startShellLoop:
 	cmp eax, 0
 	je .exit0
 
-	; Sairemos do loop.
+    ; Sairemos do loop.
     ; 1 - Alguma altera��o foi feita, 
 	; precisa salvar o metafile.
 	cmp eax, 1
@@ -177,16 +180,22 @@ startShellLoop:
 	JMP $
 
 
+    ;; Exit 0
+
 ;	
 ;Saimos do loop do shell.
 ;Nenhuma altera��o foi feita, n�o precisa salvar o metafile.
 ;Apenas reiniciamos o sistema.
 .exit0:
-	mov esi, start_msg_rebooting
-	call os_output
-    jmp keyboardReboot
-	jmp $
 
+    mov esi, start_msg_rebooting
+    call os_output
+
+    jmp keyboardReboot
+    jmp $
+
+
+    ;; Exit 1
 
 ;
 ;Saimos do loop do shell.
@@ -211,21 +220,24 @@ startShellLoop:
 
 
 ;
-; Strings
+; == Strings ==========================================
 ;
 
-start_msg_saving_metafile db 'start: Saving metafile..', 13,10,0
-start_msg_rebooting       db 'start: Rebooting..',       13,10,0
+start_msg_saving_metafile db 'start: Saving metafile..',13,10,0
+start_msg_rebooting       db 'start: Rebooting..',      13,10,0
 
 
 
 ;================================================================
 ; startGUI:
-;     Initializes BL.BIN in graphycs mode.
+;
+;     Initializes BL.BIN in graphyc mode.
 ;
 ;     Inicia o BL.BIN no modo gr�fico.
-;	  Obs: Quando retornamos para o modo real e ativamos o modo gr�fico,
-;     Saltamos para c� com a op��o de usamos mensagens em modo gr�fico 
+;     
+; obs: 
+; Quando retornamos para o modo real e ativamos o modo gr�fico,
+; Saltamos para c� com a op��o de usamos mensagens em modo gr�fico 
 ; em modo protegido.
 
 
@@ -256,12 +268,12 @@ startGUI:
 	lgdt [lgdt_opcode]
 	lidt [lidt_opcode]
 
-	
-	;; #todo: 
-	;; Nessa hora alguns vetores podem ser configurados.
-	;; Primeiro as excess�es e depois as ISRs.
-	;; Selecting the 'Processor Interrup Mode'.
-	;; PIC MODE
+
+    ;; #todo: 
+    ;; Nessa hora alguns vetores podem ser configurados.
+    ;; Primeiro as excess�es e depois as ISRs.
+    ;; Selecting the 'Processor Interrup Mode'.
+    ;; PIC MODE
     ;; Todos os componentes APIC s�o ignorados e o sistema opera
     ;; no modo single-thread usando LINT0.
 
@@ -343,13 +355,13 @@ startGUI:
 	;Detectar os par�metros do sistema de arquivos FAT16.
 	;fat lba, root lba ...
 	;call fat16DetectFSParameters  ;;fat16lib.inc
-	
-	;Setup current dir.
+
+    ;Setup current dir.
     mov dword [g_current_fat_lba],        FAT16_FAT_LBA       ;Fat do volume atual
     mov dword [g_current_directory_lba],  FAT16_ROOTDIR_LBA   ;Diret�rio do volume atual.
-	mov dword [g_current_dataarea_lba],   FAT16_DATAAREA_LBA  ;?? ;lba do inicio da area de dados do volume atual.
-	;Continua...
-	
+    mov dword [g_current_dataarea_lba],   FAT16_DATAAREA_LBA  ;?? ;lba do inicio da area de dados do volume atual.
+    ;Continua...
+
 
 	
     ;; Configurando PCI. (O b�sico suportado pelo Boot Manager.)
@@ -371,15 +383,17 @@ startGUI:
 	;
 	; Continua ...
 	;
-	
-	
-	;mask all interrupts.
-	cli 
-	mov al, 255
-	out 0xA1, al
-	out 0x21, al
-	
-	
+
+
+    ; mask all interrupts.
+    ; ====================
+    
+    cli 
+    mov al, 255
+    out 0xA1, al
+    out 0x21, al
+
+
 	; setup registers.
 	mov ax, word 0x10  
 	mov ds, ax
@@ -394,21 +408,25 @@ startGUI:
 	;Configura fs type.
 	mov al, byte 1
 	call set_fs_type
-	
-	;;internas.
-    ;Configura LFB e Buffer.
-	call configura_lfb
-	
-	
+
+
+    ;; internas.
+    ;; Configura LFB e Buffer.
+    ;; #todo: Change this name.
+    
+    call configura_lfb
+
+
     ;; #bugbug
     ;; Cancelando isso.
 	;; Pois esses valores est�o acima do limite de 16MB.
 	;; Qualquer coisa para sistemas acima de 16MB ser�o 
 	;; configuradas pelo kernel depois de detectar a 
 	;; quantidade de mem�ria.
-	
+    ;; #todo: Change this name.
+    
     ;call configura_buffer
-	
+
 	;
 	;se configurar o modo 3 n�o tem como 
 	;reconfigurar atravez desse modo ainda.
@@ -418,23 +436,21 @@ startGUI:
 	;call blconfig_set_modo	
 	;call do_save
 	
-	
-	; #todo: 
-	; N�o � certo pintar um backgraund direto na mem�ria de video.
+
+    ; #todo: 
+    ; N�o � certo pintar um backgraund direto na mem�ria de video.
     ; O Boot Manger n�o tem sincroniza��o vertical ainda.	 
-	 
-	 
-	;background test!
+    ;background test!
     ;call _background
-	;call _background_teste       
-	;call _fade_screen
-	;jmp $
-	
-	
+    ;call _background_teste       
+    ;call _fade_screen
+    ;jmp $
+
+
 	;;
-	;; ==== TESTING STRINGS ====
+	;; == Testing strings ======================================
 	;;
-	
+
 	;; #bugbug: 
 	;; As rotinas de 'char' 'string' e 'load' aparentemente est�o travando 
 	;; o sistema, as duas janelas de status est�o funcionando quando n�o 
@@ -739,7 +755,7 @@ startGUI:
 ;;
 
     ; Go!
-    ; Passa o comando para o entrypoint do Boot Loader. BL.BIN.
+    ; Jump to the entrypoint of the boot loader. (BL.BIN).
 
     jmp  8:IMAGE_ADDRESS_ENTRY_POINT
     JMP  $
@@ -791,16 +807,17 @@ startGUI:
 ; configura_lfb:
 ;     Atualiza LFB address.
 ;     Salva LFB.
+;     #todo: Change the name.
 ;++
 
 ;startSetupLFB:
-	
+
 configura_lfb:
-	push edx   
-	mov  edx, dword [ModeInfo_PhysBasePtr]  
-	mov dword [VIDEO.lfb], edx
-	pop edx
-	ret
+    push edx   
+    mov  edx, dword [ModeInfo_PhysBasePtr]  
+    mov dword [VIDEO.lfb], edx
+    pop edx
+    ret
 ;--
 
 

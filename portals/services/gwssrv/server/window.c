@@ -1341,8 +1341,22 @@ int gwssrv_init_windows(void)
     top_window         =0;
     //...
 
-    for (i=0; i<1024; i++)
+    //
+    // Window list
+    //
+
+    for (i=0; i<WINDOW_COUNT_MAX; i++)
         windowList[i] = 0;
+
+    //
+    // z order list
+    //
+
+    for (i=0; i<ZORDER_MAX; i++)
+        zList[i] = 0;
+        
+
+    // ...
 
     return 0;
 }

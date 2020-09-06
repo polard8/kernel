@@ -2,14 +2,16 @@
 ; File: fat16.inc 
 ;
 ; Descrição:
+;
 ;     FAT16 support in (32bit).
 ;
 ; Atribuições:
 ;     +Carrega arquivo.
 ;     +Passa o comando para ele.
 ;
-; Histórico:
-;     Versão: 1.0, 2015 - Created.
+; History:
+;
+;     2015 - Created.
 ;     ...
 ;
 

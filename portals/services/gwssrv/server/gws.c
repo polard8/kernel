@@ -368,7 +368,7 @@ int gwsInit(void)
     gwssrv_init_char();
     
 
-    //windows
+    // windows
     gwssrv_init_windows();    
             
 

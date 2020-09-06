@@ -67,13 +67,13 @@ bl_procedure (
                     printf ("F2");
                     break;
 
-                case VK_F3:
-                    printf ("F3");
-                    break;
+                //case VK_F3:
+                    //printf ("F3");
+                    //break;
 
-                case VK_F4:
-                    printf ("F4");
-                    break;
+                //case VK_F4:
+                    //printf ("F4");
+                    //break;
 
                 default:
                     // Nothing.

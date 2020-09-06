@@ -207,7 +207,6 @@ int kgws_mouse_scan_windows (void){
 
     //================
     // -1 = Se não temos uma janela.
-
     if ( wID == -1 )
     { 
 		//printf ("x");
@@ -255,7 +254,7 @@ int kgws_mouse_scan_windows (void){
 	// Isso está funcionando. Mas qual é a thread das janelas filhas?
 	// Elas herdam a thread de controle ??
 
-     //============================ 
+    //============================ 
     //Se estamos sobre uma janela válida.
     if ( wID >= 0 )  //if ( wID > -1 )
     {
@@ -809,8 +808,7 @@ int kgws_mouse_scan_windows (void){
             kgws_mouse_event_button_action = 0;
             return 0;
         };
-        
-
+    
 
     };
     //--

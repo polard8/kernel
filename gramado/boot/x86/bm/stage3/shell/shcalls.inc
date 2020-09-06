@@ -4,11 +4,11 @@
 ; Descrição:
 ;     Rotinas para atender algumas chamadas do Boot Manager.
 ;
-; Versão 1.0, 2015.
+; 2015 - Created.
 ;
 
 
-;==============================================================	
+;==============================================================
 ; exit:
 ;     Rotina executada quando o comando 'exit' for dado no shell 
 ; do Boot Manager.
@@ -29,7 +29,7 @@ exit:
 
 
 
-;-----------------------------------
+;==============================================================
 ; do_mount_volume:
 ;     Montando o volume do sistema. (testing...)
 ;
@@ -39,13 +39,13 @@ exit:
 do_mount_volume:
 
     pushad
-	
-	call os_screen_clear 
+
+    call os_screen_clear 
     call reset_cursor
-	
-	;Carregando o diretório raiz.
-    ;call load_root_first_sector 	
-	
+
+    ;Carregando o diretório raiz.
+    ;call load_root_first_sector 
+
 	
 	;Pega a base do diretório raiz. (diretório de volumes).
 	;mov esi, dword FAT16_ROOTDIR_ADDRESS
@@ -53,6 +53,7 @@ do_mount_volume:
 	;call os_string_compare
 	;jc .ok	
 	;jmp .fail
+
 .ok:	
 	;Setup current dir.   
     mov dword [g_current_fat_lba], 256          ;Fat do volume atual
@@ -78,7 +79,7 @@ do_mount_volume:
 	jmp .done
 .fail:
     nop
-.done:	
+.done:
 	popad
 	jmp os_command_line
  
@@ -94,7 +95,7 @@ do_mount_volume:
 ;      See stage3/pm.inc 
 
 do_boot:
-    
+
     jmp rmStartGUI
     jmp $
 
@@ -108,11 +109,12 @@ do_boot:
 ;++
 
 do_shutdown:
-	jmp rmShutdown
-;--		
-	
-	
-;-----------------------------------------
+
+    jmp rmShutdown
+;--
+
+
+;==============================================================
 ; debug:
 ;
 ;     Mostra as configurações de inicialização 
@@ -123,11 +125,11 @@ debug:
     pushad
     call debug_main
     popad
-	jmp os_command_line
+    jmp os_command_line
 ;--
 
 
-;-------------------------------------------
+;==============================================================
 ; do_save:
 ;     Torna permanente as alterações de 
 ;     inicialização e partições.		
@@ -144,12 +146,12 @@ do_save:
 	;call fs32_save_current_partition  
 	
 	;popad
-	
-	jmp os_command_line
+
+    jmp os_command_line
 ;--
 
 
-;-------------------------------------------
+;==============================================================
 ; do_formatdisk:
 ;     Formata um disco.
 ;++	
@@ -162,7 +164,7 @@ do_formatdisk:
 ;--
 
 
-;----------------------------------------------
+;==============================================================
 ; do_make_boot:
 ;     Cria diretórios e arquivos para Boot.
 ;++
@@ -175,7 +177,7 @@ do_make_boot:
 ;--
 
 
-;----------------------------------------------	
+;==============================================================
 ; do_install:
 ;     Transfere conteúdo do disco 
 ;     de uma lba para outra.	
@@ -193,7 +195,7 @@ do_install:
 ;--
 
 
-;------------------------------------------------
+;==============================================================
 ; do_set_modo1:
 ;     Configura modo1.
 ;++	
@@ -208,7 +210,7 @@ do_set_modo1:
 ;--
 
 
-;----------------------------------------
+;==============================================================
 ; do_set_modo2:
 ;     Configura modo2.
 ;++	
@@ -223,7 +225,7 @@ do_set_modo2:
 ;--
 
 
-;-------------------------------------
+;==============================================================
 ; do_set_modo3:
 ;     Configura modo3.
 ;++	
@@ -238,7 +240,7 @@ do_set_modo3:
 ;--
 
 
-;--------------------------------------
+;==============================================================
 ; do_set_modo4:
 ;     Configura modo4.
 ;++	
@@ -253,7 +255,7 @@ do_set_modo4:
 ;--
 
 
-;----------------------------------
+;==============================================================
 ; do_set_v0:
 ; Configura volume 0.
 
@@ -265,8 +267,8 @@ do_set_v0:
 	ret
 ;--
 
-	
-;-----------------------------------
+
+;==============================================================
 ; do_set_v1:
 ; Configura volume 1.
 
@@ -278,8 +280,8 @@ do_set_v1:
 	ret
 ;--
 
-	
-;---------------------------------
+
+;==============================================================
 ; do_set_v2:
 ; Configura volume 2.
 
@@ -291,8 +293,8 @@ do_set_v2:
 	ret
 ;--
 
-	
-;-----------------------------------
+
+;==============================================================
 ; do_set_v3:
 ; Configura volume 3.
 
@@ -305,7 +307,7 @@ do_set_v3:
 ;--
 
 
-;-----------------------------------
+;==============================================================
 ; do_openfile:
 ;     Abre um arquivo.
 
@@ -315,7 +317,7 @@ do_openfile:
 ;--	
 	
 	
-;------------------------------------
+;==============================================================
 ; do_makefile:
 ;     Cria um arquivo.
 ;++	
@@ -326,7 +328,7 @@ do_makefile:
 ;--	
 	
 	
-;------------------------------------
+;==============================================================
 ; do_deletefile: 
 ;     Deleta um arquivo.
 ;++	
@@ -337,7 +339,7 @@ do_deletefile:
 ;--	
 	
 	
-;---------------------------------------
+;==============================================================
 ; do_opendir:
 ;     Abre um diretório.
 ;++	
@@ -348,7 +350,7 @@ do_opendir:
 ;--	
 	
 	
-;--------------------------------------
+;==============================================================
 ; do_makedir:
 ;     Cria um diretório.
 ;++	
@@ -359,7 +361,7 @@ do_makedir:
 ;--	
 	
 	
-;--------------------------------------
+;==============================================================
 ; do_deletedir:
 ;    Deleta um diretório.
 ;++
@@ -370,7 +372,7 @@ do_deletedir:
 ;--	
 
 	
-;-----------------------------------------------
+;==============================================================
 ; do_changedir:
 ;      Muda o diretório atual.
 	
@@ -379,7 +381,7 @@ do_changedir:
 	jmp os_command_line	
 	
 	
-;--------------------------------------------
+;==============================================================
 ; ls:
 ;     lista os arquivos.
 ;     (Apresentação no estilo unix.
@@ -387,22 +389,23 @@ do_changedir:
 ;;Nothing for now!
 	
 ls:
-	jmp os_command_line	
+    ;jmp dir
+    jmp os_command_line
 
-	
-;----------------------------------------
+
+;==============================================================
 ; dir:
 ;    (Mostra o diretório de volumes)
 ;     Mostra as entradas do diretório raiz.	
 ;++
 
 dir:
-
+    ;cli
     pushad
-	
-	call os_screen_clear 
+
+    call os_screen_clear 
     call reset_cursor
-	
+
 	;Hd info.bug
 	;call hd_test
 	
@@ -416,12 +419,14 @@ dir:
 	;call show_root_dir    ;(Mostra o diretório de volumes)
 	
 	;Mostra o diretório atual.
-	call show_current_dir
-	
-	popad
-	jmp os_command_line
+    call show_current_dir
+
+    popad
+    ;sti
+
+    jmp os_command_line
 ;--
-	
+
 
 ;----------------------------------
 ; do_seleciona_d0:

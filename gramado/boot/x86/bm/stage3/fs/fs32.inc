@@ -6,11 +6,11 @@
 ;     Contém chamadas à todos os sistemas de arquivos suportados em 32bit.
 ;     O Mass Storage Manager pode dar suporte básico aos sistemas de arquivos 
 ; mais simples e mais usados.
-;     Objetivos: FAT12, FAT16, FAT32, (ELTORITO CD), EXT2, ramfs.
+;     Objetivos: FAT16
 ;
-; Histórico:
-;     Versão: 1.0, 2015 - Created.
-;     Versão: 1.0, 2016 - Revisão.
+; History:
+;
+;     2015 - Created.
 ;     ... 
 ;
 
@@ -345,7 +345,7 @@ fs32_show_rootdir:
 	
 	
 	
-; Continua ...	
+; Continua ...
 
 
 ;Partição ativa.
