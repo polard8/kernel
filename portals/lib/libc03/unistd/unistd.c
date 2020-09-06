@@ -2,6 +2,7 @@
  * File: unistd.c
  *
  *     Unix standard.
+ *     ... and maybe posix stuff.
  * 
  * History:
  *     2019 - Created by Fred Nora.
@@ -1919,6 +1920,41 @@ StrLastOcc (
             res=src-1;
    return res;
 }
+
+
+#include <spawn.h>
+
+
+// See:
+// https://man7.org/linux/man-pages/man3/posix_spawn.3.html
+
+int 
+posix_spawn (
+    pid_t *pid, 
+    const char *path,
+    const posix_spawn_file_actions_t *file_actions,
+    const posix_spawnattr_t *attrp,
+    char *const argv[], 
+    char *const envp[] )
+{
+    debug_print ("posix_spawn: [FIXME] It's a work in progress.\n"); 
+    return (int) gramado_system_call ( 900, (unsigned long) path, 0, 0 );
+}
+
+int 
+posix_spawnp (
+    pid_t *pid, 
+    const char *file,
+    const posix_spawn_file_actions_t *file_actions,
+    const posix_spawnattr_t *attrp,
+    char *const argv[], 
+    char *const envp[] )
+{
+    debug_print ("posix_spawn: [FIXME] It's a work in progress.\n"); 
+    return (int) gramado_system_call ( 900, (unsigned long) file, 0, 0 );
+}
+
+
 
 
 
