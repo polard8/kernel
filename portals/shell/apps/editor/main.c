@@ -641,7 +641,7 @@ int main ( int argc, char *argv[] ){
     addr_in.sin_port   = PORTS_WS;   
     addr_in.sin_addr.s_addr = IP(127,0,0,1); 
 
-
+    // Metrics.
     unsigned long w = gws_get_system_metrics(1);
     unsigned long h = gws_get_system_metrics(2);
 
@@ -652,8 +652,8 @@ int main ( int argc, char *argv[] ){
 
 
     //
-    // socket
-    // 
+    // Socket
+    //
 
     // #debug
     printf ("editor: Creating socket\n");
@@ -729,10 +729,13 @@ int main ( int argc, char *argv[] ){
     int button=0;
 
 
-    //main window
+    //
+    // main window
+    //
+
     main_window = gws_create_window (client_fd,
         WT_SIMPLE,1,1,"Editor",
-        40, 40, 640, 480,
+        0,0,w,h,    //40, 40, 640, 480,
         0,0,COLOR_GRAY, COLOR_GRAY);
 
     if ( main_window < 0 )             
@@ -742,17 +745,19 @@ int main ( int argc, char *argv[] ){
      gws_draw_text (
         (int) client_fd,       // fd,
         (int) main_window,     // window id,
-        (unsigned long) 50,    // left,
-        (unsigned long) 8,     // top,
+        (unsigned long) (40/3),    //( ((w-(w/2))/2) - (6*8) ),   //50,    // left,
+        (unsigned long) (40/3),    //8,     // top,
         (unsigned long) COLOR_BLACK,
-        "Name");
+        "Name:");
 
+    //
+    // Address bar (edit box)
+    //
 
-    // address bar
     addressbar_window = gws_create_window (client_fd,
         WT_EDITBOX,1,1,"address-bar",
-        100, 4, 
-        (640-300), 32,
+        (40/3) + (8*8), 4,    //((w-(w/2))/2), 4, 
+        (w/2), 32,
         main_window,0,COLOR_WHITE, COLOR_WHITE);
 
     if ( addressbar_window < 0 )             
@@ -763,15 +768,18 @@ int main ( int argc, char *argv[] ){
         (int) client_fd,             // fd,
         (int) addressbar_window,              // window id,
         (unsigned long) 8,    // left,
-        (unsigned long) 8,    // top,
+        (unsigned long) (40/3), //8,    // top,
         (unsigned long) COLOR_BLACK,
         "text.txt");
 
-    // button
+    //
+    // [Save F?] button
+    //
+
     button = gws_create_window (client_fd,
         WT_BUTTON,1,1,"Save",
-        (640-100), 4, 
-        80, 32,
+        (w-100-4), 4,//(640-100), 4, 
+        100, 32,
         main_window,0,COLOR_GRAY, COLOR_GRAY);
 
     if ( button < 0 )             
@@ -782,21 +790,25 @@ int main ( int argc, char *argv[] ){
     // client window (White)
     client_window = gws_create_window (client_fd,
         WT_EDITBOX,1,1,"client",
-        4, 40, 640-8, 480 - 40 - 4,
+        4, 40, (w-8), (h - 40 - 4),   //4, 40, 640-8, 480 - 40 - 4,
         main_window,0,COLOR_WHITE, COLOR_WHITE);
 
     if ( client_window < 0 )             
         debug_print("Editor: client_window fail\n"); 
 
-     gws_draw_text (
+    int t=0;
+    
+    for (t=0; t<32; t++){
+    gws_draw_text (
         (int) client_fd,       // fd,
         (int) client_window,   // window id,
-        (unsigned long) 40,    // left,
-        (unsigned long) 40,    // top,
+        (unsigned long) 4,    //40,    // left,
+        (unsigned long) t*8,  //40,    // top,
         (unsigned long) COLOR_BLACK,
-        "Hello, from Editor!");
-
-
+        "Hello, this is a text editor!");
+    }
+    
+    
     // Show main window.
     gws_refresh_window(client_fd,main_window);
 
