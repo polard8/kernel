@@ -117,8 +117,8 @@ build-portals
 build-boot:
 	@echo "==================="
 	@echo "Compiling Boot ... "
-	$(Q) $(MAKE) -C gramado/boot/x86/bm/ 
-	$(Q) $(MAKE) -C gramado/boot/x86/bl/ 
+	$(Q) $(MAKE) -C gros/boot/x86/bm/ 
+	$(Q) $(MAKE) -C gros/boot/x86/bl/ 
 
 build-portals:
 	@echo "==================="
@@ -137,7 +137,7 @@ KERNEL.BIN:
 	@echo "================================="
 	@echo "(Step 1) Creating the kernel image ..."
 
-	$(Q) $(MAKE) -C gramado/kernel   
+	$(Q) $(MAKE) -C gros/kernel   
 
 
 ## Step3 /mnt/gramadovhd    - Creating the directory to mount the VHD.
@@ -153,7 +153,7 @@ vhd-create:
 	@echo "================================="
 	@echo "(Step 4) Creating a VHD in Assembly language ..."
 
-	$(NASM) gramado/boot/x86/vhd/main.asm -I gramado/boot/x86/vhd/ -o GRAMADO.VHD   
+	$(NASM) gros/boot/x86/vhd/main.asm -I gros/boot/x86/vhd/ -o GRAMADO.VHD   
 
 
 ## Step5 vhd-mount          - Mounting the VHD.
@@ -176,21 +176,21 @@ vhd-copy-files:
 
 	# unix-like stuff.
 	# Creating standard folders
-	-sudo mkdir /mnt/gramadovhd/BIN
-	sudo mkdir /mnt/gramadovhd/BOOT
-	-sudo mkdir /mnt/gramadovhd/DEV
-	-sudo mkdir /mnt/gramadovhd/DEV/PTS
-	-sudo mkdir /mnt/gramadovhd/EFI
-	-sudo mkdir /mnt/gramadovhd/EFI/BOOT
-	-sudo mkdir /mnt/gramadovhd/ETC
-	-sudo mkdir /mnt/gramadovhd/HOME
-	-sudo mkdir /mnt/gramadovhd/LIB
-	-sudo mkdir /mnt/gramadovhd/MNT
-	-sudo mkdir /mnt/gramadovhd/PROGRAMS
-	-sudo mkdir /mnt/gramadovhd/PORTALS
-	-sudo mkdir /mnt/gramadovhd/SBIN
-	-sudo mkdir /mnt/gramadovhd/TMP
-	-sudo mkdir /mnt/gramadovhd/USERS
+#	-sudo mkdir /mnt/gramadovhd/BIN
+#	sudo mkdir /mnt/gramadovhd/BOOT
+#	-sudo mkdir /mnt/gramadovhd/DEV
+#	-sudo mkdir /mnt/gramadovhd/DEV/PTS
+#	-sudo mkdir /mnt/gramadovhd/EFI
+#	-sudo mkdir /mnt/gramadovhd/EFI/BOOT
+#	-sudo mkdir /mnt/gramadovhd/ETC
+#	-sudo mkdir /mnt/gramadovhd/HOME
+#	-sudo mkdir /mnt/gramadovhd/LIB
+#	-sudo mkdir /mnt/gramadovhd/MNT
+#	-sudo mkdir /mnt/gramadovhd/PROGRAMS
+#	-sudo mkdir /mnt/gramadovhd/PORTALS
+#	-sudo mkdir /mnt/gramadovhd/SBIN
+#	-sudo mkdir /mnt/gramadovhd/TMP
+#	-sudo mkdir /mnt/gramadovhd/USERS
 	# -sudo mkdir /mnt/gramadovhd/BREAD-AND-WINE
 
 
@@ -201,55 +201,32 @@ vhd-copy-files:
 
 	# 1) First of all
 	# bm, bl, kernel, init, gdeshell.
-	sudo cp gramado/boot/x86/bin/BM.BIN     /mnt/gramadovhd
-	sudo cp gramado/boot/x86/bin/BL.BIN     /mnt/gramadovhd
-	sudo cp gramado/kernel/KERNEL.BIN       /mnt/gramadovhd
-	sudo cp portals/init/INIT.BIN           /mnt/gramadovhd
-	sudo cp portals/setup/bin/GDESHELL.BIN  /mnt/gramadovhd
+	sudo cp gros/boot/x86/bin/BM.BIN        base/
+	sudo cp gros/boot/x86/bin/BL.BIN        base/
+	sudo cp gros/kernel/KERNEL.BIN          base/
+	sudo cp portals/init/INIT.BIN           base/
+	sudo cp portals/setup/bin/GDESHELL.BIN  base/
+
 
 	# EXTRA: Used for tests.
-	sudo cp portals/setup/bin/SYSMON.BIN  /mnt/gramadovhd
+	sudo cp portals/setup/bin/SYSMON.BIN base/
 	# ...
-
-	# 2) .INI
-	sudo cp gramado/infobase/ini/GUI.INI     /mnt/gramadovhd
-	sudo cp gramado/infobase/ini/INIT.INI    /mnt/gramadovhd
-	sudo cp gramado/infobase/ini/USER.INI    /mnt/gramadovhd
-
-	# 3) .FON
-	sudo cp gramado/infobase/res/fonts/bin/NC2.FON      /mnt/gramadovhd
-	sudo cp gramado/infobase/res/fonts/bin/LIN8X8.FON   /mnt/gramadovhd
-	sudo cp gramado/infobase/res/fonts/bin/LIN8X16.FON  /mnt/gramadovhd
-
-	# 4) .BMP
-	sudo cp gramado/infobase/res/cursors/CURSOR.BMP  /mnt/gramadovhd
-	sudo cp gramado/infobase/res/cursors/MOUSE.BMP   /mnt/gramadovhd
-	sudo cp gramado/infobase/res/icons/APP.BMP       /mnt/gramadovhd
-	sudo cp gramado/infobase/res/icons/BMP1.BMP      /mnt/gramadovhd
-	sudo cp gramado/infobase/res/icons/FILE.BMP      /mnt/gramadovhd
-	sudo cp gramado/infobase/res/icons/FOLDER.BMP    /mnt/gramadovhd
-	sudo cp gramado/infobase/res/icons/TERMINAL.BMP  /mnt/gramadovhd
-	# ...
-
-	# 5) .TXT
-	sudo cp gramado/infobase/GRAMADO.TXT     /mnt/gramadovhd
 
 
 	# 6) from Portals to root.
-	-sudo cp portals/services/gwssrv/bin/GWS.BIN     /mnt/gramadovhd
-	-sudo cp portals/services/gwssrv/bin/GWSSRV.BIN  /mnt/gramadovhd
-	-sudo cp portals/services/gnssrv/bin/GNS.BIN     /mnt/gramadovhd
-	-sudo cp portals/services/gnssrv/bin/GNSSRV.BIN  /mnt/gramadovhd
-	-sudo cp portals/shell/apps/bin/*.BIN            /mnt/gramadovhd
+	-sudo cp portals/services/gwssrv/bin/GWS.BIN     base/ 
+	-sudo cp portals/services/gwssrv/bin/GWSSRV.BIN  base/
+	-sudo cp portals/services/gnssrv/bin/GNS.BIN     base/
+	-sudo cp portals/services/gnssrv/bin/GNSSRV.BIN  base/
+	-sudo cp portals/shell/apps/bin/*.BIN            base/
 	#-sudo cp portals/shell/cmd/bin/*.BIN             /mnt/gramadovhd
-	-sudo cp portals/shell/net/bin/*.BIN             /mnt/gramadovhd
+	-sudo cp portals/shell/net/bin/*.BIN             base/
 	#-sudo cp portals/setup/bin/*.BIN                 /mnt/gramadovhd 
-	-sudo cp portals/shell/cmd/bin/REBOOT.BIN         /mnt/gramadovhd
-	-sudo cp portals/shell/cmd/bin/CAT.BIN            /mnt/gramadovhd
+	-sudo cp portals/shell/cmd/bin/REBOOT.BIN         base/
+	-sudo cp portals/shell/cmd/bin/CAT.BIN            base/
 #	-sudo cp portals/shell/cmd/bin/TRUE.BIN           /mnt/gramadovhd
 #	-sudo cp portals/shell/cmd/bin/FALSE.BIN          /mnt/gramadovhd
 	# ...
-
 
 
 #
@@ -257,52 +234,42 @@ vhd-copy-files:
 #
 
 # unix-like commands and stuff.
-	-sudo cp portals/shell/cmd/bin/*.BIN   /mnt/gramadovhd/BIN
+	-sudo cp portals/shell/cmd/bin/*.BIN base/BIN
+
 
 #
 # == "/BOOT" ====================================================
 #
 
-	sudo cp gramado/boot/x86/bin/BM.BIN    /mnt/gramadovhd/BOOT
-	sudo cp gramado/boot/x86/bin/BL.BIN    /mnt/gramadovhd/BOOT
-	sudo cp gramado/kernel/KERNEL.BIN      /mnt/gramadovhd/BOOT
-#	-sudo cp gramado/infobase/res/wall/ANIMAL.BMP  /mnt/gramadovhd/BOOT
+	sudo cp gros/boot/x86/bin/BM.BIN    base/BOOT
+	sudo cp gros/boot/x86/bin/BL.BIN    base/BOOT
+	sudo cp gros/kernel/KERNEL.BIN      base/BOOT
+#	-sudo cp gros/infobase/res/wall/ANIMAL.BMP  /mnt/gramadovhd/BOOT
 
 
-#
-# == "/ETC" =============================================
-#
-
-	# 
-	-sudo cp docs/*.TXT    /mnt/gramadovhd/ETC
-#	-sudo cp gramado/infobase/tests/*.CPP    /mnt/gramadovhd/ETC
-#	-sudo cp gramado/infobase/tests/*.BAS    /mnt/gramadovhd/ETC
-#	-sudo cp gramado/infobase/tests/*.ASM    /mnt/gramadovhd/ETC
-#	-sudo cp gramado/infobase/res/wall/ANIMAL.BMP   /mnt/gramadovhd/ETC
 
 
 #
 # == "/PROGRAMS" ====================================================
 #
 	# The applications.
-	-sudo cp portals/shell/apps/bin/*.BIN  /mnt/gramadovhd/PROGRAMS
-	-sudo cp portals/shell/net/bin/*.BIN   /mnt/gramadovhd/PROGRAMS
+	-sudo cp portals/shell/apps/bin/*.BIN  base/PROGRAMS
+	-sudo cp portals/shell/net/bin/*.BIN   base/PROGRAMS
 
 
 #
 # == "/PORTALS" ====================================================
 #
 	# bm, bl, kernel, init, gdeshell.
-	sudo cp gramado/boot/x86/bin/BM.BIN     /mnt/gramadovhd/PORTALS
-	sudo cp gramado/boot/x86/bin/BL.BIN     /mnt/gramadovhd/PORTALS
-	sudo cp gramado/kernel/KERNEL.BIN       /mnt/gramadovhd/PORTALS
-	sudo cp portals/init/INIT.BIN           /mnt/gramadovhd/PORTALS
-	sudo cp portals/setup/bin/GDESHELL.BIN  /mnt/gramadovhd/PORTALS
+	sudo cp gros/boot/x86/bin/BM.BIN     base/PORTALS
+	sudo cp gros/boot/x86/bin/BL.BIN     base/PORTALS
+	sudo cp gros/kernel/KERNEL.BIN       base/PORTALS
+	sudo cp portals/init/INIT.BIN           base/PORTALS
+	sudo cp portals/setup/bin/GDESHELL.BIN  base/PORTALS
 
 	# Services
-	-sudo cp portals/services/gwssrv/bin/GWSSRV.BIN  /mnt/gramadovhd/PORTALS
-	-sudo cp portals/services/gnssrv/bin/GNSSRV.BIN  /mnt/gramadovhd/PORTALS
-
+	-sudo cp portals/services/gwssrv/bin/GWSSRV.BIN  base/PORTALS
+	-sudo cp portals/services/gnssrv/bin/GNSSRV.BIN  base/PORTALS
 
 
 #
@@ -310,8 +277,8 @@ vhd-copy-files:
 #
 
 # unix-like commands and stuff.
-	-sudo cp portals/shell/cmd/bin/REBOOT.BIN   /mnt/gramadovhd/SBIN
-	-sudo cp portals/setup/bin/REBOOT2.BIN      /mnt/gramadovhd/SBIN
+#	-sudo cp portals/shell/cmd/bin/REBOOT.BIN   /mnt/gramadovhd/SBIN
+#	-sudo cp portals/setup/bin/REBOOT2.BIN      /mnt/gramadovhd/SBIN
 
 
 #
@@ -323,8 +290,11 @@ vhd-copy-files:
 # == "/TMP" =============================================
 #
 
-#	-sudo cp gramado/infobase/res/wall/ANIMAL.BMP   /mnt/gramadovhd/TMP
+#	-sudo cp gros/infobase/res/wall/ANIMAL.BMP   /mnt/gramadovhd/TMP
 
+
+	# sends everything from base to root.
+	sudo cp -r base/* /mnt/gramadovhd
 
 
 
@@ -353,6 +323,17 @@ clean3:
 	-rm portals/shell/cmd/bin/*.BIN
 	-rm portals/shell/net/bin/*.BIN
 
+#Clean base
+clean4:
+
+	-rm -rf base/*.BIN 
+	-rm -rf base/BOOT/*.BIN 
+	-rm -rf base/BIN/*.BIN 
+	-rm -rf base/SBIN/*.BIN 
+	-rm -rf base/PROGRAMS/*.BIN 
+	-rm -rf base/PORTALS/*.BIN 
+
+
 
 PHONY := clean-system-files
 clean-system-files:
@@ -360,8 +341,11 @@ clean-system-files:
 	@echo "Cleaning all system binaries ..."
 
 	# Gramado
-	-rm -rf gramado/boot/x86/bin/*.BIN
-	-rm -rf gramado/kernel/KERNEL.BIN
+	-rm -rf gros/boot/x86/bin/*.BIN
+	-rm -rf gros/kernel/KERNEL.BIN
+
+	# fonts
+	-rm -rf portals/fonts/bin/*.FON
 
 	# Init
 	-rm -rf portals/init/*.BIN
@@ -381,7 +365,7 @@ clean-system-files:
 # ...
 
 
-clean-all: clean clean2 clean3 clean-system-files  
+clean-all: clean clean2 clean3 clean4 clean-system-files  
 
 	@echo "==================="
 	@echo "ok ?"
