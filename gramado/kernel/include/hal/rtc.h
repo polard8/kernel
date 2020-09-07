@@ -113,7 +113,6 @@ struct rtc_d *rtc;
 // IRQ8.
 //
 
-void KiRtcIrq (void); 
 void rtc_irq (void);
 
 

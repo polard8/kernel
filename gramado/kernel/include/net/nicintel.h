@@ -355,8 +355,6 @@ void nic_i8254x_transmit (void);
 uint32_t E1000ReadEEPROM ( struct intel_nic_info_d *d, uint8_t addr );
 
 
-void xxxe1000handler (void);
-
 
 #endif   
 

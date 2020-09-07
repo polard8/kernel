@@ -36,8 +36,8 @@
 
 #define __CHANNEL0 0  // BAR 0 primary, master and slave
 #define __CHANNEL1 2  // BAR 2 secondary, master and slave
-#define __CHANNEL2 1  // BAR 1 extra (sata amulating ide)
-#define __CHANNEL3 3  // BAR 3 extra (sata amulating ide)
+#define __CHANNEL2 1  // BAR 1 extra (sata emulating ide)
+#define __CHANNEL3 3  // BAR 3 extra (sata emulating ide)
 
 
 // #importante

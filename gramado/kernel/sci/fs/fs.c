@@ -2653,20 +2653,26 @@ int fs_create_empty_file ( char *file_name, int type ){
     return __ret;
 }
 
+// Service 43
 int sys_create_empty_file ( char *file_name )
 {
+    int __ret=0;
     char buffer[512];
     int number_of_sectors = 1;
     int size_in_bytes = 512;  
-    int __ret;
     
+    debug_print ("sys_create_empty_file:\n");
+    
+    //#test
+    read_fntos ( (char *) file_name );
+    
+    // See: write.c
     __ret = (int) fsSaveFile ( VOLUME1_FAT_ADDRESS, VOLUME1_ROOTDIR_ADDRESS, FAT16_ROOT_ENTRIES,
                     (char *) file_name,    
                     (unsigned long) number_of_sectors,       
                     (unsigned long) size_in_bytes,  
                     (char *) &buffer[0],          
                     (char) 0x20 );  //0x20 = file.                  
-
 
 
     return __ret;
@@ -2683,7 +2689,6 @@ int fs_create_empty_directory ( char *dir_name, int type )
     char buffer[512];
     int number_of_sectors = 1;
     int size_in_bytes = 512;  
-
 
     f = (file *) kmalloc( sizeof(size_in_bytes) );
     
@@ -2709,7 +2714,7 @@ int fs_create_empty_directory ( char *dir_name, int type )
 }
 
 
-
+// Service 44
 int sys_create_empty_directory ( char *dir_name )
 {
     int __ret=0;
@@ -2717,7 +2722,12 @@ int sys_create_empty_directory ( char *dir_name )
     int number_of_sectors = 1;
     int size_in_bytes = 512;  
     
- 
+    debug_print ("sys_create_empty_directory:\n");
+    
+    //#test
+    read_fntos ( (char *) dir_name );
+
+     // See: write.c
     __ret = (int) fsSaveFile ( VOLUME1_FAT_ADDRESS, VOLUME1_ROOTDIR_ADDRESS, FAT16_ROOT_ENTRIES,
                     (char *) dir_name,    
                     (unsigned long) number_of_sectors,       

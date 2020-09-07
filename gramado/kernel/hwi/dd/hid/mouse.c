@@ -15,12 +15,13 @@
 
 /*
  ********************************************
- * mouse_handler:
+ * irq12_MOUSE:
+ * 
  *     Mouse handler do driver de mouse.
  *     #importante: Essa rotina vai ficar no driver de 
  * mouse carregado em ring0 e provavelmente enviará mensagens 
  * para o kernel.
- *    talvez pertenã ao driver do controlador 8042
+ *    talvez perteça ao driver do controlador 8042
  */
 
 //*importante:
@@ -28,7 +29,7 @@
 // Chamaremos o mouse handler dentro do kernel base.
 // ps2mouse.c
 
-void mouse_handler (void)
+void irq12_MOUSE (void)
 {
 
 	// Se o mouse ps2 não estiver inicializado !
@@ -39,7 +40,8 @@ void mouse_handler (void)
 	// Contando as interrupções desse tipo.
     g_profiler_ints_irq12++;
 
-    mouseHandler ();
+
+    mouseHandler();
 
 	 
 	 //#bugbug

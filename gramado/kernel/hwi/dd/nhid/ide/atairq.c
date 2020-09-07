@@ -21,18 +21,17 @@ void disk_reset_ata_irq_invoked (void);
 
 /*
  ***********************************
- * ata_handler1
+ * irq14_PRIMARY_IDE
  *     irq 14 handler
  */
 
-void ata_handler1 (void)
+void irq14_PRIMARY_IDE (void)
 {
 	
 	// Se o ata1 não estiver inicializado !
     if ( __breaker_ata1_initialized == 0 )
         return;
 
-	
     //
     // profiler
     //
@@ -46,11 +45,11 @@ void ata_handler1 (void)
 
 /*
  ***********************************
- * ata_handler2
+ * irq15_SECONDARY_IDE
  *     irq 15 handler
  */
 
-void ata_handler2 (void)
+void irq15_SECONDARY_IDE (void)
 {
 	// Se o ata2 não estiver inicializado !
     if ( __breaker_ata2_initialized == 0 )

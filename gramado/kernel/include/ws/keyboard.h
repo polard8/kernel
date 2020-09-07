@@ -71,8 +71,7 @@ static int __has_e1_prefix = 0;
 
 void abnt2_keyboard_handler (void);
 
-//Kernel Base driver.
-void KiKeyboard (void);    
+
 
 unsigned long get_scancode (void);
 void put_scancode( char c );

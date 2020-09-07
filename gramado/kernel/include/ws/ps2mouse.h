@@ -67,6 +67,17 @@
 #define MOUSE_Y_SIGN	0x20
 
 
+
+
+//
+// Stop
+//
+
+// The interrupt handler will not work.
+
+//int ps2mouseStopped;
+
+
 //usado pra exibir provisoriamente alguma imagem em cima da janela 
 //que o mouse passa por cima.
 unsigned long savedmouseoverwindowX;
@@ -158,9 +169,6 @@ void ps2mouse_parse_data_packet (void);
 //ps2mouse.c
 void mouseHandler (void); 
 
-//mouse.c
-//(real handler)
-void mouse_handler (void);
 
 
 int ps2_mouse_globals_initialize (void);

@@ -64,14 +64,15 @@ int rtcError;
 
  
 /*
- * KiRtcIrq:
+ **********************************************
+ * irq8_RTC:
  *     irq8 interrupt handler.
  *     System CMOS, Realtime clock.
  *     Isso é uma interface para chamar a rotina verdadeira.
  */
 
-void KiRtcIrq (void){
-	
+void irq8_RTC (void){
+
 
 	// Se o rtc não estiver inicializado !
     if ( __breaker_rtc_initialized == 0 )
@@ -83,7 +84,7 @@ void KiRtcIrq (void){
 
 	//...
 
-    rtc_irq ();
+    rtc_irq();
 }
  
  

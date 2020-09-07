@@ -280,9 +280,6 @@ typedef struct st_dev
 //
 
 
-// handlers.
-void ata_handler1 (void);
-void ata_handler2 (void);
 
 int nport_ajuste(char nport);
 

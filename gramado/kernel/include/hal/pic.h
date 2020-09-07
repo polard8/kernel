@@ -83,10 +83,42 @@ struct pic_d
     //irq_t *Irq12;    //ps/2 mouse.
     //irq_t *Irq13;
     //irq_t *Irq14;    //primary IDE.
-    //irq_t *Irq15;    //secondary IDE.	
+    //irq_t *Irq15;    //secondary IDE.
 	
 };
 struct pic_d *Pic;
+
+
+//
+// == IRQ Handlers =======================================
+//
+
+// See: pit.c
+void irq0_TIMER (void);
+
+// See: keyboard.c
+void irq1_KEYBOARD (void);
+
+// See: rtc.c
+void irq8_RTC (void); 
+
+// See: nicintel.c
+void irq_E1000 (void);
+
+// See: mouse.c
+void irq12_MOUSE (void);
+
+// See: pci.c
+// Each one will be shared by up to 4 devices.
+void irq_SHARED0 (void);
+void irq_SHARED1 (void);
+void irq_SHARED2 (void);
+void irq_SHARED3 (void);
+
+// See: atairq.c
+void irq14_PRIMARY_IDE (void);
+void irq15_SECONDARY_IDE (void);
+
 
 
 #endif   

@@ -1,5 +1,5 @@
 /*
- * File: kdrivers/pci/pci.c
+ * File: pci/pci.c
  * 
  * Descrição:
  *     Driver de PCI presente no kernel Base.
@@ -9,10 +9,9 @@
  *
  * History:
  *     2013 - Created by Fred Nora.
- *     2016 - Small changes.
  */
- 
- 
+
+
 /*
  Wikipedia:
      
@@ -717,7 +716,7 @@ static const char* sbc_subclass_strings[] = {
 
 
 /*
- * KiPciHandler1: 
+ * irq_SHARED0: 
  * 
  *     **** PCI HANDLER ****
  *
@@ -727,15 +726,16 @@ static const char* sbc_subclass_strings[] = {
  * para a rotina de serviço aproriada.
  */
 
-unsigned long KiPciHandler1 (void)
+void irq_SHARED0 (void)
 {
+    debug_print ("irq_SHARED0:\n");
 	//...
-	return (unsigned long) 0;
+    return;
 }
 
 
 /*
- * KiPciHandler2: 
+ * irq_SHARED1: 
  * 
  *     **** PCI HANDLER ****
  *
@@ -745,15 +745,16 @@ unsigned long KiPciHandler1 (void)
  * para a rotina de serviço aproriada.
  *
  */
-unsigned long KiPciHandler2 (void)
+void irq_SHARED1 (void)
 {
+    debug_print ("irq_SHARED1:\n");
 	//...
-	return (unsigned long) 0;
+    return;
 }
 
 
 /*
- * KiPciHandler3: 
+ * irq_SHARED2: 
  * 
  *     **** PCI HANDLER ****
  *
@@ -763,15 +764,16 @@ unsigned long KiPciHandler2 (void)
  * para a rotina de serviço aproriada.
  *
  */
-unsigned long KiPciHandler3 (void)
+void irq_SHARED2 (void)
 {
+    debug_print ("irq_SHARED2:\n");
 	//...
-	return (unsigned long) 0;
+    return;
 }
 
 
 /*
- * KiPciHandler4: 
+ * irq_SHARED3: 
  * 
  *     **** PCI HANDLER ****
  *
@@ -781,11 +783,15 @@ unsigned long KiPciHandler3 (void)
  * para a rotina de serviço aproriada.
  */
 
-unsigned long KiPciHandler4 (void)
+void irq_SHARED3 (void)
 {
+    debug_print ("irq_SHARED3:\n");
 	//...
-	return (unsigned long) 0;
+    return;
 }
+
+
+
 
 
 /**

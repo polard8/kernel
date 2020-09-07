@@ -189,13 +189,7 @@ struct timer_d
 unsigned long timerList[32];
 
 
-/*
- * KiTimer:
- * Interface chamada pelo handler da irq0 para um rotina num módulo dentro do 
- * kernel base.
- */
 
-void KiTimer (void); 
 
 //Global para inicialização do módulo interno.
 

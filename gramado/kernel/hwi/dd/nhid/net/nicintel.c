@@ -403,7 +403,7 @@ e1000_init_nic (
  *******************************************
  *    >>>> HANDLER <<<<
  *******************************************
- * xxxe1000handler:
+ * irq_E1000:
  *     
  *     Esse é o handler da interrupção para o NIC intel 8086:100E.
  *     Esse é o driver do controlador, ele não atua sobre protocolos 
@@ -418,7 +418,7 @@ e1000_init_nic (
 
 // Isso é chamado pelo assembly.
 
-void xxxe1000handler (void){
+void irq_E1000 (void){
 
     uint32_t status=0;
     uint32_t val=0;
@@ -446,7 +446,7 @@ void xxxe1000handler (void){
 
 
     if ( e1000_interrupt_flag != 1 ){
-        printf ("xxxe1000handler: locked\n");
+        printf ("irq_E1000: locked\n");
         refresh_screen();
         return;
 
@@ -620,7 +620,7 @@ uint32_t nic_idt_entry_new_address;
 
 void e1000_setup_irq (void){
 
-    debug_print ("e1000_setup_irq\n");
+    debug_print ("e1000_setup_irq:\n");
 
 
 	// pegando o número da irq.
@@ -629,7 +629,7 @@ void e1000_setup_irq (void){
 	
 	// handler address
 	
-    uint32_t handler = (uint32_t) &xxxe1000handler;  
+    uint32_t handler = (uint32_t) &irq_E1000;  
 
 	// #importante
 	// Transformando irq em número de interrupção.

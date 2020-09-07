@@ -38,55 +38,37 @@
 
 
 
-;
-; Funções importadas.
-;
+;;
+;; == Imports =======================================
+;;
 
 
-;;;;
-; Usadas pela _irq0.
-;Driver em user mode.
-;extern _KeTimer
-;extern _KeTaskSwitch
-;Driver no Kernel Base.
-extern _KiTimer        
-;extern _timer 
-extern _KiTaskSwitch   
-;extern _task_switch
+;;
+;; == IRQs =======================================
+;;
 
-;;;;
-; Usada pela _irq1
-extern _KiKeyboard
+;; See: pic.h
 
-;;;
-;Usada pela _irq8
-extern _KiRtcIrq
-;extern _rtc_irq
-
-;;usada pela irq12.
-extern _mouse_handler
+extern _irq0_TIMER
+extern _irq1_KEYBOARD 
+extern _irq8_RTC
+extern _irq_E1000
+extern _irq12_MOUSE
+extern _irq_SHARED0
+extern _irq_SHARED1
+extern _irq_SHARED2
+extern _irq_SHARED3
+extern _irq14_PRIMARY_IDE
+extern _irq15_SECONDARY_IDE
 
 
-;
-; _KiPciHandler (PCI)
-;     Todas as interrupções geradas pelos dispositivos PCI
-; usarão o mesmo isr (handler). Cabera à rotina do handler identificar
-; qual dispositivo sinalizou que efetuou uma interrupção. Então direcionar 
-; para a rotina de serviço apropriada.
-; Obs: 4 slots podem compartilhar a mesma interroção.
-; 4 interrupções, podem atender no máximo 16 slots, ou 16 dispositivos.
-; Precisamos ser capazes de atender à 256 dispositivos. (256/4=64interrpções)
-;
-;
+;;
+;; == Task switch =======================================
+;;
 
-;Cada um desses pode atender até 4 dispositivos.
-extern _KiPciHandler1
-extern _KiPciHandler2
-extern _KiPciHandler3
-extern _KiPciHandler4
-;;...
 
-;;...
+;; It is used bu the irq0.
+extern _KiTaskSwitch 
 
 
 ;; @todo:
@@ -156,7 +138,7 @@ _irq0:
     mov esp, eax
 
     ;; Timer support. No task switch.
-    call _KiTimer
+    call _irq0_TIMER
 
     ;; Task switching.
     call _KiTaskSwitch
@@ -341,7 +323,7 @@ _irq1:
     ;; #bugbug:
     ;; The stack.
 
-    call _KiKeyboard
+    call _irq1_KEYBOARD
 
     pop gs
     pop fs
@@ -510,7 +492,7 @@ _irq8:
     cli
     pushad
 
-    call _KiRtcIrq
+    call _irq8_RTC
 
     ;; EOI.
     ;; Order: Second, first.
@@ -578,14 +560,13 @@ _irq10:
 
 ;;===============================================
 ;;  interrupção 41. irq 9;
-extern _xxxe1000handler
 
 global _nic_handler
 _nic_handler:
     cli
     pushad
 
-    call _xxxe1000handler
+    call _irq_E1000
 
     ;; EOI.
     ;; Order: Second, first.
@@ -640,7 +621,7 @@ _irq12:
     push gs
     push ss 
 
-    call _mouse_handler
+    call _irq12_MOUSE
 
     ;; EOI.
     ;; Order: Second, first.
@@ -696,7 +677,6 @@ _irq13:
 ;     O timer precisa ser desbilitado. ??
 ;
 
-extern _ata_handler1
 
 global _irq14
 _irq14:
@@ -705,7 +685,7 @@ _irq14:
     push eax
     PUSHAD
 
-    call _ata_handler1
+    call _irq14_PRIMARY_IDE
 
     ;; EOI.
     ;; Order: Second, first.
@@ -739,7 +719,6 @@ _irq14:
 ;; was a spurious IRQ from the slave. 
 
 
-extern _ata_handler2
 
 global _irq15
 _irq15:
@@ -748,7 +727,7 @@ _irq15:
     push eax
     PUSHAD
 
-    call _ata_handler2
+    call _irq15_SECONDARY_IDE
     
     
     ;; #bugbug

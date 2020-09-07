@@ -246,7 +246,7 @@ sc_again:
 
 /*
  *********************
- * KiKeyboard:
+ * irq1_KEYBOARD:
  * 
  *     # Keyboard handler #
  * 
@@ -266,7 +266,7 @@ sc_again:
 	// Criar a variável keyboard_type no kernel base.
 	// Não aqui ... pois cada driver deve ser para um tipo de teclado.
 
-void KiKeyboard (void){
+void irq1_KEYBOARD (void){
 
 
 	// Se o teclado ps2 não estiver inicializado !
@@ -303,7 +303,7 @@ void KiKeyboard (void){
         return;
     }
 
-    if (abnt2 != 1){ panic("KiKeyboard: not abnt2\n"); }
+    if (abnt2 != 1){ panic("irq1_KEYBOARD: not abnt2\n"); }
 }
 
 

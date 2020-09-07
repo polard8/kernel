@@ -200,6 +200,15 @@ struct keyboardMessage
 };
 
 
+//
+// Stop
+//
+
+// The interrupt handler will not work.
+
+//int ps2kbdStopped;
+
+
 //Se há uma nova mensagem de teclado. 
 int kbMsgStatus;
 

@@ -227,10 +227,16 @@ unsigned short list[fat_range_max];
 
 // ======================================
 // fsSaveFile:
-//     Salva um arquivo. Onde? #todo vamos fornecer o endereço do diretorio.
+//     Salva um arquivo. 
+//     Onde? #todo vamos fornecer o endereço do diretorio.
 // IN: 
 // name, size in sectors, size in bytes, adress, flag. 
 // OUT:
+
+
+// #bugbug
+// O nome nao esta ficando certo na entrada.
+
 int
 fsSaveFile ( 
     unsigned long fat_address,

@@ -163,6 +163,7 @@ extern void do_executa_new_task (void);
 // ws - window server, and beyond. low level
 #include "ws/xproc.h"
 #include "ws/keyboard.h"
+#include "ws/mouse.h"
 #include "ws/vk.h"
 #include "ws/kbdabnt2.h"
 #include "ws/ldisc.h"
@@ -172,8 +173,10 @@ extern void do_executa_new_task (void);
 //storage (^)
 #include "storage/ide.h"
 
+
+
 //pci
-#include "pci.h"
+#include "hal/pci.h"
 
 
 //storage (^)

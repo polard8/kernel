@@ -1472,12 +1472,14 @@ gde_services (
         // 42 - livre
         // usar para manipulação de arquivo
 
-        // Create an empty file.
+        // 43 - Create an empty file.
+        // See: fs.c
         case 43:
             return (void *) sys_create_empty_file ( (char *) arg2 );
             break;
 
         // 44 -Create an empty directory.
+        // See: fs.c
         case 44:
             return (void *) sys_create_empty_directory ( (char *) arg2 );
             break;
@@ -2552,6 +2554,7 @@ gde_services (
 
         // 246
         // openat - open a file relative to a directory file descriptor 
+        // See: sci/posix/kstdio.c
         // IN: dirfd, pathname, flags.
         case 246:
             return (void *) k_openat ( (int) arg2, 

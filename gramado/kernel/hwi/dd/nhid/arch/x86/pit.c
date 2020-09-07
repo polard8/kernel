@@ -115,14 +115,15 @@ void timer (void);
 
 
 /*
- * KiTimer:
+ ************************************
+ * irq0_TIMER:
  *     Chama o handler do kernel que está no kernel base.
  * #todo: Observar alguns procedimentos antes de chamar a rotina.
  */
  
-void KiTimer (void){
-	
-	// Se o timer não estiver inicializado !
+void irq0_TIMER (void){
+
+    // Se o timer não estiver inicializado !
     if ( __breaker_timer_initialized == 0 )
         return;
 
@@ -130,11 +131,11 @@ void KiTimer (void){
 	//
 	// Profiler
 	//
-	
+
 	// Contando as interrupções desse tipo.
-	g_profiler_ints_irq0++;
-	
-	
+    g_profiler_ints_irq0++;
+
+
 	//#debug
 	//vamos checar se o primeiro iret está trazendo
 	//o fluxo para cá.
@@ -145,8 +146,8 @@ void KiTimer (void){
 	//refresh_screen();
 	//refresh_screen();
 	//while(1){}
-	
-	timer ();
+
+    timer();
 }
 
 
