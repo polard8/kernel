@@ -1819,9 +1819,9 @@ int main (int argc, char **argv){
 
 
         //gwssrv_clone_and_execute ("gws.bin");      // command gws.bin
-           //gwssrv_clone_and_execute ("gwm.bin");      // window manager
+        gwssrv_clone_and_execute ("gwm.bin");      // window manager
         //gwssrv_clone_and_execute ("terminal.bin");  
-        gwssrv_clone_and_execute ("fileman.bin");  
+        //gwssrv_clone_and_execute ("fileman.bin");  
         //gwssrv_clone_and_execute ("browser.bin");
         //gwssrv_clone_and_execute ("editor.bin");   
         //gwssrv_clone_and_execute ("launch1.bin"); 
@@ -1930,6 +1930,11 @@ int main (int argc, char **argv){
             // No metodo gramado o retorno sera o fd do servidor
             // se der certo, pois nosso write copia do servidor para
             // o cliente conectado.
+
+            //newconn = accept ( curconn, 
+            //              (struct sockaddr *) &gramsock, 
+            //              (socklen_t *) addr_len );
+            
             newconn = accept2 ( curconn, 
                           (struct sockaddr *) &gramsock, 
                           (socklen_t *) addr_len );
@@ -1940,25 +1945,12 @@ int main (int argc, char **argv){
             // Request from the new connection
             }else{
 
-                // current_connection = newconn;
-                // What is the client for this connection?
-                // Getting the struct pointer for the client with this fd.
-                // currentClient = getClient(newconn);
                 
                 //mensagens de clientes.
                 xxxHandleNextClientRequest (newconn);
                 //xxxHandleNextClientRequest (curconn);
                 // close?? no!! this is our fd.
                 
-                // We do not have a current client anymore.
-                // We need to accept a new one.
-                // The kernel will give us a new one from the list
-                // of connections when we call accept().
-                //currentClient = (struct gws_client_d *) 0;
-                
-                //mensagens de sistema.
-                //afetarão a janela com o foco.
-                //gwssrv_get_system_message();
             };
         };
 

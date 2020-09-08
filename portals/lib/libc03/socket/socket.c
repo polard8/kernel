@@ -193,11 +193,11 @@ int listen (int sockfd, int backlog){
 // On error, -1 is returned, errno is set appropriately, 
 // and addrlen is left unchanged.
 
-int accept2 (int sockfd, struct sockaddr *addr, socklen_t *addrlen){
-
+int accept2 (int sockfd, struct sockaddr *addr, socklen_t *addrlen)
+{
     int __fd = -1;
     
-    __fd = (int) gramado_system_call ( 7002, 
+    __fd = (int) gramado_system_call ( 7010, 
                      (unsigned long) sockfd, 
                      (unsigned long) addr, 
                      (unsigned long) addrlen );
@@ -213,15 +213,15 @@ int accept2 (int sockfd, struct sockaddr *addr, socklen_t *addrlen){
 
 // accept
 // #todo: standard unix-like
+// This is the unix standard method.
+// Our major goal is to return the fd for the client socket file.
+// #bugbug: Work in progress.
+
 int accept (int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 {
-    debug_print ("libc03-accept: [TODO] Work in progress\n");
-    printf      ("libc03-accept: [TODO] Work in progress\n");
-    return -1;
-
-    /*
-    int __fd = -1;    
-    __fd = (int) gramado_system_call ( ??????????????????, 
+    int __fd = -1;
+    
+    __fd = (int) gramado_system_call ( 7002, 
                      (unsigned long) sockfd, 
                      (unsigned long) addr, 
                      (unsigned long) addrlen );
@@ -230,9 +230,10 @@ int accept (int sockfd, struct sockaddr *addr, socklen_t *addrlen)
         //printf ("accept: Couldn't accept the connection\n");
         //debug_print ("accept: Couldn't accept the connection\n");
     }
+
     return (int) __fd;
-    */
 }
+
 
 
 // POSIX.1-2001, POSIX.1-2008, SVr4, 4.4BSD, 

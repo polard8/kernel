@@ -933,12 +933,13 @@ gde_extra_services (
     }
     
     
-    // accept2()
-    // Alternative way.
-    // It returns the fd of the server and write() will copy the data.  
+    // accept()
+    // This is the unix standard method.
+    // Our major goal is to return the fd for the client socket file.
+    // #bugbug: Work in progress.
     // fd, sockaddr struct pointer, addr len pointer.
     if ( number == 7002 ){
-        return (void *) sys_accept2 ( (int) arg2, 
+        return (void *) sys_accept ( (int) arg2, 
                             (struct sockaddr *) arg3, 
                             (socklen_t *) arg4 ); 
     }
@@ -996,6 +997,18 @@ gde_extra_services (
         return NULL;
     }
     
+ 
+    // accept2()
+    // Alternative way.
+    // It returns the fd of the server and write() will copy the data.  
+    // fd, sockaddr struct pointer, addr len pointer.
+    if ( number == 7010 ){
+        return (void *) sys_accept2 ( (int) arg2, 
+                            (struct sockaddr *) arg3, 
+                            (socklen_t *) arg4 ); 
+    }
+ 
+ 
     //...
     
         
