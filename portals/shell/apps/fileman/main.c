@@ -650,7 +650,7 @@ int main ( int argc, char *argv[] ){
 
 
     debug_print ("---------------------------\n");    
-    debug_print ("gwm: Initializing ...\n");
+    debug_print ("fileman: Initializing ...\n");
 
 
 
@@ -659,7 +659,7 @@ int main ( int argc, char *argv[] ){
     // 
 
     // #debug
-    printf ("gwm: Creating socket\n");
+    printf ("fileman: Creating socket\n");
 
     // cria o soquete.
     // AF_GRAMADO
@@ -667,7 +667,7 @@ int main ( int argc, char *argv[] ){
     client_fd = socket ( AF_INET, SOCK_STREAM, 0 );
     
     if ( client_fd < 0 ){
-       printf ("gwm: Couldn't create socket\n");
+       printf ("fileman: Couldn't create socket\n");
        exit(1);
     }
 
@@ -684,11 +684,11 @@ int main ( int argc, char *argv[] ){
     
         // #debug
         //printf ("gnst: Connecting to the address 'ws' ...\n");      
-        printf ("gwm: Connecting to ws via inet  ...\n");   
+        printf ("fileman: Connecting to ws via inet  ...\n");   
 
         if (connect (client_fd, (void *) &addr_in, sizeof(addr_in)) < 0){ 
-            gws_debug_print("gwm: Connection Failed \n");
-            printf("gwm: Connection Failed \n"); 
+            gws_debug_print("fileman: Connection Failed \n");
+            printf("fileman: Connection Failed \n"); 
             //return -1;
             
             //try again 

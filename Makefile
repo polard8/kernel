@@ -1,7 +1,7 @@
 # License: BSD License
 VERSION = 1
 PATCHLEVEL = 0
-SUBLEVEL = 106
+SUBLEVEL = 107
 EXTRAVERSION = 
 NAME = Gramado 1.0
 
@@ -117,8 +117,8 @@ build-portals
 build-boot:
 	@echo "==================="
 	@echo "Compiling Boot ... "
-	$(Q) $(MAKE) -C gros/boot/x86/bm/ 
-	$(Q) $(MAKE) -C gros/boot/x86/bl/ 
+	$(Q) $(MAKE) -C boot/x86/bm/ 
+	$(Q) $(MAKE) -C boot/x86/bl/ 
 
 build-portals:
 	@echo "==================="
@@ -137,7 +137,7 @@ KERNEL.BIN:
 	@echo "================================="
 	@echo "(Step 1) Creating the kernel image ..."
 
-	$(Q) $(MAKE) -C gros/kernel   
+	$(Q) $(MAKE) -C kernel
 
 
 ## Step3 /mnt/gramadovhd    - Creating the directory to mount the VHD.
@@ -153,7 +153,7 @@ vhd-create:
 	@echo "================================="
 	@echo "(Step 4) Creating a VHD in Assembly language ..."
 
-	$(NASM) gros/boot/x86/vhd/main.asm -I gros/boot/x86/vhd/ -o GRAMADO.VHD   
+	$(NASM) boot/x86/vhd/main.asm -I boot/x86/vhd/ -o GRAMADO.VHD   
 
 
 ## Step5 vhd-mount          - Mounting the VHD.
@@ -201,9 +201,9 @@ vhd-copy-files:
 
 	# 1) First of all
 	# bm, bl, kernel, init, gdeshell.
-	sudo cp gros/boot/x86/bin/BM.BIN        base/
-	sudo cp gros/boot/x86/bin/BL.BIN        base/
-	sudo cp gros/kernel/KERNEL.BIN          base/
+	sudo cp boot/x86/bin/BM.BIN        base/
+	sudo cp boot/x86/bin/BL.BIN        base/
+	sudo cp kernel/KERNEL.BIN          base/
 	sudo cp portals/init/INIT.BIN           base/
 	sudo cp portals/setup/bin/GDESHELL.BIN  base/
 
@@ -241,10 +241,10 @@ vhd-copy-files:
 # == "/BOOT" ====================================================
 #
 
-	sudo cp gros/boot/x86/bin/BM.BIN    base/BOOT
-	sudo cp gros/boot/x86/bin/BL.BIN    base/BOOT
-	sudo cp gros/kernel/KERNEL.BIN      base/BOOT
-#	-sudo cp gros/infobase/res/wall/ANIMAL.BMP  /mnt/gramadovhd/BOOT
+	sudo cp boot/x86/bin/BM.BIN    base/BOOT
+	sudo cp boot/x86/bin/BL.BIN    base/BOOT
+	sudo cp kernel/KERNEL.BIN      base/BOOT
+#	-sudo cp infobase/res/wall/ANIMAL.BMP  /mnt/gramadovhd/BOOT
 
 
 
@@ -261,9 +261,9 @@ vhd-copy-files:
 # == "/PORTALS" ====================================================
 #
 	# bm, bl, kernel, init, gdeshell.
-	sudo cp gros/boot/x86/bin/BM.BIN     base/PORTALS
-	sudo cp gros/boot/x86/bin/BL.BIN     base/PORTALS
-	sudo cp gros/kernel/KERNEL.BIN       base/PORTALS
+	sudo cp boot/x86/bin/BM.BIN     base/PORTALS
+	sudo cp boot/x86/bin/BL.BIN     base/PORTALS
+	sudo cp kernel/KERNEL.BIN       base/PORTALS
 	sudo cp portals/init/INIT.BIN           base/PORTALS
 	sudo cp portals/setup/bin/GDESHELL.BIN  base/PORTALS
 
@@ -290,7 +290,7 @@ vhd-copy-files:
 # == "/TMP" =============================================
 #
 
-#	-sudo cp gros/infobase/res/wall/ANIMAL.BMP   /mnt/gramadovhd/TMP
+#	-sudo cp infobase/res/wall/ANIMAL.BMP   /mnt/gramadovhd/TMP
 
 
 	# sends everything from base to root.
@@ -341,8 +341,8 @@ clean-system-files:
 	@echo "Cleaning all system binaries ..."
 
 	# Gramado
-	-rm -rf gros/boot/x86/bin/*.BIN
-	-rm -rf gros/kernel/KERNEL.BIN
+	-rm -rf boot/x86/bin/*.BIN
+	-rm -rf kernel/KERNEL.BIN
 
 	# fonts
 	-rm -rf portals/fonts/bin/*.FON
