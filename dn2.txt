@@ -1,0 +1,2 @@
+	gramnt - new technologies. (for developers)
+	gramci - consitent interface. (User point of view)

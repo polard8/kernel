@@ -1,7 +1,7 @@
 # License: BSD License
 VERSION = 1
 PATCHLEVEL = 0
-SUBLEVEL = 107
+SUBLEVEL = 108
 EXTRAVERSION = 
 NAME = Gramado 1.0
 
@@ -117,27 +117,27 @@ build-portals
 build-boot:
 	@echo "==================="
 	@echo "Compiling Boot ... "
-	$(Q) $(MAKE) -C boot/x86/bm/ 
-	$(Q) $(MAKE) -C boot/x86/bl/ 
+	$(Q) $(MAKE) -C gramnt/boot/x86/bm/ 
+	$(Q) $(MAKE) -C gramnt/boot/x86/bl/ 
 
 build-portals:
 	@echo "==================="
 	@echo "Compiling portals ..."
-	$(Q) $(MAKE) -C portals/lib/
-	$(Q) $(MAKE) -C portals/init/
-	$(Q) $(MAKE) -C portals/setup/
-	$(Q) $(MAKE) -C portals/services/gnssrv/ 
-	$(Q) $(MAKE) -C portals/services/gwssrv/
-	$(Q) $(MAKE) -C portals/shell/apps/
-	$(Q) $(MAKE) -C portals/shell/cmd/
-	$(Q) $(MAKE) -C portals/shell/net/
+	$(Q) $(MAKE) -C gramci/lib/
+	$(Q) $(MAKE) -C gramci/init/
+	$(Q) $(MAKE) -C gramci/setup/
+	$(Q) $(MAKE) -C gramci/services/gnssrv/ 
+	$(Q) $(MAKE) -C gramci/services/gwssrv/
+	$(Q) $(MAKE) -C gramci/shell/apps/
+	$(Q) $(MAKE) -C gramci/shell/cmd/
+	$(Q) $(MAKE) -C gramci/shell/net/
 
 ## Step1 KERNEL.BIN         - Creating the kernel image.
 KERNEL.BIN: 
 	@echo "================================="
 	@echo "(Step 1) Creating the kernel image ..."
 
-	$(Q) $(MAKE) -C kernel
+	$(Q) $(MAKE) -C gramnt/kernel
 
 
 ## Step3 /mnt/gramadovhd    - Creating the directory to mount the VHD.
@@ -153,7 +153,7 @@ vhd-create:
 	@echo "================================="
 	@echo "(Step 4) Creating a VHD in Assembly language ..."
 
-	$(NASM) boot/x86/vhd/main.asm -I boot/x86/vhd/ -o GRAMADO.VHD   
+	$(NASM) gramnt/boot/x86/vhd/main.asm -I gramnt/boot/x86/vhd/ -o GRAMADO.VHD   
 
 
 ## Step5 vhd-mount          - Mounting the VHD.
@@ -201,31 +201,32 @@ vhd-copy-files:
 
 	# 1) First of all
 	# bm, bl, kernel, init, gdeshell.
-	sudo cp boot/x86/bin/BM.BIN        base/
-	sudo cp boot/x86/bin/BL.BIN        base/
-	sudo cp kernel/KERNEL.BIN          base/
-	sudo cp portals/init/INIT.BIN           base/
-	sudo cp portals/setup/bin/GDESHELL.BIN  base/
+	sudo cp gramnt/boot/x86/bin/BM.BIN      base/
+	sudo cp gramnt/boot/x86/bin/BL.BIN      base/
+	sudo cp gramnt/kernel/KERNEL.BIN        base/
+
+	sudo cp gramci/init/INIT.BIN           base/
+	sudo cp gramci/setup/bin/GDESHELL.BIN  base/
 
 
 	# EXTRA: Used for tests.
-	sudo cp portals/setup/bin/SYSMON.BIN base/
+	sudo cp gramci/setup/bin/SYSMON.BIN base/
 	# ...
 
 
 	# 6) from Portals to root.
-	-sudo cp portals/services/gwssrv/bin/GWS.BIN     base/ 
-	-sudo cp portals/services/gwssrv/bin/GWSSRV.BIN  base/
-	-sudo cp portals/services/gnssrv/bin/GNS.BIN     base/
-	-sudo cp portals/services/gnssrv/bin/GNSSRV.BIN  base/
-	-sudo cp portals/shell/apps/bin/*.BIN            base/
-	#-sudo cp portals/shell/cmd/bin/*.BIN             /mnt/gramadovhd
-	-sudo cp portals/shell/net/bin/*.BIN             base/
-	#-sudo cp portals/setup/bin/*.BIN                 /mnt/gramadovhd 
-	-sudo cp portals/shell/cmd/bin/REBOOT.BIN         base/
-	-sudo cp portals/shell/cmd/bin/CAT.BIN            base/
-#	-sudo cp portals/shell/cmd/bin/TRUE.BIN           /mnt/gramadovhd
-#	-sudo cp portals/shell/cmd/bin/FALSE.BIN          /mnt/gramadovhd
+	-sudo cp gramci/services/gwssrv/bin/GWS.BIN     base/ 
+	-sudo cp gramci/services/gwssrv/bin/GWSSRV.BIN  base/
+	-sudo cp gramci/services/gnssrv/bin/GNS.BIN     base/
+	-sudo cp gramci/services/gnssrv/bin/GNSSRV.BIN  base/
+	-sudo cp gramci/shell/apps/bin/*.BIN            base/
+	#-sudo cp gramci/shell/cmd/bin/*.BIN             /mnt/gramadovhd
+	-sudo cp gramci/shell/net/bin/*.BIN             base/
+	#-sudo cp gramci/setup/bin/*.BIN                 /mnt/gramadovhd 
+	-sudo cp gramci/shell/cmd/bin/REBOOT.BIN         base/
+	-sudo cp gramci/shell/cmd/bin/CAT.BIN            base/
+#	-sudo cp gramci/shell/cmd/bin/TRUE.BIN           /mnt/gramadovhd
+#	-sudo cp gramci/shell/cmd/bin/FALSE.BIN          /mnt/gramadovhd
 	# ...
 
 
@@ -234,16 +235,16 @@ vhd-copy-files:
 #
 
 # unix-like commands and stuff.
-	-sudo cp portals/shell/cmd/bin/*.BIN base/BIN
+	-sudo cp gramci/shell/cmd/bin/*.BIN base/BIN
 
 
 #
 # == "/BOOT" ====================================================
 #
 
-	sudo cp boot/x86/bin/BM.BIN    base/BOOT
-	sudo cp boot/x86/bin/BL.BIN    base/BOOT
-	sudo cp kernel/KERNEL.BIN      base/BOOT
+	sudo cp gramnt/boot/x86/bin/BM.BIN    base/BOOT
+	sudo cp gramnt/boot/x86/bin/BL.BIN    base/BOOT
+	sudo cp gramnt/kernel/KERNEL.BIN      base/BOOT
 #	-sudo cp infobase/res/wall/ANIMAL.BMP  /mnt/gramadovhd/BOOT
 
 
@@ -253,23 +254,24 @@ vhd-copy-files:
 # == "/PROGRAMS" ====================================================
 #
 	# The applications.
-	-sudo cp portals/shell/apps/bin/*.BIN  base/PROGRAMS
-	-sudo cp portals/shell/net/bin/*.BIN   base/PROGRAMS
+	-sudo cp gramci/shell/apps/bin/*.BIN  base/PROGRAMS
+	-sudo cp gramci/shell/net/bin/*.BIN   base/PROGRAMS
 
 
 #
 # == "/PORTALS" ====================================================
 #
 	# bm, bl, kernel, init, gdeshell.
-	sudo cp boot/x86/bin/BM.BIN     base/PORTALS
-	sudo cp boot/x86/bin/BL.BIN     base/PORTALS
-	sudo cp kernel/KERNEL.BIN       base/PORTALS
-	sudo cp portals/init/INIT.BIN           base/PORTALS
-	sudo cp portals/setup/bin/GDESHELL.BIN  base/PORTALS
+	sudo cp gramnt/boot/x86/bin/BM.BIN     base/PORTALS
+	sudo cp gramnt/boot/x86/bin/BL.BIN     base/PORTALS
+	sudo cp gramnt/kernel/KERNEL.BIN       base/PORTALS
+	
+	sudo cp gramci/init/INIT.BIN           base/PORTALS
+	sudo cp gramci/setup/bin/GDESHELL.BIN  base/PORTALS
 
 	# Services
-	-sudo cp portals/services/gwssrv/bin/GWSSRV.BIN  base/PORTALS
-	-sudo cp portals/services/gnssrv/bin/GNSSRV.BIN  base/PORTALS
+	-sudo cp gramci/services/gwssrv/bin/GWSSRV.BIN  base/PORTALS
+	-sudo cp gramci/services/gnssrv/bin/GNSSRV.BIN  base/PORTALS
 
 
 #
@@ -277,8 +279,8 @@ vhd-copy-files:
 #
 
 # unix-like commands and stuff.
-#	-sudo cp portals/shell/cmd/bin/REBOOT.BIN   /mnt/gramadovhd/SBIN
-#	-sudo cp portals/setup/bin/REBOOT2.BIN      /mnt/gramadovhd/SBIN
+#	-sudo cp gramci/shell/cmd/bin/REBOOT.BIN   /mnt/gramadovhd/SBIN
+#	-sudo cp gramci/setup/bin/REBOOT2.BIN      /mnt/gramadovhd/SBIN
 
 
 #
@@ -319,9 +321,9 @@ clean2:
 	-rm *.VHD
 
 clean3:
-	-rm portals/shell/apps/bin/*.BIN
-	-rm portals/shell/cmd/bin/*.BIN
-	-rm portals/shell/net/bin/*.BIN
+	-rm gramci/shell/apps/bin/*.BIN
+	-rm gramci/shell/cmd/bin/*.BIN
+	-rm gramci/shell/net/bin/*.BIN
 
 #Clean base
 clean4:
@@ -341,27 +343,27 @@ clean-system-files:
 	@echo "Cleaning all system binaries ..."
 
 	# Gramado
-	-rm -rf boot/x86/bin/*.BIN
-	-rm -rf kernel/KERNEL.BIN
+	-rm -rf gramnt/boot/x86/bin/*.BIN
+	-rm -rf gramnt/kernel/KERNEL.BIN
 
 	# fonts
-	-rm -rf portals/fonts/bin/*.FON
+	-rm -rf gramci/fonts/bin/*.FON
 
 	# Init
-	-rm -rf portals/init/*.BIN
+	-rm -rf gramci/init/*.BIN
 
 	# Setup
-	-rm -rf portals/setup/bin/*.BIN
+	-rm -rf gramci/setup/bin/*.BIN
 	
 	# Services
-	-rm -rf portals/services/gnssrv/bin/*.BIN
-	-rm -rf portals/services/gwssrv/bin/*.BIN
+	-rm -rf gramci/services/gnssrv/bin/*.BIN
+	-rm -rf gramci/services/gwssrv/bin/*.BIN
 	# ...
 
 	# Shell
-	-rm -rf portals/shell/apps/bin/*.BIN
-	-rm -rf portals/shell/cmd/bin/*.BIN
-	-rm -rf portals/shell/net/bin/*.BIN
+	-rm -rf gramci/shell/apps/bin/*.BIN
+	-rm -rf gramci/shell/cmd/bin/*.BIN
+	-rm -rf gramci/shell/net/bin/*.BIN
 # ...
 
 
@@ -401,7 +403,7 @@ makeiso-x86:
 geniso-x86:
 	
 	#stage1
-	$(NASM) kernel/boot/x86/iso/stage1/stage1.asm -f bin -o stage1.bin
+	$(NASM) gramnt/kernel/boot/x86/iso/stage1/stage1.asm -f bin -o stage1.bin
 	cp stage1.bin bin/boot/gramado/
 	rm stage1.bin
 
