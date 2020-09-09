@@ -22,10 +22,9 @@
 - [Gramado on Github](https://github.com/frednora/gramado)
 
 
-## What is Portals?
+## What is Gramado?
 
     Gramado (c) is a 32 bit multithreaded operating system.
-    Portals (c) is the Desktop Environment for Gramado.
 
 ## Kernel features.
 
