@@ -17,18 +17,19 @@
 
 
 
+// Show the private socket for a process.
 void show_socket_for_a_process(int pid){
 
     struct process_d  *p;
     struct socket_d   *s;
+
 
     printf ("Socket info for pid %d: \n", pid);
 
     //#todo: max
     if (pid<0){
         printf ("pid limits\n");
-        refresh_screen();
-        return;
+        goto fail;
     }
 
 
@@ -36,15 +37,13 @@ void show_socket_for_a_process(int pid){
 
     if ( (void *) p == NULL ){
         printf("p\n");
-        refresh_screen();
-        return;
+        goto fail;
 
     }else{
 
         if ( p->used != 1 || p->magic != 1234 ){
             printf("Process validation\n");
-            refresh_screen();
-            return;
+            goto fail;
         }
 
         //ok
@@ -56,18 +55,17 @@ void show_socket_for_a_process(int pid){
     
     if ( (void *) s == NULL ){
         printf("s\n");
-        refresh_screen();
-        return;
+        goto fail;
+        
     }else{
 
-        if ( s->used != 1 || s->magic != 1234 ){
+        if ( s->used != 1 || s->magic != 1234 )
+        {
             printf("socket validation\n");
-            refresh_screen();
-            return;
+            goto fail;
         }
-
     };
-    
+
     //
     // Show !!
     //
@@ -78,10 +76,16 @@ void show_socket_for_a_process(int pid){
     //printf ("",s->);
     //printf ("",s->);
     //printf ("",s->);
-    
-    refresh_screen();
-}
 
+//done:
+
+    refresh_screen();
+    return;
+
+fail:
+   refresh_screen();
+   return;
+}
 
 
 
@@ -279,16 +283,12 @@ socket_gramado (
     if ( (void *) Process == NULL ){
         printf("socket_gramado: [FAIL] Process\n");
         goto fail;
-        //refresh_screen();
-        //return (int) (-1);
 
     }else{
 
         if ( Process->used != 1 || Process->magic != 1234 ){
             printf("socket_gramado: [FAIL] Process validation\n");
             goto fail;
-            //refresh_screen();
-            //return (int) (-1);
         }
         //ok
     };
@@ -320,8 +320,6 @@ socket_gramado (
     {
         printf ("socket_gramado: [FAIL] No free slots\n");
         goto fail;
-        //refresh_screen();
-        //return (int) (-1);
     }
 
     //
@@ -338,8 +336,6 @@ socket_gramado (
         debug_print ("socket_gramado: [FAIL] Buffer allocation fail\n");
         printf      ("socket_gramado: [FAIL] Buffer allocation fail\n");
         goto fail;
-        //refresh_screen();
-        //return (int) (-1);
     }
 
 
@@ -356,8 +352,6 @@ socket_gramado (
         debug_print ("socket_gramado: [FAIL] _file fail\n");
         printf      ("socket_gramado: [FAIL] _file fail\n");
         goto fail;
-        //refresh_screen();
-        //return (int) (-1);
 
     }else{
         _file->used = 1;
@@ -467,16 +461,12 @@ socket_unix (
     {
         printf("socket_unix: Process\n");
         goto fail;
-        //refresh_screen();
-        //return (int)(-1);
 
     }else{
 
         if ( Process->used != 1 || Process->magic != 1234 ){
             printf("socket_unix: validation\n");
             goto fail;
-            //refresh_screen();
-            //return (int)(-1);
         }
         //ok
     };
@@ -507,8 +497,6 @@ socket_unix (
     {
         printf ("socket_unix: No free slots\n");
         goto fail;
-        //refresh_screen();
-        //return (int) (-1);
     }
 
 
@@ -526,8 +514,6 @@ socket_unix (
         debug_print ("socket_unix: [FAIL] Buffer allocation fail\n");
         printf      ("socket_unix: [FAIL] Buffer allocation fail\n");
         goto fail;
-        //refresh_screen();
-        //return (int) (-1);
     }
 
 
@@ -543,8 +529,6 @@ socket_unix (
         
         printf ("socket_unix: _file fail\n");
         goto fail;
-        //refresh_screen();
-        //return (int) (-1);
 
     }else{
         _file->used = 1;
@@ -657,8 +641,6 @@ socket_inet (
         if ( Process->used != 1 || Process->magic != 1234 ){
             printf("socket_inet: validation\n");
             goto fail;
-            //refresh_screen();
-            //return (int) (-1);
         }
         //ok
     };
@@ -689,8 +671,6 @@ socket_inet (
     {
         printf ("socket_inet: No free slots\n");
         goto fail;
-        //refresh_screen();
-        //return (int) (-1);
     }
 
 
@@ -708,8 +688,6 @@ socket_inet (
         debug_print ("socket_inet: [FAIL] Buffer allocation fail\n");
         printf      ("socket_inet: [FAIL] Buffer allocation fail\n");
         goto fail;
-        //refresh_screen();
-        //return (int) (-1);
     }
 
 	//
@@ -724,8 +702,6 @@ socket_inet (
         
         printf ("socket_inet: _file fail\n");
         goto fail;
-        //refresh_screen();
-        //return (int) (-1);
 
     }else{
         _file->used = 1;
@@ -775,7 +751,6 @@ socket_inet (
         // Retornamos o fd na lista de arquivos abertos pelo processo.
         return (int) __slot;
     };
-
 
 fail:
     debug_print ("socket_inet: [FAIL]\n");
@@ -1052,7 +1027,6 @@ int sys_socket ( int family, int type, int protocol ){
     if (protocol < 0){
         debug_print ("sys_socket: [FAIL] protocol not supported\n");
         goto fail;
-        //return -1;
     }
 
 
@@ -1065,8 +1039,6 @@ int sys_socket ( int family, int type, int protocol ){
         debug_print ("sys_socket: p fail\n");
         printf      ("sys_socket: p fail\n");
         goto fail;
-        //refresh_screen();
-        //return -1;
     }
 
 
@@ -1095,6 +1067,9 @@ int sys_socket ( int family, int type, int protocol ){
 
         // #bugbug
         // The private socket of a process.
+        // This is not good. 
+        // Some process will create more than one socket?
+        
         p->priv = __socket;
 
         // family, type and protocol.
@@ -1170,7 +1145,7 @@ fail:
 }
 
 
-// Get the pointer for the socket structure of the current process
+// Get the pointer for the socket structure 
 // given the fd.
 struct socket_d *get_socket_from_fd (int fd){
 
@@ -1178,22 +1153,32 @@ struct socket_d *get_socket_from_fd (int fd){
     file *_file;
     
     
-    if (fd<0 || fd>=32)
+    if (fd<0 || fd>=32){
+        //msg
         return (struct socket_d *) 0;
+    }
 
+    // The process.
 
     p = (struct process_d *) processList[current_process];
-    if ( (void *) p == NULL)
+    
+    if ( (void *) p == NULL){
         return (struct socket_d *) 0;
- 
-        
+    }
+    
+    // The file.
+    
     _file = (file *) p->Objects[fd];    
-    if ( (void *) _file == NULL)
+    
+    if ( (void *) _file == NULL){
         return (struct socket_d *) 0;
+    }
 
+    // The structure.
 
-    // Get the pointer for the socket structure of the current process
+    // Get the pointer for the socket structure 
     // given the fd.
+    
     return (struct socket_d *) _file->socket;
 }
 

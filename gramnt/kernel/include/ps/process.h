@@ -999,10 +999,12 @@ struct process_d *processObject (void);
 pid_t getNewPID (void);
 
 
+
 // Signal.
 int 
-processSendSignal( struct process_d *p, 
-                   unsigned long signal );
+processSendSignal ( 
+    struct process_d *p, 
+    unsigned long signal );
 
 
 //
@@ -1089,9 +1091,10 @@ FILE *get_stream_from_fd ( int pid, int fd );
 
 // cria um novo process, uma thread e carrega a imagem.
 int 
-__execute_new_process ( const char *filename, 
-                      char *argv[], 
-                      char *envp[] );
+__execute_new_process ( 
+    const char *filename, 
+    char *argv[], 
+    char *envp[] );
 
 
 
@@ -1101,13 +1104,10 @@ int process_get_tty ( int pid );
 
 
 int 
-process_execve ( const char *arg1, 
-                 const char *arg2, 
-                 const char *arg3 );
-
-
-
-
+process_execve ( 
+    const char *arg1, 
+    const char *arg2, 
+    const char *arg3 );
 
 
 

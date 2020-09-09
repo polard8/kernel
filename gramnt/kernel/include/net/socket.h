@@ -56,13 +56,8 @@ int current_socket;
 
 
 
-/*
- * create_socket:
- * 
- */
-
+// Create an empty structure.
 struct socket_d *create_socket_object (void);
-
 
 
 unsigned long getSocketIP ( struct socket_d *socket );

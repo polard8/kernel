@@ -171,9 +171,9 @@ void fs_show_mounted_list(void)
 }
 
 
-// Pega um fs na lista de arquivos do processo, dado o PID.
-// Na lista de arquivos do processo.
-int fs_get_free_fd ( int pid )
+// Pega um fd na lista de arquivos do processo, dado o PID.
+// Objects[i]
+int fs_get_free_fd_from_pid (int pid)
 {
     struct process_d *p;
     int __slot=0;
@@ -181,7 +181,7 @@ int fs_get_free_fd ( int pid )
 
     //#todo max
     if ( pid<0 ){
-        debug_print ("fs_get_free_fd: pid\n");
+        debug_print ("fs_get_free_fd_from_pid: pid\n");
         //return -1;
     }
 
@@ -192,12 +192,12 @@ int fs_get_free_fd ( int pid )
     p = (struct process_d *) processList[pid];
 
     if ( (void *) p == NULL ){
-        debug_print ("fs_get_free_fd: p\n");
+        debug_print ("fs_get_free_fd_from_pid: p\n");
         return -1;
     }
 
     if ( p->used != 1 || p->magic != 1234 ){
-        debug_print ("fs_get_free_fd: p validation\n");
+        debug_print ("fs_get_free_fd_from_pid: p validation\n");
         return -1;
     }
         
@@ -211,6 +211,7 @@ int fs_get_free_fd ( int pid )
  
     return -1;
 }
+
 
 
 /*

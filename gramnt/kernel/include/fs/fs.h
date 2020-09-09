@@ -385,7 +385,10 @@ struct file_access_d
 
 struct fat16_directory_entry_d *fs_new_fat16_directory_entry(void);
 
-int fs_get_free_fd ( int pid );
+
+// Pega um fd na lista de arquivos do processo, dado o PID.
+// Objects[i]
+int fs_get_free_fd_from_pid (int pid);
 
 
 // Atualiza a string do pwd na estrutura do processo. 
