@@ -866,76 +866,99 @@ void exit_thread (int tid){
     struct thread_d *Thread;
 
 
-    // Nem existe.
-    if ( tid < 0 || tid >= THREAD_COUNT_MAX ){
-        debug_print ("exit_thread: tid");
+    if ( tid < 0 || tid >= THREAD_COUNT_MAX )
+    {
+        debug_print ("exit_thread: tid\n");
         return;
     }
 
 
     // The idle thread.
     if ( (void *) ____IDLE == NULL ){
-	    panic ("exit_thread: ____IDLE fail");
+        panic ("exit_thread: ____IDLE fail");
 
-	}else{
+    }else{
 
         if ( ____IDLE->used != 1 || ____IDLE->magic != 1234 )
         {
-		    panic ("exit_thread: ____IDLE validation");
-	    }
-	    
-	    // Se queremos deletar a idle.
-	    if ( tid == ____IDLE->tid )
-	    {
-		    panic ("exit_thread: Sorry, we can't kill the idle thread!");
-	    }
+            panic ("exit_thread: ____IDLE validation");
+        }
 
-	    // ...
-	};
+        // We can't exit the idle thread.
+        if ( tid == ____IDLE->tid ){
+            panic ("exit_thread: Sorry, we can't kill the idle thread!");
+        }
+
+        // ...
+    };
 
 
+    //
+    // Get thread structure.
+    //
 
     Thread = (void *) threadList[tid];
 
     if ( (void *) Thread == NULL )
     {
-		printf ("exit_thread: This thread doesn't exist! \n");
-		refresh_screen();
-		return;
-		
+        printf ("exit_thread: This thread doesn't exist! \n");
+        goto fail;
+        //refresh_screen();
+        //return;
+
     }else{
 
         if ( Thread->used !=1 || Thread->magic != 1234 )
         {
-		    printf ("exit_thread: validation \n");
-		    refresh_screen();
-		    return;
+            printf ("exit_thread: validation \n");
+            goto fail;
+            //refresh_screen();
+            //return;
         }
 
-		// Lembrando que se deixarmos no estado ZOMBIE o 
-		// deadthread collector vai destruir a estrutura.
+        //
+        // Zombie!
+        //
+        
+        // Lembrando que se deixarmos no estado ZOMBIE o 
+        // deadthread collector vai destruir a estrutura.
 
         Thread->state = ZOMBIE; 
         
-        // Isso avisa o sistema que ele pode acordar o dead thread collector.
-        dead_thread_collector_flag = 1;        
+        // #bugbug: Not used for now !!!
         
-        // se matamos a thread atual.         
-        if ( tid == current_thread )
-            scheduler ();
+        // Isso avisa o sistema que ele pode 
+        // acordar o dead thread collector.
+        // Isso poderia ser apenas uma atividade extra, 
+        // como acontece com os requests.
+        
+        dead_thread_collector_flag = 1; 
+        
+        // Se matamos a thread atual. 
+        // #bugbug: It looks very dangeours!
+        if ( tid == current_thread ){ 
+            debug_print ("exit_thread: scheduler\n");
+            scheduler(); 
+        }
 
+        // Se falhou o escalonamento. 
+        // Tentaremos a idle, previamente conferida.
         
-        // Se falhou o escalonamento.
         if ( current_thread < 0 || 
              current_thread >= THREAD_COUNT_MAX )
         {
             current_thread = ____IDLE->tid;
-        }   
+            debug_print ("exit_thread: scheduler fail. Using idle\n");
+        }
     };
 
 
 done:
     debug_print ("exit_thread: done\n");
+    return;
+
+fail:
+    refresh_screen();
     return;
 }
 

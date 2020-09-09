@@ -1671,21 +1671,26 @@ gde_services (
         //
 
 		// 70 - Exit.
-		// Atende a fun��o exit() da libc. 
-		// Criaremos um 'request' que ser� atendido somente quando 
-		// houver uma interrup��o de timer. 
+		// Atende a funcao exit() da libc. 
+		// Criaremos um 'request' que sera atendido somente quando 
+		// houver uma interrupcao de timer. 
 		// Enquanto isso a thread deve esperar em um loop.
+		// #bugbug: Pode haver sobreposicao de requests?
+		// Assincrono.
 		// IN: ??
-        //#todo: criar um wrapper em sci/sys.c ou kernel/exit.c
-       
+        //#todo: 
+        // Criar um wrapper em sci/sys.c ou kernel/exit.c
+        // See: request.c
+        // Request number 12. (Exit thread)
         case SYS_EXIT:
+            debug_print ("[70]: SYS_EXIT\n");
             create_request ( (unsigned long) 12,  // number 
                 (int) 1,                          // status 
                 (int) 0,                          // timeout. 0=imediatamente.
                 (int) current_process,            // target_pid
                 (int) current_thread,             // target_tid
                 NULL,                             // window 
-                (int) 0,                          // msg  
+                (int) 0,                          // msg  ??
                 (unsigned long) arg2,             // long1  
                 (unsigned long) arg3 );           // long2
             break;

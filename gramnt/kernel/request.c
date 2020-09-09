@@ -120,6 +120,9 @@ int KiRequest (void){
  *******************************************************
  * request:
  *    Trata os requests do Kernel.
+ *    Isso eh chamado durante a a fase kernel 
+ *    de uma interrupçao de timer.
+ *    
  *    São serviços que terão seu atendimento atrazado até pouco antes de 
  * retornar da interrupção do timer.
  *    Sendo assim, um programa em user mode pode solicitar um request através
@@ -131,17 +134,17 @@ int KiRequest (void){
  */
  
 int request (void){
-	
-	//targets
 
-    struct process_d *Process; 
-    struct thread_d *Thread;
+    // Targets
 
-    int PID;
-    int TID;
+    struct process_d *Process;
+    struct thread_d  *Thread;
 
-    unsigned long r;    //Número do request.
-    unsigned long t;    //Tipo de thread. (sistema, periódica...).
+    int PID=-1;
+    int TID=-1;
+
+    unsigned long r=0;    //Número do request.
+    unsigned long t=0;    //Tipo de thread. (sistema, periódica...).
 
 
 	// targets.
@@ -159,6 +162,7 @@ int request (void){
     {
         REQUEST.timeout--;
         return 1;
+        //return -1; // use this one if it is possible.
     }
 
 
@@ -189,8 +193,10 @@ int request (void){
 
     r = kernel_request;
 
-    if (r >= KERNEL_REQUEST_MAX)
+    if (r >= KERNEL_REQUEST_MAX){
+        // msg ...
         return -1;
+    }
 
 
     switch (r) 
@@ -208,7 +214,7 @@ int request (void){
         //#importante: De acordo com o tipo de thread.
         case KR_TIME:
             debug_print ("request: KR_TIME\n");
-            panic ("request: KR_TIME\n");
+            panic       ("request: KR_TIME\n");
             break;
 
 
@@ -291,12 +297,13 @@ int request (void){
 
 
         // exit thread.
-        // sairemos da thread, mas se for a thread de controle, também 
-        // sairemos do processo.
+        // Sairemos da thread, mas se for a thread de controle, 
+        // também sairemos do processo.
         case 12:
-            debug_print ("request: Exit thread\n");
-            printf ("request: 12, exiting thread %d\n", REQUEST.target_tid);
-            do_request_12 ( (int) REQUEST.target_tid );
+            debug_print ("request: [12] Exit thread\n");
+            printf      ("request: [12] Exiting thread %d\n", 
+                REQUEST.target_tid);
+            do_request_12( (int) REQUEST.target_tid );
             break;
 
 
@@ -348,7 +355,8 @@ int request (void){
 /*
  * create_request:
  *     Cria o request, que será atendido depois.
- * 
+ *     Isso eh chamado no serviço 70, por exemplo.
+ *     #bugbug: Pode haver sobreposicao de requests?
  */
 
 int 
@@ -364,9 +372,13 @@ create_request (
     unsigned long long2 )
 {
 
+
+    debug_print ("create_request:\n");
+
     if (number > KERNEL_REQUEST_MAX){
         debug_print ("create_request: number not valid\n");
         return 1;
+        //return -1;  //#todo: Use this one if it is possible.
     }
 
 
@@ -390,9 +402,9 @@ create_request (
     // Atenção com isso.
 
     REQUEST.window = (struct window_d *) window;
-    REQUEST.msg = msg;
-    REQUEST.long1 = long1;
-    REQUEST.long2 = long2;
+    REQUEST.msg    = (int) msg;
+    REQUEST.long1  = (unsigned long) long1;
+    REQUEST.long2  = (unsigned long) long2;
 
 	//extra.
 	//rever isso depois.
@@ -431,25 +443,42 @@ void clear_request (void){
 
 
 /*
- **************** 
+ *********************************************
  * do_request_12:
  *     exit thread.
  */
 
 	// exit thread.
-	// sairemos da thread, mas se for a thread de controle, também 
-	// sairemos do processo.
+	// Sairemos da thread, mas se for a thread de controle, 
+	// também sairemos do processo.
 
 void do_request_12 ( int tid ){
 
     //curent process
     struct process_d *p;
-    struct thread_d *t;
+    struct thread_d  *t;
 
     //parent process
     struct process_d *parent;
     int __ppid = 0;
 
+    // If we need to exit this process at the end of thois routine.
+    // Remember: The thread is turned zombie.
+    int kill_process = FALSE;
+
+
+    if ( tid<0 ){
+        debug_print ("do_request_12: not valid tid\n");
+        panic       ("do_request_12: not valid tid\n");
+    }
+
+
+    if ( tid != REQUEST.target_tid )
+    {
+        debug_print ("do_request_12: [PANIC] tid doesn't match\n");
+        panic       ("do_request_12: [PANIC] tid doesn't match\n");
+        //return;
+    }
 
 
 	//#debug
@@ -508,17 +537,34 @@ do_exit:
 
     t = (struct thread_d *) threadList[REQUEST.target_tid];
     p = (struct process_d *) processList[t->ownerPID];
+    
+    
+    //
+    // Control ?
+    //
+    
+    // If it is the control thread, so we need to kill the process too.
+    // Remember: We're gonna put the thread in zombie state before this.
+    
+    if ( t == p->control )
+    {
+        debug_print ("do_request_12: [FIXME] This is the control thread!\n");
+        kill_process = TRUE;
+    }
+    
 
     //parent process
     __ppid = p->ppid;
     parent = (struct process_d *) processList[__ppid];
 
-    //se o processo pai está esperando pelo processo atual,
-    //então acordamos o processo pai.
+    // Se o processo pai está esperando pelo processo atual,
+    // então acordamos o processo pai.
+    
     if (parent->wait4pid == p->pid )
     {
-        printf ("do_request_12: Acordando pai e sua thread de controle.\n");
+        printf ("do_request_12: Wake up parent ...\n");
         refresh_screen();
+
         parent->state = PROCESS_RUNNING;
         parent->control->state = RUNNING;
     }
@@ -538,7 +584,7 @@ do_exit:
 	//fprintf (stderr, " *OK ");
 
 
-
+    // See: threadi.c
     exit_thread ( (int) REQUEST.target_tid );
 
 
@@ -546,14 +592,21 @@ do_exit:
 	//kprintf ("%s \n", stderr->_base );
 	
 	// Done.
-	
-	// #bugbug:
-	// Isso é realmente necessário ?
-	// Queremos apenas exibir a mensagem no terminal.
+
+
+    // If we need to kill the process.
+    if (kill_process == TRUE)
+    {
+        debug_print ("do_request_12: [FIXME] Killing the process\n");
+        
+        // #todo: Not tested.
+        //exit_process(p->pid,0);
+    }
+     
 
 
 	// Clear request structure.
-	clear_request ();
+    clear_request();
 
 	//#debug
     //kprintf ("do_request_12: done :) \n");
