@@ -1,5 +1,5 @@
 /*
- * File: gws/server/bmp.c
+ * File: gwssrv/server/bmp.c
  *
  * Description:
  *     BMP support.
@@ -29,8 +29,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/socket.h>
-
-//#include <api.h>
 
 #include <gws.h>
 
@@ -1087,6 +1085,12 @@ gwssrv_load_and_decode_small_icon (
     unsigned long x, 
     unsigned long y )
 {
+    
+    FILE *fp;
+    int nreads=0;
+    int i=0;
+
+
     //
     // =======================================
     //
@@ -1098,12 +1102,13 @@ gwssrv_load_and_decode_small_icon (
     
     char *bmp_buffer;
 
-    
+    // #bugbug
+    // We need to get the size of the file.
     bmp_buffer = (char *) malloc(1024*128);
     //bmp_buffer = (char *) malloc(1024*512);
     
     if ( (void *) bmp_buffer == NULL ){
-        printf ("gwssrv: xxx_test_load_bmp bmp_buffer fail\n");
+        printf ("gwssrv: gwssrv_load_and_decode_small_icon bmp_buffer fail\n");
         return;
     }
     
@@ -1112,21 +1117,19 @@ gwssrv_load_and_decode_small_icon (
   
   
     //stdio_fntos ( (char *) file_name ); //não precisa
-    
-    FILE *fp;
+
     
     //fp = fopen("folder.bmp","r+");    
-    fp = fopen(filename,"r+");    
+    fp = fopen(filename,"r+"); 
 
-    int nreads=0;
-    nreads = read( fileno(fp), bmp_buffer, (1024*128) );
     //nreads = read( fileno(fp), bmp_buffer, (1024*512) );
-    
-    if(nreads <= 0)
-    { 
+    nreads = read ( fileno(fp), bmp_buffer, (1024*128) );
+
+    if (nreads <= 0){
         printf("read fail\n"); 
         return; 
     }
+
 
    //#bugbug
    //So estava lendo 4 bytes por causa do size of usado erradamente logo acima..
@@ -1134,16 +1137,15 @@ gwssrv_load_and_decode_small_icon (
     printf ("nreads={%d}\n",nreads);
 
 
-    int i=0;
-
     //#test
     if ( bmp_buffer[0] != 'B' || bmp_buffer[1] != 'M' )
     {
         printf (">>>> %c %c\n",&bmp_buffer[0],&bmp_buffer[1]);
-        gwssrv_debug_print ("gwssrv: xxx_test_load_bmp SIG FAIL \n");
-        printf("xxx_test_load_bmp: *hang1\n");
+        gwssrv_debug_print ("gwssrv: gwssrv_load_and_decode_small_icon SIG FAIL \n");
+        printf             ("gwssrv_load_and_decode_small_icon: *hang1\n");
         gws_show_backbuffer();
         while(1);
+        //return;
     }
 
     if ( bmp_buffer[0] == 'B' && bmp_buffer[1] == 'M' )
@@ -1160,7 +1162,7 @@ gwssrv_load_and_decode_small_icon (
         bmpDisplayBMP ((char *) bmp_buffer, (unsigned long) x, (unsigned long) y); 
         //bmpDisplayBMP ((char *) bmp_buffer, (unsigned long) 4, (unsigned long) 4);    
         //gde_display_bmp((char *)bmp_buffer, (unsigned long) 80, (unsigned long) 80);
-    }          
+    }
 
 
      //#debug
@@ -1170,12 +1172,14 @@ gwssrv_load_and_decode_small_icon (
 }
 
 
-char *
-gwssrv_load_small_icon ( 
+char *gwssrv_load_small_icon ( 
     char *filename, 
     unsigned long x, 
     unsigned long y )
 {
+
+    FILE *fp;
+    
     //
     // =======================================
     //
@@ -1201,8 +1205,7 @@ gwssrv_load_small_icon (
   
   
     //stdio_fntos ( (char *) file_name ); //não precisa
-    
-    FILE *fp;
+
     
     //fp = fopen("folder.bmp","r+");    
     fp = fopen(filename,"r+");    

@@ -62,10 +62,8 @@ int serviceCreateWindow (void){
     
     
     
-    
-    
     //Limits
-    if(pw<0 ||pw>WINDOW_COUNT_MAX)
+    if (pw<0 ||pw>WINDOW_COUNT_MAX)
     {
         gwssrv_debug_print("serviceCreateWindow: parent window id fail\n");
         pw=0;
@@ -76,7 +74,7 @@ int serviceCreateWindow (void){
     Parent = (struct gws_window_d *) windowList[pw];    
 
     //ajuste improvidsado
-    if( (void *) Parent == NULL ){
+    if ( (void *) Parent == NULL ){
         gwssrv_debug_print("serviceCreateWindow: parent window struct fail\n");
         Parent = gui->screen;
         exit(1); //test
@@ -359,8 +357,9 @@ int serviceRefreshRectangle(void)
     width  = message_address[6];  
     height = message_address[7];  
 
-    gws_refresh_rectangle (left,top,
-        width,height);
+    gws_refresh_rectangle ( left, top,
+        width, height);
+        
     return 0;
 }
 
@@ -822,28 +821,28 @@ gwssrv_initialize_color_schemes (int selected_type)
 		//humility->objectClass = ObjectClassGuiObjects;
 		
 
-		humility->used = 1;
-		humility->magic = 1234;
-		humility->name = "Humility";
+        humility->used = 1;
+        humility->magic = 1234;
+        humility->name = "Humility";
 		
 		//Colors
 		//Definidas em ws.h
-		humility->elements[csiNull] = 0;                             //0
+        humility->elements[csiNull] = 0;                             //0
         humility->elements[csiDesktop] = HUMILITY_COLOR_BACKGROUND;  //1		
-		humility->elements[csiWindow] = HUMILITY_COLOR_WINDOW;       //2
+        humility->elements[csiWindow] = HUMILITY_COLOR_WINDOW;       //2
         humility->elements[csiWindowBackground] = HUMILITY_COLOR_WINDOW_BACKGROUND;	 //3	
-		humility->elements[csiActiveWindowBorder] = HUMILITY_COLOR_ACTIVE_WINDOW_BORDER;  //4
+        humility->elements[csiActiveWindowBorder] = HUMILITY_COLOR_ACTIVE_WINDOW_BORDER;  //4
         humility->elements[csiInactiveWindowBorder] = HUMILITY_COLOR_INACTIVE_WINDOW_BORDER;  //5		
-		humility->elements[csiActiveWindowTitleBar] = HUMILITY_COLOR_ACTIVE_WINDOW_TITLEBAR;  //6
+        humility->elements[csiActiveWindowTitleBar] = HUMILITY_COLOR_ACTIVE_WINDOW_TITLEBAR;  //6
         humility->elements[csiInactiveWindowTitleBar] = HUMILITY_COLOR_INACTIVE_WINDOW_TITLEBAR;  //7	 	
-		humility->elements[csiMenuBar] = HUMILITY_COLOR_MENUBAR;                //8
+        humility->elements[csiMenuBar] = HUMILITY_COLOR_MENUBAR;                //8
         humility->elements[csiScrollBar] = HUMILITY_COLOR_SCROLLBAR;            //9  
-		humility->elements[csiStatusBar] = HUMILITY_COLOR_STATUSBAR;            //10
+        humility->elements[csiStatusBar] = HUMILITY_COLOR_STATUSBAR;            //10
         humility->elements[csiMessageBox] = HUMILITY_COLOR_MESSAGEBOX;		    //11
-		humility->elements[csiSystemFontColor] = HUMILITY_COLOR_SYSTEMFONT;		//12
-		humility->elements[csiTerminalFontColor] = HUMILITY_COLOR_TERMINALFONT;	//13
-		//...
-		
+        humility->elements[csiSystemFontColor] = HUMILITY_COLOR_SYSTEMFONT;		//12
+        humility->elements[csiTerminalFontColor] = HUMILITY_COLOR_TERMINALFONT;	//13
+        // ...
+
 		//Sanvando na estrutura padrão para o esquema humility.
 		GWSHumilityColorScheme = (void*) humility;
 	};	
@@ -864,28 +863,28 @@ gwssrv_initialize_color_schemes (int selected_type)
 		//pride->objectType  = ObjectTypeColorScheme;
 		//pride->objectClass = ObjectClassGuiObjects;
 
-		pride->used = 1;
-		pride->magic = 1234;
-		pride->name = "Pride";
-		
+        pride->used = 1;
+        pride->magic = 1234;
+        pride->name = "Pride";
+
 		//Colors
 		//Definidas em ws.h
-		pride->elements[csiNull] = 0;
+        pride->elements[csiNull] = 0;
         pride->elements[csiDesktop] = PRIDE_COLOR_BACKGROUND;  
-		pride->elements[csiWindow] = PRIDE_COLOR_WINDOW;
+        pride->elements[csiWindow] = PRIDE_COLOR_WINDOW;
         pride->elements[csiWindowBackground] = PRIDE_COLOR_WINDOW_BACKGROUND;
-		pride->elements[csiActiveWindowBorder] = PRIDE_COLOR_ACTIVE_WINDOW_BORDER;  
+        pride->elements[csiActiveWindowBorder] = PRIDE_COLOR_ACTIVE_WINDOW_BORDER;  
         pride->elements[csiInactiveWindowBorder] = PRIDE_COLOR_INACTIVE_WINDOW_BORDER;  
-		pride->elements[csiActiveWindowTitleBar] = PRIDE_COLOR_ACTIVE_WINDOW_TITLEBAR;    
+        pride->elements[csiActiveWindowTitleBar] = PRIDE_COLOR_ACTIVE_WINDOW_TITLEBAR;    
         pride->elements[csiInactiveWindowTitleBar] = PRIDE_COLOR_INACTIVE_WINDOW_TITLEBAR;		
-		pride->elements[csiMenuBar] = PRIDE_COLOR_MENUBAR;
+        pride->elements[csiMenuBar] = PRIDE_COLOR_MENUBAR;
         pride->elements[csiScrollBar] = PRIDE_COLOR_SCROLLBAR;  		
-		pride->elements[csiStatusBar] = PRIDE_COLOR_STATUSBAR;    
+        pride->elements[csiStatusBar] = PRIDE_COLOR_STATUSBAR;    
         pride->elements[csiMessageBox] = PRIDE_COLOR_MESSAGEBOX;
-		pride->elements[csiSystemFontColor] = PRIDE_COLOR_SYSTEMFONT;    //12
-		pride->elements[csiTerminalFontColor] = PRIDE_COLOR_TERMINALFONT;  //13		
-		//...
-		
+        pride->elements[csiSystemFontColor] = PRIDE_COLOR_SYSTEMFONT;    //12
+        pride->elements[csiTerminalFontColor] = PRIDE_COLOR_TERMINALFONT;  //13		
+        // ...
+
 		//Sanvando na estrutura padrão para o esquema pride.
 		GWSPrideColorScheme = (void *) pride;
 	};	
@@ -896,7 +895,7 @@ gwssrv_initialize_color_schemes (int selected_type)
 	//        apenas selecionando o ponteiro da estrutura.  
 	
     switch (selected_type){
-		
+
 		case ColorSchemeNull:
 		    GWSCurrentColorScheme = (void *) humility;
 		    break;
@@ -912,7 +911,7 @@ gwssrv_initialize_color_schemes (int selected_type)
 		default:
 		    GWSCurrentColorScheme = (void *) humility;
 			break;
-	};	
+    };
 }
 
 

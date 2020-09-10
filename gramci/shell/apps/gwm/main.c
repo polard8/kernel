@@ -1518,8 +1518,6 @@ int main ( int argc, char *argv[] ){
     addr_in.sin_addr.s_addr = IP(127,0,0,1); 
 
 
-
-
     debug_print ("---------------------------\n");    
     debug_print ("gwm: Initializing ...\n");
 
