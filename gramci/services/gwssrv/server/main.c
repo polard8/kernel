@@ -62,8 +62,9 @@ See: https://wiki.osdev.org/Graphics_stack
 #define GNP_LONG4      5
 #define GNP_LONG5      6
 #define GNP_LONG6      7
+//#body
+#define GNP_BODY_OFFSET    16
 // ...
-
 
 
 
@@ -1031,8 +1032,9 @@ void xxxHandleNextClientRequest (int fd){
 
     //# it works.
     char *m = (char *) (&__buffer[0] + 16);
-    sprintf( m, "gwssrv: This is a response from GWS!\n");
-    
+    sprintf( m, "GRAMADO Response from gwssrv\n\n");
+    //sprintf( m, "gwssrv: This is a response from GWS!\n");
+
     // Primeiros longs do buffer.
     message_buffer[0] = next_response[0];         // Window ID.
     message_buffer[1] = SERVER_PACKET_TYPE_REPLY; // next_response[1] 

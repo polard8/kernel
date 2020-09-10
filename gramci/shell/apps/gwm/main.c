@@ -68,6 +68,8 @@
 #define GNP_LONG4      5
 #define GNP_LONG5      6
 #define GNP_LONG6      7
+//#body
+#define GNP_BODY_OFFSET    16
 // ...
 
 

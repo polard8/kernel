@@ -84,6 +84,8 @@ See: https://wiki.osdev.org/Graphics_stack
 #define GNP_LONG4      5
 #define GNP_LONG5      6
 #define GNP_LONG6      7
+//#body
+#define GNP_BODY_OFFSET    16
 // ...
 
 
@@ -223,7 +225,8 @@ void __socket_messages (int fd){
 
     //# it works.
     char *m = (char *) (&__buffer[0] + 16);
-    sprintf( m, "HTTP/1.1 501 Not Implemented\n\n");
+    sprintf( m, "GRAMADO 501 Not Implemented\n\n");
+    //sprintf( m, "HTTP/1.1 501 Not Implemented\n\n");
     //sprintf( m, "HTTP/1.1 400 Bad Request\n Content-Type: text/html\n Content-Length: 0\n");
 
 
