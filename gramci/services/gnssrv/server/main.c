@@ -70,6 +70,21 @@ See: https://wiki.osdev.org/Graphics_stack
 #include <gns.h>
 
 
+//
+// == Gramado Network Protocol ===============================
+//
+
+// Standard. (First version)
+#define GNP_WID        0
+#define GNP_MESSAGE    1
+#define GNP_LONG1      2
+#define GNP_LONG2      3
+// #extension
+#define GNP_LONG3      4
+#define GNP_LONG4      5
+#define GNP_LONG5      6
+#define GNP_LONG6      7
+// ...
 
 
 
@@ -103,7 +118,7 @@ unsigned long next_response[32];
 //
 
 
-void gns_yield(void);
+void gnssrv_yield(void);
 int serviceInitializeNetwork(void);
 
 
@@ -165,20 +180,14 @@ void __socket_messages (int fd){
 
     // 
     // Se nao tem o que ler. saimos. 
-    if (n_reads <= 0){
-        gns_yield();
-        return;
-    }
+    if (n_reads <= 0){ gnssrv_yield(); return; }
   
     // Nesse momento lemos alguma coisa.   
  
     //debug_print ("gws: request found on its own socket \n");  
-            
+       
     //  mensagem invalida  
-    if (message_buffer[1] == 0){
-        gns_yield();
-        return;
-    }
+    if (message_buffer[1] == 0){ gnssrv_yield(); return; }
 
 
     debug_print ("gnssrv: Got a request!\n");
@@ -214,7 +223,10 @@ void __socket_messages (int fd){
 
     //# it works.
     char *m = (char *) (&__buffer[0] + 16);
-    sprintf( m, "<html><head></head><body> Nothing ... </body></html>");
+    sprintf( m, "HTTP/1.1 501 Not Implemented\n\n");
+    //sprintf( m, "HTTP/1.1 400 Bad Request\n Content-Type: text/html\n Content-Length: 0\n");
+
+
 
     // Primeiros longs do buffer.
     message_buffer[0] = next_response[0];         //  Window ID.
@@ -237,8 +249,9 @@ __again:
     //
 
     n_writes = write ( fd, __buffer, sizeof(__buffer) );
-    if (n_writes<=0){
-        gns_yield();
+    if (n_writes<=0)
+    {
+        gnssrv_yield();
         goto __again;
     }
 
@@ -262,7 +275,7 @@ __again:
 
 
 // internal
-// System ipc messages. (It's like a signal)
+// Get system messages.
 void __ipc_message (void){
 
     unsigned long message_buffer[5];   
@@ -366,7 +379,8 @@ gnsProcedure (
         case 1000:
             printf ("\n");
             printf ("gnssrv: Hello from Gramado Network Server!\n");
-            printf ("\n"); 
+            printf ("\n");
+            return 0;
             break;
 
 
@@ -548,9 +562,6 @@ int main (int argc, char **argv){
     int bind_status = -1;
 
 
-    // Flag usada no loop.
-    running = 1;
-
     int i=0;
     int _status = -1;
      
@@ -558,9 +569,13 @@ int main (int argc, char **argv){
     unsigned long h=0;
 
 
+    // Global flag for the loop.
+    running = 1;
+
+
 
     // Serial debug.
-    gde_debug_print ("--------------------------\n");
+    gde_debug_print ("-----------------------\n");
     gde_debug_print ("gnssrv: Initializing...\n");
     printf          ("gnssrv: Initializing...\n");
 
@@ -605,7 +620,9 @@ int main (int argc, char **argv){
     // #debug
     printf ("gnssrv: bind\n");
  
-    bind_status = bind ( server_fd, (struct sockaddr *) &addr, sizeof(addr) );
+    bind_status = bind ( server_fd, 
+                      (struct sockaddr *) &addr, 
+                      sizeof(addr) );
 
     if (bind_status<0){
         printf("gnssrv: Couldn't bind to the socket\n");
@@ -637,7 +654,7 @@ int main (int argc, char **argv){
     printf ("gnssrv: [FIXME] yield \n");
 
     for (i=0; i<11; i++)
-        gns_yield ();
+        gnssrv_yield();
 
 
     //
@@ -664,12 +681,17 @@ int main (int argc, char **argv){
     while (1){
 
         // Accept connection from a client. 
+
+        // #ps: Actually, accept2 returns the fd of the server,
+        // and write will copy from on socket to another.
+        
         newconn = accept2 ( curconn, 
                       (struct sockaddr *) &addr, 
                       (socklen_t *) addr_len );
 
         if (newconn < 0) {
             gde_debug_print ("gnssrv: ERROR on accept2\n");
+            gnssrv_yield(); 
 
         // Request from the new connection 
         }else{
@@ -677,6 +699,9 @@ int main (int argc, char **argv){
             //__socket_messages (curconn);
             
             //close ?
+            //#bugbug: We can not close if we are using accept2.
+            //shutdown(newconn, SHUT_RDWR);         
+            //close(newconn);
         };
     };
 
@@ -686,16 +711,18 @@ int main (int argc, char **argv){
 
     // Done.
     
-    gde_debug_print ("gnssrv: exited. \n");
-    printf ("gnssrv: exited. \n");
-    
+    gde_debug_print ("gnssrv: Bye\n");
+    printf          ("gnssrv: Bye\n");
+
     return 0; 
 }
 
 
-void gns_yield(void)
+
+//yield thread.
+void gnssrv_yield(void)
 {
-    gramado_system_call (265,0,0,0); //yield thread.
+    gramado_system_call (265,0,0,0); 
 }
 
 

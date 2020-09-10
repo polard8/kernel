@@ -10,7 +10,8 @@
  *
  * 2020 - Created by Fred Nora.
  */
- 
+
+
 // Connecting via AF_INET.
 
 // tutorial example taken from. 
@@ -287,7 +288,14 @@ void gnst_hello (int fd)
 }
 
 
-// Testing new main.
+
+
+/*
+ * main:
+ * 
+ * 
+ * 
+ */
 int main ( int argc, char *argv[] ){
 
     int client_fd = -1;
@@ -299,7 +307,9 @@ int main ( int argc, char *argv[] ){
     addr_in.sin_port = PORTS_NS;              // htons(PORTS_NS);
     addr_in.sin_addr.s_addr = IP(127,0,0,1);  // inet_addr("192.168.0.101");
 
-    debug_print ("---------------------------\n");    
+
+
+    debug_print ("-------------------------\n");
     debug_print ("gns.bin: Initializing ...\n");
 
 
@@ -322,26 +332,27 @@ int main ( int argc, char *argv[] ){
     }
 
 
-    while(1){
-    
-        //
-        // Connect
-        // 
+    //
+    // Connect
+    // 
+
+    while (1){
 
         //nessa hora colocamos no accept um fd.
         //então o servidor escreverá em nosso arquivo.
         // #debug
         //gws_debug_print ("gnst: Connecting to ns via inet  ...\n");      
         printf ("gns.bin: Connecting to ns via inet  ...\n");      
+        
         if (connect (client_fd, (void *) &addr_in, sizeof(addr_in)) < 0)
         { 
             //gws_debug_print ("gnst: Connection Failed\n");
             printf("gns.bin: Connection Failed \n"); 
             //close(client_fd);
             //exit(1);
-            //return (int) (-1); 
+            //return (int) (-1);
+             
          }else{break;}; 
-
     };
 
 
@@ -352,14 +363,15 @@ int main ( int argc, char *argv[] ){
     //
 
     // Hello.
-    while(1){
+    while (1){
+        
         gnst_hello(client_fd);
     };
+
 
     debug_print ("gns.bin: bye\n"); 
     printf      ("gns.bin: bye\n");
     return 0;
 }
-
 
 

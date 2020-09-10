@@ -54,6 +54,24 @@
 #include <gwm.h>
 
 
+//
+// == Gramado Network Protocol ===============================
+//
+
+// Standard. (First version)
+#define GNP_WID        0
+#define GNP_MESSAGE    1
+#define GNP_LONG1      2
+#define GNP_LONG2      3
+// #extension
+#define GNP_LONG3      4
+#define GNP_LONG4      5
+#define GNP_LONG5      6
+#define GNP_LONG6      7
+// ...
+
+
+
 int MOUSE_WINDOW = -1;
 
 // i8042 mouse status bit.

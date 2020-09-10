@@ -48,6 +48,25 @@ See: https://wiki.osdev.org/Graphics_stack
 #include <gws.h>
 
 
+//
+// == Gramado Network Protocol ===============================
+//
+
+// Standard. (First version)
+#define GNP_WID        0
+#define GNP_MESSAGE    1
+#define GNP_LONG1      2
+#define GNP_LONG2      3
+// #extension
+#define GNP_LONG3      4
+#define GNP_LONG4      5
+#define GNP_LONG5      6
+#define GNP_LONG6      7
+// ...
+
+
+
+
 //h:d.s
 char *hostName;
 char *displayNum;
@@ -1921,15 +1940,17 @@ int main (int argc, char **argv){
             // #bugbug: Talvez isso seja trabalho do window manager.
             // mas ele teria que chamar o window server pra efetuar o refresh
             //dos retângulos.
+            
             //if ( dirty_status == 1 )
                 //compositor();
          
             //if (isTimeToQuit == 1) { break; };
          
-            // Accept actual connection from the client.
-            // No metodo gramado o retorno sera o fd do servidor
-            // se der certo, pois nosso write copia do servidor para
-            // o cliente conectado.
+
+            // Accept connection from a client. 
+
+            // #ps: Actually, accept2 returns the fd of the server,
+            // and write will copy from on socket to another.
 
             //newconn = accept ( curconn, 
             //              (struct sockaddr *) &gramsock, 
@@ -1941,6 +1962,7 @@ int main (int argc, char **argv){
                           
             if (newconn < 0) {
                 gwssrv_debug_print ("gwssrv: ERROR on accept2\n");
+                gwssrv_yield();
  
             // Request from the new connection
             }else{
@@ -1949,18 +1971,15 @@ int main (int argc, char **argv){
                 //mensagens de clientes.
                 xxxHandleNextClientRequest (newconn);
                 //xxxHandleNextClientRequest (curconn);
-                // close?? no!! this is our fd.
+
+                //close ?
+                //#bugbug: We can not close if we are using accept2.
+                //shutdown(newconn, SHUT_RDWR);         
+                //close(newconn);
                 
             };
         };
 
-
-        // #todo
-        // Bom, nesse momento precisamos liberar os recursos
-        // para que o loop reinicie o servidor.
-        // 
-        
-        //close(____saved_server_fd);
         
         // ...
         
