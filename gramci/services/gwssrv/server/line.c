@@ -44,6 +44,7 @@ A_naive_line_drawing_algorithm(
 }
 
 
+//test1
 void test_draw_line(void)
 {
     int g=0;
@@ -51,8 +52,8 @@ void test_draw_line(void)
     for( g=0; g<400; g++ )
     {
             A_naive_line_drawing_algorithm ( 
-                8, 750, 
-                8, (50 + (g*4)) , 
+                8, 750,                 //x1,x2
+                8, (50 + (g*4)) ,       //y1,y2
                 COLOR_YELLOW );
      };
 
@@ -60,6 +61,52 @@ void test_draw_line(void)
     //while(1){}
 }
 
+
+//test2
+// illusion
+void test_draw_line2(void)
+{
+    int g=0;
+    unsigned long w = gws_get_device_width();
+    unsigned long h = gws_get_device_height();
+    unsigned long vertex1[2];
+    unsigned long vertex2[2]; 
+
+    // horizontal
+    for( g=0; g<h; g=g+10 )
+    {
+            vertex1[0]=0;  //x1
+            vertex1[1]=g;  //y1
+
+            vertex2[0]=g;  //x2
+            vertex2[1]=g;  //y2
+            
+            A_naive_line_drawing_algorithm ( 
+                vertex1[0], vertex2[0],   //x1,x2
+                vertex1[1], vertex2[1],   //y1,y2
+                COLOR_YELLOW );
+     };
+
+
+    // horizontal
+    for( g=0; g<h; g=g+10 )
+    {
+            vertex1[0]=g;  //x1
+            vertex1[1]=g;  //y1
+
+            vertex2[0]=w;  //x2
+            vertex2[1]=g;  //y2
+            
+            A_naive_line_drawing_algorithm ( 
+                vertex1[0], vertex2[0],   //x1,x2
+                vertex1[1], vertex2[1],   //y1,y2
+                COLOR_BLUE );
+     };
+
+
+    gwssrv_show_backbuffer();
+    //while(1){}
+}
 
 
 

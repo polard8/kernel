@@ -14,8 +14,9 @@ A_naive_line_drawing_algorithm(
     unsigned long y1, 
     unsigned long y2, 
     unsigned long color );
+    
 void test_draw_line(void);
-
+void test_draw_line2(void);
 
 
 

@@ -92,11 +92,11 @@ gws_refresh_rectangle (
 	// #atenção.
 	
 	//offset = (unsigned int) BUFFER_PIXEL_OFFSET( x, y );
-	
-	offset = (unsigned int) ( (bytes_count*SavedX*(y)) + (bytes_count*(x)) );
-	
-	p = (void *)       (p + offset);    
-	q = (const void *) (q + offset);    
+
+    offset = (unsigned int) ( (bytes_count*SavedX*(y)) + (bytes_count*(x)) );
+
+    p = (void *)       (p + offset);    
+    q = (const void *) (q + offset);    
 
 
 	// #bugbug
@@ -113,7 +113,7 @@ gws_refresh_rectangle (
 	//se for divisível por 4.
 	if ( ((line_size * bytes_count) % 4) == 0 )
 	{
-        count = ((line_size * bytes_count) / 4);  	
+        count = ((line_size * bytes_count) / 4); 
 
 	    for ( i=0; i < lines; i++ )
 	    {

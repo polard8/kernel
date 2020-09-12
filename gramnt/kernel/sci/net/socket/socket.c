@@ -1516,37 +1516,44 @@ sys_connect (
                 break;
             }
             
-            //PORTS_FS
+            // PORTS_FS
 
-            // FTP
+            // 21 - FTP
             if (addr_in->sin_port == 21){
                 printf("$$$$ FTP $$$$\n");
-                refresh_screen();
+                //refresh_screen();
                 goto fail;
             }
 
-            // Telnet
+            // 23 - Telnet
             if (addr_in->sin_port == 23){
                 printf("$$$$ Telnet $$$$\n");
-                refresh_screen();
+                //refresh_screen();
                 goto fail;
             }
 
-            // DHCP
+            // 67 - DHCP
             if (addr_in->sin_port == 67){
                 printf("$$$$ DHCP $$$$\n");
-                refresh_screen();
+                //refresh_screen();
                 goto fail;
             }
             
-            // HTTP
+            // 80 - HTTP
             if (addr_in->sin_port == 80){
                 printf("$$$$ HTTP $$$$\n");
-                refresh_screen();
+                //refresh_screen();
+                goto fail;
+            }
+            
+
+            // 443 - HTTPS 
+            if (addr_in->sin_port == 443){
+                printf("$$$$ HTTPS $$$$\n");
+                //refresh_screen();
                 goto fail;
             }
 
-            // Drop!
             
             printf("sys_connect: [FAIL] Port not valid {%d}\n",
                 addr_in->sin_port);

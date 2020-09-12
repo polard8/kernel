@@ -1830,8 +1830,9 @@ int main (int argc, char **argv){
 
         InitGraphics();
         
-        
+        //See: line.c
         //test_draw_line();
+        //test_draw_line2();//illusion
         //while(1){}
         
 
