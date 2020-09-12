@@ -6511,12 +6511,21 @@ void shellSocketTest (void){
 }
 
 
-struct gdeshell_ether_header {
-	
-	uint8_t dst[6];
-	uint8_t src[6];
-	uint16_t type;
-	
+// internal
+struct gdeshell_ether_header 
+{
+    // 14 bytes
+    uint8_t dst[6];
+    uint8_t src[6];
+    
+    // Ethertype
+    // See: https://en.wikipedia.org/wiki/EtherType
+    // 0x0800 	Internet Protocol version 4 (IPv4) 
+    // 0x0806 	Address Resolution Protocol (ARP) 
+    // ... 
+    
+    uint16_t type;
+
 } __attribute__((packed));
 
 #define gdeshell_FromNetByteOrder16(v) ((v >> 8) | (v << 8))
@@ -6524,15 +6533,16 @@ struct gdeshell_ether_header {
 
 //interna
 void 
-print_ethernet_header( 
+print_ethernet_header ( 
     const unsigned char *Buffer, 
     int Size )
 {
-    struct gdeshell_ether_header *eth = (struct gdeshell_ether_header *)Buffer;
-     
-    //printf ("print_ethernet_header:\n");
+    struct gdeshell_ether_header *eth = (struct gdeshell_ether_header *) Buffer;
+
     printf("\n");
     printf ("Ethernet Header\n");
+
+    // Destination
     printf ("   |-Destination Address : %.2X-%.2X-%.2X-%.2X-%.2X-%.2X \n", 
         eth->dst[0] , 
         eth->dst[1] , 
@@ -6540,6 +6550,8 @@ print_ethernet_header(
         eth->dst[3] , 
         eth->dst[4] , 
         eth->dst[5] );
+    
+    // Source
     printf ("   |-Source Address      : %.2X-%.2X-%.2X-%.2X-%.2X-%.2X \n", 
         eth->src[0] , 
         eth->src[1] , 
@@ -6547,26 +6559,30 @@ print_ethernet_header(
         eth->src[3] , 
         eth->src[4] , 
         eth->src[5] );
+    
+    // Protocol type.
+    // ARP, IP ... ?
     printf ("   |-Protocol            : %u \n",
         (unsigned short)eth->type);
-    //printf ("print_ethernet_header:done\n");
 }
 
+// ETHERNET + ARP
 uint8_t test_packet[] = 
 {
-    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, /* eth dest (broadcast) */
-    0x52, 0x54, 0x00, 0x12, 0x34, 0x56, /* eth source */
-    0x08, 0x06, /* eth type */
-    0x00, 0x01, /* ARP htype */
-    0x08, 0x00, /* ARP ptype */
-    0x06, /* ARP hlen */
-    0x04, /* ARP plen */
-    0x00, 0x01, /* ARP opcode: ARP_REQUEST */
-    0x52, 0x54, 0x00, 0x12, 0x34, 0x56, /* ARP hsrc */
-    169, 254, 13, 37, /* ARP psrc */
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* ARP hdst */
-    192, 168, 0, 137, /* ARP pdst */
+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff,  /* eth dest (broadcast) */
+    0x52, 0x54, 0x00, 0x12, 0x34, 0x56,  /* eth source */
+    0x08, 0x06,                          /* eth type */
+    0x00, 0x01,  /* ARP htype */
+    0x08, 0x00,  /* ARP ptype */
+    0x06,        /* ARP hlen */
+    0x04,        /* ARP plen */
+    0x00, 0x01,  /* ARP opcode: ARP_REQUEST */
+    0x52, 0x54, 0x00, 0x12, 0x34, 0x56,  /* ARP hsrc */
+    169, 254, 13, 37,                    /* ARP psrc */
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  /* ARP hdst */
+    192, 168, 0, 137,                    /* ARP pdst */
 };
+
 
 //interna
 void
@@ -6575,7 +6591,7 @@ gdeshell_send_packet(void)
     while(1){
         gramado_system_call( 891, 
             (unsigned long)test_packet,   //buf
-            (unsigned long)1500,      //len
+            (unsigned long)1500,          //len
             0);
     }    
 }
@@ -6622,7 +6638,10 @@ gdeshell_decode_buffer ( unsigned long buffer_address )
 
     }else{
 
-        // Print ethernet header.
+
+        //
+        // Print
+        //
 
         print_ethernet_header ( 
             (const unsigned char*) buffer_address, 1500 );
@@ -6640,6 +6659,13 @@ gdeshell_decode_buffer ( unsigned long buffer_address )
     // http://www.networksorcery.com/enp/protocol/802/ethertypes.htm
     // https://www.iana.org/assignments/ieee-802-numbers/ieee-802-numbers.xhtml
     // ...
+
+    // Ethertype
+    // See: https://en.wikipedia.org/wiki/EtherType
+    // 0x0800 	Internet Protocol version 4 (IPv4) 
+    // 0x0806 	Address Resolution Protocol (ARP) 
+    // ... 
+
     
     uint16_t Type = gdeshell_FromNetByteOrder16(eh->type);
     
@@ -6736,7 +6762,10 @@ void network_test_buffer(void)
     int i=0;
 
     debug_print("network_test_buffer:\n");
-    printf     ("network_test_buffer: [LOOP] Reading the buffers in ring3\n");
+    printf("\n");
+    printf("\n");
+    printf("=========================\n");
+    printf("network_test_buffer: [LOOP] Reading the buffers in ring3\n");
     
     
     for (i=0; i<4096; i++)
