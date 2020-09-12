@@ -19,6 +19,17 @@
 #include <sys/socket.h>
 
 
+
+
+//#test
+#include <netinet/if_ether.h>
+#include <netinet/in.h>
+#include <netinet/ip.h>
+#include <netinet/tcp.h>
+
+
+
+
 //shell stuff 
 #include "globals.h"
 #include "builtins.h"

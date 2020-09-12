@@ -6609,6 +6609,14 @@ gdeshell_decode_buffer ( unsigned long buffer_address )
 
     // The ethernet header.
     struct gdeshell_ether_header *eh;
+    
+    //See: net/  and netinet/
+    //struct ether_header *__eth;
+    //struct arphdr       *__arp; 
+    //struct ip           *__ip;
+    //struct tcphdr       *__tcp;
+    //struct udphdr       *__udp;
+    // ...
 
 
     //#debug

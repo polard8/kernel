@@ -54,6 +54,19 @@
 #include <sys/ansi.h> 
 
 
+/*
+#define MACPY(s, d) memcpy(d, s, ETHER_ADDR_LEN)
+
+#define MAXTMO 20	//seconds 
+#define MINTMO 2	//seconds 
+
+#define FNAME_SIZE 128
+#define	IFNAME_SIZE 16
+#define RECV_SIZE 1536	//XXX delete this 
+*/
+
+
+
 
 #ifndef _BSD_UINT8_T_
 typedef __uint8_t  uint8_t;

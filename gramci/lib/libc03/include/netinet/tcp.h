@@ -39,7 +39,24 @@
 #if defined(_NETBSD_SOURCE)
 #include <sys/types.h>
 
+
+
+
 typedef uint32_t tcp_seq;
+
+
+
+
+/*
+ * How much room to leave for headers in TCP packets:
+ *  14: struct ether_header
+ *  20: struct ip
+ *  20: struct tcphdr
+ */
+// #define TCP_HEADER_SIZE 20
+// #define TCP_TOTAL_HEADER_SIZE (ETHERNET_HEADER_SIZE + IP_HEADER_SIZE + TCP_HEADER_SIZE)
+
+
 
 
 /*
@@ -169,6 +186,7 @@ struct tcphdr {
  * This is currently an unstable ABI/API, in that it is expected to
  * change.
  */
+
 struct tcp_info {
 
     uint8_t		tcpi_state; /* TCP FSM state. */

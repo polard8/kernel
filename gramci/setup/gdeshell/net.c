@@ -53,8 +53,8 @@ __SendARP (
     uint8_t target_mac[6] )
 {
 
-    struct ether_header  *eh;
-    struct ether_arp     *h;  
+    struct gdeshell_ether_header  *eh;
+    struct gdeshell_ether_arp     *h;  
 
     int i=0;
       
@@ -62,7 +62,7 @@ __SendARP (
     // # ethernet header #
     //
 
-    eh = (void *) malloc ( sizeof(struct ether_header ) );
+    eh = (void *) malloc ( sizeof(struct gdeshell_ether_header ) );
 
     if ( (void *) eh == NULL){
         printf ("shellTestARP: eh struct fail\n");
@@ -93,7 +93,7 @@ __SendARP (
     // # arp header #
     //
 
-    h = (void *) malloc ( sizeof(struct  ether_arp) );
+    h = (void *) malloc ( sizeof(struct  gdeshell_ether_arp) );
 
     if ( (void *) h == NULL){
         printf ("shellTestARP: struct h fail");

@@ -20,7 +20,7 @@
 #define ETHERNET_HEADER_LENGHT 14      
 
 // ethernet header
-struct ether_header {
+struct gdeshell_ether_header {
 	
 	uint8_t dst[6];
 	uint8_t src[6];
@@ -34,7 +34,7 @@ struct ether_header {
 
 
 // arp struct
-struct  ether_arp {
+struct  gdeshell_ether_arp {
 	
     uint16_t type;  //Hardware type (HTYPE)
 	uint16_t proto; //Protocol type (PTYPE)
