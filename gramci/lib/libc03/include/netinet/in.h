@@ -90,6 +90,13 @@ typedef __sa_family_t  sa_family_t;
  * Protocols
  */
 
+// See:
+// Check the IP header. The protocol field
+// https://en.wikipedia.org/wiki/IPv4
+// TCP = 6
+// UDP = 17
+// ...
+
 #define IPPROTO_IP           0  /* dummy for IP */
 #define IPPROTO_HOPOPTS      0  /* IP6 hop-by-hop options */
 #define IPPROTO_ICMP         1  /* control message protocol */
@@ -167,6 +174,12 @@ typedef __sa_family_t  sa_family_t;
  * The range is IPPORT_RESERVEDMIN to IPPORT_RESERVEDMAX.
  */
 
+/*
+ *                0 -  1023 Well Known Ports
+ *             1024 - 49151 Registered Ports
+ *            49152 - 65535 Dynamic and/or Private Ports
+ */ 
+
 #define IPPORT_RESERVED     1024
 #define IPPORT_ANONMIN      49152
 #define IPPORT_ANONMAX      65535
@@ -221,6 +234,14 @@ struct ip_opts {
 
 
 
+struct ip_opts {
+    struct  in_addr ip_dst;     //first hop, 0 w/o src rt 
+    char    ip_opts[40];        //actually variable in size 
+};
+
+
+
+
 /*
  * Options for use with [gs]etsockopt at the IP level.
  * First word of comment is data type; bool is stored in int.
@@ -258,13 +279,13 @@ struct ip_opts {
  * IP_PKTINFO and IP_RECVPKTINFO.
  */
 
-/* 
+
 struct in_pktinfo {
 
     struct in_addr  ipi_addr;     //src/dst address 
     unsigned int    ipi_ifindex;  //interface index 
 };
-*/
+
 
 
 /*
@@ -280,12 +301,12 @@ struct in_pktinfo {
  * Argument structure for IP_ADD_MEMBERSHIP and IP_DROP_MEMBERSHIP.
  */
  
-/* 
+
 struct ip_mreq {
     struct in_addr  imr_multiaddr;  // IP multicast address of group 
     struct in_addr  imr_interface;  // local IP address of interface 
 };
-*/
+
 
 
 /*
@@ -294,9 +315,9 @@ struct ip_mreq {
  *   at bind() or connect()
  */
 
-#define	IP_PORTRANGE_DEFAULT  0  /* default range */
-#define	IP_PORTRANGE_HIGH     1  /* same as DEFAULT (FreeBSD compat) */
-#define	IP_PORTRANGE_LOW      2  /* use privileged range */
+#define IP_PORTRANGE_DEFAULT  0  /* default range */
+#define IP_PORTRANGE_HIGH     1  /* same as DEFAULT (FreeBSD compat) */
+#define IP_PORTRANGE_LOW      2  /* use privileged range */
 
 
 
