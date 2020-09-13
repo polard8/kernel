@@ -43,7 +43,7 @@ int kclearClientArea (int color);
 
 int insert_line ( char *string, int line );
 
-void REFRESH_STREAM ( FILE *stream );
+void REFRESH_STREAM ( file *f );
 
 // Virtual console support.
 void console_set_current_virtual_console ( int n );

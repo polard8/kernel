@@ -679,68 +679,17 @@ struct file_d
     int socket_buffer_full;
 };
 
-typedef struct file_d FILE;   //#todo: deletar isso. 
 typedef struct file_d file; 
 
+// file table.
 
-/*
-    Fluxo padr�o. Tamb�m conhecidos como descritores padr�o.
+file *stdin;            // 0
+file *stdout;           // 1
+file *stderr;           // 2
+file *vfs;              // 3 - vfs root dir. 
+file *volume1_rootdir;  // 4 - boot volume root dir.
+file *volume2_rootdir;  // 5 - system volume root dir. 
 
- +----------------+---------+-----------------------------------+
- |ID padronizado  |  Nome   |             Descricao             |
- +----------------+---------+-----------------------------------+
- |       0        |  stdin  |   associado a leitura do teclado  |
- +----------------+---------+-----------------------------------+
- |       1        | stdout  |  associado a sa�da normal na tela |
- +----------------+---------+-----------------------------------+
- |       2        | stderr  | associado a sa�da de erro         |
- +----------------+---------+-----------------------------------+
-*/
-
-
-
-file *stdin;            //0
-file *stdout;           //1
-file *stderr;           //2
-file *vfs;              //3 - Diret�rio raiz do vfs. 
-file *volume1_rootdir;  //4 - Diret�rio raiz do volume de boot.
-file *volume2_rootdir;  //5 - Diret�rio raiz do volume do sistema. 
-
-
-
-
-/*
- * ## Aprendendo sobre streams ##
- * 
- * #importante 
- * Lista de endere�os de estruturas de streams.
- * Essas s�o as streas que pertencem ao processo kernel.
- * Array de ponteiros de estrutura.
- *
- *
- * #importante
- * Isso poderia ser um array de acesso global,
- * contendo streams de todos os processos.
- * 
- * As primeiras streams seriam do processo kernel.
- * 
- *
- * ## IMPORTANTE ##
- * O kernel precisa gerenciar os recursos 
- * usados pelos processos e liberar esses recursos 
- * quando o processo n�o estiver mais usando ..
- * >>> N�o � trabalho da libc se preocupar
- * com o gerenciamento de recursos do processo.
- *
- * ## facilita as coisas ##
- * Pois o kernel pode alocar mem�ria 
- * para alguns arquivos usando o alocador de p�ginas, 
- * mas o processo n�o tem acesso a essa mem�ria,
- * ent�o o processo em user mode teria que fazer 
- * muitas chamadas para acessar o conte�do do arquivo, 
- * a n�o ser que o kernel compartilhe a mem�ria 
- * com o processo.
- */
  
 unsigned long file_table[NUMBER_OF_FILES]; 
 
@@ -841,17 +790,21 @@ static __inline int bsd__sputc (int _c, FILE *_p)
  * Isso � configur�vel.
  * 
  */
+
 //unsigned long Search[9]; 
 
 
 
-//Lista de arquivos abertos
-//unsigned long openfileList[128];
-//...Outras listas de arquivos.
+//
+// == prototypes ===============================================
+//
 
-/*
- * Prot�tipos do padr�o C.
- */
+
+
+//
+// == kprintf ===============================================
+//
+
 
 // #todo
 // Deletar printf

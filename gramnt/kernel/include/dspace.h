@@ -23,7 +23,7 @@ typedef struct dspace_d dspace_t;
 struct dspace_d
 {
 	//Object.
-	object_type_t objectType;
+	object_type_t  objectType;
 	object_class_t objectClass;
 	
 	int used;
@@ -32,9 +32,9 @@ struct dspace_d
 	dspace_type_t type;
 	
 	char *name;  //Qual é o nome desse Disk Apace.
-	FILE file;   //Qual arquivo é referente à esse espaço.
+	file *_file;   //Qual arquivo é referente à esse espaço.
 	//metafile??	
-	
+
 	//Endereço correspondente na memória ram.
 	unsigned long virtual_address;
 	unsigned long physical_address;

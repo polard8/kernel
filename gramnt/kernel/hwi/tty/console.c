@@ -1146,7 +1146,7 @@ int insert_line ( char *string, int line )
  *     REFRESH SOME GIVEN STREAM INTO TERMINAL CLIENT WINDOW !!
  */
 
-void REFRESH_STREAM ( FILE *stream ){
+void REFRESH_STREAM ( file *f ){
 
     char *c;
 
@@ -1154,9 +1154,9 @@ void REFRESH_STREAM ( FILE *stream ){
     int j=0;
 
 
-
     int cWidth  = get_char_width();
     int cHeight = get_char_height();
+
 
     if ( cWidth == 0 || cHeight == 0 ){
         panic ("REFRESH_STREAM: char w h ");
@@ -1165,11 +1165,24 @@ void REFRESH_STREAM ( FILE *stream ){
 
     j = (80*25);
 
+    //
+    // File
+    //
+    
     // #bugbug
     // Tem que checar a validade da estrutura e do ponteiro base.
+    //if ( (void *) f == NULL ){ ? }
 
-    c = stream->_base;
 
+    //
+    // Pointer.
+    //
+
+    c = f->_base;
+
+    // #bugbug
+    // Tem que checar a validade da estrutura e do ponteiro base.
+    //if ( (void *) c == NULL ){ ? }
 
     // Seleciona o modo terminal.
 

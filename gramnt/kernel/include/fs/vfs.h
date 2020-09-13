@@ -233,13 +233,12 @@ struct vfs_d
 	//@todo:
 	//object support.
 	
-	
-	//vaildando a estrutura.
-	int used;
-	int magic;
-	
-	FILE *stream;
-	
+
+    int used;
+    int magic;
+
+    file *stream;  //#todo: mudar para _file.
+
 	//int file_descriptor; //3
 	
 	//Qual o status do vfs.
@@ -302,7 +301,7 @@ struct vfs_d
 	
 		
     // diretório raiz.    
-    //struct dir_d *vfs;  	
+    //struct dir_d *vfs;  
 }; 
 
 
@@ -313,6 +312,6 @@ void vfsListFiles (void);
 
 
 
-#endif    
+#endif   
 
 

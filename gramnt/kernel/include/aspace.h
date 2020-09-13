@@ -33,9 +33,9 @@ struct aspace_d
 	aspace_type_t type;
 	
 	char *name;  //Qual é o nome desse Address Apace.
-	FILE file;   //Qual arquivo é referente à esse espaço.
+	file *_file;   //Qual arquivo é referente à esse espaço.
 	//metafile??
-	
+
 	unsigned long virtual_address;
 	unsigned long physical_address;
 	unsigned long size;  //Tamanho em bytes.

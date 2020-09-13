@@ -74,6 +74,7 @@ struct line_d
 	
     //FILE *line_file; //Test.	
 };
+
 line_t *Line;
 line_t *LineShell;
 //line_t *Linex;
@@ -87,14 +88,12 @@ struct line_d *LineHead;
 
 
 //Fluxo.
-FILE *line_stdin;
-FILE *line_stdout;
-FILE *line_stderr;
-
-
+file *line_stdin;
+file *line_stdout;
+file *line_stderr;
 
 
 //
-// Fim.
+// End.
 //
 

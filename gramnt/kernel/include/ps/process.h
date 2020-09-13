@@ -292,13 +292,13 @@ struct process_d
 {
     // Controle do objeto do tipo processo.
  
-    object_type_t objectType;
+    object_type_t  objectType;
     object_class_t objectClass;
 
     struct object_d *object;
 
-    int used;  
-    int magic; 
+    int used;
+    int magic;
     
     // Other process can't take some actions on this process 
     // if it is protected. ex: It can't be killed by another process.
@@ -331,7 +331,7 @@ struct process_d
     
     //group
     gid_t  gid;
-    gid_t  egid;    
+    gid_t  egid;
     gid_t  rgid;
     gid_t  sgid;
 
@@ -621,7 +621,7 @@ struct process_d
 
 
 	//IOPL of the task. (ring).
-	unsigned long iopl;      
+    unsigned long iopl; 
 
 	// Priority.
 	// Um processo tem uma prioridade b�sica est�tica e tamb�m uma prioridade 
@@ -671,15 +671,14 @@ struct process_d
 	unsigned long profiler_percentage_running;
 	unsigned long profiler_ticks_running;
 	unsigned long profiler_last_ticks;
-	
+
 	//
-	//  +++++ Thread support +++++
+	// == Thread =================================
 	//
-	
-	//N�mero de threads do processo.
-	
-	int threadCount;     
-	
+
+    int thread_count;
+
+
 	/*
 	 * threadList:
 	 *     Lista com ponteiros de estrutura das threads do processo.
@@ -687,9 +686,11 @@ struct process_d
 	 *	 
 	 *     @todo: Usar array de estruturas din�mico. (Alocar).
 	 */ 
+
 	unsigned long tList[32];      //@todo: deletar  
 	//struct thread_d *Threads;   //@todo: usar esse.
 	//struct thread_d CurrentThread;
+
 
 	//A primeira thead de uma lista linkada.
 	struct thread_d *threadListHead;
@@ -707,14 +708,14 @@ struct process_d
 
 	// Isso pode funcionar em parceria com control, 
 	// quando criarmos novos processos ou clonarmos.
-	struct thread_d *extra;  
-	
-	
+    struct thread_d *extra;  
+
+
 	// Tipo 
 	// 0 = cpu-bound
 	// 1 = i/o bound.
 
-	int bound_type;
+    int bound_type;
 	
 	// ??
 	// preempted:
@@ -736,24 +737,24 @@ struct process_d
 	 *    Tipo de evento que fazem a tarefa entrar em modo de espera. 
 	 */	
 	//event_type_t event;
-		
-	
-	/*
-	 * Windows. (Janelas)
-	 */
-	
 
-	//User session, room (window station), desktop.
-	
-	struct usession_d  *usession;  //user session
-	struct room_d      *room;      //room (Window Station) do processo.  
-	struct desktop_d   *desktop;   //Desktop do processo.        
-	
+
+    //
+    // == Security ============================
+    //
+
+    // User session, room (window station), desktop.
+
+    struct usession_d  *usession;  //user session
+    struct room_d      *room;      //room (Window Station) do processo.  
+    struct desktop_d   *desktop;   //Desktop do processo.        
+
 
 	//
-	// ORDEM: O que segue � referenciado com pouca frequ�ncia.
+	// ORDEM: 
+	// O que segue eh referenciado com pouca frequencia.
 	//
-	
+
 	//lista de arquivos ??
 	//fluxo padr�o. stdio, stdout, stderr
 	//unsigned long iob[8];
@@ -797,13 +798,13 @@ struct process_d
 	// O processo esta esperando um processo filho fechar.
 	// Esse � o PID do processo que ele est� esperando fechar.
 
-	pid_t wait4pid;
-	
+    pid_t wait4pid;
+
 	//Motivo do processo fechar.
-	int exit_code;
+    int exit_code;
 	
 	// N�mero de processos filhos.
-	int nchildren;
+    int nchildren;
 	
 	// Lista de processos filhos que est�o no estado zumbi.
 	// List of terminated childs
@@ -871,29 +872,20 @@ struct process_d
     int socket_pending_list_max; //listen() will setup this thing.
 
 
-
     // Navigation
 
     struct process_d *prev;
     struct process_d *next;
 };
 
-//Os quatro principais processos.
-struct process_d *KernelProcess;     //PID=0.   Ok.
-struct process_d *InitProcess;       //PID=100. ?
-struct process_d *ShellProcess;      //PID=101. ?
-struct process_d *TaskManProcess;    //PID=103. ?
+//
+// Primeiros processos.
+//
 
-//Outros.
-struct process_d *Process;           //Current.
-struct process_d *idle_proc;         //Iddle. //@todo: deletar
-struct process_d *cur_process;       //Current.
+struct process_d *KernelProcess;     // Base kernel
+struct process_d *InitProcess;       // init process.
 
-//Lista encadeada de processos.
-struct process_d *process_Conductor2;
-struct process_d *process_Conductor;
-struct process_d *process_rootConductor;
-struct process_d *CurrentProcess;    //Current.
+
 
 
 /*
@@ -931,18 +923,21 @@ unsigned long processList[PROCESS_COUNT_MAX];
  *   Em forma de fila.
  *
  */
-typedef struct proc_list_d proc_list_t;
+//typedef struct proc_list_d proc_list_t;
 struct proc_list_d
 {
-	unsigned long len;
-	struct process_d *head;
-	struct process_d *tail;
-	
-}; 
-struct proc_list_d *system_procs;      //Processos do sistema.
-struct proc_list_d *periodic_procs;    //Processos peri�dicos.
-struct proc_list_d *rr_procs;          //Processos do tipo round robin.
-struct proc_list_d *waiting_procs;     //Processos que est�o esperando.
+    unsigned long len;
+
+    struct process_d  *head;
+    struct process_d  *tail;
+};
+
+// #todo:
+// Rever essas listas.
+//struct proc_list_d *system_procs;      //Processos do sistema.
+//struct proc_list_d *periodic_procs;    //Processos peri�dicos.
+//struct proc_list_d *rr_procs;          //Processos do tipo round robin.
+//struct proc_list_d *waiting_procs;     //Processos que est�o esperando.
 //...  
 
 
@@ -956,14 +951,14 @@ struct proc_list_d *waiting_procs;     //Processos que est�o esperando.
 
 struct process_info_d 
 {
-	int processId;
-	struct process_d *process; 	
-    
-	// Thread principal.
-	int threadId;
-	struct thread_d *thread;
+    int processId;
+    struct process_d *process; 
 
-    //... 	
+	// Thread principal.
+    int threadId;
+    struct thread_d *thread;
+
+    //...
 };
 
 
@@ -1016,8 +1011,9 @@ unsigned long GetPageDirValue (void);
 unsigned long GetProcessDirectory ( struct process_d *process );
 
 void 
-SetProcessDirectory ( struct process_d *process, 
-                      unsigned long Address );
+SetProcessDirectory ( 
+    struct process_d *process, 
+    unsigned long Address );
 
 
 //
@@ -1043,20 +1039,20 @@ int processCopyMemory ( struct process_d *process );
 int processCopyProcess ( pid_t p1, pid_t p2 );
 
 
-struct process_d *create_process ( struct room_d *room,
-                                   struct desktop_d  *desktop,
-                                   struct window_d *window,
-                                   unsigned long base_address, 
-                                   unsigned long priority, 
-                                   int ppid, 
-                                   char *name,
-                                   unsigned long iopl,
-                                   unsigned long directory_address );
-
+struct process_d *create_process ( 
+    struct room_d    *room,
+    struct desktop_d *desktop,
+    struct window_d *window,      //??? delete
+    unsigned long base_address, 
+    unsigned long priority, 
+    int ppid, 
+    char *name,
+    unsigned long iopl,
+    unsigned long directory_address );
 
 
 //
-// Finaliza��es.
+// Finalizacoes.
 //
 
 void CloseAllProcesses (void);
@@ -1066,7 +1062,7 @@ void CloseAllProcesses (void);
  * exit_process:
  *     exit process..
  *     Torna o estado PROCESS_TERMINATED.
- *     mas n�o destr�i a estrutura DO PROCESSO.
+ *     mas nao destroi a estrutura DO PROCESSO.
  *     Outra rotina destruir� as informa��es.
  *     liberara a mem�ria.     
  */
@@ -1085,8 +1081,8 @@ int get_caller_process_id (void);
 
 int init_process_manager (void);
 
-FILE *get_stream_from_fd ( int pid, int fd );
 
+file *get_file_from_fd ( int pid, int fd );
 
 
 // cria um novo process, uma thread e carrega a imagem.

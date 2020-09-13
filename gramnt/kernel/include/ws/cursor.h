@@ -86,10 +86,11 @@ typedef struct cursor_d cursor_t;
 
 struct cursor_d
 {
-	//Object.
-	object_type_t objectType;
-	object_class_t objectClass;	
-	
+
+    // Object.
+    object_type_t  objectType;
+    object_class_t objectClass;
+
 	//Posicionamento.
 	unsigned long x;
 	unsigned long y;
@@ -103,9 +104,9 @@ struct cursor_d
 	//struct rect_d *rect;
 	
 	//Imagem usada como cursor.
-	void *imageBuffer;
-	void *imagePathName;
-	FILE cursorFile;
+    void *imageBuffer;
+    void *imagePathName;
+    file *cursorFile;
 
 	//Tipo. 
 	cursor_type_t cursorType;

@@ -346,7 +346,7 @@ unsigned long __GetProcessStats ( int pid, int index )
             break;
 
         case 41:
-            return (unsigned long) p->threadCount;
+            return (unsigned long) p->thread_count;
             break;
 
         case 42:
@@ -2446,7 +2446,8 @@ int process_find_empty_stream_slot ( struct process_d *process ){
 
 
 //mudar para: get_file_from_fd
-file *get_stream_from_fd ( int pid, int fd )
+//file *get_stream_from_fd ( int pid, int fd )
+file *get_file_from_fd ( int pid, int fd )
 {
     struct process_d *p;
     file *fp;
