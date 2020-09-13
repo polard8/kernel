@@ -1813,11 +1813,18 @@ int sys_socket_shutdown (int socket, int how)
         
     }else{
 
-        s->conn->state = SS_UNCONNECTED;
-        s->conn->conn = (struct socket_d *) 0;
+        // 31 ?
+        // p->Objects[socket] = (unsigned long) 0;
+   
+        // Disconecta.
+        s->state       = SS_UNCONNECTED;
+        //s->conn->state = SS_UNCONNECTED;
+         
+        //s->conn->state = SS_UNCONNECTED;
+        //s->conn->conn = (struct socket_d *) 0;
         
-        s->state = SS_UNCONNECTED;
-        s->conn = (struct socket_d *) 0;
+        //s->state = SS_UNCONNECTED;
+        //s->conn = (struct socket_d *) 0;
 
         //ok
         return 0;
@@ -1908,10 +1915,25 @@ sys_accept2 (
 
 
     struct process_d  *sProcess; //server process
-    file              *f;
 
     struct socket_d   *sSocket;  //server socket
     struct socket_d   *cSocket;  //client socket
+
+    file  *sFile;
+    //file  *cFile;
+    
+    //fd
+    int fdServer = -1;
+    int fdClient = -1;
+    
+    
+    // #debug
+    //debug_print ("sys_accept:\n");
+
+
+    //
+    // fd Server
+    //
     
     // #todo
     // O argumento dá o descritor para o socket do servidor.
@@ -1921,15 +1943,14 @@ sys_accept2 (
     // Ao fim devemos retornar o descritor do socket selecionado
     // na lista de conexões pendentes.
 
-    // #debug
-    //debug_print ("sys_accept:\n");
-
+    fdServer = sockfd;
+    
     // fd
     // ?? Esse é o socket do servidor.
-    if ( sockfd < 0 || sockfd >= 32 )
+    if ( fdServer < 0 || fdServer >= 32 )
     {
-        debug_print ("sys_accept2: [FAIL] sockfd\n");
-        printf      ("sys_accept2: [FAIL] sockfd\n");
+        debug_print ("sys_accept2: [FAIL] fdServer\n");
+        printf      ("sys_accept2: [FAIL] fdServer\n");
         goto fail;
     }
 
@@ -1962,12 +1983,12 @@ sys_accept2 (
 
     // file
     // The socket is a file and belongs to the process.
-    f = (file *) sProcess->Objects[sockfd];
+    sFile = (file *) sProcess->Objects[fdServer];
 
-    if ( (void *) f == NULL )
+    if ( (void *) sFile == NULL )
     {
-        debug_print ("sys_accept2: f fail\n");
-        printf      ("sys_accept2: f fail\n");
+        debug_print ("sys_accept2: sFile fail\n");
+        printf      ("sys_accept2: sFile fail\n");
         goto fail;
     }
 
@@ -1981,7 +2002,7 @@ sys_accept2 (
     // Socket structure that belongs to the process.
     // s = (struct socket_d *) p->priv;
     
-    sSocket = f->socket;
+    sSocket = sFile->socket;
     
     if ( (void *) sSocket == NULL )
     {
@@ -2072,7 +2093,7 @@ sys_accept2 (
         //refresh_screen();
         //return -1;
         
-        return (int) sockfd;
+        return (int) fdServer;
     }
 
 
@@ -2126,7 +2147,7 @@ sys_accept2 (
             
             //retornamos o fd do proprio servidor, pois nosso write copia
             //entre os buffers dos sockets conectados.
-            return (int) sockfd;
+            return (int) fdServer;
         }
 
         //fail
@@ -2148,6 +2169,15 @@ fail:
     return -1;
 }
 
+
+
+/*
+ ******************************** 
+ * sys_accept: 
+ * 
+ *     This is a work in progress.
+ * 
+ */
 
 // #todo
 // Pega um socket da lista de conexoes incompletas.
@@ -2189,11 +2219,24 @@ sys_accept (
 
 
     struct process_d  *sProcess; //server process
-    file              *f;
 
     struct socket_d   *sSocket;  //server socket
     struct socket_d   *cSocket;  //client socket
-    
+ 
+    file *sFile;   //file for the server socket.
+    file *cFile;   //todo
+
+    //fd
+    int fdServer = -1;
+    int fdClient = -1;
+
+    // #debug
+    //debug_print ("sys_accept:\n");
+
+    //
+    // fd Server 
+    //
+
     // #todo
     // O argumento dá o descritor para o socket do servidor.
     // A função accept seleciona um dos sockets da lista
@@ -2202,15 +2245,15 @@ sys_accept (
     // Ao fim devemos retornar o descritor do socket selecionado
     // na lista de conexões pendentes.
 
-    // #debug
-    //debug_print ("sys_accept:\n");
+    
+    fdServer = sockfd;
 
     // fd
     // ?? Esse é o socket do servidor.
-    if ( sockfd < 0 || sockfd >= 32 )
+    if ( fdServer < 0 || fdServer >= 32 )
     {
-        debug_print ("sys_accept: [FAIL] sockfd\n");
-        printf      ("sys_accept: [FAIL] sockfd\n");
+        debug_print ("sys_accept: [FAIL] fdServer\n");
+        printf      ("sys_accept: [FAIL] fdServer\n");
         goto fail;
     }
 
@@ -2243,12 +2286,12 @@ sys_accept (
 
     // file
     // The socket is a file and belongs to the process.
-    f = (file *) sProcess->Objects[sockfd];
+    sFile = (file *) sProcess->Objects[fdServer];
 
-    if ( (void *) f == NULL )
+    if ( (void *) sFile == NULL )
     {
-        debug_print ("sys_accept: f fail\n");
-        printf      ("sys_accept: f fail\n");
+        debug_print ("sys_accept: sFile fail\n");
+        printf      ("sys_accept: sFile fail\n");
         goto fail;
     }
 
@@ -2262,7 +2305,7 @@ sys_accept (
     // Socket structure that belongs to the process.
     // s = (struct socket_d *) p->priv;
     
-    sSocket = f->socket;
+    sSocket = sFile->socket;
     
     if ( (void *) sSocket == NULL )
     {
@@ -2348,12 +2391,12 @@ sys_accept (
     
     if ( sSocket->state == SS_CONNECTED )
     {
-        //debug_print ("sys_accept2: Already connected!\n");
-        //printf      ("sys_accept2: Already connected!\n");
+        debug_print ("sys_accept: Already connected!\n");
+        //printf      ("sys_accept: Already connected!\n");
         //refresh_screen();
         //return -1;
         
-        return (int) sockfd;
+        return (int) fdServer;
     }
 
 
@@ -2405,9 +2448,17 @@ sys_accept (
 
             cSocket->state = SS_CONNECTED;
             
+            //Salvando no slot prealocado na inicializacao
+            cFile = cSocket->private_file;
+            //sProcess->Objects[ sProcess->_client_sock_fd ] = cFile;
+            sProcess->Objects[ 31 ] = cFile;  //last
+            cFile->_file = 31;
+            return (int) cFile->_file; 
+            
+            
             //retornamos o fd do proprio servidor, pois nosso write copia
             //entre os buffers dos sockets conectados.
-            return (int) sockfd;
+            //return (int) fdServer;
         }
 
         //fail

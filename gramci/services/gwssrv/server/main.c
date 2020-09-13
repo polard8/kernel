@@ -1964,7 +1964,7 @@ int main (int argc, char **argv){
                           (socklen_t *) addr_len );
                           
             if (newconn < 0) {
-                gwssrv_debug_print ("gwssrv: ERROR on accept2\n");
+                gwssrv_debug_print ("gwssrv: ERROR on Accepting\n");
                 gwssrv_yield();
  
             // Request from the new connection
@@ -1977,7 +1977,8 @@ int main (int argc, char **argv){
 
                 //close ?
                 //#bugbug: We can not close if we are using accept2.
-                //shutdown(newconn, SHUT_RDWR);         
+                //shutdown(newconn, SHUT_RDWR);
+                //shutdown(newconn, 0);         
                 //close(newconn);
                 
             };

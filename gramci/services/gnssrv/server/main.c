@@ -687,7 +687,11 @@ int main (int argc, char **argv){
 
         // #ps: Actually, accept2 returns the fd of the server,
         // and write will copy from on socket to another.
-        
+
+        //newconn = accept ( curconn, 
+        //              (struct sockaddr *) &addr, 
+        //              (socklen_t *) addr_len );
+    
         newconn = accept2 ( curconn, 
                       (struct sockaddr *) &addr, 
                       (socklen_t *) addr_len );
