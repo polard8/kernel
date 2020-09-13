@@ -763,9 +763,25 @@ struct process_d
 	unsigned long standard_streams[3];
 
 
-    //struct _iobuf  *root;    // 4 root directory
-    //struct _iobuf  *pwd;     // 5 (print working directory) 
-	//...
+    //
+    // == fs ===========================================
+    //
+    
+    // #important
+    // This is gonna help us to navigate in the levels of the pathname.
+    // See: get_dir() on namei.c on linux 0.01
+    
+    // #todo
+    // NOT initialized yet!
+
+    // pathname absoludo
+    file *root;  
+    struct inode_d *inode_root;
+    
+    // pathname relativo
+    file *cwd;   
+    struct inode_d *inode_cwd;
+
 
 	// #todo: 
 	// Esse tamanho deve ser igual ao encontrado no m�dulo /fs.
