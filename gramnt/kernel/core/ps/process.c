@@ -868,7 +868,7 @@ int processCopyProcess ( pid_t p1, pid_t p2 ){
     Process2->pgrp = Process1->pgrp;
 
     // validation.
-    Process2->used = Process1->used;
+    Process2->used  = Process1->used;
     Process2->magic = Process1->magic;
 
     // State of process
@@ -983,6 +983,23 @@ int processCopyProcess ( pid_t p1, pid_t p2 ){
 
     Process2->base_priority = (unsigned long) BasePriority;
     Process2->priority      = (unsigned long) Process1->priority;
+
+
+    //
+    // == Security ====================================
+    //
+    
+    Process2->usession = Process1->usession;
+    Process2->room     = Process1->room;
+    Process2->desktop  = Process1->desktop;
+
+    // pathname absolute.
+    Process2->root       = Process1->root;
+    Process2->inode_root = Process1->inode_root;
+    
+    // pathname relative.
+    Process2->cwd        = Process1->cwd;
+    Process2->inode_cwd  = Process1->inode_cwd;
 
 
 
@@ -1225,8 +1242,8 @@ struct process_d *create_process (
 
     Process = (void *) kmalloc ( sizeof(struct process_d) );
 
-	// #todo: 
-	// Aqui pode retornar NULL.
+    // #todo: 
+    // Aqui pode retornar NULL.
     if ( (void *) Process == NULL ){
         panic ("process-create_process: Process");
     }
@@ -1247,9 +1264,10 @@ struct process_d *create_process (
         if ( PID <= 0 || PID >= PROCESS_COUNT_MAX )
         {
             debug_print ("create_process: [FAIL] getNewPID \n");
-            printf      ("create_process: [FAIL] getNewPID %d \n", PID);
-            refresh_screen ();
-            return NULL;
+            kprintf     ("create_process: [FAIL] getNewPID %d \n", PID);
+            goto fail;
+            //refresh_screen ();
+            //return NULL;
         }
 
         EmptyEntry = (void *) processList[PID];
@@ -1410,8 +1428,9 @@ struct process_d *create_process (
     if (directory_address == 0)
     {
         debug_print("create_process: [FAIL] page directory address\n");
-        printf     ("create_process: [FAIL] page directory address\n");
-        return NULL;
+        kprintf    ("create_process: [FAIL] page directory address\n");
+        goto fail;
+        //return NULL;
     }
 
     Process->DirectoryVA = (unsigned long ) directory_address;
@@ -1664,12 +1683,18 @@ struct process_d *create_process (
     Process->desktop  = desktop;             // Passado via argumento.
 
 
-		//Process->base_priority
+    // absolute pathname.
+    Process->root = (file *) 0;
+    Process->inode_root = (struct inode_d *) 0;
+    
+    // relative pathname.
+    Process->cwd  = (file *) 0;
+    Process->inode_cwd = (struct inode_d *) 0;
 
-	
-        // wait4pid: 
-        // O processo esta esperando um processo filho fechar.
-        // Esse � o PID do processo que ele est� esperando fechar.
+
+    // wait4pid: 
+    // O processo esta esperando um processo filho fechar.
+    // Esse � o PID do processo que ele est� esperando fechar.
 
 
     Process->wait4pid = (pid_t) 0;
@@ -1723,7 +1748,7 @@ struct process_d *create_process (
         
     printf ("create_process: calling tty_create[DEBUG]\n");
 
-    Process->tty = ( struct tty_d *) tty_create ();         
+    Process->tty = ( struct tty_d *) tty_create(); 
         
     if ( (void *) Process->tty == NULL ){
         panic ("create_process: Couldn't create tty\n");
@@ -1747,6 +1772,13 @@ struct process_d *create_process (
     processList[PID] = (unsigned long) Process;
 
     return (void *) Process;
+
+// Fail
+
+fail:
+    //Process = NULL;
+    refresh_screen();
+    return NULL;
 }
 
 

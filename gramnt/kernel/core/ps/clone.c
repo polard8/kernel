@@ -891,6 +891,8 @@ do_clone:
 
 
     Clone->pid = (pid_t) PID;
+    
+    //#todo: Deletar. Isso iremos herdar?
     Clone->uid = (uid_t) current_user;
     Clone->gid = (gid_t) current_group;
 
