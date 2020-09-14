@@ -66,10 +66,34 @@ unsigned long gScreenWidth;
 unsigned long gScreenHeight;
 
 
+//
+// == Window ==========================
+//
+
+// #todo
+// We need to sync these with the window server.
+// This way, the window server will paint the chars in the right window.
+
+
+// The active window.
+int active_window;
+
+
+// The window with the input focus.
+// Sometimes it is a child window, and it's parent needs to be the
+// active window.
+int window_with_focus;
+
+//...
 
 #define WINDOW_COUNT_MAX 1024
 
 unsigned long windowList[WINDOW_COUNT_MAX];
+
+
+//
+// == Prototypes ==========================
+//
 
 
 int gwm_init_globals(void);

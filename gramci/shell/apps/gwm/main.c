@@ -358,43 +358,59 @@ int gwm_init_globals(void)
 {
     gws_debug_print("gwm_init_globals:\n");
     
-    gScreenWidth = gws_get_system_metrics(1);
+    gScreenWidth  = gws_get_system_metrics(1);
     gScreenHeight = gws_get_system_metrics(2);
     
     
+    if (gScreenWidth==0 || gScreenHeight==0)
+        gws_debug_print("gwm_init_globals: w h fail\n");
+    
     //...
+    
     
     return 0;
 }
+
 
 int gwm_init_windows(void)
 {
     int i=0;
 
+
     gws_debug_print("gwm_init_windows:\n");
     
-    for(i=0;i<WINDOW_COUNT_MAX;i++)
+    for(i=0; i<WINDOW_COUNT_MAX; i++)
     {
         windowList[i] = 0;
     };
     
+ 
+    // Not selected yet.
+    active_window = -1;
+    window_with_focus = -1;
+    // ...   
     
     
+    //gws_debug_print("gwm_init_windows: done\n");
     return 0;
 }
-
 
 
 
 int _getmessage_request(int fd)
 {
     // Isso permite ler a mensagem na forma de longs.
-    unsigned long *message_buffer = (unsigned long *) &__buffer[0];   
+    unsigned long *message_buffer = (unsigned long *) &__buffer[0]; 
 
     int n_writes = 0;   // For sending requests.
 
-    //char *name = "Window name 1";
 
+
+    //if (fd<0){
+    //    gws_debug_print("_getmessage_request: fd\n");
+    //    return -1;
+    //}
+    
 
     //
     // Send request.
@@ -440,6 +456,13 @@ int _getmessage_response(int fd)
     unsigned long long2 = 0;
     unsigned long long3 = 0;
     unsigned long long4 = 0;
+
+
+    //if (fd<0){
+    //    gws_debug_print("_getmessage_response: fd\n");
+    //    return -1;
+    //}
+
 
 
     //
@@ -1079,7 +1102,7 @@ int create_bg_client(int fd)
         c_bg->window = gws_create_window (fd,
             WT_SIMPLE,1,1,"BG",
             0, 0, w, h,
-            0,0,COLOR_WHITE, COLOR_WHITE);
+            0,0, COLOR_GREEN, COLOR_GREEN); //COLOR_WHITE, COLOR_WHITE);
         
         if (c_bg->window < 0){
             printf ("gwm: c_bg->window fail\n");
@@ -1527,7 +1550,7 @@ _more:
 // Testing new main.
 int main ( int argc, char *argv[] ){
 
-    int client_fd = -1;
+    int fd = -1;
 
     // Porta para o Window Server 'ws' em gramado_ports[]
     struct sockaddr_in addr_in;
@@ -1552,11 +1575,11 @@ int main ( int argc, char *argv[] ){
 
     // cria o soquete.
     // AF_GRAMADO
-    //client_fd = socket ( 8000, SOCK_STREAM, 0 );
-    //client_fd = socket ( AF_INET, SOCK_STREAM, 0 );
-    client_fd = socket ( AF_INET, SOCK_RAW, 0 );
+    //fd = socket ( 8000, SOCK_STREAM, 0 );
+    //fd = socket ( AF_INET, SOCK_STREAM, 0 );
+    fd = socket ( AF_INET, SOCK_RAW, 0 );
     
-    if ( client_fd < 0 ){
+    if ( fd < 0 ){
        printf ("gwm: Couldn't create socket\n");
        exit(1);
     }
@@ -1574,7 +1597,7 @@ int main ( int argc, char *argv[] ){
         //printf ("gnst: Connecting to the address 'ws' ...\n");      
         printf ("gwm: Connecting to ws via inet  ...\n");   
 
-        if (connect (client_fd, (void *) &addr_in, sizeof(addr_in)) < 0){ 
+        if (connect (fd, (void *) &addr_in, sizeof(addr_in)) < 0){ 
             gws_debug_print ("gwm: Connection Failed \n");
             printf          ("gwm: Connection Failed \n"); 
             //return -1;
@@ -1584,13 +1607,16 @@ int main ( int argc, char *argv[] ){
 
 
     // Testing server.
-    hello(client_fd);
+    hello(fd);
 
 
+    //
     // Create clients.
-    create_bg_client(client_fd);
-    create_topbar_client(client_fd);
-    create_taskbar_client(client_fd);
+    //
+    
+    create_bg_client(fd);
+    create_topbar_client(fd);
+    create_taskbar_client(fd);
     
 
     // ...
@@ -1607,7 +1633,7 @@ int main ( int argc, char *argv[] ){
     //
 
     // Loop de requests para o gws.
-    run (client_fd);
+    run (fd);
 
 
     // #importante
@@ -1643,7 +1669,7 @@ int main ( int argc, char *argv[] ){
 
 // exit
     debug_print ("gwm: bye\n"); 
-    printf ("gwm: bye\n");
+    printf      ("gwm: bye\n");
 
     return 0;
 }

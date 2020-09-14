@@ -1200,6 +1200,26 @@ void set_active_window (int id){
 }
 
 
+
+
+
+int get_window_with_focus(void)
+{
+   return (int) window_with_focus;
+}
+
+
+int set_window_with_focus(int id)
+{
+    
+    if(id<0)
+        return -1;
+   
+    window_with_focus = (int) id;
+}
+
+
+
 // Pegando a z-order de uma janela.
 int get_zorder ( struct gws_window_d *window ){
 

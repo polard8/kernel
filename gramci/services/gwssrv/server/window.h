@@ -181,9 +181,9 @@
 // precisa ser inicializada.
 unsigned long windows_count;
 
-int window_with_focus;
-
 int active_window;
+
+int window_with_focus;
 
 int top_window;
 
@@ -193,7 +193,7 @@ int top_window;
 
 /*
  *************************************
- * button_d:
+ * gws_button_d:
  *     Structure for button object.
  *     Env: gws in ring3.
  */
@@ -1133,14 +1133,21 @@ dtextDrawText (
     unsigned long color,
     unsigned char *string );
 
-       
-       
+
 int gwsRegisterWindow (struct gws_window_d *window);
+
 int get_active_window (void);
 void set_active_window (int id);
-int get_zorder ( struct gws_window_d *window );
+
+
+int get_window_with_focus(void);
+int set_window_with_focus(int id);
+
+
 int get_top_window (void);
 void set_top_window (int id);
+
+int get_zorder ( struct gws_window_d *window );
 
 
 int 

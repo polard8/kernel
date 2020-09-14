@@ -1186,6 +1186,11 @@ int sys_write (unsigned int fd, char *ubuf, int count){
     // accept deve retornar o fd do cliente, para que o servidor
     // construa uma lista de clientes.
     // Entao copiar sera uma opçao, gerenciada por uma flag.
+    
+    // #bugbug
+    // Nao podemos fazer a copia se os dois sockets 
+    // estiverem com a conexao pendente.
+
     if ( __file->____object == ObjectTypeSocket )
     {
         // Pega a estrutura de soquete do processo atual.
@@ -1193,13 +1198,13 @@ int sys_write (unsigned int fd, char *ubuf, int count){
         // Um processo não pode escrever no socket de outro processo?
         s1 = __P->priv;
         if ( (void *) s1 == NULL){ 
-            debug_print ("sys_write: s1 \n");
+            debug_print ("sys_write: s1 \n"); 
             goto fail;
         }    
         
         // O socket tem um buffer, que é um arquivo. 
         if (__file != s1->private_file){
-            debug_print ("sys_write: __file\n");
+            debug_print ("sys_write: __file\n"); 
             goto fail;
         }  
 
@@ -1260,20 +1265,34 @@ int sys_write (unsigned int fd, char *ubuf, int count){
             // #obs: 
             // Esse ponteiro precisa ser inicializado
             // na criação da estrutura de socket.
+            // O ponteiro precisa ser valido
+            // A conexao nao pode estar pendente.
 
+            // ponteiro invalido
             if ( (void *) s1->conn == NULL){ 
                 debug_print("sys_write: s1->conn fail. No connection\n");
                 //printf("sys_write: s1->conn fail. No connection\n"); 
                 goto fail;
             }    
 
+            // The pointer to the destination.
+            
             s2 = s1->conn;
             
-            if ( (void *) s2 == NULL){    
-                debug_print("sys_write: s2 fail. No connection\n");
-                //printf("sys_write: s2 fail. No connection\n");  
-                goto fail;
+            // #bugbug: repetimos o que foi feito logo acima.
+            if ( (void *) s2 == NULL){ 
+                debug_print("sys_write: [FAIL] s2. No connection\n");
+                printf     ("sys_write: [FAIL] s2. No connection\n");  
+                goto fail2;
             } 
+ 
+            // check connection status.
+            // nao queremos uma conexao pendente.
+            if ( s2->state != SS_CONNECTED ){
+                debug_print("sys_write: [FAIL] s2 connection status\n");
+                printf     ("sys_write: [FAIL] s2 connection status\n");  
+                goto fail2;
+            }
 
             // pega o arquivo.    
             __file2 = s2->private_file;
@@ -1413,6 +1432,8 @@ int sys_write (unsigned int fd, char *ubuf, int count){
 fail:
     debug_print ("sys_write: [FAIL] Something is wrong!\n");
     printf      ("sys_write: [FAIL] something is wrong!\n");
+
+fail2:
     refresh_screen();
 
     // Não conseguimos escrever ... 

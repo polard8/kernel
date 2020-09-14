@@ -1375,6 +1375,7 @@ sys_connect (
     //#importante
     //no caso de endereços no estilo inet
     //vamos precisar de outra estrututura.
+    
     struct sockaddr_in *addr_in;
 
 
@@ -1615,15 +1616,17 @@ sys_connect (
 
     // Pega a estrutura de socket associada ao arquivo.
     // socket structure in the senders file.
-    //s = (struct socket_d *) p->priv; 
-    client_socket = (struct socket_d *) f->socket;   
+    // s = (struct socket_d *) p->priv; 
+
+    client_socket = (struct socket_d *) f->socket;
     
     if ( (void *) client_socket == NULL )
     {
-        printf ("sys_connect: [FAIL] client_socket fail\n");
+        printf ("sys_connect: [FAIL] client_socket\n");
         goto fail;
     }
 
+    // The client socket needs to be unconnected.
     if (client_socket->state != SS_UNCONNECTED) {
         printf ("sys_connect: socket not SS_UNCONNECTED\n");
         goto fail;
@@ -1703,11 +1706,19 @@ __OK_new_slot:
     // Nesse momento poderíamos usar a flag SS_CONNECTING
     // e a rotina accept() mudaria para SS_CONNECTED. 
     
+    // #bugbug
+    // Nao podemos mudar o estado do servidor,
+    // estamos apenas entrando na fila e implorando
+    // para nos conectarmos.
+    // Quem realizara a conexao sera o accept, pegando 
+    // o cliente da fila de conexoes pendentes.
+ 
     client_socket->conn = server_socket;
     server_socket->conn = client_socket;
 
     client_socket->state = SS_CONNECTING;
     server_socket->state = SS_CONNECTING;
+
     debug_print("sys_connect: Pending connection\n");
     printf     ("sys_connect: Pending connection\n");
  
@@ -2421,6 +2432,13 @@ sys_accept (
     // #ok
     // Pega um socket da lista de conexoes incompletas.
  
+    // #bugbug
+    // A estado de SS_CONNECTING foi atribuido pelo connect.
+    // Connect tam preconecta os sockets, isso eh ruim
+    // pois podemos transmitir dados mesmo antes do accept
+    // selecionar um da fila de conexoes pendentes. 
+
+    //if ( sSocket->state != SS_CONNECTED )
     if ( sSocket->state == SS_CONNECTING )
     {
         debug_print ("sys_accept: CONNECTING !!\n");
