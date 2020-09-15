@@ -52,29 +52,13 @@
 #include <kernel.h>
 
 
+//
+// == prototypes (internal) =====================================
+//
 
-//Variáveis internas.
-//int logonStatus;
-//...
-
-
-// Internas.
-void logon_create_screen (void);
-void logon_create_background (void);
-void logon_create_logo (void);
-void logon_create_taskbar (void);
-void logon_create_mainwindow (void);
-void logon_create_controlmenu (void);
-void logon_create_infobox (void);
-void logon_create_messagebox (void);
-void logon_create_debug (void);
-void logon_create_navigationbar (void);
-void logon_create_grid (void);
-void logon_create_developer_screen (void);
+void logon_create_screen_window (void);
+void logon_create_main_window (void);
 int ExitLogon (void);
-
-
-
 
 
 
@@ -260,179 +244,31 @@ int init_logon_manager (void){
 	};
 
 
-    //#debug
-   // printf ("create_logon: *breakpoint\n"); 
-   // refresh_screen();
-    //while(1){}
-
-
-	
-	// Configura elementos da tela de login.
-    
-    if ( g_guiMinimal == 1 )
+    if ( (void *) CurrentUser == NULL )
     {
-        SetLogonParameters (0,1,1,0,0,1,0,0,0,0,0,0);
+        panic("init_logon_manager: CurrentUser");
+    }
 
-    }else{
+     
+     logon_create_screen_window (); 
 
-        SetLogonParameters(0,  //refresh         
-                           1,  //*screen          
-                           1,  //*background       
-                           0,  //logo            
-                           0,  //taskbar (autoriza e prepara para a utilização de uma taskbar.)        
-                           1,  //*Main.(Desktop window, Área de trabalho)            
-                           0,  //menu           
-                           0,  //infobox         
-                           0,  //messagebox       
-                           0,  //debug           
-                           0,  //navigationbar    
-                           0); //grid (autoriza e prepara para a utilização de um grid)	
-    };
+     logon_create_main_window (); 
 
-    //
-    // ## Draw windows ##
-    //
 
-draw_logon_stuff:
+    if ( (void *) gui->main != NULL ){
 
-    printf ("init_logon_manager: Draw..\n");   
+        draw_text ( gui->main, 400 +8, 8*2, 
+            COLOR_WHITE, "Gramado Operating System" );
 
-    // Root window !
-    // Screen, Background and Logo. 
+        draw_text( gui->main, 400 +8, 8*3, 
+            COLOR_WHITE, "(under construction) ");
 
-    if (gui->screenStatus == 1){ 
-        logon_create_screen (); 
+        draw_text( gui->main, 400 +8, 8*4, 
+            COLOR_WHITE, "(This is the enviroment to run logon process)" );
     }
 
 
-	/*
-	if (gui->backgroundStatus == 1)
-	{
-	    logon_create_background (); 
-	}
-	*/
-
-    /*
-	if (gui->logoStatus == 1)
-	{ 
-	    logon_create_logo (); 
-	}
-	*/
-
-    /*
-	//Taskbar, Control menu and Messagebox.
-    if (gui->taskbarStatus == 1)
-    {
-	    logon_create_taskbar (); 
-	}
-	*/
-
-    /*
-    if (gui->menuStatus == 1)
-    { 
-	    logon_create_controlmenu (); 
-	}
-	*/
-	
-	/*
-    if (gui->messageboxStatus == 1)
-    { 
-	    logon_create_messagebox (); 
-	}
-	*/
-
-    // Main window.
-    // Destop. That area for applications.
-    if (gui->mainStatus == 1){ 
-        logon_create_mainwindow (); 
-    }
-
-
-    /*
-    if (gui->navigationbarStatus == 1)
-    { 
-	    logon_create_navigationbar (); 
-	}
-	*/
-	
-	/*
-    if (gui->gridStatus == 1)
-    { 
-	    logon_create_grid (); 
-	}
-	*/
-
-	//draw_text( gui->main, 400 +8, 8*2, 
-	   //COLOR_RED, "Gramado Operating System" );
-			    
-    //printf ("create_logon: *breakpoint"); 
-	//refresh_screen();
-	//while(1){}
-	
-	//
-	// ## Strings ##
-	//
-
-    if ( (void *) CurrentUser != NULL )
-    {
-
-		// Obs: 
-		// As mensagens aqui são para auxiliar 
-		// o desenvolvedor no processo de inicialização.
-		//@todo: Informar o desktop atual.
-			
-        if (g_guiMinimal != 1)
-        {
-
-
-/*
-#ifdef IMPORTED_VARIABLES	
-            //=======================================
-            // #Warning                            //
-            // Variables imported from Makefile    //
-            //=======================================
-			
-			sprintf(str_tmp, "Gramado %d.%d%s (%s)",  
-				GRAMADO_VERSION, 
-				GRAMADO_PATCHLEVEL,
-				GRAMADO_EXTRAVERSION,
-				GRAMAD0_NAME );
-
-			draw_text( gui->main, 400 +8, 8*1, 
-			    COLOR_WHITE, str_tmp );
-#endif
-*/
-
-            if ( (void *) gui->main != NULL ){
-			draw_text( gui->main, 400 +8, 8*2, 
-			    COLOR_WHITE, "Gramado Operating System" );
-			
-			draw_text( gui->main, 400 +8, 8*3, 
-			    COLOR_WHITE, "(under construction) ");
-				
-			draw_text( gui->main, 400 +8, 8*4, 
-			    COLOR_WHITE, "(This is the enviroment to run logon process)" );
-		    }
-		    
-			//...
- 	        
-			//draw_text(gui->screen, 640/2, 8, COLOR_WHITE, "Press F1 to Log on");
-	
-			//Opções:
-			//StatusBar( gui->screen, "Logon", "Press F1 to start User Environment or F2 to Reboot");
-			//Message Box.
-			//...
-			//
-	    };
-		//Nothing.
-	};
-	
-
-
-	//
-	// Done 
-	//
-
+    // ...
 
 done:
 
@@ -482,61 +318,8 @@ int ExitLogon (void){
 
 
 /*
- ******************************************
- * SetGuiParameters:
- *     Configura a inicialização das janelas 
- * gerenciadas pelo kernel.
- *     @todo: Limite de janelas (+- 10)
- */
-
-
-void 
-SetLogonParameters ( 
-    int refresh,         // Flag. Colocar ou não o backbuffer na tela.
-    int screen,          // Tela do computador.
-    int background,      // Background da area de trabalho. 
-    int logo,            // Logo, Janela para imagem da area de trabalho.
-    int taskbar,         // Barra de tarefas.(icones para programas)
-    int main,            // Janela principal.( Desktop, ou Kernel Setup Utility ) 
-    int menu,            // Control menu da Área de trabalho.
-    int infobox,         // Janelinha no canto, para alerta sobre sobre eventos ocorridos no sistema.
-    int messagebox,      // O message box do kernel.(cada app cria seu messagebox.) 
-    int debug,           // Janela do debug do kernel.(sonda por problemas)
-    int navigationbar,   // Janela de navegação(semelhante a navigation bar dos dispositivos mobile) 
-    int grid )           // Grid da janela principal.
-{
-
-
-    if( (void*) gui == NULL ){
-        printf ("SetLogonParameters: fail\n");
-        //refresh_screen();
-        return;
-
-    }else{
-		
-	    gui->refresh = refresh; 
-	    gui->screenStatus = screen;
-	    gui->backgroundStatus = background; 
-	    gui->mainStatus = main; 
-	    gui->logoStatus = logo;
-	    gui->taskbarStatus = taskbar;
-	    gui->menuStatus = menu;
-	    gui->infoboxStatus = infobox;
-	    gui->messageboxStatus = messagebox;
-	    gui->debugStatus = debug;
-	    gui->navigationbarStatus = navigationbar; 
-	    gui->gridStatus = grid;  
-	    // ...
-
-    };
-
-    //return;
-}
-
-
-/*
  **************************************
- * logon_create_screen:
+ * logon_create_screen_window:
  * 
  *     ( * ROOT WINDOW )
  * 
@@ -545,13 +328,13 @@ SetLogonParameters (
  *     ...
  */
 
-void logon_create_screen (void){
+void logon_create_screen_window (void){
 
     struct window_d *hWindow; 
 
     unsigned long Left = 0;
     unsigned long Top = 0;
-    unsigned long Width = (unsigned long) screenGetWidth();
+    unsigned long Width  = (unsigned long) screenGetWidth();
     unsigned long Height = (unsigned long) screenGetHeight();
 
 
@@ -572,18 +355,18 @@ void logon_create_screen (void){
 
 
     if ( (void *) hWindow == NULL ){
-       panic ("logon_create_screen:");
+       panic ("logon_create_screen_window:");
 
     }else{
 
         if ( hWindow->used != 1 || hWindow->magic != 1234 ){
-            panic ("logon_create_screen: hWindow\n");
+            panic ("logon_create_screen_window: hWindow\n");
         }
 
         RegisterWindow (hWindow);
 
         if ( (void *) gui == NULL){
-            panic ("logon_create_screen: gui");
+            panic ("logon_create_screen_window: gui");
 
         }else{
 
@@ -599,34 +382,19 @@ void logon_create_screen (void){
 			// while(1){}
 		};
     };
-
-//done:
-    //return; 
-}
-
-
-/*
- ***********************************************
- * logon_create_background:
- *     Cria o background. Pinta ele de uma cor.
- */
-
-void logon_create_background (void)
-{
-    // Nothing.
 }
 
 
 /*
  *************************************************
- * logon_create_mainwindow:
+ * logon_create_main_window:
  *      A área de trabalho.
  * 
  *  #Importante: 
  *  É a área disponível na tela para o aplicativo. 
  */
 
-void logon_create_mainwindow (void)
+void logon_create_main_window (void)
 {
     // #bugbug
     // Cuidado com isso!
@@ -636,75 +404,6 @@ void logon_create_mainwindow (void)
     
     gui->main = (void *) gui->screen;
 }
-
-
-
-// #todo: Delete this function.
-void logon_create_logo (void)
-{ 
-    // Nothing.
-}
-
-
-// #todo: Delete this function.
-void logon_create_taskbar (void)
-{ 
-    // Nothing.
-}
-
-
-// #todo: Delete this function.
-void logon_create_controlmenu (void)
-{ 
-    // Nothing.
-}
-
-
-// #todo: Delete this function.
-void logon_create_infobox (void)
-{
-    // Nothing.
-}
-
-
-// #todo: Delete this function.
-void logon_create_messagebox (void)
-{ 
-    // Nothing.
-}
-
-
-// #todo: Delete this function.
-void logon_create_debug (void)
-{ 
-    // Nothing.
-}
-
-
-// #todo: Delete this function.
-void logon_create_navigationbar (void)
-{
-    // Nothing.
-}
-
-
-// #todo: Delete this function.
-void logon_create_grid (void)
-{ 
-    // Nothing.
-}
-
-
-// #todo: Delete this function.
-void logon_create_developer_screen (void)
-{
-    // Nothing.
-}
-
-
-//
-// ====================================
-//
 
 
 int register_logon_process ( pid_t pid ){

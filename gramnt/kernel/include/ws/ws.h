@@ -238,8 +238,9 @@ int current_screen;
 
 
 
-int guiStatus;        //Status da Interface gráfica do usuário.
-int g_guiMinimal; //Light or Full gui.
+int guiStatus;       //Status da Interface gráfica do usuário.
+
+
 
 //Status de ambientes gráficos.
 int logonStatus;              //Logon status.
