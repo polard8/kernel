@@ -1,5 +1,5 @@
 /*
- * File: gramado\logon\logon.h
+ * File: logon.h
  *
  * Descrição:
  *     Kernel Mode Logon Support Routines.
@@ -31,11 +31,7 @@ int g_use_default_user;
 
 
 //Cria.
-void create_logon (void); 
-
-
-//Inicializa.
-int init_logon (int argc, char *argv[]); 	
+int init_logon_manager (void);
 
 
 /*
@@ -43,7 +39,10 @@ int init_logon (int argc, char *argv[]);
  *     Configura alguns parâmetros para a tela de logon.
  *
  */
-void SetLogonParameters( int refresh,         // Flag. Colocar ou não o backbuffer na tela.
+
+void 
+SetLogonParameters ( 
+         int refresh,         // Flag. Colocar ou não o backbuffer na tela.
          int screen,          // Tela do computador.
          int background,      // Background da area de trabalho. 
          int logo,            // Logo, Janela para imagem da area de trabalho.
@@ -58,19 +57,8 @@ void SetLogonParameters( int refresh,         // Flag. Colocar ou não o backbuff
          //limites ...
          );
 
-
-
-/*
- * LogonProcedure:
- *     Procedimento de janela do LOGON.
- */ 
-unsigned long LogonProcedure( struct window_d *window, 
-                              int msg, 
-							  unsigned long long1, 
-							  unsigned long long2 );
-							  
-							  
+  
 //
-//fim.
+// End.
 //
 

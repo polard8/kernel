@@ -54,61 +54,6 @@
 void config_user (void);
 
 
-/*
- *********************************************************************
- * startUserEnvironment:
- *     ?? Quem chamaou essa função ??
- *     Talvez ele nem seja usado ...#importante  
- *     os aplicativos podem esta rodando no ambiente de logon. 
- *     O procedimento do logon.c pode chama-lá apertando F1.  
- *     Cria um ambiente com janelas para usuário do tipo interativo.
- *     Obs: Isso não é realmente o ambiente que o usuário vai usar, mas sim 
- * as janelas principais onde o aplicativo 'file manager' (explorer e taskbar) 
- * vão criar suas janelas.
- * 
- * Mudar o nome para userenvironmentStart(int argc, char* argv[]).
- */
-
-
-// #bugbug
-// Do not use this kind of arguments.
-
-int startUserEnvironment ( int argc, char* argv[] ){
-
-    int Status = 0;
-
-
-    debug_print ("startUserEnvironment:\n");
-
-	//
-	// GUI support.
-	//
-
-    //Cria as principais janelas que servirão de base para 
-    //a interface gráfica.
-    debug_print ("startUserEnvironment: Creating GUI\n");
-    create_gui();
-
-    //Inicializa.
-    debug_print ("startUserEnvironment: Initializing GUI\n");
-    init_gui(); 
-
-
-    // Keyboard support.
-    // #todo: Maybe move this to another place.
-    debug_print ("startUserEnvironment: Setup keyboard keys\n");
-    ldisc_init_modifier_keys();
-    ldisc_init_lock_keys();
-
-
-    // ...
-
-
-    debug_print ("startUserEnvironment: done\n");
-    
-    return (int) Status;
-}
-
 
 /*
  **************************************************

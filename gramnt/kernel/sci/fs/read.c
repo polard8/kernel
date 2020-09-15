@@ -274,6 +274,7 @@ const char *break_path (const char *pathname, char *filename)
 // Caregar um arquivo na memoria e retornar seu inode.
 // ? registrar a estrutura de inode na inode_table[] ?
 // ? registrar a estrutura de arquivo na file_table[] ?
+
 struct inode_d *fs_load_file (char *pathname)
 {
     struct inode_d *inode;
@@ -282,7 +283,9 @@ struct inode_d *fs_load_file (char *pathname)
     debug_print ("fs_load_file: [TODO] It's a work in progress\n");
 
     inode = (struct inode_d *) kmalloc( sizeof(struct inode_d) );
-    if( (void*) inode == NULL ){
+    
+    if ( (void *) inode == NULL )
+    {
         debug_print ("fs_load_file: [FAIL] inode\n");
         return (struct inode_d *) 0;
 
@@ -948,6 +951,8 @@ fs_load_metafile (
 // #todo
 // Precisamos de uma estrutura com as informações sobre
 // o diretório raiz atual.
+// O ponteiro para essa estrutura sera salvo na estrutura de processo
+// juntamente com o ponteiro da estrutura de cwd.
 
 void fs_load_rootdir (void)
 {
@@ -1070,13 +1075,13 @@ unsigned long fsRootDirGetFileSize ( unsigned char *file_name ){
 
         // Setores por cluster.
         Spc = root->spc;
-        if (Spc <= 0){ panic ("fsRootDirGetFileSize: [FAIL] Spc\n"); }
+        if (Spc <= 0){ panic ("fsRootDirGetFileSize: [FAIL] spc\n"); }
 
         // Max entries ~ Número de entradas no rootdir.
         // #bugbug: 
         // Devemos ver o número de entradas no diretório alvo.
 
-        max = root->rootdir_entries;
+        max = root->dir_entries;
         if (max <= 0){ panic ("fsRootDirGetFileSize: [FAIL] max root entries\n"); }
 
         // More?! 

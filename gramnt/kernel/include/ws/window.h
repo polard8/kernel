@@ -1850,29 +1850,12 @@ struct gui_d
 struct gui_d *gui; 
 
 
- 
-
-/*
- *    ########  Protótipos.  ########
- */
- 
- 
- 
-/*
- * StartGui:
- *     Inicializa a gui.
- */						   
-
-// Deletar.
-//int StartGui ();
 
 
-/*
- * Create GUI.
- *    Cria a GUI na hora da inicialização.
- */						   
+//
+// == Prototypes ===============================================
+//
 
-void create_gui (void);
 
 
 /*
@@ -1894,7 +1877,7 @@ void SetGuiParameters( int refresh,
                        int navigationbar,    
                        int grid );
 
-					   
+  
 //
 // Bars support. (menubar)
 //

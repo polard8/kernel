@@ -296,10 +296,15 @@ struct filesystem_d
 
     char *name;
 
-    
-    // Number of entries in the root dir.
-    int rootdir_entries;
 
+    // Sectors per cluster.
+    int spc; 
+
+
+    // Number of entries in the root dir.
+    //int rootdir_entries;
+    int dir_entries;
+    
     // Size of the entry in bytes.
     int entry_size; 
 
@@ -308,6 +313,7 @@ struct filesystem_d
     // #bugbug
     // Thats specific for fat16.
     // fat16.
+    
     unsigned long rootdir_address;   //endereço do rootdir
     unsigned long rootdir_lba;       //lba
     unsigned long fat_address;       //endereço da fat  
@@ -316,18 +322,11 @@ struct filesystem_d
     unsigned long dataarea_lba;      //lba
 
 
-    // #bugbug
-    // its a disk stuff.
-    // Sectors per cluster.
-    int spc;    
-
     //...
 };
 
 struct filesystem_d *root;
-//struct filesystem_d *CurrentFileSystem;
 // ...
-
 
 
 

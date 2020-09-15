@@ -31,9 +31,14 @@
 #define SCHEDULER_READY  2
 
 
-//Hz padrão. 100Hz. Uma interrupção a cada 10ms.
+// Hz padrão. 100Hz. 
+// Uma interrupção a cada 10ms.
 #define HZ 100
-//#define LATCH (1193180/HZ)
+
+// Tranca
+// #define LATCH (1193180/HZ)
+
+
 
 //
 // Tipos diferentes de scheduler. 

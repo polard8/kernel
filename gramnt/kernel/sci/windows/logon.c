@@ -80,7 +80,8 @@ int ExitLogon (void);
 
 /* 
  ***************************************************
- * create_logon:
+ * init_logon_manager:
+ * 
  *     Cria a interface gráfica do Logon.
  *     É o ambiente onde o processo de logon deve rodar. 
  *
@@ -88,12 +89,10 @@ int ExitLogon (void);
  *     Logo  -> Sobreposto. 
  *     Navigation bar.
  *     Usuário.
- *
- *    @todo Cria window stations, desktops ...
- *    @todo: logonCreate();
  */
 
-void create_logon (void){
+int init_logon_manager (void){
+
 
     struct window_d *hWindow; 
     int z=0;
@@ -104,7 +103,7 @@ void create_logon (void){
 	// essa era o buffer delas.
 	// char str_tmp[120];	 
 
-    debug_print ("create_logon\n");
+    debug_print ("init_logon_manager\n");
 
 	
 	//
@@ -120,11 +119,11 @@ void create_logon (void){
 	
 	// Limpa a tela e reinicia o curso em (0,0);
 	// Isso funcionou em init.c
-    backgroundDraw ( (unsigned long) COLOR_RED ); 
+    backgroundDraw ( (unsigned long) COLOR_GRAY ); 
 
     kprintf ("*\n");
     //kprintf ("**\n");
-    kprintf ("*** logon.c: Initializing user environment!\n");
+    kprintf ("init_logon_manager: Initializing user environment!\n");
     //kprintf ("**\n");
     kprintf ("*\n");
 
@@ -143,8 +142,9 @@ void create_logon (void){
 
     gui = (void *) kmalloc ( sizeof(struct gui_d) );
 
-    if ( (void *) gui == NULL){
-        panic ("create_logon: gui struct");
+    if ( (void *) gui == NULL)
+    {
+        panic ("init_logon_manager: gui struct");
 
     }else{
 
@@ -165,11 +165,11 @@ void create_logon (void){
 
 
         // Limpa a lista
-        printf ("create_logon: Initializing tty module\n");
+        printf ("init_logon_manager: Initializing tty module\n");
         tty_init_module();
 
         // Limpa a lista de terminais virtuais também.
-        printf ("create_logon: Initializing vt module\n");
+        printf ("init_logon_manager: Initializing vt module\n");
         vt_init_module();
 
 
@@ -189,7 +189,7 @@ void create_logon (void){
 
 
         // Initialize user info structure
-        printf ("create_logon: init_user_info\n");
+        printf ("init_logon_manager: init_user_info\n");
         init_user_info ();   
 
         // See: ws.h
@@ -221,19 +221,19 @@ void create_logon (void){
   
 		//user section.
 #ifdef KERNEL_VERBOSE		
-		printf ("create_logon: initializing user session\n");
+		printf ("init_logon_manager: initializing user session\n");
 #endif
 		init_user_session ();
 
 		//initialize window station default.
 #ifdef KERNEL_VERBOSE
-		printf ("create_logon: initializing room\n");   
+		printf ("init_logon_manager: initializing room\n");   
 #endif
 		init_room_manager ();	
 
 	    //initialize desktop default.
 #ifdef KERNEL_VERBOSE
-		printf ("create_logon: initializing desktop\n");   
+		printf ("init_logon_manager: initializing desktop\n");   
 #endif
 		init_desktop ();
 
@@ -245,7 +245,7 @@ void create_logon (void){
 		//window.c
 
 #ifdef KERNEL_VERBOSE
-		printf ("create_logon: initializing windows\n");   
+		printf ("init_logon_manager: initializing windows\n");   
 #endif
 		init_windows (); 
 
@@ -269,12 +269,12 @@ void create_logon (void){
 	
 	// Configura elementos da tela de login.
     
-	if ( g_guiMinimal == 1 )
-	{
+    if ( g_guiMinimal == 1 )
+    {
         SetLogonParameters (0,1,1,0,0,1,0,0,0,0,0,0);
-	
-	}else{
-		
+
+    }else{
+
         SetLogonParameters(0,  //refresh         
                            1,  //*screen          
                            1,  //*background       
@@ -295,7 +295,7 @@ void create_logon (void){
 
 draw_logon_stuff:
 
-    printf ("create_logon: Draw..\n");   
+    printf ("init_logon_manager: Draw..\n");   
 
     // Root window !
     // Screen, Background and Logo. 
@@ -403,7 +403,7 @@ draw_logon_stuff:
 #endif
 */
 
-
+            if ( (void *) gui->main != NULL ){
 			draw_text( gui->main, 400 +8, 8*2, 
 			    COLOR_WHITE, "Gramado Operating System" );
 			
@@ -412,7 +412,8 @@ draw_logon_stuff:
 				
 			draw_text( gui->main, 400 +8, 8*4, 
 			    COLOR_WHITE, "(This is the enviroment to run logon process)" );
-				
+		    }
+		    
 			//...
  	        
 			//draw_text(gui->screen, 640/2, 8, COLOR_WHITE, "Press F1 to Log on");
@@ -435,14 +436,15 @@ draw_logon_stuff:
 
 done:
 
-    printf ("create_logon: Done\n"); 
-
-    refresh_screen ();
-
+    logonStatus = 1;
+    
     gui->initialised = 1;
 
-    return;
+    printf ("init_logon_manager: Done\n"); 
+    
+    return 0;
 }
+
 
 
 /*
@@ -705,66 +707,6 @@ void logon_create_developer_screen (void)
 //
 
 
-/*
- *********************************************
- * LogonProcedure:
- *     O procedimento de janela do Logon.
- *
- */
-
-unsigned long 
-LogonProcedure ( 
-    struct window_d *window, 
-    int msg, 
-    unsigned long long1, 
-    unsigned long long2 ) 
-{
-
-	// Obs: 
-	// Deve ser simples para o módulo logon do kernel base.
-
-    switch (msg)
-    {
-        case MSG_SYSKEYDOWN:                 
-            switch(long1)	       
-            {   
-				//Start	
-				case VK_F1:
-					ExitLogon();               
-					startUserEnvironment(0,0);    
-                    break;
-					
-				//Reboot	
-                case VK_F2:
-					ExitLogon ();
-				    sys_reboot ();				
-                    break;				
-				
-				default:
-                    //Nothing.
-				    break;
-		    };              
-        break;
-		
-		default:
-		    //Nothing.
-		    break;
-	};
-	
-// Done.
-
-done:
-
-    if (VideoBlock.useGui == 1){
-        refresh_screen ();
-    }
-
-    return (unsigned long) 0;
-}
-
-
-
-
 int register_logon_process ( pid_t pid ){
 
     if (pid<0 || pid >= PROCESS_COUNT_MAX ){
@@ -779,91 +721,6 @@ int register_logon_process ( pid_t pid ){
 
     __gpidLogon = (pid_t) pid;
     
-    return 0;
-}
-
-
-
-/*
- **********************************************
- * init_logon:
- * 
- *     Inicializa o Logon.
- *     Obs: Aceita argumentos.
- * 
- * Argumentos:
- * -l ou /l; ...
- */
-
-int init_logon (int argc, char *argv[]){
-
-
-    int LogonFlag = 0;
-
-    char *s;    // String
-
-
-
-    debug_print ("init_logon:\n");
-
-
-    if (argc < 1){
-        goto done;
-    }
-
-
-    while (--argc) 
-    {
-        s = *++argv;
-		
-        if (*s == '-' || *s == '/') 
-		{
-            while (*++s) 
-			{
-                switch (*s) 
-				{
-                    case 'l':
-                        LogonFlag = 0;
-                        break;
-
-                    case 's':
-                        LogonFlag = 0;
-                        break;
-
-                    case 'r':
-					    LogonFlag = 0;
-                        break;
-
-                    case 'f':
-					    LogonFlag = 0;
-                        break;
-
-                    default:    
-					    //usage();
-						break;
-                };
-            };
-			
-        }else{
-            //usage();
-        }
-    };
-	
-	//
-	// Aqui deve-se habilitar as opções de acordo com a flag.
-	//
-	
-	//
-	// Keyboard support.
-	//
-	
-    ldisc_init_modifier_keys ();
-    ldisc_init_lock_keys ();
-
-done:
-
-    logonStatus = 1;	
-
     return 0;
 }
 

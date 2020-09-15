@@ -1324,19 +1324,17 @@ void fs_init_structures (void){
         root->used  = 1;
         root->magic = 1234;
 
-        
         root->name = (char *) ____root_name;
-        
         
         // Se o volume do vfs ainda não foi criado 
         // então não podemos prosseguir.
-        if ( (void *) volume_vfs == NULL ){
-            debug_print("fs_init_structures: volume_vfs not initialized");
-            panic("fs_init_structures: volume_vfs not initialized");
+        if ( (void *) volume_vfs == NULL )
+        {
+            debug_print("fs_init_structures: [FAIL] volume_vfs not initialized");
+            panic      ("fs_init_structures: [FAIL] volume_vfs not initialized");
         }
         
         volume_vfs->fs = root;
-        
         
         storage->fs = root;
         //...
@@ -1344,14 +1342,15 @@ void fs_init_structures (void){
 
 
 
-	//Type.
-	//#bugbug: 
-    //Em qual disco e volume pegamos o tipo de sistema de arquivos.
+    // Type.
+    // #bugbug: 
+    // Em qual disco e volume pegamos o tipo de sistema de arquivos?
 
-    Type = (int) get_filesystem_type ();   
 
-    if ( Type == 0 ){
-        panic ("fs_init_structures error: Type");
+    Type = (int) get_filesystem_type();
+
+    if ( Type <= 0 ){
+        panic ("fs_init_structures: [PANIC] Type");
 
     }else{
         root->type = (int) Type;
@@ -1362,40 +1361,47 @@ void fs_init_structures (void){
     {
         case FS_TYPE_FAT16:
 
-			//Rootdir.
+            // Disk stuff.
+            // spc - Sectors per cluster.
+            root->spc = (int) get_spc(); 
+
+            // Rootdir, Fat and data area.
+            // #bugbug: Specific for fat16.
             root->rootdir_address = VOLUME1_ROOTDIR_ADDRESS;
-            root->rootdir_lba = VOLUME1_ROOTDIR_LBA;
-
-			//Fat.
-			root->fat_address = VOLUME1_FAT_ADDRESS;
-	        root->fat_lba = VOLUME1_FAT_LBA;
-	        
-			//Dataarea.
-			//filesystem->dataarea_address = ??;
-            root->dataarea_lba = VOLUME1_DATAAREA_LBA;
-
-			//sectors per cluster.
-            root->spc = (int) get_spc(); //vari�vel
-            root->rootdir_entries = FAT16_ROOT_ENTRIES;
+            root->rootdir_lba     = VOLUME1_ROOTDIR_LBA;
+            root->fat_address     = VOLUME1_FAT_ADDRESS;
+            root->fat_lba         = VOLUME1_FAT_LBA;
+            root->dataarea_lba    = VOLUME1_DATAAREA_LBA;
+            //filesystem->dataarea_address = ??;
+ 
+            // Root dir.
+            
+            // Number of entries in the root dir.
+            // #bugbug: Specific for fat16.
+            root->dir_entries = FAT16_ROOT_ENTRIES;
+            
+            // Size of the entry in bytes.
+            // #bugbug: Specific for fat16.
             root->entry_size = FAT16_ENTRY_SIZE;
        
             // ...
+            break;
 
-		    break;
-
-	    case FS_TYPE_EXT2:
-		    //nothing for now.
-		    break;
+        // Nothing for now.
+        case FS_TYPE_EXT2:
+            panic ("fs_init_structures: [PANIC] FS_TYPE_EXT2 not supported");
+            break;
 
         //...
 
-
+        // Nothing for now.
         default:
-		    //nothing for now.
+            panic ("fs_init_structures: [PANIC] default Type");
             break;
     };
+    
+    // Done.
 }
-
 
 
 
@@ -1406,7 +1412,7 @@ void fs_show_root_fs_info(void)
     printf ("fs_show_root_fs_info:\n");
 
     //
-    // root structure.
+    // root fs structure.
     //
 
     if ( (void *) root == NULL ){
@@ -1420,12 +1426,12 @@ void fs_show_root_fs_info(void)
              goto fail;
         }
 
-        printf ("name = %s \n",           root->name );
-        printf ("Object type %d \n",      root->objectType );
-        printf ("Object class %d \n",     root->objectClass );
-        printf ("type = %d \n",           root->type );
-        printf ("Root dir entries %d \n", root->rootdir_entries );
-        printf ("Entry size %d \n",       root->entry_size );
+        printf ("name = %s \n",        root->name );
+        printf ("Object type %d \n",   root->objectType );
+        printf ("Object class %d \n",  root->objectClass );
+        printf ("type = %d \n",        root->type );
+        printf ("Dir entries %d \n",   root->dir_entries );
+        printf ("Entry size %d \n",    root->entry_size );
         //printf ("",root-> );
 
         refresh_screen();
@@ -1451,12 +1457,11 @@ fail:
 int fsInit (void)
 {
     int slot = -1;
-    
-    
-    
+
+
+
     debug_print ("fsInit:\n");
-    
- 
+
     // Undefined fs!
     set_filesystem_type(FS_TYPE_NULL);
 
@@ -1466,10 +1471,10 @@ int fsInit (void)
     //
 
     // #todo: 
-    // Devemos checar o tipo da partiçao de but. Se nao aqui, depois!
+    // Devemos checar o tipo da partiçao de boot. 
+    // Se nao aqui, depois!
 
     fat16Init();
-
 
 
 	//

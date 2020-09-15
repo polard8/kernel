@@ -41,7 +41,6 @@ kgws_send_to_controlthread_of_currentwindow (
     unsigned long long2 );
 
 
-int init_gui (void);
 int init_gramado (void);
 
 

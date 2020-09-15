@@ -1227,6 +1227,21 @@ int isatty (int fd)
 }
 
 
+/*
+ //alternative
+int isatty(int fd);
+int isatty(int fd)
+{
+	struct termios tmp;
+
+	if (ioctl(fd,TCGETS,&tmp)<0)
+		return (0);
+	return 1;
+}
+*/
+
+
+
 int 
 getopt (
     int argc, 

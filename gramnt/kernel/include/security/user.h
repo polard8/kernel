@@ -417,8 +417,6 @@ int __getusername (char *buffer);
 
 int __setusername (const char *new_username);
 
-int startUserEnvironment(int argc, char* argv[]); 
-
 int init_user_environment_manager(int argc, char *argv[]); 
 
 

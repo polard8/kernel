@@ -27,8 +27,8 @@
 //nos diretórios previamente combinados.
 //melhor que sejam poucos e que sempre sejam os mesmos.
 
-#define INIT_ROOT_PATH  "root:"
-#define INIT_BIN_PATH   "root:/volume2/bin"
+#define INIT_ROOT_PATH  "/"
+#define INIT_BIN_PATH   "/BIN"
 //...
 
 
@@ -96,22 +96,22 @@ void save_kernel_args (void){
  */
 
 int init_architecture_dependent (void){
-	
-	int Status = 0;
-	unsigned char Type;
-	
-	
-	debug_print ("init_architecture_dependent\n");
-	
-	//
-	// Fase. (Verificar se essa rotina foi chamada 
-	// na fase certa de inicialização.)
+
+    int Status = 0;
+    unsigned char Type=0;
+
+
+    debug_print ("init_architecture_dependent:\n");
+
     //
-	
-	if ( KeInitPhase != 1 )
-	{
-		panic ("init_architecture_dependent: KeInitPhase\n");	
-	}
+    // Fase. 
+    // (Verificar se essa rotina foi chamada na fase certa 
+    // de inicialização.)
+    //
+
+    if ( KeInitPhase != 1 ){
+        panic ("init_architecture_dependent: KeInitPhase\n");
+    }
 
 
 	// #### IMPORTANTE ####
@@ -131,119 +131,132 @@ int init_architecture_dependent (void){
     //refresh_screen();
     //while(1){};		
 	
-	
+
 	//
-	// * A estrutura para informações sobre o processador. 
+	// A estrutura para informações sobre o processador. 
 	//
-	
+
 	// Check structure.
-	if ( (void *) processor == NULL )
-	{
-	    panic ("sm-init-init_architecture_dependent: processor\n");
+    if ( (void *) processor == NULL ){
+        panic("init_architecture_dependent: processor\n");
     }
 
-	// Sonda pra ver qual é a marca do processador.
-	// @todo: É a segunda vez que fazemos a sondagem ?!
-	
-	Type = (int) hal_probe_processor_type();
-	
-	//Type.
-	processor->Type = (int) Type;
-	
-	
+
+    // Sonda pra ver qual é a marca do processador.
+    // #todo: 
+    // É a segunda vez que fazemos a sondagem ?!
+
+    Type = (int) hal_probe_processor_type();
+
+    if(Type==0)
+        panic("init_architecture_dependent: Type\n");
+
+    processor->Type = (int) Type;
+
+    //
+    // Inicializa de acordo com o tipo de processador.
+    // Essas rotinas pegarao informacoes sobre o processador
+    // e salvarao em estruturas
+    //
+
+    switch (Type)
+    {
+
+        case Processor_INTEL: 
+            init_intel(); 
+            break;
+
+        case Processor_AMD: 
+            init_amd(); 
+            break;
+
+        // ...
+
+
+        default:
+            panic ("init_architecture_dependent: default Type\n");
+            break;
+    };
+
+
 	//
-	//Inicializa de acordo com o tipo de processador..
+	// #todo: ?? maybe 
+	// GDT, IDT (usar extern).
 	//
-	
-	switch (Type)
-	{
-	    //Intel. (pega os parâmetros do processador intel e coloca na estrutura).
-	    case Processor_INTEL: 
-		    init_intel(); 
-			break;
-
-        //AMD. (pega os parâmetros do processador amd e coloca na estrutura).
-	    case Processor_AMD: 
-		    init_amd(); 
-			break;
-
-        //Continua ...
-			
-		//@todo: Aqui é um erro fatal.	
-		default:
-		    panic ("sm-init-init_architecture_dependent default Type\n");
-            break;		
-	};
-	
-	
-	//
-	// @todo: GDT, IDT (usar extern).
-	//	
-	
-	
-	// o contexto é depedente.
-	//Inicializando o Process manager.
-	init_process_manager ();
 
 
+	// #obs: O contexto é depedente.
+	// Inicializando o Process manager.
+
+    init_process_manager();
 
 
     //
     // Continua ...
     //
-	
+
     // Done.
-    
-	return (int) Status;
+
+    // 0 = ok.
+    return (int) Status;
 }
 
 
 
 /*
- ******************************************************************
+ ********************************************************
  * init_architecture_independent:
  *
- *    Rotina de inicialização da parte do sistema que é independente da 
- * arquitetura presente. Independente da tipo de processador. 
+ *    Rotina de inicialização da parte do sistema que é 
+ * independente da arquitetura presente. 
+ *    Independente da tipo de processador. 
  *    Obs: Essa é a fase 1 de inicialização.
  */
 
 int init_architecture_independent (void){
-	
-    int Status;
+
+    int Status=0;
+
 
     debug_print ("init_architecture_independent\n");
 
+
+    // #important
+    // We need to be in the phase 0.
+    
     if (KeInitPhase != 0){
         panic ("init_architecture_independent: KeInitPhase\n");
     }
 
-	
+
 	//
-	//  ## HAL ##
+	// == hal ===================================
 	//
-    
+
+
 	// #bugbug
 	// Se é HAL é dependente da arquitetura.
 	// Isso deveria ficar na outra rotina.
 	// Não mudaremos por enquanto.
-	
-#ifdef EXECVE_VERBOSE	
+
+//#todo: Mudar o nome EXECVE_VERBOSE
+#ifdef EXECVE_VERBOSE
     printf ("init_architecture_independent: Initializing HAL..\n");
 #endif
 
-    Status = init_hal ();
+    Status = init_hal();
 
     if (Status != 0){
-        panic ("init-init_architecture_independent: init_hal\n");
+        panic ("init_architecture_independent: init_hal fail\n");
     }
 
-	
     //
-	//  ## MICREOKERNEL ##
-	//
-	
-	
+    //  == mk =================================================
+    //
+
+    // mm, ipc, ps ...
+
+
 	// Microkernel:
 #ifdef EXECVE_VERBOSE
 	// Obs: O Microkernel lida com informações dependentes da arquitetura,
@@ -251,39 +264,39 @@ int init_architecture_independent (void){
 	//entre processos.
 	//#bugbug @todo: Se é microkernel é processo é registrador ... acho que leva em consideração a arquitetura.
 	printf ("init_architecture_independent: Initializing Microkernel..\n");
-#endif	
-	
-	Status = init_microkernel ();
+#endif
+
+
+    Status = init_microkernel();
 
     if (Status != 0){
-	    panic ("init-init_architecture_independent: init_microkernel\n");
+        panic ("init_architecture_independent: init_microkernel fail\n");
     }
-	
-	
+
+
 	//
-	// ## EXECUTIVE ##
+	// == executive ===============================================
 	//
-	
-	
+
+
     // Executive:
 #ifdef EXECVE_VERBOSE
 	// Obs: O executive não é tão dependente da arquitetura, ele é
 	//uma camada mais alta, porém será inicializado aqui para
 	//efeito de ordem, já que estamos inicializando os tres módulos
 	//básicos do kernel base nesse momento.
-	printf ("init_architecture_independent: Initializing Executive..\n");
-#endif	
-	
-	Status = init_executive ();
+    printf ("init_architecture_independent: Initializing Executive..\n");
+#endif
+
+
+    Status = init_executive();
 
     if (Status != 0){
-	    panic ("init-init_architecture_independent: init_executive\n"); 
+        panic ("init_architecture_independent: init_executive\n"); 
     }
 
-	//
-	// ## GWS ?? ##
-	//
-	
+
+
 	// Gramado:
 #ifdef EXECVE_VERBOSE
     printf ("init_architecture_independent: Initializing Gramado..\n");
@@ -294,24 +307,27 @@ int init_architecture_independent (void){
     // Deprecated?
 
     Status = init_gramado();
-    if (Status != 0)
-    {
-        panic ("init-init_architecture_independent: init_gramado\n"); 
+
+    if (Status != 0){
+        panic ("init_architecture_independent: init_gramado fail\n"); 
     }
 
+    //
+    // == window manager ================================
+    //
 
-    // Initializing window manager.
-
+    // #important:
+    // This is the window manager embedded in the base kernel.
 
     // Text mode not supported.
-    if (g_useGUI != 1)
-    {
-        panic ("init_architecture_independent: PANIC: No GUI!\n");
+    
+    if (g_useGUI != 1){
+        panic ("init_architecture_independent: [PANIC] No ring0 GUI!\n");
     }
 
-// Window manager.
+
 #ifdef EXECVE_VERBOSE
-    printf ("init-init_architecture_independent: init_window_manager\n");
+    printf ("init_architecture_independent: init_window_manager\n");
 #endif
 
     init_window_manager();
@@ -324,10 +340,11 @@ int init_architecture_independent (void){
 
 #ifdef EXECVE_VERBOSE
     printf ("init_architecture_independent: Done\n");
-    refresh_screen();
+    //refresh_screen();
     //while(1){}
 #endif
 
+    // 0=ok.
     return 0;
 }
 
@@ -347,29 +364,37 @@ void init_globals (void){
 
 
 #ifdef EXECVE_VERBOSE
-    printf("sm-init-init_globals:\n");
-   debug_print("init_globals:\n");
+    debug_print("init_globals:\n");
+    printf     ("init_globals:\n");
 #endif
+
 
     //Outros.
     errno = 0;
 
     // Inicializa as estruturas do fluxo padrão.
     // Isso vai usar a file table.
+    // #todo: Mudar para kstdioInitialize.
+    
     stdioInitialize();
 
 
-	//#importante
-	//>>> é a partir daqui que temos mensagens!!!
-	
-    screenInit ();
-	
-	//
-	// ## FIRST MESSAGE !! ##
-	//
-	
+    //
+    // == Now we can print strings in the screen ==================
+    //
+
+    screenInit();
+
+    //
+    // == First message ====================================
+    //
+
+    // #todo
+    // Maybe we can print the banner.
+
+
     debug_print("init_globals: WE HAVE MESSAGES NOW!\n");
-    printf("init_globals: First message!\n");
+    printf     ("init_globals: WE HAVE MESSAGES NOW!\n");
 
 
 	//
@@ -380,17 +405,18 @@ void init_globals (void){
 	// display manager (with GUI) 	
 	// Same as runlevel 3 + display manager.
 	// Full multi-user graphical mode. 
-	current_runlevel = 5;
-	
+
+    current_runlevel = 5;
+
     //===================	
-	//vamos atrazar configuração de janela em favor de configuração de mensagem
+	//vamos atrasar configuração de janela em favor de configuração de mensagem
 
 	//Atalho para a próxima mensagem de teclado..(test) debug
-	gNextKeyboardMessage = (int) 0;
+    gNextKeyboardMessage = (int) 0;
 	
 	//Essa flag bloqueia e impede que uma janela obtenha o foco.
-	gFocusBlocked = (int) 0;
-	
+    gFocusBlocked = (int) 0;
+
 	
 	//
 	// ==== Profiler ====
@@ -425,54 +451,53 @@ void init_globals (void){
 	// As globais relativas à usuário são independentes do 
 	// ambiente gráfico.
 	//
-	
-	//Group, User.
-	current_group = 0;
-	current_user  = 0;
-	
-	//User Session, Window Station, Dasktop.
-	current_usersession = 0;
-	current_room = 0;
-	current_desktop = 0;
-	
-	//Process, Thread.
-	current_process = (int) 0;
-	current_thread  = (int) 0;
 
-	// Kernel.
+	//User and group.
+
+    current_user  = 0;
+    current_group = 0;
+
+    // Security layers.
+    // user session, room(window station), desktop.
+    current_usersession = (int) 0;
+    current_room        = (int) 0;
+    current_desktop     = (int) 0;
+
+    //Process, Thread.
+    current_process = (int) 0;
+    current_thread  = (int) 0;
+
+
     kernel_request = 0;
 
 
-    // Globais no ambiente GUI.
-    if ( g_useGUI == 1 ){
-
-        // security layers.
-        current_usersession = (int) 0;    // Current User Session.
-        current_room = (int) 0;           // Current Room. (Window Station.)
-        current_desktop = (int) 0;        // Current Desktop.
-        
-        // Window support.
-        current_window = (int) 0;         // Current Window.
-        windows_count = (int) 0;          // Window count.
-        window_with_focus = (int) 0;      // Window with focus.
-        current_menu = (int) 0;           // Current Menu.
-        // Continua ...
-
-        // windows, menus ...
-        init_windows();
-        init_menus();
-
-        //Continua...
+    if ( g_useGUI != 1 ){
+        panic("init_globals: No GUI");
     }
+
+    // Window support.
+    current_window    = (int) 0;  // Current Window.
+    windows_count     = (int) 0;  // Window count.
+    window_with_focus = (int) 0;  // Window with focus.
+    current_menu      = (int) 0;  // Current Menu.
+    // Continua ...
+
+    // windows
+    init_windows();
+        
+    // #todo: Delete?
+    init_menus();
+
+    //Continua...
 
 
     // Messages.
     g_new_message = 0;
 
 
-
     // FS type.
     // type 1, fat16.
+    
     g_currentvolume_filesystem_type = FS_TYPE_FAT16;    
     g_currentvolume_fatbits = (int) 16;
 
@@ -491,22 +516,23 @@ void init_globals (void){
 	
 	//#bugbug isso esta dando problemas.
 #ifdef EXECVE_VERBOSE
-	backgroundDraw ( (unsigned long) COLOR_BLUE ); 
+    backgroundDraw ( (unsigned long) COLOR_BLUE ); 
 #endif
 
-	
-	//printf("#breakpoint glob");
+
+    //printf("#breakpoint glob");
     //refresh_screen(); 
     //while(1){}
-	
+
 	//
 	// Keyboard support.
 	//
 	
 	//ldisc_init_modifier_keys();
 	//ldisc_init_lock_keys();	
-	
-	//Continua ...
+
+
+    //Continua ...
 
 }
 
@@ -527,13 +553,14 @@ int init (void){
     int Status = 0;
 
 
-    debug_print ("==== init:\n");
+    debug_print ("==== core-init:\n");
 
     // Check kernel phase.
 
-    if ( KeInitPhase != 0 ){
-        debug_print ("init: KeInitPhase fail\n");
-        panic ("init: KeInitPhase\n");
+    if ( KeInitPhase != 0 )
+    {
+        debug_print ("core-init: KeInitPhase fail\n");
+        panic       ("core-init: KeInitPhase fail\n");
     }
 
 
@@ -542,7 +569,7 @@ int init (void){
 	//
 
     // Globals.
-    debug_print ("init: Globals\n");
+    debug_print ("core-init: Globals\n");
     init_globals ();
 
 
@@ -554,7 +581,7 @@ int init (void){
 	
 	
 #ifdef EXECVE_VERBOSE
-    printf ("sm-init-init: init_globals ok\n");     
+    printf ("core-init: init_globals ok\n");     
 #endif  
 
 	
@@ -566,26 +593,26 @@ int init (void){
 	
     //Object manager.	
 #ifdef EXECVE_VERBOSE	
-	printf ("sm-init-init: init_object_manager\n");
+	printf ("core-init: init_object_manager\n");
 #endif
 
 
-    debug_print ("init: Object manager\n");
+    debug_print ("core-init: Object manager\n");
     init_object_manager ();
 
 
     //i/o Manager.
 #ifdef EXECVE_VERBOSE	
-	printf("sm-init-init: ioInit\n");	
+	printf("core-init: ioInit\n");	
 #endif	
 
 
-    debug_print ("init: io manager\n");
+    debug_print ("core-init: io manager\n");
     ioInit ();
 
     // Inicializa o gerenciamento de dispositivos.
     // Inicializa a lista de dispositivos.
-    debug_print ("init: device manager\n");
+    debug_print ("core-init: device manager\n");
     
     init_device_manager ();
 
@@ -602,46 +629,46 @@ int init (void){
 	//#importante 
 	//A estrutura 'storage' vai ser o nível mais baixo.
 	//É nela que as outras partes devem se basear.
-    debug_print ("init: storage structure\n");
+    debug_print ("core-init: storage structure\n");
     
     storage = (void *) kmalloc ( sizeof(struct storage_d) );
 
     if ( (void *) storage == NULL ){
-       panic ("sm-init-init: storage");
+       panic ("core-init: storage");
     }
 
 
 #ifdef EXECVE_VERBOSE
-    printf ("sm-init-init: disk_init\n");
+    printf ("core-init: disk_init\n");
 #endif  
 
-    debug_print ("init: disk\n");
+    debug_print ("core-init: disk\n");
     disk_init ();
 
 
 #ifdef EXECVE_VERBOSE
-    printf("sm-init-init: volume_init\n");
+    printf("core-init: volume_init\n");
 #endif
 
-    debug_print ("init: volume\n");
+    debug_print ("core-init: volume\n");
     volume_init ();
 
 
 	
 #ifdef EXECVE_VERBOSE	
-	printf ("fsInit: VFS..\n");
+	printf ("core-init: VFS..\n");
 #endif
 
-    debug_print ("init: vfs\n");
+    debug_print ("core-init: vfs\n");
     vfsInit ();
 
 
 //deletar
 #ifdef EXECVE_VERBOSE	
-    printf ("sm-init-init: fsInit\n");
+    printf ("core-init: fsInit\n");
 #endif   
 
-    debug_print ("init: fs\n");
+    debug_print ("core-init: fs\n");
     fsInit ();
 
 
@@ -649,14 +676,14 @@ int init (void){
     // Mount root fs.
     // See: mountedList[] in sci/fs/fs.c
     // #test: Vamos tentar montar o volume root em mountedList[0].
-    debug_print ("init: [FIXME] Initialize mounted list in fs.c\n");
+    debug_print ("core-init: [FIXME] Initialize mounted list in fs.c\n");
 
     // Inicializa a lista.
     fs_initialize_mounted_list ();
         
 
 #ifdef EXECVE_VERBOSE
-    printf("sm-init-init: initialize_system_message_queue\n");
+    printf("core-init: initialize_system_message_queue\n");
 #endif
 
     initialize_system_message_queue (); 
@@ -666,27 +693,26 @@ int init (void){
 	// Network
 	//
 
-    debug_print ("init: network\n");
+    debug_print ("core-init: network\n");
     networkInit ();
 
-	
 
     //
     // Initialize Platform structure.
     //
 
 #ifdef EXECVE_VERBOSE
-    printf ("system-init: Platform\n");
+    printf ("core-init: Platform\n");
 #endif
 
     // #important
     // This is the Root struct. :)
-    debug_print ("init: Platform struct\n");
+    debug_print ("core-init: Platform struct\n");
     
     Platform = (void *) kmalloc ( sizeof(struct platform_d) );
 
     if ( (void *) Platform ==  NULL ){
-        panic ("init: Platform\n");
+        panic ("core-init: Platform\n");
 
     }else{
 
@@ -697,7 +723,7 @@ int init (void){
         Hardware = (void *) kmalloc ( sizeof(struct hardware_d) );
 
         if ( (void *) Hardware ==  NULL ){
-            panic ("init: Hardware\n");
+            panic ("core-init: Hardware\n");
 
         }else{
             Platform->Hardware = (void *) Hardware;
@@ -708,7 +734,7 @@ int init (void){
         Firmware = (void *) kmalloc ( sizeof(struct firmware_d) );
 
         if ((void *) Firmware ==  NULL ){
-            panic ("sm-init-init: Firmware\n");
+            panic ("core-init: Firmware\n");
 
         }else{
             Platform->Firmware = (void *) Firmware;
@@ -726,7 +752,7 @@ int init (void){
         System = (void *) kmalloc ( sizeof(struct system_d) );
 
         if ( (void *) System ==  NULL ){
-            panic ("init: System\n");
+            panic ("core-init: System\n");
 
         }else{
 
@@ -740,19 +766,29 @@ int init (void){
 		//...
     };
 
-	
-	//Fase 1: Inicia a parte independente da arquitetura.
+
     Status = (int) init_architecture_independent ();
     if (Status != 0){
-        panic ("init: init_architecture_independent fail\n"); 
+        panic ("core-init: init_architecture_independent fail\n"); 
     }
-	KeInitPhase = 1;
-    
+
+    //
+    // == phase 1 ? ================================================
+    //
+
+    printf("=========================\n");
+    printf("core-init: end of phase 0\n");
+    refresh_screen();
+    //while(1){}
+
+    KeInitPhase = 1;
+
+
 	//Fase 2: Inicia a parte de arquitetura especifica da máquina atual.
 	//        Ou seja, considera a marca do processador.
     Status = (int) init_architecture_dependent ();
     if (Status != 0){
-        panic ("init: init_architecture_dependent fail\n"); 
+        panic ("core-init: init_architecture_dependent fail\n"); 
     }
 
 
@@ -761,10 +797,25 @@ int init (void){
     // Só podemos carregar o diretório raiz depois que 
     // inicializamos o controlador de IDE e as estruturas de 
     // sistema de arquivos.
+    // #todo: Precisamos inicializar a estrutura de diretorio
+    // usada pelo diretorio raiz, para colocarmos o ponteiro
+    // na estrutura de processos, juntamente com o ponteiro
+    // para o cwd. 
+    // Talvez essa seja a hora de criarmos a estrutura para
+    // o diretorio raiz, mas ainda nao temos estrutura de processo.
 
-    debug_print ("init: load root dir.\n");
+    debug_print ("core-init: load root dir.\n");
     fs_load_rootdir ();
 
+
+    //
+    // == phase 2 ? ================================================
+    //
+
+    printf("=========================\n");
+    printf("core-init: end of phase 1\n");
+    refresh_screen();
+    //while(1){}
 
     KeInitPhase = 2;
 
@@ -778,7 +829,7 @@ int init (void){
 	//  ==============  #### LOGON #### ===============
 	//
 
-    debug_print ("init: logon\n");
+    debug_print ("core-init: logon\n");
 
 	
 	//printf("#breakpoint before logon");
@@ -798,26 +849,34 @@ int init (void){
     // de acordo com predefinição.
     //
 
+    // See:
+    // windows/logon.c
 
-    if ( g_useGUI == 1 )
-    {
 
-#ifdef EXECVE_VERBOSE
-    printf ("sm-init-init: calling create_logon ...\n");
-#endif
-        create_logon ();
+    if ( g_useGUI != 1 )
+        panic("core-init: NO GUI");
 
-#ifdef EXECVE_VERBOSE
-    printf ("sm-init-init: calling init_logon ...\n");
-#endif
-        //Libera. (Aceita argumentos).
-        init_logon (0,0);    
 
-        //Obs: *IMPORTANTE Usa-se o procedimento de janela do Logon.
-    };
+    printf ("core-init: calling init_logon_manager ...\n");
+    init_logon_manager();
+
+    // #todo
+    // Talvez devamos antecipar isso, pois faz parte do teclado.
+    
+    ldisc_init_modifier_keys ();
+    ldisc_init_lock_keys ();
+
+
+    //
+    // == phase 3 ? ================================================
+    //
+
+    printf("=========================\n");
+    printf("core-init: end of phase 2\n");
+    refresh_screen();
+    //while(1){}
 
     KeInitPhase = 3; 
-
 
 
     //#debug
@@ -845,20 +904,29 @@ int init (void){
     //printf("Done!\n");	
 	//refresh_screen();
 	//@todo: Deve retornar a variável Status.
-	
-	
+
+
 #ifdef BREAKPOINT_TARGET_AFTER_INIT
     //#debug 
 	//a primeira mensagem só aparece após a inicialização da runtime.
 	//por isso não deu pra limpar a tela antes.
-	printf("debug hang: after init");
-	refresh_screen(); 
-	while (1){ asm ("hlt"); }
+    printf("core-init: debug breakpoint after init");
+    refresh_screen(); 
+    while (1){ 
+        asm ("cli");
+        asm ("hlt"); 
+    }
 #endif
 
-
     debug_print ("==== init: done\n");
-    printf ("sm-init-init: done\n");
+    printf      ("==== init: done\n");
+
+
+
+    // #debug
+    //printf("*breakpoint\n");
+    //refresh_screen();
+    //while(1){}
 
     return 0;  
 }
