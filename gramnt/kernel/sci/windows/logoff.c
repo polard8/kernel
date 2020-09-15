@@ -1,5 +1,5 @@
 /*
- * File: gramado\logoff\logoff.c
+ * File: windows/logoff.c
  *
  *  Kernel Mode Logoff Support Routines.
  *
@@ -23,7 +23,6 @@
 
 
 
-
 // See: include/gpid.h
 int register_logoff_process ( pid_t pid ){
 
@@ -43,18 +42,10 @@ int register_logoff_process ( pid_t pid ){
 }
 
 
-//deprecated
-int StartLogoff(int argc, char *argv[]) 
+// #todo
+int init_logoff (int mode) 
 {
-    panic ("StartLogoff: DEPRECATED");
-    return -1;
-}
-
-
-// deprecated
-int init_logoff (int argc, char *argv[]) 
-{
-    panic ("init_logoff: DEPRECATED");
+    panic ("init_logoff: [TODO]");
     return -1;
 }
 

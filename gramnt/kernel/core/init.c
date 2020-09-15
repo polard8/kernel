@@ -542,11 +542,13 @@ void init_globals (void){
  * init:
  *     Base initializations.
  *     (Four phases).
- *     Isso foi chamado por systemStartUp() em execve/sm/system.c
+ *     Isso foi chamado por systemStartUp() em core/system.c
  *   
  *    #todo: 
  *    Descrever aqui as fazer dessa rotina.
  */ 
+
+// It was called by systemStartUp() in core/system.c
 
 int init (void){
 
@@ -808,6 +810,19 @@ int init (void){
     fs_load_rootdir ();
 
 
+	// Disable interrupts, lock task switch and scheduler.
+	
+	asm ("cli");
+	set_task_status(LOCKED); 
+	scheduler_lock();
+
+    // #todo
+    // Talvez devamos antecipar isso, pois faz parte do teclado.
+    
+    ldisc_init_modifier_keys ();
+    ldisc_init_lock_keys ();
+
+
     //
     // == phase 2 ? ================================================
     //
@@ -859,13 +874,6 @@ int init (void){
 
     printf ("core-init: calling init_logon_manager ...\n");
     init_logon_manager();
-
-    // #todo
-    // Talvez devamos antecipar isso, pois faz parte do teclado.
-    
-    ldisc_init_modifier_keys ();
-    ldisc_init_lock_keys ();
-
 
     //
     // == phase 3 ? ================================================

@@ -32,12 +32,14 @@
  * de configuraçãoou em metafiles, que serão lidos nesse momento.
  * 
  *
- * Obs: A tela de logon poderia, como opção, apresentar as configurações
- *      gravadas em um metafile do sistema. Pois as configurações são
- *      realizadas nesse momento. 
- *      Poderia mostrar configurações salvas em variáveis globais.
+ * Obs: 
+ * A tela de logon poderia, como opção, apresentar as configurações
+ * gravadas em um metafile do sistema. Pois as configurações são
+ * realizadas nesse momento. 
+ * Poderia mostrar configurações salvas em variáveis globais.
  *
- *      *IMPORTANTE: O logon deve ser um programa em user mode que chama rotinas aqui contidas.
+ * IMPORTANTE: 
+ * O logon deve ser um programa em user mode que chama rotinas aqui contidas.
  *
  * Quando logon virar um proceso em user mode:
  * +Registra o processo de logon
@@ -57,7 +59,6 @@
 //
 
 void logon_create_screen_window (void);
-void logon_create_main_window (void);
 int ExitLogon (void);
 
 
@@ -75,8 +76,9 @@ int ExitLogon (void);
  *     Usuário.
  */
 
-int init_logon_manager (void){
+// It was called by init() in init.c
 
+int init_logon_manager (void){
 
     struct window_d *hWindow; 
     int z=0;
@@ -85,11 +87,11 @@ int init_logon_manager (void){
 	// #suspenso.
 	// Suspendemos o uso de variaveis importadas do Makefile,
 	// essa era o buffer delas.
-	// char str_tmp[120];	 
+	// char str_tmp[120];
 
-    debug_print ("init_logon_manager\n");
+    debug_print ("init_logon_manager:\n");
 
-	
+
 	//
 	// Atenção
 	//
@@ -102,8 +104,8 @@ int init_logon_manager (void){
 	// Será uma cor mais clara.
 	
 	// Limpa a tela e reinicia o curso em (0,0);
-	// Isso funcionou em init.c
-    backgroundDraw ( (unsigned long) COLOR_GRAY ); 
+
+    //backgroundDraw ( (unsigned long) COLOR_GRAY ); 
 
     kprintf ("*\n");
     //kprintf ("**\n");
@@ -111,14 +113,6 @@ int init_logon_manager (void){
     //kprintf ("**\n");
     kprintf ("*\n");
 
-
-	//g_guiMinimal = 1;
-	
-	// Disable interrupts, lock task switch and scheduler.
-	
-	asm ("cli");
-	set_task_status(LOCKED); 
-	scheduler_lock();
 
 	//
 	// GUI Structure. 
@@ -223,8 +217,6 @@ int init_logon_manager (void){
 
 
 
-
-
 	    //Inicia estrutura.
 		//window.c
 
@@ -249,24 +241,37 @@ int init_logon_manager (void){
         panic("init_logon_manager: CurrentUser");
     }
 
-     
-     logon_create_screen_window (); 
+     //printf("*breakpoint\n");
+     //refresh_screen();
+     //while(1){}
 
-     logon_create_main_window (); 
+    // This will create the screen window.
+    // The screen window will be the main window too.
 
+    logon_create_screen_window(); 
+
+
+    if ( (void *) gui->screen == NULL )
+        panic("init_logon_manager: No sreen window!");
+
+    if ( (void *) gui->main == NULL )
+        panic("init_logon_manager: No main window!");
 
     if ( (void *) gui->main != NULL ){
 
-        draw_text ( gui->main, 400 +8, 8*2, 
+        draw_text ( gui->main, 8, 8, 
             COLOR_WHITE, "Gramado Operating System" );
 
-        draw_text( gui->main, 400 +8, 8*3, 
-            COLOR_WHITE, "(under construction) ");
+        //draw_text( gui->main, 400 +8, 8*3, 
+            //COLOR_WHITE, "(under construction) ");
 
-        draw_text( gui->main, 400 +8, 8*4, 
-            COLOR_WHITE, "(This is the enviroment to run logon process)" );
+        //draw_text( gui->main, 400 +8, 8*4, 
+            //COLOR_WHITE, "(This is the enviroment to run logon process)" );
     }
 
+     //printf("*breakpoint\n");
+     //refresh_screen();
+     //while(1){}
 
     // ...
 
@@ -276,11 +281,10 @@ done:
     
     gui->initialised = 1;
 
-    printf ("init_logon_manager: Done\n"); 
+    kprintf ("init_logon_manager: Done\n"); 
     
     return 0;
 }
-
 
 
 /*
@@ -344,12 +348,8 @@ void logon_create_screen_window (void){
 	// # minimized
 	// não pode ser pintada nem repintada.
 
-    //#bugbug
-    //Tá falhando na máquina real mais ou menos nessa hora.
-    // vamos testar minimizada como antes, quando funcionava,
-
-    //hWindow = (void *) CreateWindow ( WT_SIMPLE, 0, VIEW_FULL, "Screen", 
-    hWindow = (void *) CreateWindow ( 1, 0, VIEW_MINIMIZED, "Screen", 
+    hWindow = (void *) CreateWindow ( 
+                           WT_SIMPLE, 0, VIEW_FULL, "Screen",
                            Left, Top, Width, Height, 
                            NULL, 0, 0, COLOR_BLACK );  
 
@@ -371,9 +371,12 @@ void logon_create_screen_window (void){
         }else{
 
             gui->screen = (void *) hWindow;
+            gui->main   = (void *) hWindow;
 
-			// z order
-			// Primeira janela da ordem;
+
+            // z order
+            // Primeira janela da ordem;
+            
             hWindow->z = 0;
             Windows[KGWS_ZORDER_BOTTOM] = (unsigned long) hWindow;
 
@@ -382,27 +385,6 @@ void logon_create_screen_window (void){
 			// while(1){}
 		};
     };
-}
-
-
-/*
- *************************************************
- * logon_create_main_window:
- *      A área de trabalho.
- * 
- *  #Importante: 
- *  É a área disponível na tela para o aplicativo. 
- */
-
-void logon_create_main_window (void)
-{
-    // #bugbug
-    // Cuidado com isso!
-    
-    // #todo
-    // Checks!
-    
-    gui->main = (void *) gui->screen;
 }
 
 

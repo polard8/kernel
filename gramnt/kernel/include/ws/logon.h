@@ -1,5 +1,5 @@
 /*
- * File: logon.h
+ * File: ws/logon.h
  *
  * Descrição:
  *     Kernel Mode Logon Support Routines.
@@ -22,11 +22,10 @@
  
 //flag, usar ou naõ o default user. 
 int g_use_default_user; 
- 
- 
+
 
 //
-// Protótipos.
+// == Prototypes ====================================
 // 
 
 

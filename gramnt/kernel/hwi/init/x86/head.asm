@@ -176,7 +176,11 @@ KRN_ENTRYPOINT equ 0x00101000    ;Entry Point.
 ;
 ; Isso � chamado por boot.asm.
 ;
-    
+
+;Called by:
+;_kernel_begin in hwi/init/x86/boot.asm
+
+
 head_init:
 
 

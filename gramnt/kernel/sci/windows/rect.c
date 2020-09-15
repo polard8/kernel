@@ -496,15 +496,17 @@ refresh_rectangle2 (
 // Inicializando a estrutura de gerenciamento de retângulo salvo.
 
 int initialize_saved_rect (void){
+
+	printf ("initialize_saved_rect:\n");
 	
 	// Alocando memória para a estrutura de gerenciamento do retângulo.
 
     SavedRect = (void *) kmalloc ( sizeof(struct saved_rect_d) );   
 
-    if ( (void *) SavedRect ==  NULL )
-    {
-		panic ("initialize_saved_rect: struct");
-	} else {
+    if ( (void *) SavedRect ==  NULL ){
+        panic ("initialize_saved_rect: struct");
+
+    } else {
      
         // 800x600x3 (resolução máxima) 351+ páginas.
 		//com isso poderemos salvar uma tela nessa resolução.
@@ -533,9 +535,9 @@ int initialize_saved_rect (void){
 	};		
 
 	//#debug
-	printf ("initialize_saved_rect: *done");
+	printf ("initialize_saved_rect: done\n");
 	//refresh_screen();
-	
+
 	//while (1){ asm ("hlt"); }
 	
     return 0;

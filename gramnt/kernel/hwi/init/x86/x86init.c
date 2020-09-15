@@ -113,7 +113,8 @@ void x86mainStartFirstThread (void){
     }
 
     // * MOVEMENT 2 ( Standby --> Running)
-    if ( Thread->state == STANDBY ){
+    if ( Thread->state == STANDBY )
+    {
         Thread->state = RUNNING;
         queue_insert_data ( queue, (unsigned long) Thread, QUEUE_RUNNING);
     }
@@ -255,7 +256,10 @@ void __x86StartInit (void){
 
     int fileret = -1;
  
-     
+
+    debug_print ("__x86StartInit:\n");
+
+
     //
     // INIT.BIN
     //
@@ -368,11 +372,13 @@ void __x86StartInit (void){
  *     2015 - Created by Fred Nora.
  */
 
-
 // #todo:
 // #importante:
 // Usar essa função para chamar uma sequência de funções.
 // Isso evita a dispersão das rotinas de inicialização.
+
+// Called by:
+// head_init in hwi/init/x86/head.asm
 
 int x86main (void){
 
@@ -449,8 +455,12 @@ int x86main (void){
     init_gdt ();
 
 
+    //printf("*breakpoint\n");
+    //refresh_screen();
+    //while(1){}
+
     //
-    // Processes and threads.
+    // == Processes and threads ===================================
     //
 
 
@@ -558,8 +568,13 @@ int x86main (void){
 
 	// Cria e inicializa apenas o INIT.BIN
     __x86StartInit ();
-    
- 
+
+
+    //printf("*breakpoint\n");
+    //refresh_screen();
+    //while(1){}
+
+
 	//
 	//===============================================
 	//
@@ -619,14 +634,16 @@ int x86main (void){
     // #todo: 
     // Essa inicialização deve ser adiada.
     // deixando para o processo init fazer isso.
-    
-    //ps2 ();
+    // See: i8042.c
+
+    //ps2();
 
 
     // #todo:
     // Chamaremos essa inicialização básica nesse momento.
     // A inicialização completa será chamada pelo processo init.
-    
+    // See: i8042.c
+
     early_ps2_init();
 
 
@@ -651,6 +668,11 @@ int x86main (void){
 	// suficientes para essa rotina funcionar.
 
     windowLoadGramadoIcons();
+
+
+    //printf("*breakpoint\n");
+    //refresh_screen();
+    //while(1){}
 
 
     //
@@ -771,7 +793,7 @@ done:
     refresh_screen();
 #endif
 
-        x86mainStartFirstThread ();        
+        x86mainStartFirstThread(); 
 
         printf ("[x86] x86main: No idle thread selected\n");
         goto fail;
@@ -779,6 +801,11 @@ done:
 
     // ok
     return 0;
+
+
+    //
+    // fail
+    //
 
 fail:
 

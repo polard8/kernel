@@ -1,6 +1,5 @@
 /*
- * File: top/syssm/system/system.c
- * 
+ * File: core/system.c
  * 
  * sm - System Management - 
  * Seu objetivo principal é receber os comandos de gerenciamento,
@@ -1524,6 +1523,11 @@ int systemStartUp (void){
     debug_print ("==== systemStartUp:\n");
     printf("systemStartUp:\n");
 
+
+    //
+    // == phase 0 ========================================
+    //
+
     KeInitPhase = 0;    //Set Kernel phase.    
 
 
@@ -1590,9 +1594,10 @@ int systemStartUp (void){
 
         Status = (int) init(); 
 
-        if ( Status != 0 ){
-            debug_print ("sm-systemStartUp: init fail\n");
-            panic ("sm-systemStartUp error: init\n");
+        if ( Status != 0 )
+        {
+            debug_print ("systemStartUp: init fail\n");
+            panic       ("systemStartUp: init fail\n");
         }
 
         //...
@@ -1600,18 +1605,20 @@ int systemStartUp (void){
     }; //--else
 
 
+    // System Version:
+    // Configurando a versão do sistema.
+    // #todo
+    // Talvez o init deva chamar essa rotina,
+    // para configurar a versao e o produto
 
-	// System Version:
-	//     Configurando a versão do sistema.
-    printf("systemStartUp: Setup version\n");
+    printf ("systemStartUp: Setup version\n");
     
-    
-   // #todo
-   // Talvez o init deva chamar essa rotina,
-   // para configurar a versao e o produto
-   systemSetupVersion();
+    systemSetupVersion();
 
 
+    //printf("*breakpoint\n");
+    //refresh_screen();
+    //while(1){}
 
 
 // Done: 
@@ -1640,7 +1647,7 @@ done:
 
 
     // ok
-    printf("systemStartUp: done\n");
+    printf ("systemStartUp: done\n");
     
     return (int) Status;
 }
@@ -1652,7 +1659,9 @@ done:
  *     Inicializando algumas variáveis.
  */
  
-// Called by:??
+// Called by:
+// x86main() in hwi/init/x86/x86init.c
+// ...
 
 int systemInit (void){
 
@@ -1717,6 +1726,12 @@ int systemInit (void){
 	// See: ...
     printf("systemInit: done\n");
     
+ 
+    //printf("*breakpoint\n");
+    //refresh_screen();
+    //while(1){}
+  
+  
     return (int) Status;
 }
 
