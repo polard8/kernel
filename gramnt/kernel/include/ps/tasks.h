@@ -109,7 +109,7 @@ void save_context_of_new_task (int id, unsigned long *task_address); //??
  * #todo: mover tudo para o arquivo ki.h ??   
  */	
 
-void KiTaskSwitch (void);
+
 
 void KiCpuFaults(unsigned long fault_number);
 
@@ -167,9 +167,7 @@ void KiDebugBreakpoint (void);
 
 void KiShowTasksParameters (void);
 
-
-
-void KiShowPreemptedTask (void);	
+void KiShowPreemptedTask (void);
 
  
 //

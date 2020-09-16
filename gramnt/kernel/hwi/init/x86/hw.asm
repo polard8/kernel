@@ -68,7 +68,7 @@ extern _irq15_SECONDARY_IDE
 
 
 ;; It is used bu the irq0.
-extern _KiTaskSwitch 
+extern _psTaskSwitch 
 
 
 ;; @todo:
@@ -141,7 +141,7 @@ _irq0:
     call _irq0_TIMER
 
     ;; Task switching.
-    call _KiTaskSwitch
+    call _psTaskSwitch
 
     ;Flush TLB.
     jmp dummy_flush

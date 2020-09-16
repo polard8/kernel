@@ -1,5 +1,5 @@
 /*
- * File: sysmk/create.c
+ * File: ps/create.c
  *
  *   cria a thread idle do processo init;
  */
@@ -310,8 +310,6 @@ void *createCreateInitThread (void){
 
     return (void *) InitThread;
 }
-
-
 
 
 //

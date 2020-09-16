@@ -30,16 +30,16 @@
 
 int init_runtime (void){
 
-
     int Status = 0;
-    debug_print ("init_runtime:\n");
 
+
+    debug_print ("init_runtime:\n");
     debug_print ("[Kernel] init_runtime: Initializing runtime ...\n");
+
 
     //
     // Current arch.
     //
-
 
     switch (current_arch)
     {

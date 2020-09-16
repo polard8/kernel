@@ -1,5 +1,5 @@
 /*
- * File: ps/action/ts.c
+ * File: ps/ts.c
  *
  *     Task Switching.
  *
@@ -39,7 +39,9 @@ void taskswitchFlushTLB(){
 
 
 /*
- * KiTaskSwitch:
+ ****************************************************
+ * psTaskSwitch:
+ * 
  *     Interface para chamar a rotina de Task Switch.
  *     Essa rotina somente é chamada por hw.inc.
  *     KiTaskSwitch em ts.c gerencia a rotina de 
@@ -69,24 +71,29 @@ void taskswitchFlushTLB(){
 	// >> ?? Na saída ??
 	
 	// ?? quem atualizou as variáveis de critério de escolha ??? o dispacher ??
-*/ 
- 
-void KiTaskSwitch (void){
+*/
+
+
+// Called by:
+// _irq0 in hw.asm
+
+void psTaskSwitch (void){
 
 	//Limits.
 
 
-    if ( current_thread < 0 || current_thread >= THREAD_COUNT_MAX ){
-        printf ("KiTaskSwitch: current_thread %d", current_thread ); 
-        die ();
+    if ( current_thread < 0 || current_thread >= THREAD_COUNT_MAX )
+    {
+        printf ("psTaskSwitch: current_thread %d", current_thread ); 
+        die();
     }
 
 
-    if ( current_process < 0 || current_process >= PROCESS_COUNT_MAX ){
-        printf ("KiTaskSwitch: current_thread %d", current_process );
-        die ();
+    if ( current_process < 0 || current_process >= PROCESS_COUNT_MAX )
+    {
+        printf ("psTaskSwitch: current_thread %d", current_process );
+        die();
     }
-
 
 
 #ifdef SERIAL_DEBUG_VERBOSE
@@ -95,9 +102,11 @@ void KiTaskSwitch (void){
 #endif
 
 
-	// ## Task switch ##
+    //
+    // real task switch
+    //
 
-    task_switch ();
+    task_switch();
 
     // obs: 
     // Nessa hora já temos um thread atual e um processo atual 
@@ -107,7 +116,7 @@ void KiTaskSwitch (void){
     // ou outra thread com limites válidos.
  
     // #importante:   
-    // Retornando para _irq0 em head/x86/hw.inc.
+    // Retornando para _irq0 em x86/hw.inc.
 }
 
 

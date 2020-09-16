@@ -20,18 +20,17 @@
 #include <kernel.h>
 
 
-static inline void spawnSetCr3 ( unsigned long value ){
-	
-	
+static inline void spawnSetCr3 ( unsigned long value )
+{
 	//#todo:
 	//Podemos fazer alguma filtragem aqui ??
 	
     __asm__ ( "mov %0, %%cr3" : : "r" (value) );
-};
+}
 
 
 /*
- **********************************************************************
+ ******************************************************************
  * KiSpawnTask:
  *     Interface para chamada de m�dulo interno para rotina de 
  * spawn de thread.
@@ -43,7 +42,8 @@ static inline void spawnSetCr3 ( unsigned long value ){
 void KiSpawnTask (int id){
 
 
-    if ( id < 0 || id >= THREAD_COUNT_MAX ){
+    if ( id < 0 || id >= THREAD_COUNT_MAX )
+    {
         printf ("spawn-KiSpawnTask: TID=%d", id );
         die ();
     }

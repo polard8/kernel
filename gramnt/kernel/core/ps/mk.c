@@ -1,9 +1,5 @@
 /*
- * Gramado Microkernel - The main file for the Microkernel module in the 
- * kernel base. 
- * (c) Copyright 2015 Fred Nora.
- *
- * File: mk.c 
+ *  mk ?
  *
  * History:
  *     2015 - Created by fred Nora.
@@ -11,6 +7,7 @@
 
  
 #include <kernel.h>
+
 
 //#todo
 //MicroKernel Internal Data.
@@ -20,58 +17,59 @@
 //unsigned char  MicrokernelName[] = "MICROKERNEL LAYER";
 
 
-//#define LOCALSTUFF1 0
-//int localsstuff1;
 
+// Coloca um processo ou thread em um dos planos de execução
 
-//coloca um processo ou thread em um dos planos de execução
 int jobcontrol ( int type, int id, int plane ){
-	
-	struct process_d *p;
-	struct thread_d *t;
-	
-    switch(type)
-    {
-		case PROCESS:
-		    goto do_process;
-		    break;
-			
-		case THREAD:
-		    goto do_thread;
-			break;
-			
-		default:
-		   goto fail;
-           break;		
-	};
-	
-	goto fail;
+
+    struct process_d  *p;
+    struct thread_d   *t;
+
+
+    switch (type){
+
+        case PROCESS: goto do_process; break;
+        case THREAD:  goto do_thread;  break;
+
+        default:
+           goto fail;
+           break;
+    };
+
+    goto fail;
 
 do_process:
-    if( id <0 || id >= PROCESS_COUNT_MAX ){
-		goto fail;
-	}else{
-		
-		p = (struct process_d*) processList[id];
-		if( (void*) p == NULL ){
-			goto fail;
-		}else{
-			
-			if( p->used != 1 || p->magic != 1234 ){
+
+    if ( id <0 || id >= PROCESS_COUNT_MAX )
+    {
+        goto fail;
+     
+     }else{
+
+        p = (struct process_d*) processList[id];
+
+        if ( (void*) p == NULL )
+        {
+            goto fail;
+        }else{
+
+			if ( p->used != 1 || p->magic != 1234 ){
 				goto fail;
 			}
-			
+
 			if( plane == FOREGROUND ){
-			    p->plane = (int) plane;	
+			    p->plane = (int) plane;
 			}else{
 				//Default
 				p->plane = (int) BACKGROUND;
 			};
 			goto done;
 		};
-	};
+    };
 
-do_thread:	
+
+do_thread:
+
     if( id <0 || id >= THREAD_COUNT_MAX ){
 		goto fail;
 	}else{
@@ -93,8 +91,10 @@ do_thread:
 			goto done;
 		};
 	};	
-	
+
+
 fail:
+    debug_print("jobcontrol: [FAIL] \n");
     return (int) -1;
 done:
     return (int) 0;	

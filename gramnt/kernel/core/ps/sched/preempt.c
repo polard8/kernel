@@ -26,11 +26,11 @@
  
 void preempt (void){
 
-    int Current;
-    int Next = 0;
-
     struct thread_d *t; 
-	//...
+
+    int Current=0;
+    int Next=0;
+
 
 	// Preempt current.
 

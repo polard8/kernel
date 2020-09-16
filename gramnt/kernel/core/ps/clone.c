@@ -1,5 +1,5 @@
 /*
- * File: ps/action/clone.c 
+ * File: ps/clone.c 
  * 
  */
 
@@ -22,7 +22,7 @@ pid_t clone_process (void){
     struct process_d *Clone;
 
     unsigned long *dir;
-    unsigned long old_dir_entry1; 
+    unsigned long old_dir_entry1 = 0; 
     //unsigned long old_image_pa; //usado para salvamento.
 
     int Ret = -1;

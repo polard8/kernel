@@ -991,7 +991,7 @@ int mmInit (void){
     Status = (int) init_stack();
 
     if (Status != 0){
-        printf ("mmInit: [FAIL]Stack\n");
+        printf ("mmInit: [FAIL] Stack\n");
         goto fail;
     }
 

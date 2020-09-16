@@ -404,9 +404,10 @@ void *allocPages (int size){
 
     __first_free_slot = (int) firstSlotForAList(size);
 
-    if ( __first_free_slot == -1 ){
+    if ( __first_free_slot == -1 )
+    {
         debug_print ("mmpool-allocPages: No more free slots\n");
-        panic ("mmpool-allocPages: No more free slots\n");
+        panic       ("mmpool-allocPages: No more free slots\n");
     }
 
 

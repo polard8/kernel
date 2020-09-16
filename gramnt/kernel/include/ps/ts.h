@@ -5,6 +5,8 @@
 // task switching
 
 
+void psTaskSwitch (void);
+
 void task_switch (void);
 
 void taskswitch_lock (void);
@@ -13,6 +15,6 @@ void taskswitch_unlock (void);
 
 
 //
-//
+// End.
 //
 
