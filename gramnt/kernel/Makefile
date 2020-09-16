@@ -281,10 +281,12 @@ all-c:
 	$(CC) -c core/ps/x86/x86cont.c   $(KINCLUDE)  $(CFLAGS) -o x86cont.o
 	$(CC) -c core/ps/x86/x86fault.c  $(KINCLUDE)  $(CFLAGS) -o x86fault.o
 	$(CC) -c core/ps/x86/x86start.c  $(KINCLUDE)  $(CFLAGS) -o x86start.o
-	$(CC) -c core/ps/x86/memory.c    $(KINCLUDE)  $(CFLAGS) -o memory.o
-	$(CC) -c core/ps/x86/mminfo.c    $(KINCLUDE)  $(CFLAGS) -o mminfo.o
-	$(CC) -c core/ps/x86/mmpool.c    $(KINCLUDE)  $(CFLAGS) -o mmpool.o
-	$(CC) -c core/ps/x86/pages.c     $(KINCLUDE)  $(CFLAGS) -o pages.o
+
+	# mm
+	$(CC) -c core/mm/memory.c  $(KINCLUDE)  $(CFLAGS) -o memory.o
+	$(CC) -c core/mm/mminfo.c  $(KINCLUDE)  $(CFLAGS) -o mminfo.o
+	$(CC) -c core/mm/mmpool.c  $(KINCLUDE)  $(CFLAGS) -o mmpool.o
+	$(CC) -c core/mm/pages.c   $(KINCLUDE)  $(CFLAGS) -o pages.o
 
 
 	# ps
