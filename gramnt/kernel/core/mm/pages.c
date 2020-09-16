@@ -773,7 +773,7 @@ mapping_nic1_device_address ( unsigned long pa )
 
 /*
  *************************************************************
- * SetUpPaging:
+ * mmSetUpPaging:
  *     Configura o diret�rio de p�ginas do processo Kernel e 
  * algumas tabelas de p�ginas.
  *
@@ -811,7 +811,7 @@ mapping_nic1_device_address ( unsigned long pa )
  *     ...
  */
 
-int SetUpPaging (void){
+int mmSetUpPaging (void){
 
     unsigned int i=0;
     int Index=0;
@@ -1023,7 +1023,7 @@ int SetUpPaging (void){
     // Message. (verbose).
 
 #ifdef PS_VERBOSE
-    printf ("SetUpPaging: Initializing Pages..\n");
+    printf ("mmSetUpPaging: Initializing Pages..\n");
 #endif
 
 
@@ -1588,10 +1588,10 @@ int SetUpPaging (void){
     // A memória tem menos de 64MB,
     // Então não conseguiremos criar uma frame_table 
     // que começe na marca de 32mb.
+    
     }else{
-
-        debug_print ("pages-c: #PANIC: Less than 64MB\n");
-        panic ("pages-c: #PANIC: Less than 64MB\n");
+        debug_print ("mmSetUpPaging: [PANIC] Less than 64MB\n");
+        panic       ("mmSetUpPaging: [PANIC] Less than 64MB\n");
     };
 
 

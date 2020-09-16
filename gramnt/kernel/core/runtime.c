@@ -49,18 +49,18 @@ int init_runtime (void){
         // See: mm/86/memory.c
         case CURRENT_ARCH_X86:
             debug_print ("[x86] init_runtime: Initializing mm ...\n");
-            init_mm ();
+            mmInit();
             
             debug_print ("[x86] init_runtime: Initializing paging ...\n");
-            SetUpPaging ();
+            mmSetUpPaging();
             
             //...
             break;
 
 
         case CURRENT_ARCH_X86_64:
-            debug_print ("[x86_64] init_runtime: Initializing mm ...\n");
-            debug_print ("[x86_64] init_runtime: Current arch not supported !\n *hang");
+            debug_print ("[x86_64] init_runtime: [NOT SUPPORTED] CURRENT_ARCH_X86_64\n");
+            printf      ("[x86_64] init_runtime: [NOT SUPPORTED] CURRENT_ARCH_X86_64\n");
             goto fail;
             break;
 

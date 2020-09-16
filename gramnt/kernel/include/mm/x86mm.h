@@ -1328,13 +1328,14 @@ void memoryShowMemoryInfo (void);
 // Init support.
 //
 
-int init_mm (void); 
+int mmInit (void); 
+
 
 int init_stack (void);
 
 
 // Configura paginação usada pelo kernel
-int SetUpPaging (void);    
+int mmSetUpPaging (void);    
 
 
 // #todo

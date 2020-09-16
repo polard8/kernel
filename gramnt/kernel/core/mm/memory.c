@@ -1,5 +1,5 @@
 /*
- * File: ps/x86/memory.c
+ * File: mm/memory.c
  *
  *    mm support for x86.
  *
@@ -958,12 +958,11 @@ fail:
 
 /*
  ******************************************
- * init_mm:
+ * mmInit:
  *   Inicializa o memory manager.
- *    @todo: Usar mmInit().
  */
  
-int init_mm (void){
+int mmInit (void){
 
     int Status=0;
     int i=0;
@@ -979,30 +978,29 @@ int init_mm (void){
 	// Criar mmClearBSS()
 	
 
-	//#importante:
-	//Inicializa heap e stack.
+    // heap and stack
 
     Status = (int) init_heap();
 
     if (Status != 0){
-        printf ("init_mm fail: Heap\n");
+        printf ("mmInit: [FAIL] Heap\n");
         goto fail;
-        //return (int) 1;
     }
+
 
     Status = (int) init_stack();
 
     if (Status != 0){
-        printf ("init_mm fail: Stack\n");
+        printf ("mmInit: [FAIL]Stack\n");
         goto fail;
-        //return (int) 1;
     }
 
 
 	// Zerar a lista.
 	// Lista de blocos de memória dentro do heap do kernel.
 
-    while ( i < MMBLOCK_COUNT_MAX ){
+    while ( i < MMBLOCK_COUNT_MAX )
+    {
         mmblockList[i] = (unsigned long) 0;
         i++;
     };

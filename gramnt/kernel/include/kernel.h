@@ -74,10 +74,9 @@ extern void do_executa_new_task (void);
 
 
 // memory management support.
-#include "mm.h"
-#include "memmap.h" 
-#include "intelmm.h"
-
+#include "mm/mm.h"
+#include "mm/memmap.h" 
+#include "mm/intelmm.h"
 
 
 
@@ -309,13 +308,18 @@ extern void do_executa_new_task (void);
 
 #include "execve.h"  
 
-// sysmk (^)
-#include "mmglobal.h"  // Deve ficar mais acima.
-#include "heap.h"      // Heap pointer support.
-#include "aspace.h"    // Address Space, (data base account).
-#include "dspace.h"    // Disk Space, (data base account).
-#include "bank.h"      // Bank. database
-#include "x86mm.h"     // mm, memory manager support.
+
+// mm
+#include "mm/mmglobal.h"  // Deve ficar mais acima.
+#include "mm/heap.h"      // Heap pointer support.
+#include "mm/aspace.h"    // Address Space, (data base account).
+
+// storage ?
+#include "dspace.h"    // Disk Space, (data base account). storage stuff
+
+// mm
+#include "mm/bank.h"      // Bank. database
+#include "mm/x86mm.h"     // mm, memory manager support.
 
 
 
