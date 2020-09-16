@@ -212,7 +212,9 @@
 // #### 32 MB ####
 //
 
-#define FRAME_TABLE_START (0x02000000)   // 32mb mark. 
+
+#define FRAME_TABLE_START_PA (0x02000000)   // 32mb mark. 
+
 
 
 //

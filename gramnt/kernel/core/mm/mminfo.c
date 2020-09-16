@@ -158,10 +158,20 @@ void memoryShowMemoryInfo (void){
 
         //case stNull:
         default:
-            printf("(Null) %d KB\n", memorysizeTotal );
+            //printf("(Null) %d KB\n", memorysizeTotal );
+            printf("memoryShowMemoryInfo: [FIXME] Not defined system size!\n");
             break;
     };
 
+
+    // Frame table
+    printf("Frame table start: %xH \n", FT.frame_table_start );
+
+    // ...
+
+
+    //#todo
+    //See: gramnt/kernel/include/mm/x86mm.h
 
 
 	//system zone
