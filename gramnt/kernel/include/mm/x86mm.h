@@ -1,5 +1,5 @@
 /*
- * File: mm/mm.h  
+ * File: mm/x86mm.h  
  *
  * Descri��o:
  *     Header para o Memory Manager. Gerenciamento de mem�ria.
@@ -1062,52 +1062,48 @@ int g_mm_system_type;
 // ## Physical memory ##
 //
 
-	// Small systems.
-	unsigned long SMALL_kernel_address;
-	unsigned long SMALL_kernel_base;
-	unsigned long SMALL_user_address;
-	unsigned long SMALL_vga_address;
-	unsigned long SMALL_frontbuffer_address;
-	unsigned long SMALL_backbuffer_address; 
-	unsigned long SMALL_pagedpool_address; 
-	unsigned long SMALL_heappool_address;
-	 
-	unsigned long SMALL_extraheap1_address;
-    unsigned long SMALL_extraheap2_address; 
-    unsigned long SMALL_extraheap3_address; 
-    //...
 
-    // Medium systems.	
-	unsigned long MEDIUM_kernel_address;
-	unsigned long MEDIUM_kernel_base; 
-	unsigned long MEDIUM_user_address; 
-	unsigned long MEDIUM_vga_address; 
-	unsigned long MEDIUM_frontbuffer_address; 
-	unsigned long MEDIUM_backbuffer_address; 
-	unsigned long MEDIUM_pagedpool_address;  	
-    unsigned long MEDIUM_heappool_address; 
-    
-	unsigned long MEDIUM_extraheap1_address; 	
-    unsigned long MEDIUM_extraheap2_address; 
-    unsigned long MEDIUM_extraheap3_address; 
-	
-    // Large systems.
-	unsigned long LARGE_kernel_address;
-	unsigned long LARGE_kernel_base;
-	unsigned long LARGE_user_address;
-	unsigned long LARGE_vga_address;
-	unsigned long LARGE_frontbuffer_address;
-	unsigned long LARGE_backbuffer_address;
-	unsigned long LARGE_pagedpool_address; 
-    unsigned long LARGE_heappool_address;
-    
-    unsigned long LARGE_extraheap1_address;
-    unsigned long LARGE_extraheap2_address; 
-    unsigned long LARGE_extraheap3_address; 
+// Small systems.
+unsigned long SMALL_origin_pa;
+unsigned long SMALL_kernel_base_pa;
+unsigned long SMALL_user_pa;
+unsigned long SMALL_vga_pa;
+unsigned long SMALL_frontbuffer_pa;
+unsigned long SMALL_backbuffer_pa; 
+unsigned long SMALL_pagedpool_pa; 
+unsigned long SMALL_heappool_pa; 
+unsigned long SMALL_extraheap1_pa;
+unsigned long SMALL_extraheap2_pa; 
+unsigned long SMALL_extraheap3_pa; 
+//...
 
 
+// Medium systems.
+unsigned long MEDIUM_origin_pa;
+unsigned long MEDIUM_kernel_base_pa; 
+unsigned long MEDIUM_user_pa; 
+unsigned long MEDIUM_vga_pa; 
+unsigned long MEDIUM_frontbuffer_pa; 
+unsigned long MEDIUM_backbuffer_pa; 
+unsigned long MEDIUM_pagedpool_pa;  
+unsigned long MEDIUM_heappool_pa; 
+unsigned long MEDIUM_extraheap1_pa;
+unsigned long MEDIUM_extraheap2_pa; 
+unsigned long MEDIUM_extraheap3_pa; 
 
 
+// Large systems.
+unsigned long LARGE_origin_pa;
+unsigned long LARGE_kernel_base_pa;
+unsigned long LARGE_user_pa;
+unsigned long LARGE_vga_pa;
+unsigned long LARGE_frontbuffer_pa;
+unsigned long LARGE_backbuffer_pa;
+unsigned long LARGE_pagedpool_pa; 
+unsigned long LARGE_heappool_pa;
+unsigned long LARGE_extraheap1_pa;
+unsigned long LARGE_extraheap2_pa; 
+unsigned long LARGE_extraheap3_pa; 
 
 
 

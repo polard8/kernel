@@ -7,10 +7,10 @@
 #define ____GPA_H 1
 
 
-
-#define SMALLSYSTEM_KERNELADDRESS   0
-#define MEDIUMSYSTEM_KERNELADDRESS  0
-#define LARGESYSTEM_KERNELADDRESS   0
+// primeiros 4 mb.
+#define SMALLSYSTEM_ORIGIN_ADDRESS   0
+#define MEDIUMSYSTEM_ORIGIN_ADDRESS  0
+#define LARGESYSTEM_ORIGIN_ADDRESS   0
 
 
 
@@ -151,6 +151,9 @@
 //
 
 
+//#todo
+//change this address to give to kernel more space.
+//maybe we can load in this extra mg a library
 #define USER_BASE              0x00400000  // 4MB físico.
 #define SMALLSYSTEM_USERBASE   0x00400000  // USER_BASE
 #define MEDIUMSYSTEM_USERBASE  0x00400000  // USER_BASE

@@ -823,51 +823,50 @@ int mmSetUpPaging (void){
 	// As vari�veis s�o globais para podermos gerenciar o uso de
 	// mem�ria f�sica.
 	// See:  mm/x86/mm.h
-	
-	
+	// See:  gpa.h
+
 	//==============================================================
 	//                  ****    SMALL SYSTEMS    ****
 	//==============================================================
-    SMALL_kernel_address = SMALLSYSTEM_KERNELADDRESS;
-    SMALL_kernel_base    = SMALLSYSTEM_KERNELBASE;
-    SMALL_user_address   = SMALLSYSTEM_USERBASE;
-    SMALL_vga_address    = SMALLSYSTEM_VGA;
-    SMALL_frontbuffer_address = (unsigned long) SavedLFB;                     //frontbuffer
-    SMALL_backbuffer_address  = (unsigned long) SMALLSYSTEM_BACKBUFFER;       //backbuffer
-    SMALL_pagedpool_address   = (unsigned long) SMALLSYSTEM_PAGEDPOLL_START;  //PAGED POOL
-    SMALL_heappool_address    = (unsigned long) SMALLSYSTEM_HEAPPOLL_START;
-    SMALL_extraheap1_address  = (unsigned long) SMALLSYSTEM_EXTRAHEAP1_START;
-    SMALL_extraheap2_address  = (unsigned long) SMALLSYSTEM_EXTRAHEAP2_START;
-    SMALL_extraheap3_address  = (unsigned long) SMALLSYSTEM_EXTRAHEAP3_START;
-    // ...
+    SMALL_origin_pa      = (unsigned long) SMALLSYSTEM_ORIGIN_ADDRESS;
+    SMALL_kernel_base_pa = (unsigned long) SMALLSYSTEM_KERNELBASE;
+    SMALL_user_pa        = (unsigned long) SMALLSYSTEM_USERBASE;
+    SMALL_vga_pa         = (unsigned long) SMALLSYSTEM_VGA;
+    SMALL_frontbuffer_pa = (unsigned long) SavedLFB;                     //frontbuffer
+    SMALL_backbuffer_pa  = (unsigned long) SMALLSYSTEM_BACKBUFFER;       //backbuffer
+    SMALL_pagedpool_pa   = (unsigned long) SMALLSYSTEM_PAGEDPOLL_START;  //PAGED POOL
+    SMALL_heappool_pa    = (unsigned long) SMALLSYSTEM_HEAPPOLL_START;
+    SMALL_extraheap1_pa  = (unsigned long) SMALLSYSTEM_EXTRAHEAP1_START;
+    SMALL_extraheap2_pa  = (unsigned long) SMALLSYSTEM_EXTRAHEAP2_START;
+    SMALL_extraheap3_pa  = (unsigned long) SMALLSYSTEM_EXTRAHEAP3_START;
 	//==============================================================
 	//                  ****    MEDIUM SYSTEMS    ****
 	//==============================================================
-    MEDIUM_kernel_address = MEDIUMSYSTEM_KERNELADDRESS;
-    MEDIUM_kernel_base    = MEDIUMSYSTEM_KERNELBASE;
-    MEDIUM_user_address   = MEDIUMSYSTEM_USERBASE;
-    MEDIUM_vga_address    = MEDIUMSYSTEM_VGA;
-    MEDIUM_frontbuffer_address = (unsigned long) SavedLFB;
-    MEDIUM_backbuffer_address  = (unsigned long) MEDIUMSYSTEM_BACKBUFFER;
-    MEDIUM_pagedpool_address   = (unsigned long) MEDIUMSYSTEM_PAGEDPOLL_START;
-    MEDIUM_heappool_address    = (unsigned long) MEDIUMSYSTEM_HEAPPOLL_START;
-    MEDIUM_extraheap1_address  = (unsigned long) MEDIUMSYSTEM_EXTRAHEAP1_START;
-    MEDIUM_extraheap2_address  = (unsigned long) MEDIUMSYSTEM_EXTRAHEAP2_START;
-    MEDIUM_extraheap3_address  = (unsigned long) MEDIUMSYSTEM_EXTRAHEAP3_START;
+    MEDIUM_origin_pa      = (unsigned long) MEDIUMSYSTEM_ORIGIN_ADDRESS;
+    MEDIUM_kernel_base_pa = (unsigned long) MEDIUMSYSTEM_KERNELBASE;
+    MEDIUM_user_pa        = (unsigned long) MEDIUMSYSTEM_USERBASE;
+    MEDIUM_vga_pa         = (unsigned long) MEDIUMSYSTEM_VGA;
+    MEDIUM_frontbuffer_pa = (unsigned long) SavedLFB;
+    MEDIUM_backbuffer_pa  = (unsigned long) MEDIUMSYSTEM_BACKBUFFER;
+    MEDIUM_pagedpool_pa   = (unsigned long) MEDIUMSYSTEM_PAGEDPOLL_START;
+    MEDIUM_heappool_pa    = (unsigned long) MEDIUMSYSTEM_HEAPPOLL_START;
+    MEDIUM_extraheap1_pa  = (unsigned long) MEDIUMSYSTEM_EXTRAHEAP1_START;
+    MEDIUM_extraheap2_pa  = (unsigned long) MEDIUMSYSTEM_EXTRAHEAP2_START;
+    MEDIUM_extraheap3_pa  = (unsigned long) MEDIUMSYSTEM_EXTRAHEAP3_START;
 	//==============================================================
 	//                  ****    LARGE SYSTEMS    ****
 	//==============================================================
-    LARGE_kernel_address = LARGESYSTEM_KERNELADDRESS;
-    LARGE_kernel_base    = LARGESYSTEM_KERNELBASE;
-    LARGE_user_address   = LARGESYSTEM_USERBASE;
-    LARGE_vga_address    = LARGESYSTEM_VGA;
-    LARGE_frontbuffer_address = (unsigned long) SavedLFB;
-    LARGE_backbuffer_address  = (unsigned long) LARGESYSTEM_BACKBUFFER;
-    LARGE_pagedpool_address   = (unsigned long) LARGESYSTEM_PAGEDPOLL_START;
-    LARGE_heappool_address    = (unsigned long) LARGESYSTEM_HEAPPOLL_START;
-    LARGE_extraheap1_address  = (unsigned long) LARGESYSTEM_EXTRAHEAP1_START;
-    LARGE_extraheap2_address  = (unsigned long) LARGESYSTEM_EXTRAHEAP2_START;
-    LARGE_extraheap3_address  = (unsigned long) LARGESYSTEM_EXTRAHEAP3_START;
+    LARGE_origin_pa      = (unsigned long) LARGESYSTEM_ORIGIN_ADDRESS;
+    LARGE_kernel_base_pa = (unsigned long) LARGESYSTEM_KERNELBASE;
+    LARGE_user_pa        = (unsigned long) LARGESYSTEM_USERBASE;
+    LARGE_vga_pa         = (unsigned long) LARGESYSTEM_VGA;
+    LARGE_frontbuffer_pa = (unsigned long) SavedLFB;
+    LARGE_backbuffer_pa  = (unsigned long) LARGESYSTEM_BACKBUFFER;
+    LARGE_pagedpool_pa   = (unsigned long) LARGESYSTEM_PAGEDPOLL_START;
+    LARGE_heappool_pa    = (unsigned long) LARGESYSTEM_HEAPPOLL_START;
+    LARGE_extraheap1_pa  = (unsigned long) LARGESYSTEM_EXTRAHEAP1_START;
+    LARGE_extraheap2_pa  = (unsigned long) LARGESYSTEM_EXTRAHEAP2_START;
+    LARGE_extraheap3_pa  = (unsigned long) LARGESYSTEM_EXTRAHEAP3_START;
 
 
 	// ** bank 1 ** //
@@ -1097,12 +1096,11 @@ int mmSetUpPaging (void){
 
     for ( i=0; i < 1024; i++ )
     {
-        km_page_table[i] = (unsigned long) SMALL_kernel_address | 3;     
-        SMALL_kernel_address = (unsigned long) SMALL_kernel_address + 4096;  
+        km_page_table[i] = (unsigned long) SMALL_origin_pa | 3;     
+        SMALL_origin_pa  = (unsigned long) SMALL_origin_pa + 4096;  
     };
     page_directory[ENTRY_KERNELMODE_PAGES] = (unsigned long) &km_page_table[0];      
     page_directory[ENTRY_KERNELMODE_PAGES] = (unsigned long) page_directory[ENTRY_KERNELMODE_PAGES] | 3;  
-
 
 
 
@@ -1112,7 +1110,7 @@ int mmSetUpPaging (void){
 
     //===============================================
     // kernel mode pages (0x00100000fis = 0xC0000000virt)
-    // SMALL_kernel_base = 0x00100000 = KERNEL_BASE.
+    // SMALL_kernel_base_address = 0x00100000 = KERNEL_BASE.
     // Mapear 4MB come�ando do primeiro mega. (kernel mode).
     // Preenchendo a tabela km2_page_table.
     //
@@ -1137,8 +1135,8 @@ int mmSetUpPaging (void){
 
     for ( i=0; i < 1024; i++ )
     {
-        km2_page_table[i] = (unsigned long) SMALL_kernel_base | 3; 
-        SMALL_kernel_base = (unsigned long) SMALL_kernel_base + 4096; 
+        km2_page_table[i]    = (unsigned long) SMALL_kernel_base_pa | 3; 
+        SMALL_kernel_base_pa = (unsigned long) SMALL_kernel_base_pa + 4096; 
     };
     page_directory[ENTRY_KERNELBASE_PAGES] = (unsigned long) &km2_page_table[0]; 
     page_directory[ENTRY_KERNELBASE_PAGES] = (unsigned long) page_directory[ENTRY_KERNELBASE_PAGES] | 3;  
@@ -1193,12 +1191,11 @@ int mmSetUpPaging (void){
 
     for ( i=0; i < 1024; i++ )
     {
-        um_page_table[i] = (unsigned long) SMALL_user_address | 7; 
-        SMALL_user_address = (unsigned long) SMALL_user_address + 4096; 
+        um_page_table[i]  = (unsigned long) SMALL_user_pa | 7; 
+        SMALL_user_pa     = (unsigned long) SMALL_user_pa + 4096; 
     };
     page_directory[ENTRY_USERMODE_PAGES] = (unsigned long) &um_page_table[0]; 
     page_directory[ENTRY_USERMODE_PAGES] = (unsigned long) page_directory[ENTRY_USERMODE_PAGES] | 7; 
-
 
 
     // Obs: 
@@ -1246,12 +1243,11 @@ int mmSetUpPaging (void){
 
     for ( i=0; i < 1024; i++ )
     {
-        vga_page_table[i] = (unsigned long) SMALL_vga_address | 7; 
-        SMALL_vga_address = (unsigned long) SMALL_vga_address + 4096; 
+        vga_page_table[i] = (unsigned long) SMALL_vga_pa | 7; 
+        SMALL_vga_pa      = (unsigned long) SMALL_vga_pa + 4096; 
     };
     page_directory[ENTRY_VGA_PAGES] = (unsigned long) &vga_page_table[0]; 
     page_directory[ENTRY_VGA_PAGES] = (unsigned long) page_directory[ENTRY_VGA_PAGES] | 7;  
-
 
 
     // Obs: 
@@ -1308,8 +1304,8 @@ int mmSetUpPaging (void){
 
     for ( i=0; i < 1024; i++ )
     {
-        frontbuffer_page_table[i] = (unsigned long) SMALL_frontbuffer_address | 7; 
-        SMALL_frontbuffer_address = (unsigned long) SMALL_frontbuffer_address + 4096; 
+        frontbuffer_page_table[i] = (unsigned long) SMALL_frontbuffer_pa | 7; 
+        SMALL_frontbuffer_pa      = (unsigned long) SMALL_frontbuffer_pa + 4096; 
     };
     page_directory[ENTRY_FRONTBUFFER_PAGES] = (unsigned long) &frontbuffer_page_table[0]; 
     page_directory[ENTRY_FRONTBUFFER_PAGES] = (unsigned long) page_directory[ENTRY_FRONTBUFFER_PAGES] | 7; 
@@ -1364,8 +1360,8 @@ int mmSetUpPaging (void){
 
     for ( i=0; i < 1024; i++ )
     {
-        backbuffer_page_table[i] = (unsigned long) SMALL_backbuffer_address | 7; 
-        SMALL_backbuffer_address = (unsigned long) SMALL_backbuffer_address + 4096; 
+        backbuffer_page_table[i] = (unsigned long) SMALL_backbuffer_pa | 7; 
+        SMALL_backbuffer_pa      = (unsigned long) SMALL_backbuffer_pa + 4096; 
     };
     page_directory[ENTRY_BACKBUFFER_PAGES] = (unsigned long) &backbuffer_page_table[0]; 
     page_directory[ENTRY_BACKBUFFER_PAGES] = (unsigned long) page_directory[ENTRY_BACKBUFFER_PAGES] | 7; 
@@ -1405,8 +1401,8 @@ int mmSetUpPaging (void){
 
     for ( i=0; i < 1024; i++ )
     {
-        pagedpool_page_table[i] = (unsigned long) SMALL_pagedpool_address | 7; 
-        SMALL_pagedpool_address = (unsigned long) SMALL_pagedpool_address + 4096; 
+        pagedpool_page_table[i] = (unsigned long) SMALL_pagedpool_pa | 7; 
+        SMALL_pagedpool_pa      = (unsigned long) SMALL_pagedpool_pa + 4096; 
     };
     page_directory[ENTRY_PAGEDPOOL_PAGES] = (unsigned long) &pagedpool_page_table[0]; 
     page_directory[ENTRY_PAGEDPOOL_PAGES] = (unsigned long) page_directory[ENTRY_PAGEDPOOL_PAGES] | 7; 
@@ -1436,8 +1432,8 @@ int mmSetUpPaging (void){
 
     for ( i=0; i < 1024; i++ )
     {
-        heappool_page_table[i] = (unsigned long) SMALL_heappool_address | 7; 
-        SMALL_heappool_address = (unsigned long) SMALL_heappool_address + 4096; 
+        heappool_page_table[i] = (unsigned long) SMALL_heappool_pa | 7; 
+        SMALL_heappool_pa      = (unsigned long) SMALL_heappool_pa + 4096; 
     };
     page_directory[ENTRY_HEAPPOOL_PAGES] = (unsigned long) &heappool_page_table[0]; 
     page_directory[ENTRY_HEAPPOOL_PAGES] = (unsigned long) page_directory[ENTRY_HEAPPOOL_PAGES] | 7;  
@@ -1464,12 +1460,11 @@ int mmSetUpPaging (void){
     
     for ( i=0; i < 1024; i++ )
     {
-        extraheap1_page_table[i] = (unsigned long) SMALL_extraheap1_address | 7; 
-        SMALL_extraheap1_address = (unsigned long) SMALL_extraheap1_address + 4096; 
+        extraheap1_page_table[i] = (unsigned long) SMALL_extraheap1_pa | 7; 
+        SMALL_extraheap1_pa      = (unsigned long) SMALL_extraheap1_pa + 4096; 
     };
     page_directory[ENTRY_EXTRAHEAP1_PAGES] = (unsigned long) &extraheap1_page_table[0]; 
     page_directory[ENTRY_EXTRAHEAP1_PAGES] = (unsigned long) page_directory[ENTRY_EXTRAHEAP1_PAGES] | 7;  
-
 
 
 
@@ -1488,8 +1483,8 @@ int mmSetUpPaging (void){
 
     for ( i=0; i < 1024; i++ )
     {
-        extraheap2_page_table[i] = (unsigned long) SMALL_extraheap2_address | 7; 
-        SMALL_extraheap2_address = (unsigned long) SMALL_extraheap2_address + 4096; 
+        extraheap2_page_table[i] = (unsigned long) SMALL_extraheap2_pa | 7; 
+        SMALL_extraheap2_pa      = (unsigned long) SMALL_extraheap2_pa + 4096; 
     };
     page_directory[ENTRY_EXTRAHEAP2_PAGES] = (unsigned long) &extraheap2_page_table[0]; 
     page_directory[ENTRY_EXTRAHEAP2_PAGES] = (unsigned long) page_directory[ENTRY_EXTRAHEAP2_PAGES] | 7;  
@@ -1510,8 +1505,8 @@ int mmSetUpPaging (void){
 
     for ( i=0; i < 1024; i++ )
     {
-        extraheap3_page_table[i] = (unsigned long) SMALL_extraheap3_address | 7; 
-        SMALL_extraheap3_address = (unsigned long) SMALL_extraheap3_address + 4096; 
+        extraheap3_page_table[i] = (unsigned long) SMALL_extraheap3_pa | 7; 
+        SMALL_extraheap3_pa      = (unsigned long) SMALL_extraheap3_pa + 4096; 
     };
     page_directory[ENTRY_EXTRAHEAP3_PAGES] = (unsigned long) &extraheap3_page_table[0]; 
     page_directory[ENTRY_EXTRAHEAP3_PAGES] = (unsigned long) page_directory[ENTRY_EXTRAHEAP3_PAGES] | 7; 
