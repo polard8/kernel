@@ -1040,15 +1040,24 @@ void console_scroll (int console_number){
     int i=0;
 
 
-    if ( VideoBlock.useGui != 1 ){
-        debug_print("console_scroll: no GUI");
-        panic("console_scroll: no GUI"); 
+    if ( VideoBlock.useGui != 1 )
+    {
+        debug_print ("console_scroll: no GUI\n");
+        panic       ("console_scroll: no GUI"); 
     }
 
-	// copia o retângulo.
-	// #todo: olhar as rotinas de copiar retângulo.
-	//See: comp/rect.c
-    scroll_screen_rect ();
+
+    if ( console_number < 0 )
+        panic ("console_scroll: console_number");
+
+
+    // Copia o retângulo.
+    // #todo: 
+    // Olhar as rotinas de copiar retângulo.
+    // See: windows/rect.c
+
+    scroll_screen_rect();
+
 
     //#debug
     //refresh_screen();

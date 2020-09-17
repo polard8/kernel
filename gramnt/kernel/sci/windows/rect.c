@@ -911,21 +911,24 @@ show_saved_rect ( unsigned long x,
  ************************* 
  * scroll_screen_rect:
  * 
+ *     Scroll a rectangle. ?
  */
 
-//scroll test
-//função interna de suporta ao scroll()
+// Helper function to scroll routine.
+// Called by console_scroll() in tty/console.c
 
 void scroll_screen_rect (void){
 
+    register unsigned int i=0;
 
-    register unsigned int i;
+    unsigned int line_size=0;  // w 
+    unsigned int lines=0;      // h
 
-    unsigned int line_size, lines;
-    unsigned int offset;
+    unsigned int offset=0;
 
-    unsigned long Width = (unsigned long) screenGetWidth ();
-    unsigned long Height = (unsigned long) screenGetHeight ();
+    // Device info.
+    unsigned long deviceWidth  = (unsigned long) screenGetWidth();
+    unsigned long deviceHeight = (unsigned long) screenGetHeight();
 
 
     //int cWidth = get_char_width ();
@@ -948,35 +951,27 @@ void scroll_screen_rect (void){
         //debug_print(">>16\n");
 
 
-    line_size = (unsigned int) Width; 
-    lines = (unsigned int) Height;
+    line_size = (unsigned int) deviceWidth; 
+    lines     = (unsigned int) deviceHeight;
 
     switch (SavedBPP)
     {
-		case 32:
-		    bytes_count = 4;
-		    break;
-		
-		case 24:
-		    bytes_count = 3;
-			break;
-			
-		//...
+        case 32:  bytes_count = 4;  break;
+        case 24:  bytes_count = 3;  break;
+        //...
+
+        default:
+            panic("scroll_screen_rect: SavedBPP");
+            break;
     };
 
 
-	//
-	// Origem e destino.
-	//
+    // Destination and Source.
+    // Destination is the first line.
+    // Source is the second line. It has the height of a char.
 
-
-	//destino
-    void *p = (void *) BACKBUFFER_ADDRESS;
-
-	// origem
-	// o y é a linha da origem. 
-	// o deslocamento deve ter a altura de um char.
-    const void *q = (const void *) BACKBUFFER_ADDRESS + ( bytes_count * SavedX * cHeight ) ;
+    void *Dest = (void *) BACKBUFFER_ADDRESS;
+    const void *Src  = (const void *) BACKBUFFER_ADDRESS + ( bytes_count * SavedX * cHeight ) ;
 
 
     //
@@ -994,11 +989,12 @@ void scroll_screen_rect (void){
         // Copia uma linha, quatro bytes de cada vez.  
         for ( i=0; i < lines; i++ )
         {
-            memcpy32 ( p, q, count );
+            memcpy32 (Dest,Src,count);
 
-            q += (Width * bytes_count);
-            p += (Width * bytes_count);
+            Src  += (deviceWidth * bytes_count);
+            Dest += (deviceWidth * bytes_count);
         };
+        return;
     }
 
 
@@ -1008,10 +1004,13 @@ void scroll_screen_rect (void){
         // Copia a linha, um bytes por vez.
         for ( i=0; i < lines; i++ )
         {
-            memcpy ( (void *) p, (const void *) q, (line_size * bytes_count) );
+            memcpy ( 
+                (void *) Dest, 
+                (const void *) Src, 
+                (line_size * bytes_count) );
 
-            q += (Width * bytes_count);
-            p += (Width * bytes_count);
+            Src  += (deviceWidth * bytes_count);
+            Dest += (deviceWidth * bytes_count);
         };
     }
 }
