@@ -42,17 +42,17 @@ void BlLoadKernel(void);
 void BlSetupPaging(void);
 
 
-void
-blShowMenu(void)
-{
+
+void blShowMenu (void){
+
     int i=0;
 
 
     g_cursor_x = 0;
     g_cursor_y = 0;
-    clear_backbuffer(); //black
+    clear_backbuffer();  //black
     
-    for(i=0; i<8; i++)
+    for (i=0; i<8; i++)
     {
         printf ("\n");
         
@@ -243,7 +243,7 @@ void BlMain (){
 
     if (g_initialized != 1)
     {
-        printf("BlMain:");
+        printf("BlMain: g_initialized\n");
         die();
     }
 
@@ -335,6 +335,13 @@ void BlMain (){
     BlSetupPaging();
 
 
+
+    //g_cursor_x = 0;
+    //g_cursor_y = 0;
+    //clear_backbuffer();  //black
+
+
+	
 	//@todo: Atualizar status.
 
 // Done:

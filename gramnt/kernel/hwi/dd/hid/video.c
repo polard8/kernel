@@ -1,5 +1,5 @@
 /*
- * File: x/video.c
+ * File: video.c
  *
  * Descrição: 
  *     Rotinas paga gerenciar os controladores de video.

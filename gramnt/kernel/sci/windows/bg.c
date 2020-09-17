@@ -1,6 +1,7 @@
 /*
- * File: ws/bg.c 
+ * File: windows/bg.c 
  *
+ * 
  * Descrição:
  *     Rotinas de configuração do background de um desktop.
  *     O background de um desktop é onde fica a imagem de pano de fundo.
@@ -83,35 +84,39 @@ void bg_load_image (void)
 // #atenção: rotina sensível.
 
 void backgroundDraw (unsigned long color){
-	
+
     unsigned long i=0;
-		
+
+
     if (VideoBlock.useGui != 1)
-	    return;
-	
-    for ( i=0; i<SavedY; i++ )
-	{			
+        return;
+
+    for ( i=0; i<SavedY; i++ ){
         my_buffer_horizontal_line ( 0, i, SavedX, color );
-	}
-	
+    };
+
+
 	//#bugbug
 	//estamos determinando as dimensoes do char.
 	//?? ja' podemos usar a variável. ??
-	
-	//Cursor.
-	TTY[current_vc].cursor_x = 0;
-	TTY[current_vc].cursor_y = 0;
-	
+
+    // Cursor.
+    TTY[current_vc].cursor_x = 0;
+    TTY[current_vc].cursor_y = 0;
+
+
 	// #bugbug
 	// Será que nesse momento as dimensões do char já estão configuradas ??
-	
+
 	//g_cursor_right = (SavedX/8);
 	//g_cursor_bottom = (SavedY/8);
 }
 
 
-/* backgroundSetColor:
- *     Set background color in graphics mode. */
+/* 
+ * backgroundSetColor:
+ *     Set background color in graphics mode. 
+ */
 
 void backgroundSetColor (unsigned long color)
 {
@@ -124,15 +129,18 @@ void backgroundSetColor (unsigned long color)
  *     Redraw bg. 
  */
 
-void backgroundRedraw (unsigned long color){
+void backgroundRedraw (unsigned long color)
+{
+    // #bugbug
+    // gui structure validation
 
-    if ( gui->backgroundStatus == 0 ){
-        return;
-    }
+    if ( (void *) gui == NULL ){ return; };
+
+    if ( gui->backgroundStatus == 0 ){ return; };
 
     if ( (void *) gui->background != NULL )
     {
-       backgroundDraw (color);
+        backgroundDraw(color);
     }
 }
 

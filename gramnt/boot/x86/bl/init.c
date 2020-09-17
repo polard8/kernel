@@ -90,7 +90,6 @@ void init_globals (){
 
 int init (){
 
-
     g_cursor_x = 0;
     g_cursor_y = 0;
 
@@ -172,7 +171,6 @@ int init (){
 
 
 
-
 	// Type:
 	//     CD, HD, PXE, FLASH, FAT16 ...
 	
@@ -196,9 +194,6 @@ int init (){
             break;
 	};
 */
-
-
-
 
 
 

@@ -151,13 +151,14 @@
 //
 
 
-//#todo
-//change this address to give to kernel more space.
-//maybe we can load in this extra mg a library
-#define USER_BASE              0x00400000  // 4MB físico.
-#define SMALLSYSTEM_USERBASE   0x00400000  // USER_BASE
-#define MEDIUMSYSTEM_USERBASE  0x00400000  // USER_BASE
-#define LARGESYSTEM_USERBASE   0x00400000  // USER_BASE 
+// Nothing
+// Aqui estava a area de user mode, 
+// mas mudamos para a marca de 32 MB.
+// lembrando que o kernel base foi carregado na marca de 1MB
+// e tem 2 MB de heap e stack.
+// A ideia eh aproveitar todos os 4MB mapeados para 
+// o kernel base. Por enquanto o quarto mega
+// esta desperdiçado.
 
 
 
@@ -213,7 +214,14 @@
 //
 
 
-#define FRAME_TABLE_START_PA (0x02000000)   // 32mb mark. 
+// Essa eh uma area em user mode.
+// migrou de marca de 4mb para ca, para das mais espaço para
+// o kernel base.
+
+#define USER_BASE              0x02000000    // 32 MB mark
+#define SMALLSYSTEM_USERBASE   0x02000000
+#define MEDIUMSYSTEM_USERBASE  0x02000000
+#define LARGESYSTEM_USERBASE   0x02000000 
 
 
 
@@ -221,6 +229,7 @@
 // #### 64 MB ####
 //
 
+#define FRAME_TABLE_START_PA (0x04000000)   // 64 mb mark. 
 
 //
 // #### 128 MB ####

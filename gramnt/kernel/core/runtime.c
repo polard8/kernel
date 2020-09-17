@@ -47,7 +47,9 @@ int init_runtime (void){
         // Init Memory Manager for x86:
         // Heap, Stack, Pages, mmblocks, memory sizes, memory zones ...
         // See: mm/86/memory.c
+ 
         case CURRENT_ARCH_X86:
+        
             debug_print ("[x86] init_runtime: Initializing mm ...\n");
             mmInit();
             

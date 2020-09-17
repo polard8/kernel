@@ -7,6 +7,13 @@
 ; Versão 1.0, 2015~2016.
 ;
 
+;;
+;; #bugbug
+;; Muda o nome do arquivo para o formato 8.3
+;; swlib.asm
+;;
+
+
 ;
 ; Funções importadas.
 ;
@@ -14,9 +21,9 @@
 extern _vsync
 
 
-SOFTWARELIB_BACKBUFFER EQU (0x1000000 - 0x800000)
-	
-	
+SOFTWARELIB_BACKBUFFER EQU   (0x1000000 - 0x800000)
+
+
 ;---------------------------------------------
 ; _my_buffer_load_bitmap_16x16 
 ;
@@ -137,6 +144,7 @@ _my_buffer_load_bitmap_16x16:
 ; IN:
 ;     EAX = COR
 ;
+
 global _background
 _background:
     ;nop		
@@ -154,10 +162,10 @@ _background:
 	mov byte [.b], al    ;b	
 	
 	; Direto.
-	call _vsync    ;Vertical sync.	
-	
+    call _vsync    ;Vertical sync.	
+
 	;LFB.
-	mov edx, DWORD [_g_lbf_pa]    ;; Endereço físico do LFB. Passado pelo BM. 
+    mov edx, DWORD [_g_lbf_pa]    ;; Endereço físico do LFB. Passado pelo BM. 
     mov edi, edx
 	
 	;Contador de linhas
@@ -181,12 +189,11 @@ _background:
 .exit_bg:
     popad
     RET
-;Nothing.	
-.r db 0	
+;Nothing.
+.r db 0
 .g db 0
-.b db 0	
-.a db 0	
-
+.b db 0
+.a db 0
 
 
 ;----------------------------------------------
@@ -196,11 +203,11 @@ _background:
 global _gui_buffer_putpixel
 _gui_buffer_putpixel:
 
-	push es
-	push eax
-	push ebx
+    push es
+    push eax
+    push ebx
     push ecx
-	
+
     ;@todo: Isso é um ajuste provisório.
 	mov dword [.cor], eax    ;Salva cor.
 	mov dword [.x],   ebx    ;Salva x.

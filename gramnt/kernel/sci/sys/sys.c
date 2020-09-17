@@ -1282,7 +1282,7 @@ int sys_write (unsigned int fd, char *ubuf, int count){
             // #bugbug: repetimos o que foi feito logo acima.
             if ( (void *) s2 == NULL){ 
                 debug_print("sys_write: [FAIL] s2. No connection\n");
-                printf     ("sys_write: [FAIL] s2. No connection\n");  
+                //printf     ("sys_write: [FAIL] s2. No connection\n");  
                 goto fail2;
             } 
  
@@ -1290,7 +1290,7 @@ int sys_write (unsigned int fd, char *ubuf, int count){
             // nao queremos uma conexao pendente.
             if ( s2->state != SS_CONNECTED ){
                 debug_print("sys_write: [FAIL] s2 connection status\n");
-                printf     ("sys_write: [FAIL] s2 connection status\n");  
+                //printf     ("sys_write: [FAIL] s2 connection status\n");  
                 goto fail2;
             }
 
