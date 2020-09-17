@@ -34,16 +34,35 @@
 //vamos apenas carregar um arquivo qualquer.
 void __load_path_test(void)
 {
+    int status = -1;
+    
     void *__address = 0;
     
-    //endereço para carregar o arquivo
+    // Endereço para carregar o arquivo
+    // 400 KB.
+
     __address = (void *) kmalloc(400*1024);
     //__address = (void *) kmalloc(600*1024);
+
+
+
+    //load_path ("/ETC/HELLO.CPP",(unsigned long) __address);
+    //load_path ("/ETC/NEWDIR/HELLO.CPP",(unsigned long) __address);
+    status = load_path ("/ETC/NEWDIR/LASTDIR/HELLO.CPP",(unsigned long) __address);
+
+    if ( status < 0 )
+        printf ("__load_path_test: load_path fail\n");
+
+
+    // Show file.
+
+    if ( status == 0 )
+        printf("%s \n",__address);    
     
-    load_path ("/TMP/TMP2/ANIMAL.BMP",(unsigned long) __address);
-    //load_path ("/BOOT/BL.BIN",(unsigned long) __address);
-    //load_path ("/BOOT/KERNEL.BIN",(unsigned long) __address);
+    refresh_screen();
 }
+
+
 
 
 
@@ -193,7 +212,8 @@ __local_ps2kbd_procedure (
             {
                 // Reboot
                 case VK_F5:
-                    reboot ();
+                    reboot();
+                    //__load_path_test(); //local ok
                     //do_clone_execute_process ("init2.bin");
                     break;
 
@@ -216,8 +236,7 @@ __local_ps2kbd_procedure (
                     //fs_show_file_info(stderr);
                     fs_show_file_table();
                     fs_show_inode_table();
-                    
-                    //__load_path_test(); //local ok
+                   
                     
                     //bg_load_image(); //ok
                     //console_write (0, buffer,62);

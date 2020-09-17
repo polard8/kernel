@@ -970,13 +970,17 @@ unsigned long path_count (unsigned char *path)
  *     Carrega nesse endereço o arquivo que está nesse path.
  */
 
-// Ex:  ??? "/BIN/GDESHELL.BIN" ???
 
 // IN:
 // path de dois níveis, endereço onde carregar.
+// Ex: "/BIN/GDESHELL.BIN"
+
+// #ok
+// Carregou um arquivo com 3 niveis.
+
 
 //   0 ---> ok.
-// !=0 ---> fail
+// != 0 ---> fail
 
 int load_path ( unsigned char *path, unsigned long address ){
 
@@ -1014,7 +1018,10 @@ int load_path ( unsigned char *path, unsigned long address ){
     
     if (n_levels==0){
         panic ("load_path: n_levels\n");
-    }    
+    }
+    
+    printf ("path with %d levels\n",n_levels);
+
 
     // Start with 0.
     level = 0;
@@ -1030,6 +1037,13 @@ int load_path ( unsigned char *path, unsigned long address ){
     // Primeiro src =  root address;
     __src_buffer = (void *) VOLUME1_ROOTDIR_ADDRESS;
     unsigned long limits = (512*32);
+
+    
+    // Not absolute   
+    if ( p[0] != '/' )
+    {
+        panic ("load_path: Not absolute pathname \n");
+    }
 
     
     //
@@ -1059,6 +1073,7 @@ int load_path ( unsigned char *path, unsigned long address ){
             // indicando inicio do próximo nível.
             
             buffer[i] = (char) *p;
+            
             
             // O ponto deve aparecer no último nível.
             // caso contrário falhou
@@ -1097,7 +1112,10 @@ int load_path ( unsigned char *path, unsigned long address ){
                      } 
                        
                      // Finalize the string.
-                     buffer[11] = 0;   
+                     buffer[11] = 0;
+                     
+                     printf ("\n");
+                     printf ("load_path: This is the name {%s}\n",buffer);   
                 }
 
 
@@ -1114,17 +1132,18 @@ int load_path ( unsigned char *path, unsigned long address ){
 
                       // IN: 
                       // fat address, dir address, filename, file address.
-                Ret = fsLoadFile ( (unsigned long) VOLUME1_FAT_ADDRESS,  // fat address
-                          (unsigned long) __src_buffer,                  // dir address. onde procurar. 
-                          32, //#bugbug: Number of entries. 
-                          (unsigned char *) buffer,                      // nome 
-                          (unsigned long) __dst_buffer, // addr. Onde carregar.
-                          limits );    // tamanho do buffer onde carregar.             
+                Ret = fsLoadFile ( 
+                          (unsigned long) VOLUME1_FAT_ADDRESS,  // fat address
+                          (unsigned long) __src_buffer,         // dir address. onde procurar. 
+                          32,                                   //#bugbug: Number of entries. 
+                          (unsigned char *) buffer,             // nome 
+                          (unsigned long) __dst_buffer,         // addr. Onde carregar.
+                          limits );                             // tamanho do buffer onde carregar.             
 
                 // ok.
                 if ( Ret == 0 )
                 {
-                    printf ("level %d carregado com sucesso.\n",l);
+                    printf ("Level %d loaded!\n\n",l);
                     
                     // #importante
                     // Esse nível tinha ponto, então deveria ser o último.
@@ -1139,11 +1158,11 @@ int load_path ( unsigned char *path, unsigned long address ){
                     return 0;
 
                 }else{
-                    panic ("load_path: fail loading level 0\n");
+                    panic ("load_path: [FAIL] Loading level 0\n");
                 };
             }
-            
-            
+
+
             // Se encontramos um indicador de próximo nível,
             // então esse nível não será considerado binário.
             // obs: 
@@ -1155,16 +1174,25 @@ int load_path ( unsigned char *path, unsigned long address ){
                 // o buffer ja tem chars que foram colocados um a um.
                 // Nao encontramos ponto nesse nivel.
                 // Vamos completar o nome do diretorio com espaços e finalizar.
+                
                 if (i<11)
                 {
                     // Adicionando espaços.
                     // O formato desejado eh: "DIRXDIRX   "
                     // Nome do diretorio sem extensao.
-                    while (i<=11){ buffer[i] = ' '; i++; }
+                    while (i<=11)
+                    { 
+                        //o primeiro espaço deve retirar a barra colocada antes
+                        buffer[i] = ' ';  
+                        i++; 
+                    }
                 }
                 
                 // Finalize the string.
                 buffer[11] = 0;
+                
+                printf ("\n");
+                printf ("load_path: This is the name {%s}\n",buffer);
 
                 //
                 // Load directory.
@@ -1184,18 +1212,19 @@ int load_path ( unsigned char *path, unsigned long address ){
                 }
                           
                       //IN: fat address, dir address, filename, file address.
-                Ret = fsLoadFile ( (unsigned long) VOLUME1_FAT_ADDRESS,  // fat address
-                          (unsigned long) __src_buffer,                  // dir address. onde procurar.
-                          32, //#bugbug: Number of entries.  
-                          (unsigned char *) buffer,                      // nome 
-                          (unsigned long) __dst_buffer,
-                          limits );                // addr. Onde carregar. 
+                Ret = fsLoadFile ( 
+                          (unsigned long) VOLUME1_FAT_ADDRESS,  // fat address
+                          (unsigned long) __src_buffer,         // dir address. onde procurar.
+                          32,                                   // #bugbug: Number of entries.  
+                          (unsigned char *) buffer,             // nome que pegamos no path 
+                          (unsigned long) __dst_buffer,         // onde carregar. 
+                          limits );                             // tamanho do buffer onde carregar.
                           
                           
                 // ok.
                 if ( Ret == 0 )
                 {
-                    printf ("level %d carregado com sucesso.\n",l);
+                    printf ("Level %d loaded!\n\n",l);
                     
                     // O endereço onde carregamos o arquivo desse nível
                     // será o endereço onde vamos procurar o arquivo do próximo nível.
@@ -1204,11 +1233,12 @@ int load_path ( unsigned char *path, unsigned long address ){
                     break;
 
                 }else{
-                    panic ("load_path: fail loading level 0\n");
+                    panic ("load_path: [*FAIL] Loading level 0\n");
                 };
             }
 
-            // avançamos o char se não foi '.', nem '/'.
+
+            // Avançamos o char se não foi '.', nem '/'.
             p++;
         };
     };   

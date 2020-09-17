@@ -563,12 +563,13 @@ fsLoadFile (
     // Precisamos usar as estruturas de diretorio e 
     // as estruturas de buffer.
     
-    FileSize = fsRootDirGetFileSize( (unsigned char *) file_name );
+    FileSize = fsRootDirGetFileSize ( (unsigned char *) file_name );
+    
     if (FileSize==0)
     {
         debug_print ("fsLoadFile: [FIXME] FileSize\n");
         printf      ("fsLoadFile: [FIXME] FileSize\n");
-        goto fail;
+        //goto fail;
     }
 
     if ( FileSize > BufferLimit )
@@ -967,7 +968,7 @@ void fs_load_rootdir (void)
 
 /*
  ***************************** 
- * fsGetFileSize: 
+ * fsRootDirGetFileSize: 
  * 
  */
 
@@ -1125,7 +1126,7 @@ unsigned long fsRootDirGetFileSize ( unsigned char *file_name ){
     if ( szFileName > 11 )
     {
         printf ("fsGetFileSize: [FIXME] name size fail %d\n",
-        szFileName );   
+            szFileName );   
         szFileName = 11;
     }
 
@@ -1182,11 +1183,11 @@ found:
     // Offsets: 28 29 30 31
 
     FileSize = *(unsigned long*) (VOLUME1_ROOTDIR_ADDRESS + (z*2) + 28 );
-	
+
 	//printf ("%d \n" , root[ z+14 ]);
 	//printf ("%d \n" , root[ z+15 ]);
 	//printf ("done: FileSize=%d \n" , FileSize);
-	
+
 	//#debug
 	//refresh_screen();
 	//while(1){ asm("hlt"); }
