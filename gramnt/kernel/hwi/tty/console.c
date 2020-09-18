@@ -138,27 +138,29 @@ void __local_insert_char ( int console_number )
 
 void __local_insert_line (int console_number)
 {
+    int oldtop=0;
+    int oldbottom=0;
 
-	int oldtop,oldbottom;
 
-	oldtop    = TTY[console_number].cursor_top;
-	oldbottom = TTY[console_number].cursor_bottom;
+    oldtop    = TTY[console_number].cursor_top;
+    oldbottom = TTY[console_number].cursor_bottom;
 
-	TTY[console_number].cursor_top    = TTY[console_number].cursor_y;
-	TTY[console_number].cursor_bottom = TTY[console_number].cursor_bottom;
-	
-    console_scroll (console_number);
+    TTY[console_number].cursor_top    = TTY[console_number].cursor_y;
+    TTY[console_number].cursor_bottom = TTY[console_number].cursor_bottom;
 
-	TTY[console_number].cursor_top    = oldtop;
-	TTY[console_number].cursor_bottom = oldbottom;
+
+    console_scroll(console_number);
+
+    TTY[console_number].cursor_top    = oldtop;
+    TTY[console_number].cursor_bottom = oldbottom;
 }
 
 
 void __local_delete_char(int console_number)
 {
-	
-	console_putchar ( ' ', console_number);
-	    
+
+    console_putchar ( ' ', console_number);
+
 /*
 	int i;
 	unsigned short * p = (unsigned short *) pos;
@@ -179,21 +181,22 @@ void __local_delete_char(int console_number)
 
 void __local_delete_line(int console_number)
 {
+    int oldtop=0;
+    int oldbottom=0;
 
-    int oldtop,oldbottom;
 
-	oldtop    = TTY[console_number].cursor_top;
-	oldbottom = TTY[console_number].cursor_bottom;
+    oldtop    = TTY[console_number].cursor_top;
+    oldbottom = TTY[console_number].cursor_bottom;
 
-	
-	TTY[console_number].cursor_top    = TTY[console_number].cursor_y;
-	TTY[console_number].cursor_bottom = TTY[console_number].cursor_bottom;
+
+    TTY[console_number].cursor_top    = TTY[console_number].cursor_y;
+    TTY[console_number].cursor_bottom = TTY[console_number].cursor_bottom;
 
     //#todo
 	//scrup();
 
-	TTY[console_number].cursor_top    = oldtop;
-	TTY[console_number].cursor_bottom = oldbottom;
+    TTY[console_number].cursor_top    = oldtop;
+    TTY[console_number].cursor_bottom = oldbottom;
 }
 
 
@@ -267,27 +270,22 @@ void csi_K(int par)
 
 void csi_m(void)
 {
-    int i;
+    int i=0;
 
-	for (i=0;i<=npar;i++)
-		switch (par[i]) {
-			
-			case 0:
-			    attr=0x07;
-			    break;
-			case 1:
-			    attr=0x0f;
-			    break;
-			case 4:
-			    attr=0x0f;
-			    break;
-			case 7:
-			    attr=0x70;
-			    break;
-			case 27:
-			    attr=0x07;
-			    break;
-		}
+    for (i=0; i<=npar; i++)
+    {
+
+        switch (par[i]) {
+
+        case 0:  attr=0x07;  break;
+        case 1:  attr=0x0f;  break;
+        case 4:  attr=0x0f;  break;
+        case 7:  attr=0x70;  break;
+        case 27: attr=0x07;  break;
+        // default?
+
+        };
+    };
 }
 
 
@@ -349,21 +347,21 @@ void csi_at (int nr, int console_number)
  *    Outputs a char on the console device;
  */
  
-
-void _console_outbyte (int c, int console_number){
-
-
 	// #test
 	// Tentando pegar as dimensões do char.
 	// #importante: 
 	// Não pode ser 0, pois poderíamos ter divisão por zero.
 
+void _console_outbyte (int c, int console_number){
+
     int cWidth  = get_char_width();
     int cHeight = get_char_height();
 
-    if ( cWidth == 0 || cHeight == 0 ){
-        debug_print ("_console_outbyte: char w h");
-        panic ("_console_outbyte: fail w h ");
+
+    if ( cWidth == 0 || cHeight == 0 )
+    {
+        debug_print ("_console_outbyte: char w h\n");
+        panic       ("_console_outbyte: fail w h");
     }
 
 
@@ -371,9 +369,10 @@ void _console_outbyte (int c, int console_number){
 	// Caso estejamos em modo texto.
 	// Isso ainda não é suportado.
 
-    if ( VideoBlock.useGui == 0 ){
-        debug_print ("_console_outbyte: kernel in text mode");
-        panic ("_console_outbyte: kernel in text mode");
+    if ( VideoBlock.useGui == 0 )
+    {
+        debug_print ("_console_outbyte: kernel in text mode\n");
+        panic       ("_console_outbyte: kernel in text mode");
     }
 
 	
@@ -697,7 +696,7 @@ void console_putchar ( int c, int console_number ){
         cHeight );
 
 	// flag off.
-	stdio_terminalmode_flag = 0;  
+    stdio_terminalmode_flag = 0;  
 }
 
 
@@ -715,25 +714,23 @@ __console_write (
 
 
     if ( console_number < 0 || console_number > 3 ){
-       debug_print ("__console_write: console_number\n");
-       return -1;
+       kprintf ("__console_write: console_number\n");
+       goto fail;
     }
 
  
-    //#testing.
     if ( (void *) buf == NULL ){
-        printf ("__console_write: buf\n");
-        refresh_screen();
-        return -1;
+        kprintf ("__console_write: buf\n");
+        goto fail;
     }
 
 
     if (!count){
-        printf ("__console_write: count\n");
-        return -1;
+        kprintf ("__console_write: count\n");
+        goto fail;
     }
 
-       
+
     //
     // Write string
     //   
@@ -745,6 +742,10 @@ __console_write (
 
 
     return (ssize_t) count;
+
+fail:
+    refresh_screen();
+    return (ssize_t) (-1);
 }
 
 
@@ -784,22 +785,19 @@ console_write (
     // Console number.
     if ( console_number < 0 || console_number > 3 ){
         printf ("console_write: console_number\n");
-        refresh_screen();
-        return -1;
+        goto fail;
     }
 
-    // BUffer.
+    // Buffer.
     if ( (void *) buf == NULL ){
         printf ("console_write: buf\n");
-        refresh_screen();
-        return -1;
+        goto fail;
     }
 
     // Count.
     if (!count){
         printf ("console_write: count\n");
-        refresh_screen();
-        return -1;
+        goto fail;
     }
 
 
@@ -992,8 +990,7 @@ console_write (
 
             default:
                 printf ("console_write: default\n");
-                refresh_screen();
-                return -1;
+                goto fail;
                 break;
         };
     };  // FOR 
@@ -1003,6 +1000,10 @@ console_write (
    //refresh_screen();
 
     return count;
+
+fail:
+    refresh_screen();
+    return -1;
 }
 
 
@@ -1027,9 +1028,12 @@ console_write (
  * @todo: Ele não será feito dessa forma, termos uma disciplica de linhas
  * num array de linhas que pertence à uma janela.
  *
- * @todo: Fazer o scroll somente no stream stdin e depois mostrar ele pronto.
- *
+ * #todo: 
+ * Fazer o scroll somente no stream stdin e 
+ * depois mostrar ele pronto.
  */
+
+// Called by __local_insert_line() and  console_outbyte().
 
 void console_scroll (int console_number){
 
@@ -1037,7 +1041,7 @@ void console_scroll (int console_number){
     unsigned long OldX=0;
     unsigned long OldY=0;
 
-    int i=0;
+    register int i=0;
 
 
     if ( VideoBlock.useGui != 1 )
@@ -1046,25 +1050,20 @@ void console_scroll (int console_number){
         panic       ("console_scroll: no GUI"); 
     }
 
-
+    // #bugbug
+    // Max limits ?
+ 
     if ( console_number < 0 )
         panic ("console_scroll: console_number");
 
 
-    // Copia o retângulo.
-    // #todo: 
-    // Olhar as rotinas de copiar retângulo.
+    // Scroll the screen rectangle.
     // See: windows/rect.c
 
     scroll_screen_rect();
 
-
-    //#debug
-    //refresh_screen();
-    //return;
-
-    //Limpa a última linha.
-
+    // Clena the last line.
+  
 	// Salva cursor
     OldX = TTY[console_number].cursor_x; 
     OldY = TTY[console_number].cursor_y; 
@@ -1087,7 +1086,7 @@ void console_scroll (int console_number){
     TTY[console_number].cursor_x = TTY[console_number].cursor_left; 
     TTY[console_number].cursor_y = OldY;  //( TTY[console_number].cursor_bottom -1); 
 
-    refresh_screen ();
+    refresh_screen();
 }
 
 
@@ -1102,15 +1101,15 @@ int kclear (int color, int console_number)
     int Status = -1;
 
 
-    if ( VideoBlock.useGui == 1 ){
+    if ( VideoBlock.useGui == 1 )
+    {
         backgroundDraw ( COLOR_BLUE );
+        
         TTY[console_number].cursor_x = 0; 
         TTY[console_number].cursor_y = 0; 
         Status = 0;
         
-    }else{
-        Status = -1;
-    };
+    }else{ Status = -1; };
 
     return (int) Status;
 }

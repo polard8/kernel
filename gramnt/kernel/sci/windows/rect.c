@@ -980,13 +980,15 @@ void scroll_screen_rect (void){
 
 	//#importante
 	//É bem mais rápido com múltiplos de 4.	
-	
-	//se for divisível por 4.
+
+
+    // Se for divisível por 4.
+    // Copia uma linha, quatro bytes de cada vez.  
+        
     if ( ((line_size * bytes_count) % 4) == 0 )
     {
         count = ((line_size * bytes_count) / 4); 
 
-        // Copia uma linha, quatro bytes de cada vez.  
         for ( i=0; i < lines; i++ )
         {
             memcpy32 (Dest,Src,count);
@@ -997,11 +999,12 @@ void scroll_screen_rect (void){
         return;
     }
 
-
-	//se não for divisível por 4.
+    // Se não for divisível por 4.
+    // Copia a linha, um bytes por vez.
+    // #todo: Podemos suprimir esse if e deixarmos ssomente o for.
+    
     if ( ((line_size * bytes_count) % 4) != 0 )
     {
-        // Copia a linha, um bytes por vez.
         for ( i=0; i < lines; i++ )
         {
             memcpy ( 
@@ -1014,9 +1017,6 @@ void scroll_screen_rect (void){
         };
     }
 }
-
-
-
 
 
 
