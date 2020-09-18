@@ -152,20 +152,20 @@ g_Stage2BPB dw 0    ;Para rotinas de 16 bit.
 g_Fat16BPB  dd 0    ;Para rotinas de 32 bit.
 ; ...
 
-;strings @todo: Mudar para inglês.
-;kernel_nome  db "KERNEL  BIN", 0  
 
-;
-; Mensagens.
-;
+;;
+;; == Messages =====================================================
+;;
 
 ;;
 ;; Splash.
 ;;
 
 msg_bm_splash:
-    db 'Gramado Boot Manager ',     13, 10, 
-    db 'Version ', BOOTMANAGER_VER, 13, 10, 0 
+    db 'Gramado Boot Manager ', 
+    db 'version ', BOOTMANAGER_VER, 13, 10, 0 
+
+
 
 msg_s2_init: 
     db 13, 10, "s2: Initializing stage 2", 13, 10, 0
@@ -176,13 +176,14 @@ msg_s2_activating_mode:
 msg_s2_failure:               
     db "s2: No sig", 13, 10, 0  
 
+
 ;msg
-msg_iniciando_bootmanager    db "s2: Initializing", 13, 10, 0
-msg_kernel_carregado         db "s2: Kernel carregado", 13, 10, 0
-msg_desligando_disquete      db "s2: Motor off", 13, 10, 0
-msg_initializing_VESA        db "s2: Initializing VESA", 13, 10, 0
-msg_a20                      db "s2: A20", 13, 10, 0
-msg_detect_harware           db "s2: Detecting hw", 13, 10, 0
+msg_iniciando_bootmanager    db "s2: Initializing",         13, 10, 0
+msg_kernel_carregado         db "s2: Kernel carregado",     13, 10, 0
+msg_desligando_disquete      db "s2: Motor off",            13, 10, 0
+msg_initializing_VESA        db "s2: Initializing VESA",    13, 10, 0
+msg_a20                      db "s2: A20",                  13, 10, 0
+msg_detect_harware           db "s2: Detecting hw",         13, 10, 0
 msg_selecting_videomode      db "s2: Selecting video mode", 13, 10, 0
 msg_tudo_carregado           db "s2: All loaded",0
 msg_back                     db "s2: RM",0

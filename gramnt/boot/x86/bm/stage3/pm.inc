@@ -22,18 +22,19 @@
 ;     ...
 ;
 
-
- 
-;msg_Test DB 'bm:pmInit: ...',0
  
 
-;====================================================================
-; pmInit:
-;
-;     Switching to Protected Mode.
-;
-;     Obs: Talvez essa rotina deva receber argumentos. 
-;     *Na inicialização essa rotina é chamada em modo texto.
+;; ====================================================================
+;; pmInit:
+;;
+;;     Switching to Protected Mode.
+;;
+;; obs: 
+;; Talvez essa rotina deva receber argumentos. 
+;; Na inicialização essa rotina é chamada em modo texto.
+;;
+
+;; Called by mShell in stage2/s2modes.inc
 
 pmInit:
 
@@ -42,32 +43,32 @@ pmInit:
 
     call get_boot_mode  
 
-	; #saving boot mode.
+    ; Saving boot mode.
 
     xor bx, bx
-    mov bl, al    
+    mov bl, al 
 
-	
-	;pusha
+
+    ;pusha
     ;call Window.StatusBar
     ;mov si, msg_Test
     ;call PoeString
     ;popa
-	
-	;debug
-	;jmp $
 
+    ;debug
+    ;jmp $
 
 ;;
-;; Trampoline
+;; == Trampoline ===============================================
 ;;
 
 trampoline:
-	
-	;setup registers 
+
+    ; Setup registers 
+    ; Keep the interrupts disabled.
 
     cli
-    mov ax, 0  
+    mov ax, 0 
     mov ds, ax
     mov es, ax
     ;mov fs, ax  
@@ -76,27 +77,22 @@ trampoline:
     mov ss, ax
     mov sp, 0x6000 
 
-
-	;;
-	;; GDTR
-	;;
-
+    ; GDTR
     ; Carrega o gdtr do stage 2.
+    
     lgdt [stage2_gdtr]
 
-	;;
-	;; CR0 - PE
-	;;
+    ; CR0 - PE
+    ; Muda PE.
 
-    ;Muda PE.
     mov eax, cr0
     or al, 1
     mov cr0, eax
 
 
-	;;
-	;; Flush pipeline.
-	;;
+;;
+;; == Flush pipeline ==================================================
+;;
 
 
 ;CS.
@@ -113,12 +109,10 @@ pmFlushPipeline:
 
 pm32:
 
-
     ;debug em modo texto.
     ;mov byte [0B8000h], byte 'P'
     ;jmp $
 
-	
 	;;
 	;; ## Inicalizando modo de boot ##
 	;;
@@ -145,24 +139,22 @@ pm32:
 
 	; Set up registers.
 
-	mov ax, stage2_DATA_SEL 
-	mov ds, ax
-	mov es, ax
-	;mov fs, stage2_NULL_SEL 
-	;mov gs, stage2_NULL_SEL 
-	
-	mov ss, ax
-	mov esp, dword 0x0009FFFC
+    mov ax, stage2_DATA_SEL 
+    mov ds, ax
+    mov es, ax
+    ;mov fs, stage2_NULL_SEL 
+    ;mov gs, stage2_NULL_SEL 
 
-	mov edx, dword 0
-	mov ecx, dword 0
-	mov ebx, dword 0
-	mov eax, dword 0
-	
-	
+    mov ss, ax
+    mov esp, dword 0x0009FFFC
+
+    mov edx, dword 0
+    mov ecx, dword 0
+    mov ebx, dword 0
+    mov eax, dword 0
+
 .GoToStart:
     nop
-
 
 	; debug message.
 .debug_textmode:    
@@ -174,11 +166,10 @@ pm32:
 	;mov byte [0B8003h], byte 7
 	;jmp $
 
-
 .debug_graphicmode:
     nop 
-	;jmp $
-	
+    ;jmp $
+
 .do_start:
     
 	; set IOPL to zero and reset all flags
@@ -193,8 +184,6 @@ pm32:
 	;mov eax, cr4
 	;or eax, 0x100
 	;mov cr4, eax
-	
-
 
 	;; IMPORTANTE: 
 	;; A ROTINA PARA VOLTAR PARA O MODO REAL E EXECUTAR UM SERVIÇO 
@@ -204,23 +193,27 @@ pm32:
 	; start:
 	; Inicia o modo escolhido que foi salvo em 'BOOT.modo'.
 	; IN: AL = Boot mode.
-	; #bugbug podemos ter um proble nessa variável BOOT BOOT.modo.
-	; start.inc
+	; #bugbug: 
+	; Podemos ter um proble nessa variável BOOT BOOT.modo.
+	; stage3/start.inc
 
 
-	mov al, byte [BOOT.modo]
+    mov al, byte [BOOT.modo]
 
 
-    ;;
-    ;;  Go to start
-    ;;
+;;
+;; == Go to Start =======================================
+;;
 
-	JMP start
-	JMP $
-	
+;; See: stage3/start.inc
 
-;#todo: Deletar.
-;pmMsg1 db "bm:pm: Starting PM and GM in Assembly..", 13, 10, 0
+    JMP start
+    JMP $
+
+;;
+;; ==================================================================
+;;
+
 
 
 ;

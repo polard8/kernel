@@ -1,27 +1,28 @@
-;    
-; File: lib16/s2modes.inc
-;
-;    stage2.
-;
-;     Ativa um modo de inicializa��o definido para o Boot Manager.
-;     Op��es:
-;     +1 - Inicia o Shell do boot manager.  
-;     +2 - Inicia o BL.BIN no modo GUI. 
-;
-; History:
-;     2015 - Created by Fred Nora.
-;
+;;    
+;; File: lib16/s2modes.inc
+;;
+;;    stage2.
+;;
+;;     Ativa um modo de inicializaçao definido para o Boot Manager.
+;;     Opçoes:
+;;     +1 - Inicia o Shell do boot manager.  
+;;     +2 - Inicia o BL.BIN no modo GUI. 
+;;
+;; History:
+;;     2015 - Created by Fred Nora.
+;;
 
  
 ;---------------------------------------
 ; set_boot_mode:
-;     Configura um modo de inicialisa��o do System4Nora.
+;     Configura um modo de inicializaçao.
 ;     in: al
 ; 
 set_boot_mode:
     mov byte [META$FILE.INIT_MODE], al
-	ret 
- 
+    ret 
+
+
 ;---------------------------
 ; get_boot_mode:
 ;     Pega o modo de inicialisa��o do System4Nora.
@@ -29,8 +30,9 @@ set_boot_mode:
 ;
 get_boot_mode:
     mov al, byte [META$FILE.INIT_MODE]
-	ret 
-	
+    ret 
+
+
 ;--------------------------------------------
 ; set_video_mode:
 ;     Configura um modo de video.
@@ -38,7 +40,8 @@ get_boot_mode:
 ; 
 set_video_mode:
     mov word [META$FILE.VIDEO_MODE], ax
-	ret 
+    ret 
+ 
  
 ;-------------------------------------------
 ; get_video_mode:
@@ -55,16 +58,15 @@ get_video_mode:
 
 
 
-
 ;==================================================================
 ; s2modesActivateMode:
-;     Ativa o modo escolhido por configura��o. 
+;     Ativa o modo escolhido por configuraçao. 
 ;
 ;+1 - Inicia o Shell do boot manager.  
 ;+2 - Inicia o BL.BIN no modo GUI. 
 ;++
 
-;; This function was called by main.asm.
+;; Called by xxx_Config in main.asm.
 
 s2modesActivateMode:
 
@@ -99,18 +101,19 @@ s2modesActivateMode:
     cmp al, byte BOOTMODE_GUI      
     je mGui 
 
-
-;; fail.
-.____default:
+    ;; Default
     jmp mShell
     jmp $
 
 
 
 
-;=================================================================
-;+1 (boot mode shell) -  
-;    Inicia a prompt de comandos do Boot Manager. #shell.   
+;;=================================================================
+;; mShell:
+;; 
+;;     +1 (boot mode shell) -  
+;;     Inicia a prompt de comandos do Boot Manager. #shell.   
+;;
 
 mShell:
 
@@ -120,49 +123,57 @@ mShell:
     call PoeString
     popa
 
+
 .videoMode:
 
-	;Set video mode.
-	;Modo texto � VGA 3.
-	
-	xor eax, eax
-	mov ax, word 3    
-	call set_video_mode
-	
-	;Screen.
-	;call Window.ClearScreen  
-	call Cursor.Hide         
-	
-.bootMode:	
+    ; Use video mode 3.
 
-	;Ativar modo de inicializa��o.
-	mov al, byte BOOTMODE_SHELL
-	call set_boot_mode
-	
-	; Obs: 
-	; @todo: Talvez os argumentos devam ser preparados antes.
+    xor eax, eax
+    mov ax, word 3    
+    call set_video_mode
 
-	 
-	; Inicializ�o do modo protegido.
-	; Switching to Protected Mode.
-	; msm/pm.inc
-	
-	jmp pmInit
-	jmp $  
-	
+    ; Screen.
+    ; call Window.ClearScreen  
 
-;==============================================================
-;+2 (boot mode gui) - Graphycs mode.
-;
-; VESA:
-;     + Verifica se suporta vesa.	
-;     + Inicia configura��o de video usando vesa.
-;
-;     Ativa o modo usando BIOS e valores do metafile.
-;     todo: 
-;     (bugbug) aqui estamos usando vesa para configurar o modo de
-;     de video, sem saber nada sobre a placa de v�deo.
-;
+    ; Cursor.
+    call Cursor.Hide 
+
+    ;; Boot mode.
+    ;; Ativar modo de inicializaçao.
+    ;; Obs: 
+    ;; #todo: 
+    ;; Talvez os argumentos devam ser preparados antes.
+    ;; Inicializao do modo protegido.
+    ;; Switching to Protected Mode.
+    ;; See: stage3/pm.inc
+
+.bootMode:
+
+    mov al, byte BOOTMODE_SHELL
+    call set_boot_mode
+
+    jmp pmInit
+    jmp $  
+
+
+
+;;==============================================================
+;; mGui:
+;;
+;;     +2 (boot mode gui) - Graphycs mode.
+;;
+
+
+;;
+;; VESA:
+;;     + Verifica se suporta vesa.	
+;;     + Inicia configura��o de video usando vesa.
+;;
+;;     Ativa o modo usando BIOS e valores do metafile.
+;;     todo: 
+;;     (bugbug) aqui estamos usando vesa para configurar o modo de
+;;     de video, sem saber nada sobre a placa de v�deo.
+;;
 ;;
 ;; * IMPORTANTE:
 ;;   O OBJETIVO � CHEGARMOS AQUI COM O ARQUIVO BL.BIN CARREGADO 

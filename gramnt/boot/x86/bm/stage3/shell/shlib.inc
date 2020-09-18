@@ -14,68 +14,57 @@
 ;     Cria um prompt de acordo com as configurações.
 ;     Ex: BMShell>_
 ;++ 
+
+; Questões:
+; Em que partição está o Shell?
+; Em que diretorio está o Shell?
+
+;; Called by os_command_line in shell.inc.
+
 show_new_prompt:
 
-    ;
-	; Questões:
-	; Em que partição está o Shell?
-    ; Em que diretorio está o Shell?
-	;
-	
-	mov ebx, 0x00FF0000
-	mov [os_Font_Color], ebx
-	
-	;pega
-	mov eax, dword [VOLUME.atual]    ;VOL
-	
-	;Se temos um novo, Colocamos ele.
-	cmp eax, dword 0
-	jne .new_vol
+    mov ebx, 0x00FF0000
+    mov [os_Font_Color], ebx
 
-	;
-	; Se não temos um novo, 
-	; colocamos o volume 'null' (BM-SHELL:)
-	;
-	
-	;Volume.
-	mov eax, dword VOLUME.boot_manager
-	call set_volume_atual
+    ;pega
+    mov eax, dword [VOLUME.atual]    ;VOL
 
-.new_vol:	
-	;Mostra o volume atual.
-	mov esi, dword [VOLUME.atual]    ;volumeX.
-	call os_output
+    ;Se temos um novo, Colocamos ele.
+    cmp eax, dword 0
+    jne .new_vol
 
-	;Mostra o separador ':'.
-	mov esi, dword VOLUME.separador    ;:.
-	call os_output
-	
-	mov esi, dword DIRECTORY.separador    ;/.
-	call os_output
+    ;; Set the prompt string
+    ;; See: fat16header.inc
 
-	;Pega diretório.
-	mov eax, dword [DIRECTORY.atual]    ;dir.
-	
-	cmp eax, dword 0
-	jne .new_dir 
+    mov eax, dword VOLUME.boot_manager
+    call set_volume_atual
 
-	mov esi, dword SHELL.separador1    ;>.
-	call os_output	
+.new_vol:
+
+    ;Mostra o volume atual.
+    mov esi, dword [VOLUME.atual]         ; 'volumeX' , 'BM-SHELL'
+    call os_output
+
+    mov esi, dword SHELL.separador1      ; '>'
+    call os_output
     ret
-	
-.new_dir:	
-	mov esi, dword [DIRECTORY.atual]
-	call os_output
 
-	mov esi, dword DIRECTORY.separador    ;:.
-	call os_output
+;.new_dir:	
+	;mov esi, dword [DIRECTORY.atual]
+	;call os_output
 
-	mov esi, dword SHELL.separador1    ;>.
-	call os_output
+	;mov esi, dword DIRECTORY.separador    ; ':'
+	;call os_output
+
+	;mov esi, dword SHELL.separador1       ; '>'
+	;call os_output
 
     ;mov eax, 0	
-    ret
+    ;ret
 ;--
+
+
+
 
 
 ;-----------------------------------------

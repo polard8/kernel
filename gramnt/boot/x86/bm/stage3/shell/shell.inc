@@ -51,14 +51,16 @@ align 1
 ;;     EAX = 1, Sair salvando o metafile, depois reiniciar.
 ;;++
 
+;; Called for the first time by startShellLoop in start.inc.
+
 os_command_line:
 
-	; Flag diferente de zero se haverá alguma operação com arquivo.
-	cmp byte [file_flag], 0
-	je .do_prompt
-	
-.do_change_font_color:	
-	
+    ; Flag diferente de zero se haverá alguma operação com arquivo.
+    cmp byte [file_flag], 0
+    je .do_prompt
+
+.do_change_font_color:
+
 	;Color.
 	;mov ebx, 0x00FF0000
 	;mov [os_Font_Color], ebx
@@ -72,17 +74,13 @@ os_command_line:
 	
 	; Não mostra o prompt.
 	jmp .no_prompt
-	
-	;Mostra o prompt.
-.do_prompt:	
-	
-	call show_new_prompt
-	
-	;mov esi, prompt
-	;call os_output
-    
-	;jmp $ ;Ok.
-	
+
+    ; Print new prompt.
+    ; See: stage3/shell/shlib.inc
+
+.do_prompt:
+    call show_new_prompt
+
 .no_prompt:
 	
 	;Color.
@@ -762,18 +760,26 @@ init_shell:
 shellInit: 
 	jmp os_command_line
 .done:
-	ret
-	
+    ret
+;--
 
-;--	
 
-;; #version
-;; Print shell version.
+
+
+;;================================================================
+;; shellPrintShellVersion:
+;;
+;;     Print shell version.
+;;
+
+;; Called by startShellLoop in start.inc
 
 shellPrintShellVersion:
+
+    ;; See: stage3/shell/shcalls.inc
     call print_ver
-	ret
-	
+    ret
+
 
 	;;
 	;; ======== ## Includes ## ========

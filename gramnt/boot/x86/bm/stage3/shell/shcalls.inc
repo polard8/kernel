@@ -638,20 +638,19 @@ shell_clear_screen:
 ;--
 
 
-;----------------------------------
-; print_ver:
-;     Mostra a versão.
-;++	
+;;========================================
+;; print_ver:
+;;     Print version string.
+;;++
 
 print_ver:
-	push esi
-	mov esi, version_msg
-	call os_output
-	pop esi
-	jmp os_command_line
-;--
+    push esi
+    mov esi, version_msg
+    call os_output
+    pop esi
+    jmp os_command_line
+;;--
 
-	
 ;=========================================================
 ; fail:
 ;     We didn't get a valid command or program name.

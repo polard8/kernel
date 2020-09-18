@@ -173,6 +173,8 @@ CURRENT_PATH:
     ;@todo: Talvez não precise ser tão grande ainda.
     TIMES 256 DB 0x00 
 
+
+
 ;-----------------------	
 ;Caminhos strings.
 ; @todo: Tem muita string aqui.
@@ -207,11 +209,12 @@ PATH:
 ; Pois cada volume pode estar em um disco diferente.
 ;
 ;
+
 VOLUME:
     .number: db 0                   ;Número do volume atual.
     .separador     db ":",0
     .atual:        dd 0             ;Endereço do nome do volume atual.
-	.boot_manager  db "BM-SHELL",0  ;Estamos no Boot Manager antes de qualquer partição.
+    .boot_manager  db "BM-SHELL",0  ;Estamos no Boot Manager antes de qualquer partição.
     .p0_name       db "volume0" ,0
     .p1_name       db "volume1" ,0
     .p2_name       db "volume2" ,0
@@ -223,19 +226,21 @@ VOLUME:
     .p8_name       db "volume8" ,0
     ;...
 
+
+
 ;Directory strings.
 DIRECTORY:
     ;.number:       db 0
     .separador     db "/",0
-	.atual:        dd 0            ;Endereço do nome do diretório atual.
-	.boot_manager  db 0            ;No caso do Boot Manager.
-	.boot          db "/boot"   ,0
-	.system        db "/system" ,0
-	.user          db "/user"   ,0
-	.root          db "/root"   ,0
-	;...
+    .atual:        dd 0            ;Endereço do nome do diretório atual.
+    .boot_manager  db 0            ;No caso do Boot Manager.
+    .boot          db "/boot"   ,0
+    .system        db "/system" ,0
+    .user          db "/user"   ,0
+    .root          db "/root"   ,0
+    ;...
 
-	
+
 ;
 ; Nome do arquivo.
 ;

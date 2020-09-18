@@ -159,13 +159,18 @@ G_START_GUI EQU 0  ;; 1= (YES) 0 = (NO)
 [bits 16]
 
 
+;;===============================================================
+;; bm_start:
+;;
+;;     Entry point
+;;
+
 ;; This is the entry point for the BM.BIN.
 ;; Jump after the data area.
 
 bm_main:
 
     jmp START_AFTER_DATA
-
 
 ROOTDIRSTART EQU (bootmanagerOEM_ID)
 ROOTDIRSIZE  EQU (bootmanagerOEM_ID+4)
@@ -195,17 +200,17 @@ bootmanagerSystemID              db "FAT16   "
 
 ;;
 ;; Salvando alguns argumentos passados pelo MBR. 
-save_cylinder_numbers: dw 0  ;N�mero de cilindros do disco.
+save_cylinder_numbers: dw 0  ;Numero de cilindros do disco.
 ;;...
 
 
 
-;;====================================================================
-
-
-;;
-;; Real entry point.
+;;===============================================================
+;; START_AFTER_DATA:
 ;; 
+;;     The real entry point.
+;;
+
 
 ;; #importante: 
 ;; O �nico argumento passado pelo MBR foi o n�mero do disco.
@@ -234,13 +239,11 @@ START_AFTER_DATA:
     sti
 
 
-    ;
     ; Save disk number.
-    ;
 
     mov byte [bootmanagerDriveNumber], dl
-    mov byte [META$FILE.DISK_NUMBER], dl  
-    mov byte [DISKINFO16_disk_number], dl  
+    mov byte [META$FILE.DISK_NUMBER], dl
+    mov byte [DISKINFO16_disk_number], dl
 
     ;;
     ;; Get disk info.
@@ -269,7 +272,7 @@ START_AFTER_DATA:
 
 	;
 	;Heads.
-	;N�mero de heads.
+	;Numero de heads.
 	;Logical last index of heads = (number_of - 1). 
 	;(Because index starts with 0).
 	;
@@ -331,7 +334,7 @@ START_AFTER_DATA:
     shl ax, 2                  ; Move them to bits 8&9.
     mov al, ch                 ; Rest of the cylinder bits.(low 8 bits)
     inc eax                    ; Number is 0-based.
-    ; N�mero de cilindros do disco.
+    ; Numero de cilindros do disco.
     mov word [save_cylinder_numbers], ax
     mov word [META$FILE.CYLINDERS], ax
     mov word [DISKINFO16_cylinders], ax
@@ -472,7 +475,7 @@ bootmanagerLOAD_FAT:
     mov si, bootmanagermsgImg
     call bootmanagerDisplayMessage
 
-    ; Op��o de mensagem.
+    ; Opçao de mensagem.
     ; mov si, bootmanagermsgCRLF
     ; call bootmanagerDisplayMessage
 
@@ -546,12 +549,12 @@ bootmanagerDONE:
 
     ;;========================
     ;; Aten��o:
-    ;;     Esse � primeiro setor do BM.BIN, ele ir� carregar o arquivo BL.BIN 
+    ;;     Esse � primeiro setor do BM.BIN, ele ira carregar o arquivo BL.BIN 
     ;; e ir� passar o comando para o stage 2 do (BM).
     ;;=======================	
 
     ;Mensagem de sucesso.
-    mov si, bootmanagermsgOK 
+    mov si, bootmanagermsgDONE
     call bootmanagerDisplayMessage
 
 	;Debug breakpoint.
@@ -740,13 +743,13 @@ bootmanagercluster dw 0x0000
 bootmanagerImageName    db "BL      BIN" ,0x0D, 0x0A,0x00
 
 ; Strings.
-bootmanagermsgFAT       db  0x0D, 0x0A,"Loading FAT", 0x0D, 0x0A, 0x00
-bootmanagermsgImg       db  "L... I", 0x0D, 0x0A, 0x00
+bootmanagermsgFAT       db  0x0D, 0x0A, "Loading FAT",   0x0D, 0x0A, 0x00
+bootmanagermsgImg       db  0x0D, 0x0A, "Loading Image", 0x0D, 0x0A, 0x00
 bootmanagermsgFailure   db  0x0D, 0x0A, "ROOT", 0x00
 bootmanagermsgFail      db  "Read",0x00
 bootmanagermsgSearch    db  "S",0
 bootmanagermsgProgress  db  "*", 0x00
-bootmanagermsgOK        db  "#",0
+bootmanagermsgDONE      db  0x0D, 0x0A, "DONE", 0x0D, 0x0A, 0x00 ;;"#",0
 bootmanagermsgCRLF      db  0x0D, 0x0A, 0x00
 ;; ...
 
@@ -986,30 +989,31 @@ stage2_main:
 
 
 
-;------------------------------------------
-; AFTER_DATA:
-;     In�cio real do stage 2.
-;     A primeira coisa a se fazer � salvar os par�metros de 
-; disco passados pelo stage1.
-;
-; Argumentos recebidos:
-;     bx = Magic number. (autoriza��o)
-;     ax = Number of heads.
-;     dl = Drive number.
-;     cl = Sectors per track.
-;     si = BPB.
-;
+;;==============================================================
+;; AFTER_DATA:
+;;
+;;     Inicio real do stage 2.
+;;     A primeira coisa a se fazer eh salvar os parametros de 
+;; disco passados pelo stage1.
+;;
+;; Argumentos recebidos:
+;;     bx = Magic number. (autorizaçao)
+;;     ax = Number of heads.
+;;     dl = Drive number.
+;;     cl = Sectors per track.
+;;     si = BPB.
+;;
 
 AFTER_DATA:
 
-
     ; Message.
     ; Boot Manager Splash.
-
+    ; See: s2header.inc
+    
     mov ax, 0 
     mov ds, ax
     mov es, ax 
-
+ 
     mov si, msg_bm_splash
     call DisplayMessage
 
@@ -1042,19 +1046,17 @@ xxx_checkSig:
     ; significa que o arquivo eta no lugar.
     jmp .sigFound
 
-    ;;
-    ;; Not found
-    ;;
+;;
+;; == Not Found ===============================================
+;;
 
     ; A assinatura n�o foi encontrada,
     ; o arqui n�o est� na mem�ria.
-    
-.sigNotFound:
-    
     ;; message: 
     ;; O arquivo n�o esta presente na mem�ria.
-    
-    mov si, stage2_msg_pe_sig
+
+.sigNotFound:
+    mov si, stage2_msg_pe_sigNotFound
     call DisplayMessage
 
 .sigHalt:
@@ -1063,9 +1065,9 @@ xxx_checkSig:
     jmp .sigHalt
 
 
-    ;;
-    ;; Found.
-    ;;
+;;
+;; == Found ===============================================
+;;
 
 
 ;; A assinatura foi encontrada ... 
@@ -1075,12 +1077,11 @@ xxx_checkSig:
 
 .sigFound:
 
-    mov si, stage2_msg_pe_sigOK
+    mov si, stage2_msg_pe_sigFound
     call DisplayMessage
 
     ;debug
     ;jmp $
-
 
 xxx_turnoffFDCMotor:
 
@@ -1094,11 +1095,11 @@ xxx_setupRegisters:
     mov ax, 0 
     mov ds, ax
     mov es, ax
-    ;mov fs, ax  
+    ;mov fs, ax 
     ;mov gs, ax 
     xor ax, ax
     mov ss, ax
-    mov sp, 0x6000 
+    mov sp, 0x6000
     xor dx, dx
     xor cx, cx
     xor bx, bx
@@ -1116,11 +1117,11 @@ xxx_setupA20:
     popa
 
 
-    ;;
-    ;; Config
-    ;;
+;;
+;; == xxx_Config =================================================
+;;
 
-    ; Configurando o modo de inicializa��o do Boot Manager:
+    ; Configurando o modo de inicializaçao do Boot Manager:
     ; ======================================
     ; Seleciona um modo de inicializa�ao para o Boot Manager.
     ; A op��o est� salva no metafile do Boot Mananger.
@@ -1134,33 +1135,44 @@ xxx_Config:
     ; Configura o metafile. META$FILE.INIT_MODE = al
     ;
 
+    ; Message
+    ; See: s2header.inc
+
 .setupBootMode:
 
-    ; Message
     mov si, msg_selecting_videomode
     call DisplayMessage
 
     ; Debug
     ; JMP $
 
-
-.preSelection:
-
     ; #important:
     ; It gets a global configurable variable.
     ; See the in the top of this document.
     ; 1=gui 2=text
 
+;; ++
+;; =====================================
+.preSelection:
+
     mov al, G_START_GUI 
 
+    ;; gui
     cmp al, 1
     je .xxxxGUI
 
+    ;; cli
     cmp al, 0
     je .xxxxCLI
 
     jmp .xxxxGUI
+;; =====================================
+;; --
 
+
+;;
+;; == Text mode ================================================
+;;
 
 ; text mode.
 ;   ## SET UP BOOT MODE ##
@@ -1169,6 +1181,11 @@ xxx_Config:
     mov al, byte BOOTMODE_SHELL
     call set_boot_mode
     jmp .xxxxGO
+
+
+;;
+;; == Graphics mode =============================================
+;;
 
 
 ; gui mode.
@@ -1189,7 +1206,7 @@ xxx_Config:
 ;; == \o/ ============================================
 ;;
 
-    ; Ativar o modo escolhido.
+    ; Activate the chosen mode.
     ; (lib16/s2modes.inc)
 
 .xxxxGO:
@@ -1234,14 +1251,14 @@ stage2Shutdown:
 
 
 ;;
-;; ==== Messages. ====
+;; == Messages =====================================================
 ;;
 
-stage2_msg_pe_sig: 
-    db "BM:stage2Initializations: *PE SIG",0
+stage2_msg_pe_sigNotFound: 
+    db "bm-xxx_checkSig: Signature not found", 13, 10, 0
     
-stage2_msg_pe_sigOK: 
-    db "BM:stage2Initializations: SIG OK", 13, 10, 0
+stage2_msg_pe_sigFound: 
+    db "bm-xxx_checkSig: Signature found", 13, 10, 0
 
 
 

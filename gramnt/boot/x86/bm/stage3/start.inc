@@ -36,22 +36,25 @@
 ;
 
 
+;;=======================================================
+;; start:
+;;=======================================================
+;;     Inicio do modo protegido de 32 bit
+;; IN:
+;;     AL = New mode.  (o modo a ser inicializado)
+;;
+;; Pega o modo de video passado pelo stage 2 atraves de AL e 
+;; salva no contexto de 32 bits.
+;;
 
-;=======================================================
-; start:
-;     Inicio do modo protegido de 32 bit
-; IN:
-;     AL = New mode.  (o modo a ser inicializado)
-;
-; Pega o modo de video passado pelo stage 2 atraves de AL e 
-; salva no contexto de 32 bits.
-;
+;; Called by pm32 in stage3/pm.inc
+
 
 start:
 
-	;; #bugbug 
-	;; Esse valor pode estar errado durante a 
-	;; inicializaçao em modo texto.
+    ;; #bugbug 
+    ;; Esse valor pode estar errado durante a 
+    ;; inicializaçao em modo texto.
 
     mov byte [BOOT.modo], al
 
@@ -61,162 +64,126 @@ start:
     xor eax, eax
 
 
-
 ; ajusta_modo: 
-;     Inicia um modo da configura��o permanente.
-;     @todo: Trocar o nome.
+; Inicia um modo da configura��o permanente.
+; todo: Trocar o nome.
+; #bugbug 
+; Esse valor pode estar errado durante 
+; a inicializa��o em modo texto.
+; Pega o modo de inicialisa��o do Boot Manager. 
+; Escolhe o modo:
+; ==============
+; modo 1 - Inicia o BL.BIN no modo TEXTO.(Default).
+; modo 2 - Inicia o BL.BIN no modo GR�FICO.
+; modo 3 - Inicia a prompt de comandos do bootmanager.
+; modo 4 - (reservado)
+; Default.
 
 ajusta_modo:
     nop
-	
 startSetupMode:
+    
+    xor eax, eax
+    mov al, byte [BOOT.modo]  
 
-	;; #bugbug 
-	;; Esse valor pode estar errado durante 
-	;; a inicializa��o em modo texto.
+    ;; cli
+    cmp al, byte 1  
+    je startCLI
 
-	;Pega o modo de inicialisa��o do Boot Manager. 
-	
-	xor eax, eax
-	mov al, byte [BOOT.modo]  
-	
-	
-	; Escolhe o modo:
-	; ==============
-	;
-	; modo 1 - Inicia o BL.BIN no modo TEXTO.(Default).
-	; modo 2 - Inicia o BL.BIN no modo GR�FICO.
-	; modo 3 - Inicia a prompt de comandos do bootmanager.
-	; modo 4 - (reservado)
-	; Default.
-	
-	cmp al, byte 1  
-	je startCLI
-	
-	cmp al, byte 2  
-	je startGUI
-	
-	; Default mode.
-	
-.default:	
-	jmp startCLI 
-	;jmp $
-	
+    ;; gui
+    cmp al, byte 2  
+    je startGUI
+
+    ;; default
+    jmp startCLI 
+    jmp $
+
+;;
+;; ============================================================
+;;
 
 
 ;============================
 ; startCLI:
 ;     Inicia o Shell do Boot Manager. 
-	
+
 startCLI:
-	
-	call setup_machine
-	
-	;Segmentos e pilha.
-	cli
-	mov ax, word 0x10  
-	mov ds, ax
-	mov es, ax 
-	mov eax, stack_ptr
-	mov esp, eax 
-	
-	;Configura volume.
-	;;?? onde ?? blconfig.inc
-	
-	mov al, byte 1
-	call set_fs_volume  
-	
-	;Configura fs type.
-	
-	mov al, byte 1
-	call set_fs_type
-	
-	;Limpa a tela em modo texto.
-	;call clear_screen
+
+    call setup_machine
+
+    ; Segments and stack.
+    ; Keep interrupts disabled.
+    
+    cli
+    mov ax, word 0x10  
+    mov ds, ax
+    mov es, ax 
+    mov eax, stack_ptr
+    mov esp, eax 
 
 
-    ; Enable all the interrupts.
+    ; Configura volume.
+    ; ?? onde ?? blconfig.inc
+
+    mov al, byte 1
+    call set_fs_volume  
+
+    ; Configura fs type.
+
+    mov al, byte 1
+    call set_fs_type
+
+
+    ; Limpa a tela em modo texto.
+    ; call clear_screen
+
+
+;;
+;; == Enable all the interrupts ======================================
+;;
 
 .enableInterrupts:
 
     mov al, 0
     out 0xA1, al 
     out 0x21, al 
+
     sti 
 
 
 ;;
-;; == Shell loop =================================================
+;; ===============================================================
 ;;
 
-	;; #importante
-	;; O shell est� em msm/shell
-	;; Esse � loop do shell do boot manager.
-	
+;;==================================
+;; startShellLoop:
+;;     The shell loop.
+;;
+
+;; #importante
+;; O shell esta em stage3/shell
+;; Esse eh loop do shell do boot manager.
+
 startShellLoop:
-    
-	;;shell.inc
-	call shellPrintShellVersion    
-	
-	
-.shellInit:
-    
-	;;shell.inc
-	call shellInit                
-    
-	; Sairemos do loop.
-    ; 0 - Nenhuma altera��o foi feita, 
-	; n�o precisa salvar o metafile.
-	cmp eax, 0
-	je .exit0
 
-    ; Sairemos do loop.
-    ; 1 - Alguma altera��o foi feita, 
-	; precisa salvar o metafile.
-	cmp eax, 1
-	je .exit1
-	
-	jmp startShellLoop
-	JMP $
+    ; Splash message.
+    ; See: stage3/shell/shmsg.inc
 
-
-    ;; Exit 0
-
-;	
-;Saimos do loop do shell.
-;Nenhuma altera��o foi feita, n�o precisa salvar o metafile.
-;Apenas reiniciamos o sistema.
-.exit0:
-
-    mov esi, start_msg_rebooting
+    push esi
+    mov esi, version_msg
     call os_output
+    pop esi
+    
+    ;; Go to the loop.
+    ;; stage3/shell/shell.inc
 
-    jmp keyboardReboot
+    jmp os_command_line
     jmp $
 
+;;
+;; ===============================================================
+;;
 
-    ;; Exit 1
-
-;
-;Saimos do loop do shell.
-;Alguma altera��o foi feita, precisamos salvar o metafile.
-;Reiniciamos o sistema para validar as altera��es feitas no metafile. 
-.exit1:
-
-	mov esi, start_msg_saving_metafile
-	call os_output
-	
-	; obs: 
-	; Essa rotina deve ser realizada em 32bit.
-	; ;@todo (fs\fs32.inc)
-
-    call fs32SaveMetafile  
-
-    mov esi, start_msg_rebooting
-    call os_output
-
-    jmp keyboardReboot
-    jmp $
 
 
 ;

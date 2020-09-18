@@ -1,16 +1,27 @@
 ;;
-;; Gramado MBR - Esse é o MBR que é montado no VHD na hora de sua criação.
+;; Gramado MBR - 
+;; Esse é o MBR que é montado no VHD na hora de sua criação.
 ;; Será o primeiro setor do disco.
-;; Essa rotina carrega o BM.BIN na memória e passa o comando para ele. Além de
-;; passar argumentos.
-;; (c) Copyright 2017 - Fred Nora.
+;; Essa rotina carrega o BM.BIN na memória e passa o comando para ele. 
+;; Além de passar argumentos.
 ;;
-;; É um VHD de 32MB. A primeira partição é a partição do sistema e está formatada
+;; É um VHD de 32MB. 
+;; A primeira partição é a partição do sistema e está formatada
 ;; em fat16 com 512 bytes por cluster.
 ;;
-;; Obs: Não mudar os endereços de segmento e offset usados para não arrumar problemas.
+;; Obs: 
+;; Não mudar os endereços de segmento e offset usados 
+;; para não arrumar problemas.
 ;;
-;; See: https://thestarman.pcministry.com/asm/mbr/PartTables.htm
+;; History:
+;;     2017 - Fred Nora.
+;;
+
+
+;;
+;; Partition table:
+;; See:
+;;     https://thestarman.pcministry.com/asm/mbr/PartTables.htm
 ;;
 
 
@@ -77,18 +88,20 @@ cluster     dw  0x0000
 
 ;CylinderNumbers:  dd 0  ;;dword
 
+
+
 ;;
-;; Mensagens.
+;; == Messages ==================================================
 ;;
 
+;; The image name.
 ImageName     db "BM      BIN", 0x0D, 0x0A, 0x00
-msgFailure    db "R", 0x00               ;; ROOT failure.
-;msgProgress  db "*", 0x00               ;; Progresso.
-;msgCRLF      db 0x0D, 0x0A, 0x00        ;; Espaçamento. 
-;msgFAT		  db "F", 0x0D, 0x0A, 0x00   ;; Loading FAT.
-;msgImg		  db "I", 0x0D, 0x0A, 0x00   ;; Loading Image.
-;msgFail	  db "r",0x00                ;; read failure.
+
+;; 'R' = Root fail.
+msgFailure    db "R", 0x00 
+
 ;...
+
 
 
 ;;
@@ -177,11 +190,11 @@ LOAD_ROOT:
 
 
     xor  cx, cx
-    mov  ax, 32                     ; 32 byte. Tamanho de uma entrada de diretório.
-    mul  WORD [MaxRootEntries]      ; 512. Tamanho total do diretório dado em bytes. (32*512) bytes.
-    div  WORD [BytesPerSector]      ; ((32*512)/512) O número total de bytes no diretório, dividido pela quantidade de bytes por setor.
-    mov  WORD [ROOTDIRSIZE], ax      
-    mov cx, ax                      ; Coloca o resultado em cx. (Quantidade de setores no diretório raiz.)
+    mov  ax, 32                   ; 32 byte. Tamanho de uma entrada de diretório.
+    mul  WORD [MaxRootEntries]    ; 512. Tamanho total do diretório dado em bytes. (32*512) bytes.
+    div  WORD [BytesPerSector]    ; ((32*512)/512) O número total de bytes no diretório, dividido pela quantidade de bytes por setor.
+    mov  WORD [ROOTDIRSIZE], ax
+    mov cx, ax                    ; Coloca o resultado em cx. (Quantidade de setores no diretório raiz.)
 
 
 	;; Root location
@@ -189,8 +202,8 @@ LOAD_ROOT:
 
 
     xor ax, ax
-    mov  al, BYTE [TotalFATs]        ; 2. Number of FATs.
-    mul  WORD [SectorsPerFAT]        ; 246. Sectors used by FATs.
+    mov  al, BYTE [TotalFATs]    ; 2. Number of FATs.
+    mul  WORD [SectorsPerFAT]    ; 246. Sectors used by FATs.
 
 
 	; +62. Adiciona os setores reservados. 
@@ -273,28 +286,29 @@ LOAD_ROOT:
 .searchFile:
 
     ; Browse root directory for binary image
-    mov  cx, WORD [MaxRootEntries]           ; Load loop counter.
-    mov  di, 0x0200                          ; Determinando o offset do início do diretório.
+    mov  cx, WORD [MaxRootEntries]    ; Load loop counter.
+    mov  di, 0x0200                   ; Determinando o offset do início do diretório.
 
 .LOOP:
     push  cx
-    mov  cx, 0x000B                          ; Eleven character name.
-    mov  si, ImageName                       ; Image name to find.
+    mov  cx, 0x000B       ; Eleven character name.
+    mov  si, ImageName    ; Image name to find.
     pusha
     call  DisplayMessage
     popa
     push  di
-    rep  cmpsb                               ; Test for entry match.
+    rep  cmpsb            ; Test for entry match.
     pop  di
-    je  LOAD_FAT                             ;; * Se o arquivo foi encontrado.
+    je  LOAD_FAT          ; Se o arquivo foi encontrado.
     pop  cx
-    add  di, 0x0020                          ; Queue next directory entry.
+    add  di, 0x0020       ; Queue next directory entry.
     loop  .LOOP
     jmp  FAILURE
 
 
 	;;
-	;; * Carregar o a FAT em es:bx 0x17C0:0200.
+	;; Load the FAT in es:bx 0x17C0:0200.
+	;; #bugbug Size?
 	;;
 
 LOAD_FAT:
@@ -315,7 +329,7 @@ LOAD_FAT:
     ; File's first cluster.
 
     mov dx, WORD [di + 0x001A]
-    mov WORD [cluster], dx                  
+    mov WORD [cluster], dx 
 
 
     ;; Efetuando o carregamento da fat no buffer es:bx. 
@@ -367,7 +381,6 @@ LOAD_FAT:
     ;; Carregar o arquivo BM.BIN na memória em es:bx, 
     ;; 0:8000h.
 
-
 ;.msgSpace:
     
     ;Mensagem de espaçamento.
@@ -418,16 +431,15 @@ __loop_LOAD_IMAGE:
     mov  ax, WORD [cluster]    ; Cluster inicial do arquivo, obtido na entrada no diretório.
     call  ClusterLBA           ; Convert cluster to LBA.
 
-
-.loadImage:
-
 	;; Carregamos apenas um cluster de cada vez.
 	;; No nosso caso, um cluster só tem um setor.
+
+.loadImage:
 
     xor  cx, cx
     mov  cl, BYTE [SectorsPerCluster]    ; 1. Sectors to read.
     call  ReadSectors
-    
+
 .saveThis:
 
 	; Vamos savar o offset do próximo setor a ser carregado.
@@ -456,8 +468,7 @@ __loop_LOAD_IMAGE:
 
     ; Test for end of file.
     ; Testamos para ver se é o último cluster. 
-    ; 0xFFFF ?
-    ; 0xFFF8 ?
+    ; 0xFFFF ? or 0xFFF8 ?
     ; Se esse foi o último cluster então prosseguiremos.
     ; Caso contrário volta para o loop.
 
@@ -516,14 +527,12 @@ ReadSectors:
     push  bx
     push  cx
 
-
     push si
     mov ah, 0x42
     mov dl, 0x80
     mov si, DAPSizeOfPacket
     int 0x13
     pop si
-
  
     jnc  .__SUCCESS    ; Test for read error.
     xor  ax, ax        ; BIOS reset disk.
@@ -537,7 +546,6 @@ ReadSectors:
 
     ; Attempt to read again
     jnz  .SECTORLOOP    
-
 
 ;.fail:
     int  0x18
@@ -555,12 +563,10 @@ ReadSectors:
     pop  bx
     pop  ax
 
-
     ; Queue next buffer.
-    add bx, WORD [BytesPerSector]   
+    add bx, WORD [BytesPerSector] 
     cmp bx, 0x0000
     jne .NextSector
-
 
     ; Trocando de segmento.
 
@@ -569,7 +575,6 @@ ReadSectors:
     add  ax, 0x1000
     mov  es, ax
     pop  ax
-
 
 .NextSector:
 
@@ -610,7 +615,7 @@ DisplayMessage:
     lodsb                  ; Load next character.
     or al, al              ; Test for NUL character.
     jz .DONE
-    mov ah, 0x0E           ; BIOS teletype.                           
+    mov ah, 0x0E           ; BIOS teletype. 
     mov bx, 0x0007         ; Página e atributo.  
     int 0x10               ; Invoke BIOS.
     jmp  DisplayMessage
