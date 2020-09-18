@@ -229,6 +229,33 @@ int debug (void){
 }
 
 
+/*
+void
+debugDumpMemory(
+    void *Start,
+    unsigned long Length);
+void
+debugDumpMemory(
+    void *Start,
+    unsigned long Length)
+{
+    unsigned long cnt=0;
+
+    kprintf (" %x:\n", (unsigned long) Start );
+
+    for (cnt=0; cnt<Length; cnt++) 
+    {
+        //kprintf( "%x ", *((unsigned short *)(Start)+cnt) );
+        kprintf( "%x ", *((unsigned char *)(Start)+cnt) );
+
+        if (((cnt+1)%16)==0) { kprintf ("\n"); }
+    };
+    
+    refresh_screen();
+}
+*/
+
+
 
 /*
  **********************************
