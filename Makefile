@@ -1,7 +1,7 @@
 # License: BSD License
 VERSION = 1
 PATCHLEVEL = 0
-SUBLEVEL = 112
+SUBLEVEL = 113
 EXTRAVERSION = 
 NAME = Gramado 1.0
 
@@ -170,130 +170,72 @@ vhd-copy-files:
 	@echo "(Step 6) Copying files into the mounted VHD ..."
 
 
-#
-# == Creating folders ======================================
-#
-
-	# unix-like stuff.
-	# Creating standard folders
-#	-sudo mkdir /mnt/gramadovhd/BIN
-#	sudo mkdir /mnt/gramadovhd/BOOT
-#	-sudo mkdir /mnt/gramadovhd/DEV
-#	-sudo mkdir /mnt/gramadovhd/DEV/PTS
-#	-sudo mkdir /mnt/gramadovhd/EFI
-#	-sudo mkdir /mnt/gramadovhd/EFI/BOOT
-#	-sudo mkdir /mnt/gramadovhd/ETC
-#	-sudo mkdir /mnt/gramadovhd/HOME
-#	-sudo mkdir /mnt/gramadovhd/LIB
-#	-sudo mkdir /mnt/gramadovhd/MNT
-#	-sudo mkdir /mnt/gramadovhd/PROGRAMS
-#	-sudo mkdir /mnt/gramadovhd/PORTALS
-#	-sudo mkdir /mnt/gramadovhd/SBIN
-#	-sudo mkdir /mnt/gramadovhd/TMP
-#	-sudo mkdir /mnt/gramadovhd/USERS
-	# -sudo mkdir /mnt/gramadovhd/BREAD-AND-WINE
-
-
-
-#
-# == "/" ====================================================
-#
-
+	# ====================================================
 	# 1) First of all
 	# bm, bl, kernel, init, gdeshell.
-	sudo cp gramnt/boot/x86/bin/BM.BIN      base/
-	sudo cp gramnt/boot/x86/bin/BL.BIN      base/
-	sudo cp gramnt/kernel/KERNEL.BIN        base/
+	sudo cp gramnt/boot/x86/bin/BM.BIN  base/
+	sudo cp gramnt/boot/x86/bin/BM.BIN  base/BOOT
+	sudo cp gramnt/boot/x86/bin/BM.BIN  base/PORTALS
 
-	sudo cp gramci/init/INIT.BIN           base/
+	sudo cp gramnt/boot/x86/bin/BL.BIN  base/
+	sudo cp gramnt/boot/x86/bin/BL.BIN  base/BOOT
+	sudo cp gramnt/boot/x86/bin/BL.BIN  base/PORTALS
+
+	sudo cp gramnt/kernel/KERNEL.BIN  base/
+	sudo cp gramnt/kernel/KERNEL.BIN  base/BOOT
+	sudo cp gramnt/kernel/KERNEL.BIN  base/PORTALS
+
+	sudo cp gramci/init/INIT.BIN  base/
+	sudo cp gramci/init/INIT.BIN  base/PORTALS
+
 	sudo cp gramci/setup/bin/GDESHELL.BIN  base/
+	sudo cp gramci/setup/bin/GDESHELL.BIN  base/PORTALS
+	# ====================================================
 
 
-	# EXTRA: Used for tests.
+	# setup
+	#-sudo cp gramci/setup/bin/*.BIN    base/
+
+	# sysmon
 	sudo cp gramci/setup/bin/SYSMON.BIN base/
+
+
+	# apps
+#	-sudo cp gramci/shell/apps/bin/*.BIN  base/
+#	-sudo cp gramci/shell/apps/bin/*.BIN  base/PROGRAMS
+	-sudo cp gramci/shell/apps/bin/GWM.BIN     base/
+	-sudo cp gramci/shell/apps/bin/EDITOR.BIN  base/
 	# ...
 
 
-	# 6) from Portals to root.
+	# cmd
+	#-sudo cp gramci/shell/cmd/bin/*.BIN  base/
+	#-sudo cp gramci/shell/cmd/bin/*.BIN  base/BIN
+#	-sudo cp gramci/shell/cmd/bin/REBOOT.BIN     base/
+	-sudo cp gramci/shell/cmd/bin/CAT.BIN        base/
+#	-sudo cp gramci/shell/cmd/bin/TRUE.BIN       base/
+#	-sudo cp gramci/shell/cmd/bin/FALSE.BIN      base/
+	# ...
+
+
+	# net
+#	-sudo cp gramci/shell/net/bin/*.BIN  base/
+	-sudo cp gramci/shell/net/bin/*.BIN  base/PROGRAMS
+
+	# gws
 	-sudo cp gramci/services/gwssrv/bin/GWS.BIN     base/ 
 	-sudo cp gramci/services/gwssrv/bin/GWSSRV.BIN  base/
+	-sudo cp gramci/services/gwssrv/bin/GWSSRV.BIN  base/PORTALS
+
+	# gns
 	-sudo cp gramci/services/gnssrv/bin/GNS.BIN     base/
 	-sudo cp gramci/services/gnssrv/bin/GNSSRV.BIN  base/
-	-sudo cp gramci/shell/apps/bin/*.BIN            base/
-	#-sudo cp gramci/shell/cmd/bin/*.BIN             /mnt/gramadovhd
-	-sudo cp gramci/shell/net/bin/*.BIN             base/
-	#-sudo cp gramci/setup/bin/*.BIN                 /mnt/gramadovhd 
-	-sudo cp gramci/shell/cmd/bin/REBOOT.BIN         base/
-	-sudo cp gramci/shell/cmd/bin/CAT.BIN            base/
-#	-sudo cp gramci/shell/cmd/bin/TRUE.BIN           /mnt/gramadovhd
-#	-sudo cp gramci/shell/cmd/bin/FALSE.BIN          /mnt/gramadovhd
-	# ...
-
-
-#
-# == "/BIN" ====================================================
-#
-
-# unix-like commands and stuff.
-	-sudo cp gramci/shell/cmd/bin/*.BIN base/BIN
-
-
-#
-# == "/BOOT" ====================================================
-#
-
-	sudo cp gramnt/boot/x86/bin/BM.BIN    base/BOOT
-	sudo cp gramnt/boot/x86/bin/BL.BIN    base/BOOT
-	sudo cp gramnt/kernel/KERNEL.BIN      base/BOOT
-#	-sudo cp infobase/res/wall/ANIMAL.BMP  /mnt/gramadovhd/BOOT
-
-
-
-
-#
-# == "/PROGRAMS" ====================================================
-#
-	# The applications.
-	-sudo cp gramci/shell/apps/bin/*.BIN  base/PROGRAMS
-	-sudo cp gramci/shell/net/bin/*.BIN   base/PROGRAMS
-
-
-#
-# == "/PORTALS" ====================================================
-#
-	# bm, bl, kernel, init, gdeshell.
-	sudo cp gramnt/boot/x86/bin/BM.BIN     base/PORTALS
-	sudo cp gramnt/boot/x86/bin/BL.BIN     base/PORTALS
-	sudo cp gramnt/kernel/KERNEL.BIN       base/PORTALS
-	
-	sudo cp gramci/init/INIT.BIN           base/PORTALS
-	sudo cp gramci/setup/bin/GDESHELL.BIN  base/PORTALS
-
-	# Services
-	-sudo cp gramci/services/gwssrv/bin/GWSSRV.BIN  base/PORTALS
 	-sudo cp gramci/services/gnssrv/bin/GNSSRV.BIN  base/PORTALS
 
 
-#
-# == "/SBIN" ====================================================
-#
-
-# unix-like commands and stuff.
-#	-sudo cp gramci/shell/cmd/bin/REBOOT.BIN   /mnt/gramadovhd/SBIN
-#	-sudo cp gramci/setup/bin/REBOOT2.BIN      /mnt/gramadovhd/SBIN
-
-
-#
-# == "/USERS" ====================================================
-#
-
-
-#
-# == "/TMP" =============================================
-#
-
-#	-sudo cp infobase/res/wall/ANIMAL.BMP   /mnt/gramadovhd/TMP
-
+	#
+	# Copy base!
+	#
 
 	# sends everything from base to root.
 	sudo cp -r base/* /mnt/gramadovhd
