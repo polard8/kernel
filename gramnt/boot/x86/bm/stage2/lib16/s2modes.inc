@@ -83,8 +83,8 @@ s2modesActivateMode:
     ; jmp $
 
 
-	; Pega o modo de inicializa��o no metafile.
-	; O modo configurado retornar� em al.
+	; Pega o modo de inicializaçao no metafile.
+	; O modo configurado retornara em al.
 	; al = META$FILE.INIT_MODE
 
 

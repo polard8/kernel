@@ -7,37 +7,29 @@
 ; ============
 ;
 ; VirtualBox:
+; ===============
 ; Oracle VirtualBox: 0x0112   640x480x24bpp
 ; Oracle VirtualBox: 0x0115   800x600x24BPP
 ; Oracle VirtualBox: 0x0118  1024x768x24BPP
 ;
+;
 ; Nvidia GeForce:  
+; =================
 ; GeForce_8400_GS equ 0x06E4  
 ; GeForce 8400 GS: 0x0115   800x600x32BPP
 ;
-; Obs: 
-; A resolução usada por enquanto em 32bit é 800x600x24.
-; 
-; Continua ...
-;
-; OBS: 
-;     #todo #test
-;     O Boot Loader (BL.BIN) pode querer configurar o modo de vídeo. 
-; Então ele salva o modo no metafile e reinicia a máquina. 
-; Para isso o Boot Manager deve apenas pegar o valor que esta no 
-; metafile e não editar o metafile.
-;
+; The main resolution is 800x600x24.
+; The only way to change the resolution for now is 
+; changing a global variable in this document.
 ;
 ; History:
 ;     2005 - Created by Fred Nora. 
 ;---------------------------------------------------
 
-
-;;
 ;; #importante
-;; O arquivo foi carregado em 0:8000. Fica mais f�cil lidar com a gdt 
-;; configurando o org em 0x8000 e colocando os segmentos em 0.
-;;
+;; This image was loaded in 0H:8000H.
+;; It's easier to handle the gdt stuff when the org is
+;; in 8000H and the segment is 0H.
 
 
 [ORG 0x8000]
@@ -52,11 +44,11 @@
 ;;   ## VIDEO MODE ##
 ;;
 
-;
-; 0x4112 is 640x480x24bit
-; 0x4115 is 800x600x24bit
-; 0x4118 is 1024x768x24bit 
-; 0x411B is 1280x1024x24bit
+
+; 0x4112 is 640x480x24
+; 0x4115 is 800x600x24
+; 0x4118 is 1024x768x24 
+; 0x411B is 1280x1024x24
 
 ;Mode 0x100: 640x400x8bpp
 ;Mode 0x101: 640x480x8bpp
@@ -100,12 +92,13 @@
 ;Mode 0x161: 3840x2160x32bpp
 
 
-;; #importante
-;; use isso para selecionar o modo de video.
+;;
+;; == Global variables to set the video mode ===================
 ;;
 
+
 ;; 24bpp
-;; funcionaram na oracle virtual box.
+;; These are working on virtualbox.
 ;;G_VIDEO_MODE EQU 0x112
 ;;G_VIDEO_MODE EQU 0x115
 ;;G_VIDEO_MODE EQU 0x118
@@ -113,7 +106,7 @@
 ;;...
 
 
-;;32bpp
+;; 32bpp
 ;;G_VIDEO_MODE EQU 0x140  ;;320x200x32
 ;;G_VIDEO_MODE EQU 0x141  ;;640x400x32 
 ;;G_VIDEO_MODE EQU 0x142  ;;640x480x32 
@@ -122,20 +115,25 @@
 ;;G_VIDEO_MODE EQU 0x145  ;;#bugbug
 
 
-; Nvidia GeForce:  
-; GeForce 8400 GS: 0x0115   800x600x32BPP
+;; These are wotking on Nvidia GeForce:  
+;; GeForce 8400 GS: 0x0115   800x600x32BPP
+;;
+
+
 
 ;;
-;; Selecting the mode.
+;; == Selecting the mode =======================================
 ;;
 
 
 ;; Well tested modes.
 ;; ok on qemu.
-;G_VIDEO_MODE EQU 0x0112     ;640x480
-G_VIDEO_MODE EQU 0x0115     ;800x600
-;G_VIDEO_MODE EQU 0x0118     ;1024x768
-; ...
+
+
+ G_VIDEO_MODE EQU 0x0112     ;640x480
+;; G_VIDEO_MODE EQU 0x0115     ;800x600
+;; G_VIDEO_MODE EQU 0x0118     ;1024x768
+;; ...
 
 
 
@@ -1222,6 +1220,7 @@ xxx_Config:
 
 ;; ==================================
 ;; stage2Shutdown:
+;;
 ;;     Shutdown the machine via APM.
 ;;     16bit, real mode, using BIOS.
 ;;

@@ -258,11 +258,15 @@ pm32:
 ;; sendo chamadas do modo protegido.
 ;;
 
-	
+
 ;;===========================================================
-;; rmShutdown
+;; rmShutdown:
+;;
 ;;     Desliga a máquina fica APM. Não tem argumentos. 
 ;;     Obs: Estamos usando a gdt do módulo de 32 bit        
+;;
+
+;; Called by do_shutdown in shcalls.inc
 
 rmShutdown:
 
@@ -330,7 +334,7 @@ do_rm:
     cli
 
     ;;segmento 0
-    mov ax, 0x0000        
+    mov ax, 0x0000 
     mov ds, ax
     mov es, ax
     mov fs, ax
@@ -342,9 +346,9 @@ do_rm:
     mov sp, 0xFFFF
 
 
-	;Reprogram PIC: 
-	;change IRQ 0-7 to INT 08h-0Fh, and  
-	;       IRQ 8-15 to INT 70h-77h
+	; Reprogram PIC: 
+	; change IRQ 0-7 to INT 08h-0Fh, and  
+	;        IRQ 8-15 to INT 70h-77h
 
 
     mov al, 10001b       ; Begin PIC 1 initialization.
@@ -380,8 +384,6 @@ do_rm:
 
     sti 
 
-
-
 .enableTextMode:
 
     ; set text mode for screen
@@ -389,16 +391,16 @@ do_rm:
     mov ax, 0x0003 
     int 0x10
 
-	 ; Importante:
-	 ; Mensagem em modo real.
+    ; Importante:
+    ; Mensagem em modo real.
 
     mov si, rm_shutdown_msg1
     call DisplayMessage
 
-.stop:
-
     ; wait for a key
-    xor AX, AX    
+
+.stop:
+    xor AX, AX
     int 16h
 
 
@@ -406,18 +408,21 @@ do_rm:
 	;mov si, rm_shutdown_msg1
 	;call DisplayMessage
 
-
 .doShutdown:
+    ;; See: main.asm
     call stage2Shutdown
     jmp $
 
 
-;;Mensagens para a rotina de shut down.
-rm_shutdown_msg1 db 'pm.inc: [RM] Press a key to shutdown', 13, 10, 0
-;rm_shutdown_msg2 db '*',13,10,0
-;rm_shutdown_msg3 db '.',13,10,0
-;rm_shutdown_msg4 db '.',13,10,0
-; ...
+;;
+;; == Messages ===============================================
+;;
+
+rm_shutdown_msg1: 
+    db 'pm.inc: [RM] Press a key to shutdown', 13, 10, 0
+
+;; ...
+
 
 ;;
 ;; =========================================================================
@@ -446,6 +451,8 @@ rm_shutdown_msg1 db 'pm.inc: [RM] Press a key to shutdown', 13, 10, 0
 ;; BL.BIN já foi carregado por BM.BIN usando os recursos do BIOS.
 ;; Só nos resta passar o comando para BL.BIN.
 ;;
+
+;; Called by do_boot in shcalls.inc
 
 rmStartGUI:
 
@@ -530,19 +537,16 @@ do_rm_startgui:
     mov fs, ax
     mov gs, ax
 
-
 	; Create stack
     mov ax, 0x0000
     mov ss, ax
     mov sp, 0xFFFF
-
 
 	;; Reprogram PIC: 
 	;; Voltando ao estado legado.
 	;; changes: 
 	;; IRQ 0-7 to INT 08h-0Fh  
 	;; IRQ 8-15 to INT 70h-77h
-
 
     mov al, 10001b       ; Begin PIC 1 initialization.
     out 20h, al
@@ -576,15 +580,13 @@ do_rm_startgui:
     ; #importante
     ; Renable interrupts.
 
-    sti    
-
-
-.enableTextMode:
-
+    sti 
 
 	; #importante:
 	; Entraremos no modo texto para exibimos mensagens em modo real.
 	; set text mode for screen
+
+.enableTextMode:
 
     mov ax, 0x0003
     int 0x10
@@ -598,7 +600,7 @@ do_rm_startgui:
 
 	;; #debug
 	;; mov si, rm_startgui_msg1
-	;; call DisplayMessage	
+	;; call DisplayMessage
 
 
 ;.stop:
@@ -608,36 +610,30 @@ do_rm_startgui:
     ;; xor AX, AX 
     ;; int 16h
 
-
 .doStartGUI:
 
-    ;Set mode.
+    ; Set mode.
     mov al, byte BOOTMODE_GUI
     call set_boot_mode
 
     ;; #IMPORTANTE
-    ;; definição do arquivo main.asm
+    ;; Definição do arquivo main.asm
 
     mov word [META$FILE.VIDEO_MODE], G_VIDEO_MODE
 
 
-
-    ;Inicializa o modo selecionado.
-    ;(lib16/s2modes.inc)
+    ; Inicializa o modo selecionado.
+    ; See: stage2/lib16/s2modes.inc
 
     JMP s2modesActivateMode 
-    jmp $
+    JMP $
 
 
-
-
-
-;;Mensagens para a rotina de shut down.	
-rm_startgui_msg1 db 'pm.inc: [RM] Press a key to start GUI', 13, 10, 0
-;rm_startgui_msg2 db '*',13,10,0
-;rm_startgui_msg3 db '.',13,10,0
-;rm_startgui_msg4 db '.',13,10,0
+;; Mensagens para a rotina de shutdown.
+rm_startgui_msg1: 
+    db  'pm.inc: [RM] Press a key to start GUI', 13, 10, 0
 ; ...
+
 
 
 ;;

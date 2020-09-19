@@ -558,15 +558,15 @@ struct file_d
     int used;
     int magic;
 
+    // inode structure
+    struct inode_d *inode;
+
     // A estrutura de arquivos aponta para tabela global de 
     // arquivos abertos.
     int filetable_index;
 
     // A estrutura de arquivos aponta para a tabela de inodes.
     int inodetable_index;
-
-    //inode structure
-    struct inode_d *inode;
 
 
     // #bugbug
@@ -612,13 +612,19 @@ struct file_d
 	// 0 or -_bf._size, for inline putc 
     int _lbfsize;
 
-	//operations 
-	//#todo: olhar __P em sys/cdefs.h
-    void *_cookie;                 // cookie passed to io functions 
+    // Operations 
+    // #todo: Please, do not use virtual functions for now!
+    // See: __P in sys/cdefs.h
+    
+    // cookie passed to io functions
+    void *_cookie; 
+    
+    // #todo: delete?
     int (*_close) __P((void *));
     int (*_read)  __P((void *, char *, int));
     fpos_t (*_seek)  __P((void *, fpos_t, int));
     int (*_write) __P((void *, const char *, int));
+
 
 	//file extension 
     struct __sbuf _ext;

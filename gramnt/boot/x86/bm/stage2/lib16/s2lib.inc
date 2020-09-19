@@ -13,10 +13,10 @@
 ;     Alguma falha fatal no stage 2.
 ;
 ;s2libFailure:
-s2_FAILURE:	
+s2_FAILURE:
     mov si, msg_s2_failure
-	call DisplayMessage 
-	mov ah, 0x00
+    call DisplayMessage 
+    mov ah, 0x00
     int 0x16        ;Await keypress.
     int 0x19        ;Reboot.
 

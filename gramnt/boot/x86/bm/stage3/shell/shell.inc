@@ -189,22 +189,22 @@ os_command_line:
     pop esi                     ;Pop the command string.
 
 
-	;;
-	;; Compara a primeira palavra - (edi).
-	;;
+
+;;
+;; == Compare ======================================================
+;;
+
+    ;; Compara a primeira palavra - (edi).
+
 
     ; 'mount'
     ; Monta o volume do sistema se possível.
 
-.xMount:	
-	mov edi, mount_volume_string
-	call os_string_compare
-	jc do_mount_volume	
+.xMount:
+    mov edi, mount_volume_string
+    call os_string_compare
+    jc do_mount_volume
 
-
-;;
-;; Boot.
-;;
 
     ; 'boot'
     ; Inicia o modo gráfico padrão. GUI 
@@ -216,108 +216,117 @@ os_command_line:
     jc do_boot
 
 
-    ;'shutdown'
-	; Desliga a máquina via APM.
+    ; 'shutdown'
+    ; Desliga a máquina via APM.
 .xShutdown:
-	mov edi, shutdown_string
-	call os_string_compare	
-    jc do_shutdown	
-	
-	;'cls'
-    ;Clear screen.	
-.xCLS:	
-	mov edi, cls_string		
-	call os_string_compare
-	jc  shell_clear_screen
-	
-	;'help'
-    ; Show help message.		
-.xhelp:	
-	mov edi, help_string		
-	call os_string_compare
-	jc print_help
+    mov edi, shutdown_string
+    call os_string_compare
+    jc do_shutdown
 
-	;'dir' 
-	; (Mostra o diretório de volumes)
-	; Depois do BM,(setor 65 +fat1 +fat2)
-.xDir:	
-	mov edi, dir_string		
-	call os_string_compare
-	jc dir
-	
-	
-	;'ls' 
-	; Mostra arquivos. (apresentação no estilo unix).
-	; (Mostra o diretório de volumes)
-	; Depois do BM,(setor 65 +fat1 +fat2)
-.xLs:	
-	mov edi, ls_string		
-	call os_string_compare
-	jc ls
-	
 
-	;'ver'
-	; Show version info.
-.xVer:	
-	mov edi, ver_string		
-	call os_string_compare
-	jc print_ver
+    ; 'cls'
+    ; Clear screen.
+.xCLS:
+    mov edi, cls_string
+    call os_string_compare
+    jc  shell_clear_screen
 
-	;'exit'
-	; Está reinicianso a instancia do shell, mas deveríamos sair dele.
-.xExit:	
-	mov edi, exit_string		
-	call os_string_compare
-	jc exit
-	
-	;'format'
-	;Format Disk.
-.xFormat:	
-	mov edi, format_disk_string
-	call os_string_compare
-	jc do_formatdisk	
 
-	;'debug'
-	; Está mostrando informações do META$FILE.
-.xDebug:	
-	mov edi, debug_string		
-	call os_string_compare
-	jc debug
+    ; 'help'
+    ; Show help message.
+.xhelp:
+    mov edi, help_string
+    call os_string_compare
+    jc print_help
 
-	;'reboot'
-	; Reboot the system.
-.xReboot:	
-	mov edi, reboot_string		
-	call os_string_compare
-	jc reboot
 
-	;'disk'
-	; mostra informações sobre um disco.
-.xDisk:	
-	mov edi, hd_string		
-	call os_string_compare
-	jc hd_test
-	
-	;'part' 
-	; Mostra informações sobre uma partição.
-.xPart:	
-	mov edi, particao_string  
-	call os_string_compare
-	jc shellcallsPartitionTest
-	;jc particao_test
+    ; 'dir' 
+    ; (Mostra o diretório de volumes)
+    ; Depois do BM,(setor 65 +fat1 +fat2)
+.xDir:
+    mov edi, dir_string
+    call os_string_compare
+    jc dir
 
-	;'testzone'
-	; Efetuando um teste atual.
-.xTestzone:	
-	mov edi, testzone_string	
-	call os_string_compare
-	jc testzone
-	
-	;'d0'
-.xD0:	
-	mov edi, seleciona_d0	
-	call os_string_compare
-	jc do_seleciona_d0
+
+    ; 'ls' 
+    ; Mostra arquivos. (apresentação no estilo unix).
+    ; (Mostra o diretório de volumes)
+    ; Depois do BM,(setor 65 +fat1 +fat2)
+.xLs:
+    mov edi, ls_string
+    call os_string_compare
+    jc ls
+
+
+    ; 'ver'
+    ; Show version info.
+.xVer:
+    mov edi, ver_string
+    call os_string_compare
+    jc print_ver
+
+
+    ; 'exit'
+    ; Está reinicianso a instancia do shell, mas deveríamos sair dele.
+    ; ???
+.xExit:
+    mov edi, exit_string
+    call os_string_compare
+    jc exit
+
+    ; 'format'
+    ; Format Disk.
+.xFormat:
+    mov edi, format_disk_string
+    call os_string_compare
+    jc do_formatdisk
+
+
+    ; 'debug'
+    ; Está mostrando informações do META$FILE.
+.xDebug:
+    mov edi, debug_string
+    call os_string_compare
+    jc debug
+
+    ; 'reboot'
+    ; Reboot the system.
+.xReboot:
+    mov edi, reboot_string
+    call os_string_compare
+    jc reboot
+
+
+    ; 'disk'
+    ; Mostra informações sobre um disco.
+.xDisk:
+    mov edi, hd_string
+    call os_string_compare
+    jc hd_test
+
+    ; 'part' 
+    ; Mostra informações sobre uma partição.
+.xPart:
+    mov edi, particao_string  
+    call os_string_compare
+    jc shellcallsPartitionTest
+    ;jc particao_test
+
+
+    ;'testzone'
+    ; Efetuando um teste atual.
+.xTestzone:
+    mov edi, testzone_string
+    call os_string_compare
+    jc testzone
+
+
+    ;'d0'
+.xD0:
+    mov edi, seleciona_d0
+    call os_string_compare
+    jc do_seleciona_d0
 
 	;'d1' 
 .xD1:
@@ -441,13 +450,14 @@ os_command_line:
 	call os_string_compare
 	jc do_deletedir	
 
-	;'install'
-	; Aciona o instalador.
+
+    ;'install'
+    ; Aciona o instalador.
 .xInstall:
-	mov edi, install_string
-	call os_string_compare
-	jc do_install
-	
+    mov edi, install_string
+    call os_string_compare
+    jc do_install
+
 	;'mode1'
 	;Set mode 1.
 .xMode1:
@@ -590,8 +600,8 @@ os_command_line:
     je	add_ext_app
 
 	;??
-	jmp full_name
-	
+    jmp full_name
+
 	
 	;
 	; Adicionando extenção ao nome do arquivo.

@@ -92,10 +92,9 @@ do_mount_volume:
 ;      Chamaremos uma rotina que volta para o modo real, 
 ;      muda o modo de vídeo e 
 ;      inicializa a GUI.
-;      See stage3/pm.inc 
+;      See: stage3/pm.inc 
 
 do_boot:
-
     jmp rmStartGUI
     jmp $
 
@@ -109,8 +108,8 @@ do_boot:
 ;++
 
 do_shutdown:
-
     jmp rmShutdown
+    jmp $
 ;--
 
 
@@ -312,10 +311,10 @@ do_set_v3:
 ;     Abre um arquivo.
 
 do_openfile:
-	mov byte[file_flag], 1
-	jmp os_command_line
-;--	
-	
+    mov byte[file_flag], 1
+    jmp os_command_line
+;--
+
 	
 ;==============================================================
 ; do_makefile:
@@ -614,27 +613,29 @@ particao_test:
 
 print_help:
 
-	;pushad
-	push esi
-	mov esi, help_text
-	call os_output
-	pop esi
-	;popad
-	jmp os_command_line
+    ;pushad
+    push esi
+    mov esi, help_text
+    call os_output
+    pop esi
+    ;popad
+
+    jmp os_command_line
 ;--
+
 
 
 ;----------------------------------
 ; shell_clear_screen:
 ;     Limpa a tela e reapresenta o cursor.
 ;     @todo: Talvez deva reiniciar os registradores.
-;++	
+;++
 
 shell_clear_screen:
-	;call clear_screen
-	call os_screen_clear
+    ;call clear_screen
+    call os_screen_clear
     call reset_cursor 
-	jmp os_command_line
+    jmp os_command_line
 ;--
 
 
@@ -658,7 +659,7 @@ print_ver:
 
 fail:
     nop
-shellcallsFail:					
+shellcallsFail:
 	push esi
 	mov esi, not_found_msg
 	call os_output
