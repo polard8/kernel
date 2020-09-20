@@ -1,11 +1,12 @@
 ;
-; Arquivo: input32.inc
+; File: input32.inc
 ;   
-; Descrição:
-;     Tratamento de entrada de digitações.
+; DescriÃ§ao:
+;     Tratamento de entrada de digitaï¿½ï¿½es.
 ;
-; Obs: Essa função é muito importante para o Shell do Boot Manager e para
-;      o gerenciamento de arquivos.
+; Obs: 
+; Essa funÃ§ao eh muito importante para o Shell do Boot Manager e 
+; para o gerenciamento de arquivos.
 ;
 ; ==============================================================
 ; Autor:
@@ -19,23 +20,21 @@
 ;     2015.
 ;
 
-
 align 2
     db 'DEBUG: INPUT '
 align 2
-
 
 
 ;; =================================================================
 ; os_input:
 ;     Take string from keyboard entry.
 ;
-;  IN:	
+;  IN:
 ;       EDI = Location where string will be stored.
-;	    ECX = Maximum number of characters to accept.
-; OUT:	
+;       ECX = Maximum number of characters to accept.
+; OUT:
 ;       ECX = Length of string that was inputed (NULL not counted).
-;	          All other registers preserved.
+;             All other registers preserved.
 ;
 
 os_input:

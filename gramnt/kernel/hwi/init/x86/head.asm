@@ -1,38 +1,26 @@
 ;
-; Gramado Header - The kernel entry point for x86 processors.
-; (c) Copyright 2005-2017 Fred Nora.
+; File: x86/head.asm 
+; 
+;     The kernel entry point for x86 processors.
+;     32 bit.
 ;
-; File: x86/entry/head/head.asm 
-;
-; Descri��o:
-;      Parte principal do n�cleo na arquitetura x86. 
-; Essa � a parte inicial do n�cleo de 32 bit. 
-; Nesse arquivo est� o entry point do Kernel Base.
-;
-; Endere�o:
-;     O Kernel � carregado no endere�o f�sico 0x00100000, com o entry point 
-; em 0x00101000. O endere�o l�gico � 0xC0000000.
-;     Quem carregou o Kernel e fez as configura��es iniciais foi o Boot Loader.
+; The kernel image was loaded in the physical address 0x00100000,
+; with the entry point in 0x00101000. 
+; The linear address is 0xC0000000.
+; The boot loader made some initial memory configuration. Only
+; enough to jump to the entry point in 0xC0001000.
 ;
 ; Heap and Stack:
-; ==============
-;     O heap do Kernel ser� configurado em  
-; kernel_heap_start  = 0xC0100000.(up).
-;     A pilha do Kernel ser� configurada em 
-; kernel_stack_start = 0xC03FFFF0.(down). 
+; KERNEL_HEAP_START, KERNEL_HEAP_END
+; KERNEL_STACK_START, KERNEL_STACK_END
+; See: include/globals/gva.h
 ;
-; O Kernel faz algumas inicializa��es.
-; No final desse arquivo est�o a GDT, IDT e 
-; includes padronizados.
+; In the end of the document you are gonna find 
+; the GDT and the IDT tables.
 ;
-
-;
-; Hist�rico:
-; Vers�o 1.0, 2005 - Criadas as primeiras rotinas
-; Vers�o 1.0, 2006~2014 - Cria��o de outras rotinas b�sicas.
-; Vers�o 1.0, 2015 - Organiza��o do conjunto de arquivos que forma programa.
-; Vers�o 1.0, 2016 - Revis�o.
-; ...
+; History:
+;     2005 - Create by Fred Nora.
+;     2006 ~ 2020 Some new routines.
 ;
 
 
@@ -40,43 +28,43 @@
 HEAD_CURRENT_ARCH_X86 EQU 1000
 
 
-;
-; Vari�veis importadas.
-;
+;;
+;; Imported.
+;;
 
-;;see: gdef.h
+; See: gdef.h
 extern _blSavedLastValidAddress;
 extern _blSavedMetafileAddress;
 extern _blSavedDiskNumber;
 extern _blSavedHeads;
 extern _blSavedSPT;
 extern _blSavedCylinders;
-;;...
+;; ...
 
 
-
-
-;Buffers (gdef.h)
+; Buffers 
+; See: gdef.h
 extern _g_frontbuffer_pa
-;...
+; ...
 
 
-;Stacks.
-;#bugbug: O endere�o configurado na hora da inicializa��o poder� corromper o 
-;processo em user mode, o melhor � deixar configurar na inicializa��o com o mesmo
-;endere�o indicado na tss.
-extern _kernel_stack_start      ;;usado na inicializa��o @bugbug
-extern _kernel_stack_start_pa   ;;indicado na TSS
-;...
- 
- 
- 
-;Context.
-extern _contextSS        ;User Mode.
-extern _contextESP       ;User Mode.
-extern _contextEFLAGS    ;User Mode.
-extern _contextCS        ;User Mode.
-extern _contextEIP       ;User Mode.
+; Stacks.
+; ps: It needs to be the same in the tss.
+; See: include/mm/x86mm.h
+extern _kernel_stack_start      
+extern _kernel_stack_start_pa   ;; Used in the TSS.
+; ...
+
+
+;;
+;; == Context =============================================
+;;
+
+extern _contextSS        ; User Mode.
+extern _contextESP       ; User Mode.
+extern _contextEFLAGS    ; User Mode.
+extern _contextCS        ; User Mode.
+extern _contextEIP       ; User Mode.
 extern _contextDS
 extern _contextES
 extern _contextFS
@@ -88,399 +76,304 @@ extern _contextEDX
 extern _contextESI
 extern _contextEDI
 extern _contextEBP
-;...
+; ...
 
-;GUI.
+; GUI flag.
 extern _g_useGUI
-;...
-
-;Outros.
-extern _newtask_EIP
-extern _start_new_task_status 
-extern _runnable              
-extern _start_new_task_address	
-extern _dispatch_task
-;...
+; ...
 
 
-;
-; Fun��es importadas.
-;
+;;
+;; == Imported functions =======================================
+;;
 
-; entrada na rotina de inicializa��o independente da arquitetura.
+;; Entry point for the architecture independent routine.
 extern _kernel_main
 
-; entrada na rotina de inicializa��o da arquitetura x86.
+;; Entry point for the x86 initialization.
 extern _x86main
 
-;extern _KeStartIdle         ;Start Idle (entra em User Mode). 
-extern _startStartIdle 
-extern _save_kernel_args
-;extern _kernelServices ;Services
 
 
-;...
+;; ==================================================
+;; head_init:
+;;
+;; IN:  
+;;    al = 'G' (Graphic Mode).
+;;    al = 'T' (Text Mode).
+;;
+;;    ebx = LFB.
+;;
+;;    ecx = BootBlock pointer.
+;;    edx = BootBlock pointer.
+;;    ebp = BootBlock pointer.
 
-;Tasks in ring 0.
-;Threads em ring 0 que rodar�o dentro do kernel base.
-extern _task0 
-extern _task1 
-extern _task2 
-;...
-
-;
-; Constants.
-;
-
-
-;int SYSTEM      ;modo de usar.
-;SYSTEM EQU 200  ;N�MERO DA INTERRUP��O DO SISTEMA.
-;LISTA DE SERVI�OS
-;SYSTEM_XX EQU ... 
-;SYSTEM_XX EQU ...
-;SYSTEM_XX EQU ...
-;SYSTEM_XX EQU ...
-; ...
-;
-;LISTA DE ERROS
-;
-; ERROR1 EQU
-; ERROR2 EQU
-; ERROR3 EQU
-; ...
-
-
-
-;
-; Physical address for Kernel Base and Kernel Entry Point.
-;
-
-KRN_BASE       equ 0x00100000    ;Base.
-KRN_ENTRYPOINT equ 0x00101000    ;Entry Point.
-;KRN_ENTRYPOINT equ (0x00101000+(header size))    ;Entry Point. @todo
-;...
-
-
-;==================================
-; head_init:
-;
-; IN:  
-;    al = 'G' (Graphic Mode).
-;    al = 'T' (Text Mode).
-;
-;    ebx = LFB.
-;
-;    ecx = BootBlock pointer.
-;    edx = BootBlock pointer.
-;    ebp = BootBlock pointer.
-;
-; Isso � chamado por boot.asm.
-;
-
-;Called by:
-;_kernel_begin in hwi/init/x86/boot.asm
+;; Called by _kernel_begin in hwi/init/x86/boot.asm
 
 
 head_init:
 
+    ;; Saving ...
+    mov dword [_kArg1], eax
+    mov dword [_kArg2], ebx
+    mov dword [_kArg3], ecx
+    mov dword [_kArg4], edx
 
-    ;Debug.
-    ;*IMPORTANTE para text mode.
-	;
-	; OBS: O endere�o virtual da mem�ria de v�deo vga � 0x800000
-	;      o mapeamento foi feito pelo Boot Loader.
-	;
-	;mov byte [0x800000], byte "K"
-    ;mov byte [0x800001], byte 9	
-    ;mov byte [0x800002], byte "R"
-    ;mov byte [0x800003], byte 9	
-    ;mov byte [0x800004], byte "N"
-    ;mov byte [0x800005], byte 9	
-    ;mov byte [0x800006], byte "L"
-    ;mov byte [0x800007], byte 9	
+    ;; #debug
+    ;; The vga memory was mapped in 0x800000 by the boot loader.
 
-	
-	
-	;mov byte [0xb8000], byte "k"	
-    ;mov byte [0xb8000], byte 9	
-    ;mov byte [0xb8000], byte "k"	
-    ;mov byte [0xb8000], byte 9	
+    ;mov byte [0x800000], byte "K"
+    ;mov byte [0x800001], byte 9
+    ;mov byte [0xb8000], byte "k"
+    ;mov byte [0xb8000], byte 9
 
 
-	;Debug
-	;Testando GUI.
-	;Ok funcionou.
-	
-	;mov eax, 0xc0c0c0
-	;mov ebx, 500
-	;mov ecx, 500
-	;call _gui_buffer_putpixel
+    ;; #debug
+    ;; Testing GUI routines.
 
-	;mov eax, 0xc0c0c0
-	;mov ebx, 502
-	;mov ecx, 500
-	;call _gui_buffer_putpixel
+    ;mov eax, 0xc0c0c0
+    ;mov ebx, 500
+    ;mov ecx, 500
+    ;call _gui_buffer_putpixel
 
-	;mov eax, 0xc0c0c0
-	;mov ebx, 504
-	;mov ecx, 500
-	;call _gui_buffer_putpixel
-	;call _asm_refresh_screen    ;refresh
-	;jmp $
+    ;call _asm_refresh_screen 
+    ;jmp $
 
-    	
-	;; Checando se foi carregado de um multiboot compat�vel
-	;; cmp eax, MULTIBOOT_BOOTLOADER_MAGIC ;0x36d76289
-	;; je mb_ok
     ;;
-	;; #todo: 
-	;; Mudar os argumentos passados pelo bootloder para estarem  
-	;; em conformidade com os padr�es da multiboot specification.
-	
-	;
-	; **** EAX = MAGIC  **** 0x36d76289
-	;
-	
-	;;se estivermos no modo gr�fico.
-	cmp al, byte 'G'
+    ;; Magic byte for gui mode.
+    ;;
+
+    ;; This flag tell us that we are in graphics mode.
+    cmp al, byte 'G'
     je .useGUI
 
-	;
-	; No GUI.
-	;
+;;
+;; Fail. No GUI.
+;;
 
-.nogui:
-	mov byte [0xb8000], byte "t"
+.fail_nogui:
+    mov byte [0xb8000], byte "t"
     mov byte [0xb8001], byte 9
     mov byte [0xb8002], byte "m"
     mov byte [0xb8003], byte 9
-
-
 .nogui_hang:
+    cli
     hlt
     jmp .nogui_hang
 
-	;
-	; Use GUI.
-	;
+;;
+;; == Use GUI =======================================
+;;
 
 .useGUI:
 
-    ;checar se chegamos aqui com a flag de gui acionada.
-    
-	cmp al, byte 'G'
-	jne .nogui
+    ;; Check again.
+    cmp al, byte 'G'
+    jne .fail_nogui
 
-	mov dword [_g_useGUI], dword 1
-	mov dword [_SavedBootMode], dword 1  ;; 1=gui
-	
-   
-   ;mov byte [bl_video_mode], al
-   ;mov dword [_g_lbf_pa], ebx         ;Endere�o f�sico do LFB.
+    ;; #important
+    ;; Saving flags.
+    ;; 1=gui
 
-   
-	;; #todo: 
-	;; O PONTEIRO PARA BOOTBLOCK DEVER� FICAR EM EBX E SEGUIR    
-	;; OS PADR�ES DA MULTIBOOT SPECIFICATION, PARA ISSO O BOOT BLOCK
-	;; CRIADO NO BOOT MANAGER E PASSADO PELO BOOT LOADER DEVE SER 
-	;; REORGANIZADO, PARA ADERIR AO PADR�O.
-   
-    ;BootBlock pointer.
-	;Ponteiro para o bootblock passado pelo Boot Manager.
-	
-    ;    ecx = BootBlock pointer.
-    ;    edx = LoaderBlock pointer.
+    mov dword [_g_useGUI],       dword 1
+    mov dword [_SavedBootMode],  dword 1
+
+
+    ;;
+    ;; == Boot block ========================================
+    ;;
+
+    ;; Now we're gonna grap all the offsets in the block.
+
+    ;; #todo:
+    ;; We need to put all these information in the same document
+    ;; and use the same prefix.
+    ;; These variables was defined here in this document.
+    ;; See: include/globals/gdef.h for the globals.
+
+
+    ; BootBlock pointer.
+    ; With this pointer we can create a boot block structure.
+    ; ecx = BootBlock pointer.
+    ; edx = LoaderBlock pointer.
 
     mov dword [_SavedBootBlock], edx
 
+    ; 0 - LFB.
+    ; FrontBuffer Address, (LFB)
+    ; Physical address.
+    xor eax, eax
+    mov eax, dword [edx +0] 
+    mov dword [_SavedLFB],          eax
+    mov dword [_g_frontbuffer_pa],  eax
 
-    ;; vamos lidar com o boot block herdado do bl.
-	;; vamos pegar os valores de todos os offsets.
-	;; principalmente o disk number.
 
-	; Salvando o endere�o f�sico do frontbuffer.
-	; FrontBuffer Address, (LFB)
-	
-	;0 - lfb.
-	xor eax, eax
-	mov eax, dword [edx +0]       
-	mov dword [_SavedLFB], eax
-	mov dword [_g_frontbuffer_pa], eax
-
-    ;4 - X.
-	xor eax, eax
-    mov ax, word [edx +4]         
+    ; 4 - X.
+    xor eax, eax
+    mov ax, word [edx +4] 
     mov dword [_SavedX], eax
 
-    ;8 - Y.
-	xor eax, eax
-    mov ax, word [edx +8]         
+    ; 8 - Y.
+    xor eax, eax
+    mov ax, word [edx +8] 
     mov dword [_SavedY], eax
 
-    ;12 - BPP.
-	xor eax, eax
-    mov al, byte [edx +12]  
+    ; 12 - BPP.
+    xor eax, eax
+    mov al, byte [edx +12] 
     mov dword [_SavedBPP], eax
-	
-	;; 16 - (usado para ram size)
-	;; #importante
-    ;; last valid ram address.
-    ;; see: gdef.h
-	xor eax, eax
-	mov eax, dword [edx +16]    
+
+    ;; 16 - Last valid ram address.
+    ;; Used to know the size of the RAM.
+    xor eax, eax
+    mov eax, dword [edx +16] 
     mov dword [_blSavedLastValidAddress], eax
 
-    ;; 20 - metafile address.
-	xor eax, eax
-	mov eax, dword [edx +20]    
+    ;; 20 - Metafile address.
+    xor eax, eax
+    mov eax, dword [edx +20] 
     mov dword [_blSavedMetafileAddress], eax
 
     ;; 24 - disk number
-	xor eax, eax
-	mov eax, dword [edx +24]    
+    xor eax, eax
+    mov eax, dword [edx +24] 
     mov dword [_blSavedDiskNumber], eax
 
     ;; 28 - heads
-	xor eax, eax
-	mov eax, dword [edx +28]    
+    xor eax, eax
+    mov eax, dword [edx +28] 
     mov dword [_blSavedHeads], eax
 
-
     ;; 32 - spt
-	xor eax, eax
-	mov eax, dword [edx +32]    
+    xor eax, eax
+    mov eax, dword [edx +32] 
     mov dword [_blSavedSPT], eax
 
-   ;; 36 - cylinders
-	xor eax, eax
-	mov eax, dword [edx +36]    
+    ;; 36 - cylinders
+    xor eax, eax
+    mov eax, dword [edx +36] 
     mov dword [_blSavedCylinders], eax
 
-
+    ;; #todo
+    ;; We can create a robust bootblock.
     ;; ...
 
+    ;;
+    ;; == Interrupts support ==============================
+    ;;
 
-	;; #importante:
-	;; Outras informa��es poderiam ser passadas 
-	;; atrav�s do boot block.
-	;; Informa��es captadas durante as rotinas de boot.
-	
-	
-;.no_gui:
+    ;; Theis is the order here:
+    ;; gdt, idt, ldt, tss+tr.
 
-    mov dword [_g_useGUI], dword 0
+    ;; No interrupts for now.
 
-    ; Salva os argumentos passados pelo boot loader via registradores.
-    
-	mov dword [_kArg1], eax    ;Video mode.
-	mov dword [_kArg2], ebx    ;LFB. (Linear Frame Buffer)
-	mov dword [_kArg3], ecx    ;??.
-	mov dword [_kArg4], edx    ;??.
+    cli
 
+    ;;
+    ;; == GDT ================================================
+    ;;
 
-	;
-	; Salva os argumentos do kernel em estrutura.
-	;
+    ;; We have another configuration in another place.
 
-	;call _save_kernel_args
-	
-	
-    ;; *step
-	;; Interrupt enabling: 
-	;; Come�aremos configurando suporte a interrup��es.
-
-    ; Desabilita para seguran�a.
-    
-	cli
-	
-	;; Ordem das tabelas: 
-	;; gdt, idt, ldt, tss(tr).
-	
-	; GDT.
-	
-	lgdt [_GDT_register] 
+    lgdt [_GDT_register] 
 
 
-	; IDT.
-	
-	call setup_idt        ;Aponta tudo para uma isr s�. 'unhandled_int'.
-	call setup_faults     ;Configura vetores de faults e exceptions.
-	call setup_vectors    ;Configura outros vetores.
-	lidt [_IDT_register] 
+    ;;
+    ;; == IDT ================================================
+    ;;
 
+    ;; We have another configuration in another place.
 
-    ;; LDT.
+    call setup_idt      ; Create a common handler, 'unhandled_int'.
+    call setup_faults   ; Setup vectors for faults and exceptions.
+    call setup_vectors  ; Some new vectors.
+    lidt [_IDT_register] 
+
+    ;;
+    ;; == LDT ================================================
+    ;;
+
     ;; Clear LDT
-
-    xor eax, eax    
+    xor eax, eax
     lldt ax
 
 
+    ;;
+    ;; == TR. (tss) ======================================
+    ;;
 
-	;
-	; TR. (tss)
-	;
+    ;; The tr configuration is little bit confused here.
+    ;; There is another configuration in another place.
+    ;; We're gonna work on this in the future.
 
-
-    ; ??
     ; Flush TSS:
-    ;     Load the index of our TSS structure.
-	;     The index is 0x28, as it is the 5th selector and 
-	; each is 8 bytes long, but we set the bottom two bits (making 0x2B)
+    ; Load the index of our TSS structure.
+    ; The index is 0x28, as it is the 5th selector and 
+    ; each is 8 bytes long, but we set the bottom two bits (making 0x2B)
     ; so that it has an RPL of 3, not zero.
-    ;     Load 0x2B into the task state register.
-	
-	;; #importante
-	;; Coloca o endere�o da TSS na entrada da GDT
-	
-	;;isso ja foi configurado.(103)
-	;;mov word [gdt6], tss0_end - tss0 - 1  
-	
-	mov eax, dword tss0
-	
-	mov [gdt6 + 2], ax
-	shr eax, 16
-	mov [gdt6 + 4], al
-	mov [gdt6 + 7], ah
+    ; Load 0x2B into the task state register.
 
-	;carrega TR.
-	mov ax, word 0x2B     ;28+3. 
-	ltr ax  
+    ; #important:
+    ; We need to put the TSS address into the GDT.
 
-    ; Me parece que nesse momento precisamos de um jmp far, 
-    ; semelhante ao que usamos na comuta��o do modo real para o 
-    ; modo protegido.	
+    ;; ?? 
+    ;; We already did this. (103)
+    ;; mov word [gdt6], tss0_end - tss0 - 1 
 
-    jmp 8:dummyJmpAfterLTR
+    ;; This is the address os our tss ?
+    mov eax, dword tss0
+
+    ;; This is the place for the tss0 into the gdt.
+    mov [gdt6 + 2], ax
+    shr eax, 16
+    mov [gdt6 + 4],  al
+    mov [gdt6 + 7],  ah
+
+    ;; Load TR.
+    ;; 0x2B = (0x28+3).
+    mov ax, word 0x2B
+    ltr ax
+
+    ;; Jump to flush it.
+
+    jmp 8:_trJumpToFlush
     nop
-dummyJmpAfterLTR:
+_trJumpToFlush:
+    nop
 
-	;; Selecting the 'Processor Interrup Mode'.
-	;; * PIC MODE *
-
-    ;; Todos os componentes APIC s�o ignorados e o sistema opera
-    ;; no modo single-thread usando LINT0.
+    ;; Order:
+    ;; PIC and PIT early initialization 
 
 
+    ;;
+    ;; == PIC ========================================
+    ;;
 
-;.setupPICMODE:
-
-    ; PIC.
     ; Early PIC initialization.
+
+picEarlyInitialization:
+
+    ;; ??
+    ;; PIC MODE
+    ;; Selecting the 'Processor Interrup Mode'.
+    ;; All the APIC components are ignored here, and
+    ;; the system will operate in the single-thread mode
+    ;; using LINT0.
+
 
     cli
 
     ;xor eax, eax
-    mov al, 00010001b    ;begin PIC1 initialization.
+    mov al, 00010001b    ; begin PIC1 initialization.
     out 0x20, al
     IODELAY
-    mov al, 00010001b    ;begin PIC2 initialization.
+    mov al, 00010001b    ; begin PIC2 initialization.
     out 0xA0, al
     IODELAY
-    mov al, 0x20         ;IRQ 0-7: interrupts 20h-27h.
+    mov al, 0x20         ; IRQ 0-7: interrupts 20h-27h.
     out 0x21, al
     IODELAY
-    mov al, 0x28        ;IRQ 8-15: interrupts 28h-2Fh.
+    mov al, 0x28         ; IRQ 8-15: interrupts 28h-2Fh.
     out 0xA1, al
     IODELAY
     mov al, 4
@@ -489,39 +382,41 @@ dummyJmpAfterLTR:
     mov al, 2
     out 0xA1, al
     IODELAY
-    ;mov al, 00010001b    ;11 sfnm 80x86 support.
-    mov al, 00000001b     ;01 80x86 support.
+    ;mov al, 00010001b    ; 11 sfnm 80x86 support.
+    mov al, 00000001b     ; 01 80x86 support.
     out 0x21, al
     IODELAY
     out 0xA1, al
     IODELAY
 
-    ;Mask all interrupts.
+    ;; =======================
+    ;; Mask all interrupts.
+    ;; =======================
+
     cli
     mov  al, 255
-    out  0xa1, al
+    out  0xa1,  al
     IODELAY
-    out  0x21, al
+    out  0x21,  al
     IODELAY
 
 
-	;; Com todas as interrup��es mascaradas, � hora de 
-	;; configurarmos os timers.
-	
-	;; Configurando os timers do sistema.
-	;; Nossa op��o agora � o PIT.
-	;; @todo: Para o RTC podemos fazer uma pequena inicializa��o agora.
-	;; pois temos um m�dulo mais completo em C.
+    ;;
+    ;; == PIT ========================================
+    ;;
 
-	
-	; TIMER.
-	; PIT 8253 e 8254 = (1234DD) 1193181.6666 / 100 = 11930. ; 1.19MHz.
-	; APIC timer      = 3,579,545 / 100 = 35796  3.5 MHz.
-	; 11931    ; (1193181.6666 / 100 = 11930) timer frequency 100 HZ
-	
-	; PIT
-	; Early PIT initialization.
-	
+    ; Early PIT initialization.
+
+pitEarlyInitialization:
+
+    ;; Setup system timers.
+
+    ;; ??
+    ;; Some frequencies to remember.
+    ;; PIT 8253 e 8254 = (1234DD) 1193181.6666 / 100 = 11930. ; 1.19MHz.
+    ;; APIC timer      = 3,579,545 / 100 = 35796  3.5 MHz.
+    ;; 11931    ; (1193181.6666 / 100 = 11930) timer frequency 100 HZ.
+
     ;xor eax, eax
     mov al, byte 0x36
     mov dx, word 0x43
@@ -536,149 +431,111 @@ dummyJmpAfterLTR:
     IODELAY
 
 
-	;; #todo:
-	;; Init RTC.
+    ;;
+    ;; == RTC ========================================
+    ;;
 
-	;; step 
+    ; Early RTC initialization.
+
+;rtcEarlyInitialization:
+    ;#todo 
+    ; Nothing for now
+
+
+
     ;; #todo: 
-    ;; memory caching control.	
-	
-	;;step 
-	;processor Discovery and initialization	
-	;apenas o b�sico para o boot manager.
-	
-		
-	;;
-	;; Fazendo alguma inicializa��o de dispositivos de I/O suportados.
-	;;
+    ;; memory caching control.
 
-	;step
-	;i/o devices
-	;( embedded controller EC, super io SIO, legacy free systems, 
-	; miscellaneous io devices)
-	
-	
-	;todo: Aqui  � um bom lugar para isso.
-	;teclado ide, lfb ...
-	
 
-    ;;
-    ;; Desmascarando intrrup��es.
-    ;;
+    ;; =======================
+    ;; Unmask all interrupts.
+    ;; =======================
 
-    ; Unmask only the timer interrupt.
-    ;mov dx, word 0x21
-    ;in  al, dx
-    ;IODELAY
-    ;and al, byte 0xfe
-    ;out dx, byte al
-    ;IODELAY
-    
-    ; Unmask all interrupts.
     mov al, 0
     out 0xa1, al
     IODELAY
     out 0x21, al
     IODELAY
 
-	; #IMPORTANTE.
-	; Desbilita as interrup��es. 
-	cli
+    ;; No interrupts.
+    cli
 
 
-	;;
-	;; Configurando alguns registradores.
-	;;
-	
-	; Debug.
-	; Debug: Disable break points.
-	
+    ;;
+    ;; == Set up registers ==================================
+    ;;
+
+
+    ; Debug registers.
+    ; Disable break points.
+
     xor eax, eax
     ;mov dr2, eax
     mov dr7, eax
+    ;; ...
 
+    ;; Data segments for ring 0.
 
-
-	;Segmentos de dados em ring0.
-	
+    ;xor eax, eax
     mov ax, word 0x10   
     mov ds, ax
     mov es, ax
+    ;mov fs, ax
+    ;mov gs, ax
     ;; ...
-    
- 
-	;;
-	;; STACK
-	;;
 
-	; Stack
-	; (atualiza o ponteiro para a vari�vel global).
-	
-	; (o mesmo endere�o indicado na TSS ??)
+    ;;
+    ;; STACK
+    ;;
+
+    ;; ??
+    ;; Is it the same in the tss ?
 
     mov eax, 0x003FFFF0 
     mov esp, eax 
-    
-    ; Salva.
-    mov dword [_kernel_stack_start_pa], 0x003FFFF0   
-    mov dword [_kernel_stack_start],    0x003FFFF0 
+
+    ; Save
+    mov dword [_kernel_stack_start_pa], 0x003FFFF0
+    mov dword [_kernel_stack_start],    0x003FFFF0
 
 
-	; Muda o status do kernel.
-	; #todo: 
-	; Porque mudou para um se KeMain() muda para 0?
-	; +deletar isso. 
+    ;;
+    ;; == Kernel Status ===================================
+    ;;
+
+    ;; #bugbug
+    ;; It does not make sanse.
+    ;;  Why changing to '1' if _kernel_main changes to '0'?
+    ;; we need to think about this flag.
 
     mov dword [_KernelStatus], dword 1
-	
-	
-    ;Debug:
-	; Essa mensagem aparece em modot texto.
-    ;mov byte [0x800008], byte "M"    ;flag.	
-    ;mov byte [0x800009], byte 9
 
-	;Debug
-	;#A
-	;mov eax, 0xA0A0A0
-	;mov ebx, 440
-	;mov ecx, 440
-	;call _gui_buffer_putpixel
+    ;;
+    ;; == Calling the C part ===============================
+    ;;
 
-	;call _asm_refresh_screen    
-	;jmp $
-	
-	
-	;;
-	;; Setup arch type.
-	;;
+    ;; We only have one argument. The arch type.
+    ;; See: kernel/main.c 
 
     mov eax, dword HEAD_CURRENT_ARCH_X86
     push eax
 
+    xor eax, eax
+    xor ebx, ebx
+    xor ecx, ecx
+    xor edx, edx
 
-	; Chama o c�digo em C e checa o retorno.
-	; Se n�o terminou de forma normal, halt system.
-	
-	
-	;; #todo
-	;; Para simplificar a passagem de C para Assembly, n�o
-	;; enviaremos argumentos para a fun��o main.
-	;; os argumentos recebidos pelo kernel no entrypoint em head
-	;; dever�o ser passador pelo assebly para vari�veis em C.
-    ;; See: kernel/main.c 
-    
     call _kernel_main
 
-
-    ;; #bugbug
-    ;; Estamos no modo gr�fico
-    ;; N�o conseguiremos exibir uma mensagem.
+    ;; _kernel_main returned.
+    ;; We really don't wanna reach this point.
+    ;; We are in graphics mode and we can't print an error message.
     ;; See: headlib.asm
 
 .hang:
     cli
     hlt
-    jmp __die   
+    jmp __die 
     jmp .hang
 
 
@@ -687,80 +544,67 @@ dummyJmpAfterLTR:
 	;
 
 
-;----------------------------------------
-; _SavedBootBlock:
-;     Argumentos passados pelo Boot Manager.
-;     Sobre video, ...
-;
-;
+;; ====================================================
+;; _SavedBootBlock:
+;;     To save the arguments that came from Boot Manager.
+;;     It's about video ...
+;;
+
 global _SavedBootBlock
-_SavedBootBlock:
-    dd 0
-	
+_SavedBootBlock:    dd 0
+
 global _SavedLFB
-_SavedLFB:
-    dd 0
+_SavedLFB:          dd 0
 
 global _SavedX
-_SavedX:
-    dd 0
+_SavedX:            dd 0
 
 global _SavedY
-_SavedY:
-    dd 0
+_SavedY:            dd 0
 
 global _SavedBPP
-_SavedBPP:
-    dd 0	
+_SavedBPP:          dd 0
 
 global _SavedLastValidAddress
-_SavedLastValidAddress:
-    dd 0
+_SavedLastValidAddress:    dd 0
 
+;; 1 = GUI ; 0 = Text Mode
+global _SavedBootMode
+_SavedBootMode:      dd 0
 
 
 ;;
-;; 1 = GUI ; 0 = Text Mode
-;;	
-global _SavedBootMode
-_SavedBootMode:
-    dd 0
+;;================================================= 
+;; Kernel arguments.
+;;
 
-
-;
-; Argumentos recebidos do bootloader pelo kernel.
-;	
-		
-global _kArg1	
-_kArg1: 
-    dd 0
+global _kArg1
+_kArg1:    dd 0
 
 global _kArg2
-_kArg2: 
-    dd 0
+_kArg2:    dd 0
 
 global _kArg3
-_kArg3: 
-    dd 0
+_kArg3:    dd 0
 
 global _kArg4
-_kArg4: 
-    dd 0
+_kArg4:    dd 0
 
 
-;
-; segments -------------
-; 
- 
- 	
-segment .text 
-
-;
-; OBS:.  A GDT e a IDT est�o conveniente em segmento de c�digo.
-;
 
 ;;
-;; ============================ GDT =====================================
+;; == Segment ==========================================
+;;
+
+segment .text 
+
+
+;; #ps
+;; The gdt and the idt are in the code segment.
+;; protection ?
+
+;;
+;; == GDT ====================================================
 ;;
 
 ;;
@@ -783,54 +627,54 @@ NULL_SEL equ $-_gdt
     dd 0
 ;Selector 8 - Code, kernel mode.  
 CODE_SEL equ $-_gdt
-	dw 0xFFFF
-	dw 0
-	db 0 
-	db 0x9A   ; present, ring0, code, non-confirming, readble.
-	db 0xCF
-	db 0	
+    dw 0xFFFF
+    dw 0
+    db 0
+    db 0x9A   ; present, ring0, code, non-confirming, readble.
+    db 0xCF
+    db 0
 ;Selector 0x10 - Data, kernel mode.
 DATA_SEL equ $-_gdt
-	dw 0xFFFF
-	dw 0
-	db 0 
-	db 0x92    ; present, ring0, data, expanded up, writeble. (BITS)
-	db 0xCF
-	db 0
+    dw 0xFFFF
+    dw 0
+    db 0 
+    db 0x92    ; present, ring0, data, expanded up, writeble. (BITS)
+    db 0xCF
+    db 0
 ;Selector 18h - Code, user mode.
 USER_CODE_SEL equ $-_gdt
-	dw 0xFFFF
-	dw 0
-	db 0 
-	db 0xF8   ;;0xFE   ;;5,E,F ;;A  ; 1111b ,ah  [ ( present|ring3|1 )  A = CODE ]
-	db 0xCF
-	db 0
-	
-        ;dw     0xffff
-        ;dw     0x0000
-        ;db     0x00
-        ;dw     11011111b *256 +11111010b
-        ;db     0x00	
-	
+    dw 0xFFFF
+    dw 0
+    db 0 
+    db 0xF8   ;;0xFE   ;;5,E,F ;;A  ; 1111b ,ah  [ ( present|ring3|1 )  A = CODE ]
+    db 0xCF
+    db 0
+
+    ;dw     0xffff
+    ;dw     0x0000
+    ;db     0x00
+    ;dw     11011111b *256 +11111010b
+    ;db     0x00
+
 ;Selector 20h - Data, user mode.
 USER_DATA_SEL equ $-_gdt
-	dw 0xFFFF
-	dw 0
-	db 0 
-	db 0xF2   ; 1111b ,2h  [ ( present|ring3|1 )  ,  2 = DATA ]
-	db 0xCF
-	db 0
+    dw 0xFFFF
+    dw 0
+    db 0 
+    db 0xF2   ; 1111b ,2h  [ ( present|ring3|1 )  ,  2 = DATA ]
+    db 0xCF
+    db 0
 
-        ;dw     0xffff
-        ;dw     0x0000
-        ;db     0x00
-        ;dw     11011111b *256 +11110010b
-        ;db     0x00
-	
+    ;dw     0xffff
+    ;dw     0x0000
+    ;db     0x00
+    ;dw     11011111b *256 +11110010b
+    ;db     0x00
+
 ;Tem que ter pelo menos uma tss para mudar para user mode, 
 ;sen�o da falta.
 ;Selector 28h - Tss.
-TSS_DATA_SEL equ $-_gdt	
+TSS_DATA_SEL equ $-_gdt
 gdt6:
     dw 104 ;;103
     dw 0
@@ -838,6 +682,7 @@ gdt6:
     db 0x89 ;;0x89   ;; presente, ring0(onde esta a tss??), s=0(segmento do sistema) /  ;;89h ((Present|Executable|Accessed)) 1001  bit3=32bitcode
     db 0x10
     db 0
+
 ;Selector 30h - Ldt.
 LDT_TEST_SEL equ $-_gdt
     db 0xff
@@ -858,20 +703,22 @@ _end_gdt:
 ;
 global  _GDT_register
 _GDT_register:
-	dw (_end_gdt-_gdt)-1
-    dd _gdt
+    dw  (_end_gdt-_gdt)-1
+    dd  _gdt
 
 
-;
-; idt ----------------------------------------------
-;
+
+;;
+;; == IDT ====================================================
+;;
+
 
 ;
 ; Usadas nas entradas da idt.
 ;
 
-sys_interrupt equ 0x8E  
-sys_code      equ    8    ;Seletor de c�digo.
+sys_interrupt equ    0x8E 
+sys_code      equ    8     ;Code selector.
 
 
 ;==================================================;
@@ -883,14 +730,14 @@ global _idt
 _idt:
 
 ;0 interrupt 0h, div error.
-	dw 0			  
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 	
 ;1 interrupt 1h, debug exception.
-	dw 0                    		    
+	dw 0 
 	dw sys_code
 	db 0
 	db sys_interrupt
@@ -2692,21 +2539,20 @@ _idt:
 	db 0
 	db sys_interrupt
 	dw 0
+
 idt_end:
     dd 0
 
 
-
 ;
-; IDT_register - registro.
+; IDT_register
 ;
 
 global _IDT_register
 _IDT_register:
+
     dw  (256*8) - (1)
     dd _idt 
-	
-
 
 
 

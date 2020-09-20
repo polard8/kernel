@@ -84,14 +84,14 @@ static int saved_y=0;
 
 void __local_save_cur (int console_number)
 {
-	saved_x = TTY[console_number].cursor_x;
-	saved_y = TTY[console_number].cursor_y;
+    saved_x = TTY[console_number].cursor_x;
+    saved_y = TTY[console_number].cursor_y;
 }
 
 void __local_restore_cur (int console_number)
 {
-	TTY[console_number].cursor_x = saved_x;
-	TTY[console_number].cursor_y = saved_y;
+    TTY[console_number].cursor_x = saved_x;
+    TTY[console_number].cursor_y = saved_y;
 }
 
 
@@ -148,6 +148,8 @@ void __local_insert_line (int console_number)
     TTY[console_number].cursor_top    = TTY[console_number].cursor_y;
     TTY[console_number].cursor_bottom = TTY[console_number].cursor_bottom;
 
+    //if (console_number<0)
+        //return;
 
     console_scroll(console_number);
 
@@ -338,19 +340,21 @@ void csi_at (int nr, int console_number)
 
 
 
-
-
 /*
  ***************************************
  * _console_outbyte:
  * 
  *    Outputs a char on the console device;
+ *    Low level function to draw the char into the screen.
+ *    it calls the embedded window server.
  */
- 
+
 	// #test
 	// Tentando pegar as dimensões do char.
 	// #importante: 
 	// Não pode ser 0, pois poderíamos ter divisão por zero.
+
+// Called by console_outbyte.
 
 void _console_outbyte (int c, int console_number){
 
@@ -383,28 +387,31 @@ void _console_outbyte (int c, int console_number){
 
     // Caso estivermos em modo gráfico.
     // #importante: 
-    // Essa rotina de pintura deveria ser exclusiva para dentro do terminal.
-    // Então essa flag não faz sentido.		
+    // Essa rotina de pintura deveria ser exclusiva 
+    // para dentro do terminal.
+    // Então essa flag não faz sentido.
+    // See: windows/char.c
+
 
     if ( VideoBlock.useGui == 1 )
     {
 
         // ## NÃO TRANPARENTE ##
-        // se estamos no modo terminal então usaremos as cores 
+        // Se estamos no modo terminal então usaremos as cores 
         // configuradas na estrutura do terminal atual.
         // Branco no preto é um padrão para terminal.
         if ( stdio_terminalmode_flag == 1 )
         {
-            draw_char ( cWidth * TTY[console_number].cursor_x, 
-                       cHeight * TTY[console_number].cursor_y, 
-                       c, 
-                       COLOR_WHITE, 0x303030 );
+            draw_char ( 
+                 cWidth * TTY[console_number].cursor_x, 
+                cHeight * TTY[console_number].cursor_y, 
+                c, COLOR_WHITE, 0x303030 );
 
 
         // ## TRANSPARENTE ##
-        // se não estamos no modo terminal então usaremos
+        // Se não estamos no modo terminal então usaremos
         // char transparente.
-        // Não sabemos o fundo. Vamos selecionar o foreground.        
+        // Não sabemos o fundo. Vamos selecionar o foreground. 
         }else{
             drawchar_transparent ( 
                 cWidth* TTY[console_number].cursor_x, 
@@ -426,6 +433,9 @@ void _console_outbyte (int c, int console_number){
  * Essa rotina é chamada pelas funções: /putchar/scroll/.
  * @todo: Colocar no buffer de arquivo.
  */
+
+// This functions calls _console_outbyte to draw
+// the char into the screen.
 
 void console_outbyte (int c, int console_number){
 
@@ -464,8 +474,8 @@ void console_outbyte (int c, int console_number){
     //Início da próxima linha. 
     if ( c == '\n' && prev == '\r' ) 
     {
-		// #todo: 
-		// Melhorar esse limite.
+        // #todo: 
+        // Melhorar esse limite.
         if ( TTY[console_number].cursor_y >= (TTY[console_number].cursor_bottom-1) )
         {
             //debug_print ("console_outbyte: scroll 1\n"); 
@@ -484,7 +494,7 @@ void console_outbyte (int c, int console_number){
     }
 
 
-    //Próxima linha no modo terminal.
+    // Próxima linha no modo terminal.
     if ( c == '\n' && prev != '\r' ) 
     {
         if ( TTY[console_number].cursor_y >= (TTY[console_number].cursor_bottom-1) )
@@ -526,14 +536,15 @@ void console_outbyte (int c, int console_number){
     }
 
 
-	//tab
-	//@todo: Criar a variável 'g_tab_size'.
-    if( c == '\t' )  
+    // TAB
+    // #todo: 
+    // Criar a variável 'g_tab_size'.
+    
+    if ( c == '\t' ) 
     {
         TTY[console_number].cursor_x += (8);
         //g_cursor_x += (4); 
         prev = c;
-        
         return; 
 
 		//Não adianta só avançar, tem que apagar o caminho até lá.
@@ -545,7 +556,7 @@ void console_outbyte (int c, int console_number){
 		//}
 		//Olha que coisa idiota, e se tOffset for 0.
 		//set_up_cursor( g_cursor_x +tOffset, g_cursor_y );
-		//return;        
+		//return; 
     }
 
 
@@ -555,13 +566,13 @@ void console_outbyte (int c, int console_number){
 	//{
     //    return;
     //};
- 
+
 
     // Apenas voltar ao início da linha.
     if ( c == '\r' ){
         TTY[console_number].cursor_x = TTY[console_number].cursor_left;  
         prev = c;
-        return;    
+        return; 
     }
 
 
@@ -586,9 +597,13 @@ void console_outbyte (int c, int console_number){
     }
 
 
-	//
-	// limits
-	//
+    //
+    // == Limits =======================================
+    //
+
+    // #todo:
+    // We need to check the TTY structure to handle the limits.
+    // See:
 
 	// Filtra as dimensões da janela onde está pintando.
 	// @todo: Esses limites precisam de variável global.
@@ -604,7 +619,7 @@ void console_outbyte (int c, int console_number){
 
 //checkLimits:
 
-    //Limites para o número de caracteres numa linha.
+    // Limites para o número de caracteres numa linha.
     if ( TTY[console_number].cursor_x >= (TTY[console_number].cursor_right-1) )
     {
         TTY[console_number].cursor_x = TTY[console_number].cursor_left;
@@ -1154,14 +1169,15 @@ int insert_line ( char *string, int line )
  *     REFRESH SOME GIVEN STREAM INTO TERMINAL CLIENT WINDOW !!
  */
 
+// #todo
+// Change this name. 
+// Do not use stream in the base kernel.
+
 void REFRESH_STREAM ( file *f ){
 
     char *c;
-
     int i=0;
     int j=0;
-
-
     int cWidth  = get_char_width();
     int cHeight = get_char_height();
 
@@ -1229,11 +1245,20 @@ int console_get_current_virtual_console (void)
 }
 
 
+
+/*
+ *********************************************
+ * console_init_virtual_console:
+ *
+ *     Initializes a virtual console.
+ */
+
 // #bugbug
 // #IMPORTANTE
 // Essa função apresenta problemas de compilação
 // quando incluímos mais código.
 // See: console.h
+
 void console_init_virtual_console (int n){
 
     int ConsoleIndex = -1;
@@ -1253,15 +1278,25 @@ void console_init_virtual_console (int n){
         //return;
     }
 
+    // #todo
+    // We need to check the device screen properties
+    // and the char properties to set up these values.
+    
+    // #bugbug: 
+    // 'cursor_width' is not a good name.
+
+    // #bugbug: Facing some compilation issues when 
+    // including more code in this function.
+    // Blessed gcc.
 
     TTY[ConsoleIndex].cursor_x = 0;
     TTY[ConsoleIndex].cursor_y = 0;
-    TTY[ConsoleIndex].cursor_width  = 80;
-    TTY[ConsoleIndex].cursor_height = 80;
+    TTY[ConsoleIndex].cursor_width  = 80;  // (screen width / char width) ??
+    TTY[ConsoleIndex].cursor_height = 80;  // (screen height/ char height) ??
     TTY[ConsoleIndex].cursor_left = 0;
     TTY[ConsoleIndex].cursor_top  = 0;
-    TTY[ConsoleIndex].cursor_right  = 80;
-    TTY[ConsoleIndex].cursor_bottom = 80;
+    TTY[ConsoleIndex].cursor_right  = 80;  // (screen width / char width)
+    TTY[ConsoleIndex].cursor_bottom = 80;  // (screen height/ char height)
     TTY[ConsoleIndex].cursor_color = COLOR_GREEN; //COLOR_TERMINALTEXT;
     
 
@@ -1281,7 +1316,6 @@ void console_init_virtual_console (int n){
     // #test
     // Cuidado, tivemos problemas de compilação nessa função
 
-
     //#todo
     // Local mode flags.
     TTY[ConsoleIndex].termios.c_lflag = ECHO;
@@ -1289,7 +1323,7 @@ void console_init_virtual_console (int n){
 
 
 //
-//=========
+// ============================================
 //
 
 

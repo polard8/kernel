@@ -1,33 +1,31 @@
 ;
-; File: msm\debug.inc 
+; File: debug.inc 
 ;
-; Descrição:
-; Analiza e mostra informações sobre a inicialização. 
-; Várias rotinas.
+; goal: Show some initialization info.
 ;
-; Versão 1.0, 2015.
+; 2015.
 ;
  
-	
+
 ;-----------------------------------------------
 ; debug_main:
-;     Função principal do debug.
-;     
+;     main function.
 ;
+
 debug_main:
     pushad
-    call debug_show_metafile_info     
-	popad
-	mov eax, 0
-	RET
-	
-	
-	
+    call debug_show_metafile_info
+    popad
+
+    xor eax, eax
+    RET
+
+
 ;-------------------------------------------
 ; debug_show_metafile_info:
 ;
-;     Analiza e mostra informações sobre o sistema. 
-;     Mostra as informações salvas em META$FILE.
+;     Analiza e mostra informaï¿½ï¿½es sobre o sistema. 
+;     Mostra as informaï¿½ï¿½es salvas em META$FILE.
 ;
 debug_show_metafile_info:
 
@@ -98,17 +96,17 @@ debug_show_metafile_info:
 
     mov esi, new_line
     call  os_output 
-	
-    ret	
-	
-	
+
+    ret
+
+
 
 ;
 ; debug_config_ativar_status:
 ;     Critico ... testar
 ;
 debug_config_ativar_status:
-	;faz mudanças
+	;faz mudanï¿½as
 	call blconfig_open_init_cnf
 
 	mov byte [g_init_status_bl32], byte 1
@@ -153,17 +151,18 @@ debug_show_system_cnf:
     call  os_output 
 	
 	ret
-dm_sys_name      db "System name Ok.",13,10,0
-dm_sys_name_fail db "System name fail!",13,10,0
+
+dm_sys_name      db "System name Ok.",   13,10,0
+dm_sys_name_fail db "System name fail!", 13,10,0
 
 
 
 
- 
- 
+
+
 ;---------------------------------------- 
 ; mostrar_parametros_do_disco_atual:
-;    Mostra os parâmetros do disco atual
+;    Mostra os parï¿½metros do disco atual
 ;    salvos no metafile. 
 ; 
 mostrar_parametros_do_disco_atual:  
@@ -177,16 +176,16 @@ mostrar_parametros_do_disco_atual:
  
 ;---------------------------------------------
 ; mostrar_parametros_da_particao_ativa:
-;     Mostrar os parametros da partição ativa, 
+;     Mostrar os parametros da partiï¿½ï¿½o ativa, 
 ;     salvos em estrutura.
 ;	
 mostrar_parametros_da_particao_ativa:  
     call fs32_show_activepartition_info
     ret
-	
+
 ;-------------------------------------
 ; debug_show_root_dir:
-;     Interface para a função que mostra o diretório raiz.
+;     Interface para a funï¿½ï¿½o que mostra o diretï¿½rio raiz.
 ;
 debug_show_root_dir:
     pushad
@@ -198,29 +197,30 @@ debug_show_root_dir:
 ;-------------------------------
 ; show_current_dir:
 ;
-;     @todo: Listar os arquivos no diretório corrente.
-;	
+;     @todo: Listar os arquivos no diretï¿½rio corrente.
+;
+
 show_current_dir:
     call fs32_show_currentdir
-	ret
-	
+    ret
 
-	
+
+
 ;-------------------------------------
 ; show_root_dir:
-;     (Mostra o diretório de volumes)
+;     (Mostra o diretï¿½rio de volumes)
 ;     Show root dir.
 ; 
 show_root_dir:
     call fs32_show_rootdir
-	ret
-	
+    ret
+
 
 	
 ;
 ; fs32_show_current:
 ;
-;			
+;
 fs32_show_current:
 
     pushad
@@ -254,28 +254,29 @@ fs32_show_current:
 	call os_output
 
     popad
-	
-    ret	
+    ret
 
 
 ;
-; Informações mostradas pelo debug:
+; InformaÃ§oes mostradas pelo debug:
 ; ================================
 ;
-msg_debug_about db "Debug ~ Mostra informacoes do META$FILE.",13,10,0
+
+msg_debug_about: 
+    db "Debug ~ Showing info from META$FILE.", 13,10,0
+
 ;META$FILE info	
-msg_debug_1 db 13, 10, "Init Mode               - " ,0    ;Modo de inicializção do System4Nora.
-msg_debug_2 db 13, 10, "Video Mode              - " ,0    ;Saved Video mode.
-msg_debug_3 db 13, 10, "Screen X                - " ,0    ;Screen X.
-msg_debug_4 db 13, 10, "Screen Y                - " ,0    ;Screen Y.
-msg_debug_5 db 13, 10, "LFB Address             - " ,0    ;LFB Address.
+msg_debug_1 db 13, 10, "Init Mode     - " ,0    ;Modo de inicializï¿½ï¿½o do System4Nora.
+msg_debug_2 db 13, 10, "Video Mode    - " ,0    ;Saved Video mode.
+msg_debug_3 db 13, 10, "Screen X      - " ,0    ;Screen X.
+msg_debug_4 db 13, 10, "Screen Y      - " ,0    ;Screen Y.
+msg_debug_5 db 13, 10, "LFB Address   - " ,0    ;LFB Address.
 msg_debug_6 db 13, 10, "Nothing for now!" ,0    ;Nothing for now!
 msg_debug_7 db 13, 10, "Nothing for now!" ,0    ;Nothing for now!
 msg_debug_8 db 13, 10, "Nothing for now!" ,0    ;Nothing for now!
 
-	
 msg_cur_disk db "Current disk      - ",0
-msg_cur_part db "Current partition - ",0		
+msg_cur_part db "Current partition - ",0
 
 
 msg_check_system_cnf  db "[BM:] Check system.cnf",13,10,0	
@@ -284,4 +285,5 @@ msg_check_init_cnf    db "[BM:] Check init.cnf"  ,13,10,0
 ;
 ; End.
 ;
+ 
  

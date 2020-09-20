@@ -1172,7 +1172,7 @@ int create_topbar_client(int fd)
             printf ("gwm: c_topbar->window fail\n");
             exit(1);
         }
-        printf ("w={%x}\n",c_topbar->window);
+        //printf ("w={%x}\n",c_topbar->window);
         gws_refresh_window(fd,c_topbar->window);
 
         // button1 (system menu)
@@ -1184,12 +1184,12 @@ int create_topbar_client(int fd)
         c_topbar->title_window = -1;  //todo;
         wmclientList[1] = (unsigned long) c_topbar;
     };
-    
+
     return 0;
 }
 
 
-//interna
+// interna
 int create_taskbar_client(int fd)
 {
     unsigned long w = gws_get_system_metrics(1);
@@ -1210,13 +1210,13 @@ int create_taskbar_client(int fd)
     // Taskbar
     gws_debug_print ("gwm: Create c_taskbar client\n");
     c_taskbar = (struct wm_client_d *) malloc ( sizeof(struct wm_client_d) );
-    if( (void *)c_taskbar == NULL){
+    if( (void *)c_taskbar == NULL ){
         printf ("gwm: c_taskbar fail\n");
         exit(1);
     
     }else{
 
-         c_taskbar->window = gws_create_window (fd,
+        c_taskbar->window = gws_create_window (fd,
                                  WT_SIMPLE,1,1,"Taskbar",
                                  0, (h-32), w, 32,
                                  0,0,COLOR_GRAY, COLOR_GRAY);
@@ -1225,24 +1225,24 @@ int create_taskbar_client(int fd)
             printf ("gwm: c_taskbar->window fail\n");
             exit(1);
         }
-        printf ("w={%x}\n",c_taskbar->window);
+        //printf ("w={%x}\n",c_taskbar->window);
         gws_refresh_window(fd,c_taskbar->window);
          
-         c_taskbar->title_window = -1;  //todo 
+        c_taskbar->title_window = -1;  //todo 
 
-         // button1
-         button1_window = gws_create_window (fd,
+        // button1
+        button1_window = gws_create_window (fd,
                               WT_BUTTON,1,1,"App1",
                               2, 2, 120, 28,
                               c_taskbar->window, 0,COLOR_GRAY, COLOR_GRAY);
 
          // button2
-         button2_window = gws_create_window (fd,
+        button2_window = gws_create_window (fd,
                               WT_BUTTON,1,1,"App2",
                               2 + 120 + 2, 2, 120, 28,
                               c_taskbar->window, 0,COLOR_GRAY, COLOR_GRAY);
 
-         wmclientList[2] = (unsigned long) c_taskbar;
+        wmclientList[2] = (unsigned long) c_taskbar;
     };
 
     return 0;
@@ -1290,7 +1290,7 @@ int create_tester_client(int fd)
             printf ("gwm: c_tester->window fail\n");
             exit(1);
         }
-        printf ("tester window = {%d}\n",c_tester->window);
+        //printf ("tester window = {%d}\n",c_tester->window);
         gws_refresh_window(fd,c_tester->window);
         
         // Title window.
@@ -1364,7 +1364,6 @@ int create_tester_client(int fd)
 
 
 
-
     /*
     //
     // == Sprite =================================
@@ -1403,8 +1402,7 @@ int create_tester_client(int fd)
     };
     */
     
-    
-    
+
 
     // Testing more things ....
     
@@ -1508,7 +1506,6 @@ int create_main_menu( int fd )
                   (struct gws_menu_d *) menu );
 
     }
-
 
     return 0;
 }
@@ -1617,13 +1614,11 @@ int main ( int argc, char *argv[] ){
     create_bg_client(fd);
     create_topbar_client(fd);
     create_taskbar_client(fd);
-    
 
     // ...
 
-
     gws_debug_print ("gwm: draw done!\n");
-    printf          ("gwm: draw done!\n");
+    //printf          ("gwm: draw done!\n");
 
     //gws_show_background();
     //while(1){}

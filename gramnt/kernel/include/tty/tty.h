@@ -128,15 +128,18 @@ struct tty_d
     // Quais processos estão no mesmo grupo quanto tiver a interrupção.
     // Vamos sinalizá-los.
     int pgrp;
-    
+
+    // #maybe
+    // pid, gid, uid
+    //pid_t pid;
+    //uid_t uid;
+    //gid_t gid;
+
+
     // linux-like
     short type;       // type of tty
     short subtype;    // subtype of tty 
     int flags;        // tty flags.   
-    
-    
-    //talvez;
-    //int device_number;
     
     
     //status

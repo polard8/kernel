@@ -1380,7 +1380,7 @@ process_event:
 }
 
 
-
+// Request.
 int 
 __gws_createwindow_request (
     int fd,
@@ -1457,7 +1457,7 @@ __gws_createwindow_request (
 }
 
 
-//response
+// Response
 int __gws_createwindow_response(int fd)
 {
     unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];   
@@ -1854,8 +1854,15 @@ int gws_refresh_window (int fd, int window )
 }
 
 
-// Talvez vamos retonar o descritor
-// dado pelo servidor.
+
+/*
+ ************************************************** 
+ * gws_create_window: 
+ * 
+ */
+
+// OUT: wid
+
 int
 gws_create_window ( 
     int fd,
@@ -1873,6 +1880,7 @@ gws_create_window (
     unsigned long color )      //12, Color (bg) (para janela simples).
  
 {
+    int wid = -1;
 
     //#todo
     //Um argumento passa o display usado
@@ -1881,12 +1889,16 @@ gws_create_window (
 
     //#todo
     // use more arguments.
-    __gws_createwindow_request(fd, 
+
+
+    // Request.
+    __gws_createwindow_request ( fd, 
         x, y, width, height, 
         color, type, parentwindow, windowname);
-        
-    int wid = (int) __gws_createwindow_response(fd); 
     
+    // Response
+    wid = (int) __gws_createwindow_response(fd); 
+
     return (int) wid;
 }
 

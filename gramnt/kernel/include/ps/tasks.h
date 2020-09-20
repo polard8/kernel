@@ -1,19 +1,11 @@
 /*
  * File: tasks.h
- *
- * Descrição:
- *    Header principal dos recursos do kernel envolvendo PROCESSOS.
- *    #bugbug: Tarefas são processos. Não threads.
- *    Esse módulos oferece algumas
+ *     ??
+ *     #bugbug: There is a lot of deprecated things here.
  */
 
 
 
-/*
- *  O que segue são as variáveis usadas com maior frequência.
- */
-
- 
 //Status do mecanismo de task switch. 
 unsigned long task_switch_status;
  
@@ -100,8 +92,7 @@ void start_task(unsigned long id, unsigned long *task_address);
 void switch_to_user_mode (void); //??
 
 void save_context_of_new_task (int id, unsigned long *task_address); //??	
-	
- 
+
 	
 /*
  * Ki={Kernel Internal}

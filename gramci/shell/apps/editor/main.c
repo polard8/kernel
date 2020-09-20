@@ -50,7 +50,6 @@
 #include <packet.h>
 
 
-
 // The client-side library.
 #include <gws.h>
 
@@ -309,13 +308,8 @@ response_loop:
             {
                 case VK_F1:
                     //printf ("editor: VK_F1\n");
-                    gws_draw_text (
-                        (int) fd,             // fd,
-                        (int) 0,              // window id,
-                        (unsigned long) 40,    // left,
-                        (unsigned long) 40,    // top,
-                        (unsigned long) COLOR_BLUE,
-                        "Terminal: [F1]");
+                    // fd, window id, left, top, color, string.
+                    gws_draw_text ( (int) fd, (int) 0, 40, 40, COLOR_BLUE, "[F1]");
                     break;
 
                 case VK_F2:
@@ -328,17 +322,9 @@ response_loop:
                     
                 case VK_F4:
                     //printf ("editor: VK_F4 reboot\n");
-                    //gws_reboot();
-                    gws_draw_text (
-                        (int) fd,             // fd,
-                        (int) 0,              // window id,
-                        (unsigned long) 80,    // left,
-                        (unsigned long) 80,    // top,
-                        (unsigned long) COLOR_BLUE,
-                        "Terminal: [F4] Exiting ...");
+                    gws_draw_text ( (int) fd, (int) 0, 80, 80, COLOR_BLUE, "[F4] Exiting...");
                     exit(0);
                     break;
-                    
                     
                 default:
                     goto process_event;
@@ -436,6 +422,13 @@ process_event:
 // Loop de requests para o gws.
 int _loop(int fd)
 {
+
+    if (fd<0){
+        gws_debug_print ("_loop: fd fail\n");
+        printf          ("_loop: fd fail\n");
+        return -1;
+    }
+
 
     while (1){
         _getmessage_request(fd);
@@ -735,18 +728,19 @@ int main ( int argc, char *argv[] ){
 
     main_window = gws_create_window (client_fd,
         WT_SIMPLE,1,1,"Editor",
-        0,0,w,h,    //40, 40, 640, 480,
+        0,0,w,h,
         0,0,COLOR_GRAY, COLOR_GRAY);
 
     if ( main_window < 0 )             
         debug_print("Editor: main_window fail\n"); 
 
 
+     // Text.
      gws_draw_text (
-        (int) client_fd,       // fd,
-        (int) main_window,     // window id,
-        (unsigned long) (40/3),    //( ((w-(w/2))/2) - (6*8) ),   //50,    // left,
-        (unsigned long) (40/3),    //8,     // top,
+        (int) client_fd,           // fd,
+        (int) main_window,         // window id,
+        (unsigned long) ((w/8)*0),//(40/3),    // ( ((w-(w/2))/2) - (6*8) ),   //50,    // left,
+        (unsigned long) (40/3),    // 8,     // top,
         (unsigned long) COLOR_BLACK,
         "Name:");
 
@@ -756,8 +750,8 @@ int main ( int argc, char *argv[] ){
 
     addressbar_window = gws_create_window (client_fd,
         WT_EDITBOX,1,1,"address-bar",
-        (40/3) + (8*8), 4,    //((w-(w/2))/2), 4, 
-        (w/2), 32,
+        ((w/8)*1), 4,     //(40/3) + (8*8), 4,    //((w-(w/2))/2), 4, 
+        ((w/8)*3), 32,    //(w/2), 32,
         main_window,0,COLOR_WHITE, COLOR_WHITE);
 
     if ( addressbar_window < 0 )             
@@ -766,9 +760,9 @@ int main ( int argc, char *argv[] ){
      
      gws_draw_text (
         (int) client_fd,             // fd,
-        (int) addressbar_window,              // window id,
-        (unsigned long) 8,    // left,
-        (unsigned long) (40/3), //8,    // top,
+        (int) addressbar_window,     // window id,
+        (unsigned long) 8,           // left,
+        (unsigned long) (40/3),      //8,    // top,
         (unsigned long) COLOR_BLACK,
         "text.txt");
 
@@ -778,14 +772,16 @@ int main ( int argc, char *argv[] ){
 
     button = gws_create_window (client_fd,
         WT_BUTTON,1,1,"Save",
-        (w-100-4), 4,//(640-100), 4, 
-        100, 32,
-        main_window,0,COLOR_GRAY, COLOR_GRAY);
+        ((w/8)*6), 4,     //(w-100-4), 4, //(640-100), 4, 
+        ((w/8)*1), 32,
+        main_window, 0, COLOR_GRAY, COLOR_GRAY);
 
-    if ( button < 0 )             
+    if ( button < 0 ) 
         debug_print("Editor: button fail\n"); 
 
-
+    //
+    // Client window
+    //
 
     // client window (White)
     client_window = gws_create_window (client_fd,
@@ -793,7 +789,7 @@ int main ( int argc, char *argv[] ){
         4, 40, (w-8), (h - 40 - 4),   //4, 40, 640-8, 480 - 40 - 4,
         main_window,0,COLOR_WHITE, COLOR_WHITE);
 
-    if ( client_window < 0 )             
+    if ( client_window < 0 ) 
         debug_print("Editor: client_window fail\n"); 
 
     int t=0;

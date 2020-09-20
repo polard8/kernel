@@ -1,18 +1,19 @@
 /*
- * File: kgws/comp/char.c
+ * File: windows/char.c
  *
- * Descrição:
- *     Constrói caractere em modo gráfico.
+ *     Constroi caractere em modo grï¿½fico.
  *     Desenha o caractere pixel por pixel.
- *     Faz parte do módulo Window Manager do tipo MB.
- * Obs: A fonte usada é a fonte 8x8 que está na ROM BIOS. em 0x000FFA6E.
+ *     Faz parte do mï¿½dulo Window Manager do tipo MB.
+ * 
+ * Obs: 
+ * A fonte usada ï¿½ a fonte 8x8 que estï¿½ na ROM BIOS. em 0x000FFA6E.
  *
  * History:
  *     2015 - Created by Fred Nora.
  *     2018 - Revision.
  */
 
- 
+
 #include <kernel.h>
 
 
@@ -24,7 +25,7 @@
 /*
  ********************************************************
  * my_buffer_char_blt:
- *     Constrói um caractere transparente 8x8 no buffer.
+ *     Constrï¿½i um caractere transparente 8x8 no buffer.
  */
  
 void 
@@ -76,12 +77,14 @@ drawchar_transparent (
     unsigned long color, 
     unsigned long c )
 {
-	// #todo: rever isso.
+
+    // #todo: 
+    // Rever isso.
 
     struct window_d *hWindow;
 
-    int x2;
-    int y2;
+    int x2=0;
+    int y2=0;
 
     unsigned char bit_mask = 0x80;
 
@@ -113,8 +116,8 @@ drawchar_transparent (
 
 	/*
 	 * @todo: 
-	 *     +Criar variáveis internas para tamanho de fonte.
-	 *     +Pegar as informações em uma estrutura.
+	 *     +Criar variï¿½veis internas para tamanho de fonte.
+	 *     +Pegar as informaï¿½ï¿½es em uma estrutura.
 	 *     ...
 	 */
 
@@ -133,35 +136,36 @@ drawchar_transparent (
 	 *     + Criar e usar uma estrutura para fonte.
 	 *     + Usar o ponteiro para a fonte atual que foi carregada.
 	 *     + Criar um switch para o tamanho da fonte.
-	 *     isso deveria estar na inicialização do módulo char.
+	 *     isso deveria estar na inicializaï¿½ï¿½o do mï¿½dulo char.
 	 *     ...
 	 */
 
 	// Default:
 	//     Testando o uso de uma fonte default no caso de erro.
-	//     Testando a troca da fonte padrão.
-	//     O sistema não vai parar no caso de erro. Nesse caso ele escolhera
+	//     Testando a troca da fonte padrï¿½o.
+	//     O sistema nï¿½o vai parar no caso de erro. Nesse caso ele escolhera
 	// um valor default.
 	// Definido em: include/kernel/gramado/kservers/kgws/kgws/ws.h
 
 
-    // Usaremos a ROM bios no caso de falha.
-    if ( gws_currentfont_address == 0 )
-    {
+    // Trying to use the ROM BIOS font 
+    // if we do not have loadable one.
+
+    if ( gws_currentfont_address == 0 ){
         gws_currentfont_address = (unsigned long) BIOSFONT8X8;
     }
 
+    // Selecting the default char properties.
+    // #bugbug: Is it 'int' type?
     // 8x8
     if ( gcharWidth <= 0 || gcharHeight <= 0 )
     {
-        gcharWidth = DEFAULT_CHAR_WIDTH;
+        gcharWidth  = DEFAULT_CHAR_WIDTH;
         gcharHeight = DEFAULT_CHAR_HEIGHT;
     }
 
 
-	// #todo: 
-	// Criar essas variáveis e definições.
-
+    // Checking the font size.
 
     switch (gfontSize){
 
@@ -182,20 +186,20 @@ drawchar_transparent (
             break;
 
 		//#todo: 
-		//Criar opções
+		//Criar opï¿½ï¿½es
 		//...
 
 		// #importante:
 		// #BUGBUG
-		// Se não temos um tamanho selecionado então teremos 
-		// que usar o tamanho padrão.
+		// Se nï¿½o temos um tamanho selecionado entï¿½o teremos 
+		// que usar o tamanho padrï¿½o.
 
         ////ROM bios.
         default:
             gws_currentfont_address = (unsigned long) BIOSFONT8X8;    
             set_char_width (8);
             set_char_height (8);
-            gfontSize = FONT8X8;  //#todo: fução para configurar isso.
+            gfontSize = FONT8X8;  //#todo: fuï¿½ï¿½o para configurar isso.
             break;
     };
 
@@ -203,7 +207,6 @@ drawchar_transparent (
 	// #importante:
 	// O caractere sendo trabalhado.
 	// Offset da tabela de chars de altura 8 na ROM.
-
 
     work_char = (void *) gws_currentfont_address + (c * gcharHeight);
 
@@ -229,7 +232,7 @@ drawchar_transparent (
             bit_mask = (bit_mask >> 1); 
         };
 
-        // Próxima linha da n linhas do caractere.
+        // Next line in the char.
         y++; 
         work_char++; 
     };
@@ -243,28 +246,31 @@ drawchar_transparent (
 /*
  *****************************************************
  * draw_char:
- *     Constrói um caractere 8x8 no buffer.
+ *     Constrï¿½i um caractere 8x8 no buffer.
  *     Desenha um caractere e pinta o pano de fundo.
  *     >> no backbuffer.
  */ 
 
 void 
-draw_char ( unsigned long x, 
-            unsigned long y,  
-            unsigned long c,
-            unsigned long fgcolor,
-            unsigned long bgcolor )
+draw_char ( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long c,
+    unsigned long fgcolor,
+    unsigned long bgcolor )
 {
-	// #todo: Rever isso.
+
+    // #todo: 
+    // Rever isso.
 
     struct window_d *hWindow;
 
-    int x2;
-    int y2;
+    int x2=0;
+    int y2=0;
 
     unsigned char bit_mask = 0x80;
 
-    char *work_char;  
+    char *work_char; 
 
 
 	//
@@ -299,37 +305,36 @@ draw_char ( unsigned long x,
 	 *     + Criar e usar uma estrutura para fonte.
 	 *     + Usar o ponteiro para a fonte atual que foi carregada.
 	 *     + Criar um switch para o tamanho da fonte.
-	 *     isso deveria estar na inicialização do módulo char.
+	 *     isso deveria estar na inicializaï¿½ï¿½o do mï¿½dulo char.
 	 *     ...
 	 */
 
 
 	// Default:
 	//     Testando o uso de uma fonte default no caso de erro.
-	//     Testando a troca da fonte padrão.
-	//     O sistema não vai parar no caso de erro. Nesse caso ele escolhera
+	//     Testando a troca da fonte padrï¿½o.
+	//     O sistema nï¿½o vai parar no caso de erro. Nesse caso ele escolhera
 	// um valor default.
 	// Definido em: include/kernel/gramado/kservers/kgws/kgws/ws.h
 
 
-    // Usaremos a ROM bios no caso de falha.
-    if ( gws_currentfont_address == 0 )
-    {
+    // Trying to use the ROM BIOS font 
+    // if we do not have loadable one.
+
+    if ( gws_currentfont_address == 0 ){
         gws_currentfont_address = (unsigned long) BIOSFONT8X8;
     }
+
 
     // 8x8
     if ( gcharWidth <= 0 || gcharHeight <= 0 )
     {
-        gcharWidth = DEFAULT_CHAR_WIDTH;
+        gcharWidth  = DEFAULT_CHAR_WIDTH;
         gcharHeight = DEFAULT_CHAR_HEIGHT;
     }
 
 
-
-	// #todo: 
-	// Criar essas variáveis e definições.
-
+    // Checking the font size.
 
     switch (gfontSize){
 
@@ -352,29 +357,29 @@ draw_char ( unsigned long x,
 
 
 		// #todo: 
-		// Criar opções
+		// Criar opï¿½ï¿½es
 		// ...
 
 
 		// #importante:
 		// #BUGBUG
-		// Se não temos um tamanho selecionado então teremos 
-		// que usar o tamanho padrão.
+		// Se nï¿½o temos um tamanho selecionado entï¿½o teremos 
+		// que usar o tamanho padrï¿½o.
 
         // ROM bios.
         default:
             gws_currentfont_address = (unsigned long) BIOSFONT8X8; 
             set_char_width (8);
             set_char_height (8);
-            gfontSize = FONT8X8;  //#todo: fução para configurar isso.
+            gfontSize = FONT8X8;  //#todo: fuï¿½ï¿½o para configurar isso.
             break;
     };
 
 
 
-	// tentando pintar um espaço em branco.
-	// Nas rotinas da biblioteca gráfica, quando encontram
-	// um espaço(32), nem manda para cá, apenas incrementam o cursor.
+	// tentando pintar um espaï¿½o em branco.
+	// Nas rotinas da biblioteca grï¿½fica, quando encontram
+	// um espaï¿½o(32), nem manda para cï¿½, apenas incrementam o cursor.
 
 	// #imporatante:
 	// O caractere sendo trabalhado.
@@ -395,14 +400,14 @@ draw_char ( unsigned long x,
         for ( x2=0; x2 < gcharWidth; x2++ )
         {
 
-			// Put pixel.
+            // Put pixel.
             backbuffer_putpixel ( *work_char & bit_mask ? fgcolor: bgcolor, 
                 x + x2, y, 0 );
 
             bit_mask = (bit_mask >> 1); 
         };
 
-		// Próxima linha da (y) linhas do caractere.
+        // Next line of the char.
         y++; 
         work_char++; 
     };
@@ -420,13 +425,13 @@ int charInit()
 	      gcharWidth == 0 || 
 		 gcharHeight == 0 )
 	{
-		//@todo: Criar definições globais para esses valores, ou estruturas.
+		//@todo: Criar definiï¿½ï¿½es globais para esses valores, ou estruturas.
 	    gws_currentfont_address = (unsigned long) BIOSFONT8X8;    //ROM bios.
 		gcharWidth = 8;
 		gcharHeight = 8;
 	};
 	
-	//@todo: Criar essas variáveis e definições.
+	//@todo: Criar essas variï¿½veis e definiï¿½ï¿½es.
 	switch(gfontSize)
 	{
 		case FONT8X8:
@@ -446,14 +451,14 @@ int charInit()
 		//
 		// #importante:
 		// #BUGBUG
-		// Se não temos um tamanho selecionado então teremos 
-		// que usar o tamanho padrão.
+		// Se nï¿½o temos um tamanho selecionado entï¿½o teremos 
+		// que usar o tamanho padrï¿½o.
 		//
 		default:
 		    printf("gui-char-drawchar_transparent: Font size fail.");
 			printf("gui-char-drawchar_transparent: Using default ...");
 	        
-			// Fonte padrão.
+			// Fonte padrï¿½o.
 			gws_currentfont_address = (unsigned long) BIOSFONT8X8;    //ROM bios.
 		    gcharWidth = DEFAULT_CHAR_WIDTH;               //8.
 		    gcharHeight = DEFAULT_CHAR_HEIGHT;             //8.	

@@ -1,12 +1,11 @@
 ;
-; File: x86/head/headlib.s 
+; File: x86/headlib.s 
 ;
 ; Descrição:
 ;     Funções auxiliares de supporte a head.s do Kernel Base.
 ;
-; Histórico:
-;     Versão 1.0, 2015 - Esse arquivo foi criado por Fred Nora.
-;     Versão 1.0, 2016 - Revisão.
+; History:
+;     2015 - Created by Fred Nora.
 ;     ...
 ;
 
@@ -687,28 +686,32 @@ _set_page_dir:
 global _get_page_fault_adr	
 _get_page_fault_adr:
 	mov eax, cr2
-	ret	
-	
-	
-	
+    ret
+
+
+
+;;===============================================
+;; __die:
 ;;
-;; _DIE
 ;;
-		
+
 global __die
 __die:
     cli
-	hlt
-    jmp __die	
-	
-;---------------------------
+    hlt
+    jmp  __die
+
+
+
+;;===============================================
 ; _halt:
 ;    Executa a instrução hlt.
 
-global _halt	
+global _halt
 _halt:
-	hlt
-	ret
+    hlt
+    ret
+
 
 
 ;;============================

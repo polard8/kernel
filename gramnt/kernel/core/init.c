@@ -65,19 +65,12 @@ int init_get_current_runlevel (void)
 */
 
 
-
-/*
- * save_kernel_args:
- *     Salvando em estrutura os argumentos recebidos.
- */
-
-void save_kernel_args (void){
-	
-    //KernelArgs.arg1 = ;
-    //KernelArgs.arg2 = ;
-	//KernelArgs.arg3 = ;
-	//KernelArgs.arg4 = ;
+// Deprecated
+void save_kernel_args (void)
+{
+    panic ("save_kernel_args: DEPRECATED");
 }
+
 
 
 /*

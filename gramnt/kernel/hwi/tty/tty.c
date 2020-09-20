@@ -313,25 +313,23 @@ __tty_write (
     // como essa para enviar mensagens para processos servidores 
     // ou drivers.
     
-    
-    
+
     unsigned long message_address[8];
- 
-     message_address[0] = (unsigned long) 0; //w
-     message_address[1] = (unsigned long) 444;   // alerta que tem que ler na ttyList[] do processo indicado.
-     //message_address[2] = (unsigned long) __p->pid;
-     //message_address[3] = (unsigned long) __p->pid;   
 
-     message_address[2] = (unsigned long) 0;
-     message_address[3] = (unsigned long) 0;   
+    message_address[0] = (unsigned long) 0; //w
+    message_address[1] = (unsigned long) 444;   // alerta que tem que ler na ttyList[] do processo indicado.
+    //message_address[2] = (unsigned long) __p->pid;
+    //message_address[3] = (unsigned long) __p->pid;
 
-    
-    //send
-    ipc_send_message_to_process ( (unsigned long) &message_address[0], 
-               (int) PPID );
-    
+    message_address[2] = (unsigned long) 0;
+    message_address[3] = (unsigned long) 0;
 
-    
+    // Send
+    ipc_send_message_to_process ( 
+        (unsigned long) &message_address[0], 
+        (int) PPID );
+
+
     // #bugbug
     // Não devemos copiar aqui, pois assim damos a chance
     // do processo pai escrever diretamente na tty do filho
@@ -339,7 +337,7 @@ __tty_write (
     
 
     //printf( "DONE\n");
-    //refresh_screen();        
+    //refresh_screen();
  
     return nr;
 }
@@ -395,7 +393,7 @@ tty_send_message (
 
 
     if (__p->pid < 0)
-        panic("__tty_write: PID\n");         
+        panic("__tty_write: PID\n"); 
 
 
     //pega a tty do processo alvo.
@@ -403,11 +401,12 @@ tty_send_message (
 
 
     if ( (void *) tty == NULL )
-        panic("__tty_write: tty\n");         
+        panic("__tty_write: tty\n"); 
 
 
-    //#todo check validation.
-    
+    // #todo 
+    // Check validation.
+
 
     if ( nr <= 0 ){
         printf ("__tty_write: nr \n");
@@ -512,27 +511,29 @@ tty_send_message (
     message_address[2] = (unsigned long) long1;
     message_address[3] = (unsigned long) long2;   
 
-    
-    //send
-    ipc_send_message_to_process ( (unsigned long) &message_address[0], 
-               (int) __p->pid );
-    
 
-    
+    // Send
+    ipc_send_message_to_process ( 
+        (unsigned long) &message_address[0], 
+        (int) __p->pid );
+
+
     // #bugbug
     // Não devemos copiar aqui, pois assim damos a chance
     // do processo pai escrever diretamente na tty do filho
     // caso ele obtenha sua identificação.
-    
+
 
     //printf( "DONE\n");
-    //refresh_screen();        
- 
+    //refresh_screen(); 
+
     return nr;
 }
 
 
-// IN: fd = indice na lista de arquivos abertos pelo processo.
+// IN: 
+// fd = indice na lista de arquivos abertos pelo processo.
+
 int 
 tty_read ( 
     int fd, 
@@ -740,7 +741,6 @@ tty_sets (
 // Dado o fd, pegaremos um arquivo que é um objeto tty.
 // Esse arquivo traz um ponteiro para a estrutura tty.
 
-
 // See:
 // https://man7.org/linux/man-pages/man3/tcflush.3.html
  
@@ -757,9 +757,8 @@ tty_ioctl (
 {
 
     struct process_d *p;
-    struct tty_d *tty;
     file *f;
-
+    struct tty_d *tty;
 
     debug_print ("tty_ioctl: TODO\n");
 
@@ -791,21 +790,18 @@ tty_ioctl (
     f = (file*) p->Objects[fd];
     
     if ( (void *) f == NULL ){
-        debug_print ("tty_ioctl: [FAIL] f\n");    
+        debug_print ("tty_ioctl: [FAIL] f\n"); 
         return -1;
     }
-    
-    // tty ?
+
+    // Is it a tty object?
     if (f->____object != ObjectTypeTTY){
         debug_print ("tty_ioctl: [FAIL] Not a tty file\n");
         return -1;
-    }else{
 
-        // Get tty struct!
-        
+    // Get tty struct!
+    }else{
         tty = f->tty;
-        
-        // ...
     };
 
 
@@ -878,7 +874,6 @@ tty_ioctl (
             break;
     };
 
-
     //fail.
     return -1;
 }
@@ -911,10 +906,6 @@ int tty_rewind_buffer ( struct tty_d *tty )
 */
 
 
-
-
-
-
 /*
 int init_dev(int dev);
 int init_dev(int dev)
@@ -927,9 +918,6 @@ void release_dev (int dev, file *f);
 void release_dev (int dev, file *f)
 {}
 */
-
-
-
 
 
 /*
@@ -1033,13 +1021,11 @@ void termios_init(struct termios *tm)
 
 /*
  * tty_reset_termios: 
- * 
- * 
+ *    Reset termios in a given tty.
  */
 
-// Reset termios.
 // See: ttydef.h
-    
+
 void tty_reset_termios ( struct tty_d *tty ){
 
     // #todo: Limits messages
@@ -1048,6 +1034,8 @@ void tty_reset_termios ( struct tty_d *tty ){
         return;
     }
 
+    // #check
+    // Is it a valid termios structure pointer?
 
     tty->termios.c_iflag = BRKINT | ICRNL | IXON;
     tty->termios.c_oflag = OPOST;
@@ -1253,7 +1241,7 @@ struct ttydrv_d *get_tty_driver( int fd )
 /*
  ***********************************
  * tty_create: 
- *     Cria um estrutura de tty e retorna o ponteiro.
+ *    Create a tty structure.
  * 
  * OUT:
  *     pointer.
@@ -1262,7 +1250,6 @@ struct ttydrv_d *get_tty_driver( int fd )
 struct tty_d *tty_create (void) 
 {
     struct tty_d *__tty;
-
 
 
     debug_print ("tty_create: [FIXME] \n");
@@ -1280,12 +1267,13 @@ struct tty_d *tty_create (void)
         __tty->objectType  = ObjectTypeTTY;
         __tty->objectClass = ObjectClassKernelObjects;
 
-        // #bubug: Usaremos a file table pra controlar as ttys.
-        //__tty->index = 0;
-        
         __tty->used = 1;
         __tty->magic = 1234;
-        
+
+        // #bubug: 
+        // Usaremos a file table pra controlar as ttys.
+        //__tty->index = 0;
+
         __tty->pgrp = current_group;
 
         //__tty->stopped = 0;
