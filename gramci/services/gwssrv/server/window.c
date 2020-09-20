@@ -1,98 +1,115 @@
 /*
  * File: window.c 
  * 
+ *     Draw windows.
  * 
+ * History:
+ *     2020 - Create by Fred Nora.
  */
 
-
-//#include <api.h>
 
 #include <gws.h>
 
 
-//
-//===================================================================
-//
-// service: Create a window.
-// It's a wrapper.
-// Chamaremos a função que cria a janela
-// com base nos argumentos que estão no buffer
-// que é uma variável global nesse documento.
+
+/*
+ *****************************************
+ * serviceCreateWindow:
+ *
+ *     Create a window.
+ *     It's a wrapper.
+ *     Chamaremos a função que cria a janela com base 
+ * nos argumentos que estão no buffer, que é uma variável global 
+ * nesse documento.
+ */
 
 int serviceCreateWindow (void){
 
-	// O buffer é uma global nesse documento.
+    // The buffer is a global variable.
     unsigned long *message_address = (unsigned long *) &__buffer[0];
-        
+
     struct gws_window_d *Window;
-
-    unsigned long x, y, w, h, color, type;
- 
-    int pw=0;
     struct gws_window_d *Parent;
+    int pw=0;
+
+    int i=0;
+    int id = -1;
+    unsigned char name_buffer[256+1];
+
+    // Arguments.
+    unsigned long x=0;
+    unsigned long y=0;
+    unsigned long w=0;
+    unsigned long h=0;
+    unsigned long color=0;
+    unsigned long type=0;
 
 
 
-    gwssrv_debug_print("serviceCreateWindow: serviceCreateWindow:\n");
+    gwssrv_debug_print ("serviceCreateWindow:\n");
     //printf ("serviceCreateWindow:\n");
 
-    x     = message_address[4]; 
-    y     = message_address[5]; 
-    w     = message_address[6]; 
-    h     = message_address[7]; 
+    // Get the arguments.
+
+    x     = message_address[4];
+    y     = message_address[5];
+    w     = message_address[6];
+    h     = message_address[7];
     color = message_address[8];
     type  = message_address[9];
 
-
-    //#test
-    //parent window ID.
+    // Parent window ID.
     pw = message_address[10]; 
 
-    //string support    
-    
-    unsigned char buf[256+1];
-    int i=0;
-    int string_off=  14; //8;
-    for(i=0; i<256; i++)
+    //++
+    // String support 
+    int string_off = 14; 
+    for (i=0; i<256; i++)
     {
-         buf[i] = message_address[string_off];
-         string_off++;
+        name_buffer[i] = message_address[string_off];
+        string_off++;
     }
-    buf[i] = 0;
-    
-    
-    
-    //Limits
-    if (pw<0 ||pw>WINDOW_COUNT_MAX)
+    name_buffer[i] = 0;
+    //--
+
+
+    // Limits
+    if (pw<0 || pw>WINDOW_COUNT_MAX)
     {
         gwssrv_debug_print("serviceCreateWindow: parent window id fail\n");
         pw=0;
-        exit(1); //test
+        exit(1);
     }
-    
-    //get parent window structure pointer.
-    Parent = (struct gws_window_d *) windowList[pw];    
 
-    //ajuste improvidsado
-    if ( (void *) Parent == NULL ){
-        gwssrv_debug_print("serviceCreateWindow: parent window struct fail\n");
+    // Get parent window structure pointer.
+    Parent = (struct gws_window_d *) windowList[pw];
+
+    // #bugbug
+    // Ajuste improvidsado
+    if ( (void *) Parent == NULL )
+    {
+        gwssrv_debug_print ("serviceCreateWindow: parent window struct fail\n");
+        
+        if ( (void*) gui == NULL ){
+            gwssrv_debug_print ("serviceCreateWindow: gui fail\n");
+        }
+            
         Parent = gui->screen;
-        exit(1); //test
+
+        //  #bugbug
+        //  This is a test.
+        exit(1); 
     }
 
-
-    //draw
-    //__mywindow = (struct gws_window_d *) createwCreateWindow ( type, 
-    //                                          1, 1, "No-Name",  
-    //                                          x, y, w, h,   
-    //                                          gui->screen, 0, 
-    //                                          COLOR_PINK, color ); 
+    //
+    // Draw
+    //
 
     Window = (struct gws_window_d *) createwCreateWindow ( type, 
-                                              1, 1, buf, //"No-Name",  
-                                              x, y, w, h,   
-                                              Parent, 0, 
-                                              COLOR_PINK, color ); 
+                                        1, 1, name_buffer, 
+                                        x, y, w, h, 
+                                        Parent, 0, 
+                                        COLOR_PINK, color ); 
 
 
     if ( (void *) Window == NULL )
@@ -102,8 +119,7 @@ int serviceCreateWindow (void){
        return -1;
     }
 
-
-    int id = -1;
+    // Register window.
     id = gwsRegisterWindow ( Window );
 
     if (id<0){
@@ -112,20 +128,27 @@ int serviceCreateWindow (void){
         return -1;
     }
 
-    // preparando a resposta.
-    // Ela será enviada depois pelo loop de socket.
-    next_response[0] = (unsigned long) id; //window
-    next_response[1] = SERVER_PACKET_TYPE_REPLY; //msg 
+
+    // Building the next response.
+    // It will be sent in the socket loop.
+
+    next_response[0] = (unsigned long) id;        // window
+    next_response[1] = SERVER_PACKET_TYPE_REPLY;  // msg 
     next_response[2] = 0;
     next_response[3] = 0;
 
-
+    // #debug
+    // Show the window. 
+    // Delete this in the future.
     gws_show_window_rect(Window);
-    //gws_show_backbuffer (); //for debug 
-       
-    return 0; //todo
-}
 
+    // #debug
+    // Show the screen.
+    //gws_show_backbuffer(); 
+
+
+    return 0;
+}
 
 
 

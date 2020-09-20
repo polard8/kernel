@@ -1869,10 +1869,9 @@ int printf2 ( const char *format, ... ){
 
     while ( format[index] )
     {
-
-		switch (format[index])
-		{
-		    case '%':
+        switch (format[index])
+        {
+            case '%':
 			    ++index;
 			    switch (format[index])
 			    {
@@ -1914,25 +1913,23 @@ int printf2 ( const char *format, ... ){
 				        //i2hex(d, buffer,8);
 						//printf_i2hex(d, buffer,8);
 				        //puts(buffer);
-				        printf ("%x",d);
-						break;
-			
-			        default:
-				        putchar ('%');
-				        putchar ('%');
-				        break;
-				
-			    }
-			    break;
+                        printf ("%x",d);
+                        break;
 
-		    default:
-			    putchar ( format[index] );
-			    break;
+                    default:
+                        putchar ('%');
+                        putchar ('%');
+                        break;
+                }
+                break;
+
+            default:
+                putchar ( format[index] );
+                break;
         };
 
         ++index;
     };
-
 
     return 0;
 }
@@ -1950,24 +1947,20 @@ char *stdio_nextline ( char *string ){
 
 
     p = (char *) strchr (string, '\n');
-    
-    if (p==NULL){
-        return (p);
-    }
+
+
+    if (p==NULL){ return (p); }
 
     ++p;
 
-    
+
+    // Não há próxima linha    
     if (*p=='\0')
-    {
-		//não há próxima linha
+    { 
         return (NULL);
-    
-    } else {
-		
-		//retorna o ponteiro para a próxima linha.
-        return (p);
-    }
+
+    // Retorna o ponteiro para a próxima linha. 
+    } else { return (p); };
 }
 
 
@@ -2038,10 +2031,10 @@ void libc_set_output_mode (int mode){
 			__libc_output_mode = mode;
 			break;
 
-		default:
-			__libc_output_mode = LIBC_DRAW_MODE;
-			printf ("libc_set_output_mode: fail");
-			break;
+        default:
+            __libc_output_mode = LIBC_DRAW_MODE;
+            printf ("libc_set_output_mode: fail\n");
+            break;
     };
 }
 
@@ -2063,11 +2056,11 @@ void outbyte (int c){
 
 	// spaces.
 
-    if ( c <  ' ' && 
-        c != '\r' && 
-        c != '\n' && 
-        c != '\t' && 
-        c != '\b' )
+    if ( c <  ' '  && 
+         c != '\r' && 
+         c != '\n' && 
+         c != '\t' && 
+         c != '\b' )
     {
         return;
     }
@@ -2188,10 +2181,10 @@ void outbyte (int c){
 	
     if ( g_cursor_y > g_rows )
     { 
-        scroll ();
+        scroll();
 
         g_cursor_x = 0;             //O cursor deve fica na primeira coluna.
-		g_cursor_y = (g_rows-1);    //O cursor deve ficar na última linha.
+        g_cursor_y = (g_rows-1);    //O cursor deve ficar na última linha.
     }
 
     // Imprime os caracteres normais.
@@ -2221,7 +2214,8 @@ void outbyte (int c){
 	// Tamanho do char constante = 8. 
 	// O que queremos é usar uma variável.
 
-void _outbyte ( int c ){
+void _outbyte ( int c )
+{
 
 	// #bugbug
 	// Essa funçao nao 'e usada ... NAO funciona.
@@ -2229,8 +2223,8 @@ void _outbyte ( int c ){
 	// #bugbug: size = 8
 
     gramado_system_call ( 7, 
-        8*g_cursor_x,  
-        8*g_cursor_y, 
+        (8 * g_cursor_x), 
+        (8 * g_cursor_y), 
         (unsigned long) c ); 
 
 
@@ -2242,26 +2236,38 @@ void _outbyte ( int c ){
 }
 
 
+
+/*
+int gramado_input ( const char *string, va_list arglist );
+int gramado_input ( const char *string, va_list arglist )
+{
+   //todo
+   return -1;
+}
+*/
+
+
+
 /*
  ************************************************************
  * input:
- *     Coloca os caracteres digitados em uma string. 'prompt[]'
- *     #bugbug: 
- *     Deveríamos considerar o posicionamento dentro do arquivo.
- *     Dentro da stream.
+ *     Include the given chars into a string named 'prompt[]'.
  */
+
+// #bugbug: 
+// Deveríamos considerar o posicionamento dentro do arquivo.
+// Dentro da stream.
 
 unsigned long input ( unsigned long ch ){
 
-	// Save cursor position.
-    unsigned long tmpX, tmpY;
+    // Save cursor position.
+    unsigned long tmpX=0; 
+    unsigned long tmpY=0;
 
-	// Convert.
+    // Convert.
     char c = (char) ch;    
 
-
-
-	// Ajust prompt max.
+    // Ajust prompt max.
     if ( prompt_max == 0 || prompt_max >= PROMPT_MAX_DEFAULT )
     {
         prompt_max = PROMPT_MAX_DEFAULT;
@@ -2270,7 +2276,8 @@ unsigned long input ( unsigned long ch ){
 	//Filtra limite.
 	//retornar 1??
 
-    if ( prompt_pos > prompt_max ){
+    if ( prompt_pos > prompt_max )
+    {
         printf ("input: Full buffer!\n");
         return (unsigned long) 0;   
     }
@@ -2279,11 +2286,11 @@ unsigned long input ( unsigned long ch ){
 
     switch (c)
     {
-       //Enter.
-		case VK_RETURN:
-		    prompt[prompt_pos] = (char ) '\0';
+       // Enter.
+       case VK_RETURN:
+            prompt[prompt_pos] = (char ) '\0';
             goto input_done;
-		    break;
+            break;
 
 	    // Obs: O tab avança o cursor, mas precisamos 
 		// pintar o espaço onde estava o cursor.
@@ -3821,30 +3828,27 @@ static void xxxputchar ( int c, void *arg )
  *     http://www.pagetable.com/?p=298
  */
 
+    // #todo
+    // Talvez usar semáforo aqui.
+
 int printf ( const char *fmt, ... ){
-	
-	// #todo
-	// Talvez usar semáforo aqui.
-	
+
     va_list ap;
     va_start(ap, fmt);
 
-	//int 
-	//kvprintf ( char const *fmt, 
-    //       void (*func)( int, void* ), 
-	//	   void *arg, 
-	//	   int radix, //??10 gives octal; 20 gives hex.
-	//	   va_list ap );	
-	
-	kvprintf ( fmt, xxxputchar, NULL, 10, ap );
-	
-	//#todo.
-	va_end (ap);
-	
-	//#test
-	//vamos pedir pro terminal virtual imprimir o conteúdo do buffer. 
-	//MSG_TERMINALCOMMAND = 100
-	//__SendMessageToProcess ( terminal___PID, 0, 100, 2008, 2008 );
+    // The prototype.
+    // int 
+    // kvprintf ( 
+    //     char const *fmt, 
+    //     void (*func)( int, void* ), 
+    //     void *arg, 
+    //     int radix,    // ??10 gives octal; 20 gives hex.
+    //     va_list ap );
+
+
+    kvprintf ( fmt, xxxputchar, NULL, 10, ap );
+
+    va_end (ap);
 
     return 0;
 }
@@ -5378,6 +5382,38 @@ err:
     printf ("unix_get: [FAIL] read error\n");
     return (-1);
 }
+
+
+
+/*
+void 
+write_char (
+    int ch,
+    FILE *f,
+    int *nwritten );
+
+void 
+write_char (
+    int ch,
+    FILE *f,
+    int *nwritten )
+{
+
+    if (fputc(ch, f) == EOF)
+    {
+        *nwritten = -1;
+    
+    }else{
+        
+        // ??
+        ++(*nwritten);
+    };
+}
+*/
+
+
+
+
 
 
 //

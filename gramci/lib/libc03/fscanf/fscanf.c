@@ -207,7 +207,7 @@ f_collect(register int c, register FILE *stream, register unsigned int width)
  */
 
 int _doscan (register FILE *stream, const char *format, va_list ap){
-	
+
 	int		done = 0;	/* number of items done */
 	int		nrchars = 0;	/* number of characters read */
 	int		conv = 0;	/* # of conversions */
@@ -493,17 +493,17 @@ int _doscan (register FILE *stream, const char *format, va_list ap){
 //#test
 //ainda não foi testada
 int fscanf (FILE *stream, const char *format, ...){
-	
-	va_list ap;
-	int retval;
 
-	va_start(ap, format);
+    int retval=0;
 
-	retval = _doscan (stream, format, ap);
+    va_list ap;
+    va_start(ap, format);
 
-	va_end(ap);
+    retval = _doscan (stream, format, ap);
 
-	return retval;
+    va_end(ap);
+    return retval;
 }
+
 
 
