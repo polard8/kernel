@@ -191,14 +191,48 @@ rectBackbufferDrawRectangle (
 
     // empty rectangle
 
+
+
+
     /*
     if (fill==0)
     {
-        // todo
+            //  ____
+            // |
+            //
+            
+            //board1, borda de cima e esquerda.
+            rectBackbufferDrawRectangle ( 
+                window->left, window->top,
+                window->width, 1, 
+                color, 1 );
+            rectBackbufferDrawRectangle ( 
+                window->left, window->top, 
+                1, window->height,
+                color, 1 );
+
+            //  
+            //  ____|
+            //
+
+            //board2, borda direita e baixo.
+            rectBackbufferDrawRectangle ( 
+                 ((window->left) + (window->width) -1), window->top, 
+                 1, window->height, 
+                 color, 1 );
+            rectBackbufferDrawRectangle ( 
+                 window->left, ( (window->top) + (window->height) -1 ),  
+                 window->width, 1, 
+                 color, 1 );
+          
         return;
     }
     */
-    
+
+
+
+
+
     //
     // fill
     //

@@ -335,10 +335,14 @@ void *createwCreateWindow2 (
     unsigned long color ) 
 {
 
-	// @todo: O argumento style está faltando.
-	//        cada tipo de tanela poderá ter vários estilos.
-	// Obs: Podemos ir usando apenas um estilo padrão por enquanto.
-	
+	// #todo: 
+	// O argumento style está faltando.
+	// Cada tipo de tanela poderá ter vários estilos.
+	// Obs: 
+	// Podemos ir usando apenas um estilo padrão por enquanto.
+
+
+
 	// (min, max ...).
 	//int View;
 
@@ -394,21 +398,27 @@ void *createwCreateWindow2 (
 	
     struct gws_rect_d *clientRect;  //rect
 
-	
+
 	// #improvisando uma largura de borda.
 	// @todo: isso deve ir para outro lugar.
     unsigned long border_size = 0;
     unsigned long border_color = COLOR_BORDER;
-	
-    unsigned long __tmp_color;
+
+    unsigned long __tmp_color=0;
     
 
-    //test
+    // 
     unsigned long WindowX = x;
     unsigned long WindowY = y; 
     unsigned long WindowWidth  = width; 
     unsigned long WindowHeight = height; 
 
+
+    // Button suport.
+    int buttonFocus=0;
+    int buttonSelected=0;
+    unsigned long buttonBorderColor1=0;
+    unsigned long buttonBorderColor2=0;
 
 
 	//salvar para depois restaurar os valores originais no fim da rotina.
@@ -672,9 +682,9 @@ void *createwCreateWindow2 (
 
 		// Color
 		// Background support.
-		window->bg_color = (unsigned long) color; 
-		window->clientrect_bg_color = (unsigned long) clientcolor;
-		
+        window->bg_color = (unsigned long) color; 
+        window->clientrect_bg_color = (unsigned long) clientcolor;
+
 		// ??
 		// O retângulo da janela.
 		//window->rcWindow = NULL;
@@ -728,20 +738,20 @@ void *createwCreateWindow2 (
         window->long2 = 0;
 
 		//Se tem ou não uma nova mensagem.
-		window->newmessageFlag = 0;
+        window->newmessageFlag = 0;
 		
 		//Filas de mensagens.
 		//São dessas filas que os programas em user mode
 		//são pegar as mensagens, solicitando através de system call.
-		window->hwndList[0]  = 0;
-		window->msgList[0]   = 0;
-		window->long1List[0] = 0;
-		window->long2List[0] = 0;
+        window->hwndList[0]  = 0;
+        window->msgList[0]   = 0;
+        window->long1List[0] = 0;
+        window->long2List[0] = 0;
 
 		//Offsets
-		window->sendOffset = 0;
-		window->receiveOffset = 0;
-		
+        window->sendOffset = 0;
+        window->receiveOffset = 0;
+
 		//Buffers support.
 		
 		//Dedicated buffer: 
@@ -750,7 +760,7 @@ void *createwCreateWindow2 (
 		//suspensa !!!
 
 		//window->DedicatedBuffer = (void*) windowCreateDedicatedBuffer(window);
-		window->DedicatedBuffer = NULL;
+        window->DedicatedBuffer = NULL;
 
 		// backbuffer and front buffer.
 		//window->BackBuffer = (void *) g_backbuffer_va;
@@ -758,24 +768,24 @@ void *createwCreateWindow2 (
 		
 		
 		//Child window linked list.
-		window->childListHead = NULL;
+        window->childListHead = NULL;
 		
 		// (#importante)
 		// Client window support.
 		// Obs: A área de cliente será um retângulo e não uma janela.
 		// Mas nda impede da estrutra gerenciar uma janela que fique 
 		// em cima da área de cliente.
-		window->client_window = NULL;  //window. 
-		window->rcClient = NULL;       //rect. (#importante)
+        window->client_window = NULL;  //window. 
+        window->rcClient = NULL;       //rect. (#importante)
 		
 		// #importante
 		// Terminal support.
 		// Suporte não tradicional à terminais.
 		// manipulando variáveis ao invés de uma estrutura.
-		window->terminal_used  = (int) 0;
-		window->terminal_magic = (int) 0;
-		window->terminal_tab   = (int) 0;
-		
+        window->terminal_used  = (int) 0;
+        window->terminal_magic = (int) 0;
+        window->terminal_tab   = (int) 0;
+
 		//window->terminal_left = (unsigned long) 0;
 		//window->terminal_top = (unsigned long) 0;
 		//window->terminal_width = (unsigned long) 0;
@@ -786,20 +796,20 @@ void *createwCreateWindow2 (
 		//window->desktop_id = Desktop->id;  //@todo: verificar elemento.
 		
 		// # Menu support #
-	    window->menu_window = NULL;    
-		window->sysMenu = NULL;  
-		window->barMenu = NULL;  
-		window->defaultMenu = NULL; 
-		window->isMenu = 0;
-		window->isButton = 0;
-		window->isEditBox = 0;
-		window->selected = 0;  //Caso a janela seja um ítem de menu.
+        window->menu_window = NULL;    
+        window->sysMenu = NULL;  
+        window->barMenu = NULL;  
+        window->defaultMenu = NULL; 
+        window->isMenu = 0;
+        window->isButton = 0;
+        window->isEditBox = 0;
+        window->selected = 0;  //Caso a janela seja um ítem de menu.
 		//window->text = NULL; //Texto, caso a janela seja um ítem de menu
 
-		//Draw support.
-		window->draw = 0;      //@todo: Cuidado com isso.
-		window->redraw = 0;
-	    window->show = 1; //Inicialmente presumimos que precisamos mostrar essa janela.
+        // Draw support.
+        window->draw = 0;      //@todo: Cuidado com isso.
+        window->redraw = 0;
+        window->show = 1; //Inicialmente presumimos que precisamos mostrar essa janela.
 	    //Continua ...
 	
         //Abaixo, elementos referenciados com menor frequência.
@@ -808,20 +818,19 @@ void *createwCreateWindow2 (
 		//window->process = NULL; //@todo: Definir à qual processo a janela perence.
 		
 		//Trava.
-		window->locked = 0;
-		
+        window->locked = 0;
+
 		//Linked list.
 		//window->linkedlist = NULL;
-		
-		//Prev e next.
-		window->prev = (void *) Parent;
-		window->next = NULL;
-			
+
+		// Prev e next.
+        window->prev = (void *) Parent;
+        window->next = NULL;
+
 		//#debug
 		//printf("config1 %s %d %d %d %d \n",
 		//    window->name, window->left, window->top, window->width, window->height );
-	};
-
+    };
 
     //Exemplos de tipos de janelas, segundo MS.	
     //Overlapped Windows
@@ -925,27 +934,18 @@ void *createwCreateWindow2 (
             //bordas.
             //Border = 1;
  			//window->borderUsed = 1;@todo: isso ainda não existe na extrutura ??
-		    break;
-			
-			
+            break;
 
-		// Button.
-        //Obs: existe uma rotina que desenha um botão.
-        //quando create window for chamada para criarmos um botão 
-        //podemos chamar essa rotina que desenha o botão ...
-        //apenas isso.	
-        //aqui nesse case podemos selecionar algumas caractrerísticas 
-        //do botão que são acionadas através das características 
-        //da janela.
-        
-        //Nothing for now ...
-        //Deixaremos a rotina de desenhar o botão fazer tudo por enquanto.          
+
+        // Only the bg for now.
         case WT_BUTTON:
             Background = 1;
             window->backgroundUsed = 1;
             break;
 
-        //Status bar.
+
+
+        // Status bar.
         case WT_STATUSBAR:
             Background = 1;
             window->backgroundUsed = 1;
@@ -1179,9 +1179,9 @@ void *createwCreateWindow2 (
 		// bordas horizontais e da barra de títulos.
 		// Cinza escuro.  CurrentColorScheme->elements[??] 
 		// @TODO: criar elemento sombra no esquema. 
-		
-		if ( (unsigned long) type == WT_OVERLAPPED )
-		{
+
+        if ( (unsigned long) type == WT_OVERLAPPED )
+        {
 			if (window->focus == 1)
 			{ __tmp_color = xCOLOR_GRAY1; }    //mais escuro
 			if (window->focus == 0)
@@ -1293,15 +1293,13 @@ void *createwCreateWindow2 (
         //?? More ...
     }
 
+    //
+    // == Button =============================================
+    //
+
     //Termina de desenhar o botão, mas não é frame
     //é só o botão...
     //caso o botão tenha algum frame, será alguma borda extra.
-    
-    int Focus=0;
-    int Selected;
-    unsigned long border1=0;
-    unsigned long border2=0;
-
 
     if ( (unsigned long) type == WT_BUTTON )
     {
@@ -1311,25 +1309,26 @@ void *createwCreateWindow2 (
         //está meio misturado. ja que estamos usando
         //a função de criar janela para criar botão.
         //#bugbug
-        switch( status )
+    
+        switch ( status )
         {
             case BS_FOCUS:
-                border1 = COLOR_BLUE;
-                border2 = COLOR_BLUE;
+                buttonBorderColor1 = COLOR_BLUE;
+                buttonBorderColor2 = COLOR_BLUE;
                 break;
 
             case BS_PRESS:
-                Selected = 1;
-                border1 = GWS_COLOR_BUTTONHIGHLIGHT3;
-                border2 = GWS_COLOR_BUTTONSHADOW3;
+                buttonSelected = 1;
+                buttonBorderColor1 = GWS_COLOR_BUTTONHIGHLIGHT3;
+                buttonBorderColor2 = GWS_COLOR_BUTTONSHADOW3;
                 break;
 
             case BS_HOVER:
                 break;
                     
             case BS_DISABLED:
-                border1 = COLOR_GRAY;
-                border2 = COLOR_GRAY;
+                buttonBorderColor1 = COLOR_GRAY;
+                buttonBorderColor2 = COLOR_GRAY;
                 break;
 
             case BS_PROGRESS:
@@ -1337,16 +1336,16 @@ void *createwCreateWindow2 (
 
             case BS_DEFAULT:
             default: 
-                Selected = 0;
-                border1 = GWS_COLOR_BUTTONHIGHLIGHT3;
-                border2 = GWS_COLOR_BUTTONSHADOW3;
+                buttonSelected = 0;
+                buttonBorderColor1 = GWS_COLOR_BUTTONHIGHLIGHT3;
+                buttonBorderColor2 = GWS_COLOR_BUTTONSHADOW3;
                 break;
         };
 
 
         size_t tmp_size = (size_t) strlen ( (const char *) windowname );
         unsigned long offset = 
-        ( ( (unsigned long) window->width - ( (unsigned long) tmp_size * (unsigned long) gcharWidth) ) / 2 );
+            ( ( (unsigned long) window->width - ( (unsigned long) tmp_size * (unsigned long) gcharWidth) ) / 2 );
        
 
         //#debug
@@ -1358,30 +1357,38 @@ void *createwCreateWindow2 (
         if ( (void*) Parent != NULL )
         {
 
+            //  ____
+            // |
+            //
+            
             //board1, borda de cima e esquerda.
             rectBackbufferDrawRectangle ( 
                 window->left, window->top,
-                window->width, 1, 
-                border1, 1 );
-                
+                window->width, 2, 
+                buttonBorderColor1, 1 );
             rectBackbufferDrawRectangle ( 
                 window->left, window->top, 
-                1, window->height,
-                border1, 1 );
+                2, window->height,
+                buttonBorderColor1, 1 );
 
-             //board2, borda direita e baixo.
-             rectBackbufferDrawRectangle ( 
+            //  
+            //  ____|
+            //
+
+            //board2, borda direita e baixo.
+            rectBackbufferDrawRectangle ( 
                  ((window->left) + (window->width) -1), window->top, 
-                 1, window->height, 
-                 border2, 1 );
-                 
-             rectBackbufferDrawRectangle ( 
+                 2, window->height, 
+                 buttonBorderColor2, 1 );
+            rectBackbufferDrawRectangle ( 
                  window->left, ( (window->top) + (window->height) -1 ),  
-                 window->width, 1, 
-                 border2, 1 );
-                 
+                 window->width, 2, 
+                 buttonBorderColor2, 1 );
+            
+            
+            
             // Button label
-            if (Selected == 1){
+            if (buttonSelected == 1){
                 dtextDrawString ( 
                     (window->left) + offset, 
                     (window->top)  +8, 
@@ -1401,7 +1408,8 @@ void *createwCreateWindow2 (
       // configurar a estrutura de botão 
       // e apontar ela como elemento da estrutura de janela.
       //window->button->?
-    }
+    
+    } //button
 
 
 
