@@ -214,6 +214,7 @@ createwDrawFrame (
 
     // Overlapped.
     // Janela de aplicativos.
+    struct gws_window_d *TitleBar;
 
     if ( window->type == WT_OVERLAPPED)
     {
@@ -251,12 +252,32 @@ createwDrawFrame (
             window->width, border_size, 
             border_color, 1 );
 
-        // Atenção:
-        // No more Title bar!
-        // No more button in the title bar.
 
+        // #todo
+        // Simple title bar.
+        // We're gonna have a wm inside the window server.
+        // The title bar will be very simple.
+        // We're gonna have a client area.
+        
+        // Title bar
+        TitleBar = (void *) createwCreateWindow2 ( 
+                                    WT_SIMPLE, 
+                                    1, 1, "TITLE", 
+                                    2, 2, window->width+4, 32, 
+                                    (struct gws_window_d *) window, 
+                                    0, COLOR_RED, COLOR_YELLOW );  
+
+        if ( (void *) TitleBar == NULL )
+            gwssrv_debug_print ("createwCreateWindow: TitleBar fail \n");
+    
+        TitleBar->type = WT_SIMPLE;
+
+        //  control ?
+        // ... 
+        
         return 0;
     }
+
 
 
     //button

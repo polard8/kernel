@@ -12,6 +12,11 @@
 
 
 
+//#todo
+//GetWindowRect
+//GetClientRect
+
+
 /*
  *****************************************
  * serviceCreateWindow:

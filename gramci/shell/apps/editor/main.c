@@ -723,12 +723,12 @@ int main ( int argc, char *argv[] ){
 
 
     //
-    // main window
+    // == main window ============================================
     //
 
     main_window = gws_create_window (client_fd,
-        WT_SIMPLE,1,1,"Editor",
-        0,0,w,h,
+        WT_OVERLAPPED,1,1,"Editor", //WT_SIMPLE,1,1,"Editor",
+        40,40,640,480, //0,0,w,h,
         0,0,COLOR_GRAY, COLOR_GRAY);
 
     if ( main_window < 0 )             
@@ -737,10 +737,10 @@ int main ( int argc, char *argv[] ){
 
      // Text.
      gws_draw_text (
-        (int) client_fd,           // fd,
-        (int) main_window,         // window id,
-        (unsigned long) ((w/8)*0),//(40/3),    // ( ((w-(w/2))/2) - (6*8) ),   //50,    // left,
-        (unsigned long) (40/3),    // 8,     // top,
+        (int) client_fd,              // fd,
+        (int) main_window,            // window id,
+        (unsigned long) ((640/8)*0),  //(40/3),    // ( ((w-(w/2))/2) - (6*8) ),   //50,    // left,
+        (unsigned long) 32 + (40/3),       // 8,     // top,
         (unsigned long) COLOR_BLACK,
         "Name:");
 
@@ -750,8 +750,8 @@ int main ( int argc, char *argv[] ){
 
     addressbar_window = gws_create_window (client_fd,
         WT_EDITBOX,1,1,"address-bar",
-        ((w/8)*1), 4,     //(40/3) + (8*8), 4,    //((w-(w/2))/2), 4, 
-        ((w/8)*3), 32,    //(w/2), 32,
+        ((640/8)*1), 32 +4,     //(40/3) + (8*8), 4,    //((w-(w/2))/2), 4, 
+        ((640/8)*3), 32,    //(w/2), 32,
         main_window,0,COLOR_WHITE, COLOR_WHITE);
 
     if ( addressbar_window < 0 )             
@@ -762,7 +762,7 @@ int main ( int argc, char *argv[] ){
         (int) client_fd,             // fd,
         (int) addressbar_window,     // window id,
         (unsigned long) 8,           // left,
-        (unsigned long) (40/3),      //8,    // top,
+        (unsigned long) 32 + (40/3),      //8,    // top,
         (unsigned long) COLOR_BLACK,
         "text.txt");
 
@@ -772,21 +772,22 @@ int main ( int argc, char *argv[] ){
 
     button = gws_create_window (client_fd,
         WT_BUTTON,1,1,"Save",
-        ((w/8)*6), 4,     //(w-100-4), 4, //(640-100), 4, 
-        ((w/8)*1), 32,
+        ((640/8)*6), 32 +4,     //(w-100-4), 4, //(640-100), 4, 
+        ((640/8)*1), 32,
         main_window, 0, COLOR_GRAY, COLOR_GRAY);
 
     if ( button < 0 ) 
         debug_print("Editor: button fail\n"); 
 
     //
-    // Client window
+    // == Client window =======================
     //
 
     // client window (White)
     client_window = gws_create_window (client_fd,
         WT_EDITBOX,1,1,"client",
-        4, 40, (w-8), (h - 40 - 4),   //4, 40, 640-8, 480 - 40 - 4,
+        4, 32 + 40, 
+        (640-8), (480 - 40 - 4),
         main_window,0,COLOR_WHITE, COLOR_WHITE);
 
     if ( client_window < 0 ) 
