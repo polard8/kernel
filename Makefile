@@ -219,7 +219,7 @@ vhd-copy-files:
 
 
 	# net
-#	-sudo cp gramci/shell/net/bin/*.BIN  base/
+	-sudo cp gramci/shell/net/bin/*.BIN  base/
 	-sudo cp gramci/shell/net/bin/*.BIN  base/PROGRAMS
 
 	# gws

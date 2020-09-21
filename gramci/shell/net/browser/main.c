@@ -811,7 +811,7 @@ int main ( int argc, char *argv[] ){
     addr_in.sin_addr.s_addr = IP(192, 168, 1, 112); 
 
 
-    debug_print ("---------------------------\n");    
+    debug_print ("-------------------------\n");
     debug_print ("browser: Initializing ...\n");
 
     //
@@ -891,7 +891,7 @@ int main ( int argc, char *argv[] ){
 
     //main window
     main_window = gws_create_window (client_fd,
-        WT_SIMPLE,1,1,"Browser",
+        WT_OVERLAPPED,1,1,"Browser",
         40, 40, 640, 480,
         0,0,COLOR_GRAY, COLOR_GRAY);
 
@@ -902,7 +902,7 @@ int main ( int argc, char *argv[] ){
     // address bar
     addressbar_window = gws_create_window (client_fd,
         WT_EDITBOX,1,1,"address-bar",
-        4, 4, 
+        4, 32 +4, 
         (640-32-4-4-4), 32,
         main_window,0,COLOR_WHITE, COLOR_WHITE);
 
@@ -921,7 +921,7 @@ int main ( int argc, char *argv[] ){
     // button
     button = gws_create_window (client_fd,
         WT_BUTTON,1,1,">",
-        (640-32-4), 4, 
+        (640-32-4), 32 +4, 
         32, 32,
         main_window,0,COLOR_GRAY, COLOR_GRAY);
 
@@ -933,7 +933,8 @@ int main ( int argc, char *argv[] ){
     // client window (White)
     client_window = gws_create_window (client_fd,
         WT_SIMPLE,1,1,"client",
-        4, 40, 640-8, 480 - 40 - 4,
+        4, 32 +40, 
+        640-8, 480 - 40 - 4 -32,
         main_window,0,COLOR_WHITE, COLOR_WHITE);
 
     if ( client_window < 0 )             
@@ -942,11 +943,10 @@ int main ( int argc, char *argv[] ){
      gws_draw_text (
         (int) client_fd,             // fd,
         (int) client_window,              // window id,
-        (unsigned long) 40,    // left,
+        (unsigned long) 40,        // left,
         (unsigned long) 40,    // top,
         (unsigned long) COLOR_BLACK,
         "Hello, from Google!...  (Ok, I'm lying.)");
-
 
 
     //
