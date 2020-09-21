@@ -263,9 +263,10 @@ createwDrawFrame (
         TitleBar = (void *) createwCreateWindow2 ( 
                                     WT_SIMPLE, 
                                     1, 1, "TITLE", 
-                                    2, 2, window->width+4, 32, 
+                                    3, 3, 
+                                    window->width-4, 32, 
                                     (struct gws_window_d *) window, 
-                                    0, COLOR_RED, COLOR_YELLOW );  
+                                    0, COLOR_BLUE1, COLOR_BLUE1 );  
 
         if ( (void *) TitleBar == NULL )
             gwssrv_debug_print ("createwCreateWindow: TitleBar fail \n");
@@ -440,7 +441,7 @@ void *createwCreateWindow2 (
     int buttonSelected=0;
     unsigned long buttonBorderColor1=0;
     unsigned long buttonBorderColor2=0;
-
+    unsigned long buttonBorderColor2_light=0;
 
 	//salvar para depois restaurar os valores originais no fim da rotina.
 	//unsigned long saveLeft;
@@ -1340,8 +1341,9 @@ void *createwCreateWindow2 (
 
             case BS_PRESS:
                 buttonSelected = 1;
-                buttonBorderColor1 = GWS_COLOR_BUTTONHIGHLIGHT3;
-                buttonBorderColor2 = GWS_COLOR_BUTTONSHADOW3;
+                buttonBorderColor1 = COLOR_WHITE; 
+                buttonBorderColor2 = xCOLOR_GRAY3;
+                buttonBorderColor2_light = xCOLOR_GRAY5; 
                 break;
 
             case BS_HOVER:
@@ -1358,8 +1360,9 @@ void *createwCreateWindow2 (
             case BS_DEFAULT:
             default: 
                 buttonSelected = 0;
-                buttonBorderColor1 = GWS_COLOR_BUTTONHIGHLIGHT3;
-                buttonBorderColor2 = GWS_COLOR_BUTTONSHADOW3;
+                buttonBorderColor1 = COLOR_WHITE;
+                buttonBorderColor2 = xCOLOR_GRAY3; 
+                buttonBorderColor2_light = xCOLOR_GRAY5;
                 break;
         };
 
@@ -1383,13 +1386,33 @@ void *createwCreateWindow2 (
             //
             
             //board1, borda de cima e esquerda.
+            
+            //cima
             rectBackbufferDrawRectangle ( 
                 window->left, window->top,
-                window->width, 2, 
+                window->width, 1, 
+                COLOR_BLACK, 1 );
+            rectBackbufferDrawRectangle ( 
+                window->left+1, window->top+1,
+                window->width-2, 1, 
                 buttonBorderColor1, 1 );
             rectBackbufferDrawRectangle ( 
+                window->left+1+1, window->top+1+1,
+                window->width-4, 1, 
+                buttonBorderColor1, 1 );
+               
+            //esq
+            rectBackbufferDrawRectangle ( 
                 window->left, window->top, 
-                2, window->height,
+                1, window->height,
+                COLOR_BLACK, 1 );
+            rectBackbufferDrawRectangle ( 
+                window->left+1, window->top+1, 
+                1, window->height-2,
+                buttonBorderColor1, 1 );
+            rectBackbufferDrawRectangle ( 
+                window->left+1+1, window->top+1+1, 
+                1, window->height-4,
                 buttonBorderColor1, 1 );
 
             //  
@@ -1397,15 +1420,35 @@ void *createwCreateWindow2 (
             //
 
             //board2, borda direita e baixo.
+            
+            //dir
+            rectBackbufferDrawRectangle ( 
+                 ((window->left) + (window->width) -1 -1 -1), window->top+1+1, 
+                 1, window->height-4, 
+                 buttonBorderColor2_light, 1 );
+            rectBackbufferDrawRectangle ( 
+                 ((window->left) + (window->width) -1 -1), window->top+1, 
+                 1, window->height-2, 
+                 buttonBorderColor2, 1 );
             rectBackbufferDrawRectangle ( 
                  ((window->left) + (window->width) -1), window->top, 
-                 2, window->height, 
+                 1, window->height, 
+                 COLOR_BLACK, 1 );
+
+            //baixo
+            rectBackbufferDrawRectangle ( 
+                 window->left+1+1, ( (window->top) + (window->height) -1 -1 -1),  
+                 window->width-4, 1, 
+                 buttonBorderColor2_light, 1 );
+            rectBackbufferDrawRectangle ( 
+                 window->left+1, ( (window->top) + (window->height) -1 -1),  
+                 window->width-2, 1, 
                  buttonBorderColor2, 1 );
             rectBackbufferDrawRectangle ( 
                  window->left, ( (window->top) + (window->height) -1 ),  
-                 window->width, 2, 
-                 buttonBorderColor2, 1 );
-            
+                 window->width, 1, 
+                 COLOR_BLACK, 1 );
+
             
             
             // Button label

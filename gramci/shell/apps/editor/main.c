@@ -737,12 +737,12 @@ int main ( int argc, char *argv[] ){
 
      // Text.
      gws_draw_text (
-        (int) client_fd,              // fd,
-        (int) main_window,            // window id,
-        (unsigned long) ((640/8)*0),  //(40/3),    // ( ((w-(w/2))/2) - (6*8) ),   //50,    // left,
-        (unsigned long) 32 + (40/3),       // 8,     // top,
+        (int) client_fd,       // fd,
+        (int) main_window,     // window id,
+        (unsigned long)  8, 
+        (unsigned long) 32 + (40/3), 
         (unsigned long) COLOR_BLACK,
-        "Name:");
+        " Name: ");
 
     //
     // Address bar (edit box)
@@ -787,7 +787,7 @@ int main ( int argc, char *argv[] ){
     client_window = gws_create_window (client_fd,
         WT_EDITBOX,1,1,"client",
         4, 32 + 40, 
-        (640-8), (480 - 40 - 4),
+        (640-8), (480 -32 - 40 - 4),
         main_window,0,COLOR_WHITE, COLOR_WHITE);
 
     if ( client_window < 0 ) 
