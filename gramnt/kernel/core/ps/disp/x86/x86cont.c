@@ -1,23 +1,9 @@
 /*
- * File: x86cont.c
+ * File: ps/disp/x86cont.c
  *
- * Descri��o:
- *     Opera��es com contexto de processador.
- *     Salva e restaura o contexto, para uso em task switch.
- *     Faz parte do Process Manager, parte fundamental do Kernel Base.
- *
- * @todo: 
- *     Criar fun��es que trabalhem o contexto e registradores.
- *     ??
- *
- * Obs: @todo: Esse m�dulo dever� ser apenas uma interface para chamar
- * rotinas de mudan�a de contexto que dever�o ficar em um m�dulo externo
- * ao kernel base, porem ainda em ring0. Essas rotinas poder�o fazer parte
- * do m�dulo HAL, que ser� dependente da arquitetura.
- * Ou seja, pode existir um modulo hal em ring 0 para cada arquitetura, 
- * porem o kernel base ser� o mesmo para todas as arquiteturas.
- * O m�dulo hal, dependente da arquitetura, ser� selecionado na hora da
- * instala��o.
+ * Context switching:
+ * Saving and restoring the x86 cpu context.
+ * Part of the dispatcher module.
  *
  * History:
  *     2015 - Created by Fred Nora.
@@ -31,9 +17,9 @@
 extern void set_page_dir (void);
 
 
-static inline void ckSetCr3 ( unsigned long value ){
-
-    __asm__ ( "mov %0, %%cr3" : : "r" (value) );
+static inline void ckSetCr3 ( unsigned long value )
+{
+    asm ( "mov %0, %%cr3" : : "r" (value) );
 }
 
 
@@ -68,9 +54,10 @@ static inline uint32_t ckGetCr3()
 //         do timer est� acessando essas vari�veis
 //         fazendo uso d 'extern'. 
 
-unsigned long contextSS;        //User mode.
-unsigned long contextESP;       //User mode.
-unsigned long contextEFLAGS;
+
+unsigned long contextSS;        // User mode.
+unsigned long contextESP;       // User mode.
+unsigned long contextEFLAGS; 
 unsigned long contextCS;
 unsigned long contextEIP;
 unsigned long contextDS;
@@ -84,8 +71,10 @@ unsigned long contextEDX;
 unsigned long contextESI;
 unsigned long contextEDI;
 unsigned long contextEBP;
+
 //
-// @todo: Outros registradores.
+// #todo: 
+// Outros registradores.
 // debug
 // mmx
 // ponto flutuante
@@ -97,7 +86,8 @@ unsigned long contextEBP;
 
 /*
  **************************************
- * save_current_context:    
+ * save_current_context: 
+ * 
  *    Salvando o contexto da thread interrompida pelo timer IRQ0.
  *    O contexto da tarefa interrompida foi salvo em vari�veis pela 
  * isr do timer. Aqui esse contexto � colocado na estrutura que 
@@ -108,29 +98,29 @@ unsigned long contextEBP;
  * debug e float point por exemplo.
  *     Mudar nome para contextSaveCurrent();.
  */
- 
+
+
 void save_current_context (void){
-	
-    int Status;
-	struct thread_d *t;
-    
-	// Context.
-	unsigned long *contextss  = (unsigned long *) &contextSS;	 	
-	unsigned long *contextesp = (unsigned long *) &contextESP;	 
-	unsigned long *contexteflags = (unsigned long *) &contextEFLAGS;	
-	unsigned long *contextcs  = (unsigned long *) &contextCS;	
-	unsigned long *contexteip = (unsigned long *) &contextEIP;	
-	unsigned long *contextds  = (unsigned long *) &contextDS;	
-	unsigned long *contextes  = (unsigned long *) &contextES;	
-	unsigned long *contextfs  = (unsigned long *) &contextFS;	
-	unsigned long *contextgs  = (unsigned long *) &contextGS;		
-	unsigned long *contexteax = (unsigned long *) &contextEAX;	
-	unsigned long *contextebx = (unsigned long *) &contextEBX;	
-	unsigned long *contextecx = (unsigned long *) &contextECX;	
-	unsigned long *contextedx = (unsigned long *) &contextEDX;	
-	unsigned long *contextesi = (unsigned long *) &contextESI;	
-	unsigned long *contextedi = (unsigned long *) &contextEDI;	
-	unsigned long *contextebp = (unsigned long *) &contextEBP;	
+
+    struct thread_d *t;
+
+    // Context.
+	unsigned long *contextss  = (unsigned long *) &contextSS;
+	unsigned long *contextesp = (unsigned long *) &contextESP;
+	unsigned long *contexteflags = (unsigned long *) &contextEFLAGS;
+	unsigned long *contextcs  = (unsigned long *) &contextCS;
+	unsigned long *contexteip = (unsigned long *) &contextEIP;
+	unsigned long *contextds  = (unsigned long *) &contextDS;
+	unsigned long *contextes  = (unsigned long *) &contextES;
+	unsigned long *contextfs  = (unsigned long *) &contextFS;
+	unsigned long *contextgs  = (unsigned long *) &contextGS;
+	unsigned long *contexteax = (unsigned long *) &contextEAX;
+	unsigned long *contextebx = (unsigned long *) &contextEBX;
+	unsigned long *contextecx = (unsigned long *) &contextECX;
+	unsigned long *contextedx = (unsigned long *) &contextEDX;
+	unsigned long *contextesi = (unsigned long *) &contextESI;
+	unsigned long *contextedi = (unsigned long *) &contextEDI;
+	unsigned long *contextebp = (unsigned long *) &contextEBP;
 	// Continua...
 
 
@@ -150,8 +140,8 @@ void save_current_context (void){
 	        printf ("save_current_context error: Validation Thread={%d}\n",
 		        current_thread );
 		    show_process_information ();    
-		    die ();
-		}
+            die();
+        }
 
 	    // 
 	    // @todo: Checar. 
@@ -159,7 +149,7 @@ void save_current_context (void){
 
 
         t->ss     = (unsigned long) contextss[0];      //usermode.
-        t->esp    = (unsigned long) contextesp[0];    //usermode.
+        t->esp    = (unsigned long) contextesp[0];     //usermode.
         t->eflags = (unsigned long) contexteflags[0];
         t->cs     = (unsigned long) contextcs[0];
         t->eip    = (unsigned long) contexteip[0];
@@ -200,26 +190,25 @@ void save_current_context (void){
 
 void restore_current_context (void){
 
-    int Status;
     struct thread_d *t;
 
     // Context.
-    unsigned long *contextss  = (unsigned long *) &contextSS;	 	
-    unsigned long *contextesp = (unsigned long *) &contextESP;	 
-    unsigned long *contexteflags = (unsigned long *) &contextEFLAGS;	
-    unsigned long *contextcs  = (unsigned long *) &contextCS;	
-    unsigned long *contexteip = (unsigned long *) &contextEIP;	
-    unsigned long *contextds  = (unsigned long *) &contextDS;	
-    unsigned long *contextes  = (unsigned long *) &contextES;	
-    unsigned long *contextfs  = (unsigned long *) &contextFS;	
-    unsigned long *contextgs  = (unsigned long *) &contextGS;	
-    unsigned long *contexteax = (unsigned long *) &contextEAX;	
-    unsigned long *contextebx = (unsigned long *) &contextEBX;	
-    unsigned long *contextecx = (unsigned long *) &contextECX;	
-    unsigned long *contextedx = (unsigned long *) &contextEDX;	
-    unsigned long *contextesi = (unsigned long *) &contextESI;	
-    unsigned long *contextedi = (unsigned long *) &contextEDI;	
-    unsigned long *contextebp = (unsigned long *) &contextEBP;	
+    unsigned long *contextss  = (unsigned long *) &contextSS;
+    unsigned long *contextesp = (unsigned long *) &contextESP;
+    unsigned long *contexteflags = (unsigned long *) &contextEFLAGS;
+    unsigned long *contextcs  = (unsigned long *) &contextCS;
+    unsigned long *contexteip = (unsigned long *) &contextEIP;
+    unsigned long *contextds  = (unsigned long *) &contextDS;
+    unsigned long *contextes  = (unsigned long *) &contextES;
+    unsigned long *contextfs  = (unsigned long *) &contextFS;
+    unsigned long *contextgs  = (unsigned long *) &contextGS;
+    unsigned long *contexteax = (unsigned long *) &contextEAX;
+    unsigned long *contextebx = (unsigned long *) &contextEBX;
+    unsigned long *contextecx = (unsigned long *) &contextECX;
+    unsigned long *contextedx = (unsigned long *) &contextEDX;
+    unsigned long *contextesi = (unsigned long *) &contextESI;
+    unsigned long *contextedi = (unsigned long *) &contextEDI;
+    unsigned long *contextebp = (unsigned long *) &contextEBP;
     // Continua ...
 
 
@@ -233,12 +222,12 @@ void restore_current_context (void){
 
     } else {
 
-	    //
-	    // Restore.
-	    //
-	
-        contextss[0]     = (unsigned long) t->ss & 0xffff;      //usermode.
-        contextesp[0]    = (unsigned long) t->esp;    //usermode. 
+        //
+        // Restore.
+        //
+
+        contextss[0]     = (unsigned long) t->ss & 0xffff;  // usermode.
+        contextesp[0]    = (unsigned long) t->esp;          // usermode. 
         contexteflags[0] = (unsigned long) t->eflags;
         contextcs[0]     = (unsigned long) t->cs & 0xffff;  
         contexteip[0]    = (unsigned long) t->eip;
@@ -277,14 +266,11 @@ void restore_current_context (void){
 		// #bugbug
 		// Esse flush � desnecess�rio, pois o assembly faz isso 
 		// pouco antes do iretd.
-	    
-		asm ("movl %cr3, %eax");
-	    // asm ("nop");
-	    // asm ("nop");
-	    // asm ("nop");
-	    // asm ("nop");
-        asm ("movl %eax, %cr3");		
-	};
+
+        asm ("movl %cr3, %eax");
+        // asm ("nop");
+        asm ("movl %eax, %cr3");
+    };
 
 	//
 	//flag ??...
@@ -293,24 +279,29 @@ void restore_current_context (void){
 
 
 /*
- * check_task_context: */
+ * check_task_context: 
+ */
  
-int contextCheckThreadRing0Context (int tid){
-	
-	//return -1;  //cancelada
-	return 0;
-};
+// # cancelada
+
+int contextCheckThreadRing0Context (int tid)
+{
+    return 0;
+}
  
 
-// Checar um contexto v�lido para threads em ring 3. 
-// #bugbug: N�o usaremos mais isso.
+// Checar um contexto valido para threads em ring 3. 
+// #bugbug: 
+// Nao usaremos mais isso.
 
 int contextCheckThreadRing3Context (int tid){
-	
-	//Error. (condi��o default).	
-	int Status = 1;    
-	
+
     struct thread_d *t; 
+ 
+	//Error. (default).
+    int Status = 1;    
+
+
     //...
 	
 	// Limits.
@@ -338,7 +329,7 @@ int contextCheckThreadRing3Context (int tid){
 		{
 	        printf ("contextCheckThreadRing3Context: validation\n");
 		    return (int) 1;
-	    };    
+	    }  
 	
 	    //se � ring 3.
 		
@@ -362,7 +353,7 @@ int contextCheckThreadRing3Context (int tid){
 	        printf ("contextCheckThreadRing3Context: segments fail t={%d}\n", 
 				tid );
 	        return (int) 1; 
-	    };
+	    }
 
     	//@todo: Continua checagem ...	
 	};
@@ -372,40 +363,42 @@ int contextCheckThreadRing3Context (int tid){
 	// Retorna 0.
 
 	return (int) 0;
-};
+}
 
 
 /*
  * KiCheckTaskContext:
- *     Chama m�dulo interno pra checar o contexto de uma thread. */
+ *     Chama m�dulo interno pra checar o contexto de uma thread. 
+ */
  
-int KiCheckTaskContext (int thread_id){
-	
+int KiCheckTaskContext (int thread_id)
+{
 	//@todo: filtrar argumento.
     
-	return (int) contextCheckThreadRing3Context(thread_id);
-};
-
-
-void KiSaveCurrentContext (void){
-	
-    save_current_context ();
+    return (int) contextCheckThreadRing3Context(thread_id);
 }
 
 
-void KiRestoreCurrentContext (void){
-	
-    restore_current_context ();
+void KiSaveCurrentContext (void)
+{
+    save_current_context();
+}
+
+
+void KiRestoreCurrentContext (void)
+{
+    restore_current_context();
 }
 
  
 /*
- * save_context_of_new_task: */
+ * save_context_of_new_task: 
+ */
 
-void save_context_of_new_task (int id, unsigned long *task_address){
-	
-	//return;    /* CANCELADA !*/
-};
+void save_context_of_new_task (int id, unsigned long *task_address)
+{
+	//return; 
+}
 
 
 //

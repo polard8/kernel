@@ -1,10 +1,8 @@
 /*
- * File: spawn.c
+ * File: ps/disp/spawn.c
  *
- * Descri��o:
- *     Executa uma thread pela primeira vez usando o m�todo Spawn. 
- *     Faz parte do Process Manager, parte fundamental do Kernel Base.
- * Obs: Spawn significa 'desovar'.
+ * It executes a thread fot the first time, calling the method spawn.
+ * Part of the dispatcher module.
  *
  * O Spawn coloca uma nova thread pra executar efetuando
  * um iret. A pilha foi configurada para user  mode antes de efetuar
@@ -24,8 +22,8 @@ static inline void spawnSetCr3 ( unsigned long value )
 {
 	//#todo:
 	//Podemos fazer alguma filtragem aqui ??
-	
-    __asm__ ( "mov %0, %%cr3" : : "r" (value) );
+
+    asm ( "mov %0, %%cr3" : : "r" (value) );
 }
 
 
@@ -40,7 +38,6 @@ static inline void spawnSetCr3 ( unsigned long value )
 // change to (int tid). 
  
 void KiSpawnTask (int id){
-
 
     if ( id < 0 || id >= THREAD_COUNT_MAX )
     {
@@ -74,10 +71,10 @@ void KiSpawnTask (int id){
  
 void spawn_thread (int id){
 
-    int Status;
-
     struct thread_d *Current;
     struct thread_d *spawn_Pointer;
+
+    //int Status=0;
 
 	// #todo: 
 	// Filtrar tid.

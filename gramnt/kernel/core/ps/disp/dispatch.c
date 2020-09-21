@@ -1,10 +1,9 @@
 /*
- * File: ps/action/dispatch.c
+ * File: ps/disp/dispatch.c
  *
  * Descrição:
  *     Arquivo principal do dispatcher do kernel.
- *     Faz parte do Process Control, parte fundamental do 
- * Kernel Base.    
+ *     Part of the dispatcher module.
  *     Coloca tarefas pra rodar que estejam em suas 
  * respectivas filas.
  *     Alterna entre as filas de acordo com o tipo de dispatcher.
@@ -18,7 +17,7 @@
  * Observação:
  *    Somente um tipo de dispatcher está ativo no momento.
  *
- * History
+ * History:
  *     2015 - Created by Fred Nora.
  *     2018 - Revision.
  *     //...
@@ -638,8 +637,9 @@ fail:
 
 int dispatch_Default (void){
 
-	struct thread_d *New;
-	struct thread_d *Current;
+    struct thread_d *New;
+    struct thread_d *Current;
+    int qNext=0;
 
 	Current = NULL;
 	
@@ -647,7 +647,7 @@ int dispatch_Default (void){
 	/*
 	 * Fase1 - Tenta tarefa de quantum vencido.
 	 */
-	int qNext=0;
+
     qNext = (int) check_quantum();
     if(qNext != 0)
 	{

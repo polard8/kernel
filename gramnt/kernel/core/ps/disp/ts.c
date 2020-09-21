@@ -1,7 +1,8 @@
 /*
- * File: ps/ts.c
+ * File: ps/disp/ts.c
  *
  *     Task Switching.
+ *     Part of the dispatcher module.
  *
  *     +Save the context of a thread.
  *     +Call scheduler to switch the thread.
@@ -395,8 +396,6 @@ The remainder ??
     goto dispatch_current; 
 
 
-
-
 	//
 	// == NEXT ================================================
 	//
@@ -409,16 +408,13 @@ try_next:
 #endif
 
 
-	// #critério:
-	// Se tivermos apenas uma thread rodando.
+    // We have only ONE thread.
 
-	//if (ProcessorBlock.threads_counter == 1)
     if (UPProcessorBlock.threads_counter == 1)
     {
-		//debug_print(" JUSTONE ");
-		
-		// #bugbug: queremos ____IDLE;
-		//Conductor = InitThread;
+        //debug_print(" JUSTONE ");
+        
+        // Is this a pointer?
         Conductor = ____IDLE;
         goto go_ahead;
     }
@@ -533,7 +529,6 @@ go_ahead:
 
 //superCrazyFail:
     goto dispatch_current; 
-
 
 
 
@@ -654,8 +649,8 @@ dispatch_current:
  */ 
 void set_task_status( unsigned long status )
 {
-    //#bugbug: Mudar para int.	
-	task_switch_status = (unsigned long) status;
+    //#bugbug: Mudar para int.
+    task_switch_status = (unsigned long) status;
 }
 
 

@@ -1,0 +1,14 @@
+
+
+    dispatcher:
+
+        dispatch.c
+        spawn.c
+        ts.c
+
+
+      
+    Context Switching
+    Switching to user mode
+    Jumping to the proper location in the user program to restart that program
+

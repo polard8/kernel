@@ -244,16 +244,19 @@ all-c:
 	
 	# Architecture independent layer.
 
-
+	# security
 	$(CC) -c core/security/desktop.c   $(KINCLUDE) $(CFLAGS) -o desktop.o
 	$(CC) -c core/security/room.c      $(KINCLUDE) $(CFLAGS) -o room.o
 	$(CC) -c core/security/userenv.c   $(KINCLUDE) $(CFLAGS) -o userenv.o
 	$(CC) -c core/security/usession.c  $(KINCLUDE) $(CFLAGS) -o usession.o
 
+	# debug
 	$(CC) -c core/debug/debug.c      $(KINCLUDE) $(CFLAGS) -o debug.o
 
+	# ob
 	$(CC) -c core/ob/object.c        $(KINCLUDE) $(CFLAGS) -o object.o
 
+	# core
 	$(CC) -c core/storage/storage.c  $(KINCLUDE) $(CFLAGS) -o storage.o
 	$(CC) -c core/abort.c    $(KINCLUDE) $(CFLAGS) -o abort.o
 	$(CC) -c core/info.c     $(KINCLUDE) $(CFLAGS) -o info.o
@@ -263,6 +266,15 @@ all-c:
 	$(CC) -c core/runtime.c  $(KINCLUDE) $(CFLAGS) -o runtime.o
 	$(CC) -c core/sm.c       $(KINCLUDE) $(CFLAGS) -o sm.o
 	$(CC) -c core/system.c   $(KINCLUDE) $(CFLAGS) -o system.o
+
+
+	# ps/disp
+	$(CC) -c core/ps/disp/dispatch.c      $(KINCLUDE)  $(CFLAGS) -o dispatch.o
+	$(CC) -c core/ps/disp/ts.c            $(KINCLUDE)  $(CFLAGS) -o ts.o
+	$(CC) -c core/ps/disp/spawn.c         $(KINCLUDE)  $(CFLAGS) -o spawn.o
+	$(CC) -c core/ps/disp/x86/x86cont.c   $(KINCLUDE)  $(CFLAGS) -o x86cont.o
+	$(CC) -c core/ps/disp/x86/x86start.c  $(KINCLUDE)  $(CFLAGS) -o x86start.o
+
 
 	# ps/ipc
 	$(CC) -c  core/ps/ipc/callfar.c  $(KINCLUDE)  $(CFLAGS) -o callfar.o
@@ -277,35 +289,30 @@ all-c:
 	$(CC) -c  core/ps/sched/sched.c     $(KINCLUDE) $(CFLAGS) -o sched.o
 	$(CC) -c  core/ps/sched/schedi.c    $(KINCLUDE) $(CFLAGS) -o schedi.o
 
-	# ps -x86 - falling angels.
-	$(CC) -c core/ps/x86/x86cont.c   $(KINCLUDE)  $(CFLAGS) -o x86cont.o
+	# ps/x86
 	$(CC) -c core/ps/x86/x86fault.c  $(KINCLUDE)  $(CFLAGS) -o x86fault.o
-	$(CC) -c core/ps/x86/x86start.c  $(KINCLUDE)  $(CFLAGS) -o x86start.o
+
+
+	# ps
+	$(CC) -c  core/ps/pheap.c     $(KINCLUDE)  $(CFLAGS) -o pheap.o
+	$(CC) -c  core/ps/process.c   $(KINCLUDE)  $(CFLAGS) -o process.o
+	$(CC) -c  core/ps/clone.c     $(KINCLUDE)  $(CFLAGS) -o clone.o
+	$(CC) -c  core/ps/queue.c     $(KINCLUDE)  $(CFLAGS) -o queue.o
+	$(CC) -c  core/ps/tasks.c     $(KINCLUDE)  $(CFLAGS) -o tasks.o
+	$(CC) -c  core/ps/theap.c     $(KINCLUDE)  $(CFLAGS) -o theap.o
+	$(CC) -c  core/ps/thread.c    $(KINCLUDE)  $(CFLAGS) -o thread.o
+	$(CC) -c  core/ps/threadi.c   $(KINCLUDE)  $(CFLAGS) -o threadi.o
+	$(CC) -c  core/ps/tstack.c    $(KINCLUDE)  $(CFLAGS) -o tstack.o
+	$(CC) -c  core/ps/execve.c    $(KINCLUDE)  $(CFLAGS) -o execve.o
+	$(CC) -c  core/ps/create.c    $(KINCLUDE)  $(CFLAGS) -o create.o
+	$(CC) -c  core/ps/mk.c        $(KINCLUDE)  $(CFLAGS) -o mk.o
+
 
 	# mm
 	$(CC) -c core/mm/memory.c  $(KINCLUDE)  $(CFLAGS) -o memory.o
 	$(CC) -c core/mm/mminfo.c  $(KINCLUDE)  $(CFLAGS) -o mminfo.o
 	$(CC) -c core/mm/mmpool.c  $(KINCLUDE)  $(CFLAGS) -o mmpool.o
 	$(CC) -c core/mm/pages.c   $(KINCLUDE)  $(CFLAGS) -o pages.o
-
-
-	# ps
-	$(CC) -c  core/ps/dispatch.c  $(KINCLUDE)  $(CFLAGS) -o dispatch.o
-	$(CC) -c  core/ps/pheap.c     $(KINCLUDE)  $(CFLAGS) -o pheap.o
-	$(CC) -c  core/ps/process.c   $(KINCLUDE)  $(CFLAGS) -o process.o
-	$(CC) -c  core/ps/clone.c     $(KINCLUDE)  $(CFLAGS) -o clone.o
-	$(CC) -c  core/ps/queue.c     $(KINCLUDE)  $(CFLAGS) -o queue.o
-	$(CC) -c  core/ps/spawn.c     $(KINCLUDE)  $(CFLAGS) -o spawn.o
-	$(CC) -c  core/ps/tasks.c     $(KINCLUDE)  $(CFLAGS) -o tasks.o
-	$(CC) -c  core/ps/theap.c     $(KINCLUDE)  $(CFLAGS) -o theap.o
-	$(CC) -c  core/ps/thread.c    $(KINCLUDE)  $(CFLAGS) -o thread.o
-	$(CC) -c  core/ps/threadi.c   $(KINCLUDE)  $(CFLAGS) -o threadi.o
-	$(CC) -c  core/ps/ts.c        $(KINCLUDE)  $(CFLAGS) -o ts.o
-	$(CC) -c  core/ps/tstack.c    $(KINCLUDE)  $(CFLAGS) -o tstack.o
-	$(CC) -c  core/ps/execve.c    $(KINCLUDE)  $(CFLAGS) -o execve.o
-	$(CC) -c core/ps/create.c     $(KINCLUDE)  $(CFLAGS) -o create.o
-	$(CC) -c core/ps/mk.c         $(KINCLUDE)  $(CFLAGS) -o mk.o
-
 
 
 	##
