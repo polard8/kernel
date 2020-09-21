@@ -1873,7 +1873,7 @@ int main (int argc, char **argv){
         //charBackbufferDrawcharTransparent ( 250 +8 +8, 250, COLOR_BLUE,  (unsigned long) 'B');
         //charBackbufferDrawchar ( 300, 300, (unsigned long) 'X', COLOR_YELLOW, COLOR_RED );
         //lineBackbufferDrawHorizontalLine ( 400, 88, 500, COLOR_PINK );
-        //rectBackbufferDrawRectangle ( 200, 400, 100, 60, COLOR_YELLOW );
+        //rectBackbufferDrawRectangle ( 200, 400, 100, 60, COLOR_YELLOW, 1 );
 
 
         // Wait

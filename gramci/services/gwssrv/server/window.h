@@ -1042,13 +1042,18 @@ gws_refresh_rectangle (
     unsigned long width, 
     unsigned long height );
 
+
+
 void 
 rectBackbufferDrawRectangle ( 
     unsigned long x, 
     unsigned long y, 
     unsigned long width, 
     unsigned long height, 
-    unsigned long color );
+    unsigned long color,
+    int fill );
+
+
 
 int gws_show_window_rect (struct gws_window_d *window);
 

@@ -140,7 +140,8 @@ gws_refresh_rectangle (
 
 
 
-/* 
+/*
+ *******************************************************
  * rectBackbufferDrawRectangle:
  *     Draw a rectangle on backbuffer. 
  */
@@ -151,7 +152,8 @@ rectBackbufferDrawRectangle (
     unsigned long y, 
     unsigned long width, 
     unsigned long height, 
-    unsigned long color )
+    unsigned long color,
+    int fill )
 {
 
     struct gws_rect_d rect;
@@ -186,6 +188,20 @@ rectBackbufferDrawRectangle (
 
     rect.bg_color = color;
 
+
+    // empty rectangle
+
+    /*
+    if (fill==0)
+    {
+        // todo
+        return;
+    }
+    */
+    
+    //
+    // fill
+    //
 
     // Draw lines on backbuffer.
 

@@ -524,9 +524,10 @@ gwssrv_redraw_window (
 
             
             //ok funciona
-            //rectBackbufferDrawRectangle ( window->left +1, window->top +1, 
+            //rectBackbufferDrawRectangle ( 
+            //    window->left +1, window->top +1, 
             //    window->width +1 +1, window->height +1 +1, 
-            //    __tmp_color ); 
+            //    __tmp_color, 1 ); 
             
             //test
             //remeber: the first window do not have a parent.
@@ -535,24 +536,18 @@ gwssrv_redraw_window (
                 gwssrv_debug_print ("gwssrv_redraw_window: [Shadow] Parent"); 
                 //exit(1); 
                 rectBackbufferDrawRectangle ( 
-                    (window->left +1), 
-                    (window->top +1), 
-                    (window->width +1 +1), 
-                    (window->height +1 +1), 
-                    __tmp_color ); 
+                    (window->left +1), (window->top +1), 
+                    (window->width +1 +1), (window->height +1 +1), 
+                    __tmp_color, 1 ); 
             }
             
             if ( (void*) window->parent != NULL ){
 
                 rectBackbufferDrawRectangle ( 
-                    (window->left +1), //(Parent->left   + window->left +1), 
-                    (window->top +1),  //(Parent->top    + window->top +1), 
-                    (window->width +1 +1), 
-                    (window->height +1 +1), 
-                    __tmp_color ); 
-                 
+                    (window->left +1), (window->top +1), 
+                    (window->width +1 +1), (window->height +1 +1), 
+                    __tmp_color, 1 ); 
             }
-
         }
 
         // ??
@@ -617,27 +612,20 @@ gwssrv_redraw_window (
             gwssrv_debug_print ("gwssrv_redraw_window: [Background] Parent\n"); 
             //exit(1); 
             rectBackbufferDrawRectangle ( 
-                window->left, 
-                window->top, 
-                window->width, 
-                window->height, 
-                window->bg_color );
+                window->left, window->top, 
+                window->width, window->height, 
+                window->bg_color, 1 );
         }  
         
         if ( (void*) window->parent != NULL ){
             rectBackbufferDrawRectangle ( 
-                window->left,//(Parent->left   + window->left), 
-                window->top, //(Parent->top    + window->top), 
-                (window->width), 
-                (window->height), 
-                window->bg_color );
-                
+                window->left, window->top, 
+                window->width, window->height, 
+                window->bg_color, 1 );
         }
         //?? More ...
-    }//fim do background
-    
-    
-    
+    }  //fim do background
+
     //
     // botao
     //
@@ -708,35 +696,26 @@ gwssrv_redraw_window (
 
             //board1, borda de cima e esquerda.
             rectBackbufferDrawRectangle ( 
-                window->left,//(Parent->left   + window->left), 
-                window->top,//(Parent->top    + window->top), 
-                (window->width), 
-                1, 
-                border1 );
-                
+                window->left, window->top,  
+                window->width, 1, 
+                border1, 1 );
+
             rectBackbufferDrawRectangle ( 
-                window->left, //(Parent->left   + window->left), 
-                window->top, //(Parent->top    + window->top), 
-                1, 
-                (window->height),
-                 border1 );
+                window->left, window->top,  
+                1, window->height,
+                border1, 1 );
 
              //board2, borda direita e baixo.
              rectBackbufferDrawRectangle ( 
-                 (window->left) + (window->width) -1,//(Parent->left   + window->left) + (window->width) -1, 
-                 window->top,//(Parent->top    + window->top), 
-                 1, 
-                 (window->height), 
-                 border2 );
+                 (window->left) + (window->width) -1, window->top, 
+                 1, window->height, 
+                 border2, 1 );
                  
              rectBackbufferDrawRectangle ( 
-                 window->left,//(Parent->left   + window->left), 
-                 (window->top) + (window->height) -1, //(Parent->top    + window->top) + (window->height) -1, 
-                 (window->width), 
-                 1, 
-                 border2 );
-                 
-                 
+                 window->left, (window->top) + (window->height) -1,  
+                 (window->width), 1, 
+                 border2, 1 );
+
             // Button label
             gwssrv_debug_print ("gwssrv_redraw_window: [FIXME] Button label\n"); 
             /*

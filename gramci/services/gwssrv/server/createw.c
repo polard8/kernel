@@ -75,16 +75,18 @@ createwDrawTitleBar (
     // Retângulo da barra de títulos.
     // #todo: Posicionar direito. 
     // Queremos que as bordas fiquem evidentes.
-    rectBackbufferDrawRectangle ( window->left +3, window->top +3, 
-        window->width -5, 30, __tmp_color );        
- 
+    rectBackbufferDrawRectangle ( 
+        (window->left +3), (window->top +3), 
+        (window->width -5), 30, 
+        __tmp_color, 1 ); 
+
+
 	// String
     dtextDrawString ( 
-        window->left +16 +8 +8, 
-        window->top +(32/3), 
+        (window->left +16 +8 +8), 
+        (window->top +(32/3) ), 
         COLOR_TERMINALTEXT2, 
         window->name );  
-
 
     // #test:
     // Draw button.
@@ -186,29 +188,29 @@ createwDrawFrame (
         
         // board1, borda de cima e esquerda.
         rectBackbufferDrawRectangle( 
-            window->left, //(parent->left  + window->left), 
-            window->top,  //(parent->top   + window->top), 
-            window->width, 
-            border_size, border_color );
+            window->left, window->top, 
+            window->width, border_size, 
+            border_color, 1 );
 
         rectBackbufferDrawRectangle( 
-            window->left, //(parent->left +window->left), 
-            window->top,  //(parent->top  +window->top), 
-            border_size, window->height, border_color );
+            window->left, window->top, 
+            border_size, window->height, 
+            border_color, 1 );
 
         // board2, borda direita e baixo.
         rectBackbufferDrawRectangle( 
-            (window->left + window->width -1),//(parent->left + window->left + window->width -1), 
-            window->top, //(parent->top + window->top), 
-            border_size, window->height, border_color );
+            (window->left + window->width -1), window->top,  
+            border_size, window->height, 
+            border_color, 1 );
 
         rectBackbufferDrawRectangle ( 
-            window->left, //(parent->left + window->left), 
-            window->top + window->height -1, //parent->top + window->top + window->height -1, 
-            window->width, border_size, border_color );
+            window->left, (window->top + window->height -1), 
+            window->width, border_size, 
+            border_color, 1 );
 
         return 0;
     }
+
 
     // Overlapped.
     // Janela de aplicativos.
@@ -229,26 +231,25 @@ createwDrawFrame (
          
         // board1, borda de cima e esquerda.
         rectBackbufferDrawRectangle( 
-            parent->left + window->left, 
-            parent->top + window->top, 
-            window->width, 
-            border_size, border_color );
+            parent->left + window->left, parent->top + window->top, 
+            window->width, border_size, 
+            border_color, 1 );
 
         rectBackbufferDrawRectangle( 
-            parent->left + window->left, 
-            parent->top + window->top, 
-            border_size, window->height, border_color );
+            parent->left + window->left, parent->top + window->top, 
+            border_size, window->height, 
+            border_color, 1 );
 
         //board2, borda direita e baixo.
         rectBackbufferDrawRectangle( 
-            parent->left + window->left + window->width -1, 
-            parent->top + window->top, 
-            border_size, window->height, border_color );
+            (parent->left + window->left + window->width -1), (parent->top + window->top), 
+            border_size, window->height, 
+            border_color, 1 );
 
         rectBackbufferDrawRectangle ( 
-            parent->left + window->left, 
-            parent->top + window->top + window->height -1, 
-            window->width, border_size, border_color );
+            (parent->left + window->left), (parent->top + window->top + window->height -1), 
+            window->width, border_size, 
+            border_color, 1 );
 
         // Atenção:
         // No more Title bar!
@@ -1190,8 +1191,8 @@ void *createwCreateWindow2 (
             //ok funciona
             //rectBackbufferDrawRectangle ( window->left +1, window->top +1, 
             //    window->width +1 +1, window->height +1 +1, 
-            //    __tmp_color ); 
-            
+            //    __tmp_color, 1 ); 
+         
             //test
             //remeber: the first window do not have a parent.
             if ( (void*) Parent == NULL )
@@ -1199,24 +1200,18 @@ void *createwCreateWindow2 (
                 gwssrv_debug_print ("createwCreateWindow2: [Shadow] Parent"); 
                 //exit(1); 
                 rectBackbufferDrawRectangle ( 
-                    (window->left +1), 
-                    (window->top +1), 
-                    (window->width +1 +1), 
-                    (window->height +1 +1), 
-                    __tmp_color ); 
+                    (window->left +1), (window->top +1), 
+                    (window->width +1 +1), (window->height +1 +1), 
+                    __tmp_color, 1 ); 
             }
-            
+
             if ( (void*) Parent != NULL ){
 
                 rectBackbufferDrawRectangle ( 
-                    (window->left +1), //(Parent->left   + window->left +1), 
-                    (window->top +1),  //(Parent->top    + window->top +1), 
-                    (window->width +1 +1), 
-                    (window->height +1 +1), 
-                    __tmp_color ); 
-                 
+                    (window->left +1), (window->top +1), 
+                    (window->width +1 +1), (window->height +1 +1), 
+                    __tmp_color, 1 ); 
             }
-
         }
 
         // ??
@@ -1284,34 +1279,29 @@ void *createwCreateWindow2 (
             gwssrv_debug_print ("createwCreateWindow2: [Background] Parent\n"); 
             //exit(1); 
             rectBackbufferDrawRectangle ( 
-                window->left, 
-                window->top, 
-                window->width, 
-                window->height, 
-                window->bg_color );
+                window->left, window->top, 
+                window->width, window->height, 
+                window->bg_color, 1 );
         }  
         
         if ( (void*) Parent != NULL ){
             rectBackbufferDrawRectangle ( 
-                window->left,//(Parent->left   + window->left), 
-                window->top, //(Parent->top    + window->top), 
-                (window->width), 
-                (window->height), 
-                window->bg_color );
-                
+                window->left, window->top, 
+                window->width, window->height, 
+                window->bg_color, 1 );
         }
         //?? More ...
     }
 
-  
-  
     //Termina de desenhar o botão, mas não é frame
     //é só o botão...
     //caso o botão tenha algum frame, será alguma borda extra.
-    int Focus;    //(precisa de borda)
+    
+    int Focus=0;
     int Selected;
-    unsigned long border1;
-    unsigned long border2;
+    unsigned long border1=0;
+    unsigned long border2=0;
+
 
     if ( (unsigned long) type == WT_BUTTON )
     {
@@ -1370,48 +1360,39 @@ void *createwCreateWindow2 (
 
             //board1, borda de cima e esquerda.
             rectBackbufferDrawRectangle ( 
-                window->left,//(Parent->left   + window->left), 
-                window->top,//(Parent->top    + window->top), 
-                (window->width), 
-                1, 
-                border1 );
+                window->left, window->top,
+                window->width, 1, 
+                border1, 1 );
                 
             rectBackbufferDrawRectangle ( 
-                window->left, //(Parent->left   + window->left), 
-                window->top, //(Parent->top    + window->top), 
-                1, 
-                (window->height),
-                 border1 );
+                window->left, window->top, 
+                1, window->height,
+                border1, 1 );
 
              //board2, borda direita e baixo.
              rectBackbufferDrawRectangle ( 
-                 (window->left) + (window->width) -1,//(Parent->left   + window->left) + (window->width) -1, 
-                 window->top,//(Parent->top    + window->top), 
-                 1, 
-                 (window->height), 
-                 border2 );
+                 ((window->left) + (window->width) -1), window->top, 
+                 1, window->height, 
+                 border2, 1 );
                  
              rectBackbufferDrawRectangle ( 
-                 window->left,//(Parent->left   + window->left), 
-                 (window->top) + (window->height) -1, //(Parent->top    + window->top) + (window->height) -1, 
-                 (window->width), 
-                 1, 
-                 border2 );
-                 
+                 window->left, ( (window->top) + (window->height) -1 ),  
+                 window->width, 1, 
+                 border2, 1 );
                  
             // Button label
             if (Selected == 1){
                 dtextDrawString ( 
-                    (window->left) + offset, //(Parent->left   + window->left) + offset,
-                    (window->top)  +8, //(Parent->top    + window->top)  +8, 
+                    (window->left) + offset, 
+                    (window->top)  +8, 
                     COLOR_WHITE, windowname );
             }else{
                 // (largura do botão, menos a largura da string)/2
                 // #debug: Rotina provisória
                 //dtextDrawString ( x +20, y +20, COLOR_TERMINALTEXT, string );
                 dtextDrawString ( 
-                    (window->left) +offset, //(Parent->left   + window->left) +offset, 
-                    (window->top)  +8, //(Parent->top    + window->top)  +8, 
+                    (window->left) +offset,  
+                    (window->top)  +8,  
                     COLOR_TERMINALTEXT, windowname );
             };
         }
