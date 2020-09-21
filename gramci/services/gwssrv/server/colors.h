@@ -420,7 +420,7 @@
  * (w) Colors, futuristic GUI. (Dark blu and Black)
  */ 
  
-//#define COLOR_DARKBLUE   0x00008B00 
+//#define COLOR_DARKBLUE   0x00008B00 //green
 //#define COLOR_BLACK      0x00000000 
  
  

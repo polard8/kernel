@@ -216,11 +216,15 @@ createwDrawFrame (
     // Janela de aplicativos.
     struct gws_window_d *TitleBar;
 
+    // string at center?
+    size_t tmp_size = (size_t) strlen ( (const char *) window->name );
+    unsigned long offset = 
+        ( ( (unsigned long) window->width - ( (unsigned long) tmp_size * (unsigned long) gcharWidth) ) / 2 );
+
     if ( window->type == WT_OVERLAPPED)
     {
             // Se tiver o foco.
-            if ( window->focus == 1 )
-            {
+            if ( window->focus == 1 ){
                 border_color = COLOR_BLUE;
                 border_size = 3;
             }else{
@@ -266,12 +270,17 @@ createwDrawFrame (
                                     3, 3, 
                                     window->width-4, 32, 
                                     (struct gws_window_d *) window, 
-                                    0, COLOR_BLUE1, COLOR_BLUE1 );  
+                                    0, COLOR_DARKBLUE, COLOR_DARKBLUE );  
 
         if ( (void *) TitleBar == NULL )
             gwssrv_debug_print ("createwCreateWindow: TitleBar fail \n");
     
         TitleBar->type = WT_SIMPLE;
+
+
+        // string
+        dtextDrawString ( (window->left) + offset, (window->top)  +8, 
+            COLOR_WHITE, window->name );
 
         //  control ?
         // ... 
@@ -1366,11 +1375,11 @@ void *createwCreateWindow2 (
                 break;
         };
 
-
+        // center?
         size_t tmp_size = (size_t) strlen ( (const char *) windowname );
         unsigned long offset = 
             ( ( (unsigned long) window->width - ( (unsigned long) tmp_size * (unsigned long) gcharWidth) ) / 2 );
-       
+
 
         //#debug
         if ( (void*) Parent == NULL ){
