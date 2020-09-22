@@ -1,7 +1,7 @@
 /*
  * File: char.c 
  * 
- *     gws
+ *     gws - Char support.
  * 
  * History:
  *     2019 - Created by Fred Nora.
@@ -9,30 +9,29 @@
  */
 
 
-//#include <api.h>
-
 #include <gws.h>
 
 
 
 
-
-//todo
+// #todo
 int serviceDrawChar(void)
 {
 
-	//o buffer é uma global nesse documento.
+    //O buffer é uma global nesse documento.
     unsigned long *message_address = (unsigned long *) &__buffer[0];
 
 
     struct gws_window_d *window;
     int window_id = -1;
-    unsigned long x;
-    unsigned long y;
-    unsigned long color;
+    unsigned long x=0;
+    unsigned long y=0;
+    unsigned long color=0;
     
-    int __char;
-    char *text_buffer;    // #todo
+    int __char=0;
+
+    // #todo
+    char *text_buffer; 
 
 
     // #debug
@@ -53,7 +52,7 @@ int serviceDrawChar(void)
     unsigned char _string[4];
    
    _string[0] = (unsigned char) C;
-   _string[1] = (unsigned char) 0;   
+   _string[1] = (unsigned char) 0;
    
     
     //
@@ -122,15 +121,12 @@ int serviceDrawChar(void)
     //gws_show_backbuffer ();       // for debug   
     //gws_show_window_rect(window);   // something faster for now.
     //something faster.
-    gws_refresh_rectangle ( 
-        window->left +x, 
-        window->top  +y, 
-        8,   //char width 
-        8 ); // char height 
 
+    // x,y,w,h
+    gws_refresh_rectangle ( (window->left +x), (window->top +y), 8, 8 );
 
     gwssrv_debug_print ("gwssrv: serviceDrawChar done\n");
-    
+
     return 0;
 }
 
@@ -208,29 +204,28 @@ charBackbufferDrawcharTransparent (
     unsigned long color, 
     unsigned long c )
 {
-    int x2;
-    int y2;
 
-    char *work_char;  
+    char *work_char;
     unsigned char bit_mask = 0x80;
 
+    int x2=0;
+    int y2=0;
 
     //int CharWidth;
-    //int CharHeight;  
+    //int CharHeight;
 
-  
+
     /*
 	 * Get the font pointer.
 	 *
 	 * @todo:
-     *     usar variavel g8x8fontAddress.	 
+     *     usar variavel g8x8fontAddress.
 	 *     + Criar e usar uma estrutura para fonte.
 	 *     + Usar o ponteiro para a fonte atual que foi carregada.
 	 *     + Criar um switch para o tamanho da fonte.
 	 *     isso deveria estar na inicialização do módulo char.
 	 *     ...
 	 */
-
 
     if ( gws_currentfont_address == 0 || 
          gcharWidth <= 0 || 
@@ -243,16 +238,15 @@ charBackbufferDrawcharTransparent (
 		// #debug
 		// Estamos parando para testes.
 		
-		printf ("gws_drawchar_transparent : Initialization fail\n");
-		while(1){}
+        printf ("gws_drawchar_transparent : Initialization fail\n");
+        while(1){}
     }
 
+    // #todo: 
+    // Criar essas variáveis e definições.
 
-	//@todo: 
-	//Criar essas variáveis e definições.
-	
-	switch (gfontSize){
-		
+    switch (gfontSize){
+
 		//case FONT8X8:
 	        //gws_currentfont_address = (unsigned long) BIOSFONT8X8;    //getFontAddress(...)
 		    //gcharWidth = 8;
@@ -278,7 +272,7 @@ charBackbufferDrawcharTransparent (
 		// Se não temos um tamanho selecionado então teremos 
 		// que usar o tamanho padrão.
 		
-		default:
+        default:
 		    //gws_currentfont_address = (unsigned long) BIOSFONT8X8;    //ROM bios.
 		    
 			//set_char_width(8);
@@ -289,16 +283,14 @@ charBackbufferDrawcharTransparent (
     };
 
 
-
-	// O caractere sendo trabalhado.
+    // O caractere sendo trabalhado.
 
     work_char = (void *) gws_currentfont_address + (c * gcharHeight);
 
 
-	//
-	// Draw.
-	//
-
+    //
+    // Draw.
+    //
 
     for ( y2=0; y2 < gcharHeight; y2++ )
     {
@@ -316,8 +308,9 @@ charBackbufferDrawcharTransparent (
             bit_mask = (bit_mask >> 1);  
         };
 
-        y++;            //Próxima linha da 8 linhas do caractere.
-        work_char++;   
+        // Próxima linha da 8 linhas do caractere.
+        y++; 
+        work_char++; 
     };
 }
 
@@ -338,12 +331,11 @@ charBackbufferDrawchar (
     unsigned long bgcolor )
 {
 
-    int x2;
-    int y2;
-
-    char *work_char;  
+    char *work_char; 
     unsigned char bit_mask = 0x80;
 
+    int x2=0;
+    int y2=0;
 
 
     /*
@@ -391,7 +383,7 @@ charBackbufferDrawchar (
 		    //gcharWidth = 8;
 		    //gcharHeight = 16;
 		    //set_char_width(8);
-			//set_char_height(16);			
+			//set_char_height(16);
 		    //break;
 		 
 		//#todo: 
@@ -402,28 +394,27 @@ charBackbufferDrawchar (
 		// #BUGBUG
 		// Se não temos um tamanho selecionado então teremos 
 		// que usar o tamanho padrão.
-		
-		default:
+
+        default:
 		    //gws_currentfont_address = (unsigned long) BIOSFONT8X8;    //ROM bios.
 		    //set_char_width(8);
 			//set_char_height(8);	
             //gfontSize = FONT8X8;  //#todo: fução para configurar isso.			
-			break;
-	};
-	
-	
+            break;
+    };
+
 	//tentando pintar um espaço em branco.
     //Nas rotinas da biblioteca gráfica, quando encontram
 	//um espaço(32), nem manda para cá, apenas incrementam o cursor.
 
 	// O caractere sendo trabalhado.
-	// Offset da tabela de chars de altura 8 na ROM.	
+	// Offset da tabela de chars de altura 8 na ROM.
 
     work_char = (void *) gws_currentfont_address + (c * gcharHeight);
 
-	//
-	// Draw.
-	//
+    //
+    // Draw.
+    //
 
     for ( y2=0; y2 < gcharHeight; y2++ )
     {
@@ -442,18 +433,12 @@ charBackbufferDrawchar (
 
         // Próxima linha da (y) linhas do caractere.
         y++; 
-        work_char++;   
+        work_char++; 
     };
 }
-
 
 
 //
 // End.
 //
-
-
-
-
-
 

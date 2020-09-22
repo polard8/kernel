@@ -807,10 +807,10 @@ int main ( int argc, char *argv[] ){
     
     
 
-    debug_print ("---------------------------\n");    
+    debug_print ("-------------------------\n");    
     debug_print ("launch1: Initializing ...\n");
 
-     //
+    //
     // socket
     // 
 
@@ -831,20 +831,19 @@ int main ( int argc, char *argv[] ){
 
 
 
-        //
-        // connect
-        // 
+    //
+    // connect
+    // 
+
+    //nessa hora colocamos no accept um fd.
+    //então o servidor escreverá em nosso arquivo.
 
     while(1){
 
-
-        //nessa hora colocamos no accept um fd.
-        //então o servidor escreverá em nosso arquivo.
-    
         // #debug
-        //printf ("gnst: Connecting to the address 'ws' ...\n");      
-        printf ("launch1: Connecting to the address via inet  ...\n");    
-      
+        gws_debug_print ("launch1: Connecting to the address via inet ...\n");    
+        //printf ("launch1: Connecting to the address via inet  ...\n");    
+        
         if (connect (client_fd, (void *) &addr_in, sizeof(addr_in)) < 0){ 
             
             debug_print ("launch1: Connection Failed \n"); 
@@ -888,42 +887,61 @@ int main ( int argc, char *argv[] ){
     int button2_window;
     int button3_window;
 
-    // libgws
+
+
+    //
+    // == main window ======================
+    //
   
     //main window
     main_window = gws_create_window (client_fd,
         WT_SIMPLE,1,1,"Launch1",
         40, 40, 120, 480,
         0,0,COLOR_GRAY, COLOR_GRAY);
-        
-    if (main_window >0 && main_window < 1024){ 
+
+    if (main_window<0)
+        gws_debug_print ("launch1: main_window fail\n");
+
+
+    if (main_window >0 && main_window < 1024)
+    { 
 
         // button
         button1_window = gws_create_window (client_fd,
             WT_BUTTON,1,1,"button1",
-            4, 100, 100, 32,
+            4, ((480/5)*1), 100, 32,
             main_window,0,COLOR_GRAY, COLOR_GRAY);
+
+        if (button1_window<0)
+            gws_debug_print ("launch1: button1_window fail\n");
 
        // button
-        button1_window = gws_create_window (client_fd,
+        button2_window = gws_create_window (client_fd,
             WT_BUTTON,1,1,"button2",
-            4, 150, 100, 32,
+            4, ((480/5)*2), 100, 32,
             main_window,0,COLOR_GRAY, COLOR_GRAY);
+
+        if (button2_window<0)
+            gws_debug_print ("launch1: button2_window fail\n");
 
         // button
-        button1_window = gws_create_window (client_fd,
+        button3_window = gws_create_window (client_fd,
             WT_BUTTON,1,1,"button3",
-            4, 200, 100, 32,
+            4, ((480/5)*3), 100, 32,
             main_window,0,COLOR_GRAY, COLOR_GRAY);
+
+        if (button3_window<0)
+            gws_debug_print ("launch1: button3_window fail\n");
     }
 
+    //
+    // Loop
+    //
 
-    //loop
-    _loop(client_fd);
+    _loop (client_fd);
 
     debug_print ("launch1: bye\n"); 
     printf      ("launch1: bye\n");
-
 
     return 0;
 }

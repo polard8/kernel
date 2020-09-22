@@ -277,6 +277,10 @@ createwDrawFrame (
     
         TitleBar->type = WT_SIMPLE;
 
+        rectBackbufferDrawRectangle ( 
+            TitleBar->left, ( (TitleBar->top) + (TitleBar->height) -1 ),  
+            TitleBar->width, 1, 
+            COLOR_BLACK, 1 );
 
         // string
         dtextDrawString ( (window->left) + offset, (window->top)  +8, 

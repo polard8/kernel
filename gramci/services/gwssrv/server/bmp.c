@@ -9,19 +9,14 @@
  *     Conferir os parametros do bmp em seu header.
  *     todo: Criar uma rotina para filtrar o bmp por tamanho e tipo.
  *            bugbug: bmp envolve o carregamento de arquivo.
- *            Temos a opção de utilizarmos arquivos que foram carregados
- * na inicialização, como parte dos elementos da interface gráfica.
- * Obs: Esse tipo de serviços pode ser oferecido por servidor.
+ *            Temos a opï¿½ï¿½o de utilizarmos arquivos que foram carregados
+ * na inicializaï¿½ï¿½o, como parte dos elementos da interface grï¿½fica.
+ * Obs: Esse tipo de serviï¿½os pode ser oferecido por servidor.
  * 
  * History: 
- *     2015 - Created by Fred Nora. 
- *            24 bpp support.
- *     2018 - Display 4bpp, 8bpp, and 32bpp BMPs.
+ *     2019 - Created by Fred Nora. 
+ *            Ported from older versions in the system.
  */
-
-
-//#include <api.h>
-//#include <gws.h>
 
 
 #include <sys/cdefs.h>
@@ -34,7 +29,6 @@
 
 
 
-
 // 4bpp support.
 static int nibble_count_16colors = 0;
 
@@ -43,11 +37,11 @@ static int nibble_count_16colors = 0;
  ********************************************************
  * bmpDirectDisplayBMP:
  *
- *     Mostra na tela uma imagem bmp que já está 
- * carregada na memória. (diretamente no LFB)
+ *     Mostra na tela uma imagem bmp que jï¿½ estï¿½ 
+ * carregada na memï¿½ria. (diretamente no LFB)
  * 
  * IN:
- *     address = endereço base
+ *     address = endereï¿½o base
  *     x       = posicionamento 
  *     y       = posicionamento
  *
@@ -58,7 +52,7 @@ static int nibble_count_16colors = 0;
 
 // #todo
 // Vamos suspender essa rotina, porque
-// falta  a função que escreve diretamente no lfb
+// falta  a funï¿½ï¿½o que escreve diretamente no lfb
 // estando aqui em ring3.
 
 
@@ -91,10 +85,10 @@ bmpDirectDisplayBMP (
 	struct bmp_header_d *bh;
 	struct bmp_infoheader_d *bi;
 	
-	// Endereço base do BMP que foi carregado na memória
+	// Endereï¿½o base do BMP que foi carregado na memï¿½ria
 	unsigned char *bmp = (unsigned char *) address;
 	
-	// Variável para salvar rgba.
+	// Variï¿½vel para salvar rgba.
 	unsigned char *c = (unsigned char *) &color;
     unsigned char *c2 = (unsigned char *) &color2;	
 	
@@ -108,7 +102,7 @@ bmpDirectDisplayBMP (
 	
 	
 	//
-	// Sincronização do retraço vertical.
+	// Sincronizaï¿½ï¿½o do retraï¿½o vertical.
 	//
 	
 	// #suspenso
@@ -125,7 +119,7 @@ bmpDirectDisplayBMP (
 	
 
 	// @todo:
-	// Testar validade do endereço.
+	// Testar validade do endereï¿½o.
 	if ( address == 0 ){
 		//goto fail;
 	};
@@ -198,7 +192,7 @@ bmpDirectDisplayBMP (
 	//}
 	
 	
-	// 0 = Nenhuma compressão.
+	// 0 = Nenhuma compressï¿½o.
 	if ( bi->bmpCompression != 0 ){
 		//fail
 	}
@@ -214,14 +208,14 @@ bmpDirectDisplayBMP (
 	top = y; 
 	bottom = ( top + bi->bmpHeight );
 
-	// Início da área de dados do BMP.
+	// Inï¿½cio da ï¿½rea de dados do BMP.
 	
 	//#importante:
-	//A base é diferente para os tipos ?? 
+	//A base ï¿½ diferente para os tipos ?? 
 
 	switch ( bi->bmpBitCount )
     {
-		//Obs: Cada cor é representada com 4 bytes. RGBA.
+		//Obs: Cada cor ï¿½ representada com 4 bytes. RGBA.
 		
 		//case 1:
 		//    base = (0x36 + 0x40);
@@ -291,7 +285,7 @@ bmpDirectDisplayBMP (
 	        };	
 
 			// 256 cores
-			// Próximo pixel para 8bpp
+			// Prï¿½ximo pixel para 8bpp
 	        if ( bi->bmpBitCount == 8 )
 	        {   
 				offset = base;
@@ -301,7 +295,7 @@ bmpDirectDisplayBMP (
 	        };			
 			
 			
-			// Próximo pixel para 16bpp
+			// Prï¿½ximo pixel para 16bpp
 	        if ( bi->bmpBitCount == 16 )
 	        {
 				//a
@@ -328,7 +322,7 @@ bmpDirectDisplayBMP (
 	        };			
 			
 
-			// Próximo pixel para 24bpp.
+			// Prï¿½ximo pixel para 24bpp.
 	        if( bi->bmpBitCount == 24 )
 	        {  
 			    c[0] = 0; //A					
@@ -346,7 +340,7 @@ bmpDirectDisplayBMP (
 	        };
 			
 			
-			// Próximo pixel para 32bpp.
+			// Prï¿½ximo pixel para 32bpp.
 	        if ( bi->bmpBitCount == 32 )
 	        {	
 			    c[0] = 0;  //A				
@@ -367,16 +361,16 @@ bmpDirectDisplayBMP (
 			// # Put pixel #
 			//
 			
-			//Nesse momento já temos a cor selecionada 
+			//Nesse momento jï¿½ temos a cor selecionada 
 			//no formato 0xaarrggbb ... 
 			//Agora se a flag de mascara estiver selecionada,
-			//então devemos ignora o pixel e não pintá-lo.	
+			//entï¿½o devemos ignora o pixel e nï¿½o pintï¿½-lo.	
 			
 			switch (bmp_change_color_flag)
 			{
 				//1000
 				//flag para ignorarmos a cor selecionada.
-				//Não pinte nada.
+				//Nï¿½o pinte nada.
 				//Devemos pintar caso a cor atual seja  
 				//diferente da cor selecionada.
 				case BMP_CHANGE_COLOR_TRANSPARENT:
@@ -391,7 +385,7 @@ bmpDirectDisplayBMP (
 					
 				//2000	
 				//Substitua pela cor indicada.
-				//Se a cor atual é igual a cor selecionada,
+				//Se a cor atual ï¿½ igual a cor selecionada,
 				//devemos substituir a cor atual pela substituta.
 				//Mas se a cor atual for diferente da cor selecionada,
 				//pintamos normalmente a cor atual.
@@ -428,7 +422,7 @@ bmpDirectDisplayBMP (
 					break;
 			};
 
-			// Próximo pixel.
+			// Prï¿½ximo pixel.
 			left++; 
 		};
 		
@@ -470,11 +464,11 @@ fail:
  ********************************************************
  * bmpDisplayBMP:
  *
- *     Mostra na tela uma imagem BMP que já está 
- * carregada na memória. (pinta no backbuffer)
+ *     Mostra na tela uma imagem BMP que jï¿½ estï¿½ 
+ * carregada na memï¿½ria. (pinta no backbuffer)
  * 
  * IN:
- *     address = endereço base onde o bmp já está carregado.
+ *     address = endereï¿½o base onde o bmp jï¿½ estï¿½ carregado.
  *     x       = posicionamento 
  *     y       = posicionamento
  *
@@ -487,7 +481,7 @@ bmpDisplayBMP (
     unsigned long x, 
     unsigned long y )
 {
-    // Endereço base do BMP que foi carregado na memória
+    // EndereÃ§o base do BMP que foi carregado na memoria
     unsigned char *bmp = (unsigned char *) address;
 
     struct gws_bmp_header_d      *bh;
@@ -497,15 +491,20 @@ bmpDisplayBMP (
 
     unsigned long left, top, bottom;
 
-    unsigned long Width, Height;
-    unsigned long xLimit, yLimit;
 
-    unsigned short sig;
+    unsigned long Width=0;
+    unsigned long Height=0;
+    unsigned long xLimit=0;
+    unsigned long yLimit=0;
 
-    unsigned long color, color2;
-    unsigned long pal_address;
+    unsigned short sig=0;
 
-    // Variável para salvar rgba.
+    unsigned long color=0;
+    unsigned long color2=0;
+    unsigned long pal_address=0;
+
+
+    // Variï¿½vel para salvar rgba.
     unsigned char *c  = (unsigned char *) &color;
     unsigned char *c2 = (unsigned char *) &color2;
 
@@ -523,20 +522,18 @@ bmpDisplayBMP (
 
 
     // Limits.
-    if ( x > xLimit || y > yLimit )
-    {
+    if ( x > xLimit || y > yLimit ){
         gwssrv_debug_print ("bmpDisplayBMP: Limits \n");
-        printf          ("bmpDisplayBMP: Limits \n");
+        printf             ("bmpDisplayBMP: Limits \n");
         goto fail;
     }
 
 
     // #todo:
-    // Testar validade do endereço.
-    if ( address == 0 )
-    {
+    // Testar validade do endereï¿½o.
+    if ( address == 0 ){
         gwssrv_debug_print ("bmpDisplayBMP: address fail \n");
-        printf          ("bmpDisplayBMP: address fail \n");
+        printf             ("bmpDisplayBMP: address fail \n");
         goto fail;
     }
 
@@ -554,38 +551,38 @@ bmpDisplayBMP (
     //char buffer2[512];
 
 
-    bh = (struct gws_bmp_header_d *) malloc( sizeof(struct gws_bmp_header_d) );
-    //bh = (struct gws_bmp_header_d *) &buffer[0];
+    bh = (struct gws_bmp_header_d *) malloc ( sizeof(struct gws_bmp_header_d) );
+
     if ( (void *) bh == NULL )
     {
         gwssrv_debug_print ("bmpDisplayBMP: bh fail \n");
-        printf          ("bmpDisplayBMP: bh fail \n");
+        printf             ("bmpDisplayBMP: bh fail \n");
         goto fail;
     }
 
-
+    //
     // Signature.
+    //
+
     sig = *(unsigned short *) &bmp[0];
     bh->bmpType = sig;
     //printf ("sig={%x}\n",sig);
 
-    // #test
-    // Signature
     if ( bmp[0] != 'B' || bmp[1] != 'M' )
     {
-        gwssrv_debug_print ("bmpDisplayBMP: SIG FAIL \n");
-        printf          ("bmpDisplayBMP: SIG FAIL >>>> %c %c\n", 
+        gwssrv_debug_print ("bmpDisplayBMP: [FAIL] signature \n");
+        printf             ("bmpDisplayBMP: [FAIL] signature %c %c\n", 
             bmp[0], bmp[1]);
         goto fail;
     }
 
-
-
+    //
     // Size. ( 2 bytes )
+    //
+
     unsigned short Size = *(unsigned short *) &bmp[2];
     bh->bmpSize = Size;
     //printf ("Size={%x}\n",Size);
-
 
 
 
@@ -593,13 +590,12 @@ bmpDisplayBMP (
 	// struct for Info header
 	//
 
-	//Windows bmp.
-	bi = (struct gws_bmp_infoheader_d *) malloc( sizeof(struct gws_bmp_infoheader_d) );
-    //bi = (struct gws_bmp_infoheader_d *)  &buffer2[0];
-    if ( (void *) bi == NULL )
-    {
+    //Windows bmp.
+    bi = (struct gws_bmp_infoheader_d *) malloc ( sizeof(struct gws_bmp_infoheader_d) );
+
+    if ( (void *) bi == NULL ){
         gwssrv_debug_print ("bmpDisplayBMP: bi fail \n");
-        printf          ("bmpDisplayBMP: bi fail \n");
+        printf             ("bmpDisplayBMP: bi fail \n");
         goto fail;
     }
 
@@ -637,12 +633,16 @@ bmpDisplayBMP (
     // }
 
 
+    //
+    // Compression.
+    //
 
-    // 0 = Nenhuma compressão.
-    if ( bi->bmpCompression != 0 )
-    {
+    // 0 = No compression.
+
+    if ( bi->bmpCompression != 0 ){
         gwssrv_debug_print ("bmpDisplayBMP: bmpCompression fail \n");
-        printf          ("bmpDisplayBMP: bmpCompression fail \n");
+        printf             ("bmpDisplayBMP: bmpCompression fail \n");
+        goto fail;
     }
 
 
@@ -651,8 +651,7 @@ bmpDisplayBMP (
     //
 
     gwssrv_debug_print ("bmpDisplayBMP: Draw!\n");
-    printf          ("bmpDisplayBMP: Draw!\n");
-
+    //printf             ("bmpDisplayBMP: Draw!\n");
 
     // Top, Left, Bottom.
 
@@ -661,18 +660,28 @@ bmpDisplayBMP (
     bottom = ( top + bi->bmpHeight );
 
 
-	// Início da área de dados do BMP.
-
-
-	// #importante:
-	// A base é diferente para os tipos? 
+    //
+    // Data area.
+    //
 
     // bpp
+    // The begin of the data area depends on the bpp value.
+
+// #tutorial:
+//1     -  1 bpp (Mono)
+//4     -  4 bpp (Indexed)
+//8     -  8 bpp (Indexed) bbgggrrr
+//16565 - 16 bpp (5:6:5, RGB Hi color)
+//16    - 16 bpp (5:5:5:1, RGB Hi color)
+//160   - 16 bpp (5:5:5:1, RGBA Hi color)
+//24    - 24 bpp (True color)
+//32    - 32 bpp (True color, RGB)
+//320   - 32 bpp (True color, RGBA)	
 
     switch ( bi->bmpBitCount )
     {
         // Obs: 
-        // Cada cor é representada com 4 bytes. RGBA.
+        // Cada cor ï¿½ representada com 4 bytes. RGBA.
 
         // ??
         //case 1:  base = (0x36 + 0x40); break;
@@ -682,16 +691,16 @@ bmpDisplayBMP (
 
         // 4 bytes pra cada cor, 16 cores. Total 64 bytes.
         case 4:  
-            base = (0x36 + 0x40);  
-            gwssrv_debug_print ("bmpDisplayBMP: bmpBitCount 4\n");  
+            base = (0x36 + 0x40); 
+            gwssrv_debug_print ("bmpDisplayBMP: bmpBitCount 4\n"); 
             break; 
 
         // 4 bytes pra cada cor, 256 cores. Total 1024 bytes.
         case 8:  
             base = (0x36 + 0x400); 
-            gwssrv_debug_print ("bmpDisplayBMP: bmpBitCount 8\n");   
+            gwssrv_debug_print ("bmpDisplayBMP: bmpBitCount 8\n"); 
             break;
-        
+
         // #todo: Onde fica a base??
         case 16:
             base = 0x36;
@@ -710,30 +719,17 @@ bmpDisplayBMP (
             gwssrv_debug_print ("bmpDisplayBMP: [FIXME] bmpBitCount 32\n"); 
             break;
 
-        // Default.
-        // #todo: Onde fica a base??
+        // #bugbug
+        // We need to abort.
         default:  
             base = 0x36;
             gwssrv_debug_print ("bmpDisplayBMP: [FAIL] bmpBitCount fail\n"); 
             break;
     };
 
-
-//#Aprendendo:
-//1     -  1 bpp (Mono)
-//4     -  4 bpp (Indexed)
-//8     -  8 bpp (Indexed) bbgggrrr
-//16565 - 16 bpp (5:6:5, RGB Hi color)
-//16    - 16 bpp (5:5:5:1, RGB Hi color)
-//160   - 16 bpp (5:5:5:1, RGBA Hi color)
-//24    - 24 bpp (True color)
-//32    - 32 bpp (True color, RGB)
-//320   - 32 bpp (True color, RGBA)	
-
-
+    //#debug
     gwssrv_debug_print ("bmpDisplayBMP: for\n");
-    printf          ("bmpDisplayBMP: for\n");
-
+    //printf             ("bmpDisplayBMP: for\n");
 
     for ( i=0; i < bi->bmpHeight; i++ )
     {
@@ -768,17 +764,17 @@ bmpDisplayBMP (
             };
 
             // >> 256 cores
-            // Próximo pixel para 8bpp
+            // Prï¿½ximo pixel para 8bpp
             if ( bi->bmpBitCount == 8 )
             {   
                 offset = base;
                 color = (unsigned long) palette[  bmp[offset] ];
 
-                base = base + 1;     
+                base = base + 1; 
             }
 
             // >>
-            // Próximo pixel para 16bpp
+            // Prï¿½ximo pixel para 16bpp
             if ( bi->bmpBitCount == 16 )
             {
                 //a
@@ -805,7 +801,7 @@ bmpDisplayBMP (
             };
 
 
-            // Próximo pixel para 24bpp.
+            // Prï¿½ximo pixel para 24bpp.
             if ( bi->bmpBitCount == 24 )
             {  
                 c[0] = 0; //A
@@ -823,7 +819,7 @@ bmpDisplayBMP (
             };
 
 
-            // Próximo pixel para 32bpp.
+            // Prï¿½ximo pixel para 32bpp.
             if ( bi->bmpBitCount == 32 )
             {
                 c[0] = 0;  //A
@@ -844,16 +840,16 @@ bmpDisplayBMP (
 			// # Put pixel #
 			//
 			
-			//Nesse momento já temos a cor selecionada 
+			//Nesse momento jï¿½ temos a cor selecionada 
 			//no formato 0xaarrggbb ... 
 			//Agora se a flag de mascara estiver selecionada,
-			//então devemos ignora o pixel e não pintá-lo.	
+			//entï¿½o devemos ignora o pixel e nï¿½o pintï¿½-lo.	
 			
             switch (bmp_change_color_flag)
             {
 				//1000
 				//flag para ignorarmos a cor selecionada.
-				//Não pinte nada.
+				//Nï¿½o pinte nada.
 				//Devemos pintar caso a cor atual seja  
 				//diferente da cor selecionada.
                 case BMP_CHANGE_COLOR_TRANSPARENT:
@@ -879,7 +875,7 @@ bmpDisplayBMP (
 
 				//2000	
 				//Substitua pela cor indicada.
-				//Se a cor atual é igual a cor selecionada,
+				//Se a cor atual ï¿½ igual a cor selecionada,
 				//devemos substituir a cor atual pela substituta.
 				//Mas se a cor atual for diferente da cor selecionada,
 				//pintamos normalmente a cor atual.
@@ -944,7 +940,7 @@ bmpDisplayBMP (
                     break;
             };
 
-			// Próximo pixel.
+			// Prï¿½ximo pixel.
             left++; 
         };
 
@@ -954,11 +950,6 @@ bmpDisplayBMP (
 		// Reiniciamos o x.
         left = x;    
     };
-
-
-
-
-
 
 
 	// ## test palette 
@@ -976,22 +967,25 @@ bmpDisplayBMP (
 
 
 done:
-	//Debug
+    
+    // #debug
     gwssrv_debug_print ("bmpDisplayBMP: done \n");
-    printf          ("bmpDisplayBMP: done \n");
-	//printf("w={%d} h={%d}\n", bi->bmpWidth, bi->bmpHeight );
+    //printf            ("bmpDisplayBMP: done \n");
+    //printf("w={%d} h={%d}\n", bi->bmpWidth, bi->bmpHeight );
+    
     return 0;
 
 fail:
-    gwssrv_debug_print ("bmpDisplayBMP: fail \n");
-    printf          ("bmpDisplayBMP: fail \n");
+    gwssrv_debug_print ("bmpDisplayBMP: Fail \n");
+    printf             ("bmpDisplayBMP: Fail \n");
+    
     return (int) 1;
+    //return (int) -1;
 }
 
 
-
 //mostra no lfb
-//levando em consideração tratamento de transparência.
+//levando em consideraï¿½ï¿½o tratamento de transparï¿½ncia.
 
 // #todo: precisamos de put pixel direto no lfb.
 /*
@@ -1013,8 +1007,8 @@ bmpDisplayMousePointerBMP (
 	
 	
 	//#importante:
-	//Selecionamos a cor que será ignorada.
-    //background do bitmap é branco.
+	//Selecionamos a cor que serï¿½ ignorada.
+    //background do bitmap ï¿½ branco.
 	bmp_selected_color = COLOR_WHITE;
     
 	//
@@ -1036,9 +1030,9 @@ bmpDisplayMousePointerBMP (
 
 
 //mostra no lfb
-//levando em consideração tratamento de transparência.
+//levando em consideraï¿½ï¿½o tratamento de transparï¿½ncia.
 //mostra no lfb
-//levando em consideração tratamento de transparência.
+//levando em consideraï¿½ï¿½o tratamento de transparï¿½ncia.
 
 // #todo: precisamos de putpixl direto no lfb.
 
@@ -1060,8 +1054,8 @@ bmpDisplayCursorBMP (
 	bmp_change_color_flag = BMP_CHANGE_COLOR_TRANSPARENT;
 
 	//#importante:
-	//Selecionamos a cor que será ignorada.
-    //background do bitmap é branco.
+	//Selecionamos a cor que serï¿½ ignorada.
+    //background do bitmap ï¿½ branco.
 	bmp_selected_color = COLOR_WHITE;
 
 	// Display !!
@@ -1116,7 +1110,7 @@ gwssrv_load_and_decode_small_icon (
     //printf ("gwssrv: xxx_test_load_bmp bmp_buffer = %x\n", bmp_buffer);
   
   
-    //stdio_fntos ( (char *) file_name ); //não precisa
+    //stdio_fntos ( (char *) file_name ); //nï¿½o precisa
 
     
     //fp = fopen("folder.bmp","r+");    
@@ -1204,7 +1198,7 @@ char *gwssrv_load_small_icon (
     //printf ("gwssrv: xxx_test_load_bmp bmp_buffer = %x\n", bmp_buffer);
   
   
-    //stdio_fntos ( (char *) file_name ); //não precisa
+    //stdio_fntos ( (char *) file_name ); //nï¿½o precisa
 
     
     //fp = fopen("folder.bmp","r+");    
@@ -1320,7 +1314,7 @@ void __test_load_bmp(void)
     printf ("gwssrv: __test_load_bmp bmp_buffer = %x\n", bmp_buffer);
   
   
-    //stdio_fntos ( (char *) file_name ); //não precisa
+    //stdio_fntos ( (char *) file_name ); //nï¿½o precisa
     
     FILE *fp;
     

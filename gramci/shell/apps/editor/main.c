@@ -1,16 +1,13 @@
 /*
  * File: main.c
  *
- *    Client side application for Gramado Network Server.
- *    Using socket to connect with gns.
- *    AF_GRAMADO family.
+ *     Simple text editor for Gramado Window Server.
  * 
- * 
- *       O propósito é testar o servidor gns.
- *
- * 2020 - Created by Fred Nora.
+ * History:
+ *     2020 - Created by Fred Nora.
  */
- 
+
+
 // Connecting via AF_INET.
 
 // tutorial example taken from. 
@@ -52,7 +49,6 @@
 
 // The client-side library.
 #include <gws.h>
-
 
 #include <fileman.h>
 
@@ -241,8 +237,8 @@ response_loop:
 
     // Se retornou -1 é porque algo está errado com o arquivo.
     if (n_reads < 0){
-        gws_debug_print ("editor: recv fail.\n");
-        printf ("editor: recv fail.\n");
+        gws_debug_print ("editor: recv fail\n");
+        printf          ("editor: recv fail\n");
         printf ("Something is wrong with the socket.\n");
         exit(1);
     }
@@ -282,14 +278,12 @@ response_loop:
                 //case VK_BACK:
                 
                 //...
-                
-                
-                // We are in the terminal ...
-                // We will not process the chars ...
-                // We need to send it to the client via file.
+
                 default:
+                    //gws_draw_text ( (int) fd, (int) 0, 40, 40, COLOR_BLUE, "x");
                     //terminal_write_char(long1) #todo
-                    printf ("%c",long1); fflush(stdout);
+                    printf ("%c",long1); 
+                    fflush(stdout);
                     goto process_event;
                     break;
             };
@@ -323,6 +317,8 @@ response_loop:
                 case VK_F4:
                     //printf ("editor: VK_F4 reboot\n");
                     gws_draw_text ( (int) fd, (int) 0, 80, 80, COLOR_BLUE, "[F4] Exiting...");
+                    gws_debug_print("editor: Closing socket and exiting ...\n");
+                    close (fd);
                     exit(0);
                     break;
                     
@@ -394,12 +390,14 @@ response_loop:
     
 process_reply:
 
+    gws_debug_print ("editor: process_reply:\n"); 
+
     // #test
-    gws_debug_print ("editor: Testing close() ...\n"); 
+    //gws_debug_print ("editor: Testing close() ...\n"); 
     //close (fd);
 
     //gws_debug_print ("gwst: bye\n"); 
-    printf ("editor: Window ID %d \n", message_buffer[0] );
+    //printf ("editor: Window ID %d \n", message_buffer[0] );
     //printf ("editor: Bye\n");
     
     // #todo
@@ -504,7 +502,7 @@ __again:
     //}
 
     if (n_reads == 0){
-        gws_yield();        
+        gws_yield(); 
         goto __again;
     }
     
@@ -583,19 +581,19 @@ new_message:
     //
 
     // #debug
-    debug_print ("editor: Writing ...\n");      
+    debug_print ("editor: Writing ...\n");  
 
     // Enviamos um request para o servidor.
     // ?? Precisamos mesmo de um loop para isso. ??
 
 
     // Write!
-    // Se foi possível enviar, então saimos do loop.        
+    // Se foi possível enviar, então saimos do loop.  
     // obs: podemos usar send();
 
     while (1){
 
-        // Solicita um hello na posição x,y.      
+        // Solicita um hello na posição x,y. 
         message_buffer[0] = 0;       // window. 
         message_buffer[1] = 1000;    // msg=hello.
         message_buffer[2] = 10;       // x
@@ -613,8 +611,10 @@ new_message:
 
 void _hello(int fd)
 {
-    if(fd<0)return;
-    
+    if (fd<0)
+        return;
+
+
     //while(1){
         _hello_request(fd);
         _hello_response(fd);
@@ -622,7 +622,12 @@ void _hello(int fd)
 }
 
 
-// Testing new main.
+/*
+ **********************************************
+ * main:
+ *     Main function for editor.bin.
+ */
+
 int main ( int argc, char *argv[] ){
 
     int client_fd = -1;
@@ -639,8 +644,7 @@ int main ( int argc, char *argv[] ){
     unsigned long h = gws_get_system_metrics(2);
 
 
-
-    debug_print ("---------------------------\n");    
+    debug_print ("------------------------\n"); 
     debug_print ("editor: Initializing ...\n");
 
 
@@ -649,7 +653,9 @@ int main ( int argc, char *argv[] ){
     //
 
     // #debug
-    printf ("editor: Creating socket\n");
+    gws_debug_print ("editor: Creating socket\n");
+    //printf          ("editor: Creating socket\n");
+
 
     // cria o soquete.
     // AF_GRAMADO
@@ -670,19 +676,19 @@ int main ( int argc, char *argv[] ){
     //então o servidor escreverá em nosso arquivo.
 
     while (1){
-    
-        // #debug
-        //printf ("gnst: Connecting to the address 'ws' ...\n");      
-        printf ("editor: Connecting to ws via inet  ...\n");   
 
-        if (connect (client_fd, (void *) &addr_in, sizeof(addr_in)) < 0){ 
+        // #debug
+        gws_debug_print ("editor: Connecting to ws via inet ...\n");
+        //printf          ("editor: Connecting to ws via inet ...\n");
+
+        if (connect (client_fd, (void *) &addr_in, sizeof(addr_in)) < 0)
+        { 
             gws_debug_print("editor: Connection Failed \n");
             printf         ("editor: Connection Failed \n"); 
         
         }else{ break; }; 
     };
 
- 
     //
     // messages
     //
@@ -698,8 +704,6 @@ int main ( int argc, char *argv[] ){
 
     _hello(client_fd);
 
-
-   
 
     /*
     // libgws
@@ -717,7 +721,7 @@ int main ( int argc, char *argv[] ){
     //#todo: salvar em global
     //por enquanto aqui
     int main_window=0;
-    int addressbar_window=0;    
+    int addressbar_window=0; 
     int client_window=0;
     int button=0;
 
@@ -847,9 +851,8 @@ int main ( int argc, char *argv[] ){
     */
 
 
-
 // exit
-
+    //close (client_fd);
     debug_print ("editor: bye\n"); 
     printf      ("editor: bye\n");
 
