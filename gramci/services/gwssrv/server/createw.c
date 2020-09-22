@@ -1402,8 +1402,8 @@ void *createwCreateWindow2 (
             
             //cima
             rectBackbufferDrawRectangle ( 
-                window->left, window->top,
-                window->width, 1, 
+                window->left+1, window->top,
+                window->width-2, 1, 
                 COLOR_BLACK, 1 );
             rectBackbufferDrawRectangle ( 
                 window->left+1, window->top+1,
@@ -1416,8 +1416,8 @@ void *createwCreateWindow2 (
                
             //esq
             rectBackbufferDrawRectangle ( 
-                window->left, window->top, 
-                1, window->height,
+                window->left, window->top+1, 
+                1, window->height-2,
                 COLOR_BLACK, 1 );
             rectBackbufferDrawRectangle ( 
                 window->left+1, window->top+1, 
@@ -1444,8 +1444,8 @@ void *createwCreateWindow2 (
                  1, window->height-2, 
                  buttonBorderColor2, 1 );
             rectBackbufferDrawRectangle ( 
-                 ((window->left) + (window->width) -1), window->top, 
-                 1, window->height, 
+                 ((window->left) + (window->width) -1), window->top+1, 
+                 1, window->height-2, 
                  COLOR_BLACK, 1 );
 
             //baixo
@@ -1458,8 +1458,8 @@ void *createwCreateWindow2 (
                  window->width-2, 1, 
                  buttonBorderColor2, 1 );
             rectBackbufferDrawRectangle ( 
-                 window->left, ( (window->top) + (window->height) -1 ),  
-                 window->width, 1, 
+                 window->left+1, ( (window->top) + (window->height) -1 ),  
+                 window->width-2, 1, 
                  COLOR_BLACK, 1 );
 
             
