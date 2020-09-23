@@ -1,9 +1,9 @@
 # License: BSD License
-VERSION = 1
-PATCHLEVEL = 0
-SUBLEVEL = 116
-EXTRAVERSION = 
-NAME = Gramado 1.0
+VERSION_MAJOR = 1
+VERSION_MINOR = 0
+VERSION_BUILD = 116
+PRODUCT_NAME  = Gramado Operating System
+# See: config/version.h
 
 # Documentation.
 # See: docs/
@@ -15,24 +15,21 @@ _all: all
 
 	@echo "That's all!"
 
-
-KERNELVERSION = $(VERSION)$(if $(PATCHLEVEL),.$(PATCHLEVEL)$(if $(SUBLEVEL),.$(SUBLEVEL)))$(EXTRAVERSION)
+KERNELVERSION = $(VERSION_MAJOR)$(if $(VERSION_MINOR),.$(VERSION_MINOR)$(if $(VERSION_BUILD),.$(VERSION_BUILD)))
 
 export KBUILD_IMAGE ?= KERNEL.BIN 
-
 
 srctree := .
 objtree := .
 src := $(srctree)
 obj := $(objtree)
  
- 
 # Make variables (CC, etc...)
 AS      = as
 LD      = ld
 CC      = gcc
 AR      = ar
-MAKE	= make
+MAKE    = make
 NASM    = nasm
 OBJCOPY = objcopy
 OBJDUMP = objdump
@@ -89,9 +86,7 @@ clean-system-files
 	#Giving permitions to run ./run hahaha
 	chmod 755 ./run
 
-#	@echo "Gramado $(VERSION) $(PATCHLEVEL) $(SUBLEVEL) $(EXTRAVERSION) $(NAME) "
-#	@echo "Arch x86"
-	@echo "Gramado $(KERNELVERSION) ($(NAME)) "
+	@echo "$(PRODUCT_NAME) $(KERNELVERSION)"
 #	@echo "$(ARCH)"
 
 

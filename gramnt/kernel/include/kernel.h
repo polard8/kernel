@@ -35,8 +35,10 @@ extern void do_executa_new_task (void);
 
 
 // config
-#include "config/gramado.h"    // Product. 
+#include "config/version.h"    // Product. 
+#include "config/u.h"          // User
 #include "config/config.h"     // Compiling.
+
 
 // gramado
 #include "gramado/limits.h"

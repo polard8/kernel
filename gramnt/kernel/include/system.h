@@ -1,5 +1,5 @@
 /*
- * File: sm/system.h (System Management)
+ * File: system.h (System Management)
  *
  * Descrição:
  *     Header para rotinas de gerenciamento do sistema dentro do módulo 
@@ -242,11 +242,11 @@ int gLogoffPID;
 //
 //    ****    SYSTEM STATUS INDEX   **** 
 //
-//*Importante.
-#define SS_NULL 0  
-#define SS_LOGGED 1      //estamos logados.?
-#define SS_USING_GUI  2  // estamos no modo gráfico?
-#define SS_KERNELSTATUS 3 //
+
+#define SS_NULL          0  
+#define SS_LOGGED        1  //estamos logados.?
+#define SS_USING_GUI     2  // estamos no modo gráfico?
+#define SS_KERNELSTATUS  3  //
 //Continua ...
 //@todo.
 
@@ -260,6 +260,7 @@ int gLogoffPID;
 // Globals.
 // 
 
+// ??
 typedef enum {
     systemsizeNull,
     systemsize1,     //#  1 O sistema tem pelo menos 32 MB
@@ -284,12 +285,8 @@ int systemSize;
 //Flag para habilitar as opções para o desenvolvedor.
 int gDeveloperOptions;
 
-//Sobre a destinação do sistema operacional.
-// 1 - Developer Edition.
-// 2 - Workstation Edition.
-// 3 - Server Edition.
-// 4 - IOT Edition.
-//...
+
+// ??
 int gSystemEdition;
 
 
@@ -304,34 +301,13 @@ int gSystemStatus; //?? Usado pelo construtor.
 //O endereço e a rotina são de 32bit.
 unsigned long shutdown_address;
 
-static char *default_user_name = "root";
-//static char *default_user_name = "default-[USER]";
-//...
 
+static char *default_user_name = DEFAULT_USERNAME;
 
-
-//...
 
 
 /*
- * Test.
-typedef struct active_environment_d active_environment_t;
-struct active_environment_d
-{
-	unsigned long disk_number;
-	unsigned long volume_number;
-    unsigned long directory_number;
-
-    const char* disk_string;
-    const char* volume_string;
-    const char* directory_string;	
-} 
-struct active_environment_d *CurrentEnvironment;
-*/ 
-
-
-/*
- * VERSION:
+ * version_d:
  *     Estrutura para versão do sistema.    
  *     O que determina a versão do sistema é a versão do Kernel.
  *
@@ -341,40 +317,35 @@ struct active_environment_d *CurrentEnvironment;
  *     na estrutura versioninfo.
  *
  * Obs: Talvez usar um header. version.h.
- * #bugbug já tem version_t tefinida em algum lugar.
+ * #bugbug: 
+ * Já tem version_t tefinida em algum lugar.
  *         Aparentemente não deu mais problema. 
  */
-typedef struct version_d version_t;
+
 struct version_d
 {
     unsigned long Major;
-    unsigned long Minor;	
-	unsigned long Revision;
+    unsigned long Minor;
+    unsigned long Build;
 };
 struct version_d *Version;
 //...
 
 
 /*
- * Version Info:
+ * version_info_d:
  *     Dados complemetares sobre a versão.
  */
-typedef struct version_info_d version_info_t;
+
 struct version_info_d
 {
-    struct version_d *version;    	
-	char *string;             //String para o nome da versão "VERSION..."
-	//char *string2;
-	char *copyright_string;   //"ex: (c) Copyright Nora Code"
-	//...
-	
-	//@todo:
-	//Data,
-	//
-	
-	//...
-	
+    struct version_d *version;
+
+    char *string;             //String para o nome da versão "VERSION..."
+    char *copyright_string;   //"ex: (c) Copyright Nora Code"
+    // ...
 };
+
 struct version_info_d *VersionInfo;
 
  
@@ -390,44 +361,39 @@ struct version_info_d *VersionInfo;
 
 struct system_d
 {
-	int used;
-	int magic;
-	
-	//version
-	struct version_d *version;
-	struct version_info_d *version_info;
-	
-	
-	//
-	// ## storage ##
-	//
-	
-	int disk;
-	int volume;
-	
-    //
+    int used;
+    int magic;
+
+    // Version
+    struct version_d *version;
+    struct version_info_d *version_info;
+
+
+    // storage 
+    int disk;
+    int volume;
+
     // System  info.
-    //	
-	int ProcessorArchitecture;
-	int NumberOfProcessors;
-	int PageSize;
-	
-	struct devices_d *deviceList;	
-	
-	
-	//...
+    int ProcessorArchitecture;
+    int NumberOfProcessors;
+    int PageSize;
+
+
+    struct devices_d *deviceList;
+
+    //...
 };
+
 struct system_d *System;
 
 
 
 //
-// Prototypes.
+// == Prototypes ===============================================
 //
 
 
-
-void servicesPutChar ( int c );
+void servicesPutChar(int c);
 
 unsigned long serviceCreateWindow ( char * message_buffer );
  
@@ -462,11 +428,12 @@ void *systemNull (void);
  *     Linkando um driver ao sistema operacional
  */
  
-void *systemLinkDriver ( unsigned long arg1, 
-                         unsigned long arg2, 
-						 unsigned long arg3 );
-						 
-						 
+void *systemLinkDriver ( 
+    unsigned long arg1, 
+    unsigned long arg2, 
+    unsigned long arg3 );
+ 
+ 
 /*
  **********************************************************
  * systemShowDevicesInfo:
@@ -526,13 +493,12 @@ SystemMenuProcedure (
     unsigned long long2 );
    
 
-void systemReboot (void);	    //systemReboot: Reboot stuff.	
+void systemReboot (void);    //systemReboot: Reboot stuff.
 
 void systemShutdown (void);      //systemShutdown: Shut down stuff.
 
 //Chamar a função de 32 bit herdado do BM.
 void systemShutdownViaAPM (void); 
-
 
 
 //Pega informações de medida de elementos do sistema.
@@ -551,6 +517,8 @@ int systemInit (void);      // Inicializador.
 //void systemSystem (void);   // Construtor.
 
 int init_executive (void);
+
+
 //
 // End
 //

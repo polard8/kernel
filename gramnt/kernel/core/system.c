@@ -289,25 +289,30 @@ void systemShowDevicesInfo (void)
  *     Setup version info.     
  */
 
+// See:
+// config/version.h
+// config/u.h
+// system.h
+
 void systemSetupVersion (void){
 
-    // Version.
     Version = (void *) kmalloc( sizeof(struct version_d) );
 
-        //#todo:
-        //Isso deve ser considerado um erro fatal,
-        //pois existem aplicações que dependem da versão do sistema 
-        //para funcionarem corretamente.. 		
+    //#todo:
+    //Isso deve ser considerado um erro fatal,
+    //pois existem aplicações que dependem da versão do sistema 
+    //para funcionarem corretamente.. 
 
     if ( (void *) Version == NULL ){
         panic("systemSetupVersion: Version");
 
     } else {
 
-        Version->Major = SYSTEM_VERSION_MAJOR;
-        Version->Minor = SYSTEM_VERSION_MINOR;
-        Version->Revision = SYSTEM_VERSION_REVISION;
+        Version->Major = VERSION_MAJOR;
+        Version->Minor = VERSION_MINOR;
+        Version->Build = VERSION_BUILD;
     };
+
 
     // VersionInfo.
     VersionInfo = (void *) kmalloc ( sizeof(struct version_info_d) );
@@ -318,7 +323,7 @@ void systemSetupVersion (void){
         //para funcionarem corretamente.. 
 
     if ( (void *) VersionInfo == NULL ){
-        panic ("sm-system-systemSetupVersion: VersionInfo");
+        panic ("systemSetupVersion: VersionInfo");
 
     }else{
 
