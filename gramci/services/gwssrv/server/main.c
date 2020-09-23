@@ -1482,7 +1482,7 @@ void InitGraphics(void){
     //gwssrv_load_and_decode_small_icon ("file.bmp", 50,4);
     //gwssrv_load_and_decode_small_icon ("folder.bmp",100,4);
     //gwssrv_load_and_decode_small_icon ("terminal.bmp",150,4);
-    gwssrv_load_and_decode_small_icon ("app.bmp", 4, 100);
+    //gwssrv_load_and_decode_small_icon ("app.bmp", 4, 100);
     //gwssrv_load_and_decode_small_icon ("cursor.bmp",250,4);
     //gwssrv_load_and_decode_small_icon ("mouse.bmp",300,4);
     //gwssrv_load_and_decode_small_icon ("folder.bmp",350,4);

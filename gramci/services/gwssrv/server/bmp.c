@@ -1098,6 +1098,7 @@ gwssrv_load_and_decode_small_icon (
 
     // #bugbug
     // We need to get the size of the file.
+    // 128 KB.
     bmp_buffer = (char *) malloc(1024*128);
     //bmp_buffer = (char *) malloc(1024*512);
     
@@ -1116,8 +1117,14 @@ gwssrv_load_and_decode_small_icon (
     //fp = fopen("folder.bmp","r+");    
     fp = fopen(filename,"r+"); 
 
-    //nreads = read( fileno(fp), bmp_buffer, (1024*512) );
+    // #bugbug
+    // Se o arquivo for maior que 128KB, apenas 
+    // leremos a primeira parte do arquivo.
+    // Essa rotina so funcionaria com arquivos de tamanho controlado.
+
+
     nreads = read ( fileno(fp), bmp_buffer, (1024*128) );
+    //nreads = read( fileno(fp), bmp_buffer, (1024*512) );
 
     if (nreads <= 0){
         printf("read fail\n"); 
@@ -1125,8 +1132,12 @@ gwssrv_load_and_decode_small_icon (
     }
 
 
-   //#bugbug
-   //So estava lendo 4 bytes por causa do size of usado erradamente logo acima..
+   // #bugbug: 
+   // Se o close tentar salvar o arquivos isso vai dar problema.
+   // close(fd);
+   
+   // #bugbug
+   // So estava lendo 4 bytes por causa do size of usado erradamente logo acima..
 
     printf ("nreads={%d}\n",nreads);
 
@@ -1289,6 +1300,10 @@ gwssrv_decode_small_icon (
 
 void __test_load_bmp(void)
 {
+    FILE *fp;
+    int i=0;
+
+
     //
     // =======================================
     //
@@ -1316,8 +1331,6 @@ void __test_load_bmp(void)
   
     //stdio_fntos ( (char *) file_name ); //n�o precisa
     
-    FILE *fp;
-    
     fp = fopen("folder.bmp","r+");    
     //fp = fopen("dennis2.bmp","r+");    
 
@@ -1337,8 +1350,6 @@ void __test_load_bmp(void)
 
     printf ("nreads={%d}\n",nreads);
 
-
-    int i=0;
 
     //#test
     if ( bmp_buffer[0] != 'B' || bmp_buffer[1] != 'M' )
@@ -1371,9 +1382,6 @@ void __test_load_bmp(void)
      gws_show_backbuffer();
      while(1);
 }
-
-
-
 
 
 //

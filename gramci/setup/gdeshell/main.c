@@ -2292,7 +2292,7 @@ do_compare:
         goto exit_cmp;
     }
 
-    
+
 	// mbr
 	// ?? Talvez mostrar informa��es sobre o mbr ou realizar testes.
     if ( gramado_strncmp( prompt, "mbr", 3 ) == 0 ){
@@ -6806,6 +6806,7 @@ void network_test_buffer(void)
     debug_print("network_test_buffer: Done\n");
     printf     ("network_test_buffer: Done\n");
 }
+
 
 void network_initialize(void)
 {
