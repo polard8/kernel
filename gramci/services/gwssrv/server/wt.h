@@ -19,9 +19,6 @@
 #define WT_BUTTON     8   
 #define WT_STATUSBAR  9
 #define WT_ICON       10
-//... 
 
-
-
-
+//#define WT_MAX (WT_ICON+1)
 

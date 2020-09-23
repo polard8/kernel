@@ -763,12 +763,13 @@ int main ( int argc, char *argv[] ){
         
      
      gws_draw_text (
-        (int) client_fd,             // fd,
-        (int) addressbar_window,     // window id,
-        (unsigned long) 8,           // left,
-        (unsigned long) 32 + (40/3),      //8,    // top,
+        (int) client_fd,            // fd,
+        (int) addressbar_window,    // window id,
+        (unsigned long) 8,          // left,
+        (unsigned long) 8,          // top,
         (unsigned long) COLOR_BLACK,
         "text.txt");
+
 
     //
     // [Save F?] button

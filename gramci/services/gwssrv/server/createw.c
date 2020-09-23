@@ -30,98 +30,6 @@
 #include <gws.h>
 
 
-/*
- *****************************
- * createwDrawTitleBar:
- * 
- * 
- */
-
-// #importante
-// Criaremos a barra de títulos depois que a janela estiver pronta.
-// Desenhar a barra de titulos faz parte da criação do frame.
-  
-int 
-createwDrawTitleBar ( 
-    struct gws_window_d *window,
-    unsigned long x,
-    unsigned long y,
-    unsigned long width,
-    unsigned long height,
-    int style,
-    char *string )         
-{
-
-    unsigned long __tmp_color;
-
-    // Podemos desenhar a string e os botões de controle.
-    // Isso poderá ser chamado pelo wm.
-
-    //todo: checar validades.
-
-    // barra de títulos;   
-    //todo: usar o esquema de cores.      
-
-    // mais escuro
-    if (window->focus == 1)
-    { __tmp_color = xCOLOR_GRAY1; }  
-
-
-    // escolhida pelo aplicativo;
-    if (window->focus == 0)
-    { __tmp_color = xCOLOR_GRAY5; }    
-    //{ __tmp_color = window->bg_color; }     
- 
-    // Retângulo da barra de títulos.
-    // #todo: Posicionar direito. 
-    // Queremos que as bordas fiquem evidentes.
-    rectBackbufferDrawRectangle ( 
-        (window->left +3), (window->top +3), 
-        (window->width -5), 30, 
-        __tmp_color, 1 ); 
-
-
-	// String
-    dtextDrawString ( 
-        (window->left +16 +8 +8), 
-        (window->top +(32/3) ), 
-        COLOR_TERMINALTEXT2, 
-        window->name );  
-
-    // #test:
-    // Draw button.
-    // #todo: registra isso na estrutura da janela.
-    // #bugbug: Tem que pintar usando posicionamento relativo. 
-    // #todo: mudar a função gws_draw_button e incluir o argumento
-    // ponteiro de estrutura de janela.
-    
-    //gws_draw_button ("X", 1,1,1, 
-    //    window->left + window->width -32, window->top +4, 
-    //    28, 28, 
-    //    xCOLOR_GRAY3 );//GWS_COLOR_BUTTONFACE3 );
-    
-    /*
-    struct gws_window_d *__mybutton;
-
-    __mybutton = (struct gws_window_d *) createwCreateWindow ( WT_BUTTON, 
-                                              1, 1, "x",  
-                                              window->width -32, +4, 
-                                              28, 28,   
-                                              window, 0, 
-                                              COLOR_PINK, xCOLOR_GRAY3 ); 
-
-    if ( (void *) __mybutton == NULL ){
-       gwssrv_debug_print ("createwDrawTitleBar: __mybutton fail\n");
-       //return -1;
-    }
-    */
- 
-
-    return 0;
-}
-
-
-
 
 /*
  ********************************
@@ -262,13 +170,14 @@ createwDrawFrame (
         // We're gonna have a wm inside the window server.
         // The title bar will be very simple.
         // We're gonna have a client area.
-        
+        window->titlebar_height = 32;
+
         // Title bar
         TitleBar = (void *) createwCreateWindow2 ( 
                                     WT_SIMPLE, 
                                     1, 1, "TITLE", 
                                     3, 3, 
-                                    window->width-4, 32, 
+                                    window->width-4, window->titlebar_height, 
                                     (struct gws_window_d *) window, 
                                     0, COLOR_DARKBLUE, COLOR_DARKBLUE );  
 
@@ -276,6 +185,7 @@ createwDrawFrame (
             gwssrv_debug_print ("createwCreateWindow: TitleBar fail \n");
     
         TitleBar->type = WT_SIMPLE;
+        window->titlebar = TitleBar;
 
         rectBackbufferDrawRectangle ( 
             TitleBar->left, ( (TitleBar->top) + (TitleBar->height) -1 ),  
@@ -1652,10 +1562,23 @@ draw_frame:
             1 );  //style
         
     }
-    
+
+
+//draw_menubar:
+// ...
+
+//draw_toolbar:
+// ...
+
+//draw_h_scrollbar:
+// ...
+
+//draw_v_scrollbar:
+// ...
+
+//done:
     return (void *) __w;   
 }
-
 
 
 //

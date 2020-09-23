@@ -417,8 +417,6 @@ struct gws_window_d
     unsigned long type;  //tipo ... (editbox, normal, ...)  style???
 
 
-
-
 	// Características dessa janela..
 
 
@@ -459,6 +457,94 @@ struct gws_window_d
 // 
 //==================================================
 
+
+    //
+    // == app window stack ================================
+    //
+
+
+    int backgroundUsed;
+
+
+    int shadowUsed;
+
+
+    // title and border.
+    struct gws_window_d *titlebar;
+    struct gws_window_d *minimize;
+    struct gws_window_d *maximize;
+    struct gws_window_d *close;
+    int isMinimize;
+    int isMaximize;
+    int isClose;
+    unsigned long titlebar_height;
+    int titlebarUsed;
+
+
+    //border.
+    unsigned long border_size;
+    int borderUsed;
+
+
+    // menubar    
+    struct gws_window_d *menubar;
+    unsigned long menubar_height;
+    int menubarUsed;     
+
+
+    // toolbar
+    struct gws_window_d *toolbar;
+    unsigned long toolbar_height;
+    int toolbarUsed;
+ 
+ 
+    // client window
+    struct gws_window_d *client_window; 
+    struct gws_rect_d *rcClient;     
+    unsigned long clientrect_bg_color; //cor do retângulo da área do cliente.
+    unsigned long clientwindow_height;
+    int clientAreaUsed;
+
+
+    // vertical scrollbar
+    // The wm will call the window server to create this 
+    // kind of control.
+    struct gws_window_d *scrollbar;
+    struct gws_window_d *scrollbar_button1;
+    struct gws_window_d *scrollbar_button2;
+    struct gws_window_d *scrollbar_button3;
+    int isScrollBarButton1;
+    int isScrollBarButton2;
+    int isScrollBarButton3;
+    int minimizebuttonUsed;
+    int maximizebuttonUsed;
+    int closebuttonUsed;
+    unsigned long scrollbar_height;
+    int scrollbarUsed;
+
+
+    // horizontal scrollbar
+    // ...
+
+    // status bar
+    struct window_d *statusbar;
+    unsigned long statusbar_height;
+    int statusbarUsed;    
+
+// ======================================================
+
+    // Flag par indicar se a janela é um item de menu ou um botão.
+    int isMenu;   
+    int isMenuItem;
+    int isControl;  // Window control ...
+    int isButton;  //#importante: Indica que a janela é um botão.
+    int isEditBox; //#importante: Indica que a janela é um editbox.
+    int isCheckBox;
+    int isIcon;
+    // ...
+    
+// ======================================================
+
     // ??
     // Um alerta de que exite uma mensagem para essa janela.
     int msgAlert;  
@@ -492,7 +578,6 @@ struct gws_window_d
     unsigned long long2; 
 
     int newmessageFlag;
-
 
 
 	//
@@ -534,18 +619,6 @@ struct gws_window_d
 // 
 //==================================================
 
-	// Client window support.
-    
-    // É a janela propriamente dita, 
-	// excluindo a moldura e a barra de rolagem.
-	// Tudo o que há dentro da janela menos o frame.
-	// É a parte que é exibida quando a janela está em full screen.
-    
-    struct gws_window_d *client_window; 
-    struct gws_rect_d *rcClient;     
-
-	//cor do retângulo da área do cliente.
-    unsigned long clientrect_bg_color;    
 
 
 
@@ -560,27 +633,7 @@ struct gws_window_d
 // 
 //==================================================	
 
-	// Bars support.
-	// Cada tipo de janela tem seus itens específicos.
-	// Esses são os status dos ítens. Se eles estão presentes ou não.
 
-    // #bugbug
-    // Remember: Now we will have a ws and a wm.
-    // The wm will create the controls.
-
-    int backgroundUsed;
-    int shadowUsed;
-    int titlebarUsed;
-    int menubarUsed; 
-    int toolbarUsed;
-    int clientAreaUsed;
-    int statusbarUsed;
-    int scrollbarUsed;
-    int minimizebuttonUsed;
-    int maximizebuttonUsed;
-    int closebuttonUsed;
-    int borderUsed;
-    //...
     
 // 
 //==================================================	
@@ -611,12 +664,6 @@ struct gws_window_d
 	//struct desktop_d *desktop;   //suspenso.
 
 // 
-//==================================================
-
-
-    // Navegation.
-    struct gws_window_d *prev; 
-    struct gws_window_d *next; 
 
 
 	// If locked we can't change a simple thing. 
@@ -638,23 +685,8 @@ struct gws_window_d
 
 // 
 //==================================================
-
-
-    // scroll bar
-    // The wm will call the window server to create this 
-    // kind of control.
-    struct gws_window_d *scrollbar;
-    struct gws_window_d *scrollbar_button1;
-    struct gws_window_d *scrollbar_button2;
-    struct gws_window_d *scrollbar_button3;
-
-    int isScrollBarButton1;
-    int isScrollBarButton2;
-    int isScrollBarButton3;
  
 
-    // status bar
-    struct window_d *statusbar;
 
 
 	// Buffer para mensagens pequenas.
@@ -820,13 +852,6 @@ struct gws_window_d
     // void *buffer;        
 
 
-    //
-    // Client area!
-    //
-
-	// ?? Se mudar para Rect pode deletar alguns elementos acima
-	// como x, y, width ...
-    struct gws_rect_d *rcWindow;
 
     // rects.
 
@@ -877,24 +902,13 @@ struct gws_window_d
 	// Menus.
 	//
 
-
 	//?? Qual janela o menu usará.
-    struct window_d *menu_window;   //Menu Window.
+    struct gws_window_d *menu_window;   //Menu Window.
 
     struct menu_d *sysMenu;         //menu de sistema.(control menu)
     struct menu_d *barMenu;         //menu da barra de menu.
     struct menu_d *defaultMenu;     //menu da janela (*importante)
     //...
-	
-   // Flag par indicar se a janela é um item de menu ou um botão.
-    int isMenu;   
-    int isMenuItem;
-    
-    int isControl;  // Window control ...
-    int isButton;  //#importante: Indica que a janela é um botão.
-    int isEditBox; //#importante: Indica que a janela é um editbox.
-    int isCheckBox;
-    int isIcon;
 
     //
     // button
@@ -909,18 +923,6 @@ struct gws_window_d
     int selected;         //seleção  de item de menu.
     const char *text;     // 
 
-
-    // Controls.
-    // ps: The wm will create the controls.
-    // It will not be used anymore.
-    struct gws_window_d *minimize;
-    struct gws_window_d *maximize;
-    struct gws_window_d *close;
-
-
-    int isMinimize;
-    int isMaximize;
-    int isClose;
 
     //
     // Actions
@@ -969,11 +971,16 @@ struct gws_window_d
     // ??
     // What ?
     int handle_status;
+
+//==================================================
+    // Navigation.
+    struct gws_window_d *prev; 
+    struct gws_window_d *next; 
 };
 
 struct gws_window_d *ROOT;
-//struct gws_window_d *testxxxxxxx;   
 //...
+
 
 // #todo
 // We need to define the root window.
@@ -1054,22 +1061,7 @@ rectBackbufferDrawRectangle (
     int fill );
 
 
-
 int gws_show_window_rect (struct gws_window_d *window);
-
-// #importante
-// >>> Criaremos a barra de títulos depois que a janela estiver pronta.
-            
-int 
-createwDrawTitleBar ( 
-    struct gws_window_d *window,
-    unsigned long x,
-    unsigned long y,
-    unsigned long width,
-    unsigned long height,
-    int style,
-    char *string );
-
 
 
 // In: style = estilo do frame.
