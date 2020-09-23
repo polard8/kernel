@@ -62,20 +62,19 @@ int __current_runlevel;
 
 
 //=================================
+// See: 
+// config/version.h in the kernel.
+//
+// #todo:
+// Temos que pegar isso com o kernel. 
+//
 
-// Enterprise machines to access the business server.
-#define PT_GRAMADO_WORKSTATION    1000
+// 1000 - gramado server.
+// 2000 - gramado workstation
+// 3000 - gramado desktop
+// 4000 - gramado iot
 
-// The business server.
-#define PT_GRAMADO_SERVER         2000
-
-// Regular desktop machine.
-#define PT_GRAMADO_DESKTOP        3000 
-
-// iot machine
-#define PT_GRAMADO_IOT            4000 
-
-int __product_type;
+unsigned long __product_type;
 
 
 //
@@ -147,8 +146,10 @@ initialize_product_type(void)
     //
     // This is the only product we have for now!
     //
-    
-    __product_type = PT_GRAMADO_DESKTOP;
+
+   // #todo:
+   // Temos que pegar isso com o kernel.
+   //__product_type = ??;  
 
     // #todo:
     // Call the kernel to setup the product identification.

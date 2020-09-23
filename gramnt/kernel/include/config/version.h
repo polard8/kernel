@@ -20,7 +20,27 @@
 //
 
 
-#define PRODUCT_NAME "Gramado Operating System"
+#define PRODUCT_NAME    "Gramado Operating System"
+
+
+//
+//  == Product type ==========================================
+//
+
+// The business server.
+#define PT_GRAMADO_SERVER         1000
+
+// Enterprise machines to access the business server.
+#define PT_GRAMADO_WORKSTATION    2000
+
+// Regular desktop machine.
+#define PT_GRAMADO_DESKTOP        3000 
+
+// iot machine
+#define PT_GRAMADO_IOT            4000 
+
+// static
+#define PRODUCT_TYPE    PT_GRAMADO_DESKTOP
 
 
 //
