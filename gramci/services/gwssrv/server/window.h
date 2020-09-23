@@ -291,28 +291,26 @@ struct gws_rect_d
 
     //estilo de design
     int style;
-	
-	//int validated;
-	//int focus;
 
-    unsigned long x;
-    unsigned long y;
-    unsigned long cx;
-    unsigned long cy;
+    //int validated;
+    //int dirty;
+    //int focus;
 
+    // ??
+    unsigned long left;
+    unsigned long top;
+    unsigned long right;
+    unsigned long bottom;
 
     unsigned long width;
     unsigned long height;
 
-    unsigned long left;
-    unsigned long top;	
-    unsigned long right;
-    unsigned long bottom;
-
     unsigned long bg_color; //color_bg;
+
 
     //Essa é  ajanela à qual o retângulo pertence.
     struct gws_window_d *window;   //mudar. #todo
+
 
     struct gws_rect_d *next;
 };
@@ -1060,7 +1058,40 @@ rectBackbufferDrawRectangle (
     unsigned long color,
     int fill );
 
+int
+set_rect ( 
+    struct gws_rect_d *rect, 
+    unsigned long left, 
+    unsigned long top,
+    unsigned long width,
+    unsigned long height );
 
+void 
+inflate_rect ( 
+    struct gws_rect_d *rect, 
+    unsigned long cx, 
+    unsigned long cy );
+
+void 
+copy_inflate_rect ( 
+    struct gws_rect_d *rectDest, 
+    struct gws_rect_d *rectSrc, 
+    unsigned long cx, 
+    unsigned long cy );
+
+void 
+offset_rect ( 
+    struct gws_rect_d *rect, 
+    unsigned long cx, 
+    unsigned long cy );
+    
+void 
+copy_offset_rect ( 
+    struct gws_rect_d *rectDest, 
+    struct gws_rect_d *rectSrc, 
+    unsigned long cx, 
+    unsigned long cy ); 
+    
 int gws_show_window_rect (struct gws_window_d *window);
 
 

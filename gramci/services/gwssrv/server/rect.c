@@ -11,15 +11,133 @@
 #include <gws.h>
 
 
+int
+set_rect ( 
+    struct gws_rect_d *rect, 
+    unsigned long left, 
+    unsigned long top,
+    unsigned long width,
+    unsigned long height )
+{
+    if ( (void*) rect == NULL )
+        return FALSE;
+    
+    rect->left   = left;
+    rect->top    = top;
+    rect->width  = width;
+    rect->height = height;
+
+    return TRUE;
+}
+
+
+// See: window.h
+void 
+inflate_rect ( 
+    struct gws_rect_d *rect, 
+    unsigned long cx, 
+    unsigned long cy )
+{
+    if ( (void*) rect == NULL )
+        return;
+    
+    rect->left   -= cx;
+    rect->top    -= cy;
+
+    rect->right  += cx;
+    rect->bottom += cy;
+
+    rect->width  = (rect->right  - rect->left);
+    rect->height = (rect->bottom - rect->top);
+}
+
+
+void 
+copy_inflate_rect ( 
+    struct gws_rect_d *rectDest, 
+    struct gws_rect_d *rectSrc, 
+    unsigned long cx, 
+    unsigned long cy )
+{
+    if ( (void*) rectDest == NULL )
+        return;
+
+    if ( (void*) rectSrc == NULL )
+        return;
+    
+    rectDest = rectSrc->left   -= cx;
+    rectDest = rectSrc->top    -= cy;
+    
+    rectDest = rectSrc->right  += cx;
+    rectDest = rectSrc->bottom += cy;
+
+    rectDest->width  = (rectDest->right  - rectDest->left);
+    rectDest->height = (rectDest->bottom - rectDest->top);
+
+    rectSrc->width  = (rectSrc->right  - rectSrc->left);
+    rectSrc->height = (rectSrc->bottom - rectSrc->top);
+}
+
+
+void 
+offset_rect ( 
+    struct gws_rect_d *rect, 
+    unsigned long cx, 
+    unsigned long cy )
+{
+    if ( (void*) rect == NULL )
+        return;
+    
+    rect->left   += cx;
+    rect->top    += cy;
+    
+    rect->right  += cx;
+    rect->bottom += cy;
+
+    rect->width  = (rect->right  - rect->left);
+    rect->height = (rect->bottom - rect->top);
+}
+
+
+void 
+copy_offset_rect ( 
+    struct gws_rect_d *rectDest, 
+    struct gws_rect_d *rectSrc, 
+    unsigned long cx, 
+    unsigned long cy )
+{
+    if ( (void*) rectDest == NULL )
+        return;
+
+    if ( (void*) rectSrc == NULL )
+        return;
+    
+    rectDest = rectSrc->left   += cx;
+    rectDest = rectSrc->top    += cy;
+    
+    rectDest = rectSrc->right  += cx;
+    rectDest = rectSrc->bottom += cy;
+
+    rectSrc->width  = (rectSrc->right  - rectSrc->left);
+    rectSrc->height = (rectSrc->bottom - rectSrc->top);
+}
+
 
 
 int is_rect_empty( struct gws_rect_d *rect )
 {
     if ( (void*) rect == NULL )
         return -1;
-        
-    return (int) ((rect->left >= rect->right) || (rect->top >= rect->bottom));
+
+
+    if ((rect->left >= rect->right) || (rect->top >= rect->bottom))
+    {
+        return (int) TRUE;
+    }
+     
+    return FALSE;
 }
+
 
 
 void *rect_memcpy32 ( void *v_dst, const void *v_src, unsigned long c )
@@ -160,17 +278,13 @@ rectBackbufferDrawRectangle (
     
     unsigned long w_max = gws_get_device_width();
     unsigned long h_max = gws_get_device_height();
-   
-    //Dimensions.
-    rect.x = 0;  
-    rect.y = 0;  
 
-    //posicionamento
-    rect.left = x;    
+
+    rect.left = x;
     rect.top  = y;
-     
     rect.width  = width;  
     rect.height = height;  
+
 
     if ( rect.width > (w_max - rect.left) )
     {
