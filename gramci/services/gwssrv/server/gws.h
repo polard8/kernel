@@ -25,6 +25,8 @@
 #include "wt.h"
 
 
+#include "menu.h"
+
 // X-like
 #include "window.h"
 #include "screen.h"

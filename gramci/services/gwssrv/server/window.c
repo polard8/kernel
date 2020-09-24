@@ -1049,12 +1049,12 @@ int gws_show_window_rect (struct gws_window_d *window){
 
 
             
-            p = window->parent;
+            //p = window->parent;
             
             //#todo: delete
-            if ((void*)p==NULL)
-            {
-                gwssrv_debug_print("gws_show_window_rect: No parent");
+            //if ((void*)p==NULL)
+            //{
+            //    gwssrv_debug_print("gws_show_window_rect: No parent\n");
                 
                 gws_refresh_rectangle ( 
                     window->left, 
@@ -1063,22 +1063,22 @@ int gws_show_window_rect (struct gws_window_d *window){
                     window->height ); 
 
                 return 0;
-            }
+            //}
             
-            if ((void*)p!=NULL)
-            {
+            //if ((void*)p!=NULL)
+            //{
                 //gwssrv_debug_print("gws_show_window_rect: parent ok");
                 
-                gws_refresh_rectangle ( 
-                    window->left,
-                    window->top,
-                    window->width, 
-                    window->height ); 
+               // gws_refresh_rectangle ( 
+               //     window->left,
+               //     window->top,
+               //     window->width, 
+               //     window->height ); 
 
-                return 0;
-            }
+                //return 0;
+            //}
 
-            return 0;
+            //return 0;
         }
     };
 
@@ -1250,6 +1250,177 @@ void set_top_window (int id)
 {
     top_window = (int) id;
 }
+
+
+
+struct gwsssrv_menu_d *gwssrv_create_menu (
+    struct gws_window_d *parent,
+    int highlight,
+    int count,
+    unsigned long x,
+    unsigned long y,
+    unsigned long width,
+    unsigned long height,
+    unsigned long color )
+{
+
+    struct gwsssrv_menu_d *menu;
+    struct gws_window_d *window;
+
+
+    gwssrv_debug_print("gwssrv_create_menu:\n");
+
+    menu = (struct gwsssrv_menu_d *) malloc( sizeof(struct gwsssrv_menu_d) );
+
+    if ( (void *) menu == NULL ){
+        gwssrv_debug_print("gwssrv_create_menu: [FAIL] menu\n");
+        return (struct gwsssrv_menu_d *) 0;
+    }
+
+
+    // Deslocamento em relação a janela mãe.
+    menu->x = x;
+    menu->y = y;
+    menu->width  = width;
+    menu->height = height;
+    
+    menu->color=color;
+    menu->highlight = highlight;
+    menu->itens_count = count;
+
+
+    window = (struct gws_window_d *) createwCreateWindow ( WT_SIMPLE, 
+                                         1, 1, "menu-bg",  
+                                         menu->x, menu->y, menu->width, menu->height,   
+                                         (struct gws_window_d *) parent, 0, 
+                                         color, color );    
+
+    if ( (void *) window == NULL )
+    {
+        gwssrv_debug_print ("gwssrv: window fail\n");  
+        return NULL;
+    }
+
+
+    //primeiro salva.
+        
+    menu->window = window; 
+    menu->parent = parent;
+    
+    return (struct gwsssrv_menu_d *) menu;
+}
+
+
+
+struct gwsssrv_menu_item_d *gwssrv_create_menu_item (
+    char *label,
+    int id,
+    struct gwsssrv_menu_d *menu)
+{
+
+    struct gws_window_d *window; //menu item window
+    
+    struct gwsssrv_menu_item_d *item;
+    
+    
+    gwssrv_debug_print("gwssrv_create_menu_item:\n");    
+    
+    if ( (void *) menu == NULL ){
+        return (struct gwsssrv_menu_item_d *) 0;
+    }
+    
+    //create menu item.
+    item = (struct gwsssrv_menu_item_d *) malloc( sizeof(struct gwsssrv_menu_item_d) );
+
+    if ( (void *) item == NULL ){
+        return (struct gwsssrv_menu_item_d *) 0;
+    }
+
+    //provisório
+    if(id>5 || id>menu->itens_count)
+        return (struct gwsssrv_menu_item_d *) 0;
+
+
+    item->id = id;
+
+    item->width  = (menu->width -8);
+    item->height = (menu->height / menu->itens_count);
+    item->x = 4;
+    item->y = (item->height*id);
+    
+
+   if( menu->window != NULL )
+   {
+
+        window = (struct gws_window_d *) createwCreateWindow ( WT_BUTTON,//WT_SIMPLE, 
+                                             1, 1, (char *) label,  
+                                             item->x, item->y, item->width, item->height,   
+                                             menu->window, 0, 
+                                            COLOR_GRAY, COLOR_GRAY );    
+
+         item->window = window;
+    }
+
+
+    return (struct gwsssrv_menu_item_d *) item;
+}
+
+
+
+//test
+int create_main_menu(void){
+	
+    struct gwsssrv_menu_d *menu;
+
+
+    // #testing (NEW)
+    menu = gwssrv_create_menu (
+               (int) gui->screen,
+               (int) 0,   //highlight
+               (int) 4,   //count
+               (unsigned long) 8, 
+               (unsigned long) 8,
+               (unsigned long) 320,
+               (unsigned long) 280,
+               (unsigned long) COLOR_WHITE );
+
+
+
+    if ( (void*) menu != NULL )
+    {
+               //menu item 0
+               gwssrv_create_menu_item (
+                  "Test mouse F3",
+                  (int) 0,
+                  (struct gwsssrv_menu_d *) menu );
+ 
+               
+               //menu item 1
+               gwssrv_create_menu_item (
+                  "Editor F10",
+                  (int) 1,
+                  (struct gwsssrv_menu_d *) menu );
+
+               //menu item 2
+               gwssrv_create_menu_item (
+                  "Terminal F12",
+                  (int) 2,
+                  (struct gwsssrv_menu_d *) menu );
+
+               //menu item 3
+               gwssrv_create_menu_item (
+                  "Reboot F4",
+                  (int) 3,
+                  (struct gwsssrv_menu_d *) menu );
+              
+    }
+
+    
+    gws_show_window_rect(menu->window);
+        
+    return 0;
+}
+
 
 
 
