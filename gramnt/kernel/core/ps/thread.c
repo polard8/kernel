@@ -1,8 +1,6 @@
 /*
- * File: ps/action/thread.c
+ * File: ps/thread.c
  *
- * Descri��o:
- *     TM - Thread Manager (Parte fundamental do Kernel Base).
  *     Rotinas com threads. 
  *     Criar, deletar ...
  *
@@ -21,6 +19,10 @@
  *     2015 - Create by Fred Nora.
  *     2016 - Revision.
  */
+
+
+// #todo
+// We can use the psXXXXX prefix to export the methods.
 
 
 #include <kernel.h>

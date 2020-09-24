@@ -191,14 +191,10 @@ typedef enum {
 
 struct thread_d 
 {
-    
     // Object control.
-
     object_type_t  objectType;
     object_class_t objectClass;
-    
     struct object_d *object;
-
 
     int used;
     int magic;
@@ -350,24 +346,37 @@ struct thread_d
 
 
     //
-    // == Priority =====================================
+    // == Priorities ==================================================
+    //
+    // Priority levels.
+    // Used by processes and threads.
+    // Classes:
+    // 1 ~ 5 = variable.
+    // 6 ~ 9 = realtime.
+    // variable:
+    //     Can be changed on the fly.
+    // realtime:
+    //     Can't be changed on the fly.
+    // # ps:
+    // The base priority is never changed. It's used to classify
+    // the priority level.
+    // The priority can't be changed to a level below the base priority.
+    // The base priority is static and the current priority is dinamic.
     //
 
-    // Poderia ser base_priority e dinamic_priority.
-    unsigned long base_priority;    //Prioridade básica.
-    unsigned long priority;         //Prioridade dinâmica.
+    unsigned long base_priority;  // static 
+    unsigned long priority;       // dinamic
 
-	
-	/*
-	 * preempted:
-	 *     flag ~ Sinaliza que uma tarefa pode ou não sofrer preempção.
-     *     Uma tarefa de menor prioridade pode deixar o estado running 
-	 * para assumir o estado ready em favor de uma tarefa de maior prioridade
-	 * que assumirá o estado running.
-	 * @todo: isso pode ser int, bool ou char.
-	 */
+
+    // preempted:
+    // flag ~ Sinaliza que uma tarefa pode ou não sofrer preempção.
+    // Uma tarefa de menor prioridade pode deixar o estado running 
+    // para assumir o estado ready em favor de uma tarefa de maior prioridade
+    // que assumirá o estado running.
+    // todo: isso pode ser int, bool ou char.
 
     unsigned long preempted;
+
 
 	//
 	// ORDEM: 
@@ -698,8 +707,6 @@ struct thread_d *tmpConductor;  //Conductor2;
 struct thread_d *rootConductor;
 
 int conductorIndex;
-
-
 
 
 

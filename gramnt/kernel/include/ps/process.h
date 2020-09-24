@@ -112,26 +112,50 @@ struct process_d *xxxClonedProcess;
 #define USER_BASE_PID 100    
  
  
+//
+// == Priorities ==================================================
+//
+
 // Priority levels.
 // Used by processes and threads.
 
-#define PRIORITY_LOW4      1  //4
-#define PRIORITY_LOW3      2  //3
-#define PRIORITY_LOW2      3  //2
-#define PRIORITY_LOW1      4  //1 
-#define PRIORITY_NORMAL    5  //*0 (Normal).
-#define PRIORITY_HIGH1     6  //1
-#define PRIORITY_HIGH2     7  //2
-#define PRIORITY_HIGH3     8  //3
-#define PRIORITY_HIGH4     9  //4
+// Classes:
+// 1 ~ 5 = variable.
+// 6 ~ 9 = realtime.
+//
+// variable:
+//     Can be changed on the fly.
+// realtime:
+//     Can't be changed on the fly. (maior que o normal)
+//
+// # ps:
+// The base priority is never changed. It's used to classify
+// the priority level.
+// The priority can't be changed to a level below the base priority.
+//
 
-#define PRIORITY_LOW        PRIORITY_LOW1
-#define PRIORITY_MIN        PRIORITY_LOW4
-#define PRIORITY_HIGH       PRIORITY_HIGH1 
-#define PRIORITY_MAX        PRIORITY_HIGH4
+#define PRIORITY_LOW4      1  // 4
+#define PRIORITY_LOW3      2  // 3
+#define PRIORITY_LOW2      3  // 2
+#define PRIORITY_LOW1      4  // 1 
+#define PRIORITY_NORMAL    5  // 0 (Normal).
+#define PRIORITY_HIGH1     6  // 1
+#define PRIORITY_HIGH2     7  // 2
+#define PRIORITY_HIGH3     8  // 3
+#define PRIORITY_HIGH4     9  // 4
+
+// Aliases.
+
+#define PRIORITY_MIN       PRIORITY_LOW4
+#define PRIORITY_MAX       PRIORITY_HIGH4
+#define PRIORITY_LOW       PRIORITY_LOW1
+#define PRIORITY_HIGH      PRIORITY_HIGH1 
 
 
 
+//
+// == Multiplier =========================
+//
 
 // #todo: Criar uma vari�vel para esse multiplicador.
 // para fazermos testes;
@@ -623,13 +647,28 @@ struct process_d
 	//IOPL of the task. (ring).
     unsigned long iopl; 
 
-	// Priority.
-	// Um processo tem uma prioridade b�sica est�tica e tamb�m uma prioridade 
-	// atual din�mica, que pode ser incrementada ou decrementada. Se afastando 
-	// ou se aproximando da prioridade b�sica. Isso acontece no OpenVMS e no NT.
-	
-	unsigned long base_priority; //b�sica. 
-	unsigned long priority;      //din�mica.
+    //
+    // == Priorities ==================================================
+    //
+    // Priority levels.
+    // Used by processes and threads.
+    // Classes:
+    // 1 ~ 5 = variable.
+    // 6 ~ 9 = realtime.
+    // variable:
+    //     Can be changed on the fly.
+    // realtime:
+    //     Can't be changed on the fly.
+    // # ps:
+    // The base priority is never changed. It's used to classify
+    // the priority level.
+    // The priority can't be changed to a level below the base priority.
+    // The base priority is static and the current priority is dinamic.
+    //
+
+    unsigned long base_priority;  // static 
+    unsigned long priority;       // dinamic
+
 
 	//Que tipo de scheduler o processo utiliza. (rr, realtime ...).
 	//int scheduler_type;    

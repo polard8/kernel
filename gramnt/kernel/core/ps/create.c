@@ -14,20 +14,31 @@
  * createCreateInitThread:
  * 
  *     Criando init-thread manualmente.
- *     Essa � a thread do processo init. (init2.bin)
+ *     Essa eh a thread do processo init. (init.bin)
  */
+
+// It has the lowest priority.
+// ...
 
 void *createCreateInitThread (void){
 
-    char *ThreadName = "init-thread";    
+    char *ThreadName = "init-thread"; 
 
     // Stack pointer.
-    // calculando stack.
     void *__initStack;   
 
-    int r=0;
-    int q=0;  //msg queue.
+    int r=0;    // Wait reason.
+    int i=0;    // Message queue.
+    int q=0;    // Message queue.
 
+
+    // The init process.
+    if ( (void *) InitProcess == NULL ){
+            panic ("createCreateInitThread: InitProcess\n");
+    }
+
+    // ??
+    // e a validade da estrutura de processo? 
 
     // Struct.
 
@@ -47,16 +58,14 @@ void *createCreateInitThread (void){
             // ??
             // e a validade da estrutura de processo? 
 
-            //Indica � qual processo a thread pertence.
+            //Indica a qual processo a thread pertence.
             InitThread->process = (void *) InitProcess;
        
            // ...
        
         };
-       
-        //Continua...
+        // ...
     };
-
 
 	// @todo: 
 	// #bugbug: #importante
@@ -70,7 +79,7 @@ void *createCreateInitThread (void){
 	//InitThread->Heap = ?;
 	//InitThread->HeapSize = ?;
 	//InitThread->Stack = ?;
-	//InitThread->StackSize = ?;	
+	//InitThread->StackSize = ?;
 	
 	//Stack. @todo: A stack deve ser a que est� na TSS
 	//#BugBug.
@@ -91,10 +100,9 @@ void *createCreateInitThread (void){
 
 
 	// #todo: 
-	//     � poss�vel usar a fun��o create_thread nesse momento.
-	//     Mas � mais veloz fazer o m�ximo em uma fun��o s�.
-	//     Mas por enquanto ser�o feitas � m�o essas primeiras threads. 
-
+	// Eh poss�vel usar a fun��o create_thread nesse momento.
+	// Mas � mais veloz fazer o m�ximo em uma fun��o s�.
+	// Mas por enquanto ser�o feitas � m�o essas primeiras threads. 
 
 	// #todo: 
 	// objectType, objectClass, appMode
@@ -103,30 +111,37 @@ void *createCreateInitThread (void){
     InitThread->used = 1;
     InitThread->magic = 1234;
 
-
     InitThread->tid = 1;
-    InitThread->ownerPID = (int) InitProcess->pid;  
+    InitThread->ownerPID = (int) InitProcess->pid; 
 
     InitThread->name_address = (unsigned long) ThreadName; 
 
-    // Obs: Já fizemos isso no início da rotina.
+    // Obs: 
+    // Já fizemos isso no início da rotina.
     InitThread->process = (void *) InitProcess;
 
+    // Execution plane.
+    InitThread->plane = BACKGROUND;
 
     // Page Directory
-    InitThread->DirectoryPA = (unsigned long ) InitProcess->DirectoryPA;
 
-    // Wait reason.
+    InitThread->DirectoryPA = (unsigned long ) InitProcess->DirectoryPA;
+    
+    if ( InitThread->DirectoryPA == 0 ){
+        panic("createCreateInitThread: InitThread->DirectoryPA\n");
+    }
+
+    // Clean the 'wait reason'.
 
     for ( r=0; r<8; r++ ){
         InitThread->wait_reason[r] = (int) 0;
     };
 
 
-    InitThread->plane = BACKGROUND;
+    // ??
+    // The system window procedure used by this thread.
+    // This is a dialog inside the base kernel.
 
-    // Procedimento de janela.
-    // O procedimento.
     InitThread->procedure = (unsigned long) &system_procedure;
 
 
@@ -143,81 +158,77 @@ void *createCreateInitThread (void){
     //InitThread->long
     //...
 
-    // #todo: 
-    // Falta limpar a outra fila de mensagens.
-        int z=0;
-        for ( z=0; z<32; z++ )
-        {
-            InitThread->window_list[z] = 0;
-            InitThread->msg_list[z]    = 0;
-            InitThread->long1_list[z]  = 0;
-            InitThread->long2_list[z]  = 0;
-            InitThread->long3_list[z]  = 0;
-            InitThread->long4_list[z]  = 0;
-        }
-        InitThread->head_pos = 0;
-        InitThread->tail_pos = 0;
+    // Clean the message queue.
+    
+    for ( i=0; i<32; i++ ){
+
+        InitThread->window_list[i] = 0;
+        InitThread->msg_list[i]    = 0;
+        InitThread->long1_list[i]  = 0;
+        InitThread->long2_list[i]  = 0;
+        InitThread->long3_list[i]  = 0;
+        InitThread->long4_list[i]  = 0;
+    };
+
+    InitThread->head_pos = 0;
+    InitThread->tail_pos = 0;
 
 
-    //
     // Message queue.
-    //
-
     for ( q=0; q<32; q++ ){ InitThread->MsgQueue[q] = 0; };
     InitThread->MsgQueueHead = 0;
     InitThread->MsgQueueTail = 0;
 
 
-    // Caracter�sticas.
+    // Caracteristicas.
     InitThread->type = TYPE_IDLE;    //TYPE_SYSTEM.
     InitThread->iopl = RING3;        //Idle thread � uma thread de um processo em user mode.
     InitThread->state = INITIALIZED;   
 
-
     // Priorities.
-    InitThread->base_priority = PRIORITY_NORMAL;
-    InitThread->priority = InitThread->base_priority;          //din�mica.
+    // The idle thread has the lowest priority possible.
+
+    InitThread->base_priority = PRIORITY_MIN;    // Static
+    InitThread->priority      = PRIORITY_MIN;    // Dynamic
 
 
     InitThread->saved = 0; 
     InitThread->preempted = UNPREEMPTABLE; 
 
-    //Temporizadores.
+    // Temporizadores.
     InitThread->step = 0;          
     InitThread->quantum = QUANTUM_BASE;
     InitThread->quantum_limit = QUANTUM_LIMIT;
 
+    // Contadores.
     InitThread->standbyCount = 0;
     InitThread->runningCount = 0;    //Tempo rodando antes de parar.
     InitThread->readyCount = 0;      //Tempo de espera para retomar a execu��o.
 
     InitThread->initial_time_ms = get_systime_ms ();
     InitThread->total_time_ms = 0;
-	
-	//quantidade de tempo rodando dado em ms.
+
+    // Quantidade de tempo rodando dado em ms.
     InitThread->runningCount_ms = 0;
-	
+
     InitThread->ready_limit = READY_LIMIT;
     InitThread->waitingCount  = 0;
     InitThread->waiting_limit = WAITING_LIMIT;
     InitThread->blockedCount = 0;    //Tempo bloqueada.
     InitThread->blocked_limit = BLOCKED_LIMIT;
 
-	
     InitThread->ticks_remaining = 1000;
 
-	// Signal
+    // Signal
     InitThread->signal = 0;
     InitThread->umask = 0;
 
-	//...
-	
-	//
-	// Obs: Essa parte � dependente da arquitetura, deveria estar em 
-	//      uma pasta, por exemplo, microkernel\i386.
-	//	
-	
-	//if(MachineType == i386Type){...};
+    //
+    // #obs: 
+    // Essa parte eh dependente da arquitetura, 
+    // deveria estar em uma pasta, por exemplo, x86/.
+    // if(MachineType == i386Type){...};
+    //
 
 
     // Context.
@@ -227,32 +238,31 @@ void *createCreateInitThread (void){
 
     // Stack frame.
 
-    InitThread->ss  = 0x23; 
-    InitThread->esp = (unsigned long) CONTROLTHREAD_STACK; 
-    InitThread->eflags = 0x3200; 
-    InitThread->cs = 0x1B;  
-    InitThread->eip = (unsigned long) CONTROLTHREAD_ENTRYPOINT; 
+    InitThread->ss     = 0x23; 
+    InitThread->esp    = (unsigned long) CONTROLTHREAD_STACK; 
+    InitThread->eflags = 0x3200;    // #atencao!
+    InitThread->cs     = 0x1B;  
+    InitThread->eip    = (unsigned long) CONTROLTHREAD_ENTRYPOINT; 
+
+    InitThread->ds = 0x23;
+    InitThread->es = 0x23;
+    InitThread->fs = 0x23;
+    InitThread->gs = 0x23;
+
+    InitThread->eax = 0;
+    InitThread->ebx = 0;
+    InitThread->ecx = 0;
+    InitThread->edx = 0;
+
+    InitThread->esi = 0;
+    InitThread->edi = 0;
+    InitThread->ebp = 0;
+    // ...
+
+    // O endereço incial, para controle.
+    InitThread->initial_eip = (unsigned long) InitThread->eip; 
 
 
-	InitThread->ds = 0x23; 
-	InitThread->es = 0x23; 
-	InitThread->fs = 0x23; 
-	InitThread->gs = 0x23; 
-	
-	InitThread->eax = 0;
-	InitThread->ebx = 0;
-	InitThread->ecx = 0;
-	InitThread->edx = 0;
-	
-	InitThread->esi = 0;
-	InitThread->edi = 0;
-	InitThread->ebp = 0;
-	//...
-	
-	
-	//O endere�o incial, para controle.
-	InitThread->initial_eip = (unsigned long) InitThread->eip; 
-	
 	//#bugbug
 	//Obs: As estruturas precisam j� estar devidamente inicializadas.
 	//IdleThread->root = (struct _iobuf *) file_root;
@@ -264,19 +274,26 @@ void *createCreateInitThread (void){
 	//IdleThread->confined = 1;           //Flag, confinado ou n�o.
 	//IdleThread->CurrentProcessor = 0;   //Qual processador.
 	//IdleThread->NextProcessor = 0;      //Pr�ximo processador. 
-	
-	//Coloca na lista de estruturas.
-	threadList[ InitThread->tid ] = (unsigned long) InitThread;
-	
-    rootConductor = (struct thread_d *) InitThread;
-	
-	// #importante
-	// # current idle thread #
-	//current_idle_thread = IdleThread->tid;
-
 
     InitThread->next = NULL;
-    //InitThread->Next = (void *) InitThread;  //maybe
+    
+    // Coloca na lista de estruturas.
+    threadList[ InitThread->tid ] = (unsigned long) InitThread;
+
+
+    //
+    // == Conductor ===================================
+    //
+
+    // #todo
+    // We can use a method in the scheduler for this.
+
+    rootConductor = (struct thread_d *) InitThread;
+
+
+    //
+    // == counter =================================
+    //
 
 
     // #importante
@@ -294,7 +311,13 @@ void *createCreateInitThread (void){
 	
     //ProcessorBlock.threads_counter = (int) 1;
     UPProcessorBlock.threads_counter++;
-    
+
+
+    //
+    // == Queue =====================================
+    //
+ 
+ 
     // #bugbug
 	// N�o h� a necessidade de colocar na fila de inicializadas
 	// se logo em seguida estamos selecionando para execu��o 
@@ -302,7 +325,14 @@ void *createCreateInitThread (void){
     
     queue_insert_data ( queue, 
         (unsigned long) InitThread, QUEUE_INITIALIZED );
-    
+
+
+    //
+    // == Execution ===============================
+    //
+
+    // #todo
+    // This method really need a prefix.
 
     // * MOVEMENT 1 ( Initialized ---> Standby ).
     SelectForExecution (InitThread);    

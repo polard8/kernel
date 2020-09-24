@@ -1,7 +1,6 @@
 /*
- * File: ps/action/threadi.c 
+ * File: ps/threadi.c 
  *
- * Descrição:
  *      Thread internal.    
  *
  *     'Ki_' é para rotinas com threads oferecidas
@@ -18,55 +17,48 @@
  *     2018 - Revision.
  */
 
+
+// #todo
+// We can use the psXXXXX prefix to export the methods.
  
 #include <kernel.h>
 
-
-//protóripo de função interna.
-void xxxRing0Idle (void);
-
 // ==============  idle thread in ring 0  ===============
-
-
-
-   //#test
-    //Ok, está funcionando. :)
-	//printf(".");
-    
-	// Esse negócio do cli e dead)thread_collector funcionou bem,
-	// mas precisamos atualizar o contador de threads rodando.
-	// Precisa decrementar o contador, e´o problema está aí,
-	// precisa checar se decrementar esse contador causa algum efeito 
-	// negativo.
-	// É necessário de decrementemos o contador.
-
+//#test
+//Ok, está funcionando. :)
+// Esse negócio do cli e dead)thread_collector funcionou bem,
+// mas precisamos atualizar o contador de threads rodando.
+// Precisa decrementar o contador, e´o problema está aí,
+// precisa checar se decrementar esse contador causa algum efeito 
+// negativo.
+// É necessário de decrementemos o contador.
 // Isso é uma thread em ring 0 que será usada como idle.
-
 // #importante
 // Suspendemos o uso do dead thread collector por enquanto.
 // Para usarmos a instrução hlt e calcularmos 
 // quanto tempo ficamos parados e quanto tempo ficamos rodando.
+// ring0 thread.
+// Protóripo de função interna.
+
+void xxxRing0Idle (void);
 
 void xxxRing0Idle (void){
-	
-	
-	//
+
 	// Initializing ...
-	//
-	
 	// #importante:
 	// Quando a thread inicializa ela muda o status do dead thread collector,
 	// liberando rotinas que dependam dele estar funcionando.
-	
-	//dead_thread_collector_status = 1;
-	
-Loop:
-	
-	//asm ("cli");
-	
-	//dead_thread_collector ();
-    asm ("sti");
-	
+
+    // deprecated.
+    // dead_thread_collector_status = 1;
+
+
+    //
+    // loop.
+    //
+
+    // sti/hlt 
+
 	// Importante:
 	// Efetuamos o halt com as interrupções habilitadas.
 	// Então na primeira interrupção o sistema volta a funcionar.
@@ -81,10 +73,11 @@ Loop:
 	// Avisa que o dead thread collector pode dormir.
 	// Não chamaremos a função agora porque estamos usando ele.
 	// Vamos apenas sinalizar que queremos que ele durma.
-	
-	//dead_thread_collector_flag = 0;
 
-
+Loop:
+    //dead_thread_collector ();
+    asm ("sti");
+    //dead_thread_collector_flag = 0;
     asm ("hlt");
     goto Loop;
 }
@@ -103,26 +96,34 @@ void *KiCreateRing0Idle (void){
 
     struct thread_d *t;
 
-    char *ThreadName = "ring0-idle-thread";  // Name.
+    char *ThreadName = "ring0-idle-thread";
 
-    void *ring0IdleStack;  // Stack pointer. 
+    // Stack pointer.
+    void *ring0IdleStack; 
 
     int r=0;    // Wait reason.
-    int q=0;    // Msg queue.
+    int i=0;    // Message queue.
+    int q=0;    // Message queue.
 
 
+    // The kernel process.
     if ( (void *) KernelProcess == NULL ){
-        panic ("action-KiCreateRing0Idle: KernelProcess\n");
+        panic ("KiCreateRing0Idle: KernelProcess\n");
     }
 
+    // ??
+    // e a validade da estrutura de processo? 
 
-    t = (void *) kmalloc( sizeof(struct thread_d) );
+
+    // Struct.
+
+    t = (void *) kmalloc ( sizeof(struct thread_d) );
 
     if ( (void *) t == NULL ){
-        panic ("action-KiCreateRing0Idle: t \n");
+        panic ("KiCreateRing0Idle: t \n");
     
     }else{  
-        //Indica à qual proesso a thread pertence.
+        //Indica à qual processo a thread pertence.
         t->process = (void *) KernelProcess;
     };
 
@@ -136,43 +137,51 @@ void *KiCreateRing0Idle (void){
     ring0IdleStack = (void *) kmalloc (8*1024);
 
     if ( (void *) ring0IdleStack == NULL ){
-        panic ("action-KiCreateRing0Idle: ring0IdleStack\n");
+        panic ("KiCreateRing0Idle: ring0IdleStack\n");
     }
-
 
 
 	// #todo: 
 	// Object support.
 
-
     t->used = 1;
     t->magic = 1234;
 
 
-    //Identificadores      
+    // Identificadores 
 
-	t->tid = 0;  
-	t->ownerPID = (int) KernelProcess->pid;         
+    t->tid = 0;  
+    t->ownerPID = (int) KernelProcess->pid; 
 
+    t->name_address = (unsigned long) ThreadName; 
 
-	t->name_address = (unsigned long) ThreadName;   //Funciona.
+    // Obs: 
+    // Já fizemos isso no início da rotina.
+    t->process = (void *) KernelProcess;
 
-	t->process = (void *) KernelProcess;
-	t->plane = BACKGROUND;
-	t->DirectoryPA = (unsigned long ) KernelProcess->DirectoryPA;
+    // Execution plane.
+    t->plane = BACKGROUND;
 
+    // Page Directory
 
-    // Waiting reason.
+    t->DirectoryPA = (unsigned long ) KernelProcess->DirectoryPA;
+
+    if ( t->DirectoryPA == 0 ){
+        panic("KiCreateRing0Idle: t->DirectoryPA\n");
+    }
+
+    // Clean the 'wait reason'.
 
     for ( r=0; r<8; r++ ){
         t->wait_reason[r] = (int) 0;
     };
 
 
-	// ?? rever ??
-	//Procedimento de janela.
-	t->procedure = (unsigned long) &system_procedure;
+    // ??
+    // The system window procedure used by this thread.
+    // This is a dialog inside the base kernel.
 
+    t->procedure = (unsigned long) &system_procedure;
 
     //
     // Single message;
@@ -187,71 +196,67 @@ void *KiCreateRing0Idle (void){
     //t->long
     //...
     
-    // #todo: 
-    // Falta limpar a outra fila de mensagens.
-        int z=0;
-        for ( z=0; z<32; z++ )
-        {
-            t->window_list[z] = 0;
-            t->msg_list[z]    = 0;
-            t->long1_list[z]  = 0;
-            t->long2_list[z]  = 0;
-            t->long3_list[z]  = 0;
-            t->long4_list[z]  = 0;
-        }
-        t->head_pos = 0;
-        t->tail_pos = 0;
+    
+    // Message queue.  
+    for ( i=0; i<32; i++ ){
+
+        t->window_list[i] = 0;
+        t->msg_list[i]    = 0;
+        t->long1_list[i]  = 0;
+        t->long2_list[i]  = 0;
+        t->long3_list[i]  = 0;
+        t->long4_list[i]  = 0;
+    };
+    
+    t->head_pos = 0;
+    t->tail_pos = 0;
 
 
-    //
     // Message queue.
-    //
-
     for ( q=0; q<32; q++ ){ t->MsgQueue[q] = 0; }
     t->MsgQueueHead = 0;
     t->MsgQueueTail = 0;
 
 
-    //Características.	
-	t->type = TYPE_SYSTEM;  
-	t->state = INITIALIZED; 
+    // Características.
+    t->type = TYPE_SYSTEM;  
+    t->iopl = RING0;
+    t->state = INITIALIZED; 
 
-    t->base_priority = PRIORITY_NORMAL;     //básica.   
-    t->priority = t->base_priority;         //dinâmica.
-	
-	t->iopl = RING0;
-	t->saved = 0;
-	t->preempted = PREEMPTABLE;    //PREEMPT_NAOPODE; //nao pode.	
-	
-	// Não precisamos de um heap para  thread idle por enquanto.
-	//t->Heap;
-	//t->HeapSize;
-	//t->Stack;
-	//t->StackSize;
+    // Priorities.
+    // This is a ring0 thread, only used for sti/hlt.
+    // Maybe it is gonna be a idle thread to manage the energy.
 
-	//Temporizadores.
+    t->base_priority = PRIORITY_MIN;    // Static
+    t->priority      = PRIORITY_MIN;    // Dynamic
+
+
+    t->saved = 0;
+    t->preempted = UNPREEMPTABLE;
+
+
+    // Temporizadores.
     t->step = 0;
     t->quantum = QUANTUM_BASE;
     t->quantum_limit = QUANTUM_LIMIT;
-   
-    //Contadores.
-	t->standbyCount = 0;
-	t->runningCount = 0;    //Tempo rodando antes de parar.
-	t->readyCount = 0;      //Tempo de espera para retomar a execução.
-	
-	
-	t->initial_time_ms = get_systime_ms();
-	t->total_time_ms = 0;
-	
-	//quantidade de tempo rodadndo dado em ms.
-	t->runningCount_ms = 0;
-	
-	t->ready_limit = READY_LIMIT;
-	t->waitingCount  = 0;
-	t->waiting_limit = WAITING_LIMIT;
-	t->blockedCount = 0;    //Tempo bloqueada.
-	t->blocked_limit = BLOCKED_LIMIT;
 
+    // Contadores.
+
+    t->standbyCount = 0;
+    t->runningCount = 0;    //Tempo rodando antes de parar.
+    t->readyCount = 0;      //Tempo de espera para retomar a execução.
+
+    t->initial_time_ms = get_systime_ms();
+    t->total_time_ms = 0;
+
+    // Quantidade de tempo rodadndo dado em ms.
+    t->runningCount_ms = 0;
+
+    t->ready_limit = READY_LIMIT;
+    t->waitingCount  = 0;
+    t->waiting_limit = WAITING_LIMIT;
+    t->blockedCount = 0;    //Tempo bloqueada.
+    t->blocked_limit = BLOCKED_LIMIT;
 
     t->ticks_remaining = 1000;
 
@@ -259,10 +264,18 @@ void *KiCreateRing0Idle (void){
     t->signal = 0;
     t->umask = 0;
 
-	// x86 Context.
-	// Isso deve ir para uma estrutura de contexto.
-	// Obs: eflags 0x0200.
-	// Queremos que esse thread rode em ring0.
+
+    //
+    // #obs: 
+    // Essa parte eh dependente da arquitetura, 
+    // deveria estar em uma pasta, por exemplo, x86/.
+    // if(MachineType == i386Type){...};
+    //
+
+    // x86 Context.
+    // Isso deve ir para uma estrutura de contexto.
+    // Obs: eflags 0x0200.
+    // Queremos que esse thread rode em ring0.
 
     // Stack frame.
     t->ss     = 0x10 | 0; 
@@ -273,19 +286,20 @@ void *KiCreateRing0Idle (void){
 
     t->ds = 0x10 | 0;
     t->es = 0x10 | 0;
-    t->fs = 0x10 | 0; 
-    t->gs = 0x10 | 0; 
+    t->fs = 0x10 | 0;
+    t->gs = 0x10 | 0;
     
     t->eax = 0;
     t->ebx = 0;
     t->ecx = 0;
     t->edx = 0;
+
     t->esi = 0;
     t->edi = 0;
     t->ebp = 0;
-    //...
+    // ...
 
-	//O endereço incial, para controle.
+    // O endereço incial, para controle.
     t->initial_eip = (unsigned long) t->eip; 
 
 
@@ -300,34 +314,48 @@ void *KiCreateRing0Idle (void){
 	//t->CurrentProcessor = 0;   //Qual processador.
 	//t->NextProcessor = 0;      //Próximo processador. 
 
-    //Coloca na lista de estruturas.
+    t->next = NULL;
+
+    // Coloca na lista de estruturas.
     threadList[ t->tid ] = (unsigned long) t;
 
 
-    t->next = NULL;
+    //
+    // == Idle thread ==============================
+    //
 
-	//
-	// Setup idle.
-	//
+    // #todo
+    // We can use a method in the scheduler for this.
+    // Or in the dispatcher?
 
     ____IDLE = (struct thread_d *) t;
 
 
-	//
-	// Running tasks.
-	//
-	
+    //
+    // == counter =================================
+    //
+
+
 	// #bugbug
 	// Se deixarmos de criar alguma das threads esse contador falha.
 	// #todo: Deveríamos apenas incrementá-lo.
-	
 
     UPProcessorBlock.threads_counter++;
-    
-    
+
+    //
+    // == Queue =====================================
+    //
+
     queue_insert_data (queue, (unsigned long) t, QUEUE_INITIALIZED);
+
+    //
+    // == Execution ===============================
+    //
+
+    // #todo
+    // This method really need a prefix.
     
-	// * MOVEMENT 1 (Initialized --> Standby).
+    // * MOVEMENT 1 (Initialized --> Standby).
     SelectForExecution (t);    
 
     return (void *) t;
@@ -632,35 +660,30 @@ void show_reg (int tid){
 
 
     if ( tid < 0 || tid >= THREAD_COUNT_MAX ){
-        printf ("fail\n");
+        printf ("show_reg: fail\n");
         return;
     }
 
-
-	// Structure.
+    // Structure.
     t = (void *) threadList[tid];
 
     if ( (void *) t == NULL ){
-        printf ("fail\n");
+        printf ("show_reg: fail\n");
         return;
 
-	} else {
-		
+    } else {
 
-	    // Show registers.
+        // Show registers.
 
-	    printf("\n eflags=[%x]", t->eflags);
-	    printf("\n cs:eip=[%x:%x] ss:esp=[%x:%x]", 
-		    t->cs, t->eip, t->ss, t->esp );
-			
-	    printf("\n ds=[%x] es=[%x] fs=[%x] gs=[%x]",
-	        t->ds, t->es, t->fs, t->gs );
-	
-	    printf("\n a=[%x] b=[%x] c=[%x] d=[%x]\n",
-	        t->eax, t->ebx, t->ecx, t->edx );
-			
-		//...	
-	};
+        printf ("\n eflags=[%x]", t->eflags);
+        printf ("\n cs:eip=[%x:%x] ss:esp=[%x:%x]", 
+            t->cs, t->eip, t->ss, t->esp );
+        printf ("\n ds=[%x] es=[%x] fs=[%x] gs=[%x]",
+            t->ds, t->es, t->fs, t->gs );
+        printf ("\n a=[%x] b=[%x] c=[%x] d=[%x]\n",
+            t->eax, t->ebx, t->ecx, t->edx );
+        // ...
+    };
 }
 
 
@@ -679,7 +702,12 @@ set_thread_priority (
 {
 
     unsigned long OldPriority=0;
+    unsigned long BasePriority=0;
 
+
+    // Limits
+    if ( priority > PRIORITY_MAX )
+        return;
 
     if ( (void *) t == NULL )
     {
@@ -687,33 +715,35 @@ set_thread_priority (
         return;
 
     }else{
-	
-        if ( t->used != 1 || t->magic != 1234 )
-        {
-		    return;
-	    }
-	    
-	    // get old
-	    OldPriority = t->priority;
 
-	    // Se aprioridade solicitada for igual da prioridade atual.	
-	    if ( priority == OldPriority )
-	    {
-		    return;
-	    }
+        // Validation
+        if ( t->used != 1 || t->magic != 1234 ){ return; }
 
-	    // limits
-	
+        OldPriority  = t->priority;
+        BasePriority = t->base_priority;
+
+        // Se aprioridade solicitada for igual da prioridade atual.
+        if ( priority == OldPriority ){ return; }
+        
+        // Se a prioridade solicitada for menor que a prioridade basica.
+        if ( priority < BasePriority ){ return; }
+
+        // Se a prioridade basica pertencer a classe de tempo real
+        // nao podemos mudar a prioridade.
+        if ( BasePriority > PRIORITY_NORMAL ){ return; }
+        
+        // limits again
         if ( priority > PRIORITY_MAX )
         {
             t->priority = PRIORITY_MAX;
         }
 
         // Change!
-	    // se aprioridade solicitada for diferente da prioridade atual.
-	    if ( priority != OldPriority )
-	    {
-		    //Muda a prioridade.
+        // Se aprioridade solicitada for diferente da prioridade atual.
+        // Tambem nao pode ser menor que a base.
+        if ( priority != OldPriority )
+        {
+            // Muda a prioridade.
             t->priority = priority;
         
             t->quantum = ( priority * TIMESLICE_MULTIPLIER );
@@ -723,9 +753,8 @@ set_thread_priority (
                   t->quantum = QUANTUM_LIMIT;
             }
         };    
-		//...
-	};
-
+        // ...
+    };
     // ??
 }
 

@@ -1,5 +1,5 @@
 /*
- * File: ps/action/process.c 
+ * File: ps/process.c 
  *
  *     Gerenciamento de processos.
  *     PM - Process Manager (Parte fundamental do Kernel Base).
@@ -62,14 +62,17 @@
 	a entrada padr�o (geralmente o teclado) e quem � 
 	a sa�da padr�o (geralmente a tela).
 */ 
- 
- 
+
+
+// #todo
+// We can use the psXXXXX prefix to export the methods.
+
+
 #include <kernel.h>
 
 
-
 //
-// Fun��es importadas.
+// == imported ============================================
 //
 
 extern unsigned long get_page_dir (void);
@@ -90,12 +93,13 @@ int processNewPID;
 
 
 
-
-
 void process_enter_criticalsection(int pid)
 {
     struct process_d *p;
 
+
+    if (pid<0)
+        panic ("process_enter_criticalsection: pid \n");
 
     p = (void *) processList[pid];
 
@@ -111,7 +115,6 @@ void process_enter_criticalsection(int pid)
         criticalsection_pid = (pid_t) pid;
         p->_critical = 1;
     };
-
 }
 
 
@@ -120,11 +123,13 @@ void process_exit_criticalsection(int pid)
     struct process_d *p;
 
 
+    if (pid<0)
+        panic ("process_exit_criticalsection: pid \n");
+
     p = (void *) processList[pid];
 
     if ( (void *) p == NULL ){
         panic ("process_exit_criticalsection: p \n");
-
 
     } else {
 
@@ -153,10 +158,12 @@ unsigned long __GetProcessStats ( int pid, int index )
 {
     struct process_d *p;
 
-    //#todo:
-    //checar validade dos argumentos.
 
-	//Struct.
+    if (pid<0)
+        panic ("__GetProcessStats: pid \n");
+
+
+    //Struct.
     p = (void *) processList[pid];
 
     if ( (void *) p == NULL ){
@@ -168,12 +175,8 @@ unsigned long __GetProcessStats ( int pid, int index )
 		//...
     };
 
-	
-	
-	
-	
-    switch ( index )
-    {
+
+    switch (index){
 
         case 1:
            return (unsigned long) p->pid;
@@ -397,7 +400,8 @@ unsigned long __GetProcessStats ( int pid, int index )
     
         // ...
     };
-    
+
+
     return 0;
 }
 
@@ -413,7 +417,7 @@ int getprocessname ( int pid, char *buffer ){
     //#todo
     //checar validade dos argumentos.
 
-    if(pid<0){
+    if (pid<0){
         debug_print ("getprocessname: [FAIL] pid\n");
         return -1;
     }
