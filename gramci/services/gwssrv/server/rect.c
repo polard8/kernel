@@ -219,7 +219,8 @@ gws_refresh_rectangle (
 
 	// = 3; 24bpp
     int bytes_count=0;
-
+    int pitch=0;   //width + bpp
+    
 
     line_size = (unsigned int) width; 
     lines     = (unsigned int) height;
@@ -228,7 +229,7 @@ gws_refresh_rectangle (
     if ( width> ScreenWidth)
         gwssrv_debug_print ("gws_refresh_rectangle: width limits\n");
 
-    if ( height> ScreenHeight)
+    if ( height> ScreenHeight )
         gwssrv_debug_print ("gws_refresh_rectangle: height limits\n");
 
 
@@ -241,8 +242,14 @@ gws_refresh_rectangle (
 
         default:
             gwssrv_debug_print ("gws_refresh_rectangle: SavedBPP\n");
+            printf             ("gws_refresh_rectangle: SavedBPP\n");
+            exit(1);
             break;
     };
+
+
+    // Bytes per line.
+    pitch = (line_size*bytes_count);
 
 
 	// #atenção.
@@ -251,33 +258,28 @@ gws_refresh_rectangle (
 
     offset = (unsigned int) ( (bytes_count*SavedX*(y)) + (bytes_count*(x)) );
 
-    p = (void *)       (p + offset);    
-    q = (const void *) (q + offset);    
+    p = (void *)       (p + offset); 
+    q = (const void *) (q + offset); 
 
 
 	// #bugbug
 	// Isso pode nos dar problemas.
 	// ?? Isso ainda é necessário nos dias de hoje ??
 	
-	//vsync ();	
-		
-	//(line_size * bytes_count) é o número de bytes por linha. 
+	//vsync ();
+
 
 	//#importante
 	//É bem mais rápido com múltiplos de 4.
 
 
-    int pitch=0;
-    pitch = (line_size*bytes_count);
-
-
-	// Se for divisível por 4.
+    // Se for divisível por 4.
+    // Copia uma linha ou um pouco mais caso 
+    // não seja divisível por 4.
     if ( (pitch % 4) == 0 )
     {
         count = (pitch / 4); 
 
-        // Copia uma linha ou um pouco mais caso 
-        // não seja divisível por 4.
         for ( i=0; i < lines; i++ ){
             rect_memcpy32 ( p, q, count );
             q += pitch;
@@ -296,39 +298,7 @@ gws_refresh_rectangle (
             p += pitch;
         };
     }
-
-
-    /*
-     #backup
-	// Se for divisível por 4.
-	if ( ((line_size * bytes_count) % 4) == 0 )
-	{
-        count = ((line_size * bytes_count) / 4); 
-
-	    for ( i=0; i < lines; i++ )
-	    {
-		    //copia uma linha ou um pouco mais caso não seja divisível por 
-		    rect_memcpy32 ( p, q, count );
-		    
-			q += (ScreenWidth * bytes_count);
-	 		p += (ScreenWidth * bytes_count);
-	    };
-	}
-
-	//se não for divisível por 4.
-	if ( ((line_size * bytes_count) % 4) != 0 )
-	{
-	    for ( i=0; i < lines; i++ )
-	    {
-		    memcpy ( (void *) p, (const void *) q, (line_size * bytes_count) );
-		    
-			q += (ScreenWidth * bytes_count);
-		    p += (ScreenWidth * bytes_count);
-	    };
-	}
-	*/
 }
-
 
 
 /*
@@ -417,25 +387,18 @@ rectBackbufferDrawRectangle (
     */
 
 
-
-
-
     //
     // fill
     //
 
     // Draw lines on backbuffer.
 
-    while (rect.height--)
-    {
-        lineBackbufferDrawHorizontalLine ( 
-            rect.left, 
-            rect.top, 
-            rect.right, 
-            rect.bg_color );
+    while (rect.height--){
+        lineBackbufferDrawHorizontalLine ( rect.left, rect.top, 
+            rect.right, rect.bg_color );
        
        rect.top++;
-    };    
+    };
 }
 
 

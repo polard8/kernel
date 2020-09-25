@@ -74,6 +74,10 @@ int serviceDrawText(void)
     buf[i] = 0;
     
     
+    //#todo
+    //switch (alignment) {  ... }
+    
+    
     //dtextDrawText ( (struct gws_window_d *) gui->screen,
         //x, y, color, buf ); 
 
