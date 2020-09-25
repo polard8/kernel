@@ -140,23 +140,53 @@ int is_rect_empty( struct gws_rect_d *rect )
 
 
 
-void *rect_memcpy32 ( void *v_dst, const void *v_src, unsigned long c )
+int is_rect_dirty( struct gws_rect_d *rect )
 {
-	
-	//const char *src = v_src;
-	//char *dst = v_dst;
+    if ( (void*) rect == NULL )
+        return -1;
 
-	long *src = (long *) v_src;
-	long *dst = (long *) v_dst;
-	
-	/* Simple, byte oriented memcpy. */
-	while (c--)
-		*dst++ = *src++;
-
-	return v_dst;
+    if ( rect->dirty == 1  ){
+        return (int) TRUE;
+    }
+     
+    return FALSE;
 }
 
 
+
+
+void *rect_memcpy32 ( void *v_dst, const void *v_src, unsigned long c )
+{
+
+    long *src = (long *) v_src;
+    long *dst = (long *) v_dst;
+
+
+	//const char *src = v_src;
+	//char *dst = v_dst;
+
+
+    /* Simple, byte oriented memcpy. */
+    while (c--){
+        *dst++ = *src++;
+    };
+
+    return v_dst;
+}
+
+
+
+int gwssrv_refresh_this_rect( struct gws_rect_d *rect )
+{
+    if ( (void*) rect == NULL )
+        return -1;
+
+    gws_refresh_rectangle ( 
+        rect->left, rect->top, 
+        rect->width, rect->height );
+
+    return 0;
+}
 
 
 void 
@@ -172,40 +202,48 @@ gws_refresh_rectangle (
 
 
 	//#TEST
-	register unsigned int i;
-	//unsigned int i;
+    register unsigned int i=0;
+    //unsigned int i;
 
 
-	unsigned int line_size=0; 
-	unsigned int lines=0;
-	unsigned int offset=0;
+    unsigned int line_size=0; 
+    unsigned int lines=0;
+    unsigned int offset=0;
 
 
     // Device info.
     unsigned long ScreenWidth  = (unsigned long) gws_get_device_width();
-    //unsigned long ScreenHeight = (unsigned long) gws_get_device_height();
+    unsigned long ScreenHeight = (unsigned long) gws_get_device_height();
 
-	int count; 
+    int count=0; 
 
 	// = 3; 24bpp
-	int bytes_count;
-
+    int bytes_count=0;
 
 
     line_size = (unsigned int) width; 
     lines     = (unsigned int) height;
 
-    switch (SavedBPP)
-    {
+
+    if ( width> ScreenWidth)
+        gwssrv_debug_print ("gws_refresh_rectangle: width limits\n");
+
+    if ( height> ScreenHeight)
+        gwssrv_debug_print ("gws_refresh_rectangle: height limits\n");
+
+
+    switch (SavedBPP){
+
         case 32:  bytes_count = 4;  break;
         case 24:  bytes_count = 3;  break;
 
-		// ...
+        // ...
 
-		//??
-		//default:
-		    //break;
+        default:
+            gwssrv_debug_print ("gws_refresh_rectangle: SavedBPP\n");
+            break;
     };
+
 
 	// #atenção.
 	
@@ -226,9 +264,43 @@ gws_refresh_rectangle (
 	//(line_size * bytes_count) é o número de bytes por linha. 
 
 	//#importante
-	//É bem mais rápido com múltiplos de 4.	
-	
-	//se for divisível por 4.
+	//É bem mais rápido com múltiplos de 4.
+
+
+    int pitch=0;
+    pitch = (line_size*bytes_count);
+
+
+	// Se for divisível por 4.
+    if ( (pitch % 4) == 0 )
+    {
+        count = (pitch / 4); 
+
+        // Copia uma linha ou um pouco mais caso 
+        // não seja divisível por 4.
+        for ( i=0; i < lines; i++ ){
+            rect_memcpy32 ( p, q, count );
+            q += pitch;
+            p += pitch;
+        };
+    }
+
+    // Se não for divisível por 4.
+    // #bugbug: Isso deixa muito lento para os casos
+    // que nao sao 4bytes, pois tem que copiar byte por byte.
+    if ( ( pitch % 4) != 0 )
+    {
+        for ( i=0; i < lines; i++ ){
+            memcpy ( (void *) p, (const void *) q, pitch );
+            q += pitch;
+            p += pitch;
+        };
+    }
+
+
+    /*
+     #backup
+	// Se for divisível por 4.
 	if ( ((line_size * bytes_count) % 4) == 0 )
 	{
         count = ((line_size * bytes_count) / 4); 
@@ -254,6 +326,7 @@ gws_refresh_rectangle (
 		    p += (ScreenWidth * bytes_count);
 	    };
 	}
+	*/
 }
 
 

@@ -1,11 +1,16 @@
 
 
 
+// Menu item types
+#define MI_TYPE_SEPARATOR  1000
+#define MI_TYPE_TEXT       2000
+
+
+
 struct gwsssrv_menu_item_d
 {
     int id;
 
-    //int window;
     struct gws_window_d *window;
     
     unsigned long x;
@@ -21,12 +26,9 @@ struct gwsssrv_menu_item_d
 };
 
 
+// menu
 struct gwsssrv_menu_d
 {
-
-    //int window;
-    //int parent;
-    
     struct gws_window_d *window;
     struct gws_window_d *parent;
 
@@ -45,6 +47,13 @@ struct gwsssrv_menu_d
     struct gwsssrv_menu_item_d *list;
 };
 
+
+
+//
+// == Prototypes ==============================================
+//
+
+int gwssrv_get_number_of_itens (struct gwsssrv_menu_d *menu);
 
 struct gwsssrv_menu_d *gwssrv_create_menu (
     struct gws_window_d *parent,

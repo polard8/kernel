@@ -1253,6 +1253,15 @@ void set_top_window (int id)
 
 
 
+int gwssrv_get_number_of_itens (struct gwsssrv_menu_d *menu)
+{
+    if ( (void*) menu == NULL )
+        return -1;
+   
+    return (int) menu->itens_count;
+}
+
+
 struct gwsssrv_menu_d *gwssrv_create_menu (
     struct gws_window_d *parent,
     int highlight,
@@ -1366,10 +1375,51 @@ struct gwsssrv_menu_item_d *gwssrv_create_menu_item (
 }
 
 
+/*
+struct gwsssrv_menu_item_d *gwssrv_get_menu_item(struct gwsssrv_menu_d *menu, int i);
+struct gwsssrv_menu_item_d *gwssrv_get_menu_item(struct gwsssrv_menu_d *menu, int i)
+{
+
+
+     //return (struct gwsssrv_menu_item_d *) ?;
+}
+*/
+
+/*
+int gwssrv_redraw_menuitem(struct gwsssrv_menu_item_d *);
+int gwssrv_redraw_menuitem(struct gwsssrv_menu_item_d *)
+{
+}
+*/
+
+
+/*
+int gwssrv_redraw_menu ( struct gwsssrv_menu_d *menu );
+int gwssrv_redraw_menu ( struct gwsssrv_menu_d *menu )
+{
+    int i=0;
+    int n=0;
+
+    if ( (void*) menu == NULL )
+        return -1;
+    
+    n = (int) gwssrv_get_number_of_itens(menu);
+
+    if ( n<=0 )
+        return -1;
+    
+    for (i=0; i<n; i++)
+    {
+        mi = gwssrv_get_menu_item(i,menu);
+        gwssrv_redraw_menuitem(mi);
+    };
+}
+*/
+
 
 //test
 int create_main_menu(void){
-	
+
     struct gwsssrv_menu_d *menu;
 
 

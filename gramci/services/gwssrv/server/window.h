@@ -292,9 +292,7 @@ struct gws_rect_d
     //estilo de design
     int style;
 
-    //int validated;
-    //int dirty;
-    //int focus;
+    int dirty;
 
     // ??
     unsigned long left;
@@ -422,6 +420,9 @@ struct gws_window_d
     int view; 
     
     int status;
+    
+    //maybe
+    //int dirty;
 
 
     // Margins. (position)
@@ -1035,10 +1036,16 @@ gws_draw_button (
     unsigned long color );
 
 
+
+
 int is_rect_empty( struct gws_rect_d *rect );
+int is_rect_dirty( struct gws_rect_d *rect );
+
 
 void *rect_memcpy32 ( void *v_dst, const void *v_src, unsigned long c );
 
+
+int gwssrv_refresh_this_rect( struct gws_rect_d *rect );
 
 void 
 gws_refresh_rectangle ( 
