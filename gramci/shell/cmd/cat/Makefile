@@ -32,10 +32,10 @@ CFLAGS = -m32 \
 	-Werror=strict-prototypes    
 	
 
-	
-	
-LIBC    = ../../../lib/libc03/include/
-LIBCOBJ = ../../../lib/libc03/obj
+
+LIBC    = ../../../../rtl/include/
+LIBCOBJ = ../../../../rtl/obj
+
 API     = ../../../lib/api02/include/
 APIOBJ  = ../../../lib/api02/obj
 

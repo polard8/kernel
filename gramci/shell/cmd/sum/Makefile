@@ -30,13 +30,12 @@ CFLAGS = -m32 \
 	-s \
 	-Werror=strict-prototypes    
 
-	
 
+LIBC    = ../../../../rtl/include/
+LIBCOBJ = ../../../../rtl/obj
 
-LIBC    = ../../../lib/libc03/include/
-LIBCOBJ = ../../../lib/libc03/obj
-API     = ../../../lib/api02/include/
-APIOBJ  = ../../../lib/api02/obj
+API     = ../../../lib/libcore/include/
+APIOBJ  = ../../../lib/libcore/obj
 
 
 	##

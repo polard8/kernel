@@ -40,10 +40,11 @@ CFLAGS = -m32 \
 
 
 
-LIBC    =  ../lib/libc03/include/
-LIBCOBJ =  ../lib/libc03/obj
-API     =  ../lib/libcore/include/
-APIOBJ  =  ../lib/libcore/obj
+LIBC    =  ../../rtl/include/
+LIBCOBJ =  ../../rtl/obj
+
+API     =  ../../gramci/lib/libcore/include/
+APIOBJ  =  ../../gramci/lib/libcore/obj
 
 
 

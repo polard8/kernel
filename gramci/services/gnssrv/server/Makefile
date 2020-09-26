@@ -37,8 +37,9 @@ CFLAGS = -m32 \
 #todo
 #path longo. vamos mudar  as libs de lugar para gramado/libs.
 
-LIBC    = ../../../lib/libc03/include/
-LIBCOBJ = ../../../lib/libc03/obj
+LIBC    = ../../../../rtl/include/
+LIBCOBJ = ../../../../rtl/obj
+
 API02   = ../../../lib/libcore/include/
 APIOBJ  = ../../../lib/libcore/obj
 

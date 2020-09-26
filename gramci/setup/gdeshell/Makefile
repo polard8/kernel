@@ -52,8 +52,9 @@ CFLAGS = -m32 \
 
 
 # depois vamos mudar  alib de lugar.
-LIB     = ../../lib/libc03/include/
-LIBOBJ  = ../../lib/libc03/obj
+LIB     = ../../../rtl/include/
+LIBOBJ  = ../../../rtl/obj
+
 API     = ../../lib/libcore/include/
 APIOBJ  = ../../lib/libcore/obj
 

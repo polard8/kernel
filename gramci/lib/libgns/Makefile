@@ -28,8 +28,7 @@ CFLAGS = -m32 \
 	-s
 
 
-LIBS  = -I. -I ../libc03/include/
-
+LIBS  = -I. -I ../../../rtl/include/
 
 
 .PHONY: all all-c gws-link finalize clean

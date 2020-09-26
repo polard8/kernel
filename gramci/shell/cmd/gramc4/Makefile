@@ -37,13 +37,12 @@ CFLAGS = -m32 \
 
 
 
+LIBC    = ../../../../rtl/include/
+LIBCOBJ = ../../../../rtl/obj
 
-
-
-LIBC    = ../../../lib/libc03/include/
-LIBCOBJ = ../../../lib/libc03/obj
 API02   = ../../../lib/libcore/include/
 APIOBJ  = ../../../lib/libcore/obj
+
 
 
 	##

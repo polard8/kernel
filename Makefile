@@ -117,9 +117,19 @@ build-boot:
 
 build-portals:
 	@echo "==================="
-	@echo "Compiling portals ..."
+	@echo "Compiling rtl ..."
+	$(Q) $(MAKE) -C rtl/
+
+	@echo "==================="
+	@echo "Compiling gramci lib ..."
 	$(Q) $(MAKE) -C gramci/lib/
-	$(Q) $(MAKE) -C gramci/init/
+
+	@echo "==================="
+	@echo "Compiling init ..."
+	$(Q) $(MAKE) -C gramnt/init/
+
+	@echo "==================="
+	@echo "Compiling gramci stuff ..."
 	$(Q) $(MAKE) -C gramci/setup/
 	$(Q) $(MAKE) -C gramci/services/gnssrv/ 
 	$(Q) $(MAKE) -C gramci/services/gwssrv/
@@ -180,8 +190,8 @@ vhd-copy-files:
 	sudo cp gramnt/kernel/KERNEL.BIN  base/BOOT
 	sudo cp gramnt/kernel/KERNEL.BIN  base/PORTALS
 
-	sudo cp gramci/init/INIT.BIN  base/
-	sudo cp gramci/init/INIT.BIN  base/PORTALS
+	sudo cp gramnt/init/INIT.BIN  base/
+	sudo cp gramnt/init/INIT.BIN  base/PORTALS
 
 	sudo cp gramci/setup/bin/GDESHELL.BIN  base/
 	sudo cp gramci/setup/bin/GDESHELL.BIN  base/PORTALS
@@ -252,6 +262,8 @@ clean:
 	@echo "(Step 8) Deleting the object files ..."
 
 	-rm *.o
+	-rm -rf rtl/obj/*.o
+	
 	@echo "Success?"
 
 clean2:
@@ -265,7 +277,6 @@ clean3:
 
 #Clean base
 clean4:
-
 	-rm -rf base/*.BIN 
 	-rm -rf base/BOOT/*.BIN 
 	-rm -rf base/BIN/*.BIN 
@@ -280,15 +291,16 @@ clean-system-files:
 	@echo "==================="
 	@echo "Cleaning all system binaries ..."
 
+
 	# Gramado
 	-rm -rf gramnt/boot/x86/bin/*.BIN
 	-rm -rf gramnt/kernel/KERNEL.BIN
 
+	# Init
+	-rm -rf gramnt/init/*.BIN
+
 	# fonts
 	-rm -rf gramci/fonts/bin/*.FON
-
-	# Init
-	-rm -rf gramci/init/*.BIN
 
 	# Setup
 	-rm -rf gramci/setup/bin/*.BIN
