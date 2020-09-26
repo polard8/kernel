@@ -1,9 +1,0 @@
-	gi/ ring 3
-	gf/ ring 0
-
-
-	Ex:
-	"gi:something/something"
-	"gf:something/something"
-
-
