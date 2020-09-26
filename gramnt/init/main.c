@@ -46,6 +46,13 @@
  
 #include "init.h"
 
+
+
+
+#define COLOR_YELLOW   0x00FFFF00
+
+
+
 /*
  Example:
 ID 	Name 	Description
@@ -161,19 +168,19 @@ initialize_product_type(void)
 void Reboot(void)
 {
     printf ("init.bin: Reboot()\n");
-    
+    while(1){}
     // ...
     
-    gde_reboot();
+    //gde_reboot();
 }
 
 void Shutdown(void)
 {
     printf ("init.bin: Reboot()\n");
-
+    while(1){}
     // ...
     
-    gde_shutdown();
+    //gde_shutdown();
 }
 
 
@@ -183,15 +190,14 @@ void Logoff(void)
 
 
 
-
     if (gReboot == 1)
     {
-        //Reboot();
+        Reboot();
     }
 
     if (gShutdown == 1)
     {
-         //Shutdown()
+         Shutdown();
     }
 }
 
@@ -250,10 +256,15 @@ int main ( int argc, char *argv[] ){
    
 
     // Using api.
-    gde_draw_text ( NULL, 
-        0, 0, COLOR_YELLOW, _string );
+    // obs: nao temos a variavel window.
 
-    gde_show_backbuffer();
+    //gde_draw_text ( NULL, 
+    //    0, 0, COLOR_YELLOW, _string );
+
+    // #debug
+    rtl_draw_text ( 0, 0, COLOR_YELLOW, _string );
+    rtl_show_backbuffer();
+
 
     // #debug
     // while(1){}
@@ -392,15 +403,15 @@ int main ( int argc, char *argv[] ){
 Mainloop:
 
 
-    while (TRUE)
-    {
+    while (1){
+
         // Get message.
-        gde_enter_critical_section(); 
+        rtl_enter_critical_section(); 
         gramado_system_call ( 111,
             (unsigned long) &message_buffer[0],
             (unsigned long) &message_buffer[0],
             (unsigned long) &message_buffer[0] );
-        gde_exit_critical_section(); 
+        rtl_exit_critical_section(); 
 
         // No message. Yield.
         if ( message_buffer[1] == 0 ){ 

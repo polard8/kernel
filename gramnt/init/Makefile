@@ -43,8 +43,8 @@ CFLAGS = -m32 \
 LIBC    =  ../../rtl/include/
 LIBCOBJ =  ../../rtl/obj
 
-API     =  ../../gramci/lib/libcore/include/
-APIOBJ  =  ../../gramci/lib/libcore/obj
+#API     =  ../../gramci/lib/libcore/include/
+#APIOBJ  =  ../../gramci/lib/libcore/obj
 
 
 
@@ -52,10 +52,10 @@ APIOBJ  =  ../../gramci/lib/libcore/obj
 	# Objects
 	#
 
-myObjects = crt0.o main.o api.o \
+myObjects = crt0.o main.o \
 ctype.o stdio.o stdlib.o string.o conio.o unistd.o \
-termios.o ioctl.o fcntl.o \
-stubs.o    
+termios.o ioctl.o fcntl.o stubs.o    
+
 
 
 
@@ -71,7 +71,8 @@ crt0.o:
 #	gcc  -c  crt0.c -I $(LIBC) -I $(API) $(CFLAGS) -o crt0.o
 
 main.o:
-	gcc  -c  main.c -I $(LIBC) -I $(API) $(CFLAGS) -o main.o
+	gcc  -c  main.c -I $(LIBC) $(CFLAGS) -o main.o
+
 
 all-c:
 
@@ -92,7 +93,7 @@ all-c:
 	cp $(LIBCOBJ)/ioctl.o .
 	cp $(LIBCOBJ)/fcntl.o .
 	
-	cp $(APIOBJ)/api.o .
+	#cp $(APIOBJ)/api.o .
 
 
 shell-link:

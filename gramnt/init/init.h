@@ -1,8 +1,10 @@
 
-#include <api.h>      //api.
 
 
-// libc03
+//#include <api.h>      //api.
+
+
+// rtl
 #include <stdio.h>
 #include <stddef.h>
 #include <string.h>
