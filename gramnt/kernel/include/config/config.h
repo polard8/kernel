@@ -7,6 +7,14 @@
 #ifndef ____CONFIG_H_
 #define ____CONFIG_H_
 
+
+//#define DEFAULT_HZ 100
+//#define DEFAULT_HZ 600 
+#define DEFAULT_HZ 1000
+
+
+
+
 //
 // ## IMPORNTANTE ##
 //

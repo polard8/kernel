@@ -105,6 +105,12 @@ align 4
 ; Restart the boot routine.
 START:
 
+    ; #test
+    ; Clean flags.
+    ;push dword 0
+    ;popfd 
+
+
     cli
     cld
 

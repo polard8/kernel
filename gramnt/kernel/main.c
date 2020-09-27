@@ -25,8 +25,9 @@ extern unsigned long SavedBootMode;
 // "Copyright (c) 2005-2020 \n\tFred Nora. All rights reserved.\n\n";
 
 
+
 /*
- ****************************
+ *************************************************
  * kernel_main:
  *
  *     Main function.

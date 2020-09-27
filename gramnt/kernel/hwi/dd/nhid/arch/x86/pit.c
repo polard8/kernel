@@ -944,20 +944,38 @@ int early_timer_init (void){
 	}
 
 
-    // 400:
-    // 100 deixa a digitação muito lenta.
-	//sys_time_hz = (unsigned long) HZ * 4;
+    //
+    // == Hz ============================================
+    //
 
-    //set_systime_hz ( HZ * 4 );
-    set_systime_hz ( HZ * 6 );
+    // Let's setup the variable sys_time_hz.
+    // And setup the controler.
+    // We can use the default variable. 
+    // See> config.h
 
+
+    // Changing the variable.
+    // set_systime_hz ( HZ * 4 );     // Slow
+    // set_systime_hz ( HZ * 6 );     // Normal
+    set_systime_hz ( DEFAULT_HZ );    // See: config.h
+
+    // Setup the controller.
     timerInit8253 ( sys_time_hz );
 
+
+    //
+    // == Quantum =======================================
+    //
+
     set_current_quantum (QUANTUM_BASE);
-    
-   set_next_quantum (QUANTUM_BASE);
-    
-	set_quantum (QUANTUM_BASE);
+    set_next_quantum (QUANTUM_BASE);
+    set_quantum (QUANTUM_BASE);
+
+
+    //
+    // == Timeout =======================================
+    //
+
 
     //timeout 
 	 

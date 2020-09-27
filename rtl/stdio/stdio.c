@@ -3368,6 +3368,7 @@ static char *ksprintn (
 
 
 /*
+ *******************************************************
  * kvprintf:
  *     Scaled down version of printf(3).
  *
@@ -3439,27 +3440,26 @@ kvprintf (
 
 
 
-	if (radix < 2 || radix > 36)
-		radix = 10;
+    if (radix < 2 || radix > 36)
+        radix = 10;
 
 
     for (;;)
     {
 
-		padc = ' ';
-		width = 0;
-		
-		while ( ( ch = (u_char) *fmt++ ) != '%' || stop ) 
-		{
+        padc = ' ';
+        width = 0;
+
+        while ( ( ch = (u_char) *fmt++ ) != '%' || stop ) 
+        {
 			//if (ch == '')
 			//	return (retval);
-			
-			if (ch == 0)
-			    return (retval);
-			
-			PCHAR (ch);
-		}
-		
+
+            if (ch == 0){ return (retval); }
+
+            PCHAR (ch);
+        };
+
 		percent = fmt - 1;
 		
 		qflag = 0; 
@@ -3478,30 +3478,23 @@ kvprintf (
 		jflag = 0; 
 		tflag = 0; 
 		zflag = 0;
-		
-        reswitch:  
+
+        //
+        // Loop.
+        //
+        
+        reswitch:
 
         switch ( ch = (u_char) *fmt++ ){
 
-        case '.':
-			dot = 1;
-			goto reswitch;
-
-        case '#':
-			sharpflag = 1;
-			goto reswitch;
-
-        case '+':
-			sign = 1;
-			goto reswitch;
-
-        case '-':
-			ladjust = 1;
-			goto reswitch;
+        case '.':  dot = 1;        goto reswitch;
+        case '#':  sharpflag = 1;  goto reswitch;
+        case '+':  sign = 1;       goto reswitch;
+        case '-':  ladjust = 1;    goto reswitch;
 
         case '%':
-			PCHAR(ch);
-			break;
+            PCHAR (ch);
+            break;
 
         case '*':
 			if (!dot) 
@@ -3541,25 +3534,26 @@ kvprintf (
 				n = n * 10 + ch - '0';
 				ch = *fmt;
 				
-				if (ch < '0' || ch > '9')
-					break;
-			}
+				if (ch < '0' || ch > '9') { break; }
+			};
 			
 			if (dot)
 				dwidth = n;
 			else
 				width = n;
+
 			goto reswitch;
-			
+
 		case 'b':
 			num = (u_int)va_arg(ap, int);
 			p = va_arg(ap, char *);
-			
-			for (q = ksprintn(nbuf, num, *p++, NULL, 0); *q;)
-				PCHAR(*q--);
 
-			if (num == 0)
-				break;
+            // #bugbug: This is very dangeours.
+            for (q = ksprintn(nbuf, num, *p++, NULL, 0); *q;){
+                PCHAR (*q--);
+            }
+
+            if (num == 0){ break; }
 
 			for (tmp = 0; *p;) 
 			{
@@ -3584,7 +3578,8 @@ kvprintf (
 		case 'c':
 			PCHAR(va_arg(ap, int));
 			break;
-			
+
+
 		case 'D':
 			up = va_arg(ap, u_char *);
 			p = va_arg(ap, char *);
@@ -3602,14 +3597,17 @@ kvprintf (
 						PCHAR(*q);
 			};
 			break;
-			
-		case 'd':
-		case 'i':
-			base = 10;
-			sign = 1;
-			goto handle_sign;
-			
-		case 'h':
+
+        // Decimal.
+        case 'd':
+        case 'i':
+            base = 10;
+            sign = 1;
+            goto handle_sign;
+
+
+        // Hexadecimal.
+        case 'h':
 			if (hflag) 
 			{
 				hflag = 0;
@@ -3617,11 +3615,13 @@ kvprintf (
 			} else
 				hflag = 1;
 			goto reswitch;
-			
+
+
 		case 'j':
 			jflag = 1;
 			goto reswitch;
-			
+
+
 		case 'l':
 			if (lflag) 
 			{
@@ -3630,7 +3630,8 @@ kvprintf (
 			} else
 				lflag = 1;
 			goto reswitch;
-			
+
+
 		case 'n':
 			if (jflag)
 				*(va_arg(ap, intmax_t *)) = retval;
@@ -3647,11 +3648,13 @@ kvprintf (
 			else
 				*(va_arg(ap, int *)) = retval;
 			break;
-			
+
+        //octal
 		case 'o':
 			base = 8;
 			goto handle_nosign;
-			
+
+
 		case 'p':
 			base = 16;
 			sharpflag = (width == 0);
@@ -3690,16 +3693,19 @@ kvprintf (
 				while (width--)
 					PCHAR(padc);
 			break;
-			
+
+
 		case 't':
 			tflag = 1;
 			goto reswitch;
-			
+
+
 		// ?? case 'U': ??
 		case 'u':
 			base = 10;
 			goto handle_nosign;
-			
+
+
 		case 'X':
 			upper = 1;
 		case 'x':
@@ -3714,7 +3720,7 @@ kvprintf (
 		case 'z':
 			zflag = 1;
 			goto reswitch;
-			
+
         handle_nosign:
 			sign = 0;
 			if (jflag)
@@ -3794,12 +3800,14 @@ kvprintf (
 					PCHAR(padc);
 
 			break;
-			
-		default:
-			
-			while (percent < fmt)
-				PCHAR(*percent++);
-			
+
+        default:
+            while (percent < fmt)
+            {
+                PCHAR (*percent++);
+            };
+
+
 			/* Since we ignore an formatting argument it is no
 			 * longer safe to obey the remaining formatting
 			 * arguments as the arguments will no longer match

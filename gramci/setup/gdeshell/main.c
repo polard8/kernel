@@ -1905,6 +1905,13 @@ do_compare:
         goto exit_cmp;
     }
 
+    // #todo:
+    // float support.
+    if ( gramado_strncmp( prompt, "double", 6 ) == 0 )
+    {
+        printf ("double is a double precision float number\n" );
+        goto exit_cmp;
+    }
 
     // exec - Executa um programa fechando o shell.
     // o que segue o comando exec � um pathname.
