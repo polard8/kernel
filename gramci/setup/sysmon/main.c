@@ -1,11 +1,14 @@
 // main.c 
 // sysmon - System monitor using kgws.
+// Environment: Setup.
 
 
 #include "sysmon.h"
 
 
+
 //#define TEDITOR_VERBOSE 1
+
 
 
 #define GRID_HORIZONTAL    1000
@@ -16,25 +19,27 @@
 int running = 1;
 
 
-// Janelas
-struct window_d *main_window;
-struct window_d *client_window;
-struct window_d *client_bar_Window;
-struct window_d *data_window;         //White.
-
+// Windows.
+struct window_d  *main_window;
+struct window_d  *client_window;
+struct window_d  *client_bar_Window;
+struct window_d  *data_window;         // White.
+// ...
 
 // bar buttons
 struct window_d *bar_button_1; 
+// ...
 
-struct window_d *cpu_window;    //cpu usage test;
 
-int __count;
+//
+// == CPU usage ===============================================
+//
+
+struct window_d *cpu_window;   // Window.
 unsigned long CPU_USAGE[32];
+int __count;
 
 
-//static char *dest_argv[] = { "-sujo0","-sujo1","-sujo2",NULL };
-//static unsigned char *dest_envp[] = { "-sujo", NULL };
-//static unsigned char dest_msg[512];
 
  
 /*
@@ -95,7 +100,7 @@ void update_cpu_usage (void)
     //printf ("cpu usage: %d percent \n", __value);
 }
 
-void test_cpu(struct window_d *window)
+void test_cpu (struct window_d *window)
 {
     debug_print("test_cpu:");
 
@@ -135,14 +140,14 @@ void test_cpu(struct window_d *window)
     gde_enter_critical_section ();
     cpu_window = (void *) gde_create_window ( 1, 1, 1, 
                               "cpu-usage",  
-                               (deviceWidth - (32*8) -4 ), 2, 
-                               32*8, 100,    
-                               window, 0, 
-                               COLOR_YELLOW, COLOR_YELLOW );
+                               4, 4, 
+                               (32*8), 100, 
+                               window, 0, COLOR_WHITE, COLOR_WHITE );
     gde_register_window (cpu_window);
     gde_show_window (cpu_window);
     gde_exit_critical_section ();
     //--
+
 
     // Atualizar à cada 2000 ms. 
     //janela, 100 ms, tipo 2= intermitente.
@@ -282,7 +287,7 @@ sysmonProcedure (
                 case VK_F4: 
                     debug_print("sysmon: [F4]"); 
                     // IN: parent window.
-                    test_cpu(main_window);
+                    test_cpu (data_window);
                     goto done;
                     break;
 
@@ -385,48 +390,15 @@ int main ( int argc, char *argv[] ){
     unsigned long width=0;
     unsigned long height=0;
     
-    left = 4;  //deviceWidth/2;
-    top = 4;  //deviceHeight/3;
-    width  = (deviceWidth -20);
-    height = (deviceHeight-20);
+    left = 0;
+    top  = 0;  
+    width  = deviceWidth;
+    height = deviceHeight;
 
 
-//#ifdef TEDITOR_VERBOSE
-	//printf("\n");
-	//printf("Initializing File explorer:\n");
-	//printf("mainTextEditor: # argv={%s} # \n", &argv[0] );
-//#endif
-
-	//
-	// ## vamos repetir o que dá certo ...
-	//
-
-	//vamos passar mais coisas via registrador.
-
-	//ok
-	//foi passado ao crt0 via registrador
-	//printf("argc={%d}\n", argc ); 
-	
-	//foi passado ao crt0 via memória compartilhada.
-	//printf("argvAddress={%x}\n", &argv[0] ); //endereço.
-	
-	
-	//unsigned char* buf = (unsigned char*) (0x401000 - 0x100) ;
-	//printf("argvString={%s}\n" ,  &argv[0] );
-	//printf("argvString={%s}\n" , &buf[0] );
-	
-	//printf("argv={%s}\n", &argv[2] );
-
-	//
-	// ## app window ##
-	//
-
-	//green crocodile = 0x44541C 
-	//orange royal = 0xF9812A
-	//window = 0xF5DEB3
-	//client window = 0x2d89ef 
-	//...
-
+//
+// == Main window =================================================
+//
 
     //++
     // The main window.
@@ -434,16 +406,15 @@ int main ( int argc, char *argv[] ){
     hWindow = (void *) gde_create_window (  WT_OVERLAPPED, 1, 1, 
                            "Setup: sysmon",
                            left, top, width, height,    
-                           0, 0, 
-                           COLOR_BLUE, COLOR_BLUE );  
+                           0, 0, COLOR_WHITE, COLOR_WHITE );  
 
     if ( (void *) hWindow == NULL ){
         printf ("sysmon: hWindow fail\n");
         gde_end_paint ();
         goto fail;
 
+    // Register and show.
     }else{
-        //Registrar e mostrar.
         gde_register_window (hWindow);
         gde_show_window (hWindow);
         main_window = ( struct window_d *) hWindow;
@@ -451,10 +422,11 @@ int main ( int argc, char *argv[] ){
     gde_end_paint ();
     //--
 
-     //Text
-     gde_draw_text ( main_window, 4, 4, 
-         COLOR_WHITE, "sysmon.bin: System information." );
-     gde_show_window (main_window);
+     // #debug
+     // Text,
+     //gde_draw_text ( main_window, 4, 4, 
+     //    COLOR_WHITE, "sysmon.bin: System information." );
+     //gde_show_window (main_window);
      //while(1){}
 
 
@@ -464,15 +436,17 @@ int main ( int argc, char *argv[] ){
 
     //++
     // Client background.
+    // Almost the same size of the main window.
     gde_enter_critical_section ();  
     client_window = (void *) gde_create_window ( WT_SIMPLE, 1, 1, 
                                 "client-bg",     
-                                16, 16, 
-                                width -16 -16, height -16 -16, 
+                                1, 1, 
+                                width -2, height -2, 
                                 main_window, 0, 
                                 0xF5DEB3, 0xF5DEB3 );
 
-    if ( (void *) client_window == NULL){
+    if ( (void *) client_window == NULL)
+    {
         printf ("client_window fail");
         gde_show_backbuffer();
         gde_exit_critical_section ();
@@ -485,7 +459,7 @@ int main ( int argc, char *argv[] ){
 
 
     //
-    // ========= Client bar =====================
+    // == Client bar ============================================
     //
 
     //++

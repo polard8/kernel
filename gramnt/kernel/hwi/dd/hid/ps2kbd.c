@@ -864,10 +864,10 @@ uint8_t keyboard_read (void)
 // na porta 0x60, fora do IRQ1.
 void keyboard_write (uint8_t write)
 {
-    kbdc_wait (1);
+    kbdc_wait(1);
 
     out8 ( 0x60, write );
-    
+
     wait_ns(400);
 }
 
@@ -919,8 +919,8 @@ int BAT_TEST (void){
     };
 
 
-	//fail
-	printf ("ps2kbd.c: BAT_TEST %d times\n",i);
+    // Fail
+    printf ("ps2kbd.c: BAT_TEST %d times\n",i);
     return (int) -1; 
 }
 
@@ -1449,16 +1449,16 @@ void keyboardEnable (void){
  *     Disable keyboard.
  */
 
-void keyboardDisable (void){
-	
-	//Wait for bit 1 of status reg to be zero.
+// Wait for bit 1 of status reg to be zero.
+// Send code for setting disable command.
     
+void keyboardDisable (void){
+
     while ( ( in8 (0x64) & 2) != 0 )
-    {
-		//Nothing.
+    { 
+         // Nothing.
     };
 
-	//Send code for setting disable command.
     out8 (0x60,0xF5);
     //sleep(100);
 }
@@ -1472,33 +1472,30 @@ void keyboardDisable (void){
  */
 
 void keyboard_set_leds (char flag){
-	
-	//@todo: filtro.
 
-	//Wait for bit 1 of status reg to be zero.
+    //#todo: Filtro.
+
+    // Wait for bit 1 of status reg to be zero.
     while ( ( in8 (0x64) & 2) != 0 )
     {
-		//Nothing.
-	};
-	//Send code for setting the flag.
+        // Nothing.
+    };
+    // Send code for setting the flag.
     out8 (0x60,0xED); 
     sleep (100);
 
 
-	//Wait for bit 1 of status reg to be zero.
-	while ( ( in8 (0x64) & 2) != 0 )
-	{
-	    //Nothing.
-	};
-    //Send flag. 
-	out8 (0x60,flag);
-	sleep (100);
+    // Wait for bit 1 of status reg to be zero.
+    while ( ( in8 (0x64) & 2) != 0 )
+    {
+        // Nothing.
+    };
+    // Send flag. 
+    out8 (0x60,flag);
+    sleep (100);
 
-
-	//@todo mudar o status.
-    //switch(flag)
-    //{
-	//}
+    // #todo: Mudar o status.
+    // switch(flag){}
 }
 
 
@@ -1510,29 +1507,35 @@ void keyboard_set_leds (char flag){
  * à qual a thread pertence.
  */
 
-// #todo
+
+// #bugbug
 // Um driver de teclado não tem essa relação com janela.
 
-void *KdGetWindowPointer (int tid){
-	
-	struct thread_d *t;
 
-	//@todo: filtrar argumento. 
-	
-	if ( tid < 0 )
+void *KdGetWindowPointer (int tid)
+{
+    tid=0;
+    panic("KdGetWindowPointer: Deprecated");
+    return NULL;
+
+    /* 
+    struct thread_d *t;
+
+    // #todo: 
+    // Filtrar argumento. 
+
+    if ( tid < 0 )
         return NULL;
-        
-		
-	// Structure.
-	t = (void *) threadList[tid];
 
-	if ( (void *) t == NULL )
-	{
-        return NULL;        
-	};
 
+    // Structure.
+    t = (void *) threadList[tid];
+
+    if ( (void *) t == NULL ){ return NULL; }
 
     return (void *) t->window;
+
+    */
 }
 
 
@@ -1550,8 +1553,13 @@ void *KdGetWindowPointer (int tid){
  *                estrutura do proceso. (Talvez não na thread e nem na janela.)
  */
 
-int KbGetMessage (int tid){
-	
+int KbGetMessage (int tid)
+{
+    tid=0;
+    panic("KbGetMessage: Deprecated");
+    return -1;
+
+    /*
 	int ret_val;
 	struct thread_d *t;
 	
@@ -1567,6 +1575,8 @@ int KbGetMessage (int tid){
 
 	WindowProcedure->msgStatus = 0;    //Muda o status.
 	return (int) ret_val;              //Retorna a mensagem.
+	
+	*/
 }
 
 
@@ -1575,20 +1585,26 @@ int KbGetMessage (int tid){
  *    Pega o parametro "long1" do procedimento de janela de uma thread.
  */
 
-unsigned long KbGetLongParam1 (int tid){
-   	
+unsigned long KbGetLongParam1 (int tid)
+{
+
+    tid=0;
+    panic("KbGetLongParam1: Deprecated");
+    return 0;
+
+    /*
 	struct thread_d *t;
 	
 	// Structure.
 	t = (void *) threadList[tid];
 
-	if ( (void *) t == NULL)
-	{
-        return (unsigned long) 0;    //@todo: fail;
-	};
-
+    if ( (void *) t == NULL){
+        return (unsigned long) 0; 
+    }
 
     return (unsigned long) t->long1;
+    
+    */
 }
 
 
@@ -1597,30 +1613,35 @@ unsigned long KbGetLongParam1 (int tid){
  *     Pega o parametro "long2" do procedimento de janela de uma thread.
  */
 unsigned long KbGetLongParam2 (int tid){
-	
+
+    tid=0;
+    panic("KbGetLongParam2: Deprecated");
+    return 0;
+
+    /*
 	struct thread_d *t;
 	
 	// Structure.
 	t = (void *) threadList[tid];
 
-	if ( (void *) t == NULL)
-	{
-        return (unsigned long) 0;    //@todo: fail;
-	}
+    if ( (void *) t == NULL){
+        return (unsigned long) 0; 
+    }
 
     return (unsigned long) t->long2;
+    */
 }
 
 
 
-//Get alt Status.
+// Get alt Status.
 int get_alt_status (void)
 {
     return (int) alt_status;
 }
 
 
-//Get control status.
+// Get control status.
 int get_ctrl_status (void)
 {
     return (int) ctrl_status;
@@ -1629,8 +1650,8 @@ int get_ctrl_status (void)
  
 //Get shift status.
 int get_shift_status (void)
-{	
-    return (int) shift_status;	
+{
+    return (int) shift_status;
 }
 
 
@@ -1645,120 +1666,52 @@ int get_shift_status (void)
 
 void kbdc_wait (unsigned char type){
 
-    if (type==0)
-    {
+    if (type==0){
 
         while ( !in8(0x64) & 1 )
         {
-			outanyb (0x80);
-			outanyb (0x80);
-			outanyb (0x80);
-			outanyb (0x80);
-			
-			wait_ns (400);
+            outanyb (0x80);
+            outanyb (0x80);
+            outanyb (0x80);
+            outanyb (0x80);
+
+            wait_ns (400);
         };
-		
+
     }else{
 
         while ( in8(0x64) & 2 )
         {
-			outanyb (0x80);
-			outanyb (0x80);
-			outanyb (0x80);
-			outanyb (0x80);
-			
-			wait_ns (400);
+            outanyb (0x80);
+            outanyb (0x80);
+            outanyb (0x80);
+            outanyb (0x80);
+
+            wait_ns (400);
         };
     };
 }
 
 
-
-//events.h
-void set_current_keyboard_responder ( int i ){
-	
+// events.h
+void set_current_keyboard_responder ( int i )
+{
     current_keyboard_responder = i;
 }
 
 
-//events.h
-int get_current_keyboard_responder (void){
-
+// events.h
+int get_current_keyboard_responder (void)
+{
     return (int) current_keyboard_responder;
 }
 
 
-/*
- * Constructor.
-int keyboardKeyboard(){
-	;
-};
-*/
-
-
-/*
- obs: definido acima.
-int keyboardInit(){
-	;
-};
-*/
-
-
-/*
-void keyboard();
-void keyboard()
-{
-	//@todo: Create global.
-	if(gKeyboardType == 1){
-		abnt2_keyboard_handler();
-	}
-	//...
-	return;
-}
-*/
-
-
-/*
-unsigned long 
-ps2_keyboard_dialog ( int msg,
-                      unsigned long long1,
-                      unsigned long long2 );
-unsigned long 
-ps2_keyboard_dialog ( int msg,
-                      unsigned long long1,
-                      unsigned long long2 )
-{
-    switch (msg)
-    {
-		//habilitar
-        case 4000:
-            break;
-
-        //desabilitar.
-        case 4001:
-            break;
-
-        //#test
-        // reinicializar ??
-        case 4002:
-            break;
-            
-        default:
-            break;
-    };
-
-
-    return 0;
-}
-*/
-
-
-
-
 
 //
-// ======
+// ===========================================================
 //
+
 
 /*
  *********************** 
@@ -1769,7 +1722,9 @@ ps2_keyboard_dialog ( int msg,
     // #todo: 
     // 35 - Getting message from the thread's queue. 
     // Vamos pegar uma mensagem na fila de mesagens da thread
-    // e colocarmos nos elementos de single message para o aplicativo pegar.
+    // e colocarmos nos elementos de single message para 
+    // o aplicativo pegar.
+
 
 void *__do_35 ( unsigned long buffer ){
 
@@ -1778,7 +1733,8 @@ void *__do_35 ( unsigned long buffer ){
     unsigned char SC=0;
     
     struct thread_d *t;
-    
+
+    struct msg_d *msg;
 
 
     // ==================================
@@ -1798,18 +1754,15 @@ void *__do_35 ( unsigned long buffer ){
   
     
     
-    if ( (void *) t == NULL )
-    {
-         panic ("__do_35: t");;
+    if ( (void *) t == NULL ){
+         panic ("__do_35: t");
     }
 
 
     //
     // Trying ...
     //
-  
-    
-    struct msg_d *msg;
+
     
     
     //

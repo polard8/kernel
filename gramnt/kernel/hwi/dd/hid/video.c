@@ -606,6 +606,30 @@ video_driver_dialog ( int service,
 */
 
 
+/*
+// Used in vga controller stuff.
+// #todo: We need to use 'unsigned int' in the port?
+void 
+write_vga_reg ( 
+    int port, 
+    unsigned char index, 
+    unsigned char val);
+void 
+write_vga_reg ( 
+    int port, 
+    unsigned char index, 
+    unsigned char val) 
+{
+    
+    if (port != 0x3c0) {
+         out16 ( (int) port, (unsigned short) val << 8 | index );
+
+    } else {
+        out8 ( (int) port, (unsigned char) index );   
+        out8 ( (int) port, (unsigned char) val );     
+    };
+}
+*/
 
 
 /*
@@ -644,18 +668,18 @@ int videoInit (void){
 	
 	// global usada pelo kernel.
 	// #todo: não devemos configurar essa global.
-	// O kernel deve solicitar esse endereço.    	
+	// O kernel deve solicitar esse endereço. 
 	//endereço físico do frontbuffer.
-	g_frontbuffer_pa = (unsigned long) SavedLFB;              
+    g_frontbuffer_pa = (unsigned long) SavedLFB;  
 
 	//endereço virtual do backbuffer.
-	g_backbuffer_va = (unsigned long) BACKBUFFER_VA;
-			
+    g_backbuffer_va = (unsigned long) BACKBUFFER_VA;
+
 	//Device screen sizes. (herdadas do boot loader.)
-	g_device_screen_width = (unsigned long) SavedX;
-	g_device_screen_height = (unsigned long) SavedY;
-	
-	
+    g_device_screen_width  = (unsigned long) SavedX;
+    g_device_screen_height = (unsigned long) SavedY;
+
+
 	// #importante
 	// Nesse momento podemos testar o LFB.
 	// Enviando alguma coisa diretamente pra la' ...
@@ -706,24 +730,24 @@ int videoInit (void){
 	//#bugbug: 
 	//Na verdade video.c não tem acesso a essa variável,
 	//é preciso chamar o servidor através de um método para configurá-la.
-        
-	gwsSetCurrentFontAddress ( VIDEO_BIOS_FONT8X8_ADDRESS );		
+
+    gwsSetCurrentFontAddress ( VIDEO_BIOS_FONT8X8_ADDRESS );		
  
-	//#todo: usar a função que configura essas variáveis.
-	gcharWidth  = VIDEO_BIOS_FONT8X8_WIDTH;
-	gcharHeight = VIDEO_BIOS_FONT8X8_HEIGHT;
-	gfontSize   = FONT8X8;
+    // #todo: 
+    // Usar a função que configura essas variáveis.
+    gcharWidth  = VIDEO_BIOS_FONT8X8_WIDTH;
+    gcharHeight = VIDEO_BIOS_FONT8X8_HEIGHT;
+    gfontSize   = FONT8X8;
+
+    // Cursor. 
+    TTY[current_vc].cursor_x = 0;       //g_cursor_x = 0;
+    TTY[current_vc].cursor_y = 8;        //g_cursor_y = 8;
+    TTY[current_vc].cursor_width = 8;    //g_cursor_width = 8;
+    TTY[current_vc].cursor_height = 8;   //g_cursor_height = 8;
+    TTY[current_vc].cursor_color = COLOR_WHITE;
 
 
-	//Cursor. 
-	TTY[current_vc].cursor_x = 0;       //g_cursor_x = 0;
-	TTY[current_vc].cursor_y = 8;        //g_cursor_y = 8;
-	TTY[current_vc].cursor_width = 8;    //g_cursor_width = 8;
-	TTY[current_vc].cursor_height = 8;   //g_cursor_height = 8;
-	TTY[current_vc].cursor_color = COLOR_WHITE;
-
-
-	//@todo; Criar defines para default.
+    //@todo; Criar defines para default.
     TTY[current_vc].cursor_left = 0;      // Margem esquerda dada em linhas.
     TTY[current_vc].cursor_top = 0;       // Margem superior dada em linhas.
     TTY[current_vc].cursor_right  = 256;  // Margem direita dada em linhas.
@@ -757,14 +781,13 @@ int videoInit (void){
 	
 	
 #ifdef BREAKPOINT_TARGET_AFTER_VIDEO
-    //#debug 
-	//a primeira mensagem só aparece após a inicialização da runtime.
-	//por isso não deu pra limpar a tela antes.
-	printf(">>>debug hang: after video");
-	refresh_screen(); 
-	while (1){ asm ("hlt"); };
+    // #debug 
+    // A primeira mensagem só aparece após a inicialização da runtime.
+    // por isso não deu pra limpar a tela antes.
+    printf(">>>debug hang: after video");
+    refresh_screen(); 
+    while (1){ asm ("hlt"); };
 #endif
-
 
     return (int) Status;    
 }
@@ -779,7 +802,7 @@ int videoInit (void){
  */
 
 int videoVideo (void){
-	
+
     videoStatus = 0;
     videoError = 0;
     //...

@@ -155,13 +155,13 @@
 // out8 out16 out32
 
  
-unsigned char  in8  (int port); 
-unsigned short in16 (int port);
-unsigned long  in32 (int port);
+unsigned char  in8  (unsigned int port); 
+unsigned short in16 (unsigned int port);
+unsigned long  in32 (unsigned int port);
  
-void out8  (int port, unsigned char data);
-void out16 (int port, unsigned short data);
-void out32 (int port, unsigned long data);
+void out8  (unsigned int port, unsigned char data);
+void out16 (unsigned int port, unsigned short data);
+void out32 (unsigned int port, unsigned long data);
 
  
 //

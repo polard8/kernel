@@ -31,32 +31,37 @@
 //     out8 out16 out32
 
 
+// #bugbug
+// Talvez o melhor seria usar 'unsigned long' ao inves de 'int'
+// para as portas. Ou ainda 'unsigned int'.
+
+
 #include <kernel.h>
 
 
 
 
-unsigned char in8 (int port){
+unsigned char in8 (unsigned int port){
 
-    unsigned char ret;
+    unsigned char ret=0;
  
     asm volatile ("inb %%dx, %%al" : "=a"(ret): "d"(port) );
 
     return (unsigned char) ret;
 }
 
-unsigned short in16 (int port){
+unsigned short in16 (unsigned int port){
 
-    unsigned short ret;
+    unsigned short ret=0;
 
     asm volatile ("inw %%dx, %%ax" : "=a" (ret) : "d" (port) );
 
     return (unsigned short) ret;
 }
 
-unsigned long in32 (int port){
+unsigned long in32 (unsigned int port){
 
-    unsigned long ret;
+    unsigned long ret=0;
 
     asm volatile ("inl %%dx,%%eax" : "=a" (ret) : "d"(port) );
 
@@ -65,17 +70,17 @@ unsigned long in32 (int port){
 
 
 
-void out8 ( int port, unsigned char data ){
+void out8 ( unsigned int port, unsigned char data ){
 
     asm volatile ("outb %%al, %%dx" :: "a" (data), "d" (port) );
 }
 
-void out16 (int port, unsigned short data){
+void out16 (unsigned int port, unsigned short data){
     
     asm volatile ("outw %%ax, %%dx" :: "a" (data), "d" (port) );
 }
 
-void out32 ( int port, unsigned long data ){
+void out32 ( unsigned int port, unsigned long data ){
 
     asm volatile ("outl %%eax, %%dx" :: "a" (data), "d" (port) );
 }
