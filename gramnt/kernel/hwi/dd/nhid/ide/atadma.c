@@ -5,7 +5,7 @@
  *    kernel base persistent driver.
  *
  * Credits: 
- *     2018 - Nelson Cole.
+ *     2018 - Original by Nelson Cole.
  *     2019 - Fred Nora.
  */
 
@@ -104,24 +104,29 @@ static inline void ata_set_device_and_sector ( unsigned long count, unsigned lon
  */
 
 void 
-ide_dma_data ( void *addr, 
-               uint16_t byte_count,
-               uint8_t flg,
-               uint8_t nport )
+ide_dma_data ( 
+    void *addr, 
+    uint16_t byte_count,
+    uint8_t flg,
+    uint8_t nport )
 {
-    unsigned char data;
-    uint32_t phy;
 
-	// #todo: Check limits.
+    unsigned char data=0;
+    uint32_t phy=0;
 
-	//@todo: (&~1)sera que e necessario?
+
+	// #todo: 
+	// Check limits.
+
+	// #todo: (&~1)sera que e necessario?
+
 
     ide_dma_prdt[nport].addr = (unsigned long) addr;  
     ide_dma_prdt[nport].len  = byte_count | 0x80000000;
 
     phy = (uint32_t) &ide_dma_prdt[nport];
 
-	// prds physical.
+    // prds physical.
     out32 ( ata.bus_master_base_address + ide_dma_reg_addr, phy );
 
 	// (bit 3 read/write)
@@ -130,8 +135,8 @@ ide_dma_data ( void *addr,
 
     data = in8 ( ata.bus_master_base_address + ide_dma_reg_cmd ) &~8;
 
-	// TODO bit 8 Confilito no Oracle VirtualBox
-	// Obs: Isso foi enviado via argumento e agora foi alerado.
+    // #todo: bit 8, Confilito no Oracle VirtualBox
+	// #obs: Isso foi enviado via argumento e agora foi alerado.
 
     flg = 1;  
 
@@ -151,10 +156,10 @@ ide_dma_data ( void *addr,
  *     2018 - Created by Nelson Cole. 
  */
 
-void ide_dma_start (void){
-	
+void ide_dma_start (void)
+{
     unsigned char data = in8 ( ata.bus_master_base_address + ide_dma_reg_cmd );
-	
+
     out8 ( ata.bus_master_base_address + ide_dma_reg_cmd, data | 1 );
 }
 
@@ -166,13 +171,13 @@ void ide_dma_start (void){
  */
 
 void ide_dma_stop (void){
-	
+
     unsigned char data = in8 ( ata.bus_master_base_address + ide_dma_reg_cmd ); 
-	
+
     out8 ( ata.bus_master_base_address + ide_dma_reg_cmd, data &~1);
 
     data = in8 ( ata.bus_master_base_address + ide_dma_reg_status );
-	
+
     out8 ( ata.bus_master_base_address + ide_dma_reg_status, data &~6);
 }
 

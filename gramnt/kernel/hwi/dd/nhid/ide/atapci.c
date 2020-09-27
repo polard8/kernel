@@ -1,7 +1,8 @@
 /*
  * File: atapci.c
  * 
- * 
+ *    Original by Nelson Cole.
+ *    Fred Nora.
  */
 
 
@@ -88,7 +89,10 @@ diskWritePCIConfigAddr (
 
 uint32_t diskPCIScanDevice ( int class ){
 
-    int bus, dev, fun;
+    int bus=0;
+    int dev=0;
+    int fun=0;
+
 
 	// #bugbug 
 	// Usando -1 para unsigned int. 
@@ -141,7 +145,6 @@ uint32_t diskPCIScanDevice ( int class ){
 	//isso e' lento
 	//refresh_screen();
 
-
     return (uint32_t) (-1);
 }
 
@@ -154,7 +157,7 @@ uint32_t diskPCIScanDevice ( int class ){
 
 int diskATAPCIConfigurationSpace ( struct pci_device_d *D ){
 
-    uint32_t data;
+    uint32_t data=0;
 
 
 #ifdef KERNEL_VERBOSE
@@ -163,21 +166,20 @@ int diskATAPCIConfigurationSpace ( struct pci_device_d *D ){
 #endif
 
 
-    if ( (void *) D == NULL )
-    {
+    if ( (void *) D == NULL ){
         kprintf ("diskATAPCIConfigurationSpace: struct\n");
+        refresh_screen();
         return PCI_MSG_ERROR;
 
     }else{
 
-        if ( D->used != 1 || D->magic != 1234 )
-        {
+        if ( D->used != 1 || D->magic != 1234 ){
             kprintf ("diskATAPCIConfigurationSpace: validation\n");
-           return PCI_MSG_ERROR;
+            refresh_screen();
+            return PCI_MSG_ERROR;
         }
 
 		//ok
-
     };
 
 
@@ -232,7 +234,8 @@ int diskATAPCIConfigurationSpace ( struct pci_device_d *D ){
 	//
 
 
-    if ( D->classCode == PCI_CLASSCODE_MASS && D->subclass == PCI_SUBCLASS_IDE )
+    if ( D->classCode == PCI_CLASSCODE_MASS && 
+         D->subclass == PCI_SUBCLASS_IDE )
     {
 
         // IDE
@@ -297,8 +300,8 @@ int diskATAPCIConfigurationSpace ( struct pci_device_d *D ){
           {
               ata.chip_control_type = ATA_RAID_CONTROLLER;
 
-              kprintf ("diskATAPCIConfigurationSpace: ATA RAID not supported");
-              die ();
+              panic ("diskATAPCIConfigurationSpace: ATA RAID not supported");
+              //die ();
   
               //
               //  # ACHI
@@ -377,17 +380,15 @@ int diskATAPCIConfigurationSpace ( struct pci_device_d *D ){
 	// PCI cacheline, Latancy, Headr type, end BIST
 
     data = diskReadPCIConfigAddr ( D->bus, D->dev, D->func, 0xC );
-
     D->latency_timer = data >>  8 & 0xff;
     D->header_type   = data >> 16 & 0xff;
     D->bist          = data >> 24 & 0xff;
 
 
 
-
-	//
-	// # BARs
-	//
+    //
+    // == BARs =================================================
+    //
 
     D->BAR0 = diskReadPCIConfigAddr ( D->bus, D->dev, D->func, 0x10 );
     D->BAR1 = diskReadPCIConfigAddr ( D->bus, D->dev, D->func, 0x14 );
@@ -397,18 +398,16 @@ int diskATAPCIConfigurationSpace ( struct pci_device_d *D ){
     D->BAR5 = diskReadPCIConfigAddr ( D->bus, D->dev, D->func, 0x24 );
 
 
-    // Interrupt
+    // irqline and irq pin.
     
     data = diskReadPCIConfigAddr ( D->bus, D->dev, D->func, 0x3C );
-
     D->irq_line = data & 0xff;
     D->irq_pin  = data >> 8 & 0xff;
 
 
-    // PCI command and status
+    // PCI command and status.
 
     data = diskReadPCIConfigAddr ( D->bus, D->dev, D->func, 4 );
-
     D->Command = data & 0xffff; 
     D->Status  = data >> 16 & 0xffff;
 
@@ -425,16 +424,13 @@ int diskATAPCIConfigurationSpace ( struct pci_device_d *D ){
         D->irq_line, D->irq_pin );
 #endif
 
-
-
-	// DMA.
-
+    //
+    // == DMA =================================================
+    //
+    
     data = diskReadPCIConfigAddr ( D->bus, D->dev, D->func, 0x48);
-
-
-#ifdef KERNEL_VERBOSE
     kprintf ("[ Synchronous DMA Control Register %x ]\n", data );
-#endif
+
 
 
 //

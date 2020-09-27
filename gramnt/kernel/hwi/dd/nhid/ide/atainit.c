@@ -13,7 +13,8 @@
 /*
  *******************************************
  * ataDialog:
- *     Rotina de diálogo com o driver ATA. */
+ *     Rotina de diálogo com o driver ATA. 
+ */
 
 int 
 ataDialog ( 
@@ -21,7 +22,7 @@ ataDialog (
     unsigned long long1, 
     unsigned long long2 )
 {
-    int Status = 1;    //Error.	
+    int Status = 1;    //Error.
 
 
     switch (msg)
@@ -44,7 +45,7 @@ ataDialog (
 
         default:
             debug_print ("ataDialog: default\n");
-            printf ("ataDialog: fail\n");
+            printf      ("ataDialog: default\n");
             break;
     };
 
