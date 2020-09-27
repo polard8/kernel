@@ -7,6 +7,7 @@
  *        2020 - Created by Fred Nora. 
  */
 
+
 // hostname:D.S
 // [host]:<display>[.screen]
 // [host]:<display>.[screen]
@@ -1270,21 +1271,25 @@ gwsProcedure (
         case 1003:
             servicelineBackbufferDrawHorizontalLine();
             break;
-    
+
+
         // Draw char
-        //MSG_GWS_DRAWCHAR
+        // MSG_GWS_DRAWCHAR
+        // See: char.c
         case 1004:
             gwssrv_debug_print ("gwssrv: Message number 1004\n");
             serviceDrawChar();
             break;
 
+
         // Draw text
-        // #todo: tem que testar isso!!!
-        //MSG_GWS_DRAWTEXT
+        // MSG_GWS_DRAWTEXT
+        // See: dtext.c
         case 1005:
            gwssrv_debug_print ("gwssrv: Message number 1005\n");
            serviceDrawText();
            break;
+
 
         // Refresh window
         //MSG_GWS_REFRESHWIDNOW

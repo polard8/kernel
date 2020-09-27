@@ -1,9 +1,13 @@
 /*
  * File: libio.c
  * 
+ * Ring 3 i/o library.
+ * It's very dangerous.
+ * But it helps to implement drivers in ring3 to port it 
+ * to kernel in the future.
+ * 
  * 2019 - Created by Fred Nora.
  */
-
 
 
 // Acesso a portas para processos em user mode.
@@ -28,7 +32,7 @@
 
 // Protótipo da system call.
 
-void *
+unsigned long
 __libio_system_call ( 
     unsigned long ax, 
     unsigned long bx, 
@@ -41,14 +45,14 @@ __libio_system_call (
  *     system call usada pelo gdeio para acessar as portas.
  */
 
-void *
+unsigned long
 __libio_system_call ( 
     unsigned long ax, 
     unsigned long bx, 
     unsigned long cx, 
     unsigned long dx )
 {
-    int Ret = 0;
+    unsigned long Ret = 0;
 
     // System interrupt.
 
@@ -57,44 +61,62 @@ __libio_system_call (
         : "i"(0x80), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
 
 
-    return (void *) Ret; 
+    return (unsigned long) Ret; 
 }
 
 
+//
+// == IN ======================================================
+//
 
 // #bugbug: return size
-//retorna o valor.
-unsigned char gde_inport8 (unsigned short port)
+// retorna o valor.
+unsigned char gde_inport8 (unsigned int port)
 {
-    return (unsigned char) __libio_system_call ( 126, 
+    unsigned char _Ret=0;
+
+
+    _Ret = (unsigned char) __libio_system_call ( 126, 
                                (unsigned long) 8, 
                                (unsigned long) port, 
                                (unsigned long) port );
+
+    return (unsigned char) _Ret;
 }
 
 
 // #bugbug: return size
 //retorna o valor.
-unsigned short gde_inport16 (unsigned short port)
+unsigned short gde_inport16 (unsigned int port)
 {
-    return (unsigned short) __libio_system_call ( 126, 
+    unsigned short _Ret=0;
+    
+    _Ret = (unsigned short) __libio_system_call ( 126, 
                                 (unsigned long) 16, 
                                 (unsigned long) port, 
                                 (unsigned long) port );
+    return (unsigned short) _Ret;
 }
 
 
 //retorna o valor.
-unsigned long gde_inport32 (unsigned short port)
+unsigned long gde_inport32 (unsigned int port)
 {
-    return (unsigned long) __libio_system_call ( 126, 
+    unsigned long _Ret=0;
+    
+    _Ret = (unsigned long) __libio_system_call ( 126, 
                                (unsigned long) 32, 
                                (unsigned long) port, 
                                (unsigned long) port );
+    return (unsigned long) _Ret;
 }
 
 
-void gde_outport8 ( unsigned short port, unsigned char value)
+//
+// == OUT ======================================================
+//
+
+void gde_outport8 ( unsigned int port, unsigned char value)
 {
     __libio_system_call ( 127, 
          (unsigned long) 8, 
@@ -103,7 +125,7 @@ void gde_outport8 ( unsigned short port, unsigned char value)
 }
 
 
-void gde_outport16 ( unsigned short port, unsigned short value)
+void gde_outport16 ( unsigned int port, unsigned short value)
 {
     __libio_system_call ( 127, 
         (unsigned long) 16, 
@@ -112,7 +134,7 @@ void gde_outport16 ( unsigned short port, unsigned short value)
 }
 
 
-void gde_outport32 ( unsigned short port, unsigned long value)
+void gde_outport32 ( unsigned int port, unsigned long value)
 {
     __libio_system_call ( 127, 
         (unsigned long) 32, 

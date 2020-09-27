@@ -36,34 +36,19 @@ CFLAGS = -m32 \
 LIBS  = -I. -I ../../../rtl/include/
 
 
-.PHONY: all all-c gws-link finalize clean
 
 
 
-all: main.o all-c gws-link finalize clean
+.PHONY: all all-c finalize clean
+
+all: all-c finalize clean
 	@echo "Ok?"
 
-main.o:
-#nothing
-
-
-   # vamos incluir a libcore do mesmo modo que a api incluiu.
-   # Porém acho que a api não usou recursos da libcore;
-
 all-c:
-
 	gcc -c connect.c  $(CFLAGS) $(LIBS) -o connect.o
 	gcc -c events.c   $(CFLAGS) $(LIBS) -o events.o
 	gcc -c rw.c       $(CFLAGS) $(LIBS) -o rw.o
 	gcc -c gws.c      $(CFLAGS) $(LIBS) -o gws.o
-
-
-
-
-#create 'ar'
-gws-link:
-#nothing.
-
 
 finalize:
 	-mkdir obj/

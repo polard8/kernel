@@ -189,6 +189,13 @@ int gwssrv_refresh_this_rect( struct gws_rect_d *rect )
 }
 
 
+/*
+ *************************************************** 
+ * gws_refresh_rectangle:
+ * 
+ * 
+ */
+ 
 void 
 gws_refresh_rectangle ( 
     unsigned long x, 
@@ -201,7 +208,6 @@ gws_refresh_rectangle (
     const void *q = (const void*) ____BACKBUFFER_VA;
 
 
-	//#TEST
     register unsigned int i=0;
     //unsigned int i;
 
@@ -213,24 +219,18 @@ gws_refresh_rectangle (
 
     // Device info.
     unsigned long ScreenWidth  = (unsigned long) gws_get_device_width();
-    unsigned long ScreenHeight = (unsigned long) gws_get_device_height();
+    //unsigned long ScreenHeight = (unsigned long) gws_get_device_height();
 
     int count=0; 
 
 	// = 3; 24bpp
-    int bytes_count=0;
-    int pitch=0;   //width + bpp
-    
+	int bytes_count=0;
+
+
 
     line_size = (unsigned int) width; 
     lines     = (unsigned int) height;
 
-
-    if ( width> ScreenWidth)
-        gwssrv_debug_print ("gws_refresh_rectangle: width limits\n");
-
-    if ( height> ScreenHeight )
-        gwssrv_debug_print ("gws_refresh_rectangle: height limits\n");
 
 
     switch (SavedBPP){
@@ -238,19 +238,12 @@ gws_refresh_rectangle (
         case 32:  bytes_count = 4;  break;
         case 24:  bytes_count = 3;  break;
 
-        // ...
+		// ...
 
-        default:
-            gwssrv_debug_print ("gws_refresh_rectangle: SavedBPP\n");
-            printf             ("gws_refresh_rectangle: SavedBPP\n");
-            exit(1);
-            break;
+		//??
+		//default:
+		    //break;
     };
-
-
-    // Bytes per line.
-    pitch = (line_size*bytes_count);
-
 
 	// #atenção.
 	
@@ -258,47 +251,51 @@ gws_refresh_rectangle (
 
     offset = (unsigned int) ( (bytes_count*SavedX*(y)) + (bytes_count*(x)) );
 
-    p = (void *)       (p + offset); 
-    q = (const void *) (q + offset); 
+    p = (void *)       (p + offset);    
+    q = (const void *) (q + offset);    
 
 
 	// #bugbug
 	// Isso pode nos dar problemas.
 	// ?? Isso ainda é necessário nos dias de hoje ??
 	
-	//vsync ();
-
+	//vsync ();	
+		
+	//(line_size * bytes_count) é o número de bytes por linha. 
 
 	//#importante
-	//É bem mais rápido com múltiplos de 4.
+	//É bem mais rápido com múltiplos de 4.	
+	
+	//se for divisível por 4.
+	if ( ((line_size * bytes_count) % 4) == 0 )
+	{
+        count = ((line_size * bytes_count) / 4); 
 
+	    for ( i=0; i < lines; i++ )
+	    {
+		    //copia uma linha ou um pouco mais caso não seja divisível por 
+		    rect_memcpy32 ( p, q, count );
+		    
+			q += (ScreenWidth * bytes_count);
+	 		p += (ScreenWidth * bytes_count);
+	    };
+	}
 
-    // Se for divisível por 4.
-    // Copia uma linha ou um pouco mais caso 
-    // não seja divisível por 4.
-    if ( (pitch % 4) == 0 )
-    {
-        count = (pitch / 4); 
-
-        for ( i=0; i < lines; i++ ){
-            rect_memcpy32 ( p, q, count );
-            q += pitch;
-            p += pitch;
-        };
-    }
-
-    // Se não for divisível por 4.
-    // #bugbug: Isso deixa muito lento para os casos
-    // que nao sao 4bytes, pois tem que copiar byte por byte.
-    if ( ( pitch % 4) != 0 )
-    {
-        for ( i=0; i < lines; i++ ){
-            memcpy ( (void *) p, (const void *) q, pitch );
-            q += pitch;
-            p += pitch;
-        };
-    }
+	//se não for divisível por 4.
+	if ( ((line_size * bytes_count) % 4) != 0 )
+	{
+	    for ( i=0; i < lines; i++ )
+	    {
+		    memcpy ( (void *) p, (const void *) q, (line_size * bytes_count) );
+		    
+			q += (ScreenWidth * bytes_count);
+		    p += (ScreenWidth * bytes_count);
+	    };
+	}
 }
+
+
+
 
 
 /*

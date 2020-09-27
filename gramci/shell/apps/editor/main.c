@@ -762,7 +762,7 @@ int main ( int argc, char *argv[] ){
         debug_print("Editor: addressbar_window fail\n"); 
         
      
-     gws_draw_text (
+    gws_draw_text (
         (int) client_fd,            // fd,
         (int) addressbar_window,    // window id,
         (unsigned long) 8,          // left,
@@ -791,7 +791,7 @@ int main ( int argc, char *argv[] ){
     // client window (White)
     client_window = gws_create_window (client_fd,
         WT_EDITBOX,1,1,"client",
-        4, 32 + 40, 
+        4, 32 +40, 
         (640-8), (480 -32 - 40 - 4),
         main_window,0,COLOR_WHITE, COLOR_WHITE);
 

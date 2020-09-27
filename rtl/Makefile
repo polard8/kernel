@@ -62,15 +62,11 @@ endif
 
 
 
-#.PHONY: all all-c jackpot-link finalize clean
+
 .PHONY: all all-c libc-link finalize clean
 
-#all: main.o all-c jackpot-link finalize clean
-all: main.o all-c libc-link finalize clean
+all: all-c libc-link finalize clean
 	@echo "Ok?"
-
-main.o:
-#	nothing...
 
 all-c:
 
@@ -83,10 +79,8 @@ all-c:
 #/fcntl
 	gcc  -c  fcntl/fcntl.c  $(CFLAGS) -I. -I include/ -o fcntl.o
 
-
 #/fscanf
 	gcc  -c  mmap/mmap.c  $(CFLAGS) -I. -I include/ -o mmap.o
-
 
 #/mmap
 	gcc  -c  fscanf/fscanf.c  $(CFLAGS) -I. -I include/ -o fscanf.o
@@ -115,7 +109,6 @@ all-c:
 #/unistd
 	gcc  -c  termios/termios.c  $(CFLAGS) -I. -I include/ -o termios.o
 
-
 # outros	
 	gcc  -c  conio.c   $(CFLAGS) -I. -I include/ -o conio.o
 	gcc  -c  string.c  $(CFLAGS) -I. -I include/ -o string.o
@@ -134,15 +127,12 @@ all-c:
 	gcc  -c  pty.c    $(CFLAGS) -I. -I include/ -o pty.o
 	gcc  -c  tty.c    $(CFLAGS) -I. -I include/ -o tty.o
 
-
 	gcc  -c  _split.c    $(CFLAGS) -I. -I include/ -o _split.o
-	
 	
 	gcc  -c  linkaddr.c    $(CFLAGS) -I. -I include/ -o linkaddr.o
 	
 #...	
 
- 
 #tests 
 #	gcc  -c  tests/test1.c   $(CFLAGS) -I. -I include/ -o test1.o
  
@@ -164,27 +154,24 @@ all-c:
 	
 
 # create 'ar'
-# #todo: We need a new ld file.
+# #todo: 
+# We need a new ld file.
 libc-link:
+
 #	ar rc LIBC03.A $(OBJECTS)
 #	ld -m elf_i386 socrt0.o somain.o -nostdlib -T elf_ia32_efi.lds -shared -znocombreloc -Bsymbolic -L . -l:LIBC03.A -o LIBC03.SO -Map map.s
+
 
 finalize:
 	-mkdir obj/
 	-cp *.o obj/
 	-cp LIBC03.A obj/
 	-cp LIBC03.SO obj/
-	
-	
+
 
 clean:
 	-rm *.o
 	-rm *.A
 	-rm *.SO
-	
-	
-#linux-test:
-	#gcc -o linux-test main.c
-
 	
 

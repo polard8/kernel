@@ -12,9 +12,9 @@
 #include <gws.h>
 
 
-
-
 // #todo
+// Draw char.
+// Service 1004.
 int serviceDrawChar(void)
 {
 

@@ -1,28 +1,29 @@
 /*
  * File: dtext.c 
  * 
- *     string support.
+ *     Draw text routines.
  */
 
-
-//#include <api.h>
 
 #include <gws.h>
 
 
 
-int serviceDrawText(void)
+// Draw text.
+// Service 1005
+int serviceDrawText (void)
 {
 
-	//o buffer é uma global nesse documento.
+    // Global buffer.
     unsigned long *message_address = (unsigned long *) &__buffer[0];
 
 
-    struct gws_window_d *window;
-    int window_id = -1;
-    unsigned long x;
-    unsigned long y;
-    unsigned long color;
+    struct gws_window_d  *window;
+    
+    int window_id = -1;      // index 4
+    unsigned long x;         // index 5
+    unsigned long y;         // index 6
+    unsigned long color;     // index 7
 
 
     // #debug
@@ -31,10 +32,10 @@ int serviceDrawText(void)
 
     // Get
 
-    window_id = message_address[4];
-    x         = message_address[5];
-    y         = message_address[6]; 
-    color     = message_address[7];
+    window_id = (int) message_address[4];
+    x         = (unsigned long) message_address[5];
+    y         = (unsigned long) message_address[6]; 
+    color     = (unsigned long) message_address[7];
 
 
     /*
@@ -49,11 +50,13 @@ int serviceDrawText(void)
         exit(1);
     }
     */
-   
+
+
    //
-   // Draw
+   // == Draw ==========================================
    //
-   
+
+
     //#todo
     // Get the window structure given the id.
     //window = (struct gws_window_d *) windowList[window_id];
@@ -74,6 +77,10 @@ int serviceDrawText(void)
     buf[i] = 0;
     
     
+    //
+    // == Draw ===============================================
+    //
+    
     //#todo
     //switch (alignment) {  ... }
     
@@ -87,20 +94,32 @@ int serviceDrawText(void)
 
         window = (struct gws_window_d *) windowList[window_id];
         
-        if((void*)window!=NULL){
+        if ((void*)window!=NULL){
             dtextDrawText ( (struct gws_window_d *) window,
                 x, y, color, buf );
+        
+            gws_show_window_rect(window);
         }
     
     //#debug
     }else{
-        
-        dtextDrawText ( (struct gws_window_d *) gui->screen,
-            x, y, color, buf ); 
+
+        if ( (void*) gui->screen != NULL ){
+            
+            dtextDrawText ( (struct gws_window_d *) gui->screen,
+                x, y, color, buf ); 
+                
+            gws_show_window_rect(gui->screen);
+         }
     };
 
 
-   gws_show_backbuffer (); // for debug   
+   // #debug
+   // We are refreshing the whole screen for now.
+   // #todo: let's try to refresh only the window.
+   // or each char maybe.
+   
+   //gws_show_backbuffer(); 
    
    return 0;
 }
@@ -136,18 +155,16 @@ dtextDrawString (
     
         //#debug
         //gde_message_box (3, "xxx","dtext-draw_string: cWidth");
-        printf("dtext-draw_string: cWidth\n");
+        printf ("dtextDrawString: cWidth\n");
         while(1){}
     }
-      
-      
+
     //int size = sizeof(string);  
     //for ( Index=0; Index<size; Index++ )
     
     for ( Index=0; string[Index] != 0; Index++ )
     {
-        charBackbufferDrawcharTransparent ( 
-            x, y, 
+        charBackbufferDrawcharTransparent ( x, y, 
             color, string[Index] );
 
         //#todo: 
@@ -186,21 +203,18 @@ dtextDrawText (
     __w = (struct gws_window_d *) gui->screen;
 
 
-    if ( (void *) window == NULL )
-    {
-        if( (void*)__w != NULL ){
-            dtextDrawString ( __w->left +x, __w->top +y, color, string );
+    if ( (void *) window == NULL ){
+
+        if ( (void*)__w != NULL ){
+            dtextDrawString ( (__w->left +x), (__w->top +y), color, string );
             return;
         }
         gwssrv_debug_print("dtextDrawText: __w\n");
         return;
-        
+
     }else{
-        dtextDrawString ( window->left +x, window->top +y, color, string );
+        dtextDrawString ( (window->left +x), (window->top +y), color, string );
     };
 }
-
-
-
 
 

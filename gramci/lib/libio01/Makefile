@@ -1,6 +1,6 @@
-
-#history:
-#2019 - Created by Fred Nora.
+# danger: ring3 i/o library. hahaha
+# History:
+# 2019 - Created by Fred Nora.
 
 
 VERSION = 0
@@ -27,19 +27,13 @@ CFLAGS = -m32 \
 
 
 
-.PHONY: all all-c gdeio-link finalize clean
+.PHONY: all all-c finalize clean
 
-
-all: main.o all-c gdeio-link finalize
+all: all-c finalize clean
 	@echo "Ok?"
 
-main.o:
-	gcc  -c  libio.c $(CFLAGS) -I include/ -o libio.o 
-
-
 all-c:
-
-gdeio-link:
+	gcc  -c  libio.c $(CFLAGS) -I include/ -o libio.o 
 
 finalize:
 	-mkdir obj

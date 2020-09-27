@@ -1199,8 +1199,8 @@ __gws_drawtext_request (
     // msg = 369 (get input event)
 
 
-    while (1)
-    {
+    while (1){
+
         message_buffer[0] = 0;       // window. 
         message_buffer[1] = 1005;    // Draw text.
         message_buffer[2] = 0;
@@ -1214,7 +1214,7 @@ __gws_drawtext_request (
         char buf[256];
         int i=0;
         int string_off=8;
-        for(i=0; i<250; i++)
+        for (i=0; i<250; i++)
         {
             message_buffer[string_off] = *string;
             string_off++; string++;
@@ -1640,7 +1640,7 @@ gws_draw_text (
         (char *) string );
 
     gws_debug_print("gws_draw_text: response\n");
-    response = __gws_drawtext_response((int) fd);  
+    response = __gws_drawtext_response ((int) fd);  
 
     gws_debug_print("gws_draw_text: done\n");
     return (int) response;
