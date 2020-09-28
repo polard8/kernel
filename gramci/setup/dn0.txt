@@ -10,3 +10,10 @@
 	have it's own user session.
 
 
+        ----
+        We need to close the 'setup system'
+        to initializes the user environment. Just like the BIOS system.
+
+        The goal is that the setup system is the only system that uses the
+        libcore/ library, so we can change its name to libsu/
+

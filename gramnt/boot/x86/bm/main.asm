@@ -268,6 +268,14 @@ START_AFTER_DATA:
     mov ah, byte 08h
     int 0x13 
 
+
+    ;; #test
+    ;; Set the keyboard repeat rate to the max
+    ;; mov ax, 0x0305
+    ;; xor bx,bx 
+    ;; int 0x16
+
+
 	;
 	;Heads.
 	;Numero de heads.

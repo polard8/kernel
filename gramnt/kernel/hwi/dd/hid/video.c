@@ -18,13 +18,52 @@
 // e enviará dados para o lfb.
 
 
+//
+// == VGA =======================================================
+//
+
+/*
+  
+    This index lists the VGA's I/O ports in numerical order, 
+    making looking up a specific I/O port access simpler.
+ 
+    3B4h -- CRTC Controller Address Register
+    3B5h -- CRTC Controller Data Register
+    3BAh Read -- Input Status #1 Register
+    3BAh Write -- Feature Control Register
+    3C0h -- Attribute Address/Data Register
+    3C1h -- Attribute Data Read Register
+    3C2h Read -- Input Status #0 Register
+    3C2h Write -- Miscellaneous Output Register
+    3C4h -- Sequencer Address Register
+    3C5h -- Sequencer Data Register
+    3C7h Read -- DAC State Register
+    3C7h Write -- DAC Address Read Mode Register
+    3C8h -- DAC Address Write Mode Register
+    3C9h -- DAC Data Register
+    3CAh Read -- Feature Control Register
+    3CCh Read -- Miscellaneous Output Register
+    3CEh -- Graphics Controller Address Register
+    3CFh -- Graphics Controller Data Register
+    3D4h -- CRTC Controller Address Register
+    3D5h -- CRTC Controller Data Register
+    3DAh Read -- Input Status #1 Register
+    3DAh Write -- Feature Control Register
+
+See:
+    https://web.stanford.edu/class/cs140/projects/pintos/specs/freevga/vga/portidx.htm
+ */
+
+
+
+
 #include <kernel.h>
 
 
 //Definições internas.
 
 //@todo: Criar um arquivo para gerenciar fontes.
-#define VIDEO_BIOS_FONT8X8_ADDRESS 0x000FFA6E
+#define VIDEO_BIOS_FONT8X8_ADDRESS    0x000FFA6E
 //#define VIDEO_BIOS_FONT8X16_ADDRESS (0x000FFA6E+??)
 //...
 
