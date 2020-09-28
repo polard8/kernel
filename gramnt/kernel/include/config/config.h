@@ -13,6 +13,16 @@
 #define DEFAULT_HZ 1000
 
 
+// Where are the types defines?
+// See:
+// core/init.c
+	// 5 	Start the system normally with appropriate 
+	// display manager (with GUI) 	
+	// Same as runlevel 3 + display manager.
+	// Full multi-user graphical mode. 
+#define DEFAULT_RUNLEVEL 5
+
+
 
 
 //

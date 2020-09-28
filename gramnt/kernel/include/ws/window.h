@@ -65,6 +65,11 @@ int windowLoadGramadoIcons (void);
 
 int window_getch (void); 
 
+
+void CreateProgressBar(void);
+void IncrementProgressBar(void);
+
+
 //
 // #importante:
 // Tipos de mensagem de comunicação nos diálogos 

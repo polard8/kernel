@@ -1528,14 +1528,6 @@ int systemStartUp (void){
     debug_print ("==== systemStartUp:\n");
     printf("systemStartUp:\n");
 
-
-    //
-    // == phase 0 ========================================
-    //
-
-    KeInitPhase = 0;    //Set Kernel phase.    
-
-
 	// Antes de tudo: 
 	// CLI, Video, runtime.
 
@@ -1557,16 +1549,19 @@ int systemStartUp (void){
 		//Set scheduler type. (Round Robin).
 	    schedulerType = SCHEDULER_RR; 
 		
-	    
-		//Obs: O video já foi inicializado em main.c.
-				
+
+		// Obs: 
+		// O video já foi inicializado em main.c.
+
 		//
 		// BANNER !
 		//
 		
         //Welcome message. (Poderia ser um banner.) 
-		set_up_cursor (0,1);
-		
+        
+        set_up_cursor (0,1);
+
+
 //#ifdef EXECVE_VERBOSE		
         //#todo
 		//printf("sm-sys-system-systemStartUp: Starting 32bit Kernel [%s]..\n",
@@ -1588,19 +1583,19 @@ int systemStartUp (void){
 //			(unsigned long) SavedY,
 //			(unsigned long) SavedBPP );
 //#endif
-	
-        
+
+
+
         //
-        // INIT ! 
+        // == INIT ! ===========================================
         //  
 
         // See: 
-        // init.c
+        // core/init.c
 
         Status = (int) init(); 
 
-        if ( Status != 0 )
-        {
+        if ( Status != 0 ){
             debug_print ("systemStartUp: init fail\n");
             panic       ("systemStartUp: init fail\n");
         }
@@ -1610,15 +1605,6 @@ int systemStartUp (void){
     }; //--else
 
 
-    // System Version:
-    // Configurando a versão do sistema.
-    // #todo
-    // Talvez o init deva chamar essa rotina,
-    // para configurar a versao e o produto
-
-    printf ("systemStartUp: Setup version\n");
-    
-    systemSetupVersion();
 
 
     //printf("*breakpoint\n");
@@ -1647,10 +1633,6 @@ done:
 	//refresh_screen();
 
 
-    // #todo: Use '-1'.
-    if (KeInitPhase != 3){ Status = (int) -1; }
-
-
     // ok
     printf ("systemStartUp: done\n");
     
@@ -1670,8 +1652,17 @@ done:
 
 int systemInit (void){
 
-    int Status = 0;
+    int Status = 0; //ok
 
+
+    //
+    // == phase 0 ========================================
+    //
+
+    // Essa eh uma boa rotina pra inicializar o contador de fases.
+    KeInitPhase = 0;    //Set Kernel phase.    
+    
+    
     //
     // Flag.
     //
@@ -1679,8 +1670,8 @@ int systemInit (void){
     gSystemStatus = 1;
 
     debug_print ("====\n");
-    debug_print ("====systemInit:\n");
-    printf ("systemInit:\n");
+    debug_print ("systemInit:\n");
+    printf      ("systemInit:\n");
 
 
    // #todo
@@ -1688,14 +1679,20 @@ int systemInit (void){
    // para configurar a versao e o produto
 
     gSystemEdition = 0;
-    //...
 
-	// Podemos fazer algumas inicializações antes de chamarmos 
-	//a rotina de start up.
+    // System Version:
+    // Configurando a versão do sistema.
+    // Estamos inicializando as estruturas.
+    // O processo init.bin podera usa-la.
+    // Ou ainda a inicializaçao podera depender da versao.
+    
+    printf ("systemInit: Initialize version support\n");
+    systemSetupVersion();
+
 
     Status = (int) systemStartUp();
     if (Status < 0)
-            panic("systemInit: systemStartUp fail\n");
+        panic("systemInit: systemStartUp fail\n");
 
 	//#debug 
 	//a primeira mensagem só aparece após a inicialização da runtime.
@@ -1708,6 +1705,36 @@ int systemInit (void){
 #endif
 
 
+    printf("=========================\n");
+    printf("core-init: end of phase 2\n");
+
+    // 3 - fim da fase 2.
+    IncrementProgressBar();
+    
+    //refresh_screen();
+    //while(1){}
+
+
+//
+// == phase 3 ? ================================================
+//
+    
+    KeInitPhase = 3; 
+    
+    // Logon. 
+    // Cria Background, main window, navigation bar.
+    // de acordo com predefinição.
+    // See:
+    // windows/logon.c
+
+
+    if ( g_useGUI != 1 )
+        panic("core-init: NO GUI");
+        
+    printf ("core-init: calling init_logon_manager ...\n");
+    init_logon_manager();
+
+
     // #debug:  
     // Esperamos alcaçarmos esse alvo.
     // Isso funcionou gigabyte/intel
@@ -1715,7 +1742,7 @@ int systemInit (void){
     // Quem chamou essa funçao foi o começo da inicializaçao do kernel.
     // Retornamos para x86main.c para arch x86.
 
-    debug_print ("====systemInit: done\n");
+    debug_print ("systemInit: done\n");
     debug_print ("====\n");
 
 

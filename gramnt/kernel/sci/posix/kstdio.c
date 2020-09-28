@@ -542,6 +542,9 @@ printi (
 // vai escrever na IVT ?
 // Vai chamar alguma rotina passando esse emsmo endereço de buffer.
 
+//Atençao:
+// print() nao analisa flags como runlevel ou kernel phase.
+
 int print ( char **out, int *varg ){
 
     register int width, pad;
@@ -656,17 +659,34 @@ int print ( char **out, int *varg ){
 // Vamos substtuir essa função por uma de licensa bsd.
 // Olhar na biblioteca.
 
-int printf ( const char *format, ... ){
-
+int printf ( const char *format, ... )
+{
     register int *varg = (int *) (&format);
-
 
     // #bugbug:
     // Se print() está usando '0' como buffer,
     // então ele está sujando a IVT. 
+
+    // Durante a inicializaçao
+    // A partir da fase 3 teremos printf novamente.
+
+    if ( KeInitPhase < 3 )
+    {
+        // Esse runlevel eh o modo grafico completo.
+        // entao essa funçao nao funciona ?
+
+        if ( current_runlevel == 5 ){
+            debug_print("kernel: printf quiet for KeInitPhase < 3 and runlevel 5\n");
+            return 0;
+        }
+    }
     
+    //Atençao:
+    // print() nao analisa flags.
+
     return (int) print ( 0, varg );
 }
+
 
 
 

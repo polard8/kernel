@@ -216,7 +216,7 @@ DrawFrame (
         drawDataRectangle( window->left, 
             window->top, border_size, window->height, border_color );
 
-		//board2, borda direita e baixo.
+        //board2, borda direita e baixo.
         drawDataRectangle( window->left +window->width -1, 
             window->top, border_size, window->height, border_color );
 

@@ -21,6 +21,9 @@
  * hang the system.
  */
 
+// Isso funciona em todas as fases e em todos os runlevels.
+// porque print nao analisa flags.
+
 void panic ( const char *format, ... ){
 
     register int *varg = (int *) (&format);

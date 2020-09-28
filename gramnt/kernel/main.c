@@ -169,8 +169,8 @@ int kernel_main (int arch_type){
 
     // In video.c 
 
-    videoVideo ();
-    videoInit ();
+    videoVideo();
+    videoInit();
 
     // Init screen
 
@@ -227,7 +227,7 @@ int kernel_main (int arch_type){
 
     switch (current_arch){
 
-        // See: bottom/init/x86/x86init.c
+        // See: hwi/init/x86/x86init.c
         case CURRENT_ARCH_X86:
             debug_print ("[Kernel] kernel_main: Initializing x86 arch ...\n");
             Status = (int) x86main();

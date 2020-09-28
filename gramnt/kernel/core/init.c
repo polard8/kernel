@@ -398,8 +398,11 @@ void init_globals (void){
 	// display manager (with GUI) 	
 	// Same as runlevel 3 + display manager.
 	// Full multi-user graphical mode. 
+    // See: config.h
+    
+    current_runlevel = DEFAULT_RUNLEVEL;
+    //current_runlevel = 5;
 
-    current_runlevel = 5;
 
     //===================	
 	//vamos atrasar configuração de janela em favor de configuração de mensagem
@@ -512,7 +515,6 @@ void init_globals (void){
     backgroundDraw ( (unsigned long) COLOR_BLUE ); 
 #endif
 
-
     //printf("#breakpoint glob");
     //refresh_screen(); 
     //while(1){}
@@ -558,23 +560,31 @@ int init (void){
         panic       ("core-init: KeInitPhase fail\n");
     }
 
-
 	//
 	// #IMPORTANT
 	//
 
     // Globals.
     debug_print ("core-init: Globals\n");
-    init_globals ();
+    init_globals();
+
+    // ==============================================================
+    // #importante
+    // À partir daqui podemos exibir strings na tela.
+    // Ou usarmos a barra de progresso. Depende do runlevel.
+    // ==============================================================
 
 
-	// #importante
-	// À partir daqui podemos exibir strings na tela.
+    //
+    // == progress bar ===================================
+    //
+    
+    // Precisa ser depois de inicializar as globais
+    // pois considera o runlevel.
+
+    CreateProgressBar();
 
 
-	
-	
-	
 #ifdef EXECVE_VERBOSE
     printf ("core-init: init_globals ok\n");     
 #endif  
@@ -767,14 +777,17 @@ int init (void){
         panic ("core-init: init_architecture_independent fail\n"); 
     }
 
+    printf("=========================\n");
+    printf("core-init: end of phase 0\n");
+    
+    // 1. Fim da fase 0.
+    IncrementProgressBar();
+    //refresh_screen();
+    //while(1){}
+
     //
     // == phase 1 ? ================================================
     //
-
-    printf("=========================\n");
-    printf("core-init: end of phase 0\n");
-    refresh_screen();
-    //while(1){}
 
     KeInitPhase = 1;
 
@@ -816,16 +829,23 @@ int init (void){
     ldisc_init_lock_keys ();
 
 
+    printf("=========================\n");
+    printf("core-init: end of phase 1\n");
+
+    //2 - fim da fase 1.
+    IncrementProgressBar();
+    //refresh_screen();
+    //while(1){}
+
     //
     // == phase 2 ? ================================================
     //
 
-    printf("=========================\n");
-    printf("core-init: end of phase 1\n");
-    refresh_screen();
-    //while(1){}
-
     KeInitPhase = 2;
+    
+    
+    
+    
 
 
     //#debug
@@ -833,78 +853,12 @@ int init (void){
     // refresh_screen();
     // while(1){}	
 
-	//
-	//  ==============  #### LOGON #### ===============
-	//
 
-    debug_print ("core-init: logon\n");
-
-	
-	//printf("#breakpoint before logon");
-	//refresh_screen();
-	//while(1){}	
-	
-	//
-	// Logon.
-	//
-	
-	//Fase3: Logon. 
-//Logon:
-
-    //
-    // Logon. 
-    // Cria Background, main window, navigation bar.
-    // de acordo com predefinição.
-    //
-
-    // See:
-    // windows/logon.c
+    debug_print ("==== init: done\n");
+    printf      ("==== init: done\n");
 
 
-    if ( g_useGUI != 1 )
-        panic("core-init: NO GUI");
 
-
-    printf ("core-init: calling init_logon_manager ...\n");
-    init_logon_manager();
-
-    //
-    // == phase 3 ? ================================================
-    //
-
-    printf("=========================\n");
-    printf("core-init: end of phase 2\n");
-    refresh_screen();
-    //while(1){}
-
-    KeInitPhase = 3; 
-
-
-    //#debug
-    //printf ("init: *breakpoint :) \n"); 
-    //refresh_screen();
-    //while(1){}
-
-
-	// Continua ...
-	
-
-// * Fase 3:
-// *     classe system.device.unblocked.
-// *	   @todo: Inicializar dispositivos LPC/super io.
-// *            Keyboard, mouse, TPM, parallel port, serial port, FDC. 
-// *
- //* Fase 4:
- //*     classe system.device.unblocked.
- //*     @todo: Dispositivos PCI, ACPI ...
- //*
-	
-	
-// Done.
-//done:
-    //printf("Done!\n");	
-	//refresh_screen();
-	//@todo: Deve retornar a variável Status.
 
 
 #ifdef BREAKPOINT_TARGET_AFTER_INIT
@@ -918,10 +872,6 @@ int init (void){
         asm ("hlt"); 
     }
 #endif
-
-    debug_print ("==== init: done\n");
-    printf      ("==== init: done\n");
-
 
 
     // #debug
