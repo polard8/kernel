@@ -1,6 +1,11 @@
 
 
 all:
+
+	# lib
+	make -C libcore
+
+
 	make -C gdeshell
 	make -C gfe
 	make -C gramcode

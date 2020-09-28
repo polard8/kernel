@@ -1,5 +1,4 @@
-# gde file explorer
-# file explorer for gde.
+# sysmon - system monitor for gde.
 
 #history:
 #2019 - Created by Fred Nora.
@@ -10,24 +9,7 @@ VERSION = 0
 PATCHLEVEL = 0
 SUBLEVEL = 0
 EXTRAVERSION =
-#NAME = Gramado File Explorer
-
-#todo:
-#We need to simplify these flags
-
-#CFLAGS = -m32 \
-#	--std=gnu89 \
-#	-nodefaultlibs \
-#	-nostdinc \
-#	-nostdlib \
-#	-static \
-#	-fgnu89-inline \
-#	-ffreestanding \
-#	-fno-builtin \
-#	-fno-pie \
-#	-no-pie \
-#	-fno-stack-protector \
-#	-s
+#NAME = sysmon
 
 
 CFLAGS = -m32 \
@@ -47,13 +29,11 @@ CFLAGS = -m32 \
 
 
 
-
-
 LIBC    = ../../../rtl/include/
 LIBCOBJ = ../../../rtl/obj
 
-API     = ../../lib/libcore/include/
-APIOBJ  = ../../lib/libcore/obj
+API     = ../libcore/include/
+APIOBJ  = ../libcore/obj
 
 
 	##
@@ -76,16 +56,17 @@ stubs.o
 
 
 
-.PHONY: all all-c gfe-link finalize clean
+.PHONY: all all-c sysmon-link finalize clean
 
-all: main.o all-c gfe-link finalize clean
+all: main.o all-c sysmon-link finalize clean
 	@echo "Ok?"
 
 main.o:
 	gcc  -c  main.c     $(CFLAGS) -I $(LIBC) -I $(API) -o main.o
 	gcc  -c  status.c   $(CFLAGS) -I $(LIBC) -I $(API) -o status.o
 	gcc  -c  addrbar.c  $(CFLAGS) -I $(LIBC) -I $(API) -o addrbar.o
-	
+
+
 all-c:
 	cp $(LIBCOBJ)/crt0.o   .
 	
@@ -98,25 +79,25 @@ all-c:
 
 	cp $(LIBCOBJ)/termios.o  .
 	cp $(LIBCOBJ)/ioctl.o  .
-	cp $(LIBCOBJ)/fcntl.o  .
 
-	cp $(LIBCOBJ)/stubs.o   .
+	cp $(LIBCOBJ)/fcntl.o  .
 	
+	cp $(LIBCOBJ)/stubs.o   .
 	cp $(APIOBJ)/api.o      .
 
 
 
-gfe-link:
-	ld -m elf_i386 -T ../link.ld -o LAUNCHER.BIN $(myObjects)    
-	
+sysmon-link:
+	ld -m elf_i386 -T ../link.ld -o SYSMON.BIN $(myObjects)    
 	
 	
 
+
 finalize:
-	cp LAUNCHER.BIN  ../bin
+	cp SYSMON.BIN  ../bin
 
 clean:
 	-rm *.o
-	-rm LAUNCHER.BIN 
+	-rm SYSMON.BIN 
 	
 	

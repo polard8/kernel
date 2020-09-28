@@ -55,8 +55,8 @@ CFLAGS = -m32 \
 LIB     = ../../../rtl/include/
 LIBOBJ  = ../../../rtl/obj
 
-API     = ../../lib/libcore/include/
-APIOBJ  = ../../lib/libcore/obj
+API     = ../libcore/include/
+APIOBJ  = ../libcore/obj
 
 
 	#

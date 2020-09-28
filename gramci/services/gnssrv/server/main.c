@@ -145,7 +145,7 @@ void gns_send_error_response (int fd, int code, char *error_message)
 {
     // 500: internal server error!!
     //#todo
-    gde_debug_print ("gnssrv: [TODO] gns_send_error_response\n");
+    debug_print ("gnssrv: [TODO] gns_send_error_response\n");
 }
 
 
@@ -165,7 +165,7 @@ void __socket_messages (int fd){
 
 
     if (fd<0){
-        gde_debug_print ("gnssrv: __socket_messages fd\n");
+        debug_print ("gnssrv: __socket_messages fd\n");
         return;
     }
 
@@ -221,7 +221,7 @@ void __socket_messages (int fd){
     // Sending reply.
     // 
      
-    //gde_debug_print ("Sending response ...\n");  
+    //debug_print ("Sending response ...\n");  
 
     //# it works.
     char *m = (char *) (&__buffer[0] + 16);
@@ -245,7 +245,7 @@ __again:
     // #todo:
     // while(1){...}
     
-    gde_debug_print ("gnssrv: Sending response ...\n");
+    debug_print ("gnssrv: Sending response ...\n");
 
     //
     // Send
@@ -272,7 +272,7 @@ __again:
         next_response[c] = 0;
 
 
-    gde_debug_print ("gnssrv: Response sent\n");  
+    debug_print ("gnssrv: Response sent\n");  
 }
 
 
@@ -285,12 +285,12 @@ void __ipc_message (void){
 
 
     // Get message.
-    gde_enter_critical_section();
+    rtl_enter_critical_section();
     gramado_system_call ( 111,
             (unsigned long) &message_buffer[0],
             (unsigned long) &message_buffer[0],
             (unsigned long) &message_buffer[0] );
-    gde_exit_critical_section();
+    rtl_exit_critical_section();
 
     // No message.
     if ( message_buffer[1] == 0 ){
@@ -338,7 +338,7 @@ gnsProcedure (
         // então devemos drenar input usado loop de mensagens e
         // repassar para o cliente via socket.
         case 8080:
-            gde_debug_print ("gnssrv: [TODO] 8080. drain messages ...\n");
+            debug_print ("gnssrv: [TODO] 8080. drain messages ...\n");
             break;
 
         case MSG_SYSKEYUP:
@@ -346,7 +346,7 @@ gnsProcedure (
             {
                 // #debug
                 case VK_F1:
-                    gde_reboot ();
+                    //reboot ();
                     break;
                     
                 // #debug
@@ -360,7 +360,7 @@ gnsProcedure (
                 // Enviar a mensagem para o processo associado
                 // com a janela que tem o foco de entrada.
                 default:
-                    gde_debug_print ("gnssrv: MSG_SYSKEYUP\n");
+                    debug_print ("gnssrv: MSG_SYSKEYUP\n");
                     break;
             }    
             break;
@@ -374,7 +374,7 @@ gnsProcedure (
             //printf ("%c", (char) long1); 
             //gws_show_backbuffer ();
             
-            gde_debug_print ("gnssrv: MSG_KEYDOWN\n");
+            debug_print ("gnssrv: MSG_KEYDOWN\n");
             break;
 
 
@@ -418,7 +418,7 @@ gnsProcedure (
 
         //MSG_GNS_SHUTDOWN
         case 2010:
-            gde_debug_print ("gnssrv: [2010] Disconnect\n");
+            debug_print ("gnssrv: [2010] Disconnect\n");
             break;
 
         case 2020:
@@ -446,7 +446,7 @@ gnsProcedure (
     // #todo: 
     // Call the system's window procedure.    
     // Rever esse retorno.
-    //return (int) gde_system_procedure (window,msg,long1,long2);
+    //return (int) xxxxxx_system_procedure (window,msg,long1,long2);
     return 0;
 }
 
@@ -578,8 +578,8 @@ int main (int argc, char **argv){
 
 
     // Serial debug.
-    gde_debug_print ("-----------------------\n");
-    gde_debug_print ("gnssrv: Initializing...\n");
+    debug_print ("-----------------------\n");
+    debug_print ("gnssrv: Initializing...\n");
     printf          ("gnssrv: Initializing...\n");
 
 
@@ -592,11 +592,11 @@ int main (int argc, char **argv){
     _status = (int) register_ns();
 
     if (_status<0){
-        gde_debug_print ("gnssrv: Couldn't register the server \n");
+        debug_print ("gnssrv: Couldn't register the server \n");
         printf ("gnssrv: Couldn't register the server \n");
         exit(1);
     }
-    gde_debug_print ("gnssrv: Registration ok \n");
+    debug_print ("gnssrv: Registration ok \n");
 
 
     //
@@ -644,9 +644,9 @@ int main (int argc, char **argv){
 
     //printf ("gnssrv: Calling child \n");
 
-    //gde_clone_and_execute ("gns.bin"); 
-    //gde_clone_and_execute ("??.bin");  
-    //gde_clone_and_execute ("??.bin");  
+    //xxxx_clone_and_execute ("gns.bin"); 
+    //xxxx_clone_and_execute ("??.bin");  
+    //xxxx_clone_and_execute ("??.bin");  
     // ...
 
 
@@ -665,7 +665,7 @@ int main (int argc, char **argv){
     //
 
 // loop:
-    gde_debug_print ("gnssrv: Entering main loop.\n");
+    debug_print ("gnssrv: Entering main loop.\n");
 
 
     // Messages sended via sockets.
@@ -697,7 +697,7 @@ int main (int argc, char **argv){
                       (socklen_t *) addr_len );
 
         if (newconn < 0) {
-            gde_debug_print ("gnssrv: ERROR on accept2\n");
+            debug_print ("gnssrv: ERROR on accept2\n");
             gnssrv_yield(); 
 
         // Request from the new connection 
@@ -718,7 +718,7 @@ int main (int argc, char **argv){
 
     // Done.
     
-    gde_debug_print ("gnssrv: Bye\n");
+    debug_print ("gnssrv: Bye\n");
     printf          ("gnssrv: Bye\n");
 
     return 0; 

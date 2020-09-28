@@ -40,8 +40,8 @@ CFLAGS = -m32 \
 LIBC    = ../../../../rtl/include/
 LIBCOBJ = ../../../../rtl/obj
 
-API02   = ../../../lib/libcore/include/
-APIOBJ  = ../../../lib/libcore/obj
+#API02   = ../../../lib/libcore/include/
+#APIOBJ  = ../../../lib/libcore/obj
 
 
 GWS_INCLUDES  = include/    
@@ -61,7 +61,7 @@ GWS_INCLUDES  = include/
 	
 myObjects = crt0.o main.o stubs.o \
 ctype.o stdio.o stdlib.o string.o conio.o socket.o signal.o unistd.o \
-api.o connect.o decode.o \
+connect.o decode.o \
 termios.o ioctl.o fcntl.o    
 
 
@@ -72,11 +72,11 @@ all: main.o all-c gws-link finalize clean
 	@echo "Ok?"
 
 main.o:
-	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -I $(API02)  -I $(GWS_INCLUDES) -I . -o main.o
+	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -I $(GWS_INCLUDES) -I . -o main.o
 
 all-c:
-	gcc  -c  connect.c  $(CFLAGS) -I $(LIBC) -I $(API02)  -I $(GWS_INCLUDES) -I . -o connect.o
-	gcc  -c  decode.c   $(CFLAGS) -I $(LIBC) -I $(API02)  -I $(GWS_INCLUDES) -I . -o decode.o
+	gcc  -c  connect.c  $(CFLAGS) -I $(LIBC) -I $(GWS_INCLUDES) -I . -o connect.o
+	gcc  -c  decode.c   $(CFLAGS) -I $(LIBC) -I $(GWS_INCLUDES) -I . -o decode.o
 
 
 # nothing for now.
@@ -95,9 +95,6 @@ all-c:
 	cp $(LIBCOBJ)/termios.o .
 	cp $(LIBCOBJ)/ioctl.o .
 	cp $(LIBCOBJ)/fcntl.o .
-
-	# libgui
-	cp $(APIOBJ)/api.o .
 
 
 

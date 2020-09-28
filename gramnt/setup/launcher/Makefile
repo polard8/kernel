@@ -29,6 +29,7 @@ EXTRAVERSION =
 #	-fno-stack-protector \
 #	-s
 
+
 CFLAGS = -m32 \
 	-std=gnu89 \
 	-nodefaultlibs \
@@ -47,12 +48,12 @@ CFLAGS = -m32 \
 
 
 
+
 LIBC    = ../../../rtl/include/
 LIBCOBJ = ../../../rtl/obj
 
-API     = ../../lib/libcore/include/
-APIOBJ  = ../../lib/libcore/obj
-
+API     = ../libcore/include/
+APIOBJ  = ../libcore/obj
 
 
 	##
@@ -84,39 +85,38 @@ main.o:
 	gcc  -c  main.c     $(CFLAGS) -I $(LIBC) -I $(API) -o main.o
 	gcc  -c  status.c   $(CFLAGS) -I $(LIBC) -I $(API) -o status.o
 	gcc  -c  addrbar.c  $(CFLAGS) -I $(LIBC) -I $(API) -o addrbar.o
-
-
+	
 all-c:
 	cp $(LIBCOBJ)/crt0.o   .
 	
 	cp $(LIBCOBJ)/ctype.o   .
 	cp $(LIBCOBJ)/stdio.o   .
-	cp $(LIBCOBJ)/stdlib.o  .	
+	cp $(LIBCOBJ)/stdlib.o  .
 	cp $(LIBCOBJ)/string.o  .
 	cp $(LIBCOBJ)/time.o    .
 	cp $(LIBCOBJ)/unistd.o  .
 
 	cp $(LIBCOBJ)/termios.o  .
 	cp $(LIBCOBJ)/ioctl.o  .
-	
 	cp $(LIBCOBJ)/fcntl.o  .
 
-	cp $(LIBCOBJ)/stubs.o   .	
+	cp $(LIBCOBJ)/stubs.o   .
 	
 	cp $(APIOBJ)/api.o      .
-		
+
 
 
 gfe-link:
-	ld -m elf_i386 -T ../link.ld -o GFE.BIN $(myObjects)    
+	ld -m elf_i386 -T ../link.ld -o LAUNCHER.BIN $(myObjects)    
+	
 	
 	
 
 finalize:
-	cp GFE.BIN  ../bin
+	cp LAUNCHER.BIN  ../bin
 
 clean:
 	-rm *.o
-	-rm GFE.BIN 
+	-rm LAUNCHER.BIN 
 	
 	

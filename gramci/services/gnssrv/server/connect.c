@@ -35,7 +35,7 @@ int register_ns (void){
     __ns_desktop = (struct desktop_d *) gramado_system_call (519,0,0,0);
     
     if ( (void *) __ns_desktop == NULL ){
-        gde_debug_print ("register_ns: __ns_desktop fail\n");
+        debug_print ("register_ns: __ns_desktop fail\n");
         return (int) (-1);
     }
 
@@ -43,7 +43,7 @@ int register_ns (void){
     __ns_pid = (int) getpid();
 
     if ( __ns_pid < 0 ){
-        gde_debug_print ("register_ns: __ns_pid fail \n");
+        debug_print ("register_ns: __ns_pid fail \n");
         return (int) (-1);
     }
 

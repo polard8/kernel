@@ -1,4 +1,4 @@
-# sysmon - system monitor for gde.
+# gramcode - text editor for gde
 
 #history:
 #2019 - Created by Fred Nora.
@@ -9,7 +9,25 @@ VERSION = 0
 PATCHLEVEL = 0
 SUBLEVEL = 0
 EXTRAVERSION =
-#NAME = sysmon
+#NAME = gramcode
+
+#todo:
+#We need to simplify these flags
+
+#CFLAGS = -m32 \
+#	--std=gnu89 \
+#	-nodefaultlibs \
+#	-nostdinc \
+#	-nostdlib \
+#	-static \
+#	-fgnu89-inline \
+#	-ffreestanding \
+#	-fno-builtin \
+#	-fno-pie \
+#	-no-pie \
+#	-fno-stack-protector \
+#	-s
+
 
 
 CFLAGS = -m32 \
@@ -29,11 +47,14 @@ CFLAGS = -m32 \
 
 
 
+
+
 LIBC    = ../../../rtl/include/
 LIBCOBJ = ../../../rtl/obj
 
-API     = ../../lib/libcore/include/
-APIOBJ  = ../../lib/libcore/obj
+API     = ../libcore/include/
+APIOBJ  = ../libcore/obj
+
 
 
 	##
@@ -48,7 +69,6 @@ string.o \
 unistd.o \
 api.o \
 status.o \
-addrbar.o \
 termios.o \
 ioctl.o \
 fcntl.o \
@@ -56,19 +76,21 @@ stubs.o
 
 
 
-.PHONY: all all-c sysmon-link finalize clean
 
-all: main.o all-c sysmon-link finalize clean
+.PHONY: all all-c gramcode-link finalize clean
+
+all: main.o all-c gramcode-link finalize clean
 	@echo "Ok?"
 
 main.o:
-	gcc  -c  main.c     $(CFLAGS) -I $(LIBC) -I $(API) -o main.o
-	gcc  -c  status.c   $(CFLAGS) -I $(LIBC) -I $(API) -o status.o
-	gcc  -c  addrbar.c  $(CFLAGS) -I $(LIBC) -I $(API) -o addrbar.o
-
-
+	gcc  -c  main.c    $(CFLAGS) -I $(LIBC) -I $(API) -o main.o
+	gcc  -c  status.c  $(CFLAGS) -I $(LIBC) -I $(API) -o status.o
+	
+	
 all-c:
+
 	cp $(LIBCOBJ)/crt0.o   .
+	cp $(LIBCOBJ)/stubs.o   .
 	
 	cp $(LIBCOBJ)/ctype.o   .
 	cp $(LIBCOBJ)/stdio.o   .
@@ -76,28 +98,24 @@ all-c:
 	cp $(LIBCOBJ)/string.o  .
 	cp $(LIBCOBJ)/time.o    .
 	cp $(LIBCOBJ)/unistd.o  .
-
+	
 	cp $(LIBCOBJ)/termios.o  .
 	cp $(LIBCOBJ)/ioctl.o  .
-
 	cp $(LIBCOBJ)/fcntl.o  .
-	
-	cp $(LIBCOBJ)/stubs.o   .
 	cp $(APIOBJ)/api.o      .
 
 
-
-sysmon-link:
-	ld -m elf_i386 -T ../link.ld -o SYSMON.BIN $(myObjects)    
+gramcode-link:
+	ld -m elf_i386 -T ../link.ld -o GRAMCODE.BIN $(myObjects)    
 	
 	
 
 
 finalize:
-	cp SYSMON.BIN  ../bin
+	cp GRAMCODE.BIN  ../bin
 
 clean:
 	-rm *.o
-	-rm SYSMON.BIN 
+	-rm GRAMCODE.BIN 
 	
 	

@@ -20,14 +20,13 @@
 #include <sys/socket.h>
 
 
+#include <vk.h>
+
 // protocol structures.
 #include <net/if_arp.h>
 #include <netinet/udp.h>
 #include <netinet/tcp.h>
 
-
-// #todo: Delete!???
-#include <api.h>
 
 #include <wm.h>
 

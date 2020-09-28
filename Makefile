@@ -2,7 +2,7 @@
 PRODUCT_NAME  = Gramado Operating System
 VERSION_MAJOR = 1
 VERSION_MINOR = 0
-VERSION_BUILD = 122
+VERSION_BUILD = 123
 # See: config/version.h
 
 # Documentation.
@@ -121,16 +121,19 @@ build-portals:
 	$(Q) $(MAKE) -C rtl/
 
 	@echo "==================="
-	@echo "Compiling gramci lib ..."
-	$(Q) $(MAKE) -C gramci/lib/
-
-	@echo "==================="
 	@echo "Compiling init ..."
 	$(Q) $(MAKE) -C gramnt/init/
 
 	@echo "==================="
+	@echo "Compiling setup ..."
+	$(Q) $(MAKE) -C gramnt/setup/
+
+	@echo "==================="
+	@echo "Compiling gramci lib ..."
+	$(Q) $(MAKE) -C gramci/lib/
+	
+	@echo "==================="
 	@echo "Compiling gramci stuff ..."
-	$(Q) $(MAKE) -C gramci/setup/
 	$(Q) $(MAKE) -C gramci/services/gnssrv/ 
 	$(Q) $(MAKE) -C gramci/services/gwssrv/
 	$(Q) $(MAKE) -C gramci/shell/apps/
@@ -175,9 +178,15 @@ vhd-copy-files:
 	@echo "(Step 6) Copying files into the mounted VHD ..."
 
 
+	#
+	# == gramnt ======================================
+	#
+
 	# ====================================================
 	# 1) First of all
 	# bm, bl, kernel, init, gdeshell.
+	# Only on gramnt/
+
 	sudo cp gramnt/boot/x86/bin/BM.BIN  base/
 	sudo cp gramnt/boot/x86/bin/BM.BIN  base/BOOT
 	sudo cp gramnt/boot/x86/bin/BM.BIN  base/PORTALS
@@ -193,17 +202,20 @@ vhd-copy-files:
 	sudo cp gramnt/init/INIT.BIN  base/
 	sudo cp gramnt/init/INIT.BIN  base/PORTALS
 
-	sudo cp gramci/setup/bin/GDESHELL.BIN  base/
-	sudo cp gramci/setup/bin/GDESHELL.BIN  base/PORTALS
+	sudo cp gramnt/setup/bin/GDESHELL.BIN  base/
+	sudo cp gramnt/setup/bin/GDESHELL.BIN  base/PORTALS
+
+	# setup
+	#-sudo cp gramnt/setup/bin/*.BIN    base/
+	# sysmon
+	sudo cp gramnt/setup/bin/SYSMON.BIN base/
+
 	# ====================================================
 
 
-	# setup
-	#-sudo cp gramci/setup/bin/*.BIN    base/
-
-	# sysmon
-	sudo cp gramci/setup/bin/SYSMON.BIN base/
-
+	#
+	# == gramci ======================================
+	#
 
 	# apps
 #	-sudo cp gramci/shell/apps/bin/*.BIN  base/
@@ -240,7 +252,7 @@ vhd-copy-files:
 
 
 	#
-	# Copy base!
+	# == Copy base ===========================================
 	#
 
 	# sends everything from base to root.
@@ -271,6 +283,7 @@ clean2:
 	-rm *.VHD
 
 clean3:
+	-rm gramnt/setup/bin/*.BIN
 	-rm gramci/shell/apps/bin/*.BIN
 	-rm gramci/shell/cmd/bin/*.BIN
 	-rm gramci/shell/net/bin/*.BIN
