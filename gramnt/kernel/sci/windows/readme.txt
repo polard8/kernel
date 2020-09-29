@@ -1,3 +1,0 @@
-
-
-   kgws compositor module.

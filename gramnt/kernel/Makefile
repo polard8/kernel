@@ -212,31 +212,34 @@ all-c:
 	$(CC) -c sci/net/network/channel.c   $(KINCLUDE) $(CFLAGS) -o channel.o
 	$(CC) -c sci/net/network/network.c   $(KINCLUDE) $(CFLAGS) -o network.o
 
-    #Window system ring 0 support.
 	# Window Manager.
-	$(CC) -c sci/windows/kgwm.c    $(KINCLUDE) $(CFLAGS) -o kgwm.o
+    #Window system ring 0 support.
+	# model business logic
+	$(CC) -c sci/windows/model/kgwm.c    $(KINCLUDE) $(CFLAGS) -o kgwm.o
+	$(CC) -c sci/windows/model/wm.c      $(KINCLUDE) $(CFLAGS) -o wm.o
+	$(CC) -c sci/windows/model/kgws.c      $(KINCLUDE) $(CFLAGS) -o kgws.o
+	# data model
+	$(CC) -c sci/windows/model/font.c      $(KINCLUDE) $(CFLAGS) -o font.o
+
+	# Window Server.
+	$(CC) -c sci/windows/view/bg.c        $(KINCLUDE) $(CFLAGS) -o bg.o
+	$(CC) -c sci/windows/view/bmp.c       $(KINCLUDE) $(CFLAGS) -o bmp.o
+	$(CC) -c sci/windows/view/button.c    $(KINCLUDE) $(CFLAGS) -o button.o
+	$(CC) -c sci/windows/view/char.c      $(KINCLUDE) $(CFLAGS) -o char.o
+	$(CC) -c sci/windows/view/createw.c   $(KINCLUDE) $(CFLAGS) -o createw.o
+	$(CC) -c sci/windows/view/dtext.c     $(KINCLUDE) $(CFLAGS) -o dtext.o
+	$(CC) -c sci/windows/view/grid.c      $(KINCLUDE) $(CFLAGS) -o grid.o
+	$(CC) -c sci/windows/view/line.c      $(KINCLUDE) $(CFLAGS) -o line.o
+	$(CC) -c sci/windows/view/menu.c      $(KINCLUDE) $(CFLAGS) -o menu.o
+	$(CC) -c sci/windows/view/menubar.c   $(KINCLUDE) $(CFLAGS) -o menubar.o
+	$(CC) -c sci/windows/view/pixel.c     $(KINCLUDE) $(CFLAGS) -o pixel.o
+	$(CC) -c sci/windows/view/rect.c      $(KINCLUDE) $(CFLAGS) -o rect.o
+	$(CC) -c sci/windows/view/sbar.c      $(KINCLUDE) $(CFLAGS) -o sbar.o
+	$(CC) -c sci/windows/view/toolbar.c   $(KINCLUDE) $(CFLAGS) -o toolbar.o
+	$(CC) -c sci/windows/view/xproc.c     $(KINCLUDE) $(CFLAGS) -o xproc.o
+
 	$(CC) -c sci/windows/logoff.c  $(KINCLUDE) $(CFLAGS) -o logoff.o
 	$(CC) -c sci/windows/logon.c   $(KINCLUDE) $(CFLAGS) -o logon.o
-	$(CC) -c sci/windows/wm.c      $(KINCLUDE) $(CFLAGS) -o wm.o
-	# Window Server.
-	$(CC) -c sci/windows/bg.c        $(KINCLUDE) $(CFLAGS) -o bg.o
-	$(CC) -c sci/windows/bmp.c       $(KINCLUDE) $(CFLAGS) -o bmp.o
-	$(CC) -c sci/windows/button.c    $(KINCLUDE) $(CFLAGS) -o button.o
-	$(CC) -c sci/windows/char.c      $(KINCLUDE) $(CFLAGS) -o char.o
-	$(CC) -c sci/windows/createw.c   $(KINCLUDE) $(CFLAGS) -o createw.o
-	$(CC) -c sci/windows/dtext.c     $(KINCLUDE) $(CFLAGS) -o dtext.o
-	$(CC) -c sci/windows/font.c      $(KINCLUDE) $(CFLAGS) -o font.o
-	$(CC) -c sci/windows/grid.c      $(KINCLUDE) $(CFLAGS) -o grid.o
-	$(CC) -c sci/windows/line.c      $(KINCLUDE) $(CFLAGS) -o line.o
-	$(CC) -c sci/windows/menu.c      $(KINCLUDE) $(CFLAGS) -o menu.o
-	$(CC) -c sci/windows/menubar.c   $(KINCLUDE) $(CFLAGS) -o menubar.o
-	$(CC) -c sci/windows/pixel.c     $(KINCLUDE) $(CFLAGS) -o pixel.o
-	$(CC) -c sci/windows/rect.c      $(KINCLUDE) $(CFLAGS) -o rect.o
-	$(CC) -c sci/windows/sbar.c      $(KINCLUDE) $(CFLAGS) -o sbar.o
-	$(CC) -c sci/windows/toolbar.c   $(KINCLUDE) $(CFLAGS) -o toolbar.o
-	$(CC) -c sci/windows/kgws.c      $(KINCLUDE) $(CFLAGS) -o kgws.o
-	$(CC) -c sci/windows/xproc.c     $(KINCLUDE) $(CFLAGS) -o xproc.o
-
 
 	#
 	# == Gramado Core =================================================

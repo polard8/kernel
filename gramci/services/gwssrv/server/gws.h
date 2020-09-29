@@ -1,68 +1,72 @@
+// gws.h 
 
 
-//gws.h 
 
+// rtl
 #include <types.h>
 #include <sys/types.h>
+#include <sys/cdefs.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/socket.h>
+// ...
 
-//...
 
+// 
 #include "globals.h"
 
-#include "colors.h"
 
-
-#include "pixel.h"
-#include "char.h"
-#include "dtext.h"
-#include "line.h"
-
-
-
-#include "vk.h"
-#include "wt.h"
-
-
-#include "menu.h"
-
-// X-like
-#include "window.h"
-#include "screen.h"
-#include "display.h"
-#include "host.h"
-#include "gui.h"
+// #view
+#include "view/colors.h"
+#include "view/pixel.h"
+#include "view/char.h"
+#include "view/dtext.h"
+#include "view/line.h"
+#include "view/vk.h"       // # view input events
+#include "view/wt.h"
+#include "view/menu.h"
+#include "view/window.h"
+#include "view/bmp.h"
+#include "view/screen.h"   // X-like
+#include "view/display.h"  // X-like
+#include "view/host.h"     // X-like h:0.0
+#include "view/gui.h"
+#include "view/comp.h"
+#include "view/event.h"    // view inputs
+// ...
 
 
 
 
-#include "comp.h"
+// # data model
+#include "model/packet.h"
 
-#include "packet.h"
-#include "bmp.h"
 
+// # model. business logic
 // #todo:
 // We can put this thing in the library. (libgws)
 // or (libcon)
-#include "connect.h"
+#include "model/connect.h"
 
-
-#include "font.h"
-
-// nc2 font.
-#include "nc2.h"
-
-#include "event.h"
-
-
+// data model
+#include "model/font.h"
+#include "model/nc2.h"   //nelson cole 2 font.
 
 // Client structure.
 // O proprio servidor poderia ser o cliente 0??
-#include "client.h"
+
+#include "model/client.h"
 
 
-#include "services.h"
+// # model. business logic
+#include "model/services.h"
+
+
+//
+// =============================================================
+//
 
 
 

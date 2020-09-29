@@ -358,40 +358,42 @@ refresh_rectangle (
 	// #bugbug
 	// Isso pode nos dar problemas.
 	// ?? Isso ainda é necessário nos dias de hoje ??
-	
-	vsync ();	
-		
+
+
+    //vsync();
+
+
+
 	//(line_size * bytes_count) é o número de bytes por linha. 
 
 	//#importante
 	//É bem mais rápido com múltiplos de 4.	
-	
-	//se for divisível por 4.
-	if ( ((line_size * bytes_count) % 4) == 0 )
-	{
-        count = ((line_size * bytes_count) / 4);  	
 
-	    for ( i=0; i < lines; i++ )
-	    {
-		    //copia uma linha ou um pouco mais caso não seja divisível por 
-		    memcpy32 ( p, q, count );
-		    
-			q += (Width * bytes_count);
-	 		p += (Width * bytes_count);
-	    };
-	}
 
-	//se não for divisível por 4.
-	if ( ((line_size * bytes_count) % 4) != 0 )
-	{
-	    for ( i=0; i < lines; i++ )
-	    {
-		    memcpy ( (void *) p, (const void *) q, (line_size * bytes_count) );
-		    
-			q += (Width * bytes_count);
-		    p += (Width * bytes_count);
-	    };	
-	}
+    // Se for divisível por 4.
+    // Copia uma linha ou um pouco mais caso não seja divisível por 4.
+    if ( ((line_size * bytes_count) % 4) == 0 )
+    {
+        count = ((line_size * bytes_count) / 4); 
+
+        for ( i=0; i < lines; i++ )
+        {
+            memcpy32 ( p, q, count );
+            q += (Width * bytes_count);
+            p += (Width * bytes_count);
+        };
+    }
+
+    // Se não for divisível por 4.
+    if ( ((line_size * bytes_count) % 4) != 0 )
+    {
+        for ( i=0; i < lines; i++ )
+        {
+            memcpy ( (void *) p, (const void *) q, (line_size * bytes_count) );
+            q += (Width * bytes_count);
+            p += (Width * bytes_count);
+        };
+    }
 }
 
 

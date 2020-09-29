@@ -10,15 +10,9 @@
 
 
 
-
-//
-#include <stddef.h>
-
-//Using some system resources.
-//#include <api.h>
-
-// window server routines.
+// Window server routines.
 #include <gws.h>
+
 
 
 /*

@@ -82,13 +82,15 @@ extern void do_executa_new_task (void);
 
 
 
-// ws - window server, and beyond
-#include "ws/display.h"
-#include "ws/screen.h"
-#include "ws/video.h"
-#include "ws/fonts.h"
-#include "ws/ascii.h" 
+// ws -
+// #view presentation output.
+#include "ws/view/display.h"
+#include "ws/view/screen.h"
+#include "ws/view/video.h"
 
+// #model. data model.
+#include "ws/model/fonts.h"
+#include "ws/model/ascii.h" 
 
 
 //tty
@@ -105,9 +107,12 @@ extern void do_executa_new_task (void);
 #include "fs/vfs.h"
 
 
-// ws - window server, and beyond
-#include "ws/prompt.h"
-#include "ws/bmp2.h"
+// ws - 
+// view - input and presentation
+#include "ws/view/prompt.h"
+
+// view - showing the data.
+#include "ws/view/bmp2.h"
 
 
 
@@ -148,7 +153,7 @@ extern void do_executa_new_task (void);
 
 // ws - window server, and beyond
 // ps2 controller.
-#include "ws/ps2.h"
+#include "ws/view/ps2.h"
 
 
 
@@ -161,14 +166,15 @@ extern void do_executa_new_task (void);
 
 
 
-// ws - window server, and beyond. low level
-#include "ws/xproc.h"
-#include "ws/keyboard.h"
-#include "ws/mouse.h"
-#include "ws/vk.h"
-#include "ws/kbdabnt2.h"
-#include "ws/ldisc.h"
-
+// ws - window server
+// inputs
+#include "ws/view/xproc.h"
+#include "ws/view/keyboard.h"
+#include "ws/view/mouse.h"
+#include "ws/view/vk.h"
+#include "ws/view/kbdabnt2.h"
+// #view. drawing routines.
+#include "ws/view/ldisc.h"
 
 
 //storage (^)
@@ -217,16 +223,22 @@ extern void do_executa_new_task (void);
 #include "ps/mk.h"
 
 
-// ws - window server, and beyond
-#include "ws/kgwm.h"
-#include "ws/ws.h"
-#include "ws/window.h"
-#include "ws/menu.h"
-#include "ws/grid.h"
-#include "ws/bmp.h"
-#include "ws/line.h"
-#include "ws/terminal.h"
-#include "ws/guiconf.h"
+
+// ws - 
+// model business logic
+#include "ws/model/kgwm.h"
+#include "ws/model/ws.h"
+
+// #view - designers
+#include "ws/view/window.h"
+#include "ws/view/menu.h"
+#include "ws/view/grid.h"
+#include "ws/view/bmp.h"
+#include "ws/view/line.h"
+
+// #view. presentation
+#include "ws/view/terminal.h"
+#include "ws/view/guiconf.h"
 
 
 //
@@ -244,7 +256,10 @@ extern void do_executa_new_task (void);
 // ws - window server, and beyond
 #include "ws/logon.h"
 #include "ws/logoff.h"
-#include "ws/kgws.h"
+
+// model. business logic
+#include "ws/model/kgws.h"
+
 
 
 
@@ -257,10 +272,11 @@ extern void do_executa_new_task (void);
 #include "tty/console.h"
 
 
-// ws - window server, and beyond
-#include "ws/i8042.h"
-#include "ws/ps2mouse.h"
-#include "ws/ps2kbd.h"
+// ws - 
+// view - input support.
+#include "ws/view/i8042.h"
+#include "ws/view/ps2mouse.h"
+#include "ws/view/ps2kbd.h"
 
 
 
@@ -325,9 +341,9 @@ extern void do_executa_new_task (void);
 
 
 
-// ws - window server, and beyond
-#include "ws/cursor.h"
-
+// ws - 
+// view. input support.
+#include "ws/view/cursor.h"
 
 
 #include "messages.h"

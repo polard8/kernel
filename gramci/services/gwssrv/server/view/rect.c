@@ -265,36 +265,33 @@ gws_refresh_rectangle (
 
 	//#importante
 	//É bem mais rápido com múltiplos de 4.	
-	
-	//se for divisível por 4.
-	if ( ((line_size * bytes_count) % 4) == 0 )
-	{
+
+
+    // Se for divisível por 4.
+    // Copia uma linha ou um pouco mais caso não seja divisível por 4.
+    if ( ((line_size * bytes_count) % 4) == 0 )
+    {
         count = ((line_size * bytes_count) / 4); 
 
-	    for ( i=0; i < lines; i++ )
-	    {
-		    //copia uma linha ou um pouco mais caso não seja divisível por 
-		    rect_memcpy32 ( p, q, count );
-		    
-			q += (ScreenWidth * bytes_count);
-	 		p += (ScreenWidth * bytes_count);
-	    };
-	}
+        for ( i=0; i < lines; i++ )
+        {
+            rect_memcpy32 ( p, q, count );
+            q += (ScreenWidth * bytes_count);
+            p += (ScreenWidth * bytes_count);
+        };
+    }
 
-	//se não for divisível por 4.
-	if ( ((line_size * bytes_count) % 4) != 0 )
-	{
-	    for ( i=0; i < lines; i++ )
-	    {
-		    memcpy ( (void *) p, (const void *) q, (line_size * bytes_count) );
-		    
-			q += (ScreenWidth * bytes_count);
-		    p += (ScreenWidth * bytes_count);
-	    };
-	}
+    // Se não for divisível por 4.
+    if ( ((line_size * bytes_count) % 4) != 0 )
+    {
+        for ( i=0; i < lines; i++ )
+        {
+             memcpy ( (void *) p, (const void *) q, (line_size * bytes_count) );
+             q += (ScreenWidth * bytes_count);
+             p += (ScreenWidth * bytes_count);
+        };
+    }
 }
-
-
 
 
 

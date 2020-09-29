@@ -89,26 +89,31 @@ main.o:
 
 all-c:
 
-	# gws
-	gcc  -c  char.c     $(CFLAGS) -I $(LIBC) -I include/ -I .  -o char.o
-	gcc  -c  comp.c     $(CFLAGS) -I $(LIBC) -I include/ -I .  -o comp.o
-	gcc  -c  createw.c  $(CFLAGS) -I $(LIBC) -I include/ -I .  -o createw.o
-	gcc  -c  dtext.c    $(CFLAGS) -I $(LIBC) -I include/ -I .  -o dtext.o
-	gcc  -c  line.c     $(CFLAGS) -I $(LIBC) -I include/ -I .  -o line.o
-	gcc  -c  pixel.c    $(CFLAGS) -I $(LIBC) -I include/ -I .  -o pixel.o
-	gcc  -c  rect.c     $(CFLAGS) -I $(LIBC) -I include/ -I .  -o rect.o
-	gcc  -c  window.c   $(CFLAGS) -I $(LIBC) -I include/ -I .  -o window.o
-	gcc  -c  bmp.c      $(CFLAGS) -I $(LIBC) -I include/ -I .  -o bmp.o
-	gcc  -c  connect.c  $(CFLAGS) -I $(LIBC) -I include/ -I .  -o connect.o
-	gcc  -c  button.c   $(CFLAGS) -I $(LIBC) -I include/ -I .  -o button.o
-	gcc  -c  font.c     $(CFLAGS) -I $(LIBC) -I include/ -I .  -o font.o
+	# view-like component
+	gcc  -c  view/pixel.c    $(CFLAGS) -I $(LIBC) -I include/ -I .  -o pixel.o
+	gcc  -c  view/char.c     $(CFLAGS) -I $(LIBC) -I include/ -I .  -o char.o
+	gcc  -c  view/dtext.c    $(CFLAGS) -I $(LIBC) -I include/ -I .  -o dtext.o
+	gcc  -c  view/line.c     $(CFLAGS) -I $(LIBC) -I include/ -I .  -o line.o
+	gcc  -c  view/rect.c     $(CFLAGS) -I $(LIBC) -I include/ -I .  -o rect.o
+	gcc  -c  view/createw.c  $(CFLAGS) -I $(LIBC) -I include/ -I .  -o createw.o
+	gcc  -c  view/window.c   $(CFLAGS) -I $(LIBC) -I include/ -I .  -o window.o
+	gcc  -c  view/button.c   $(CFLAGS) -I $(LIBC) -I include/ -I .  -o button.o
+	gcc  -c  view/bmp.c      $(CFLAGS) -I $(LIBC) -I include/ -I .  -o bmp.o
+	gcc  -c  view/comp.c     $(CFLAGS) -I $(LIBC) -I include/ -I .  -o comp.o
+
+	# model-like component
+	gcc  -c  model/font.c     $(CFLAGS) -I $(LIBC) -I include/ -I .  -o font.o
+	gcc  -c  model/connect.c  $(CFLAGS) -I $(LIBC) -I include/ -I .  -o connect.o
+	gcc  -c  model/gws.c      $(CFLAGS) -I $(LIBC) -I include/ -I .  -o gws.o
 	# ...
 
-	# base
-	gcc  -c  gws.c $(CFLAGS) -I $(LIBC) -I include/ -I . -o gws.o
+
+	#
+	# == imported objects =============================
+	#
 
 
-	# libc03
+	# rtl/
 	cp $(LIBCOBJ)/crt0.o .
 	cp $(LIBCOBJ)/stubs.o .
 	cp $(LIBCOBJ)/ctype.o .
