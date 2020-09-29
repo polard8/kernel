@@ -145,10 +145,7 @@ void *createCreateInitThread (void){
     InitThread->procedure = (unsigned long) &system_procedure;
 
 
-    //
     // Single message;
-    //
-
     //Argumentos do procedimento de janela.	
     InitThread->window = NULL; //window;//arg1.
     InitThread->msg   = 0;     //arg2.
@@ -173,7 +170,6 @@ void *createCreateInitThread (void){
     InitThread->head_pos = 0;
     InitThread->tail_pos = 0;
 
-
     // Message queue.
     for ( q=0; q<32; q++ ){ InitThread->MsgQueue[q] = 0; };
     InitThread->MsgQueueHead = 0;
@@ -196,9 +192,14 @@ void *createCreateInitThread (void){
     InitThread->preempted = UNPREEMPTABLE; 
 
     // Temporizadores.
-    InitThread->step = 0;          
-    InitThread->quantum = QUANTUM_BASE;
+    InitThread->step = 0; 
+        
+    //InitThread->quantum  = QUANTUM_BASE;
+    InitThread->quantum  = ( InitThread->priority * TIMESLICE_MULTIPLIER);
+
+    // QUANTUM_LIMIT  (PRIORITY_MAX *TIMESLICE_MULTIPLIER)
     InitThread->quantum_limit = QUANTUM_LIMIT;
+
 
     // Contadores.
     InitThread->standbyCount = 0;

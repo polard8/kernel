@@ -199,8 +199,10 @@ struct thread_d
     int used;
     int magic;
 
+    // #todo
     // Other process can't take some actions on this thread
-    // if it is protected. ex: It can't be killed by another process.
+    // if it is protected. 
+    // ex: It can't be killed by another process.
     int _protected;
 
 
@@ -209,7 +211,6 @@ struct thread_d
     //
 
     // Thread id and owner process id.
-
     int tid;
 
     // Owner process.    
@@ -313,7 +314,6 @@ struct thread_d
     unsigned short cs;
     unsigned long  eip;    //usado com o pd do processo
 
-
 	// para o kernel saltar para o novo processo.
     unsigned long ring0_eip;  //usado com o pd do kernel
     unsigned long eipPA;
@@ -361,11 +361,11 @@ struct thread_d
     // The base priority is never changed. It's used to classify
     // the priority level.
     // The priority can't be changed to a level below the base priority.
-    // The base priority is static and the current priority is dinamic.
+    // The base priority is static and the current priority is dynamic.
     //
 
     unsigned long base_priority;  // static 
-    unsigned long priority;       // dinamic
+    unsigned long priority;       // dynamic
 
 
     // preempted:
@@ -419,60 +419,79 @@ struct thread_d
     // == Time ===================================
     //
 
-    //
-    // #todo: 
-    // Ticks and Deadline.
-    //
+    // Podemos criar a estrutura 'thread_time_d' t->time.step
 
-	// Quanto tempo passou, mesmo quando a tarefa não esteve rodando.
-	// Quando tempo a tarefa tem para que ela complete a sua execução.
-	//
-	//unsigned long Ticks;
-    //unsigned long DeadLine.
+    // Quanto tempo passou, mesmo quando a tarefa não esteve rodando.
+    // unsigned long jiffies_alive;
+
 
     // step: 
+    // How many jiffies. total_jiffies.
     // Quantas vezes ela já rodou no total.
     unsigned long step; 
 
-	// sys time inicial da thread.
-	// quando ela foi criada.
+
+    // Quando ela foi criada.
+    // systime inicial da thread.
     unsigned long initial_time_ms;
-	
-	//ms total..
+
+    // Tempo total dado em milisegundos.
     unsigned long total_time_ms; 
-	
-	
-	//Quantum. (time-slice, igual cota) 
-    unsigned long quantum;         //tempo que a thread tem.
-    unsigned long quantum_limit;   //limite quando dado boost. tempo limite rodando. 		
-	
-	//unsigned long  RemainingTime;  //??
-	
+
+
+    // Quantum. 
+    // time-slice or quota. 
+    // Quantos jiffies a thread pode rodar em um round.
+    // Quantidade limite de jiffies que uma thread pode rodar em um round.
+    // Limite quando dado boost. 
+    unsigned long quantum;
+    unsigned long quantum_limit;   
+
+    // Quantos jiffies a thread ficou no estado e espera para
+    // pronta para rodar.
     unsigned long standbyCount;
 
-    // runningCount: 
-    // Quanto tempo ela está rodando antes de parar.
+    // Quantos jiffies ela está rodando antes de parar.
     unsigned long runningCount; 
 
-	//ms rodando antes de parar.
+    // Quantos milisegundos ela está rodando antes de parar.
     unsigned long runningCount_ms; 
 
-	//Obs: A soma das 3 esperas é a soma do tempo de espera
-	//depois que ela rodou pela primeira vez.
-	
-    //Contando o tempo nos estados de espera.
-    unsigned long readyCount;   //tempo de espera para retomar a execução.
+    // obs: 
+    // ??
+    // A soma das 3 esperas é a soma do tempo de espera
+    // depois que ela rodou pela primeira vez.
+
+    // Contando o tempo nos estados de espera.
+
+    // Tempo de espera para retomar a execução.
+    // Limite esperando para rodar novamente.
+    // Talvez essa contagem nao precise agora. 
+    unsigned long readyCount;
     unsigned long ready_limit;
 
-    //Esperando por eventos.
-    unsigned long waitingCount; //tempo esperando algo.	
-    unsigned long waiting_limit;   //tempo limite que uma tarefa ready fica sem rodar.
-    
+    // Quantos jiffies esperando por algum evento.
+    // Quantos jiffies a thread pode esperar no maximo.
+    unsigned long waitingCount; 
+    unsigned long waiting_limit;
+
+    // Quantos jiffies ficou bloqueada.
+    // Qauntos jiffies a thread pode esperar bloqueada.
     unsigned long blockedCount;
     unsigned long blocked_limit;
 
-    //Ticks remaining. (tempo para a tarefa chegar ao fim, tempo total-tempo percorrito)
-    unsigned long ticks_remaining; //rt, quanto tempo a tarefa tem disponível para ser concluida.
+    // #todo: 
+    // Deadline.
+    // Quando tempo a tarefa tem para que ela complete a sua execução.
+
+    // unsigned long DeadLine.
+    // unsigned long RemainingTime; 
+
+    // Ticks remaining. (Deadline)
+    // Contagem do prazo limite.
+    // Contagem regressiva.
+    // Isso eh usado por threads 'real-time'
+    unsigned long ticks_remaining;
 
 
     //

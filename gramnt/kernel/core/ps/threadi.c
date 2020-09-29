@@ -94,7 +94,8 @@ Loop:
 
 void *KiCreateRing0Idle (void){
 
-    struct thread_d *t;
+    struct thread_d  *t;
+
 
     char *ThreadName = "ring0-idle-thread";
 
@@ -184,9 +185,10 @@ void *KiCreateRing0Idle (void){
     t->procedure = (unsigned long) &system_procedure;
 
     //
-    // Single message;
+    // == message support =============
     //
 
+    // Single message;
     t->window = NULL;      // arg1.
     t->msg = 0;            // arg2.
     t->long1 = 0;          // arg3.
@@ -195,7 +197,6 @@ void *KiCreateRing0Idle (void){
     //t->long
     //t->long
     //...
-    
     
     // Message queue.  
     for ( i=0; i<32; i++ ){
@@ -207,15 +208,14 @@ void *KiCreateRing0Idle (void){
         t->long3_list[i]  = 0;
         t->long4_list[i]  = 0;
     };
-    
     t->head_pos = 0;
     t->tail_pos = 0;
-
 
     // Message queue.
     for ( q=0; q<32; q++ ){ t->MsgQueue[q] = 0; }
     t->MsgQueueHead = 0;
     t->MsgQueueTail = 0;
+
 
 
     // Características.
@@ -236,9 +236,17 @@ void *KiCreateRing0Idle (void){
 
 
     // Temporizadores.
+    
     t->step = 0;
-    t->quantum = QUANTUM_BASE;
+    
+
+    // QUANTUM_BASE   (PRIORITY_NORMAL*TIMESLICE_MULTIPLIER)
+    //t->quantum = QUANTUM_BASE;
+    t->quantum  = ( t->priority * TIMESLICE_MULTIPLIER);
+    
+    // QUANTUM_LIMIT  (PRIORITY_MAX *TIMESLICE_MULTIPLIER)
     t->quantum_limit = QUANTUM_LIMIT;
+
 
     // Contadores.
 
@@ -582,7 +590,7 @@ void show_slots(){
              t->used == 1 && 
              t->magic == 1234 )
         {
-            show_slot(t->tid);
+            show_slot (t->tid);
         }
     };
 }
@@ -605,7 +613,6 @@ void show_slot (int tid){
         goto fail;
     }
 
-
     t = (void *) threadList[tid];
 
     if ( (void *) t == NULL ){
@@ -616,16 +623,16 @@ void show_slot (int tid){
 
         // Show one slot.
         printf ("\n");
-        printf ("TID   PID   pdPA  Prio  State Quan jiffies initial_eip eflags   tName \n");
+        printf ("TID   PID   pdPA  Prio  State *Quan *Jiffies initial_eip eflags   tName \n");
         printf ("====  ====  ====  ====  ===== ==== ====    ==========  ======  ===== \n");
-        printf ("%d    %d    %x    %d    %d    %d   %d    %x          %x      %s \n", 
+        printf ("%d    %d    %x   %d    %d    %d   %d      %x          %x      %s \n", 
             t->tid, 
             t->ownerPID,
             t->DirectoryPA,
             t->priority, 
             t->state,
-            t->quantum,
-            t->step, //t->total_time_ms,  //#bugbug
+            t->quantum,    // Quantum
+            t->step,       // Jiffies
             t->initial_eip,
             t->eflags,
             t->name_address );

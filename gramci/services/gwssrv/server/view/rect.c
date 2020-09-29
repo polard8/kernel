@@ -196,6 +196,11 @@ int gwssrv_refresh_this_rect( struct gws_rect_d *rect )
  * 
  */
  
+
+// #bugbug
+// I's not refreshing the borders in the editbox windows.
+
+
 void 
 gws_refresh_rectangle ( 
     unsigned long x, 

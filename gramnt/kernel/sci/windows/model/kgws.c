@@ -61,6 +61,9 @@ unsigned long progressbar_height;
 unsigned long progressbar_offset;
 
 
+// #bugbug
+// This is a 'designer' thing.
+// We can move this to the view/ folder.
 void CreateProgressBar(void)
 {
 
@@ -90,6 +93,10 @@ void CreateProgressBar(void)
    refresh_screen();
 }
 
+
+// #bugbug
+// This is a 'designer' thing.
+// We can move this to the view/ folder.
 void IncrementProgressBar(void)
 {
     // 5 = full gui

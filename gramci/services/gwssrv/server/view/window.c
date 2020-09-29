@@ -1007,11 +1007,15 @@ fail:
 /*
  ***********************************************
  * show_window_rect:
+ * 
  *     Mostra o retângulo de uma janela que está no backbuffer.
  *     Tem uma janela no backbuffer e desejamos enviar ela para o frontbuffer.
  *     A rotina de refresh rectangle tem que ter o vsync
  *     #todo: criar um define chamado refresh_window.
  */
+
+// #bugbug
+// Nao esta dando refresh nas bordas de um editbox.
 
 int gws_show_window_rect (struct gws_window_d *window){
 

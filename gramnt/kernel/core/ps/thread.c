@@ -847,20 +847,21 @@ get_next:
     
     }else{
 
-		//Object.
-		Thread->objectType  = ObjectTypeThread;
-		Thread->objectClass = ObjectClassKernelObjects;
+        // Object.
+        Thread->objectType  = ObjectTypeThread;
+        Thread->objectClass = ObjectClassKernelObjects;
 
-		// c,Put in list.
-		// Iniciamos em 100. 
-		Thread->tid = (int) i;
-		
+        // c,Put in list.
+        // Iniciamos em 100. 
+        Thread->tid = (int) i;
+
 		//if( Thread->tid < 0 ){
 		    //fail	
 		//};		
-		
-		//ID do processo ao qual o thread pertence.
-		Thread->ownerPID = (int) pid; //#bugbug: Deve ser (ProcessID).  
+
+
+        // ID do processo ao qual o thread pertence.
+        Thread->ownerPID = (int) pid;
 
         Thread->used = 1;
         Thread->magic = 1234;
@@ -868,27 +869,27 @@ get_next:
         // Not a protected thread!
         Thread->_protected = 0;
 
-
-        Thread->name_address = (unsigned long) name;  //Name.   
-		//@todo: Usar Thread->name. 
-		//Thread->cmd @todo.
-		
-		
-        //#test
-        //64 bytes m�x.
+        // name.
+        Thread->name_address = (unsigned long) name; 
+        //#todo: Usar Thread->name. 
+        //#todo: Thread->cmd.
+        //#test 64 bytes max.
         strcpy ( Thread->__threadname, (const char *) name); 
 
-        //Thread->process = (void*) Process;
+        // #todo
+        // Thread->process = (void*) Process;
 
-        // #bugbug: Estamos repensando isso.
-         // Procedimento de janela.
+        // #bugbug: 
+        // Estamos repensando isso.
+        // Procedimento de janela.
         Thread->procedure = (unsigned long) &system_procedure;
 
         //
-        // Single message;
+        // message support.
         //
 
-		// Msg support. //Argumentos.
+        // Single message;
+        // Msg support. //Argumentos.
         Thread->window = NULL;        //arg1.
         Thread->msg = 0;              //arg2.
         Thread->long1 = 0;            //arg3.
@@ -911,32 +912,29 @@ get_next:
         Thread->tail_pos = 0;
 
 
-        //
         // Message queue.
-        //
-
         for ( q=0; q<32; q++ ){ Thread->MsgQueue[q] = 0; };
         Thread->MsgQueueHead = 0;
         Thread->MsgQueueTail = 0;
 
-
         // Caracteristicas.
-		// TYPE_IDLE;    //?? //Type...@todo: Rever. 
-	    Thread->type = TYPE_SYSTEM; 
-	    Thread->state = INITIALIZED;  
-		//Apenas Initialized, pois a fun��o SelectForExecution
-		//seleciona uma thread para a execu��o colocando ela no
-		//state Standby.	
-		
-		//@TODO: ISSO DEVERIA VIR POR ARGUMENTO
-        Thread->plane = FOREGROUND;	
-		
-		// A prioridade b�sica da thread � igual a prioridade b�sica do processo.
-		// Process->base_priority;
-		// priority; A prioridade din�mica da thread foi passada por argumento.
-		Thread->base_priority = (unsigned long) PRIORITY_NORMAL; 
-		Thread->priority = (unsigned long) Thread->base_priority;			
-		
+        
+        // TYPE_IDLE;    //?? //Type...@todo: Rever. 
+        Thread->type = TYPE_SYSTEM; 
+        Thread->state = INITIALIZED;  
+
+        // Apenas Initialized, pois a fun��o SelectForExecution
+        // seleciona uma thread para a execu��o colocando ela no
+        // state Standby.	
+
+		//#TODO: ISSO DEVERIA VIR POR ARGUMENTO
+        Thread->plane = FOREGROUND;
+
+        // static and dynamic priorities.
+        Thread->base_priority = (unsigned long) PRIORITY_NORMAL;  //static
+        Thread->priority      = (unsigned long) PRIORITY_NORMAL;  //dynamic
+
+
 		//IOPL.
 		//Se ela vai rodar em kernel mode ou user mode.
 		//@todo: herdar o mesmo do processo.
@@ -950,17 +948,35 @@ get_next:
 	    //Thread->Stack;
 	    //Thread->StackSize;
 
+        //
+        // == Time support ======================================
+        //
+        
+        
+
         // Temporizadores. 
-        // step - Quantas vezes ela usou o processador no total.  		
-	    // quantum_limit - (9*2);  O boost n�o deve ultrapassar o limite. 
-		Thread->step = 0;                           
-        Thread->quantum = QUANTUM_BASE;    
+        // step - Quantas vezes ela usou o processador no total. 
+        // quantum_limit - (9*2);  O boost n�o deve ultrapassar o limite. 
+
+        // step: 
+        // How many jiffies. total_jiffies.
+        // Quantas vezes ela já rodou no total.
+        Thread->step = 0;
+
+        // Quantum. 
+        // time-slice or quota. 
+        // See: ps/process.h
+        
+        // Quantos jiffies a thread pode rodar em um round.
+        // QUANTUM_BASE   (PRIORITY_NORMAL*TIMESLICE_MULTIPLIER)
+        // Thread->quantum  = QUANTUM_BASE; 
+        Thread->quantum  = ( Thread->priority * TIMESLICE_MULTIPLIER);
+
+        // Quantidade limite de jiffies que uma thread pode rodar em um round.
+        // QUANTUM_LIMIT  (PRIORITY_MAX *TIMESLICE_MULTIPLIER)
         Thread->quantum_limit = QUANTUM_LIMIT; 
-		
-		
-		// runningCount - Tempo rodando antes de parar.
-		// readyCount - Tempo de espera para retomar a execu��o.
-		// blockedCount - Tempo bloqueada.
+
+
         Thread->standbyCount = 0;
 
         Thread->runningCount = 0;   
