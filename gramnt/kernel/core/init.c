@@ -91,7 +91,8 @@ void save_kernel_args (void)
 int init_architecture_dependent (void){
 
     int Status = 0;
-    unsigned char Type=0;
+
+    unsigned char ProcessorType=0;
 
 
     debug_print ("init_architecture_dependent:\n");
@@ -135,41 +136,67 @@ int init_architecture_dependent (void){
     }
 
 
+    //
+    // == Processor global initialization ==========================
+    //
+    
+    // #test
+    
+    // UP
+    // We have at least one.
+    processors_count = 1;
+
+    // Clenning th list.
+    int i=0;
+    for (i=0; i<PROCESSORS_MAX_COUNT; i++)
+        processorsList[i] = 0;
+
+
+
+    //
+    // == Processor brand ========================================
+    //
+
+
     // Sonda pra ver qual é a marca do processador.
     // #todo: 
     // É a segunda vez que fazemos a sondagem ?!
 
-    Type = (int) hal_probe_processor_type();
+    ProcessorType = (int) hal_probe_processor_type();
 
-    if(Type==0)
-        panic("init_architecture_dependent: Type\n");
+    if (ProcessorType==0){
+        panic("init_architecture_dependent: ProcessorType\n");
+    }
 
-    processor->Type = (int) Type;
+    // Saving again
+    processor->Type = (int) ProcessorType;
 
     //
+    // == Initializing processor info ===============================
+    //
+ 
     // Inicializa de acordo com o tipo de processador.
-    // Essas rotinas pegarao informacoes sobre o processador
-    // e salvarao em estruturas
-    //
+    // Essas rotinas pegarao informacoes sobre o processador e 
+    // salvarao em estruturas.
 
-    switch (Type)
-    {
+    switch (ProcessorType){
 
-        case Processor_INTEL: 
-            init_intel(); 
+        case PROCESSOR_NULL:
+            panic ("init_architecture_dependent: We need a processor type\n");
             break;
 
-        case Processor_AMD: 
-            init_amd(); 
-            break;
+        // See: 
+        // x86/x86.c
+        // amd/cpuamd.c
 
+        case PROCESSOR_INTEL: init_intel(); break;
+        case PROCESSOR_AMD:   init_amd();   break;
         // ...
-
-
         default:
-            panic ("init_architecture_dependent: default Type\n");
+            panic ("init_architecture_dependent: default processor type\n");
             break;
     };
+
 
 
 	//

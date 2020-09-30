@@ -20,9 +20,14 @@
  
 
 // Supported brands.
-#define Processor_NULL  0 
-#define Processor_INTEL 1
-#define Processor_AMD   2
+
+#define PROCESSOR_NULL   0 
+#define PROCESSOR_INTEL  1
+#define PROCESSOR_AMD    2
+// ... hahaha
+
+
+
 
 // #todo:
 // More brands.
@@ -297,19 +302,22 @@ unsigned long processorsList[PROCESSORS_MAX_COUNT];
  */
  
 int cpuHasMSR (void);
-void cpuGetMSR(unsigned long msr, unsigned long *lo, unsigned long *hi);
-void cpuSetMSR(unsigned long msr, unsigned long lo, unsigned long hi);
+void 
+cpuGetMSR (
+    unsigned long msr, 
+    unsigned long *lo, 
+    unsigned long *hi );
+    
+void 
+cpuSetMSR (
+    unsigned long msr, 
+    unsigned long lo, 
+    unsigned long hi );
  
 void show_cpu_info(void);
 
-int cpu_get_parameters (void);
 
 unsigned long get_processor_feature(int i);
-
-//#bugbug
-//Esse nome não é apropriado.
-//@todo: Isso deve isr para include/ke.h.
-int KeTestCPU (void);   
 
 
 void init_cpu (void);
