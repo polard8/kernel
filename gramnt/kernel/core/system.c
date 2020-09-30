@@ -1053,15 +1053,15 @@ unsigned long systemGetSystemMetrics ( int index ){
     switch ( index )
     {
 		//screen width.
-		case 1:
-		    return (unsigned long) screenGetWidth();
-		    break;
-			
-		//screen height.	
-		case 2:
-		    return (unsigned long) screenGetHeight();
+        case 1:
+            return (unsigned long) screenGetWidth();
             break;
-			
+
+        //screen height.	
+        case 2:
+            return (unsigned long) screenGetHeight();
+            break;
+
 		//cursor width.
 		case 3:
 		    return (unsigned long) TTY[current_vc].cursor_width;
@@ -1083,43 +1083,41 @@ unsigned long systemGetSystemMetrics ( int index ){
 		    return (unsigned long) g_mousepointer_height;
             break;
 
-		//char width.
+        //char width.
         case 7:
-		    return (unsigned long) get_char_width();
+            return (unsigned long) get_char_width();
             break;
 
-		//char height.
+        //char height.
         case 8:
-		    return (unsigned long) get_char_height();
+            return (unsigned long) get_char_height();
             break;
-            
-            
+
+        //bpp
         case 9:
-            return (unsigned long) SavedBPP;
-            break;    
-            
-      
+            return (unsigned long) g_device_screen_bpp; //SavedBPP;
+            break; 
+ 
         //
         // screen buffers
         //
 
         // lfb pa
         case 10:
-		    return (unsigned long) g_frontbuffer_pa;
-            break;        
+            return (unsigned long) g_frontbuffer_pa;
+            break;
 
-            
         // lfb va
         case 11:
-		    return (unsigned long) g_frontbuffer_va;
-            break;        
+            return (unsigned long) g_frontbuffer_va;
+            break; 
 
         // main backbuffer va
         case 12:
-		    return (unsigned long) g_backbuffer_va;
-            break;                   
-     
-                      
+            return (unsigned long) g_backbuffer_va;
+            break;  
+
+
         //20   
         // mouse x    
         case SM_GETMOUSEX:

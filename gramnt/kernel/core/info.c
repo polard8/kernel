@@ -1,8 +1,7 @@
 /*
  * File: info.c
  *
- * Descri��o:
- *     Rotinas de informa��es sobre o sistema.
+ *     Rotinas de informaçoes sobre o sistema.
  *
  * History:
  *     2015 - Created by Fred Nora.
@@ -72,12 +71,17 @@ void KiInformation (void){
         GRAMAD0_NAME );	
 #endif
 */
-	
-	
-	//screen 
-	
-    printf ("\n Screen Resolution: W=%d H=%d \n",
-        g_device_screen_width, g_device_screen_height );
+
+
+
+
+    //screen 
+
+    printf ("\n Screen Resolution: W=%d H=%d BPP=%d \n",
+        g_device_screen_width, 
+        g_device_screen_height,
+        g_device_screen_bpp );
+
 
 
 	// Timing
