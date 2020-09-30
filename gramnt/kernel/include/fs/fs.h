@@ -171,6 +171,7 @@ unsigned short file_cluster_list[1024];
 
 //suporte ao diretório alvo que desejamos acessar.
 //com base em um pathname passado via argumento.
+
 struct target_dir_d
 {
     int used;
@@ -180,12 +181,12 @@ struct target_dir_d
 	//char *pwd_string;  
 	
 	//file name 8.3 (11 bytes;)
-	char name[32];
+    char name[32];
 	
 	//onde esse direto'rio esta' carregado.
     unsigned long current_dir_address;
-		
-	//...
+
+    //...
 };
 struct target_dir_d current_target_dir;
  
@@ -216,7 +217,7 @@ struct softlink_d
 struct fat_d
 {
     unsigned long address;
-	int type;
+    int type;
 	//...
 };
 struct fat_d *fat;

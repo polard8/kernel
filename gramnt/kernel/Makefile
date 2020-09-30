@@ -263,7 +263,6 @@ all-c:
 	$(CC) -c core/ob/object.c        $(KINCLUDE) $(CFLAGS) -o object.o
 
 	# core
-	$(CC) -c core/storage/storage.c  $(KINCLUDE) $(CFLAGS) -o storage.o
 	$(CC) -c core/abort.c    $(KINCLUDE) $(CFLAGS) -o abort.o
 	$(CC) -c core/info.c     $(KINCLUDE) $(CFLAGS) -o info.o
 	$(CC) -c core/init.c     $(KINCLUDE) $(CFLAGS) -o init.o
@@ -330,7 +329,6 @@ all-c:
 
 	# dd
 	$(CC) -c hwi/dd/devmgr.c  $(KINCLUDE) $(CFLAGS) -o devmgr.o
-
 
 
 	#
@@ -406,6 +404,9 @@ all-c:
 	$(CC) -c hwi/dd/hid/output.c    $(KINCLUDE) $(CFLAGS) -o output.o
 	$(CC) -c hwi/dd/hid/screen.c    $(KINCLUDE) $(CFLAGS) -o screen.o
 	$(CC) -c hwi/dd/hid/video.c     $(KINCLUDE) $(CFLAGS) -o video.o
+
+	# storage
+	$(CC) -c hwi/storage/storage.c  $(KINCLUDE) $(CFLAGS) -o storage.o
 
 
 	# x86 initialization
