@@ -975,13 +975,14 @@ void procedureWindowWithFocusTest (void)
 
 
 // ??
-// Rever isso.
+// #todo: deletar!
 
 void procedureGrid (void)
 {
-    int Status;
-
-
+    panic ("xproc-procedureGrid: Deprecated!");
+        
+    /*
+    int Status=0;
     Status = grid ( (struct window_d *) gui->main, 
                  (int) 4, 
                  (int) GRID_HORIZONTAL ); 
@@ -991,7 +992,9 @@ void procedureGrid (void)
     {
         panic ("xproc-procedureGrid:\n");
     }
+    */
 }
+
 
 
 //

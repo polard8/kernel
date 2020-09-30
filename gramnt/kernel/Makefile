@@ -101,16 +101,15 @@ ifeq ($(ARCH),x86)
 	apic.o pic.o rtc.o serial.o pit.o  
 	
 	KSERVERS_OBJECTS := cf.o format.o pipe.o fs.o read.o search.o write.o \
-	cedge.o bg.o bmp.o button.o char.o createw.o dtext.o font.o grid.o \
-	line.o menu.o menubar.o pixel.o rect.o sbar.o toolbar.o wm.o \
-	logoff.o \
-	logon.o \
+	cedge.o bg.o bmp.o button.o char.o createw.o dtext.o font.o pbar.o \
+	line.o menu.o mbar.o pixel.o rect.o sbar.o tbar.o wm.o \
+	logoff.o logon.o \
 	input.o output.o terminal.o \
 	desktop.o room.o userenv.o usession.o \
 	kgwm.o kgws.o \
 	vfs.o 
-	
-	
+
+
 	MK_OBJECTS := x86cont.o x86fault.o x86start.o \
 	dispatch.o pheap.o process.o clone.o queue.o spawn.o \
 	tasks.o theap.o thread.o threadi.o ts.o tstack.o \
@@ -212,34 +211,38 @@ all-c:
 	$(CC) -c sci/net/network/channel.c   $(KINCLUDE) $(CFLAGS) -o channel.o
 	$(CC) -c sci/net/network/network.c   $(KINCLUDE) $(CFLAGS) -o network.o
 
-	# Window Manager.
-    #Window system ring 0 support.
-	# model business logic
-	$(CC) -c sci/windows/model/kgwm.c    $(KINCLUDE) $(CFLAGS) -o kgwm.o
-	$(CC) -c sci/windows/model/wm.c      $(KINCLUDE) $(CFLAGS) -o wm.o
-	$(CC) -c sci/windows/model/kgws.c      $(KINCLUDE) $(CFLAGS) -o kgws.o
+	#
+	# ui
+	#
+
+    # Window Manager.
+    # Window system ring 0 support.
+    # model business logic
+	$(CC) -c ui/windows/model/kgwm.c  $(KINCLUDE) $(CFLAGS) -o kgwm.o
+	$(CC) -c ui/windows/model/wm.c    $(KINCLUDE) $(CFLAGS) -o wm.o
+	$(CC) -c ui/windows/model/kgws.c  $(KINCLUDE) $(CFLAGS) -o kgws.o
 	# data model
-	$(CC) -c sci/windows/model/font.c      $(KINCLUDE) $(CFLAGS) -o font.o
+	$(CC) -c ui/windows/model/font.c  $(KINCLUDE) $(CFLAGS) -o font.o
 
 	# Window Server.
-	$(CC) -c sci/windows/view/bg.c        $(KINCLUDE) $(CFLAGS) -o bg.o
-	$(CC) -c sci/windows/view/bmp.c       $(KINCLUDE) $(CFLAGS) -o bmp.o
-	$(CC) -c sci/windows/view/button.c    $(KINCLUDE) $(CFLAGS) -o button.o
-	$(CC) -c sci/windows/view/char.c      $(KINCLUDE) $(CFLAGS) -o char.o
-	$(CC) -c sci/windows/view/createw.c   $(KINCLUDE) $(CFLAGS) -o createw.o
-	$(CC) -c sci/windows/view/dtext.c     $(KINCLUDE) $(CFLAGS) -o dtext.o
-	$(CC) -c sci/windows/view/grid.c      $(KINCLUDE) $(CFLAGS) -o grid.o
-	$(CC) -c sci/windows/view/line.c      $(KINCLUDE) $(CFLAGS) -o line.o
-	$(CC) -c sci/windows/view/menu.c      $(KINCLUDE) $(CFLAGS) -o menu.o
-	$(CC) -c sci/windows/view/menubar.c   $(KINCLUDE) $(CFLAGS) -o menubar.o
-	$(CC) -c sci/windows/view/pixel.c     $(KINCLUDE) $(CFLAGS) -o pixel.o
-	$(CC) -c sci/windows/view/rect.c      $(KINCLUDE) $(CFLAGS) -o rect.o
-	$(CC) -c sci/windows/view/sbar.c      $(KINCLUDE) $(CFLAGS) -o sbar.o
-	$(CC) -c sci/windows/view/toolbar.c   $(KINCLUDE) $(CFLAGS) -o toolbar.o
-	$(CC) -c sci/windows/view/xproc.c     $(KINCLUDE) $(CFLAGS) -o xproc.o
+	$(CC) -c ui/windows/view/bg.c        $(KINCLUDE) $(CFLAGS) -o bg.o
+	$(CC) -c ui/windows/view/bmp.c       $(KINCLUDE) $(CFLAGS) -o bmp.o
+	$(CC) -c ui/windows/view/button.c    $(KINCLUDE) $(CFLAGS) -o button.o
+	$(CC) -c ui/windows/view/char.c      $(KINCLUDE) $(CFLAGS) -o char.o
+	$(CC) -c ui/windows/view/createw.c   $(KINCLUDE) $(CFLAGS) -o createw.o
+	$(CC) -c ui/windows/view/dtext.c     $(KINCLUDE) $(CFLAGS) -o dtext.o
+	$(CC) -c ui/windows/view/line.c      $(KINCLUDE) $(CFLAGS) -o line.o
+	$(CC) -c ui/windows/view/menu.c      $(KINCLUDE) $(CFLAGS) -o menu.o
+	$(CC) -c ui/windows/view/mbar.c      $(KINCLUDE) $(CFLAGS) -o mbar.o
+	$(CC) -c ui/windows/view/pixel.c     $(KINCLUDE) $(CFLAGS) -o pixel.o
+	$(CC) -c ui/windows/view/pbar.c      $(KINCLUDE) $(CFLAGS) -o pbar.o
+	$(CC) -c ui/windows/view/rect.c      $(KINCLUDE) $(CFLAGS) -o rect.o
+	$(CC) -c ui/windows/view/sbar.c      $(KINCLUDE) $(CFLAGS) -o sbar.o
+	$(CC) -c ui/windows/view/tbar.c      $(KINCLUDE) $(CFLAGS) -o tbar.o
+	$(CC) -c ui/windows/view/xproc.c     $(KINCLUDE) $(CFLAGS) -o xproc.o
 
-	$(CC) -c sci/windows/logoff.c  $(KINCLUDE) $(CFLAGS) -o logoff.o
-	$(CC) -c sci/windows/logon.c   $(KINCLUDE) $(CFLAGS) -o logon.o
+	$(CC) -c ui/windows/logoff.c  $(KINCLUDE) $(CFLAGS) -o logoff.o
+	$(CC) -c ui/windows/logon.c   $(KINCLUDE) $(CFLAGS) -o logon.o
 
 	#
 	# == Gramado Core =================================================

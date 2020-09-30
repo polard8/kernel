@@ -31,12 +31,15 @@ extern unsigned long SavedBPP;
 // Zero-sized copy? 
 // Destination is Source?
 
-void *rectStrCopyMemory32 ( unsigned long *dest, 
-                            unsigned long *src, 
-                            int count ) 
+void *rectStrCopyMemory32 ( 
+    unsigned long *dest, 
+    unsigned long *src, 
+    int count ) 
 {
-	int i;
-	
+
+    int i=0;
+
+
 	if ( (dest == NULL)  || 
 	     (src == NULL)   || 
 		 (count == 0)    || 
@@ -312,39 +315,39 @@ refresh_rectangle (
     unsigned long height )
 {
 
-	void *p = (void *) FRONTBUFFER_ADDRESS;
+	void *p       = (void *)      FRONTBUFFER_ADDRESS;
 	const void *q = (const void*) BACKBUFFER_ADDRESS;
 
+
 	//#TEST
-	register unsigned int i;
+	register unsigned int i=0;
 	//unsigned int i;
 
+
 	unsigned int line_size, lines;
-	unsigned int offset;
-	unsigned long Width = (unsigned long) screenGetWidth();
+	unsigned int offset=0;
+	unsigned long Width  = (unsigned long) screenGetWidth();
 	unsigned long Height = (unsigned long) screenGetHeight();
 
-	int count; 
+	int count=0; 
 
 	// = 3; 24bpp
-	int bytes_count;
+	int bytes_count=0;
 
-	line_size = (unsigned int) width; 
-	lines = (unsigned int) height;
+    line_size = (unsigned int) width; 
+    lines     = (unsigned int) height;
 
-	
-	switch (SavedBPP)
-	{
-		case 32:
-		    bytes_count = 4;
-		    break;
-		
-		case 24:
-		    bytes_count = 3;
-			break;
-			
-		//...
-	}
+
+    switch (SavedBPP){
+
+        case 32:  bytes_count = 4;  break;
+        case 24:  bytes_count = 3;  break;
+
+        // ...
+        
+        //#todo: default
+    };
+
 
 	// #atenção.
 	

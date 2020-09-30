@@ -232,7 +232,7 @@ extern void do_executa_new_task (void);
 // #view - designers
 #include "ws/view/window.h"
 #include "ws/view/menu.h"
-#include "ws/view/grid.h"
+#include "ws/view/pbar.h"
 #include "ws/view/bmp.h"
 #include "ws/view/line.h"
 

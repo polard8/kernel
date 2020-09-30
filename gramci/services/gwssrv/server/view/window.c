@@ -1014,17 +1014,17 @@ fail:
  *     #todo: criar um define chamado refresh_window.
  */
 
-// #bugbug
-// Nao esta dando refresh nas bordas de um editbox.
+int gws_show_window_rect (struct gws_window_d *window)
+{
 
-int gws_show_window_rect (struct gws_window_d *window){
+    struct gws_window_d  *p;
 
 
-    struct gws_window_d *p;
-
-    if ( (void *) window == NULL ){
-        debug_print ("show_window_rect: window\n");
-        return (int) 1;
+    if ( (void *) window == NULL )
+    {
+        debug_print ("gws_show_window_rect: window\n");
+        return (int) -1;
+        //return (int) 1;
 
     }else{
 
@@ -1055,42 +1055,18 @@ int gws_show_window_rect (struct gws_window_d *window){
             
             //p = window->parent;
             
-            //#todo: delete
-            //if ((void*)p==NULL)
-            //{
-            //    gwssrv_debug_print("gws_show_window_rect: No parent\n");
                 
-                gws_refresh_rectangle ( 
-                    window->left, 
-                    window->top, 
-                    window->width, 
-                    window->height ); 
+            gws_refresh_rectangle ( 
+                window->left, window->top, 
+                window->width, window->height ); 
 
-                return 0;
-            //}
-            
-            //if ((void*)p!=NULL)
-            //{
-                //gwssrv_debug_print("gws_show_window_rect: parent ok");
-                
-               // gws_refresh_rectangle ( 
-               //     window->left,
-               //     window->top,
-               //     window->width, 
-               //     window->height ); 
-
-                //return 0;
-            //}
-
-            //return 0;
+            return 0;
         }
     };
 
-
-	//fail.
-    return (int) 1;
+    // fail.
+    return (int) -1;
 }
-
 
 
 /*

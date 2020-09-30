@@ -217,10 +217,10 @@ DrawFrame (
             window->top, border_size, window->height, border_color );
 
         //board2, borda direita e baixo.
-        drawDataRectangle( window->left +window->width -1, 
+        drawDataRectangle( window->left +window->width -border_size, 
             window->top, border_size, window->height, border_color );
 
-        drawDataRectangle ( window->left, window->top +window->height -1, 
+        drawDataRectangle ( window->left, window->top +window->height -border_size, 
             window->width, border_size, border_color );
 
         return 0;
@@ -247,10 +247,10 @@ DrawFrame (
             window->top, border_size, window->height, border_color );
 
 		//board2, borda direita e baixo.
-        drawDataRectangle( window->left +window->width -1, 
+        drawDataRectangle( window->left +window->width -border_size, 
             window->top, border_size, window->height, border_color );
 
-        drawDataRectangle ( window->left, window->top +window->height -1, 
+        drawDataRectangle ( window->left, window->top +window->height -border_size, 
             window->width, border_size, border_color );
             
        
@@ -292,10 +292,10 @@ DrawFrame (
             window->top, border_size, window->height, border_color );
 
 		//board2, borda direita e baixo.
-        drawDataRectangle( window->left +window->width -1, 
+        drawDataRectangle( window->left +window->width -border_size, 
             window->top, border_size, window->height, border_color );
 
-        drawDataRectangle ( window->left, window->top +window->height -1, 
+        drawDataRectangle ( window->left, window->top +window->height -border_size, 
             window->width, border_size, border_color );
 
         return 0;
@@ -303,6 +303,7 @@ DrawFrame (
 
 
     return 1;
+    //return -1;
 }
 
 

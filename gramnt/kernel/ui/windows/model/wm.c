@@ -122,15 +122,16 @@ int show_saved_window (struct window_d *window){
  *     #todo: criar um define chamado refresh_window.
  */
 
-int show_window_rect (struct window_d *window){
+int show_window_rect (struct window_d *window)
+{
 
+    if ( (void *) window == NULL )
+    {
+        printf ("show_window_rect: window\n");
+        return (int) -1;
 
-    if ( (void *) window == NULL ){
-		printf ("show_window_rect: window\n");
-		return (int) 1;
+    } else {
 
-	} else {
-	
         if ( window->used == 1 || window->magic == 1234 )
         {
 			
@@ -153,17 +154,21 @@ int show_window_rect (struct window_d *window){
 				//    window->width +2, window->height +2 ); 
 				//return (int) 0;
 			//}
-			
-            refresh_rectangle ( window->left, window->top, 
-                window->width, window->height ); 
 
-			return 0;
-		}
-	};
+            // #hackhack
+            // Inclui esse 8 ate descobrir porque nao esta 
+            // dando refresh da janela inteira.
 
+            refresh_rectangle ( 
+                window->left, window->top, 
+                window->width, window->height); 
 
-	//fail.
-    return (int) 1;
+            return 0;
+        }
+    };
+
+    // fail.
+    return (int) -1;
 }
 
 

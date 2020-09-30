@@ -2,6 +2,7 @@
 // Talvez todas as rotinas de tratamento ter�o seus wrappers 
 // em sci/sys/.
 
+
 /*
  * File: sci/gde_serv.c 
  *
@@ -2157,10 +2158,9 @@ gde_services (
 		// Create grid and itens.
 		// window, n, view. 
         case 148:
-           return (void *) grid ( (struct window_d *) arg2, 
-                               (int) arg3, (int) arg4 );
+            debug_print("148: deprecated\n");
+            return NULL;
             break;
-
 
 
         // 149 - Testing system menu.

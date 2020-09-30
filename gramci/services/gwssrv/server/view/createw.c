@@ -104,12 +104,12 @@ createwDrawFrame (
 
         // board2, borda direita e baixo.
         rectBackbufferDrawRectangle( 
-            (window->left + window->width -1), window->top,  
+            (window->left + window->width - border_size), window->top,  
             border_size, window->height, 
             border_color, 1 );
 
         rectBackbufferDrawRectangle ( 
-            window->left, (window->top + window->height -1), 
+            window->left, (window->top + window->height - border_size), 
             window->width, border_size, 
             border_color, 1 );
 
@@ -152,12 +152,12 @@ createwDrawFrame (
 
         //board2, borda direita e baixo.
         rectBackbufferDrawRectangle( 
-            (parent->left + window->left + window->width -1), (parent->top + window->top), 
+            (parent->left + window->left + window->width - border_size), (parent->top + window->top), 
             border_size, window->height, 
             border_color, 1 );
 
         rectBackbufferDrawRectangle ( 
-            (parent->left + window->left), (parent->top + window->top + window->height -1), 
+            (parent->left + window->left), (parent->top + window->top + window->height - border_size), 
             window->width, border_size, 
             border_color, 1 );
 
@@ -174,7 +174,7 @@ createwDrawFrame (
                                     WT_SIMPLE, 
                                     1, 1, "TITLE", 
                                     3, 3, 
-                                    window->width-4, window->titlebar_height, 
+                                    (window->width - 3 - border_size),     window->titlebar_height, 
                                     (struct gws_window_d *) window, 
                                     0, COLOR_DARKBLUE, COLOR_DARKBLUE );  
 

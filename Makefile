@@ -2,7 +2,7 @@
 PRODUCT_NAME  = Gramado Operating System
 VERSION_MAJOR = 1
 VERSION_MINOR = 0
-VERSION_BUILD = 125
+VERSION_BUILD = 126
 # See: config/version.h
 
 # Documentation.

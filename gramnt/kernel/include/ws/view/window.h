@@ -66,8 +66,6 @@ int windowLoadGramadoIcons (void);
 int window_getch (void); 
 
 
-void CreateProgressBar(void);
-void IncrementProgressBar(void);
 
 
 //
