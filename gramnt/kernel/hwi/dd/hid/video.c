@@ -456,20 +456,16 @@ __video_refresh_rectangle ( unsigned long x,
 
 
 /*
- ****************
  * videoSetupCGAStartAddress:
- * 
  *     Configura o endereço inicial da memória de video em modo texto   
  *     fis=b8000  vir=0x800000 
  */
 
-void 
-videoSetupCGAStartAddress (unsigned long address)
-{
+void videoSetupCGAStartAddress (unsigned long address){
+	
     g_current_vm = (unsigned long) address;
-    //g_current_cga_address
+	//g_current_cga_address
 }
-
 
 
 /*
@@ -484,39 +480,33 @@ void videoSetupVGAStartAddress( unsigned long address)
 
 
 /*
- *******************************************
- * videoGetMode: 
+ * get_video_mode: 
  *     Obtem o modo de video atual.
  */
 
-// #todo
-// Isso pode ser incluido em 'get system parameters' system call.
+//#todo
+//isso pode ser incluido em 'get system parameters' system call.
 
-// ??
-// What is this number ????
-
-unsigned long videoGetMode (void)
-{
-    return (unsigned long) g_current_video_mode;
+unsigned long videoGetMode (void){
+	
+	return (unsigned long) g_current_video_mode;
 }
 
 
 /*
- *****************************************************
  * videoSetMode:
  *     Configura o modo de video atual.
  */
-
 void videoSetMode (unsigned long mode){
+	
+    unsigned long VideoMode;
+    unsigned long Width;
+	unsigned long Height;
+	//continua...(outros parametros)
 
-    unsigned long VideoMode=0;
-    unsigned long Width=0;
-    unsigned long Height=0;
-    //continua...(outros parametros)
-
-
-    VideoMode = (unsigned long) mode;
-
+	
+	VideoMode = (unsigned long) mode;
+	
     //
 	// todo: Check limits.
 	//
@@ -525,14 +515,14 @@ void videoSetMode (unsigned long mode){
 	
 
 	//Se estiver nos limites.
-    if ( VideoMode > 0 && VideoMode < 9000)
-    {
-        //g_current_video_mode = (unsigned long) VideoMode;
+	if ( VideoMode > 0 && VideoMode < 9000)
+	{
+		//g_current_video_mode = (unsigned long) VideoMode;
         g_video_mode = (unsigned long) VideoMode;
-        VideoBlock.vesaMode = (unsigned long) VideoMode; 
+		VideoBlock.vesaMode = (unsigned long) VideoMode; 
 		//...
-    }
-
+	};
+	
 	
 	//
 	// @todo:
@@ -686,66 +676,47 @@ write_vga_reg (
  * videoInit:
  *     Inicia variáveis de video de acordo com o modo gráfico utilizado.
  */ 
-
-// Called by: ???
-
+ 
 int videoInit (void){
 
     int Status=0;
 
 
+
     // Se o modo de video nao esta habilitado
-    if ( VideoBlock.useGui != 1 )
-    {
-        panic ("videoInit:");
+    if ( VideoBlock.useGui != 1 ){
+        panic("videoInit:");
     }
 
-    VideoBlock.useGui = 1;
+
     g_useGUI = 1;
-
+    VideoBlock.useGui = 1;
 
 
     //
-    // == Frontbuffer (LFB) =======================================
+    // LFB
     //
 
-    // global usada pelo kernel.
-    // #todo: não devemos configurar essa global.
-    // O kernel deve solicitar esse endereço. 
-    //endereço físico do frontbuffer.
-    g_frontbuffer_pa = (unsigned long) SavedLFB;  
-
-
-    // Esses valores vieram do bootloader.
-    // Mas eles precisar ser enviados para esse driver
-    // quando o kernel estiver iniciando o driver.
+	// Esses valores vieram do bootloader.
+	// Mas eles precisar ser enviados para esse driver
+	// quando o kernel estiver iniciando o driver.
     __frontbuffer_va = (unsigned long) SavedLFB;
     __frontbuffer_pa = (unsigned long) FRONTBUFFER_VA;  
 
 
+	
+	// global usada pelo kernel.
+	// #todo: não devemos configurar essa global.
+	// O kernel deve solicitar esse endereço. 
+	//endereço físico do frontbuffer.
+    g_frontbuffer_pa = (unsigned long) SavedLFB;  
 
-    //
-    // == Backbuffer ==========================================
-    //
-
-    //endereço virtual do backbuffer.
+	//endereço virtual do backbuffer.
     g_backbuffer_va = (unsigned long) BACKBUFFER_VA;
 
-
-    //
-    // == Device info =======================================
-    //
-
-    // Device screen sizes and bpp. 
-    // (herdadas do boot loader.)
-    // See: globals/gdevice.h
-
+	//Device screen sizes. (herdadas do boot loader.)
     g_device_screen_width  = (unsigned long) SavedX;
     g_device_screen_height = (unsigned long) SavedY;
-    g_device_screen_bpp    = (unsigned long) SavedBPP;
-
-
-    // ==========================================
 
 
 	// #importante

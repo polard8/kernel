@@ -15,37 +15,34 @@
  
  
  
-#define DISK_COUNT_MAX 1024 
+#define DISK_COUNT_MAX 1024    //8
 
 #define DISK_BYTES_PER_SECTOR  512 
 //#define DISK_BYTES_PER_SECTOR 4096 
-
-//
-// == MBR ===========================
-//
-
+ 
+ 
 // MBR support.
-#define  BS_JmpBoot       0   /* x86 jump instruction (3-byte) */
-#define  BS_OEMName       2   /* OEM name (8-byte) */
-#define  BPB_BytsPerSec  11   /* Sector size [byte] (WORD) */
-#define  BPB_SecPerClus  13   /* Cluster size [sector] (BYTE) */
-#define  BPB_RsvdSecCnt  14   /* Size of reserved area [sector] (WORD) */
-#define  BPB_NumFATs     16   /* Number of FATs (BYTE) */
-#define  BPB_RootEntCnt  17   /* Size of root directory area for FAT [entry] (WORD) */
-#define  BPB_TotSec16    19   /* Volume size (16-bit) [sector] (WORD) */
-#define  BPB_Media       21   /* Media descriptor byte (BYTE) */
-#define  BPB_FATSz16     22   /* FAT size (16-bit) [sector] (WORD) */
-#define  BPB_SecPerTrk   24   /* Number of sectors per track for int13h [sector] (WORD) */
-#define  BPB_NumHeads    26   /* Number of heads for int13h (WORD) */
-#define  BPB_HiddSec     28   /* Volume offset from top of the drive (DWORD) */
-#define  BPB_TotSec32    32   /* Volume size (32-bit) [sector] (DWORD) */
-#define  BS_DrvNum       36   /* Physical drive number for int13h (BYTE) */
-#define  BS_NTres        37   /* WindowsNT error flag (BYTE) */
-#define  BS_BootSig      38   /* Extended boot signature (BYTE) */
-#define  BS_VolID        39   /* Volume serial number (DWORD) */
-#define  BS_VolLab       42   /* Volume label string (8-byte) */
-#define  BS_FilSysType   50   /* Filesystem type string (8-byte) */
-#define  BS_BootCode     62   /* Boot code (448-byte) */
+#define  BS_JmpBoot       0  /* x86 jump instruction (3-byte) */
+#define  BS_OEMName       2  /* OEM name (8-byte) */
+#define  BPB_BytsPerSec  11  /* Sector size [byte] (WORD) */
+#define  BPB_SecPerClus  13  /* Cluster size [sector] (BYTE) */
+#define  BPB_RsvdSecCnt  14  /* Size of reserved area [sector] (WORD) */
+#define  BPB_NumFATs     16  /* Number of FATs (BYTE) */
+#define  BPB_RootEntCnt  17  /* Size of root directory area for FAT [entry] (WORD) */
+#define  BPB_TotSec16    19  /* Volume size (16-bit) [sector] (WORD) */
+#define  BPB_Media       21  /* Media descriptor byte (BYTE) */
+#define  BPB_FATSz16     22  /* FAT size (16-bit) [sector] (WORD) */
+#define  BPB_SecPerTrk   24  /* Number of sectors per track for int13h [sector] (WORD) */
+#define  BPB_NumHeads    26  /* Number of heads for int13h (WORD) */
+#define  BPB_HiddSec     28  /* Volume offset from top of the drive (DWORD) */
+#define  BPB_TotSec32    32  /* Volume size (32-bit) [sector] (DWORD) */
+#define  BS_DrvNum       36  /* Physical drive number for int13h (BYTE) */
+#define  BS_NTres        37  /* WindowsNT error flag (BYTE) */
+#define  BS_BootSig      38  /* Extended boot signature (BYTE) */
+#define  BS_VolID        39  /* Volume serial number (DWORD) */
+#define  BS_VolLab       42  /* Volume label string (8-byte) */
+#define  BS_FilSysType   50  /* Filesystem type string (8-byte) */
+#define  BS_BootCode     62  /* Boot code (448-byte) */
 #define  BS_55AA         510  /* Signature word (WORD) */
 #define  MBR_Table       446  /* MBR: Offset of partition table in the MBR */ 
 
@@ -92,7 +89,6 @@ typedef enum {
     DISK_CLASS_NULL,
     DISK_CLASS_PHYSICAL,
     DISK_CLASS_VIRTUAL
-    // ...
 
 }disk_class_t;
 
@@ -104,6 +100,7 @@ struct bpb_d
     int id;
     int used;
     int magic;
+    
     //...
 
     struct bpb_d *next;
@@ -331,11 +328,7 @@ int disk_init (void);
 //*teste de operação com disco.
 void init_test_disk (void);   
 
-int 
-get_ide_disk_info ( 
-    int port, 
-    unsigned long buffer, 
-    int master );
+int get_ide_disk_info ( int port, unsigned long buffer, int master );
 
 void show_ideports_info (void);
 

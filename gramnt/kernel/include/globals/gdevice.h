@@ -90,25 +90,18 @@ struct xdevice_driver_d
 	//...
 };
 */
-
-
-
-
+ 
 // 
 // Globais de fácil acesso.
 // devem refletir os valores armazenados na estrutura.
 //
 
-// Screen sizes.
+//Screen sizes.
 unsigned long g_device_screen_width; 
 unsigned long g_device_screen_height; 
 
-// bpp.
-unsigned long g_device_screen_bpp; 
  
-
-
-
+ 
 #endif   
 
  

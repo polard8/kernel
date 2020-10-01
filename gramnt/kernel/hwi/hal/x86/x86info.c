@@ -9,11 +9,11 @@
 
 
 
-// #test
+//#test
 void x86_info (void)
 {
-    // ...
-    show_cpu_intel_parameters();
+	//
+	show_cpu_intel_parameters();
 }
 
 
@@ -28,45 +28,28 @@ void x86_info (void)
  */
 
 void show_cpu_intel_parameters (void){
-
-    // Title.
-    // printf("=============\n");
-    printf("\n x86 CPU Info: *\n\n");
-
-
-    if ( (void *) processor == NULL ){
-        debug_print ("show_cpu_intel_parameters: processor\n");
-        return;
-    }
-
-
-    // Vendor, 
-    // Name, 
-    // is apic supported ?, 
-    // Max feature id,
-    // L2 Line size, 
-    // L2 cache size,
-    // ...
-
-    // Vendor.
-    printf("          Vendor: {%s}\n", &processor->Vendor[0] );
-    
-    // Brand name.
-    printf("             Cpu: {%s}\n", &processor->BrandName[0] );
-    
-    //printf("ApicSupport={%x}\n", processor->isApic);
-    
+	
+    //Title.
+    printf("\nx86 CPU Info:\n\n");
+	//printf("=============\n");
+	
+	//
+    // Vendor, Name, is apic supported ?, Max feature id,
+    // L2 Line size, L2 cache size,
     //
-    printf("  Max feature id: {%d}\n", 
-        (unsigned long) processor->MaxFeatureId );
+	
+	printf("          Vendor: {%s}\n", &processor->Vendor[0] );
+	printf("             Cpu: {%s}\n", &processor->BrandName[0] );	
+	//printf("ApicSupport={%x}\n", processor->isApic);
+	printf("  Max feature id: {%d}\n", 
+	    (unsigned long) processor->MaxFeatureId );
+	
+	//Bits 0-7: Cache Line Size.
+	printf("    L2 line size: {%d Byte}\n", 
+	    (unsigned long) processor->L2LineSize ); 	
 
-    // L2 line size.
-    // Bits 0-7: Cache Line Size.
-    printf("    L2 line size: {%d Byte}\n", 
-        (unsigned long) processor->L2LineSize ); 
 
-
-    // L2 Associativity. 
+	// L2 Associativity. 
 
     switch (processor->L2Associativity){
 
@@ -94,11 +77,9 @@ void show_cpu_intel_parameters (void){
             break; 
     };
 
-    // L2 cache size.
-    // Bits 16-31: Cache size in 1K units.
-    printf("   L2 cache size: {%d KB}\n", 
-        (unsigned long) processor->L2Cachesize ); 
-
+	//Bits 16-31: Cache size in 1K units.
+	printf("   L2 cache size: {%d KB}\n", 
+	    (unsigned long) processor->L2Cachesize ); 	
 
 	//
 	// Physical and Virtual Address.
@@ -109,27 +90,25 @@ void show_cpu_intel_parameters (void){
 	//36 ou 39 indica memória extendida. normal é 32=(4GB).
 	// maximum physical address bits  
 	//maximum linear (virtual) address bits 
+	
+	printf("[Largest virtual and physical address sizes]\n");
+	
+	printf("          PA Lim: {%d}\n", 
+	    (unsigned long) processor->Physical_Address_Size );
+		
+	printf("          VA Lim: {%d}\n", 
+	    (unsigned long) processor->Virtual_Address_Size );
+	
+	//printf("     Memory Size: {%d}\n",(unsigned long) processor->MemorySize);
+	
+	//Continua...
 
-    printf("[Largest virtual and physical address sizes]\n");
+    //como não usa janelas devemos dar refresh na tela todo por enquanto.
 
-    // PA lim.
-    printf("          PA Lim: {%d}\n", 
-        (unsigned long) processor->Physical_Address_Size );
-
-    // VA lim.
-    printf("          VA Lim: {%d}\n", 
-        (unsigned long) processor->Virtual_Address_Size );
-
-
-    // Memory size.
-    //printf("     Memory Size: {%d}\n",(unsigned long) processor->MemorySize);
-
-
-    // ...
-
-
+	//#bugbug: isso é lento.
     refresh_screen();
 }
+
 
 
 //

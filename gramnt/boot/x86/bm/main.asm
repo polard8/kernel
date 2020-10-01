@@ -44,20 +44,11 @@
 ;;   ## VIDEO MODE ##
 ;;
 
-;; See:
-;; https://en.wikipedia.org/wiki/VESA_BIOS_Extensions
-;; ...
 
-
-;;==============================
-;; For 24bpp:
-;;
-;; 0x410F is 320×200x24   ;; Not tested!!!
-;; 0x4112 is 640x480x24
-;; 0x4115 is 800x600x24
-;; 0x4118 is 1024x768x24 
-;; 0x411B is 1280x1024x24
-;;==============================
+; 0x4112 is 640x480x24
+; 0x4115 is 800x600x24
+; 0x4118 is 1024x768x24 
+; 0x411B is 1280x1024x24
 
 ;Mode 0x100: 640x400x8bpp
 ;Mode 0x101: 640x480x8bpp
@@ -138,26 +129,13 @@
 ;; Well tested modes.
 ;; ok on qemu.
 
-;;==============================
-;; For 24bpp: 
-;;
-;; 0x410F is 320×200x24   ;; Not tested!!!
-;; 0x4112 is 640x480x24
-;; 0x4115 is 800x600x24
-;; 0x4118 is 1024x768x24 
-;; 0x411B is 1280x1024x24
-;;==============================
 
-
-;; 24
-;; G_VIDEO_MODE EQU 0x010F     ;320x200
-;; G_VIDEO_MODE EQU 0x0112     ;640x480   
-G_VIDEO_MODE EQU 0x0115     ;800x600   ****
+;; G_VIDEO_MODE EQU 0x0112     ;640x480
+ G_VIDEO_MODE EQU 0x0115       ;800x600
 ;; G_VIDEO_MODE EQU 0x0118     ;1024x768
 ;; ...
 
-
-
+;; G_VIDEO_MODE EQU 0x0140
 
 ;;
 ;; GUI FLAG.
