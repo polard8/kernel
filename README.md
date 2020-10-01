@@ -41,8 +41,8 @@
 
 ## Libraries.
 
-* unix-like libc for commands. (libc03)
-* API for GUI apps. (libcore)
+* unix-like library. (rtl)
+* API for setup environment. (libcore)
 * Lib for the window server's clients. (libgws)
 
 
@@ -58,8 +58,8 @@
 
 You can run the VHD on Oracle Virtual Box and qemu.
 
+$ ./run
 $ make qemu-test
-
 
 ## Testing
 
@@ -69,9 +69,8 @@ Please, give us some feedback.
 ## More information
 
 Gramado is a Free and Open Source operating system created by Fred Nora.
-
 The source code uses the BSD license.
 
-# Quote:
+# Quotes:
+	Oh boy, there is no spoon!
 
-    WWW - Isolation makes me hungry.

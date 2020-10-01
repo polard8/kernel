@@ -123,4 +123,38 @@ void rtl_show_backbuffer (void)
 }
 
 
+/*
+ **********************************
+ * rtl_get_system_metrics:
+ *     Obtem informações sobre dimensões e posicionamentos. 
+ *     #importante
+ */
+
+unsigned long rtl_get_system_metrics (int index){
+    //if (index<0){
+        //gde_debug_print ("gde_get_system_metrics: fail\n");
+        //return 0;
+    //}
+
+    return (unsigned long) gramado_system_call ( SYSTEMCALL_GETSYSTEMMETRICS, 
+                               (unsigned long) index, 
+                               (unsigned long) index, 
+                               (unsigned long) index );
+}
+
+
+// ms
+// tempo total em ms.
+// usado para calcular o tempo de execuçao de uma funcao.
+unsigned long rtl_get_progress_time(void)
+{
+    return rtl_get_system_metrics (120);
+}
+
+
+
+
+
+
+
 

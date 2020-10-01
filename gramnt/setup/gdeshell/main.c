@@ -65,7 +65,9 @@ int _running = 1;
 //est� emprimeiro plando.
 int executing = 0;
 
+
 int login_status = 0;
+
 
 //Sendo assim, o shell poderia abrir no ambiente de logon.
 
@@ -1091,7 +1093,7 @@ shellProcedure (
                 // cada rotina chamada que fará seu próprio refresh 
                 // se conseguir.
                 case VK_RETURN:
-                    input('\0'); 
+                    input('\0');
                     shellCompare (window);
                     goto done;
                     break; 
@@ -3368,6 +3370,7 @@ void shellShell (void){
 
     shellStatus = 0;
     shellError = 0;
+
 
 
 	//

@@ -798,21 +798,22 @@ int main ( int argc, char *argv[] ){
     if ( client_window < 0 ) 
         debug_print("Editor: client_window fail\n"); 
 
+
     int t=0;
-    
     for (t=0; t<32; t++){
     gws_draw_text (
-        (int) client_fd,       // fd,
-        (int) client_window,   // window id,
-        (unsigned long) 4,    //40,    // left,
-        (unsigned long) t*8,  //40,    // top,
+        (int) client_fd,        // fd,
+        (int) client_window,    // window id,
+        (unsigned long) 4,      // left,
+        (unsigned long) t*8,    // top,
         (unsigned long) COLOR_BLACK,
         "Hello, this is a text editor!");
-    }
-    
+    }    
+
     
     // Show main window.
     gws_refresh_window(client_fd,main_window);
+
 
     //
     // Loop

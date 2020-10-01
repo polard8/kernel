@@ -1347,39 +1347,63 @@ unsigned long systemGetSystemMetrics ( int index ){
             
         case 111:
             return (unsigned long) g_profiler_ints_irq11;
-            break;              
+            break; 
 
         case 112:
             return (unsigned long) g_profiler_ints_irq12;
-            break;              
+            break; 
 
         case 113:
             return (unsigned long) g_profiler_ints_irq13;
-            break;              
+            break; 
             
         case 114:
             return (unsigned long) g_profiler_ints_irq14;
-            break;              
+            break; 
             
             
         case 115:
             return (unsigned long) g_profiler_ints_irq15;
-            break;              
+            break; 
             
           
         // Interrupção de serviços do sistema.
         case 117:
             return (unsigned long) g_profiler_ints_gde_services;
-            break;              
+            break; 
 
-                        
-		//...
-		
-		default:
-		    goto done;
-		    break;
+       // PIT
+       // See: hal/pit.h
+       
+       // jiffies.
+       // total ticks
+       case 118:
+           return (unsigned long) jiffies;
+           break;
+
+       // seconds
+       // por quantos segundos o sistema esta rodando
+       // jiffies/sys_time_hz
+       case 119:
+           return (unsigned long) seconds; 
+           break;
+       
+       // Por quantos ms o sistema esta rodando.
+       case 120:
+           return (unsigned long) sys_time_ms;
+           break;
+
+       // pit frequency
+       case 121:
+           return (unsigned long) sys_time_hz;
+           break;
+
+        // ...
+
+        default:
+            goto done;
+            break;
     };
-
 
 done:
     return (unsigned long) 0;

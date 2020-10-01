@@ -291,13 +291,18 @@ typedef enum {
  
  
 /*
+ *******************************************************************
  * user_info_d:
  *     Estrutura para perfil de usuário do computador.
  */ 
 
+// #test
+// This is used in the terminal structure to handle user sessions.
+// logon stuff.
+
 struct user_info_d
 {
-    object_type_t objectType;
+    object_type_t  objectType;
     object_class_t objectClass;
 
 
@@ -306,6 +311,25 @@ struct user_info_d
 
     int used;
     int magic;
+
+    //
+    // == Security ============================================
+    //
+
+    // Section, window station and desktop.    
+    struct usession_d *usession;
+    int usessionId;
+    
+    struct room_d     *room;
+    int roomId;
+    
+    struct desktop_d  *desktop;
+    int desktopId;
+    // ===================================================
+
+
+
+
 
 
     //??
@@ -336,31 +360,13 @@ struct user_info_d
 	//unsigned long StartTime;
 	//end time.
     //unsigned long EndTime;
-	
-	//
-	// * IMPORTANTE:
-	// A estrutura de user session representa uma sessão  
-	// de uso. Nessa estrutura temos ponteiros para pools
-    // de objetos, pools de pagedirectory e pools de desktop (wstation)	
-	//
-	
-	//Section, window station and desktop.
-	int usessionId;
-    int roomId;
-    int desktopId;
+
+
+
     
     // em qual console virtual iniciamos a sessão.
     int virtualconsoleId;
 
-    //
-    // 4 estruturas principais.
-    //
-    
-    //=============================
-    
-    struct usession_d *usession;
-    struct room_d     *room;
-    struct desktop_d  *desktop;
     
 	// Em qual console virtual iniciamos a sessão?
 	// F1 ~ F7 ...

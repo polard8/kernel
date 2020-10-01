@@ -3,6 +3,8 @@
 
 // #bugbug: It is not properly stub routines,
 // used by shared libraries. It's is o.s. dependent routines.
+// We need to change the name of this document, and change
+// the name in ALL apllications.
 //
 
 
@@ -34,6 +36,13 @@ rtl_draw_text (
 void rtl_show_backbuffer (void);
 
 
+
+unsigned long rtl_get_system_metrics (int index);
+
+// ms
+// tempo total em ms.
+// usado para calcular o tempo de execuçao de uma funcao.
+unsigned long rtl_get_progress_time(void);
 
 #endif
 

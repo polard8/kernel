@@ -103,6 +103,23 @@ struct tty_d
     int used;
     int magic;
 
+
+    //
+    // == Security ============================================
+    //
+
+    // What is the user logged in this terminal?
+    struct user_info_d *user_info;
+
+    // Security
+    // user session, room, desktop;
+    struct usession_d  *user_session;
+    struct room_d      *room;
+    struct desktop_d   *desktop;
+    // ===================================================
+
+
+
     // device driver, line discipline and termios.
 
     //#todo: Indice do dispositivo.
@@ -145,19 +162,6 @@ struct tty_d
     //status
     int stopped;
 
-
-	//
-	// User
-	//
-
-    struct user_info_d *user_info;
-
-
-    // Security
-    // user session, room, desktop;
-    struct usession_d  *user_session;
-    struct room_d      *room;
-    struct desktop_d   *desktop;
 
     // Window.
     // When we are using the kgws.
