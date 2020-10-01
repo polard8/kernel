@@ -86,8 +86,8 @@ update_button (
     //4. Disabled
     //5. Hover and Active
 
-    switch (state)
-    {
+    switch (state){
+
         case BS_NULL:
             break;
 
@@ -124,12 +124,11 @@ update_button (
         case BS_PROGRESS:
             break;
 
-		// Valor inválido.
-		default:  
-		    return;
-		    //return NULL; 
+
+        default:  
+            return;
             break;    
-    };  
+    }; 
 }
 
 
@@ -139,8 +138,10 @@ update_button (
  * draw_button:
  *     Desenha um botão dado um tipo.
  *     
- * @todo: Medir o tamanho da string da tag.
- * @todo: O botão precisa de uma etiqueta, que pode ser uma string ou uma imagem.
+ * #todo: 
+ * Medir o tamanho da string da tag.
+ * #todo: 
+ * O botão precisa de uma etiqueta, que pode ser uma string ou uma imagem.
  * Talvez uma estrutura de botão seja necessário, para armazenas coisas como 
  * deslocamento dentro da janela e endereço da imagem carregada como etiqueta.
  *
@@ -148,12 +149,10 @@ update_button (
  * Retorna o ponteiro pra estrutura do botão.
  */
 
+// #todo
+// Precisamos usar o esquema de cores.
 
-//#todo
-//Precisamos usar o esquema de cores.
-
-void *
-draw_button ( 
+void *draw_button ( 
     unsigned char *string,
     int style,
     int state,
@@ -165,7 +164,7 @@ draw_button (
     unsigned long color )
 {
 
-    int Focus;    //(precisa de borda)
+    int Focus;
     int Selected;
     unsigned long border1;
     unsigned long border2;
@@ -493,10 +492,11 @@ int button_down ( struct window_d *window ){
 
     if ( (void *) window == NULL )
     {
-		printf ("window\n");
-		refresh_screen();
-	    return -1;
-	}else{
+        printf ("button_down: window\n");
+        refresh_screen();
+        return -1;
+
+    }else{
 
 	    if ( window->isButton != 1 )
 	    {
@@ -539,6 +539,7 @@ int button_up ( struct window_d *window ){
     if ( (void *) window == NULL )
     {
 	    return -1;
+
 	}else{
 	    if ( window->isButton != 1 )
 	    {

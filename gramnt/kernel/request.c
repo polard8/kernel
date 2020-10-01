@@ -108,7 +108,7 @@ int KiRequest (void){
     {
         // #debug
         printf ("KiRequest: %d", kernel_request );
-        die ();
+        die();
     }
 
 
@@ -137,8 +137,8 @@ int request (void){
 
     // Targets
 
-    struct process_d *Process;
-    struct thread_d  *Thread;
+    struct process_d  *Process;
+    struct thread_d   *Thread;
 
     int PID=-1;
     int TID=-1;
@@ -253,20 +253,20 @@ int request (void){
         //6 - torna atual a próxima thread anunciada pela atual.
         case KR_NEXT:
             debug_print ("request: KR_NEXT\n");
-            panic ("request: KR_NEXT\n");
+            panic       ("request: KR_NEXT\n");
             break;
 
 
         //7 - tick do timer.
         case KR_TIMER_TICK:
-            debug_print ("request: timer tick \n");
-            panic ("request: KR_TIMER_TICK\n");
+            debug_print ("request: KR_TIMER_TICK\n");
+            panic       ("request: KR_TIMER_TICK\n");
             break;
 
         //8 - limite de funcionamento do kernel.
         case KR_TIMER_LIMIT:
-            debug_print ("request: timer limit\n");
-            panic ("request: KR_TIMER_LIMIT\n");
+            debug_print ("request: KR_TIMER_LIMIT\n");
+            panic       ("request: KR_TIMER_LIMIT\n");
             break;
 
 
@@ -334,8 +334,8 @@ int request (void){
 
 
         default:
-            debug_print ("request: default \n");  
-            printf ("request: Default request {%d} \n", r );
+            debug_print ("request: Default \n");  
+            printf      ("request: Default request {%d} \n", r );
             break;
     };
 
@@ -353,6 +353,7 @@ int request (void){
 
 
 /*
+ *******************************************************
  * create_request:
  *     Cria o request, que será atendido depois.
  *     Isso eh chamado no serviço 70, por exemplo.
@@ -420,8 +421,8 @@ create_request (
 
 
 
-void clear_request (void){
-
+void clear_request (void)
+{
     REQUEST.kernel_request = 0;
 
     REQUEST.status = 0;
@@ -455,8 +456,8 @@ void clear_request (void){
 void do_request_12 ( int tid ){
 
     //curent process
-    struct process_d *p;
-    struct thread_d  *t;
+    struct process_d  *p;
+    struct thread_d   *t;
 
     //parent process
     struct process_d *parent;

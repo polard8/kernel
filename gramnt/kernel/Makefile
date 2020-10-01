@@ -178,13 +178,14 @@ all-c:
 	# == SCI - System Call Interface ==============================
 	#
 
-	# posix - (Interface to give ring0 support for posix libc)
-	$(CC) -c sci/posix/ctype.c   $(KINCLUDE) $(CFLAGS) -o ctype.o
-	$(CC) -c sci/posix/kstdio.c  $(KINCLUDE) $(CFLAGS) -o kstdio.o
-	$(CC) -c sci/posix/signal.c  $(KINCLUDE) $(CFLAGS) -o signal.o
-	$(CC) -c sci/posix/stdlib.c  $(KINCLUDE) $(CFLAGS) -o stdlib.o
-	$(CC) -c sci/posix/string.c  $(KINCLUDE) $(CFLAGS) -o string.o
-	$(CC) -c sci/posix/unistd.c  $(KINCLUDE) $(CFLAGS) -o unistd.o
+	# Not gramado.
+	$(CC) -c rtl/ctype.c   $(KINCLUDE) $(CFLAGS) -o ctype.o
+	$(CC) -c rtl/kstdio.c  $(KINCLUDE) $(CFLAGS) -o kstdio.o
+	$(CC) -c rtl/signal.c  $(KINCLUDE) $(CFLAGS) -o signal.o
+	$(CC) -c rtl/stdlib.c  $(KINCLUDE) $(CFLAGS) -o stdlib.o
+	$(CC) -c rtl/string.c  $(KINCLUDE) $(CFLAGS) -o string.o
+	$(CC) -c rtl/unistd.c  $(KINCLUDE) $(CFLAGS) -o unistd.o
+
 
 	$(CC) -c sci/sys/sys.c   $(KINCLUDE) $(CFLAGS) -o sys.o
 

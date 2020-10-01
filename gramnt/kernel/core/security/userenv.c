@@ -69,7 +69,8 @@ void ShowUserInfo (int user_id){
     struct user_info_d *__User;
 
 
-    if ( user_id < 0 || user_id >= USER_COUNT_MAX ){
+    if ( user_id < 0 || user_id >= USER_COUNT_MAX )
+    {
         return;
     }
 
@@ -109,9 +110,9 @@ void ShowUserInfo (int user_id){
  * sobre o usuário e serão colocanas nas estruturas.
  */
 
-void config_user (void){
-	
-    userconfig_Status = 0;	//#todo
+void config_user (void)
+{
+    userconfig_Status = 0;    //#todo
 }
 
 

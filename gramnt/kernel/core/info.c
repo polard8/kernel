@@ -48,8 +48,11 @@ extern unsigned long bss_end;
 
 //void infoShowKernelInfo() 
 
-void KiInformation (void){
-	
+
+void KiInformation (void)
+{
+
+
 	//printf("\n");	
 	
 

@@ -1,8 +1,4 @@
+	
+	ps - Process Structure
+	(process control)
 
- microkernel support
-
-
- Folders:
-
- /arch  - some archtecture dependent components.
- /pc    - Process Control.

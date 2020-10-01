@@ -1,9 +1,0 @@
-
- O vfs será o principal módulo a invocar o gerente de objetos, mas o gerente
-de objetos poderá ser invocado por qualquer módulo do sistema para manipulação 
-de objetos.
-
-o registro dos objetos será feitos pelo gerenciador de objetos e ele será o manipulador 
-de objetos, o vfs somente acessará o gerente de objetos para manipula-los.
-
- desse modo o vfs torna-se uma interface homogênea para a manipulação de objetos que se assemelha à um sistema de arquivos, isso vaficita as coisas para aplicativos que lidam com arquivos, como o shell. Ou seja é mais fácil para o shell manipular o vfs do que manipular o gerente de objetos.

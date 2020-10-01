@@ -52,36 +52,36 @@
  *
  * 2015 - Created by Fred Nora.
  */
- 
- 
-#include <kernel.h>
 
-//Variáveis internas.
-//int objectmanagerStatus;
-//
+
+
+#include <kernel.h>
 
 
 
 /*
+ *******************************************
  * init_object_manager:
  *     Inicializa o gerenciador de objetos.
  */
 
-int init_object_manager (void){
-	
+int init_object_manager (void)
+{
     int Status = 0;
-	
+
+
 //#ifdef EXECVE_VERBOSE	
 	//printf("Initializing Object Manager..\n");
 //#endif	
     
     // ??
-	g_current_object = 0;         //objeto numero 0
+    g_current_object = 0;         //objeto numero 0
     g_current_list = 0;            //lista de objetos em kernel mode.
-	
-	
-	
-	//@todo: initialize object List.
+
+
+
+   // #todo: 
+   // Initialize object List.
 
     //Inicializado.
 	g_object_manager_status = 1;
@@ -90,23 +90,10 @@ int init_object_manager (void){
 //#ifdef EXECVE_VERBOSE	
 	//printf ("Done\n");
 //#endif	
-    
-	return (int) Status;
+
+
+    return (int) Status;
 }
-
-
-//
-//void *objectCreate(...)
-//int objectOpen(...)
-//int objectClose(...)
-
-
-/*
-int objectmanagerInit()
-{
-    return (int) init_object_manager();	
-};
-*/
 
 
 //

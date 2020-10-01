@@ -144,22 +144,29 @@ void debug_breakpoint (void){
 }
 
 
-//retorna um checksum dado um buffer e um tamanho.
+
+/*
+ * debug_compute_checksum: 
+ * 
+ * 
+ */
+ 
+// retorna um checksum dado um buffer e um tamanho.
 
 unsigned long 
-debug_compute_checksum ( unsigned char *Buffer, 
-                         unsigned long Lenght )
+debug_compute_checksum ( 
+    unsigned char *Buffer, 
+     unsigned long Lenght )
 {
     unsigned long CheckSum = 0;
 
-    while (Lenght > 0)
-	{	
-		CheckSum = CheckSum + (unsigned long) *Buffer++;
-	    
-		Lenght--;	
-	};
 
-	return (unsigned long) CheckSum;
+    while (Lenght > 0){
+        CheckSum = ( CheckSum + (unsigned long) *Buffer++ );
+        Lenght--;
+    };
+
+    return (unsigned long) CheckSum;
 }
 
 
@@ -181,7 +188,7 @@ int debug (void){
     // Checa inicialização. 
     // Fases, variáveis e estruturas.
 
-    Status = (int) debug_check_inicialization ();
+    Status = (int) debug_check_inicialization();
 
     if (Status == 1){
         panic ("debug: debug_check_inicialization fail\n");
@@ -266,8 +273,9 @@ debugDumpMemory(
 
 void debug_print ( char *data ){
 
-    uint32_t i;
-
+    register int i=0;
+    //uint32_t i=0;
+    
     for ( i=0; data[i] != '\0'; i++ ){
         serial_write_char (data[i]);
     }

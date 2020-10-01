@@ -1,5 +1,5 @@
 /*
- * File: windows/bg.c 
+ * File: windows/view/bg.c 
  *
  * 
  * Descrição:
@@ -19,10 +19,12 @@
 
 
 
-//Herdadas do Boot Loader.
+// Herdadas do Boot Loader.
 // De onde vem isso ?? head.s
-// @todo: Devemos chamar o módulo hal para obtermos esses valores.
-//depois salvamos em variáveis internas usadas pela gui.
+// #todo: 
+// Devemos chamar o módulo hal para obtermos esses valores.
+// depois salvamos em variáveis internas usadas pela gui.
+
 extern unsigned long SavedBootBlock;
 extern unsigned long SavedLFB;
 extern unsigned long SavedX;
@@ -36,11 +38,11 @@ void bg_load_image (void)
 
     int status = -1;
     
-	// 512*4096 = 2MB
-	unsigned long tmp_size = (512*4096);
+    // 512*4096 = 2MB
+    unsigned long tmp_size = (512*4096);
     void *__buffer = (void *) allocPages ( 512 );
 
-    
+
     // # not tested.
     // See: fs.c
     // IN: path os two levels, address.
@@ -57,8 +59,7 @@ void bg_load_image (void)
                            (unsigned long) __buffer,
                            tmp_size );
         
-        if (status != 0)
-        {
+        if (status != 0){
             debug_print ("bg_load_image: fail\n");
             return;
         }
@@ -66,7 +67,7 @@ void bg_load_image (void)
 
     // A imagem foi carregada no buffer.
     // Vamos exibir na tela em 0,0.
-    
+
     // #bugbug: 
     // A imagem sai cortada do lado direito.
 
@@ -75,6 +76,7 @@ void bg_load_image (void)
  
  
 /*
+ ******************************
  * backgroundDraw:
  *     Draw device screen in graphics mode.
  *     Clear the screen in text mode.
@@ -104,11 +106,10 @@ void backgroundDraw (unsigned long color){
     TTY[current_vc].cursor_x = 0;
     TTY[current_vc].cursor_y = 0;
 
-
 	// #bugbug
 	// Será que nesse momento as dimensões do char já estão configuradas ??
 
-	//g_cursor_right = (SavedX/8);
+	//g_cursor_right  = (SavedX/8);
 	//g_cursor_bottom = (SavedY/8);
 }
 
@@ -164,27 +165,23 @@ int backgroundInit (void){
     int i=0;
 
 
-	// #bugbug:
-	// We need to get w and h if the function is available.
+    // #bugbug:
+    // We need to get w and h if the function is available.
     //debug_print ("backgroundInit: FIXME: w and h\n");
 
-    for ( i=0; i< 800*600; i++ )
+    for ( i=0; i< 800*600; i++ ){
         lfb[i] = COLOR_BLACK;
-
-
+    }
 
     backgroundBackground ();
 
 	//...
 
-
     return 0; 
 }
 
 
-
-
 //
-//End.
+// End.
 //
 

@@ -3,9 +3,8 @@
  *
  *     System Procedure.
  *
- *     ****   Central de diálogo do x server  ****
- *
- * A qui ficarão todos os diálogos para conversar com os módulos do kernel base.
+ * A qui ficarão todos os diálogos para conversar 
+ * com os módulos do kernel base.
  * Eles serão chamados de 'dialog' ou 'procedure'. 
  *
  * O PROCEDIMENTO NUNCA DEVE SER TROCADO, SEMPRE SERÁ O PROCEDIMENTO DO SISTEMA
@@ -82,12 +81,12 @@ unsigned long ___xxx;
 unsigned long ___yyy;
 void test_move_window (void)
 {
-	struct window_d *w;
+
+    struct window_d  *w;
 
 
     w = (struct window_d *) windowList[window_with_focus];
     //w = (struct window_d *) windowList[active_window];
-
 
    //___xxx = ___xxx + 5;
    //___yyy = ___yyy + 5;
@@ -96,13 +95,15 @@ void test_move_window (void)
    ___yyy = w->top + 5;
 
     w->left = ___xxx;
-    w->top = ___yyy;
+    w->top  = ___yyy;
 
     save_window ( (struct window_d *) w );
 
     replace_window ( (struct window_d *) w, ___xxx, ___yyy);
     
-    refresh_rectangle2 ( w->left +5, w->top +5, w->width, w->height, 
+    refresh_rectangle2 ( 
+        (w->left +5), (w->top +5), 
+        w->width, w->height, 
         (unsigned long) FRONTBUFFER_ADDRESS, 
         (unsigned long) BACKBUFFER_ADDRESS);
 
@@ -124,10 +125,14 @@ void test_move_window (void)
 
 void test_move_window_2 (void)
 {
-	int i;
-	for (i=0; i<10; i++)
-	    test_move_window ();
+    int i=0;
+
+    for (i=0; i<10; i++){
+        test_move_window();
+    }
 }
+
+
 
 /*
  * XPROC_SEND_MESSAGE
@@ -136,14 +141,16 @@ void test_move_window_2 (void)
  */
 
 int 
-XPROC_SEND_MESSAGE ( struct window_d *window, 
-                     int msg, 
-                     unsigned long long1, 
-                     unsigned long long2 )
+XPROC_SEND_MESSAGE ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 )
 {
 
-    struct thread_d *t; 
-    struct window_d *w; 
+    struct thread_d  *t;
+    struct window_d  *w;
+
 
 	//
 	// ## window ##
@@ -154,24 +161,24 @@ XPROC_SEND_MESSAGE ( struct window_d *window,
 	// será um elemento da mensagem.
 	// Mas enviaremos a mensagem para a fila da thread atual.
 
-	//#todo mensagem de erro.
-	
-	if (window_with_focus < 0)
-		return -1;
-	
-	w = (void *) windowList[window_with_focus];
-	
+    // #todo 
+    // Mensagem de erro.
+
+    if (window_with_focus < 0){
+        return -1;
+    }
+
+
+    w = (void *) windowList[window_with_focus];
+
 	if ( (void *) w == NULL )
 	{
-		printf ("LINE_DISCIPLINE: w");
-		die();
-		
+		panic ("XPROC_SEND_MESSAGE: w");
+
 	}else{
 		
-		if ( w->used != 1 || w->magic != 1234 )
-		{
-			printf ("LINE_DISCIPLINE: w validation");
-			die();
+		if ( w->used != 1 || w->magic != 1234 ){
+			panic ("XPROC_SEND_MESSAGE: w validation");
 		}
 
 		//
@@ -184,16 +191,12 @@ XPROC_SEND_MESSAGE ( struct window_d *window,
 		
 		t = (void *) w->control;
 		
-		if ( (void *) t == NULL )
-		{
-		    printf("LINE_DISCIPLINE: t");
-		    die();			
+		if ( (void *) t == NULL ){
+		    panic ("XPROC_SEND_MESSAGE: t");
 		}
-		
-		if ( t->used != 1 || t->magic != 1234 )
-		{
-			printf ("LINE_DISCIPLINE: t validation \n");
-			die ();
+
+		if ( t->used != 1 || t->magic != 1234 ){
+			panic ("XPROC_SEND_MESSAGE: t validation \n");
 		} 
 
 		//#importante:
@@ -211,107 +214,30 @@ XPROC_SEND_MESSAGE ( struct window_d *window,
 		//ja o input de mouse deve ir para a thread de qualquer janela.
 		
 		t->window = window;
-		t->msg = (int) msg;
-		t->long1 = long1;
-		t->long2 = long2;
-		
+		t->msg    = (int) msg;
+		t->long1  = long1;
+		t->long2  = long2;
+
 		t->newmessageFlag = 1;
     };
-
 
     return 0;
 }
 
 
 
-
 // ??
 void xxxtestSHELLServer (void)
 {
-    debug_print ("xxxtestSHELLServer:deprecated!\n");
-    return;
-    
-    /*
-   //#atenção:
-   //antes precisa inicializar o servidor.
-   //+por enquanto vamos usar o comando 'gws' para isso.
-
-    //enviaremos uma mensagem para a thread atual,
-	//os programas em user mode consumirão essa mensagem
-	//reenviaremos até que quem consuma saiba lidar com ela,
-	//no caso o server shell/gws.
-
-    struct thread_d *t;
-    
-	t = (void *) threadList[current_thread];
-	
-		
-	//#test 9004
-	//draw horizontal line
-	//x1, y , x2, color
-    
-	t->window = 0;
-	t->msg = 9004;  
-	t->long1 = 100; //x
-	t->long2 = 100; //y
-	
-	t->long3 = 200; //width
-	t->long4 = COLOR_YELLOW;
-	t->long5 = 0;
-	t->long6 = 0;
-	// ... 
-    
-	//sinalizamos que temos uma mensagem.
-	t->newmessageFlag = 1; 
-	*/
+    debug_print ("xxxtestSHELLServer: deprecated\n");
 }
-
 
 
 // #IMPORTANTE
 // REFRESH STDOUT
-
 void xxxtestlibcSTDOUT (void)
 {
-    debug_print ("xxxtestlibcSTDOUT:deprecated!\n");
-    return;
-
-    /*
-     
-    char *c;
-
-    sprintf ( current_stdout->_base, "TESTING STDOUT ..." );
-
-    int i;
-    int j;
-
-    j = 80*25;
-
-    c = current_stdout->_base;
-
-    int cWidth = get_char_width ();
-    int cHeight = get_char_height ();
-
-    if ( cWidth == 0 || cHeight == 0 )
-    {
-		//#debug
-		printf ("servicesPutChar: fail w h ");
-		die();
-    }
-
-
-     stdio_terminalmode_flag = 1;  
-	 for (i=0; i<j; i++)
-	 {
-	    //putchar ( (int) c );
-		printf("%c",  *c );
-	    refresh_rectangle ( g_cursor_x * cWidth, g_cursor_y * cHeight, 
-		    cWidth, cHeight );
-		 c++;
-	 }
-	stdio_terminalmode_flag = 0;  
-	
-	*/
+    debug_print ("xxxtestlibcSTDOUT: deprecated\n");
 }
 
 
@@ -319,91 +245,46 @@ void xxxtestlibcSTDOUT (void)
 //=========================================
 //f5
 //para testar recursos da libc.
-
-void xxxtestlibc (void){
-
-    /*
-	FILE *f1;
-	int ch_test;
-	
-		printf("\n xxxtestlibc: Open init.txt \n");
-        
-		//f1 = (FILE *) fopen ("init.txt","rb");   	
-	      f1 = (FILE *) fopen ("GRAMADO TXT","rb");  
-        if( f1 == NULL )
-		{
-			printf("fopen fail\n");
-		}else{
-			printf("fopen ok\n");
-			
-			//#bugbug
-			//isso funcionou, entao fopen funciona, entao o problema esta' em fgetc
-			//printf("show: %s @\n", f1->_base );
-			
-		    //Isso mostra que o arquivo foi carregado corretamente 
-		    //na base esperada.
-		    //printf("Show f1->_base: %s\n",f1->_base);
-		
-		    printf ("stream info:\n");
-		    printf ("f1->_base: %x\n",f1->_base);
-		    printf ("f1->_p: %x\n",f1->_p);
-		    printf ("f1->_cnt: %d\n",f1->_cnt);
-		}
-		
-
-		
-		//
-		// #bugbug ... o fgetc não lê na estrutura esperada.
-		//
-		printf ("Testing fgetc ... \n\n");
-		while(1)
-		{
-			//#bugbug: page fault quando chamamos fgetc.
-			//printf("1");
-			ch_test = (int) fgetc (f1);
-			//ch_test = (int) getc (f1); 
-			
-			if( ch_test == EOF )
-			{
-				printf("\n\n");
-				printf("EOF reached :)\n\n");
-				return;
-				//goto exit_cmp;
-				
-			}else{
-				//printf("+");
-			    printf ("%c", ch_test);
-			};
-		};
-    */
+void xxxtestlibc (void)
+{
+    debug_print ("xxxtestlibc: deprecated\n");
 }
 //====================================
 
 
 
-// ?? testando rotina de write sector.
-void procTestF6 (void){
-	
-	void *address = (void *) kmalloc (1024);
-	
-	unsigned char *buffer = (unsigned char *) address;
+// Write on lba 559
+// ?? Testando rotina de write sector.
+void procTestF6 (void)
+{
 
-    //write
-	pio_rw_sector ( (unsigned long) buffer, 
-	    (unsigned long) 559, 
-		(int) 0x30, 
-		(int) g_current_ide_channel, 
-		(int) g_current_ide_device );
-	 
+    debug_print ("procTestF6: deprecated\n");
+    return;
+    
+    /*
+    void *address = (void *) kmalloc (1024);
+
+    unsigned char *buffer = (unsigned char *) address;
+
+
+    // write
+    pio_rw_sector ( 
+        (unsigned long) buffer, 
+        (unsigned long) 559,    // ?? What is this lba ??? 
+        (int) 0x30, 
+        (int) g_current_ide_channel, 
+        (int) g_current_ide_device );
+
 	// #debug
 	// printf("Signature: [ %x %x ] \n" , buffer[0x1FE], buffer[0x1FF] ); 
+    */
 }
 
 
 
 
 /*
- ***********************************************************************
+ ********************************************************************
  * system_procedure:
  *     Procedimento de janela da janela com o foco de entrada ... (edit box.)
  *     Procedimento de janela default.
@@ -445,10 +326,10 @@ system_procedure (
 
     void *buff;
 
-    int AltStatus;
-    int CtrlStatus;
-    int ShiftStatus;
-	//...
+    int AltStatus=0;
+    int CtrlStatus=0;
+    int ShiftStatus=0;
+    //...
 
 
 	//usado no refresh_rectangle
@@ -459,16 +340,15 @@ system_procedure (
     AltStatus  = (int) get_alt_status(); 
     CtrlStatus = (int) get_ctrl_status();
     //ShiftStatus = (int) get_shift_status();
-	//...
-	
+    //...
 
 	// Lidando com a janela com o foco de entrada.
-	unsigned long left; 
-	unsigned long top;   
-	unsigned long width; 
-	unsigned long height; 
+    unsigned long left=0;
+    unsigned long top=0;
+    unsigned long width=0;
+    unsigned long height=0;
 
-	
+
 	//janela de teste.
 	struct window_d *xxxx;
 	
@@ -563,8 +443,7 @@ system_procedure (
 	// o foco de entrada sem fecharmos o terminal.
 
  
-    switch (msg)
-    {
+    switch (msg){
 
         // Teclas de digitação.
         // O procedimento de janelas do sistema 
@@ -767,20 +646,18 @@ system_procedure (
         case 30:
         case 31:
             return (unsigned long) kgwm_mouse_dialog ( window, 
-                                       msg, 
-                                       long1, 
-                                       long2 );
+                                       msg, long1, long2 );
             break;
 
-
-        default:    
+        default:
             break;
     };
+
 
     //
     // Done.
     //
-    
+ 
 done:
 
     return (unsigned long) 0;
@@ -802,10 +679,9 @@ SendMessage (
     unsigned long long1, 
     unsigned long long2 )
 {
-    return (unsigned long) system_procedure ( window, msg,
-                               long1, long2 );
+    return (unsigned long) system_procedure ( window, 
+                               msg, long1, long2 );
 }
-
 
 
 /*
@@ -841,28 +717,26 @@ void procedureLinkDriverTest (void)
 	// no caso de reprovar alguma coisa.
 	//
 	//goto: failReturn;
-	
-	printf("iret\n");
-	
-    asm volatile(" cli \n"   
-                 " mov $0x23, %ax  \n" 
-                 " mov %ax, %ds  \n"
-                 " mov %ax, %es  \n"
-                 " mov %ax, %fs  \n"
-                 " mov %ax, %gs  \n"
-                 " pushl $0x23            \n"    //ss.
-                 " movl $0x0044FFF0, %eax \n"
-                 " pushl %eax             \n"    //esp.
-                 " pushl $0x3200          \n"    //eflags.
-                 " pushl $0x1B            \n"    //cs.
-                 " pushl $0x00401000      \n"    //eip. 
-				 
-				 " mov $1234, %edx  \n"          //Obs: Acrescentamos essa flag.
 
-                 " iret \n" );
-				 
-				 
-//failReturn:
+
+    printf("iret\n");
+
+    asm volatile (" cli \n"   
+                  " mov $0x23, %ax  \n" 
+                  " mov %ax, %ds  \n"
+                  " mov %ax, %es  \n"
+                  " mov %ax, %fs  \n"
+                  " mov %ax, %gs  \n"
+                  " pushl $0x23            \n"    //ss.
+                  " movl $0x0044FFF0, %eax \n"
+                  " pushl %eax             \n"    //esp.
+                  " pushl $0x3200          \n"    //eflags.
+                  " pushl $0x1B            \n"    //cs.
+                  " pushl $0x00401000      \n"    //eip. 
+
+                  " mov $1234, %edx  \n"          //Obs: Acrescentamos essa flag.
+
+                  " iret \n" );
 
     return;
 }
@@ -873,103 +747,16 @@ void procedureLinkDriverTest (void)
 // Deletar isso. 
 void procedureMakeTests (void)
 {
+    debug_print ("procedureMakeTests: Deprecated\n");
     // Nothing.
 }
-
-
-
-/*
- * Configura o procedimento atual.
-void procedureSetProcedure(unsigned long address)
-{};
-*/
-
-
-/*
- * Obtem o procedimento atual.
-void procedureGetProcedure()
-{
-    return (unsigned long) x;	
-};
-*/
-
-
-/*
- * Invocar um procedimento que está em user mode
- e pertence à um processo cliente.
- Invocar da mesma forma que o kernel inicializa um driver,
- através de iret diretamente na rotina.
- o procedimento de janel retornará utilizando uma system call.
- 
-void *procedureInvokeUserModeProcedure()
-void *procedureInvokeUserModeProcedure()
-{
-	
-}
-*/
 
 
 // ??
 // Rever isso.
 void procedureWindowWithFocusTest (void)
 {
-	/*
-	
-	
-	// TESTANDO A JANELA DO desenvolvedor 
-	// SERÁ A ÚNICA JANELA EM PRIMEIRO PLANO POR ENQUANTO 
-	// A ÚNICA COM O FOCO DE ENTRADA
-
-	//
-	// #bugbug ... essa rotina está travando ...
-	//
-					
-	//escrevendo fora da janela
-	printf("F12:Fora.\n");
-	//refresh_screen();
-					
-	if( (void*) WindowWithFocus == NULL ){
-	    printf("F12: WindowWithFocus");
-	    refresh_screen();
-		while(1){}
-	}
-
-	if( (void*) WindowWithFocus != gui->DEVELOPERSCREEN ){
-		printf("F12: WindowWithFocus != gui->DEVELOPERSCREEN");
-		refresh_screen();
-		while(1){}
-	}
-					
-	//Esperamos que a ultima janela a receber o foco tenha sido
-	//a janela do desenvolvedor...
-	//
-	WindowWithFocus->cursor_x = 0;
-	WindowWithFocus->cursor_y = 0;
-	//WindowWithFocus->left  = 0;
-	//WindowWithFocus->top = 0;
-					
-	g_cursor_x = (unsigned long) (WindowWithFocus->left);
-	g_cursor_y = (unsigned long) (WindowWithFocus->top);
-	printf("F12: [left/top]\n");
-
-	//g_cursor_x = (unsigned long) (WindowWithFocus->right);
-	//g_cursor_y = (unsigned long) (WindowWithFocus->top);
-	//printf("F12: [right/top]\n");
-
-	//g_cursor_x = (unsigned long) (WindowWithFocus->left);
-	//g_cursor_y = (unsigned long) (WindowWithFocus->bottom);
-	//printf("F12: [left/bottom]\n");
-
-	//g_cursor_x = (unsigned long) (WindowWithFocus->right);
-	//g_cursor_y = (unsigned long) (WindowWithFocus->bottom);
-	//printf("F12: [right/bottom]\n");
-	
-	//...
-
-    return;
-    
-    
-    */
+    debug_print ("procedureWindowWithFocusTest: Deprecated\n");
 }
 
 
@@ -980,21 +767,7 @@ void procedureWindowWithFocusTest (void)
 void procedureGrid (void)
 {
     panic ("xproc-procedureGrid: Deprecated!");
-        
-    /*
-    int Status=0;
-    Status = grid ( (struct window_d *) gui->main, 
-                 (int) 4, 
-                 (int) GRID_HORIZONTAL ); 
-
-
-    if (Status == 1)
-    {
-        panic ("xproc-procedureGrid:\n");
-    }
-    */
 }
-
 
 
 //

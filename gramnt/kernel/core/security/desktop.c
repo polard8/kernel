@@ -516,31 +516,24 @@ int desktop_setup_ws ( struct desktop_d *desktop, int ws_pid )
 {
     if ( (void *) desktop != NULL )
     {
-		desktop->ws = ws_pid;
-		return 0;    
+        desktop->ws = ws_pid;
+        return 0;    
     }
-	
-	return -1;
-}
 
+    return -1;
+}
 
 
 int desktop_setup_wm ( struct desktop_d *desktop, int wm_pid )
 {
     if ( (void *) desktop != NULL )
     {
-		desktop->wm = wm_pid;
-		return 0;
+        desktop->wm = wm_pid;
+        return 0;
     }
  
-	return -1;
+    return -1;
 }
-
-
-/*
-int desktopInit()
-{}
-*/
 
 
 //
