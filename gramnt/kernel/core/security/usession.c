@@ -39,6 +39,20 @@ void *get_current_user_session (void){
 
 
 
+
+void 
+set_current_user_session ( struct usession_d *usession )
+{
+    if ( (void *) usession == NULL )
+    { 
+        return; 
+    }
+
+    current_usersession = (int) usession->id;
+    CurrentUserSession = usession;
+}
+
+
 /*
  *********************************
  * CreateUserSection:
@@ -198,8 +212,9 @@ void init_user_session (void){
         panic ("init_user_session: usession0");
     }
 
-
-    CurrentUserSession = (void *) usession0;
+    
+    //CurrentUserSession = (void *) usession0;
+    set_current_user_session(usession0);
 
 	//Open.
     open_user_session ();
@@ -210,10 +225,6 @@ void init_user_session (void){
 }
 
 
-/*
-int usersessionInit()
-{}
-*/
 
 
 //

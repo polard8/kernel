@@ -1269,6 +1269,18 @@ struct tty_d *tty_create (void)
 
         __tty->used = 1;
         __tty->magic = 1234;
+        
+        // No user logged yet.
+        __tty->user_info = NULL;
+        
+        // #bugbug
+        // Security stuff.
+        // Maybe it will change when a user login into a terminal.
+        __tty->user_session = CurrentUserSession;
+        __tty->room         = CurrentRoom;
+        __tty->desktop      = CurrentDesktop;
+
+
 
         // #bubug: 
         // Usaremos a file table pra controlar as ttys.
@@ -1289,7 +1301,7 @@ struct tty_d *tty_create (void)
         __tty->_cbuffer = (file *) newPage();
         
         //output buffer.
-        __tty->_obuffer = (file *) newPage ();   
+        __tty->_obuffer = (file *) newPage();
         
         
         if ( (void *) __tty->_rbuffer == NULL ||
@@ -1304,7 +1316,7 @@ struct tty_d *tty_create (void)
         __tty->_rbuffer->magic = 1234;  
                
         __tty->_cbuffer->used = 1;
-        __tty->_cbuffer->magic = 1234;         
+        __tty->_cbuffer->magic = 1234;
         
         __tty->_obuffer->used = 1;
         __tty->_obuffer->magic = 1234;
@@ -1315,10 +1327,11 @@ struct tty_d *tty_create (void)
         // o buffer do arquivo. (_base)
         //
         
-        __tty->_rbuffer->_base  = (char *) newPage (); 
-        __tty->_cbuffer->_base  = (char *) newPage (); 
-        __tty->_obuffer->_base  = (char *) newPage (); 
-        
+        __tty->_rbuffer->_base  = (char *) newPage();
+        __tty->_cbuffer->_base  = (char *) newPage();
+        __tty->_obuffer->_base  = (char *) newPage();
+
+
         // #bugbug
         // Temos que completar as estruturas.
         // São muitos elementos ...
@@ -1342,8 +1355,9 @@ struct tty_d *tty_create (void)
 __ok_register:
 
 
-    if ( (void*) __tty == NULL )
+    if ( (void*) __tty == NULL ){
         panic("tty_create: __tty");
+    }
 
     //
     // name
@@ -1416,11 +1430,11 @@ __ok_register:
         // See: ??
         
         devmgr_register_device ( (file *) __file, 
-             newname,                    // device name.                  
-             0,                    //class (char, block, network)
-             1,                          //type (pci, legacy
-             (struct pci_device_d *) 0,  //pci device
-             NULL );                     //tty driver
+             newname,                    // device name.  
+             0,                          // class (char, block, network)
+             1,                          // type (pci, legacy
+             (struct pci_device_d *) 0,  // pci device
+             NULL );                     // tty driver
     
     };
 

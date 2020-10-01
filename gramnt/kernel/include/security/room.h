@@ -65,7 +65,9 @@ struct room_d
 };
 
 struct room_d *room0;
+struct room_d *CurrentRoom;
 //...
+
 
 unsigned long roomList[ROOM_COUNT_MAX];
 

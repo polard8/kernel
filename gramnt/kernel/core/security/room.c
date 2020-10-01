@@ -22,7 +22,8 @@
  * get_current_windowstation:
  */
 
-void *get_current_room (void){
+void *get_current_room (void)
+{
 
     if ( current_room < 0 ){ return NULL; }
 
@@ -31,16 +32,19 @@ void *get_current_room (void){
 
 
 /*
- * set_current_windowstation:
+ * set_current_room:
  *
  */
-void set_current_room (struct room_d *room){
 
+void set_current_room (struct room_d *room)
+{
     //Check.
 
     if ( (void *) room == NULL ){ return; }  
     
+    
     current_room = (int) room->id;
+    CurrentRoom = room;
 }
 
 
@@ -60,7 +64,7 @@ void *CreateRoom (struct room_d *room){
 	if ( (void *) room == NULL )
 	{
 	    return NULL;
-	};
+	}
 	
 	//Window Station Struct.
     
@@ -161,9 +165,9 @@ void init_room_manager (void){
 
     
 	rooms_count = 0;
-	
+
 	//List.
-	init_room_list ();
+	init_room_list();
 
 
     room0 = (void *) kmalloc ( sizeof(struct room_d) );

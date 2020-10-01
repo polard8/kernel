@@ -84,6 +84,25 @@ int RegisterDesktop (struct desktop_d *d){
     return (int) 1;
 }
 
+/*
+ * get_current_desktop:
+ *     Pega o endereço da estrutura do desktop atual.
+ *     @todo: Mudar para desktopGetCurrentDesktop().
+ */
+
+void *get_current_desktop (void)
+{
+    //Check limits.
+
+    if ( current_desktop < 0 || 
+         current_desktop >= DESKTOP_COUNT_MAX )
+    {
+        return NULL;
+    }
+    
+    return (void *) desktopList[current_desktop];
+}
+
 
 /*
  * set_current_desktop:
@@ -101,29 +120,8 @@ set_current_desktop ( struct desktop_d *desktop )
         return; 
     }
 
-
-    CurrentDesktop = desktop;
     current_desktop = (int) desktop->desktopId;
-}
-
-
-/*
- * get_current_desktop:
- *     Pega o endereço da estrutura do desktop atual.
- *     @todo: Mudar para desktopGetCurrentDesktop().
- */
-
-void *get_current_desktop (void){
-	
-    //Check limits.
-    
-	if ( current_desktop < 0 || 
-	     current_desktop >= DESKTOP_COUNT_MAX )
-	{
-	    return NULL;
-	}
-    
-	return (void *) desktopList[current_desktop];
+    CurrentDesktop = desktop;
 }
 
 

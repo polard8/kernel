@@ -119,6 +119,10 @@ void *CreateUserSession(int userID);
 
 void *get_current_user_session (void);
 
+void 
+set_current_user_session ( struct usession_d *usession );
+
+
 void open_user_session (void);
 
 void close_user_session (void);
