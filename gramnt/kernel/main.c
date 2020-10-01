@@ -110,6 +110,7 @@ int kernel_main (int arch_type){
 
 
     // Initializing the global spinlock.
+    // todo: Isso pode ir para init_globals
 
     __spinlock_ipc = 1;
 
@@ -195,7 +196,7 @@ int kernel_main (int arch_type){
 
     // #bugbug:
     // We need the runtime initialization for the messages.
-    // What about to initialize it early?!
+    // What about to initialize it early?! now!!!!
     // See: core/runtime.c
 
     debug_print ("[Kernel] kernel_main: Initializing runtime\n");
@@ -215,6 +216,20 @@ int kernel_main (int arch_type){
 	// breakpoint
 	// lfb_putpixel ( COLOR_YELLOW, 11, 11, 0 );
 	// while(1){}
+
+    // obs:
+    // Nesse momento o bl deixou a tela suja.
+    // Entao as mensagens nessa fase da inicializaçao
+    // sao apresentadas em cima da sujeira deixada pelo boot loader.
+    // #test: 
+    // Se possivel vamos limpara a tela agora. Pois ja inicializamos
+    // a runtime.
+    
+    backgroundDraw ( (unsigned long) COLOR_BLACK); 
+        
+    //#debug.
+    //refresh_screen();
+    //while(1){}
 
 
 	//

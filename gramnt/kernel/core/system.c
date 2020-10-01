@@ -298,12 +298,13 @@ void systemSetupVersion (void){
 
     Version = (void *) kmalloc( sizeof(struct version_d) );
 
-    //#todo:
-    //Isso deve ser considerado um erro fatal,
-    //pois existem aplicações que dependem da versão do sistema 
-    //para funcionarem corretamente.. 
+    // #todo:
+    // Isso deve ser considerado um erro fatal,
+    // pois existem aplicações que dependem da versão do sistema 
+    // para funcionarem corretamente.. 
 
-    if ( (void *) Version == NULL ){
+    if ( (void *) Version == NULL )
+    {
         panic("systemSetupVersion: Version");
 
     } else {
@@ -322,7 +323,8 @@ void systemSetupVersion (void){
         //pois existem aplicações que dependem da versão do sistema 
         //para funcionarem corretamente.. 
 
-    if ( (void *) VersionInfo == NULL ){
+    if ( (void *) VersionInfo == NULL )
+    {
         panic ("systemSetupVersion: VersionInfo");
 
     }else{
@@ -342,6 +344,10 @@ void systemSetupVersion (void){
     // System
     //
 
+    if ( (void *) System == NULL ){
+        panic ("systemSetupVersion: System");
+    }
+
 	//
 	// Colocando na estrutura System se ela for válida.
 	//
@@ -350,7 +356,7 @@ void systemSetupVersion (void){
     {
 		if ( System->used == 1 && System->magic == 1234 )
 		{
-			System->version = (void *) Version;
+			System->version      = (void *) Version;
 			System->version_info = (void *) VersionInfo;
 		}
 		//Nothing
@@ -1680,19 +1686,11 @@ int systemInit (void){
 
     gSystemEdition = 0;
 
-    // System Version:
-    // Configurando a versão do sistema.
-    // Estamos inicializando as estruturas.
-    // O processo init.bin podera usa-la.
-    // Ou ainda a inicializaçao podera depender da versao.
-    
-    printf ("systemInit: Initialize version support\n");
-    systemSetupVersion();
-
 
     Status = (int) systemStartUp();
     if (Status < 0)
         panic("systemInit: systemStartUp fail\n");
+
 
 	//#debug 
 	//a primeira mensagem só aparece após a inicialização da runtime.

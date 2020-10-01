@@ -194,17 +194,19 @@ void timer (void){
 
 
 
+    
+    if (sys_time_hz != 0 )
+    {
+        // por quantos segundos o sistema esta rodando
+        // jiffies/sys_time_hz
+        seconds = (jiffies/sys_time_hz);
+    
+        //sys_time_ms = sys_time_ms + 10;  //100 hz
+        //sys_time_ms = sys_time_ms + 1;   //1000 hz
+        sys_time_ms = (unsigned long) sys_time_ms + (1000/sys_time_hz);
+    }
 
-	//
-	// ## sys time ##
-	//
-	
-	//Mais 10ms para um sistema funcionando a 100HZ
-    //sys_time_ms = sys_time_ms + 10;
-	
-	sys_time_ms = (unsigned long) sys_time_ms + (1000/sys_time_hz);
 
-	
 	//
 	// ## threads time ##
 	//
@@ -789,15 +791,19 @@ unsigned long get_timeout (void){
 
 int timerTimer (void){
 
-    //
-    //   Jiffies !!!
-    //
 
+    // total ticks
     jiffies = 0;
+    
+    // por quantos segundos o sistema esta rodando
+    // jiffies/sys_time_hz
+    seconds = 0; 
 
+    // Por quantos ms o sistema esta rodando.
+    sys_time_ms = 0; 
 
+    // pit frequency
     sys_time_hz = 0;
-    sys_time_ms = 0;
 
 
     //

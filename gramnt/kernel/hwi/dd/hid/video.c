@@ -714,9 +714,16 @@ int videoInit (void){
 	//endereço virtual do backbuffer.
     g_backbuffer_va = (unsigned long) BACKBUFFER_VA;
 
-	//Device screen sizes. (herdadas do boot loader.)
+
+
+    // Device screen sizes. 
+    // (herdadas do boot loader.)
+    // See: globals/gdevice.h
+
     g_device_screen_width  = (unsigned long) SavedX;
     g_device_screen_height = (unsigned long) SavedY;
+    g_device_screen_bpp    = (unsigned long) SavedBPP;
+
 
 
 	// #importante

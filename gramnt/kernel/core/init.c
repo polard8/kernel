@@ -511,9 +511,9 @@ void init_globals (void){
     //while(1){}	
 	
 	//#bugbug isso esta dando problemas.
-#ifdef EXECVE_VERBOSE
+//#ifdef EXECVE_VERBOSE
     backgroundDraw ( (unsigned long) COLOR_BLUE ); 
-#endif
+//#endif
 
     //printf("#breakpoint glob");
     //refresh_screen(); 
@@ -528,8 +528,8 @@ void init_globals (void){
 
 
     //Continua ...
-
 }
+
 
 
 /*

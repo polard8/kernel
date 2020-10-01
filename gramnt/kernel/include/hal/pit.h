@@ -23,10 +23,22 @@
 #define  HZ  100
 
 
+// total ticks
 unsigned long jiffies;
 
+// por quantos segundos o sistema esta rodando
+// jiffies/sys_time_hz
+unsigned long seconds;
 
- 
+// Por quantos ms o sistema esta rodando.
+unsigned long sys_time_ms;
+
+// pit frequency
+unsigned long sys_time_hz;
+
+
+
+
 //
 // Working set support.
 // 
@@ -76,12 +88,7 @@ unsigned long profiler_percentage_idle_thread;
 //unsigned long timer_profile_ticks;
 
 
-//
-//  ## sys time ##
-//
 
-unsigned long sys_time_hz;
-unsigned long sys_time_ms;
 
 
 

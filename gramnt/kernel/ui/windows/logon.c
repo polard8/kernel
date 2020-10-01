@@ -92,6 +92,16 @@ int init_logon_manager (void){
     debug_print ("init_logon_manager:\n");
 
 
+    // #test
+    // Nesse momento a tela ainda esta azul,
+    // quando o bg foi pintado pelo init_globals.
+    // Hora de mudar isso ... par aa fase pos-azul,
+    // onde retomam as mensagens de texto.
+    // obs: Essa tela nao dura muito tempo,
+    // pois logo vem a inicializaçao das janelas.
+
+    backgroundDraw ( (unsigned long) COLOR_BLACK ); 
+
 	//
 	// Atenção
 	//
@@ -112,6 +122,12 @@ int init_logon_manager (void){
     kprintf ("init_logon_manager: Initializing user environment!\n");
     //kprintf ("**\n");
     kprintf ("*\n");
+
+    // #todo:
+    // Podemos mudar o nome dessa funçao para logonSetupVersion()
+
+    kprintf ("init_logon_manager: Initialize version support  \n");
+    systemSetupVersion();
 
 
 	//
@@ -216,6 +232,13 @@ int init_logon_manager (void){
 		init_desktop ();
 
 
+        // #test
+        // Mostrando as mensagens antes de pintarmos a primeira janela.
+        
+        //#debug
+        //breakpoint
+        refresh_screen();
+        //while(1){}
 
 	    //Inicia estrutura.
 		//window.c

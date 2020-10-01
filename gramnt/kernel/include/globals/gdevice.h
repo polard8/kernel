@@ -96,16 +96,17 @@ struct xdevice_driver_d
 // devem refletir os valores armazenados na estrutura.
 //
 
-//Screen sizes.
-unsigned long g_device_screen_width; 
-unsigned long g_device_screen_height; 
+//Screen sizes and bpp.
 
- 
- 
+unsigned long g_device_screen_width;
+unsigned long g_device_screen_height;
+unsigned long g_device_screen_bpp; 
+
+
 #endif   
 
  
- 
+
 //
 // End.
 //
