@@ -732,7 +732,7 @@ int main ( int argc, char *argv[] ){
 
     main_window = gws_create_window (client_fd,
         WT_OVERLAPPED,1,1,"Editor", //WT_SIMPLE,1,1,"Editor",
-        40,40,640,480, //0,0,w,h,
+        4, 4, (w-40), (h-40),
         0,0,COLOR_GRAY, COLOR_GRAY);
 
     if ( main_window < 0 )             
@@ -743,10 +743,11 @@ int main ( int argc, char *argv[] ){
      gws_draw_text (
         (int) client_fd,       // fd,
         (int) main_window,     // window id,
-        (unsigned long)  8, 
+        (unsigned long)  2, 
         (unsigned long) 32 + (40/3), 
         (unsigned long) COLOR_BLACK,
         " Name: ");
+
 
     //
     // Address bar (edit box)
@@ -754,8 +755,8 @@ int main ( int argc, char *argv[] ){
 
     addressbar_window = gws_create_window (client_fd,
         WT_EDITBOX,1,1,"address-bar",
-        ((640/8)*1), 32 +4,     //(40/3) + (8*8), 4,    //((w-(w/2))/2), 4, 
-        ((640/8)*3), 32,    //(w/2), 32,
+        (( (w-40)/8 )*2), 32 +4,
+        (( (w-40)/8 )*3), 32,    
         main_window,0,COLOR_WHITE, COLOR_WHITE);
 
     if ( addressbar_window < 0 )             
@@ -777,8 +778,8 @@ int main ( int argc, char *argv[] ){
 
     button = gws_create_window (client_fd,
         WT_BUTTON,1,1,"Save",
-        ((640/8)*6), 32 +4,     //(w-100-4), 4, //(640-100), 4, 
-        ((640/8)*1), 32,
+        (( (w-40)/8 )*6), 32 +4,     //(w-100-4), 4, //(640-100), 4, 
+        (( (w-40)/8 )*1), 32,
         main_window, 0, COLOR_GRAY, COLOR_GRAY);
 
     if ( button < 0 ) 
@@ -792,7 +793,7 @@ int main ( int argc, char *argv[] ){
     client_window = gws_create_window (client_fd,
         WT_EDITBOX,1,1,"client",
         4, 32 +40, 
-        (640-8), (480 -32 - 40 - 4),
+        (w-40 -4 -2), ( (h-40) -32 - 40 -4 ),
         main_window,0,COLOR_WHITE, COLOR_WHITE);
 
     if ( client_window < 0 ) 
@@ -800,7 +801,7 @@ int main ( int argc, char *argv[] ){
 
 
     int t=0;
-    for (t=0; t<32; t++){
+    for (t=0; t<4; t++){
     gws_draw_text (
         (int) client_fd,        // fd,
         (int) client_window,    // window id,
