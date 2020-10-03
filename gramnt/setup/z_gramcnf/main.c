@@ -9,7 +9,7 @@
 #include "gramcnf.h"
 
 
-#define __VERSION__ "0.1"
+//#define __VERSION__ "0.1"
 
 
 #ifndef __COPYRIGHT__
@@ -42,12 +42,10 @@ char **create_tokenlist( char *s );
 void fncc_print_tokenList ( char *token_list[], char *separator );
 
 //inicializando as variáveis e buffers.
-int gramccInitialize();
+//int gramccInitialize();
 
 void usage (char **argv);
 
-//testando suporte à ctype.
-//void mainTestingCTYPE();
 
 //static int running = 1;
 int running = 1;
@@ -61,16 +59,18 @@ int no_output;
 //static unsigned char *dest_envp[] = { "-sujo", NULL };
 //static unsigned char dest_msg[512];
 
-void editorClearScreen(); 
+void editorClearScreen(void); 
 
-void debugShowStat();
+void debugShowStat(void);
 
 
 /* Cancelada */
-int gramc_main (){
+/*
+int gramc_main ()
+{
     //cancelada, foi para crt0.	
 }
-
+*/
 
 
 /*
@@ -251,7 +251,7 @@ done:
  *     Limpar a tela deletar isso
  */
 
-void editorClearScreen (){
+void editorClearScreen (void){
 	
     int lin, col;    
 
@@ -399,7 +399,7 @@ int is_letter(char c)
  *     Inicializa variáveis globais.
  */
 
-int gramcInitialize (){
+int gramcInitialize (void){
 
     int Status = 0;
     int i=0;
@@ -512,7 +512,7 @@ void mainTestingCTYPE()
 
 
 //mostra as estatísticas para o desenvolvedor.
-void debugShowStat (){
+void debugShowStat (void){
 	
 	printf("debugShowStat:\n\n");
 	

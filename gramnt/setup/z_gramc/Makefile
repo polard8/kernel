@@ -33,12 +33,11 @@ CFLAGS = -m32 \
 	
 
 
-LIBC    = ../../../../rtl/include/
-LIBCOBJ = ../../../../rtl/obj
+LIBC    = ../../../rtl/include/
+LIBCOBJ = ../../../rtl/obj
 
-API     = ../../../lib/libcore/include/
-APIOBJ  = ../../../lib/libcore/obj
-
+API     = ../libcore/include/
+APIOBJ  = ../libcore/obj
 
 
 	##
@@ -90,16 +89,15 @@ all-c:
 
 
 gramcc-link:
-	ld -m elf_i386 -T ../link.ld -o GRAMCNF.BIN $(myObjects)  
+	ld -m elf_i386 -T ../link.ld -o GRAMC.BIN $(myObjects)  
 	
 
 
 finalize:
-	cp GRAMCNF.BIN  ../bin
+	cp GRAMC.BIN  ../bin
 
 clean:
 	-rm *.o
-	-rm GRAMCNF.BIN 
-
-
+	-rm GRAMC.BIN 
+	
 	

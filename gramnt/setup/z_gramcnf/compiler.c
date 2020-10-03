@@ -14,7 +14,7 @@
 
 
 
-FILE *compiler (){
+FILE *compiler (void){
 
     int lexer_return = -1;
     int parser_return = -1;

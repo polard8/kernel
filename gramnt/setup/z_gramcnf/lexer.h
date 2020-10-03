@@ -133,15 +133,16 @@ static char *token_buffer;	/* Pointer to token buffer */
 char real_token_buffer[MAXTOKEN];
 
 
+
 //gcc 0.9
 //int check_newline ();
-int skip_white_space ();
-int yylex ();
+int skip_white_space (void);
+int yylex (void);
 
  // Vamos inicializar o lexer.
-int lexerInit ();
+int lexerInit (void);
 
-int lexer ();
+int lexer (void);
 
 //...
 

@@ -33,12 +33,11 @@ CFLAGS = -m32 \
 	
 
 
-LIBC    = ../../../../rtl/include/
-LIBCOBJ = ../../../../rtl/obj
+LIBC    = ../../../rtl/include/
+LIBCOBJ = ../../../rtl/obj
 
-API     = ../../../lib/libcore/include/
-APIOBJ  = ../../../lib/libcore/obj
-
+API     = ../libcore/include/
+APIOBJ  = ../libcore/obj
 
 
 	##
@@ -65,7 +64,7 @@ main.o:
 
 all-c:
 
-	# from libc03
+	# rtl
 	cp $(LIBCOBJ)/crt0.o    .
 	cp $(LIBCOBJ)/stubs.o   .
 	cp $(LIBCOBJ)/ctype.o   .
@@ -90,15 +89,16 @@ all-c:
 
 
 gramcc-link:
-	ld -m elf_i386 -T ../link.ld -o GRAMC.BIN $(myObjects)  
+	ld -m elf_i386 -T ../link.ld -o GRAMCNF.BIN $(myObjects)  
 	
 
 
 finalize:
-	cp GRAMC.BIN  ../bin
+	cp GRAMCNF.BIN  ../bin
 
 clean:
 	-rm *.o
-	-rm GRAMC.BIN 
-	
+	-rm GRAMCNF.BIN 
+
+
 	

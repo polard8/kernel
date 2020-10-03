@@ -1635,13 +1635,13 @@ expression_exit:
  *     Pegando tokens com o lexer e fazendo coisas ...
  */
  
-int parse (){
+int parse (void){
 
     int running = 1;
 
-    register int token;
+    register int token=0;
 
-    int i;
+    int i=0;
 
 
     //Se entramos em um desses corpos.
@@ -2366,10 +2366,11 @@ parse_exit:
  *     Initializing parser.
  */
 
-int parserInit (){
-	
-	register int i=0;
-	
+int parserInit (void){
+
+
+    register int i=0;
+
 	
 //#ifdef GRAMC_VERBOSE	
     printf ("parserInit:\n");
@@ -2413,7 +2414,7 @@ int parserInit (){
 }
 
 
-int parser(){
+int parser(void){
 
     int Status = -1;
     
@@ -2422,9 +2423,10 @@ int parser(){
     
     //initialize	
     Status = (int) parserInit();
-    
+
+
     //parse it
-    Status = (int) parse ();
+    Status = (int) parse();
     printf ("parser: parse() returned %d\n", Status); 
     
     return 0;

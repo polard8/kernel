@@ -169,28 +169,30 @@ struct node* insert ( struct node* node, int key ){
 
 /*
  *********************************************************
- *
+ * bst_main:
+ * 
  */
  
 // Driver Program to test above functions 
 // C program to demonstrate insert operation in binary search tree 
 
-	/* Let us create following BST 
+/* 
+     Let us create following BST 
            - 
           /  \ 
          +     * 
         / \   / \ 
-       4   3 2   5 */
-	   
-	   //4+3 - 2*5 = 12
-	
-int bst_main (){
-	
-	
-	printf("bst_main:\n");
-	
-	buffer_offset = 0;
-		
+       4   3 2   5 
+
+*/
+   
+     //4+3 - 2*5 = 12
+
+
+int bst_main (void){
+
+    buffer_offset = 0;
+
 	struct node *root = NULL; 
 	
 	int i;
@@ -207,9 +209,12 @@ int bst_main (){
     //int exp[] = { 4, '+', 3, '-', 2, '*', 5, '?' };	
 	
 	int c;
-	
-	printf("for\n");
-    
+
+
+    printf ("bst_main:\n");
+    printf ("for\n");
+
+
 	//colocamos nos buffers em ordem.
 	for ( i=0; (c = exp_buffer[i]) != '?'; i++ )		
     {
@@ -422,8 +427,9 @@ int eval ( int *str ){
  * ##imortante: provavelmente essa rotina não é usada.
  */
 
-int testtest_main (){
-	
+int testtest_main (void){
+
+
 	printf ("testtest_main: Not used ??");
 	while(1){}
 	
@@ -466,8 +472,9 @@ int testtest_main (){
 
 //calcula a expressão e retorna o valor;
 
-unsigned long tree_eval (){
-	
+unsigned long tree_eval (void){
+
+
 	//#todo:
 	//prepara o buffer contendo a expressão em ordem. 
 	//pra isso precisamos pegar os tokens e colocar no buffer. 

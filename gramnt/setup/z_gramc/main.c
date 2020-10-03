@@ -755,7 +755,6 @@ int main ( int argc, char *argv[] ){
 	//debugShowStat();
 
     gde_debug_print ("gramc: Done. :^) \n");    
-    
     printf("\n");
     printf ("gramc: done. \n");
 
@@ -764,13 +763,11 @@ int main ( int argc, char *argv[] ){
 }
 
 
-
-void usage (char **argv){
-
-    printf ("\n\n");
+void usage (char **argv)
+{
+    printf ("\n");
     printf ("====================\n");
-    printf ("%s version %s \n", 
-        argv[0], __VERSION__);
+    printf ("%s version %s \n", argv[0], __VERSION__);
 }
 
 //

@@ -18,6 +18,7 @@ EXTRAVERSION =
 #todo:
 #We need to simplify these flags
 
+
 CFLAGS = -m32 \
 	-std=gnu89 \
 	-nodefaultlibs \
@@ -36,34 +37,23 @@ CFLAGS = -m32 \
 
 
 
+LIBC    = ../../../rtl/include/
+LIBCOBJ = ../../../rtl/obj
 
+API02   = ../libcore/include/
+APIOBJ  = ../libcore/obj
 
-LIBC    = ../../../../rtl/include/
-LIBCOBJ = ../../../../rtl/obj
-
-API02   = ../../../lib/libcore/include/
-APIOBJ  = ../../../lib/libcore/obj
 
 
 	##
 	## Objects
 	##
 
-myObjects = crt0.o c4.o \
-ctype.o \
-stdio.o \
-stdlib.o \
-string.o \
-time.o \
+myObjects = crt0.o gramc4.o \
+ctype.o stdio.o stdlib.o string.o time.o \
 api.o \
-unistd.o \
-math.o \
-strtol.o \
-strtoul.o \
-fscanf.o \
-fcntl.o \
-termios.o \
-ioctl.o \
+unistd.o math.o strtol.o strtoul.o fscanf.o fcntl.o termios.o \
+ioctl.o wait.o \
 stubs.o    
 
 
@@ -74,7 +64,7 @@ all: c4.o all-c jackpot-link finalize clean
 	@echo "Ok?"
 
 c4.o:
-	gcc  -c  c4.c  -Wall     $(CFLAGS) -I $(LIBC) -I $(API02) -o c4.o
+	gcc  -c  gramc4.c  -Wall  $(CFLAGS) -I $(LIBC) -I $(API02) -o gramc4.o
 
 
 all-c:
@@ -100,21 +90,22 @@ all-c:
 	cp $(LIBCOBJ)/termios.o  .
 	cp $(LIBCOBJ)/ioctl.o  .
 	
+	cp $(LIBCOBJ)/wait.o .
+
 	cp $(APIOBJ)/api.o      .
 
 
 
 jackpot-link:
-	ld -m elf_i386 -T ../link.ld -o C4.BIN $(myObjects)    
+	ld -m elf_i386 -T ../link.ld -o GRAMC4.BIN $(myObjects)    
 	
 	
 
 finalize:
-	cp C4.BIN ../bin 
+	cp GRAMC4.BIN ../bin 
 
 clean:
 	-rm *.o
-	-rm C4.BIN 
-	
+	-rm GRAMC4.BIN 
 	
 	
