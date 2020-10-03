@@ -6517,28 +6517,9 @@ void shellSocketTest (void){
     printf ("Socket: ( %d.%d.%d.%d:%d )\n", 
         ip[0], ip[1], ip[2], ip[3], port );
 	//printf("iplong=%x\n",iplong);
-    printf ("Done.\n");
+    printf ("Done\n");
 }
 
-
-// internal
-struct gdeshell_ether_header 
-{
-    // 14 bytes
-    uint8_t dst[6];
-    uint8_t src[6];
-    
-    // Ethertype
-    // See: https://en.wikipedia.org/wiki/EtherType
-    // 0x0800 	Internet Protocol version 4 (IPv4) 
-    // 0x0806 	Address Resolution Protocol (ARP) 
-    // ... 
-    
-    uint16_t type;
-
-} __attribute__((packed));
-
-#define gdeshell_FromNetByteOrder16(v) ((v >> 8) | (v << 8))
 
 
 //interna

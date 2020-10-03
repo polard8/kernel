@@ -5,7 +5,7 @@
 
 
 #include "shell.h"
-#include "net.h"
+
 
 
 // Temporary. 
@@ -21,6 +21,7 @@
 	host_mac_address[4] = (uint8_t) 0x12;
 	host_mac_address[5] = (uint8_t) 0x32;
 */
+
 
 unsigned char host_mac_address[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 //u8 src_MAC[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};

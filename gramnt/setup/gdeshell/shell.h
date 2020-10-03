@@ -3,12 +3,16 @@
 // 2016 - Created by Fred Nora.
 //
 
-//Setup current compiler 
+
+
+// Setup current compiler 
+
 #include "compiler.h"
 
+
+// rtl
 #include <sys/ioctl.h>
 #include <sys/ioctls.h>
-
 #include <types.h>
 #include <stddef.h>
 #include <stdarg.h>   
@@ -17,19 +21,21 @@
 #include <string.h>
 #include <termios.h>
 #include <sys/socket.h>
-
-
 #include <netinet/if_ether.h>
 #include <netinet/in.h>
 #include <netinet/ip.h>
 #include <netinet/tcp.h>
+#include <sys/wait.h> 
 
 
 
 
-//shell stuff 
+// gdeshell stuff 
 #include "globals.h"
 #include "builtins.h"
+
+
+// libcore
 #include <api.h>
 
 
@@ -40,13 +46,18 @@
 #include "alias.h"
 #include "ndir.h"
 #include "version.h"
- 
-#include <sys/wait.h> 
-//...
 
 
+// tests
 #include "tests.h"
 
+// net tests
+#include "net.h"
+
+
+//
+// =================================================
+//
 
 
 //#define SHELL_VERBOSE 1

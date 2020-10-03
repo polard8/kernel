@@ -11,11 +11,16 @@ char *primary_desktop_folder = PDESKTOPFOLDER;
 #define SDESKTOPFOLDER "/tmp/volume1/users/fred/desktop"
 #endif
 char *secondary_desktop_folder = SDESKTOPFOLDER;
+
+
+
+// Deprecated
 int desktopInitialize (void)
 {
-    printf ("Initializing desktop ...\n");
-    printf ("%s\n",primary_desktop_folder);
-    printf ("%s\n",secondary_desktop_folder);
+    printf ("desktopInitialize: Deprecated!\n");
+    
+    //printf ("%s\n",primary_desktop_folder);
+    //printf ("%s\n",secondary_desktop_folder);
     return 0;
 }
 

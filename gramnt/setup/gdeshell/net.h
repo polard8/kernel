@@ -1,4 +1,8 @@
 
+#ifndef __NET_H
+#define __NET_H    1
+
+
 
 #define ETH_TYPE_IP   0x0800  
 #define ETH_TYPE_ARP  0x0806
@@ -14,19 +18,25 @@
 #define FromNetByteOrder32(v) (((v >> 24) & 0xFF) | ((v << 8) & 0xFF0000) | ((v >> 8) & 0xFF00) | ((v << 24) & 0xFF000000))
 
 
+//extra
+#define gdeshell_FromNetByteOrder16(v) ((v >> 8) | (v << 8))
+
 
 
 // Ethernet header length
 #define ETHERNET_HEADER_LENGHT 14      
 
+
+
 // ethernet header
-struct gdeshell_ether_header {
-	
-	uint8_t dst[6];
-	uint8_t src[6];
-	uint16_t type;
-	
+struct gdeshell_ether_header 
+{
+    uint8_t dst[6];
+    uint8_t src[6];
+
+    uint16_t type;
 } __attribute__((packed)); 
+
 
 
 // ARP header length
@@ -61,6 +71,9 @@ __SendARP ( uint8_t source_ip[4],
           uint8_t target_mac[6] );
 
 void __shellTestARP (void);
+
+
+#endif    
 
 
 
