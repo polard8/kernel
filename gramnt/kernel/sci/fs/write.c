@@ -294,14 +294,15 @@ fsSaveFile (
     }
 
 
-    if ( (void*) file_name == NULL )
+    if ( (void *) file_name == NULL )
     {
         debug_print ("fsSaveFile: [FIXME] No filename\n");
         printf      ("fsSaveFile: [FIXME] No filename\n"); 
         goto fail;
     }
 
-    
+    printf ("name address = %x \n", &file_name );
+
     printf ("name    = %s \n", file_name ); 
     printf ("size    = %d \n", file_size );       // Size in sectors.
     printf ("nbytes  = %d \n", size_in_bytes );

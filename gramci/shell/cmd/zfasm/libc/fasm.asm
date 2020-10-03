@@ -3,8 +3,10 @@
 ; Copyright (c) 1999-2020, Tomasz Grysztar.
 ; All rights reserved.
 
-	format	ELF
-	public	fasm_main
+
+    format  ELF
+    public  _fasm_main
+
 
 macro ccall proc,[arg]
   { common
@@ -27,7 +29,9 @@ macro ccall proc,[arg]
      call proc 
      mov esp,ebp }
 
-extrn gettimeofday
+
+extrn _gettimeofday
+
 
 section '.text' executable align 16
 
@@ -35,7 +39,7 @@ section '.text' executable align 16
 ;; #todo
 ;; main() needs to give us the arguments.
 
-fasm_main:
+_fasm_main:
 
     ; argc
     mov ecx,[esp+4]
@@ -107,7 +111,7 @@ fasm_main:
     call display_string
 
     ; Time of the day.
-    ccall gettimeofday,buffer,0
+    ccall _gettimeofday,buffer,0
 
 
     ;;
@@ -168,8 +172,8 @@ fasm_main:
     mov	esi,_passes_suffix
     call	display_string
 	
-	
-	ccall	gettimeofday,buffer,0
+
+    ccall _gettimeofday,buffer,0
 	mov	eax,dword [buffer]
 	mov	ecx,1000
 	mul	ecx

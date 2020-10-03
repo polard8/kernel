@@ -23,7 +23,7 @@
 //Talvez precisemos configurar o stdout.
  
 
-extern void fasm_main(int argc, char *argv[]);
+extern void fasm_main (int argc, char *argv[]);
 
 
 //
@@ -40,7 +40,7 @@ int main ( int argc, char *argv[] ){
     // IN: 
     // It needs to be in: [esp+4] and [esp+8]
     
-    fasm_main(argc,argv);
+    fasm_main (argc,argv);
     
     printf ("fasm: Done\n");
 

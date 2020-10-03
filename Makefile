@@ -231,6 +231,7 @@ vhd-copy-files:
 	#-sudo cp gramci/shell/cmd/bin/*.BIN  base/BIN
 #	-sudo cp gramci/shell/cmd/bin/REBOOT.BIN     base/
 	-sudo cp gramci/shell/cmd/bin/CAT.BIN        base/
+	-sudo cp gramci/shell/cmd/bin/FASM.BIN       base/
 #	-sudo cp gramci/shell/cmd/bin/TRUE.BIN       base/
 #	-sudo cp gramci/shell/cmd/bin/FALSE.BIN      base/
 	# ...

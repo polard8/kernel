@@ -3,20 +3,21 @@
 ; Copyright (c) 1999-2020, Tomasz Grysztar.
 ; All rights reserved.
 
-extrn malloc
-extrn free
-extrn getenv
-extrn fopen
-extrn fclose
-extrn fread
-extrn fwrite
-extrn fseek
-extrn ftell
-extrn time
-extrn exit
+extrn _malloc
+extrn _free
+extrn _getenv
+extrn _fopen
+extrn _fclose
+extrn _fread
+extrn _fwrite
+extrn _fseek
+extrn _ftell
+extrn _time
+extrn _exit
 
-extrn 'write' as libc_write
 
+extrn '_write' as libc_write
+;;extrn 'write' as libc_write
 
 init_memory:
     mov eax,esp
@@ -30,7 +31,7 @@ init_memory:
 
 allocate_memory:
 	mov	[memory_setting],ecx
-	ccall	malloc,ecx
+    ccall _malloc,ecx
 	or	eax,eax
 	jz	out_of_memory
 	mov	[additional_memory],eax
@@ -46,9 +47,9 @@ allocate_memory:
 exit_program:
 	movzx	eax,al
 	push	eax
-	ccall	free,[additional_memory]
+    ccall _free,[additional_memory]
 	pop	eax
-	ccall	exit,eax
+	ccall	_exit,eax
     mov	esp,[stack_frame]
     pop	ebp
     ret
@@ -62,7 +63,7 @@ exit_program:
 
 get_environment_variable:
 
-    ccall getenv, esi
+    ccall _getenv, esi
 
     mov esi, eax
     or eax, eax
@@ -91,7 +92,7 @@ no_environment_variable:
 open:
 	push	esi edi ebp
 	call	adapt_path
-	ccall	fopen,buffer,open_mode
+	ccall	_fopen,buffer,open_mode
 	pop	ebp edi esi
 	or	eax,eax
 	jz	file_error
@@ -117,7 +118,7 @@ adapt_path:
 create:
 	push	esi edi ebp
 	call	adapt_path
-	ccall	fopen,buffer,create_mode
+	ccall	_fopen,buffer,create_mode
 	pop	ebp edi esi
 	or	eax,eax
 	jz	file_error
@@ -125,11 +126,11 @@ create:
 	clc
 	ret
 close:
-	ccall	fclose,ebx
+	ccall	_fclose,ebx
 	ret
 read:
 	push	ebx ecx edx esi edi ebp
-	ccall	fread,edx,1,ecx,ebx
+	ccall	_fread,edx,1,ecx,ebx
 	pop	ebp edi esi edx ecx ebx
 	cmp	eax,ecx
 	jne	file_error
@@ -140,7 +141,7 @@ read:
 	ret
 write:
 	push	ebx ecx edx esi edi ebp
-	ccall	fwrite,edx,1,ecx,ebx
+	ccall	_fwrite,edx,1,ecx,ebx
 	pop	ebp edi esi edx ecx ebx
 	cmp	eax,ecx
 	jne	file_error
@@ -149,11 +150,11 @@ write:
 lseek:
 	push	ebx
 	movzx	eax,al
-	ccall	fseek,ebx,edx,eax
+	ccall	_fseek,ebx,edx,eax
 	test	eax,eax
 	jnz	lseek_error
 	mov	ebx,[esp]
-	ccall	ftell,ebx
+	ccall	_ftell,ebx
 	pop	ebx
 	clc
 	ret
@@ -412,14 +413,17 @@ assembler_error:
 	mov	al,2
 	jmp	exit_program
 
-make_timestamp:
-	ccall	time,timestamp
-	mov	eax,dword [timestamp]
-	mov	edx,dword [timestamp+4]
-	ret
 
-open_mode db 'r',0
+make_timestamp:
+    ccall _time,timestamp
+    mov eax, dword [timestamp]
+    mov edx, dword [timestamp+4]
+    ret
+
+
+open_mode   db 'r',0
 create_mode db 'w',0
+
 
 error_prefix db 'error: ',0
 error_suffix db '.'

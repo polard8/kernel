@@ -14,6 +14,10 @@ all:
 	make -C ./tprintf
 	make -C ./uname
 	
+	
+	make -C ./zfasm
+	
+	
 	# gramc thing.    
 #	make -C ./gramc
 #	make -C ./gramcnf

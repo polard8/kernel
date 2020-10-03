@@ -33,8 +33,8 @@ CFLAGS = -m32 \
 LIBC    = ../../../../rtl/include/
 LIBCOBJ = ../../../../rtl/obj
 
-API     = ../../../lib/libcore/include/
-APIOBJ  = ../../../lib/libcore/obj
+#API     = ../../../lib/libcore/include/
+#APIOBJ  = ../../../lib/libcore/obj
 
 
 	##
@@ -54,7 +54,7 @@ all: main.o all-c cat-link finalize clean
 
 main.o:
 
-	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -I $(API) -o main.o
+	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -o main.o
 
 	make -C libc
 
