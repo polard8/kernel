@@ -179,19 +179,8 @@ int fs_get_free_fd_from_pid (int pid)
          if ( p->Objects[__slot] == 0 ){ return (int) __slot; }
     };
  
- 
     return -1;
 }
-
-
-
-/*
-int vfs_root_mounted(void);
-int vfs_root_mounted(void)
-{
-    return (root)?1:0;
-}
-*/
 
 
 
@@ -293,7 +282,7 @@ fsListFiles (
 
     if ( current_disk == 0 && current_volume == 0 && current_directory == 0 )
     {
-        vfsListFiles ();
+        //vfsListFiles ();
         goto done;
     }
 
@@ -1368,14 +1357,12 @@ fail:
  * 
  */
 
-
 // #todo
 // Essa funcao deve ter acesso as informacoes herdadas do boot.
 // Talvez uma estrutura de 'BootInfo'.
 
+int fsInit (void){
 
-int fsInit (void)
-{
     int slot = -1;
 
 
@@ -1411,12 +1398,14 @@ int fsInit (void)
 
     // pega slot em file_table[] para
     slot = get_free_slots_in_the_file_table();
-    if(slot<0 || slot >=NUMBER_OF_FILES)
+    if (slot<0 || slot >= NUMBER_OF_FILES){
         panic("fsInit: slot");
+    }
     volume1_rootdir = file_table[slot];
     volume1_rootdir->filetable_index = slot;
 
-    if ( (void *) volume1_rootdir == NULL ){
+    if ( (void *) volume1_rootdir == NULL )
+    {
         panic ("fsInit: volume1_rootdir \n");
 
     } else {
@@ -1439,19 +1428,20 @@ int fsInit (void)
         // inode support.
         // pega slot em inode_table[] 
         slot = get_free_slots_in_the_inode_table();
-        if(slot<0 || slot >=32)
+        if (slot<0 || slot >=32){
             panic("fsInit: volume1_rootdir inode slot");
+        }
         volume1_rootdir->inode = inode_table[slot];
         volume1_rootdir->inodetable_index = slot;
-        if( (void*) volume1_rootdir->inode == NULL ){
+        if ( (void*) volume1_rootdir->inode == NULL ){
             panic("fsInit: volume1_rootdir inode struct");
         }
-        volume1_rootdir->inode->filestruct_counter = 1; //inicialize
-        memcpy( (void*) volume1_rootdir->inode->path, 
-                (const void*) volume1_rootdir->_tmpfname, 
-                sizeof( volume1_rootdir->inode->path ) );
+        volume1_rootdir->inode->filestruct_counter = 1;  //inicialize
+        memcpy ( 
+            (void*) volume1_rootdir->inode->path, 
+            (const void*) volume1_rootdir->_tmpfname, 
+            sizeof( volume1_rootdir->inode->path ) );
         // ... 
-
 
         // File that represents the system volume.
         storage->__file = volume1_rootdir; 
@@ -1465,12 +1455,14 @@ int fsInit (void)
 
     // pega slot em file_table[] para
     slot = get_free_slots_in_the_file_table();
-    if(slot<0 || slot >=NUMBER_OF_FILES)
+    if (slot<0 || slot >= NUMBER_OF_FILES){
         panic("fsInit: slot");
+    }
     volume2_rootdir = file_table[slot];
     volume2_rootdir->filetable_index = slot;
 
-    if ( (void *) volume2_rootdir == NULL ){
+    if ( (void *) volume2_rootdir == NULL )
+    {
         panic ("fsInit: volume2_rootdir\n");
 
 
@@ -1482,8 +1474,8 @@ int fsInit (void)
  
         volume2_rootdir->_base = (unsigned char *) VOLUME2_ROOTDIR_ADDRESS;
         volume2_rootdir->_p    = (unsigned char *) VOLUME2_ROOTDIR_ADDRESS;
-        volume2_rootdir->_cnt = (32 * 512) ;
-        volume2_rootdir->_file = 0; //?
+        volume2_rootdir->_cnt = (32 * 512);  // #bugbug: Check this size.
+        volume2_rootdir->_file = 0;          // ?
         volume2_rootdir->_tmpfname = "VOLUME2 VOL";
         volume2_rootdir->fd_counter = 1;
 
@@ -1491,26 +1483,25 @@ int fsInit (void)
         // inode support.
         // pega slot em inode_table[] 
         slot = get_free_slots_in_the_inode_table();
-        if(slot<0 || slot >=32)
+        if (slot<0 || slot >= 32){
             panic("fsInit: volume2_rootdir inode slot");
+        }
         volume2_rootdir->inode = inode_table[slot];
         volume2_rootdir->inodetable_index = slot;
-        if( (void*) volume2_rootdir->inode == NULL ){
+        if ( (void*) volume2_rootdir->inode == NULL ){
             panic("fsInit: volume2_rootdir inode struct");
         }
-        volume2_rootdir->inode->filestruct_counter = 1; //inicialize
-        memcpy( (void*) volume2_rootdir->inode->path, 
-                (const void*) volume2_rootdir->_tmpfname, 
-                sizeof( volume2_rootdir->inode->path ) );
+        volume2_rootdir->inode->filestruct_counter = 1;  //inicialize
+        memcpy ( 
+            (void*) volume2_rootdir->inode->path, 
+            (const void*) volume2_rootdir->_tmpfname, 
+            sizeof( volume2_rootdir->inode->path ) );
         // ... 
-
     };
-
 
     //
     // == pipe_gramadocore_init_execve ================================ 
     //
-
 
 	//
 	// ## Inicializando os pipes usados em execve ## 
@@ -1519,32 +1510,33 @@ int fsInit (void)
 	
 	//gramado core init execve 
 	
-	//aloca mem�ria para a estrutura.
+	//aloca memoria para a estrutura.
     pipe_gramadocore_init_execve = (file *) kmalloc ( sizeof(file) );
 
-    if ( (void *) pipe_gramadocore_init_execve == NULL ){
+    if ( (void *) pipe_gramadocore_init_execve == NULL )
+    {
         panic ("fsInit: pipe_gramadocore_init_execve\n");
 
     }else{
 
         // Aloca memória para o buffer.
+        // #todo: Define this variable in the top of the body.
+        // #bugbug: Chech this size.
         unsigned long pipe0base = (unsigned long) kmalloc (512);
 
         if ( (void *) pipe0base == NULL ){
             panic ("fsInit: pipe0base\n");
         }
 
-
         pipe_gramadocore_init_execve->used = 1;
         pipe_gramadocore_init_execve->magic = 1234;
 
         pipe_gramadocore_init_execve->_base = (unsigned char *) pipe0base;
-        pipe_gramadocore_init_execve->_p = (unsigned char *) pipe0base;
-        pipe_gramadocore_init_execve->_cnt  = 512;
-        pipe_gramadocore_init_execve->_file = 0; //??
+        pipe_gramadocore_init_execve->_p    = (unsigned char *) pipe0base;
+        pipe_gramadocore_init_execve->_cnt  = 512;  // #bugbug: Check this size.
+        pipe_gramadocore_init_execve->_file = 0;    // ??
         pipe_gramadocore_init_execve->_tmpfname = "pipe0";
-        
-        
+
         // #todo
         //fileList[ ? ] = (unsigned long) pipe_gramadocore_init_execve;
 
@@ -1567,11 +1559,9 @@ int fsInit (void)
     // Inicializa a estrutura de suporte ao target dir.
     fsInitTargetDir();
 
-    
     // Done.
     debug_print ("fsInit: done\n");
 
-    
     return 0;
 }
 

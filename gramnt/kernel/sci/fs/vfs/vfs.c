@@ -1,10 +1,10 @@
 /*
- * File: fs\vfs.c
+ * File: fs/vfs.c
  *
  *     Virtual File System
  *     Sistema de arquivos virtual gerenciado pelo kernel base.
  *
- * 2018 - Created by Fred Nora.
+ *    2018 - Created by Fred Nora.
  */
 
 
@@ -12,14 +12,12 @@
 
 
 /*
+ *********************************************
  * vfsInit:
  *     Initializing VFS.
- *     #todo: esse retorno tem que ser int.
  */
- 
-//int vfsInit (){ 
 
-void vfsInit (void){
+int vfsInit (void){
 
     int i=0;
     int slot = -1;
@@ -35,8 +33,10 @@ void vfsInit (void){
 
     storage->vfs = kmalloc ( sizeof(struct vfs_d) );
 
-    if ( (void *) storage->vfs == NULL ){
-        panic ("vfsInit: storage->vfs");
+
+    if ( (void *) storage->vfs == NULL )
+    {
+        panic ("vfsInit: [FAIL] storage->vfs");
 
     }else{
         // todo: object 
@@ -60,27 +60,28 @@ void vfsInit (void){
     };
 
 	//
-	// ## STREAM ##
+	// file ?
 	//
 
-	
-	//foi definido em stdio.h
-	//file *vfs;
-	
+    // vfs foi definido em stdio.h
+
     // pega slot em file_table[] para
     slot = get_free_slots_in_the_file_table();
-    if(slot<0 || slot >=NUMBER_OF_FILES)
-        panic("fsInit: slot");
+    if (slot<0 || slot >= NUMBER_OF_FILES){
+        panic ("fsInit: slot");
+    }
     vfs = file_table[slot];
     vfs->filetable_index = slot;
 
-    if ( (void *) vfs == NULL ){
-        panic ("vfsInit: vfs fail");
+    if ( (void *) vfs == NULL )
+    {
+        panic ("vfsInit: [FAIL] vfs");
 
     }else{
 
-        //#bugbug: Não usar o termo 'stream'.
-        storage->vfs->stream = vfs;
+        // #bugbug: 
+        // Não usar o termo 'stream'.
+        storage->vfs->_file = vfs;
 
         vfs->used = 1;
         vfs->magic = 1234;
@@ -105,15 +106,20 @@ void vfsInit (void){
         // inode support.
         // pega slot em inode_table[] 
         slot = get_free_slots_in_the_inode_table();
-        if(slot<0 || slot >=32)
-            panic("klibc-stdioInitialize: vfs inode slot");
+        if (slot<0 || slot >=32){
+            panic ("vfsInit: vfs inode slot");
+        }
         vfs->inode = inode_table[slot];
         vfs->inodetable_index = slot;
-        if( (void*) vfs->inode == NULL ){
-            panic("klib-stdioInitialize: vfs inode struct");
+        if ( (void*) vfs->inode == NULL ){
+            panic ("vfsInit: vfs inode struct");
         }
-        vfs->inode->filestruct_counter = 1; //inicialize
-        memcpy( (void*) vfs->inode->path, (const void*) vfs->_tmpfname, sizeof( vfs->inode->path ) );
+        vfs->inode->filestruct_counter = 1;  //inicialize
+        memcpy ( 
+            (void*) vfs->inode->path, 
+            (const void*) vfs->_tmpfname, 
+            sizeof( vfs->inode->path ) );
+        
         // ... 
     };
 
@@ -124,12 +130,14 @@ void vfsInit (void){
 
 	// #importante
 	// É possivel fazer mais inicializações.
-	
+
 #ifdef KERNEL_VERBOSE
-	printf("VFS Initialized\n");
-#endif	
+    printf("VFS Initialized\n");
+#endif
 
     debug_print("vfsInit: done\n");
+
+    return 0;
 }
 
 
@@ -274,7 +282,7 @@ void vfsShowVFSInfo (void){
    // printf("done\n");	
 	//refresh_screen();
 	//return;
-};
+}
 
 
 //lista os nomes dos arquivos no diretório raiz do vfs.
@@ -300,9 +308,21 @@ void vfsListFiles (void)
 		}
 	};
 */
-    printf("vfsListFile: [FIXME] use file_table[]\n");
-	refresh_screen();
+
+    printf ("vfsListFile: [FIXME] use file_table[]\n");
+    
+    refresh_screen();
 }
+
+
+/*
+int vfs_root_mounted(void);
+int vfs_root_mounted(void)
+{
+    return (root)?1:0;
+}
+*/
+
 
 //
 // End.

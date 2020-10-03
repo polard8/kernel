@@ -1,15 +1,16 @@
-
-//vfs.h 
-
-// header do gerenciador de sistema de arquivos virtual.
-// O vfs é uma abstração que uniformiza o acesso aos arquivos ...
-// serão usadas as estruturas de 'directory entry' e 'inode' do ext2. 
-// 
+/*
+ * File: vfs.h 
+ *
+ * header do gerenciador de sistema de arquivos virtual.
+ * O vfs é uma abstração que uniformiza o acesso aos arquivos ...
+ * serão usadas as estruturas de 'directory entry' e 'inode' do ext2. 
+ *
+ *    2019 - Create by fred Nora.
+ */
 
 
 #ifndef ____VFS_H
 #define ____VFS_H
-
 
 
 //
@@ -27,23 +28,12 @@
 #define VFS_ROOTDIR_ENTRY_SIZE 32 
 
 
-#define VHS_DIR_ROOT         'root:' 
-#define VHS_DIR_ETC          'root:/etc'  // misc
-#define VHS_DIR_OBJECTS      'root:/objects'  // gerenciador de objetos.
-#define VHS_DIR_TMP          'root:/tmp'      // tmp 
-//...
 
-
-
-
-// Ex: 
-//
-// /root
-// /root/bin
-// /root/user/fred
-// /root/dev/hd0
-//
-//
+//#define VFS_DIR_ROOT       'vfs:/' 
+//#define VFS_DIR_ETC        'vfs:/etc'      // misc
+//#define VFS_DIR_OBJECTS    'vfs:/objects'  // gerenciador de objetos.
+//#define VFS_DIR_TMP        'vfs:/tmp'      // tmp 
+// ...
 
 
 // a entrada '/objects' vai apontar para a lista de ponteiros 
@@ -66,54 +56,53 @@
  *********************************************************************
  * Structure of an inode on the disk
  */
- 
-typedef struct ext2_inode_d ext2_inode_t;
+
+
 struct ext2_inode_d 
 {
-	unsigned short i_mode;        /* File mode */
-	
-	/* Use 0 as the user id for the assignment. */
-	unsigned short i_uid;         /* Low 16 bits of Owner Uid */
-	
-	unsigned int   i_size;        /* Size in bytes */
-	
-	/* You don't need to set access time for the assignment. */
-	unsigned int   i_atime;       /* Access time */
-	
-	unsigned int   i_ctime;       /* Creation time */
-	
-	/* You don't need to set modification time for the assignment. */
-	unsigned int   i_mtime;       /* Modification time */
-	
-	/* d_time must be set when appropriate */
-	unsigned int   i_dtime;       /* Deletion Time */
-	
-	/* Use 0 as the group id for the assignment. */
-	unsigned short i_gid;         /* Low 16 bits of Group Id */
-	
-	unsigned short i_links_count; /* Links count */
-	
-	unsigned int   i_blocks;      /* Blocks count IN DISK SECTORS*/
-	
-	/* You can ignore flags for the assignment. */
-	unsigned int   i_flags;       /* File flags */
-	
-	/* You should set it to 0. */
-	unsigned int   osd1;          /* OS dependent 1 */
-	
-	unsigned int   i_block[15];   /* Pointers to blocks */
-	
-	/* You should use generation number 0 for the assignment. */
-	unsigned int   i_generation;  /* File version (for NFS) */
-	
-	/* The following fields should be 0 for the assignment.  */
-	unsigned int   i_file_acl;    /* File ACL */
-	unsigned int   i_dir_acl;     /* Directory ACL */
-	unsigned int   i_faddr;       /* Fragment address */
-	unsigned int   extra[3];
+
+    unsigned short i_mode;        /* File mode */
+
+    /* Use 0 as the user id for the assignment. */
+    unsigned short i_uid;         /* Low 16 bits of Owner Uid */
+
+    unsigned int   i_size;        /* Size in bytes */
+
+    /* You don't need to set access time for the assignment. */
+    unsigned int   i_atime;       /* Access time */
+
+    unsigned int   i_ctime;       /* Creation time */
+
+    /* You don't need to set modification time for the assignment. */
+    unsigned int   i_mtime;       /* Modification time */
+
+    /* d_time must be set when appropriate */
+    unsigned int   i_dtime;       /* Deletion Time */
+
+    /* Use 0 as the group id for the assignment. */
+    unsigned short i_gid;         /* Low 16 bits of Group Id */
+
+    unsigned short i_links_count; /* Links count */
+
+    unsigned int   i_blocks;      /* Blocks count IN DISK SECTORS*/
+
+    /* You can ignore flags for the assignment. */
+    unsigned int   i_flags;       /* File flags */
+
+    /* You should set it to 0. */
+    unsigned int   osd1;          /* OS dependent 1 */
+
+    unsigned int   i_block[15];   /* Pointers to blocks */
+
+    /* You should use generation number 0 for the assignment. */
+    unsigned int   i_generation;  /* File version (for NFS) */
+
+    /* The following fields should be 0 for the assignment.  */
+    unsigned int   i_file_acl;    /* File ACL */
+    unsigned int   i_dir_acl;     /* Directory ACL */
+    unsigned int   i_faddr;       /* Fragment address */
+    unsigned int   extra[3];
 };
-
-
 
 
 //#define VFS_MAX_INODES 512
@@ -132,16 +121,15 @@ struct ext2_inode_d
  * bigger than 255 chars, it's safe to reclaim the extra byte for the
  * file_type field.
  */
-typedef struct ext2_dir_entry_d ext2_dir_entry_t;
+
 struct ext2_dir_entry_d 
 {
-	unsigned int   inode;     /* Inode number */
-	unsigned short rec_len;   /* Directory entry length */
-	unsigned char  name_len;  /* Name length */
-	unsigned char  file_type;
-	char           name[EXT2_NAME_LEN];    /* File name, up to EXT2_NAME_LEN */
+    unsigned int   inode;     /* Inode number */
+    unsigned short rec_len;   /* Directory entry length */
+    unsigned char  name_len;  /* Name length */
+    unsigned char  file_type;
+    char           name[EXT2_NAME_LEN];    /* File name, up to EXT2_NAME_LEN */
 };
-
 
 
 //#define VFS_MAX_ENTRIES 512
@@ -154,36 +142,34 @@ struct ext2_dir_entry_d
 // manipulador das entradas de diretório do vfs.
 // Essa estrutura existe para termos informações extras 
 // além das poucas oferecidadas por uma entrada de ext2 padrão.
-typedef struct vfs_handle_d vfs_handle_t;
+
 struct vfs_handle_d
 {
-	//id do handle.
+
+    // id do handle.
     int id;
 
     int used;
-    int magic;  //
+    int magic;
 
-	int status;
-	
+    int status;
 
-	// Nome do handle e não o nome do arquivo.
+    // Nome do handle e não o nome do arquivo.
     // Isso servirá para efeito de exibução.
-	//poderá ter quanquer tamanho.
+    // poderá ter quanquer tamanho.
     char *name;
-	
-	//Posso colocar aqui os identificadores 
-	//de minha preferência.
-	
-	//Continua ...
-	//...
-	
-	struct ext2_dir_entry_d *directory_entry; 	
+
+    // Posso colocar aqui os identificadores de minha preferência.
+
+    // Continua ...
+    // ...
+
+    struct ext2_dir_entry_d  *directory_entry;
 };
 
 
 //#define VFS_HANDLE_MAX 512
 //unsigned long vfs_handle_list[VFS_HANDLE_MAX];
-
 
 
 //
@@ -193,12 +179,13 @@ struct vfs_handle_d
 
 
 typedef enum {
-	VFSStatusNull,
-	VFSStatusInitialized,
-	VFSStatusLocked,
-    //...	
-}vfs_status_t;
 
+    VFSStatusNull,
+    VFSStatusInitialized,
+    VFSStatusLocked,
+    // ...
+
+}vfs_status_t;
 
 
 
@@ -209,18 +196,18 @@ typedef enum {
 // a token vai indicar quais as permissões de acesso 
 // que o processo tem.
 //
-typedef struct vfs_token_d vfs_token_t;
+
 struct vfs_token_d
 {
-	int used;
-	int magic;
-	
-	int type;
-	
-	struct process_d *process;
-	
-	// ...
-	
+
+    int used;
+    int magic;
+
+    int type;
+
+    struct process_d *process;
+
+    // ...
 };
 
 
@@ -230,14 +217,15 @@ struct vfs_token_d
 
 struct vfs_d
 {
-	//@todo:
-	//object support.
-	
+
+    //#todo:
+    //object support.
 
     int used;
     int magic;
 
-    file *stream;  //#todo: mudar para _file.
+    file *_file;
+
 
 	//int file_descriptor; //3
 	
@@ -302,10 +290,15 @@ struct vfs_d
 		
     // diretório raiz.    
     //struct dir_d *vfs;  
-}; 
+};
 
 
-void vfsInit (void);
+//
+// == Prototypes ===============================================
+//
+
+int vfsInit (void);
+
 void vfs_show_handle_list (void);
 void vfsShowVFSInfo (void);
 void vfsListFiles (void);
