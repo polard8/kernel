@@ -1,0 +1,5 @@
+
+	
+	The apps in the shell/app/ folder are clientes of the gws window server.
+	The apps in the shell/cmd/ folder are posix apps and will run into a
+	virtual terminal or into the virtual console embedded into the base kernel.

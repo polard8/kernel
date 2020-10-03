@@ -1,12 +1,13 @@
 
     Three main folders of the project:
 
-    animal/
-        Ring 3 apps and commands. The apps are GUI applications and
-        the commands will run inside the Terminal.
 
-    gramado/
-        Boot, kernel, drivers and servers.
+    base/ This folder will be cloned into the real hd to test it in the real machine.
 
-    lib/
-        Ring 3 libraries used by animal/ and gramado/.
+    gramci/ Gramado consistent interface.
+
+    gramnt/ Gramado New Technologies. This is the core system.
+
+    rtl/ ring3 runtime library. 
+    It has a unix-like low level stuff, but it exports some routines
+     using the rtl_ prefix.

@@ -1,5 +1,4 @@
-# animal
+# gramci
 
-
-    + GUI apps
-    + commands to run on terminal
+	Gramado Consistent Interface
+	
