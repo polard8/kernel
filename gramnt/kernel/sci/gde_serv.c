@@ -1034,13 +1034,14 @@ gde_extra_services (
     
     
     // Mostra a lista de volumes montados.
-    if (number == 8500){
-        fs_show_mounted_list();
+    if (number == 8500)
+    {
+        //Deprecated
         return NULL;
     }
 
 
-    
+
     // #test
     // [FAIL]
     //Special loader to load a file into a shared memory;

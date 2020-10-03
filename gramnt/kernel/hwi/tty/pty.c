@@ -3,6 +3,15 @@
 // File: pty.c
 
 
+// "The PTY virtualizes a computer’s serial communications hardware, 
+// exposing “master” and “slave” pseudo-devices:"
+// Terminal apps connect to a master pseudo-device; 
+// Command-Line applications 
+// (e.g. shells like Cmd, PowerShell, and bash) connect to a slave pseudo-device.
+// See: 
+// https://devblogs.microsoft.com/commandline/windows-command-line-introducing-the-windows-pseudo-console-conpty/
+
+
 // pty é um canal de comunicação com duas pontas.
 // é semelhante ao canal com dois soquetes, um em cada ponta.
 // Enquando os canais usam os termos server/client os pty

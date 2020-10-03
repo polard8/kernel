@@ -2761,17 +2761,17 @@ process_execve (
 
     l = (size_t) strlen ( (char *) arg1 ); //ok
     //l = (size_t) strlen ( (char *) &arg1[0] );
-    
-	printf ("filename %s   \n", &arg1[0] );
-	printf ("name size %d  \n", l );
+
+    printf ("filename %s   \n", &arg1[0] );
+    printf ("name size %d  \n", l );
 
     // O tamanho m�ximo � 12.
     // '8' '.' '3'
 
     if ( l > 12 )
     {
-		printf ("name size %d  \n", l );
-        panic ("do_execve: l. The filename is too long ! \n");
+        printf ("name size %d  \n", l );
+        panic ("process_execve: l. The filename is too long ! \n");
         
 		// #obs: 
 		// N�o sairemos da fun��o pois isso � um teste ainda.
@@ -2797,7 +2797,7 @@ process_execve (
             {       
                 if ( l > 8 )
                 {
-                    panic ("do_execve: File without ext is too long\n");
+                    panic ("process_execve: File without ext is too long\n");
                     
 					// Obs: 
 					// N�o sairemos da fun��o pois isso � um teste ainda.
@@ -2895,7 +2895,7 @@ process_execve (
                        BUGBUG_IMAGE_SIZE_LIMIT );
 
     if ( Status == 1 ){
-        printf ("do_execve: Couldn't load file\n");
+        printf ("process_execve: Couldn't load file\n");
         goto fail;
     }
 
@@ -2906,18 +2906,11 @@ process_execve (
 
     Status = (int) fsCheckELFFile ( (unsigned long) process->Image );
 
-    if ( Status == 0 ){
-        goto format_ok;
- 
-    }else{
-		panic ("do_execve: It's not a valid ELF file\n");
-		//goto fail;
-    };
+    if (Status<0){
+        panic ("process_execve: It's not a valid ELF file\n");
+    }
 
-
-	//
-	// ELF Signature OK
-	//
+    // ELF Signature OK
 
 format_ok:
 
@@ -3048,9 +3041,9 @@ format_ok:
 
     Thread = (struct thread_d *) threadList[current_thread];
 
-    if ( (void *) Thread == NULL ){
-        panic ("do_execve: Thread fail\n");
-        //goto fail;
+    if ( (void *) Thread == NULL )
+    {
+        panic ("process_execve: Thread fail\n");
 
     }else{
 
@@ -3147,15 +3140,14 @@ format_ok:
 
         // No return!
                 
-        panic ("do_execve: KiSpawnTask returned ");
-        //goto done;
+        panic ("process_execve: KiSpawnTask returned ");
     };
 
 	// fail
-
+	
 fail:
 
-    printf ("do_execve: #fail\n");
+    printf ("process_execve: Fail\n");
 	// refresh_screen ();
 
 done:
@@ -3179,7 +3171,7 @@ done:
 	// #obs: 
 	// Estamos usando isso s� por enquanto para debug.
 
-    refresh_screen ();
+    refresh_screen();
 
     return (int) Status;
 }

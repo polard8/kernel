@@ -568,7 +568,7 @@ pid_t sys_fork_process (void)
 
 // #importante
 // >>>> Isso funciona. 
-// ( * N�o * ) mexa pois ainda estamos
+// (  Nao  ) mexa pois ainda estamos
 // trabalahndo os outros m�todos.
 
 // It loads a file of a given directory address.
@@ -1003,16 +1003,15 @@ do_clone:
    }
 
 
-       // Check ELF signature.
-       // OK. O comando existe e o arquivo foi carregado, mas 
-       // precisamos saber se a assinatura de ELF é válida.
-
-    Status = (int) fsCheckELFFile ( (unsigned long) Clone->Image );
-
+    // Check ELF signature.
+    // OK. O comando existe e o arquivo foi carregado, mas 
+    // precisamos saber se a assinatura de ELF é válida.
     // Assinatura ELF inválida. 
     // Vamos matar a thread e o processo.
+
+    Status = (int) fsCheckELFFile ( (unsigned long) Clone->Image );
     
-    if ( Status != 0 )
+    if ( Status < 0 )
     {
         // Kill thread.
         Clone->control->used = 0;
@@ -1021,7 +1020,7 @@ do_clone:
 
         // Kill process.
         Clone->used = 0;
-        Clone->magic = 0;            
+        Clone->magic = 0; 
         Clone = NULL;
 
         debug_print ("clone_and_execute_process: [FAIL] ELF fail \n");

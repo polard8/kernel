@@ -7,12 +7,16 @@
 #define ____GPA_H 1
 
 
-// primeiros 4 mb.
+
+// Primeiros 4 MB.
 #define SMALLSYSTEM_ORIGIN_ADDRESS   0
 #define MEDIUMSYSTEM_ORIGIN_ADDRESS  0
 #define LARGESYSTEM_ORIGIN_ADDRESS   0
 
 
+
+
+// ===================================================
 
 // #importante: PERIGO !!!
 // >>>> 0x1000
@@ -29,7 +33,10 @@
 // #OBS: Os endereços físico e virtual são iguais.
 // See: mm/x86/pages.c
 
-// #define CREATE_DIRECTORY_HEAP_BASE 0x1000
+#define  ____DANGER_TABLE_POINTER_HEAP_BASE    0x1000
+
+
+// ===================================================
 
 
 

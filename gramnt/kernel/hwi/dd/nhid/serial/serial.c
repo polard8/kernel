@@ -1,12 +1,14 @@
 /*
- * File: bottom/dd/serial/serial.c
+ * File: dd/nhid/serial/serial.c
  *
  * Credits: 
  *     Chicago OS. (Ítalo Lima Marconato Matias). 
- *    
+ *   
  *     2019 - Document created by Fred Nora.
  */
 
+// #remember:
+// We can connect some server to a serial port.
 
 #include <kernel.h>
 

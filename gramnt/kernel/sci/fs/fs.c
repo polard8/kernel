@@ -13,7 +13,7 @@
 // #todo
 // A tabela de montagem guarda relação com os volumes existentes.
 // Esses volumes podem ser de vários tipos.
-// See: syssm/storage/storage.c
+// See: storage/storage.c
 
  
 
@@ -137,37 +137,8 @@ struct inode_d *file_inode (file *f)
     if ( (void *)f==NULL ){
         return (struct inode_d *) 0;
     }
+
     return (struct inode_d *) f->inode;
-}
-
-
-
-// Get free slot.
-int fs_get_mounted_free_slot (void)
-{
-    return -1;
-}
-
-
-
-void fs_initialize_mounted_list(void)
-{
-	//
-}
-
-
-
-void fs_show_mounted(int i)
-{
-    //
-}
-
-
-
-//mostra a lista de volumes montados.
-void fs_show_mounted_list(void)
-{
-    //
 }
 
 
@@ -238,11 +209,6 @@ int fs_file_seek (file *f, int pos)
 */
 
 
-//Vari�veis internas.
-//int fsStatus;
-//int fsError;
-//...
-
 
 // #todo
 /*
@@ -267,6 +233,11 @@ int fs_count_separators( const char *path){
 */
 
 
+// Check the signature in a elf header.
+// OUT:
+// 0 = OK. #todo: Isso poderia ser '1'.
+// < 0 Means error.
+
 int fsCheckELFFile ( unsigned long address ){
 
     unsigned char *buffer = (unsigned char *) address;
@@ -278,23 +249,14 @@ int fsCheckELFFile ( unsigned long address ){
          buffer[3] != 0x46 )
     {
         printf ("fsCheckELFFile: Sig \n");
-        return 1;
+        return -1;
     }
 
-	// Continua...
-
+    // OK.
 
     return 0;
 }
 
-
-// Deprecated!
-int fsCheckPEFile ( unsigned long address )
-{
-    debug_print ("fsCheckPEFile: [Deprecated]\n");
-    printf      ("fsCheckPEFile: [Deprecated]\n");
-    return -1; 
-}
 
 
 /*
@@ -314,7 +276,8 @@ fsListFiles (
     int directory_id )
 {
 
-	// @todo: Checar mais limites.
+    // #todo: 
+    // Checar mais limites.
 
     if ( disk_id == -1 || volume_id == -1 || directory_id == -1 )
     {
@@ -369,7 +332,8 @@ int fsList ( const char *dir_name ){
         // usar o atual.
         dir_name = current_target_dir.name;
 
-        if ( (void *) dir_name == NULL ){
+        if ( (void *) dir_name == NULL )
+        {
             debug_print ("fsList: dir_name fail\n");
             return -1;
         }
@@ -584,14 +548,18 @@ void set_global_open_file ( void *file, int Index ){
 
 void fs_show_file_info (file *f)
 {
-    if ((void*)f==NULL){
+    if ((void*)f==NULL)
+    {
+        //??
         return;
     }{
-        if(f->used==1){
+        if (f->used==1)
+        {
             
-            if( (void*) f->_tmpfname != NULL )
+            if ( (void*) f->_tmpfname != NULL ){
                 printf ("Name={%s}\n",f->_tmpfname);
             //refresh_screen();
+            }
         }
     }; 
 }
@@ -617,15 +585,19 @@ void fs_show_file_table(void)
 
 void fs_show_inode_info (struct inode_d *i)
 {
-    if ((void*)i==NULL){
+    if ((void*)i==NULL)
+    {
+        //??
         return;
     }{
         
-        if(i->used==1){
-            
-            if( (void*)i->path != NULL )
+        if (i->used==1)
+        {
+    
+            if( (void*)i->path != NULL ){
                 printf ("Name={%s}\n",i->path);
             //refresh_screen();
+            }
         }
     }; 
 }
@@ -635,12 +607,16 @@ void fs_show_inode_table(void)
     int i=0;
     struct inode_d *inode;
 
+
     printf ("\ninode_table:\n");
     
-    for(i=0; i<32; i++){
+    for(i=0; i<32; i++)
+    {
         inode=(struct inode_d *)inode_table[i];
-        if( (void*)inode!=NULL )
+        
+        if ( (void*)inode!=NULL ){
             fs_show_inode_info(inode);
+        }
     };
 
     refresh_screen();
@@ -696,95 +672,6 @@ int get_free_slots_in_the_inode_table(void)
     return -1;
 }
 
-
-
-void fs_test_fat_vector (void)
-{
-    // Nothing for now.
-}
-
-
-unsigned long fs_get_fat_entry (unsigned long n)
-{
-    // Nothing for now.
-    return 0; 
-}
-
-
-void fs_set_fat_entry ( unsigned long n, unsigned long value )
-{
-    // Nothing for now.
-}
-
-
-
-void fs_set_entry ( unsigned long id, unsigned long eid )
-{
-    // Nothing for now.
-}
-
-
-void fs_get_entry ( unsigned long id, unsigned long eid )
-{
-    // Nothing for now.
-}
-
-
-void fs_show_dir_entry ( unsigned long id, unsigned long eid )
-{
-    // Nothing for now.
-}
-
-
-void fs_show_dir (unsigned long id)
-{
-    // Nothing for now.
-}
-
-
-unsigned long fs_check_cluster (unsigned long id)
-{
-    // Nothing for now.
-	return 0; 
-}
-
-
-/*
- * fs_check_fat:
- *     Check FAT. 
- */
-
-unsigned long fs_check_fat (void)
-{
-    // Nothing for now.
-	return 1; 
-}
-
-
-void fs_show_entry ( unsigned long id, unsigned long eid )
-{
-    // Nothing for now.
-}
-
-
-unsigned long 
-fs_get_entry_status ( 
-    unsigned long id, 
-    unsigned long eid )
-{
-    // Nothing for now.
-	return 0; 
-}
-
-
-void 
-fs_set_entry_status ( 
-    unsigned long id, 
-    unsigned long eid, 
-    unsigned long status )
-{
-    // Nothing for now.
-}
 
 
 /*
@@ -1473,16 +1360,19 @@ fail:
     return;
 }
 
+
 /*
  ********************************************************
  * fsInit:
- *     Inicializa o file system manager.
+ *     Initializes the fs support.
+ * 
  */
 
 
 // #todo
 // Essa funcao deve ter acesso as informacoes herdadas do boot.
 // Talvez uma estrutura de 'BootInfo'.
+
 
 int fsInit (void)
 {
@@ -1761,17 +1651,14 @@ int fat16Init (void){
  *****************************************
  * fsInitializeWorkingDiretoryString:
  *     Atualiza a string do diret�rio de trabalho.
- * Essa � a string que ser� mostrada antes do prompt.
+ * Essa eh a string que ser� mostrada antes do prompt.
  * 'pwd'> 
- * ?? isso deve sser todo o pathname do pwd ?? 
- * ex: root:/volume0>
  */
  
 void fsInitializeWorkingDiretoryString (void){
 
-    struct volume_d *v;
+    struct volume_d  *v;
 
-	// root:/volumeX
     char volume_string[8];   
 
 
@@ -1796,7 +1683,7 @@ void fsInitializeWorkingDiretoryString (void){
 
 	//'/'
 	// ## separador ##
-	strcat ( current_workingdiretory_string, FS_PATHNAME_SEPARATOR );
+    strcat ( current_workingdiretory_string, FS_PATHNAME_SEPARATOR );
 
 
 	//
@@ -1805,7 +1692,8 @@ void fsInitializeWorkingDiretoryString (void){
 
     v = (struct volume_d *) volumeList[current_volume];
 
-    if ( (void *) v == NULL ){
+    if ( (void *) v == NULL )
+    {
         panic ("fsInitializeWorkingDiretoryString: v\n");
 
     }else{
@@ -1830,7 +1718,7 @@ void fsInitializeWorkingDiretoryString (void){
 		        //fail.
 		        //printf("fsInitializeWorkingDiretoryString: default volume #todo\n");
 		        //die();
-			    current_volume_string = (char *) volume_string; 
+                current_volume_string = (char *) volume_string; 
                 break;
         };
 
@@ -1977,7 +1865,7 @@ int fs_print_process_pwd (int pid){
  
 void fsUpdateWorkingDiretoryString ( char *string ){
 
-    struct process_d *p;
+    struct process_d  *p;
     char *tmp;
     int i=0; 
 

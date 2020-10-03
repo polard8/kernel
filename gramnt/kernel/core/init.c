@@ -683,8 +683,7 @@ int init (void){
     // #test: Vamos tentar montar o volume root em mountedList[0].
     debug_print ("core-init: [FIXME] Initialize mounted list in fs.c\n");
 
-    // Inicializa a lista.
-    fs_initialize_mounted_list ();
+
         
 
 #ifdef EXECVE_VERBOSE

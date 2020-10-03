@@ -155,10 +155,12 @@ void *clone_kernel_page_directory (void){
 
 
 /*
+ ***********************************************************
  * initialize_frame_table:
- *     What is this?
+ *     Frame table to handle a pool of page frames.
  */
- 
+
+
 int initialize_frame_table (void){
 
     int i=0;
@@ -173,12 +175,12 @@ int initialize_frame_table (void){
     FT.frame_table = (unsigned char *) allocPages(FT.n_pages);
 
     if ((void *) FT.frame_table ==NULL){
-        panic("invalid FT.frame_table"); 
+        panic("initialize_frame_table: invalid FT.frame_table"); 
     }
 
     //#todo: limits
     if ( FT.frame_table_size_in_bytes == 0 ){
-        panic("frame_table_size_in_bytes");
+        panic("initialize_frame_table: frame_table_size_in_bytes");
     }
 
 
@@ -189,7 +191,7 @@ int initialize_frame_table (void){
 
 
     //#debug
-    printf ("table size in pages %d\n",FT.n_pages);
+    printf ("Table size in pages %d\n",FT.n_pages);
     printf ("Total frames %d\n",FT.total_frames);
     refresh_screen();
 
@@ -229,6 +231,7 @@ unsigned long get_new_frame (void){
 
 
 
+// ====================================================================
 
 // #importante: PERIGO !!!
 //#bugbug
@@ -248,7 +251,11 @@ unsigned long get_new_frame (void){
 // O limite ser� o in�cio da cga em modo texto.
 // See: gpa.h
 
-unsigned long table_pointer_heap_base = 0x1000;
+unsigned long table_pointer_heap_base = ____DANGER_TABLE_POINTER_HEAP_BASE;
+//unsigned long table_pointer_heap_base = 0x1000;
+
+// ====================================================================
+
 
 unsigned long get_table_pointer (void)
 {

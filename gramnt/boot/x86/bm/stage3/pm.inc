@@ -99,15 +99,15 @@ trampoline:
 
 pmFlushPipeline:
 
-    jmp stage2_CODE_SEL:pm32 
+    jmp stage2_CODE_SEL:pmFlush32 
 
-	;;
-	;; ## 32 BIT START ##
-	;;
+    ;;
+    ;; == 32 ===============================================
+    ;;
 
     [BITS 32]
 
-pm32:
+pmFlush32:
 
     ;debug em modo texto.
     ;mov byte [0B8000h], byte 'P'
@@ -116,14 +116,14 @@ pm32:
 	;;
 	;; ## Inicalizando modo de boot ##
 	;;
-	
+
 	; Salva o boot mode em um endereço de 32 bits.
 	; #bugbug: O bl foi zerado um pouco antes.
 	; Provavelmente podemos deletar isso.
 	; É preciso conferir se não usamos essa variável 
 	; logo a frente.
 
-	; Aqui estamos selecionando o modo '0'.
+    ; Aqui estamos selecionando o modo '0'.
     mov byte [BOOT.modo], bl
 
 	;;

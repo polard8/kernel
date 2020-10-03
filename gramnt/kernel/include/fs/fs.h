@@ -479,13 +479,6 @@ fsFAT16ListFiles (
    int number_of_entries );
 
 
-//MBR support.
-void fsCheckMbrFile ( unsigned char *buffer );
-
-//VBR support.
-void fsCheckVbrFile ( unsigned char *buffer );
-
-
 void fs_init_structures (void);
 
 void set_filesystem_type (int type);
@@ -513,11 +506,6 @@ void fs_init_fat (void);
 void fs_load_fat(void);
 
 
-unsigned long fs_get_fat_entry(unsigned long n);
-void fs_set_fat_entry(unsigned long n, unsigned long value);
-
-unsigned long fs_check_fat (void);
-void fs_test_fat_vector (void);
 
 
 //Load metafile.
@@ -648,20 +636,7 @@ fs_create_entry (
 
 
 void fs_create_name( char *name, unsigned long id,unsigned long eid);
-void fs_show_dir_entry(unsigned long id,unsigned long eid);
-void fs_show_dir(unsigned long id);
 
-void fs_set_entry(unsigned long id, unsigned long eid);
-void fs_get_entry(unsigned long id, unsigned long eid);
-
-
-/*
-int 
-fs_load_dir ( 
-    unsigned long address, 
-    unsigned long lba, 
-    unsigned long sectors );
-*/
 
 
 int
@@ -680,18 +655,10 @@ fs_save_file (
     char *file_address,
     char flag );  
 
-void 
-fs_set_entry_status ( 
-    unsigned long id, 
-    unsigned long eid, 
-    unsigned long status );
 
-
-unsigned long fs_get_entry_status(unsigned long id, unsigned long eid);
 void fs_delete_entry(unsigned long id, unsigned long eid);
 
 
-void fs_show_entry (unsigned long id, unsigned long eid);
 
 unsigned short fs_find_n_empty_entries ( int n);
 
@@ -699,8 +666,6 @@ unsigned short fs_find_n_empty_entries ( int n);
 // Encontrar uma entrada vazia na fat.
 unsigned short fs_find_empty_entry ( char *fat_address );
 
-
-unsigned long fs_check_cluster (unsigned long id);
 
 
 unsigned long 
@@ -748,19 +713,20 @@ void read_fntos (char *name);
 
   
 int fsCheckELFFile ( unsigned long address );
-int fsCheckPEFile( unsigned long address );
+
+// MBR support.
+void fsCheckMbrFile ( unsigned char *buffer );
+
+// VBR support.
+void fsCheckVbrFile ( unsigned char *buffer );
+
+
+
 int fsLoadFileFromCurrentTargetDir (void);
 void fsInitTargetDir (void);
 
 
 void fs_show_root_fs_info(void);
-
-
-int fs_get_mounted_free_slot(void);
-
-void fs_initialize_mounted_list(void);
-void fs_show_mounted(int i);
-void fs_show_mounted_list(void);
 
 
 
