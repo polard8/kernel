@@ -651,23 +651,31 @@ strtok(char *s, const char *delim)
 {
     static char *last;
 
-    return strtok_r(s, delim, &last);
+
+    return strtok_r (s, delim, &last);
 }
 
 
-
-
+// Duplicate a string.
 char *strdup (const char *str){
 
     char *copy;
     size_t len;
 
-	len = strlen(str) + 1;
-	
-	if (!(copy = (char *) kmalloc( ( size_t ) len ) ))
-		return (NULL);
-	memcpy (copy, str, len);
-	return (copy);
+
+    len = strlen(str) + 1;
+
+    // #todo:
+    //  simplify this thing.
+    if ( !(copy = (char *) kmalloc( ( size_t ) len ) ) )
+    {
+        return (NULL);
+    }
+
+    memcpy (copy, str, len);
+    
+// done.
+    return (char *) copy;
 }
 
 

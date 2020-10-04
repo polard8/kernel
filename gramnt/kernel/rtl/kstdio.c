@@ -131,17 +131,16 @@ file *k_fopen ( const char *filename, const char *mode ){
 
     Process = (void *) processList[current_process];
 
-    if ( (void *) Process == NULL ){
+    if ( (void *) Process == NULL )
+    {
         printf("k_fopen: Process\n");
-        refresh_screen();
-        return (file *) 0;
+        goto fail;
 
     }else{
 
         if ( Process->used != 1 || Process->magic != 1234 ){
             printf("k_fopen: Process validation\n");
-            refresh_screen();
-            return (file *) 0;
+            goto fail;
         }
         //ok
     };
@@ -156,11 +155,9 @@ file *k_fopen ( const char *filename, const char *mode ){
     if ( __slot == -1 )
     {
         printf ("k_fopen: No free slots\n");
-        refresh_screen();
-        return (file *) 0;
+        goto fail;
     }
 
-    
 
 	// #bugbug
 	// Estamos com problemas com a string de nome.
@@ -168,7 +165,7 @@ file *k_fopen ( const char *filename, const char *mode ){
 
 	// #debug
 	//printf ("before_read_fntos: %s\n", filename );
-	
+
     read_fntos ( (char *) filename );
 
 	// #debug
@@ -263,14 +260,24 @@ file *k_fopen ( const char *filename, const char *mode ){
         // #bugbug
         // We need to get the filename in the inode.
         
-        f->_tmpfname = (char *) filename;
+        // #bugbug
+        // We have PF with filename's pointer.
+        // Let's copy to a new string.
+        
+        //f->_tmpfname = (char *) filename;
+        f->_tmpfname = (char *) strdup(filename);
 
+        if ( (void *) f->_tmpfname == NULL ){
+            panic ("kfopen: _tmpfname");
+        }
 
-        f->_base = file_buffer;
-        f->_p = f->_base;
+        f->_base     = file_buffer;
+        f->_p        = file_buffer;
         f->_bf._base = file_buffer;
-        f->_lbfsize = s;             // File size.
-        f->_cnt = s;
+
+        f->_lbfsize  = s;
+        f->_cnt      = s;
+
         f->_r = 0;
         f->_w = 0;
 
