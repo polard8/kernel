@@ -35,8 +35,10 @@ int main ( int argc, char *argv[] ){
 
     printf ("fasm: Initializing ...\n");
     
+    
     // See:
     // fasm.asm
+    //
     // IN: 
     // It needs to be in: [esp+4] and [esp+8]
     

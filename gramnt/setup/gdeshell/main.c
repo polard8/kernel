@@ -2619,7 +2619,7 @@ do_compare:
     {
         printf ("t5: Saving a file\n");
         //shell_save_file ();  //local
-        gde_test_save_file("FILE1UM TXT");  //api
+        gde_test_save_file("FILE1UM TXT");  // See: libcore.
         printf ("t5: Done :)\n");
         goto exit_cmp;
     }

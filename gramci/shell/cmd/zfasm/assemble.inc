@@ -10,6 +10,7 @@ assembler:
 	mov	[resolver_flags],eax
 	mov	[number_of_sections],eax
 	mov	[actual_fixups_size],eax
+
       assembler_loop:
 	mov	eax,[labels_list]
 	mov	[tagged_blocks],eax

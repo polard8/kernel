@@ -301,6 +301,9 @@ fsSaveFile (
         goto fail;
     }
 
+    // #bugbug
+    // Esse endereço eh valido ?
+    
     printf ("name address = %x \n", &file_name );
 
     printf ("name    = %s \n", file_name ); 

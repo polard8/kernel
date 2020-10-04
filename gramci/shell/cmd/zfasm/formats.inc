@@ -3,12 +3,17 @@
 ; Copyright (c) 1999-2020, Tomasz Grysztar.
 ; All rights reserved.
 
+
+
+
 formatter:
-	mov	[current_offset],edi
-	cmp	[output_file],0
-	jne	output_path_ok
-	mov	esi,[input_file]
-	mov	edi,[free_additional_memory]
+
+    mov [current_offset], edi
+    cmp [output_file], 0
+    jne output_path_ok
+    mov esi, [input_file]
+    mov edi, [free_additional_memory]
+      
       duplicate_output_path:
 	lods	byte [esi]
 	cmp	edi,[structures_buffer]
@@ -53,18 +58,22 @@ formatter:
 	jnc	exe_extension
 	mov	eax,'.dll'
 	jmp	make_extension
+
       sys_extension:
-	mov	eax,'.sys'
-	jmp	make_extension
+    mov	eax,'.sys'
+    jmp	make_extension
+      
       efi_extension:
-	mov	eax,'.efi'
-	jmp	make_extension
+    mov eax, '.efi'
+    jmp make_extension
+      
       bin_extension:
-	mov	eax,'.bin'
-	bt	[format_flags],0
-	jnc	make_extension
-	mov	eax,'.com'
-	jmp	make_extension
+    mov eax, '.bin'
+    bt [format_flags], 0
+    jnc make_extension
+    mov eax, '.com'
+    jmp make_extension
+
       obj_extension:
 	mov	eax,'.obj'
 	jmp	make_extension
@@ -77,16 +86,19 @@ formatter:
 	jmp	make_extension
       exe_extension:
 	mov	eax,'.exe'
+    
+      ;; Make extension.
       make_extension:
-	xchg	eax,[edi]
-	scas	dword [edi]
-	mov	byte [edi],0
-	scas	byte [edi]
-	mov	esi,edi
-	stos	dword [edi]
-	sub	edi,9
-	xor	eax,eax
-	mov	ebx,characters
+    xchg eax, [edi]
+    scas dword [edi]
+    mov byte [edi], 0
+    scas byte [edi]
+    mov esi, edi
+    stos dword [edi]
+    sub edi, 9
+    xor eax, eax
+    mov ebx, characters
+      
       adapt_case:
 	mov	al,[esi]
 	or	al,al
@@ -102,6 +114,7 @@ formatter:
 	cmp	byte [edi],0
 	jne	adapt_case
 	jmp	extension_ok
+
       extension_specified:
 	mov	al,'.'
 	stos	byte [edi]
@@ -112,6 +125,8 @@ formatter:
 	test	al,al
 	jnz	copy_extension
 	dec	edi
+
+    ;;extension ok
       extension_ok:
 	mov	esi,edi
 	lea	ecx,[esi+1]
@@ -124,20 +139,24 @@ formatter:
 	inc	edi
 	mov	[structures_buffer],edi
 	mov	[output_file],edi
+
       output_path_ok:
-	cmp	[symbols_file],0
-	je	labels_table_ok
-	mov	ecx,[memory_end]
-	sub	ecx,[labels_list]
-	mov	edi,[tagged_blocks]
-	sub	edi,8
-	mov	[edi],ecx
-	or	dword [edi+4],-1
-	sub	edi,ecx
+    cmp [symbols_file], 0
+    je labels_table_ok
+    mov ecx, [memory_end]
+    sub ecx, [labels_list]
+    mov edi, [tagged_blocks]
+    sub edi, 8
+    mov [edi], ecx
+    or dword [edi+4], -1
+    sub edi, ecx
 	cmp	edi,[current_offset]
 	jbe	out_of_memory
 	mov	[tagged_blocks],edi
 	mov	esi,[memory_end]
+      
+      ;; Copy labels.
+      
       copy_labels:
 	sub	esi,32
 	cmp	esi,[labels_list]
@@ -146,6 +165,7 @@ formatter:
 	rep	movs dword [edi],[esi]
 	sub	esi,32
 	jmp	copy_labels
+
       labels_table_ok:
 	mov	edi,[current_offset]
 	cmp	[output_format],4
@@ -154,6 +174,7 @@ formatter:
 	jne	common_formatter
 	bt	[format_flags],0
 	jnc	elf_formatter
+
       common_formatter:
 	mov	eax,edi
 	sub	eax,[code_start]
@@ -161,42 +182,87 @@ formatter:
 	cmp	edi,[undefined_data_end]
 	jne	calculate_code_size
 	mov	edi,[undefined_data_start]
+
+    ;; Calculate size.
+
       calculate_code_size:
-	mov	[current_offset],edi
-	sub	edi,[code_start]
-	mov	[code_size],edi
-	and	[written_size],0
-	mov	edx,[output_file]
-	call	create
-	jc	write_failed
-	cmp	[output_format],3
-	jne	stub_written
-	mov	edx,[code_start]
-	mov	ecx,[stub_size]
-	sub	edx,ecx
-	add	[written_size],ecx
-	call	write
+    mov [current_offset], edi
+    sub edi, [code_start]
+    mov [code_size], edi
+    and [written_size], 0
+    mov	edx,[output_file]
+    
+    ;;
+    ;; create 
+    ;;
+    
+    ;; This is routine here in the fasm.
+    ;; See: system.inc
+    
+    call  create
+    jc write_failed
+
+
+    cmp [output_format], 3
+    jne stub_written
+
+    mov edx, [code_start]
+    mov ecx, [stub_size]
+    sub edx, ecx
+    add [written_size], ecx
+    
+    ;; 
+    ;; write
+    ;;
+    
+    call  write
+      
+      
       stub_written:
 	cmp	[output_format],2
 	jne	write_output
 	call	write_mz_header
+
+    ;; Write output.
+    ;; This is when we put the code into the file.
       write_output:
-	call	write_code
-      output_written:
-	call	close
-	cmp	[symbols_file],0
-	jne	dump_symbols
-	ret
+    call  write_code
+    
+    ;; Save file
+    
+    ;; Close.
+    ;; Well, the code is written into the file.
+    ;; Let's close to save the file.
+    ;; #bugbug: 
+    ;; This is not a good way to know the name of the file? hahaha
+    ;; What is the name of the file ??
+    ;; Probably fopen gave the name to the kernel.
+    ;; close will save the file but it will no touch the name.
+    ;; See: system.inc
+    
+       output_written:
+    call close
+
+
+    cmp [symbols_file], 0
+    jne dump_symbols
+    ret
+
+
+    ;; Write code.
+
       write_code:
-	mov	eax,[written_size]
-	mov	[headers_size],eax
-	mov	edx,[code_start]
-	mov	ecx,[code_size]
-	add	[written_size],ecx
-	lea	eax,[edx+ecx]
-	call	write
-	jc	write_failed
-	ret
+    mov eax, [written_size]
+    mov [headers_size], eax
+    mov edx, [code_start]
+    mov ecx, [code_size]
+    add [written_size], ecx
+    lea eax, [edx+ecx]
+    call  write
+    jc  write_failed
+    ret
+
+
 format_directive:
 	cmp	edi,[code_start]
 	jne	unexpected_instruction

@@ -64,7 +64,7 @@ _fasm_main:
 
 
     ;;
-    ;; Step 1
+    ;; == Step 1 ============================================
     ;;
 
     mov esi, __step1
@@ -75,7 +75,7 @@ _fasm_main:
 
 
     ;;
-    ;; Step 2
+    ;; == Step 2 ==============================================
     ;;
 
     mov esi, __step2
@@ -83,7 +83,7 @@ _fasm_main:
     call init_memory
 
     ;;
-    ;; Step 3
+    ;; == Step 3 ============================================
     ;;
 
     mov esi, __step3
@@ -92,19 +92,21 @@ _fasm_main:
     mov esi,_memory_prefix
     call display_string
 
-	mov	eax,[memory_end]
-	sub	eax,[memory_start]
-	add	eax,[additional_memory_end]
-	sub	eax,[additional_memory]
-	shr	eax,10
-	call	display_number
 
+    mov eax, [memory_end]
+    sub eax, [memory_start]
+    add eax, [additional_memory_end]
+    sub eax, [additional_memory]
+    shr eax, 10
+    call  display_number
+
+    ;; message
     mov esi,_memory_suffix
     call display_string
 
 
     ;;
-    ;; Step 4
+    ;; == Step 4 ==============================================
     ;;
 
     mov esi, __step4
@@ -115,7 +117,7 @@ _fasm_main:
 
 
     ;;
-    ;; Step 5
+    ;; == Step 5 ================================================
     ;;
 
     ;; #bugbug
@@ -139,7 +141,7 @@ _fasm_main:
     or [preprocessing_done], -1
 
     ;;
-    ;; Parser.
+    ;; == Parser. step 6 ==========================================
     ;;
 
     mov esi, __step6
@@ -147,34 +149,41 @@ _fasm_main:
     call parser
 
     ;;
-    ;; Assembler.
+    ;; == Assembler. step 7 =======================================
     ;;
 
     mov esi, __step7
     call display_string
+
     call assembler
     
     ;;
-    ;; Formater.
+    ;; == Formater. step 8 ==========================================
     ;;
     
     mov esi, __step8
     call display_string
+
     call formatter
 
 
+    ;; Display user messages.
     call display_user_messages
 
-    movzx	eax,[current_pass]
+
+    movzx  eax, [current_pass]
     inc eax
     call display_number
 
-    mov	esi,_passes_suffix
-    call	display_string
-	
+
+    mov esi, _passes_suffix
+    call  display_string
+
+    ;; time of the day.
 
     ccall _gettimeofday,buffer,0
-	mov	eax,dword [buffer]
+
+    mov	eax,dword [buffer]
 	mov	ecx,1000
 	mul	ecx
 	mov	ebx,eax
@@ -199,21 +208,30 @@ _fasm_main:
 	call	display_character
 	pop	eax
 	call	display_number
+	
 	mov	esi,_seconds_suffix
 	call	display_string
-      display_bytes_count:
+    
+    display_bytes_count:
 	mov	eax,[written_size]
 	call	display_number
 	mov	esi,_bytes_suffix
 	call	display_string
-	xor	al,al
-	jmp	exit_program
+
+    ;; exit.
+    
+    xor al, al
+    jmp exit_program
+
+
+;; Information.
 
 information:
-	mov	esi,_usage
-	call	display_string
-	mov	al,1
-	jmp	exit_program
+    mov esi, _usage
+    call display_string
+    mov al, 1
+    jmp exit_program
+
 
 get_params:
 	mov	[input_file],0

@@ -44,15 +44,26 @@ allocate_memory:
 	mov	[memory_start],eax
 	ret
 
+
+
+;;
+;; ===========================================================
+;; Exit program
+;;
+
 exit_program:
-	movzx	eax,al
-	push	eax
+
+    movzx	eax,al
+
+    push eax
     ccall _free,[additional_memory]
-	pop	eax
-	ccall	_exit,eax
-    mov	esp,[stack_frame]
-    pop	ebp
+    pop eax
+    ccall _exit,eax
+    mov esp, [stack_frame]
+    
+    pop ebp
     ret
+
 
 ;;
 ;; Get environment variable.
@@ -112,22 +123,51 @@ adapt_path:
 	stos	byte [edi]
 	or	al,al
 	jnz	copy_path
-	cmp	edi,buffer+1000h
-	ja	out_of_memory
-	ret
+
+    cmp edi, buffer+1000h
+    ja out_of_memory
+    ret
+
+
+;;
+;; ============================================================
+;; create
+;;     It call fopen to create a file.
+;;     fopen will create a file if a file is not found ?
+;;
+
+;; Called by formatter in formats.inc
+
 create:
-	push	esi edi ebp
-	call	adapt_path
-	ccall	_fopen,buffer,create_mode
-	pop	ebp edi esi
-	or	eax,eax
-	jz	file_error
-	mov	ebx,eax
-	clc
-	ret
+
+
+    push  esi  edi  ebp
+    call  adapt_path
+    ccall  _fopen,buffer,create_mode
+    pop ebp  edi  esi
+
+    or eax, eax
+    jz file_error
+
+    mov ebx, eax
+    clc
+    ret
+
+
+;;
+;; ============================================================
+;; close
+;;
+
 close:
 	ccall	_fclose,ebx
 	ret
+
+;;
+;; ============================================================
+;; read
+;;
+
 read:
 	push	ebx ecx edx esi edi ebp
 	ccall	_fread,edx,1,ecx,ebx
@@ -139,14 +179,33 @@ read:
     file_error:
 	stc
 	ret
+
+
+;;
+;; ============================================================
+;; write
+;;
+;;   It calls fwrite.
+
+;; Called by formatter in formats.inc
+
 write:
-	push	ebx ecx edx esi edi ebp
-	ccall	_fwrite,edx,1,ecx,ebx
-	pop	ebp edi esi edx ecx ebx
-	cmp	eax,ecx
-	jne	file_error
-	clc
-	ret
+
+    push ebx ecx edx esi edi ebp
+    ccall _fwrite,edx,1,ecx,ebx
+    pop ebp edi esi edx ecx ebx
+    cmp eax,ecx
+    jne file_error
+    clc
+    ret
+
+
+;;
+;; ============================================================
+;; lseek
+;;
+
+
 lseek:
 	push	ebx
 	movzx	eax,al
@@ -162,6 +221,15 @@ lseek:
 	pop	ebx
 	stc
 	ret
+
+
+
+
+
+;;
+;; ============================================================
+;; display_string
+;;
 
 display_string:
 	lodsb
@@ -209,6 +277,12 @@ display_number:
 	pop	ebx
 	ret
 
+
+;;
+;; ============================================================
+;; display_user_messages
+;;
+
 display_user_messages:
 	mov	[displayed_count],0
 	call	show_display_buffer
@@ -233,7 +307,13 @@ display_block:
 	pop	esi ecx
 	loop	display_characters
       block_displayed:
-	ret
+    ret
+
+;;
+;; ============================================================
+;; fatal_error
+;;
+
 
 fatal_error:
 	mov	[con_handle],2
@@ -421,13 +501,21 @@ make_timestamp:
     ret
 
 
-open_mode   db 'r',0
-create_mode db 'w',0
 
+;;
+;; ======================================================
+;;
 
-error_prefix db 'error: ',0
-error_suffix db '.'
+open_mode     db 'r',0
+create_mode   db 'w',0
+error_prefix  db 'error: ',0
+error_suffix  db '.'
 lf db 0xA,0
-line_number_start db ' [',0
-line_data_start db ':',0xA,0
+line_number_start  db ' [',0
+line_data_start    db ':',0xA,0
 preprocessed_instruction_prefix db 'processed: ',0
+
+
+
+
+

@@ -1821,44 +1821,47 @@ gde_save_file (
 	// 512*4 = 2048  (4 setores) 2KB
 	// Se a quantidade de bytes for '0'. ???
 
-int gde_test_save_file(char *file_name){
 
-    int Ret;
+int gde_test_save_file (char *file_name){
 
-    char file_1[] = "gde_test_save_file: Arquivo \n escrito \n em \n user mode. \n";
-	//char file_1_name[] = "FILE1UM TXT";
+    int Ret=0;
 
     char *file_1_name;
+    char file_1[] = "gde_test_save_file: Arquivo \n escrito \n em \n user mode. \n";
+    
+    unsigned long number_of_sectors = 0;
+    size_t len = 0;
+    
+
+
+    printf ("gde_test_save_file: Saving a file ...\n");
     
     file_1_name = file_name;
 
-    unsigned long number_of_sectors = 0;
-    size_t len = 0;
 
-    printf ("gde_test_save_file: Salvando um arquivo ...\n");
 
-	//
-	// Lenght in bytes.
-	//
-	
+    // Lenght in bytes.
+    
     len = (size_t) strlen (file_1);
 
     if (len <= 0){
         printf ("gde_test_save_file:  Fail. Empty file.\n");
         return (int) 1;
+        //return (int) -1;
     }
 
     if (len > 2048){
         printf ("gde_test_save_file:  Limit Fail. The  file is too long.\n");
         return (int) 1;
+        //return (int) -1;
     }
 
     //
     // Number os sectors.
     //
-	
-	number_of_sectors = (unsigned long) ( len / 512 );
-	
+
+    number_of_sectors = (unsigned long) ( len / 512 );
+
     if ( len > 0 && len < 512 )
     {
         number_of_sectors = 1; 
@@ -1868,25 +1871,32 @@ int gde_test_save_file(char *file_name){
     {
         printf ("gde_test_save_file:  Limit Fail. (0) sectors so save.\n");
         return (int) 1;
+        //return (int) -1;
     }
 
 	//limite de teste.
 	//Se tivermos que salvar mais que 4 setores.
     if ( number_of_sectors > 4 )
     {
-	    printf ("gde_test_save_file:  Limit Fail. (%d) sectors so save.\n",
-		    number_of_sectors );
+        printf ("gde_test_save_file:  Limit Fail. (%d) sectors so save.\n",
+            number_of_sectors );
         return (int) 1;
+        //return (int) -1;
     }
-	
-	
-    Ret = (int) gde_save_file ( file_1_name,  // name 
-                    number_of_sectors,      // number of sectors.
-                    len,                    // size in bytes
-                    file_1,                 // address
-                    0x20 );                 // flag
 
-	//if (Ret == 0)
+    // Save!
+
+    Ret = (int) gde_save_file ( 
+                    file_1_name,        // name 
+                    number_of_sectors,  // number of sectors.
+                    len,                // size in bytes
+                    file_1,             // address
+                    0x20 );             // flag ??
+
+
+    //if (Ret == 0)
+    //    printf ("gde_test_save_file: fail\n");
+
 
     printf ("gde_test_save_file: done\n");
 
