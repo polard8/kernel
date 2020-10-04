@@ -357,25 +357,30 @@ void gde_init_background (void)
  *     Types=[1~5]
  *     @todo: Devemos considerar o retorno? E se a chamada falhar?
  */
- 
-// deprecated
- 
-int __mb_current_button; 
 
+// #todo
+// It can be usefull in the setup environment.
 // #todo: 
 // usar get system metrics
-	
-int gde_message_box ( int type, char *string1, char *string2 ){
 
-    int Response = 0;
-    int running = 1;          // Loop.
+int __mb_current_button; 
+
+int 
+gde_message_box ( 
+    int type, 
+    char *string1, 
+    char *string2 )
+{
+
     struct window_d *hWnd;    // Window.
+    int Response = 0;
 
-	// x and y
-	// #todo 
-	// centralizado: metade | um terço.
-	// #todo: 
-	// Pegar a métrica do dispositivo.
+    int running = 1;          // Loop.
+
+
+    //#todo
+    //unsigned long deviceWidth  = gde_get_system_metrics(?); 
+    //unsigned long deviceHeight = gde_get_system_metrics(?);
 
     unsigned long x  = (unsigned long) 10;       //deslocamento x
     unsigned long y  = (unsigned long) 300;      //deslocamento y
@@ -384,18 +389,17 @@ int gde_message_box ( int type, char *string1, char *string2 ){
 
     int Button = 0;
 
-    unsigned long WindowClientAreaColor;
-    unsigned long WindowColor;
+    // Colors;
+    unsigned long WindowClientAreaColor=0;
+    unsigned long WindowColor=0;
 
-	//
-	// Colors.
-	//
 
+    // Colors.
     WindowClientAreaColor = xCOLOR_GRAY3;   
-    WindowColor = COLOR_TERMINAL2;  
+    WindowColor = COLOR_TERMINAL2; 
 
 
-    //seleciona o botão 1. first responder;
+    // Seleciona o botão 1. first responder;
     __mb_current_button = 1;
     first_responder = messagebox_button1;
 
@@ -408,26 +412,33 @@ int gde_message_box ( int type, char *string1, char *string2 ){
 		//return -1;
 
 
-    switch (type)
-    {
+    // ??
+    // Qual eh o tipo de message box.
+    switch (type){
+
+        // fail
         case 1:
         case 2:
+            printf ("message box type not supported\n");
             return (int) -1;
             break;
 
+        // ok
         case 3:
             goto do_create_messagebox_3;
             break;
 
+        // fail
         case 4:
         default:
+            printf ("message box type not supported\n");
             return (int) -1;
             break;
     };
 
 
 //
-// Create Window.
+// == Create Window ==============================================
 //
 
 do_create_messagebox_3:
@@ -441,8 +452,7 @@ do_create_messagebox_3:
     gde_enter_critical_section ();
     
     hWnd = (void *) gde_create_window ( WT_OVERLAPPED, 1, 1, string1, 
-                        x, y, 
-                        cx, cy, 
+                        x, y, cx, cy, 
                         NULL, 0, 
                         WindowClientAreaColor, WindowColor );
 
@@ -540,29 +550,25 @@ do_create_messagebox_3:
     // apiShowWindow (hWnd);
 
 
-	//
-	//  ==== Loop ====
-	//
 
 
+//
+// == Message loop ===============================================
+//
 
-	// loop support
-	unsigned long message_buffer[5];
-
+    // buffer.
+    unsigned long message_buffer[5];
     message_buffer[0] = 0;
     message_buffer[1] = 0;
     message_buffer[3] = 0;
     message_buffer[4] = 0;
 
-
-
 Mainloop:
 
-    while (running)
-    {
+    while (running){
 
         //++
-        gde_enter_critical_section ();
+        gde_enter_critical_section();
         system_call ( 111, 
             (unsigned long) &message_buffer[0],
             (unsigned long) &message_buffer[0], 
@@ -570,20 +576,19 @@ Mainloop:
         gde_exit_critical_section();
         //--
 
-
         if ( message_buffer[1] != 0 )
         {
-            Response = (int) mbProcedure ( (struct window_d *) message_buffer[0], 
+            Response = (int) mbProcedure ( 
+                                 (struct window_d *) message_buffer[0], 
                                  (int) message_buffer[1], 
                                  (unsigned long) message_buffer[2], 
                                  (unsigned long) message_buffer[3] );
 
             // Temos uma resposta.
-            if (Response > 100)
-            {
-                printf ("Response=%d \n", Response );
+            if (Response > 100){
+                printf ("Response = %d \n", Response );
                 goto exit_messagebox;
-            };
+            }
 
             message_buffer[0] = 0;
             message_buffer[1] = 0;
@@ -592,10 +597,7 @@ Mainloop:
         };
     };
 
-
-//
-// Exit.
-//
+// Exit message box.
 
 exit_messagebox:
 
@@ -604,7 +606,6 @@ exit_messagebox:
 
     return (int) Response;
 }
-
 
 
 /*

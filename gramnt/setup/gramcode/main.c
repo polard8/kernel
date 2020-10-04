@@ -82,13 +82,17 @@ __SendMessageToProcess (
 
 
 /*
+ * editorClearScreen:
  * Limpar a tela 
  * #todo: poderemos limpara a tela do mesmo modo que o shell faz.    
  */
 
 void editorClearScreen (void){
-	
-	int lin, col;    
+
+
+    int lin=0; 
+    int col=0;
+
 
 	// @todo:
 	//system( "cls" ); // calls the cls command.
@@ -726,13 +730,12 @@ int main ( int argc, char *argv[] ){
     
     FILE *fp;
 
-    int ch;
-    int ch_test;    
+    int ch=0;
+    int ch_test=0;    
     int char_count = 0;
 
 
 
-	
 	//
 	// Atenção: saltando ...
 	//

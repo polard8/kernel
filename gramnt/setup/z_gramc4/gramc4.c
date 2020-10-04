@@ -17,6 +17,8 @@
 // Written by Robert Swierczek
 
 
+// fetch, decode and execute instructions.
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <memory.h>
