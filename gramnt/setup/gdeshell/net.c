@@ -65,16 +65,19 @@ unsigned char host_mac_address[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
 void 
 __SendARP ( 
-    uint8_t source_ip[4], 
-    uint8_t target_ip[4], 
-    uint8_t target_mac[6] )
+    uint8_t src_ip[4], 
+    uint8_t dst_ip[4],
+    uint8_t src_mac[6], 
+    uint8_t dst_mac[6] )
 {
 
     struct gdeshell_ether_header  *eh;
     struct gdeshell_ether_arp     *h;  
 
     int i=0;
-      
+    
+    
+    
     //==============================================
     // # ethernet header #
     //
@@ -96,8 +99,8 @@ __SendARP (
 
         for( i=0; i<6; i++)
         {
-            //eh->src[i] = currentNIC->mac_address[i];    // source
-            eh->dst[i] = target_mac[i];                 // dest. 
+            eh->src[i] = src_mac[i];     // src mac 
+            eh->dst[i] = dst_mac[i];     // dst mac
         };
 
         eh->type = (uint16_t) ToNetByteOrder16(ETH_TYPE_ARP);
@@ -143,9 +146,10 @@ __SendARP (
 		// O endereço mac de destino foi passado via argumento.
 
        //#todo: pegar o mec do host.
-        for ( i=0; i<6; i++ ){
-            h->arp_sha[i] = host_mac_address[i];
-            h->arp_tha[i] = target_mac[i]; 
+        for ( i=0; i<6; i++ )
+        {
+            h->arp_sha[i] = src_mac[i];
+            h->arp_tha[i] = dst_mac[i]; 
         };
 
 
@@ -156,9 +160,10 @@ __SendARP (
 		// target ip
 		// Os endereços foram passados via argumento.
 
-        for ( i=0; i<4; i++ ){
-            h->arp_spa[i] = source_ip[i]; 
-            h->arp_tpa[i] = target_ip[i]; 
+        for ( i=0; i<4; i++ )
+        {
+            h->arp_spa[i] = src_ip[i]; 
+            h->arp_tpa[i] = dst_ip[i]; 
         };
 
         //...
@@ -173,13 +178,16 @@ __SendARP (
     printf ("type={%x} proto={%x} hlen={%d} plen={%d} op={%x} \n", 
         h->type, h->proto, h->hlen, h->plen, h->op );
 
+    // sender
     printf ("\n sender: mac ");
     for( i=0; i<6; i++){ printf("%x ",h->arp_sha[i]); }
-    printf("\n sender: ip ");
+    printf ("\n sender: ip ");
     for( i=0; i<4; i++){ printf("%d ",h->arp_spa[i]); }
-    printf("\n target: mac ");
+    
+    // target
+    printf ("\n target: mac ");
     for( i=0; i<6; i++){ printf("%x ",h->arp_tha[i]); }
-    printf("\n target: ip ");
+    printf ("\n target: ip ");
     for( i=0; i<4; i++){ printf("%d ",h->arp_tpa[i]); }
     printf ("\n\n");
 
@@ -247,7 +255,7 @@ void __shellTestARP (void){
     uint8_t source_ip_address[4];
     source_ip_address[0] = 192;
     source_ip_address[1] = 168;
-    source_ip_address[2] = 1;   
+    source_ip_address[2] = 1;
     source_ip_address[3] = 112; 
 
     // Target.
@@ -255,22 +263,31 @@ void __shellTestARP (void){
     target_ip_address[0] = 192;
     target_ip_address[1] = 168;
     target_ip_address[2] = 1; 
-    target_ip_address[3] = 1; //111; 
+    target_ip_address[3] = 100;
+
+    // sorce mac #bugbug
+    uint8_t source_mac_address[6];
+    source_mac_address[0] = 0x00;
+    source_mac_address[1] = 0x00;
+    source_mac_address[2] = 0x00;
+    source_mac_address[3] = 0x00;
+    source_mac_address[4] = 0x00;
+    source_mac_address[5] = 0x00;
 
     // Broadcast.
-	uint8_t target_mac_address[6];
-	target_mac_address[0] = 0xFF;
-	target_mac_address[1] = 0xFF;
-	target_mac_address[2] = 0xFF;
-	target_mac_address[3] = 0xFF;
-	target_mac_address[4] = 0xFF;
-	target_mac_address[5] = 0xFF;
+    uint8_t target_mac_address[6];
+    target_mac_address[0] = 0xFF;
+    target_mac_address[1] = 0xFF;
+    target_mac_address[2] = 0xFF;
+    target_mac_address[3] = 0xFF;
+    target_mac_address[4] = 0xFF;
+    target_mac_address[5] = 0xFF;
 
-
-   __SendARP ( source_ip_address, 
-       target_ip_address, target_mac_address );
+   //#bugbug
+   __SendARP ( 
+       source_ip_address, target_ip_address, 
+       source_mac_address, target_mac_address );
 }
-
 
 
 void network_initialize (void)
@@ -278,8 +295,11 @@ void network_initialize (void)
     debug_print("network_initialize:\n");
     printf     ("network_initialize: Initializing the ring0 network manager...\n");
     gramado_system_call (968,0,0,0);
-}
 
+    debug_print("network_initialize: Sending arp\n");
+    printf     ("network_initialize: Sending arp\n");
+    __shellTestARP();
+}
 
 
 
@@ -326,6 +346,40 @@ print_ethernet_header (
     // ARP, IP ... ?
     printf ("   |-Protocol            : %u \n",
         (unsigned short)eth->type);
+}
+
+
+void print_arp_header ( char *Buffer )
+{
+    int i=0;
+    
+    
+    
+    struct gdeshell_ether_arp *h = (struct gdeshell_ether_arp *) (Buffer + ETHERNET_HEADER_LENGHT);
+    
+    //==================================
+    // #debug
+    // show arp
+
+    printf ("\n\n");
+    printf ("[arp]\n\n");
+    printf ("type={%x} proto={%x} hlen={%d} plen={%d} op={%x} \n", 
+        h->type, h->proto, h->hlen, h->plen, h->op );
+
+    // sender
+    printf ("\n sender: mac ");
+    for( i=0; i<6; i++){ printf("%x ",h->arp_sha[i]); }
+    printf ("\n sender: ip ");
+    for( i=0; i<4; i++){ printf("%d ",h->arp_spa[i]); }
+    
+    // target
+    printf ("\n target: mac ");
+    for( i=0; i<6; i++){ printf("%x ",h->arp_tha[i]); }
+    printf ("\n target: ip ");
+    for( i=0; i<4; i++){ printf("%d ",h->arp_tpa[i]); }
+    printf ("\n\n");
+
+    //==================================
 }
 
 
@@ -377,7 +431,6 @@ gdeshell_decode_buffer ( unsigned long buffer_address )
         return -1;
 
     }else{
-
 
         //
         // Print
@@ -437,6 +490,7 @@ gdeshell_decode_buffer ( unsigned long buffer_address )
         //fazermos tudo aqui. kkk.
         case 0x0806:
             printf ("[0x0806]: ARP received\n");
+            print_arp_header ((char *)buffer_address);
             //refresh_screen ();
                    
             //printf("\nARP ");

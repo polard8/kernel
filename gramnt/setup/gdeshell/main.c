@@ -2304,6 +2304,7 @@ do_compare:
     // network
     // Initialize ring0 network support.
     // Reading the buffers sended by the kernel.
+    // See: net.c
     if ( gramado_strncmp( prompt, "network", 7 ) == 0 )
     {
         network_initialize();
