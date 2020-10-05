@@ -523,18 +523,21 @@ char *inet_ntoa ( struct in_addr in )
     return (char *) 0;
 }
 
+
 /*
  * Formulate an Internet address from network + host.  Used in
  * building addresses stored in the ifnet structure.
  */
+ 
 struct in_addr
 inet_makeaddr(in_addr_t net, in_addr_t host)
 {
     
-	in_addr_t addr;
-	struct in_addr ret;
+    in_addr_t addr;
+    struct in_addr ret;
 
     printf("inet_makeaddr: [BUGBUG] Not implemented!\n");
+
 
 	/*
 	if (net < 128)
@@ -547,8 +550,8 @@ inet_makeaddr(in_addr_t net, in_addr_t host)
 		addr = net | host;
 	ret.s_addr = htonl(addr);
 	*/
-	
-	return ret;
+
+    return ret;
 }
 
 

@@ -1726,8 +1726,14 @@ int get_current_keyboard_responder (void)
     // o aplicativo pegar.
 
 
-void *__do_35 ( unsigned long buffer ){
+void *__do_35 ( unsigned long buffer )
+{
 
+    panic ("__do_32: #todo");
+
+    return NULL;
+
+    /*
     unsigned long *message_address = (unsigned long *) buffer;
     
     unsigned char SC=0;
@@ -1829,6 +1835,8 @@ void *__do_35 ( unsigned long buffer ){
         t->newmessageFlag = 0;    
         return (void *) 1;    
     };
+    
+    */
 }
 
 

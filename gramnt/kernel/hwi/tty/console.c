@@ -146,7 +146,9 @@ void __local_insert_line (int console_number)
     oldbottom = TTY[console_number].cursor_bottom;
 
     TTY[console_number].cursor_top    = TTY[console_number].cursor_y;
-    TTY[console_number].cursor_bottom = TTY[console_number].cursor_bottom;
+    
+    //#bugbug: apontando par asi mesmo.
+    //TTY[console_number].cursor_bottom = TTY[console_number].cursor_bottom;
 
     //if (console_number<0)
         //return;
@@ -192,7 +194,9 @@ void __local_delete_line(int console_number)
 
 
     TTY[console_number].cursor_top    = TTY[console_number].cursor_y;
-    TTY[console_number].cursor_bottom = TTY[console_number].cursor_bottom;
+    
+    //#bugbug: apontando para si mesmo.
+    //TTY[console_number].cursor_bottom = TTY[console_number].cursor_bottom;
 
     //#todo
 	//scrup();

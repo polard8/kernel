@@ -2879,6 +2879,9 @@ void *gde_133 (
     unsigned long arg3, 
     unsigned long arg4 )
 {
+    debug_print("gde_133: [TODO]\n");
+    
+	/*
     void *ret;
 
 
@@ -2892,6 +2895,7 @@ void *gde_133 (
     restore_current_context ();
 
     return (void *) ret; 
+    */
 }
 
 

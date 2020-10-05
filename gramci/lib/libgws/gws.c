@@ -2113,7 +2113,7 @@ struct gws_menu_item_d *gws_create_menu_item (
     int id,
     struct gws_menu_d *menu)
 {
-    int window; //menu item window
+    int window=0;    //menu item window
     
     struct gws_menu_item_d *item;
     

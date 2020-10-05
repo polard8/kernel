@@ -502,7 +502,11 @@ unsigned long init_testing_memory_size (int mb)
         
         //printf ("coloca \n");
         //refresh_screen();
-                    
+         
+         
+         // #bugbug
+         // cuidado com ponteiro nulo.
+         
         //coloca.
         BASE[offset +0] = 0xAA;  //1
         BASE[offset +1] = 0x55;  //2

@@ -43,7 +43,6 @@ inflate_rect (
     
     rect->left   -= cx;
     rect->top    -= cy;
-
     rect->right  += cx;
     rect->bottom += cy;
 
@@ -65,17 +64,19 @@ copy_inflate_rect (
     if ( (void*) rectSrc == NULL )
         return;
     
-    rectDest = rectSrc->left   -= cx;
-    rectDest = rectSrc->top    -= cy;
     
-    rectDest = rectSrc->right  += cx;
-    rectDest = rectSrc->bottom += cy;
+    // inflate and copy.
+    // todo: fazer isso em duas etapas.
+    rectDest->left   = rectSrc->left   -= cx;
+    rectDest->top    = rectSrc->top    -= cy;
+    rectDest->right  = rectSrc->right  += cx;
+    rectDest->bottom = rectSrc->bottom += cy;
 
+    //update width and height
+    rectSrc->width   = (rectSrc->right   - rectSrc->left);
+    rectSrc->height  = (rectSrc->bottom  - rectSrc->top);
     rectDest->width  = (rectDest->right  - rectDest->left);
     rectDest->height = (rectDest->bottom - rectDest->top);
-
-    rectSrc->width  = (rectSrc->right  - rectSrc->left);
-    rectSrc->height = (rectSrc->bottom - rectSrc->top);
 }
 
 
@@ -88,12 +89,13 @@ offset_rect (
     if ( (void*) rect == NULL )
         return;
     
+    //offset rect
     rect->left   += cx;
     rect->top    += cy;
-    
     rect->right  += cx;
     rect->bottom += cy;
 
+    //update width and height
     rect->width  = (rect->right  - rect->left);
     rect->height = (rect->bottom - rect->top);
 }
@@ -112,14 +114,17 @@ copy_offset_rect (
     if ( (void*) rectSrc == NULL )
         return;
     
-    rectDest = rectSrc->left   += cx;
-    rectDest = rectSrc->top    += cy;
-    
-    rectDest = rectSrc->right  += cx;
-    rectDest = rectSrc->bottom += cy;
+    // offset and copy the rect.
+    rectDest->left   = rectSrc->left   += cx;
+    rectDest->top    = rectSrc->top    += cy;
+    rectDest->right  = rectSrc->right  += cx;
+    rectDest->bottom = rectSrc->bottom += cy;
 
-    rectSrc->width  = (rectSrc->right  - rectSrc->left);
-    rectSrc->height = (rectSrc->bottom - rectSrc->top);
+    //update width and height,
+    rectSrc->width   = (rectSrc->right  - rectSrc->left);
+    rectSrc->height  = (rectSrc->bottom - rectSrc->top);
+    rectDest->width  = (rectDest->right  - rectDest->left);
+    rectDest->height = (rectDest->bottom - rectDest->top);
 }
 
 
