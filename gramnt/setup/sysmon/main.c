@@ -382,7 +382,7 @@ int main ( int argc, char *argv[] ){
     int char_count = 0;
 
 
-    unsigned long deviceWidth  = gde_get_system_metrics(1); 
+    unsigned long deviceWidth  = gde_get_system_metrics(1);
     unsigned long deviceHeight = gde_get_system_metrics(2);
     
     unsigned long left=0;

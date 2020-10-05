@@ -231,13 +231,10 @@ gde_system_procedure (
 {
 
     unsigned long message_buffer[5]; 
-
-
     message_buffer[0] = (unsigned long) window; 
     message_buffer[1] = (unsigned long) msg;
     message_buffer[2] = (unsigned long) long1;
     message_buffer[3] = (unsigned long) long2;
-    
     
     if ( (void *) window == NULL ){ return NULL; }
 
@@ -309,10 +306,10 @@ int gde_load_path ( char *path, unsigned long buffer, unsigned long buffer_len )
 {
     int status = -1;
     
-     status = (int) gramado_system_call ( 4004, 
-                        (unsigned long) path, 
-                        (unsigned long) buffer, 
-                        (unsigned long) buffer_len );
+    status = (int) gramado_system_call ( 4004, 
+                       (unsigned long) path, 
+                       (unsigned long) buffer, 
+                       (unsigned long) buffer_len );
 
     return (int) status;
 }
@@ -869,25 +866,26 @@ int gde_dialog_box ( int type, char *string1, char *string2 ){
     unsigned long cx = (unsigned long) (800/2);  //largura   
     unsigned long cy = (unsigned long) (600/3);  //altura
 
-    int Button = 0;	
+    int Button = 0;
 
-    unsigned long WindowClientAreaColor;
-    unsigned long WindowColor;
+    // Color
+    unsigned long WindowClientAreaColor=0;
+    unsigned long WindowColor=0;
 
+    WindowClientAreaColor = COLOR_YELLOW;
+    WindowColor           = COLOR_PINK;
 
     gde_debug_print ("gde_dialog_box: [DEPRECATED]\n");
 
 
-	WindowClientAreaColor = COLOR_YELLOW;
-	WindowColor = COLOR_PINK;	
+    // Obs: 
+    // Por enquanto para todos os tipos de messagebox 
+    // estamos usando o mesmo tipo de janela.
+    
+    switch (type){
 
-
-	//Obs: Por enquanto para todos os tipos de messagebox 
-	// estamos usando o mesmo tipo de janela.
-    switch (type)
-    {	
 	    // Com botão, considera o título.
-	    case 1:
+        case 1:
 
             gde_begin_paint();
             Button = 1;
@@ -996,24 +994,25 @@ int gde_dialog_box ( int type, char *string1, char *string2 ){
 	//==================================
 	// loop support;
 	//
-	
-	unsigned long message_buffer[5];
 
+    unsigned long message_buffer[5];
     message_buffer[0] = 0;
     message_buffer[1] = 0;
     message_buffer[3] = 0;
     message_buffer[4] = 0;
 
 Mainloop:
-	
-	while (running)
-	{
-		gde_enter_critical_section ();
-		system_call ( 111, (unsigned long)&message_buffer[0],
-			(unsigned long)&message_buffer[0], 
-			(unsigned long)&message_buffer[0] );
+
+    while (running){
+
+        gde_enter_critical_section ();
+        system_call ( 111, 
+            (unsigned long)&message_buffer[0],
+            (unsigned long)&message_buffer[0], 
+            (unsigned long)&message_buffer[0] );
         gde_exit_critical_section();
-			
+
+
 		if ( message_buffer[1] != 0 )
 		{
 	        
@@ -1176,21 +1175,22 @@ gde_create_window (
 	// mais argumentos. 
 	// #importante: Isso está funcionado, Vamos fazer assim e 
 	// não do jeito antigo.
-	
+
+
 	unsigned long message_buffer[12];
-	
-	message_buffer[0] = (unsigned long) type;
-	message_buffer[1] = (unsigned long) status;
-	message_buffer[2] = (unsigned long) view;
-	message_buffer[3] = (unsigned long) windowname;
-	message_buffer[4] = (unsigned long) x;
-	message_buffer[5] = (unsigned long) y;
-	message_buffer[6] = (unsigned long) width;
-	message_buffer[7] = (unsigned long) height;
-	message_buffer[8] = (unsigned long) pWindow;
-	message_buffer[9] = (unsigned long) onde;
+	message_buffer[0]  = (unsigned long) type;
+	message_buffer[1]  = (unsigned long) status;
+	message_buffer[2]  = (unsigned long) view;
+	message_buffer[3]  = (unsigned long) windowname;
+	message_buffer[4]  = (unsigned long) x;
+	message_buffer[5]  = (unsigned long) y;
+	message_buffer[6]  = (unsigned long) width;
+	message_buffer[7]  = (unsigned long) height;
+	message_buffer[8]  = (unsigned long) pWindow;
+	message_buffer[9]  = (unsigned long) onde;
 	message_buffer[10] = (unsigned long) clientcolor;
 	message_buffer[11] = (unsigned long) color;
+
 
     // #bugbug
     // Now we need to use the window server to create windows.
@@ -1228,20 +1228,18 @@ gde_create_window (
 
 int gde_register_window (struct window_d *window){
 
-
     if ( (void *) window == NULL ){
         gde_debug_print ("gde_register_window: fail\n");
         return 1;
 
     }else{
-
         return (int) system_call ( SYSTEMCALL_REGISTERWINDOW, 
                         (unsigned long) window, 
                         (unsigned long) window, 
                         (unsigned long) window);
     };
 
-
+    //#todo: Maybe '-1'
     return 2;
 }
 
@@ -1267,6 +1265,7 @@ int gde_close_window (struct window_d *window){
                          (unsigned long) window );
     };
 
+    //#todo: Maybe '-1'
     return 2;
 }
 
@@ -1290,6 +1289,7 @@ int gde_set_focus (struct window_d *window){
                         (unsigned long) window );
     };
 
+    //#todo: Maybe '-1'
     return 2;
 }
 
@@ -1328,7 +1328,7 @@ int gde_kill_focus (struct window_d *window){
                          (unsigned long) window );
     };
 
-
+    //#todo: Maybe '-1'
     return (int) 2;
 }
 
@@ -1354,6 +1354,7 @@ int gde_set_active_window (struct window_d *window){
                          (unsigned long) window );
     };
 
+    //#todo: Maybe '-1'
     return 2;
 }
 
@@ -1384,7 +1385,7 @@ void gde_show_current_process_info (void)
 	system_call ( SYSTEMCALL_CURRENTPROCESSINFO, 0, 0, 0 );
 }
 
- 
+
 void 
 gde_resize_window ( 
     struct window_d *window, 
@@ -1459,7 +1460,7 @@ void gde_update_window (struct window_d *window){
 
 void *gde_get_foregroung_window (void)
 {
-    system_call ( SYSTEMCALL_GETFOREGROUNDWINDOW, 0, 0, 0 );	
+    system_call ( SYSTEMCALL_GETFOREGROUNDWINDOW, 0, 0, 0 );
 }
 
 
@@ -1614,8 +1615,8 @@ void gde_reboot (void)
  *     Set cursor. 
  */
 
-void gde_set_cursor ( unsigned long x, unsigned long y ){
-	
+void gde_set_cursor ( unsigned long x, unsigned long y )
+{
     system_call ( SYSTEMCALL_SETCURSOR, x, y, 0 );
 }
 
@@ -1664,8 +1665,8 @@ void *gde_get_client_area_rect (void)
  *     Enviar uma estrutura de retângulo criada em user mode para o kernel.
  */
 
-void gde_set_client_area_rect (struct rect_d *r){
-	
+void gde_set_client_area_rect (struct rect_d *r)
+{
     system_call ( SYSTEMCALL_SETCLIENTAREARECT, 
         (unsigned long) r, (unsigned long) r, (unsigned long) r );
 }
@@ -1682,6 +1683,7 @@ void *gde_create_process (
     unsigned long process_priority )
 {
     gde_debug_print ("gde_create_process:\n");
+
     return (void *) system_call ( SYSTEMCALL_CREATEPROCESS, 
                         (unsigned long) name, 
                         (unsigned long) process_priority, 
@@ -1698,13 +1700,13 @@ void *gde_create_process (
  *     Essa será uma rotina de baixo nível para pthreads.
  */
 
-void *
-gde_create_thread ( 
+void *gde_create_thread ( 
     unsigned long init_eip, 
     unsigned long init_stack, 
     char *name )
 {
     gde_debug_print ("gde_create_thread:\n");
+
     return (void *) system_call ( SYSTEMCALL_CREATETHREAD, 
                         init_eip, 
                         init_stack, 
@@ -1786,25 +1788,23 @@ gde_save_file (
 	// não do jeito antigo.
 
     unsigned long message_buffer[12];
-
     message_buffer[0] = (unsigned long) file_name;
     message_buffer[1] = (unsigned long) file_size;
     message_buffer[2] = (unsigned long) size_in_bytes;
     message_buffer[3] = (unsigned long) file_address;
     message_buffer[4] = (unsigned long) flag;
-
     //message_buffer[5] = (unsigned long) x;
     //message_buffer[6] = (unsigned long) x;
     // ...
 
-    gde_enter_critical_section();
 
+    gde_enter_critical_section();
     Ret = (int) gramado_system_call ( SYSTEMCALL_WRITE_FILE,
                     (unsigned long) &message_buffer[0], 
                     (unsigned long) &message_buffer[0],  
                     (unsigned long) &message_buffer[0] ); 
-
     gde_exit_critical_section();
+
 
     return (int) Ret;
 }
@@ -1910,12 +1910,12 @@ int gde_create_empty_file ( char *file_name ){
 
     int __ret = 0;
     
-    gde_enter_critical_section();
     
+    gde_enter_critical_section();
     __ret = (int) gramado_system_call ( 43, 
                       (unsigned long) file_name, 0, 0);
-
     gde_exit_critical_section();    
+    
     
     return __ret;
 }
@@ -2019,7 +2019,6 @@ void gde_up (struct semaphore_d *s){
 
 tryAgain:
 
-
     Status = (int) system_call ( SYSTEMCALL_SEMAPHORE_UP, 
                        (unsigned long) s, 
                        (unsigned long) s, 
@@ -2047,10 +2046,10 @@ tryAgain:
 		
 		//Opção 2.
 		goto tryAgain;
-	};	
+	}
 
 fail:
-	goto tryAgain;
+    goto tryAgain;
 }
 
 
@@ -2216,9 +2215,9 @@ int gde_dialog ( const char *string ){
 
     printf (string);
 
-    while (1)
-    {
-        ch = (int) gde_getchar();
+    while (1){
+
+        ch = (int) gde_getchar ();
 
         if ( ch != -1 )
         {
@@ -2242,10 +2241,10 @@ int gde_dialog ( const char *string ){
 				//    break;
 		    };		   
 		};
-		
-		// ?? rever isso.
+
+        // ?? rever isso.
         asm ("pause");
-	};
+    };
 
 
     return (int) Status;
@@ -2305,10 +2304,10 @@ gde_display_bmp (
     unsigned char *bmp = (unsigned char *) address;
 	
 	// Variável para salvar rgba.
-    unsigned char *c = (unsigned char *) &color;
-    unsigned char *c2 = (unsigned char *) &color2;	
+    unsigned char *c  = (unsigned char *) &color;
+    unsigned char *c2 = (unsigned char *) &color2;
 
-    unsigned long *palette = (unsigned long *) (address + 0x36);		
+    unsigned long *palette = (unsigned long *) (address + 0x36);
     unsigned char *palette_index = (unsigned char *) &pal_address;	
 
 
@@ -2332,7 +2331,7 @@ gde_display_bmp (
 	if ( address == 0 )
 	{
 		//goto fail;
-	};
+	}
 	
 	
 	//
@@ -2383,13 +2382,13 @@ gde_display_bmp (
 	bi->bmpSize = *( unsigned long * ) &bmp[14];
 	
 	// Width and height.
-    Width = *( unsigned long * ) &bmp[18];
-    Height = *( unsigned long * ) &bmp[22];	
+    Width  = *( unsigned long * ) &bmp[18];
+    Height = *( unsigned long * ) &bmp[22];
 	
 	//@todo: checar validade da altura e da largura encontrada.
 	
 	// Salvar.
-	bi->bmpWidth = (unsigned long) Width;
+	bi->bmpWidth  = (unsigned long) Width;
 	bi->bmpHeight = (unsigned long) Height;
 	
 	
@@ -2667,7 +2666,6 @@ gde_send_message_to_process (
         return -1;
     }
 
-
     message_buffer[0] = (unsigned long) window;
     message_buffer[1] = (unsigned long) message;
     message_buffer[2] = (unsigned long) long1;
@@ -2735,7 +2733,7 @@ gde_send_message (
 {
 
     unsigned long message_buffer[5];
-
+    
     message_buffer[0] = (unsigned long) window;
     message_buffer[1] = (unsigned long) message;
     message_buffer[2] = (unsigned long) long1;
@@ -2760,7 +2758,7 @@ gde_draw_text (
 {
 
     unsigned long msg[8];
-
+    
     msg[0] = (unsigned long) window;
     msg[1] = (unsigned long) x;
     msg[2] = (unsigned long) y;
@@ -2849,7 +2847,8 @@ void gde_show_window (struct window_d *window){
 // pega o pid do terminal atual
 // manda uma mensagem pedindo para o terminal dizer hello.
 
-// #obs: Isso funcionou.
+// #bugbug
+// Deprecated.
  
 int gde_start_terminal (void){
 
@@ -2866,20 +2865,20 @@ int gde_start_terminal (void){
 	//printf ("PID = %d \n", PID);
 
     //registra o terminal como terminal atual.
-	system_call ( 1003, PID, 0, 0 ); 
-		
+    system_call ( 1003, PID, 0, 0 ); 
+
 	//invalida a variável.
-	PID = -1;
+    PID = -1;
 		
 	//pega o pid do terminal atual
-	PID = (int) system_call ( 1004, 0, 0, 0 ); 
-		
-	if ( PID <= 0 )
-	{
-		printf ("PID fail. We can't send the message\n");
-	    return -1;
-	}
-		
+    PID = (int) system_call ( 1004, 0, 0, 0 ); 
+
+    if ( PID <= 0 ){
+        printf ("PID fail. We can't send the message\n");
+        return -1;
+    }
+
+
 	//manda uma mensagem pedindo para o terminal dizer hello.
 	//__SendMessageToProcess ( PID, NULL, MSG_TERMINALCOMMAND, 2001, 2001 );
 
@@ -2905,8 +2904,9 @@ gde_update_statusbar (
 // rodando ao mesmo tempo.
 int gde_get_pid (int index){
 
-    if ( index < 0 )
+    if ( index < 0 ){
         return (int) -1;
+    }
 
     // #todo
     // Lá no kernel tem que checar os limites.
@@ -2917,19 +2917,19 @@ int gde_get_pid (int index){
 
 struct window_d *gde_get_screen_window (void)
 {
-	return (struct window_d *) gramado_system_call ( 955, 0, 0, 0 );
+    return (struct window_d *) gramado_system_call ( 955, 0, 0, 0 );
 }
 
 
 struct window_d *gde_get_background_window (void)
 {
-	return (struct window_d *) gramado_system_call ( 956, 0, 0, 0 );
+    return (struct window_d *) gramado_system_call ( 956, 0, 0, 0 );
 }
 
 
 struct window_d *gde_get_main_window (void)
 {
-	return (struct window_d *) gramado_system_call ( 957, 0, 0, 0 );
+    return (struct window_d *) gramado_system_call ( 957, 0, 0, 0 );
 }
 
 
@@ -2997,10 +2997,10 @@ int gde_getthreadname (int tid, char *name, size_t len){
         return -1;
     }
 
-	if ( __len_ret > len )
-	{
-		__len_ret = len;
-	}
+    if ( __len_ret > len )
+    {
+        __len_ret = len;
+    }
 
 
     return 0;

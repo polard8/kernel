@@ -41,18 +41,9 @@ APIOBJ  = ../libcore/obj
 	##
 
 myObjects = crt0.o main.o \
-ctype.o \
-stdlib.o \
-stdio.o \
-string.o \
-unistd.o \
+ctype.o stdlib.o stdio.o string.o unistd.o \
 api.o \
-status.o \
-addrbar.o \
-termios.o \
-ioctl.o \
-fcntl.o \
-stubs.o    
+termios.o ioctl.o fcntl.o stubs.o    
 
 
 
@@ -63,8 +54,6 @@ all: main.o all-c sysmon-link finalize clean
 
 main.o:
 	gcc  -c  main.c     $(CFLAGS) -I $(LIBC) -I $(API) -o main.o
-	gcc  -c  status.c   $(CFLAGS) -I $(LIBC) -I $(API) -o status.o
-	gcc  -c  addrbar.c  $(CFLAGS) -I $(LIBC) -I $(API) -o addrbar.o
 
 
 all-c:
