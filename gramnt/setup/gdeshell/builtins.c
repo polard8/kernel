@@ -7,7 +7,7 @@
  */
 
  
-#include "shell.h"
+#include "gdeshell.h"
 
 
 void cd_buitins (void)

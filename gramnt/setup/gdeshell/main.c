@@ -8,7 +8,7 @@
 
 
 
-#include "shell.h"
+#include "gdeshell.h"
 
 
 

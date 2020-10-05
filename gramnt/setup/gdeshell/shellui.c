@@ -12,7 +12,7 @@
  */
 
 
-#include "shell.h"
+#include "gdeshell.h"
 
 
 extern int ShellFlag;
