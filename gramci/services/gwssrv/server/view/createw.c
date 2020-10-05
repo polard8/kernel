@@ -130,7 +130,7 @@ createwDrawFrame (
     {
             // Se tiver o foco.
             if ( window->focus == 1 ){
-                border_color = COLOR_BLUE;
+                border_color = COLOR_BLUE1;
                 border_size = 3;
             }else{
                 border_color = COLOR_INACTIVEBORDER;
@@ -176,7 +176,7 @@ createwDrawFrame (
                                     3, 3, 
                                     (window->width - 3 - border_size),     window->titlebar_height, 
                                     (struct gws_window_d *) window, 
-                                    0, COLOR_DARKBLUE, COLOR_DARKBLUE );  
+                                    0, COLOR_BLUE1, COLOR_BLUE1 );  
 
         if ( (void *) TitleBar == NULL )
             gwssrv_debug_print ("createwCreateWindow: TitleBar fail \n");
@@ -189,6 +189,9 @@ createwDrawFrame (
             TitleBar->width, 1, 
             COLOR_BLACK, 1 );
 
+        //icon
+        gwssrv_display_system_icon ( 1, window->left +8, window->top +8 );
+    
         // string
         dtextDrawString ( (window->left) + offset, (window->top)  +8, 
             COLOR_WHITE, window->name );

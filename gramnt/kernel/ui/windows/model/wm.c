@@ -1922,7 +1922,7 @@ int redraw_window (struct window_d *window, unsigned long flags ){
     // Icon.
     if (window->type == WT_ICON)
     {
-        bmpDisplayBMP ( appIconBuffer, 
+        bmpDisplayBMP ( shared_buffer_app_icon, 
             (window->left +8), (window->top +8) );
             
         draw_string ( 
@@ -3501,7 +3501,7 @@ done:
 
 int windowLoadGramadoIcons (void){
 
-	unsigned long fRet;
+    unsigned long fRet=0;
 
 	//#debug
 	//printf("windowLoadGramadoIcons:\n");
@@ -3517,94 +3517,98 @@ int windowLoadGramadoIcons (void){
 	// ## size ##
 	// Vamos carregar ícones pequenos.
 	//@todo checar a validade dos ponteiros.
-	
-	unsigned long tmp_size = (4*4096);
-
-	appIconBuffer      = (void *) allocPages (4);
-	fileIconBuffer     = (void *) allocPages (4);
-	folderIconBuffer   = (void *) allocPages (4);
-	terminalIconBuffer = (void *) allocPages (4);
-	cursorIconBuffer   = (void *) allocPages (4);
-	// ...
 
 
-    if ( (void *) appIconBuffer == NULL ){
-       panic ("init_windows: appIconBuffer\n");
+
+    unsigned long tmp_size = (4*4096);
+
+
+    // See: window.h
+    shared_buffer_app_icon       = (void *) allocPages (4);
+    shared_buffer_file_icon      = (void *) allocPages (4);
+    shared_buffer_folder_icon    = (void *) allocPages (4);
+    shared_buffer_terminal_icon  = (void *) allocPages (4);
+    shared_buffer_cursor_icon    = (void *) allocPages (4);
+    // ...
+
+
+    if ( (void *) shared_buffer_app_icon == NULL ){
+        panic ("init_windows: shared_buffer_app_icon\n");
     }
 
-	if ( (void *) fileIconBuffer == NULL )
-	{
-		panic ("init_windows: fileIconBuffer\n");
-	}
+    if ( (void *) shared_buffer_file_icon == NULL ){
+        panic ("init_windows: shared_buffer_file_icon\n");
+    }
 
-	if ( (void *) folderIconBuffer == NULL )
-	{
-		panic ("init_windows: folderIconBuffer\n");
-	}
+    if ( (void *) shared_buffer_folder_icon == NULL ){
+        panic ("init_windows: shared_buffer_folder_icon\n");
+    }
 
-	if ( (void *) terminalIconBuffer == NULL )
-	{
-		panic ("init_windows: terminalIconBuffer\n");
-	}
+    if ( (void *) shared_buffer_terminal_icon == NULL ){
+        panic ("init_windows: shared_buffer_terminal_icon\n");
+    }
 
-	if ( (void *) cursorIconBuffer == NULL )
-	{
-		panic ("init_windows: cursorIconBuffer\n");
-	}
+    if ( (void *) shared_buffer_cursor_icon == NULL ){
+        panic ("init_windows: shared_buffer_cursor_icon\n");
+    }
 
 	//
-	// # Load #
+	// Load
 	//
 
+    // app icon
     fRet = (unsigned long) fsLoadFile ( VOLUME1_FAT_ADDRESS,
                                VOLUME1_ROOTDIR_ADDRESS, 
                                32, //#bugbug: Number of entries.
                                "APP     BMP", 
-                               (unsigned long) appIconBuffer,
+                               (unsigned long) shared_buffer_app_icon,
                                tmp_size );
     if ( fRet != 0 ){
         panic ("init_windows: APP.BMP\n");
     }
 
-
+    // file icon
     fRet = (unsigned long) fsLoadFile ( VOLUME1_FAT_ADDRESS,
                                VOLUME1_ROOTDIR_ADDRESS, 
                                32, //#bugbug: Number of entries.
                                "FILE    BMP", 
-                               (unsigned long) fileIconBuffer,
+                               (unsigned long) shared_buffer_file_icon,
                                tmp_size );
     if ( fRet != 0 ){
         panic ("init_windows: FILE.BMP\n");
     }
 
 
+    // folder icon
     fRet = (unsigned long) fsLoadFile ( VOLUME1_FAT_ADDRESS, 
                                VOLUME1_ROOTDIR_ADDRESS, 
                                32, //#bugbug: Number of entries.
                                "FOLDER  BMP", 
-                               (unsigned long) folderIconBuffer,
+                               (unsigned long) shared_buffer_folder_icon,
                                tmp_size );
     if ( fRet != 0 ){
         panic ("init_windows: FOLDER.BMP\n");
     }
 
 
+    // terminal icon
     fRet = (unsigned long) fsLoadFile ( VOLUME1_FAT_ADDRESS, 
                                VOLUME1_ROOTDIR_ADDRESS, 
                                32, //#bugbug: Number of entries.
                                "TERMINALBMP", 
-                               (unsigned long) terminalIconBuffer,
+                               (unsigned long) shared_buffer_terminal_icon,
                                tmp_size );
     if ( fRet != 0 ){
         panic ("init_windows: TERMINAL.BMP\n");
     }
 
 
+    // cursor icon
     fRet = (unsigned long) fsLoadFile ( VOLUME1_FAT_ADDRESS, 
                                VOLUME1_ROOTDIR_ADDRESS, 
                                32, //#bugbug: Number of entries.
                                "CURSOR  BMP", 
-                               (unsigned long) cursorIconBuffer,
+                               (unsigned long) shared_buffer_cursor_icon,
                                tmp_size );
     if ( fRet != 0 ){
         panic ("init_windows: CURSOR.BMP\n");
@@ -3616,6 +3620,29 @@ int windowLoadGramadoIcons (void){
     return 0;
 }
 
+
+// get a shared buffer to a system icon.
+// it is gonna be used by the window server.
+void *ui_get_system_icon ( int n )
+{
+    if (n <= 0){
+        return NULL;
+    }
+
+    // See: window.h
+    switch (n){
+
+        case 1: return (void *) shared_buffer_app_icon;       break;
+        case 2: return (void *) shared_buffer_file_icon;      break;
+        case 3: return (void *) shared_buffer_folder_icon;    break;
+        case 4: return (void *) shared_buffer_terminal_icon;  break;
+        case 5: return (void *) shared_buffer_cursor_icon;    break;
+        // ...
+        
+    };
+
+    return NULL;
+}
 
 
 /*

@@ -106,29 +106,11 @@ bmpDisplayBMP (
     unsigned long y );
 
 
-void 
-gwssrv_load_and_decode_small_icon ( 
-    char *filename, 
-    unsigned long x, 
-    unsigned long y );
 
+void *gwssrv_get_system_icon(int n);
 
-
-char *
-gwssrv_load_small_icon ( 
-    char *filename, 
-    unsigned long x, 
-    unsigned long y );
-
-int
-gwssrv_decode_small_icon (
-    char *address,
-    char *filename, 
-    unsigned long x, 
-    unsigned long y );
-    
-
-void __test_load_bmp(void);
+//void __test_load_bmp2(void);
+int gwssrv_display_system_icon ( int index, unsigned long x, unsigned long y );
 
 
 //

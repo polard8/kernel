@@ -574,10 +574,6 @@ gwssrv_init_client_support(void);
 void init_client_struct ( struct gws_client_d *c );
 
 
-void __test_load_icon(void);
-
-
-
 
 
 //
@@ -1428,27 +1424,6 @@ void create_background (void)
 
 
 
-void __test_load_icon(void)
-{
-	/*
-    FILE *fp;
-    char *buffer;
-    
-    buffer = (char *) malloc(128*1024);
-    
-    fp = fopen ("terminal.bmp", "r+" );
-
-    int nreads = read ( fileno(fp), buffer, (128*1024) );
-
-    bmpDisplayBMP ((char *) buffer, (unsigned long) 80, (unsigned long) 80);    
-
-     gws_show_backbuffer();
-     while(1);
-     */
-}
-
-
-
 
 void InitGraphics(void){
 
@@ -1474,24 +1449,16 @@ void InitGraphics(void){
     
     create_background();
 
+ 
+    // Testing bmp.
+    gwssrv_display_system_icon ( 1, 100, 8);
+    gwssrv_display_system_icon ( 2, 200, 8);
+    gwssrv_display_system_icon ( 3, 300, 8);
+    gwssrv_display_system_icon ( 4, 400, 8);
+    //#debug breakpoint
+    //while(1){}
 
-    // #test
-    // Precisamos encontrar uma rotina de carregamento apropriada.
-    //__test_load_bmp(); //OK
-    // __test_load_icon();
-    
-    // OK.
-    // Testando ...
-    // Tentar carregar todos, falha!.
-    //gwssrv_load_and_decode_small_icon ("bmp1.bmp",  4,4);
-    //gwssrv_load_and_decode_small_icon ("file.bmp", 50,4);
-    //gwssrv_load_and_decode_small_icon ("folder.bmp",100,4);
-    //gwssrv_load_and_decode_small_icon ("terminal.bmp",150,4);
-    //gwssrv_load_and_decode_small_icon ("app.bmp", 4, 100);
-    //gwssrv_load_and_decode_small_icon ("cursor.bmp",250,4);
-    //gwssrv_load_and_decode_small_icon ("mouse.bmp",300,4);
-    //gwssrv_load_and_decode_small_icon ("folder.bmp",350,4);
-    //gwssrv_load_and_decode_small_icon ("folder.bmp",400,4);
+
 
     //See: window.c
     //create_main_menu();

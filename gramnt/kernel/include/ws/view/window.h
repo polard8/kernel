@@ -45,15 +45,19 @@ int window_mouse_over;
 // Ponteiros para o endereço onde os ícones 
 // foram carregados.
 
- 
- 
-void *appIconBuffer;  
-void *fileIconBuffer; 
-void *folderIconBuffer; 
-void *terminalIconBuffer;  
-void *cursorIconBuffer; 
-//... 
- 
+// queremos saber se o endereço alocado eh compartilhado ...
+// para o window server usar ... entao chamaremos de sharedbufferIcon.
+
+void *shared_buffer_app_icon;  //1
+void *shared_buffer_file_icon; 
+void *shared_buffer_folder_icon;
+void *shared_buffer_terminal_icon;
+void *shared_buffer_cursor_icon;
+// ... 
+
+
+void *ui_get_system_icon( int n );
+
 //testando ... devemos chamar isso
 //somente depois que todas as estruturas 
 //necessárias estiverem inicializadas.

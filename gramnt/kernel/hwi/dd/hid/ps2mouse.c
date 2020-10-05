@@ -892,32 +892,39 @@ void ps2mouse_change_and_show_pointer_bmp ( int number ){
 	       refresh_rectangle ( saved_mouse_x, saved_mouse_y, 20, 20 );
 	       bmpDisplayMousePointerBMP ( mouseBMPBuffer, mouse_x, mouse_y ); 		
 		   break;
-		   
+
+        // app icon
 		case 2:
-	      refresh_rectangle ( saved_mouse_x, saved_mouse_y, 20, 20 );
-	       bmpDisplayMousePointerBMP ( appIconBuffer, mouse_x, mouse_y ); 		
-		   break;		
-		
-		case 3:
-	       refresh_rectangle ( saved_mouse_x, saved_mouse_y, 20, 20 );
-	       bmpDisplayMousePointerBMP (fileIconBuffer, mouse_x, mouse_y ); 		
-		   break;
+	        refresh_rectangle ( saved_mouse_x, saved_mouse_y, 20, 20 );
+	        bmpDisplayMousePointerBMP ( shared_buffer_app_icon, mouse_x, mouse_y ); 
+		    break;
 
-		case 4:
-	      refresh_rectangle ( saved_mouse_x, saved_mouse_y, 20, 20 );
-	       bmpDisplayMousePointerBMP (folderIconBuffer, mouse_x, mouse_y ); 		
-		   break;
+        // file icon
+        case 3:
+            refresh_rectangle ( saved_mouse_x, saved_mouse_y, 20, 20 );
+            bmpDisplayMousePointerBMP (shared_buffer_file_icon, mouse_x, mouse_y );
+            break;
 
-		case 5:
-	       refresh_rectangle ( saved_mouse_x, saved_mouse_y, 20, 20 );
-	       bmpDisplayMousePointerBMP (terminalIconBuffer, mouse_x, mouse_y ); 		
-		   break;
-		   
-		case 6:
-	      refresh_rectangle ( saved_mouse_x, saved_mouse_y, 20, 20 );
-	       bmpDisplayMousePointerBMP (cursorIconBuffer, mouse_x, mouse_y ); 		
-		   break;
-		   
+
+        // folder icon
+        case 4:
+            refresh_rectangle ( saved_mouse_x, saved_mouse_y, 20, 20 );
+            bmpDisplayMousePointerBMP (shared_buffer_folder_icon, mouse_x, mouse_y ); 
+            break;
+
+        // terminal icon
+        case 5:
+           refresh_rectangle ( saved_mouse_x, saved_mouse_y, 20, 20 );
+           bmpDisplayMousePointerBMP (shared_buffer_terminal_icon, mouse_x, mouse_y ); 
+           break;
+
+
+        case 6:
+            refresh_rectangle ( saved_mouse_x, saved_mouse_y, 20, 20 );
+            bmpDisplayMousePointerBMP (shared_buffer_cursor_icon, mouse_x, mouse_y );
+            break;
+ 
+ 
 		 //#estamos usando os ícones previamente carregados.  
 		   
 		 //...  

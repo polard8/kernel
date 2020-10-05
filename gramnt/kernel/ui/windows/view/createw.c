@@ -100,7 +100,10 @@ extern unsigned long SavedBPP;
 
 
 
-int DrawIcon ( struct window_d *window, int n ){
+int DrawIcon ( struct window_d *window, int n )
+{
+
+    debug_print ("DrawIcon: [FIXME] n \n");
 
     // todo: 
     // Checar validades.
@@ -108,7 +111,7 @@ int DrawIcon ( struct window_d *window, int n ){
     // n = seleciona um icon de uma lista.
     // switch()
     
-    bmpDisplayBMP ( appIconBuffer, 
+    bmpDisplayBMP ( shared_buffer_app_icon, 
          window->left +8, window->top +8 );
 }
 
@@ -1407,7 +1410,7 @@ void *CreateWindow (
     // Icon.
     if (window->type == WT_ICON)
     {
-        bmpDisplayBMP ( appIconBuffer, 
+        bmpDisplayBMP ( shared_buffer_app_icon, 
             (window->left +8), (window->top +8) );
             
         draw_string ( 

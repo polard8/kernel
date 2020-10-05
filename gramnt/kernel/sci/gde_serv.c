@@ -1065,6 +1065,14 @@ gde_extra_services (
     }
     */
 
+    //test: pegando o endereço de um buffer de icone..
+    //queremos saber se ele eh compartilhado.
+    // See: wm.c
+    if (number == 9100)
+    {
+        //return (void *) shared_buffer_terminal_icon;
+        return (void *) ui_get_system_icon( (int) arg2 );
+    }
 
 
     //test

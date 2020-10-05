@@ -1066,314 +1066,75 @@ bmpDisplayCursorBMP (
 */
 
 
-void 
-gwssrv_load_and_decode_small_icon ( 
-    char *filename, 
-    unsigned long x, 
-    unsigned long y )
+
+
+//funciona
+//void __test_load_bmp2(void)
+int gwssrv_display_system_icon ( int index, unsigned long x, unsigned long y )
 {
-    
-    FILE *fp;
-    int nreads=0;
-    int i=0;
-
-
-    //
-    // =======================================
-    //
-    
-    //#todo
-    //Trying to load and show a bmp file.
-    //char *file_name = "FOLDER  BMP";
-    //char file_name[] = "FOLDER  BMP";
-    
+	
+	//testando um endereço compartilhado.
+	//o icone foi carregado pelo kernel.
     char *bmp_buffer;
-
-    // #bugbug
-    // We need to get the size of the file.
-    // 128 KB.
-    bmp_buffer = (char *) malloc(1024*128);
-    //bmp_buffer = (char *) malloc(1024*512);
+    
+    
+    
+    //#todo: limits for x and y.
+    
+    //bmp_buffer =  gramado_system_call (9100,1,1,1);
+    //bmp_buffer =  gramado_system_call (9100,2,0,0);    
+    
+    bmp_buffer = gwssrv_get_system_icon(index);
+    //bmp_buffer = gwssrv_get_system_icon(2);
+    //...
     
     if ( (void *) bmp_buffer == NULL ){
-        printf ("gwssrv: gwssrv_load_and_decode_small_icon bmp_buffer fail\n");
-        return;
-    }
-    
-    // ?? Onde fica o heap usado por esse malloc ??
-    //printf ("gwssrv: xxx_test_load_bmp bmp_buffer = %x\n", bmp_buffer);
-  
-  
-    //stdio_fntos ( (char *) file_name ); //n�o precisa
-
-    
-    //fp = fopen("folder.bmp","r+");    
-    fp = fopen(filename,"r+"); 
-
-    // #bugbug
-    // Se o arquivo for maior que 128KB, apenas 
-    // leremos a primeira parte do arquivo.
-    // Essa rotina so funcionaria com arquivos de tamanho controlado.
-
-
-    nreads = read ( fileno(fp), bmp_buffer, (1024*128) );
-    //nreads = read( fileno(fp), bmp_buffer, (1024*512) );
-
-    if (nreads <= 0){
-        printf("read fail\n"); 
-        return; 
+        printf ("gwssrv: gwssrv_display_system_icon: bmp_buffer fail\n");
+        return -1;
     }
 
 
-   // #bugbug: 
-   // Se o close tentar salvar o arquivos isso vai dar problema.
-   // close(fd);
-   
-   // #bugbug
-   // So estava lendo 4 bytes por causa do size of usado erradamente logo acima..
-
-    printf ("nreads={%d}\n",nreads);
-
-
-    //#test
     if ( bmp_buffer[0] != 'B' || bmp_buffer[1] != 'M' )
     {
         printf (">>>> %c %c\n",&bmp_buffer[0],&bmp_buffer[1]);
-        gwssrv_debug_print ("gwssrv: gwssrv_load_and_decode_small_icon SIG FAIL \n");
-        printf             ("gwssrv_load_and_decode_small_icon: *hang1\n");
+        gwssrv_debug_print ("gwssrv: gwssrv_display_system_icon SIG FAIL \n");
+        printf("gwssrv_display_system_icon: *hang1\n");
         gws_show_backbuffer();
         while(1);
-        //return;
     }
+
 
     if ( bmp_buffer[0] == 'B' && bmp_buffer[1] == 'M' )
     {
-        printf("xxx_test_load_bmp: BMP signature OK\n");
-        
-        //#flags
+		
+    //#flags
         bmp_change_color_flag = BMP_CHANGE_COLOR_TRANSPARENT;
         //bmp_change_color_flag = BMP_CHANGE_COLOR_SUBSTITUTE;
         //bmp_change_color_flag = BMP_CHANGE_COLOR_NULL;
         bmp_selected_color = COLOR_WHITE;
 
  
-        bmpDisplayBMP ((char *) bmp_buffer, (unsigned long) x, (unsigned long) y); 
-        //bmpDisplayBMP ((char *) bmp_buffer, (unsigned long) 4, (unsigned long) 4);    
-        //gde_display_bmp((char *)bmp_buffer, (unsigned long) 80, (unsigned long) 80);
+        bmpDisplayBMP ((char *) bmp_buffer, (unsigned long) x, (unsigned long) y);    
+        //gde_display_bmp((char *)bmp_buffer, (unsigned long) 80, (unsigned long) 80); 
     }
-
-
+    
      //#debug
-     //printf("xxx_test_load_bmp: done\n");
+     printf("gwssrv_display_system_icon: *hang2\n");
+     
+     
+     // #bugbug #todo
+     // We need to use the routine to refresh the rectangle.
      gws_show_backbuffer();
      //while(1);
-}
-
-
-char *gwssrv_load_small_icon ( 
-    char *filename, 
-    unsigned long x, 
-    unsigned long y )
-{
-
-    FILE *fp;
-    
-    //
-    // =======================================
-    //
-    
-    //#todo
-    //Trying to load and show a bmp file.
-    //char *file_name = "FOLDER  BMP";
-    //char file_name[] = "FOLDER  BMP";
-    
-    char *bmp_buffer;
-
-    
-    bmp_buffer = (char *) malloc(1024*128);
-    //bmp_buffer = (char *) malloc(1024*512);
-    
-    if ( (void *) bmp_buffer == NULL ){
-        printf ("gwssrv: xxx_test_load_bmp bmp_buffer fail\n");
-        return (char *) 0;
-    }
-   
-    // ?? Onde fica o heap usado por esse malloc ??
-    //printf ("gwssrv: xxx_test_load_bmp bmp_buffer = %x\n", bmp_buffer);
-  
-  
-    //stdio_fntos ( (char *) file_name ); //n�o precisa
-
-    
-    //fp = fopen("folder.bmp","r+");    
-    fp = fopen(filename,"r+");    
-
-    int nreads=0;
-    nreads = read( fileno(fp), bmp_buffer, (1024*128) );
-    //nreads = read( fileno(fp), bmp_buffer, (1024*512) );
-    
-    if(nreads <= 0)
-    { 
-        printf("read fail\n"); 
-        return (char *) 0; 
-    }
-
-   //#bugbug
-   //So estava lendo 4 bytes por causa do size of usado erradamente logo acima..
-
-    printf ("nreads={%d}\n",nreads);
-    
-    return (char *) bmp_buffer;
+     
+     return 0;
 }
 
 
 
-int
-gwssrv_decode_small_icon (
-    char *address,
-    char *filename, 
-    unsigned long x, 
-    unsigned long y )
+void *gwssrv_get_system_icon (int n)
 {
-
-    char *bmp_buffer;
-    
-    
-    
-    bmp_buffer = address;
-    
-    if ( (void *) bmp_buffer == NULL ){
-        printf ("gwssrv: gwssrv_decode_small_icon bmp_buffer fail\n");
-        return;
-    }
- 
-
-    int i=0;
-
-    //#test
-    if ( bmp_buffer[0] != 'B' || bmp_buffer[1] != 'M' )
-    {
-        printf (">>>> %c %c\n",&bmp_buffer[0],&bmp_buffer[1]);
-        gwssrv_debug_print ("gwssrv: gwssrv_decode_small_icon SIG FAIL \n");
-        printf("xxx_test_load_bmp: *hang1\n");
-        gws_show_backbuffer();
-        while(1);
-    }
-
-    if ( bmp_buffer[0] == 'B' && bmp_buffer[1] == 'M' )
-    {
-        printf("gwssrv_decode_small_icon: BMP signature OK\n");
-        
-        //#flags
-        bmp_change_color_flag = BMP_CHANGE_COLOR_TRANSPARENT;
-        //bmp_change_color_flag = BMP_CHANGE_COLOR_SUBSTITUTE;
-        //bmp_change_color_flag = BMP_CHANGE_COLOR_NULL;
-        bmp_selected_color = COLOR_WHITE;
-
- 
-        bmpDisplayBMP ((char *) bmp_buffer, (unsigned long) x, (unsigned long) y); 
-        //bmpDisplayBMP ((char *) bmp_buffer, (unsigned long) 4, (unsigned long) 4);    
-        //gde_display_bmp((char *)bmp_buffer, (unsigned long) 80, (unsigned long) 80);
-    }          
-
-
-     //#debug
-     //printf("xxx_test_load_bmp: done\n");
-     gws_show_backbuffer();
-     //while(1);
-}
-
-
-
-
-
-
-
-
-
-void __test_load_bmp(void)
-{
-    FILE *fp;
-    int i=0;
-
-
-    //
-    // =======================================
-    //
-    
-    //#todo
-    //Trying to load and show a bmp file.
-    //char *file_name = "FOLDER  BMP";
-    //char file_name[] = "FOLDER  BMP";
-    
-    char *bmp_buffer;
-
-    
-    //char file_name[] = "terminal.bmp";
-    //bmp_buffer = (char *) malloc(1024*128);
-    bmp_buffer = (char *) malloc(1024*512);
-    
-    if ( (void *) bmp_buffer == NULL ){
-        printf ("gwssrv: __test_load_bmp: bmp_buffer fail\n");
-        return;
-    }
-    
-    // ?? Onde fica o heap usado por esse malloc ??
-    printf ("gwssrv: __test_load_bmp bmp_buffer = %x\n", bmp_buffer);
-  
-  
-    //stdio_fntos ( (char *) file_name ); //n�o precisa
-    
-    fp = fopen("folder.bmp","r+");    
-    //fp = fopen("dennis2.bmp","r+");    
-
-
-    int nreads=0;
-    //nreads = read( fileno(fp), bmp_buffer, (1024*128) );
-    nreads = read( fileno(fp), bmp_buffer, (1024*512) );
-    
-    if(nreads <= 0)
-    { 
-        printf("read fail\n"); 
-        return; 
-    }
-
-   //#bugbug
-   //So estava lendo 4 bytes por causa do size of usado erradamente logo acima..
-
-    printf ("nreads={%d}\n",nreads);
-
-
-    //#test
-    if ( bmp_buffer[0] != 'B' || bmp_buffer[1] != 'M' )
-    {
-        printf (">>>> %c %c\n",&bmp_buffer[0],&bmp_buffer[1]);
-        gwssrv_debug_print ("gwssrv: __test_load_bmp SIG FAIL \n");
-        printf("__test_load_bmp: *hang1\n");
-        gws_show_backbuffer();
-        while(1);
-    }
-
-    if ( bmp_buffer[0] == 'B' && bmp_buffer[1] == 'M' )
-    {
-        printf("__test_load_bmp: BMP signature OK\n");
-        
-        //#flags
-        bmp_change_color_flag = BMP_CHANGE_COLOR_TRANSPARENT;
-        //bmp_change_color_flag = BMP_CHANGE_COLOR_SUBSTITUTE;
-        //bmp_change_color_flag = BMP_CHANGE_COLOR_NULL;
-        bmp_selected_color = COLOR_WHITE;
-
- 
-        bmpDisplayBMP ((char *) bmp_buffer, (unsigned long) 4, (unsigned long) 4);    
-        //gde_display_bmp((char *)bmp_buffer, (unsigned long) 80, (unsigned long) 80);
-    }          
-
-
-     //#debug
-     printf("__test_load_bmp: *hang2\n");
-     gws_show_backbuffer();
-     while(1);
+    return (void *) gramado_system_call (9100,n,n,n);
 }
 
 

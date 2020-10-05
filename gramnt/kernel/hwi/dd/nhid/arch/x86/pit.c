@@ -329,9 +329,9 @@ void timer (void){
             // Acende.
             if ( timerTextCursorStatus == 1 )
             {
-                bmpDisplayCursorBMP ( cursorIconBuffer, 
+                bmpDisplayCursorBMP ( shared_buffer_cursor_icon, 
                     (TTY[current_vc].cursor_x + 1) * __cWidth, 
-                    TTY[current_vc].cursor_y * __cHeight );
+                    TTY[current_vc].cursor_y       * __cHeight );
          
                 timerTextCursorStatus = 0;
                 goto cursorExit;
