@@ -480,6 +480,10 @@ struct gws_window_d
     int titlebarUsed;
 
 
+    // If the title bar uses or not an icon.
+    int has_icon;
+
+
     //border.
     unsigned long border_size;
     int borderUsed;

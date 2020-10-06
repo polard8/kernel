@@ -191,6 +191,8 @@ createwDrawFrame (
 
         //icon
         gwssrv_display_system_icon ( 1, window->left +8, window->top +8 );
+        window->has_icon = 1;  //#test
+
     
         // string
         dtextDrawString ( (window->left) + offset, (window->top)  +8, 
