@@ -1,5 +1,6 @@
 
 // #todo
+// Remember: double is double precision float.
 
 // x to power of y
 double pow (double __x, double __y)
@@ -12,7 +13,7 @@ double pow (double __x, double __y)
 double sqrt (double __x)
 {
     return 0;
-}	
+}
 
 
 double floor (double __x)

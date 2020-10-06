@@ -44,6 +44,10 @@ APIOBJ  = ../../../lib/api02/obj
 	## Objects
 	##
 
+
+# todo
+# this pronect uses the libcore.
+
 myObjects = crt0.o ctype.o main.o dumpit.o\
 stdio.o \
 stdlib.o \
@@ -51,7 +55,7 @@ string.o \
 time.o \
 api.o \
 unistd.o \
-stubs.o    
+rtl.o    
 
 
 
@@ -65,8 +69,12 @@ all: main.o all-c tascii-link finalize clean
 main.o:
 	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -I $(API01) -o main.o
 	gcc  -c  dumpit.c  $(CFLAGS) -I $(LIBC) -I $(API01) -o dumpit.o
-	
+
+
 all-c:
+	cp $(LIBCOBJ)/crt0.o  .
+	cp $(LIBCOBJ)/rtl.o  .
+
 	cp $(APIOBJ)/api.o      .
 	
 	cp $(LIBCOBJ)/ctype.o   .
@@ -75,8 +83,8 @@ all-c:
 	cp $(LIBCOBJ)/string.o .
 	cp $(LIBCOBJ)/time.o    .
 	cp $(LIBCOBJ)/unistd.o  .
-	cp $(LIBCOBJ)/stubs.o  .
-	cp $(LIBCOBJ)/crt0.o  .	
+
+
 
 tascii-link:
 	ld -m elf_i386 -T ../link.ld -o DUMPIT.BIN $(myObjects)    

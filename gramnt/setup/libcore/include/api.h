@@ -42,10 +42,13 @@
  */
 
 
-// ??
-#include <types.h>      
+// rtl
+#include <types.h>
 #include <stddef.h>
- 
+
+
+
+
 //
 // @todo: Fazer suporte a objetos. estruturas.
 //

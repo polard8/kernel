@@ -51,7 +51,8 @@
 // ...
 
 
-
+// #todo:
+// We need to change the name of this document??
 #include "noraterm.h"
 
 

@@ -1,7 +1,12 @@
 // cmp command from unix v7
 
+
+
+// rtl
 #include <stdio.h>
 #include <ctype.h>
+
+
 
 FILE	*file1,*file2;
 int	eflg;

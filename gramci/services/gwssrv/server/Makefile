@@ -71,7 +71,7 @@ LIBCOBJ = ../../../../rtl/obj
 	##
 	
 	
-myObjects = crt0.o main.o stubs.o \
+myObjects = crt0.o main.o rtl.o \
 ctype.o stdio.o stdlib.o string.o conio.o socket.o signal.o unistd.o \
 pixel.o line.o rect.o char.o dtext.o createw.o gws.o comp.o window.o \
 bmp.o connect.o button.o font.o\
@@ -115,7 +115,8 @@ all-c:
 
 	# rtl/
 	cp $(LIBCOBJ)/crt0.o .
-	cp $(LIBCOBJ)/stubs.o .
+	cp $(LIBCOBJ)/rtl.o .
+
 	cp $(LIBCOBJ)/ctype.o .
 	cp $(LIBCOBJ)/stdio.o .
 	cp $(LIBCOBJ)/stdlib.o .

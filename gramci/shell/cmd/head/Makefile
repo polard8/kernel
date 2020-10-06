@@ -52,7 +52,7 @@ time.o \
 unistd.o \
 err.o \
 locale.o \
-stubs.o
+rtl.o
 
 
 
@@ -68,9 +68,9 @@ main.o:
 all-c:
 
 	cp $(LIBCOBJ)/crt0.o  .
-		
-	cp $(LIBCOBJ)/stubs.o  .
-	
+	cp $(LIBCOBJ)/rtl.o  .
+
+
 	cp $(LIBCOBJ)/ctype.o   .
 	cp $(LIBCOBJ)/stdio.o .
 	cp $(LIBCOBJ)/stdlib.o .
@@ -80,10 +80,10 @@ all-c:
 	cp $(LIBCOBJ)/err.o  .
 	cp $(LIBCOBJ)/locale.o  .
 
-#	cp $(APIOBJ)/api.o      .
-	
+
+
 cat-link:
-	ld -m elf_i386 -T link.ld -o HEAD.BIN $(myObjects) -Map map.s
+	ld -m elf_i386 -T ../link.ld -o HEAD.BIN $(myObjects) -Map map.s
 
 finalize:
 #	cp HEAD.BIN  ../../bin

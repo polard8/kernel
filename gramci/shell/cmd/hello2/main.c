@@ -13,8 +13,10 @@
  *
  * 2018 - Fred Nora.
  */
- 
- 
+
+
+
+// rtl
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -24,26 +26,31 @@
 #define STANDARD_ASCII_MAX 128
 
 
+
+// internal
 int
-__PostMessageToProcess ( int pid, 
-                          unsigned long window, 
-                          int message,
-                          unsigned long long1,
-                          unsigned long long2 );
+__PostMessageToProcess ( 
+    int pid, 
+    unsigned long window, 
+    int message,
+    unsigned long long1,
+    unsigned long long2 );
                           
 int
-__PostMessageToProcess ( int pid, 
-                          unsigned long window, 
-                          int message,
-                          unsigned long long1,
-                          unsigned long long2 )
+__PostMessageToProcess ( 
+    int pid, 
+    unsigned long window, 
+    int message,
+    unsigned long long1,
+    unsigned long long2 )
 {
-	unsigned long message_buffer[5];
 
-	
+    unsigned long message_buffer[5];
+
     if (pid<0)
-		return -1;
-	
+        return -1;
+
+
 	message_buffer[0] = (unsigned long) window;
 	message_buffer[1] = (unsigned long) message;
 	message_buffer[2] = (unsigned long) long1;
@@ -63,10 +70,11 @@ __PostMessageToProcess ( int pid,
  */
 
 int main (int argc, char *argv[] ){
-	
-	FILE *fp;		
-    unsigned char count;
-	unsigned char standard_ascii_max = STANDARD_ASCII_MAX;
+
+
+    FILE *fp;
+    unsigned char count=0;
+    unsigned char standard_ascii_max = STANDARD_ASCII_MAX;
 	
 	char buffer[512];
 	char buffer2[] = "DURTY...........";

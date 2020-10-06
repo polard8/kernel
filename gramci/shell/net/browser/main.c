@@ -39,7 +39,9 @@
 // https://wiki.osdev.org/Synchronization_Primitives
 // ...
  
- 
+
+
+// rtl 
 #include <types.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -50,8 +52,10 @@
 #include <sys/socket.h>
 #include <packet.h>
 
+
 // The client-side library.
 #include <gws.h>
+
 
 
 //

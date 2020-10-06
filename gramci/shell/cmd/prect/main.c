@@ -3,7 +3,11 @@
 // See: https://gist.github.com/Silva97/0d7cfd0ef8ae19d8d74b654367d35997
 
 
+// rtl
 #include <stdio.h>
+
+
+
 
 enum {
     RECT_T  = '-',  // Aresta do topo
@@ -20,10 +24,14 @@ enum {
 void putmchar(int c, int times);
 void printrect(int width, int height);
 
-int main(){
-	
-	printf("\n");
-	printf("\n");
+
+
+
+
+int main(void){
+
+    printf("\n");
+    printf("\n");
     printrect ( 10, 10);
     
     return 0;

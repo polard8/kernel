@@ -50,7 +50,7 @@ time.o \
 unistd.o \
 termios.o \
 ioctl.o \
-stubs.o    
+rtl.o    
 
 
 
@@ -64,8 +64,11 @@ main.o:
 	gcc  -c  main.c  $(CFLAGS) -I $(LIBC)  -o main.o
 
 all-c:
-#	cp $(APIOBJ)/api.o      .
-	
+
+
+	cp $(LIBCOBJ)/crt0.o  .
+	cp $(LIBCOBJ)/rtl.o  .
+
 	cp $(LIBCOBJ)/ctype.o   .
 	cp $(LIBCOBJ)/stdio.o .
 	cp $(LIBCOBJ)/fcntl.o .
@@ -77,8 +80,6 @@ all-c:
 	cp $(LIBCOBJ)/termios.o  .
 	cp $(LIBCOBJ)/ioctl.o  .
 	
-	cp $(LIBCOBJ)/stubs.o  .
-	cp $(LIBCOBJ)/crt0.o  .
 
 hello3-link:
 	ld -m elf_i386 -T ../link.ld -o HELLO3.BIN $(myObjects)    

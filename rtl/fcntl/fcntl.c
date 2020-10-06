@@ -12,9 +12,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-// ...
-
-//used for flock()
 #include <sys/file.h>
 
 
@@ -25,8 +22,8 @@
  *
  */
 
-int fcntl ( int fd, int cmd, ... )
-{
+int fcntl ( int fd, int cmd, ... ){
+
     int __ret = -1;
 
     if (fd<0) {

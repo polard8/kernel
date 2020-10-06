@@ -20,19 +20,22 @@ export const hidden = "\x1b[8m"
  */
 
 
+// Credits:
+/* vsprintf.c -- Lars Wirzenius & Linus Torvalds. */
+/* Wirzenius wrote this portably, Torvalds fucked it up :-) */
+
+
+
+// rtl
 //#include <types.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-
-/* vsprintf.c -- Lars Wirzenius & Linus Torvalds. */
-/*
- * Wirzenius wrote this portably, Torvalds fucked it up :-)
- */
-
 #include <stdarg.h>
 //#include <string.h>
+
+
 
 /* we use this so that we can do without the ctype library */
 #define __is_digit(c)	((c) >= '0' && (c) <= '9')

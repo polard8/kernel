@@ -44,16 +44,8 @@ LIBCOBJ = ../../../../rtl/obj
 	##
 
 myObjects = crt0.o main.o \
-ctype.o \
-stdio.o \
-fcntl.o \
-stdlib.o \
-string.o \
-time.o \
-unistd.o \
-termios.o \
-ioctl.o \
-stubs.o    
+ctype.o stdio.o fcntl.o stdlib.o string.o time.o \
+unistd.o termios.o ioctl.o rtl.o    
 
 
 
@@ -68,7 +60,7 @@ main.o:
 all-c:
 
 	cp $(LIBCOBJ)/crt0.o   .
-	cp $(LIBCOBJ)/stubs.o  .
+	cp $(LIBCOBJ)/rtl.o  .
 
 	cp $(LIBCOBJ)/ctype.o   .
 	cp $(LIBCOBJ)/stdio.o .

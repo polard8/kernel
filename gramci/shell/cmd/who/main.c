@@ -33,22 +33,25 @@
  * SUCH DAMAGE.
  */
 
+
+
+
+// rtl
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <paths.h>
 #include <pwd.h>
-
 #include <utmp.h>
-
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
-
 #include <time.h>
-
 #include <err.h>
 #include <locale.h>
+
+
+
 
 void  output(struct utmp *);
 void  output_labels(void);

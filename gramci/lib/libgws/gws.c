@@ -20,7 +20,7 @@
 
 
 
-// libc03
+// rtl
 #include <types.h>  
 #include <stddef.h>
 #include <stdio.h>

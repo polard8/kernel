@@ -6,35 +6,33 @@
  */
 
 
-// #todo
-// Where is the protocol structures?
-// In the libc ??
 
+
+// rtl
 #include <types.h>
 #include <sys/types.h>
-
 #include <sys/cdefs.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/socket.h>
 
-
+// gnssrv
 #include <vk.h>
 
-// protocol structures.
+// rtl
 #include <net/if_arp.h>
 #include <netinet/udp.h>
 #include <netinet/tcp.h>
 
 
+// gnssrv
 #include <wm.h>
-
 #include <connect.h>
 #include <packet.h>
 #include <decode.h>
-
 #include <client.h>
+
 
 
 

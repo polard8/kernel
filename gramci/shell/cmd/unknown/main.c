@@ -3,6 +3,9 @@
 // Remonta o nome do arquivo, caso ele tenha sido
 // digitado com espaços ...
 
+
+
+// rtl
 #include <stdio.h>
 
 

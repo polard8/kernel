@@ -2,12 +2,14 @@
  *  scan formatted input
  * credits: minix 3
  */
-/* $Header$ */
 
-#include	<stdio.h>
-#include	<stdlib.h>
-#include	<ctype.h>
-#include	<stdarg.h>
+
+
+#include  <stdio.h>
+#include  <stdlib.h>
+#include  <ctype.h>
+#include  <stdarg.h>
+
 
 
 //==================

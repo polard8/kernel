@@ -100,8 +100,8 @@ all-c:
 #/stdlib
 	gcc  -c  stdlib/stdlib.c  $(CFLAGS) -I. -I include/ -o stdlib.o
 	
-#/stubs
-	gcc  -c  stubs/stubs.c    $(CFLAGS) -I. -I include/ -o stubs.o
+#/rtl
+	gcc  -c  rtl/rtl.c    $(CFLAGS) -I. -I include/ -o rtl.o
 	
 #/unistd
 	gcc  -c  unistd/unistd.c  $(CFLAGS) -I. -I include/ -o unistd.o

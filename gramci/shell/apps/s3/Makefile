@@ -51,22 +51,10 @@ LIBGWSOBJ = ../../../lib/libgws/obj
 	## Objects
 	##
 
-myObjects = crt0.o main.o stubs.o \
-ctype.o \
-stdio.o \
-fcntl.o \
-stdlib.o \
-string.o \
-unistd.o \
-termios.o \
-ioctl.o \
-socket.o \
+myObjects = crt0.o main.o rtl.o \
+ctype.o stdio.o fcntl.o stdlib.o string.o \
+unistd.o termios.o ioctl.o socket.o \
 gws.o connect.o events.o rw.o    
-
-
-
-
-
 
 
 
@@ -81,7 +69,7 @@ main.o:
 all-c:
 
 	cp $(LIBCOBJ)/crt0.o   .
-	cp $(LIBCOBJ)/stubs.o  .
+	cp $(LIBCOBJ)/rtl.o  .
 
 	cp $(LIBCOBJ)/ctype.o   .
 	cp $(LIBCOBJ)/stdio.o .

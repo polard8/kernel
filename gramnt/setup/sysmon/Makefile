@@ -43,7 +43,7 @@ APIOBJ  = ../libcore/obj
 myObjects = crt0.o main.o \
 ctype.o stdlib.o stdio.o string.o unistd.o \
 api.o \
-termios.o ioctl.o fcntl.o stubs.o    
+termios.o ioctl.o fcntl.o rtl.o    
 
 
 
@@ -71,7 +71,7 @@ all-c:
 
 	cp $(LIBCOBJ)/fcntl.o  .
 	
-	cp $(LIBCOBJ)/stubs.o   .
+	cp $(LIBCOBJ)/rtl.o   .
 	cp $(APIOBJ)/api.o      .
 
 

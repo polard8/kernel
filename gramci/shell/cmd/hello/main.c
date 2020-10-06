@@ -2,14 +2,18 @@
 
 // programa usado para testes da libc e do console.
 
- 
- 
+
+
+// rtl
 #include <stddef.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+
+
+
 
 
 int  i, j, life, maxrand;

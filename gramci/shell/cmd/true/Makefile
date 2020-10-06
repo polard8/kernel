@@ -42,16 +42,8 @@ LIBCOBJ = ../../../../rtl/obj
 	##
 
 myObjects = crt0.o main.o \
-ctype.o \
-stdio.o \
-stdlib.o \
-string.o \
-time.o \
-unistd.o \
-termios.o \
-ioctl.o \
-fcntl.o \
-stubs.o
+ctype.o stdio.o stdlib.o string.o time.o \
+unistd.o termios.o ioctl.o fcntl.o rtl.o    
 
 
 
@@ -64,10 +56,10 @@ all: main.o all-c cat-link finalize clean
 main.o:
 	gcc  -c  main.c  $(CFLAGS) -I $(LIBC)  -o main.o
 
-all-c:
 
+all-c:
 	cp $(LIBCOBJ)/crt0.o  .
-	cp $(LIBCOBJ)/stubs.o  .
+	cp $(LIBCOBJ)/rtl.o  .
 	
 	cp $(LIBCOBJ)/ctype.o   .
 	cp $(LIBCOBJ)/stdio.o .

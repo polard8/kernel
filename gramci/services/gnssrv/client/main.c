@@ -38,8 +38,10 @@
 // https://wiki.osdev.org/Message_Passing_Tutorial
 // https://wiki.osdev.org/Synchronization_Primitives
 // ...
- 
- 
+
+
+
+// rtl
 #include <types.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -50,10 +52,10 @@
 #include <sys/socket.h>
 
 
-//#test
-//#include <gws.h>
-
+// gns
 #include <packet.h>
+
+
 
 //
 // == ports ====================================

@@ -33,9 +33,6 @@ CFLAGS = -m32 \
 LIBC    = ../../../../rtl/include/
 LIBCOBJ = ../../../../rtl/obj
 
-#API     = ../../../lib/libcore/include/
-#APIOBJ  = ../../../lib/libcore/obj
-
 
 	##
 	## Objects
@@ -43,8 +40,9 @@ LIBCOBJ = ../../../../rtl/obj
 
 myObjects = crt0.o main.o fasm.o \
 ctype.o stdio.o stdlib.o string.o time.o \
-unistd.o termios.o ioctl.o fcntl.o \
-stubs.o   
+unistd.o termios.o ioctl.o fcntl.o rtl.o     
+
+
 
 
 .PHONY: all all-c cat-link finalize clean
@@ -61,8 +59,11 @@ main.o:
 
 all-c:
 
+	cp libc/fasm.o .
+
+
 	cp $(LIBCOBJ)/crt0.o  .
-	cp $(LIBCOBJ)/stubs.o  .
+	cp $(LIBCOBJ)/rtl.o  .
 	
 	cp $(LIBCOBJ)/ctype.o   .
 	cp $(LIBCOBJ)/stdio.o .
@@ -74,7 +75,7 @@ all-c:
 	cp $(LIBCOBJ)/ioctl.o  .
 	cp $(LIBCOBJ)/fcntl.o  .
 
-	cp libc/fasm.o .
+
 	
 cat-link:
 	ld -m elf_i386 -T ../link.ld -o FASM.BIN $(myObjects)    

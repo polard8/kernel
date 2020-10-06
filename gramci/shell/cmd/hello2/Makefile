@@ -35,8 +35,8 @@ CFLAGS = -m32 \
 LIBC    = ../../../../rtl/include/
 LIBCOBJ = ../../../../rtl/obj
 
-API01   = ../../lib/api01/include/
-APIOBJ  = ../../lib/api01/obj
+#API01   = ../../lib/api01/include/
+#APIOBJ  = ../../lib/api01/obj
 
 
 	##
@@ -44,17 +44,8 @@ APIOBJ  = ../../lib/api01/obj
 	##
 
 myObjects = crt0.o main.o \
-ctype.o \
-stdio.o \
-fcntl.o \
-stdlib.o \
-string.o \
-time.o \
-unistd.o \
-termios.o \
-ioctl.o \
-stubs.o    
-
+ctype.o stdio.o fcntl.o stdlib.o string.o time.o \
+unistd.o termios.o ioctl.o rtl.o    
 
 
 
@@ -64,12 +55,13 @@ all: main.o all-c hello2-link finalize clean
 	@echo "Ok?"
 
 main.o:
-	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -I $(API01) -o main.o
+	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -o main.o
+
 
 all-c:
 
 	cp $(LIBCOBJ)/crt0.o  .
-	cp $(LIBCOBJ)/stubs.o  .
+	cp $(LIBCOBJ)/rtl.o  .
 
 	cp $(LIBCOBJ)/ctype.o   .
 	cp $(LIBCOBJ)/stdio.o .

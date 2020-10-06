@@ -47,12 +47,11 @@ APIOBJ  = ../../../lib/libcore/obj
 	## Objects
 	##
 
+# bugbug
+# This project is including the api.o !!!!
+
 myObjects = crt0.o main.o \
-ctype.o \
-stdio.o \
-stdlib.o \
-string.o \
-time.o \
+ctype.o stdio.o stdlib.o string.o time.o \
 api.o \
 unistd.o \
 math.o \
@@ -60,10 +59,7 @@ strtol.o \
 strtoul.o \
 fscanf.o \
 fcntl.o \
-termios.o \
-ioctl.o \
-wait.o \
-stubs.o    
+termios.o ioctl.o wait.o rtl.o    
 
 
 
@@ -79,8 +75,7 @@ main.o:
 all-c:
 
 	cp $(LIBCOBJ)/crt0.o   .
-	
-	cp $(LIBCOBJ)/stubs.o  .
+	cp $(LIBCOBJ)/rtl.o  .
 	
 	cp $(LIBCOBJ)/ctype.o   .
 	cp $(LIBCOBJ)/stdio.o .

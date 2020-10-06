@@ -8,6 +8,7 @@
  */
 
 
+
 #include <types.h> 
 #include <stddef.h>
 #include <mm.h>
@@ -20,8 +21,9 @@
 #include <sys/ioctl.h>
 #include <fcntl.h>
 #include <unistd.h>
-//system calls.
-#include <stubs/gramado.h> 
+#include <rtl/gramado.h> 
+ 
+ 
  
 
 // exit().

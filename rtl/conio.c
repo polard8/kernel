@@ -9,19 +9,17 @@
 
 
 //putch - Writes a character directly to the console.
-int putch (int c){
-	
+int putch (int c)
+{
     printf ( "%c", (char) c );
-	
     return 1;
 }
 
 
 //cputs - Writes a string directly to the console.
-int cputs (const char *str){
-	
+int cputs (const char *str)
+{
     printf ("%s", str);
-	
     return 1;
 }
 

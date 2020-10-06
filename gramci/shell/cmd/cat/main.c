@@ -4,7 +4,7 @@
  * cat command for Gramado.
  */
 
-
+// rtl
 #include <types.h>
 #include <stddef.h>
 #include <stdlib.h>

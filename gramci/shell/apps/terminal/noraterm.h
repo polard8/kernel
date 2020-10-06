@@ -8,11 +8,11 @@
 
 #define WINDOW_LEFT      0      
 #define WINDOW_TOP       0      
-
 #define WINDOW_WIDTH     800    
 #define WINDOW_HEIGHT    600-24   
 
 
+// rtl
 #include <types.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,7 +22,8 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 
-// #pertencem ao terminal ??
+
+// terminal project includes.
 #include <compiler.h>
 #include <globals.h>
 #include <variables.h> 
@@ -34,8 +35,8 @@
 #include <packet.h>
 #include <terminal.h>
 
+
+// Client-side library.
 #include <gws.h>
-
-
 
 

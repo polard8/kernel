@@ -53,10 +53,7 @@
  */
 
 
-//incluido por fred
 #include <stddef.h>
-
-
 #include <limits.h>
 #include <ctype.h>
 #include <errno.h>
@@ -83,14 +80,15 @@ strtoul(nptr, endptr, base)
 
 
 unsigned long strtoul ( const char *nptr, char **endptr, int base ){
-	
+
 	register const char *s = nptr;
 	register unsigned long acc;
 	register int c;
 	register unsigned long cutoff;
 	register int neg = 0, any, cutlim;
 
-	
+
+
 	// See strtol for comments as to the logic used.
 	
 	do {

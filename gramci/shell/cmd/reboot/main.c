@@ -1,8 +1,10 @@
 /*
  * reboot command for Gramado.
  */
- 
- 
+
+
+
+// rtl
 #include <stddef.h>
 #include <ctype.h>
 #include <stdio.h>
@@ -10,6 +12,7 @@
 #include <string.h>
 //#include <time.h>
 #include <stdbool.h>
+
 
 
 // ??

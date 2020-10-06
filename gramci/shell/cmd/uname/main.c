@@ -1,6 +1,10 @@
 
+
+
+// rtl
 #include <stdio.h>
 #include <sys/utsname.h>
+
 
 
 /*

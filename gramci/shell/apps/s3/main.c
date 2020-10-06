@@ -37,6 +37,7 @@
 // ...
 
 
+// rtl
 #include <types.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -45,6 +46,9 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
+
+
+// client-side library
 #include <gws.h>
 
 

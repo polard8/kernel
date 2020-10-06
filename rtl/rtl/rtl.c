@@ -1,27 +1,15 @@
 
 /*
- * File: stubs.c 
+ * File: rtl.c 
  * 
- *    stubs and system calls.
  */
-
-// Stubs are nop functions.
-// It's used in dinlink.
-
-
-// #bugbug: It is not properly stub routines,
-// used by shared libraries. It's is o.s. dependent routines.
 
 
 #include <stdio.h>
 #include <types.h> 
 #include <stdarg.h> 
 #include <stddef.h>
-
-
-//system calls.
-#include <stubs/gramado.h> 
-
+#include <rtl/gramado.h> 
 #include <sysdeps/gramado/syscall.h>
 
 
@@ -34,7 +22,7 @@ void *gramado_system_call (
 {
     int __Ret = 0;
 
-    //System interrupt.
+    // System interrupt.
 
     asm volatile ( " int %1 \n"
                  : "=a"(__Ret)

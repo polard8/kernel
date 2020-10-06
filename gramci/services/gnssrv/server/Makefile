@@ -59,7 +59,7 @@ GWS_INCLUDES  = include/
 	##
 	
 	
-myObjects = crt0.o main.o stubs.o \
+myObjects = crt0.o main.o rtl.o \
 ctype.o stdio.o stdlib.o string.o conio.o socket.o signal.o unistd.o \
 connect.o decode.o \
 termios.o ioctl.o fcntl.o    
@@ -83,7 +83,8 @@ all-c:
 
 	# libc03
 	cp $(LIBCOBJ)/crt0.o .
-	cp $(LIBCOBJ)/stubs.o .
+	cp $(LIBCOBJ)/rtl.o .
+	
 	cp $(LIBCOBJ)/ctype.o .
 	cp $(LIBCOBJ)/stdio.o .
 	cp $(LIBCOBJ)/stdlib.o .

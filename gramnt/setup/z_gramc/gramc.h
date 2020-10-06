@@ -11,7 +11,7 @@
 #include "debug.h"
 
 
-// Libc support.
+// rtl
 #include <types.h>
 #include <ctype.h>
 #include <heap.h>
@@ -21,12 +21,8 @@
 #include <stdio.h>
 #include <unistd.h>
 
-
-// API.
-// Animal and Gramado operating systems.
+// libcore
 #include <api.h>
-
-
 
 // gramc 
 #include "gdef.h"

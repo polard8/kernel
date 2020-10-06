@@ -6,24 +6,22 @@
 
 #include <sys/types.h>   //for pid_t
 //#include <unistd.h>      //for pid_t
- 
 #include <sys/wait.h>   
- 
-//system calls.
-#include <stubs/gramado.h>  
- 
- 
- 
+#include <rtl/gramado.h>  
+
+
+
 /*
  *********************************
  * wait:
  *
  */
 
-pid_t wait ( int *status ){
-
+pid_t wait ( int *status )
+{
     return (pid_t) waitpid ( (pid_t) -1, (int *) status, (int) 0 );
 }
+
 
 
 /*

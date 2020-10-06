@@ -15,19 +15,19 @@
  
 
 // main window.
-//# usado para teste 
-//divisível por 4 é mais lento.
+// # usado para teste 
+// divisível por 4 é mais lento.
 
 #define WINDOW_LEFT      0      
 #define WINDOW_TOP       0      
-
 #define WINDOW_WIDTH     800    
 #define WINDOW_HEIGHT    600-24   
 
 
 
-// libc
-#include <stubs/gramado.h>
+
+// rtl
+#include <rtl/gramado.h>
 #include <ctype.h>
 #include <types.h>
 #include <stddef.h>
@@ -37,7 +37,7 @@
 #include <string.h>
 #include <fcntl.h>
 
-//api
+// libcore
 #include <api.h>
 
 

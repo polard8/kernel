@@ -19,16 +19,16 @@
 
 // fetch, decode and execute instructions.
 
+
+// rtl
 #include <stdio.h>
 #include <stdlib.h>
 #include <memory.h>
 #include <unistd.h>
 #include <fcntl.h>
-
-//test
 #include <sys/wait.h> 
+#include <rtl/gramado.h>
 
-#include <stubs/gramado.h>
 
 
 // target: i386.

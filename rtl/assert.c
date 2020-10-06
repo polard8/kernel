@@ -1,7 +1,8 @@
 //Credits: serenity os
 
-#include <assert.h>
 
+
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -11,10 +12,11 @@
 #ifdef DEBUG
 
 void 
-__assertion_failed ( const char* msg, 
-                     const char* file, 
-                     unsigned line, 
-                     const char* func )
+__assertion_failed ( 
+    const char* msg, 
+    const char* file, 
+    unsigned line, 
+    const char* func )
 {
 
     printf ("USERSPACE(%d) ASSERTION FAILED: ", getpid() );

@@ -69,7 +69,7 @@ ctype.o stdio.o stdlib.o string.o conio.o \
 builtins.o \
 tests.o \
 unistd.o socket.o wait.o termios.o ioctl.o fcntl.o \
-stubs.o    
+rtl.o    
 
 
 
@@ -93,7 +93,7 @@ all-c:
 
 # Getting objects from libcore.
 	cp $(LIBOBJ)/crt0.o .
-	cp $(LIBOBJ)/stubs.o .
+	cp $(LIBOBJ)/rtl.o .
 	cp $(LIBOBJ)/ctype.o   .
 	cp $(LIBOBJ)/stdio.o .
 	cp $(LIBOBJ)/stdlib.o .

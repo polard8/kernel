@@ -28,29 +28,37 @@
  * SUCH DAMAGE.
  */
 
-//incluido por fred
-#include <stddef.h>
 
+
+#include <stddef.h>
 #include <ctype.h>
 #include <errno.h>
 #include <limits.h>
 #include <stdlib.h>
 
 
+
 /*
- * Convert a string to a long integer.
+ ************************************
+ * strtol:
+ *     Convert a string to a long integer.
  *
  * Ignores `locale' stuff.  Assumes that the upper and lower case
  * alphabets and digits are each contiguous.
+ * 
+ * bsd
  */
 
+
 long strtol (const char *nptr, char **endptr, int base){
-	
-	const char *s;
-	long acc, cutoff;
-	int c;
-	int neg, any, cutlim;
-	
+
+    const char *s;
+    long acc, cutoff;
+    int c=0;
+    int neg, any, cutlim;
+
+
+
 	// Skip white space and pick up leading +/- sign if any.
 	// If base is 0, allow 0x for hex and 0 for octal, else
 	// assume decimal; if base is already 16, allow 0x.

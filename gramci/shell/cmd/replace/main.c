@@ -5,8 +5,12 @@
  ********************/
 
 
+
+
+// rtl
 #include <stdio.h>
 #include <string.h>
+
 
 
 int replace(char *text, char *word, char *new);

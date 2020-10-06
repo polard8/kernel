@@ -44,7 +44,8 @@ APIOBJ  = ../libcore/obj
 	## Objects
 	##
 
-myObjects = crt0.o main.o stubs.o \
+
+myObjects = crt0.o main.o rtl.o \
 ctype.o stdlib.o stdio.o string.o unistd.o termios.o ioctl.o fcntl.o \
 api.o \
 lexer.o parser.o tree.o compiler.o    
@@ -66,7 +67,8 @@ all-c:
 
 	# rtl
 	cp $(LIBCOBJ)/crt0.o    .
-	cp $(LIBCOBJ)/stubs.o   .
+	cp $(LIBCOBJ)/rtl.o    .
+
 	cp $(LIBCOBJ)/ctype.o   .
 	cp $(LIBCOBJ)/stdio.o   .
 	cp $(LIBCOBJ)/stdlib.o  .

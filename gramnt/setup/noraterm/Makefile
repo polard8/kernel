@@ -68,7 +68,7 @@ APIOBJ  = ../libcore/obj
 	
 	
 myObjects = crt0.o main.o \
-stubs.o \
+rtl.o \
 ctype.o stdio.o stdlib.o string.o conio.o socket.o signal.o unistd.o \
 api.o \
 builtins.o desktop.o login.o tests.o cmdline.o \
@@ -144,7 +144,7 @@ all-c:
 
 	cp $(LIBCOBJ)/unistd.o .
 	
-	cp $(LIBCOBJ)/stubs.o .
+	cp $(LIBCOBJ)/rtl.o .
 	
 	cp $(LIBCOBJ)/socket.o .
 

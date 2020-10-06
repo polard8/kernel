@@ -28,8 +28,6 @@
 #include <sys/wait.h> 
 
 
-
-
 // gdeshell stuff 
 #include "globals.h"
 #include "builtins.h"

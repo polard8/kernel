@@ -7,16 +7,17 @@
 
 #include <time.h>
 #include <types.h> 
-
 #include <sys/time.h>
+#include <rtl/gramado.h> 
 
-//system calls.
-#include <stubs/gramado.h> 
 
-						 
+
+
 // time 
-// #obs: O que representa esse retorno ?
+// #obs: 
+// O que representa esse retorno ?
 // Isso funciona.
+
 
 time_t time (time_t *timer){
 

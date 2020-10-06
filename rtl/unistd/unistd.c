@@ -13,10 +13,8 @@
 #include <sys/types.h>  
 #include <sys/socket.h>
 #include <sys/mman.h>
-
 #include <fcntl.h>
 #include <sys/stat.h>   
-
 #include <fcntl.h>
 #include <unistd.h>
 #include <limits.h>
@@ -24,17 +22,11 @@
 #include <sys/resource.h>
 #include <pty.h>
 #include <utmp.h>
-
 #include <sys/ioctl.h>
 #include <sys/ioctls.h>
-
 #include <termios.h>
 #include <sys/utsname.h>
-
-
-// System calls.
-#include <stubs/gramado.h> 
-
+#include <rtl/gramado.h> 
 
 
 

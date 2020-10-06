@@ -53,8 +53,7 @@ myObjects = crt0.o gramc4.o \
 ctype.o stdio.o stdlib.o string.o time.o \
 api.o \
 unistd.o math.o strtol.o strtoul.o fscanf.o fcntl.o termios.o \
-ioctl.o wait.o \
-stubs.o    
+ioctl.o wait.o rtl.o    
 
 
 
@@ -69,9 +68,9 @@ c4.o:
 
 all-c:
 
+
 	cp $(LIBCOBJ)/crt0.o   .
-	
-	cp $(LIBCOBJ)/stubs.o  .
+	cp $(LIBCOBJ)/rtl.o  .
 	
 	cp $(LIBCOBJ)/ctype.o   .
 	cp $(LIBCOBJ)/stdio.o .

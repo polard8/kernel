@@ -31,9 +31,8 @@
 #include <ctype.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <rtl/gramado.h> 
 
-// System calls.
-#include <stubs/gramado.h> 
 
 
 // Usada por uma função nesse documento. 

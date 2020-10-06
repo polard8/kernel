@@ -51,7 +51,7 @@ time.o \
 unistd.o \
 err.o \
 locale.o \
-stubs.o
+rtl.o
 
 
 
@@ -67,8 +67,7 @@ main.o:
 all-c:
 
 	cp $(LIBCOBJ)/crt0.o  .
-		
-	cp $(LIBCOBJ)/stubs.o  .
+	cp $(LIBCOBJ)/rtl.o  .
 	
 	cp $(LIBCOBJ)/ctype.o   .
 	cp $(LIBCOBJ)/stdio.o .
