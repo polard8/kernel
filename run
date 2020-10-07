@@ -2,7 +2,7 @@
 	echo "~~~~>"
 	
 	qemu-system-x86_64 -hda GRAMADO.VHD \
-	-m 512 \
+	-m 256 \
 	-serial stdio \
 	-netdev user,id=breh -device e1000,netdev=breh    
 	

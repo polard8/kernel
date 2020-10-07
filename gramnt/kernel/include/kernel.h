@@ -361,7 +361,6 @@ extern void do_executa_new_task (void);
 #include "ki.h"
 #include "info.h"
 #include "request.h"
-#include "panic.h"
 #include "reboot.h"
 #include "sub.h"       // gramado sub systems
 
@@ -803,7 +802,13 @@ void faults (unsigned long number);
 //
 // Error support
 // 
- 
+
+// panic without clean
+void panic ( const char *format, ... );   //panic.c
+
+// clean and panic.
+void panic2 ( const char *format, ... );   //panic.c
+
 void abort (void);    //abort.c
 void die (void);      //system.c
 

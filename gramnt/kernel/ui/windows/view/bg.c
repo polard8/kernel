@@ -90,8 +90,10 @@ void backgroundDraw (unsigned long color){
     unsigned long i=0;
 
 
-    if (VideoBlock.useGui != 1)
+    if (VideoBlock.useGui != 1){
+        debug_print ("backgroundDraw: No GUI\n");
         return;
+    }
 
     for ( i=0; i<SavedY; i++ ){
         my_buffer_horizontal_line ( 0, i, SavedX, color );

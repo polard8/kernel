@@ -34,6 +34,23 @@ void panic ( const char *format, ... )
 }
 
 
+// Clena and panic.
+void panic2 ( const char *format, ... )
+{
+    register int *varg = (int *) (&format);
+
+    // #todo
+    // Poderia existir uma flag que indicasse
+    // se ja podemos usar esse tipo de recurso grafico.
+
+    backgroundDraw ( (unsigned long) COLOR_RED ); 
+    
+    printf ("panic: KERNEL PANIC\n");
+    print ( 0, varg );
+    die();
+}
+
+
 //
 // End.
 //

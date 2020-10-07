@@ -1023,7 +1023,7 @@ int mmInit (void){
 	// Get memory sizes via RTC. (KB)
 	// base, other, extended.
 	// RTC só consegue perceber 64MB de memória.
-	
+
     memorysizeBaseMemory  = (unsigned long) rtcGetBaseMemory();  
     memorysizeOtherMemory = (unsigned long) (1024 - memorysizeBaseMemory);
 
@@ -1069,7 +1069,6 @@ int mmInit (void){
     if ( memorysizeTotal >= LARGESYSTEM_SIZE_KB ){
         g_mm_system_type = stLargeSystem;
     }
-
 
 
     // Inicializando o framepool (paged pool).

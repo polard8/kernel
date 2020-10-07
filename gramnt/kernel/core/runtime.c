@@ -118,6 +118,7 @@ int init_runtime (void){
 
 fail:
     debug_print ("[Kernel] init_runtime: Runtime fail\n");
+    refresh_screen();
     return -1;
 }
 

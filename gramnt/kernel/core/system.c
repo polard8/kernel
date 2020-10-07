@@ -1565,17 +1565,18 @@ int systemStartUp (void){
 	// As mensagens do abort podem não funcionarem nesse caso.
 	// AINDA NÃO INICIALIZAMOS O RECURSO DE MENSAGENS.
 	
-    if ( KeInitPhase != 0 ){
-        KiAbort ();
+    if ( KeInitPhase != 0 )
+    {
+        KiAbort();
 
     }else{
 
-	    //Disable interrupts, lock taskswitch and scheduler.
-	    
-		asm ("cli");	
-	    taskswitch_lock();
-	    scheduler_lock();
-		
+        // Disable interrupts, lock taskswitch and scheduler.
+        asm ("cli");  // #todo: call a hal routine.
+        taskswitch_lock();
+        scheduler_lock();
+
+
 		//Set scheduler type. (Round Robin).
 	    schedulerType = SCHEDULER_RR; 
 		
@@ -1586,7 +1587,7 @@ int systemStartUp (void){
 		//
 		// BANNER !
 		//
-		
+
         //Welcome message. (Poderia ser um banner.) 
         
         set_up_cursor (0,1);

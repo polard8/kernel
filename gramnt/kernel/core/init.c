@@ -12,9 +12,8 @@
  *    +init_video
  *    +init_globals
  *
- * Histórico:
- *     Versão 1.0, 2015 - Esse arquivo foi criado por Fred Nora.
- *     Versão 1.0, 2016 - Aprimoramento geral das rotinas básicas.
+ * History
+ *     2015 - Created by Fred Nora.
  *     //...
  */ 
 

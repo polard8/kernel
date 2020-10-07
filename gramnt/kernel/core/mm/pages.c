@@ -1569,7 +1569,7 @@ int mmSetUpPaging (void){
 
     // Size in KB.
     // Se for maior que 128 MB.
-    // (128*1024)KB
+    // (128*1024) KB
     } else if ( memorysizeTotal > (128*1024) ){
 
         FT.frame_table_start = FRAME_TABLE_START_PA;  // 64 MB mark. 
@@ -1585,11 +1585,13 @@ int mmSetUpPaging (void){
     // que começe na marca de 64 MB.
 
     }else{
-        debug_print ("mmSetUpPaging: [PANIC] 128 MB or less\n");
-        kprintf     ("mmSetUpPaging: [PANIC] 128 MB or less\n");
-        die();
-        //refresh_screen();
-        //panic       ("mmSetUpPaging: [PANIC] 128 MB or less\n");
+
+        debug_print ("mmSetUpPaging: [PANIC] We need 256 MB of RAM\n");
+        kprintf     ("mmSetUpPaging: [PANIC] We need 256 MB of RAM\n");
+        refresh_screen();
+        //die();
+        
+        panic2       ("mmSetUpPaging: [PANIC] We need 256 MB of RAM\n");
     };
 
 
