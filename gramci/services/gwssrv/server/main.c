@@ -1817,10 +1817,10 @@ int main (int argc, char **argv){
 
         //gwssrv_clone_and_execute ("gws.bin");      // command gws.bin
         //gwssrv_clone_and_execute ("gwm.bin");      // window manager
+        gwssrv_clone_and_execute ("editor.bin");           
         //gwssrv_clone_and_execute ("terminal.bin");  
         //gwssrv_clone_and_execute ("fileman.bin");  
         //gwssrv_clone_and_execute ("browser.bin");
-        gwssrv_clone_and_execute ("editor.bin");   
         //gwssrv_clone_and_execute ("launch1.bin"); 
         //gwssrv_clone_and_execute ("s2.bin");      // shell  
         //gwssrv_clone_and_execute ("s3.bin");    // hello        
@@ -1919,10 +1919,14 @@ int main (int argc, char **argv){
             // #bugbug: Talvez isso seja trabalho do window manager.
             // mas ele teria que chamar o window server pra efetuar o refresh
             //dos retângulos.
+            // See comp.c
             
-            //if ( dirty_status == 1 )
-                //compositor();
-         
+            if ( dirty_status == 1 )
+            {
+                compositor();    //nothing for now.
+                dirty_status = 0;
+            }
+
             //if (isTimeToQuit == 1) { break; };
          
 

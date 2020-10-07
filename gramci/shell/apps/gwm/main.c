@@ -1097,7 +1097,8 @@ int create_bg_client(int fd)
     // Topbar
     gws_debug_print ("gwm: Create c_topbar client\n");
     c_bg = (struct wm_client_d *) malloc ( sizeof(struct wm_client_d) );
-    if( (void *) c_bg == NULL){
+    if( (void *) c_bg == NULL)
+    {
         printf ("gwm: c_bg fail\n");
         exit(1);
     
@@ -1107,7 +1108,7 @@ int create_bg_client(int fd)
         c_bg->window = gws_create_window (fd,
             WT_SIMPLE,1,1,"BG",
             0, 0, w, h,
-            0,0, COLOR_GREEN, COLOR_GREEN); //COLOR_WHITE, COLOR_WHITE);
+            0,0, 0xD5D5D5, 0xD5D5D5); 
         
         if (c_bg->window < 0){
             printf ("gwm: c_bg->window fail\n");
@@ -1284,14 +1285,14 @@ int create_tester_client(int fd)
     {
         c_tester->used = 1;
         c_tester->magic = 1234;
-        
+
         // Window.
-        c_tester->window = gws_create_window (fd,
-                                    WT_SIMPLE,1,1,"Tester",
-                                    100, 100, 480, 100,
-                                    0,0, COLOR_GRAY, COLOR_GRAY);//0xF5DEB3, 0xF5DEB3);
+        c_tester->window = gws_create_window ( fd,
+                               WT_SIMPLE, 1, 1,"Tester",
+                               100, 100, 480, 100,
+                               0, 0, COLOR_GRAY, COLOR_GRAY );
         
-        if( c_tester->window < 0){
+        if ( c_tester->window < 0){
             printf ("gwm: c_tester->window fail\n");
             exit(1);
         }
@@ -1299,12 +1300,12 @@ int create_tester_client(int fd)
         gws_refresh_window(fd,c_tester->window);
         
         // Title window.
-        c_tester->title_window = gws_create_window (fd,
-                                          WT_SIMPLE,1,1,"Tester Title",
-                                          100, 100-32, 480, 32,
-                                          0,0, 0x2d89ef, 0x2d89ef);
+        c_tester->title_window = gws_create_window ( fd,
+                                     WT_SIMPLE,1,1,"Tester Title",
+                                     100, 100-32, 480, 32,
+                                     0,0,0x2d89ef,0x2d89ef);
 
-        if( c_tester->title_window < 0 ){
+        if ( c_tester->title_window < 0 ){
             printf ("gwm: c_tester->title_window fail\n");
             exit(1);
         }
@@ -1520,9 +1521,10 @@ int create_main_menu( int fd )
 // Update all
 int update(int fd)
 {
-    struct wm_client_d *c;
+    struct wm_client_d  *c;
     int i=0;
-    
+
+
     if ( (void*) c_bg != NULL ){
         gws_redraw_window(fd,c_bg->window,1);
         if ( (void*) c_topbar != NULL ){
@@ -1537,7 +1539,7 @@ int update(int fd)
 
 _more:
     //0=bg 1=topbar 2=taskbar
-    for( i=3; i<32; i++ )
+    for ( i=3; i<32; i++ )
     {
         c = (struct wm_client_d *) wmclientList[i];
         if ( (void*) c != NULL ){

@@ -268,6 +268,10 @@ head_init:
     ;; No interrupts for now.
 
     cli
+    
+    
+    ;; Memory management registes:
+    ;; GDTR, IDTR, LDTR and TR.
 
     ;;
     ;; == GDT ================================================
@@ -333,6 +337,11 @@ head_init:
     ;; 0x2B = (0x28+3).
     mov ax, word 0x2B
     ltr ax
+
+    ;;
+    ;; ========================================================
+    ;;
+
 
     ;; Jump to flush it.
 
@@ -465,6 +474,8 @@ pitEarlyInitialization:
     ;; == Set up registers ==================================
     ;;
 
+    ;; Debug registers:
+    ;; DR0 ~ DR7
 
     ; Debug registers.
     ; Disable break points.
@@ -475,7 +486,8 @@ pitEarlyInitialization:
     ;; ...
 
     ;; Data segments for ring 0.
-
+    ;;  ...
+    
     ;xor eax, eax
     mov ax, word 0x10   
     mov ds, ax

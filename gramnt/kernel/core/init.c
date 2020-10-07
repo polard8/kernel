@@ -18,7 +18,7 @@
  *     //...
  */ 
 
- 
+
 #include <kernel.h>
 
 
@@ -138,33 +138,30 @@ int init_architecture_dependent (void){
     // Sonda pra ver qual é a marca do processador.
     // #todo: 
     // É a segunda vez que fazemos a sondagem ?!
+    // See: hal/detect.c
+    // This routine is valid for intel and amd processors.
 
     Type = (int) hal_probe_processor_type();
 
-    if(Type==0)
-        panic("init_architecture_dependent: Type\n");
+    if (Type==0){
+        panic("init_architecture_dependent: processor Type\n");
+    }
 
     processor->Type = (int) Type;
 
-    //
-    // Inicializa de acordo com o tipo de processador.
-    // Essas rotinas pegarao informacoes sobre o processador
-    // e salvarao em estruturas
-    //
 
-    switch (Type)
-    {
+    // Ok.
+    // Let's make some initialization and 
+    // get more information about the processor
+    // using the cpuid instruction.
+    // See: hal/x86 and hal/amd.
 
-        case Processor_INTEL: 
-            init_intel(); 
-            break;
+    switch (Type){
 
-        case Processor_AMD: 
-            init_amd(); 
-            break;
+        case Processor_INTEL:  init_intel();   break;
+        case Processor_AMD:    init_amd();     break;
 
         // ...
-
 
         default:
             panic ("init_architecture_dependent: default Type\n");

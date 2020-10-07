@@ -12,6 +12,8 @@
 void compositor (void)
 {
     // #todo.
+    // Check for dirty rectangles and refresh'em all.
+    // Show all the windows respecting the zorder.
     
     // #test
     // Refresh the screen
