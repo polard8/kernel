@@ -739,23 +739,46 @@ int main ( int argc, char *argv[] ){
     int addressbar_window=0;    
     int client_window=0;
     int button=0;
+    int button_current_directory=0;
+    // ...
+
+    //
+    // == Main ==============================================
+    //
+    
+    // #hackhack
+    unsigned long titlebarHeight = 32;
+
+    unsigned long wLeft   = 8;
+    unsigned long wTop    = 8;
+    unsigned long wWidth  = (w-32);
+    unsigned long wHeight = (h-32);
 
 
     //main window
     main_window = gws_create_window (client_fd,
-        WT_SIMPLE,1,1,"Fileman",
-        40, 40, 640, 480,
+        WT_OVERLAPPED, 1, 1, "Fileman",
+        wLeft, wTop, wWidth, wHeight,
         0,0,COLOR_GRAY, COLOR_GRAY);
 
     if ( main_window < 0 )             
         debug_print("fileman: main_window fail\n"); 
 
 
+    //
+    // == Address bar =========================================
+    //
+
+    // #bugbug
+    // The window server needs to fix the client area.
+    // So 0,0 needs to mean the top/left of the 
+    // client area.
+
     // address bar
     addressbar_window = gws_create_window (client_fd,
         WT_EDITBOX,1,1,"address-bar",
-        4, 4, 
-        (640-32-4-4-4), 32,
+        4, titlebarHeight +4, 
+        (wWidth-40), 32,
         main_window,0,COLOR_WHITE, COLOR_WHITE);
 
     if ( addressbar_window < 0 )             
@@ -768,12 +791,17 @@ int main ( int argc, char *argv[] ){
         (unsigned long) 8,    // left,
         (unsigned long) 8,    // top,
         (unsigned long) COLOR_BLACK,
-        "file://text.txt");
+        "file://");
 
+    //
+    // == Button =========================================
+    //
+
+    // [>]
     // button
     button = gws_create_window (client_fd,
-        WT_BUTTON,1,1,">",
-        (640-32-4), 4, 
+        WT_BUTTON, BS_DEFAULT, 1, ">",
+        (wWidth-32-4), titlebarHeight +4, 
         32, 32,
         main_window,0,COLOR_GRAY, COLOR_GRAY);
 
@@ -781,32 +809,47 @@ int main ( int argc, char *argv[] ){
         debug_print("fileman: button fail\n"); 
 
 
+    //
+    // == Client window =========================================
+    //
+
+    unsigned long cwLeft   = 4;
+    unsigned long cwTop    = titlebarHeight + 40;
+    unsigned long cwWidth  = (wWidth-8);
+    unsigned long cwHeight = (wHeight - cwTop -4);
 
     // client window (White)
     client_window = gws_create_window (client_fd,
         WT_SIMPLE,1,1,"client",
-        4, 40, 640-8, 480 - 40 - 4,
+        cwLeft, cwTop, cwWidth, cwHeight,
         main_window,0,COLOR_WHITE, COLOR_WHITE);
 
     if ( client_window < 0 )             
         debug_print("fileman: client_window fail\n"); 
 
-     gws_draw_text (
-        (int) client_fd,             // fd,
-        (int) client_window,              // window id,
-        (unsigned long) 40,    // left,
-        (unsigned long) 40,    // top,
+    // [/]
+    // button
+    // Current directory
+    button_current_directory = gws_create_window (client_fd,
+        WT_BUTTON, BS_DEFAULT, 1, "/",
+        8, 8, 50, 24,
+        client_window, 0, COLOR_WHITE, COLOR_WHITE);
+
+    if ( button_current_directory < 0 )             
+        debug_print("fileman: button_current_directory fail\n"); 
+
+     // dir entries
+
+    int e=0;
+    for (e=3; e<24; e++){
+    gws_draw_text (
+        (int) client_fd,         // fd,
+        (int) client_window,     // window id,
+        (unsigned long) 8,       // left,
+        (unsigned long) e*16,  // top,
         (unsigned long) COLOR_BLACK,
-        "Hello, from File Manager!");
-
-
-
-
-
-
-
-
-
+        "FAKEFILE.TXT");
+    }
 
     //
     // Loop

@@ -22,8 +22,6 @@
 #include "colours.h"
 
 
-
-
 // Windows.
 #include "window.h"
 

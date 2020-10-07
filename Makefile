@@ -222,7 +222,9 @@ vhd-copy-files:
 #	-sudo cp gramci/shell/apps/bin/*.BIN  base/PROGRAMS
 	-sudo cp gramci/shell/apps/bin/GWM.BIN     base/
 	-sudo cp gramci/shell/apps/bin/EDITOR.BIN  base/
-	-sudo cp gramci/shell/apps/bin/LAUNCH1.BIN  base/
+	-sudo cp gramci/shell/apps/bin/FILEMAN.BIN  base/
+	#-sudo cp gramci/shell/apps/bin/LAUNCH1.BIN  base/
+
 	# ...
 
 

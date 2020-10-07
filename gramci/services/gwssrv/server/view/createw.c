@@ -1389,7 +1389,7 @@ void *createwCreateWindow2 (
                 dtextDrawString ( 
                     (window->left) +offset,  
                     (window->top)  +8,  
-                    COLOR_TERMINALTEXT, windowname );
+                    COLOR_BLACK, windowname );
             };
         }
 

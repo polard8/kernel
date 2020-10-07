@@ -2074,7 +2074,28 @@ do_compare:
         goto exit_cmp;
     }
 
-
+    // gramado
+    // Initialize the window server and the window server
+    // will call the first client.
+    if ( gramado_strncmp( prompt, "gramado", 7 ) == 0 )
+    {
+        // clear screen and setup cursor.
+        shellClearScreen();
+        
+        // Disable blinking cursor.
+        // #todo: Create function on libcore for this.
+        system_call ( 245, 
+            (unsigned long) 0, (unsigned long) 0, (unsigned long) 0 );
+        
+        // call window server
+        gramado_system_call ( 900, 
+            (unsigned long) "gwssrv.bin", 0, 0 );
+        
+        //exit gdeshell
+        exit(0);
+        goto exit_cmp;
+    }
+    
     // heap
     void *hBuffer;
     if ( gramado_strncmp( prompt, "heap", 4 ) == 0 )
@@ -4241,9 +4262,9 @@ fail:
  
 void shellClearScreen (void){
 
-	struct window_d *w;
-	unsigned long left, top, right, bottom;
-	
+    struct window_d *w;
+    unsigned long left, top, right, bottom;
+
     //desabilita o cursor
     system_call ( 245, 
         (unsigned long) 0, (unsigned long) 0, (unsigned long) 0 );

@@ -1119,8 +1119,7 @@ int gwssrv_display_system_icon ( int index, unsigned long x, unsigned long y )
     }
     
      //#debug
-     printf("gwssrv_display_system_icon: *hang2\n");
-     
+     //printf("gwssrv_display_system_icon: *hang2\n");
      
      // #bugbug #todo
      // We need to use the routine to refresh the rectangle.
