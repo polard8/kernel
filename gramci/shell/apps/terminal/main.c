@@ -2253,7 +2253,8 @@ int main ( int argc, char *argv[] ){
 
 
     //Creating the main window
-    int __response_wid = 0;
+    int main_window = 0;
+    int terminal_window = 0;
     
     //__response_wid = terminal_createwindow_request(client_fd, 100, 100, 480, 320, COLOR_BLACK);
     //terminal_createwindow_response(client_fd); 
@@ -2263,23 +2264,24 @@ int main ( int argc, char *argv[] ){
      //#test
      //Creating a window using the libgws library.
      //Ok. it works.
-     //__response_wid = gws_create_window_using_socket (client_fd,
-     //                     WT_SIMPLE, 1, 1, "Terminal",
-     //                     100, 100, 480,320,
-     //                     0,0,COLOR_GRAY,COLOR_BLACK);
+     main_window = gws_create_window_using_socket (client_fd,
+                      WT_OVERLAPPED, 1, 1, "Terminal",
+                      100, 100, 640, 480,
+                      0,0,COLOR_GRAY,COLOR_BLACK);
 
     //#test
-     __response_wid = gws_create_window (client_fd,
-                          WT_SIMPLE, 1, 1, "Terminal",
-                          100, 100, 480,320,
-                          0,0,COLOR_GRAY,COLOR_BLACK);
-                          
+     terminal_window = gws_create_window (client_fd,
+                          WT_SIMPLE, 1, 1, "ter-client",
+                          2, 32, 640-4, 480 -40,
+                          main_window,0,COLOR_GRAY,COLOR_BLACK);
+      
     // Saving the window id.
-    Terminal.window_id = __response_wid;
+    Terminal.window_id = terminal_window;
     
     if (Terminal.window_id<0){
         gws_debug_print ("terminal: [FAIL] create main window return fail\n");
     }
+
 
     //
     // Test 3
