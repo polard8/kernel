@@ -31,6 +31,8 @@
 #include "host.h"
 
 
+#include "ports.h"
+
 
 #include "menu.h"
 
@@ -100,6 +102,8 @@ void *gws_system_call (
 
 
 void gws_debug_print (char *string);
+
+
 
 
 // Initialize the library.

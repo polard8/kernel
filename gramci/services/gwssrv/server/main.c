@@ -38,16 +38,7 @@ See: https://wiki.osdev.org/Graphics_stack
 */
 
 
-//  #bugbug
-// Isso eh desnecessario, pois ja foi adicionado em gws.h
-// se nao foram, devem ser.
-/*
-#include <sys/cdefs.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/socket.h>
-*/
+
 
 // pertence a esse projeto, nao eh a biblioteca.
 #include <gws.h>
@@ -1950,7 +1941,6 @@ int main (int argc, char **argv){
             // Request from the new connection
             }else{
 
-                
                 //mensagens de clientes.
                 xxxHandleNextClientRequest (newconn);
                 //xxxHandleNextClientRequest (curconn);
@@ -1960,11 +1950,10 @@ int main (int argc, char **argv){
                 //shutdown(newconn, SHUT_RDWR);
                 //shutdown(newconn, 0);         
                 //close(newconn);
-                
             };
         };
 
-        
+
         // ...
         
         //

@@ -1753,95 +1753,97 @@ fail:
 // See: https://linux.die.net/man/3/shutdown
 int sys_socket_shutdown (int socket, int how)
 {
+
     // #todo
     // desconectar dois sockets.
     // mas nao destruir o socket ...
 
 
+    // The current process.
+    struct process_d *p;
+
+    // The file indicated by the fd.
+    file *f;
+    
+    // The socket structure for the file.
+    struct socket_d *s;
+
+    // Is this file a socket object?
+    int IsSocketObject = -1;
+
+
     debug_print ("sys_socket_shutdown: [TODO]\n");
-    printf      ("sys_socket_shutdown: [TODO] fd=%d how=%d\n",
-        socket, how );
+    //printf      ("sys_socket_shutdown: [TODO] fd=%d how=%d\n",
+    //    socket, how );
 
 
-    if ( socket < 0 )
-    {
+    // Invalid fd.
+    if ( socket < 0 ){
         debug_print ("sys_socket_shutdown: [FAIL] fd\n");
         printf      ("sys_socket_shutdown: [FAIL] fd\n");
         goto fail;
     }
     
 
-    struct process_d *p;
-    file *f;
-    struct socket_d *s;
+    //
+    // Process
+    //
     
     p = (struct process_d *) processList[current_process];
  
-    if ( (void *) p == NULL )
-    {
+    if ( (void *) p == NULL ){
         debug_print ("sys_socket_shutdown: p fail\n");
         printf      ("sys_socket_shutdown: p fail\n");
         goto fail;
     }
  
+    //
+    // File
+    //
+ 
     // sender's file
     // Objeto do tipo socket.
+    
     f = (file *) p->Objects[socket];
 
-    if ( (void *) f == NULL )
-    {
+    if ( (void *) f == NULL ){
         debug_print ("sys_socket_shutdown: f fail\n");
         printf      ("sys_socket_shutdown: f fail\n");
         goto fail;
     }
 
-    //is socket??
+    // Is this file a socket object?
     
-    int __is = -1;
+    IsSocketObject = is_socket ((file *)f);
     
-    __is = is_socket ((file *)f);
-    if(__is != 1)
-    {
+    if (IsSocketObject != 1){
         debug_print ("sys_socket_shutdown: f is not a socket\n");
         printf      ("sys_socket_shutdown: f is not a socket\n");
         goto fail;
     }
 
     //
-    // == socket =====================
+    // Socket
     //
 
-    // Pega a estrutura de socket associada ao arquivo.
-    // socket structure in the senders file.
-    //s = (struct socket_d *) p->priv; 
+    // Yes, This is a socket object.
+    // Let's get the socket structure associated with the file.
+    // Let's simply change the flag for this socket.
+
     s = (struct socket_d *) f->socket;   
-    
+
     if ( (void *) s == NULL )
     {
         debug_print ("sys_socket_shutdown: s fail\n");
         printf      ("sys_socket_shutdown: s fail\n");
         goto fail;
-        
+    
+    
+    // permanece conectado, mas usaremos outro da fila.
     }else{
-
-        // 31 ?
-        // p->Objects[socket] = (unsigned long) 0;
-   
-        // Disconecta.
-        s->state       = SS_UNCONNECTED;
-        //s->conn->state = SS_UNCONNECTED;
-         
-        //s->conn->state = SS_UNCONNECTED;
-        //s->conn->conn = (struct socket_d *) 0;
-        
-        //s->state = SS_UNCONNECTED;
-        //s->conn = (struct socket_d *) 0;
-
-        //ok
+        s->state = 216; 
         return 0;
-
     };
-
 
     // ...
 
@@ -2097,13 +2099,12 @@ sys_accept2 (
     // O socket do servidor precisa estar desconectado.
     // Pois cada accept eh cria uma nova conexao.
     
-    if ( sSocket->state == SS_CONNECTED )
+    
+    // SS_CONNECTED:
+    // Esse socket esta conectado. Usaremos ele.
+    
+    if ( sSocket->state == SS_CONNECTED  )
     {
-        //debug_print ("sys_accept2: Already connected!\n");
-        //printf      ("sys_accept2: Already connected!\n");
-        //refresh_screen();
-        //return -1;
-        
         return (int) fdServer;
     }
 

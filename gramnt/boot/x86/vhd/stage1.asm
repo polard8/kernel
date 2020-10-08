@@ -54,7 +54,7 @@ MaxRootEntries        dw 0x0200
 TotalSectorsSmall     dw 0x0000  ;; (CHS=963/4/17-5)(Number of sectors - number of hidden sectors)
 MediaDescriptor       db 0xF8
 SectorsPerFAT         dw 246    
-SectorsPerTrack       dw 17      ;;  19 ;;0x11    ;; 17 SPT.    
+SectorsPerTrack       dw 17      ;; 19 SPT.  
 NumHeads              dw 4       ;; 4 HEADS. Number of surfaces
 HiddenSectors         dd 5       ;; 1+1+3 ( mbr + vbr + reserved sectors depois do vbr)
 TotalSectorsLarge     dd 0       ;; Number of sectors, if 'TotalSectorsSmall = 0'.
@@ -491,6 +491,7 @@ DONE:
 
 
     ; Passando o comando para o BM.BIN em 0:8000h.
+    ; 0x8000:0
  
 ;Step9:
 
@@ -671,12 +672,21 @@ FAILURE:
 
 ; Partition 0. 
 P0:
+
+;; begin (4 bytes)
 .flag:                db  0x80     
 .hcs_inicial:         db  1, 1, 0       ; h,c,s      
+
+; end (4 bytes)
 .os_type:             db  0xEF          ; EFI FAT12/FAT16.       
 .hcs_final:           db  0x03, 0x4A, 0xCF  ; h,c,s (3, 255, 16)    0001 0000b
+
+; relative
 .lba_inicial:         dd  0x3F          ; First sector. (63, vbr).
+
+; size
 .tamanho_da_particao: dd  65512         ; in sectors. 
+
 
 ; (obs: Os dois bits mais altos de s pertencem al c)
 ; (17406*512)=8911872
@@ -701,7 +711,7 @@ P0:
 ; Partition 1, 2 and 3.
 P1: dd 0,0,0,0 
 P2: dd 0,0,0,0 
-P3: dd 0,0,0,0  
+P3: dd 0,0,0,0 
 
 
 ; Signature.
