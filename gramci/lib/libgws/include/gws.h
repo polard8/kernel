@@ -235,6 +235,10 @@ void *gws_create_thread (
     unsigned long init_stack, 
     char *name );
 
+
+void gws_start_thread (void *thread);
+
+
 int gws_clone_and_execute ( char *name );
 
 unsigned long gws_get_system_metrics (int index);

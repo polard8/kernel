@@ -24,6 +24,16 @@ void *gramado_system_call (
 void rtl_enter_critical_section (void);
 void rtl_exit_critical_section (void);
 
+void *
+rtl_create_thread ( 
+    unsigned long init_eip, 
+    unsigned long init_stack, 
+    char *name );
+
+
+void rtl_start_thread (void *thread);
+
+
 //vamos escrever em uma janela indefinida. NULL.
 //provavelmente a janela principal.
 int 

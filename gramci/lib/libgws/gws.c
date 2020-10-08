@@ -1936,7 +1936,7 @@ gws_create_thread (
     char *name )
 {
     //#define	SYSTEMCALL_CREATETHREAD     72
-    gws_debug_print ("gws_create_thread:\n");
+    debug_print ("gws_create_thread:\n");
     return (void *) gws_system_call ( 72, //SYSTEMCALL_CREATETHREAD, 
                         init_eip, 
                         init_stack, 
@@ -1944,6 +1944,24 @@ gws_create_thread (
 }
 
 
+
+
+/*
+ ****************************************************************
+ * gws_start_thread:
+ *     Coloca no estado standby para executar pela primeira vez
+ */
+
+void gws_start_thread (void *thread)
+{
+    // #define	SYSTEMCALL_STARTTHREAD  94 
+
+    debug_print ("gws_start_thread:\n");
+    gramado_system_call ( 94, //SYSTEMCALL_STARTTHREAD, 
+        (unsigned long) thread, 
+        (unsigned long) thread, 
+        (unsigned long) thread );
+}
 
 
 int gws_clone_and_execute ( char *name )

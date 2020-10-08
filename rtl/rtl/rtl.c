@@ -68,6 +68,49 @@ void rtl_exit_critical_section (void)
 }
 
 
+
+/*
+ **************************
+ * gws_create_thread:
+ *     Create a thread.
+ *     #todo: 
+ *     Precisamos uma função que envie mais argumentos.
+ *     Essa será uma rotina de baixo nível para pthreads.
+ */
+
+void *
+rtl_create_thread ( 
+    unsigned long init_eip, 
+    unsigned long init_stack, 
+    char *name )
+{
+    //#define	SYSTEMCALL_CREATETHREAD     72
+    debug_print ("rtl_create_thread:\n");
+    return (void *) gramado_system_call ( 72, //SYSTEMCALL_CREATETHREAD, 
+                        init_eip, 
+                        init_stack, 
+                        (unsigned long) name );
+}
+
+
+/*
+ ****************************************************************
+ * rtl_start_thread:
+ *     Coloca no estado standby para executar pela primeira vez
+ */
+
+void rtl_start_thread (void *thread)
+{
+    debug_print ("rtl_create_thread:\n");
+    gramado_system_call ( SYSTEMCALL_STARTTHREAD, 
+        (unsigned long) thread, 
+        (unsigned long) thread, 
+        (unsigned long) thread );
+}
+
+
+
+
 //vamos escrever em uma janela indefinida. NULL.
 //provavelmente a janela principal.
 int 
