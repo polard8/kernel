@@ -183,9 +183,31 @@ unsigned long rtl_get_progress_time(void)
 }
 
 
+/*
+void XorSwap( int* x, int* y ); 
+void XorSwap( int* x, int* y ) 
+{
+  if (x != y)
+  {
+    *x ^= *y;
+    *y ^= *x;
+    *x ^= *y;
+  }
+}
+*/
 
 
-
-
+/*
+void AddSwap( unsigned int* x, unsigned int* y );
+void AddSwap( unsigned int* x, unsigned int* y )
+{
+  if (x != y)
+  {
+    *x = *x + *y;
+    *y = *x - *y;
+    *x = *x - *y;
+  }
+}
+*/
 
 

@@ -803,7 +803,7 @@ int main ( int argc, char *argv[] ){
 
 
     int t=0;
-    for (t=0; t<4; t++){
+    for (t=1; t<8; t++){
     gws_draw_text (
         (int) client_fd,        // fd,
         (int) client_window,    // window id,
@@ -811,8 +811,21 @@ int main ( int argc, char *argv[] ){
         (unsigned long) t*8,    // top,
         (unsigned long) COLOR_BLACK,
         "Hello, this is a text editor!");
-    }    
+    } 
+    
 
+    /*
+    int t=0;
+    for (t=0; t<80; t++){
+        gws_draw_char (
+            (int) client_fd,        // fd,
+            (int) client_window,    // window id,
+            (unsigned long) t*8,    // left,
+            (unsigned long) 8,      // top,
+            (unsigned long) COLOR_BLUE,
+            (unsigned long) t );
+    } 
+    */
     
     // Show main window.
     gws_refresh_window(client_fd,main_window);

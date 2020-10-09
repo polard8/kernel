@@ -74,11 +74,6 @@ static unsigned char eye_sprite[5*8] = {
 
 
 
-
-
-
-
-
 //
 // Font
 //
