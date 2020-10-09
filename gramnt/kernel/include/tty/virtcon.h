@@ -3,7 +3,7 @@
 // Move this file to kdrivers/tty/  !!!
 
 #ifndef ____X_VIRTCON_H
-#define ____X_VIRTCON_H
+#define ____X_VIRTCON_H  1
 
 
 //
@@ -78,7 +78,10 @@ struct virtual_console_d
 
 unsigned long virtualconsoleList[12];
 
+
 #endif   
+
+
 
 
 

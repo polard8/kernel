@@ -3,7 +3,7 @@
 
 
 #ifndef ____CONSOLE_H
-#define ____CONSOLE_H
+#define ____CONSOLE_H  1
 
 
 //#define CONSOLE_COUNT_MIN    1
@@ -53,13 +53,7 @@ void console_init_virtual_console (int n);
 int console_ioctl ( int fd, unsigned long request, unsigned long arg );
 
 
-
-#endif   
-
-
-
-
-
+#endif    
 
 
 

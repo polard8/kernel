@@ -2,7 +2,7 @@
 
 
 #ifndef ____TTYDRV_H
-#define ____TTYDRV_H
+#define ____TTYDRV_H  1
 
 
 //#define TTY_DRIVER_MAGIC		0x5402

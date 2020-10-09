@@ -4,9 +4,9 @@
  */
 
 #ifndef ____TTY_H
-#define ____TTY_H
+#define ____TTY_H  1
 
- 
+
 
 #define TTYCHARS_COUNT_MAX 25    //80 
 #define TTYLINES_COUNT_MAX 25    //25 
@@ -420,7 +420,8 @@ tty_send_message (
 int tty_init_module (void);
 
 
-#endif
+#endif    
+
 
 
 //

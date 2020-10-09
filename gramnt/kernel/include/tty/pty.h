@@ -7,7 +7,7 @@
 
 
 #ifndef ____PTY_H
-#define ____PTY_H
+#define ____PTY_H  1
 
 
 

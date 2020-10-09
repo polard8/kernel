@@ -94,14 +94,14 @@ ifeq ($(ARCH),x86)
 	ata.o atadma.o atainit.o atairq.o atapci.o hdd.o \
 	channel.o network.o nicintel.o \
 	pci.o pciinfo.o pciscan.o \
-	tty.o pty.o vt.o\
+	console.o tty.o pty.o vt.o\
 	usb.o \
 	video.o vsync.o screen.o xproc.o \
 	i8042.o keyboard.o mouse.o ps2kbd.o ps2mouse.o ldisc.o \
 	apic.o pic.o rtc.o serial.o pit.o  
 	
 	KSERVERS_OBJECTS := cf.o format.o pipe.o fs.o read.o search.o write.o \
-	cedge.o bg.o bmp.o button.o char.o createw.o dtext.o font.o pbar.o \
+	bg.o bmp.o button.o char.o createw.o dtext.o font.o pbar.o \
 	line.o menu.o mbar.o pixel.o rect.o sbar.o tbar.o wm.o \
 	logoff.o logon.o \
 	input.o output.o terminal.o \
@@ -387,7 +387,7 @@ all-c:
 	# 
 
 	# tty
-	$(CC) -c hwi/tty/console.c   $(KINCLUDE) $(CFLAGS) -o cedge.o
+	$(CC) -c hwi/tty/console.c   $(KINCLUDE) $(CFLAGS) -o console.o
 	$(CC) -c hwi/tty/pty.c       $(KINCLUDE) $(CFLAGS) -o pty.o
 	$(CC) -c hwi/tty/tty.c       $(KINCLUDE) $(CFLAGS) -o tty.o
 	$(CC) -c hwi/tty/vt.c        $(KINCLUDE) $(CFLAGS) -o vt.o
@@ -429,8 +429,8 @@ link-kernel:
 	@echo "(Step 2) Linking the kernel image ..."
 
 	$(LD) $(LDFLAGS) -T link.ld -o KERNEL.BIN $(OBJECTS)    
-
-
+	
+	
 
 clean:
 	rm -rf *.o   

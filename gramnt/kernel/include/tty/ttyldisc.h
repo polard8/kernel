@@ -3,8 +3,7 @@
 
 
 #ifndef ____TTYLDISC_H
-#define ____TTYLDISC_H
-
+#define ____TTYLDISC_H  1
 
 
 
