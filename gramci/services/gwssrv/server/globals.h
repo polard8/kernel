@@ -1,8 +1,7 @@
 
 
 #ifndef __GWSSRV_GLOBALS_H
-#define __GWSSRV_GLOBALS_H
-
+#define __GWSSRV_GLOBALS_H  1
 
 
 // ## button support ##
@@ -146,7 +145,7 @@ struct gws_color_scheme_d
 	//cada estilo pode invocar por si um padrão de cores.
 	//ou o padrão de cores por si pode representar um estilo.
     int style;
-	
+
     char *name; 
 	
 	//cada índice desse array representará um elemento gráfico,
@@ -162,6 +161,7 @@ struct gws_color_scheme_d* GWSCurrentColorScheme;
 struct gws_color_scheme_d* GWSHumilityColorScheme; // Simples.
 struct gws_color_scheme_d* GWSPrideColorScheme;    // Colorido.
 //... 
+
 
 
 

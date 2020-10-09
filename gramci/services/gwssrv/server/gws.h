@@ -75,6 +75,15 @@
 //
 
 
+void invalidate(void);
+void validate(void);
+int isdirty(void);
+
+
+void invalidate_background(void);
+void validate_background(void);
+int is_background_dirty(void);
+
 
 // #test
 // from x window system.

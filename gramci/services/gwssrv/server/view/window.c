@@ -17,6 +17,66 @@
 //GetClientRect
 
 
+
+void wm_process_windows(void)
+{
+    int dirty_status = -1;
+    int background_status = -1;
+    
+    //
+    // == dirty rectangles ===========================
+    //
+    
+    dirty_status = isdirty();
+    
+    // Nothing to do.
+    if (dirty_status != 1)
+    {
+        validate();   // torna 0.
+        return;
+    }
+    
+    //
+    // == dirty background ==============================
+    //
+    
+    background_status = is_background_dirty();
+    
+    if (background_status == 1)
+    {
+        gws_show_backbuffer();              
+        validate_background();
+        return;
+    }
+    
+    // #todo
+    // redraw using zorder.
+    
+    // refresh using zorder.
+
+    int i=0;
+    struct gws_window_d  *tmp;
+    for (i=0; i<ZORDER_MAX; i++)
+    {
+        tmp = (struct gws_window_d  *) zList[i];
+        if ( (void*) tmp != NULL )
+        {
+            if ( tmp->used == 1 && tmp->magic == 1234 )
+            {
+                if (tmp->dirty == 1)
+                {
+                    //gws_show_window_rect(tmp);
+                    gwssrv_redraw_window(tmp,1); //redesenha e mostra.
+                    tmp->dirty=0;
+                }
+            }
+        }
+    }
+    
+}
+
+
+
 /*
  *****************************************
  * serviceCreateWindow:
@@ -1478,6 +1538,10 @@ gws_resize_window (
         window->width  = (unsigned long) cx;
         window->height = (unsigned long) cy;
     }
+    
+    
+    //#test
+    //window->dirty = 1;
 
     return 0;
 }
@@ -1519,6 +1583,9 @@ gwssrv_change_window_position (
     window->y = y;
     window->left = (window->parent->left + window->x); 
     window->top  = (window->parent->top  + window->y); 
+    
+    //#test
+    //window->dirty = 1;
     
     return 0;
 }

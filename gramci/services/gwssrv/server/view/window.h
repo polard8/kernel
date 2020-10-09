@@ -421,9 +421,7 @@ struct gws_window_d
     
     int status;
     
-    //maybe
-    //int dirty;
-
+    int dirty;
 
     // Margins. (position)
     // Deslocamento em relação à tela. (screen)
@@ -1023,6 +1021,10 @@ unsigned long zList[ZORDER_MAX];
 //
 // ================================================================
 //
+
+
+
+void wm_process_windows(void);
 
 
 // #todo

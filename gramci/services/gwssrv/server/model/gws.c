@@ -15,6 +15,10 @@
 
 
 
+int dirty=0;
+int background=0;
+
+
 /*
  *******************************************
  * xxxThread:
@@ -429,6 +433,36 @@ int gwsInit(void)
     return 0;
 }
 
+
+void invalidate(void)
+{
+    dirty = 1;
+}
+
+void validate(void)
+{
+    dirty = 0;
+}
+
+int isdirty(void)
+{
+    return (int) dirty;
+}
+
+void invalidate_background(void)
+{
+    background = 1;
+}
+
+void validate_background(void)
+{
+    background = 0;
+}
+
+int is_background_dirty(void)
+{
+    return (int) background;
+}
 
 
 

@@ -44,7 +44,6 @@ See: https://wiki.osdev.org/Graphics_stack
 #include <gws.h>
 
 
-
 //
 // == Gramado Network Protocol ===============================
 //
@@ -85,7 +84,6 @@ int ____saved_server_fd = -1;
 // ...
 
 
-int dirty_status = 0;
 int connection_status = 0;
 
 
@@ -1684,8 +1682,8 @@ int main (int argc, char **argv){
 
 
     // Activate the compositor.
-    dirty_status = 1;
-
+    invalidate();
+    invalidate_background();
 
 
     //++
@@ -1912,11 +1910,15 @@ int main (int argc, char **argv){
             //dos retângulos.
             // See comp.c
             
-            if ( dirty_status == 1 )
-            {
-                compositor();    //nothing for now.
-                dirty_status = 0;
-            }
+            //See: window.c
+            wm_process_windows();
+            //wm_process_events(); //todo
+            
+            //if ( dirty == 1 )
+            //{
+            //    compositor();    //nothing for now.
+            //    dirty = 0;
+            //}
 
             //if (isTimeToQuit == 1) { break; };
          

@@ -826,9 +826,16 @@ int main ( int argc, char *argv[] ){
             (unsigned long) t );
     } 
     */
-    
+
+
     // Show main window.
     gws_refresh_window(client_fd,main_window);
+
+    
+
+    //test
+    //gws_change_window_position(client_fd,main_window,0,0);
+    //gws_resize_window(client_fd,main_window,w,h);
 
 
     //
