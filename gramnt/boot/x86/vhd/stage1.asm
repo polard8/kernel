@@ -491,14 +491,13 @@ DONE:
 
 
     ; Passando o comando para o BM.BIN em 0:8000h.
-    ; 0x8000:0
  
 ;Step9:
 
 .FLY:
 
-    PUSH WORD  0 
-    PUSH WORD  0x8000 
+    PUSH WORD  0         ;; cs
+    PUSH WORD  0x8000    ;; offset 
     RETF
 
 

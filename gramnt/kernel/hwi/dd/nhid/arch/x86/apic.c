@@ -14,9 +14,24 @@
  *
  * Versão 1.0, 2015.
  */
- 
+
+
+// See:
+// hwi/dd/nhid/arch/x86/apic.c
+
+
 
 #include <kernel.h>
+
+
+
+/* Flush caches */
+/*
+void flush_cashes(void)
+{
+	__asm__("wbinvd");
+}
+*/
 
 
 //@todo: definir porta 70h usada nesse arquivo.
@@ -47,7 +62,8 @@
  *
  */
 
-static inline void imcr_pic_to_apic (void){
+static inline void imcr_pic_to_apic (void)
+{
 
 	//Select IMCR register.
     outb (0x70, 0x22);
@@ -59,7 +75,8 @@ static inline void imcr_pic_to_apic (void){
 }
 
  
-static inline void imcr_apic_to_pic (void){
+static inline void imcr_apic_to_pic (void)
+{
 
 	//Select IMCR register.
     outb (0x70, 0x22);
@@ -91,10 +108,14 @@ static inline void imcr_apic_to_pic (void){
  *  note that this requires CPUID to be supported.
  */
 
-int check_apic (void){
+int check_apic (void)
+{
+   unsigned long eax=0; 
+   unsigned long ebx=0; 
+   unsigned long ecx=0;
+   unsigned long edx=0;
 
-   unsigned long  eax, ebx, ecx, edx;
-   
+
    cpuid (1, eax, ebx, ecx, edx );
    
    return (int) (edx & CPUID_FEAT_EDX_APIC);
@@ -104,11 +125,12 @@ int check_apic (void){
 
 
 /* Set the physical address for local APIC registers */
+// ??
+// Is it possible to change the base?
+// But we have a default adddress, it is 0xFEE00000.
 
-
-
-void cpu_set_apic_base(unsigned long apic) {
-
+void cpu_set_apic_base(unsigned long apic) 
+{
    unsigned long edx = 0;
    unsigned long eax = (apic & 0xfffff000) | IA32_APIC_BASE_MSR_ENABLE;
  
@@ -116,7 +138,7 @@ void cpu_set_apic_base(unsigned long apic) {
 //   edx = (apic >> 32) & 0x0f;
 //#endif
  
-   cpuSetMSR(IA32_APIC_BASE_MSR, eax, edx);
+   cpuSetMSR (IA32_APIC_BASE_MSR, eax, edx);
 }
 
  
@@ -127,10 +149,13 @@ void cpu_set_apic_base(unsigned long apic) {
  * Get the physical address of the APIC registers page
  * make sure you map it to virtual memory ;)
  */
-unsigned long cpu_get_apic_base(void) {
+unsigned long cpu_get_apic_base (void) 
+{
    
-   unsigned long eax, edx;
-   
+   unsigned long eax=0; 
+   unsigned long edx=0;
+
+
    cpuGetMSR (IA32_APIC_BASE_MSR, &eax, &edx);
  
 /* 
@@ -223,32 +248,24 @@ void APIC::wakeupSequence(U32 apicId, U8 pvect)
 
 
 
+
 /*
-int init_apic();
-int init_apic()
+uint32_t apic_read(void* apic_base, uint32_t register);
+uint32_t apic_read(void* apic_base, uint32_t register) 
 {
-    
- 
-done:
-    g_driver_apic_initialized = 0;
-    return (int) 0;
-};
+    return *((volatile uint32_t*)(apic_base + register));
+}
 */
-
 
 
 /*
- * Constructor.
-int apicApic()
-{};
+void apic_write(void* apic_base, uint32_t register, uint32_t data);
+void apic_write(void* apic_base, uint32_t register, uint32_t data) 
+{
+    *((volatile uint32_t*)(apic_base + register)) = data;
+}
 */
 
-
-
-/*
-int apicInit()
-{};
-*/
 
 
 

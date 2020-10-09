@@ -12,6 +12,10 @@
  * 2018 - IDE controller support by Nelson Cole.
  *
  */
+
+// See:
+// https://thestarman.pcministry.com/asm/mbr/PartTables.htm
+ 
  
  
  
@@ -49,7 +53,33 @@
 
 
 
-//#define  PARTITION_ACTIVE_FLAG    0x80
+// mbr partition table offsets.
+
+#define MBR_PT0_OFFSET  0x01BE  // (446) 
+#define MBR_PT1_OFFSET  0x01CE  // (462)
+#define MBR_PT2_OFFSET  0x01DE  // (478) 
+#define MBR_PT3_OFFSET  0x01EE  // (494) 
+
+
+//#define PARTITION_ACTIVE_FLAG    0x80
+//#define MBR_PT_ACTIVE_FLAG   PARTITION_ACTIVE_FLAG
+
+
+// Partition type
+// See:
+// https://en.wikipedia.org/wiki/Partition_type
+
+#define MBR_PT_EMPTY   0x00
+#define MBR_PT_FAT16   0x04
+#define MBR_PT_FAT16B  0x06
+// ...
+
+
+//
+// =========================================
+//
+
+
 
  
 //macro

@@ -51,8 +51,14 @@
 #include "model/connect.h"
 
 // data model
+
+#include "model/nc2.h"   //nelson cole 2 font. 8x8
+#include "model/lt8x8.h"
+// ...
 #include "model/font.h"
-#include "model/nc2.h"   //nelson cole 2 font.
+
+
+
 
 // Client structure.
 // O proprio servidor poderia ser o cliente 0??
