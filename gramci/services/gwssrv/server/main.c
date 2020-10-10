@@ -87,10 +87,12 @@ int ____saved_server_fd = -1;
 int connection_status = 0;
 
 
+
 // Window.
-struct gws_window_d  *__bg_window;
-struct gws_window_d  *__taskbar_window; 
-struct gws_window_d  *__taskbar_button; 
+// See: window.h
+//struct gws_window_d  *__bg_window;
+//struct gws_window_d  *__taskbar_window; 
+//struct gws_window_d  *__taskbar_button; 
 // ...
 
 
@@ -1391,29 +1393,32 @@ void create_background (void)
 {
     unsigned long w = gws_get_device_width();
     unsigned long h = gws_get_device_height();
+    int WindowId = -1;
 
 
     gwssrv_debug_print ("gwssrv: create_background\n");
 
     __bg_window = (struct gws_window_d *) createwCreateWindow ( WT_SIMPLE, 
-                                         1, 1, "gwssrv-bg",  
-                                         0, 0, w, h,   
-                                         gui->screen, 0, 
-                                         COLOR_BACKGROUND, COLOR_BACKGROUND );    
+                                            1, 1, "gwssrv-bg",  
+                                            0, 0, w, h,   
+                                            gui->screen, 0, 
+                                            COLOR_BACKGROUND, COLOR_BACKGROUND );    
 
     if ( (void *) __bg_window == NULL ){
         gwssrv_debug_print ("gwssrv: __bg_window fail\n");  
         return;
     }
-    
-    //#test
-    int id = -1;
-    id = gwsRegisterWindow ( __bg_window );
 
-    if (id<0){
+
+    WindowId = gwsRegisterWindow (__bg_window);
+
+    if (WindowId<0){
         gwssrv_debug_print ("create_background: Couldn't register window\n");
         //return -1;
     }
+
+
+    //__bg_window->dirty = 1;
 }
 
 

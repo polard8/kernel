@@ -1471,7 +1471,7 @@ createwCreateWindow (
                            (char *) windowname, 
                            x, y, width, height, 
                            (struct gws_window_d *) pWindow, 
-                           desktopid, clientcolor, color );      
+                           desktopid, clientcolor, color );          
     
         // Pintamos simples, mas a tipagem será overlapped.
         __w->type = WT_OVERLAPPED;   
@@ -1577,6 +1577,28 @@ draw_frame:
 
 //draw_v_scrollbar:
 // ...
+
+
+    //__w->dirty = 1;
+
+
+    // Quando criamos uma overlapped, ela deve vicar no topo da pilha.
+    if ( type == WT_OVERLAPPED )
+    {
+        // #bugbug
+        // refaz a lista de zorder...
+        // somente com overlalled
+        //reset_zorder();
+        
+        // #bugbug isso nao eh bom.
+        //invalidate parent, if present
+        //invalidate_window(__w->parent);
+
+        // coloca a nova janela no topo.
+        __w->zIndex = ZORDER_TOP;
+        zList[ZORDER_TOP] = (unsigned long) __w;
+    }
+
 
 //done:
     return (void *) __w;   

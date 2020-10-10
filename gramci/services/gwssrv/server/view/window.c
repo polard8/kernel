@@ -48,10 +48,40 @@ void wm_process_windows(void)
         validate_background();
         return;
     }
-    
+
+
+    // bg window (root window)
+    if ( (void*) __bg_window != NULL )
+    {
+        if ( __bg_window->used == 1 && __bg_window->magic == 1234 )
+        {
+            if (__bg_window->dirty == 1)
+            {
+                //gws_show_window_rect(tmp);
+                gwssrv_redraw_window(__bg_window,1); //redesenha e mostra.
+                __bg_window->dirty=0;
+            }
+        }
+    }
+
+    // taskbar window
+    if ( (void*) __taskbar_window != NULL )
+    {
+        if ( __taskbar_window->used == 1 && __taskbar_window->magic == 1234 )
+        {
+            if (__taskbar_window->dirty == 1)
+            {
+                //gws_show_window_rect(tmp);
+                gwssrv_redraw_window(__taskbar_window,1); //redesenha e mostra.
+                __taskbar_window->dirty=0;
+            }
+        }
+    }
+
+
+
     // #todo
     // redraw using zorder.
-    
     // refresh using zorder.
 
     int i=0;
@@ -63,6 +93,7 @@ void wm_process_windows(void)
         {
             if ( tmp->used == 1 && tmp->magic == 1234 )
             {
+                // Se foi corrompido por outra janela.
                 if (tmp->dirty == 1)
                 {
                     //gws_show_window_rect(tmp);
@@ -73,6 +104,19 @@ void wm_process_windows(void)
         }
     }
     
+}
+
+
+void invalidate_window (struct gws_window_d *window)
+{
+    // bg window (root window)
+    if ( (void*) window != NULL )
+    {
+        if ( window->used == 1 && window->magic == 1234 )
+        {
+            window->dirty=1;
+        }
+    }
 }
 
 
@@ -1539,11 +1583,39 @@ gws_resize_window (
         window->height = (unsigned long) cy;
     }
     
-    
+
     //#test
-    //window->dirty = 1;
+    window->dirty = 1;
+    //__bg_window->dirty = 1;
 
     return 0;
+}
+
+
+
+// #test
+// Isso so faz sentido num contexto de reinicializaçao 
+// do desktop.
+void reset_zorder(void)
+{
+     struct gws_window_d *w;
+     
+     int i=0;
+     for ( i=0; i<WINDOW_COUNT_MAX; i++)
+     {
+         w = (struct gws_window_d *) windowList[i];
+         if ( (void*) w != NULL )
+         {
+             if ( w->used == 1 && w->magic == 1234 )
+             {
+                 // Coloca na zorder as janelas overlapped.
+                 if ( w->type == WT_OVERLAPPED )
+                 {
+                     zList[i] = windowList[i];
+                 }
+             }
+         }
+     };
 }
 
 
@@ -1624,7 +1696,14 @@ void gwsWindowUnlock (struct gws_window_d *window){
 }
 
 
-int gwssrv_init_windows(void)
+/*
+ *****************************************
+ * gwssrv_init_windows:
+ * 
+ * 
+ */
+
+int gwssrv_init_windows (void)
 {
     int i=0;
     

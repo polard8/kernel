@@ -829,13 +829,16 @@ int main ( int argc, char *argv[] ){
 
 
     // Show main window.
-    gws_refresh_window(client_fd,main_window);
+    gws_refresh_window (client_fd,main_window);
 
     
-
-    //test
+    // test: ok
     //gws_change_window_position(client_fd,main_window,0,0);
-    //gws_resize_window(client_fd,main_window,w,h);
+    //gws_resize_window ( client_fd, main_window, 400, 400);
+    //gws_redraw_window(client_fd,main_window,1);
+
+    //mudando o tamanho de uma janela que esta no top
+    //vai deixar ela suja e o compositor vai repintar.
 
 
     //

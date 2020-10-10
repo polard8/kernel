@@ -466,6 +466,7 @@ int is_background_dirty(void)
 
 
 
+
 // Função padrão para todos os servidores ???
 // #todo: temos que criar isso.
 int serverInit (void)

@@ -9,6 +9,12 @@
 #define ____WINDOW_H    1
 
 
+// Window.
+struct gws_window_d  *__bg_window;   //root window?
+struct gws_window_d  *__taskbar_window; 
+struct gws_window_d  *__taskbar_button; 
+// ...
+
 
 //apresentação.
 #define VIEW_NULL      0
@@ -1007,13 +1013,20 @@ unsigned long windowList[WINDOW_COUNT_MAX];
 //
 
 #define ZORDER_MAX 1024
+#define ZORDER_TOP (ZORDER_MAX-1)
+#define ZORDER_BOTTOM 0
+//...
+
+#define TOP_WINDOW    ZORDER_TOP
+#define BOTTOM_WINDOW 0
+// ...
+
 
 unsigned long zList[ZORDER_MAX];
 
 //
 // ================================================================
 //
-
 
 
 
@@ -1025,6 +1038,11 @@ unsigned long zList[ZORDER_MAX];
 
 
 void wm_process_windows(void);
+
+
+//refaz zorder.
+void reset_zorder(void);
+void invalidate_window (struct gws_window_d *window);
 
 
 // #todo
