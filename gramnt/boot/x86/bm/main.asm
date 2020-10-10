@@ -132,7 +132,7 @@
 ;; G_VIDEO_MODE EQU 0x010F    ;320x200
 G_VIDEO_MODE EQU 0x0112    ;640x480
 ;; G_VIDEO_MODE EQU 0x0115    ;800x600
-;; G_VIDEO_MODE EQU 0x0118    ;1024x768
+;;G_VIDEO_MODE EQU 0x0118    ;1024x768
 ;; ...
 
 ;; =================================================================

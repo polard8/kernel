@@ -1040,6 +1040,10 @@ unsigned long zList[ZORDER_MAX];
 void wm_process_windows(void);
 
 
+
+void yellow_status( char *string );
+
+
 int is_within ( struct gws_window_d *window, unsigned long x, unsigned long y );
 
 //refaz zorder.

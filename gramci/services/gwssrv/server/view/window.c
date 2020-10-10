@@ -20,6 +20,11 @@
 
 void wm_process_windows(void)
 {
+
+    unsigned long t_start = 0;
+    unsigned long t_end = 0;
+
+
     int dirty_status = -1;
     int background_status = -1;
     
@@ -35,6 +40,10 @@ void wm_process_windows(void)
         validate();   // torna 0.
         return;
     }
+    
+//===================================================================
+// ++  Start
+    t_start = rtl_get_progress_time();
     
     //
     // == dirty background ==============================
@@ -103,7 +112,39 @@ void wm_process_windows(void)
             }
         }
     }
+
+    // debug
+    //gws_show_backbuffer();              
     
+//===================================================================
+// ++  End
+    t_end = rtl_get_progress_time();
+
+    //__refresh_rate =  t_end - t_start;
+    
+    //printf ("@ %d %d %d \n",__refresh_rate, t_now, t_old);
+
+    //====================================
+    //fps++
+    //char rate_buffer[32];
+    //itoa(__refresh_rate, rate_buffer); 
+    //yellow_status(rate_buffer);
+    //fps--
+    //=======================
+}   
+
+
+void yellow_status( char *string )
+{
+    
+    rectBackbufferDrawRectangle ( 
+            0, 0, 400, 24, 
+            COLOR_YELLOW, 1 );
+    
+    dtextDrawString ( 8, 8, COLOR_BLACK, "flush ms: " );
+    dtextDrawString ( 100, 8, COLOR_BLACK, string );
+    
+    gws_refresh_rectangle(0,0,400,24);
 }
 
 

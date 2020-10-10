@@ -183,6 +183,14 @@ unsigned long __device_height;
 
 
 
+// refresh rate of the whole screen.
+unsigned long __fps;
+
+// refresh rate for all dirty objects.
+unsigned long __refresh_rate;
+
+
+
 //
 // Prototypes.
 //

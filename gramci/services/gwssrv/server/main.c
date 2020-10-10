@@ -1410,6 +1410,8 @@ void create_background (void)
 
     if ( (void *) __bg_window == NULL ){
         gwssrv_debug_print ("gwssrv: __bg_window fail\n");  
+        printf ("gwssrv: __bg_window fail\n");
+        exit(1);
         return;
     }
 
