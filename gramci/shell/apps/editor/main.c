@@ -646,6 +646,10 @@ int main ( int argc, char *argv[] ){
     unsigned long h = gws_get_system_metrics(2);
 
 
+    // #todo:
+    // check validation od w h
+
+
     debug_print ("------------------------\n"); 
     debug_print ("editor: Initializing ...\n");
 
@@ -676,12 +680,11 @@ int main ( int argc, char *argv[] ){
 
     //nessa hora colocamos no accept um fd.
     //então o servidor escreverá em nosso arquivo.
+    // #debug
+    gws_debug_print ("editor: Connecting to ws via inet ...\n");
+    //printf          ("editor: Connecting to ws via inet ...\n");
 
     while (1){
-
-        // #debug
-        gws_debug_print ("editor: Connecting to ws via inet ...\n");
-        //printf          ("editor: Connecting to ws via inet ...\n");
 
         if (connect (client_fd, (void *) &addr_in, sizeof(addr_in)) < 0)
         { 
@@ -704,6 +707,12 @@ int main ( int argc, char *argv[] ){
     // Mas como sabemos que é um soquete,
     // então sabemos que é possível ler.
 
+    // =============================================================
+    // #bugbug
+    // Sem essa chamada a funçao create window vai falhar
+    // na string do title bar.
+    // =============================================================
+    
     _hello(client_fd);
 
 
@@ -733,9 +742,9 @@ int main ( int argc, char *argv[] ){
     //
 
     main_window = gws_create_window (client_fd,
-        WT_OVERLAPPED,1,1,"Editor", //WT_SIMPLE,1,1,"Editor",
+        WT_OVERLAPPED, 1, 1, "Editor", 
         4, 4, (w-40), (h-40),
-        0,0,COLOR_GRAY, COLOR_GRAY);
+        0, 0, COLOR_GRAY, COLOR_GRAY );
 
     if ( main_window < 0 )             
         debug_print("Editor: main_window fail\n"); 

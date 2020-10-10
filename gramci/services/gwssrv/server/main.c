@@ -1025,8 +1025,7 @@ void xxxHandleNextClientRequest (int fd){
 
     //# it works.
     char *m = (char *) (&__buffer[0] + 16);
-    sprintf( m, "GRAMADO Response from gwssrv\n\n");
-    //sprintf( m, "gwssrv: This is a response from GWS!\n");
+    sprintf( m, "~ Response from gwssrv \n");
 
     // Primeiros longs do buffer.
     message_buffer[0] = next_response[0];         // Window ID.
@@ -1059,11 +1058,16 @@ __again:
     message_buffer[1] = 0;
     message_buffer[2] = 0;
     message_buffer[3] = 0;
+    int b=0;
+    for (b=0; b<MSG_BUFFER_SIZE; b++)
+        __buffer[b] = 0;
+
 
     // Cleaning
     int c=0;
-    for(c=0; c<32; c++)  //todo: 512
+    for (c=0; c<NEXTRESPONSE_BUFFER_SIZE; c++)  //32. todo: 512
         next_response[c] = 0;
+
 
     gwssrv_debug_print ("gwssrv: Response sent\n");  
 }
@@ -1249,7 +1253,7 @@ gwsProcedure (
         //MSG_GWS_CREATEWINDOW
         case 1001:
             gwssrv_debug_print ("gwssrv: [FIXME] Message number 1001\n");
-            serviceCreateWindow (); 
+            serviceCreateWindow();
             break; 
 
         // backbuffer putpixel
@@ -1812,14 +1816,13 @@ int main (int argc, char **argv){
         //gwssrv_clone_and_execute ("gws.bin");      // command gws.bin
         //gwssrv_clone_and_execute ("gwm.bin");      // window manager
         //gwssrv_clone_and_execute ("fileman.bin");  
-        gwssrv_clone_and_execute ("editor.bin");           
+        //gwssrv_clone_and_execute ("editor.bin");           
         //gwssrv_clone_and_execute ("terminal.bin");  
         //gwssrv_clone_and_execute ("browser.bin");
-        //gwssrv_clone_and_execute ("launch1.bin"); 
+        gwssrv_clone_and_execute ("launch1.bin"); 
         //gwssrv_clone_and_execute ("s2.bin");      // shell  
         //gwssrv_clone_and_execute ("s3.bin");    // hello        
         // ...
-
 
 
         //#test 

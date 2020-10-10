@@ -791,8 +791,12 @@ new_message:
 }
 
 
+/*
+ ***************************** 
+ * main:
+ * 
+ */
 
-// Testing new main.
 int main ( int argc, char *argv[] ){
 
     int client_fd = -1;
@@ -809,6 +813,14 @@ int main ( int argc, char *argv[] ){
     //addr_in.sin_addr.s_addr = inet_addr("127.0.0.1");
     
     
+    // Metrics.
+    unsigned long w = gws_get_system_metrics(1);
+    unsigned long h = gws_get_system_metrics(2);
+
+
+    // #todo:
+    // check validation od w h
+
 
     debug_print ("-------------------------\n");    
     debug_print ("launch1: Initializing ...\n");
@@ -822,9 +834,9 @@ int main ( int argc, char *argv[] ){
 
     // cria o soquete.
     // AF_GRAMADO
-    //client_fd = socket ( 8000, SOCK_STREAM, 0 );
-    //client_fd = socket ( AF_INET, SOCK_STREAM, 0 );
-    client_fd = socket ( AF_INET, SOCK_RAW, 0 );
+    // client_fd = socket ( 8000, SOCK_STREAM, 0 );
+    // client_fd = socket ( AF_INET, SOCK_RAW, 0 );
+     client_fd = socket ( AF_INET, SOCK_STREAM, 0 );
     
     if ( client_fd < 0 ){
        printf ("launch1: Couldn't create socket\n");
@@ -840,24 +852,19 @@ int main ( int argc, char *argv[] ){
 
     //nessa hora colocamos no accept um fd.
     //então o servidor escreverá em nosso arquivo.
+    // #debug
+    gws_debug_print ("launch1: Connecting to the address via inet ...\n");    
+    //printf ("launch1: Connecting to the address via inet  ...\n");    
 
     while(1){
 
-        // #debug
-        gws_debug_print ("launch1: Connecting to the address via inet ...\n");    
-        //printf ("launch1: Connecting to the address via inet  ...\n");    
-        
         if (connect (client_fd, (void *) &addr_in, sizeof(addr_in)) < 0){ 
             
             debug_print ("launch1: Connection Failed \n"); 
             printf      ("launch1: Connection Failed \n"); 
             //return -1; 
-        
-        // try again
-        
         }else{ break; }; 
     };
- 
  
     //
     // messages
@@ -872,10 +879,14 @@ int main ( int argc, char *argv[] ){
     // Mas como sabemos que é um soquete,
     // então sabemos que é possível ler.
 
-    //while(1){
-        browser_hello_request(client_fd);
-        browser_hello_response(client_fd);
-    //}
+    // =============================================================
+    // #bugbug
+    // Sem essa chamada a funçao create window vai falhar
+    // na string do title bar.
+    // =============================================================
+
+    browser_hello_request (client_fd);
+    browser_hello_response (client_fd);
 
     // The main window.
     // #todo: Can gws_create_window call these two functions? 
@@ -895,16 +906,17 @@ int main ( int argc, char *argv[] ){
     //
     // == main window ======================
     //
-  
+
     //main window
     main_window = gws_create_window (client_fd,
-        WT_SIMPLE,1,1,"Launch1",
-        40, 40, 120, 480,
-        0,0,COLOR_GRAY, COLOR_GRAY);
+        WT_OVERLAPPED, 1, 1, "Launch1",
+        0, 0, (w/2), h,
+        0, 0, COLOR_GRAY, COLOR_GRAY );
 
-    if (main_window<0)
+    if (main_window<0){
         gws_debug_print ("launch1: main_window fail\n");
-
+        exit(1);
+    }
 
     if (main_window >0 && main_window < 1024)
     { 
@@ -912,7 +924,7 @@ int main ( int argc, char *argv[] ){
         // button
         button1_window = gws_create_window (client_fd,
             WT_BUTTON,1,1,"button1",
-            4, ((480/5)*1), 100, 32,
+            4, ((h/5)*1), (w/2)-8, 32,
             main_window,0,COLOR_GRAY, COLOR_GRAY);
 
         if (button1_window<0)
@@ -921,7 +933,7 @@ int main ( int argc, char *argv[] ){
        // button
         button2_window = gws_create_window (client_fd,
             WT_BUTTON,1,1,"button2",
-            4, ((480/5)*2), 100, 32,
+            4, ((h/5)*2), (w/2)-8, 32,
             main_window,0,COLOR_GRAY, COLOR_GRAY);
 
         if (button2_window<0)
@@ -930,7 +942,7 @@ int main ( int argc, char *argv[] ){
         // button
         button3_window = gws_create_window (client_fd,
             WT_BUTTON,1,1,"button3",
-            4, ((480/5)*3), 100, 32,
+            4, ((h/5)*3), (w/2)-8, 32,
             main_window,0,COLOR_GRAY, COLOR_GRAY);
 
         if (button3_window<0)

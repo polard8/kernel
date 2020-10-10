@@ -107,6 +107,35 @@ void wm_process_windows(void)
 }
 
 
+
+int 
+is_within ( 
+    struct gws_window_d *window, 
+    unsigned long x, 
+    unsigned long y )
+{
+    // validation
+    if ( (void*) window != NULL )
+    {
+        if ( window->used == 1 && window->magic == 1234 )
+        {
+            // yes!
+            if ( x >= window->left && 
+                 x <= window->right &&
+                 y >= window->top &&
+                 y <= window->bottom )
+            {
+                return 1;
+            }
+        }
+    }
+    
+    // No!
+    return 0;
+}
+
+
+
 void invalidate_window (struct gws_window_d *window)
 {
     // bg window (root window)
@@ -173,13 +202,17 @@ int serviceCreateWindow (void){
     //++
     // String support 
     int string_off = 14; 
-    for (i=0; i<256; i++)
-    {
+    for (i=0; i<256; i++){
         name_buffer[i] = message_address[string_off];
         string_off++;
     }
     name_buffer[i] = 0;
     //--
+
+
+    //#debug
+    //printf("%s\n",name_buffer);
+    //while(1){}
 
 
     // Limits

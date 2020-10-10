@@ -94,6 +94,10 @@ struct gws_window_d *button_window;  // Where button was pressed.
 
 
 
+//
+// == buffer ===============================================
+//
+
 // O buffer para  as mensagens recebidas via socket.
 #define MSG_BUFFER_SIZE 512
 char __buffer[MSG_BUFFER_SIZE];   
@@ -103,6 +107,7 @@ char __buffer[MSG_BUFFER_SIZE];
 // Eles são configurados pelo dialogo na hora da 
 // prestação do serviço.
 // No início desse array fica o header.
+#define NEXTRESPONSE_BUFFER_SIZE  32
 unsigned long next_response[32];
 
 

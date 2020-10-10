@@ -130,6 +130,11 @@ get_cs(void)
 
 
 
+void init_fpu (void) 
+{
+    asm volatile ("fninit");
+}
+
 
 
 // x86 enable interrupts.

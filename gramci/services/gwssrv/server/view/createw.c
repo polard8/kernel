@@ -190,14 +190,19 @@ createwDrawFrame (
             COLOR_BLACK, 1 );
 
         //icon
-        gwssrv_display_system_icon ( 1, window->left +8, window->top +8 );
+        //gwssrv_display_system_icon ( 1, window->left +8, window->top +8 );
+        gwssrv_display_system_icon ( 1, TitleBar->left +4, TitleBar->top +4 );
         window->has_icon = 1;  //#test
 
     
         // string
-        dtextDrawString ( (window->left) + offset, (window->top)  +8, 
-            COLOR_WHITE, window->name );
-
+        TitleBar->name = (char *) strdup ( (const char *) window->name );
+        
+        //dtextDrawString ( (window->left) + offset, (window->top)  +8, 
+            //COLOR_WHITE, window->name );
+            
+        dtextDrawString ( (TitleBar->left) + offset, (TitleBar->top)  +8, 
+            COLOR_WHITE, TitleBar->name );
         //  control ?
         // ... 
         

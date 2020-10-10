@@ -67,7 +67,7 @@
 
 // Instructions.
 
-
+void init_fpu (void);
 
 void enable (void);
 void disable (void);
