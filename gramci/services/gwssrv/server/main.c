@@ -1392,15 +1392,53 @@ gwsProcedure (
 }
 
 
+void xxxx_refresh(void)
+{
+    void       *dest = (void *)      ____FRONTBUFFER_VA;
+    const void *src  = (const void*) ____BACKBUFFER_VA;
+
+    unsigned long w = gws_get_device_width();
+    unsigned long h = gws_get_device_height();
+
+    int y=0;
+    int x=0;
+
+    // 24/8
+    int nbytes = (SavedBPP/8);
+    int pitch=w*nbytes;
+
+
+    //linhas
+    for ( y=0; y < h; y++ ) 
+    { 
+        //colunas. chuncks
+        for (x=0 ; x< (pitch/64) ; x++) 
+        { 
+            memcpy ( dest, src + ((y&63) * pitch ), 64 );
+            dest += 64; 
+        } 
+        
+        if (pitch &63) 
+        { 
+            memcpy (dest, src+((y&63) * pitch ), pitch & 63 ); 
+            dest += ( pitch & 63); 
+        } 
+    }
+}
+
 
 void create_background (void)
 {
+	
     unsigned long w = gws_get_device_width();
     unsigned long h = gws_get_device_height();
     int WindowId = -1;
 
 
     gwssrv_debug_print ("gwssrv: create_background\n");
+
+
+    // bg window
 
     __bg_window = (struct gws_window_d *) createwCreateWindow ( WT_SIMPLE, 
                                             1, 1, "gwssrv-bg",  
@@ -1425,6 +1463,9 @@ void create_background (void)
 
 
     //__bg_window->dirty = 1;
+    
+    //xxxx_refresh();
+    //while(1){}
 }
 
 
