@@ -1392,40 +1392,6 @@ gwsProcedure (
 }
 
 
-void xxxx_refresh(void)
-{
-    void       *dest = (void *)      ____FRONTBUFFER_VA;
-    const void *src  = (const void*) ____BACKBUFFER_VA;
-
-    unsigned long w = gws_get_device_width();
-    unsigned long h = gws_get_device_height();
-
-    int y=0;
-    int x=0;
-
-    // 24/8
-    int nbytes = (SavedBPP/8);
-    int pitch=w*nbytes;
-
-
-    //linhas
-    for ( y=0; y < h; y++ ) 
-    { 
-        //colunas. chuncks
-        for (x=0 ; x< (pitch/64) ; x++) 
-        { 
-            memcpy ( dest, src + ((y&63) * pitch ), 64 );
-            dest += 64; 
-        } 
-        
-        if (pitch &63) 
-        { 
-            memcpy (dest, src+((y&63) * pitch ), pitch & 63 ); 
-            dest += ( pitch & 63); 
-        } 
-    }
-}
-
 
 void create_background (void)
 {
@@ -1497,6 +1463,7 @@ void InitGraphics(void){
 
  
     // Testing bmp.
+    // See:
     gwssrv_display_system_icon ( 1, 100, 8);
     gwssrv_display_system_icon ( 2, 200, 8);
     gwssrv_display_system_icon ( 3, 300, 8);
@@ -1514,7 +1481,6 @@ void InitGraphics(void){
     //gws_show_window_rect(gui->screen);
     
     gws_show_backbuffer();              
-
     
     debug_print("gwssrv: InitGraphics done\n");
     //printf     ("gwssrv: InitGraphics done *hang\n");

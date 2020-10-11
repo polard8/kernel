@@ -176,11 +176,6 @@ void gwssrv_wait_message(void);
 void gwssrv_yield(void);
 
 
-// refresh screen, doom style.
-// See: main.c
-void xxxx_refresh(void);
-
-
 
 
 
