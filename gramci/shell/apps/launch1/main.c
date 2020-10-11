@@ -902,7 +902,25 @@ int main ( int argc, char *argv[] ){
     int button3_window;
 
 
+    unsigned long w_width  = (w/2);
+    unsigned long w_height = (h/2);
+    
+    // left
+    // Posiciona uma janela de largura '(w/2)' no centro
+    // de uma tela de largura 'w'.
+    unsigned long viewwindowx = ( ( w - w_width ) >> 1 );
+    unsigned long viewwindowy=0;
 
+    // Se a largura da janela for igual a largura da tela
+    // entao a janela começa no topo.
+    // caso contrario vamos centralizar na vertical.
+    if (w_width == w){   
+        viewwindowy = 0; 
+    }else{ 
+        viewwindowy = (h-w_height) >> 1; 
+    };
+    
+    
     //
     // == main window ======================
     //
@@ -910,8 +928,9 @@ int main ( int argc, char *argv[] ){
     //main window
     main_window = gws_create_window (client_fd,
         WT_OVERLAPPED, 1, 1, "Launch1",
-        0, 0, (w/2), h,
+        viewwindowx, viewwindowy, w_width, w_height,
         0, 0, COLOR_GRAY, COLOR_GRAY );
+
 
     if (main_window<0){
         gws_debug_print ("launch1: main_window fail\n");
@@ -924,7 +943,7 @@ int main ( int argc, char *argv[] ){
         // button
         button1_window = gws_create_window (client_fd,
             WT_BUTTON,1,1,"button1",
-            4, ((h/5)*1), (w/2)-8, 32,
+            4, ((w_height/5)*1), w_width-8, 32,
             main_window,0,COLOR_GRAY, COLOR_GRAY);
 
         if (button1_window<0)
@@ -933,7 +952,7 @@ int main ( int argc, char *argv[] ){
        // button
         button2_window = gws_create_window (client_fd,
             WT_BUTTON,1,1,"button2",
-            4, ((h/5)*2), (w/2)-8, 32,
+            4, ((w_height/5)*2), w_width-8, 32,
             main_window,0,COLOR_GRAY, COLOR_GRAY);
 
         if (button2_window<0)
@@ -942,7 +961,7 @@ int main ( int argc, char *argv[] ){
         // button
         button3_window = gws_create_window (client_fd,
             WT_BUTTON,1,1,"button3",
-            4, ((h/5)*3), (w/2)-8, 32,
+            4, ((w_height/5)*3), w_width-8, 32,
             main_window,0,COLOR_GRAY, COLOR_GRAY);
 
         if (button3_window<0)
