@@ -12,7 +12,7 @@ static unsigned char waves[4*8] = {
 };
 
 
-static unsigned char eye_sprite[5*8] = {
+static unsigned char eye_sprite[6*8] = {
 
 //0 -   
 	0xFF, //    11111111
@@ -65,6 +65,18 @@ static unsigned char eye_sprite[5*8] = {
 	0x81, //    1000 0001
 	0x81, //    1000 0001
 	0x7e, //    0111 1110 
+
+
+// 5
+// monstrinho
+	0x18, //    11111111
+	0x3C, //    11111111
+	0x7E, //    11111111
+	0xDB, //    11111111
+	0xFF, //    11111111
+	0x24, //    11111111
+	0x5A, //    11111111
+	0x81, //    11111111
 
 };
 

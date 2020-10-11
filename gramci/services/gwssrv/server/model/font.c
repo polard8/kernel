@@ -62,6 +62,7 @@ int gwssrv_init_font(void)
         tmp[i]   = (unsigned char) TableBitReverse[tmp_char];
     }; 
 
+    // lt8x8
     gws_currentfont_address = (unsigned long) tmp;
         
     // ...
