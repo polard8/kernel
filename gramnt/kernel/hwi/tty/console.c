@@ -23,6 +23,9 @@
 #include <kernel.h>
 
 
+extern unsigned long SavedX;
+extern unsigned long SavedY;
+
 // Usado para manipular csi
 static unsigned long __state = 0;
 
@@ -404,11 +407,10 @@ void _console_outbyte (int c, int console_number){
         // Se estamos no modo terminal então usaremos as cores 
         // configuradas na estrutura do terminal atual.
         // Branco no preto é um padrão para terminal.
-        if ( stdio_terminalmode_flag == 1 )
-        {
+        if ( stdio_terminalmode_flag == 1 ){
             draw_char ( 
-                 cWidth * TTY[console_number].cursor_x, 
-                cHeight * TTY[console_number].cursor_y, 
+                 (cWidth * TTY[console_number].cursor_x), 
+                (cHeight * TTY[console_number].cursor_y), 
                 c, COLOR_WHITE, 0x303030 );
 
 
@@ -418,8 +420,8 @@ void _console_outbyte (int c, int console_number){
         // Não sabemos o fundo. Vamos selecionar o foreground. 
         }else{
             drawchar_transparent ( 
-                cWidth* TTY[console_number].cursor_x, 
-                cHeight * TTY[console_number].cursor_y, 
+                (cWidth  * TTY[console_number].cursor_x), 
+                (cHeight * TTY[console_number].cursor_y), 
                 TTY[console_number].cursor_color, 
                 c );
         };
@@ -464,60 +466,63 @@ void console_outbyte (int c, int console_number){
     //switch ?? 
 
 
-    //form feed - Nova tela.
-    if ( c == '\f' ){
+    // form feed - Nova tela.
+    if ( c == '\f' )
+    {
         TTY[console_number].cursor_y = TTY[console_number].cursor_top;
         TTY[console_number].cursor_x = TTY[console_number].cursor_left;
         return;
     }
 
 
-    // #m$. 
+    // #obs: #m$. 
     // É normal \n retornar sem imprimir nada.
     
-    //Início da próxima linha. 
+    
+
+    // Início da próxima linha. 
+    // not used!!!  "...\r\n";
     if ( c == '\n' && prev == '\r' ) 
     {
         // #todo: 
         // Melhorar esse limite.
-        if ( TTY[console_number].cursor_y >= (TTY[console_number].cursor_bottom-1) )
+        if ( TTY[console_number].cursor_y > (TTY[console_number].cursor_bottom) )
         {
             //debug_print ("console_outbyte: scroll 1\n"); 
             console_scroll (console_number);
 
-            TTY[console_number].cursor_y = (TTY[console_number].cursor_bottom-1);
+            TTY[console_number].cursor_y = (TTY[console_number].cursor_bottom);
             prev = c; 
-
         }else{
             TTY[console_number].cursor_y++;
             TTY[console_number].cursor_x = TTY[console_number].cursor_left;
             prev = c;
         };
-
         return;
     }
 
 
+
     // Próxima linha no modo terminal.
+    // "...\n"
     if ( c == '\n' && prev != '\r' ) 
     {
-        if ( TTY[console_number].cursor_y >= (TTY[console_number].cursor_bottom-1) )
+        // se o line feed apareceu quando estamos na ultima linha
+        if ( TTY[console_number].cursor_y > (TTY[console_number].cursor_bottom) )
         {
 
             //debug_print ("console_outbyte: scroll 2\n"); 
             console_scroll (console_number);
             
-            TTY[console_number].cursor_y = (TTY[console_number].cursor_bottom-1);
+            TTY[console_number].cursor_y = (TTY[console_number].cursor_bottom);
             prev = c;
 
         }else{
-
             TTY[console_number].cursor_y++;
 
 			//Retornaremos mesmo assim ao início da linha 
 			//se estivermos imprimindo no terminal.
-            if ( stdio_terminalmode_flag == 1 )
-            {
+            if ( stdio_terminalmode_flag == 1 ){
                 TTY[console_number].cursor_x = TTY[console_number].cursor_left;	
             } 
 
@@ -525,8 +530,7 @@ void console_outbyte (int c, int console_number){
 			//permite que a tela do kernel funcione igual a um 
 			//terminal, imprimindo os printfs um abaixo do outro.
 			//sempre reiniciando x.
-            if ( stdio_verbosemode_flag == 1 )
-            {
+            if ( stdio_verbosemode_flag == 1 ){
                 TTY[console_number].cursor_x = TTY[console_number].cursor_left;
             } 
 
@@ -573,7 +577,8 @@ void console_outbyte (int c, int console_number){
 
 
     // Apenas voltar ao início da linha.
-    if ( c == '\r' ){
+    if ( c == '\r' )
+    {
         TTY[console_number].cursor_x = TTY[console_number].cursor_left;  
         prev = c;
         return; 
@@ -594,7 +599,8 @@ void console_outbyte (int c, int console_number){
     
  
     // backspace ??
-    if ( c == 8 ){
+    if ( c == 8 )
+    {
         TTY[console_number].cursor_x--; 
         prev = c;
         return;
@@ -605,29 +611,16 @@ void console_outbyte (int c, int console_number){
     // == Limits =======================================
     //
 
-    // #todo:
-    // We need to check the TTY structure to handle the limits.
-    // See:
+    // Nao eh um escape sequense ...
+    // mas chegamos no fim da linha ou na ultima linha.
 
-	// Filtra as dimensões da janela onde está pintando.
-	// @todo: Esses limites precisam de variável global.
-	//        mas estamos usando printf pra tudo.
-	//        cada elemento terá que impor seu próprio limite.
-	//        O processo shell impõe seu limite.
-	//        a janela impõe seu limite etc...
-	//        Esse aqui é o limite máximo de uma linha.
-	// Poderia ser o limite imposto pela disciplina de linha
-	// do kernel para o máximo de input. Pois o input é
-	// armazenado em uma linha.	 
-
-
-//checkLimits:
-
+    // fim da linha.
     // Limites para o número de caracteres numa linha.
-    if ( TTY[console_number].cursor_x >= (TTY[console_number].cursor_right-1) )
+    if ( TTY[console_number].cursor_x > (TTY[console_number].cursor_right) )
     {
+        // voltamos ao inicio da linha e avançamos uma linha;
         TTY[console_number].cursor_x = TTY[console_number].cursor_left;
-        TTY[console_number].cursor_y++;  
+        TTY[console_number].cursor_y++;
 
     // Incrementando.
     // Apenas incrementa a coluna.
@@ -641,19 +634,25 @@ void console_outbyte (int c, int console_number){
 	// de limite diferente desse.
 
 	// Número máximo de linhas. (n pixels por linha.)
-    if ( TTY[console_number].cursor_y >= TTY[console_number].cursor_bottom )  
+    if ( TTY[console_number].cursor_y > TTY[console_number].cursor_bottom )  
     { 
         //debug_print ("console_outbyte: scroll 3\n"); 
         console_scroll (console_number);
 
+        TTY[console_number].cursor_x = TTY[console_number].cursor_left;
         TTY[console_number].cursor_y = TTY[console_number].cursor_bottom;
     }
 
+
+    //
+    // ============================================
+    //
 
     // Imprime os caracteres normais.
     // Nesse momento imprimiremos os caracteres.
     // Imprime os caracteres normais.
     // Atualisa o prev.
+draw:
 
     _console_outbyte (c, console_number);
 
@@ -709,8 +708,8 @@ void console_putchar ( int c, int console_number ){
 	// Copiar o retângulo na memória de vídeo.
 
     refresh_rectangle ( 
-        TTY[console_number].cursor_x * cWidth, 
-        TTY[console_number].cursor_y * cHeight, 
+        (TTY[console_number].cursor_x * cWidth), 
+        (TTY[console_number].cursor_y * cHeight), 
         cWidth, 
         cHeight );
 
@@ -1089,7 +1088,7 @@ void console_scroll (int console_number){
 
     // Cursor na ultima linha.
     TTY[console_number].cursor_x = TTY[console_number].cursor_left; 
-    TTY[console_number].cursor_y = ( TTY[console_number].cursor_bottom -1); 
+    TTY[console_number].cursor_y = ( TTY[console_number].cursor_bottom); 
 
 
    // Limpa a últime linha.
@@ -1293,6 +1292,7 @@ void console_init_virtual_console (int n){
     // including more code in this function.
     // Blessed gcc.
 
+    /*
     TTY[ConsoleIndex].cursor_x = 0;
     TTY[ConsoleIndex].cursor_y = 0;
     TTY[ConsoleIndex].cursor_width  = 80;  // (screen width / char width) ??
@@ -1302,7 +1302,45 @@ void console_init_virtual_console (int n){
     TTY[ConsoleIndex].cursor_right  = 80;  // (screen width / char width)
     TTY[ConsoleIndex].cursor_bottom = 80;  // (screen height/ char height)
     TTY[ConsoleIndex].cursor_color = COLOR_GREEN; //COLOR_TERMINALTEXT;
+    */
+
+
+    /*
+    TTY[ConsoleIndex].cursor_x = 0;
+    TTY[ConsoleIndex].cursor_y = 0;
+    TTY[ConsoleIndex].cursor_width  = 80;  // (screen width / char width) ??
+    TTY[ConsoleIndex].cursor_height = 80;  // (screen height/ char height) ??
+    TTY[ConsoleIndex].cursor_left = 0;
+    TTY[ConsoleIndex].cursor_top  = 0;
+    TTY[ConsoleIndex].cursor_right  = 80;  // (screen width / char width)
+    TTY[ConsoleIndex].cursor_bottom = 80;  // (screen height/ char height)
+    TTY[ConsoleIndex].cursor_color = COLOR_GREEN; //COLOR_TERMINALTEXT;
+    */
+
+    /*
+    TTY[ConsoleIndex].cursor_x = 0;
+    TTY[ConsoleIndex].cursor_y = 0;
+    TTY[ConsoleIndex].cursor_width  = 80;  // (screen width / char width) ??
+    TTY[ConsoleIndex].cursor_height = 80;  // (screen height/ char height) ??
+    TTY[ConsoleIndex].cursor_left = 0;
+    TTY[ConsoleIndex].cursor_top  = 0;
+    TTY[ConsoleIndex].cursor_right  = 80;  // (screen width / char width)
+    TTY[ConsoleIndex].cursor_bottom = 80;  // (screen height/ char height)
+    TTY[ConsoleIndex].cursor_color = COLOR_GREEN; //COLOR_TERMINALTEXT;
+    */
+
     
+    TTY[ConsoleIndex].cursor_x = 0;
+    TTY[ConsoleIndex].cursor_y = 0;
+    TTY[ConsoleIndex].cursor_width  = (SavedX/8) -1;    //  80;  // (screen width / char width) ??
+    TTY[ConsoleIndex].cursor_height = (SavedY/8) -1;    //80;  // (screen height/ char height) ??
+    TTY[ConsoleIndex].cursor_left = 0;
+    TTY[ConsoleIndex].cursor_top  = 0;
+    TTY[ConsoleIndex].cursor_right  = 0+(SavedX/8) -1;  //80;  // (screen width / char width)
+    TTY[ConsoleIndex].cursor_bottom = 0+(SavedY/8) -1;  //80;  // (screen height/ char height)
+    TTY[ConsoleIndex].cursor_color = COLOR_GREEN;    //COLOR_TERMINALTEXT;
+
+
 
     //#todo
     // Buffers !!!

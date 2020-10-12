@@ -3742,20 +3742,30 @@ done:
     // getusername ( current_user_name, (size_t) 64);
     // gethostname ( current_host_name, (size_t) 64);
 
+    
     if ( interactive == 1 )
     {
         // Welcome message!
         
         printf("Gramado Setup");
         printf("\n");
+        
         printf("=============");
         printf("\n");
+        
         printf("\n");
         fflush(stdout);
 
         // First prompt.
         shellPrompt();
     }
+
+
+    //printf("============= $$$ ================ \n");
+    //printf ("gdeshell-shellInit: breakpoint    \n");
+    //while(1){}
+
+
 
     return 0;
 }
@@ -6905,6 +6915,11 @@ noArgs:
 	// #BUGBUG
 	// Estamos passando um ponteiro que � uma vari�vel local.
 
+    // #bugbug
+    // alguma coisa esta falhando na maquina real nesse ponto ...
+    // vamos usar break point e verbose.
+
+
     //++
     gde_enter_critical_section ();
     Status = (int) shellInit(hWindow); 
@@ -6914,6 +6929,12 @@ noArgs:
     }
     gde_exit_critical_section (); 
     //--
+
+
+
+    //printf ("gdeshell: breakpoint \n");
+    //while(1){}
+
 
 
 	// #importante:

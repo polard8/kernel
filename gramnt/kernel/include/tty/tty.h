@@ -298,7 +298,9 @@ struct tty_d
 
 //#define MAX_KERNEL_VIRTUAL_CONSOLES 4
 int current_vc;
-struct tty_d TTY[4];
+
+
+static struct tty_d TTY[4];
 
 
 

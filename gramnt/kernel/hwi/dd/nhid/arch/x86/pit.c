@@ -306,8 +306,16 @@ void timer (void){
 	//de tempos em tempos atualiza o cursor
 	//a cada segundo. sendo ele 100 ou 1000 ... tanto faz.
 	//#todo: mas poderia ser exatamente o hz configurado par ao mouse
+	
+	
+	//#bubug
+	//estamos desabilitando isso pois 
+	//pode ser a causa de problemas na maquina real.
+	// alguma problema com os valores da TTY
+
+    /*
 	//if ( jiffies % mouse_cursor_hz == 0 )
-	//if ( jiffies % sys_time_hz == 0 )	
+	//if ( jiffies % sys_time_hz == 0 )
     if ( jiffies % 70 == 0 )
     {
         // Se o cursor piscante está habilitado.
@@ -336,8 +344,9 @@ void timer (void){
                 timerTextCursorStatus = 0;
                 goto cursorExit;
             }
-        };
-    };
+        }
+    }
+    */
 
 
 cursorExit:
