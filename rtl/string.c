@@ -17,6 +17,31 @@
 #include <inttypes.h>
 
 
+int strupr(char *n) 
+{
+      int i=0;
+      
+      // #bugbug
+      // Find another way to do this.
+      for (i=0; n[i]; i++) 
+      {
+               n[i] = toupper(n[i]);
+      }
+      return 1;
+}
+
+int strlwr(char *n) 
+{
+      int i=0;
+
+      // #bugbug
+      // Find another way to do this.
+      for (i=0; n[i]; i++) 
+      {
+               n[i] = tolower(n[i]);
+      }
+      return 1;
+}
 
 
 /*

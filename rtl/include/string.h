@@ -21,6 +21,12 @@ typedef	_BSD_SIZE_T_	size_t;
 // #define streq(s1,s2)  (strcmp(s1,s2)==0)
 
 
+
+
+
+int strupr(char *n); 
+int strlwr(char *n); 
+
 // ??
 void *
 check_bytes8 ( 
