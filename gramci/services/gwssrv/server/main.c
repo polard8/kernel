@@ -1520,13 +1520,11 @@ void InitGraphics(void){
     grPlot0(-11, -4, 4,COLOR_YELLOW);  // q4 afasta  para q3
     */    
 
-
+    /*
     int y=0;
     int x=0;
     int z=0;
-    
-    
-    
+   
     z=0;
     for( y=0; y<32; y++)
     {
@@ -1536,7 +1534,6 @@ void InitGraphics(void){
         z++;
     }
 
-
     z=0;
     for( y=0; y<32; y++)
     {
@@ -1545,9 +1542,35 @@ void InitGraphics(void){
     
         z--;
     }
+    */
 
 
+   int i=0;
+   
+   for (i=0; i<4; i++)
+   {    
+       //ok
+       plotCircle ( i*8, i*8, 100, COLOR_GREEN); 
+   };
 
+   for (i=0; i<4; i++)
+   {   
+       // ok
+       plotEllipseRect (
+            i*8, i*8, 
+            30, 220, 
+            COLOR_BLUE);
+   };
+
+
+   for (i=0; i<5; i++)
+   { 
+       //ok
+       plotLine3d ( 
+           2, 2, 0,     // vertex 1
+           20, i*20, 0,
+           COLOR_RED );
+    };
 
 
     //See: window.c
@@ -1559,8 +1582,7 @@ void InitGraphics(void){
     
     gws_show_backbuffer();              
     //while(1){}
-    
-    
+       
     
         
     debug_print("gwssrv: InitGraphics done\n");
