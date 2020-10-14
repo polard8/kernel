@@ -57,6 +57,7 @@
 //...
 
 
+
 /*
  *****************************************************
  * ColorSchemeType:
@@ -147,7 +148,7 @@ struct gws_color_scheme_d
     int style;
 
     char *name; 
-	
+
 	//cada índice desse array representará um elemento gráfico,
 	//os valores no array são cores correspondentes aos elementos gráficos 
 	//representados por índices.
@@ -157,11 +158,8 @@ struct gws_color_scheme_d
 };
 
 struct gws_color_scheme_d* GWSCurrentColorScheme;
-
 struct gws_color_scheme_d* GWSHumilityColorScheme; // Simples.
 struct gws_color_scheme_d* GWSPrideColorScheme;    // Colorido.
-//... 
-
 
 
 
@@ -191,8 +189,26 @@ unsigned long __refresh_rate;
 
 
 
+// Pointeiros para os backbuffers.
+unsigned long screens[4];
+
+/*
+struct vid_d
+{
+    unsigned long width;
+    unsigned long height;
+    unsigned long bpp;
+    
+    unsigned long frontbuffer;  // lfb
+    unsigned long backbuffer;   // screen[0]
+};
+struct vid_d vidConfig;
+*/
+
+
+
 //
-// Prototypes.
+// == Prototypes ===================================================
 //
 
 void 

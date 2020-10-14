@@ -17,6 +17,23 @@
 #include <inttypes.h>
 
 
+/*
+static char *int2str(int n);
+static char *int2str(int n)
+{
+    int         i;
+    static char res[16];
+
+    res[15] = '\0';
+    res[14] = (n%10)+'0';
+    for (i=13; (n /= 10); i--)
+        res[i] = (n%10)+'0';
+
+    return &res[i+1];
+}
+*/
+
+
 int strupr(char *n) 
 {
       int i=0;
