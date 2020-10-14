@@ -1464,13 +1464,12 @@ void InitGraphics(void){
  
     // Testing bmp.
     // See:
-    gwssrv_display_system_icon ( 1, 100, 8);
-    gwssrv_display_system_icon ( 2, 200, 8);
-    gwssrv_display_system_icon ( 3, 300, 8);
-    gwssrv_display_system_icon ( 4, 400, 8);
+    gwssrv_display_system_icon ( 1, 8, 100);
+    gwssrv_display_system_icon ( 2, 8, 120);
+    gwssrv_display_system_icon ( 3, 8, 140);
+    gwssrv_display_system_icon ( 4, 8, 160);
     //#debug breakpoint
     //while(1){}
-
 
 
     //See: window.c

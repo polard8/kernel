@@ -485,8 +485,11 @@ bmpDisplayBMP (
     unsigned long left, top, bottom;
 
 
+    unsigned long X=0;
+    unsigned long Y=0;
     unsigned long Width=0;
     unsigned long Height=0;
+    
     unsigned long xLimit=0;
     unsigned long yLimit=0;
 
@@ -596,7 +599,10 @@ bmpDisplayBMP (
     bi->bmpSize = *( unsigned long * ) &bmp[14];
     //printf ("HeaderSize={%x}\n",bi->bmpSize);
 
-
+    // X and Y.
+    X = x;
+    Y = y;
+    
     // Width and height.
     Width  = *( unsigned long * ) &bmp[18];
     Height = *( unsigned long * ) &bmp[22];
@@ -671,10 +677,8 @@ bmpDisplayBMP (
 //32    - 32 bpp (True color, RGB)
 //320   - 32 bpp (True color, RGBA)	
 
-    switch ( bi->bmpBitCount )
-    {
-        // Obs: 
-        // Cada cor � representada com 4 bytes. RGBA.
+
+    switch ( bi->bmpBitCount ){
 
         // ??
         //case 1:  base = (0x36 + 0x40); break;
@@ -961,6 +965,8 @@ bmpDisplayBMP (
 
 done:
     
+    gws_refresh_rectangle (X,Y,Width,Height);
+        
     // #debug
     gwssrv_debug_print ("bmpDisplayBMP: done \n");
     //printf            ("bmpDisplayBMP: done \n");
