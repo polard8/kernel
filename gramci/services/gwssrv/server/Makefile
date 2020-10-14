@@ -74,7 +74,7 @@ LIBCOBJ = ../../../../rtl/obj
 myObjects = crt0.o main.o rtl.o \
 ctype.o stdio.o stdlib.o string.o conio.o socket.o signal.o unistd.o \
 pixel.o line.o rect.o char.o dtext.o createw.o gws.o comp.o window.o \
-bmp.o connect.o button.o font.o\
+grprim.o bmp.o connect.o button.o font.o\
 termios.o ioctl.o fcntl.o    
 
 
@@ -98,9 +98,13 @@ all-c:
 	gcc  -c  view/createw.c  $(CFLAGS) -I $(LIBC) -I include/ -I .  -o createw.o
 	gcc  -c  view/window.c   $(CFLAGS) -I $(LIBC) -I include/ -I .  -o window.o
 	gcc  -c  view/button.c   $(CFLAGS) -I $(LIBC) -I include/ -I .  -o button.o
-	gcc  -c  view/bmp.c      $(CFLAGS) -I $(LIBC) -I include/ -I .  -o bmp.o
 	gcc  -c  view/comp.c     $(CFLAGS) -I $(LIBC) -I include/ -I .  -o comp.o
 
+	gcc  -c  view/bmp.c      $(CFLAGS) -I $(LIBC) -I include/ -I .  -o bmp.o
+	
+	gcc  -c  view/grprim.c      $(CFLAGS) -I $(LIBC) -I include/ -I .  -o grprim.o
+	
+	
 	# model-like component
 	gcc  -c  model/font.c     $(CFLAGS) -I $(LIBC) -I include/ -I .  -o font.o
 	gcc  -c  model/connect.c  $(CFLAGS) -I $(LIBC) -I include/ -I .  -o connect.o

@@ -1395,7 +1395,7 @@ gwsProcedure (
 
 void create_background (void)
 {
-	
+
     unsigned long w = gws_get_device_width();
     unsigned long h = gws_get_device_height();
     int WindowId = -1;
@@ -1472,6 +1472,27 @@ void InitGraphics(void){
     //while(1){}
 
 
+    grInit();
+    
+    
+    grPlot0(0, 4, 4,COLOR_RED);     // q1
+    grPlot0(3, 4, 4,COLOR_RED);     // q1 afasta para q1
+    grPlot0(90, 4, 4,COLOR_RED);     // q1 afasta para q1
+    
+    grPlot0(0, 4,-4,COLOR_GREEN);   // q2
+    grPlot0(3, 4,-4,COLOR_GREEN);   // q2  afasta  para q1   
+    grPlot0(90, 4,-4,COLOR_GREEN);   // q2  afasta  para q1    
+    
+    grPlot0(0,-4,-4,COLOR_BLUE);    // q3
+    grPlot0(3,-4,-4,COLOR_BLUE);    // q3 afasta  para q1
+    grPlot0(90,-4,-4,COLOR_BLUE);    // q3 afasta  para q1
+    
+    grPlot0(0,-4, 4,COLOR_YELLOW);  // q4 
+    grPlot0(3,-4, 4,COLOR_YELLOW);  // q4 afasta  para q1
+    grPlot0(90,-4, 4,COLOR_YELLOW);  // q4 afasta  para q1
+    
+
+
     //See: window.c
     //create_main_menu();
   
@@ -1480,7 +1501,11 @@ void InitGraphics(void){
     //gws_show_window_rect(gui->screen);
     
     gws_show_backbuffer();              
+    while(1){}
     
+    
+    
+        
     debug_print("gwssrv: InitGraphics done\n");
     //printf     ("gwssrv: InitGraphics done *hang\n");
     //while(1){}
