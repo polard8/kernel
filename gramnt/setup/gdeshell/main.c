@@ -3534,11 +3534,6 @@ void shellShell (void){
  * shellInit:
  *     Inicializa o Shell.  
  *
- *     #bugbug: 
- *     Essa rotina come�a escrever na janela com o foco de entrada. 
- * Mas um outro aplicativo solicitou o foco de entrada e essa rotina 
- * esta terminando de escrever mas agora na janela do outro aplicativo.
- *
  * @todo: Inicializar globais e estruturas.
  */
  
@@ -3710,12 +3705,14 @@ int shellInit ( struct window_d *window ){
 
 	//PID = (int) APIGetPID();
 
-    PID = (int) system_call( SYSTEMCALL_GETPID, 0, 0, 0 );
+    //PID = (int) system_call( SYSTEMCALL_GETPID, 0, 0, 0 );
+    PID = (int) getpid();
     if ( PID == (-1) ){
         printf ("ERROR getting PID\n");
     }
 
-    PPID = (int) system_call( SYSTEMCALL_GETPPID, 0, 0, 0 );
+    //PPID = (int) system_call( SYSTEMCALL_GETPPID, 0, 0, 0 );
+    PPID = (int) getppid();
     if ( PPID == (-1) ){
         printf ("ERROR getting PPID\n");
     }
@@ -3747,6 +3744,10 @@ done:
     {
         // Welcome message!
         
+        //shellSetCursor ( 0, 0 );
+        
+        // Top of the screen ?
+        printf("\f");
         printf("Gramado Setup");
         printf("\n");
         
@@ -3952,28 +3953,34 @@ int shellCheckPassword (void)
  * escrever corretamente dentro dela.
  * e isso se faz atrav�s de uma chamada ao kernel.
  */
-void shellSetCursor ( unsigned long x, unsigned long y ){
-	
-    //
-	// Coisas do kernel.
-	//
-	
-	//setando o cursor usado pelo kernel base.
+
+
+// printf escrevera no console virtual
+// atraves do arquivo '1'.
+// Isso implica que esara o cursor do console virtual.
+
+void 
+shellSetCursor ( 
+    unsigned long x, 
+    unsigned long y )
+{
+
+    // Setando o cursor usado pelo kernel base.
     gde_set_cursor (x,y);
-	
-//Atualizando as vari�veis globais usadas somente aqui no shell.
-//setGlobals:
+
+
+    // Atualizando as variaveis globais 
+    // usadas somente aqui no shell.
 
     g_cursor_x = (unsigned long) x;
     g_cursor_y = (unsigned long) y;
-	
 
-	//
-	// Coisas do screen buffer.
-	//
-    
-	move_to ( x, y);
+    // buffer.
+    // Coisas do screen buffer.
+
+    move_to(x,y);
 }
+
 
 
 /*
@@ -3981,8 +3988,10 @@ void shellSetCursor ( unsigned long x, unsigned long y ){
  * shellThread:
  *     Um thread dentro para testes.
  */
+
 void shellThread (void){
-	
+
+
 	printf("\n");
 	printf("$\n");
 	printf("$$\n");
@@ -4269,33 +4278,44 @@ fail:
  *     Limpar a tela do shell.
  *     usada pelo comando 'cls'.
  */
- 
+
+// called by cls_builtins().
+
 void shellClearScreen (void){
 
-    struct window_d *w;
+
+    struct window_d  *w;
     unsigned long left, top, right, bottom;
+
 
     //desabilita o cursor
     system_call ( 245, 
         (unsigned long) 0, (unsigned long) 0, (unsigned long) 0 );
 
 
-    shellClearBuffer ();
+    shellClearBuffer();
 
 
     w = (void *) shell_info.terminal_window;
 
-    if ( (void *) w != NULL ){
+    if ( (void *) w != NULL )
+    {
         gde_redraw_window ( w, 1 );
     }
 
-	
+
+    // #bugbug
+    // This routine is not working ...
+    // so we're gonna try the printf escape sequence.
+    
     left = (terminal_rect.left/smCharWidth);
-    top = (terminal_rect.top/smCharHeight);
-	
+    top  = (terminal_rect.top/smCharHeight);
     shellSetCursor ( left, top );
-
-
+    
+    printf("\f");
+    fflush(stdout);
+    
+    
 	// Copiamos o conte�do do screenbuffer para 
 	// a �rea de cliente do shell.
 	// obs: A outra op��o seria repintarmos a janela.
@@ -4305,8 +4325,8 @@ void shellClearScreen (void){
 	//shellRefreshVisibleArea();
 	
 	//reabilita o cursor
-	system_call ( 244, 
-	    (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);	
+    system_call ( 244, 
+        (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);
 }
 
 

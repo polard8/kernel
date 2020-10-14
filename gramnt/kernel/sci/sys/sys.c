@@ -793,8 +793,12 @@ int sys_read (unsigned int fd, char *ubuf, int count){
     // socket_read()
 
 
+    // #todo
+    // Maybe we ca read from console.
+    // if ( __file->____object == ObjectTypeVirtualConsole ){}
+
     //
-    // ==== Socket file ====
+    // == Socket file ====
     //
 
 
@@ -1115,6 +1119,7 @@ int sys_write (unsigned int fd, char *ubuf, int count){
     // #debug: 
     // limits
     // Um socket tem o tamanho de BUFSIZ.
+    
     if (ubuf_len > 512 )
     {
         ubuf_len = 512;
@@ -1157,10 +1162,15 @@ int sys_write (unsigned int fd, char *ubuf, int count){
     // >> Console.
     // Se o descritor usado por write() for de um arquivo
     // do tipo console, escreveremos no console 0.
+
     if ( __file->____object == ObjectTypeVirtualConsole )
     {
        // IN: console number, buffer, size.
-       return (int) console_write ( (int) 0, 
+       //return (int) console_write ( (int) 0, 
+       //                 (const void *) ubuf, (size_t) count );
+
+       // #test.
+       return (int) console_write ( (int) current_vc, 
                         (const void *) ubuf, (size_t) count );
     }
 

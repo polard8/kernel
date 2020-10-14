@@ -704,7 +704,7 @@ void console_putchar ( int c, int console_number ){
 	
     console_outbyte  ( (int) c, console_number );
 
-	
+
 	// Copiar o retângulo na memória de vídeo.
 
     refresh_rectangle ( 
@@ -784,8 +784,17 @@ console_read (
 
 
 
+/*
+ *************************** 
+ * console_write:
+ * 
+ */
+
+// Called by sys_write() in sys.c.
+
 // Tem escape sequence
 // console number, buffer, size.
+
 ssize_t 
 console_write ( 
     int console_number, 
@@ -1220,8 +1229,8 @@ void REFRESH_STREAM ( file *f ){
         printf ("%c", *c );
 
         refresh_rectangle ( 
-            TTY[current_vc].cursor_x * cWidth, 
-            TTY[current_vc].cursor_y * cHeight,  
+            (TTY[current_vc].cursor_x * cWidth), 
+            (TTY[current_vc].cursor_y * cHeight),  
             cWidth, cHeight );
 
         c++;
@@ -1231,10 +1240,10 @@ void REFRESH_STREAM ( file *f ){
 }
 
 
-void console_set_current_virtual_console(int n)
+void console_set_current_virtual_console (int n)
 {
     if ( n < 0 || n >= 4 ){
-        debug_print("console_set_current_virtual_console: Limits\n");
+        debug_print ("console_set_current_virtual_console: Limits\n");
         return;
     }
 
@@ -1268,78 +1277,28 @@ void console_init_virtual_console (int n){
 
 
     debug_print ("console_init_virtual_console:\n");
-    
 
 
     ConsoleIndex = n;
-        
-    // Limits
-    if ( ConsoleIndex < 0 || ConsoleIndex > 3 )
-    {
+
+    if ( ConsoleIndex < 0 || ConsoleIndex > 3 ){
         debug_print ("console_init_virtual_console: [FAIL] ConsoleIndex\n");
         panic       ("console_init_virtual_console: [FAIL] ConsoleIndex\n");
-        //return;
     }
 
-    // #todo
-    // We need to check the device screen properties
-    // and the char properties to set up these values.
-    
+
     // #bugbug: 
     // 'cursor_width' is not a good name.
 
-    // #bugbug: Facing some compilation issues when 
-    // including more code in this function.
-    // Blessed gcc.
-
-    /*
     TTY[ConsoleIndex].cursor_x = 0;
     TTY[ConsoleIndex].cursor_y = 0;
-    TTY[ConsoleIndex].cursor_width  = 80;  // (screen width / char width) ??
-    TTY[ConsoleIndex].cursor_height = 80;  // (screen height/ char height) ??
+    TTY[ConsoleIndex].cursor_width  = (SavedX/8) -1;    // (screen width / char width) ??
+    TTY[ConsoleIndex].cursor_height = (SavedY/8) -1;    // (screen height/ char height) ??
     TTY[ConsoleIndex].cursor_left = 0;
     TTY[ConsoleIndex].cursor_top  = 0;
-    TTY[ConsoleIndex].cursor_right  = 80;  // (screen width / char width)
-    TTY[ConsoleIndex].cursor_bottom = 80;  // (screen height/ char height)
-    TTY[ConsoleIndex].cursor_color = COLOR_GREEN; //COLOR_TERMINALTEXT;
-    */
-
-
-    /*
-    TTY[ConsoleIndex].cursor_x = 0;
-    TTY[ConsoleIndex].cursor_y = 0;
-    TTY[ConsoleIndex].cursor_width  = 80;  // (screen width / char width) ??
-    TTY[ConsoleIndex].cursor_height = 80;  // (screen height/ char height) ??
-    TTY[ConsoleIndex].cursor_left = 0;
-    TTY[ConsoleIndex].cursor_top  = 0;
-    TTY[ConsoleIndex].cursor_right  = 80;  // (screen width / char width)
-    TTY[ConsoleIndex].cursor_bottom = 80;  // (screen height/ char height)
-    TTY[ConsoleIndex].cursor_color = COLOR_GREEN; //COLOR_TERMINALTEXT;
-    */
-
-    /*
-    TTY[ConsoleIndex].cursor_x = 0;
-    TTY[ConsoleIndex].cursor_y = 0;
-    TTY[ConsoleIndex].cursor_width  = 80;  // (screen width / char width) ??
-    TTY[ConsoleIndex].cursor_height = 80;  // (screen height/ char height) ??
-    TTY[ConsoleIndex].cursor_left = 0;
-    TTY[ConsoleIndex].cursor_top  = 0;
-    TTY[ConsoleIndex].cursor_right  = 80;  // (screen width / char width)
-    TTY[ConsoleIndex].cursor_bottom = 80;  // (screen height/ char height)
-    TTY[ConsoleIndex].cursor_color = COLOR_GREEN; //COLOR_TERMINALTEXT;
-    */
-
-    
-    TTY[ConsoleIndex].cursor_x = 0;
-    TTY[ConsoleIndex].cursor_y = 0;
-    TTY[ConsoleIndex].cursor_width  = (SavedX/8) -1;    //  80;  // (screen width / char width) ??
-    TTY[ConsoleIndex].cursor_height = (SavedY/8) -1;    //80;  // (screen height/ char height) ??
-    TTY[ConsoleIndex].cursor_left = 0;
-    TTY[ConsoleIndex].cursor_top  = 0;
-    TTY[ConsoleIndex].cursor_right  = 0+(SavedX/8) -1;  //80;  // (screen width / char width)
-    TTY[ConsoleIndex].cursor_bottom = 0+(SavedY/8) -1;  //80;  // (screen height/ char height)
-    TTY[ConsoleIndex].cursor_color = COLOR_GREEN;    //COLOR_TERMINALTEXT;
-
+    TTY[ConsoleIndex].cursor_right  = 0+(SavedX/8) -1;  // (screen width / char width)
+    TTY[ConsoleIndex].cursor_bottom = 0+(SavedY/8) -1;  // (screen height/ char height)
+    TTY[ConsoleIndex].cursor_color = COLOR_GREEN; 
 
 
     //#todo
@@ -1347,20 +1306,14 @@ void console_init_virtual_console (int n){
     //TTY[ConsoleIndex]._rbuffer ...
     //TTY[ConsoleIndex]._cbuffer ...    
 
-    // #bugbug
-    // A estrutura tem mais elementos que podem ser inicializados.
-    // Tivemos problemas ao tentar inicializa-los.
-    
-    //#bugbug
-    //sempre que tentamos aumentar essa função encontramos problemas
-    //de compilação.
-
-    // #test
-    // Cuidado, tivemos problemas de compilação nessa função
 
     //#todo
     // Local mode flags.
     TTY[ConsoleIndex].termios.c_lflag = ECHO;
+
+    // #bugbug
+    // A estrutura tem mais elementos que podem ser inicializados.
+    // Tivemos problemas ao tentar inicializa-los.
 }
 
 
@@ -1370,24 +1323,7 @@ void console_init_virtual_console (int n){
 
 
 /*
-int console_can_read( void);
-int console_can_read( void)
-{
-   return 0;  //false
-}
-*/
-
-/*
-int console_can_write( void);
-int console_can_write( void)
-{
-   return 1;  //true
-}
-*/
-
-
-/*
- **************** 
+ ********************************************** 
  * console_ioctl:
  * 
  */

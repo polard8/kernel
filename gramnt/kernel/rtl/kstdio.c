@@ -1299,8 +1299,8 @@ int putchar (int ch){
    
     // Para virtual consoles.
     // Em tty/console.c
-    console_outbyte (ch,current_vc );
 
+    console_outbyte ( ch, current_vc );
 
     // Para pseudo terminal (pts).
     //Em tty/vt.c

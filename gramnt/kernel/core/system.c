@@ -199,16 +199,21 @@ void set_up_text_color ( unsigned char forecolor, unsigned char backcolor ){
 
 
 /*
- ***************************************************************
+ **********************************************************
  * set_up_cursor:
- *     Configura cursor.
- *     @todo: Isso pode ir para outro lugar.
+ *     Setup cursor for the current virtual console.
+ *
  */
 
-void set_up_cursor ( unsigned long x, unsigned long y ){   
+// We can move this to another place.
 
-	TTY[current_vc].cursor_x = (unsigned long) x;
-	TTY[current_vc].cursor_y = (unsigned long) y;
+void set_up_cursor ( unsigned long x, unsigned long y )
+{
+
+    if (current_vc<0){ return; }
+
+    TTY[current_vc].cursor_x = (unsigned long) x;
+    TTY[current_vc].cursor_y = (unsigned long) y;
 }
 
 
@@ -219,9 +224,9 @@ void set_up_cursor ( unsigned long x, unsigned long y ){
  *     @todo: Isso pode ir para outro lugar.
  */
 
-unsigned long get_cursor_x (void){
-	
-	return (unsigned long) TTY[current_vc].cursor_x;
+unsigned long get_cursor_x (void)
+{
+    return (unsigned long) TTY[current_vc].cursor_x;
 }
 
 
@@ -232,15 +237,16 @@ unsigned long get_cursor_x (void){
  *     @todo: Isso pode ir para outro lugar.
  */
 
-unsigned long get_cursor_y (void){
-	
+unsigned long get_cursor_y (void)
+{
     return (unsigned long) TTY[current_vc].cursor_y; 
 }
 
 
-void *systemNull (void){
-	
-	return NULL;
+void *systemNull (void)
+{
+    // ?
+    return NULL;
 }
 
 
@@ -249,17 +255,18 @@ void *systemNull (void){
  *     Ligando um driver ao sistema operacional.
  */
 
-void *systemLinkDriver( unsigned long arg1, 
-                        unsigned long arg2, 
-						unsigned long arg3 )
+    // #todo: 
+    // Ainda não implementada.
+
+void *systemLinkDriver ( 
+    unsigned long arg1, 
+    unsigned long arg2, 
+    unsigned long arg3 )
 {
-	
-	// #todo: 
-	// Ainda não implementada.
-	
-	printf ("systemLinkDriver:\n");
-    refresh_screen();	
-    return NULL; 	
+
+    printf ("systemLinkDriver: [TODO]\n");
+    refresh_screen();
+    return NULL; 
 }
 
 
@@ -352,15 +359,17 @@ void systemSetupVersion (void){
 	// Colocando na estrutura System se ela for válida.
 	//
 
+
     if ( (void *) System != NULL )
     {
-		if ( System->used == 1 && System->magic == 1234 )
-		{
-			System->version      = (void *) Version;
-			System->version_info = (void *) VersionInfo;
-		}
-		//Nothing
-    };
+
+        if ( System->used == 1 && System->magic == 1234 )
+        {
+            System->version      = (void *) Version;
+            System->version_info = (void *) VersionInfo;
+        }
+        //Nothing
+    }
 
 	// More ?!
 }
@@ -441,15 +450,15 @@ int SystemMenu (void){
 
 	// Se houve falha na criação da janela.
 
-    if ( (void *) hWindow == NULL )
-    {
-        panic ("sm-system-SystemMenu: hWindow\n");
+    if ( (void *) hWindow == NULL ){
+        panic ("system-SystemMenu: hWindow\n");
     }
 
 	// Se houve falha na criação do menu.
-    if ( (void *) hWindow->defaultMenu == NULL )
-    {
+    if ( (void *) hWindow->defaultMenu == NULL ){
+
         return (int) 1;
+
     }else{
 
 		//Inicializa o array de menuítens.
@@ -468,6 +477,7 @@ int SystemMenu (void){
 
 
 /*
+ **************************************************
  * SystemMenuProcedure:
  *     O procedimento do control menu principal.
  *     menu do sistema, manipula a janela ativa.
@@ -476,19 +486,22 @@ int SystemMenu (void){
 // # dialog !!!
 
 unsigned long 
-SystemMenuProcedure ( struct window_d *window, 
-                      int msg, 
-                      unsigned long long1, 
-                      unsigned long long2 ) 
+SystemMenuProcedure ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 ) 
 {
+
+
     switch (msg)
     {
         case MSG_KEYDOWN:
             switch (long1)
             {
-                case VK_ESCAPE:
-                   break;
-
+                case VK_ESCAPE:  
+                    break;
+                    
                 default:
                     break; 
             };
@@ -543,7 +556,7 @@ done:
 
     if (VideoBlock.useGui == 1)
     {
-        refresh_screen ();
+        refresh_screen();
     }
 
     return (unsigned long) 0;
@@ -905,12 +918,14 @@ void systemShutdownViaAPM (void){
 
 void *systemGetSystemMetric (int number){
 
-    if ( number <= 0 )
+    if ( number <= 0 ){
         return NULL;
+    }
 
 
-    switch ( number )
-    {
+    switch ( number ){
+
+
 		//case SM_NULL:
 		//    return NULL;
 		//	break;
@@ -943,12 +958,14 @@ void *systemGetSystemMetric (int number){
 
 void *systemGetSystemStatus (int number){
 
-    if ( number <= 0 )
+    if ( number <= 0 ){
         return NULL;
+    }
 
 
-    switch ( number )
-    {
+    switch ( number ){
+
+
 		//case SS_NULL:
 		//    return NULL;
 		//	break;
@@ -1011,8 +1028,9 @@ void die (void){
 
 int system_get_pid (int index){
 
-    if ( index < 0 )
+    if ( index < 0 ){
         return -1;
+    }
 
 
     switch (index)

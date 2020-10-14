@@ -360,6 +360,10 @@ int __fflush (FILE *stream){
     } 
 
 
+    //
+    // == Write =====================================
+    //
+
     // #todo: 
     // This is the desired way.
     // Nesse teste escreveremos em stdout. Seu descritor indicará
@@ -368,8 +372,7 @@ int __fflush (FILE *stream){
 
     nwrite = write ( fileno(stream), stream->_base, stream->_w );
  
-    if (nwrite <= 0)
-    {
+    if (nwrite <= 0){
         printf ("__fflush: [FAIL] nwrite\n");
         //stream->_flags |= _IOERROR; //#todo
         //stream->error = errno;
@@ -387,8 +390,6 @@ int __fflush (FILE *stream){
     //stream->have_ungotten = false;
     //stream->ungotten = 0;
     
-
-
     return 0;
 }
 

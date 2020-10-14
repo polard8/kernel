@@ -1619,8 +1619,9 @@ void gde_reboot (void)
 
 void gde_set_cursor ( unsigned long x, unsigned long y )
 {
-    system_call ( SYSTEMCALL_SETCURSOR, x, y, 0 );
+    gramado_system_call ( SYSTEMCALL_SETCURSOR, x, y, 0 );
 }
+
 
 // #todo
 void gde_get_cursor ( unsigned long *x, unsigned long *y )

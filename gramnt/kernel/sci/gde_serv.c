@@ -1431,10 +1431,11 @@ gde_services (
             //break;
 
 
-        // 34 - Setup cursor.
+        // 34 - Setup cursor for the current virtual console.
+        // See: core/system.c
         case SYS_VIDEO_SETCURSOR: 
-            set_up_cursor ( (unsigned long) arg2, 
-                (unsigned long) arg3 );
+            set_up_cursor ( 
+                (unsigned long) arg2, (unsigned long) arg3 );
             return NULL;
             break; 
 
