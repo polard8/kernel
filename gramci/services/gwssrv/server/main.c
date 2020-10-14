@@ -1475,6 +1475,9 @@ void InitGraphics(void){
     grInit();
     
     
+    
+    /*
+     //testes com z positivo
     grPlot0(0, 4, 4,COLOR_RED);     // q1
     grPlot0(3, 4, 4,COLOR_RED);     // q1 afasta para q1
     grPlot0(90, 4, 4,COLOR_RED);     // q1 afasta para q1
@@ -1490,7 +1493,32 @@ void InitGraphics(void){
     grPlot0(0,-4, 4,COLOR_YELLOW);  // q4 
     grPlot0(3,-4, 4,COLOR_YELLOW);  // q4 afasta  para q1
     grPlot0(90,-4, 4,COLOR_YELLOW);  // q4 afasta  para q1
+    */
+
+
+     /*
+     //testes com z negativo
+    grPlot0 ( 0, 4, 4,COLOR_RED);     // q1
+    grPlot0 (-3, 4, 4,COLOR_RED);     // q1 afasta para q3
+    grPlot0 (-9, 4, 4,COLOR_RED);     // q1 afasta para q3
+    grPlot0 (-11, 4, 4,COLOR_RED);     // q1 afasta para q3
     
+
+    grPlot0( 0, 4,-4,COLOR_GREEN);   // q2
+    grPlot0(-3, 4,-4,COLOR_GREEN);   // q2  afasta  para q3   
+    grPlot0(-9, 4,-4,COLOR_GREEN);   // q2  afasta  para q3    
+    grPlot0(-11, 4,-4,COLOR_GREEN);   // q2  afasta  para q3    
+    
+    grPlot0( 0,-4,-4,COLOR_BLUE);    // q3
+    grPlot0(-3,-4,-4,COLOR_BLUE);    // q3 afasta  para q3
+    grPlot0(-9,-4,-4,COLOR_BLUE);    // q3 afasta  para q3
+    grPlot0(-11,-4,-4,COLOR_BLUE);    // q3 afasta  para q3
+    
+    grPlot0( 0, -4, 4,COLOR_YELLOW);  // q4 
+    grPlot0(-3, -4, 4,COLOR_YELLOW);  // q4 afasta  para q3
+    grPlot0(-9, -4, 4,COLOR_YELLOW);  // q4 afasta  para q3
+    grPlot0(-11, -4, 4,COLOR_YELLOW);  // q4 afasta  para q3
+    */    
 
 
     //See: window.c
@@ -1501,7 +1529,7 @@ void InitGraphics(void){
     //gws_show_window_rect(gui->screen);
     
     gws_show_backbuffer();              
-    while(1){}
+    //while(1){}
     
     
     

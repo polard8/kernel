@@ -36,12 +36,56 @@ int grPlot0 (int z, int x, int y, unsigned long color)
     unsigned long X=0;
     unsigned long Y=0;
 
+
+
+
     // z negativo
     if (z < 0)
     {
-        // todo
-        return -1;
+        //positivo, para direita.
+        if (x >= 0 )
+        {
+            z = abs(z);
+            zBaseX = (unsigned long) (HotSpotX - (unsigned long) z);
+            
+            X = (unsigned long) (zBaseX + (unsigned long) x);
+        }
+        
+        // negativo, para esquerda.
+        if (x < 0 )
+        {
+            z = abs(z);
+            zBaseX = (unsigned long) (HotSpotX - (unsigned long) z);
+            x = abs(x);   
+            X = (unsigned long) (zBaseX - (unsigned long) x);
+        }
+
+        //positivo, para cima.
+        if ( y >= 0 )
+        {
+            z = abs(z);
+            zBaseY = (unsigned long) (HotSpotY + (unsigned long) z);
+            
+            Y = (unsigned long) (zBaseY - (unsigned long) y); 
+        }
+
+        // negativo, para baixo
+        if ( y < 0 )
+        {
+            z = abs(z);
+            zBaseY = (unsigned long) (HotSpotY + (unsigned long) z);
+            y = abs(y);
+            Y = (unsigned long) (zBaseY + (unsigned long) y);           
+        }
+        
+        pixelBackBufferPutpixel ( color, X, Y );  
+        return 0;
     }
+    
+    
+    
+    
+    
     
     // z maior que zero.
     if (z >= 0)
