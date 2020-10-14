@@ -1521,6 +1521,35 @@ void InitGraphics(void){
     */    
 
 
+    int y=0;
+    int x=0;
+    int z=0;
+    
+    
+    
+    z=0;
+    for( y=0; y<32; y++)
+    {
+        for( x=0; x<32; x++)
+            grPlot0 ( z, x, y,COLOR_RED);
+    
+        z++;
+    }
+
+
+    z=0;
+    for( y=0; y<32; y++)
+    {
+        for( x=0; x<32; x++)
+            grPlot0 ( z, -x, -y,COLOR_BLUE);
+    
+        z--;
+    }
+
+
+
+
+
     //See: window.c
     //create_main_menu();
   
