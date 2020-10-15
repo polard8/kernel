@@ -10,9 +10,21 @@ struct gws_screen_d
     int used;
     int magic;
     
+    unsigned long flags;
+    
     unsigned long width;
     unsigned long height;
     //bpp?
+    
+    
+    unsigned long hotspot_x;
+    unsigned long hotspot_y;
+
+    unsigned long min_x;   // 0 = hot spot
+    unsigned long min_y;   // 0 = hot spot
+    unsigned long max_x;
+    unsigned long max_y;
+
 
     unsigned long font_size;
 

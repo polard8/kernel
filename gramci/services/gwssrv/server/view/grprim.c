@@ -33,7 +33,7 @@ int grInit(void)
 }
 
 
-
+// low lever plot.
 int grPlot0 (int z, int x, int y, unsigned long color)
 {
 
@@ -44,6 +44,13 @@ int grPlot0 (int z, int x, int y, unsigned long color)
     unsigned long Y=0;
 
 
+
+    //#debug: Exagero?!
+    if ( (void*) CurrentScreen == NULL )
+    {
+        printf("grPlot0: CurrentScreen\n");
+        exit(1);
+    }
 
 
     // z negativo
@@ -85,13 +92,14 @@ int grPlot0 (int z, int x, int y, unsigned long color)
             Y = (unsigned long) (zBaseY + (unsigned long) y);           
         }
         
-        pixelBackBufferPutpixel ( color, X, Y );  
-        return 0;
+        
+        if ( 0 <= X < CurrentScreen->width && 0 <= Y < CurrentScreen->height )
+        {
+            pixelBackBufferPutpixel ( color, X, Y ); 
+            return 0;
+        }
+        return -1;
     }
-    
-    
-    
-    
     
     
     // z maior que zero.
@@ -129,9 +137,13 @@ int grPlot0 (int z, int x, int y, unsigned long color)
             y = abs(y);
             Y = (unsigned long) (zBaseY + (unsigned long) y);           
         }
-        
-        pixelBackBufferPutpixel ( color, X, Y );  
-        return 0;
+
+        if ( 0 <= X < CurrentScreen->width && 0 <= Y < CurrentScreen->height )
+        {
+            pixelBackBufferPutpixel ( color, X, Y );  
+            return 0;
+        }
+        return -1;
     }
 
     return -1;

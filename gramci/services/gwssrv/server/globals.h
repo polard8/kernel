@@ -168,16 +168,21 @@ struct gws_color_scheme_d* GWSPrideColorScheme;    // Colorido.
 // hadware, software
 
 unsigned long  ____BACKBUFFER_VA;
-unsigned long  ____FRONTBUFFER_VA;  //#test
+unsigned long  ____FRONTBUFFER_VA;
 
+
+// Saving
 unsigned long SavedBootBlock;
-unsigned long SavedLFB;   // ??? pa va ???
+unsigned long SavedLFB;   // #bugbug? VA ?
 unsigned long SavedX;
 unsigned long SavedY;
 unsigned long SavedBPP; 
 
+
+// helper.
 unsigned long __device_width;
 unsigned long __device_height;
+unsigned long __device_bpp;
 
 
 
@@ -190,7 +195,9 @@ unsigned long __refresh_rate;
 
 
 // Pointeiros para os backbuffers.
-unsigned long screens[4];
+#define MAX_SCREENS    4
+unsigned long screens[MAX_SCREENS];
+
 
 /*
 struct vid_d

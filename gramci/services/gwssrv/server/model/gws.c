@@ -267,27 +267,61 @@ unsigned long gws_get_device_height(void)
 
 int gwssrv_init_globals(void)
 {
+    int i=0;
+    
     // buffers
     ____FRONTBUFFER_VA = (unsigned long) gwssrv_get_system_metrics(11);
-    ____BACKBUFFER_VA  = (unsigned long) gwssrv_get_system_metrics(12);
+    ____BACKBUFFER_VA  = (unsigned long) gwssrv_get_system_metrics(12); // #todo: check
 
 
     // Screen
-    SavedX = gwssrv_get_system_metrics(1);
-    SavedY = gwssrv_get_system_metrics(2);
-    __device_width  = SavedX;
-    __device_height = SavedY;
+    __device_width  = (unsigned long) gwssrv_get_system_metrics(1);
+    __device_height = (unsigned long) gwssrv_get_system_metrics(2);
+    __device_bpp    = (unsigned long) gwssrv_get_system_metrics(9);
+    
+    // Saving
+    SavedX   = (unsigned long) __device_width;
+    SavedY   = (unsigned long) __device_height;
+    SavedBPP = (unsigned long) __device_bpp;
+    SavedLFB = (unsigned long) ____FRONTBUFFER_VA;
+        
+    if ( SavedX == 0 || SavedY == 0 || SavedBPP == 0 || SavedLFB == 0 )
+    {
+        printf ("gwssrv_init_globals: [FAIL] Screen properties\n");
+        exit (1);
+    }
 
 
-    // bpp
-    SavedBPP = (unsigned long) gwssrv_get_system_metrics(9);
+    //
+    // == Backbuffers ======================================
+    //
+    
+    // #todo
+    // O tamanho dos backbuffers depende da resoluçao da tela.
+    // Pois temos 4MB alocados. 
+    // Talvez menos, por causa de alguma memoria compartilhada irregular.
+
+    // #bugbug: Null pointers,    
+    for (i=0; i<MAX_SCREENS; i++){
+        screens[i] = 0;
+    }
+         
+    // Backbuffer.
+    screens[0] = ____BACKBUFFER_VA;
+
+    if ( screens[0] == 0 )
+    {
+        printf ("gwssrv_init_globals: [FAIL] backbuffer\n");
+        exit (1);
+    }
 
 
     //background_color = xCOLOR_GRAY3;
    
    
-   gwssrv_initialize_color_schemes(ColorSchemeHumility);
-   gwssrv_select_color_scheme(ColorSchemeHumility);
+    // Color scheme
+    gwssrv_initialize_color_schemes(ColorSchemeHumility);
+    gwssrv_select_color_scheme(ColorSchemeHumility);
    
    
     //...
@@ -320,6 +354,10 @@ int gwsInit(void)
     // Current display, current screen, current root window.
 
 
+    //
+    // == Display ===============================================
+    //
+
     CurrentDisplay = (void *) malloc (sizeof(struct gws_display_d));
     if( (void*) CurrentDisplay == NULL){
         debug_print("gwsInit: CurrentDisplay\n");
@@ -334,6 +372,10 @@ int gwsInit(void)
         
         //...
     };
+
+    //
+    // == Screen ===============================================
+    //
     
     
     CurrentScreen  = (void *) malloc (sizeof(struct gws_screen_d));
@@ -344,16 +386,33 @@ int gwsInit(void)
         CurrentScreen->id = 0; 
         CurrentScreen->used = 1; 
         CurrentScreen->magic = 1234; 
+        
+        //#todo:
+        CurrentScreen->flags = 0;
 
-        // Serão configurados depois.
-        // Por enquanto estamos apenas limpando.
-        CurrentScreen->width = 0;
-        CurrentScreen->height = 0;
-        CurrentScreen->font_size = 0;
-        CurrentScreen->char_width  = 0;
-        CurrentScreen->char_height = 0;
-        CurrentScreen->backbuffer  = NULL;
-        CurrentScreen->frontbuffer = NULL;
+        // #test
+        // Configuramos algumas variaveis globais quando
+        // chamamos a rotina de inicializaçao de globais.
+        // See: gwssrv_init_globals().
+        
+        CurrentScreen->width  = SavedX;
+        CurrentScreen->height = SavedY;
+        CurrentScreen->font_size   = 0;    //todo
+        CurrentScreen->char_width  = 0;    //todo
+        CurrentScreen->char_height = 0;    //todo
+        CurrentScreen->backbuffer  = (void *) ____BACKBUFFER_VA;
+        CurrentScreen->frontbuffer = (void *) ____FRONTBUFFER_VA;
+        
+        
+        CurrentScreen->hotspot_x = ( CurrentScreen->width / 2 );
+        CurrentScreen->hotspot_y = ( CurrentScreen->height / 2 );
+        
+        // Limites para a tela em cruz. '+'
+        CurrentScreen->min_x = 0;
+        CurrentScreen->min_y = 0;
+        CurrentScreen->max_x = ( CurrentScreen->width / 2 );
+        CurrentScreen->max_y = ( CurrentScreen->height / 2 );
+       
         //...
 
     };
