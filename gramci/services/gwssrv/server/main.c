@@ -1630,7 +1630,7 @@ void InitGraphics(void){
     //gws_show_window_rect(gui->screen);
     
     gws_show_backbuffer();              
-    while(1){}
+    //while(1){}
        
     
         
