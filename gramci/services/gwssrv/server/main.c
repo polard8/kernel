@@ -1545,31 +1545,80 @@ void InitGraphics(void){
     */
 
 
-   int i=0;
+    //int i=0;
    
-   for (i=0; i<4; i++)
-   {    
+    /*
+    for (i=0; i<4; i++)
+    {    
        //ok
        plotCircle ( i*8, i*8, 100, COLOR_GREEN); 
-   };
+    };
+    */
 
-   for (i=0; i<4; i++)
-   {   
-       // ok
+    /*
+    for (i=0; i<4; i++)
+    {
        plotEllipseRect (
             i*8, i*8, 
             30, 220, 
             COLOR_BLUE);
-   };
+    };
+    */
 
-
-   for (i=0; i<5; i++)
-   { 
-       //ok
+    /*
+    for (i=0; i<5; i++)
+    { 
        plotLine3d ( 
            2, 2, 0,     // vertex 1
            20, i*20, 0,
            COLOR_RED );
+    };
+    */
+
+
+     // Lines.
+
+     /*
+     grPlot0 ( 0, 0, 40, COLOR_WHITE ); //MARCADOR
+     plotLine3d ( 
+         0,    0,  0,
+         0,   40,  0,
+         COLOR_RED );
+
+     grPlot0 ( 0, 40, 0, COLOR_WHITE ); //MARCADOR
+     plotLine3d ( 
+         0,    0,  0,
+         40,   0,  0,
+         COLOR_GREEN );
+
+
+     grPlot0 ( 0, -40, -40, COLOR_WHITE ); //MARCADOR
+     plotLine3d ( 
+         0,    0,  0,
+         -40,  -40,  0,
+         COLOR_BLUE );
+     */
+
+    //rectangle(
+    //    8,8,
+    //    80,80, COLOR_YELLOW );
+
+ 
+    /*
+    cube ( 
+        15,25,25,35,    // back
+        20,10,30,30,   // front
+        COLOR_WHITE );
+    */
+
+
+    int i=0;
+    for (i=0; i<5; i++){
+
+    cubeZ ( 
+        15,25,25,35,    // back
+        20,10,30,30,   // front
+        COLOR_WHITE, i*40 );
     };
 
 
@@ -1581,7 +1630,7 @@ void InitGraphics(void){
     //gws_show_window_rect(gui->screen);
     
     gws_show_backbuffer();              
-    //while(1){}
+    while(1){}
        
     
         
