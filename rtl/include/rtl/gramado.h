@@ -54,6 +54,17 @@ unsigned long rtl_get_system_metrics (int index);
 // usado para calcular o tempo de execuçao de uma funcao.
 unsigned long rtl_get_progress_time(void);
 
+
+// #bugbug
+// Not tested yet.
+int 
+rtl_copy_text ( 
+    unsigned long src, 
+    unsigned long dest, 
+    int width, 
+    int height );
+
+
 #endif
 
 

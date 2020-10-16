@@ -211,3 +211,64 @@ void AddSwap( unsigned int* x, unsigned int* y )
 */
 
 
+/*
+ *************************************************** 
+ * rtl_copy_text:
+ *      Copy a string of bytes given the source, the destination,
+ * the width and the height.
+ *      It copies in chuncks of 64 bytes.
+ *      
+ */
+
+// #bugbug
+// Not tested yet.
+int 
+rtl_copy_text ( 
+    unsigned long src, 
+    unsigned long dest, 
+    int width, 
+    int height )
+{
+
+    char *__src  = (char *) src;
+    char *__dest = (char *) dest; 
+
+    // text width and text height.
+    int __width  = width;
+    int __height = height;
+
+    int x=0;
+    int y=0; 
+
+
+    if ( (void *) src == NULL || (void *) dest == NULL )
+    {
+        printf("rtl_copy_text: src dest\n");
+        return -1;
+    }
+
+    if ( width <= 0 || height <= 0 )
+    {
+        printf("rtl_copy_text: width height\n");
+        return -1;
+    }
+  
+
+    for ( y=0; y< __height; y++ ) 
+    { 
+        for (x=0 ; x<__width/64 ; x++) 
+        { 
+            memcpy ( __dest, __src+((y&63)<<6),64 );
+            __dest += 64; 
+        } 
+        if (__width&63) 
+        { 
+            memcpy (__dest, __src+((y&63)<<6), __width&63 ); 
+            __dest += (__width&63); 
+        } 
+    };
+    
+    return -0; 
+}
+
+
