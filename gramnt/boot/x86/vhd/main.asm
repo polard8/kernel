@@ -62,11 +62,8 @@ boot_main:
 
     %include "stage1.asm"
 
-;;
+
 ;; Segue um deslocamento para colocar o VBR no lugar certo.
-;;
-
-
 ;;=========================================================
 ;; eof:                                                   ;
 ;;     End of file.                                       ;
@@ -152,15 +149,60 @@ fs_fat16_rootdir:
 
     ;; ## Volume1 entry ##
     
+    ;; Label (GRAMADO)
     db 0x47, 0x52, 0x41, 0x4D, 0x41, 0x44, 0x4F, 0x20
     db 0x20, 0x20, 0x20, 0x08, 0x00, 0x00, 0x00, 0x00 
     db 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xEE, 0x7B
     db 0x1B, 0x4B, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 
-	;; Completando o diretório raiz do volume de boot.
-	;; 512 entradas de 32 bytes cada.
-    times (32*512) - (32) db 0    
+    ; Metafile (BRAMADO)
+    db 0x42, 0x52, 0x41, 0x4D, 0x41, 0x44, 0x4F, 0x20
+    db 0x20, 0x20, 0x20, 0x08, 0x00, 0x00, 0x00, 0x00 
+    db 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xEE, 0x7B
+    db 0x1B, 0x4B, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 
+
+    ;; Podemos criar mais uma entrada aqui,
+    ;; como o root dir eh frequentemente carregado pelos boot loader,
+    ;; ele podera usar as primeiras entradas como metafiles.
+    ;; Essas entrada podem ter nomes como METAVID, METAXX ... HRAMADO
+    ;; O sistema operaciona pode editar essas entradas sem nem mesmo
+    ;; tocar na fat.
+    ;; Podemos limitar o numero de metafiles a '1',
+    ;; assim nao teremos muitos arquivos que nao podem ser tocados,
+    ;; apenas dois, os dois primeiros.
+    ;; Teremos que compactar as informaçoes dentro da entrada.
+    ;; #todo: todos os metafiles podem apontar para o mesmo
+    ;; cluster apontado pela label ... que provavelmente eh nenhum ...
+    ;; ou aponta para os dois primeiros, que estao fora do range
+    ;; usado pela fat16.
+    
+    
+    
+    ;; Completando o diretório raiz do volume de boot.
+    ;; 512 entradas de 32 bytes cada.
+
+    ;;times (32*512) - (32*1) db 0   ;; Com apenas a label   GRAMADO
+    times (32*512) - (32*2) db 0     ;; Incluindo o metafile BRAMADO for boot configuration.
+
+    ;; We can setup what boot manager name to load.
+    ;; This way we can load a lot of different operating systems.
+    ;; Ex: BM, BM1, BM2, BM3 ~ BM9.
+        
+    ;; We can setup what boot loader name to load.
+    ;; This way we can load a lot of different operating systems.
+    ;; Ex: BL, BL1, BL2, BL3 ~ BL9.
+
+    ;; We can setup what kernel name to load.
+    ;; This way we can load a lot of different operating systems.
+    ;; Ex: KERNEL, KERNEL1, KERNEL2, KERNEL3 ~ KERNEL9.
+
+    ;; This way we only need the BRAMADO metafile.
+    ;; We will change only 3 bytes in the entry.
+    ;; The default files are BM, BL and KERNEL.
+    ;; The extended files are BMx, BLx and KERNELx.
+    
+    
 
 ;;
 ;;  ##  DATA AREA  ##
