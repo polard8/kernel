@@ -1,4 +1,7 @@
 
+#ifndef ____WT_H
+#define ____WT_H    1
+
 
 // 
 // == Window Types ==
@@ -21,4 +24,8 @@
 #define WT_ICON       10
 
 //#define WT_MAX (WT_ICON+1)
+
+#endif    
+
+
 

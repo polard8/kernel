@@ -1132,6 +1132,8 @@ copy_offset_rect (
 int gws_show_window_rect (struct gws_window_d *window);
 
 
+void demoTerry(void);
+
 // In: style = estilo do frame.
 int 
 createwDrawFrame ( 

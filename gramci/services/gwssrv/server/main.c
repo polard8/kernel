@@ -1472,6 +1472,11 @@ void InitGraphics(void){
     //while(1){}
 
 
+    //
+    // init lib
+    //
+    
+    // See: grprim.c
     grInit();
     
     
@@ -1612,16 +1617,19 @@ void InitGraphics(void){
     */
 
 
+    /*
     int i=0;
     for (i=0; i<5; i++){
-
     cubeZ ( 
         15,25,25,35,    // back
         20,10,30,30,   // front
         COLOR_WHITE, i*40 );
     };
-
-
+    */
+   
+    //Terry's window
+    //demoTerry();
+    
     //See: window.c
     //create_main_menu();
   

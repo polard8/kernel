@@ -12,6 +12,85 @@
 #include <gws.h>
 
 
+
+void
+DrawBorder( 
+    unsigned long l, unsigned long r, unsigned long t, unsigned long b,
+    int solid )
+{
+
+    int i=0;
+    int CharSize = 8;
+    
+    
+    
+    
+    if (solid) {
+
+      //PlotScreenU8(CH_DBL_TL+attr,l-1,t-1);
+      //PlotScreenU8(CH_DBL_TR+attr,r+1,t-1);
+      //PlotScreenU8(CH_DBL_BL+attr,l-1,b+1);
+      //PlotScreenU8(CH_DBL_BR+attr,r+1,b+1);
+      
+      charBackbufferDrawcharTransparent( l-CharSize, t-CharSize, COLOR_BLUE, CH_DBL_TL );
+      charBackbufferDrawcharTransparent( r+CharSize, t-CharSize, COLOR_BLUE, CH_DBL_TR );
+      charBackbufferDrawcharTransparent( l-CharSize, b+CharSize, COLOR_BLUE, CH_DBL_BL );
+      charBackbufferDrawcharTransparent( r+CharSize, b+CharSize, COLOR_BLUE, CH_DBL_BR );
+      
+      
+      for ( i=l; i <= (r/CharSize); i++) {
+         //PlotScreenU8(CH_DBL_HORZ+attr,i,t-1);
+         //PlotScreenU8(CH_DBL_HORZ+attr,i,b+1);
+
+          charBackbufferDrawcharTransparent( i*CharSize, t-CharSize, COLOR_BLUE, CH_DBL_HORZ );
+          charBackbufferDrawcharTransparent( i*CharSize, b+CharSize, COLOR_BLUE, CH_DBL_HORZ );
+      }
+      
+      
+      for (i=t;i <= (b/CharSize);i++) {
+          //PlotScreenU8(CH_DBL_VERT+attr,l-1,i);
+          //PlotScreenU8(CH_DBL_VERT+attr,r+1,i);
+
+         charBackbufferDrawcharTransparent( l-CharSize,i*CharSize, COLOR_BLUE, CH_DBL_VERT );
+         charBackbufferDrawcharTransparent( r+CharSize,i*CharSize, COLOR_BLUE, CH_DBL_VERT );
+      }
+      
+
+    }else{
+  
+      //PlotScreenU8(CH_SINGLE_TL+attr,l-1,t-1);
+      //PlotScreenU8(CH_SINGLE_TR+attr,r+1,t-1);
+      //PlotScreenU8(CH_SINGLE_BL+attr,l-1,b+1);
+      //PlotScreenU8(CH_SINGLE_BR+attr,r+1,b+1);
+
+      charBackbufferDrawcharTransparent( l-CharSize,t-CharSize, COLOR_BLUE, CH_SINGLE_TL );
+      charBackbufferDrawcharTransparent( r+CharSize,t-CharSize, COLOR_BLUE, CH_SINGLE_TR );
+      charBackbufferDrawcharTransparent( l-CharSize,b+CharSize, COLOR_BLUE, CH_SINGLE_BL );
+      charBackbufferDrawcharTransparent( r+CharSize,b+CharSize, COLOR_BLUE, CH_SINGLE_BR );
+
+      for ( i=l; i<= (r/CharSize); i++ ) {
+          
+          //PlotScreenU8(CH_SINGLE_HORZ+attr,i,t-1);
+          //PlotScreenU8(CH_SINGLE_HORZ+attr,i,b+1);
+
+          charBackbufferDrawcharTransparent( i*CharSize, t-CharSize, COLOR_BLUE, CH_SINGLE_HORZ );
+          charBackbufferDrawcharTransparent( i*CharSize, b+CharSize, COLOR_BLUE, CH_SINGLE_HORZ );
+      }
+      
+      for (i=t; i<=(b/CharSize); i++) {
+          
+          //PlotScreenU8(CH_SINGLE_VERT+attr,l-1,i);
+          //PlotScreenU8(CH_SINGLE_VERT+attr,r+1,i);
+          
+          charBackbufferDrawcharTransparent( l-CharSize, i*CharSize, COLOR_BLUE, CH_SINGLE_VERT );
+          charBackbufferDrawcharTransparent( r+CharSize, i*CharSize, COLOR_BLUE, CH_SINGLE_VERT );
+      }
+      
+    };
+}
+
+
+
 // #todo
 // Draw char.
 // Service 1004.

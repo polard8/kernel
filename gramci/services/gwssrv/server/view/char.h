@@ -8,7 +8,17 @@ int gcharWidth;
 int gcharHeight;
 
 
+//
+//
+//
 
+
+
+void
+DrawBorder( 
+    unsigned long l, unsigned long r, unsigned long t, unsigned long b,
+    int solid );
+    
 
 
 void charSetCharWidth ( int width );

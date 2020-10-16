@@ -28,6 +28,41 @@
 
 
 
+void demoTerry(void)
+{
+     createwCreateWindow ( WT_SIMPLE, 
+         1, 1, "terry0",  
+         0, 0, 240 +8+8, 320 +8+8,   
+         gui->screen, 0, 
+         COLOR_WHITE, COLOR_WHITE );
+  
+     struct gws_window_d *terry;
+     terry = (struct gws_window_d *) createwCreateWindow ( WT_SIMPLE, 
+         1, 1, "terry",  
+         8, 8, 240, 320,   
+         gui->screen, 0, 
+         COLOR_WHITE, COLOR_WHITE );
+
+    // IN: l,r,t,b, solid
+    DrawBorder ( 
+        8, 240, 
+        8, 320, 1 );
+
+    // IN: l,r,t,b, solid
+    //DrawBorder ( 
+    //    8, 240, 
+    //    8, 320, 0 );
+
+    if( (void*) terry != NULL){
+        dtextDrawText ( (struct gws_window_d *) terry,
+            20, 20, COLOR_BLUE, "Demo: Terry's window" );
+        dtextDrawText ( (struct gws_window_d *) terry,
+            20, 32, COLOR_RED,  "by Fred Nora" );
+    }
+
+}
+
+
 /*
  ********************************
  * createwDrawFrame:
