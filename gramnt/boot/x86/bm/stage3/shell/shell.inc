@@ -216,6 +216,40 @@ os_command_line:
     jc do_boot
 
 
+.xBootJail:
+    mov edi, bootjail_string
+    call os_string_compare
+    jc do_gramado_mode_jail
+
+
+.xBootP1:
+    mov edi, bootp1_string
+    call os_string_compare
+    jc do_gramado_mode_p1
+
+
+.xBootHome:
+    mov edi, boothome_string
+    call os_string_compare
+    jc do_gramado_mode_home
+
+.xBootP2:
+    mov edi, bootp2_string
+    call os_string_compare
+    jc do_gramado_mode_p2
+
+.xBootCastle:
+    mov edi, bootcastle_string
+    call os_string_compare
+    jc do_gramado_mode_castle
+
+
+.xBootCalifornia:
+    mov edi, bootcalifornia_string
+    call os_string_compare
+    jc do_gramado_mode_california
+
+
     ; 'shutdown'
     ; Desliga a máquina via APM.
 .xShutdown:

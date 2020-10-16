@@ -40,24 +40,33 @@
 ;;====================================================
 
 
-;;
-;;   ## VIDEO MODE ##
-;;
+
+;; The gramado mode
+;; it will select the video mode.
+;; The vide mode depends on the gramado mode.
+;; See: rmStartGUI on pm.inc
 
 
-;;
-;; == Global variables to set the video mode ===================
-;;
+;;GRAMADO_DEFAULT_MODE EQU 0x00  ; jail        320x200
+;;GRAMADO_DEFAULT_MODE EQU 0x01  ; p1          640x480
+GRAMADO_DEFAULT_MODE EQU 0x02  ; home        800x600
+;;GRAMADO_DEFAULT_MODE EQU 0x03  ; p2          1024x768
+;;GRAMADO_DEFAULT_MODE EQU 0x04  ; castle      ??
+;;GRAMADO_DEFAULT_MODE EQU 0x05  ; california  ??
+;; ...
 
 
 ;;
 ;; == Selecting the mode =======================================
 ;;
 
+;; This is the default video mode.
+;; we will use this if the 'gramado mode' fail.
+;; the video mode depends on the 'gramado mode'
+;; Global variables to set the video mode 
 ;; Well tested modes.
 ;; ok on qemu.
 ;; It works on nvidia geforce too, but with 32bpp.
-
 
 ;; 24bpp on qemu
 ;;G_VIDEO_MODE EQU 0x010F    ;320x200

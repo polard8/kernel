@@ -385,7 +385,14 @@ META$FILE:
 ;;
 .SYSTEM_INFO_FILE_ADDRESS:   
     DD 0
-	
+    
+
+;;#test
+;; jail, p1, home, p2, castle.
+.GRAMADO_MODE: 
+    DB 0x00
+
+
 META$FILE_END:	
     TIMES (2*512) - (META$FILE_END - META$FILE) DB 0
     ;TIMES (4*512) - (META$FILE_END - META$FILE) DB 0

@@ -8,22 +8,69 @@
 ;
 
 
-;==============================================================
-; exit:
-;     Rotina executada quando o comando 'exit' for dado no shell 
-; do Boot Manager.
-;     
-;     Essa rotina é diferente dos outros comandos. Precisamos 
-; colocar um valor de retorno em EAX e e sairmos do loop
-; da rotina shellInit em shell.inc. As opções de retorno são:
-; 
-; OUT:
-;     EAX = 0, Sair sem salvar o metafile, depois reiniciar. 
-;     EAX = 1, Sair salvando o metafile, depois reiniciar. 
-;++
+;===============================================================
+; do_boot:
+;
+;      Iniciaremos o modo gráfico padrão.
+;      Chamaremos uma rotina que volta para o modo real, 
+;      muda o modo de vídeo e 
+;      inicializa a GUI.
+;      See: stage3/pm.inc 
 
 exit:
-    jmp do_boot
+    nop;
+do_boot:
+    mov byte [META$FILE.GRAMADO_MODE], 0x00   ;;jail
+    jmp rmStartGUI
+    jmp $
+
+;      See: stage3/pm.inc 
+do_gramado_mode_jail:
+    mov byte [META$FILE.GRAMADO_MODE], 0x00
+    jmp rmStartGUI
+    jmp $
+
+;      See: stage3/pm.inc 
+do_gramado_mode_p1:
+    mov byte [META$FILE.GRAMADO_MODE], 0x01
+    jmp rmStartGUI
+    jmp $
+
+;      See: stage3/pm.inc 
+do_gramado_mode_home:
+    mov byte [META$FILE.GRAMADO_MODE], 0x02
+    jmp rmStartGUI
+    jmp $
+
+;      See: stage3/pm.inc 
+do_gramado_mode_p2:
+    mov byte [META$FILE.GRAMADO_MODE], 0x03
+    jmp rmStartGUI
+    jmp $
+
+;      See: stage3/pm.inc 
+do_gramado_mode_castle:
+    mov byte [META$FILE.GRAMADO_MODE], 0x04
+    jmp rmStartGUI
+    jmp $
+
+;      See: stage3/pm.inc 
+do_gramado_mode_california:
+    mov byte [META$FILE.GRAMADO_MODE], 0x05
+    jmp rmStartGUI
+    jmp $
+    
+
+
+;===============================================================
+; do_shutdown:
+;     Desliga a maquina via APM.
+;      Chamaremos uma rotina que volta para o modo real, 
+; e efetua o desligamento com a int 0x15.
+;++
+
+do_shutdown:
+    jmp rmShutdown
     jmp $
 ;--
 
@@ -56,10 +103,10 @@ do_mount_volume:
 
 .ok:	
 	;Setup current dir.   
-    mov dword [g_current_fat_lba], 256          ;Fat do volume atual
-    mov dword [g_current_directory_lba], 510    ;Diretório do volume atual.   
-	mov dword [g_current_dataarea_lba], 542  ;?? ;lba do inicio da area de dados do volume atual. 
-	
+    mov dword [g_current_fat_lba], 256        ;Fat do volume atual
+    mov dword [g_current_directory_lba], 510  ;Diretório do volume atual.   
+    mov dword [g_current_dataarea_lba],  542  ;?? ;lba do inicio da area de dados do volume atual. 
+
 	;load FAT
 	;Inicia ide.
 	call init_ide0_master
@@ -80,37 +127,9 @@ do_mount_volume:
 .fail:
     nop
 .done:
-	popad
-	jmp os_command_line
+    popad
+    jmp os_command_line
  
-
-
-;===============================================================
-; do_boot:
-;
-;      Iniciaremos o modo gráfico padrão.
-;      Chamaremos uma rotina que volta para o modo real, 
-;      muda o modo de vídeo e 
-;      inicializa a GUI.
-;      See: stage3/pm.inc 
-
-do_boot:
-    jmp rmStartGUI
-    jmp $
-
-
-
-;===============================================================
-; do_shutdown:
-;     Desliga a maquina via APM.
-;      Chamaremos uma rotina que volta para o modo real, 
-; e efetua o desligamento com a int 0x15.
-;++
-
-do_shutdown:
-    jmp rmShutdown
-    jmp $
-;--
 
 
 ;==============================================================

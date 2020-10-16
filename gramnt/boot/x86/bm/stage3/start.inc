@@ -223,6 +223,7 @@ start_msg_rebooting       db 'start: Rebooting..',      13,10,0
 	;; Mas o timer foi configurado v�rias vezes.
 
 
+;; Called by s2modespm32 in s2modes.inc
 
 startGUI:
 
@@ -704,10 +705,15 @@ startGUI:
 
 	
 	;Continua...
-	
-	;xor eax, eax
-	mov al, byte 'G'                       ;Flag. (useing graphics)	
-	
+
+    ;xor eax, eax
+    mov al, byte 'G'              ;Flag. (useing graphics)	
+
+    ;; #todo
+    ;; Passar isso para BL.BIN
+    ;; #mov ah, byte [META$FILE.GRAMADO_MODE]
+
+
 	mov ebx, dword [ModeInfo_PhysBasePtr]  ;LFB address (endere�o f�sico)
 	
 	mov ebp, dword BootBlock

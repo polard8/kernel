@@ -43,11 +43,23 @@ file_flag db 0
 ; Incluir configurações de inicialização, como as do menu16.
 
 ;Inicialização.
-boot_string       db     'boot', 0    ;Inicia com a configuração atual. 
+
 reboot_string     db   'reboot', 0    ;Reinicia o sistema.
 shutdown_string   db 'shutdown', 0    ;Desliga a máquina via APM.
 make_boot_string  db 'makeboot', 0    ;Cria inicialização padrão. 
 ; ...
+
+;; gramado modes.
+;; commands:
+boot_string            db  'boot', 0    ;Inicia com a configuração atual. 
+bootjail_string        db  'bootjail', 0
+bootp1_string          db  'bootp1', 0
+boothome_string        db  'boothome', 0
+bootp2_string          db  'bootp2', 0
+bootcastle_string      db  'bootcastle', 0
+bootcalifornia_string  db  'bootcali', 0
+;bootcalifornia2_string  db  'bootcali2', 0
+;;...
 
 
 ;Operações com dispositivos.
@@ -210,10 +222,13 @@ dir_title2_string:
 ;
 
 help_text:
-    db 'boot, reboot, shutdown', 13, 10
+    db 'boot', 13, 10
+    db 'bootjail, bootp1', 13, 10
+    db 'boothome', 13, 10
+    db 'bootp2, bootcastle', 13, 10
+    db 'reboot, shutdown', 13, 10
     db 'disk, part, dir',        13, 10
     db 'help, cls, ver',         13, 10, 0
-
 
 ;
 ; End.

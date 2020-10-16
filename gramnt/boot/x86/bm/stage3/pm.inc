@@ -612,18 +612,144 @@ do_rm_startgui:
 
 .doStartGUI:
 
+    ; #bugbug: Isso foi para o fim dessa funçao.
     ; Set mode.
-    mov al, byte BOOTMODE_GUI
-    call set_boot_mode
+    ;mov al, byte BOOTMODE_GUI
+    ;call set_boot_mode
 
+
+    ;;
+    ;; == Video mode ================================================
+    ;;
+    
+    ;; #todo
+    ;; The video mode depends on the 'gramado mode'
+    ;; We get the 'gramado mode' in the root dir entry,
+    ;; and the default mode comes from the configuration
+    ;; in the main.asm file
+    ;; video: 0x010F, 0x0112, 0x0115, 0x0118
+
+    ;; default: JAIL !
+    xor ax, ax
+    
+    ;mov al, byte 0x00   ;; JAIL
+    ;mov al, byte 0x01   ;; P1
+    ;mov al, byte 0x02   ;; HOME
+    ;mov al, byte 0x03   ;; P2
+    ;mov al, byte 0x04   ;; CASTLE
+    ;mov al, byte 0x05   ;; CALIFORNIA
+    ;; ...
+
+    ;; Selecionamos primeiramente a 
+    ;; configuraçao default feita no main.asm,
+    ;; mas em seguida pegamos a que nos foi oferecida 
+    ;; pelo comando de boot.
+    ;; boot, bootjail, bootp1 ... etc ...
+    ;; o comando de boot configura o metafile em [META$FILE.GRAMADO_MODE];
+    
+    ;; See: main.asm
+    mov al, byte GRAMADO_DEFAULT_MODE
+    
+    ;; #todo
+    ;; Some routine needs to get this value for us
+    ;; in the root dir, entry 'B'RAMADO. 'B' means boot configuration.
+    ;;
+    
+    ;; Pegamos a que nos foi oferecida 
+    ;; pelo comando de boot.
+    ;; boot, bootjail, bootp1 ... etc ...
+    ;; o comando de boot configura o metafile em [META$FILE.GRAMADO_MODE];
+    
+    mov al, byte [META$FILE.GRAMADO_MODE]
+
+
+    ;; #todo:
+    ;; Temos que rever essa configuraçao acima,
+    ;; por enquanto quem decide eh o comando de boot.
+    ;; parece divertido.
+    
+
+;; ======================
+;; 0x010F - 320x200
+gramado_mode_JAIL:
+    cmp al, byte 0x00
+    jne gramado_mode_P1
+    mov word [META$FILE.VIDEO_MODE], 0x010F
+    jmp ____gramado_mode_done
+
+
+;; ======================
+;; 0x0112 - 640x480
+gramado_mode_P1:
+    cmp al, byte 0x01
+    jne gramado_mode_HOME
+    mov word [META$FILE.VIDEO_MODE], 0x0112
+    jmp ____gramado_mode_done
+
+
+;; ======================
+;; 0x0115 - 800x600
+gramado_mode_HOME:
+    cmp al, byte 0x02
+    jne gramado_mode_P2
+    mov word [META$FILE.VIDEO_MODE], 0x0115
+    jmp ____gramado_mode_done
+
+
+;; ======================
+;; 0x0118 - 1024x768
+gramado_mode_P2:
+    cmp al, byte 0x03
+    jne gramado_mode_CASTLE
+    mov word [META$FILE.VIDEO_MODE], 0x0118
+    jmp ____gramado_mode_done
+
+
+;; ======================
+;; ??
+gramado_mode_CASTLE:
+    cmp al, byte 0x04
+    jne gramado_mode_CALIFORNIA
+    mov word [META$FILE.VIDEO_MODE], 0x0118 ;;todo: more then that.
+    jmp ____gramado_mode_done
+
+
+;; ======================
+;; ??
+gramado_mode_CALIFORNIA:
+    cmp al, byte 0x05
+    jne gramado_mode_CASTLE
+    mov word [META$FILE.VIDEO_MODE], 0x0118   ;;todo: more then that.
+    jmp ____gramado_mode_done
+
+
+;#todo
+;gramado_mode_CALIFORNIA2:
+;gramado_mode_CALIFORNIA3:
+;gramado_mode_CALIFORNIA4:
+;; ...
+
+
+    ;;
+    ;; == FAIL ====================================================
+    ;;
+    
+    ;; Well, it fails.
+    ;; So we need to use the default video mode,
+    ;; and select the default 'gramado mode' in the arguments.
+    
     ;; #IMPORTANTE
     ;; Definição do arquivo main.asm
 
     mov word [META$FILE.VIDEO_MODE], G_VIDEO_MODE
 
-
     ; Inicializa o modo selecionado.
     ; See: stage2/lib16/s2modes.inc
+____gramado_mode_done:
+
+    ; Set mode.
+    mov al, byte BOOTMODE_GUI
+    call set_boot_mode
 
     JMP s2modesActivateMode 
     JMP $

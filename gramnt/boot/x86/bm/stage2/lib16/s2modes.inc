@@ -67,6 +67,7 @@ get_video_mode:
 ;++
 
 ;; Called by xxx_Config in main.asm.
+;; Called by ____gramado_mode_done in pm.inc.
 
 s2modesActivateMode:
 
