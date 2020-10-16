@@ -1,5 +1,17 @@
 // gws.h 
 
+// Modes.
+#define GRAMADO_JAIL        0x00
+#define GRAMADO_P1          0x01
+#define GRAMADO_HOME        0x02
+#define GRAMADO_P2          0x03
+#define GRAMADO_CASTLE      0x04
+#define GRAMADO_CALIFORNIA  0x05
+// ...
+
+// Fail mode.
+static char current_mode = 0xFF;
+
 
 
 // rtl

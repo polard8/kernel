@@ -17,6 +17,7 @@
 #include <kernel.h>
 
 
+
 // Boot mode.
 extern unsigned long SavedBootMode;
 
@@ -36,7 +37,7 @@ extern unsigned long SavedBootMode;
 
 int kernel_main (int arch_type){
 
-    int Status = -1;
+    int Status = (-1);
 
 
     // Current arch support.

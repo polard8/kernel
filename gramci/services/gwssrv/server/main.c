@@ -1827,6 +1827,8 @@ int serviceNextEvent(void)
 
 int main (int argc, char **argv){
 
+    //int Status = (-1);
+
     struct sockaddr gramsock;  //addr;
     gramsock.sa_family = AF_GRAMADO;
     gramsock.sa_data[0] = 'w';

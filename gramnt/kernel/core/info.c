@@ -52,40 +52,41 @@ extern unsigned long bss_end;
 void KiInformation (void)
 {
 
+    // The current mode.
+    // This is not the product name.
+    
+    switch (current_mode){
 
-	//printf("\n");	
-	
-
-	// #suspenso
-	// Suspendemos o uso de vari�veis importadas do makefile.
-	
-/*	
-#ifdef IMPORTED_VARIABLES	
-	//=======================================
-	// #Warning                            //
-	// Variables imported from Makefile    //
-	//=======================================
-	
-	printf ("Gramado %d.%d.%d%s (%s)\n",
-        GRAMADO_VERSION, 
-        GRAMADO_PATCHLEVEL,
-        GRAMADO_SUBLEVEL, 
-        GRAMADO_EXTRAVERSION,
-        GRAMAD0_NAME );	
-#endif
-*/
-	
-	
-	//screen 
-	
-    printf ("\n Screen Resolution: W=%d H=%d BPP=%d \n",
-        g_device_screen_width, 
-        g_device_screen_height, 
-        g_device_screen_bpp );
+        case GRAMADO_JAIL:
+            printf ("GRAMADO_JAIL: \n");
+            break;
+            
+        case GRAMADO_P1:
+            printf ("GRAMADO_P1: \n");
+            break;
+            
+        case GRAMADO_HOME:
+            printf ("GRAMADO_HOME: \n");
+            break;
+            
+        case GRAMADO_P2:
+            printf ("GRAMADO_P2: \n");
+            break;
+            
+        case GRAMADO_CASTLE:
+            printf ("GRAMADO_CASTLE: \n");
+            break;
+        
+        case GRAMADO_CALIFORNIA:
+        // ...
+        default:
+            printf ("INFO: current_mode not defined!\n");
+            goto fail;
+            break;
+    };
 
 
-	// Timing
-
+    // Timing
     printf ("seconds %d | jiffies %d | %d HZ | sys time %d ms  \n", 
         seconds,
         jiffies, 
@@ -208,21 +209,31 @@ void KiInformation (void)
 	
     //
     //  ## Memory ##
-    //	
-	
-	memoryShowMemoryInfo ();
-	
-	//Nothing. 
+    //
+
+    memoryShowMemoryInfo();
+
+    // Nothing. 
     goto done;
 
 
-fail:
-    printf ("fail\n");
+//
+// Exit.
+//
 
+fail:
+    printf ("Fail\n");
 done:
 
-	// Talvez possamos da refresh apenas da janela 
-	// onde as strings aparecem.
+    // Show basics.
+    
+    // screen 
+    printf ("\n Screen Resolution: W=%d H=%d BPP=%d \n",
+        g_device_screen_width, 
+        g_device_screen_height, 
+        g_device_screen_bpp );
+
+
 
     refresh_screen();
     return;

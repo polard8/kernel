@@ -26,6 +26,7 @@
 #include <bootloader.h>
 
 
+
 //static char *codename = "Gramado Boot";
 //char kernel_file_name[] = "kernel.bin";
 //static char **argv = { NULL, NULL, NULL };
@@ -147,7 +148,7 @@ ____go:
 
 void BlMain (){
 
-    int Status = -1;
+    int Status = (-1);
 
     // Set GUI.
     // VideoBlock.useGui = 1;
@@ -179,21 +180,15 @@ void BlMain (){
 
     // ok
     //__address = (unsigned long) init_testing_memory_size (4);
-    
-    
     // ok
     //__address = (unsigned long) init_testing_memory_size (64);
-    
-    
-    //ok
-    //__address = (unsigned long) init_testing_memory_size (127);    
-    
-
+    // ok
+    //__address = (unsigned long) init_testing_memory_size (127);  
     // 511
-    //__address = (unsigned long) init_testing_memory_size (1024);        
-    
+    //__address = (unsigned long) init_testing_memory_size (1024);   
+
     //para testar na m�quina real com 2048 mb instalado.
-    __address = (unsigned long) init_testing_memory_size (2048);        
+    __address = (unsigned long) init_testing_memory_size (2048);   
         
     printf ("init: address = %x \n", __address);
     refresh_screen();
@@ -202,8 +197,6 @@ void BlMain (){
 //
 // ========================== memory ===============================
 //
-
-
 
 
     // #todo
@@ -240,16 +233,14 @@ void BlMain (){
     printf ("BlMain: Starting Boot Loader..\n");
 #endif
 
-
-    if (g_initialized != 1)
-    {
+    if (g_initialized != 1){
         printf("BlMain: g_initialized\n");
         die();
     }
 
 
 
-    //*Importante:
+    // #important:
     // ===========
     //     Daqui pra frente vamos carregar os arquivos. 
     // Lembrando que o Boot Loader ainda n�o sabe carregar de 
@@ -272,8 +263,6 @@ void BlMain (){
 	// Carregando o diret�rio raiz e a fat na mem�ria.
 	// Evitando repeti��o de carregamento.
 
-
-	// Ok isso deu certo.
 
     fs_load_rootdirEx();
     fs_load_fatEx();
@@ -322,18 +311,17 @@ void BlMain (){
 	//     configurar os registradores e 
 	//     passar o comando para o kernel.
 	//
-	// Obs:
-	//     Essa configura��o b�sica n�o impede
-	//     que o kernel fa�a uma reconfigura��o completa.
+	// #obs:
+	// Essa configuraçao basica nao impede
+	// que o kernel faça uma reconfiguraçao completa.
 
-#ifdef BL_VERBOSE	
-	printf ("BlMain: Initializing pages..\n");
-	//refresh_screen();
+
+#ifdef BL_VERBOSE
+    printf ("BlMain: Initializing pages..\n");
+    //refresh_screen();
 #endif
 
-
     BlSetupPaging();
-
 
 
     //g_cursor_x = 0;
