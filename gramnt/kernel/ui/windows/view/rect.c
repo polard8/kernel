@@ -315,8 +315,8 @@ refresh_rectangle (
     unsigned long height )
 {
 
-	void *p       = (void *)      FRONTBUFFER_ADDRESS;
-	const void *q = (const void*) BACKBUFFER_ADDRESS;
+    void *dest       = (void *)      FRONTBUFFER_ADDRESS;
+    const void *src  = (const void*) BACKBUFFER_ADDRESS;
 
 
 	//#TEST
@@ -326,13 +326,28 @@ refresh_rectangle (
 
 	unsigned int line_size, lines;
 	unsigned int offset=0;
-	unsigned long Width  = (unsigned long) screenGetWidth();
-	unsigned long Height = (unsigned long) screenGetHeight();
+
+    // screen line size in pixels * bytes per pixel.
+    unsigned int pitch=0;  
+
+    // rectangle line size in pixels * bytes per pixel.
+    unsigned int internal_pitch=0;  
+
 
 	int count=0; 
 
 	// = 3; 24bpp
 	int bytes_count=0;
+
+
+    // dc
+    unsigned long Width  = (unsigned long) screenGetWidth();
+    //unsigned long Height = (unsigned long) screenGetHeight();
+
+    if ( Width == 0 ){
+        panic ("refresh_rectangle: Width\n");
+    }
+
 
     line_size = (unsigned int) width; 
     lines     = (unsigned int) height;
@@ -342,22 +357,32 @@ refresh_rectangle (
 
         case 32:  bytes_count = 4;  break;
         case 24:  bytes_count = 3;  break;
-
-        // ...
+        // ... #todo
         
-        //#todo: default
+        default:
+            panic ("refresh_rectangle: SavedBPP");
+            break;
     };
 
 
+    // screen line size in pixels * bytes per pixel.
+    pitch = (unsigned int) (bytes_count * Width);
+
+    // rectangle line size in pixels * bytes per pixel.
+    internal_pitch = (unsigned int) (bytes_count * line_size);
+
+
+
 	// #atenção.
-	
 	//offset = (unsigned int) BUFFER_PIXEL_OFFSET( x, y );
-	
-	offset = (unsigned int) ( (bytes_count*SavedX*(y)) + (bytes_count*(x)) );
-	
-	p = (void *) (p + offset);    
-	q = (const void *) (q + offset);    
-	 
+
+    offset = (unsigned int) ( (y*pitch) + (bytes_count*x) );
+
+
+    dest = (void *)       (dest + offset);    
+    src  = (const void *) (src  + offset);    
+
+
 	// #bugbug
 	// Isso pode nos dar problemas.
 	// ?? Isso ainda é necessário nos dias de hoje ??
@@ -375,26 +400,24 @@ refresh_rectangle (
 
     // Se for divisível por 4.
     // Copia uma linha ou um pouco mais caso não seja divisível por 4.
-    if ( ((line_size * bytes_count) % 4) == 0 )
+    if ( (internal_pitch % 4) == 0 )
     {
-        count = ((line_size * bytes_count) / 4); 
+        count = ( internal_pitch / 4); 
 
-        for ( i=0; i < lines; i++ )
-        {
-            memcpy32 ( p, q, count );
-            q += (Width * bytes_count);
-            p += (Width * bytes_count);
+        for ( i=0; i < lines; i++ ){
+            memcpy32 ( (void *) dest, (const void *) src, count );
+            dest += pitch;
+            src  += pitch;
         };
     }
 
     // Se não for divisível por 4.
-    if ( ((line_size * bytes_count) % 4) != 0 )
+    if ( (internal_pitch % 4) != 0 )
     {
-        for ( i=0; i < lines; i++ )
-        {
-            memcpy ( (void *) p, (const void *) q, (line_size * bytes_count) );
-            q += (Width * bytes_count);
-            p += (Width * bytes_count);
+        for ( i=0; i < lines; i++ ){
+            memcpy ( (void *) dest, (const void *) src, internal_pitch );
+            dest += pitch; 
+            src  += pitch; 
         };
     }
 }
