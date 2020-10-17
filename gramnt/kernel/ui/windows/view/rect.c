@@ -436,7 +436,17 @@ refresh_rectangle2 (
     unsigned long height,
     unsigned long buffer1,
     unsigned long buffer2 )
-{    
+{  
+	
+
+
+	
+	// #todo
+	// Fazer a mesma otimizaçao que fizemos na outra rotina de refresh rectangle.
+
+
+
+	  
 	void *p = (void *) buffer1;   // destino
 	const void *q = (const void *) buffer2;  //origem.
 

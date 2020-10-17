@@ -275,37 +275,40 @@ _gui_buffer_putpixel:
 
 
 
-;------------------------------------
+;;==================================================================
 ;  _refresh_screen:
 ;      Passa o conteúdo do Backbuffer para o LFB.
 ;      @todo: _softwarelibRefreshScreen:       
 ;
+
+
 global _refresh_screen
-_refresh_screen:		
+_refresh_screen:
 
     call _vsync    ;Vertical sync.
-	
-	push esi
-	push edi
-	push ecx
-	push edx
-	
+
+    push esi
+    push edi
+    push ecx
+    push edx
+
     ;Origem, buffer.
     mov esi, dword SOFTWARELIB_BACKBUFFER ;0x01000000 
-	;Destino, LFB, (no início o bootloader lida com endereços fisicos).
-	mov edx, DWORD [_g_lbf_pa]    ;[bl_lfb] 
+    ;Destino, LFB, (no início o bootloader lida com endereços fisicos).
+    mov edx, DWORD [_g_lbf_pa]    ;[bl_lfb] 
     mov edi, edx
-	
-    mov ecx, dword (800*600)    ;(640*480) 
-    rep movsd
-	
-	pop edx
-	pop ecx
-	pop edi
-    pop esi		
-    RET	
 
-	
+    ;; Nunca mais do que isso.
+    mov ecx, dword (800*600)  
+    rep movsd
+
+    pop edx
+    pop ecx
+    pop edi
+    pop esi
+    RET
+
+
 	
 ;--------------------------------------
 ; write_char:

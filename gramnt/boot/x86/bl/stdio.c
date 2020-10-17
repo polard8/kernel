@@ -437,25 +437,26 @@ void outbyte (int c){
     //Sendo menor que espaço, não pode ser 'tab,return,back...)    
 
     if ( c <  ' '  && 
-	     c != '\r' && 
-		 c != '\n' && 
-		 c != '\t' && 
-		 c != '\b' )
+         c != '\r' && 
+         c != '\n' && 
+         c != '\t' && 
+         c != '\b' )
     {
         return;
-    };
-    
+    }
+
 
     // Sendo maior que 'espaço'. 
     
 	// Volta ao início da linha.
-	if ( c == '\r' )
-	{
+    if ( c == '\r' )
+    {
         g_cursor_x = 0; //volta ao inicio da linha
         prev = c;
         return;    
-    };        
-       
+    }
+ 
+   
     // Vai pra próxima linha e volta ao inicio da linha.    
     if ( c == '\n' && prev != '\r' )
     {
@@ -523,23 +524,26 @@ void outbyte (int c){
     
 	// #importante:
 	// Imprime os caracteres normais.
-	
-	_outbyte (c);
 
-	
+    _outbyte (c);
+
+
     prev = c;    //Atualisa o prev.	   
 	
     //Nothing.
-	
+
 done: 
     return;
 }
 
 
 /*
+ ***********************************************
  * _outbyte: 
  *     Coloca um char na tela. Com opções de modo de vídeo.
  */
+
+// Called by outbyte().
 
 void _outbyte (int c){
 
@@ -556,12 +560,12 @@ void _outbyte (int c){
 
 
     // Caso estivermos em modo gráfico.
-	if(VideoBlock.useGui == 1)
-	{
+    if (VideoBlock.useGui == 1)
+    {
 	    //vsync();
 		
-	    switch(VideoBlock.vesaMode)
-		{
+        switch (VideoBlock.vesaMode)
+        {
 		    //@todo: Listar aqui os modos VESA.
 		    case 1:
 			    my_buffer_char_blt( 8*g_cursor_x, 8*g_cursor_y, COLOR_WHITE, c);
@@ -571,23 +575,24 @@ void _outbyte (int c){
 			    //modo gráfico vesa 640x480 24bpp, 8 pixel por caractere.
 			    my_buffer_char_blt( 8*g_cursor_x, 8*g_cursor_y, COLOR_WHITE, c);
 			    break;
-		}; 
-        goto done;
-	};
-	
-	
+        };
+        return;
+        //goto done;
+    }
+
+
 	// Caso estivermos em text mode.
-    if(VideoBlock.useGui == 0)
-	{
+    if (VideoBlock.useGui == 0)
+    {
 	    //calcula o valor do deslocamento para text mode 80x25.
 	    y = (unsigned long) (g_cursor_y *80 *2);
         x = (unsigned long) (g_cursor_x *2);    
         i = (unsigned long) (y + x);
         
 		//envia o caractere.
-		vm[i+0] = ch;             //char.
+        vm[i+0] = ch;             //char.
         vm[i+1] = ch_atributo;    //atributo (foreground,background).
-	};
+    }
 
 	//Nothing.
 
