@@ -181,10 +181,13 @@ void *rect_memcpy32 ( void *v_dst, const void *v_src, unsigned long c )
 
 
 
-int gwssrv_refresh_this_rect( struct gws_rect_d *rect )
+int gwssrv_refresh_this_rect ( struct gws_rect_d *rect )
 {
-    if ( (void*) rect == NULL )
+
+    if ( (void*) rect == NULL ){
+        gwssrv_debug_print("gwssrv_refresh_this_rect: rect\n");
         return -1;
+    }
 
     gws_refresh_rectangle ( 
         rect->left, rect->top, 
@@ -209,22 +212,24 @@ gws_refresh_rectangle (
     unsigned long height )
 {
 
-    void       *p = (void *)      ____FRONTBUFFER_VA;
-    const void *q = (const void*) ____BACKBUFFER_VA;
+    void       *dest = (void *)      ____FRONTBUFFER_VA;
+    const void *src  = (const void*) ____BACKBUFFER_VA;
 
 
     register unsigned int i=0;
     //unsigned int i;
 
 
-    unsigned int line_size=0; 
-    unsigned int lines=0;
+
+    unsigned int line_size=0;  // rectangle line size in pixels.
+    unsigned int lines=0;      // quantas linhas.
     unsigned int offset=0;
 
+    // screen line size in pixels * bytes per pixel.
+    unsigned int pitch=0;  
 
-    // Device info.
-    unsigned long ScreenWidth  = (unsigned long) gws_get_device_width();
-    //unsigned long ScreenHeight = (unsigned long) gws_get_device_height();
+    // rectangle line size in pixels * bytes per pixel.
+    unsigned int internal_pitch=0;  
 
     int count=0; 
 
@@ -232,31 +237,47 @@ gws_refresh_rectangle (
     int bytes_count=0;
 
 
+    // Device info.
+    unsigned long ScreenWidth  = (unsigned long) gws_get_device_width();
+    //unsigned long ScreenHeight = (unsigned long) gws_get_device_height();
+
+    if ( ScreenWidth == 0 ){
+        printf ("gws_refresh_rectangle: ScreenWidth\n");
+        exit(1);
+    }
+
+
     line_size = (unsigned int) width; 
     lines     = (unsigned int) height;
-
 
 
     switch (SavedBPP){
 
         case 32:  bytes_count = 4;  break;
         case 24:  bytes_count = 3;  break;
-
-		// ...
-
-		// #todo
-		//default:
-		    //break;
+        // ... #todo
+        
+        default:
+            printf ("gws_refresh_rectangle: SavedBPP\n");
+            exit(1);
+            break;
     };
 
+
+    // screen line size in pixels * bytes per pixel.
+    pitch = (unsigned int) (bytes_count * ScreenWidth);
+
+    // rectangle line size in pixels * bytes per pixel.
+    internal_pitch = (unsigned int) (bytes_count * line_size);
+
+
 	// #atenção.
-	
 	//offset = (unsigned int) BUFFER_PIXEL_OFFSET( x, y );
 
-    offset = (unsigned int) ( (bytes_count*SavedX*(y)) + (bytes_count*(x)) );
+    offset = (unsigned int) ( (y*pitch) + (bytes_count*x) );
 
-    p = (void *)       (p + offset);    
-    q = (const void *) (q + offset);    
+    dest = (void *)       (dest + offset);    
+    src  = (const void *) (src  + offset);    
 
 
 	// #bugbug
@@ -273,26 +294,24 @@ gws_refresh_rectangle (
 
     // Se for divisível por 4.
     // Copia uma linha ou um pouco mais caso não seja divisível por 4.
-    if ( ((line_size * bytes_count) % 4) == 0 )
+    if ( (internal_pitch % 4) == 0 )
     {
-        count = ((line_size * bytes_count) / 4); 
+        count = (internal_pitch / 4); 
 
-        for ( i=0; i < lines; i++ )
-        {
-            rect_memcpy32 ( p, q, count );
-            q += (ScreenWidth * bytes_count);
-            p += (ScreenWidth * bytes_count);
+        for ( i=0; i < lines; i++ ){
+            rect_memcpy32 ( (void *) dest, (const void *) src, count );
+            dest += pitch;
+            src  += pitch;
         };
     }
 
     // Se não for divisível por 4.
-    if ( ((line_size * bytes_count) % 4) != 0 )
+    if ( (internal_pitch % 4) != 0 )
     {
-        for ( i=0; i < lines; i++ )
-        {
-             memcpy ( (void *) p, (const void *) q, (line_size * bytes_count) );
-             q += (ScreenWidth * bytes_count);
-             p += (ScreenWidth * bytes_count);
+        for ( i=0; i < lines; i++ ){
+             memcpy ( (void *) dest, (const void *) src, internal_pitch );
+             dest += pitch;
+             src  += pitch;
         };
     }
 }
