@@ -195,9 +195,19 @@ static unsigned long frames_count;
 
 
 
-// Pointeiros para os backbuffers.
+
+
+
+// Pointers to screens.
 #define MAX_SCREENS    4
-unsigned long screens[MAX_SCREENS];
+#define SCREEN_FRONTBUFFER     0
+#define SCREEN_BACKBUFFER      1
+//#define SCREEN_BACKBUFFER2   2
+//#define SCREEN_BACKBUFFER3   3
+
+static unsigned long screens[MAX_SCREENS];
+
+
 
 
 /*

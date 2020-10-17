@@ -293,7 +293,7 @@ int gwssrv_init_globals(void)
 
 
     //
-    // == Backbuffers ======================================
+    // == buffers ======================================
     //
     
     // #todo
@@ -302,18 +302,20 @@ int gwssrv_init_globals(void)
     // Talvez menos, por causa de alguma memoria compartilhada irregular.
 
     // #bugbug: Null pointers,    
-    for (i=0; i<MAX_SCREENS; i++){
-        screens[i] = 0;
-    }
-         
-    // Backbuffer.
-    screens[0] = ____BACKBUFFER_VA;
+    for (i=0; i<MAX_SCREENS; i++){ screens[i] = 0; }
 
-    if ( screens[0] == 0 )
+    screens[SCREEN_FRONTBUFFER] = (unsigned long) ____FRONTBUFFER_VA;
+    screens[SCREEN_BACKBUFFER]  = (unsigned long) ____BACKBUFFER_VA;
+
+    if ( screens[SCREEN_FRONTBUFFER] == 0 || 
+         screens[SCREEN_BACKBUFFER] == 0 )
     {
-        printf ("gwssrv_init_globals: [FAIL] backbuffer\n");
+        printf ("gwssrv_init_globals: [FAIL] screens\n");
         exit (1);
     }
+
+
+
 
 
     //background_color = xCOLOR_GRAY3;
