@@ -2081,7 +2081,11 @@ int main (int argc, char **argv){
         // a fila do sistema é global.See: input.c
         // ntuser faz isso também. tem dois inputs,
         // um do sistema e outro dos apps.
-    
+        
+        //initialize frames counter,
+        frames_count = 0;
+        fps = 0;
+        
         while (running == 1)
         {
             // Se tem ou não retângulos sujos.

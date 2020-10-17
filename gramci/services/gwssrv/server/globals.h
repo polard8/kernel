@@ -187,10 +187,11 @@ unsigned long __device_bpp;
 
 
 // refresh rate of the whole screen.
-unsigned long __fps;
+static unsigned long fps;
+
 
 // refresh rate for all dirty objects.
-unsigned long __refresh_rate;
+static unsigned long frames_count;
 
 
 

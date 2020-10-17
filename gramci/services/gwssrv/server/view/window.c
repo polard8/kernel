@@ -16,6 +16,8 @@
 //GetWindowRect
 //GetClientRect
 
+static unsigned long ____old=0;
+static unsigned long ____new=0;
 
 
 void wm_process_windows(void)
@@ -40,10 +42,10 @@ void wm_process_windows(void)
         validate();   // torna 0.
         return;
     }
-    
+
 //===================================================================
 // ++  Start
-    t_start = rtl_get_progress_time();
+    //t_start = rtl_get_progress_time();
     
     //
     // == dirty background ==============================
@@ -114,21 +116,46 @@ void wm_process_windows(void)
     }
 
     // debug
-    //gws_show_backbuffer();              
+    gws_show_backbuffer();              
+    frames_count++;
+    
+        
+    
+    // delta
+    unsigned long dt=0;
+    ____new = rtl_get_progress_time();
+    
+    dt = ____new - ____old;
+
     
 //===================================================================
 // ++  End
-    t_end = rtl_get_progress_time();
+    //t_end = rtl_get_progress_time();
 
     //__refresh_rate =  t_end - t_start;
+    
+    //__refresh_rate = __refresh_rate/1000;
     
     //printf ("@ %d %d %d \n",__refresh_rate, t_now, t_old);
 
     //====================================
     //fps++
-    //char rate_buffer[32];
-    //itoa(__refresh_rate, rate_buffer); 
-    //yellow_status(rate_buffer);
+    char rate_buffer[32];
+    //conta quantos frames.
+
+
+    // se passau um segundo.
+    if ( dt > 1000 )
+    {
+        ____old = ____new;
+        
+        fps = frames_count; // quantos frames em 1000 ms aproximadamente?
+        itoa(fps, rate_buffer); 
+        yellow_status(rate_buffer);
+        frames_count=0;
+        fps=0;
+        dt=0;
+    }
     //fps--
     //=======================
 }   
@@ -140,10 +167,10 @@ void yellow_status( char *string )
     rectBackbufferDrawRectangle ( 
             0, 0, 400, 24, 
             COLOR_YELLOW, 1 );
-    
-    dtextDrawString ( 8, 8, COLOR_BLACK, "flush ms: " );
-    dtextDrawString ( 100, 8, COLOR_BLACK, string );
-    
+
+    dtextDrawString ( 8, 8, COLOR_BLACK, string );    
+    dtextDrawString ( 60, 8, COLOR_BLACK, "FPS" );
+        
     gws_refresh_rectangle(0,0,400,24);
 }
 
