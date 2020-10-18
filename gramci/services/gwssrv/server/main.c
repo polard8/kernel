@@ -1642,15 +1642,21 @@ void InitGraphics(void){
  
     int i=0;
     for(i=0; i<100; i++){
-            noraDrawingStuff3 (i,i,0);
+            
+            //noraDrawingStuff3 (i,i,0);
+            noraDrawingStuff3 (-i,-i,0);
+            
             //rectangle(8,8,i,i,COLOR_BLUE);
             //rectangleZ(i,i,i+20,i+20,COLOR_BLUE,i);
-            //plotCircle ( i, i, i, COLOR_GREEN);
-            //plotCircleZ ( i/20, i/20, i/20, COLOR_GREEN, i/20); 
             
-            plotEllipseRect (
-                i, i, 
-                i*5, i*5, COLOR_BLUE);
+            //plotCircle ( -i % 20, -i % 20, i%20, COLOR_GREEN);
+            plotCircleZ ( -i % 20, -i % 20, i % 20, COLOR_GREEN, i % 20);
+            
+            //plotCircleZ ( -i % 20, -i % 20, i % 20, COLOR_GREEN, i % 20);   //save this
+            
+            
+            //plotEllipseRect ( i, i, i*5, i*5, COLOR_BLUE);
+            //plotEllipseRectZ ( i%20, i%20, i, i, COLOR_BLUE,i%20);
     };
  
  
