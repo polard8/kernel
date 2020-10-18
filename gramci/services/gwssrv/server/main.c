@@ -1436,7 +1436,6 @@ void create_background (void)
 
 
 
-
 void InitGraphics(void){
 
     int __init_status = -1;
@@ -1640,6 +1639,7 @@ void InitGraphics(void){
     //noraDrawingStuff3(1);
  
  
+     /*
     int i=0;
     for(i=0; i<100; i++){
             
@@ -1658,8 +1658,13 @@ void InitGraphics(void){
             //plotEllipseRect ( i, i, i*5, i*5, COLOR_BLUE);
             //plotEllipseRectZ ( i%20, i%20, i, i, COLOR_BLUE,i%20);
     };
+    */
  
- 
+
+
+    matrix_demo1();
+    
+      
     //See: window.c
     //create_main_menu();
   

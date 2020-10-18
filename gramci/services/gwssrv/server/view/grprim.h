@@ -6,6 +6,41 @@
 #define __GRPRIM_H   1
 
 
+//
+// =========================
+//
+
+// matrix
+
+
+static int projection4x4[4][4] = { 
+        {1,0,0,0}, 
+        {0,1,0,0},
+        {0,0,0,0},
+        {1,1,0,0}
+        };
+
+
+void multiply4 (int mat1[][4], int mat2[][4], int res[][4]);
+
+// function to multiply two matrices
+void 
+multiplyMatrices (
+    int  first[][10],
+    int second[][10],
+    int result[][10],
+    int r1, int c1,   // rows and columns for the first matrix
+    int r2, int c2,   // rows and columns for the second matrix
+    int rr, int cr );
+
+
+void matrix_demo1(void);
+
+//
+// ===========================================================
+//
+
+
 #define grMIN2(a, b)  (((a) < (b)) ? (a) : (b))
 #define grMAX2(a, b)  (((a) > (b)) ? (a) : (b))
 

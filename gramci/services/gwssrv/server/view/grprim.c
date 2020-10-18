@@ -605,5 +605,229 @@ void noraDrawingStuff3(int x, int y, int z)
 }
 
 
+/* 
+// This function multiplies mat1[][] and mat2[][],
+// and stores the result in res[][]
+
+void 
+matrix_multiply_2x3 ( 
+    int mat1[2][3], 
+    int mat2[2][3], 
+    int res[2][3])
+{
+
+    int N1 = 2;
+    int N2 = 3;
+    
+    int i, j, k;
+    
+    
+    for (i = 0; i < N1; i++) 
+    {
+        for (j = 0; j < N2; j++) 
+        {
+            res[i][j] = 0;
+            
+            //for (k = 0; k < N1; k++)
+            for (k = 0; k < N2; k++)
+                res[i][j] += mat1[i][k] * mat2[k][j];
+        }
+    }
+}
+*/
+
+void multiply4 (int mat1[][4], int mat2[][4], int res[][4])
+{
+    int i, j, k;
+    for (i = 0; i < 4; i++) {
+        for (j = 0; j < 4; j++) {
+            res[i][j] = 0;
+            for (k = 0; k < 4; k++)
+                res[i][j] += mat1[i][k] * mat2[k][j];
+        }
+    }
+}
+
+
+// function to multiply two matrices
+void 
+multiplyMatrices (
+    int  first[][10],
+    int second[][10],
+    int result[][10],
+    int r1, int c1,   // rows and columns for the first matrix
+    int r2, int c2,   // rows and columns for the second 
+    int rr, int cr)
+{
+   int i=0;
+   int j=0;
+   int k=0;
+
+
+   // Initializing elements of matrix mult to 0.
+   for (i = 0; i < rr; ++i) 
+   {
+      for (j = 0; j < cr; ++j) 
+      {
+         result[i][j] = 0;
+      }
+   }
+
+
+   /*
+   // Multiplying first and second matrices and storing it in result
+   for (i = 0; i < r1; ++i) 
+   {
+      for (j = 0; j < c2; ++j) 
+      {
+         for ( k = 0; k < c1; ++k) 
+         {
+            result[i][j] += first[i][k] * second[k][j];
+         }
+      }
+   }
+   */
+
+
+    for (i = 0; i < r1; i++) {
+        for (j = 0; j < c2; j++) {
+            result[i][j] = 0;
+            for (k = 0; k < c1; k++)
+                result[i][j] += first[i][k] * second[k][j];
+        }
+    }
+    
+}
+
+
+
+void matrix_demo1(void)
+{
+
+     //#define N 4
+   
+    /*
+    int mat1[4][4] = { { 1, 1, 1, 1 },
+                        { 2, 2, 2, 2 },
+                        { 3, 3, 3, 3 },
+                        { 4, 4, 4, 4 } };
+ 
+    int mat2[4][4] = { { 1, 1, 1, 1 },
+                       { 2, 2, 2, 2 },
+                       { 3, 3, 3, 3 },
+                       { 4, 4, 4, 4 } };
+    
+    int res[4][4]; // To store result
+    */
+
+
+    int mat1[4][4] = {  { 1, 1, 1, 1 },
+                        { 2, 2, 2, 2 },
+                        { 3, 3, 3, 3 },
+                        { 4, 4, 4, 4 } };
+ 
+    int mat2[4][4] = { { -5, -5, 0, 0 },
+                       { 5,  -5, 0, 0 },
+                       { 5,   5, 0, 0 },
+                       { -5,  5, 0, 0 } };
+    
+    int res[4][4]; // To store result
+
+    //int m1[10][10];
+    //int m2[10][10];
+    //int m2[3][1];
+    //int  r[10][10];
+
+
+    //grPlot0 ( 0, -50, -50, COLOR_WHITE ); 
+    //grPlot0 ( 0, 50, -50, COLOR_WHITE ); 
+    //grPlot0 ( 0, 50, 50, COLOR_WHITE ); 
+    //grPlot0 ( 0, -50, 50, COLOR_WHITE ); 
+   
+    // rows and columns for the first matrix
+    // rows and columns for the second matrix
+    //multiplyMatrices(m1, m2, r, r1, c1, r2, c2);
+    //multiplyMatrices(m1, m2, r, 
+    //    2, 3, 3, 1 );
+
+    // multiplicando um dos pontos pela projeçao.
+    //m2[0][0] = 50;   // x
+    //m2[1][0] = 50;   // y
+    //m2[3][0] = 0;    // z
+    
+    //multiplyMatrices ( mat1, mat2, res, 
+    //    4, 4, 4, 4 , 4, 4);
+    
+
+
+    
+
+    //x,y,z,?
+    //printf ("%d | %d | %d | %d \n",res[0][0], res[0][1], res[0][2], res[0][3]);
+    //printf ("%d | %d | %d | %d \n",res[1][0], res[1][1], res[1][2], res[1][3]);
+    //printf ("%d | %d | %d | %d \n",res[2][0], res[2][1], res[2][2], res[2][3]);
+    //printf ("%d | %d | %d | %d \n",res[3][0], res[3][1], res[3][2], res[3][3]);
+
+
+
+    
+    int i=0;
+    
+    while (1){
+
+    for (i=0; i<100; i++){
+
+       rectBackbufferDrawRectangle ( 
+           0, 0, 
+           320, 200, 
+           COLOR_BLACK, 1 );
+                
+       multiply4 ( projection4x4, mat2, res );
+       
+       //z,x,y
+       grPlot0 ( res[0][2], res[0][0], res[0][1], COLOR_WHITE); 
+       grPlot0 ( res[1][2], res[1][0], res[1][1], COLOR_WHITE); 
+       grPlot0 ( res[2][2], res[2][0], res[2][1], COLOR_WHITE); 
+       grPlot0 ( res[3][2], res[3][0], res[3][1], COLOR_WHITE); 
+   
+       
+       projection4x4[0][0] = i%5;
+       projection4x4[0][1] = 0;
+       // projection4x4[0][2] = 0;
+       // projection4x4[0][3] = 0;
+
+       
+        projection4x4[1][0] = 0;
+        projection4x4[1][1] = i%5;
+       // projection4x4[1][2] = 0;
+       // projection4x4[1][3] = 0;
+
+       
+        projection4x4[2][0] = 0;
+        projection4x4[2][1] = 0;
+       // projection4x4[2][2] = 0;
+       // projection4x4[2][3] = 0;
+
+       
+        projection4x4[3][0] = i%5;
+        projection4x4[3][1] = i%5;
+       // projection4x4[3][2] = 0;
+       // projection4x4[3][3] = 0;
+   
+	    //{i,0,0,0}, 
+	    //{0,i,0,0},
+	    //{0,0,0,0},
+	    //{i,i,0,0}
+	    
+	        gws_show_backbuffer();  
+	        gwssrv_yield();
+	        gwssrv_yield();            
+	    
+        };
+    };
+}
+
+
+
 
 
