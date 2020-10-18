@@ -1631,6 +1631,29 @@ void InitGraphics(void){
     //Terry's window
     //demoTerry();
     
+    
+    //noraDrawingStuff();
+   
+   
+    //noraDrawingStuff3(-1);
+    //noraDrawingStuff3(0);
+    //noraDrawingStuff3(1);
+ 
+ 
+    int i=0;
+    for(i=0; i<100; i++){
+            noraDrawingStuff3 (i,i,0);
+            //rectangle(8,8,i,i,COLOR_BLUE);
+            //rectangleZ(i,i,i+20,i+20,COLOR_BLUE,i);
+            //plotCircle ( i, i, i, COLOR_GREEN);
+            //plotCircleZ ( i/20, i/20, i/20, COLOR_GREEN, i/20); 
+            
+            plotEllipseRect (
+                i, i, 
+                i*5, i*5, COLOR_BLUE);
+    };
+ 
+ 
     //See: window.c
     //create_main_menu();
   
@@ -1639,7 +1662,7 @@ void InitGraphics(void){
     //gws_show_window_rect(gui->screen);
     
     gws_show_backbuffer();              
-    //while(1){}
+    while(1){}
        
     
         

@@ -391,6 +391,51 @@ plotCircle (
 }
   
 
+void 
+plotCircleZ ( 
+    int xm, 
+    int ym, 
+    int r, 
+    unsigned long color, 
+    int z )
+{
+
+    /* II. Quadrant */ 
+   //int x = -r, y = 0, err = 2-2*r; 
+   
+   int x = -r;
+   int y = 0;
+   int err =  (2-(2*r));
+
+   do {
+      
+      //setPixel(xm-x, ym+y); /*   I. Quadrant */
+      //setPixel(xm-y, ym-x); /*  II. Quadrant */
+      //setPixel(xm+x, ym-y); /* III. Quadrant */
+      //setPixel(xm+y, ym+x); /*  IV. Quadrant */
+      
+      grPlot0 ( z, xm-x, ym+y, color);
+      grPlot0 ( z, xm-y, ym-x, color);
+      grPlot0 ( z, xm+x, ym-y, color);
+      grPlot0 ( z, xm+y, ym+x, color);
+      
+      r = err;
+      
+      /* e_xy+e_y < 0 */
+      if (r <= y) 
+      { 
+           err += ++y * 2 + 1; 
+      }           
+      
+      /* e_xy+e_x > 0 or no 2nd y-step */
+      if (r > x || err > y) 
+      { 
+          err += ++x * 2+1; 
+      }
+      
+   } while (x < 0);
+}
+  
 
 
 //Ellipse
@@ -450,6 +495,114 @@ plotEllipseRect (
 
 
 
+void 
+plotEllipseRectZ (
+    int x0, int y0, 
+    int x1, int y1, 
+    unsigned long color,
+    int z )
+{
+
+   int a = abs(x1-x0), b = abs(y1-y0), b1 = b&1; /* values of diameter */
+   long dx = 4*(1-a)*b*b, dy = 4*(b1+1)*a*a; /* error increment */
+   long err = dx+dy+b1*a*a, e2; /* error of 1.step */
+
+   if (x0 > x1) { x0 = x1; x1 += a; } /* if called with swapped points */
+   if (y0 > y1) y0 = y1; /* .. exchange them */
+   y0 += (b+1)/2; y1 = y0-b1;   /* starting pixel */
+   a *= 8*a; b1 = 8*b*b;
+
+
+    do {
+       //setPixel(x1, y0); /*   I. Quadrant */
+       //setPixel(x0, y0); /*  II. Quadrant */
+       //setPixel(x0, y1); /* III. Quadrant */
+       //setPixel(x1, y1); /*  IV. Quadrant */
+       
+       
+       grPlot0 ( z, x1, y0, color);
+       grPlot0 ( z, x0, y0, color);
+       grPlot0 ( z, x0, y1, color);
+       grPlot0 ( z, x1, y1, color);
+       
+       
+       e2 = (2*err);
+       if (e2 <= dy) { y0++; y1--; err += dy += a; }  /* y step */ 
+       if (e2 >= dx || 2*err > dy) { x0++; x1--; err += dx += b1; } /* x step */
+    
+    } while (x0 <= x1);
+
+
+    /* too early stop of flat ellipses a=1 */
+    while (y0-y1 < b) 
+    {
+       //setPixel(x0-1, y0); /* -> finish tip of ellipse */
+       //setPixel(x1+1, y0++); 
+       //setPixel(x0-1, y1);
+       //setPixel(x1+1, y1--); 
+   
+        grPlot0 ( z, x0-1,    y0, color);
+        grPlot0 ( z, x1+1,  y0++, color);
+        grPlot0 ( z, x0-1,    y1, color);
+        grPlot0 ( z, x1+1,  y1--, color);
+    };
+}
+
+
+void noraDrawingStuff(void)
+{
+    int x=0;
+    int y=0;
+
+
+    // colunas.
+    for (x=0; x< SavedX; x++)    
+    {
+        for (y=0; y<SavedY; y++)
+        {
+            if ( x != 0 )
+            {
+                if ( y % x == 0 ){
+                    pixelBackBufferPutpixel ( COLOR_BLACK, x, y );  
+                }
+            }
+        };
+        
+        if ( x >= SavedY) { 
+            break; 
+        }
+    };
+}
+
+
+void noraDrawingStuff3(int x, int y, int z)
+{
+    int _x=0;
+    int _y=0;
+    int _z = z;
+
+
+    int limitX = SavedX/2;
+    int limitY = SavedY/2;    
+
+
+    // colunas.
+    for (_x=x; _x<limitX; _x++)    
+    {
+        for (_y=y; _y<limitY; _y++)
+        {
+            if ( _x != 0 )
+            {
+                if ( _y % _x == 0 ){
+                    //pixelBackBufferPutpixel ( COLOR_BLACK, x, y );  
+                    grPlot0 (_z, _x, _y,COLOR_BLACK);
+                }
+            }
+        };
+        
+        if ( _x >= limitY) { break; }
+    };
+}
 
 
 

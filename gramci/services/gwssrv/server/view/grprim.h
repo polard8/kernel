@@ -25,6 +25,8 @@
 // define CLAMP(x, low, high)  (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
 
 int grInit(void);
+
+
 int grPlot0 (int z, int x, int y, unsigned long color);
 
 
@@ -61,10 +63,32 @@ cubeZ (
 
 
 void plotCircle (int xm, int ym, int r, unsigned long color);
+void 
+plotCircleZ ( 
+    int xm, 
+    int ym, 
+    int r, 
+    unsigned long color, 
+    int z );
+
 
 void plotEllipseRect(int x0, int y0, int x1, int y1, unsigned long color);
 
+void 
+plotEllipseRectZ (
+    int x0, int y0, 
+    int x1, int y1, 
+    unsigned long color,
+    int z );
+
+
+//#test
+void noraDrawingStuff(void);
+void noraDrawingStuff3(int x, int y, int z);
+
 #endif    
+
+
 
 
 
