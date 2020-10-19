@@ -9,6 +9,13 @@
 #define ____COLORS_H    1
 
 
+// #todo: We can define a default transparent color,
+// just like PINK
+// #define COLOR_TRANSPARENT ?
+// #define COLOR_TRANSPARENT COLOR_PINK
+
+
+
 /*
  losethos
 public BGREntry vga_palette4_std[16] = {

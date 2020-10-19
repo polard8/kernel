@@ -6,6 +6,13 @@
  */
 
 
+void plotLineRect4 ( int x1, int y1, int x2, int y2, int color );
+void plotLineRectZ ( int x1, int y1, int z1, int x2, int y2, int z2, int color );
+
+void testLines ( int x1, int y1, int x2, int y2, int color );
+void testLinesZ ( int x1, int y1, int z1, int x2, int y2, int z2, int color );
+
+
 // See: https://en.wikipedia.org/wiki/Line_drawing_algorithm
 void
 A_naive_line_drawing_algorithm(

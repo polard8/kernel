@@ -12,6 +12,53 @@
 
 #include <gws.h>
 
+
+
+void plotLineRect4 ( int x1, int y1, int x2, int y2, int color )
+{
+    plotLine3d ( x1,y1,0, x2,y1,0, color );
+    plotLine3d ( x2,y1,0, x2,y2,0, color );
+    plotLine3d ( x2,y2,0, x1,y2,0, color );
+    plotLine3d ( x1,y2,0, x1,y1,0, color );
+}
+
+
+void plotLineRectZ ( int x1, int y1, int z1, int x2, int y2, int z2, int color )
+{
+    plotLine3d ( x1,y1,z1, x2,y1,z2, color );
+    plotLine3d ( x2,y1,z1, x2,y2,z2, color );
+    plotLine3d ( x2,y2,z1, x1,y2,z2, color );
+    plotLine3d ( x1,y2,z1, x1,y1,z2, color );
+}
+
+
+//ok triangulo invertido.
+void testLines ( int x1, int y1, int x2, int y2, int color )
+{
+   int dx = x2-x1;
+   int dy = y2-y1;
+     
+  plotLine3d(   x1,  y1-dy, 0,   x1+dx, y1   , 0, color);
+  plotLine3d(x1+dx,     y1, 0,     x1, y1+dy , 0, color);
+  plotLine3d(   x1,  y1+dy, 0,  x1-dx, y1    , 0, color);
+  plotLine3d(x1-dx,     y1, 0,     x1, y1-dy , 0, color);
+}
+
+
+//ok triangulo invertido.
+void testLinesZ ( int x1, int y1, int z1, int x2, int y2, int z2, int color )
+{
+   int dx = x2-x1;
+   int dy = y2-y1;
+     
+  plotLine3d(   x1,  y1-dy, z1,   x1+dx, y1   , z2, color);
+  plotLine3d(x1+dx,     y1, z1,     x1, y1+dy , z2, color);
+  plotLine3d(   x1,  y1+dy, z1,  x1-dx, y1    , z2, color);
+  plotLine3d(x1-dx,     y1, z1,     x1, y1-dy , z2, color);
+}
+
+
+
 // ...
 //dx = x2 − x1
 //dy = y2 − y1

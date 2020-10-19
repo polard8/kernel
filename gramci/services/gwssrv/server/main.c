@@ -1662,9 +1662,27 @@ void InitGraphics(void){
  
 
 
-    matrix_demo1();
+    //matrix_demo1();
+
+
+
+
     
-      
+    
+    plotLineRect4(8,8,80,80, COLOR_BLACK);  //ok. it works.
+    //plotLineRectZ ( 8,8,0, 80,80,0, COLOR_BLACK);    //ok. it works.
+    plotLineRectZ ( 8,8,100, 80,80,100, COLOR_WHITE);    
+   
+   
+   
+    testLines(8,8,80,80, COLOR_BLACK); //ok triangulo invertido.
+    //testLinesZ ( 8,8,0, 80,80,0, COLOR_BLACK); //ok triangulo invertido.    
+    testLinesZ ( 8,8,100, 80,80,100, COLOR_WHITE);    //ok triangulo invertido.
+
+
+
+
+   
     //See: window.c
     //create_main_menu();
   
