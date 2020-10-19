@@ -1639,27 +1639,26 @@ void InitGraphics(void){
     //noraDrawingStuff3(1);
  
  
-     /*
+    /*
     int i=0;
-    for(i=0; i<100; i++){
-            
+    for (i=0; i<100; i++){
             //noraDrawingStuff3 (i,i,0);
             noraDrawingStuff3 (-i,-i,0);
-            
             //rectangle(8,8,i,i,COLOR_BLUE);
             //rectangleZ(i,i,i+20,i+20,COLOR_BLUE,i);
-            
             //plotCircle ( -i % 20, -i % 20, i%20, COLOR_GREEN);
-            plotCircleZ ( -i % 20, -i % 20, i % 20, COLOR_GREEN, i % 20);
-            
+            //plotCircleZ ( -i % 20, -i % 20, i % 20, COLOR_GREEN, i % 20);  //save this
             //plotCircleZ ( -i % 20, -i % 20, i % 20, COLOR_GREEN, i % 20);   //save this
-            
-            
+            //cool
+            //plotCircleZ ( -i % fib(20), -i % fib(20), i % fib(20), COLOR_GREEN, i % fib(20) );
+            //igual o de cima.
+            //plotCircleZ ( -i % fib(20), -i % fib(20), i, COLOR_GREEN, i % fib(20) );
+            plotCircleZ ( -i % fib(7), -i % fib(7), i % fib(7), COLOR_GREEN, i % fib(7) );
             //plotEllipseRect ( i, i, i*5, i*5, COLOR_BLUE);
             //plotEllipseRectZ ( i%20, i%20, i, i, COLOR_BLUE,i%20);
     };
     */
- 
+
 
 
     //matrix_demo1();
@@ -1669,15 +1668,15 @@ void InitGraphics(void){
 
     
     
-    plotLineRect4(8,8,80,80, COLOR_BLACK);  //ok. it works.
+    //plotLineRect4(8,8,80,80, COLOR_BLACK);  //ok. it works.
     //plotLineRectZ ( 8,8,0, 80,80,0, COLOR_BLACK);    //ok. it works.
-    plotLineRectZ ( 8,8,100, 80,80,100, COLOR_WHITE);    
+    //plotLineRectZ ( 8,8,100, 80,80,100, COLOR_WHITE);    
    
    
    
-    testLines(8,8,80,80, COLOR_BLACK); //ok triangulo invertido.
+    //testLines(8,8,80,80, COLOR_BLACK); //ok triangulo invertido.
     //testLinesZ ( 8,8,0, 80,80,0, COLOR_BLACK); //ok triangulo invertido.    
-    testLinesZ ( 8,8,100, 80,80,100, COLOR_WHITE);    //ok triangulo invertido.
+    //testLinesZ ( 8,8,100, 80,80,100, COLOR_WHITE);    //ok triangulo invertido.
 
 
 
@@ -1691,7 +1690,7 @@ void InitGraphics(void){
     //gws_show_window_rect(gui->screen);
     
     gws_show_backbuffer();              
-    while(1){}
+    //while(1){}
        
     
         

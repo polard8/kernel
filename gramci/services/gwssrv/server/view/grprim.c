@@ -828,6 +828,26 @@ void matrix_demo1(void)
 }
 
 
+// Fibonacci Series using Recursion 
+int fib(int n) 
+{ 
 
+    int a=0;
+    int b=0;
+
+    if (n <= 1){ 
+        return n; 
+    }
+    
+    a = fib(n - 1); 
+    b = fib(n - 2);
+
+    return (int) (a+b);
+} 
+
+
+
+
+ 
 
 

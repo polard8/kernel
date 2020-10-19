@@ -121,6 +121,12 @@ plotEllipseRectZ (
 void noraDrawingStuff(void);
 void noraDrawingStuff3(int x, int y, int z);
 
+// Fibonacci Series using Recursion 
+int fib(int n);
+
+
+
+
 #endif    
 
 
