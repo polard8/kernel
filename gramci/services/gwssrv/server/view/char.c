@@ -266,7 +266,7 @@ int charGetCharHeight (void)
 
 /*
  ******************************************************
- * gws_drawchar_transparent:
+ * charBackbufferDrawcharTransparent:
  *     Desenha um caractere sem alterar o pano de fundo.
  *     >> no backbuffer.
  */

@@ -125,6 +125,20 @@ void noraDrawingStuff3(int x, int y, int z);
 int fib(int n);
 
 
+void 
+plotCharBackbufferDrawcharTransparent ( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long color, 
+    unsigned long c );
+
+void 
+plotCharBackbufferDrawcharTransparentZ ( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long color, 
+    unsigned long c,
+    int z );
 
 
 #endif    

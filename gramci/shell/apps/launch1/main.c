@@ -817,6 +817,11 @@ int main ( int argc, char *argv[] ){
     unsigned long w = gws_get_system_metrics(1);
     unsigned long h = gws_get_system_metrics(2);
 
+    if ( w == 0 || h == 0 ){
+        printf ("launch1: w h \n");
+        exit(1);
+    }
+
 
     // #todo:
     // check validation od w h
@@ -902,14 +907,30 @@ int main ( int argc, char *argv[] ){
     int button3_window;
 
 
+    // a janela eh a metade da tela.
     unsigned long w_width  = (w/2);
-    unsigned long w_height = (h/2);
+    unsigned long w_height = (h/2);    
     
     // left
     // Posiciona uma janela de largura '(w/2)' no centro
     // de uma tela de largura 'w'.
     unsigned long viewwindowx = ( ( w - w_width ) >> 1 );
     unsigned long viewwindowy=0;
+
+    // #hackhack
+    // @media
+    // se a tela for pequena demais para os dias de hoje. hahaha
+    if ( w == 320 )
+    {
+        // dimensoes
+        w_width  = w;
+        w_height = h;
+        
+        //posicionamento
+        viewwindowx = 0;
+        viewwindowy = 0;
+    }
+
 
     // Se a largura da janela for igual a largura da tela
     // entao a janela começa no topo.

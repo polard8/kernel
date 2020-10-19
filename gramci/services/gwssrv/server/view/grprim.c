@@ -847,6 +847,271 @@ int fib(int n)
 
 
 
+/*
+ ******************************************************
+ * plotCharBackbufferDrawcharTransparent:
+ *     Desenha um caractere sem alterar o pano de fundo.
+ *     >> no backbuffer.
+ */
+
+// #bugbug
+// Nessa função estamos usando globais.
+// Talvez devamos pegá-las antes e não 
+// referenciá-las diretamente.
+
+void 
+plotCharBackbufferDrawcharTransparent ( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long color, 
+    unsigned long c )
+{
+
+    char *work_char;
+    unsigned char bit_mask = 0x80;
+
+    int x2=0;
+    int y2=0;
+
+    //int CharWidth;
+    //int CharHeight;
+
+
+    /*
+	 * Get the font pointer.
+	 *
+	 * @todo:
+     *     usar variavel g8x8fontAddress.
+	 *     + Criar e usar uma estrutura para fonte.
+	 *     + Usar o ponteiro para a fonte atual que foi carregada.
+	 *     + Criar um switch para o tamanho da fonte.
+	 *     isso deveria estar na inicialização do módulo char.
+	 *     ...
+	 */
+
+    if ( gws_currentfont_address == 0 || 
+         gcharWidth <= 0 || 
+         gcharHeight <= 0 )
+    {
+	    //gws_currentfont_address = (unsigned long) BIOSFONT8X8;    //ROM bios.
+		//gcharWidth = DEFAULT_CHAR_WIDTH;               //8.
+		//gcharHeight = DEFAULT_CHAR_HEIGHT;             //8.
+		
+		// #debug
+		// Estamos parando para testes.
+		
+        printf ("gws_drawchar_transparent : Initialization fail\n");
+        while(1){}
+    }
+
+    // #todo: 
+    // Criar essas variáveis e definições.
+
+    switch (gfontSize){
+
+		//case FONT8X8:
+	        //gws_currentfont_address = (unsigned long) BIOSFONT8X8;    //getFontAddress(...)
+		    //gcharWidth = 8;
+		    //gcharHeight = 8;
+		    //set_char_width(8);
+			//set_char_height(8);
+			//break;
+		
+		//case FONT8X16:
+	        //gws_currentfont_address = (unsigned long) BIOSFONT8X16;    //getFontAddress(...)
+		    //gcharWidth = 8;
+		    //gcharHeight = 16;
+		    //set_char_width(8);
+			//set_char_height(16);			
+		    //break;
+		 
+		//#todo: 
+		//Criar opções
+		//...
+		
+		// #importante:
+		// #BUGBUG
+		// Se não temos um tamanho selecionado então teremos 
+		// que usar o tamanho padrão.
+		
+        default:
+		    //gws_currentfont_address = (unsigned long) BIOSFONT8X8;    //ROM bios.
+		    
+			//set_char_width(8);
+			//set_char_height(8);	
+            //gfontSize = FONT8X8;  //#todo: fução para configurar isso.
+
+            break;
+    };
+
+
+    // O caractere sendo trabalhado.
+
+    work_char = (void *) gws_currentfont_address + (c * gcharHeight);
+
+
+    //
+    // Draw.
+    //
+
+    for ( y2=0; y2 < gcharHeight; y2++ )
+    {
+        bit_mask = 0x80;
+
+        for ( x2=0; x2 < gcharWidth; x2++ )
+        {
+
+           // Put pixel. 
+            if ( ( *work_char & bit_mask ) ){
+ 
+                //pixelBackBufferPutpixel ( color, x + x2, y );  
+                grPlot0 ( 0, x + x2, y, color ); 
+            }
+
+            // Rotate bitmask.
+            bit_mask = (bit_mask >> 1);  
+        };
+
+        // Próxima linha da 8 linhas do caractere.
+        y++; 
+        work_char++; 
+    };
+}
+
+
+
+
+/*
+ ******************************************************
+ * plotCharBackbufferDrawcharTransparentZ:
+ *     Desenha um caractere sem alterar o pano de fundo.
+ *     >> no backbuffer.
+ */
+
+// #bugbug
+// Nessa função estamos usando globais.
+// Talvez devamos pegá-las antes e não 
+// referenciá-las diretamente.
+
+void 
+plotCharBackbufferDrawcharTransparentZ ( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long color, 
+    unsigned long c,
+    int z )
+{
+
+    char *work_char;
+    unsigned char bit_mask = 0x80;
+
+    int x2=0;
+    int y2=0;
+
+    //int CharWidth;
+    //int CharHeight;
+
+
+    /*
+	 * Get the font pointer.
+	 *
+	 * @todo:
+     *     usar variavel g8x8fontAddress.
+	 *     + Criar e usar uma estrutura para fonte.
+	 *     + Usar o ponteiro para a fonte atual que foi carregada.
+	 *     + Criar um switch para o tamanho da fonte.
+	 *     isso deveria estar na inicialização do módulo char.
+	 *     ...
+	 */
+
+    if ( gws_currentfont_address == 0 || 
+         gcharWidth <= 0 || 
+         gcharHeight <= 0 )
+    {
+	    //gws_currentfont_address = (unsigned long) BIOSFONT8X8;    //ROM bios.
+		//gcharWidth = DEFAULT_CHAR_WIDTH;               //8.
+		//gcharHeight = DEFAULT_CHAR_HEIGHT;             //8.
+		
+		// #debug
+		// Estamos parando para testes.
+		
+        printf ("gws_drawchar_transparent : Initialization fail\n");
+        while(1){}
+    }
+
+    // #todo: 
+    // Criar essas variáveis e definições.
+
+    switch (gfontSize){
+
+		//case FONT8X8:
+	        //gws_currentfont_address = (unsigned long) BIOSFONT8X8;    //getFontAddress(...)
+		    //gcharWidth = 8;
+		    //gcharHeight = 8;
+		    //set_char_width(8);
+			//set_char_height(8);
+			//break;
+		
+		//case FONT8X16:
+	        //gws_currentfont_address = (unsigned long) BIOSFONT8X16;    //getFontAddress(...)
+		    //gcharWidth = 8;
+		    //gcharHeight = 16;
+		    //set_char_width(8);
+			//set_char_height(16);			
+		    //break;
+		 
+		//#todo: 
+		//Criar opções
+		//...
+		
+		// #importante:
+		// #BUGBUG
+		// Se não temos um tamanho selecionado então teremos 
+		// que usar o tamanho padrão.
+		
+        default:
+		    //gws_currentfont_address = (unsigned long) BIOSFONT8X8;    //ROM bios.
+		    
+			//set_char_width(8);
+			//set_char_height(8);	
+            //gfontSize = FONT8X8;  //#todo: fução para configurar isso.
+
+            break;
+    };
+
+
+    // O caractere sendo trabalhado.
+
+    work_char = (void *) gws_currentfont_address + (c * gcharHeight);
+
+
+    //
+    // Draw.
+    //
+
+    for ( y2=0; y2 < gcharHeight; y2++ )
+    {
+        bit_mask = 0x80;
+
+        for ( x2=0; x2 < gcharWidth; x2++ )
+        {
+
+           // Put pixel. 
+            if ( ( *work_char & bit_mask ) ){
+ 
+                //pixelBackBufferPutpixel ( color, x + x2, y );  
+                grPlot0 ( z, x + x2, y, color ); 
+            }
+
+            // Rotate bitmask.
+            bit_mask = (bit_mask >> 1);  
+        };
+
+        // Próxima linha da 8 linhas do caractere.
+        y++; 
+        work_char++; 
+    };
+}
 
  
 
