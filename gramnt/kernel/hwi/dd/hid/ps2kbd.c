@@ -183,7 +183,17 @@ int BAT_TEST (void);
 
 
 
-// Local procedure.
+
+/*
+ ******************************************************************* 
+ * __local_ps2kbd_procedure:
+ * 
+ *       This function handle the emergency keys F5, F6, F6 and F8.
+ *       MSG_SYSKEYUP only.
+ */
+
+// Local function.
+
 unsigned long 
 __local_ps2kbd_procedure ( 
     struct window_d *window, 
@@ -205,8 +215,8 @@ __local_ps2kbd_procedure (
 
 
 
-    switch (msg)
-    {
+    switch (msg){
+
         case MSG_SYSKEYUP: 
             switch (long1)  
             {
@@ -257,9 +267,8 @@ __local_ps2kbd_procedure (
                     // testNIC ();
                     //pciInfo ();
                     // ahciSATAInitialize (1);
-                    refresh_screen();
+                    //refresh_screen();
                     break;
-
             }
     };
 
@@ -672,7 +681,7 @@ done:
     // Scan code.
     //
 
-    unsigned long tmp_sc;
+    unsigned long tmp_sc=0;
     tmp_sc = (unsigned long) scancode;
     tmp_sc = (unsigned long) ( tmp_sc & 0x000000FF );
 
@@ -768,6 +777,7 @@ done:
 
                 // Emergency keys.
                 // Sending these keys to the system procedure.
+                // This is a local routine.
                 case VK_F5: 
                 case VK_F6: 
                 case VK_F7: 
@@ -779,7 +789,12 @@ done:
                         (unsigned long) tmp_sc );       
                     return 0;
                     break;
-                
+
+                // This is a window of the embedded window server.
+                // Not the loadable window server.
+                // We wish to send the message to the current terminal (tty).
+                // and the current tty will have a thread associated.
+                // See: ui/windows/model/kgws.c
                 case VK_F1: 
                 case VK_F2: 
                 case VK_F3: 
@@ -788,7 +803,7 @@ done:
                 case VK_F10: 
                 case VK_F11: 
                 case VK_F12:
-                    kgws_send_to_controlthread_of_currentwindow ( w,
+                     kgws_send_to_controlthread_of_currentwindow ( w,
                         (int) message, 
                         (unsigned long) ch, 
                         (unsigned long) tmp_sc );
@@ -799,7 +814,7 @@ done:
                 // kgws:
                 // Send a message to the thread associated with the
                 // window with focus.
-                // See: ws/kgws.c
+                // See: ui/windows/model/kgws.c
                 default:
                     kgws_send_to_controlthread_of_currentwindow ( w,
                         (int) message, 
@@ -831,45 +846,45 @@ done:
 }
 
 
+/*
+ *************************************** 
+ * xxx_keyboard_write: 
+ * 
+ */
+
+// Esta função será usada para escrever dados do teclado 
+// na porta 0x60, fora do IRQ1.
+
+void xxx_keyboard_write (uint8_t data)
+{
+    kbdc_wait(1);
+
+    out8 ( 0x60, data );
+
+    wait_ns(400);
+}
 
 
 /*
  *************************************** 
- * keyboard_read: 
+ * xxx_keyboard_read: 
  * 
  */
 
 // Esta função será usada para ler dados do teclado na 
 // porta 0x60, fora do IRQ1.
-uint8_t keyboard_read (void)
+
+uint8_t xxx_keyboard_read (void)
 {
- 
     kbdc_wait (0);
 
-    uint8_t val = in8 (0x60);
+    uint8_t val = in8(0x60);
     
     wait_ns(400);
     
     return (uint8_t) val;
 }
 
-
-/*
- *************************************** 
- * keyboard_write: 
- * 
- */
- 
-// Esta função será usada para escrever dados do teclado 
-// na porta 0x60, fora do IRQ1.
-void keyboard_write (uint8_t write)
-{
-    kbdc_wait(1);
-
-    out8 ( 0x60, write );
-
-    wait_ns(400);
-}
 
 
 // Esta rotina faz o Auto-teste 0xaa êxito, 0xfc erro
@@ -878,7 +893,7 @@ void keyboard_write (uint8_t write)
 int BAT_TEST (void){
 
     int val = -1;
-    int i;
+    int i=0;
 
 	// #todo:
 	// Cuidado.
@@ -891,9 +906,9 @@ int BAT_TEST (void){
     };
 
 
-	for ( i=0; i<999; i++ )
-	{
-        val = (int) keyboard_read ();
+    for ( i=0; i<999; i++ )
+    {
+        val = (int) xxx_keyboard_read();
 
 		//Ok funcionou o auto teste
         if(val == 0xAA)
@@ -914,8 +929,8 @@ int BAT_TEST (void){
 		// Reenviar o comando. 
         // obs: este comando não é colocado em buffer
         
-		//printf ("ps2kbd.c: BAT_TEST %d\n", i);
-		keyboard_write (0xFE);       
+        //printf ("ps2kbd.c: BAT_TEST %d\n", i);
+        xxx_keyboard_write (0xFE);       
     };
 
 
@@ -1162,7 +1177,7 @@ void ps2kbd_initialize_device (void){
 	// ACK
     wait_ns (400);
     wait_ns (400);
-    while ( keyboard_read() != 0xFA );
+    while ( xxx_keyboard_read() != 0xFA );  // #bugbug: Danger, Danger !!
 
     //=================================================
     //--

@@ -22,25 +22,47 @@
 // Defines
 // Credits: serenity OS
 #define IRQ_MOUSE 1
+
+// ?
 #define I8042_BUFFER 0x60
 #define I8042_STATUS 0x64
+
 #define I8042_ACK 0xFA
 #define I8042_BUFFER_FULL 0x01
 #define I8042_WHICH_BUFFER 0x20
 #define I8042_MOUSE_BUFFER 0x20
 #define I8042_KEYBOARD_BUFFER 0x00
-#define PS2MOUSE_SET_RESOLUTION 0xE8
-#define PS2MOUSE_STATUS_REQUEST 0xE9
-#define PS2MOUSE_REQUEST_SINGLE_PACKET 0xEB
-#define PS2MOUSE_GET_DEVICE_ID 0xF2
-#define PS2MOUSE_SET_SAMPLE_RATE 0xF3
-#define PS2MOUSE_ENABLE_PACKET_STREAMING 0xF4
-#define PS2MOUSE_DISABLE_PACKET_STREAMING 0xF5
-#define PS2MOUSE_SET_DEFAULTS 0xF6
-#define PS2MOUSE_RESEND 0xFE
-#define PS2MOUSE_RESET 0xFF
+
+#define PS2MOUSE_SET_RESOLUTION            0xE8
+#define PS2MOUSE_STATUS_REQUEST            0xE9
+#define PS2MOUSE_REQUEST_SINGLE_PACKET     0xEB
+#define PS2MOUSE_GET_DEVICE_ID             0xF2
+#define PS2MOUSE_SET_SAMPLE_RATE           0xF3
+#define PS2MOUSE_ENABLE_PACKET_STREAMING   0xF4
+#define PS2MOUSE_DISABLE_PACKET_STREAMING  0xF5
+#define PS2MOUSE_SET_DEFAULTS              0xF6
+#define PS2MOUSE_RESEND                    0xFE
+#define PS2MOUSE_RESET                     0xFF
+
 #define PS2MOUSE_INTELLIMOUSE_ID 0x03
 //--
+
+// i8042 mouse status bit.
+#define MOUSE_LEFT_BTN    0x01
+#define MOUSE_RIGHT_BTN   0x02
+#define MOUSE_MIDDLE_BTN  0x04
+#define MOUSE_X_SIGN      0x10
+#define MOUSE_Y_SIGN      0x20
+#define MOUSE_X_OVERFLOW  0x40
+#define MOUSE_Y_OVERFLOW  0x80
+
+//  mouseHandler support
+#define MOUSE_DATA_BIT  1
+#define MOUSE_SIG_BIT   2
+#define MOUSE_F_BIT     0x20
+#define MOUSE_V_BIT     0x08 
+
+
 
 
 // Screen width and height
@@ -69,18 +91,6 @@ int ps2_mouse_drag_status;
 // update_mouse support
 
 
-
-// i8042 mouse status bit.
-#define MOUSE_LEFT_BTN    0x01
-#define MOUSE_RIGHT_BTN   0x02
-#define MOUSE_MIDDLE_BTN  0x04
-#define MOUSE_X_SIGN      0x10
-#define MOUSE_Y_SIGN      0x20
-#define MOUSE_X_OVERFLOW  0x40
-#define MOUSE_Y_OVERFLOW  0x80
-
-
-
 long mouse_x = 0;
 long mouse_y = 0;
 
@@ -94,11 +104,6 @@ char mouse_packet_scroll = 0;
 
 
 //====================================================================
-//  mouseHandler support
-#define MOUSE_DATA_BIT 1
-#define MOUSE_SIG_BIT  2
-#define MOUSE_F_BIT  0x20
-#define MOUSE_V_BIT  0x08 
 
 // Contador
 static int count_mouse = 0;
@@ -129,11 +134,14 @@ int MOUSE_BAT_TEST (void);
 // Pegamos os tres char do inout de mouse e 
 // transformamos em uma mensagem que será enviada para uma thread.
 
+// #bugbug
+// TODO
+
 int MOUSE_SEND_MESSAGE (void *buffer) {
 
-    if ( (void *) buffer == NULL )
+    if ( (void *) buffer == NULL ){
         return (int) -1;
-
+    }
 
     unsigned char *chars = (unsigned char *) buffer;
 
@@ -154,19 +162,19 @@ int MOUSE_SEND_MESSAGE (void *buffer) {
 
 /*
  *********************************************
- * mouse_write:
+ * xxx_mouse_write:
  *     Envia um byte para a porta 0x60.
  */
 
 //mudar o arg para data;
 
-void mouse_write (unsigned char write){
+void xxx_mouse_write (unsigned char data){
 
     prepare_for_output();
-    out8 (I8042_STATUS, 0xd4);
+    out8 (I8042_STATUS, 0xD4);
 
     prepare_for_output();
-    out8 (I8042_BUFFER, write);
+    out8 (I8042_BUFFER, data);
 }
 
 
@@ -174,17 +182,15 @@ void mouse_write (unsigned char write){
 
 /*
  **************************************
- * mouse_read:
+ * xxx_mouse_read:
  *     Pega um byte na porta 0x60.
  */
 
-unsigned char mouse_read (void){
-
-    //kbdc_wait (0);
-    //return (unsigned char) in8 (0x60);
-
+unsigned char xxx_mouse_read (void)
+{
     prepare_for_input();
-    return (unsigned char) in8 (0x60);
+    
+    return (unsigned char) in8(0x60);
 }
 
 
@@ -219,7 +225,7 @@ int MOUSE_BAT_TEST (void){
 
     for ( i=0; i<999; i++ )
     {
-        val = mouse_read ();
+        val = xxx_mouse_read();
 
         if (val == 0xAA)
         {
@@ -235,7 +241,7 @@ int MOUSE_BAT_TEST (void){
         // Reenviar o comando. 
         // OBS: este comando não é colocado em buffer
 
-        mouse_write (0xFE);       
+        xxx_mouse_write (0xFE);       
     };
 
     // #bugbug:
@@ -420,7 +426,7 @@ void ps2mouse_initialize_device (void){
     // A rotina abaixo faz o mouse ficar com sua coniguração padrão.
 
     // Set default settings.
-    mouse_write (PS2MOUSE_SET_DEFAULTS);
+    xxx_mouse_write (PS2MOUSE_SET_DEFAULTS);
     expect_ack();
 
     //=================================================
@@ -438,7 +444,7 @@ void ps2mouse_initialize_device (void){
 
 
     // Enable streaming.
-    mouse_write(PS2MOUSE_ENABLE_PACKET_STREAMING);
+    xxx_mouse_write (PS2MOUSE_ENABLE_PACKET_STREAMING);
     expect_ack();
     
     //=================================================
@@ -456,30 +462,30 @@ void ps2mouse_initialize_device (void){
     // Credits: Serenity OS.    
 
     // Pega o device id e faz configurações de wheel.
-    mouse_write(PS2MOUSE_GET_DEVICE_ID);
+    xxx_mouse_write (PS2MOUSE_GET_DEVICE_ID);
     expect_ack();
     
-    unsigned char device_id = mouse_read(); 
+    unsigned char device_id = xxx_mouse_read(); 
     
     if (device_id != PS2MOUSE_INTELLIMOUSE_ID){
 
         // Send magical wheel initiation sequence.
-        mouse_write(PS2MOUSE_SET_SAMPLE_RATE);
+        xxx_mouse_write (PS2MOUSE_SET_SAMPLE_RATE);
         expect_ack();
-        mouse_write(200);
+        xxx_mouse_write (200);
         expect_ack();
-        mouse_write(PS2MOUSE_SET_SAMPLE_RATE);
+        xxx_mouse_write (PS2MOUSE_SET_SAMPLE_RATE);
         expect_ack();
-        mouse_write(100);
+        xxx_mouse_write (100);
         expect_ack();
-        mouse_write(PS2MOUSE_SET_SAMPLE_RATE);
+        xxx_mouse_write (PS2MOUSE_SET_SAMPLE_RATE);
         expect_ack();
-        mouse_write(80);
+        xxx_mouse_write (80);
         expect_ack();
 
-        mouse_write(PS2MOUSE_GET_DEVICE_ID);
+        xxx_mouse_write (PS2MOUSE_GET_DEVICE_ID);
         expect_ack();
-        device_id = mouse_read();
+        device_id = xxx_mouse_read();
     }
 
     if (device_id == PS2MOUSE_INTELLIMOUSE_ID) {
@@ -1186,7 +1192,7 @@ void mouseHandler (void)
 	// #obs: 
 	// count_mouse é global. Provavelmente nesse arquivo mesmo.
 
-    *_byte = (char) mouse_read();
+    *_byte = (char) xxx_mouse_read();
 
     switch (count_mouse)
     {
@@ -1273,12 +1279,17 @@ void mouseHandler (void)
 }
 
 
-void expect_ack(void)
+// =====================================================
+// #bugbug
+// Danger Danger !!
+// =====================================================
+
+void expect_ack (void)
 {
     // #bugbug
     // ? loop infinito  
     
-    while ( mouse_read() != 0xFA);
+    while ( xxx_mouse_read() != 0xFA);
 }
 
 
@@ -1286,14 +1297,13 @@ void expect_ack(void)
 
 void set_ps2_mouse_status(int status)
 {
-	ps2_mouse_status = status;
+    ps2_mouse_status = status;
 }
 
 int get_ps2_mouse_status(void)
 {
-	return (int) ps2_mouse_status;
+    return (int) ps2_mouse_status;
 }
-
 
 
 /*

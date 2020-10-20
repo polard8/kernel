@@ -23,8 +23,6 @@
 // que a tty atua.
 // sendo que o primeiro dispositivo (canal) é o console.
 
-unsigned long tty_table[4];  //os 4 consoles virtuais.
-
 
 
 /*
@@ -67,6 +65,221 @@ tty_write_from_of ( unsigned int fd,
 }
 */
 
+
+
+/*
+ ***********************************
+ * tty_create: 
+ *    Create a tty structure.
+ * 
+ * OUT:
+ *     pointer.
+ */
+
+// #test
+// We are including a pointer to the RIT. raw input thread.
+// This is the control thread of the window with focus on kgws.
+
+// See: tty.h
+
+struct tty_d *tty_create (void){
+
+    struct tty_d *__tty;
+
+    // name
+    char __tmpname[64];
+    
+    file *__file;
+
+
+    debug_print ("tty_create: [FIXME] \n");
+
+
+    __tty = (struct tty_d *) kmalloc ( sizeof(struct tty_d) );
+    
+    if ( (void *) __tty == NULL ){
+        panic ("tty_create: __tty kmalloc fail \n");   
+        //return NULL;
+ 
+    }else{
+
+        // Object control;
+        __tty->objectType  = ObjectTypeTTY;
+        __tty->objectClass = ObjectClassKernelObjects;
+
+        __tty->used = 1;
+        __tty->magic = 1234;
+        
+        
+        // No thread for now.
+        // ?? What thread we need to use here?
+        __tty->control = NULL;
+
+
+        // No user logged yet.
+        __tty->user_info = NULL;
+        
+        // #bugbug
+        // Security stuff.
+        // Maybe it will change when a user login into a terminal.
+        __tty->user_session = CurrentUserSession;
+        __tty->room         = CurrentRoom;
+        __tty->desktop      = CurrentDesktop;
+
+
+
+        // #bubug: 
+        // Usaremos a file table pra controlar as ttys.
+        //__tty->index = 0;
+
+        __tty->pgrp = current_group;
+
+        //__tty->stopped = 0;
+
+
+
+        // Ponteiros para estruturas de arquivos.
+        // Esses arquivos servem de buffers.
+
+        // Buffers.        
+        // Raw and canonical.
+        __tty->_rbuffer = (file *) newPage();
+        __tty->_cbuffer = (file *) newPage();
+        
+        //output buffer.
+        __tty->_obuffer = (file *) newPage();
+        
+
+        if ( (void *) __tty->_rbuffer == NULL ||
+             (void *) __tty->_cbuffer == NULL ||
+             (void *) __tty->_obuffer == NULL   )
+        {
+            panic("tty_create: [FAIL] Buffers\n");
+        }
+
+        // Precisa validar
+
+        __tty->_rbuffer->used = 1;
+        __tty->_rbuffer->magic = 1234;  
+               
+        __tty->_cbuffer->used = 1;
+        __tty->_cbuffer->magic = 1234;
+        
+        __tty->_obuffer->used  = 1;
+        __tty->_obuffer->magic = 1234;
+
+
+        // o buffer do arquivo. (_base)
+
+        __tty->_rbuffer->_base  = (char *) newPage();
+        __tty->_cbuffer->_base  = (char *) newPage();
+        __tty->_obuffer->_base  = (char *) newPage();
+
+
+        // #bugbug
+        // Temos que completar as estruturas.
+        // São muitos elementos ...
+
+        // ...
+
+        goto __ok_register;
+        //return (struct tty_d *) __tty;
+    };
+
+
+    panic ("tty_create: Crazy error!\n");   
+    //return NULL;
+
+
+// ==========================================
+__ok_register:
+
+
+    if ( (void *) __tty == NULL ){
+        panic("tty_create: __tty");
+    }
+
+    //#test
+    // isso não é o ponto de montagem.
+    
+    sprintf ( (char *) &__tmpname[0], 
+        "/DEV_TTY%d", 
+        __tty->index );
+    
+    char *newname = (char *) kmalloc (64);
+    if ( (void*) newname == NULL ){
+        panic("tty_create: newname");
+    }
+    strcpy (newname,__tmpname);
+
+
+    // Agora registra o dispositivo pci na lista genérica
+    // de dispositivos.
+    // #importante: 
+    // Ele precisa de um arquivo 'file'.
+    
+    __file = (file *) kmalloc ( sizeof(file) );
+    
+    if ( (void *) __file == NULL ){
+        panic ("tty_create: __file fail, can't register device");
+    
+    }else{
+        __file->____object = ObjectTypeTTY;
+
+        __file->used  = 1;
+        __file->magic = 1234;
+
+        __file->isDevice = 1;
+
+        // A estrutura de tty associada com esse arquivo.
+        __file->tty = __tty;
+
+
+        //Todo: create the file name.
+        //__file->_tmpfname = "TTYX    TTY";
+        //sprintf( (char *) __file->_tmpfname, "TTY%d", ?? );
+        //strcpy (?,__file->_tmpfname);
+
+        // Esse é o arquivo que aponta para essa estrutura.
+        __tty->_fp = __file;
+        
+        
+        // #todo
+        // precisamos pegar um slot livre na lista de objetos abertos pelo processo.
+        // O indice da tty é fd do arquivo que aponta para a tty.
+        //__tty->index = __file->_file;
+        __tty->index = -1;
+        
+
+        //
+        // == Register ===========================================
+        //
+
+        // #importante
+        // Essa é a tabela de montagem de dispositivos.
+        // O nome do dispositivo deve ser um pathname.
+        // Mas podemos ter mais de um nome.
+        // vamos criar uma string aqui usando sprint e depois duplicala.
+        // See: ??
+        
+        devmgr_register_device ( (file *) __file, 
+             newname,                    // device name.  
+             0,                          // class (char, block, network)
+             1,                          // type (pci, legacy
+             (struct pci_device_d *) 0,  // pci device
+             NULL );                     // tty driver
+    
+    };
+// ==========================================
+
+    // last check.
+    if ( (void *) __tty == NULL ){
+        panic ("tty_create: [FAIL] __tty");
+    }
+
+    // ok.
+    return (struct tty_d *) __tty;
+}
 
 
 
@@ -1235,216 +1448,6 @@ struct ttydrv_d *get_tty_driver( int fd )
     return (struct ttydrv_d *) 0;
 }
 */
-
-
-
-/*
- ***********************************
- * tty_create: 
- *    Create a tty structure.
- * 
- * OUT:
- *     pointer.
- */
-
-struct tty_d *tty_create (void) 
-{
-    struct tty_d *__tty;
-
-
-    debug_print ("tty_create: [FIXME] \n");
-
-
-    __tty = (struct tty_d *) kmalloc ( sizeof(struct tty_d) );
-    
-    if ( (void *) __tty == NULL ){
-        panic ("tty_create: __tty kmalloc fail \n");   
-        //return NULL;
- 
-    }else{
-
-        // Object control;
-        __tty->objectType  = ObjectTypeTTY;
-        __tty->objectClass = ObjectClassKernelObjects;
-
-        __tty->used = 1;
-        __tty->magic = 1234;
-        
-        // No user logged yet.
-        __tty->user_info = NULL;
-        
-        // #bugbug
-        // Security stuff.
-        // Maybe it will change when a user login into a terminal.
-        __tty->user_session = CurrentUserSession;
-        __tty->room         = CurrentRoom;
-        __tty->desktop      = CurrentDesktop;
-
-
-
-        // #bubug: 
-        // Usaremos a file table pra controlar as ttys.
-        //__tty->index = 0;
-
-        __tty->pgrp = current_group;
-
-        //__tty->stopped = 0;
-
-
-
-        // Ponteiros para estruturas de arquivos.
-        // Esses arquivos servem de buffers.
-
-        // Buffers.        
-        // Raw and canonical.
-        __tty->_rbuffer = (file *) newPage();
-        __tty->_cbuffer = (file *) newPage();
-        
-        //output buffer.
-        __tty->_obuffer = (file *) newPage();
-        
-        
-        if ( (void *) __tty->_rbuffer == NULL ||
-             (void *) __tty->_cbuffer == NULL ||
-             (void *) __tty->_obuffer == NULL   )
-        {
-            panic ("tty_create: [FAIL] Buffers!\n");
-        }
-
-        // Precisa validar
-        __tty->_rbuffer->used = 1;
-        __tty->_rbuffer->magic = 1234;  
-               
-        __tty->_cbuffer->used = 1;
-        __tty->_cbuffer->magic = 1234;
-        
-        __tty->_obuffer->used = 1;
-        __tty->_obuffer->magic = 1234;
-        
-      
-
-        //
-        // o buffer do arquivo. (_base)
-        //
-        
-        __tty->_rbuffer->_base  = (char *) newPage();
-        __tty->_cbuffer->_base  = (char *) newPage();
-        __tty->_obuffer->_base  = (char *) newPage();
-
-
-        // #bugbug
-        // Temos que completar as estruturas.
-        // São muitos elementos ...
-        //
-
-        // ...
-               
-        goto __ok_register;
-        //return (struct tty_d *) __tty;
-    };
-
-
-    panic ("tty_create: Crazy error!\n");   
-    //return NULL;
-
-
-//
-// ==========================================
-//
-
-__ok_register:
-
-
-    if ( (void*) __tty == NULL ){
-        panic("tty_create: __tty");
-    }
-
-    //
-    // name
-    //
-    
-    char __tmpname[64];
-    
-    //#test
-    // isso não é o ponto de montagem.
-    sprintf( (char *) &__tmpname[0], "/DEV_TTY%d",__tty->index);
-    
-    char *newname = (char *) kmalloc (64);
-    if ( (void*) newname == NULL )
-        panic("tty_create: newname");
-    strcpy (newname,__tmpname);
-
-
-    //
-    // Agora registra o dispositivo pci na lista genérica
-    // de dispositivos.
-    // #importante: ele precisa de um arquivo 'file'.
-    //
-    
-    file *__file;
-    
-    __file = (file *) kmalloc ( sizeof(file) );
-    
-    if ( (void *) __file == NULL ){
-        panic ("tty_create: __file fail, can't register device");
-    
-    }else{
-
-
-        __file->____object = ObjectTypeTTY;
-
-        __file->used = 1;
-        __file->magic = 1234;
-
-        __file->isDevice = 1;
-
-        // A estrutura de tty associada com esse arquivo.
-        __file->tty = __tty;
-
-
-        //Todo: create the file name.
-        //__file->_tmpfname = "TTYX    TTY";
-        //sprintf( (char *) __file->_tmpfname, "TTY%d", ?? );
-        //strcpy (?,__file->_tmpfname);
-
-        // Esse é o arquivo que aponta para essa estrutura.
-        __tty->_fp = __file;
-        
-        
-        // #todo
-        // precisamos pegar um slot livre na lista de objetos abertos pelo processo.
-        // O indice da tty é fd do arquivo que aponta para a tty.
-        //__tty->index = __file->_file;
-        __tty->index = -1;
-        
-
-        //
-        // Register.
-        //
-
-        // #importante
-        // Essa é a tabela de montagem de dispositivos.
-        // O nome do dispositivo deve ser um pathname.
-        // Mas podemos ter mais de um nome.
-        // vamos criar uma string aqui usando sprint e depois duplicala.
-        // See: ??
-        
-        devmgr_register_device ( (file *) __file, 
-             newname,                    // device name.  
-             0,                          // class (char, block, network)
-             1,                          // type (pci, legacy
-             (struct pci_device_d *) 0,  // pci device
-             NULL );                     // tty driver
-    
-    };
-
-
-//
-// ==========================================
-//
-    return (struct tty_d *) __tty;
-}
-
 
 
 /*

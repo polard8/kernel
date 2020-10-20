@@ -10,17 +10,19 @@
 
 
 
-
-
 /*
- ********************************************
+ ******************************* 
  * ipc_send_to_ws:
- *     Send a message to the ws if it is present.
+ * 
+ *     Let's send a message to the registered window server.
+ *     For it's control thread.
  * 
  */
 
 // #bugbug
 // Now the window server is using unix-like sockets.
+
+// Called by KEYBOARD_SEND_MESSAGE() in ps2kbd.c
 
 // OUT:
 // <= 0 - The ws is present and we sent the message to it.
@@ -45,7 +47,7 @@ si_send_to_ws (
 
     if ( (void *) CurrentDesktop == NULL ){
         debug_print ("si_send_to_ws: CurrentDesktop\n");
-        return -1;
+        return (int) (-1);
     }
         
   
@@ -53,7 +55,7 @@ si_send_to_ws (
          CurrentDesktop->desktopMagic != 1234 )
     {
         debug_print ("si_send_to_ws: CurrentDesktop validation\n");
-        return -1;
+        return (int) (-1);
     }
 
     //
@@ -79,18 +81,20 @@ si_send_to_ws (
     } 
 
     // used ? magic ?
-    
-  
-    switch (msg)
-    {
+
+
+    // Emergency keys.
+    // Sending these keys to the system procedure.
+    // See: ps2kbd.c
+
+    switch (msg){
+
         case MSG_SYSKEYUP:
             
             switch (long1){
                 
-                // Emergency keys.
-                // Sending these keys to the system procedure.
-                case VK_F5: 
-                case VK_F6: 
+                case VK_F5:  
+                case VK_F6:  
                 case VK_F7: 
                 case VK_F8:
                     debug_print ("si_send_to_ws: >>>> [MSG_SYSKEYUP] to system procedure\n");  
@@ -103,32 +107,36 @@ si_send_to_ws (
             };
             break;
     };
-    
-    
-    //
-    // Send
-    //
-    
+
+
+    // Send and rotate the queue.
+
     __p->control->window_list[ __p->control->tail_pos ] = window;
     __p->control->msg_list[ __p->control->tail_pos ]    = msg;
     __p->control->long1_list[ __p->control->tail_pos ]  = long1;
     __p->control->long2_list[ __p->control->tail_pos ]  = long2;
 
-
     __p->control->tail_pos++;
     if ( __p->control->tail_pos >= 31 )
+    {
         __p->control->tail_pos = 0;
-        
- 
-    //
-    // Ok.
-    // 
+    }
 
+    // Ok.
     return 0;
 }
 
 
 
+/*
+ ******************************* 
+ * si_send_longmessage_to_ws:
+ * 
+ *     Let's send a  long message to the registered window server.
+ *     For it's control thread.
+ */
+
+// Called by ??
 
 int
 si_send_longmessage_to_ws ( 
@@ -151,7 +159,7 @@ si_send_longmessage_to_ws (
 
     if ( (void *) CurrentDesktop == NULL ){
         debug_print ("si_send_longmessage_to_ws: CurrentDesktop\n");
-        return -1;
+        return (int) (-1);
     }
         
   
@@ -159,7 +167,7 @@ si_send_longmessage_to_ws (
          CurrentDesktop->desktopMagic != 1234 )
     {
         debug_print ("si_send_longmessage_to_ws: CurrentDesktop validation\n");
-        return -1;
+        return (int) (-1);
     }
 
     //
@@ -185,19 +193,20 @@ si_send_longmessage_to_ws (
     } 
 
     // used ? magic ?
-    
-  
-    switch (msg)
-    {
+
+    // Emergency keys.
+    // Sending these keys to the system procedure.
+    // See: ps2kbd.c
+
+    switch (msg){
+
         case MSG_SYSKEYUP:
             
             switch (long1){
-                
-                // Emergency keys.
-                // Sending these keys to the system procedure.
-                case VK_F5: 
-                case VK_F6: 
-                case VK_F7: 
+
+                case VK_F5:
+                case VK_F6:
+                case VK_F7:
                 case VK_F8:
                     debug_print ("si_send_longmessage_to_ws: >>>> [MSG_SYSKEYUP] to system procedure\n");  
                     __local_ps2kbd_procedure ( window, 
@@ -209,12 +218,10 @@ si_send_longmessage_to_ws (
             };
             break;
     };
-    
-    
-    //
-    // Send
-    //
-    
+
+
+    // Send and rotate the queue.
+
     __p->control->window_list[ __p->control->tail_pos ] = window;
     __p->control->msg_list[ __p->control->tail_pos ]    = msg;
 
@@ -224,20 +231,20 @@ si_send_longmessage_to_ws (
     __p->control->long4_list[ __p->control->tail_pos ]  = long4;
 
 
-
     __p->control->tail_pos++;
     if ( __p->control->tail_pos >= 31 )
+    {
         __p->control->tail_pos = 0;
-        
+    }   
  
-    //
     // Ok.
-    // 
-
     return 0;
 }
 
 
+//
+// End.
+//
 
 
 

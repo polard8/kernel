@@ -2049,10 +2049,12 @@ int main (int argc, char **argv){
         // #debug
         printf ("gwssrv: bind\n");
  
-        bind_status = bind ( server_fd, (struct sockaddr *) &gramsock, sizeof(gramsock) );
+        bind_status = bind ( 
+                          server_fd, 
+                          (struct sockaddr *) &gramsock, 
+                          sizeof(gramsock) );
 
-        if (bind_status<0)
-        {
+        if (bind_status<0){
             gwssrv_debug_print ("gwssrv: [FATAL] Couldn't bind to the socket\n");
             printf             ("gwssrv: [FATAL] Couldn't bind to the socket\n");
             exit(1);
@@ -2084,10 +2086,10 @@ int main (int argc, char **argv){
         //gwssrv_clone_and_execute ("gws.bin");      // command gws.bin
         //gwssrv_clone_and_execute ("gwm.bin");      // window manager
         //gwssrv_clone_and_execute ("fileman.bin");  
-        gwssrv_clone_and_execute ("editor.bin");           
+        //gwssrv_clone_and_execute ("editor.bin");           
         //gwssrv_clone_and_execute ("terminal.bin");  
         //gwssrv_clone_and_execute ("browser.bin");
-        //gwssrv_clone_and_execute ("launch1.bin"); 
+        gwssrv_clone_and_execute ("launch1.bin"); 
         //gwssrv_clone_and_execute ("s2.bin");      // shell  
         //gwssrv_clone_and_execute ("s3.bin");    // hello        
         // ...

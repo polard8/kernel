@@ -3,7 +3,12 @@
 
 
 #ifndef ____PS2KBD_H
-#define ____PS2KBD_H
+#define ____PS2KBD_H    1
+
+
+
+// #bugbug
+// We have these same definitions on ps2keyboard.c ??
 
 
 //
@@ -138,12 +143,10 @@ uint8_t kybrd_ctrl_read_status () {
 // ter um char map, ele apenas passa o scancode.
 //
 
- //
-// Variáveis internas
-//
-//int keyboardStatus;
-//int keyboardError;
-//...
+
+
+
+
 
 // Enumerando os tipos de teclados.
 typedef enum {
@@ -154,32 +157,31 @@ typedef enum {
 }keyboard_type_t;
 
 
-//
-// structure for hardware keyboard info.
-//  As informações sobre o hardware de teclado devem ser mantidas 
-// pelo kernel base, mas não é aqui o lugagr dessa estrutura.
-//
 
-typedef struct keyboard_d keyboard_t;
+
+// structure for hardware keyboard info.
+// As informações sobre o hardware de teclado devem ser mantidas 
+// pelo kernel base, mas não é aqui o lugagr dessa estrutura.
+
 struct keyboard_d
 {
-	object_type_t objectType;
-	object_class_t objectClass;
+    object_type_t  objectType;
+    object_class_t objectClass;
 
-	keyboard_type_t type;
-	//...
-	int dummy;
-	//int VendorId;
-	//...
+    keyboard_type_t type;
+    //...
+    int dummy;
+    //int VendorId;
+    //...
 
     //unsigned long normal_charmap_address;
     //unsigned long shift_charmap_address;
     //unsigned long control_charmap_address;
 
-	//unsigned long keyboard_handler_address;
-
+    //unsigned long keyboard_handler_address;
 };
-//keyboard_t *Keyboard;
+
+
 
 
 // keyboardMessage
@@ -190,14 +192,20 @@ struct keyboardMessage
     unsigned char scancode;
 
     //??
-    //@todo: Na verdade todo driver usará estrutura de janela descrita na API 
-    //que o driver use.
+    //#todo: 
+    // Na verdade todo driver usará estrutura de janela 
+    // descrita na API que o driver use.
 
     //? hwnd;  
     int message;
     unsigned long long1;
     unsigned long long2;
 };
+
+
+//
+// ======================================================
+//
 
 
 //
@@ -237,7 +245,16 @@ unsigned long scrolllock_status;
 unsigned long keyboard_handler_address;
 
 
-// Send message.				  
+
+//
+// ===============================================
+//
+
+void xxx_keyboard_write (uint8_t data);
+uint8_t xxx_keyboard_read (void);
+
+
+// Send message.
 // Pega um scancode, transforma em caractere e envia na forma de mensagem
 // para a thread de controle associada com a janela que tem o foco de entrada.
 
@@ -285,10 +302,6 @@ void kbdc_wait (unsigned char type);
 //Pega o status das teclas de modificação.
 unsigned long keyboardGetKeyState (unsigned char key);
 
-
-uint8_t keyboard_read (void);
-
-void keyboard_write (uint8_t write);
 
 
 // Service

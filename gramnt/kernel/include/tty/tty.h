@@ -88,10 +88,19 @@ struct tty_line_d
 };
 
 
+/*
+ *************************************** 
+ * tty_d:
+ * 
+ *     The tty structure need to have a pointer to
+ * a buffer and a pointer to a thread. These is the where
+ * we're gonna send the data.
+ * 
+ */
 
-//estrutura para tty
-//uma estrutura de tty deve estar associado a
-//uma janela de terminal virtual.
+// estrutura para tty
+// uma estrutura de tty deve estar associado a
+// uma janela de terminal virtual.
 
 struct tty_d
 {
@@ -103,6 +112,8 @@ struct tty_d
     int used;
     int magic;
 
+    // Control thread;
+    struct thread_d *control;
 
     //
     // == Security ============================================

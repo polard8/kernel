@@ -862,7 +862,13 @@ done:
 
 // Send a message to the thread associated with the
 // window with focus.
-// Isso é chamado por: KEYBOARD_SEND_MESSAGE().
+
+// Called by KEYBOARD_SEND_MESSAGE() in ps2kbd.c.
+
+// #todo:
+// We need to associate the current thread and the current tty.
+// tty->control
+// window->control
 
 int
 kgws_send_to_controlthread_of_currentwindow ( 

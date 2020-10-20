@@ -2681,7 +2681,7 @@ void windowUnblockFocus (void)
 // Revendo a questão de repintar a janela mãe quando se seta o foco. 
  
 void SetFocus ( struct window_d *window ){
-	
+
     // priority stuff
     struct thread_d *thread;
 
@@ -2694,34 +2694,46 @@ void SetFocus ( struct window_d *window ){
         panic ("SetFocus: window");
 
     }else{
-	
-	    if ( window->used != 1 || window->magic != 1234 )
-	    {
-		    panic ("SetFocus: validation");
-		}
+        if ( window->used != 1 || window->magic != 1234 ){
+            panic("SetFocus: Validation");
+        }
 
-		// ... ok
+        // ... 
 
-        window->focus = 1; 
+        // ok: Let's set the focus.
+
         window_with_focus = (int) window->id;
+        
+        window->focus = 1; 
+
         WindowWithFocus = (void *) window;
-	};
-	
+    };
+
 
     // Process and thread.
 
     //if ( (void *) window->control == NULL )
         //panic(?)
-        
+
+
+    // Let's check the validation of the control thread
+    // and send it's pointer to the current TTY.
+    // #bugbug: For now we're gonna setup only the virtual console. 
+    // It's because it is easier to do this right now.
     // Focus, priority and quantum.
     if ( (void *) window->control != NULL )
     {
-        // [Focus]
+        // Focus!!
         // Who can read the input.
         active_process = window->control->ownerPID; 
-        active_thread = window->control->tid;
+        active_thread  = window->control->tid;
       
-        //priority
+        // Current virtual console.
+        TTY[current_vc].control = (struct thread_d *) window->control;
+      
+        // ...
+      
+        // priority
         set_thread_priority ( (struct thread_d *) window->control,
             PRIORITY_MAX );
     }

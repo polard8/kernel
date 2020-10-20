@@ -1,10 +1,18 @@
+/*
+ * File: ps2mouse.h
+ * 
+ * 
+ *     ? - Created by Fred Nora.
+ */
 
-// ps2mouse.h
 
 
 #ifndef ____PS2MOUSE_H
-#define ____PS2MOUSE_H
+#define ____PS2MOUSE_H    1
 
+
+// #bugbug
+// We have these same definitions on ps2mouse.c ??
 
 
 //Standard PS/2 Mouse Commands
@@ -22,7 +30,6 @@
 //0xEB	None	Read Data
 //0xEA	None	Set Stream Mode
 //0xE9	None	Status Request
-
 
 
 
@@ -62,10 +69,17 @@
 // hardwarelib.inc
 //
 
-
 #define MOUSE_X_SIGN	0x10
 #define MOUSE_Y_SIGN	0x20
 
+
+
+
+
+
+//
+// =====================================================
+//
 
 
 
@@ -119,9 +133,12 @@ int mouse_button_action;
 //=========================================================
 
 
+// #bugbug
+// This is very ugly!
+// Please, use the standard io/out routines.
 
-//?? usado pelo mouse ??
-#define outanyb(p) __asm__ __volatile__( "outb %%al,%0" : : "dN"((p)) : "eax" )
+#define outanyb(p)  asm volatile ( "outb %%al,%0" : : "dN"((p)) : "eax" )
+
 
 
 //
@@ -129,16 +146,17 @@ int mouse_button_action;
 //
 
 
-
 unsigned long g_mousepointer_width;
 unsigned long g_mousepointer_height;
 
 
+// read and write the controller.
+// ?? not used ??
+void xxx_mouse_write (unsigned char data);
+unsigned char xxx_mouse_read (void);
+
 
 void expect_ack (void);
-
-
-
 
 
 
@@ -149,9 +167,7 @@ void expect_ack (void);
 int MOUSE_SEND_MESSAGE ( void *buffer );
 
 
-void mouse_write (unsigned char write);
 
-unsigned char mouse_read (void);
 
 static unsigned char getMouseData (void);
 
@@ -179,19 +195,23 @@ void ps2mouse_initialize_device (void);
 void set_ps2_mouse_status(int status);
 int get_ps2_mouse_status(void);
 
+
 // Conversando com o driver para fazer configurações.
 unsigned long 
-ps2_mouse_dialog ( int msg,
-                   unsigned long long1,
-                   unsigned long long2 );
+ps2_mouse_dialog ( 
+    int msg,
+    unsigned long long1,
+    unsigned long long2 );
                    
                    
-unsigned long ps2_mouse_get_info ( int i );
+unsigned long ps2_mouse_get_info(int i);
 
-void ps2mouse_change_and_show_pointer_bmp ( int number );
+// ?
+void ps2mouse_change_and_show_pointer_bmp (int number);
 
 
 #endif   
+
 
 
 //

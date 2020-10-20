@@ -1269,7 +1269,12 @@ int console_get_current_virtual_console (void)
 // #IMPORTANTE
 // Essa função apresenta problemas de compilação
 // quando incluímos mais código.
-// See: console.h
+
+// #test
+// We are including a pointer to the RIT. raw input thread.
+// This is the control thread of the window with focus on kgws.
+
+// See: console.h and tty.h
 
 void console_init_virtual_console (int n){
 
@@ -1286,6 +1291,9 @@ void console_init_virtual_console (int n){
         panic       ("console_init_virtual_console: [FAIL] ConsoleIndex\n");
     }
 
+
+    // No thread for now.
+    TTY[ConsoleIndex].control = NULL;
 
     // #bugbug: 
     // 'cursor_width' is not a good name.

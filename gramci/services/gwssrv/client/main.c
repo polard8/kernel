@@ -162,8 +162,7 @@ int main ( int argc, char *argv[] ){
 
 
     // #debug
-    // while(1){}
-
+    while(1){}
 
     // exit
     gws_debug_print ("gws: bye :) \n");
