@@ -641,9 +641,19 @@ int main ( int argc, char *argv[] ){
     addr_in.sin_port   = PORTS_WS;   
     addr_in.sin_addr.s_addr = IP(127,0,0,1); 
 
+
+
+
     // Metrics.
     unsigned long w = gws_get_system_metrics(1);
     unsigned long h = gws_get_system_metrics(2);
+
+
+    if ( w == 0 || h == 0 ){
+        printf ("editor: w h \n");
+        exit(1);
+    }
+
 
 
     // #todo:
@@ -736,6 +746,28 @@ int main ( int argc, char *argv[] ){
     int client_window=0;
     int button=0;
 
+    // a janela eh a metade da tela.
+    unsigned long w_width  = (w/2);
+    unsigned long w_height = (h/2); 
+
+    unsigned long viewwindowx = ( ( w - w_width ) >> 1 );
+    unsigned long viewwindowy = ( ( h - w_height) >> 1 ); 
+
+
+    // #hackhack
+    // @media
+    // se a tela for pequena demais para os dias de hoje. hahaha
+    if ( w == 320 )
+    {
+        // dimensoes
+        w_width  = w;
+        w_height = h;
+        
+        //posicionamento
+        viewwindowx = 0;
+        viewwindowy = 0;
+    }
+
 
     //
     // == main window ============================================
@@ -743,7 +775,7 @@ int main ( int argc, char *argv[] ){
 
     main_window = gws_create_window (client_fd,
         WT_OVERLAPPED, 1, 1, "Editor", 
-        4, 4, (w-40), (h-40),
+        viewwindowx, viewwindowy, w_width, w_height,
         0, 0, COLOR_GRAY, COLOR_GRAY );
 
     if ( main_window < 0 )             
@@ -766,8 +798,8 @@ int main ( int argc, char *argv[] ){
 
     addressbar_window = gws_create_window (client_fd,
         WT_EDITBOX,1,1,"address-bar",
-        (( (w-40)/8 )*2), 32 +4,
-        (( (w-40)/8 )*3), 32,    
+        (( w_width/8 )*2), 32 +4,
+        (( w_width/8 )*3), 32,    
         main_window,0,COLOR_WHITE, COLOR_WHITE);
 
     if ( addressbar_window < 0 )             
@@ -789,8 +821,8 @@ int main ( int argc, char *argv[] ){
 
     button = gws_create_window (client_fd,
         WT_BUTTON,1,1,"Save",
-        (( (w-40)/8 )*6), 32 +4,     //(w-100-4), 4, //(640-100), 4, 
-        (( (w-40)/8 )*1), 32,
+        (( w_width/8 )*6), 32 +4,     //(w-100-4), 4, //(640-100), 4, 
+        (( w_width/8 )*1), 32,
         main_window, 0, COLOR_GRAY, COLOR_GRAY);
 
     if ( button < 0 ) 
@@ -804,7 +836,7 @@ int main ( int argc, char *argv[] ){
     client_window = gws_create_window (client_fd,
         WT_EDITBOX,1,1,"client",
         4, 32 +40, 
-        (w-40 -4 -2), ( (h-40) -32 - 40 -4 ),
+        (w_width -4 -2), ( w_height -32 - 40 -4 ),
         main_window,0,COLOR_WHITE, COLOR_WHITE);
 
     if ( client_window < 0 ) 

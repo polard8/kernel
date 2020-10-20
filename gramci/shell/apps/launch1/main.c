@@ -66,6 +66,8 @@
 // ...
 
 
+static int running = 1;
+
 
 // #test
 // Tentando deixar o buffer aqui e aproveitar em mais funções.
@@ -81,18 +83,26 @@ char __buffer[512];
 
 
 
+//
+// == prototypes ================================================
+//
+
+
 // Hello!
-// Podemos isso na lib.
-int browser_hello_request(int fd);
-int browser_hello_response(int fd);
+int launch1_hello_request(int fd);
+int launch1_hello_response(int fd);
 
-
-//message support
+// message support
 int _loop(int fd);
-int browser_getmessage_request(int fd);
-int browser_getmessage_response(int fd);
+int launch1_getmessage_request(int fd);
+int launch1_getmessage_response(int fd);
 
-int browser_getmessage_request(int fd)
+
+//
+// =========================================================
+//
+
+int launch1_getmessage_request(int fd)
 {
     // Isso permite ler a mensagem na forma de longs.
     unsigned long *message_buffer = (unsigned long *) &__buffer[0];   
@@ -116,7 +126,7 @@ int browser_getmessage_request(int fd)
     while (1)
     {
         // #debug
-        gws_debug_print ("browser: Sending request ...\n");      
+        gws_debug_print ("launch1: Sending request ...\n");      
     
         // Create window    
         message_buffer[0] = 0;       // window. 
@@ -149,7 +159,7 @@ int browser_getmessage_request(int fd)
 }
 
 
-int browser_getmessage_response(int fd)
+int launch1_getmessage_response(int fd)
 {
     unsigned long *message_buffer = (unsigned long *) &__buffer[0];   
     int n_reads = 0;    // For receiving responses.
@@ -191,7 +201,7 @@ int browser_getmessage_response(int fd)
 response_loop:
 
     // #debug
-    gws_debug_print ("browser: Getting response ...\n");      
+    gws_debug_print ("launch1: Getting response ...\n");      
 
 
     //n_reads = read ( fd, __buffer, sizeof(__buffer) );
@@ -210,8 +220,8 @@ response_loop:
     
     // Se retornou -1 é porque algo está errado com o arquivo.
     if (n_reads < 0){
-        gws_debug_print ("browser: recv fail.\n");
-        printf ("browser: recv fail.\n");
+        gws_debug_print ("launch1: recv fail.\n");
+        printf ("launch1: recv fail.\n");
         printf ("Something is wrong with the socket.\n");
         exit (1);
     }
@@ -242,6 +252,7 @@ response_loop:
             //gws_debug_print ("MSG_KEYDOWN\n");
             switch (long1)
             {
+                case 'q': running = 0; break;
                 //case 0:
                     //relax cpu
                     //break; 
@@ -261,8 +272,8 @@ response_loop:
                 // We need to send it to the client via file.
                 default:
                     //terminal_write_char(long1) #todo
-                    printf ("%c",long1);
-                    fflush(stdout);
+                    //printf ("%c",long1);
+                    //fflush(stdout);
                     goto process_event;
                     break;
             };
@@ -279,8 +290,14 @@ response_loop:
         case MSG_SYSKEYDOWN:
             switch (long1)
             {
-                case VK_F1:
+                case VK_F1:  
                     gws_reboot();
+                    break;
+                
+                
+                case VK_F2:
+                    running = 0;  //sai do loop.
+                    //exit(0);
                     break;
                     
                 default:
@@ -331,7 +348,7 @@ response_loop:
             break;
             
         case SERVER_PACKET_TYPE_ERROR:
-            gws_debug_print ("browser: SERVER_PACKET_TYPE_ERROR\n");
+            gws_debug_print ("launch1: SERVER_PACKET_TYPE_ERROR\n");
             goto response_loop;
             //exit (-1);
             break;
@@ -356,12 +373,12 @@ response_loop:
 process_reply:
 
     // #test
-    gws_debug_print ("browser: Testing close() ...\n"); 
+    gws_debug_print ("launch1: Testing close() ...\n"); 
     //close (fd);
 
     //gws_debug_print ("gwst: bye\n"); 
-    printf ("browser: Window ID %d \n", message_buffer[0] );
-    //printf ("browser: Bye\n");
+    printf ("launch1: Window ID %d \n", message_buffer[0] );
+    //printf ("launch1: Bye\n");
     
     // #todo
     // Podemos usar a biblioteca e testarmos
@@ -374,19 +391,23 @@ process_reply:
 //
 
 process_event:
-    gws_debug_print ("browser: We got an event\n"); 
+    gws_debug_print ("launch1: We got an event\n"); 
     return 0;
 }
 
 
-//loop
-int _loop(int fd)
-{
-	//while(___running){
-    while(1){
-        browser_getmessage_request(fd);
-        browser_getmessage_response(fd);
+//
+// == Loop ==================================================
+//
+
+int _loop (int fd){
+
+    //while (1){
+    while (running){
+        launch1_getmessage_request(fd);
+        launch1_getmessage_response(fd);
     }
+
     return 0; 
 }
 
@@ -637,7 +658,7 @@ struct sockaddr_in addr = {
 
 
 
-int browser_hello_response(int fd){
+int launch1_hello_response(int fd){
 
     unsigned long *message_buffer = (unsigned long *) &__buffer[0];   
     int n_reads = 0;    // For receiving responses.
@@ -654,7 +675,7 @@ int browser_hello_response(int fd){
     // obs: Nesse momento deveríamos estar dormindo.
 
     // #debug
-    debug_print ("browser: Waiting ...\n");      
+    debug_print ("launch1: Waiting ...\n");      
 
 
     int y;
@@ -668,7 +689,7 @@ int browser_hello_response(int fd){
     //
 
     // #debug
-    debug_print ("browser: Reading ...\n");      
+    debug_print ("launch1: Reading ...\n");      
 
 
        //#caution
@@ -689,7 +710,7 @@ __again:
     }
     
     if (n_reads < 0){
-        printf ("browser: recv fail.\n");
+        printf ("launch1: recv fail.\n");
         printf ("Something is wrong with the socket.\n");
         exit (1);
     }
@@ -707,7 +728,7 @@ __again:
             break;
             
         case SERVER_PACKET_TYPE_REPLY:
-            debug_print ("browser: SERVER_PACKET_TYPE_REPLY received\n"); 
+            debug_print ("launch1: SERVER_PACKET_TYPE_REPLY received\n"); 
             goto process_reply;
             break;
             
@@ -717,7 +738,7 @@ __again:
             break;
             
         case SERVER_PACKET_TYPE_ERROR:
-            debug_print ("browser: SERVER_PACKET_TYPE_ERROR\n");
+            debug_print ("launch1: SERVER_PACKET_TYPE_ERROR\n");
             goto __again;
             //exit (-1);
             break;
@@ -741,7 +762,7 @@ process_reply:
 }
 
 
-int browser_hello_request(int fd){
+int launch1_hello_request(int fd){
 
     // Isso permite ler a mensagem na forma de longs.
     unsigned long *message_buffer = (unsigned long *) &__buffer[0];   
@@ -763,7 +784,7 @@ new_message:
     //
 
     // #debug
-    debug_print ("browser: Writing ...\n");      
+    debug_print ("launch1: Writing ...\n");      
 
     // Enviamos um request para o servidor.
     // ?? Precisamos mesmo de um loop para isso. ??
@@ -783,8 +804,8 @@ new_message:
         // ...
 
         n_writes = write (fd, __buffer, sizeof(__buffer));
-        if(n_writes>0)
-           break;
+        
+        if (n_writes>0) { break; }
     }
 
     return 0;
@@ -798,6 +819,9 @@ new_message:
  */
 
 int main ( int argc, char *argv[] ){
+
+
+    running = 1;
 
     int client_fd = -1;
 
@@ -890,8 +914,12 @@ int main ( int argc, char *argv[] ){
     // na string do title bar.
     // =============================================================
 
-    browser_hello_request (client_fd);
-    browser_hello_response (client_fd);
+
+    // #suspenso
+    //launch1_hello_request (client_fd);
+    //launch1_hello_response (client_fd);
+
+
 
     // The main window.
     // #todo: Can gws_create_window call these two functions? 
@@ -901,10 +929,10 @@ int main ( int argc, char *argv[] ){
 
     //#todo: salvar em global
     //por enquanto aqui
-    int main_window;
-    int button1_window;
-    int button2_window;
-    int button3_window;
+    int main_window=0;
+    int button1_window=0;
+    int button2_window=0;
+    int button3_window=0;
 
 
     // a janela eh a metade da tela.
