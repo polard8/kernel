@@ -121,10 +121,21 @@ ifeq ($(ARCH),x86)
 
 
 	REQUEST_OBJECTS := request.o 
-	PANIC_OBJECTS := panic.o 
-	REBOOT_OBJECTS := reboot.o 
-	SYS_OBJECTS := sys.o pump.o sifs.o siws.o sins.o   
+	
+	PANIC_OBJECTS   := panic.o 
+	
+	REBOOT_OBJECTS  := reboot.o 
+	
+	SYS_OBJECTS     := sys.o pump.o sifs.o siws.o sins.o   
 
+
+    #
+    # == Objects ================================================
+    #
+    
+    # See the DOOM makefile.
+    # All the objects has a prefix to keep the class together.
+    # We can do the same for some classes here.
 
 	OBJECTS := $(ENTRY_OBJECTS) \
 	$(EXECVE_OBJECTS) \
