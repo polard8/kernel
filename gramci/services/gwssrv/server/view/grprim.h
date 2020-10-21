@@ -141,6 +141,20 @@ plotCharBackbufferDrawcharTransparentZ (
     int z );
 
 
+// substitui cor no lfb
+void grDCMono (
+    struct gws_display_d *dc,
+    unsigned char subpixel_quest,         //I64 quest=COLOR_TRANSPARENT,
+    unsigned char subpixel_true_color,    //I64 true_color=0,
+    unsigned char subpixel_false_color );  //I64 false_color=COLOR_MONO)
+
+
+// substitui cor no lfb
+void grDCColorChg ( 
+    struct gws_display_d *dc,
+    unsigned char subpixel_src_color,
+    unsigned char subpixel_dst_color );  // dst_color=COLOR_TRANSPARENT )
+
 #endif    
 
 

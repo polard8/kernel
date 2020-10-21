@@ -399,6 +399,11 @@ int gwsInit(void)
         
         CurrentScreen->width  = SavedX;
         CurrentScreen->height = SavedY;
+        CurrentScreen->bpp    = SavedBPP;  // bits per pixel
+        
+        CurrentScreen->pitch = ( SavedX * (SavedBPP/8) );
+
+
         CurrentScreen->font_size   = 0;    //todo
         CurrentScreen->char_width  = 0;    //todo
         CurrentScreen->char_height = 0;    //todo
@@ -416,7 +421,10 @@ int gwsInit(void)
         CurrentScreen->max_y = ( CurrentScreen->height / 2 );
        
         //...
-
+        
+        if ( (void*) CurrentDisplay != NULL ){
+            CurrentDisplay->screen = CurrentScreen;
+        }
     };
 
 

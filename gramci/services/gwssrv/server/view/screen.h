@@ -14,8 +14,10 @@ struct gws_screen_d
     
     unsigned long width;
     unsigned long height;
-    //bpp?
+    unsigned long bpp;    // bits per pixel
     
+    
+    unsigned long pitch;
     
     unsigned long hotspot_x;
     unsigned long hotspot_y;

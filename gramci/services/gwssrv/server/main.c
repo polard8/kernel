@@ -1733,9 +1733,29 @@ void InitGraphics(void){
     //gws_refresh_rectangle(0,0,400,400);
     //gws_show_window_rect(gui->screen);
     
+    
+    
+    
+    
+    // refresh
     gws_show_backbuffer();              
-    //while(1){}
-       
+    
+
+    // Change
+    // Se encontrar o 0x80 muda para 0x50 caso contrario mude para 0x00
+    //grDCMono ( CurrentDisplay, 0x80, 0x50, 0x00 );
+    
+    // Se encontrar 0x80 mude para 0x50.
+    //grDCColorChg ( CurrentDisplay, 0x80, 0x50 );
+    
+    // filtro
+    // atenuando
+
+    grDCColorChg ( CurrentDisplay, 0x80, 0x80 - 0x30 );
+    grDCColorChg ( CurrentDisplay, 0xC0, 0x80 - 0x30 );
+    grDCColorChg ( CurrentDisplay, 0xFF, 0x80 - 0x30 );
+    grDCColorChg ( CurrentDisplay, 0x00, 0x80 - 0x30 );
+    while(1){}
     
         
     debug_print("gwssrv: InitGraphics done\n");

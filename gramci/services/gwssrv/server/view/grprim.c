@@ -1113,6 +1113,144 @@ plotCharBackbufferDrawcharTransparentZ (
     };
 }
 
- 
+
+
+// substitui cor no lfb
+void grDCMono (
+    struct gws_display_d *dc,
+    unsigned char subpixel_quest,         //I64 quest=COLOR_TRANSPARENT,
+    unsigned char subpixel_true_color,    //I64 true_color=0,
+    unsigned char subpixel_false_color )  //I64 false_color=COLOR_MONO)
+{
+
+    int i=0;
+    unsigned char *dst;
+
+    struct gws_screen_d *screen;
+
+
+    printf ("grDCMono:\n");
+
+    // Device context
+    if ( (void *) dc == NULL )
+    {
+        printf ("dc\n");
+        return;
+     }
+
+    if (dc->used != 1 || dc->magic != 1234 )
+    {
+        printf ("dc validation\n");
+        return;
+     }
+
+
+    //
+    // Screen
+    //
+
+    screen = dc->screen;
+
+    if ( (void*) screen == NULL )
+    {
+        printf ("screen\n");
+        return;
+     }
+
+
+    if (screen->used != 1 || screen->magic != 1234 )
+    {
+        printf ("screen validation\n");
+        return;
+     }
+
+
+
+    // 3 BPP
+    if (screen->bpp == 24) {
+        
+        dst = (unsigned char *) screen->frontbuffer;  //dst = dc->body;
+        i = (int) (screen->height * screen->pitch);   //i = dc->width_internal*dc->height;
+
+        //if (i<0)
+            //return;
+                   
+        while (i--){
+            
+            if ( *dst == subpixel_quest ){
+                *dst++ = subpixel_true_color;
+            }else{
+                *dst++ = subpixel_false_color;
+            };
+        };
+    }
+}
+
+
+
+// substitui cor no lfb
+void grDCColorChg ( 
+    struct gws_display_d *dc,
+    unsigned char subpixel_src_color,
+    unsigned char subpixel_dst_color )  // dst_color=COLOR_TRANSPARENT )
+{
+
+    int i=0;
+    unsigned char *dst;
+
+    struct gws_screen_d *screen;
+
+
+    printf ("grDCColorChg:\n");
+
+    // Device context
+    if ( (void *) dc == NULL )
+        return;
+
+    if (dc->used != 1 || dc->magic != 1234 )
+        return;    
+
+
+
+    //
+    // Screen
+    //
+
+    screen = dc->screen;
+
+    if ( (void*) screen == NULL )
+        return;
+
+    if (screen->used != 1 || screen->magic != 1234 )
+        return;    
+
+
+    if (screen->bpp == 24) {    
+        
+        dst = (unsigned char *) screen->frontbuffer;
+        i = (int) (screen->height * screen->pitch);
+        
+        while (i--){
+            
+            if (*dst == subpixel_src_color){
+                *dst++ = subpixel_dst_color;
+            }else{
+                dst++;
+            };
+        };
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 

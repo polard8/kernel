@@ -24,7 +24,7 @@ struct gws_display_d
     
     //#test
     //only one screen for now.
-    //struct gws_screen_d *screen;
+    struct gws_screen_d *screen;
     
     //#test
     //root window for the screen ??
