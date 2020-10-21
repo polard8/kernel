@@ -198,13 +198,12 @@ start_msg_rebooting       db 'start: Rebooting..',      13,10,0
 ;================================================================
 ; startGUI:
 ;
-;     Initializes BL.BIN in graphyc mode.
+;     Initializes BL.BIN in graphics mode.
+;     Inicia o BL.BIN no modo grafico.
 ;
-;     Inicia o BL.BIN no modo gr�fico.
-;     
 ; obs: 
 ; Quando retornamos para o modo real e ativamos o modo gr�fico,
-; Saltamos para c� com a op��o de usamos mensagens em modo gr�fico 
+; Saltamos para c� com a opçao de usamos mensagens em modo gr�fico 
 ; em modo protegido.
 
 
@@ -227,15 +226,14 @@ start_msg_rebooting       db 'start: Rebooting..',      13,10,0
 
 startGUI:
 
-	;;===============
-	;;setup machine
+    ;;===============
+    ;; Setup machine
 
     cli
 
-	;GDT and IDT. 
-	lgdt [lgdt_opcode]
-	lidt [lidt_opcode]
-
+    ; GDT and IDT. 
+    lgdt [lgdt_opcode]
+    lidt [lidt_opcode]
 
     ;; #todo: 
     ;; Nessa hora alguns vetores podem ser configurados.
@@ -248,16 +246,16 @@ startGUI:
 
 ;.setupPICMODE:
 
+	; PIC.
 
-	;PIC.
 	cli
-	mov al, 00010001b		; Begin PIC 1 initialization.
+	mov al, 00010001b    ; Begin PIC 1 initialization.
 	out 0x20, al
-	mov al, 00010001b		; Begin PIC 2 initialization.
-	out 0xA0, al	
-	mov al, 0x20			; IRQ 0-7: interrupts 20h-27h.
+	mov al, 00010001b    ; Begin PIC 2 initialization.
+	out 0xA0, al
+	mov al, 0x20         ; IRQ 0-7:  interrupts 20h-27h.
 	out 0x21, al
-	mov al, 0x28			; IRQ 8-15: interrupts 28h-2Fh.
+	mov al, 0x28         ; IRQ 8-15: interrupts 28h-2Fh.
 	out 0xA1, al
 	mov al, 4
 	out 0x21, al
@@ -266,8 +264,8 @@ startGUI:
 	mov al, 1
 	out 0x21, al
 	out 0xA1, al
-	
-	
+
+
 	
 	;;@todo:
 	;;Init RTC.
@@ -324,34 +322,35 @@ startGUI:
 	;fat lba, root lba ...
 	;call fat16DetectFSParameters  ;;fat16lib.inc
 
-    ;Setup current dir.
+    ;;
+    ;; ========================================================
+    ;;
+    
+    ;; Set up LBA for first FAT, root dir and data area.
+    
     mov dword [g_current_fat_lba],        FAT16_FAT_LBA       ;Fat do volume atual
-    mov dword [g_current_directory_lba],  FAT16_ROOTDIR_LBA   ;Diret�rio do volume atual.
+    mov dword [g_current_directory_lba],  FAT16_ROOTDIR_LBA   ;Diretorio do volume atual.
     mov dword [g_current_dataarea_lba],   FAT16_DATAAREA_LBA  ;?? ;lba do inicio da area de dados do volume atual.
-    ;Continua...
+    ; Continua ...
 
 
-	
+
     ;; Configurando PCI. (O b�sico suportado pelo Boot Manager.)
-	;; O boot manager est� carregando o BL utilizando recursos 
-	;; do BIOS em modo real. Mas se o BM fosse carregar o BL 
-	;; de um dispositivo SATA em 32bit teria que configurar o PCI.
-	;; (Se poss�vel deixaremos para o BL o penoso trabalho de lidar
-	;; com PCI, j� que o BL � feito em C, isso deve ser mais f�cil para
-	;; o BL do que para o BM.)
-	
-	;step
-	;;PCI device descovery.
+    ;; O boot manager est� carregando o BL utilizando recursos 
+    ;; do BIOS em modo real. Mas se o BM fosse carregar o BL 
+    ;; de um dispositivo SATA em 32bit teria que configurar o PCI.
+    ;; (Se poss�vel deixaremos para o BL o penoso trabalho de lidar
+    ;; com PCI, j� que o BL � feito em C, isso deve ser mais f�cil para
+    ;; o BL do que para o BM.)
 
-	
-	;CURSOR.
-	call reset_cursor 
-	
+	;; step
+	;; PCI device descovery.
 
-	;
-	; Continua ...
-	;
+    ; Cursor.
+    call reset_cursor 
 
+
+    ;; ...
 
     ; mask all interrupts.
     ; ====================
@@ -362,17 +361,26 @@ startGUI:
     out 0x21, al
 
 
-	; setup registers.
+	; Setup registers.
 	mov ax, word 0x10  
 	mov ds, ax
 	mov es, ax 
+	;mov fs, ax
+	;mov gs, ax 
+	
+	;; #bugbug
+	;; Missing ss register. (This is a test) (out. 2020)
+	mov ss, ax
+
 	mov eax, stack_ptr
 	mov esp, eax 
-	
-	;Configura volume.
+
+
+	; Configura volume.
 	mov al, byte 1
 	call set_fs_volume
-	
+
+
 	;Configura fs type.
 	mov al, byte 1
 	call set_fs_type
@@ -382,18 +390,19 @@ startGUI:
     ;; Configura LFB e Buffer.
     ;; #todo: Change this name.
     
-    call configura_lfb
+    call setup_lfb
 
 
     ;; #bugbug
     ;; Cancelando isso.
-	;; Pois esses valores est�o acima do limite de 16MB.
-	;; Qualquer coisa para sistemas acima de 16MB ser�o 
-	;; configuradas pelo kernel depois de detectar a 
-	;; quantidade de mem�ria.
+    ;; Pois esses valores est�o acima do limite de 16MB.
+    ;; Qualquer coisa para sistemas acima de 16MB ser�o 
+    ;; configuradas pelo kernel depois de detectar a 
+    ;; quantidade de mem�ria.
     ;; #todo: Change this name.
     
-    ;call configura_buffer
+    ;call setup_buffer
+
 
 	;
 	;se configurar o modo 3 n�o tem como 
@@ -777,15 +786,13 @@ startGUI:
 
 
 ;-------------------------------------
-; configura_lfb:
+; setup_lfb:
 ;     Atualiza LFB address.
 ;     Salva LFB.
 ;     #todo: Change the name.
 ;++
 
-;startSetupLFB:
-
-configura_lfb:
+setup_lfb:
     push edx   
     mov  edx, dword [ModeInfo_PhysBasePtr]  
     mov dword [VIDEO.lfb], edx
@@ -796,7 +803,7 @@ configura_lfb:
 
 
 ;-------------------------------------
-; configura_buffer:
+; setup_buffer:
 ;     Configura buffer para modo gr�fico.
 ;     
 ;  #bugbug 
@@ -809,9 +816,7 @@ configura_lfb:
 ;
 ;++
 
-;startSetupBuffer:
-	
-configura_buffer:
+setup_buffer:
 
     ;; #bugbug
     ;; Cancelando isso.

@@ -465,10 +465,11 @@ rmStartGUI:
     mov ss,ax
     mov esp, dword 0x0009FFFC
 
-	;; #Importante:
-	;; Daqui pra frente não usaremos mais o seletor para 32bit, somente 
-	;; o seletor para modo protegido de 16bit.
-	;; Pula para o o modo protegido de 16bit, usando o seletor de 16bit.
+    ;; #importante:
+    ;; Pula para o o modo protegido de 16 bit, 
+    ;; usando o seletor de 16 bit.
+    ;; Daqui pra frente não usaremos mais o seletor para 32 bit, 
+    ;; somente o seletor para modo protegido de 16 bit.
 
     jmp RM_Code_Sel:pmode_16bit_startgui
 
@@ -486,10 +487,8 @@ pmode_16bit_startgui:
     ;mov fs, ax
     ;mov gs, ax
 
-
     ;debug
     ;jmp $
-
 
     ; Carrega ivt = 0:0
 
@@ -537,16 +536,16 @@ do_rm_startgui:
     mov fs, ax
     mov gs, ax
 
-	; Create stack
+    ; Create stack
     mov ax, 0x0000
     mov ss, ax
     mov sp, 0xFFFF
 
-	;; Reprogram PIC: 
-	;; Voltando ao estado legado.
-	;; changes: 
-	;; IRQ 0-7 to INT 08h-0Fh  
-	;; IRQ 8-15 to INT 70h-77h
+    ;; Reprogram PIC: 
+    ;; Voltando ao estado legado.
+    ;; Changes: 
+    ;; IRQ 0-7 to INT 08h-0Fh  
+    ;; IRQ 8-15 to INT 70h-77h
 
     mov al, 10001b       ; Begin PIC 1 initialization.
     out 20h, al
@@ -591,12 +590,10 @@ do_rm_startgui:
     mov ax, 0x0003
     int 0x10
 
-
 	;; #Importante:
 	;; Mensagem em modo real.
 	;; Suspenderemos essa mensagem porque está degradando o desempenho.
 	;; Ela será uma opção de debug.
-
 
 	;; #debug
 	;; mov si, rm_startgui_msg1
@@ -743,8 +740,15 @@ gramado_mode_CALIFORNIA:
 
     mov word [META$FILE.VIDEO_MODE], G_VIDEO_MODE
 
+
+;;================================================================
+;; ____gramado_mode_done:
+;;
+;;
+
     ; Inicializa o modo selecionado.
     ; See: stage2/lib16/s2modes.inc
+    
 ____gramado_mode_done:
 
     ; Set mode.

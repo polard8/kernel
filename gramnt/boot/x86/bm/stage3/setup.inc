@@ -12,42 +12,37 @@
 ; setup_machine:
 ;     Configura a arquitetura.  ??obs: @todo: certificar que estamos um 32bit ??
 ;
+
 setup_machine:
-;    nop
-;setupSetupMachine:
 
-    ;;
-	;; Interrupt enabling: 
-	;; Começaremos configurando suporte a interrupções.
-	;;
-
-    pushad
-	
-	cli
-
-    ;GDT and IDT. 	
+    ;; Interrupt enabling: 
+    ;; Começaremos configurando suporte a interrupções.
     
-	lgdt [lgdt_opcode] 
-	lidt [lidt_opcode]	
-	
-	;;
-	;; @todo: Nessa hora alguns vetores podem ser configurados.
-	;;        primeiro as excessões e depois as ISRs.
-	;;
+    pushad
 
-	;;
+    cli
+
+    ; GDT and IDT.
+
+    lgdt [lgdt_opcode] 
+    lidt [lidt_opcode]
+
+
+	;; todo: 
+	;; Nessa hora alguns vetores podem ser configurados.
+	;; primeiro as excessões e depois as ISRs.
+
 	;; Selecting the 'Processor Interrup Mode'.
 	;; * PIC MODE *
-	;;
-		
-	;;
+
     ;; Todos os componentes APIC são ignorados e o sistema opera
     ;; no modo single-thread usando LINT0.
-    ;;	
-		
-;.setupPICMODE:	
 
-	;PIC.
+
+;.setupPICMODE:
+
+	; PIC.
+
 	cli
 	mov al, 00010001b		;begin PIC 1 initialization.
 	out 0x20, al
@@ -101,22 +96,24 @@ setup_machine:
 	
 	;KEYBOARD.
 	;call keyboardInit
-	
-	;IDE0.
-	call init_ide0_master
-	
-	;LFB.
-	;;?? onde está essa rotina ??
-	call configura_lfb   
-	
-	
-	;
-	; #BUGBUG
-	; @todo:
-	;     Aqui estamos usando constantes, porem esses valores precisam ser
+
+
+    ; IDE0.
+    call init_ide0_master
+
+
+    ;; LFB.
+    ;; See: start.inc
+
+    call setup_lfb 
+
+
+	; #bugbug
+	; #todo:
+	; Aqui estamos usando constantes, porem esses valores precisam ser
 	; detectados, pois variam à cada formatação.
-	;
-	
+
+
 	;Detectar os parâmetros do sistema de arquivos FAT16.
 	;fat lba, root lba ...
 	call fat16DetectFSParameters
