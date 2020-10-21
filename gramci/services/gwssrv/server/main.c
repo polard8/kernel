@@ -1750,12 +1750,11 @@ void InitGraphics(void){
     
     // filtro
     // atenuando
-
-    grDCColorChg ( CurrentDisplay, 0x80, 0x80 - 0x30 );
-    grDCColorChg ( CurrentDisplay, 0xC0, 0x80 - 0x30 );
-    grDCColorChg ( CurrentDisplay, 0xFF, 0x80 - 0x30 );
-    grDCColorChg ( CurrentDisplay, 0x00, 0x80 - 0x30 );
-    while(1){}
+    //grDCColorChg ( CurrentDisplay, 0x80, 0x80 - 0x30 );
+    //grDCColorChg ( CurrentDisplay, 0xC0, 0x80 - 0x30 );
+    //grDCColorChg ( CurrentDisplay, 0xFF, 0x80 - 0x30 );
+    //grDCColorChg ( CurrentDisplay, 0x00, 0x80 - 0x30 );
+    //while(1){}
     
         
     debug_print("gwssrv: InitGraphics done\n");
