@@ -908,16 +908,24 @@ int main ( int argc, char *argv[] ){
     // Mas como sabemos que é um soquete,
     // então sabemos que é possível ler.
 
+
+
+
+
+
+
+    // #bugbug    // #bugbug   // #bugbug   // #bugbug
+
+
     // =============================================================
     // #bugbug
     // Sem essa chamada a funçao create window vai falhar
     // na string do title bar.
     // =============================================================
+    launch1_hello_request (client_fd);
+    launch1_hello_response (client_fd);
 
 
-    // #suspenso
-    //launch1_hello_request (client_fd);
-    //launch1_hello_response (client_fd);
 
 
 
