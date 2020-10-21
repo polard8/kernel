@@ -708,8 +708,8 @@ set_thread_priority (
     unsigned long priority )
 {
 
-    unsigned long OldPriority=0;
-    unsigned long BasePriority=0;
+    unsigned long OldPriority  = 0;
+    unsigned long BasePriority = 0;
 
 
     // Limits
@@ -763,6 +763,21 @@ set_thread_priority (
         // ...
     };
     // ??
+}
+
+
+// muda a prioridade para alem dos limites ... teste.
+void threadi_power(
+    struct thread_d *t, 
+    unsigned long priority )
+{
+
+    if ( (void *) t == NULL ){ return; }
+   
+    if ( t->used != 1 || t->magic != 1234 ){ return; }
+    
+    t->priority = priority;
+    t->quantum = ( priority * TIMESLICE_MULTIPLIER );
 }
 
 

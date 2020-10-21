@@ -1017,16 +1017,24 @@ struct process_info_d
 };
 
 
+
 /* 
- * Linux style. */
+ * Linux style. 
+ */
 
 #define invalidate() \
     asm ("movl %%eax,%%cr3"::"a" (0))
 
 
+
+
 //
-// Prot�tipos de fun��o.
+// == Prototypes =====================================================
 //
+
+
+void power_pid (int pid, int power);
+
 
 unsigned long __GetProcessStats ( int pid, int index );
 

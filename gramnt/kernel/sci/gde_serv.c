@@ -92,10 +92,15 @@ gde_extra_services (
     unsigned long arg4 )
 {
 
-    // #todo
-    // Talvez precisaremos disso e do argumento
-    // que passe o endere�o do buffer.
-    // unsigned long *msg = (unsigned long *) buffer;
+
+    struct process_d *__p;
+    struct process_d *__net_process;
+
+    struct desktop_d *__desktop;
+    //struct desktop_d *_Desktop;
+    
+    struct window_d  *__window;
+
 
 
 	//generic file pointer
@@ -317,7 +322,6 @@ gde_extra_services (
     }
     
     
-    struct window_d *__window;
     
     //veja se essa � overlapped.
     if (number == 400)
@@ -341,9 +345,7 @@ gde_extra_services (
     }
 
 
-    //usado por 4 fun��es logo abaixo.
-    struct desktop_d *__desktop;
-    
+
 	// 512 - get ws PID for a given desktop
     if ( number == SYS_GET_WS_PID )
     {
@@ -361,9 +363,12 @@ gde_extra_services (
     }
 
 
-	// 513 - set ws PID for a given desktop
-	// Register a window server.
-	// gramado_ports[11] = ws_pid
+    // 513 - Set ws PID for a given desktop
+    // Register a window server.
+    // gramado_ports[11] = ws_pid
+    // Called by the window server.
+    // arg2 = desktop structure pointer.
+    // arg3 = The window server PID.
 
     if ( number == SYS_SET_WS_PID )
     {
@@ -375,9 +380,17 @@ gde_extra_services (
             {
                 __desktop->ws = (int) arg3;
                 
-                
                 // What is the process listen to the port 11.
                 gramado_ports[GRAMADO_WS_PORT] = (int) current_process;
+                
+                // #test
+                // Eleva a prioridade da thread de controle para alem dos limites.
+                // #bugbug: Cancelado.
+                // Isso melhorou a performance somente no qemu.
+                // Todo o resto piorou. Piorou a conexao entre os processos e
+                // principalmente piorou em resoluçoes maiores e na maquina real.
+                //power_pid(current_process,4);
+                //power_pid(current_process,8);
                 
                 // returning ok.
                 // But, we could return the port number.
@@ -387,8 +400,8 @@ gde_extra_services (
         return NULL; //fail
     }    
     
-	// 514 - get wm PID for a given desktop
-	// IN: desktop
+    // 514 - get wm PID for a given desktop
+    // IN: desktop
     if ( number == SYS_GET_WM_PID )
     {
         // pega o wm de um dado desktop.
@@ -405,8 +418,8 @@ gde_extra_services (
     }
 
 
-	// 515 - set wm PID for a given desktop
-	// IN: desktop, pid
+    // 515 - set wm PID for a given desktop
+    // IN: desktop, pid
     if ( number == SYS_SET_WM_PID )
     {
         __desktop = ( struct desktop_d *) arg2;
@@ -445,17 +458,14 @@ gde_extra_services (
 
 
     // Repinta todas as janelas que foram invalidadas.
-    // Isso ser� usado pelo compositor do window server. 
+    // Isso sera usado pelo compositor do window server. 
     // Ou pelo window manager.
-    if ( number == 518 ){
-        redraw_screen();
-        return NULL;
-    }
+    if ( number == 518 ){  redraw_screen();  return NULL;  }
 
-    // get current desktop
-    if (number == 519){
-        return (void *) CurrentDesktop;
-    }
+
+    // Get current desktop
+    if (number == 519){  return (void *) CurrentDesktop; }
+
 
     // network server
 	// 520 - get ns PID for a given desktop
@@ -504,7 +514,6 @@ gde_extra_services (
 
     // ??
     // setup net buffer for a process.
-    struct process_d *__net_process;
     if (number == 550)
     {
         __net_process = (struct process_d *) processList[arg2];
@@ -560,22 +569,20 @@ gde_extra_services (
                             (const char *) arg4 );             // envp
     }
 
-    
-    
-    struct desktop_d *_Desktop;
+
     
 	// 714 - get ws PID
 	// IN: desktop
     if ( number == 714 )
     {
         // pega o ws de um dado desktop.
-        _Desktop = ( struct desktop_d *) arg2;
-        if ( (void *) _Desktop != NULL )
+        __desktop = ( struct desktop_d *) arg2;
+        if ( (void *) __desktop != NULL )
         {
-            if ( _Desktop->desktopUsed == 1 && 
-                 _Desktop->desktopMagic == 1234 )
+            if ( __desktop->desktopUsed == 1 && 
+                 __desktop->desktopMagic == 1234 )
             {
-                return (void *) _Desktop->ws; 
+                return (void *) __desktop->ws; 
             }
         }
         return NULL; //#bugbug: Isso pode significar pid 0.
@@ -586,13 +593,13 @@ gde_extra_services (
 	// IN: desktop, pid
     if ( number == 715 )
     {
-        _Desktop = ( struct desktop_d *) arg2;
-        if ( (void *) _Desktop != NULL )
+        __desktop = ( struct desktop_d *) arg2;
+        if ( (void *) __desktop != NULL )
         {
-            if ( _Desktop->desktopUsed == 1 && 
-                 _Desktop->desktopMagic == 1234 )
+            if ( __desktop->desktopUsed == 1 && 
+                 __desktop->desktopMagic == 1234 )
             {
-                 _Desktop->ws = (int) arg3;
+                 __desktop->ws = (int) arg3;
                 return (void *) 1;  //ok 
             }
         }
@@ -677,8 +684,7 @@ gde_extra_services (
 
     // Get process stats given pid
     // IN: pid, number
-    if ( number == 880 )
-    {
+    if ( number == 880 ){
        return (void *) __GetProcessStats ( (int) arg2, (int) arg3 );
     }
 
@@ -688,13 +694,11 @@ gde_extra_services (
         return (void *) __GetThreadStats ( (int) arg2, (int) arg3 );
     }
 
-
     // Get process name
     // IN: PID, ubuffer.
     if ( number == 882 ){
         return (void *) getprocessname ( (int) arg2, (char *) arg3);
     }
-
 
     // Get thread name
     if ( number == 883 ){
@@ -748,19 +752,13 @@ gde_extra_services (
     
     // get screen window.
     // #todo. checar validade
-    if ( number == 955 ){
-        return (void *) gui->screen;
-    }    
+    if ( number == 955 ){  return (void *) gui->screen;  } 
 
-    if ( number == 956 ){
-        return (void *) gui->background;
-    } 
+    if ( number == 956 ){  return (void *) gui->background; } 
     
     // get main window.
     // #todo. checar validade
-    if ( number == 957 ){
-        return (void *) gui->main;
-    }    
+    if ( number == 957 ){ return (void *) gui->main; }  
 
 
     // O processo está se comunicando com o driver de rede.
@@ -775,10 +773,7 @@ gde_extra_services (
     
 
     // 968 - Testing network.
-    if (number == 968){
-        network_test();
-        return NULL;
-    }
+    if (number == 968){  network_test();  return NULL;  }
 
 
     // 970 - Create request.
@@ -1032,14 +1027,10 @@ gde_extra_services (
                             (unsigned long) arg4 );
     }
     
-    
-    // Mostra a lista de volumes montados.
-    if (number == 8500)
-    {
-        //Deprecated
-        return NULL;
-    }
 
+    // Deprecated    
+    // Mostra a lista de volumes montados.
+    if (number == 8500){  return NULL;  }
 
 
     // #test

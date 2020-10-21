@@ -3,7 +3,12 @@
 
 #ifndef ____X_VIDEO_H
 #define ____X_VIDEO_H
- 
+
+
+
+// See:
+// http://www.brokenthorn.com/Resources/OSDevVid2.html
+
  
  
 /*
@@ -56,6 +61,28 @@ Mono graphics	A0000 to AFFFF	3B0 to 3BB, 3C0 to 3CF
 Colour text	B8000 to BFFFF	3C0 to 3CF, 3D0 to 3DF
 Colour graphics	A0000 to AFFFF or B8000 to BFFFF	3C0 to 3CF, 3D0 to 3DF
  */
+
+
+/*
+ #test: The format of the structure we got with vesa bios.
+ bl needs to give us this pointer.
+//vbeInfoBlock structure has the following format.
+typedef struct _vbeInfoBlock {
+        uint8_t  signature[4];     // “VESA”
+        uint16_t version;          // Either 0x0200 (VBE 2.0) or 0x0300 (VBE 3.0)
+        uint32_t oemString;        // Far pointer to OEM name
+        uint8_t  capabilities[4];  // capabilities
+        uint32_t videoModesPtr;    // Far pointer to video mode list
+        uint16_t totalMemory;      // Memory size in 64K blocks
+        uint16_t oemSoftwareRev;
+        uint32_t oemVenderNamePtr;
+        uint32_t oemProductNamePtr;
+        uint32_t oemProductRevPtr;
+        uint8_t  reserved [222];
+        uint8_t  oemData [256];
+}vbeInfoBlock;
+*/
+
 
 
 #endif   

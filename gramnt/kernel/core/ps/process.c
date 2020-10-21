@@ -92,6 +92,40 @@ int processNewPID;
 
 
 
+//
+// =====================================
+//
+
+// #test
+// Eleva a prioridade para alem dos limites.
+// Usada como teste por enquanto.
+
+
+void power_pid (int pid, int power)
+{
+    struct process_d *p;
+    
+    if(pid<0)
+        return;
+
+    if(power<=0)
+        return;
+    
+    p = (struct process_d *) processList[pid];
+    
+    if ( (void*) p == NULL ){
+        return;
+    }else{
+
+        if (p->used == 1 && p->magic == 1234)
+        {
+            
+            debug_print ("power_pid: change priority\n");
+            threadi_power ( p->control, (PRIORITY_MAX*power) );
+        }
+    };
+}
+
 
 void process_enter_criticalsection(int pid)
 {

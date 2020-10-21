@@ -9,8 +9,7 @@
 // Registered ?
 int __ws_registerd = -1;
 
-// Our desktop;
-// This structure is defined in the libgui.
+// Destop structure.
 struct desktop_d *__ws_desktop;
 
 // Our PID.
@@ -31,7 +30,8 @@ int register_ws (void){
     // desktop.
 
 
-    // Desktop    
+    // Desktop 
+    // Getting the current desktop structure pointer.
     __ws_desktop = (struct desktop_d *) gramado_system_call (519,0,0,0);
     
     if ( (void *) __ws_desktop == NULL ){

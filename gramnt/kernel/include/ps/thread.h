@@ -798,6 +798,13 @@ void dispatch_thread (struct thread_d *thread);
 void set_thread_priority (struct thread_d *t, unsigned long priority);
 
 
+// muda a prioridade para alem dos limites.
+// teste.
+void threadi_power(
+    struct thread_d *t, 
+    unsigned long priority );
+
+
 // ## Page directory support ## 
 
 // Pega o endereço do diretório de páginas usado pela thread.
