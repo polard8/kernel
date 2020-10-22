@@ -674,6 +674,7 @@ void *createwCreateWindow2 (
 
         //input pointer
         window->ip_on = 0;   // desligado
+        window->ip_device = IP_DEVICE_NULL;
         window->ip_x = 0;    // in chars
         window->ip_y = 0;    // in chars
         window->ip_color = COLOR_BLACK;
