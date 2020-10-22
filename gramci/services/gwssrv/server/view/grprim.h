@@ -13,6 +13,9 @@ struct gr_vec3D_d
     int x;
     int y;
     int z;
+    
+    // for interpolation.
+    unsigned long color;
 };
 
 struct gr_line_d
@@ -143,7 +146,10 @@ cube (
     int bx0, int by0, int bx1, int by1,  //back rect
     int fx0, int fy0, int fx1, int fy1,  //front rect 
     unsigned long color );
-    
+
+
+int xxxCubeZ ( struct gr_cube_d *cube );
+
 void 
 cubeZ ( 
     int bx0, int by0, int bx1, int by1,  //back rect

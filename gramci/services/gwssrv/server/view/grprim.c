@@ -20,9 +20,15 @@ static unsigned long HotSpotX=0;
 static unsigned long HotSpotY=0;
 
 
-int grInit(void)
-{
+/*
+ ********************************** 
+ * grInit:
+ * 
+ * 
+ */
 
+int grInit (void)
+{
     unsigned long w = gws_get_device_width();
     unsigned long h = gws_get_device_height();
 
@@ -380,6 +386,82 @@ cube (
     plotLine3d (bx0, by1, 0, fx0, fy1, 0, color);
     // 4th line
     plotLine3d (bx1, by0, 0, fx1, fy0, 0, color);
+}
+
+
+
+
+// #test
+int xxxCubeZ ( struct gr_cube_d *cube )
+{
+
+    int h=0; 
+    int d=0;
+    int i=0;
+
+
+    if ( (void*) cube == NULL )
+        return -1;
+    
+    //cube->p[0].x;
+    
+    //north
+    rectangleZ ( cube->p[2].x, cube->p[2].y, cube->p[0].x, cube->p[0].y, 
+        cube->p[0].color, cube->p[0].z );
+
+    ras_rectangleZ ( cube->p[2].x, cube->p[2].y, cube->p[0].x, cube->p[0].y, 
+        cube->p[0].color, cube->p[0].z );
+    
+    
+    
+    // 1st line 
+    plotLine3d (cube->p[0].x, cube->p[0].y, cube->p[0].z, 
+                cube->p[4].x, cube->p[4].y, cube->p[4].z, cube->p[7].color );
+    // 2nd line
+    plotLine3d (cube->p[1].x, cube->p[1].y, cube->p[1].z, 
+                cube->p[5].x, cube->p[5].y, cube->p[5].z, cube->p[7].color);
+    // 3rd line
+    plotLine3d (cube->p[2].x, cube->p[2].y, cube->p[2].z, 
+                cube->p[6].x, cube->p[6].y, cube->p[6].z, cube->p[7].color);
+    // 4th line 
+    plotLine3d (cube->p[3].x, cube->p[3].y, cube->p[3].z, 
+                cube->p[7].x, cube->p[7].y, cube->p[7].z, cube->p[7].color);
+
+
+    //ras
+    
+    //
+    // right
+    //
+    
+    //ras diagonal
+    //rectangleZ ( cube->p[1].x, cube->p[1].y, cube->p[7].x, cube->p[4].y, COLOR_RED, cube->p[0].z ); //marcador.
+    //i=0;
+   // for (h =by0; h<by1; h++){
+   //     plotLine3d (bx1, h, z, fx1, fy0+i, z, color);
+    //    i++;
+    //}
+
+    //
+    // left
+    //
+
+    //ras diagonal
+    //rectangleZ ( bx0, by1, fx0, fy0, COLOR_RED,z ); //marcador.
+    //i=0;
+    //for (h=by0; h<by1; h++){
+    //    plotLine3d (bx0, h, z, fx0, fy0+i, z, color);
+    //    i++;
+    //}
+
+    // ...
+    
+   // south 
+    rectangleZ ( cube->p[6].x, cube->p[6].y, cube->p[4].x, cube->p[4].y, 
+       cube->p[7].color, cube->p[7].z );
+
+    ras_rectangleZ ( cube->p[6].x, cube->p[6].y, cube->p[4].x, cube->p[4].y, 
+       cube->p[7].color, cube->p[7].z );
 }
 
 
