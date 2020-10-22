@@ -398,6 +398,16 @@ struct gws_window_class_d
 };
 
 
+// Input pointer device type.
+typedef enum {
+
+    IP_DEVICE_NULL,
+    IP_DEVICE_KEYBOARD,
+    IP_DEVICE_MOUSE
+    // ... 
+} gws_ip_device_t;
+
+
 
 /*
  ********************************
@@ -456,6 +466,33 @@ struct gws_window_d
     //unsigned long border_color;
     //unsigned long border_width;
 
+
+    // Cliente area in chars.
+    //unsigned long client_area_width;
+    //unsigned long client_area_height;
+
+    //
+    // == input pointer =========================================
+    //
+    
+    // Valido apenas para essa janela.
+    
+    // Esta ligado?
+    int ip_on;
+    
+    // Qual eh o dispositivo de input.
+    gws_ip_device_t ip_device;
+
+    // para input do typo teclado
+    unsigned long ip_x;
+    unsigned long ip_y;
+    unsigned long ip_color;
+    unsigned long ip_type;
+    // ...
+
+    // para input do typo teclado
+    unsigned long ip_pixel_x;
+    unsigned long ip_pixel_y;
 
 // 
 //==================================================
@@ -627,16 +664,6 @@ struct gws_window_d
 //==================================================
 
 
-
-
-// 
-//==================================================
-
-    unsigned long CursorX;
-    unsigned long CursorY;
-    unsigned long CursorColor;
-
-
 // 
 //==================================================	
 
@@ -699,22 +726,6 @@ struct gws_window_d
 	// Buffer para mensagens pequenas.
     // Será usado pelo produtor e pelo consumidor.
     // char read_buf[WINDOW_MSG_BUFFER_SIZE];
-    //
-	//
-	
-	
-    //
-	//@todo: rever esse cursor, pois ja existe na versão 0.1 acima.
-	
-	//Posição do cursor para texto dentro da janela.
-	//Obs: Deve ser multiplo da altura e largura do caractere.
-	//Obs: Para cada janela o cursor pode estar em uma posição diferente.
-	//@todo: Deletar isso e começar usar a estrutura.
-
-    // #bugbug
-    // Cursor again ??
-    unsigned long cursor_x;
-    unsigned long cursor_y;
 
 
 

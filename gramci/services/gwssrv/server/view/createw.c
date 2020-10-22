@@ -672,15 +672,24 @@ void *createwCreateWindow2 (
         window->bg_color = (unsigned long) color; 
         window->clientrect_bg_color = (unsigned long) clientcolor;
 
+        //input pointer
+        window->ip_on = 0;   // desligado
+        window->ip_x = 0;    // in chars
+        window->ip_y = 0;    // in chars
+        window->ip_color = COLOR_BLACK;
+        window->ip_type = 0;   // #bugbug #todo
+        
+        // in pixel for mouse pointer ip device.
+        window->ip_pixel_x = 0;
+        window->ip_pixel_y = 0;
+
 		// ??
 		// O retângulo da janela.
 		//window->rcWindow = NULL;
 		
 
-		// Cursor support
-        window->CursorX = 0;
-        window->CursorY = 0;
-        window->CursorColor = COLOR_WINDOWTEXT; 
+
+		
 		//@todo: As outras características do cursor.
 		//Características.
 		
@@ -708,9 +717,6 @@ void *createwCreateWindow2 (
 		//	window->cursor->cursorType = cursorTypeDefault;
 		//};
 
-		//cursores (parar de usar e começar usar apenas a estrutura.)
-        window->cursor_x = 0;
-        window->cursor_y = 0;
 
 		//Barras.
 		//As flags que representam a presença de cada uma das barras
