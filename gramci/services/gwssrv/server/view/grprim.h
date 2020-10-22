@@ -81,8 +81,16 @@ rectangleZ (
     int right, int bottom,
     unsigned long color,
     int z );
-    
-    
+
+
+void
+ras_rectangleZ (
+    int left, int top, 
+    int right, int bottom,
+    unsigned long color,
+    int z );
+
+
 void 
 cube ( 
     int bx0, int by0, int bx1, int by1,  //back rect

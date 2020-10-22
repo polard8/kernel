@@ -283,6 +283,47 @@ rectangleZ (
 
 
 
+void
+ras_rectangleZ (
+    int left, int top, 
+    int right, int bottom,
+    unsigned long color,
+    int z )
+{
+
+     int h=0;
+     
+     for (h=top;h<bottom; h++){
+
+     //cima
+     plotLine3d ( 
+         left, h,   z,
+         right, h,  z,
+         color );
+    }
+    
+     //baixo
+     //plotLine3d ( 
+         //left, bottom,   z,
+         //right,bottom,  z,
+         //color );
+
+     //esquerda
+     //plotLine3d ( 
+         //left, top,   z,
+         //left, bottom,  z,
+         //color );
+
+     //direita
+     //plotLine3d ( 
+         //right,    top,   z,
+         //right, bottom,  z,
+         //color );
+}
+
+
+
+
 
 void 
 cube ( 
@@ -321,25 +362,74 @@ cubeZ (
     unsigned long color, int z )
 {
 
+    int h=0;   
+    int d=0;
+    int i=0;
+
+    //#todo
+    // a rasterizaçao deve ser opcional
+    // colocar uma flag nos argumentos.
+
     //back
     //1st rectangle
     //rectangle(100,200,200,300, color );
     rectangleZ ( bx0, by0, bx1, by1, color,z );
+    ras_rectangleZ ( bx0, by0, bx1, by1, color,z );
     
     //front
     //2nd rectangle
     //rectangle(150,250,250,350, color);
-    rectangleZ ( fx0, fy0, fx1, fy1, color,z );
+    //rectangleZ ( fx0, fy0, fx1, fy1, color,z );
+    //ras_rectangleZ ( fx0, fy0, fx1, fy1, color,z ); 
+
+    //
+    // lines
+    //
     
-    
-    // 1st line
+    // 1st line esq baixo
     plotLine3d (bx0, by0, z, fx0, fy0, z, color);
     // 2nd line
     plotLine3d (bx1, by1, z, fx1, fy1, z, color);
     // 3rd line
     plotLine3d (bx0, by1, z, fx0, fy1, z, color);
-    // 4th line
+    // 4th line dir baixo
     plotLine3d (bx1, by0, z, fx1, fy0, z, color);
+    
+    
+    //
+    // right
+    //
+    
+    //ras diagonal
+    //rectangleZ ( bx1, by1, fx1, fy0, COLOR_RED,z ); //marcador.
+    i=0;
+    for (h=by0; h<by1; h++){
+        plotLine3d (bx1, h, z, fx1, fy0+i, z, color);
+        i++;
+    }
+
+    //
+    // left
+    //
+
+    //ras diagonal
+    //rectangleZ ( bx0, by1, fx0, fy0, COLOR_RED,z ); //marcador.
+    i=0;
+    for (h=by0; h<by1; h++){
+        plotLine3d (bx0, h, z, fx0, fy0+i, z, color);
+        i++;
+    }
+    
+    //
+    // front
+    //
+    
+     //front
+    //2nd rectangle
+    //rectangle(150,250,250,350, color);
+    rectangleZ ( fx0, fy0, fx1, fy1, color,z );
+    ras_rectangleZ ( fx0, fy0, fx1, fy1, color,z ); 
+
 }
 
 
