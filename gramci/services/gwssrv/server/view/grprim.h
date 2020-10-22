@@ -6,8 +6,55 @@
 #define __GRPRIM_H   1
 
 
+
+
+struct gr_vec3D_d
+{
+    int x;
+    int y;
+    int z;
+};
+
+struct gr_line_d
+{
+    struct gr_vec3D_d p[2];
+};
+
+struct gr_triandle_d
+{
+    struct gr_vec3D_d p[3];
+};
+
+struct gr_rectangle_d
+{
+    struct gr_vec3D_d p[4];
+};
+
+struct gr_cube_d
+{
+    struct gr_vec3D_d p[8];
+};
+
+
+
+/*
+struct gr_mat4x4_d 
+{
+    int m[4][4];
+};
+*/
+
+
+/*
+struct gr_mesh_d 
+{
+    void *list;
+};
+*/
+
+
 //
-// =========================
+// ===========================================
 //
 
 // matrix

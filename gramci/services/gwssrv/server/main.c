@@ -1735,14 +1735,18 @@ void InitGraphics(void){
     
     
     //noraDrawingStuff3 (0,0,0);
-    
-    int z=0;
-    for (z=0; z<200; z +=40){
+   
+    /* 
     cubeZ ( 
         0,     0,    100,     10,   // back
         0+40, 0-20, 100+40, 10-20,   // front
-        COLOR_WHITE, z );
-    }
+        COLOR_WHITE, 0 );
+    
+    cubeZ ( 
+        0,     0,    100,     10,   // back
+        0+40, 0-20, 100+40, 10-20,   // front
+        COLOR_WHITE, 100 );
+    */
 
     //ras_rectangleZ (
         //0+40, 0-20, 100+40, 10-20,
@@ -1771,7 +1775,7 @@ void InitGraphics(void){
         
     debug_print("gwssrv: InitGraphics done\n");
     //printf     ("gwssrv: InitGraphics done *hang\n");
-    while(1){}
+    //while(1){}
 }
 
 

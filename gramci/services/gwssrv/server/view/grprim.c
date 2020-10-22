@@ -10,6 +10,11 @@
 // ...
 
 
+// =============================================================
+// #projection:
+// For orthographics projection there is no scaling factor.
+// For perspective, we do have scaling.
+
 
 static unsigned long HotSpotX=0;
 static unsigned long HotSpotY=0;
@@ -33,10 +38,34 @@ int grInit(void)
 }
 
 
-// low lever plot.
+// low level plot.
 int grPlot0 (int z, int x, int y, unsigned long color)
 {
 
+    // #todo
+    // We need a z-buffer or (depth buffer)
+    // it is used to depth testing.
+    // it discards some unnecessary covered plots. 
+    
+    // Normalized Device Coordinates (NDC)
+    // We are using or own ndc style.
+    // Maybe it is different for diferent systens.
+    
+    //      +y  +z
+    // -x   +   +x
+    // -z   -y
+    
+    // We use:
+    // Left-hand System (LHS) 
+    // LHS is clockwise (CW).
+    // Same as Microsoft Direct3D.
+    // See: https://en.wikipedia.org/wiki/Direct3D
+    
+    // Another way is:
+    // Right-Hand Coordinate System (RHS).
+    // RHS is counter-clockwise (CCW).
+    
+    
     unsigned long zBaseX=0;
     unsigned long zBaseY=0;
 
@@ -355,6 +384,10 @@ cube (
 
 
 
+// #todo
+// It has an orthogonal projection
+// cubeZOrtho(
+
 void 
 cubeZ ( 
     int bx0, int by0, int bx1, int by1,  //back rect
@@ -362,19 +395,30 @@ cubeZ (
     unsigned long color, int z )
 {
 
-    int h=0;   
+    int h=0; 
     int d=0;
     int i=0;
+
+    // aspect ratio = height/width
+    // sem float isso da zero.
+    
+    // remember: we can't divide by zero.
+    //int scale = 0;
+    //scale = z; 
+
 
     //#todo
     // a rasterizaçao deve ser opcional
     // colocar uma flag nos argumentos.
+    
+    // We need to check the limits and do not paint what is
+    // out of the limits.
 
-    //back
+    //back (NORTH) PROJECTED!!!
     //1st rectangle
     //rectangle(100,200,200,300, color );
-    rectangleZ ( bx0, by0, bx1, by1, color,z );
-    ras_rectangleZ ( bx0, by0, bx1, by1, color,z );
+    rectangleZ     ( bx0, by0, bx1, by1, color, z );
+    ras_rectangleZ ( bx0, by0, bx1, by1, color, z );
     
     //front
     //2nd rectangle
@@ -424,12 +468,11 @@ cubeZ (
     // front
     //
     
-     //front
+     //front   (SOUTH)
     //2nd rectangle
     //rectangle(150,250,250,350, color);
-    rectangleZ ( fx0, fy0, fx1, fy1, color,z );
-    ras_rectangleZ ( fx0, fy0, fx1, fy1, color,z ); 
-
+    rectangleZ     ( fx0, fy0, fx1, fy1, color, z );
+    ras_rectangleZ ( fx0, fy0, fx1, fy1, color, z ); 
 }
 
 
