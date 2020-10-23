@@ -391,6 +391,99 @@ cube (
 
 
 
+int xxxInflateCubeZ ( struct gr_cube_d *cube, int value )
+{
+    if ( (void*) cube == NULL )
+        return -1;
+
+    //int value = z;
+    //int value = z*2;
+
+        // back points
+        cube->p[0].x = (cube->p[0].x - value);
+        cube->p[0].y = (cube->p[0].y + value);
+        cube->p[0].z = (cube->p[0].z - value);
+        
+        cube->p[1].x = (cube->p[1].x + value);
+        cube->p[1].y = (cube->p[1].y + value);
+        cube->p[1].z = (cube->p[1].z - value);
+        
+        cube->p[2].x = (cube->p[2].x + value);
+        cube->p[2].y = (cube->p[2].y - value);
+        cube->p[2].z = (cube->p[2].z - value);
+        
+        cube->p[3].x = (cube->p[3].x - value);
+        cube->p[3].y = (cube->p[3].y - value);
+        cube->p[3].z = (cube->p[3].z - value);
+
+        //front points
+        cube->p[4].x = (cube->p[4].x - value);
+        cube->p[4].y = (cube->p[4].y + value);
+        cube->p[4].z = (cube->p[4].z - value);
+        
+        cube->p[5].x = (cube->p[5].x + value);
+        cube->p[5].y = (cube->p[5].y + value);
+        cube->p[5].z = (cube->p[5].z - value);
+        
+        cube->p[6].x = (cube->p[6].x + value);
+        cube->p[6].y = (cube->p[6].y - value);
+        cube->p[6].z = (cube->p[6].z - value);
+        
+        cube->p[7].x = (cube->p[7].x - value);
+        cube->p[7].y = (cube->p[7].y - value);
+        cube->p[7].z = (cube->p[7].z - value);
+        
+    return 0;
+}
+
+
+int xxxDeflateCubeZ ( struct gr_cube_d *cube, int value )
+{
+    if ( (void*) cube == NULL )
+        return -1;
+
+    //int value = z;
+    //int value = z*2;
+
+        // back points
+        cube->p[0].x = (cube->p[0].x + value);
+        cube->p[0].y = (cube->p[0].y - value);
+        cube->p[0].z = (cube->p[0].z + value);
+        
+        cube->p[1].x = (cube->p[1].x - value);
+        cube->p[1].y = (cube->p[1].y - value);
+        cube->p[1].z = (cube->p[1].z + value);
+        
+        cube->p[2].x = (cube->p[2].x - value);
+        cube->p[2].y = (cube->p[2].y + value);
+        cube->p[2].z = (cube->p[2].z + value);
+        
+        cube->p[3].x = (cube->p[3].x + value);
+        cube->p[3].y = (cube->p[3].y + value);
+        cube->p[3].z = (cube->p[3].z + value);
+
+        //front points
+        //cube->p[4].x = (cube->p[4].x + value);
+        //cube->p[4].y = (cube->p[4].y - value);
+        //cube->p[4].z = (cube->p[4].z + value);
+        
+        //cube->p[5].x = (cube->p[5].x - value);
+        //cube->p[5].y = (cube->p[5].y - value);
+        //cube->p[5].z = (cube->p[5].z + value);
+        
+        //cube->p[6].x = (cube->p[6].x - value);
+        //cube->p[6].y = (cube->p[6].y + value);
+        //cube->p[6].z = (cube->p[6].z + value);
+        
+        //cube->p[7].x = (cube->p[7].x + value);
+        //cube->p[7].y = (cube->p[7].y + value);
+        //cube->p[7].z = (cube->p[7].z + value);
+
+        
+    return 0;
+}
+
+
 // #test
 int xxxCubeZ ( struct gr_cube_d *cube )
 {
@@ -558,6 +651,105 @@ cubeZ (
 }
 
 
+
+// inflate varias vezes.
+//only on jail
+void cube_demo1(void)
+{
+    int i=0;
+    int j=0;
+   
+   
+    struct gr_cube_d *cube;
+    cube = (void *) malloc( sizeof( struct gr_cube_d ) );
+    if ( (void*) cube != NULL )
+    {
+		
+		
+		while(1){
+
+        // back points
+        cube->p[0].x = 0;
+        cube->p[0].y = 40;
+        cube->p[0].z = 0;
+        cube->p[0].color = COLOR_YELLOW;
+        
+        cube->p[1].x = 100;
+        cube->p[1].y = 40;
+        cube->p[1].z = 0;
+        
+        cube->p[2].x = 100;
+        cube->p[2].y = 0;
+        cube->p[2].z = 0;
+        
+        cube->p[3].x = 0;
+        cube->p[3].y = 0;
+        cube->p[3].z = 0;
+
+        //front points
+        cube->p[4].x = 0+20;
+        cube->p[4].y = 20;
+        cube->p[4].z = 0;
+        
+        cube->p[5].x = 100+20;
+        cube->p[5].y = 20;
+        cube->p[5].z = 0;
+        
+        cube->p[6].x = 100+20;
+        cube->p[6].y = 10;
+        cube->p[6].z = 0;
+        
+        cube->p[7].x = 0+20;
+        cube->p[7].y = 10;
+        cube->p[7].z = 0;
+        cube->p[7].color = COLOR_WHITE;
+
+
+       rectBackbufferDrawRectangle ( 
+           0, 0, 320, 200, COLOR_BLACK, 1 );
+        xxxCubeZ(cube);
+        gws_refresh_rectangle(0,0,320,200);
+        for(i=0;i<16;i++){ gwssrv_yield(); }
+
+       for(j=0; j<30; j++){        
+       rectBackbufferDrawRectangle ( 
+           0, 0, 320, 200, COLOR_BLACK, 1 );        
+        xxxInflateCubeZ (cube, 1);
+        xxxCubeZ(cube);
+        gws_refresh_rectangle(0,0,320,200);
+        for(i=0;i<16;i++){ gwssrv_yield(); }
+        }
+        
+        }
+       
+        
+        //xxxInflateCubeZ (cube, 10);
+        //xxxCubeZ(cube);
+
+        //xxxInflateCubeZ (cube, 20);
+        //xxxCubeZ(cube);
+
+        //xxxDeflateCubeZ (cube, 5);
+        //xxxCubeZ(cube);
+        
+        //xxxDeflateCubeZ (cube, 10);
+        //xxxCubeZ(cube);
+
+        //plotCharBackbufferDrawcharTransparentZ ( cube->p[0].x,  cube->p[0].y, COLOR_BLACK, 'G', cube->p[0].z );
+        //plotCharBackbufferDrawcharTransparentZ ( cube->p[1].x,  cube->p[1].y, COLOR_BLACK, 'R', cube->p[1].z );
+        //plotCharBackbufferDrawcharTransparentZ ( cube->p[2].x,  cube->p[2].y, COLOR_BLACK, 'A', cube->p[2].z );
+        //plotCharBackbufferDrawcharTransparentZ ( cube->p[3].x,  cube->p[3].y, COLOR_BLACK, 'M', cube->p[3].z );
+        //plotCharBackbufferDrawcharTransparentZ ( cube->p[4].x,  cube->p[4].y, COLOR_BLACK, 'A', cube->p[4].z );
+        //plotCharBackbufferDrawcharTransparentZ ( cube->p[5].x,  cube->p[5].y, COLOR_BLACK, 'D', cube->p[5].z );
+        //plotCharBackbufferDrawcharTransparentZ ( cube->p[6].x,  cube->p[6].y, COLOR_BLACK, '0', cube->p[6].z );
+        //plotCharBackbufferDrawcharTransparentZ ( cube->p[7].x,  cube->p[7].y, COLOR_BLACK, '*', cube->p[7].z );
+    }
+
+
+}
+
+
+
 //Circle
 //This is an implementation of the circle algorithm.
 
@@ -574,7 +766,7 @@ plotCircle (
    
    int x = -r;
    int y = 0;
-   int err =  (2-(2*r));
+   int err = (2-(2*r));
 
    do {
       
@@ -674,17 +866,10 @@ plotEllipseRect (
 
 
     do {
-       //setPixel(x1, y0); /*   I. Quadrant */
-       //setPixel(x0, y0); /*  II. Quadrant */
-       //setPixel(x0, y1); /* III. Quadrant */
-       //setPixel(x1, y1); /*  IV. Quadrant */
-       
-       
-       grPlot0 ( 0, x1, y0, color);
-       grPlot0 ( 0, x0, y0, color);
-       grPlot0 ( 0, x0, y1, color);
-       grPlot0 ( 0, x1, y1, color);
-       
+       grPlot0 ( 0, x1, y0, color);  //   I. Quadrant
+       grPlot0 ( 0, x0, y0, color);  //  II. Quadrant
+       grPlot0 ( 0, x0, y1, color);  // III. Quadrant
+       grPlot0 ( 0, x1, y1, color);  //  IV. Quadrant
        
        e2 = (2*err);
        if (e2 <= dy) { y0++; y1--; err += dy += a; }  /* y step */ 
@@ -694,14 +879,9 @@ plotEllipseRect (
 
 
     /* too early stop of flat ellipses a=1 */
-    while (y0-y1 < b) 
-    {
-       //setPixel(x0-1, y0); /* -> finish tip of ellipse */
-       //setPixel(x1+1, y0++); 
-       //setPixel(x0-1, y1);
-       //setPixel(x1+1, y1--); 
-   
-        grPlot0 ( 0, x0-1,    y0, color);
+    while (y0-y1 < b) {
+
+        grPlot0 ( 0, x0-1,    y0, color);  //-> finish tip of ellipse
         grPlot0 ( 0, x1+1,  y0++, color);
         grPlot0 ( 0, x0-1,    y1, color);
         grPlot0 ( 0, x1+1,  y1--, color);
@@ -729,16 +909,10 @@ plotEllipseRectZ (
 
 
     do {
-       //setPixel(x1, y0); /*   I. Quadrant */
-       //setPixel(x0, y0); /*  II. Quadrant */
-       //setPixel(x0, y1); /* III. Quadrant */
-       //setPixel(x1, y1); /*  IV. Quadrant */
-       
-       
-       grPlot0 ( z, x1, y0, color);
-       grPlot0 ( z, x0, y0, color);
-       grPlot0 ( z, x0, y1, color);
-       grPlot0 ( z, x1, y1, color);
+       grPlot0 ( z, x1, y0, color);  //   I. Quadrant
+       grPlot0 ( z, x0, y0, color);  //  II. Quadrant
+       grPlot0 ( z, x0, y1, color);  // III. Quadrant
+       grPlot0 ( z, x1, y1, color);  //  IV. Quadrant
        
        
        e2 = (2*err);
@@ -749,20 +923,22 @@ plotEllipseRectZ (
 
 
     /* too early stop of flat ellipses a=1 */
-    while (y0-y1 < b) 
-    {
-       //setPixel(x0-1, y0); /* -> finish tip of ellipse */
-       //setPixel(x1+1, y0++); 
-       //setPixel(x0-1, y1);
-       //setPixel(x1+1, y1--); 
+    while (y0-y1 < b) {
    
-        grPlot0 ( z, x0-1,    y0, color);
+        grPlot0 ( z, x0-1,    y0, color);  // -> finish tip of ellipse
         grPlot0 ( z, x1+1,  y0++, color);
         grPlot0 ( z, x0-1,    y1, color);
         grPlot0 ( z, x1+1,  y1--, color);
     };
 }
 
+
+/*
+ ********************************************************
+ * noraDrawingStuff: 
+ *    Lot of dots in the right place. (prime stuff)
+ *    2020 - Created by Fred Nora. 
+ */
 
 void noraDrawingStuff(void)
 {
@@ -775,22 +951,25 @@ void noraDrawingStuff(void)
     {
         for (y=0; y<SavedY; y++)
         {
-            if ( x != 0 )
-            {
+            if ( x != 0 ){
                 if ( y % x == 0 ){
                     pixelBackBufferPutpixel ( COLOR_BLACK, x, y );  
                 }
             }
         };
         
-        if ( x >= SavedY) { 
-            break; 
-        }
+        if ( x >= SavedY ) { break; }
     };
 }
 
+/*
+ ********************************************************
+ * noraDrawingStuff3: 
+ *    Lot of dots in the right place. (prime stuff)
+ *    2020 - Created by Fred Nora. 
+ */
 
-void noraDrawingStuff3(int x, int y, int z)
+void noraDrawingStuff3 (int x, int y, int z)
 {
     int _x=0;
     int _y=0;
@@ -806,10 +985,8 @@ void noraDrawingStuff3(int x, int y, int z)
     {
         for (_y=y; _y<limitY; _y++)
         {
-            if ( _x != 0 )
-            {
+            if ( _x != 0 ){
                 if ( _y % _x == 0 ){
-                    //pixelBackBufferPutpixel ( COLOR_BLACK, x, y );  
                     grPlot0 (_z, _x, _y,COLOR_BLACK);
                 }
             }
@@ -1044,15 +1221,12 @@ void matrix_demo1(void)
 
 
 // Fibonacci Series using Recursion 
-int fib(int n) 
-{ 
+int fib (int n){ 
 
     int a=0;
     int b=0;
 
-    if (n <= 1){ 
-        return n; 
-    }
+    if (n <= 1){ return n; }
     
     a = fib(n - 1); 
     b = fib(n - 2);
@@ -1179,7 +1353,7 @@ plotCharBackbufferDrawcharTransparent (
            // Put pixel. 
             if ( ( *work_char & bit_mask ) ){
  
-                //pixelBackBufferPutpixel ( color, x + x2, y );  
+                // IN: z,x,y,color.
                 grPlot0 ( 0, x + x2, y, color ); 
             }
 
@@ -1312,9 +1486,9 @@ plotCharBackbufferDrawcharTransparentZ (
         {
 
            // Put pixel. 
-            if ( ( *work_char & bit_mask ) ){
- 
-                //pixelBackBufferPutpixel ( color, x + x2, y );  
+            if ( ( *work_char & bit_mask ) )
+            {
+                // IN: z,x,y,color.
                 grPlot0 ( z, x + x2, y, color ); 
             }
 

@@ -1752,61 +1752,9 @@ void InitGraphics(void){
         //0+40, 0-20, 100+40, 10-20,
         //COLOR_WHITE, 0 ); 
 
-    /*
-    struct gr_cube_d *cube;
-    cube = (void *) malloc( sizeof( struct gr_cube_d ) );
-    if ( (void*) cube != NULL )
-    {
-        // back points
-        cube->p[0].x = 0;
-        cube->p[0].y = 40;
-        cube->p[0].z = 0;
-        cube->p[0].color = COLOR_YELLOW;
-        
-        cube->p[1].x = 100;
-        cube->p[1].y = 40;
-        cube->p[1].z = 0;
-        
-        cube->p[2].x = 100;
-        cube->p[2].y = 0;
-        cube->p[2].z = 0;
-        
-        cube->p[3].x = 0;
-        cube->p[3].y = 0;
-        cube->p[3].z = 0;
-
-        //front points
-        cube->p[4].x = 0+20;
-        cube->p[4].y = 20;
-        cube->p[4].z = 0;
-        
-        cube->p[5].x = 100+20;
-        cube->p[5].y = 20;
-        cube->p[5].z = 0;
-        
-        cube->p[6].x = 100+20;
-        cube->p[6].y = 10;
-        cube->p[6].z = 0;
-        
-        cube->p[7].x = 0+20;
-        cube->p[7].y = 10;
-        cube->p[7].z = 0;
-        cube->p[7].color = COLOR_WHITE;
-        
-        xxxCubeZ(cube);
-
-        plotCharBackbufferDrawcharTransparentZ ( cube->p[0].x,  cube->p[0].y, COLOR_BLACK, 'G', 0 );
-        plotCharBackbufferDrawcharTransparentZ ( cube->p[1].x,  cube->p[1].y, COLOR_BLACK, 'R', 0 );
-        plotCharBackbufferDrawcharTransparentZ ( cube->p[2].x,  cube->p[2].y, COLOR_BLACK, 'A', 0 );
-        plotCharBackbufferDrawcharTransparentZ ( cube->p[3].x,  cube->p[3].y, COLOR_BLACK, 'M', 0 );
-        plotCharBackbufferDrawcharTransparentZ ( cube->p[4].x,  cube->p[4].y, COLOR_BLACK, 'A', 0 );
-        plotCharBackbufferDrawcharTransparentZ ( cube->p[5].x,  cube->p[5].y, COLOR_BLACK, 'D', 0 );
-        plotCharBackbufferDrawcharTransparentZ ( cube->p[6].x,  cube->p[6].y, COLOR_BLACK, '0', 0 );
-        plotCharBackbufferDrawcharTransparentZ ( cube->p[7].x,  cube->p[7].y, COLOR_BLACK, '*', 0 );
-    }
-    */
-
-
+    // inflate or deflate several times.
+    // only jail.
+    //cube_demo1();
     
     // refresh
     gws_show_backbuffer();              

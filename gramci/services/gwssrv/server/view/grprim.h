@@ -148,7 +148,12 @@ cube (
     unsigned long color );
 
 
+
+int xxxInflateCubeZ ( struct gr_cube_d *cube, int value );
+int xxxDeflateCubeZ ( struct gr_cube_d *cube, int value );
+
 int xxxCubeZ ( struct gr_cube_d *cube );
+
 
 void 
 cubeZ ( 
@@ -156,6 +161,7 @@ cubeZ (
     int fx0, int fy0, int fx1, int fy1,  //front rect 
     unsigned long color, int z );
 
+void cube_demo1(void);
 
 
 void plotCircle (int xm, int ym, int r, unsigned long color);
