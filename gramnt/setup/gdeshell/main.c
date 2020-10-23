@@ -1,33 +1,21 @@
-// File: main.c
-// Setup - Shell
-// A simple shell
-// This shell uses the virtual console, not the virtual terminal.
-// This shell uses the window server embeded into the base kernel.
-// History:
-//     2016 - Created by Fred Nora.
-
+/*
+ * File: main.c
+ * Setup - Shell
+ * A simple shell
+ * This shell uses the virtual console, not the virtual terminal.
+ * This shell uses the window server embeded into the base kernel.
+ * History:
+ *     2016 - Created by Fred Nora.
+ */
 
 
 #include "gdeshell.h"
 
 
 
-
 // #hackhack
 #define gramado_strncmp strncmp 
 
-
-// buffer usado para criar um arquivo de configuracao.
-char __setup_buffer[512];
-
-// Para que o procedimento possa acessa-lo.
-// #bugbug: size
-char __net_buffer[4096];
-
-
-// A janela principal do aplicativo.
-struct window_d *hWindow;  
-struct window_d *cpu_window;  //cpu usage test;
 
 #define WINDOW_LEFT      0      //10
 #define WINDOW_TOP       0      //10
@@ -47,6 +35,19 @@ struct window_d *cpu_window;  //cpu usage test;
 
 
 //#define MIN(x,y) ((x < y) ? x : y)
+
+// buffer usado para criar um arquivo de configuracao.
+char __setup_buffer[512];
+
+// Para que o procedimento possa acessa-lo.
+// #bugbug: size
+char __net_buffer[4096];
+
+
+// A janela principal do aplicativo.
+struct window_d *hWindow;  
+struct window_d *cpu_window;  //cpu usage test;
+
 
 
 // Ser� configurado na inicializa��o.
@@ -181,13 +182,9 @@ int indirection_level = 0;
 int shell_level = 0;
 
 
-
-
 char *shell_name = "GDESHELL.BIN";
 char *dist_version = "0.1";
 char *build_version = "1";
-
-
 
 
 /* The name of the .(shell)rc file. */
@@ -318,13 +315,8 @@ unsigned long CPU_USAGE[32];
 
 
 //
-// ===============================================================
+// == Prototypes =====================================================
 //
-
-// Prototypes.
-
-
-
 
 
 //Arg: Endere�os dos buffers contendo os chars.
@@ -348,8 +340,73 @@ __SendMessageToProcess (
 
 
 int gdeshell_save_config_file (void);
+
+
+// ==== Prototypes ====
+
+void die (char *str);
+void error ( char *msg, char *arg1, char *arg2 );
+void fatal ( char *msg, char *arg1, char *arg2 );
+
+//isso foi para stdlib.c
+//void *xmalloc( int size);
+
+char *concat ( char *s1, char *s2, char *s3 );
+char *save_string ( char *s, int len );
+
+int shell_save_file (void);
+
+void shellInitSystemMetrics (void);
+void shellInitWindowLimits (void);
+void shellInitWindowPosition (void);
+void shellInitWindowSizes (void);
+
+// testes de scroll.
+void testScrollChar (int c);
+
+// row support
+
+void textSetTopRow ( int number );
+void textSetBottomRow ( int number );
+int textGetTopRow (void);
+int textGetBottomRow (void);
+
+void clearLine ( int line_number );
+void testShowLines (void);
+
+void testChangeVisibleArea (void);
+void updateVisibleArea ( int direction );
+void shellRefreshVisibleArea (void);
+
+
+// Procedimento de janela principal do aplicativo.
+unsigned long 
+shellProcedure ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 );
+
+// di�logo para alimentar o terminal usado pelos aplicativos.
+int 
+feedterminalDialog ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 );
+
+// Procedimento de janela da topbar.
+unsigned long 
+shellTopbarProcedure ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 );
+ 
+
+
 //
-// ===========================================================
+// == Functions ==============================================
 //
 
 
@@ -490,7 +547,7 @@ void process_stats(void){
     unsigned long __process_image_pa;    
     unsigned long __process_image_va;
     unsigned long __process_image_size;
-    int i;
+    int i=0;
 
     for(i=100; i<109; i++){
         __process_image_pa  = gde_get_process_stats (i,18);
@@ -807,55 +864,6 @@ xmas_tree (void)
 
 
 
-
-
-
-//
-// ==== Prototypes ====
-//
-
-void die (char *str);
-void error ( char *msg, char *arg1, char *arg2 );
-void fatal ( char *msg, char *arg1, char *arg2 );
-
-//isso foi para stdlib.c
-//void *xmalloc( int size);
-
-char *concat ( char *s1, char *s2, char *s3 );
-char *save_string ( char *s, int len );
-
-
-
-int shell_save_file (void);
-
-void shellInitSystemMetrics (void);
-void shellInitWindowLimits (void);
-void shellInitWindowPosition (void);
-void shellInitWindowSizes (void);
-
-// testes de scroll.
-void testScrollChar (int c);
-
-// row support
-
-void textSetTopRow ( int number );
-void textSetBottomRow ( int number );
-int textGetTopRow (void);
-int textGetBottomRow (void);
-
-
-void clearLine ( int line_number );
-void testShowLines (void);
-
-
-void testChangeVisibleArea (void);
-void updateVisibleArea ( int direction );
-void shellRefreshVisibleArea (void);
-
-
-
-
-
 //
 // ==== Internals ====
 //
@@ -898,43 +906,6 @@ void __load_path_test(void)
 }
 
 
-
-
-//
-// Prot�tipos para fun��es internas.
-//
-
-// Procedimento de janela principal do aplicativo.
-
-unsigned long 
-shellProcedure ( 
-    struct window_d *window, 
-    int msg, 
-    unsigned long long1, 
-    unsigned long long2 );
-
-
-// ??
-// di�logo para alimentar o terminal usado pelos aplicativos.
-
-int 
-feedterminalDialog ( 
-    struct window_d *window, 
-    int msg, 
-    unsigned long long1, 
-    unsigned long long2 );
-
-
-
-// Procedimento de janela da topbar.
-
-unsigned long 
-shellTopbarProcedure ( 
-    struct window_d *window, 
-    int msg, 
-    unsigned long long1, 
-    unsigned long long2 );
- 
  
 void quit ( int status )
 {
@@ -6593,6 +6564,14 @@ int gdeshell_save_config_file (void){
     return (int) Ret;
 }
 
+
+
+// Deprecated
+int desktopInitialize (void)
+{
+    printf ("desktopInitialize: Deprecated!\n");
+    return 0;
+}
 
 
 /*

@@ -1637,6 +1637,90 @@ int abs(int j)
 }
 
 
+/*
+int rtl_abs(int i);
+int rtl_abs(int i)
+{
+  if (i<0)
+    return -i;
+  else
+    return i;
+}
+*/
+
+
+/*
+int rtl_sign(int i);
+int rtl_sign(int i)
+{
+  if (i<0)
+    return -1;
+  else if (!i)
+    return 0;
+  else
+    return 1;
+}
+*/
+
+
+/*
+DWORD to_hex8(char *st);
+DWORD to_hex8(char *st)
+{
+  DWORD result=0,i;
+  char ch;
+  for (i=0;i<8;i++) {
+    result=result*16;
+    ch=st[i];
+    if (ch>='0' && ch <='9')
+      result=result+ch-'0';
+    else if (ch>='A' && ch<='F')
+      result=result+ch-'A'+10;
+    else if (ch>='a' && ch<='f')
+      result=result+ch-'a'+10;
+  }
+  return result;
+}
+*/
+
+
+/*
+ // dumpo
+ //credits: HOPPY OS
+void d_common(BYTE *buf,DWORD count,bool memory);  //Hex Dump
+void d_common(BYTE *buf,DWORD count,bool memory)  //Hex Dump
+{
+  DWORD i,j,k;
+  for (i=0;i<count;i=i+16) {
+    if (memory)
+      ? buf+i," ";
+    else
+      ? i," ";
+    for (j=0;j<16;j++) {
+      if (j==8) ? "- ";
+      k=i+j;
+      if (k<count)
+	? buf[k]," ";
+      else
+	spaces(3);
+    }
+    space;
+    for (j=0;j<16;j++) {
+      k=i+j;
+      if (k<count) {
+	if (buf[k]>=0x20 && buf[k]<=0x7E)
+	  putchar(buf[k]);
+	else
+	  ? ".";
+      }
+    }
+    crlf;
+  }
+}
+*/
+
+
+
 //================================================
 
 //credits.

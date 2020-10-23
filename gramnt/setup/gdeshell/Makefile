@@ -67,7 +67,6 @@ myObjects = crt0.o main.o net.o shellui.o \
 api.o \
 ctype.o stdio.o stdlib.o string.o conio.o \
 builtins.o \
-tests.o \
 unistd.o socket.o wait.o termios.o ioctl.o fcntl.o \
 rtl.o    
 
@@ -87,7 +86,6 @@ all-c:
 
 	gcc  -c  shellui.c   $(CFLAGS) -I $(LIB) -I $(API)  -o shellui.o
 	gcc  -c  builtins.c  $(CFLAGS) -I $(LIB) -I $(API)  -o builtins.o
-	gcc  -c  tests.c     $(CFLAGS) -I $(LIB) -I $(API)  -o tests.o
 	gcc  -c  net.c       $(CFLAGS) -I $(LIB) -I $(API)  -o net.o
 
 

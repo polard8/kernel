@@ -34,8 +34,124 @@ static char *int2str(int n)
 */
 
 
-int strupr(char *n) 
+/*
+ //credits: HOPPY OS.
+int occurrences (char *src, char ch);
+int occurrences (char *src, char ch)
 {
+    int i=0;
+    
+    while (*src)
+        if (*src++ == ch) i++;
+    
+    return i;
+}
+*/
+
+
+/*
+ //credits: HOPPY OS.
+char *remove_first_segment(char *src, char marker, char *dst);
+char *remove_first_segment(char *src, char marker, char *dst)
+{
+  char *temp,*temp1,ch;
+
+  temp = src;
+  temp1= dst;
+  while ( (ch = *src++) && (ch != marker) )
+    *dst++=ch;
+
+  *dst = 0;
+  if (ch)
+    strcpy(temp,src);
+  else
+    *temp=0;
+  return temp1;
+}
+*/
+
+/*
+ //credits: HOPPY OS.
+char *remove_last_segment(char *src, char marker, char *dst);
+char *remove_last_segment(char *src, char marker, char *dst)
+{
+  char *temp;
+
+  temp=src+strlen(src);
+  while (temp>src && *temp!=marker)
+    temp--;
+  if (*temp==marker) {
+    strcpy(dst,temp+1);
+    *temp=0;
+  } else {
+    strcpy(dst,src);
+    *src=0;
+  }
+  return dst;
+}
+*/
+
+
+/*
+ //credits: HOPPY OS.
+bool wild_card_match(char *wild_st,char *src_st);
+bool wild_card_match(char *wild_st,char *src_st)
+{
+  BYTE ch1,ch2;
+  while (true) {
+    if ( !(ch1 = *src_st++)) {
+      if (*wild_st)
+	return false;
+      else
+	return true;
+    } else {
+      if ( !(ch2 = *wild_st++))
+	return false;
+      else {
+	if (ch2 == '*') {
+	  if (!(ch2 = *wild_st++))
+	    return true;
+	  while (ch2 != ch1)
+	    if (!(ch1 = *src_st++))
+	      return false;
+	} else
+	  if (ch2!='?')
+	    if (ch1!=ch2)
+	      return false;
+      }
+    }
+  }
+}
+*/
+
+/*
+ //credits: HOPPY OS.
+bool wild_filename_list(char *wild_st,char *src_st);
+bool wild_filename_list(char *wild_st,char *src_st)
+{
+  char *buf1=new_string(wild_st),
+       *buf2=malloc(strlen(wild_st)+1);
+  while (true) {
+    remove_first_segment(buf1,';',buf2);
+    if (*buf2) {
+      if (wild_card_match(buf2,src_st))  {
+	free(buf1);
+	free(buf2);
+	return true;
+      }
+    } else {
+      free(buf1);
+      free(buf2);
+      return false;
+    }
+  }
+}
+*/
+
+
+
+int strupr (char *n){
+
       int i=0;
       
       // #bugbug
@@ -43,7 +159,7 @@ int strupr(char *n)
       for (i=0; n[i]; i++) 
       {
                n[i] = toupper(n[i]);
-      }
+      };
       return 1;
 }
 

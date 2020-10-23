@@ -60,6 +60,90 @@ struct file_access_d *fs_load_file_and_get_access (
 }
 */
 
+/*
+ //Credits: HOPPY OS.
+void 
+to_FAT_name (
+    char *src,
+    char *dst );
+void 
+to_FAT_name (
+    char *src,
+    char *dst )
+{
+    DWORD i;
+    char *ptr;
+    
+    if (!strcmp(src,"..")) {
+        strcpy(dst,src);
+        i=2;
+    
+    } else if (!strcmp(src,".")) {
+        strcpy(dst,src);
+        i=1;
+    
+    } else {
+        
+        ptr=src;
+        
+        i=0;
+        
+        while (i<8 && *ptr && *ptr != '.') {
+            dst[i++] = *ptr++;
+        }
+        
+        while (i<8)
+            dst[i++] = 0x20;
+        
+        if (*ptr == '.') ptr++;
+        while (i<11 && *ptr) {
+            dst[i++]=*ptr++;
+        }
+    }
+    while (i<11)
+        dst[i++]=0x20;
+}
+*/
+
+/*
+  //Credits: HOPPY OS.
+void 
+from_FAT_name (
+    char *src, 
+    char *dst );
+void 
+from_FAT_name (
+    char *src, 
+    char *dst )
+{
+
+    int i,j,k;
+    
+    for (j=7; j >= 0 && src[j] == 0x20; j--);
+    
+    k=0;
+    
+    for( i=0; i<=j; i++ )
+        dst[k++] = src[i];
+    if (*src != '.')
+        dst[k++] = '.';
+    for (j=10; j>=8 && src[j]==0x20; j--);
+    if (j==7) {
+    if (k==1)
+       dst[k]=0;
+    else {
+      if (dst[0]=='.')
+	dst[k]=0;
+      else
+	dst[k-1]=0;
+    }
+  } else {
+    for(i=8;i<=j;i++)
+      dst[k++]=src[i];
+    dst[k++]=0;
+  }
+}
+*/
 
 
 // Cria uma nova estrutura de entrada de diretorio para fat16.

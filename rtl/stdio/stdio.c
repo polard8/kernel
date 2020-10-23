@@ -61,6 +61,11 @@ static int terminal___PID;
 
 
 
+//
+// =========================================================
+//
+
+
 //++
 // Internas.
 // estamos falando do posicionamento do cursor dentro da janela 
@@ -70,6 +75,29 @@ unsigned long stdioGetCursorX(void);
 unsigned long stdioGetCursorY(void); 
 static size_t stdio_strlen (const char *s);
 //--
+
+//
+// =========================================================
+//
+
+
+/*
+char *out_char(char *dst,char ch);
+char *out_char(char *dst,char ch)
+{
+  if (dst==NULL)
+    putchar(ch);
+  else
+    *(dst++)=ch;
+  return dst;
+}
+*/
+
+
+
+
+
+
 
 
 

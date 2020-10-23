@@ -1,0 +1,7 @@
+	QD64 - Quick and Dirty 64 bit environment.
+
+	#todo:
+	Use the assebly files in the kernel to build the
+	core system.
+	Maybe it could be a single game. Called Gramado qd64
+
