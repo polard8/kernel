@@ -605,6 +605,108 @@ void cube_demo1(void)
 }
 
 
+// inflate varias vezes.
+//only on jail
+void cube_demo2(void)
+{
+    int i=0;
+    int j=0;
+   
+   
+    struct gr_cube_d *cube;
+    cube = (void *) malloc( sizeof( struct gr_cube_d ) );
+    if ( (void*) cube != NULL )
+    {
+		//marcador.
+		noraDrawingStuff3 (0,0,0);
+
+        while (1) {
+
+        //south     
+        cube->p[0].x = 0;
+        cube->p[0].y = 40;
+        cube->p[0].z = 0;
+        cube->p[0].color = COLOR_WHITE;
+        
+        cube->p[1].x = 40;
+        cube->p[1].y = 40;
+        cube->p[1].z = 0;
+        cube->p[1].color = COLOR_WHITE;
+        
+        cube->p[2].x = 40;
+        cube->p[2].y = 0;
+        cube->p[2].z = 0;
+        cube->p[2].color = COLOR_WHITE;
+        
+        cube->p[3].x = 0;
+        cube->p[3].y = 0;
+        cube->p[3].z = 0;
+        cube->p[3].color = COLOR_WHITE;
+
+        //north
+        cube->p[4].x = 0;
+        cube->p[4].y = 40;
+        cube->p[4].z = 40;
+        cube->p[4].color = COLOR_BLACK;
+        
+        cube->p[5].x = 40;
+        cube->p[5].y = 40;
+        cube->p[5].z = 40;
+        cube->p[5].color = COLOR_BLACK;
+        
+        cube->p[6].x = 40;
+        cube->p[6].y = 0;
+        cube->p[6].z = 40;
+        cube->p[6].color = COLOR_BLACK;
+        
+        cube->p[7].x = 0;
+        cube->p[7].y = 0;
+        cube->p[7].z = 40;
+        cube->p[7].color = COLOR_BLACK;
+                
+
+
+        rectBackbufferDrawRectangle ( 
+            0, 0, 320, 200, COLOR_BLACK, 1 );
+        xxxCubeZ(cube);
+        gws_refresh_rectangle(0,0,320,200);
+        for(i=0;i<16;i++){ gwssrv_yield(); }
+
+        for (j=0; j<30; j++){        
+            rectBackbufferDrawRectangle ( 
+                0, 0, 320, 200, COLOR_BLACK, 1 );        
+            xxxInflateCubeZ (cube, 1);
+            xxxCubeZ(cube);
+            gws_refresh_rectangle(0,0,320,200);
+            for(i=0;i<16;i++){ gwssrv_yield(); }
+        }
+        
+        }; //while--
+       
+        
+        //xxxInflateCubeZ (cube, 10);
+        //xxxCubeZ(cube);
+
+        //xxxInflateCubeZ (cube, 20);
+        //xxxCubeZ(cube);
+
+        //xxxDeflateCubeZ (cube, 5);
+        //xxxCubeZ(cube);
+        
+        //xxxDeflateCubeZ (cube, 10);
+        //xxxCubeZ(cube);
+
+        //plotCharBackbufferDrawcharTransparentZ ( cube->p[0].x,  cube->p[0].y, COLOR_BLACK, 'G', cube->p[0].z );
+        //plotCharBackbufferDrawcharTransparentZ ( cube->p[1].x,  cube->p[1].y, COLOR_BLACK, 'R', cube->p[1].z );
+        //plotCharBackbufferDrawcharTransparentZ ( cube->p[2].x,  cube->p[2].y, COLOR_BLACK, 'A', cube->p[2].z );
+        //plotCharBackbufferDrawcharTransparentZ ( cube->p[3].x,  cube->p[3].y, COLOR_BLACK, 'M', cube->p[3].z );
+        //plotCharBackbufferDrawcharTransparentZ ( cube->p[4].x,  cube->p[4].y, COLOR_BLACK, 'A', cube->p[4].z );
+        //plotCharBackbufferDrawcharTransparentZ ( cube->p[5].x,  cube->p[5].y, COLOR_BLACK, 'D', cube->p[5].z );
+        //plotCharBackbufferDrawcharTransparentZ ( cube->p[6].x,  cube->p[6].y, COLOR_BLACK, '0', cube->p[6].z );
+        //plotCharBackbufferDrawcharTransparentZ ( cube->p[7].x,  cube->p[7].y, COLOR_BLACK, '*', cube->p[7].z );
+    }
+}
+
 
 //Circle
 //This is an implementation of the circle algorithm.

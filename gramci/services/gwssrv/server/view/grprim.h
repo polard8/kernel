@@ -146,7 +146,7 @@ int xxxCubeZ ( struct gr_cube_d *cube );
 
 
 void cube_demo1(void);
-
+void cube_demo2(void);
 
 void plotCircle (int xm, int ym, int r, unsigned long color);
 void 
