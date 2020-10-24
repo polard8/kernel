@@ -1757,8 +1757,20 @@ void InitGraphics(void){
     // only jail.
     
     //cube_demo1();
-    cube_demo2();
+    //cube_demo2();
     
+    /* 
+    // line
+    plotQuadBezierSeg ( 
+        0,  0, 0,    //x0, y0, z0, 
+        40, 40, 0,   //x1, y1, z1,
+       100, 20, 0,  //x2, y2, z2, 
+       COLOR_WHITE );
+   */
+   
+    
+    
+    //curveDemo();
     
     // refresh
     gws_show_backbuffer();              
@@ -1782,7 +1794,7 @@ void InitGraphics(void){
         
     debug_print("gwssrv: InitGraphics done\n");
     //printf     ("gwssrv: InitGraphics done *hang\n");
-    while(1){}
+    //while(1){}
 }
 
 

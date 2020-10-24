@@ -1,4 +1,13 @@
-	// gramado 3d primitives.
+/*
+ * File: grprim.c 
+ * 
+ *     Primitives.
+ * 
+ * 
+ * History:
+ *     2020 - Created by Fred Nora.
+ */
+
 
 
 #include <gws.h>
@@ -44,9 +53,18 @@ int grInit (void)
 }
 
 
+/*
+ ******************************* 
+ * grPlot0:
+ *      Plot into a normalized screen. kinda.
+ */
+
 // low level plot.
-int grPlot0 (int z, int x, int y, unsigned long color)
-{
+// History:
+//     2020 - Created by Fred Nora.
+
+
+int grPlot0 (int z, int x, int y, unsigned long color){
 
     // #todo
     // We need a z-buffer or (depth buffer)
@@ -200,7 +218,7 @@ void plotLine(int x0, int y0, int x1, int y1)
             if (x0 == x1) break;
             err += dy; x0 += sx;
         }
-        if (e2 <= dx) {                                       // e_xy+e_y < 0 
+        if (e2 <= dx) {                                // e_xy+e_y < 0 
             if (y0 == y1) break;
             err += dx; y0 += sy;
         }
@@ -210,9 +228,14 @@ void plotLine(int x0, int y0, int x1, int y1)
 
 
 
-//Bresenham in 3D
-//The algorithm could be extended to three (or more) dimensions.
-
+/*
+ ************************************************ 
+ * plotLine3d: 
+ * 
+ */
+ 
+// Bresenham in 3D
+// The algorithm could be extended to three (or more) dimensions.
 void 
 plotLine3d (
     int x0, int y0, int z0, 
@@ -426,33 +449,33 @@ int xxxCubeZ ( struct gr_cube_d *cube )
 
     // north;
     plotLine3d (cube->p[4].x, cube->p[4].y, cube->p[4].z, 
-                cube->p[5].x, cube->p[5].y, cube->p[5].z, COLOR_PINK );
+                cube->p[5].x, cube->p[5].y, cube->p[5].z, cube->p[4].color );
     plotLine3d (cube->p[5].x, cube->p[5].y, cube->p[5].z, 
-                cube->p[6].x, cube->p[6].y, cube->p[6].z, COLOR_PINK );
+                cube->p[6].x, cube->p[6].y, cube->p[6].z, cube->p[5].color );
     plotLine3d (cube->p[7].x, cube->p[7].y, cube->p[7].z, 
-                cube->p[6].x, cube->p[6].y, cube->p[6].z, COLOR_PINK );
+                cube->p[6].x, cube->p[6].y, cube->p[6].z, cube->p[6].color );
     plotLine3d (cube->p[4].x, cube->p[4].y, cube->p[4].z, 
-                cube->p[7].x, cube->p[7].y, cube->p[7].z, COLOR_PINK );
+                cube->p[7].x, cube->p[7].y, cube->p[7].z, cube->p[7].color );
 
     ras_rectangleZ ( 
         cube->p[4].x, cube->p[4].y, cube->p[4].z, 
         cube->p[6].x, cube->p[6].y, cube->p[6].z,
-        COLOR_YELLOW  );
+        cube->p[4].color  );
  
     //=================================================================
     
     // 1st line 
     plotLine3d (cube->p[0].x, cube->p[0].y, cube->p[0].z, 
-                cube->p[4].x, cube->p[4].y, cube->p[4].z, COLOR_RED );
+                cube->p[4].x, cube->p[4].y, cube->p[4].z, cube->p[0].color );
     // 2nd line
     plotLine3d (cube->p[1].x, cube->p[1].y, cube->p[1].z, 
-                cube->p[5].x, cube->p[5].y, cube->p[5].z, COLOR_RED );
+                cube->p[5].x, cube->p[5].y, cube->p[5].z, cube->p[1].color );
     // 3rd line
     plotLine3d (cube->p[2].x, cube->p[2].y, cube->p[2].z, 
-                cube->p[6].x, cube->p[6].y, cube->p[6].z, COLOR_RED );
+                cube->p[6].x, cube->p[6].y, cube->p[6].z, cube->p[2].color );
     // 4th line 
     plotLine3d (cube->p[3].x, cube->p[3].y, cube->p[3].z, 
-                cube->p[7].x, cube->p[7].y, cube->p[7].z, COLOR_RED );
+                cube->p[7].x, cube->p[7].y, cube->p[7].z, cube->p[3].color );
 
     //=================================================================
 
@@ -460,38 +483,38 @@ int xxxCubeZ ( struct gr_cube_d *cube )
     ras_rectangleZ ( 
         cube->p[0].x, cube->p[0].y, cube->p[0].z, 
         cube->p[7].x, cube->p[7].y, cube->p[7].z,
-        COLOR_RED  );
+        cube->p[0].color  );
 
 
     //right ok
     ras_rectangleZ ( 
         cube->p[1].x, cube->p[1].y, cube->p[1].z, 
         cube->p[6].x, cube->p[6].y, cube->p[6].z,
-        COLOR_RED  );
+        cube->p[1].color  );
 
 
     //bottom fail
     //ras_rectangleZ ( 
     //    cube->p[3].x, cube->p[3].y, cube->p[3].z, 
     //    cube->p[6].x, cube->p[6].y, cube->p[6].z,
-    //    COLOR_RED  );
+    //    cube->p[2].color  );
 
     // top fail
     //ras_rectangleZ ( 
     //    cube->p[4].x, cube->p[4].y, cube->p[4].z, 
     //    cube->p[0].x, cube->p[0].y, cube->p[0].z,
-    //    COLOR_RED  );
+    //    cube->p[3].color  );
 
        
     //south
     plotLine3d (cube->p[0].x, cube->p[0].y, cube->p[0].z, 
-                cube->p[1].x, cube->p[1].y, cube->p[1].z, COLOR_BLUE );
+                cube->p[1].x, cube->p[1].y, cube->p[1].z, cube->p[0].color );
     plotLine3d (cube->p[1].x, cube->p[1].y, cube->p[1].z, 
-                cube->p[2].x, cube->p[2].y, cube->p[2].z, COLOR_BLUE );
+                cube->p[2].x, cube->p[2].y, cube->p[2].z, cube->p[1].color );
     plotLine3d (cube->p[3].x, cube->p[3].y, cube->p[3].z, 
-                cube->p[2].x, cube->p[2].y, cube->p[2].z, COLOR_BLUE );
+                cube->p[2].x, cube->p[2].y, cube->p[2].z, cube->p[2].color );
     plotLine3d (cube->p[0].x, cube->p[0].y, cube->p[0].z, 
-                cube->p[3].x, cube->p[3].y, cube->p[3].z, COLOR_BLUE );
+                cube->p[3].x, cube->p[3].y, cube->p[3].z, cube->p[3].color );
 
    ras_rectangleZ (  
        cube->p[0].x, cube->p[0].y, cube->p[0].z,   //y=top? 
@@ -617,8 +640,8 @@ void cube_demo2(void)
     cube = (void *) malloc( sizeof( struct gr_cube_d ) );
     if ( (void*) cube != NULL )
     {
-		//marcador.
-		noraDrawingStuff3 (0,0,0);
+        //marcador.
+        noraDrawingStuff3 (0,0,0);
 
         while (1) {
 
@@ -647,22 +670,22 @@ void cube_demo2(void)
         cube->p[4].x = 0;
         cube->p[4].y = 40;
         cube->p[4].z = 40;
-        cube->p[4].color = COLOR_BLACK;
+        cube->p[4].color = COLOR_YELLOW;
         
         cube->p[5].x = 40;
         cube->p[5].y = 40;
         cube->p[5].z = 40;
-        cube->p[5].color = COLOR_BLACK;
+        cube->p[5].color = COLOR_YELLOW;
         
         cube->p[6].x = 40;
         cube->p[6].y = 0;
         cube->p[6].z = 40;
-        cube->p[6].color = COLOR_BLACK;
+        cube->p[6].color = COLOR_YELLOW;
         
         cube->p[7].x = 0;
         cube->p[7].y = 0;
         cube->p[7].z = 40;
-        cube->p[7].color = COLOR_BLACK;
+        cube->p[7].color = COLOR_YELLOW;
                 
 
 
@@ -1591,9 +1614,106 @@ void grDCColorChg (
 
 
 
+//Bézier curve
+//This program example plots a quadratic Bézier curve limited to gradients without sign change.
+
+void 
+plotQuadBezierSeg ( 
+    int x0, int y0, int z0, 
+    int x1, int y1, int z1,
+    int x2, int y2, int z2, unsigned long color )
+{ 
+                           
+    int  sx = x2-x1, sy = y2-y1;
+    long xx = x0-x1, yy = y0-y1, xy;         /* relative values for checks */
+    //double dx, dy, err, cur = xx*sy-yy*sx;                    /* curvature */
+    long dx, dy, err, cur = xx*sy-yy*sx;
+
+    /* sign of gradient must not change */
+    //assert(xx*sx <= 0 && yy*sy <= 0);  
+
+    if ( xx*sx <= 0 && 
+         yy*sy <= 0 )
+    {
+        printf("plotQuadBezierSeg: [TODO] assert\n");
+        exit(1);
+    }
+
+     /* begin with longer part */
+    if (sx*(long)sx+sy*(long)sy > xx*xx+yy*yy)
+    {  
+        //swap P0 P2
+        x2 = x0; 
+        x0 = sx+x1; 
+        y2 = y0; 
+        y0 = sy+y1; 
+        cur = -cur;  
+    }  
+    
+    if (cur != 0) {                                    /* no straight line */
+    xx += sx; xx *= sx = x0 < x2 ? 1 : -1;           /* x step direction */
+    yy += sy; yy *= sy = y0 < y2 ? 1 : -1;           /* y step direction */
+    xy = 2*xx*yy; xx *= xx; yy *= yy;          /* differences 2nd degree */
+    if (cur*sx*sy < 0) {                           /* negated curvature? */
+      xx = -xx; yy = -yy; xy = -xy; cur = -cur;
+    }
+    
+    //dx = 4.0*sy*cur*(x1-x0)+xx-xy;             /* differences 1st degree */
+    //dy = 4.0*sx*cur*(y0-y1)+yy-xy;
+
+    dx = 4*sy*cur*(x1-x0)+xx-xy;             /* differences 1st degree */
+    dy = 4*sx*cur*(y0-y1)+yy-xy;
+    
+    xx += xx; yy += yy; err = dx+dy+xy;                /* error 1st step */    
+    do {                              
+      
+      /* plot curve */
+      //setPixel(x0,y0); 
+      grPlot0(x0,y0,z0,color);
+
+      if (x0 == x2 && y0 == y2) return;  /* last pixel -> curve finished */
+      y1 = 2*err < dx;                  /* save value for test of y step */
+      if (2*err > dy) { x0 += sx; dx -= xy; err += dy += yy; } /* x step */
+      if (    y1    ) { y0 += sy; dy -= xy; err += dx += xx; } /* y step */
+    } while (dy < dx );           /* gradient negates -> algorithm fails */
+    
+    
+    }
+    
+    /* plot remaining part to end */
+    //plotLine(x0,y0, x2,y2);   
+    plotLine3d(x0,y0,z0, x2,y2,z2, color); 
+}  
+  
 
 
+void curveDemo(void)
+{
+    int i=0;
+    int j=0;
+    while(1){
 
+    for (i=0; i<10; i++){
+        // line
+
+        rectBackbufferDrawRectangle ( 
+            0, 0, 320, 200, COLOR_BLACK, 1 );
+        
+        //a variaçao de y2 me pareceu certa.
+        plotQuadBezierSeg ( 
+            0,   0,  0,      //x0, y0, z0, 
+            40,  40, 0,      //x1, y1, z1,
+           100,  20+i+i, 0,  //x2, y2, z2, 
+           COLOR_YELLOW );
+
+        gws_refresh_rectangle(0,0,320,200);
+
+        for (j=0; j<80; j++){ gwssrv_yield();}
+    };
+    
+    }
+
+}
 
 
 

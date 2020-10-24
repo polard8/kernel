@@ -272,3 +272,19 @@ rtl_copy_text (
 }
 
 
+/*
+char *johncarmack_strstr(const char *haystack, const char *needle);
+char *johncarmack_strstr(const char *haystack, const char *needle)
+{
+	// ...
+}
+*/
+
+
+
+
+
+
+
+
+

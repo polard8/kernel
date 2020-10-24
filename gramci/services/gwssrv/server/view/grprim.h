@@ -1,11 +1,17 @@
-
+/*
+ * File: grprim.h 
+ * 
+ *     Header for primitives.
+ * 
+ * 
+ * History:
+ *     2020 - Created by Fred Nora.
+ */
 
 
 
 #ifndef __GRPRIM_H
 #define __GRPRIM_H   1
-
-
 
 
 struct gr_vec3D_d
@@ -112,12 +118,32 @@ void matrix_demo1(void);
 int grInit(void);
 
 
+
+// Point.
 int grPlot0 (int z, int x, int y, unsigned long color);
 
 
 
-void plotLine3d(int x0, int y0, int z0, int x1, int y1, int z1, unsigned long color);
+//
+// == Line ==============================================
+//
 
+void 
+plotLine3d (
+    int x0, int y0, int z0, 
+    int x1, int y1, int z1, 
+    unsigned long color );
+    
+    
+void 
+plotQuadBezierSeg ( 
+    int x0, int y0, int z0, 
+    int x1, int y1, int z1,
+    int x2, int y2, int z2, unsigned long color );
+
+//
+// == rectangle =======================================
+//
 
 void
 rectangle (
@@ -140,13 +166,21 @@ ras_rectangleZ (
     unsigned long color );
 
 
+//
+// == Cube ========================================================
+//
+
 int xxxInflateCubeZ ( struct gr_cube_d *cube, int value );
 int xxxDeflateCubeZ ( struct gr_cube_d *cube, int value );
 int xxxCubeZ ( struct gr_cube_d *cube );
 
-
 void cube_demo1(void);
 void cube_demo2(void);
+
+
+//
+// == Circle =================================================
+//
 
 void plotCircle (int xm, int ym, int r, unsigned long color);
 void 
@@ -158,8 +192,11 @@ plotCircleZ (
     int z );
 
 
-void plotEllipseRect(int x0, int y0, int x1, int y1, unsigned long color);
+//
+// == Ellipse =================================================
+//
 
+void plotEllipseRect(int x0, int y0, int x1, int y1, unsigned long color);
 void 
 plotEllipseRectZ (
     int x0, int y0, 
@@ -168,13 +205,23 @@ plotEllipseRectZ (
     int z );
 
 
-//#test
+
+//
+// Fred Nora's algo. Prime stuff;
+//
+
 void noraDrawingStuff(void);
 void noraDrawingStuff3(int x, int y, int z);
+
+
 
 // Fibonacci Series using Recursion 
 int fib(int n);
 
+
+//
+// == Char ========================================
+//
 
 void 
 plotCharBackbufferDrawcharTransparent ( 
@@ -182,6 +229,7 @@ plotCharBackbufferDrawcharTransparent (
     unsigned long y, 
     unsigned long color, 
     unsigned long c );
+
 
 void 
 plotCharBackbufferDrawcharTransparentZ ( 
@@ -205,6 +253,9 @@ void grDCColorChg (
     struct gws_display_d *dc,
     unsigned char subpixel_src_color,
     unsigned char subpixel_dst_color );  // dst_color=COLOR_TRANSPARENT )
+
+
+void curveDemo(void);
 
 #endif    
 
