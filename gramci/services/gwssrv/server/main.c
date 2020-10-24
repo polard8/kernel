@@ -1755,7 +1755,7 @@ void InitGraphics(void){
 
     // inflate or deflate several times.
     // only jail.
-    cube_demo1();
+    //cube_demo1();
     
     
     
@@ -1781,9 +1781,8 @@ void InitGraphics(void){
         
     debug_print("gwssrv: InitGraphics done\n");
     //printf     ("gwssrv: InitGraphics done *hang\n");
-    while(1){}
+    //while(1){}
 }
-
 
 
 void

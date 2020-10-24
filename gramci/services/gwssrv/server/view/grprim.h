@@ -135,31 +135,15 @@ rectangleZ (
 
 void
 ras_rectangleZ (
-    int left, int top, 
-    int right, int bottom,
-    unsigned long color,
-    int z );
-
-
-void 
-cube ( 
-    int bx0, int by0, int bx1, int by1,  //back rect
-    int fx0, int fy0, int fx1, int fy1,  //front rect 
+    int left, int top, int z0,
+    int right, int bottom, int z1,
     unsigned long color );
-
 
 
 int xxxInflateCubeZ ( struct gr_cube_d *cube, int value );
 int xxxDeflateCubeZ ( struct gr_cube_d *cube, int value );
-
 int xxxCubeZ ( struct gr_cube_d *cube );
 
-
-void 
-cubeZ ( 
-    int bx0, int by0, int bx1, int by1,  //back rect
-    int fx0, int fy0, int fx1, int fy1,  //front rect 
-    unsigned long color, int z );
 
 void cube_demo1(void);
 

@@ -259,29 +259,17 @@ rectangle (
     unsigned long color )
 {
 
-     //cima
-     plotLine3d ( 
-         left, top,   0,
-         right, top,  0,
-         color );
+     // cima
+     plotLine3d ( left, top, 0, right, top, 0, color );
 
-     //baixo
-     plotLine3d ( 
-         left, bottom,   0,
-         right,bottom,  0,
-         color );
+     // baixo
+     plotLine3d ( left, bottom, 0, right,bottom, 0, color );
 
-     //esquerda
-     plotLine3d ( 
-         left, top,   0,
-         left, bottom,  0,
-         color );
+     // esquerda
+     plotLine3d ( left, top, 0, left, bottom, 0, color );
 
-     //direita
-     plotLine3d ( 
-         right,    top,   0,
-         right, bottom,  0,
-         color );
+     // direita
+     plotLine3d ( right, top, 0, right, bottom, 0, color );
 }
  
 
@@ -294,104 +282,35 @@ rectangleZ (
     unsigned long color,
     int z )
 {
+     // cima
+     plotLine3d ( left, top,  z, right, top, z, color );
 
-     //cima
-     plotLine3d ( 
-         left, top,   z,
-         right, top,  z,
-         color );
+     // baixo
+     plotLine3d ( left, bottom, z, right,bottom, z, color );
 
-     //baixo
-     plotLine3d ( 
-         left, bottom,   z,
-         right,bottom,  z,
-         color );
+     // esquerda
+     plotLine3d ( left, top, z, left, bottom, z, color );
 
-     //esquerda
-     plotLine3d ( 
-         left, top,   z,
-         left, bottom,  z,
-         color );
-
-     //direita
-     plotLine3d ( 
-         right,    top,   z,
-         right, bottom,  z,
-         color );
+     // direita
+     plotLine3d ( right,  top, z, right, bottom, z, color );
 }
 
 
 // The upper-left corner and lower-right corner. 
 void
 ras_rectangleZ (
-    int left, int top, 
-    int right, int bottom,
-    unsigned long color,
-    int z )
+    int left, int top, int z0,
+    int right, int bottom, int z1,
+    unsigned long color )
 {
 
      int h=0;
-     
-     for (h=top;h<bottom; h++){
 
-     //cima
-     plotLine3d ( 
-         left, h,   z,
-         right, h,  z,
-         color );
+     // COmewça com a linha de cima.
+     for ( h=top; h >= bottom; h-- ){
+         plotLine3d ( left,  h, z0, right, h, z1, color );
     }
-    
-     //baixo
-     //plotLine3d ( 
-         //left, bottom,   z,
-         //right,bottom,  z,
-         //color );
-
-     //esquerda
-     //plotLine3d ( 
-         //left, top,   z,
-         //left, bottom,  z,
-         //color );
-
-     //direita
-     //plotLine3d ( 
-         //right,    top,   z,
-         //right, bottom,  z,
-         //color );
 }
-
-
-
-
-//cube mesh
-void 
-cube ( 
-    int bx0, int by0, int bx1, int by1,  //back rect
-    int fx0, int fy0, int fx1, int fy1,  //front rect 
-    unsigned long color)
-{
-
-    //back
-    //1st rectangle
-    //rectangle(100,200,200,300, color );
-    rectangle ( bx0, by0, bx1, by1, color );
-    
-    //front
-    //2nd rectangle
-    //rectangle(150,250,250,350, color);
-    rectangle ( fx0, fy0, fx1, fy1, color );
-    
-    
-    // 1st line
-    plotLine3d (bx0, by0, 0, fx0, fy0, 0, color);
-    // 2nd line
-    plotLine3d (bx1, by1, 0, fx1, fy1, 0, color);
-    // 3rd line
-    plotLine3d (bx0, by1, 0, fx0, fy1, 0, color);
-    // 4th line
-    plotLine3d (bx1, by0, 0, fx1, fy0, 0, color);
-}
-
 
 
 
@@ -515,8 +434,10 @@ int xxxCubeZ ( struct gr_cube_d *cube )
     plotLine3d (cube->p[4].x, cube->p[4].y, cube->p[4].z, 
                 cube->p[7].x, cube->p[7].y, cube->p[7].z, COLOR_PINK );
 
-    ras_rectangleZ ( cube->p[6].x, cube->p[6].y, cube->p[4].x, cube->p[4].y, 
-       cube->p[7].color, cube->p[7].z );
+    ras_rectangleZ ( 
+        cube->p[4].x, cube->p[4].y, cube->p[4].z, 
+        cube->p[6].x, cube->p[6].y, cube->p[6].z,
+        COLOR_YELLOW  );
  
     //=================================================================
     
@@ -534,35 +455,34 @@ int xxxCubeZ ( struct gr_cube_d *cube )
                 cube->p[7].x, cube->p[7].y, cube->p[7].z, COLOR_RED );
 
     //=================================================================
-    
-    //
-    // right
-    //
-    
-    //ras diagonal
-    //rectangleZ ( cube->p[1].x, cube->p[1].y, cube->p[7].x, cube->p[4].y, COLOR_RED, cube->p[0].z ); //marcador.
-    //i=0;
-    //for (h =by0; h<by1; h++){
-       //plotLine3d (bx1, h, z, fx1, fy0+i, z, COLOR_GREEN );
-    //   i++;
-    //}
 
-    //
-    // left
-    //
+    //left ok
+    ras_rectangleZ ( 
+        cube->p[0].x, cube->p[0].y, cube->p[0].z, 
+        cube->p[7].x, cube->p[7].y, cube->p[7].z,
+        COLOR_RED  );
 
-    //ras diagonal
-    //rectangleZ ( bx0, by1, fx0, fy0, COLOR_RED,z ); //marcador.
-    //i=0;
-    //for (h=by0; h<by1; h++){
-    //    plotLine3d (bx0, h, z, fx0, fy0+i, z, color);
-    //    i++;
-    //}
 
-    // ...
-    
-   // south 
+    //right ok
+    ras_rectangleZ ( 
+        cube->p[1].x, cube->p[1].y, cube->p[1].z, 
+        cube->p[6].x, cube->p[6].y, cube->p[6].z,
+        COLOR_RED  );
 
+
+    //bottom fail
+    //ras_rectangleZ ( 
+    //    cube->p[3].x, cube->p[3].y, cube->p[3].z, 
+    //    cube->p[6].x, cube->p[6].y, cube->p[6].z,
+    //    COLOR_RED  );
+
+    // top fail
+    //ras_rectangleZ ( 
+    //    cube->p[4].x, cube->p[4].y, cube->p[4].z, 
+    //    cube->p[0].x, cube->p[0].y, cube->p[0].z,
+    //    COLOR_RED  );
+
+       
     //south
     plotLine3d (cube->p[0].x, cube->p[0].y, cube->p[0].z, 
                 cube->p[1].x, cube->p[1].y, cube->p[1].z, COLOR_BLUE );
@@ -573,107 +493,11 @@ int xxxCubeZ ( struct gr_cube_d *cube )
     plotLine3d (cube->p[0].x, cube->p[0].y, cube->p[0].z, 
                 cube->p[3].x, cube->p[3].y, cube->p[3].z, COLOR_BLUE );
 
-   ras_rectangleZ ( cube->p[2].x, cube->p[2].y, cube->p[0].x, cube->p[0].y, 
-        cube->p[0].color, cube->p[0].z );
-
+   ras_rectangleZ (  
+       cube->p[0].x, cube->p[0].y, cube->p[0].z,   //y=top? 
+       cube->p[2].x, cube->p[2].y, cube->p[2].z,
+       cube->p[0].color );
 }
-
-
-
-
-//cube mash
-
-// #todo
-// It has an orthogonal projection
-// cubeZOrtho(
-
-void 
-cubeZ ( 
-    int bx0, int by0, int bx1, int by1,  //back rect
-    int fx0, int fy0, int fx1, int fy1,  //front rect 
-    unsigned long color, int z )
-{
-
-    int h=0; 
-    int d=0;
-    int i=0;
-
-    // aspect ratio = height/width
-    // sem float isso da zero.
-    
-    // remember: we can't divide by zero.
-    //int scale = 0;
-    //scale = z; 
-
-
-    //#todo
-    // a rasterizaçao deve ser opcional
-    // colocar uma flag nos argumentos.
-    
-    // We need to check the limits and do not paint what is
-    // out of the limits.
-
-    //back (NORTH) PROJECTED!!!
-    //1st rectangle
-    //rectangle(100,200,200,300, color );
-    rectangleZ     ( bx0, by0, bx1, by1, color, z );
-    ras_rectangleZ ( bx0, by0, bx1, by1, color, z );
-    
-    //front
-    //2nd rectangle
-    //rectangle(150,250,250,350, color);
-    //rectangleZ ( fx0, fy0, fx1, fy1, color,z );
-    //ras_rectangleZ ( fx0, fy0, fx1, fy1, color,z ); 
-
-    //
-    // lines
-    //
-    
-    // 1st line esq baixo
-    plotLine3d (bx0, by0, z, fx0, fy0, z, color);
-    // 2nd line
-    plotLine3d (bx1, by1, z, fx1, fy1, z, color);
-    // 3rd line
-    plotLine3d (bx0, by1, z, fx0, fy1, z, color);
-    // 4th line dir baixo
-    plotLine3d (bx1, by0, z, fx1, fy0, z, color);
-    
-    
-    //
-    // right
-    //
-    
-    //ras diagonal
-    //rectangleZ ( bx1, by1, fx1, fy0, COLOR_RED,z ); //marcador.
-    i=0;
-    for (h=by0; h<by1; h++){
-        plotLine3d (bx1, h, z, fx1, fy0+i, z, color);
-        i++;
-    }
-
-    //
-    // left
-    //
-
-    //ras diagonal
-    //rectangleZ ( bx0, by1, fx0, fy0, COLOR_RED,z ); //marcador.
-    i=0;
-    for (h=by0; h<by1; h++){
-        plotLine3d (bx0, h, z, fx0, fy0+i, z, color);
-        i++;
-    }
-    
-    //
-    // front
-    //
-    
-     //front   (SOUTH)
-    //2nd rectangle
-    //rectangle(150,250,250,350, color);
-    rectangleZ     ( fx0, fy0, fx1, fy1, color, z );
-    ras_rectangleZ ( fx0, fy0, fx1, fy1, color, z ); 
-}
-
 
 
 // inflate varias vezes.
