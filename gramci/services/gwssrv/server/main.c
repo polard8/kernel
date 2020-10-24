@@ -1436,6 +1436,7 @@ void create_background (void)
 
 
 
+
 void InitGraphics(void){
 
     int __init_status = -1;
@@ -1570,6 +1571,7 @@ void InitGraphics(void){
     */
 
     /*
+    int i=0;
     for (i=0; i<5; i++)
     { 
        plotLine3d ( 
@@ -1578,7 +1580,6 @@ void InitGraphics(void){
            COLOR_RED );
     };
     */
-
 
      // Lines.
 
@@ -1754,7 +1755,9 @@ void InitGraphics(void){
 
     // inflate or deflate several times.
     // only jail.
-    //cube_demo1();
+    cube_demo1();
+    
+    
     
     // refresh
     gws_show_backbuffer();              
@@ -1778,7 +1781,7 @@ void InitGraphics(void){
         
     debug_print("gwssrv: InitGraphics done\n");
     //printf     ("gwssrv: InitGraphics done *hang\n");
-    //while(1){}
+    while(1){}
 }
 
 

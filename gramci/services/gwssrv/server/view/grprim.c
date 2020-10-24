@@ -250,6 +250,8 @@ plotLine3d (
 }
 
 
+
+// The upper-left corner and lower-right corner. 
 void
 rectangle (
     int left, int top, 
@@ -283,6 +285,8 @@ rectangle (
 }
  
 
+
+// The upper-left corner and lower-right corner. 
 void
 rectangleZ (
     int left, int top, 
@@ -317,7 +321,7 @@ rectangleZ (
 }
 
 
-
+// The upper-left corner and lower-right corner. 
 void
 ras_rectangleZ (
     int left, int top, 
@@ -359,7 +363,7 @@ ras_rectangleZ (
 
 
 
-
+//cube mesh
 void 
 cube ( 
     int bx0, int by0, int bx1, int by1,  //back rect
@@ -485,6 +489,7 @@ int xxxDeflateCubeZ ( struct gr_cube_d *cube, int value )
 
 
 // #test
+// cube mesh
 int xxxCubeZ ( struct gr_cube_d *cube )
 {
 
@@ -496,32 +501,39 @@ int xxxCubeZ ( struct gr_cube_d *cube )
     if ( (void*) cube == NULL )
         return -1;
     
-    //cube->p[0].x;
-    
+ 
     //north
-    rectangleZ ( cube->p[2].x, cube->p[2].y, cube->p[0].x, cube->p[0].y, 
-        cube->p[0].color, cube->p[0].z );
+    //primeiro desenha o north porque ele sera sobreposto pelo sul nessa camera.
 
-    ras_rectangleZ ( cube->p[2].x, cube->p[2].y, cube->p[0].x, cube->p[0].y, 
-        cube->p[0].color, cube->p[0].z );
-    
-    
+    // north;
+    plotLine3d (cube->p[4].x, cube->p[4].y, cube->p[4].z, 
+                cube->p[5].x, cube->p[5].y, cube->p[5].z, COLOR_PINK );
+    plotLine3d (cube->p[5].x, cube->p[5].y, cube->p[5].z, 
+                cube->p[6].x, cube->p[6].y, cube->p[6].z, COLOR_PINK );
+    plotLine3d (cube->p[7].x, cube->p[7].y, cube->p[7].z, 
+                cube->p[6].x, cube->p[6].y, cube->p[6].z, COLOR_PINK );
+    plotLine3d (cube->p[4].x, cube->p[4].y, cube->p[4].z, 
+                cube->p[7].x, cube->p[7].y, cube->p[7].z, COLOR_PINK );
+
+    ras_rectangleZ ( cube->p[6].x, cube->p[6].y, cube->p[4].x, cube->p[4].y, 
+       cube->p[7].color, cube->p[7].z );
+ 
+    //=================================================================
     
     // 1st line 
     plotLine3d (cube->p[0].x, cube->p[0].y, cube->p[0].z, 
-                cube->p[4].x, cube->p[4].y, cube->p[4].z, cube->p[7].color );
+                cube->p[4].x, cube->p[4].y, cube->p[4].z, COLOR_RED );
     // 2nd line
     plotLine3d (cube->p[1].x, cube->p[1].y, cube->p[1].z, 
-                cube->p[5].x, cube->p[5].y, cube->p[5].z, cube->p[7].color);
+                cube->p[5].x, cube->p[5].y, cube->p[5].z, COLOR_RED );
     // 3rd line
     plotLine3d (cube->p[2].x, cube->p[2].y, cube->p[2].z, 
-                cube->p[6].x, cube->p[6].y, cube->p[6].z, cube->p[7].color);
+                cube->p[6].x, cube->p[6].y, cube->p[6].z, COLOR_RED );
     // 4th line 
     plotLine3d (cube->p[3].x, cube->p[3].y, cube->p[3].z, 
-                cube->p[7].x, cube->p[7].y, cube->p[7].z, cube->p[7].color);
+                cube->p[7].x, cube->p[7].y, cube->p[7].z, COLOR_RED );
 
-
-    //ras
+    //=================================================================
     
     //
     // right
@@ -530,9 +542,9 @@ int xxxCubeZ ( struct gr_cube_d *cube )
     //ras diagonal
     //rectangleZ ( cube->p[1].x, cube->p[1].y, cube->p[7].x, cube->p[4].y, COLOR_RED, cube->p[0].z ); //marcador.
     //i=0;
-   // for (h =by0; h<by1; h++){
-   //     plotLine3d (bx1, h, z, fx1, fy0+i, z, color);
-    //    i++;
+    //for (h =by0; h<by1; h++){
+       //plotLine3d (bx1, h, z, fx1, fy0+i, z, COLOR_GREEN );
+    //   i++;
     //}
 
     //
@@ -550,14 +562,26 @@ int xxxCubeZ ( struct gr_cube_d *cube )
     // ...
     
    // south 
-    rectangleZ ( cube->p[6].x, cube->p[6].y, cube->p[4].x, cube->p[4].y, 
-       cube->p[7].color, cube->p[7].z );
 
-    ras_rectangleZ ( cube->p[6].x, cube->p[6].y, cube->p[4].x, cube->p[4].y, 
-       cube->p[7].color, cube->p[7].z );
+    //south
+    plotLine3d (cube->p[0].x, cube->p[0].y, cube->p[0].z, 
+                cube->p[1].x, cube->p[1].y, cube->p[1].z, COLOR_BLUE );
+    plotLine3d (cube->p[1].x, cube->p[1].y, cube->p[1].z, 
+                cube->p[2].x, cube->p[2].y, cube->p[2].z, COLOR_BLUE );
+    plotLine3d (cube->p[3].x, cube->p[3].y, cube->p[3].z, 
+                cube->p[2].x, cube->p[2].y, cube->p[2].z, COLOR_BLUE );
+    plotLine3d (cube->p[0].x, cube->p[0].y, cube->p[0].z, 
+                cube->p[3].x, cube->p[3].y, cube->p[3].z, COLOR_BLUE );
+
+   ras_rectangleZ ( cube->p[2].x, cube->p[2].y, cube->p[0].x, cube->p[0].y, 
+        cube->p[0].color, cube->p[0].z );
+
 }
 
 
+
+
+//cube mash
 
 // #todo
 // It has an orthogonal projection
@@ -664,63 +688,71 @@ void cube_demo1(void)
     cube = (void *) malloc( sizeof( struct gr_cube_d ) );
     if ( (void*) cube != NULL )
     {
+		//marcador.
+		noraDrawingStuff3 (0,0,0);
 		
-		
-		while(1){
+		//while(1){
 
-        // back points
+        //south     
         cube->p[0].x = 0;
         cube->p[0].y = 40;
         cube->p[0].z = 0;
-        cube->p[0].color = COLOR_YELLOW;
+        cube->p[0].color = COLOR_WHITE;
         
-        cube->p[1].x = 100;
+        cube->p[1].x = 40;
         cube->p[1].y = 40;
         cube->p[1].z = 0;
+        cube->p[1].color = COLOR_WHITE;
         
-        cube->p[2].x = 100;
+        cube->p[2].x = 40;
         cube->p[2].y = 0;
         cube->p[2].z = 0;
+        cube->p[2].color = COLOR_WHITE;
         
         cube->p[3].x = 0;
         cube->p[3].y = 0;
         cube->p[3].z = 0;
+        cube->p[3].color = COLOR_WHITE;
 
-        //front points
-        cube->p[4].x = 0+20;
-        cube->p[4].y = 20;
-        cube->p[4].z = 0;
+        //north
+        cube->p[4].x = 0;
+        cube->p[4].y = 40;
+        cube->p[4].z = 40;
+        cube->p[4].color = COLOR_BLACK;
         
-        cube->p[5].x = 100+20;
-        cube->p[5].y = 20;
-        cube->p[5].z = 0;
+        cube->p[5].x = 40;
+        cube->p[5].y = 40;
+        cube->p[5].z = 40;
+        cube->p[5].color = COLOR_BLACK;
         
-        cube->p[6].x = 100+20;
-        cube->p[6].y = 10;
-        cube->p[6].z = 0;
+        cube->p[6].x = 40;
+        cube->p[6].y = 0;
+        cube->p[6].z = 40;
+        cube->p[6].color = COLOR_BLACK;
         
-        cube->p[7].x = 0+20;
-        cube->p[7].y = 10;
-        cube->p[7].z = 0;
-        cube->p[7].color = COLOR_WHITE;
+        cube->p[7].x = 0;
+        cube->p[7].y = 0;
+        cube->p[7].z = 40;
+        cube->p[7].color = COLOR_BLACK;
+                
 
 
-       rectBackbufferDrawRectangle ( 
-           0, 0, 320, 200, COLOR_BLACK, 1 );
+        //rectBackbufferDrawRectangle ( 
+        //   0, 0, 320, 200, COLOR_BLACK, 1 );
         xxxCubeZ(cube);
-        gws_refresh_rectangle(0,0,320,200);
-        for(i=0;i<16;i++){ gwssrv_yield(); }
+        //gws_refresh_rectangle(0,0,320,200);
+        //for(i=0;i<16;i++){ gwssrv_yield(); }
 
-       for(j=0; j<30; j++){        
-       rectBackbufferDrawRectangle ( 
-           0, 0, 320, 200, COLOR_BLACK, 1 );        
-        xxxInflateCubeZ (cube, 1);
-        xxxCubeZ(cube);
-        gws_refresh_rectangle(0,0,320,200);
-        for(i=0;i<16;i++){ gwssrv_yield(); }
-        }
+        //for(j=0; j<30; j++){        
+        //rectBackbufferDrawRectangle ( 
+        //   0, 0, 320, 200, COLOR_BLACK, 1 );        
+        //xxxInflateCubeZ (cube, 1);
+        //xxxCubeZ(cube);
+        //gws_refresh_rectangle(0,0,320,200);
+        //for(i=0;i<16;i++){ gwssrv_yield(); }
+        //}
         
-        }
+        //}
        
         
         //xxxInflateCubeZ (cube, 10);
