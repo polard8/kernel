@@ -1757,7 +1757,7 @@ void InitGraphics(void){
     // only jail.
     
     //cube_demo1();
-    //cube_demo2();
+    cube_demo2();
     
     /* 
     // line
@@ -1794,7 +1794,7 @@ void InitGraphics(void){
         
     debug_print("gwssrv: InitGraphics done\n");
     //printf     ("gwssrv: InitGraphics done *hang\n");
-    //while(1){}
+    while(1){}
 }
 
 

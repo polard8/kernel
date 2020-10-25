@@ -345,7 +345,7 @@ int xxxInflateCubeZ ( struct gr_cube_d *cube, int value )
     //int value = z;
     //int value = z*2;
 
-        // back points
+        // south points =====================================
         cube->p[0].x = (cube->p[0].x - value);
         cube->p[0].y = (cube->p[0].y + value);
         cube->p[0].z = (cube->p[0].z - value);
@@ -362,22 +362,22 @@ int xxxInflateCubeZ ( struct gr_cube_d *cube, int value )
         cube->p[3].y = (cube->p[3].y - value);
         cube->p[3].z = (cube->p[3].z - value);
 
-        //front points
+        //north points ==========================================
         cube->p[4].x = (cube->p[4].x - value);
         cube->p[4].y = (cube->p[4].y + value);
-        cube->p[4].z = (cube->p[4].z - value);
+        cube->p[4].z = (cube->p[4].z + value);
         
         cube->p[5].x = (cube->p[5].x + value);
         cube->p[5].y = (cube->p[5].y + value);
-        cube->p[5].z = (cube->p[5].z - value);
+        cube->p[5].z = (cube->p[5].z + value);
         
         cube->p[6].x = (cube->p[6].x + value);
         cube->p[6].y = (cube->p[6].y - value);
-        cube->p[6].z = (cube->p[6].z - value);
+        cube->p[6].z = (cube->p[6].z + value);
         
         cube->p[7].x = (cube->p[7].x - value);
         cube->p[7].y = (cube->p[7].y - value);
-        cube->p[7].z = (cube->p[7].z - value);
+        cube->p[7].z = (cube->p[7].z + value);
         
     return 0;
 }
@@ -388,10 +388,10 @@ int xxxDeflateCubeZ ( struct gr_cube_d *cube, int value )
     if ( (void*) cube == NULL )
         return -1;
 
-    //int value = z;
-    //int value = z*2;
+    
 
-        // back points
+
+        // south points ==========================
         cube->p[0].x = (cube->p[0].x + value);
         cube->p[0].y = (cube->p[0].y - value);
         cube->p[0].z = (cube->p[0].z + value);
@@ -408,23 +408,22 @@ int xxxDeflateCubeZ ( struct gr_cube_d *cube, int value )
         cube->p[3].y = (cube->p[3].y + value);
         cube->p[3].z = (cube->p[3].z + value);
 
-        //front points
-        //cube->p[4].x = (cube->p[4].x + value);
-        //cube->p[4].y = (cube->p[4].y - value);
-        //cube->p[4].z = (cube->p[4].z + value);
+        // north points =========================
+        cube->p[4].x = (cube->p[4].x + value);
+        cube->p[4].y = (cube->p[4].y - value);
+        cube->p[4].z = (cube->p[4].z - value);
         
-        //cube->p[5].x = (cube->p[5].x - value);
-        //cube->p[5].y = (cube->p[5].y - value);
-        //cube->p[5].z = (cube->p[5].z + value);
+        cube->p[5].x = (cube->p[5].x - value);
+        cube->p[5].y = (cube->p[5].y - value);
+        cube->p[5].z = (cube->p[5].z - value);
         
-        //cube->p[6].x = (cube->p[6].x - value);
-        //cube->p[6].y = (cube->p[6].y + value);
-        //cube->p[6].z = (cube->p[6].z + value);
+        cube->p[6].x = (cube->p[6].x - value);
+        cube->p[6].y = (cube->p[6].y + value);
+        cube->p[6].z = (cube->p[6].z - value);
         
-        //cube->p[7].x = (cube->p[7].x + value);
-        //cube->p[7].y = (cube->p[7].y + value);
-        //cube->p[7].z = (cube->p[7].z + value);
-
+        cube->p[7].x = (cube->p[7].x + value);
+        cube->p[7].y = (cube->p[7].y + value);
+        cube->p[7].z = (cube->p[7].z - value);
         
     return 0;
 }
@@ -634,7 +633,8 @@ void cube_demo2(void)
 {
     int i=0;
     int j=0;
-   
+    static int action = 1000; // inflate.
+    
    
     struct gr_cube_d *cube;
     cube = (void *) malloc( sizeof( struct gr_cube_d ) );
@@ -688,22 +688,29 @@ void cube_demo2(void)
         cube->p[7].color = COLOR_YELLOW;
                 
 
-
-        rectBackbufferDrawRectangle ( 
-            0, 0, 320, 200, COLOR_BLACK, 1 );
+        rectBackbufferDrawRectangle ( 0, 0, 320, 200, COLOR_BLACK, 1 );
         xxxCubeZ(cube);
         gws_refresh_rectangle(0,0,320,200);
         for(i=0;i<16;i++){ gwssrv_yield(); }
 
-        for (j=0; j<30; j++){        
-            rectBackbufferDrawRectangle ( 
-                0, 0, 320, 200, COLOR_BLACK, 1 );        
-            xxxInflateCubeZ (cube, 1);
+        //porque o z eh reduzido duas vezes.
+        //entao esse eh o limite da reduçao.
+        for (j=0; j<(40/2); j++){        
+            rectBackbufferDrawRectangle ( 0, 0, 320, 200, COLOR_BLACK, 1 );        
+            if (action==1000){
+                xxxInflateCubeZ (cube, 1);
+            }else{
+                xxxDeflateCubeZ (cube, 1);
+            };
             xxxCubeZ(cube);
             gws_refresh_rectangle(0,0,320,200);
-            for(i=0;i<16;i++){ gwssrv_yield(); }
+            for(i=0;i<32;i++){ gwssrv_yield(); }
         }
-        
+        switch (action){
+            case 1000: action = 2000; break;
+            case 2000: action = 1000; break;
+            default:   action = 1000; break;
+        };
         }; //while--
        
         
