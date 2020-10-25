@@ -12,13 +12,75 @@
 #include <kernel.h>
 
 
-//internal
+// Internal
 #define SYS_SOCKET_IP(a, b, c, d) (a << 24 | b << 16 | c << 8 | d)
+
+
+/*
+// #todo
+// release a socket given the poiter for the structure.
+void socket_release_peer (struct socket_d *peer);
+void socket_release_peer (struct socket_d *peer)
+{
+    if ( (void*) peer == NULL )
+        return;
+    
+    // Change the state.
+    //peer->state = SS_DISCONNECTING;
+    
+    // Wake up the thread the was waiting for this.
+    //wake_up(peer->wait);
+}
+*/
+
+
+/*
+//#todo
+// it will disconnect properly.
+// unpliggin the two plugged pointers of structure.
+void socket_release(struct socket_d *sock);
+void socket_release(struct socket_d *sock)
+{
+}
+*/
+
+
+/*
+// #todo
+// it will call socket_release to do the job.
+void socket_close (struct inode_d *inode, struct file *file);
+void socket_close (struct inode_d *inode, struct file *file)
+{}
+*/
+
+
+
+/*
+// ?? nao tenho certeza disso
+// Nos conectamos ao socket servidor usando os ponteiros
+// caso nao tenha alguem na fila.
+// se tiver alguem na fila, entao devemos nos colocar na fila.
+// Eh uma tentativa de conexao ... e ficar na fila caso de errado.
+// tenta conectar, mas fica na fila se der errado
+// Se a ultima conexao pendente eh invalida.
+// Seremos nos a ultima conexao
+
+int
+socket_awaitconn ( 
+    struct socket_d *mysock, 
+    struct socket_d *servsock );
+int
+socket_awaitconn ( 
+    struct socket_d *mysock, 
+    struct socket_d *servsock )
+{
+}
+*/
 
 
 
 // Show the private socket for a process.
-void show_socket_for_a_process(int pid){
+void show_socket_for_a_process (int pid){
 
     struct process_d  *p;
     struct socket_d   *s;
@@ -40,12 +102,10 @@ void show_socket_for_a_process(int pid){
         goto fail;
 
     }else{
-
         if ( p->used != 1 || p->magic != 1234 ){
             printf("Process validation\n");
             goto fail;
         }
-
         //ok
     };
     
@@ -58,10 +118,8 @@ void show_socket_for_a_process(int pid){
         goto fail;
         
     }else{
-
-        if ( s->used != 1 || s->magic != 1234 )
-        {
-            printf("socket validation\n");
+        if ( s->used != 1 || s->magic != 1234 ){
+            printf ("socket validation\n");
             goto fail;
         }
     };
@@ -2193,9 +2251,13 @@ fail:
 
 // #todo
 // Pega um socket da lista de conexoes incompletas.
-
 // Essa eh uma implementacao tradicional
 // Nosso maior objetivo aqui eh retornar o fd arquivo de socket do cliente.
+
+     // #todo
+     // We need to create a new socket. Only this way the process
+     // will have a new file in p->Objects[].
+
 
 int 
 sys_accept (
@@ -2212,9 +2274,11 @@ sys_accept (
     // We create a new socket and connect this 
     // new socket with the client.
     // This way we can return the fd of the socket.
+    // #obs:
     // When the write() writes in the new socket, the data
-    // will be copied to the client socket.
-    
+    // will be copied to the client socket. But it can be only an option.
+
+
     /*
      * From Linux 0.98.1:
      * 
@@ -2224,23 +2288,18 @@ sys_accept (
      * wake up the client, then 
      * return the new connected fd.
      */
-     
-     // #todo
-     // We need to create a new socket. Only this way the process
-     // will have a new file in p->Objects[].
-
 
     struct process_d  *sProcess; //server process
 
     struct socket_d   *sSocket;  //server socket
-    struct socket_d   *cSocket;  //client socket
+    struct socket_d   *cSocket;  //client socket  <<<------
  
     file *sFile;   //file for the server socket.
-    file *cFile;   //todo
+    file *cFile;   //todo    <<<------
 
     //fd
     int fdServer = -1;
-    int fdClient = -1;
+    int fdClient = -1;    //  <<<------
 
     // #debug
     //debug_print ("sys_accept:\n");
