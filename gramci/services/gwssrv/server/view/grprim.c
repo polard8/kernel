@@ -1779,7 +1779,7 @@ void fredDemo1(void)
 void fredDemo2(void)
 {
     int i=0;
-    for (i=0; i<100; i++){
+    for (i=1; i< (1024-768); i++){
             //noraDrawingStuff3 (i,i,0);
             noraDrawingStuff3 (-i,-i,0);
             //rectangle(8,8,i,i,COLOR_BLUE);
@@ -1791,10 +1791,11 @@ void fredDemo2(void)
             //plotCircleZ ( -i % fib(20), -i % fib(20), i % fib(20), COLOR_GREEN, i % fib(20) );
             
             //IN: x,y,r,color,z
-            plotCircleZ ( -i % fib(20), -i % fib(20), i %  fib(20/2), COLOR_RED, i % fib(20) );
-            plotCircleZ ( -i % fib(20), -i % fib(20), i %  fib(20/3), COLOR_GREEN, i % fib(20) );
-            plotCircleZ ( -i % fib(20), -i % fib(20), i %  fib(20/5), COLOR_BLUE, i % fib(20) );
-            plotCircleZ ( -i % fib(20), -i % fib(20), i %  fib(20/7), COLOR_YELLOW, i % fib(20) );
+            plotCircleZ ( -i % fib(20), -i % fib(20), i % (1024-768), COLOR_RED, i % fib(20) );
+            //plotCircleZ ( -i % fib(20), -i % fib(20), i %  fib(20/3), COLOR_GREEN, i % fib(20) );
+            //plotCircleZ ( -i % fib(20), -i % fib(20), i %  fib(20/5), COLOR_BLUE, i % fib(20) );
+            //plotCircleZ ( -i % fib(20), -i % fib(20), i %  fib(20/7), COLOR_YELLOW, i % fib(20) );
+            
             //plotCircleZ ( -i % fib(20), -i % fib(20), i %  fib(20/), COLOR_GREEN, i % fib(20) );
             //plotCircleZ ( -i % fib(20), -i % fib(20), i %  fib(20/3), COLOR_YELLOW, i % fib(20) );
             

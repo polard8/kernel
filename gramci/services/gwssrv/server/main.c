@@ -1777,8 +1777,9 @@ void InitGraphics(void){
     
     //fredDemo0();
     //fredDemo1();
-    fredDemo2();
+    //fredDemo2(); // $bootcastle
     //...
+    
     
     // refresh
     gws_show_backbuffer();              
@@ -1802,7 +1803,7 @@ void InitGraphics(void){
         
     debug_print("gwssrv: InitGraphics done\n");
     //printf     ("gwssrv: InitGraphics done *hang\n");
-    while(1){}
+    //while(1){}
 }
 
 
