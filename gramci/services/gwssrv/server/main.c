@@ -1657,9 +1657,9 @@ void InitGraphics(void){
             //plotCircleZ ( -i % fib(7), -i % fib(7), i % fib(7), COLOR_GREEN, i % fib(7) );
             //plotEllipseRect ( i, i, i*5, i*5, COLOR_BLUE);
             //plotEllipseRectZ ( i%20, i%20, i, i, COLOR_BLUE,i%20);
-
     };
     */
+    
  
     /*
     plotCharBackbufferDrawcharTransparentZ (  (8*0), 0, COLOR_RED, 'G', 0 );
@@ -1757,7 +1757,7 @@ void InitGraphics(void){
     // only jail.
     
     //cube_demo1();
-    cube_demo2();
+    //cube_demo2();
     
     /* 
     // line
@@ -1771,6 +1771,14 @@ void InitGraphics(void){
     
     
     //curveDemo();
+    
+    
+    // fred demo ======
+    
+    //fredDemo0();
+    //fredDemo1();
+    fredDemo2();
+    //...
     
     // refresh
     gws_show_backbuffer();              

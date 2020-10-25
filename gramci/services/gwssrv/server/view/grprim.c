@@ -1724,6 +1724,104 @@ void curveDemo(void)
 
 
 
+//
+// == fred demo ========================================
+//
+
+
+void fredDemo0(void)
+{
+    int i=0;
+    for (i=0; i<100; i++){
+            //noraDrawingStuff3 (i,i,0);
+            noraDrawingStuff3 (-i,-i,0);
+            //rectangle(8,8,i,i,COLOR_BLUE);
+            //rectangleZ(i,i,i+20,i+20,COLOR_BLUE,i);
+            //plotCircle ( -i % 20, -i % 20, i%20, COLOR_GREEN);
+            
+            plotCircleZ ( -i % 20, -i % 20, i % 20, COLOR_GREEN, i % 20);  //save this
+            //plotCircleZ ( -i % 20, -i % 20, i % 20, COLOR_GREEN, i % 20);   //save this
+            //cool
+            //plotCircleZ ( -i % fib(20), -i % fib(20), i % fib(20), COLOR_GREEN, i % fib(20) );
+            //igual o de cima.
+            //plotCircleZ ( -i % fib(20), -i % fib(20), i, COLOR_GREEN, i % fib(20) );
+            //plotCircleZ ( -i % fib(7), -i % fib(7), i % fib(7), COLOR_GREEN, i % fib(7) );
+            //plotEllipseRect ( i, i, i*5, i*5, COLOR_BLUE);
+            //plotEllipseRectZ ( i%20, i%20, i, i, COLOR_BLUE,i%20);
+    };
+
+}
+
+
+void fredDemo1(void)
+{
+    int i=0;
+    for (i=0; i<100; i++){
+            //noraDrawingStuff3 (i,i,0);
+            noraDrawingStuff3 (-i,-i,0);
+            //rectangle(8,8,i,i,COLOR_BLUE);
+            //rectangleZ(i,i,i+20,i+20,COLOR_BLUE,i);
+            //plotCircle ( -i % 20, -i % 20, i%20, COLOR_GREEN);
+            //plotCircleZ ( -i % 20, -i % 20, i % 20, COLOR_GREEN, i % 20);  //save this
+            //plotCircleZ ( -i % 20, -i % 20, i % 20, COLOR_GREEN, i % 20);   //save this
+            //cool
+            plotCircleZ ( -i % fib(20), -i % fib(20), i % fib(20), COLOR_GREEN, i % fib(20) );
+            //igual o de cima.
+            //plotCircleZ ( -i % fib(20), -i % fib(20), i, COLOR_GREEN, i % fib(20) );
+            //plotCircleZ ( -i % fib(7), -i % fib(7), i % fib(7), COLOR_GREEN, i % fib(7) );
+            //plotEllipseRect ( i, i, i*5, i*5, COLOR_BLUE);
+            //plotEllipseRectZ ( i%20, i%20, i, i, COLOR_BLUE,i%20);
+    };
+
+}
+
+
+void fredDemo2(void)
+{
+    int i=0;
+    for (i=0; i<100; i++){
+            //noraDrawingStuff3 (i,i,0);
+            noraDrawingStuff3 (-i,-i,0);
+            //rectangle(8,8,i,i,COLOR_BLUE);
+            //rectangleZ(i,i,i+20,i+20,COLOR_BLUE,i);
+            //plotCircle ( -i % 20, -i % 20, i%20, COLOR_GREEN);
+            //plotCircleZ ( -i % 20, -i % 20, i % 20, COLOR_GREEN, i % 20);  //save this
+            //plotCircleZ ( -i % 20, -i % 20, i % 20, COLOR_GREEN, i % 20);   //save this
+            //cool
+            //plotCircleZ ( -i % fib(20), -i % fib(20), i % fib(20), COLOR_GREEN, i % fib(20) );
+            
+            //IN: x,y,r,color,z
+            plotCircleZ ( -i % fib(20), -i % fib(20), i %  fib(20/2), COLOR_RED, i % fib(20) );
+            plotCircleZ ( -i % fib(20), -i % fib(20), i %  fib(20/3), COLOR_GREEN, i % fib(20) );
+            plotCircleZ ( -i % fib(20), -i % fib(20), i %  fib(20/5), COLOR_BLUE, i % fib(20) );
+            plotCircleZ ( -i % fib(20), -i % fib(20), i %  fib(20/7), COLOR_YELLOW, i % fib(20) );
+            //plotCircleZ ( -i % fib(20), -i % fib(20), i %  fib(20/), COLOR_GREEN, i % fib(20) );
+            //plotCircleZ ( -i % fib(20), -i % fib(20), i %  fib(20/3), COLOR_YELLOW, i % fib(20) );
+            
+            //igual o de cima.
+            //plotCircleZ ( -i % fib(20), -i % fib(20), i, COLOR_GREEN, i % fib(20) );
+            //plotCircleZ ( -i % fib(7), -i % fib(7), i % fib(7), COLOR_GREEN, i % fib(7) );
+            //plotEllipseRect ( i, i, i*5, i*5, COLOR_BLUE);
+            //plotEllipseRectZ ( i%20, i%20, i, i, COLOR_BLUE,i%20);
+    };
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
