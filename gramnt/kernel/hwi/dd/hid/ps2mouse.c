@@ -1,6 +1,6 @@
 /*
- * File: i8042/ps2mouse.c
- * 
+ * File: hid/ps2mouse.c
+ *
  *      + ps2 mouse controler support.
  *      + mouse event support.
  * 
@@ -13,7 +13,8 @@
 
 // #todo
 // talvez fazer estruturas para controlar as configurações de mouse.
- 
+
+
 #include <kernel.h>
 
 
@@ -346,19 +347,15 @@ int ps2_mouse_globals_initialize (void){
 
     mouse_ret = (int) load_mouse_bmp ();
 
-    if (mouse_ret != 0)
-    {
+    if (mouse_ret != 0){
         panic ("ps2_mouse_globals_initialize: load_mouse_bmp\n");
     }
-
-
 
 	//printf("ps2_mouse_globals_initialize: done\n");
 	//refresh_screen ();
 
     //initialized = 1;
     //return (kernelDriverRegister(mouseDriver, &defaultMouseDriver));
-
 
     return 0;
 }
@@ -378,6 +375,8 @@ void ps2mouse_initialize_device (void){
     unsigned char status = 0;
     
     
+    int i=0;
+    
     //
     // Globals first.
     //
@@ -390,9 +389,15 @@ void ps2mouse_initialize_device (void){
 
     //++
     //======================================================
-    
     // #obs:
     // A rotina abaixo habilita o segundo dispositivo. O mouse.
+    
+    // #bugbug
+    // Essa nao eh uma rotina de habilitaçao do dispositivo secundario,
+    // estamos apenas lendo a porta 60 e devolvendo o que lemos o que lemos
+    // com alguma modificaçao;
+    // #todo: me parece que para habilitar o secundario eh
+    // preciso apenas mandar 0xA8 para a porta 0x64.
 
     // Dizemos para o controlador entrar no modo leitura.
     // Esperamos para ler e lemos.
@@ -406,6 +411,15 @@ void ps2mouse_initialize_device (void){
     wait_then_write (0x64,I8042_WRITE);   // I8042_WRITE = 0x60
     wait_then_write (0x60,status);   
     
+    // 0x64 <<< 0xA8 ?? enable aux
+    // 0x64 <<< 0xA9 ?? check for mouse
+    // #todo: See i8042.h for the commands used in the initialization.
+
+    // #test
+    // Habilitando o dispositivo secundario na forla bruta.
+    wait_then_write (0x64,0xA8);   // I8042_WRITE = 0x60
+    for (i=0;i<10000;i++);
+        
     //======================================================
     //--    
 
@@ -417,39 +431,17 @@ void ps2mouse_initialize_device (void){
 
 
 
-//__set_default:
 
-    //++
-    //=================================================
-    
-    // #obs:
-    // A rotina abaixo faz o mouse ficar com sua coniguração padrão.
 
     // Set default settings.
-    xxx_mouse_write (PS2MOUSE_SET_DEFAULTS);
-    expect_ack();
-
-    //=================================================
-    //--
-    
-    
-    
-//__enable_streaming:    
-
-    //++
-    //=================================================
-    
-    // #obs:
-    // A rotina abaixo configura o modo streaming do mouse.
-
+    //xxx_mouse_write (PS2MOUSE_SET_DEFAULTS);
+    //expect_ack();
 
     // Enable streaming.
-    xxx_mouse_write (PS2MOUSE_ENABLE_PACKET_STREAMING);
-    expect_ack();
+    //xxx_mouse_write (PS2MOUSE_ENABLE_PACKET_STREAMING);
+    //expect_ack();
     
-    //=================================================
-    //--    
-    
+   
     
     
 //__enable_wheel:    
@@ -500,6 +492,39 @@ void ps2mouse_initialize_device (void){
 
     //=================================================
     //--
+    
+    
+    
+    // 0xF6 Set default settings.
+    xxx_mouse_write (PS2MOUSE_SET_DEFAULTS);
+    expect_ack();
+
+    // ??
+    xxx_mouse_write (0xE6);
+    expect_ack();
+
+    // 0xF4 Enable streaming.
+    xxx_mouse_write (PS2MOUSE_ENABLE_PACKET_STREAMING);
+    expect_ack();
+
+    // 0xF3 set sample rate.
+    xxx_mouse_write (0xF3);
+    expect_ack();
+
+
+    // 0x64 ??
+    xxx_mouse_write (0x64);
+    expect_ack();
+    
+    
+    // 0xE8 set resolution
+    xxx_mouse_write (0xE8);
+    expect_ack();
+    
+    // 0x03 ??
+    xxx_mouse_write (0x03);
+    expect_ack();
+    
 
     // Wait for nothing!
     kbdc_wait (1);
@@ -569,8 +594,6 @@ void ps2mouse_initialize_device (void){
              NULL );                     //tty driver
     
     };
-
-
 
 //
 // ==========================================
@@ -1293,8 +1316,6 @@ void expect_ack (void)
 }
 
 
-
-
 void set_ps2_mouse_status(int status)
 {
     ps2_mouse_status = status;
@@ -1317,7 +1338,6 @@ ps2_mouse_dialog (
     unsigned long long1,
     unsigned long long2 )
 {
-
 
     switch (msg)
     {
