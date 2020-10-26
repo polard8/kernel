@@ -123,6 +123,8 @@ int grInit(void);
 int grPlot0 (int z, int x, int y, unsigned long color);
 
 
+int serviceGrPlot0(void);
+
 
 //
 // == Line ==============================================

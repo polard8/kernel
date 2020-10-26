@@ -40,8 +40,15 @@ static unsigned long HotSpotY=0;
  ********************************** 
  * grInit:
  * 
- * 
+ *     Initialize the 3d support.
+ *     Create the hotspot to normalize the screen.
+ *     The device context was created in the beginning of
+ * of the initialization.
+ *     To handle the device context we have the structures:
+ * 'display' and 'screen'. The clients will use the data in these
+ *  structures.
  */
+
 
 int grInit (void)
 {
@@ -55,23 +62,12 @@ int grInit (void)
 
     HotSpotX = (w/2);
     HotSpotY = (h/2);
+    
+    // ...
 
     return 0;
 }
 
-
-/*
- // #todo
- // This is gonna be used as a service to initialize the
- // graphics library of the window server.
- // See: gwsProcedure(), service 2040 in main.c
-int serviceGrInit(void);
-int serviceGrInit(void)
-{
-    grInit();
-    // ...
-}
-*/
 
 
 
@@ -224,6 +220,52 @@ int grPlot0 (int z, int x, int y, unsigned long color){
 
     return -1;
 }
+
+
+// #todo
+// See: gwsProcedure(), service 2040 in main.c
+
+int serviceGrPlot0 (void){
+
+    unsigned long *message_address = (unsigned long *) &__buffer[0];
+
+    unsigned long x=0;
+    unsigned long y=0;
+    unsigned long z=0;
+    unsigned long color=0;
+
+
+    gwssrv_debug_print("serviceGrPlot0: [TODO] \n");
+
+
+    // =================================
+    
+    // Arguments:
+    // Sempre começa do 10 para rotinas 3D.
+    
+    x      = message_address[10];
+    y      = message_address[11];
+    z      = message_address[12]; 
+    color  = message_address[13];
+    
+    
+    // =================================
+
+
+    
+    // #todo:
+    // pegar os argumentos no buffer e chamar a rotina de plotagem de pixel.
+    // Acho que esse serviço nao retorna uma mensagem ao cliente.
+    
+    grPlot0 ( 
+        (int) z, (int) x, (int) y, 
+        (unsigned long) color );
+
+
+    return 0;
+}
+
+
 
 
 /*

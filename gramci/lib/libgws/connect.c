@@ -149,6 +149,11 @@ void gws_set_desktop_id(int desktop_id)
 }
 
 
+/*
+ ***************************************** 
+ * gws_initialize_connection:
+ * 
+ */
 
 int gws_initialize_connection (void)
 {
@@ -166,31 +171,37 @@ int gws_initialize_connection (void)
         
         
     
-    if (__ws__pid<0)
+    if (__ws__pid<0){
         return -1;
-        
-        
-        // Send message.
-        // Envia uma mensagem pedindo para o ws emitir um hello!
-        // msg = 1000;
+    }
 
-        //vamos criar uma chamada semelhante a essa.
 
-        // IN: PID, window, msg, long1, long2
-        gws_send_message_to_process ( __ws__pid, 
-            0, 1000, 0, 0 );  
+    // #bugbug
+    // O window server nao esta processando mensgens do sistema.
+    // Ele apenas pega as mensagens de sistema quando solicitadas
+    // pelos clientes.
+
+
+
+    // Send message.
+    // Envia uma mensagem pedindo para o ws emitir um hello!
+    // msg = 1000;
+
+    //vamos criar uma chamada semelhante a essa.
+
+    // IN: PID, window, msg, long1, long2
+    //gws_send_message_to_process ( __ws__pid, 
+    //    0, 1000, 0, 0 );  
     
+    // put some pixel in this position.
+    //gws_send_message_to_process ( __ws__pid, 
+    //    0, 2000, 40, 40 );  
 
-        // put some pixel in this position.
-        gws_send_message_to_process ( __ws__pid, 
-            0, 2000, 40, 40 );  
+    // refresh screen
+    //gws_send_message_to_process ( __ws__pid, 
+    //    0, 2020, 0, 0 );     
 
-        // refresh screen
-        gws_send_message_to_process ( __ws__pid, 
-            0, 2020, 0, 0 );     
-        
-        
-    return 0;
+    return __ws__pid;
 }
 
 

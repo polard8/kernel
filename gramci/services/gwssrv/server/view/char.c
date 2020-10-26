@@ -94,10 +94,9 @@ DrawBorder(
 // #todo
 // Draw char.
 // Service 1004.
-int serviceDrawChar(void)
-{
 
-    //O buffer é uma global nesse documento.
+int serviceDrawChar (void){
+
     unsigned long *message_address = (unsigned long *) &__buffer[0];
 
 
@@ -111,6 +110,8 @@ int serviceDrawChar(void)
 
     // #todo
     char *text_buffer; 
+    
+    unsigned char _string[4];
 
 
     // #debug
@@ -128,7 +129,6 @@ int serviceDrawChar(void)
     //text_buffer =    //#todo
    
     //lets create a fake string.
-    unsigned char _string[4];
    
    _string[0] = (unsigned char) C;
    _string[1] = (unsigned char) 0;

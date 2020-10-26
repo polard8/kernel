@@ -642,12 +642,9 @@ int main ( int argc, char *argv[] ){
     addr_in.sin_addr.s_addr = IP(127,0,0,1); 
 
 
-
-
     // Metrics.
     unsigned long w = gws_get_system_metrics(1);
     unsigned long h = gws_get_system_metrics(2);
-
 
     if ( w == 0 || h == 0 ){
         printf ("editor: w h \n");

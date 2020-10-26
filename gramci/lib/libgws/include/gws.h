@@ -51,6 +51,10 @@
 // Read and write from socket.
 #include "rw.h"
 
+
+// 3d graphics support.
+#include "gr.h"
+
 // ...
 
 
@@ -104,17 +108,15 @@ void *gws_system_call (
 void gws_debug_print (char *string);
 
 
-
-
 // Initialize the library.
 int gws_initialize_library (void);
 
 
 // Services.
+// Dialog with the library
 // IN: service number, ...
 
-void *
-gws_services ( 
+void *gws_services ( 
     int service,
     unsigned long arg2,
     unsigned long arg3,
@@ -143,6 +145,28 @@ gws_send_message_to_thread (
 
 
 
+//
+// == 3d ==============================================
+//
+
+//test
+//plot a point
+int 
+gws_plot0 (
+    int fd,
+    unsigned long x,
+    unsigned long y,
+    unsigned long z,
+    unsigned long color );
+
+
+// ...
+
+
+//
+// == 2d ==============================================
+//
+
 //draw a char
 int 
 gws_draw_char (
@@ -164,7 +188,11 @@ gws_draw_text (
 
 
 int 
-gws_redraw_window(int fd, int window, unsigned long flags);
+gws_redraw_window (
+    int fd, 
+    int window, 
+    unsigned long flags );
+
 
 int gws_refresh_window (int fd, int window );
 
@@ -176,15 +204,19 @@ gws_change_window_position (
     unsigned long y );
 
 int 
-gws_resize_window( 
+gws_resize_window ( 
     int fd, 
     int window, 
     unsigned long w, 
     unsigned long h );
 
 
-// Talvez vamos retonar o descritor
-// dado pelo servidor.
+
+/*
+ *********************************** 
+ * gws_create_window:
+ * 
+ */
 
 int
 gws_create_window ( 
@@ -203,6 +235,9 @@ gws_create_window (
     unsigned long color );     //12, Color (bg) (para janela simples).
 
 
+// #bugbug
+// This is redundant.
+// We alread have a function like this one. gws_create_window.
 int
 gws_create_window_using_socket (
     int fd, 
@@ -223,7 +258,12 @@ gws_create_window_using_socket (
 
 void gws_reboot (void);
 
-int gws_load_path ( char *path, unsigned long buffer, unsigned long buffer_len );
+
+int 
+gws_load_path ( 
+    char *path, 
+    unsigned long buffer, 
+    unsigned long buffer_len );
 
 
 void gws_yield(void);
@@ -235,17 +275,15 @@ void *gws_create_thread (
     unsigned long init_stack, 
     char *name );
 
-
 void gws_start_thread (void *thread);
-
 
 int gws_clone_and_execute ( char *name );
 
 unsigned long gws_get_system_metrics (int index);
 
+
 void gws_enter_critical_section(void);
 void gws_exit_critical_section(void);
-
 
 int gws_create_empty_file ( char *file_name );
 int gws_create_empty_directory ( char *dir_name );
@@ -274,8 +312,7 @@ struct gws_menu_item_d *gws_create_menu_item (
 // get next event.
 // the window server return the next event
 // from the queue of a client.
-struct gws_event_d *gws_next_event(int fd);
-
+struct gws_event_d *gws_next_event (int fd);
 
 
 // Send event.
@@ -295,7 +332,6 @@ unsigned long gws_explode_byte (unsigned char data);
 //
 // End.
 //
-
 
 
 

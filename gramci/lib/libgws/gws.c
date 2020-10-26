@@ -89,6 +89,19 @@ __gws_createwindow_request (
 int __gws_createwindow_response(int fd);
 
 
+
+
+// == plot point ===============================================
+int 
+__gws_plot0_request (
+    int fd,
+    unsigned long x,
+    unsigned long y,
+    unsigned long z,
+    unsigned long color );
+int __gws_plot0_response (int fd);  
+
+
 // == Draw Char ==========================
 int 
 __gws_drawchar_request (
@@ -152,20 +165,27 @@ void gws_debug_print (char *string)
 }
 
 
+/*
+ ******************************** 
+ * gws_initialize_library:
+ *     
+ */
+
 // Initialize the library.
-int gws_initialize_library (void)
-{
-    int status = -1;
+
+int gws_initialize_library (void){
+
+    // PID do window server.
+    int wsPID = -1;
     
 
-    status = gws_initialize_connection();    
+    wsPID = gws_initialize_connection();    
 
-    if(status<0){
-        gws_debug_print("gws_initialize_library: fail\n");
+    if (wsPID < 0){
+        gws_debug_print("gws_initialize_library: Fail\n");
         return -1;
     }
-    
-    
+
     // #todo:
     // #importante
     // We need to alloc memory to the CurrentEvent struct.
@@ -177,6 +197,8 @@ int gws_initialize_library (void)
 
     return 0;
 }
+
+
 
 //
 // == Helper functions ====================================================
@@ -934,6 +956,215 @@ process_event:
     return 0;
 }
 
+
+
+//
+// ====================================================================
+//
+
+int 
+__gws_plot0_request (
+    int fd,
+    unsigned long x,
+    unsigned long y,
+    unsigned long z,
+    unsigned long color )
+{
+    // Isso permite ler a mensagem na forma de longs.
+    unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];   
+
+    int n_writes = 0;   // For sending requests.
+    
+    //char *name = "Window name 1";
+
+
+    //
+    // Send request.
+    //
+
+
+    // #debug
+    gws_debug_print ("gws_drawchar_request: Writing ...\n");      
+
+    // Enviamos um request para o servidor.
+    // ?? Precisamos mesmo de um loop para isso. ??
+    // msg = 369 (get input event)
+
+    while (1)
+    {
+        message_buffer[0] = 0;       // window. 
+        message_buffer[1] = 2040;    // msg (plot point)
+        message_buffer[2] = 0;
+        message_buffer[3] = 0;
+        
+        // ...
+        
+        // os argumentos para rotinas graficas começam em '10'.
+        // Sempre começa com x,y,z e color ...
+        
+        message_buffer[10] = x;
+        message_buffer[11] = y; 
+        message_buffer[12] = z; 
+        message_buffer[13] = color; 
+        // ...
+
+        // Write!
+        // Se foi possível enviar, então saimos do loop.  
+
+        // n_writes = write (fd, __buffer, sizeof(__buffer));
+        n_writes = send ( fd, 
+                       __gws_message_buffer, 
+                       sizeof(__gws_message_buffer), 
+                       0 );
+       
+        if(n_writes>0){ break; }
+    }
+
+    return 0; 
+}
+
+
+//response
+int __gws_plot0_response (int fd)
+{
+    unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];   
+    int n_reads = 0;    // For receiving responses.
+
+    //
+    // Waiting for response. ==================
+    //
+
+    // Espera para ler a resposta. 
+    // Esperando com yield como teste.
+    // Isso demora, pois a resposta só será enviada depois de
+    // prestado o servido.
+    // obs: Nesse momento deveríamos estar dormindo.
+
+    // #debug
+    gws_debug_print ("__gws_plot0_response: Waiting ...\n");      
+
+    int y=0;
+    for(y=0; y<15; y++)
+        gws_yield();   // See: libgws/
+
+
+    // #todo
+    // Podemos checar antes se o fd 
+    // representa um objeto que permite leitura.
+    // Pode nem ser possível.
+    // Mas como sabemos que é um soquete,
+    // então sabemos que é possível ler.
+
+    //
+    // read
+    //
+
+    // #debug
+    gws_debug_print ("__gws_plot0_response: Reading ...\n");      
+
+
+    // #caution
+    // Waiting for response.
+    // We can stay here for ever.
+
+response_loop:
+
+    //n_reads = read ( fd, __buffer, sizeof(__buffer) );
+    n_reads = recv ( fd, 
+                  __gws_message_buffer, 
+                  sizeof(__gws_message_buffer), 
+                  0 );
+    
+    //if (n_reads<=0){
+    //     gws_yield(); 
+    //    goto response_loop;
+    //}
+    
+    // Se retornou 0, podemos tentar novamente.
+    if (n_reads == 0){
+        gws_yield(); 
+        goto response_loop;
+    }
+    
+    // Se retornou -1 é porque algo está errado com o arquivo.
+    if (n_reads < 0){
+        gws_debug_print ("__gws_plot0_response: recv fail.\n");
+        printf          ("__gws_plot0_response: recv fail.\n");
+        printf ("Something is wrong with the socket.\n");
+        exit (1);
+    }
+
+    //
+    // The msg index.
+    //
+    
+    // Get the message sended by the server.
+
+    int msg = (int) message_buffer[1];
+    
+    switch (msg){
+
+        case GWS_SERVER_PACKET_TYPE_REQUEST:
+            gws_yield ();
+            goto response_loop;
+            break;
+            
+        // Reply!
+        case GWS_SERVER_PACKET_TYPE_REPLY:
+            goto process_reply;
+            break;
+            
+        case GWS_SERVER_PACKET_TYPE_EVENT:
+            goto process_event;
+            //goto response_loop;
+            break;
+            
+        case GWS_SERVER_PACKET_TYPE_ERROR:
+            gws_debug_print ("__gws_plot0_response: SERVER_PACKET_TYPE_ERROR\n");
+            goto response_loop;
+            //exit (-1);
+            break;
+        
+        default:
+            goto response_loop;
+            break; 
+    };
+
+//
+// Process reply.
+//
+
+// A resposta tras o window id no início do buffer.
+    
+process_reply:
+
+    // #test
+    //gws_debug_print ("terminal: Testing close() ...\n"); 
+    //close (fd);
+
+    //gws_debug_print ("terminal: bye\n"); 
+    //printf ("terminal: Window ID %d \n", message_buffer[0] );
+    //printf ("terminal: Bye\n");
+    
+    // #todo
+    // Podemos usar a biblioteca e testarmos
+    // vários serviços da biblioteca nesse momento.
+
+    //return 0;
+    return (int) message_buffer[0];
+
+//
+// Process an event.
+//
+
+process_event:
+    gws_debug_print ("__gws_plot0_response: We got an event\n"); 
+    return 0;
+}
+
+
+
+
 //
 // =============================
 //
@@ -1588,6 +1819,27 @@ process_event:
 // == Functions =======================================================
 //
 
+//test
+//plot a point
+int 
+gws_plot0 (
+    int fd,
+    unsigned long x,
+    unsigned long y,
+    unsigned long z,
+    unsigned long color )
+{
+    //Maybe we will not have a response.
+    //int Response=-1;
+
+    __gws_plot0_request ( fd, x, y, z, color );
+    __gws_plot0_response( fd );
+
+    return 0;
+}
+
+
+
 // Draw char.
 int 
 gws_draw_char (
@@ -1610,6 +1862,8 @@ gws_draw_char (
         (unsigned long) color,
         (unsigned long) c );
 
+    // #todo
+    // We realy need a response ?
     gws_debug_print("gws_draw_char: response\n");
     response = __gws_drawchar_response((int) fd);  
 
@@ -1681,6 +1935,9 @@ gws_create_window_using_socket (
 }    
 
 
+
+// ??
+// This is a dialog with the library.
 // Services.
 // IN: service number, ...
 void *gws_services ( 
@@ -1692,8 +1949,8 @@ void *gws_services (
 
     gws_debug_print("gws_services: [TODO]\n");
 
-   if (service<0)
-       return NULL;
+    if (service<0)
+        return NULL;
 
 
     switch (service)

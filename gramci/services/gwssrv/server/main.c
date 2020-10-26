@@ -561,7 +561,7 @@ gwsProcedure (
     unsigned long long2 );
 
 
-void InitGraphics(void);
+int initGraphics(void);
 void create_background (void);
 
 
@@ -1369,12 +1369,17 @@ gwsProcedure (
             //serviceNextEvent();
             break;
             
-        // #todo: Initialize the graphics libray.
+
         // See: grprim.c
-        //case 2040:
-            //serviceGrInit();
-            //break;
-        
+        case 2040:
+            serviceGrPlot0();
+            break;
+            
+        // #todo
+        // Segue serviços graficos 3d.
+        // ...
+
+
         //MSG_GWS_PROTOCOL
         //case 3000:
             //break;
@@ -1441,48 +1446,72 @@ void create_background (void)
 
 
 
-void InitGraphics(void){
+/*
+ ****************************** 
+ * initGraphics:
+ *
+ *     Initialize the graphics support.
+ */
+
+// Initialize the window server infrastructure.
+// The current display and the current screen.
+// Initialize the 3d support.
+
+int initGraphics (void){
 
     int __init_status = -1;
 
 
-    debug_print("gwssrv: InitGraphics\n");
+    debug_print("gwssrv: initGraphics\n");
+    
+    
+    // Initialize the window server infrastructure.
+    // The current display and the current screen.
     
     __init_status = gwsInit();
 
-    if (__init_status != 0){
-        debug_print("gwssrv: InitGraphics [PANIC] Couldn't initialize the graphics\n");
-        printf("gwssrv: InitGraphics [PANIC] Couldn't initialize the graphics\n");
-        while(1);
+    if (__init_status != 0)
+    {
+        debug_print ("gwssrv: initGraphics [PANIC] Couldn't initialize the graphics\n");
+        printf      ("gwssrv: initGraphics [PANIC] Couldn't initialize the graphics\n");
+        exit(1);
+        //while(1);
     }
 
+   
+    if ( (void*) gui == NULL ){
+        debug_print ("initGraphics: gui\n");
+        printf      ("initGraphics: gui\n");
+        exit(1);
+    }
 
-    if( (void*) gui->screen != NULL){
+    if ( (void*) gui->screen != NULL )
+    {
         dtextDrawText ( (struct gws_window_d *) gui->screen,
-            200, 80, COLOR_RED, "gwssrv: Initializing graphics" );
+            8, 8, COLOR_RED, "gwssrv: Initializing graphics" );
     }
 
-    
+    // background.
+    // Clean background.
+
     create_background();
 
  
     // Testing bmp.
     // See:
-    gwssrv_display_system_icon ( 1, 8, 100);
-    gwssrv_display_system_icon ( 2, 8, 120);
-    gwssrv_display_system_icon ( 3, 8, 140);
-    gwssrv_display_system_icon ( 4, 8, 160);
+    gwssrv_display_system_icon ( 1, 8, 100 );
+    gwssrv_display_system_icon ( 2, 8, 120 );
+    gwssrv_display_system_icon ( 3, 8, 140 );
+    gwssrv_display_system_icon ( 4, 8, 160 );
     //#debug breakpoint
     //while(1){}
 
 
-    //
-    // init lib
-    //
+    // Initialize the graphics support.
+    // Now we can use 3d routines.
     
     // See: grprim.c
     grInit();
-    
     
     
     /*
@@ -1808,12 +1837,16 @@ void InitGraphics(void){
     debug_print("gwssrv: InitGraphics done\n");
     //printf     ("gwssrv: InitGraphics done *hang\n");
     //while(1){}
+    
+    
+    // ok
+    return 0;
 }
 
 
-void
-gwssrv_init_client_support(void)
-{
+
+void gwssrv_init_client_support (void){
+
     int i=0;
     
     
@@ -2136,61 +2169,33 @@ int main (int argc, char **argv){
 
         // Draw !!!
         // Init gws infrastructure.
+        // Initialize the 3d graphics support.
         // Let's create the traditional green background.
+ 
+        initGraphics();
 
-        InitGraphics();
-        
-        //See: line.c
-        //test_draw_line();
-        //test_draw_line2();//illusion
-        //while(1){}
-        
 
         // Calling child.
         //printf ("gwssrv: Calling child \n");  
 
 
-        //gwssrv_clone_and_execute ("gws.bin");      // command gws.bin
+        gwssrv_clone_and_execute ("gws.bin");      // command gws.bin
         //gwssrv_clone_and_execute ("gwm.bin");      // window manager
         //gwssrv_clone_and_execute ("fileman.bin");  
         //gwssrv_clone_and_execute ("editor.bin");           
         //gwssrv_clone_and_execute ("terminal.bin");  
         //gwssrv_clone_and_execute ("browser.bin");
-        gwssrv_clone_and_execute ("launch1.bin"); 
+        //gwssrv_clone_and_execute ("launch1.bin"); 
         //gwssrv_clone_and_execute ("s2.bin");      // shell  
         //gwssrv_clone_and_execute ("s3.bin");    // hello        
         // ...
 
 
-        //#test 
-        /*
-        //++
-        struct gws_window_d *Window;
-        Window = (struct gws_window_d *) createwCreateWindow ( WT_SIMPLE, 
-            1, 1, "no-name",  10, 10, 100, 100,   
-            gui->screen, 0, COLOR_PINK, COLOR_PINK ); 
-        gws_show_window_rect(Window);
-        //--
-        */
-
-        // #tests
-        // Isso funciona.
-        //pixelBackBufferPutpixel ( COLOR_RED,   100, 250 );
-        //pixelBackBufferPutpixel ( COLOR_GREEN, 105, 250 );
-        //pixelBackBufferPutpixel ( COLOR_BLUE,  110, 250 );
-        //charBackbufferDrawcharTransparent ( 250,       250, COLOR_RED,   (unsigned long) 'R');
-        //charBackbufferDrawcharTransparent ( 250 +8,    250, COLOR_GREEN, (unsigned long) 'G');
-        //charBackbufferDrawcharTransparent ( 250 +8 +8, 250, COLOR_BLUE,  (unsigned long) 'B');
-        //charBackbufferDrawchar ( 300, 300, (unsigned long) 'X', COLOR_YELLOW, COLOR_RED );
-        //lineBackbufferDrawHorizontalLine ( 400, 88, 500, COLOR_PINK );
-        //rectBackbufferDrawRectangle ( 200, 400, 100, 60, COLOR_YELLOW, 1 );
-
-
         // Wait
         // printf ("gwssrv: [FIXME] yield \n");
-        for (i=0; i<11; i++)
+        //for (i=0; i<11; i++)
+        for (i=0; i<22; i++)
             gwssrv_yield();
-            
  
         //
         // =======================================

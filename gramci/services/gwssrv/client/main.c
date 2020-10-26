@@ -131,43 +131,82 @@ int main ( int argc, char *argv[] ){
     int client_fd = -1;
 
 
-
     client_fd = gws();
 
-    if ( client_fd < 0 )
-    {
+    if ( client_fd < 0 ){
          gws_debug_print ("gws.bin: gws initialization fail \n");
          printf          ("gws.bin: gws initialization fail \n");
          exit(1);
     }
 
+    // Metrics.
+    unsigned long w = gws_get_system_metrics(1);
+    unsigned long h = gws_get_system_metrics(2);
 
-    // #test: 
-    // Create a lil window in the top left corner.
-    
-    gws_create_window (client_fd,
+    if ( w == 0 || h == 0 ){
+        printf ("gws.bin: w h \n");
+        exit(1);
+    }
+
+
+    //
+    // Window
+    //
+
+
+    int wid = gws_create_window (client_fd,
         WT_SIMPLE,1,1,"gws-client",
-        2, 2, 8, 8,
-        0, 0, COLOR_RED, COLOR_RED);
+        0, 0, w, h,
+        0, 0, COLOR_BLACK, COLOR_BLACK);
 
-    // #test: 
+    if (wid<0){
+        printf ("gws.bin: wid\n");
+        exit(1);
+    }
+
+    gws_draw_char ( client_fd, wid, 
+        16, 8, COLOR_RED, 'C' );
+
+
+    // Create a little window in the top left corner.
+    //gws_create_window (client_fd,
+        //WT_SIMPLE,1,1,"gws-client",
+        //2, 2, 8, 8,
+        //0, 0, COLOR_RED, COLOR_RED);
+
     // Draw a char.
-    gws_draw_char (
-        client_fd, 
-        0,          // window
-        10,         // x
-        10,         // y
-        COLOR_RED,  // COLOR
-        'C');
+    // IN: fd, window id, x, y, color, char.
+    //gws_draw_char ( client_fd, 0, 
+        //16, 8, COLOR_RED, 'C' );
 
 
+    //test: plot point;
+    //um ponto em cada quadrante.
+    gws_plot0 ( client_fd, -4,  4, 0, COLOR_RED );
+    gws_plot0 ( client_fd,  4,  4, 0, COLOR_GREEN );
+    gws_plot0 ( client_fd,  4, -4, 0, COLOR_BLUE );
+    gws_plot0 ( client_fd, -4, -4, 0, COLOR_YELLOW );
+
+   
     // #debug
-    while(1){}
+    while (1){
+
+        gws_draw_char ( client_fd, wid, 
+            48, 40, COLOR_RED, 'X' );
+   
+        // ...
+        
+        gws_refresh_window (client_fd, wid);
+        
+        gws_yield();
+    }
+
 
     // exit
     gws_debug_print ("gws: bye :) \n");
     return 0;
 }
+
 
 
 //
