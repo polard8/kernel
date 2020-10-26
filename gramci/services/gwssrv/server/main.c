@@ -1368,13 +1368,18 @@ gwsProcedure (
             gwssrv_debug_print ("gwssrv: [2031] serviceNextEvent\n");
             //serviceNextEvent();
             break;
+            
+        // #todo: Initialize the graphics libray.
+        // See: grprim.c
+        //case 2040:
+            //serviceGrInit();
+            //break;
         
         //MSG_GWS_PROTOCOL
-        case 3000:
-            break;
-            
+        //case 3000:
+            //break;
+
         // ...
-        
 
         
         default:
@@ -1433,7 +1438,6 @@ void create_background (void)
     //xxxx_refresh();
     //while(1){}
 }
-
 
 
 

@@ -19,6 +19,13 @@
 // ...
 
 
+// ====
+/*
+ * Transformations: 
+ *     Ex: Scaling, translation and rotation ...
+ * 
+ */
+
 // =============================================================
 // #projection:
 // For orthographics projection there is no scaling factor.
@@ -51,6 +58,22 @@ int grInit (void)
 
     return 0;
 }
+
+
+/*
+ // #todo
+ // This is gonna be used as a service to initialize the
+ // graphics library of the window server.
+ // See: gwsProcedure(), service 2040 in main.c
+int serviceGrInit(void);
+int serviceGrInit(void)
+{
+    grInit();
+    // ...
+}
+*/
+
+
 
 
 /*

@@ -124,7 +124,8 @@ int __gws_drawtext_response(int fd);
 
 
 // System call.
-    //System interrupt.
+// System interrupt.
+    
 void *gws_system_call ( 
     unsigned long a, 
     unsigned long b, 
@@ -1647,6 +1648,11 @@ gws_draw_text (
 }
 
 
+// #bubgug
+// This is a test.
+// trying to create a window using the fd as an argument.
+// #todo: This routine is redundant. Delete it.
+// gws_create_window is doing the same. Is it?
 int
 gws_create_window_using_socket (
     int fd, 
@@ -1694,7 +1700,7 @@ void *gws_services (
     {
         // Say hello !
         case 1:
-            
+            //?
             break;
     };
 
@@ -1725,8 +1731,10 @@ gws_send_message_to_process (
     unsigned long message_buffer[5];
 
 
-    if ( pid<0 )
+    if ( pid<0 ){
+        // msg?
         return -1;
+    }
 
 
     message_buffer[0] = (unsigned long) window;
@@ -1759,8 +1767,10 @@ gws_send_message_to_thread (
 
     unsigned long message_buffer[5];
 
-    if (tid < 0)
+    if (tid < 0){
+        //?msg
         return -1;
+    }
 
 
     message_buffer[0] = (unsigned long) window;
@@ -1776,17 +1786,25 @@ gws_send_message_to_thread (
                      (unsigned long) tid );
 }
 
-void gws_reboot(void)
+
+void gws_reboot (void)
 {
-   //#todo
-   gws_debug_print ("gws_reboot: [FIXME]\n");
-   gws_system_call(110,0,0,0); 
-   gws_debug_print ("gws_reboot: unexpected return\n");
-   while (1){ asm("pause"); };
+    //#todo
+    gws_debug_print ("gws_reboot: [FIXME]\n");
+    gws_system_call(110,0,0,0); 
+    gws_debug_print ("gws_reboot: unexpected return\n");
+    
+    while (1){ asm("pause"); };
 }
 
 
-int gws_load_path ( char *path, unsigned long buffer, unsigned long buffer_len )
+
+// Load a file using a pathname as an argument.
+int 
+gws_load_path ( 
+    char *path, 
+    unsigned long buffer, 
+    unsigned long buffer_len )
 {
     int status = -1;
     
@@ -1858,10 +1876,13 @@ int gws_refresh_window (int fd, int window )
 /*
  ************************************************** 
  * gws_create_window: 
- * 
+ *     Create a window.
+ *     Given it's type.
  */
 
+
 // OUT: wid
+
 
 int
 gws_create_window ( 
@@ -1899,6 +1920,8 @@ gws_create_window (
     // Response
     wid = (int) __gws_createwindow_response(fd); 
 
+    // Return the index returned by the window server.
+    
     return (int) wid;
 }
 
@@ -1906,7 +1929,7 @@ gws_create_window (
 // Yield thread.
 void gws_yield (void)
 {
-    gws_system_call(265,0,0,0); 
+    gws_system_call (265,0,0,0); 
 }
 
 
@@ -1929,8 +1952,7 @@ void gws_yield_n_times (unsigned long n)
  *     Essa será uma rotina de baixo nível para pthreads.
  */
 
-void *
-gws_create_thread ( 
+void *gws_create_thread ( 
     unsigned long init_eip, 
     unsigned long init_stack, 
     char *name )
@@ -1964,13 +1986,16 @@ void gws_start_thread (void *thread)
 }
 
 
+// Clone the current and execute the clone.
 int gws_clone_and_execute ( char *name )
 {
     return (int) gws_system_call ( 900, (unsigned long) name, 0, 0 );
 }
 
-unsigned long gws_get_system_metrics (int index){
 
+// Get system metrics.
+unsigned long gws_get_system_metrics (int index)
+{
     //if (index<0){
         //gde_debug_print ("gde_get_system_metrics: fail\n");
         //return 0;
@@ -2011,9 +2036,9 @@ void gws_enter_critical_section (void){
     //Nothing
 
 done:
-    //Muda para zero para que ninguém entre.
-    gws_system_call ( 227,//SYSTEMCALL_CLOSE_KERNELSEMAPHORE, 
-        0, 0, 0 );
+    // Muda para zero para que ninguém entre.
+    //SYSTEMCALL_CLOSE_KERNELSEMAPHORE,
+    gws_system_call ( 227, 0, 0, 0 );
     return;
 }
 
@@ -2022,9 +2047,10 @@ done:
 void gws_exit_critical_section (void)
 {
 	//Hora de sair. Mudo para 1 para que outro possa entrar.
-    gws_system_call ( 228,//SYSTEMCALL_OPEN_KERNELSEMAPHORE, 
-       0, 0, 0 );
+    //SYSTEMCALL_OPEN_KERNELSEMAPHORE, 
+    gws_system_call ( 228, 0, 0, 0 );
 }
+
 
 /*
 //refresh raw rectangle
@@ -2068,6 +2094,7 @@ int gws_window ( int fd, int type )
 */
 
 
+// Create menu and return a pointer to a menu structure.
 struct gws_menu_d *gws_create_menu (
     int fd,
     int parent,
@@ -2081,11 +2108,13 @@ struct gws_menu_d *gws_create_menu (
 {
 
     struct gws_menu_d *menu;
-    int window;
+    int window=0;
 
     menu = (struct gws_menu_d *) malloc( sizeof(struct gws_menu_d) );
 
-    if ( (void *) menu == NULL ){
+    if ( (void *) menu == NULL )
+    {
+        // msg?
         return (struct gws_menu_d *) 0;
     }
 
@@ -2101,6 +2130,8 @@ struct gws_menu_d *gws_create_menu (
     menu->itens_count = count;
 
 
+    // Create menu window.
+
     window = gws_create_window ( fd,
                  WT_SIMPLE,1,1,"Menu",
                  menu->x,  //Deslocamento em relação a janela mãe. 
@@ -2112,6 +2143,8 @@ struct gws_menu_d *gws_create_menu (
 
     if (window<=0)
     { 
+        // msg?
+        //free(menu);
         menu->window = 0;  //#bugbug !!!!
         return (struct gws_menu_d *) 0;
     }
@@ -2121,10 +2154,14 @@ struct gws_menu_d *gws_create_menu (
     menu->window = window; //bugbug
     menu->parent = parent;
     
+    // Ok.
+    // Return the pointer.
+    
     return (struct gws_menu_d *) menu;
 }
 
 
+// Create a menu item for a given valid menu.
 struct gws_menu_item_d *gws_create_menu_item (
     int fd,
     char *label,
@@ -2135,22 +2172,28 @@ struct gws_menu_item_d *gws_create_menu_item (
     
     struct gws_menu_item_d *item;
     
-    
-    if ( (void *) menu == NULL ){
+    // Check
+    if ( (void *) menu == NULL )
+    {
+        // ? msg ?
         return (struct gws_menu_item_d *) 0;
     }
     
     //create menu item.
     item = (struct gws_menu_item_d *) malloc( sizeof(struct gws_menu_item_d) );
 
-    if ( (void *) item == NULL ){
+    if ( (void *) item == NULL )
+    {
+        // msg ?
         return (struct gws_menu_item_d *) 0;
     }
 
-    //provisório
-    if(id>5 || id>menu->itens_count)
-        return (struct gws_menu_item_d *) 0;
 
+    // Provisório
+    if (id>5 || id>menu->itens_count){
+        // ? msg ?
+        return (struct gws_menu_item_d *) 0;
+    }
 
     item->id = id;
 
@@ -2160,8 +2203,10 @@ struct gws_menu_item_d *gws_create_menu_item (
     item->y = (item->height*id);
     
 
-   if( menu->window > 0 )
-   {
+    // Create a window for a menu item.
+
+    if ( menu->window > 0 )
+    {
         window = gws_create_window ( fd,
                      WT_BUTTON,1,1, label,
                      item->x, 
@@ -2183,18 +2228,18 @@ struct gws_menu_item_d *gws_create_menu_item (
          item->window = window;
     }
 
+    // Return the pointer fot the menu item.
     return (struct gws_menu_item_d *) item;
 }
 
-
-
+// Expand a byt all over the long.
 unsigned long gws_explode_byte (unsigned char data)
 {
     return (unsigned long) (data << 24 | data << 16 | data << 8 | data);
 }
 
 
-
+// Create empty file.
 int gws_create_empty_file ( char *file_name ){
 
     int __ret = 0;
@@ -2210,6 +2255,7 @@ int gws_create_empty_file ( char *file_name ){
 }
 
 
+// Create empty directory.
 int gws_create_empty_directory ( char *dir_name ){
 
     int __ret=0;
