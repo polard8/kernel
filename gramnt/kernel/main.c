@@ -18,8 +18,19 @@
 
 
 
-// Boot mode.
+// variaveis herdadas do BL.
+
+// O modo de boot. gui or cli.
 extern unsigned long SavedBootMode;
+
+// Endereço do boot block
+extern unsigned long SavedBootBlock;   
+
+
+
+
+
+
 
 
 // char copyright[] =
@@ -50,6 +61,37 @@ int kernel_main (int arch_type){
     KernelStatus = KERNEL_NULL;
 
 
+    
+    // #bugbug
+    // Talvez esse endereço nao esteja acessivel ao kernel.
+    
+     //See gdef.h
+    unsigned long *base = (unsigned long *) SavedBootBlock;
+    
+    BootBlock.lfb                = (unsigned long) base[0]; // 0
+    BootBlock.x                  = (unsigned long) base[1]; // 4
+    BootBlock.y                  = (unsigned long) base[2]; // 8
+    BootBlock.bpp                = (unsigned long) base[3]; // 12
+    BootBlock.last_valid_address = (unsigned long) base[4]; // 16
+    BootBlock.metafile_address   = (unsigned long) base[5]; // 20
+    BootBlock.disk_number        = (unsigned long) base[6]; // 24
+    BootBlock.heads              = (unsigned long) base[7]; // 28
+    BootBlock.spt                = (unsigned long) base[8]; // 32 
+    BootBlock.cylinders          = (unsigned long) base[9]; // 36
+    BootBlock.boot_mode          = (unsigned long) base[10]; // 40
+    BootBlock.gramado_mode       = (unsigned long) base[11]; //  44
+    
+
+    // The 'gramado mode' or 'gamemode'.
+    // jail,p1,home,p2,castle
+    // We can't check right here ...
+    // there is no messages yet.
+    
+    // Saving
+    // It is used by the kernel info.
+    current_mode = (char) BootBlock.gramado_mode;
+
+
 
     // #order
     // serial debug.
@@ -74,6 +116,40 @@ int kernel_main (int arch_type){
     debug_print ("============================================\n");
     debug_print ("[Kernel] kernel_main: \n");
     debug_print ("[Kernel] kernel_main: Initializing the part in C ...\n");
+
+
+    //gramado mode
+    //game mode
+    switch (current_mode){
+
+        case GRAMADO_JAIL:
+            debug_print ("kernel_main: GRAMADO_JAIL: \n");
+            break;
+            
+        case GRAMADO_P1:
+            debug_print ("kernel_main: GRAMADO_P1: \n");
+            break;
+            
+        case GRAMADO_HOME:
+            debug_print ("kernel_main: GRAMADO_HOME: \n");
+            break;
+            
+        case GRAMADO_P2:
+            debug_print ("kernel_main: GRAMADO_P2: \n");
+            break;
+            
+        case GRAMADO_CASTLE:
+            debug_print ("kernel_main: GRAMADO_CASTLE: \n");
+            break;
+        
+        //case GRAMADO_CALIFORNIA:
+        // ...
+        default:
+            debug_print ("kernel_main: current_mode not defined!\n");
+            break;
+    }
+
+
 
 
     // Virtual Console
@@ -226,11 +302,31 @@ int kernel_main (int arch_type){
     // Se possivel vamos limpara a tela agora. Pois ja inicializamos
     // a runtime.
     
-    backgroundDraw ( (unsigned long) COLOR_BLACK); 
+    backgroundDraw ( (unsigned long) COLOR_BLACK ); 
         
     //#debug.
     //refresh_screen();
     //while(1){}
+
+    // #debug
+    // breakpoint
+    // Consegumos pegar varios valores do boot block
+    // menos o ultimo, que o que mais nos interessa.
+
+    printf ("kernel_main: breakpoint. pegando valores do boot block\n");
+    printf ("Boot block pa %x\n",SavedBootBlock); //isso esta certo.
+    printf ("lfb %x\n",BootBlock.lfb);
+    printf ("x   %d\n",BootBlock.x);
+    printf ("y   %d\n",BootBlock.y);
+    printf ("bpp %d\n",BootBlock.bpp);
+    //...
+    printf (">>>  Gramado mode %d\n", BootBlock.gramado_mode);
+    
+    
+   
+    refresh_screen();
+    //while(1){}
+
 
 
 	//

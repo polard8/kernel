@@ -18,9 +18,6 @@
 #define GRAMADO_CALIFORNIA  0x05
 // ...
 
-// Fail mode.
-static char current_mode = 0xFF;
-
 
 
 //
@@ -452,6 +449,8 @@ typedef enum {
 //
 // ==== current ====
 //
+
+int current_mode;
 
 int current_arch;
 

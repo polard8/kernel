@@ -137,7 +137,8 @@ struct bpb_d
 };
 
 
-struct boot_block_d
+/*
+struct ?????_block_d
 {
     int id;
     int used;
@@ -145,9 +146,9 @@ struct boot_block_d
     
     struct bpb_d bpb;
 
-    struct boot_block_d *next;
+    struct ????_block_d *next;
 };
-
+*/
 
 
 

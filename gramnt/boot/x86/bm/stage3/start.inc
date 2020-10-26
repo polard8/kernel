@@ -676,16 +676,15 @@ startGUI:
 	mov al, byte [ModeInfo_BitsPerPixel]   
 	mov dword [BootBlock.bpp], eax 
 
-    ;; ??
-    ;; metafile address
-	xor eax, eax
-	mov eax, dword META$FILE    
-	mov dword [BootBlock.metafile_address], eax
-
-
     ;; #bugbug
-	;; Algo nao permite enderecarmos os elementos do metafile.
-	;; mas conseguimos passar seu endereco.
+    ;; Algo nao permite enderecarmos os elementos do metafile.
+    ;; mas conseguimos passar seu endereco.
+
+    ;; == ?? ==================================================
+    ;; metafile address
+    xor eax, eax
+    mov eax, dword META$FILE    
+    mov dword [BootBlock.metafile_address], eax
 
 
     ;; disk number.
@@ -705,14 +704,18 @@ startGUI:
 	mov ax, word [DISKINFO16_spt]
 	mov dword [BootBlock.spt], eax 
 
-
     ;; cylinders (word)
 	xor eax, eax
 	mov ax, word [DISKINFO16_cylinders]
 	mov dword [BootBlock.cylinders], eax 
 
+    ;; Saving the gramado mode in the boot block. 
+    ;; Maybe it is enough to the BL have this number.
+    xor eax, eax
+    mov eax, dword [tmp_gamemode]
+    mov dword [BootBlock.gramado_mode], eax 
 
-	
+
 	;Continua...
 
     ;xor eax, eax
@@ -723,12 +726,12 @@ startGUI:
     ;; #mov ah, byte [META$FILE.GRAMADO_MODE]
 
 
-	mov ebx, dword [ModeInfo_PhysBasePtr]  ;LFB address (endere�o f�sico)
-	
-	mov ebp, dword BootBlock
-	mov ecx, ebp                           ;tabela
-	mov edx, ebp                           ;tabela
-	
+    mov ebx, dword [ModeInfo_PhysBasePtr]  ;LFB address (endere�o f�sico)
+
+    mov ebp, dword BootBlock
+    mov ecx, ebp                           ;tabela
+    mov edx, ebp                           ;tabela
+
 .goBL:
 
 

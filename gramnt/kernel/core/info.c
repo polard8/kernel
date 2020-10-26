@@ -77,10 +77,10 @@ void KiInformation (void)
             printf ("GRAMADO_CASTLE: \n");
             break;
         
-        case GRAMADO_CALIFORNIA:
+        //case GRAMADO_CALIFORNIA:
         // ...
         default:
-            printf ("INFO: current_mode not defined!\n");
+            printf ("INFO: mode={%d} current_mode not defined!\n", current_mode);
             goto fail;
             break;
     };

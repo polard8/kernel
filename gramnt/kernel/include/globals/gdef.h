@@ -143,6 +143,40 @@ typedef enum {
 
 
 
+
+
+struct boot_block_d
+{
+    unsigned long lfb;
+    unsigned long x;
+    unsigned long y;
+    unsigned long bpp;
+    unsigned long last_valid_address;
+    unsigned long metafile_address;
+    unsigned long disk_number;
+    unsigned long heads; 
+    unsigned long spt; 
+    unsigned long cylinders; 
+    unsigned long boot_mode; 
+    unsigned long gramado_mode;
+    //...
+};
+
+struct boot_block_d BootBlock;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // Window server and window manager.
 // Somente um processo pode ser o ws.
 // Somente um processo pode ser o wm.

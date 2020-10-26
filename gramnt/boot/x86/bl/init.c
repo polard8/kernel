@@ -13,9 +13,20 @@
 #include <bootloader.h>
 
 
-// Funções importadas.
+// Variaveis herdadas do boot manager
 
+// O modo de boot. gui or cli.
 extern unsigned long SavedBootMode;
+
+// Endereço do boot block
+extern unsigned long SavedBootBlock;   
+
+// device info
+//extern unsigned long SavedLFB;
+//extern unsigned long SavedX;
+//extern unsigned long SavedY;
+//extern unsigned long SavedBPP;
+
 
 
 
@@ -149,7 +160,44 @@ int init (){
 	printf("init: Globals..\n");
 #endif	
     init_globals ();
-	
+
+
+
+    //
+    // == boot block ===========================
+    //
+    
+    // Vamos pegar as informaçoes no boot block passado pelo
+    // BM e salvarmos na estrutura no BL.
+    // Eh melhor copiar do que simplesmente fazer referencia.
+    // Vamos copiar em ordem.
+    // See: gdef.h
+    
+    unsigned long *base = (unsigned long *) SavedBootBlock;
+    
+    BootBlock.lfb                = (unsigned long) base[0]; // 0
+    BootBlock.x                  = (unsigned long) base[1]; // 4
+    BootBlock.y                  = (unsigned long) base[2]; // 8
+    BootBlock.bpp                = (unsigned long) base[3]; // 12
+    BootBlock.last_valid_address = (unsigned long) base[4]; // 16
+    BootBlock.metafile_address   = (unsigned long) base[5]; // 20
+    BootBlock.disk_number        = (unsigned long) base[6]; // 24
+    BootBlock.heads              = (unsigned long) base[7]; // 28
+    BootBlock.spt                = (unsigned long) base[8]; // 32 
+    BootBlock.cylinders          = (unsigned long) base[9]; // 36
+    BootBlock.boot_mode          = (unsigned long) base[10]; // 40
+    BootBlock.gramado_mode       = (unsigned long) base[11]; //  44
+
+    // #debug
+    // vamos mostrar as informaçoes do boot block
+    
+    // OK
+    //printf ("Gramado mode %d\n",BootBlock.gramado_mode);
+    //refresh_screen();
+    //while(1){}
+
+
+
     //sistema de arquivos.
 #ifdef BL_VERBOSE	
 	printf("init: file system..\n");

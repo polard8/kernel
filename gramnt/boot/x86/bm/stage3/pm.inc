@@ -751,7 +751,18 @@ gramado_mode_CALIFORNIA:
     
 ____gramado_mode_done:
 
+    ;; Saving the gramado mode in a tmp variable.
+    ;; We will save in the boot block in the future.
+    ;; See: bootloader.inc. Defined here.
+    ;; See: start.inc. Where we setup the boot block
+    
+    xor eax, eax
+    mov al, byte [META$FILE.GRAMADO_MODE]
+    mov dword [tmp_gamemode], eax
+    
+    
     ; Set mode.
+    ; gui or cli.
     mov al, byte BOOTMODE_GUI
     call set_boot_mode
 

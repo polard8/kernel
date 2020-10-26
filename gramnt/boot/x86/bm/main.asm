@@ -43,9 +43,13 @@
 
 ;; The gramado mode
 ;; it will select the video mode.
-;; The vide mode depends on the gramado mode.
+;; The video mode depends on the gramado mode.
 ;; See: rmStartGUI on pm.inc
 
+;; This is the default mode.
+;; But actually the mode is selected by the user
+;; in the command shell.
+;; It's like a 'gamemode'.
 
 ;;GRAMADO_DEFAULT_MODE EQU 0x00  ; jail        320x200
 ;;GRAMADO_DEFAULT_MODE EQU 0x01  ; p1          640x480

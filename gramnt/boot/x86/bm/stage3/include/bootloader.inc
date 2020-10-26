@@ -51,14 +51,25 @@ BootBlock:
     .x:      dd 0              ;; 4
     .y:      dd 0              ;; 8
     .bpp:    dd 0              ;; 12
-	.last_valid_address: dd 0  ;; 16 - ram (size)
+    .last_valid_address: dd 0  ;; 16 - ram (size)
     .metafile_address:   dd 0  ;; 20
     .disk_number: dd 0         ;; 24
-	.heads: dd 0               ;; 28
-	.spt: dd 0                 ;; 32
-	.cylinders: dd 0           ;; 36 
-
+    .heads:       dd 0         ;; 28
+    .spt:         dd 0         ;; 32
+    .cylinders:   dd 0         ;; 36 
+    .boot_mode:     dd 0       ;; 40 cli or gui,  
+    .gramado_mode:  dd 0       ;; 44 (gamemode. jail,p1,home,p2,castle)
+    
     ;Continua...
+
+;;
+;; ============================================================
+;; Gramado mode
+;;      This is the same of the BootBlock.gramado_mode.
+;;      Nao eh aqui que salvamos a configuraçao
+;;      isso eh so usado para ajudar.
+;;
+tmp_gamemode: dd 0
 
 
 
@@ -66,7 +77,8 @@ BootBlock:
 
 ;;
 ;;  Bloco de informa��es para o multiboot.
-;;	
+;;
+
 MultiBootBlock:
     dd 0
     dd 0

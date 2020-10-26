@@ -5,7 +5,7 @@
 ; It's a 32bit, kernel mode, system aplication used to load the 
 ; kernel and some other files.
 ;
-; Descri��o:
+; Descriçao:
 ; Esse arquivo � o entrypoint do Boot Loader. (BL.BIN).
 ; Parte inicial do n�cleo do Boot Loader para a arquitetura x86 de 32bit 
 ; para desktops.
@@ -126,15 +126,20 @@ ____START:
     mov byte [bl_video_mode], al
     mov dword [_g_lbf_pa], ebx         ;Endere�o f�sico do LFB.
 
-	;;
-	;; ## Boot Block ##
-	;;
 
-	;BootBlock pointer.
-	;Ponteiro para o bootblock passado pelo boot manager.
-	
+
+    ;;
+    ;; == Boot Block ========================================
+    ;;
+
+
+    ; BootBlock pointer.
+    ; Ponteiro para o bootblock passado pelo boot manager.
+    ; #todo
+    ; We need to use this address to setup the base of the
+    ; boot block strucure used in this BL.
+    
     mov dword [_SavedBootBlock], edx 
-
 
 
 
@@ -328,58 +333,82 @@ StartKernelEntry:
 	mov edx, dword [_SavedBootBlock]
 
 
+    ;;
+    ;; == BL_BootBlock ==================================
+    ;;
+
+    ;; BL_BootBlock eh uma estrutura que
+    ;; esta logo abaixo...
+    ;; eh o ponteiro para ela que
+    ;; passaremos para o kernel.
+    ;; antes vamos configurar os valores corretamente.
+
+
     ; 0 - lfb
 	xor eax, eax
 	mov eax, dword [_SavedLFB]    
-	mov dword [BootBlock.lfb], eax
+	mov dword [BL_BootBlock.lfb], eax
 	
 	; 4 - x
 	xor eax, eax
 	mov ax, word [_SavedX]       
-	mov dword [BootBlock.x], eax 
+	mov dword [BL_BootBlock.x], eax 
 	
 	; 8 - y
 	xor eax, eax
 	mov ax, word [_SavedY]       
-	mov dword [BootBlock.y], eax 
+	mov dword [BL_BootBlock.y], eax 
 	
 	; 12 - bpp
 	xor eax, eax
 	mov al, byte [_SavedBPP]     
-	mov dword [BootBlock.bpp], eax 
+	mov dword [BL_BootBlock.bpp], eax 
 
 
     ; 16 - last valid address 
 	xor eax, eax
 	mov eax, dword [___last_valid_address]   ;;pega em gdef.h 
-	mov dword [BootBlock.last_valid_address], eax   ;;estrutura logo abaixo.
+	mov dword [BL_BootBlock.last_valid_address], eax   ;;estrutura logo abaixo.
 
 
     ;;#todo: 20
+    ;xor eax, eax
+    ;mov eax, dword [edx +20]    
+    ;mov dword [BL_BootBlock.??], eax
 
      ;; 24 - disk number
-	xor eax, eax
-	mov eax, dword [edx +24]    
-    mov dword [BootBlock.disk_number], eax
+    xor eax, eax
+    mov eax, dword [edx +24]    
+    mov dword [BL_BootBlock.disk_number], eax
 
     ;; 28 - heads
-	xor eax, eax
-	mov eax, dword [edx +28]    
-    mov dword [BootBlock.heads], eax
+    xor eax, eax
+    mov eax, dword [edx +28]    
+    mov dword [BL_BootBlock.heads], eax
 
 
     ;; 32 - spt
 	xor eax, eax
 	mov eax, dword [edx +32]    
-    mov dword [BootBlock.spt], eax
+    mov dword [BL_BootBlock.spt], eax
 
    ;; 36 - cylinders
-	xor eax, eax
-	mov eax, dword [edx +36]    
-    mov dword [BootBlock.cylinders], eax
+    xor eax, eax
+    mov eax, dword [edx +36]    
+    mov dword [BL_BootBlock.cylinders], eax
 
 
+    ;; todo: 40
+    xor eax, eax
+    mov eax, dword [edx +40]    
+    mov dword [BL_BootBlock.boot_mode], eax
 
+    ;; todo: 44
+    xor eax, eax
+    mov eax, dword [edx +44]    
+    mov dword [BL_BootBlock.gramado_mode], eax
+    
+    ;; ...
 
 
 	;Continua...
@@ -395,11 +424,14 @@ StartKernelEntry:
 	;mov al, byte 'G'             ;Flag. (useing graphics).	
 	;mov al, byte 'T'             ;Flag. (useing textmode).	
 	
-	;Prepara a tabela.
-	mov ebp, dword BootBlock	
+	;; Prepara a tabela.
+	;; #bugbug O kernel nao consegue pegar as coisas no boot block.
+	;; por que ?? maping?
+
+	mov ebp, dword BL_BootBlock	
 	mov edx, ebp                 ;Tabela. (boot block)
 	mov ecx, ebp                 ;Tabela. (boot block)
-	
+
 	;Prepara o lfb.
 	mov ebx, dword [_SavedLFB]   ;LFB address.
 
@@ -460,7 +492,7 @@ blShellLoop:
 
 
 ;========================================================
-; BootBlock:
+; BL_BootBlock:
 ;     Bloco de configura��o de inicializa��o.
 ;     LFB address.
 
@@ -470,18 +502,22 @@ blShellLoop:
 
 ;; ok ta igual ao do bm.
 
-BootBlock:
-.lfb: dd 0                   ;  0 - LFB address.
-.x:   dd 0                   ;  4 - Width in pixels.
-.y:   dd 0                   ;  8 - Height in pixel.
-.bpp: dd 0                   ; 12 - bpp address.
-.last_valid_address: dd 0    ; 16 - last valid ram address when finding mem size.
-.metafile_address:   dd 0    ;; 20
-.disk_number: dd 0           ;; 24
-.heads: dd 0                 ;; 28
-.spt: dd 0                   ;; 32
-.cylinders: dd 0             ;; 36 
-
+BL_BootBlock:
+    .lfb: dd 0                   ;  0 - LFB address.
+    .x:   dd 0                   ;  4 - Width in pixels.
+    .y:   dd 0                   ;  8 - Height in pixel.
+    .bpp: dd 0                   ; 12 - bpp address.
+    .last_valid_address: dd 0    ; 16 - last valid ram address when finding mem size.
+    .metafile_address:   dd 0    ;; 20
+    .disk_number: dd 0           ;; 24
+    .heads: dd 0                 ;; 28
+    .spt: dd 0                   ;; 32
+    .cylinders: dd 0             ;; 36 
+    .boot_mode:  dd 0            ;; 40
+    .gramado_mode dd 0           ;; 44
+    
+    
+    
 
 
 ;Continua...

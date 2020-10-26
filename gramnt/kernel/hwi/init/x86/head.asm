@@ -198,6 +198,8 @@ head_init:
     ; edx = LoaderBlock pointer.
 
     mov dword [_SavedBootBlock], edx
+    ;;mov dword [_SavedBootBlock], ebp
+
 
     ; 0 - LFB.
     ; FrontBuffer Address, (LFB)

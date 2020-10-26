@@ -325,10 +325,13 @@ s2modespm32:
     mov al, byte [ModeInfo_BitsPerPixel]   
     mov dword [BootBlock.bpp], eax 
 
+
+    ;; #bugbug
+    ;; provavelmente so podemos salvar o endereço do metafile
+    ;; e nao seus elementos como estrutura.
     xor eax, eax
     mov eax, dword META$FILE  
     mov dword [BootBlock.metafile_address], eax
-
     ;; ...
 
     ;;
