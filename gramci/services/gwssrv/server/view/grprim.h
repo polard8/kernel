@@ -39,6 +39,8 @@ struct gr_rectangle_d
     struct gr_vec3D_d p[4];
 };
 
+
+// Cube
 struct gr_cube_d
 {
     struct gr_vec3D_d p[8];
@@ -99,7 +101,6 @@ void matrix_demo1(void);
 
 #define grMIN2(a, b)  (((a) < (b)) ? (a) : (b))
 #define grMAX2(a, b)  (((a) > (b)) ? (a) : (b))
-
 
 #define grMIN3(x,y,z)     (x < y  ? (x < z ? x : z) : (y < z ? y : z))
 #define grMAX3(x,y,z)     ( (x>y) ? ((x>z)?x:z)     : ((y>z)?y:z) )
@@ -175,6 +176,10 @@ ras_rectangleZ (
 int xxxInflateCubeZ ( struct gr_cube_d *cube, int value );
 int xxxDeflateCubeZ ( struct gr_cube_d *cube, int value );
 int xxxCubeZ ( struct gr_cube_d *cube );
+
+//sevice 2041
+int serviceGrCubeZ(void);
+
 
 void cube_demo1(void);
 void cube_demo2(void);

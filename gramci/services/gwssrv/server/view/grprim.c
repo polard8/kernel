@@ -587,13 +587,78 @@ int xxxCubeZ ( struct gr_cube_d *cube )
 }
 
 
+//sevice 2041
+int serviceGrCubeZ(void)
+{
+    // #todo:
+    // Vamos pegar os vertices do cubo nos argumentos
+    // e completar a estrtutura local.
+    // entao passamos o endereço da estrutura para a funçao helper.
+
+    unsigned long *message_address = (unsigned long *) &__buffer[0];
+    
+    
+    gwssrv_debug_print("serviceGrCubeZ: [2041]\n");
+    
+    struct gr_cube_d cube;
+   
+    //south     
+    cube.p[0].x = message_address[10];
+    cube.p[0].y = message_address[11];
+    cube.p[0].z = message_address[12];
+    cube.p[0].color = message_address[13];
+        
+    cube.p[1].x = message_address[14];
+    cube.p[1].y = message_address[15];
+    cube.p[1].z = message_address[16];
+    cube.p[1].color = message_address[17];
+        
+    cube.p[2].x = message_address[18];
+    cube.p[2].y = message_address[19];
+    cube.p[2].z = message_address[20];
+    cube.p[2].color = message_address[21];
+        
+    cube.p[3].x = message_address[22];
+    cube.p[3].y = message_address[23];
+    cube.p[3].z = message_address[24];
+    cube.p[3].color = message_address[25];
+
+    //north
+    cube.p[4].x = message_address[26];
+    cube.p[4].y = message_address[27];
+    cube.p[4].z = message_address[28];
+    cube.p[4].color = message_address[29];
+       
+    cube.p[5].x = message_address[30];
+    cube.p[5].y = message_address[31];
+    cube.p[5].z = message_address[32];
+    cube.p[5].color = message_address[33];
+        
+    cube.p[6].x = message_address[34];
+    cube.p[6].y = message_address[35];
+    cube.p[6].z = message_address[36];
+    cube.p[6].color = message_address[37];
+        
+    cube.p[7].x = message_address[38];
+    cube.p[7].y = message_address[39];
+    cube.p[7].z = message_address[40];
+    cube.p[7].color = message_address[41];
+    
+   
+    //#test
+    //Temos que passar corretamente o endereço da estrutura.
+    xxxCubeZ ( (struct gr_cube_d *) &cube );
+   
+   return 0;
+}
+
+
 // inflate varias vezes.
 //only on jail
 void cube_demo1(void)
 {
     int i=0;
     int j=0;
-   
    
     struct gr_cube_d *cube;
     cube = (void *) malloc( sizeof( struct gr_cube_d ) );

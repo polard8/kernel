@@ -160,6 +160,12 @@ gws_plot0 (
     unsigned long color );
 
 
+
+int 
+gws_plotcube (
+    int fd,
+    struct gr_cube_d *cube );
+
 // ...
 
 

@@ -1375,6 +1375,12 @@ gwsProcedure (
             serviceGrPlot0();
             break;
             
+        // See: grprim.c
+        case 2041:
+            serviceGrCubeZ();
+            break;
+            
+            
         // #todo
         // Segue serviços graficos 3d.
         // ...

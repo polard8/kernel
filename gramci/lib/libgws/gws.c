@@ -102,6 +102,12 @@ __gws_plot0_request (
 int __gws_plot0_response (int fd);  
 
 
+
+// == plot cube ======================================================
+int __gws_plotcube_request ( int fd, struct gr_cube_d *cube );
+int __gws_plotcube_response (int fd);
+
+
 // == Draw Char ==========================
 int 
 __gws_drawchar_request (
@@ -1163,13 +1169,251 @@ process_event:
 }
 
 
-
-
 //
 // =============================
 //
+//cube
+
+int __gws_plotcube_request ( int fd, struct gr_cube_d *cube )
+{
+    // Isso permite ler a mensagem na forma de longs.
+    unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];   
+
+    int n_writes = 0;   // For sending requests.
+    
+    //char *name = "Window name 1";
 
 
+    if ( (void*) cube == NULL )
+        return -1;
+
+
+    //
+    // Send request.
+    //
+
+
+    // #debug
+    gws_debug_print ("__gws_plotcube_request: Writing ...\n");      
+
+    // Enviamos um request para o servidor.
+    // ?? Precisamos mesmo de um loop para isso. ??
+    // msg = 369 (get input event)
+
+    while (1)
+    {
+        message_buffer[0] = 0;       // window. 
+        message_buffer[1] = 2041;    // msg (plot cube)
+        message_buffer[2] = 0;
+        message_buffer[3] = 0;
+        
+        // ...
+        
+        // os argumentos para rotinas graficas começam em '10'.
+        // Sempre começa com x,y,z e color ...
+        
+        // south
+        message_buffer[10] = cube->p[0].x;
+        message_buffer[11] = cube->p[0].y;
+        message_buffer[12] = cube->p[0].z;
+        message_buffer[13] = cube->p[0].color;
+
+        message_buffer[14] = cube->p[1].x;
+        message_buffer[15] = cube->p[1].y;
+        message_buffer[16] = cube->p[1].z;
+        message_buffer[17] = cube->p[1].color;
+
+        message_buffer[18] = cube->p[2].x;
+        message_buffer[19] = cube->p[2].y;
+        message_buffer[20] = cube->p[2].z;
+        message_buffer[21] = cube->p[2].color;
+
+        message_buffer[22] = cube->p[3].x;
+        message_buffer[23] = cube->p[3].y;
+        message_buffer[24] = cube->p[3].z;
+        message_buffer[25] = cube->p[3].color;
+
+        // north
+        message_buffer[26] = cube->p[4].x;
+        message_buffer[27] = cube->p[4].y;
+        message_buffer[28] = cube->p[4].z;
+        message_buffer[29] = cube->p[4].color;
+
+        message_buffer[30] = cube->p[5].x;
+        message_buffer[31] = cube->p[5].y;
+        message_buffer[32] = cube->p[5].z;
+        message_buffer[33] = cube->p[5].color;
+
+        message_buffer[34] = cube->p[6].x;
+        message_buffer[35] = cube->p[6].y;
+        message_buffer[36] = cube->p[6].z;
+        message_buffer[37] = cube->p[6].color;
+
+        message_buffer[38] = cube->p[7].x;
+        message_buffer[39] = cube->p[7].y;
+        message_buffer[40] = cube->p[7].z;
+        message_buffer[41] = cube->p[7].color;
+
+        // ...
+
+        // Write!
+        // Se foi possível enviar, então saimos do loop.  
+
+        // n_writes = write (fd, __buffer, sizeof(__buffer));
+        n_writes = send ( fd, 
+                       __gws_message_buffer, 
+                       sizeof(__gws_message_buffer), 
+                       0 );
+       
+        if(n_writes>0){ break; }
+    }
+
+    return 0; 
+}
+
+
+//response
+int __gws_plotcube_response (int fd)
+{
+    unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];   
+    int n_reads = 0;    // For receiving responses.
+
+    //
+    // Waiting for response. ==================
+    //
+
+    // Espera para ler a resposta. 
+    // Esperando com yield como teste.
+    // Isso demora, pois a resposta só será enviada depois de
+    // prestado o servido.
+    // obs: Nesse momento deveríamos estar dormindo.
+
+    // #debug
+    gws_debug_print ("__gws_plotcube_response: Waiting ...\n");      
+
+    int y=0;
+    for(y=0; y<15; y++)
+        gws_yield();   // See: libgws/
+
+
+    // #todo
+    // Podemos checar antes se o fd 
+    // representa um objeto que permite leitura.
+    // Pode nem ser possível.
+    // Mas como sabemos que é um soquete,
+    // então sabemos que é possível ler.
+
+    //
+    // read
+    //
+
+    // #debug
+    gws_debug_print ("__gws_plotcube_response: Reading ...\n");      
+
+
+    // #caution
+    // Waiting for response.
+    // We can stay here for ever.
+
+response_loop:
+
+    //n_reads = read ( fd, __buffer, sizeof(__buffer) );
+    n_reads = recv ( fd, 
+                  __gws_message_buffer, 
+                  sizeof(__gws_message_buffer), 
+                  0 );
+    
+    //if (n_reads<=0){
+    //     gws_yield(); 
+    //    goto response_loop;
+    //}
+    
+    // Se retornou 0, podemos tentar novamente.
+    if (n_reads == 0){
+        gws_yield(); 
+        goto response_loop;
+    }
+    
+    // Se retornou -1 é porque algo está errado com o arquivo.
+    if (n_reads < 0){
+        gws_debug_print ("__gws_plotcube_response: recv fail.\n");
+        printf          ("__gws_plotcube_response: recv fail.\n");
+        printf ("Something is wrong with the socket.\n");
+        exit (1);
+    }
+
+    //
+    // The msg index.
+    //
+    
+    // Get the message sended by the server.
+
+    int msg = (int) message_buffer[1];
+    
+    switch (msg){
+
+        case GWS_SERVER_PACKET_TYPE_REQUEST:
+            gws_yield ();
+            goto response_loop;
+            break;
+            
+        // Reply!
+        case GWS_SERVER_PACKET_TYPE_REPLY:
+            goto process_reply;
+            break;
+            
+        case GWS_SERVER_PACKET_TYPE_EVENT:
+            goto process_event;
+            //goto response_loop;
+            break;
+            
+        case GWS_SERVER_PACKET_TYPE_ERROR:
+            gws_debug_print ("__gws_plotcube_response: SERVER_PACKET_TYPE_ERROR\n");
+            goto response_loop;
+            //exit (-1);
+            break;
+        
+        default:
+            goto response_loop;
+            break; 
+    };
+
+//
+// Process reply.
+//
+
+// A resposta tras o window id no início do buffer.
+    
+process_reply:
+
+    // #test
+    //gws_debug_print ("terminal: Testing close() ...\n"); 
+    //close (fd);
+
+    //gws_debug_print ("terminal: bye\n"); 
+    //printf ("terminal: Window ID %d \n", message_buffer[0] );
+    //printf ("terminal: Bye\n");
+    
+    // #todo
+    // Podemos usar a biblioteca e testarmos
+    // vários serviços da biblioteca nesse momento.
+
+    //return 0;
+    return (int) message_buffer[0];
+
+//
+// Process an event.
+//
+
+process_event:
+    gws_debug_print ("__gws_plotcube_response: We got an event\n"); 
+    return 0;
+}
+
+
+//
+// =======================
+//
 
 int 
 __gws_drawchar_request (
@@ -1837,6 +2081,23 @@ gws_plot0 (
 
     return 0;
 }
+
+
+//plot cube
+int 
+gws_plotcube (
+    int fd,
+    struct gr_cube_d *cube )
+{
+    
+    if ( (void*) cube == NULL )
+        return -1;
+        
+    __gws_plotcube_request  (fd, (struct gr_cube_d *) cube );
+    __gws_plotcube_response (fd);
+    return 0;
+}
+
 
 
 

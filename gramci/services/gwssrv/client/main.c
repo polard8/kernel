@@ -182,10 +182,67 @@ int main ( int argc, char *argv[] ){
 
     //test: plot point;
     //um ponto em cada quadrante.
-    gws_plot0 ( client_fd, -4,  4, 0, COLOR_RED );
-    gws_plot0 ( client_fd,  4,  4, 0, COLOR_GREEN );
-    gws_plot0 ( client_fd,  4, -4, 0, COLOR_BLUE );
-    gws_plot0 ( client_fd, -4, -4, 0, COLOR_YELLOW );
+    gws_plot0 ( client_fd, -50,  50, 0, COLOR_RED );
+    gws_plot0 ( client_fd,  50,  50, 0, COLOR_GREEN );
+    gws_plot0 ( client_fd,  50, -50, 0, COLOR_BLUE );
+    gws_plot0 ( client_fd, -50, -50, 0, COLOR_YELLOW );
+
+    //
+    // == cube ==================================
+    //
+    
+    struct gr_cube_d *cube;
+    cube = (void *) malloc( sizeof( struct gr_cube_d ) );
+    if ( (void*) cube != NULL )
+    {
+
+        //south     
+        cube->p[0].x = 0;
+        cube->p[0].y = 20;
+        cube->p[0].z = 0;
+        cube->p[0].color = COLOR_WHITE;
+        
+        cube->p[1].x = 20;
+        cube->p[1].y = 20;
+        cube->p[1].z = 0;
+        cube->p[1].color = COLOR_WHITE;
+        
+        cube->p[2].x = 20;
+        cube->p[2].y = 0;
+        cube->p[2].z = 0;
+        cube->p[2].color = COLOR_WHITE;
+        
+        cube->p[3].x = 0;
+        cube->p[3].y = 0;
+        cube->p[3].z = 0;
+        cube->p[3].color = COLOR_WHITE;
+
+        //north
+        cube->p[4].x = 0;
+        cube->p[4].y = 20;
+        cube->p[4].z = 20;
+        cube->p[4].color = COLOR_YELLOW;
+        
+        cube->p[5].x = 20;
+        cube->p[5].y = 20;
+        cube->p[5].z = 20;
+        cube->p[5].color = COLOR_YELLOW;
+        
+        cube->p[6].x = 20;
+        cube->p[6].y = 0;
+        cube->p[6].z = 20;
+        cube->p[6].color = COLOR_YELLOW;
+        
+        cube->p[7].x = 0;
+        cube->p[7].y = 0;
+        cube->p[7].z = 20;
+        cube->p[7].color = COLOR_YELLOW;
+        
+        
+        // plot cube 
+        gws_plotcube ( client_fd, (struct gr_cube_d *) cube );
+
+    }
 
    
     // #debug
