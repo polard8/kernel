@@ -10,8 +10,8 @@
 // ...
 
 // Fail mode.
-static char current_mode = 0xFF;
-
+//static char current_mode = 0xFF;
+int current_mode;
 
 
 // rtl

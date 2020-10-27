@@ -417,6 +417,11 @@ void ps2mouse_initialize_device (void){
 
     // #test
     // Habilitando o dispositivo secundario na forla bruta.
+    // Reenable mouse port.
+    // #bugbug: a rotina de inicializaçao da controladora ps2,
+    // esta fazendo isso ao fim da rotina. nao precisamos fazer isso aqui.
+    // Talvez atrapalhe a inicializaçao.
+    
     wait_then_write (0x64,0xA8);   // I8042_WRITE = 0x60
     for (i=0;i<10000;i++);
         
@@ -1183,6 +1188,9 @@ void mouseHandler (void)
     
     int msg_status=-1;
 
+    // Disable keyboard.
+    wait_then_write (0x64,0xAD); 
+
 
     //#todo: Isso é um teste.
     // O mouse ps2 está desabilitado porém recebendo as interupções
@@ -1296,10 +1304,13 @@ void mouseHandler (void)
         // Problemas na contagem de interrupções.
         default:
             count_mouse = 0;
-            return;
             break;
     };
+
+    // Reanable keyboard.
+    wait_then_write (0x64,0xAE); 
 }
+
 
 
 // =====================================================

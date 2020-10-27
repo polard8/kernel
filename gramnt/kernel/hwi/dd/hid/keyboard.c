@@ -162,6 +162,10 @@ void put_scancode( char c )
 void abnt2_keyboard_handler (void){
 
 
+
+    wait_then_write (0x64,0xA7);  //Disable mouse port.
+
+
     // ??
     // See: Serenity os.
     //u8 status = IO::in8(I8042_STATUS);
@@ -229,7 +233,7 @@ sc_again:
     // caso tenha um instalado.
 
             
-     if ( __raw == 0 )   { return; }
+     if ( __raw == 0 )   {                      goto done;     }
      if ( __raw == 0xE0 ){ __has_e0_prefix = 1; goto sc_again; }
      if ( __raw == 0xE1 ){ __has_e1_prefix = 1; goto sc_again; }
 
@@ -240,6 +244,10 @@ sc_again:
     // Clean the mess.
     __has_e0_prefix = 0;
     __has_e1_prefix = 0;
+
+done:
+    wait_then_write (0x64,0xA8);  // Reenable the mouse port.
+    return;
 }
 
 

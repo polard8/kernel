@@ -44,48 +44,46 @@ wait_then_write ( int port, int data ){
 /*
  ***************
  * ps2:
+ *     Inicializa o controlador ps2.
+ * 
  *     Essa rotina de inicialização do controlador 
  * poderá ter seu próprio módulo.
- *     Inicializa o controlador ps2.
+ * 
  *     Inicializa a porta do teclado no controlador.
  *     Inicializa a porta do mouse no controlador.
  *     Obs: *importante: A ordem precisa ser respeitada.
  *     As vezes os dois não funcionam ao mesmo tempo se a 
  *     inicialização não for feita desse jeito. 
  */
- 
+
+
+// Essa eh uma inicializaçao completa.
+
 void ps2 (void){
 
-
 	// #debug
-	printf ("ps2: Initializing..\n");
-	refresh_screen();
-
-
+    printf ("ps2: Initializing..\n");
+    refresh_screen();
 
     // ======================================
     // Deactivate ports!
-    wait_then_write (0x64,0xAD);
-    wait_then_write (0x64,0xA7); 
-
+    wait_then_write (0x64,0xAD);  // Disable keyboard port.
+    wait_then_write (0x64,0xA7);  // Disable mouse port.
 
     // Keyboard.
     printf ("ps2: Initializing keyboard ..\n");
     refresh_screen();
     ps2kbd_initialize_device ();
 
-
     // Mouse.
     printf ("ps2: Initializing mouse ..\n");
     refresh_screen();
     ps2mouse_initialize_device ();
 
-
     // ======================================
     // Reactivate ports!
-    wait_then_write (0x64,0xAE);
-    wait_then_write (0x64,0xA8);
-
+    wait_then_write (0x64,0xAE);  // Reenavle keyboard port.
+    wait_then_write (0x64,0xA8);  // Renable mouse port.
 
     // Wait for nothing!
     kbdc_wait (1);
@@ -93,8 +91,7 @@ void ps2 (void){
     kbdc_wait (1);
     kbdc_wait (1);
 
-
-// Done.
+    // Done.
 
     //#debug
     printf ("ps2: done\n");
@@ -102,13 +99,29 @@ void ps2 (void){
 }
 
 
+
+/*
+ ************************************************************
+ * early_ps2_init:
+ * 
+ * 
+ */
+
 // Inicialização preliminar. Sem mouse.
 // Ela existe porque a emulação de ps2 na máquina real 
 // apresenta falhas.
 // No gdeshell.bin incluiremos os comando "ps2-init"
 // para obtermos a inicialização completa.
-void early_ps2_init (void)
-{
+
+// #importante
+// Nao chamamos a rotina de inicializaçao do mouse.
+// mas poderiamos. O importante eh deixar a porta desabilitada
+// ao final da rotina.
+// Ao fim dessa rotina, reabilitamos apenas a porta de teclado.
+// A porta de mouse permaneçe fechada.
+
+void early_ps2_init (void){
+
     // mas simples...
     // apenas teclado.
 
@@ -117,11 +130,10 @@ void early_ps2_init (void)
 	refresh_screen();
 
 
-
     // ======================================
     // Deactivate ports!
-    wait_then_write (0x64,0xAD);
-    wait_then_write (0x64,0xA7); 
+    wait_then_write (0x64,0xAD);  //Disable keyboard port.
+    wait_then_write (0x64,0xA7);  //Disable mouse port.
 
 
     // Keyboard.
@@ -138,8 +150,12 @@ void early_ps2_init (void)
 
     // ======================================
     // Reactivate ports!
-    wait_then_write (0x64,0xAE);
-    //wait_then_write (0x64,0xA8);
+    wait_then_write (0x64,0xAE);    // Reenable keyboard port.
+    //wait_then_write (0x64,0xA8);  // do NOT reenable the mouse port.
+
+
+    // We can call this one.
+    // wait_then_write (0x64,0xA7);  //Disable mouse port.
 
 
     // Wait for nothing!
@@ -148,14 +164,11 @@ void early_ps2_init (void)
     kbdc_wait (1);
     kbdc_wait (1);
 
-
-// Done.
+    // Done.
 
     //#debug
     printf ("early_ps2_init: done\n");
     refresh_screen();
-
-
 }
 
 
