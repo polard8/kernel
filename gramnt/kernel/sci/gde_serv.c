@@ -148,15 +148,10 @@ gde_extra_services (
     }
 
 
-
-    // yield the current thread.
+    // Yield the current thread.
     // O seu tempo rodando vai para perto do fim.
-    if (number == 265){
-        //todo: debug_print
-        yield (current_thread);
-        return NULL;
-    }
-
+    //todo: debug_print
+    if (number == 265){  yield (current_thread); return NULL; }
 
     // Pega o n�mero da tty de um processo, dado o pid.
     // ps/action/process.c
@@ -461,7 +456,6 @@ gde_extra_services (
     // Isso sera usado pelo compositor do window server. 
     // Ou pelo window manager.
     if ( number == 518 ){  redraw_screen();  return NULL;  }
-
 
     // Get current desktop
     if (number == 519){  return (void *) CurrentDesktop; }
@@ -2140,20 +2134,14 @@ gde_services (
         // isso n�o parece seguro, precismos checar a validade 
         // da estrutura antes, mas vai ficar assim por enquanto.
         // Perigo!
-        case 146:
-            return (void *) gui->screen;
-            break;
-
+        case 146:  return (void *) gui->screen;  break;
 
         // 147
         // #bugbug: 
         // isso n�o parece seguro, precismos checar a validade da 
         // estrutura antes, mas vai ficar assim por enquanto.
         // Perigo!
-        case 147:
-            return (void *) gui->main;
-            break;
-
+        case 147:  return (void *) gui->main;  break;
 
 		// 148 
 		// Create grid and itens.
@@ -2165,17 +2153,16 @@ gde_services (
 
 
         // 149 - Testing system menu.
-        // Essa � uma rotina de teste, qua chama v�rias fun��es.
+        // Essa eh uma rotina de teste, qua chama v�rias fun��es.
         case 149:
-            MainMenu ( (struct window_d *) arg2 );
+            // MainMenu ( (struct window_d *) arg2 );
             break;
-
 
         // 152 - get uid
         case SYS_GETCURRENTUSERID: 
             return (void *) current_user; 
             break;
-
+ 
         // 154 - get gid
         case SYS_GETCURRENTGROUPID: 
             return (void *) current_group; 
@@ -2242,17 +2229,11 @@ gde_services (
 
 
         // 164 - livre. 
-
         // socket stuff
-        case 165:
-            break;
-
+        // case 165:  break;
         // socket stuff
-        case 166:
-            break;
-
- 
-       // 167 - livre.
+        // case 166:  break;
+        // 167 - livre.
  
  
        // livre
@@ -2371,12 +2352,12 @@ gde_services (
        // 196 - livre.
 
 
-        //197
-		//scroll de �rea de cliente de uma janela;
+        // 197
+        // scroll de area de cliente de uma janela;
         case 197:
-		    //essa � uma boa rotina, mas precisamos tabalhar nisso,
-			//est� dando page fault.
-			//scroll_client_window ( (struct window_d *) arg2 );
+            //essa � uma boa rotina, mas precisamos tabalhar nisso,
+            //est� dando page fault.
+            //scroll_client_window ( (struct window_d *) arg2 );
             break; 
 
 
@@ -2396,10 +2377,8 @@ gde_services (
             return NULL;
             break;
             
-        //#todo: precismos criar o suporte a chamada signal()
+        // #todo: precismos criar o suporte a chamada signal()
         // maybe sys_signal
-        //
-
 
         // ...
 
@@ -2407,73 +2386,72 @@ gde_services (
         // block for a reason.
         //bloqueamos uma thead por um dos motivos indicados em argumento.
         case SYS_GENERICWAIT:
-		    //TID, reason.
+            //TID, reason.
             //block_for_a_reason ( (int) arg2, (int) arg3 );
-			break;		
-
-		//210
-		case SYS_CREATETERMINAL: 
             break;
-			
-		//211
+
+        //210
+        case SYS_CREATETERMINAL: 
+            break;
+
+        //211
         case SYS_GETCURRENTTERMINAL:
             return (void *) current_terminal;
-			break;
-			
-	    //212
+            break;
+
+        //212
         case SYS_SETCURRENTTERMINAL:
             current_terminal = (int) arg2;
-			break;
-			
-		//213
-        case SYS_GETTERMINALINPUTBUFFER:	
+            break;
+
+        //213
+        case SYS_GETTERMINALINPUTBUFFER:
             return NULL;
-			break;
-			
-		//214
-        case SYS_SETTERMINALINPUTBUFFER:
-		    break;
+            break;
+
+        //214
+        // case SYS_SETTERMINALINPUTBUFFER:  break;
 
 		// 215
 		// Get terminal window.	
 		// retorna o ID.
 		// O ID fica em terminal_window.
-		case SYS_GETTERMINALWINDOW: 
-			return (void *) systemGetTerminalWindow (); 
-			break;
+        case SYS_GETTERMINALWINDOW: 
+            return (void *) systemGetTerminalWindow (); 
+            break;
 
 		// 216
 		// Set terminal window	
 		// Configura qual vai ser a janela do terminal virtual. 
 		// #obs: O refresh de stdout podera' ocorrer em ts.c
-		// O ID fica em terminal_window.	
-		case SYS_SETTERMINALWINDOW:	
-		   systemSetTerminalWindow ( (struct window_d *) arg2 );	
-		   break;
-		   
-		//217
-		case SYS_GETTERMINALRECT:
-			return NULL; 
-			break;
+		// O ID fica em terminal_window.
+        case SYS_SETTERMINALWINDOW:
+           systemSetTerminalWindow ( (struct window_d *) arg2 );
+           break;
 
-		//218
+        //217
+        case SYS_GETTERMINALRECT:
+            return NULL; 
+            break;
+
+        //218
         //configura na estrutura do terminal corrente,
-        //qual vai ser o ret�ngulo a ser usado. 		
-		case SYS_SETTERMINALRECT:
-		
-		   //#bugbug: Pagefault.
-		   
-		    // Estamos usando default por falta de argumento.
+        //qual vai ser o ret�ngulo a ser usado. 
+        case SYS_SETTERMINALRECT:
+
+            //#bugbug: Pagefault.
+
+            // Estamos usando default por falta de argumento.
             //systemSetTerminalRectangle( DEFAULT_TERMINAL_LEFT, 
-			//                            DEFAULT_TERMINAL_TOP, 
-			//							arg3, 
-			//							arg4 );		
-		    break;
+            //                            DEFAULT_TERMINAL_TOP, 
+            //                            arg3, 
+            //                            arg4 );
+            
+            break;
 
 
-		//219
-        case SYS_DESTROYTERMINAL:
-            break; 
+        //219
+        //case SYS_DESTROYTERMINAL:  break; 
  
          //220 - reboot             #todo
          //221 - execute a program. #todo
@@ -2489,8 +2467,8 @@ gde_services (
             break;
 
 
-        //223 - get sys time info.
-        // informa��es variadas sobre o sys time.
+        // 223 - get sys time info.
+        // informaçoes variadas sobre o sys time.
         case 223:
             return (void *) get_systime_info ( (int) arg2 );
             break;
@@ -2540,17 +2518,15 @@ gde_services (
 		// 235 - livre
 
 
-
-		// tty ... 236 237 238 239.
+        // tty ... 236 237 238 239.
 
         // 236 - get tty id
-        case 236:
-            return (void *) current_tty;
-            break;
-
-        //240
+        case 236:  return (void *) current_tty;  break;
+        
+        // 240
         case SYS_GETCURSORX:  return (void *) get_cursor_x();  break;
-        //241
+        
+        // 241
         case SYS_GETCURSORY:  return (void *) get_cursor_y();  break;
 
 
