@@ -16,15 +16,22 @@
 //GetWindowRect
 //GetClientRect
 
+
+
+/*
+ *************************************************************** 
+ * wm_process_windows: 
+ * 
+ * 
+ */
+
 static unsigned long ____old=0;
 static unsigned long ____new=0;
 
-
-void wm_process_windows(void)
-{
+void wm_process_windows (void){
 
     unsigned long t_start = 0;
-    unsigned long t_end = 0;
+    unsigned long t_end   = 0;
 
 
     int dirty_status = -1;
@@ -115,11 +122,27 @@ void wm_process_windows(void)
         }
     }
 
-    // debug
-    gws_show_backbuffer();              
-    frames_count++;
+    // #test
+    // Let's refresh only the valid screen.
+    // We will refresh the device screen only if explicity called
+    // by the app.
     
-        
+    // explicity called.
+    if ( refresh_device_screen_flag == 1 ){
+
+        refresh_device_screen();
+    
+    // Refresh only the valid screen
+    }else{
+        refresh_valid_screen();
+    };
+
+    // counter
+    frames_count++;
+
+    //
+    // == time =========================================
+    //
     
     // delta
     unsigned long dt=0;
@@ -130,27 +153,23 @@ void wm_process_windows(void)
     
 //===================================================================
 // ++  End
-    //t_end = rtl_get_progress_time();
 
+    //t_end = rtl_get_progress_time();
     //__refresh_rate =  t_end - t_start;
-    
     //__refresh_rate = __refresh_rate/1000;
-    
     //printf ("@ %d %d %d \n",__refresh_rate, t_now, t_old);
 
+
     //====================================
-    //fps++
+    // fps++
+    // conta quantos frames. 
     char rate_buffer[32];
-    //conta quantos frames.
-
-
     // se passau um segundo.
-    if ( dt > 1000 )
-    {
+    if ( dt > 1000 ){
         ____old = ____new;
         
         fps = frames_count; // quantos frames em 1000 ms aproximadamente?
-        itoa(fps, rate_buffer); 
+        itoa (fps, rate_buffer); 
         yellow_status(rate_buffer);
         frames_count=0;
         fps=0;
@@ -161,17 +180,37 @@ void wm_process_windows(void)
 }   
 
 
+
+
+// yellow bar.
+// developer status.
 void yellow_status( char *string )
 {
-    
-    rectBackbufferDrawRectangle ( 
-            0, 0, 400, 24, 
-            COLOR_YELLOW, 1 );
+    //methods. get with the w.s., not with the system.
+    unsigned long w = gws_get_device_width();
+    unsigned long h = gws_get_device_height();
 
-    dtextDrawString ( 8, 8, COLOR_BLACK, string );    
-    dtextDrawString ( 60, 8, COLOR_BLACK, "FPS" );
+
+    unsigned long offset_string1 = 8;  //( 8*1 );
+    unsigned long offset_string2 = ( 8*5 );
+    unsigned long bar_size = w;
+
+    if ( current_mode == GRAMADO_JAIL ){
+        //bar_size = w;
+        bar_size = (w>>1);
+        rectBackbufferDrawRectangle ( 
+            0, 0, bar_size, 24, COLOR_YELLOW, 1 );
+    }else{
+
+        bar_size = (offset_string2 + (4*8) );
+        rectBackbufferDrawRectangle ( 
+            0, 0, bar_size, 24, COLOR_YELLOW, 1 );
+    };
+
+    dtextDrawString ( offset_string1, 8, COLOR_BLACK, string );    
+    dtextDrawString ( offset_string2, 8, COLOR_BLACK, "FPS" );
         
-    gws_refresh_rectangle(0,0,400,24);
+    gws_refresh_rectangle(0,0,bar_size,24);
 }
 
 

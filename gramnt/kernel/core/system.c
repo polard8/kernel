@@ -1395,28 +1395,23 @@ unsigned long systemGetSystemMetrics ( int index ){
        
        // jiffies.
        // total ticks
-       case 118:
-           return (unsigned long) jiffies;
-           break;
+       case 118:  return (unsigned long) jiffies;  break;
 
        // seconds
        // por quantos segundos o sistema esta rodando
        // jiffies/sys_time_hz
-       case 119:
-           return (unsigned long) seconds; 
-           break;
+       case 119:  return (unsigned long) seconds;      break;
        
        // Por quantos ms o sistema esta rodando.
-       case 120:
-           return (unsigned long) sys_time_ms;
-           break;
+       case 120:  return (unsigned long) sys_time_ms;  break;
 
        // pit frequency
-       case 121:
-           return (unsigned long) sys_time_hz;
-           break;
+       case 121:  return (unsigned long) sys_time_hz;  break;
 
         // ...
+
+       // gramado mode, gamemode.
+       case 130: return (unsigned long) current_mode; break;
 
         default:
             goto done;

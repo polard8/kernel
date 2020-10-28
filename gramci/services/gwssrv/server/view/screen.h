@@ -3,6 +3,10 @@
 #define ____SCREEN_H    1
 
 
+
+int refresh_device_screen_flag;
+
+
 struct gws_screen_d
 {
 
@@ -15,18 +19,18 @@ struct gws_screen_d
     unsigned long width;
     unsigned long height;
     unsigned long bpp;    // bits per pixel
-    
-    
+
     unsigned long pitch;
     
     unsigned long hotspot_x;
     unsigned long hotspot_y;
 
+    //origin
     unsigned long min_x;   // 0 = hot spot
     unsigned long min_y;   // 0 = hot spot
+    
     unsigned long max_x;
     unsigned long max_y;
-
 
     unsigned long font_size;
 
@@ -44,10 +48,38 @@ struct gws_screen_d
     struct gws_window_d *root;
 };
 
-struct gws_screen_d *CurrentScreen;
+
+// The device screen.
+// The refresh is called by refresh_device_screen();
+// It is called explicit by the app.
+struct gws_screen_d *DeviceScreen;
+
+
+
+//
+// == prototypes ================================
+//
+
+
+// Refresh the device screen
+void refresh_screen(void);
+
+// Refresh the device screen
+void refresh_device_screen(void);
+
+// Refresh the valid screen
+void refresh_valid_screen(void);
 
 
 #endif    
+
+
+
+
+
+
+
+
 
 
 

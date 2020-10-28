@@ -117,10 +117,9 @@ int grPlot0 (int z, int x, int y, unsigned long color){
 
 
 
-    //#debug: Exagero?!
-    if ( (void*) CurrentScreen == NULL )
-    {
-        printf("grPlot0: CurrentScreen\n");
+    // #debug
+    if ( (void *) DeviceScreen == NULL ){
+        printf("grPlot0: DeviceScreen\n");
         exit(1);
     }
 
@@ -164,8 +163,16 @@ int grPlot0 (int z, int x, int y, unsigned long color){
             Y = (unsigned long) (zBaseY + (unsigned long) y);           
         }
         
+        // ??
+        // Device screen.
+        // #todo: 
+        // In the future we will have a situation when we are plotting
+        // inside a valid screen, inside a window. and the 'origin'
+        // will be in the center of the window and not in the center 
+        // of the device screen. 
         
-        if ( 0 <= X < CurrentScreen->width && 0 <= Y < CurrentScreen->height )
+        if ( 0 <= X < DeviceScreen->width && 
+             0 <= Y < DeviceScreen->height )
         {
             pixelBackBufferPutpixel ( color, X, Y ); 
             return 0;
@@ -210,7 +217,16 @@ int grPlot0 (int z, int x, int y, unsigned long color){
             Y = (unsigned long) (zBaseY + (unsigned long) y);           
         }
 
-        if ( 0 <= X < CurrentScreen->width && 0 <= Y < CurrentScreen->height )
+        // ??
+        // Device screen.
+        // #todo: 
+        // In the future we will have a situation when we are plotting
+        // inside a valid screen, inside a window. and the 'origin'
+        // will be in the center of the window and not in the center 
+        // of the device screen. 
+
+        if ( 0 <= X < DeviceScreen->width && 
+             0 <= Y < DeviceScreen->height )
         {
             pixelBackBufferPutpixel ( color, X, Y );  
             return 0;
@@ -1766,7 +1782,7 @@ void grDCMono (
     int i=0;
     unsigned char *dst;
 
-    struct gws_screen_d *screen;
+    struct gws_screen_d *Screen;
 
 
     printf ("grDCMono:\n");
@@ -1786,31 +1802,26 @@ void grDCMono (
 
 
     //
-    // Screen
+    // Device screen
     //
 
-    screen = dc->screen;
+    Screen = dc->device_screen;
 
-    if ( (void*) screen == NULL )
-    {
-        printf ("screen\n");
+    if ( (void*) Screen == NULL ){
+        printf ("Screen\n");
         return;
-     }
+    }
 
-
-    if (screen->used != 1 || screen->magic != 1234 )
-    {
-        printf ("screen validation\n");
+    if (Screen->used != 1 || Screen->magic != 1234 ){
+        printf ("Screen validation\n");
         return;
-     }
-
-
+    }
 
     // 3 BPP
-    if (screen->bpp == 24) {
+    if (Screen->bpp == 24) {
         
-        dst = (unsigned char *) screen->frontbuffer;  //dst = dc->body;
-        i = (int) (screen->height * screen->pitch);   //i = dc->width_internal*dc->height;
+        dst = (unsigned char *) Screen->frontbuffer;  //dst = dc->body;
+        i = (int) (Screen->height * Screen->pitch);   //i = dc->width_internal*dc->height;
 
         //if (i<0)
             //return;
@@ -1838,7 +1849,7 @@ void grDCColorChg (
     int i=0;
     unsigned char *dst;
 
-    struct gws_screen_d *screen;
+    struct gws_screen_d *Screen;
 
 
     printf ("grDCColorChg:\n");
@@ -1856,19 +1867,19 @@ void grDCColorChg (
     // Screen
     //
 
-    screen = dc->screen;
+    Screen = dc->device_screen;
 
-    if ( (void*) screen == NULL )
+    if ( (void*) Screen == NULL )
         return;
 
-    if (screen->used != 1 || screen->magic != 1234 )
+    if (Screen->used != 1 || Screen->magic != 1234 )
         return;    
 
 
-    if (screen->bpp == 24) {    
+    if (Screen->bpp == 24) {    
         
-        dst = (unsigned char *) screen->frontbuffer;
-        i = (int) (screen->height * screen->pitch);
+        dst = (unsigned char *) Screen->frontbuffer;
+        i = (int) (Screen->height * Screen->pitch);
         
         while (i--){
             

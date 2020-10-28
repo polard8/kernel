@@ -268,7 +268,11 @@ unsigned long gws_get_device_height(void)
 int gwssrv_init_globals(void)
 {
     int i=0;
-    
+
+    // get gramado mode.
+    // jail, p1, home, p2, castle ...
+    current_mode = gwssrv_get_system_metrics(130);
+
     // buffers
     ____FRONTBUFFER_VA = (unsigned long) gwssrv_get_system_metrics(11);
     ____BACKBUFFER_VA  = (unsigned long) gwssrv_get_system_metrics(12); // #todo: check
@@ -285,9 +289,19 @@ int gwssrv_init_globals(void)
     SavedBPP = (unsigned long) __device_bpp;
     SavedLFB = (unsigned long) ____FRONTBUFFER_VA;
         
-    if ( SavedX == 0 || SavedY == 0 || SavedBPP == 0 || SavedLFB == 0 )
+    if ( SavedX == 0 || 
+         SavedY == 0 || 
+         SavedBPP == 0 || 
+         SavedLFB == 0 )
     {
         printf ("gwssrv_init_globals: [FAIL] Screen properties\n");
+        exit (1);
+    }
+
+    // jail, p1, home, p2, castle ...
+    if (current_mode < 0)
+    {
+        printf ("gwssrv_init_globals: [FAIL] current_mode\n");
         exit (1);
     }
 
@@ -315,7 +329,8 @@ int gwssrv_init_globals(void)
     }
 
 
-
+    // refresh the device screen ??
+    refresh_device_screen_flag = 0;
 
 
     //background_color = xCOLOR_GRAY3;
@@ -380,50 +395,54 @@ int gwsInit(void)
     //
     
     
-    CurrentScreen  = (void *) malloc (sizeof(struct gws_screen_d));
-    if( (void*) CurrentScreen == NULL){
-        debug_print("gwsInit: CurrentScreen\n");
+    DeviceScreen  = (void *) malloc (sizeof(struct gws_screen_d));
+    if ( (void*) DeviceScreen == NULL){
+        debug_print("gwsInit: DeviceScreen\n");
         //while(1);
+        
     }else{
-        CurrentScreen->id = 0; 
-        CurrentScreen->used = 1; 
-        CurrentScreen->magic = 1234; 
+        DeviceScreen->id = 0; 
+        DeviceScreen->used = 1; 
+        DeviceScreen->magic = 1234; 
         
         //#todo:
-        CurrentScreen->flags = 0;
+        DeviceScreen->flags = 0;
 
         // #test
         // Configuramos algumas variaveis globais quando
         // chamamos a rotina de inicializaçao de globais.
         // See: gwssrv_init_globals().
         
-        CurrentScreen->width  = SavedX;
-        CurrentScreen->height = SavedY;
-        CurrentScreen->bpp    = SavedBPP;  // bits per pixel
+        DeviceScreen->width  = SavedX;
+        DeviceScreen->height = SavedY;
+        DeviceScreen->bpp    = SavedBPP;  // bits per pixel
         
-        CurrentScreen->pitch = ( SavedX * (SavedBPP/8) );
+        DeviceScreen->pitch = ( SavedX * (SavedBPP/8) );
 
-
-        CurrentScreen->font_size   = 0;    //todo
-        CurrentScreen->char_width  = 0;    //todo
-        CurrentScreen->char_height = 0;    //todo
-        CurrentScreen->backbuffer  = (void *) ____BACKBUFFER_VA;
-        CurrentScreen->frontbuffer = (void *) ____FRONTBUFFER_VA;
+        DeviceScreen->font_size   = 0;    //todo
+        DeviceScreen->char_width  = 0;    //todo
+        DeviceScreen->char_height = 0;    //todo
+        DeviceScreen->backbuffer  = (void *) ____BACKBUFFER_VA;
+        DeviceScreen->frontbuffer = (void *) ____FRONTBUFFER_VA;
         
         
-        CurrentScreen->hotspot_x = ( CurrentScreen->width / 2 );
-        CurrentScreen->hotspot_y = ( CurrentScreen->height / 2 );
+        DeviceScreen->hotspot_x = ( DeviceScreen->width  / 2 );
+        DeviceScreen->hotspot_y = ( DeviceScreen->height / 2 );
         
         // Limites para a tela em cruz. '+'
-        CurrentScreen->min_x = 0;
-        CurrentScreen->min_y = 0;
-        CurrentScreen->max_x = ( CurrentScreen->width / 2 );
-        CurrentScreen->max_y = ( CurrentScreen->height / 2 );
+        DeviceScreen->min_x = 0;
+        DeviceScreen->min_y = 0;
+        DeviceScreen->max_x = ( DeviceScreen->width  / 2 );
+        DeviceScreen->max_y = ( DeviceScreen->height / 2 );
        
         //...
-        
-        if ( (void*) CurrentDisplay != NULL ){
-            CurrentDisplay->screen = CurrentScreen;
+
+        // The device screen will be the valid screen for now.
+        // Save the device screen in the diplay structure.
+
+        if ( (void *) CurrentDisplay != NULL ){
+            CurrentDisplay->device_screen = DeviceScreen;
+            CurrentDisplay->valid_screen  = DeviceScreen;
         }
     };
 
@@ -433,7 +452,6 @@ int gwsInit(void)
 
     // char support
     gwssrv_init_char();
-    
 
     // windows
     gwssrv_init_windows();    
@@ -454,14 +472,20 @@ int gwsInit(void)
     }
 
 
+    // #bugbug
+    // Its is not a screen. It is only a window.
+    // It is the main window of the gui structure.
+    // The 'screen' window is the device screen and the
+    // main window is the desktop window.
+
     if ( (void *) gui != NULL )
     {
         // (root window)
         gui->screen = (struct gws_window_d *) createwCreateWindow ( WT_SIMPLE, 
-                                              1, 1, "screen-window",  
-                                              0, 0, 
-                                              __device_width, __device_height,   
-                                              NULL, 0, xCOLOR_GRAY3, xCOLOR_GRAY3 );
+                                                1, 1, "screen-window",  
+                                                0, 0, 
+                                                __device_width, __device_height,   
+                                                NULL, 0, xCOLOR_GRAY3, xCOLOR_GRAY3 );
 
         if ( (void*) gui->screen == NULL)
         {
@@ -533,6 +557,54 @@ int is_background_dirty(void)
     return (int) background;
 }
 
+
+// Refresh the device screen
+void refresh_screen(void)
+{
+    refresh_device_screen();
+}
+
+// Refresh the device screen
+void refresh_device_screen(void)
+{
+    gws_show_backbuffer();
+}
+
+
+// Refresh the valid screen
+void refresh_valid_screen(void)
+{
+    //todo
+    //refresh the root window of the valid screen.
+    
+    if ( (void*) CurrentDisplay == NULL ){
+        printf("refresh_valid_screen: [ERROR] CurrentDisplay\n");
+        exit (1);
+    }
+    
+    // The valid screen is the device screen.
+    if ( CurrentDisplay->valid_screen == CurrentDisplay->device_screen )
+    {
+        gws_show_backbuffer();
+        return;
+    }
+    
+    // Well the valid screen is not the device screen.
+    
+    // The window server will frequently refresh only the
+    // valid screen ... it will be only a part of the
+    // device screen in a higher resolution.
+    // It depends on the fps rate ...
+    // If the fps is very high so we can use the device screen as
+    // a fixed valid screen.
+    
+    // #todo
+    // This kind of window is NOT well define yet.
+    // We nned to use this pointer.
+    // refresh >> CurrentDisplay->valid_screen
+    // gws_show_window_rect( CurrentDisplay->valid_screen->root );
+    // ...
+}
 
 
 

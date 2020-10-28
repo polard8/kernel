@@ -21,11 +21,18 @@ struct gws_display_d
     //char *buffer;		//Output buffer starting address. 
     //char *bufptr;		//Output buffer index pointer. 
     //char *bufmax;		//Output buffer maximum+1 address. 
-    
-    //#test
-    //only one screen for now.
-    struct gws_screen_d *screen;
-    
+
+    // The device screen.
+    // The refresh is called by refresh_device_screen();
+    // It is called explicit by the app.
+    struct gws_screen_d *device_screen;
+
+    // The device screen.
+    // The refresh is called by refresh_valid_screen();
+    // It is called frequently by the window server.
+    struct gws_screen_d *valid_screen;
+
+
     //#test
     //root window for the screen ??
     //struct gws_window_d *root;
