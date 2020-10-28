@@ -304,6 +304,12 @@ void fredDemo2(void);
 // ...
 
 
+void window_server_startup_animation(int i);
+
+//start up animation
+void sa_1(void);
+// ...
+
 
 #endif    
 

@@ -1416,7 +1416,6 @@ gwsProcedure (
 
 void create_background (void)
 {
-
     unsigned long w = gws_get_device_width();
     unsigned long h = gws_get_device_height();
     int WindowId = -1;
@@ -1425,7 +1424,10 @@ void create_background (void)
     gwssrv_debug_print ("gwssrv: create_background\n");
 
 
-    // bg window
+    // The background window
+    // #todo
+    // Se estivermos em JAIL, podemos arriscar algum background melhor.
+    // Talvez alguma imagem.
 
     __bg_window = (struct gws_window_d *) createwCreateWindow ( WT_SIMPLE, 
                                             1, 1, "gwssrv-bg",  
@@ -1451,7 +1453,11 @@ void create_background (void)
 
     //__bg_window->dirty = 1;
     
-    //xxxx_refresh();
+
+    if (current_mode == GRAMADO_JAIL)
+        refresh_screen();
+
+    //#debug
     //while(1){}
 }
 
@@ -1496,11 +1502,15 @@ int initGraphics (void){
         exit(1);
     }
 
+    // #debug
+    // Se o background a seguir falhar, entao veremos
+    // pelo menos essa mensagem.
     if ( (void*) gui->screen != NULL )
     {
         dtextDrawText ( (struct gws_window_d *) gui->screen,
             8, 8, COLOR_RED, "gwssrv: Initializing graphics" );
     }
+
 
     // background.
     // Clean background.
@@ -1510,10 +1520,18 @@ int initGraphics (void){
  
     // Testing bmp.
     // See:
-    gwssrv_display_system_icon ( 1, 8, 100 );
-    gwssrv_display_system_icon ( 2, 8, 120 );
-    gwssrv_display_system_icon ( 3, 8, 140 );
-    gwssrv_display_system_icon ( 4, 8, 160 );
+    if (current_mode == GRAMADO_JAIL){
+        gwssrv_display_system_icon ( 1, 8, 100 );
+        gwssrv_display_system_icon ( 2, 8, 120 );
+        gwssrv_display_system_icon ( 3, 8, 140 );
+        gwssrv_display_system_icon ( 4, 8, 160 );
+        // ...
+    }else{
+        gwssrv_display_system_icon ( 1, 8, 100 );
+        gwssrv_display_system_icon ( 2, 8, 120 );
+    };
+
+
     //#debug breakpoint
     //while(1){}
 
@@ -1524,6 +1542,24 @@ int initGraphics (void){
     // See: grprim.c
     grInit();
     
+    //
+    // == demos =================================================
+    //
+    
+    // Always run some demo if we are in JAIL mode.
+    // It's an animation in the initialization.
+    
+    if (current_mode == GRAMADO_JAIL)
+    {
+        // Seleciona a animaçao.
+        // Nao deve travar, deve ter timeout.
+        window_server_startup_animation(1);
+    }
+
+
+    //
+    // == tests =================================================
+    //
     
     /*
      //testes com z positivo
@@ -1741,21 +1777,14 @@ int initGraphics (void){
 
     //matrix_demo1();
 
-
-
-
-    
     
     //plotLineRect4(8,8,80,80, COLOR_BLACK);  //ok. it works.
     //plotLineRectZ ( 8,8,0, 80,80,0, COLOR_BLACK);    //ok. it works.
     //plotLineRectZ ( 8,8,100, 80,80,100, COLOR_WHITE);    
    
-   
-   
     //testLines(8,8,80,80, COLOR_BLACK); //ok triangulo invertido.
     //testLinesZ ( 8,8,0, 80,80,0, COLOR_BLACK); //ok triangulo invertido.    
     //testLinesZ ( 8,8,100, 80,80,100, COLOR_WHITE);    //ok triangulo invertido.
-
 
 
 
@@ -1813,7 +1842,6 @@ int initGraphics (void){
    */
    
     
-    
     //curveDemo();
     
     
@@ -1823,7 +1851,8 @@ int initGraphics (void){
     //fredDemo1();
     //fredDemo2(); // $bootcastle
     //...
-    
+
+
     /*
      //ok isso funcionou.
     struct gr_rectangle_d *rect;
@@ -1856,11 +1885,6 @@ int initGraphics (void){
         rectangleZZ ( (struct gr_rectangle_d *) rect );
     }
     */
-    
-    
-    
-    
-    
     
     
     

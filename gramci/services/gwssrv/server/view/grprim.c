@@ -1487,6 +1487,99 @@ void matrix_demo1(void)
 }
 
 
+
+//start up animation
+//matrix multiplication
+void sa_1(void)
+{
+    int mat1[4][4] = {  { 1, 1, 1, 1 },
+                        { 2, 2, 2, 2 },
+                        { 3, 3, 3, 3 },
+                        { 4, 4, 4, 4 } };
+ 
+    int mat2[4][4] = { { -5, -5, 0, 0 },
+                       { 5,  -5, 0, 0 },
+                       { 5,   5, 0, 0 },
+                       { -5,  5, 0, 0 } };
+    
+    int res[4][4]; // To store result
+
+    
+    int count=3;
+    int i=0;
+        
+    
+    if (current_mode != GRAMADO_JAIL)
+        return;
+    
+    
+    
+    while ( count>0){
+
+        for (i=0; i<32; i++){
+        
+            // black background.
+            rectBackbufferDrawRectangle ( 
+               0, 0, 320, 200, COLOR_BLACK, 1 );
+            
+            // transform.
+            multiply4 ( projection4x4, mat2, res );
+       
+            // PLot for dots.
+            // z,x,y
+            grPlot0 ( res[0][2], res[0][0], res[0][1], COLOR_WHITE); 
+            grPlot0 ( res[1][2], res[1][0], res[1][1], COLOR_WHITE); 
+            grPlot0 ( res[2][2], res[2][0], res[2][1], COLOR_WHITE); 
+            grPlot0 ( res[3][2], res[3][0], res[3][1], COLOR_WHITE); 
+          
+            // New projection matrix.
+            
+            projection4x4[0][0] = i%5;
+            projection4x4[0][1] = 0;
+            // projection4x4[0][2] = 0;
+            // projection4x4[0][3] = 0;
+
+            projection4x4[1][0] = 0;
+            projection4x4[1][1] = i%5;
+            // projection4x4[1][2] = 0;
+            // projection4x4[1][3] = 0;
+
+            projection4x4[2][0] = 0;
+            projection4x4[2][1] = 0;
+            // projection4x4[2][2] = 0;
+            // projection4x4[2][3] = 0;
+       
+            projection4x4[3][0] = i%5;
+            projection4x4[3][1] = i%5;
+            // projection4x4[3][2] = 0;
+            // projection4x4[3][3] = 0;
+  
+            // Refresh and yield.
+            refresh_device_screen(); 
+            gwssrv_yield();
+            gwssrv_yield();
+            gwssrv_yield();
+            gwssrv_yield();
+            // ...
+        };
+        
+        count--;
+    };
+}
+
+
+void window_server_startup_animation(int i)
+{
+    switch (i){
+    case 1: sa_1(); break;
+    //case 1: sa_2(); break;
+    //case 1: sa_3(); break;
+    //case 1: sa_4(); break;
+    default: break;
+    };
+}
+
+
 // Fibonacci Series using Recursion 
 int fib (int n){ 
 
