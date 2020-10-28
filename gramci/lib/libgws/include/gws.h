@@ -166,6 +166,17 @@ gws_plotcube (
     int fd,
     struct gr_cube_d *cube );
 
+
+
+
+//plot rectangle
+int 
+gws_plotrectangle (
+    int fd,
+    struct gr_rectangle_d *rect );
+    
+    
+    
 // ...
 
 

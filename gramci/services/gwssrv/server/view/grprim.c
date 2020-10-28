@@ -326,8 +326,7 @@ plotLine3d (
  
  
     for (;;) {  /* loop */
-      
-      //setPixel(x0,y0,z0);
+
       grPlot0 ( z0, x0, y0, color);
       
       if (i-- == 0) break;
@@ -336,6 +335,55 @@ plotLine3d (
       z1 -= dz; if (z1 < 0) { z1 += dm; z0 += sz; } 
    }
 }
+
+
+// plot line given two colors.
+// interpolation ?
+void 
+plotLine3d2 (
+    int x0, int y0, int z0, unsigned long color1,
+    int x1, int y1, int z1, unsigned long color2, int flag )
+{
+
+    int dx = abs(x1-x0), sx = x0<x1 ? 1 : -1;
+    int dy = abs(y1-y0), sy = y0<y1 ? 1 : -1; 
+    int dz = abs(z1-z0), sz = z0<z1 ? 1 : -1; 
+   
+    //#bugbug: This macro is wrong?!
+    //int dm = grMAX3 (dx,dy,dz), i = dm; /* maximum difference */
+   
+    int dm = grMAX3(dx,dy,dz);
+    int i = dm;
+   
+    // x1 = y1 = z1 = dm/2; /* error offset */
+ 
+    x1 = (dm >> 1);
+    y1 = x1;
+    z1 = x1;
+    
+    
+    //nothing for now;
+    //interpolation flag.
+    flag=0;
+    
+    
+ 
+    //
+    // Loop 
+    //
+       
+    for (;;) {  
+
+        grPlot0 ( z0, x0, y0, color1);
+        //grPlot0 ( z0, x0, y0, color2);
+      
+        if (i-- == 0) break;
+        x1 -= dx; if (x1 < 0) { x1 += dm; x0 += sx; } 
+        y1 -= dy; if (y1 < 0) { y1 += dm; y0 += sy; } 
+        z1 -= dz; if (z1 < 0) { z1 += dm; z0 += sz; } 
+    }
+}
+
 
 
 
@@ -382,6 +430,43 @@ rectangleZ (
      // direita
      plotLine3d ( right,  top, z, right, bottom, z, color );
 }
+
+
+
+
+void rectangleZZ ( struct gr_rectangle_d *rect )
+{
+    if ( (void*) rect == NULL )
+        return -1;
+
+
+      // points
+      //  0  1
+      //  3  2
+
+     //#bugbug
+     // We need to create a routine with colors in both points.
+
+     // cima
+     //plotLine3d ( left, top,  z, right, top, z, color );
+     plotLine3d2 ( rect->p[0].x, rect->p[0].y, rect->p[0].z, rect->p[0].color,
+                  rect->p[1].x, rect->p[1].y, rect->p[1].z, rect->p[1].color, 0 );
+
+     // baixo
+     //plotLine3d ( left, bottom, z, right,bottom, z, color );
+     plotLine3d2 ( rect->p[3].x, rect->p[3].y, rect->p[3].z, rect->p[3].color,
+                  rect->p[2].x, rect->p[2].y, rect->p[2].z, rect->p[2].color, 0 );
+
+     // esquerda
+     //plotLine3d ( left, top, z, left, bottom, z, color );
+     plotLine3d2 ( rect->p[0].x, rect->p[0].y, rect->p[0].z, rect->p[0].color,
+                  rect->p[3].x, rect->p[3].y, rect->p[3].z, rect->p[3].color, 0 );     
+     // direita
+     //plotLine3d ( right,  top, z, right, bottom, z, color );
+     plotLine3d2 ( rect->p[1].x, rect->p[1].y, rect->p[1].z, rect->p[1].color,
+                  rect->p[2].x, rect->p[2].y, rect->p[2].z, rect->p[2].color, 0 );
+}
+
 
 
 // The upper-left corner and lower-right corner. 
@@ -651,6 +736,54 @@ int serviceGrCubeZ(void)
    
    return 0;
 }
+
+
+
+//sevice 2042
+int serviceGrRectangle(void)
+{
+    // #todo:
+    // Vamos pegar os vertices do cubo nos argumentos
+    // e completar a estrtutura local.
+    // entao passamos o endereço da estrutura para a funçao helper.
+
+    unsigned long *message_address = (unsigned long *) &__buffer[0];
+    
+    
+    gwssrv_debug_print("serviceGrRectangle: [2042]\n");
+    
+    struct gr_rectangle_d rect;
+   
+    //south     
+    rect.p[0].x = message_address[10];
+    rect.p[0].y = message_address[11];
+    rect.p[0].z = message_address[12];
+    rect.p[0].color = message_address[13];
+        
+    rect.p[1].x = message_address[14];
+    rect.p[1].y = message_address[15];
+    rect.p[1].z = message_address[16];
+    rect.p[1].color = message_address[17];
+        
+    rect.p[2].x = message_address[18];
+    rect.p[2].y = message_address[19];
+    rect.p[2].z = message_address[20];
+    rect.p[2].color = message_address[21];
+
+    rect.p[3].x = message_address[22];
+    rect.p[3].y = message_address[23];
+    rect.p[3].z = message_address[24];
+    rect.p[3].color = message_address[25];
+   
+    //#test
+    //Temos que passar corretamente o endereço da estrutura.
+    rectangleZZ ( (struct gr_rectangle_d *) &rect );
+   
+    gwssrv_debug_print("serviceGrRectangle: [2042] DONE << \n");
+    
+    return 0;
+}
+
 
 
 // inflate varias vezes.

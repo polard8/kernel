@@ -64,6 +64,22 @@ struct gr_mesh_d
 */
 
 
+
+// Camera
+struct gr_camera_d
+{
+    // position
+    struct gr_vec3D_d *position;
+    
+    // ...
+
+    // Next node in the linked list.
+    struct gr_camera_d *next;
+};
+
+
+
+
 //
 // ===========================================
 //
@@ -136,7 +152,14 @@ plotLine3d (
     int x0, int y0, int z0, 
     int x1, int y1, int z1, 
     unsigned long color );
-    
+
+
+// plot line given two colors.
+// interpolation ?
+void 
+plotLine3d2 (
+    int x0, int y0, int z0, unsigned long color1,
+    int x1, int y1, int z1, unsigned long color2, int flag );
     
 void 
 plotQuadBezierSeg ( 
@@ -162,11 +185,18 @@ rectangleZ (
     int z );
 
 
+void rectangleZZ( struct gr_rectangle_d *rect );
+
 void
 ras_rectangleZ (
     int left, int top, int z0,
     int right, int bottom, int z1,
     unsigned long color );
+
+
+//sevice 2042
+int serviceGrRectangle(void);
+
 
 
 //

@@ -244,6 +244,43 @@ int main ( int argc, char *argv[] ){
 
     }
 
+
+
+    //
+    // == rectangle ==================================
+    //
+    
+    
+    struct gr_rectangle_d *rect;
+    rect = (void *) malloc( sizeof( struct gr_rectangle_d ) );
+    if ( (void*) rect != NULL )
+    {
+
+        rect->p[0].x = -20;
+        rect->p[0].y = 20;
+        rect->p[0].z = 0;
+        rect->p[0].color = COLOR_BLUE;
+        
+        rect->p[1].x = 10;
+        rect->p[1].y = 20;
+        rect->p[1].z = 0;
+        rect->p[1].color = COLOR_BLUE;
+        
+        rect->p[2].x = 10;
+        rect->p[2].y = 0;
+        rect->p[2].z = 0;
+        rect->p[2].color = COLOR_BLUE;
+        
+        rect->p[3].x = -20;
+        rect->p[3].y = 0;
+        rect->p[3].z = 0;
+        rect->p[3].color = COLOR_BLUE;
+        
+        
+        // plot rectangle 
+        gws_plotrectangle ( client_fd, (struct gr_rectangle_d *) rect );
+    }
+
    
     // #debug
     while (1){

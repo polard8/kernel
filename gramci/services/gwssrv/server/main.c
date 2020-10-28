@@ -1379,8 +1379,13 @@ gwsProcedure (
         case 2041:
             serviceGrCubeZ();
             break;
-            
-            
+        
+        // See: grprim.c
+        case 2042:
+            serviceGrRectangle();
+            break;
+         
+         
         // #todo
         // Segue serviços graficos 3d.
         // ...
@@ -1819,6 +1824,46 @@ int initGraphics (void){
     //fredDemo2(); // $bootcastle
     //...
     
+    /*
+     //ok isso funcionou.
+    struct gr_rectangle_d *rect;
+    rect = (void *) malloc( sizeof( struct gr_rectangle_d ) );
+    if ( (void*) rect != NULL )
+    {
+
+        rect->p[0].x = 0;
+        rect->p[0].y = 20;
+        rect->p[0].z = 0;
+        rect->p[0].color = COLOR_PINK;
+        
+        rect->p[1].x = 20;
+        rect->p[1].y = 20;
+        rect->p[1].z = 0;
+        rect->p[1].color = COLOR_PINK;
+        
+        rect->p[2].x = 20;
+        rect->p[2].y = 0;
+        rect->p[2].z = 0;
+        rect->p[2].color = COLOR_PINK;
+        
+        rect->p[3].x = 0;
+        rect->p[3].y = 0;
+        rect->p[3].z = 0;
+        rect->p[3].color = COLOR_PINK;
+        
+        
+        // plot rectangle 
+        rectangleZZ ( (struct gr_rectangle_d *) rect );
+    }
+    */
+    
+    
+    
+    
+    
+    
+    
+    
     
     // refresh
     gws_show_backbuffer();              
@@ -1843,6 +1888,7 @@ int initGraphics (void){
     debug_print("gwssrv: InitGraphics done\n");
     //printf     ("gwssrv: InitGraphics done *hang\n");
     //while(1){}
+    
     
     
     // ok
