@@ -2,7 +2,7 @@
 PRODUCT_NAME  = Gramado Operating System
 VERSION_MAJOR = 1
 VERSION_MINOR = 0
-VERSION_BUILD = 148
+VERSION_BUILD = 149
 # See: config/version.h
 
 # Documentation.
@@ -230,7 +230,6 @@ vhd-copy-files:
 
 	# ...
 
-
 	# cmd
 	#-sudo cp gramci/shell/cmd/bin/*.BIN  base/
 	#-sudo cp gramci/shell/cmd/bin/*.BIN  base/BIN
@@ -240,7 +239,6 @@ vhd-copy-files:
 #	-sudo cp gramci/shell/cmd/bin/TRUE.BIN       base/
 #	-sudo cp gramci/shell/cmd/bin/FALSE.BIN      base/
 	# ...
-
 
 	# net
 	-sudo cp gramci/shell/net/bin/*.BIN  base/
