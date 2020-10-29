@@ -213,9 +213,24 @@ mGui:
 
     ; Configura modo de video usando VESA.
 .initVESA:
+
     pusha
     call s2vesaInitVESA
     popa
+
+
+    ;; #test
+    ;; Set start
+    ;; Tested on real machine.
+    ;; I didn't see any difference in the visible area position.
+    ;pusha
+    ;mov   ax,4F07h 
+    ;xor   bx,bx 
+    ;mov   cx, 0 
+    ;mov   dx, 0 
+    ;int   10h 
+    ;popa
+
 
 .setupVideoMode:
 
