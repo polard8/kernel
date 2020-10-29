@@ -112,43 +112,43 @@ build-portals
 build-boot:
 	@echo "==================="
 	@echo "Compiling Boot ... "
-	$(Q) $(MAKE) -C gramnt/boot/x86/bm/ 
-	$(Q) $(MAKE) -C gramnt/boot/x86/bl/ 
+	$(Q) $(MAKE) -C ge/boot/x86/bm/ 
+	$(Q) $(MAKE) -C ge/boot/x86/bl/ 
 
 build-portals:
 	@echo "==================="
 	@echo "Compiling rtl ..."
-	$(Q) $(MAKE) -C rtl/
+	$(Q) $(MAKE) -C ge/rtl/
 
 	@echo "==================="
 	@echo "Compiling init ..."
-	$(Q) $(MAKE) -C gramnt/init/
+	$(Q) $(MAKE) -C ge/init/
 
 	@echo "==================="
 	@echo "Compiling setup ..."
-	$(Q) $(MAKE) -C gramnt/grass/
+	$(Q) $(MAKE) -C setup/grass/
 
 	@echo "==================="
-	@echo "Compiling gramci lib ..."
-	$(Q) $(MAKE) -C gramci/lib/
+	@echo "Compiling  lib ..."
+	$(Q) $(MAKE) -C ge/lib/
 	
 	@echo "==================="
-	@echo "Compiling gramci stuff ..."
+	@echo "Compiling setup stuff ..."
 	
-	$(Q) $(MAKE) -C gramci/aurora/
+	$(Q) $(MAKE) -C ge/aurora/
 	
-	$(Q) $(MAKE) -C gramci/services/gnssrv/ 
+	$(Q) $(MAKE) -C ge/services/gnssrv/ 
 
-	$(Q) $(MAKE) -C gramci/ufo/apps/
-	$(Q) $(MAKE) -C gramci/ufo/cmd/
-	$(Q) $(MAKE) -C gramci/ufo/net/
+	$(Q) $(MAKE) -C setup/ufo/apps/
+	$(Q) $(MAKE) -C setup/ufo/cmd/
+	$(Q) $(MAKE) -C setup/ufo/net/
 
 ## Step1 KERNEL.BIN         - Creating the kernel image.
 KERNEL.BIN: 
 	@echo "================================="
 	@echo "(Step 1) Creating the kernel image ..."
 
-	$(Q) $(MAKE) -C gramnt/kernel
+	$(Q) $(MAKE) -C ge/kernel
 
 
 ## Step3 /mnt/gramadovhd    - Creating the directory to mount the VHD.
@@ -164,7 +164,7 @@ vhd-create:
 	@echo "================================="
 	@echo "(Step 4) Creating a VHD in Assembly language ..."
 
-	$(NASM) gramnt/boot/x86/vhd/main.asm -I gramnt/boot/x86/vhd/ -o GRAMADO.VHD   
+	$(NASM) ge/boot/x86/vhd/main.asm -I ge/boot/x86/vhd/ -o GRAMADO.VHD   
 
 
 ## Step5 vhd-mount          - Mounting the VHD.
@@ -182,80 +182,80 @@ vhd-copy-files:
 
 
 	#
-	# == gramnt ======================================
+	# == ge ======================================
 	#
 
 	# ====================================================
 	# 1) First of all
 	# bm, bl, kernel, init, gdeshell.
-	# Only on gramnt/
+	# Only on ge/
 
-	sudo cp gramnt/boot/x86/bin/BM.BIN  base/
-	sudo cp gramnt/boot/x86/bin/BM.BIN  base/BOOT
-	sudo cp gramnt/boot/x86/bin/BM.BIN  base/PORTALS
+	sudo cp ge/boot/x86/bin/BM.BIN  base/
+	sudo cp ge/boot/x86/bin/BM.BIN  base/BOOT
+	sudo cp ge/boot/x86/bin/BM.BIN  base/PORTALS
 
-	sudo cp gramnt/boot/x86/bin/BL.BIN  base/
-	sudo cp gramnt/boot/x86/bin/BL.BIN  base/BOOT
-	sudo cp gramnt/boot/x86/bin/BL.BIN  base/PORTALS
+	sudo cp ge/boot/x86/bin/BL.BIN  base/
+	sudo cp ge/boot/x86/bin/BL.BIN  base/BOOT
+	sudo cp ge/boot/x86/bin/BL.BIN  base/PORTALS
 
-	sudo cp gramnt/kernel/KERNEL.BIN  base/
-	sudo cp gramnt/kernel/KERNEL.BIN  base/BOOT
-	sudo cp gramnt/kernel/KERNEL.BIN  base/PORTALS
+	sudo cp ge/kernel/KERNEL.BIN  base/
+	sudo cp ge/kernel/KERNEL.BIN  base/BOOT
+	sudo cp ge/kernel/KERNEL.BIN  base/PORTALS
 
-	sudo cp gramnt/init/INIT.BIN  base/
-	sudo cp gramnt/init/INIT.BIN  base/PORTALS
+	sudo cp ge/init/INIT.BIN  base/
+	sudo cp ge/init/INIT.BIN  base/PORTALS
 
-	sudo cp gramnt/grass/bin/GDESHELL.BIN  base/
-	sudo cp gramnt/grass/bin/GDESHELL.BIN  base/PORTALS
+	sudo cp setup/grass/bin/GDESHELL.BIN  base/
+	sudo cp setup/grass/bin/GDESHELL.BIN  base/PORTALS
 
 	# setup
-	#-sudo cp gramnt/grass/bin/*.BIN    base/
+	#-sudo cp setup/grass/bin/*.BIN    base/
 	# sysmon
-	sudo cp gramnt/grass/bin/SYSMON.BIN base/
+	sudo cp setup/grass/bin/SYSMON.BIN base/
 
 	# ====================================================
 
 
 	#
-	# == gramci ======================================
+	# == setup ======================================
 	#
 
 	# apps
-#	-sudo cp gramci/ufo/apps/bin/*.BIN  base/
-#	-sudo cp gramci/ufo/apps/bin/*.BIN  base/PROGRAMS
-	-sudo cp gramci/ufo/apps/bin/GWM.BIN     base/
-	-sudo cp gramci/ufo/apps/bin/EDITOR.BIN  base/
-	#-sudo cp gramci/ufo/apps/bin/FILEMAN.BIN  base/
-	-sudo cp gramci/ufo/apps/bin/LAUNCH1.BIN  base/
+#	-sudo cp setup/ufo/apps/bin/*.BIN  base/
+#	-sudo cp setup/ufo/apps/bin/*.BIN  base/PROGRAMS
+	-sudo cp setup/ufo/apps/bin/GWM.BIN     base/
+	-sudo cp setup/ufo/apps/bin/EDITOR.BIN  base/
+	#-sudo cp setup/ufo/apps/bin/FILEMAN.BIN  base/
+	-sudo cp setup/ufo/apps/bin/LAUNCH1.BIN  base/
 
-	#-sudo cp gramci/ufo/apps/bin/TERMINAL.BIN  base/
-	#-sudo cp gramci/ufo/cmd/bin/SHELL.BIN       base/
+	#-sudo cp setup/ufo/apps/bin/TERMINAL.BIN  base/
+	#-sudo cp setup/ufo/cmd/bin/SHELL.BIN       base/
 
 	# ...
 
 	# cmd
-	#-sudo cp gramci/ufo/cmd/bin/*.BIN  base/
-	#-sudo cp gramci/ufo/cmd/bin/*.BIN  base/BIN
-#	-sudo cp gramci/ufo/cmd/bin/REBOOT.BIN     base/
-	-sudo cp gramci/ufo/cmd/bin/CAT.BIN        base/
-	-sudo cp gramci/ufo/cmd/bin/FASM.BIN       base/
-#	-sudo cp gramci/ufo/cmd/bin/TRUE.BIN       base/
-#	-sudo cp gramci/ufo/cmd/bin/FALSE.BIN      base/
+	#-sudo cp setup/ufo/cmd/bin/*.BIN  base/
+	#-sudo cp setup/ufo/cmd/bin/*.BIN  base/BIN
+#	-sudo cp setup/ufo/cmd/bin/REBOOT.BIN     base/
+	-sudo cp setup/ufo/cmd/bin/CAT.BIN        base/
+	-sudo cp setup/ufo/cmd/bin/FASM.BIN       base/
+#	-sudo cp setup/ufo/cmd/bin/TRUE.BIN       base/
+#	-sudo cp setup/ufo/cmd/bin/FALSE.BIN      base/
 	# ...
 
 	# net
-	-sudo cp gramci/ufo/net/bin/*.BIN  base/
-	-sudo cp gramci/ufo/net/bin/*.BIN  base/PROGRAMS
+	-sudo cp setup/ufo/net/bin/*.BIN  base/
+	-sudo cp setup/ufo/net/bin/*.BIN  base/PROGRAMS
 
 	# gws
-	-sudo cp gramci/aurora/bin/GWS.BIN     base/ 
-	-sudo cp gramci/aurora/bin/GWSSRV.BIN  base/
-	-sudo cp gramci/aurora/bin/GWSSRV.BIN  base/PORTALS
+	-sudo cp ge/aurora/bin/GWS.BIN     base/ 
+	-sudo cp ge/aurora/bin/GWSSRV.BIN  base/
+	-sudo cp ge/aurora/bin/GWSSRV.BIN  base/PORTALS
 
 	# gns
-	-sudo cp gramci/services/gnssrv/bin/GNS.BIN     base/
-	-sudo cp gramci/services/gnssrv/bin/GNSSRV.BIN  base/
-	-sudo cp gramci/services/gnssrv/bin/GNSSRV.BIN  base/PORTALS
+	-sudo cp ge/services/gnssrv/bin/GNS.BIN     base/
+	-sudo cp ge/services/gnssrv/bin/GNSSRV.BIN  base/
+	-sudo cp ge/services/gnssrv/bin/GNSSRV.BIN  base/PORTALS
 
 
 	#
@@ -290,11 +290,11 @@ clean2:
 	-rm *.VHD
 
 clean3:
-	-rm gramnt/grass/bin/*.BIN
+	-rm setup/grass/bin/*.BIN
 
-	-rm gramci/ufo/apps/bin/*.BIN
-	-rm gramci/ufo/cmd/bin/*.BIN
-	-rm gramci/ufo/net/bin/*.BIN
+	-rm setup/ufo/apps/bin/*.BIN
+	-rm setup/ufo/cmd/bin/*.BIN
+	-rm setup/ufo/net/bin/*.BIN
 
 #Clean base
 clean4:
@@ -314,29 +314,29 @@ clean-system-files:
 
 
 	# Gramado
-	-rm -rf gramnt/boot/x86/bin/*.BIN
-	-rm -rf gramnt/kernel/KERNEL.BIN
+	-rm -rf ge/boot/x86/bin/*.BIN
+	-rm -rf ge/kernel/KERNEL.BIN
 
 	# Init
-	-rm -rf gramnt/init/*.BIN
+	-rm -rf ge/init/*.BIN
 
 	# fonts
-	-rm -rf gramci/fonts/bin/*.FON
+	-rm -rf ge/fonts/bin/*.FON
 
 	# Setup
-	-rm -rf gramci/grass/bin/*.BIN
+	-rm -rf setup/grass/bin/*.BIN
 	
 	# aurora
-	-rm -rf gramci/aurora/bin/*.BIN
+	-rm -rf ge/aurora/bin/*.BIN
 	
 	# Services
-	-rm -rf gramci/services/gnssrv/bin/*.BIN
+	-rm -rf ge/services/gnssrv/bin/*.BIN
 	# ...
 
 	# Shell
-	-rm -rf gramci/ufo/apps/bin/*.BIN
-	-rm -rf gramci/ufo/cmd/bin/*.BIN
-	-rm -rf gramci/ufo/net/bin/*.BIN
+	-rm -rf setup/ufo/apps/bin/*.BIN
+	-rm -rf setup/ufo/cmd/bin/*.BIN
+	-rm -rf setup/ufo/net/bin/*.BIN
 # ...
 
 
@@ -376,7 +376,7 @@ makeiso-x86:
 geniso-x86:
 	
 	#stage1
-	$(NASM) gramnt/kernel/boot/x86/iso/stage1/stage1.asm -f bin -o stage1.bin
+	$(NASM) ge/kernel/boot/x86/iso/stage1/stage1.asm -f bin -o stage1.bin
 	cp stage1.bin bin/boot/gramado/
 	rm stage1.bin
 
