@@ -2082,23 +2082,28 @@ int get_char_width (void);
 int get_char_height (void);
 
 
+
+
+
 // desenha um caractere transparente.
 void 
-drawchar_transparent ( unsigned long x, 
-                       unsigned long y, 
-                       unsigned long color, 
-                       unsigned long c);
+d_drawchar_transparent ( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long color, 
+    unsigned long c);
 
 
 // desenha um caractere.
 void 
-draw_char ( unsigned long x, 
-            unsigned long y,  
-            unsigned long c,
-            unsigned long fgcolor,
-            unsigned long bgcolor);
+d_draw_char ( 
+    unsigned long x, 
+    unsigned long y,  
+    unsigned long c,
+    unsigned long fgcolor,
+    unsigned long bgcolor);
  
-
+ 
 
 //
 // Pixel, line rect support.
@@ -2113,29 +2118,31 @@ void refresh_pixel( unsigned long x,  unsigned long y );
 
 
 void 
-refresh_horizontal_line ( unsigned long x1,
-                          unsigned long y, 
-                          unsigned long x2 );
+refresh_horizontal_line ( 
+    unsigned long x1,
+    unsigned long y, 
+    unsigned long x2 );
   
 
 
 // envia um retângulo do backbuffer para o frontbuffer
 void 
-refresh_rectangle ( unsigned long x, 
-                    unsigned long y, 
-                    unsigned long width, 
-                    unsigned long height );
+refresh_rectangle ( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long width, 
+    unsigned long height );
 
 
 //envia um retângulo de um buffer para outro.
 void 
-refresh_rectangle2 ( unsigned long x, 
-                     unsigned long y, 
-                     unsigned long width, 
-                     unsigned long height,
-                     unsigned long buffer1,
-                     unsigned long buffer2 );
-
+refresh_rectangle2 ( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long width, 
+    unsigned long height,
+    unsigned long buffer1,
+    unsigned long buffer2 );
 
 
 //
@@ -2181,10 +2188,11 @@ int initialize_saved_rect (void);
 // método de salvar um bmp em um arquivo.
 
 int 
-save_rect ( unsigned long x, 
-            unsigned long y, 
-            unsigned long width, 
-            unsigned long height );
+save_rect ( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long width, 
+    unsigned long height );
 
 
 //pintar no backbuffer o retângulo salvo vai ser semelhante ao processo 

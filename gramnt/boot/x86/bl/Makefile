@@ -44,17 +44,13 @@ x86.o \
 stdio.o \
 stdlib.o \
 string.o \
-keyboard.o \
-pci.o \
-hdd.o \
-ide.o \
-timer.o \
+keyboard.o pci.o hdd.o ide.o timer.o \
 pages.o \
 heap.o \
 procedure.o \
 fs.o \
 shell.o \
-services.o \
+r_render.o \
 abort.o \
 faults.o  
 
@@ -90,7 +86,6 @@ bl-x86:
 
     #Sys
 	gcc -c procedure.c -I include/ $(CFLAGS) -o procedure.o
-	gcc -c services.c  -I include/ $(CFLAGS) -o services.o
 	gcc -c abort.c     -I include/ $(CFLAGS) -o abort.o
 
 
@@ -101,6 +96,8 @@ bl-x86:
 	gcc -c fs/fs.c     -I include/ $(CFLAGS) -o fs.o
 	gcc -c fs/loader.c -I include/ $(CFLAGS) -o loader.o
 
+
+	gcc -c render/r_render.c  -I include/ $(CFLAGS) -o r_render.o
 
     # dd
 	gcc -c dd/pci.c       -I include/ $(CFLAGS)  -o pci.o

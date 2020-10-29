@@ -29,6 +29,8 @@ int current_mode;
 #include "globals.h"
 
 
+#include "render/r_render.h"
+
 // #view
 #include "view/colors.h"
 #include "view/pixel.h"

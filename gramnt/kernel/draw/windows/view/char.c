@@ -35,7 +35,7 @@ my_buffer_char_blt (
     unsigned long color, 
     unsigned long c )
 {
-    drawchar_transparent ( x, y, color, c );
+    d_drawchar_transparent ( x, y, color, c );
 }
 
 
@@ -65,13 +65,13 @@ int get_char_height (void)
 
 /*
  ******************************************************
- * drawchar_transparent:
+ * d_drawchar_transparent:
  *     Desenha um caractere sem alterar o pano de fundo.
  *     >> no backbuffer.
  */
 
 void 
-drawchar_transparent ( 
+d_drawchar_transparent ( 
     unsigned long x, 
     unsigned long y, 
     unsigned long color, 
@@ -237,7 +237,6 @@ drawchar_transparent (
         work_char++; 
     };
 
-
 	// Algo mais ?
 }
 
@@ -245,14 +244,14 @@ drawchar_transparent (
 
 /*
  *****************************************************
- * draw_char:
- *     Constr�i um caractere 8x8 no buffer.
+ * d_draw_char:
+ *     Constroi um caractere 8x8 no buffer.
  *     Desenha um caractere e pinta o pano de fundo.
  *     >> no backbuffer.
  */ 
 
 void 
-draw_char ( 
+d_draw_char ( 
     unsigned long x, 
     unsigned long y, 
     unsigned long c,
@@ -263,14 +262,18 @@ draw_char (
     // #todo: 
     // Rever isso.
 
+    // The window.
     struct window_d *hWindow;
 
-    int x2=0;
-    int y2=0;
+    // The char.
+    char *work_char; 
 
+    // The mask.
     unsigned char bit_mask = 0x80;
 
-    char *work_char; 
+    // The position.
+    int x2=0;
+    int y2=0;
 
 
 	//
@@ -388,10 +391,7 @@ draw_char (
     work_char = (void *) gws_currentfont_address + (c * gcharHeight);
 
 
-	//
 	// Draw.
-	//
-
 
     for ( y2=0; y2 < gcharHeight; y2++ )
     {
@@ -411,7 +411,6 @@ draw_char (
         y++; 
         work_char++; 
     };
-
 
 	// Algo mais ? 
 }

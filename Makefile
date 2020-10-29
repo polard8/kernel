@@ -2,7 +2,7 @@
 PRODUCT_NAME  = Gramado Operating System
 VERSION_MAJOR = 1
 VERSION_MINOR = 0
-VERSION_BUILD = 149
+VERSION_BUILD = 150
 # See: config/version.h
 
 # Documentation.
@@ -126,7 +126,7 @@ build-portals:
 
 	@echo "==================="
 	@echo "Compiling setup ..."
-	$(Q) $(MAKE) -C gramnt/setup/
+	$(Q) $(MAKE) -C gramnt/grass/
 
 	@echo "==================="
 	@echo "Compiling gramci lib ..."
@@ -134,11 +134,14 @@ build-portals:
 	
 	@echo "==================="
 	@echo "Compiling gramci stuff ..."
+	
+	$(Q) $(MAKE) -C gramci/aurora/
+	
 	$(Q) $(MAKE) -C gramci/services/gnssrv/ 
-	$(Q) $(MAKE) -C gramci/services/gwssrv/
-	$(Q) $(MAKE) -C gramci/shell/apps/
-	$(Q) $(MAKE) -C gramci/shell/cmd/
-	$(Q) $(MAKE) -C gramci/shell/net/
+
+	$(Q) $(MAKE) -C gramci/ufo/apps/
+	$(Q) $(MAKE) -C gramci/ufo/cmd/
+	$(Q) $(MAKE) -C gramci/ufo/net/
 
 ## Step1 KERNEL.BIN         - Creating the kernel image.
 KERNEL.BIN: 
@@ -202,13 +205,13 @@ vhd-copy-files:
 	sudo cp gramnt/init/INIT.BIN  base/
 	sudo cp gramnt/init/INIT.BIN  base/PORTALS
 
-	sudo cp gramnt/setup/bin/GDESHELL.BIN  base/
-	sudo cp gramnt/setup/bin/GDESHELL.BIN  base/PORTALS
+	sudo cp gramnt/grass/bin/GDESHELL.BIN  base/
+	sudo cp gramnt/grass/bin/GDESHELL.BIN  base/PORTALS
 
 	# setup
-	#-sudo cp gramnt/setup/bin/*.BIN    base/
+	#-sudo cp gramnt/grass/bin/*.BIN    base/
 	# sysmon
-	sudo cp gramnt/setup/bin/SYSMON.BIN base/
+	sudo cp gramnt/grass/bin/SYSMON.BIN base/
 
 	# ====================================================
 
@@ -218,36 +221,36 @@ vhd-copy-files:
 	#
 
 	# apps
-#	-sudo cp gramci/shell/apps/bin/*.BIN  base/
-#	-sudo cp gramci/shell/apps/bin/*.BIN  base/PROGRAMS
-	-sudo cp gramci/shell/apps/bin/GWM.BIN     base/
-	-sudo cp gramci/shell/apps/bin/EDITOR.BIN  base/
-	#-sudo cp gramci/shell/apps/bin/FILEMAN.BIN  base/
-	-sudo cp gramci/shell/apps/bin/LAUNCH1.BIN  base/
+#	-sudo cp gramci/ufo/apps/bin/*.BIN  base/
+#	-sudo cp gramci/ufo/apps/bin/*.BIN  base/PROGRAMS
+	-sudo cp gramci/ufo/apps/bin/GWM.BIN     base/
+	-sudo cp gramci/ufo/apps/bin/EDITOR.BIN  base/
+	#-sudo cp gramci/ufo/apps/bin/FILEMAN.BIN  base/
+	-sudo cp gramci/ufo/apps/bin/LAUNCH1.BIN  base/
 
-	#-sudo cp gramci/shell/apps/bin/TERMINAL.BIN  base/
-	#-sudo cp gramci/shell/cmd/bin/SHELL.BIN       base/
+	#-sudo cp gramci/ufo/apps/bin/TERMINAL.BIN  base/
+	#-sudo cp gramci/ufo/cmd/bin/SHELL.BIN       base/
 
 	# ...
 
 	# cmd
-	#-sudo cp gramci/shell/cmd/bin/*.BIN  base/
-	#-sudo cp gramci/shell/cmd/bin/*.BIN  base/BIN
-#	-sudo cp gramci/shell/cmd/bin/REBOOT.BIN     base/
-	-sudo cp gramci/shell/cmd/bin/CAT.BIN        base/
-	-sudo cp gramci/shell/cmd/bin/FASM.BIN       base/
-#	-sudo cp gramci/shell/cmd/bin/TRUE.BIN       base/
-#	-sudo cp gramci/shell/cmd/bin/FALSE.BIN      base/
+	#-sudo cp gramci/ufo/cmd/bin/*.BIN  base/
+	#-sudo cp gramci/ufo/cmd/bin/*.BIN  base/BIN
+#	-sudo cp gramci/ufo/cmd/bin/REBOOT.BIN     base/
+	-sudo cp gramci/ufo/cmd/bin/CAT.BIN        base/
+	-sudo cp gramci/ufo/cmd/bin/FASM.BIN       base/
+#	-sudo cp gramci/ufo/cmd/bin/TRUE.BIN       base/
+#	-sudo cp gramci/ufo/cmd/bin/FALSE.BIN      base/
 	# ...
 
 	# net
-	-sudo cp gramci/shell/net/bin/*.BIN  base/
-	-sudo cp gramci/shell/net/bin/*.BIN  base/PROGRAMS
+	-sudo cp gramci/ufo/net/bin/*.BIN  base/
+	-sudo cp gramci/ufo/net/bin/*.BIN  base/PROGRAMS
 
 	# gws
-	-sudo cp gramci/services/gwssrv/bin/GWS.BIN     base/ 
-	-sudo cp gramci/services/gwssrv/bin/GWSSRV.BIN  base/
-	-sudo cp gramci/services/gwssrv/bin/GWSSRV.BIN  base/PORTALS
+	-sudo cp gramci/aurora/bin/GWS.BIN     base/ 
+	-sudo cp gramci/aurora/bin/GWSSRV.BIN  base/
+	-sudo cp gramci/aurora/bin/GWSSRV.BIN  base/PORTALS
 
 	# gns
 	-sudo cp gramci/services/gnssrv/bin/GNS.BIN     base/
@@ -287,10 +290,11 @@ clean2:
 	-rm *.VHD
 
 clean3:
-	-rm gramnt/setup/bin/*.BIN
-	-rm gramci/shell/apps/bin/*.BIN
-	-rm gramci/shell/cmd/bin/*.BIN
-	-rm gramci/shell/net/bin/*.BIN
+	-rm gramnt/grass/bin/*.BIN
+
+	-rm gramci/ufo/apps/bin/*.BIN
+	-rm gramci/ufo/cmd/bin/*.BIN
+	-rm gramci/ufo/net/bin/*.BIN
 
 #Clean base
 clean4:
@@ -320,17 +324,19 @@ clean-system-files:
 	-rm -rf gramci/fonts/bin/*.FON
 
 	# Setup
-	-rm -rf gramci/setup/bin/*.BIN
+	-rm -rf gramci/grass/bin/*.BIN
+	
+	# aurora
+	-rm -rf gramci/aurora/bin/*.BIN
 	
 	# Services
 	-rm -rf gramci/services/gnssrv/bin/*.BIN
-	-rm -rf gramci/services/gwssrv/bin/*.BIN
 	# ...
 
 	# Shell
-	-rm -rf gramci/shell/apps/bin/*.BIN
-	-rm -rf gramci/shell/cmd/bin/*.BIN
-	-rm -rf gramci/shell/net/bin/*.BIN
+	-rm -rf gramci/ufo/apps/bin/*.BIN
+	-rm -rf gramci/ufo/cmd/bin/*.BIN
+	-rm -rf gramci/ufo/net/bin/*.BIN
 # ...
 
 

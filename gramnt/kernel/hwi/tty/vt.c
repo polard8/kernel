@@ -87,7 +87,7 @@ void _vt_outbyte ( int c, struct tty_d *tty ){
 
     if ( cWidth == 0 || cHeight == 0 ){
         debug_print ("_vt_outbyte: char w h");
-        panic ("_vt_outbyte: fail w h ");
+        panic       ("_vt_outbyte: fail w h ");
     }
 
 
@@ -97,7 +97,7 @@ void _vt_outbyte ( int c, struct tty_d *tty ){
 
     if ( VideoBlock.useGui == 0 ){
         debug_print ("_vt_outbyte: kernel in text mode");
-        panic ("_vt_outbyte: kernel in text mode");
+        panic       ("_vt_outbyte: kernel in text mode");
     }
 
 	
@@ -115,48 +115,41 @@ void _vt_outbyte ( int c, struct tty_d *tty ){
         //dentro do terminal.
         //então essa flag não faz sentido.		
  
-		if ( stdio_terminalmode_flag == 1 )
-		{
-			
-			// ## NÃO TRANPARENTE ##
+        if ( stdio_terminalmode_flag == 1 ){
+
+            // ## NÃO TRANPARENTE ##
             // se estamos no modo terminal então usaremos as cores 
             // configuradas na estrutura do terminal atual.
             // Branco no preto é um padrão para terminal.
-			
+
             //draw_char ( cWidth * TTY[console_number].cursor_x, cHeight * TTY[console_number].cursor_y, c, 
-				//COLOR_TERMINALTEXT, COLOR_TERMINAL2 );
-				
-            draw_char ( 
+            //  COLOR_TERMINALTEXT, COLOR_TERMINAL2 );
+
+            d_draw_char ( 
                 (cWidth * tty->cursor_x), (cHeight * tty->cursor_y), 
                 c, COLOR_WHITE, 0x303030 );
 
-		}else{
-			
-			// ## TRANSPARENTE ##
-		    // se não estamos no modo terminal então usaremos
-		    // char transparente.
+        }else{
+
+            // ## TRANSPARENTE ##
+            // se não estamos no modo terminal então usaremos
+            // char transparente.
             // Não sabemos o fundo. Vamos selecionar o foreground.
-			
+
 			//drawchar_transparent ( 
 			    //cWidth* TTY[console_number].cursor_x, cHeight * TTY[console_number].cursor_y, 
 				//TTY[console_number].cursor_color, c );
-				
-            drawchar_transparent ( 
+
+            d_drawchar_transparent ( 
                 (cWidth * tty->cursor_x), (cHeight * tty->cursor_y), 
                 tty->cursor_color, c );
-		};
-		
-		//#testando ...
-		//g_cursor_x++;
-     	
-		//goto done;
-        //return;
+        };
     };
 }
 
 
 /*
- *******************************************************************
+ *******************************************************
  * vt_outbyte:
  *
  *    Outputs char on the pseudo terminal device.
@@ -408,10 +401,7 @@ void vt_scroll (struct tty_d *tty){
     int i=0;
 
 
-    //
     // Check tty
-    //
-    
 
     if ( (void *) tty == NULL ){
         debug_print ("vt_scroll: tty\n");

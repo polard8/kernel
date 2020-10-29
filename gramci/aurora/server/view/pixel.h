@@ -2,6 +2,10 @@
 
 //pixel.h
 
+
+#ifndef __PIXEL_H
+#define __PIXEL_H  1
+
 int 
 pixelBackBufferPutpixel2 ( 
     unsigned long color, 
@@ -17,3 +21,7 @@ pixelBackBufferPutpixel (
     unsigned long y );
     
     
+#endif    
+
+
+

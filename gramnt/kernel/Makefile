@@ -96,7 +96,7 @@ ifeq ($(ARCH),x86)
 	pci.o pciinfo.o pciscan.o \
 	console.o tty.o pty.o vt.o\
 	usb.o \
-	video.o vsync.o screen.o xproc.o \
+	video.o vsync.o screen.o r_render.o xproc.o \
 	i8042.o keyboard.o mouse.o ps2kbd.o ps2mouse.o ldisc.o \
 	apic.o pic.o rtc.o serial.o pit.o  
 	
@@ -224,37 +224,37 @@ all-c:
 	$(CC) -c sci/net/network/network.c   $(KINCLUDE) $(CFLAGS) -o network.o
 
 	#
-	# ui
+	# Draw
 	#
 
     # Window Manager.
     # Window system ring 0 support.
     # model business logic
-	$(CC) -c ui/windows/model/kgwm.c  $(KINCLUDE) $(CFLAGS) -o kgwm.o
-	$(CC) -c ui/windows/model/wm.c    $(KINCLUDE) $(CFLAGS) -o wm.o
-	$(CC) -c ui/windows/model/kgws.c  $(KINCLUDE) $(CFLAGS) -o kgws.o
+	$(CC) -c draw/windows/model/kgwm.c  $(KINCLUDE) $(CFLAGS) -o kgwm.o
+	$(CC) -c draw/windows/model/wm.c    $(KINCLUDE) $(CFLAGS) -o wm.o
+	$(CC) -c draw/windows/model/kgws.c  $(KINCLUDE) $(CFLAGS) -o kgws.o
 	# data model
-	$(CC) -c ui/windows/model/font.c  $(KINCLUDE) $(CFLAGS) -o font.o
+	$(CC) -c draw/windows/model/font.c  $(KINCLUDE) $(CFLAGS) -o font.o
 
 	# Window Server.
-	$(CC) -c ui/windows/view/bg.c        $(KINCLUDE) $(CFLAGS) -o bg.o
-	$(CC) -c ui/windows/view/bmp.c       $(KINCLUDE) $(CFLAGS) -o bmp.o
-	$(CC) -c ui/windows/view/button.c    $(KINCLUDE) $(CFLAGS) -o button.o
-	$(CC) -c ui/windows/view/char.c      $(KINCLUDE) $(CFLAGS) -o char.o
-	$(CC) -c ui/windows/view/createw.c   $(KINCLUDE) $(CFLAGS) -o createw.o
-	$(CC) -c ui/windows/view/dtext.c     $(KINCLUDE) $(CFLAGS) -o dtext.o
-	$(CC) -c ui/windows/view/line.c      $(KINCLUDE) $(CFLAGS) -o line.o
-	$(CC) -c ui/windows/view/menu.c      $(KINCLUDE) $(CFLAGS) -o menu.o
-	$(CC) -c ui/windows/view/mbar.c      $(KINCLUDE) $(CFLAGS) -o mbar.o
-	$(CC) -c ui/windows/view/pixel.c     $(KINCLUDE) $(CFLAGS) -o pixel.o
-	$(CC) -c ui/windows/view/pbar.c      $(KINCLUDE) $(CFLAGS) -o pbar.o
-	$(CC) -c ui/windows/view/rect.c      $(KINCLUDE) $(CFLAGS) -o rect.o
-	$(CC) -c ui/windows/view/sbar.c      $(KINCLUDE) $(CFLAGS) -o sbar.o
-	$(CC) -c ui/windows/view/tbar.c      $(KINCLUDE) $(CFLAGS) -o tbar.o
-	$(CC) -c ui/windows/view/xproc.c     $(KINCLUDE) $(CFLAGS) -o xproc.o
+	$(CC) -c draw/windows/view/bg.c        $(KINCLUDE) $(CFLAGS) -o bg.o
+	$(CC) -c draw/windows/view/bmp.c       $(KINCLUDE) $(CFLAGS) -o bmp.o
+	$(CC) -c draw/windows/view/button.c    $(KINCLUDE) $(CFLAGS) -o button.o
+	$(CC) -c draw/windows/view/char.c      $(KINCLUDE) $(CFLAGS) -o char.o
+	$(CC) -c draw/windows/view/createw.c   $(KINCLUDE) $(CFLAGS) -o createw.o
+	$(CC) -c draw/windows/view/dtext.c     $(KINCLUDE) $(CFLAGS) -o dtext.o
+	$(CC) -c draw/windows/view/line.c      $(KINCLUDE) $(CFLAGS) -o line.o
+	$(CC) -c draw/windows/view/menu.c      $(KINCLUDE) $(CFLAGS) -o menu.o
+	$(CC) -c draw/windows/view/mbar.c      $(KINCLUDE) $(CFLAGS) -o mbar.o
+	$(CC) -c draw/windows/view/pixel.c     $(KINCLUDE) $(CFLAGS) -o pixel.o
+	$(CC) -c draw/windows/view/pbar.c      $(KINCLUDE) $(CFLAGS) -o pbar.o
+	$(CC) -c draw/windows/view/rect.c      $(KINCLUDE) $(CFLAGS) -o rect.o
+	$(CC) -c draw/windows/view/sbar.c      $(KINCLUDE) $(CFLAGS) -o sbar.o
+	$(CC) -c draw/windows/view/tbar.c      $(KINCLUDE) $(CFLAGS) -o tbar.o
+	$(CC) -c draw/windows/view/xproc.c     $(KINCLUDE) $(CFLAGS) -o xproc.o
 
-	$(CC) -c ui/windows/logoff.c  $(KINCLUDE) $(CFLAGS) -o logoff.o
-	$(CC) -c ui/windows/logon.c   $(KINCLUDE) $(CFLAGS) -o logon.o
+	$(CC) -c draw/windows/logoff.c  $(KINCLUDE) $(CFLAGS) -o logoff.o
+	$(CC) -c draw/windows/logon.c   $(KINCLUDE) $(CFLAGS) -o logon.o
 
 	#
 	# == Gramado Core =================================================
@@ -418,6 +418,10 @@ all-c:
 	$(CC) -c hwi/dd/hid/output.c    $(KINCLUDE) $(CFLAGS) -o output.o
 	$(CC) -c hwi/dd/hid/screen.c    $(KINCLUDE) $(CFLAGS) -o screen.o
 	$(CC) -c hwi/dd/hid/video.c     $(KINCLUDE) $(CFLAGS) -o video.o
+
+
+	# Render
+	$(CC) -c render/r_render.c    $(KINCLUDE) $(CFLAGS) -o r_render.o
 
 
 	# x86 initialization

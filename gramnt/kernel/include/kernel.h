@@ -99,6 +99,15 @@ extern void do_executa_new_task (void);
 #include "ws/view/screen.h"
 #include "ws/view/video.h"
 
+
+//
+// Render
+//
+
+#include "render/r_render.h"
+
+
+
 // #model. data model.
 #include "ws/model/fonts.h"
 #include "ws/model/ascii.h" 

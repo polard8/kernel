@@ -1,5 +1,5 @@
 /*
- * File: services.c 
+ * File: r_render.c 
  * 
  * Descrição:
  *     Alguns serviços internos oferecidos pelo Boot Loader.
@@ -10,31 +10,19 @@
  * 2015 - Created by Fred Nora.
  */
 
- 
+
 #include <bootloader.h>
 
 
-void *blServices ( 
-    unsigned long arg1, 
-    unsigned long arg2,
-    unsigned long arg3,
-    unsigned long arg4 )
+
+void r_refresh_screen (void)
 {
-
-    switch (arg1)
-    {
-        case 1:
-            break;
-			
-		//case 2:
-		//    break;
-		
-		//...
-    }
-
-
-    return NULL;
+    //#todo
+    
+    // See:
+    // softwarelib.inc
 }
+
 
 
 /*
@@ -42,6 +30,7 @@ void *blServices (
  *     int 200 - Serviços do Boot Loader.
  */
 
+//deletar
 void system_services (){
 	
     //Nothing.

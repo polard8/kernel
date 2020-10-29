@@ -56,8 +56,8 @@ CFLAGS = -m32 \
 #todo
 #path longo. vamos mudar  as libs de lugar para gramado/libs.
 
-LIBC    = ../../../../rtl/include/
-LIBCOBJ = ../../../../rtl/obj
+LIBC    = ../../../rtl/include/
+LIBCOBJ = ../../../rtl/obj
 
 
 #GWS_INCLUDES  = include/    
@@ -73,6 +73,7 @@ LIBCOBJ = ../../../../rtl/obj
 	
 myObjects = crt0.o main.o rtl.o \
 ctype.o stdio.o stdlib.o string.o conio.o socket.o signal.o unistd.o \
+r_render.o \
 pixel.o line.o rect.o char.o dtext.o createw.o gws.o comp.o window.o \
 grprim.o bmp.o connect.o button.o font.o\
 termios.o ioctl.o fcntl.o    
@@ -89,6 +90,8 @@ main.o:
 
 all-c:
 
+	gcc  -c  render/r_render.c    $(CFLAGS) -I $(LIBC) -I include/ -I .  -o r_render.o
+	
 	# view-like component
 	gcc  -c  view/pixel.c    $(CFLAGS) -I $(LIBC) -I include/ -I .  -o pixel.o
 	gcc  -c  view/char.c     $(CFLAGS) -I $(LIBC) -I include/ -I .  -o char.o

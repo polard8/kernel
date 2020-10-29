@@ -58,21 +58,18 @@ draw_string (
     //int cHeight = get_char_height ();
 
 
-	//if ( cWidth == 0 || cHeight == 0 )
+    //if ( cWidth == 0 || cHeight == 0 )
     if ( cWidth == 0 ){
         panic ("dtext-draw_string: cWidth");
     }
-      
+    
+    // #bugbug
+    // There is something not good with this routine.
+    
     for ( Index=0; string[Index] != 0; Index++ )
     {
-		//@todo: 
-		//   Conflito de tipo no argumento 4.
-		//   gcharWidth.
-		//my_buffer_char_blt( x, y, color, string[Index]);
-        drawchar_transparent ( x, y, color, string[Index] );
-        
-		//#todo: Tamanho do char. Usr variável.
-		
+        d_drawchar_transparent ( x, y, color, string[Index] );
+
         x += cWidth;
     };
 }

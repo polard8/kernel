@@ -1,0 +1,17 @@
+
+	Prefixes for the name of the files.
+
+
+	i_  = Initialization.
+	s_  = System
+	d_  = Drawing.
+	r_  = Render.
+	f_  = Finalization.
+
+ ===========================================
+
+  r_:
+       The folders draw/ and render/ will provide an easy
+	access to routines that has the hability to improve
+	the performance of the system.
+

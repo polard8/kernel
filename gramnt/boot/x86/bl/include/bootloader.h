@@ -23,8 +23,8 @@
 #define GRAMADO_CALIFORNIA  0x05
 // ...
 
-// Fail mode.
-static char current_mode = 0xFF;
+
+int current_mode;
 
 
 //
@@ -335,6 +335,8 @@ extern void refresh_screen();
 //
 #include <bli.h>
 
+
+#include <render/r_render.h>
 
 //
 // Variáveis globais.

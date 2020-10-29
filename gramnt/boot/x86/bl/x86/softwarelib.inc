@@ -4,8 +4,9 @@
 ; Descrição:
 ;     Rotinas de apoio para rotinas de software em software.inc.
 ;
-; Versão 1.0, 2015~2016.
+; 2015 - Created by Fred Nora.
 ;
+
 
 ;;
 ;; #bugbug
@@ -36,20 +37,22 @@ SOFTWARELIB_BACKBUFFER EQU   (0x1000000 - 0x800000)
 ; c = y 
 ; d = null
 ;
+
 global _my_buffer_load_bitmap_16x16     
 _my_buffer_load_bitmap_16x16:
 ;softwarelibLoadOnBufferBitmap16x16
    
-	mov dword [.endereco], eax
-	mov dword [.x], ebx
-	mov dword [.y], ecx
+  
+    mov dword [.endereco], eax
+    mov dword [.x],        ebx
+    mov dword [.y],        ecx
 
     ;
     ;Origem.   
 	
 	;eax contem o inicio do bmp.
     add eax, dword 036h    ;Adiciona o offset da area de dados do bmp.	
-	mov esi, eax           ;Início da area de dados da imagem.
+    mov esi, eax           ;Início da area de dados da imagem.
 
 	;
 	;Destino.
@@ -129,7 +132,7 @@ _my_buffer_load_bitmap_16x16:
 
 
 
-;=======================================================================
+;==========================================
 ; _background:
 ;     Pinta um background diretamente na memória de video.  
 ;     ( #teste Não é recomendado escrever na memoria de video 
@@ -144,6 +147,8 @@ _my_buffer_load_bitmap_16x16:
 ; IN:
 ;     EAX = COR
 ;
+
+;; r_background:
 
 global _background
 _background:
@@ -259,19 +264,19 @@ _gui_buffer_putpixel:
 	mov al, byte [.b]
 	stosb 
     ;Nothing.
-	pop ecx
-	pop ebx
-	pop eax
+    pop ecx
+    pop ebx
+    pop eax
     pop es
-    ret	
-;Nothing	
-.cor: dd 0
-.x: dd 0
-.y: dd 0
-.r db 0	
-.g db 0
-.b db 0	
-.a db 0	
+    ret
+;Nothing
+.cor:  dd 0
+.x:    dd 0
+.y:    dd 0
+.r     db 0
+.g     db 0
+.b     db 0
+.a     db 0
 
 
 
@@ -280,7 +285,6 @@ _gui_buffer_putpixel:
 ;      Passa o conteúdo do Backbuffer para o LFB.
 ;      @todo: _softwarelibRefreshScreen:       
 ;
-
 
 global _refresh_screen
 _refresh_screen:
@@ -309,7 +313,7 @@ _refresh_screen:
     RET
 
 
-	
+
 ;--------------------------------------
 ; write_char:
 ;     Escreve um caractere na tela em modo texto.

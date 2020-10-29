@@ -39,11 +39,11 @@ CFLAGS = -m32 \
 
 
 
-LIBC      = ../../../../rtl/include/
-LIBCOBJ   = ../../../../rtl/obj
+LIBC      = ../../../rtl/include/
+LIBCOBJ   = ../../../rtl/obj
 
-LIBGWS    = ../../../lib/libgws/include/
-LIBGWSOBJ = ../../../lib/libgws/obj
+LIBGWS    = ../../lib/libgws/include/
+LIBGWSOBJ = ../../lib/libgws/obj
 
 
 	#

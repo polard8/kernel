@@ -189,17 +189,17 @@ task1:
 ;     Carrega gdtr.
 ;
 setup_gdt:
-	lgdt [GDT_register]
-	ret
-	
-	
+    lgdt [GDT_register]
+    ret
+
+
 ;------------------------------
 ; setup_idt:
 ;     Configura a IDT.
 ;
 setup_idt:
     pushad
-	mov edx, unhandled_int 
+    mov edx, unhandled_int 
 	
 	mov eax, dword 0x00080000    ;Selector = 0x0008 = cs.	
 	mov ax, dx		             ;Uma parte do endereço.

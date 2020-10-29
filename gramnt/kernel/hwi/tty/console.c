@@ -408,7 +408,7 @@ void _console_outbyte (int c, int console_number){
         // configuradas na estrutura do terminal atual.
         // Branco no preto é um padrão para terminal.
         if ( stdio_terminalmode_flag == 1 ){
-            draw_char ( 
+            d_draw_char ( 
                  (cWidth * TTY[console_number].cursor_x), 
                 (cHeight * TTY[console_number].cursor_y), 
                 c, COLOR_WHITE, 0x303030 );
@@ -419,20 +419,20 @@ void _console_outbyte (int c, int console_number){
         // char transparente.
         // Não sabemos o fundo. Vamos selecionar o foreground. 
         }else{
-            drawchar_transparent ( 
+            d_drawchar_transparent ( 
                 (cWidth  * TTY[console_number].cursor_x), 
                 (cHeight * TTY[console_number].cursor_y), 
                 TTY[console_number].cursor_color, 
                 c );
         };
-		// Nothing.
+        // Nothing.
     }
 }
 
 
 /*
  *********************************************
- * outbyte:
+ * console_outbyte:
  *     Trata o caractere a ser imprimido e chama a rotina /_outbyte/
  * para efetivamente colocar o caractere na tela.
  *

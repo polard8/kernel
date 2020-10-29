@@ -1,0 +1,9 @@
+
+	folders:
+
+	aurora/   - The window server.
+	lib/      - The lib used by gramci.
+	services/ - Servers.
+	ufo/      - The commands and the apps.
+
+

@@ -1,6 +1,6 @@
 
 #ifndef __CHAR_H
-#define __CHAR_H
+#define __CHAR_H  1
 
 
 // Draw char support
