@@ -127,19 +127,20 @@ void power_pid (int pid, int power)
 }
 
 
-void process_enter_criticalsection(int pid)
-{
-    struct process_d *p;
+// Enter critical session.
+void process_enter_criticalsection (int pid){
 
+    struct process_d *p;
 
     if (pid<0)
         panic ("process_enter_criticalsection: pid \n");
+
+    // Process.
 
     p = (void *) processList[pid];
 
     if ( (void *) p == NULL ){
         panic ("process_enter_criticalsection: p \n");
-
 
     } else {
 
@@ -152,6 +153,7 @@ void process_enter_criticalsection(int pid)
 }
 
 
+// Exit critical session.
 void process_exit_criticalsection(int pid)
 {
     struct process_d *p;
@@ -160,6 +162,8 @@ void process_exit_criticalsection(int pid)
     if (pid<0)
         panic ("process_exit_criticalsection: pid \n");
 
+    // Process.
+ 
     p = (void *) processList[pid];
 
     if ( (void *) p == NULL ){
@@ -188,16 +192,16 @@ int process_profiler()
 
 
 
-unsigned long __GetProcessStats ( int pid, int index )
-{
+unsigned long __GetProcessStats ( int pid, int index ){
+
     struct process_d *p;
 
 
     if (pid<0)
         panic ("__GetProcessStats: pid \n");
 
-
-    //Struct.
+    // Process.
+    
     p = (void *) processList[pid];
 
     if ( (void *) p == NULL ){
@@ -212,48 +216,20 @@ unsigned long __GetProcessStats ( int pid, int index )
 
     switch (index){
 
-        case 1:
-           return (unsigned long) p->pid;
-           break;            
-            
-        case 2:
-           return (unsigned long) p->ppid;
-           break;            
+        case 1:  return (unsigned long) p->pid;  break; 
+        case 2:  return (unsigned long) p->ppid;  break; 
+        case 3:  return (unsigned long) p->uid;  break; 
+        case 4:  return (unsigned long) p->gid;  break; 
+        case 5:  return (unsigned long) p->state;  break; 
+        case 6:  return (unsigned long) p->plane;  break; 
+        case 7:  return (unsigned long) p->input_type;  break; 
+        case 8:  return (unsigned long) p->personality;  break; 
+        case 9:  return (unsigned long) p->appMode;  break; 
 
-        case 3:
-           return (unsigned long) p->uid;
-           break;            
-
-        case 4:
-           return (unsigned long) p->gid;
-           break; 
-           
-        //state    
-        case 5:
-            return (unsigned long) p->state;
-            break;                      
-           
-        case 6:
-            return (unsigned long) p->plane;
-            break;              
-           
-        case 7:
-            return (unsigned long) p->input_type;
-            break;              
-
-        case 8:
-            return (unsigned long) p->personality;
-            break;              
-
-        case 9:
-            return (unsigned long) p->appMode;
-            break;              
-
-        
-        case 10:
+        case 10:  
             return (unsigned long) p->private_memory_size;
             break;  
-           
+
         case 11:
             return (unsigned long) p->shared_memory_size;
             break;          
@@ -270,110 +246,34 @@ unsigned long __GetProcessStats ( int pid, int index )
             return (unsigned long) p->pagefaultCount;
             break;          
 
-        case 15:
-            return (unsigned long) p->DirectoryPA;
-            break;
-           
-        case 16:
-            return (unsigned long) p->DirectoryVA;
-            break;
-
-        //image address.    
-        case 17:
-            return (unsigned long) p->Image;
-            break;
-
-        case 18:
-            return (unsigned long) p->ImagePA;
-            break;
-
-
-        case 19:
-            return (unsigned long) p->childImage;
-            break;
-           
-        case 20:
-           return (unsigned long) p->childImage_PA;
-           break;
-          
-        case 21:
-            return (unsigned long) p->Heap;
-            break;
-
-        case 22:
-            return (unsigned long) p->HeapEnd;
-            break;
-           
-        case 23:
-            return (unsigned long) p->HeapSize;
-            break;
-
-
-        case 24:
-            return (unsigned long) p->HeapPointer;
-            break;
-
-        case 25:
-            return (unsigned long) p->HeapLastValid;
-            break;
-
-        case 26:
-            return (unsigned long) p->HeapLastSize;
-            break;
-
-        case 27:
-            return (unsigned long) p->Stack;
-            break;
-           
-        case 28:
-            return (unsigned long) p->StackEnd;
-            break;
-
-
-        case 29:
-            return (unsigned long) p->StackSize;
-            break;
-
-        case 30:
-           return (unsigned long) p->StackOffset;
-           break;
-
-
-        case 31:
-            return (unsigned long) p->iopl;
-            break;
-           
-        case 32:
-            return (unsigned long) p->base_priority;
-            break;
-           
-        case 33:
-            return (unsigned long) p->priority;
-            break;
-
-        case 34:
-            return (unsigned long) p->step;
-            break;
-
-
-        case 35:
-            return (unsigned long) p->quantum;
-            break;
-
-        case 36:
-            return (unsigned long) p->timeout;
-            break;
-           
-           
-        case 37:
-            return (unsigned long) p->ticks_remaining;
-            break;
-
-        case 38:
+        case 15:  return (unsigned long) p->DirectoryPA;  break;
+        case 16:  return (unsigned long) p->DirectoryVA;  break;
+        case 17:  return (unsigned long) p->Image;  break;
+        case 18:  return (unsigned long) p->ImagePA;  break;
+        case 19:  return (unsigned long) p->childImage;  break;
+        case 20:  return (unsigned long) p->childImage_PA;  break;
+        case 21:  return (unsigned long) p->Heap;  break;
+        case 22:  return (unsigned long) p->HeapEnd;  break;
+        case 23:  return (unsigned long) p->HeapSize;  break;
+        case 24:  return (unsigned long) p->HeapPointer;  break;
+        case 25:  return (unsigned long) p->HeapLastValid;  break;
+        case 26:  return (unsigned long) p->HeapLastSize;  break;
+        case 27:  return (unsigned long) p->Stack;  break;
+        case 28:  return (unsigned long) p->StackEnd;  break;
+        case 29:  return (unsigned long) p->StackSize;  break;
+        case 30:  return (unsigned long) p->StackOffset;  break;
+        case 31:  return (unsigned long) p->iopl;  break;
+        case 32:  return (unsigned long) p->base_priority;  break;
+        case 33:  return (unsigned long) p->priority;  break;
+        case 34:  return (unsigned long) p->step;  break;
+        case 35:  return (unsigned long) p->quantum;  break;
+        case 36:  return (unsigned long) p->timeout;  break;
+        case 37:  return (unsigned long) p->ticks_remaining;  break;
+        
+        case 38:  
             return (unsigned long) p->profiler_percentage_running;
             break;
-           
-           
+
         case 39:
             return (unsigned long) p->profiler_ticks_running;
             break;
@@ -382,52 +282,17 @@ unsigned long __GetProcessStats ( int pid, int index )
             return (unsigned long) p->profiler_last_ticks;
             break;
 
-        case 41:
-            return (unsigned long) p->thread_count;
-            break;
-
-        case 42:
-            return (unsigned long) p->bound_type;
-            break;
-
-        case 43:
-            return (unsigned long) p->preempted;
-            break;
-
-        case 44:
-            return (unsigned long) p->saved;
-            break;
-
-        case 45:
-            return (unsigned long) p->PreviousMode;
-            break;
-
-
-        case 46:
-            return (unsigned long) p->wait4pid;
-            break;
-
-        case 47:
-            return (unsigned long) p->exit_code;
-            break;
-
-        case 48:
-            return (unsigned long) p->signal;
-            break;
-           
-        case 49:
-            return (unsigned long) p->umask;   //signal_mask;
-            break;
-
-        case 50:
-            return (unsigned long) p->dialog_address;
-            break;
-           
-        // Image size.
-        // Isso � importante.
-        case 51:
-            return (unsigned long) p->ImageSize;
-            break;
+        case 41:  return (unsigned long) p->thread_count;  break;
+        case 42:  return (unsigned long) p->bound_type;  break;
+        case 43:  return (unsigned long) p->preempted;  break;
+        case 44:  return (unsigned long) p->saved;  break;
+        case 45:  return (unsigned long) p->PreviousMode;  break;
+        case 46:  return (unsigned long) p->wait4pid;  break;
+        case 47:  return (unsigned long) p->exit_code;  break;
+        case 48:  return (unsigned long) p->signal;  break;
+        case 49:  return (unsigned long) p->umask;  break;
+        case 50:  return (unsigned long) p->dialog_address; break;
+        case 51:  return (unsigned long) p->ImageSize;  break;
            
         // #todo:
         // Precisamos da quantidade de p�ginas usadas.
@@ -496,7 +361,7 @@ int getprocessname ( int pid, char *buffer ){
 
 struct process_d *processObject (void){
 
-   struct process_d *tmp;
+    struct process_d *tmp;
 
     tmp = (void *) kmalloc ( sizeof(struct process_d) );
 
@@ -528,10 +393,8 @@ pid_t getNewPID (void){
 
         p = (struct process_d *) processList[i];
 
-        if ( (void *) p == NULL ){
-            return (pid_t) i;
-        }
-
+        if ( (void *) p == NULL ){ return (pid_t) i; }
+        
         i++;
     };
 
@@ -549,28 +412,22 @@ pid_t getNewPID (void){
  */
 
 int processTesting (int pid){
-	
-	struct process_d *P;
-	
-	P = (void *) processList[pid];
-	
-	if ( (void *) P == NULL )
-	{
-		return 0;
-		
-	}else{		
-		
-		if ( P->used == 1 && P->magic == 1234 )
-		{
-			// magic.
-	        return (int) 1234;
-		}
-	};
-	
-	// Fail.
-	
-	return 0;
+
+    struct process_d *P;
+
+    // Process.
+    P = (void *) processList[pid];
+
+    if ( (void *) P == NULL ){
+        return 0;
+
+    }else{
+        if ( P->used == 1 && P->magic == 1234 ){ return (int) 1234; }
+    };
+
+    return 0;
 }
+
 
 
 /*
@@ -693,8 +550,7 @@ int processCopyMemory ( struct process_d *process ){
     // Mas usaremos apenas o endereço físico extraído desse endereço.
     __new_base = (unsigned long) allocPages ( (1024*200)/4096 ); 
 
-    if ( __new_base == 0 )
-    {
+    if ( __new_base == 0 ){
         printf ("processCopyMemory: __new_base fail\n");
         refresh_screen();
         return (int) (-1);
@@ -1261,15 +1117,14 @@ struct process_d *create_process (
 	// contagem de processos criados.
 	// processNewPID � global ?
 
-    if ( processNewPID < USER_BASE_PID || processNewPID >= PROCESS_COUNT_MAX )
+    if ( processNewPID < USER_BASE_PID || 
+         processNewPID >= PROCESS_COUNT_MAX )
     {
         processNewPID = (int) USER_BASE_PID;
     }
 
-    //
     // Base priority.
     // Please, don't inherit base priority!
-    //
 
     BasePriority = (unsigned long) PRIORITY_NORMAL; 
     Priority     = (unsigned long) priority;
@@ -1295,8 +1150,8 @@ struct process_d *create_process (
 	// Se o slot estiver ocupado tentaremos o pr�ximo.
 	// Na verdade podemos usar aquela fun��o que procura por um vazio. 
 
-    while(1)
-    {
+    while (1){
+
         PID = (int) getNewPID();
 
         if ( PID <= 0 || PID >= PROCESS_COUNT_MAX )
@@ -1304,14 +1159,11 @@ struct process_d *create_process (
             debug_print ("create_process: [FAIL] getNewPID \n");
             kprintf     ("create_process: [FAIL] getNewPID %d \n", PID);
             goto fail;
-            //refresh_screen ();
-            //return NULL;
         }
 
         EmptyEntry = (void *) processList[PID];
  
-        if ( (void *) EmptyEntry == NULL )
-            break;
+        if ( (void *) EmptyEntry == NULL ){ break; }
     };
  
  
@@ -1437,9 +1289,9 @@ struct process_d *create_process (
 		//Process->processImageMemory =
 		//Process->processHeapMemory =
 		//Process->processStackMemory =
-		
-	    // ORDEM: 
-		// O que segue � referenciado durante o processo de task switch.
+
+        // ORDEM: 
+        // O que segue � referenciado durante o processo de task switch.
 
 		// Page Directory: 
 		//     Alocar um endere�o f�sico para o diret�rio de p�ginas do 
@@ -1601,20 +1453,20 @@ struct process_d *create_process (
         // poderia ficar no fim de seu heap ???
 
 
-    if (g_heappool_va == 0)
-        panic("clone_and_execute_process: g_heappool_va");
-
+    if (g_heappool_va == 0){
+        panic ("clone_and_execute_process: g_heappool_va");
+    }
         // Ignoraremos esse pois vai falhar na criacao do primeiro heap.
         //if (g_heap_count == 0)
             //panic("clone_and_execute_process: g_heap_count");
 
-    if (g_heap_size == 0)
-        panic("clone_and_execute_process: g_heap_size");
-            
-        // #bugbug
-        // There is a limit here. End we will have a huge problem 
-        // when reach it.
+    if (g_heap_size == 0){
+        panic ("clone_and_execute_process: g_heap_size");
+    }
 
+    // #bugbug
+    // There is a limit here. End we will have a huge problem 
+    // when reach it.
 
     Process->Heap     = (unsigned long) g_heappool_va + (g_heap_count * g_heap_size);
     Process->HeapSize = (unsigned long) g_heap_size;
@@ -1668,9 +1520,7 @@ struct process_d *create_process (
 		//Process->process_message_queue[8]
 
 
-
     // Priority
-    
     Process->base_priority = (unsigned long) BasePriority;
     Process->priority      = (unsigned long) Priority;
 
@@ -1749,7 +1599,6 @@ struct process_d *create_process (
     Process->dialog_address = (unsigned long) &system_procedure;
 
     // Signal
-    
     Process->signal = 0;
     Process->umask = 0;
 
@@ -1795,19 +1644,16 @@ struct process_d *create_process (
 
 
     // Navigation
-    
     Process->prev = NULL; 
     Process->next = NULL; 
 
 
-    //
-    // Register.
-    //
-    
-    // List.
+    // Register
+    // List
     // Coloca o processo criado na lista de processos.
 
     processList[PID] = (unsigned long) Process;
+
 
     return (void *) Process;
 
@@ -1831,29 +1677,41 @@ fail:
 
 void CloseAllProcesses (void){
 
-    int Index = 0;
     struct process_d *P;
+    int i=0;
 
 	// #importante:
 	// Menos o 0, pois � o kernel. 
 
-    for ( Index = 1; Index < PROCESS_COUNT_MAX; Index++ )
+    //Pega, bloqueia e tira da lista.
+    for ( i=1; i < PROCESS_COUNT_MAX; i++ )
     {
-		//Pega, bloqueia e tira da lista.
-        P = (void *) processList[Index];
+        P = (void *) processList[i];
         P->state = PROCESS_BLOCKED;
-
-        processList[Index] = (unsigned long) 0;
+        
+        // Not kernel.
+        if (i != 100){
+            processList[i] = (unsigned long) 0;
+        }
     };
 
-
-	//Check process 0.
+    //Check process 0.
     P = (void *) processList[0];
 
     if ( (void *) P == NULL ){
         panic ("CloseAllProcesses: P\n");
     }
+
+    // #bugbug
+    // The kernel is process 100.
+
+    P = (void *) processList[100];
+
+    if ( (void *) P == NULL ){
+        panic ("CloseAllProcesses: kernel\n");
+    }
 }
+
 
 // usado pelo comando "current-process" no shell
 void show_currentprocess_info (void){
@@ -1903,7 +1761,7 @@ void show_currentprocess_info (void){
     };
 
 
-    refresh_screen ();
+    refresh_screen();
 }
 
 
@@ -1921,8 +1779,8 @@ void show_currentprocess_info (void){
 
 void show_process_information (void){
 
-    int i=0;
     struct process_d *p;
+    int i=0;
 
 
     printf ("\n\n show_process_information: \n\n");
@@ -1954,14 +1812,12 @@ void show_process_information (void){
 		//Nothing.
     };
 
-
-    //printf ("done\n");
-    refresh_screen ();
+    refresh_screen();
 }
 
 
 /*
- **************************************************************
+ *************************
  * SetProcessDirectory:
  *     Configura o endere�o do diret�rio de p�ginas do processo.
  *     @todo: Isso pode ser um servi�o oferecido pelo kernel,
@@ -2010,13 +1866,13 @@ unsigned long GetProcessDirectory ( struct process_d *process ){
 
 unsigned long GetPageDirValue (void)
 {
-    return (unsigned long ) get_page_dir ();
+    return (unsigned long ) get_page_dir();
 }
 
 
 
 /*
- ***************************************************************
+ ***********************************************
  * init_task:
  *     Inicia um processo.
  *     @todo: Mudar o nome para init_process().
@@ -2025,18 +1881,22 @@ unsigned long GetPageDirValue (void)
  *            ficando a cargo dessa rotina inicializar a estrutura criada. 
  */ 
 
-int init_task (int id)
-{ 
 	//@todo: inicializar uma estrutura para um processo criado.
 	//obs: ja tem essa rotina feita em aalgum lugar..
-	
-    return 0;   
+
+// #bugbug
+// Deprecated!
+
+int init_task (int id){ 
+    id=0;
+    panic ("init_task: deprecated");
+    return -1;   
 }
 
 
 
 /*
- *************************************************************
+ ***************************************
  * init_tasks: 
  *     Inicia as vari�veis.
  *
@@ -2066,13 +1926,13 @@ void init_tasks (void)
  */
  
 void init_processes (void){
-	
-    int i;
-	
+
+    int i=0;
+
 	//
 	// Iniciando vari�veis globais.
 	//
-	
+
 	kernel_request = 0;    // O que fazer com a tarefa atual.
 	
 	
@@ -2085,17 +1945,13 @@ void init_processes (void){
     current_process = 0;
 
 
-	//
-	// Inicializando a lista de processos.
-	//
-
+    // Clear process list.
     i=0;
-
-    while (i < PROCESS_COUNT_MAX)
-    {
+    while (i < PROCESS_COUNT_MAX){
         processList[i] = (unsigned long) 0;
         i++;
     };
+
 
     // More ?
 }
@@ -2386,19 +2242,19 @@ unsigned long GetProcessHeapStart ( pid_t pid ){
 		goto fail;
 		 
     }else{
-		
-		if ( process->used != 1 || process->magic != 1234 )
-		{
-			goto fail;
-		}
-		
-		//Ok.
-		return (unsigned long) process->Heap;
+
+        if ( process->used != 1 || 
+             process->magic != 1234 )
+        {
+            goto fail;
+        }
+
+		// Ok.
+        return (unsigned long) process->Heap;
     };
 
 
 fail:
-	
     return (unsigned long) 0;
 }
 
@@ -2427,17 +2283,18 @@ unsigned long GetProcessPageDirectoryAddress ( pid_t pid ){
 		goto fail;
 		 
     }else{
-		
-		if ( process->used != 1 || process->magic != 1234 ){
-			goto fail;
-		}
+
+        if ( process->used != 1 || 
+             process->magic != 1234 )
+        {
+            goto fail;
+        }
 
         return (unsigned long) process->DirectoryPA;
     };
 
 
 fail:
-
     return (unsigned long) 0;
 }
 
@@ -2521,21 +2378,22 @@ file *get_file_from_fd ( int pid, int fd )
 {
     struct process_d *p;
     file *fp;
-    
-   
 
-    if ( pid < 0)
+
+    if ( pid < 0){
         return NULL;
-
+    }
 
     // Get process pointer.
     p = (struct process_d *) processList[ pid ];
 
-    if (fd<0)
+    if (fd<0){
         return NULL;
-
+    }
 
     // Get fp from list of open files.
+    // #bugbug: Overflow.
+    
     return ( file * ) p->Objects[fd];  
 }
 
@@ -2647,8 +2505,9 @@ __execute_new_process (
 
 // Pega o número da tty de um processo, dado o pid.
 // Serviço: 266.
-int process_get_tty ( int pid )
-{
+
+int process_get_tty (int pid){
+
     // Usada para debug.
   
     struct process_d *p;
@@ -3141,8 +3000,8 @@ format_ok:
         Thread->gs = 0x23; 
 
         // Outros.
-        Thread->eax = 0;
-        Thread->ebx = 0;
+        Thread->eax = 0;  
+        Thread->ebx = 0;  
         Thread->ecx = 0;
         Thread->edx = 0;
         Thread->esi = 0;

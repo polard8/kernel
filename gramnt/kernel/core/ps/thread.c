@@ -46,164 +46,60 @@ unsigned long __GetThreadStats ( int tid, int index ){
 
     } else {
         //checar validade.
-		//...
+        //...
     };
 
+    // See: 
+    // https://en.wikipedia.org/wiki/Processor_affinity
+    // ...
+ 
+    switch ( index ){
 
-    switch ( index )
-    {
-
-        case 1:
-            return (unsigned long) t->tid;
-            break;            
-            
-        case 2:
-            return (unsigned long) t->ownerPID;
-            break;            
-
-        case 3:
-            return (unsigned long) t->type;
-            break;            
-
-        case 4:
-            return (unsigned long) t->state;
-            break; 
-           
-        //state    
-        case 5:
-            return (unsigned long) t->plane;
-            break;                      
+        case 1:  return (unsigned long) t->tid;  break;
+        case 2:  return (unsigned long) t->ownerPID;  break; 
+        case 3:  return (unsigned long) t->type;  break; 
+        case 4:  return (unsigned long) t->state;  break; 
+        case 5:  return (unsigned long) t->plane;  break; 
+        case 6:  return (unsigned long) t->cpu;  break; 
+        case 7:  return (unsigned long) t->affinity;  break;
         
+        // #bugbug: repetido. 6.
+        case 8:  return (unsigned long) t->cpu;  break;   
         
-        // Current cpu
-        case 6:
-            return (unsigned long) t->cpu;
-            break;              
-        
-        // See: https://en.wikipedia.org/wiki/Processor_affinity
-        case 7:
-            return (unsigned long) t->affinity;
-            break;
-
-        // Current cpu
-        // #bugbug: see 'case 6'.
-        case 8:
-            return (unsigned long) t->cpu;
-            break;              
-
-        case 9:
-            return (unsigned long) t->next_cpu;
-            break;              
-
-        
-        case 10:
-            return (unsigned long) t->DirectoryPA;
-            break;  
-           
-        case 11:
-            return (unsigned long) t->iopl;
-            break;          
-
-        case 12:
-            return (unsigned long) t->base_priority;
-            break;          
-
-        case 13:
-            return (unsigned long) t->priority;
-            break;          
+        case 9:  return (unsigned long) t->next_cpu;  break; 
+        case 10:  return (unsigned long) t->DirectoryPA;  break; 
+        case 11:  return (unsigned long) t->iopl;  break; 
+        case 12:  return (unsigned long) t->base_priority;  break; 
+        case 13:  return (unsigned long) t->priority;  break;          
 
         case 14:
             return (unsigned long) 0;
             //return (unsigned long) t->pagefaultCount;
             break;          
 
-        case 15:
-            return (unsigned long) t->preempted;
-            break;
-           
-        case 16:
-            return (unsigned long) t->saved;
-            break;
-
-        //image address.    
-        case 17:
-            return (unsigned long) t->Heap;
-            break;
-
-        case 18:
-            return (unsigned long) t->Stack;
-            break;
-
-        case 19:
-            return (unsigned long) t->HeapSize;
-            break;
-           
-        case 20:
-            return (unsigned long) t->StackSize;
-            break;
-          
-        case 21:
-            return (unsigned long) t->step;
-            break;
-
-        case 22:
-            return (unsigned long) t->initial_time_ms;
-            break;
-           
-        case 23:
-            return (unsigned long) t->total_time_ms;
-            break;
-
-        case 24:
-            return (unsigned long) t->quantum;
-            break;
-
-        case 25:
-            return (unsigned long) t->quantum_limit;
-            break;
-
-        case 26:
-            return (unsigned long) t->standbyCount;
-            break;
-
-        case 27:
-            return (unsigned long) t->runningCount;
-            break;
-           
-        case 28:
-            return (unsigned long) t->runningCount_ms;
-            break;
-
-        case 29:
-            return (unsigned long) t->readyCount;
-            break;
-
-        case 30:
-            return (unsigned long) t->ready_limit;
-            break;
-
-        case 31:
-            return (unsigned long) t->waitingCount;
-            break;
-           
-        case 32:
-            return (unsigned long) t->waiting_limit;
-            break;
-           
-        case 33:
-            return (unsigned long) t->blockedCount;
-            break;
-
-        case 34:
-            return (unsigned long) t->blocked_limit;
-            break;
-
-
-        case 35:
-            return (unsigned long) t->ticks_remaining;
-            break;
-
-        case 36:
+        case 15:  return (unsigned long) t->preempted;  break;
+        case 16:  return (unsigned long) t->saved;  break;
+        case 17:  return (unsigned long) t->Heap;  break;
+        case 18:  return (unsigned long) t->Stack;  break;
+        case 19:  return (unsigned long) t->HeapSize;  break;
+        case 20:  return (unsigned long) t->StackSize;  break;
+        case 21:  return (unsigned long) t->step;  break;
+        case 22:  return (unsigned long) t->initial_time_ms;  break;
+        case 23:  return (unsigned long) t->total_time_ms;  break;
+        case 24:  return (unsigned long) t->quantum;  break;
+        case 25:  return (unsigned long) t->quantum_limit;  break;
+        case 26:  return (unsigned long) t->standbyCount;  break;
+        case 27:  return (unsigned long) t->runningCount;  break;
+        case 28:  return (unsigned long) t->runningCount_ms;  break;
+        case 29:  return (unsigned long) t->readyCount;  break;
+        case 30:  return (unsigned long) t->ready_limit;  break;
+        case 31:  return (unsigned long) t->waitingCount;  break;
+        case 32:  return (unsigned long) t->waiting_limit; break;
+        case 33:  return (unsigned long) t->blockedCount;  break;
+        case 34:  return (unsigned long) t->blocked_limit;  break;
+        case 35:  return (unsigned long) t->ticks_remaining;  break;
+        
+        case 36:  
             return (unsigned long) t->profiler_percentage_running;
             break;
             
@@ -214,8 +110,7 @@ unsigned long __GetThreadStats ( int tid, int index ){
         case 38:
             return (unsigned long) t->profiler_percentage_running_mod;
             break;
-           
-           
+         
         case 39:
             return (unsigned long) t->profiler_ticks_running;
             break;
@@ -224,17 +119,9 @@ unsigned long __GetThreadStats ( int tid, int index ){
             return (unsigned long) t->profiler_last_ticks;
             break;
 
-        case 41:
-            return (unsigned long) t->PreviousMode;
-            break;
-
-        case 42:
-            return (unsigned long) t->signal;
-            break;
-
-        case 43:
-            return (unsigned long) t->umask;
-            break;
+        case 41:  return (unsigned long) t->PreviousMode;  break;
+        case 42:  return (unsigned long) t->signal;  break;
+        case 43:  return (unsigned long) t->umask;  break;
         
         //#todo
         //default:
@@ -293,18 +180,16 @@ int thread_profiler( int service ){
     
     __current = (struct thread_d *) threadList[current_thread];
     
-    if ( (void *) __current == NULL )
-    {
-		printf ("thread_profiler: t");
-		die();
-		//return -1;
+    if ( (void *) __current == NULL ){
+        printf ("thread_profiler: t");
+        die();
+        //return -1;
     }
     
     
     //unsigned long __total_ticks;
     //__total_ticks = (unsigned long) get_systime_totalticks();
- 
- 
+  
     switch (service)
     {
 		// Incrementa.
@@ -356,30 +241,28 @@ int thread_profiler( int service ){
 unsigned long 
 thread_get_profiler_percentage ( struct thread_d *thread)
 {
-    if ( (void *) thread == NULL )
-    {
-		printf ("thread_get_profiler_percentage: thread");
-		die();
-		//return -1;
+    if ( (void *) thread == NULL ){
+        printf ("thread_get_profiler_percentage: thread");
+        die();
+        //return -1;
     }
-    
+ 
     return ( unsigned long ) thread->profiler_percentage_running;
 }
 
 
-void thread_show_profiler_info (void)
-{
+void thread_show_profiler_info (void){
 
     struct thread_d *thread;
     int i=0;
 
 
-	printf ("\n");
-	
-	for (i=0; i<THREAD_COUNT_MAX; i++)
-	{
-	    thread = (struct thread_d *) threadList[i];
-	
+    printf ("\n");
+
+    for (i=0; i<THREAD_COUNT_MAX; i++)
+    {
+        thread = (struct thread_d *) threadList[i];
+
         if ( (void *) thread != NULL )
         {
 			if ( thread->used == 1 && thread->magic == 1234 )
@@ -392,7 +275,7 @@ void thread_show_profiler_info (void)
 		            thread->name_address );
 			}
         }
-	};
+    };
 
     refresh_screen();
 }
@@ -428,13 +311,14 @@ struct thread_d *threadCopyThread ( struct thread_d *thread ){
     // um nome personalizado pra não ficar tudo igual.
     //char new_name[32];
 
-    clone = (struct thread_d *) create_thread ( NULL,      // room
-                                    NULL,                  // desktop
-                                    NULL,                  // w
-                                    0,                     // init eip
-                                    0,                     // init stack
-                                    current_process,       // pid.
-                                    "clone-thread" );      // name
+    // IN: 
+    // room, desktop, window,
+    // initial eip, initial stack, 
+    // pid, thread name.
+    
+    clone = (struct thread_d *) create_thread ( NULL, NULL, NULL, 
+                                    0, 0,  
+                                    current_process, "clone-thread" );
 
     // The copy.
     if ( (void *) clone == NULL ){
@@ -590,7 +474,7 @@ struct thread_d *threadCopyThread ( struct thread_d *thread ){
     clone->esi = thread->esi;
     clone->edi = thread->edi;
     clone->ebp = thread->ebp;
-		
+
 	//TSS
     
     clone->tss = thread->tss;
@@ -627,10 +511,10 @@ struct thread_d *threadCopyThread ( struct thread_d *thread ){
 	// ORDEM: 
 	// O que segue � referenciado com pouca frequ�ncia.
 
-	clone->waitingCount = thread->waitingCount;    //Tempo esperando algo.
-	clone->blockedCount = thread->blockedCount;    //Tempo bloqueada.	
-	
-    //� qual processo pertence a thread.  
+    clone->waitingCount = thread->waitingCount;    //Tempo esperando algo.
+    clone->blockedCount = thread->blockedCount;    //Tempo bloqueada.
+
+    //qual processo pertence a thread.  
     clone->process = thread->process; 
 
 	//Thread->window_station
@@ -827,11 +711,11 @@ get_next:
 	
 	//BugBug: Isso pode virar um loop infinito!
 
+    // Recomeça o loop na base para id de usu�rios.
+
     i++;
-    if ( i >= THREAD_COUNT_MAX )
-    {
-		// Recome�a o loop na base para id de usu�rios.
-		i = USER_BASE_TID;    
+    if ( i >= THREAD_COUNT_MAX ){
+       i = USER_BASE_TID;    
     }
 
 
@@ -841,8 +725,8 @@ get_next:
 	//Se o slot estiver ocupado.
     if ( (void *) Empty != NULL )
     {
-		// Voltamos.
-		// #bugbug: Isso pode n�o parar nunca.
+        // Voltamos.
+        // #bugbug: Isso pode n�o parar nunca.
         goto get_next;
     
     }else{
@@ -1150,7 +1034,7 @@ get_next:
 	// ( N�O COLOCAR PARA EXECU��O, 
 	//   OUTRA FUN��O DEVE COLOCAR PARA EXECU��O )
 
-done:
+//done:
 
     //SelectForExecution(t);  //***MOVEMENT 1 (Initialized ---> Standby)
     return (void *) Thread;
@@ -1187,10 +1071,7 @@ void *GetCurrentThread (void){
 
     Current = (void *) threadList[current_thread];
 
-    if ( (void *) Current == NULL )
-    {
-        return NULL;
-    }
+    if ( (void *) Current == NULL ){  return NULL; }
 
     return (void *) Current;
 }
@@ -1209,13 +1090,12 @@ void *GetCurrentThread (void){
 void *FindReadyThread (void){
 
     struct thread_d *Thread;
-    int Index=0;
+    int i=0;
 
 
-    for ( Index=0; Index<THREAD_COUNT_MAX; Index++ )
-    {
+    for ( i=0; i<THREAD_COUNT_MAX; i++ ){
 
-        Thread = (void *) threadList[Index];
+        Thread = (void *) threadList[i];
 
         if ( (void *) Thread != NULL )
         {
@@ -1223,12 +1103,10 @@ void *FindReadyThread (void){
                  Thread->magic == 1234 && 
                  Thread->state == READY )
             {
-				//Done.
                 return (void *) Thread;
             }
         }
     };
-
 
     // Nenhuma foi encontrada.   
     // #todo: Message ??
@@ -1426,17 +1304,16 @@ int init_threads (void){
 	start_new_task_address = (unsigned long) 0;    //Endere�o da nova tarefa.
 	
 	//@todo: H� mais vari�veis para serem inicializadas??!!
-	
-	
-	//Zerando a lista de threads.
-	i=0;
-	
-	while ( i < THREAD_COUNT_MAX )
-	{
-	    threadList[i] = (unsigned long) 0;   
+
+
+    // Clear thread list.
+    i=0;
+    while ( i < THREAD_COUNT_MAX ){
+        threadList[i] = (unsigned long) 0; 
         i++;
-	}
-	
+    }
+
+
 	//
 	// @todo: Nada mais?
 	//
@@ -1466,10 +1343,9 @@ int thread_getchar (void){
 	// Pode ser que esse aplicativo n�o tenha janela,
 	// mas esteja rodando na janela do shell.
 
-    struct window_d *w;
 
     struct thread_d *t;
-
+    struct window_d *w;
 
 	//
 	// Bloqueia pra que nenhum aplicativo pegue mensagens 
@@ -1480,20 +1356,20 @@ int thread_getchar (void){
  
 	//pega o char em current_stdin.
 	//isso est� em kdrivers/x/i8042/keyboard.c
-	
-	SC = (unsigned char) get_scancode();
-	
+
+    SC = (unsigned char) get_scancode();
+
 	// Isso coloca a mensagem na thread de controle da janela com o foco de entrada.
-	
-	KEYBOARD_SEND_MESSAGE ( SC );
+
+    KEYBOARD_SEND_MESSAGE ( SC );
 
 	
 	// #importante
 	// Deve ser a thread da janela com o foco de entrada.
 	
-	
-	
-	w = (void *) windowList[window_with_focus];
+    // Window.
+
+    w = (void *) windowList[window_with_focus];
 
 	if ( (void *) w == NULL ){
 		panic ("thread_getchar: w");
@@ -1512,10 +1388,8 @@ int thread_getchar (void){
 	};
 
 
-	//
-	// Check thread,
-	//
-    
+    // Thread.
+
     if ( (void *) t == NULL )
 	{
          //msg
