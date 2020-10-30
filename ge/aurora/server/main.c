@@ -1923,7 +1923,7 @@ int initGraphics (void){
         
     debug_print("gwssrv: InitGraphics done\n");
     //printf     ("gwssrv: InitGraphics done *hang\n");
-    while(1){}
+    //while(1){}
         
     
     // ok
