@@ -1553,7 +1553,11 @@ int initGraphics (void){
     {
         // Seleciona a animaçao.
         // Nao deve travar, deve ter timeout.
-        window_server_startup_animation(1);
+         window_server_startup_animation(1);
+    
+        //curveDemo();
+        //cube_demo2();
+        // ...
     }
 
 
@@ -1886,7 +1890,8 @@ int initGraphics (void){
     }
     */
     
-    
+    /*
+     //ok, it works
     plotCharBackbufferDrawcharTransparentZ (  (8*0), 0, COLOR_RED, 'G', 0 );
     plotCharBackbufferDrawcharTransparentZ (  (8*1), 0, COLOR_RED, 'R', 0 );   
     plotCharBackbufferDrawcharTransparentZ (  (8*2), 0, COLOR_RED, 'A', 0 );
@@ -1894,7 +1899,7 @@ int initGraphics (void){
     plotCharBackbufferDrawcharTransparentZ (  (8*4), 0, COLOR_RED, 'A', 0 );
     plotCharBackbufferDrawcharTransparentZ (  (8*5), 0, COLOR_RED, 'D', 0 );
     plotCharBackbufferDrawcharTransparentZ (  (8*6), 0, COLOR_RED, 'O', 0 );
-
+    */
     
     // refresh
     gws_show_backbuffer();              
