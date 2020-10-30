@@ -1837,7 +1837,12 @@ plotCharBackbufferDrawcharTransparentZ (
     //
     // Draw.
     //
-
+    
+    // #todo
+    // We need a flat to invert or not.
+    // invert
+    
+    // ok. it works
     for ( y2=0; y2 < gcharHeight; y2++ )
     {
         bit_mask = 0x80;
@@ -1848,8 +1853,9 @@ plotCharBackbufferDrawcharTransparentZ (
            // Put pixel. 
             if ( ( *work_char & bit_mask ) )
             {
+                // começa do fim
                 // IN: z,x,y,color.
-                grPlot0 ( z, x + x2, y, color ); 
+                grPlot0 ( z, x + x2, (y + gcharWidth), color ); 
             }
 
             // Rotate bitmask.
@@ -1857,7 +1863,8 @@ plotCharBackbufferDrawcharTransparentZ (
         };
 
         // Próxima linha da 8 linhas do caractere.
-        y++; 
+        //y++; 
+        y--;
         work_char++; 
     };
 }
