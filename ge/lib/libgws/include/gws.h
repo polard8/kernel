@@ -292,6 +292,19 @@ void gws_refresh_yield (int fd);
 // refresh a given window and yield the current thread
 void gws_refresh_yield2 (int fd, int window);
 
+
+void gws_yield_n_times (unsigned long n);
+
+
+//
+// payment
+//
+
+void gws_payment(void);
+
+
+
+
 void *gws_create_thread ( 
     unsigned long init_eip, 
     unsigned long init_stack, 

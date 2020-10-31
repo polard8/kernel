@@ -290,12 +290,18 @@ int main ( int argc, char *argv[] ){
             48, 40, COLOR_RED, 'X' );
    
         // ...
-       
-        // #bugbug
-        // It is not working.
-        gws_refresh_window (client_fd, main_window);
+
+        // Saving the fd into the libgws.
+        // it's gonna be used by the payment routine.
+        // See: connect.c
+        gws_set_client_fd(client_fd);
+        gws_payment();
         
-        gws_yield();
+        //refresh background and yield.
+        //gws_refresh_yield(client_fd);
+        
+        //gws_refresh_window (client_fd, main_window);
+        //gws_yield();
     }
 
 

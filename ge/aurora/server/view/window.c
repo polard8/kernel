@@ -130,10 +130,12 @@ void wm_process_windows (void){
     // explicity called.
     if ( refresh_device_screen_flag == 1 ){
 
+        gwssrv_debug_print("== R (device) ==\n");  //debug 
         refresh_device_screen();
     
     // Refresh only the valid screen
     }else{
+        gwssrv_debug_print("== R (valid) ==\n");  //debug
         refresh_valid_screen();
     };
 
@@ -555,9 +557,9 @@ int serviceDrawButton(void)
 }
 
 
-
-int serviceRedrawWindow(void)
-{
+// Redraw window.
+int serviceRedrawWindow (void){
+    
     //O buffer é uma global nesse documento.
     unsigned long *message_address = (unsigned long *) &__buffer[0];
 
@@ -582,7 +584,7 @@ int serviceRedrawWindow(void)
    
     // Limits
     if ( window_id < 0 || window_id >= WINDOW_COUNT_MAX ){
-        gwssrv_debug_print ("gwssrv: serviceRefreshWindow window_id\n");
+        gwssrv_debug_print ("gwssrv: [FAIL] serviceRefreshWindow window_id\n");
         return -1;
     }
 
@@ -592,19 +594,16 @@ int serviceRedrawWindow(void)
 
     if ( (void *) window == NULL )
     {
-        gwssrv_debug_print ("gwssrv: serviceRefreshWindow window\n");
+        gwssrv_debug_print ("gwssrv: [FAIL] serviceRefreshWindow window\n");
         return -1;
         
     }else{
-
-        if ( window->used != 1 || window->magic != 1234 )
-        {
-            gwssrv_debug_print ("gwssrv: serviceRefreshWindow validation\n");
+        if ( window->used != 1 || window->magic != 1234 ){
+            gwssrv_debug_print ("gwssrv: [FAIL] serviceRefreshWindow validation\n");
             return -1;
         }
 
         // redraw!
-    
         gwssrv_redraw_window (
             (struct gws_window_d *) window, 
             (unsigned long) flags );
@@ -616,8 +615,7 @@ int serviceRedrawWindow(void)
 }
 
 
-int serviceRefreshRectangle(void)
-{
+int serviceRefreshRectangle (void){
 
 	//o buffer é uma global nesse documento.
     unsigned long *message_address = (unsigned long *) &__buffer[0];
@@ -629,8 +627,7 @@ int serviceRefreshRectangle(void)
     width  = message_address[6];  
     height = message_address[7];  
 
-    gws_refresh_rectangle ( left, top,
-        width, height);
+    gws_refresh_rectangle ( left, top, width, height );
         
     return 0;
 }
@@ -658,8 +655,8 @@ int serviceRefreshWindow (void){
     // Get
     
     
-    window_id = (int) message_address[4];
-    
+    //window_id = (int) message_address[4];  //#bugbug Wrong!!!
+    window_id = (int) message_address[0];    // #ok: isso rereouveu o problema!!!
     
     //
     // Window ID
@@ -670,14 +667,13 @@ int serviceRefreshWindow (void){
     // Will be used in the ghost frame routines.
     // #bugbug: Not working ...
     // We can't get this negative value.
-    /*
+    
     if ( window_id == (-4) )
     {
-        gwssrv_debug_print("== R ==\n");  //debug
+        gwssrv_debug_print("== R (extra) ==\n");  //debug
         refresh_device_screen();
         return 0;
     }
-    */
    
    
     // Limits

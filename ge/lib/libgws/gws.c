@@ -2724,29 +2724,54 @@ void gws_refresh_yield (int fd)
     // It's not working ...
     // The window server can't get this negative number
     
-    //gws_refresh_window (fd, -4);  //refresh background
+    gws_refresh_window (fd, -4);  //refresh background
     
-    //gws_system_call (265,0,0,0); 
+    gws_system_call (265,0,0,0); 
 }
 
 
 // refresh a given window and yield the current thread
 void gws_refresh_yield2 (int fd, int window)
 {
-    //gws_refresh_window (fd, window);
-    //gws_system_call (265,0,0,0); 
+    gws_refresh_window (fd, window);
+    gws_system_call (265,0,0,0); 
 }
 
 
-/*
-void gws_yield_n_times (unsigned long n);
+
 void gws_yield_n_times (unsigned long n)
 {
     int i=0;
     for(i=0;i<n;i++)
         gws_system_call(265,0,0,0); 
 }
-*/
+
+
+
+
+
+// It's time to pay!
+void gws_payment(void)
+{
+
+    gws_debug_print("==== PAYMENT ====\n");
+        
+    // o aplicativo salvou na biblioteca estatica o fd do window server.
+    // entao agora pegamos o fd e efetuamos o refresh do background
+    //e o yield da thread.
+    // See: connect.c
+    
+    int fd = (int) gws_get_client_fd();
+    
+    if (fd<0){
+        gws_debug_print("payment: fd\n");
+        return;
+    }
+    
+    gws_refresh_yield(fd);
+}
+
+
 
 /*
  **************************
