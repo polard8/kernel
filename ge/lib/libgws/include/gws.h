@@ -285,7 +285,12 @@ gws_load_path (
 
 void gws_yield(void);
 
+// refresh the background and yield the current thread
+void gws_refresh_yield (int fd);
 
+
+// refresh a given window and yield the current thread
+void gws_refresh_yield2 (int fd, int window);
 
 void *gws_create_thread ( 
     unsigned long init_eip, 

@@ -636,12 +636,10 @@ int serviceRefreshRectangle(void)
 }
 
 
-int serviceRefreshWindow(void)
-{
+// 1006
+int serviceRefreshWindow (void){
 
-	//o buffer é uma global nesse documento.
     unsigned long *message_address = (unsigned long *) &__buffer[0];
-
 
     struct gws_window_d *window;
     int window_id = -1;
@@ -660,16 +658,32 @@ int serviceRefreshWindow(void)
     // Get
     
     
-    window_id = message_address[4];
+    window_id = (int) message_address[4];
     
     
     //
     // Window ID
     //
    
+    // #extra
+    // Special case.
+    // Will be used in the ghost frame routines.
+    // #bugbug: Not working ...
+    // We can't get this negative value.
+    /*
+    if ( window_id == (-4) )
+    {
+        gwssrv_debug_print("== R ==\n");  //debug
+        refresh_device_screen();
+        return 0;
+    }
+    */
+   
+   
     // Limits
     if ( window_id < 0 || window_id >= WINDOW_COUNT_MAX ){
-        gwssrv_debug_print ("gwssrv: serviceRefreshWindow window_id\n");
+        //printf("%d\n",window_id);
+        gwssrv_debug_print ("gwssrv: [FAIL] serviceRefreshWindow window_id\n");
         return -1;
     }
 
@@ -678,12 +692,12 @@ int serviceRefreshWindow(void)
     window = (struct gws_window_d *) windowList[window_id];
    
     if ( (void *) window == NULL ){
-        gwssrv_debug_print ("gwssrv: serviceRefreshWindow window\n");
+        gwssrv_debug_print ("gwssrv: [FAIL] serviceRefreshWindow window\n");
         return -1;
     }
     
     if ( window->used != 1 || window->magic != 1234 ){
-        gwssrv_debug_print ("gwssrv: serviceRefreshWindow validation\n");
+        gwssrv_debug_print ("gwssrv: [FAIL] serviceRefreshWindow validation\n");
         return -1;
     }
 

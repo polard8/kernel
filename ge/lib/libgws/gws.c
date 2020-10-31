@@ -2637,11 +2637,22 @@ gws_redraw_window (
 }
 
 
-// Refresh window.
+
+/*
+ **************************************** 
+ * gws_refresh_window:
+ *     Refresh window.
+ */
+
+// #bugbug
+// It is not working.
+// The window server can not get the window number.
+
 int gws_refresh_window (int fd, int window )
 {
     __gws_refresh_window_request(fd,window);
     __gws_refresh_window_reponse(fd);
+
     return 0;
 }
 
@@ -2704,6 +2715,26 @@ gws_create_window (
 void gws_yield (void)
 {
     gws_system_call (265,0,0,0); 
+}
+
+// refresh the background and yield the current thread
+void gws_refresh_yield (int fd)
+{
+    // #bugbug
+    // It's not working ...
+    // The window server can't get this negative number
+    
+    //gws_refresh_window (fd, -4);  //refresh background
+    
+    //gws_system_call (265,0,0,0); 
+}
+
+
+// refresh a given window and yield the current thread
+void gws_refresh_yield2 (int fd, int window)
+{
+    //gws_refresh_window (fd, window);
+    //gws_system_call (265,0,0,0); 
 }
 
 

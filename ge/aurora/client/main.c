@@ -129,6 +129,7 @@ int gws(void)
 int main ( int argc, char *argv[] ){
 
     int client_fd = -1;
+    int main_window = -1;
 
 
     client_fd = gws();
@@ -138,6 +139,7 @@ int main ( int argc, char *argv[] ){
          printf          ("gws.bin: gws initialization fail \n");
          exit(1);
     }
+
 
     // Metrics.
     unsigned long w = gws_get_system_metrics(1);
@@ -154,17 +156,18 @@ int main ( int argc, char *argv[] ){
     //
 
 
-    int wid = gws_create_window (client_fd,
-        WT_SIMPLE,1,1,"gws-client",
-        0, 0, w, h,
-        0, 0, COLOR_BLACK, COLOR_BLACK);
+    main_window = gws_create_window (client_fd,
+                      WT_SIMPLE, 1, 1, "gws-client",
+                      0, 0, w, h,
+                      0, 0, COLOR_BLACK, COLOR_BLACK);
 
-    if (wid<0){
-        printf ("gws.bin: wid\n");
+    if (main_window<0)
+    {
+        printf ("gws.bin: main_window\n");
         exit(1);
     }
 
-    gws_draw_char ( client_fd, wid, 
+    gws_draw_char ( client_fd, main_window, 
         16, 8, COLOR_RED, 'C' );
 
 
@@ -283,12 +286,14 @@ int main ( int argc, char *argv[] ){
     // #debug
     while (1){
 
-        gws_draw_char ( client_fd, wid, 
+        gws_draw_char ( client_fd, main_window, 
             48, 40, COLOR_RED, 'X' );
    
         // ...
-        
-        gws_refresh_window (client_fd, wid);
+       
+        // #bugbug
+        // It is not working.
+        gws_refresh_window (client_fd, main_window);
         
         gws_yield();
     }
