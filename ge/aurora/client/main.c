@@ -197,51 +197,49 @@ int main ( int argc, char *argv[] ){
     {
 
         //south     
-        cube->p[0].x = 0;
-        cube->p[0].y = 20;
+        cube->p[0].x = -140;
+        cube->p[0].y = -90;
         cube->p[0].z = 0;
         cube->p[0].color = COLOR_WHITE;
         
-        cube->p[1].x = 20;
-        cube->p[1].y = 20;
+        cube->p[1].x = 140;
+        cube->p[1].y = -90;
         cube->p[1].z = 0;
         cube->p[1].color = COLOR_WHITE;
         
-        cube->p[2].x = 20;
-        cube->p[2].y = 0;
+        cube->p[2].x = 140;
+        cube->p[2].y = -100;
         cube->p[2].z = 0;
         cube->p[2].color = COLOR_WHITE;
         
-        cube->p[3].x = 0;
-        cube->p[3].y = 0;
+        cube->p[3].x = -140;
+        cube->p[3].y = -100;
         cube->p[3].z = 0;
         cube->p[3].color = COLOR_WHITE;
 
         //north
-        cube->p[4].x = 0;
-        cube->p[4].y = 20;
+        cube->p[4].x = -140;
+        cube->p[4].y = -90;
         cube->p[4].z = 20;
         cube->p[4].color = COLOR_YELLOW;
         
-        cube->p[5].x = 20;
-        cube->p[5].y = 20;
+        cube->p[5].x = 140;
+        cube->p[5].y = -90;
         cube->p[5].z = 20;
         cube->p[5].color = COLOR_YELLOW;
         
-        cube->p[6].x = 20;
-        cube->p[6].y = 0;
+        cube->p[6].x = 140;
+        cube->p[6].y = -100;
         cube->p[6].z = 20;
         cube->p[6].color = COLOR_YELLOW;
         
-        cube->p[7].x = 0;
-        cube->p[7].y = 0;
+        cube->p[7].x = -140;
+        cube->p[7].y = -100;
         cube->p[7].z = 20;
         cube->p[7].color = COLOR_YELLOW;
         
-        
         // plot cube 
         gws_plotcube ( client_fd, (struct gr_cube_d *) cube );
-
     }
 
 
@@ -280,7 +278,7 @@ int main ( int argc, char *argv[] ){
         // plot rectangle 
         gws_plotrectangle ( client_fd, (struct gr_rectangle_d *) rect );
     }
-
+    
    
     // #debug
     while (1){

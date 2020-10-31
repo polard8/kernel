@@ -282,6 +282,41 @@ char *johncarmack_strstr(const char *haystack, const char *needle)
 
 
 
+/*
+int rtl_file_length (FILE *f);
+int rtl_file_length (FILE *f)
+{
+	int		pos;
+	int		end;
+
+	pos = ftell (f);
+	fseek (f, 0, SEEK_END);
+	end = ftell (f);
+	fseek (f, pos, SEEK_SET);
+
+	return end;
+}
+*/
+
+/*
+int rtl_file_exists (const char *filename);
+int rtl_file_exists (const char *filename)
+{
+	FILE *f;
+
+	// [RH] Empty filenames are never there
+	if (*filename == 0)
+		return FALSE;
+
+	f = fopen (filename, "r");
+	if (!f)
+		return FALSE;
+	fclose (f);
+	return TRUE;
+}
+*/
+
+
 
 
 
