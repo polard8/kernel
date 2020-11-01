@@ -1,17 +1,16 @@
 /*
  * File: main.c
- * 
+ *
  *    Main file for the Gramado Window Server.
  * 
  *    History:
- *        2020 - Created by Fred Nora. 
+ *        2020 - Created by Fred Nora.
  */
 
 
 // hostname:D.S
 // [host]:<display>[.screen]
 // [host]:<display>.[screen]
-
 
 
 // main.c
@@ -39,8 +38,8 @@ See: https://wiki.osdev.org/Graphics_stack
 
 
 
-
-// pertence a esse projeto, nao eh a biblioteca.
+// This is part of this project. 
+// It is NOT a library.
 #include <gws.h>
 
 
@@ -64,7 +63,7 @@ See: https://wiki.osdev.org/Graphics_stack
 
 
 
-//h:d.s
+// h:d.s
 char *hostName;
 char *displayNum;
 char *screenNum;
@@ -73,7 +72,6 @@ char *screenNum;
 
 int running = 0;
 int ____saved_server_fd = -1;
-
 
 
 // #test
@@ -196,8 +194,7 @@ void update_mouse (void){
 //testa o sinal para x
 do_x:
 
-    if ( mouse_packet_data & MOUSE_X_SIGN ) 
-    {
+    if ( mouse_packet_data & MOUSE_X_SIGN ) {
         goto x_neg;
     }
 
@@ -304,11 +301,11 @@ void parse_data_packet ( char data, char x, char y)
     // #obs: Pra quem mandaremos a mensagem de moving ??
     if ( saved_mouse_x != mouse_x || saved_mouse_y != mouse_y )
     {
-		// flag: o mouse está se movendo.
-		// usaremos isso no keydown.
-		// >> na hora de enviarmos uma mensagem de mouse se movendo
-		// se o botão estiver pressionado então temos um drag (carregar.)
-		// um release cancela o carregar.
+	// flag: o mouse está se movendo.
+	// usaremos isso no keydown.
+	// >> na hora de enviarmos uma mensagem de mouse se movendo
+	// se o botão estiver pressionado então temos um drag (carregar.)
+	// um release cancela o carregar.
 		
         ps2_mouse_moving = 1;
 
@@ -327,25 +324,25 @@ void parse_data_packet ( char data, char x, char y)
                          
     }else{
 		
-		// Não redesenhamos quando o evento for um click, sem movimento.
+	// Não redesenhamos quando o evento for um click, sem movimento.
         ps2_mouse_moving = 0;
-    }; 
+    };
     */
 
 
-	//Apenas obtendo o estado dos botões.
+    //Apenas obtendo o estado dos botões.
     mouse_buttom_1 = 0;
     mouse_buttom_2 = 0;
     mouse_buttom_3 = 0;
 
 
-	// ## LEFT ##
+    // ## LEFT ##
     if ( ( mouse_packet_data & MOUSE_LEFT_BUTTON ) == 0 )
     {
-		//liberada.
+        //liberada.
         mouse_buttom_1 = 0;
         ps2_button_pressed = 0;
-        
+
         //mudamos sempre que pressionar.
         //todo: mudaremos sempre que pressionar numa title bar.
         //refresh_rectangle ( saved_mouse_x, saved_mouse_y, 20, 20 );
@@ -404,11 +401,12 @@ void parse_data_packet ( char data, char x, char y)
 	        ps2_button_pressed = 1;
         };
    
-     
-	// ===
-	// Confrontando o estado atual com o estado anterior para saber se ouve 
-	// alguma alteração ou não.
-	// 1 = ouve alteração.
+ 
+    // ===
+    // Confrontando o estado atual com
+    // o estado anterior para saber se ouve
+    // alguma alteração ou não.
+    // 1 = ouve alteração.
 
     if ( mouse_buttom_1 != old_mouse_buttom_1 ||
          mouse_buttom_2 != old_mouse_buttom_2 ||
@@ -419,8 +417,7 @@ void parse_data_packet ( char data, char x, char y)
     }else{
         mouse_button_action = 0;
     };
-    
-    
+
     //#isso ainda eh um teste.
     old_mouse_buttom_1 = mouse_buttom_1;
     old_mouse_buttom_2 = mouse_buttom_2;
@@ -442,20 +439,20 @@ void parse_data_packet ( char data, char x, char y)
 // corresponda às cordenadas do mouse.
 // retorna window id
 
-int top_at ( int x, int y )
-{
+int top_at ( int x, int y ){
+
     int z = 0;
     int wID = -1;
     struct gws_window_d *__last_found;
     struct gws_window_d *tmp;
 
-  
+
     //max 1024 janelas.
     for ( z=0; z<ZORDER_MAX; z++ )
     {
         //pega a próxima na zorderlist;
         tmp = (struct gws_window_d *) zList[z];
-        
+    
         //check
         if ( (void *) tmp != NULL )
         {
@@ -577,8 +574,9 @@ void init_client_struct ( struct gws_client_d *c );
 //
 
 
-void gwssrv_debug_print (char *string){
-
+// Print a simple string in the serial port.
+void gwssrv_debug_print (char *string)
+{
     gramado_system_call ( 289, 
         (unsigned long) string,
         (unsigned long) string,
@@ -586,14 +584,18 @@ void gwssrv_debug_print (char *string){
 }
 
 
+// Clone and execute a process.
+// #todo: We can use the rtl.
 int gwssrv_clone_and_execute ( char *name )
 {
     return (int) gramado_system_call ( 900, (unsigned long) name, 0, 0 );
 }
 
 
-
-unsigned long gwssrv_get_system_metrics (int index){
+// #todo
+// We can use the rtl.
+unsigned long gwssrv_get_system_metrics (int index)
+{
 
     //if (index<0){
         //gde_debug_print ("gswsrv_get_system_metrics: fail\n");
@@ -608,6 +610,7 @@ unsigned long gwssrv_get_system_metrics (int index){
 
 
 
+// #todo: We can use the rtl.
 //P (Proberen) testar.
 void gwssrv_enter_critical_section (void){
 
@@ -650,23 +653,25 @@ void gwssrv_exit_critical_section (void)
 
 
 
+// Copy the backbuffer in the frontbuffer(lfb).
+// #??
+// It uses the embedded window server in the kernel.
 void gwssrv_show_backbuffer (void)
 {
     // #todo
     // trocar o nome dessa systemcall.
     // refresh screen será associado à refresh all windows.
-    
+
     //#define	SYSTEMCALL_REFRESHSCREEN        11
-    
+
     gramado_system_call ( 11, //SYSTEMCALL_REFRESHSCREEN, 
         0, 0, 0 );
 }
 
 
 
-
 //
-//===================================================================
+// =============================================================
 //
 
 
@@ -879,9 +884,9 @@ void xxxHandleNextClientRequest (int fd){
     //
     // Recv.
     //
-    
+
     // Lê a mensagem e coloca no buffer.
-    
+  
     n_reads = read ( fd, __buffer, sizeof(__buffer) );
     //n_reads = recv ( fd, __buffer, sizeof(__buffer), 0 );
     
@@ -1239,8 +1244,8 @@ gwsProcedure (
             {
                 //if ( gui->screen->used == 1 && gui->screen->magic == 1234 ){
                     dtextDrawText ( (struct gws_window_d *) gui->screen,
-                        long1, long2, COLOR_GREEN,
-                       "gwssrv: Hello friend. This is the Gramado Window Server!");
+                      long1, long2, COLOR_GREEN,
+                      "gwssrv: Hello friend. This is the Gramado Window Server!");
                 //}
             } 
             gws_show_backbuffer();
@@ -1371,21 +1376,14 @@ gwsProcedure (
             
 
         // See: grprim.c
-        case 2040:
-            serviceGrPlot0();
-            break;
-            
+        case 2040:  serviceGrPlot0();  break;
+
         // See: grprim.c
-        case 2041:
-            serviceGrCubeZ();
-            break;
-        
+        case 2041:  serviceGrCubeZ();  break;
+
         // See: grprim.c
-        case 2042:
-            serviceGrRectangle();
-            break;
-         
-         
+        case 2042:  serviceGrRectangle();  break;
+
         // #todo
         // Segue serviços graficos 3d.
         // ...
@@ -1397,7 +1395,6 @@ gwsProcedure (
 
         // ...
 
-        
         default:
             gwssrv_debug_print ("gwssrv: Default message number\n");
             //printf ("msg=%d ",msg);
@@ -1435,14 +1432,15 @@ void create_background (void)
                                             gui->screen, 0, 
                                             COLOR_BACKGROUND, COLOR_BACKGROUND );    
 
-    if ( (void *) __bg_window == NULL ){
-        gwssrv_debug_print ("gwssrv: __bg_window fail\n");  
-        printf ("gwssrv: __bg_window fail\n");
-        exit(1);
+    if ( (void *) __bg_window == NULL )
+    {
+        gwssrv_debug_print ("gwssrv: __bg_window fail\n"); 
+        printf             ("gwssrv: __bg_window fail\n");
+        exit (1);
         return;
     }
 
-
+    // Register.
     WindowId = gwsRegisterWindow (__bg_window);
 
     if (WindowId<0){
@@ -1454,8 +1452,9 @@ void create_background (void)
     //__bg_window->dirty = 1;
     
 
-    if (current_mode == GRAMADO_JAIL)
+    if (current_mode == GRAMADO_JAIL){
         refresh_screen();
+    }
 
     //#debug
     //while(1){}
@@ -1480,11 +1479,10 @@ int initGraphics (void){
 
 
     debug_print("gwssrv: initGraphics\n");
-    
-    
+
     // Initialize the window server infrastructure.
     // The current display and the current screen.
-    
+
     __init_status = gwsInit();
 
     if (__init_status != 0)
@@ -1935,8 +1933,8 @@ int initGraphics (void){
 void gwssrv_init_client_support (void){
 
     int i=0;
-    
-    
+
+
     for(i=0; i<CLIENT_COUNT_MAX; i++)
         gwsClientList[i] = 0;
     

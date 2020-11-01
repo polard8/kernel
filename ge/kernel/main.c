@@ -1,10 +1,9 @@
 /*
- * File: kernel/main.c 
- * 
+ * File: kernel/main.c
  *     This is the main file for the kernel.
  *     It's architecture independent.
  *     The Assembly code passed the control for us, so now
- * we're gonna do some architechture intependent initialization 
+ * we're gonna do some architechture intependent initialization
  * and call the next part of the architechture dependent stuff.
  *
  * History:
@@ -13,38 +12,29 @@
  */
 
 
-
 #include <kernel.h>
 
+// This variables came from BL.BIN.
 
-
-// variaveis herdadas do BL.
-
-// O modo de boot. gui or cli.
+// The boot mode. CLI or GUI.
 extern unsigned long SavedBootMode;
 
-// Endereço do boot block
-extern unsigned long SavedBootBlock;   
-
-
-
-
-
-
+// Boot Block address.
+extern unsigned long SavedBootBlock;
 
 
 // char copyright[] =
 // "Copyright (c) 2005-2020 \n\tFred Nora. All rights reserved.\n\n";
 
 
-
 /*
- *************************************************
+ ********************************************
  * kernel_main:
  *
  *     Main function.
  *     The Assembly part calls this function.
  */
+
 
 int kernel_main (int arch_type){
 
@@ -61,43 +51,41 @@ int kernel_main (int arch_type){
     KernelStatus = KERNEL_NULL;
 
 
-    
     // #bugbug
     // Talvez esse endereço nao esteja acessivel ao kernel.
-    
+
      //See gdef.h
     unsigned long *base = (unsigned long *) SavedBootBlock;
     
     BootBlock.lfb                = (unsigned long) base[0]; // 0
-    BootBlock.x                  = (unsigned long) base[1]; // 4
-    BootBlock.y                  = (unsigned long) base[2]; // 8
-    BootBlock.bpp                = (unsigned long) base[3]; // 12
-    BootBlock.last_valid_address = (unsigned long) base[4]; // 16
-    BootBlock.metafile_address   = (unsigned long) base[5]; // 20
-    BootBlock.disk_number        = (unsigned long) base[6]; // 24
-    BootBlock.heads              = (unsigned long) base[7]; // 28
-    BootBlock.spt                = (unsigned long) base[8]; // 32 
-    BootBlock.cylinders          = (unsigned long) base[9]; // 36
+    BootBlock.x                  = (unsigned long) base[1];  // 4
+    BootBlock.y                  = (unsigned long) base[2];  // 8
+    BootBlock.bpp                = (unsigned long) base[3];  // 12
+    BootBlock.last_valid_address = (unsigned long) base[4];  // 16
+    BootBlock.metafile_address   = (unsigned long) base[5];  // 20
+    BootBlock.disk_number        = (unsigned long) base[6];  // 24
+    BootBlock.heads              = (unsigned long) base[7];  // 28
+    BootBlock.spt                = (unsigned long) base[8];  // 32
+    BootBlock.cylinders          = (unsigned long) base[9];  // 36
     BootBlock.boot_mode          = (unsigned long) base[10]; // 40
-    BootBlock.gramado_mode       = (unsigned long) base[11]; //  44
-    
+    BootBlock.gramado_mode       = (unsigned long) base[11]; // 44
+
 
     // The 'gramado mode' or 'gamemode'.
     // jail,p1,home,p2,castle
     // We can't check right here ...
     // there is no messages yet.
-    
+
     // Saving
     // It is used by the kernel info.
     current_mode = (char) BootBlock.gramado_mode;
-
 
 
     // #order
     // serial debug.
     // video.
     // ...
-    
+ 
     // Serial debug
     // Initialize all the ports.
     // ps: We can't use debug in this first initialization.
@@ -125,37 +113,35 @@ int kernel_main (int arch_type){
         case GRAMADO_JAIL:
             debug_print ("kernel_main: GRAMADO_JAIL: \n");
             break;
-            
+
         case GRAMADO_P1:
             debug_print ("kernel_main: GRAMADO_P1: \n");
             break;
-            
+
         case GRAMADO_HOME:
             debug_print ("kernel_main: GRAMADO_HOME: \n");
             break;
-            
+
         case GRAMADO_P2:
             debug_print ("kernel_main: GRAMADO_P2: \n");
             break;
-            
+
         case GRAMADO_CASTLE:
             debug_print ("kernel_main: GRAMADO_CASTLE: \n");
             break;
-        
+
         //case GRAMADO_CALIFORNIA:
         // ...
         default:
             debug_print ("kernel_main: current_mode not defined!\n");
             break;
-    }
+    };
 
 
-
-
-    // Virtual Console
+    // Virtual Console:
     // The kernel only have four virtual consoles.
     debug_print ("[Kernel] kernel_main: Initializing virtual console...\n");
-    
+
     console_set_current_virtual_console (0);
     console_init_virtual_console (0);
     console_init_virtual_console (1);
@@ -185,27 +171,25 @@ int kernel_main (int arch_type){
     };
 
 
-
     // Initializing the global spinlock.
-    // todo: Isso pode ir para init_globals
+    // #todo: Isso pode ir para init_globals
 
     __spinlock_ipc = 1;
 
+    //
+    // Video support
+    //
 
-	//
-	// Video support 
-	//
+    // First of all.
+    // #ps:
+    // Boot loader is mapping the LFB.
 
-	// First of all.
-	// #ps: 
-	// Boot loader is mapping the LFB.
+    // #todo:
+    // Device screen sizes.
 
-	// #todo: 
-	// Device screen sizes.
-
-	// Set graphics mode or text mode using a flag.
-	// #bugbug: 
-	// Text mode is not supported.
+    // Set graphics mode or text mode using a flag.
+    // #bugbug:
+    // Text mode is not supported.
 
     if ( SavedBootMode == 1 ){
         g_useGUI = GUI_ON;
@@ -245,7 +229,7 @@ int kernel_main (int arch_type){
     stdio_verbosemode_flag = 1;
 
 
-    // In video.c 
+    // In video.c
 
     videoVideo();
     videoInit();
@@ -254,11 +238,11 @@ int kernel_main (int arch_type){
 
 
 // If we are using graphics mode.
-#ifdef ENTRY_VERBOSE	
+#ifdef ENTRY_VERBOSE
     if (VideoBlock.useGui == GUI_ON){
         debug_print ("[Kernel] kernel_main: Using GUI\n");
     }
-#endif	
+#endif
 
 
 	// #debug
@@ -298,12 +282,12 @@ int kernel_main (int arch_type){
     // Nesse momento o bl deixou a tela suja.
     // Entao as mensagens nessa fase da inicializaçao
     // sao apresentadas em cima da sujeira deixada pelo boot loader.
-    // #test: 
+    // #test:
     // Se possivel vamos limpara a tela agora. Pois ja inicializamos
     // a runtime.
-    
-    backgroundDraw ( (unsigned long) COLOR_BLACK ); 
-        
+
+    backgroundDraw ( (unsigned long) COLOR_BLACK );
+
     //#debug.
     //refresh_screen();
     //while(1){}
@@ -321,17 +305,14 @@ int kernel_main (int arch_type){
     printf ("bpp %d\n",BootBlock.bpp);
     //...
     printf (">>>  Gramado mode %d\n", BootBlock.gramado_mode);
-    
-    
-   
+
     refresh_screen();
     //while(1){}
 
 
-
-	//
-	// ======== Select arch ========
-	//
+    //
+    // == Select arch ==============================
+    //
 
 	// #todo
 	// A partir daqui faremos inicializações de partes
@@ -365,7 +346,7 @@ int kernel_main (int arch_type){
             debug_print ("[Kernel] kernel_main: Current arch not defined!\n ");
             debug_print ("*Hang\n");
             goto fail;
-            break; 
+            break;
     };
 
     //
@@ -373,7 +354,6 @@ int kernel_main (int arch_type){
     //
 
 fail:
-
     debug_print ("[Kernel] kernel_main-fail:  *hang \n");
     return (-1);
 }
@@ -382,5 +362,4 @@ fail:
 //
 // End.
 //
-
 

@@ -2,19 +2,19 @@
  * File: main.c 
  *
  *     The INIT.BIN process.
- * 
+ *
  * Environment:
  *     ring 3.
- * 
+ *
  * Purpose:
  *     + To call interrupt 129 to enable maskable interrupts.
  *     + Hang forever. Some new process will reuse this process.
- * 
  *
  *     Esse programa deverá ser chamado sempre que o sistema estiver ocioso,
- * ou com falta de opções viáveis. Então esse programa deve ficar responsável 
- * por alguma rotina de manutenção do equilíbrio de sitema, ou por gerência de 
- * energia, com o objetivo de poupar energia nesse momento de ociosidade.
+ * ou com falta de opções viáveis. Então esse programa deve ficar 
+ * responsável por alguma rotina de manutenção do equilíbrio de sitema, 
+ * ou por gerência de energia, com o objetivo de poupar energia 
+ * nesse momento de ociosidade.
  *
  * O processo idle pode solicitar que processos de gerencia de energia entrem em
  * atuação. Pois a chamada do processo idle em si já é um indicativo de ociosidade
@@ -34,46 +34,44 @@
  *
  * History:
  *     2015 - Created by Fred Nora.
- *     2016 - Lil changes.
  *     2019 - The int 129 support.
  *     ...
  */
- 
- 
+
+
 //
 // Includes.
-// 
- 
+//
+
 #include "init.h"
-
-
 
 
 #define COLOR_YELLOW   0x00FFFF00
 
 
-
 /*
  Example:
-ID 	Name 	Description
-0 	Halt 	Shuts down the system.
-1 	Single-user mode 	Mode for administrative tasks.[2][b]
-2 	Multi-user mode 	Does not configure network interfaces and does not export networks services.[c]
-3 	Multi-user mode with networking 	Starts the system normally.[1]
-4 	Not used/user-definable 	For special purposes.
-5 	Start the system normally with appropriate display manager (with GUI) 	Same as runlevel 3 + display manager.
-6 	Reboot 	Reboots the system.  
+ ID 	Name 	Description
+ 0 	Halt 	Shuts down the system.
+ 1 	Single-user mode 	Mode for administrative tasks.[2][b]
+ 2 	Multi-user mode 	Does not configure network interfaces and does not export networks services.[c]
+ 3 	Multi-user mode with networking 	Starts the system normally.[1]
+ 4 	Not used/user-definable 	For special purposes.
+ 5 	Start the system normally with appropriate display manager (with GUI) 	Same as runlevel 3 + display manager.
+ 6 	Reboot 	Reboots the system.  
  */
+
 
 int __current_runlevel;
 
 
+
 //=================================
-// See: 
+// See:
 // config/version.h in the kernel.
 //
 // #todo:
-// Temos que pegar isso com o kernel. 
+// Temos que pegar isso com o kernel.
 //
 
 // 1000 - gramado server.
@@ -85,7 +83,7 @@ unsigned long __product_type;
 
 
 //
-// Variáveis internas.
+// Internal variables.
 //
 
 
@@ -95,17 +93,13 @@ int gShutdown = 0;
 //Idle application support.
 int idleStatus;
 int idleError;
-//...
-
+// ...
 
 
 
 //
 // == Prototypes =============================================
 //
-
-
-
 
 
 //...
@@ -120,7 +114,7 @@ void enable_maskable_interrupts(void);
 static inline void pause2 (void)
 {
     asm volatile ("pause" ::: "memory"); 
-} 
+}
 
 
 /* REP NOP (PAUSE) is a good thing to insert into busy-wait loops. */
@@ -133,11 +127,9 @@ static inline void rep_nop (void)
 #define cpu_relax()  rep_nop()
 
 
-
-
 // interna
 // Uma interrupção para habilitar as interrupções mascaráveis.
-// Só depois disso a interrupção de timer vai funcionar.
+// So depois disso a interrupção de timer vai funcionar.
 
 void enable_maskable_interrupts(void)
 {
@@ -145,11 +137,10 @@ void enable_maskable_interrupts(void)
 }
 
 
-void
-initialize_product_type(void)
-{
+void initialize_product_type (void){
+
     debug_print ("init.bin: Initializing product type ...\n");
-    
+ 
     //
     // This is the only product we have for now!
     //
@@ -161,11 +152,10 @@ initialize_product_type(void)
     // #todo:
     // Call the kernel to setup the product identification.
     // ex: gde_setup_product(...)
-
 }
 
 
-void Reboot(void)
+void Reboot (void)
 {
     printf ("init.bin: Reboot()\n");
     while(1){}
@@ -174,38 +164,36 @@ void Reboot(void)
     //gde_reboot();
 }
 
-void Shutdown(void)
+
+void Shutdown (void)
 {
     printf ("init.bin: Reboot()\n");
     while(1){}
     // ...
-    
+
     //gde_shutdown();
 }
 
 
-void Logoff(void)
+void Logoff (void)
 {
     printf ("init.bin: Logoff()\n");
 
 
-
-    if (gReboot == 1)
-    {
+    if (gReboot == 1){
         Reboot();
     }
 
-    if (gShutdown == 1)
-    {
+    if (gShutdown == 1){
          Shutdown();
     }
 }
 
 
 /*
- ********************** 
+ **********************
  * main:
- * 
+ *
  */
 
 // See: sw.asm in the kernel. 
@@ -224,26 +212,23 @@ int main ( int argc, char *argv[] ){
 
 
     // Initialize with error value.
-    __current_runlevel = (int) -1; 
- 
+    __current_runlevel = (int) -1;
+
     // Reboot and shutdown flags.
     gReboot = 0;
     gShutdown = 0;
 
     // Product
     initialize_product_type();
-    
-   
 
-    
+
     // #todo:
     // initialization/installation/upgrade???
     // Precisamos checar se um perfil de usuario ja existe.
     // Caso ja exista, apenas inicializamos, caso nao exista,
     // entao estamos configurando o primeiro uso. Isso acontece
-    // depois de uma instalacao ou upgrade ... 
-    // 
-    
+    // depois de uma instalacao ou upgrade ...
+
     // call setup(), for configuration or product upgrade/installation.
     // Create: user session, room and desktops.
     // ex: initUserSession->initRoom->initDesktop ...
@@ -251,14 +236,13 @@ int main ( int argc, char *argv[] ){
     // profiles: Setup user environment, create user's folders, etc ...
     // Setup groups.
     // Setup some environment variables.
-    // Delete /tmp files. 
+    // Delete /tmp files.
     // Delete ?/history files
-   
 
     // Using api.
     // obs: nao temos a variavel window.
 
-    //gde_draw_text ( NULL, 
+    //gde_draw_text ( NULL,
     //    0, 0, COLOR_YELLOW, _string );
 
     // #debug
@@ -269,16 +253,14 @@ int main ( int argc, char *argv[] ){
     // #debug
     // while(1){}
 
+    //
+    // Enable the maskable interrupts.
+    //
 
-    //
-    // Habilita as interrupções mascaráveis.
-    //
-   
-    
     // #DEBUG
     // Olhando eflags.
     // asm ("int $3 \n");
-    
+
     enable_maskable_interrupts ();
     //asm ("int $129 \n");
 
@@ -290,11 +272,11 @@ int main ( int argc, char *argv[] ){
 
     //
     // == Runlevel ======================================
-    // 
+    //
 
     // 0) Halt 
-    //    Shuts down the system. 
-    // 1) Single-user mode 
+    //    Shut the system down 
+    // 1) Single-user mode
     //    Mode for administrative tasks.
     // 2) Multi-user mode 
     //    Does not configure network interfaces and 
@@ -317,7 +299,8 @@ int main ( int argc, char *argv[] ){
     // Get the value in the file.
 
     // Get the current runlevel.
-    __current_runlevel = (int) gramado_system_call ( 288, 0, 0, 0 );  
+
+    __current_runlevel = (int) gramado_system_call ( 288, 0, 0, 0 );
 
     itoa (__current_runlevel, runlevel_string);
 
@@ -327,20 +310,18 @@ int main ( int argc, char *argv[] ){
     //
     // Initializing in the selected runlevel.
     //
-    
+
     switch (__current_runlevel){
 
-       // 0) Halt 
-       //    Shuts down the system. 
+       // 0) Halt
+       //    Shut the system down.
        //case 0:
            //halt
            //break;
-           
-       // 1) Single-user mode 
+
+       // 1) Single-user mode
        //    Mode for administrative tasks.
-       
-       
-           
+
        //case ?:
            //gramado_system_call ( 900, (unsigned long) "gws.bin", 0, 0 ); 
            //break;
@@ -363,13 +344,13 @@ int main ( int argc, char *argv[] ){
         default:
             gramado_system_call ( 900, 
                 (unsigned long) "gdeshell.bin", 0, 0 ); 
-            
+
             //gramado_system_call ( 900, 
                 //(unsigned long) "gnssrv.bin", 0, 0 );      
-                
+
             //gramado_system_call ( 900, 
                 //(unsigned long) "gwssrv.bin", 0, 0 );  
-                           
+
             break;
     };
 
@@ -387,7 +368,7 @@ int main ( int argc, char *argv[] ){
         //if (gShutdown == 1){ goto shutdown; };
     };
     */
-    
+
     
     //
     // == Get system message ==============================
@@ -401,7 +382,6 @@ int main ( int argc, char *argv[] ){
     //
 
 Mainloop:
-
 
     while (1){
 

@@ -90,11 +90,9 @@ clean-system-files
 #	@echo "$(ARCH)"
 
 
-
 # Building system files.
 # boot, libs, apps and commands.
 # #todo: fonts.
-
 
 
 PHONY := build-system-files
@@ -139,9 +137,9 @@ build-portals:
 	
 	$(Q) $(MAKE) -C ge/services/gnssrv/ 
 
-	$(Q) $(MAKE) -C setup/ufo/apps/
-	$(Q) $(MAKE) -C setup/ufo/cmd/
-	$(Q) $(MAKE) -C setup/ufo/net/
+	$(Q) $(MAKE) -C setup/apps/
+	$(Q) $(MAKE) -C setup/cmd/
+	$(Q) $(MAKE) -C setup/net/
 
 ## Step1 KERNEL.BIN         - Creating the kernel image.
 KERNEL.BIN: 
@@ -180,7 +178,6 @@ vhd-copy-files:
 	@echo "================================="
 	@echo "(Step 6) Copying files into the mounted VHD ..."
 
-
 	#
 	# == ge ======================================
 	#
@@ -213,6 +210,12 @@ vhd-copy-files:
 	# sysmon
 	sudo cp setup/grass/bin/SYSMON.BIN base/
 
+	#tests interpreters.
+	#sudo cp setup/grass/bin/C4.BIN base/
+	#sudo cp setup/grass/bin/GRAMC.BIN base/
+	sudo cp setup/grass/bin/GRAMC4.BIN base/
+	#sudo cp setup/grass/bin/GRAMCNF.BIN base/
+	
 	# ====================================================
 
 
@@ -221,31 +224,31 @@ vhd-copy-files:
 	#
 
 	# apps
-#	-sudo cp setup/ufo/apps/bin/*.BIN  base/
-#	-sudo cp setup/ufo/apps/bin/*.BIN  base/PROGRAMS
-	-sudo cp setup/ufo/apps/bin/GWM.BIN     base/
-	-sudo cp setup/ufo/apps/bin/EDITOR.BIN  base/
-	#-sudo cp setup/ufo/apps/bin/FILEMAN.BIN  base/
-	-sudo cp setup/ufo/apps/bin/LAUNCH1.BIN  base/
+#	-sudo cp setup/apps/bin/*.BIN  base/
+#	-sudo cp setup/apps/bin/*.BIN  base/PROGRAMS
+	-sudo cp setup/apps/bin/GWM.BIN     base/
+	-sudo cp setup/apps/bin/EDITOR.BIN  base/
+	#-sudo cp setup/apps/bin/FILEMAN.BIN  base/
+	-sudo cp setup/apps/bin/LAUNCH1.BIN  base/
 
-	#-sudo cp setup/ufo/apps/bin/TERMINAL.BIN  base/
-	#-sudo cp setup/ufo/cmd/bin/SHELL.BIN       base/
+	#-sudo cp setup/apps/bin/TERMINAL.BIN  base/
+	#-sudo cp setup/cmd/bin/SHELL.BIN       base/
 
 	# ...
 
 	# cmd
-	#-sudo cp setup/ufo/cmd/bin/*.BIN  base/
-	#-sudo cp setup/ufo/cmd/bin/*.BIN  base/BIN
-#	-sudo cp setup/ufo/cmd/bin/REBOOT.BIN     base/
-	-sudo cp setup/ufo/cmd/bin/CAT.BIN        base/
-	-sudo cp setup/ufo/cmd/bin/FASM.BIN       base/
-#	-sudo cp setup/ufo/cmd/bin/TRUE.BIN       base/
-#	-sudo cp setup/ufo/cmd/bin/FALSE.BIN      base/
+	#-sudo cp setup/cmd/bin/*.BIN  base/
+	#-sudo cp setup/cmd/bin/*.BIN  base/BIN
+#	-sudo cp setup/cmd/bin/REBOOT.BIN     base/
+	-sudo cp setup/cmd/bin/CAT.BIN        base/
+	-sudo cp setup/cmd/bin/FASM.BIN       base/
+#	-sudo cp setup/cmd/bin/TRUE.BIN       base/
+#	-sudo cp setup/cmd/bin/FALSE.BIN      base/
 	# ...
 
 	# net
-	-sudo cp setup/ufo/net/bin/*.BIN  base/
-	-sudo cp setup/ufo/net/bin/*.BIN  base/PROGRAMS
+	-sudo cp setup/net/bin/*.BIN  base/
+	-sudo cp setup/net/bin/*.BIN  base/PROGRAMS
 
 	# gws
 	-sudo cp ge/aurora/bin/GWS.BIN     base/ 
@@ -292,9 +295,9 @@ clean2:
 clean3:
 	-rm setup/grass/bin/*.BIN
 
-	-rm setup/ufo/apps/bin/*.BIN
-	-rm setup/ufo/cmd/bin/*.BIN
-	-rm setup/ufo/net/bin/*.BIN
+	-rm setup/apps/bin/*.BIN
+	-rm setup/cmd/bin/*.BIN
+	-rm setup/net/bin/*.BIN
 
 #Clean base
 clean4:
@@ -304,7 +307,6 @@ clean4:
 	-rm -rf base/SBIN/*.BIN 
 	-rm -rf base/PROGRAMS/*.BIN 
 	-rm -rf base/PORTALS/*.BIN 
-
 
 
 PHONY := clean-system-files
@@ -334,9 +336,9 @@ clean-system-files:
 	# ...
 
 	# Shell
-	-rm -rf setup/ufo/apps/bin/*.BIN
-	-rm -rf setup/ufo/cmd/bin/*.BIN
-	-rm -rf setup/ufo/net/bin/*.BIN
+	-rm -rf setup/apps/bin/*.BIN
+	-rm -rf setup/cmd/bin/*.BIN
+	-rm -rf setup/net/bin/*.BIN
 # ...
 
 
@@ -354,9 +356,9 @@ clean-all: clean clean2 clean3 clean4 clean-system-files
 ## 4) Serial debug support.
 ## 5) Clean files support.
 ## 6) Usage support.
-	
+
 #
-# ======== ISO ======== 
+# ======== ISO ========
 #
 
 # test
@@ -387,12 +389,11 @@ geniso-x86:
 
 
 
-
 #
-# ======== HDD ========
+# == HDD ================================
 #
 
-	
+
 hdd-mount:
 	-sudo umount /mnt/gramadohdd
 	sudo mount -t vfat -o loop,offset=32256 /dev/sda /mnt/gramadohdd/
@@ -404,35 +405,40 @@ hdd-unmount:
 hdd-copy-kernel:
 	sudo cp bin/boot/KERNEL.BIN /mnt/gramadohdd/BOOT 
 
+# Danger!!
+# This is gonna copy th image into the real HD.
+# My host is running on sdb and i copy the image into sda.
+# It is because the sda is in primary master IDE.
 danger-hdd-clone-vhd:
 	sudo dd if=./GRAMADO.VHD of=/dev/sda
 #	sudo dd if=./GRAMADO.VHD of=/dev/sdb
 
 
-
-
 #
-# ======== VM ========
+# == VM ====================
 #
-
 
 # Oracle Virtual Box 
+# This target runs the image in the virtual box emulator.
+# I use a virtual machine called "Gramado"
 oracle-virtual-box-test:
 	VBoxManage startvm "Gramado"
 
 
 # qemu 
+# This target runs the image in the qemu emulator.
+# You also van use a script called "./run". 
 qemu-test:
 	qemu-system-x86_64 -hda GRAMADO.VHD -m 512 -serial stdio 
 #	qemu-system-x86_64 -hda GRAMADO.VHD -m 128 -device e1000 -show-cursor -serial stdio -device e1000
 
-
+# ??
 test-sda:
 	sudo qemu-system-i386 -m 512 -drive file=/dev/sda,format=raw
 
+# ??
 test-sdb:
 	sudo qemu-system-i386 -m 512 -drive file=/dev/sdb,format=raw
-
 
 
 #install-kvm-qemu:
@@ -441,11 +447,13 @@ test-sdb:
 
 
 #
-# ======== SERIAL DEBUG ========
+# == SERIAL DEBUG ===============================
 #
 
+# It shows the serial debug output file.
+# fixme.
 serial-debug:
-	cat ./docs/sdebug.txt
+#	cat ./docs/sdebug.txt
 
 
 #
@@ -458,16 +466,15 @@ kernel-version:
 image-name:
 	@echo $(KBUILD_IMAGE)
 
-
 kernel-file-header:
-	-rm docs/KFH.TXT
-	readelf -h bin/boot/KERNEL.BIN > docs/KFH.TXT
-	cat docs/KFH.TXT
-	
+#	-rm docs/KFH.TXT
+#	readelf -h bin/boot/KERNEL.BIN > docs/KFH.TXT
+#	cat docs/KFH.TXT
+
 kernel-program-headers:
-	-rm docs/KPH.TXT
-	readelf -l bin/boot/KERNEL.BIN > docs/KPH.TXT
-	cat docs/KPH.TXT
+#	-rm docs/KPH.TXT
+#	readelf -l bin/boot/KERNEL.BIN > docs/KPH.TXT
+#	cat docs/KPH.TXT
 
 kernel-section-headers:
 	-rm docs/KSH.TXT
@@ -481,12 +488,12 @@ kernel-section-headers:
 #
 
 gcc-test:
-	chmod 755 ./scripts/gcccheck
-	./scripts/gcccheck
+#	chmod 755 ./scripts/gcccheck
+#	./scripts/gcccheck
 
 
 #
-# ======== USAGE ========
+# == USAGE ========
 #
 
 help:
