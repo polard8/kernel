@@ -48,16 +48,14 @@ int k_fclose (file *f){
 
     debug_print("k_fclose: [FIXME]\n");
 
-
+    // fail
     if ( (void *) f == NULL ){
         debug_print("k_fclose: f\n");
         return EOF;
 
     }else{
-
         f->used = 1;
         f->magic = 1234;
-
         f->pid = (pid_t) 0;
         f->uid = (uid_t) 0;
         f->gid = (gid_t) 0;
@@ -112,16 +110,16 @@ int k_fclose (file *f){
 
 file *k_fopen ( const char *filename, const char *mode ){
 
-    file *f;
-    
     struct process_d *Process;
+    file *f;
 
     // Buffer para armazenar o arquivo que vamos abrir.
     char *file_buffer;
 
     int i=0;    
     int __slot = -1;
-    unsigned long fileret;
+    unsigned long fileret=0;
+    size_t s = 0;
 
 
     debug_print ("k_fopen:\n");
@@ -131,13 +129,11 @@ file *k_fopen ( const char *filename, const char *mode ){
 
     Process = (void *) processList[current_process];
 
-    if ( (void *) Process == NULL )
-    {
+    if ( (void *) Process == NULL ){
         printf("k_fopen: Process\n");
         goto fail;
 
     }else{
-
         if ( Process->used != 1 || Process->magic != 1234 ){
             printf("k_fopen: Process validation\n");
             goto fail;
@@ -146,14 +142,14 @@ file *k_fopen ( const char *filename, const char *mode ){
     };
 
     // Reserva um slot.
+    // Começa no 3.
     for ( i=3; i< NUMBER_OF_FILES; i++ )
     {
         if ( Process->Objects[i] == 0 ){ __slot = i; break; }
     };
 
     // Check slot validation. 
-    if ( __slot == -1 )
-    {
+    if ( __slot == -1 ){
         printf ("k_fopen: No free slots\n");
         goto fail;
     }
@@ -183,7 +179,7 @@ file *k_fopen ( const char *filename, const char *mode ){
 	//#test
 	//temos que fazer isso de um jeito melhor
 
-    size_t s = (size_t) fsRootDirGetFileSize ( (unsigned char *) filename );
+    s = (size_t) fsRootDirGetFileSize ( (unsigned char *) filename );
 
     if ( s <= 0 ){
         printf ("k_fopen: file size \n");
@@ -207,8 +203,6 @@ file *k_fopen ( const char *filename, const char *mode ){
 	//printf ("klibc: fopen limits. size=%d \n", s);
 	//refresh_screen ();
 
-
-
 	//alocando apenas uma página.
 	//4KB
 	//Buffer do arquivo.
@@ -218,18 +212,16 @@ file *k_fopen ( const char *filename, const char *mode ){
 	//#todo:
 	//já temos recursos para alocar memória para um buffer maior.
 	//obs: Essa alocação vai depender do tamanho do arquivo.
-	
-
 
 
     file_buffer = (char *) kmalloc(s);
     //file_buffer = (char *) newPage();
 
+    // fail
     if ( (char *) file_buffer == NULL )
     {
         Process->Objects[__slot] = (unsigned long) 0;
-        
-        printf ("k_fopen: file_buffer \n");
+        kprintf ("k_fopen: file_buffer \n");
         goto fail;
     }
 
@@ -238,11 +230,10 @@ file *k_fopen ( const char *filename, const char *mode ){
 
     f = (file *) kmalloc( sizeof(file) );
 
-    if ( (void *) f == NULL )
-    {
+    // fail
+    if ( (void *) f == NULL ){
         Process->Objects[__slot] = (unsigned long) 0;
-        
-        printf ("k_fopen: f\n");
+        kprintf ("k_fopen: f\n");
         goto fail;
 
     }else{
@@ -296,20 +287,17 @@ file *k_fopen ( const char *filename, const char *mode ){
 	// pwd support.
     fsUpdateWorkingDiretoryString ( (char *) filename );
 
+    // Fail.
+    // Reset data.
     if ( current_target_dir.current_dir_address == 0 )
     {
         printf ("k_fopen: current_target_dir.current_dir_address fail \n");
-
-		//reset.
         current_target_dir.current_dir_address = VOLUME1_ROOTDIR_ADDRESS;
-
-        for ( i=0; i<11; i++ ){
-            current_target_dir.name[i] = '\0';
-        }
-
+        for ( i=0; i<11; i++ ){ current_target_dir.name[i] = '\0'; };
         goto fail;
         //return (file *) 0;
     }
+
 
 	//
 	// Loading file.
@@ -328,7 +316,9 @@ file *k_fopen ( const char *filename, const char *mode ){
 
 	//printf ("after_fsLoadFile: %s\n", filename );  
 
-    if ( fileret != 0 ){
+    // fail
+    if ( fileret != 0 )
+    {
         printf ("k_fopen: fsLoadFile fail\n");
         f = NULL;
         goto fail;
@@ -338,35 +328,47 @@ file *k_fopen ( const char *filename, const char *mode ){
     // We need to check the file type in the inode
     // to set the object type in the file structure.
     // read() will need this.
+    
     debug_print ("k_fopen: [FIXME] We need the object type found in the inode\n");
-
-//done:
     debug_print ("k_fopen: done\n");
+    
     return (file *) f;
 
+
+//
+// fail
+//
+
 fail:
-    debug_print ("k_fopen: fail\n");
+    debug_print ("k_fopen: Fail\n");
     refresh_screen ();
     return (file *) 0;
 }
 
 
 
+/*
+ *************************** 
+ * k_openat:
+ * 
+ */
+ 
 // #bugbug
 // openat - open a file relative to a directory file descriptor 
 // See: https://linux.die.net/man/2/openat
 // Wrapper
+
 int k_openat (int dirfd, const char *pathname, int flags){
 
     file *f;
-    
-    debug_print ("k_openat: [FIXME]\n");
 
+
+    debug_print ("k_openat: [FIXME]\n");
 
     // The directory
     if ( dirfd < 0 ){ 
         debug_print("k_openat: [FAIL] dirfd\n");
-        return -1; 
+        goto fail; 
     }
 
 
@@ -378,17 +380,21 @@ int k_openat (int dirfd, const char *pathname, int flags){
     
     f = (file *) k_fopen ( (const char *) pathname, "r" );
 
-    if ( (void *) f == NULL )
-    {
+    // fail
+    if ( (void *) f == NULL ){
         kprintf ("k_openat: f\n");
-        refresh_screen();
-        return (int) (-1);
+        goto fail;
     }
 
 
     debug_print ("k_openat: done\n");
     
     return (int) f->_file;
+
+
+fail:
+    refresh_screen();
+    return (int) (-1);
 }
 
 
@@ -409,6 +415,10 @@ int k_openat (int dirfd, const char *pathname, int flags){
  * prints:
  *     Rotina de suporta a printf. 
  */
+ 
+// #bugbug
+// We need to create a cleaner routine.
+// This one is a mess.
 
 int 
 prints ( 
@@ -420,40 +430,40 @@ prints (
 
     register int pc = 0, padchar = ' ';
 
+    register int len = 0;
+    register const char *ptr;
 
     if (width > 0) 
     {
-	    register int len = 0;
-		register const char *ptr;
-		
-		for (ptr = string; *ptr; ++ptr) ++len;
-		if (len >= width) width = 0;
-		else width -= len;
-		if (pad & PAD_ZERO) padchar = '0';
+        // ?? ugly
+        for (ptr = string; *ptr; ++ptr) ++len;
+        if (len >= width) width = 0;
+        else width -= len;
+        if (pad & PAD_ZERO) padchar = '0';
     }
 
 
     if( !(pad & PAD_RIGHT) ) 
     {
-		for ( ; width > 0; --width)
-		{
-		    printchar (out,padchar);
-			++pc;
-		};
+        for ( ; width > 0; --width)
+        {
+            printchar (out,padchar);
+            ++pc;
+        };
     }
 
 
     for ( ; *string; ++string )
     {
-		printchar (out, *string);
-		++pc;
+        printchar (out, *string);
+        ++pc;
     };
 
 
     for ( ; width > 0; --width )
     {
-		printchar (out,padchar);
-		++pc;
+        printchar (out,padchar);
+        ++pc;
     };
 
 
@@ -485,19 +495,19 @@ printi (
     register unsigned int u = i;
 
 
-    if ( i == 0 ) {
-
-		print_buf[0] = '0';
-		print_buf[1] = '\0';
-		
-		return prints (out, print_buf, width, pad);
+    if ( i == 0 ) 
+    {
+        print_buf[0] = '0';
+        print_buf[1] = '\0';
+        
+        return (int) prints (out, print_buf, width, pad);
     }
 
 
     if ( sg && b == 10 && i < 0 )
     {
-		neg = 1;
-		u = -i;
+        neg = 1;
+        u = -i;
     }
 
 
@@ -506,34 +516,36 @@ printi (
     *s = '\0';
 
 
-    while (u) 
-    {
-		t = u % b;
-		
-		if ( t >= 10 )
-		    t += letbase - '0' - 10;
-		    *--s = t + '0';
-		    u /= b;
+    while (u){
+
+        t = (u % b);
+        
+        // ugly
+        
+        if ( t >= 10 )
+            t += letbase - '0' - 10;
+        *--s = t + '0';
+        u /= b;
     };
 
 
     if (neg) 
     {
-		if ( width && (pad & PAD_ZERO) ) 
-		{
-		    printchar(out, '-');
-			++pc;
-			--width;
-		}else {
-			
-			*--s = '-';
-		};
+        if ( width && (pad & PAD_ZERO) ){
+
+            printchar (out, '-');
+            ++pc;
+            --width;
+
+        }else { *--s = '-'; };
     };
 
 
 	// #obs: 
 	// retorna pc + o retorno da função.
-
+    
+    // ugly shit
+    
     return (int) pc + prints(out, s, width, pad);
 }
 
@@ -554,26 +566,25 @@ printi (
 
 int print ( char **out, int *varg ){
 
-    register int width, pad;
+    register int width = 0;
+    register int pad = 0;
     register int pc = 0;
     register char *format = (char *) (*varg++);
-    
+
+
     char scr[2];
 
+    // ugly
     for ( ; *format != 0; ++format ) 
     {
-
-		if ( *format == '%' ) 
-		{
+        if ( *format == '%' ) 
+        {
 			++format;
 			width = pad = 0;
-			
-			if ( *format == '\0' ) 
-			    break;
-			
-			if ( *format == '%' ) 
-			    goto ____out;
-			
+
+            if ( *format == '\0' ) { break; }
+            if ( *format == '%' )  { goto ____out; }
+
 			if ( *format == '-' ) 
 			{
 				++format;
@@ -594,6 +605,7 @@ int print ( char **out, int *varg ){
 			
 			if ( *format == 's' ) 
 			{
+                // #bugbug: definition here.
 				register char *s = *((char **)varg++);
 				pc += prints (out, s?s:"(null)", width, pad);
 				continue;
@@ -618,28 +630,29 @@ int print ( char **out, int *varg ){
 				pc += printi (out, *varg++, 10, 0, width, pad, 'a');
 				continue;
 			}
-			
-			if ( *format == 'c' ) 
-	        {
+
+            if ( *format == 'c' ) 
+            {
 				/* char are converted to int then pushed on the stack */
 				scr[0] = *varg++;
 				scr[1] = '\0';
+				
+				// shit
 				pc += prints (out, scr, width, pad);
-				continue;
-			}
+                continue;
+            }
 
         // Os caracteres normais diferentes de "%".
         }else{
-
             ____out:
-			    printchar (out, *format);
-			    ++pc;
-		};
+                printchar (out, *format);
+                ++pc;
+        };
     };
 
     // Se o buffer existe, finaliza a string ?
-    if (out) 
-        **out = '\0';
+    
+    if (out){ **out = '\0'; }
 
 
     return (int) pc;
@@ -677,11 +690,11 @@ int printf ( const char *format, ... )
     // Durante a inicializaçao
     // A partir da fase 3 teremos printf novamente.
 
+    // Esse runlevel eh o modo grafico completo.
+    // entao essa funçao nao funciona ?
+
     if ( KeInitPhase < 3 )
     {
-        // Esse runlevel eh o modo grafico completo.
-        // entao essa funçao nao funciona ?
-
         if ( current_runlevel == 5 ){
             debug_print("kernel: printf quiet for KeInitPhase < 3 and runlevel 5\n");
             return 0;
@@ -726,14 +739,15 @@ int kputs ( const char *str )
  * sprintf:
  *     @field 2
  *     int sprintf ( char * str, const char * format, ... );
+ * 
  *     Composes a string with the same text that would be 
  * printed if format was used on printf, 
  * but instead of being printed, the content is stored 
  * as a C string in the buffer pointed by str.
  */
 
-int sprintf ( char *str, const char *format, ... ){
-
+int sprintf ( char *str, const char *format, ... )
+{
     register int *varg = (int *) (&format);
 
     return (int) print (&str, varg);
@@ -754,20 +768,21 @@ int sprintf ( char *str, const char *format, ... ){
 // Isso significa que fprintf não pode ativar a rotina de pintura
 // enquanto não encontrar um '\n'
 
-int fprintf ( file *f, const char *format, ... ){
-
+int fprintf ( file *f, const char *format, ... )
+{
     register int *varg = (int *) (&format);
-
+    size_t len = 0;
+    int status = -1;
+    
 
     if ( (void *) f == NULL ){
-        panic ("syslib-fprintf: f\n");
+        panic ("kstdio-fprintf: f\n");
 
     }else{
-
         if ( f->used != 1 || f->magic != 1234 ){
-            panic ("syslib-fprintf: f validation\n");
+            panic ("kstdio-fprintf: f validation\n");
         }
-		//...
+        //...
     };
 
 
@@ -781,17 +796,17 @@ int fprintf ( file *f, const char *format, ... ){
 	// #todo
 	// Tem que atualizar o ponteiro com uma strlen.
 
-    size_t len = 0;
     len = (size_t) strlen ( (const char *) format);
 
 
-    int status = -1;
     status = (int) print (&str, varg);
 
 	// Depois de ter imprimido então atualizamos o ponteiro de entrada 
 	// no arquivo.
 
-    f->_p = f->_p + len;
+    // This is a pointer.
+
+    f->_p = (f->_p + len);
 
 
     return (int) status;
@@ -800,7 +815,8 @@ int fprintf ( file *f, const char *format, ... ){
 
 /*
  ********************************
- * fputs:      
+ * k_fputs:
+ * 
  */
 
 int k_fputs ( const char *str, file *f ){
@@ -812,18 +828,15 @@ int k_fputs ( const char *str, file *f ){
         return (int) (-1);
 
     } else {
-
         size = (int) strlen (str);
 
-        if ( size > f->_cnt ){
-            return (int) (-1);
-        }
+        if ( size > f->_cnt ){ return (int) (-1); }
 
         f->_cnt = (int) (f->_cnt - size);
 
         sprintf ( f->_p, str );
 
-        f->_p = f->_p + size;
+        f->_p = (f->_p + size);
 
         return 0;
     };
@@ -840,12 +853,12 @@ int k_fputs ( const char *str, file *f ){
 
 int k_ungetc ( int c, file *f ){
 
-    if (c == EOF) 
-        return (int) c;
+    // c fail.
+    if (c == EOF){ return (int) c; }
 
+    // f fail.
+    if ( (void *) f == NULL ){ return EOF; }
 
-    if ( (void *) f == NULL )
-       return EOF;
 
 	//@todo: flag oef.
 	//stream->flags = (stream->flags & ~_IOEOF);
@@ -859,15 +872,14 @@ int k_ungetc ( int c, file *f ){
 
 
 /*
- * ftell: 
+ *************************
+ * k_ftell: 
  * 
  */
 
-long k_ftell (file *f){
-
-    if ( (void *) f == NULL )
-       return EOF;
-
+long k_ftell (file *f)
+{
+    if ( (void *) f == NULL ){ return EOF; }
 
     return (long) (f->_p - f->_base);
 }
@@ -875,10 +887,9 @@ long k_ftell (file *f){
 
 
 // fileno: Return the fd.
-int k_fileno ( file *f ){
-
-    if ( (void *) f == NULL )
-       return EOF;
+int k_fileno ( file *f )
+{
+    if ( (void *) f == NULL ){ return EOF; }
 
     return (int) f->_file;  
 }
@@ -976,16 +987,12 @@ int k_feof ( file *f ){
         return (int) (-1);
 
     } else {
-
         ch = k_fgetc (f);
 
-        if ( ch == EOF )
-        {
+        if ( ch == EOF ){
              return (int) 1;
-
         }else{
-
-            return 0;
+             return 0;
         };
     };
 
@@ -999,15 +1006,13 @@ int k_feof ( file *f ){
 
 /*
  *********************************
- * ferror:
+ * k_ferror:
  *
  */
 
 int k_ferror ( file *f ){
 
-    if ( (void *) f == NULL )
-       return EOF;
-
+    if ( (void *) f == NULL ){ return EOF; }
 
     return (int) ( ( f->_flags & _IOERR ) );
 }
@@ -1188,8 +1193,9 @@ int k_fputc ( int ch, file *f ){
 int k_fscanf (file *f, const char *format, ... )
 {
 	
-    if ( (void *) f == NULL )
-       return EOF;
+    if ( (void *) f == NULL ){
+       return EOF; 
+    }
 
     // #obs:
     // Existe um scanf completo em ring3.
@@ -1234,7 +1240,7 @@ int vfprintf(file *stream, const char *format, va_list ap)
 
 
 /*
- * rewind
+ * k_rewind
  *
  */
 
@@ -1242,8 +1248,7 @@ void k_rewind ( file *f ){
 
     //fseek (f, 0L, SEEK_SET);
 
-    if ( (void *) f == NULL )
-        return;
+    if ( (void *) f == NULL ){ return; }
 
     f->_p = f->_base;
 }
@@ -1428,23 +1433,21 @@ unsigned long input ( unsigned long ch ){
     };
 
 
+    //tem que ter o tamanho de um arquivo.
     if (g_inputmode == INPUT_MODE_MULTIPLE_LINES )
     {
-		//tem que ter o tamanho de um arquivo.
-		if (prompt_pos >= PROMPT_SIZE)
-		{
-	        printf("input: INPUT_MODE_MULTIPLE_LINES full buffer\n");
-	        refresh_screen();
-			return (unsigned long) 0; 
-		}
-    };
+        if (prompt_pos >= PROMPT_SIZE)
+        {
+            printf("input: INPUT_MODE_MULTIPLE_LINES full buffer\n");
+            refresh_screen();
+            return (unsigned long) 0; 
+        }
+    }
 
 
 	// Trata o caractere digitado. 
 
-
-    switch (c)
-    {
+    switch (c){
 
 	    //Enter.
 		//+se for modo comando devemos finalizar com zero.
@@ -1459,22 +1462,20 @@ unsigned long input ( unsigned long ch ){
 				//o compare está no aplicativo.
 	            for(i=0; i<PROMPT_MAX_DEFAULT;i++)
 	            {
-		            prompt[i] = (char) '\0';
+		            prompt[i]     = (char) '\0';
 		            prompt_out[i] = (char) '\0';
 		            prompt_err[i] = (char) '\0';
 	            };
                 prompt_pos = 0;
 				goto input_done;
-			};
+			}
             //modo multiplas linhas 
-		    if (g_inputmode == INPUT_MODE_MULTIPLE_LINES )
-		    {
-			    prompt[prompt_pos] = (char )'\r';
-                prompt_pos++;
-				prompt[prompt_pos] = (char )'\n';
-				prompt_pos++;
-			};
-		    break;
+            if (g_inputmode == INPUT_MODE_MULTIPLE_LINES )
+            {
+                prompt[prompt_pos] = (char )'\r';  prompt_pos++;
+                prompt[prompt_pos] = (char )'\n';  prompt_pos++;
+            }
+            break;
 
 	    //Backspace.
 		case 0x0E:
@@ -1492,12 +1493,13 @@ unsigned long input ( unsigned long ch ){
 			break;
 			
 		//...	
-		
-        //Para qualquer caractere que não sejam os especiais tratados acima.
-		default:
-		    prompt[prompt_pos] = c;
-		    prompt_pos++;          //incrementa fila
-			break;
+
+
+        // Para qualquer caractere que não sejam os especiais tratados acima.
+        default:
+            prompt[prompt_pos] = c;  
+            prompt_pos++;
+            break;
     };
 
 
@@ -1541,7 +1543,7 @@ int stdioInitialize (void){
     int cHeight = get_char_height();
 
     if ( cWidth == 0 || cHeight == 0 ){
-        panic ("klibc-stdioInitialize: Char info");
+        panic ("kstdio-stdioInitialize: Char info");
     }
 
     // Os buffers dos arquivos acima.
@@ -1752,9 +1754,8 @@ int stdioInitialize (void){
         TTY[i].cursor_y = 0;     
         TTY[i].cursor_left = 0; 
         TTY[i].cursor_top = 0;  
-        TTY[i].cursor_right  = (SavedX/cWidth);    
-        TTY[i].cursor_bottom = (SavedY/cHeight);  
-
+        TTY[i].cursor_right  = (SavedX/cWidth); 
+        TTY[i].cursor_bottom = (SavedY/cHeight); 
         TTY[i].cursor_color = COLOR_WHITE;  
     };
 
@@ -1771,16 +1772,21 @@ fail:
 
 
 /*
- * setbuf:
+ *****************************
+ * k_setbuf:
  * 
  */
 
 // see: 
 // https://linux.die.net/man/3/setvbuf
 
-void k_setbuf (file *f, char *buf){
+void k_setbuf (file *f, char *buf)
+{
 
-    if ( (void *) f == NULL ){
+    if ( (void *) f == NULL )
+    {
+        // #todo
+        // Maybe we need a message here.
         return;
 
     }else{
@@ -1808,13 +1814,16 @@ void k_setbuf (file *f, char *buf){
 
 
 /*
- * setbuffer:
+ * k_setbuffer:
  * 
  */
  
 void k_setbuffer (file *f, char *buf, size_t size){
 
-    if ( (void *) f == NULL ){
+    if ( (void *) f == NULL )
+    {
+        // #todo
+        // Maybe we need a message here.
         return;
 
     }else{
@@ -1843,30 +1852,34 @@ void k_setbuffer (file *f, char *buf, size_t size){
 
 
 /*
- * setlinebuf:
+ * k_setlinebuf:
  * 
  */
  
 void k_setlinebuf (file *f)
 {
-    debug_print ("k_setlinebuf: \n");
+    debug_print ("k_setlinebuf: [TODO] \n");
     
     if ( (void *) f == NULL )
+    {
        return;
+    }
 }
 
 
 
 /*
- * setvbuf: 
+ * k_setvbuf: 
  * 
  * 
  */
 
-int k_setvbuf (file *f, char *buf, int mode, size_t size){
+int k_setvbuf (file *f, char *buf, int mode, size_t size)
+{
 
-
-    if ( (void *) f == NULL ){
+    if ( (void *) f == NULL )
+    {
+        // MSG ?
         return -1;
 
     }else{
@@ -1883,7 +1896,7 @@ int k_setvbuf (file *f, char *buf, int mode, size_t size){
         
         // Udate stream.
         f->_bf._base = buf;
-        f->_lbfsize = size;        
+        f->_lbfsize = size; 
         // ?? f->bufmode = mode;
 
         f->_p = buf;

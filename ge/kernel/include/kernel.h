@@ -65,24 +65,25 @@ extern void do_executa_new_task (void);
 #include "globals/gwd.h"   //whatch dogs
 
 
-// klibc
-#include "klibc/cdefs.h"
-#include "klibc/stddef.h"
-#include "klibc/types.h"
-#include "klibc/types2.h"
-#include "klibc/limits.h"
-#include "klibc/kstdio.h"
-#include "klibc/stdlib.h"
-#include "klibc/string.h"
-#include "klibc/ctype.h"
-#include "klibc/iso646.h"
-#include "klibc/signal.h"
-#include "klibc/unistd.h"
-#include "klibc/fcntl.h"
-#include "klibc/ioctl.h"
-#include "klibc/ioctls.h"
-#include "klibc/termios.h"
-#include "klibc/ttydef.h"
+// rtl 
+// Inside the base kernel
+#include "rtl/cdefs.h"
+#include "rtl/stddef.h"
+#include "rtl/types.h"
+#include "rtl/types2.h"
+#include "rtl/limits.h"
+#include "rtl/kstdio.h"
+#include "rtl/stdlib.h"
+#include "rtl/string.h"
+#include "rtl/ctype.h"
+#include "rtl/iso646.h"
+#include "rtl/signal.h"
+#include "rtl/unistd.h"
+#include "rtl/fcntl.h"
+#include "rtl/ioctl.h"
+#include "rtl/ioctls.h"
+#include "rtl/termios.h"
+#include "rtl/ttydef.h"
 
 
 

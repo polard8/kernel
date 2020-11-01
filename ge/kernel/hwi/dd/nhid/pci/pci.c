@@ -1,195 +1,16 @@
 /*
  * File: pci/pci.c
- * 
- * Descrição:
- *     Driver de PCI presente no kernel Base.
  *
- * Ambiente: 
- *     RING 0.
+ *     PCI interface.
+ *     ring0.
  *
  * History:
  *     2013 - Created by Fred Nora.
  */
 
 
-/*
- Wikipedia:
-     
-    One of the major improvements the PCI Local Bus had over other I/O 
-architectures was its configuration mechanism. In addition to the 
-normal memory-mapped and I/O port spaces, each device function 
-on the bus has a configuration space, which is 256 bytes long, 
-addressable by knowing the eight-bit PCI bus, five-bit device, and 
-three-bit function numbers for the device (commonly referred to as the BDF or 
-B/D/F, as abbreviated from bus/device/function). 
-    This allows up to 256 buses, each with up to 32 devices, each supporting 
-eight functions. A single PCI expansion card can respond as a device and 
-must implement at least function number zero. 
-    The first 64 bytes of configuration space are standardized, the remainder 
-are available for vendor-defined purposes.
- 
-    The system's firmware, device drivers or the operating system program the 
-Base Address Registers (commonly called BARs).
- 
-    Because all PCI devices are in an inactive state upon system reset, they 
-will have no addresses assigned to them by which the operating system or 
-device drivers can communicate with them. 
-
-    The BIOS or operating system will program the memory-mapped and I/O port 
-addresses into the device's BAR configuration register. These addresses stay 
-valid as long as the system remains turned on.
-
-    Each non-bridge PCI device function can implement up to 6 BARs, each of 
-which can respond to different addresses in I/O port and memory-mapped 
-address space. Each BAR describes a region.
-
-    The value written to the 'Configuration Space Address I/O port' is created 
-by combining B/D/F values and the registers address value into a 32-bit word.
-
-    ** Methods **
-	Configuration reads and writes can be initiated from the CPU in two ways: 
-    One legacy method via I/O addresses 0xCF8 and 0xCFC, and another called 
-	memory-mapped configuration.
-	
-    The legacy method was present in the original PCI, and it is called 
-Configuration Access Mechanism (CAM). It allows for 256 bytes of a device's 
-address space to be reached indirectly via two 32-bit registers called 
-PCI CONFIG_ADDRESS and PCI CONFIG_DATA. These registers are at addresses 
-0xCF8 and 0xCFC in the x86 I/O address space.
-
-*/ 
-  
-  
-/*
- http://wiki.osdev.org/PCI
- 
- Base Address Registers:
-
-    Base address Registers (or BARs) can be used to hold memory addresses used 
-by the device, or offsets for port addresses. 
- 
-    Typically, memory address BARs need to be located in physical ram while 
-I/O space BARs can reside at any memory address (even beyond physical memory). 
-To distinguish between them, you can check the value of the lowest bit. 
- 
-;----
-    
-    The following tables describe the two types of BARs:
-
-* Memory Space BAR Layout:
-                  31 - 4	          3	         2 - 1	 0
-16-Byte Aligned Base Address	|Prefetchable	|Type	|Always 0
-
-* I/O Space BAR Layout:
-                  31 - 2	    1	        0
-4-Byte Aligned Base Address	| Reserved	| Always 1
-
-;----
-
-    The Type field of the Memory Space BAR Layout specifies the size of the 
-base register and where in memory it can be mapped. 
-* If it has a value of 0x00 then the base register is 32-bits wide and can be 
-mapped anywhere in the 32-bit Memory Space. 
-* A value of 0x02 means the base register is 64-bits wide 
-and can be mapped anywhere in the 64-bit Memory Space (A 64-bit base address 
-register consumes 2 of the base address registers available). 
-* A value of 0x01 is reserved as of revision 3.0 of the PCI Local Bus 
-Specification. 
-
-    In earlier versions it was used to support memory space below 1MB (16-bit 
-wide base register that can be mapped anywhere in the 16-bit Memory Space).
-
- *** 
- When you want to retrieve the actual base address of a BAR, be sure to mask 
- the lower bits. 
- ***
- 
- ------
- Para encontrar o endereço de memória é só mascarar os valores de 16bit encontrados
-na BAR dessa maneira:
-
- For 16-Bit Memory Space BARs, you calculate 
- (BAR[x] & 0xFFF0). 
- 
- For 32-Bit Memory Space BARs, you calculate 
- (BAR[x] & 0xFFFFFFF0). 
- 
- For 64-Bit Memory Space BARs, you calculate 
- ((BAR[x] & 0xFFFFFFF0) + ((BAR[x+1] & 0xFFFFFFFF) << 32)) 
-
- -------
- Para o número da porta de I/O, é só mascarar o BAR dessa maneira:
- 
- For I/O Space BARs, you calculate (BAR[x] & 0xFFFFFFFC).
-
- * IMPORTANTE.
-    Para determinar a quantidade de memória que um dispositivo irá precisar,
-é só salvar o valor da BAR, colocar tudo 1 e ler de volta. A quantidade de 	
-memória poderá ser vista mascarando os bits com um NOT (~) e incrementando
-em 1. Depois disso podemos restaurar o valor original da BAR, que antes 
-foi salvo.
-	
-    ----    
-	To determine the amount of address space needed by a PCI device, you must 
-save the original value of the BAR, write a value of all 1's to the register, 
-then read it back. 
-    The amount of memory can then be determined by masking the information 
-bits, performing a bitwise NOT ('~' in C), and incrementing the value by 1. 
-
-    The original value of the BAR should then be restored. 
-
-    The BAR register is naturally aligned and as such you can only modify 
-the bits that are set. For example, if a device utilizes 16 MB it will have BAR0 
- filled with 0xFF000000 (0x01000000 after decoding) and you can only modify 
- the upper 8-bits.
- */  
-  
-  
-/*
- OSDEV.ORG
-
- Interrupt Line:
-
-    *PIC:
-	If you're using the old PIC, your life is really easy. You have the 
-Interrupt Line field of the header, which is read/write (you can change 
-it's value!) and it says which interrupt will the PCI device fire when 
-it needs attention.
-    
-	*APIC:
-    If you plan to use the I/O APIC, your life will be a nightmare. 
-You have 4 new IRQs called INTA#, INTB#, INTC# and INTD#. You can find which 
-IRQ the device will use in the Interrupt Line field. In the ACPI AML Tables 
-you will find (using ACPICA) that INTA# is connected to a specified interrupt 
-line, INTB# to another, etc...
-
-    So far so good. You have, say, 20 devices. 10 of those are using INTA#, 
-5 for INTB#, 5 for INTC#, and none for INTD#. So when the IRQ number related 
-to #INTC you have to scan the 5 devices to understand who was the interested 
-one. So there is a LOT of IRQ sharing, expecially for INTA#.
-
-* 
-    With time manufacturers started to use mainly INTA#, forgetting the 
-existence of other pins. So you will likely have 18 devices on INTA# and 2 
-on INTB#. 
-    Motherboard manufacturers decided take the situation in control. So at 
-boot the INTx# are remapped, so that you will have 5 devices for INTA#, 
-5 for INTB#, 5 for INTC#, and 5 for INTD# (in the best case). That's great! 
-IRQs are balanced and IRQ sharing is reduced. 
-    The only problem is that you don't know what devices where mapped. If you 
-read the Interrupt Pin you still get INTA#. You now need to parse the MP Tables 
-or the ACPI ones to solve the mess. Good luck.
-
-*/  
-  
-  
-//Lista de alguns dispositivos:  
-//0x2668	82801FB (ICH6) High Definition Audio Controller	0x8086	Intel.
-//0x7113	PIIX4/4E/4M Power Management Controller	0x8086	Intel. 
-//0x2448	Hub Interface to PCI Bridge	0x8086	Intel Corporation  
-//0x27B9	Intel(R) ICH7M/U LPC Interface Controller	0x8086	Intel.
-//0x2000	PCnet LANCE PCI Ethernet Controller	0x1022	Advanced Micro Devices
-//...  
+// See:
+// ./dn_pci.txt
 
 
 #include <kernel.h>
@@ -549,20 +370,22 @@ supports both channels switched to ISA compatibility mode, supports bus masterin
 
 
 //1 mass storage
-//Obs: parece que outra forma de lista é mais apropriado.
-static const char* mass_storage_subclass_strings[] = {
-    "SCSI Bus Controller",          //0x00
-	"IDE Controller",               //0x01
-	"Floppy Disk Controller",       //0x02 
-	"IPI Bus Controller",           //0x03
-	"RAID Controller",              //0x04
-	"ATA Controller",               //0x05 (ATA controller with ADMA interface)
-	"Serial ATA",                   //0x06 (Serial ATA controller)
-	"Serial Attached SCSI (SAS)",   //0x07 (Serial Attached SCSI (SAS) controller)
-	0
-	//0x08 (Non-volatile memory subsystem)
-	//0x09 (Universal Flash Storage (UFS) controller)
-	//0x80 Other Mass Storage Controller
+//Obs: Parece que outra forma de lista é mais apropriado.
+
+static const char *mass_storage_subclass_strings[] = {
+
+    "SCSI Bus Controller",         // 0x00
+    "IDE Controller",              // 0x01
+    "Floppy Disk Controller",      // 0x02 
+    "IPI Bus Controller",          // 0x03
+    "RAID Controller",             // 0x04
+    "ATA Controller",              // 0x05 (ATA controller with ADMA interface)
+    "Serial ATA",                  // 0x06 (Serial ATA controller)
+    "Serial Attached SCSI (SAS)",  // 0x07 (Serial Attached SCSI (SAS) controller)
+    0
+    //0x08 (Non-volatile memory subsystem)
+    //0x09 (Universal Flash Storage (UFS) controller)
+    //0x80 Other Mass Storage Controller
 };
 
 
@@ -716,20 +539,22 @@ static const char* sbc_subclass_strings[] = {
 
 
 /*
+ *****************************************
  * irq_SHARED0: 
  * 
  *     **** PCI HANDLER ****
  *
  *     Todas as interrupções geradas pelos dispositivos PCI
- * usarão o mesmo isr (handler). Caberá à rotina do handler identificar
- * qual dispositivo sinalizou que efetuou uma interrupção. Então direcionar 
+ * usarão o mesmo isr (handler). 
+ *     Caberá à rotina do handler identificar qual dispositivo 
+ * sinalizou que efetuou uma interrupção. Então direcionar 
  * para a rotina de serviço aproriada.
  */
 
 void irq_SHARED0 (void)
 {
     debug_print ("irq_SHARED0:\n");
-	//...
+    //...
     return;
 }
 
@@ -739,16 +564,19 @@ void irq_SHARED0 (void)
  * 
  *     **** PCI HANDLER ****
  *
- *     Todas as interrupções geradas pelos dispositivos PCI
- * usarão o mesmo isr (handler). Cabera à rotina do handler identificar
- * qual dispositivo sinalizou que efetuou uma interrupção. Então direcionar 
- * para a rotina de serviço aproriada.
+ *     **** PCI HANDLER ****
  *
+ *     Todas as interrupções geradas pelos dispositivos PCI
+ * usarão o mesmo isr (handler). 
+ *     Caberá à rotina do handler identificar qual dispositivo 
+ * sinalizou que efetuou uma interrupção. Então direcionar 
+ * para a rotina de serviço aproriada.
  */
+
 void irq_SHARED1 (void)
 {
     debug_print ("irq_SHARED1:\n");
-	//...
+    //...
     return;
 }
 
@@ -758,16 +586,18 @@ void irq_SHARED1 (void)
  * 
  *     **** PCI HANDLER ****
  *
- *     Todas as interrupções geradas pelos dispositivos PCI
- * usarão o mesmo isr (handler). Cabera à rotina do handler identificar
- * qual dispositivo sinalizou que efetuou uma interrupção. Então direcionar 
- * para a rotina de serviço aproriada.
+ *     **** PCI HANDLER ****
  *
+ *     Todas as interrupções geradas pelos dispositivos PCI
+ * usarão o mesmo isr (handler). 
+ *     Caberá à rotina do handler identificar qual dispositivo 
+ * sinalizou que efetuou uma interrupção. Então direcionar 
+ * para a rotina de serviço aproriada.
  */
 void irq_SHARED2 (void)
 {
     debug_print ("irq_SHARED2:\n");
-	//...
+    //...
     return;
 }
 
@@ -777,9 +607,12 @@ void irq_SHARED2 (void)
  * 
  *     **** PCI HANDLER ****
  *
+ *     **** PCI HANDLER ****
+ *
  *     Todas as interrupções geradas pelos dispositivos PCI
- * usarão o mesmo isr (handler). Cabera à rotina do handler identificar
- * qual dispositivo sinalizou que efetuou uma interrupção. Então direcionar 
+ * usarão o mesmo isr (handler). 
+ *     Caberá à rotina do handler identificar qual dispositivo 
+ * sinalizou que efetuou uma interrupção. Então direcionar 
  * para a rotina de serviço aproriada.
  */
 
@@ -789,9 +622,6 @@ void irq_SHARED3 (void)
 	//...
     return;
 }
-
-
-
 
 
 /**
@@ -835,16 +665,19 @@ static __inline void pci_write_dword(int busno, int devno, int funcno, int addr,
 
 
 /*
+ ********************************************************
  * pciConfigReadByte:
  *     Read com retorno do tipo unsigned char.
  */
 
 unsigned char 
-pciConfigReadByte ( unsigned char bus, 
-                    unsigned char slot, 
-                    unsigned char func, 
-                    unsigned char offset )
+pciConfigReadByte ( 
+    unsigned char bus, 
+    unsigned char slot, 
+    unsigned char func, 
+    unsigned char offset )
 {
+
 	// Montando uma unsigned long.
 	// Bus, Device and Function.
 
@@ -890,6 +723,7 @@ pciConfigReadByte ( unsigned char bus,
 
 
 /*
+ *******************************
  * pciConfigReadWord:
  *    Read com retorno do tipo unsigned short.
  *    Envia o comando (32bit) para a porta 0xCF8, e retorna o status (16bit) 
@@ -916,11 +750,13 @@ pciConfigReadByte ( unsigned char bus,
  */
 
 unsigned short 
-pciConfigReadWord ( unsigned char bus, 
-                    unsigned char slot, 
-                    unsigned char func, 
-                    unsigned char offset )
+pciConfigReadWord ( 
+    unsigned char bus, 
+    unsigned char slot, 
+    unsigned char func, 
+    unsigned char offset )
 {
+
 	// Montando uma unsigned long.
 	// Bus, Device and Function.
 
@@ -928,10 +764,10 @@ pciConfigReadWord ( unsigned char bus,
     unsigned long lslot = (unsigned long) slot; 
     unsigned long lfunc = (unsigned long) func; 
 
-	//O endereço a ser montado e enviado para porta 0xCF8.
-	unsigned long address;   
+	// O endereço a ser montado e enviado para porta 0xCF8.
+    unsigned long address;   
 
-	//Retorno armazenado na porta de status.
+	// Retorno armazenado na porta de status.
     unsigned short Ret = 0;             
 
 	// #todo: 
@@ -960,21 +796,24 @@ pciConfigReadWord ( unsigned char bus,
     // Obs: 
     // (offset & 2) * 8) = 0 Will choose the first word of the 32 bits register.   
 
-
     return (unsigned short) Ret; 
 }
 
 
 /* 
+ *****************************
  * pciConfigReadDWord:
- *     Read com retorno do tipo unsigned long. */
+ *     Read com retorno do tipo unsigned long. 
+ */
 
 unsigned long 
-pciConfigReadDWord ( unsigned char bus, 
-                     unsigned char slot, 
-                     unsigned char func, 
-                     unsigned char offset )
+pciConfigReadDWord ( 
+    unsigned char bus, 
+    unsigned char slot, 
+    unsigned char func, 
+    unsigned char offset )
 {
+
 	// Montando uma unsigned long.
 	// Bus, Device and Function.
 
@@ -1012,19 +851,19 @@ pciConfigReadDWord ( unsigned char bus,
     // Obs: 
     // (offset & 2) * 8) = 0 Will choose the first word of the 32 bits register.
 
-
     return (unsigned long) Ret; 
 }
 
 
 /*
+ ************************************************
  * pciCheckVendor:
  *     Check vendor, offset 0. 
  */
 
-	// #todo: 
-	// Nesse momento não há nenhume busca por fuction.
-	// Vendor.
+// #todo: 
+// Nesse momento não há nenhume busca por fuction.
+// Vendor.
 
 unsigned short 
 pciCheckVendor (unsigned char bus, unsigned char slot)
@@ -1035,13 +874,14 @@ pciCheckVendor (unsigned char bus, unsigned char slot)
 
 
 /*
+ *****************************************
  * pciCheckDevice:
  *     Check device, offset 2. 
  */
 
-	// #todo: 
-	// Nesse momento não há nenhume busca por fuction. 
-	// Device.
+// #todo: 
+// Nesse momento não há nenhume busca por fuction. 
+// Device.
 
 unsigned short 
 pciCheckDevice (unsigned char bus, unsigned char slot)
@@ -1068,6 +908,7 @@ pciGetClassCode (unsigned char bus, unsigned char slot)
 
 
 /*
+ *****************************************
  * pciGetSubClass:
  *     Get subclass code. Offset 0x0A.
  */
@@ -1084,6 +925,7 @@ pciGetSubClass (unsigned char bus, unsigned char slot)
 
 
 /*
+ **********************************
  * pciGetHeaderType:
  * 
  */
@@ -1135,22 +977,26 @@ pciGetHeaderType (unsigned char bus, unsigned char slot)
  */
 
 unsigned long 
-pciGetBAR ( unsigned char bus, 
-            unsigned char slot, 
-            int number )
+pciGetBAR ( 
+    unsigned char bus, 
+    unsigned char slot, 
+    int number )
 {
+
     unsigned long BAR = 0;
 
 	// #todo: 
 	// Filtros para argumentos.
 
-    if ( number <0 || number > 5 ){
+    if ( number <0 || number > 5 )
+    {
+        // ?? msg
         return 0;
     }
 
 
-    switch (number)
-    {
+    switch (number){
+
         case 0:
             BAR = (unsigned long) pciConfigReadDWord ( bus, 
                                       slot, 
@@ -1201,11 +1047,12 @@ pciGetBAR ( unsigned char bus,
 
 
         default:
+            // ??
             return 0;
             break;
     };
 
-	//Nothing.
+	// Nothing.
 
 done:
     return (unsigned long) BAR;
@@ -1219,14 +1066,16 @@ done:
 
 
 /*
+ *******************************************
  * pciGetInterruptLine:
  *     Get Interrupt Line, offset 0x3C.
  *     (Read an write register).
  */
 
 unsigned char 
-pciGetInterruptLine ( unsigned char bus, 
-                      unsigned char slot )
+pciGetInterruptLine ( 
+    unsigned char bus, 
+    unsigned char slot )
 {
     return (unsigned char) pciConfigReadByte ( bus, slot, 0, 
                                PCI_OFFSET_INTERRUPTLINE );
@@ -1235,13 +1084,15 @@ pciGetInterruptLine ( unsigned char bus,
 
 
 /*
+ *************************************
  * pciGetInterruptPin:
  *     Get interrupt pin offser 3d (Read only).
  */
 
 unsigned char 
-pciGetInterruptPin ( unsigned char bus, 
-                     unsigned char slot )
+pciGetInterruptPin ( 
+    unsigned char bus, 
+    unsigned char slot )
 {
     return (unsigned char) pciConfigReadByte ( bus, slot, 0, 
                               PCI_OFFSET_INTERRUPTPIN );
@@ -1261,20 +1112,25 @@ pciGetInterruptPin ( unsigned char bus,
  */
 
 int 
-pciHandleDevice ( unsigned char bus, 
-                  unsigned char dev, 
-                  unsigned char fun )
+pciHandleDevice ( 
+    unsigned char bus, 
+    unsigned char dev, 
+    unsigned char fun )
 { 
-    uint32_t data;
+    // Device.
+    struct pci_device_d *D;    
+
+    uint32_t data=0;
 
     int Status = -1;
-
-	//Device.
-    struct pci_device_d *D;    
     
     // char, block, network
     int __class;
     
+    // name support.
+    char __tmpname[64];
+    char *newname;
+
 
 	//#debug
 	//printf ("bus=%d dev=%d fun=%d \n", bus, dev, fun);
@@ -1282,52 +1138,61 @@ pciHandleDevice ( unsigned char bus,
 
     D = (void *) kmalloc ( sizeof( struct pci_device_d  ) );
 
-    if ( (void *) D == NULL )
-    {
+    if ( (void *) D == NULL ){
         panic ("pciHandleDevice: D");
+
     }else{
 
-		//Object support.
-		D->objectType = ObjectTypePciDevice;
-		D->objectClass = ObjectClassKernelObjects;
-		
-		//Identificador.
-		D->id = (int) pciListOffset;
-		D->used = (int) 1;
-		D->magic = (int) 1234;
-		//D->name = "No name";
+        // Object support.
+        D->objectType = ObjectTypePciDevice;
+        D->objectClass = ObjectClassKernelObjects;
 
-		//Localização.
-		D->bus = (unsigned char) bus;
-		D->dev = (unsigned char) dev;
-		D->func = (unsigned char) fun; 
+        // Identificador.
+        D->id = (int) pciListOffset;
+        D->used  = (int) 1;
+        D->magic = (int) 1234;
+        //D->name = "No name";
 
-		//Pci Header.
-		D->Vendor = (unsigned short) pciCheckVendor (bus, dev);
-		D->Device = (unsigned short) pciCheckDevice (bus, dev);
-		
-		D->name = "pci-device-no-name";
-		
+        // Localização.
+        D->bus  = (unsigned char) bus;
+        D->dev  = (unsigned char) dev;
+        D->func = (unsigned char) fun; 
+
+        // PCI Header.
+        D->Vendor = (unsigned short) pciCheckVendor (bus, dev);
+        D->Device = (unsigned short) pciCheckDevice (bus, dev);
+
+        D->name = "pci-device-no-name";
+
+
 		// #debug
 		// printf ("$ vendor=%x device=%x \n",D->Vendor, D->Device);
-		
-		//#isso funcionou
-		data  = (uint32_t) diskReadPCIConfigAddr ( bus, dev, fun, 8 );
-		D->classCode  = data >> 24 & 0xff;
-		D->subclass   = data >> 16 & 0xff;
+
+        //OK, it is working
+        data  = (uint32_t) diskReadPCIConfigAddr ( bus, dev, fun, 8 );
+        D->classCode  = data >> 24 & 0xff;
+        D->subclass   = data >> 16 & 0xff;
 
 		//#bugbug: Isso falhou. Deletar isso e trabalhar essas funções.
 		//D->classCode = (unsigned char) pciGetClassCode(bus, dev);
 		//D->subclass = (unsigned char) pciGetSubClass(bus, dev); 
 
-		D->irq_line = (unsigned char) pciGetInterruptLine (bus, dev);
-		D->irq_pin = (unsigned char) pciGetInterruptPin (bus, dev);
+        D->irq_line = (unsigned char) pciGetInterruptLine (bus, dev);
+        D->irq_pin  = (unsigned char) pciGetInterruptPin (bus, dev);
 
-		D->next = NULL;   //Next device.
+        // Next device.
+        D->next = NULL; 
 
-		//
-		// NIC Intel.
-		//
+
+        // nvidia
+        // if ( (D->Vendor == 0x10DE) )
+        // {
+        // }
+
+
+        //
+        // == NIC Intel. ===================
+        //
 
         if ( (D->Vendor == 0x8086)  && 
              (D->Device == 0x100E ) && 
@@ -1340,7 +1205,8 @@ pciHandleDevice ( unsigned char bus,
 
             //See: network/nicintel.c
 
-            Status = (int) e1000_init_nic ( (unsigned char) D->bus, 
+            Status = (int) e1000_init_nic ( 
+                               (unsigned char) D->bus, 
                                (unsigned char) D->dev, 
                                (unsigned char) D->func, 
                                (struct pci_device_d *) D );
@@ -1357,7 +1223,7 @@ pciHandleDevice ( unsigned char bus,
                 //testNIC();
                 printf ("pciHandleDevice: Unlocking interrupt handler \n");
                 e1000_interrupt_flag = 1;
-	
+
                 //printf("8086:100e done\n");
                 //printf("#debug breakpoint");
                 //refresh_screen();
@@ -1367,15 +1233,10 @@ pciHandleDevice ( unsigned char bus,
                 __class = 3;
  
             }else{
-
-                panic ("pciHandleDevice: #debug NIC");
+                panic ("pciHandleDevice: NIC Intel [0x8086:0x100E]");
             };
         };
 
-
-        //
-        // 
-        //
 
         // 8086:1237
         // 440FX - 82441FX PMC [Natoma] - Intel Corporation
@@ -1402,17 +1263,18 @@ pciHandleDevice ( unsigned char bus,
             debug_print ("0x8086:0x7000 found \n");  
 
             // See: usb.c
-            Status = (int) serial_bus_controller_init ( (unsigned char) D->bus, 
+            Status = (int) serial_bus_controller_init ( 
+                               (unsigned char) D->bus, 
                                (unsigned char) D->dev, 
                                (unsigned char) D->func, 
                                (struct pci_device_d *) D );
                                
              if (Status == 0)
              {
-				 //...
+                 // ...
              }else{
-                 panic ("pciHandleDevice: #debug Serial controller\n");
-             }     
+                 panic ("pciHandleDevice: Serial controller [0x8086:0x7000]\n");
+             };
         }
 
 
@@ -1423,47 +1285,54 @@ pciHandleDevice ( unsigned char bus,
         //{}
 
 
-
-       
-
-
 		//Colocar a estrutura na lista.
 
-		//#todo: Limits
-		//#bugbug: limite determinado ... 
-		//precisa de variável.
-		
-		if ( pciListOffset < 0 || pciListOffset >= 32 )
-		{ 
-			printf ("pciHandleDevice: No more slots!\n");
-			return -1;
-		}
+		// #todo: Limits
+		// #bugbug: limite determinado ... 
+		// precisa de variável.
 
+        if ( pciListOffset < 0 || pciListOffset >= 32 )
+        { 
+            printf ("pciHandleDevice: [FAIL] No more slots!\n");
+            return (int) (-1);
+        }
 
-		pcideviceList[pciListOffset] = (unsigned long) D;
-		pciListOffset++;
-		
-		//#debug
-		//printf("$");
+        // Saving.
+        pcideviceList[pciListOffset] = (unsigned long) D;
+        pciListOffset++;
 
-	};
-
+        // #debug
+        //printf("$");
+    };
 
     //
-    // name
+    // == Name ==============================================
     //
     
-    char __tmpname[64];
+    // #bugbug
+    // buffer overflow?
     
-    //#test
+    // #test
     // isso não é o ponto de montagem.
-    sprintf( (char *) &__tmpname[0], "/DEV_%x_%x", D->Vendor,D->Device );
     
-    char *newname = (char *) kmalloc (64);
+    //buffer1.
+    sprintf ( 
+        (char *) &__tmpname[0], 
+        "/DEV_%x_%x", 
+        D->Vendor, 
+        D->Device );
+
+    //buffer2.
+    newname = (char *) kmalloc (64);
     if ( (void*) newname == NULL )
+    {
         panic("pciHandleDevice: newname");
+    }
     strcpy (newname,__tmpname);
 
+    //
+    // == file ====================================
+    //
 
     //
     // Agora registra o dispositivo pci na lista genérica
@@ -1479,12 +1348,9 @@ pciHandleDevice ( unsigned char bus,
         panic ("pciHandleDevice: __file fail, can't register device");
     
     }else{
-
         __file->used = 1;
         __file->magic = 1234;
-
         __file->isDevice = 1;
-
 
         //
         // Register.
@@ -1496,16 +1362,13 @@ pciHandleDevice ( unsigned char bus,
         // Mas podemos ter mais de um nome.
         // vamos criar uma string aqui usando sprint e depois duplicala.
      
-        
-        devmgr_register_device ( (file *) __file, 
-             newname,                    // device name.                  
-             __class,                    //class (char, block, network)
-             1,                          //type (pci, legacy
-             (struct pci_device_d *) D,  //pci device
-             NULL );                     //tty driver
-    
+        // IN:
+        // file structure, device name, class (char,block,network).
+        // type (pci, legacy), pci device structure, tty driver struct.
+ 
+        devmgr_register_device ( (file *) __file, newname, __class, 
+            1, (struct pci_device_d *) D, NULL );
     };
-
 
     return 0;
 }
@@ -1526,10 +1389,10 @@ pciHandleDevice ( unsigned char bus,
 int init_pci (void){
 
     int Status = 0;
-    int Index=0;
+    int i=0;
     int Max = 32;   //@todo.
 
-    unsigned long data;
+    unsigned long data=0;
 
 
     debug_print ("init_pci:\n");
@@ -1547,21 +1410,19 @@ int init_pci (void){
 	//Talvez seja um 386 ou 486 sem suporte a PCI.
 	//Talvez ISA.
 
-    if ( data != 0x80000000 )
-    {
+    if ( data != 0x80000000 ){
+
         pci_supported = 0;
 
         //STATUS_NOT_SUPPORTED
         panic ("init_pci: PCI NOT supported\n");
 
     }else{
-
         pci_supported = 1;
 
         //STATUS_SUCCESS
         //printf("PCI supported!");
     };
-
 
 	//#todo: 
 	//Colocar esse status na estrutura platform->pci_supported.
@@ -1578,8 +1439,8 @@ int init_pci (void){
     // Initialise PCI device list.
     // Initialise the offset.
 
-    for ( Index=0; Index<Max; Index++ ){
-        pcideviceList[Index] = (unsigned long) 0;
+    for ( i=0; i<Max; i++ ){
+        pcideviceList[i] = (unsigned long) 0;
     };
 
     pciListOffset = 0;
@@ -1588,16 +1449,13 @@ int init_pci (void){
 	// Encontrar os dispositivos PCI e salvar as informações sobre eles
 	// em suas respectivas estruturas.
 
-    Status = (int) pci_setup_devices (); 
-
+    Status = (int) pci_setup_devices();
+    
     if (Status != 0){
-        panic ("init_pci:\n");
+        panic ("init_pci: pci_setup_devices fail.\n");
     }
 
-
-
     //...
-
 
     g_driver_pci_initialized = (int) 1; 
 

@@ -25,26 +25,6 @@
 
 
 
-// Indices into c_cc array.  
-// Default values in parentheses. POSIX Table 7-5. 
-#define VEOF           0	/* cc_c[VEOF] = EOF char (^D) */
-#define VEOL           1	/* cc_c[VEOL] = EOL char (undef) */
-#define VERASE         2	/* cc_c[VERASE] = ERASE char (^H) */
-#define VINTR          3	/* cc_c[VINTR] = INTR char (DEL) */
-#define VKILL          4	/* cc_c[VKILL] = KILL char (^U) */
-#define VMIN           5	/* cc_c[VMIN] = MIN value for timer */
-#define VQUIT          6	/* cc_c[VQUIT] = QUIT char (^\) */
-#define VTIME          7	/* cc_c[VTIME] = TIME value for timer */
-#define VSUSP          8	/* cc_c[VSUSP] = SUSP (^Z, ignored) */
-#define VSTART         9	/* cc_c[VSTART] = START char (^S) */
-#define VSTOP         10	/* cc_c[VSTOP] = STOP char (^Q) */
-#define VERASEWORD    14	/* cc_c[VERASEWORD] = ERASEWORD char (^W) */
-
-// Size of cc_c array, some extra space for extensions.
-#define  NCCS  20
-
-
-
 
 
 /* Terminal input output data types. */
@@ -82,23 +62,46 @@ Macro: int NCCS
     The value of this macro is the number of elements in the c_cc array. 
 */
 
-/*
-tcflag_t c_iflag;      // input modes 
-tcflag_t c_oflag;      // output modes 
-tcflag_t c_cflag;      // control modes 
-tcflag_t c_lflag;      // local modes 
-cc_t     c_cc[NCCS];   // special characters 
-*/
 
-
-/*
 struct winsize {
-	unsigned short ws_row;
-	unsigned short ws_col;
-	unsigned short ws_xpixel;
-	unsigned short ws_ypixel;
+
+    unsigned short ws_row;
+    unsigned short ws_col;
+    unsigned short ws_xpixel;
+    unsigned short ws_ypixel;
+
 };
-*/
+
+
+
+// Indices into c_cc array.  
+// Default values in parentheses. POSIX Table 7-5. 
+#define VEOF           0	/* cc_c[VEOF] = EOF char (^D) */
+#define VEOL           1	/* cc_c[VEOL] = EOL char (undef) */
+#define VERASE         2	/* cc_c[VERASE] = ERASE char (^H) */
+#define VINTR          3	/* cc_c[VINTR] = INTR char (DEL) */
+#define VKILL          4	/* cc_c[VKILL] = KILL char (^U) */
+#define VMIN           5	/* cc_c[VMIN] = MIN value for timer */
+#define VQUIT          6	/* cc_c[VQUIT] = QUIT char (^\) */
+#define VTIME          7	/* cc_c[VTIME] = TIME value for timer */
+#define VSUSP          8	/* cc_c[VSUSP] = SUSP (^Z, ignored) */
+#define VSTART         9	/* cc_c[VSTART] = START char (^S) */
+#define VSTOP         10	/* cc_c[VSTOP] = STOP char (^Q) */
+#define VERASEWORD    14	/* cc_c[VERASEWORD] = ERASEWORD char (^W) */
+
+
+
+
+#define NCC 8
+struct termio {
+	unsigned short c_iflag;		//input mode flags 
+	unsigned short c_oflag;		//output mode flags 
+	unsigned short c_cflag;		//control mode flags 
+	unsigned short c_lflag;		//local mode flags 
+	unsigned char c_line;		//line discipline 
+	unsigned char c_cc[NCC];	//control characters /
+};
+
 
 
 //https://www.mkssoftware.com/docs/man5/struct_termios.5.asp
@@ -111,18 +114,19 @@ struct winsize {
 /*
  * Terminal IO options.
  */
-     
+
+// Size of cc_c array, some extra space for extensions.
+#define  NCCS  20
 struct termios 
 {
-    tcflag_t c_iflag;     // input modes 
-    tcflag_t c_oflag;     // output modes 
-    tcflag_t c_cflag;     // control modes 
-    tcflag_t c_lflag;     // local modes 
-  
-    speed_t  c_ispeed;    // input speed 
-    speed_t  c_ospeed;    // output speed 
-  
-    cc_t c_cc[NCCS];      // control characters 
+    tcflag_t c_iflag;      // input modes 
+    tcflag_t c_oflag;      // output modes 
+    tcflag_t c_cflag;      // control modes 
+    tcflag_t c_lflag;      // local modes 
+    //unsigned char c_line;  // line discipline (linux?) 
+    cc_t c_cc[NCCS];       // control characters 
+    speed_t  c_ispeed;     // input speed 
+    speed_t  c_ospeed;     // output speed 
 };
 
 
@@ -248,6 +252,24 @@ struct termios
 #define  TCION   4  /* transmit a START character on the line */
 
 
+
+/* modem lines */
+/*
+#define TIOCM_LE	0x001
+#define TIOCM_DTR	0x002
+#define TIOCM_RTS	0x004
+#define TIOCM_ST	0x008
+#define TIOCM_SR	0x010
+#define TIOCM_CTS	0x020
+#define TIOCM_CAR	0x040
+#define TIOCM_RNG	0x080
+#define TIOCM_DSR	0x100
+#define TIOCM_CD	TIOCM_CAR
+#define TIOCM_RI	TIOCM_RNG
+#define TIOCM_OUT1	0x2000
+#define TIOCM_OUT2	0x4000
+#define TIOCM_LOOP	0x8000
+*/
 
 #endif /* _TERMIOS_H */
 

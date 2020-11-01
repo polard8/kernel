@@ -1,0 +1,184 @@
+
+//Lista de alguns dispositivos:  
+//0x2668	82801FB (ICH6) High Definition Audio Controller	0x8086	Intel.
+//0x7113	PIIX4/4E/4M Power Management Controller	0x8086	Intel. 
+//0x2448	Hub Interface to PCI Bridge	0x8086	Intel Corporation  
+//0x27B9	Intel(R) ICH7M/U LPC Interface Controller	0x8086	Intel.
+//0x2000	PCnet LANCE PCI Ethernet Controller	0x1022	Advanced Micro Devices
+//...  
+
+
+/*
+ Wikipedia:
+     
+    One of the major improvements the PCI Local Bus had over other I/O 
+architectures was its configuration mechanism. In addition to the 
+normal memory-mapped and I/O port spaces, each device function 
+on the bus has a configuration space, which is 256 bytes long, 
+addressable by knowing the eight-bit PCI bus, five-bit device, and 
+three-bit function numbers for the device (commonly referred to as the BDF or 
+B/D/F, as abbreviated from bus/device/function). 
+    This allows up to 256 buses, each with up to 32 devices, each supporting 
+eight functions. A single PCI expansion card can respond as a device and 
+must implement at least function number zero. 
+    The first 64 bytes of configuration space are standardized, the remainder 
+are available for vendor-defined purposes.
+ 
+    The system's firmware, device drivers or the operating system program the 
+Base Address Registers (commonly called BARs).
+ 
+    Because all PCI devices are in an inactive state upon system reset, they 
+will have no addresses assigned to them by which the operating system or 
+device drivers can communicate with them. 
+
+    The BIOS or operating system will program the memory-mapped and I/O port 
+addresses into the device's BAR configuration register. These addresses stay 
+valid as long as the system remains turned on.
+
+    Each non-bridge PCI device function can implement up to 6 BARs, each of 
+which can respond to different addresses in I/O port and memory-mapped 
+address space. Each BAR describes a region.
+
+    The value written to the 'Configuration Space Address I/O port' is created 
+by combining B/D/F values and the registers address value into a 32-bit word.
+
+    ** Methods **
+    Configuration reads and writes can be initiated from the CPU in two ways: 
+    One legacy method via I/O addresses 0xCF8 and 0xCFC, and another called 
+    memory-mapped configuration.
+
+    The legacy method was present in the original PCI, and it is called 
+Configuration Access Mechanism (CAM). It allows for 256 bytes of a device's 
+address space to be reached indirectly via two 32-bit registers called 
+PCI CONFIG_ADDRESS and PCI CONFIG_DATA. These registers are at addresses 
+0xCF8 and 0xCFC in the x86 I/O address space.
+
+*/ 
+
+/*
+ http://wiki.osdev.org/PCI
+ 
+ Base Address Registers:
+
+    Base address Registers (or BARs) can be used to hold memory addresses used 
+by the device, or offsets for port addresses. 
+ 
+    Typically, memory address BARs need to be located in physical ram while 
+I/O space BARs can reside at any memory address (even beyond physical memory). 
+To distinguish between them, you can check the value of the lowest bit. 
+ 
+;----
+    
+    The following tables describe the two types of BARs:
+
+* Memory Space BAR Layout:
+                  31 - 4	          3	         2 - 1	 0
+16-Byte Aligned Base Address	|Prefetchable	|Type	|Always 0
+
+* I/O Space BAR Layout:
+                  31 - 2	    1	        0
+4-Byte Aligned Base Address	| Reserved	| Always 1
+
+;----
+
+    The Type field of the Memory Space BAR Layout specifies the size of the 
+base register and where in memory it can be mapped. 
+* If it has a value of 0x00 then the base register is 32-bits wide and can be 
+mapped anywhere in the 32-bit Memory Space. 
+* A value of 0x02 means the base register is 64-bits wide 
+and can be mapped anywhere in the 64-bit Memory Space (A 64-bit base address 
+register consumes 2 of the base address registers available). 
+* A value of 0x01 is reserved as of revision 3.0 of the PCI Local Bus 
+Specification. 
+
+    In earlier versions it was used to support memory space below 1MB (16-bit 
+wide base register that can be mapped anywhere in the 16-bit Memory Space).
+
+ *** 
+ When you want to retrieve the actual base address of a BAR, be sure to mask 
+ the lower bits. 
+ ***
+ 
+ ------
+ Para encontrar o endereço de memória é só mascarar os valores de 16bit encontrados
+na BAR dessa maneira:
+
+ For 16-Bit Memory Space BARs, you calculate 
+ (BAR[x] & 0xFFF0). 
+ 
+ For 32-Bit Memory Space BARs, you calculate 
+ (BAR[x] & 0xFFFFFFF0). 
+ 
+ For 64-Bit Memory Space BARs, you calculate 
+ ((BAR[x] & 0xFFFFFFF0) + ((BAR[x+1] & 0xFFFFFFFF) << 32)) 
+
+ -------
+ Para o número da porta de I/O, é só mascarar o BAR dessa maneira:
+ 
+ For I/O Space BARs, you calculate (BAR[x] & 0xFFFFFFFC).
+
+ * IMPORTANTE.
+    Para determinar a quantidade de memória que um dispositivo irá precisar,
+é só salvar o valor da BAR, colocar tudo 1 e ler de volta. A quantidade de 	
+memória poderá ser vista mascarando os bits com um NOT (~) e incrementando
+em 1. Depois disso podemos restaurar o valor original da BAR, que antes 
+foi salvo.
+	
+    ----    
+	To determine the amount of address space needed by a PCI device, you must 
+save the original value of the BAR, write a value of all 1's to the register, 
+then read it back. 
+    The amount of memory can then be determined by masking the information 
+bits, performing a bitwise NOT ('~' in C), and incrementing the value by 1. 
+
+    The original value of the BAR should then be restored. 
+
+    The BAR register is naturally aligned and as such you can only modify 
+the bits that are set. For example, if a device utilizes 16 MB it will have BAR0 
+ filled with 0xFF000000 (0x01000000 after decoding) and you can only modify 
+ the upper 8-bits.
+ */  
+
+
+/*
+ OSDEV.ORG
+
+ Interrupt Line:
+
+    *PIC:
+	If you're using the old PIC, your life is really easy. You have the 
+Interrupt Line field of the header, which is read/write (you can change 
+it's value!) and it says which interrupt will the PCI device fire when 
+it needs attention.
+    
+	*APIC:
+    If you plan to use the I/O APIC, your life will be a nightmare. 
+You have 4 new IRQs called INTA#, INTB#, INTC# and INTD#. You can find which 
+IRQ the device will use in the Interrupt Line field. In the ACPI AML Tables 
+you will find (using ACPICA) that INTA# is connected to a specified interrupt 
+line, INTB# to another, etc...
+
+    So far so good. You have, say, 20 devices. 10 of those are using INTA#, 
+5 for INTB#, 5 for INTC#, and none for INTD#. So when the IRQ number related 
+to #INTC you have to scan the 5 devices to understand who was the interested 
+one. So there is a LOT of IRQ sharing, expecially for INTA#.
+
+* 
+    With time manufacturers started to use mainly INTA#, forgetting the 
+existence of other pins. So you will likely have 18 devices on INTA# and 2 
+on INTB#. 
+    Motherboard manufacturers decided take the situation in control. So at 
+boot the INTx# are remapped, so that you will have 5 devices for INTA#, 
+5 for INTB#, 5 for INTC#, and 5 for INTD# (in the best case). That's great! 
+IRQs are balanced and IRQ sharing is reduced. 
+    The only problem is that you don't know what devices where mapped. If you 
+read the Interrupt Pin you still get INTA#. You now need to parse the MP Tables 
+or the ACPI ones to solve the mess. Good luck.
+
+*/  
+
+
+
+
+ 
+
