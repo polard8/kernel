@@ -42,8 +42,15 @@ struct boot_block_d BootBlock;
 // =====================================================
 //
 
-// ??
-int gdefTesting;
+
+// main flags.
+int gdefLegacyBIOSBoot;
+int gdefEFIBoot;
+int gdefSafeBoot;
+int gdefShowLogo;
+int gdefShowProgressBar;
+//...
+
 
 
 // + Objects.

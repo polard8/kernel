@@ -16,12 +16,18 @@ unsigned long progressbar_width;
 unsigned long progressbar_height;
 unsigned long progressbar_offset;
 
+
 // #bugbug
 // This is a 'designer' thing.
 // We can move this to the view/ folder.
-void CreateProgressBar(void)
+
+void CreateProgressBar (void)
 {
 
+    if ( gdefShowProgressBar == FALSE ){
+        return;
+    }
+    
     // 5 = full gui
     if ( current_runlevel != 5 ){
         return;
@@ -51,6 +57,10 @@ void CreateProgressBar(void)
 
 void IncrementProgressBar(void)
 {
+    if ( gdefShowProgressBar == FALSE ){
+        return;
+    }
+
     // 5 = full gui
     if ( current_runlevel != 5 ){
         return;

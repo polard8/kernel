@@ -143,12 +143,19 @@ ____go:
  *     This is the entrypoint for the C part of the boot loader.
  *     Initializes, loads the kernel image and returns to head.s.
  */
- 
-//void BlMain( int argc, char *argv[], char *envp[] ) 
 
-void BlMain (){
+void BlMain (void){
 
     int Status = (-1);
+
+    // main flags.
+    gdefLegacyBIOSBoot = FALSE;
+    gdefEFIBoot = FALSE;
+    gdefSafeBoot = FALSE;
+    gdefShowLogo = FALSE;
+    gdefShowProgressBar = FALSE;
+    // ...
+
 
     // Set GUI.
     // VideoBlock.useGui = 1;
@@ -364,8 +371,7 @@ void BlLoadKernel(void){
 
     Status = (int) load_kernel();
 
-    if ( Status != 0 )
-    {
+    if ( Status != 0 ){
         printf ("BlLoadKernel:\n");
         die();
     }

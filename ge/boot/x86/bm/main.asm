@@ -1043,6 +1043,13 @@ xxx_turnoffFDCMotor:
     mov dx, 3F2h 
     mov al, 0 
     out dx, al
+    
+;; #test
+xxx_setupPS2Mouse:
+
+    ; reset PS/2 mouse
+    mov  ax, 0c201h              
+    int  15h
 
 xxx_setupRegisters:
 

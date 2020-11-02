@@ -121,6 +121,10 @@ unsigned long blSavedCylinders;
 
 
 
+int gdefShowLogo;
+int gdefShowProgressBar;
+//...
+
 /*
  * Os Type:
  *     O sistema operacional pode ser usado como servidor.

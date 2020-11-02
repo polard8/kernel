@@ -593,7 +593,7 @@ void init_globals();
 void boot(); 
 
 
-							
+
 //
 // Text support.
 //

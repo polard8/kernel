@@ -49,6 +49,11 @@ int kernel_main (int arch_type){
 
     // Kernel status.
     KernelStatus = KERNEL_NULL;
+    
+    gdefShowLogo = FALSE;
+    gdefShowProgressBar = TRUE;
+    // ...
+    
 
 
     // #bugbug
