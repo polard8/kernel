@@ -8,7 +8,6 @@
 #obs: #bugbug tem que arrumas as coisas aqui.
 
 
-
 VERSION = 0
 PATCHLEVEL = 0
 SUBLEVEL = 0
@@ -32,20 +31,16 @@ CFLAGS = -m32 \
 	-fno-stack-protector \
 	-s \
 	-Werror=strict-prototypes    
-	
 
 
 LIBC    = ../../../ge/rtl/include/
 LIBCOBJ = ../../../ge/rtl/obj
 
 
-	##
-	## Objects
-	##
-
-myObjects = crt0.o main.o \
+#Objects
+myObjects = crt0.o main.o rtl.o \
 ctype.o stdio.o stdlib.o string.o \
-unistd.o termios.o ioctl.o fcntl.o rtl.o    
+unistd.o termios.o ioctl.o fcntl.o     
 
 
 
@@ -59,10 +54,8 @@ main.o:
 	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -o main.o
 
 all-c:
-
 	cp $(LIBCOBJ)/crt0.o   .
 	cp $(LIBCOBJ)/rtl.o  .
-
 
 	cp $(LIBCOBJ)/ctype.o   .
 	cp $(LIBCOBJ)/stdio.o .
@@ -73,13 +66,8 @@ all-c:
 	cp $(LIBCOBJ)/ioctl.o  .
 	cp $(LIBCOBJ)/fcntl.o  .
 
-
-
 jackpot-link:
 	ld -m elf_i386 -T ../link.ld -o REBOOT.BIN $(myObjects)    
-
-
-
 
 finalize:
 	cp REBOOT.BIN  ../bin
@@ -87,6 +75,4 @@ finalize:
 clean:
 	-rm *.o
 	-rm REBOOT.BIN 
-	
-	
 	

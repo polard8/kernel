@@ -316,7 +316,10 @@ int rtl_file_exists (const char *filename)
 }
 */
 
-
+void rtl_reboot(void)
+{
+    gramado_system_call(110,0,0,0);
+}
 
 
 

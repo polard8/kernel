@@ -2107,25 +2107,24 @@ int serviceNextEvent(void)
 
 int main (int argc, char **argv){
 
-    //int Status = (-1);
-
     struct sockaddr gramsock;  //addr;
     gramsock.sa_family = AF_GRAMADO;
     gramsock.sa_data[0] = 'w';
-    gramsock.sa_data[1] = 's';   
+    gramsock.sa_data[1] = 's';
     
+    // files.
     int server_fd = -1; 
+    int newconn = -1;
+    int curconn = -1;
+    
     int bind_status = -1;
-
-
-    // Flag usada no loop.
-    running = 1;
     
     int i=0;
     int _status = -1;
 
-    int newconn = -1;
-    int curconn = -1;
+
+    // Flag usada no loop.
+    running = 1;
 
 
     /*
@@ -2216,8 +2215,7 @@ int main (int argc, char **argv){
 
         server_fd = (int) socket(AF_GRAMADO, SOCK_STREAM, 0);
 
-        if (server_fd<0)
-        {
+        if (server_fd<0){
             gwssrv_debug_print ("gwssrv: [FATAL] Couldn't create the server socket\n");
             printf             ("gwssrv: [FATAL] Couldn't create the server socket\n");
             exit(1);
@@ -2263,10 +2261,9 @@ int main (int argc, char **argv){
         // Calling child.
         //printf ("gwssrv: Calling child \n");  
 
-
-        gwssrv_clone_and_execute ("gws.bin");      // command gws.bin
+        //gwssrv_clone_and_execute ("gws.bin");      // command gws.bin
         //gwssrv_clone_and_execute ("gwm.bin");      // window manager
-        //gwssrv_clone_and_execute ("fileman.bin");  
+        gwssrv_clone_and_execute ("fileman.bin");  
         //gwssrv_clone_and_execute ("editor.bin");           
         //gwssrv_clone_and_execute ("terminal.bin");  
         //gwssrv_clone_and_execute ("browser.bin");
@@ -2274,6 +2271,7 @@ int main (int argc, char **argv){
         //gwssrv_clone_and_execute ("s2.bin");      // shell  
         //gwssrv_clone_and_execute ("s3.bin");    // hello        
         // ...
+
 
 
         // Wait

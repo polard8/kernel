@@ -2,7 +2,7 @@
 PRODUCT_NAME  = Gramado Operating System
 VERSION_MAJOR = 1
 VERSION_MINOR = 0
-VERSION_BUILD = 152
+VERSION_BUILD = 153
 # See: config/version.h
 
 # Documentation.
@@ -226,9 +226,9 @@ vhd-copy-files:
 	# apps
 #	-sudo cp setup/apps/bin/*.BIN  base/
 #	-sudo cp setup/apps/bin/*.BIN  base/PROGRAMS
-	-sudo cp setup/apps/bin/GWM.BIN     base/
+	#-sudo cp setup/apps/bin/GWM.BIN     base/
 	-sudo cp setup/apps/bin/EDITOR.BIN  base/
-	#-sudo cp setup/apps/bin/FILEMAN.BIN  base/
+	-sudo cp setup/apps/bin/FILEMAN.BIN  base/
 	-sudo cp setup/apps/bin/LAUNCH1.BIN  base/
 
 	#-sudo cp setup/apps/bin/TERMINAL.BIN  base/
@@ -239,7 +239,7 @@ vhd-copy-files:
 	# cmd
 	#-sudo cp setup/cmd/bin/*.BIN  base/
 	#-sudo cp setup/cmd/bin/*.BIN  base/BIN
-#	-sudo cp setup/cmd/bin/REBOOT.BIN     base/
+	-sudo cp setup/cmd/bin/REBOOT.BIN     base/
 	-sudo cp setup/cmd/bin/CAT.BIN        base/
 	-sudo cp setup/cmd/bin/FASM.BIN       base/
 #	-sudo cp setup/cmd/bin/TRUE.BIN       base/

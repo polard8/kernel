@@ -41,6 +41,7 @@
 
 
 // rtl
+#include <rtl/gramado.h>
 #include <types.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -51,10 +52,8 @@
 #include <sys/socket.h>
 #include <packet.h>
 
-
 // The client-side library.
 #include <gws.h>
-
 
 // fileman
 #include <fileman.h>
@@ -70,7 +69,8 @@
 #define PORTS_FS 4042
 // ...
 
-
+// JAIL,P1 ...
+int current_mode;
 
 // #test
 // Tentando deixar o buffer aqui e aproveitar em mais funções.
@@ -654,6 +654,11 @@ int main ( int argc, char *argv[] ){
     debug_print ("---------------------------\n");    
     debug_print ("fileman: Initializing ...\n");
 
+    //ok
+    current_mode = rtl_get_system_metrics(130);
+    
+    //printf ("The current mode is %d\n",current_mode);
+    //exit(0);
 
 
     //
@@ -674,33 +679,28 @@ int main ( int argc, char *argv[] ){
     }
 
 
-        //
-        // connect
-        // 
+    //
+    // connect
+    // 
 
-    while(1){
+    // Nessa hora colocamos no accept um fd.
+    // então o servidor escreverá em nosso arquivo.
 
+    //printf ("gnst: Connecting to the address 'ws' ...\n");      
+    printf ("fileman: Connecting to ws via inet  ...\n");   
 
-        //nessa hora colocamos no accept um fd.
-        //então o servidor escreverá em nosso arquivo.
-    
-        // #debug
-        //printf ("gnst: Connecting to the address 'ws' ...\n");      
-        printf ("fileman: Connecting to ws via inet  ...\n");   
+    while (1){
 
-        if (connect (client_fd, (void *) &addr_in, sizeof(addr_in)) < 0){ 
+        if (connect (client_fd, (void *) &addr_in, sizeof(addr_in)) < 0){
+ 
             gws_debug_print("fileman: Connection Failed \n");
             printf("fileman: Connection Failed \n"); 
             //return -1;
             
-            //try again 
-        }else{
-            break;
-        }; 
+        // try again 
+        }else{ break; }; 
     };
 
-
- 
  
     //
     // messages
@@ -717,8 +717,6 @@ int main ( int argc, char *argv[] ){
 
     _hello(client_fd);
 
-
-   
 
     /*
     // libgws
@@ -755,14 +753,22 @@ int main ( int argc, char *argv[] ){
     unsigned long wHeight = (h-32);
 
 
-    //main window
-    main_window = gws_create_window (client_fd,
+    if (current_mode == GRAMADO_JAIL ){
+        wLeft=0;  wTop=0;  wWidth=w;  wHeight=h;
+    }
+
+
+    // main window
+    main_window = gws_create_window ( client_fd,
         WT_OVERLAPPED, 1, 1, "Fileman",
         wLeft, wTop, wWidth, wHeight,
-        0,0,COLOR_GRAY, COLOR_GRAY);
+        0, 0, COLOR_GRAY, COLOR_GRAY );
 
-    if ( main_window < 0 )             
-        debug_print("fileman: main_window fail\n"); 
+    if ( main_window < 0 ){
+        debug_print("fileman: main_window fail\n");
+        printf     ("fileman: main_window fail\n");
+        exit(1);
+    }
 
 
     //
@@ -771,19 +777,20 @@ int main ( int argc, char *argv[] ){
 
     // #bugbug
     // The window server needs to fix the client area.
-    // So 0,0 needs to mean the top/left of the 
-    // client area.
+    // So 0,0 needs to mean the top/left of the client area.
 
     // address bar
     addressbar_window = gws_create_window (client_fd,
         WT_EDITBOX,1,1,"address-bar",
         4, titlebarHeight +4, 
         (wWidth-40), 32,
-        main_window,0,COLOR_WHITE, COLOR_WHITE);
+        main_window, 0, COLOR_WHITE, COLOR_WHITE );
 
-    if ( addressbar_window < 0 )             
+    if ( addressbar_window < 0 ){
         debug_print("fileman: addressbar_window fail\n"); 
-        
+        printf     ("fileman: addressbar_window fail\n"); 
+        exit(1);
+    }
      
      gws_draw_text (
         (int) client_fd,             // fd,
@@ -805,9 +812,11 @@ int main ( int argc, char *argv[] ){
         32, 32,
         main_window,0,COLOR_GRAY, COLOR_GRAY);
 
-    if ( button < 0 )             
+    if ( button < 0 ){
         debug_print("fileman: button fail\n"); 
-
+        printf     ("fileman: button fail\n"); 
+        exit(1);
+    }
 
     //
     // == Client window =========================================
@@ -824,7 +833,7 @@ int main ( int argc, char *argv[] ){
         cwLeft, cwTop, cwWidth, cwHeight,
         main_window,0,COLOR_WHITE, COLOR_WHITE);
 
-    if ( client_window < 0 )             
+    if ( client_window < 0 )
         debug_print("fileman: client_window fail\n"); 
 
     // [/]
@@ -841,14 +850,12 @@ int main ( int argc, char *argv[] ){
      // dir entries
 
     int e=0;
-    for (e=3; e<24; e++){
-    gws_draw_text (
-        (int) client_fd,         // fd,
-        (int) client_window,     // window id,
-        (unsigned long) 8,       // left,
-        (unsigned long) e*16,  // top,
-        (unsigned long) COLOR_BLACK,
-        "FAKEFILE.TXT");
+    int max=22;
+    if (current_mode==GRAMADO_JAIL){max=5;}
+    for (e=3; e<max; e++){
+    // fd, window_id, left, top, color, name.
+    gws_draw_text ( (int) client_fd, (int) client_window,
+        8, (e*16), COLOR_BLACK, "FAKEFILE.TXT");
     }
 
     //
@@ -890,10 +897,8 @@ int main ( int argc, char *argv[] ){
 
 
 
-// exit
     debug_print ("gwm: bye\n"); 
-    printf ("gwm: bye\n");
-
+    printf      ("gwm: bye\n");
     return 0;
 }
 
