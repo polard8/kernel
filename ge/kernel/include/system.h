@@ -508,13 +508,6 @@ void *systemGetSystemMetric(int number);
 void *systemGetSystemStatus(int number);
 
 
-// ## Initializing ##
-
-int systemStartUp (void);   // Inicialização do sistema.
-
-int systemInit (void);      // Inicializador.
-
-//void systemSystem (void);   // Construtor.
 
 int init_executive (void);
 

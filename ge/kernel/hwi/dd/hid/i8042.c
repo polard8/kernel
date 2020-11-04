@@ -174,8 +174,18 @@ void early_ps2_init (void){
 
 
 
+int PS2_initialize(void)
+{
+	ps2();
+	return 0;
+}
 
 
+int PS2_early_initialization(void)
+{
+	early_ps2_init();
+	return 0;
+}
 
 
 

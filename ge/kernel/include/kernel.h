@@ -174,7 +174,7 @@ extern void do_executa_new_task (void);
 
 // ws - window server, and beyond
 // ps2 controller.
-#include "ws/view/ps2.h"
+//#include "ws/view/ps2.h"
 
 
 
@@ -298,6 +298,10 @@ extern void do_executa_new_task (void);
 #include "ws/view/i8042.h"
 #include "ws/view/ps2mouse.h"
 #include "ws/view/ps2kbd.h"
+
+
+//isso estava la em cima, vem pra ca se possivel.
+#include "ws/view/ps2.h"
 
 
 

@@ -394,6 +394,15 @@ int x86main (void){
     UPProcessorBlock.threads_counter = 0;
 
 
+
+
+
+
+
+//
+//=======================================================================================================
+//
+
     // # system
     // #bugbug
     // Daqui pra frente tem coisa que é dependente da arquitetura x86 e 
@@ -409,22 +418,172 @@ int x86main (void){
 
     printf ("[x86] x86main: Calling systemInit\n");
 
-    Status = (int) systemInit();
+    //Status = (int) systemInit();
 
-    if ( Status != 0 )
-    {
-        KernelStatus = KERNEL_ABORTED;
+    //if ( Status != 0 )
+    //{
+    //    KernelStatus = KERNEL_ABORTED;
         
-        debug_print ("[x86] x86main: systemInit fail\n");
-        printf      ("[x86] x86main: systemInit fail\n");
-        goto fail;
-    }
+    //    debug_print ("[x86] x86main: systemInit fail\n");
+    //    printf      ("[x86] x86main: systemInit fail\n");
+    //    goto fail;
+    //}
 
+
+
+
+
+    //
+    // == phase 0 ========================================
+    //
+
+    // Essa eh uma boa rotina pra inicializar o contador de fases.
+    // Set Kernel phase.  
+    // Status Flag.
+    // edition flag.
+    
+    KeInitPhase = 0;
+    gSystemStatus = 1;
+    gSystemEdition = 0;
+
+    debug_print ("====\n");
+    debug_print ("systemInit:\n");
+    printf      ("systemInit:\n");
+
+//
+//=======================================================================================================
+//
+
+    debug_print ("====\n");
+    debug_print ("==== systemStartUp:\n");
+    printf("systemStartUp:\n");
+
+	// Antes de tudo: 
+	// CLI, Video, runtime.
+
+	// ## BUGBUG ##
+	// As mensagens do abort podem não funcionarem nesse caso.
+	// AINDA NÃO INICIALIZAMOS O RECURSO DE MENSAGENS.
+	
+    if ( KeInitPhase != 0 )
+    {
+        KiAbort();
+    
+    }else{
+        
+        // Disable interrupts, lock taskswitch and scheduler.
+        //Set scheduler type. (Round Robin).
+        // #todo: call a hal routine for cli.
+
+        asm ("cli");  
+        taskswitch_lock();
+        scheduler_lock();
+        schedulerType = SCHEDULER_RR; 
+
+
+		// Obs: 
+		// O video já foi inicializado em main.c.
+		// BANNER !
+        //Welcome message. (Poderia ser um banner.) 
+        
+        set_up_cursor (0,1);
+
+
+        //
+        // == INIT ! ===========================================
+        //  
+
+        // See: 
+        // core/init.c
+
+        Status = (int) init(); 
+        
+        if ( Status != 0 )
+        {
+            debug_print ("systemStartUp: init fail\n");
+            panic       ("systemStartUp: init fail\n");
+        }
+        //...
+
+    }; //--else
+
+    //printf("*breakpoint\n");
+    //refresh_screen();
+    //while(1){}
+
+
+// Done: 
+//     Completas as 3 fases de inicialização do sistema.
+//     @todo: Na verdade serão mais fases..
+//           as fases estão em init().
+
+    printf ("systemStartUp: done\n");
+
+//
+//=======================================================================================================
+//
+
+	//#debug 
+	//a primeira mensagem só aparece após a inicialização da runtime.
+	//por isso não deu pra limpar a tela antes.
+
+
+#ifdef BREAKPOINT_TARGET_AFTER_SYSTEM
+    printf ("systemInit: *breakpoint\n");
+    refresh_screen(); 
+    while (1){ asm ("hlt"); }
+#endif
+
+
+    printf("=========================\n");
+    printf("core-init: end of phase 2\n");
+
+    // 3 - fim da fase 2.
+    IncrementProgressBar();
+    
+    //refresh_screen();
+    //while(1){}
+
+//
+// == phase 3 ? ================================================
+//
+    
+    KeInitPhase = 3; 
+    
+    // Logon. 
+    // Cria Background, main window, navigation bar.
+    // de acordo com predefinição.
+    // See:
+    // windows/logon.c
+
+
+    if ( g_useGUI != 1 )
+        panic("core-init: NO GUI");
+        
+    printf ("core-init: calling init_logon_manager ...\n");
+    init_logon_manager();
+
+    // #debug:  
+    // Esperamos alcaçarmos esse alvo.
+    // Isso funcionou gigabyte/intel
+    // Vamos avançar
+    // Quem chamou essa funçao foi o começo da inicializaçao do kernel.
+    // Retornamos para x86main.c para arch x86.
+
+    debug_print ("systemInit: done\n");
+    debug_print ("====\n");
+    
+    //printf("*breakpoint\n");
+    //refresh_screen();
+    //while(1){}
+
+//
+//=======================================================================================================
+//
 
     //
     //=======================================================
     //
-
 
 	//
 	// # GDT
@@ -440,7 +599,6 @@ int x86main (void){
     printf      ("[x86] x86main: Initializing GDT\n");
         
     init_gdt ();
-
 
     //printf("*breakpoint\n");
     //refresh_screen();
@@ -621,17 +779,14 @@ int x86main (void){
     // #todo: 
     // Essa inicialização deve ser adiada.
     // deixando para o processo init fazer isso.
-    // See: i8042.c
-
-    //ps2();
-
-
-    // #todo:
     // Chamaremos essa inicialização básica nesse momento.
     // A inicialização completa será chamada pelo processo init.
     // See: i8042.c
 
-    early_ps2_init();
+    //PS2_initialize();
+    PS2_early_initialization();
+
+
 
 
 	//
@@ -752,20 +907,13 @@ int x86main (void){
     refresh_screen(); 
     while (1){ asm ("hlt"); }
 
-#endif	
+#endif
 
 
-	//
 	// done !
-	//
-
-
 done:
-
-
     debug_print ("[x86] x86main: done\n");
     debug_print ("==============\n");
-
 
     // Return to assembly file, (head.s).
     if ( KernelStatus == KERNEL_INITIALIZED )
@@ -789,21 +937,15 @@ done:
     // ok
     return 0;
 
-
-    //
     // fail
-    //
-
-fail:
-
 	// #todo
 	// Uma opção aqui é usarmos a tipagem void para essa função
 	// e ao invés de retornarmos, apenas entrarmos na thread idle
 	// em ring 0, isso depois de criadas as threads em user mode.
 
+fail:
     debug_print ("[x86] x86main: fail\n");
-    refresh_screen ();
-    
+    refresh_screen (); 
     return -1;
 }
 

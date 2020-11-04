@@ -41,6 +41,11 @@ linha de relógio. Quando o hospedeiro puxa o relógio para baixo, a comunicação d
 //...
 
  
+void ps2 (void);
+void early_ps2_init (void);
+
+int PS2_initialize(void);
+int PS2_early_initialization(void);
 
 
 #endif  
