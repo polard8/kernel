@@ -1257,6 +1257,14 @@ int console_get_current_virtual_console (void)
 }
 
 
+void console_switch_to(int n)
+{
+    // #todo:
+    // maybe we can do somo other configuration here.
+    
+    console_set_current_virtual_console (n);
+}
+
 
 /*
  *********************************************
@@ -1348,6 +1356,26 @@ console_ioctl (
     //switch(request){}
     return -1;
 }
+
+
+// main routine.
+// called by main.c
+int VirtualConsole_initialize(void)
+{
+    // Virtual Console:
+    // The kernel only have four virtual consoles.
+
+    console_init_virtual_console(0);
+    console_init_virtual_console(1);
+    console_init_virtual_console(2);
+    console_init_virtual_console(3);
+    console_switch_to(0); 
+
+    return 0;
+}
+
+
+
 
 
 //

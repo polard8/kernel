@@ -132,6 +132,24 @@ int KiInitRuntime (void)
 }
 
 
+// called by main.c
+int Runtime_initialize(void)
+{
+    int Status = (int) init_runtime();
+
+    if ( Status < 0 ){
+        debug_print ("Runtime_initialize: Runtime fail. *hang\n");
+        // No message support at the moment ?!
+        asm ("cli \n");
+        while (1){  asm ("hlt \n");  };
+    }
+
+    // ...
+
+
+    return 0;
+}
+
 
 //
 // End.

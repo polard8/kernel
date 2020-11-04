@@ -26,7 +26,6 @@
  * things.o - Classe .Things.
  *
  * Ambiente:
- *     sm/system.c
  *     Kernel base. Ring0.
  *
  * Descrição:
@@ -65,32 +64,26 @@
  *     +systemReboot
  *     +systemShutdown
  *
- * Histórico:
- *    Versão 1.0, 2015 - Esse arquivo foi criado por Fred Nora.
- *    Versão 1.0, 2016 - Aprimoramento geral das rotinas básicas. 
- *    //...
+ * History:
+ *     2015 - Created by Fred Nora.
  */
 
  
 #include <kernel.h>
 
 
-//
-// Informações herdadas do boot.
-//
-
-
+// from boot loader.
 extern unsigned long SavedBootBlock;
 extern unsigned long SavedLFB;
 extern unsigned long SavedX;
 extern unsigned long SavedY;
 extern unsigned long SavedBPP; 
 
+
+// #bugbug
+// Temos que rever as deviniçoes abaixo.
  
-//Variáveis internas.
-//int systemStatus;
-//int systemError;
-//... 
+
 
 
 /*
@@ -154,17 +147,6 @@ static char *systemLogFilePathName  = "/root/log.txt";
 //static char *systemInitFilePathName = "/root/log.txt";
 //static char *systemInitFilePathName = "/root/log.txt";
 static char *systemSwapFilePathName      = "/root/swap";  //'Arquivo' de paginação.
-//... 
-
-//Listas.
-//unsigned long systemFileListX[128];
-//unsigned long systemFileListXX[128];
-
-
-//Informações sobre a memória do sistema
-//não uasr ponteiro.
-//struct memory_info_d systemMemoryInfo;
-
 
 
 
@@ -177,9 +159,9 @@ static char *systemSwapFilePathName      = "/root/swap";  //'Arquivo' de paginaç
  *     @todo: Isso pode ir para outro lugar.   
  */
 
-void set_up_color ( unsigned long color ){  
- 
-	g_system_color = (unsigned long) color;
+void set_up_color ( unsigned long color )
+{
+    g_system_color = (unsigned long) color;
 }
 
 
@@ -192,8 +174,11 @@ void set_up_color ( unsigned long color ){
  *     @todo: Isso pode ir para outro lugar.
  */
 
-void set_up_text_color ( unsigned char forecolor, unsigned char backcolor ){
-	
+void 
+set_up_text_color ( 
+    unsigned char forecolor, 
+    unsigned char backcolor )
+{
     g_char_attrib = (backcolor << 4) | (forecolor & 0x0F);
 }
 

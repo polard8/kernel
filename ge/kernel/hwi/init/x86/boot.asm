@@ -1,5 +1,5 @@
-
-;; File: x86/entry/head/head.asm 
+;; File: hwi/init/x86/boot.asm
+;; 
 ;; para dar suporte ao multiboot.
 ;; Esse será o primeiro ponto de entrada do kernel para x86
 ;; Ele será simples e pequeno, dando uma visão geral
@@ -105,38 +105,30 @@ align 4
 ; Restart the boot routine.
 START:
 
-    ; #test
-    ; Clean flags.
+    ; #test: Clean flags.
+    
     ;push dword 0
     ;popfd 
-
 
     cli
     cld
 
-
-    ; IN:  
-    ;    al = 'G' (Graphic Mode).
-    ;    al = 'T' (Text Mode).
-    ;
-    ;    ebx = LFB.
-    ;
-    ;    ecx = BootBlock pointer.
-    ;    edx = BootBlock pointer.
-    ;    ebp = BootBlock pointer.
-    
-    
-    
-    ;; #importante
-    ;; AL e EBX foram configurados pelo BL.BIN ??
-
+    ; IN: 
+    ; al = 'G' (Graphic Mode).
+    ; al = 'T' (Text Mode).
+    ; ebx = LFB.
+    ; ecx = BootBlock pointer.
+    ; edx = BootBlock pointer.
+    ; ebp = BootBlock pointer.
+    ; #importante
+    ; AL e EBX foram configurados pelo BL.BIN ??
 
     call head_init
-
-.hang:
     cli
+
+loop:
     hlt
-    jmp .hang
+    jmp loop
 
 
 ;

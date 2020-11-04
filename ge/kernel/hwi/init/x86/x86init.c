@@ -366,74 +366,57 @@ void __x86StartInit (void){
 /*
  *************************************************
  * x86main: 
- *     The entry point for a C part of the Kernel.
  *
  * Function history:
  *     2015 - Created by Fred Nora.
  */
 
-// #todo:
-// #importante:
-// Usar essa função para chamar uma sequência de funções.
-// Isso evita a dispersão das rotinas de inicialização.
-
-// Called by:
-// head_init in hwi/init/x86/head.asm
+// Called by main.c
 
 int x86main (void){
 
     int Status=0;
 
 
-    // Arch.
-    if (current_arch != CURRENT_ARCH_X86)
-    {
+    if (current_arch != CURRENT_ARCH_X86){
         debug_print ("[x86] x86main: Arch fail\n");
         panic       ("[x86] x86main: Arch fail\n"); 
     }
-
 
     debug_print ("==============\n");
     debug_print ("[x86] x86main:\n");
 
 
+    // SSE
+    x86_sse_init ();
 
-//initializeSystem:
-
-
-    //#todo:
-    //x86_sse_init ();
-    
-    //
     // Threads counter.
-    //
-
     UPProcessorBlock.threads_counter = 0;
 
 
-	//
-	// # system
-	//
-
-
-	// #bugbug
-	// Daqui pra frente tem coisa que é dependente da arquitetura x86 e 
-	// coisa que não é ... 
-	// Talvez possamos mandar coisas que não são dependentes 
-	// para main.c
-
+    // # system
+    // #bugbug
+    // Daqui pra frente tem coisa que é dependente da arquitetura x86 e 
+    // coisa que não é ... 
+    // precisamos que aqui tudo seja dependente da arquitetura x86.
+    // As outras coisas podem ser chamadas em main.
+    // Talvez possamos mandar coisas que não são dependentes 
+    // para main.c
 
 
     // System initialization.
     // See: core/system.c
+
     printf ("[x86] x86main: Calling systemInit\n");
 
     Status = (int) systemInit();
 
-    if ( Status != 0 ){
+    if ( Status != 0 )
+    {
+        KernelStatus = KERNEL_ABORTED;
+        
         debug_print ("[x86] x86main: systemInit fail\n");
         printf      ("[x86] x86main: systemInit fail\n");
-        KernelStatus = KERNEL_ABORTED;
         goto fail;
     }
 

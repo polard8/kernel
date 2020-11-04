@@ -836,12 +836,13 @@ int init_intel (void){
 }
 
 
-
-
-
 // Initializes sse support.
+// Credits: Serenity OS.
+
 void x86_sse_init (void)
 {
+    debug_print("x86_sse_init: [TEST]\n");
+
     asm volatile (
         "mov %cr0, %eax\n"
         "andl $0xfffffffb, %eax\n"

@@ -840,6 +840,7 @@ int videoInit (void){
 
 
 /*
+ *********************
  * videoVideo:
  *     Método construtor.
  *     Funçao interna. 
@@ -847,14 +848,25 @@ int videoInit (void){
  *     @todo: isso poderia ter retorno void.
  */
 
-int videoVideo (void){
-
+int videoVideo (void)
+{
     videoStatus = 0;
     videoError = 0;
     //...
 
-	return 0;
+    return 0;
 }
+
+// called by main.c
+int Video_initialize(void)
+{
+    videoVideo();
+    videoInit();
+    // ...
+    
+    return 0;
+}
+
 
 
 //

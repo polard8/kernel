@@ -73,272 +73,6 @@ void save_kernel_args (void)
 
 
 /*
- ***********************************
- * init_architecture_dependent:
- *     Rotina de inicialização dependente da arquitetura atual da máquina.
- *     A fase 1 identificou o tipo de processador. Aqui chamaremos a rotina 
- * de inicialização de acordo com o tipo identificado.
- *     A fase 1 inicializou a estrutura processor. Aqui checamos se ela é 
- * válida.
- *  GDT, IDT, ... TR ...
- *
- * Obs: Essa é a fase 2 de inicialização.
- *
- * Obs: Dependente significa dependente da marca do procesador.
- */
-
-int init_architecture_dependent (void){
-
-    int Status = 0;
-    unsigned char Type=0;
-
-
-    debug_print ("init_architecture_dependent:\n");
-
-    //
-    // Fase. 
-    // (Verificar se essa rotina foi chamada na fase certa 
-    // de inicialização.)
-    //
-
-    if ( KeInitPhase != 1 ){
-        panic ("init_architecture_dependent: KeInitPhase\n");
-    }
-
-
-	// #### IMPORTANTE ####
-	//
-	// VAMOS ANTECIPAR ESSA INICIALIZAÇÃO NA TENTATIVA DE
-	// ANTECIPARMOS O USO DE MENSAGENS.
-    // >>> mas essa rotina precisa do kmalloc ,,,
-	//então tem que ser depois da inicialização do stdio.
-	
-	
-	// Os parâmetros de tela dependem das propriedades de hardware
-	// como monitor e placa de vídeo.
-	
-	//screenInit();
-
-    //printf("init_architecture_dependent: #Debug");
-    //refresh_screen();
-    //while(1){};		
-	
-
-	//
-	// A estrutura para informações sobre o processador. 
-	//
-
-	// Check structure.
-    if ( (void *) processor == NULL ){
-        panic("init_architecture_dependent: processor\n");
-    }
-
-
-    // Sonda pra ver qual é a marca do processador.
-    // #todo: 
-    // É a segunda vez que fazemos a sondagem ?!
-    // See: hal/detect.c
-    // This routine is valid for intel and amd processors.
-
-    Type = (int) hal_probe_processor_type();
-
-    if (Type==0){
-        panic("init_architecture_dependent: processor Type\n");
-    }
-
-    processor->Type = (int) Type;
-
-
-    // Ok.
-    // Let's make some initialization and 
-    // get more information about the processor
-    // using the cpuid instruction.
-    // See: hal/x86 and hal/amd.
-
-    switch (Type){
-
-        case Processor_INTEL:  init_intel();   break;
-        case Processor_AMD:    init_amd();     break;
-
-        // ...
-
-        default:
-            panic ("init_architecture_dependent: default Type\n");
-            break;
-    };
-
-
-	//
-	// #todo: ?? maybe 
-	// GDT, IDT (usar extern).
-	//
-
-
-	// #obs: O contexto é depedente.
-	// Inicializando o Process manager.
-
-    init_process_manager();
-
-
-    //
-    // Continua ...
-    //
-
-    // Done.
-
-    // 0 = ok.
-    return (int) Status;
-}
-
-
-
-/*
- ********************************************************
- * init_architecture_independent:
- *
- *    Rotina de inicialização da parte do sistema que é 
- * independente da arquitetura presente. 
- *    Independente da tipo de processador. 
- *    Obs: Essa é a fase 1 de inicialização.
- */
-
-int init_architecture_independent (void){
-
-    int Status=0;
-
-
-    debug_print ("init_architecture_independent\n");
-
-
-    // #important
-    // We need to be in the phase 0.
-    
-    if (KeInitPhase != 0){
-        panic ("init_architecture_independent: KeInitPhase\n");
-    }
-
-
-	//
-	// == hal ===================================
-	//
-
-
-	// #bugbug
-	// Se é HAL é dependente da arquitetura.
-	// Isso deveria ficar na outra rotina.
-	// Não mudaremos por enquanto.
-
-//#todo: Mudar o nome EXECVE_VERBOSE
-#ifdef EXECVE_VERBOSE
-    printf ("init_architecture_independent: Initializing HAL..\n");
-#endif
-
-    Status = init_hal();
-
-    if (Status != 0){
-        panic ("init_architecture_independent: init_hal fail\n");
-    }
-
-    //
-    //  == mk =================================================
-    //
-
-    // mm, ipc, ps ...
-
-
-	// Microkernel:
-#ifdef EXECVE_VERBOSE
-	// Obs: O Microkernel lida com informações dependentes da arquitetura,
-	// porém inicializa a gerencia de processos e threads e de comunicação
-	//entre processos.
-	//#bugbug @todo: Se é microkernel é processo é registrador ... acho que leva em consideração a arquitetura.
-	printf ("init_architecture_independent: Initializing Microkernel..\n");
-#endif
-
-
-    Status = init_microkernel();
-
-    if (Status != 0){
-        panic ("init_architecture_independent: init_microkernel fail\n");
-    }
-
-
-	//
-	// == executive ===============================================
-	//
-
-
-    // Executive:
-#ifdef EXECVE_VERBOSE
-	// Obs: O executive não é tão dependente da arquitetura, ele é
-	//uma camada mais alta, porém será inicializado aqui para
-	//efeito de ordem, já que estamos inicializando os tres módulos
-	//básicos do kernel base nesse momento.
-    printf ("init_architecture_independent: Initializing Executive..\n");
-#endif
-
-
-    Status = init_executive();
-
-    if (Status != 0){
-        panic ("init_architecture_independent: init_executive\n"); 
-    }
-
-
-
-	// Gramado:
-#ifdef EXECVE_VERBOSE
-    printf ("init_architecture_independent: Initializing Gramado..\n");
-#endif
-
-   
-    // #bugbug
-    // Deprecated?
-
-    Status = init_gramado();
-
-    if (Status != 0){
-        panic ("init_architecture_independent: init_gramado fail\n"); 
-    }
-
-    //
-    // == window manager ================================
-    //
-
-    // #important:
-    // This is the window manager embedded in the base kernel.
-
-    // Text mode not supported.
-    
-    if (g_useGUI != 1){
-        panic ("init_architecture_independent: [PANIC] No ring0 GUI!\n");
-    }
-
-
-#ifdef EXECVE_VERBOSE
-    printf ("init_architecture_independent: init_window_manager\n");
-#endif
-
-    init_window_manager();
-
-
-    // More? ...
-
-
-//done:
-
-#ifdef EXECVE_VERBOSE
-    printf ("init_architecture_independent: Done\n");
-    //refresh_screen();
-    //while(1){}
-#endif
-
-    // 0=ok.
-    return 0;
-}
-
-
-/*
  **************************************************
  * init_globals:
  *     Init globals. 
@@ -767,10 +501,147 @@ int init (void){
     };
 
 
-    Status = (int) init_architecture_independent ();
-    if (Status != 0){
-        panic ("core-init: init_architecture_independent fail\n"); 
+
+
+//
+//============================================================================================================
+//
+
+
+    debug_print ("init_architecture_independent\n");
+
+
+    // #important
+    // We need to be in the phase 0.
+    
+    if (KeInitPhase != 0){
+        panic ("init_architecture_independent: KeInitPhase\n");
     }
+
+
+	//
+	// == hal ===================================
+	//
+
+
+	// #bugbug
+	// Se é HAL é dependente da arquitetura.
+	// Isso deveria ficar na outra rotina.
+	// Não mudaremos por enquanto.
+
+//#todo: Mudar o nome EXECVE_VERBOSE
+#ifdef EXECVE_VERBOSE
+    printf ("init_architecture_independent: Initializing HAL..\n");
+#endif
+
+    //#bugbug
+    //isso eh dependente, pode mudar para a outra rotina desse documento.
+    Status = init_hal();
+
+    if (Status != 0){
+        panic ("init_architecture_independent: init_hal fail\n");
+    }
+
+    //
+    //  == mk =================================================
+    //
+
+    // mm, ipc, ps ...
+
+
+	// Microkernel:
+#ifdef EXECVE_VERBOSE
+	// Obs: O Microkernel lida com informações dependentes da arquitetura,
+	// porém inicializa a gerencia de processos e threads e de comunicação
+	//entre processos.
+	//#bugbug @todo: Se é microkernel é processo é registrador ... acho que leva em consideração a arquitetura.
+	printf ("init_architecture_independent: Initializing Microkernel..\n");
+#endif
+
+    //isso tambem eh dependente, pode ir para a outra rotina, nesse mesmo documento.
+    Status = init_microkernel();
+
+    if (Status != 0){
+        panic ("init_architecture_independent: init_microkernel fail\n");
+    }
+
+
+	//
+	// == executive ===============================================
+	//
+
+    // Executive:
+#ifdef EXECVE_VERBOSE
+    printf ("init_architecture_independent: Initializing Executive..\n");
+#endif
+
+
+    Status = init_executive();
+
+    if (Status != 0){
+        panic ("init_architecture_independent: init_executive\n"); 
+    }
+
+
+
+	// Gramado:
+#ifdef EXECVE_VERBOSE
+    printf ("init_architecture_independent: Initializing Gramado..\n");
+#endif
+
+   
+    // #bugbug
+    // Deprecated?
+    // onde?
+
+    Status = init_gramado();
+
+    if (Status != 0){
+        panic ("init_architecture_independent: init_gramado fail\n"); 
+    }
+
+    //
+    // == window manager ================================
+    //
+
+    // #important:
+    // This is the window manager embedded in the base kernel.
+
+    // Text mode not supported.
+    
+    if (g_useGUI != 1){
+        panic ("init_architecture_independent: [PANIC] No ring0 GUI!\n");
+    }
+
+
+#ifdef EXECVE_VERBOSE
+    printf ("init_architecture_independent: init_window_manager\n");
+#endif
+
+    init_window_manager();
+
+
+    // More? ...
+
+
+//done:
+
+#ifdef EXECVE_VERBOSE
+    printf ("init_architecture_independent: Done\n");
+    //refresh_screen();
+    //while(1){}
+#endif
+
+
+
+
+
+//
+//============================================================================================================
+//
+
+
+
 
     printf("=========================\n");
     printf("core-init: end of phase 0\n");
@@ -787,12 +658,130 @@ int init (void){
     KeInitPhase = 1;
 
 
-	//Fase 2: Inicia a parte de arquitetura especifica da máquina atual.
-	//        Ou seja, considera a marca do processador.
-    Status = (int) init_architecture_dependent ();
-    if (Status != 0){
-        panic ("core-init: init_architecture_dependent fail\n"); 
+
+
+
+//
+//==================================================================================
+//
+
+
+    // Fase 2: 
+    // Inicia a parte de arquitetura especifica da máquina atual.
+    // Ou seja, considera a marca do processador.
+    
+    //Status = (int) init_architecture_dependent ();
+    //if (Status != 0){
+    //    panic ("core-init: init_architecture_dependent fail\n"); 
+    //}
+
+
+
+    //int Status = 0;
+    unsigned char Type=0;
+
+
+    debug_print ("init_architecture_dependent:\n");
+
+    //
+    // Fase. 
+    // (Verificar se essa rotina foi chamada na fase certa 
+    // de inicialização.)
+    //
+
+    if ( KeInitPhase != 1 ){
+        panic ("init_architecture_dependent: KeInitPhase\n");
     }
+
+
+	// #### IMPORTANTE ####
+	//
+	// VAMOS ANTECIPAR ESSA INICIALIZAÇÃO NA TENTATIVA DE
+	// ANTECIPARMOS O USO DE MENSAGENS.
+    // >>> mas essa rotina precisa do kmalloc ,,,
+	//então tem que ser depois da inicialização do stdio.
+	
+	
+	// Os parâmetros de tela dependem das propriedades de hardware
+	// como monitor e placa de vídeo.
+	
+	//screenInit();
+
+    //printf("init_architecture_dependent: #Debug");
+    //refresh_screen();
+    //while(1){};		
+	
+
+	//
+	// A estrutura para informações sobre o processador. 
+	//
+
+	// Check structure.
+    if ( (void *) processor == NULL ){
+        panic("init_architecture_dependent: processor\n");
+    }
+
+
+    // Sonda pra ver qual é a marca do processador.
+    // #todo: 
+    // É a segunda vez que fazemos a sondagem ?!
+    // See: hal/detect.c
+    // This routine is valid for intel and amd processors.
+
+    Type = (int) hal_probe_processor_type();
+
+    if (Type==0){
+        panic("init_architecture_dependent: processor Type\n");
+    }
+
+    processor->Type = (int) Type;
+
+
+    // Ok.
+    // Let's make some initialization and 
+    // get more information about the processor
+    // using the cpuid instruction.
+    // See: hal/x86 and hal/amd.
+
+    switch (Type){
+
+        case Processor_INTEL:  init_intel();   break;
+        case Processor_AMD:    init_amd();     break;
+
+        // ...
+
+        default:
+            panic ("init_architecture_dependent: default Type\n");
+            break;
+    };
+
+
+	//
+	// #todo: ?? maybe 
+	// GDT, IDT (usar extern).
+	//
+
+
+	// #obs: O contexto é depedente.
+	// Inicializando o Process manager.
+
+    init_process_manager();
+
+
+    //
+    // Continua ...
+    //
+
+    // Done.
+
+
+
+
+
+
+//
+//==================================================================================
+//
 
 
 
@@ -812,10 +801,10 @@ int init (void){
 
 
 	// Disable interrupts, lock task switch and scheduler.
-	
-	asm ("cli");
-	set_task_status(LOCKED); 
-	scheduler_lock();
+
+    asm ("cli");
+    set_task_status(LOCKED); 
+    scheduler_lock();
 
     // #todo
     // Talvez devamos antecipar isso, pois faz parte do teclado.
@@ -837,10 +826,6 @@ int init (void){
     //
 
     KeInitPhase = 2;
-    
-    
-    
-    
 
 
     //#debug
@@ -853,19 +838,18 @@ int init (void){
     printf      ("==== init: done\n");
 
 
-
-
-
 #ifdef BREAKPOINT_TARGET_AFTER_INIT
-    //#debug 
-	//a primeira mensagem só aparece após a inicialização da runtime.
-	//por isso não deu pra limpar a tela antes.
+    
+    // #debug 
+    // A primeira mensagem só aparece após a inicialização da runtime.
+    // por isso não deu pra limpar a tela antes.
+    
     printf("core-init: debug breakpoint after init");
     refresh_screen(); 
-    while (1){ 
-        asm ("cli");
-        asm ("hlt"); 
-    }
+    
+    asm ("cli");
+    while (1){ asm ("hlt"); }
+
 #endif
 
 

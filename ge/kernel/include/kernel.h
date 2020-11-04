@@ -377,6 +377,8 @@ extern void do_executa_new_task (void);
 #include "pints.h"
 
 
+#include "runtime.h"
+
 // kernel
 #include "ke.h"
 #include "ki.h"
@@ -775,14 +777,6 @@ int kernel_main (int arch_type);
 int x86main (void);
 //...
 
-
-//
-// Initializations support.  
-//
-
-
-//RunTime.
-int init_runtime (void);         
 
 
 //Save args in the structure.

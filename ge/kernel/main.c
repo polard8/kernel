@@ -31,14 +31,27 @@ extern unsigned long SavedBootBlock;
  ********************************************
  * kernel_main:
  *
- *     Main function.
- *     The Assembly part calls this function.
+ *  Gramado OS kernel C entry point. :)
+ * 
+ *  This is where C execution begins, after head.asm 
+ *  transfers control here.
+ * 
+ *  The purpose is to initialize the virtual console support,
+ *  the video support, the runtime support and starts the
+ *  architecture initialization routine.
+ * 
  */
 
 
-int kernel_main (int arch_type){
+int kernel_main (int arch_type)
+{
 
     int Status = (-1);
+
+
+    //
+    // == Globals ====================================================
+    //
 
 
     // Current arch support.
@@ -85,15 +98,10 @@ int kernel_main (int arch_type){
     // It is used by the kernel info.
     current_mode = (char) BootBlock.gramado_mode;
 
+    //
+    // == serial ======================================================
+    //
 
-    // #order
-    // serial debug.
-    // video.
-    // ...
- 
-    // Serial debug
-    // Initialize all the ports.
-    // ps: We can't use debug in this first initialization.
     // See: bottom/dd/serial/serial.c
     Status = serial_init();
     if (Status != 0)
@@ -103,6 +111,7 @@ int kernel_main (int arch_type){
         // falhou na inicialização das portas seriais.
         // Vamos continuar por enquanto.
     }
+
     
     debug_print ("============================================\n");
     debug_print ("== main.c: Architechture independent part ==\n");
@@ -113,6 +122,7 @@ int kernel_main (int arch_type){
 
     //gramado mode
     //game mode
+    
     switch (current_mode){
 
         case GRAMADO_JAIL:
@@ -143,15 +153,11 @@ int kernel_main (int arch_type){
     };
 
 
-    // Virtual Console:
-    // The kernel only have four virtual consoles.
-    debug_print ("[Kernel] kernel_main: Initializing virtual console...\n");
-
-    console_set_current_virtual_console (0);
-    console_init_virtual_console (0);
-    console_init_virtual_console (1);
-    console_init_virtual_console (2);
-    console_init_virtual_console (3);
+    // Virtual Console.
+    // See: tty/console.c
+    
+    debug_print ("[Kernel] kernel_main: Initializing virtual consoles ...\n");
+    VirtualConsole_initialize();
 
 
     switch (current_arch){
@@ -197,28 +203,22 @@ int kernel_main (int arch_type){
     // Text mode is not supported.
 
     if ( SavedBootMode == 1 ){
-        g_useGUI = GUI_ON;
+        g_useGUI          = GUI_ON;
         VideoBlock.useGui = GUI_ON;
         debug_print ("[Kernel] kernel_main: GUI_ON\n");
 		//...
 
     }else{
-        g_useGUI = GUI_OFF;
+        g_useGUI          = GUI_OFF;
         VideoBlock.useGui = GUI_OFF;
+
         debug_print ("[Kernel] kernel_main: GUI_OFF\n");
         debug_print ("[Kernel] kernel_main: Text mode not supported! *hang");
 
-        while (1){
-            asm ("cli \n");
-            asm ("hlt \n");
-        };
-
-		//...
-
-		// #todo
-		// No message support at the moment ?!
-		// panic ("kernel_main: Text mode not supported");
-	};
+        // No message support at the moment ?!
+        asm ("cli \n");
+        while (1){  asm ("hlt \n");  };
+    };
 
 
     debug_print ("[Kernel] kernel_main: Initializing video support ...\n");
@@ -234,10 +234,8 @@ int kernel_main (int arch_type){
     stdio_verbosemode_flag = 1;
 
 
-    // In video.c
-
-    videoVideo();
-    videoInit();
+    // In dd/hid/video.c
+    Video_initialize();
 
     // Init screen
 
@@ -266,16 +264,7 @@ int kernel_main (int arch_type){
     // See: core/runtime.c
 
     debug_print ("[Kernel] kernel_main: Initializing runtime\n");
-
-    Status = (int) init_runtime();
-
-    if ( Status < 0 ){
-        debug_print ("[Kernel] kernel_main: Runtime fail. *hang\n");
-        while (1){
-            asm ("cli \n");
-            asm ("hlt \n");
-        };
-    }
+    Runtime_initialize();
 
 
 	// #DEBUG
@@ -311,6 +300,7 @@ int kernel_main (int arch_type){
     //...
     printf (">>>  Gramado mode %d\n", BootBlock.gramado_mode);
 
+    // #bugbug: slow.
     refresh_screen();
     //while(1){}
 
@@ -346,17 +336,12 @@ int kernel_main (int arch_type){
 
         // ...
 
-
         default:
             debug_print ("[Kernel] kernel_main: Current arch not defined!\n ");
             debug_print ("*Hang\n");
             goto fail;
             break;
     };
-
-    //
-    // Fail!
-    //
 
 fail:
     debug_print ("[Kernel] kernel_main-fail:  *hang \n");

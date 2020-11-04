@@ -85,6 +85,9 @@ typedef struct _vbeInfoBlock {
 
 
 
+int Video_initialize(void);
+
+
 #endif   
 
 

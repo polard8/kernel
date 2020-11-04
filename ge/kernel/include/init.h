@@ -1,71 +1,39 @@
 /*
  * File: init.h
  *
- * Descrição:
- *     Header da rotina de inicialização de partes básicas do sistema.
- *
- * Versão 1.0, 2015.
+ *     Initialization support.
+ * 
+ * History:
+ *     2015 - Created by Fred Nora.
  */
 
 
-/*
- * initialization_d:
- *     Estrutura para gerenciamento da inicialização do sistema.
- *     @todo: Mudar nome para initialization_d initialization_t. 
- */ 
-typedef struct initialization_d initialization_t;
+// Initialization support.
 struct initialization_d
 {
-    //Fases do kernel.
+    //#todo
+    
+    // kernel phases.
     int phase1; 
-	int phase2;
-	int phase3;
-	
-	//Componentes principais.
-	int hal;
-	int microkernel;
-	int executive;
-	//int gramado;  //@todo: Esse ainda não foi implementado.
-	
-	//...
+    int phase2;
+    int phase3;
+
+    // #bugbug: 
+    // main components.
+    // deprecated names.
+    int hal;
+    int microkernel;
+    int executive;
+    int gramado;
+
+    // ...
 }; 
-initialization_t Initialization;    //Obs: Não usando ponteiro.
 
- 
-//
-// Protótipos.
-// 
+// No pointer.
+struct initialization_d Initialization;
 
-
-/*
- * init_architecture_dependent:
- *     Inicializa módulos que dependem da arquitetura da máquina.
- */
-
-int init_architecture_dependent (void);
-
-
-/*
- * init_architecture_independent:
- *     Inicializa módulos que são independentes da arquitetura da máquina.
- */    
-
-int init_architecture_independent (void);
-
-
-/*
- * init_globals:
- *     Inicializa globais do sistema.
- */     
 
 void init_globals (void);
-
-
-/*
- * init:
- *     Inicialização de partes básicas do sistema.
- */ 
-
 int init (void);
 
 

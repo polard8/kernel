@@ -98,18 +98,14 @@ extern _x86main
 ;; ==================================================
 ;; head_init:
 ;;
-;; IN:  
+;; IN: 
 ;;    al = 'G' (Graphic Mode).
 ;;    al = 'T' (Text Mode).
-;;
 ;;    ebx = LFB.
-;;
 ;;    ecx = BootBlock pointer.
 ;;    edx = BootBlock pointer.
 ;;    ebp = BootBlock pointer.
-
 ;; Called by _kernel_begin in hwi/init/x86/boot.asm
-
 
 head_init:
 
@@ -147,17 +143,14 @@ head_init:
     cmp al, byte 'G'
     je .useGUI
 
-;;
 ;; Fail. No GUI.
-;;
-
 .fail_nogui:
     mov byte [0xb8000], byte "t"
     mov byte [0xb8001], byte 9
     mov byte [0xb8002], byte "m"
     mov byte [0xb8003], byte 9
-.nogui_hang:
     cli
+.nogui_hang:
     hlt
     jmp .nogui_hang
 
@@ -491,7 +484,7 @@ pitEarlyInitialization:
     ;;  ...
     
     ;xor eax, eax
-    mov ax, word 0x10   
+    mov ax, word 0x10  
     mov ds, ax
     mov es, ax
     ;mov fs, ax
@@ -502,15 +495,13 @@ pitEarlyInitialization:
     ;; STACK
     ;;
 
-    ;; ??
+    ;; Initialize and save.
     ;; Is it the same in the tss ?
-
+    
     mov eax, 0x003FFFF0 
     mov esp, eax 
-
-    ; Save
-    mov dword [_kernel_stack_start_pa], 0x003FFFF0
-    mov dword [_kernel_stack_start],    0x003FFFF0
+    mov dword [_kernel_stack_start],    eax 
+    mov dword [_kernel_stack_start_pa], eax 
 
 
     ;;
@@ -523,6 +514,7 @@ pitEarlyInitialization:
     ;; we need to think about this flag.
 
     mov dword [_KernelStatus], dword 1
+    ;; mov dword [_KernelStatus], dword 0
 
     ;;
     ;; == Calling the C part ===============================
@@ -541,16 +533,15 @@ pitEarlyInitialization:
 
     call _kernel_main
 
-    ;; _kernel_main returned.
     ;; We really don't wanna reach this point.
     ;; We are in graphics mode and we can't print an error message.
-    ;; See: headlib.asm
+    ;; We will not return to boot.asm.
 
-.hang:
     cli
+
+han__g:
     hlt
-    jmp __die 
-    jmp .hang
+    jmp han__g
 
 
 	;
