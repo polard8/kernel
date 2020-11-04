@@ -1369,7 +1369,17 @@ int VirtualConsole_initialize(void)
     console_init_virtual_console(1);
     console_init_virtual_console(2);
     console_init_virtual_console(3);
-    console_switch_to(0); 
+    console_switch_to(0);
+
+		// Obs: 
+		// O video já foi inicializado em main.c.
+		// Isso atualiza a estrutura de console do console atual.
+
+		// BANNER !
+        //Welcome message. (Poderia ser um banner.) ??
+        
+    set_up_cursor (0,1);
+ 
 
     return 0;
 }

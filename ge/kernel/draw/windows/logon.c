@@ -148,7 +148,7 @@ int init_logon_manager (void){
 
 	
 	    // tty support.
-	    // As mensagens do kernel precisam usar esses par^ametros.
+	    // As mensagens do kernel precisam usar esses parametros.
 	    // o kernel usa a tty0.
 	
 	    //#importante
@@ -246,7 +246,7 @@ int init_logon_manager (void){
 #ifdef KERNEL_VERBOSE
 		printf ("init_logon_manager: initializing windows\n");   
 #endif
-		init_windows (); 
+		init_windows(); 
 
 
 		//menus.

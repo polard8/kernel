@@ -483,10 +483,13 @@ int x86main (void){
 
 		// Obs: 
 		// O video já foi inicializado em main.c.
+		// Isso atualiza a estrutura de console do console atual.
+        // #test: mudamos isso para o momento em que inicializamos os consoles.
+        
 		// BANNER !
         //Welcome message. (Poderia ser um banner.) 
         
-        set_up_cursor (0,1);
+        //set_up_cursor (0,1);
 
 
         //
@@ -550,18 +553,11 @@ int x86main (void){
     
     KeInitPhase = 3; 
     
-    // Logon. 
-    // Cria Background, main window, navigation bar.
-    // de acordo com predefinição.
-    // See:
-    // windows/logon.c
-
-
-    if ( g_useGUI != 1 )
-        panic("core-init: NO GUI");
-        
-    printf ("core-init: calling init_logon_manager ...\n");
-    init_logon_manager();
+    // Initialize all the kernel graphics support.
+    // some extra things like virtual terminal and tty.
+    // #todo: rever essa inicializaçao.
+    // See; windows/model/kgws.c
+    KGWS_initialize();
 
     // #debug:  
     // Esperamos alcaçarmos esse alvo.

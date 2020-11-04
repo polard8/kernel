@@ -50,10 +50,6 @@ int gwsGetCurrentFontCharHeight (void)
 
 
 
-
-
-
-
 /* 
  * gwsInstallFont:
  *     Carregando e instalando uma fonte dado o nome. 
@@ -61,9 +57,8 @@ int gwsGetCurrentFontCharHeight (void)
  
 int gwsInstallFont ( char *file_name ){
 
-    unsigned long fileret;
+    unsigned long fileret=0;
 
-	// 
 	// #todo: 
 	// Rever esse tamanho.
 

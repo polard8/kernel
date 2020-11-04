@@ -44,6 +44,10 @@ kgws_send_to_controlthread_of_currentwindow (
 int init_gramado (void);
 
 
+
+int KGWS_initialize(void);
+
+
 //
 // End.
 //

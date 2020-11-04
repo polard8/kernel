@@ -76,10 +76,9 @@ void gwsDisableTextCursor ()
 }
 */ 
 
- 
 //abrir o servidor de janelas. 
-int gwsOpen (void){
-	
+int gwsOpen (void)
+{
 	//Aberto.
 	kgwm_status = 1;
 	//..
@@ -89,8 +88,8 @@ int gwsOpen (void){
 
 
 //fechar o servidor de janelas
-int gwsClose (void){
-	
+int gwsClose (void)
+{
 	kgwm_status = 0;
 
     return 0;
@@ -98,28 +97,25 @@ int gwsClose (void){
 
 
 // Registrar um window manager.
-int kgwmRegisterWindowManager ( int pid ){
-
+int kgwmRegisterWindowManager ( int pid )
+{
     int Status = 0;
 
 
     if ( kgwm_status != 1 )
     {
-		Status = 1;
-		goto fail;
+        Status = 1;
+        goto fail;
+    
     }else{
-		
-	    kgwm_wm_PID = (int) pid;
-	    kgwm_wm_status = 1;
-		goto done;
+        kgwm_wm_PID = (int) pid;
+        kgwm_wm_status = 1;
+        return 0;
     };
-
 
 fail:
     printf("kgwmRegisterWindowManager: fail\n");
-
-done:
-    return 0;
+    return Status;
 }
 
 
@@ -522,6 +518,7 @@ void gui_create_infobox (void){
     if ( (void *) gui == NULL ){
         debug_print ("gui_create_infobox: gui\n");
         return;
+    
     }else{
         gui->infobox = NULL;
     };    
@@ -537,8 +534,8 @@ void gui_create_messagebox (void){
     if ( (void *) gui == NULL ){
         debug_print ("gui_create_messagebox: gui\n");
         return;
+    
     }else{
-
         gui->messagebox = NULL;
     };
 }
@@ -555,8 +552,8 @@ void gui_create_debug (void){
     if ( (void *) gui == NULL ){
         debug_print ("gui_create_debug: gui\n");
         return;
+    
     }else{
-
         gui->debug = NULL;
     };
 
@@ -591,11 +588,10 @@ void gui_create_navigationbar (void)
 
 void gui_create_grid (void){
  
-    if ( (void *) gui == NULL )
-    {
+    if ( (void *) gui == NULL ){
         return;
+        
     }else{
-
 		//initScreenGrid();
         gui->grid = NULL;
     };
@@ -611,7 +607,6 @@ void *guiGetScreenWindow (void){
     {
         return NULL;
     }
-
 
     return (void *) gui->screen;
 }
@@ -655,7 +650,6 @@ void *guiGetLogoWindow (void){
     {
         return NULL;
     }
-
 
     return (void *) gui->logo;
 }
@@ -892,28 +886,20 @@ guiSetUpMainWindow (
 	//check limits
 
     if ( x > Width || y > Height )
-    { 
-        return; 
-    }
-        
-    if ( width > Width || height > Height )
-    { 
-        return; 
-    }
+    { return; }
 
+    if ( width > Width || height > Height ) 
+    { return; }
 
     if ( (void *) gui == NULL )
-    {
-        return;
-    }
-
+    { return; }
 
 
     if ( (void *) gui->main == NULL )
     {
         return;
-    }else{
 
+    }else{
         replace_window (gui->main, x, y);
         resize_window ( gui->main, width, height);
     };

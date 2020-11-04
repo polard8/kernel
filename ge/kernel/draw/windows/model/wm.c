@@ -1,7 +1,7 @@
 /*
- * File: wm/wm.c 
+ * File: windows/model/wm.c 
  *
- *  wm. - Window Manager.
+ *  wm. - kernel Window Manager.
  * 
  * Descrição:
  *     Arquivo principal do Window Manager.
@@ -374,16 +374,16 @@ void printQueue(circularQueue_t *theQueue)
 //wm.
 
 int windowGetWindowID ( struct window_d *window ){
-	
+
 	if ( (void *) window != NULL )
 	{
 		if ( window->used == 1 && window->magic == 1234 )
 		{	
 		    return (int) window->id; 	
 		}
-	};
+	}
 
-	return (int) -1;
+    return (int) -1;
 }
 
 
@@ -558,37 +558,33 @@ void windowSetUpColorScheme (int type){
 		panic ("windowSetUpColorScheme: humility");
 		
 	}else{
-		
-		//Object.
-		humility->objectType = ObjectTypeColorScheme;
-		humility->objectClass = ObjectClassGuiObjects;
-		
+        humility->objectType  = ObjectTypeColorScheme;
+        humility->objectClass = ObjectClassGuiObjects;
+        humility->used  = 1;
+        humility->magic = 1234;
+        humility->name  = "Humility";
 
-		humility->used = 1;
-		humility->magic = 1234;
-		humility->name = "Humility";
-		
-		//Colors
-		//Definidas em ws.h
-		humility->elements[csiNull] = 0;                             //0
-        humility->elements[csiDesktop] = HUMILITY_COLOR_BACKGROUND;  //1		
-		humility->elements[csiWindow] = HUMILITY_COLOR_WINDOW;       //2
-        humility->elements[csiWindowBackground] = HUMILITY_COLOR_WINDOW_BACKGROUND;	 //3	
-		humility->elements[csiActiveWindowBorder] = HUMILITY_COLOR_ACTIVE_WINDOW_BORDER;  //4
-        humility->elements[csiInactiveWindowBorder] = HUMILITY_COLOR_INACTIVE_WINDOW_BORDER;  //5		
-		humility->elements[csiActiveWindowTitleBar] = HUMILITY_COLOR_ACTIVE_WINDOW_TITLEBAR;  //6
-        humility->elements[csiInactiveWindowTitleBar] = HUMILITY_COLOR_INACTIVE_WINDOW_TITLEBAR;  //7	 	
-		humility->elements[csiMenuBar] = HUMILITY_COLOR_MENUBAR;                //8
+        // Colors
+        // Definidas em ws.h
+        humility->elements[csiNull] = 0;                             //0
+        humility->elements[csiDesktop] = HUMILITY_COLOR_BACKGROUND;  //1
+        humility->elements[csiWindow] = HUMILITY_COLOR_WINDOW;       //2
+        humility->elements[csiWindowBackground] = HUMILITY_COLOR_WINDOW_BACKGROUND;       //3
+        humility->elements[csiActiveWindowBorder] = HUMILITY_COLOR_ACTIVE_WINDOW_BORDER;  //4
+        humility->elements[csiInactiveWindowBorder] = HUMILITY_COLOR_INACTIVE_WINDOW_BORDER;  //5
+        humility->elements[csiActiveWindowTitleBar] = HUMILITY_COLOR_ACTIVE_WINDOW_TITLEBAR;  //6
+        humility->elements[csiInactiveWindowTitleBar] = HUMILITY_COLOR_INACTIVE_WINDOW_TITLEBAR;  //7
+        humility->elements[csiMenuBar] = HUMILITY_COLOR_MENUBAR;                //8
         humility->elements[csiScrollBar] = HUMILITY_COLOR_SCROLLBAR;            //9  
-		humility->elements[csiStatusBar] = HUMILITY_COLOR_STATUSBAR;            //10
+        humility->elements[csiStatusBar] = HUMILITY_COLOR_STATUSBAR;            //10
         humility->elements[csiMessageBox] = HUMILITY_COLOR_MESSAGEBOX;		    //11
-		humility->elements[csiSystemFontColor] = HUMILITY_COLOR_SYSTEMFONT;		//12
-		humility->elements[csiTerminalFontColor] = HUMILITY_COLOR_TERMINALFONT;	//13
-		//...
-		
+        humility->elements[csiSystemFontColor] = HUMILITY_COLOR_SYSTEMFONT;		//12
+        humility->elements[csiTerminalFontColor] = HUMILITY_COLOR_TERMINALFONT;	//13
+        // ...
+
 		//Sanvando na estrutura padrão para o esquema humility.
 		HumilityColorScheme = (void*) humility;
-	};	
+	};
 	
 	//
 	// * PRIDE 
@@ -601,60 +597,57 @@ void windowSetUpColorScheme (int type){
         panic ("windowSetUpColorScheme: pride");
 
     }else{
-		
-		//Object.
-		pride->objectType  = ObjectTypeColorScheme;
-		pride->objectClass = ObjectClassGuiObjects;
+        pride->objectType  = ObjectTypeColorScheme;
+        pride->objectClass = ObjectClassGuiObjects;
+        pride->used  = 1;
+        pride->magic = 1234;
+        pride->name  = "Pride";
 
-		pride->used = 1;
-		pride->magic = 1234;
-		pride->name = "Pride";
-		
 		//Colors
 		//Definidas em ws.h
-		pride->elements[csiNull] = 0;
+        pride->elements[csiNull] = 0;
         pride->elements[csiDesktop] = PRIDE_COLOR_BACKGROUND;  
-		pride->elements[csiWindow] = PRIDE_COLOR_WINDOW;
+        pride->elements[csiWindow] = PRIDE_COLOR_WINDOW;
         pride->elements[csiWindowBackground] = PRIDE_COLOR_WINDOW_BACKGROUND;
-		pride->elements[csiActiveWindowBorder] = PRIDE_COLOR_ACTIVE_WINDOW_BORDER;  
-        pride->elements[csiInactiveWindowBorder] = PRIDE_COLOR_INACTIVE_WINDOW_BORDER;  
-		pride->elements[csiActiveWindowTitleBar] = PRIDE_COLOR_ACTIVE_WINDOW_TITLEBAR;    
-        pride->elements[csiInactiveWindowTitleBar] = PRIDE_COLOR_INACTIVE_WINDOW_TITLEBAR;		
-		pride->elements[csiMenuBar] = PRIDE_COLOR_MENUBAR;
+        pride->elements[csiActiveWindowBorder] = PRIDE_COLOR_ACTIVE_WINDOW_BORDER; 
+        pride->elements[csiInactiveWindowBorder] = PRIDE_COLOR_INACTIVE_WINDOW_BORDER; 
+        pride->elements[csiActiveWindowTitleBar] = PRIDE_COLOR_ACTIVE_WINDOW_TITLEBAR; 
+        pride->elements[csiInactiveWindowTitleBar] = PRIDE_COLOR_INACTIVE_WINDOW_TITLEBAR;
+        pride->elements[csiMenuBar] = PRIDE_COLOR_MENUBAR;
         pride->elements[csiScrollBar] = PRIDE_COLOR_SCROLLBAR;  		
-		pride->elements[csiStatusBar] = PRIDE_COLOR_STATUSBAR;    
+        pride->elements[csiStatusBar] = PRIDE_COLOR_STATUSBAR;    
         pride->elements[csiMessageBox] = PRIDE_COLOR_MESSAGEBOX;
-		pride->elements[csiSystemFontColor] = PRIDE_COLOR_SYSTEMFONT;    //12
-		pride->elements[csiTerminalFontColor] = PRIDE_COLOR_TERMINALFONT;  //13		
-		//...
-		
+        pride->elements[csiSystemFontColor] = PRIDE_COLOR_SYSTEMFONT;    //12
+        pride->elements[csiTerminalFontColor] = PRIDE_COLOR_TERMINALFONT;  //13
+        // ...
+
 		//Sanvando na estrutura padrão para o esquema pride.
 		PrideColorScheme = (void *) pride;
-	};	
-		
-	
+	};
+
+
 	// Configurando qual será o esquema padrão.
 	// @todo; Criar uma função que selecione qual dois esquemas serão usados
 	//        apenas selecionando o ponteiro da estrutura.  
-	
+
     switch (type){
-		
-		case ColorSchemeNull:
-		    CurrentColorScheme = (void *) humility;
-		    break;
-		
-		case ColorSchemeHumility:
-		    CurrentColorScheme = (void *) humility;
-		    break;
-		
-		case ColorSchemePride:
-	        CurrentColorScheme = (void *) pride; 
-		    break;
-		
-		default:
-		    CurrentColorScheme = (void *) humility;
-			break;
-	};	
+
+    case ColorSchemeNull: 
+        CurrentColorScheme = (void *) humility;
+        break;
+
+    case ColorSchemeHumility:
+        CurrentColorScheme = (void *) humility;
+        break;
+
+    case ColorSchemePride:
+        CurrentColorScheme = (void *) pride; 
+        break;
+
+    default:
+        CurrentColorScheme = (void *) humility;
+        break;
+    };
 }
 
 
@@ -664,23 +657,23 @@ int windowSelectColorScheme (int type){
 	//#debug
 	//printf("windowSelectColorScheme: type={%d} \n", type);
 	
-    switch (type)
-	{
-		case ColorSchemeHumility:
-		    goto do_humility;
-		    break;
-			
-		case ColorSchemePride:
-		    goto do_pride;
-			break;
-			
-		default:
-		    printf("windowSelectColorScheme: Type not defined\n");
-			goto fail;
-			break;
-	};
+    switch (type){
 
-	
+    case ColorSchemeHumility:
+        goto do_humility;
+        break;
+
+    case ColorSchemePride:
+        goto do_pride;
+        break;
+
+    default:
+        printf ("windowSelectColorScheme: Type not defined\n");
+        goto fail;
+        break;
+    };
+
+
 do_humility:
 
     if ( (void *) HumilityColorScheme == NULL )
@@ -724,11 +717,9 @@ do_pride:
 	};		
 
 done:
+    return 0;
 
-    return 0;	
-    
 fail:
-
     printf ("fail\n");
     return 1;
 }
@@ -1017,15 +1008,16 @@ void windowUnlock (struct window_d *window){
  
 void set_current_window (struct window_d *window){
 	
-	if ( (void *) window == NULL ){
+	if ( (void *) window == NULL )
+	{
 		//message 
 	    return; 
 	} 
 
+    current_window = (int) window->id;
 
-	CurrentWindow = (void *) window;
-	
-	current_window = (int) window->id;
+    //struct.
+    CurrentWindow = (void *) window;
 }
 
 
@@ -1065,7 +1057,6 @@ int RegisterWindow (struct window_d *window){
 
     struct window_d *Empty; 
     int Offset = 0; 
-
 
 
     if ( (void *) window == NULL ){
@@ -1154,11 +1145,9 @@ void windowShowWindowList (void){
         return;
 
     }else{
-
-        left = gui->main->left;
-        top = gui->main->top;
-
-        width = gui->main->width;
+        left   = gui->main->left;
+        top    = gui->main->top;
+        width  = gui->main->width;
         height = gui->main->height;
 
 		//...
@@ -1167,9 +1156,11 @@ void windowShowWindowList (void){
 
 	//@todo: Chamar método.	
 	//Cursor.
-	TTY[current_vc].cursor_x = (left/8);
-	TTY[current_vc].cursor_y = (top/8);  
+
+    TTY[current_vc].cursor_x = (left/8);
+    TTY[current_vc].cursor_y = (top/8);  
 	//set_up_cursor(0,10);
+
 
 	//
 	// Se estamos no modo gráfico.
@@ -1182,13 +1173,10 @@ void windowShowWindowList (void){
 
     if( VideoBlock.useGui == 1 )
     {
-		//Parent window.
-	    //#warning: Já checamos isso anteriormente.
-		
-		if( (void *) gui->main == NULL)
-		{
-	        return;
-	    };
+        //Parent window.
+        //#warning: Já checamos isso anteriormente.
+
+        if( (void *) gui->main == NULL){ return; }
 
         hWindow = (void *) CreateWindow ( 3, 0, VIEW_MAXIMIZED, "window-list", 
                                left, top, width, height, 
@@ -1225,12 +1213,11 @@ void windowShowWindowList (void){
 		// #bugbug
 		// Cuidado para não dividir por '0'.
 
-		TTY[current_vc].cursor_left = (hWindow->left/8);
-		TTY[current_vc].cursor_top = (hWindow->top/8) + 4;   //Queremos o início da área de clente.
-		
-		TTY[current_vc].cursor_right = TTY[current_vc].cursor_left + (width/8);
+		TTY[current_vc].cursor_left   = (hWindow->left/8);
+		TTY[current_vc].cursor_top    = (hWindow->top/8) + 4;   //Queremos o início da área de clente.
+		TTY[current_vc].cursor_right  = TTY[current_vc].cursor_left + (width/8);
 		TTY[current_vc].cursor_bottom = TTY[current_vc].cursor_top  + (height/8);
-		
+
 		//cursor (0, mas com margem nova).
 		TTY[current_vc].cursor_x = TTY[current_vc].cursor_left; 
 		TTY[current_vc].cursor_y = TTY[current_vc].cursor_top; 
@@ -1252,23 +1239,22 @@ void windowShowWindowList (void){
 				    i, hWnd, hWnd->DedicatedBuffer, hWnd->name );
 					
 				//draw_text( hWindow, 8,  1*(400/16), COLOR_WINDOWTEXT, "F1 Help.");
-	        };
+	        }
 			
 		    i++;
 	    };
-		
-		show_active_window();
+
+        show_active_window();
         show_window_with_focus();
         SetFocus(hWindow);
-	
-		
+
+
 		//voltando a margem normal a margem
-		TTY[current_vc].cursor_left = (left/8);    //0;
-		TTY[current_vc].cursor_top = (top/8);        //0;
-		
-		TTY[current_vc].cursor_right = (width/8);   
-		TTY[current_vc].cursor_bottom = (height/8);  
-		
+		TTY[current_vc].cursor_left   = (left/8); 
+		TTY[current_vc].cursor_top    = (top/8);
+		TTY[current_vc].cursor_right  = (width/8);
+		TTY[current_vc].cursor_bottom = (height/8); 
+
 		//cursor (0, mas com margem nova)
 		TTY[current_vc].cursor_x = TTY[current_vc].cursor_left; 
 		TTY[current_vc].cursor_y = TTY[current_vc].cursor_top;
@@ -2197,9 +2183,7 @@ replace_window (
         //@todo: Checar limites.
 	
         window->left = (unsigned long) x;
-        window->top = (unsigned long) y;
-        
-        
+        window->top  = (unsigned long) y; 
         
         if (window->clientAreaUsed == 1)
         {
@@ -2212,31 +2196,31 @@ replace_window (
 					if ( window->type == WT_SIMPLE )
 					{
                         window->rcClient->left = (unsigned long) (window->left);
-                        window->rcClient->top = (unsigned long) (window->top);
+                        window->rcClient->top  = (unsigned long) (window->top);
 					}
 					
                     if ( window->type == WT_OVERLAPPED )
                     {
                         window->rcClient->left = (unsigned long) (window->left +1);
-                        window->rcClient->top = (unsigned long) (window->top  +2 +32 +2);
+                        window->rcClient->top  = (unsigned long) (window->top  +2 +32 +2);
 			        }
 			        
                     if ( window->type == WT_EDITBOX || 
                          window->type == WT_EDITBOX_MULTIPLE_LINES )
                     {
                         window->rcClient->left = (unsigned long) (window->left +1);
-                        window->rcClient->top = (unsigned long) (window->top  +1);
+                        window->rcClient->top  = (unsigned long) (window->top  +1);
                     }
 				} 
 			}
         }
-        
-        
+ 
         if (window->statusbarUsed == 1)
         {
 			if ( (void *) window->statusbar != NULL )
 			{
 				window->bottom = window->top + window->height; 
+
 			    window->statusbar->left = window->left +1;
 			    window->statusbar->top  = window->bottom -25 -1;
             }
@@ -2386,25 +2370,21 @@ void CloseWindow ( struct window_d *window ){
 	    // devemos retirar a janela da zorder list 
 	
 	    z = (int) window->z;
-	
-	    if ( z >= 0 && z < KGWS_ZORDER_MAX )
-	    {
+
+        if ( z >= 0 && z < KGWS_ZORDER_MAX )
+        {
 	        Windows[z] = (unsigned long) 0;	
 	    
 		    //atualiza o contador.
             zorderCounter--;
-	   
-	        if (zorderCounter < 0 )
-	        {
-		        zorderCounter = 0;
-            }
-	    };
+            if (zorderCounter < 0 ){ zorderCounter = 0; }
+        }
 	
         //Sinaliza para o GC.
-	    
-		window->used = WINDOW_GC;       //216;
-	    window->magic = WINDOW_CLOSED;  //4321;		
-		
+
+        window->used  = WINDOW_GC;      // 216;
+        window->magic = WINDOW_CLOSED;  // 4321;
+
 		//...
 	};
 	
@@ -2597,7 +2577,7 @@ void show_window_with_focus (void)
 void CloseActiveWindow (void){
 
     struct window_d *Window;	
-    int Offset;
+    int Offset=0;
 
 
     Offset = (int) get_active_window ();
@@ -2627,7 +2607,7 @@ void CloseActiveWindow (void){
 	        if ( (void *) Window->parent != NULL )
 			{
 	            set_active_window(Window->parent);
-	        };
+	        }
 		};
     };
 
@@ -2867,15 +2847,15 @@ int raise_window ( struct window_d *window ){
 // wm ? 
  
 void windowSwitchFocus (void){
-	
-	int Max;
-	int CurrentID;
-	int NextID;
+
+	int Max=0;
+	int CurrentID=0;
+	int NextID=0;
 
     struct window_d *window;
-	struct window_d *next;	
+    struct window_d *next;
 	//...
-	
+
 	//Max e Current.
 	
 	Max = (int) windows_count;
@@ -2943,9 +2923,8 @@ done:
 	//refresh_screen();
 	
 	return;
-	
-fail:
 
+fail:
     return;
 }
 
@@ -3371,7 +3350,6 @@ done:
 	return 0;
 	
 fail:
-
 	return (int) 1;
 }
 
@@ -3637,20 +3615,17 @@ int windowLoadGramadoIcons (void){
 // it is gonna be used by the window server.
 void *ui_get_system_icon ( int n )
 {
-    if (n <= 0){
-        return NULL;
-    }
+    if (n <= 0){ return NULL; }
 
     // See: window.h
     switch (n){
 
-        case 1: return (void *) shared_buffer_app_icon;       break;
-        case 2: return (void *) shared_buffer_file_icon;      break;
-        case 3: return (void *) shared_buffer_folder_icon;    break;
-        case 4: return (void *) shared_buffer_terminal_icon;  break;
-        case 5: return (void *) shared_buffer_cursor_icon;    break;
-        // ...
-        
+    case 1: return (void *) shared_buffer_app_icon;       break;
+    case 2: return (void *) shared_buffer_file_icon;      break;
+    case 3: return (void *) shared_buffer_folder_icon;    break;
+    case 4: return (void *) shared_buffer_terminal_icon;  break;
+    case 5: return (void *) shared_buffer_cursor_icon;    break;
+    // ...
     };
 
     return NULL;
@@ -3848,7 +3823,7 @@ int windowOverLappedScan ( unsigned long x, unsigned long y ){
 
     struct window_d *w;
     int i = 0;
-    int WID;
+    int WID=0;
 
 
 	// #bugbug

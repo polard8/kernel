@@ -964,6 +964,26 @@ int register_ws_process ( pid_t pid ){
 }
 
 
+// called by x86init.c
+int KGWS_initialize(void)
+{
+    // Logon. 
+    // Cria Background, main window, navigation bar.
+    // de acordo com predefinição.
+    // See:
+    // windows/logon.c
+
+    if ( g_useGUI != 1 ){
+        panic("KGWS_initialize: NO GUI");
+    }
+    
+    printf ("KGWS_initialize: calling init_logon_manager ...\n");
+    init_logon_manager();
+
+    return 0;
+}
+
+
 //
 // End.
 //
