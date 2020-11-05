@@ -28,18 +28,6 @@ extern unsigned long SavedBootBlock;
 
 
 /*
- //future mummies.
-void die_motherfucker (int motherfucker)
-{
-    if (motherfucker==1)
-        wait_then_write (0x64,0xAD);  // Disable keyboard port.
-
-    if (motherfucker==2)
-        wait_then_write (0x64,0xA7);  // Disable mouse port.
-}
-*/
-
-/*
  ********************************************
  * kernel_main:
  *
@@ -58,10 +46,6 @@ int kernel_main (int arch_type)
 {
 
     int Status = (-1);
-    
-
-    //die_motherfucker(1);
-    //die_motherfucker(2);
 
 
     //
