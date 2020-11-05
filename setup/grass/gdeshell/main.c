@@ -1767,12 +1767,12 @@ do_compare:
     // cd - Change dir.
     if ( strncmp ( prompt, "cd", 2 ) == 0 )
     {
-        i++;
-        token = (char *) tokenList[i];
+        i++;   // Next token.
+        
+        token = (char *) tokenList[i];   // Get next token.
 
         if ( token == NULL ){
             printf ("cd: No arg\n");
-
         }else{
 
 			//#bugbug: n�o � possivel fazer isso por enquanto,
@@ -1787,11 +1787,8 @@ do_compare:
             }
 
             // Updating the current working directory string.
+            // Updating the file system support in the kernel.
             shellUpdateWorkingDiretoryString ( (char *) tokenList[i] );
-
-			// #todo: podemos checar se o pathname � absoluto,
-			//e onde se encontra o arquivo que queremos.
-			//shellDisplayBMP( (char*) tokenList[i] );
         };
 
 		// o que segue o comando cd � um pathname.
@@ -2360,15 +2357,12 @@ do_compare:
         goto exit_cmp; 
     }
 
-
-    // pwd 
-    // Print working directory.
+    // pwd - Print Working Directory.
     if ( gramado_strncmp( prompt, "pwd", 3 ) == 0 )
     {
         pwd_builtins ();
         goto exit_cmp;
     }
-
 
     // ram - Show RAM memory info.
     if (gramado_strncmp ( prompt, "ram", 3 ) == 0)
@@ -4928,48 +4922,45 @@ void shellExit (int code)
  * Essa � a string que ser� mostrada antes do prompt.
  * 'pwd'> 
  * ?? isso deve sser todo o pathname do pwd ?? 
- * ex: root:/volume0>
  */
 
-void shellUpdateWorkingDiretoryString ( char *string ){
+// Used by the 'cd' command.
 
-    if ( pwd_initialized == 0 ){
-        gde_debug_print ("shellUpdateWorkingDiretoryString: pwd_initialized\n");
-        goto fail;
+void shellUpdateWorkingDiretoryString ( char *string )
+{
+    
+    // Is it initialized in the gdeshell?
+    if ( pwd_initialized == 0 )
+    {
+        gde_debug_print ("shellUpdateWorkingDiretoryString: [FAIL] pwd_initialized\n");
+        return;
 
+    // YES, it is.
     }else{
 
-        if ( (void *) string == NULL ){
-            gde_debug_print ("shellUpdateWorkingDiretoryString: string\n");
-            goto fail;
+        if ( (void *) string == NULL )
+        {
+            gde_debug_print ("shellUpdateWorkingDiretoryString: [FAIL] invalid string\n");
+            return;
 
+        // OK, let's go!
         }else{
 
             //++
-            // Atualizando dentro do gdeshell
-
-            // concatenate string.
+            // Atualizando dentro do gdeshell.
+            // concatenate string and separator.
             strcat ( current_workingdiretory_string, string );
-
-            // concatenate separator.
             strcat ( current_workingdiretory_string, 
                 SHELL_PATHNAME_SEPARATOR );
 
             //++
             // Atualizar no gerenciamento feito pelo kernel.
-            system_call( 175, 
+            system_call ( 175, 
                 (unsigned long) string,
                 (unsigned long) string, 
                 (unsigned long) string );
         };
     };
-
-	// ...
-
-fail:
-
-done:
-    return;
 }
 
 

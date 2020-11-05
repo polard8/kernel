@@ -32,22 +32,7 @@
 
 
 
-// LBA - logical block address.
-// fat16
-
-#define MBR_LBA               0 
-#define VOLUME1_VBR_LBA       63
-#define VOLUME1_FAT_LBA       67 
-#define VOLUME1_ROOTDIR_LBA   559
-#define VOLUME1_DATAAREA_LBA  591 
-#define VOLUME2_VBR_LBA       32000
-#define VOLUME2_FAT_LBA       33000  
-#define VOLUME2_ROOTDIR_LBA   34000
-#define VOLUME2_DATAAREA_LBA  35000
-
-
-
-// ?? 
+// deveria is para disk.h
 #define SECTOR_SIZE    512  
 //#define SECTOR_SIZE  4096  
 
@@ -419,6 +404,11 @@ void fsInitializeWorkingDiretoryString (void);
 
 void fsUpdateWorkingDiretoryString ( char *string );
 
+
+
+void sys_pwd(void);
+
+void sys_cd_command( char *string);
 
 
 /* 

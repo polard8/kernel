@@ -15,6 +15,40 @@
  
 #define VOLUME_COUNT_MAX 1024
 
+
+#define VFS_VOLUME_ID              0
+#define BOOTPARTITION_VOLUME_ID    1
+#define SYSTEMPARTITION_VOLUME_ID  2
+//...
+
+//
+// == system disk =================================================
+//
+
+// These are the main partitions 
+// in the Gramado system.
+
+// mbr
+#define MBR_LBA               0 
+
+// boot partition
+#define VOLUME1_VBR_LBA       63
+#define VOLUME1_FAT_LBA       67 
+//#define VOLUME1_FAT2_LBA    ??
+#define VOLUME1_ROOTDIR_LBA   559
+#define VOLUME1_DATAAREA_LBA  591 
+
+// system partition
+#define VOLUME2_VBR_LBA       32000
+#define VOLUME2_FAT_LBA       33000  
+//#define VOLUME2_FAT2_LBA    ?? 
+#define VOLUME2_ROOTDIR_LBA   34000
+#define VOLUME2_DATAAREA_LBA  35000
+
+// ==================================================================
+
+
+
 char *current_volume_string;
 
 // volume atual ??
@@ -91,12 +125,29 @@ struct volume_d
     int id;
     int used;
     int magic;
+    
+    // Only one thread can call read and write routine at time.
+    int blocked;
+    struct thread_d *waiting;  //this thread is waiting.
 
-    struct superblock_d super;
-
+    // This is the process that call the read/write operation on this volume.
+    pid_t pid;
 
     // See the enum.
     volume_type_t volumeType;
+
+    // areas.
+    // maybe we can find these in the superblock.
+    // well, this is the fast access.
+    unsigned long VBR_lba;
+    unsigned long FAT1_lba;
+    unsigned long FAT2_lba;
+    unsigned long ROOT_lba;
+    unsigned long DATA_lba;
+    
+    struct superblock_d super;
+
+
 
     // Ponteiro para um buffer se o tipo permitir.
     void *priv_buffer;
@@ -126,9 +177,6 @@ struct volume_d
     // Se é um volume virtual e precisa ser salvo
     // pois houve uma modificação.
     int need_to_save;
-
-    // Qual processo está usando.
-    pid_t pid;
 
     // #todo
     // contador de processos usando o volume

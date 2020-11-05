@@ -2258,13 +2258,12 @@ gde_services (
            break;
 
 
-        //170
-        //pwd ...
-        //Cada processo tem seu pr�prio pwd.
-        //Essa rotina mostra o pathname usado pelo processo.	
+        // 170 - pwd
+        // Cada processo tem seu proprio pwd.
+        // Essa rotina mostra o pathname usado pelo processo.
+        // See: fs.c
         case SYS_PWD:
-            debug_print ("175:\n");
-            fs_print_process_pwd (current_process);
+            sys_pwd();
             return NULL;
             break;
 
@@ -2282,7 +2281,7 @@ gde_services (
 
         // 173
         // Lista arquivos de um diret�rio, dado o n�mero do disco,
-        //o n�mero do volume e o n�mero do diret�rio,
+        //o numero do volume e o n�mero do diret�rio,
         //args in: disk id, volume id, directory id
         case SYS_LISTFILES:
             fsListFiles ( arg2, arg3, arg4 );  
@@ -2292,7 +2291,8 @@ gde_services (
 
         // 174
         case SYS_SEARCHFILE:
-            return (void *) KiSearchFile ( (unsigned char *) arg2, 
+            return (void *) KiSearchFile ( 
+                                (unsigned char *) arg2, 
                                 (unsigned long) arg3 );
             break;
 
@@ -2301,10 +2301,10 @@ gde_services (
         // +Atualiza o pathname na estrutura do processo atual.
         // +Atualiza o pathname na string global.
         // +Carrega o arquivo referente ao diretório atual.
+        // See: fs.c
         case 175:
-            debug_print ("175:\n");
-            fsUpdateWorkingDiretoryString ( (char *) arg2 );
-            fsLoadFileFromCurrentTargetDir ();
+            debug_print ("175: cd command\n");
+            sys_cd_command ( (char *) arg2 );
             return NULL;
             break;
 

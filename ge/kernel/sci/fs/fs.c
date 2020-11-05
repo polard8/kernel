@@ -899,29 +899,133 @@ void set_filesystem_type (int type)
 }
 
 
-
-//Credits: Sirius OS.
+// Credits: Sirius OS.
 unsigned long path_count (unsigned char *path)
 {
     int i=0;
     unsigned long val=0;
     int max = (80*25);
 
-
     for ( i=0; i < max; i++ )
     {
-        if (path[i] == '/')
-            val++;
-        
-        if (path[i] == '\0')
-            break;
+        if (path[i] == '/') { val++; }
+        if (path[i] == '\0'){ break; }
     };
-
 
     return (unsigned long) val;
 }
 
 
+// credits: hoppy os.
+// to 8.3
+// not tested yet.
+void 
+to_FAT_name (
+    char *src,
+    char *dst )
+{
+    int i=0;
+    char *ptr;
+    
+    if (!strcmp(src,"..")) {
+        strcpy(dst,src);
+        i=2;
+    
+    } else if (!strcmp(src,".")) {
+        strcpy(dst,src);
+        i=1;
+    
+    } else {
+        
+        ptr=src;
+        
+        i=0;
+        
+        while (i<8 && *ptr && *ptr != '.') 
+        {
+            dst[i++] = *ptr++;
+        };
+        
+        // Completa com '0' ate 8.
+        while (i<8){ dst[i++] = 0x20; };
+        
+        if (*ptr == '.') { ptr++; }
+        
+        // Ext
+        while (i<11 && *ptr){
+            dst[i++] = *ptr++;
+        };
+    };
+
+    // Completa com '0' ate o fim.
+    while (i<11){ dst[i++] = 0x20; };
+}
+
+// credits: hoppy os.
+// from 8.3
+// not tested yet.
+void 
+from_FAT_name (
+    char *src, 
+    char *dst )
+{
+
+    int i=0;
+    int j=0;
+    int k=0;
+
+
+    // dirty
+    // pra saber o tamanho do nome exluindo os espaços.
+    for (j=7; j >= 0 && src[j] == 0x20; j--)
+    {
+    };
+    
+    k=0;
+    
+    // j eh o tamanho do nome calculado anteriormente.
+    // copia esse nome.
+    for( i=0; i<=j; i++ )
+    {
+        dst[k++] = src[i];
+    }
+    
+    
+    if (*src != '.')
+    {
+        dst[k++] = '.';
+    }
+    
+    // dirty.
+    // pra saber o tamanho da extensao, excluindo os espaços.
+    for (j=10; j>=8 && src[j]==0x20; j--)
+    {
+    };
+    
+    //
+    if (j==7) {
+    
+        if (k==1){
+           dst[k]=0;
+        } else {
+			
+            if (dst[0]=='.'){
+	            dst[k]=0;
+            }else{
+	            dst[k-1]=0;
+	        };
+        };
+    
+    } else {
+        
+        for (i=8; i<=j; i++)
+        {
+            dst[k++] = src[i];
+        };
+        
+        dst[k++] = 0;
+    };
+}
 
 
 /*
@@ -1863,14 +1967,12 @@ int fs_initialize_process_pwd ( int pid, char *string ){
         panic ("fs_initialize_process_pwd: p\n");
 
     }else{
-
         if ( p->used != 1 || p->magic != 1234 ){
             panic ("fs_initialize_process_pwd: validation\n");
         }
 
-        for ( i=0; i<32; i++ ){
-            p->pwd_string[i] = string[i];
-        }
+        // ?? fixed size.
+        for ( i=0; i<32; i++ ){ p->pwd_string[i] = string[i]; }
     };
 
 
@@ -1879,10 +1981,13 @@ int fs_initialize_process_pwd ( int pid, char *string ){
 
 
 /*
+ *********************************
  * fs_print_process_pwd
- *     Cada processo tem seu pr�prio pwd.
+ *     Cada processo tem seu proprio pwd.
  *     Essa rotina mostra o pathname usado pelo processo. 
  */
+
+// this is used by the pwd command. service 170.
 
 int fs_print_process_pwd (int pid){
 
@@ -1890,10 +1995,12 @@ int fs_print_process_pwd (int pid){
 
 
     debug_print ("fs_print_process_pwd:\n");
+    printf      ("fs_print_process_pwd:\n");
+
 
     if (pid<0){
         debug_print ("fs_print_process_pwd: pid\n");
-        return 1;
+        return -1;
     }
 
     // Process
@@ -1904,28 +2011,33 @@ int fs_print_process_pwd (int pid){
         panic ("fs_print_process_pwd: p\n");
 
     }else{
-
         if ( p->used != 1 || p->magic != 1234 ){
             panic ("fs_print_process_pwd: validation\n");
         }
 
-        printf ("PWD:\n");
+        if ( (void *) p->pwd_string != NULL ){
+            printf ("> PID=%d p->pwd_string {%s} \n", 
+                p->pid, p->pwd_string);
+        }
         
-        if ( (void *) p->pwd_string != NULL )
-            printf ("> PID=%d %s \n", p->pid, p->pwd_string);
-            
-        if ( (void *) current_target_dir.name != NULL )
-            printf ("> PID=%d %s \n", p->pid, current_target_dir.name);
+        if ( (void *) current_target_dir.name != NULL ){
+            printf ("> PID=%d current_target_dir.name {%s} \n", 
+                p->pid, current_target_dir.name);
+        }
 
-        refresh_screen ();
+        refresh_screen();
         return 0;
     };
 
-
-    // fail.
-    debug_print ("fs_print_process_pwd: fail\n");
-    
+    debug_print ("fs_print_process_pwd: fail\n");   
     return -1;
+}
+
+
+// Service 170. pwd.
+void sys_pwd(void)
+{
+    fs_print_process_pwd (current_process);
 }
 
 
@@ -1936,7 +2048,9 @@ int fs_print_process_pwd (int pid){
  *     +Atualiza o pathname na estrutura do processo atual.
  *     +Atualiza o pathname na string global. 
  */ 
- 
+
+// Used by the service 175, cd command.
+
 void fsUpdateWorkingDiretoryString ( char *string ){
 
     struct process_d  *p;
@@ -2001,6 +2115,14 @@ void fsUpdateWorkingDiretoryString ( char *string ){
 }
 
 
+// Service 175. cd command.
+void sys_cd_command( char *string)
+{
+    fsUpdateWorkingDiretoryString ( (char *) string );
+    fsLoadFileFromCurrentTargetDir ();
+    // ...
+}
+
 
 /* 
  ************************************************
@@ -2049,16 +2171,12 @@ void fs_pathname_backup ( int pid, int n ){
 
         register char *s = path + strlen( path );
  
-        if (*path)
-            s--;
+        if (*path){ s--; };
 
         while (n--)
         {
-            while (*s == '/')
-                s--;
-
-            while (*s != '/')
-                s--;
+            while (*s == '/'){ s--; };
+            while (*s != '/'){ s--; };
 
             *++s = '\0';
         };
@@ -2067,7 +2185,6 @@ void fs_pathname_backup ( int pid, int n ){
         for ( i=0; i<32; i++ ){
             current_workingdiretory_string[i] = p->pwd_string[i];
         }
-
 
         // Name.
         for ( i=0; i< 11; i++ ){
