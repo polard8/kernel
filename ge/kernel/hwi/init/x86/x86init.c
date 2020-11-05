@@ -60,10 +60,12 @@ extern void turn_task_switch_on (void);
 extern void clear_nt_flag (void);
 
 
-static inline void mainSetCr3 (unsigned long value){
 
-    __asm__ ( "mov %0, %%cr3" : : "r" (value) );
-};
+// set cr3.
+static inline void mainSetCr3 (unsigned long value)
+{
+    asm ( "mov %0, %%cr3" : : "r" (value) );
+}
 
 
 /*
@@ -123,14 +125,12 @@ void x86mainStartFirstThread (void){
 
     current_process = Thread->process->pid;
 
-	//
-	// Done!
-	//
-
-    for ( i=0; i <= PRIORITY_MAX; i++ ){
-
+    // list.
+    
+    for ( i=0; i < PRIORITY_MAX; i++ )
+    {
         dispatcherReadyList[i] = (unsigned long) Thread;
-    }
+    };
 
     IncrementDispatcherCount (SELECT_IDLE_COUNT);
 

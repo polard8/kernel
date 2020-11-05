@@ -101,3 +101,32 @@ gws_send_event (
 }
 
 
+
+// let's manage the input inside a window.
+// the client gets some keyboard event
+// and change the position of the input pointer
+// inside the window
+// but remeber, the window server has the window structure,
+// so we need to tell him to draw the input pointer
+// inside the window limits.
+// the window server will draw the next char inside the window with focus.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -278,6 +278,7 @@ void init_globals (void){
 int init (void){
 
     int Status = 0;
+    unsigned char ProcessorType=0;
 
 
     debug_print ("==== core-init:\n");
@@ -325,22 +326,20 @@ int init (void){
 	//para o início da tela.
 	//então após iniciarmos as globais temos que repintar o background e 
 	// fazer um refresh da tela se a flag de verbose estiver ligada.
-	
-    //Object manager.	
-#ifdef EXECVE_VERBOSE	
-	printf ("core-init: init_object_manager\n");
+
+    //Object manager.
+#ifdef EXECVE_VERBOSE
+    printf ("core-init: init_object_manager\n");
 #endif
 
 
     debug_print ("core-init: Object manager\n");
     init_object_manager ();
 
-
-    //i/o Manager.
-#ifdef EXECVE_VERBOSE	
-	printf("core-init: ioInit\n");	
-#endif	
-
+    // i/o Manager.
+#ifdef EXECVE_VERBOSE
+    printf("core-init: ioInit\n");
+#endif
 
     debug_print ("core-init: io manager\n");
     ioInit ();
@@ -352,7 +351,7 @@ int init (void){
     init_device_manager ();
 
     //
-    // =================== ## STORAGE ## ===========================
+    // == STORAGE ===========================
     //
 
     // #ordem:
@@ -375,7 +374,7 @@ int init (void){
 
 #ifdef EXECVE_VERBOSE
     printf ("core-init: disk_init\n");
-#endif  
+#endif 
 
     debug_print ("core-init: disk\n");
     disk_init ();
@@ -389,17 +388,16 @@ int init (void){
     volume_init ();
 
 
-	
-#ifdef EXECVE_VERBOSE	
-	printf ("core-init: VFS..\n");
+#ifdef EXECVE_VERBOSE
+     printf ("core-init: VFS..\n");
 #endif
 
     debug_print ("core-init: vfs\n");
     vfsInit ();
 
 
-//deletar
-#ifdef EXECVE_VERBOSE	
+// deletar
+#ifdef EXECVE_VERBOSE
     printf ("core-init: fsInit\n");
 #endif   
 
@@ -414,15 +412,13 @@ int init (void){
     debug_print ("core-init: [FIXME] Initialize mounted list in fs.c\n");
 
 
-        
 
 #ifdef EXECVE_VERBOSE
     printf("core-init: initialize_system_message_queue\n");
 #endif
 
     initialize_system_message_queue (); 
-    
-    
+
 	//
 	// Network
 	//
@@ -461,7 +457,7 @@ int init (void){
 
         }else{
             Platform->Hardware = (void *) Hardware;
-            //printf(".");			
+            //printf(".");
         };
 
 		//Firmware
@@ -472,10 +468,10 @@ int init (void){
 
         }else{
             Platform->Firmware = (void *) Firmware;
-            //printf(".");  			
+            //printf("."); 
         };
 
-		
+
 		//System (software)
 
 		//
@@ -487,7 +483,6 @@ int init (void){
 
         if ( (void *) System ==  NULL ){
             panic ("core-init: System\n");
-
         }else{
 
             System->used = 1;    //Sinaliza que a estrutura esta em uso.
@@ -501,12 +496,9 @@ int init (void){
     };
 
 
-
-
 //
 //============================================================================================================
 //
-
 
     debug_print ("init_architecture_independent\n");
 
@@ -534,8 +526,9 @@ int init (void){
     printf ("init_architecture_independent: Initializing HAL..\n");
 #endif
 
-    //#bugbug
-    //isso eh dependente, pode mudar para a outra rotina desse documento.
+    // #bugbug
+    // Isso eh dependente, pode mudar para a outra rotina desse documento.
+
     Status = init_hal();
 
     if (Status != 0){
@@ -558,7 +551,8 @@ int init (void){
 	printf ("init_architecture_independent: Initializing Microkernel..\n");
 #endif
 
-    //isso tambem eh dependente, pode ir para a outra rotina, nesse mesmo documento.
+    // Isso tambem eh dependente, pode ir para a outra rotina, 
+    // nesse mesmo documento.
     Status = init_microkernel();
 
     if (Status != 0){
@@ -677,9 +671,6 @@ int init (void){
 
 
 
-    //int Status = 0;
-    unsigned char Type=0;
-
 
     debug_print ("init_architecture_dependent:\n");
 
@@ -721,39 +712,34 @@ int init (void){
         panic("init_architecture_dependent: processor\n");
     }
 
-
     // Sonda pra ver qual é a marca do processador.
     // #todo: 
     // É a segunda vez que fazemos a sondagem ?!
     // See: hal/detect.c
     // This routine is valid for intel and amd processors.
-
-    Type = (int) hal_probe_processor_type();
-
-    if (Type==0){
-        panic("init_architecture_dependent: processor Type\n");
-    }
-
-    processor->Type = (int) Type;
-
-
     // Ok.
     // Let's make some initialization and 
     // get more information about the processor
     // using the cpuid instruction.
     // See: hal/x86 and hal/amd.
 
-    switch (Type){
+    ProcessorType = (int) hal_probe_processor_type();
 
+    if (ProcessorType==0){
+        panic("init_architecture_dependent: processor Type\n");
+    }
+
+    processor->Type = (int) ProcessorType;
+
+    switch (ProcessorType){
         case Processor_INTEL:  init_intel();   break;
         case Processor_AMD:    init_amd();     break;
-
         // ...
-
         default:
             panic ("init_architecture_dependent: default Type\n");
             break;
     };
+
 
 
 	//

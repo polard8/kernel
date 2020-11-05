@@ -55,6 +55,27 @@
 #include <fileman.h>
 
 
+//
+// windows
+//
+
+    //#todo: salvar em global
+    //por enquanto aqui
+    int main_window=0;
+    int addressbar_window=0; 
+    int client_window=0;
+    int button=0;
+
+
+//
+// tmp input pointer.
+//
+
+// #todo
+// we will copy all the iput support from the other editor.
+// for now we will use this tmp right here.
+int tmp_ip_x=8;
+int tmp_ip_y=8;
 
 //
 // == ports ====================================
@@ -284,8 +305,30 @@ response_loop:
                 default:
                     //gws_draw_text ( (int) fd, (int) 0, 40, 40, COLOR_BLUE, "x");
                     //terminal_write_char(long1) #todo
-                    printf ("%c",long1); 
-                    fflush(stdout);
+                    
+                    //printf ("%c",long1); 
+                    //fflush(stdout);
+                    
+                    if ( tmp_ip_x<0){tmp_ip_x=0;}
+                    if ( tmp_ip_x>320){tmp_ip_x=320;}
+                    if ( tmp_ip_y<0){tmp_ip_y=0;}
+                    if ( tmp_ip_y>200){tmp_ip_y=200;}
+
+                    
+                    // #test
+                    // tell to the window server draw the char inside 
+                    // the window with focus.
+                    // IN: fd, window, x, y, color, ch.
+                    gws_draw_char ( 
+                        fd, 
+                        client_window,
+                        tmp_ip_x, tmp_ip_y, COLOR_BLUE, long1 );
+                    //circula
+                    tmp_ip_x = tmp_ip_x + 8;
+                    if (tmp_ip_x >= 320){ 
+                        tmp_ip_x = 0; 
+                        tmp_ip_y = tmp_ip_y +8;
+                    }
                     goto process_event;
                     break;
             };
@@ -738,10 +781,10 @@ int main ( int argc, char *argv[] ){
 
     //#todo: salvar em global
     //por enquanto aqui
-    int main_window=0;
-    int addressbar_window=0; 
-    int client_window=0;
-    int button=0;
+    //int main_window=0;
+    //int addressbar_window=0; 
+    //int client_window=0;
+    //int button=0;
 
     // a janela eh a metade da tela.
     unsigned long w_width  = (w/2);
@@ -840,6 +883,7 @@ int main ( int argc, char *argv[] ){
         debug_print("Editor: client_window fail\n"); 
 
 
+    /*
     int t=0;
     for (t=1; t<8; t++){
     gws_draw_text (
@@ -850,7 +894,7 @@ int main ( int argc, char *argv[] ){
         (unsigned long) COLOR_BLACK,
         "Hello, this is a text editor!");
     } 
-    
+    */
 
     /*
     int t=0;
