@@ -69,22 +69,19 @@ void main (int argc, char **argv)
     fclose(fp);
 }
 
-     
 
-    /* To check if it is a function */
+/* To check if it is a function */
 
-void check(char *c, int p1, int p2)
+void check (char *c, int p1, int p2)
 {
-
     int i, flag = 0, temp = p1;
 
-     
 
-    if ((c[p1 + 1] == ')')){
+    if ((c[p1 + 1] == ')'))
+    {
          display(c, p1);
          return;
-     }
-
+    }
 
     for (i = p1 + 1; i < p2; i++)
     {

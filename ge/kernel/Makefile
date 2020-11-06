@@ -380,9 +380,10 @@ link-kernel:
 	@echo "================================="
 	@echo "(Step 2) Linking the kernel image ..."
 
+	#debug
+	#$(LD) $(LDFLAGS) -T link.ld -o KERNEL.BIN $(OBJECTS) -Map kernel.map    
+
 	$(LD) $(LDFLAGS) -T link.ld -o KERNEL.BIN $(OBJECTS)    
-	
-	
 
 clean:
 	rm -rf *.o   

@@ -7,13 +7,9 @@
 // http://man7.org/linux/man-pages/man2/socket.2.html
 
 
-
 #include <sys/types.h>  
 #include <sys/select.h>
 #include <sys/socket.h>
-
-
-
 
 
 
@@ -355,7 +351,9 @@ int pselect(int nfds, fd_set *readfds, fd_set *writefds,
 
 
 /*
+ ****************************************
  * send:
+ * 
  */
 
 ssize_t 
@@ -404,7 +402,9 @@ ssize_t sendmsg (int sockfd, const struct msghdr *msg, int flags)
 
 
 /*
+ **************************************
  * recv:
+ * 
  */
 
 ssize_t 
@@ -486,10 +486,12 @@ getsockname (
 // ===========
 //
 
-int inet_aton(const char *cp, struct in_addr *inp)
+int inet_aton (const char *cp, struct in_addr *inp)
 {
+    debug_print ("inet_aton: [TODO]\n");
     return -1;
 }
+
 
 in_addr_t inet_addr(const char *cp)
 {
@@ -500,6 +502,7 @@ in_addr_t inet_addr(const char *cp)
 
 in_addr_t inet_network(const char *cp)
 {
+    debug_print ("inet_network: [TODO]\n");
     return (in_addr_t) 0;
 }
 
@@ -508,9 +511,13 @@ in_addr_t inet_network(const char *cp)
  * Convert network-format internet address
  * to base 256 d.d.d.d representation.
  */
+
 /*const*/ 
+
 char *inet_ntoa ( struct in_addr in ) 
 {
+    debug_print ("inet_ntoa: [TODO]\n");
+    
     /*
     static char ret[18];
 
@@ -529,8 +536,7 @@ char *inet_ntoa ( struct in_addr in )
  * building addresses stored in the ifnet structure.
  */
  
-struct in_addr
-inet_makeaddr(in_addr_t net, in_addr_t host)
+struct in_addr inet_makeaddr ( in_addr_t net, in_addr_t host )
 {
     
     in_addr_t addr;

@@ -75,14 +75,13 @@ all-c:
 	cp $(LIBCOBJ)/ioctl.o  .
 	cp $(LIBCOBJ)/fcntl.o  .
 
-
-	
 cat-link:
+	
 	ld -m elf_i386 -T ../link.ld -o FASM.BIN $(myObjects)    
-
-
-
-
+	
+	#debug
+	#ld -m elf_i386 -T ../link.ld -o FASM.BIN $(myObjects)  -Map fasm.map
+	
 finalize:
 	cp FASM.BIN  ../bin
 

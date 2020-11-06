@@ -225,7 +225,7 @@ first(TSet *ts, Sym *stnc, TSet *last)
 }
 
 
-void ginit (){
+void ginit (void){
 	
 	int chg;
 	Rule *r;
@@ -400,7 +400,7 @@ stadd(Item **pi)
 }
 
 void
-stgen()
+stgen(void)
 {
 	Sym s;
 	Rule *r;
@@ -545,7 +545,7 @@ setdef(Row *r, int w, int top)
 }
 
 void
-tblgen()
+tblgen(void)
 {
 	Row *r;
 	Item *i;
@@ -575,14 +575,14 @@ tblgen()
 	}
 }
 
-int
-prcmp(const void *a, const void *b)
+
+int prcmp (const void *a, const void *b)
 {
-	return (*(Row **)a)->ndef - (*(Row **)b)->ndef;
+    return (*(Row **)a)->ndef - (*(Row **)b)->ndef;
 }
 
-void
-actgen()
+
+void actgen(void)
 {
 	Row **o, *r;
 	int n, m, t, dsp, nnt;
@@ -673,7 +673,7 @@ void aout (char *name, int *t, int n){
 
 
 void
-tblout()
+tblout(void)
 {
 	int *o, n, m;
 
@@ -734,7 +734,7 @@ tblout()
 }
 
 void
-stdump()
+stdump(void)
 {
 	Term *t;
 	Sym *s1;
@@ -825,13 +825,13 @@ struct {
 char idnt[IdntSz];
 
 
-int istok (int c){
-	
-	return isalnum(c) || c=='_' || c=='%';
+int istok (int c)
+{
+    return isalnum(c) || c=='_' || c=='%';
 }
 
 
-int nexttk (){
+int nexttk (void){
 	
 	int n;
 	char c, *p;
@@ -882,9 +882,9 @@ int nexttk (){
 }
 
 
-char *
-cpycode()
+char *cpycode(void)
 {
+
 	int c, nest, in, len, pos;
 	char *s;
 
@@ -971,7 +971,7 @@ findsy(char *name, int add)
 }
 
 void
-getdecls()
+getdecls(void)
 {
 	int tk, prec, p, a, c, c1, n;
 	Info *si;
@@ -1094,7 +1094,7 @@ getdecls()
 }
 
 void
-getgram()
+getgram(void)
 {
 	extern char *retcode;
 	int tk;
@@ -1238,8 +1238,9 @@ actout(Rule *r)
 }
 
 
-void codeout (){
-	
+void codeout (void)
+{
+
 	extern char *code0[], *code1[];
 	char **p;
 	Rule *r;
@@ -1262,8 +1263,10 @@ void codeout (){
 }
 
 
-void init (int ac, char *av[]){
-	
+// Handle the arguments.
+void init (int ac, char *av[])
+{
+
 	int c, vf, df;
 	char *pref, buf[100], *opt;
 

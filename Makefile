@@ -244,6 +244,7 @@ vhd-copy-files:
 	-sudo cp setup/cmd/bin/FASM.BIN       base/
 #	-sudo cp setup/cmd/bin/TRUE.BIN       base/
 #	-sudo cp setup/cmd/bin/FALSE.BIN      base/
+#	-sudo cp setup/cmd/bin/SHOWFUN.BIN       base/
 	# ...
 
 	# net
