@@ -210,11 +210,12 @@ vhd-copy-files:
 	# sysmon
 	sudo cp setup/grass/bin/SYSMON.BIN base/
 
+
 	#tests interpreters.
-	#sudo cp setup/grass/bin/C4.BIN base/
-	#sudo cp setup/grass/bin/GRAMC.BIN base/
-	sudo cp setup/grass/bin/GRAMC4.BIN base/
-	#sudo cp setup/grass/bin/GRAMCNF.BIN base/
+	sudo cp setup/grass/bin/C4.BIN       base/
+	sudo cp setup/grass/bin/GRAMC.BIN    base/
+	sudo cp setup/grass/bin/GRAMC4.BIN   base/
+	sudo cp setup/grass/bin/GRAMCNF.BIN  base/
 	
 	# ====================================================
 
