@@ -1885,6 +1885,86 @@ int gwssrv_init_windows (void)
 }
 
 
+//
+// == ajusting the window to fit in the screen. =======================
+//
+
+/*
+ credits: hoppy os.
+void 
+set_window_hor (
+    tss_struct *tss,
+    int i,
+    int j)
+{
+    
+    int d = j-i;
+    
+    if ( i >= tss->crt_width) 
+    {
+        i = tss->crt_width-2;
+        j = i+d;
+    }
+    
+    if (j<0) 
+    {
+        j=0;
+        i = j-d;
+    }
+    
+    if (i>j) 
+    {
+        if (i>0)
+           j=i;
+        else
+            i=j;
+    }
+    
+    tss->window_left=i;
+    tss->window_right=j;
+}
+*/
+
+
+/*
+ credits: hoppy os.
+void 
+set_window_vert ( 
+    tss_struct *tss,
+    int i,
+    int j )
+{
+
+    int d = j-i;
+    
+    if (i >= tss->crt_height) 
+    {
+        // ajusta o i.
+        i = tss->crt_height-1;
+        j = i+d;
+    }
+    
+    if (j<0) 
+    {
+        // ajusta o i.
+        j = 0;
+        i = j-d;
+    }
+
+    if (i>j) 
+    {
+        if (i>0)
+            j=i;
+        else
+            i=j;
+    }
+
+    tss->window_top    = i;
+    tss->window_bottom = j;
+}
+*/
+
+
 
 //
 // End.

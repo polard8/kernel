@@ -1062,12 +1062,11 @@ int g_mm_system_type;
 // ## Physical memory ##
 //
 
-
 // Small systems.
 unsigned long SMALL_origin_pa;
 unsigned long SMALL_kernel_base_pa;
 unsigned long SMALL_user_pa;
-unsigned long SMALL_vga_pa;
+unsigned long SMALL_cga_pa;
 unsigned long SMALL_frontbuffer_pa;
 unsigned long SMALL_backbuffer_pa; 
 unsigned long SMALL_pagedpool_pa; 
@@ -1077,12 +1076,11 @@ unsigned long SMALL_extraheap2_pa;
 unsigned long SMALL_extraheap3_pa; 
 //...
 
-
 // Medium systems.
 unsigned long MEDIUM_origin_pa;
 unsigned long MEDIUM_kernel_base_pa; 
 unsigned long MEDIUM_user_pa; 
-unsigned long MEDIUM_vga_pa; 
+unsigned long MEDIUM_cga_pa; 
 unsigned long MEDIUM_frontbuffer_pa; 
 unsigned long MEDIUM_backbuffer_pa; 
 unsigned long MEDIUM_pagedpool_pa;  
@@ -1091,12 +1089,11 @@ unsigned long MEDIUM_extraheap1_pa;
 unsigned long MEDIUM_extraheap2_pa; 
 unsigned long MEDIUM_extraheap3_pa; 
 
-
 // Large systems.
 unsigned long LARGE_origin_pa;
 unsigned long LARGE_kernel_base_pa;
 unsigned long LARGE_user_pa;
-unsigned long LARGE_vga_pa;
+unsigned long LARGE_cga_pa;
 unsigned long LARGE_frontbuffer_pa;
 unsigned long LARGE_backbuffer_pa;
 unsigned long LARGE_pagedpool_pa; 

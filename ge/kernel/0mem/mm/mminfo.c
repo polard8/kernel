@@ -116,7 +116,7 @@ void memoryShowMemoryInfo (void){
             printf("Origin:            %xH \n", SMALL_origin_pa );
             printf("Base kernel start: %xH \n", SMALL_kernel_base_pa );
             printf("User area start:   %xH \n", SMALL_user_pa );
-            printf("vga memory:        %xH \n", SMALL_vga_pa );
+            printf("cga memory:        %xH \n", SMALL_cga_pa );
             printf("frontbuffer:       %xH \n", SMALL_frontbuffer_pa );
             printf("backbuffer:        %xH \n", SMALL_backbuffer_pa );
             printf("paged memory pool: %xH \n", SMALL_pagedpool_pa );
@@ -131,7 +131,7 @@ void memoryShowMemoryInfo (void){
             printf("Origin:            %xH \n", MEDIUM_origin_pa );
             printf("Base kernel start: %xH \n", MEDIUM_kernel_base_pa );
             printf("User area start:   %xH \n", MEDIUM_user_pa );
-            printf("vga memory:        %xH \n", MEDIUM_vga_pa );
+            printf("cga memory:        %xH \n", MEDIUM_cga_pa );
             printf("frontbuffer:       %xH \n", MEDIUM_frontbuffer_pa );
             printf("backbuffer:        %xH \n", MEDIUM_backbuffer_pa );
             printf("paged memory pool: %xH \n", MEDIUM_pagedpool_pa );
@@ -146,7 +146,7 @@ void memoryShowMemoryInfo (void){
             printf("Origin:            %xH \n", LARGE_origin_pa );
             printf("Base kernel start: %xH \n", LARGE_kernel_base_pa );
             printf("User area start:   %xH \n", LARGE_user_pa );
-            printf("vga memory:        %xH \n", LARGE_vga_pa );
+            printf("cga memory:        %xH \n", LARGE_cga_pa );
             printf("frontbuffer:       %xH \n", LARGE_frontbuffer_pa );
             printf("backbuffer:        %xH \n", LARGE_backbuffer_pa );
             printf("paged memory pool: %xH \n", LARGE_pagedpool_pa );

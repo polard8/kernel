@@ -52,8 +52,6 @@
  *
  * History:
  *     2015 - Created by Fred Nora.
- *     2016 - Revision.
- *     ...
  */
 
 
@@ -76,29 +74,22 @@
 #include <kernel.h>
 
 
-//
-// Vari�veis passadas pelo Boot Loader.
-//
-
-
-// Obs: 
-// Teremos que rever os argumentos passados pelo Boot Loader ao Kernel 
-// Pois podemos tornar o Kernel compat�vel com GRUB.
-
-extern unsigned long SavedBootBlock;    //Par�mtros passados pelo Boot Loader.
-extern unsigned long SavedLFB;          //LFB address.
-extern unsigned long SavedX;            //Screen width.
-extern unsigned long SavedY;            //Screen height.
-extern unsigned long SavedBPP;          //Bits per pixel.
-//...
+// These values came from BL.BIN.
+// bootblock, lfb, device width, device height, bpp ...
+extern unsigned long SavedBootBlock; 
+extern unsigned long SavedLFB;
+extern unsigned long SavedX;
+extern unsigned long SavedY;
+extern unsigned long SavedBPP;
+// ...
 
 
 //
-// Fun��es importadas.
+// == imports =======================
 //
 
 extern void set_page_dir (void);
-//...
+// ...
 
 
 
@@ -148,10 +139,68 @@ static inline void __native_flush_tlb_single (unsigned long addr)
 
 /*
 void *clone_kernel_page_directory (void);
-void *clone_kernel_page_directory (void){
+void *clone_kernel_page_directory (void)
+{
     return (void *) CreatePageDirectory ();
 }
 */
+
+
+// ===================================================================
+//
+// #important: DANGER !!!
+//
+//
+// #bugbug
+// Isso eh um improviso, precisamos de outro endereço.
+// >>>> 0x1000
+//
+// O sistema esta usando esse endereço como inicio de um heap
+// onde pegamos paginas (frames?) de memoria para criarmos diretorios de paginas.
+// Isso porque precisamos de endereços que terminem com pelo menos 
+// 12 bits zerados.
+//
+// #todo: 
+// Precisamos encontrar outro lugar para esse heap, 
+// tendo em vista que o numero de diretorios criados sera grande 
+// e o heap invadir outras areas.
+//
+// #bugbug
+// Vamos improvisar um limite por enquanto.
+// See: globals/gpa.h
+//
+
+unsigned long table_pointer_heap_base = ____DANGER_TABLE_POINTER_HEAP_BASE;
+//unsigned long table_pointer_heap_base = 0x1000;
+
+// ====================================================================
+
+unsigned long get_table_pointer (void)
+{
+    table_pointer_heap_base = (table_pointer_heap_base + 0x1000);
+
+    // #todo
+    // Precisamos de uma nova origem.
+    // Os primeiros 12bits precisam ser '0'.
+    // VM_BASE = 0x000B8000.
+    
+    // #bugbug
+    // Todo o espaço entre 0x1000 e 0x000B8000 esta livre ?
+    // Onde estao a fat e o root dir?
+    // MBR_ADDRESS = 0x20000. 
+    // Esse o o endereço mais baixo entre os endereços usados
+    // pelo sistema de arquivos.
+    
+    //if ( table_pointer_heap_base >= VM_BASE )
+    if ( table_pointer_heap_base >= MBR_ADDRESS )
+    {
+        panic ("pages-get_table_pointer: [FIXME] Limits\n");
+    }
+
+
+    return (unsigned long) table_pointer_heap_base;
+}
+
 
 
 /*
@@ -226,51 +275,6 @@ unsigned long get_new_frame (void){
 
     //fail;
     return 0;
-}
-
-
-
-
-// ====================================================================
-
-// #importante: PERIGO !!!
-//#bugbug
-//isso � um improviso, precisamos de outro endere�o.
-// >>>> 0x1000
-// O sistema est� usando esse endere�o como in�cio de um heap
-// onde pegamos p�ginas de mem�ria para criarmos diret�rios de p�ginas.
-// Isso porque precisamos de endere�os que terminem com pelo menos 
-// 12bits zerados.
-// #todo: 
-// Precisamos encontrar outro lugar para esse heap, tendo em vista que
-// o n�mero de diret�rios criados ser� grande e o heap invadir� 
-// outras �reas.
-
-// #bugbug
-// Vamos improvisar um limite por enquanto.
-// O limite ser� o in�cio da cga em modo texto.
-// See: gpa.h
-
-unsigned long table_pointer_heap_base = ____DANGER_TABLE_POINTER_HEAP_BASE;
-//unsigned long table_pointer_heap_base = 0x1000;
-
-// ====================================================================
-
-
-unsigned long get_table_pointer (void)
-{
-    table_pointer_heap_base = (table_pointer_heap_base + 0x1000);
-
-    if ( table_pointer_heap_base >= VM_BASE )
-    {
-        // #todo
-        // Precisamos de uma nova origem.
-        // Os primeiros 12bits precisam ser '0'.
-        panic ("pages-get_table_pointer: FIXME: limits\n");
-    }
-
-
-    return (unsigned long) table_pointer_heap_base;
 }
 
 
@@ -832,7 +836,7 @@ int mmSetUpPaging (void){
 	// S�o endere�os de mem�ria f�sica.
 	// As vari�veis s�o globais para podermos gerenciar o uso de
 	// mem�ria f�sica.
-	// See:  mm/x86/mm.h
+	// See:  mm/mm.h
 	// See:  gpa.h
 
 	//==============================================================
@@ -841,7 +845,7 @@ int mmSetUpPaging (void){
     SMALL_origin_pa      = (unsigned long) SMALLSYSTEM_ORIGIN_ADDRESS;
     SMALL_kernel_base_pa = (unsigned long) SMALLSYSTEM_KERNELBASE;
     SMALL_user_pa        = (unsigned long) SMALLSYSTEM_USERBASE;
-    SMALL_vga_pa         = (unsigned long) SMALLSYSTEM_VGA;
+    SMALL_cga_pa         = (unsigned long) SMALLSYSTEM_CGA;
     SMALL_frontbuffer_pa = (unsigned long) SavedLFB;                     //frontbuffer
     SMALL_backbuffer_pa  = (unsigned long) SMALLSYSTEM_BACKBUFFER;       //backbuffer
     SMALL_pagedpool_pa   = (unsigned long) SMALLSYSTEM_PAGEDPOLL_START;  //PAGED POOL
@@ -855,7 +859,7 @@ int mmSetUpPaging (void){
     MEDIUM_origin_pa      = (unsigned long) MEDIUMSYSTEM_ORIGIN_ADDRESS;
     MEDIUM_kernel_base_pa = (unsigned long) MEDIUMSYSTEM_KERNELBASE;
     MEDIUM_user_pa        = (unsigned long) MEDIUMSYSTEM_USERBASE;
-    MEDIUM_vga_pa         = (unsigned long) MEDIUMSYSTEM_VGA;
+    MEDIUM_cga_pa         = (unsigned long) MEDIUMSYSTEM_CGA;
     MEDIUM_frontbuffer_pa = (unsigned long) SavedLFB;
     MEDIUM_backbuffer_pa  = (unsigned long) MEDIUMSYSTEM_BACKBUFFER;
     MEDIUM_pagedpool_pa   = (unsigned long) MEDIUMSYSTEM_PAGEDPOLL_START;
@@ -869,7 +873,7 @@ int mmSetUpPaging (void){
     LARGE_origin_pa      = (unsigned long) LARGESYSTEM_ORIGIN_ADDRESS;
     LARGE_kernel_base_pa = (unsigned long) LARGESYSTEM_KERNELBASE;
     LARGE_user_pa        = (unsigned long) LARGESYSTEM_USERBASE;
-    LARGE_vga_pa         = (unsigned long) LARGESYSTEM_VGA;
+    LARGE_cga_pa         = (unsigned long) LARGESYSTEM_CGA;
     LARGE_frontbuffer_pa = (unsigned long) SavedLFB;
     LARGE_backbuffer_pa  = (unsigned long) LARGESYSTEM_BACKBUFFER;
     LARGE_pagedpool_pa   = (unsigned long) LARGESYSTEM_PAGEDPOLL_START;
@@ -995,7 +999,7 @@ int mmSetUpPaging (void){
     unsigned long *um_page_table = (unsigned long *) PAGETABLE_USERBASE;
 
     // user mode. (vga). 0x0008C000
-    unsigned long *vga_page_table = (unsigned long *) PAGETABLE_VGA;
+    unsigned long *cga_page_table = (unsigned long *) PAGETABLE_CGA;
 
     // user mode. (LFB). 0x0008B000
     unsigned long *frontbuffer_page_table = (unsigned long *) PAGETABLE_FRONTBUFFER;
@@ -1253,11 +1257,11 @@ int mmSetUpPaging (void){
 
     for ( i=0; i < 1024; i++ )
     {
-        vga_page_table[i] = (unsigned long) SMALL_vga_pa | 7; 
-        SMALL_vga_pa      = (unsigned long) SMALL_vga_pa + 4096; 
+        cga_page_table[i] = (unsigned long) SMALL_cga_pa | 7; 
+        SMALL_cga_pa      = (unsigned long) SMALL_cga_pa + 4096; 
     };
-    page_directory[ENTRY_VGA_PAGES] = (unsigned long) &vga_page_table[0]; 
-    page_directory[ENTRY_VGA_PAGES] = (unsigned long) page_directory[ENTRY_VGA_PAGES] | 7;  
+    page_directory[ENTRY_CGA_PAGES] = (unsigned long) &cga_page_table[0]; 
+    page_directory[ENTRY_CGA_PAGES] = (unsigned long) page_directory[ENTRY_CGA_PAGES] | 7;  
 
 
     // Obs: 
@@ -1711,7 +1715,7 @@ int mmSetUpPaging (void){
     printf ("Page={%x} \n",     (unsigned long) &km_page_table[0]);
     printf ("Page={%x} \n",     (unsigned long) &km2_page_table[0]);
     printf ("Page={%x} \n",     (unsigned long) &um_page_table[0]);
-    printf ("Page={%x} \n",     (unsigned long) &vga_page_table[0]);
+    printf ("Page={%x} \n",     (unsigned long) &cga_page_table[0]);
     printf ("Page={%x} \n",     (unsigned long) &frontbuffer_page_table[0]);
     printf ("Page={%x} \n",     (unsigned long) &backbuffer_page_table[0]);
     printf ("Page={%x} \n",     (unsigned long) &pagedpool_page_table[0]);
@@ -1767,7 +1771,7 @@ int mmSetUpPaging (void){
 	pagetableList[0] = (unsigned long) &km_page_table[0];
 	pagetableList[1] = (unsigned long) &km2_page_table[0];
 	pagetableList[2] = (unsigned long) &um_page_table[0];
-	pagetableList[3] = (unsigned long) &vga_page_table[0];
+	pagetableList[3] = (unsigned long) &cga_page_table[0];
 	pagetableList[4] = (unsigned long) &frontbuffer_page_table[0];
 	pagetableList[5] = (unsigned long) &backbuffer_page_table[0];
 	//pagetableList[6] = (unsigned long) 0;

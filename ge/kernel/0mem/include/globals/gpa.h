@@ -40,35 +40,36 @@
 
 
 
-#define VM_BASE                0x000B8000  //Físico.
-#define KERNEL_TEXT_MODE_BASE  0x000B8000
-#define SMALLSYSTEM_VGA        0x000B8000  //VM_BASE
-#define MEDIUMSYSTEM_VGA       0x000B8000  //VM_BASE
-#define LARGESYSTEM_VGA        0x000B8000  //VM_BASE
 
-
-#define KERNEL_GRAPHIC_MODE_BASE  0x000A0000
-#define MEM_BASE                  0x000A0000  //KERNEL_GRAPHIC_MODE_BASE
-
-
-//Podemos alocar memória para isso, liberando esse espaço?
+// Podemos alocar memória para isso, liberando esse espaço?
 #define MBR_ADDRESS            0x00020000  
+
 
 //Podemos alocar memória para isso, liberando esse espaço?
 #define VOLUME1_VBR_ADDRESS   (0x00020000 + 0x200) 
 #define VOLUME2_VBR_ADDRESS   (0x00020000 + 0x200) 
 
+// #todo
+// Tem muito espaço sobrando aqui.
+
+// size ?
 //Podemos alocar memória para isso, liberando esse espaço?
 #define VOLUME1_FAT_ADDRESS   0x00030000 
 #define VOLUME2_FAT_ADDRESS   0x00030000
 
+// #todo
+// Tem espaço sobrando aqui ??
+
+// ?? 512 * 32 = 16KB.
 //Podemos alocar memória para isso, liberando esse espaço?
 #define VOLUME1_ROOTDIR_ADDRESS 0x00070000 
 #define VOLUME2_ROOTDIR_ADDRESS 0x00070000 
 
 
+// #todo
+// Tem espaço sobrando aqui ??
 
-//
+
 // 0x0008F000 Tabela para mapear a parte mais baixa da memória física. Começa em 0.
 // 0x0008E000 Tabela para mapear a memória usada pela imagem do kernel. Começa em 0x100000.
 // 0x0008D000 Tabela para mapear uma área em user mode onde rodam códigos. Começa em 0x400000.
@@ -91,60 +92,93 @@
 // #importante 
 // Essas pagetable possuem endereço físico e lógico iguais.
 
-//#define PAGETABLE_RES7         0x00080000
-#define PAGETABLE_RES6         0x00081000
-#define PAGETABLE_RES5         0x00082000
 
-//#test
-//tantando mapear alguma coisa para ahci
-#define PAGETABLE_AHCI1         0x00083000   //AHCI 1
+// Page tables.
+// ?? estao sendo usadas no momento ou nao?
+//#define PAGETABLE_RES7  0x00080000
+#define PAGETABLE_RES6    0x00081000
+#define PAGETABLE_RES5    0x00082000
 
 
+// Tentando mapear alguma coisa para ahci.
+// AHCI 1
+#define PAGETABLE_AHCI1  0x00083000   
+
+
+// Extra heaps.
 #define PAGETABLE_EXTRAHEAP3  0x00084000
-#define PAGETABLE_EXTRAHEAP2    0x00085000
-#define PAGETABLE_EXTRAHEAP1     0x00086000
+#define PAGETABLE_EXTRAHEAP2  0x00085000
+#define PAGETABLE_EXTRAHEAP1  0x00086000
 
 
+// pagetable para mapear um pool de heaps.
+#define PAGETABLE_HEAPPOOL     0x00087000 
 
-#define PAGETABLE_HEAPPOOL     0x00087000  //POOL DE HEAPS;
+// Page table para mapear um NIC.
+#define PAGETABLE_NIC1  0x00088000
 
-#define PAGETABLE_NIC1         0x00088000  //NIC 1
 
-#define PAGETABLE_PAGEDPOOL    0x00089000
+// Pagetable para mapear um pool.
+// Possivelmente usado por um alocador de memoria compartilhada.
+#define PAGETABLE_PAGEDPOOL  0x00089000
 
-#define PAGETABLE_BACKBUFFER   0x0008A000
-#define BUFFER_PAGETABLE       0x0008A000  // BackBuffer. BACKBUFFER_PAGETABLE
+// Pagetable para o backbuffer.
+// Esse eh o backbuffer que copiamos para o lfb.
+#define PAGETABLE_BACKBUFFER  0x0008A000
 
+// pagetable para o lfb.
 #define PAGETABLE_FRONTBUFFER  0x0008B000
-#define LFB_PAGETABLE          0x0008B000  // LFB.        FRONTBUFFER_PAGETABLE
-
-#define PAGETABLE_VGA          0x0008C000
-#define VGA_PAGETABLE          0x0008C000  // Pagetable para o VGA em user mode.
-
-#define PAGETABLE_USERBASE     0x0008D000
-#define UM_PAGETABLE           0x0008D000  // Pagetable para o aplicativos em user mode.
-
-#define PAGETABLE_KERNELBASE   0x0008E000
-#define KM2_PAGETABLE          0x0008E000  // Pagetable para 'O Kernel'. A 'imagem'.
-
-#define PAGETABLE_KERNELAREA   0x0008F000
-#define KM1_PAGETABLE          0x0008F000 // Pagetable para o kernel mode stuff.
 
 
-//O endereço físico e virtual são iguais.
+// Pagetable para o CGA em user mode.
+// Aquele memoria de modo texto colorido.
+#define PAGETABLE_CGA  0x0008C000
+
+// Pagetable para mapear uma area de memoria 
+// que sera usada pelos aplicativos em user mode.
+#define PAGETABLE_USERBASE  0x0008D000
+
+// Pagetable para mapear o endereço onde a imagem do kernel
+// sera carregada na memoria fisica.
+#define PAGETABLE_KERNELBASE  0x0008E000
+
+// Pagetable para mapear os primeiros 4MB de memoria fisica.
+// ring0. 1:1
+#define PAGETABLE_KERNELAREA 0x0008F000
+
+
+// Endereço do diretorio de paginas do kernel.
+// O endereço físico e virtual são iguais.
+// size ? 4KB ? 1024*4 ?
 #define XXXKERNEL_PAGEDIRECTORY 0x0009C000
 
-
-
-// ??
+// #bugbug
 // Temos uma pilha aqui ??
+// eh possivel, temos espaço.
 // 0x0009FFF0 ??
 
 
-//
-// #### 1 MB ####
-//
+// vga
+// The address of the VGA buffer.
+#define VGA_PA  0x000A0000
 
+// mda
+// The address of the MDA buffer.
+// Monocrome.
+#define MDA_PA  0x000B0000
+
+// cga
+// The address of the CGA buffer.
+// colors.
+#define CGA_PA            0x000B8000
+#define SMALLSYSTEM_CGA   0x000B8000
+#define MEDIUMSYSTEM_CGA  0x000B8000
+#define LARGESYSTEM_CGA   0x000B8000
+
+
+//
+// == 1 MB =========================================================
+//
 
 #define KERNEL_BASE              0x00100000  // 1MB físico.
 #define SMALLSYSTEM_KERNELBASE   0x00100000  // KERNEL_BASE
@@ -154,9 +188,8 @@
 
 
 //
-// #### 4 MB ####
+// == 4 MB =========================================================
 //
-
 
 // Nothing
 // Aqui estava a area de user mode, 
@@ -170,15 +203,13 @@
 
 
 //
-// #### 8 MB ####
+// == 8 MB =========================================================
 //
 
-
 //16-8 = 8
-#define SMALLSYSTEM_BACKBUFFER       0x800000  //(0x01000000 - 0x800000)  
-#define MEDIUMSYSTEM_BACKBUFFER      0x800000  //(0x01000000 - 0x800000) 
-#define LARGESYSTEM_BACKBUFFER       0x800000  //(0x01000000 - 0x800000)  
-
+#define SMALLSYSTEM_BACKBUFFER   0x800000  //(0x01000000 - 0x800000)  
+#define MEDIUMSYSTEM_BACKBUFFER  0x800000  //(0x01000000 - 0x800000) 
+#define LARGESYSTEM_BACKBUFFER   0x800000  //(0x01000000 - 0x800000)  
 
 //16-4 = 12
 #define SMALLSYSTEM_PAGEDPOLL_START   0xC00000  //(0x01000000 - 0x400000) 
@@ -187,25 +218,22 @@
 
 
 //
-// #### 16 MB ####
+// == 16 MB =========================================================
 //
 
 #define SMALLSYSTEM_HEAPPOLL_START   (0x01000000) 
 #define MEDIUMSYSTEM_HEAPPOLL_START  (0x01000000)
 #define LARGESYSTEM_HEAPPOLL_START   (0x01000000)
 
-
 //16+4 = 20
 #define SMALLSYSTEM_EXTRAHEAP1_START     (0x01000000 + 0x400000) //20mb
 #define MEDIUMSYSTEM_EXTRAHEAP1_START    (0x01000000 + 0x400000) 
 #define LARGESYSTEM_EXTRAHEAP1_START     (0x01000000 + 0x400000) 
 
-
 //16+8 = 24
 #define SMALLSYSTEM_EXTRAHEAP2_START    (0x01000000 + 0x800000) //24mb 
 #define MEDIUMSYSTEM_EXTRAHEAP2_START   (0x01000000 + 0x800000) 
 #define LARGESYSTEM_EXTRAHEAP2_START    (0x01000000 + 0x800000) 
-
 
 //16+12 = 28
 #define SMALLSYSTEM_EXTRAHEAP3_START  (0x01000000 + 0xC00000) //28mb 
@@ -217,7 +245,7 @@
 
 
 //
-// #### 32 MB ####
+// == 32 MB =========================================================
 //
 
 
@@ -233,19 +261,24 @@
 
 
 //
-// #### 64 MB ####
+// == 64 MB =========================================================
 //
+
 
 #define FRAME_TABLE_START_PA (0x04000000)   // 64 mb mark. 
 
-//
-// #### 128 MB ####
-//
 
 
 //
-// #### 256 MB ####
+// == 128 MB =========================================================
 //
+
+
+
+//
+// == 256 MB =========================================================
+//
+
 
 // Área de memória para uma frame table grande.
 // De onde pegaremos os frames para mapearmos.
@@ -261,23 +294,26 @@
 
 
 //
-// #### 512 MB ####
+// == 512 MB =========================================================
 //
 
-/*
-    0x01000000 (16MB)
-    0x02000000 (32MB)
-    0x04000000 (64MB)
-    0x08000000 (128MB)
-    0x10000000   = 256 MB 
-    0x20000000   = 512 MB
-    0x40000000   = 1 GB
-    0x50000000   = 1.24 GB
-    0x60000000   = 1.5 GB
-    0x70000000   = 1.75 GB
-    0x80000000   = 2 GB
-*/
 
+/*
+    // endereços comuns
+    
+    0x01000000 =  16 MB
+    0x02000000 =  32 MB
+    0x04000000 =  64 MB
+    0x08000000 = 128 MB
+    
+    0x10000000 = 256 MB 
+    0x20000000 = 512 MB
+    0x40000000 = 1    GB
+    0x50000000 = 1.24 GB
+    0x60000000 = 1.5  GB
+    0x70000000 = 1.75 GB
+    0x80000000 = 2    GB
+*/
 
 
 #endif    

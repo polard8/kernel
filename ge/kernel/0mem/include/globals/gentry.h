@@ -22,16 +22,14 @@
 //
 
 
-#define ENTRY_KERNELMODE_PAGES  0
-#define KERNEL_PAGE_DIRECTORY_ENTRY        0    // 4 primeiros megas em kernel mode.
+#define ENTRY_KERNELMODE_PAGES       0
+#define KERNEL_PAGE_DIRECTORY_ENTRY  0    // 4 primeiros megas em kernel mode.
 
+#define ENTRY_USERMODE_PAGES           1
+#define USERMODE_PAGE_DIRECTORY_ENTRY  1    // 4 megas em user mode.
 
-#define ENTRY_USERMODE_PAGES    1
-#define USERMODE_PAGE_DIRECTORY_ENTRY      1    // 4 megas em user mode.
-
-
-#define ENTRY_VGA_PAGES         2
-#define VGA_PAGE_DIRECTORY_ENTRY           2    // VGA
+#define ENTRY_CGA_PAGES           2
+#define CGA_PAGE_DIRECTORY_ENTRY  2    // CGA
 
 //256
 //Se o programa do processo for carregado aqui, então ele pode 
