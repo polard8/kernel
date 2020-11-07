@@ -159,10 +159,6 @@ kernel fica com o 1GB superior."
 
 
 
-
-
-
-
 //#define x86_copy_page(from,to) \
 //__asm__("cld ; rep ; movsl"::"S" (from),"D" (to),"c" (1024):"cx","di","si")
 
@@ -223,9 +219,7 @@ static inline void copy_page(void *to, void *from)
 
 unsigned long gKernelPageDirectoryAddress; 
 
-unsigned long gInitPageDirectoryAddress; 
-unsigned long gShellPageDirectoryAddress; 
-unsigned long gTaskmanPageDirectoryAddress; 
+
 
 
 /* 
@@ -247,35 +241,21 @@ unsigned long gTaskmanPageDirectoryAddress;
 
 
 //
-// zones support
+// == zones ==================================================
 //
 
-//mem�ria total em duas partes.
-// 
-
-
-//Zones.
-// ** ESSA ESTRUTURA � A RAIZ DE TODA GER�NCIA DE MEM�RIA **
-typedef struct mm_zones_d mm_zones_t;
-struct mm_zones_d
-{
-    struct system_zone_d *system_zone;  //Essa zona � para o sistema.
-    struct window_zone_d *window_zone;  //Essa zona toda � uma user session.
-};
-mm_zones_t *zones;
+// Memoria total em duas partes.
 
 
 //system zone. 
-typedef struct system_zone_d system_zone_t;
 struct system_zone_d
 {
     unsigned long systemzone_start;  //0x00000000. s�o os 32MB iniciais  
 };
-system_zone_t *systemzone;
-
+struct system_zone_d *systemzone;
 
 //window zone.  
-typedef struct window_zone_d window_zone_t;
+//#bugbug: maybe it is not a good name.
 struct window_zone_d
 {
 	unsigned long windowzone_start;
@@ -283,10 +263,21 @@ struct window_zone_d
 	unsigned long usersession_start;	//ficar� dentro de uma �rea paginada.
     struct usession_d *usersession;    
 };
-window_zone_t *windowzone;
+struct window_zone_d *windowzone;
+
+
+//Zones.
+// ** ESSA ESTRUTURA � A RAIZ DE TODA GER�NCIA DE MEM�RIA **
+struct mm_zones_d
+{
+    struct system_zone_d *system_zone;  //Essa zona � para o sistema.
+    struct window_zone_d *window_zone;  //Essa zona toda � uma user session.
+};
+struct mm_zones_d *zones;
 
 
 
+//===============================================================
 
 // vari�veis blobais de endere�os usados no gerenciamento de zonas de mem�ria.
 
@@ -321,28 +312,30 @@ unsigned long windowzoneSize;
  * funcionam como pools de frames.
  */
 
-typedef struct page_directory_d page_directory_t;
+
+//typedef struct page_directory_d page_directory_t;
 struct page_directory_d
 {
-	
-	object_type_t objectType;
-	object_class_t objectClass;
-	
+
+    object_type_t  objectType;
+    object_class_t objectClass;
+
+
 	//identificadores.
-	int id;
-	int used;
-	int magic;
+    int id;
+    int used;
+    int magic;
 	
 	//Qual processo � o dono do diret�rio de p�ginas.
 	//talvez seja possivel reaproveitar o diret�rio.
-	struct process_d *process;
+    struct process_d *process;
 	
 	//Endere�o onde ficar� o diret�rio de p�ginas.
 	//Obs: Para configurar um diret�rio de p�ginas talvez
 	//tenha que colocar um endere�o f�sico em CR3. Lembre-se
 	//que o malloc do kernel base aloca mem�ria no heap do 
 	//processo kernel que fica no �ltimo giga da mem�ria virtual.
-	unsigned long Address;
+    unsigned long Address;
 	
 	
 	// ?? struct page_directory_entry_d[1024] ??
@@ -353,12 +346,13 @@ struct page_directory_d
 	//significa processos ligados em um job.
     struct page_directory_d *next;  
 };
-page_directory_t *pagedirectoryKernelProcess;    // KERNEL.
-page_directory_t *pagedirectoryIdleProcess;      // IDLE.
-page_directory_t *pagedirectoryTaskmanProcess;   // TASKMAN.
-page_directory_t *pagedirectoryCurrent;          // Current.
-page_directory_t *pagedirectoryShared;           // Shared. 
+
+struct page_directory_d *pagedirectoryKernelProcess;    // KERNEL.
+struct page_directory_d *pagedirectoryIdleProcess;      // IDLE.
+struct page_directory_d *pagedirectoryCurrent;          // Current.
+struct page_directory_d *pagedirectoryShared;           // Shared. 
 //...
+
 
 //
 // Lista de diret�rios. (Pois cada processo tem um diret�rio).
@@ -380,38 +374,38 @@ unsigned long pagedirectoryList[PAGEDIRECTORY_COUNT_MAX];
  *          Tamb�m pode ser compartilhada entre processo.(cuidado).
  */
 
-typedef struct page_table_d page_table_t;
+//typedef struct page_table_d page_table_t;
 struct page_table_d
 {
-	object_type_t objectType;
-	object_class_t objectClass;
-	
-	int id;
-	int used;
-	int magic;
+    object_type_t  objectType;
+    object_class_t objectClass;
+
+    int id;
+    int used;
+    int magic;
 	
 	//A qual diret�rio de p�ginas a page table perrtence.
 	//se bem que talvez possamos usar a mesma pagetable
 	//em mais de um diret�rio. ser�??
-	struct page_directory_d *directory;
+    struct page_directory_d *directory;
 	
 	//Cada pagetable pertence � um processo.
-	struct process_d *process;
+    struct process_d *process;
 	
 	//Travando uma pagetable inteira,
 	//nenhuma de suas p�ginas poder�o se descarregadas
 	//para o disco de swap.
-	int locked;
+    int locked;
 	
 	// ?? struct page_table_entry_d[1024] ??
 	
     //@todo: Mais informa��es sobre a pagetable.
-	struct page_table_d *next;
+    struct page_table_d *next;
 };
-//page_table_t *pagetableCurrent;
 
-page_table_t *pagetableCurrent;
+struct page_table_d *pagetableCurrent;
 //...
+
 
 //
 // Lista de pagetables.
@@ -645,17 +639,17 @@ unsigned long kernel_stack_start_pa;   //pa (endere�o indicado na TSS).
  * ir para o /microkernel.
  */
 
-typedef struct process_memory_info_d process_memory_info_t;
 struct process_memory_info_d
 {
-	object_type_t objectType;
-	object_class_t objectClass;	
-	
-	struct process_d *process;
+    object_type_t  objectType;
+    object_class_t objectClass;
+
+
+    struct process_d *process;
 	
 	//valor em KB. (quantidade de p�ginas + tamanho da p�gina.)
 	
-	unsigned long WorkingSet;  //Working Set.
+    unsigned long WorkingSet;  //Working Set.
     unsigned long Private;     //Mem�ria n�o compartilhada. 
     unsigned long Shared;	   //Mem�ria compartilhada.
 	//...
@@ -666,8 +660,7 @@ struct process_memory_info_d
 	//??delta de conjunto de trabalho.
 	//...
 };
-//Informa��es de mem�ria do processo atual.
-process_memory_info_t *pmiCurrent;
+struct process_memory_info_d *pmiCurrent;
 //...
 
 
@@ -678,7 +671,6 @@ process_memory_info_t *pmiCurrent;
  *     O arquivo system.h deve usar isso. 
  */
 
-typedef struct physical_memory_info_d physical_memory_info_t;
 struct physical_memory_info_d
 {
 	object_type_t objectType;
@@ -690,7 +682,7 @@ struct physical_memory_info_d
 	unsigned long Free;      //Livre.(Existe na RAM mas n�o foi paginada??).
     //...	
 };
-physical_memory_info_t *pmiMemoryInfo;
+struct physical_memory_info_d *pmiMemoryInfo;
 //...
 
 
@@ -700,7 +692,6 @@ physical_memory_info_t *pmiMemoryInfo;
  *     Isso pode ser usado pela configura��o do sistema. 
  */
 
-typedef struct memory_info_d memory_info_t;
 struct memory_info_d
 {
 	object_type_t objectType;
@@ -714,8 +705,7 @@ struct memory_info_d
 	unsigned long TotalV;
     unsigned long AvailableV;
 };
-
-memory_info_t *miMemoryInfo;
+struct memory_info_d *miMemoryInfo;
 //...
 
 
@@ -808,10 +798,10 @@ struct mmblock_d
 	// IMPORTANTE: 
 	// Talvez temos algum limite para o tamanho dessa estrutura em especial. 
 	// N�o inluir nada por enquanto.
-	
-	// Navega��o
-	struct mmblock_d *Prev;
-	struct mmblock_d *Next;
+
+    // Navigation
+    struct mmblock_d *Prev;
+    struct mmblock_d *Next;
 };
 struct mmblock_d *current_mmblock;
 
@@ -834,27 +824,27 @@ struct page_d
 	
 	//identificador da estrutura.
 	//� um �ndice na lista de p�ginas do pagedpool.
-	int id;
-	
-	int used;
-	int magic;
+
+    int id;
+    int used;
+    int magic;
 	
 	// Identificador de frame.
 	// (pa/4096)
-	int frame_number;
+    int frame_number;
 	
 	//N�o pode ser descarregado para o disco.
 	//N�o pode ser alterado.
-	int locked;             
+    int locked;             
 	
 	//A p�gina est� livrea para uso pelos processos.
-	int free;    
+    int free;    
 	
 	//Contador de refer�ncias.
     int ref_count;
-	
-	//navega��o
-    struct page_d *next;	
+
+    // Navigation
+    struct page_d *next;
 };
  
 
@@ -879,22 +869,23 @@ struct frame_pool_d
 	//object_class_t objectClass;
 	
 	//�ndice na lista de frame pools;
-	int id;
-	
-	int used;
-	int magic;
-	
+
+    int id;
+    int used;
+    int magic;
+
 	//N�o pode ser modificada.
-	int locked;
+    int locked;
 	
 	//Endere�o do in�cio do framepool.
 	// va ou pa ??
 	unsigned long address; 
 	
 	//Qual processo � o dono desse framepool.
-	struct process_d *process;
-	
-	struct frame_pool_d *next;
+    struct process_d *process;
+
+    // Navigation
+    struct frame_pool_d *next;
 };
 
 //
@@ -1045,12 +1036,14 @@ unsigned long g_kernel_nonpaged_memory;
 
 
 
-//tipo de sistema baseado no tamanho da mem�ria.
+// Tipo de sistema baseado no tamanho da memoria.
 typedef enum {
-	stNull,
+
+    stNull,
     stSmallSystem,
     stMediumSystem,
     stLargeSystem,
+
 }mm_system_type_t;
 
 
@@ -1186,11 +1179,11 @@ struct frame_table_d
     unsigned long frame_table_end;
     unsigned long frame_table_size_in_bytes;
 
-	int total_frames;
-	int n_pages;
+    int total_frames;
+    int n_pages;
 
-	int total_free;
-	int total_used;
+    int total_free;
+    int total_used;
 };
 
 // frame table struct.
@@ -1249,14 +1242,6 @@ struct frame_d SWAPPED_FRAMES[1024];
 
 
 
-
-
-
-
-
-
-
-
 // ...
 
 
@@ -1299,11 +1284,10 @@ unsigned long memorysizeAvailableVirtualMemory;
 
 
 
-
-
 //
-// Prot�tipos.
+// == prototypes =================================================
 //
+
 
 //#bugbug
 //isso � um improviso,rever ...PERIGO
@@ -1337,7 +1321,6 @@ int mmSetUpPaging (void);
 void x86_SetCR3 (unsigned long pa);
 unsigned long mm_get_current_directory_pa (void);
 void mm_switch_directory ( unsigned long dir);
-
 
 
 //mapeando o nic principal.
@@ -1386,12 +1369,9 @@ void notfreePage (struct page_d *p);
 int firstSlotForAList (int size);
 
 
-
-
 //?? Talvez tenha que mudar de nome.
 //checar se estamos lidando com p�ginas ou com frames.
 void initializeFramesAlloc (void);
-
 
 
 // Allocate single page.
@@ -1403,15 +1383,13 @@ void *allocPages (int size);
 void *mm_alloc_contig_pages ( size_t size );
 
 
-
 void testingPageAlloc (void); 
 
 
-
-
 unsigned long 
-virtual_to_physical ( unsigned long virtual_address, 
-                      unsigned long dir_va ) ;
+virtual_to_physical ( 
+    unsigned long virtual_address, 
+    unsigned long dir_va ) ;
 
 void pages_calc_mem(void);
 
@@ -1427,7 +1405,6 @@ void showFreepagedMemory ( int max );
 
 int initialize_frame_table(void);
 unsigned long get_new_frame(void);
-
 
 
 // Kernel Garbage Collector.

@@ -291,9 +291,9 @@ unsigned long get_new_frame (void){
 
 void *clone_directory( unsigned long directory_va ){
 
-    int i=0;
     unsigned long destAddressVA=0; 
-
+    int i=0;
+    
 
     destAddressVA = (unsigned long) get_table_pointer(); 
 
@@ -327,8 +327,8 @@ void *clone_directory( unsigned long directory_va ){
 
 void *CloneKernelPageDirectory (void){
 
-    int i=0;
     unsigned long destAddressVA=0; 
+    int i=0;
 
 
     //destAddressVA = (unsigned long) newPage (); 
@@ -407,8 +407,8 @@ void *CreatePageTable (
     unsigned long region_address )
 {
 
-    int i=0;
     unsigned long *PD = (unsigned long *) directory_address_va;
+    int i=0;
 
 
 	//
@@ -452,11 +452,9 @@ void *CreatePageTable (
 	//unsigned long ptVA = (unsigned long) 0x1000;               //ok
 	unsigned long ptVA = (unsigned long) get_table_pointer();  //ok
 
-    if ( ptVA == 0 )
-    {
+    if ( ptVA == 0 ){
         panic ("CreatePageTable: ptVA\n");
     }
-
 
     // O endereço virtual permite manipularmos a 
     // pagetable daqui do kernel.
@@ -576,17 +574,16 @@ void *CreatePageTable (
 // #bugbug: Esse método não está bom.
 // Usar o outro presente nesse documento.
 // mm_switch_directory.
-
+// N�o podemos usar um diret�rio de p�ginas que esteja
+// no in�cio da mem�ria RAM.
+// See: x86/headlib.asm
+    
 void x86_SetCR3 (unsigned long pa)
 {
-
-    // N�o podemos usar um diret�rio de p�ginas que esteja
-    // no in�cio da mem�ria RAM.
     if (pa == 0){
         panic ("x86_SetCR3: 0 is not a valid address!");
     }
 
-    // See: x86/headlib.asm
     asm volatile ("\n" :: "a"(pa) );
     
     set_page_dir();
@@ -612,7 +609,8 @@ unsigned long mm_get_current_directory_pa (void)
 void mm_switch_directory (unsigned long dir)
 {
 
-    if (dir == 0){
+    if (dir == 0)
+    {
         // #debug ?
         return;
     }
@@ -676,18 +674,14 @@ unsigned long
 mapping_ahci1_device_address ( unsigned long pa )
 {
 
-    int i=0;
     unsigned long *page_directory = (unsigned long *) gKernelPageDirectoryAddress;      
 
-
-	//##bugbug: 
-	//Esse endere�o � improvisado. Parece que n�o tem nada nesse endere�o.
-	//#todo: temos que alocar mem�ria e converter o endere�o l�gico em f�sico.
-	
-	// ?? //0x00083000 
+    // Endereço improvisado.
+    // See: gpa.h
     unsigned long *ahci1_page_table = (unsigned long *) PAGETABLE_AHCI1; 
 
-	
+    int i=0;
+
     // If you do use a pointer to the device register mapping, 
 	// be sure to declare it volatile; otherwise, 
 	// the compiler is allowed to cache values and reorder accesses to this memory.	
@@ -737,18 +731,14 @@ unsigned long
 mapping_nic1_device_address ( unsigned long pa )
 {
 
-    int i=0; 
     unsigned long *page_directory = (unsigned long *) gKernelPageDirectoryAddress; 
 
+    // Endereço improvisado.
+    // See: gpa.h
+    unsigned long *nic0_page_table = (unsigned long *) PAGETABLE_NIC1;
 
-	//##bugbug: 
-	//Esse endere�o � improvisado. Parece que n�o tem nada nesse endere�o.
-	//#todo: temos que alocar mem�ria e converter o endere�o l�gico em f�sico.
-	
-	//unsigned long volatile *nic0_page_table = (unsigned long volatile *) PAGETABLE_NIC1; //0x88000;
-    unsigned long *nic0_page_table = (unsigned long *) PAGETABLE_NIC1; //0x88000;
+    int i=0; 
 
-	
     // If you do use a pointer to the device register mapping, 
 	// be sure to declare it volatile; otherwise, 
 	// the compiler is allowed to cache values and reorder accesses to this memory.	
@@ -1928,9 +1918,10 @@ int pEmpty (struct page_d *p)
 
 
 // Selecionar a página como livre.
-void freePage (struct page_d *p){
-
-    if (p == NULL){
+void freePage (struct page_d *p)
+{
+    if ( (void*) p == NULL )
+    {
         // #debug ?
         return;  
     }
@@ -1941,9 +1932,10 @@ void freePage (struct page_d *p){
 
 
 // Selecionar a p�gina como n�o livre.
-void notfreePage (struct page_d *p){
-
-    if (p == NULL){
+void notfreePage (struct page_d *p)
+{
+    if ( (void*) p == NULL )
+    {
         // #debug ?
         return; 
     }
@@ -1966,9 +1958,9 @@ virtual_to_physical (
     unsigned long dir_va ) 
 {
 
-    if (dir_va == 0)
+    if (dir_va == 0){
         panic ("virtual_to_physical: invalid dir va");
-
+    }
 
     // Directory.
     unsigned long *dir = (unsigned long *) dir_va;
@@ -2000,10 +1992,15 @@ virtual_to_physical (
 }
 
 
+// show info.
 // Mostra entradas no diretório.
+// move to mminfo.c?
 void pages_calc_mem (void){
  
-    int i, j, k, free=0;
+    int i=0;
+    int j=0;
+    int k=0;
+    int free=0;
 
     long *pg_dir = (long *) gKernelPageDirectoryAddress;   
     long *pg_tbl;
@@ -2015,19 +2012,20 @@ void pages_calc_mem (void){
     //    if (!mem_map[i]) free++;
     //printf("%d pages free (of %d)\n\r",free,PAGING_PAGES);
 
-    for (i=0 ; i<1024 ; i++)
+    for (i=0; i<1024; i++)
     {
-        if (1&pg_dir[i])
+        if (1 & pg_dir[i])
         {
             pg_tbl = (long *) (0xfffff000 & pg_dir[i]);
 
-            for(j=k=0 ; j<1024 ; j++)
+            // ugly
+            for ( j=k=0; j<1024; j++ )
                 if (pg_tbl[j]&1)
                     k++;
             printf ("Pg-dir[%d] uses %d pages\n",i,k);
         }
     };
-    
+
     refresh_screen();
 }
 

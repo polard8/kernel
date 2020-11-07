@@ -284,25 +284,23 @@ void show_memory_structs (void){
 	// Title.
 	printf("Memory Block Information:\n\n");
 	//printf("=========================\n");
-	
-	//Mostra os heap da lista.
+
+    // Mostra os heap da lista.
     while (i < MMBLOCK_COUNT_MAX) 
     {
         B = (void *) mmblockList[i];
-		
-		i++;
-		
-		if ( (void *) B != NULL )
-		{
-			//Validade.
-		    if ( B->Used == 1 && B->Magic == 1234 ){
-				
-		        printf ("Id={%d} Header={%x} userA={%x} Footer{%x}\n",
-				    B->Id, B->Header, B->userArea, B->Footer );
-			};
-			//Nothing.
-		};
-		//Nothing.
+
+        i++;
+        if ( (void *) B != NULL )
+        {
+            if ( B->Used == 1 && B->Magic == 1234 )
+            {
+                kprintf ("Id={%d} Header={%x} userA={%x} Footer{%x}\n",
+                    B->Id, B->Header, B->userArea, B->Footer );
+            }
+            //Nothing.
+        }
+        //Nothing.
     };
 
 
@@ -414,17 +412,16 @@ void showFreepagedMemory ( int max ){
 
 
     struct page_d *p;
-    int Index=0;
-
+    int i=0;
 
 
     if (max < 0 || max >= 1024 )
         return;
 
 
-    for ( Index=0; Index < max; Index++ )
+    for ( i=0; i < max; i++ )
     {  
-        p = (void *) pageAllocList[Index]; 
+        p = (void *) pageAllocList[i]; 
 
 		//if ( (void *) p == NULL )
 		//{
@@ -440,7 +437,6 @@ void showFreepagedMemory ( int max ){
 				p->ref_count );
         }
     };
-
 
     refresh_screen ();
 }
