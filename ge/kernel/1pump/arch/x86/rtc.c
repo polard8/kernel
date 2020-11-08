@@ -118,6 +118,15 @@ void rtc_irq (void){
 }
 
 
+/*
+unsigned char bcd_to_binary(unsigned char bcd);
+unsigned char bcd_to_binary(unsigned char bcd)
+{
+    return (unsigned char) (bcd & 0x0F) + ((bcd >> 4) * 10);
+}
+*/
+
+
 /* 
  **************************************************
  * read_cmos_bcd:
@@ -173,7 +182,6 @@ unsigned long get_time (void){
  * Formato(bytes): YYMD 
  *
  * todo: Essa função pode ser trabalhada sem riscos ao sistema.
- * sTATUS: fUNCIONA BEM.
  */
 
 unsigned long get_date (void){

@@ -19,6 +19,18 @@
 
 
 
+void ps2kbd_drain(void);
+void ps2kbd_drain(void)
+{
+    int i=0;
+    char _byte=0;
+    
+    for(i=0; i<9; i++)
+        _byte = (char) in8(60);
+}
+
+
+
 /*
   //Credits: serenity os
 #define IRQ_KEYBOARD 1
@@ -1301,6 +1313,11 @@ void ps2kbd_initialize_device (void){
     
     };
 
+
+
+    // #test
+    // Drain the output buffer.
+    ps2kbd_drain();
 
 
 //

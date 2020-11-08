@@ -1225,8 +1225,7 @@ void mouseHandler (void)
 
     *_byte = (char) xxx_mouse_read();
 
-    switch (count_mouse)
-    {
+    switch (count_mouse){
 
 		// > Essa foi a primeira interrupção.
         case 0:

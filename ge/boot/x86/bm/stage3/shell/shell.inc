@@ -799,10 +799,24 @@ os_command_line_ret:
 ;     Nothing.
 ;+ 
 
+
+;; #bugbug
+;; We need to initialize the i8042 when we enter 
+;; in the 32bit protected mode environment.
+
 init_shell:
     nop
 shellInit: 
-	jmp os_command_line
+    
+    ;; #test
+    ;; Let's drain the keyboard output buffer.
+    
+    in al, 0x60
+    in al, 0x60
+    in al, 0x60
+    in al, 0x60
+    
+    jmp os_command_line
 .done:
     ret
 ;--

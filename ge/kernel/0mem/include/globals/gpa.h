@@ -162,6 +162,7 @@
 // The address of the VGA buffer.
 #define VGA_PA  0x000A0000
 
+
 // mda
 // The address of the MDA buffer.
 // Monocrome.
