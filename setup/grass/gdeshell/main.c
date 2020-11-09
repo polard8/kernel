@@ -2097,17 +2097,25 @@ do_compare:
     // See: http://man7.org/linux/man-pages/man2/ioctl.2.html
     if ( gramado_strncmp( prompt, "ioctl", 5 ) == 0 )
     {
-        printf ("~ioctl:\n");
+        printf ("~ioctl: tests ...\n");
 
         // fd request
-        ioctl ( STDIN_FILENO,  TCIFLUSH, 0 );
-        ioctl ( STDOUT_FILENO, TCIFLUSH, 0 );
-        ioctl ( STDERR_FILENO, TCIFLUSH, 0 );
-        ioctl ( 4,             TCIFLUSH, 0 );
+        debug_print("stdin ============\n");
+        ioctl ( STDIN_FILENO,  TCIFLUSH, 0 ); // normal
+        debug_print("stdout ============\n");
+        ioctl ( STDOUT_FILENO, TCIFLUSH, 0 ); // console
+        debug_print("stderr ============\n");
+        ioctl ( STDERR_FILENO, TCIFLUSH, 0 ); // normal
+        debug_print("fd 4 ============\n");
+        ioctl ( 4,             TCIFLUSH, 0 ); // invalid.
         
         // Not valid.
+        debug_print("fd -1 ============\n");
         ioctl ( -1,  -1, 0 );
-        ioctl ( 257, -1, 0 );
+        
+        debug_print("fd 33 ============\n");
+        ioctl ( 33, -1, 0 ); // the limit is 31 for now.
+        
         printf ("done\n");
         goto exit_cmp;
     }

@@ -1909,6 +1909,17 @@ int k_setvbuf (file *f, char *buf, int mode, size_t size)
 }
 
 
+// Maybe we can do some operations in a regular file using ioctl.
+int 
+regularfile_ioctl ( 
+    int fd, 
+    unsigned long request, 
+    unsigned long arg )
+{
+    debug_print ("regularfile_ioctl: TODO\n");
+    return -1;
+}
+
 //
 // End.
 //

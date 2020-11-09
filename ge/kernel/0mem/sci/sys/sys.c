@@ -185,6 +185,16 @@ int sys_serial_debug_printk ( char *s )
 // character special files (e.g., terminals) may be controlled with
 // ioctl() requests.  The argument fd must be an open file descriptor.
 
+// return:
+// On error, -1 is returned, and errno is set appropriately.
+// EBADF  fd is not a valid file descriptor.
+// EFAULT argp references an inaccessible memory area.
+// EINVAL request or argp is not valid.
+// ENOTTY fd is not associated with a character special device.
+// ENOTTY 
+// The specified request does not apply to the kind of object
+// that the file descriptor fd references
+
        
 // IN: fd, what to do, ?
 
@@ -198,24 +208,27 @@ int sys_ioctl ( int fd, unsigned long request, unsigned long arg ){
 
     // fd must to be on open file descriptor.
     if ( fd<0 || fd>31 ){
-       debug_print("sys_ioctl: Invalid fd\n");
-       return -1;
+       debug_print("sys_ioctl: [FAIL] Invalid fd\n");
+       return -1;  //EBADF
     }
 
+    // #todo
+    // Check the arg pointer validation
+    // EFAULT
+    // But we will not use this argument in all the cases.
 
     p = (struct process_d *) processList[current_process];
 
     if ( (void *) p == NULL ){
-        debug_print("sys_ioctl: p fail\n");
+        debug_print("sys_ioctl: [FAIL] p fail\n");
         return -1;
     }
         
     if ( p->used != 1 || p->magic != 1234 ){
-        debug_print("sys_ioctl: validation fail\n");
+        debug_print("sys_ioctl: [FAIL] validation fail\n");
         return -1;
     }
-        
-        
+  
     // pega o arquivo.
     // checa o tipo de objeto.
     // Isso deve ser usado principalmente com dispositivos 
@@ -223,10 +236,13 @@ int sys_ioctl ( int fd, unsigned long request, unsigned long arg ){
 
     f = (file *) p->Objects[fd];
     
-    
     //#todo
     // check file structure validation.
     
+    if ( (void *) f == NULL ){
+        debug_print("sys_ioctl: [FAIL] f\n");
+        return -1;
+    }
     
     // The TIOCSTI (terminal I/O control, 
     // simulate terminal input) ioctl 
@@ -238,15 +254,18 @@ int sys_ioctl ( int fd, unsigned long request, unsigned long arg ){
     // Now we can use a swit to call different
     // functions, as tty_ioctl etc.
     
-    switch (f->____object)
-    {
+    switch (f->____object){
+
         // Pode isso ??
-        //Normal file ???
+        // Normal file ???
+        // See: kstdio.c
         case ObjectTypeFile:
             debug_print ("sys_ioctl: ObjectTypeFile [TEST]\n");
-            return -1;
+            return (int) regularfile_ioctl ( (int) fd, 
+                            (unsigned long) request, 
+                            (unsigned long) arg );
             break;
-       
+
         // tty object
         case ObjectTypeTTY:
         //case ObjectTypeTerminal: 
@@ -277,7 +296,7 @@ int sys_ioctl ( int fd, unsigned long request, unsigned long arg ){
             
         default:
             debug_print ("sys_ioctl: [FAIL] default object\n");
-            return -1;
+            return -1;  //ENOTTY maybe
             break;
     }
 

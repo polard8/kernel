@@ -1353,7 +1353,23 @@ console_ioctl (
     unsigned long arg )
 {
     debug_print ("console_ioctl: TODO\n");
-    //switch(request){}
+    
+    switch (request){
+
+
+    // #todo:
+    // There is no fflush here in ring0.
+    // The ring3 libc is doing this job using write.
+    case TCIFLUSH:
+        debug_print ("console_ioctl: [TEST] flush\n");
+        break;
+        
+    // #todo: Yes, we can return data from the console tty termios. 
+    // case TCGETS:
+    // ...
+    };
+
+
     return -1;
 }
 
