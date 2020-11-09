@@ -169,6 +169,12 @@ int sys_serial_debug_printk ( char *s )
  *     Executa um dado comando em um dado dispositivo.
  */
 
+// This is called by ioctl() in ring3.
+
+// OK Isso é um wrapper.
+// Chamaremos tty_ioctl() ou outros ...  
+// ...
+
 // See:
 // http://man7.org/linux/man-pages/man2/ioctl.2.html
 // https://en.wikipedia.org/wiki/Ioctl
@@ -179,8 +185,6 @@ int sys_serial_debug_printk ( char *s )
 // character special files (e.g., terminals) may be controlled with
 // ioctl() requests.  The argument fd must be an open file descriptor.
 
-// OK Isso é um wrapper.
-// Chamaremos tty_ioctl() ou outros ...  
        
 // IN: fd, what to do, ?
 
@@ -234,13 +238,13 @@ int sys_ioctl ( int fd, unsigned long request, unsigned long arg ){
     // Now we can use a swit to call different
     // functions, as tty_ioctl etc.
     
-    switch(f->____object)
+    switch (f->____object)
     {
         // Pode isso ??
         //Normal file ???
         case ObjectTypeFile:
             debug_print ("sys_ioctl: ObjectTypeFile [TEST]\n");
-            return -1;    
+            return -1;
             break;
        
         // tty object
@@ -272,12 +276,13 @@ int sys_ioctl ( int fd, unsigned long request, unsigned long arg ){
         //...    
             
         default:
-            debug_print ("sys_ioctl: default object\n");
+            debug_print ("sys_ioctl: [FAIL] default object\n");
+            return -1;
             break;
     }
 
     //fail
-    debug_print ("sys_ioctl: fail\n");
+    debug_print ("sys_ioctl: Fail\n");
     return -1;
 }
 

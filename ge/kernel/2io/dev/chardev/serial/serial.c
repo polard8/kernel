@@ -211,6 +211,21 @@ int serial_init (void){
 }
 
 
+/*
+int 
+serial_ioctl ( 
+    int fd, 
+    unsigned long request, 
+    unsigned long arg );
+int 
+serial_ioctl ( 
+    int fd, 
+    unsigned long request, 
+    unsigned long arg )
+{
+}
+*/
+
 //
 // End.
 //

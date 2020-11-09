@@ -93,7 +93,7 @@ ifeq ($(ARCH),x86)
 
 	KDRIVERS_OBJECTS := ahci.o \
 	ata.o atadma.o atainit.o atairq.o atapci.o hdd.o \
-	channel.o network.o nicintel.o \
+	channel.o network.o e1000.o \
 	pci.o pciinfo.o pciscan.o \
 	console.o tty.o pty.o vt.o\
 	usb.o \
@@ -334,44 +334,53 @@ all-c:
 	$(CC) -c 1pump/arch/x86/pic.c       $(KINCLUDE) $(CFLAGS) -o pic.o
 	$(CC) -c 1pump/arch/x86/pit.c       $(KINCLUDE) $(CFLAGS) -o pit.o
 	$(CC) -c 1pump/arch/x86/rtc.c       $(KINCLUDE) $(CFLAGS) -o rtc.o
-	$(CC) -c 1pump/arch/x86/pci.c       $(KINCLUDE) $(CFLAGS) -o pci.o
-	$(CC) -c 1pump/arch/x86/pciinfo.c   $(KINCLUDE) $(CFLAGS) -o pciinfo.o
-	$(CC) -c 1pump/arch/x86/pciscan.c   $(KINCLUDE) $(CFLAGS) -o pciscan.o
+
+
+
 
 	$(CC) -c 2io/io.c    $(KINCLUDE) $(CFLAGS) -o io.o
-	
+
+	# pci bus
+	$(CC) -c 2io/bus/pcibus/pci.c       $(KINCLUDE) $(CFLAGS) -o pci.o
+	$(CC) -c 2io/bus/pcibus/pciinfo.c   $(KINCLUDE) $(CFLAGS) -o pciinfo.o
+	$(CC) -c 2io/bus/pcibus/pciscan.c   $(KINCLUDE) $(CFLAGS) -o pciscan.o
+	# usb bus
+	$(CC) -c 2io/bus/usbbus/usb.c        $(KINCLUDE) $(CFLAGS) -o usb.o
+
+
     # blkdev
-	$(CC) -c 2io/blkdev/ahci/ahci.c    $(KINCLUDE) $(CFLAGS) -o ahci.o
-	$(CC) -c 2io/blkdev/ide/ata.c      $(KINCLUDE) $(CFLAGS) -o ata.o
-	$(CC) -c 2io/blkdev/ide/atadma.c   $(KINCLUDE) $(CFLAGS) -o atadma.o
-	$(CC) -c 2io/blkdev/ide/atainit.c  $(KINCLUDE) $(CFLAGS) -o atainit.o
-	$(CC) -c 2io/blkdev/ide/atairq.c   $(KINCLUDE) $(CFLAGS) -o atairq.o
-	$(CC) -c 2io/blkdev/ide/atapci.c   $(KINCLUDE) $(CFLAGS) -o atapci.o
-	$(CC) -c 2io/blkdev/ide/hdd.c      $(KINCLUDE) $(CFLAGS) -o hdd.o
-	$(CC) -c 2io/blkdev/storage/storage.c  $(KINCLUDE) $(CFLAGS) -o storage.o
+	$(CC) -c 2io/dev/blkdev/ahci/ahci.c    $(KINCLUDE) $(CFLAGS) -o ahci.o
+	$(CC) -c 2io/dev/blkdev/ide/ata.c      $(KINCLUDE) $(CFLAGS) -o ata.o
+	$(CC) -c 2io/dev/blkdev/ide/atadma.c   $(KINCLUDE) $(CFLAGS) -o atadma.o
+	$(CC) -c 2io/dev/blkdev/ide/atainit.c  $(KINCLUDE) $(CFLAGS) -o atainit.o
+	$(CC) -c 2io/dev/blkdev/ide/atairq.c   $(KINCLUDE) $(CFLAGS) -o atairq.o
+	$(CC) -c 2io/dev/blkdev/ide/atapci.c   $(KINCLUDE) $(CFLAGS) -o atapci.o
+	$(CC) -c 2io/dev/blkdev/ide/hdd.c      $(KINCLUDE) $(CFLAGS) -o hdd.o
+	$(CC) -c 2io/dev/blkdev/storage/storage.c  $(KINCLUDE) $(CFLAGS) -o storage.o
 	
     # chardev
-	$(CC) -c 2io/chardev/hid/i8042.c      $(KINCLUDE) $(CFLAGS) -o i8042.o
-	$(CC) -c 2io/chardev/hid/input.c      $(KINCLUDE) $(CFLAGS) -o input.o
-	$(CC) -c 2io/chardev/hid/keyboard.c   $(KINCLUDE) $(CFLAGS) -o keyboard.o
-	$(CC) -c 2io/chardev/hid/mouse.c      $(KINCLUDE) $(CFLAGS) -o mouse.o
-	$(CC) -c 2io/chardev/hid/output.c     $(KINCLUDE) $(CFLAGS) -o output.o
-	$(CC) -c 2io/chardev/hid/ps2kbd.c     $(KINCLUDE) $(CFLAGS) -o ps2kbd.o
-	$(CC) -c 2io/chardev/hid/ps2mouse.c   $(KINCLUDE) $(CFLAGS) -o ps2mouse.o
-	$(CC) -c 2io/chardev/hid/render/r_render.c    $(KINCLUDE) $(CFLAGS) -o r_render.o
-	$(CC) -c 2io/chardev/hid/screen.c     $(KINCLUDE) $(CFLAGS) -o screen.o
-	$(CC) -c 2io/chardev/hid/video.c      $(KINCLUDE) $(CFLAGS) -o video.o
-	$(CC) -c 2io/chardev/hid/vsync.c      $(KINCLUDE) $(CFLAGS) -o vsync.o
-	$(CC) -c 2io/chardev/tty/console.c    $(KINCLUDE) $(CFLAGS) -o console.o
-	$(CC) -c 2io/chardev/tty/ldisc.c      $(KINCLUDE) $(CFLAGS) -o ldisc.o
-	$(CC) -c 2io/chardev/tty/pty.c        $(KINCLUDE) $(CFLAGS) -o pty.o
-	$(CC) -c 2io/chardev/serial/serial.c  $(KINCLUDE) $(CFLAGS) -o serial.o
-	$(CC) -c 2io/chardev/tty/terminal.c   $(KINCLUDE) $(CFLAGS) -o terminal.o
-	$(CC) -c 2io/chardev/tty/tty.c        $(KINCLUDE) $(CFLAGS) -o tty.o
-	$(CC) -c 2io/chardev/usb/usb.c        $(KINCLUDE) $(CFLAGS) -o usb.o
-	$(CC) -c 2io/chardev/tty/vt.c         $(KINCLUDE) $(CFLAGS) -o vt.o
+	$(CC) -c 2io/dev/chardev/hid/i8042.c      $(KINCLUDE) $(CFLAGS) -o i8042.o
+	$(CC) -c 2io/dev/chardev/hid/input.c      $(KINCLUDE) $(CFLAGS) -o input.o
+	$(CC) -c 2io/dev/chardev/hid/keyboard.c   $(KINCLUDE) $(CFLAGS) -o keyboard.o
+	$(CC) -c 2io/dev/chardev/hid/mouse.c      $(KINCLUDE) $(CFLAGS) -o mouse.o
+	$(CC) -c 2io/dev/chardev/hid/output.c     $(KINCLUDE) $(CFLAGS) -o output.o
+	$(CC) -c 2io/dev/chardev/hid/ps2kbd.c     $(KINCLUDE) $(CFLAGS) -o ps2kbd.o
+	$(CC) -c 2io/dev/chardev/hid/ps2mouse.c   $(KINCLUDE) $(CFLAGS) -o ps2mouse.o
+	$(CC) -c 2io/dev/chardev/hid/render/r_render.c    $(KINCLUDE) $(CFLAGS) -o r_render.o
+	$(CC) -c 2io/dev/chardev/hid/screen.c     $(KINCLUDE) $(CFLAGS) -o screen.o
+	$(CC) -c 2io/dev/chardev/hid/video.c      $(KINCLUDE) $(CFLAGS) -o video.o
+	$(CC) -c 2io/dev/chardev/hid/vsync.c      $(KINCLUDE) $(CFLAGS) -o vsync.o
+	$(CC) -c 2io/dev/chardev/tty/console.c    $(KINCLUDE) $(CFLAGS) -o console.o
+	$(CC) -c 2io/dev/chardev/tty/ldisc.c      $(KINCLUDE) $(CFLAGS) -o ldisc.o
+	$(CC) -c 2io/dev/chardev/tty/pty.c        $(KINCLUDE) $(CFLAGS) -o pty.o
+	$(CC) -c 2io/dev/chardev/serial/serial.c  $(KINCLUDE) $(CFLAGS) -o serial.o
+	$(CC) -c 2io/dev/chardev/tty/terminal.c   $(KINCLUDE) $(CFLAGS) -o terminal.o
+	$(CC) -c 2io/dev/chardev/tty/tty.c        $(KINCLUDE) $(CFLAGS) -o tty.o
+	$(CC) -c 2io/dev/chardev/tty/vt.c         $(KINCLUDE) $(CFLAGS) -o vt.o
 
-	$(CC) -c 2io/netdev/net/nicintel.c   $(KINCLUDE) $(CFLAGS) -o nicintel.o
+	# netdev
+	$(CC) -c 2io/dev/netdev/e1000/e1000.c   $(KINCLUDE) $(CFLAGS) -o e1000.o
+
 
 ## Step2 link-kernel-image  - Linking the kernel image.
 #kernel-image-link:

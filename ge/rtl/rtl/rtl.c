@@ -322,6 +322,17 @@ void rtl_reboot(void)
 }
 
 
+/*
+void rtl_set_line_buffering(void);
+void rtl_set_line_buffering(void)
+{
+    setvbuf(stdout, NULL, _IOLBF, 0);
+}
+*/
+
+
+
+
 
 
 

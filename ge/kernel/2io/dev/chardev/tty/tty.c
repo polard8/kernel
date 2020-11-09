@@ -1020,8 +1020,8 @@ tty_ioctl (
 
     // The command!
 
-    switch (request)
-    {
+    switch (request){
+
         // Get termios.
         case TCGETS:
             debug_print ("tty_ioctl: TCGETS\n");
@@ -1082,7 +1082,7 @@ tty_ioctl (
         
       
         default:
-            debug_print ("tty_ioctl: default\n");
+            debug_print ("tty_ioctl: [FAIL] default\n");
             return -1;
             break;
     };

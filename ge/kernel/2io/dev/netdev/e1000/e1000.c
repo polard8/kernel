@@ -1271,6 +1271,21 @@ uint32_t E1000ReadEEPROM ( struct intel_nic_info_d *d, uint8_t addr ){
 }
 
 
+/*
+int 
+e1000_ioctl ( 
+    int fd, 
+    unsigned long request, 
+    unsigned long arg );
+int 
+e1000_ioctl ( 
+    int fd, 
+    unsigned long request, 
+    unsigned long arg )
+{
+}
+*/
+    
 //
 // End.
 //
