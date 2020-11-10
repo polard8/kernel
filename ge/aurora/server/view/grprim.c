@@ -1129,8 +1129,55 @@ plotCircleZ (
       
    } while (x < 0);
 }
-  
+ 
+ 
+/* 
+ //credits: uVGA
+void __fillCircle(int xm, int ym, int r, int color)
+{
+	int x, y;
 
+	for (y = -r; y <= r; y++)
+	{
+		for (x = -r; x <= r; x++)
+		{
+			if ((x * x) + (y * y) <= (r * r))
+			{
+				drawHLine(ym + y, xm + x, xm - x, color);
+				if(y != 0)
+					drawHLine(ym - y, xm + x, xm - x, color);
+				break;
+			}
+		}
+	}
+}
+*/
+
+/*
+void uVGA::fillEllipse(int x0, int y0, int x1, int y1, int color)
+{
+	int x;
+	int y;
+	int half_height = abs(y0 - y1) / 2;
+	int half_width = abs(x0 - x1) / 2;
+	int center_x = (x0 < x1 ? x0 : x1) + half_width;
+	int center_y = (y0 < y1 ? y0 : y1) + half_height;
+
+	for(y = -half_height; y <= 0; y++)
+	{
+		for(x = -half_width; x <= 0; x++)
+		{
+			if( (x * x * half_height * half_height + y * y * half_width * half_width) <= (half_height * half_height * half_width * half_width))
+			{
+				drawHLine(center_y + y, center_x + x, center_x - x, color);
+				if(y != 0)
+					drawHLine(center_y - y, center_x + x, center_x - x, color);
+				break;
+			}
+		}
+	}
+}
+*/
 
 //Ellipse
 //This program example plots an ellipse inside a specified rectangle.
