@@ -652,30 +652,26 @@ int serviceRefreshWindow (void){
     gwssrv_debug_print ("gwssrv: serviceRefreshWindow\n");
 
 
-    // Get
-    
-    
-    //window_id = (int) message_address[4];  //#bugbug Wrong!!!
-    window_id = (int) message_address[0];    // #ok: isso rereouveu o problema!!!
-    
     //
-    // Window ID
+    // == Window ID ============================
     //
+
+    // Get it
+    window_id = (int) message_address[0];   
    
     // #extra
     // Special case.
     // Will be used in the ghost frame routines.
-    // #bugbug: Not working ...
-    // We can't get this negative value.
     
     if ( window_id == (-4) )
     {
+        gwssrv_debug_print("gwssrv: serviceRefreshWindow\n");  //debug
         gwssrv_debug_print("== R (extra) ==\n");  //debug
         refresh_device_screen();
         return 0;
     }
-   
-   
+
+ 
     // Limits
     if ( window_id < 0 || window_id >= WINDOW_COUNT_MAX ){
         //printf("%d\n",window_id);

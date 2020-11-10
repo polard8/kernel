@@ -2652,7 +2652,6 @@ int gws_refresh_window (int fd, int window )
 {
     __gws_refresh_window_request(fd,window);
     __gws_refresh_window_reponse(fd);
-
     return 0;
 }
 
@@ -2720,12 +2719,10 @@ void gws_yield (void)
 // refresh the background and yield the current thread
 void gws_refresh_yield (int fd)
 {
-    // #bugbug
-    // It's not working ...
-    // The window server can't get this negative number
+    //refresh background
+    gws_refresh_window (fd, -4);  
     
-    gws_refresh_window (fd, -4);  //refresh background
-    
+    //yield
     gws_system_call (265,0,0,0); 
 }
 

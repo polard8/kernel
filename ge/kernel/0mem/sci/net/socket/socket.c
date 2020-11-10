@@ -2063,24 +2063,25 @@ sys_accept2 (
         goto fail;
     }
 
-    // #todo
-    // Poderiamos chamar uma 'helper function' logo apos
-    // pegarmos os dois ponteiros para estruturas de socket.
-    
-    // O socket privado do Servidor.
+    // #bugbug
+    // Is this file a socket ??
+    if (sFile->____object != ObjectTypeSocket ){
+        panic ("sys_accept2: sFile is not a server object.");
+    }
 
-    // socket
-    // Socket structure that belongs to the process.
-    // s = (struct socket_d *) p->priv;
-    
+    // Get the socket strcuture.
     sSocket = sFile->socket;
-    
     if ( (void *) sSocket == NULL )
     {
         debug_print ("sys_accept2: [FAIL] sSocket\n");
         printf      ("sys_accept2: [FAIL] sSocket\n");
         goto fail;
     }
+    
+    
+    // #todo
+    // Vamos checar o fd na estrutura com o fd do argumento.
+    
 
     // Isso significa que o cliente chamou connect antes mesmo 
     // do servidor chamar accept ??
@@ -2159,6 +2160,12 @@ sys_accept2 (
     
     
     // SS_CONNECTED:
+    // Esse eh o socket do servidor.
+    // Se ele ja esta connectado usaremos ele mesmo.
+    // Mas precisariamos considerar a caracteristica de nosso write
+    // em copiar de um socket para outro.
+    // Se ele nao copia entao nao devemos retornar o socket do
+    // servidor, precisamos retornar o socket do client que esta na lista.
     // Esse socket esta conectado. Usaremos ele.
     
     if ( sSocket->state == SS_CONNECTED  )
@@ -2187,6 +2194,7 @@ sys_accept2 (
     
     // #ok
     // Pega um socket da lista de conexoes incompletas.
+    // Isso nos diz que o socket do servidor esta conectando.
  
     if ( sSocket->state == SS_CONNECTING )
     {
@@ -2215,8 +2223,10 @@ sys_accept2 (
 
             cSocket->state = SS_CONNECTED;
             
-            //retornamos o fd do proprio servidor, pois nosso write copia
-            //entre os buffers dos sockets conectados.
+            // retornamos o fd do proprio servidor, pois nosso write copia
+            // entre os buffers dos sockets conectados.
+            // ?? Poderiamos retornar o fd do cliente nesse caso?
+            
             return (int) fdServer;
         }
 
@@ -2366,15 +2376,14 @@ sys_accept (
         goto fail;
     }
 
-    // #todo
-    // Poderiamos chamar uma 'helper function' logo apos
-    // pegarmos os dois ponteiros para estruturas de socket.
-    
-    // O socket privado do Servidor.
-
-    // socket
-    // Socket structure that belongs to the process.
-    // s = (struct socket_d *) p->priv;
+    /*
+    // #bugbug
+    // Is this file a socket ??
+    if (sFile->____object != ObjectTypeSocket )
+    {
+        panic ("sys_accept: sFile is not a server object.");
+    }
+    */
     
     sSocket = sFile->socket;
     

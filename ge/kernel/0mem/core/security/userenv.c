@@ -97,9 +97,9 @@ void ShowUserInfo (int user_id){
 		    __User->desktopId );
 
 	    //...
-	};
+    };
 	
-	refresh_screen();
+    refresh_screen();
 }
 
 

@@ -476,9 +476,7 @@ int top_at ( int x, int y ){
     };
 
 __found:
-
     window_mouse_over = __last_found->id;
-
     return (int) __last_found->id;
 }
 
@@ -875,6 +873,21 @@ void xxxHandleNextClientRequest (int fd){
 
 //__loop:
 
+
+    //
+    // == Request ============================
+    //
+
+    /*
+    // Is current client connected.
+    if (currentClient->is_connected == 0)
+    {
+        // [FAIL] Not connected.
+        // close?
+    }
+    */
+
+
     // #todo
     // Devemos escrever em nosso próprio
     // socket e o kernel copia??
@@ -891,6 +904,10 @@ void xxxHandleNextClientRequest (int fd){
     //n_reads = recv ( fd, __buffer, sizeof(__buffer), 0 );
     
     // Different kind of errors!
+    
+    // #test
+    // Poderiamos nesse momento pegarmos mensagens do sistema
+    // e retornarmos como se a leitura do arquivo estivesse falhado.
     
     // Precisamos fechar o client e yield.
     if (n_reads < 0) { gwssrv_yield(); return; }
@@ -923,6 +940,12 @@ void xxxHandleNextClientRequest (int fd){
     // na fila de entrada do cliente com o foco de entrada.
     // o cliente com o foco de entrada possui a janela com 
     // o foco de entrada.
+    
+    // ??
+    // Imagine a remote client.
+    // Well, here the client is getting raw input directly
+    // from the system messages. Maybe it is not a good ideia.
+    // Or is it?
     
     if (message_buffer[1] == 369)
     {
@@ -1040,10 +1063,24 @@ void xxxHandleNextClientRequest (int fd){
 
 __again:
 
+    //
+    // == Response ============================
+    //
+      
+    gwssrv_debug_print ("gwssrv: Sending response ...\n");
+
     // #todo:
     // while(1){...}
-    
-    gwssrv_debug_print ("gwssrv: Sending response ...\n");
+
+    /*
+    // Is current client connected.
+    if (currentClient->is_connected == 0)
+    {
+        // [FAIL] Not connected.
+        // close?
+    }
+    */
+
 
     //
     // Send
@@ -1547,14 +1584,22 @@ int initGraphics (void){
     // Always run some demo if we are in JAIL mode.
     // It's an animation in the initialization.
     
-    if (current_mode == GRAMADO_JAIL)
-    {
         // Seleciona a animaçao.
         // Nao deve travar, deve ter timeout.
-         window_server_startup_animation(1);
-    
-        //curveDemo();
-        //cube_demo2();
+
+    if (current_mode == GRAMADO_JAIL)
+    {
+         window_server_startup_animation(1);  //ok
+         //window_server_startup_animation(2);
+         //window_server_startup_animation(3);
+         //window_server_startup_animation(4);
+         //window_server_startup_animation(5);
+         //window_server_startup_animation(6);   //ok
+         //window_server_startup_animation(7);   //ok
+         //window_server_startup_animation(8);  //ok
+         
+         //gwssrv_show_backbuffer();
+         //while(1){}
         // ...
     }
 
@@ -1930,17 +1975,28 @@ int initGraphics (void){
 
 
 
+
+// Initialize the client list.
+// This is an array of connections.
+// See: clients.h
+
 void gwssrv_init_client_support (void){
 
     int i=0;
 
 
-    for(i=0; i<CLIENT_COUNT_MAX; i++)
-        gwsClientList[i] = 0;
+    gwssrv_debug_print ("gwssrv_init_client_support:\n");
+
+    for (i=0; i<CLIENT_COUNT_MAX; i++)
+    {
+        connections[i] = 0;
+    };
     
-    
+    // The current client
     currentClient = (struct gws_client_d *) 0;
     
+    
+    // The server client.
     serverClient = (struct gws_client_d *) malloc ( sizeof( struct gws_client_d ) );
     if ( (void *) serverClient == NULL )
     {
@@ -1954,6 +2010,8 @@ void gwssrv_init_client_support (void){
         serverClient->used = 1;
         serverClient->magic = 1234;
         
+        serverClient->is_connected = 0;  //no
+        
         serverClient->fd = -1;
         
         serverClient->pid = getpid();
@@ -1964,7 +2022,7 @@ void gwssrv_init_client_support (void){
         // #todo
         // Limpar a fila de mensagens para esse cliente.
         
-        for (i=0; i<32; i++)
+        for (i=0; i<CLIENT_COUNT_MAX; i++)
         {
             serverClient->window_list[i] = 0;
             serverClient->msg_list[i]    = 0;
@@ -1975,9 +2033,8 @@ void gwssrv_init_client_support (void){
         serverClient->head_pos = 0;
         
         // ...
-        
-        //gwsClientList[0] = (unsigned long) serverClient;
-        gwsClientList[SERVER_CLIENT_INDEX] = (unsigned long) serverClient;
+
+        connections[SERVER_CLIENT_INDEX] = (unsigned long) serverClient;
     };
 }
 
@@ -1993,11 +2050,13 @@ void init_client_struct ( struct gws_client_d *c )
     c->used = 1;
     c->magic = 1234;
     
+    c->is_connected = 0;  //no
+    
     c->fd = -1;
     c->pid = -1;
     c->gid = -1;
  
-    for (i=0; i<32; i++)
+    for (i=0; i<CLIENT_COUNT_MAX; i++)
     {
         c->window_list[i] = 0;
         c->msg_list[i]    = 0;
@@ -2008,6 +2067,17 @@ void init_client_struct ( struct gws_client_d *c )
     c->head_pos = 0;
 }
 
+
+/*
+ //Send the message in the buffer to all the clients.
+ //This is a great opportunity to shutdown the clients
+ //if it is not connected.
+
+void gwssrv_message_all_clients(void);
+void gwssrv_message_all_clients(void)
+{
+}
+*/
 
 // When a client send us an event
 int serviceClientEvent(void)
@@ -2044,7 +2114,7 @@ int serviceClientEvent(void)
 }
 
 // When a client get the next event from it's own queue.
-int serviceNextEvent(void)
+int serviceNextEvent (void)
 {
     //O buffer é uma global nesse documento.
     unsigned long *message_address = (unsigned long *) &__buffer[0];
@@ -2213,7 +2283,7 @@ int main (int argc, char **argv){
         // #debug
         printf ("gwssrv: Creating socket\n");
 
-        server_fd = (int) socket(AF_GRAMADO, SOCK_STREAM, 0);
+        server_fd = (int) socket (AF_GRAMADO, SOCK_STREAM, 0);
 
         if (server_fd<0){
             gwssrv_debug_print ("gwssrv: [FATAL] Couldn't create the server socket\n");
@@ -2382,7 +2452,6 @@ int main (int argc, char **argv){
 
                 //mensagens de clientes.
                 xxxHandleNextClientRequest (newconn);
-                //xxxHandleNextClientRequest (curconn);
 
                 //close ?
                 //#bugbug: We can not close if we are using accept2.
@@ -2390,6 +2459,8 @@ int main (int argc, char **argv){
                 //shutdown(newconn, 0);         
                 //close(newconn);
             };
+            
+            //#talvez aqui podemos pegar as mensages de sistema.
         };
 
 

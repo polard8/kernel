@@ -1708,7 +1708,7 @@ int sys_getpid (void)
 int sys_getppid (void){
 
     struct process_d *p;
-    int pid = -1;
+    pid_t pid = -1;
 
 
     pid = (int) current_process;
@@ -1719,18 +1719,13 @@ int sys_getppid (void){
 
         if ( (void *) p == NULL ){ return (int) -1; }
 
-        if ( p->used != 1 || p->magic != 1234 )
-        {
-            return (int) -1;
-        }
+        if ( p->used != 1 || p->magic != 1234 ){ return (int) -1; }
 
         return (int) p->ppid;
     }
 
     return (int) (-1);
 }
-
-
 
 
 /*
@@ -1740,8 +1735,9 @@ int sys_getppid (void){
  */
 
 // #todo 
-int sys_fork (void){
 
+int sys_fork (void)
+{
     debug_print ("sys_fork: \n");
 
     // #todo

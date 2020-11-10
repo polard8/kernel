@@ -31,6 +31,9 @@ struct gws_client_d
     int magic;
 
 
+    int is_connected;
+
+
     // host, display, screen
     struct gws_host_d     host;
     struct gws_display_d  display;  
@@ -64,12 +67,10 @@ struct gws_client_d  *serverClient;
 struct gws_client_d  *currentClient;
 // ...
 
-
-#define CLIENT_COUNT_MAX 32
-unsigned long gwsClientList[CLIENT_COUNT_MAX];
-
-
 #define SERVER_CLIENT_INDEX 0
+#define CLIENT_COUNT_MAX 32
+unsigned long connections[CLIENT_COUNT_MAX];
+
 
 
 #endif    

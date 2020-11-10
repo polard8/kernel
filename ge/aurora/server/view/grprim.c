@@ -914,6 +914,8 @@ void cube_demo2 (void)
     int j=0;
     static int action = 1000; // inflate.
     
+    
+    int count=4;
    
     struct gr_cube_d *cube;
     cube = (void *) malloc( sizeof( struct gr_cube_d ) );
@@ -922,7 +924,9 @@ void cube_demo2 (void)
         //marcador.
         noraDrawingStuff3 (0,0,0);
 
-        while (1) {
+        while (count>0) {
+
+        count--;
 
         //south     
         cube->p[0].x = 0;
@@ -1448,14 +1452,16 @@ void matrix_demo1(void)
     
     int i=0;
     
-    while (1){
+    int count=4;
+    
+    while (count>0){
 
-    for (i=0; i<100; i++){
+    count--;
+
+    for (i=0; i<8; i++){
 
        rectBackbufferDrawRectangle ( 
-           0, 0, 
-           320, 200, 
-           COLOR_BLACK, 1 );
+           0, 0, 320, 200, COLOR_BLACK, 1 );
                 
        multiply4 ( projection4x4, mat2, res );
        
@@ -1521,7 +1527,7 @@ void sa_1(void)
     int res[4][4]; // To store result
 
     
-    int count=3;
+
     int i=0;
         
     
@@ -1529,10 +1535,10 @@ void sa_1(void)
         return;
     
     
-    
+    int count=3;    
     while ( count>0){
 
-        for (i=0; i<32; i++){
+        for (i=0; i<8; i++){
         
             // black background.
             rectBackbufferDrawRectangle ( 
@@ -1584,13 +1590,20 @@ void sa_1(void)
 }
 
 
+// Rotina usada para rodar rotinas demo na inicializaçao.
+// Seleciona a rotina demo a ser executada.
 void window_server_startup_animation(int i)
 {
     switch (i){
     case 1: sa_1(); break;
-    //case 1: sa_2(); break;
-    //case 1: sa_3(); break;
-    //case 1: sa_4(); break;
+    case 2: fredDemo0(); break;
+    case 3: fredDemo1(); break;
+    case 4: fredDemo2(); break;
+    case 5: cube_demo1(); break;
+    case 6: cube_demo2(); break;
+    case 7: curveDemo(); break;
+    case 8: matrix_demo1(); break;
+    //case 9: xxx(); break;
     default: break;
     };
 }
@@ -2088,7 +2101,12 @@ void curveDemo(void)
 {
     int i=0;
     int j=0;
-    while(1){
+ 
+ 
+    int count=4;
+    
+    while (count>0){
+        count--;
 
     for (i=0; i<10; i++){
         // line
