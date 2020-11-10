@@ -8,8 +8,8 @@
 
 
 // (ETHERNET + ARP)
-uint8_t test_packet[] = 
-{
+uint8_t test_packet[] = {
+
     0xff, 0xff, 0xff, 0xff, 0xff, 0xff,  /* eth dest (broadcast) */
     0x52, 0x54, 0x00, 0x12, 0x34, 0x56,  /* eth source  ??? o nic sabe*/
     0x08, 0x06,                          /* eth type */
@@ -39,7 +39,6 @@ uint8_t test_packet[] =
 	host_mac_address[4] = (uint8_t) 0x12;
 	host_mac_address[5] = (uint8_t) 0x32;
 */
-
 
 unsigned char host_mac_address[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 //u8 src_MAC[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
@@ -73,11 +72,9 @@ __SendARP (
 
     struct gdeshell_ether_header  *eh;
     struct gdeshell_ether_arp     *h;  
-
     int i=0;
-    
-    
-    
+    unsigned char *buffer;
+
     //==============================================
     // # ethernet header #
     //
@@ -194,12 +191,9 @@ __SendARP (
     //==================================
 
 
-
     //
     // Copiando o pacote no buffer.
     //
-
-    unsigned char *buffer;
     
     buffer = (unsigned char *) malloc(512);
     
@@ -238,7 +232,6 @@ __SendARP (
 	// 14 + 28;
 
     //currentNIC->legacy_tx_descs[old].length = ( ETHERNET_HEADER_LENGHT + ARP_HEADER_LENGHT );
-
 
     printf ("done\n");
 }
@@ -302,16 +295,21 @@ void network_initialize (void)
 }
 
 
-
-void gdeshell_send_packet( unsigned long packet_buffer )
+// Send packet.
+// O conteudo nao eh analizado.
+// Apenas passamos para o driver de nic um buffer e o comando
+// de enviar.
+// O driver de nic devera usar as informaçoes do buffer
+// para saber o destino. 
+// Se o pacote for invalido, ele apenas derruba.
+void gdeshell_send_packet ( unsigned long packet_buffer )
 {
-    gramado_system_call( 891, 
+    if (packet_buffer == 0){ return; };
+    gramado_system_call ( 891, 
             (unsigned long) packet_buffer,   //buf
             (unsigned long) 1500,            //len
             0);
-
 }
-
 
 
 void 
@@ -351,12 +349,11 @@ print_ethernet_header (
 
 void print_arp_header ( char *Buffer )
 {
-    int i=0;
-    
-    
-    
+    // O header ARP começa depois do header de ethernet.
     struct gdeshell_ether_arp *h = (struct gdeshell_ether_arp *) (Buffer + ETHERNET_HEADER_LENGHT);
-    
+    int i=0;
+
+
     //==================================
     // #debug
     // show arp
@@ -392,9 +389,9 @@ void print_arp_header ( char *Buffer )
 int 
 gdeshell_decode_buffer ( unsigned long buffer_address )
 {
-
     // The ethernet header.
     struct gdeshell_ether_header *eh;
+    uint16_t Type=0;
     
     //See: net/  and netinet/
     //struct ether_header *__eth;
@@ -409,9 +406,7 @@ gdeshell_decode_buffer ( unsigned long buffer_address )
     debug_print ("gdeshell_decode_buffer:\n");
     //printf ("network_decode_buffer:\n");
 
-
-    if ( buffer_address == 0 )
-    {
+    if ( buffer_address == 0 ){
         printf ("gdeshell_decode_buffer: [FAIL] null buffer address\n");
         return -1;
     }
@@ -432,9 +427,7 @@ gdeshell_decode_buffer ( unsigned long buffer_address )
 
     }else{
 
-        //
         // Print
-        //
 
         print_ethernet_header ( 
             (const unsigned char*) buffer_address, 1500 );
@@ -460,10 +453,10 @@ gdeshell_decode_buffer ( unsigned long buffer_address )
     // ... 
 
     
-    uint16_t Type = gdeshell_FromNetByteOrder16(eh->type);
+    Type = gdeshell_FromNetByteOrder16(eh->type);
     
-    switch ( (uint16_t) Type)
-    {
+    switch ( (uint16_t) Type){
+
         // ::: IPV4
         // 0x0800	Internet Protocol version 4 (IPv4)
         // Ok como test vamos notificar o processo atual
@@ -545,6 +538,7 @@ gdeshell_decode_buffer ( unsigned long buffer_address )
 /*
  **************************** 
  * network_test_buffer:
+ * 
  *     Loop to read the buffers.
  *     Called by the builting command "network"
  */
@@ -568,25 +562,21 @@ void network_test_buffer(void)
     // Loop.
     //
 
-    // Get the packet.
-    // Decode the buffer.
+    // + Get the packet.
+    // + Decode the buffer.
 
     while (1)
     {
         // IN: Service, buffer, lenght, nothing.
-        gramado_system_call( 890, 
+        gramado_system_call ( 890, 
             (unsigned long) &buf[0], (unsigned long) 1500, 0);
 
-        //printf("[begin]%s[end]\n",buf);
-
-        gdeshell_decode_buffer((unsigned long) &buf[0]);
+        gdeshell_decode_buffer ((unsigned long) &buf[0]);
         
         //#test: OK. o led indica que esta enviando.
         //envia um pacote
         //gdeshell_send_packet();
     };
-    
-    //Exit
     
     debug_print("network_test_buffer: Done\n");
     printf     ("network_test_buffer: Done\n");
@@ -610,7 +600,8 @@ void shellSocketTest (void){
 	unsigned long port=0; //short
 	
 	unsigned char ip[4];
-	
+
+
     printf("\n");
     printf("shellSocketTest: Testing socket stuff ...\n");
 

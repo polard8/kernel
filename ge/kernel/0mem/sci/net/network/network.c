@@ -109,7 +109,19 @@ file *____network_file;
 int network_buffer_in( void *buffer, int len )
 {
     void *dst_buffer;
-    int tail = NETWORK_BUFFER.receive_tail;
+    int tail=0;
+    
+
+    // check args
+
+    if ( (void*) buffer == NULL )
+        panic ("network_buffer_in: buffer");
+        
+    if(len>1500)
+        return -1;
+
+   
+    tail = NETWORK_BUFFER.receive_tail;
 
     //circula.
     NETWORK_BUFFER.receive_tail++;
@@ -124,25 +136,25 @@ int network_buffer_in( void *buffer, int len )
     //refresh_screen();
 
 
-    if(len>1500)
-        return -1;
         
     if(tail<0)
         return -1;
         
     // Pega o destination buffer.
-    if (tail<32){
+    if (tail<32)
+    {
         dst_buffer = (void*) NETWORK_BUFFER.receive_buffer[tail];
        
-       if((void*)dst_buffer!= NULL)
-           memcpy( dst_buffer, buffer, len);        
+        if ((void*)dst_buffer != NULL){
+            memcpy( dst_buffer, buffer, len);
+        }        
     
         //printf("network_buffer_in: ok\n");
         //refresh_screen();
         return 0;//ok
     }
 
-   return -1;
+    return -1;
 }
 
 
@@ -160,14 +172,14 @@ sys_network_receive (
 {
 
     void *src_buffer;
-
+    int head=0;
 
     debug_print("sys_network_receive:\n");
     
     
     // Pega do head. 
     // Primeiro da fila.
-    int head = NETWORK_BUFFER.receive_head;
+    head = NETWORK_BUFFER.receive_head;
 
 
     // Round the buffer.
@@ -192,16 +204,13 @@ sys_network_receive (
             goto fail;
         }
 
-        //
         // Copy.
-        //
-        
+
         // Copia do kernel para user mode.
         if ( (void *) ubuf != NULL ){
             memcpy( ubuf, src_buffer, size);
-        }        
+        } 
 
-        // OK.
         return 0;
     }
 
@@ -211,26 +220,42 @@ fail:
 }
 
 
-// Retirar um buffer de uma lista de buffers.
-// O gns chamará essa rotina e copiará um buffer
-// para ring3, onde chamará as rotinas de protocolo.
 // #importante
-//o kernel vai chamar essa rotina para que ela coloque o conteudo do
-//buffer no endreço de buffer indicado no argumento
-//o endereço do argumento será o endereço usado pelo controlador na hora do send.
+// O kernel vai chamar essa rotina para que ela coloque o conteudo do
+// buffer no endreço de buffer indicado no argumento
+// o endereço do argumento será o endereço usado pelo controlador na hora do send.
+// Retirar um buffer de uma lista de buffers.
+// O gns chamará essa rotina e copiará um buffer para ring3, 
+// onde chamará as rotinas de protocolo.
+
 int network_buffer_out ( void *buffer, int len )
 {
-    debug_print("network_buffer_out:\n");
-    
     void *src_buffer;
-    //o kernel vai retirar do head ... 
-    //o que foi colocado pelo aplicativo em tail.
-    int head = NETWORK_BUFFER.send_head;
+    int head=0;
 
-    //circula.
+
+    debug_print("network_buffer_out:\n");
+
+    // check args
+
+    if ( (void*) buffer == NULL )
+        panic ("network_buffer_out: buffer");
+    
+    if (len>1500)
+        return -1;
+
+
+    // Vamos pegar um numero de buffer para enviarmos o pacote.
+    // o kernel vai retirar do head ... 
+    // o que foi colocado pelo aplicativo em tail.
+
+    head = NETWORK_BUFFER.send_head;
+
+    // circula.
     NETWORK_BUFFER.send_head++;
     if (NETWORK_BUFFER.send_head >= 8)
         NETWORK_BUFFER.send_head=0;
+
 
 	// #todo
 	// MTU: maximim transmition unit.
@@ -239,20 +264,19 @@ int network_buffer_out ( void *buffer, int len )
     //printf ("network_buffer_in: buffer_len %d\n",len);
     //refresh_screen();
 
-
-    if(len>1500)
-        return -1;
         
     if(head<0)
         return -1;
         
     // Pega o destination buffer.
-    if (head<8){
+    if (head<8)
+    {
         src_buffer = (void*) NETWORK_BUFFER.send_buffer[head];
        
-       if((void*)src_buffer!= NULL)
-           memcpy( buffer, src_buffer,len);        
-    
+        if ((void*)src_buffer != NULL){
+            memcpy( buffer, src_buffer, len );
+        } 
+
         //printf("network_buffer_in: ok\n");
         //refresh_screen();
         return 0;//ok
@@ -261,11 +285,14 @@ int network_buffer_out ( void *buffer, int len )
    return -1;
 }
 
+
+
 /*
  *************************************************
  * sys_network_send:
  *     Service 891. 
- *     Envia um buffer pra ser enviado para rede.
+ *     Passamos o endereço de um buffer para o driver de nic.
+ *     O pacote sera enviado para a rede.
  */
 
 int 
@@ -275,16 +302,20 @@ sys_network_send (
 {
 
     void *src_buffer;
-    
+    int tail=0;
+
+
     // #bugbug
     // Do not use this buffer here.
+    // It is too big to be inside the kernel.
     char xxxbuffer[4096];
+
 
     debug_print("sys_network_send:\n");
 
 
-    //O aplicativo esta colocando no tail.
-    int tail = NETWORK_BUFFER.send_tail;
+    // O aplicativo esta colocando no tail.
+    tail = NETWORK_BUFFER.send_tail;
 
     // Round buffer.
     NETWORK_BUFFER.send_tail++;
@@ -303,25 +334,35 @@ sys_network_send (
             goto fail;
         }
 
-        if((void*)src_buffer== NULL){
+        if ((void*)src_buffer== NULL){
             printf("sys_network_send: [FAIL] src_buffer\n");
             goto fail;
         }
 
-        //do kernel para user mode.
+        // Copiamos do buffer do usuario para um dos buffers
+        // do nic.
         if ( (void *) ubuf != NULL ){
-            memcpy( src_buffer,ubuf, size); 
+            memcpy ( src_buffer, ubuf, size); 
         }
         
-        //
+        // #bugbug
+        // Nao estamos colocando duas vezes no buffer do nic,
+        // ja que colocamos logo acima e estamos colocando novamente.
+        // Precisamos rever toda essa historia de buffers.
+        // Precisamos gerenciar melhor os buffers de nic aqui em ring0.
+        
         // Send.
-        //
-                
+
         // Coloque nesse buffer o conteúdo do head
         // na lista de buffers para enviar.
         // depois enviaremos abaixo.
-        network_buffer_out(xxxbuffer,1500);
-        network_send_packet(xxxbuffer,1500);
+        
+        // ??
+        // 
+        network_buffer_out (xxxbuffer,1500);
+        
+        // ??
+        network_send_packet (xxxbuffer,1500);
 
         // OK.
         return 0;
@@ -484,7 +525,6 @@ network_procedure (
 
 
 
-
 void networkSetstatus (int status)
 {
 
@@ -529,11 +569,11 @@ int networkInit (void){
     int i=0;
     
     //receive buffers,
-    for(i=0;i<32;i++)
+    for (i=0;i<32;i++)
     {
         nbuffer = (void*) newPage();
         
-        if((void *)nbuffer == NULL)
+        if ((void *)nbuffer == NULL)
             panic("networkInit: receive nbuffer");
     
         NETWORK_BUFFER.receive_buffer[i] = (unsigned long) nbuffer;
@@ -607,24 +647,19 @@ int networkInit (void){
         //return -1;
     
     }else{
-
-        LocalHostHTTPSocket->ip = 0;
+        LocalHostHTTPSocket->ip   = 0;
         LocalHostHTTPSocket->port = 0;
         // ...
         
         CurrentSocket = (struct socket_d *) LocalHostHTTPSocket;
     };
 
-
 	// ...
-
 
     socket_init();
 
-
 	// Status
     networkSetstatus (1);
-
 
     debug_print ("networkInit: done\n");
     
@@ -655,13 +690,10 @@ void show_network_info (void){
         return;
 
     }else{
-
-        // #todo: 
-        printf ("IP %s ", HostInfo->hostIP );
+        printf ("IP %s ",   HostInfo->hostIP  );
         printf ("MAC %s\n", HostInfo->hostMAC );
         //...
     };
-
 
     // nic
     show_current_nic_info ();
@@ -769,7 +801,6 @@ void show_current_nic_info (void){
         printf ("interrupt_count={%d}\n", currentNIC->interrupt_count );
 
         // ...
-
     };
 
 	// ?? precisamos do refresh ?
@@ -2075,7 +2106,7 @@ int do_arp ( unsigned long buffer ){
 
     // Fail:
     debug_print ("do_arp: Not valid operation\n");
-    printf ("do_arp: Not valid operation\n");
+    printf      ("do_arp: Not valid operation\n");
     return -1;
 
 //
@@ -2150,7 +2181,8 @@ __request_received:
                                (char *) &ah->arp_spa[0], 
                                  4 ) == 0 )
             {
-                memcpy ( (void *) &currentNIC->arp_cache[i].mac_address[0], 
+                memcpy ( 
+                    (void *) &currentNIC->arp_cache[i].mac_address[0], 
                     (const void *) &eh->src[0], 
                      6 );
 

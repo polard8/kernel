@@ -26,8 +26,12 @@
 extern unsigned long SavedX;
 extern unsigned long SavedY;
 
+
+// Esse eh o marcador de estagio do escape sequence.
 // Usado para manipular csi
-static unsigned long __state = 0;
+static unsigned long __EscapeSequenceStage = 0;
+
+
 
 #define NPAR 16
 static unsigned long npar, par[NPAR];
@@ -243,6 +247,7 @@ void csi_J (int par)
 }
 
 
+// move to
 void csi_K(int par)
 {
    /*
@@ -277,11 +282,20 @@ void csi_K(int par)
 }
 
 
+// FIM da escape sequence.
+// isso eh chamado quando encontramos um 'm'.
+// O 'm' eh um marcador de fim de escape sequence.
+
+// Entao vamos checar os parametros no buffer.
+// Configuramos a variavel de atributo de acordo
+// com o parametro encontrado.
+// Ficaremos com o ultimo atributo. #bugbug ????
+
 void csi_m(void)
 {
     int i=0;
 
-    for (i=0; i<=npar; i++)
+    for (i=0; i <= npar; i++)
     {
 
         switch (par[i]) {
@@ -310,6 +324,7 @@ void csi_M ( int nr, int console_number )
 }
 
 
+// move to
 void csi_L (int nr, int console_number)
 {
 
@@ -805,7 +820,7 @@ console_write (
     char ch=0; 
     int i=0;  
     char *data = (char *) buf;
-
+    size_t StringSize=0;
 
     //debug_print ("console_write: [test]\n");
 
@@ -833,21 +848,25 @@ console_write (
     //   
 
 
-    // Inicializando.
-    // Dão dá mais pra confiar!
-    // #bugbug: Onde isso está definido?
-    // Isso é uma flag para scape sequence?
-    __state = 0; 
- 
- 
-    for (i=0; i<count; i++)
+    // Isso eh o contador de estagios do escape sequence.
+    // Vamos percorret todos os bytes da sequencia quando
+    // encontrarmos o marcador.
+    
+    __EscapeSequenceStage = 0; 
+     StringSize = count;
+  
+    for (i=0; i<StringSize; i++)
     {
+        // Get next char from the string.
         ch = data[i];
 
-        switch (__state){
-            
-            
-            // State 0
+        // Select the stage in the escape sequence.
+ 
+        switch (__EscapeSequenceStage){
+
+            //================================================
+            // Stage 0
+            // Nao entramos em uma escape sequence.
             case 0:
                 // #debug
                 //console_putchar ( '@',console_number);
@@ -859,8 +878,10 @@ console_write (
                     console_putchar ( ch, console_number );
                
                // Escape.
+               // >>>> Entramos em uma escape sequence,
+               // entao o proximo case inicia o tratamento da escape sequence.
                } else if (ch==27){ 
-                   __state=1;
+                   __EscapeSequenceStage=1;  // <<<<<<<--
                
                // ?? \n
                }else if (ch==10 || ch==11 || ch==12){
@@ -880,19 +901,28 @@ console_write (
                };
                break;
             
-            
-            // State 1
+            //================================================
+            // Stage 1
+            // Acabamos de entrar na escape sequence.
+            // Vamos checar o primeiro char.
             case 1:
+            
                 // #debug
                 //console_putchar ( '@',console_number);
                 //console_putchar ( '1',console_number);
                 //console_putchar ( '\n',console_number);
             
-                __state=0;
+                // Zerando o marcador de estagio.
+                // Isso porque o estagio mudara dependendo do char encontrado agora.
+                __EscapeSequenceStage=0; 
                 
-                // Entra.
+                // '['
+                // CSI.    '0x1b['
                 if (ch=='['){
-                    __state=2;
+                    __EscapeSequenceStage = 2;
+                
+                // >>> nao eh csi ... o 'E' esta no lugar do '['
+                
                 }else if (ch=='E'){ 
                     __local_gotoxy ( 0, (TTY[console_number].cursor_y + 1), console_number );
                 }else if (ch=='M'){
@@ -901,120 +931,199 @@ console_write (
                     console_putchar ( ch, console_number );  //lf();
                 }else if (ch=='Z'){
                     __respond (console_number);    //test
+                
+                //??
+                // tivemos um 0x1b e o cursor esta em determinado lugar.
                 }else if ( TTY[console_number].cursor_x == '7'){   //?? What L.T.
                     __local_save_cur (console_number);
+                
+                //??
+                // tivemos um 0x1b e o cursor esta em determinado lugar.
                 }else if ( TTY[console_number].cursor_x == '8' ){  //?? What L.T.
                     __local_restore_cur (console_number);
                 };
                 break;
 
-            //State 2
+            //================================================
+            // Stage 2
+            // Chegamos aqui depois de encontrarmos um CSI. '0x1b['
+            // O que vem apos o '[' sao parametros separados por delimitadores
+            // e terminados com um 'm'. 
             case 2:
+            
                 // #debug
                 //console_putchar ( '@',console_number);
                 //console_putchar ( '2',console_number);
                 //console_putchar ( '\n',console_number);
  
-                // Clean
+                // Limpando o array de parametros.
                 for ( npar=0; npar<NPAR; npar++ ){ par[npar]=0; };
                 npar=0;
-                __state=3;  // Next state.
+                //Mudando de estago para checar os parametros.
+                __EscapeSequenceStage=3;  // Next state.
+                
+                //Se o primeiro char apos o '[' for um '?'
+                // entao vamos para o proximo estagio, mas quebraremos 
+                // par ao for pegar o proximo char.
+                // Caso contrario vamos para o proximo estago sem pegarmos o proximo char?
                 if ( ques = ( ch == '?' ) ) 
                     break;
 
+            //================================================
+            // Stage 3
             case 3:
                 // #debug
                 //console_putchar ( '@',console_number);
                 //console_putchar ( '3',console_number);
                 //console_putchar ( '\n',console_number);
             
-				if ( ch==';' && npar<NPAR-1) {
-					npar++;
-					break;  //#bugbug: Não moda de state??
+                // Se encontramos um delimitador
+                // e ainda nao acabou o array usado para parametros.
+                // entao avançamos para o proximo char nos parametros.
+                if ( ch == ';' && 
+                     npar < NPAR-1) 
+                {
+                    // Avançamos, mas quebramos para que o for pegue
+                    // o proximo char da string.
+                    //#bugbug: Não moda de state??
+                    npar++;  break;  
 
-				} else if ( ch >= '0' && ch <='9'){
-					par[npar] = 10 * par[npar] + ch -'0';
-					break;
-					
-				} else __state=4;
+                // Isso nao eh um delimitador.
+                // Checamos se eh um numero.
+                } else if ( ch >= '0' && ch <='9'){
 
+                    // Sim eh um numero.
+                    // #bugbug?
+                    // Multiplicamos o que estava no buffer por 10.
+                    // Mas nem sei o que ja estava no buffer??
+                    // porque fizemos isso ?
+                    // o buffer provavelmente esta vazio no primeiro numero.
+                    // Sendo assim qeubramos para tentarmos pegar mais numeros no for.
+                    par[npar] = 10 * par[npar] + ch - '0';
+                    break;
 
+                 // Nao eh um delimitador nem um numero.
+                 // entao vamos para o proximo estagio
+                 // porque provavelmente eh uma letra.
+                 // Nao precisamos quebrar, pois ja temos um char.
+                 } else { 
+                     __EscapeSequenceStage = 4;
+                 }
+
+            // Stage 4
             case 4:
                 // #debug
                 //console_putchar ( '@',console_number);
                 //console_putchar ( '4',console_number);
                 //console_putchar ( '\n',console_number);
-            
-                __state=0;
+
+                // Zerando o marcador de estagio.
+                // Significa que se quebrarmos, vamos voltar para o estagio zero.
+                // No estagio zero estamos fora da escape sequence.
+ 
+                __EscapeSequenceStage=0;
                 
                 switch (ch){
 
+                    // mudamos o cursor e saimos da escape sequence
                     case 'G': case '`':
 						if (par[0]) par[0]--;
 						__local_gotoxy (par[0], TTY[console_number].cursor_y, console_number);
 						break;
+
+                    // mudamos o cursor e saimos da escape sequence
                     case 'A':
 						if (!par[0]) par[0]++;
 						__local_gotoxy ( TTY[console_number].cursor_x,  TTY[console_number].cursor_y - par[0], console_number);
 						break;
+
                     case 'B': case 'e':
 						if (!par[0]) par[0]++;
 						__local_gotoxy ( TTY[console_number].cursor_x, TTY[console_number].cursor_y + par[0], console_number);
 						break;
+
+                    // mudamos o cursor e saimos da escape sequence 
                     case 'C': case 'a':
 						if (!par[0]) par[0]++;
 						__local_gotoxy ( TTY[console_number].cursor_x + par[0], TTY[console_number].cursor_y, console_number);
 						break;
+
+                    // mudamos o cursor e saimos da escape sequence
                     case 'D':
 						if (!par[0]) par[0]++;
 						__local_gotoxy ( TTY[console_number].cursor_x - par[0], TTY[console_number].cursor_y, console_number);
 						break;
+
+                    // mudamos o cursor e saimos da escape sequence
 					case 'E':
 						if (!par[0]) par[0]++;
 						__local_gotoxy (0, TTY[console_number].cursor_y + par[0], console_number);
 						break;
+
+                    // mudamos o cursor e saimos da escape sequence
 					case 'F':
 						if (!par[0]) par[0]++;
 						__local_gotoxy (0, TTY[console_number].cursor_y - par[0], console_number);
 						break;
+
+                    // mudamos o cursor e saimos da escape sequence
 					case 'd':
 						if (par[0]) par[0]--;
 						__local_gotoxy ( TTY[console_number].cursor_x, par[0], console_number);
 						break;
+
+                    // mudamos o cursor e saimos da escape sequence
 					case 'H': case 'f':
 						if (par[0]) par[0]--;
 						if (par[1]) par[1]--;
 						__local_gotoxy (par[1],par[0], console_number);
 						break;
 
-					case 'J': csi_J  (par[0]); break;
-					case 'K': csi_K  (par[0]); break;
+                    // Outros tratadores.
+					case 'J': csi_J  (par[0]);                 break;
+					case 'K': csi_K  (par[0]);                 break;
 					case 'L': csi_L  (par[0], console_number); break;
 					case 'M': csi_M  (par[0], console_number); break;
 					case 'P': csi_P  (par[0], console_number); break;
 					case '@': csi_at (par[0], console_number); break;
-					case 'm': csi_m (); break;
 
-					case 'r':
-						if (par[0]) par[0]--;
-						if (!par[1]) par[1] = TTY[console_number].cursor_height;  //?? 
+                    // FIM.
+                    // Isso marca o fim da escape sequence,
+                    // vamos quebrar e voltar para a string normal.
+                    // Essa rotina cheaca os parametros e configura o atributo
+                    // de acordo com o ultimo parametro.
+                    case 'm': 
+                        csi_m (); 
+                        break;
+
+                    // ?? 
+                    // 0x1b[r
+                    // Isso ajusta o top e o bottom.
+                    case 'r':
+						if (par[0])  { par[0]--; }
+						if (!par[1]) { par[1] = TTY[console_number].cursor_height; }  
 						if (par[0] < par[1] &&
-						    par[1] <= TTY[console_number].cursor_height ) {
-							TTY[console_number].cursor_top =par[0];
+						    par[1] <= TTY[console_number].cursor_height ) 
+						{
+                            // ajuste feito por 'r'.
+							TTY[console_number].cursor_top    = par[0];
 							TTY[console_number].cursor_bottom = par[1];
 						}
-						break;
+                        break;
 
+                    // salva o cursor
                     case 's': 
                         __local_save_cur( console_number ); 
                         break;
 
+                    // restaura o cursor.
                     case 'u': 
                         __local_restore_cur (console_number);
                         break;
                 };
                 break;
 
+            // Stage fail
             default:
                 printf ("console_write: default\n");
                 goto fail;
@@ -1026,7 +1135,7 @@ console_write (
    //printf ("console_write: done\n");
    //refresh_screen();
 
-    return count;
+    return StringSize;
 
 fail:
     refresh_screen();

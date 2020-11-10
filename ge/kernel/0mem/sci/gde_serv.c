@@ -101,8 +101,6 @@ gde_extra_services (
     
     struct window_d  *__window;
 
-
-
 	//generic file pointer
     file *__fp;
 
@@ -113,15 +111,19 @@ gde_extra_services (
     //Deprecated.
     //Outro n�mero fará esse trabalhao.
     if ( number == 260 ){
-        return (void *) sys_read ( (unsigned int) arg2, 
-                            (char *) arg3, (int) arg4 );
+        return (void *) sys_read ( 
+                            (unsigned int) arg2, 
+                            (char *)       arg3, 
+                            (int)          arg4 );
     }
      
     //Deprecated.
     //Outro n�mero fará esse trabalhao.
     if ( number == 261 ){
-        return (void *) sys_write ( (unsigned int) arg2, 
-                            (char *) arg3, (int) arg4 );
+        return (void *) sys_write ( 
+                            (unsigned int) arg2, 
+                            (char *)       arg3, 
+                            (int)          arg4 );
     }
 
 
@@ -198,9 +200,10 @@ gde_extra_services (
     // of the current process.
     // IN: fd, buf, count.         
     if (number == 272){
-           return (void *) tty_read ( (unsigned int) arg2,   //channel 
-                               (char *) arg3,                //buf
-                               (int) arg4 );                 //nr
+           return (void *) tty_read ( 
+                               (unsigned int) arg2,    // channel 
+                               (char *)       arg3,    // buf
+                               (int)          arg4 );  // nr
     }
 
 
@@ -208,15 +211,15 @@ gde_extra_services (
     // of the current process.
     // IN: fd, buf, count.         
     if (number == 273){
-        return (void *) tty_write ( (unsigned int) arg2,  //channel 
-                            (char *) arg3,                //buf
-                            (int) arg4 );                 //nr
+        return (void *) tty_write ( 
+                            (unsigned int) arg2,    // channel 
+                            (char *)       arg3,    // buf
+                            (int)          arg4 );  // nr
     }
-
 
     // Get current virtual console.
     if (number == 277 ){
-        return (void *) console_get_current_virtual_console ();
+        return (void *) console_get_current_virtual_console();
     }
 
     // Set current cirtual console.
@@ -282,11 +285,11 @@ gde_extra_services (
 
     // Updates a status bar of a given window.
     // #deprecated. Delete!
-    if ( number == 300 )
-    {
-        return (void *) UpdateStatusBar ( (struct window_d *) arg2, 
-                            (unsigned char *) arg3, 
-                            (unsigned char *) arg4 );
+    if ( number == 300 ){
+        return (void *) UpdateStatusBar ( 
+                            (struct window_d *) arg2, 
+                            (unsigned char *)   arg3, 
+                            (unsigned char *)   arg4 );
     }
     
     
@@ -325,11 +328,10 @@ gde_extra_services (
         
         __window = (struct window_d *) windowList[arg2];
         
-        if ( __window->type == WT_OVERLAPPED )
-        {
-			return (void *) 1;
+        if ( __window->type == WT_OVERLAPPED ){
+            return (void *) 1;
         }
-        return (void *) 0;		
+        return (void *) 0;
     }
 
     //pega o ponteiro de um janela.
@@ -546,8 +548,10 @@ gde_extra_services (
     // See: unistd.c
     // IN: fd, offset, whence.
     if ( number == 603 ){
-        return (void *) sys_lseek ( (int) arg2, 
-                            (off_t) arg3, (int) arg4 );
+        return (void *) sys_lseek ( 
+                            (int)   arg2, 
+                            (off_t) arg3, 
+                            (int)   arg4 );
     }
  
 
@@ -558,9 +562,10 @@ gde_extra_services (
     // da imagem.
     // IN: name, argv, envp.
     if (number == 620){
-        return (void *) process_execve ( (const char *) arg2,  // pathname 
-                            (const char *) arg3,               // argv
-                            (const char *) arg4 );             // envp
+        return (void *) process_execve ( 
+                            (const char *) arg2,    // pathname 
+                            (const char *) arg3,    // argv
+                            (const char *) arg4 );  // envp
     }
 
 
@@ -615,9 +620,8 @@ gde_extra_services (
  
     /*
     //arp request test.
-    if ( number == 800 )
-    {   
-		return (void *) 0;
+    if ( number == 800 ){
+        return (void *) 0;
     }
     */
 
@@ -661,18 +665,14 @@ gde_extra_services (
                             (char *) arg3, (size_t) arg4  ); 
     } 
 
-    // Deprecated!
-    if ( number == 810 )
-    {
-        debug_print ("gde_serv.c: [810] Deprecated\n");
-        return NULL;
-    }
 
     // Deprecated!
-    if ( number == 811 )
-    {
-        debug_print ("gde_serv.c: [811] Deprecated\n");
-        return NULL;
+    if ( number == 810 ){
+        debug_print ("gde_serv.c: [810] Deprecated\n");  return NULL;
+    }
+    // Deprecated!
+    if ( number == 811 ){
+        debug_print ("gde_serv.c: [811] Deprecated\n");  return NULL;
     }
 
 
@@ -699,22 +699,21 @@ gde_extra_services (
         return (void *) getthreadname ( (int) arg2, (char *) arg3);
     }
 
- 
-     //890 ~ 899 network stuff 
+    //==========================
+    // 890 ~ 899 network stuff 
     
     // 890 - Receive.
     // O usuário recebe um buffer com um pacote.
-    // See: net/network/network.c
+    // See: sci/net/network/network.c
     // IN: ubuf, len.
     if ( number == 890 ){
         return (void *) sys_network_receive ( 
                             (void *) arg2, (int) arg3 );
     }
 
-
     // 891 - Send.
     // O usuário envia um buffer com um pacote.
-    // See: net/network/network.c
+    // See: sci/net/network/network.c
     // IN: ubuf, len.
     if ( number == 891 ){
         return (void *) sys_network_send ( 

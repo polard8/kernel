@@ -91,9 +91,6 @@ __SendARP (
     uint8_t src_mac[6], 
     uint8_t dst_mac[6] );
 
-
-
-
 // Test ARP.
 void __shellTestARP (void);
 
@@ -113,15 +110,12 @@ print_ethernet_header (
     const unsigned char *Buffer, 
     int Size );
 
-
 void print_arp_header ( char *Buffer );
 
 int 
 gdeshell_decode_buffer ( unsigned long buffer_address );
 
-
 void network_test_buffer(void);
-
 
 // Testa rotinas do kernel.
 // Nao eh socket unix.

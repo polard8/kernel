@@ -1916,6 +1916,26 @@ do_compare:
         goto exit_cmp;
     }
     
+    // escape.
+    // Teste some escape sequences.
+    // O tratador eh o console virtual dentro do kernel.
+    // #define __ESC "\x1b"
+    // #define __CSI "\x1b["
+    //See:
+    //http://ascii-table.com/ansi-escape-sequences-vt-100.php
+    //https://notes.burke.libbey.me/ansi-escape-codes/
+    if ( gramado_strncmp( prompt, "escape", 6 ) == 0 )
+    {
+        printf("~escape: Testing some escape sequences.\n");
+        //printf("tes\x1b[7mte\n");
+        //printf("tes\x1B[?25hte\n"); 
+        //printf("\n");
+        //printf("\n");
+        //printf("\n");
+        //printf("\n");
+        goto exit_cmp;
+    }
+
 
     // gethostname 
     char *my_hostname;
