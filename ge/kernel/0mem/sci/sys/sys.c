@@ -710,9 +710,10 @@ int sys_read (unsigned int fd, char *ubuf, int count){
 
 
     // fd.
-    if (fd<0 || fd>31){
+    if (fd<0 || fd>31)
+    {
         debug_print ("sys_read: fd\n");
-        printf ("sys_read: fd\n");
+        printf      ("sys_read: fd\n");
         goto fail;
     }
 
@@ -720,14 +721,14 @@ int sys_read (unsigned int fd, char *ubuf, int count){
     // todo: Checar a validade da região de memória.
     if ( (char *) ubuf == (char *) 0 ){
         debug_print ("sys_read: invalid ubuf address\n");
-        printf ("sys_read: invalid ubuf address\n"); 
+        printf      ("sys_read: invalid ubuf address\n"); 
         goto fail; 
     }
 
     // count.
     if (count<=0){
         debug_print ("sys_read: count\n");
-        printf ("sys_read: count\n");
+        printf      ("sys_read: count\n");
         goto fail;
     }
 
@@ -838,7 +839,12 @@ int sys_read (unsigned int fd, char *ubuf, int count){
         // #bugbug
         // temos que inicializar essa variável, na hora da 
         // clonagem de processo e na hora da criação de processo.
-        if ( (void *) __P->priv == NULL ){
+        
+        // podemos pegar o socket privado, sem problemas,
+        // o que nao podemos eh apenas lermos do socket privado.
+        
+        if ( (void *) __P->priv == NULL )
+        {
             debug_print ("sys_read: __P->priv fail\n");
             printf      ("sys_read: __P->priv fail\n");
             goto fail;
@@ -857,18 +863,27 @@ int sys_read (unsigned int fd, char *ubuf, int count){
         // atenção
         // temos que inicializar essa variável, na hora da 
         // criação do socket.
+
+        // podemos pegar o socket privado, sem problemas,
+        // o que nao podemos eh apenas lermos do socket privado.
+
         if ( (void *) s->private_file == NULL ){
             debug_print ("sys_read: s->private_file fail\n");
             printf      ("sys_read: s->private_file fail\n");
             goto fail;
         }
 
+        // #bugbug
+        // Nao podemos ler apenas o socket privado.
+        // temos o direito de lermos qualquer socket registrado na estrutura
+        // do processo atual.
+        
         // O arquivo do socket precisa ser esse arquivo.
-        if (__file != s->private_file){
-            debug_print ("sys_read: __file fail\n");
-            printf      ("sys_read: __file fail\n");
-            goto fail;
-        }
+        //if (__file != s->private_file){
+        //    debug_print ("sys_read: __file fail\n");
+        //    printf      ("sys_read: __file fail\n");
+        //    goto fail;
+        //}
 
         // Read!
 
@@ -1090,11 +1105,24 @@ int sys_write (unsigned int fd, char *ubuf, int count){
     // Copiar deve ser uma opcao e nao uma regra!
     // Precisamos de uma flag para copyonwrite.
     
+    // atençao
+    // Podemos escrever num socket que nao eh o privado!!!
+    // existe a possibilidade de o processo atual estar 
+    // escrevendo em um socket que pertence a outro processo.
+    // mas que por causa da conexao possui o fd dele registrado
+    // em sua estrutura.
+    // Entao o fd passado por argumento nao precisa ser o mesmo
+    // do socket privado do processo. Pois poderemos estar
+    // escrevendo em outro socket que nao o privado.
+
     struct process_d  *__P;
+    
     file              *__file;
     file              *__file2;
+    
     struct socket_d   *s1;
     struct socket_d   *s2;
+    
     int nbytes = 0;
     int ubuf_len=0;
 
@@ -1186,27 +1214,26 @@ int sys_write (unsigned int fd, char *ubuf, int count){
     // >> Console.
     // Se o descritor usado por write() for de um arquivo
     // do tipo console, escreveremos no console 0.
-
+    // IN: console number, buffer, size.
+       
     if ( __file->____object == ObjectTypeVirtualConsole )
     {
-       // IN: console number, buffer, size.
        //return (int) console_write ( (int) 0, 
        //                 (const void *) ubuf, (size_t) count );
 
-       // #test.
        return (int) console_write ( (int) current_vc, 
                         (const void *) ubuf, (size_t) count );
     }
 
 
-    //
     // Write
     // and copy if it's a socket.
+    // #bugbug: We need a flag to handle this issue.
     // __file2
-    //
+
 
     //
-    // Sockets
+    // == Sockets ===============================================
     //
     
     ncopy = count;
@@ -1230,25 +1257,35 @@ int sys_write (unsigned int fd, char *ubuf, int count){
         // Pega a estrutura de soquete do processo atual.
         // #bugbug: 
         // Um processo não pode escrever no socket de outro processo?
+        // Pode sim, eh o que o servidor faz !!!!
+        
+        // pegamos o privado.
+        // mas nao significa que vamos escrever nele.
         s1 = __P->priv;
         if ( (void *) s1 == NULL){ 
             debug_print ("sys_write: s1 \n"); 
             goto fail;
         }    
         
+        // #bugbug: Podemos escrever em qualquer socket registrado 
+        // na estrutura do processo atual.
         // O socket tem um buffer, que é um arquivo. 
-        if (__file != s1->private_file){
-            debug_print ("sys_write: __file\n"); 
-            goto fail;
-        }  
+        //if (__file != s1->private_file){
+        //    debug_print ("sys_write: __file\n"); 
+        //    goto fail;
+        //}  
 
         //#debug
         //printf ("sys_write: (1) pid %d Writing in the socket file %d \n", 
             //current_process, __file->_file );
         //refresh_screen();
 
-        // Write!
+        //
+        // == Write! =======================================
+        //
+        
         // Write in the socket buffer.
+        
         nbytes = (int) file_write_buffer ( (file *) __file, 
                            (char *) ubuf, (int) count );
 
@@ -1289,6 +1326,7 @@ int sys_write (unsigned int fd, char *ubuf, int count){
         // NO, don't copy!
         // #todo
         // Retornaremos se não é para copiar para o socket conectado.
+        
         if (s1->conn_copy != 1){
             panic ("sys_write: [FIXME] Working to not copy the data from s1 to s2.");
         }
@@ -1310,6 +1348,8 @@ int sys_write (unsigned int fd, char *ubuf, int count){
             }    
 
             // The pointer to the destination.
+            // O segundo socket nos dara o fd do socket onde 
+            // vamos copiar.
             
             s2 = s1->conn;
             

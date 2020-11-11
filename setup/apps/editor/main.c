@@ -684,6 +684,11 @@ int main ( int argc, char *argv[] ){
     addr_in.sin_port   = PORTS_WS;   
     addr_in.sin_addr.s_addr = IP(127,0,0,1); 
 
+    // #todo:
+    // check validation od w h
+    debug_print ("------------------------\n"); 
+    debug_print ("editor: Initializing ...\n");
+
 
     // Metrics.
     unsigned long w = gws_get_system_metrics(1);
@@ -694,14 +699,6 @@ int main ( int argc, char *argv[] ){
         exit(1);
     }
 
-
-
-    // #todo:
-    // check validation od w h
-
-
-    debug_print ("------------------------\n"); 
-    debug_print ("editor: Initializing ...\n");
 
 
     //
@@ -818,9 +815,10 @@ int main ( int argc, char *argv[] ){
         viewwindowx, viewwindowy, w_width, w_height,
         0, 0, COLOR_GRAY, COLOR_GRAY );
 
-    if ( main_window < 0 )             
+    if ( main_window < 0 ){   
         debug_print("Editor: main_window fail\n"); 
-
+        exit(1);
+    }
 
      // Text.
      gws_draw_text (

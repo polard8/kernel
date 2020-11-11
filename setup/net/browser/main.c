@@ -818,6 +818,17 @@ int main ( int argc, char *argv[] ){
     debug_print ("-------------------------\n");
     debug_print ("browser: Initializing ...\n");
 
+
+    // Metrics.
+    unsigned long w = gws_get_system_metrics(1);
+    unsigned long h = gws_get_system_metrics(2);
+
+    if ( w == 0 || h == 0 ){
+        printf ("browser: w h \n");
+        exit(1);
+    }
+
+
     //
     // socket
     // 
@@ -840,15 +851,15 @@ int main ( int argc, char *argv[] ){
     // connect
     // 
 
-    while(1){
+    //nessa hora colocamos no accept um fd.
+    //então o servidor escreverá em nosso arquivo.
 
-        //nessa hora colocamos no accept um fd.
-        //então o servidor escreverá em nosso arquivo.
-    
-        // #debug
-        //printf ("gnst: Connecting to the address 'ws' ...\n");      
-        printf ("browser: Connecting to the address via inet  ...\n");    
-      
+    // #debug
+    //printf ("gnst: Connecting to the address 'ws' ...\n");      
+    printf ("browser: Connecting to the address via inet  ...\n");    
+
+    while (1){
+
         if (connect (client_fd, (void *) &addr_in, sizeof(addr_in)) < 0){ 
             
             debug_print("browser: Connection Failed \n"); 
@@ -856,7 +867,6 @@ int main ( int argc, char *argv[] ){
             //return -1; 
         
         // try again
-        
         }else{ break; }; 
     };
  
@@ -873,6 +883,9 @@ int main ( int argc, char *argv[] ){
     // Pode nem ser possível.
     // Mas como sabemos que é um soquete,
     // então sabemos que é possível ler.
+
+   // #bugbug
+   // We need this or something is gonna fail in the title bar.
 
     //while(1){
         browser_hello_request(client_fd);
@@ -893,21 +906,44 @@ int main ( int argc, char *argv[] ){
     int button=0;
 
 
+
+    // a janela eh a metade da tela.
+    unsigned long w_width  = (w/2);
+    unsigned long w_height = (h/2); 
+
+    unsigned long viewwindowx = ( ( w - w_width ) >> 1 );
+    unsigned long viewwindowy = ( ( h - w_height) >> 1 ); 
+
+
+    if ( w == 320 )
+    {
+        // dimensoes
+        w_width  = w;
+        w_height = h;
+        
+        //posicionamento
+        viewwindowx = 0;
+        viewwindowy = 0;
+    }
+
+
+
     //main window
     main_window = gws_create_window (client_fd,
-        WT_OVERLAPPED,1,1,"Browser",
-        40, 40, 640, 480,
-        0,0,COLOR_GRAY, COLOR_GRAY);
+                      WT_OVERLAPPED, 1, 1, "Browser",
+                      viewwindowx, viewwindowy, w_width, w_height,
+                      0, 0, COLOR_GRAY, COLOR_GRAY );
 
-    if ( main_window < 0 )             
+    if ( main_window < 0 ){
         debug_print("browser: main_window fail\n"); 
-
+        exit(1);
+    }
 
     // address bar
     addressbar_window = gws_create_window (client_fd,
         WT_EDITBOX,1,1,"address-bar",
         4, 32 +4, 
-        (640-32-4-4-4), 32,
+        (w_width-32-4-4-4), 32,
         main_window,0,COLOR_WHITE, COLOR_WHITE);
 
     if ( addressbar_window < 0 )             
@@ -925,7 +961,7 @@ int main ( int argc, char *argv[] ){
     // button
     button = gws_create_window (client_fd,
         WT_BUTTON,1,1,">",
-        (640-32-4), 32 +4, 
+        (w_width-32-4), 32 +4, 
         32, 32,
         main_window,0,COLOR_GRAY, COLOR_GRAY);
 
@@ -938,19 +974,19 @@ int main ( int argc, char *argv[] ){
     client_window = gws_create_window (client_fd,
         WT_SIMPLE,1,1,"client",
         4, 32 +40, 
-        640-8, 480 - 40 - 4 -32,
+        w_width-8, w_height - 40 - 4 -32,
         main_window,0,COLOR_WHITE, COLOR_WHITE);
 
     if ( client_window < 0 )             
         debug_print("browser: client_window fail\n"); 
 
      gws_draw_text (
-        (int) client_fd,             // fd,
-        (int) client_window,              // window id,
-        (unsigned long) 40,        // left,
-        (unsigned long) 40,    // top,
+        (int) client_fd,        // fd,
+        (int) client_window,    // window id,
+        (unsigned long) 40,     // left,
+        (unsigned long) 40,     // top,
         (unsigned long) COLOR_BLACK,
-        "Hello, from Google!...  (Ok, I'm lying.)");
+        "Hello, from G**gle!");
 
 
     //
