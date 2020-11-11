@@ -16,6 +16,8 @@
 // See:
 // https://wiki.osdev.org/3D_Renderer_Basics
 // http://members.chello.at/easyfilter/bresenham.html
+// http://math.hws.edu/graphicsbook/c2/s3.html
+// http://math.hws.edu/graphicsbook/index.html
 // ...
 
 
@@ -25,6 +27,49 @@
  *     Ex: Scaling, translation and rotation ...
  * 
  */
+
+// translation
+// x1 = x + e
+// y1 = y + f
+// translate( e, f )
+
+
+// Scaling
+// inflate, deflate.
+// x1 = a * x
+// y1 = d * y
+
+// affine transform
+// x1 = a*x + b*y + e
+// y1 = c*x + d*y + f
+// T(x,y) = ( a*x + b*y + e, c*x + d*y + f )
+
+
+// Rotation
+//x1 = cos(r) * x - sin(r) * y
+//y1 = sin(r) * x + cos(r) * y
+
+
+// shearing transform.
+// tosquear, podar.
+//x1 = x + b * y
+//y1 = y
+//---------
+//x1 = x
+//y1 = c * x + y
+
+
+//Combining Transformations
+//translate(4,0)
+//rotate(90)
+
+//Window-to-Viewport
+//scale( width / (right-left), height / (bottom-top) );
+//translate( -left, -top )
+//-------
+//x1 = width / (right-left) * (x-left)
+//y1 = height / (bottom-top) * (y-top)
+
 
 // =============================================================
 // #projection:
@@ -502,7 +547,7 @@ ras_rectangleZ (
 }
 
 
-
+// scaling
 int xxxInflateCubeZ ( struct gr_cube_d *cube, int value )
 {
     if ( (void*) cube == NULL )
@@ -548,7 +593,7 @@ int xxxInflateCubeZ ( struct gr_cube_d *cube, int value )
     return 0;
 }
 
-
+// scaling
 int xxxDeflateCubeZ ( struct gr_cube_d *cube, int value )
 {
     if ( (void*) cube == NULL )
