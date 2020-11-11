@@ -69,14 +69,77 @@ struct gr_mesh_d
 struct gr_camera_d
 {
     // position
-    struct gr_vec3D_d *position;
-    
+    struct gr_vec3D_d position;
+    struct gr_vec3D_d upview;
+    struct gr_vec3D_d lookat;
     // ...
+    
+    
+    struct gr_projection_d *projection;
 
     // Next node in the linked list.
-    struct gr_camera_d *next;
+    //struct gr_camera_d *next;
 };
 
+struct gr_camera_d *CurrentCamera;
+
+
+// ??
+// graphical projection perspective
+// See:
+// https://en.wikipedia.org/wiki/Perspective_(graphical)
+struct gr_projection_d
+{
+    // perspective or orthographic
+    int type;
+
+
+    // fovy   Number The angle between the upper and lower sides of the viewing frustum.
+    // aspect Number The aspect ratio of the viewing window. (width/height).
+    
+ 
+    // The frustrum:   
+    // The rectangle that the can see.
+    // The limits in z axis. zmin and zmax;
+    
+    struct gr_rectangle_d *frustrum_view;   // projection window.
+    
+    int zNear;   // Distance to the near clipping plane along the -Z axis.
+    int zFar;    // Distance to the far clipping plane along the -Z axis.
+    int zRange;  // zRange = zNear - zFar;
+
+
+    // fov: field of view.
+    int angle_of_view;
+    
+
+    // The apex.
+    // mid_x = (left + right) * 0.5;
+    // mid_y = (bottom + top)  * 0.5;
+    struct gr_vec3D_d *frustrum_apex;
+
+
+
+    // apsect ratio
+    // ar = screen width / screen height
+    // #bugbug: We are using int, not float.
+    int ar;
+
+
+    // talvez precisamos aqui uma matrix de transformaçao.
+};
+
+struct gr_projection_d *CurrentProjection;
+
+
+// The Perspective Calculation
+
+// we can calculate the location of a 3D vertex in a 
+// 2D viewing window with a multiplication and a division like this:
+// x' = (x*near)/z
+// y' = (y*near)/z
+// x' = (x*near)/(-z)
+// y' = (y*near)/(-z)
 
 
 
@@ -94,7 +157,7 @@ static int projection4x4[4][4] = {
         {1,1,0,0}
         };
 
-
+ 
 void multiply4 (int mat1[][4], int mat2[][4], int res[][4]);
 
 // function to multiply two matrices
@@ -134,6 +197,21 @@ void matrix_demo1(void);
 
 int grInit(void);
 
+
+// Camera
+int camera_initialize(void);
+int 
+camera ( 
+    int x, int y, int z,
+    int xUp, int yUp, int zUp,
+    int xLookAt, int yLookAt, int zLookAt );
+
+
+int projection_initialize(void);
+
+
+// chaging the view for the current projection
+int view(int near, int far);
 
 
 // Point.

@@ -76,6 +76,15 @@
 // For orthographics projection there is no scaling factor.
 // For perspective, we do have scaling.
 
+// Camera and Perspective 
+// camera:
+// location, pointing at, pointing to top.
+// .., lookat(view vector), top (upvector).
+// perspective:
+// view frustrum
+// near, far ...
+// from, to
+
 
 static unsigned long HotSpotX=0;
 static unsigned long HotSpotY=0;
@@ -100,6 +109,9 @@ int grInit (void)
     unsigned long w = gws_get_device_width();
     unsigned long h = gws_get_device_height();
 
+
+    gwssrv_debug_print ("grInit:\n");
+
     if ( w == 0 || h == 0 ){
         printf ("grInit: [FAIL] w h\n");
         exit(1);
@@ -108,12 +120,150 @@ int grInit (void)
     HotSpotX = (w/2);
     HotSpotY = (h/2);
     
+    //
+    // == Camera ===================================================
+    //
+    
+    gwssrv_debug_print ("grInit: camera\n");
+        
+    // initialize the current camera.
+    camera_initialize();
+    
+    
+    // change some attributes for the current camera.
+    camera ( 
+        -40, -40, 0,  // position vector
+        -40, 40, 0,   // upview vector
+        10, 10, 10 ); // lookat vector
+    
+    
+    //
+    // == Projection ================================================
+    //
+
+    gwssrv_debug_print ("grInit: projection\n");
+    
+    // initialize the current projection.
+    projection_initialize();
+    // change the view for the current projection.
+    view(0,40);
+    
+     
     // ...
 
+    gwssrv_debug_print ("grInit: done\n");
     return 0;
 }
 
 
+
+int camera_initialize(void)
+{
+    CurrentCamera = (void *) malloc ( sizeof( struct gr_camera_d ) );
+    
+    if ( (void*) CurrentCamera == NULL )
+    {
+        printf("camera_initialize fail\n");
+        exit(1);
+    }
+    
+    // position
+    CurrentCamera->position.x = -40;
+    CurrentCamera->position.y = -40;
+    CurrentCamera->position.z = 0;
+
+    //upview
+    CurrentCamera->upview.x = -40;
+    CurrentCamera->upview.y = +40;
+    CurrentCamera->upview.z = 0;
+
+    //lookat. target poit origin.
+    CurrentCamera->lookat.x = 0;
+    CurrentCamera->lookat.y = 0;
+    CurrentCamera->lookat.z = 0;
+    
+    
+    CurrentCamera->projection = NULL;
+    
+    return 0;
+}
+
+int 
+camera ( 
+    int x, int y, int z,
+    int xUp, int yUp, int zUp,
+    int xLookAt, int yLookAt, int zLookAt )
+{
+        
+    if ( (void*) CurrentCamera == NULL )
+    {
+        printf("camera: fail\n");
+        return -1;
+        //exit(1);
+    }
+    
+    // position
+    CurrentCamera->position.x = x;
+    CurrentCamera->position.y = y;
+    CurrentCamera->position.z = z;
+
+    //upview
+    CurrentCamera->upview.x = xUp;
+    CurrentCamera->upview.y = yUp;
+    CurrentCamera->upview.z = zUp;
+
+    //lookat. target poit origin.
+    CurrentCamera->lookat.x = xLookAt;
+    CurrentCamera->lookat.y = yLookAt;
+    CurrentCamera->lookat.z = zLookAt;
+    
+    return 0;
+}
+
+
+
+int projection_initialize(void)
+{
+    CurrentProjection = (void *) malloc ( sizeof( struct gr_projection_d ) );
+    
+    if ( (void*) CurrentProjection == NULL )
+    {
+        printf("projection_initialize fail\n");
+        exit(1);
+    }
+
+    //perspective or orthogonal
+    CurrentProjection->type = 1; 
+
+    // ??
+    CurrentProjection->zNear   =  0;
+    CurrentProjection->zFar    = 40;
+    CurrentProjection->zRange  = (CurrentProjection->zFar - CurrentProjection->zNear);
+
+    //CurrentProjection->angle_of_view = ?;
+    //CurrentProjection->ar = ?;
+    //CurrentProjection->frustrum_apex = ?;
+    //CurrentProjection->frustrum_view = ?;
+
+    //...
+ 
+    return 0;
+}
+
+// chaging the view for the current projection
+int view(int near, int far)
+{
+    if ( (void*) CurrentProjection == NULL )
+    {
+        printf("view: fail\n");
+        return -1;
+        //exit(1);
+    }
+    CurrentProjection->zNear   = near;
+    CurrentProjection->zFar    = far;
+    CurrentProjection->zRange  = (CurrentProjection->zFar - CurrentProjection->zNear);
+    return 0;
+}
 
 
 
