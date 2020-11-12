@@ -774,6 +774,10 @@ int putchar (int ch){
 // Root 3
 //
 
+// #todo
+// Do not use this. Use fgets instead.
+// Using gets we can read more than we need.
+
 char *gets (char *s){
 
     register c;
@@ -786,7 +790,6 @@ char *gets (char *s){
         return (NULL);
 
     *cs++ = '\0';
-
 
     return (s);
 }
@@ -2737,7 +2740,11 @@ int fputs2 ( const char *str, FILE *stream )
  * gets:
  *     gets() devolve um ponteiro para string
  */
- 
+
+// #todo
+// Do not use this. Use fgets instead.
+// Using gets we can read more than we need.
+
 char *gets2 (char *s){
 
     char *p;

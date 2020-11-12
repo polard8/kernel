@@ -1,6 +1,5 @@
 /*
- * File: dd/net/nicintel.c   
- *
+ * File: netdev/e1000/nicintel.c   
  * 
  * // Driver para o NIC intel. (8086:100E)
  * 

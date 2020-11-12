@@ -2324,8 +2324,7 @@ do_compare:
     // See: net.c
     if ( gramado_strncmp( prompt, "network", 7 ) == 0 )
     {
-        network_initialize();
-        network_test_buffer();
+        network();
         goto exit_cmp;
     }
 

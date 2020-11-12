@@ -95,9 +95,6 @@ __SendARP (
 void __shellTestARP (void);
 
 
-// Initialize the network low level support.
-void network_initialize (void);
-
 // Send packet.
 // Direto. Envia o endereço do pacote para o kernel.
 // So lembrando que o lernel nao fara procesamentos
@@ -112,10 +109,12 @@ print_ethernet_header (
 
 void print_arp_header ( char *Buffer );
 
-int 
-gdeshell_decode_buffer ( unsigned long buffer_address );
+// Testing network.
+int network_decode_buffer ( unsigned long buffer_address );
+void network_loop(void);
+void network_initialize (void);
+void network(void);
 
-void network_test_buffer(void);
 
 // Testa rotinas do kernel.
 // Nao eh socket unix.

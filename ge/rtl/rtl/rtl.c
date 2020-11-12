@@ -331,7 +331,39 @@ void rtl_set_line_buffering(void)
 */
 
 
+/*
+ credits: apple chameleon boot loader.
+uint16_t rtl_swap16(uint16_t toswap) {
+	return (((toswap & 0x00FF) << 8) | ((toswap & 0xFF00) >> 8));
+}
 
+uint32_t rtl_swap32(uint32_t toswap) {
+	return  ((toswap & 0x000000FF) << 24) |
+	((toswap & 0x0000FF00) << 8 ) |
+	((toswap & 0x00FF0000) >> 8 ) |
+	((toswap & 0xFF000000) >> 24);
+}	
+
+uint8_t  rtl_read8(uint8_t *ptr, uint16_t offset) { 
+	return ptr[offset];
+}
+
+uint16_t rtl_read16(uint8_t *ptr, uint16_t offset) {
+	uint8_t ret[2];
+	ret[0] = ptr[offset+1];
+	ret[1] = ptr[offset];
+	return *((uint16_t*)&ret);
+}
+
+uint32_t rtl_read32(uint8_t *ptr, uint16_t offset) {
+	uint8_t ret[4];
+	ret[0] = ptr[offset+3];
+	ret[1] = ptr[offset+2];
+	ret[2] = ptr[offset+1];
+	ret[3] = ptr[offset];
+	return *((uint32_t*)&ret);
+}
+*/
 
 
 

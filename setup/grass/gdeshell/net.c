@@ -70,14 +70,13 @@ __SendARP (
     uint8_t dst_mac[6] )
 {
 
-    struct gdeshell_ether_header  *eh;
-    struct gdeshell_ether_arp     *h;  
+    struct gdeshell_ether_header  *eh;  // ethernet header.
+    struct gdeshell_ether_arp     *h;   // arp header.
     int i=0;
     unsigned char *buffer;
 
     //==============================================
     // # ethernet header #
-    //
 
     eh = (void *) malloc ( sizeof(struct gdeshell_ether_header ) );
 
@@ -119,21 +118,19 @@ __SendARP (
 
     }else{
 
-		// Hardware type (HTYPE)   (00 01)
-		// Protocol type (PTYPE)   (08 00)
-		// Hardware address length (MAC)
-		// Protocol address length (IP)
-
-        h->type  = 0x0100;
-        h->proto = 0x0008;
-        h->hlen  = 6;
-        h->plen  = 4;
-
-
-		// Operation (OPER) (dois bytes invertidos)
-
-        //h->op = ToNetByteOrder16(ARP_OPC_REPLY);
+        // Hardware type (HTYPE)   (00 01)
+        // Protocol type (PTYPE)   (08 00)
+        // Hardware address length (MAC)
+        // Protocol address length (IP)
+        // Operation (OPER) (dois bytes invertidos)
+ 
+        h->type  = 1;      // 0x0100;  // 1      ?? #bugbug order ??
+        h->proto = 0x800;  // 0x0008;  // 0x800  ?? #bugbug order ??
+        h->hlen  = 6;      // mac size.
+        h->plen  = 4;      // ip size.
         h->op = ToNetByteOrder16(ARP_OPC_REQUEST);
+        //h->op = ToNetByteOrder16(ARP_OPC_REPLY);
+
 
 // mac
 		// Configurando na estrutura de arp o endereço mac de origem e destino.
@@ -142,7 +139,7 @@ __SendARP (
 		// O endereço mac de origem pegamos na estrutura no nic intel.
 		// O endereço mac de destino foi passado via argumento.
 
-       //#todo: pegar o mec do host.
+        //#todo: pegar o mec do host.
         for ( i=0; i<6; i++ )
         {
             h->arp_sha[i] = src_mac[i];
@@ -150,7 +147,7 @@ __SendARP (
         };
 
 
-	// ip
+		// ip
 		// Configurando na estrutura de arp o endereço do ip de origem e 
 		// o ip de destino.
 		// sender ip
@@ -174,6 +171,15 @@ __SendARP (
     printf ("[arp]\n\n");
     printf ("type={%x} proto={%x} hlen={%d} plen={%d} op={%x} \n", 
         h->type, h->proto, h->hlen, h->plen, h->op );
+
+    if ((h->type  != 1)     ||  /* ethernet */
+        (h->proto != 0x800) ||  /* IPv4 */
+        (h->hlen != 6)      ||  /* 6-byte MAC */
+        (h->plen != 4))         /* 4-byte protocol address */
+    {
+        printf ("__SendARP: [FAIL]\n");
+        return;
+    }
 
     // sender
     printf ("\n sender: mac ");
@@ -213,8 +219,8 @@ __SendARP (
 
 
     //
-	// Copy.
-	//
+    // Copy.
+    //
 
 	// Copiando as estruturas para o buffer.
 	// >Copiando o header ethernet.
@@ -283,6 +289,12 @@ void __shellTestARP (void){
 }
 
 
+/*
+ *************************** 
+ * network_initialize:
+ *     
+ */
+
 void network_initialize (void)
 {
     debug_print("network_initialize:\n");
@@ -295,6 +307,39 @@ void network_initialize (void)
 }
 
 
+
+/*
+ ***************** 
+ * network
+ * 
+ */
+ 
+// Initialize ring0 network support.
+// Reading the buffers sended by the kernel.
+
+void network(void)
+{
+    printf("gdeshell-network: Testing network support.\n");
+
+    // Initializing.
+    network_initialize();
+    
+    // Input loop:
+    // Getting some input from the driver
+    // and decoding some packets.
+    network_loop();
+    
+    // Not reached!
+}
+
+
+/*
+ *********************************** 
+ * gdeshell_send_packet:
+ * 
+ *     Send a packet to the nic driver.
+ */
+ 
 // Send packet.
 // O conteudo nao eh analizado.
 // Apenas passamos para o driver de nic um buffer e o comando
@@ -302,6 +347,7 @@ void network_initialize (void)
 // O driver de nic devera usar as informaçoes do buffer
 // para saber o destino. 
 // Se o pacote for invalido, ele apenas derruba.
+
 void gdeshell_send_packet ( unsigned long packet_buffer )
 {
     if (packet_buffer == 0){ return; };
@@ -322,26 +368,18 @@ print_ethernet_header (
     printf("\n");
     printf ("Ethernet Header\n");
 
-    // Destination
-    printf ("   |-Destination Address : %.2X-%.2X-%.2X-%.2X-%.2X-%.2X \n", 
-        eth->dst[0] , 
-        eth->dst[1] , 
-        eth->dst[2] , 
-        eth->dst[3] , 
-        eth->dst[4] , 
-        eth->dst[5] );
-    
-    // Source
-    printf ("   |-Source Address      : %.2X-%.2X-%.2X-%.2X-%.2X-%.2X \n", 
-        eth->src[0] , 
-        eth->src[1] , 
-        eth->src[2] , 
-        eth->src[3] , 
-        eth->src[4] , 
-        eth->src[5] );
-    
+    // Destination MAC
+    // Source MAC
     // Protocol type.
-    // ARP, IP ... ?
+
+    printf ("   |-Destination Address : %.2X-%.2X-%.2X-%.2X-%.2X-%.2X \n", 
+        eth->dst[0], eth->dst[1], eth->dst[2], 
+        eth->dst[3], eth->dst[4], eth->dst[5] );
+
+    printf ("   |-Source Address      : %.2X-%.2X-%.2X-%.2X-%.2X-%.2X \n", 
+        eth->src[0], eth->src[1], eth->src[2], 
+        eth->src[3], eth->src[4], eth->src[5] );
+ 
     printf ("   |-Protocol            : %u \n",
         (unsigned short)eth->type);
 }
@@ -382,12 +420,12 @@ void print_arp_header ( char *Buffer )
 
 /*
  ***************** 
- * gdeshell_decode_buffer:
+ * network_decode_buffer:
+ * 
  *     Decode a buffer with a network packet.
  */
 
-int 
-gdeshell_decode_buffer ( unsigned long buffer_address )
+int network_decode_buffer ( unsigned long buffer_address )
 {
     // The ethernet header.
     struct gdeshell_ether_header *eh;
@@ -403,11 +441,11 @@ gdeshell_decode_buffer ( unsigned long buffer_address )
 
 
     //#debug
-    debug_print ("gdeshell_decode_buffer:\n");
+    debug_print ("network_decode_buffer:\n");
     //printf ("network_decode_buffer:\n");
 
     if ( buffer_address == 0 ){
-        printf ("gdeshell_decode_buffer: [FAIL] null buffer address\n");
+        printf ("network_decode_buffer: [FAIL] null buffer address\n");
         return -1;
     }
 
@@ -422,17 +460,14 @@ gdeshell_decode_buffer ( unsigned long buffer_address )
 
     if ( (void *) eh == NULL )
     {
-        printf ("gdeshell_decode_buffer: [FAIL] Ethernet header\n");
+        printf ("network_decode_buffer: [FAIL] Ethernet header\n");
         return -1;
 
     }else{
 
-        // Print
-
+        // Print ethernet header.
         print_ethernet_header ( 
             (const unsigned char*) buffer_address, 1500 );
-
-        //printf("type={%x} ",eh->type);
     };
 
 
@@ -537,29 +572,29 @@ gdeshell_decode_buffer ( unsigned long buffer_address )
 
 /*
  **************************** 
- * network_test_buffer:
+ * network_loop:
  * 
  *     Loop to read the buffers.
  *     Called by the builting command "network"
  */
 
-void network_test_buffer(void)
+void network_loop(void)
 {
     char buf[4096];
     int i=0;
 
-    debug_print("network_test_buffer:\n");
+    debug_print("network_loop:\n");
     printf("\n");
     printf("\n");
     printf("=========================\n");
-    printf("network_test_buffer: [LOOP] Reading the buffers in ring3\n");
+    printf("network_loop: [LOOP] Reading the buffers in ring3\n");
     
     
     for (i=0; i<4096; i++)
         buf[i] = 0;
 
     //
-    // Loop.
+    // == Loop ======================================
     //
 
     // + Get the packet.
@@ -567,19 +602,24 @@ void network_test_buffer(void)
 
     while (1)
     {
+        // Input
         // IN: Service, buffer, lenght, nothing.
         gramado_system_call ( 890, 
             (unsigned long) &buf[0], (unsigned long) 1500, 0);
 
-        gdeshell_decode_buffer ((unsigned long) &buf[0]);
+        network_decode_buffer ((unsigned long) &buf[0]);
         
         //#test: OK. o led indica que esta enviando.
         //envia um pacote
         //gdeshell_send_packet();
-    };
     
-    debug_print("network_test_buffer: Done\n");
-    printf     ("network_test_buffer: Done\n");
+        // #todo:
+        // Maybe we can exit this loop.
+    };
+
+    // Not reached.
+    debug_print("network_loop: Done\n");
+    printf     ("network_loop: Done\n");
 }
 
 
