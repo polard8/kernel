@@ -2289,8 +2289,16 @@ int gramado_input ( const char *string, va_list arglist )
 // Deveríamos considerar o posicionamento dentro do arquivo.
 // Dentro da stream.
 
-unsigned long input ( unsigned long ch ){
+// Isso eh chamado pelo shell pra construir uma linha de comandos
+// com as teclas digitadas.
+// Serve para construir uma string.
 
+// ??
+// E esse retorno ??
+
+unsigned long 
+input ( unsigned long ch )
+{
     // Save cursor position.
     unsigned long tmpX=0; 
     unsigned long tmpY=0;
@@ -2313,62 +2321,52 @@ unsigned long input ( unsigned long ch ){
         return (unsigned long) 0;   
     }
 
-	// Trata caractere digitado.
 
-    switch (c)
-    {
-       // Enter.
+    // Trata caractere digitado.
+
+    switch (c){
+
+       // [ Enter ]
        case VK_RETURN:
             prompt[prompt_pos] = (char ) '\0';
             goto input_done;
             break;
 
-	    // Obs: O tab avança o cursor, mas precisamos 
-		// pintar o espaço onde estava o cursor.
-		// Por isso talvez seja bom um while de espaços.
-		// Mas no buffer fica apenas o '\t'.
-		case VK_TAB:
-		    prompt[prompt_pos] = (char ) '\t';
-			//for( i=0; i<4; i++)
-			//{ printf("%c", (char) ' '); }
-		    goto input_done;
-			break;
+        // obs: 
+        // O tab avança o cursor, mas precisamos 
+        // pintar o espaço onde estava o cursor.
+        // Por isso talvez seja bom um while de espaços.
+        // Mas no buffer fica apenas o '\t'.
+        case VK_TAB:
+            prompt[prompt_pos] = (char ) '\t';
+            //for( i=0; i<4; i++)
+            //{ printf("%c", (char) ' '); }
+            goto input_done;
+            break;
 
-		case VK_BACKSPACE:
-            
-			// Se estamos no início da linha.
-			if (prompt_pos <= 0){
+        // ok, isso funcionou no gdeshell.
+        // Volta, mas nao apaga, quem apaga eh o 0x20.
+        case 0x8:
+        case 0x7f:      // del
+        case VK_BACKSPACE:  //0x0E
+            // Se ja estamos no início da linha.
+            if (prompt_pos <= 0)
+            {
                 prompt_pos = 0; 
-			    prompt[prompt_pos] = (char ) '\0';
-				break; 
-			}
+                prompt[prompt_pos] = (char ) '\0';
+                break; 
+            }
+            //Se nao estamos no inicio da linha.
+            prompt_pos--;              //volta um no buffer.
+            //Muda a posicao do cursor.
+            //Altera a tela no modo gráfico com janelas.
+            tmpX = stdioGetCursorX(); 
+            tmpY = stdioGetCursorY();
+            tmpX--;
+            stdioSetCursor(tmpX,tmpY);
+            break;
 
 
-			//altera o buffer.
-			//Apaga o anterior.
-			prompt_pos--;                        //volta um no buffer.
-			prompt[prompt_pos] = (char ) '\0';   //apaga no buffer.
-			
-			//altera a tela no modo gráfico com janelas.
-			tmpX = stdioGetCursorX(); 
-			tmpY = stdioGetCursorY();
-			
-			//Volta um na tela.
-			tmpX--;
-			stdioSetCursor(tmpX,tmpY);
-			
-			//apaga a tela.
-			printf ("%c", (char) ' '); 
-			
-			//altera a tela no modo gráfico com janelas.
-			tmpX = stdioGetCursorX(); 
-			tmpY = stdioGetCursorY();
-			
-			//Volta um na tela.
-			tmpX--;
-			stdioSetCursor(tmpX,tmpY);
-			break;
-			
 		//Continua ...
 		
 		// Vamos deixar o sistema mostrar o cursor.

@@ -1076,20 +1076,25 @@ shellProcedure (
                 // #todo
                 // falta configurar prompt[] usado por input();
                 // falta configurar LINES[]...
-                case VK_BACK:
-                    // Apaga o char no buffer.
+                case 0x8: // backspace
+                case 0x7f: // del
+                case VK_BACK:  //0x0E
+                    // Apaga o char na tela, na linha de comandos e no buffer.
                     if ( textCurrentCol > 0 )
                     { 
-                        // backspace afetando o buffer da fun��o input()
-                        input ('\b');
-                        
+                        // ok. funcionou. 
+                        // a linha de comandos. prompt[]
+                        putchar(0x8);  input(0x8);  // volta
+                        putchar(0x20); input(0x20); // apaga
+                        putchar(0x8);  input(0x8);  // volta
+                        fflush(stdout);             // mostra sem mudar de linha.
+                        //o buffer.
+                        //volta um char no buffer e apaga na nova posiçao.
                         textCurrentCol--; 
                         LINES[textCurrentRow].CHARS[textCurrentCol] = 0;       
-                        printf ("\b");
                     }
                     goto done;
                     break;
-
 
 
                 // Mensagens de digitação.
