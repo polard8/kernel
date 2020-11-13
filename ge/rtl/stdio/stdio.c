@@ -795,13 +795,15 @@ char *gets (char *s){
 }
 
 
-int puts (const char *s){
+int puts (const char *s)
+{
+    register int c;
 
-    register c;
-
-    while (c = *s++)
+    while (c = *s++){
         putchar(c);
-    return (putchar('\n'));
+    };
+    
+    return (int) putchar('\n');
 }
 
 
@@ -844,12 +846,14 @@ char *fgets (char *s, int size, FILE *stream){
 //s iop
 int fputs ( const char *s, FILE *stream ){
 
-    register r;
-    register c;
+    register int c=0;
+    register int r=0;
 
-    while (c = *s++)
+    while (c = *s++){
         r = putc(c,stream);
-    return(r);
+    };
+
+    return (r);
 }
 
 
@@ -2452,7 +2456,6 @@ int fprintf ( FILE *stream, const char *format, ... ){
 
 
 
-
 //#todo: testar.
 //Credits: Sombra OS.
 void nputs (char *cp, int len){
@@ -2709,22 +2712,20 @@ char *fgets2 (char *s, int count, FILE *fp){
 
 /*
  ********************************
- * fputs2:      
+ * fputs2: 
  */
 
 int fputs2 ( const char *str, FILE *stream )
 {
 
-    if ( (void *) stream == NULL )
-        return EOF;
+    if ( (void *) stream == NULL ){ return EOF; }
 
-
-    for (; *str; ++str) {
-
+    // ugly.
+    for (; *str; ++str) 
+    {
         int rc = putc (*str, stream);
 
-        if (rc == EOF)
-            return EOF;
+        if (rc == EOF){ return EOF; }
     }
 
     return 1;
@@ -3979,6 +3980,8 @@ vfprintf (
     stdio_va_list argptr )
 {
 
+    debug_print("vfprintf: [TODO]\n");
+
 	//#suspenso.
 	//return (int) kvprintf ( format, NULL, stream->_ptr, 10, argptr );
 	
@@ -4918,7 +4921,7 @@ int vscanf (const char *format, va_list ap)
 int vsscanf (const char *str, const char *format, va_list ap)
 { 
     debug_print ("vsscanf: [TODO]\n");
-	return -1; 
+    return -1; 
 }
 
 
@@ -4933,9 +4936,8 @@ int vfscanf (FILE *stream, const char *format, va_list ap)
 }
 
 
-
-FILE *tmpfile (void){
-
+FILE *tmpfile (void)
+{
     debug_print ("tmpfile: [TODO]\n");
 
     // steps:

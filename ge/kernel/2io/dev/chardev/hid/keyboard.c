@@ -162,7 +162,6 @@ void put_scancode( char c )
 void abnt2_keyboard_handler (void){
 
 
-
     wait_then_write (0x64,0xA7);  //Disable mouse port.
 
 
@@ -239,6 +238,8 @@ sc_again:
 
      // Build the message and send it to the thread's queue.
      // This routine will select the target thread.
+     // See: ps2kbd.c
+     
      KEYBOARD_SEND_MESSAGE (__raw);
 
     // Clean the mess.

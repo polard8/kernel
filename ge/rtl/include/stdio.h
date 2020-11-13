@@ -556,7 +556,6 @@ void perror (const char *str);
 int stdout_printf (const char *format, ...);
 int stderr_printf (const char *format, ...);
 
-
 //
 // printf saga.
 //

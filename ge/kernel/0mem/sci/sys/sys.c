@@ -1120,32 +1120,28 @@ int sys_write (unsigned int fd, char *ubuf, int count){
     file              *__file;
     file              *__file2;
     
-    struct socket_d   *s1;
-    struct socket_d   *s2;
+    struct socket_d  *s1;
+    struct socket_d  *s2;
     
-    int nbytes = 0;
+    int nbytes=0;
     int ubuf_len=0;
 
-    size_t ncopy = 0;
+    size_t ncopy=0;
 
+    // check arguments.
+    // fd, ubuf, count.
+    // todo: Check validation for the memory region. 
 
-    // fd
     if (fd<0 || fd>31){
-        debug_print ("sys_write: fd\n");
-        goto fail;
+        debug_print ("sys_write: fd\n");  goto fail;
     }
 
-    // ubuf
-    // todo: Check validation for the memory region.    
     if ( (char *) ubuf == (char *) 0 ){
-        debug_print ("sys_write: invalid ubuf address\n");
-        goto fail;
+        debug_print ("sys_write: invalid ubuf address\n");  goto fail;
     }
 
-    // count
     if (count<=0){
-        debug_print ("sys_write: count\n");
-        goto fail;
+        debug_print ("sys_write: count\n");  goto fail;
     }
 
 
@@ -1209,20 +1205,29 @@ int sys_write (unsigned int fd, char *ubuf, int count){
     // is_block_dev?    read_block(...)
     // is_
 
+    //
+    // == stdout ===================================
+    //
+    
+    // Primeiro vamos checar se eh o arquivo numero um do processo atual.
+    // Depois vamos checar se ele eh do tipo console virtual,
+    // como deve ser.
+    // Devemos escrever no console virtual atual,
+    // e nao em qualquer um.
 
     // ==== Console ===============================
     // >> Console.
     // Se o descritor usado por write() for de um arquivo
     // do tipo console, escreveremos no console 0.
     // IN: console number, buffer, size.
-       
-    if ( __file->____object == ObjectTypeVirtualConsole )
-    {
-       //return (int) console_write ( (int) 0, 
-       //                 (const void *) ubuf, (size_t) count );
 
-       return (int) console_write ( (int) current_vc, 
-                        (const void *) ubuf, (size_t) count );
+    if ( __file->_file == 1 )
+    {
+        if ( __file->____object != ObjectTypeVirtualConsole ){
+            panic("sys_write: Wrong object for stdout");
+        }
+        return (int) console_write ( (int) current_vc, 
+                         (const void *) ubuf, (size_t) count );
     }
 
 

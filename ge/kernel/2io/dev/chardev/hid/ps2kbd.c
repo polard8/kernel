@@ -313,12 +313,12 @@ __local_ps2kbd_procedure (
 // para assim usar o array certo. ke0 indica o teclado estendido.
 
 
-int KEYBOARD_SEND_MESSAGE ( unsigned char SC ){
+int KEYBOARD_SEND_MESSAGE (unsigned char SC){
 
     struct process_d  *__p;
     struct thread_d   *t;
-    struct window_d   *w;
 
+    struct window_d   *w;
 
     // Step 0 
     // Declarações de variáveis.
@@ -327,7 +327,7 @@ int KEYBOARD_SEND_MESSAGE ( unsigned char SC ){
     unsigned char scancode=0;
     unsigned char key=0;         //Tecla (uma parte do scancode).  
 
-    //int fakewin;           //arg1
+    //int fakewin;             //arg1
     int message=0;             //arg2.
     unsigned long ch=0;        //arg3 - (O caractere convertido para ascii).
     unsigned long status=0;    //arg4.  
@@ -409,8 +409,8 @@ int KEYBOARD_SEND_MESSAGE ( unsigned char SC ){
 
 			//control menu.
             case VK_CONTROL_MENU:
-			    //controlmenu_status = 0; //@todo
-			    message = MSG_SYSKEYUP;
+                //controlmenu_status = 0; //@todo
+                message = MSG_SYSKEYUP;
                 break;
 
             //right control liberada.
@@ -443,13 +443,11 @@ int KEYBOARD_SEND_MESSAGE ( unsigned char SC ){
 		// Analiza: Se for tecla normal, pega o mapa de caracteres apropriado.
 		// minúscula
 		// Nenhuma tecla de modificação ligada.
-        if (message == MSG_KEYUP)    
-        { ch = map_abnt2[key]; }
+        if (message == MSG_KEYUP){ ch = map_abnt2[key]; }
 
         // Analiza: Se for do sistema usa o mapa de caracteres apropriado. 
         // Normal.
-        if (message == MSG_SYSKEYUP) 
-        { ch = map_abnt2[key]; }
+        if (message == MSG_SYSKEYUP){ ch = map_abnt2[key]; }
 
         // Nothing.
         goto done;
@@ -474,23 +472,23 @@ int KEYBOARD_SEND_MESSAGE ( unsigned char SC ){
             //?? tab será tratado como tecla normal por enquanto.
 			
 			//caps lock keydown
-			case VK_CAPITAL:
-			    //muda o status do capslock não importa o anterior.
-				if (capslock_status == 0)
-				{ 
+            case VK_CAPITAL:
+                //muda o status do capslock não importa o anterior.
+                if (capslock_status == 0)
+                { 
                     capslock_status = 1; message = MSG_SYSKEYDOWN; 
                     break; 
-				}
-				if (capslock_status == 1)
-				{ 
+                }
+                if (capslock_status == 1)
+                { 
                     capslock_status = 0; message = MSG_SYSKEYDOWN; 
                     break; 
-				}
-				break; 
+                }
+                break; 
 
 			//Left shift pressionada.
-			case VK_LSHIFT:
-			//case KEY_SHIFT:
+            case VK_LSHIFT:
+            //case KEY_SHIFT:
                 shift_status = 1; message = MSG_SYSKEYDOWN;
                 break;
 
@@ -507,18 +505,16 @@ int KEYBOARD_SEND_MESSAGE ( unsigned char SC ){
 
             //left Alt pressionada.
             case VK_LMENU:
-				alt_status = 1;
-				message = MSG_SYSKEYDOWN;
-			    break;
+                alt_status = 1;  message = MSG_SYSKEYDOWN;
+                break;
 
 			//@todo alt gr.	
 
 			//Right Winkey pressionada.
-			case VK_RWIN:
-			    winkey_status = 1;
-				message = MSG_SYSKEYDOWN;
-				break;
-			
+            case VK_RWIN:
+                winkey_status = 1;  message = MSG_SYSKEYDOWN;
+                break;
+
             //@todo: Control menu.
             
 			//Right control pressionada.
@@ -541,13 +537,11 @@ int KEYBOARD_SEND_MESSAGE ( unsigned char SC ){
             // Num Lock.
             case VK_NUMLOCK:
                 // Muda o status do numlock não importa o anterior.
-                if (numlock_status == 0)
-                {
+                if (numlock_status == 0){
                     numlock_status = 1; message = MSG_SYSKEYDOWN;
                     break;
                 }
-                if (numlock_status == 1)
-                { 
+                if (numlock_status == 1){ 
                     numlock_status = 0; message = MSG_SYSKEYDOWN; 
                     break; 
                 }
@@ -556,16 +550,14 @@ int KEYBOARD_SEND_MESSAGE ( unsigned char SC ){
             // Scroll Lock.
             case VK_SCROLL:
                 // Muda o status do numlock não importa o anterior.
-                if (scrolllock_status == 0)
-                {  
+                if (scrolllock_status == 0){  
                     scrolllock_status = 1; message = MSG_SYSKEYDOWN;
                     break;
                 }
-                if (scrolllock_status == 1)
-                { 
+                if (scrolllock_status == 1){ 
                     scrolllock_status = 0; message = MSG_SYSKEYDOWN; 
                     break; 
-                };
+                }
                 break;
 
             //...
@@ -602,12 +594,9 @@ int KEYBOARD_SEND_MESSAGE ( unsigned char SC ){
 			
             //Nothing.
         }
-		
-		// Uma tecla do sistema foi pressionada.
-        if (message == MSG_SYSKEYDOWN)
-        { 
-            ch = map_abnt2[key]; 
-        }
+
+        // Uma tecla do sistema foi pressionada.
+        if (message == MSG_SYSKEYDOWN){ ch = map_abnt2[key]; }
 
         // Nothing.
         goto done;
@@ -616,9 +605,8 @@ int KEYBOARD_SEND_MESSAGE ( unsigned char SC ){
 
 
     //
-    // ## Done ##
+    // Done.
     //
-
 
 	// Para finalizar, 
 	// vamos enviar a mensagem para fila certa.
@@ -629,7 +617,7 @@ done:
     if ( (ctrl_status == 1) && (alt_status == 1) && (ch == KEY_DELETE) )
     {
         debug_print ("KEYBOARD_SEND_MESSAGE: ctrl + alt + del\n");
-        // reboot ();
+        //reboot ();
     }
 
     // #test
@@ -849,6 +837,15 @@ done:
                 (unsigned long) ch, 
                 (unsigned long) tmp_sc );
             debug_print ("KEYBOARD_SEND_MESSAGE: >>>> [default] to wwf\n");
+            
+            // #test
+            // Vamos escrever em stdin.
+            // Que tipo de objeto? file? tty?
+            // #bugbug: kernel panic!
+            
+            //sys_write ( 
+            //    (int) 0, (const void *) &ch, (size_t) 1 );
+            
             return 0;
             break;
     };

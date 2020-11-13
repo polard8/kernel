@@ -102,11 +102,8 @@ struct tty_d *tty_create (void){
         //return NULL;
  
     }else{
-
-        // Object control;
         __tty->objectType  = ObjectTypeTTY;
         __tty->objectClass = ObjectClassKernelObjects;
-
         __tty->used = 1;
         __tty->magic = 1234;
         
@@ -125,7 +122,6 @@ struct tty_d *tty_create (void){
         __tty->user_session = CurrentUserSession;
         __tty->room         = CurrentRoom;
         __tty->desktop      = CurrentDesktop;
-
 
 
         // #bubug: 
@@ -225,7 +221,6 @@ __ok_register:
     
     }else{
         __file->____object = ObjectTypeTTY;
-
         __file->used  = 1;
         __file->magic = 1234;
 

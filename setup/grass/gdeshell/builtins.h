@@ -21,6 +21,9 @@ int getppid_builtins(void);
 int getuid_builtins(void);
 int getgid_builtins(void);
 void help_builtins(void);
+
+void ints_builtins(void);
+
 void pwd_builtins(void);
 
 
