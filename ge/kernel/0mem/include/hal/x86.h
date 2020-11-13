@@ -5,6 +5,9 @@
  * 2005 - Created by Fred Nora.
  */
 
+// See:
+// https://www.felixcloutier.com/x86/
+// ...
 
 
 #ifndef ____X86_H

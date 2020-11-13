@@ -366,6 +366,21 @@ uint32_t rtl_read32(uint8_t *ptr, uint16_t offset) {
 */
 
 
+/*
+int rtl_is_separator (int c);
+int rtl_is_separator (int c) 
+{
+    if ((c == '/') || (c == '\\')){
+        return TRUE;
+    }else{
+        return FALSE;
+    };
+}
+*/
+
+
+
+
 
 
 

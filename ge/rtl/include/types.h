@@ -67,6 +67,13 @@ typedef __uint32_t  u_int32_t;
 //typedef	__uint64_t	u_int64_t;
 
 
+// i like this
+typedef unsigned char       u8;
+typedef unsigned short      u16;
+typedef unsigned int        u32;
+//typedef unsigned long long  u64;
+
+
 
 #define __packed        __attribute__((packed))
 #define __aligned(x)    __attribute__((aligned(x)))
