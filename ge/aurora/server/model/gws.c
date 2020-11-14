@@ -231,6 +231,8 @@ void gwssrv_wait_message(void)
 }
 
 
+// refresh the whole screen.
+// #todo: move to view/
 void gws_show_backbuffer(void)
 {
 
@@ -247,7 +249,8 @@ void gws_show_backbuffer(void)
         debug_print("gws_show_backbuffer: [PANIC] screen window fail\n");
         return;
     }
-    gws_show_window_rect(gui->screen);
+    //See: widnow.c
+    gws_show_window_rect (gui->screen);
 }
 
 
@@ -559,12 +562,14 @@ int is_background_dirty(void)
 
 
 // Refresh the device screen
+// #todo: move to view/
 void refresh_screen(void)
 {
     refresh_device_screen();
 }
 
 // Refresh the device screen
+// #todo: move to view/
 void refresh_device_screen(void)
 {
     gws_show_backbuffer();
@@ -572,6 +577,7 @@ void refresh_device_screen(void)
 
 
 // Refresh the valid screen
+// #todo: move to view/
 void refresh_valid_screen(void)
 {
     //todo

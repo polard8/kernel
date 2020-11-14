@@ -162,6 +162,9 @@ struct gws_color_scheme_d* GWSHumilityColorScheme; // Simples.
 struct gws_color_scheme_d* GWSPrideColorScheme;    // Colorido.
 
 
+//
+// == variables ==============================================
+//
 
 
 // #ordem
@@ -170,7 +173,6 @@ struct gws_color_scheme_d* GWSPrideColorScheme;    // Colorido.
 unsigned long  ____BACKBUFFER_VA;
 unsigned long  ____FRONTBUFFER_VA;
 
-
 // Saving
 unsigned long SavedBootBlock;
 unsigned long SavedLFB;   // #bugbug? VA ?
@@ -178,23 +180,21 @@ unsigned long SavedX;
 unsigned long SavedY;
 unsigned long SavedBPP; 
 
-
 // helper.
 unsigned long __device_width;
 unsigned long __device_height;
 unsigned long __device_bpp;
 
-
-
 // refresh rate of the whole screen.
 static unsigned long fps;
-
 
 // refresh rate for all dirty objects.
 static unsigned long frames_count;
 
-
-
+// Vamos usar ou nao.
+int use_vsync;
+#define VSYNC_YES  1
+#define VSYNC_NO   0
 
 
 
@@ -204,7 +204,6 @@ static unsigned long frames_count;
 #define SCREEN_BACKBUFFER      1
 //#define SCREEN_BACKBUFFER2   2
 //#define SCREEN_BACKBUFFER3   3
-
 static unsigned long screens[MAX_SCREENS];
 
 

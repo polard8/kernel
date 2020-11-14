@@ -17,6 +17,12 @@ struct gws_display_d
     int fd;    // Network socket. 
     int lock;  // is someone in critical section?  
  
+    //#todo:
+    //See: r_render.h
+    //int render_mode;
+    //rendermode_t render_mode;
+     
+ 
     //#test
     //char *buffer;		//Output buffer starting address. 
     //char *bufptr;		//Output buffer index pointer. 

@@ -28,6 +28,23 @@ extern unsigned long SavedBootBlock;
 
 
 /*
+//#test
+// The problem here is the variables are imported from 'ld'.
+// Thats not what we want.
+// We wanna build gramado with our own compiler.
+extern unsigned long bss_begin;
+extern unsigned long bss_end;
+static void clear_bss(void)
+{
+    memset ( 
+        bss_begin,              // start 
+        0,                      // data
+        bss_end - bss_begin );  // size
+}
+*/
+
+
+/*
  ********************************************
  * kernel_main:
  *
@@ -47,6 +64,9 @@ int kernel_main (int arch_type)
 
     int Status = (-1);
 
+
+    // #test
+    // clear_bss();
 
     //
     // == Globals ====================================================

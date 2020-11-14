@@ -217,19 +217,16 @@ gws_refresh_rectangle (
 
 
     register unsigned int i=0;
-    //unsigned int i;
-
-
 
     unsigned int line_size=0;  // rectangle line size in pixels.
     unsigned int lines=0;      // quantas linhas.
     unsigned int offset=0;
 
+
     // screen line size in pixels * bytes per pixel.
     unsigned int pitch=0;  
-
     // rectangle line size in pixels * bytes per pixel.
-    unsigned int internal_pitch=0;  
+    unsigned int rectangle_pitch=0;  
 
     int count=0; 
 
@@ -242,24 +239,18 @@ gws_refresh_rectangle (
     //unsigned long ScreenHeight = (unsigned long) gws_get_device_height();
 
     if ( ScreenWidth == 0 ){
-        printf ("gws_refresh_rectangle: ScreenWidth\n");
-        exit(1);
+        printf ("gws_refresh_rectangle: ScreenWidth\n");  exit(1);
     }
-
 
     line_size = (unsigned int) width; 
     lines     = (unsigned int) height;
 
-
     switch (SavedBPP){
-
         case 32:  bytes_count = 4;  break;
         case 24:  bytes_count = 3;  break;
         // ... #todo
-        
         default:
-            printf ("gws_refresh_rectangle: SavedBPP\n");
-            exit(1);
+            printf ("gws_refresh_rectangle: SavedBPP\n");  exit(1);
             break;
     };
 
@@ -268,7 +259,7 @@ gws_refresh_rectangle (
     pitch = (unsigned int) (bytes_count * ScreenWidth);
 
     // rectangle line size in pixels * bytes per pixel.
-    internal_pitch = (unsigned int) (bytes_count * line_size);
+    rectangle_pitch = (unsigned int) (bytes_count * line_size);
 
 
 	// #atenção.
@@ -294,25 +285,45 @@ gws_refresh_rectangle (
 
     // Se for divisível por 4.
     // Copia uma linha ou um pouco mais caso não seja divisível por 4.
-    if ( (internal_pitch % 4) == 0 )
+    if ( (rectangle_pitch % 4) == 0 )
     {
-        count = (internal_pitch / 4); 
+        count = (rectangle_pitch / 4); 
 
         for ( i=0; i < lines; i++ ){
             rect_memcpy32 ( (void *) dest, (const void *) src, count );
             dest += pitch;
             src  += pitch;
         };
+        
+        /* doom style.
+        i=0;
+        do{
+            rect_memcpy32 ( (void *) dest, (const void *) src, count );
+            dest += pitch;
+            src  += pitch;
+            i++;
+        }while(i<lines);
+        */
     }
 
     // Se não for divisível por 4.
-    if ( (internal_pitch % 4) != 0 )
+    if ( (rectangle_pitch % 4) != 0 )
     {
         for ( i=0; i < lines; i++ ){
-             memcpy ( (void *) dest, (const void *) src, internal_pitch );
+             memcpy ( (void *) dest, (const void *) src, rectangle_pitch );
              dest += pitch;
              src  += pitch;
         };
+        
+        /* doom style
+        i=0;
+        do{
+            memcpy ( (void *) dest, (const void *) src, rectangle_pitch );
+            dest += pitch;
+            src  += pitch;
+            i++;
+        }while(i<lines);
+        */
     }
 }
 

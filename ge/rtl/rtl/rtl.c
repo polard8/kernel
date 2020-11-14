@@ -379,6 +379,109 @@ int rtl_is_separator (int c)
 */
 
 
+/*
+//caracteres iguais em duas strings,
+//consecutivos, da esquerda para direita.
+int 
+rtl_StrCommonSubset(
+    unsigned char *a, 
+    unsigned char *b );
+int 
+rtl_StrCommonSubset(
+    unsigned char *a, 
+    unsigned char *b ) 
+{
+
+    int len=0;
+
+    while (*a && *b == *a) 
+    {
+        a++;  b++;  len++;
+    };
+    
+    return (int) len;
+}
+*/
+
+
+/*
+int rtl_IsPath(unsigned char *str);
+int rtl_IsPath(unsigned char *str)
+{
+  for (; *str; str++) {
+    if (*str == '/')
+      return TRUE;
+  }
+  return FALSE;
+}
+*/
+
+
+/*
+//credits: 8188eu driver
+static int hex2num_i(char c);
+static int hex2num_i(char c)
+{
+	if (c >= '0' && c <= '9')
+		return c - '0';
+	if (c >= 'a' && c <= 'f')
+		return c - 'a' + 10;
+	if (c >= 'A' && c <= 'F')
+		return c - 'A' + 10;
+	return -1;
+}
+*/
+
+/**
+ * hwaddr_aton - Convert ASCII string to MAC address
+ * @txt: MAC address as a string (e.g., "00:11:22:33:44:55")
+ * @addr: Buffer for the MAC address (ETH_ALEN = 6 bytes)
+ * Returns: 0 on success, -1 on failure (e.g., string not a MAC address)
+ */
+/*
+//credits: 8188eu driver
+static int hwaddr_aton_i(const char *txt, u8 *addr);
+static int hwaddr_aton_i(const char *txt, u8 *addr)
+{
+	int i;
+
+	for (i = 0; i < 6; i++) {
+		int a, b;
+
+		a = hex2num_i(*txt++);
+		if (a < 0)
+			return -1;
+		b = hex2num_i(*txt++);
+		if (b < 0)
+			return -1;
+		*addr++ = (a << 4) | b;
+		if (i < 5 && *txt++ != ':')
+			return -1;
+	}
+
+	return 0;
+}
+*/
+
+
+/*
+void *rtl_zalloc (size_t size);
+void *rtl_zalloc (size_t size)
+{
+    if( size<0 ){ return NULL; };
+    
+    void *n = (void *) malloc(size);
+
+    if (n){
+        memset (n, 0, size);
+    }
+
+    return n;
+}
+*/
+
+
+
 
 
 

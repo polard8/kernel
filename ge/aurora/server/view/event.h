@@ -1,5 +1,15 @@
 
 
+
+// #todo: 
+// no gramado as mensagens do systema
+// podem se tornar 'gramado_ev' um tipo de evento gramado.
+// e a 'mensagem' determina o tipo de evento.
+// alem disso podemos ter mais detalhes
+// como se o evento vem do sistema ou do window server ...
+//
+
+
 struct gws_keyboard_event_d
 {
     int dummy;

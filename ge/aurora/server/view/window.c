@@ -1305,7 +1305,7 @@ int gws_show_window_rect (struct gws_window_d *window)
             
             //p = window->parent;
             
-                
+            // See: rect.c   
             gws_refresh_rectangle ( 
                 window->left, window->top, 
                 window->width, window->height ); 
