@@ -1423,7 +1423,21 @@ void console_init_virtual_console (int n){
     TTY[ConsoleIndex].cursor_top  = 0;
     TTY[ConsoleIndex].cursor_right  = 0+(SavedX/8) -1;  // (screen width / char width)
     TTY[ConsoleIndex].cursor_bottom = 0+(SavedY/8) -1;  // (screen height/ char height)
-    TTY[ConsoleIndex].cursor_color = COLOR_GREEN; 
+    
+    //everyone.
+    TTY[ConsoleIndex].cursor_color = COLOR_WHITE; 
+
+    //#test
+    
+    if( ConsoleIndex == 1)
+            TTY[ConsoleIndex].cursor_color = COLOR_RED; 
+
+    if( ConsoleIndex == 2)
+            TTY[ConsoleIndex].cursor_color = COLOR_GREEN; 
+            
+    if( ConsoleIndex == 3)
+            TTY[ConsoleIndex].cursor_color = COLOR_BLUE; 
+                
 
 
     //#todo

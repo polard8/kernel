@@ -613,19 +613,34 @@ int KEYBOARD_SEND_MESSAGE (unsigned char SC){
     
 done:
 
+    /*
     // control + alt + del.
     if ( (ctrl_status == 1) && (alt_status == 1) && (ch == KEY_DELETE) )
     {
         debug_print ("KEYBOARD_SEND_MESSAGE: ctrl + alt + del\n");
         //reboot ();
     }
+    */
 
-    // #test
-    // control + f1.
-    // if ( (ctrl_status == 1) && (ch == VK_F1)
-    // {
-        //Call the kernel's console.
-    // }
+
+
+    if ( (ctrl_status == 1) && (ch == VK_F1) ){
+        debug_print ("KEYBOARD_SEND_MESSAGE: [Console 1] alt + f1\n");
+        //reboot ();
+        console_switch_to(1);
+    }
+
+    if ( (ctrl_status == 1) && (ch == VK_F2) ){
+        debug_print ("KEYBOARD_SEND_MESSAGE: [Console 2] alt + f2\n");
+        //reboot ();
+        console_switch_to(2);
+    }
+
+    if ( (ctrl_status == 1) && (ch == VK_F3) ){
+        debug_print ("KEYBOARD_SEND_MESSAGE: [Console 3] alt + f3\n");
+        //reboot ();
+        console_switch_to(3);
+    }
 
 
 	// Nesse momento temos duas opções:
