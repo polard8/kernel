@@ -372,6 +372,7 @@ void grDCColorChg (
 
 void curveDemo(void);
 
+void catDemo(void);
 
 //
 // == fred demo  ===========================================

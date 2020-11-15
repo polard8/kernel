@@ -1589,7 +1589,9 @@ int initGraphics (void){
 
     if (current_mode == GRAMADO_JAIL)
     {
-         window_server_startup_animation(1);  //ok
+         catDemo();
+         
+         //window_server_startup_animation(1);  //ok
          //window_server_startup_animation(2);
          //window_server_startup_animation(3);
          //window_server_startup_animation(4);
@@ -1598,7 +1600,7 @@ int initGraphics (void){
          //window_server_startup_animation(7);   //ok
          //window_server_startup_animation(8);  //ok
          
-         //gwssrv_show_backbuffer();
+         gwssrv_show_backbuffer();
          //while(1){}
         // ...
     }

@@ -2335,8 +2335,45 @@ plotQuadBezierSeg (
     /* plot remaining part to end */
     //plotLine(x0,y0, x2,y2);   
     plotLine3d(x0,y0,z0, x2,y2,z2, color); 
-}  
-  
+}
+
+
+
+void catDemo(void)
+{
+    int i=0;
+    int j=0;
+    int count = 20;
+
+    while(count>0){
+    
+    for (i=0; i<8; i++){
+
+       rectBackbufferDrawRectangle ( 
+           0, 0, 320, 200, COLOR_BLACK, 1 );
+    //head
+    plotCircleZ ( 0, 12, 25, COLOR_WHITE, 0); 
+
+    //eyes
+    plotCircleZ ( -10, 20, 1+i, COLOR_WHITE, 0); 
+    plotCircleZ (  10, 20, 1+i, COLOR_WHITE, 0); 
+
+    plotLine3d ( -40, 8,0, -4, 5,0, COLOR_WHITE); 
+    plotLine3d ( -40, 5,0, -4, 4,0, COLOR_WHITE); 
+    plotLine3d ( -40, 2,0, -4, 3,0, COLOR_WHITE); 
+
+    plotLine3d ( 4, 5,0, 40, 8,0, COLOR_WHITE); 
+    plotLine3d ( 4, 4,0, 40, 5,0, COLOR_WHITE); 
+    plotLine3d ( 4, 3,0, 40, 2,0, COLOR_WHITE); 
+
+    plotLine3d ( -10, -2,0, 10, -2,0, COLOR_WHITE); 
+
+    gws_refresh_rectangle(0,0,320,200);
+    for (j=0; j<200; j++){ gwssrv_yield();}
+    }
+    count--;
+    }
+}
 
 
 void curveDemo(void)
@@ -2373,7 +2410,6 @@ void curveDemo(void)
         plotCharBackbufferDrawcharTransparentZ ( 40+ (8*6), 20+i+i, COLOR_RED, 'O', 0 );
 
         gws_refresh_rectangle(0,0,320,200);
-        
         for (j=0; j<80; j++){ gwssrv_yield();}
     };
     
