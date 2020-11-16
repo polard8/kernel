@@ -241,14 +241,14 @@ __local_ps2kbd_procedure (
 
                 // 
                 case VK_F6:
-                    initialize_frame_table();
-                    printf (">> %x \n", get_new_frame() );
-                    refresh_screen();
-                    //pages_calc_mem();
+                    //initialize_frame_table();
+                    //printf (">> %x \n", get_new_frame() );
+                    pages_calc_mem();
                     //testNIC();
                     // #se o processo não existe vai dar problema.
                     //tty_send_message (103,buffer, 32, 444, 0, 0);
                     //tty_send_message (104,buffer, 32, 444, 0, 0);
+                    refresh_screen();
                     break;
 
                 // Test 1.

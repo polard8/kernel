@@ -35,9 +35,8 @@ void initializeFramesAlloc (void){
 
     int __slot = 0;
 
-	//
+
 	// Inicializando a lista de pages.
-	//
 
     for ( __slot=0; __slot < PAGE_COUNT_MAX; __slot++ )
     {
@@ -58,7 +57,6 @@ void initializeFramesAlloc (void){
         panic ("mmpool-initializeFramesAlloc:\n");
 
     }else{
-
         p->id = 0;
         p->used = 1;
         p->magic = 1234;
@@ -133,7 +131,6 @@ void *page (void){
             return (void *) New;
         };
     };
-    
     
     // Overflow.
     
@@ -273,10 +270,10 @@ void *mm_alloc_single_page (void)
 }
 
 // Allocate n contiguous pages.
-void *mm_alloc_contig_pages ( size_t size )
+void *mm_alloc_contig_pages (size_t size)
 {
     if (size<=0)
-       panic("mm_alloc_contig_pages: FIXME, invalid size");
+       panic("mm_alloc_contig_pages: [FIXME] invalid size");
        
     return (void *) allocPages(size);
 }
@@ -434,7 +431,6 @@ void *allocPages (int size){
 
 			//printf("#");
 			p->id = __slot;
-			
 			p->used = 1;
 			p->magic = 1234;
 			
@@ -485,7 +481,6 @@ void *allocPages (int size){
                 
                 return (void *) ( base + (Ret->id * 4096) );
             }
-            
             //fail
         };
     };

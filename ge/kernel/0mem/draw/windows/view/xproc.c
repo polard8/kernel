@@ -523,27 +523,18 @@ system_procedure (
             { 
 
                 // Usadas pelos aplicativos.
-                case VK_F1:
-                case VK_F2:
-                case VK_F3:
-                case VK_F4:
+                case VK_F1:  case VK_F2:  case VK_F3:  case VK_F4:
                     break;
 
                 // F1, F2, F3, F4
                 // Os testes que estavam aqui foram pra outro lugar.
                 // __local_ps2kbd_procedure()
                 // See: dd/ws/ps2kbd.c 
-                case VK_F5:
-                case VK_F6:
-                case VK_F7:
-                case VK_F8:
+                case VK_F5:  case VK_F6:  case VK_F7:  case VK_F8:
                     break;
 
                 // Usadas pelos aplicativos.
-                case VK_F9:
-                case VK_F10:
-                case VK_F11:
-                case VK_F12:
+                case VK_F9:  case VK_F10:  case VK_F11:  case VK_F12:
                     break;
 
 
@@ -625,18 +616,15 @@ system_procedure (
         case MSG_DEVELOPER:
             switch(long1)
             {
-				//fechar message box em kernel mode.
-				case 1:
-				    CloseWindow (window);
-				    break;
+				// Fechar message box em kernel mode.
+                case 1:  CloseWindow (window);  break;
                 
                 //...
                 
-				default:
-				    break;
-			};
-			break;
-
+                default:
+                    break;
+            };
+            break;
 
         //
         // Mouse.

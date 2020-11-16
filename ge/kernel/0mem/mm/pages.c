@@ -1994,7 +1994,24 @@ virtual_to_physical (
 
 // show info.
 // Mostra entradas no diretório.
-// move to mminfo.c?
+// move to mminfo.c? pois eh um teste que imprime.
+// credits: old linux
+// This is a small routine that shows the info inside 
+// the kernel's page directory.
+// First of all it gets a used entry in the directory. 
+// This Entry will point to another table called Page Table. 
+// After that the routine checks how many used entries 
+// we have in this page table. Each entry in the page table 
+// is able to handle a single Page. 
+// This page can be in the ram, in the rom, 
+// in the video card memory or even in the disk.
+
+// #todo
+// We can create the same routine to check any page directory, 
+// given its address.
+//void pages_calc_mem_for_this_directory (unsigned long address)
+//{}
+
 void pages_calc_mem (void){
  
     int i=0;
@@ -2002,7 +2019,8 @@ void pages_calc_mem (void){
     int k=0;
     int free=0;
 
-    long *pg_dir = (long *) gKernelPageDirectoryAddress;   
+    // The kernel page directory.
+    long *pg_dir = (long *) gKernelPageDirectoryAddress;
     long *pg_tbl;
 
 
@@ -2012,16 +2030,21 @@ void pages_calc_mem (void){
     //    if (!mem_map[i]) free++;
     //printf("%d pages free (of %d)\n\r",free,PAGING_PAGES);
 
+
+    // todas as entradas do diretorio.
     for (i=0; i<1024; i++)
     {
-        if (1 & pg_dir[i])
+        // O primeiro bit da entrada.
+        // O que ele significa mesmo? kkk
+        if ( pg_dir[i] & 1 )    //if (1 & pg_dir[i])
         {
             pg_tbl = (long *) (0xfffff000 & pg_dir[i]);
 
             // ugly
             for ( j=k=0; j<1024; j++ )
-                if (pg_tbl[j]&1)
-                    k++;
+            {
+                if (pg_tbl[j] & 1){ k++; }
+            };
             printf ("Pg-dir[%d] uses %d pages\n",i,k);
         }
     };

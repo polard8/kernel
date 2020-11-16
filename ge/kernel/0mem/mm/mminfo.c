@@ -62,7 +62,7 @@ void mmShowPDEForAllProcesses (int entry_number){
 		    if ( p->DirectoryVA != 0 ){
 		        printf ("Process %d: ", i);
 			    mmShowPDE ( entry_number, (unsigned long) p->DirectoryVA );
-		    }		
+		    }
 		}
 	};
 
@@ -397,19 +397,18 @@ void testingPageAlloc (void){
 
     panic ("mminfo-testingPageAlloc: *hang\n");
 
-
 done:
   // Nothing for now.
-
 fail:
     refresh_screen ();
     return;
 }
 
 
-//mostra as estruturas de pagina usadas para paginação no pagedpool.
-void showFreepagedMemory ( int max ){
+// Mostra as estruturas de pagina 
+// usadas para paginação no pagedpool.
 
+void showFreepagedMemory ( int max ){
 
     struct page_d *p;
     int i=0;
@@ -428,13 +427,9 @@ void showFreepagedMemory ( int max ){
 		//    printf("null\n");	 
 		//}
 
-        if ( (void *) p != NULL )
-        {
-		    printf ("id=%d free=%d frameno=%d ref=%d \n", 
-				p->id, 
-				p->free, 
-				p->frame_number,
-				p->ref_count );
+        if ( (void *) p != NULL ){
+            printf ("id=%d free=%d frameno=%d ref=%d \n", 
+                p->id, p->free, p->frame_number, p->ref_count );
         }
     };
 
