@@ -2,12 +2,10 @@
  * File: grprim.c 
  * 
  *     Primitives.
- * 
- * 
+ *
  * History:
  *     2020 - Created by Fred Nora.
  */
-
 
 
 #include <gws.h>
@@ -250,8 +248,9 @@ int projection_initialize(void)
     return 0;
 }
 
-// chaging the view for the current projection
-int view(int near, int far)
+
+// Chaging the view for the current projection
+int view (int near, int far)
 {
     if ( (void*) CurrentProjection == NULL )
     {
@@ -259,9 +258,9 @@ int view(int near, int far)
         return -1;
         //exit(1);
     }
-    CurrentProjection->zNear   = near;
-    CurrentProjection->zFar    = far;
-    CurrentProjection->zRange  = (CurrentProjection->zFar - CurrentProjection->zNear);
+    CurrentProjection->zNear  = near;
+    CurrentProjection->zFar   = far;
+    CurrentProjection->zRange = (CurrentProjection->zFar - CurrentProjection->zNear);
     return 0;
 }
 
@@ -463,15 +462,11 @@ int serviceGrPlot0 (void){
     // =================================
 
 
-    
     // #todo:
     // pegar os argumentos no buffer e chamar a rotina de plotagem de pixel.
     // Acho que esse serviço nao retorna uma mensagem ao cliente.
     
-    grPlot0 ( 
-        (int) z, (int) x, (int) y, 
-        (unsigned long) color );
-
+    grPlot0 ( (int) z, (int) x, (int) y, (unsigned long) color );
 
     return 0;
 }
@@ -540,11 +535,11 @@ plotLine3d (
 
       grPlot0 ( z0, x0, y0, color);
       
-      if (i-- == 0) break;
-      x1 -= dx; if (x1 < 0) { x1 += dm; x0 += sx; } 
-      y1 -= dy; if (y1 < 0) { y1 += dm; y0 += sy; } 
-      z1 -= dz; if (z1 < 0) { z1 += dm; z0 += sz; } 
-   }
+        if (i-- == 0) { break; }
+        x1 -= dx; if (x1 < 0) { x1 += dm; x0 += sx; } 
+        y1 -= dy; if (y1 < 0) { y1 += dm; y0 += sy; } 
+        z1 -= dz; if (z1 < 0) { z1 += dm; z0 += sz; } 
+    };
 }
 
 
@@ -606,19 +601,15 @@ rectangle (
     unsigned long color )
 {
 
-     // cima
-     plotLine3d ( left, top, 0, right, top, 0, color );
-
-     // baixo
-     plotLine3d ( left, bottom, 0, right,bottom, 0, color );
-
-     // esquerda
-     plotLine3d ( left, top, 0, left, bottom, 0, color );
-
-     // direita
-     plotLine3d ( right, top, 0, right, bottom, 0, color );
+    // cima
+    plotLine3d ( left, top, 0, right, top, 0, color );
+    // baixo
+    plotLine3d ( left, bottom, 0, right,bottom, 0, color );
+    // esquerda
+    plotLine3d ( left, top, 0, left, bottom, 0, color );
+    // direita
+    plotLine3d ( right, top, 0, right, bottom, 0, color );
 }
- 
 
 
 // The upper-left corner and lower-right corner. 
@@ -629,20 +620,15 @@ rectangleZ (
     unsigned long color,
     int z )
 {
-     // cima
-     plotLine3d ( left, top,  z, right, top, z, color );
-
-     // baixo
-     plotLine3d ( left, bottom, z, right,bottom, z, color );
-
-     // esquerda
-     plotLine3d ( left, top, z, left, bottom, z, color );
-
-     // direita
-     plotLine3d ( right,  top, z, right, bottom, z, color );
+    // cima
+    plotLine3d ( left, top,  z, right, top, z, color );
+    // baixo
+    plotLine3d ( left, bottom, z, right,bottom, z, color );
+    // esquerda
+    plotLine3d ( left, top, z, left, bottom, z, color );
+    // direita
+    plotLine3d ( right,  top, z, right, bottom, z, color );
 }
-
-
 
 
 void rectangleZZ ( struct gr_rectangle_d *rect )
@@ -688,11 +674,11 @@ ras_rectangleZ (
     unsigned long color )
 {
 
-     int h=0;
+    int h=0;
 
-     // COmewça com a linha de cima.
-     for ( h=top; h >= bottom; h-- ){
-         plotLine3d ( left,  h, z0, right, h, z1, color );
+    // COmewça com a linha de cima.
+    for ( h=top; h >= bottom; h-- ){
+        plotLine3d ( left,  h, z0, right, h, z1, color );
     }
 }
 
@@ -706,39 +692,39 @@ int xxxInflateCubeZ ( struct gr_cube_d *cube, int value )
     //int value = z;
     //int value = z*2;
 
-        // south points =====================================
-        cube->p[0].x = (cube->p[0].x - value);
-        cube->p[0].y = (cube->p[0].y + value);
-        cube->p[0].z = (cube->p[0].z - value);
+    // south points =====================================
+    cube->p[0].x = (cube->p[0].x - value);
+    cube->p[0].y = (cube->p[0].y + value);
+    cube->p[0].z = (cube->p[0].z - value);
         
-        cube->p[1].x = (cube->p[1].x + value);
-        cube->p[1].y = (cube->p[1].y + value);
-        cube->p[1].z = (cube->p[1].z - value);
+    cube->p[1].x = (cube->p[1].x + value);
+    cube->p[1].y = (cube->p[1].y + value);
+    cube->p[1].z = (cube->p[1].z - value);
         
-        cube->p[2].x = (cube->p[2].x + value);
-        cube->p[2].y = (cube->p[2].y - value);
-        cube->p[2].z = (cube->p[2].z - value);
+    cube->p[2].x = (cube->p[2].x + value);
+    cube->p[2].y = (cube->p[2].y - value);
+    cube->p[2].z = (cube->p[2].z - value);
         
-        cube->p[3].x = (cube->p[3].x - value);
-        cube->p[3].y = (cube->p[3].y - value);
-        cube->p[3].z = (cube->p[3].z - value);
+    cube->p[3].x = (cube->p[3].x - value);
+    cube->p[3].y = (cube->p[3].y - value);
+    cube->p[3].z = (cube->p[3].z - value);
 
-        //north points ==========================================
-        cube->p[4].x = (cube->p[4].x - value);
-        cube->p[4].y = (cube->p[4].y + value);
-        cube->p[4].z = (cube->p[4].z + value);
+    //north points ==========================================
+    cube->p[4].x = (cube->p[4].x - value);
+    cube->p[4].y = (cube->p[4].y + value);
+    cube->p[4].z = (cube->p[4].z + value);
         
-        cube->p[5].x = (cube->p[5].x + value);
-        cube->p[5].y = (cube->p[5].y + value);
-        cube->p[5].z = (cube->p[5].z + value);
+    cube->p[5].x = (cube->p[5].x + value);
+    cube->p[5].y = (cube->p[5].y + value);
+    cube->p[5].z = (cube->p[5].z + value);
         
-        cube->p[6].x = (cube->p[6].x + value);
-        cube->p[6].y = (cube->p[6].y - value);
-        cube->p[6].z = (cube->p[6].z + value);
+    cube->p[6].x = (cube->p[6].x + value);
+    cube->p[6].y = (cube->p[6].y - value);
+    cube->p[6].z = (cube->p[6].z + value);
         
-        cube->p[7].x = (cube->p[7].x - value);
-        cube->p[7].y = (cube->p[7].y - value);
-        cube->p[7].z = (cube->p[7].z + value);
+    cube->p[7].x = (cube->p[7].x - value);
+    cube->p[7].y = (cube->p[7].y - value);
+    cube->p[7].z = (cube->p[7].z + value);
         
     return 0;
 }
@@ -749,43 +735,41 @@ int xxxDeflateCubeZ ( struct gr_cube_d *cube, int value )
     if ( (void*) cube == NULL )
         return -1;
 
-    
 
+    // south points ==========================
+    cube->p[0].x = (cube->p[0].x + value);
+    cube->p[0].y = (cube->p[0].y - value);
+    cube->p[0].z = (cube->p[0].z + value);
+        
+    cube->p[1].x = (cube->p[1].x - value);
+    cube->p[1].y = (cube->p[1].y - value);
+    cube->p[1].z = (cube->p[1].z + value);
+        
+    cube->p[2].x = (cube->p[2].x - value);
+    cube->p[2].y = (cube->p[2].y + value);
+    cube->p[2].z = (cube->p[2].z + value);
+        
+    cube->p[3].x = (cube->p[3].x + value);
+    cube->p[3].y = (cube->p[3].y + value);
+    cube->p[3].z = (cube->p[3].z + value);
 
-        // south points ==========================
-        cube->p[0].x = (cube->p[0].x + value);
-        cube->p[0].y = (cube->p[0].y - value);
-        cube->p[0].z = (cube->p[0].z + value);
+    // north points =========================
+    cube->p[4].x = (cube->p[4].x + value);
+    cube->p[4].y = (cube->p[4].y - value);
+    cube->p[4].z = (cube->p[4].z - value);
         
-        cube->p[1].x = (cube->p[1].x - value);
-        cube->p[1].y = (cube->p[1].y - value);
-        cube->p[1].z = (cube->p[1].z + value);
+    cube->p[5].x = (cube->p[5].x - value);
+    cube->p[5].y = (cube->p[5].y - value);
+    cube->p[5].z = (cube->p[5].z - value);
         
-        cube->p[2].x = (cube->p[2].x - value);
-        cube->p[2].y = (cube->p[2].y + value);
-        cube->p[2].z = (cube->p[2].z + value);
+    cube->p[6].x = (cube->p[6].x - value);
+    cube->p[6].y = (cube->p[6].y + value);
+    cube->p[6].z = (cube->p[6].z - value);
         
-        cube->p[3].x = (cube->p[3].x + value);
-        cube->p[3].y = (cube->p[3].y + value);
-        cube->p[3].z = (cube->p[3].z + value);
-
-        // north points =========================
-        cube->p[4].x = (cube->p[4].x + value);
-        cube->p[4].y = (cube->p[4].y - value);
-        cube->p[4].z = (cube->p[4].z - value);
-        
-        cube->p[5].x = (cube->p[5].x - value);
-        cube->p[5].y = (cube->p[5].y - value);
-        cube->p[5].z = (cube->p[5].z - value);
-        
-        cube->p[6].x = (cube->p[6].x - value);
-        cube->p[6].y = (cube->p[6].y + value);
-        cube->p[6].z = (cube->p[6].z - value);
-        
-        cube->p[7].x = (cube->p[7].x + value);
-        cube->p[7].y = (cube->p[7].y + value);
-        cube->p[7].z = (cube->p[7].z - value);
-        
+    cube->p[7].x = (cube->p[7].x + value);
+    cube->p[7].y = (cube->p[7].y + value);
+    cube->p[7].z = (cube->p[7].z - value);
+       
     return 0;
 }
 
@@ -944,8 +928,8 @@ int serviceGrCubeZ(void)
     //#test
     //Temos que passar corretamente o endereço da estrutura.
     xxxCubeZ ( (struct gr_cube_d *) &cube );
-   
-   return 0;
+    
+    return 0;
 }
 
 
@@ -997,240 +981,6 @@ int serviceGrRectangle(void)
 
 
 
-// inflate varias vezes.
-//only on jail
-void cube_demo1(void)
-{
-    int i=0;
-    int j=0;
-   
-    struct gr_cube_d *cube;
-    cube = (void *) malloc( sizeof( struct gr_cube_d ) );
-    if ( (void*) cube != NULL )
-    {
-		//marcador.
-		noraDrawingStuff3 (0,0,0);
-		
-		//while(1){
-
-        //south     
-        cube->p[0].x = 0;
-        cube->p[0].y = 40;
-        cube->p[0].z = 0;
-        cube->p[0].color = COLOR_WHITE;
-        
-        cube->p[1].x = 40;
-        cube->p[1].y = 40;
-        cube->p[1].z = 0;
-        cube->p[1].color = COLOR_WHITE;
-        
-        cube->p[2].x = 40;
-        cube->p[2].y = 0;
-        cube->p[2].z = 0;
-        cube->p[2].color = COLOR_WHITE;
-        
-        cube->p[3].x = 0;
-        cube->p[3].y = 0;
-        cube->p[3].z = 0;
-        cube->p[3].color = COLOR_WHITE;
-
-        //north
-        cube->p[4].x = 0;
-        cube->p[4].y = 40;
-        cube->p[4].z = 40;
-        cube->p[4].color = COLOR_BLACK;
-        
-        cube->p[5].x = 40;
-        cube->p[5].y = 40;
-        cube->p[5].z = 40;
-        cube->p[5].color = COLOR_BLACK;
-        
-        cube->p[6].x = 40;
-        cube->p[6].y = 0;
-        cube->p[6].z = 40;
-        cube->p[6].color = COLOR_BLACK;
-        
-        cube->p[7].x = 0;
-        cube->p[7].y = 0;
-        cube->p[7].z = 40;
-        cube->p[7].color = COLOR_BLACK;
-                
-
-
-        //rectBackbufferDrawRectangle ( 
-        //   0, 0, 320, 200, COLOR_BLACK, 1 );
-        xxxCubeZ(cube);
-        //gws_refresh_rectangle(0,0,320,200);
-        //for(i=0;i<16;i++){ gwssrv_yield(); }
-
-        //for(j=0; j<30; j++){        
-        //rectBackbufferDrawRectangle ( 
-        //   0, 0, 320, 200, COLOR_BLACK, 1 );        
-        //xxxInflateCubeZ (cube, 1);
-        //xxxCubeZ(cube);
-        //gws_refresh_rectangle(0,0,320,200);
-        //for(i=0;i<16;i++){ gwssrv_yield(); }
-        //}
-        
-        //}
-       
-        
-        //xxxInflateCubeZ (cube, 10);
-        //xxxCubeZ(cube);
-
-        //xxxInflateCubeZ (cube, 20);
-        //xxxCubeZ(cube);
-
-        //xxxDeflateCubeZ (cube, 5);
-        //xxxCubeZ(cube);
-        
-        //xxxDeflateCubeZ (cube, 10);
-        //xxxCubeZ(cube);
-
-        //plotCharBackbufferDrawcharTransparentZ ( cube->p[0].x,  cube->p[0].y, COLOR_BLACK, 'G', cube->p[0].z );
-        //plotCharBackbufferDrawcharTransparentZ ( cube->p[1].x,  cube->p[1].y, COLOR_BLACK, 'R', cube->p[1].z );
-        //plotCharBackbufferDrawcharTransparentZ ( cube->p[2].x,  cube->p[2].y, COLOR_BLACK, 'A', cube->p[2].z );
-        //plotCharBackbufferDrawcharTransparentZ ( cube->p[3].x,  cube->p[3].y, COLOR_BLACK, 'M', cube->p[3].z );
-        //plotCharBackbufferDrawcharTransparentZ ( cube->p[4].x,  cube->p[4].y, COLOR_BLACK, 'A', cube->p[4].z );
-        //plotCharBackbufferDrawcharTransparentZ ( cube->p[5].x,  cube->p[5].y, COLOR_BLACK, 'D', cube->p[5].z );
-        //plotCharBackbufferDrawcharTransparentZ ( cube->p[6].x,  cube->p[6].y, COLOR_BLACK, '0', cube->p[6].z );
-        //plotCharBackbufferDrawcharTransparentZ ( cube->p[7].x,  cube->p[7].y, COLOR_BLACK, '*', cube->p[7].z );
-    }
-
-
-}
-
-
-// inflate varias vezes.
-// only on jail
-void cube_demo2 (void)
-{
-    int i=0;
-    int j=0;
-    static int action = 1000; // inflate.
-    
-    
-    int count=4;
-   
-    struct gr_cube_d *cube;
-    cube = (void *) malloc( sizeof( struct gr_cube_d ) );
-    if ( (void*) cube != NULL )
-    {
-        //marcador.
-        noraDrawingStuff3 (0,0,0);
-
-        while (count>0) {
-
-        count--;
-
-        //south     
-        cube->p[0].x = 0;
-        cube->p[0].y = 40;
-        cube->p[0].z = 0;
-        cube->p[0].color = COLOR_WHITE;
-        
-        cube->p[1].x = 40;
-        cube->p[1].y = 40;
-        cube->p[1].z = 0;
-        cube->p[1].color = COLOR_WHITE;
-        
-        cube->p[2].x = 40;
-        cube->p[2].y = 0;
-        cube->p[2].z = 0;
-        cube->p[2].color = COLOR_WHITE;
-        
-        cube->p[3].x = 0;
-        cube->p[3].y = 0;
-        cube->p[3].z = 0;
-        cube->p[3].color = COLOR_WHITE;
-
-        //north
-        cube->p[4].x = 0;
-        cube->p[4].y = 40;
-        cube->p[4].z = 40;
-        cube->p[4].color = COLOR_YELLOW;
-        
-        cube->p[5].x = 40;
-        cube->p[5].y = 40;
-        cube->p[5].z = 40;
-        cube->p[5].color = COLOR_YELLOW;
-        
-        cube->p[6].x = 40;
-        cube->p[6].y = 0;
-        cube->p[6].z = 40;
-        cube->p[6].color = COLOR_YELLOW;
-        
-        cube->p[7].x = 0;
-        cube->p[7].y = 0;
-        cube->p[7].z = 40;
-        cube->p[7].color = COLOR_YELLOW;
-                
-
-        rectBackbufferDrawRectangle ( 0, 0, 320, 200, COLOR_BLACK, 1 );
-        xxxCubeZ(cube);
-        //string!
-        plotCharBackbufferDrawcharTransparentZ ( cube->p[0].x + (8*0), cube->p[0].y, COLOR_RED, 'G', cube->p[0].z );
-        plotCharBackbufferDrawcharTransparentZ ( cube->p[0].x + (8*1), cube->p[0].y, COLOR_RED, 'R', cube->p[0].z );   
-        plotCharBackbufferDrawcharTransparentZ ( cube->p[0].x + (8*2), cube->p[0].y, COLOR_RED, 'A', cube->p[0].z );
-        plotCharBackbufferDrawcharTransparentZ ( cube->p[0].x + (8*3), cube->p[0].y, COLOR_RED, 'M', cube->p[0].z );
-        plotCharBackbufferDrawcharTransparentZ ( cube->p[0].x + (8*4), cube->p[0].y, COLOR_RED, 'A', cube->p[0].z );
-        plotCharBackbufferDrawcharTransparentZ ( cube->p[0].x + (8*5), cube->p[0].y, COLOR_RED, 'D', cube->p[0].z );
-        plotCharBackbufferDrawcharTransparentZ ( cube->p[0].x + (8*6), cube->p[0].y, COLOR_RED, 'O', cube->p[0].z );
-        gws_refresh_rectangle(0,0,320,200);
-        for(i=0;i<16;i++){ gwssrv_yield(); }
-
-        //porque o z eh reduzido duas vezes.
-        //entao esse eh o limite da reduçao.
-        for (j=0; j<(40/2); j++){        
-            rectBackbufferDrawRectangle ( 0, 0, 320, 200, COLOR_BLACK, 1 );        
-            if (action==1000){
-                xxxInflateCubeZ (cube, 1);
-            }else{
-                xxxDeflateCubeZ (cube, 1);
-            };
-            xxxCubeZ(cube);
-            
-            plotCharBackbufferDrawcharTransparentZ ( cube->p[0].x + (8*0), cube->p[0].y, COLOR_RED, 'G', cube->p[0].z );
-            plotCharBackbufferDrawcharTransparentZ ( cube->p[0].x + (8*1), cube->p[0].y, COLOR_RED, 'R', cube->p[0].z );   
-            plotCharBackbufferDrawcharTransparentZ ( cube->p[0].x + (8*2), cube->p[0].y, COLOR_RED, 'A', cube->p[0].z );
-            plotCharBackbufferDrawcharTransparentZ ( cube->p[0].x + (8*3), cube->p[0].y, COLOR_RED, 'M', cube->p[0].z );
-            plotCharBackbufferDrawcharTransparentZ ( cube->p[0].x + (8*4), cube->p[0].y, COLOR_RED, 'A', cube->p[0].z );
-            plotCharBackbufferDrawcharTransparentZ ( cube->p[0].x + (8*5), cube->p[0].y, COLOR_RED, 'D', cube->p[0].z );
-            plotCharBackbufferDrawcharTransparentZ ( cube->p[0].x + (8*6), cube->p[0].y, COLOR_RED, 'O', cube->p[0].z );
-            gws_refresh_rectangle(0,0,320,200);
-            for(i=0;i<32;i++){ gwssrv_yield(); }
-        }
-        switch (action){
-            case 1000: action = 2000; break;
-            case 2000: action = 1000; break;
-            default:   action = 1000; break;
-        };
-        }; //while--
-       
-        
-        //xxxInflateCubeZ (cube, 10);
-        //xxxCubeZ(cube);
-
-        //xxxInflateCubeZ (cube, 20);
-        //xxxCubeZ(cube);
-
-        //xxxDeflateCubeZ (cube, 5);
-        //xxxCubeZ(cube);
-        
-        //xxxDeflateCubeZ (cube, 10);
-        //xxxCubeZ(cube);
-
-        //plotCharBackbufferDrawcharTransparentZ ( cube->p[0].x,  cube->p[0].y, COLOR_BLACK, 'G', cube->p[0].z );
-        //plotCharBackbufferDrawcharTransparentZ ( cube->p[1].x,  cube->p[1].y, COLOR_BLACK, 'R', cube->p[1].z );
-        //plotCharBackbufferDrawcharTransparentZ ( cube->p[2].x,  cube->p[2].y, COLOR_BLACK, 'A', cube->p[2].z );
-        //plotCharBackbufferDrawcharTransparentZ ( cube->p[3].x,  cube->p[3].y, COLOR_BLACK, 'M', cube->p[3].z );
-        //plotCharBackbufferDrawcharTransparentZ ( cube->p[4].x,  cube->p[4].y, COLOR_BLACK, 'A', cube->p[4].z );
-        //plotCharBackbufferDrawcharTransparentZ ( cube->p[5].x,  cube->p[5].y, COLOR_BLACK, 'D', cube->p[5].z );
-        //plotCharBackbufferDrawcharTransparentZ ( cube->p[6].x,  cube->p[6].y, COLOR_BLACK, '0', cube->p[6].z );
-        //plotCharBackbufferDrawcharTransparentZ ( cube->p[7].x,  cube->p[7].y, COLOR_BLACK, '*', cube->p[7].z );
-    }
-}
-
 
 //Circle
 //This is an implementation of the circle algorithm.
@@ -1250,7 +1000,7 @@ plotCircle (
    int y = 0;
    int err = (2-(2*r));
 
-   do {
+    do {
       
       //setPixel(xm-x, ym+y); /*   I. Quadrant */
       //setPixel(xm-y, ym-x); /*  II. Quadrant */
@@ -1276,9 +1026,9 @@ plotCircle (
           err += ++x * 2+1; 
       }
       
-   } while (x < 0);
+    } while (x < 0);
 }
-  
+   
 
 void 
 plotCircleZ ( 
@@ -1409,7 +1159,6 @@ plotEllipseRect (
 
     /* too early stop of flat ellipses a=1 */
     while (y0-y1 < b) {
-
         grPlot0 ( 0, x0-1,    y0, color);  //-> finish tip of ellipse
         grPlot0 ( 0, x1+1,  y0++, color);
         grPlot0 ( 0, x0-1,    y1, color);
@@ -1452,8 +1201,8 @@ plotEllipseRectZ (
 
 
     /* too early stop of flat ellipses a=1 */
+    
     while (y0-y1 < b) {
-   
         grPlot0 ( z, x0-1,    y0, color);  // -> finish tip of ellipse
         grPlot0 ( z, x1+1,  y0++, color);
         grPlot0 ( z, x0-1,    y1, color);
@@ -1473,7 +1222,6 @@ void noraDrawingStuff(void)
 {
     int x=0;
     int y=0;
-
 
     // colunas.
     for (x=0; x< SavedX; x++)    
@@ -1504,10 +1252,8 @@ void noraDrawingStuff3 (int x, int y, int z)
     int _y=0;
     int _z = z;
 
-
     int limitX = SavedX/2;
-    int limitY = SavedY/2;    
-
+    int limitY = SavedY/2;
 
     // colunas.
     for (_x=x; _x<limitX; _x++)    
@@ -1609,7 +1355,6 @@ multiplyMatrices (
    }
    */
 
-
     for (i = 0; i < r1; i++) {
         for (j = 0; j < c2; j++) {
             result[i][j] = 0;
@@ -1618,236 +1363,6 @@ multiplyMatrices (
         }
     }
     
-}
-
-
-
-void matrix_demo1(void)
-{
-
-     //#define N 4
-   
-    /*
-    int mat1[4][4] = { { 1, 1, 1, 1 },
-                        { 2, 2, 2, 2 },
-                        { 3, 3, 3, 3 },
-                        { 4, 4, 4, 4 } };
- 
-    int mat2[4][4] = { { 1, 1, 1, 1 },
-                       { 2, 2, 2, 2 },
-                       { 3, 3, 3, 3 },
-                       { 4, 4, 4, 4 } };
-    
-    int res[4][4]; // To store result
-    */
-
-
-    int mat1[4][4] = {  { 1, 1, 1, 1 },
-                        { 2, 2, 2, 2 },
-                        { 3, 3, 3, 3 },
-                        { 4, 4, 4, 4 } };
- 
-    int mat2[4][4] = { { -5, -5, 0, 0 },
-                       { 5,  -5, 0, 0 },
-                       { 5,   5, 0, 0 },
-                       { -5,  5, 0, 0 } };
-    
-    int res[4][4]; // To store result
-
-    //int m1[10][10];
-    //int m2[10][10];
-    //int m2[3][1];
-    //int  r[10][10];
-
-
-    //grPlot0 ( 0, -50, -50, COLOR_WHITE ); 
-    //grPlot0 ( 0, 50, -50, COLOR_WHITE ); 
-    //grPlot0 ( 0, 50, 50, COLOR_WHITE ); 
-    //grPlot0 ( 0, -50, 50, COLOR_WHITE ); 
-   
-    // rows and columns for the first matrix
-    // rows and columns for the second matrix
-    //multiplyMatrices(m1, m2, r, r1, c1, r2, c2);
-    //multiplyMatrices(m1, m2, r, 
-    //    2, 3, 3, 1 );
-
-    // multiplicando um dos pontos pela projeçao.
-    //m2[0][0] = 50;   // x
-    //m2[1][0] = 50;   // y
-    //m2[3][0] = 0;    // z
-    
-    //multiplyMatrices ( mat1, mat2, res, 
-    //    4, 4, 4, 4 , 4, 4);
-    
-
-
-    
-
-    //x,y,z,?
-    //printf ("%d | %d | %d | %d \n",res[0][0], res[0][1], res[0][2], res[0][3]);
-    //printf ("%d | %d | %d | %d \n",res[1][0], res[1][1], res[1][2], res[1][3]);
-    //printf ("%d | %d | %d | %d \n",res[2][0], res[2][1], res[2][2], res[2][3]);
-    //printf ("%d | %d | %d | %d \n",res[3][0], res[3][1], res[3][2], res[3][3]);
-
-
-
-    
-    int i=0;
-    
-    int count=4;
-    
-    while (count>0){
-
-    count--;
-
-    for (i=0; i<8; i++){
-
-       rectBackbufferDrawRectangle ( 
-           0, 0, 320, 200, COLOR_BLACK, 1 );
-                
-       multiply4 ( projection4x4, mat2, res );
-       
-       //z,x,y
-       grPlot0 ( res[0][2], res[0][0], res[0][1], COLOR_WHITE); 
-       grPlot0 ( res[1][2], res[1][0], res[1][1], COLOR_WHITE); 
-       grPlot0 ( res[2][2], res[2][0], res[2][1], COLOR_WHITE); 
-       grPlot0 ( res[3][2], res[3][0], res[3][1], COLOR_WHITE); 
-   
-       
-       projection4x4[0][0] = i%5;
-       projection4x4[0][1] = 0;
-       // projection4x4[0][2] = 0;
-       // projection4x4[0][3] = 0;
-
-       
-        projection4x4[1][0] = 0;
-        projection4x4[1][1] = i%5;
-       // projection4x4[1][2] = 0;
-       // projection4x4[1][3] = 0;
-
-       
-        projection4x4[2][0] = 0;
-        projection4x4[2][1] = 0;
-       // projection4x4[2][2] = 0;
-       // projection4x4[2][3] = 0;
-
-       
-        projection4x4[3][0] = i%5;
-        projection4x4[3][1] = i%5;
-       // projection4x4[3][2] = 0;
-       // projection4x4[3][3] = 0;
-   
-	    //{i,0,0,0}, 
-	    //{0,i,0,0},
-	    //{0,0,0,0},
-	    //{i,i,0,0}
-	    
-	        gws_show_backbuffer();  
-	        gwssrv_yield();
-	        gwssrv_yield();            
-	    
-        };
-    };
-}
-
-
-
-//start up animation
-//matrix multiplication
-void sa_1(void)
-{
-    int mat1[4][4] = {  { 1, 1, 1, 1 },
-                        { 2, 2, 2, 2 },
-                        { 3, 3, 3, 3 },
-                        { 4, 4, 4, 4 } };
- 
-    int mat2[4][4] = { { -5, -5, 0, 0 },
-                       { 5,  -5, 0, 0 },
-                       { 5,   5, 0, 0 },
-                       { -5,  5, 0, 0 } };
-    
-    int res[4][4]; // To store result
-
-    
-
-    int i=0;
-        
-    
-    if (current_mode != GRAMADO_JAIL)
-        return;
-    
-    
-    int count=3;    
-    while ( count>0){
-
-        for (i=0; i<8; i++){
-        
-            // black background.
-            rectBackbufferDrawRectangle ( 
-               0, 0, 320, 200, COLOR_BLACK, 1 );
-            
-            // transform.
-            multiply4 ( projection4x4, mat2, res );
-       
-            // PLot for dots.
-            // z,x,y
-            grPlot0 ( res[0][2], res[0][0], res[0][1], COLOR_WHITE); 
-            grPlot0 ( res[1][2], res[1][0], res[1][1], COLOR_WHITE); 
-            grPlot0 ( res[2][2], res[2][0], res[2][1], COLOR_WHITE); 
-            grPlot0 ( res[3][2], res[3][0], res[3][1], COLOR_WHITE); 
-          
-            // New projection matrix.
-            
-            projection4x4[0][0] = i%5;
-            projection4x4[0][1] = 0;
-            // projection4x4[0][2] = 0;
-            // projection4x4[0][3] = 0;
-
-            projection4x4[1][0] = 0;
-            projection4x4[1][1] = i%5;
-            // projection4x4[1][2] = 0;
-            // projection4x4[1][3] = 0;
-
-            projection4x4[2][0] = 0;
-            projection4x4[2][1] = 0;
-            // projection4x4[2][2] = 0;
-            // projection4x4[2][3] = 0;
-       
-            projection4x4[3][0] = i%5;
-            projection4x4[3][1] = i%5;
-            // projection4x4[3][2] = 0;
-            // projection4x4[3][3] = 0;
-  
-            // Refresh and yield.
-            refresh_device_screen(); 
-            gwssrv_yield();
-            gwssrv_yield();
-            gwssrv_yield();
-            gwssrv_yield();
-            // ...
-        };
-        
-        count--;
-    };
-}
-
-
-// Rotina usada para rodar rotinas demo na inicializaçao.
-// Seleciona a rotina demo a ser executada.
-void window_server_startup_animation(int i)
-{
-    switch (i){
-    case 1: sa_1(); break;
-    case 2: fredDemo0(); break;
-    case 3: fredDemo1(); break;
-    case 4: fredDemo2(); break;
-    case 5: cube_demo1(); break;
-    case 6: cube_demo2(); break;
-    case 7: curveDemo(); break;
-    case 8: matrix_demo1(); break;
-    //case 9: xxx(); break;
-    default: break;
-    };
 }
 
 
@@ -2336,187 +1851,6 @@ plotQuadBezierSeg (
     //plotLine(x0,y0, x2,y2);   
     plotLine3d(x0,y0,z0, x2,y2,z2, color); 
 }
-
-
-
-void catDemo(void)
-{
-    int i=0;
-    int j=0;
-    int count = 20;
-
-    while(count>0){
-    
-    for (i=0; i<8; i++){
-
-       rectBackbufferDrawRectangle ( 
-           0, 0, 320, 200, COLOR_BLACK, 1 );
-    //head
-    plotCircleZ ( 0, 12, 25, COLOR_WHITE, 0); 
-
-    //eyes
-    plotCircleZ ( -10, 20, 1+i, COLOR_WHITE, 0); 
-    plotCircleZ (  10, 20, 1+i, COLOR_WHITE, 0); 
-
-    plotLine3d ( -40, 8,0, -4, 5,0, COLOR_WHITE); 
-    plotLine3d ( -40, 5,0, -4, 4,0, COLOR_WHITE); 
-    plotLine3d ( -40, 2,0, -4, 3,0, COLOR_WHITE); 
-
-    plotLine3d ( 4, 5,0, 40, 8,0, COLOR_WHITE); 
-    plotLine3d ( 4, 4,0, 40, 5,0, COLOR_WHITE); 
-    plotLine3d ( 4, 3,0, 40, 2,0, COLOR_WHITE); 
-
-    plotLine3d ( -10, -2,0, 10, -2,0, COLOR_WHITE); 
-
-    gws_refresh_rectangle(0,0,320,200);
-    for (j=0; j<200; j++){ gwssrv_yield();}
-    }
-    count--;
-    }
-}
-
-
-void curveDemo(void)
-{
-    int i=0;
-    int j=0;
- 
- 
-    int count=4;
-    
-    while (count>0){
-        count--;
-
-    for (i=0; i<10; i++){
-        // line
-
-        rectBackbufferDrawRectangle ( 
-            0, 0, 320, 200, COLOR_BLACK, 1 );
-        
-        //a variaçao de y2 me pareceu certa.
-        plotQuadBezierSeg ( 
-            0,   0,  0,      //x0, y0, z0, 
-            40,  40, 0,      //x1, y1, z1,
-           100,  20+i+i, 0,  //x2, y2, z2, 
-           COLOR_YELLOW );
-
-        //string! funny
-        plotCharBackbufferDrawcharTransparentZ ( 40+ (8*0), 20+i+i, COLOR_RED, 'G', 0 );
-        plotCharBackbufferDrawcharTransparentZ ( 40+ (8*1), 20+i+i, COLOR_RED, 'R', 0 );   
-        plotCharBackbufferDrawcharTransparentZ ( 40+ (8*2), 20+i+i, COLOR_RED, 'A', 0 );
-        plotCharBackbufferDrawcharTransparentZ ( 40+ (8*3), 20+i+i, COLOR_RED, 'M', 0 );
-        plotCharBackbufferDrawcharTransparentZ ( 40+ (8*4), 20+i+i, COLOR_RED, 'A', 0 );
-        plotCharBackbufferDrawcharTransparentZ ( 40+ (8*5), 20+i+i, COLOR_RED, 'D', 0 );
-        plotCharBackbufferDrawcharTransparentZ ( 40+ (8*6), 20+i+i, COLOR_RED, 'O', 0 );
-
-        gws_refresh_rectangle(0,0,320,200);
-        for (j=0; j<80; j++){ gwssrv_yield();}
-    };
-    
-    }
-
-}
-
-
-
-//
-// == fred demo ========================================
-//
-
-
-void fredDemo0(void)
-{
-    int i=0;
-    for (i=0; i<100; i++){
-            //noraDrawingStuff3 (i,i,0);
-            noraDrawingStuff3 (-i,-i,0);
-            //rectangle(8,8,i,i,COLOR_BLUE);
-            //rectangleZ(i,i,i+20,i+20,COLOR_BLUE,i);
-            //plotCircle ( -i % 20, -i % 20, i%20, COLOR_GREEN);
-            
-            plotCircleZ ( -i % 20, -i % 20, i % 20, COLOR_GREEN, i % 20);  //save this
-            //plotCircleZ ( -i % 20, -i % 20, i % 20, COLOR_GREEN, i % 20);   //save this
-            //cool
-            //plotCircleZ ( -i % fib(20), -i % fib(20), i % fib(20), COLOR_GREEN, i % fib(20) );
-            //igual o de cima.
-            //plotCircleZ ( -i % fib(20), -i % fib(20), i, COLOR_GREEN, i % fib(20) );
-            //plotCircleZ ( -i % fib(7), -i % fib(7), i % fib(7), COLOR_GREEN, i % fib(7) );
-            //plotEllipseRect ( i, i, i*5, i*5, COLOR_BLUE);
-            //plotEllipseRectZ ( i%20, i%20, i, i, COLOR_BLUE,i%20);
-    };
-
-}
-
-
-void fredDemo1(void)
-{
-    int i=0;
-    for (i=0; i<100; i++){
-            //noraDrawingStuff3 (i,i,0);
-            noraDrawingStuff3 (-i,-i,0);
-            //rectangle(8,8,i,i,COLOR_BLUE);
-            //rectangleZ(i,i,i+20,i+20,COLOR_BLUE,i);
-            //plotCircle ( -i % 20, -i % 20, i%20, COLOR_GREEN);
-            //plotCircleZ ( -i % 20, -i % 20, i % 20, COLOR_GREEN, i % 20);  //save this
-            //plotCircleZ ( -i % 20, -i % 20, i % 20, COLOR_GREEN, i % 20);   //save this
-            //cool
-            plotCircleZ ( -i % fib(20), -i % fib(20), i % fib(20), COLOR_GREEN, i % fib(20) );
-            //igual o de cima.
-            //plotCircleZ ( -i % fib(20), -i % fib(20), i, COLOR_GREEN, i % fib(20) );
-            //plotCircleZ ( -i % fib(7), -i % fib(7), i % fib(7), COLOR_GREEN, i % fib(7) );
-            //plotEllipseRect ( i, i, i*5, i*5, COLOR_BLUE);
-            //plotEllipseRectZ ( i%20, i%20, i, i, COLOR_BLUE,i%20);
-    };
-
-}
-
-
-void fredDemo2(void)
-{
-    int i=0;
-    for (i=1; i< (1024-768); i++){
-            //noraDrawingStuff3 (i,i,0);
-            noraDrawingStuff3 (-i,-i,0);
-            //rectangle(8,8,i,i,COLOR_BLUE);
-            //rectangleZ(i,i,i+20,i+20,COLOR_BLUE,i);
-            //plotCircle ( -i % 20, -i % 20, i%20, COLOR_GREEN);
-            //plotCircleZ ( -i % 20, -i % 20, i % 20, COLOR_GREEN, i % 20);  //save this
-            //plotCircleZ ( -i % 20, -i % 20, i % 20, COLOR_GREEN, i % 20);   //save this
-            //cool
-            //plotCircleZ ( -i % fib(20), -i % fib(20), i % fib(20), COLOR_GREEN, i % fib(20) );
-            
-            //IN: x,y,r,color,z
-            plotCircleZ ( -i % fib(20), -i % fib(20), i % (1024-768), COLOR_RED, i % fib(20) );
-            //plotCircleZ ( -i % fib(20), -i % fib(20), i %  fib(20/3), COLOR_GREEN, i % fib(20) );
-            //plotCircleZ ( -i % fib(20), -i % fib(20), i %  fib(20/5), COLOR_BLUE, i % fib(20) );
-            //plotCircleZ ( -i % fib(20), -i % fib(20), i %  fib(20/7), COLOR_YELLOW, i % fib(20) );
-            
-            //plotCircleZ ( -i % fib(20), -i % fib(20), i %  fib(20/), COLOR_GREEN, i % fib(20) );
-            //plotCircleZ ( -i % fib(20), -i % fib(20), i %  fib(20/3), COLOR_YELLOW, i % fib(20) );
-            
-            //igual o de cima.
-            //plotCircleZ ( -i % fib(20), -i % fib(20), i, COLOR_GREEN, i % fib(20) );
-            //plotCircleZ ( -i % fib(7), -i % fib(7), i % fib(7), COLOR_GREEN, i % fib(7) );
-            //plotEllipseRect ( i, i, i*5, i*5, COLOR_BLUE);
-            //plotEllipseRectZ ( i%20, i%20, i, i, COLOR_BLUE,i%20);
-    };
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

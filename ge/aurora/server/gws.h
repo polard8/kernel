@@ -53,7 +53,7 @@ int current_mode;
 
 #include "view/grprim.h"
 
-
+#include "view/demos.h"
 
 
 // # data model

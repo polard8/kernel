@@ -171,7 +171,7 @@ multiplyMatrices (
     int rr, int cr );
 
 
-void matrix_demo1(void);
+
 
 //
 // ===========================================================
@@ -289,8 +289,6 @@ int xxxCubeZ ( struct gr_cube_d *cube );
 int serviceGrCubeZ(void);
 
 
-void cube_demo1(void);
-void cube_demo2(void);
 
 
 //
@@ -370,24 +368,6 @@ void grDCColorChg (
     unsigned char subpixel_dst_color );  // dst_color=COLOR_TRANSPARENT )
 
 
-void curveDemo(void);
-
-void catDemo(void);
-
-//
-// == fred demo  ===========================================
-//
-void fredDemo0(void);
-void fredDemo1(void);
-void fredDemo2(void);
-// ...
-
-
-void window_server_startup_animation(int i);
-
-//start up animation
-void sa_1(void);
-// ...
 
 
 #endif    
