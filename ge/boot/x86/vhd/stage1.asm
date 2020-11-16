@@ -48,7 +48,7 @@ BUFFER_NAME           db "MSDOS5.0"    ;GRAMADO.
 BPB:
 BytesPerSector        dw 0x0200
 SectorsPerCluster     db 1
-ReservedSectors       dw 62      ;; 62   
+ReservedSectors       dw 62      ;; 62
 TotalFATs             db 0x02
 MaxRootEntries        dw 0x0200
 TotalSectorsSmall     dw 0x0000  ;; (CHS=963/4/17-5)(Number of sectors - number of hidden sectors)
@@ -62,7 +62,7 @@ DriveNumber           db 0x80
 Flags                 db 0x00    ;; ?? Current Head ??
 Signature             db 0x29    ;; 41
 BUFFER_VOLUME_ID      dd 0x980E63F5
-VolumeLabel           db "GRAMADO MBR"
+VolumeLabel           db "GRAMADO    "   ;;11 bytes
 SystemID              db "FAT16   "
 
 

@@ -475,10 +475,12 @@ void set_filesystem_type (int type);
 
 int get_filesystem_type (void);
 
-void set_spc(int spc);
 
+//#todo: spt in a given volume.
+void set_spc(int spc);
 int get_spc (void);
  
+
 
 unsigned long path_count (unsigned char *path);
 int load_path ( unsigned char *path, unsigned long address );

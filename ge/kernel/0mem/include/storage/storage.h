@@ -1,14 +1,13 @@
+/*
+ * File: storage/storage.h
+ * 
+ * 2019 - Created by Fred Nora.
+ */
 
 
-// storage/storage.h
-
-
-
-
-
-//===================================================================
-//                      STORAGE  
-//===================================================================
+//===============================================================
+//  STORAGE  
+//===============================================================
 //
 // # important:
 // Informação sobre os recursos de armazenamento.
@@ -24,36 +23,26 @@
 struct storage_d
 {
 
-    //
     // Disk.
-    //
-    
-
     // System disk
     // The disk where the system is installed.
+
     struct disk_d *system_disk;
 
 
-    //
     // Volume.
-    //
-    
-    
     // vfs volume.
-    struct volume_d *vfs_volume;
-    
     // Boot volume.
-    struct volume_d *boot_volume;
-
     // System volume.
-    struct volume_d *system_volume;    
+
+    struct volume_d     *vfs_volume;
+    struct volume_d    *boot_volume;
+    struct volume_d  *system_volume;
 
 
-    //
     // vfs
-    //
-
-    //virtual file system
+    // virtual file system
+    
     struct vfs_d *vfs;
 
 

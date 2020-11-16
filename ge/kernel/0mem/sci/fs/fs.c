@@ -729,7 +729,7 @@ int get_free_slots_in_the_inode_table(void)
     int i=0;
 
     
-    for (i=0;i<32; i++)
+    for (i=0; i<32; i++)
     {
         tmp = (void*) inode_table[i];
         
@@ -752,6 +752,10 @@ int get_free_slots_in_the_inode_table(void)
  * fsCheckMbrFile: 
  *     Check mbr file, given a buffer.
  */
+
+
+// #todo
+// Check the command 'mbr' in gdeshell.bin.
 
 void fsCheckMbrFile ( unsigned char *buffer ){
 
@@ -857,9 +861,10 @@ done:
 // Configura spc, 'Sector Per Cluster' em vari�vel global.
 // ?? #bugbug: De qual disco ?? 
 
+//void set_spc (int spc, int volume_id)
 void set_spc (int spc)
 {
-    g_spc = (int) spc;
+    panic("set_spc: [TODO] Sectors per cluster in a given volume.\n");
 }
 
 
@@ -869,9 +874,11 @@ void set_spc (int spc)
  *     ?? #bugbug: De qual disco ?? 
  */
 
+//int get_spc (int volume_id)
 int get_spc (void)
 {
-    return (int) g_spc;
+    panic("get_spc: [TODO] Sectors per cluster in a given volume.\n");
+    return (int) -1;
 }
 
 
@@ -1457,7 +1464,9 @@ void fs_init_structures (void){
 
             // Disk stuff.
             // spc - Sectors per cluster.
-            root->spc = (int) get_spc(); 
+            root->spc = (int) VOLUME1_SPC;
+            //root->spc = (int) get_spc(); 
+            
 
             // Rootdir, Fat and data area.
             // #bugbug: Specific for fat16.
@@ -1784,10 +1793,10 @@ int fat16Init (void){
 
 
 	// SPC 
-	// Configura o n�mero de setores por cluster.
-	// Nesse caso, s�o (512 bytes por setor, um setor por cluster).
+	// Configura o numero de setores por cluster.
+	// Nesse caso, sao (512 bytes por setor, um setor por cluster).
 
-    set_spc(1);
+    //set_spc(1);
 
 
 	// ## initialize currents ##
@@ -1809,7 +1818,6 @@ int fat16Init (void){
 	//current_disk = 0;
 	//current_volume = 0;   
 	//current_directory = 0;
-
 
 
     // Structures and fat.

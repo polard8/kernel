@@ -10,7 +10,6 @@
  *
  * 2015 - Created by Fred Nora
  * 2018 - IDE controller support by Nelson Cole.
- *
  */
 
 // See:
@@ -24,10 +23,20 @@
 #define DISK_BYTES_PER_SECTOR  512 
 //#define DISK_BYTES_PER_SECTOR 4096 
  
- 
-// MBR support.
+//
+// == MBR =================================================
+//
+
+// MBR support:
+// jmp, bpb, partition table, signature.
+
+// jmp
 #define  BS_JmpBoot       0  /* x86 jump instruction (3-byte) */
+
+// name
 #define  BS_OEMName       2  /* OEM name (8-byte) */
+
+// bpb
 #define  BPB_BytsPerSec  11  /* Sector size [byte] (WORD) */
 #define  BPB_SecPerClus  13  /* Cluster size [sector] (BYTE) */
 #define  BPB_RsvdSecCnt  14  /* Size of reserved area [sector] (WORD) */
@@ -40,26 +49,48 @@
 #define  BPB_NumHeads    26  /* Number of heads for int13h (WORD) */
 #define  BPB_HiddSec     28  /* Volume offset from top of the drive (DWORD) */
 #define  BPB_TotSec32    32  /* Volume size (32-bit) [sector] (DWORD) */
+
+// extra.
 #define  BS_DrvNum       36  /* Physical drive number for int13h (BYTE) */
 #define  BS_NTres        37  /* WindowsNT error flag (BYTE) */
 #define  BS_BootSig      38  /* Extended boot signature (BYTE) */
 #define  BS_VolID        39  /* Volume serial number (DWORD) */
+
+
+// #todo: 11 bytes for DOS 4.0
+// See:
+// https://en.wikipedia.org/wiki/BIOS_parameter_block
 #define  BS_VolLab       42  /* Volume label string (8-byte) */
-#define  BS_FilSysType   50  /* Filesystem type string (8-byte) */
-#define  BS_BootCode     62  /* Boot code (448-byte) */
-#define  BS_55AA         510  /* Signature word (WORD) */
-#define  MBR_Table       446  /* MBR: Offset of partition table in the MBR */ 
+
+//
+// #bugbug: ??? Is this the right offset??
+//#define  BS_FilSysType   50  /* Filesystem type string (8-byte) */ 
+#define  BS_FilSysType   53  // starts here in dos 4.0
+
+
+// #todo:
+// Where is this restart point in gramado os ??
+// boot code.
+//#define  BS_BootCode     62  /* Boot code (448-byte) */
+#define  BS_BootCode     62  
 
 
 
-
+// partition table
 // mbr partition table offsets.
-
+#define  MBR_Table       446  /* MBR: Offset of partition table in the MBR */ 
 #define MBR_PT0_OFFSET  0x01BE  // (446) 
 #define MBR_PT1_OFFSET  0x01CE  // (462)
 #define MBR_PT2_OFFSET  0x01DE  // (478) 
 #define MBR_PT3_OFFSET  0x01EE  // (494) 
 
+//signature.
+#define  BS_55AA         510  /* Signature word (WORD) */
+
+
+//
+//=============================================
+//
 
 //#define PARTITION_ACTIVE_FLAG    0x80
 //#define MBR_PT_ACTIVE_FLAG   PARTITION_ACTIVE_FLAG
@@ -80,14 +111,10 @@
 //
 
 
-
- 
 //macro
 //#define CYLMAX(c)  ((c) > 1023 ? 1023 : (c))  
 
 
-// disco atual ??
-int g_spc;               //sectors per cluster.(spc é variável.)
 
 
 
@@ -316,8 +343,6 @@ struct disk_d
     // #todo
     // contador de processos usando o disco
 
-
-
     uint8_t channel;
     uint8_t dev_num;
     
@@ -337,6 +362,12 @@ struct disk_d *____boot____disk;
 unsigned long diskList[DISK_COUNT_MAX];
 
 
+//
+// == variables ==================================
+//
+
+
+// ...
 
 
 //

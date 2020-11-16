@@ -31,19 +31,23 @@
 // mbr
 #define MBR_LBA               0 
 
+//================================
 // boot partition
 #define VOLUME1_VBR_LBA       63
 #define VOLUME1_FAT_LBA       67 
 //#define VOLUME1_FAT2_LBA    ??
 #define VOLUME1_ROOTDIR_LBA   559
 #define VOLUME1_DATAAREA_LBA  591 
+#define VOLUME1_SPC  1 // sectors per cluster.
 
+//=======================================
 // system partition
 #define VOLUME2_VBR_LBA       32000
 #define VOLUME2_FAT_LBA       33000  
 //#define VOLUME2_FAT2_LBA    ?? 
 #define VOLUME2_ROOTDIR_LBA   34000
 #define VOLUME2_DATAAREA_LBA  35000
+#define VOLUME2_SPC  1 // sectors per cluster.
 
 // ==================================================================
 

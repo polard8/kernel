@@ -4646,36 +4646,79 @@ void shellTestMBR (void){
 	
     unsigned char buffer[512];
 
-
+    printf ("gdeshell.bin: shellTestMBR()\n");
+    printf ("Reading the sector to a ring3 buffer\n\n");
 
     //++
     gde_enter_critical_section (); 
-	
-	//message 
-	printf("shellTestMBR: Initializing MBR test ...\n");
-	
-	//read sector
-	system_call ( SYSTEMCALL_READ_LBA, 
-	              (unsigned long) &buffer[0],  //address 
-				  (unsigned long) 0,           //lba
-				  (unsigned long) 0);
-				 
-	gde_exit_critical_section ();   
+    //read sector
+    // IN: service number, buffer, lba, nothing.
+    system_call ( 
+        SYSTEMCALL_READ_LBA, 
+        (unsigned long) &buffer[0],  
+        (unsigned long) 0, 
+        (unsigned long) 0);
+    gde_exit_critical_section ();   
     //--
 
+    //
+    // Print.
+    //
 
-	//
-	// exibe o conte�do carregado.
-	//
-	
-	//?? address #bugbug
-	printf("Signature: [ %x %x ] \n" , buffer[0x1FE], buffer[0x1FF] );
-	
-	
-	//
-	// @todo: Sondar cada elemento do MBR para 
-	// confirmar a presen�a.
-	//
+    // jump
+    printf("JMP: [ %x %x ] \n" , buffer[0], buffer[1] );
+
+    // os name
+    char OS_Name[8+1];  //MSDOSxx
+    OS_Name[0] = buffer[2];
+    OS_Name[1] = buffer[3];
+    OS_Name[2] = buffer[4];
+    OS_Name[3] = buffer[5];
+    OS_Name[4] = buffer[6];
+    OS_Name[5] = buffer[7];
+    OS_Name[6] = buffer[8];
+    OS_Name[7] = buffer[9];
+    OS_Name[9] = 0;  // finaliza
+    printf("OS Name: %s\n",OS_Name);
+ 
+
+    // volume label   //GRAMADO      11 bytes
+    char VolumeLabel[11+1];
+    VolumeLabel[0] = buffer[42];
+    VolumeLabel[1] = buffer[43];
+    VolumeLabel[2] = buffer[44];
+    VolumeLabel[3] = buffer[45];
+    VolumeLabel[4] = buffer[46];
+    VolumeLabel[5] = buffer[47];
+    VolumeLabel[6] = buffer[48];
+    VolumeLabel[7] = buffer[49];
+    VolumeLabel[8] = buffer[50];
+    VolumeLabel[9] = buffer[51];
+    VolumeLabel[10] = buffer[52];
+    
+    VolumeLabel[11] = 0;  // finaliza
+    printf("Volume Label: %s\n",VolumeLabel);
+
+
+    // fs type string.  'FAT16   '.
+    // #bugbug: what is the right offset??
+    char fsTypeString[8+1];
+    fsTypeString[0] = buffer[53];
+    fsTypeString[1] = buffer[54];
+    fsTypeString[2] = buffer[55];
+    fsTypeString[3] = buffer[56];
+    fsTypeString[4] = buffer[57];
+    fsTypeString[5] = buffer[58];
+    fsTypeString[6] = buffer[59];
+    fsTypeString[7] = buffer[60];
+    fsTypeString[9] = 0;  // finaliza
+    printf("fs type string: %s\n",fsTypeString);
+
+ 
+    // signature
+    printf("Signature: [ %x %x ] \n" , buffer[0x1FE], buffer[0x1FF] );
+    
+    printf("shellTestMBR: done\n");
 }
 
 
