@@ -522,8 +522,9 @@ plotLine3d (
    //int dm = grMAX3 (dx,dy,dz), i = dm; /* maximum difference */
    
    int dm = grMAX3(dx,dy,dz);
-   int i = dm;
-   
+   register int i = dm;
+
+
     // x1 = y1 = z1 = dm/2; /* error offset */
  
     x1 = (dm >> 1);
@@ -559,7 +560,7 @@ plotLine3d2 (
     //int dm = grMAX3 (dx,dy,dz), i = dm; /* maximum difference */
    
     int dm = grMAX3(dx,dy,dz);
-    int i = dm;
+    register int i = dm;
    
     // x1 = y1 = z1 = dm/2; /* error offset */
  
@@ -674,10 +675,11 @@ ras_rectangleZ (
     unsigned long color )
 {
 
-    int h=0;
+    register int h=0;
 
     // COmewça com a linha de cima.
-    for ( h=top; h >= bottom; h-- ){
+    for ( h=top; h >= bottom; h-- )
+    {
         plotLine3d ( left,  h, z0, right, h, z1, color );
     }
 }
@@ -996,9 +998,12 @@ plotCircle (
     /* II. Quadrant */ 
    //int x = -r, y = 0, err = 2-2*r; 
    
-   int x = -r;
-   int y = 0;
-   int err = (2-(2*r));
+    //loop
+    register int x = -r;
+   
+    int y = 0;
+    int err = (2-(2*r));
+
 
     do {
       
@@ -1042,11 +1047,13 @@ plotCircleZ (
     /* II. Quadrant */ 
    //int x = -r, y = 0, err = 2-2*r; 
    
-   int x = -r;
-   int y = 0;
-   int err =  (2-(2*r));
+    //loop
+    register int x = -r;
+   
+    int y = 0;
+    int err =  (2-(2*r));
 
-   do {
+    do {
       
       //setPixel(xm-x, ym+y); /*   I. Quadrant */
       //setPixel(xm-y, ym-x); /*  II. Quadrant */
@@ -1072,7 +1079,7 @@ plotCircleZ (
           err += ++x * 2+1; 
       }
       
-   } while (x < 0);
+    } while (x < 0);
 }
  
  
@@ -1220,8 +1227,9 @@ plotEllipseRectZ (
 
 void noraDrawingStuff(void)
 {
-    int x=0;
-    int y=0;
+
+    register int x=0;
+    register int y=0;
 
     // colunas.
     for (x=0; x< SavedX; x++)    
@@ -1248,19 +1256,24 @@ void noraDrawingStuff(void)
 
 void noraDrawingStuff3 (int x, int y, int z)
 {
-    int _x=0;
-    int _y=0;
-    int _z = z;
+    register int _x=0;
+    register int _y=0;
+    register int _z = z;
 
-    int limitX = SavedX/2;
-    int limitY = SavedY/2;
+    //int limitX = SavedX/2;
+    //int limitY = SavedY/2;
+
+    int limitX = (SavedX >> 1);
+    int limitY = (SavedY >> 1);
+
 
     // colunas.
     for (_x=x; _x<limitX; _x++)    
     {
         for (_y=y; _y<limitY; _y++)
         {
-            if ( _x != 0 ){
+            if ( _x != 0 )
+            {
                 if ( _y % _x == 0 ){
                     grPlot0 (_z, _x, _y,COLOR_BLACK);
                 }
@@ -1303,16 +1316,25 @@ matrix_multiply_2x3 (
 }
 */
 
+
 void multiply4 (int mat1[][4], int mat2[][4], int res[][4])
 {
-    int i, j, k;
-    for (i = 0; i < 4; i++) {
-        for (j = 0; j < 4; j++) {
+    register int i=0; 
+    register int j=0; 
+    register int k=0;
+
+    for (i = 0; i < 4; i++) 
+    {
+        for (j = 0; j < 4; j++) 
+        {
             res[i][j] = 0;
-            for (k = 0; k < 4; k++)
+            
+            // slow
+            for (k = 0; k < 4; k++){
                 res[i][j] += mat1[i][k] * mat2[k][j];
-        }
-    }
+            };
+        };
+    };
 }
 
 
@@ -1326,9 +1348,10 @@ multiplyMatrices (
     int r2, int c2,   // rows and columns for the second 
     int rr, int cr)
 {
-   int i=0;
-   int j=0;
-   int k=0;
+
+   register int i=0;
+   register int j=0;
+   register int k=0;
 
 
    // Initializing elements of matrix mult to 0.
@@ -1336,9 +1359,9 @@ multiplyMatrices (
    {
       for (j = 0; j < cr; ++j) 
       {
-         result[i][j] = 0;
-      }
-   }
+          result[i][j] = 0;
+      };
+   };
 
 
    /*
@@ -1355,13 +1378,18 @@ multiplyMatrices (
    }
    */
 
-    for (i = 0; i < r1; i++) {
-        for (j = 0; j < c2; j++) {
+    for (i = 0; i < r1; i++) 
+    {
+        for (j = 0; j < c2; j++) 
+        {
             result[i][j] = 0;
-            for (k = 0; k < c1; k++)
+            
+            //slow
+            for (k = 0; k < c1; k++){
                 result[i][j] += first[i][k] * second[k][j];
-        }
-    }
+            };
+        };
+    };
     
 }
 
@@ -1369,13 +1397,15 @@ multiplyMatrices (
 // Fibonacci Series using Recursion 
 int fib (int n){ 
 
+    register int Copy = n;
+    
     int a=0;
     int b=0;
 
-    if (n <= 1){ return n; }
+    if (Copy <= 1){ return Copy; }
     
-    a = fib(n - 1); 
-    b = fib(n - 2);
+    a = fib(Copy - 1); 
+    b = fib(Copy - 2);
 
     return (int) (a+b);
 } 
@@ -1402,11 +1432,13 @@ plotCharBackbufferDrawcharTransparent (
     unsigned long c )
 {
 
+    //loop
+    register int y2=0;
+    register int x2=0;
+
+
     char *work_char;
     unsigned char bit_mask = 0x80;
-
-    int x2=0;
-    int y2=0;
 
     //int CharWidth;
     //int CharHeight;
@@ -1794,7 +1826,14 @@ plotQuadBezierSeg (
     int  sx = x2-x1, sy = y2-y1;
     long xx = x0-x1, yy = y0-y1, xy;         /* relative values for checks */
     //double dx, dy, err, cur = xx*sy-yy*sx;                    /* curvature */
-    long dx, dy, err, cur = xx*sy-yy*sx;
+    
+    //loop
+    register long dx=0; 
+    register long dy=0;
+    
+    long err=0; 
+    long cur = xx*sy-yy*sx;
+
 
     /* sign of gradient must not change */
     //assert(xx*sx <= 0 && yy*sy <= 0);  
@@ -1818,6 +1857,7 @@ plotQuadBezierSeg (
     }  
     
     if (cur != 0) {                                    /* no straight line */
+
     xx += sx; xx *= sx = x0 < x2 ? 1 : -1;           /* x step direction */
     yy += sy; yy *= sy = y0 < y2 ? 1 : -1;           /* y step direction */
     xy = 2*xx*yy; xx *= xx; yy *= yy;          /* differences 2nd degree */
@@ -1842,14 +1882,18 @@ plotQuadBezierSeg (
       y1 = 2*err < dx;                  /* save value for test of y step */
       if (2*err > dy) { x0 += sx; dx -= xy; err += dy += yy; } /* x step */
       if (    y1    ) { y0 += sy; dy -= xy; err += dx += xx; } /* y step */
+    
     } while (dy < dx );           /* gradient negates -> algorithm fails */
     
     
     }
-    
+
     /* plot remaining part to end */
     //plotLine(x0,y0, x2,y2);   
-    plotLine3d(x0,y0,z0, x2,y2,z2, color); 
+    plotLine3d (
+        x0,y0,z0, 
+        x2,y2,z2, 
+        color ); 
 }
 
 

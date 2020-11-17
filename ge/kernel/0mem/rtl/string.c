@@ -5,51 +5,51 @@
  *     Operações com strings.
  *     Parte da biblioteca da linguagem C.
  *
- * Versão 1.0, 2015.
+ * 2015 - Created by Fred Nora.
  */
 
- 
+
 #include <kernel.h>
+
 
 //test.
 //#define tolower(c)  ((int)((c) & ~0x20))
 //#define toupper(c)  ((int)((c) | 0x20))
 
 
-/* strcmp:
- *     Compara duas strings. */
+/* 
+ * strcmp:
+ *     Compara duas strings. 
+ */
 
 int strcmp (char * s1, char * s2){
-	
-	int i;
 
-	for ( i=0; s1[i] == s2[i]; i++ )
-	{
-		if( s1[i] == '\0' ){
-			return (0);
-		}
-	};
-	
-	return ((int) (s1[i] - s2[i]));
+    register int i=0;
+
+    for ( i=0; s1[i] == s2[i]; i++ )
+    {
+        if ( s1[i] == '\0' ){  return (0);  }
+    };
+
+    return ((int) (s1[i] - s2[i]));
 }
 
 
-/* strncmp:
- *     Compara duas strings. */
+/* 
+ * strncmp:
+ *     Compara duas strings. 
+ */
 
 int strncmp ( char *s1, char *s2, int len ){
-	
-	int n = len;
-	
-	while( n > 0 )
-	{	
-	    n--;
+
+    register int n = len;
+
+    while ( n > 0 )
+    {
+        n--;
         
-		if( *s1 != *s2 )
-		{
-            return (int) 1;
-        };
-		
+        if ( *s1 != *s2 ){  return (int) 1;  }
+
 		//#bugbug:
 		//Esse incremento está errado.
 		
@@ -63,57 +63,69 @@ int strncmp ( char *s1, char *s2, int len ){
 		
 		
 	};		
-			
-			
-	if (*s1 != '\0' || *s2 != '\0' )
-	{	
-	    return 2;
-	};
-	
-	return (int) 0;
-};
+
+
+    if (*s1 != '\0' || *s2 != '\0' )
+    {
+        return 2;
+    }
+
+    return 0;
+}
 
 
 /*
  * str_cmp:
  *     Compara strings.
  */
+
 int str_cmp(unsigned char *str1, unsigned char *str2)
 {
-	while(*str1 == *str2 && *str1 != 0 && *str2 != 0) 
-    { 
-        str1++; 
-        str2++; 
-    };
     
+    while ( *str1 == *str2 && 
+            *str1 != 0     && 
+            *str2 != 0) 
+    { 
+        str1++;  str2++; 
+    };
+
+
 	// mesma quantidade de chars iguais
-    if(*str1 == *str2) 
+    if (*str1 == *str2) 
 	    return 0;
 	
-	if(*str1 > *str2) 
+	if (*str1 > *str2) 
 	    return 1;
 		
-	if(*str1 < *str2) 
+	if (*str1 < *str2) 
 	    return -1;
-	
+
+
     return -1;
-};
+}
 
  
  
 /*
- * memcpy: */
+ * memcpy: 
+ */
 
 void *memcpy ( void *v_dst, const void *v_src, unsigned long c ){
-	
-	const char *src = v_src;
-	char *dst = v_dst;
 
-	/* Simple, byte oriented memcpy. */
-	while (c--)
-		*dst++ = *src++;
+    const char *src = v_src;
+    char *dst = v_dst;
 
-	return v_dst;
+    register unsigned long Copy=c;
+
+    /* Simple, byte oriented memcpy. */
+    //#danger.
+    
+    while (Copy--)
+    {
+        *dst++ = *src++;
+    };
+
+    return v_dst;
 }
 
 
@@ -124,40 +136,50 @@ void *memcpy32 ( void *v_dst, const void *v_src, unsigned long c ){
 
 	long *src = (long *) v_src;
 	long *dst = (long *) v_dst;
-	
-	/* Simple, byte oriented memcpy. */
-	while (c--)
-		*dst++ = *src++;
 
-	return v_dst;
+    register unsigned long Copy=c;
+    
+	/* Simple, byte oriented memcpy. */
+    //danger
+    
+    while (Copy--)
+    {
+        *dst++ = *src++;
+    };
+
+    return v_dst;
 }
 
 
 /*
- * strcpy - copia uma string */
+ * strcpy - copia uma string 
+ */
 
 char *strcpy ( char *to, const char *from ){
-	
-	int i = 0;
 
-	while ( to[i] = from[i] ){
-		i += 1;
-	};
-	
-	return (to);
+    register int i=0;
+
+    while ( to[i] = from[i] )
+    {
+        i += 1;
+    };
+
+    return (to);
 }
 
 
 /*
- * strcat - acrescenta uma string ao fim de outra. */
+ * strcat - acrescenta uma string ao fim de outra. 
+ */
 
 char *strcat (char *to, const char *from){
 	
-	char *ret = to;
+    char *ret = to;
 
-	while (*to) {
-		to += 1;
-	};
+    while (*to) 
+    {
+        to += 1;
+    };
 	
 	strcpy(to, from);
 	return (ret);
@@ -183,8 +205,10 @@ char *strcat (char *to, const char *from){
 /*
  *  bcopy: */
 
-void bcopy (char *from, char *to, int len){
-	
+void bcopy (char *from, char *to, int len)
+{
+
+    //danger
 	while(len--) 
 	{
 		*to++ = *from++;
@@ -198,7 +222,8 @@ void bcopy (char *from, char *to, int len){
  *      Preenche com zeros. */
 
 void bzero (char *cp, int len){
-	
+
+    //danger
 	while(len--)
 	{
 		*(cp + len) = 0;
@@ -209,18 +234,22 @@ void bzero (char *cp, int len){
 
 /*
  * strlen:
- *     Calcula o tamanho de uma string. */
+ *     Calcula o tamanho de uma string. 
+ */
 
 size_t strlen (const char *s){
-	
-    size_t i = 0;
-	
-	for (i = 0; s[i] != '\0'; ++i){
-	    ;
-	};
-	
-//done:
-	return ( (size_t) i );
+
+    register size_t i=0;
+
+    //#todo
+    //if ( (void *) s == NULL ){ return -1; }
+
+    for ( i=0; s[i] != '\0'; ++i )
+    {
+        ;
+    };
+
+    return ( (size_t) i );
 }
 
 
@@ -424,22 +453,22 @@ int strcmp(const char *a, const char *b)
 //Isso ainda não foi testado.
 
 void *memset ( void *ptr, int value, int size ){
-	
-    if( ptr != NULL && size > 0 )
-    {
-        unsigned char *temp = ptr;
 
-        int i = 0;
+    register int i=0;
+        
+    if ( ptr != NULL && size > 0 )
+    {
+        //#bugbug.
+        unsigned char *temp = ptr;
 
         for ( i = 0; i < size; i++ )
         {
-            *temp++ = (unsigned char)value;
-        }
-
+            *temp++ = (unsigned char) value;
+        };
     };
-		
+
     return (void *) ptr;
-};
+}
  
 
 
@@ -480,51 +509,55 @@ void *memset ( void *ptr, int value, int size ){
 /* Copyright (c) 2011, 2012 Jonas 'Sortie' Termansen. */
 size_t strcspn(const char* str, const char* reject)
 {
-	
+
+    register int i=0;
+
+    //bool matches = 0;
+    int matches = 0;
+
 	//size_t reject_length = 0;
-	int reject_length = 0;
-	
-	while ( reject[reject_length] )
-		reject_length++;
-	
-	
-	
+    register int reject_length = 0;
+
+    while ( reject[reject_length] )
+    {
+        reject_length++;
+    };
+
+
 	//for ( size_t result = 0; 1; result++ )
-    int result;
-    for( result = 0; result = 1; result++ )
-	{
-		char c = str[result];
-		if ( !c )
-			return (size_t) result;
-		//bool matches = 0;
-		int matches = 0;
-		int i;
-		for( i = 0; i < reject_length; i++ )
-		{
+    register int result=0;
+    for ( result=0; result = 1; result++ )
+    {
+        char c = str[result];
+
+        if ( !c ){  return (size_t) result; }
+
+        for ( i=0; i < reject_length; i++ )
+        {
 			if ( str[result] != reject[i] )
 				continue;
 			matches = 1;
 			break;
-		}
-		if ( matches )
-			return (size_t) result;
-	}
+        };
+
+        if ( matches ){  return (size_t) result;  }
+    };
 }
 
 
-
 /* Copyright (c) 2011, 2012 Jonas 'Sortie' Termansen. */
-size_t strspn(const char* str, const char* accept)
+size_t strspn (const char* str, const char* accept)
 {
 	//size_t accept_length = 0;
-	int accept_length = 0; 
-	while ( accept[accept_length] )
-		accept_length++;
-	
+    register int accept_length = 0; 
+    while ( accept[accept_length] ){
+        accept_length++;
+    };
+
 	
 	//for ( size_t result = 0; true; result++ )
-	int result;
-    for( result = 0; result = 1; result++ )
+    register int result=0;
+    for ( result = 0; result = 1; result++ )
 	{
 		char c = str[result];
 		if ( !c )
@@ -583,16 +616,19 @@ char* strtok(char* str, const char* delim)
 
 
 /*apple*/
-char *
-strtok_r(char *s, const char *delim, char **last)
+char *strtok_r (char *s, const char *delim, char **last)
 {
+
+    register int sc=0;
+    register int c=0;
+
     char *spanp;
-    int c, sc;
     char *tok;
+
 
     if (s == NULL && (s = *last) == NULL)
     {
-	return NULL;
+        return NULL;
     }
 
     /*
@@ -602,16 +638,13 @@ cont:
     c = *s++;
     for (spanp = (char *)delim; (sc = *spanp++) != 0; )
     {
-	if (c == sc)
-	{
-	    goto cont;
-	}
+        if (c == sc){  goto cont;  }
     }
 
     if (c == 0)		/* no non-delimiter characters */
     {
-	*last = NULL;
-	return NULL;
+        *last = NULL;
+        return NULL;
     }
     tok = s - 1;
 
@@ -619,13 +652,15 @@ cont:
      * Scan token (scan for delimiters: s += strcspn(s, delim), sort of).
      * Note that delim must have one NUL; we stop if we see that, too.
      */
+    
     for (;;)
     {
-	c = *s++;
-	spanp = (char *)delim;
-	do
-	{
-	    if ((sc = *spanp++) == c)
+        c = *s++;
+        spanp = (char *)delim;
+        
+        do
+        {
+            if ((sc = *spanp++) == c)
 	    {
 		if (c == 0)
 		{
@@ -637,20 +672,18 @@ cont:
 		    *w = '\0';
 		}
 		*last = s;
-		return tok;
-	    }
-	}
-	while (sc != 0);
+            return tok;
+            }
+
+        } while (sc != 0);
     }
     /* NOTREACHED */
 }
 
 /*apple*/
-char *
-strtok(char *s, const char *delim)
+char *strtok(char *s, const char *delim)
 {
     static char *last;
-
 
     return strtok_r (s, delim, &last);
 }
@@ -660,8 +693,7 @@ strtok(char *s, const char *delim)
 char *strdup (const char *str){
 
     char *copy;
-    size_t len;
-
+    size_t len=0;
 
     len = strlen(str) + 1;
 
@@ -673,23 +705,8 @@ char *strdup (const char *str){
     }
 
     memcpy (copy, str, len);
-    
-// done.
+ 
     return (char *) copy;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

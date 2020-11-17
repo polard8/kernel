@@ -19,14 +19,14 @@
 
 int strcmp (char *s1, char *s2){
 
-    int i=0;
+    register int i=0;
 
-	for ( i=0; s1[i] == s2[i]; i++ )
-	{
-		if (s1[i] == '\0') { return 0; }
-	};
+    for ( i=0; s1[i] == s2[i]; i++ )
+    {
+        if (s1[i] == '\0') { return 0; }
+    };
 
-	return ( (int) (s1[i] - s2[i]) );
+    return ( (int) (s1[i] - s2[i]) );
 }
 
 
@@ -34,28 +34,27 @@ int strcmp (char *s1, char *s2){
  *     Compara duas strings. */
 
 int strncmp (char *s1, char *s2, int len){
-	
-	int n = len;
-	
-	while (n > 0)
-	{	
-	    n--;
+
+    // copy
+    register int n = len;
+
+    while (n > 0)
+    {
+        n--;
         
-		if (*s1 != *s2)
-		{
+        if (*s1 != *s2){
             return (int) 1;
-        };
-		
+        }
+
 		*s1++;
 		*s2++;
-	};		
+    };
 
 
     if (*s1 != '\0' || *s2 != '\0')
     {
         return (int) 2;
     };
-
 
     return 0;
 }
@@ -122,9 +121,10 @@ void *memcpy ( void *v_dst, const void *v_src, unsigned long c ){
  *     Obtem o tamanho de uma string. 
  */
 
-size_t strlen (const char *s){
-
-    int i;
+size_t strlen (const char *s)
+{
+    //loop
+    register int i=0;
 
     for ( i=0; s[i] != '\0'; i++ ){ ; };
 
@@ -137,16 +137,17 @@ size_t strlen (const char *s){
  *     Copia uma string 
  */
 
-char *strcpy (char *to, const char *from){
-	
-	int i = 0;
+char *strcpy (char *to, const char *from)
+{
+    //loop
+    register int i=0;
 
-	while (to[i] = from[i])
-	{
-		i += 1;
-	};
-	
-	return (to);
+    while (to[i] = from[i])
+    {
+        i += 1;
+    };
+
+    return (to);
 }
 
 

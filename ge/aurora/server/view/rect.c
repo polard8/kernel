@@ -166,19 +166,20 @@ void *rect_memcpy32 ( void *v_dst, const void *v_src, unsigned long c )
     long *src = (long *) v_src;
     long *dst = (long *) v_dst;
 
+    register unsigned long Copy = c;
 
 	//const char *src = v_src;
 	//char *dst = v_dst;
 
 
     /* Simple, byte oriented memcpy. */
-    while (c--){
+    while (Copy--)
+    {
         *dst++ = *src++;
     };
 
     return v_dst;
 }
-
 
 
 int gwssrv_refresh_this_rect ( struct gws_rect_d *rect )
@@ -215,21 +216,21 @@ gws_refresh_rectangle (
     void       *dest = (void *)      ____FRONTBUFFER_VA;
     const void *src  = (const void*) ____BACKBUFFER_VA;
 
-
+    //loop?
     register unsigned int i=0;
-
+    register int count=0; 
+    register unsigned int lines=0;      // quantas linhas.
     unsigned int line_size=0;  // rectangle line size in pixels.
-    unsigned int lines=0;      // quantas linhas.
-    unsigned int offset=0;
-
 
     // screen line size in pixels * bytes per pixel.
     unsigned int pitch=0;  
     // rectangle line size in pixels * bytes per pixel.
-    unsigned int rectangle_pitch=0;  
+    register unsigned int rectangle_pitch=0;  //loop
 
-    int count=0; 
 
+
+    unsigned int offset=0;
+    
     // = 3; 24bpp
     int bytes_count=0;
 

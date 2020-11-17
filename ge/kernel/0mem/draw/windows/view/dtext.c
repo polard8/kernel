@@ -5,7 +5,7 @@
  *     Escreve um texto dentro de uma janela.
  *     Faz parte do módulo Window Manager do tipo MB.
  *
- * Versão 1.0, 2015.
+ * 2015 - Created by Fred Nora.
  */
 
 
@@ -52,7 +52,8 @@ draw_string (
     unsigned char *string )
 {
 
-    int Index=0;
+    // loop
+    register int Index=0;
 
     int cWidth = get_char_width ();
     //int cHeight = get_char_height ();

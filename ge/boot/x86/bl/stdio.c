@@ -44,30 +44,36 @@ void panic (const char *msg)
  */
  
 void scroll (void){
-	
-    unsigned short i, j;
-    
+
+
+    //loop
+    register unsigned short i=0;
+    register unsigned short j=0;
+
+
 	//inicio da tela
 	unsigned short *p1 = (unsigned short *) ScreenStart;
 	
 	//inicio da segunda linha
     unsigned short *p2 = (unsigned short *) (ScreenStart + 2 * SCREEN_WIDTH) ;
 
+
 	//24 vezes
     for (i=0; i < ROWS - 1; i++)
-	{
-	    //80 vezes
-        for (j=0; j < SCREEN_WIDTH; j++){
+    {
+        //80 vezes
+        for (j=0; j < SCREEN_WIDTH; j++)
+        {
             *p1++ = *p2++;
-		};
-	};
+        };
+    };
 	
 	//80 vezes
     for (i=0; i < SCREEN_WIDTH; i++)
     {
 		*p1++ = 0x07*256 + ' '; 
 		//*p1++ = REVERSE_ATTRIB*256 + ' ';
-	};
+    };
 }
 
 
@@ -80,22 +86,22 @@ void scroll (void){
 // Não usamos mas esse modo de vídeo. 
  
 int bl_clear (int color){
-	
-    unsigned int i = 0;
+
+
+    //loop
+    register unsigned int i=0;
+
     char *vidmemz = (char *) 0x000B8000; 
 
     while (i < (80*25*2)) 
     { 
-        vidmemz[i] = 219; 
-        i++; 
-        
-        vidmemz[i] = color; 
-        i++; 
+        vidmemz[i] = 219;      i++; 
+        vidmemz[i] = color;    i++; 
     };
-	
-	g_cursor_x = 0;
-	g_cursor_y = 0;
-	
+
+    g_cursor_x = 0;
+    g_cursor_y = 0;
+
     return 0; 
 }
 
@@ -111,7 +117,9 @@ int bl_clear (int color){
 
 int kprintf ( char *message, unsigned int line, int color )
 {
-	unsigned int i = 0;	
+    //loop
+    register unsigned int i = 0;
+
 	char *vidmemp = (char *) 0x000B8000; 
 	
     i = (unsigned int) (line*80*2); 
@@ -218,16 +226,18 @@ static int printi (
 
     register char *s;
     register int t, neg = 0, pc = 0;
+    
+    //loop
     register unsigned int u = i;
 
 
-	if (i == 0)
-	{
-		print_buf[0] = '0';
-		print_buf[1] = '\0';
+    if (i == 0)
+    {
+        print_buf[0] = '0';
+        print_buf[1] = '\0';
 
-		return prints (out, print_buf, width, pad);
-	};
+        return prints (out, print_buf, width, pad);
+    }
 
 
 	if (sg && b == 10 && i < 0)
@@ -417,10 +427,10 @@ static void printchar (char **str, int c){
  *     Put a char.
  */
 
-int putchar (int ch){
-
+int putchar (int ch)
+{
     outbyte (ch);
-  
+
     return ch;    
 }
 
@@ -432,15 +442,18 @@ int putchar (int ch){
 
 void outbyte (int c){
 
+    // Copy.
+    register int Ch=c;
+
     static char prev = 0;
-    
+
     //Sendo menor que espaço, não pode ser 'tab,return,back...)    
 
-    if ( c <  ' '  && 
-         c != '\r' && 
-         c != '\n' && 
-         c != '\t' && 
-         c != '\b' )
+    if ( Ch <  ' '  && 
+         Ch != '\r' && 
+         Ch != '\n' && 
+         Ch != '\t' && 
+         Ch != '\b' )
     {
         return;
     }
@@ -449,54 +462,54 @@ void outbyte (int c){
     // Sendo maior que 'espaço'. 
     
 	// Volta ao início da linha.
-    if ( c == '\r' )
+    if ( Ch == '\r' )
     {
         g_cursor_x = 0; //volta ao inicio da linha
-        prev = c;
+        prev = Ch;
         return;    
     }
  
    
     // Vai pra próxima linha e volta ao inicio da linha.    
-    if ( c == '\n' && prev != '\r' )
+    if ( Ch == '\n' && prev != '\r' )
     {
         g_cursor_y++;      // proxima linha
         g_cursor_x = 0;    // inicio da linha 
-        prev = c;
+        prev = Ch;
         return;
     };
         
-    if ( c == '\n' && prev == '\r' )
+    if ( Ch == '\n' && prev == '\r' )
     {
         g_cursor_y++;    //proxima linha
-        prev = c;
+        prev = Ch;
         return; 
     };
 
     //tab
-    if ( c == '\t' )
+    if ( Ch == '\t' )
     {
         g_cursor_x += (4);    //criar a var -> 'g_tab_size'
-        prev = c;
+        prev = Ch;
         return;         
-    };
+    }
         
     //space 
-    if ( c == ' ' )
+    if ( Ch == ' ' )
     {
         g_cursor_x++; 
-        prev = c;
+        prev = Ch;
         return;         
-    };
+    }
         
     //delete 
-    if ( c == 8 )
+    if ( Ch == 8 )
     {
         g_cursor_x--; 
-        prev = c;
-        return;         
-    };
-       
+        prev = Ch;
+        return; 
+    }
+
         
     /*
      *  Filtra as dimensões da janela onde esta pintando.
@@ -525,15 +538,15 @@ void outbyte (int c){
 	// #importante:
 	// Imprime os caracteres normais.
 
-    _outbyte (c);
+    _outbyte (Ch);
 
 
-    prev = c;    //Atualisa o prev.	   
-	
+    prev = Ch;    //Atualisa o prev.
+
     //Nothing.
 
-done: 
-    return;
+//done: 
+    //return;
 }
 
 

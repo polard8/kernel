@@ -1,10 +1,10 @@
 /*
- * File: execve/crts/libc/stdlib.c
+ * File: stdlib.c
  *
  * Descrição:
  *     Stdlib. Parte da lib C do kernel.
  *
- * Versão 1.0, 2015.
+ * 2015.
  */
 
  

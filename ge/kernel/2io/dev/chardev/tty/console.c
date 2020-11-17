@@ -458,7 +458,11 @@ void _console_outbyte (int c, int console_number){
 // This functions calls _console_outbyte to draw
 // the char into the screen.
 
-void console_outbyte (int c, int console_number){
+void console_outbyte (int c, int console_number)
+{
+
+    // Copy.
+    register int Ch=c;
 
     static char prev = 0;
 
@@ -482,7 +486,7 @@ void console_outbyte (int c, int console_number){
 
 
     // form feed - Nova tela.
-    if ( c == '\f' )
+    if ( Ch == '\f' )
     {
         TTY[console_number].cursor_y = TTY[console_number].cursor_top;
         TTY[console_number].cursor_x = TTY[console_number].cursor_left;
@@ -497,7 +501,7 @@ void console_outbyte (int c, int console_number){
 
     // Início da próxima linha. 
     // not used!!!  "...\r\n";
-    if ( c == '\n' && prev == '\r' ) 
+    if ( Ch == '\n' && prev == '\r' ) 
     {
         // #todo: 
         // Melhorar esse limite.
@@ -507,11 +511,11 @@ void console_outbyte (int c, int console_number){
             console_scroll (console_number);
 
             TTY[console_number].cursor_y = (TTY[console_number].cursor_bottom);
-            prev = c; 
+            prev = Ch; 
         }else{
             TTY[console_number].cursor_y++;
             TTY[console_number].cursor_x = TTY[console_number].cursor_left;
-            prev = c;
+            prev = Ch;
         };
         return;
     }
@@ -520,7 +524,7 @@ void console_outbyte (int c, int console_number){
 
     // Próxima linha no modo terminal.
     // "...\n"
-    if ( c == '\n' && prev != '\r' ) 
+    if ( Ch == '\n' && prev != '\r' ) 
     {
         // se o line feed apareceu quando estamos na ultima linha
         if ( TTY[console_number].cursor_y > (TTY[console_number].cursor_bottom) )
@@ -530,7 +534,7 @@ void console_outbyte (int c, int console_number){
             console_scroll (console_number);
             
             TTY[console_number].cursor_y = (TTY[console_number].cursor_bottom);
-            prev = c;
+            prev = Ch;
 
         }else{
             TTY[console_number].cursor_y++;
@@ -552,7 +556,7 @@ void console_outbyte (int c, int console_number){
 			//Obs: No caso estarmos imprimindo em um editor 
 			//então não devemos voltar ao início da linha.
 
-            prev = c;
+            prev = Ch;
         };
 
         return;
@@ -563,11 +567,11 @@ void console_outbyte (int c, int console_number){
     // #todo: 
     // Criar a variável 'g_tab_size'.
     
-    if ( c == '\t' ) 
+    if ( Ch == '\t' ) 
     {
         TTY[console_number].cursor_x += (8);
         //g_cursor_x += (4); 
-        prev = c;
+        prev = Ch;
         return; 
 
 		//Não adianta só avançar, tem que apagar o caminho até lá.
@@ -592,10 +596,10 @@ void console_outbyte (int c, int console_number){
 
 
     // Apenas voltar ao início da linha.
-    if ( c == '\r' )
+    if ( Ch == '\r' )
     {
         TTY[console_number].cursor_x = TTY[console_number].cursor_left;  
-        prev = c;
+        prev = Ch;
         return; 
     }
 
@@ -614,10 +618,10 @@ void console_outbyte (int c, int console_number){
     
  
     // backspace ??
-    if ( c == 8 )
+    if ( Ch == 8 )
     {
         TTY[console_number].cursor_x--; 
-        prev = c;
+        prev = Ch;
         return;
     }
 
@@ -669,9 +673,9 @@ void console_outbyte (int c, int console_number){
     // Atualisa o prev.
 draw:
 
-    _console_outbyte (c, console_number);
+    _console_outbyte (Ch, console_number);
 
-    prev = c;
+    prev = Ch;
 }
 
 

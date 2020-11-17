@@ -2,8 +2,6 @@
  * File: line.c 
  * 
  * 
- * 
- * 
  */
 
 
@@ -75,13 +73,18 @@ A_naive_line_drawing_algorithm(
     unsigned long y2, 
     unsigned long color)
 {
-    unsigned long dx =  x2 - x1;
-    unsigned long dy =  y2 - y1;
-    unsigned long x=0;
-    unsigned long y=0;
-    
+
+    //loop
+    register unsigned long x=0;
+    register unsigned long y=0;
+
+    unsigned long dx =  (x2 - x1);
+    unsigned long dy =  (y2 - y1);
+
+
     for ( x = x1; x < x2; x++ )
     {
+         // ugly
          y = (y1 + dy * (x - x1) / dx);
          
          pixelBackBufferPutpixel ( color, x, y );
@@ -94,7 +97,7 @@ A_naive_line_drawing_algorithm(
 //test1
 void test_draw_line(void)
 {
-    int g=0;
+    register int g=0;
 
     for( g=0; g<400; g++ )
     {
@@ -113,7 +116,9 @@ void test_draw_line(void)
 // illusion
 void test_draw_line2(void)
 {
-    int g=0;
+    
+    register int g=0;
+    
     unsigned long w = gws_get_device_width();
     unsigned long h = gws_get_device_height();
     unsigned long vertex1[2];

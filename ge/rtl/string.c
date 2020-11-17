@@ -152,28 +152,32 @@ bool wild_filename_list(char *wild_st,char *src_st)
 
 int strupr (char *n){
 
-      int i=0;
-      
-      // #bugbug
-      // Find another way to do this.
-      for (i=0; n[i]; i++) 
-      {
-               n[i] = toupper(n[i]);
-      };
-      return 1;
+    register int i=0;
+    
+    // #bugbug
+    // Find another way to do this.
+    for (i=0; n[i]; i++) 
+    {
+        n[i] = toupper(n[i]);
+    };
+    
+    return 1;
 }
 
-int strlwr(char *n) 
-{
-      int i=0;
 
-      // #bugbug
-      // Find another way to do this.
-      for (i=0; n[i]; i++) 
-      {
-               n[i] = tolower(n[i]);
-      }
-      return 1;
+int strlwr (char *n) 
+{
+
+    register int i=0;
+
+    // #bugbug
+    // Find another way to do this.
+    for (i=0; n[i]; i++) 
+    {
+        n[i] = tolower(n[i]);
+    };
+    
+    return 1;
 }
 
 
@@ -245,12 +249,15 @@ int strncasecmp(const char *_l, const char *_r, size_t n)
 }
 */
 
-void *memsetw (void *dst, int val, size_t count){
-
+void *memsetw (void *dst, int val, size_t count)
+{
     unsigned short *temp = (unsigned short *) dst;
 
+    //danger!
     for ( ; count != 0; count--)
+    {
         *temp++ = val;
+    };
 
     return (void *) dst;
 }
@@ -261,7 +268,8 @@ void *memsetw (void *dst, int val, size_t count){
  *     Compare memory regions.
  */
 
-int memcmp (const void *s1, const void *s2, size_t n){
+int memcmp (const void *s1, const void *s2, size_t n)
+{
 
     if (n != 0) 
     {
@@ -290,12 +298,16 @@ int memcmp (const void *s1, const void *s2, size_t n){
 char *strdup (const char *str){
 
     char *copy;
-    size_t len;
+    size_t len=0;
+
 
     len = strlen(str) + 1;
 
-    if (!(copy = (char *) malloc( ( size_t ) len ) ))
-        return (NULL);
+    // ugly!
+    if ( !(copy = (char *) malloc ( ( size_t ) len ) ) )
+    {
+        return NULL;
+    }
 
     memcpy (copy, str, len);
     
@@ -311,9 +323,10 @@ char *strndup (const char *s, size_t n){
 
     d = (char *) malloc (l + 1);
 
-    if (!d)
+    if (!d){
         return NULL;
-
+    }
+    
     memcpy (d, s, l);
 
     d[l] = '\0';
@@ -405,19 +418,22 @@ char *strnchr (const char *s, size_t count, int c){
 char *strrchr (const char *p, int ch){
 
     char *save;
-    char c;
+    char c=0;
 
     c = ch;
 
     for ( save = NULL;; ++p ) 
     {
-        if (*p == c)
+        if (*p == c){
             save = (char *) p;
+        }
 
-        if (*p == '\0')
+        if (*p == '\0'){
             return (char *) save;
-    }
-	/* NOTREACHED */
+        }
+    };
+    
+    /* NOTREACHED */
 }
 
 
@@ -498,7 +514,9 @@ int strncasecmp(const char* s1, const char* s2, size_t n)
 
 int strcasecmp (const char *s1, const char *s2){
 
-    unsigned char s1ch, s2ch;
+    unsigned char s1ch=0; 
+    unsigned char s2ch=0;
+
 
     for (;;){
 
@@ -507,17 +525,14 @@ int strcasecmp (const char *s1, const char *s2){
 
 		//tolower
 		
-		if (s1ch >= 'A' && s1ch <= 'Z')
-			s1ch += 32;
-		
-		if (s2ch >= 'A' && s2ch <= 'Z')
-			s2ch += 32;
-		
-		if (s1ch != s2ch)
-			return (int) (s1ch - s2ch);
-		
-		if (s1ch == '\0')
-			return 0;
+        if (s1ch >= 'A' && s1ch <= 'Z'){ s1ch += 32; }
+        if (s2ch >= 'A' && s2ch <= 'Z'){ s2ch += 32; }
+
+        if (s1ch != s2ch){
+            return (int) (s1ch - s2ch);
+        }
+
+        if (s1ch == '\0'){  return 0;  }
     }
 	/* NOTREACHED */
 }
@@ -542,13 +557,13 @@ char *strncpy (char *s1, const char *s2, size_t n){
     {
         *s++ = *s2++;
         n--;
-    }
+    };
 
     while (n > 0)
     {
         *s++ = '\0';
         n--;
-    }
+    };
 
     return (char *) s1;
 }
@@ -562,20 +577,18 @@ char *strncpy (char *s1, const char *s2, size_t n){
 // See:
 // http://man7.org/linux/man-pages/man3/strcmp.3.html
 
-int strcmp(const char *s1, const char *s2){
+int strcmp (const char *s1, const char *s2){
 
-    int i=0;
+    register int i=0;
 
     for ( i=0; s1[i] == s2[i]; i++ )
     {
-        if ( s1[i] == '\0' ){ 
-            return 0; 
-        }
+        if ( s1[i] == '\0' ){  return 0;  }
     };
-
 
     return (int) ( s1[i] - s2[i] );
 }
+
 
 
 /*
@@ -592,19 +605,17 @@ int strncmp (const char *s1, const char *s2, size_t n){
     {
         n--;
 
-        if ( *s1 != *s2 ){ 
-            return (int) 1; 
-        }
+        if ( *s1 != *s2 ){  return (int) 1;  }
 
-        *s1++; 
+        *s1++;  
         *s2++;
     };
+
 
     if ( *s1 != '\0' || *s2 != '\0' )
     {
         return (int) 2;
     }
-
 
     return 0;
 }
@@ -617,18 +628,17 @@ int strncmp (const char *s1, const char *s2, size_t n){
 
 void *memset ( void *ptr, int value, int size ){
 
+    register int i=0;
+
     if ( ptr != NULL && size > 0 )
     {
         unsigned char *temp = ptr;
 
-        int i = 0;
-
-        for ( i=0; i < size; i++ ){
+        for ( i=0; i < size; i++ )
+        {
             *temp++ = (unsigned char) value;
-        }
-
+        };
     }
-
 
     return (void *) ptr;
 }
@@ -678,14 +688,11 @@ void *memcpy ( void *v_dst, const void *v_src, unsigned long c ){
  *     Copy a string. 
  */
 
-char *strcpy ( char *to, const char *from ){
+char *strcpy ( char *to, const char *from )
+{
+    register int i=0;
 
-    int i=0;
-
-    while ( to[i] = from[i] )
-    { 
-        i += 1; 
-    };
+    while ( to[i] = from[i] ){  i += 1;  };
 
     return (char *) to;
 }
@@ -707,23 +714,27 @@ char* strcpy(char* to, const char* from)
 
 size_t strlcpy (char *dst, const char *src, size_t size){
 
-    size_t bytes = 0;
+
     char *q = dst;
     const char *p = src;
-    char ch;
+
+    //register char ch=0;
+    //register size_t bytes = 0;
+    char ch=0;
+    size_t bytes=0;
 
     while ( (ch = *p++) )
     {
-		if (bytes + 1 < size)
-			*q++ = ch;
-		bytes++;
-    }
+        if (bytes + 1 < size){  
+            *q++ = ch;  
+        }
+        bytes++;
+    };
 
 	// If size == 0 there is no space for a final null... 
-    if (size)
-        *q = '\0';
+    if (size){  *q = '\0';  }
 
-    return bytes;
+    return (size_t) bytes;
 }
 
 
@@ -737,10 +748,7 @@ char *strcat ( char *to, const char *from ){
 
     char *ret = to;
 
-    while ( *to )
-    { 
-        to += 1; 
-    };
+    while ( *to ){  to += 1;  };
 
     strcpy ( to, from );
     
@@ -759,61 +767,70 @@ char *strcat ( char *to, const char *from ){
  */
 
 
-char *strchrnul (const char *s, int c){
+char *strchrnul (const char *s, int c)
+{
+    while (*s && *s != (char)c){  s++;  };
 
-	while (*s && *s != (char)c)
-		s++;
-	return (char *) s;
+    return (char *) s;
 }
 
 
-size_t strlcat (char *dst, const char *src, size_t size){
-
-    size_t bytes = 0;
+size_t strlcat (char *dst, const char *src, size_t size)
+{
     char *q = dst;
     const char *p = src;
-    char ch;
 
+    //register char ch=0;
+    //register size_t bytes = 0;
+    char ch=0;
+    size_t bytes = 0;
+    
     //#bugbug
     //E se size for menor que zero.?
 
     while (bytes < size && *q)
     {
-		q++;
-		bytes++;
+        q++;
+        bytes++;
     };
 
-    if (bytes == size)
+    if (bytes == size){
         return (bytes + strlen(src));
+    }
 
-    while ((ch = *p++)){
+    //ugly
+    while ((ch = *p++))
+    {
 
 		if (bytes + 1 < size)
 			*q++ = ch;
 		bytes++;
     };
 
-	*q = '\0';
-	return bytes;
+    *q = '\0';
+
+    return bytes;
 }
 
 
-char *strncat (char *dst, const char *src, size_t n){
-
+char *strncat (char *dst, const char *src, size_t n)
+{
     char *q = strchr (dst, '\0');
 
     const char *p = src;
 
-    char ch;
-
+    //register char ch=0;
+    char ch=0;
+    
     // #bugbug
     // E se n for menor que zero?
 
     while (n--)
     {
+        //very ugly
         *q++ = ch = *p++;
-        if (!ch)
-            return dst;
+        
+        if (!ch){  return dst;  };
     };
 
     *q = '\0';
@@ -862,10 +879,12 @@ void  bzero ( char *cp, int len ){
 
 size_t strlen (const char *s){
 
-    size_t i=0;
+    register size_t i=0;
 
     for ( i=0; s[i] != '\0'; i++ )
-    { ; };
+    { 
+        ; 
+    };
 
     return (size_t) i;
 }
@@ -878,38 +897,39 @@ size_t strlen (const char *s){
  *  return MAXLEN. 
  */
 
-size_t strnlen ( const char *s, size_t maxlen ){
-
-    size_t n=0;
+size_t strnlen ( const char *s, size_t maxlen )
+{
     const char *e;
-    
+    register size_t n=0;
+        
     //#bugbug
     // E se maxlen for negativo.
 
     //if ( maxlen <=0 )
         //return -1;
 
-    for (e = s, n = 0; *e && n < maxlen; e++, n++)
-    { ; };
-
+    //very ugly
+    for ( e=s, n=0; *e && n<maxlen; e++, n++ )
+    { 
+        ; 
+    };
 
     return (size_t) n;
 }
 
 
-char *strpbrk (const char *cs, const char *ct){
-
-    const char *sc1, *sc2;
+char *strpbrk (const char *cs, const char *ct)
+{
+    const char *sc1;
+    const char *sc2;
 
     for ( sc1 = cs; *sc1 != '\0'; ++sc1 )
     {
         for ( sc2 = ct; *sc2 != '\0'; ++sc2 )
         {
-            if (*sc1 == *sc2)
-                return (char *) sc1;
+            if (*sc1 == *sc2){ return (char *) sc1; }
         };
     };
-
 
     return NULL;
 }
@@ -934,7 +954,9 @@ char *strsep (char **s, const char *ct){
     char *end;
 
     if (sbegin == NULL)
+    {
         return NULL;
+    }
 
     end = strpbrk (sbegin, ct);
 
@@ -1071,10 +1093,12 @@ check_bytes8 (
 
     while (bytes)
     {
-		if (*start != value)
-			return (void *)start;
-		start++;
-		bytes--;
+        if (*start != value){
+            return (void *) start;
+        }
+
+        start++;
+        bytes--;
     };
 
     return NULL;
@@ -1091,11 +1115,17 @@ check_bytes8 (
  * Returns pointer to the nul byte at the end of @s.
  */
 
-char *strreplace (char *s, char old, char new){
+char *strreplace (char *s, char old, char new)
+{
 
-	for (; *s; ++s)
-		if (*s == old)
-			*s = new;
+    //ugly
+    for (; *s; ++s)
+    {
+        if (*s == old)
+        { 
+            *s = new; 
+        }
+    };
 
     return (char *) s;
 }
@@ -1112,40 +1142,45 @@ char *strreplace (char *s, char old, char new){
  */
 
 size_t strcspn ( const char *str, const char *reject ){
-	
-    int result;
-	
-	//size_t reject_length = 0;
-    int reject_length = 0;
-	
-	while ( reject[reject_length] )
-		reject_length++;
-	
-	
+
+    // The return.
+    size_t Result=0;
+
+    // Iterators.
+    //size_t reject_length = 0;
+    register int reject_length = 0;
+    register int i=0;
+
+    //bool matches = 0;
+    int matches=0;
+
+
+    while ( reject[reject_length] )
+    {
+        reject_length++;
+    };
+
 	// ?? Não seria "result==1" ??
 	//for ( size_t result = 0; 1; result++ )
-    for ( result=0; result=1; result++ )
+    for ( Result=0; Result=1; Result++ )
     {
-		char c = str[result];
-		
-		if ( !c )
-			return (size_t) result;
-		
-		//bool matches = 0;
-		int matches = 0;
-		int i;
-		
-		for ( i=0; i < reject_length; i++ )
-		{
-			if ( str[result] != reject[i] )
-				continue;
-			matches = 1;
-			break;
-		};
-		
-		if ( matches )
-			return (size_t) result;
-	};
+        char c = str[Result];
+
+        if ( !c ){  return (size_t) Result;  }
+
+        for ( i=0; i < reject_length; i++ )
+        {
+            if ( str[Result] != reject[i] )
+            { 
+                continue; 
+            }
+
+            matches = 1;
+            break;
+        };
+
+        if ( matches ){  return (size_t) Result;  }
+    };
 }
 
 
@@ -1158,10 +1193,17 @@ size_t strcspn ( const char *str, const char *reject ){
  
 size_t strspn ( const char *str, const char *accept ){
 
-    int result;
+    // The return
+    int result=0;
 
+    //iterators
 	//size_t accept_length = 0;
-    int accept_length = 0; 
+    register int accept_length = 0; 
+    register int i=0;
+
+		//bool matches = false;
+    int matches = 0;
+
 
 	while ( accept[accept_length] )
 		accept_length++;
@@ -1177,9 +1219,6 @@ size_t strspn ( const char *str, const char *accept ){
 		if ( !c )
 			return (size_t) result;
 		
-		//bool matches = false;
-		int matches = 0;
-		int i;
 		
 		//for ( size_t i = 0; i < accept_length; i++ )
 		
@@ -1206,11 +1245,14 @@ size_t strspn ( const char *str, const char *accept ){
  *     Apple. (Open Source)
  */
 
-char *strtok_r ( char *s, const char *delim, char **last ){
+char *strtok_r ( char *s, const char *delim, char **last )
+{
 
     char *spanp;
-    int c, sc;
     char *tok;
+
+    register int c=0; 
+    register int sc=0;
 
     if ( s == NULL && (s = *last) == NULL )
     {
@@ -1225,9 +1267,7 @@ cont:
     
     for ( spanp = (char *) delim; (sc = *spanp++) != 0; )
     {
-        if (c == sc){
-            goto cont;
-        }
+        if (c == sc){  goto cont;  }
     };
 
 
@@ -1249,8 +1289,8 @@ cont:
 	    c = *s++;
 	    spanp = (char *) delim;
 	    
-		do
-	    {
+        do
+        {
 	        if ( (sc = *spanp++) == c )
 	        {
                 if ( c == 0 ){
@@ -1283,8 +1323,8 @@ cont:
  *     strtok 
  */
 
-char *strtok ( char *s, const char *delim ){
-
+char *strtok ( char *s, const char *delim )
+{
     static char *last;
 
     return strtok_r ( s, delim, &last );
@@ -1297,7 +1337,8 @@ char *strtok ( char *s, const char *delim ){
  * linux style 
  */
 
-char *strchr (const char *s, int c){
+char *strchr (const char *s, int c)
+{
 
 	for (; *s != (char) c; ++s)
 		if (*s == '\0')
@@ -1369,10 +1410,12 @@ void *memscan (void *addr, int c, size_t size){
 
 char *strstr (const char *s1, const char *s2){
 
-    size_t l1, l2;
+    register size_t l1=0; 
+    register size_t l2=0;
+
 
     l2 = strlen(s2);
-	
+
 	if (!l2)
 		return (char *)s1;
 	l1 = strlen(s1);
@@ -1384,7 +1427,6 @@ char *strstr (const char *s1, const char *s2){
 			return (char *)s1;
 		s1++;
     };
-
 
     return NULL;
 }
@@ -1448,6 +1490,7 @@ char *index (const char *s, int c){
     do {
         if (*s == c)
             return (char *) (s);
+
     } while (*s++);
 
     return(NULL);
@@ -1471,7 +1514,11 @@ char *rindex (const char *s, int c)
 
 size_t strxfrm (char *dst, const char *src, size_t n){
 
-    size_t srclen, copysize;
+    // The return.
+    size_t srclen=0; 
+    
+    // work integer.
+    register size_t copysize=0;
 
 	// Since locales are unimplemented, this is just a copy.
 
@@ -1479,15 +1526,15 @@ size_t strxfrm (char *dst, const char *src, size_t n){
 
     if (n != 0)
     {
-		copysize = srclen < n ? srclen : n - 1;
-		
+        copysize = srclen < n ? srclen : n - 1;
+
 		//(void) memcpy (dst, src, copysize);
-		memcpy (dst, src, copysize);
-		
-		dst[copysize] = 0;
+        memcpy (dst, src, copysize);
+
+        dst[copysize] = 0;
     }
 
-    return (srclen);
+    return (size_t) srclen;
 }
 
 

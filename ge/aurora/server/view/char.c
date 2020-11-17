@@ -19,11 +19,12 @@ DrawBorder(
     int solid )
 {
 
-    int i=0;
+    //loop
+    register int i=0;
+    
+    // #bugbug
     int CharSize = 8;
-    
-    
-    
+
     
     if (solid) {
 
@@ -38,22 +39,23 @@ DrawBorder(
       charBackbufferDrawcharTransparent( r+CharSize, b+CharSize, COLOR_BLUE, CH_DBL_BR );
       
       
-      for ( i=l; i <= (r/CharSize); i++) {
+      for ( i=l; i <= (r/CharSize); i++ ) 
+      {
          //PlotScreenU8(CH_DBL_HORZ+attr,i,t-1);
          //PlotScreenU8(CH_DBL_HORZ+attr,i,b+1);
 
           charBackbufferDrawcharTransparent( i*CharSize, t-CharSize, COLOR_BLUE, CH_DBL_HORZ );
           charBackbufferDrawcharTransparent( i*CharSize, b+CharSize, COLOR_BLUE, CH_DBL_HORZ );
-      }
+      };
       
-      
-      for (i=t;i <= (b/CharSize);i++) {
+      for (i=t; i <= (b/CharSize); i++) 
+      {
           //PlotScreenU8(CH_DBL_VERT+attr,l-1,i);
           //PlotScreenU8(CH_DBL_VERT+attr,r+1,i);
 
          charBackbufferDrawcharTransparent( l-CharSize,i*CharSize, COLOR_BLUE, CH_DBL_VERT );
          charBackbufferDrawcharTransparent( r+CharSize,i*CharSize, COLOR_BLUE, CH_DBL_VERT );
-      }
+      };
       
 
     }else{
@@ -284,11 +286,12 @@ charBackbufferDrawcharTransparent (
     unsigned long c )
 {
 
+    //loop
+    register int y2=0;
+    register int x2=0;
+
     char *work_char;
     unsigned char bit_mask = 0x80;
-
-    int x2=0;
-    int y2=0;
 
     //int CharWidth;
     //int CharHeight;
@@ -410,11 +413,13 @@ charBackbufferDrawchar (
     unsigned long bgcolor )
 {
 
+    //loop
+    register int y2=0;
+    register int x2=0;
+
     char *work_char; 
     unsigned char bit_mask = 0x80;
 
-    int x2=0;
-    int y2=0;
 
 
     /*

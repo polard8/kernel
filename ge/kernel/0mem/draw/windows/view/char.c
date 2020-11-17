@@ -78,17 +78,19 @@ d_drawchar_transparent (
     unsigned long c )
 {
 
+    // loop
+    register int y2=0;
+    register int x2=0;
+
     // #todo: 
     // Rever isso.
 
     struct window_d *hWindow;
-
-    int x2=0;
-    int y2=0;
-
+    
     unsigned char bit_mask = 0x80;
 
     char *work_char;  
+
 
 	//
 	// Window Terminal.
@@ -229,6 +231,7 @@ d_drawchar_transparent (
             }
 
             // Rotate bitmask.
+            // very good!
             bit_mask = (bit_mask >> 1); 
         };
 
@@ -259,6 +262,10 @@ d_draw_char (
     unsigned long bgcolor )
 {
 
+    // loop
+    register int y2=0;
+    register int x2=0;
+
     // #todo: 
     // Rever isso.
 
@@ -271,9 +278,6 @@ d_draw_char (
     // The mask.
     unsigned char bit_mask = 0x80;
 
-    // The position.
-    int x2=0;
-    int y2=0;
 
 
 	//
@@ -404,6 +408,7 @@ d_draw_char (
             backbuffer_putpixel ( *work_char & bit_mask ? fgcolor: bgcolor, 
                 x + x2, y, 0 );
 
+            // Very good!
             bit_mask = (bit_mask >> 1); 
         };
 

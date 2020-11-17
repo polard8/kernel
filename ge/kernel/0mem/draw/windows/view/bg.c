@@ -87,7 +87,8 @@ void bg_load_image (void)
 
 void backgroundDraw (unsigned long color){
 
-    unsigned long i=0;
+    //loop
+    register unsigned long i=0;
 
 
     if (VideoBlock.useGui != 1){
@@ -162,16 +163,19 @@ void backgroundBackground (void)
 
 int backgroundInit (void){
 
+    //loop
+    register int i=0;
+    
     unsigned long *lfb = (unsigned long *) BACKBUFFER_VA;
-
-    int i=0;
 
 
     // #bugbug:
     // We need to get w and h if the function is available.
     //debug_print ("backgroundInit: FIXME: w and h\n");
 
-    for ( i=0; i< 800*600; i++ ){
+    //#bugbug
+    for ( i=0; i< 800*600; i++ )
+    {
         lfb[i] = COLOR_BLACK;
     }
 

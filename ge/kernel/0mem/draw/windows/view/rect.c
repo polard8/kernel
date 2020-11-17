@@ -37,26 +37,25 @@ void *rectStrCopyMemory32 (
     int count ) 
 {
 
-    int i=0;
+    register int i=0;
 
+    // Yes
+    if ( (dest == NULL)  || 
+         (src == NULL)   || 
+         (count == 0)    || 
+         (src == dest) ) 
+    {
+        return dest;
+    }
 
-	if ( (dest == NULL)  || 
-	     (src == NULL)   || 
-		 (count == 0)    || 
-		 (src == dest) ) 
-	{
-        // Yes		
-		return dest;
-	}
-	
-	// GCC should optimize this for us :)
-	
-	for ( i=0; i < count; i++ ) 
-	{
-		dest[i] = src[i];
-	}
-	
-	return dest;
+    // GCC should optimize this for us :)
+    // I'm lying.
+    for ( i=0; i < count; i++ ) 
+    {
+        dest[i] = src[i];
+    };
+
+    return dest;
 }
 
 
@@ -179,14 +178,20 @@ void rectDrawRectangle( struct window_d *window, struct rect_d *rect)
  */
 
 void 
-drawDataRectangle ( unsigned long x, 
-                    unsigned long y, 
-                    unsigned long width, 
-                    unsigned long height, 
-                    unsigned long color )
+drawDataRectangle ( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long width, 
+    unsigned long height, 
+    unsigned long color )
 {
-	struct rect_d rect;
-	
+
+    //loop
+    register unsigned long internal_height = height;
+
+
+    struct rect_d rect;
+
     rect.bg_color = color;
 
     //Dimensions.
@@ -219,16 +224,17 @@ drawDataRectangle ( unsigned long x,
 	{
         rect.bottom = SavedY;
 	}
-    	
-  	
+
+
     // Draw lines on backbuffer.
-	
-	while (height--)
-	{	
-	    my_buffer_horizontal_line ( rect.left, y, rect.right, rect.bg_color );
-		
-		y++;
-    };    
+
+    while (internal_height--)
+    {
+        my_buffer_horizontal_line ( 
+            rect.left, y, rect.right, rect.bg_color );
+
+        y++;
+    };
 }
 
 
@@ -319,13 +325,13 @@ refresh_rectangle (
     const void *src  = (const void*) BACKBUFFER_ADDRESS;
 
 
-	//#TEST
-	register unsigned int i=0;
-	//unsigned int i;
+    // loop
+    register unsigned int i=0;
+    register unsigned int lines=0;
+    unsigned int line_size=0; 
+    register int count=0; 
 
 
-	unsigned int line_size, lines;
-	unsigned int offset=0;
 
     // screen line size in pixels * bytes per pixel.
     unsigned int pitch=0;  
@@ -333,11 +339,11 @@ refresh_rectangle (
     // rectangle line size in pixels * bytes per pixel.
     unsigned int internal_pitch=0;  
 
+    unsigned int offset=0;
 
-	int count=0; 
+    // = 3; 24bpp
+    int bytes_count=0;
 
-	// = 3; 24bpp
-	int bytes_count=0;
 
 
     // dc
@@ -348,10 +354,8 @@ refresh_rectangle (
         panic ("refresh_rectangle: Width\n");
     }
 
-
     line_size = (unsigned int) width; 
     lines     = (unsigned int) height;
-
 
     switch (SavedBPP){
 
@@ -379,8 +383,8 @@ refresh_rectangle (
     offset = (unsigned int) ( (y*pitch) + (bytes_count*x) );
 
 
-    dest = (void *)       (dest + offset);    
-    src  = (const void *) (src  + offset);    
+    dest = (void *)       (dest + offset); 
+    src  = (const void *) (src  + offset); 
 
 
 	// #bugbug
@@ -440,59 +444,57 @@ refresh_rectangle2 (
 	
 
 
-	
 	// #todo
 	// Fazer a mesma otimizaçao que fizemos na outra rotina de refresh rectangle.
 
 
+    void *p       = (void *)       buffer1;  // destino.
+    const void *q = (const void *) buffer2;  // origem.
 
-	  
-	void *p = (void *) buffer1;   // destino
-	const void *q = (const void *) buffer2;  //origem.
 
-	//register unsigned int i;
-	unsigned int i;
-	
-	unsigned int line_size, lines;
-	unsigned int offset;
+    register unsigned int i=0;
+    register unsigned int lines=0;
+    unsigned int line_size=0; 
+    register int count=0; 
+
+    unsigned int offset=0;
+
+	// = 3; //24bpp
+    int bytes_count;
+
 	unsigned long Width = (unsigned long) screenGetWidth();
 	unsigned long Height = (unsigned long) screenGetHeight();	
 
-	int count; 
 
-	// = 3; //24bpp
-	int bytes_count;
-	
+
 	line_size = (unsigned int) width; 
-	lines = (unsigned int) height;
-	
-	switch (SavedBPP)
-	{
-		case 32:
-		    bytes_count = 4;
-		    break;
-		
-		case 24:
-		    bytes_count = 3;
-			break;
-	}
-	
-	
+	lines     = (unsigned int) height;
+
+
+    switch (SavedBPP)
+    {
+		case 32:  bytes_count = 4;  break;
+		case 24:  bytes_count = 3;  break;
+		//#todo: default
+    };
+
+
 	//offset = (unsigned int) BUFFER_PIXEL_OFFSET( x, y );
 	offset = (unsigned int) ( (bytes_count*SavedX*(y)) + (bytes_count*(x)) );	
 
 	
-	p = (void *) (p + offset);    
+	p = (void *)       (p + offset);    
 	q = (const void *) (q + offset);    
-	 
+
+    //if( use_vsync)
     //vsync ();
-	
+
 	
 	//(line_size * 3) é o número de bytes por linha. 
 	
 	//se for divisível por 4.
-	if( ((line_size * 3) % 4) == 0 )
-	{
+    if ( ((line_size * 3) % 4) == 0 )
+    {
         count = ((line_size * 3) / 4);  	
 
 	    for ( i=0; i < lines; i++ )
@@ -503,11 +505,11 @@ refresh_rectangle2 (
 			q += (Width * 3);
 	 	    p += (Width * 3);
 	    };
-	}
+    }
 
 	//se não for divisível por 4.
-	if( ((line_size * 3) % 4) != 0 )
-	{
+    if ( ((line_size * 3) % 4) != 0 )
+    {
 
         //count = (line_size * 3);  		
 	
@@ -516,9 +518,9 @@ refresh_rectangle2 (
 		    memcpy ( (void *) p, (const void *) q, (line_size * 3) );
 		    q += (Width * 3);
 		    p += (Width * 3);
-	    };	
-	}  		
-	
+	    };
+    }
+
 	/*
 	
 	for ( i=0; i < lines; i++ )
@@ -556,10 +558,10 @@ int initialize_saved_rect (void){
 	    }
 
         SavedRect->x = 0; 
-	    SavedRect->y = 0;
-		SavedRect->width = 0;
-		SavedRect->height = 0;
-		
+        SavedRect->y = 0;
+        SavedRect->width = 0;
+        SavedRect->height = 0;
+
 		SavedRect->pixels = 0;
 		SavedRect->bytes = 0;
 		SavedRect->bpp = 0;
@@ -587,13 +589,13 @@ int initialize_saved_rect (void){
 //salvar um bmp em um arquivo.
 
 int 
-save_rect ( unsigned long x, 
-            unsigned long y, 
-            unsigned long width, 
-            unsigned long height )
+save_rect ( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long width, 
+    unsigned long height )
 {
-	
-	
+
         //#debug
         //Ok. está pegando os valores certos.
         //printf ("l=%d t=%d w=%d h=%d \n", x, y, width, height );

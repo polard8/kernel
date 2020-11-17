@@ -1224,12 +1224,17 @@ FILE *fopen2 ( const char *filename, const char *mode ){
 
 void scroll (void){
 
+    //loop
+    register unsigned short i=0;
+    register unsigned short j=0;
+
+
 	//Início da tela.
     unsigned short *p1 = (unsigned short *) SCREEN_START;
 
 	//Início da segunda linha.
     unsigned short *p2 = (unsigned short *) (SCREEN_START + 2 * SCREEN_WIDTH);
-    unsigned short i, j;
+
 
 
 	// Linhas.
@@ -2087,15 +2092,18 @@ void libc_set_output_mode (int mode){
  
 void outbyte (int c){
 
+    // Copy.
+    register int Ch=c;
+
     static char prev = 0;
 
 	// spaces.
 
-    if ( c <  ' '  && 
-         c != '\r' && 
-         c != '\n' && 
-         c != '\t' && 
-         c != '\b' )
+    if ( Ch <  ' '  && 
+         Ch != '\r' && 
+         Ch != '\n' && 
+         Ch != '\t' && 
+         Ch != '\b' )
     {
         return;
     }
@@ -2112,62 +2120,61 @@ void outbyte (int c){
 
 	// carriege return 
 	// Volta ao início da linha.
-    if ( c == '\r' )
+    if ( Ch == '\r' )
     {
         g_cursor_x = 0;
-        prev = c;
-        return;    
+        prev = Ch;
+        return;  
     }
 
 
 	//Próxima linha e não início da linha.   
-    if ( c == '\n' && prev != '\r' ) 
+    if ( Ch == '\n' && prev != '\r' ) 
     {
         g_cursor_y++; 
         g_cursor_x = 0;  
-        prev = c;
+        prev = Ch;
         return;
     }
 
 
     //Próxima linha e início da linha. 	   
-    if ( c == '\n' && prev == '\r' ) 
+    if ( Ch == '\n' && prev == '\r' ) 
     {
         g_cursor_y++;  
-        prev = c;
+        prev = Ch;
         return;
     }
 
 
 	//Tab.
 	//@todo: Criar a var -> 'g_tab_size'.
-    if ( c == '\t' )  
+    if ( Ch == '\t' )  
     {
         g_cursor_x += (4);    
-        prev = c;
-        return;         
+        prev = Ch;
+        return;   
     }
 
 
 	//Space 
 	//#todo:
 	// ?? talvez devêssemos imprimir o caractere espaço. ??    
-    if ( c == ' ' )  
+    if ( Ch == ' ' )  
     {
         g_cursor_x++; 
-        prev = c;
+        prev = Ch;
         return; 
     }
 
 
     //Delete. 
-    if ( c == 8 )  
+    if ( Ch == 8 )  
     {
         g_cursor_x--; 
-        prev = c;
+        prev = Ch;
         return; 
     }
-
 
     // Filtra as dimensões da janela onde esta pintando.
  
@@ -2224,10 +2231,10 @@ void outbyte (int c){
 
     // Imprime os caracteres normais.
 
-    _outbyte (c);
+    _outbyte (Ch);
 
 	//Atualisa o prev.
-    prev = c; 
+    prev = Ch; 
 }
 
 

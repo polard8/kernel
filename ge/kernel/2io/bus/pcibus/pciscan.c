@@ -33,19 +33,26 @@
 
 int pci_setup_devices (void){
 
-    unsigned short Vendor;    // Offset 0.
-    unsigned short Device;    // Offset 2.
+    unsigned short Vendor=0;    // Offset 0.
+    unsigned short Device=0;    // Offset 2.
 
+    unsigned char HeaderType=0;
+    
 	// Bus, Devices and Functions.
 	// #todo: Change names. Ex: (bus, dev, fun).
 
-    unsigned char i = 0;
-    unsigned char j = 0;
-    unsigned char k = 0;
+    // #test
+    //register unsigned char i = 0;
+    //register unsigned char j = 0;
+    //register unsigned char k = 0;
 
+    unsigned char i=0;
+    unsigned char j=0;
+    
+    // inside loop
+    unsigned char k=0;
+    register int funcCount=0;
 
-    unsigned char HeaderType;
-    int funcCount;
 
 
 	// #debug
@@ -84,9 +91,8 @@ int pci_setup_devices (void){
 				// Function.
                 for ( k=0; k<funcCount; k++)
                 {
-                    pciHandleDevice ( i, j, k );
+                    pciHandleDevice(i,j,k);
                 }; 
-
             };
 		};    // Device for.
 	};    // Bus for.
@@ -117,7 +123,7 @@ struct pci_device_d *scan_pci_device_list (
 {
     struct pci_device_d *D;
 
-    int i=0;
+    register int i=0;
 
 	//#bugbug
 	//Nossa lista só tem 32 slots por enquanto.
@@ -137,7 +143,6 @@ struct pci_device_d *scan_pci_device_list (
             }
         }
     };
-
 
     return NULL;
 } 

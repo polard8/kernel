@@ -492,6 +492,8 @@ printi (
     
     register char *s;
     register int t, neg = 0, pc = 0;
+    
+    // loop
     register unsigned int u = i;
 
 
@@ -516,8 +518,8 @@ printi (
     *s = '\0';
 
 
-    while (u){
-
+    while (u)
+    {
         t = (u % b);
         
         // ugly
