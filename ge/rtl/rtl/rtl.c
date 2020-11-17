@@ -696,6 +696,163 @@ void rtl_string_offset_tolower (char *s, int offset)
 */
 
 
+/*
+void rtl_changepath_to_right(char *path);
+void rtl_changepath_to_right(char *path)
+{
+    for (; *path; ++path)
+    {
+        if (*path == '\\'){  *path = '/';  }
+    };
+}
+*/
+
+/*
+void rtl_changepath_to_left(char *path);
+void rtl_changepath_to_left(char *path)
+{
+    for (; *path; ++path)
+    {
+        if (*path == '/'){  *path = '\\';  }
+    };
+}
+*/
+
+
+/*
+//2020 - created by fred nora.
+void rtl_changepath_to_dash(char *path);
+void rtl_changepath_to_dash(char *path)
+{
+    for (; *path; ++path)
+    {
+        if (*path == '/' || *path == '\\')
+        {  
+            *path = '-';  
+        }
+    };
+}
+*/
+
+
+/*
+//2020 - created by fred nora.
+void rtl_changepath_to_underline(char *path);
+void rtl_changepath_to_underline(char *path)
+{
+    for (; *path; ++path)
+    {
+        if (*path == '/' || *path == '\\')
+        {  
+            *path = '_';  
+        }
+    };
+}
+*/
+
+
+/*
+//2020 - created by fred nora.
+void rtl_changepath_to_star(char *path);
+void rtl_changepath_to_star(char *path)
+{
+    for (; *path; ++path)
+    {
+        if (*path == '/' || *path == '\\')
+        {  
+            *path = '*';  
+        }
+    };
+}
+*/
+
+
+/*
+ // 2020 - created by fred nora,
+//write from 'ptr' to 'f'.
+void rtl_fwrite32(const void *ptr, FILE *f);
+void rtl_fwrite32(const void *ptr, FILE *f)
+{
+    //Fred's 'caltela'.
+    if ( (void *) ptr == NULL ){ return; }
+    if ( (void *) f   == NULL ){ return; }
+    
+    fwrite (&ptr, 4, 1, f);
+}
+*/
+
+
+/*
+//2020 - created by fred nora
+ssize_t rtl_write_out (const void *data);
+ssize_t rtl_write_out (const void *data)
+{
+    //stdout
+    return (ssize_t) write (1, (const void *) data, (size_t) sizeof(data) );
+}
+*/
+
+
+/*
+//2020 - created by fred nora
+ssize_t rtl_write_err (const void *data);
+ssize_t rtl_write_err (const void *data)
+{
+    //stderr
+    return (ssize_t) write (2, (const void *) data, (size_t) sizeof(data) );
+}
+*/
+
+
+/*
+char *rtl_fgets2(char *buffer, int buflen, FILE *f);
+char *rtl_fgets2(char *buffer, int buflen, FILE *f)
+{
+    char *p;
+    buffer[0] = 0;
+    register int n=0;
+
+    
+    // Fred's caltela.
+    if( (void*) buffer == NULL ){ return NULL; }
+    if(buflen<0){ return NULL; }
+ 
+    // fgets
+    p = fgets(buffer, buflen, f);
+
+    
+    if (p) 
+    {
+        n = (int) ( strlen(p) - 1 );
+        
+        // finaliza.
+        if (n >= 0)
+        {
+            if (p[n] == '\n'){ p[n] = 0; }
+        }
+    }
+    
+    return p;
+}
+*/
+
+
+/*
+//learning ...
+// ?? what??
+static int isdotdirname(char *name);
+static int isdotdirname(char *name)
+{
+   if (name[0] == '.')
+      return (name[1] == '.') ? !name[2] : !name[1];
+   return 0;
+}
+*/
+
+
+
+
+
 
 
 
