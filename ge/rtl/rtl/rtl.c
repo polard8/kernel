@@ -480,6 +480,221 @@ void *rtl_zalloc (size_t size)
 }
 */
 
+/*
+void *rtl_realloc_raw (void *p, int sz);
+void *rtl_realloc_raw (void *p, int sz)
+{
+    // arg error 1:
+    if ( (void*) p == NULL ){
+        return (void *) malloc(sz);
+    }
+    
+    // arg error 2:
+    if (sz == 0)
+    { 
+        free(p); 
+        return NULL; 
+    }
+    
+    // arg ok:
+    return (void *) realloc(p,sz);
+}
+*/
+
+
+/*
+static char *rtl__filename;
+static int   rtl__fileline;
+int rtl_record_fileline (const char *f, int n);
+int rtl_record_fileline (const char *f, int n)
+{
+    rtl__filename = (char *) f;
+    rtl__fileline = n;
+    return 0;
+}
+*/
+
+/*
+void *rtl_copy_bytes(void *p, size_t sz);
+void *rtl_copy_bytes(void *p, size_t sz)
+{
+   void *q = (void *) malloc(sz);
+   memcpy(q, p, sz);
+   return q;
+}
+*/
+
+
+/*
+// 2020 - Created by Fred Nora.
+void *rtl_copy_bytes_offset(void *p, int offset, size_t sz);
+void *rtl_copy_bytes_offset(void *p, int offset, size_t sz)
+{
+   void *q = (void *) malloc(sz);
+   memcpy (q, p+offset, sz);
+   return q;
+}
+*/
+
+/*
+// 2020 - Created by Fred Nora.
+void *rtl_copy_bytes_offset_origin(void *p, int offset, size_t sz);
+void *rtl_copy_bytes_offset_origin(void *p, int offset, size_t sz)
+{
+   void *q = (void *) malloc(sz);
+   memcpy (q, p+offset, sz);
+   
+   //Return the origin.
+   return (void *) (p+offset);
+   //return q;
+}
+*/
+
+
+/*
+// 2020 - Created by Fred Nora.
+int rtl_getchar_offset (char *ch, void *p, int offset);
+int rtl_getchar_offset (char *ch, void *p, int offset)
+{
+    if ( (void*) p == NULL ){
+        *ch = 0;
+        return FALSE;
+    }else{
+        *ch = p[offset];
+        return TRUE; //ok
+    };
+    return FALSE;
+}
+*/
+
+
+/*
+ //created by fred nora.
+void rtl_free_environ (void *address, int len);
+void rtl_free_environ (void *address, int len)
+{
+    void **____environ = (void **) address;
+    
+    register int i=0;
+   
+    for (i=0; i<len; i++)
+    {
+        free(____environ[i]);
+    };
+}
+*/
+
+
+/*
+ //2020 - created by fred nora.
+void rtl_free_environ_element (void *address, int element);
+void rtl_free_environ_element (void *address, int element)
+{
+    void **____environ = (void **) address;
+    
+    if ( element<0)
+        return;
+    
+    free (____environ[element]);
+}
+*/
+
+/*
+ //2020 - created by fred nora.
+void rtl_free_environ_elements (void *address, int start, int end);
+void rtl_free_environ_elements (void *address, int start, int end)
+{
+    void **____environ = (void **) address;
+    
+    register int i=0;
+   
+    if ( start<end )
+        return;
+    
+    //if ( start == end )
+    //    return;
+    
+   
+    for (i=start; i<end; i++)
+    {
+        free(____environ[i]);
+    };
+}
+*/
+
+
+/*
+// dafuck
+int number_status ( unsigned long number );
+int number_status ( unsigned long number )
+{
+    if (number < 2020){
+         return NORMAL;
+    }else if (number == 2020){
+         return NOT_NORMAL;
+    }else{
+         return NEW_NORMAL;
+    };
+}
+*/
+
+
+/*
+static int rtl__memcmpoffset, rtl__memcmpsize;
+int rtl_memcmp_offset (const void *a, const void *b)
+{
+   return (int) memcmp (
+                    (char *) a + rtl__memcmpoffset, 
+                    (char *) b + rtl__memcmpoffset, 
+                    rtl__memcmpsize );
+}
+*/
+
+/*
+//2020 - created by fred nora
+int rtl_memcmp_offset2 (const void *a, const void *b, int offset, size_t size);
+int rtl_memcmp_offset2 (const void *a, const void *b, int offset, size_t size)
+{
+   if (offset<0){ return -1; }
+   if (size<0){ return -1; }
+   return (int) memcmp (
+                    (char *) a + offset, 
+                    (char *) b + offset, 
+                    size );
+}
+*/
+
+
+/*
+void rtl_string_tolower (char *s);
+void rtl_string_tolower (char *s)
+{
+    while (*s) 
+    {
+        *s = tolower(*s);
+        s++;
+    };
+}
+*/
+
+/*
+// 2020 - created by fred nora.
+void rtl_string_offset_tolower (char *s, int offset);
+void rtl_string_offset_tolower (char *s, int offset)
+{
+    if( offset<0)
+        return;
+
+    char *String = (char *) (s+offset);
+
+    while (*String) 
+    {
+        *String = tolower(*String);
+        String++;
+    };
+}
+*/
+
 
 
 
