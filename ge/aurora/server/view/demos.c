@@ -6,7 +6,7 @@
 
 void demoCat(void)
 {
-    int i=0;
+    register int i=0;
     int j=0;
     int count = 20;
 
@@ -48,7 +48,7 @@ void demoCat(void)
 
 void demoFred0(void)
 {
-    int i=0;
+    register int i=0;
     for (i=0; i<100; i++){
             //noraDrawingStuff3 (i,i,0);
             noraDrawingStuff3 (-i,-i,0);
@@ -72,7 +72,7 @@ void demoFred0(void)
 
 void demoFred1(void)
 {
-    int i=0;
+    register int i=0;
     for (i=0; i<100; i++){
             //noraDrawingStuff3 (i,i,0);
             noraDrawingStuff3 (-i,-i,0);
@@ -94,7 +94,7 @@ void demoFred1(void)
 
 void demoFred2(void)
 {
-    int i=0;
+    register int i=0;
     for (i=1; i< (1024-768); i++){
             //noraDrawingStuff3 (i,i,0);
             noraDrawingStuff3 (-i,-i,0);
@@ -129,6 +129,8 @@ void demoFred2(void)
 //matrix multiplication
 void demoSA1(void)
 {
+    register int i=0;
+
     int mat1[4][4] = {  { 1, 1, 1, 1 },
                         { 2, 2, 2, 2 },
                         { 3, 3, 3, 3 },
@@ -141,13 +143,12 @@ void demoSA1(void)
     
     int res[4][4]; // To store result
 
-    int i=0;
         
     
     if (current_mode != GRAMADO_JAIL)
         return;
     
-    
+
     int count=3;    
     while ( count>0){
 
@@ -208,9 +209,10 @@ void demoSA1(void)
 //only on jail
 void demoCube1(void)
 {
-    int i=0;
-    int j=0;
-   
+    register int i=0;
+    register int j=0;
+
+
     struct gr_cube_d *cube;
     cube = (void *) malloc( sizeof( struct gr_cube_d ) );
     if ( (void*) cube != NULL )
@@ -310,8 +312,9 @@ void demoCube1(void)
 // only on jail
 void demoCube2 (void)
 {
-    int i=0;
-    int j=0;
+    register int i=0;
+    register int j=0;
+ 
     static int action = 1000; // inflate.
     
     
@@ -439,8 +442,8 @@ void demoCube2 (void)
 
 void demoCurve(void)
 {
-    int i=0;
-    int j=0;
+    register int i=0;
+    register int j=0;
 
     int count=4;
     
@@ -480,6 +483,8 @@ void demoCurve(void)
 void demoMatrix1(void)
 {
 
+    register int i=0;
+    
      //#define N 4
    
     /*
@@ -541,8 +546,6 @@ void demoMatrix1(void)
     //printf ("%d | %d | %d | %d \n",res[2][0], res[2][1], res[2][2], res[2][3]);
     //printf ("%d | %d | %d | %d \n",res[3][0], res[3][1], res[3][2], res[3][3]);
 
-
-    int i=0;
     
     int count=4;
     

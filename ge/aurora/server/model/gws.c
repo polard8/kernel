@@ -270,10 +270,12 @@ unsigned long gws_get_device_height(void)
 
 int gwssrv_init_globals(void)
 {
-    int i=0;
+    //Loop to clear something
+    register int i=0;
 
     // get gramado mode.
     // jail, p1, home, p2, castle ...
+ 
     current_mode = gwssrv_get_system_metrics(130);
 
     // buffers
@@ -319,7 +321,7 @@ int gwssrv_init_globals(void)
     // Talvez menos, por causa de alguma memoria compartilhada irregular.
 
     // #bugbug: Null pointers,    
-    for (i=0; i<MAX_SCREENS; i++){ screens[i] = 0; }
+    for (i=0; i<MAX_SCREENS; ++i){ screens[i] = 0; }
 
     screens[SCREEN_FRONTBUFFER] = (unsigned long) ____FRONTBUFFER_VA;
     screens[SCREEN_BACKBUFFER]  = (unsigned long) ____BACKBUFFER_VA;
@@ -342,10 +344,8 @@ int gwssrv_init_globals(void)
     // Color scheme
     gwssrv_initialize_color_schemes(ColorSchemeHumility);
     gwssrv_select_color_scheme(ColorSchemeHumility);
-   
-   
-    //...
 
+    //...
 
     return 0;
 }

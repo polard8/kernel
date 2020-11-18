@@ -115,9 +115,11 @@ int grInit (void)
         exit(1);
     }
 
-    HotSpotX = (w/2);
-    HotSpotY = (h/2);
-    
+    //HotSpotX = (w/2);
+    //HotSpotY = (h/2);
+    HotSpotX = (w>>1);
+    HotSpotY = (h>>1);
+
     //
     // == Camera ===================================================
     //

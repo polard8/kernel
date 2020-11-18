@@ -21,9 +21,15 @@
 /*
  *************************************************************** 
  * wm_process_windows: 
+ *
+ *     This is the compositor. !!!
  * 
- * 
+ *     O objetivo eh repintar todas as janelas de tras para frente e
+ *     chamar um loop para dar refresh em todos os retangulos sujos.
+ *     Dependendo do modo, vamos dar refresh na tela toda. Por exemplo,
+ *     se estivermos usando graficos em full screen.
  */
+
 
 static unsigned long ____old=0;
 static unsigned long ____new=0;
@@ -102,9 +108,11 @@ void wm_process_windows (void){
     // redraw using zorder.
     // refresh using zorder.
 
-    int i=0;
     struct gws_window_d  *tmp;
-    for (i=0; i<ZORDER_MAX; i++)
+    
+    register int i=0;
+
+    for (i=0; i<ZORDER_MAX; ++i)
     {
         tmp = (struct gws_window_d  *) zList[i];
         if ( (void*) tmp != NULL )
@@ -115,25 +123,41 @@ void wm_process_windows (void){
                 if (tmp->dirty == 1)
                 {
                     //gws_show_window_rect(tmp);
-                    gwssrv_redraw_window(tmp,1); //redesenha e mostra.
+                    
+                    // redesenha e mostra.
+                    // #todo: poderiamos apenas redesenhar e marcar 
+                    // o retangulo da janela como sujo, 
+                    // para efetuarmso o refresh mais abaixo.
+                    // Se mudarmos o segundo argumento para '0', 
+                    // nao da refresh da janela agora.
+                    // #bugbug: Mas se nao efetuarmos o refresh agora,
+                    // temos necessariamente que efetuar logo abaixo.
+                    //gwssrv_redraw_window(tmp,1);
+                    gwssrv_redraw_window(tmp,0); 
                     tmp->dirty=0;
                 }
             }
         }
-    }
+    };
 
     // #test
     // Let's refresh only the valid screen.
     // We will refresh the device screen only if explicity called
     // by the app.
     
-    // explicity called.
-    if ( refresh_device_screen_flag == 1 ){
+    // #todo
+    // Devemos dar refresh na tela toda apenas se estivermos usando
+    // graficos em modo fullscreen.
+    // E claro, se o gramado mode for jail. Ou seja, resoluçao baixa.
 
+    // explicity called.
+    // Essa flag estara sempre acionada se estivermos 
+    // rodando graficos em modo fullscreen.
+    if ( refresh_device_screen_flag == 1 ){
         gwssrv_debug_print("== R (device) ==\n");  //debug 
         refresh_device_screen();
     
-    // Refresh only the valid screen
+    // Refresh only the 'valid screen'
     }else{
         gwssrv_debug_print("== R (valid) ==\n");  //debug
         refresh_valid_screen();
@@ -272,6 +296,9 @@ void invalidate_window (struct gws_window_d *window)
 
 int serviceCreateWindow (void){
 
+    //loop
+    register int i=0;
+
     // The buffer is a global variable.
     unsigned long *message_address = (unsigned long *) &__buffer[0];
 
@@ -279,7 +306,6 @@ int serviceCreateWindow (void){
     struct gws_window_d *Parent;
     int pw=0;
 
-    int i=0;
     int id = -1;
     unsigned char name_buffer[256+1];
 
@@ -311,7 +337,7 @@ int serviceCreateWindow (void){
     //++
     // String support 
     int string_off = 14; 
-    for (i=0; i<256; i++){
+    for (i=0; i<256; ++i){
         name_buffer[i] = message_address[string_off];
         string_off++;
     }
@@ -525,12 +551,21 @@ int serviceResizeWindow(void)
 
 
 
-//#bugbug
+// #bugbug
 // Usaremos a função create window para desenhar botões.
 // #deletar !!!
 
 int serviceDrawButton(void)
 {
+
+    // Deprecated !!
+    
+    printf("serviceDrawButton: deprecated\n");
+    gwssrv_debug_print("serviceDrawButton: deprecated\n");
+    exit(1);
+    return -1;
+    
+    /*
     //O buffer é uma global nesse documento.
     unsigned long *message_address = (unsigned long *) &__buffer[0];
 
@@ -546,14 +581,18 @@ int serviceDrawButton(void)
     height = message_address[7]; 
     // ...
 
-
+    // #todo
+    // The label?
+    
     gws_draw_button ("Label", 1,1,1, 
         x, y, width, height, GWS_COLOR_BUTTONFACE3 );
 
 
-   // for debug 
-   gws_show_backbuffer(); 
-   return 0;
+    // #bugbug
+    // Used for debug. We don't need this thing 
+    gws_show_backbuffer(); 
+    return 0;
+    */
 }
 
 
@@ -1362,11 +1401,12 @@ int gwsDefineInitialRootWindow ( struct gws_window_d *window )
 // < 0 = fail.
 // > 0 = Ok. (index)
  
-int gwsRegisterWindow (struct gws_window_d *window){
-
+int gwsRegisterWindow (struct gws_window_d *window)
+{
+    //loop
+    register int __slot=0;
+    
     struct gws_window_d *tmp; 
-
-    int __slot=0;
 
 
 
@@ -1390,7 +1430,7 @@ int gwsRegisterWindow (struct gws_window_d *window){
 
 
     // Search for empty slot
-    for (__slot=0; __slot<1024; __slot++)
+    for (__slot=0; __slot<1024; ++__slot)
     {
         tmp = (struct gws_window_d *) windowList[__slot];
 
@@ -1744,10 +1784,13 @@ gws_resize_window (
 // do desktop.
 void reset_zorder(void)
 {
-     struct gws_window_d *w;
+     //loop
+     register int i=0;
      
-     int i=0;
-     for ( i=0; i<WINDOW_COUNT_MAX; i++)
+     struct gws_window_d *w;
+
+
+     for ( i=0; i<WINDOW_COUNT_MAX; ++i)
      {
          w = (struct gws_window_d *) windowList[i];
          if ( (void*) w != NULL )
@@ -1851,8 +1894,9 @@ void gwsWindowUnlock (struct gws_window_d *window){
 
 int gwssrv_init_windows (void)
 {
-    int i=0;
-    
+    //loop
+    register int i=0;
+
     //window.h
     windows_count      =0;
     window_with_focus  =0;
@@ -1860,18 +1904,14 @@ int gwssrv_init_windows (void)
     top_window         =0;
     //...
 
-    //
-    // Window list
-    //
 
-    for (i=0; i<WINDOW_COUNT_MAX; i++)
+    // Window list
+    for (i=0; i<WINDOW_COUNT_MAX; ++i)
         windowList[i] = 0;
 
-    //
-    // z order list
-    //
 
-    for (i=0; i<ZORDER_MAX; i++)
+    // z order list
+    for (i=0; i<ZORDER_MAX; ++i)
         zList[i] = 0;
         
 

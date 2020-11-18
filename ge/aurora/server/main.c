@@ -849,6 +849,7 @@ __again:
 //#todo:
 // No loop precisamos de accept() read() e write();
 // Get client's request from socket.
+
 void xxxHandleNextClientRequest (int fd){
 
     // Isso permite ler a mensagem na forma de longs.
@@ -1100,16 +1101,14 @@ __again:
     message_buffer[1] = 0;
     message_buffer[2] = 0;
     message_buffer[3] = 0;
-    int b=0;
-    for (b=0; b<MSG_BUFFER_SIZE; b++)
+    register int b=0;
+    for (b=0; b<MSG_BUFFER_SIZE; ++b)
         __buffer[b] = 0;
 
-
     // Cleaning
-    int c=0;
-    for (c=0; c<NEXTRESPONSE_BUFFER_SIZE; c++)  //32. todo: 512
+    register int c=0;
+    for (c=0; c<NEXTRESPONSE_BUFFER_SIZE; ++c)  //32. todo: 512
         next_response[c] = 0;
-
 
     gwssrv_debug_print ("gwssrv: Response sent\n");  
 }
@@ -2418,23 +2417,18 @@ int main (int argc, char **argv){
             // mas ele teria que chamar o window server pra efetuar o refresh
             //dos retângulos.
             // See comp.c
-            
-            //See: window.c
-            wm_process_windows();
-            //wm_process_events(); //todo
-            
-            //if ( dirty == 1 )
-            //{
-            //    compositor();    //nothing for now.
-            //    dirty = 0;
-            //}
+
+            compositor();
+
+            //process_events(); //todo
 
             //if (isTimeToQuit == 1) { break; };
          
 
             // Accept connection from a client. 
 
-            // #ps: Actually, accept2 returns the fd of the server,
+            // #ps: 
+            // Actually, accept2 returns the fd of the server,
             // and write will copy from on socket to another.
 
             //newconn = accept ( curconn, 
