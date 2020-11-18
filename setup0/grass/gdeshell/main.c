@@ -2553,6 +2553,11 @@ do_compare:
         goto exit_cmp;
     }
 
+    //
+    // == Tests =============================================
+    //
+    
+    // t1 ~ txx
 
     // t1 - 
     // Test file
@@ -2561,6 +2566,7 @@ do_compare:
     // no cursor. Isso força um scroll.
     if ( gramado_strncmp( prompt, "t1", 2 ) == 0 )
     {
+        printf ("t1: Loading a file\n");
         shellTestLoadFile ();
         goto exit_cmp;
     }
@@ -2570,6 +2576,7 @@ do_compare:
     if ( gramado_strncmp( prompt, "t2", 2 ) == 0 || 
          gramado_strncmp( prompt, "test-fork", 9 ) == 0 )
     {
+        printf ("t2: Testing fork\n");
         shellTestFork();
         goto exit_cmp;
     }
@@ -2579,6 +2586,7 @@ do_compare:
     if ( gramado_strncmp( prompt, "t3", 2 ) == 0 ||
          gramado_strncmp( prompt, "test-thread", 11 ) == 0 )
     {
+        printf ("t3: Testing thread\n");
         shellTestThreads();
         goto exit_cmp;
     }
@@ -2586,27 +2594,30 @@ do_compare:
 
     // t4 - Testing fopen function.
     // #bugbug: It is not working.
+    // #todo: podemos fazer uma funçao para esse teste.
     FILE *f1;
     int ch_test;
     if ( gramado_strncmp( prompt, "t4", 2 ) == 0 )
     {
-        printf ("\n t4: Open gramado.txt \n");
-       
+        printf ("t4: Open and reading a file\n");
+
         f1 = fopen ("gramado.txt","rb");  
         if( f1 == NULL ){
 			printf ("fopen fail\n");
 			//goto exit_cmp;
-		}else{
+        }else{
 			printf ("fopen ok\n");
 			//goto exit_cmp;
-		};
+        };
 
 		// #bugbug ... o fgetc n�o l� na estrutura esperada.
         printf ("Testing fgetc ... \n\n");
+
         while (1){
 
-			//ch_test = (int) fgetc(f1);
-			ch_test = (int) getc (f1); 
+            //ch_test = (int) fgetc(f1);
+            ch_test = (int) getc (f1); 
+
 			if( ch_test == EOF )
 			{
 				printf("\n\n");
@@ -2616,9 +2627,9 @@ do_compare:
 			}else{
 			    printf("%c", ch_test);	
 			};
-		};
-		//fail.
-		goto exit_cmp;
+        };
+        //fail.
+        goto exit_cmp;
     }
 
 
@@ -2637,6 +2648,7 @@ do_compare:
 
 
     // t6 - Save file using close().
+    // It is working. \o/
     char _buftest[] = "DIRTYDIRTYDIRTYDIRTYDIRTY";
     if ( gramado_strncmp ( prompt, "t6", 2 ) == 0 )
     {
@@ -2655,6 +2667,8 @@ do_compare:
          gramado_strncmp( prompt, "T7", 2 ) == 0 || 
          gramado_strncmp( prompt, "t7", 2 ) == 0 )
     {
+        printf ("t7: Testing keyboard key state\n");
+        
         printf ("VK_CAPITAL %d \n", 
             system_call ( 138, VK_CAPITAL, VK_CAPITAL, VK_CAPITAL ) );
 
@@ -2682,22 +2696,26 @@ do_compare:
     // atraves do mouse.
     if ( gramado_strncmp( prompt, "t8", 2 ) == 0 )
     {
+        printf ("t8: Creating buttons \n");
         shellTestButtons ();
         gde_show_backbuffer ();
         goto exit_cmp;
     }
 
 
-	// t11 - 
-	// Testando o envio de mensagens para o procedimento de janelas
-	// dess processo. Usando o kernel.
-	// Chama message box com mensagem about.
+    // t11 
+    // Testando o envio de mensagens para o 
+    // procedimento de janelas desse processo. Usando o kernel.
+    // Chama message box com mensagem about.
+    
     if ( gramado_strncmp( prompt, "t11", 3 ) == 0 )
-    {    
-       gde_send_message ( (struct window_d *) 0, 
-            (int) MSG_COMMAND, 
-            (unsigned long) CMD_ABOUT, 
-            (unsigned long) 0 );
+    { 
+        printf ("t11: Sending message to this process \n");
+        gde_send_message ( 
+             (struct window_d *) 0, 
+             (int) MSG_COMMAND, 
+             (unsigned long) CMD_ABOUT, 
+             (unsigned long) 0 );
         goto exit_cmp;
     }
 
@@ -2707,6 +2725,7 @@ do_compare:
 
     // t17 - create process
     // #bugbug: It is not working.
+    // It's a work in progress!
     // #todo:
     // No kernel, precisamos criar mais rotinas de suporte
     // a criacao de processos.
@@ -2729,68 +2748,40 @@ do_compare:
 
 
 	// t18 - OpenTTY.
-	FILE *opentty_fp;
-	FILE *terminal_opentty_fp;
+	// DEPRECATED !!!
+	//FILE *opentty_fp;
+	//FILE *terminal_opentty_fp;
 	int x_ch;
 	int terminal_PID;
 	#define MSG_TERMINALCOMMAND 100 //provis�rio
 
-    if ( gramado_strncmp ( prompt, "t18", 3 ) == 0 )
-    {
-		//get tty stream
-		//o shell pega um stream para escrever.
-		//pega o stdout do kernel
-		opentty_fp = (FILE *) gramado_system_call ( 1000, getpid(), 0, 0 );
-		fprintf (opentty_fp, "test1 ...\n");
-		fprintf (opentty_fp, "test2 ...");   //sem \n
-		
-		//get tty stream
-		//o terminal pegar um stream para ler.
-		//terminal_opentty_fp = (FILE *) system_call ( 1001, 0, 0, 0 );
-		 
-	    //x_ch = (int) fgetc (terminal_opentty_fp);	
-		
-		//while (1)
-		//{
-		    //pega um char, mas n�o � o �ltimo que foi colocado, � o que ainda n�o foi pego.
-		//    x_ch = (int) system_call ( 1002, 0, 0, 0 );
-		//    if (x_ch == '\n'){ break;};	
-		//	printf (" CHAR:{%c} \n",x_ch);
-	    //}
-		
-		//get terminal pid
-		//avisa o terminal que ele pode imprimir as mesangens pendentes que estao na stream
+    // DEPRECATED!!!
+    // if ( gramado_strncmp ( prompt, "t18", 3 ) == 0 )
+    // { goto exit_cmp; }
 
-       terminal_PID = (int) gramado_system_call ( 1004, 0, 0, 0 );
-       __SendMessageToProcess ( terminal_PID, 
-           NULL, MSG_TERMINALCOMMAND, 2000, 2000 );
-        goto exit_cmp;
-    }
+
 
     // t19
     int xxx__PID;
-    if ( gramado_strncmp ( prompt, "t19", 3 ) == 0 )
-    {
-        // deprecated.
-        goto exit_cmp;
-    }
+    // deprecated.
+    //if ( gramado_strncmp ( prompt, "t19", 3 ) == 0 )
+    //{  goto exit_cmp; }
 
 
     // t20 - Isso executa o terminal e manda uma mensagem pra ele.
     int terminal___PID;
     FILE *_fp;
-
-    if ( gramado_strncmp ( prompt, "t20", 3 ) == 0 )
-    {
-        // deprecated.
-        goto exit_cmp;
-    }
+    // deprecated.
+    //if ( gramado_strncmp ( prompt, "t20", 3 ) == 0 )
+    //{  goto exit_cmp; }
 
 
     // t900 - Clona e executa o filho dado o nome do filho.
     // Isso funciona muito bem.
     if ( gramado_strncmp ( prompt, "t900", 4 ) == 0 )
     {
+        printf ("t900: Testing the systemcall 900.\n");
+        printf ("Clone and execute a new process. (sysmon.bin)\n");
         system_call ( 900, (unsigned long) "sysmon.bin", 0, 0 );
         goto exit_cmp;
     }

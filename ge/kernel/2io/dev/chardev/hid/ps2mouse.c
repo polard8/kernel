@@ -1186,7 +1186,8 @@ void mouseHandler (void)
     char *_byte;
     
     
-    int msg_status=-1;
+    int msg_status=-1; //FAIL
+
 
     // Disable keyboard.
     wait_then_write (0x64,0xAD); 
@@ -1227,68 +1228,71 @@ void mouseHandler (void)
 
     switch (count_mouse){
 
-		// > Essa foi a primeira interrupção.
+        // > Essa foi a primeira interrupção.
         case 0:
             //Pegamos o primeiro char.
             buffer_mouse[0] = (char) *_byte;
             if (*_byte & MOUSE_V_BIT){ count_mouse++; }
             break;
 
-		// >> Essa foi a segunda interrupção.
+        // >> Essa foi a segunda interrupção.
         case 1:
             //Pegamos o segundo char.
             buffer_mouse[1] = (char) *_byte;
             count_mouse++;
             break;
 
-
-		// >>> Essa foi a terceira interrupção. É a última.
+        // >>> Essa foi a terceira interrupção. É a última.
         case 2:
             //Pegamos o terceiro char.
             buffer_mouse[2] = (char) *_byte;
             count_mouse = 0;
             
-            
             //
-            // Message.
+            // == Message ==========================================
             //
             
             // #todo
-            // Mandar uma mensagem par o window server registrado
+            // Mandar uma mensagem para o window server registrado
             // caso exita um. Dai o ws scaneia suas janelas.
             // obs: essa chamada tem um retorno.
-            // veja como o teclado faz.
-            // #bugbug:
-            // O pacote tem 3 longs ..., com esse metodo so conseguimos
-            // mandar duas.
-            
-            //msg_status = (int) si_send_to_ws ( (struct window_d *) 0,  // Deprecated!
-            //                      (int) MSG_MOUSE_PACKET,               // A mensagem comtem um pacote. 
-            //                      (unsigned long) buffer_mouse[0],      //
-            //                      (unsigned long) buffer_mouse[1]);
-
-            msg_status = (int) si_send_longmessage_to_ws ( (struct window_d *) 0,  // Deprecated!
+            // O pacote tem 3 longs ...
+            // Somente par ao 'ws input mode'.
+            msg_status = -1; //fail
+            if (current_input_mode == INPUT_MODE_WS )
+            {
+                msg_status = (int) si_send_longmessage_to_ws ( (struct window_d *) 0,  // Deprecated!
                                   (int) 4567, //MSG_MOUSE_PACKET,               // A mensagem comtem um pacote. 
                                   (unsigned long) buffer_mouse[0],      //
                                   (unsigned long) buffer_mouse[1],
                                   (unsigned long) buffer_mouse[2],
-                                   0);
-            //Se a mensagem nao foi enviada para o ws.
-            if(msg_status!=0)
-            {
-                // #todo
-                // Nao precisamos fazer esse parse aqui ...
-                // apenas mandar o pacote para o window server em ring3
-                // na forma de mensagens.
-                // Tambem nao precisamos escanear janelas ... o ws fara isso.
-                ps2mouse_parse_data_packet();
-            
-                //#bugbug
-                // escaneando janelas.
-                // O window server deveria fazer isso.
-                // sci/windows/kgws.c
-                kgws_mouse_scan_windows();
+                                   0 );
+                
             }
+            
+            // Se a mensagem nao foi enviada para o ws.
+            // Entao vamos tratar aqui mesmo no kernel.
+            // Entao nao estamod no ws input mode.
+            // Que input mode estamos?
+            if (msg_status!=0)
+            {
+                if (current_input_mode == INPUT_MODE_SETUP )
+                {
+                    // #todo
+                    // Nao precisamos fazer esse parse aqui ...
+                    // apenas mandar o pacote para o window server em ring3
+                    // na forma de mensagens.
+                    // Tambem nao precisamos escanear janelas ... o ws fara isso.
+                    ps2mouse_parse_data_packet();
+            
+                    // #bugbug
+                    // escaneando janelas.
+                    // O window server deveria fazer isso.
+                    // sci/windows/kgws.c
+                    kgws_mouse_scan_windows();
+                }
+            }
+            
             
             // O driver precisa do old pra configurar a variável de ação.
             // #todo Talvez precise de outras

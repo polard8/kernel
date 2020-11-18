@@ -147,8 +147,6 @@ typedef enum {
 
 
 
-
-
 struct boot_block_d
 {
     unsigned long lfb;
@@ -167,15 +165,6 @@ struct boot_block_d
 };
 
 struct boot_block_d BootBlock;
-
-
-
-
-
-
-
-
-
 
 
 

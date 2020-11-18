@@ -756,33 +756,45 @@ done:
     // ou para um procedimento aqui nesse documento.
     // See: si/siws.c
 
-    msg_status = (int) si_send_to_ws ( (struct window_d *) w,
+
+    // We will check the presence of the window sever only if we are
+    // in the ws input mode.
+    // We set this input mode when we register the ring3 window server.
+
+    if ( current_input_mode == INPUT_MODE_WS )
+    {
+
+        msg_status = (int) si_send_to_ws ( (struct window_d *) w,
                            (int) message, 
                            (unsigned long) ch,
                            (unsigned long) tmp_sc);
-        
-    // Se a mensagem foi enviada para o ws,
-    // então podemos retornar.
-    if ( msg_status == 0 ){
-        debug_print ("KEYBOARD_SEND_MESSAGE: >>>> to ws\n");        
-        return 0;
+
+        // Se a mensagem foi enviada para o ws, então podemos retornar.
+        if ( msg_status == 0 ){
+            debug_print ("KEYBOARD_SEND_MESSAGE: >>>> to ws\n");        
+            return 0;
+        }
     }
- 
+
 
     // #importante
     // Só chegaremos até aqui se o ws não está rodando.
-           
-        
-    //
-    // Special message.
-    //
 
+
+
+
+    // ==========================
+    // Emergency keys.
+    // We need to press the emergency keys for all the input modes.
     // F5 F6 F7 F8
     // These messages are used by the developer.
     // + Reboot system
     // + Switch focus.
     // + Test 1
     // + Test 2
+    
+    // ===========================
+    
         
     switch (message)
     {
@@ -792,79 +804,67 @@ done:
 
                 // Emergency keys.
                 // Sending these keys to the system procedure.
+                // It needs to work in all the input modes.
                 // This is a local routine.
-                case VK_F5: 
-                case VK_F6: 
-                case VK_F7: 
-                case VK_F8:
+                case VK_F5:  case VK_F6:  case VK_F7:  case VK_F8:
+                    // For all the input modes.
                     debug_print ("KEYBOARD_SEND_MESSAGE: >>>> [MSG_SYSKEYUP] to system procedure\n"); 
-                    __local_ps2kbd_procedure ( w, 
+                    __local_ps2kbd_procedure ( 
+                        w, 
                         (int) message, 
                         (unsigned long) ch, 
                         (unsigned long) tmp_sc );       
                     return 0;
                     break;
 
+
+                // Default syskeyups dent to control thread.
                 // This is a window of the embedded window server.
                 // Not the loadable window server.
-                // We wish to send the message to the current terminal (tty).
-                // and the current tty will have a thread associated.
-                // See: ui/windows/model/kgws.c
-                case VK_F1: 
-                case VK_F2: 
-                case VK_F3: 
-                case VK_F4:
-                case VK_F9: 
-                case VK_F10: 
-                case VK_F11: 
-                case VK_F12:
-                     kgws_send_to_controlthread_of_currentwindow ( w,
-                        (int) message, 
-                        (unsigned long) ch, 
-                        (unsigned long) tmp_sc );
-                    debug_print ("KEYBOARD_SEND_MESSAGE: >>>> [MSG_SYSKEYUP.function] to wwf\n");        
-                    return 0; 
-                    break;
-
-                // kgws:
-                // Send a message to the thread associated with the
-                // window with focus.
-                // See: ui/windows/model/kgws.c
+                // Only for the setup input mode.
                 default:
-                    kgws_send_to_controlthread_of_currentwindow ( w,
-                        (int) message, 
-                        (unsigned long) ch, 
-                        (unsigned long) tmp_sc );
-                    debug_print ("KEYBOARD_SEND_MESSAGE: >>>> [MSG_SYSKEYUP.default] to wwf\n");        
+                    // Only for the setup input mode.
+                    if (current_input_mode == INPUT_MODE_SETUP)
+                    {
+                        kgws_send_to_controlthread_of_currentwindow ( 
+                             w,
+                            (int) message, 
+                            (unsigned long) ch, 
+                            (unsigned long) tmp_sc );
+                        debug_print ("KEYBOARD_SEND_MESSAGE: >>>> [MSG_SYSKEYUP.function] to wwf\n");        
+                    }
                     return 0; 
                     break;
             };
             break;
-                
-        // Para todas as outras mensagens.
+
+        // Para todas as outras mensagens alem de syskeyup.
         // kgws:
         // Send a message to the thread associated with the
         // window with focus.
         // See: ws/kgws.c
         default:
-            kgws_send_to_controlthread_of_currentwindow ( w,
-                (int) message, 
-                (unsigned long) ch, 
-                (unsigned long) tmp_sc );
-            debug_print ("KEYBOARD_SEND_MESSAGE: >>>> [default] to wwf\n");
+           // Only for the setup input mode.
+           if (current_input_mode == INPUT_MODE_SETUP)
+           {
+               kgws_send_to_controlthread_of_currentwindow ( 
+                   w,
+                   (int) message, 
+                   (unsigned long) ch, 
+                   (unsigned long) tmp_sc );
+               debug_print ("KEYBOARD_SEND_MESSAGE: >>>> [default] to wwf\n");
             
-            // #test
-            // Vamos escrever em stdin.
-            // Que tipo de objeto? file? tty?
-            // #bugbug: kernel panic!
+               // #test
+               // Vamos escrever em stdin.
+               // Que tipo de objeto? file? tty?
+               // #bugbug: kernel panic!
             
-            //sys_write ( 
-            //    (int) 0, (const void *) &ch, (size_t) 1 );
-            
+               //sys_write ( 
+               //    (int) 0, (const void *) &ch, (size_t) 1 );
+            }
             return 0;
             break;
     };
-
 
     return 0;
 }

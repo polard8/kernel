@@ -360,7 +360,9 @@ gde_extra_services (
     }
 
 
-    // 513 - Set ws PID for a given desktop
+    // 513
+    // Register the ring3 window server.
+    // Set ws PID for a given desktop
     // Register a window server.
     // gramado_ports[11] = ws_pid
     // Called by the window server.
@@ -388,6 +390,14 @@ gde_extra_services (
                 // principalmente piorou em resoluçoes maiores e na maquina real.
                 //power_pid(current_process,4);
                 //power_pid(current_process,8);
+                
+                
+                // Changing the kernel input mode.
+                // #bugbug: Maybe we need to wait a little bit. hahaha
+                // The window server is still initializing ...
+                // but there is no problem to sent messages to its control thread.
+                // os am i wrong?
+                current_input_mode = INPUT_MODE_WS; 
                 
                 // returning ok.
                 // But, we could return the port number.
@@ -432,8 +442,6 @@ gde_extra_services (
         return NULL; //fail
     }
 
-
-
     // 516 - show x server info
     // ws para o desktop atual
     if ( number == SYS_SHOW_X_SERVER_INFO )
@@ -443,8 +451,6 @@ gde_extra_services (
         return NULL;
     }
 
-
-
     // 517 - show wm info
     // wm para o desktop atual
     if ( number == SYS_SHOW_WM_INFO ){
@@ -452,7 +458,6 @@ gde_extra_services (
         refresh_screen ();
         return NULL;
     }
-
 
     // Repinta todas as janelas que foram invalidadas.
     // Isso sera usado pelo compositor do window server. 
@@ -2064,12 +2069,18 @@ gde_services (
 		// 136 - livre.
 
 
-		// 137
-		// Isso � usado pela biblioteca stdio em user mode
-		// na fun��o 'getchar()'
-		// Pega caractere no stdin do teclado.
-		// Isso funciona.
-		// #bugbug: Rever isso.
+        // 137
+        // Isso eh um metodo alternativo de pegar input.
+        // Ainda esta sobre avaliaçao.
+        // Isso eh usado pela biblioteca stdio em user mode
+        // na funçao 'getchar()'
+        // Isso tambem eh usado por gde_getchar em libcore/ em grass/
+        // ??? Pega caractere no stdin do teclado.
+        // ?? Isso funciona.
+        
+        // #bugbug: >>>> Rever isso.
+        
+        // See: core/ps/thread.c
         case SYS_GETCH:  
             return (void *) thread_getchar();
             break;

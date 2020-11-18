@@ -1326,13 +1326,22 @@ int init_threads (void){
 /*
  **********************************************************
  * thread_getchar:
- *     Esse � o servi�o 137.
- *     Isso � usado pela biblioteca stdio em user mode na fun��o getchar().
- *     Isso funciona.
+ *     Esse eh o serviço 137.
+
  */
 
-// ??
+// #bugbug
 // Rever isso.
+
+// Isso eh um metodo alternativo de pegar input.
+// Ainda esta sobre avaliaçao.
+// Isso eh usado pela biblioteca stdio em user mode
+// na funçao 'getchar()'
+// Isso tambem eh usado por gde_getchar em libcore/ em grass/
+// ??? Pega caractere no stdin do teclado.
+
+
+// only keydown
 
 int thread_getchar (void){
 
@@ -1359,89 +1368,72 @@ int thread_getchar (void){
 
     SC = (unsigned char) get_scancode();
 
-	// Isso coloca a mensagem na thread de controle da janela com o foco de entrada.
+    // Translate and put the event in the threds event queue.
+    // Isso coloca a mensagem na thread de controle da 
+    // janela com o foco de entrada.
 
     KEYBOARD_SEND_MESSAGE ( SC );
 
-	
-	// #importante
-	// Deve ser a thread da janela com o foco de entrada.
-	
+    // Get the event.
+    // #importante
+    // Deve ser a thread da janela com o foco de entrada.
     // Window.
 
     w = (void *) windowList[window_with_focus];
 
-	if ( (void *) w == NULL ){
-		panic ("thread_getchar: w");
+    if ( (void *) w == NULL ){
+        panic ("thread_getchar: w");
 
-	}else{
-	    if ( w->used != 1 || w->magic != 1234 ){
-	        panic ("thread_getchar: w validation");
-		}
-		
-		
-		//
-		// Thread,
-		//
-		
-		t = (void *) w->control;
-	};
+    }else{
+        if ( w->used != 1 || w->magic != 1234 ){
+            panic ("thread_getchar: w validation");
+        }
+
+        // Thread.
+        t = (void *) w->control;
+        
+        // Invalid
+        if ( (void *) t == NULL ){  goto fail;  }
+    };
 
 
-    // Thread.
+    // with validation.
+    if ( (void*) t != NULL )
+    {
+        // validation
+        if ( t->used == 1 && t->magic == 1234 )
+        {
+            if ( t->newmessageFlag != 1 ){  goto fail; }
+            
+            // == Only keydown ====================================
+            if ( t->msg != MSG_KEYDOWN ){  goto fail;  }
+    
+            // salva o char.
+            save = (int) t->long1;
 
-    if ( (void *) t == NULL )
-	{
-         //msg
-	     goto fail;
-	}	
-	
-	if ( t->newmessageFlag != 1 )
-	{
-		//msg
-	    goto fail;
-	}
-	
-	if ( t->msg != MSG_KEYDOWN )
-	{
-	    goto fail;	
-	}	
-	
-	//salva s� o char.
-	save = (int) t->long1;
-		
-	// #importante:
-	// >Limpa.
-	// >Sinaliza que a mensagem foi consumida, e que n�o 
-	// temos nova mensagem.
-	
-	t->window = 0;
-	t->msg = 0;
-	t->long1 = 0;
-	t->long2 = 0;
-	t->newmessageFlag = 0;
-	
-	//===============
-	// Retorna o char.
-	//===============
+            // Limpa.
+            // Sinaliza que a mensagem foi consumida, 
+            // e que nao temos nova mensagem.
+            
+            // event
+            t->window = 0;
+            t->msg = 0;
+            t->long1 = 0;
+            t->long2 = 0;
+            
+            //falg
+            t->newmessageFlag = 0;
 
-//#todo: Create this label.
-//done:
-    return (int) save;
+            // OK. Return the char.
+            return (int) save;
+        }
+    }
 
-// ?? 
+// Fail.
 fail:
-// ?? delete this label.
-done:
-
-   // window_getch_lock = 0;
-
-	// =============
-	// Retorna erro
-	// =============
-
-    return (int) -1; //erro
+    return (int) -1; 
 }
+
 
 
 //

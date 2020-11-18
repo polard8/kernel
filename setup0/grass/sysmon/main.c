@@ -7,10 +7,6 @@
 
 
 
-//#define TEDITOR_VERBOSE 1
-
-
-
 #define GRID_HORIZONTAL    1000
 #define GRID_VERTICAL      2000
 
@@ -257,10 +253,9 @@ sysmonProcedure (
     unsigned long long2 )
 {
 
-    //Salvaremos o nome do processo aqui.
-    //char __processname_buffer[64];
-    //char __tmp_buffer[64];
 
+    if ( msg<0 )
+        return -1;
 
     switch (msg)
     {
@@ -295,6 +290,7 @@ sysmonProcedure (
             goto done;
             break;
 
+
         case MSG_SYSKEYUP:  
             goto done;
             break;
@@ -318,8 +314,9 @@ sysmonProcedure (
             gde_redraw_window (main_window, 1);
             gde_redraw_window (main_window, 1);
             break;
-            
-        case MSG_KILLFOCUS:
+        
+        
+        case MSG_KILLFOCUS:  
             break;
 
 
@@ -331,15 +328,16 @@ sysmonProcedure (
         case 31:
             switch (long1)
             {
-				case 1:
-					if (window == main_window)
-					{
-						gde_set_focus (window);
-					    gde_redraw_window (window,1);
-					    // #todo: we need to redraw all other windows.
-					}
+                // button 1
+                case 1:
+                    if (window == main_window)
+                    {
+                        gde_set_focus (window);
+                        gde_redraw_window (window,1);
+                        // #todo: we need to redraw all other windows.
+                    }
 
-                    //pid button.
+                    // pid button.
                     if ( window == bar_button_1 )
                     {
                         gde_redraw_window (data_window,1);
@@ -350,17 +348,15 @@ sysmonProcedure (
                         showinfo_button1();
                         break;
                     }
-				    break;
-			};
-			goto done;
-			break;
-
+                    break;
+            };
+            goto done;
+            break;
 
         default:
-            debug_print ("sysmon: default message");
+            //debug_print ("sysmon: default message");
             break;
     };
-
 
 done:
     return (int) gde_system_procedure (window, msg, long1, long2);

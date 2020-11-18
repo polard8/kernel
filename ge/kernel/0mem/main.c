@@ -108,6 +108,11 @@ int kernel_main (int arch_type)
     BootBlock.gramado_mode       = (unsigned long) base[11]; // 44
 
 
+
+    //
+    // == gramado mode =============================================
+    //
+
     // The 'gramado mode' or 'gamemode'.
     // jail,p1,home,p2,castle
     // We can't check right here ...
@@ -117,6 +122,19 @@ int kernel_main (int arch_type)
     // It is used by the kernel info.
     current_mode = (char) BootBlock.gramado_mode;
 
+
+    //
+    // == input mode =============================================
+    //
+
+    // This is the default initial input mode.
+    // This mode is gonna change only when we load
+    // a ring3 window server.
+    
+    current_input_mode = INPUT_MODE_SETUP;
+ 
+
+ 
     //
     // == serial ======================================================
     //

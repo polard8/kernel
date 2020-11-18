@@ -2208,6 +2208,10 @@ void api_receive_message( struct api_receive_message_d *m )
  *     Diálogo de yes ou no. 
  */
 
+// #??
+// Ninguem esta usando essa rotina no momento. hahaha
+// precisamos testar rotinas de input.
+
 int gde_dialog ( const char *string ){
 
     int Status = 1; // Yes!
@@ -2218,18 +2222,25 @@ int gde_dialog ( const char *string ){
 
     printf (string);
 
+    //
+    // == loop =====================================
+    //
+
     while (1){
 
-        ch = (int) gde_getchar ();
+        // #todo:
+        // Check this input method.
+        // It can be useful for some other aplications running
+        // with no window server.
+        
+        ch = (int) gde_getchar();
 
         if ( ch != -1 )
         {
-	        switch (ch)
+            switch (ch)
             {
-				case VK_RETURN:
-				    return (int) Status;
-                    break;
-					
+                case VK_RETURN:  return (int) Status;  break;
+
 			    case 'Y': case 'y':
 				    printf ("Yes\n");
 			        Status = 1;
@@ -2239,7 +2250,7 @@ int gde_dialog ( const char *string ){
 			        printf ("No\n");
 					Status = 0;
 				    break;
-					
+
 				//default:
 				//    break;
 		    };		   
@@ -2254,12 +2265,24 @@ int gde_dialog ( const char *string ){
 }
 
 
+
+/*
+ ******************************** 
+ * gde_getchar:
+ *     Metodo alternativo de pegar input.
+ *     #todo: Checar.
+ */
+
 // #todo
-// Descrever o método usdo por essa rotina.
+// Descrever o método usado por essa rotina.
+// O que pegamos aqui?
+// Como pegamos?
+
 int gde_getchar (void)
 {
     return (int) gramado_system_call ( 137, 0, 0, 0 );
 }
+
 
 
 /*
@@ -3029,12 +3052,16 @@ unsigned long gde_get_thread_stats (int tid, int index){
 
 
 /*
+ **********************************************
  * gde_debug_print:
- * 
+ *     Envia uma string para a porta serial COM1.
  */
-// Envia uma string para a porta serial COM1
-void gde_debug_print (char *string){
 
+void gde_debug_print (char *string)
+{
+    // #todo
+    // Check pointer validation.
+    
     gramado_system_call ( 289, 
         (unsigned long) string,
         (unsigned long) string,

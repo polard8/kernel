@@ -124,7 +124,7 @@ build-portals:
 
 	@echo "==================="
 	@echo "Compiling setup ..."
-	$(Q) $(MAKE) -C setup/grass/
+	$(Q) $(MAKE) -C setup0/grass/
 
 	@echo "==================="
 	@echo "Compiling  lib ..."
@@ -137,9 +137,11 @@ build-portals:
 	
 	$(Q) $(MAKE) -C ge/services/gnssrv/ 
 
-	$(Q) $(MAKE) -C setup/apps/
-	$(Q) $(MAKE) -C setup/cmd/
-	$(Q) $(MAKE) -C setup/net/
+	$(Q) $(MAKE) -C setup1/apps/
+	$(Q) $(MAKE) -C setup1/net/
+	
+	$(Q) $(MAKE) -C setup2/cmd/
+
 
 ## Step1 KERNEL.BIN         - Creating the kernel image.
 KERNEL.BIN: 
@@ -202,20 +204,20 @@ vhd-copy-files:
 	sudo cp ge/init/INIT.BIN  base/
 	sudo cp ge/init/INIT.BIN  base/PORTALS
 
-	sudo cp setup/grass/bin/GDESHELL.BIN  base/
-	sudo cp setup/grass/bin/GDESHELL.BIN  base/PORTALS
+	sudo cp setup0/grass/bin/GDESHELL.BIN  base/
+	sudo cp setup0/grass/bin/GDESHELL.BIN  base/PORTALS
 
 	# setup
-	#-sudo cp setup/grass/bin/*.BIN    base/
+	#-sudo cp setup0/grass/bin/*.BIN    base/
 	# sysmon
-	sudo cp setup/grass/bin/SYSMON.BIN base/
+	sudo cp setup0/grass/bin/SYSMON.BIN base/
 
 
 	#tests interpreters.
-	sudo cp setup/grass/bin/C4.BIN       base/
-	sudo cp setup/grass/bin/GRAMC.BIN    base/
-	sudo cp setup/grass/bin/GRAMC4.BIN   base/
-	sudo cp setup/grass/bin/GRAMCNF.BIN  base/
+	sudo cp setup0/grass/bin/C4.BIN       base/
+	sudo cp setup0/grass/bin/GRAMC.BIN    base/
+	sudo cp setup0/grass/bin/GRAMC4.BIN   base/
+	sudo cp setup0/grass/bin/GRAMCNF.BIN  base/
 	
 	# ====================================================
 
@@ -225,33 +227,34 @@ vhd-copy-files:
 	#
 
 	# apps
-#	-sudo cp setup/apps/bin/*.BIN  base/
-#	-sudo cp setup/apps/bin/*.BIN  base/PROGRAMS
-	#-sudo cp setup/apps/bin/GWM.BIN     base/
-	-sudo cp setup/apps/bin/EDITOR.BIN  base/
-	-sudo cp setup/apps/bin/FILEMAN.BIN  base/
-	-sudo cp setup/apps/bin/LAUNCH1.BIN  base/
+#	-sudo cp setup1/apps/bin/*.BIN  base/
+#	-sudo cp setup1/apps/bin/*.BIN  base/PROGRAMS
+	#-sudo cp setup1/apps/bin/GWM.BIN     base/
+	-sudo cp setup1/apps/bin/EDITOR.BIN  base/
+	-sudo cp setup1/apps/bin/FILEMAN.BIN  base/
+	-sudo cp setup1/apps/bin/LAUNCH1.BIN  base/
+	#-sudo cp setup1/apps/bin/TERMINAL.BIN  base/
+	
+	-sudo cp setup1/net/bin/*.BIN  base/PROGRAMS
 
-	#-sudo cp setup/apps/bin/TERMINAL.BIN  base/
-	#-sudo cp setup/cmd/bin/SHELL.BIN       base/
+	# net
+	-sudo cp setup1/net/bin/*.BIN  base/
 
 	# ...
 
 	# cmd
-	#-sudo cp setup/cmd/bin/*.BIN  base/
-	#-sudo cp setup/cmd/bin/*.BIN  base/BIN
-	-sudo cp setup/cmd/bin/REBOOT.BIN     base/
-	-sudo cp setup/cmd/bin/CAT.BIN        base/
-	-sudo cp setup/cmd/bin/FASM.BIN       base/
-#	-sudo cp setup/cmd/bin/TRUE.BIN       base/
-#	-sudo cp setup/cmd/bin/FALSE.BIN      base/
-#	-sudo cp setup/cmd/bin/SHOWFUN.BIN       base/
+	#-sudo cp setup2/cmd/bin/*.BIN  base/
+	#-sudo cp setup2/cmd/bin/*.BIN  base/BIN
+	-sudo cp setup2/cmd/bin/REBOOT.BIN     base/
+	-sudo cp setup2/cmd/bin/CAT.BIN        base/
+	-sudo cp setup2/cmd/bin/FASM.BIN       base/
+#	-sudo cp setup2/cmd/bin/TRUE.BIN       base/
+#	-sudo cp setup2/cmd/bin/FALSE.BIN      base/
+#	-sudo cp setup2/cmd/bin/SHOWFUN.BIN       base/
 	# ...
 
-	# net
-	-sudo cp setup/net/bin/*.BIN  base/
-	-sudo cp setup/net/bin/*.BIN  base/PROGRAMS
-
+	#-sudo cp setup2/cmd/bin/SHELL.BIN       base/
+	
 	# gws
 	-sudo cp ge/aurora/bin/GWS.BIN     base/ 
 	-sudo cp ge/aurora/bin/GWSSRV.BIN  base/
@@ -295,11 +298,14 @@ clean2:
 	-rm *.VHD
 
 clean3:
-	-rm setup/grass/bin/*.BIN
 
-	-rm setup/apps/bin/*.BIN
-	-rm setup/cmd/bin/*.BIN
-	-rm setup/net/bin/*.BIN
+	-rm setup0/grass/bin/*.BIN
+
+	-rm setup1/apps/bin/*.BIN
+	-rm setup1/net/bin/*.BIN
+
+	-rm setup2/cmd/bin/*.BIN
+
 
 #Clean base
 clean4:
@@ -327,9 +333,6 @@ clean-system-files:
 	# fonts
 	-rm -rf ge/fonts/bin/*.FON
 
-	# Setup
-	-rm -rf setup/grass/bin/*.BIN
-	
 	# aurora
 	-rm -rf ge/aurora/bin/*.BIN
 	
@@ -337,10 +340,11 @@ clean-system-files:
 	-rm -rf ge/services/gnssrv/bin/*.BIN
 	# ...
 
-	# Shell
-	-rm -rf setup/apps/bin/*.BIN
-	-rm -rf setup/cmd/bin/*.BIN
-	-rm -rf setup/net/bin/*.BIN
+	# Setup
+	-rm -rf setup0/grass/bin/*.BIN
+	-rm -rf setup1/apps/bin/*.BIN
+	-rm -rf setup1/net/bin/*.BIN
+	-rm -rf setup2/cmd/bin/*.BIN
 # ...
 
 

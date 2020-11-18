@@ -8,8 +8,11 @@
  *     2014~2018 - Resision.
  */
 
+//
+// == gramado modes =================================================
+//
 
-// Modes.
+// See: 'current_mode'.
 #define GRAMADO_JAIL        0x00
 #define GRAMADO_P1          0x01
 #define GRAMADO_HOME        0x02
@@ -18,6 +21,45 @@
 #define GRAMADO_CALIFORNIA  0x05
 // ...
 
+//
+// == input modes ==================================================
+//
+
+// See: 'current_input_mode'.
+
+
+// ================
+// fred:
+// Talvez o bom mesmo seja usarmos apenas o input mode tty.
+// Nesse caso para todos os tipos de aplicativo eles precisaram ler
+// a tty para pegar o input no seu modo raw.
+// Todo esse trabalho so existe porque o kernel esta construindo
+// o evento de input ao inves de mandar o input no formato raw.
+// ================
+
+
+// Setup input mode.
+// This is the mode used when we do not have a 
+// loadble ring3 window server.
+// Send the input event to the thread associated with the
+// window with focus in the window server embedded inside the kernel.
+#define INPUT_MODE_SETUP  1000
+
+// WS input mode.
+// This is the mode used when we have a loadable ring3 window server.
+// Send the input event to the control thread of the 
+// loadable window server if we have one.
+#define INPUT_MODE_WS      2000
+
+
+// tty input mode.
+// In this mode we're gonna send the input to the tty buffer.
+// This way a virtual terminal can share the input with its client.
+#define INPUT_MODE_TTY     3000
+
+
+
+// ...
 
 
 //
@@ -425,6 +467,8 @@ extern void do_executa_new_task (void);
 
 //keyboard suppport 
 //abnt2 flag.
+//#todo: Move this to another file.
+//maybe gdef.h
 int abnt2;
 //...
 
@@ -463,11 +507,16 @@ typedef enum {
 
 
 //
-// ==== current ====
+// == current ======================================================
 //
 
+// GRAMADO_JAIL, GRAMADO_P1 ...
 int current_mode;
 
+// INPUT_MODE_SETUP, INPUT_MODE_WS ...
+int current_input_mode;
+
+// x86 ...
 int current_arch;
 
 
