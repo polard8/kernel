@@ -48,9 +48,31 @@
 
 
 
+//
+// == events ===========================================
+//
+
+// System messages in the thread's event queue.
+
+#define LIBCORE_WAIT_FOR_EVENTS  1
+#define LIBCORE_POOL_FOR_EVENTS  2
+
+//  The buffer for the event elements.
+unsigned long LibCoreEventBuffer[32];
+
+// Get an event from the thread's event queue.
+// That old 'get system message'
+// Using a buffer
+int libcore_get_event (void);
+
+// ===========================================================
+
+
+
 
 //
-// @todo: Fazer suporte a objetos. estruturas.
+// #todo: 
+// Fazer suporte a objetos. estruturas.
 //
 
 

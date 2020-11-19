@@ -289,7 +289,7 @@ clean:
 	@echo "(Step 8) Deleting the object files ..."
 
 	-rm *.o
-	-rm -rf rtl/obj/*.o
+	-rm -rf ge/rtl/obj/*.o
 	
 	@echo "Success?"
 

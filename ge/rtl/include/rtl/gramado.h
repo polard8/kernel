@@ -23,24 +23,47 @@
 // ...
 
 
-
+// system call
 void *gramado_system_call ( 
     unsigned long a, 
     unsigned long b, 
     unsigned long c, 
     unsigned long d );
 
+//
+// == events ===========================================
+//
+
+// System messages in the thread's event queue.
+
+#define RTL_WAIT_FOR_EVENTS  1
+#define RTL_POOL_FOR_EVENTS  2
+
+//  The buffer for the event elements.
+unsigned long RTLEventBuffer[32];
+
+// Get an event from the thread's event queue.
+// That old 'get system message'
+// Using a buffer
+int rtl_get_event (void);
+
+// ===========================================================
+
+
+
 
 
 void rtl_enter_critical_section (void);
 void rtl_exit_critical_section (void);
 
-void *
-rtl_create_thread ( 
+//
+// == thread ===============================
+//
+
+void *rtl_create_thread ( 
     unsigned long init_eip, 
     unsigned long init_stack, 
     char *name );
-
 
 void rtl_start_thread (void *thread);
 

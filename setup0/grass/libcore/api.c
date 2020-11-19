@@ -57,9 +57,6 @@
  *
  * History: 
  *     2014 - Created by Fred Nora.
- *     2015 - New services.
- *     2016 - New services.
- *     2018 - Revision.
  *     ...
  */
 
@@ -3122,6 +3119,47 @@ execute_new_process (
 }
 
 
+
+// Get an event from the thread's event queue.
+// That old 'get system message'
+// Using a buffer
+int libcore_get_event (void)
+{
+    // clear
+    LibCoreEventBuffer[0] = 0;
+    LibCoreEventBuffer[1] = 0;
+    LibCoreEventBuffer[2] = 0;
+    LibCoreEventBuffer[3] = 0;
+    //...
+
+    // Get event from the thread's event queue.
+    gde_enter_critical_section(); 
+    gramado_system_call ( 111,
+        (unsigned long) &LibCoreEventBuffer[0],
+        (unsigned long) &LibCoreEventBuffer[0],
+        (unsigned long) &LibCoreEventBuffer[0] );
+    gde_exit_critical_section(); 
+
+    // Check if it is a valid event.
+
+    // No, we do not have an event. Yield.
+    if ( LibCoreEventBuffer[1] == 0 )
+    {
+        gramado_system_call (265,0,0,0); 
+        
+        // clear
+        LibCoreEventBuffer[0] = 0;
+        LibCoreEventBuffer[1] = 0;
+        LibCoreEventBuffer[2] = 0;
+        LibCoreEventBuffer[3] = 0;
+        //...
+
+        return FALSE; 
+    }
+
+    // Yes, we have an event.
+    return TRUE;
+}
 
 
 //

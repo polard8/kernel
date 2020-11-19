@@ -13,7 +13,7 @@
 #include <sysdeps/gramado/syscall.h>
 
 
-
+// system call.
 void *gramado_system_call ( 
     unsigned long a, 
     unsigned long b, 
@@ -30,6 +30,53 @@ void *gramado_system_call (
 
     return (void *) __Ret; 
 }
+
+
+
+// Get an event from the thread's event queue.
+// That old 'get system message'
+// Using a buffer
+int rtl_get_event (void)
+{
+    // clear
+    RTLEventBuffer[0] = 0;
+    RTLEventBuffer[1] = 0;
+    RTLEventBuffer[2] = 0;
+    RTLEventBuffer[3] = 0;
+    //...
+
+    // Get event from the thread's event queue.
+    rtl_enter_critical_section(); 
+    gramado_system_call ( 111,
+        (unsigned long) &RTLEventBuffer[0],
+        (unsigned long) &RTLEventBuffer[0],
+        (unsigned long) &RTLEventBuffer[0] );
+    rtl_exit_critical_section(); 
+
+    // Check if it is a valid event.
+
+    // No, we do not have an event. Yield.
+    if ( RTLEventBuffer[1] == 0 )
+    {
+        gramado_system_call (265,0,0,0); 
+        
+        // clear
+        RTLEventBuffer[0] = 0;
+        RTLEventBuffer[1] = 0;
+        RTLEventBuffer[2] = 0;
+        RTLEventBuffer[3] = 0;
+        //...
+
+        return FALSE; 
+    }
+
+    // Yes, we have an event.
+    return TRUE;
+}
+
+
+
+
 
 
 
@@ -161,7 +208,8 @@ void rtl_show_backbuffer (void)
  *     #importante
  */
 
-unsigned long rtl_get_system_metrics (int index){
+unsigned long rtl_get_system_metrics (int index)
+{
     //if (index<0){
         //gde_debug_print ("gde_get_system_metrics: fail\n");
         //return 0;

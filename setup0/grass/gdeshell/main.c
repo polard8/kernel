@@ -6973,13 +6973,13 @@ noArgs:
     //
 
     // Buffer.
-    unsigned long message_buffer[5];
+    //unsigned long message_buffer[5];
 
     // Stack.
     //struct window_d *msg_Window;
-    int msg_Message;
-    void *msg_Long1;
-    void *msg_Long2;
+    //int msg_Message;
+    //void *msg_Long1;
+    //void *msg_Long2;
 
 
 read_and_execute:
@@ -6989,38 +6989,30 @@ read_and_execute:
     //
     // == Main loop =================================================
     //
+    
+    int EventStatus=FALSE;  // No event.
 
 Mainloop:
 
     while (_running)
     {
-        // Get message.
-        gde_enter_critical_section(); 
-        system_call ( 111,
-            (unsigned long) &message_buffer[0],
-            (unsigned long) &message_buffer[0],
-            (unsigned long) &message_buffer[0] );
-        gde_exit_critical_section(); 
-
-        // No message. Yield.
-        if ( message_buffer[1] == 0 ){ 
-            gramado_system_call (265,0,0,0); 
-        }
-
-        // We've got a message. Call the procedure.
-        if ( message_buffer[1] != 0 )
+        EventStatus = (int) libcore_get_event();
+        
+        // We've got en event. 
+        // Call the window procedure. 
+        // Call event handler!
+        
+        if ( EventStatus == TRUE )
         {
             shellProcedure ( 
-                (struct window_d *) message_buffer[0], 
-                (int) message_buffer[1], 
-                (unsigned long) message_buffer[2], 
-                (unsigned long) message_buffer[3] );
-
-            message_buffer[0] = 0;
-            message_buffer[1] = 0;
-            message_buffer[2] = 0;
-            message_buffer[3] = 0;
+                (struct window_d *) LibCoreEventBuffer[0], 
+                (int)               LibCoreEventBuffer[1], 
+                (unsigned long)     LibCoreEventBuffer[2], 
+                (unsigned long)     LibCoreEventBuffer[3] );
         }
+        
+        //pool or sleep.
+        //if ( mode == ??
     };
 
 

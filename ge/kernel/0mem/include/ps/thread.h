@@ -563,14 +563,17 @@ struct thread_d
     unsigned long procedure; //Endereço do procedimento de janela da tarefa. 
 	//unsigned long control_menu_procedure; //procedimento do control menu.
 
-	
+
 	// #ORDEM: 
 	// O que segue é referenciado durante as trocas de mensagens.
 	// utilização de canais e IPC.
 
+
     //
+    // == Single event ===========================================
+    //
+
     // Single system message.
-    //
 
     // 4 argumentos padrão;
     struct window_d *window;    //arg1.
@@ -581,32 +584,29 @@ struct thread_d
     int newmessageFlag;         
 
 
-
     //
-    // Queue. (list)
+    // == event queue ===========================================
     //
 
-    // #todo
-    // Essas longs extras podem ajudar ...
-    // Por exemplo: O mouse pode mandar um pacote com 3 longs
-    // para o ws em ring3.
-    // Mas ser'a que a system call consegue pegar todos esses argumentos ???
+    // This is the event queue.
+    // It is used by the ring 3 processes.
+    // Normally a server enter in a loop waiting for events,
+    // One of these events can be 
+    // the MSG_CLIENT_REQUEST/ EVENT_CLIENT_REQUEST.
+
+    // lists
+    struct window_d  *window_list[32];
+    int                  msg_list[32];  // <<< --- This is the event ID.
+    unsigned long      long1_list[32];
+    unsigned long      long2_list[32];
+    unsigned long      long3_list[32];
+    unsigned long      long4_list[32];
     
-    struct window_d *window_list[32];
-    int msg_list[32];
-    unsigned long long1_list[32];
-    unsigned long long2_list[32];
-    unsigned long long3_list[32];
-    unsigned long long4_list[32];
+    // offsets
     int tail_pos;
     int head_pos;
 
-    // Vamos alocar um buffer do tamanho de uma pagina.
-    // Se esse buffer estiver no espaço de memmoria
-    // do processo, entao o processo podera ler, sem precisar copiar
-    // mas copiar n~ao seir uma problema.
-    
-    //void *msg_buffer;
+    // ====================================================
 
 
     //
@@ -621,12 +621,10 @@ struct thread_d
     int MsgQueueTail;  //coloca.
 
 
-
     // Quando um processo só pode receber mensagens de um 
     // determinado processo. Ou de qualquer um.
     // Ex: ANY=-1, PID ...
     // pid_t receive_from_pid;
-
 
 
 	//?? mensagens pendentes.
