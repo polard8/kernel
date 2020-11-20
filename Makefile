@@ -12,9 +12,10 @@ VERSION_BUILD = 163
 # That's our default target when none is given on the command line.
 PHONY := _all
 _all: all
-
 	@echo "That's all!"
 
+# ==========================================
+# Variables.
 KERNELVERSION = $(VERSION_MAJOR)$(if $(VERSION_MINOR),.$(VERSION_MINOR)$(if $(VERSION_BUILD),.$(VERSION_BUILD)))
 
 export KBUILD_IMAGE ?= KERNEL.BIN 
@@ -41,7 +42,6 @@ PYTHON2 = python2
 PYTHON3 = python3
 RUBY    = ruby
 
-
 # Verbose.
 
 ifndef KBUILD_VERBOSE
@@ -59,23 +59,22 @@ endif
 # Begin.
 #
 
-## ====================================================================
+## ===============================================================
 ## Step0 build-system-files - Libraries and apps.
-## Step1 KERNEL.BIN         - Creating the kernel image.
+## Step1 build-applications - setupx files. 
 ## Step2 /mnt/gramadovhd    - Creating the directory to mount the VHD.
 ## Step3 vhd-mount          - Mounting the VHD.
 ## Step4 vhd-copy-files     - Copying files into the mounted VHD.
 ## Step5 vhd-unmount        - Unmounting the VHD.
-## Step6 clean              - Deleting the object files.           
+## Step6 clean              - Deleting the object files. 
 
 
 PHONY := all
 
-
 # All the steps.
 all:  \
 build-system-files \
-KERNEL.BIN \
+build-applications \
 /mnt/gramadovhd  \
 vhd-mount \
 vhd-copy-files \
@@ -83,86 +82,107 @@ vhd-unmount \
 clean \
 clean-system-files
 
-
-
-
-	#Giving permitions to run ./run hahaha
+# Giving permitions to run ./run hahaha
 	chmod 755 ./run
 
+# Product info:
 	@echo "$(PRODUCT_NAME) $(KERNELVERSION)"
 #	@echo "$(ARCH)"
 
 
-# Building system files.
-# boot, libs, apps and commands.
-# #todo: fonts.
-
-
-PHONY := build-system-files
-
-
+#===================================================
+#:::0
 # ~ Step 0: Building system files.
+PHONY := build-system-files
 build-system-files: \
 /usr/local/gramado-build \
-build-boot \
-build-portals    
+ge-boot \
+ge-kernel \
+ge-rtl \
+ge-lib \
+ge-init \
+ge-aurora \
+ge-services    
 
 /usr/local/gramado-build:
 	-sudo mkdir /usr/local/gramado-build
 
-build-boot:
+ge-boot:
+	#::boot   xxx xx x
 	@echo "==================="
 	@echo "Compiling boot/ ... "
 	$(Q) $(NASM)    ge/boot/x86/xxxvhd/main.asm -I ge/boot/x86/xxxvhd/ -o GRAMADO.VHD   
 	$(Q) $(MAKE) -C ge/boot/x86/xxbm/ 
 	$(Q) $(MAKE) -C ge/boot/x86/xbl/ 
-
-build-portals:
-
+# KERNEL.BIN  - Creating the kernel image.
+ge-kernel:
+	#::kernel
+	@echo "================================="
+	@echo "(Step 1) Creating the kernel image ..."
+	$(Q) $(MAKE) -C ge/kernel
+ge-rtl:
+	#::rtl
 	@echo "==================="
 	@echo "Compiling rtl ..."
 	$(Q) $(MAKE) -C ge/rtl/
-
+ge-lib:
+	#::lib
 	@echo "==================="
 	@echo "Compiling  lib ..."
 	$(Q) $(MAKE) -C ge/lib/
-
+ge-init:
+	#::init
 	@echo "==================="
 	@echo "Compiling init ..."
 	$(Q) $(MAKE) -C ge/init/
-
+ge-aurora:
+	#::aurora Aurora Window Server.
 	@echo "==================="
 	@echo "Compiling Aurora window server ..."
 	$(Q) $(MAKE) -C ge/aurora/
-
-	@echo "==================="
-	@echo "Compiling setup ..."
-	$(Q) $(MAKE) -C setup0/grass/
-	$(Q) $(MAKE) -C setup1/apps/
-	$(Q) $(MAKE) -C setup1/net/
-	$(Q) $(MAKE) -C setup2/cmd/
-
+ge-services:
+	#::services Services
 	@echo "==================="
 	@echo "Compiling services..."
 	$(Q) $(MAKE) -C ge/services/gnssrv/ 
 
-# ~ Step 1: KERNEL.BIN  - Creating the kernel image.
-KERNEL.BIN: 
-	@echo "================================="
-	@echo "(Step 1) Creating the kernel image ..."
-	$(Q) $(MAKE) -C ge/kernel
 
 
+#===================================================
+#:::1
+# ~ Step 1 Setup directories.
+PHONY := build-applications 
+build-applications: \
+setup0-grass \
+setup1-apps \
+setup1-net \
+setup2-cmd    
+
+setup0-grass:
+	#::grass
+	$(Q) $(MAKE) -C setup0/grass/
+setup1-apps:
+	#::apps
+	$(Q) $(MAKE) -C setup1/apps/
+setup1-net:
+	#::net
+	$(Q) $(MAKE) -C setup1/net/
+setup2-cmd:
+	#::cmd
+	$(Q) $(MAKE) -C setup2/cmd/
+
+
+#===================================================
+#:::2
 # Step 2: /mnt/gramadovhd  - Creating the directory to mount the VHD.
 /mnt/gramadovhd:
 	@echo "================================="
 	@echo "(Step 2) Creating the directory to mount the VHD ..."
 	sudo mkdir /mnt/gramadovhd
 
-#
-# == vhd ====================================
-#
 
+#===================================================
+#:::3
 # ~ Step 3: vhd-mount  - Mounting the VHD.
 vhd-mount:
 	@echo "================================="
@@ -170,7 +190,8 @@ vhd-mount:
 	-sudo umount /mnt/gramadovhd
 	sudo mount -t vfat -o loop,offset=32256 GRAMADO.VHD /mnt/gramadovhd/
 
-
+#===================================================
+#:::4
 # ~ Step 4 vhd-copy-files  - Copying files into the mounted VHD.
 vhd-copy-files:
 	@echo "================================="
@@ -262,7 +283,8 @@ vhd-copy-files:
 	sudo cp -r base/* /mnt/gramadovhd
 
 
-
+#===================================================
+#:::5
 # ~ Step 5 vhd-unmount  - Unmounting the VHD.
 vhd-unmount:
 	@echo "================================="
@@ -279,7 +301,9 @@ clean clean2 clean3 clean4 clean-system-files
 	@echo "==================="
 	@echo "ok ?"
 
-## Step 6 clean              - Deleting the object files.           
+#===================================================
+#:::6
+# ~ Step 6 clean  - Deleting the object files.           
 clean:
 	@echo "================================="
 	@echo "(Step 6) Deleting the object files ..."
