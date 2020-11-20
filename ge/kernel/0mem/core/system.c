@@ -981,21 +981,18 @@ void *systemGetSystemStatus (int number){
  */
 
 void die (void){
-	
-	//*Bullet.
-    printf ("die: * System Halted\n");      
 
-    if ( VideoBlock.useGui == 1 )
-    {
+    // Bullet.
+    printf ("die: * System Halted\n");
+
+    if ( VideoBlock.useGui == 1 ){
         refresh_screen ();
     }
 
-//halt:
-
-    asm ("hlt");   
 
     while (1){ 
         asm ("cli");
+        //asm ("mwait");   
         asm ("hlt");
     };
 }

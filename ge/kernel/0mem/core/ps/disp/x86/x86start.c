@@ -32,30 +32,36 @@ extern void turn_task_switch_on (void);
  *     #esse nome precisa ser resolvido ... não usaremos o termo task.
  */
 
-void start_task ( unsigned long id, unsigned long *task_address ){     	
-	
+void 
+start_task ( 
+    unsigned long id, 
+    unsigned long *task_address )
+{
+
 	// #todo: filtrar argumentos.
 	//  start_new_task_status:
 	//      É uma FLAG. Indica que existe uma thread querendo ser executada 
 	//  pela primeira vez.
 	// #todo: 
 	//  Isso poderia estar na estrutura 'ProcessorBlock' ?!
-	 
-	start_new_task_status = 1; 
-    
-    //Id e Address.
-	start_new_task_id = (int) id; 
+
+
+    start_new_task_status = 1; 
+
+    // Id e Address.
+    start_new_task_id = (int) id; 
     start_new_task_address = (unsigned long) task_address;
 
-    // mais ??!!	
+
+    // mais ??!!
 }
 
 
- 
 
 
 /*
- * switch_to_user_mode:  */
+ * switch_to_user_mode:  
+ */
 
 void switch_to_user_mode (void)
 {
@@ -182,6 +188,7 @@ void KiSwitchToUserMode (void)
 }
 
 
+// #todo: Delete this thing.
 unsigned long KiExecutaTarefa ( int id, unsigned long *task_address )
 {
     return 0;  //Deprecated

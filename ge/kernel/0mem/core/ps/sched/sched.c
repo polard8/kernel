@@ -23,11 +23,11 @@
  * @todo:
  *     Não por interface nessa rotina. Perde velocidade.
  *
- * Histórico:
- *     Versão 1.0, 2015 - Esse arquivo foi criado por Fred Nora.
- *     Versão 1.0, 2016 - Aprimoramento geral das rotinas básicas.
+ * History:
+ *     2015 - Created by Fred Nora.
  *     //...
  */
+
 
  /*
   * #importante:
@@ -39,17 +39,6 @@
  
 
 #include <kernel.h>
-
-
-//
-// Variáveis internas.
-//
-
-//int schedulerStatus;
-//int schedulerError;
-//int schedulerType;
-//...
-
 
 
 /*
@@ -234,8 +223,10 @@ prepare_next:
 
 int scheduler (void){
 
+    // loop
+    register int i=0;
+
     struct thread_d *TmpThread;
-    int i=0;
 
 
 #ifdef SERIAL_DEBUG_VERBOSE
@@ -251,7 +242,7 @@ int scheduler (void){
     Conductor = (void *) tmpConductor->next;
 
     // READY threads in the threadList[].
-    for ( i=0; i < THREAD_COUNT_MAX; i++ )
+    for ( i=0; i < THREAD_COUNT_MAX; ++i )
     {
         TmpThread = (void *) threadList[i];
 

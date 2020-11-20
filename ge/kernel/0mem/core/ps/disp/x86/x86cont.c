@@ -165,7 +165,7 @@ void save_current_context (void){
         t->edx = (unsigned long) contextedx[0];
         t->esi = (unsigned long) contextesi[0];
         t->edi = (unsigned long) contextedi[0];
-        t->ebp = (unsigned long) contextebp[0];		
+        t->ebp = (unsigned long) contextebp[0];
         //Continua...
     };
 

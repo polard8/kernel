@@ -214,17 +214,18 @@ done:
 	
 fail:
     //printf("# FAIL #");
-    //die();	
-	
+    //die();
+
 tryagain:
     printf ("*HANG\n");
     //refresh_screen();
-	
+
 	// #debug
 	// Não estamos continuando por enquanto pois 
 	// ainda estamos iplementando isso.
-	
-	die ();
+	// See: core/system.c
+
+    die();
 }
 
 

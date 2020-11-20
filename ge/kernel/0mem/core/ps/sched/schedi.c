@@ -307,10 +307,8 @@ int wakeup_thread_reason ( int tid, int reason ){
 		//nothing
     };
 
-
 fail:
     return (int) 1;
-
 done:
     return 0;
 }
@@ -327,11 +325,12 @@ done:
 
 int wakeup_scan_thread_reason ( int reason ){
 
-    int i=0;
+    //loop
+    register int i=0;
 
-    printf ("wakeup_scan_thread_reason: %d", reason);
-    refresh_screen();
-
+    // #debug ??
+    // printf ("wakeup_scan_thread_reason: %d", reason);
+    // refresh_screen();
 
     // reason
     if ( reason < 0 || reason >= 10 ){
@@ -339,12 +338,12 @@ int wakeup_scan_thread_reason ( int reason ){
         goto fail;
     } 
 
-
-    for ( i=0; i<THREAD_COUNT_MAX; i++ ){
+    // loop
+    for ( i=0; i<THREAD_COUNT_MAX; ++i )
+    {
         wakeup_thread_reason ( i, reason );
     };
 
-//done:
     printf ("wakeup_scan_thread_reason: done\n");
     refresh_screen();
     return 0;
@@ -785,6 +784,7 @@ void yield (int tid){
 	        // e que deve sair quando for seguro fazer isso.
             // Agenda o yield.
             // >>> O ts.c vai fazer isso na hora certa.
+
             t->_yield = 1;    
         }
     }
@@ -861,9 +861,10 @@ void wakeup_thread (int tid){
  * @todo: Mudar para schediSelectNextThread(int current);.
  */
 
-int SelectNextThread (int current){
-
-    int Next;
+int SelectNextThread (int current)
+{
+    int Next=0;
+    
     struct thread_d *t; 
     struct thread_d *n; 
 
@@ -895,14 +896,13 @@ int SelectNextThread (int current){
 		    n = (void *) threadList[Next];
 
             if ( (void *) n == NULL ){
-				Next = next_thread;
-			    return (int) Next; 
-		    
-            }else{
-			    Next = (int) n->tid;    //Pega id.
-			    return (int) Next;
-            };
+                Next = next_thread;
+                return (int) Next; 
 
+            }else{
+                Next = (int) n->tid;    //Pega id.
+                return (int) Next;
+            };
 
 		//Aceita a indicação de próxima.
         }else{
@@ -924,7 +924,6 @@ int SelectNextThread (int current){
         //Nothing.
     };
 
-
     return (int) Next;
 }
 
@@ -932,6 +931,7 @@ int SelectNextThread (int current){
 /*
  *****************************************
  * check_for_standby:
+ * 
  *     Procura na lista de threads no estado StandyBy.
  * Se tiver uma thread nessa lista, ela se torna 
  * a current. Para rodar pela primeira vez, atravéz de Spawn.
@@ -940,11 +940,13 @@ int SelectNextThread (int current){
  
 void check_for_standby (void){
 
-    int newId;
-    struct thread_d *New;
+    // loop
+    register int i = 0;
+    register int Max = 32;
 
-    int i = 0;
-    int Max = 32;
+    int newId=0;
+
+    struct thread_d *New;
 
 
 
@@ -961,9 +963,8 @@ void check_for_standby (void){
         {
             if ( New->used == 1 && 
                  New->magic == 1234 && 
-                 New->state == STANDBY )   
+                 New->state == STANDBY ) 
             {
-
                 current_thread = (int) New->tid;
                 goto do_spawn;
             }
@@ -1020,8 +1021,10 @@ do_spawn:
 
 int check_quantum (void){
 
+    //loop
+    register int i=0;
+    
     struct thread_d *New;
-    int i=0;
 
 
     while ( i < THREAD_COUNT_MAX )

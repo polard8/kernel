@@ -51,7 +51,7 @@ int KiSetPriority (void)
 {
 	//#todo: Fazer alguma coisa aqui.
 
-    return (int) set_priority ();
+    return (int) set_priority();
 }
 
 
@@ -79,12 +79,15 @@ int KiIncreasePriority (int pid)
  
 int find_higher_priority (void){
 
+    //loop
+    register int i=0;  // Counter
+
+    unsigned long p=0;  // Priority
+    
+    int Current=0; 
+
     struct thread_d *t;
     
-    int i;              //Contador.
-    unsigned long p;    //Prioridade.
-
-    int Current; 
 
 
     // Only Idle? return.
@@ -99,37 +102,37 @@ int find_higher_priority (void){
 		//{
 			//return (int) next_thread;
 		//}
+
+		// #todo: 
+		// E caso a única thread que está rodando não seja a thread idle??
 		
 		return (int) ____IDLE->tid;
-		
-		//@todo: E caso a única thread que está rodando não seja a thread idle??
     }
 
 
 	// Find: Procura uma thread de maior prioridade, que o estado seja READY e 
 	// que o contexto esteja salvo.
 
-    for ( i=0; i < THREAD_COUNT_MAX; i++ )
+    for ( i=0; i < THREAD_COUNT_MAX; ++i )
     {
         //Pega na lista.
-       	t = (void *) threadList[i]; 
+        t = (void *) threadList[i]; 
         
         if ( (void *) t != NULL )
         { 
-		    if (t->used  != 1){ continue; };
-		    if (t->magic != 1234){ continue; };
+		    if (t->used  != 1)    { continue; };
+		    if (t->magic != 1234) { continue; };
 		    if (t->state != READY){ continue; };
-		    
-			//Pega a de maior prioridade.
-			if (t->priority > p)
-			{ 
-			    p = t->priority; 
-			}
 
+			// Pega a de maior prioridade.
+            if (t->priority > p)
+            { 
+                p = t->priority; 
+            }
             //Nothing.
-        };
+        }
 		//Nothing.
-	};
+    };
 
 
 	// Encontra a próxima thread a ser executada. Ela deve ter prioridade 
@@ -192,7 +195,7 @@ int KiFindHigherPriority (void)
 	// #todo:
 	// Algo pode ser feito aqui.
 
-    return (int) find_higher_priority (); 
+    return (int) find_higher_priority(); 
 }
 
 

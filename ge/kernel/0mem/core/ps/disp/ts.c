@@ -348,6 +348,8 @@ The remainder ??
                 
                 // Unix signals.
                 KiSignal();
+                
+                // ...
 
                 // #todo: 
                 // Talvez possamos incluir mais atividades extras.
@@ -409,6 +411,8 @@ try_next:
 
 
     // We have only ONE thread.
+    // Is that thread the idle thread?
+    // Can we use the mwait instruction ?
 
     if (UPProcessorBlock.threads_counter == 1)
     {
@@ -416,6 +420,11 @@ try_next:
         
         // Is this a pointer?
         Conductor = ____IDLE;
+        
+        // If we will run only the idle thread, 
+        // so we can use the mwait instruction. 
+        // asm ("mwait"); 
+        
         goto go_ahead;
     }
 
@@ -525,7 +534,6 @@ go_ahead:
 	//
 	// fail
 	//
-
 
 //superCrazyFail:
     goto dispatch_current; 
