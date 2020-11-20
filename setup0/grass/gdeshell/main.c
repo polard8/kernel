@@ -1966,18 +1966,13 @@ do_compare:
     if ( gramado_strncmp ( prompt, "gethostname", 11 ) == 0 )
     {
         gethostname (hostbuffer, sizeof(hostbuffer));
-
-		printf(">>> ");
-		printf (hostbuffer);
-		printf("\n");
-
+        printf(">>> ");  printf (hostbuffer);  printf("\n");
 		//#obs: Isso funciona.
 		//vai colocar num buffer ba libc
 		//my_hostname = ( char *) __gethostname();
 		//printf(">> ");
 		//printf (my_hostname);
 		//printf("\n");
-
         goto exit_cmp;
     }
 
@@ -2126,10 +2121,15 @@ do_compare:
 
 
     // help
+    int help_id=0;
     if ( gramado_strncmp( prompt, "HELP", 4 ) == 0 || 
          gramado_strncmp( prompt, "help", 4 ) == 0 || 
          gramado_strncmp( prompt, "?", 1 ) == 0 )
     {
+        //#bugbug: NULL pointer?
+        //help_id = (int) atoi( tokenList[1] );
+        //printf("help %d: \n",help_id);
+        
         help_builtins();
         goto exit_cmp;
     }

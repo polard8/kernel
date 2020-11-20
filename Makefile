@@ -62,25 +62,28 @@ endif
 ## ====================================================================
 ## Step0 build-system-files - Libraries and apps.
 ## Step1 KERNEL.BIN         - Creating the kernel image.
-## Step2 kernel-image-link  - Linking the kernel image.
-## Step3 /mnt/gramadovhd    - Creating the directory to mount the VHD.
-## Step4 vhd-create         - Creating a VHD in Assembly language.
-## Step5 vhd-mount          - Mounting the VHD.
-## Step6 vhd-copy-files     - Copying files into the mounted VHD.
-## Step7 vhd-unmount        - Unmounting the VHD.
-## Step8 clean              - Deleting the object files.           
+## Step2 /mnt/gramadovhd    - Creating the directory to mount the VHD.
+## Step3 vhd-mount          - Mounting the VHD.
+## Step4 vhd-copy-files     - Copying files into the mounted VHD.
+## Step5 vhd-unmount        - Unmounting the VHD.
+## Step6 clean              - Deleting the object files.           
+
 
 PHONY := all
 
-all: build-system-files \
+
+# All the steps.
+all:  \
+build-system-files \
 KERNEL.BIN \
 /mnt/gramadovhd  \
-vhd-create \
 vhd-mount \
 vhd-copy-files \
 vhd-unmount \
 clean \
 clean-system-files
+
+
 
 
 	#Giving permitions to run ./run hahaha
@@ -97,88 +100,81 @@ clean-system-files
 
 PHONY := build-system-files
 
-#Step 0
-build-system-files: /usr/local/gramado-build \
+
+# ~ Step 0: Building system files.
+build-system-files: \
+/usr/local/gramado-build \
 build-boot \
 build-portals    
-
 
 /usr/local/gramado-build:
 	-sudo mkdir /usr/local/gramado-build
 
-
 build-boot:
 	@echo "==================="
-	@echo "Compiling Boot ... "
-	$(Q) $(MAKE) -C ge/boot/x86/bm/ 
-	$(Q) $(MAKE) -C ge/boot/x86/bl/ 
+	@echo "Compiling boot/ ... "
+	$(Q) $(NASM)    ge/boot/x86/xxxvhd/main.asm -I ge/boot/x86/xxxvhd/ -o GRAMADO.VHD   
+	$(Q) $(MAKE) -C ge/boot/x86/xxbm/ 
+	$(Q) $(MAKE) -C ge/boot/x86/xbl/ 
 
 build-portals:
+
 	@echo "==================="
 	@echo "Compiling rtl ..."
 	$(Q) $(MAKE) -C ge/rtl/
+
+	@echo "==================="
+	@echo "Compiling  lib ..."
+	$(Q) $(MAKE) -C ge/lib/
 
 	@echo "==================="
 	@echo "Compiling init ..."
 	$(Q) $(MAKE) -C ge/init/
 
 	@echo "==================="
+	@echo "Compiling Aurora window server ..."
+	$(Q) $(MAKE) -C ge/aurora/
+
+	@echo "==================="
 	@echo "Compiling setup ..."
 	$(Q) $(MAKE) -C setup0/grass/
-
-	@echo "==================="
-	@echo "Compiling  lib ..."
-	$(Q) $(MAKE) -C ge/lib/
-	
-	@echo "==================="
-	@echo "Compiling setup stuff ..."
-	
-	$(Q) $(MAKE) -C ge/aurora/
-	
-	$(Q) $(MAKE) -C ge/services/gnssrv/ 
-
 	$(Q) $(MAKE) -C setup1/apps/
 	$(Q) $(MAKE) -C setup1/net/
-	
 	$(Q) $(MAKE) -C setup2/cmd/
 
+	@echo "==================="
+	@echo "Compiling services..."
+	$(Q) $(MAKE) -C ge/services/gnssrv/ 
 
-## Step1 KERNEL.BIN         - Creating the kernel image.
+# ~ Step 1: KERNEL.BIN  - Creating the kernel image.
 KERNEL.BIN: 
 	@echo "================================="
 	@echo "(Step 1) Creating the kernel image ..."
-
 	$(Q) $(MAKE) -C ge/kernel
 
 
-## Step3 /mnt/gramadovhd    - Creating the directory to mount the VHD.
+# Step 2: /mnt/gramadovhd  - Creating the directory to mount the VHD.
 /mnt/gramadovhd:
 	@echo "================================="
-	@echo "(Step 3) Creating the directory to mount the VHD ..."
-
+	@echo "(Step 2) Creating the directory to mount the VHD ..."
 	sudo mkdir /mnt/gramadovhd
 
+#
+# == vhd ====================================
+#
 
-## Step4 vhd-create         - Creating a VHD in Assembly language.
-vhd-create:
-	@echo "================================="
-	@echo "(Step 4) Creating a VHD in Assembly language ..."
-
-	$(NASM) ge/boot/x86/vhd/main.asm -I ge/boot/x86/vhd/ -o GRAMADO.VHD   
-
-
-## Step5 vhd-mount          - Mounting the VHD.
+# ~ Step 3: vhd-mount  - Mounting the VHD.
 vhd-mount:
 	@echo "================================="
-	@echo "(Step 5) Mounting the VHD ..."
-
+	@echo "(Step 3) Mounting the VHD ..."
 	-sudo umount /mnt/gramadovhd
 	sudo mount -t vfat -o loop,offset=32256 GRAMADO.VHD /mnt/gramadovhd/
 
-## Step6 vhd-copy-files     - Copying files into the mounted VHD.
+
+# ~ Step 4 vhd-copy-files  - Copying files into the mounted VHD.
 vhd-copy-files:
 	@echo "================================="
-	@echo "(Step 6) Copying files into the mounted VHD ..."
+	@echo "(Step 4) Copying files into the mounted VHD ..."
 
 	#
 	# == ge ======================================
@@ -221,11 +217,6 @@ vhd-copy-files:
 	
 	# ====================================================
 
-
-	#
-	# == setup ======================================
-	#
-
 	# apps
 #	-sudo cp setup1/apps/bin/*.BIN  base/
 #	-sudo cp setup1/apps/bin/*.BIN  base/PROGRAMS
@@ -266,48 +257,46 @@ vhd-copy-files:
 	-sudo cp ge/services/gnssrv/bin/GNSSRV.BIN  base/PORTALS
 
 
-	#
-	# == Copy base ===========================================
-	#
-
+	# Copy base
 	# sends everything from base to root.
 	sudo cp -r base/* /mnt/gramadovhd
 
 
 
-## Step7 vhd-unmount        - Unmounting the VHD.
+# ~ Step 5 vhd-unmount  - Unmounting the VHD.
 vhd-unmount:
 	@echo "================================="
-	@echo "(Step 7) Unmounting the VHD ..."
-
+	@echo "(Step 5) Unmounting the VHD ..."
 	sudo umount /mnt/gramadovhd
 
 
-## Step8 clean              - Deleting the object files.           
+#
+# == clean ====================================
+#
+
+clean-all: \
+clean clean2 clean3 clean4 clean-system-files  
+	@echo "==================="
+	@echo "ok ?"
+
+## Step 6 clean              - Deleting the object files.           
 clean:
 	@echo "================================="
-	@echo "(Step 8) Deleting the object files ..."
-
+	@echo "(Step 6) Deleting the object files ..."
 	-rm *.o
 	-rm -rf ge/rtl/obj/*.o
-	
 	@echo "Success?"
-
+# clean ISO and VHD.
 clean2:
 	-rm *.ISO
 	-rm *.VHD
-
+# clean setup
 clean3:
-
 	-rm setup0/grass/bin/*.BIN
-
 	-rm setup1/apps/bin/*.BIN
 	-rm setup1/net/bin/*.BIN
-
 	-rm setup2/cmd/bin/*.BIN
-
-
-#Clean base
+# clean base
 clean4:
 	-rm -rf base/*.BIN 
 	-rm -rf base/BOOT/*.BIN 
@@ -315,43 +304,29 @@ clean4:
 	-rm -rf base/SBIN/*.BIN 
 	-rm -rf base/PROGRAMS/*.BIN 
 	-rm -rf base/PORTALS/*.BIN 
-
-
+# clean system files.
 PHONY := clean-system-files
 clean-system-files:
 	@echo "==================="
 	@echo "Cleaning all system binaries ..."
-
-
 	# Gramado
 	-rm -rf ge/boot/x86/bin/*.BIN
 	-rm -rf ge/kernel/KERNEL.BIN
-
 	# Init
 	-rm -rf ge/init/*.BIN
-
 	# fonts
 	-rm -rf ge/fonts/bin/*.FON
-
 	# aurora
 	-rm -rf ge/aurora/bin/*.BIN
-	
 	# Services
 	-rm -rf ge/services/gnssrv/bin/*.BIN
 	# ...
-
 	# Setup
 	-rm -rf setup0/grass/bin/*.BIN
 	-rm -rf setup1/apps/bin/*.BIN
 	-rm -rf setup1/net/bin/*.BIN
 	-rm -rf setup2/cmd/bin/*.BIN
 # ...
-
-
-clean-all: clean clean2 clean3 clean4 clean-system-files  
-
-	@echo "==================="
-	@echo "ok ?"
 
 
 ## ==================================================================
