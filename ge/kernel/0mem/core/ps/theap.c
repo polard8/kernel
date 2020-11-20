@@ -94,35 +94,24 @@ void *theapSetHeapPointer(struct thread_d *thread, struct heap_d heap)
  *     @todo: Mudar para theapGetStart(.).
  */
 //unsigned long theapGetStart(struct thread_d *thread) 
-unsigned long 
-GetThreadHeapStart( struct thread_d *thread )
+
+unsigned long GetThreadHeapStart ( struct thread_d *thread )
 {
-    //Estrutura inválida.
-	if((void*) thread == NULL){
-        return (unsigned long) 0;        
-	};
+
+    if ((void*) thread == NULL)
+    {
+        // message?
+        return (unsigned long) 0;
+    }
 
 	//@todo:
     //return (unsigned long) thread->heap->HeapStart;
-	
-	return (unsigned long) thread->Heap;
-};
 
-
-/*
- *Constructor.
-int thmThm()
-{};
-*/
-
-
-/*
-int thmInit()
-{};
-*/
+    return (unsigned long) thread->Heap;
+}
 
 
 //
-// Fim.
+// End.
 //
 

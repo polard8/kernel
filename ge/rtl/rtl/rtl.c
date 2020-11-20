@@ -898,9 +898,184 @@ static int isdotdirname(char *name)
 */
 
 
+/*
+// do a getc, but give error message if EOF encountered.
+int rtl_safegetc(FILE *f)
+int rtl_safegetc(FILE *f)
+{
+    register int c = getc(f);
+    
+    if (c == EOF){
+        printf ("rtl_safegetc: Unexpected end of file\n");
+        exit(1);
+    }
+    return c;
+}
+*/
+
+
+/*
+//Generate a string from the integer I.
+//Return a ptr to internal memory containing the string.  
+char *rtl_int_to_string (int i);
+char *rtl_int_to_string (int i)
+{
+    static char buf[20];
+    
+    sprintf(buf, "%d", i);
+    return buf;
+}
+*/
+
+
+/*
+int snprintf2(char *str, size_t size, const char *format, ...);
+int snprintf2(char *str, size_t size, const char *format, ...)
+{
+    va_list ap;
+    int rv;
+
+    va_start(ap, format);
+    rv = vsnprintf(str, size, format, ap);
+    va_end(ap);
+
+    return rv;
+}
+*/
 
 
 
+/*
+int rtl_eq (char *a, char *b);
+int rtl_eq (char *a, char *b)
+{
+    int i=0;
+
+l:
+    // Se for diferente.
+    if(a[i] != b[i])
+        return (0);
+
+    // Se terminou a string.
+    if (a[i++] == '\0')
+        return (1);
+
+    goto l;
+}
+*/
+
+
+
+/*
+ //ugly
+char *rtl_ptsname2(int fd);
+char *rtl_ptsname2(int fd)
+{
+  static char buffer[32];  // Big enough to hold even a 64-bit pts no 
+  unsigned int ptyno;
+
+  if ( ioctl(fd, TIOCGPTN, &ptyno) )
+    return NULL;
+  
+  snprintf(buffer, sizeof buffer, "/dev/pts/%u", ptyno);
+  
+  return buffer;
+}
+*/
+
+
+/*
+int rtl_unlockpt2(int fd);
+int rtl_unlockpt2(int fd)
+{
+  int unlock = 0;
+
+  return ioctl(fd, TIOCSPTLCK, &unlock);
+}
+*/
+
+
+/*
+//Basically getdelim() with the delimiter hard wired to '\n'.
+ssize_t rtl_getline2 (char **linebuf, size_t *n, FILE *file);
+ssize_t rtl_getline2 (char **linebuf, size_t *n, FILE *file)
+{
+    return (getdelim (linebuf, n, '\n', file));
+}
+*/
+
+
+/*
+int rtl__libc_tcdrain(int fd);
+int rtl__libc_tcdrain(int fd)
+{
+  return ioctl(fd, TCSBRK, 1);
+}
+*/
+
+
+/*
+int rtl__libc_tcflush2(int fd, int queue_selector);
+int rtl__libc_tcflush2(int fd, int queue_selector)
+{
+  return ioctl(fd, TCFLSH, queue_selector);
+}
+*/
+
+
+/*
+int rtl__write1 (const char* s);
+int rtl__write1 (const char* s) 
+{
+    return write (1, s, strlen(s));
+}
+*/
+
+/*
+int rtl__write2 (const char* s); 
+int rtl__write2 (const char* s) 
+{
+    return write (2, s, strlen(s));
+}
+*/
+
+
+/*
+       path           dirname        basename
+       "/usr/lib"     "/usr"         "lib"
+       "/usr/"        "/"            "usr"
+       "usr"          "."            "usr"
+       "/"            "/"            "/"
+       "."            "."            "."
+       ".."           "."            ".."
+*/
+
+
+/*
+// not tested
+// credits: dietlibc-0.20
+char *rtl_get_basename (char *path);
+char *rtl_get_basename (char *path) 
+{
+    char *c;
+
+again:
+    if ( !( c = strrchr(path,'/') ) ) 
+        return path;
+    
+    if (c[1]==0) 
+    {
+        if (c == path){
+            return c;
+        } else {
+            *c=0;
+            goto again;
+        };
+    }
+    
+    return c+1;
+}
+*/
 
 
 

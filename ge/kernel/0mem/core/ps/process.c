@@ -1100,11 +1100,14 @@ struct process_d *create_process (
     // Para a entrada vazia no array de processos.
     struct process_d *EmptyEntry; 
     
-    int i=0;
+    // loop
+    register int i=0;
 
-    //indice usado na inicializaçao da lista de 
-    //conexoes pendentes do processo servidor.
-    int sIndex=0;
+    // loop
+    // indice usado na inicializaçao da lista de 
+    // conexoes pendentes do processo servidor.
+    register int sIndex=0;
+
 
     unsigned long BasePriority=0;
     unsigned long Priority=0;
@@ -1170,11 +1173,9 @@ struct process_d *create_process (
      //====================
     
 
-    // Object.
+    // Object and validation
     Process->objectType  = ObjectTypeProcess;
     Process->objectClass = ObjectClassKernelObjects;
-
-    //Validation.
     Process->used = 1;
     Process->magic = 1234;
 
@@ -1231,8 +1232,9 @@ struct process_d *create_process (
         // Podemos colocar 3 arquivos em Objects[]
         // Ou seriam tty ? 
 
+    // loop
     // Limpando todos slots.
-    for ( i=0; i<32; i++ ){ Process->Objects[i] = 0; }
+    for ( i=0; i<32; ++i ){ Process->Objects[i] = 0; }
 
     if ( (void *) stdin == NULL ){
         panic ("create_process: [TEST] stdin");
@@ -1241,7 +1243,7 @@ struct process_d *create_process (
     if ( (void *) stdout == NULL ){
         panic ("create_process: [TEST] stdout");
     }
-        
+
     if ( (void *) stderr == NULL ){
         panic ("create_process: [TEST] stderr");
     }
@@ -1562,10 +1564,7 @@ struct process_d *create_process (
 		// Para isso ela deve ser configurada na inicializa��o do gws,
 		// antes da cria��o dos processo.
 
-    //
-    // == Security ==============================
-    //
-
+    // Security
     Process->usession = CurrentUserSession;  // Current.
     Process->room     = room;                // Passado via argumento.
     Process->desktop  = desktop;             // Passado via argumento.
@@ -1623,9 +1622,11 @@ struct process_d *create_process (
     // == Socket ===================================
     //
 
-    for (sIndex=0; sIndex<32; sIndex++)
+    // loop
+    for (sIndex=0; sIndex<32; ++sIndex){
         Process->socket_pending_list[sIndex] = 0; 
-        
+    };
+
     Process->socket_pending_list_head =0;
     Process->socket_pending_list_tail =0;
     Process->socket_pending_list_max = 0; //atualizado pelo listen();
@@ -1653,7 +1654,6 @@ struct process_d *create_process (
     // Coloca o processo criado na lista de processos.
 
     processList[PID] = (unsigned long) Process;
-
 
     return (void *) Process;
 

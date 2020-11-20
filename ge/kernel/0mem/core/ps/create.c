@@ -20,16 +20,18 @@
 // It has the lowest priority.
 // ...
 
-void *createCreateInitThread (void){
+void *createCreateInitThread (void)
+{
+
+    // loops
+    int r=0;    // Wait reason.
+    int i=0;    // Message queue.
+    int q=0;    // Message queue.
 
     char *ThreadName = "init-thread"; 
 
     // Stack pointer.
     void *__initStack;   
-
-    int r=0;    // Wait reason.
-    int i=0;    // Message queue.
-    int q=0;    // Message queue.
 
 
     // The init process.
@@ -131,12 +133,9 @@ void *createCreateInitThread (void){
         panic("createCreateInitThread: InitThread->DirectoryPA\n");
     }
 
+    // loop
     // Clean the 'wait reason'.
-
-    for ( r=0; r<8; r++ ){
-        InitThread->wait_reason[r] = (int) 0;
-    };
-
+    for ( r=0; r<8; ++r ){ InitThread->wait_reason[r] = (int) 0; };
 
     // ??
     // The system window procedure used by this thread.
@@ -155,10 +154,10 @@ void *createCreateInitThread (void){
     //InitThread->long
     //...
 
+    // loop
     // Clean the message queue.
-    
-    for ( i=0; i<32; i++ ){
-
+    for ( i=0; i<32; ++i )
+    {
         InitThread->window_list[i] = 0;
         InitThread->msg_list[i]    = 0;
         InitThread->long1_list[i]  = 0;
@@ -166,12 +165,12 @@ void *createCreateInitThread (void){
         InitThread->long3_list[i]  = 0;
         InitThread->long4_list[i]  = 0;
     };
-
     InitThread->head_pos = 0;
     InitThread->tail_pos = 0;
 
+    // loop
     // Message queue.
-    for ( q=0; q<32; q++ ){ InitThread->MsgQueue[q] = 0; };
+    for ( q=0; q<32; ++q ){ InitThread->MsgQueue[q] = 0; };
     InitThread->MsgQueueHead = 0;
     InitThread->MsgQueueTail = 0;
 
@@ -337,7 +336,6 @@ void *createCreateInitThread (void){
 
     // * MOVEMENT 1 ( Initialized ---> Standby ).
     SelectForExecution (InitThread);    
-
 
     return (void *) InitThread;
 }

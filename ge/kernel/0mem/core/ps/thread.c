@@ -646,8 +646,8 @@ struct thread_d *create_thread (
 
     // Counters.
     int i = USER_BASE_TID;
-    int w=0;
-    int q=0; 
+    register int q=0;  //loop
+    register int w=0;  //loop
 
 
 	// Limits da thread atual.
@@ -714,7 +714,8 @@ get_next:
     // Recomeça o loop na base para id de usu�rios.
 
     i++;
-    if ( i >= THREAD_COUNT_MAX ){
+    if ( i >= THREAD_COUNT_MAX )
+    {
        i = USER_BASE_TID;    
     }
 
@@ -730,10 +731,11 @@ get_next:
         goto get_next;
     
     }else{
-
-        // Object.
+        // Object and validation.
         Thread->objectType  = ObjectTypeThread;
         Thread->objectClass = ObjectClassKernelObjects;
+        Thread->used = 1;
+        Thread->magic = 1234;
 
         // c,Put in list.
         // Iniciamos em 100. 
@@ -743,13 +745,9 @@ get_next:
 		    //fail	
 		//};		
 
-
         // ID do processo ao qual o thread pertence.
         Thread->ownerPID = (int) pid;
 
-        Thread->used = 1;
-        Thread->magic = 1234;
-        
         // Not a protected thread!
         Thread->_protected = 0;
 
@@ -774,16 +772,17 @@ get_next:
 
         // Single message;
         // Msg support. //Argumentos.
-        Thread->window = NULL;        //arg1.
-        Thread->msg = 0;              //arg2.
-        Thread->long1 = 0;            //arg3.
-        Thread->long2 = 0;            //arg4.
+        Thread->window = NULL;  //arg1.
+        Thread->msg    = 0;     //arg2.
+        Thread->long1  = 0;     //arg3.
+        Thread->long2  = 0;     //arg4.
         //Thread->long
         //Thread->long
         //Thread->long
         //...
 
-        for ( q=0; q<32; q++ )
+        // loop
+        for ( q=0; q<32; ++q )
         {
             Thread->window_list[q] = 0;
             Thread->msg_list[q]    = 0;
@@ -795,9 +794,9 @@ get_next:
         Thread->head_pos = 0;
         Thread->tail_pos = 0;
 
-
+        // loop
         // Message queue.
-        for ( q=0; q<32; q++ ){ Thread->MsgQueue[q] = 0; };
+        for ( q=0; q<32; ++q ){ Thread->MsgQueue[q] = 0; };
         Thread->MsgQueueHead = 0;
         Thread->MsgQueueTail = 0;
 
@@ -860,14 +859,12 @@ get_next:
         // QUANTUM_LIMIT  (PRIORITY_MAX *TIMESLICE_MULTIPLIER)
         Thread->quantum_limit = QUANTUM_LIMIT; 
 
-
         Thread->standbyCount = 0;
 
         Thread->runningCount = 0;   
 
         Thread->initial_time_ms = get_systime_ms();
         Thread->total_time_ms = 0;
-
 
         // Quantidade de tempo rodadndo dado em ms.
         Thread->runningCount_ms = 0;
@@ -990,12 +987,9 @@ get_next:
 		
 		//Thread->wait4pid =
 
+        // loop
         // Waiting reasons.
-
-        for ( w=0; w<8; w++ ){
-            Thread->wait_reason[w] = (int) 0;
-        };
-
+        for ( w=0; w<8; ++w ){ Thread->wait_reason[w] = (int) 0; };
 
 		//...
         //@todo:
@@ -1087,14 +1081,17 @@ void *GetCurrentThread (void){
 // OUT:
 // Return a pointer to the found thread.
 
-void *FindReadyThread (void){
+void *FindReadyThread (void)
+{
 
+    // loop
+    register int i=0;
+    
     struct thread_d *Thread;
-    int i=0;
 
 
-    for ( i=0; i<THREAD_COUNT_MAX; i++ ){
-
+    for ( i=0; i<THREAD_COUNT_MAX; ++i )
+    {
         Thread = (void *) threadList[i];
 
         if ( (void *) Thread != NULL )

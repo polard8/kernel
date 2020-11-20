@@ -815,10 +815,10 @@ mapping_nic1_device_address ( unsigned long pa )
 // Called by:
 // 
 
-int mmSetUpPaging (void){
-
-    unsigned int i=0;
-    int Index=0;
+int mmSetUpPaging (void)
+{
+    // loops
+    register unsigned int i=0;
 
 
 	// #importante
@@ -942,7 +942,6 @@ int mmSetUpPaging (void){
 
 
 
-
 	// O que temos logo abaixo s�o pequenas parti��es de mem�ria f�sica.
 	// cada parti��o tem 1024 unsigned longs. o que d� 4KB cada. 
 	
@@ -1011,7 +1010,6 @@ int mmSetUpPaging (void){
     unsigned long *extraheap2_page_table = (unsigned long *) PAGETABLE_EXTRAHEAP2;
     unsigned long *extraheap3_page_table = (unsigned long *) PAGETABLE_EXTRAHEAP3;
 
-
     //...
 
 	//
@@ -1028,7 +1026,6 @@ int mmSetUpPaging (void){
 #ifdef PS_VERBOSE
     printf ("mmSetUpPaging: Initializing Pages..\n");
 #endif
-
 
 
 	//
@@ -1049,7 +1046,7 @@ int mmSetUpPaging (void){
     // #importante:
     // O endere�o f�sico e virtual s�o iguais para essa tabela.
     
-    for ( i=0; i < 1024; i++ ){
+    for ( i=0; i < 1024; ++i ){
         page_directory[i] = (unsigned long) 0 | 2; 
     };
 
@@ -1098,7 +1095,7 @@ int mmSetUpPaging (void){
     // #importante:
     // O endere�o f�sico e virtual s�o iguais para essa tabela.
 
-    for ( i=0; i < 1024; i++ )
+    for ( i=0; i < 1024; ++i )
     {
         km_page_table[i] = (unsigned long) SMALL_origin_pa | 3;     
         SMALL_origin_pa  = (unsigned long) SMALL_origin_pa + 4096;  
@@ -1137,7 +1134,7 @@ int mmSetUpPaging (void){
     // #importante:
     // O endere�o f�sico e virtual s�o iguais para essa tabela.
 
-    for ( i=0; i < 1024; i++ )
+    for ( i=0; i < 1024; ++i )
     {
         km2_page_table[i]    = (unsigned long) SMALL_kernel_base_pa | 3; 
         SMALL_kernel_base_pa = (unsigned long) SMALL_kernel_base_pa + 4096; 
@@ -1193,7 +1190,7 @@ int mmSetUpPaging (void){
     // #importante:
     // O endere�o f�sico e virtual s�o iguais para essa tabela.
 
-    for ( i=0; i < 1024; i++ )
+    for ( i=0; i < 1024; ++i )
     {
         um_page_table[i]  = (unsigned long) SMALL_user_pa | 7; 
         SMALL_user_pa     = (unsigned long) SMALL_user_pa + 4096; 
@@ -1245,7 +1242,7 @@ int mmSetUpPaging (void){
     // #importante:	
     // O endere�o f�sico e virtual s�o iguais para essa tabela.
 
-    for ( i=0; i < 1024; i++ )
+    for ( i=0; i < 1024; ++i )
     {
         cga_page_table[i] = (unsigned long) SMALL_cga_pa | 7; 
         SMALL_cga_pa      = (unsigned long) SMALL_cga_pa + 4096; 
@@ -1306,7 +1303,7 @@ int mmSetUpPaging (void){
     // #importante:	
     // O endere�o f�sico e virtual s�o iguais para essa tabela.
 
-    for ( i=0; i < 1024; i++ )
+    for ( i=0; i < 1024; ++i )
     {
         frontbuffer_page_table[i] = (unsigned long) SMALL_frontbuffer_pa | 7; 
         SMALL_frontbuffer_pa      = (unsigned long) SMALL_frontbuffer_pa + 4096; 
@@ -1362,7 +1359,7 @@ int mmSetUpPaging (void){
     // #importante:
     // O endere�o f�sico e virtual s�o iguais para essa tabela.
 
-    for ( i=0; i < 1024; i++ )
+    for ( i=0; i < 1024; ++i )
     {
         backbuffer_page_table[i] = (unsigned long) SMALL_backbuffer_pa | 7; 
         SMALL_backbuffer_pa      = (unsigned long) SMALL_backbuffer_pa + 4096; 
@@ -1376,7 +1373,6 @@ int mmSetUpPaging (void){
     // (marca de 16MB), s�o destinados ao back buffer. 
     // Obs: 
     // Isso � bem pouco, uma tela com alta resolu��o usa mais que isso.
-
 
 
 	//
@@ -1403,7 +1399,7 @@ int mmSetUpPaging (void){
     // #importante:
     // O endere�o f�sico e virtual s�o iguais para essa tabela.
 
-    for ( i=0; i < 1024; i++ )
+    for ( i=0; i < 1024; ++i )
     {
         pagedpool_page_table[i] = (unsigned long) SMALL_pagedpool_pa | 7; 
         SMALL_pagedpool_pa      = (unsigned long) SMALL_pagedpool_pa + 4096; 
@@ -1434,7 +1430,7 @@ int mmSetUpPaging (void){
     // #importante:
     // O endere�o f�sico e virtual s�o iguais para essa tabela.
 
-    for ( i=0; i < 1024; i++ )
+    for ( i=0; i < 1024; ++i )
     {
         heappool_page_table[i] = (unsigned long) SMALL_heappool_pa | 7; 
         SMALL_heappool_pa      = (unsigned long) SMALL_heappool_pa + 4096; 
@@ -1446,7 +1442,6 @@ int mmSetUpPaging (void){
     //
     // Extra heaps.
     //
-
 
 
     // +++++++
@@ -1462,7 +1457,7 @@ int mmSetUpPaging (void){
     // #importante:
     // O endere�o f�sico e virtual s�o iguais para essa tabela.
     
-    for ( i=0; i < 1024; i++ )
+    for ( i=0; i < 1024; ++i )
     {
         extraheap1_page_table[i] = (unsigned long) SMALL_extraheap1_pa | 7; 
         SMALL_extraheap1_pa      = (unsigned long) SMALL_extraheap1_pa + 4096; 
@@ -1485,14 +1480,13 @@ int mmSetUpPaging (void){
     // #importante:	
     // O endere�o f�sico e virtual s�o iguais para essa tabela.
 
-    for ( i=0; i < 1024; i++ )
+    for ( i=0; i < 1024; ++i )
     {
         extraheap2_page_table[i] = (unsigned long) SMALL_extraheap2_pa | 7; 
         SMALL_extraheap2_pa      = (unsigned long) SMALL_extraheap2_pa + 4096; 
     };
     page_directory[ENTRY_EXTRAHEAP2_PAGES] = (unsigned long) &extraheap2_page_table[0]; 
     page_directory[ENTRY_EXTRAHEAP2_PAGES] = (unsigned long) page_directory[ENTRY_EXTRAHEAP2_PAGES] | 7;  
-
 
 
     // +++++++
@@ -1507,7 +1501,7 @@ int mmSetUpPaging (void){
     // #importante:
     // O endere�o f�sico e virtual s�o iguais para essa tabela.
 
-    for ( i=0; i < 1024; i++ )
+    for ( i=0; i < 1024; ++i )
     {
         extraheap3_page_table[i] = (unsigned long) SMALL_extraheap3_pa | 7; 
         SMALL_extraheap3_pa      = (unsigned long) SMALL_extraheap3_pa + 4096; 
@@ -1594,7 +1588,6 @@ int mmSetUpPaging (void){
     //
 
 
-
     // #Importante
     // Agora vamos calcular a quantidade de mem�ria f�sica usada 
     // at� agora.
@@ -1621,10 +1614,8 @@ int mmSetUpPaging (void){
         mm_used_extraheap1 + mm_used_extraheap2 + mm_used_extraheap3 +
         mm_used_frame_table );
 
-
     // Free.
     memorysizeFree = memorysizeTotal - memorysizeUsed;
-
 
 
     // #todo:  
@@ -1714,15 +1705,12 @@ int mmSetUpPaging (void){
 	//while(1){};
 #endif
 
-
 	// Obs: 
 	// Podemos reaproveitas pagetables em diferentes processos.
-
 
     // Salvando o endere�o do diret�rio do processo Kernel no CR3. 
 
     x86_SetCR3 ( (unsigned long) &page_directory[0] );
-
 
 
     // LISTAS:
@@ -1737,9 +1725,9 @@ int mmSetUpPaging (void){
     // 
 
 
-    for ( Index=0; Index < PAGEDIRECTORY_COUNT_MAX; Index++ )
+    for ( i=0; i < PAGEDIRECTORY_COUNT_MAX; ++i )
     {
-        pagedirectoryList[Index] = (unsigned long) 0;
+        pagedirectoryList[i] = (unsigned long) 0;
     };
 
     //O primeiro diret�rio da lista � o diret�rio do kernel.
@@ -1752,9 +1740,9 @@ int mmSetUpPaging (void){
 	// Inicializando a lista de pagetables..
 	//
 
-    for ( Index=0; Index < PAGETABLE_COUNT_MAX; Index++ )
+    for ( i=0; i < PAGETABLE_COUNT_MAX; ++i )
     {
-        pagetableList[Index] = (unsigned long) 0;
+        pagetableList[i] = (unsigned long) 0;
     };
 
     //Configurando manualmente as primeiras entradas da lista.
@@ -1772,14 +1760,14 @@ int mmSetUpPaging (void){
 	// Inicializando a lista de framepools. (parti��es)
 	//
 
-    for ( Index=0; Index < FRAMEPOOL_COUNT_MAX; Index++ )
+    for ( i=0; i < FRAMEPOOL_COUNT_MAX; ++i )
     {
-        framepoolList[Index] = (unsigned long) 0;
+        framepoolList[i] = (unsigned long) 0;
     };
 
 	//Configurando manualmente a lista de pageframes.
-	framepoolList[0] = (unsigned long) 0;
-	framepoolList[1] = (unsigned long) 0;
+    framepoolList[0] = (unsigned long) 0;
+    framepoolList[1] = (unsigned long) 0;
 	//...
 
 
@@ -1797,7 +1785,6 @@ int mmSetUpPaging (void){
     if ( (void *) kfp != NULL  )
     {
 		kfp->id = 0;
-		
 		kfp->used = 1;
 		kfp->magic = 1234;
 		
@@ -1832,7 +1819,6 @@ int mmSetUpPaging (void){
     if ( (void *) small_fp != NULL  )
     {
 		small_fp->id = 1;
-		
 		small_fp->used = 1;
 		small_fp->magic = 1234;
 		
@@ -1872,7 +1858,6 @@ int mmSetUpPaging (void){
     if( (void *) pageable_fp != NULL  )
     {
 		pageable_fp->id = 5;   //quinto �ndice.
-		
 		pageable_fp->used = 1;
 		pageable_fp->magic = 1234;
 		
@@ -1893,16 +1878,13 @@ int mmSetUpPaging (void){
     };
 
 
-
 	// More ?
-
 
 // Done.
 	
 #ifdef MK_VERBOSE
     printf ("Done\n");
 #endif
-
 
     return 0;
 }

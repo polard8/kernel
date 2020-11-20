@@ -591,6 +591,13 @@ clone_and_execute_process (
     struct process_d *Current;
     struct process_d *Clone;
 
+    // loop
+    // Socket support.
+    // indice usado na inicializaçao da lista de 
+    // conexoes pendentes do processo servidor.
+    register int sIndex=0;
+
+
     int Status = -1;
     int PID = -1;
 
@@ -604,10 +611,6 @@ clone_and_execute_process (
     char *path;
     char *name;
 
-    // Socket support.
-    //indice usado na inicializaçao da lista de 
-    //conexoes pendentes do processo servidor.
-    int sIndex=0;
 
 
     // #debug
@@ -1113,9 +1116,9 @@ do_clone:
     // Socket ============
     //
 
-    for (sIndex=0; sIndex<32; sIndex++)
+    for (sIndex=0; sIndex<32; ++sIndex){
         Clone->socket_pending_list[sIndex] = 0; 
-
+    };
 
     Clone->socket_pending_list_head =0;
     Clone->socket_pending_list_tail =0;
@@ -1183,15 +1186,16 @@ do_clone:
 
 
 
-        // #debug: 
-        // Para a máquina real.
-    
+    // #debug: 
+    // Para a máquina real.
+
     printf ("clone_and_execute_process: [DEBUG] Returning to father\n");
     refresh_screen();
 
-		//
-		// Return.
-		//
+
+	//
+	// Return.
+	//
 
 		// #obs:
 		// Retornamos para o pai o PID do filho.

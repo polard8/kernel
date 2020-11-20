@@ -59,7 +59,6 @@ int init_runtime (void){
             //...
             break;
 
-
         case CURRENT_ARCH_X86_64:
             debug_print ("[x86_64] init_runtime: [NOT SUPPORTED] CURRENT_ARCH_X86_64\n");
             printf      ("[x86_64] init_runtime: [NOT SUPPORTED] CURRENT_ARCH_X86_64\n");
@@ -137,7 +136,8 @@ int Runtime_initialize(void)
 {
     int Status = (int) init_runtime();
 
-    if ( Status < 0 ){
+    if ( Status < 0 )
+    {
         debug_print ("Runtime_initialize: Runtime fail. *hang\n");
         // No message support at the moment ?!
         asm ("cli \n");
@@ -145,7 +145,6 @@ int Runtime_initialize(void)
     }
 
     // ...
-
 
     return 0;
 }

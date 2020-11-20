@@ -92,19 +92,22 @@ Loop:
  * thread rodando.
  */
 
-void *KiCreateRing0Idle (void){
+void *KiCreateRing0Idle (void)
+{
+
+    // loops
+    register int r=0;    // Wait reason.
+    register int i=0;    // Message queue.
+    register int q=0;    // Message queue.
+
 
     struct thread_d  *t;
-
 
     char *ThreadName = "ring0-idle-thread";
 
     // Stack pointer.
     void *ring0IdleStack; 
 
-    int r=0;    // Wait reason.
-    int i=0;    // Message queue.
-    int q=0;    // Message queue.
 
 
     // The kernel process.
@@ -171,12 +174,9 @@ void *KiCreateRing0Idle (void){
         panic("KiCreateRing0Idle: t->DirectoryPA\n");
     }
 
+    // loop
     // Clean the 'wait reason'.
-
-    for ( r=0; r<8; r++ ){
-        t->wait_reason[r] = (int) 0;
-    };
-
+    for ( r=0; r<8; ++r ){ t->wait_reason[r] = (int) 0; };
 
     // ??
     // The system window procedure used by this thread.
@@ -198,9 +198,10 @@ void *KiCreateRing0Idle (void){
     //t->long
     //...
     
+    // loop
     // Message queue.  
-    for ( i=0; i<32; i++ ){
-
+    for ( i=0; i<32; ++i )
+    {
         t->window_list[i] = 0;
         t->msg_list[i]    = 0;
         t->long1_list[i]  = 0;
@@ -211,11 +212,11 @@ void *KiCreateRing0Idle (void){
     t->head_pos = 0;
     t->tail_pos = 0;
 
+    // loop
     // Message queue.
-    for ( q=0; q<32; q++ ){ t->MsgQueue[q] = 0; }
+    for ( q=0; q<32; ++q ){ t->MsgQueue[q] = 0; }
     t->MsgQueueHead = 0;
     t->MsgQueueTail = 0;
-
 
 
     // Características.
@@ -229,7 +230,6 @@ void *KiCreateRing0Idle (void){
 
     t->base_priority = PRIORITY_MIN;    // Static
     t->priority      = PRIORITY_MIN;    // Dynamic
-
 
     t->saved = 0;
     t->preempted = UNPREEMPTABLE;
@@ -342,7 +342,6 @@ void *KiCreateRing0Idle (void){
     //
     // == counter =================================
     //
-
 
 	// #bugbug
 	// Se deixarmos de criar alguma das threads esse contador falha.
@@ -1048,15 +1047,11 @@ void kill_thread (int tid){
         }
 
 	    // Se queremos deletar a idle.
-        if ( tid == ____IDLE->tid )
-        {
+        if ( tid == ____IDLE->tid ){
             panic ("kill_thread: Sorry, we can't kill the idle thread!");
 	    }
-
 	    // ...
     };
-
-	
 
 	
 	//
@@ -1144,10 +1139,10 @@ done:
  
 void dead_thread_collector (void){
 
-    register int i=0;
+    register int i=0;  //loop
     
-    struct process_d *p; 
-    struct thread_d *Thread;  
+    struct process_d  *p; 
+    struct thread_d   *Thread; 
 
 
 	//
@@ -1166,11 +1161,10 @@ void dead_thread_collector (void){
         // ...
     };
 
-
+    // loop
     // Scan
-	
-	for ( i=0; i < THREAD_COUNT_MAX; i++ )
-	{
+    for ( i=0; i < THREAD_COUNT_MAX; i++ )
+    {
 	    Thread = (void *) threadList[i];
 		
 		if ( (void *) Thread != NULL )
@@ -1225,12 +1219,10 @@ void dead_thread_collector (void){
 }
 
 
-void kill_all_threads (void){
-
+void kill_all_threads (void)
+{
     register int i=0;
-
-    for ( i=0; i < THREAD_COUNT_MAX; i++ )
-        kill_thread(i);
+    for ( i=0; i < THREAD_COUNT_MAX; ++i ){ kill_thread(i); };
 }
 
 
@@ -1250,8 +1242,8 @@ void check_for_dead_thread_collector (void){
 			// O próprio dead thread collector vai sinalizar que 
 			// quer dormir, dai o case default faz isso.
 			
-		    release ( RING0IDLEThread->tid );
-			break;
+            release ( RING0IDLEThread->tid );
+            break;
 			
 		// sleep
 		default:

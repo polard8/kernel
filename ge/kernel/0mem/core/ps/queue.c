@@ -191,13 +191,10 @@ int init_queue (struct queue_d *q){
 		q->defaultList[i] = (unsigned long) 0;	
 		++i;
 	};
-	
-//
-// Done.
-//	
+
 done:
-	return (int) 0;
-};
+    return 0;
+}
 
 
 
@@ -205,16 +202,16 @@ done:
  * queue_insert_data:
  *     Coloca um dado no fim da fila. (FIFO)
  */
-int queue_insert_data(struct queue_d *q, unsigned long data, int type)
+
+int queue_insert_data (struct queue_d *q, unsigned long data, int type)
 {
-    if((void*) q == NULL){
-        printf("queue_insert_data:"); 
-		refresh_screen();
-        while(1){}		
-    };	
-	
-	switch(type)
-	{	
+    if ((void*) q == NULL)
+    {
+        panic ("queue_insert_data:"); 
+    }
+
+    switch (type)
+    {
         case QUEUE_STANDBY:
 		    goto standbyInsertData;
             break;		
@@ -397,21 +394,19 @@ done:
  */
 
 int 
-queue_insert_head ( struct queue_d *q, 
-					unsigned long data, 
-					int type )
+queue_insert_head ( 
+    struct queue_d *q, 
+    unsigned long data, 
+    int type )
 {
+
     if ( (void *) q == NULL )
-	{
-        kprintf ("queue_insert_head:"); 
-		die ();
-		
-		//refresh_screen();
-        //while(1){}		
-    };	
-	
-	switch (type)
-	{
+    {
+        panic ("queue_insert_head:"); 
+    }
+
+    switch (type)
+    {
         case QUEUE_STANDBY:
 		    goto standbyInsertData; 
             break;		
@@ -528,10 +523,10 @@ realtimeInsertData:
 defaultInsertData:
     q->defaultList[q->defaultHead] = (unsigned long) data;
     goto done;
-//Done.
+
 done:
-	return (int) 0;
-};
+    return 0;
+}
 
 
 /*
@@ -541,21 +536,19 @@ done:
  *    Isso consome o elemento da lista.
  */
 
-struct thread_d *queue_get_data ( struct queue_d *q, int type ){
-	
+struct thread_d *queue_get_data ( struct queue_d *q, int type )
+{
+
     struct thread_d *Thread;
-	
+
+
     if ( (void *) q == NULL )
-	{
-        kprintf ("queue_get_data:"); 
-		die ();
-		
-		//refresh_screen();
-        //while(1){}		
-    };		
-	
-	switch (type)
-	{
+    {
+        panic ("queue_get_data:"); 
+    }
+
+    switch (type)
+    {
         case QUEUE_STANDBY:
 		    goto standbyGetData;
             break;		
@@ -615,8 +608,8 @@ struct thread_d *queue_get_data ( struct queue_d *q, int type ){
 		default:
 		    goto defaultGetData;
 		    break;
-	};	
-	
+	};
+
 	
 	//
 	// rotinas.
@@ -625,23 +618,23 @@ struct thread_d *queue_get_data ( struct queue_d *q, int type ){
 	
 standbyGetData:
     Thread = (void *) q->standbyList[q->standbyHead];	
-	q->standbyList[q->standbyHead] = 0;
+    q->standbyList[q->standbyHead] = 0;
     goto done;
 	
 //#bugbug: Haha ... esse tipo não faz sentido.	
 runningGetData:
     Thread = (void *) q->runningList[q->runningHead];
-	q->runningList[q->runningHead] = 0;
+    q->runningList[q->runningHead] = 0;
     goto done;
 	
 readyGetData:
     Thread = (void *) q->readyList[q->readyHead];
-	q->readyList[q->readyHead] = 0;
+    q->readyList[q->readyHead] = 0;
     goto done;
 	
 waitingGetData:
     Thread = (void *) q->waitingList[q->waitingHead];
-	q->waitingList[q->waitingHead] = 0;
+    q->waitingList[q->waitingHead] = 0;
     goto done;
 	
 blockedGetData:
@@ -651,12 +644,12 @@ blockedGetData:
 	
 zombieGetData:
     Thread = (void *) q->zombieList[q->zombieHead];
-	q->zombieList[q->zombieHead] = 0;
+    q->zombieList[q->zombieHead] = 0;
     goto done;
 	
 deadGetData:
     Thread = (void *) q->deadList[q->deadHead];
-	q->deadList[q->deadHead] = 0;
+    q->deadList[q->deadHead] = 0;
     goto done;
 	
 initializedGetData:
@@ -666,73 +659,75 @@ initializedGetData:
 	
 syscoopGetData: 
     Thread = (void *) q->syscoopList[q->syscoopHead];	
-	q->syscoopList[q->syscoopHead] = 0;
+    q->syscoopList[q->syscoopHead] = 0;
     goto done;
 	
 usercoopGetData:
     Thread = (void *) q->usercoopList[q->usercoopHead];
-	q->usercoopList[q->usercoopHead] = 0;
+    q->usercoopList[q->usercoopHead] = 0;
     goto done;
 	
 sysconcGetData:
     Thread = (void *) q->sysconcList[q->sysconcHead];	
-	q->sysconcList[q->sysconcHead] = 0;
+    q->sysconcList[q->sysconcHead] = 0;
     goto done;
 	
 userconcGetData:
-    Thread = (void *) q->userconcList[q->userconcHead];	
-	q->userconcList[q->userconcHead] = 0;	
+    Thread = (void *) q->userconcList[q->userconcHead];
+    q->userconcList[q->userconcHead] = 0;
     goto done;
 	
 realtimeGetData:
-    Thread = (void *) q->realtimeList[q->realtimeHead];	
-	q->realtimeList[q->realtimeHead] = 0;
+    Thread = (void *) q->realtimeList[q->realtimeHead];
+    q->realtimeList[q->realtimeHead] = 0;
     goto done;
 	
 defaultGetData:
     Thread = (void *) q->defaultList[q->defaultHead];
-	q->defaultList[q->defaultHead] = 0;
+    q->defaultList[q->defaultHead] = 0;
     goto done;
-	
+
 // Done.
 done:
-	
+
     //feed_ready_queue(q,1);    //feed head.
 	
-    return (struct thread_d *) Thread;    	
+    return (struct thread_d *) Thread;
 }
 
 
 /*
+ *********************************************
  * show_queue_information:
  *      Mostra informações sobre a queue.
+ *      #todo: put this in a info file.
  */
+
 void show_queue_information(struct queue_d *q)
-{	
-	int i=0;
-	
-	if((void*) q == NULL){
-	    printf("show_queue_information error: Struct.\n");
-		return;
-	};
+{
+    register int i=0;
+
+    if ((void*) q == NULL)
+    {
+        printf("show_queue_information error: Struct\n");
+        return;
+    }
 
     printf("Ready queue Information:\n");	
-	printf("Head={%d} Tail={%d}\n", q->readyHead, q->readyTail);
-	
-    while(i < q->readyMax)
-    {	
-	    q = (void *) q->readyList[i];
-        if( (void *) q != NULL ){
+    printf("Head={%d} Tail={%d}\n", q->readyHead, q->readyTail);
+
+    while (i < q->readyMax)
+    {
+        q = (void *) q->readyList[i];
+        if ( (void *) q != NULL ){
             printf("Index={%d} Struct={%x}\n", i, (void*) q );
-		}; 
-		++i;
-	};
+        } 
+        
+        ++i;
+    };
 
 	//@todo: Informações de outras filas.
-	
-done:	
-	return;
-};
+}
 
 
 /*
@@ -742,19 +737,23 @@ done:
  */
 void ScanReadyQueue(struct queue_d *q)
 {
-	struct thread_d *t;
-	int i=0;
-	
+    // loop
+    register int i=0;
+
+    struct thread_d *t;
+
+
+
 	if((void*)q == NULL){
 	    printf("ScanReadyQueue:\n");
 	    return;
-	};
+	}
 		
 	//printf("head={%d} tail={%d}\n", q->readyHead, q->readyTail);
 
-    while( i < q->readyMax)
-    {	
-	    t = (void *) q->readyList[i];
+    while ( i < q->readyMax)
+    {
+        t = (void *) q->readyList[i];
         if( (void *) t != NULL && t->used == 1 && t->magic == 1234 )
 		{
 		    if( t->waitingCount >= t->waiting_limit )
@@ -763,28 +762,29 @@ void ScanReadyQueue(struct queue_d *q)
 				t->priority = PRIORITY_MAX;
 				queue_insert_head(queue, (unsigned long) t, 1);
 				return;
-            };			
-		}; 
+            }
+		}
+
 		++i;
 	};
-
-
-    return;
 }
 
 
 void feed_ready_queue (struct queue_d *q, int type)
 {
-	struct thread_d *t;
-	unsigned long p;
-	int i;
-	
-	//Struct.
-	if((void*)q == NULL){
-	    printf("feed_ready_queue:");
-		refresh_screen();
-		while(1){}
-	};
+
+    // loop
+    register int i=0;
+
+    unsigned long p=0;
+
+    struct thread_d *t;
+
+
+	if ((void*)q == NULL)
+	{
+	    panic ("feed_ready_queue:");
+	}
 	
     switch(type)
     {
@@ -848,7 +848,7 @@ feed_with_threadList:
 	i = 1;
     
     do
-	{	
+    {
 	    t = (void *) threadList[i];
         if( (void *) t != NULL && t->used == 1 && t->magic == 1234 )
 		{
@@ -859,21 +859,24 @@ feed_with_threadList:
 				    q->readyList[i] = (unsigned long) 0;
 				    p = t->priority;
 				    queue_insert_data(queue, (unsigned long) t, QUEUE_READY);
-				};
-				goto done;	
-            };			
-		}; 
-		++i;
-	}while( i < THREAD_COUNT_MAX );
-    	
+				}
+				goto done;
+            }
+		}
+ 
+        ++i;
+
+    }while( i < THREAD_COUNT_MAX );
+ 
     goto done;	
 	
 done:
-    return;	
-};
+    return;
+}
 
 
 //
-//fim.
+// End.
 //
+
 
