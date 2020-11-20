@@ -24,9 +24,9 @@ void *createCreateInitThread (void)
 {
 
     // loops
-    int r=0;    // Wait reason.
-    int i=0;    // Message queue.
-    int q=0;    // Message queue.
+    register int r=0;    // Wait reason.
+    register int i=0;    // Message queue.
+    register int q=0;    // Message queue.
 
     char *ThreadName = "init-thread"; 
 
