@@ -315,25 +315,29 @@ void csi_m(void)
 void csi_M ( int nr, int console_number )
 {
 
+    /*
 	if ( nr > TTY[console_number].cursor_height )
 		nr = TTY[console_number].cursor_height;
 	else if (!nr)
 		nr=1;
 	while (nr--)
 		__local_delete_line(console_number);
+    
+    */
 }
 
 
 // move to
 void csi_L (int nr, int console_number)
 {
-
+   /*
 	if (nr > TTY[console_number].cursor_height)
 		nr = TTY[console_number].cursor_height;
 	else if (!nr)
 		nr=1;
 	while (nr--)
 		__local_insert_line(console_number);
+    */
 }
 
 
@@ -1100,14 +1104,14 @@ console_write (
                         csi_m (); 
                         break;
 
-                    // ?? 
+                    // ??  #bugbug
                     // 0x1b[r
                     // Isso ajusta o top e o bottom.
                     case 'r':
 						if (par[0])  { par[0]--; }
-						if (!par[1]) { par[1] = TTY[console_number].cursor_height; }  
+						if (!par[1]) { par[1] = TTY[console_number].cursor_bottom; }  
 						if (par[0] < par[1] &&
-						    par[1] <= TTY[console_number].cursor_height ) 
+						    par[1] <= TTY[console_number].cursor_bottom ) 
 						{
                             // ajuste feito por 'r'.
 							TTY[console_number].cursor_top    = par[0];
@@ -1412,27 +1416,111 @@ void console_init_virtual_console (int n){
         panic       ("console_init_virtual_console: [FAIL] ConsoleIndex\n");
     }
 
+    // Todo virtual console eh uma tty. Os 4.
+    TTY[ConsoleIndex].objectType  = ObjectTypeTTY;
+    TTY[ConsoleIndex].objectClass = ObjectClassKernelObjects;
+    TTY[ConsoleIndex].used = 1;
+    TTY[ConsoleIndex].magic = 1234;
 
     // No thread for now.
     TTY[ConsoleIndex].control = NULL;
 
-    // #bugbug: 
-    // 'cursor_width' is not a good name.
+    // tty is a terminal, so the user logs on a terminal.
+    // No user logged yet.
+    TTY[ConsoleIndex].user_info = NULL;
 
+    // Security stuff.
+    // Nao sei se essas estruturas estao prontas para isso nesse momento
+    // ou se esses ponteiros sao nulos.
+    TTY[ConsoleIndex].user_session = NULL;  //CurrentUserSession;
+    TTY[ConsoleIndex].room         = NULL;  // CurrentRoom;
+    TTY[ConsoleIndex].desktop      = NULL;  // CurrentDesktop;
+
+    // file pointer
+    // this file handles this tty object
+    // TTY[ConsoleIndex]._fp
+    
+    // tty name
+    //TTY[ConsoleIndex].__ttyname[?] 
+    TTY[ConsoleIndex].ttyName_len = 0;  //initialized
+
+    //#todo: Indice do dispositivo.
+    // TTY[ConsoleIndex].device = 0;   // initialized.
+
+    TTY[ConsoleIndex].driver = NULL;  //driver struct
+    TTY[ConsoleIndex].ldisc  = NULL;  //line discipline struct
+
+    //TTY[ConsoleIndex].termios??       //termios struct (not a pointer)
+
+    // process group.
+    TTY[ConsoleIndex].gid = current_group;
+
+    // ??
+    // Quantos processos estao usando essa tty.
+    TTY[ConsoleIndex].pid_count=0;
+
+
+    TTY[ConsoleIndex].type = 0;
+    TTY[ConsoleIndex].subtype = 0;
+        
+    TTY[ConsoleIndex].flags = 0;
+
+    // not stopped
+    TTY[ConsoleIndex].stopped = 0;
+
+    // process
+    //TTY[ConsoleIndex].process = KernelProcess;
+    
+    // thread
+    //TTY[ConsoleIndex].thread  = ?
+
+    // Qual terminal virtual esta usando essa tty.
+    TTY[ConsoleIndex].virtual_terminal_pid = 0;
+
+    // Window.
+    // When we are using the kgws.
+    // TTY[ConsoleIndex].window = NULL;
+
+
+    //
+    // == buffers ===========================
+    //
+
+    // #bugbug
+    // No buffers fo rthe virtual consoles.
+    // remember: 
+    // The virtual console is used only in the 'stdout' of a process.
+    TTY[ConsoleIndex].nobuffers = TRUE;   // No buffers.
+    TTY[ConsoleIndex]._rbuffer = (file *) 0; 
+    TTY[ConsoleIndex]._cbuffer = (file *) 0;
+    TTY[ConsoleIndex]._obuffer = (file *) 0;
+
+
+
+    // cursor dimentions in pixel.
+    // #bugbug: determinado
+    TTY[current_vc].cursor_width_in_pixels = 8; 
+    TTY[current_vc].cursor_height_in_pixels = 8;
+
+    //cursor position in chars.
     TTY[ConsoleIndex].cursor_x = 0;
     TTY[ConsoleIndex].cursor_y = 0;
-    TTY[ConsoleIndex].cursor_width  = (SavedX/8) -1;    // (screen width / char width) ??
-    TTY[ConsoleIndex].cursor_height = (SavedY/8) -1;    // (screen height/ char height) ??
+
+    // cursor margin
     TTY[ConsoleIndex].cursor_left = 0;
     TTY[ConsoleIndex].cursor_top  = 0;
+    
+    // cursor limits
     TTY[ConsoleIndex].cursor_right  = 0+(SavedX/8) -1;  // (screen width / char width)
     TTY[ConsoleIndex].cursor_bottom = 0+(SavedY/8) -1;  // (screen height/ char height)
     
     //everyone.
     TTY[ConsoleIndex].cursor_color = COLOR_WHITE; 
 
-    //#test
-    
+
+    if( ConsoleIndex == 0)
+            TTY[ConsoleIndex].cursor_color = COLOR_GRAY; 
+
     if( ConsoleIndex == 1)
             TTY[ConsoleIndex].cursor_color = COLOR_RED; 
 
@@ -1442,6 +1530,10 @@ void console_init_virtual_console (int n){
     if( ConsoleIndex == 3)
             TTY[ConsoleIndex].cursor_color = COLOR_BLUE; 
                 
+
+
+
+
 
 
     //#todo

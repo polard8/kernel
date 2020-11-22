@@ -18,6 +18,9 @@
 #include <kernel.h> 
 
 
+extern unsigned long SavedX;
+extern unsigned long SavedY;
+
 
 // Ponteiros para os dispositivos
 // que a tty atua.
@@ -106,32 +109,81 @@ struct tty_d *tty_create (void){
         __tty->objectClass = ObjectClassKernelObjects;
         __tty->used = 1;
         __tty->magic = 1234;
-        
-        
+
         // No thread for now.
         // ?? What thread we need to use here?
         __tty->control = NULL;
 
-
         // No user logged yet.
         __tty->user_info = NULL;
-        
+
         // #bugbug
         // Security stuff.
         // Maybe it will change when a user login into a terminal.
-        __tty->user_session = CurrentUserSession;
-        __tty->room         = CurrentRoom;
-        __tty->desktop      = CurrentDesktop;
+        // Nao sei se essas estruturas estao prontas para isso nesse momento
+        // ou se esses ponteiros sao nulos.
+        __tty->user_session = NULL;  //CurrentUserSession;
+        __tty->room         = NULL;  // CurrentRoom;
+        __tty->desktop      = NULL;  // CurrentDesktop;
 
 
-        // #bubug: 
-        // Usaremos a file table pra controlar as ttys.
-        //__tty->index = 0;
+        // file pointer
+        // this file handles this tty object
+        //isso sera tratado la em baixo.
+        //__tty->_fp
+    
+        // tty name
+        // isso sera tratado la em baixo.
+        //__tty->__ttyname[?] 
+        __tty->ttyName_len = 0;  //initialized
 
-        __tty->pgrp = current_group;
+        //#todo: Indice do dispositivo.
+        // __tty->device = 0;   // initialized.
 
-        //__tty->stopped = 0;
+        __tty->driver = NULL;  //driver struct
+        __tty->ldisc  = NULL;  //line discipline struct
+        
+        //__tty->termios       //termios struct (not a pointer)
+        
+        
+        // process group.
+        __tty->gid = current_group;
 
+        // ??
+        // Quantos processos estao usando essa tty.
+        __tty->pid_count=0;
+
+
+        __tty->type = 0;
+        __tty->subtype = 0;
+        
+        __tty->flags = 0;
+
+
+        // not stopped
+        __tty->stopped = 0;
+
+        // process
+        // __tty->process = KernelProcess;
+    
+        // thread
+        // __tty->thread  = ?
+
+        // Qual terminal virtual esta usando essa tty.
+        __tty->virtual_terminal_pid = 0;
+
+        // Window.
+        // When we are using the kgws.
+        //__tty->window = NULL;
+
+
+
+        //
+        // == buffers ===========================
+        //
+
+        // YES, We are using buffer.
+        __tty->nobuffers = FALSE;   // No buffers.
 
 
         // Ponteiros para estruturas de arquivos.
@@ -172,9 +224,32 @@ struct tty_d *tty_create (void){
         __tty->_obuffer->_base  = (char *) newPage();
 
 
+        // system metrics .
+        
+        // cursor dimentions in pixels.
+        // #bugbug: determined.
+        __tty->cursor_width_in_pixels  = 8;
+        __tty->cursor_height_in_pixels = 8;
+
+        __tty->cursor_color = COLOR_WHITE; 
+        
+        // cursor position in chars.
+        __tty->cursor_x = 0;
+        __tty->cursor_y = 0;
+        
+        // cursor margin
+        __tty->cursor_left = 0;
+        __tty->cursor_top  = 0;
+        
+        // cursor limits.
+        __tty->cursor_right  = 0+(SavedX/8) -1;  // (screen width / char width)
+        __tty->cursor_bottom = 0+(SavedY/8) -1;  // (screen height/ char height)
+    
+
         // #bugbug
         // Temos que completar as estruturas.
         // São muitos elementos ...
+
 
         // ...
 

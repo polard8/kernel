@@ -8,6 +8,10 @@
 #include <kernel.h>
 
 
+extern unsigned long SavedX;
+extern unsigned long SavedY;
+
+
 // Deprecated!
 unsigned long 
 terminal_dialog ( 
@@ -107,15 +111,29 @@ void systemSetTerminalWindow ( struct window_d *window ){
     window->terminal_top = window->top;
     window->terminal_width = window->width;
     window->terminal_height = window->height;
+    
 
+    // #bugbug
+    // Qual eh o current no momento dessa inicializaçao
+    // so temos 4.
+    // eles ja estao inicializados.
+    // #todo: podeia ter uma flag que diz se ja inicializamos os consoles.
+    
+    if (current_vc < 0 || current_vc>3)
+        panic("systemSetTerminalWindow: current_vc");
+
+    //position
     TTY[current_vc].cursor_x = (window->left / 8);
     TTY[current_vc].cursor_y = (window->top  / 8);
-    
+
+    //margin
     TTY[current_vc].cursor_left = TTY[current_vc].cursor_x; 
     TTY[current_vc].cursor_top  = TTY[current_vc].cursor_y;
-    
-    TTY[current_vc].cursor_right  = ( (window->left + window->width ) /8 );
-    TTY[current_vc].cursor_bottom = ( (window->top  + window->height) /8 );
+
+    //limits
+    TTY[current_vc].cursor_right  = 0+(SavedX/8) -1;  // (screen width / char width)
+    TTY[current_vc].cursor_bottom = 0+(SavedY/8) -1;  // (screen height/ char height)
+
 
 	//
 	// rcClient  (retângulo)
@@ -216,8 +234,8 @@ void systemSetTerminalWindow ( struct window_d *window ){
     // Cursor.
     //
 
-    TTY[current_vc].cursor_width  = 8; 
-    TTY[current_vc].cursor_height = 8; 
+    TTY[current_vc].cursor_width_in_pixels  = 8; 
+    TTY[current_vc].cursor_height_in_pixels = 8; 
     TTY[current_vc].cursor_color  = COLOR_WHITE;
 
 

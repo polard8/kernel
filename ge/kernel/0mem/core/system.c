@@ -1067,18 +1067,19 @@ unsigned long systemGetSystemMetrics ( int index ){
 		case 2:
 		    return (unsigned long) screenGetHeight();
             break;
-			
-		//cursor width.
-		case 3:
-		    return (unsigned long) TTY[current_vc].cursor_width;
+
+
+        //cursor width in pixels.
+        case 3:
+            return (unsigned long) TTY[current_vc].cursor_width_in_pixels;
+            break;
+        //cursor hight in pixels.
+        case 4:
+            return (unsigned long) TTY[current_vc].cursor_height_in_pixels;
             break;
 
-		//cursor hight.
-		case 4:
-		    return (unsigned long) TTY[current_vc].cursor_height;
-            break;
-			
-			
+
+
 		//mouse pointer width.
 		case 5:
 		    return (unsigned long) g_mousepointer_width;

@@ -106,9 +106,9 @@ struct tty_d
 {
     object_type_t  objectType;
     object_class_t objectClass;
-
+    
     int index;
-
+    
     int used;
     int magic;
 
@@ -130,177 +130,131 @@ struct tty_d
     // ===================================================
 
 
-
-    // device driver, line discipline and termios.
-
-    //#todo: Indice do dispositivo.
-    //int device;
-    
-    struct ttydrv_d *driver;
-    
-    struct ttyldisc_d *ldisc;
-    
-    struct termios termios;
-
-    
+    // file pointer
     // #importante
     // Esse é o arquivo que aponta para essa estrutura.
     file *_fp;
-
+    
+    // tty name
     char __ttyname[64];    // 
     size_t ttyName_len;    // len 
+
+
+    //#todo: Indice do dispositivo.
+    //int device;
+
+    // device driver, line discipline
     
+    struct ttydrv_d *driver;
+    struct ttyldisc_d *ldisc;
+
+    // termios
+    struct termios termios;
+
 
     // process group.
     // Usando quanto tiver uma interrupção de tty.
     // Quais processos estão no mesmo grupo quanto tiver a interrupção.
     // Vamos sinalizá-los.
-    int pgrp;
+    gid_t gid;
 
-    // #maybe
-    // pid, gid, uid
-    //pid_t pid;
-    //uid_t uid;
-    //gid_t gid;
+    // ??
+    // Quantos processos estao usando essa tty.
+    int pid_count;
 
 
-    // linux-like
     short type;       // type of tty
     short subtype;    // subtype of tty 
-    int flags;        // tty flags.   
     
+    unsigned long flags;        // tty flags.   
+
     
     //status
     int stopped;
 
 
-    // Window.
-    // When we are using the kgws.
-    struct window_d *window;
-
-    // ??
-    // Quantos objetos associados a essa tty?
-    int count;
-
-    // id do terminal associado a essa tty.
-    int terminal_id;  //tdo deletar.
-    int terminal_pid;  //todo: usar esse
-
-
-
-    // Owner process.
+   // Owner process.
     struct process_d *process;
 
     // Thread de input.
     struct thread_d *thread;
 
+    // Qual terminal virtual esta usando essa tty.
+    int virtual_terminal_pid;
+
+    // Window.
+    // When we are using the kgws.
+    struct window_d *window;
+
+
+ 
     //
     // Buffers.
     //
+    
+    // If the buffer are used or not.
+    // options: TRUE, FALSE.
+    int nobuffers;
 
     // Canonical. (cooked mode)
     // Applications programs reading from the terminal 
     // receive entire lines, after line editing has been 
     // completed by the user pressing return.
 
+
+    //===================
+    // Input buffers.
     // Raw input buffer.
     // Canonical buffer.
 
-    file *_rbuffer;
-    file *_cbuffer;
-    
+    file *_rbuffer;    // raw
+    file *_cbuffer;    // canonical
+
+    //====================
     // Output buffer.
     file *_obuffer;
 
+    //
+    // system metrics.
+    //
+    
+    // cursor dimentions in pixel.
+    unsigned long cursor_width_in_pixels;
+    unsigned long cursor_height_in_pixels; 
 
+    unsigned long cursor_color;
 
+    //
+    // Print support
+    //
 
-	//
-	// Print support
-	//
-	
-	// De onde começar a pintar
-	// depois da libc ter colocado caracteres no arquivo. 
-
-    //unsigned char *stdin_last_ptr;
-    //unsigned char *stdin_limit;
-    unsigned char *stdout_last_ptr;
-    unsigned char *stdout_limit;
-    unsigned char *stderr_last_ptr;
-    unsigned char *stderr_limit;
-
-
-	// status
-	// 0 = não repinte stdout no tty atual
-	// 1 = repinte stdout no tty atual
-    int stdout_status;
-    int stdout_update_what; //char, linha, coluna.
-
-    int print_pending;
-
-    int LinMax;
-    int ColMax;
-    int FullScreen;    //flag.
-
-
-	//informações básicas sobre o retângulo
-    unsigned long left; 
-    unsigned long top;
-    unsigned long width;
-    unsigned long height;
- 
-    //cursor support.
+    // print position in chars.
     unsigned long cursor_x;
     unsigned long cursor_y;
-    unsigned long cursor_width;    //??
-    unsigned long cursor_height;   //??
 
+    //margin in chars.
     unsigned long cursor_left;     // margem esquerda dada em linhas
     unsigned long cursor_top;      // margem superior dada em linhas
+
+    //limits in chars.
     unsigned long cursor_right;    // margem direita dada em linhas
     unsigned long cursor_bottom;   // margem inferior dada em linhas
 
-    unsigned long cursor_color;
-    
-
-	//linha atual da lista abaixo.
-    int current_line;
-
-	// Organizando as linhas dentro do TTY.	
-	//Lista de ponteiros de estrutura de linha (tty_line_d)
-    unsigned long lines[32];
-    
-    
-    //#todo
-    //struct ttybuffer_d *buffer;
 
 
 
-    //in support
-    //unsigned long IN[320];
-    //int head; //coloca.
-    //int tail; //pega.
-	
-	//out support	
-	//unsigned long OUT[320];
-	
-	//continua ...
-	
-	//#obs: olhar o do minix
-	
-	//Id da janela do terminal virtual associado
-	//ao tty
-    //int windowID;
-    
-    //#test
-    //canal de conexão; (network channel)
-    struct channel_d *channel;
-     
+    // Connection
     // pty associa a tty 'to' com a tty 'from'
     // master/slave.
     struct tty_d *link;
 
+
+    // navigation
+    // ?? estamos pensando nisso.
+    // struct tty_d *next;
 };
+
+
 
 
 // Consoles virtuais
@@ -310,7 +264,7 @@ struct tty_d
 //#define MAX_KERNEL_VIRTUAL_CONSOLES 4
 int current_vc;
 
-
+// Virtual consoles.
 static struct tty_d TTY[4];
 
 

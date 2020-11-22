@@ -682,7 +682,6 @@ int videoInit (void){
     int Status=0;
 
 
-
     // Se o modo de video nao esta habilitado
     if ( VideoBlock.useGui != 1 ){
         panic("videoInit:");
@@ -785,22 +784,39 @@ int videoInit (void){
     gcharHeight = VIDEO_BIOS_FONT8X8_HEIGHT;
     gfontSize   = FONT8X8;
 
-    // Cursor. 
-    TTY[current_vc].cursor_x = 0;       //g_cursor_x = 0;
-    TTY[current_vc].cursor_y = 8;        //g_cursor_y = 8;
-    TTY[current_vc].cursor_width = 8;    //g_cursor_width = 8;
-    TTY[current_vc].cursor_height = 8;   //g_cursor_height = 8;
+
+    // #bugbug
+    // Qual eh o current no momento dessa inicializaçao
+    // so temos 4.
+    // eles ja estao inicializados.
+    // #todo: podeia ter uma flag que diz se ja inicializamos os consoles.
+    
+    if (current_vc < 0 || current_vc>3)
+        panic("videoInit: current_vc");
+    
+    
+    // cursor dimentions in pixel.
+    // #bugbug: determinado
+    TTY[current_vc].cursor_width_in_pixels = 8; 
+    TTY[current_vc].cursor_height_in_pixels = 8;
+       
     TTY[current_vc].cursor_color = COLOR_WHITE;
 
+    //position
+    TTY[current_vc].cursor_x = 0;       //g_cursor_x = 0;
+    TTY[current_vc].cursor_y = 8;        //g_cursor_y = 8;
 
-    //@todo; Criar defines para default.
+
+    //margin
     TTY[current_vc].cursor_left = 0;      // Margem esquerda dada em linhas.
     TTY[current_vc].cursor_top = 0;       // Margem superior dada em linhas.
+    
+    //limits
     TTY[current_vc].cursor_right  = 256;  // Margem direita dada em linhas.
     TTY[current_vc].cursor_bottom = 256;  // Margem inferior dada em linhas.
 		
 	set_up_cursor(0,0);    //Cursor.
-	
+
 	
 	//Continua ...
 		

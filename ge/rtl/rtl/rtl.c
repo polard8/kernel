@@ -1078,6 +1078,30 @@ again:
 */
 
 
+/*
+char * 
+index (s, c)
+char *s, c;
+{
+    return ((char *) strchr (s, c));
+}
+*/
+
+/*
+char * 
+rindex (s, c)
+char *s, c;
+{
+    return ((char *) strrchr (s, c));
+}
+*/
+
+
+
+
+
+
+
 
 
 
