@@ -25,6 +25,21 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+//===============================================================
+/*
+    The basics:
+    The ELF file has basically four parts:
+    + The ELF header.
+    + The program header table.
+    + (code,data,bss)
+    + The section header table.
+    See: 
+    https://en.wikipedia.org/wiki/Executable_and_Linkable_Format
+    ...
+
+ */
+//===============================================================
+
 /*
  * This is the ELF ABI header file
  * formerly known as "elf_abi.h".
@@ -68,7 +83,8 @@ typedef __uint16_t  Elf32_Half;   /* Unsigned medium integer */
  * e_ident[] identification indexes
  * See http://www.sco.com/developers/gabi/latest/ch4.eheader.html
  */
- 
+
+// offsets?
 #define EI_MAG0        0		/* file ID */
 #define EI_MAG1        1		/* file ID */
 #define EI_MAG2        2		/* file ID */
@@ -82,11 +98,16 @@ typedef __uint16_t  Elf32_Half;   /* Unsigned medium integer */
 #define EI_NIDENT     16		/* Size of e_ident[] */
 
 
+
 /* e_ident[] magic number */
+
+// Magic.
 #define  ELFMAG0    0x7f       /* e_ident[EI_MAG0] */
 #define  ELFMAG1    'E'        /* e_ident[EI_MAG1] */
 #define  ELFMAG2    'L'        /* e_ident[EI_MAG2] */
 #define  ELFMAG3    'F'        /* e_ident[EI_MAG3] */
+
+//??
 #define  ELFMAG     "\177ELF"  /* magic */
 #define  SELFMAG    4          /* size of magic */
 
@@ -121,6 +142,12 @@ typedef __uint16_t  Elf32_Half;   /* Unsigned medium integer */
 #define ELFOSABI_OPENBSD	12	/* OpenBSD */
 #define ELFOSABI_ARM		97	/* ARM */
 #define ELFOSABI_STANDALONE	255	/* Standalone (embedded) application */
+
+// #todo
+//#define ELFOSABI_GRAMADO      0x32
+//#define ELFOSABI_GRAMADO32    0x32
+//#define ELFOSABI_GRAMADO64    0x64
+
 
 /* e_ident */
 /*

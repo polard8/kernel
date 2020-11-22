@@ -1,13 +1,10 @@
 
-
 // #todo
 // kernel side termios support.
- 
- 
+
 //provavelmente suporte ao gerenciamento de terminais.
 //http://man7.org/linux/man-pages/man3/termios.3.html
 //http://kirste.userpage.fu-berlin.de/chemnet/use/info/libc/libc_12.html
-
 
 //#obs:
 //coisas pra fazer com terminal:
@@ -24,16 +21,13 @@
 #define _TERMIOS_H
 
 
-
-
-
-/* Terminal input output data types. */
+// Types.
+// Terminal input output data types.
 
 typedef unsigned char   cc_t;      // Terminal special characters.
 typedef unsigned int    speed_t;   // Terminal baud rates.
 typedef unsigned short  tcflag_t;  // Terminal modes.
-
-
+// ...
 
 
 
@@ -63,72 +57,84 @@ Macro: int NCCS
 */
 
 
-struct winsize {
-
+struct winsize 
+{
     unsigned short ws_row;
     unsigned short ws_col;
+
     unsigned short ws_xpixel;
     unsigned short ws_ypixel;
-
 };
 
 
 
 // Indices into c_cc array.  
 // Default values in parentheses. POSIX Table 7-5. 
-#define VEOF           0	/* cc_c[VEOF] = EOF char (^D) */
-#define VEOL           1	/* cc_c[VEOL] = EOL char (undef) */
-#define VERASE         2	/* cc_c[VERASE] = ERASE char (^H) */
-#define VINTR          3	/* cc_c[VINTR] = INTR char (DEL) */
-#define VKILL          4	/* cc_c[VKILL] = KILL char (^U) */
-#define VMIN           5	/* cc_c[VMIN] = MIN value for timer */
-#define VQUIT          6	/* cc_c[VQUIT] = QUIT char (^\) */
-#define VTIME          7	/* cc_c[VTIME] = TIME value for timer */
-#define VSUSP          8	/* cc_c[VSUSP] = SUSP (^Z, ignored) */
-#define VSTART         9	/* cc_c[VSTART] = START char (^S) */
-#define VSTOP         10	/* cc_c[VSTOP] = STOP char (^Q) */
-#define VERASEWORD    14	/* cc_c[VERASEWORD] = ERASEWORD char (^W) */
+
+#define VEOF         0	/* cc_c[VEOF] = EOF char (^D) */
+#define VEOL         1	/* cc_c[VEOL] = EOL char (undef) */
+#define VERASE       2	/* cc_c[VERASE] = ERASE char (^H) */
+#define VINTR        3	/* cc_c[VINTR] = INTR char (DEL) */
+#define VKILL        4	/* cc_c[VKILL] = KILL char (^U) */
+#define VMIN         5	/* cc_c[VMIN] = MIN value for timer */
+#define VQUIT        6	/* cc_c[VQUIT] = QUIT char (^\) */
+#define VTIME        7	/* cc_c[VTIME] = TIME value for timer */
+#define VSUSP        8	/* cc_c[VSUSP] = SUSP (^Z, ignored) */
+#define VSTART       9	/* cc_c[VSTART] = START char (^S) */
+#define VSTOP       10	/* cc_c[VSTOP] = STOP char (^Q) */
+#define VERASEWORD  14	/* cc_c[VERASEWORD] = ERASEWORD char (^W) */
 
 
+// ================================================
 
+//
+// termio
+//
 
 #define NCC 8
-struct termio {
-	unsigned short c_iflag;		//input mode flags 
-	unsigned short c_oflag;		//output mode flags 
-	unsigned short c_cflag;		//control mode flags 
-	unsigned short c_lflag;		//local mode flags 
-	unsigned char c_line;		//line discipline 
-	unsigned char c_cc[NCC];	//control characters /
+
+struct termio 
+{
+    unsigned short c_iflag;  // input mode flags 
+    unsigned short c_oflag;  // output mode flags 
+
+    unsigned short c_cflag;  // control mode flags 
+    unsigned short c_lflag;  // local mode flags 
+
+    unsigned char c_line;    //line discipline 
+
+    unsigned char c_cc[NCC];  //control characters
 };
 
+// ================================================
 
+//
+// termios
+//
 
-//https://www.mkssoftware.com/docs/man5/struct_termios.5.asp
+// See:
+// https://www.mkssoftware.com/docs/man5/struct_termios.5.asp
 /* Primary terminal control structure. POSIX Table 7-1. */
-
-// Vamos incluir ponteiro para essa estrtuura
-// em estruturas de tty.
-
-
-/*
- * Terminal IO options.
- */
 
 // Size of cc_c array, some extra space for extensions.
 #define  NCCS  20
+
 struct termios 
 {
     tcflag_t c_iflag;      // input modes 
     tcflag_t c_oflag;      // output modes 
+
     tcflag_t c_cflag;      // control modes 
     tcflag_t c_lflag;      // local modes 
+
     //unsigned char c_line;  // line discipline (linux?) 
     cc_t c_cc[NCCS];       // control characters 
+
     speed_t  c_ispeed;     // input speed 
     speed_t  c_ospeed;     // output speed 
 };
 
+// ================================================
 
 
 /* Values for termios c_iflag bit map.  POSIX Table 7-2. */
@@ -179,8 +185,6 @@ struct termios
 #define  ISIG      0x0040  /* enable signals */
 #define  NOFLSH    0x0080  /* disable flush after interrupt or quit */
 #define  TOSTOP    0x0100  /* send SIGTTOU (job control, not implemented*/
-
-
 
 
 
@@ -272,5 +276,17 @@ struct termios
 */
 
 #endif /* _TERMIOS_H */
+
+
+//
+// End.
+//
+
+
+
+
+
+
+
 
 

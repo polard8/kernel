@@ -110,8 +110,8 @@ struct ext2_inode_d
 
 
 
-#define EXT2_NAME_LEN 255
-#define VFS_NAME_LEN 255
+#define EXT2_NAME_LEN  255
+#define VFS_NAME_LEN   255
 
 
 /*
@@ -300,9 +300,10 @@ struct vfs_d
 int vfsInit (void);
 
 void vfs_show_handle_list (void);
-void vfsShowVFSInfo (void);
-void vfsListFiles (void);
 
+void vfsShowVFSInfo (void);
+
+void vfsListFiles (void);
 
 
 #endif   

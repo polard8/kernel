@@ -3,6 +3,8 @@
 #ifndef __ASM_GENERIC_IOCTLS_H
 #define __ASM_GENERIC_IOCTLS_H
 
+
+
 //#include <linux/ioctl.h>
 
 /*
@@ -16,7 +18,12 @@
  * architecture.
  */
 
-/* 0x54 is just a magic number to make these relatively unique ('T') */
+
+
+// #??
+// 0x54 is just a magic number 
+// to make these relatively unique ('T') 
+
 
 #define TCGETS		0x5401
 #define TCSETS		0x5402
@@ -98,6 +105,9 @@
 # define FIOQSIZE	0x5460
 #endif
 
+
+// ============================
+
 /* Used for packet mode */
 #define TIOCPKT_DATA		 0
 #define TIOCPKT_FLUSHREAD	 1
@@ -107,8 +117,15 @@
 #define TIOCPKT_NOSTOP		16
 #define TIOCPKT_DOSTOP		32
 
+
+
 #define TIOCSER_TEMT	0x01	/* Transmitter physically empty */
 
 #endif /* __ASM_GENERIC_IOCTLS_H */
+
+//
+// End.
+//
+
 
 

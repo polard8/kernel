@@ -1,13 +1,17 @@
 
-
 // inode support.
 // it's a test yet.
 // See: https://en.wikipedia.org/wiki/Inode
 
+
+#ifndef __INODE_H
+#define __INODE_H    1
+
+
 struct inode_d
 {
     int id;
-    
+
     int used;
     int magic;
     
@@ -32,7 +36,6 @@ struct inode_d
     // Contador de hardlinks.
     int hardlink_counter;
 
-    
     // ...
     
     // fat16 support.
@@ -66,8 +69,8 @@ struct inode_d
     struct inode_d *next;
 };
 
-
 unsigned long inode_table[32];
+
 
 
 // #bugbug
@@ -78,6 +81,15 @@ int search_path_in_the_inode_table( const char *path );
 //OUT: inode structure.
 struct inode_d *file_inode (file *f);
 
+
+#endif    
+
+
+
+
+//
+// End.
+//
 
 
 

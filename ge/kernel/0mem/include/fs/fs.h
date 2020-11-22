@@ -2,13 +2,12 @@
  * File: fs.h
  * 
  * 
- * Created by: Fred Nora.
+ * 2015 - Created by Fred Nora.
  */
 
 
 #ifndef ____FS_H
 #define ____FS_H
-
 
 
 // #order:
@@ -46,8 +45,6 @@
 
 // short.
 //#define FS_I386_IMAGE  0x014C
-
-
 
 
 
@@ -151,36 +148,38 @@ unsigned short file_cluster_list[1024];
  *
  * History:
  *     2014 - Created by Fred Nora.
- *     2015 - Revision.
  */
 
 //suporte ao diretório alvo que desejamos acessar.
 //com base em um pathname passado via argumento.
+
 struct target_dir_d
 {
     int used;
     int magic;
-	
+
 	//ponteiro para a string do caminho
 	//char *pwd_string;  
 	
 	//file name 8.3 (11 bytes;)
-	char name[32];
-	
-	//onde esse direto'rio esta' carregado.
+    char name[32];
+
+    //onde esse direto'rio esta' carregado.
     unsigned long current_dir_address;
-		
+
 	//...
 };
+
 struct target_dir_d current_target_dir;
  
  
 // links para arquivos ou diretórios 
 // dentro do mesmo sistema de arquivos. 
+
 struct hardlink_d
 {
-	int used;
-	int magic;
+    int used;
+    int magic;
 	//..
 };
 
@@ -190,20 +189,20 @@ struct hardlink_d
 // volumes espalhados por vários discos. 
 struct softlink_d
 {
-	int used;
-	int magic;
+    int used;
+    int magic;
 	//..
 };
 
 
- 
 
 struct fat_d
 {
     unsigned long address;
-	int type;
+    int type;
 	//...
 };
+
 struct fat_d *fat;
 
  
@@ -219,11 +218,10 @@ struct fat_d *fat;
 
 struct dir_d
 {
-
     int id;
+
     int used;
     int magic;
-
 
     // #todo: Precisaremos dessas coisas.
     struct inode_d *inode;
@@ -239,7 +237,6 @@ struct dir_d
 
     //numero total de bytes no diretório.
     int totalentries_size_in_bytes;
-
 
     int number_of_entries;
 
@@ -273,6 +270,8 @@ struct filesystem_d
     object_type_t  objectType;
     object_class_t objectClass;
 
+    //#todo:
+    //int id;
 
     int used;
     int magic;
@@ -305,7 +304,6 @@ struct filesystem_d
     unsigned long fat_lba;           //lba
     unsigned long dataarea_address;  //endereço do inicio da area de dados.
     unsigned long dataarea_lba;      //lba
-
 
     //...
 };
@@ -355,15 +353,8 @@ struct file_access_d
 
 
 
-
-
-
-
-
-
-
 //
-//    ====    Prototypes    ====
+// == Prototypes ================================================
 //
 
 
@@ -405,7 +396,6 @@ void fsInitializeWorkingDiretoryString (void);
 void fsUpdateWorkingDiretoryString ( char *string );
 
 
-
 void sys_pwd(void);
 
 void sys_cd_command( char *string);
@@ -427,7 +417,6 @@ void sys_cd_command( char *string);
  */
 
 void fs_pathname_backup ( int pid, int n ); 
-
 
 
 
@@ -496,7 +485,6 @@ void fs_init_fat (void);
 
  
 void fs_load_fat(void);
-
 
 
 
@@ -713,13 +701,11 @@ void fsCheckMbrFile ( unsigned char *buffer );
 void fsCheckVbrFile ( unsigned char *buffer );
 
 
-
 int fsLoadFileFromCurrentTargetDir (void);
 void fsInitTargetDir (void);
 
 
 void fs_show_root_fs_info(void);
-
 
 
 // Initialization support.

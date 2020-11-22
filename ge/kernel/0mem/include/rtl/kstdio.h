@@ -8,329 +8,20 @@
  *     2015 - Created by Fred Nora.
  */
 
- 
- 
-/*
-    The stdio.h header defines three variable types, 
-	several macros, and various functions for performing 
-	input and output.
 
-    Library Variables
-    Following are the variable types 
-	defined in the header stdio.h -
+#ifndef __KSTDIO_H
+#define __KSTDIO_H    1
 
-    S.N.	Variable & Description
-    1	size_t
-    This is the unsigned integral type and 
-	is the result of the sizeof keyword.
 
-    2 FILE
-    This is an object type suitable for storing 
-	information for a file stream.
 
-    3 fpos_t
-    This is an object type suitable for 
-	storing any position in a file.
-
-    Library Macros
-    Following are the macros 
-	defined in the header stdio.h -
-
-    S.N. Macro & Description
-    1 NULL
-    This macro is the value of a null pointer constant.
-
-    2 _IOFBF, _IOLBF and _IONBF
-    These are the macros which expand to integral constant 
-	expressions with distinct values and 
-	suitable for the use as third argument to the setvbuf function.
-
-    3 BUFSIZ
-    This macro is an integer, 
-	which represents the size of the buffer used by the setbuf function.
-
-    4 EOF
-    This macro is a negative integer, 
-	which indicates that the end-of-file has been reached.
-
-   5 FOPEN_MAX
-   This macro is an integer, 
-   which represents the maximum number of files 
-   that the system can guarantee to be opened simultaneously.
-
-   6 FILENAME_MAX
-   This macro is an integer, 
-   which represents the longest length of a char array 
-   suitable for holding the longest possible filename. 
-   If the implementation imposes no limit, 
-   then this value should be the recommended maximum value.
-
-   7 L_tmpnam
-   This macro is an integer, 
-   which represents the longest length of a char array 
-   suitable for holding the longest possible temporary filename 
-   created by the tmpnam function.
-
-  8 SEEK_CUR, SEEK_END, and SEEK_SET
-  These macros are used in the fseek function to 
-  locate different positions in a file.
-
-  9	TMP_MAX
-  This macro is the maximum number of unique filenames 
-  that the function tmpnam can generate.
-
-  10 stderr, stdin, and stdout
-  These macros are pointers to FILE types 
-  which correspond to the standard error, 
-  standard input, and standard output streams.
-
-  Library Functions
-  Following are the functions defined in the header stdio.h -
-
-  Follow the same sequence of functions for better understanding and 
-  to make use of Try it(Online compiler) option, 
-  because file created in the first function will be 
-  used in subsequent functions.
-  
-  S.N.	Function & Description
-
-  1	
-  int fclose(FILE *stream)
-  Closes the stream. All buffers are flushed.
-
-  2	
-  void clearerr(FILE *stream)
-  Clears the end-of-file and error indicators for the given stream.
-
-  3	
-  int feof(FILE *stream)
-  Tests the end-of-file indicator for the given stream.
-
-  4	
-  int ferror(FILE *stream)
-  Tests the error indicator for the given stream.
-
-  5	
-  int fflush(FILE *stream)
-  Flushes the output buffer of a stream.
-
-  6	
-  int fgetpos(FILE *stream, fpos_t *pos)
-  Gets the current file position of the stream and writes it to pos.
-
-  7	
-  FILE *fopen(const char *filename, const char *mode)
-  Opens the filename pointed to by filename using the given mode.
-
-  8	
-  size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream)
-  Reads data from the given stream into the array pointed to by ptr.
-
-  9	
-  FILE *freopen(const char *filename, const char *mode, FILE *stream)
-  Associates a new filename with the given open 
-  stream and same time closing the old file in stream.
-
-  10	
-  int fseek(FILE *stream, long int offset, int whence)
-  Sets the file position of the stream to the given offset. 
-  The argument offset signifies the number of bytes to seek 
-  from the given whence position.
-
-  11	
-  int fsetpos(FILE *stream, const fpos_t *pos)
-  Sets the file position of the given stream to the given position. 
-  The argument pos is a position given by the function fgetpos.
-
-  12	
-  long int ftell(FILE *stream)
-  Returns the current file position of the given stream.
-
-  13	
-  size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream)
-  Writes data from the array pointed to by ptr to the given stream.
-
-  14	
-  int remove(const char *filename)
-  Deletes the given filename so that it is no longer accessible.
-
-  15	
-  int rename(const char *old_filename, const char *new_filename)
-  Causes the filename referred to, by old_filename to be changed to new_filename.
-
-  16	
-  void rewind(FILE *stream)
-  Sets the file position to the beginning of the file of the given stream.
-
-  17	
-  void setbuf(FILE *stream, char *buffer)
-  Defines how a stream should be buffered.
-
-  18	
-  int setvbuf(FILE *stream, char *buffer, int mode, size_t size)
-  Another function to define how a stream should be buffered.
-
-  19	
-  FILE *tmpfile(void)
-  Creates a temporary file in binary update mode (wb+).
-
-  20	
-  char *tmpnam(char *str)
-  Generates and returns a valid temporary filename which does not exist.
-
-  21	
-  int fprintf(FILE *stream, const char *format, ...)
-  Sends formatted output to a stream.
-
-  22	
-  int printf(const char *format, ...)
-  Sends formatted output to stdout.
-
-  23	
-  int sprintf(char *str, const char *format, ...)
-  Sends formatted output to a string.
-
-  24	
-  int vfprintf(FILE *stream, const char *format, va_list arg)
-  Sends formatted output to a stream using an argument list.
-
-  25	
-  int vprintf(const char *format, va_list arg)
-  Sends formatted output to stdout using an argument list.
-
-  26	
-  int vsprintf(char *str, const char *format, va_list arg)
-  Sends formatted output to a string using an argument list.
-
-  27	
-  int fscanf(FILE *stream, const char *format, ...)
-  Reads formatted input from a stream.
-
-  28	
-  int scanf(const char *format, ...)
-  Reads formatted input from stdin.
-
-  29	
-  int sscanf(const char *str, const char *format, ...)
-  Reads formatted input from a string.
-
-  30	
-  int fgetc(FILE *stream)
-  Gets the next character (an unsigned char) 
-  from the specified stream and 
-  advances the position indicator for the stream.
-
-  31	
-  char *fgets(char *str, int n, FILE *stream)
-  Reads a line from the specified stream and 
-  stores it into the string pointed to by str. 
-  It stops when either (n-1) characters are read, 
-  the newline character is read, 
-  or the end-of-file is reached, 
-  whichever comes first.
-
-  32	
-  int fputc(int char, FILE *stream)
-  Writes a character (an unsigned char) 
-  specified by the argument char to the specified stream and 
-  advances the position indicator for the stream.
-
-  33	
-  int fputs(const char *str, FILE *stream)
-  Writes a string to the specified stream up to 
-  but not including the null character.
-
-  34	
-  int getc(FILE *stream)
-  Gets the next character (an unsigned char) 
-  from the specified stream and 
-  advances the position indicator for the stream.
-
-  35	
-  int getchar(void)
-  Gets a character (an unsigned char) from stdin.
-
-  36	
-  char *gets(char *str)
-  Reads a line from stdin and 
-  stores it into the string pointed to by, str. 
-  It stops when either the newline character is 
-  read or when the end-of-file is reached, 
-  whichever comes first.
-
-  37	
-  int putc(int char, FILE *stream)
-  Writes a character (an unsigned char) 
-  specified by the argument char to the 
-  specified stream and 
-  advances the position indicator for the stream.
-
-  38	
-  int putchar(int char)
-  Writes a character (an unsigned char) 
-  specified by the argument char to stdout.
-
-  39	
-  int puts(const char *str)
-  Writes a string to stdout up to 
-  but not including the null character. 
-  A newline character is appended to the output.
-
-  40	
-  int ungetc(int char, FILE *stream)
-  Pushes the character char (an unsigned char) 
-  onto the specified stream so 
-  that the next character is read.
-
-  41	
-  void perror(const char *str)
-  Prints a descriptive error message to stderr. 
-  First the string str is printed followed by a colon and then a space.
-*/ 
-
-
-
-
-//
-// * Kernel streams.
-//
-
-// Essas s�o as primeiras streams na estrutura Streams[]
-// S�o padronizadas e pertencem ao kernel.
-
-// Configuradas em stdio.c
-#define __KERNEL_STREAM_STDIN   0
-#define __KERNEL_STREAM_STDOUT  1
-#define __KERNEL_STREAM_STDERR  2
-
-// Configuradas em vfs.c.c
-#define __KERNEL_STREAM_VFS     3
-
-// Configuradas em fs.c
-#define __KERNEL_STREAM_VOL1_ROOTDIR   4
-#define __KERNEL_STREAM_VOL2_ROOTDIR   5
-
-// ...
- 
- 
- 
- 
-//#ifdef  _POSIX_
-//...
-//#endif
- 
-//
-// input() support
-// 
-
+// input() function support?
 #define INPUT_MODE_LINE                0
 #define INPUT_MODE_MULTIPLE_LINES      1
 int g_inputmode;
  
  
- 
-
 #define REVERSE_ATTRIB 0x70
+
 #define PAD_RIGHT 1
 #define PAD_ZERO 2
 
@@ -391,38 +82,31 @@ int g_inputmode;
 #define _IOSTRG   0x0040 /* Strange or no file descriptor */
 
 
-#define	STDIN_FILENO	0
-#define	STDOUT_FILENO	1
-#define	STDERR_FILENO	2
+#define STDIN_FILENO   0
+#define STDOUT_FILENO  1
+#define STDERR_FILENO  2
+
 
 //The macro yields the maximum size array of characters that 
 //you must provide to hold a filename.
 //#define FILENAME_MAX (8+3)
 
 #ifndef FILENAME_MAX
-#define	FILENAME_MAX	(260)
+#define FILENAME_MAX    (260)
 #endif
+
 
 //The macro yields the maximum number of files that the target 
 //environment permits to be simultaneously open (including stderr, stdin, and stdout).
-#define FOPEN_MAX	    (32)
-#define NUMBER_OF_FILES (32)
+#define FOPEN_MAX        (32)
+#define NUMBER_OF_FILES  (32)
 
-
-/*
- * Prompt:
- *    O prompt do shell. 
- *    Se os caracteres do prompt do shell
- * ser�o pintados no terminal, ent�o precisamos de mais espa�o.
- * o terminal pode ser a janela que � a tela toda (gui->screen) ou
- * outra janela qualquer.
- *
- */
  
 //BUFFER
 //_IOFBF, _IOLBF and _IONBF
 //_IONBF: The macro yields the value of the mode argument to 
 // setvbuf to indicate no buffering. (Flush the stream buffer at the end of each write operation.)
+
 
 /*
 #define  _IONBF  0       //unbuffered 
@@ -431,42 +115,48 @@ int g_inputmode;
 */
 
 /*bsd-like*/
-#define	_IOFBF	0		// setvbuf should set fully buffered 
-#define	_IOLBF	1		// setvbuf should set line buffered 
-#define	_IONBF	2		// setvbuf should set unbuffered 
-    
+#define _IOFBF  0		// setvbuf should set fully buffered 
+#define _IOLBF  1		// setvbuf should set line buffered 
+#define _IONBF  2		// setvbuf should set unbuffered 
+
+
 //#define  BUFSIZ  512 
 #define  BUFSIZ  1024 
 
+
 /* It moves file pointer position to the beginning of the file. */
 #ifndef SEEK_SET
-#define SEEK_SET        0       
+#define SEEK_SET  0
 #endif
+
 
 /* It moves file pointer position to given location. */
 #ifndef SEEK_CUR
-#define SEEK_CUR        1       
+#define SEEK_CUR  1
 #endif
+
 
 /*  It moves file pointer position to the end of file. */
 #ifndef SEEK_END
-#define SEEK_END        2       
+#define SEEK_END  2
 #endif
 
 
+//
+// == prompt =============================
+//
 
-#define PROMPT_SIZE 256 
-#define PROMPT_MAX_DEFAULT 256
+#define PROMPT_SIZE         256 
+#define PROMPT_MAX_DEFAULT  256
 
- 
 char prompt[PROMPT_SIZE];      //buffer para stdin
 char prompt_out[PROMPT_SIZE];  //buffer para stdout
 char prompt_err[PROMPT_SIZE];  //buffer para strerr
 
-
 unsigned long prompt_pos; 
 unsigned long prompt_status;
 
+// =======================================
 
 
 //
@@ -478,7 +168,7 @@ unsigned long prompt_status;
 //
 //#importante: 
 //
-//  +++ N�o se escreve fora do terminal com printf. +++
+//  +++ Nao se escreve fora do terminal com printf. +++
 //
 // Como n�o se escreve fora no terminal com printf.
 // essa flag s� faz sentido dentro de stdio.c
@@ -519,6 +209,8 @@ typedef struct __sfpos {
 // Vamos usar esse por enquanto.
 typedef __off_t fpos_t;
 
+
+
 //#define	_FSTDIO			/* Define for new stdio with functions. */
 
 /*
@@ -528,8 +220,7 @@ typedef __off_t fpos_t;
  */
 
 
-/* stdio buffers */
-
+// stdio buffers
 struct __sbuf 
 {
     unsigned char *_base;
@@ -543,12 +234,10 @@ struct __sbuf
 /*
  **********************************************
  * FILE:
- *     Estrutura padr�o para arquivos.
- *     >>> i/o buffer 
- *
- *     Ambiente: RING 0.
+ *     File structure.
+ *     ring 0.
  */
- 
+
 struct file_d
 {
     // Indica qual tipo de objeto esse arquivo representa.
@@ -702,18 +391,17 @@ unsigned long file_table[NUMBER_OF_FILES];
 
 
 // N� usaremos o array de estrutura.
-//#define stdin     (_io_table[0])	
-//#define stdout 	(_io_table[1])
-//#define stderr 	(_io_table[2])
-//#define stdin     (&_io_table[0])	
-//#define stdout 	(&_io_table[1])
-//#define stderr 	(&_io_table[2])
-
+//#define stdin     (_io_table[0])
+//#define stdout    (_io_table[1])
+//#define stderr    (_io_table[2])
+//#define stdin     (&_io_table[0])
+//#define stdout    (&_io_table[1])
+//#define stderr    (&_io_table[2])
 
 
 
 //
-// Pipes support
+// == Pipes ======================================
 //
 
 // 0
@@ -729,6 +417,8 @@ file *pipe_execve;
 
 #define NUMBER_OF_PIPES 8
 unsigned long Pipes[NUMBER_OF_PIPES];
+
+// ========================================================
 
 
 
@@ -813,27 +503,23 @@ static __inline int bsd__sputc (int _c, FILE *_p)
 
 
 // #todo
-// Deletar printf
+// Deletar printf eusar kprintf
 #define kprintf printf
-
 
 int printf (const char *format, ...);
 int sprintf (char *str, const char *format, ...);
 int fprintf (file *f, const char *format, ...);
 int putchar ( int ch );
 
-
 int kputs ( const char *str );
 
 void printchar (char **str, int c);
-
 
 int 
 prints ( char **out, 
          const char *string, 
          int width, 
          int pad );
-
 
 int 
 printi ( char **out, 
@@ -846,8 +532,7 @@ printi ( char **out,
 
 int print (char **out, int *varg);
 
-
-
+//=======================================
 
 
 
@@ -884,6 +569,9 @@ regularfile_ioctl (
 
 //inicializa os buffers do fluxo padr�o em stdio.c
 int stdioInitialize (void);
+
+
+#endif    
 
 
 //
