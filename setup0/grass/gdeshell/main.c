@@ -2159,6 +2159,12 @@ do_compare:
         debug_print("fd 33 ============\n");
         ioctl ( 33, -1, 0 ); // the limit is 31 for now.
         
+        // the stdout is a vitual console.
+        // Changing the color.
+        // ok: it is working
+        debug_print("fd 1 ============\n");
+        ioctl(1,1000,COLOR_YELLOW);
+        
         printf ("done\n");
         goto exit_cmp;
     }

@@ -93,27 +93,23 @@ int io_ioctl ( int fd, unsigned long request, unsigned long arg )
     // checa o tipo de objeto.
     // Isso deve ser usado principalmente com dispositivos 
     // de caracteres como o terminal.
+    // #todo
+    // check file structure validation.
+    // The TIOCSTI (terminal I/O control, 
+    // simulate terminal input) ioctl 
+    // function can push a character into a device stream
+    // ENOTTY -  "Not a typewriter"
+    // #todo
+    // Now we can use a swit to call different
+    // functions, as tty_ioctl etc.
 
     f = (file *) p->Objects[fd];
-    
-    //#todo
-    // check file structure validation.
-    
+
     if ( (void *) f == NULL ){
         debug_print("io_ioctl: [FAIL] f\n");
         return -1;
     }
-    
-    // The TIOCSTI (terminal I/O control, 
-    // simulate terminal input) ioctl 
-    // function can push a character into a device stream
 
-    // ENOTTY -  "Not a typewriter"
-    
-    // #todo
-    // Now we can use a swit to call different
-    // functions, as tty_ioctl etc.
-    
     switch (f->____object){
 
         // Pode isso ??
@@ -143,7 +139,8 @@ int io_ioctl ( int fd, unsigned long request, unsigned long arg )
                             (unsigned long) arg );
             break;
         
-        // Console object    
+        // Console object
+        // See: console.c
         case ObjectTypeVirtualConsole: 
             debug_print ("io_ioctl: ObjectTypeVirtualConsole\n");
             return (int) console_ioctl ( (int) fd, 

@@ -1572,9 +1572,22 @@ console_ioctl (
     unsigned long arg )
 {
     debug_print ("console_ioctl: TODO\n");
+
     
+    if(fd<0){
+        debug_print ("console_ioctl: fd\n");
+        return -1;
+    }
+
+
     switch (request){
 
+    // #test
+    // Change the color of the char for the current virtual console.
+    case 1000:
+        TTY[current_vc].cursor_color = (unsigned long) arg;
+        return 0;  //ok
+        break;
 
     // #todo:
     // There is no fflush here in ring0.
