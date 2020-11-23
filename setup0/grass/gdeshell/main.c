@@ -2645,14 +2645,16 @@ do_compare:
 
 
     // t6 - Save file using close().
+    // The kernel has files tor standard stream.
+    // and we are writing on stderr. KSTDERR.TXT i guess.
     // It is working. \o/
     char _buftest[] = "DIRTYDIRTYDIRTYDIRTYDIRTY";
     if ( gramado_strncmp ( prompt, "t6", 2 ) == 0 )
     {
         printf ("t6: Testing close()\n");
-        write(2,_buftest,sizeof(_buftest));
-        close(0); //regular file
-        close(1); //virtual console
+        write (2,_buftest,sizeof(_buftest));
+        //close(0); //regular file
+        //close(1); //virtual console
         close(2); //regular file
         goto exit_cmp;
     }
@@ -2802,9 +2804,14 @@ do_compare:
     // tty3
     if ( gramado_strncmp ( prompt, "tty3", 4 ) == 0 )
     {
-        if ( isatty(fileno(stdout)) == 0 )
-        {
-            printf ("testing isatty(): stdout is not a tty.\n");
+        if ( isatty(fileno(stdin)) == 0 ){
+            printf ("stdin is not a tty.\n");
+        }
+        if ( isatty(fileno(stdout)) == 0 ){
+            printf ("stdout is not a tty.\n");
+        }
+        if ( isatty(fileno(stderr)) == 0 ){
+            printf ("stderr is not a tty.\n");
         }
         goto exit_cmp;
     }
