@@ -1532,10 +1532,6 @@ void console_init_virtual_console (int n){
                 
 
 
-
-
-
-
     //#todo
     // Buffers !!!
     //TTY[ConsoleIndex]._rbuffer ...
@@ -1584,10 +1580,30 @@ console_ioctl (
 
     // #test
     // Change the color of the char for the current virtual console.
+    // ok. it is working.
     case 1000:
         TTY[current_vc].cursor_color = (unsigned long) arg;
         return 0;  //ok
         break;
+
+    // cursor x position
+    case 1001:
+        TTY[current_vc].cursor_x = 0;
+        return 0;  //ok
+        break;
+
+    // cursor y position
+    case 1002:
+        TTY[current_vc].cursor_y = 0;
+        return 0;  //ok
+        break;
+
+    // switching the current virtual console.
+    // We have onlu 4 virtual consoles.
+    case 1003:
+        if ( arg >= 0 && arg <= 3 ){ current_vc = arg; }
+        return 0;
+        break; 
 
     // #todo:
     // There is no fflush here in ring0.

@@ -14,6 +14,16 @@
 
 
 
+/*
+// #todo
+// We need a ioctl for serial devices.
+int serial_ioctl ( int fd, unsigned long request, unsigned long arg );
+int serial_ioctl ( int fd, unsigned long request, unsigned long arg )
+{}
+*/
+
+
+
 void serial1_handler (void)
 {
 
@@ -73,14 +83,13 @@ void serial4_handler (void)
  *     Maybe we can select the port.
  */
 
-void 
-serial_write_char ( char data ) 
+void serial_write_char (char data) 
 {
-
     while (( in8(COM1_PORT + 5) & 0x20 ) == 0);
 
     out8 (COM1_PORT, data);
 }
+
 
 /*
 void 

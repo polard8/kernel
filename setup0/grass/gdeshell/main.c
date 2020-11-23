@@ -2163,7 +2163,10 @@ do_compare:
         // Changing the color.
         // ok: it is working
         debug_print("fd 1 ============\n");
-        ioctl(1,1000,COLOR_YELLOW);
+        //ioctl(1,1000,COLOR_YELLOW);
+        //ioctl(1,1001,10); //change x
+        //ioctl(1,1002,10); //change y
+        //ioctl(1,1003,2);  //switch to the virtual console 2. 
         
         printf ("done\n");
         goto exit_cmp;
@@ -2214,17 +2217,18 @@ do_compare:
 
     // creat (libc)
     // Create a file using the libc.
-    if ( gramado_strncmp( prompt, "creat", 5 ) == 0 ){
-        //creat("new.txt", 0666);
-        creat( (const char *) tokenList[1], 0666 );
+    if ( gramado_strncmp( prompt, "creat", 5 ) == 0 )
+    {
+        creat ( (const char *) tokenList[1], 0666 );
         goto exit_cmp;
     }
 
 
     // mkdir (libc)
     // Create a directory using the libc.
-    if ( gramado_strncmp( prompt, "mkdir", 5 ) == 0 ){
-        mkdir( (const char *) tokenList[1], 0666 );
+    if ( gramado_strncmp( prompt, "mkdir", 5 ) == 0 )
+    {
+        mkdir ( (const char *) tokenList[1], 0666 );
         goto exit_cmp;
     }
 
@@ -2599,42 +2603,29 @@ do_compare:
 
 
     // t4 - Testing fopen function.
-    // #bugbug: It is not working.
-    // #todo: podemos fazer uma funçao para esse teste.
+    // ok funcionou com fgetc e getc.
     FILE *f1;
     int ch_test;
     if ( gramado_strncmp( prompt, "t4", 2 ) == 0 )
     {
         printf ("t4: Open and reading a file\n");
-
         f1 = fopen ("gramado.txt","rb");  
-        if( f1 == NULL ){
-			printf ("fopen fail\n");
-			//goto exit_cmp;
-        }else{
-			printf ("fopen ok\n");
-			//goto exit_cmp;
-        };
+        if ( f1 == NULL ){
+            printf ("fopen fail\n");
+            goto exit_cmp;
+        }
 
-		// #bugbug ... o fgetc n�o l� na estrutura esperada.
-        printf ("Testing fgetc ... \n\n");
-
+        printf ("Testing getc ... \n\n");
         while (1){
-
-            //ch_test = (int) fgetc(f1);
-            ch_test = (int) getc (f1); 
-
-			if( ch_test == EOF )
-			{
-				printf("\n\n");
-				printf("EOF reached :)\n\n");
-				//printf("Show f1->_base: %s\n",f1->_base);
-				goto exit_cmp;
-			}else{
-			    printf("%c", ch_test);	
-			};
+            //ch_test = (int) fgetc (f1);    //funcionou.
+            ch_test = (int) getc  (f1);  //funcionou. 
+            if ( ch_test == EOF ){
+                printf("  EOF reached :)\n\n");
+                goto exit_cmp;
+            }else{
+                  printf("%c", ch_test);  fflush(stdout);
+            };
         };
-        //fail.
         goto exit_cmp;
     }
 

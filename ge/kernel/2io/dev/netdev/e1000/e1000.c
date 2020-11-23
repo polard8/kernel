@@ -52,6 +52,17 @@ techniques:
 
 
 
+
+/*
+// #todo
+// We need a ioctl for nic devices.
+int e1000_ioctl ( int fd, unsigned long request, unsigned long arg );
+int e1000_ioctl ( int fd, unsigned long request, unsigned long arg )
+{}
+*/
+
+
+
 // irq handler.
 void 
 PCIRegisterIRQHandler ( 

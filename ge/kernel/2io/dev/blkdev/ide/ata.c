@@ -1226,20 +1226,19 @@ void show_ide_info (void){
 }
 
 
-/*
-int 
-ata_ioctl ( 
-    int fd, 
-    unsigned long request, 
-    unsigned long arg );
+
+
 int 
 ata_ioctl ( 
     int fd, 
     unsigned long request, 
     unsigned long arg )
 {
+    debug_print("ata_ioctl: [TODO] \n");
+    return -1;
 }
-*/
+
+
 
 
 //

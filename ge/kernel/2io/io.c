@@ -53,7 +53,13 @@
 // ENOTTY 
 // The specified request does not apply to the kind of object
 // that the file descriptor fd references
+// See:
+// https://man7.org/linux/man-pages/man2/ioctl.2.html
 
+    // #bugbug
+    // arg is the address for the arguments.
+    // We are using argument not as an address sometimes.
+    // it depends on the request number.
        
 // Called by sys_ioctl().
 // But this routine can be called by the routines inside the kernel.
@@ -71,6 +77,13 @@ int io_ioctl ( int fd, unsigned long request, unsigned long arg )
        debug_print("io_ioctl: [FAIL] Invalid fd\n");
        return -1;  //EBADF
     }
+
+
+    // #bugbug
+    // arg is the address for the arguments.
+    // We are using argument not as an address sometimes.
+    // it depends on the request number.
+
 
     // #todo
     // Check the arg pointer validation
@@ -149,8 +162,13 @@ int io_ioctl ( int fd, unsigned long request, unsigned long arg )
             break; 
 
 
+        // keyboard
+        // mouse
+        // serial
+        // disk
+
         //...    
-            
+ 
         default:
             debug_print ("io_ioctl: [FAIL] default object\n");
             return -1;  //ENOTTY maybe

@@ -1388,8 +1388,10 @@ pciHandleDevice (
 
 int init_pci (void){
 
+    //loop
+    register int i=0;
+
     int Status = 0;
-    int i=0;
     int Max = 32;   //@todo.
 
     unsigned long data=0;
@@ -1404,25 +1406,24 @@ int init_pci (void){
     
     data = (unsigned long) in32 (0xCF8);
     io_delay();
-    
-	//#todo:
-	//Fazer alguma coisa pra esse caso.
-	//Talvez seja um 386 ou 486 sem suporte a PCI.
-	//Talvez ISA.
 
-    if ( data != 0x80000000 ){
+ 
+	// #todo:
+	// Fazer alguma coisa pra esse caso.
+	// Talvez seja um 386 ou 486 sem suporte a PCI.
+	// Talvez ISA.
 
+    // STATUS_NOT_SUPPORTED
+    // Can we live with no pci support. Maybe ISA.
+    if ( data != 0x80000000 )
+    {
         pci_supported = 0;
+        panic ("init_pci: [FIXME] PCI NOT supported\n");
+    }
+    
+    pci_supported = 1;
+    //printf("PCI supported!");
 
-        //STATUS_NOT_SUPPORTED
-        panic ("init_pci: PCI NOT supported\n");
-
-    }else{
-        pci_supported = 1;
-
-        //STATUS_SUCCESS
-        //printf("PCI supported!");
-    };
 
 	//#todo: 
 	//Colocar esse status na estrutura platform->pci_supported.
@@ -1439,7 +1440,7 @@ int init_pci (void){
     // Initialise PCI device list.
     // Initialise the offset.
 
-    for ( i=0; i<Max; i++ ){
+    for ( i=0; i<Max; ++i ){
         pcideviceList[i] = (unsigned long) 0;
     };
 
