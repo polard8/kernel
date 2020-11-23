@@ -27,84 +27,144 @@
 #include <kernel.h> 
 
 
-/*
- * ioServices:
- * Serviços de i/o oferecidos pelo kernel base.
- * Quando o módulo 'service.c' receber chamadas para serviços de i/o 
- * ele pode desviar as chamadas para serem atendidas por essa rotina.
- */
+//==========================================
+// This is called by ioctl() in ring3.
 
-void *ioServices ( 
-    unsigned long number, 
-    unsigned long arg2, 
-    unsigned long arg3, 
-    unsigned long arg4 )
+// OK Isso é um wrapper.
+// Chamaremos tty_ioctl() ou outros ...  
+// ...
+
+// See:
+// http://man7.org/linux/man-pages/man2/ioctl.2.html
+// https://en.wikipedia.org/wiki/Ioctl
+
+// The ioctl() system call manipulates the 
+// underlying device parameters of special files.
+// In particular, many operating characteristics of
+// character special files (e.g., terminals) may be controlled with
+// ioctl() requests.  The argument fd must be an open file descriptor.
+
+// return:
+// On error, -1 is returned, and errno is set appropriately.
+// EBADF  fd is not a valid file descriptor.
+// EFAULT argp references an inaccessible memory area.
+// EINVAL request or argp is not valid.
+// ENOTTY fd is not associated with a character special device.
+// ENOTTY 
+// The specified request does not apply to the kind of object
+// that the file descriptor fd references
+
+       
+// Called by sys_ioctl().
+// But this routine can be called by the routines inside the kernel.
+
+int io_ioctl ( int fd, unsigned long request, unsigned long arg )
 {
-
-    struct process_d *P;
-
-    int Caller_Process_ID=0;
+    struct process_d *p;
+    file *f;
 
 
-	// #todo: 
-	// O subsistema em user mode deve fazer algum tipo de filtragem
-	// pra autorizar ou não um processo à usar o sistema de i/o.
-	// Porém aqui também é feito alguma filtragem pra conferir autorização.
-	// @todo:
-	// Checar a token do processo, se a token do tipo HAL está habilitada
-	// para o processo que chama a rotina.	
+    debug_print ("io_ioctl: [TODO]\n");
 
-	//
-	// Id do processo que está chamando a rotina de i/o.
-	//
-
-
-	// todo: 
-	// Filtrar argumentos.
-
-    Caller_Process_ID = (int) get_caller_process_id();
-
-    if ( Caller_Process_ID <0 || 
-         Caller_Process_ID >= PROCESS_COUNT_MAX )
-    {
-        debug_print ("ioServices: Caller_Process_ID\n");
-        return NULL;
+    // fd must to be on open file descriptor.
+    if ( fd<0 || fd>31 ){
+       debug_print("io_ioctl: [FAIL] Invalid fd\n");
+       return -1;  //EBADF
     }
 
+    // #todo
+    // Check the arg pointer validation
+    // EFAULT
+    // But we will not use this argument in all the cases.
 
-    P = (void *) processList[Caller_Process_ID];
+    p = (struct process_d *) processList[current_process];
 
-    if ( (void *) P == NULL )
-    {
-        debug_print ("ioServices: P\n");
-        return NULL;
+    if ( (void *) p == NULL ){
+        debug_print("io_ioctl: [FAIL] p fail\n");
+        return -1;
     }
+        
+    if ( p->used != 1 || p->magic != 1234 ){
+        debug_print("io_ioctl: [FAIL] validation fail\n");
+        return -1;
+    }
+  
+    // pega o arquivo.
+    // checa o tipo de objeto.
+    // Isso deve ser usado principalmente com dispositivos 
+    // de caracteres como o terminal.
 
-	//
-	// Chama o serviço solicitado.
-	//
-	
-	switch (number)
-    {
-        case 0:
-		    //Nothing.
+    f = (file *) p->Objects[fd];
+    
+    //#todo
+    // check file structure validation.
+    
+    if ( (void *) f == NULL ){
+        debug_print("io_ioctl: [FAIL] f\n");
+        return -1;
+    }
+    
+    // The TIOCSTI (terminal I/O control, 
+    // simulate terminal input) ioctl 
+    // function can push a character into a device stream
+
+    // ENOTTY -  "Not a typewriter"
+    
+    // #todo
+    // Now we can use a swit to call different
+    // functions, as tty_ioctl etc.
+    
+    switch (f->____object){
+
+        // Pode isso ??
+        // Normal file ???
+        // See: kstdio.c
+        case ObjectTypeFile:
+            debug_print ("io_ioctl: ObjectTypeFile [TEST]\n");
+            return (int) regularfile_ioctl ( (int) fd, 
+                            (unsigned long) request, 
+                            (unsigned long) arg );
             break;
 
-        case 1:
-            //Nothing.
-            //sys_ioctl ( int fd, unsigned long request, char *arg );
+        // tty object
+        case ObjectTypeTTY:
+        //case ObjectTypeTerminal: 
+            debug_print ("io_ioctl: ObjectTypeTTY\n"); 
+            return (int) tty_ioctl ( (int) fd, 
+                            (unsigned long) request, 
+                            (unsigned long) arg );
+            break;
+        
+        // socket object
+        case ObjectTypeSocket:
+            debug_print ("io_ioctl: ObjectTypeSocket\n");
+            return (int) socket_ioctl ( (int) fd, 
+                            (unsigned long) request, 
+                            (unsigned long) arg );
+            break;
+        
+        // Console object    
+        case ObjectTypeVirtualConsole: 
+            debug_print ("io_ioctl: ObjectTypeVirtualConsole\n");
+            return (int) console_ioctl ( (int) fd, 
+                            (unsigned long) request, 
+                            (unsigned long) arg );
             break; 
-        //...
 
+
+        //...    
+            
         default:
-            debug_print ("ioServices: default\n");
+            debug_print ("io_ioctl: [FAIL] default object\n");
+            return -1;  //ENOTTY maybe
             break;
-    };
+    }
 
-	// ...
-
-    return NULL;
+    //fail
+    debug_print ("io_ioctl: Fail\n");
+    return -1;
 }
+
 
 
 

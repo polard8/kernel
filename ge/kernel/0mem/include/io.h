@@ -86,11 +86,7 @@ unsigned long ioControl[32];
  
 
 // Handler for services.
-void *ioServices ( 
-    unsigned long number, 
-    unsigned long arg2, 
-    unsigned long arg3, 
-    unsigned long arg4 );
+int io_ioctl ( int fd, unsigned long request, unsigned long arg );
 
 
 int ioInit (void);

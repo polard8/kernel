@@ -706,13 +706,15 @@ systemcall_t *CurrentSystemCall;
 
 
 /*
- * gde_services:
- *    Atende as chamadas das interrupções do sistema. 
+ *********************************************
+ * sci:
+ *     This is the system interrupt handler.
  */
 
 // int 0x80
-// See: gde_serv.c
-void *gde_services ( 
+// See: sci.c
+
+void *sci ( 
     unsigned long number, 
     unsigned long arg2, 
     unsigned long arg3, 

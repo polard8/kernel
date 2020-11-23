@@ -82,7 +82,7 @@ ifeq ($(ARCH),x86)
 
 	EXECVE_OBJECTS := socket.o ctype.o  kstdio.o stdlib.o string.o unistd.o \
 	devmgr.o \
-	gde_serv.o \
+	sci.o \
 	debug.o storage.o install.o object.o runtime.o \
 	abort.o info.o io.o modules.o signal.o sm.o \
 	init.o system.o \
@@ -193,7 +193,8 @@ all-c:
 	$(CC) -c 0mem/rtl/unistd.c  $(KINCLUDE) $(CFLAGS) -o unistd.o
 
 	$(CC) -c 0mem/sci/sys/sys.c   $(KINCLUDE) $(CFLAGS) -o sys.o
-	$(CC) -c 0mem/sci/gde_serv.c $(KINCLUDE) $(CFLAGS) -o gde_serv.o
+
+	$(CC) -c 0mem/sci/sci.c $(KINCLUDE) $(CFLAGS) -o sci.o
 
 	# fs/vfs
 	$(CC) -c 0mem/sci/fs/vfs/vfs.c     $(KINCLUDE) $(CFLAGS) -o vfs.o

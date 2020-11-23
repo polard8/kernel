@@ -4,7 +4,7 @@
 
 
 /*
- * File: sci/gde_serv.c 
+ * File: sci/sci.c 
  *
  * 
  *       (SCI) = SYSTEM CALL INTERFACE
@@ -1105,7 +1105,7 @@ gde_extra_services (
 
 /*
  ****************************************
- * gde_services:
+ * sci:
  *     Rotina que atende os pedidos feitos pelos aplicativos em user mode 
  *     via int 200. Ou ainda o kernel pode chamar essa rotina diretamente.
  *     S�o v�rios servi�os.
@@ -1138,26 +1138,27 @@ gde_extra_services (
  *  E N�O NO KERNEL BASE.
  */
 
-
-void *
-gde_services ( 
+void *sci ( 
     unsigned long number, 
     unsigned long arg2, 
     unsigned long arg3, 
     unsigned long arg4 )
 {
 
-    // Para strings
-    char *aa2 = (char *) arg2;
-    char *aa3 = (char *) arg3;
-    char *aa4 = (char *) arg4;
+    // Message
+    // o endereço do array passado pelo aplicativo
+    // usaremos para enviar uma mensagem com 4 elementos.
+    unsigned long *message_address = (unsigned long *) arg2;
 
     // Array de longs.
     unsigned long *a2 = (unsigned long*) arg2;
     unsigned long *a3 = (unsigned long*) arg3;
     unsigned long *a4 = (unsigned long*) arg4;
 
-
+    // Para strings
+    char *aa2 = (char *) arg2;
+    char *aa3 = (char *) arg3;
+    char *aa4 = (char *) arg4;
 
     int desktopID=0;
 
@@ -1165,20 +1166,8 @@ gde_services (
     struct window_d *hWnd;
     struct window_d *focusWnd;   //Janela com foco de entrada.
     unsigned long WindowColor = COLOR_WHITE;  
-    unsigned long WindowClientAreaColor = COLOR_WHITE;  
-
-
-	//Window.
+    unsigned long WindowClientAreaColor = COLOR_WHITE; 
     hWnd = (void *) arg2;
-
-
-	//
-	// Message
-	//
-
-	//o endere�o do array passado pelo aplicativo
-	//usaremos para enviar uma mensagem com 4 elementos.
-    unsigned long *message_address = (unsigned long *) arg2;
 
 
     // Counter and size.
@@ -1199,15 +1188,15 @@ gde_services (
 	// Color scheme.
 
     if ( (void *) CurrentColorScheme == NULL ){
-        panic ("gde_services: CurrentColorScheme");
+        panic ("sci: CurrentColorScheme");
  
     }else{
 
         if ( CurrentColorScheme->used != 1 || 
              CurrentColorScheme->magic != 1234 )
         {
-            debug_print ("gde_services: CurrentColorScheme \n");
-            panic ("gde_services: CurrentColorScheme");
+            debug_print ("sci: CurrentColorScheme \n");
+            panic       ("sci: CurrentColorScheme");
         }
         
         WindowColor = CurrentColorScheme->elements[csiWindowBackground]; 
@@ -1224,15 +1213,14 @@ gde_services (
 	// main window
 
     if (gui->main == NULL){
-        debug_print ("gde_services: gui->main\n");
-        panic ("gde_services: gui->main");
+        debug_print ("sci: gui->main\n");
+        panic       ("sci: gui->main");
     }
-
 
 
     //
     // =====================================
-    // ===============  Special ============
+    // == Special ============
     // =====================================
     //
 
@@ -1378,7 +1366,7 @@ gde_services (
         // IN: pathname, flags, mode
         //OUT: fd
         case SYS_OPEN:
-            debug_print ("gde_serv: SYS_OPEN\n");
+            debug_print ("sci: SYS_OPEN\n");
             return (void *) sys_open ( (const char *) arg2, 
                                 (int) arg3, (mode_t) arg4 ); 
             break;
@@ -1387,7 +1375,7 @@ gde_services (
         // See: sys.c
         // IN: fd
         case SYS_CLOSE:
-            debug_print ("gde_serv: SYS_CLOSE\n");
+            debug_print ("sci: SYS_CLOSE\n");
             return (void *) sys_close( (int) arg2 );
             break;
 
@@ -1874,7 +1862,7 @@ gde_services (
         // It's a wrapper, an interface.
         case SYS_REBOOT: 
             sys_reboot();
-            panic("gde_serv: SYS_REBOOT!");
+            panic("sci: SYS_REBOOT!");
             break;
 
 
@@ -2627,28 +2615,13 @@ gde_services (
 		// If it s invalid, return ENOSYS Function not implemented error
 
         default:
-            printf ("services: Default {%d}\n", number );
+            printf ("sci: Default {%d}\n", number );
             refresh_screen ();
             return NULL;
             break;
     };
 
-
-	//Debug.
-	//printf("SystemService={%d}\n",number);
-   
-
-	// * importante:
-	//   Depois de esgotados os 'cases', vamos para a sa�da da fun��o.
-	//    No caso de um aplicativo ter chamado essa rotina, 
-	// o retorno ser� para o ISR da int 0x80, feito em assembly.
-	//    No caso do kernel ter chamado essa rotina, apenas retorna.
-
-
 done:
-    //Debug.
-    //printf("Done\n",number);
-    //refresh_screen();
     return NULL;
 }
 

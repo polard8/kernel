@@ -35,33 +35,28 @@ pid_t clone_process (void){
     printf      ("clone-clone_process: [FIXME] Cloning the current process..\n");
 
 
-	//
-	// Current.
-	//
+    //
+    // == Current ============================================
+    //
 
-    if ( current_process < 0 )
-    {
+    if ( current_process < 0 ){
         debug_print ("clone_process: [FAIL] current_process\n");
         printf      ("clone_process: [FAIL] current_process\n");
         goto fail;
     } 
 
-
     Current = (struct process_d *) processList[current_process];
 
-    if ( (void *) Current == NULL )
-    {
+    if ( (void *) Current == NULL ){
         debug_print ("clone_process: [FAIL] Current\n");
         printf      ("clone_process: [FAIL] Current\n");
         goto fail;
 
     }else{
-
         if ( Current->used != 1 || Current->magic != 1234 ){
             printf ("clone_process: Current validation \n");
             goto fail;
         }
-
 
         // ?? why???
         // #test
@@ -71,14 +66,13 @@ pid_t clone_process (void){
         old_dir_entry1 = dir[1];    // Saving it.
 
         // Saving the physical address.
-		//old_image_pa = (unsigned long) virtual_to_physical ( Current->Image, gKernelPageDirectoryAddress ); 		
-		
-	    // #debug
-	    // printf(">>> check current process: %d %d \n", current_process, Current->pid );
-		goto do_clone;
-		//...
-    };
+        //old_image_pa = (unsigned long) virtual_to_physical ( Current->Image, gKernelPageDirectoryAddress ); 		
 
+        // #debug
+        // printf(">>> check current process: %d %d \n", current_process, Current->pid );
+        goto do_clone;
+        //...
+    };
 
     // Fail
     // Something is wrong if we reach this point here!
@@ -578,9 +572,7 @@ pid_t sys_fork_process (void)
 // IN: ??
 // OUT: ??
 
-pid_t 
-clone_and_execute_process (
-    char *filename )
+pid_t clone_and_execute_process ( char *filename )
 {
 
     // #bugbug (fs)
@@ -724,7 +716,10 @@ __search:
     // Que eh o diretorio raiz
 
     Status = (int) KiSearchFile ( name, dir_address );
-    if (Status == 1){ goto __found; }
+    if (Status == 1)
+    { 
+        goto __found; 
+    }
 
 
 
@@ -761,9 +756,6 @@ __search:
  
 
 
-
-
-
     /*
     //
     // == Search in SBIN/ =======================================================
@@ -795,10 +787,6 @@ __search:
     */
 
 
-
-
-
-
     //
     // == Fail =====================================
     //
@@ -821,6 +809,10 @@ __found:
     //printf ("do_clone_execute_processs: clona o pai e executa o filho..\n");
 
 
+    //
+    // == Current ===========================================
+    //
+
 	// ## Current ##
 	// Checando a validade do processo atual.
 
@@ -834,8 +826,7 @@ __found:
         goto fail;
 
     }else{
-
-        if ( Current->used != 1 || Current->magic != 1234 ){    
+        if ( Current->used != 1 || Current->magic != 1234 ){ 
             printf ("clone_and_execute_process: Current validation \n");
             goto fail;
         }
@@ -892,6 +883,8 @@ do_clone:
         goto fail;
     }
 
+    Clone->used = 1;
+    Clone->magic = 1234;
 
     Clone->pid = (pid_t) PID;
     
@@ -899,12 +892,10 @@ do_clone:
     Clone->uid = (uid_t) current_user;
     Clone->gid = (gid_t) current_group;
 
-    Clone->used = 1;
-    Clone->magic = 1234;
 
     // Register.
 
-    // Salvando na lista.
+    // Saving the new process in the list.
     processList[PID] = (unsigned long) Clone;
 
 
@@ -1120,11 +1111,12 @@ do_clone:
         Clone->socket_pending_list[sIndex] = 0; 
     };
 
-    Clone->socket_pending_list_head =0;
-    Clone->socket_pending_list_tail =0;
-    Clone->socket_pending_list_max = 0; //atualizado pelo listen();
+    Clone->socket_pending_list_head = 0;
+    Clone->socket_pending_list_tail = 0;
+    Clone->socket_pending_list_max  = 0; //atualizado pelo listen();
 
-        //#bugbug: The priv socket ??
+
+  //#bugbug: The priv socket ??
 
         //
         // Debug
@@ -1161,11 +1153,10 @@ do_clone:
 
 		//#hackhack
 
-		// [pai]
+	// [pai]
     Current->control->state = READY;
 
-
-		// [filho]
+	// [filho]
     Clone->control->saved = 0;
     
     SelectForExecution(Clone->control);
@@ -1193,21 +1184,20 @@ do_clone:
     refresh_screen();
 
 
-	//
 	// Return.
-	//
+	// #obs:
+	// Retornamos para o pai o PID do filho.
+	// Igual acontece no fork().
 
-		// #obs:
-		// Retornamos para o pai o PID do filho.
-		// Igual acontece no fork().
-		
-		//pai
+
+	//pai
     current_process = Current->pid;
     current_thread  = Current->control->tid;
+    
+    //if ( current_process < 0 || current_thread < 0 )
+    //    return -1;
 
     return (pid_t) Clone->pid;
-
-	// Fail.
 
 fail:
     refresh_screen();

@@ -384,10 +384,10 @@ new_dummy_flush:
 ; #todo: 
 ; Pelo jeito eh natural entrar com muito mais argumentos, 
 ; passados pelos registradores ebp, esi, edi.
-; See: gde_serv.c
+; See: sci/sci.c
 ;++
 
-extern _gde_services
+extern _sci
 
 global _int128
 _int128: 
@@ -408,23 +408,16 @@ _int128:
     ;; the user data.
 
     ;;---------------
-    
-    ; Push arguments.
-    push dword edx    ;arg4.
-    push dword ecx    ;arg3. 
-    push dword ebx    ;arg2. 
-    push dword eax    ;arg1. {Service number}.
-
-    call _gde_services
-
-    mov dword [.int128Ret], eax    
-
-    ;; Pop arguments.
+    push dword edx    ; arg4
+    push dword ecx    ; arg3 
+    push dword ebx    ; arg2 
+    push dword eax    ; arg1 {Service number}.
+    call _sci
+    mov dword [.int128Ret], eax 
     pop eax
     pop ebx
     pop ecx
     pop edx 
-    
     ;;---------------
 
     pop gs
@@ -437,8 +430,6 @@ _int128:
     popad
     mov eax, dword [.int128Ret] 
     sti
-
-    ; Fly!
 
     iretd
     
@@ -469,9 +460,9 @@ _int129:
     push dword [.frameEIP]
     iretd
 
-.frameEIP: dd 0
-.frameCS: dd 0
-.frameEFLAGS: dd 0
+.frameEIP:     dd 0
+.frameCS:      dd 0
+.frameEFLAGS:  dd 0
 
 
 
