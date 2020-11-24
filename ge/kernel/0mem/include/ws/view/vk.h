@@ -32,6 +32,10 @@
 #define VK_FINAL	0x18
 #define VK_HANJA	0x19
 #define VK_KANJI	0x19
+
+// #test
+// #define VK_CCEDILHA 0x19
+
 #define VK_ACENTO_AGUDO 0x1A  //26 //0xb4 abnt	
 #define VK_ACENTO_GRAVE 0x1A  //26  //0x60	abnt
 #define VK_ESCAPE      0x1B  //27 
@@ -73,8 +77,18 @@
 #define VK_F9    0x43  //67 
 #define VK_F10   0x44  //68
 #define VK_NUMLOCK  0x45  //69 //0x90
-#define VK_SCROLL	0x46  //70 //0x91
-#define VK_HOME	  0x47    //71          
+#define VK_SCROLL   0x46  //70 //0x91
+#define VK_HOME	  0x47    //71    
+
+
+// arrow
+// #todo: copiar isso em ring3.
+#define VK_ARROW_UP     0x48
+#define VK_ARROW_LEFT   0x4B
+#define VK_ARROW_RIGHT  0x4D
+#define VK_ARROW_DOWN   0x50
+
+
 #define VK_END	  0x4F    //79
 #define VK_DELETE_TECLADONUMERICO 0x53  //83  
 #define VK_F11	  0x57  //87 

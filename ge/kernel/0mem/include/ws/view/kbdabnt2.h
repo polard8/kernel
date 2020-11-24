@@ -121,7 +121,7 @@ static unsigned char map_abnt2[ABNT2_CHARMAP_SIZE] = {
  'i',
  'o',
  'p',          //25
- ' ',          //26 (00b4 @) dead_acute dead_grave
+ ' ',          //26 /// VK_ACENTO_AGUDO acento agudo (00b4 @) dead_acute dead_grave
  '[',          //27   bracketleft   braceleft
  VK_RETURN,    //28 [Enter].
  VK_LCONTROL,  //29 ms right control. ??
@@ -134,7 +134,7 @@ static unsigned char map_abnt2[ABNT2_CHARMAP_SIZE] = {
  'j',
  'k',
  'l',        //38 
- 135,        //39 00e7 ccedilla
+ 135,        //39 00e7 VK_CCEDILHA ccedilla
  '~',        //40 dead_tilde	dead_circumflex
  '\'',       //41 (") (espaço) (') dead_acute dead_diaeresis 
  VK_LSHIFT,  //42 Shift.  
@@ -164,20 +164,20 @@ static unsigned char map_abnt2[ABNT2_CHARMAP_SIZE] = {
  VK_F8,        //66 F8.(abnt)
  VK_F9,        //67 F9.(abnt)
  VK_F10,       //68 F10.(abnt)
-VK_PAUSE,      //69 abnt2=(PAUSE). (num lock) abnt2=VK_NUMLOCK,
-VK_SCROLL,     //70 abnt2(Scroll Lock) abnt2=break.
-'7',    //71 abnt2=(7). abnt2=home
-'8',    //72       (8). abnt2=up
-'9',    //73       (9). abnt2=pgup
-'-',    //74        -
-'4',    //75       (4). abnt2=left 
-'5',    //76       (5).
-'6',    //77       (6). abnt2=right
-'+',    //78       +
-'1',	//79       (1). abnt2=end  
-'2',    //80       (2). abnt2=down
-'3',    //81       (3). abnt2=pgdn (q).     
-'0',    //82       (0). abnt2=Ins
+ VK_PAUSE,      //69 abnt2=(PAUSE). (num lock) abnt2=VK_NUMLOCK,
+ VK_SCROLL,     //70 abnt2(Scroll Lock) abnt2=break.
+ VK_ARROW_UP,  //'7',    //71 abnt2=(7). abnt2=home
+ VK_ARROW_UP,  //'8',    //72       >>> (8). abnt2=up
+ '9',    //73       (9). abnt2=pgup
+ '-',    //74        -
+ VK_ARROW_LEFT,  //'4',    //75       >>> (4). abnt2=left 
+ '5',    //76       (5).
+ VK_ARROW_RIGHT,  //'6',    //77       >>> (6). abnt2=right
+ '+',    //78       +
+ '1',    //79       (1). abnt2=end  
+ VK_ARROW_DOWN,  //'2',    //80       >>> (2). abnt2=down
+ '3',    //81       (3). abnt2=pgdn (q).     
+ '0',    //82       (0). abnt2=Ins
 VK_DELETE_TECLADONUMERICO,    //83 abnt2=(,) abnt2=(Num DEL) (abnt).(´)
 VK_PRINT,   //84 abnt2=(SysRq) PRINT SCREEN E sys req (abnt).
 '.',        //85
@@ -186,9 +186,9 @@ VK_F11,     //87 abnt2=(F11).
 VK_F12,     //88 abnt2=(F12).
 '/',        //89 slash question /?
 VK_F14,     //90
-VK_LWIN,    //91 abnt2=(Left Windows)  (right WinKey) ([).
-VK_RWIN,    //92 abnt2=(Right Windows) (left WinKey) (\).
-VK_CONTROL_MENU,    //93 CONTROL MENU, abnt2=(Application). (]).
+VK_LWIN,               //91 abnt2=(Left Windows)  (right WinKey) ([).
+VK_RWIN,               //92 abnt2=(Right Windows) (left WinKey) (\).
+VK_CONTROL_MENU,       //93 abnt2=(Application). CONTROL MENU, (]).
 VK_F18,    //94
 VK_F19,    //95
 '`',       //96 (0). (`)Acento grave.(enter)

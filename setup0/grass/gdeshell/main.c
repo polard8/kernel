@@ -1044,14 +1044,10 @@ shellProcedure (
 				//    break;
 				
 				// Null key.
-				case 0:
-				    pause();
-					pause();
-					//pause();
-					//pause();
-					cpu_relax();
-				    return (unsigned long) 0;
-				    break;
+                case 0:
+                    pause();  pause();  cpu_relax();
+                    return (unsigned long) 0;
+                    break;
 
                 // [Enter].
                 // Finaliza a string e compara.
@@ -1072,7 +1068,13 @@ shellProcedure (
 
                 // #test
                 case VK_TAB: printf ("\t"); goto done; break;
-
+                
+                //keyboard arrows
+                case 0x48: printf ("UP   \n"); goto done; break;
+                case 0x4B: printf ("LEFT \n"); goto done; break;
+                case 0x4D: printf ("RIGHT\n"); goto done; break;
+                case 0x50: printf ("DOWN \n"); goto done; break;
+                
                 // #todo
                 // falta configurar prompt[] usado por input();
                 // falta configurar LINES[]...

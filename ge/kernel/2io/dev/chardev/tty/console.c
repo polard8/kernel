@@ -627,7 +627,8 @@ void console_outbyte (int c, int console_number)
         TTY[console_number].cursor_x--; 
         prev = Ch;
         return;
-    }
+    }        
+        
 
 
     //

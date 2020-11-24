@@ -39,6 +39,12 @@
  *     ...
  */
 
+
+// See:
+// http://danjovic.blogspot.com/2014/06/tabelas-de-scancodes-para-teclados-abnt.html
+// http://kbdlayout.info/KBDBR/scancodes
+
+
  
 #include <kernel.h>
 
@@ -245,10 +251,10 @@ sc_again:
      //#debug
      //int key = __raw;
      //    key &= LDISC_KEY_MASK;    
-     // printf ("KEY{%d}\n", key ); 
-     // refresh_screen();
-     // if (__has_e0_prefix == 1){ printf ("e0: key{%d}\n", key ); refresh_screen(); }
-     // if (__has_e1_prefix == 1){ printf ("e1: key{%d}\n", key ); refresh_screen(); }
+     //printf ("KEY{%x}\n", key ); 
+     //refresh_screen();
+     //if (__has_e0_prefix == 1){ printf ("e0: key{%x}\n", key ); refresh_screen(); }
+     //if (__has_e1_prefix == 1){ printf ("e1: key{%x}\n", key ); refresh_screen(); }
 
  
      KEYBOARD_SEND_MESSAGE (__raw);

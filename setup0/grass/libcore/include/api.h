@@ -1929,7 +1929,17 @@ static unsigned long vga_256colors_palette[256] = {
 #define VK_F10	0x44  //68
 #define VK_NUMLOCK  0x45  //69 //0x90
 #define VK_SCROLL	0x46  //70 //0x91
-#define VK_HOME	  0x47  //71          
+#define VK_HOME	  0x47  //71
+
+
+// keyboad arrow keys
+#define VK_ARROW_UP     0x48
+#define VK_ARROW_LEFT   0x4B
+#define VK_ARROW_RIGHT  0x4D
+#define VK_ARROW_DOWN   0x50
+
+
+          
 #define VK_END	  0x4F  //79
 #define VK_DELETE_TECLADONUMERICO 0x53  //83  
 #define VK_F11	  0x57  //87 
