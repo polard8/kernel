@@ -1097,6 +1097,31 @@ char *s, c;
 */
 
 
+/*
+static unsigned short rtl_b2u16 (unsigned char c0, unsigned char c1);
+static unsigned short rtl_b2u16 (unsigned char c0, unsigned char c1)
+{
+    return (unsigned short) ( c0 | (c1 << 8) );
+}
+*/
+
+/*
+static unsigned long rtl_b2u32 ( unsigned char c0, unsigned char c1, unsigned char c2, unsigned char c3 );
+static unsigned long rtl_b2u32 ( unsigned char c0, unsigned char c1, unsigned char c2, unsigned char c3 )
+{
+    return (unsigned long)( ((unsigned long) c0      ) | 
+                            ((unsigned long) c1 <<  8) | 
+                            ((unsigned long) c2 << 16) | 
+                            ((unsigned long) c3 << 24) );
+}
+*/
+
+
+
+
+
+
+
 
 
 

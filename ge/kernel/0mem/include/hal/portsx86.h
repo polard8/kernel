@@ -4,9 +4,16 @@
  * Descrição:
  *     Header para rotinas de acesso as portas na arquitetura x86 intel.
  *
- * Versão 1.0, 2015.
+ * 2015 - Created by Fred Nora.
  */
- 
+
+
+// See:
+// https://wiki.osdev.org/I/O_Ports
+// http://bochs.sourceforge.net/techspec/PORTS.LST
+// 
+// ...
+
 
 #ifndef ____PORTSX86_H
 #define ____PORTSX86_H

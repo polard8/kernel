@@ -5,6 +5,10 @@
 #define __R_RENDER_H  1
 
 
+// See:
+// Bitblt (for "BIT BLock Transfer") 
+
+
 /*
  #todo
  A renderizaçao tomara decisoes de acordo com esse tipo.

@@ -11,6 +11,10 @@
  */
 
 
+// See:
+// https://wiki.osdev.org/Accelerated_Graphic_Cards
+
+
 // # importante
 // Essa deve ser a única maneira em que o sistema acessa
 // o controlador de vídeo.
