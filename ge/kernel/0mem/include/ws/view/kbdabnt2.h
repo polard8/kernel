@@ -166,17 +166,17 @@ static unsigned char map_abnt2[ABNT2_CHARMAP_SIZE] = {
  VK_F10,       //68 F10.(abnt)
  VK_PAUSE,      //69 abnt2=(PAUSE). (num lock) abnt2=VK_NUMLOCK,
  VK_SCROLL,     //70 abnt2(Scroll Lock) abnt2=break.
- VK_ARROW_UP,  //'7',    //71 abnt2=(7). abnt2=home
+ VK_HOME,      //'7',    //71 abnt2=(7). abnt2=home
  VK_ARROW_UP,  //'8',    //72       >>> (8). abnt2=up
- '9',    //73       (9). abnt2=pgup
+ VK_PAGEUP,  //'9',    //73       (9). abnt2=pgup
  '-',    //74        -
  VK_ARROW_LEFT,  //'4',    //75       >>> (4). abnt2=left 
  '5',    //76       (5).
  VK_ARROW_RIGHT,  //'6',    //77       >>> (6). abnt2=right
  '+',    //78       +
- '1',    //79       (1). abnt2=end  
+ VK_END,  //'1',    //79       (1). abnt2=end  
  VK_ARROW_DOWN,  //'2',    //80       >>> (2). abnt2=down
- '3',    //81       (3). abnt2=pgdn (q).     
+ VK_PAGEDOWN,  //'3',    //81       (3). abnt2=pgdn (q).     
  '0',    //82       (0). abnt2=Ins
 VK_DELETE_TECLADONUMERICO,    //83 abnt2=(,) abnt2=(Num DEL) (abnt).(´)
 VK_PRINT,   //84 abnt2=(SysRq) PRINT SCREEN E sys req (abnt).

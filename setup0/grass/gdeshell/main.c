@@ -1074,6 +1074,14 @@ shellProcedure (
                 case 0x4B: printf ("LEFT \n"); goto done; break;
                 case 0x4D: printf ("RIGHT\n"); goto done; break;
                 case 0x50: printf ("DOWN \n"); goto done; break;
+
+                // home end
+                case 0x47: printf ("HOME\n"); goto done; break;
+                case 0x4F: printf ("END \n"); goto done; break;
+
+                //pageup pagedown
+                case 0x49: printf ("PAGEUP   \n"); goto done; break;
+                case 0x51: printf ("PAGEDOWN \n"); goto done; break;
                 
                 // #todo
                 // falta configurar prompt[] usado por input();

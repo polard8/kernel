@@ -78,7 +78,8 @@
 #define VK_F10   0x44  //68
 #define VK_NUMLOCK  0x45  //69 //0x90
 #define VK_SCROLL   0x46  //70 //0x91
-#define VK_HOME	  0x47    //71    
+
+
 
 
 // arrow
@@ -89,7 +90,14 @@
 #define VK_ARROW_DOWN   0x50
 
 
-#define VK_END	  0x4F    //79
+#define VK_HOME   0x47    //71    
+#define VK_END    0x4F    //79
+
+#define VK_PAGEUP       0x49
+#define VK_PAGEDOWN     0x51
+
+
+
 #define VK_DELETE_TECLADONUMERICO 0x53  //83  
 #define VK_F11	  0x57  //87 
 #define VK_F12	  0x58  //88    
