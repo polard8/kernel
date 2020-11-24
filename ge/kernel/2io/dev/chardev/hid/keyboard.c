@@ -187,25 +187,32 @@ void abnt2_keyboard_handler (void){
     // um scancode.
 
     unsigned char __raw=0;
+    unsigned char val=0;
 
 sc_again:
-    
-    __raw = in8(0x60);
 
-    switch (__raw)
-    {
-        // O controlador solicitou um resend. :)
-        // case RESEND:        
-        // break;
-        
-        // O controlador avisa que recenheceu o comando anterior.
-        // case ACKNOWLEDGE:   
-        // break;        
-        
-        // O scancoude.
-        default: 
-            break;           
-    };
+    // old way
+    //__raw = in8(0x60);
+
+
+    //===========================================
+    
+    //
+    // #test
+    // Testing with ack
+    // credits: minix
+    //
+    
+    // #define KEYBD		0x60	/* I/O port for keyboard data */
+    // #define PORT_B          0x61	/* I/O port for 8255 port B (kbd, beeper...) */
+    // #define KBIT		0x80	/* bit used to ack characters to keyboard */
+    
+    __raw = in8(0x60);		/* get the scan code for the key struck */
+    val   = in8(0x61);		/* strobe the keyboard to ack the char */
+    out8(0x61, val | 0x80);	/* strobe the bit high */
+    out8(0x61, val);		/* now strobe it low */
+    //===========================================
+
 
 
     //
