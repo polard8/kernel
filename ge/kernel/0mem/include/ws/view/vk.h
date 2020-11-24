@@ -21,10 +21,19 @@
 #define VK_MBUTTON	0x04
 #define VK_XBUTTON1	0x05
 #define VK_XBUTTON2	0x06
-#define VK_CLEAR	0x0C  //12
-#define VK_BACK	    0x0E  //14  //8
+
+
+#define VK_ABNT2_TREMA 0x07   // caps lock ligado.
+
+#define VK_CLEAR	0x0C  //12 ??
+
+
+#define VK_BACK         0x0E  //14  //8
 //#define VK_BACKSPACE  0x0E  //14  //8
-#define VK_TAB      0x0F  //15  //9
+#define VK_TAB          0x0F  //15  //9
+
+
+
 #define VK_KANA	    0x15
 #define VK_HANGEUL  0x15
 #define VK_HANGUL	0x15
@@ -97,8 +106,11 @@
 #define VK_PAGEDOWN     0x51
 
 
+#define VK_ABNT2_INSERT  0x52
+#define VK_ABNT2_DELETE  0x53
 
 #define VK_DELETE_TECLADONUMERICO 0x53  //83  
+
 #define VK_F11	  0x57  //87 
 #define VK_F12	  0x58  //88    
 

@@ -94,6 +94,8 @@
  * obs: Isso pode ser carregável para várias configurações de teclado.
  */
 
+// minusculas
+
 static unsigned char map_abnt2[ABNT2_CHARMAP_SIZE] = {
  0,      //Scancode 0.
  033,    //1  (Esc). (\e)
@@ -177,8 +179,8 @@ static unsigned char map_abnt2[ABNT2_CHARMAP_SIZE] = {
  VK_END,  //'1',    //79       (1). abnt2=end  
  VK_ARROW_DOWN,  //'2',    //80       >>> (2). abnt2=down
  VK_PAGEDOWN,  //'3',    //81       (3). abnt2=pgdn (q).     
- '0',    //82       (0). abnt2=Ins
-VK_DELETE_TECLADONUMERICO,    //83 abnt2=(,) abnt2=(Num DEL) (abnt).(´)
+ VK_ABNT2_INSERT,  //'0',    //82       (0). abnt2=Ins
+ VK_ABNT2_DELETE,  //VK_DELETE_TECLADONUMERICO,    //83 abnt2=(,) abnt2=(Num DEL) (abnt).(´)
 VK_PRINT,   //84 abnt2=(SysRq) PRINT SCREEN E sys req (abnt).
 '.',        //85
 '\\',       //86 abnt2=(\). abnt2=(help) backslash  bar
@@ -237,7 +239,12 @@ VK_F24,	 //135
 /*
  * SHIFT ABNT2.
  */
-static unsigned char shift_abnt2[ABNT2_CHARMAP_SIZE] = {	
+
+// CAPS LOCK LIGADO
+
+// maiusculas
+
+static unsigned char shift_abnt2[ABNT2_CHARMAP_SIZE] = {
 0, 
 033,   // "
 '!',   //2 
@@ -245,50 +252,50 @@ static unsigned char shift_abnt2[ABNT2_CHARMAP_SIZE] = {
 '#',   //4
 '$',   //5
 '%',   //6
-168,   //7 (00a8 @) (trema)
+VK_ABNT2_TREMA, //168,   //7 (00a8 @) (trema)
 '&',   //8
 '*',   //9
 '(',   //10
 ')',   //11
 '_',   //12
 '+',   //13 
-0177,
-'\t',   //15 TAB
-'Q',    //16
-'W',    //17
+VK_BACK,  // 0x0E     0177,
+VK_TAB,   // 0x0F     '\t',   //15 TAB
+'Q',    //16  FAIL
+'W',    //17  
 'E',    //18
-'R',    //19
+'R',    //19  FAIL
 'T',    //20
 'Y',    //21
 'U',    //22
-'I',
-'O',    //24
-'P',    //25
+'I',    //23    FAIL
+'O',    //24    FAIL
+'P',    //25    FAIL
 '`',    //26
 '{',    //27
-VK_RETURN,   //28
-CTL,
+VK_RETURN,   // 28
+CTL,         // 29 
 'A',    //30
-'S',
+'S',    // FAIL
 'D',
 'F',
-'G',
-'H',
+'G',    //FAIL
+'H',    //FAIL
 'J',
-'K',
+'K',  //FAIL
 'L',  //38
 128,  //39 (00c7) Ç
-'^',  //40
+'^',  //40             //OK
 '"',  //41 abnt2=(")
 SHF,
- '}',  //43 
+ '}',  //43            //OK
 'Z',   //44 
 'X',
 'C',
 'V',
 'B',
 'N',
-'M',  //50 
+'M',  //50             //FAIL
 '<',  //51 abnt2
 '>',  //52 abnt2
 ':',  //53 abnt2
@@ -309,19 +316,19 @@ CPS|L,  //58
 0,   //68
 NUM|L,  //69
 STP|L,  //70
-'7',    //71
-'8',    //72
-'9',    //73
+VK_HOME,  //'7',    //71
+VK_ARROW_UP,  //'8',    //72
+VK_PAGEUP,  //'9',    //73
 '-',    //74
-'4',    //75
+VK_ARROW_LEFT,  //'4',    //75
 '5',    //76
-'6',    //77
+VK_ARROW_RIGHT,  //'6',    //77
 '+',    //78
-'1',    //79
-'2',    //80
-'3',    //81
-'0',    //82
-',',    //83 abnt2(,)
+VK_END,  //'1',    //79
+VK_ARROW_DOWN,  //'2',    //80
+VK_PAGEDOWN,  //'3',    //81
+VK_ABNT2_INSERT,  //'0',    //82
+VK_ABNT2_DELETE,  //',',    //83 abnt2(,)
 0,      //84
 0,      //85
 '|',    //86 abnt2(|)
@@ -372,6 +379,10 @@ STP|L,  //70
 /*
  * CONTROL ABNT2.
  */
+
+// com control
+// control + key
+
 static unsigned char ctl_abnt2[ABNT2_CHARMAP_SIZE] = {
 0,     //0
 033,   //1

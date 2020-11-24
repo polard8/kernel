@@ -1069,11 +1069,14 @@ shellProcedure (
                 // #test
                 case VK_TAB: printf ("\t"); goto done; break;
                 
+                case 0x07: printf ("TREMA\n"); goto done; break;
+                
                 //keyboard arrows
                 case 0x48: printf ("UP   \n"); goto done; break;
                 case 0x4B: printf ("LEFT \n"); goto done; break;
                 case 0x4D: printf ("RIGHT\n"); goto done; break;
                 case 0x50: printf ("DOWN \n"); goto done; break;
+
 
                 // home end
                 case 0x47: printf ("HOME\n"); goto done; break;
@@ -1082,12 +1085,17 @@ shellProcedure (
                 //pageup pagedown
                 case 0x49: printf ("PAGEUP   \n"); goto done; break;
                 case 0x51: printf ("PAGEDOWN \n"); goto done; break;
-                
+
+                // insert delete
+                case 0x52: printf ("INSERT\n"); goto done; break;
+                case 0x53: printf ("DELETE\n"); goto done; break;
+
+
                 // #todo
                 // falta configurar prompt[] usado por input();
                 // falta configurar LINES[]...
                 case 0x8: // backspace
-                case 0x7f: // del
+                //case 0x7f: // del
                 case VK_BACK:  //0x0E
                     // Apaga o char na tela, na linha de comandos e no buffer.
                     if ( textCurrentCol > 0 )

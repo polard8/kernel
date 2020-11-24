@@ -363,6 +363,7 @@ int KEYBOARD_SEND_MESSAGE (unsigned char SC){
     // Tratar as mensagens.
 
 
+    // ================================================
     // Se a tecla for (liberada).
     // Dá '0' se o bit de paridade for '0'.
 
@@ -443,17 +444,36 @@ int KEYBOARD_SEND_MESSAGE (unsigned char SC){
 		// Analiza: Se for tecla normal, pega o mapa de caracteres apropriado.
 		// minúscula
 		// Nenhuma tecla de modificação ligada.
-        if (message == MSG_KEYUP){ ch = map_abnt2[key]; }
+        if (message == MSG_KEYUP)
+        {
+            // Minúsculas.
+            if (capslock_status == 0)
+            { ch = map_abnt2[key];   goto done; }
+            // Maiúsculas.
+            if (capslock_status == 1)
+            { ch = shift_abnt2[key]; goto done; }
+            // ...
+        }
 
         // Analiza: Se for do sistema usa o mapa de caracteres apropriado. 
         // Normal.
-        if (message == MSG_SYSKEYUP){ ch = map_abnt2[key]; }
+        if (message == MSG_SYSKEYUP)
+        {   
+            // se liberada teclas de sistema como capslock ligado
+            if (capslock_status == 0)
+            { ch = map_abnt2[key];   goto done; }
+            // se liberada teclas de sistema como capslock desligado
+            if (capslock_status == 1)
+            { ch = shift_abnt2[key]; goto done; }
+            // ...
+        }
+
 
         // Nothing.
         goto done;
     };
 
-
+    // ================================================
     // * Tecla (pressionada) ...........
     if ( (scancode & LDISC_KEY_RELEASED) != 0 )
     { 
@@ -569,34 +589,34 @@ int KEYBOARD_SEND_MESSAGE (unsigned char SC){
                 break;
         };
 
-		//uma tecla normal foi pressionada.
-		//mensagem de digitação.	
+        // ==============================
+        // Teclas de digitaçao
+        // Uma tecla normal foi pressionada.
+        // mensagem de digitação.	
         if (message == MSG_KEYDOWN)
         {
+            // Minúsculas.
+            if (capslock_status == 0)
+            { ch = map_abnt2[key];   goto done; }
             // Maiúsculas.
             if (capslock_status == 1)
             { ch = shift_abnt2[key]; goto done; }
-
-            // Minúsculas.
-            if (capslock_status == 0)
-            { ch = map_abnt2[key]; goto done; }
-
-			//#todo
-			// fomos avisados que se trata de uma scape sequence para teclas extras
-			// do teclado estendido. Temos que pegar o scancode de outro mapa.
-			
-			//if ( ESCAPE_E0 == 1 && numlock_status == 1 )
-			//{
-		    //    ch = numlock_abnt2[key];
-			//    ESCAPE_E0 = 0;
-			//	goto done;			
-			//}
-			
-            //Nothing.
+            // ...
         }
 
+        // ==============================
+        // Teclas de sistema
         // Uma tecla do sistema foi pressionada.
-        if (message == MSG_SYSKEYDOWN){ ch = map_abnt2[key]; }
+        if (message == MSG_SYSKEYDOWN)
+        {   
+            // se pressionamos teclas de sistema como capslock ligado
+            if (capslock_status == 0)
+            { ch = map_abnt2[key];   goto done; }
+            // se pressionamos teclas de sistema como capslock desligado
+            if (capslock_status == 1)
+            { ch = shift_abnt2[key]; goto done; }
+            // ...
+        }
 
         // Nothing.
         goto done;
