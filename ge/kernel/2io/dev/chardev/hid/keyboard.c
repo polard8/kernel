@@ -161,6 +161,8 @@ void put_scancode( char c )
 
 void abnt2_keyboard_handler (void){
 
+    static int __has_e0_prefix = 0;
+    static int __has_e1_prefix = 0;
 
     wait_then_write (0x64,0xA7);  //Disable mouse port.
 
@@ -231,15 +233,24 @@ sc_again:
     // Mas por enquanto, essa rotina manda mensagens para o ws
     // caso tenha um instalado.
 
-            
-     if ( __raw == 0 )   {                      goto done;     }
-     if ( __raw == 0xE0 ){ __has_e0_prefix = 1; goto sc_again; }
-     if ( __raw == 0xE1 ){ __has_e1_prefix = 1; goto sc_again; }
+
+     if ( __raw == 0 )   {                      goto done;  }
+     if ( __raw == 0xE0 ){ __has_e0_prefix = 1; goto done;  }
+     if ( __raw == 0xE1 ){ __has_e1_prefix = 1; goto done;  }
 
      // Build the message and send it to the thread's queue.
      // This routine will select the target thread.
      // See: ps2kbd.c
-     
+
+     //#debug
+     //int key = __raw;
+     //    key &= LDISC_KEY_MASK;    
+     // printf ("KEY{%d}\n", key ); 
+     // refresh_screen();
+     // if (__has_e0_prefix == 1){ printf ("e0: key{%d}\n", key ); refresh_screen(); }
+     // if (__has_e1_prefix == 1){ printf ("e1: key{%d}\n", key ); refresh_screen(); }
+
+ 
      KEYBOARD_SEND_MESSAGE (__raw);
 
     // Clean the mess.

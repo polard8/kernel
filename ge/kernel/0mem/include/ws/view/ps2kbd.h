@@ -247,7 +247,7 @@ unsigned long keyboard_handler_address;
 
 
 //
-// ===============================================
+// == prototypes =============================================
 //
 
 void xxx_keyboard_write (uint8_t data);

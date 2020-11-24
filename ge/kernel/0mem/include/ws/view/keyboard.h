@@ -43,7 +43,7 @@ struct keyboard_message_d
     struct process_d  *receiver_process;
     struct process_d  *receiver_thread;
 
-    struct window_d *receiver_window;	
+    struct window_d *receiver_window;
 
     // Dados.
     struct window_d  *window;
@@ -56,17 +56,9 @@ struct keyboard_message_d keyboard_queue[8];
 
 
 
-
-
 //
-// OBS:
-// ISSO PODE FICAR FORA DO KERNEL BASE ... NO DRIVER;
+// == prototypes =======================================
 //
-
-
-static int __has_e0_prefix = 0;
-static int __has_e1_prefix = 0;
-//...
 
 
 void abnt2_keyboard_handler (void);
