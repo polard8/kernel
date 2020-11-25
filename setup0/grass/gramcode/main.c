@@ -16,10 +16,10 @@
 
 
 
-#define WINDOW_LEFT     40 
-#define WINDOW_TOP      40
-#define WINDOW_WIDTH   480  
-#define WINDOW_HEIGHT  480
+#define WINDOW_LEFT      0
+#define WINDOW_TOP       0
+#define WINDOW_WIDTH   320 
+#define WINDOW_HEIGHT  200
 
 
     // main window.
@@ -437,31 +437,25 @@ void teditorTeditor (void){
     int i=0;
     int j=0;
 
-	//
-	// ## Inicializando as estruturas de linha ##
-	//
-	
-	//inicializamos com espaços.
-	for ( i=0; i<32; i++ )
-	{
-		for ( j=0; j<80; j++ )
-		{
-		    LINES[i].CHARS[j] = (char) ' ';
-		    LINES[i].ATTRIBUTES[j] = (char) 7;
-	    }
-		
-		LINES[i].left = 0;
-		LINES[i].right = 0;
-		LINES[i].pos = 0;
-	};	
-	
+    // Inicializando as estruturas de linha
+    // inicializamos com espaços.
 
+    for ( i=0; i<32; i++ )
+    {
+        for ( j=0; j<80; j++ )
+        {
+            LINES[i].CHARS[j]      = (char) ' ';
+            LINES[i].ATTRIBUTES[j] = (char) 7;
+        };
+        LINES[i].left = 0;
+        LINES[i].right = 0;
+        LINES[i].pos = 0;
+    };
 
-	//inicializa as metricas do sistema.
-	//inicializa os limites da janela.
-	//inicia o tamanho da janela.
-	//inicializar a posição da janela.
-	
+    //inicializa as metricas do sistema.
+    //inicializa os limites da janela.
+    //inicia o tamanho da janela.
+    //inicializar a posição da janela.
     // #todo
     // Mudar o nome dessas funções.
     
@@ -502,7 +496,7 @@ void shellInitWindowLimits (void){
     //full screen support
     wlFullScreenLeft = 0;
     wlFullScreenTop = 0;
-    wlFullScreenWidth = smScreenWidth;
+    wlFullScreenWidth  = smScreenWidth;
     wlFullScreenHeight = smScreenHeight;
 
 
@@ -512,7 +506,7 @@ void shellInitWindowLimits (void){
     wlMinWindowHeight = smCharWidth * 10;
     //wlMinWindowWidth = smCharWidth * 80;
     //wlMinWindowHeight = smCharWidth * 25;
-    wlMaxWindowWidth = wlFullScreenWidth;
+    wlMaxWindowWidth  = wlFullScreenWidth;
     wlMaxWindowHeight = wlFullScreenHeight;
 
 
@@ -520,7 +514,7 @@ void shellInitWindowLimits (void){
     wlMinColumns = 80;
     wlMinRows = 1;
     wlMaxColumns = (wlFullScreenWidth / 8);
-    wlMaxRows = (wlFullScreenHeight / 8);
+    wlMaxRows    = (wlFullScreenHeight / 8);
 	
 	//dado em quantidade de linhas.
     textMinWheelDelta = 1;  //mínimo que se pode rolar o texto
@@ -530,42 +524,33 @@ void shellInitWindowLimits (void){
 }
 
 
-
+// Window size
 void shellInitWindowSizes (void)
 {
-    //
-    //  ## Window size ##
-    //
-
-    //wsWindowWidth = wlMinWindowWidth;
-    //wsWindowHeight = wlMinWindowHeight;
-	
-	//Tamanho da janela do shell com base nos limites 
+    //Tamanho da janela do shell com base nos limites 
     //que ja foram configurados.	
-	
-	wsWindowWidth =  WINDOW_WIDTH;
-	wsWindowHeight = WINDOW_HEIGHT;
-	
-	
-	if ( wsWindowWidth < wlMinWindowWidth )
-	{
-		wsWindowWidth = wlMinWindowWidth;
-	}
-	
-	if ( wsWindowHeight < wlMinWindowHeight )
-	{
-	    wsWindowHeight = wlMinWindowHeight;
-	}
+
+    wsWindowWidth  = WINDOW_WIDTH;
+    wsWindowHeight = WINDOW_HEIGHT;
+
+    if ( wsWindowWidth < wlMinWindowWidth )
+    {
+        wsWindowWidth = wlMinWindowWidth;
+    }
+
+    if ( wsWindowHeight < wlMinWindowHeight )
+    {
+        wsWindowHeight = wlMinWindowHeight;
+    }
 }
 
 
 void shellInitWindowPosition (void)
 {
+    // window position
+    wpWindowLeft = WINDOW_LEFT;
+    wpWindowTop  = WINDOW_TOP;
 
-	//window position
-	wpWindowLeft = WINDOW_LEFT;
-	wpWindowTop = WINDOW_TOP;
-	
 	//wpWindowLeft = (unsigned long) ( (smScreenWidth - wsWindowWidth)/2 );
 	//wpWindowTop = (unsigned long) ( (smScreenHeight - wsWindowHeight)/2 );  	
 }
@@ -812,19 +797,17 @@ hangz:
 	//
 	
 	
-skip_test:	
-	
-	
-	
+skip_test:
 
 
 #ifdef TEDITOR_VERBOSE
     gde_set_cursor (0,0);
     printf("\n");
-    printf("Initializing Text Editor:\n");
-    printf("mainTextEditor: # argv0={%s} # \n", argv[0] );
-    printf("mainTextEditor: # argv1={%s} # \n", argv[1] );
+    printf("gramcode: Initializing\n");
+    printf("main: # argv0={%s}\n", argv[0] );
+    printf("main: # argv1={%s}\n", argv[1] );
 #endif
+
 
     //prompt_put_string("Testing ...");
     //prompt_flush(0);
@@ -854,15 +837,32 @@ skip_test:
 	
 	//#importante
 	//inicializa as variáveis antes de pintar.
+
     teditorTeditor();
-	
+
+    // device limits
+    unsigned long deviceWidth  = gde_get_system_metrics(1);
+    unsigned long deviceHeight = gde_get_system_metrics(2);
 
 	//
 	// Window
 	//
+
+    // Forget the old configuration.
+    // Let's do this again. full screen.
     
-	// frame
-	// Criando uma janela para meu editor de textos.
+    wpWindowLeft=0;
+    wpWindowTop=0;
+    wsWindowWidth  = deviceWidth;
+    wsWindowHeight = deviceHeight;
+
+
+    //
+    // frame
+    //
+
+    // frame
+    // Criando uma janela para meu editor de textos.
 
     //++
     gde_begin_paint (); 
@@ -870,8 +870,7 @@ skip_test:
                           argv[1],
                           wpWindowLeft, wpWindowTop, 
                           wsWindowWidth, wsWindowHeight,    
-                          0, 0, 
-                          COLOR_BLUE, COLOR_BLUE); //0x303030, 0x303030 );
+                          0, 0, 0x303030, 0x303030 );
 
     if ( (void *) hWindow == NULL ){
         gde_end_paint ();
@@ -915,12 +914,11 @@ skip_test:
     // Editbox.
     //
 
-	//++
-	gde_enter_critical_section ();  
-	editboxWindow = (void *) gde_create_window ( WT_EDITBOX, 1, 1, "editbox",     
-                                1, 1, 
-                                wsWindowWidth -50, wsWindowHeight -80, 
-                                editbox_bg_Window, 0, 0x303030, 0x303030 );
+    //++
+    gde_enter_critical_section ();  
+    editboxWindow = (void *) gde_create_window ( WT_EDITBOX, 1, 1, "editbox",     
+                                1, 1, wsWindowWidth -8, wsWindowHeight -8 -36, 
+                                editbox_bg_Window, 0, COLOR_RED, COLOR_RED );
     if ( (void *) editboxWindow == NULL){
         gde_exit_critical_section ();  
         printf ("editboxWindow fail");
@@ -1000,47 +998,47 @@ skip_test:
     // argv[0] =  Nome do programa.
     // argv[1] =  Nome do arquivo.
 
-
-    // Se nenhum nome de arquivo foi especificado, então começamos a digitar.
-    if ( (char *) argv[1] == NULL ){
-        goto startTyping;	
+    // Se nenhum nome de arquivo foi especificado, 
+    // então começamos a digitar.
+    if ( (char *) argv[1] == NULL )
+    {
+        goto startTyping;
     }
 
-
-
-//#ifdef TEDITOR_VERBOSE
+    // Ok, let's open the file
+    
     gde_set_cursor (0,0);
+    
     printf("\n");
     printf("Loading file ...\n");
-//#endif	
 
-    //
-    // Open.
-    //
-
-
-    fp = fopen ( (char *) argv[1], "rb" );	
+    fp = fopen ( (char *) argv[1], "rb" );
 
     if ( fp == NULL ){
         printf ("gramcode: Couldn't open the file. Start typing ...\n");
         goto startTyping;
+
+    // Mostrando o arquivo.
     }else{
 
-
-        // Mostrando o arquivo.
         printf ("\n");
 
-        while (1)
-        {
+        while (1){
             ch_test = (int) fgetc (fp);
 
             if ( ch_test == EOF ){
                 goto out;
             }else{
-                printf ("%c", ch_test);	
+
+                // #bugbug
+                // This is gonna print the file in the console,
+                // not in the editor.
+                
+                printf ("%c", ch_test);  fflush (stdout); 
             };
         };
 
+    //ok
 
 out:
 

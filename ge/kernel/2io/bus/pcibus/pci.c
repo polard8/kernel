@@ -1111,6 +1111,8 @@ pciGetInterruptPin (
  *    Inicializa em alguns casos.
  */
 
+// Called by pci_setup_devices() in pciscan.c
+
 int 
 pciHandleDevice ( 
     unsigned char bus, 
@@ -1125,7 +1127,7 @@ pciHandleDevice (
     int Status = -1;
     
     // char, block, network
-    int __class;
+    int __class=0;
     
     // name support.
     char __tmpname[64];
@@ -1142,16 +1144,12 @@ pciHandleDevice (
         panic ("pciHandleDevice: D");
 
     }else{
-
-        // Object support.
-        D->objectType = ObjectTypePciDevice;
+        D->objectType  = ObjectTypePciDevice;
         D->objectClass = ObjectClassKernelObjects;
-
-        // Identificador.
-        D->id = (int) pciListOffset;
         D->used  = (int) 1;
         D->magic = (int) 1234;
-        //D->name = "No name";
+
+        D->id = (int) pciListOffset;
 
         // Localização.
         D->bus  = (unsigned char) bus;
@@ -1159,8 +1157,8 @@ pciHandleDevice (
         D->func = (unsigned char) fun; 
 
         // PCI Header.
-        D->Vendor = (unsigned short) pciCheckVendor (bus, dev);
-        D->Device = (unsigned short) pciCheckDevice (bus, dev);
+        D->Vendor = (unsigned short) pciCheckVendor (bus,dev);
+        D->Device = (unsigned short) pciCheckDevice (bus,dev);
 
         D->name = "pci-device-no-name";
 
@@ -1169,26 +1167,70 @@ pciHandleDevice (
 		// printf ("$ vendor=%x device=%x \n",D->Vendor, D->Device);
 
         //OK, it is working
-        data  = (uint32_t) diskReadPCIConfigAddr ( bus, dev, fun, 8 );
-        D->classCode  = data >> 24 & 0xff;
-        D->subclass   = data >> 16 & 0xff;
+        data = (uint32_t) diskReadPCIConfigAddr ( bus, dev, fun, 8 );
+        D->classCode = data >> 24 & 0xff;
+        D->subclass  = data >> 16 & 0xff;
 
 		//#bugbug: Isso falhou. Deletar isso e trabalhar essas funções.
 		//D->classCode = (unsigned char) pciGetClassCode(bus, dev);
 		//D->subclass = (unsigned char) pciGetSubClass(bus, dev); 
 
-        D->irq_line = (unsigned char) pciGetInterruptLine (bus, dev);
-        D->irq_pin  = (unsigned char) pciGetInterruptPin (bus, dev);
+        D->irq_line = (unsigned char) pciGetInterruptLine (bus,dev);
+        D->irq_pin  = (unsigned char) pciGetInterruptPin (bus,dev);
 
         // Next device.
         D->next = NULL; 
 
+        // #debug
+        // 07d1	D-Link System Inc
+        // 101e	American Megatrends Inc.
+        // 1028	Dell
+        // 1022	Advanced Micro Devices, Inc. [AMD]
+        // 101c	Western Digital
+        // 103c	Hewlett-Packard Company
+        // 1043	ASUSTeK Computer Inc.
+        // 104c	Texas Instruments
+        // 1050	Winbond Electronics Corp
+        // 1078	Cyrix Corporation
+        // 108e	Oracle/SUN
+        // 10de	NVIDIA Corporation
+        // 1106	VIA Technologies, Inc.
+        // 1412	VIA Technologies Inc.
+        // 115f	Maxtor Corporation
+        // 1186	D-Link System Inc
+        // 11c3	NEC Corporation
+        // 121a	3Dfx Interactive, Inc.
+        // 10ec	Realtek Semiconductor Co., Ltd.
+        // 0bda Realtek Semiconductor Corp. 
+        // 807d	Asustek Computer, Inc.
+        // 8c4a	Winbond
+        // ...
+        
+        if ( (D->Vendor == 0xFFFF) ){
+            debug_print ("pciHandleDevice: [BUGBUG] Illegal vendor\n");
+        }
 
         // nvidia
-        // if ( (D->Vendor == 0x10DE) )
-        // {
-        // }
+        if ( (D->Vendor == 0x10DE) ){
+            debug_print ("pciHandleDevice: [TODO] nvidia device found\n");
+        }
 
+        // VIA
+        if ( (D->Vendor == 0x1106 || D->Vendor == 0x1412) ){
+            debug_print ("pciHandleDevice: [TODO] VIA device found\n");
+        }
+
+        // realtek
+        if ( (D->Vendor == 0x10EC || D->Vendor == 0x0BDA ) ){
+            debug_print ("pciHandleDevice: [TODO] realtek device found\n");
+        }
+
+        // logitec
+        if ( (D->Vendor == 0x046D) ){
+            debug_print ("pciHandleDevice: [TODO] logitec device found\n");
+        }
+
+        // ...
 
         //
         // == NIC Intel. ===================
@@ -1277,7 +1319,7 @@ pciHandleDevice (
              };
         }
 
-
+        // #todo
         // Display controller on qemu.
         //if ( (D->Vendor == 0x1234)  && 
              //(D->Device == 0x1111 ) && 

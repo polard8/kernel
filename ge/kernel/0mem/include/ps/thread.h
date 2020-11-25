@@ -267,7 +267,8 @@ struct thread_d
     // What will be the next processor for this thread.
     int next_cpu;
     
-    // Processor affinity.
+    // Processor affinity. (CPU pinning)
+    // The thread will execute only on the designated CPU.
     // See: https://en.wikipedia.org/wiki/Processor_affinity
     int affinity;
 
@@ -295,13 +296,14 @@ struct thread_d
 
     unsigned long DirectoryPA;
 
-
     // ring.
     unsigned long iopl;
     unsigned long PreviousMode;
 
+    //
+    // == Context ======================= 
+    //
 
-	// Context. 
 	// #todo: 
 	// Usars uma estrutura.
 	// #todo: 
@@ -383,13 +385,9 @@ struct thread_d
 	// O que segue é referenciado durante o processo de dispatch.
 	//
 
-	/*
-	 * save 
-	 * Sinaliza que a tarefa teve o seu contexto salvo.
-	 * #todo: 
-	 * Isso pode ser int, bool ou char.
-	 */
-
+    // save:
+    // Sinaliza que a tarefa teve o seu contexto salvo.
+    // #todo: Isso pode ser int, bool ou char.
     unsigned long saved;
 
 
@@ -430,14 +428,12 @@ struct thread_d
     // Quantas vezes ela já rodou no total.
     unsigned long step; 
 
-
     // Quando ela foi criada.
     // systime inicial da thread.
     unsigned long initial_time_ms;
 
     // Tempo total dado em milisegundos.
     unsigned long total_time_ms; 
-
 
     // Quantum. 
     // time-slice or quota. 
@@ -498,7 +494,6 @@ struct thread_d
     // == Profiler ==================================
     //
 
-
     //quanto por cento do tempo o processo ficou rodando.
     //é a soma do quanto ficou rodando todas as suas threads.
     unsigned long profiler_percentage_running;
@@ -506,7 +501,6 @@ struct thread_d
     unsigned long profiler_percentage_running_mod;
     unsigned long profiler_ticks_running;
     unsigned long profiler_last_ticks;
-
 
     //Tempo para o próximo alarme, dado em ticks.
     //unsigned long alarm; 
@@ -570,23 +564,32 @@ struct thread_d
 
 
     //
-    // == Single event ===========================================
+    // == Kernel ===========================================
     //
 
-    // Single system message.
+    // #test
+    // Sending a message to the kernel.
+    // #todo: no queue.
 
-    // 4 argumentos padrão;
     struct window_d *window;    //arg1.
     int msg;                    //arg2.
     unsigned long long1;        //arg3.
     unsigned long long2;        //arg4.
+
     // Flag avisando que tem nova mensagem.
+    // O kernel deve checar essa flag. Se ela estiver acionada,
+    // significa que o kernel deve processar essa mensagem.
+    
     int newmessageFlag;         
 
 
+
     //
-    // == event queue ===========================================
+    // == Notify ===========================================
     //
+
+    // O processo recebe uma notificaçao de que um evento ocorreu.
+    // a notificaçao eh o proprio evento em si. 
 
     // This is the event queue.
     // It is used by the ring 3 processes.
@@ -616,6 +619,10 @@ struct thread_d
     // Coloca-se em tail, quande chegar ao fim do buffer, recomeça.
     // Se o tail encontrar o head é porque o processo não está 
     // respondendo.
+    
+    // #bugbug
+    // isso ao esta sendo usado no momento.
+    
     unsigned long MsgQueue[32];
     int MsgQueueHead;  //retira. 
     int MsgQueueTail;  //coloca.
@@ -707,10 +714,6 @@ struct thread_d *InitThread;
 // Ponteiro para a thread usada na hora da clonagem de processos.
 struct thread_d *ClonedThread;
 
-
-
-
-
 /* 
  * Listas encadeadas de threads.
  * Usadas no gerenciamento de rounds 
@@ -735,12 +738,9 @@ int conductorIndex;
 //struct thread_d *ready_list_head;
 
 
-
-
-/*
- * threadList:
- * 
- */
+//
+// Thread list.
+//
 
 // #Atenção
 // Esse é a lista principal. Contém todas as threads.
@@ -764,6 +764,10 @@ struct thread_list_d
 //unsigned long DispatcherList[10];
 //DispatcherList[2].Threads[4].tid
 
+
+//
+// ==  prototypes ============================================
+//
 
 
 //clona uma thread e retorna o ponteira da clone.
@@ -822,7 +826,6 @@ unsigned long GetThreadStackStart(struct thread_d *thread);
 //...
 
 void SelectForExecution (struct thread_d *Thread);
-
 
 
 // Show info about all threads.
@@ -891,6 +894,7 @@ int getthreadname ( int tid, char *buffer );
 
 
 unsigned long __GetThreadStats ( int tid, int index );
+
 
 //
 // End.

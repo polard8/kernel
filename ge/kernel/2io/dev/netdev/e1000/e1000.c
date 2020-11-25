@@ -72,14 +72,9 @@ PCIRegisterIRQHandler (
     unsigned long handler,
     void *priv ) 
 {
-
-	// #debug 
-
-    panic ("nicintel-PCIRegisterIRQHandler:");
-
-    // refresh_screen ();
-    // while (1){}
+    panic ("E1000-PCIRegisterIRQHandler: [FIXME]");
 }
+
 
 
 /*
@@ -104,42 +99,51 @@ e1000_init_nic (
     struct pci_device_d *pci_device )
 {
 
+    // loop
+    register uint32_t i=0; 
+    
     // pci info.
     uint32_t data=0;
 
-    unsigned long phy_address;
-    unsigned short tmp16;
-    uint32_t i=0; 
+    unsigned short Vendor=0;
+    unsigned short Device=0;
+
+    unsigned long phy_address=0;
+    unsigned long virt_address=0;
+
+    unsigned short tmp16=0;
 
 
-	// #debug
+    // #debug
     debug_print ("e1000_init_nic:\n");
-    printf ("e1000_init_nic:\n");
+    printf      ("e1000_init_nic:\n");
 
 
-
-    //
     // NIC Intel.
-    //
-
-	// #importante
-	// Devemos falhar antes de alocarmos memória para a estrutura.
-	// #todo
-	// Fazer uma lista de dispositivos Intel suportados por esse driver.
-	// +usar if else.
+    // #importante
+    // Devemos falhar antes de alocarmos memória para a estrutura.
+    // #todo
+    // Fazer uma lista de dispositivos Intel suportados por esse driver.
+    // +usar if else.
 
     data = (uint32_t) diskReadPCIConfigAddr ( bus, dev, fun, 0 );
 
-    unsigned short Vendor = (unsigned short) (data       & 0xffff);
-    unsigned short Device = (unsigned short) (data >> 16 & 0xffff);
+    Vendor = (unsigned short) (data       & 0xffff);
+    Device = (unsigned short) (data >> 16 & 0xffff);
 
-    if ( Vendor != 0x8086 || Device != 0x100E ){
-        debug_print ("e1000_init_nic: Device not found\n");
+    if ( Vendor != 0x8086 || Device != 0x100E )
+    {
+        debug_print ("e1000_init_nic: [FAIL] Device not found\n");
+
+        // #todo
+        // #bugbug
+        // Temos que sinalizar que o dispositivo nao foi inicializado.
+        
         return (int) (-1);
     }
 
-	//#debug
-    printf ("Vendor=%x \n", (data       & 0xffff) );
+    // #debug
+    printf ("Vendor=%x ",   (data       & 0xffff) );
     printf ("Device=%x \n", (data >> 16 & 0xffff) );
 
 
@@ -155,9 +159,9 @@ e1000_init_nic (
         panic ("e1000_init_nic: pci_device\n");
 
     }else{
-
         pci_device->used = 1;
         pci_device->magic = 1234;
+        
         pci_device->bus  = (unsigned char) bus;
         pci_device->dev  = (unsigned char) dev;
         pci_device->func = (unsigned char) fun;
@@ -194,89 +198,70 @@ e1000_init_nic (
 		// BARs
 		//
 
-        pci_device->BAR0 = (unsigned long) diskReadPCIConfigAddr ( bus, 
-                                               dev, fun, 0x10 );
-        pci_device->BAR1 = (unsigned long) diskReadPCIConfigAddr ( bus, 
-                                               dev, fun, 0x14 ); 
-        pci_device->BAR2 = (unsigned long) diskReadPCIConfigAddr ( bus, 
-                                               dev, fun, 0x18 );
-        pci_device->BAR3 = (unsigned long) diskReadPCIConfigAddr ( bus, 
-                                               dev, fun, 0x1C );
-        pci_device->BAR4 = (unsigned long) diskReadPCIConfigAddr ( bus, 
-                                               dev, fun, 0x20 );
-        pci_device->BAR5 = (unsigned long) diskReadPCIConfigAddr ( bus, 
-                                               dev, fun, 0x24 );
+        pci_device->BAR0 = (unsigned long) diskReadPCIConfigAddr ( 
+                                               bus, dev, fun, 0x10 );
+        pci_device->BAR1 = (unsigned long) diskReadPCIConfigAddr ( 
+                                               bus, dev, fun, 0x14 ); 
+        pci_device->BAR2 = (unsigned long) diskReadPCIConfigAddr ( 
+                                               bus, dev, fun, 0x18 );
+        pci_device->BAR3 = (unsigned long) diskReadPCIConfigAddr ( 
+                                               bus, dev, fun, 0x1C );
+        pci_device->BAR4 = (unsigned long) diskReadPCIConfigAddr ( 
+                                               bus, dev, fun, 0x20 );
+        pci_device->BAR5 = (unsigned long) diskReadPCIConfigAddr ( 
+                                               bus, dev, fun, 0x24 );
+
+        // IRQ.
+
+        // irq
+        pci_device->irq_line = (uint8_t) pciConfigReadByte ( 
+                                             bus, dev, fun, 0x3C );
+        // letras
+        pci_device->irq_pin  = (uint8_t) pciConfigReadByte ( 
+                                             bus, dev, fun, 0x3D ); 
 
 
-		// IRQ.
-
-		// irq
-        pci_device->irq_line = (uint8_t) pciConfigReadByte ( bus, 
-                                             dev, fun, 0x3C );
-
-		// letras
-        pci_device->irq_pin  = (uint8_t) pciConfigReadByte ( bus, 
-                                             dev, fun, 0x3D ); 
-
-
-        //
         // The physical address!
-        //
+        // #importante:
+        // Grab the Base I/O Address of the device
+        // Aqui nós pegamos o endereço dos registadores na BAR0,
+        // Então mapeamos esse endereço físico para termos um 
+        // endereço virtual para manipularmos os registradores. 
 
-		// ##importante:
-		// Grab the Base I/O Address of the device
-		// Aqui nós pegamos o endereço dos registadores na BAR0,
-		// Então mapeamos esse endereço físico para termos um endereço virtual 
-		// para manipularmos os registradores. 
+        phy_address = (unsigned long) ( pci_device->BAR0 & 0xFFFFFFF0 );
 
-        phy_address = ( pci_device->BAR0 & 0xFFFFFFF0 );
+        if (phy_address == 0){
+            panic ("e1000_init_nic: Invalid phy_address");
+        }
 
-        //...
+        // ...
     };
-    
-    if (phy_address == 0)
-    {
-        panic ("e1000_init_nic: Invalid physical address\n");
-        // #bugbug
-        // Maybe only return.
-        // debug_print ("e1000_init_nic: Invalid physical address\n");
-        // return -1;
+
+
+    // Base address
+    // #importante:
+    // Mapeando para obter o endereço virtual que 
+    // o kernel pode manipular.
+    // pages.c
+    // #bugbug: 
+    // >> Isso é um improviso. Ainda falta criar rotinas melhores.
+
+    virt_address = (unsigned long) mapping_nic1_device_address (phy_address);
+
+    if (virt_address == 0){
+        panic ("e1000_init_nic: Invalid virt_address");
     }
 
-
-
-	//
-	// ## Base address ##
-	//
-
-	// #importante:
-	// Mapeando para obter o endereço virtual que o kernel pode manipular.
-	// pages.c
-	// #bugbug: 
-	// Isso é um improviso. Ainda falta criar rotinas melhores.
-
-    unsigned long virt_address = mapping_nic1_device_address (phy_address);
-
-    if (virt_address == 0)
-    {
-        panic ("e1000_init_nic: Invalid virtual address\n");
-        // #bugbug
-        // Maybe only return.
-        // debug_print ("e1000_init_nic: Invalid virtual address\n");
-        // return -1;
-    }
-
-
-
-	// Endereço base.
-	// Preparando a mesma base de duas maneiras.
+    // Endereço base.
+    // Preparando a mesma base de duas maneiras.
 
     unsigned char *base_address   = (unsigned char *) virt_address;
     unsigned long *base_address32 = (unsigned long *) virt_address;
 
-	//
-	//  NIC
-	//
+
+    //
+    // == NIC =========================
+    //
 
 	// #todo: 
 	// Checar essa estrutura.
@@ -287,11 +272,10 @@ e1000_init_nic (
         panic ("e1000_init_nic: currentNIC struct\n");
 
     } else {
-
         currentNIC->used = 1;
         currentNIC->magic = 1234;
+        
         currentNIC->interrupt_count = 0;
-
 
         currentNIC->pci = (struct pci_device_d *) pci_device;
 
@@ -318,10 +302,10 @@ e1000_init_nic (
 		currentNIC->eeprom = 0; 
 
 		// Let's try to discover reading the status field!
-
-        for ( i=0; i < 1000 && !currentNIC->eeprom; i++ ) 
+        uint32_t val=0;
+        for ( i=0; i < 1000 && !currentNIC->eeprom; ++i ) 
         {
-            uint32_t val = E1000ReadCommand ( currentNIC, 0x14 );
+             val = E1000ReadCommand ( currentNIC, 0x14 );
 
 		    // We have? Yes!.
             if ( (val & 0x10) == 0x10) { currentNIC->eeprom = 1; }
@@ -384,24 +368,23 @@ e1000_init_nic (
 	// We really need to do it?
 	// Yes, set the bus mastering bit
 	// And write back 
-
 	//( bus, slot, func, PCI_COMMAND )
+    
+    uint16_t cmd=0;
+    cmd = (uint16_t) pciConfigReadWord ( 
+                         (unsigned char) bus, 
+                         (unsigned char) dev, 
+                         (unsigned char) fun, 
+                         (unsigned char) 0x04 );
 
-    uint16_t cmd = pciConfigReadWord ( (unsigned char) bus, 
-                       (unsigned char) dev, 
-                       (unsigned char) fun, 
-                       (unsigned char) 0x04 );
-
-
-    if ( (cmd & 0x04) != 0x04 ){
-
+    // IN: (bus, slot, func, PCI_COMMAND, cmd);
+    if ( (cmd & 0x04) != 0x04 )
+    {
         cmd |= 0x04;
-
-        // ?? (bus, slot, func, PCI_COMMAND, cmd);
-        diskWritePCIConfigAddr ( (int) bus, (int) dev, (int) fun, 
+        diskWritePCIConfigAddr ( 
+            (int) bus, (int) dev, (int) fun, 
             (int) 0x04, (int) cmd ); 
     }
-
 
     printf ("Done\n");
 
@@ -630,7 +613,7 @@ uint32_t nic_idt_entry_new_address;
 
 void e1000_setup_irq (void){
 
-    debug_print ("e1000_setup_irq:\n");
+    debug_print ("e1000_setup_irq: [FIXME]\n");
 
 
 	// pegando o número da irq.
@@ -700,6 +683,8 @@ void e1000_setup_irq (void){
 int e1000_reset_controller (void){
 
     int i=0;
+    //register int i=0;
+
 
     debug_print ("e1000_reset_controller\n");
 
@@ -768,7 +753,7 @@ int e1000_reset_controller (void){
         // Alloc the phys/virt address of this transmit desc
         // alocamos memória para o buffer, salvamos o endereço físico do buffer e 
         // obtemos o endereço virtual do buffer.		
-        currentNIC->legacy_tx_descs[i].addr = E1000AllocCont ( 0x3000, &currentNIC->tx_descs_virt[i] );
+        currentNIC->legacy_tx_descs[i].addr  = E1000AllocCont ( 0x3000, &currentNIC->tx_descs_virt[i] );
         currentNIC->legacy_tx_descs[i].addr2 = 0;
 
 		// We failed, unmap everything
@@ -826,7 +811,7 @@ int e1000_reset_controller (void){
     for ( i=0; i < 32; i++ ) 
     {
         // Alloc the phys/virt address of this transmit desc
-        currentNIC->legacy_rx_descs[i].addr = E1000AllocCont ( 0x3000, (uint32_t *) &currentNIC->rx_descs_virt[i] );
+        currentNIC->legacy_rx_descs[i].addr  = E1000AllocCont ( 0x3000, (uint32_t *) &currentNIC->rx_descs_virt[i] );
         currentNIC->legacy_rx_descs[i].addr2 = 0;
 
         // Buffer null.
@@ -1019,6 +1004,11 @@ int e1000_reset_controller (void){
 }
 
 
+/*
+ * E1000WriteCommand:
+ * 
+ */
+ 
 void 
 E1000WriteCommand ( 
     struct intel_nic_info_d *d, 
@@ -1075,32 +1065,40 @@ E1000ReadCommand (
  * ... colocar o virtual em *virt e retornar o físico.
  */
 
-uint32_t E1000AllocCont ( uint32_t amount, uint32_t *virt ){
+// Precisamos de um endereço fisico.
+// + alocamos um endereço virtual
+// + convertemos para fisico
+
+// IN: size, return pointer.
+uint32_t E1000AllocCont ( uint32_t amount, uint32_t *virt )
+{
+    uint32_t va=0;
+    uint32_t pa=0;
 
 
-    uint32_t va = (uint32_t) kmalloc ( (uint32_t) amount );
+    if (amount==0)
+        panic ("E1000AllocCont: [FAIL] amount");
 
 
+    // ============
+    // va
+    va = (uint32_t) kmalloc ( (size_t) amount );
     *virt = va;
-
-
     if (*virt == 0){
-        printf ("E1000AllocCont: falha ao alocar endereco virtual");
-        refresh_screen ();
-        while (1){}
+        panic ("E1000AllocCont: [FAIL] va allocation");
     }
 
-
-    uint32_t pa = (uint32_t) virtual_to_physical ( va, gKernelPageDirectoryAddress ); 
-
+    
+    // ============
+    // pa
+    // ps: Using the kernel page directory.
+    pa = (uint32_t) virtual_to_physical (
+                        va, gKernelPageDirectoryAddress ); 
     if (pa == 0){
-        printf ("E1000AllocCont: pa fail");
-        refresh_screen ();
-        while (1){}
+        panic ("E1000AllocCont: [FAIL] pa");
     }
 
-
-    return pa;
+    return (uint32_t) pa;
 }
 
 
@@ -1143,55 +1141,55 @@ void NetSendEthPacket (
 
  
 // Dispositivo, tamanho, dados a serem copiados no buffer.
-void E1000Send ( void *ndev, uint32_t len, uint8_t *data ){
+void E1000Send ( void *ndev, uint32_t len, uint8_t *data )
+{
+
+    uint32_t i=0;
+    //register uint32_t i=0;
+
+    uint16_t old=0;
+
 
     struct intel_nic_info_d *dev = (struct intel_nic_info_d *) ndev;
 
-
-    uint32_t i=0;
-
-
-    // dev.
-    // #todo: error message.
-    if ( (void *) dev == NULL )
+    if ( (void *) dev == NULL ){
+        debug_print("E1000Send: [FAIL] dev\n");
         return;
-
+    }
 
 
 	// Quem ?
 	// Qual buffer ?
-
-    uint16_t old = dev->tx_cur;
-
-
 	// ## Copiando o pacote no buffer ##
 	// com base no comprimento indicado no argmento.
 	// Pegando o endereço virtual do buffer na estrutura do dispositivo.	
 
-    unsigned char *buffer = (unsigned char *) currentNIC->tx_descs_virt[old];
-    unsigned char *src_data = (unsigned char *) data; 	
+    old = dev->tx_cur;
+    
+    // src and dst.
+    unsigned char *src_data = (unsigned char *) data; 
+    unsigned char *buffer   = (unsigned char *) currentNIC->tx_descs_virt[old];
 
-	//
-	// Copiando o header ethernet.
-	//
+    //
+    // Copy
+    //
 
-    // #todo: error message.
-    if (len==0)
+    if (len==0){
+        debug_print("E1000Send: [FAIL] len\n");
         return;
+    }
 
-
-    // Copy.
     for (i=0; i<len; i++){
         buffer[i] = src_data[i];
     };
 
-	
-	
+
+
 	//void *memcpy(void *v_dst, const void *v_src, unsigned long c);
 	//StrCopyMemory((PUInt8)(dev->tx_descs_virt[old]), data, len);
-	
+
 	//memcpy( (void *)(dev->tx_descs_virt[old]), (const void *) data, (unsigned long) len);
-	
+
 
     dev->legacy_tx_descs[old].length = len;
 
@@ -1206,20 +1204,24 @@ void E1000Send ( void *ndev, uint32_t len, uint8_t *data ){
 
 	//#debug
     printf ("Sending broadcast arp, (while)\n");
-    refresh_screen ();	
+    refresh_screen ();
 
 
     while ( !(dev->legacy_tx_descs[old].status & 0xFF) )
     {
         // Nothing
-    }
-
+    };
 
     printf ("E1000Send: done\n");
     refresh_screen ();
 }
 
 
+/*
+ ****************************
+ * send_ipv4_packet:
+ * 
+ */
 
 //enviar um pacote ipv4
 //configuramos o buffer
@@ -1229,13 +1231,24 @@ void E1000Send ( void *ndev, uint32_t len, uint8_t *data ){
 //14+20 bytes
 
 void 
-send_ipv4_packet ( struct intel_nic_info_d *dev, 
-                   uint32_t len, 
-                   uint8_t *data )
+send_ipv4_packet ( 
+    struct intel_nic_info_d *dev, 
+    uint32_t len, 
+    uint8_t *data )
 {
 
-    if ( (void *) dev == NULL )
+    if ( (void *) dev == NULL ){
+        debug_print("send_ipv4_packet: [FAIL] dev\n");
         return;
+    }
+
+    if (len==0){
+        debug_print("send_ipv4_packet: [FAIL] len\n");
+        return;
+    }
+
+    // #todo
+    // data? pointer validation
 
     E1000Send ( (void *) dev, (uint32_t) len , (uint8_t *) &data[0] );
 }
@@ -1244,12 +1257,14 @@ send_ipv4_packet ( struct intel_nic_info_d *dev,
 // #todo: Deletar isso.
 void nic_i8254x_transmit (void)
 {
-    //Cancelada.
+    // Cancelada.
+    debug_print("nic_i8254x_transmit: [Nothing]\n");
 }
 
 
 
-uint32_t E1000ReadEEPROM ( struct intel_nic_info_d *d, uint8_t addr ){
+uint32_t E1000ReadEEPROM ( struct intel_nic_info_d *d, uint8_t addr )
+{
 
     uint32_t data = 0;
 

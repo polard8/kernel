@@ -315,10 +315,8 @@ struct process_info_d
 struct process_d 
 {
     // Controle do objeto do tipo processo.
- 
     object_type_t  objectType;
     object_class_t objectClass;
-
     struct object_d *object;
 
     int used;
@@ -327,7 +325,6 @@ struct process_d
     // Other process can't take some actions on this process 
     // if it is protected. ex: It can't be killed by another process.
     int _protected;
-
 
     // Arquivos abertos.
     // Objetos abertos pelo processo.
@@ -343,17 +340,17 @@ struct process_d
     //process group.
     int pgrp;
 
-    //process
+    // process
     pid_t  pid;
     pid_t  ppid;
     
-    //user
+    // user
     uid_t  uid;
     uid_t  euid;
     uid_t  ruid;
     uid_t  suid;
     
-    //group
+    // group
     gid_t  gid;
     gid_t  egid;
     gid_t  rgid;
@@ -364,7 +361,7 @@ struct process_d
 	// flag ?
     process_state_t state; 
 
-	//plano de execu��o.
+	//plano de execuçao.
     int plane;
 
 	// error.
@@ -715,61 +712,54 @@ struct process_d
 	// == Thread =================================
 	//
 
+	// Tipo de thread
+	// 0 = cpu-bound
+	// 1 = i/o bound.
+
+    int bound_type;
+
+    // preempted:
+    // flag ~ Sinaliza que um processo pode ou nao sofrer preempçao.
+    // Uma tarefa de menor prioridade pode deixar o estado running 
+    // para assumir o estado ready em favor de uma tarefa 
+    // de maior prioridade que assumir o estado running.
+    // Como na verdade quem sofre preempcao eh a thread, entao
+    // esse marcador devera ser herdado pelos threads desse processo.
+
+    unsigned long preempted;
+
+    //saved ~ Sinaliza que a tarefa teve o seu contexto salvo.
+    unsigned long saved;
+
+    unsigned long PreviousMode;
+
+
+    // Quantas threads o processo tem.
     int thread_count;
 
+    // Thread de controle
+    // Usada para input de mensagens e sinais.
+    // Se fechar ela, tem que fechar o processo.
+    struct thread_d *control;
 
-	/*
-	 * threadList:
-	 *     Lista com ponteiros de estrutura das threads do processo.
-	 *     O indice dessa lista serve para enumer�las.
-	 *	 
-	 *     @todo: Usar array de estruturas din�mico. (Alocar).
-	 */ 
+    // Isso pode funcionar em parceria com control, 
+    // quando criarmos novos processos ou clonarmos.
+    struct thread_d *extra;  
+
+
+    // Lista com ponteiros de estrutura das threads do processo.
+    // O indice dessa lista serve para enumeralas. 
+    // @todo: Usar array de estruturas din�mico. (Alocar).
 
 	unsigned long tList[32];      //@todo: deletar  
 	//struct thread_d *Threads;   //@todo: usar esse.
 	//struct thread_d CurrentThread;
-
 
 	//A primeira thead de uma lista linkada.
 	struct thread_d *threadListHead;
 	//struct thread_d *threadReadyListHead;
 	//...
 
-
-    // #importante:
-    // Thread de controle
-    // Usada para input de mensagens e sinais.
-    // Se fechar ela, tem que fechar o processo.
-
-    struct thread_d *control;
-
-
-	// Isso pode funcionar em parceria com control, 
-	// quando criarmos novos processos ou clonarmos.
-    struct thread_d *extra;  
-
-
-	// Tipo 
-	// 0 = cpu-bound
-	// 1 = i/o bound.
-
-    int bound_type;
-	
-	// ??
-	// preempted:
-	//     flag ~ Sinaliza que uma tarefa pode ou n�o sofrer preemp��o.
-	//     Uma tarefa de menor prioridade pode deixar o estado running 
-	// para assumir o estado ready em favor de uma tarefa de maior prioridade
-	// que assumir� o estado running.
-
-	unsigned long preempted;
-
-	//saved ~ Sinaliza que a tarefa teve o seu contexto salvo.
-	unsigned long saved;
-
-	//??
-	unsigned long PreviousMode;
 
 	/*
 	 * event: 
@@ -855,9 +845,6 @@ struct process_d
 
     pid_t wait4pid;
 
-	//Motivo do processo fechar.
-    int exit_code;
-	
 	// N�mero de processos filhos.
     int nchildren;
 	
@@ -926,6 +913,9 @@ struct process_d
     int socket_pending_list_tail;
     int socket_pending_list_max; //listen() will setup this thing.
 
+
+    //Motivo do processo fechar.
+    int exit_code;
 
     // Navigation
 

@@ -11,25 +11,29 @@
 /*
  ***********************************************************************
  * pci_setup_devices:
- *     Encontrar os dispositivos PCI e salvar as informações sobre eles
- * em suas respectivas estruturas.
- *     #importante: Isso pode ser usado em futuras sondagens por dispositivo.
- *     É só procurarmos pelo dispositivo nessa lista.
+ * 
+ *     Encontrar os dispositivos PCI e 
+ * salvar as informações sobre eles em suas respectivas estruturas.
+ * 
+ * #importante: 
+ * Isso pode ser usado em futuras sondagens por dispositivo.
+ * É só procurarmos pelo dispositivo nessa lista.
  *
- * @todo: 
- *     Completar toda a estrutura, ainda faltam elementos.
- *     Obs: A estrutura está em pci.h.    
+ * #todo: 
+ * Completar toda a estrutura, ainda faltam elementos.
+ * Obs: A estrutura está em pci.h.    
  *
- * #importante:
- * #todo
- * Quando sondamos os dispositivos pci usando for, podemos checar a
- * classe e a subclasse dos dispositivos e se encontrarmos a combilaçao desejada
- * entao inicializamos o dispositivo.
+ * Quando sondamos os dispositivos pci usando for, 
+ * podemos checar a classe e a subclasse dos dispositivos e 
+ * se encontrarmos a combinaçao desejada entao inicializamos 
+ * o dispositivo.
  */
 
 // #bugbug
 // Não precisamos inicialziar os dispositivos nesse momento.
 // Somente colocar na estrutura.
+
+// Essa rotina chamara pciHandleDevice() em pci.c
 
 int pci_setup_devices (void){
 
@@ -64,38 +68,36 @@ int pci_setup_devices (void){
     //kprintf ("Detecting PCI Devices..\n");
 
 
-	// Bus.
+    // Bus.
     for ( i=0; i < PCI_MAX_BUSES; i++ )
     {
-		// Device.
+        // Device.
         for ( j=0; j < PCI_MAX_DEVICES; j++ )
         {
-
-			// Valid device ?
-
-             Vendor = (unsigned short) pciCheckVendor (i, j);
+             // Valid device ?
+             Vendor = (unsigned short) pciCheckVendor (i,j);
 
             if ( Vendor != 0 && Vendor != PCI_INVALID_VENDORID )
             {
-
 				//#debug
 				//printf ("vendor=%x\n",Vendor);
 
 				// Multifunction ??
 				//Se o bit 7 estiver acionado, entao e' multifunction.
 
-                HeaderType = pciGetHeaderType (i, j);
+                HeaderType = pciGetHeaderType (i,j);
 
                 funcCount = HeaderType & PCI_TYPE_MULTIFUNC ? PCI_MAX_FUNCTIONS : 1;
 
-				// Function.
+                // Function.
+                // Handle device info.
                 for ( k=0; k<funcCount; k++)
-                {
-                    pciHandleDevice(i,j,k);
+                { 
+                    pciHandleDevice(i,j,k); 
                 }; 
             };
-		};    // Device for.
-	};    // Bus for.
+        };    // Device for.
+    };    // Bus for.
 
 
     //#debug
