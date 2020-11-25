@@ -11,19 +11,22 @@
 
 int main ( int argc, char *argv[] ){
 
-	int code=0;
-	char *env_string;
+    char *env_string;
 
-	puts ("\n");
-	printf ("reboot\n");
+    puts ("\n");
+    printf ("reboot\n");
 
-	env_string = (char *) getenv ("USER");
-	printf (">>> Bye %s! :) \n", env_string);
+    // Getting the user name.
+    env_string = (char *) getenv ("USER");
 
-	rtl_reboot();
+    // Showing the user name.
+    printf (">>> Bye %s! :) \n", env_string);
 
-	return -1;
+    // reboot.
+    rtl_reboot();
+
+    printf("reboot.bin: Fail\n");
+    return (int) (-1);
 }
-
 
 

@@ -35,19 +35,22 @@ $EDITOR: Gives default file editor.
 $UID: Gives user ID of current user.
 $SHELL: Gives location of current user's shell program.
 */
+
 static char *my_environ[] = { 
+
     "USER=anon",  
     "PATH=/",
     "PWD=/",
     "HOME=/",
-    "HOSTNAME=?",
-    "LANG=pt-br",
+    "HOSTNAME=rtl-hostname",
+    "LANG=en-us",
     "EDITOR=gramcode",
-    "SHELL=?",
+    "SHELL=gdeshell",
     "TERM=noraterm",
     "PS1=~$",  
     "PS2=:>",  
-	NULL 
+
+    NULL 
 };
 
 
