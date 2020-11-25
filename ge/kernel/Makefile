@@ -169,83 +169,10 @@ all-c:
 
 	# main (Architechture independent)
 	# It's the higher level of the init sybsystem.
-	$(CC) -c 0mem/main.c $(KINCLUDE) $(CFLAGS) -o main.o
-	
-	# kernel
-	$(CC) -c 0mem/request.c  $(KINCLUDE) $(CFLAGS) -o request.o
+	$(CC) -c 0mem/main.c     $(KINCLUDE) $(CFLAGS) -o main.o
 	$(CC) -c 0mem/panic.c    $(KINCLUDE) $(CFLAGS) -o panic.o
 	$(CC) -c 0mem/reboot.c   $(KINCLUDE) $(CFLAGS) -o reboot.o
-
-
-	# == SI - Service Interface ==============================
-	$(CC) -c 0mem/si/sifs.c  $(KINCLUDE) $(CFLAGS) -o sifs.o
-	$(CC) -c 0mem/si/sins.c  $(KINCLUDE) $(CFLAGS) -o sins.o
-	$(CC) -c 0mem/si/siws.c  $(KINCLUDE) $(CFLAGS) -o siws.o
-	#...
-
-	# == SCI - System Call Interface ==============================
-	# Not gramado.
-	$(CC) -c 0mem/rtl/ctype.c   $(KINCLUDE) $(CFLAGS) -o ctype.o
-	$(CC) -c 0mem/rtl/kstdio.c  $(KINCLUDE) $(CFLAGS) -o kstdio.o
-	$(CC) -c 0mem/rtl/signal.c  $(KINCLUDE) $(CFLAGS) -o signal.o
-	$(CC) -c 0mem/rtl/stdlib.c  $(KINCLUDE) $(CFLAGS) -o stdlib.o
-	$(CC) -c 0mem/rtl/string.c  $(KINCLUDE) $(CFLAGS) -o string.o
-	$(CC) -c 0mem/rtl/unistd.c  $(KINCLUDE) $(CFLAGS) -o unistd.o
-
-	$(CC) -c 0mem/sci/sys/sys.c   $(KINCLUDE) $(CFLAGS) -o sys.o
-
-	$(CC) -c 0mem/sci/sci.c $(KINCLUDE) $(CFLAGS) -o sci.o
-
-	# fs/vfs
-	$(CC) -c 0mem/sci/fs/vfs/vfs.c     $(KINCLUDE) $(CFLAGS) -o vfs.o
-	
-	# fs
-	$(CC) -c 0mem/sci/fs/cf.c      $(KINCLUDE) $(CFLAGS) -o cf.o
-	$(CC) -c 0mem/sci/fs/format.c  $(KINCLUDE) $(CFLAGS) -o format.o
-	$(CC) -c 0mem/sci/fs/fs.c      $(KINCLUDE) $(CFLAGS) -o fs.o
-	$(CC) -c 0mem/sci/fs/pipe.c    $(KINCLUDE) $(CFLAGS) -o pipe.o
-	$(CC) -c 0mem/sci/fs/read.c    $(KINCLUDE) $(CFLAGS) -o read.o
-	$(CC) -c 0mem/sci/fs/search.c  $(KINCLUDE) $(CFLAGS) -o search.o
-	$(CC) -c 0mem/sci/fs/write.c   $(KINCLUDE) $(CFLAGS) -o write.o
-
-	# net
-	# three layers support:
-	# socket, protocol and network interface.
-
-	$(CC) -c 0mem/sci/net/socket/socket.c  $(KINCLUDE) $(CFLAGS) -o socket.o
-	#$(CC) -c 0mem/sci/net/protocol ...
-	$(CC) -c 0mem/sci/net/network/channel.c   $(KINCLUDE) $(CFLAGS) -o channel.o
-	$(CC) -c 0mem/sci/net/network/network.c   $(KINCLUDE) $(CFLAGS) -o network.o
-
-	# Draw
-    # Window Manager.
-    # Window system ring 0 support.
-    # model business logic
-	$(CC) -c 0mem/draw/windows/model/kgwm.c  $(KINCLUDE) $(CFLAGS) -o kgwm.o
-	$(CC) -c 0mem/draw/windows/model/wm.c    $(KINCLUDE) $(CFLAGS) -o wm.o
-	$(CC) -c 0mem/draw/windows/model/kgws.c  $(KINCLUDE) $(CFLAGS) -o kgws.o
-	# data model
-	$(CC) -c 0mem/draw/windows/model/font.c  $(KINCLUDE) $(CFLAGS) -o font.o
-
-	# Window Server.
-	$(CC) -c 0mem/draw/windows/view/bg.c        $(KINCLUDE) $(CFLAGS) -o bg.o
-	$(CC) -c 0mem/draw/windows/view/bmp.c       $(KINCLUDE) $(CFLAGS) -o bmp.o
-	$(CC) -c 0mem/draw/windows/view/button.c    $(KINCLUDE) $(CFLAGS) -o button.o
-	$(CC) -c 0mem/draw/windows/view/char.c      $(KINCLUDE) $(CFLAGS) -o char.o
-	$(CC) -c 0mem/draw/windows/view/createw.c   $(KINCLUDE) $(CFLAGS) -o createw.o
-	$(CC) -c 0mem/draw/windows/view/dtext.c     $(KINCLUDE) $(CFLAGS) -o dtext.o
-	$(CC) -c 0mem/draw/windows/view/line.c      $(KINCLUDE) $(CFLAGS) -o line.o
-	$(CC) -c 0mem/draw/windows/view/menu.c      $(KINCLUDE) $(CFLAGS) -o menu.o
-	$(CC) -c 0mem/draw/windows/view/mbar.c      $(KINCLUDE) $(CFLAGS) -o mbar.o
-	$(CC) -c 0mem/draw/windows/view/pixel.c     $(KINCLUDE) $(CFLAGS) -o pixel.o
-	$(CC) -c 0mem/draw/windows/view/pbar.c      $(KINCLUDE) $(CFLAGS) -o pbar.o
-	$(CC) -c 0mem/draw/windows/view/rect.c      $(KINCLUDE) $(CFLAGS) -o rect.o
-	$(CC) -c 0mem/draw/windows/view/sbar.c      $(KINCLUDE) $(CFLAGS) -o sbar.o
-	$(CC) -c 0mem/draw/windows/view/tbar.c      $(KINCLUDE) $(CFLAGS) -o tbar.o
-	$(CC) -c 0mem/draw/windows/view/xproc.c     $(KINCLUDE) $(CFLAGS) -o xproc.o
-
-	$(CC) -c 0mem/draw/windows/logoff.c  $(KINCLUDE) $(CFLAGS) -o logoff.o
-	$(CC) -c 0mem/draw/windows/logon.c   $(KINCLUDE) $(CFLAGS) -o logon.o
+	$(CC) -c 0mem/request.c  $(KINCLUDE) $(CFLAGS) -o request.o
 
 
 	# == Gramado Core =================================================
@@ -310,9 +237,37 @@ all-c:
 	$(CC) -c  0mem/core/ps/create.c    $(KINCLUDE)  $(CFLAGS) -o create.o
 	$(CC) -c  0mem/core/ps/mk.c        $(KINCLUDE)  $(CFLAGS) -o mk.o
 
-	## == HWI - Hardware Interface ======================= 
 
-	$(CC) -c 0mem/devmgr.c  $(KINCLUDE) $(CFLAGS) -o devmgr.o
+    # Draw
+    # Window Manager.
+    # Window system ring 0 support.
+    # model business logic
+	$(CC) -c 0mem/draw/windows/model/kgwm.c  $(KINCLUDE) $(CFLAGS) -o kgwm.o
+	$(CC) -c 0mem/draw/windows/model/wm.c    $(KINCLUDE) $(CFLAGS) -o wm.o
+	$(CC) -c 0mem/draw/windows/model/kgws.c  $(KINCLUDE) $(CFLAGS) -o kgws.o
+	# data model
+	$(CC) -c 0mem/draw/windows/model/font.c  $(KINCLUDE) $(CFLAGS) -o font.o
+
+	# Window Server.
+	$(CC) -c 0mem/draw/windows/view/bg.c        $(KINCLUDE) $(CFLAGS) -o bg.o
+	$(CC) -c 0mem/draw/windows/view/bmp.c       $(KINCLUDE) $(CFLAGS) -o bmp.o
+	$(CC) -c 0mem/draw/windows/view/button.c    $(KINCLUDE) $(CFLAGS) -o button.o
+	$(CC) -c 0mem/draw/windows/view/char.c      $(KINCLUDE) $(CFLAGS) -o char.o
+	$(CC) -c 0mem/draw/windows/view/createw.c   $(KINCLUDE) $(CFLAGS) -o createw.o
+	$(CC) -c 0mem/draw/windows/view/dtext.c     $(KINCLUDE) $(CFLAGS) -o dtext.o
+	$(CC) -c 0mem/draw/windows/view/line.c      $(KINCLUDE) $(CFLAGS) -o line.o
+	$(CC) -c 0mem/draw/windows/view/menu.c      $(KINCLUDE) $(CFLAGS) -o menu.o
+	$(CC) -c 0mem/draw/windows/view/mbar.c      $(KINCLUDE) $(CFLAGS) -o mbar.o
+	$(CC) -c 0mem/draw/windows/view/pixel.c     $(KINCLUDE) $(CFLAGS) -o pixel.o
+	$(CC) -c 0mem/draw/windows/view/pbar.c      $(KINCLUDE) $(CFLAGS) -o pbar.o
+	$(CC) -c 0mem/draw/windows/view/rect.c      $(KINCLUDE) $(CFLAGS) -o rect.o
+	$(CC) -c 0mem/draw/windows/view/sbar.c      $(KINCLUDE) $(CFLAGS) -o sbar.o
+	$(CC) -c 0mem/draw/windows/view/tbar.c      $(KINCLUDE) $(CFLAGS) -o tbar.o
+	$(CC) -c 0mem/draw/windows/view/xproc.c     $(KINCLUDE) $(CFLAGS) -o xproc.o
+
+	$(CC) -c 0mem/draw/windows/logoff.c  $(KINCLUDE) $(CFLAGS) -o logoff.o
+	$(CC) -c 0mem/draw/windows/logon.c   $(KINCLUDE) $(CFLAGS) -o logon.o
+
 
 	# memdev
 	$(CC) -c 0mem/mm/memory.c  $(KINCLUDE)  $(CFLAGS) -o memory.o
@@ -320,6 +275,55 @@ all-c:
 	$(CC) -c 0mem/mm/mmpool.c  $(KINCLUDE)  $(CFLAGS) -o mmpool.o
 	$(CC) -c 0mem/mm/pages.c   $(KINCLUDE)  $(CFLAGS) -o pages.o
 
+
+	# Not gramado.
+	$(CC) -c 0mem/rtl/ctype.c   $(KINCLUDE) $(CFLAGS) -o ctype.o
+	$(CC) -c 0mem/rtl/kstdio.c  $(KINCLUDE) $(CFLAGS) -o kstdio.o
+	$(CC) -c 0mem/rtl/signal.c  $(KINCLUDE) $(CFLAGS) -o signal.o
+	$(CC) -c 0mem/rtl/stdlib.c  $(KINCLUDE) $(CFLAGS) -o stdlib.o
+	$(CC) -c 0mem/rtl/string.c  $(KINCLUDE) $(CFLAGS) -o string.o
+	$(CC) -c 0mem/rtl/unistd.c  $(KINCLUDE) $(CFLAGS) -o unistd.o
+
+
+	# == SCI - System Call Interface ==============================
+	$(CC) -c 0mem/sci/sci.c $(KINCLUDE) $(CFLAGS) -o sci.o
+	
+	$(CC) -c 0mem/sci/console/console.c    $(KINCLUDE) $(CFLAGS) -o console.o
+
+	# fs
+	$(CC) -c 0mem/sci/fs/cf.c      $(KINCLUDE) $(CFLAGS) -o cf.o
+	$(CC) -c 0mem/sci/fs/format.c  $(KINCLUDE) $(CFLAGS) -o format.o
+	$(CC) -c 0mem/sci/fs/fs.c      $(KINCLUDE) $(CFLAGS) -o fs.o
+	$(CC) -c 0mem/sci/fs/pipe.c    $(KINCLUDE) $(CFLAGS) -o pipe.o
+	$(CC) -c 0mem/sci/fs/read.c    $(KINCLUDE) $(CFLAGS) -o read.o
+	$(CC) -c 0mem/sci/fs/search.c  $(KINCLUDE) $(CFLAGS) -o search.o
+	$(CC) -c 0mem/sci/fs/write.c   $(KINCLUDE) $(CFLAGS) -o write.o
+
+	# fs/vfs
+	$(CC) -c 0mem/sci/fs/vfs/vfs.c     $(KINCLUDE) $(CFLAGS) -o vfs.o
+
+	# net
+	# three layers support:
+	# socket, protocol and network interface.
+
+	$(CC) -c 0mem/sci/net/socket/socket.c  $(KINCLUDE) $(CFLAGS) -o socket.o
+	#$(CC) -c 0mem/sci/net/protocol ...
+	$(CC) -c 0mem/sci/net/network/channel.c   $(KINCLUDE) $(CFLAGS) -o channel.o
+	$(CC) -c 0mem/sci/net/network/network.c   $(KINCLUDE) $(CFLAGS) -o network.o
+
+	$(CC) -c 0mem/sci/sys/sys.c   $(KINCLUDE) $(CFLAGS) -o sys.o
+	
+	$(CC) -c 0mem/sci/terminal/terminal.c  $(KINCLUDE) $(CFLAGS) -o terminal.o
+
+
+
+	# == SI - Service Interface ==============================
+	$(CC) -c 0mem/si/sifs.c  $(KINCLUDE) $(CFLAGS) -o sifs.o
+	$(CC) -c 0mem/si/sins.c  $(KINCLUDE) $(CFLAGS) -o sins.o
+	$(CC) -c 0mem/si/siws.c  $(KINCLUDE) $(CFLAGS) -o siws.o
+	#...
+
+    #pump
 	$(CC) -c 1pump/pump.c  $(KINCLUDE) $(CFLAGS) -o pump.o
 
     #arch
@@ -337,9 +341,9 @@ all-c:
 	$(CC) -c 1pump/arch/x86/rtc.c       $(KINCLUDE) $(CFLAGS) -o rtc.o
 
 
-
-
-	$(CC) -c 2io/io.c    $(KINCLUDE) $(CFLAGS) -o io.o
+	## == HWI - Hardware Interface ======================= 
+	
+	$(CC) -c 2io/io.c      $(KINCLUDE) $(CFLAGS) -o io.o
 
 	# pci bus
 	$(CC) -c 2io/bus/pcibus/pci.c       $(KINCLUDE) $(CFLAGS) -o pci.o
@@ -348,7 +352,8 @@ all-c:
 	# usb bus
 	$(CC) -c 2io/bus/usbbus/usb.c        $(KINCLUDE) $(CFLAGS) -o usb.o
 
-
+	$(CC) -c 2io/dev/devmgr.c  $(KINCLUDE) $(CFLAGS) -o devmgr.o
+	
     # blkdev
 	$(CC) -c 2io/dev/blkdev/ahci/ahci.c    $(KINCLUDE) $(CFLAGS) -o ahci.o
 	$(CC) -c 2io/dev/blkdev/ide/ata.c      $(KINCLUDE) $(CFLAGS) -o ata.o
@@ -371,16 +376,17 @@ all-c:
 	$(CC) -c 2io/dev/chardev/hid/screen.c     $(KINCLUDE) $(CFLAGS) -o screen.o
 	$(CC) -c 2io/dev/chardev/hid/video.c      $(KINCLUDE) $(CFLAGS) -o video.o
 	$(CC) -c 2io/dev/chardev/hid/vsync.c      $(KINCLUDE) $(CFLAGS) -o vsync.o
-	$(CC) -c 2io/dev/chardev/tty/console.c    $(KINCLUDE) $(CFLAGS) -o console.o
 	$(CC) -c 2io/dev/chardev/tty/ldisc.c      $(KINCLUDE) $(CFLAGS) -o ldisc.o
 	$(CC) -c 2io/dev/chardev/tty/pty.c        $(KINCLUDE) $(CFLAGS) -o pty.o
 	$(CC) -c 2io/dev/chardev/serial/serial.c  $(KINCLUDE) $(CFLAGS) -o serial.o
-	$(CC) -c 2io/dev/chardev/tty/terminal.c   $(KINCLUDE) $(CFLAGS) -o terminal.o
+
 	$(CC) -c 2io/dev/chardev/tty/tty.c        $(KINCLUDE) $(CFLAGS) -o tty.o
 	$(CC) -c 2io/dev/chardev/tty/vt.c         $(KINCLUDE) $(CFLAGS) -o vt.o
 
 	# netdev
 	$(CC) -c 2io/dev/netdev/e1000/e1000.c   $(KINCLUDE) $(CFLAGS) -o e1000.o
+
+
 
 
 ## Step2 link-kernel-image  - Linking the kernel image.
