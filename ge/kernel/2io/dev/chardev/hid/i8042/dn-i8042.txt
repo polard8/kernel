@@ -1,6 +1,12 @@
+
+See:
+https://wiki.osdev.org/%228042%22_PS/2_Controller
+// ...
+
+
 	Files
 	=====	
-
+   
 	i8042:
 	+ i8042.c - ps2 device driver.
 

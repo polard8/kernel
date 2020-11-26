@@ -1,4 +1,8 @@
 
+	#important
+	This is the window manager high level support
+	for the widnow server embedded inside the base kernel.
+	The low level part of the output support you can find on 2io/
 
 
     GUI support embedded in the base kernel.

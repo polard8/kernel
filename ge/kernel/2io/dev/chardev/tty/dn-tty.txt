@@ -1,4 +1,12 @@
 
+todo:
+	If it is possible, please use tty.c as an interrupt handler.
+	and all the rest as device driver.
+	Maybe we can create the file ttydvr.c for device driver and
+	ptmx.c for the multiplexer. The multiplexer is a virtual device.
+
+
+
 
     /tty  - (fluxo de caractere: teclado-->processo, processo-->monitor).
 

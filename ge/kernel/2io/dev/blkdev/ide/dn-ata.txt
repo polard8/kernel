@@ -1,0 +1,4 @@
+todo:
+
+	Use ata.c as interrupt handler and
+	all the other files as device driver.

@@ -11,6 +11,8 @@
  *
  */
 
+// See:
+// https://en.wikipedia.org/wiki/Line_discipline
 
 // #todo
 // A disciplina de linhas poderia chamar o procedimento de janelas padrão

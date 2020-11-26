@@ -1,0 +1,20 @@
+
+	two main layers:
+
+	+ device drivers: generate events.
+	+ handler:        handle these events.
+
+
+
+from linux manual:
+
+3.1 Device drivers
+~~~~~~~~~~~~~~~~~~
+  Device drivers are the modules that generate events. The events are
+however not useful without being handled, so you also will need to use some
+of the modules from section 3.2.
+
+3.2 Event handlers
+~~~~~~~~~~~~~~~~~~
+  Event handlers distribute the events from the devices to userland and
+kernel, as needed.
