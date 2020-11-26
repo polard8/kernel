@@ -15,6 +15,8 @@
 
 
 // Wrapper to tty_ioctl
+// #bugbug:
+// We already have this thing on terminal.c in sci/
 int 
 vt_ioctl ( 
     int fd, 

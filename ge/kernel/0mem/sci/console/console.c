@@ -1,7 +1,10 @@
 /*
  * File: console.c 
  *
+ *     Console interface.
+ *     Interface to handle all the virtual console management.
  *     Writing on the console device.
+ *     See: chardev/tty/ in 2io/
  */
 
 
@@ -750,8 +753,10 @@ __console_write (
     const void *buf, 
     size_t count )
 {
-    char ch=0; 
+    // loop
     size_t __i=0;
+    
+    char ch=0; 
     char *data = (char *) buf;
 
 
@@ -760,12 +765,10 @@ __console_write (
        goto fail;
     }
 
- 
     if ( (void *) buf == NULL ){
         kprintf ("__console_write: buf\n");
         goto fail;
     }
-
 
     if (!count){
         kprintf ("__console_write: count\n");
@@ -779,9 +782,9 @@ __console_write (
        
     // original - backup
 
-    for (__i=0; __i<count; __i++)
+    for (__i=0; __i<count; __i++){
         console_putchar ( (int) data[__i], console_number);
-
+    };
 
     return (ssize_t) count;
 
@@ -826,8 +829,10 @@ console_write (
     size_t count )
 {
 
-    char ch=0; 
+    // loop
     int i=0;  
+    
+    char ch=0; 
     char *data = (char *) buf;
     size_t StringSize=0;
 
@@ -1305,12 +1310,14 @@ int insert_line ( char *string, int line )
 
 void REFRESH_STREAM ( file *f ){
 
-    char *c;
+    //loop
     int i=0;
     int j=0;
+    
     int cWidth  = get_char_width();
     int cHeight = get_char_height();
 
+    char *c;
 
     if ( cWidth == 0 || cHeight == 0 ){
         panic ("REFRESH_STREAM: char w h ");

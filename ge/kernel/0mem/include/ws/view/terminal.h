@@ -112,63 +112,61 @@ configurável.
 
 
 /*
+ **********************************************
  * terminal_d:
  *     Terminal struct.
  */
 
-// Estrutura usada apenas para enumerar terminais
-// do sistema, limitando à 8.
-// #na estrutura de tty ficará tudo o que o terminal precisa.
+// #bugbug
+// We dont need this.
+// We can simply use the tty structure.
 
 struct terminal_d
 {
-	object_type_t objectType;
-	object_class_t objectClass;
+    object_type_t  objectType;
+    object_class_t objectClass;
 
-	//Slot number.(NÚMERO DO TERMINAL)
+    //Slot number.(NÚMERO DO TERMINAL)
     int id;    
     
-	int used;
+    int used;
     int magic;
 
-	// #na estrutura de tty ficará tudo o que o terminal precisa.
+    // #na estrutura de tty ficará tudo o que o terminal precisa.
     struct tty_d *tty;    
-	
+
 }TERMINAL[TERMINAL_COUNT_MAX];
 
 
 
-// #bugbug
-// estamos usando um número limitado de terminais.
-// Por que ??
-// Poderemos acioná-los usando teclas de atalho. F1 à F8
-// Terminais são usados por administradores e desenvolvedores.
-// Não precisamos de muitos.
+//
+// == prototypes ==========================================
+//
 
 
 
-
-
-
-unsigned long 
-terminal_dialog ( struct window_d *window, 
-                  int msg, 
-                  unsigned long long1, 
-                  unsigned long long2 ); 
+int 
+terminal_ioctl ( 
+    int fd, 
+    unsigned long request, 
+    unsigned long arg );
 
 void systemSetTerminalWindow ( struct window_d *window );
+
 int systemGetTerminalWindow (void); 
 
-//configuramos o retângulo do terminal virtual corrente.. 
+// Configuramos o retângulo do terminal virtual corrente.
 void 
-systemSetTerminalRectangle ( unsigned long left,
-                             unsigned long top,
-							 unsigned long width,
-							 unsigned long height );
+systemSetTerminalRectangle ( 
+    unsigned long left,
+    unsigned long top,
+    unsigned long width,
+    unsigned long height );
 
 
 // initialize terminal support.
 int terminalInit (void);
+
 
 //
 // End.

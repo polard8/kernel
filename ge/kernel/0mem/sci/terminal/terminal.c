@@ -1,5 +1,11 @@
+/*
+ * File: terminal.c 
+ * 
+ *     Terminal interface.
+ *     Interface to handle all the virtual terminal management.
+ *     See: chardev/tty/ in 2io/
+ */
 
-// terminal.c
 
 //   This is the kserver part for the virtual terminal support.
 //   Initialization routines needs to call this file to setup 
@@ -12,16 +18,20 @@ extern unsigned long SavedX;
 extern unsigned long SavedY;
 
 
-// Deprecated!
-unsigned long 
-terminal_dialog ( 
-    struct window_d *window, 
-    int msg, 
-    unsigned long long1, 
-    unsigned long long2 ) 
+
+int 
+terminal_ioctl ( 
+    int fd, 
+    unsigned long request, 
+    unsigned long arg )
 {
-    //# todo
-    return 0;	
+    if ( fd<0 ){
+        debug_print("terminal_ioctl:\n");
+        return -1;
+    }
+    
+    // ?? more
+    return (int) tty_ioctl(fd,request,arg);
 }
 
 
@@ -265,8 +275,8 @@ void systemSetTerminalWindow ( struct window_d *window ){
 // o ID da janela que tem o terminal virtual ativo.
 // isso deve ir para kgws
 
-int systemGetTerminalWindow (void){
-
+int systemGetTerminalWindow (void)
+{
     return (int) terminal_window;
 }
 
@@ -280,18 +290,14 @@ systemSetTerminalRectangle (
     unsigned long width,
     unsigned long height )
 {
-	
-	//
 	// current terminal
-	//
-
 }
 
 
 // initialize terminal support.
 
-int terminalInit (void){
-
+int terminalInit (void)
+{
 	// seleciona o primeiro terminal
 	current_terminal = 0;
 		
