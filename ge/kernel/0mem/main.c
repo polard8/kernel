@@ -94,9 +94,9 @@ int kernel_main (int arch_type)
      //See gdef.h
     unsigned long *base = (unsigned long *) SavedBootBlock;
     
-    BootBlock.lfb                = (unsigned long) base[0]; // 0
-    BootBlock.x                  = (unsigned long) base[1];  // 4
-    BootBlock.y                  = (unsigned long) base[2];  // 8
+    BootBlock.lfb                = (unsigned long) base[0];  //  0
+    BootBlock.x                  = (unsigned long) base[1];  //  4
+    BootBlock.y                  = (unsigned long) base[2];  //  8
     BootBlock.bpp                = (unsigned long) base[3];  // 12
     BootBlock.last_valid_address = (unsigned long) base[4];  // 16
     BootBlock.metafile_address   = (unsigned long) base[5];  // 20
@@ -106,7 +106,6 @@ int kernel_main (int arch_type)
     BootBlock.cylinders          = (unsigned long) base[9];  // 36
     BootBlock.boot_mode          = (unsigned long) base[10]; // 40
     BootBlock.gramado_mode       = (unsigned long) base[11]; // 44
-
 
 
     //
@@ -243,16 +242,15 @@ int kernel_main (int arch_type)
         g_useGUI          = GUI_ON;
         VideoBlock.useGui = GUI_ON;
         debug_print ("[Kernel] kernel_main: GUI_ON\n");
-		//...
+        // ...
 
     }else{
         g_useGUI          = GUI_OFF;
         VideoBlock.useGui = GUI_OFF;
 
+        // No message support at the moment ?!
         debug_print ("[Kernel] kernel_main: GUI_OFF\n");
         debug_print ("[Kernel] kernel_main: Text mode not supported! *hang");
-
-        // No message support at the moment ?!
         asm ("cli \n");
         while (1){  asm ("hlt \n");  };
     };

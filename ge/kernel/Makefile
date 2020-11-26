@@ -363,15 +363,17 @@ all-c:
 	$(CC) -c 2io/dev/blkdev/ide/atapci.c   $(KINCLUDE) $(CFLAGS) -o atapci.o
 	$(CC) -c 2io/dev/blkdev/ide/hdd.c      $(KINCLUDE) $(CFLAGS) -o hdd.o
 	$(CC) -c 2io/dev/blkdev/storage/storage.c  $(KINCLUDE) $(CFLAGS) -o storage.o
-	
+
+
     # chardev
-	$(CC) -c 2io/dev/chardev/hid/i8042.c      $(KINCLUDE) $(CFLAGS) -o i8042.o
+	$(CC) -c 2io/dev/chardev/hid/i8042/i8042.c     $(KINCLUDE) $(CFLAGS) -o i8042.o
+	$(CC) -c 2io/dev/chardev/hid/i8042/keyboard.c  $(KINCLUDE) $(CFLAGS) -o keyboard.o
+	$(CC) -c 2io/dev/chardev/hid/i8042/ps2kbd.c    $(KINCLUDE) $(CFLAGS) -o ps2kbd.o
+	$(CC) -c 2io/dev/chardev/hid/i8042/mouse.c     $(KINCLUDE) $(CFLAGS) -o mouse.o
+	$(CC) -c 2io/dev/chardev/hid/i8042/ps2mouse.c  $(KINCLUDE) $(CFLAGS) -o ps2mouse.o
+
 	$(CC) -c 2io/dev/chardev/hid/input.c      $(KINCLUDE) $(CFLAGS) -o input.o
-	$(CC) -c 2io/dev/chardev/hid/keyboard.c   $(KINCLUDE) $(CFLAGS) -o keyboard.o
-	$(CC) -c 2io/dev/chardev/hid/mouse.c      $(KINCLUDE) $(CFLAGS) -o mouse.o
 	$(CC) -c 2io/dev/chardev/hid/output.c     $(KINCLUDE) $(CFLAGS) -o output.o
-	$(CC) -c 2io/dev/chardev/hid/ps2kbd.c     $(KINCLUDE) $(CFLAGS) -o ps2kbd.o
-	$(CC) -c 2io/dev/chardev/hid/ps2mouse.c   $(KINCLUDE) $(CFLAGS) -o ps2mouse.o
 	$(CC) -c 2io/dev/chardev/hid/render/r_render.c    $(KINCLUDE) $(CFLAGS) -o r_render.o
 	$(CC) -c 2io/dev/chardev/hid/screen.c     $(KINCLUDE) $(CFLAGS) -o screen.o
 	$(CC) -c 2io/dev/chardev/hid/video.c      $(KINCLUDE) $(CFLAGS) -o video.o

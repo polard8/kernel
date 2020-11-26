@@ -1,0 +1,15 @@
+	Files
+	=====	
+
+	i8042:
+	+ i8042.c - ps2 device driver.
+
+	keyboard:
+	+ keyboard.c - handler.
+	+ ps2kbd.    - device driver.
+
+	mouse:
+	+ mouse.c     - handler.
+	+ ps2mouse.c  - device driver.
+
+
