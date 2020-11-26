@@ -68,8 +68,8 @@ endif
 
 
 #KINCLUDE = -I include/
-KINCLUDE = -I 0mem/include/
-
+#KINCLUDE = -I 0mem/include/
+KINCLUDE = -I 0mem/0prey/
 
 ##
 ## Objects

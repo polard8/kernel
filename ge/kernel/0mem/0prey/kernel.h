@@ -86,25 +86,24 @@ extern void do_executa_new_task (void);
 // =========================================================
 
 
+// oh boy
+#include "0boy/0boy.h"
 
 // config
-#include "config/version.h"    // Product. 
-#include "config/u.h"          // User
-#include "config/config.h"     // Compiling.
-
-
-// gramado
-#include "gramado/limits.h"
+#include "0config/version.h"    // Product. 
+#include "0config/u.h"          // User
+#include "0config/config.h"     // Compiling.
 
 // globals
-#include "globals/gpa.h"
-#include "globals/gva.h"
-#include "globals/gentry.h"
-#include "globals/gdef.h"
-#include "globals/gdevice.h"
-#include "globals/gobject.h"
-#include "globals/gspin.h"
-#include "globals/gwd.h"   //whatch dogs
+#include "0globals/limits.h"
+#include "0globals/gpa.h"
+#include "0globals/gva.h"
+#include "0globals/gentry.h"
+#include "0globals/gdef.h"
+#include "0globals/gdevice.h"
+#include "0globals/gobject.h"
+#include "0globals/gspin.h"
+#include "0globals/gwd.h"   //whatch dogs
 
 
 // rtl 
@@ -450,19 +449,16 @@ extern void do_executa_new_task (void);
 // by the ring3 apps via system call.
 // This is the last #include. :^)
 
-#include "sci/syscall.h"        
-#include "sci/sys.h"
-
-
+#include "zi/sci/syscall.h"        
+#include "zi/sci/sys.h"
 
 //
 // si - services interfce
 //
 
-#include "si/sifs.h"
-#include "si/sins.h"
-#include "si/siws.h"
-
+#include "zi/si/sifs.h"
+#include "zi/si/sins.h"
+#include "zi/si/siws.h"
 
 
 //keyboard suppport 
