@@ -133,36 +133,31 @@ all-c:
 
 
 	cp $(APIOBJ)/api.o .
+
+	cp $(LIBCOBJ)/rtl.o .
 	
 	cp $(LIBCOBJ)/ctype.o .
 	cp $(LIBCOBJ)/stdio.o .
 	cp $(LIBCOBJ)/stdlib.o .
 	cp $(LIBCOBJ)/string.o .
 	cp $(LIBCOBJ)/conio.o .
-#	cp ../../../lib/wait.o .
-
 	cp $(LIBCOBJ)/unistd.o .
-	
-	cp $(LIBCOBJ)/rtl.o .
-	
 	cp $(LIBCOBJ)/socket.o .
-
 	cp $(LIBCOBJ)/signal.o .
-	
 	cp $(LIBCOBJ)/termios.o .
 	cp $(LIBCOBJ)/ioctl.o .
 	cp $(LIBCOBJ)/fcntl.o .
-	
+
+#	cp ../../../lib/wait.o .
+
 	#gws cancelado
 #	cp $(GWSOBJ)/pixel.o   .
-	
+
 
 shell-link:
 	ld -m elf_i386 -T ../link.ld -o NORATERM.BIN $(myObjects)    
 	
-	
-	
-	
+
 
 
 finalize:

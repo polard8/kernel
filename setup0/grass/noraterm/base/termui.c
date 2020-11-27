@@ -510,6 +510,10 @@ void terminalCreateEditBox (void){
  
 struct window_d *terminalCreateMainWindow ( int status ){
 
+    // device limits
+    unsigned long deviceWidth  = gde_get_system_metrics(1);
+    unsigned long deviceHeight = gde_get_system_metrics(2);
+
     struct window_d *w;
 
     unsigned long left;
@@ -518,30 +522,28 @@ struct window_d *terminalCreateMainWindow ( int status ){
     unsigned long height;
 
 
+    //===================
+    
+    // posicionamento da janela principal.
+    wpWindowLeft = 0; 
+    wpWindowTop  = 0;
 
-	// Tamanho da tela.	
-	//unsigned long ScreenWidth = apiGetSystemMetrics(1);
-    //unsigned long ScreenHeight = apiGetSystemMetrics(2); 
-	
+    // dimensoes da janela principal.
+    if ( deviceWidth == 0 || deviceHeight == 0 ){
+        printf("terminalCreateMainWindow: device info\n");
+        exit(1);
+    }
 
-	
-    // #imporante
-	// Essas sao as dimensões da janela principal.
+    wsWindowWidth  = deviceWidth;
+    wsWindowHeight = deviceHeight;
 
-	//wpWindowLeft = DEFAULT_WINDOW_X;  //0;
-	//wpWindowTop =  DEFAULT_WINDOW_Y;  //0;
-	wpWindowLeft = 20;  //0;
-	wpWindowTop =  40;  //0;
-	
-	wsWindowWidth  = (__wlMaxColumns*8) +100;    //640;  
-	wsWindowHeight = (__wlMaxRows*8)    +300;    //480;  
+    // Saving.
+    left   = wpWindowLeft;
+    top    = wpWindowTop;
+    width  = wsWindowWidth;
+    height = wsWindowHeight;
 
-
-	left   = wpWindowLeft;
-	top    = wpWindowTop;
-	width  = wsWindowWidth;
-	height = wsWindowHeight;
-
+    //===================
 
 	//char colors:
 	//fg=COLOR_TERMINALTEXT, bg=COLOR_TERMINAL2 
@@ -549,21 +551,19 @@ struct window_d *terminalCreateMainWindow ( int status ){
     w = (void *) gde_create_window ( WT_OVERLAPPED, 1, VIEW_NORMAL, 
                      "Setup: Noraterm",
                      left, top, width, height,
-                     0, 0, COLOR_BLUE, COLOR_BLUE ); 
+                     0, 0, COLOR_GRAY, COLOR_GRAY ); 
 
     if ( (void *) w == NULL ){
         printf ("terminalCreateMainWindow: w fail\n");
-        while (1){ asm ("pause"); }
-        //exit (0);
+        exit(1);
     }
 
     // Registrar e mostrar.
-    gde_register_window (w);
-    gde_show_window (w);
+    gde_register_window(w);
+    gde_show_window(w);
 
     return w;
 }
-
 
 
 void terminalCreateWindow (void){

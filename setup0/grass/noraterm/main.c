@@ -5,15 +5,13 @@
  *
  * History:
  *     2016 - Created by Fred Nora.
- *     2019 - .
  */
- 
- 
+
+
 // #importante
 // O terminal pega as teclas digitadas e envia elas para
 // um arquivo que o shell poderá ler.
 // Então o stdout do terminal será lido pelo child.
-
 
 // See:
 // https://www.mkssoftware.com/docs/man5/struct_termios.5.asp
@@ -6658,31 +6656,34 @@ void terminal_write_char (int c){
  *    +Carregar um arquivo na área de cliente.
  *    +Testar outros recursos do Kernel.
  *    +Testar as chamadas para pegar informções sobre o processo.
- *    +...
+ *    + ...
  *
- *  
- *  ## O SHELL É UM APLICATIVO DO TIPO JANELA, DEVE TER UM MAIN 
- *     DO TIPO JANELA ##
- *
- * Obs: Esses argumentos podem ser um padrão.
  */
- 
+
 int main ( int argc, char *argv[] ){
-	
-	//#importante: Isso será definido somente uma vez.
-	__wlMaxColumns = DEFAULT_MAX_COLUMNS;
-	__wlMaxRows    = DEFAULT_MAX_ROWS;
-	
-	// Número máximo de colunas e linhas.
+
+    //loop
+    register int i=0;
+
+
+    // #importante: 
+    // Isso será definido somente uma vez.
+
+    __wlMaxColumns = DEFAULT_MAX_COLUMNS;
+    __wlMaxRows    = DEFAULT_MAX_ROWS;
+
+
+    // Número máximo de colunas e linhas.
     g_columns = __wlMaxColumns;    // 80;
     g_rows    = __wlMaxRows;       // 25;
+
 
     FILE *default_input = stdin;
     char *local_pending_command = (char *) NULL;	
 
 	//char **internal;
 	char *filename;
-	register int i;
+
 
 	
 	int _quit = 0;
@@ -6901,25 +6902,20 @@ int main ( int argc, char *argv[] ){
 	
 	//Nothing.
 	
-	
-	if (_quit)
-		exit (0);
-	
-	
-	
+
+    if (_quit)
+        exit(0);
+
 	// #todo
 	// Nesse momento usa-se as funções de termio.h para configurar o terminal.
 	// Ou outra lib/api apropriada.
 	
-	
 	// #debug
 	//printf ("#debug: Breakpoint");
 	//while (1){}
-	
-	
-noArgs:		
-	
-	
+
+noArgs:
+
 	//...
 	
 	//@todo:
@@ -6940,17 +6936,15 @@ noArgs:
 	// Isso configura alguns padrões do aplicativo.
 	// Os argumentos tratados abaixo podem modificar esses padrões
 	// Ex: Um argumento de entrada pode solicitar a troca de cor de fonte.
-	
-	terminalTerminal (); 	
-	
-	
-    //
-    // Main window.
-    //
-	
-	
-    mainwindow_used = 1;
 
+    terminalTerminal();
+
+
+    //
+    // == Main window =========================================
+    //
+
+    mainwindow_used = 1;
 
 
     // ++
@@ -6959,7 +6953,7 @@ noArgs:
     hWindow = (struct window_d *) terminalCreateMainWindow (1);
     // Setup a global pointer for main window.
     main_window = hWindow;
-    shell_info.main_window = ( struct window_d * ) hWindow;	
+    shell_info.main_window = ( struct window_d * ) hWindow;
     gde_exit_critical_section ();
     //--
 
@@ -6993,15 +6987,16 @@ noArgs:
 
 
      // background.
-     __bgleft = 1 +20;
-     __bgtop  = 1 +36;    
-     __bgwidth  = (__wlMaxColumns*8) +60;  
-     __bgheight = (__wlMaxRows*8)    +200; 
- 
+     __bgleft = 1;
+     __bgtop  = 1 +36;
+     __bgwidth  = wsWindowWidth -2;
+     __bgheight = wsWindowHeight -38;
+
+
      // bar.
      __barleft = 2;
-     __bartop = 2;
-     __barwidth = wsWindowWidth -40 -4;
+     __bartop  = 2;
+     __barwidth  = __bgwidth -4;
      __barheight = 34; 
 
 
@@ -7153,17 +7148,18 @@ noArgs:
 
 
 
-
     //
+    // client bar. (barra de ferramentas?)
+    //
+
     // Vamos fazer botões na barra de ferramentas.. 
     // que será o início do bg da área de cliente.
-    //
 
 
 	//++
-	gde_enter_critical_section ();  
-	client_bar_Window = (void *) gde_create_window ( WT_SIMPLE, 1, 1, 
-	                                 "client-bar",     
+    gde_enter_critical_section ();  
+    client_bar_Window = (void *) gde_create_window ( WT_SIMPLE, 1, 1, 
+                                     "client-bar",     
                                     __barleft, __bartop, 
                                     __barwidth, __barheight, 
                                     client_bg, 0, 0x404040, 0x404040 );
@@ -7181,14 +7177,14 @@ noArgs:
 
 
     //
-    // ============ Bar buttons =========
+    // == Bar buttons =========
     //
     
 	//++
     gde_enter_critical_section (); 
 	bar_button_1 = (void *) gde_create_window ( WT_BUTTON, 1, 1, " 1 ",  
-                                     1, 1, 
-                                     50, 32,    
+                                     ((__barwidth/4)*0), 1, 
+                                     (__barwidth/4)-2, 32,    
                                      client_bar_Window, 0, 
                                      xCOLOR_GRAY3, xCOLOR_GRAY3 );
 
@@ -7209,8 +7205,8 @@ noArgs:
 	//++
     gde_enter_critical_section (); 
 	bar_button_2 = (void *) gde_create_window ( WT_BUTTON, 1, 1, " 2 ", 
-                                     50 +1, 1,
-                                     100, 32,   
+                                     ((__barwidth/4)*1), 1, 
+                                     (__barwidth/4)-2, 32,   
                                      client_bar_Window, 0, 
                                      xCOLOR_GRAY3, xCOLOR_GRAY3 );
 	
@@ -7231,11 +7227,11 @@ noArgs:
 	//++
     gde_enter_critical_section (); 
 	bar_button_3 = (void *) gde_create_window ( WT_BUTTON, 1, 1, " 3 ", 
-                                     50 +1 +100 +1, 1,
-                                     200, 32,   
+                                     ((__barwidth/4)*2), 1, 
+                                     (__barwidth/4)-2, 32,   
                                      client_bar_Window, 0, 
                                      xCOLOR_GRAY3, xCOLOR_GRAY3 );
-	
+
 	if ( (void *) bar_button_3 == NULL )
 	{
 		printf ("Couldn't create Priority button\n");

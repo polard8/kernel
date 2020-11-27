@@ -121,16 +121,21 @@ void check (char *c, int p1, int p2)
 
 
 /* To display function name */
-void display(char *c,int p1)
+void display (char *c, int p1)
 {
-
    int temp = p1, i;
+
 
     while (c[--temp] != ' ');
 
-        for (i = temp + 1; i < p1; i++)            /* Print name of function character by character */
-            printf("%c", c[i]);
 
+    /* Print name of function character by character */
+    for (i = temp + 1; i < p1; i++)
+    {
+        printf ("%c", c[i]);
+    };
+
+        //flush.
         printf("\n");
 
         return;
