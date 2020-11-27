@@ -427,11 +427,11 @@ void fs_pathname_backup ( int pid, int n );
 
 // usada por open();
 // IN: name, flags, mode
-int sys_read_file ( char *file_name,  int flags, mode_t mode );
+int sys_read_file_from_disk ( char *file_name,  int flags, mode_t mode );
 
 
 int
-sys_write_file ( 
+sys_write_file_to_disk ( 
     char *file_name, 
     unsigned long file_size,
     unsigned long size_in_bytes,

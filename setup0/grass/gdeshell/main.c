@@ -2626,28 +2626,42 @@ do_compare:
     int ch_test;
     if ( gramado_strncmp( prompt, "t4", 2 ) == 0 )
     {
+        //stdout
         printf ("t4: Open and reading a file\n");
-        f1 = fopen ("gramado.txt","rb");  
+        f1 = fopen ("gramado.txt","rb");
+        
         if ( f1 == NULL ){
-            printf ("fopen fail\n");
+            printf ("fopen fail\n");  //stdout
             goto exit_cmp;
         }
-
-        printf ("Testing getc ... \n\n");
+        printf ("Testing getc ... \n\n");  
         while (1){
             //ch_test = (int) fgetc (f1);    //funcionou.
             ch_test = (int) getc  (f1);  //funcionou. 
             if ( ch_test == EOF ){
-                printf("  EOF reached :)\n\n");
+                printf("  EOF reached :)\n\n"); 
                 goto exit_cmp;
             }else{
-                  printf("%c", ch_test);  fflush(stdout);
+                  printf("%c", ch_test);  fflush(stdout);  
             };
         };
         goto exit_cmp;
     }
 
-
+    int crI;
+    char crName[11];
+    if ( gramado_strncmp( prompt, "tcreat", 6 ) == 0 )
+    {
+        for (crI=0; crI<8; crI++)
+        {
+            itoa(crI,crName); 
+            crName[crI+1] = 'x';
+            creat (crName, 0);
+        }
+            
+        goto exit_cmp;
+    }
+    
     // t5
     // Saving a file.
     // It's running on qemu.

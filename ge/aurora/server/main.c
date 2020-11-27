@@ -1589,19 +1589,19 @@ int initGraphics (void){
     if (current_mode == GRAMADO_JAIL)
     {
          
-         demos_startup_animation(1);  //ok
-         //demos_startup_animation(2);
-         //demos_startup_animation(3);
-         //demos_startup_animation(4);
-         //demos_startup_animation(5);
-         demos_startup_animation(6);   //ok
-         demos_startup_animation(7);   //ok
-         demos_startup_animation(8);  //ok
+         //demos_startup_animation(1);  //ok
+         //demos_startup_animation(2);  //it works
+         //demos_startup_animation(3);    //it works
+         //demos_startup_animation(4);     //it works.
+         //demos_startup_animation(5);      // it works.
+         //demos_startup_animation(6);   //ok
+         //demos_startup_animation(7);   //ok
+         //demos_startup_animation(8);  //ok
          demos_startup_animation(9);  //ok
          
          gwssrv_show_backbuffer();
          //while(1){}
-        // ...
+         // ...
     }
 
 

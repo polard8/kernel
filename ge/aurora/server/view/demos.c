@@ -4,33 +4,36 @@
 #include <gws.h>
 
 
-void demoCat(void)
+void demoCat (void)
 {
     register int i=0;
     int j=0;
     int count = 20;
 
-    while(count>0){
+    while (count>0){
     
     for (i=0; i<8; i++){
 
        rectBackbufferDrawRectangle ( 
            0, 0, 320, 200, COLOR_BLACK, 1 );
-    //head
+    // head
     plotCircleZ ( 0, 12, 25, COLOR_WHITE, 0); 
 
-    //eyes
+    // eyes
     plotCircleZ ( -10, 20, 1+i, COLOR_WHITE, 0); 
     plotCircleZ (  10, 20, 1+i, COLOR_WHITE, 0); 
 
+    // =
     plotLine3d ( -40, 8,0, -4, 5,0, COLOR_WHITE); 
     plotLine3d ( -40, 5,0, -4, 4,0, COLOR_WHITE); 
     plotLine3d ( -40, 2,0, -4, 3,0, COLOR_WHITE); 
 
+    // =
     plotLine3d ( 4, 5,0, 40, 8,0, COLOR_WHITE); 
     plotLine3d ( 4, 4,0, 40, 5,0, COLOR_WHITE); 
     plotLine3d ( 4, 3,0, 40, 2,0, COLOR_WHITE); 
 
+    // mouth
     plotLine3d ( -10, -2,0, 10, -2,0, COLOR_WHITE); 
 
     gws_refresh_rectangle(0,0,320,200);
@@ -49,6 +52,7 @@ void demoCat(void)
 void demoFred0(void)
 {
     register int i=0;
+
     for (i=0; i<100; i++){
             //noraDrawingStuff3 (i,i,0);
             noraDrawingStuff3 (-i,-i,0);
@@ -66,13 +70,13 @@ void demoFred0(void)
             //plotEllipseRect ( i, i, i*5, i*5, COLOR_BLUE);
             //plotEllipseRectZ ( i%20, i%20, i, i, COLOR_BLUE,i%20);
     };
-
 }
 
 
 void demoFred1(void)
 {
     register int i=0;
+
     for (i=0; i<100; i++){
             //noraDrawingStuff3 (i,i,0);
             noraDrawingStuff3 (-i,-i,0);
@@ -95,6 +99,7 @@ void demoFred1(void)
 void demoFred2(void)
 {
     register int i=0;
+
     for (i=1; i< (1024-768); i++){
             //noraDrawingStuff3 (i,i,0);
             noraDrawingStuff3 (-i,-i,0);
@@ -131,17 +136,19 @@ void demoSA1(void)
 {
     register int i=0;
 
+    // To store result
+    int res[4][4];  
+
     int mat1[4][4] = {  { 1, 1, 1, 1 },
                         { 2, 2, 2, 2 },
                         { 3, 3, 3, 3 },
                         { 4, 4, 4, 4 } };
  
     int mat2[4][4] = { { -5, -5, 0, 0 },
-                       { 5,  -5, 0, 0 },
-                       { 5,   5, 0, 0 },
+                       {  5, -5, 0, 0 },
+                       {  5,  5, 0, 0 },
                        { -5,  5, 0, 0 } };
     
-    int res[4][4]; // To store result
 
         
     
@@ -217,9 +224,9 @@ void demoCube1(void)
     cube = (void *) malloc( sizeof( struct gr_cube_d ) );
     if ( (void*) cube != NULL )
     {
-		//marcador.
-		noraDrawingStuff3 (0,0,0);
-		
+        // marcador.
+        noraDrawingStuff3 (0,0,0);
+
 		//while(1){
 
         //south     
@@ -482,25 +489,13 @@ void demoCurve(void)
 
 void demoMatrix1(void)
 {
-
     register int i=0;
     
      //#define N 4
    
-    /*
-    int mat1[4][4] = { { 1, 1, 1, 1 },
-                        { 2, 2, 2, 2 },
-                        { 3, 3, 3, 3 },
-                        { 4, 4, 4, 4 } };
- 
-    int mat2[4][4] = { { 1, 1, 1, 1 },
-                       { 2, 2, 2, 2 },
-                       { 3, 3, 3, 3 },
-                       { 4, 4, 4, 4 } };
-    
-    int res[4][4]; // To store result
-    */
-
+   
+    // To store result
+    int res[4][4]; 
 
     int mat1[4][4] = {  { 1, 1, 1, 1 },
                         { 2, 2, 2, 2 },
@@ -508,11 +503,10 @@ void demoMatrix1(void)
                         { 4, 4, 4, 4 } };
  
     int mat2[4][4] = { { -5, -5, 0, 0 },
-                       { 5,  -5, 0, 0 },
-                       { 5,   5, 0, 0 },
+                       {  5, -5, 0, 0 },
+                       {  5,  5, 0, 0 },
                        { -5,  5, 0, 0 } };
-    
-    int res[4][4]; // To store result
+
 
     //int m1[10][10];
     //int m2[10][10];
@@ -557,7 +551,8 @@ void demoMatrix1(void)
 
        rectBackbufferDrawRectangle ( 
            0, 0, 320, 200, COLOR_BLACK, 1 );
-                
+       
+       // See: Where is this projection?
        multiply4 ( projection4x4, mat2, res );
        
        //z,x,y

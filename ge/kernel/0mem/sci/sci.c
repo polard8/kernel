@@ -1263,7 +1263,7 @@ void *sci (
 
         // IN: name, flags, mode
         case SYS_READ_FILE:
-            return (void *) sys_read_file ( (char *) a2, 
+            return (void *) sys_read_file_from_disk ( (char *) a2, 
                                 (int) arg3, (mode_t) arg4 ); 
             break;
 
@@ -1274,7 +1274,8 @@ void *sci (
         // See: fs/fs.c
         // IN: name, size in sectors, size in bytes, adress, flag.
         case SYS_WRITE_FILE:
-            sys_write_file ( (char *) message_address[0],  
+            sys_write_file_to_disk ( 
+                (char *) message_address[0],  
                 (unsigned long) message_address[1],   
                 (unsigned long) message_address[2],  
                 (char *) message_address[3],  
@@ -1381,13 +1382,15 @@ void *sci (
 
 
         // 18 - read() 
+        // See:
         case SYS_READ:
-            return (void *) sys_read( (unsigned int) arg2, 
+            return (void *) sys_read ( (unsigned int) arg2, 
                                 (char *) arg3, (int) arg4 );  
             break;
 
 
         // 19 - write()
+        // See:
         case SYS_WRITE:
             return (void *) sys_write ( (unsigned int) arg2, 
                                 (char *) arg3, (int) arg4 );  

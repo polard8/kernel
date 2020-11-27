@@ -292,9 +292,14 @@ sys_open (
     mode_t mode )
 {
 
+    // ??
+    // creat chama open.
+    // open tenta ler num arquivo que nao existe?
+    
+
     // See: fs.c
     // OUT: fd
-    return (int) sys_read_file ( (char *) pathname, flags, mode );
+    return (int) sys_read_file_from_disk ( (char *) pathname, flags, mode );
 }
 
 

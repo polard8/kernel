@@ -2214,6 +2214,10 @@ int fs_search_inode_table( char *path )
 }
 */
 
+
+
+
+
 /*
  ************************************* 
  * sys_read_file: 
@@ -2224,7 +2228,7 @@ int fs_search_inode_table( char *path )
 // usada por open()
 // tem que retornar o fd e colocar o ponteiro na lista de arquivos
 // abertos.
-// Carrega um arquivo do disco para a mem�ria.
+// Carrega um arquivo do disco para a memoria.
 // funcionou.
 
 // #bugbug
@@ -2243,8 +2247,16 @@ int fs_search_inode_table( char *path )
     // E na lista de inodes. inode_table[]
     // See: fs.c
 
+
+// #bugbug
+// Nao seria o read() usado para ler um arquivo ja aberto ??
+// sim. a rotina de suporte para read esta em sys_read e nao chama essa aqui.
+// essa aqui poderia ter outro nome, pois ela carrega um arquivo
+// poderia chamar-se load.
+
+
 int 
-sys_read_file ( 
+sys_read_file_from_disk ( 
     char *file_name, 
     int flags, 
     mode_t mode )
@@ -2263,7 +2275,7 @@ sys_read_file (
 
 
 
-    debug_print ("sys_read_file:\n");
+    debug_print ("sys_read_file_from_disk:\n");
 
     // Convertendo o formato do nome do arquivo.    
     // >>> "12345678XYZ"
@@ -2707,7 +2719,7 @@ int fsLoadFileFromCurrentTargetDir (void){
 // name, size in sectors, size in bytes, adress, flag.
 
 int
-sys_write_file ( 
+sys_write_file_to_disk ( 
     char *file_name, 
     unsigned long file_size,
     unsigned long size_in_bytes,
@@ -2716,7 +2728,7 @@ sys_write_file (
 {
     int __ret = -1;
 
-    debug_print ("sys_write_file:\n");
+    debug_print ("sys_write_file_to_disk:\n");
 
     //++
     // See: sci/fs/write.c
