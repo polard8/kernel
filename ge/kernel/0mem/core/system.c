@@ -197,8 +197,8 @@ void set_up_cursor ( unsigned long x, unsigned long y )
 
     if (current_vc<0){ return; }
 
-    TTY[current_vc].cursor_x = (unsigned long) x;
-    TTY[current_vc].cursor_y = (unsigned long) y;
+    CONSOLE[current_vc].cursor_x = (unsigned long) x;
+    CONSOLE[current_vc].cursor_y = (unsigned long) y;
 }
 
 
@@ -211,7 +211,7 @@ void set_up_cursor ( unsigned long x, unsigned long y )
 
 unsigned long get_cursor_x (void)
 {
-    return (unsigned long) TTY[current_vc].cursor_x;
+    return (unsigned long) CONSOLE[current_vc].cursor_x;
 }
 
 
@@ -224,7 +224,7 @@ unsigned long get_cursor_x (void)
 
 unsigned long get_cursor_y (void)
 {
-    return (unsigned long) TTY[current_vc].cursor_y; 
+    return (unsigned long) CONSOLE[current_vc].cursor_y; 
 }
 
 
@@ -1071,11 +1071,11 @@ unsigned long systemGetSystemMetrics ( int index ){
 
         //cursor width in pixels.
         case 3:
-            return (unsigned long) TTY[current_vc].cursor_width_in_pixels;
+            return (unsigned long) CONSOLE[current_vc].cursor_width_in_pixels;
             break;
         //cursor hight in pixels.
         case 4:
-            return (unsigned long) TTY[current_vc].cursor_height_in_pixels;
+            return (unsigned long) CONSOLE[current_vc].cursor_height_in_pixels;
             break;
 
 

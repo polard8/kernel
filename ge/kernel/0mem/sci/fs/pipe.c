@@ -490,5 +490,29 @@ int is_packetized(struct file *file)
 }
 */
 
+int pipe_ioctl ( int fd, unsigned long request, unsigned long arg )
+{
+    debug_print ("pipe_ioctl: TODO\n");
+    
+    if (fd<0)
+        return -1;    
+
+
+    switch (request){
+
+    // ...
+    
+    default:
+        break;
+    };
+
+    return -1;
+}
+
+
+
+
+
+
 
 

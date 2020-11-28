@@ -250,6 +250,7 @@ struct file_d
     // inode structure
     struct inode_d *inode;
 
+
     // A estrutura de arquivos aponta para tabela global de 
     // arquivos abertos.
     int filetable_index;

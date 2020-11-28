@@ -19,7 +19,7 @@
 // Control Sequence Introducer (CSI) 
 // See:
 // https://docs.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences
-//
+// ...
 
 
 
@@ -58,16 +58,16 @@ void __local_gotoxy ( int new_x, int new_y, int console_number )
 	//y=new_y;
 	//pos=origin+((y*columns+x)<<1);
 		
-     if ( new_x >= (TTY[console_number].cursor_right-1) )
+     if ( new_x >= (CONSOLE[console_number].cursor_right-1) )
          return;
          
     
-    if ( new_y >= (TTY[console_number].cursor_bottom-1) )
+    if ( new_y >= (CONSOLE[console_number].cursor_bottom-1) )
         return;
         
 
-    TTY[console_number].cursor_x = new_x; 
-    TTY[console_number].cursor_y = new_y;
+    CONSOLE[console_number].cursor_x = new_x; 
+    CONSOLE[console_number].cursor_y = new_y;
 }
 
 
@@ -94,14 +94,14 @@ static int saved_y=0;
 
 void __local_save_cur (int console_number)
 {
-    saved_x = TTY[console_number].cursor_x;
-    saved_y = TTY[console_number].cursor_y;
+    saved_x = CONSOLE[console_number].cursor_x;
+    saved_y = CONSOLE[console_number].cursor_y;
 }
 
 void __local_restore_cur (int console_number)
 {
-    TTY[console_number].cursor_x = saved_x;
-    TTY[console_number].cursor_y = saved_y;
+    CONSOLE[console_number].cursor_x = saved_x;
+    CONSOLE[console_number].cursor_y = saved_y;
 }
 
 
@@ -134,14 +134,14 @@ void __local_insert_char ( int console_number )
 	}
 */
 
-    //int i = TTY[console_number].cursor_x;
+    //int i = CONSOLE[console_number].cursor_x;
     //int tmp;
     //int old = 0x20;
     
     // #bugbug
     // Não é possível fazer essa rotina pois não temos um buffer e chars.
 
-    //while (i++ < TTY[console_number].cursor_height ) {};
+    //while (i++ < CONSOLE[console_number].cursor_height ) {};
     
     console_putchar (0x20, console_number);
 }
@@ -152,21 +152,21 @@ void __local_insert_line (int console_number)
     int oldbottom=0;
 
 
-    oldtop    = TTY[console_number].cursor_top;
-    oldbottom = TTY[console_number].cursor_bottom;
+    oldtop    = CONSOLE[console_number].cursor_top;
+    oldbottom = CONSOLE[console_number].cursor_bottom;
 
-    TTY[console_number].cursor_top    = TTY[console_number].cursor_y;
+    CONSOLE[console_number].cursor_top = CONSOLE[console_number].cursor_y;
     
     //#bugbug: apontando par asi mesmo.
-    //TTY[console_number].cursor_bottom = TTY[console_number].cursor_bottom;
+    //CONSOLE[console_number].cursor_bottom = CONSOLE[console_number].cursor_bottom;
 
     //if (console_number<0)
         //return;
 
     console_scroll(console_number);
 
-    TTY[console_number].cursor_top    = oldtop;
-    TTY[console_number].cursor_bottom = oldbottom;
+    CONSOLE[console_number].cursor_top    = oldtop;
+    CONSOLE[console_number].cursor_bottom = oldbottom;
 }
 
 
@@ -199,20 +199,20 @@ void __local_delete_line(int console_number)
     int oldbottom=0;
 
 
-    oldtop    = TTY[console_number].cursor_top;
-    oldbottom = TTY[console_number].cursor_bottom;
+    oldtop    = CONSOLE[console_number].cursor_top;
+    oldbottom = CONSOLE[console_number].cursor_bottom;
 
 
-    TTY[console_number].cursor_top    = TTY[console_number].cursor_y;
+    CONSOLE[console_number].cursor_top = CONSOLE[console_number].cursor_y;
     
     //#bugbug: apontando para si mesmo.
-    //TTY[console_number].cursor_bottom = TTY[console_number].cursor_bottom;
+    //CONSOLE[console_number].cursor_bottom = CONSOLE[console_number].cursor_bottom;
 
     //#todo
 	//scrup();
 
-    TTY[console_number].cursor_top    = oldtop;
-    TTY[console_number].cursor_bottom = oldbottom;
+    CONSOLE[console_number].cursor_top    = oldtop;
+    CONSOLE[console_number].cursor_bottom = oldbottom;
 }
 
 
@@ -319,8 +319,8 @@ void csi_M ( int nr, int console_number )
 {
 
     /*
-	if ( nr > TTY[console_number].cursor_height )
-		nr = TTY[console_number].cursor_height;
+	if ( nr > CONSOLE[console_number].cursor_height )
+		nr = CONSOLE[console_number].cursor_height;
 	else if (!nr)
 		nr=1;
 	while (nr--)
@@ -334,8 +334,8 @@ void csi_M ( int nr, int console_number )
 void csi_L (int nr, int console_number)
 {
    /*
-	if (nr > TTY[console_number].cursor_height)
-		nr = TTY[console_number].cursor_height;
+	if (nr > CONSOLE[console_number].cursor_height)
+		nr = CONSOLE[console_number].cursor_height;
 	else if (!nr)
 		nr=1;
 	while (nr--)
@@ -347,8 +347,8 @@ void csi_L (int nr, int console_number)
 void csi_P (int nr, int console_number)
 {
 
-	if (nr > TTY[console_number].cursor_right -1 )
-		nr = TTY[console_number].cursor_right -1 ;
+	if (nr > CONSOLE[console_number].cursor_right -1 )
+		nr = CONSOLE[console_number].cursor_right -1 ;
 	else if (!nr)
 		nr=1;
 	while (nr--)
@@ -359,8 +359,8 @@ void csi_P (int nr, int console_number)
 void csi_at (int nr, int console_number)
 {
 
-	if (nr > TTY[console_number].cursor_right -1 )
-		nr = TTY[console_number].cursor_right -1 ;
+	if (nr > CONSOLE[console_number].cursor_right -1 )
+		nr = CONSOLE[console_number].cursor_right -1 ;
 	else if (!nr)
 		nr=1;
 	while (nr--)
@@ -431,8 +431,8 @@ void _console_outbyte (int c, int console_number){
         // Branco no preto é um padrão para terminal.
         if ( stdio_terminalmode_flag == 1 ){
             d_draw_char ( 
-                 (cWidth * TTY[console_number].cursor_x), 
-                (cHeight * TTY[console_number].cursor_y), 
+                 (cWidth * CONSOLE[console_number].cursor_x), 
+                (cHeight * CONSOLE[console_number].cursor_y), 
                 c, COLOR_WHITE, 0x303030 );
 
 
@@ -442,9 +442,9 @@ void _console_outbyte (int c, int console_number){
         // Não sabemos o fundo. Vamos selecionar o foreground. 
         }else{
             d_drawchar_transparent ( 
-                (cWidth  * TTY[console_number].cursor_x), 
-                (cHeight * TTY[console_number].cursor_y), 
-                TTY[console_number].cursor_color, 
+                (cWidth  * CONSOLE[console_number].cursor_x), 
+                (cHeight * CONSOLE[console_number].cursor_y), 
+                CONSOLE[console_number].cursor_color, 
                 c );
         };
         // Nothing.
@@ -495,8 +495,8 @@ void console_outbyte (int c, int console_number)
     // form feed - Nova tela.
     if ( Ch == '\f' )
     {
-        TTY[console_number].cursor_y = TTY[console_number].cursor_top;
-        TTY[console_number].cursor_x = TTY[console_number].cursor_left;
+        CONSOLE[console_number].cursor_y = CONSOLE[console_number].cursor_top;
+        CONSOLE[console_number].cursor_x = CONSOLE[console_number].cursor_left;
         return;
     }
 
@@ -512,16 +512,16 @@ void console_outbyte (int c, int console_number)
     {
         // #todo: 
         // Melhorar esse limite.
-        if ( TTY[console_number].cursor_y > (TTY[console_number].cursor_bottom) )
+        if ( CONSOLE[console_number].cursor_y > (CONSOLE[console_number].cursor_bottom) )
         {
             //debug_print ("console_outbyte: scroll 1\n"); 
             console_scroll (console_number);
 
-            TTY[console_number].cursor_y = (TTY[console_number].cursor_bottom);
+            CONSOLE[console_number].cursor_y = (CONSOLE[console_number].cursor_bottom);
             prev = Ch; 
         }else{
-            TTY[console_number].cursor_y++;
-            TTY[console_number].cursor_x = TTY[console_number].cursor_left;
+            CONSOLE[console_number].cursor_y++;
+            CONSOLE[console_number].cursor_x = CONSOLE[console_number].cursor_left;
             prev = Ch;
         };
         return;
@@ -534,22 +534,22 @@ void console_outbyte (int c, int console_number)
     if ( Ch == '\n' && prev != '\r' ) 
     {
         // se o line feed apareceu quando estamos na ultima linha
-        if ( TTY[console_number].cursor_y > (TTY[console_number].cursor_bottom) )
+        if ( CONSOLE[console_number].cursor_y > (CONSOLE[console_number].cursor_bottom) )
         {
 
             //debug_print ("console_outbyte: scroll 2\n"); 
             console_scroll (console_number);
             
-            TTY[console_number].cursor_y = (TTY[console_number].cursor_bottom);
+            CONSOLE[console_number].cursor_y = (CONSOLE[console_number].cursor_bottom);
             prev = Ch;
 
         }else{
-            TTY[console_number].cursor_y++;
+            CONSOLE[console_number].cursor_y++;
 
 			//Retornaremos mesmo assim ao início da linha 
 			//se estivermos imprimindo no terminal.
             if ( stdio_terminalmode_flag == 1 ){
-                TTY[console_number].cursor_x = TTY[console_number].cursor_left;	
+                CONSOLE[console_number].cursor_x = CONSOLE[console_number].cursor_left;	
             } 
 
 			//verbose mode do kernel.
@@ -557,7 +557,7 @@ void console_outbyte (int c, int console_number)
 			//terminal, imprimindo os printfs um abaixo do outro.
 			//sempre reiniciando x.
             if ( stdio_verbosemode_flag == 1 ){
-                TTY[console_number].cursor_x = TTY[console_number].cursor_left;
+                CONSOLE[console_number].cursor_x = CONSOLE[console_number].cursor_left;
             } 
 
 			//Obs: No caso estarmos imprimindo em um editor 
@@ -576,7 +576,7 @@ void console_outbyte (int c, int console_number)
     
     if ( Ch == '\t' ) 
     {
-        TTY[console_number].cursor_x += (8);
+        CONSOLE[console_number].cursor_x += (8);
         //g_cursor_x += (4); 
         prev = Ch;
         return; 
@@ -605,7 +605,7 @@ void console_outbyte (int c, int console_number)
     // Apenas voltar ao início da linha.
     if ( Ch == '\r' )
     {
-        TTY[console_number].cursor_x = TTY[console_number].cursor_left;  
+        CONSOLE[console_number].cursor_x = CONSOLE[console_number].cursor_left;  
         prev = Ch;
         return; 
     }
@@ -627,7 +627,7 @@ void console_outbyte (int c, int console_number)
     // backspace ??
     if ( Ch == 8 )
     {
-        TTY[console_number].cursor_x--; 
+        CONSOLE[console_number].cursor_x--; 
         prev = Ch;
         return;
     }        
@@ -643,16 +643,16 @@ void console_outbyte (int c, int console_number)
 
     // fim da linha.
     // Limites para o número de caracteres numa linha.
-    if ( TTY[console_number].cursor_x > (TTY[console_number].cursor_right) )
+    if ( CONSOLE[console_number].cursor_x > (CONSOLE[console_number].cursor_right) )
     {
         // voltamos ao inicio da linha e avançamos uma linha;
-        TTY[console_number].cursor_x = TTY[console_number].cursor_left;
-        TTY[console_number].cursor_y++;
+        CONSOLE[console_number].cursor_x = CONSOLE[console_number].cursor_left;
+        CONSOLE[console_number].cursor_y++;
 
     // Incrementando.
     // Apenas incrementa a coluna.
     }else{ 
-        TTY[console_number].cursor_x++;  
+        CONSOLE[console_number].cursor_x++;  
     };
 
 
@@ -661,13 +661,13 @@ void console_outbyte (int c, int console_number)
 	// de limite diferente desse.
 
 	// Número máximo de linhas. (n pixels por linha.)
-    if ( TTY[console_number].cursor_y > TTY[console_number].cursor_bottom )  
+    if ( CONSOLE[console_number].cursor_y > CONSOLE[console_number].cursor_bottom )  
     { 
         //debug_print ("console_outbyte: scroll 3\n"); 
         console_scroll (console_number);
 
-        TTY[console_number].cursor_x = TTY[console_number].cursor_left;
-        TTY[console_number].cursor_y = TTY[console_number].cursor_bottom;
+        CONSOLE[console_number].cursor_x = CONSOLE[console_number].cursor_left;
+        CONSOLE[console_number].cursor_y = CONSOLE[console_number].cursor_bottom;
     }
 
 
@@ -735,8 +735,8 @@ void console_putchar ( int c, int console_number ){
 	// Copiar o retângulo na memória de vídeo.
 
     refresh_rectangle ( 
-        (TTY[console_number].cursor_x * cWidth), 
-        (TTY[console_number].cursor_y * cHeight), 
+        (CONSOLE[console_number].cursor_x * cWidth), 
+        (CONSOLE[console_number].cursor_y * cHeight), 
         cWidth, 
         cHeight );
 
@@ -938,7 +938,7 @@ console_write (
                 // >>> nao eh csi ... o 'E' esta no lugar do '['
                 
                 }else if (ch=='E'){ 
-                    __local_gotoxy ( 0, (TTY[console_number].cursor_y + 1), console_number );
+                    __local_gotoxy ( 0, (CONSOLE[console_number].cursor_y + 1), console_number );
                 }else if (ch=='M'){
                     __local_ri ();   //scroll. deixa pra depois. kkk
                 }else if (ch=='D'){
@@ -948,12 +948,12 @@ console_write (
                 
                 //??
                 // tivemos um 0x1b e o cursor esta em determinado lugar.
-                }else if ( TTY[console_number].cursor_x == '7'){   //?? What L.T.
+                }else if ( CONSOLE[console_number].cursor_x == '7'){   //?? What L.T.
                     __local_save_cur (console_number);
                 
                 //??
                 // tivemos um 0x1b e o cursor esta em determinado lugar.
-                }else if ( TTY[console_number].cursor_x == '8' ){  //?? What L.T.
+                }else if ( CONSOLE[console_number].cursor_x == '8' ){  //?? What L.T.
                     __local_restore_cur (console_number);
                 };
                 break;
@@ -1042,48 +1042,48 @@ console_write (
                     // mudamos o cursor e saimos da escape sequence
                     case 'G': case '`':
 						if (par[0]) par[0]--;
-						__local_gotoxy (par[0], TTY[console_number].cursor_y, console_number);
+						__local_gotoxy (par[0], CONSOLE[console_number].cursor_y, console_number);
 						break;
 
                     // mudamos o cursor e saimos da escape sequence
                     case 'A':
 						if (!par[0]) par[0]++;
-						__local_gotoxy ( TTY[console_number].cursor_x,  TTY[console_number].cursor_y - par[0], console_number);
+						__local_gotoxy ( CONSOLE[console_number].cursor_x,  CONSOLE[console_number].cursor_y - par[0], console_number);
 						break;
 
                     case 'B': case 'e':
 						if (!par[0]) par[0]++;
-						__local_gotoxy ( TTY[console_number].cursor_x, TTY[console_number].cursor_y + par[0], console_number);
+						__local_gotoxy ( CONSOLE[console_number].cursor_x, CONSOLE[console_number].cursor_y + par[0], console_number);
 						break;
 
                     // mudamos o cursor e saimos da escape sequence 
                     case 'C': case 'a':
 						if (!par[0]) par[0]++;
-						__local_gotoxy ( TTY[console_number].cursor_x + par[0], TTY[console_number].cursor_y, console_number);
+						__local_gotoxy ( CONSOLE[console_number].cursor_x + par[0], CONSOLE[console_number].cursor_y, console_number);
 						break;
 
                     // mudamos o cursor e saimos da escape sequence
                     case 'D':
 						if (!par[0]) par[0]++;
-						__local_gotoxy ( TTY[console_number].cursor_x - par[0], TTY[console_number].cursor_y, console_number);
+						__local_gotoxy ( CONSOLE[console_number].cursor_x - par[0], CONSOLE[console_number].cursor_y, console_number);
 						break;
 
                     // mudamos o cursor e saimos da escape sequence
 					case 'E':
 						if (!par[0]) par[0]++;
-						__local_gotoxy (0, TTY[console_number].cursor_y + par[0], console_number);
+						__local_gotoxy (0, CONSOLE[console_number].cursor_y + par[0], console_number);
 						break;
 
                     // mudamos o cursor e saimos da escape sequence
 					case 'F':
 						if (!par[0]) par[0]++;
-						__local_gotoxy (0, TTY[console_number].cursor_y - par[0], console_number);
+						__local_gotoxy (0, CONSOLE[console_number].cursor_y - par[0], console_number);
 						break;
 
                     // mudamos o cursor e saimos da escape sequence
 					case 'd':
 						if (par[0]) par[0]--;
-						__local_gotoxy ( TTY[console_number].cursor_x, par[0], console_number);
+						__local_gotoxy ( CONSOLE[console_number].cursor_x, par[0], console_number);
 						break;
 
                     // mudamos o cursor e saimos da escape sequence
@@ -1115,13 +1115,13 @@ console_write (
                     // Isso ajusta o top e o bottom.
                     case 'r':
 						if (par[0])  { par[0]--; }
-						if (!par[1]) { par[1] = TTY[console_number].cursor_bottom; }  
+						if (!par[1]) { par[1] = CONSOLE[console_number].cursor_bottom; }  
 						if (par[0] < par[1] &&
-						    par[1] <= TTY[console_number].cursor_bottom ) 
+						    par[1] <= CONSOLE[console_number].cursor_bottom ) 
 						{
                             // ajuste feito por 'r'.
-							TTY[console_number].cursor_top    = par[0];
-							TTY[console_number].cursor_bottom = par[1];
+							CONSOLE[console_number].cursor_top    = par[0];
+							CONSOLE[console_number].cursor_bottom = par[1];
 						}
                         break;
 
@@ -1215,17 +1215,17 @@ void console_scroll (int console_number){
     // Clena the last line.
   
 	// Salva cursor
-    OldX = TTY[console_number].cursor_x; 
-    OldY = TTY[console_number].cursor_y; 
+    OldX = CONSOLE[console_number].cursor_x; 
+    OldY = CONSOLE[console_number].cursor_y; 
 
     // Cursor na ultima linha.
-    TTY[console_number].cursor_x = TTY[console_number].cursor_left; 
-    TTY[console_number].cursor_y = ( TTY[console_number].cursor_bottom); 
+    CONSOLE[console_number].cursor_x = CONSOLE[console_number].cursor_left; 
+    CONSOLE[console_number].cursor_y = ( CONSOLE[console_number].cursor_bottom); 
 
 
    // Limpa a últime linha.
-   for ( i = TTY[console_number].cursor_x; 
-         i < TTY[console_number].cursor_right; 
+   for ( i = CONSOLE[console_number].cursor_x; 
+         i < CONSOLE[console_number].cursor_right; 
          i++ )
    {
         _console_outbyte (' ',console_number); 
@@ -1233,8 +1233,8 @@ void console_scroll (int console_number){
 
 
     // Reposiciona o cursor na última linha.
-    TTY[console_number].cursor_x = TTY[console_number].cursor_left; 
-    TTY[console_number].cursor_y = OldY;  //( TTY[console_number].cursor_bottom -1); 
+    CONSOLE[console_number].cursor_x = CONSOLE[console_number].cursor_left; 
+    CONSOLE[console_number].cursor_y = OldY;  //( CONSOLE[console_number].cursor_bottom -1); 
 
     refresh_screen();
 }
@@ -1255,8 +1255,8 @@ int kclear (int color, int console_number)
     {
         backgroundDraw ( COLOR_BLUE );
         
-        TTY[console_number].cursor_x = 0; 
-        TTY[console_number].cursor_y = 0; 
+        CONSOLE[console_number].cursor_x = 0; 
+        CONSOLE[console_number].cursor_y = 0; 
         Status = 0;
         
     }else{ Status = -1; };
@@ -1354,9 +1354,10 @@ void REFRESH_STREAM ( file *f ){
         printf ("%c", *c );
 
         refresh_rectangle ( 
-            (TTY[current_vc].cursor_x * cWidth), 
-            (TTY[current_vc].cursor_y * cHeight),  
-            cWidth, cHeight );
+            (CONSOLE[current_vc].cursor_x * cWidth), 
+            (CONSOLE[current_vc].cursor_y * cHeight),  
+            cWidth, 
+            cHeight );
 
         c++;
     };
@@ -1425,69 +1426,69 @@ void console_init_virtual_console (int n){
     }
 
     // Todo virtual console eh uma tty. Os 4.
-    TTY[ConsoleIndex].objectType  = ObjectTypeTTY;
-    TTY[ConsoleIndex].objectClass = ObjectClassKernelObjects;
-    TTY[ConsoleIndex].used = 1;
-    TTY[ConsoleIndex].magic = 1234;
+    CONSOLE[ConsoleIndex].objectType  = ObjectTypeTTY;
+    CONSOLE[ConsoleIndex].objectClass = ObjectClassKernelObjects;
+    CONSOLE[ConsoleIndex].used = 1;
+    CONSOLE[ConsoleIndex].magic = 1234;
 
     // No thread for now.
-    TTY[ConsoleIndex].control = NULL;
+    CONSOLE[ConsoleIndex].control = NULL;
 
     // tty is a terminal, so the user logs on a terminal.
     // No user logged yet.
-    TTY[ConsoleIndex].user_info = NULL;
+    CONSOLE[ConsoleIndex].user_info = NULL;
 
     // Security stuff.
     // Nao sei se essas estruturas estao prontas para isso nesse momento
     // ou se esses ponteiros sao nulos.
-    TTY[ConsoleIndex].user_session = NULL;  //CurrentUserSession;
-    TTY[ConsoleIndex].room         = NULL;  // CurrentRoom;
-    TTY[ConsoleIndex].desktop      = NULL;  // CurrentDesktop;
+    CONSOLE[ConsoleIndex].user_session = NULL;  //CurrentUserSession;
+    CONSOLE[ConsoleIndex].room         = NULL;  // CurrentRoom;
+    CONSOLE[ConsoleIndex].desktop      = NULL;  // CurrentDesktop;
 
     // file pointer
     // this file handles this tty object
-    // TTY[ConsoleIndex]._fp
+    // CONSOLE[ConsoleIndex]._fp
     
     // tty name
-    //TTY[ConsoleIndex].__ttyname[?] 
-    TTY[ConsoleIndex].ttyName_len = 0;  //initialized
+    //CONSOLE[ConsoleIndex].__ttyname[?] 
+    CONSOLE[ConsoleIndex].ttyName_len = 0;  //initialized
 
     //#todo: Indice do dispositivo.
-    // TTY[ConsoleIndex].device = 0;   // initialized.
+    // CONSOLE[ConsoleIndex].device = 0;   // initialized.
 
-    TTY[ConsoleIndex].driver = NULL;  //driver struct
-    TTY[ConsoleIndex].ldisc  = NULL;  //line discipline struct
+    CONSOLE[ConsoleIndex].driver = NULL;  //driver struct
+    CONSOLE[ConsoleIndex].ldisc  = NULL;  //line discipline struct
 
-    //TTY[ConsoleIndex].termios??       //termios struct (not a pointer)
+    //CONSOLE[ConsoleIndex].termios??       //termios struct (not a pointer)
 
     // process group.
-    TTY[ConsoleIndex].gid = current_group;
+    CONSOLE[ConsoleIndex].gid = current_group;
 
     // ??
     // Quantos processos estao usando essa tty.
-    TTY[ConsoleIndex].pid_count=0;
+    CONSOLE[ConsoleIndex].pid_count=0;
 
 
-    TTY[ConsoleIndex].type = 0;
-    TTY[ConsoleIndex].subtype = 0;
+    CONSOLE[ConsoleIndex].type = 0;
+    CONSOLE[ConsoleIndex].subtype = 0;
         
-    TTY[ConsoleIndex].flags = 0;
+    CONSOLE[ConsoleIndex].flags = 0;
 
     // not stopped
-    TTY[ConsoleIndex].stopped = 0;
+    CONSOLE[ConsoleIndex].stopped = 0;
 
     // process
-    //TTY[ConsoleIndex].process = KernelProcess;
+    //CONSOLE[ConsoleIndex].process = KernelProcess;
     
     // thread
-    //TTY[ConsoleIndex].thread  = ?
+    //CONSOLE[ConsoleIndex].thread  = ?
 
     // Qual terminal virtual esta usando essa tty.
-    TTY[ConsoleIndex].virtual_terminal_pid = 0;
+    CONSOLE[ConsoleIndex].virtual_terminal_pid = 0;
 
     // Window.
     // When we are using the kgws.
-    // TTY[ConsoleIndex].window = NULL;
+    // CONSOLE[ConsoleIndex].window = NULL;
 
 
     //
@@ -1498,57 +1499,60 @@ void console_init_virtual_console (int n){
     // No buffers fo rthe virtual consoles.
     // remember: 
     // The virtual console is used only in the 'stdout' of a process.
-    TTY[ConsoleIndex].nobuffers = TRUE;   // No buffers.
-    TTY[ConsoleIndex]._rbuffer = (file *) 0; 
-    TTY[ConsoleIndex]._cbuffer = (file *) 0;
-    TTY[ConsoleIndex]._obuffer = (file *) 0;
+    CONSOLE[ConsoleIndex].nobuffers = TRUE;   // No buffers.
+    CONSOLE[ConsoleIndex]._rbuffer = (file *) 0; 
+    CONSOLE[ConsoleIndex]._cbuffer = (file *) 0;
+    CONSOLE[ConsoleIndex]._obuffer = (file *) 0;
 
 
 
     // cursor dimentions in pixel.
     // #bugbug: determinado
-    TTY[current_vc].cursor_width_in_pixels = 8; 
-    TTY[current_vc].cursor_height_in_pixels = 8;
+    CONSOLE[current_vc].cursor_width_in_pixels = 8; 
+    CONSOLE[current_vc].cursor_height_in_pixels = 8;
 
     //cursor position in chars.
-    TTY[ConsoleIndex].cursor_x = 0;
-    TTY[ConsoleIndex].cursor_y = 0;
+    CONSOLE[ConsoleIndex].cursor_x = 0;
+    CONSOLE[ConsoleIndex].cursor_y = 0;
 
     // cursor margin
-    TTY[ConsoleIndex].cursor_left = 0;
-    TTY[ConsoleIndex].cursor_top  = 0;
+    CONSOLE[ConsoleIndex].cursor_left = 0;
+    CONSOLE[ConsoleIndex].cursor_top  = 0;
     
     // cursor limits
-    TTY[ConsoleIndex].cursor_right  = 0+(SavedX/8) -1;  // (screen width / char width)
-    TTY[ConsoleIndex].cursor_bottom = 0+(SavedY/8) -1;  // (screen height/ char height)
+    CONSOLE[ConsoleIndex].cursor_right  = 0+(SavedX/8) -1;  // (screen width / char width)
+    CONSOLE[ConsoleIndex].cursor_bottom = 0+(SavedY/8) -1;  // (screen height/ char height)
     
     //everyone.
-    TTY[ConsoleIndex].cursor_color = COLOR_WHITE; 
+    CONSOLE[ConsoleIndex].cursor_color = COLOR_WHITE; 
 
 
     if( ConsoleIndex == 0)
-            TTY[ConsoleIndex].cursor_color = COLOR_GRAY; 
+            CONSOLE[ConsoleIndex].cursor_color = COLOR_GRAY; 
 
     if( ConsoleIndex == 1)
-            TTY[ConsoleIndex].cursor_color = COLOR_RED; 
+            CONSOLE[ConsoleIndex].cursor_color = COLOR_RED; 
 
     if( ConsoleIndex == 2)
-            TTY[ConsoleIndex].cursor_color = COLOR_GREEN; 
+            CONSOLE[ConsoleIndex].cursor_color = COLOR_GREEN; 
             
     if( ConsoleIndex == 3)
-            TTY[ConsoleIndex].cursor_color = COLOR_BLUE; 
+            CONSOLE[ConsoleIndex].cursor_color = COLOR_BLUE; 
                 
 
 
     //#todo
     // Buffers !!!
-    //TTY[ConsoleIndex]._rbuffer ...
-    //TTY[ConsoleIndex]._cbuffer ...    
+    //CONSOLE[ConsoleIndex]._rbuffer ...
+    //CONSOLE[ConsoleIndex]._cbuffer ...    
 
 
     //#todo
     // Local mode flags.
-    TTY[ConsoleIndex].termios.c_lflag = ECHO;
+    CONSOLE[ConsoleIndex].termios.c_lflag = ECHO;
+
+
+    //CONSOLE[ConsoleIndex].vc_mode = 0;
 
     // #bugbug
     // A estrutura tem mais elementos que podem ser inicializados.
@@ -1590,19 +1594,19 @@ console_ioctl (
     // Change the color of the char for the current virtual console.
     // ok. it is working.
     case 1000:
-        TTY[current_vc].cursor_color = (unsigned long) arg;
+        CONSOLE[current_vc].cursor_color = (unsigned long) arg;
         return 0;  //ok
         break;
 
     // cursor x position
     case 1001:
-        TTY[current_vc].cursor_x = 0;
+        CONSOLE[current_vc].cursor_x = 0;
         return 0;  //ok
         break;
 
     // cursor y position
     case 1002:
-        TTY[current_vc].cursor_y = 0;
+        CONSOLE[current_vc].cursor_y = 0;
         return 0;  //ok
         break;
 

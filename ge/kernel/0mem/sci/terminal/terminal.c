@@ -65,6 +65,20 @@ terminal_ioctl (
 // O sistema poderá ter 8 terminais virtuais tty e 8
 // usuários diferentes poderão logar ao mesmo tempo.
 
+
+// #bugbug
+// There is something wrong here.
+// The purpose of this routine is to setup the
+// window for the virtual terminal, not
+// for the virtual console.
+// So, we need two routines, 
+// one for the virtual consoles and
+// another one for the virtual terminals.
+// Both will use the tty structure,
+// but the console is not able to use
+// all the tty features (there is a bug)
+
+
 void systemSetTerminalWindow ( struct window_d *window ){
 
 	// Obs: ?? Como faremos para pintar dentro da janela do terminal.
@@ -118,9 +132,12 @@ void systemSetTerminalWindow ( struct window_d *window ){
 	//..
 
     window->terminal_left = window->left;
-    window->terminal_top = window->top;
-    window->terminal_width = window->width;
+    window->terminal_top  = window->top;
+
+    window->terminal_width  = window->width;
     window->terminal_height = window->height;
+    
+    
     
 
     // #bugbug
@@ -128,21 +145,35 @@ void systemSetTerminalWindow ( struct window_d *window ){
     // so temos 4.
     // eles ja estao inicializados.
     // #todo: podeia ter uma flag que diz se ja inicializamos os consoles.
-    
+ 
+ 
+// #bugbug
+// There is something wrong here.
+// The purpose of this routine is to setup the
+// window for the virtual terminal, not
+// for the virtual console.
+// So, we need two routines, 
+// one for the virtual consoles and
+// another one for the virtual terminals.
+// Both will use the tty structure,
+// but the console is not able to use
+// all the tty features (there is a bug)
+ 
+ 
     if (current_vc < 0 || current_vc>3)
         panic("systemSetTerminalWindow: current_vc");
 
     //position
-    TTY[current_vc].cursor_x = (window->left / 8);
-    TTY[current_vc].cursor_y = (window->top  / 8);
+    CONSOLE[current_vc].cursor_x = (window->left / 8);
+    CONSOLE[current_vc].cursor_y = (window->top  / 8);
 
     //margin
-    TTY[current_vc].cursor_left = TTY[current_vc].cursor_x; 
-    TTY[current_vc].cursor_top  = TTY[current_vc].cursor_y;
+    CONSOLE[current_vc].cursor_left = CONSOLE[current_vc].cursor_x; 
+    CONSOLE[current_vc].cursor_top  = CONSOLE[current_vc].cursor_y;
 
     //limits
-    TTY[current_vc].cursor_right  = 0+(SavedX/8) -1;  // (screen width / char width)
-    TTY[current_vc].cursor_bottom = 0+(SavedY/8) -1;  // (screen height/ char height)
+    CONSOLE[current_vc].cursor_right  = 0+(SavedX/8) -1;  // (screen width / char width)
+    CONSOLE[current_vc].cursor_bottom = 0+(SavedY/8) -1;  // (screen height/ char height)
 
 
 	//
@@ -219,36 +250,32 @@ void systemSetTerminalWindow ( struct window_d *window ){
     //#bugbug
     //isso tá errado. limite   80;
 
-    if ( TTY[current_vc].cursor_left > 800 )
-	{
-        TTY[current_vc].cursor_left = 795;
-    }
-
-    if ( TTY[current_vc].cursor_top > 600 )
-	{
-         TTY[current_vc].cursor_top = 595;
-    }
-
-    if ( TTY[current_vc].cursor_right > 800 )
-	{
-         TTY[current_vc].cursor_right = 795;
-    }
-
-    if ( TTY[current_vc].cursor_bottom > 600 )
+    if ( CONSOLE[current_vc].cursor_left > 800 )
     {
-         TTY[current_vc].cursor_bottom = 595;
+        CONSOLE[current_vc].cursor_left = 795;
+    }
+
+    if ( CONSOLE[current_vc].cursor_top > 600 )
+    {
+         CONSOLE[current_vc].cursor_top = 595;
+    }
+
+    if ( CONSOLE[current_vc].cursor_right > 800 )
+    {
+         CONSOLE[current_vc].cursor_right = 795;
+    }
+
+    if ( CONSOLE[current_vc].cursor_bottom > 600 )
+    {
+         CONSOLE[current_vc].cursor_bottom = 595;
     }
 
 
-    //
     // Cursor.
-    //
 
-    TTY[current_vc].cursor_width_in_pixels  = 8; 
-    TTY[current_vc].cursor_height_in_pixels = 8; 
-    TTY[current_vc].cursor_color  = COLOR_WHITE;
-
-
+    CONSOLE[current_vc].cursor_width_in_pixels  = 8; 
+    CONSOLE[current_vc].cursor_height_in_pixels = 8; 
+    CONSOLE[current_vc].cursor_color  = COLOR_WHITE;
 
 
 	//

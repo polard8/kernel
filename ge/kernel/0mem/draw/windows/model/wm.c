@@ -1157,8 +1157,8 @@ void windowShowWindowList (void){
 	//@todo: Chamar método.	
 	//Cursor.
 
-    TTY[current_vc].cursor_x = (left/8);
-    TTY[current_vc].cursor_y = (top/8);  
+    CONSOLE[current_vc].cursor_x = (left/8);
+    CONSOLE[current_vc].cursor_y = (top/8);  
 	//set_up_cursor(0,10);
 
 
@@ -1213,14 +1213,14 @@ void windowShowWindowList (void){
 		// #bugbug
 		// Cuidado para não dividir por '0'.
 
-		TTY[current_vc].cursor_left   = (hWindow->left/8);
-		TTY[current_vc].cursor_top    = (hWindow->top/8) + 4;   //Queremos o início da área de clente.
-		TTY[current_vc].cursor_right  = TTY[current_vc].cursor_left + (width/8);
-		TTY[current_vc].cursor_bottom = TTY[current_vc].cursor_top  + (height/8);
+		CONSOLE[current_vc].cursor_left   = (hWindow->left/8);
+		CONSOLE[current_vc].cursor_top    = (hWindow->top/8) + 4;   //Queremos o início da área de clente.
+		CONSOLE[current_vc].cursor_right  = CONSOLE[current_vc].cursor_left + (width/8);
+		CONSOLE[current_vc].cursor_bottom = CONSOLE[current_vc].cursor_top  + (height/8);
 
 		//cursor (0, mas com margem nova).
-		TTY[current_vc].cursor_x = TTY[current_vc].cursor_left; 
-		TTY[current_vc].cursor_y = TTY[current_vc].cursor_top; 
+		CONSOLE[current_vc].cursor_x = CONSOLE[current_vc].cursor_left; 
+		CONSOLE[current_vc].cursor_y = CONSOLE[current_vc].cursor_top; 
 
         //Mostrando as informações de todas as janelas registradas.
         while( i < WINDOW_COUNT_MAX )
@@ -1250,14 +1250,14 @@ void windowShowWindowList (void){
 
 
 		//voltando a margem normal a margem
-		TTY[current_vc].cursor_left   = (left/8); 
-		TTY[current_vc].cursor_top    = (top/8);
-		TTY[current_vc].cursor_right  = (width/8);
-		TTY[current_vc].cursor_bottom = (height/8); 
+		CONSOLE[current_vc].cursor_left   = (left/8); 
+		CONSOLE[current_vc].cursor_top    = (top/8);
+		CONSOLE[current_vc].cursor_right  = (width/8);
+		CONSOLE[current_vc].cursor_bottom = (height/8); 
 
 		//cursor (0, mas com margem nova)
-		TTY[current_vc].cursor_x = TTY[current_vc].cursor_left; 
-		TTY[current_vc].cursor_y = TTY[current_vc].cursor_top;
+		CONSOLE[current_vc].cursor_x = CONSOLE[current_vc].cursor_left; 
+		CONSOLE[current_vc].cursor_y = CONSOLE[current_vc].cursor_top;
         //set_up_cursor(g_cursor_left,g_cursor_top); 
 
 
@@ -2709,12 +2709,13 @@ void SetFocus ( struct window_d *window ){
         active_thread  = window->control->tid;
       
         // Current virtual console.
-        TTY[current_vc].control = (struct thread_d *) window->control;
+        CONSOLE[current_vc].control = (struct thread_d *) window->control;
       
         // ...
       
         // priority
-        set_thread_priority ( (struct thread_d *) window->control,
+        set_thread_priority ( 
+            (struct thread_d *) window->control,
             PRIORITY_MAX );
     }
 }

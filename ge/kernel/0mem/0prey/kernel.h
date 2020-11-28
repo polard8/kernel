@@ -155,9 +155,6 @@ extern void do_executa_new_task (void);
 #include "ws/model/ascii.h" 
 
 
-//tty
-#include "tty/virtcon.h"
-
 
 // fs
 #include "fs/path.h"         // path.
@@ -210,12 +207,6 @@ extern void do_executa_new_task (void);
 #include "storage/volume.h"
 #include "storage/disk.h"  
 #include "storage/storage.h" 
-
-
-
-// ws - window server, and beyond
-// ps2 controller.
-//#include "ws/view/ps2.h"
 
 
 
@@ -332,6 +323,8 @@ extern void do_executa_new_task (void);
 #include "tty/pty.h"
 #include "tty/vt.h"
 #include "tty/console.h"
+
+
 
 
 // ws - 

@@ -1750,18 +1750,16 @@ int stdioInitialize (void){
     // tty.h
     // console.h
 
-    for (i=0; i<4; i++)
-    {
-        TTY[i].cursor_x = 0;   
-        TTY[i].cursor_y = 0;     
-        TTY[i].cursor_left = 0; 
-        TTY[i].cursor_top = 0;  
-        TTY[i].cursor_right  = (SavedX/cWidth); 
-        TTY[i].cursor_bottom = (SavedY/cHeight); 
-        TTY[i].cursor_color = COLOR_WHITE;  
+    for (i=0; i<4; i++){
+        CONSOLE[i].cursor_x = 0;   
+        CONSOLE[i].cursor_y = 0;     
+        CONSOLE[i].cursor_left = 0; 
+        CONSOLE[i].cursor_top = 0;  
+        CONSOLE[i].cursor_right  = (SavedX/cWidth); 
+        CONSOLE[i].cursor_bottom = (SavedY/cHeight); 
+        CONSOLE[i].cursor_color = COLOR_WHITE;  
     };
 
-    
 	// Done !
 
     return 0;

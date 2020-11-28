@@ -162,6 +162,16 @@ struct tty_d
     // Quantos processos estao usando essa tty.
     int pid_count;
 
+    //=========================
+    
+    // Qual eh o modo de operacao do terminal virtual.
+    // graphics, text ...
+    //int vt_mode;
+    
+    // Qual eh o modo de operacao do console virtual.
+    // graphics, text ...
+    int vc_mode;
+
 
     short type;       // type of tty
     short subtype;    // subtype of tty 
@@ -256,29 +266,26 @@ struct tty_d
 
 
 
+//
+// == consoles =================================================
+//
 
 // Consoles virtuais
 // Consoles virtuais em full screen.
 // Criados a unha pelo kernel.
 
-//#define MAX_KERNEL_VIRTUAL_CONSOLES 4
+#define CONSOLE_COUNT_MAX    4
+
+// Index.
 int current_vc;
 
 // Virtual consoles.
-static struct tty_d TTY[4];
-
-
-
+static struct tty_d CONSOLE[CONSOLE_COUNT_MAX];
+// ==============================================================
 
 //
-// Pseudo terminais.
+// == prototyes =================================================
 //
-
-
-// Usado pelos aplicativos para criarem terminais virtuais.
-// Criadas com ponteiros e alocadas com kmalloc.
-//int current_pts;
-
 
 
 // Get the tty pointer.
@@ -297,15 +304,11 @@ struct tty_d *tty_create (void);
 int tty_delete ( struct tty_d *tty );
 
 
-
-
-
 /*
 int pty_write(struct tty_d *tty, const char *buf, int c);
 int pty_write(struct tty_d *tty, const char *buf, int c)
 {}
 */
-
 
 
 void tty_stop (struct tty_d *tty);

@@ -24,6 +24,11 @@ int sys_read_pipe ( int fd, char *ubuf, int count );
 int sys_write_pipe ( int fd, char *ubuf, int count );
 
 
+
+int pipe_ioctl ( int fd, unsigned long request, unsigned long arg );
+
+
+
 #endif
 
 

@@ -436,8 +436,7 @@ int main ( int argc, char *argv[] ){
     gde_enter_critical_section ();  
     client_window = (void *) gde_create_window ( WT_SIMPLE, 1, 1, 
                                 "client-bg",     
-                                1, 1, 
-                                width -2, height -2, 
+                                1, 1, (width -2), (height -2), 
                                 main_window, 0, 
                                 0xF5DEB3, 0xF5DEB3 );
 
@@ -446,7 +445,8 @@ int main ( int argc, char *argv[] ){
         printf ("client_window fail");
         gde_show_backbuffer();
         gde_exit_critical_section ();
-        while(1){}
+        exit(1);
+        //while(1){}
     }
     gde_register_window (client_window);
     gde_show_window (client_window);
@@ -463,8 +463,7 @@ int main ( int argc, char *argv[] ){
     gde_enter_critical_section ();  
     client_bar_Window = (void *) gde_create_window ( WT_SIMPLE, 1, 1, 
                                     "client-bar",     
-                                    2, 2, 
-                                    ((width -16 -16) -2 -2), 40, 
+                                    2, 2, (width -8), 40, 
                                     client_window, 0, 
                                     0x404040, 0x404040 );
     
@@ -520,8 +519,7 @@ int main ( int argc, char *argv[] ){
     gde_enter_critical_section ();  
     data_window = (void *) gde_create_window ( WT_SIMPLE, 1, 1, 
                                "DataWindow",     
-                                4, 48, 
-                                ((width -16 -16) -4 -4), ((height*2)/3), 
+                                4, 48, (width -8), ((height*2)/3), 
                                 client_window, 0, 
                                 COLOR_WHITE, COLOR_WHITE );
 

@@ -6,8 +6,35 @@
 #define ____CONSOLE_H  1
 
 
-//#define CONSOLE_COUNT_MIN    1
-//#define CONSOLE_COUNT_MAX    4
+
+struct virtual_console_login_d
+{
+    int id;
+
+    int used;
+    int magic;
+
+
+    // Index in the list CONSOLE[i].
+    // See: tty.h
+    int virtual_console_index;
+
+    // 0 = 'text'
+    // 1 = 'x-server'
+    int mode;
+    
+    struct user_info_d *user_info;
+    
+    struct usession_d *usession;
+    struct room_d     *room;     //window station
+    struct desktop_d  *desktop;
+};
+
+
+
+//
+// == prototypes ================================================
+//
 
 
 //
