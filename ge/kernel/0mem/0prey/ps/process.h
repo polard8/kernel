@@ -1085,6 +1085,13 @@ void show_currentprocess_info (void);
 void show_process_information (void);
 
 
+void process_copy_files (struct process_d *from, struct process_d *to);
+
+// fecha todos os arquivos que podem ser fechados,
+// mas se a flag estiver acionada, fecha todos mesmo.
+void process_close_files(struct process_d *process, int all);
+
+
 // Copia a imagem do processo que est� carregada na mem�ria.
 int processCopyMemory ( struct process_d *process );
 
@@ -1122,6 +1129,8 @@ void CloseAllProcesses (void);
 
 void exit_process ( pid_t pid, int code );
 
+// exit current process.
+void exit_current_process ( int code );
 
 //critical section
 void process_enter_criticalsection(int pid);
@@ -1135,8 +1144,9 @@ int get_caller_process_id (void);
 int init_process_manager (void);
 
 
-file *get_file_from_fd ( int pid, int fd );
 
+file *process_get_file_from_pid ( pid_t pid, int fd );
+file *process_get_file ( int fd );
 
 // cria um novo process, uma thread e carrega a imagem.
 int 

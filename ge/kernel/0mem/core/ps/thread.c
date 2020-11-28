@@ -28,6 +28,114 @@
 #include <kernel.h>
 
 
+/*
+ *******************************************************
+ * exit_thread:
+ *     Exit a thread.
+ *     Torna o estado ZOMBIE mas não destrói a estrutura.
+ *     Outra rotina destruirá as informações de uma estrutura de thread zombie.
+ */
+ 
+void exit_thread (int tid){
+
+    struct thread_d *Thread;
+
+
+    if ( tid < 0 || tid >= THREAD_COUNT_MAX )
+    {
+        debug_print ("exit_thread: tid\n");
+        return;
+    }
+
+
+    // The idle thread.
+    if ( (void *) ____IDLE == NULL ){
+        panic ("exit_thread: ____IDLE fail");
+
+    }else{
+
+        if ( ____IDLE->used != 1 || ____IDLE->magic != 1234 )
+        {
+            panic ("exit_thread: ____IDLE validation");
+        }
+
+        // We can't exit the idle thread.
+        if ( tid == ____IDLE->tid ){
+            panic ("exit_thread: Sorry, we can't kill the idle thread!");
+        }
+
+        // ...
+    };
+
+
+    // Get thread structure.
+
+    Thread = (void *) threadList[tid];
+
+    if ( (void *) Thread == NULL ){
+        printf ("exit_thread: [FAIL] This thread doesn't exist\n");
+        goto fail;
+    }else{
+        if ( Thread->used !=1 || Thread->magic != 1234 )
+        {
+            printf ("exit_thread: validation \n");
+            goto fail;
+            //refresh_screen();
+            //return;
+        }
+
+        //
+        // Zombie!
+        //
+        
+        // Lembrando que se deixarmos no estado ZOMBIE o 
+        // deadthread collector vai destruir a estrutura.
+
+        Thread->state = ZOMBIE; 
+        
+        // #bugbug: Not used for now !!!
+        
+        // Isso avisa o sistema que ele pode 
+        // acordar o dead thread collector.
+        // Isso poderia ser apenas uma atividade extra, 
+        // como acontece com os requests.
+        
+        dead_thread_collector_flag = 1; 
+        
+        // Se matamos a thread atual. 
+        // #bugbug: It looks very dangeours!
+        if ( tid == current_thread ){ 
+            debug_print ("exit_thread: scheduler\n");
+            scheduler(); 
+        }
+
+        // Se falhou o escalonamento. 
+        // Tentaremos a idle, previamente conferida.
+        
+        if ( current_thread < 0 || 
+             current_thread >= THREAD_COUNT_MAX )
+        {
+            current_thread = ____IDLE->tid;
+            debug_print ("exit_thread: scheduler fail. Using idle\n");
+        }
+    };
+
+done:
+    debug_print ("exit_thread: done\n");
+    return;
+fail:
+    refresh_screen();
+    return;
+}
+
+
+// exit current thread.
+void exit_current_thread(void)
+{
+    exit_thread(current_thread);
+}
+
+
 // Thread stats.
 unsigned long __GetThreadStats ( int tid, int index ){
 
@@ -35,8 +143,15 @@ unsigned long __GetThreadStats ( int tid, int index ){
 
     //#todo:
     //checar validade dos argumentos.
+    
+    // safety
+    if ( tid < 0 || index < 0 )
+    {
+       return 0;
+    }
 
-	//Struct.
+
+    //Struct.
     t = (void *) threadList[tid];
 
     if ( (void *) t == NULL ){
@@ -143,6 +258,13 @@ int getthreadname ( int tid, char *buffer )
 
     //#todo
     //checar validade dos argumentos.
+
+    // safety
+    if ( tid < 0  )
+    {
+       return 0;
+    }
+
  
     t = (struct thread_d *) threadList[tid]; 
 
@@ -178,12 +300,19 @@ int thread_profiler( int service ){
     unsigned long __total = 0; //todas inclusive idle.
     
     
+    // safety
+    if ( service < 0 )
+    {
+       return -1;
+    }
+    
+    
+    
     __current = (struct thread_d *) threadList[current_thread];
     
-    if ( (void *) __current == NULL ){
-        printf ("thread_profiler: t");
-        die();
-        //return -1;
+    if ( (void *) __current == NULL )
+    {
+        panic ("thread_profiler: __current");
     }
     
     
@@ -242,9 +371,7 @@ unsigned long
 thread_get_profiler_percentage ( struct thread_d *thread)
 {
     if ( (void *) thread == NULL ){
-        printf ("thread_get_profiler_percentage: thread");
-        die();
-        //return -1;
+        panic ("thread_get_profiler_percentage: thread");
     }
  
     return ( unsigned long ) thread->profiler_percentage_running;

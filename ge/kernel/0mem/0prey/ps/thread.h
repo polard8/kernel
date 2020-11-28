@@ -858,8 +858,14 @@ void spawn_thread (int id);
 void release ( int tid );
 
 
-//Torna zumbi uma thread.
+
+// Torna zumbi uma thread.
 void exit_thread ( int tid );       
+
+
+// exit current thread.
+void exit_current_thread(void);
+
 
 
 //Destrói uma thread.

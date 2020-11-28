@@ -92,6 +92,7 @@ int processNewPID;
 
 
 
+
 //
 // =====================================
 //
@@ -472,6 +473,19 @@ int processSendSignal (struct process_d *p, unsigned long signal){
 	return 1;
 }
 
+
+//copy all the files from a process to another
+void process_copy_files (struct process_d *from, struct process_d *to)
+{
+    debug_print("process_copy_files: [TODO]\n");
+}
+
+// fecha todos os arquivos que podem ser fechados,
+// mas se a flag estiver acionada, fecha todos mesmo.
+void process_close_files(struct process_d *process, int all)
+{
+    debug_print("process_close_files: [TODO]\n");
+}
 
 /*
  ****************************
@@ -1675,10 +1689,12 @@ fail:
  *     processCloseAllProcesses();    
  */
 
-void CloseAllProcesses (void){
-
-    struct process_d *P;
+void CloseAllProcesses (void)
+{
+    //loop
     int i=0;
+    
+    struct process_d *P;
 
 	// #importante:
 	// Menos o 0, pois � o kernel. 
@@ -1777,10 +1793,12 @@ void show_currentprocess_info (void){
 // e o endere�o mostrado � em rela��o ao diret�rio de p�ginas do kernel
 // pois o kernel � que controla o posicionamento das imagens.
 
-void show_process_information (void){
-
-    struct process_d *p;
+void show_process_information (void)
+{
+    // loop
     int i=0;
+    
+    struct process_d *p;
 
 
     printf ("\n\n show_process_information: \n\n");
@@ -1826,7 +1844,9 @@ void show_process_information (void){
  */
 
 void 
-SetProcessDirectory ( struct process_d *process, unsigned long Address )
+SetProcessDirectory ( 
+    struct process_d *process, 
+    unsigned long Address )
 {
     if ( (void *) process != NULL )
     {
@@ -1851,7 +1871,6 @@ unsigned long GetProcessDirectory ( struct process_d *process ){
 		//@todo: checar used e magic.
         return (unsigned long) process->DirectoryPA;
     }
-
 
     return (unsigned long) 0;
 }
@@ -1887,7 +1906,8 @@ unsigned long GetPageDirValue (void)
 // #bugbug
 // Deprecated!
 
-int init_task (int id){ 
+int init_task (int id)
+{ 
     id=0;
     panic ("init_task: deprecated");
     return -1;   
@@ -2089,7 +2109,6 @@ void exit_process ( pid_t pid, int code ){
         goto done;
 
     }else{
-		
 		// Ok, se o primeiro da lista � v�lido, podemos 
 		// tentar fechar todas.
         // ... 
@@ -2170,6 +2189,11 @@ done:
 }
 
 
+// exit current process.
+void exit_current_process ( int code )
+{
+    exit_process( current_process, code );
+}
 
 // ??
 int get_caller_process_id (void)
@@ -2230,21 +2254,19 @@ unsigned long GetProcessHeapStart ( pid_t pid ){
 
 	//Limits.
 
-    if ( pid < 0 || pid >= PROCESS_COUNT_MAX ){
+    if ( pid < 0 || pid >= PROCESS_COUNT_MAX )
+    {
         goto fail; 
     }
 
 
     process = (struct process_d *) processList[pid];
     
-    if ( (void *) process == NULL )
-    {
-		goto fail;
-		 
+    if ( (void *) process == NULL ){
+        goto fail;
     }else{
 
-        if ( process->used != 1 || 
-             process->magic != 1234 )
+        if ( process->used != 1 || process->magic != 1234 )
         {
             goto fail;
         }
@@ -2278,21 +2300,16 @@ unsigned long GetProcessPageDirectoryAddress ( pid_t pid ){
 
     process = (struct process_d *) processList[pid];
 
-    if ( (void *) process == NULL )
-    {
-		goto fail;
-		 
+    if ( (void *) process == NULL ){
+        goto fail;
     }else{
-
-        if ( process->used != 1 || 
-             process->magic != 1234 )
+        if ( process->used != 1 || process->magic != 1234 )
         {
             goto fail;
         }
 
         return (unsigned long) process->DirectoryPA;
     };
-
 
 fail:
     return (unsigned long) 0;
@@ -2366,15 +2383,12 @@ int process_find_empty_stream_slot ( struct process_d *process ){
 */
 
 
-    
+ 
 //=============
 
 // Pega uma stream na lista de arquivos dado o fd.
 
-
-//mudar para: get_file_from_fd
-//file *get_stream_from_fd ( int pid, int fd )
-file *get_file_from_fd ( int pid, int fd )
+file *process_get_file_from_pid ( pid_t pid, int fd )
 {
     struct process_d *p;
     file *fp;
@@ -2395,6 +2409,18 @@ file *get_file_from_fd ( int pid, int fd )
     // #bugbug: Overflow.
     
     return ( file * ) p->Objects[fd];  
+}
+
+
+// Return the file pointer from a given fd.
+// the fd represents a index in the object list of the
+// current process.
+file *process_get_file ( int fd )
+{
+    if( fd<0)
+        return NULL;
+
+    return (file *) process_get_file_from_pid (current_process, fd );
 }
 
 //===============

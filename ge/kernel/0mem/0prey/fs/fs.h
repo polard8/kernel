@@ -358,6 +358,12 @@ struct file_access_d
 //
 
 
+void file_close (file *_file);
+int file_truncate ( file *_file, size_t len);
+size_t file_get_len(file *_file);
+
+
+
 struct fat16_directory_entry_d *fs_new_fat16_directory_entry(void);
 
 

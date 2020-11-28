@@ -215,6 +215,26 @@ unsigned char lfn_checksum(const unsigned char *pFCBName)
 */
 
 
+
+
+void file_close (file *_file)
+{
+    debug_print("file_close: todo\n");
+}
+
+int file_truncate ( file *_file, size_t len)
+{
+    debug_print("file_truncate: todo\n");
+    return -1;
+}
+
+size_t file_get_len(file *_file)
+{
+    debug_print("file_get_len: todo\n");
+    return (size_t) -1;
+}
+
+
 //OUT: inode structure.
 struct inode_d *file_inode (file *f)
 {
@@ -2298,17 +2318,17 @@ sys_read_file_from_disk (
     if (Status != 1)
     {
          //#debug
-         printf ("sys_read_file: [FIXME] File not found!\n");
+         printf ("sys_read_file_from_disk: [FIXME] File not found!\n");
          refresh_screen();
          
          // Create a new one.
          if (flags & O_CREAT)
          {
-             debug_print ("sys_read_file: [O_CREAT] Creating a new file\n"); 
+             debug_print ("sys_read_file_from_disk: [O_CREAT] Creating a new file\n"); 
 
              buff = (void*) kmalloc(1024);
              if ((void*)buff==NULL){
-                 debug_print("sys_read_file: buff fail\n");
+                 debug_print("sys_read_file_from_disk: buff fail\n");
                  return -1; 
              }
 
@@ -2345,12 +2365,12 @@ __go:
     p = (struct process_d *) processList[current_process];
 
     if ( (void *) p == NULL ){
-        debug_print ("sys_read_file: p\n");
+        debug_print ("sys_read_file_from_disk: p\n");
         return -1;
     }
 
     if ( p->used != 1 || p->magic != 1234 ){
-        debug_print ("sys_read_file: validation\n");
+        debug_print ("sys_read_file_from_disk: validation\n");
         return -1;
     }
     
@@ -2361,14 +2381,14 @@ __go:
          if ( p->Objects[__slot] == 0 ){ goto __OK; }
     };
     
-    panic ("sys_read_file: No slots!\n");
+    panic ("sys_read_file_from_disk: No slots!\n");
 
 // Slot found.
 __OK:
 
     if ( __slot < 0 || __slot >= 32 )
     {
-        printf ("sys_read_file: Slot fail\n");
+        printf ("sys_read_file_from_disk: Slot fail\n");
         refresh_screen();
         return (int) (-1);
     }
@@ -2378,7 +2398,7 @@ __OK:
     __file = (file *) kmalloc( sizeof(file) );
     
     if ( (void *) __file == NULL ){
-        printf ("sys_read_file: __file\n");
+        printf ("sys_read_file_from_disk: __file\n");
         refresh_screen();
         return -1;
 
@@ -2429,7 +2449,7 @@ __OK:
     __file->_base = (char *) kmalloc(BUFSIZ);
     
     if ( (void *) __file->_base == NULL ){
-        printf ("sys_read_file: buffer fail\n");
+        printf ("sys_read_file_from_disk: buffer fail\n");
         refresh_screen();
         return -1;
     }
@@ -2440,7 +2460,7 @@ __OK:
     FileSize = (size_t) fsRootDirGetFileSize( (unsigned char *) file_name );
     
     if (FileSize <= 0){
-        printf ("sys_read_file: File size fail\n");
+        printf ("sys_read_file_from_disk: File size fail\n");
         refresh_screen();
         return (-1);
     }
@@ -2456,7 +2476,7 @@ __OK:
         // #bugbug: Provisório.
         // Limite - 1MB.
         if (FileSize > 1024*1024){
-            printf ("sys_read_file: File size out of limits\n");
+            printf ("sys_read_file_from_disk: File size out of limits\n");
             printf ("%d bytes \n",FileSize);
             refresh_screen();
             return (-1);
@@ -2466,7 +2486,7 @@ __OK:
         __file->_base = (char *) kmalloc(FileSize);
         
         if ( (void *) __file->_base == NULL ){
-            printf ("sys_read_file: Couldn't create a new buffer\n");
+            printf ("sys_read_file_from_disk: Couldn't create a new buffer\n");
             refresh_screen();
             return -1;             
         }
@@ -2480,7 +2500,7 @@ __OK:
     // #bugbug: Provisório.
     // Limits - 1MB
     if (FileSize > 1024*1024){
-        printf ("sys_read_file: File size out of limits\n");
+        printf ("sys_read_file_from_disk: File size out of limits\n");
         refresh_screen();
         return -1;
     }
@@ -2488,7 +2508,7 @@ __OK:
     // #paranoia.
     // Checando base novamente.
     if ( (void *) __file->_base == NULL ){
-        printf ("sys_read_file: buffer fail\n");
+        printf ("sys_read_file_from_disk: buffer fail\n");
         refresh_screen();
         return -1;
     }
@@ -2510,7 +2530,7 @@ __OK:
                        __file->_lbfsize );
 
     if ( Status != 0 ){
-        printf ("sys_read_file: fsLoadFile fail\n");
+        printf ("sys_read_file_from_disk: fsLoadFile fail\n");
         refresh_screen();
         return -1;
     }
@@ -2557,7 +2577,7 @@ __OK:
        
     //if (mode == 0)
     //{
-          debug_print ("sys_read_file: default mode\n");
+          debug_print ("sys_read_file_from_disk: default mode\n");
           __file->_p = __file->_base;
     //}
 
@@ -2566,13 +2586,13 @@ __OK:
     // O offset fica no fim do arquivo.
     if ( mode & O_APPEND)        
     { 
-        debug_print ("sys_read_file: O_APPEND\n");
+        debug_print ("sys_read_file_from_disk: O_APPEND\n");
         //__file->_p = __file->_base + s;
     }
 
     if ( mode & O_ASYNC )        
     { 
-         debug_print ("sys_read_file: O_ASYNC\n");
+         debug_print ("sys_read_file_from_disk: O_ASYNC\n");
     }
 
     /* 
@@ -2586,7 +2606,7 @@ __OK:
 
     if ( mode & O_CREAT )        
     { 
-         debug_print ("sys_read_file: O_CREAT\n");
+         debug_print ("sys_read_file_from_disk: O_CREAT\n");
     }
         
              
@@ -2613,11 +2633,10 @@ __OK:
     // Pois essa rotina � usada por open();
     //      
 
-    debug_print ("sys_read_file: done\n");
+    debug_print ("sys_read_file_from_disk: done\n");
                   
     return (int) __file->_file;
 }
-
 
 
 
@@ -2735,7 +2754,10 @@ sys_write_file_to_disk (
     taskswitch_lock ();
     scheduler_lock ();
 
-    __ret = (int) fsSaveFile ( VOLUME1_FAT_ADDRESS, VOLUME1_ROOTDIR_ADDRESS, FAT16_ROOT_ENTRIES,
+    __ret = (int) fsSaveFile ( 
+                      VOLUME1_FAT_ADDRESS, 
+                      VOLUME1_ROOTDIR_ADDRESS, 
+                      FAT16_ROOT_ENTRIES,
                       (char *) file_name,    
                       (unsigned long) file_size,       
                       (unsigned long) size_in_bytes,  
@@ -2746,9 +2768,9 @@ sys_write_file_to_disk (
     taskswitch_unlock ();
     //--
 
-    debug_print ("sys_save_file: done\n");
+    debug_print ("sys_write_file_to_disk: done\n");
     
-    return __ret;
+    return (int) __ret;
 }
 
 
