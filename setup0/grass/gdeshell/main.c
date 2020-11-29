@@ -3735,10 +3735,11 @@ done:
         
         // Top of the screen ?
         printf("\f");
-        printf("Gramado Setup");
+        //printf("Gramado Setup");
+        printf("Gramado OS 1.0");
         printf("\n");
         
-        printf("=============");
+        printf("==============");
         printf("\n");
         
         printf("\n");
