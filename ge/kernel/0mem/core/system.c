@@ -1056,16 +1056,16 @@ unsigned long systemGetSystemMetrics ( int index ){
         return (unsigned long) 0;
 
 
-    switch ( index )
-    {
-		//screen width.
-		case 1:
-		    return (unsigned long) screenGetWidth();
-		    break;
-			
-		//screen height.	
-		case 2:
-		    return (unsigned long) screenGetHeight();
+    switch ( index ){
+
+        //screen width.
+        case 1:
+            return (unsigned long) screenGetWidth();
+            break;
+
+        //screen height.	
+        case 2:
+            return (unsigned long) screenGetHeight();
             break;
 
 
@@ -1394,8 +1394,31 @@ unsigned long systemGetSystemMetrics ( int index ){
         // ...
 
        // gramado mode, gamemode.
-       case 130: return (unsigned long) current_mode; break;
+       case 130: 
+           return (unsigned long) current_mode; 
+           break;
 
+        // 200 ~ 2xx window server info.
+        // See: ws.h
+
+        case 200:
+           return (unsigned long) WindowServer.type;
+           break;
+
+        case 201:
+           return (unsigned long) WindowServer.pid; 
+           break;
+
+        case 202:
+           return (unsigned long) WindowServer.virtual_console; 
+           break;
+
+        case 203:
+           return (unsigned long) WindowServer.initialized; 
+           break;
+
+        // ...
+                
         default:
             goto done;
             break;

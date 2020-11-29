@@ -10,9 +10,7 @@
 ;     +Passa o comando para ele.
 ;
 ; History:
-;
-;     2015 - Created.
-;     ...
+;     2015 - Created by Fred Nora.
 ;
 
 
@@ -50,21 +48,21 @@ lista_file_clusters:
 ;     ecx = ??
 ;     edx = ??
 ;
+
 fat16ReadFile:
 
     pushad 
 
 	;Salva o endereço do nome do arquivo.
     mov dword [g_image_address], eax 	
-	
+
     ;Confere o número do disco.
     cmp byte [fat16_bpb.DriveNumber], byte 0x80	
     jne .fail
-	
-	;
+
+
 	; Go!
-	;
-	
+
     xor eax, eax  
     xor ebx, ebx
     xor ecx, ecx
@@ -242,6 +240,7 @@ fat16ReadFile:
 ; IN:
 ;     eax = Endereço do nome do arquivo.
 ;
+
 fat16_write_file:
 fat16WriteFile:
  
@@ -251,7 +250,7 @@ fat16WriteFile:
     mov dword [g_image_address], eax 	
 	 
     ;confere o numero do disco
-    cmp byte [fat16_bpb.DriveNumber], byte 0x80	
+    cmp byte [fat16_bpb.DriveNumber], byte 0x80 
     jne .fail
 	
 	;post message
@@ -336,28 +335,24 @@ fat16WriteFile:
 	;pop eax 
 	call _asm_refresh_screen
 
-	popad	
-    ret	     ;Retorna para quem chamou fat16.inc.
+    popad
+    ret    ; Retorna para quem chamou fat16.inc.
+
 .fail:
+
     ;mov esi, msg_fat16_diskfail
     ;call os_output
-	;push eax
-	;push ebx
-	;push ecx 
-	;push edx
-	mov esi, msg_fat16_diskfail  
-	call lib32PrintString
-	;pop edx 
-	;pop ecx 
-	;pop ebx 
-	;pop eax 
-	call _asm_refresh_screen	
-	
-	popad
-	ret
-	
-	
+
+    mov esi, msg_fat16_diskfail  
+    call lib32PrintString
+ 
+    call _asm_refresh_screen
+
+    popad
+    ret
+
+
 ;
-;End.
+; End.
 ;
 

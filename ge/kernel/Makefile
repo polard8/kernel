@@ -84,7 +84,7 @@ ifeq ($(ARCH),x86)
 	devmgr.o \
 	sci.o \
 	debug.o storage.o install.o object.o runtime.o \
-	abort.o info.o io.o modules.o signal.o sm.o \
+	abort.o info.o io.o ws.o modules.o signal.o sm.o \
 	init.o system.o \
 	execve.o 
 	
@@ -344,6 +344,7 @@ all-c:
 	## == HWI - Hardware Interface ======================= 
 	
 	$(CC) -c 2io/io.c      $(KINCLUDE) $(CFLAGS) -o io.o
+	$(CC) -c 2io/ws.c      $(KINCLUDE) $(CFLAGS) -o ws.o
 
 	# pci bus
 	$(CC) -c 2io/bus/pcibus/pci.c       $(KINCLUDE) $(CFLAGS) -o pci.o

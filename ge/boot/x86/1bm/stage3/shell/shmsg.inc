@@ -222,13 +222,13 @@ dir_title2_string:
 ;
 
 help_text:
-    db 'boot', 13, 10
-    db 'bootjail, bootp1', 13, 10
-    db 'boothome', 13, 10
-    db 'bootp2, bootcastle', 13, 10
-    db 'reboot, shutdown', 13, 10
+    db 'boot, reboot, shutdown', 13, 10
+    db 'bootjail, bootp1',       13, 10
+    db 'boothome',               13, 10
+    db 'bootp2, bootcastle',     13, 10
     db 'disk, part, dir',        13, 10
     db 'help, cls, ver',         13, 10, 0
+
 
 ;
 ; End.

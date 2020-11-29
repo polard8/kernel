@@ -1,12 +1,9 @@
 ;
-; Arquivo: fs\file.inc
+; File: fs/file.inc
 ;
-; Descrição: 
-;     Operações com arquivos.
+;    File support.
+;    2015 - Created by Fred Nora.
 ;
-; Versão 1.0, 2015, 2016.
-;
-
 
 
 ;
@@ -26,14 +23,15 @@ FILE_IMG_SIZE                equ 64
 ;
 ; eax = endereço do nome do arquivo.
 ;
-start_program:   
-    ;
-	;call fat16_read_file  
-    ;call FILE_IMG_ADDRESS_ENTRY_POINT
-	;
-	ret
 
-	
+start_program:   
+    ;call fat16_read_file  
+    ;call FILE_IMG_ADDRESS_ENTRY_POINT
+    ret
+
+
 ;
-;fim.
-;	
+; End
+;
+
+

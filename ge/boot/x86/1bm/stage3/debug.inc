@@ -193,12 +193,11 @@ debug_show_root_dir:
 	popad
 	ret
 
-	
-;-------------------------------
-; show_current_dir:
-;
-;     @todo: Listar os arquivos no diret�rio corrente.
-;
+
+;;=========================
+;; show_current_dir:
+;;     Print a list of the entries of the current directory.
+;;
 
 show_current_dir:
     call fs32_show_currentdir

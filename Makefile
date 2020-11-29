@@ -2,7 +2,7 @@
 PRODUCT_NAME  = Gramado Operating System
 VERSION_MAJOR = 1
 VERSION_MINOR = 0
-VERSION_BUILD = 170
+VERSION_BUILD = 171
 # See: config/version.h
 
 # Documentation.
@@ -108,12 +108,13 @@ ge-services
 	-sudo mkdir /usr/local/gramado-build
 
 ge-boot:
-	#::boot   xxx xx x
-	@echo "==================="
+	#::boot
+	@echo "=================== "
 	@echo "Compiling boot/ ... "
-	$(Q) $(NASM)    ge/boot/x86/xxxvhd/main.asm -I ge/boot/x86/xxxvhd/ -o GRAMADO.VHD   
-	$(Q) $(MAKE) -C ge/boot/x86/xxbm/ 
-	$(Q) $(MAKE) -C ge/boot/x86/xbl/ 
+	$(Q) $(NASM)    ge/boot/x86/0vhd/main.asm -I ge/boot/x86/0vhd/ -o GRAMADO.VHD   
+	$(Q) $(MAKE) -C ge/boot/x86/1bm/ 
+	$(Q) $(MAKE) -C ge/boot/x86/2bl/ 
+
 # KERNEL.BIN  - Creating the kernel image.
 ge-kernel:
 	#::kernel

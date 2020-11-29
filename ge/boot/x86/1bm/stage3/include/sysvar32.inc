@@ -4,20 +4,23 @@
 ; Descrição:
 ;     Memory Map e variáveis do sistema.
 ;
-; Versão: 1.0, 2015, 2016.
+; 2015 - Created by Fred Nora.
 ;
+
 
 align 2
     db 'DEBUG: SYSVAR   '
 align 2
 
 
-;
-;  ----------------  * Memory Map *  ----------------------
-;
-;
-; Obs: O memory map usa endereços físicos de memória.
-;
+;;
+;; == Memory Map =================================================
+;;
+
+
+; obs: 
+; O memory map usa endereços físicos de memória.
+
 
 ;
 ; bloco 0
@@ -265,36 +268,35 @@ os_debug_dump_reg_stage:	db 0x00
 
 
 
-;
-; Estruturas.
-;
-
+;;
+;; == structures ===================================
+;;
 
 
 ; File System
 ; Define the structure of a directory entry
 struc  BMFS_DirEnt
     .filename    resb 32
-	.start		 resd 1	; starting block index
-	.reserved	 resd 1	; number of blocks reserved
-	.size		 resd 1	; number of bytes
-	.unused		 resd 1
+    .start       resd 1    ; starting block index
+    .reserved    resd 1    ; number of blocks reserved
+    .size        resd 1    ; number of bytes
+    .unused      resd 1
 endstruc
 
-
+;; stack frame.
 struc  stack_frame_t
     .ss     resd 1
     .esp    resd 1
     .eflags resd 1
-	.cs     resd 1
-	.eip    resd 1
+    .cs     resd 1
+    .eip    resd 1
 endstruc
 
 
-
+; palette.
 ; These colors are in RGB format. 
 ; Each color byte is actually 6 bits (0x00 - 0x3F)
-palette:		
+palette:
     db 0x00, 0x00, 0x00	;  0 Black
     db 0x33, 0x00, 0x00	;  1 Red
     db 0x0F, 0x26, 0x01	;  2 Green
@@ -366,19 +368,22 @@ startupapp:		       db 'startup.app', 0
 
 
 ; Constants
-hextable: db '0123456789ABCDEF'
+hextable: 
+    db '0123456789ABCDEF'
+
 
 ;---------------------------------------
 ; Buffer: String para comandos.
 ;
-;
-cli_command_string:	
+
+cli_command_string:
     times 14 db 0
 
 
 align 4
-this_is_the_end:    db '*'
+this_is_the_end:  db '*'
+
 
 ;
-;fim.
+; End.
 ;

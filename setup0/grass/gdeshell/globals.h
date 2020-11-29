@@ -178,6 +178,13 @@ unsigned long smCharWidth;           //7
 unsigned long smCharHeight;          //8
 //...
 
+// Window server info.
+int sm_ws_type;   //200
+int sm_ws_pid;    //201
+int sm_ws_virtual_console;  //202
+int sm_ws_initialized;  //203
+
+
 //
 // ## Window limits ##
 //

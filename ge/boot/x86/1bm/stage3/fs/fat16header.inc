@@ -8,7 +8,7 @@
 ;     O propósito principal é carregar o sistema operacional se ele estiver 
 ; em um sistema de arquivos fat16.
 ;
-; Versão 1.0, 2015.
+; 2015 - Created by Fred Nora.
 ;
 
 
@@ -169,15 +169,15 @@ g_image_entrypoint  dd 0
 ; Reserva espaço para trabalhar o caminho atual.
 ;
 
+; #todo: 
+; Talvez não precise ser tão grande ainda.
 CURRENT_PATH:
-    ;@todo: Talvez não precise ser tão grande ainda.
     TIMES 256 DB 0x00 
 
 
 
-;-----------------------	
+;-----------------------
 ;Caminhos strings.
-; @todo: Tem muita string aqui.
 ;
 PATH:
     .atual:     dd 0    ;Endereço do nome do caminho atual.	
@@ -207,7 +207,6 @@ PATH:
 ; O número do volume não tem relação
 ; com o disco que o volume está.
 ; Pois cada volume pode estar em um disco diferente.
-;
 ;
 
 VOLUME:
@@ -292,22 +291,26 @@ fat16_bpb:
 msg_fat16_CRLF     db 0x0D, 0x0A, 0x00
 msg_fat16_Progress db ".", 0x00
 msg_fat16_space    db " ", 0x00
-msg_fat16_Loading  db "FAT16: Loading"  ,10,13,0
+msg_fat16_Loading  db "FAT16: Loading"   ,10,13,0
 msg_fat16_Failure  db "FAT16: Error"     ,10,13,0
 msg_fat16_Done     db "FAT16: Done"      ,10,13,0
 msg_fat16_RootOk   db "FAT16: Root"      ,10,13,0
 msg_fat16_FatOk    db "FAT16: FAT Ok"    ,10,13,0
 msg_fat16_FatFail  db "FAT16: FAT fail"  ,10,13,0
 msg_fat16_diskfail db "FAT16: Disk fail" ,10,13,0
+
 ;Steps.
 msg_fat16_step1 db "Step1: Calculating DATA AREA",13,10,0
 msg_fat16_step2 db "Step2: Loading ROOT"         ,13,10,0
 msg_fat16_step3 db "Step3: Searching file"       ,13,10,0
 msg_fat16_step4 db "Step4: Loading FAT"          ,13,10,0
 msg_fat16_step5 db "Step5: Loading file"         ,13,10,0
-;File.
-msg_file_ok        db "File found"     ,13,10,0
-msg_file_not_found db "* BM: fat16_search_file_name: File not found! HANG" ,13,10,0
+
+; File.
+msg_file_ok:
+    db "[BM.BIN]: File found", 13, 10, 0
+msg_file_not_found: 
+    db "[BM.BIN]: File not found! HANG" , 13, 10, 0
 
 
 ;

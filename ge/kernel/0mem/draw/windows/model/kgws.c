@@ -964,7 +964,7 @@ int register_ws_process ( pid_t pid ){
 }
 
 
-// called by x86init.c
+// called by x86/x86init.c
 int KGWS_initialize(void)
 {
     // Logon. 

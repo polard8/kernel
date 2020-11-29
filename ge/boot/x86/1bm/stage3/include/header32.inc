@@ -5,7 +5,7 @@
 ;     Header principal do Boot Manager.
 ;     Header para a parte de 32bit.
 ;
-; *Importante:
+; Importante:
 ; O arquivo main.asm faz uma sequencia de inclusões de módulos
 ; que compõem o Boot manager, começando pelos módulos de 16bit
 ; e depois os módulos de 32bit. O arquivo header32.inc deve ficar no 
@@ -17,7 +17,7 @@
 ;     Variáveis dentro do arquivo system.cnf.
 ;     Address = 0x00009000, logo apos o bootmanager ( 0xe00 ~ 0x8000 ) 31,5 kb.
 ;
-; Versão 1.0, 2015.
+; 2015 - Created by Fred Nora.
 ;
 
 
@@ -27,10 +27,11 @@
 
 
 ;Definições usadas apenas em 32bit.
-%DEFINE BOOT_VER '0.1'
-%DEFINE BOOT_MANAGER_VER '0.1'
-%DEFINE SHELL_VER '0.1'
-;...
+%DEFINE BOOT_VER          '0.1'
+%DEFINE BOOT_MANAGER_VER  '0.1'
+%DEFINE SHELL_VER         '0.1'
+; ...
+
 
 ;
 ; Igualdades.
@@ -43,17 +44,20 @@
 ;
 ;gdt stuffs.
 ;
-sys_code         equ 8 
-TSS0_SEL         equ 0x20
-LDT0_SEL         equ 0x28
-TSS1_SEL         equ 0x30
-LDT1_SEL         equ 0x38
-SYS64_CODE_SEL	 equ 8	
+sys_code        equ  8 
+TSS0_SEL        equ  0x20
+LDT0_SEL        equ  0x28
+TSS1_SEL        equ  0x30
+LDT1_SEL        equ  0x38
+SYS64_CODE_SEL  equ  8
+
 
 ;
 ;idt stuffs.
 ;
-sys_interrupt    equ 0x8E  ;usanda nas entradas da idt.
+
+;usanda nas entradas da idt.
+sys_interrupt  equ  0x8E  
 
 
 ;
@@ -65,17 +69,18 @@ SYSTEM_CNF       EQU 0x00008C00    ;@todo: Rever.
 INIT_CNF         EQU 0x00008E00    ;@todo: Rever.
 BL_BIN           EQU 0x00020000    ;Boot Loader base.
 BL_BIN_ENTRY     EQU 0x00021000    ;Boot Loader entry point.
-KRN_BASE         equ 0x00100000    ;Kernel base.
+KRN_BASE         EQU 0x00100000    ;Kernel base.
 BOOT_DIR         EQU 0x00200000    ;Boot dir.  
 SYSTEM_DIR       EQU 0x00300000    ;System dir.
 USER_DIR         EQU 0x00400000    ;User dir.    
 
 
-;
-; @todo: LBA??
-;
-Root_Dir  equ 559    ;Diretório raiz.
-Boot_Fat  equ 67     ;FAT.
+;; LBA
+Boot_Fat  equ  67   ; FAT.
+Root_Dir  equ  559  ; Diretório raiz.
+;; ...
+
+
 
 
 ;
@@ -83,14 +88,22 @@ Boot_Fat  equ 67     ;FAT.
 ;
 
 ;reinicia algum modo de 32 bits.
-restart32_status: dd 0
+restart32_status: 
+    dd 0
+
 ;current.
-current:          dd 0
+current:  
+  dd 0
+
 ;deslocamento dentro da memória de video 
-scr_loc:          dd 0
+scr_loc:    
+  dd 0
+
 ;Cursor.
-g_cursor_x:       dd 0
-g_cursor_y:       dd 0
+g_cursor_x:  dd 0
+g_cursor_y:  dd 0
+
+
 
 ;
 ; File System support.
@@ -181,9 +194,8 @@ g_init_userdir_cluster    dd 0  ;.lba    dd 5
 ;Continua...
 
 
-;;
-;; ## video mode support ##
-;;
+;; =========================
+;; video mode support
 
 g_x_resolution dw 0
 g_y_resolution dw 0

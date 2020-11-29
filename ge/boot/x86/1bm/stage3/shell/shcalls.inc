@@ -413,35 +413,18 @@ ls:
 
 ;==============================================================
 ; dir:
-;    (Mostra o diretório de volumes)
-;     Mostra as entradas do diretório raiz.	
+; Show the entries in the root dir.
+; #bugbug: 
+; It is not working on my real machine. (fred)
 ;++
 
+;; See: 
+;; fs32.inc
+
 dir:
-    ;cli
-    pushad
-
-    call os_screen_clear 
-    call reset_cursor
-
-	;Hd info.bug
-	;call hd_test
-	
-    ;mov esi, msg_tamanho_da_particaoP
-	;call os_output		
-    ;mov eax, dword [ParticaoAtiva.tamanho_da_particao]  
-    ;call print_hex		
-	
-	
-	;Files in root.
-	;call show_root_dir    ;(Mostra o diretório de volumes)
-	
-	;Mostra o diretório atual.
-    call show_current_dir
-
-    popad
-    ;sti
-
+    ;call os_screen_clear 
+    ;call reset_cursor
+    call fs32_show_rootdir
     jmp os_command_line
 ;--
 
@@ -610,20 +593,25 @@ hd_test:
 shellcallsPartitionTest:
     nop
 particao_test:
-
-    pushad		
-	;call os_screen_clear
+    pushad
+    
+    ;call os_screen_clear
     ;call reset_cursor
-	
-	call blconfigFindActivePartition       ;encontra_particao_ativa
-	call blconfigFindInitialLBA            ;encontrar_lba_inicial
-    call blconfigGetActivePartitionInfo    ;pegar_parametros_da_particao_ativa	
-	call fs32ShowActivePartitionInfo       ;fs32_show_activepartition_info    
-	
-	popad
-	jmp os_command_line	
+
+    ;; #debug
+    mov esi, debug_message_fixme2_loading_sector
+    call os_output
+
+
+    call blconfigFindActivePartition     ; encontra_particao_ativa
+    call blconfigFindInitialLBA          ; encontrar_lba_inicial
+    call blconfigGetActivePartitionInfo  ; pegar_parametros_da_particao_ativa
+    call fs32ShowActivePartitionInfo     ; fs32_show_activepartition_info
+
+    popad
+    jmp os_command_line
 ;--
-	
+
 
 ;--------------------------------
 ; print_help:
@@ -711,6 +699,10 @@ testzone:
 ;--	
 
 
+;; debug messages
+debug_message_fixme2_loading_sector:  
+    db "[FIXME]: loading sector on real machine ?", 13, 10, 0
+    
 ;
 ; End.
 ;

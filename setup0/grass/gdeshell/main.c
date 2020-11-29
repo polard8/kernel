@@ -522,11 +522,11 @@ void ram_test (void){
     unsigned long __memorysizeUsed;
     unsigned long __memorysizeFree;
 
-    __memorysizeBaseMemory = gde_get_system_metrics (30);
-    __memorysizeOtherMemory = gde_get_system_metrics (31);
+    __memorysizeBaseMemory     = gde_get_system_metrics (30);
+    __memorysizeOtherMemory    = gde_get_system_metrics (31);
     __memorysizeExtendedMemory = gde_get_system_metrics (32);
-    __memorysizeTotal = gde_get_system_metrics (33);
-        
+    __memorysizeTotal          = gde_get_system_metrics (33);
+ 
     __memorysizeUsed = gde_get_system_metrics (34);
     __memorysizeFree = gde_get_system_metrics (35);
                 
@@ -544,15 +544,17 @@ void ram_test (void){
 
 void process_stats(void){
 
+    register int i=0;
+    
     unsigned long __process_image_pa;    
     unsigned long __process_image_va;
     unsigned long __process_image_size;
-    int i=0;
 
-    for(i=100; i<109; i++){
+    for (i=100; i<109; i++){
         __process_image_pa  = gde_get_process_stats (i,18);
-        __process_image_va  = gde_get_process_stats (i,17);        
-        __process_image_size = gde_get_process_stats (i,51);                
+        __process_image_va  = gde_get_process_stats (i,17);  
+        
+        __process_image_size = gde_get_process_stats (i,51);  
         printf ("> pid %d: image_size=%d ", i, __process_image_size);
         printf ("pa=%x ", __process_image_pa);
         printf ("va=%x \n", __process_image_va);
@@ -3243,27 +3245,38 @@ done:
 	// step1
 	//inicializa as metricas do sistema.
 void shellInitSystemMetrics (void){
+
 	//pegaremos todas as metricas de uma vez s�,
 	//se uma falhar, ent�o pegaremos tudo novamente.
 
+    // Window server info.
+    sm_ws_type            = gde_get_system_metrics(200);
+    sm_ws_pid             = gde_get_system_metrics(201);
+    sm_ws_virtual_console = gde_get_system_metrics(202);
+    sm_ws_initialized     = gde_get_system_metrics(202);
+
     // Tamanho da tela.
-    smScreenWidth = gde_get_system_metrics (1);
-    smScreenHeight = gde_get_system_metrics (2);
-    smCursorWidth = gde_get_system_metrics (3);
-    smCursorHeight = gde_get_system_metrics (4);
-    smMousePointerWidth = gde_get_system_metrics (5);
-    smMousePointerHeight = gde_get_system_metrics (6);
-    smCharWidth = gde_get_system_metrics (7);
-    smCharHeight = gde_get_system_metrics (8);
-    //...
-	
-	
+    smScreenWidth  = gde_get_system_metrics(1);
+    smScreenHeight = gde_get_system_metrics(2);
+    
+    // cursor. 
+    smCursorWidth  = gde_get_system_metrics(3);
+    smCursorHeight = gde_get_system_metrics(4);
+    
+    smMousePointerWidth  = gde_get_system_metrics(5);
+    smMousePointerHeight = gde_get_system_metrics(6);
+    
+    smCharWidth  = gde_get_system_metrics(7);
+    smCharHeight = gde_get_system_metrics(8);
+    // ...
+
     //#debug  ok t� certo.
     //printf("w={%d} h={%d}\n", smScreenWidth, smScreenHeight); 
     //while (1){ asm ("pause"); }	
 
     sm_initialized = 1;
 } 
+
 
 
 	// step2
@@ -4805,16 +4818,29 @@ void shellShowInfo (void){
 
 //metrics
 void shellShowMetrics (void){
-	
+
     //reinicializa as metricas do sistema.
-	//isso pega os valores e coloca nas vari�veis globais.
-	
-	shellInitSystemMetrics ();
+    //isso pega os valores e coloca nas vari�veis globais.
+
+    shellInitSystemMetrics();
 
 
 	printf ("\n");  
 	printf (" # shellShowMetrics: # \n");
-	
+
+
+    // Window server info.
+    sm_ws_type            = gde_get_system_metrics(200);
+    sm_ws_pid             = gde_get_system_metrics(201);
+    sm_ws_virtual_console = gde_get_system_metrics(202);
+    sm_ws_initialized     = gde_get_system_metrics(202);
+
+    printf ("window server type: %d\n",sm_ws_type);
+    printf ("window server pid: %d \n",sm_ws_pid);
+    printf ("window server virtual console: %d \n",sm_ws_virtual_console);
+    printf ("window server initialized: %d \n",sm_ws_initialized);
+
+
 	printf ("screenWidth={%d} screenHeight={%d}\n", 
 	    smScreenWidth, smScreenHeight );
 	

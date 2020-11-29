@@ -558,6 +558,9 @@ int x86main (void){
     // #todo: rever essa inicializaçao.
     // See; windows/model/kgws.c
     KGWS_initialize();
+    
+    //ws.c
+    ws_init();
 
     // #debug:  
     // Esperamos alcaçarmos esse alvo.

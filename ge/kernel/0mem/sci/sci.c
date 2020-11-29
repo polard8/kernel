@@ -334,16 +334,16 @@ gde_extra_services (
         return (void *) 0;
     }
 
-    //pega o ponteiro de um janela.
+    // pega o ponteiro de um janela.
     if (number == 401)
     {
-		//#bugbug todo: fazer checks
+        //#bugbug todo: fazer checks
         return (void *) windowList[arg2];
     }
 
 
 
-	// 512 - get ws PID for a given desktop
+    // 512 - get ws PID for a given desktop
     if ( number == SYS_GET_WS_PID )
     {
         // pega o wm de um dado desktop.
@@ -381,6 +381,11 @@ gde_extra_services (
                 
                 // What is the process listen to the port 11.
                 gramado_ports[GRAMADO_WS_PORT] = (int) current_process;
+                
+                //#todo
+                //WindowServer.desktop = (struct desktop_d *) __desktop;
+                WindowServer.type = WindowServerTypeRing3Process;
+                WindowServer.pid = (pid_t) current_process;
                 
                 // #test
                 // Eleva a prioridade da thread de controle para alem dos limites.

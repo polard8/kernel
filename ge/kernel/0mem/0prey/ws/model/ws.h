@@ -333,6 +333,92 @@ unsigned long g_mousepointer_y;
 
 
 //
+// == window server ==================================================
+//
+
+// types of window server.
+typedef enum {
+
+    WindowServerTypeNull,
+    WindowServerTypeEmbedded,       // Embedded inside the base kernel.
+    WindowServerTypeRing0Process,
+    WindowServerTypeRing3Process
+    
+    // ...
+
+} window_server_t;
+
+// The window server struct.
+// Here we will find all the info we need about the window server
+// that the system is using in the moment. Things like, name, pid ... 
+// The system is able to run only one window server.
+// We can select one window server per desktop.
+// The window server is a ring3 process.
+// The system also have an embedded window server inside the base kernel.
+// Maybe we will create different kinds of window server in the future,
+// but this is gonna be the struct for then all. Only one structure.
+
+
+// #todo:
+// maybe the window server can be an kind of device
+// and we can use the file dev/ws to setup the properties.
+// and use ioctl.
+
+struct window_server_d
+{
+
+    // #bugbug
+    // It works fine on qemu.
+    // But we lost all these values when testing on my real machine. 
+    // Why?
+    // ps: We are using the embedded command, 'metrics' on gdeshell.
+    // Maybe the problem is in the gdeshell application.
+
+    int initialized;
+    
+    window_server_t type;  // tipo de window server.
+    
+    // the pid for loadable window servers.
+    // When the window server is the embedded so this pid needs to be
+    // the pid of the kernel process.
+    
+    pid_t pid; 
+    struct desktop_d *desktop;    // the desktop associated with the widnow server. 
+
+    // Limiting the nale to 64.
+    char name[64];
+
+    file *ws_file;
+    
+    // the virtual console used by this window server.
+    int virtual_console;
+    
+    //no navigation.
+};
+
+static struct window_server_d WindowServer;
+
+
+//
+// == prototypes ==============================================
+//
+
+
+// This is called at the kernel initialization to initialize
+// the window server struct with the embedded window server info.
+int ws_init(void);
+
+// Let's setup the window server.
+// See:
+// 2io/ws.c
+int 
+ws_ioctl ( 
+    int fd, 
+    unsigned long request, 
+    unsigned long arg );
+
+
+//
 // End
 //
 
