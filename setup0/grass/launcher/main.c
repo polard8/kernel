@@ -5,31 +5,28 @@
 #include "launcher.h"
 
 
-//#define TEDITOR_VERBOSE 1
 
 
-#define GRID_HORIZONTAL 1000
-#define GRID_VERTICAL 2000
+#define GRID_HORIZONTAL  1000
+#define GRID_VERTICAL    2000
 
 
 //static int running = 1;
 int running = 1;
 
 
-	//
-	// ## Janelas de teste ##
-	//
-	
-    struct window_d *main_window;
+// Windows and buttons.
 
-    struct window_d *gWindow;          // grid 
-    struct window_d *mWindow;          // menu
-    struct window_d *reboot_button;    // reboot button;
-    
-    
-    struct window_d *launcher_button_1;
-    struct window_d *launcher_button_2;
-    struct window_d *launcher_button_3;   //para testes
+struct window_d *main_window;
+
+struct window_d *gWindow;          // grid 
+struct window_d *mWindow;          // menu
+struct window_d *reboot_button;    // reboot button;
+
+struct window_d *launcher_button_1;
+struct window_d *launcher_button_2;
+struct window_d *launcher_button_3;   //para testes
+
 
 
 //static char *dest_argv[] = { "-sujo0","-sujo1","-sujo2",NULL };
@@ -39,11 +36,11 @@ int running = 1;
  
 
 int 
-launcherProcedure ( struct window_d *window, 
-                    int msg, 
-                    unsigned long long1, 
-                    unsigned long long2 );
- 
+launcherProcedure ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 );
 
 
 /*
@@ -60,33 +57,44 @@ launcherProcedure (
     unsigned long long2 )
 {
 
+    if(msg<0)
+        return -1;
 
-
-    switch (msg)
-    {
+    switch (msg){
 
 		// A janela principal é uma overlapped,
 		// então colocou uma mensagem na fila,
 		// e o app vai pegar quando entrar no loop.
-        case MSG_CREATE: printf ("MSG_CREATE:\n"); break;
+        case MSG_CREATE: 
+            //printf ("MSG_CREATE:\n");
+            debug_print ("MSG_CREATE:\n"); 
+            break;
 
-        
         case MSG_SYSKEYDOWN:
             //...
             switch (long1)
             {  
                 case VK_F1:
+                    debug_print("F1\n");
                     gramado_system_call (900, "gdeshell.bin", 0, 0);
                     exit(0);   
                     break;
 
-                case VK_F2: debug_print("F2"); break;
-                case VK_F3: debug_print("F3"); break;
+                case VK_F2: 
+                    debug_print("F2\n"); 
+                    gramado_system_call (900, "gramcode.bin", 0, 0);
+                    exit(0);   
+                    break;
+                    
+                case VK_F3: 
+                    debug_print("F3\n"); 
+                    gramado_system_call (900, "sysmon.bin", 0, 0);
+                    exit(0);   
+                    break;
      
             };
             goto done;
             break;
-
 
 		// MSG_MOUSEKEYDOWN
 		case 30:
@@ -127,15 +135,13 @@ launcherProcedure (
                         break;
                     }
 
-                    if ( window == gWindow )
-                    {
-						printf("grid window\n");
+                    if ( window == gWindow ){ 
+                        printf("grid window\n");
                     }
 
-				    if ( window == mWindow )
-					{
-						printf("menu window\n");
-					}
+                    if ( window == mWindow ){
+                        printf("menu window\n");
+                    }
 
 					//se
 					if ( window == main_window )
@@ -149,10 +155,9 @@ launcherProcedure (
 					}
 
 					break;
-			};
-			goto done;
-			break;
-
+            };
+            goto done;
+            break;
 
         //mouse key up
         case 31:
@@ -172,13 +177,9 @@ launcherProcedure (
                             (unsigned long) window, 
                             (unsigned long) window, 
                             (unsigned long) window );
-                        //execve ( (const char *) "noraterm.bin", 
-                           //(const char *) 0, (const char *) 0 ); 
-                        
-                        gramado_system_call (900, "noraterm.bin", 0, 0);   
-
-                        //yield. test
-                        gramado_system_call ( 265,0,0,0);          
+                       
+                        gramado_system_call (900, "gdeshell.bin", 0, 0);   
+                        exit(0);
                         break;
                     }
                     if ( window == launcher_button_2 )
@@ -187,17 +188,9 @@ launcherProcedure (
                             (unsigned long) window, 
                             (unsigned long) window, 
                             (unsigned long) window );
-                        
-                        gramado_system_call (900, "gwm.bin", 0, 0);                          
-                        //execve ( (const char *) "gramcode.bin",
-                            //(const char *) 0, (const char *) 0 );
-                        //execve ( (const char *) "reboot2.bin",
-                            //(const char *) 0, (const char *) 0 );
-                        //execve ( (const char *) "gwm.bin",
-                            //(const char *) 0, (const char *) 0 );
 
-                        //yield. test
-                        gramado_system_call ( 265,0,0,0); 
+                        gramado_system_call (900, "gramcode.bin", 0, 0);                          
+                        exit(0);
                         break;
                     }
                     
@@ -208,23 +201,8 @@ launcherProcedure (
                             (unsigned long) window, 
                             (unsigned long) window );
                             
-                        gramado_system_call (900, "gramcode.bin", 0, 0);                             
-                            
-                        //execve ( (const char *) "gramcode.bin", 
-                           //(const char *) 0, (const char *) 0 ); 
-                        
-                        //execve ( (const char *) "gramcode.bin", 
-                           //(const char *) 0, (const char *) 0 ); 
-                           
-                        //execve ( (const char *) "false.bin", 
-                           //(const char *) 0, (const char *) 0 ); 
-                             
-                       // #test: 
-                       // Criando essa nova rotina.
-                       //execute_new_process ( "FALSE   BIN", 0, 0 );   
-                       
-                        //yield. test
-                        gramado_system_call ( 265,0,0,0); 
+                        gramado_system_call (900, "sysmon.bin", 0, 0);                             
+                        exit(0);
                         break;
                     }
                     break;
@@ -265,7 +243,6 @@ launcherProcedure (
             break;
     };
 
-
 done:
     return (int) gde_system_procedure (window,msg,long1,long2);
 }
@@ -303,18 +280,19 @@ int main ( int argc, char *argv[] ){
     unsigned long deviceHeight = gde_get_system_metrics (2);
 
 
-    //left = (deviceWidth/3)*2;
-    left = ((deviceWidth/4) *3) -10;
-    top  = 80;
-    width = deviceWidth/4;
-    height = deviceHeight -100;
 
+    left = 0;  
+    top  = 0;  
+    
+    width  = deviceWidth/4;
+    height = deviceHeight/2;
 
-//#ifdef TEDITOR_VERBOSE
-	//printf("\n");
-	//printf("Initializing File explorer:\n");
-	//printf("mainTextEditor: # argv={%s} # \n", &argv[0] );
-//#endif
+    // #hackhack
+    if ( deviceWidth == 320 && deviceHeight == 200 )
+    {
+        width  = deviceWidth;
+        height = deviceHeight;
+    }
 
 	//
 	// ## vamos repetir o que dá certo ...
@@ -345,6 +323,11 @@ int main ( int argc, char *argv[] ){
 	//window = 0xF5DEB3
 	//client window = 0x2d89ef 
 	//...
+
+
+    //
+    // main window
+    //
 
     //++
     gde_begin_paint ();
@@ -570,13 +553,12 @@ int main ( int argc, char *argv[] ){
 	//gde_show_backbuffer ();
 
 
-
-	//++
+    // button 1
+    //++
     gde_enter_critical_section ();
     launcher_button_1 = (void *) gde_create_window ( WT_BUTTON, 1, 1, 
-                                     " terminal ",  
-                                     10, 50, 
-                                     width-50, (height/8),    
+                                     "gdeshell [F1]",  
+                                     2, (height/4)*0, (width -4), (height/4), 
                                      hWindow, 0, 
                                      xCOLOR_GRAY3, xCOLOR_GRAY3 );
 
@@ -591,16 +573,15 @@ int main ( int argc, char *argv[] ){
         gde_show_backbuffer ();
     };
     gde_exit_critical_section ();
-	//--
+    //--
 
 
-
-	//++
+    // button 2
+    //++
     gde_enter_critical_section (); 
     launcher_button_2 = (void *) gde_create_window ( WT_BUTTON, 1, 1, 
-                                     " gwm ", 
-                                     10, 200, 
-                                     width-50, (height/8),   
+                                     "gramcode [F2]", 
+                                     2, (height/4)*1, (width -4), (height/4),
                                      hWindow, 0, 
                                      xCOLOR_GRAY3, xCOLOR_GRAY3 );
 
@@ -616,19 +597,18 @@ int main ( int argc, char *argv[] ){
         gde_show_backbuffer ();
     };
     gde_exit_critical_section (); 
-	//--
+    //--
 
 
-
-	//++
+    // button 3
+    //++
     gde_enter_critical_section (); 
     launcher_button_3 = (void *) gde_create_window ( WT_BUTTON, 1, 1, 
-                                     " testes ", 
-                                     10, 350, 
-                                     width-50, (height/8),   
+                                     "sysmon [F3]", 
+                                     2, (height/4)*2, (width -4), (height/4),
                                      hWindow, 0, 
                                      xCOLOR_GRAY3, xCOLOR_GRAY3 );
-	
+
     if ( (void *) launcher_button_3 == NULL )
     {
         printf ("Couldn't create button 3\n");
@@ -641,9 +621,10 @@ int main ( int argc, char *argv[] ){
         gde_show_backbuffer ();
     };
     gde_exit_critical_section (); 
-	//--
+    //--
 
 
+    //
 
 
     gde_set_focus(hWindow);
@@ -660,8 +641,8 @@ int main ( int argc, char *argv[] ){
 
 Mainloop:
 
-    while (running)
-    {
+    while (running){
+
         gde_enter_critical_section ();
         system_call ( 111,
             (unsigned long) &message_buffer[0],
