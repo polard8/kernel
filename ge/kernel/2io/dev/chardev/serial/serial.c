@@ -7,6 +7,19 @@
  *     2019 - Document created by Fred Nora.
  */
 
+
+// See:
+// https://wiki.osdev.org/Serial_Ports
+// ...
+
+
+//COM Port IO Port
+//COM1     0x3F8
+//COM2     0x2F8
+//COM3     0x3E8
+//COM4     0x2E8 
+
+
 // #remember:
 // We can connect some server to a serial port.
 
@@ -73,6 +86,21 @@ void serial4_handler (void)
         return;
 
 }
+
+
+
+/*
+//created by fred nora.
+//not tested.
+//It reads only from the port COM1_PORT.
+char serial_read_char (void);
+char serial_read_char (void) 
+{
+    while (( in8(COM1_PORT + 5) & 1 ) == 0);
+
+    return (char) in8 (COM1_PORT);
+}
+*/
 
 
 
@@ -232,6 +260,49 @@ serial_ioctl (
     unsigned long request, 
     unsigned long arg )
 {
+}
+*/
+
+
+
+/*
+//credits: osdev
+//Initialization
+#define PORT 0x3f8  //COM1
+void init_serial() {
+   outb(PORT + 1, 0x00);    // Disable all interrupts
+   outb(PORT + 3, 0x80);    // Enable DLAB (set baud rate divisor)
+   outb(PORT + 0, 0x03);    // Set divisor to 3 (lo byte) 38400 baud
+   outb(PORT + 1, 0x00);    //                  (hi byte)
+   outb(PORT + 3, 0x03);    // 8 bits, no parity, one stop bit
+   outb(PORT + 2, 0xC7);    // Enable FIFO, clear them, with 14-byte threshold
+   outb(PORT + 4, 0x0B);    // IRQs enabled, RTS/DSR set
+}
+*/
+
+
+
+/*
+//credits: osdev
+//Receiving data
+int serial_received() {
+   return inb(PORT + 5) & 1;
+}
+char read_serial() {
+   while (serial_received() == 0);
+   return inb(PORT);
+}
+*/
+
+/*
+//credits: osdev
+//Sending data
+int is_transmit_empty() {
+   return inb(PORT + 5) & 0x20;
+}
+void write_serial(char a) {
+   while (is_transmit_empty() == 0);
+   outb(PORT,a);
 }
 */
 
