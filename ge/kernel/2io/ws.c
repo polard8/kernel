@@ -32,27 +32,36 @@ int ws_init (void)
     //WindowServer.desktop = (struct desktop_d *) __desktop;
 
     // The system starts with the embedded window server.
-    WindowServer.type = WindowServerTypeEmbedded;
+    WindowServer_type = WindowServerTypeEmbedded;
     
     // #todo
     // Use the pid of the kernel process.
     //WindowServer.pid = (pid_t) current_process;
 
     // name.
-    WindowServer.name[0] = 'k';
-    WindowServer.name[1] = 'g';
-    WindowServer.name[2] = 'w';
-    WindowServer.name[3] = 's';
-    WindowServer.name[4] = 0;
+    WindowServer_name[0] = 'k';
+    WindowServer_name[1] = 'g';
+    WindowServer_name[2] = 'w';
+    WindowServer_name[3] = 's';
+    WindowServer_name[4] = 0;
     
     
-    WindowServer.virtual_console = 0;
+    WindowServer_virtual_console = 0;
 
-    WindowServer.initialized = 1;
+    WindowServer_initialized = 1;
         
     return 0;
 }
 
+void ws_show_info(void)
+{
+    printf("name %s\n",WindowServer_name);
+    printf("initialized     %d\n", WindowServer_initialized);
+    printf("type            %d\n", WindowServer_type);
+    printf("pid             %d\n", WindowServer_pid);
+    printf("virtual console %d\n", WindowServer_virtual_console);
+    refresh_screen();
+}
 
 
 //

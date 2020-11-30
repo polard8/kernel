@@ -22,10 +22,14 @@
  * History:
  *     2018 - Created by Fred Nora.
  */
- 
- 
-// ## Contagens ##
 
+
+#ifndef __WS_H
+#define __WS_H    1
+
+
+
+// Counters.
 #define USER_SESSION_COUNT_MAX  16
 #define ROOM_COUNT_MAX          16
 #define DESKTOP_COUNT_MAX       16
@@ -364,9 +368,8 @@ typedef enum {
 // and we can use the file dev/ws to setup the properties.
 // and use ioctl.
 
-struct window_server_d
-{
-
+//struct window_server_d
+//{
     // #bugbug
     // It works fine on qemu.
     // But we lost all these values when testing on my real machine. 
@@ -374,29 +377,28 @@ struct window_server_d
     // ps: We are using the embedded command, 'metrics' on gdeshell.
     // Maybe the problem is in the gdeshell application.
 
-    int initialized;
+    int WindowServer_initialized;
     
-    window_server_t type;  // tipo de window server.
+    window_server_t WindowServer_type;  // tipo de window server.
     
     // the pid for loadable window servers.
     // When the window server is the embedded so this pid needs to be
     // the pid of the kernel process.
     
-    pid_t pid; 
-    struct desktop_d *desktop;    // the desktop associated with the widnow server. 
+    pid_t WindowServer_pid; 
+    //struct desktop_d *desktop;    // the desktop associated with the widnow server. 
 
     // Limiting the nale to 64.
-    char name[64];
+    char WindowServer_name[64];
 
-    file *ws_file;
+    //file *ws_file;
     
     // the virtual console used by this window server.
-    int virtual_console;
+    int WindowServer_virtual_console;
     
     //no navigation.
-};
-
-static struct window_server_d WindowServer;
+//};
+//static struct window_server_d WindowServer;
 
 
 //
@@ -408,6 +410,9 @@ static struct window_server_d WindowServer;
 // the window server struct with the embedded window server info.
 int ws_init(void);
 
+
+void ws_show_info(void);
+
 // Let's setup the window server.
 // See:
 // 2io/ws.c
@@ -416,6 +421,11 @@ ws_ioctl (
     int fd, 
     unsigned long request, 
     unsigned long arg );
+
+
+#endif    
+
+
 
 
 //

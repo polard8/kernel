@@ -406,6 +406,28 @@ _int128:
     ;; This way the kernel is able to access all the user data.
     ;; Normally it is preserved only the register 'fs' to access
     ;; the user data.
+    
+    ;; This way, probably we are not able to get the data 
+    ;; inside the base kernel. It's because the data will point to another
+    ;; place, probably inside the application.
+    
+    ;; Are we switching the page directory ???
+    
+    ;; #test
+    ;; Kernel data segments
+    ;; se fizer isso vai dar problema. 
+    ;; e se nao fizer teremos problemas para ler as coisas dentro do kernel.
+    ;; #todo:
+    ;; Sera preciso um gerenciamento melhor dos registradores de segmento
+    ;; para podermos pegar informaçao tanto no kernel quanto no aplicativo.
+        
+    ;xor eax, eax
+    ;mov ax, word 0x10 
+    ;mov ds, ax
+    ;mov es, ax
+    ;mov fs, ax
+    ;mov gs, ax
+
 
     ;;---------------
     push dword edx    ; arg4

@@ -226,7 +226,6 @@ __local_ps2kbd_procedure (
     int Status = -1;
 
 
-
     switch (msg){
 
         case MSG_SYSKEYUP: 
@@ -241,9 +240,10 @@ __local_ps2kbd_procedure (
 
                 // 
                 case VK_F6:
+                    ws_show_info();
                     //initialize_frame_table();
                     //printf (">> %x \n", get_new_frame() );
-                    pages_calc_mem();
+                    //pages_calc_mem();
                     //testNIC();
                     // #se o processo não existe vai dar problema.
                     //tty_send_message (103,buffer, 32, 444, 0, 0);

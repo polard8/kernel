@@ -1401,20 +1401,43 @@ unsigned long systemGetSystemMetrics ( int index ){
         // 200 ~ 2xx window server info.
         // See: ws.h
 
+        // #bugbug
+        // Quando estamos dentro do kernel por entrarmos via interrupçao de teclado,
+        // esses valores estao certos,
+        // mas quando estamos dentro do kernel, por entrarmos via interrupçao de sistema,
+        // esses valores estao errados.
+        // #porque
+        // ?? seria algum problema de selecao de diretorio de paginas,
+        // ou de configuraçao de registrador de segmento.
+        // podemos checar se a configuraçao dos segmentos de dados esta
+        // certa na hora da entrada da interrupçao de sistema.
+        // o problema eh que mudarmos o registrador de segmento, entao
+        // o kernel nao podera mais pegar as informaçoes que estao em ring3. certo??
+        // See:
+        // sw.asm
+        
         case 200:
-           return (unsigned long) WindowServer.type;
+           printf ("#type: %d\n",WindowServer_type);
+           refresh_screen();
+           return (unsigned long) WindowServer_type;
            break;
 
         case 201:
-           return (unsigned long) WindowServer.pid; 
+           printf ("#pid: %d\n",WindowServer_pid);
+           refresh_screen();
+           return (unsigned long) WindowServer_pid; 
            break;
 
         case 202:
-           return (unsigned long) WindowServer.virtual_console; 
+           printf ("#virtual_console: %d\n",WindowServer_virtual_console);
+           refresh_screen();
+           return (unsigned long) WindowServer_virtual_console; 
            break;
 
         case 203:
-           return (unsigned long) WindowServer.initialized; 
+           printf ("#initialized: %d\n",WindowServer_initialized);
+           refresh_screen();
+           return (unsigned long) WindowServer_initialized; 
            break;
 
         // ...

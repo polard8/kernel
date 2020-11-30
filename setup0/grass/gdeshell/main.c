@@ -3253,7 +3253,8 @@ void shellInitSystemMetrics (void){
     sm_ws_type            = gde_get_system_metrics(200);
     sm_ws_pid             = gde_get_system_metrics(201);
     sm_ws_virtual_console = gde_get_system_metrics(202);
-    sm_ws_initialized     = gde_get_system_metrics(202);
+    sm_ws_initialized     = gde_get_system_metrics(203);
+
 
     // Tamanho da tela.
     smScreenWidth  = gde_get_system_metrics(1);
@@ -4816,7 +4817,7 @@ void shellShowInfo (void){
 }
 
 
-//metrics
+// metrics
 void shellShowMetrics (void){
 
     //reinicializa as metricas do sistema.
@@ -4824,21 +4825,14 @@ void shellShowMetrics (void){
 
     shellInitSystemMetrics();
 
+    printf ("\n");  
+    printf (" # shellShowMetrics: # \n");
 
-	printf ("\n");  
-	printf (" # shellShowMetrics: # \n");
-
-
-    // Window server info.
-    sm_ws_type            = gde_get_system_metrics(200);
-    sm_ws_pid             = gde_get_system_metrics(201);
-    sm_ws_virtual_console = gde_get_system_metrics(202);
-    sm_ws_initialized     = gde_get_system_metrics(202);
-
-    printf ("window server type: %d\n",sm_ws_type);
-    printf ("window server pid: %d \n",sm_ws_pid);
+    printf ("window server type: %d\n"            ,sm_ws_type);
+    printf ("window server pid: %d \n"            ,sm_ws_pid);
     printf ("window server virtual console: %d \n",sm_ws_virtual_console);
-    printf ("window server initialized: %d \n",sm_ws_initialized);
+    printf ("window server initialized: %d \n"    ,sm_ws_initialized);
+
 
 
 	printf ("screenWidth={%d} screenHeight={%d}\n", 

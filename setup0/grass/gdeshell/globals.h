@@ -168,8 +168,8 @@ unsigned long screenbufferList[8];
 // ## System Metrics ##
 //
 
-int smScreenWidth;                   //1 
-int smScreenHeight;                  //2
+unsigned long smScreenWidth;                   //1 
+unsigned long smScreenHeight;                  //2
 unsigned long smCursorWidth;         //3
 unsigned long smCursorHeight;        //4
 unsigned long smMousePointerWidth;   //5
@@ -178,11 +178,12 @@ unsigned long smCharWidth;           //7
 unsigned long smCharHeight;          //8
 //...
 
+
 // Window server info.
-int sm_ws_type;   //200
-int sm_ws_pid;    //201
-int sm_ws_virtual_console;  //202
-int sm_ws_initialized;  //203
+unsigned long sm_ws_type;             //200
+unsigned long sm_ws_pid;              //201
+unsigned long sm_ws_virtual_console;  //202
+unsigned long sm_ws_initialized;      //203
 
 
 //

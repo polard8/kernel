@@ -384,8 +384,8 @@ gde_extra_services (
                 
                 //#todo
                 //WindowServer.desktop = (struct desktop_d *) __desktop;
-                WindowServer.type = WindowServerTypeRing3Process;
-                WindowServer.pid = (pid_t) current_process;
+                //WindowServer.type = WindowServerTypeRing3Process;
+                //WindowServer.pid = (pid_t) current_process;
                 
                 // #test
                 // Eleva a prioridade da thread de controle para alem dos limites.

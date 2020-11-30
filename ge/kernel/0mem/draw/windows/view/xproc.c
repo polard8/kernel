@@ -457,11 +457,9 @@ system_procedure (
 				// normalmente ignora as teclas de digitação.
                 case VK_RETURN: goto done; break;
 
-
 				// O procedimento de janelas do sistema 
 				// normalmente ignora as teclas de digitação.
                 case VK_ESCAPE: goto done; break;
-
 
 
 				//Obs: 
@@ -493,7 +491,6 @@ system_procedure (
                 case VK_PAUSE: 
                     goto done; 
                     break;
-
 
 				// O procedimento de janelas do sistema 
 				// normalmente ignora as teclas de digitação.
@@ -633,21 +630,15 @@ system_procedure (
         // Vamos tratar aqui vários eventos de mouse.
         case 30:
         case 31:
-            return (unsigned long) kgwm_mouse_dialog ( window, 
-                                       msg, long1, long2 );
+            return (unsigned long) kgwm_mouse_dialog ( 
+                                       window, msg, long1, long2 );
             break;
 
         default:
             break;
     };
 
-
-    //
-    // Done.
-    //
- 
 done:
-
     return (unsigned long) 0;
 }
  
