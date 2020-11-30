@@ -24,6 +24,7 @@ struct window_d  *data_window;         // White.
 
 // bar buttons
 struct window_d *bar_button_1; 
+struct window_d *bar_button_2; 
 // ...
 
 
@@ -104,19 +105,22 @@ void test_cpu (struct window_d *window)
     unsigned long deviceHeight = gde_get_system_metrics(2);
 
 
-    if ( (void*) window == NULL ){
+    // validade da janela mae.
+    if ( (void*) window == NULL )
+    {
         debug_print("test_cpu: window\n");
+             printf("test_cpu: window\n");
         return;
     }
 
+    // a janela mae tem que ser a janela da barra.
+    if( window != client_bar_Window)
+    {
+        debug_print("test_cpu: [FAIL] window\n");
+             printf("test_cpu: [FAIL] window\n");
+        return;
+    }
 
-    //gramado_system_call ( 9901,   
-      //  (unsigned long) window, 
-      //  (unsigned long) window, 
-      //  (unsigned long) window );
-
-     //execve ( (const char *) "noraterm.bin", 
-        //(const char *) 0, (const char *) 0); 
 
 //====================================
 // # timer-test
@@ -134,11 +138,11 @@ void test_cpu (struct window_d *window)
 
     //++
     gde_enter_critical_section ();
+    // deixamos espaço para dois botoes. f1 e f2
     cpu_window = (void *) gde_create_window ( 1, 1, 1, 
                               "cpu-usage",  
-                               4, 4, 
-                               (32*8), 100, 
-                               window, 0, COLOR_WHITE, COLOR_WHITE );
+                               40+4, 2, (32*8), 40-4, 
+                               window, 0, COLOR_YELLOW, COLOR_YELLOW );
     gde_register_window (cpu_window);
     gde_show_window (cpu_window);
     gde_exit_critical_section ();
@@ -188,11 +192,10 @@ void showinfo_button1(void)
   
     // Labels
     gde_draw_text ( data_window,    4, 8, COLOR_BLACK, "PID" );
-    gde_draw_text ( data_window,   50, 8, COLOR_BLACK, "Name" );
-    gde_draw_text ( data_window,  200, 8, COLOR_BLACK, "Priority" );     
-    gde_draw_text ( data_window,  300, 8, COLOR_BLACK, "State" );     
+    gde_draw_text ( data_window,   40, 8, COLOR_BLACK, "Name" );
+    gde_draw_text ( data_window,  180, 8, COLOR_BLACK, "Prio" );     
+    gde_draw_text ( data_window,  220, 8, COLOR_BLACK, "State" );     
     //...
-
         
     //for ( i=100; i<104; i++ )
     for ( i=100; i<110; i++ )
@@ -219,11 +222,11 @@ void showinfo_button1(void)
         
             gde_draw_text ( data_window,   4, y, 
                 COLOR_BLACK, (char *) __pid_buffer );
-            gde_draw_text ( data_window,  50, y, 
+            gde_draw_text ( data_window,  40, y, 
                 COLOR_BLACK, (char *) __processname_buffer );
-            gde_draw_text ( data_window, 200, y, 
+            gde_draw_text ( data_window, 180, y, 
                 COLOR_BLACK, (char *) __priority_buffer ); 
-            gde_draw_text ( data_window, 300, y, 
+            gde_draw_text ( data_window, 220, y, 
                 COLOR_BLACK, (char *) __state_buffer );      
             //...
     
@@ -266,24 +269,26 @@ sysmonProcedure (
                 case VK_F1: 
                     debug_print("sysmon: [F1]"); 
                     showinfo_button1();
-                    goto done;
+                    return 0;
                     break;
 
                 case VK_F2: 
                     debug_print("sysmon: [F2]"); 
-                    goto done;
+                    // IN: parent window.
+                    test_cpu (client_bar_Window);
+                    return 0;
                     break;
 
                 case VK_F3: 
                     debug_print("sysmon: [F3]"); 
-                    goto done;
+                    return 0;
                     break;
 
                 case VK_F4: 
                     debug_print("sysmon: [F4]"); 
                     // IN: parent window.
-                    test_cpu (data_window);
-                    goto done;
+                    test_cpu (client_bar_Window);
+                    return 0;
                     break;
 
             };
@@ -335,9 +340,9 @@ sysmonProcedure (
                         gde_set_focus (window);
                         gde_redraw_window (window,1);
                         // #todo: we need to redraw all other windows.
+                        return 0;
                     }
 
-                    // pid button.
                     if ( window == bar_button_1 )
                     {
                         gde_redraw_window (data_window,1);
@@ -346,9 +351,24 @@ sysmonProcedure (
                             (unsigned long) window, 
                             (unsigned long) window ); 
                         showinfo_button1();
+                        return 0;
                         break;
                     }
+
+                    if ( window == bar_button_2 )
+                    {
+                        gde_redraw_window (data_window,1);
+                        gramado_system_call ( 9901,   
+                            (unsigned long) window, 
+                            (unsigned long) window, 
+                            (unsigned long) window ); 
+                        test_cpu (client_bar_Window);
+                        return 0;
+                        break;
+                    }
+
                     break;
+                    
             };
             goto done;
             break;
@@ -381,15 +401,63 @@ int main ( int argc, char *argv[] ){
     unsigned long deviceWidth  = gde_get_system_metrics(1);
     unsigned long deviceHeight = gde_get_system_metrics(2);
 
+    //main window
     unsigned long left=0;
     unsigned long top=0;
     unsigned long width=0;
     unsigned long height=0;
-    
+    unsigned long color;
+
+    //client window
+    unsigned long cw_left=0;
+    unsigned long cw_top=0;
+    unsigned long cw_width=0;
+    unsigned long cw_height=0;
+    unsigned long cw_color;
+
+    //client bar window
+    unsigned long cbw_left=0;
+    unsigned long cbw_top=0;
+    unsigned long cbw_width=0;
+    unsigned long cbw_height=0;
+    unsigned long cbw_color;
+
+    //data window
+    unsigned long dw_left=0;
+    unsigned long dw_top=0;
+    unsigned long dw_width=0;
+    unsigned long dw_height=0;
+    unsigned long dw_color;
+
+    // main window
     left = 0;
     top  = 0;  
     width  = deviceWidth;
     height = deviceHeight;
+    color = COLOR_GRAY;
+
+    // client window
+    cw_left = 1;
+    cw_top  = 1;  
+    cw_width  = width -2;
+    cw_height = height -2;
+    cw_color = 0xF5DEB3;  //0xF5DEB3
+
+    // client bar window
+    // inside the client window
+    cbw_left = 1;
+    cbw_top  = 1;  
+    cbw_width  = cw_width -2;
+    cbw_height = 40;
+    cbw_color = 0x404040;  //0x404040
+
+    // data window
+    // inside the client window
+    dw_left = 1;
+    dw_top  = cbw_height + 8;  
+    dw_width  = cw_width -2;
+    dw_height = cw_height - cbw_height - 8;
+    dw_color = COLOR_WHITE;  //COLOR_WHITE
 
 
 //
@@ -402,7 +470,7 @@ int main ( int argc, char *argv[] ){
     hWindow = (void *) gde_create_window (  WT_OVERLAPPED, 1, 1, 
                            "Setup: sysmon",
                            left, top, width, height,    
-                           0, 0, COLOR_WHITE, COLOR_WHITE );  
+                           0, 0, color, color );  
 
     if ( (void *) hWindow == NULL ){
         printf ("sysmon: hWindow fail\n");
@@ -436,9 +504,9 @@ int main ( int argc, char *argv[] ){
     gde_enter_critical_section ();  
     client_window = (void *) gde_create_window ( WT_SIMPLE, 1, 1, 
                                 "client-bg",     
-                                1, 1, (width -2), (height -2), 
+                                cw_left, cw_top, cw_width, cw_height, 
                                 main_window, 0, 
-                                0xF5DEB3, 0xF5DEB3 );
+                                cw_color, cw_color); //0xF5DEB3, 0xF5DEB3 );
 
     if ( (void *) client_window == NULL)
     {
@@ -463,9 +531,9 @@ int main ( int argc, char *argv[] ){
     gde_enter_critical_section ();  
     client_bar_Window = (void *) gde_create_window ( WT_SIMPLE, 1, 1, 
                                     "client-bar",     
-                                    2, 2, (width -8), 40, 
+                                    cbw_left, cbw_top, cbw_width, cbw_height, 
                                     client_window, 0, 
-                                    0x404040, 0x404040 );
+                                    cbw_color, cbw_color );  //0x404040, 0x404040 );
     
     if ( (void *) client_bar_Window == NULL){
         printf ("client_bar_Window fail");
@@ -487,8 +555,8 @@ int main ( int argc, char *argv[] ){
     //bar button [ F1 ]
     gde_enter_critical_section (); 
     bar_button_1 = (void *) gde_create_window ( WT_BUTTON, 1, 1, 
-                                " F1 ",  
-                                4, 4, 100, 32,    
+                                "F1",  
+                                1, 1, 20, 40-4,    
                                 client_bar_Window, 0, 
                                 xCOLOR_GRAY3, xCOLOR_GRAY3 );
 
@@ -506,6 +574,28 @@ int main ( int argc, char *argv[] ){
     //--
 
 
+    //++
+    //bar button [ F2 ]
+    gde_enter_critical_section (); 
+    bar_button_2 = (void *) gde_create_window ( WT_BUTTON, 1, 1, 
+                                "F2",
+                                20+2, 1, 20, 40-4,    
+                                client_bar_Window, 0, 
+                                xCOLOR_GRAY3, xCOLOR_GRAY3 );
+
+    if ( (void *) bar_button_2 == NULL ){
+        printf ("Couldn't create PID button\n");
+        gde_exit_critical_section ();
+        return 1;
+
+    }else{
+        gde_register_window (bar_button_2);
+        gde_show_window (bar_button_2);
+        gde_show_backbuffer ();
+    };
+    gde_exit_critical_section (); 
+    //--
+
 
 
     //
@@ -519,9 +609,9 @@ int main ( int argc, char *argv[] ){
     gde_enter_critical_section ();  
     data_window = (void *) gde_create_window ( WT_SIMPLE, 1, 1, 
                                "DataWindow",     
-                                4, 48, (width -8), ((height*2)/3), 
+                                dw_left, dw_top, dw_width, dw_height,  
                                 client_window, 0, 
-                                COLOR_WHITE, COLOR_WHITE );
+                                dw_color, dw_color );
 
     if ( (void *) data_window == NULL){
         printf ("DataWindow fail");

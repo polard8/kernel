@@ -3169,13 +3169,23 @@ do_compare:
     // Se o filho não vai rodar em bg, então devemos esperar.
     }else{
 
-        debug_print ("The child will run in foreground\n");
+        debug_print ("The child will run in foreground.\n");
+
+        //exit(0);
+                
+        gramado_system_call (265,0,0,0); //yield thread.
+        gramado_system_call (265,0,0,0); //yield thread.
+        gramado_system_call (265,0,0,0); //yield thread.
+        gramado_system_call (265,0,0,0); //yield thread.
+
+        
         fake_sleep (8000);
         fake_sleep (8000);
         waitpid (-1,&Wait_status,0);
         debug_print("gdeshell: waitpid() ends\n");
-        //fake_sleep (8000);
-        //fake_sleep (8000);
+        fake_sleep (8000);
+        fake_sleep (8000);
+        
         goto exit_cmp;
     };
 
