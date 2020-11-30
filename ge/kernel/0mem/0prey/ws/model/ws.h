@@ -368,6 +368,13 @@ typedef enum {
 // and we can use the file dev/ws to setup the properties.
 // and use ioctl.
 
+
+// #bugbug
+// Estamos com problemas na hora dos aplicativos pegarem 
+// informaçoes que estao dentro de estruturas do kernel.
+// Por isso suspendemos essa estrutura por enquanto.
+// Leia as notas de design.
+
 //struct window_server_d
 //{
     // #bugbug

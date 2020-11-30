@@ -1,0 +1,22 @@
+
+    // #bugbug
+    // We have a HUGE problem here.
+    // We can't properly get the data inside the structures. 
+    // The value is not the same when we enter inside the kernel via
+    // keyboard interrupt or via system interrupt.
+    // #todo: Maybe we need to use global variables for now
+    // and review all the moment when the ring3 app tryes to
+    // get data from a ring0 struct.
+
+
+    // pt-br
+    // resumindo:
+    // aplicativos em ring3 estao pegando valores errados nas estruturas
+    // que estao dentro do kernel ... 
+    // talvez seja um problema na configuraçao dos registradores de segmento.
+    // Mas os aplicativos conseguem pegar corretamente as informaçoes que estao em
+    // variaveis globais dentro do kernel.
+    // Tudo isso depende dos registradores de segmento, do tipo de dado, dos 
+    // modificadores de tipo e do trabalho feito pelo compilador..
+    // >>> certamente teremos problemas ainda maiores quando
+    // tentarmos usar outro compilador.

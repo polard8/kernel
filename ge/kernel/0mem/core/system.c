@@ -1048,7 +1048,21 @@ int system_get_pid (int index){
  *     Criam um enum para essa função, aqui mesmo nesse arquivo.
  */
 
-unsigned long systemGetSystemMetrics ( int index ){
+unsigned long systemGetSystemMetrics ( int index )
+{
+
+
+
+    // #bugbug
+    // We have a HUGE problem here.
+    // We can't properly get the data inside the structures. 
+    // The value is not the same when we enter inside the kernel via
+    // keyboard interrupt or via system interrupt.
+    // #todo: Maybe we need to use global variables for now
+    // and review all the moment when the ring3 app tryes to
+    // get data from a ring0 struct.
+
+
 
 	//print ("#debug: systemGetSystemMetrics: i={%d} \n",index)
 
@@ -1417,26 +1431,26 @@ unsigned long systemGetSystemMetrics ( int index ){
         // sw.asm
         
         case 200:
-           printf ("#type: %d\n",WindowServer_type);
-           refresh_screen();
+           //printf ("#type: %d\n",WindowServer_type);
+           //refresh_screen();
            return (unsigned long) WindowServer_type;
            break;
 
         case 201:
-           printf ("#pid: %d\n",WindowServer_pid);
-           refresh_screen();
+           //printf ("#pid: %d\n",WindowServer_pid);
+           //refresh_screen();
            return (unsigned long) WindowServer_pid; 
            break;
 
         case 202:
-           printf ("#virtual_console: %d\n",WindowServer_virtual_console);
-           refresh_screen();
+           //printf ("#virtual_console: %d\n",WindowServer_virtual_console);
+           //refresh_screen();
            return (unsigned long) WindowServer_virtual_console; 
            break;
 
         case 203:
-           printf ("#initialized: %d\n",WindowServer_initialized);
-           refresh_screen();
+           //printf ("#initialized: %d\n",WindowServer_initialized);
+           //refresh_screen();
            return (unsigned long) WindowServer_initialized; 
            break;
 
