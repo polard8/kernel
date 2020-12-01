@@ -36,12 +36,14 @@ CFLAGS = -m32 \
 LIBC    = ../../../ge/rtl/include/
 LIBCOBJ = ../../../ge/rtl/obj
 
+LIBIO    = ../../../ge/lib/libio01/include/
+LIBIOOBJ = ../../../ge/lib/libio01/obj
+
 
 #Objects
 myObjects = crt0.o main.o rtl.o \
 ctype.o stdio.o stdlib.o string.o \
-unistd.o termios.o ioctl.o fcntl.o     
-
+unistd.o termios.o ioctl.o fcntl.o libio.o    
 
 
 
@@ -51,11 +53,15 @@ all: main.o all-c jackpot-link finalize clean
 	@echo "Ok?"
 
 main.o:
-	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -o main.o
+	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -I $(LIBIO) -o main.o
 
 all-c:
+
 	cp $(LIBCOBJ)/crt0.o   .
 	cp $(LIBCOBJ)/rtl.o  .
+
+
+	cp $(LIBIOOBJ)/libio.o  .
 
 	cp $(LIBCOBJ)/ctype.o   .
 	cp $(LIBCOBJ)/stdio.o .

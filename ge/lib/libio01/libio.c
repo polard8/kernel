@@ -9,6 +9,12 @@
  * 2019 - Created by Fred Nora.
  */
 
+// [ libio ]
+// I just created a ring3 i/o library, 
+// given to the ring3 processes full access to the i/o ports. Why not?!
+// This way i can build new drivers in ring 3, 
+// with no risk for the system. So I will only port to ring0 the well tested drivers.  
+
 
 // Acesso a portas para processos em user mode.
 // Será usado pelos servidores e drivers.
@@ -71,7 +77,7 @@ __libio_system_call (
 
 // #bugbug: return size
 // retorna o valor.
-unsigned char gde_inport8 (unsigned int port)
+unsigned char libio_inport8 (unsigned int port)
 {
     unsigned char _Ret=0;
 
@@ -87,7 +93,7 @@ unsigned char gde_inport8 (unsigned int port)
 
 // #bugbug: return size
 //retorna o valor.
-unsigned short gde_inport16 (unsigned int port)
+unsigned short libio_inport16 (unsigned int port)
 {
     unsigned short _Ret=0;
     
@@ -100,7 +106,7 @@ unsigned short gde_inport16 (unsigned int port)
 
 
 //retorna o valor.
-unsigned long gde_inport32 (unsigned int port)
+unsigned long libio_inport32 (unsigned int port)
 {
     unsigned long _Ret=0;
     
@@ -116,7 +122,7 @@ unsigned long gde_inport32 (unsigned int port)
 // == OUT ======================================================
 //
 
-void gde_outport8 ( unsigned int port, unsigned char value)
+void libio_outport8 ( unsigned int port, unsigned char value)
 {
     __libio_system_call ( 127, 
          (unsigned long) 8, 
@@ -125,7 +131,7 @@ void gde_outport8 ( unsigned int port, unsigned char value)
 }
 
 
-void gde_outport16 ( unsigned int port, unsigned short value)
+void libio_outport16 ( unsigned int port, unsigned short value)
 {
     __libio_system_call ( 127, 
         (unsigned long) 16, 
@@ -134,7 +140,7 @@ void gde_outport16 ( unsigned int port, unsigned short value)
 }
 
 
-void gde_outport32 ( unsigned int port, unsigned long value)
+void libio_outport32 ( unsigned int port, unsigned long value)
 {
     __libio_system_call ( 127, 
         (unsigned long) 32, 
