@@ -2178,11 +2178,18 @@ int serviceNextEvent (void)
 
 int main (int argc, char **argv){
 
-    struct sockaddr gramsock;  //addr;
+
+    //==================
+    struct sockaddr gramsock;
+    socklen_t addrlen;
+
     gramsock.sa_family = AF_GRAMADO;
     gramsock.sa_data[0] = 'w';
     gramsock.sa_data[1] = 's';
-    
+
+    addrlen = sizeof(gramsock);
+    //==================
+
     // files.
     int server_fd = -1; 
     int newconn = -1;
@@ -2306,7 +2313,7 @@ int main (int argc, char **argv){
         bind_status = bind ( 
                           server_fd, 
                           (struct sockaddr *) &gramsock, 
-                          sizeof(gramsock) );
+                          addrlen );
 
         if (bind_status<0){
             gwssrv_debug_print ("gwssrv: [FATAL] Couldn't bind to the socket\n");
@@ -2392,9 +2399,6 @@ int main (int argc, char **argv){
         curconn = serverClient->fd;
         newconn = -1;
 
-        // struct len. Used in accept().  
-        socklen_t addr_len;
-        addr_len = sizeof(gramsock);
     
         // #todo:
         // Precisamos criar uma fila de mensagens para o sistema
@@ -2433,11 +2437,11 @@ int main (int argc, char **argv){
 
             //newconn = accept ( curconn, 
             //              (struct sockaddr *) &gramsock, 
-            //              (socklen_t *) addr_len );
+            //              (socklen_t *) addrlen );
             
             newconn = accept2 ( curconn, 
                           (struct sockaddr *) &gramsock, 
-                          (socklen_t *) addr_len );
+                          (socklen_t *) addrlen );
                           
             if (newconn < 0) {
                 gwssrv_debug_print ("gwssrv: ERROR on Accepting\n");

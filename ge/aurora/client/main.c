@@ -62,17 +62,27 @@
 int gws (void);
 int gws(void)
 {
-    int client_fd = -1;
 
     // Vamos nos concetar com o processo identificado 
     // com o nome 'ws'
     // The port name is 'port:/ws'
 
+    //==============================
     struct sockaddr addr; 
+    int addrlen;
     
     addr.sa_family = AF_GRAMADO;  //8000
     addr.sa_data[0] = 'w';
     addr.sa_data[1] = 's';  
+
+    addrlen = sizeof(addr);
+    //==============================
+    
+    
+    int client_fd = -1;
+    
+    
+    
     
     gws_debug_print ("-------------------------\n"); 
     printf          ("-------------------------\n"); 
@@ -110,7 +120,7 @@ int gws(void)
         
     while (1){
 
-        if ( connect (client_fd, (struct sockaddr *) &addr, sizeof(addr)) < 0 )
+        if ( connect (client_fd, (struct sockaddr *) &addr, addrlen ) < 0 )
         { 
             gws_debug_print ("gws: Connection Failed\n");
             printf          ("gws: Connection Failed \n"); 
@@ -132,14 +142,17 @@ int main ( int argc, char *argv[] ){
     int main_window = -1;
 
 
+    //===============
+    // connection.
     client_fd = gws();
 
-    if ( client_fd < 0 ){
+    if ( client_fd < 0 )
+    {
          gws_debug_print ("gws.bin: gws initialization fail \n");
          printf          ("gws.bin: gws initialization fail \n");
          exit(1);
     }
-
+    //===============
 
     // Metrics.
     unsigned long w = gws_get_system_metrics(1);

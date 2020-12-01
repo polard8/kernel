@@ -366,9 +366,15 @@ int tcsetpgrp (int fd, pid_t pgrp);
 int setpgid(pid_t pid, pid_t pgid);
 pid_t getpgid(pid_t pid); 
 
+
+/* System V version */
+int setpgrp(void);
 /* POSIX.1 version */
 pid_t getpgrp(void);
 
+
+/* BSD version */
+int bsd_setpgrp(pid_t pid, pid_t pgid);
 /* BSD version */
 pid_t bsd_getpgrp(pid_t pid); 
 

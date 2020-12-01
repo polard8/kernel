@@ -502,6 +502,21 @@ gid_t getgid (void)
 
 
 
+/*
+ There is differente versions of these routines.
+ See:
+ https://man7.org/linux/man-pages/man2/getpgrp.2.html 
+ */
+
+
+
+/* System V version */
+int setpgrp(void)
+{
+   return -1;
+}
+
+
 /* POSIX.1 version */
 pid_t getpgrp(void)
 {
@@ -509,6 +524,13 @@ pid_t getpgrp(void)
     return -1;
 }
 
+
+
+/* BSD version */
+int bsd_setpgrp(pid_t pid, pid_t pgid)
+{
+   return -1;
+}
 
 /* BSD version */
 pid_t bsd_getpgrp(pid_t pid)

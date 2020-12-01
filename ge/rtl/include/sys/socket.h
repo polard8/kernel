@@ -411,6 +411,12 @@ getpeername (
 
 
 
+int getsockopt (int sockfd, int level, int optname, void *optval, socklen_t *optlen); 
+int setsockopt (int sockfd, int level, int optname, const void *optval, socklen_t optlen);
+int sendfd(int sockfd, int fd);
+int recvfd(int sockfd);
+
+
 /*
 struct hostent *gethostbyaddr(
     const void *addr,

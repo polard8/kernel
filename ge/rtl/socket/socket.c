@@ -589,8 +589,8 @@ inet_lnaof(struct in_addr in)
  * Return the network number from an internet
  * address; handles class a/b/c network #'s.
  */
-in_addr_t
-inet_netof(struct in_addr in)
+
+in_addr_t inet_netof (struct in_addr in)
 {
     printf("inet_netof: [BUGBUG] Not implemented!\n");
     return 0;
@@ -609,6 +609,23 @@ inet_netof(struct in_addr in)
 
 }
 
+
+
+
+int getsockopt (int sockfd, int level, int optname, void *optval, socklen_t *optlen)
+{ return -1; }
+
+int setsockopt (int sockfd, int level, int optname, const void *optval, socklen_t optlen)
+{ return -1; }
+
+
+
+int sendfd(int sockfd, int fd)
+{ return -1; }
+
+
+int recvfd(int sockfd)
+{ return -1; }
 
 //
 // End.

@@ -556,10 +556,17 @@ ip_calculate_checksum(void *ip)
 
 int main (int argc, char **argv){
 
+
+
     struct sockaddr addr;
+    socklen_t addrlen;
+    
     addr.sa_family = AF_GRAMADO;
     addr.sa_data[0] = 'n';
     addr.sa_data[1] = 's';
+
+    addrlen = sizeof(addr);
+
 
     int server_fd = -1; 
     int bind_status = -1;
@@ -580,7 +587,7 @@ int main (int argc, char **argv){
     // Serial debug.
     debug_print ("-----------------------\n");
     debug_print ("gnssrv: Initializing...\n");
-    printf          ("gnssrv: Initializing...\n");
+    printf      ("gnssrv: Initializing...\n");
 
 
     //
@@ -623,9 +630,10 @@ int main (int argc, char **argv){
     // #debug
     printf ("gnssrv: bind\n");
  
-    bind_status = bind ( server_fd, 
+    bind_status = bind ( 
+                      server_fd, 
                       (struct sockaddr *) &addr, 
-                      sizeof(addr) );
+                      addrlen );
 
     if (bind_status<0){
         printf("gnssrv: Couldn't bind to the socket\n");
@@ -677,9 +685,6 @@ int main (int argc, char **argv){
     int newconn = -1;
     int curconn = ____saved_server_fd;
 
-
-    socklen_t addr_len;
-    addr_len = sizeof(addr);
     
     while (1){
 
@@ -690,11 +695,11 @@ int main (int argc, char **argv){
 
         //newconn = accept ( curconn, 
         //              (struct sockaddr *) &addr, 
-        //              (socklen_t *) addr_len );
+        //              (socklen_t *) addrlen );
     
         newconn = accept2 ( curconn, 
                       (struct sockaddr *) &addr, 
-                      (socklen_t *) addr_len );
+                      (socklen_t *) addrlen );
 
         if (newconn < 0) {
             debug_print ("gnssrv: ERROR on accept2\n");

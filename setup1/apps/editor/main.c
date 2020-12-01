@@ -675,15 +675,25 @@ void _hello(int fd)
 
 int main ( int argc, char *argv[] ){
 
-    int client_fd = -1;
 
+    //=========================
+    
     struct sockaddr_in addr_in;
+    int addrlen;
+    
     addr_in.sin_family = AF_INET;
 
     // Connecting to the window server in this machine.
     addr_in.sin_port   = PORTS_WS;   
     addr_in.sin_addr.s_addr = IP(127,0,0,1); 
+    
+    addrlen = sizeof(addr_in);
 
+    //=========================
+
+
+    int client_fd = -1;
+    
     // #todo:
     // check validation od w h
     debug_print ("------------------------\n"); 
@@ -733,7 +743,7 @@ int main ( int argc, char *argv[] ){
 
     while (1){
 
-        if (connect (client_fd, (void *) &addr_in, sizeof(addr_in)) < 0)
+        if (connect (client_fd, (void *) &addr_in, addrlen ) < 0)
         { 
             gws_debug_print("editor: Connection Failed \n");
             printf         ("editor: Connection Failed \n"); 

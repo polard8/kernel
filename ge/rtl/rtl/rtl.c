@@ -1117,15 +1117,21 @@ static unsigned long rtl_b2u32 ( unsigned char c0, unsigned char c1, unsigned ch
 */
 
 
+/*
+int rtl_GetTimeInMillis(void);
+int rtl_GetTimeInMillis(void)
+{
+    struct timeval  tp;
 
-
-
-
-
-
-
-
-
+    gettimeofday (&tp, 0);
+    
+    // #bugbug
+    // Why 'int' ?
+    // is it unsigned long?
+    
+    return (int) (tp.tv_sec * 1000) + (tp.tv_usec / 1000);
+}
+*/
 
 
 

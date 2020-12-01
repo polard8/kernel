@@ -300,16 +300,22 @@ void gnst_hello (int fd)
  */
 int main ( int argc, char *argv[] ){
 
-    int client_fd = -1;
 
+    //========================
     struct sockaddr_in addr_in;
+    int addrlen;
+    
     addr_in.sin_family = AF_INET;
     
     // Connecting to the network server in this machine.
     addr_in.sin_port = PORTS_NS;              // htons(PORTS_NS);
     addr_in.sin_addr.s_addr = IP(127,0,0,1);  // inet_addr("192.168.0.101");
 
+    addrlen = sizeof(addr_in);
+    //========================
+ 
 
+    int client_fd = -1;
 
     debug_print ("-------------------------\n");
     debug_print ("gns.bin: Initializing ...\n");
@@ -338,26 +344,24 @@ int main ( int argc, char *argv[] ){
     // Connect
     // 
 
+    //nessa hora colocamos no accept um fd.
+    //então o servidor escreverá em nosso arquivo.
+    
+    // #debug
+    //gws_debug_print ("gnst: Connecting to ns via inet  ...\n");      
+    printf ("gns.bin: Connecting to ns via inet  ...\n");      
+        
     while (1){
 
-        //nessa hora colocamos no accept um fd.
-        //então o servidor escreverá em nosso arquivo.
-        // #debug
-        //gws_debug_print ("gnst: Connecting to ns via inet  ...\n");      
-        printf ("gns.bin: Connecting to ns via inet  ...\n");      
-        
-        if (connect (client_fd, (void *) &addr_in, sizeof(addr_in)) < 0)
+        if (connect (client_fd, (void *) &addr_in, addrlen ) < 0)
         { 
             //gws_debug_print ("gnst: Connection Failed\n");
-            printf("gns.bin: Connection Failed \n"); 
+            printf ("gns.bin: Connection Failed \n"); 
             //close(client_fd);
             //exit(1);
             //return (int) (-1);
-             
          }else{break;}; 
     };
-
-
 
 
     //

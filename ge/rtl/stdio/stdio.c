@@ -5085,7 +5085,27 @@ FILE *fdopen (int fd, const char *mode){
 }
 
 
-// freopen
+
+/*
+ ****************** 
+ * freopen:
+ * 
+ */
+
+/*
+    cool!!
+    The freopen() function opens the file whose name 
+    is the string pointed to by path and 
+    associates the stream pointed to by stream with it. 
+    The original stream (if it exists) is closed. 
+    The mode argument is used just as in the fopen() function. 
+    The primary use of the freopen() function is 
+    to change the file associated with a 
+    standard text stream (stderr, stdin, or stdout). 
+*/
+
+// See:
+// https://linux.die.net/man/3/freopen
 FILE *freopen (
     const char *pathname, 
     const char *mode, 

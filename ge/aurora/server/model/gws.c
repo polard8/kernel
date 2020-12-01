@@ -19,6 +19,26 @@ int dirty=0;
 int background=0;
 
 
+
+/*
+// #test
+// from: x-window-system
+int
+gws_WriteToClient ( 
+    struct gws_client_d *who, 
+    int count, 
+    char *buf );
+int
+gws_WriteToClient ( 
+    struct gws_client_d *who, 
+    int count, 
+    char *buf )
+{
+    return -1;
+}
+*/
+
+
 /*
  *******************************************
  * xxxThread:
