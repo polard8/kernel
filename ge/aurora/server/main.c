@@ -2180,15 +2180,16 @@ int main (int argc, char **argv){
 
 
     //==================
-    struct sockaddr gramsock;
+    struct sockaddr server_address;
     socklen_t addrlen;
 
-    gramsock.sa_family = AF_GRAMADO;
-    gramsock.sa_data[0] = 'w';
-    gramsock.sa_data[1] = 's';
+    server_address.sa_family = AF_GRAMADO;
+    server_address.sa_data[0] = 'w';
+    server_address.sa_data[1] = 's';
 
-    addrlen = sizeof(gramsock);
+    addrlen = sizeof(server_address);
     //==================
+
 
     // files.
     int server_fd = -1; 
@@ -2312,7 +2313,7 @@ int main (int argc, char **argv){
  
         bind_status = bind ( 
                           server_fd, 
-                          (struct sockaddr *) &gramsock, 
+                          (struct sockaddr *) &server_address, 
                           addrlen );
 
         if (bind_status<0){
@@ -2436,11 +2437,11 @@ int main (int argc, char **argv){
             // and write will copy from on socket to another.
 
             //newconn = accept ( curconn, 
-            //              (struct sockaddr *) &gramsock, 
+            //              (struct sockaddr *) &server_address, 
             //              (socklen_t *) addrlen );
             
             newconn = accept2 ( curconn, 
-                          (struct sockaddr *) &gramsock, 
+                          (struct sockaddr *) &server_address, 
                           (socklen_t *) addrlen );
                           
             if (newconn < 0) {
@@ -2492,6 +2493,7 @@ int main (int argc, char **argv){
     // while(1){ xxxGetNextSystemMessage(); }
 
     // Done.
+    //close(server_fd);
     
     gwssrv_debug_print ("gwssrv: exited. \n");
     printf             ("gwssrv: exited. \n");
