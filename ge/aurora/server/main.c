@@ -2454,6 +2454,10 @@ int main (int argc, char **argv){
                 xxxHandleNextClientRequest (newconn);
 
                 //close ?
+                // #importante:
+                // Se isso fechar o arquivo que o accept criou para o cliente,
+                // entao o novo accept vai criar um novo arquivo quando sondar a lista 
+                // de conexoes pendentes. 
                 //#bugbug: We can not close if we are using accept2.
                 //shutdown(newconn, SHUT_RDWR);
                 //shutdown(newconn, 0);         

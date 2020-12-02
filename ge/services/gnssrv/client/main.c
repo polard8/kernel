@@ -302,16 +302,16 @@ int main ( int argc, char *argv[] ){
 
 
     //========================
-    struct sockaddr_in addr_in;
+    struct sockaddr_in server_address;
     int addrlen;
     
-    addr_in.sin_family = AF_INET;
+    server_address.sin_family = AF_INET;
     
     // Connecting to the network server in this machine.
-    addr_in.sin_port = PORTS_NS;              // htons(PORTS_NS);
-    addr_in.sin_addr.s_addr = IP(127,0,0,1);  // inet_addr("192.168.0.101");
+    server_address.sin_port        = PORTS_NS;       // htons(PORTS_NS);
+    server_address.sin_addr.s_addr = IP(127,0,0,1);  // inet_addr("192.168.0.101");
 
-    addrlen = sizeof(addr_in);
+    addrlen = sizeof(server_address);
     //========================
  
 
@@ -353,7 +353,7 @@ int main ( int argc, char *argv[] ){
         
     while (1){
 
-        if (connect (client_fd, (void *) &addr_in, addrlen ) < 0)
+        if (connect (client_fd, (void *) &server_address, addrlen ) < 0)
         { 
             //gws_debug_print ("gnst: Connection Failed\n");
             printf ("gns.bin: Connection Failed \n"); 
