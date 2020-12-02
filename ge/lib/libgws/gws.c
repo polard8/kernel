@@ -321,18 +321,19 @@ response_loop:
     //}
     
     // Se retornou 0, podemos tentar novamente.
-    if (n_reads == 0){
+    if (n_reads <= 0){
         gws_yield(); 
-        goto response_loop;
+        return 0;
+        //goto response_loop;
     }
 
     // Se retornou -1 é porque algo está errado com o arquivo.
-    if (n_reads < 0){
-        gws_debug_print ("__gws_refresh_window_reponse: recv fail.\n");
-        printf          ("__gws_refresh_window_reponse: recv fail.\n");
-        printf ("Something is wrong with the socket.\n");
-        exit (1);
-    }
+    //if (n_reads < 0){
+    //    gws_debug_print ("__gws_refresh_window_reponse: recv fail.\n");
+    //    printf          ("__gws_refresh_window_reponse: recv fail.\n");
+    //    printf ("Something is wrong with the socket.\n");
+    //    exit (1);
+    //}
 
 
     //
@@ -1089,24 +1090,26 @@ response_loop:
                   sizeof(__gws_message_buffer), 
                   0 );
     
-    //if (n_reads<=0){
-    //     gws_yield(); 
+    if (n_reads<=0){
+        gws_yield(); 
+        return 0;
+        //goto response_loop;
+    }
+    
+    // Se retornou 0, podemos tentar novamente.
+    //if (n_reads == 0){
+    //    gws_yield(); 
     //    goto response_loop;
     //}
     
-    // Se retornou 0, podemos tentar novamente.
-    if (n_reads == 0){
-        gws_yield(); 
-        goto response_loop;
-    }
-    
     // Se retornou -1 é porque algo está errado com o arquivo.
-    if (n_reads < 0){
-        gws_debug_print ("__gws_plot0_response: recv fail.\n");
-        printf          ("__gws_plot0_response: recv fail.\n");
-        printf ("Something is wrong with the socket.\n");
-        exit (1);
-    }
+    //if (n_reads < 0){
+    //    gws_debug_print ("__gws_plot0_response: recv fail.\n");
+    //    printf          ("__gws_plot0_response: recv fail.\n");
+    //    printf ("Something is wrong with the socket.\n");
+    //    exit (1);
+    //}
+
 
     //
     // The msg index.
@@ -1673,14 +1676,14 @@ __gws_drawchar_request (
 
 
     // #debug
-    gws_debug_print ("gws_drawchar_request: Writing ...\n");      
+    gws_debug_print ("__gws_drawchar_request: Writing ...\n");      
 
     // Enviamos um request para o servidor.
     // ?? Precisamos mesmo de um loop para isso. ??
     // msg = 369 (get input event)
 
-    while (1)
-    {
+    while (1){
+
         message_buffer[0] = 0;       // window. 
         message_buffer[1] = 1004;    // Draw char.
         message_buffer[2] = 0;
@@ -1702,6 +1705,8 @@ __gws_drawchar_request (
                        0 );
        
         if(n_writes>0){ break; }
+        
+        return -1;
     }
 
     return 0; 
@@ -1726,7 +1731,7 @@ int __gws_drawchar_response(int fd)
     // obs: Nesse momento deveríamos estar dormindo.
 
     // #debug
-    gws_debug_print ("gws_drawchar_response: Waiting ...\n");      
+    gws_debug_print ("__gws_drawchar_response: Waiting ...\n");      
 
     int y=0;
     for(y=0; y<15; y++)
@@ -1745,7 +1750,7 @@ int __gws_drawchar_response(int fd)
     //
 
     // #debug
-    gws_debug_print ("gws_drawchar_response: Reading ...\n");      
+    gws_debug_print ("__gws_drawchar_response: Reading ...\n");      
 
 
     // #caution
@@ -1760,24 +1765,26 @@ response_loop:
                   sizeof(__gws_message_buffer), 
                   0 );
     
-    //if (n_reads<=0){
-    //     gws_yield(); 
+    if (n_reads<=0){
+         gws_debug_print ("__gws_drawchar_response: recv fail\n");      
+         gws_yield(); 
+         return -1;
+         //goto response_loop;
+    }
+
+    // Se retornou 0, podemos tentar novamente.
+    //if (n_reads == 0){
+    //    gws_yield(); 
     //    goto response_loop;
     //}
     
-    // Se retornou 0, podemos tentar novamente.
-    if (n_reads == 0){
-        gws_yield(); 
-        goto response_loop;
-    }
-    
     // Se retornou -1 é porque algo está errado com o arquivo.
-    if (n_reads < 0){
-        gws_debug_print ("gws_drawchar_response: recv fail.\n");
-        printf          ("gws_drawchar_response: recv fail.\n");
-        printf ("Something is wrong with the socket.\n");
-        exit (1);
-    }
+    //if (n_reads < 0){
+    //    gws_debug_print ("gws_drawchar_response: recv fail.\n");
+    //    printf          ("gws_drawchar_response: recv fail.\n");
+    //    printf ("Something is wrong with the socket.\n");
+    //    exit (1);
+    //}
 
     //
     // The msg index.
@@ -1805,7 +1812,7 @@ response_loop:
             break;
             
         case GWS_SERVER_PACKET_TYPE_ERROR:
-            gws_debug_print ("gws_drawchar_response: SERVER_PACKET_TYPE_ERROR\n");
+            gws_debug_print ("__gws_drawchar_response: SERVER_PACKET_TYPE_ERROR\n");
             goto response_loop;
             //exit (-1);
             break;
@@ -1843,7 +1850,7 @@ process_reply:
 //
 
 process_event:
-    gws_debug_print ("gws_drawchar_response: We got an event\n"); 
+    gws_debug_print ("__gws_drawchar_response: We got an event\n"); 
     return 0;
 }
 
@@ -2120,7 +2127,7 @@ __gws_createwindow_request (
 
 
     // #debug
-    gws_debug_print ("libgws: Writing ...\n");      
+    gws_debug_print ("libgws-__gws_createwindow_request: Writing ...\n");      
 
     // Enviamos um request para o servidor.
     // ?? Precisamos mesmo de um loop para isso. ??
@@ -2186,7 +2193,7 @@ int __gws_createwindow_response(int fd)
     // obs: Nesse momento deveríamos estar dormindo.
 
     // #debug
-    gws_debug_print ("libgws: Waiting ...\n");      
+    gws_debug_print ("libgws-__gws_createwindow_response: Waiting ...\n");      
 
     for(y=0; y<15; y++)
         gws_yield();   // See: libgws/
@@ -2205,7 +2212,7 @@ int __gws_createwindow_response(int fd)
     //
 
     // #debug
-    gws_debug_print ("libgws: reading ...\n");      
+    gws_debug_print ("libgws__gws_createwindow_response: reading ...\n");      
 
 
     // #caution
@@ -2221,17 +2228,19 @@ response_loop:
                   0 );
 
     // Se retornou -1 é porque algo está errado com o arquivo.
-    if (n_reads < 0){
-        gws_debug_print ("libgws: recv fail.\n");
-        printf          ("libgws: recv fail.\n");
-        printf ("Something is wrong with the socket.\n");
-        exit (1);
-    }
+    //if (n_reads < 0){
+    //    gws_debug_print ("libgws: recv fail.\n");
+    //    printf          ("libgws: recv fail.\n");
+    //    printf ("Something is wrong with the socket.\n");
+    //    exit (1);
+    //}
 
     // Se retornou 0, podemos tentar novamente.
-    if (n_reads == 0){
+    if (n_reads <= 0){
         gws_yield(); 
-        goto response_loop;
+        gws_yield(); 
+        return 0;
+        //goto response_loop;
     }
 
 

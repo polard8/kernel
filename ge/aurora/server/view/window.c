@@ -43,6 +43,9 @@ void wm_process_windows (void){
     int dirty_status = -1;
     int background_status = -1;
     
+    
+    gwssrv_debug_print("wm_process_windows:\n");
+    
     //
     // == dirty rectangles ===========================
     //

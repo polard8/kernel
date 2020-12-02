@@ -1720,7 +1720,6 @@ sys_connect (
     }
 
 
-    
     // Procurando um slot livre.
     int __slot=0;
     for (__slot=0; __slot<32; __slot++)
@@ -1729,7 +1728,8 @@ sys_connect (
     };
     panic ("sys_connect: [FIXME] We need a slot in the server\n");
 __OK_new_slot:
-    client_socket->clientfd_on_server = __slot;
+
+
 
 
 
@@ -1738,7 +1738,15 @@ __OK_new_slot:
     // Dessa forma o alvo é o servidor.
 
     server_socket = (struct socket_d *) sProcess->priv;
-    
+
+    server_socket->clientfd_on_server = __slot;
+    client_socket->clientfd_on_server = __slot;
+
+    // incluimos como objeto do servidor o ponteiro para 
+    // o arquivo que representa o socket do cliente.
+    sProcess->Objects[__slot] = (file *) f;  // no que encontramos
+    sProcess->Objects[31]     = (file *) f;  // no 31.
+
     //
     // == Connecting! ======================================
     //
@@ -1776,6 +1784,9 @@ __OK_new_slot:
 
     client_socket->state = SS_CONNECTING;
     server_socket->state = SS_CONNECTING;
+    
+    client_socket->magic_string[0] = 'C';
+    client_socket->magic_string[1] = 0; 
 
     debug_print("sys_connect: Pending connection\n");
     printf     ("sys_connect: Pending connection\n");
@@ -2168,11 +2179,17 @@ sys_accept2 (
     // servidor, precisamos retornar o socket do client que esta na lista.
     // Esse socket esta conectado. Usaremos ele.
     
+    // #test
+    // nao faremos mais isso.
+    
+    /*
     if ( sSocket->state == SS_CONNECTED  )
     {
-        return (int) fdServer;
+        debug_print ("sys_accept2: [fixme] server socket already connected\n");
+        return cSocket->clientfd_on_server;
+        //return (int) fdServer;
     }
-
+    */
 
     // #todo
     // Na verdade precisamos pegar um da fila.
@@ -2196,7 +2213,8 @@ sys_accept2 (
     // Pega um socket da lista de conexoes incompletas.
     // Isso nos diz que o socket do servidor esta conectando.
  
-    if ( sSocket->state == SS_CONNECTING )
+    //#test: se ja conectamos uma vez, vamos reconectar;
+    if ( sSocket->state == SS_CONNECTING || sSocket->state == SS_CONNECTED )
     {
         debug_print ("sys_accept2: CONNECTING !!\n");
 
@@ -2226,8 +2244,8 @@ sys_accept2 (
             // retornamos o fd do proprio servidor, pois nosso write copia
             // entre os buffers dos sockets conectados.
             // ?? Poderiamos retornar o fd do cliente nesse caso?
-            
-            return (int) fdServer;
+            return cSocket->clientfd_on_server;
+            //return (int) fdServer;
         }
 
         //fail
@@ -2312,7 +2330,7 @@ sys_accept (
     int fdClient = -1;    //  <<<------
 
     // #debug
-    //debug_print ("sys_accept:\n");
+    debug_print ("sys_accept:\n");
 
     //
     // fd Server 
@@ -2326,7 +2344,6 @@ sys_accept (
     // Ao fim devemos retornar o descritor do socket selecionado
     // na lista de conexões pendentes.
 
-    
     fdServer = sockfd;
 
     // fd
@@ -2363,10 +2380,10 @@ sys_accept (
     }
 
 
-    // O objeto que se refere ao socket do servidor.
-
     // file
+    // O objeto que se refere ao socket do servidor.
     // The socket is a file and belongs to the process.
+    
     sFile = (file *) sProcess->Objects[fdServer];
 
     if ( (void *) sFile == NULL )
@@ -2376,15 +2393,14 @@ sys_accept (
         goto fail;
     }
 
-    /*
-    // #bugbug
     // Is this file a socket ??
     if (sFile->____object != ObjectTypeSocket )
     {
-        panic ("sys_accept: sFile is not a server object.");
+        debug_print ("sys_accept: sFile is not a server object.\n");
+             printf ("sys_accept: sFile is not a server object.\n");
+        goto fail;
     }
-    */
-    
+
     sSocket = sFile->socket;
     
     if ( (void *) sSocket == NULL )
@@ -2469,15 +2485,16 @@ sys_accept (
     // O socket do servidor precisa estar desconectado.
     // Pois cada accept eh cria uma nova conexao.
     
+    /*
     if ( sSocket->state == SS_CONNECTED )
     {
         debug_print ("sys_accept: Already connected!\n");
         //printf      ("sys_accept: Already connected!\n");
         //refresh_screen();
         //return -1;
-        
         return (int) fdServer;
     }
+    */
 
 
     // #todo
@@ -2507,18 +2524,20 @@ sys_accept (
     // pois podemos transmitir dados mesmo antes do accept
     // selecionar um da fila de conexoes pendentes. 
 
+    // ele tambem esta em um dos slots e no slot 31.
+
     //if ( sSocket->state != SS_CONNECTED )
-    if ( sSocket->state == SS_CONNECTING )
+    if ( sSocket->state == SS_CONNECTING || sSocket->state == SS_CONNECTED )
     {
         debug_print ("sys_accept: CONNECTING !!\n");
 
         //Server socket. Pre-connect.
         //precisamos mudar no caso de erro no cliente.
         sSocket->state = SS_CONNECTED;
-             
+
         // Se existe outro socket linkado ao socket do servidor.
         cSocket = (struct socket_d *) sProcess->socket_pending_list[0];
-        
+                
         // Not valid Client socket
         if ( (void*) cSocket == NULL )
         {
@@ -2540,7 +2559,14 @@ sys_accept (
             //sProcess->Objects[ sProcess->_client_sock_fd ] = cFile;
             sProcess->Objects[ 31 ] = cFile;  //last
             cFile->_file = 31;
-            return (int) cFile->_file; 
+            
+            if( cSocket->magic_string[0] == 'C')
+                debug_print("MAGIC C\n");
+            //printf ("magic: %s\m",cSocket->magic_string);
+            
+            
+            debug_print ("sys_accept: done ok\n");
+            return (int) cFile->_file;    /// client ???
             
             
             //retornamos o fd do proprio servidor, pois nosso write copia

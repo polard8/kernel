@@ -168,11 +168,13 @@ int main ( int argc, char *argv[] ){
     // Window
     //
 
+    gws_debug_print ("gws.bin: Creating window \n");
+    printf          ("gws.bin: Creating window \n");
 
     main_window = gws_create_window (client_fd,
                       WT_SIMPLE, 1, 1, "gws-client",
                       0, 0, w, h,
-                      0, 0, COLOR_BLACK, COLOR_BLACK);
+                      0, 0, COLOR_PINK, COLOR_PINK);
 
     if (main_window<0)
     {
@@ -180,8 +182,25 @@ int main ( int argc, char *argv[] ){
         exit(1);
     }
 
+    //gws_refresh_window (client_fd, main_window);
+
+    gws_debug_print ("gws.bin: Drawing a char \n");
+    printf          ("gws.bin: Drawing a char \n");
+
+
     gws_draw_char ( client_fd, main_window, 
         16, 8, COLOR_RED, 'C' );
+        
+
+    gws_debug_print ("gws.bin: hang in a loop \n");
+    printf          ("gws.bin: hang in a loop \n");
+    
+    //#debug
+    while(1)
+    {
+        gws_draw_char ( client_fd, main_window, 
+            16, 8, COLOR_RED, 'C' );
+    }
 
 
     // Create a little window in the top left corner.
@@ -196,6 +215,9 @@ int main ( int argc, char *argv[] ){
         //16, 8, COLOR_RED, 'C' );
 
 
+    gws_debug_print ("gws.bin: Testing Plot0 4x\n");
+    printf          ("gws.bin: Testing Plot0 4x\n");
+
     //test: plot point;
     //um ponto em cada quadrante.
     gws_plot0 ( client_fd, -50,  50, 0, COLOR_RED );
@@ -206,7 +228,11 @@ int main ( int argc, char *argv[] ){
     //
     // == cube ==================================
     //
-    
+
+    gws_debug_print ("gws.bin: Testing Plot cube \n");
+    printf          ("gws.bin: Testing Plot cube \n");
+
+
     struct gr_cube_d *cube;
     cube = (void *) malloc( sizeof( struct gr_cube_d ) );
     if ( (void*) cube != NULL )

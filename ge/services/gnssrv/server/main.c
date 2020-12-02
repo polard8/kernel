@@ -694,13 +694,13 @@ int main (int argc, char **argv){
     
     while (1){
 
-        //newconn = accept ( curconn, 
-        //              (struct sockaddr *) &server_address, 
-        //              (socklen_t *) addrlen );
-    
-        newconn = accept2 ( curconn, 
+        newconn = accept ( ____saved_server_fd, 
                       (struct sockaddr *) &server_address, 
                       (socklen_t *) addrlen );
+    
+        //newconn = accept2 ( ____saved_server_fd, 
+        //              (struct sockaddr *) &server_address, 
+        //              (socklen_t *) addrlen );
 
         if (newconn < 0) {
             debug_print ("gnssrv: ERROR on accept2\n");
@@ -708,8 +708,10 @@ int main (int argc, char **argv){
 
         // Request from the new connection 
         }else{
+
+            //accept2 esta retornando ofd do cliente. 
+            //vamos tentar usa-lo.
             __socket_messages (newconn);
-            //__socket_messages (curconn);
             
             //close ?
             //#bugbug: We can not close if we are using accept2.

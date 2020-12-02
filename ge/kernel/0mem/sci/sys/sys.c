@@ -793,6 +793,7 @@ int sys_read (unsigned int fd, char *ubuf, int count){
             // + Acordar quem espera para escrever.
 
             if (nbytes > 0){
+                debug_print("sys_read: o read funcionou\n");
                 // printf ("read ok. %d bytes \n",nbytes);
                 __file->socket_buffer_full = 0;
                 __file->_flags |= __SWR;
@@ -812,14 +813,16 @@ int sys_read (unsigned int fd, char *ubuf, int count){
             // + sinalizamos que podem escrever no arquivo.
  
             if (nbytes == 0){
+
+                debug_print("sys_read: nbytes equal zero\n");
              
                 // #debug
                 //printf ("sys_read: The thread %d is waiting now \n", 
                     //current_thread);
                 //refresh_screen();
                 
-                do_thread_waiting (current_thread);
-                __file->tid_waiting = current_thread;
+                //do_thread_waiting (current_thread);
+                //__file->tid_waiting = current_thread;
                 __file->_flags |= __SWR;  //pode escrever      
                 scheduler();  //#bugbug: Isso é um teste
                 return 0;   //not fail ... just waiting.
@@ -840,17 +843,18 @@ int sys_read (unsigned int fd, char *ubuf, int count){
         //if (nbytes == 0)
         if (__file->socket_buffer_full == 0)
         { 
-            
+            debug_print("sys_read: [fail] socket_buffer_full not full\n");
             //#debug
             //printf ("thread %d is waiting now \n", current_thread);
             //refresh_screen();
 
-            do_thread_waiting (current_thread);
-            __file->tid_waiting = current_thread;
+            //do_thread_waiting (current_thread);
+            //__file->tid_waiting = current_thread;
             __file->_flags |= __SWR;  //pode escrever.
             scheduler();   //??? #bugbug!!!
             return 0;  //not fail ... just waiting.
         }  // if it's not full.
+
 
         panic ("sys_read: unexpected socket_buffer_full value \n");
     } //-- socket file  
@@ -1148,7 +1152,8 @@ int sys_write (unsigned int fd, char *ubuf, int count){
         // pegamos o privado.
         // mas nao significa que vamos escrever nele.
         s1 = __P->priv;
-        if ( (void *) s1 == NULL){ 
+        if ( (void *) s1 == NULL )
+        { 
             debug_print ("sys_write: s1 \n"); 
             goto fail;
         }    
@@ -1172,8 +1177,10 @@ int sys_write (unsigned int fd, char *ubuf, int count){
         
         // Write in the socket buffer.
         
-        nbytes = (int) file_write_buffer ( (file *) __file, 
-                           (char *) ubuf, (int) count );
+        nbytes = (int) file_write_buffer ( 
+                           (file *) __file, 
+                           (char *) ubuf, 
+                           (int) count );
 
         // fail
         if (nbytes < 0){
@@ -1189,6 +1196,9 @@ int sys_write (unsigned int fd, char *ubuf, int count){
         }
 
         // ok, write funcionou.
+        if (nbytes>0) 
+             __file->socket_buffer_full = 1;
+        
         
         // #debug
         // printf ("sys_write: written\n");
@@ -1213,10 +1223,19 @@ int sys_write (unsigned int fd, char *ubuf, int count){
         // #todo
         // Retornaremos se não é para copiar para o socket conectado.
         
-        if (s1->conn_copy != 1){
-            panic ("sys_write: [FIXME] Working to not copy the data from s1 to s2.");
-        }
+        // ok.
+        // retornamos o numero de bytes escritos.
+        return nbytes;
         
+        //if (s1->conn_copy != 1){
+        //    panic ("sys_write: [FIXME] Working to not copy the data from s1 to s2.");
+        //}
+        
+        // #test
+        // Estamos suspendendo a copia.
+        // precisamos mudar o accept2 para que ele nao retorno o fd do servidor.
+        // pois o conteudo nao sera mais copiado do socket do servidor para o socket do cliente.
+        /*
         // YES, copy!
         if (s1->conn_copy == 1)
         {
@@ -1312,6 +1331,7 @@ int sys_write (unsigned int fd, char *ubuf, int count){
                 return (int) nbytes;
             }
         }
+        */
 
         debug_print("sys_write:  fail. Target is not a socket.\n");
         return 0;

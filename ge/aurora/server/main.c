@@ -866,8 +866,12 @@ void xxxHandleNextClientRequest (int fd){
     // socket que usaremos ... por isso poderemos fecha-lo
     // para assim obtermos um novo da próxima vez.
 
+
+    gwssrv_debug_print ("xxxHandleNextClientRequest: \n");
+        
+
     if (fd<0){
-        gwssrv_debug_print ("gwssrv: xxxHandleNextClientRequest fd\n");
+        gwssrv_debug_print ("xxxHandleNextClientRequest: xxxHandleNextClientRequest fd\n");
         return;
     }
 
@@ -911,10 +915,15 @@ void xxxHandleNextClientRequest (int fd){
     // e retornarmos como se a leitura do arquivo estivesse falhado.
     
     // Precisamos fechar o client e yield.
-    if (n_reads < 0) { gwssrv_yield(); return; }
+    if (n_reads <= 0)
+    { 
+        gwssrv_debug_print ("xxxHandleNextClientRequest: read fail\n");
+        gwssrv_yield(); 
+        return; 
+    }
     
     // Sem problemas, nao precisamos fechar o client.
-    if (n_reads == 0){ gwssrv_yield(); return; }
+    //if (n_reads == 0){ gwssrv_yield(); return; }
 
 
     // Nesse momento lemos alguma coisa.   
@@ -950,7 +959,7 @@ void xxxHandleNextClientRequest (int fd){
     
     if (message_buffer[1] == 369)
     {
-        debug_print ("gwssrv: [TEST] 369 INPUT request !!! \n");
+        debug_print ("xxxHandleNextClientRequest: [TEST] 369 INPUT request !!! \n");
 
         // Pegar o input!
 
@@ -986,21 +995,21 @@ void xxxHandleNextClientRequest (int fd){
             gws_refresh_rectangle( mouse_x, mouse_y, 8, 8 );
         }
 
-        debug_print("gwssrv: Sending response\n");
+        debug_print("xxxHandleNextClientRequest: Sending response\n");
         
         n_writes = send ( fd, __buffer, sizeof(__buffer), 0 );
         
         if (n_writes<=0){
-             debug_print ("gwssrv: [FAIL] Couldn't send response!\n"); 
+             debug_print ("xxxHandleNextClientRequest: [FAIL] Couldn't send response!\n"); 
         }
         message_buffer[1] = 0;
-        debug_print("gwssrv: response sent\n");
+        debug_print("xxxHandleNextClientRequest: response sent\n");
         return;
     }
 
 
-    debug_print ("gwssrv: Got a request!\n");
-    debug_print ("gwssrv: Calling window procedure \n");
+    debug_print ("xxxHandleNextClientRequest: Got a request!\n");
+    debug_print ("xxxHandleNextClientRequest: Calling window procedure \n");
     
     
     // #todo.
@@ -1068,7 +1077,7 @@ __again:
     // == Response ============================
     //
       
-    gwssrv_debug_print ("gwssrv: Sending response ...\n");
+    gwssrv_debug_print ("xxxHandleNextClientRequest: Sending response ...\n");
 
     // #todo:
     // while(1){...}
@@ -1089,11 +1098,10 @@ __again:
 
     n_writes = write ( fd, __buffer, sizeof(__buffer) );
     //n_writes = send ( fd, __buffer, sizeof(__buffer), 0 );
-    
-    if (n_writes<=0){
-        gwssrv_yield();
-        goto __again;
-    }
+   
+   
+    // limpa.
+    // se a resposta der certo ou se der errado.
 
 
     // Cleaning
@@ -1110,7 +1118,16 @@ __again:
     for (c=0; c<NEXTRESPONSE_BUFFER_SIZE; ++c)  //32. todo: 512
         next_response[c] = 0;
 
-    gwssrv_debug_print ("gwssrv: Response sent\n");  
+
+    if (n_writes<=0){
+        gwssrv_debug_print ("xxxHandleNextClientRequest: write fail. response fail\n");
+        gwssrv_yield();
+        return;
+    }
+    
+    if (n_writes>0)
+       gwssrv_debug_print ("xxxHandleNextClientRequest: Response sent\n");  
+
 }
 
 
@@ -1442,6 +1459,7 @@ gwsProcedure (
     // Call the system's window procedure.    
     // Rever esse retorno.
     //return (int) gde_system_procedure (window,msg,long1,long2);
+ 
     return 0;
 }
 
@@ -2340,10 +2358,10 @@ int main (int argc, char **argv){
         // Calling child.
         //printf ("gwssrv: Calling child \n");  
 
-        //gwssrv_clone_and_execute ("gws.bin");      // command gws.bin
+        gwssrv_clone_and_execute ("gws.bin");      // command gws.bin
         //gwssrv_clone_and_execute ("gwm.bin");      // window manager
         //gwssrv_clone_and_execute ("fileman.bin");  
-        gwssrv_clone_and_execute ("editor.bin");           
+        //gwssrv_clone_and_execute ("editor.bin");           
         //gwssrv_clone_and_execute ("terminal.bin");  
         //gwssrv_clone_and_execute ("browser.bin");
         //gwssrv_clone_and_execute ("launch1.bin"); 
@@ -2397,7 +2415,7 @@ int main (int argc, char **argv){
         connection_status = 1;
 
         //curconn = ____saved_server_fd;
-        curconn = serverClient->fd;
+        //curconn = serverClient->fd;
         newconn = -1;
 
     
@@ -2423,7 +2441,7 @@ int main (int argc, char **argv){
             //dos retângulos.
             // See comp.c
 
-            compositor();
+            //compositor();
 
             //process_events(); //todo
 
@@ -2435,16 +2453,25 @@ int main (int argc, char **argv){
             // #ps: 
             // Actually, accept2 returns the fd of the server,
             // and write will copy from on socket to another.
-
-            //newconn = accept ( curconn, 
-            //              (struct sockaddr *) &server_address, 
-            //              (socklen_t *) addrlen );
             
-            newconn = accept2 ( curconn, 
+            // Seja profissional e aceite a conexaozinha \o/
+
+            newconn = accept ( serverClient->fd, 
                           (struct sockaddr *) &server_address, 
                           (socklen_t *) addrlen );
-                          
-            if (newconn < 0) {
+        
+            //newconn = accept2 ( curconn, 
+            //              (struct sockaddr *) &server_address, 
+            //              (socklen_t *) addrlen );
+        
+            gwssrv_debug_print("gwssrv: accept returned\n");
+            printf ("gwssrv: newconn %d\n",newconn);
+            
+            if (newconn>0)
+                xxxHandleNextClientRequest (newconn);
+            
+            /*
+            if (newconn <= 0) {
                 gwssrv_debug_print ("gwssrv: ERROR on Accepting\n");
                 gwssrv_yield();
  
@@ -2464,6 +2491,7 @@ int main (int argc, char **argv){
                 //shutdown(newconn, 0);         
                 //close(newconn);
             };
+            */
             
             //#talvez aqui podemos pegar as mensages de sistema.
         };

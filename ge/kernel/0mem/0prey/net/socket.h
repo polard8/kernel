@@ -553,6 +553,8 @@ struct socket_d
     // Nosso arquivo, nosso buffer ?
     file *private_file;
 
+    ///testing
+    char magic_string[8];
 
 
     //se ele está ou não aceitando conexões. ...
