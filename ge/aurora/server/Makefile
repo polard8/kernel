@@ -72,7 +72,7 @@ myObjects = crt0.o main.o rtl.o \
 ctype.o stdio.o stdlib.o string.o conio.o socket.o signal.o unistd.o \
 r_render.o \
 pixel.o line.o rect.o char.o dtext.o createw.o gws.o comp.o window.o \
-grprim.o demos.o bmp.o connect.o button.o font.o\
+grprim.o sprite.o demos.o bmp.o connect.o button.o font.o\
 termios.o ioctl.o fcntl.o    
 
 
@@ -101,8 +101,9 @@ all-c:
 	gcc  -c  view/comp.c     $(CFLAGS) -I $(LIBC) -I include/ -I .  -o comp.o
 
 	gcc  -c  view/bmp.c      $(CFLAGS) -I $(LIBC) -I include/ -I .  -o bmp.o
-	
-	gcc  -c  view/grprim.c      $(CFLAGS) -I $(LIBC) -I include/ -I .  -o grprim.o
+
+	gcc  -c  view/grprim.c   $(CFLAGS) -I $(LIBC) -I include/ -I .  -o grprim.o
+	gcc  -c  view/sprite.c   $(CFLAGS) -I $(LIBC) -I include/ -I .  -o sprite.o
 
 	gcc  -c  view/demos.c      $(CFLAGS) -I $(LIBC) -I include/ -I .  -o demos.o
 	

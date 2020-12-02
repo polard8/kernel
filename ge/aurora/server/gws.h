@@ -53,6 +53,9 @@ int current_mode;
 
 #include "view/grprim.h"
 
+
+#include "view/sprite.h"
+
 #include "view/demos.h"
 
 
