@@ -611,13 +611,12 @@ int _hello_request(int fd){
 
     int n_writes = 0;   // For sending requests.
 
-     //
-     // Loop for new message.
-     //
+    // unsigned long ____color = 0x00FF00;
 
-    unsigned long ____color = 0x00FF00;
+    int i=0;
 
 // loop:
+// Loop for new message.
 new_message:
 
     
@@ -638,7 +637,7 @@ new_message:
 
     while (1){
 
-        // Solicita um hello na posição x,y. 
+        // message: Solicita um hello na posição x,y. 
         message_buffer[0] = 0;       // window. 
         message_buffer[1] = 1000;    // msg=hello.
         message_buffer[2] = 10;       // x
@@ -647,7 +646,13 @@ new_message:
 
         n_writes = write (fd, __buffer, sizeof(__buffer));
         
-        if (n_writes>0){ break; }
+        if (n_writes>0){ 
+            break; 
+        }
+        
+        for (i=0; i<9; i++){
+            gws_yield();
+        }
     };
 
     return 0;

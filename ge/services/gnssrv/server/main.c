@@ -557,15 +557,15 @@ ip_calculate_checksum(void *ip)
 int main (int argc, char **argv){
 
 
-
-    struct sockaddr addr;
+    //=======================
+    struct sockaddr server_address;
     socklen_t addrlen;
     
-    addr.sa_family = AF_GRAMADO;
-    addr.sa_data[0] = 'n';
-    addr.sa_data[1] = 's';
+    server_address.sa_family = AF_GRAMADO;
+    server_address.sa_data[0] = 'n';
+    server_address.sa_data[1] = 's';
 
-    addrlen = sizeof(addr);
+    addrlen = sizeof(server_address);
 
 
     int server_fd = -1; 
@@ -632,7 +632,7 @@ int main (int argc, char **argv){
  
     bind_status = bind ( 
                       server_fd, 
-                      (struct sockaddr *) &addr, 
+                      (struct sockaddr *) &server_address, 
                       addrlen );
 
     if (bind_status<0){
@@ -682,23 +682,24 @@ int main (int argc, char **argv){
     // via mensagens e repassar via socket. 
     
 
+    // clients.
     int newconn = -1;
     int curconn = ____saved_server_fd;
 
+
+
+    // Accept connection from a client. 
+    // #ps: Actually, accept2 returns the fd of the server,
+    // and write will copy from on socket to another.
     
     while (1){
 
-        // Accept connection from a client. 
-
-        // #ps: Actually, accept2 returns the fd of the server,
-        // and write will copy from on socket to another.
-
         //newconn = accept ( curconn, 
-        //              (struct sockaddr *) &addr, 
+        //              (struct sockaddr *) &server_address, 
         //              (socklen_t *) addrlen );
     
         newconn = accept2 ( curconn, 
-                      (struct sockaddr *) &addr, 
+                      (struct sockaddr *) &server_address, 
                       (socklen_t *) addrlen );
 
         if (newconn < 0) {

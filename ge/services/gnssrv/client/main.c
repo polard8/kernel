@@ -230,20 +230,19 @@ process_reply:
 }
 
 
-int gnst_hello_request(int fd){
+int gnst_hello_request (int fd){
 
     // Isso permite ler a mensagem na forma de longs.
     unsigned long *message_buffer = (unsigned long *) &__buffer[0];   
 
     int n_writes = 0;   // For sending requests.
 
-     //
-     // Loop for new message.
-     //
-
-    unsigned long ____color = 0x00FF00;
+    //unsigned long ____color = 0x00FF00;
+    int i=0;
 
 // loop:
+// Loop for new message.
+
 new_message:
 
     //
@@ -256,14 +255,13 @@ new_message:
     // Enviamos um request para o servidor.
     // ?? Precisamos mesmo de um loop para isso. ??
 
-
     // Write!
     // Se foi possível enviar, então saimos do loop.        
     // obs: podemos usar send();
 
     while (1){
 
-        // solicita um hello!      
+        // messae: Solicita um hello!      
         message_buffer[0] = 0;       // window. 
         message_buffer[1] = 1000;    // msg=hello.
         message_buffer[2] = 0;
@@ -271,8 +269,13 @@ new_message:
         // ...
 
         n_writes = write (fd, __buffer, sizeof(__buffer));
-        if(n_writes>0)
+        if (n_writes>0)
            break;
+        
+        for (i=0; i<9; i++){
+            gramado_system_call (265,0,0,0); //yield thread.
+            //gns_yield();
+        }
     }
 
     return 0;
@@ -282,8 +285,9 @@ new_message:
 //internal
 void gnst_hello (int fd)
 {
-    if(fd<0)
+    if (fd<0){
         debug_print("gnst_hello: fd\n");
+    }
 
     gnst_hello_request(fd);
     gnst_hello_response(fd);
@@ -369,8 +373,7 @@ int main ( int argc, char *argv[] ){
     //
 
     // Hello.
-    while (1){
-        
+    while (1){ 
         gnst_hello(client_fd);
     };
 
