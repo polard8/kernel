@@ -24,6 +24,25 @@
 
 
 
+//TTY_DRIVER_TYPE_SYSTEM
+//TTY_DRIVER_TYPE_CONSOLE
+//TTY_DRIVER_TYPE_SERIAL
+//TTY_DRIVER_TYPE_PTY
+
+// type
+#define TTY_TYPE_CONSOLE    1000
+#define TTY_TYPE_SERIAL     2000
+#define TTY_TYPE_USBSERIAL  3000
+#define TTY_TYPE_PTY        4000
+// ...
+
+
+// subtype
+#define TTY_SUBTYPE_PTY_MASTER   100
+#define TTY_SUBTYPE_PTY_SLAVE    200
+// ...
+
+
 //These bits are used in the flags field of the tty structure.
 #define TTY_THROTTLED         0	/* Call unthrottle() at threshold min */
 #define TTY_IO_ERROR          1	/* Cause an I/O error (may be no ldisc too) */

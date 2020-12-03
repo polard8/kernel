@@ -10,6 +10,18 @@
 #define ____PTY_H  1
 
 
+/*
+#important
+window server >> terminal >> shell
+
+    The terminal communicates with the window server via socket.
+    To create an instance of a terminal, you need to open a ptmx, 
+    that is a multiplexer and has its own file system, and 
+    the ptmx will give you two TTYs, one for master and one for slave. 
+    These tty given by the ptmx is called pty. 
+    So the shell will use the pty slave and the terminal will 
+    use the pty master.
+*/    
 
 // A pseudoterminal (sometimes abbreviated "pty") is a pair of virtual
 // character devices that provide a bidirectional communication channel.

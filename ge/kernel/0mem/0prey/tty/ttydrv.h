@@ -32,8 +32,8 @@
 
 
 
-struct ttydrv_d {
-
+struct ttydrv_d 
+{
     int index;
     
     int used;
@@ -41,13 +41,16 @@ struct ttydrv_d {
     
     char name[64];
 
-    // COntagem simplificada;
-    int major;
-    int minor;
+
+    // Versionamento simplificado.
+    unsigned short major;
+    unsigned short minor;
+
 
     // linux-like
     short type;       // type of tty driver. 
     short subtype;    // subtype of tty driver. 
+
     int flags;        // tty driver flags.
 
      // owner process.
@@ -64,6 +67,13 @@ struct ttydrv_d {
     
     //ldisc: 'from' and 'to'
     struct ttyldisc_d *ldisc;
+
+    // maybe
+    // Pointer to a tty slave driver. 
+    // This is used only by the pty driver and 
+    // should not be used by any other tty driver.
+    
+    //struct ttydrv_d *other;
 };
 struct ttydrv_d *CurrentTTYDRV;
 
