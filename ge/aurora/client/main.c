@@ -168,40 +168,44 @@ int main ( int argc, char *argv[] ){
     // Window
     //
 
+    //===============================
     gws_debug_print ("gws.bin: Creating window \n");
-    printf          ("gws.bin: Creating window \n");
+    //printf          ("gws.bin: Creating window \n");
 
     main_window = gws_create_window (client_fd,
                       WT_SIMPLE, 1, 1, "gws-client",
                       0, 0, w, h,
                       0, 0, COLOR_PINK, COLOR_PINK);
 
-    if (main_window<0)
-    {
+    if (main_window<0){
         printf ("gws.bin: main_window\n");
         exit(1);
     }
+    //========================
 
-    //gws_refresh_window (client_fd, main_window);
 
+    //===================
     gws_debug_print ("gws.bin: Drawing a char \n");
-    printf          ("gws.bin: Drawing a char \n");
-
-
+    //printf          ("gws.bin: Drawing a char \n");
     gws_draw_char ( client_fd, main_window, 
         16, 8, COLOR_RED, 'C' );
-        
+    //====================
 
+
+   
+    //====================
     gws_debug_print ("gws.bin: hang in a loop \n");
-    printf          ("gws.bin: hang in a loop \n");
-    
+    //printf          ("gws.bin: hang in a loop \n");
     //#debug
     while(1)
     {
         gws_draw_char ( client_fd, main_window, 
-            16, 8, COLOR_RED, 'C' );
+            w/3, 8, COLOR_RED, 'C' );
     }
-
+    //================
+   
+    
+    
 
     // Create a little window in the top left corner.
     //gws_create_window (client_fd,
@@ -229,6 +233,7 @@ int main ( int argc, char *argv[] ){
     // == cube ==================================
     //
 
+    
     gws_debug_print ("gws.bin: Testing Plot cube \n");
     printf          ("gws.bin: Testing Plot cube \n");
 
@@ -283,7 +288,7 @@ int main ( int argc, char *argv[] ){
         // plot cube 
         gws_plotcube ( client_fd, (struct gr_cube_d *) cube );
     }
-
+   
 
 
     //
@@ -320,7 +325,7 @@ int main ( int argc, char *argv[] ){
         // plot rectangle 
         gws_plotrectangle ( client_fd, (struct gr_rectangle_d *) rect );
     }
-    
+   
    
     // #debug
     while (1){
@@ -333,8 +338,8 @@ int main ( int argc, char *argv[] ){
         // Saving the fd into the libgws.
         // it's gonna be used by the payment routine.
         // See: connect.c
-        gws_set_client_fd(client_fd);
-        gws_payment();
+        //gws_set_client_fd(client_fd);
+        //gws_payment();
         
         //refresh background and yield.
         //gws_refresh_yield(client_fd);

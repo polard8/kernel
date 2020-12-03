@@ -868,16 +868,20 @@ void xxxHandleNextClientRequest (int fd){
 
 
     gwssrv_debug_print ("xxxHandleNextClientRequest: \n");
-        
 
     if (fd<0){
         gwssrv_debug_print ("xxxHandleNextClientRequest: xxxHandleNextClientRequest fd\n");
+        gwssrv_yield(); 
+        // Cleaning
+        message_buffer[0] = 0;
+        message_buffer[1] = 0;
+        message_buffer[2] = 0;
+        message_buffer[3] = 0;
         return;
     }
 
 
 //__loop:
-
 
     //
     // == Request ============================
@@ -902,29 +906,22 @@ void xxxHandleNextClientRequest (int fd){
     //
     // Recv.
     //
-
-    // Lê a mensagem e coloca no buffer.
   
     n_reads = read ( fd, __buffer, sizeof(__buffer) );
     //n_reads = recv ( fd, __buffer, sizeof(__buffer), 0 );
-    
-    // Different kind of errors!
-    
-    // #test
-    // Poderiamos nesse momento pegarmos mensagens do sistema
-    // e retornarmos como se a leitura do arquivo estivesse falhado.
-    
+
     // Precisamos fechar o client e yield.
     if (n_reads <= 0)
     { 
         gwssrv_debug_print ("xxxHandleNextClientRequest: read fail\n");
         gwssrv_yield(); 
+        // Cleaning
+        message_buffer[0] = 0;
+        message_buffer[1] = 0;
+        message_buffer[2] = 0;
+        message_buffer[3] = 0;
         return; 
     }
-    
-    // Sem problemas, nao precisamos fechar o client.
-    //if (n_reads == 0){ gwssrv_yield(); return; }
-
 
     // Nesse momento lemos alguma coisa.   
  
@@ -937,6 +934,11 @@ void xxxHandleNextClientRequest (int fd){
     {
         gwssrv_debug_print ("xxxHandleNextClientRequest: Invalid request!\n");
         gwssrv_yield();
+        // Cleaning
+        message_buffer[0] = 0;
+        message_buffer[1] = 0;
+        message_buffer[2] = 0;
+        message_buffer[3] = 0;
         return;
     }
 
@@ -1007,9 +1009,12 @@ void xxxHandleNextClientRequest (int fd){
         return;
     }
 
+    //
+    // == Got a request! ============
+    //
 
     debug_print ("xxxHandleNextClientRequest: Got a request!\n");
-    debug_print ("xxxHandleNextClientRequest: Calling window procedure \n");
+    debug_print ("xxxHandleNextClientRequest: Calling window procedure\n");
     
     
     // #todo.
@@ -1029,9 +1034,7 @@ void xxxHandleNextClientRequest (int fd){
     // + Set property: Probably setting a property of an object.
     // + Disconnect:
     // ...
-    
-    
-                
+
     //#debug: para a máquina real.
     //printf ("gws: got a message!\n");
     //printf ("gws: xxxGetNextClientRequest: calling window procedure \n");
@@ -1103,7 +1106,6 @@ __again:
     // limpa.
     // se a resposta der certo ou se der errado.
 
-
     // Cleaning
     message_buffer[0] = 0;
     message_buffer[1] = 0;
@@ -1118,13 +1120,14 @@ __again:
     for (c=0; c<NEXTRESPONSE_BUFFER_SIZE; ++c)  //32. todo: 512
         next_response[c] = 0;
 
-
+    // NO. We couldn't send a response.
     if (n_writes<=0){
         gwssrv_debug_print ("xxxHandleNextClientRequest: write fail. response fail\n");
         gwssrv_yield();
         return;
     }
     
+    // YES, We sent a response.
     if (n_writes>0)
        gwssrv_debug_print ("xxxHandleNextClientRequest: Response sent\n");  
 
@@ -2449,10 +2452,6 @@ int main (int argc, char **argv){
          
 
             // Accept connection from a client. 
-
-            // #ps: 
-            // Actually, accept2 returns the fd of the server,
-            // and write will copy from on socket to another.
             
             // Seja profissional e aceite a conexaozinha \o/
 
@@ -2460,15 +2459,13 @@ int main (int argc, char **argv){
                           (struct sockaddr *) &server_address, 
                           (socklen_t *) addrlen );
         
-            //newconn = accept2 ( curconn, 
-            //              (struct sockaddr *) &server_address, 
-            //              (socklen_t *) addrlen );
-        
             gwssrv_debug_print("gwssrv: accept returned\n");
-            printf ("gwssrv: newconn %d\n",newconn);
+            //printf ("gwssrv: newconn %d\n",newconn);
             
             if (newconn>0)
                 xxxHandleNextClientRequest (newconn);
+            
+            //close(newconn);
             
             /*
             if (newconn <= 0) {
