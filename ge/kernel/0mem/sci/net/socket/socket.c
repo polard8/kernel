@@ -1927,8 +1927,10 @@ fail:
 // Deprecated!
 int sys_accept_sender (int n)
 {
+    n=0;
     debug_print ("sys_accept_sender: [DEPRECATED]\n");
     printf      ("sys_accept_sender: [DEPRECATED]\n");
+    refresh_screen();
     return -1;
 }
 
@@ -1970,6 +1972,8 @@ sys_accept2 (
     socklen_t *addrlen )
 {
     debug_print ("sys_accept2: deprecated!\n");
+         printf ("sys_accept2: deprecated!\n");
+    refresh_screen();
     return -1;
 }
 
@@ -2102,8 +2106,8 @@ sys_accept (
     // Is this file a socket ??
     if (sFile->____object != ObjectTypeSocket )
     {
-        debug_print ("sys_accept: sFile is not a server object.\n");
-             printf ("sys_accept: sFile is not a server object.\n");
+        debug_print ("sys_accept: sFile is not a socket object\n");
+             printf ("sys_accept: sFile is not a socket object\n");
         goto fail;
     }
 
@@ -2266,18 +2270,14 @@ sys_accept (
             sProcess->Objects[ 31 ] = cFile;  //last
             cFile->_file = 31;
             
+            // certificar que eh um socket de cliente ja conectado.
             if( cSocket->magic_string[0] == 'C')
                 debug_print("MAGIC C\n");
             //printf ("magic: %s\m",cSocket->magic_string);
             
             
             debug_print ("sys_accept: done ok\n");
-            return (int) cFile->_file;    /// client ???
-            
-            
-            //retornamos o fd do proprio servidor, pois nosso write copia
-            //entre os buffers dos sockets conectados.
-            //return (int) fdServer;
+            return (int) cFile->_file; 
         }
 
         //fail
