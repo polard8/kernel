@@ -1002,11 +1002,11 @@ int sys_write (unsigned int fd, char *ubuf, int count){
 
     struct process_d  *__P;
     
-    file              *__file;
-    file              *__file2;
+    file *__file;
+
     
     struct socket_d  *s1;
-    struct socket_d  *s2;
+    //struct socket_d  *s2;
     
     int nbytes=0;
     int ubuf_len=0;
@@ -1111,15 +1111,11 @@ int sys_write (unsigned int fd, char *ubuf, int count){
         if ( __file->____object != ObjectTypeVirtualConsole ){
             panic("sys_write: Wrong object for stdout");
         }
-        return (int) console_write ( (int) current_vc, 
-                         (const void *) ubuf, (size_t) count );
+        return (int) console_write ( 
+                         (int) current_vc, 
+                         (const void *) ubuf, 
+                         (size_t) count );
     }
-
-
-    // Write
-    // and copy if it's a socket.
-    // #bugbug: We need a flag to handle this issue.
-    // __file2
 
 
     //
@@ -1226,115 +1222,6 @@ int sys_write (unsigned int fd, char *ubuf, int count){
         // ok.
         // retornamos o numero de bytes escritos.
         return nbytes;
-        
-        //if (s1->conn_copy != 1){
-        //    panic ("sys_write: [FIXME] Working to not copy the data from s1 to s2.");
-        //}
-        
-        // #test
-        // Estamos suspendendo a copia.
-        // precisamos mudar o accept2 para que ele nao retorno o fd do servidor.
-        // pois o conteudo nao sera mais copiado do socket do servidor para o socket do cliente.
-        /*
-        // YES, copy!
-        if (s1->conn_copy == 1)
-        {
-            // #obs: 
-            // Esse ponteiro precisa ser inicializado
-            // na criação da estrutura de socket.
-            // O ponteiro precisa ser valido
-            // A conexao nao pode estar pendente.
-
-            // ponteiro invalido
-            if ( (void *) s1->conn == NULL){ 
-                debug_print("sys_write: s1->conn fail. No connection\n");
-                //printf("sys_write: s1->conn fail. No connection\n"); 
-                goto fail;
-            }    
-
-            // The pointer to the destination.
-            // O segundo socket nos dara o fd do socket onde 
-            // vamos copiar.
-            
-            s2 = s1->conn;
-            
-            // #bugbug: repetimos o que foi feito logo acima.
-            if ( (void *) s2 == NULL){ 
-                debug_print("sys_write: [FAIL] s2. No connection\n");
-                //printf     ("sys_write: [FAIL] s2. No connection\n");  
-                goto fail2;
-            } 
- 
-            // check connection status.
-            // nao queremos uma conexao pendente.
-            if ( s2->state != SS_CONNECTED ){
-                debug_print("sys_write: [FAIL] s2 connection status\n");
-                //printf     ("sys_write: [FAIL] s2 connection status\n");  
-                goto fail2;
-            }
-
-            // pega o arquivo.    
-            __file2 = s2->private_file;
-
-            if ( (void *) __file2 == NULL){
-                debug_print ("sys_write: target file fail. __file2\n");
-                //printf ("sys_write: target file fail. __file2\n");
-                goto fail;
-            }  
-
-            if ( __file2->____object == ObjectTypeSocket )
-            {
-
-                // #debug
-                //printf ("sys_write: (2)  pid %d  Writing in the socket file %d \n",
-                    //current_process, __file2->_file);
-                //refresh_screen();
-              
-                //memcpy( (void *) fa->_base, (const void *) __file->_base, (size_t) ncopy );
-         
-                nbytes = (int) file_write_buffer ( (file *) __file2, 
-                                   (char *) ubuf, (int) ncopy );
-
-                // fail
-                if (nbytes < 0){
-                    debug_print("sys_write: file_write_buffer fail (2)\n");
-                    goto fail;
-                }
-            
-                // fail
-                // Não foi escrito ...
-                // não mudamos flag, nem dormimos.
-                if (nbytes == 0){ 
-                    debug_print("sys_write: file_write_buffer fail 0 (2)\n");
-                    return 0; 
-                }
-       
-                //printf ("sys_write: written\n");
-                //refresh_screen();
-             
-                if (nbytes>0) 
-                    __file2->socket_buffer_full = 1;
-             
-                // Atualizamos a flag.             
-                // Se alguma thread estava esperando 
-                // que alguem escrevesse, então acordamos ela.
-            
-                if (__file2->tid_waiting >0){
-                    //printf ("thread %d is ready now \n", __file2->tid_waiting);
-                    do_thread_ready(__file2->tid_waiting);
-                    __file2->tid_waiting = 0;
-                }
-
-                // Agora pode ler.
-                __file2->_flags |= __SRD; 
-                do_thread_ready( __file2->tid_waiting );
-                return (int) nbytes;
-            }
-        }
-        */
-
-        debug_print("sys_write:  fail. Target is not a socket.\n");
-        return 0;
         
     }  //socket file 
 
