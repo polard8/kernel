@@ -8,10 +8,7 @@
  *     2016 - Created by Fred Nora.
  */
 
-
 #include "gdeshell.h"
-
-
 
 // #hackhack
 #define gramado_strncmp strncmp 
@@ -1040,14 +1037,11 @@ shellProcedure (
             //...
             switch (long1)
             {
-				//EOF
-				//case -1:
-				//    #todo
-				//    break;
-				
-				// Null key.
+                //case EOF:  break;
+
+                // Null key.
                 case 0:
-                    pause();  pause();  cpu_relax();
+                    cpu_relax(); 
                     return (unsigned long) 0;
                     break;
 
@@ -1133,16 +1127,69 @@ shellProcedure (
             break;
 
 
-        case MSG_KEYUP:   
+        case MSG_KEYUP: 
             break;
-        
+ 
+
         case MSG_SYSKEYDOWN: 
             switch (long1)
             {
-                case VK_F1: debug_print(" [F1] "); break;
-                case VK_F2: debug_print(" [F2] "); break;
-                case VK_F3: debug_print(" [F3] "); break;
-                case VK_F4: debug_print(" [F4] "); break;
+                // #bugbug
+                // Nao temos retorno.
+                // Se falhar, trava.
+
+                // grass:  f1,  f2,  f3,  f4
+                // system: f5,  f6,  f7,  f9
+                // cmd:    f9, f10, f11, f12
+                
+                case VK_F1: 
+                    debug_print(" [F1] "); 
+                    gde_clone_and_execute ("launcher.bin");
+                    exit(0);
+                    break;
+                    
+                case VK_F2: 
+                    debug_print(" [F2] "); 
+                    gde_clone_and_execute ("gfe.bin");
+                    exit(0);
+                    break;
+                    
+                case VK_F3: 
+                    debug_print(" [F3] "); 
+                    gde_clone_and_execute ("gramcode.bin");
+                    exit(0);
+                    break;
+                    
+                case VK_F4: 
+                    debug_print(" [F4] "); 
+                    gde_clone_and_execute ("sysmon.bin");
+                    exit(0);
+                    break;
+
+                case VK_F9: 
+                    debug_print(" [F9] "); 
+                    gde_clone_and_execute ("reboot.bin");
+                    exit(0);
+                    break;
+
+                case VK_F10: 
+                    debug_print(" [F10] "); 
+                    gde_clone_and_execute ("reboot.bin");
+                    exit(0);
+                    break;
+
+                case VK_F11: 
+                    debug_print(" [F11] "); 
+                    gde_clone_and_execute ("reboot.bin");
+                    exit(0);
+                    break;
+
+                case VK_F12: 
+                    debug_print(" [F12] "); 
+                    gde_clone_and_execute ("reboot.bin");
+                    exit(0);
+                    break;
+
             };
             goto done;
             break;
@@ -3759,11 +3806,10 @@ done:
         
         // Top of the screen ?
         printf("\f");
-        //printf("Gramado Setup");
-        printf("Gramado OS 1.0");
+        printf("GRAMADO OS 1.0");
         printf("\n");
         
-        printf("==============");
+        printf("______________");
         printf("\n");
         
         printf("\n");
@@ -3773,12 +3819,8 @@ done:
         shellPrompt();
     }
 
-
-    //printf("============= $$$ ================ \n");
     //printf ("gdeshell-shellInit: breakpoint    \n");
     //while(1){}
-
-
 
     return 0;
 }

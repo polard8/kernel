@@ -228,17 +228,17 @@ vhd-copy-files:
 	# setup
 	#-sudo cp setup0/grass/bin/*.BIN    base/
 
-	sudo cp setup0/grass/bin/SYSMON.BIN    base/
-	sudo cp setup0/grass/bin/GRAMCODE.BIN  base/
-	#sudo cp setup0/grass/bin/NORATERM.BIN  base/
 	sudo cp setup0/grass/bin/LAUNCHER.BIN  base/
-
+	sudo cp setup0/grass/bin/GRAMCODE.BIN  base/
+	sudo cp setup0/grass/bin/GFE.BIN       base/
+	sudo cp setup0/grass/bin/SYSMON.BIN    base/
+	#sudo cp setup0/grass/bin/NORATERM.BIN  base/
 
 	#tests interpreters.
-	sudo cp setup0/grass/bin/C4.BIN       base/
-	sudo cp setup0/grass/bin/GRAMC.BIN    base/
+	#sudo cp setup0/grass/bin/C4.BIN       base/
+	#sudo cp setup0/grass/bin/GRAMC.BIN    base/
 	sudo cp setup0/grass/bin/GRAMC4.BIN   base/
-	sudo cp setup0/grass/bin/GRAMCNF.BIN  base/
+	#sudo cp setup0/grass/bin/GRAMCNF.BIN  base/
 	
 	# ====================================================
 
