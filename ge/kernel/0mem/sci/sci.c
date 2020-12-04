@@ -402,7 +402,12 @@ gde_extra_services (
                 // The window server is still initializing ...
                 // but there is no problem to sent messages to its control thread.
                 // os am i wrong?
-                current_input_mode = INPUT_MODE_WS; 
+                
+                //#importante
+                // Nao mudaremos mais o modo de input.
+                // Esse modo de input nao vai mais existir.
+                // o cliente pegara o input.
+                // current_input_mode = INPUT_MODE_WS; 
                 
                 // returning ok.
                 // But, we could return the port number.

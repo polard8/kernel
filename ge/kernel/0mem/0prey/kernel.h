@@ -45,21 +45,14 @@
 // window with focus in the window server embedded inside the kernel.
 #define INPUT_MODE_SETUP  1000
 
-// WS input mode.
-// This is the mode used when we have a loadable ring3 window server.
-// Send the input event to the control thread of the 
-// loadable window server if we have one.
-#define INPUT_MODE_WS      2000
-
-
 // tty input mode.
 // In this mode we're gonna send the input to the tty buffer.
 // This way a virtual terminal can share the input with its client.
-#define INPUT_MODE_TTY     3000
-
-
+#define INPUT_MODE_TTY    2000
 
 // ...
+
+
 
 
 //

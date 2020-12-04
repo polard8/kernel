@@ -166,10 +166,11 @@ int gnst_hello_response(int fd)
 __again:
     n_reads = read ( fd, __buffer, sizeof(__buffer) );
     
-    if (n_reads <= 0){
+    if (n_reads <= 0)
+    {
         printf ("gnst: recv fail\n");
         gnst_yield ();
-        return 0;
+        return -1;
     }
         
     // Get the message sended by the server.
@@ -204,16 +205,19 @@ __again:
     };
 
 
-process_reply:
-
     //
     // done:
     //
 
-    //printf("%d bytes readed\n",n_reads);
-    printf("RESPONSE: {%s} \n",__buffer+16);
+    char response_buffer[64];
 
-    return 0;
+process_reply:
+
+    sprintf( response_buffer, (__buffer+16) );
+    response_buffer[63] = 0;  //finaliza
+    printf("RESPONSE: {%s} \n", response_buffer );
+
+    return TRUE;
 }
 
 
@@ -270,16 +274,17 @@ new_message:
 
 
 //internal
-void gnst_hello (int fd)
+int gnst_hello (int fd)
 {
+    
     if (fd<0){
         debug_print("gnst_hello: fd\n");
     }
 
     gnst_hello_request(fd);
-    gnst_hello_response(fd);
+    
+    return (int) gnst_hello_response(fd);
 }
-
 
 
 
@@ -355,19 +360,24 @@ int main ( int argc, char *argv[] ){
     };
 
 
-    //
-    // Loop.
-    //
-
-    // Hello.
-    while (1){ 
-        gnst_hello(client_fd);
-    };
-
-
+    // no loop.
+    gnst_hello (client_fd);
+    gnst_hello (client_fd);
+    gnst_hello (client_fd);
+    gnst_hello (client_fd);
+    
+    int i=0;
+    for(i=0; i<50; i++)
+        gnst_yield();
+    
+    
+    close(client_fd);
+    
     debug_print ("gns.bin: bye\n"); 
     printf      ("gns.bin: bye\n");
     return 0;
 }
+
+
 
 

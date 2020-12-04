@@ -1252,45 +1252,21 @@ void mouseHandler (void)
             // == Message ==========================================
             //
             
-            // #todo
-            // Mandar uma mensagem para o window server registrado
-            // caso exita um. Dai o ws scaneia suas janelas.
-            // obs: essa chamada tem um retorno.
-            // O pacote tem 3 longs ...
-            // Somente par ao 'ws input mode'.
-            msg_status = -1; //fail
-            if (current_input_mode == INPUT_MODE_WS )
-            {
-                msg_status = (int) si_send_longmessage_to_ws ( (struct window_d *) 0,  // Deprecated!
-                                  (int) 4567, //MSG_MOUSE_PACKET,               // A mensagem comtem um pacote. 
-                                  (unsigned long) buffer_mouse[0],      //
-                                  (unsigned long) buffer_mouse[1],
-                                  (unsigned long) buffer_mouse[2],
-                                   0 );
-                
-            }
             
-            // Se a mensagem nao foi enviada para o ws.
-            // Entao vamos tratar aqui mesmo no kernel.
-            // Entao nao estamod no ws input mode.
-            // Que input mode estamos?
-            if (msg_status!=0)
+            if (current_input_mode == INPUT_MODE_SETUP )
             {
-                if (current_input_mode == INPUT_MODE_SETUP )
-                {
                     // #todo
                     // Nao precisamos fazer esse parse aqui ...
                     // apenas mandar o pacote para o window server em ring3
                     // na forma de mensagens.
                     // Tambem nao precisamos escanear janelas ... o ws fara isso.
-                    ps2mouse_parse_data_packet();
+                ps2mouse_parse_data_packet();
             
                     // #bugbug
                     // escaneando janelas.
                     // O window server deveria fazer isso.
                     // sci/windows/kgws.c
-                    kgws_mouse_scan_windows();
-                }
+                kgws_mouse_scan_windows();
             }
             
             

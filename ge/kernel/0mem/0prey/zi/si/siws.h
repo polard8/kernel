@@ -3,12 +3,12 @@
 
 // window server
 int
-si_send_to_ws ( 
+si_send_message_to_ws ( 
     struct window_d *window, 
     int msg, 
     unsigned long long1, 
     unsigned long long2 );
-    
+
     
     
 // enviando 4 longs par ao window server.

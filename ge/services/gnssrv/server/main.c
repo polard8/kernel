@@ -164,8 +164,15 @@ void __socket_messages (int fd){
     int n_writes = 0;    // For responses.
 
 
-    if (fd<0){
+    if (fd<0)
+    {
         debug_print ("gnssrv: __socket_messages fd\n");
+        // Cleaning
+        message_buffer[0] = 0;
+        message_buffer[1] = 0;
+        message_buffer[2] = 0;
+        message_buffer[3] = 0;
+        gnssrv_yield(); 
         return;
     }
 
@@ -180,17 +187,38 @@ void __socket_messages (int fd){
 
     n_reads = read ( fd, __buffer, sizeof(__buffer) );
 
-    // 
-    // Se nao tem o que ler. saimos. 
-    if (n_reads <= 0){ gnssrv_yield(); return; }
+    if (n_reads <= 0)
+    { 
+        debug_print ("gnssrv: __socket_messages n_reads\n");
+        // Cleaning
+        message_buffer[0] = 0;
+        message_buffer[1] = 0;
+        message_buffer[2] = 0;
+        message_buffer[3] = 0;
+        gnssrv_yield(); 
+        return; 
+    }
   
     // Nesse momento lemos alguma coisa.   
  
     //debug_print ("gws: request found on its own socket \n");  
        
     //  mensagem invalida  
-    if (message_buffer[1] == 0){ gnssrv_yield(); return; }
+    if (message_buffer[1] == 0)
+    { 
+        debug_print ("gnssrv: __socket_messages Unknown message\n");
+        // Cleaning
+        message_buffer[0] = 0;
+        message_buffer[1] = 0;
+        message_buffer[2] = 0;
+        message_buffer[3] = 0;
+        gnssrv_yield(); 
+        return;
+    }
 
+    //
+    // == Message OK =====================
+    //
 
     debug_print ("gnssrv: Got a request!\n");
     debug_print ("gnssrv: Calling window procedure \n");
@@ -201,10 +229,11 @@ void __socket_messages (int fd){
  
                 
     // realiza o serviço.
-    gnsProcedure ( (void *) message_buffer[0], 
-       (int) message_buffer[1], 
-       (unsigned long) message_buffer[2], 
-       (unsigned long) message_buffer[3] );
+    gnsProcedure ( 
+        (void *)        message_buffer[0], 
+        (int)           message_buffer[1], 
+        (unsigned long) message_buffer[2], 
+        (unsigned long) message_buffer[3] );
 
 
     // #todo
@@ -240,7 +269,7 @@ void __socket_messages (int fd){
     // #todo:
     // Talvez aqui possamos usar alguma função chamada post_message().
 
-__again:
+//__again:
 
     // #todo:
     // while(1){...}
@@ -254,8 +283,7 @@ __again:
     n_writes = write ( fd, __buffer, sizeof(__buffer) );
     if (n_writes<=0)
     {
-        gnssrv_yield();
-        goto __again;
+        debug_print ("gnssrv: __socket_messages Response fail\n");
     }
 
 
@@ -264,7 +292,6 @@ __again:
     message_buffer[1] = 0;
     message_buffer[2] = 0;
     message_buffer[3] = 0;
-
 
     // Cleaning
     int c=0;
@@ -381,7 +408,7 @@ gnsProcedure (
         //MSG_GNS_HELLO
         case 1000:
             printf ("\n");
-            printf ("gnssrv: Hello from Gramado Network Server!\n");
+            printf ("gnssrv: [1000] Hello from Gramado Network Server!\n");
             printf ("\n");
             return 0;
             break;
@@ -389,10 +416,13 @@ gnsProcedure (
 
         //MSG_GNS_INITIALIZENETWORK
         case 1001:
+            printf ("\n");
+            printf ("gnssrv: [1001]\n");
             serviceInitializeNetwork();
+            printf ("\n");
+            return 0;
             break; 
-            
-            
+           
         case 1002:
             break;
 
@@ -600,7 +630,7 @@ int main (int argc, char **argv){
 
     if (_status<0){
         debug_print ("gnssrv: Couldn't register the server \n");
-        printf ("gnssrv: Couldn't register the server \n");
+             printf ("gnssrv: Couldn't register the server \n");
         exit(1);
     }
     debug_print ("gnssrv: Registration ok \n");
@@ -687,10 +717,7 @@ int main (int argc, char **argv){
     int curconn = ____saved_server_fd;
 
 
-
     // Accept connection from a client. 
-    // #ps: Actually, accept2 returns the fd of the server,
-    // and write will copy from on socket to another.
     
     while (1){
 
@@ -698,12 +725,9 @@ int main (int argc, char **argv){
                       (struct sockaddr *) &server_address, 
                       (socklen_t *) addrlen );
     
-        //newconn = accept2 ( ____saved_server_fd, 
-        //              (struct sockaddr *) &server_address, 
-        //              (socklen_t *) addrlen );
 
         if (newconn < 0) {
-            debug_print ("gnssrv: ERROR on accept2\n");
+            debug_print ("gnssrv: ERROR on accept\n");
             gnssrv_yield(); 
 
         // Request from the new connection 
@@ -713,7 +737,7 @@ int main (int argc, char **argv){
             //vamos tentar usa-lo.
             __socket_messages (newconn);
             
-            //close ?
+
             //#bugbug: We can not close if we are using accept2.
             //shutdown(newconn, SHUT_RDWR);         
             //close(newconn);
@@ -727,7 +751,7 @@ int main (int argc, char **argv){
     // Done.
     
     debug_print ("gnssrv: Bye\n");
-    printf          ("gnssrv: Bye\n");
+         printf ("gnssrv: Bye\n");
 
     return 0; 
 }
@@ -745,9 +769,8 @@ int serviceInitializeNetwork(void)
 {
     // Ring0 routine to initialize network infrastructure.
     gramado_system_call (968,0,0,0);
+    return 0;
 }
-
-
 
 
 

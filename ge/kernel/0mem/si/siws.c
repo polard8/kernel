@@ -29,7 +29,7 @@
 // > 0  - The ws PID.
 
 int
-si_send_to_ws ( 
+si_send_message_to_ws ( 
     struct window_d *window, 
     int msg, 
     unsigned long long1, 
@@ -46,7 +46,7 @@ si_send_to_ws (
     // E é rápido.
 
     if ( (void *) CurrentDesktop == NULL ){
-        debug_print ("si_send_to_ws: CurrentDesktop\n");
+        debug_print ("si_send_message_to_ws: CurrentDesktop\n");
         return (int) (-1);
     }
         
@@ -54,7 +54,7 @@ si_send_to_ws (
     if ( CurrentDesktop->desktopUsed != 1 || 
          CurrentDesktop->desktopMagic != 1234 )
     {
-        debug_print ("si_send_to_ws: CurrentDesktop validation\n");
+        debug_print ("si_send_message_to_ws: CurrentDesktop validation\n");
         return (int) (-1);
     }
 
@@ -65,7 +65,7 @@ si_send_to_ws (
     // The ws PID.
     // #bugbug: Is it a valid PID? range?
     if (CurrentDesktop->ws <= 0){
-        debug_print ("si_send_to_ws: ws PID\n");
+        debug_print ("si_send_message_to_ws: ws PID\n");
         return (int) (-1);
     }
 
@@ -76,7 +76,7 @@ si_send_to_ws (
     __p = (struct process_d *) processList[ CurrentDesktop->ws ];
       
     if ( (void *) __p == NULL ){
-        debug_print ("si_send_to_ws: __p\n");
+        debug_print ("si_send_message_to_ws: __p\n");
         return (int) (-1);
     } 
 
@@ -97,7 +97,7 @@ si_send_to_ws (
                 case VK_F6:  
                 case VK_F7: 
                 case VK_F8:
-                    debug_print ("si_send_to_ws: >>>> [MSG_SYSKEYUP] to system procedure\n");  
+                    debug_print ("si_send_message_to_ws: >>>> [MSG_SYSKEYUP] to system procedure\n");  
                     __local_ps2kbd_procedure ( window, 
                         (int) msg, 
                         (unsigned long) long1, 

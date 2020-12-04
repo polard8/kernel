@@ -760,48 +760,6 @@ done:
     // em unsigned long.
 
 
-    //
-    // ws
-    // 
-
-    // Se o ws está rodando, então mandaremos a mensagem para 
-    // a fila de mensagem dele.
-    // #isso funcionou.
-    // O ws recebeu a mensagem de teclado, e é rápido.
-     
-    // Tentamos mandar a mensagem para ws, 
-    // se der certo a gente retorna,
-    // se não der certo então enviaremos para
-    // a thread de controle da janela com o foco
-    // ou para um procedimento aqui nesse documento.
-    // See: si/siws.c
-
-
-    // We will check the presence of the window sever only if we are
-    // in the ws input mode.
-    // We set this input mode when we register the ring3 window server.
-
-    if ( current_input_mode == INPUT_MODE_WS )
-    {
-
-        msg_status = (int) si_send_to_ws ( (struct window_d *) w,
-                           (int) message, 
-                           (unsigned long) ch,
-                           (unsigned long) tmp_sc);
-
-        // Se a mensagem foi enviada para o ws, então podemos retornar.
-        if ( msg_status == 0 ){
-            debug_print ("KEYBOARD_SEND_MESSAGE: >>>> to ws\n");        
-            return 0;
-        }
-    }
-
-
-    // #importante
-    // Só chegaremos até aqui se o ws não está rodando.
-
-
-
 
     // ==========================
     // Emergency keys.
