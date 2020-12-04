@@ -403,16 +403,16 @@ setup_vectors:
 	;32
 	;Timer.
 	;Iniciamos um timer provisório, depois o main() inicia o definitivo.
-	mov eax, dword _timer_test    
-	mov ebx, dword 32
-	call _setup_system_interrupt
+    mov eax, dword _timer_test    
+    mov ebx, dword 32
+    call _setup_system_interrupt
 
 	;33
 	;Keyboard.
-	mov eax, dword  _irq1
-	mov ebx, dword 33
-	call _setup_system_interrupt
-	
+    mov eax, dword  _irq1
+    mov ebx, dword 33
+    call _setup_system_interrupt
+
 	;40
 	;Clock, rtc.
 	mov eax, dword  _irq8
@@ -532,69 +532,12 @@ _asm_nic_create_new_idt_entry:
 	
 	popad
 	ret 
-	
-	
-	
-
-;====================================================
-; _do_executa_new_task:
-;
-;  _contextSS      -  user data + RPL
-;  _contextESP*	   -  *** user mode task esp
-;  _contextEFLAGS  -  eflags
-;  _contextCS      -  user code + RPL
-;  _contextEIP*    -  *** entry point da tarefa.
-;
-; PS: 
-; Essa rotina é chamada pelo kernel depois de 
-; salvo o contexto da thread interrompida.
-;
-
-;; #bugbug
-;; What is this?
-
-global _do_executa_new_task
-_do_executa_new_task:	
-
-    ;Ajusta segmentos e RPL
-    xor eax, eax
-    mov ax, 0x23
-    mov ds, ax 
-    mov es, ax
-    mov fs, ax ;0
-    mov gs, ax ;0
-
-	;ss   USER_DATA_SEL+RPL
-	xor eax, eax
-	mov ax, word 0x23    ;user data com rpl = 3.
-	push dword eax              
-	
-	;esp
-	push dword [_contextESP]    
-	
-	;eflags  (IOPL = 3)
-	push dword 0x00003200         	
-	
-	;cs      (CPL  = 3)  USER_CODE_SEL+RPL
-	xor eax, eax
-	mov ax, word 0x1B    ;user code com rpl = 3.
-	push dword eax                     
-	;push word ax        ;teste.
-	
-	;eip
-	push dword [_contextEIP]    ;eip.
-	
-    mov al, 0x20
-    out 0x20, al 
-
-    sti
-    iretd
 
 
-;--------------------------------------------
+
+;;============================================
 ; set_base:
 ;     ??
-;
 ; in: 
 ;    eax - logic addr.
 ;    ebx = base addr. 
@@ -617,14 +560,14 @@ set_base:
 
 
 ;------------------------------------------------------------
-; _test_cpuid_support:
-;     Testar via eflags se a cpu suporta a instrução cpuid. 
+; _x86_test_cpuid_support:
 ;
-; cpuid supported?
+;     Testar via eflags se a cpu suporta a instrução cpuid. 
+;     cpuid supported?
 ;
 
-global _test_cpuid_support
-_test_cpuid_support:
+global _x86_test_cpuid_support
+_x86_test_cpuid_support:
 
     pushfd                  ;push the flags onto the stack.
     pop eax                 ;pop them back out, into EAX.
@@ -654,38 +597,39 @@ _CPUID_SUPPORTED:
 
 
 
-;==========================================================
+;==============================================
 ; _get_page_dir:
 ;     Pega o valor de cr3.
 ;     page dir. 
 ;	  _headlibGetPageDirectoryAddress
 
-global _get_page_dir	
+global _get_page_dir
 _get_page_dir:
-	mov eax, cr3
-	ret
-	
-	
-;==================================================================
+    mov eax, cr3
+    ret
+
+
+;===========================================
 ; _set_page_dir:
 ;     configura o cr3
 ;     page dir. 
 ;     _headlibSetPageDirectoryAddress
 
-global _set_page_dir	
+global _set_page_dir
 _set_page_dir:
-	mov cr3, eax
-	ret
-	
-	
+    mov cr3, eax
+    ret
+
+
 ;=============================================
 ; _get_page_fault_adr: 
 ;     Pega o cr2.
 ;     endereço quando da pagefault.
-;	
-global _get_page_fault_adr	
+;
+
+global _get_page_fault_adr
 _get_page_fault_adr:
-	mov eax, cr2
+    mov eax, cr2
     ret
 
 
@@ -721,29 +665,33 @@ _halt:
 global _idle_halt_cpu
 _idle_halt_cpu:
     sti
-	hlt
-	jmp _idle_halt_cpu
-	
+    hlt
+    jmp _idle_halt_cpu
 
-global _refresh_tlb	
+
+;; =============================
+global _refresh_tlb
 _refresh_tlb:
     push eax
-	mov eax, cr3
-	mov cr3, eax
-	pop eax
-	ret
-	
-	
+    mov eax, cr3
+    ;; todo: delay ?
+    ;; nop
+    mov cr3, eax
+    pop eax
+    ret
+
+
+;; =============================
 global _arch_pause
 _arch_pause:
     pause
     ret
-	
+
 
 global _interrupts_enable
 _interrupts_enable:
     sti
-	ret
+    ret
 
 
 global _interrupts_disable
@@ -859,19 +807,21 @@ _setup_idt_vector:
 
  
 ;=====================================
-; _enable_pse:
+; _x86_enable_pse:
 ;     Enable PSE para páginas de 4MB.
 ;     Não usaremos isso.
 ;
-global _enable_pse
-_enable_pse:
-    push eax	
-	mov eax, cr4
+
+global _x86_enable_pse
+_x86_enable_pse:
+    push eax
+    mov eax, cr4
     or eax, 0x00000010
-    mov cr4, eax		
-	pop eax
-	ret
-	
+    mov cr4, eax
+    pop eax
+    ret
+
+
 ;=====================================
 ; _asm_shut_down:
 ; * shut down
@@ -879,35 +829,50 @@ _enable_pse:
 ;
 global _asm_shut_down
 _asm_shut_down:
-	jmp _asm_reboot  ;;Errado.      
+    jmp _asm_reboot  ;;Errado.      
     jmp $
-	
-	
+
+
+
 ;=====================================
 ; _asm_reboot:
-;     Reboot via teclado.
-;     _headlibReboot. 
+;
+;     Reboot the system via ps2 keyboard.
+;
+; Steps:
+; Wait for an empty Input Buffer.
+; Send the reboot call to the keyboard controller.
+;
 
-global _asm_reboot	
+global _asm_reboot
 _asm_reboot:
-    ; Wait for an empty Input Buffer.
-	in al, 0x64
-	test al, 00000010b		
-	jne _asm_reboot
-	; Send the reboot call to the keyboard controller.
-	mov al, 0xFE
-	out 0x64, al			
-	hlt
-    jmp _asm_reboot	
-	
+
+    xor eax, eax
+
+    in al, 0x64
+    test al, 00000010b
+    jne _asm_reboot
+
+    mov al, 0xFE
+    out 0x64, al
+
+    hlt
+    jmp _asm_reboot
+;; =================================
+
+
+;; ==================================
+;; limpar a flag nt em eflags. 
+;; e da refresh na pipeline.
+
+global _x86_clear_nt_flag
+_x86_clear_nt_flag:
     
-;;limpar a flag nt em eflags. 
-;;e d'a refresh na piline.
-global _clear_nt_flag
-_clear_nt_flag:
+    ; salvando o que vamos usar.
     push eax
     push ebx
     
+    ; pegando as flags.
     pushfd
     pop eax
     mov ebx, 0x00004000
@@ -918,15 +883,9 @@ _clear_nt_flag:
     
     pop ebx
     pop eax
+    
     ret
     
-
-
-   
-
-
-
-
 
 
 ;

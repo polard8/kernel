@@ -347,10 +347,9 @@ _reset_ide0:
     ret
 
 
-;--------------------------------	
-; init_ide0_master:	
+;--------------------------------
+; init_ide0_master:
 ;     Reseta o ide0 master.
-;
 
 init_ide0_master:
 
@@ -425,16 +424,18 @@ commandok   db 0    ;Command completed properly flag.
 
 ;; Hour
 global _hour
-_hour:          db 0
+_hour:          
+    db 0
 
 ;; Minute
 global _minute
-_minute:        db 0
+_minute:
+    db 0
 
 ;; Second
 global _second
-_second:        db 0
-
+_second: 
+    db 0
 
 
 

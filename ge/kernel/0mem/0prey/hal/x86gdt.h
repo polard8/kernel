@@ -222,12 +222,13 @@ static inline void native_store_gdt ( struct gdt_ptr_d *dtr)
 // Probably stolen from minix or netbsd.
 
 void
-setgate ( struct gate_descriptor_d *gd, 
-          void *func, 
-          int args, 
-          int type, 
-          int dpl,
-          int sel );
+setgate ( 
+    struct gate_descriptor_d *gd, 
+    void *func, 
+    int args, 
+    int type, 
+    int dpl,
+    int sel );
 
 
 // Unset gate.
@@ -241,9 +242,10 @@ void unsetgate (struct gate_descriptor_d *gd);
 // Probably stolen from minix or netbsd.
 
 void
-setregion ( struct region_descriptor_d *rd, 
-            void *base, 
-            size_t limit );
+setregion ( 
+    struct region_descriptor_d *rd, 
+    void *base, 
+    size_t limit );
 
 
 
@@ -251,31 +253,31 @@ setregion ( struct region_descriptor_d *rd,
 // Probably stolen from minix or netbsd.
 
 void
-setsegment ( struct segment_descriptor_d *sd, 
-             const void *base, 
-             size_t limit,
-             int type, 
-             int dpl, 
-             int def32, 
-             int gran );
+setsegment ( 
+    struct segment_descriptor_d *sd, 
+    const void *base, 
+    size_t limit,
+    int type, 
+    int dpl, 
+    int def32, 
+    int gran );
 
 
 // Set segment nr.
 // Probably stolen from minix or netbsd.
 
 void
-setsegmentNR ( int number, 
-               const void *base, 
-               size_t limit,
-               int type, 
-               int dpl, 
-               int def32, 
-               int gran );
+setsegmentNR ( 
+    int number, 
+    const void *base, 
+    size_t limit,
+    int type, 
+    int dpl, 
+    int def32, 
+    int gran );
 
 
-
-
-int init_gdt (void);
+int x86_init_gdt (void);
 
 
 #endif    

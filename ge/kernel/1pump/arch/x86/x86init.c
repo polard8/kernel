@@ -57,15 +57,18 @@ extern unsigned long SavedBootMode;
 // Task switching support.
 extern void turn_task_switch_on (void);
 
-extern void clear_nt_flag (void);
+extern void x86_clear_nt_flag (void);
 
 
 
+// local
 // set cr3.
-static inline void mainSetCr3 (unsigned long value)
+//static inline void __local_x86_set_cr3 (unsigned long value);
+static inline void __local_x86_set_cr3 (unsigned long value)
 {
     asm ( "mov %0, %%cr3" : : "r" (value) );
 }
+
 
 
 /*
@@ -152,19 +155,23 @@ void x86mainStartFirstThread (void){
 
     // Set cr3 and flush TLB.
     // isso não é necessário se chamarmos spawn ela faz isso.
-    mainSetCr3 ( (unsigned long) Thread->DirectoryPA );
+    __local_x86_set_cr3 ( (unsigned long) Thread->DirectoryPA );
+    
+    // flush
     asm ("movl %cr3, %eax");
     //#todo: delay.
     asm ("movl %eax, %cr3");  
 
 
-    clear_nt_flag ();   
+    // See: x86/headlib.asm
+    x86_clear_nt_flag ();   
+
 
 	//vamos iniciar antes para que
 	//possamos usar a current_tss quando criarmos as threads
-	//init_gdt ();
+	//x86_init_gdt ();
 
-    
+
     // ??
     asm ("clts \n");
 
@@ -177,10 +184,6 @@ void x86mainStartFirstThread (void){
 	//    refresh_screen ();
 	//}    
 
-
-	// #debug
-    printf ("Go to user mode!\n");
-    refresh_screen (); 
 
 	// #importante
 	// Mudamos para a última fase da inicialização.
@@ -216,7 +219,9 @@ void x86mainStartFirstThread (void){
         panic ("x86mainStartFirstThread: init .ELF signature");
     }
 
-    printf (">> IRET\n");
+
+    // #debug
+    printf ("[x86] Go to user mode!  IRET\n");
     refresh_screen ();
 
 
@@ -373,8 +378,8 @@ void __x86StartInit (void){
 
 // Called by main.c
 
-int x86main (void){
-
+int x86main (void)
+{
     int Status=0;
 
 
@@ -597,7 +602,7 @@ int x86main (void){
     debug_print ("[x86] x86main: Initializing GDT\n");
     printf      ("[x86] x86main: Initializing GDT\n");
         
-    init_gdt ();
+    x86_init_gdt();
 
     //printf("*breakpoint\n");
     //refresh_screen();

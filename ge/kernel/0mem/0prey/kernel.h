@@ -72,13 +72,9 @@ extern unsigned long task1_stack;
 extern unsigned long task2_stack;
 extern unsigned long task3_stack;
 extern unsigned long stack0_krn_ptr;
-//...
+// ...
 
-//functions
-extern void dispatch_context (void);
-extern void do_executa_new_task (void);
- 
- 
+
 //#test 
 //typedef int (*fn_ptr)();
 

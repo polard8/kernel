@@ -130,75 +130,72 @@ get_cs(void)
 
 
 
-void init_fpu (void) 
+void x86_init_fpu (void) 
 {
     asm volatile ("fninit");
 }
 
-
-
-// x86 enable interrupts.
-
-void enable (void)
-{
-    asm ("sti");
-}
-
 // x86 disable interrupts.
-
-void disable (void)
+void x86_disable_interrupts (void)
 {
     asm ("cli"); 
 }
 
 
-void farReturn (void)
+// x86 enable interrupts.
+void x86_enable_interrupts (void)
 {
-    asm ("lret");
+    asm ("sti");
 }
 
 
-void intReturn (void)
+void x86_iret (void)
 {
     asm ("iret");
 }
 
 
-void stopCpu (void)
+void x86_lret (void)
+{
+    asm ("lret");
+}
+
+
+void x86_cli_hlt(void)
 {
     asm (" cli \n \t "); 
     asm (" hlt \n \t ");
 }
 
 
-// ?? return value
-int getFlags (int variable){
-
-    __asm (" pushfl \n \t "     
-           " popl %0 "         
-           : "=r" (variable) );
-}
-
-
-// ?? return value
-int setFlags (int variable){
-
-    __asm ("pushl %0 \n\t"   
-           "popfl"           
-           : : "r" (variable) );
+void x86_stop_cpu (void)
+{
+    x86_cli_hlt();
 }
 
 
 
+int x86_get_eflags (unsigned long value)
+{
+    asm (" pushfl \n \t " 
+         " popl %0      "  
+       : "=r" (value) );
+}
 
+int x86_set_eflags (unsigned long value)
+{
+    asm (" pushl %0 \n\t "   
+         " popfl         "   
+           : : "r" (value) );
+}
 
 
 // Enable cache.
 // credits: barrelfish.
 // #todo: Test it on my real machine.
 
-void cpux86_enable_caches (void){
-
+void x86_enable_cache (void)
+{
     uint32_t cr0 = 0;
 
     asm volatile ("mov %%cr0, %[cr0]" : [cr0] "=r" (cr0) );
@@ -330,12 +327,12 @@ setsegmentNR (
  *     See: x86gdt.h
  */
 
-int init_gdt (void){
-
+int x86_init_gdt (void)
+{
     struct i386tss_d *tss;
 
 
-    debug_print ("[x86] init_gdt: Danger!\n");
+    debug_print ("[x86] x86_init_gdt: Danger!\n");
 
 
     // Creating a TSS and initializing it.
@@ -343,14 +340,16 @@ int init_gdt (void){
     tss = (void *) kmalloc ( sizeof(struct i386tss_d) );
 
     if ( (void *) tss == NULL ){
-        debug_print ("[x86] init_gdt: \n");
-        panic ("[x86] init_gdt: \n");
+        debug_print ("[x86] x86_init_gdt: \n");
+              panic ("[x86] x86_init_gdt: \n");
 
     }else{
  
         // Init TSS. 
-        tss_init ( (struct i386tss_d *) tss, 
-            (void *) 0x003FFFF0, (void *) 0x401000 );
+        tss_init ( 
+            (struct i386tss_d *) tss, 
+            (void *) 0x003FFFF0, 
+            (void *) 0x401000 );
 
 
          // Setup current.
@@ -538,8 +537,8 @@ void tss_set_kernel_stack (unsigned long stack_address )
 // The CPUID.01h:EDX[bit 9] flag 
 // specifies whether a CPU has a built-in local APIC. 
 
-void get_cpu_intel_parameters (void){
-
+void get_cpu_intel_parameters (void)
+{
 
     unsigned long eax=0; 
     unsigned long ebx=0; 
@@ -814,9 +813,9 @@ void get_cpu_intel_parameters (void){
 
 // Called by init_architecture_dependent() on core/init.c
 
-int init_intel (void){
-
-    debug_print ("[x86] init_intel:");
+int x86_init_intel (void)
+{
+    debug_print ("[x86] x86_init_intel:");
 
     // #bugbug
     // Suspended.
@@ -824,7 +823,7 @@ int init_intel (void){
     // See: sysio/hal/arch/x86/x86.h
     // See: sysio/hal/arch/x86/x86.c
     
-    cpux86_enable_caches();
+    x86_enable_cache();
 
     // Get info.
     // See: x86.c

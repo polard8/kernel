@@ -732,7 +732,7 @@ int init (void){
     processor->Type = (int) ProcessorType;
 
     switch (ProcessorType){
-        case Processor_INTEL:  init_intel();   break;
+        case Processor_INTEL:  x86_init_intel();   break;
         case Processor_AMD:    init_amd();     break;
         // ...
         default:

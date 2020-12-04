@@ -199,60 +199,7 @@ dummy_flush:
     iretd
 
 
-
-
-
-;----------------------------------------------------------
-; _dispatch_context:
-;     Despacha o contexto salvo.
-;     Retorna para a tarefa interrompida através de iret.
-;
-
-global _dispatch_context
-_dispatch_context:
-	
-	;segments
-	xor eax, eax
-	mov ax, word [_contextDS]
-	mov ds, ax
-	mov ax, word [_contextES]
-	mov es, ax
-	mov ax, word [_contextFS]
-	mov fs, ax
-	mov ax, word [_contextGS]
-	mov gs, ax
-	
-	;
-	;registers 
-	mov esi, dword [_contextESI]    ;esi.
-	mov edi, dword [_contextEDI]    ;edi.
-	mov ebp, dword [_contextEBP]    ;ebp.
-	;
-	mov eax, dword [_contextEAX]    ;eax.
-	mov ebx, dword [_contextEBX]    ;ebx.
-	mov ecx, dword [_contextECX]    ;ecx.
-	mov edx, dword [_contextEDX]    ;edx.
-	
-	;
-	;stack
-	push dword [_contextSS]        ;ss  - user mode.
-	push dword [_contextESP]       ;esp - user mode.
-	push dword [_contextEFLAGS]    ;eflags.
-	push dword [_contextCS]        ;cs.
-	push dword [_contextEIP]       ;eip.
-
-    ;
-    ;EOI - sinal
-    mov al, 20h
-    out 20h, al   
-
-	;(Não precisa 'sti', pois as flags da pilha habilitam as interrupções ).
-	;sti
-
-    iretd
-
-
-;-------------------------------------------
+;;==========================================
 ; _timer_test:
 ;     Timer sem multitarefas. 
 ;     (usado antes de acionar a multitarefa)
@@ -338,7 +285,6 @@ _irq1:
     ;out     061h, al
     ;mov     al, ah
     ;out     061h, al
-
 
     ;; EOI - Only the first PIC.
     xor eax, eax 
@@ -778,7 +724,7 @@ unhandled_irq:
 
 
 ;;
-;; ================ # FAULTS # ================ 
+;; == # FAULTS # ================ 
 ;;
 
 
@@ -797,228 +743,228 @@ extern _faults
 ; int 0 
 global _fault_N0
 _fault_N0:
-	mov dword [save_fault_number], dword 0
-    jmp all_faults	
+    mov dword [save_fault_number], dword 0
+    jmp all_faults
 
 ;
 ; int 1 
 global _fault_N1
 _fault_N1:
-	mov dword [save_fault_number], dword 1
-    jmp all_faults	
-	
+     mov dword [save_fault_number], dword 1
+    jmp all_faults
+
 ;
 ; int 2 
 global _fault_N2
 _fault_N2:
-	mov dword [save_fault_number], dword 2
-    jmp all_faults	
-	
+    mov dword [save_fault_number], dword 2
+    jmp all_faults
+
 ;
 ; int 3 
 global _fault_N3
 _fault_N3:
-	mov dword [save_fault_number], dword 3
-    jmp all_faults	
-	
+    mov dword [save_fault_number], dword 3
+    jmp all_faults
+
 ;
 ; int 4 
 global _fault_N4
 _fault_N4:
-	mov dword [save_fault_number], dword 4
-    jmp all_faults	
-	
+    mov dword [save_fault_number], dword 4
+    jmp all_faults
+
 
 ;
 ; int 5 
 global _fault_N5
 _fault_N5:
-	mov dword [save_fault_number], dword 5
-    jmp all_faults	
+     mov dword [save_fault_number], dword 5
+    jmp all_faults
 
 ;
 ; int 6 - Instrução inválida.
 global _fault_INTRUCAO_INVALIDA
 _fault_INTRUCAO_INVALIDA:
-	mov dword [save_fault_number], dword 6
-    jmp all_faults	
+    mov dword [save_fault_number], dword 6
+    jmp all_faults
 
 ;
 ; int 7
 global _fault_N7
 _fault_N7:
-	mov dword [save_fault_number], dword 7
-    jmp all_faults	
+    mov dword [save_fault_number], dword 7
+    jmp all_faults
 
 ;
 ; int 8 - double fault
 global _fault_DOUBLE
 _fault_DOUBLE:
-	mov dword [save_fault_number], dword 8
-    jmp all_faults	
-	
+    mov dword [save_fault_number], dword 8
+    jmp all_faults
+
 ;
 ; int 9 
 global _fault_N9
 _fault_N9:
-	mov dword [save_fault_number], dword 9
-    jmp all_faults	
-	
+    mov dword [save_fault_number], dword 9
+    jmp all_faults
+
 ;
 ; int 10 
 global _fault_N10
 _fault_N10:
-	mov dword [save_fault_number], dword 10
-    jmp all_faults	
-	
+    mov dword [save_fault_number], dword 10
+    jmp all_faults
+
 ;
 ; int 11
 global _fault_N11
 _fault_N11:
-	mov dword [save_fault_number], dword 11
-    jmp all_faults	
+    mov dword [save_fault_number], dword 11
+    jmp all_faults
 
 ;
 ; int 12 - Falha de pilha (interrupção 12).
 global _fault_STACK
 _fault_STACK:
-	mov dword [save_fault_number], dword 12
-    jmp all_faults	
+    mov dword [save_fault_number], dword 12
+    jmp all_faults
 
 ;
 ; int 13 - general protection fault (GPF).
 global _fault_GP
 _fault_GP:   
-	mov dword [save_fault_number], dword 13
-    jmp all_faults	
+    mov dword [save_fault_number], dword 13
+    jmp all_faults
 
 ;
 ; int 14 - Page Fault (PF).
 global _fault_N14
 _fault_N14:
-	mov dword [save_fault_number], dword 14
-    jmp all_faults	
-	
+    mov dword [save_fault_number], dword 14
+    jmp all_faults
+
 ;
 ; int 15 
 global _fault_N15
 _fault_N15:
-	mov dword [save_fault_number], dword 15
-    jmp all_faults	
-	
+    mov dword [save_fault_number], dword 15
+    jmp all_faults
+
 ;
 ; int 16 
 global _fault_N16
 _fault_N16:
-	mov dword [save_fault_number], dword 16
-    jmp all_faults	
-	
+    mov dword [save_fault_number], dword 16
+    jmp all_faults
+
 ;
 ; int 17 
 global _fault_N17
 _fault_N17:
-	mov dword [save_fault_number], dword 17
-    jmp all_faults	
-	
+    mov dword [save_fault_number], dword 17
+    jmp all_faults
+
 ;
 ; int 18
 global _fault_N18
 _fault_N18:
-	mov dword [save_fault_number], dword 18
-    jmp all_faults	
-	
+    mov dword [save_fault_number], dword 18
+    jmp all_faults
+
 ;
 ; int 19
 global _fault_N19
 _fault_N19:
-	mov dword [save_fault_number], dword 19
-    jmp all_faults	
-	
+    mov dword [save_fault_number], dword 19
+    jmp all_faults
+
 ;
 ; int 20 
 global _fault_N20
 _fault_N20:
-	mov dword [save_fault_number], dword 20
-    jmp all_faults	
-	
+    mov dword [save_fault_number], dword 20
+    jmp all_faults
+
 ;
 ; int 21
 global _fault_N21
 _fault_N21:
-	mov dword [save_fault_number], dword 21
-    jmp all_faults	
-	
+    mov dword [save_fault_number], dword 21
+    jmp all_faults
+
 ;
 ; int 22
 global _fault_N22
 _fault_N22:
-	mov dword [save_fault_number], dword 22
-    jmp all_faults	
-	
+    mov dword [save_fault_number], dword 22
+    jmp all_faults
+
 ;
 ; int 23 
 global _fault_N23
 _fault_N23:
-	mov dword [save_fault_number], dword 23
-    jmp all_faults	
-	
+    mov dword [save_fault_number], dword 23
+    jmp all_faults
+
 ;
 ; int 24 
 global _fault_N24
 _fault_N24:
-	mov dword [save_fault_number], dword 24
-    jmp all_faults	
-	
+    mov dword [save_fault_number], dword 24
+    jmp all_faults
+
 ;
 ; int 25 
 global _fault_N25
 _fault_N25:
-	mov dword [save_fault_number], dword 25
-    jmp all_faults	
-	
+    mov dword [save_fault_number], dword 25
+    jmp all_faults
+
 ;
 ; int 26 
 global _fault_N26
 _fault_N26:
-	mov dword [save_fault_number], dword 26
-    jmp all_faults	
-	
+    mov dword [save_fault_number], dword 26
+    jmp all_faults
+
 ;
 ; int 27 
 global _fault_N27
 _fault_N27:
-	mov dword [save_fault_number], dword 27
-    jmp all_faults	
-	
+    mov dword [save_fault_number], dword 27
+    jmp all_faults
+
 ;
 ; int 28 
 global _fault_N28
 _fault_N28:
-	mov dword [save_fault_number], dword 28
-    jmp all_faults	
-	
+    mov dword [save_fault_number], dword 28
+    jmp all_faults
+
 ;
 ; int 29
 global _fault_N29
 _fault_N29:
-	mov dword [save_fault_number], dword 29
-    jmp all_faults	
-	
+    mov dword [save_fault_number], dword 29
+    jmp all_faults
+
 ;
 ; int 30
 global _fault_N30
 _fault_N30:
-	mov dword [save_fault_number], dword 30
-    jmp all_faults	
-	
+    mov dword [save_fault_number], dword 30
+    jmp all_faults
+
 ;
 ; int 31 
 global _fault_N31
 _fault_N31:
-	mov dword [save_fault_number], dword 31
-    jmp all_faults	
-	
-	
+    mov dword [save_fault_number], dword 31
+    jmp all_faults
+
+
 ;===============================================
 ; all_faults:
 ;     As faltas são tratadas em kernel mode, tem que ajustar 
@@ -1036,11 +982,11 @@ _fault_N31:
 all_faults:
 
 	;d,c,b,a
-	mov dword [_contextEDX], edx	
-	mov dword [_contextECX], ecx	
-	mov dword [_contextEBX], ebx	
+	mov dword [_contextEDX], edx
+	mov dword [_contextECX], ecx
+	mov dword [_contextEBX], ebx
 	mov dword [_contextEAX], eax
-		
+
 	;ebp,edi,esi
 	mov eax, ebp
 	mov dword [_contextEBP], eax
@@ -1049,17 +995,17 @@ all_faults:
 	mov eax, esi
 	mov dword [_contextESI], eax
 
-	;gs,fs,es,ds
-	xor eax, eax	
+    ;gs, fs, es, ds
+    xor eax, eax
     mov ax, gs
-	mov word [_contextGS], ax	
+    mov word [_contextGS], ax
     mov ax, fs
-	mov word [_contextFS], ax	
+    mov word [_contextFS], ax
     mov ax, es
-	mov word [_contextES], ax	
+    mov word [_contextES], ax
     mov ax, ds
-	mov word [_contextDS], ax	
-		
+    mov word [_contextDS], ax
+
 	;(DOUBLE), eip, cs, eflags, esp, ss 
     
     ; #bugbug: 
@@ -1070,23 +1016,23 @@ all_faults:
     ; ou se é o valor configurado antes do primeiro salto para ring3.
     
 	pop eax
-	mov dword [_contextEIP], eax	
+	mov dword [_contextEIP], eax
 	pop eax
-	mov dword [_contextCS], eax	
+	mov dword [_contextCS], eax
 	pop eax
-	mov dword [_contextEFLAGS], eax		
+	mov dword [_contextEFLAGS], eax
 	pop eax
-	mov dword [_contextESP], eax	
+	mov dword [_contextESP], eax
 	pop eax
-	mov dword [_contextSS], eax		
+	mov dword [_contextSS], eax
     
     ;;
     ;; Reajustando os segmentos para rodarmos tranquilos em ring0.
     ;;
     
-	; Load the Kernel Data Segment descriptor.
+    ; Load the Kernel Data Segment descriptor.
     xor eax, eax
-	mov ax, word 0x10   
+    mov ax, word 0x10   
     mov ds, ax
     mov es, ax
     mov fs, ax
@@ -1097,35 +1043,32 @@ all_faults:
     ;; stack aqui.
     
     ;; #todo #todo #todo STACK STACK STACK
-	
+
     
     ;;
     ;; O número da falta.
     ;;
     
-	; Chama a rotina em C.
-    ;Passa o argumento via pilha.	
-	push dword [save_fault_number]     
-	
-	;; Chama código em C. (faults.c)
-	
-	call _faults 
+    ; Chama a rotina em C.
+    ;Passa o argumento via pilha.
+    push dword [save_fault_number]
 
-;hang	
-.hang:	
+    ;Chama código em C. (faults.c)
+    call _faults 
+
+.hang:
     cli
-	hlt
-	jmp .hang
-	
-	;
+    hlt
+    jmp .hang
+
+
 	; @todo: 
 	;     Existe ERROR NUMBER em algumas exceções ?
-	;
-	
+
 ;Salva aqui o número da fault.	
 save_fault_number: 
-    dd 0	
-	
+    dd 0
+
 ;
 ; End.
 ;
