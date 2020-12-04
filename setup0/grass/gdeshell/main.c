@@ -2337,8 +2337,7 @@ do_compare:
     int mi=0;
     if ( gramado_strncmp( prompt, "msg-test", 8 ) == 0 )
     {
-        for (mi=0; mi<20;mi++)
-        {
+        for (mi=0; mi<20;mi++){
             __SendMessageToProcess ( getpid() , 
                NULL, MSG_COMMAND, CMD_ABOUT, CMD_ABOUT );
         }
@@ -2358,7 +2357,7 @@ do_compare:
     // mounted
     if ( gramado_strncmp( prompt, "mounted", 7 ) == 0 )
     {
-        gramado_system_call(8500,0,0,0);
+        gramado_system_call (8500,0,0,0);
         goto exit_cmp;
     }
 
@@ -2501,8 +2500,7 @@ do_compare:
     // #test: Saving the config file.
     if ( gramado_strncmp( prompt, "setup", 5 ) == 0 )
     {
-        //Initializing the buffer.
-        sprintf(__setup_buffer,"This is the setup file");
+        sprintf (__setup_buffer,"This is the setup file");
         gdeshell_save_config_file();
         goto exit_cmp;
     }
@@ -2510,8 +2508,6 @@ do_compare:
 
 	// socket
 	// Testando socket() da libc.
-	// Vai retornar um �ndice na lista de arquivos abertos do processo.
-	// Um descritor de arquivos.
 	// >>> Isso est� criando o socket e se comunicando com o driver de rede.
 	//nesse teste aproveitamos o soquete criado para se
 	//comunicar com o driver de rede. que enviar� uma mensagem para
@@ -2526,7 +2522,8 @@ do_compare:
     if ( gramado_strncmp( prompt, "socket", 6 ) == 0 )
     {
         printf("\n");
-        socket_fd = (int) socket ( (int) AF_INET, 
+        socket_fd = (int) socket ( 
+                             (int) AF_INET, 
                              (int) SOCK_STREAM, 
                              (int) 0 );
         
@@ -2566,7 +2563,8 @@ do_compare:
     // processo atraves da stream configurada anteriormente.
     if ( gramado_strncmp( prompt, "test-net", 8 ) == 0 )
     {
-        socket_fd = (int) socket ( (int) AF_INET, 
+        socket_fd = (int) socket ( 
+                              (int) AF_INET, 
                               (int) SOCK_STREAM, 
                               (int) 0 );
         
@@ -2606,7 +2604,7 @@ do_compare:
 	// Atençao: Nao eh o soquete da libc unix-like.
     if ( gramado_strncmp( prompt, "socket-test", 11 ) == 0 )
     {
-        shellSocketTest ();
+        //shellSocketTest ();
         goto exit_cmp;
     }
 
@@ -2615,9 +2613,9 @@ do_compare:
     if ( gramado_strncmp( prompt, "streams", 7 ) == 0 )
     {
         printf ("Streams: \n");
-        printf ("__stdin_fd  = %d \n", __stdin_fd  );
-        printf ("__stdout_fd = %d \n", __stdout_fd );
-        printf ("__stderr_fd = %d \n", __stderr_fd );
+        printf ("fd of stdin  = %d \n", fileno(stdin) );
+        printf ("fd of stdout = %d \n", fileno(stdout) );
+        printf ("fd of stderr = %d \n", fileno(stderr) );
         //...
         goto exit_cmp;
     }
@@ -2983,18 +2981,15 @@ do_compare:
         shellShowWindowInfo();
         goto exit_cmp;
     }
-    
 
-	// wscreen - test screen window (root window)
-	//#bugbug: isso n�o funcionou
+    // wscreen - test screen window (root window)
+    // #obs: 
+    // Se minimizada, por isso n�o pode ser pintada ou repintada.
     struct window_d *__screen_window;
     if ( gramado_strncmp( prompt, "wscreen", 7 ) == 0 )
     {
-        // #obs: 
-        // Se minimizada, por isso n�o pode ser pintada ou repintada.
         __screen_window = (struct window_d *) gde_get_screen_window();
         gde_redraw_window (__screen_window,1);
-        //apiShowWindow (__screen_window);
         goto exit_cmp;
     }
 

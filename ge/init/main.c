@@ -307,6 +307,45 @@ int main ( int argc, char *argv[] ){
     printf ("The current runlevel is %s \n",runlevel_string);
 
 
+    /*
+     This test is cool, but very slow.
+    // #test
+    // Creating th /SYSLOG.TXT file.
+    int new_fd = -1;
+    char new_buffer[512];
+    int nwrite=0;
+    //creat ( (const char *) tokenList[1], 0666 );
+    new_fd = creat ( "syslog.txt", 0666 );
+
+    if (new_fd>0){
+        sprintf(new_buffer,"init.bin: Create SYSLOG.TXT \n");
+        new_buffer[511] = 0;
+        write (new_fd, new_buffer, sizeof(new_buffer) );
+    }
+    */
+
+    
+    /*
+    // #test
+    // Open syslog file.
+    FILE *fp;
+    fp = (FILE*) fopen("syslog.txt","r+");
+    if ( (void*)  fp == NULL ){
+        printf("error");
+        fflush(stdout);
+        exit(1);
+    }
+    if ( (void*)  fp != NULL ){
+        write( fileno(fp), "test\n", 5);
+        fprintf(fp,"init.bin: test\n");
+        fflush(fp);
+        close(fileno(fp));
+        //fclose(fp); 
+    }
+    */
+    
+    
+    
     //
     // Initializing in the selected runlevel.
     //
