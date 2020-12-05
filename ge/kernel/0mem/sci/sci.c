@@ -380,6 +380,7 @@ gde_extra_services (
                 __desktop->ws = (int) arg3;
                 
                 // What is the process listen to the port 11.
+                // use this one: socket_set_gramado_port(...)
                 gramado_ports[GRAMADO_WS_PORT] = (int) current_process;
                 
                 //#todo

@@ -33,24 +33,31 @@
 //
 
 
-//++
-// ports for local servers
-// What pid is on each port.
-// AF_GRAMADO
 
+
+//=====================================================
+//++
+// ports for local servers.
+// What pid is on each port.
+// It can be used to setup the main components of the system,
+// or maybe only the services in the gramado_ports.
+// AF_GRAMADO
 // ... gramado_ports[]
 
+// ...
 #define GRAMADO_WS_PORT  11  // window server.
 #define GRAMADO_NS_PORT  14  // network server.
 #define GRAMADO_FS_PORT  16  // file system
-
-
 // ...
-int gramado_ports[32];
+#define GRAMADO_PORT_MAX 32
+
+int gramado_ports[GRAMADO_PORT_MAX];
 //--
+//=====================================================
 
 
-//#atenção. Variável global;
+// #atenção. 
+// Variável global;
 int current_socket;
 
 

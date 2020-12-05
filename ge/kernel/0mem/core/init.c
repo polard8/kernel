@@ -178,30 +178,48 @@ void init_globals (void){
 	// ambiente gráfico.
 	//
 
-	//User and group.
-
+    // =========================================
+    //User and group.
     current_user  = 0;
     current_group = 0;
 
+
+    // =========================================
     // Security layers.
     // user session, room(window station), desktop.
     current_usersession = (int) 0;
     current_room        = (int) 0;
     current_desktop     = (int) 0;
 
+    // =========================================
     //Process, Thread.
     current_process = (int) 0;
     current_thread  = (int) 0;
 
 
-    kernel_request = 0;
+    // =========================================
+    // Initialize the ports table used by the socket infrastruture.
+    // todo: Create socket_init_gramado_ports();
+    for (i=0; i<GRAMADO_PORT_MAX; i++){
+        gramado_ports[i] = 0;
+    }
+
+    // =========================================
+    // The kernel request.
+    // See: request.c
+    clear_request();
+    //kernel_request = 0;
 
 
+
+    // =========================================
     if ( g_useGUI != 1 ){
         panic("init_globals: No GUI");
     }
 
+    // ===============================================
     // Window support.
+ 
     current_window    = (int) 0;  // Current Window.
     windows_count     = (int) 0;  // Window count.
     window_with_focus = (int) 0;  // Window with focus.
@@ -220,6 +238,8 @@ void init_globals (void){
     // Messages.
     g_new_message = 0;
 
+    // ==============================
+    // fs support
 
     // FS type.
     // type 1, fat16.
@@ -373,7 +393,7 @@ int init (void){
 
 
 #ifdef EXECVE_VERBOSE
-    printf ("core-init: disk_init\n");
+    printk ("core-init: disk_init\n");
 #endif 
 
     debug_print ("core-init: disk\n");
@@ -381,7 +401,7 @@ int init (void){
 
 
 #ifdef EXECVE_VERBOSE
-    printf("core-init: volume_init\n");
+    printk ("core-init: volume_init\n");
 #endif
 
     debug_print ("core-init: volume\n");
@@ -389,7 +409,7 @@ int init (void){
 
 
 #ifdef EXECVE_VERBOSE
-     printf ("core-init: VFS..\n");
+     printk ("core-init: VFS..\n");
 #endif
 
     debug_print ("core-init: vfs\n");
@@ -398,7 +418,7 @@ int init (void){
 
 // deletar
 #ifdef EXECVE_VERBOSE
-    printf ("core-init: fsInit\n");
+    printk ("core-init: fsInit\n");
 #endif   
 
     debug_print ("core-init: fs\n");
@@ -414,7 +434,7 @@ int init (void){
 
 
 #ifdef EXECVE_VERBOSE
-    printf("core-init: initialize_system_message_queue\n");
+    printk ("core-init: initialize_system_message_queue\n");
 #endif
 
     initialize_system_message_queue (); 
@@ -432,7 +452,7 @@ int init (void){
     //
 
 #ifdef EXECVE_VERBOSE
-    printf ("core-init: Platform\n");
+    printk ("core-init: Platform\n");
 #endif
 
     // #important
@@ -454,7 +474,6 @@ int init (void){
 
         if ( (void *) Hardware ==  NULL ){
             panic ("core-init: Hardware\n");
-
         }else{
             Platform->Hardware = (void *) Hardware;
             //printf(".");
@@ -465,7 +484,6 @@ int init (void){
 
         if ((void *) Firmware ==  NULL ){
             panic ("core-init: Firmware\n");
-
         }else{
             Platform->Firmware = (void *) Firmware;
             //printf("."); 
@@ -474,19 +492,17 @@ int init (void){
 
 		//System (software)
 
-		//
 		// #IMPORTATE: 
 		// Aqui estamos inicializando a estrutura do systema.
-		//
 
         System = (void *) kmalloc ( sizeof(struct system_d) );
 
         if ( (void *) System ==  NULL ){
             panic ("core-init: System\n");
         }else{
-
-            System->used = 1;    //Sinaliza que a estrutura esta em uso.
+            System->used  = 1;    //Sinaliza que a estrutura esta em uso.
             System->magic = 1234; //sinaliza que a estrutura não esta corrompida.
+            
             Platform->System = (void *) System;
             //printf(".");
         };
@@ -497,7 +513,7 @@ int init (void){
 
 
 //
-//============================================================================================================
+// ====================================================================
 //
 
     debug_print ("init_architecture_independent\n");
@@ -523,7 +539,7 @@ int init (void){
 
 //#todo: Mudar o nome EXECVE_VERBOSE
 #ifdef EXECVE_VERBOSE
-    printf ("init_architecture_independent: Initializing HAL..\n");
+    printk ("init_architecture_independent: Initializing HAL..\n");
 #endif
 
     // #bugbug
@@ -535,20 +551,18 @@ int init (void){
         panic ("init_architecture_independent: init_hal fail\n");
     }
 
-    //
-    //  == mk =================================================
-    //
 
     // mm, ipc, ps ...
 
-
-	// Microkernel:
+    // ================
+    // Microkernel:
 #ifdef EXECVE_VERBOSE
 	// Obs: O Microkernel lida com informações dependentes da arquitetura,
 	// porém inicializa a gerencia de processos e threads e de comunicação
 	//entre processos.
-	//#bugbug @todo: Se é microkernel é processo é registrador ... acho que leva em consideração a arquitetura.
-	printf ("init_architecture_independent: Initializing Microkernel..\n");
+	//#bugbug @todo: Se é microkernel é processo é registrador ... 
+	// acho que leva em consideração a arquitetura.
+    printk ("init_architecture_independent: Initializing Microkernel..\n");
 #endif
 
     // Isso tambem eh dependente, pode ir para a outra rotina, 
@@ -560,13 +574,11 @@ int init (void){
     }
 
 
-	//
-	// == executive ===============================================
-	//
 
+    // =====================
     // Executive:
 #ifdef EXECVE_VERBOSE
-    printf ("init_architecture_independent: Initializing Executive..\n");
+    printk ("init_architecture_independent: Initializing Executive..\n");
 #endif
 
 
@@ -576,11 +588,10 @@ int init (void){
         panic ("init_architecture_independent: init_executive\n"); 
     }
 
-
-
-	// Gramado:
+    // =====================
+    // Gramado:
 #ifdef EXECVE_VERBOSE
-    printf ("init_architecture_independent: Initializing Gramado..\n");
+    printk ("init_architecture_independent: Initializing Gramado..\n");
 #endif
 
    
@@ -609,7 +620,7 @@ int init (void){
 
 
 #ifdef EXECVE_VERBOSE
-    printf ("init_architecture_independent: init_window_manager\n");
+    printk ("init_architecture_independent: init_window_manager\n");
 #endif
 
     init_window_manager();
@@ -621,20 +632,15 @@ int init (void){
 //done:
 
 #ifdef EXECVE_VERBOSE
-    printf ("init_architecture_independent: Done\n");
+    printk ("init_architecture_independent: Done\n");
     //refresh_screen();
     //while(1){}
 #endif
 
 
-
-
-
 //
-//============================================================================================================
+// ====================================================================
 //
-
-
 
 
     printf("=========================\n");
@@ -652,11 +658,8 @@ int init (void){
     KeInitPhase = 1;
 
 
-
-
-
 //
-//==================================================================================
+// ====================================================================
 //
 
 
@@ -668,7 +671,6 @@ int init (void){
     //if (Status != 0){
     //    panic ("core-init: init_architecture_dependent fail\n"); 
     //}
-
 
 
 
@@ -702,6 +704,10 @@ int init (void){
     //refresh_screen();
     //while(1){};		
 	
+
+    //
+    // == Processor ===================================
+    //
 
 	//
 	// A estrutura para informações sobre o processador. 
@@ -763,10 +769,8 @@ int init (void){
 
 
 
-
-
 //
-//==================================================================================
+// ====================================================================
 //
 
 
@@ -786,7 +790,7 @@ int init (void){
     fs_load_rootdir ();
 
 
-	// Disable interrupts, lock task switch and scheduler.
+    // Disable interrupts, lock task switch and scheduler.
 
     asm ("cli");
     set_task_status(LOCKED); 
@@ -824,18 +828,15 @@ int init (void){
     printf      ("==== init: done\n");
 
 
-#ifdef BREAKPOINT_TARGET_AFTER_INIT
-    
     // #debug 
     // A primeira mensagem só aparece após a inicialização da runtime.
     // por isso não deu pra limpar a tela antes.
-    
-    printf("core-init: debug breakpoint after init");
+
+#ifdef BREAKPOINT_TARGET_AFTER_INIT
+    printk ("core-init: debug breakpoint after init");
     refresh_screen(); 
-    
     asm ("cli");
     while (1){ asm ("hlt"); }
-
 #endif
 
 

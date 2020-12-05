@@ -100,20 +100,20 @@ void do_request_12 ( int tid );
 // This routine was called by the task switch as a extra service.
 // See: ts.c
 
-int KiRequest (void){
-
+int KiRequest (void)
+{
     //debug_print("KiRequest: [OK] Kernel request support.");
  
     if ( kernel_request < 0 || kernel_request > KERNEL_REQUEST_MAX )
     {
-        // #debug
+        debug_print("KiRequest: [PANIC] kernel_request\n");
         printf ("KiRequest: %d", kernel_request );
         die();
     }
 
-
     return (int) request();
 }
+
 
 
 /*
@@ -172,7 +172,6 @@ int request (void){
 
     if ( PID < 0 || PID > PROCESS_COUNT_MAX ){
         Process = NULL;
-
     }else{
         Process = (void *) processList[PID];
     };
@@ -180,10 +179,8 @@ int request (void){
 
     if ( TID < 0 || TID > THREAD_COUNT_MAX ){
         Thread = NULL;
-
     }else{
         Thread = (void *) threadList[TID];
-
     };
 
 
@@ -238,9 +235,9 @@ int request (void){
             do_thread_zombie ( (int) REQUEST.target_tid );
             break;
 
-		//5 - start new task.
-		//Uma nova thread passa a ser a current, para rodar pela primeira vez.
-		//Não mexer. Pois temos usado isso assim.	
+        //5 - start new task.
+        //Uma nova thread passa a ser a current, para rodar pela primeira vez.
+        //Não mexer. Pois temos usado isso assim.	
         case KR_NEW:
             debug_print ("request: Start a new thread\n");
             //Start a new thread. 
@@ -272,7 +269,9 @@ int request (void){
 
         // 9 - Checa se ha threads para serem inicializadas e 
         // inicializa pelo método spawn.
-        // obs: se spawn retornar, continua a rotina de request. sem problemas.	
+        // obs: 
+        // Se spawn retornar, continua a rotina de request. 
+        // Sem problemas.
         case KR_CHECK_INITIALIZED:
             debug_print ("request: Check for standby\n");
             check_for_standby ();
@@ -343,7 +342,7 @@ int request (void){
 //Done:
 //   Essas finalizações aplicam para todos os requests.
 
-    clear_request ();
+    clear_request();
     kernel_request = (unsigned long) 0;  
 
 
@@ -440,7 +439,11 @@ void clear_request (void)
     REQUEST.long4 = 0;
     REQUEST.long5 = 0;
     REQUEST.long6 = 0;
+
+    // The number of the current request.
+    kernel_request = 0;
 }
+
 
 
 /*
