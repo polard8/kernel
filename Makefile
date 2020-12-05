@@ -232,6 +232,7 @@ vhd-copy-files:
 	sudo cp setup0/grass/bin/GRAMCODE.BIN  base/
 	sudo cp setup0/grass/bin/GFE.BIN       base/
 	sudo cp setup0/grass/bin/SYSMON.BIN    base/
+	#sudo cp setup0/grass/bin/REBOOT2.BIN    base/
 	#sudo cp setup0/grass/bin/NORATERM.BIN  base/
 
 	#tests interpreters.

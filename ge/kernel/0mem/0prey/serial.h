@@ -175,7 +175,7 @@ int serial_init_port ( uint16_t port );
 
 int serial_init (void);
 
-
+int serial_ioctl ( int fd, unsigned long request, unsigned long arg );
 
 
 #endif   

@@ -290,13 +290,15 @@ int serial_init (void){
 
 
 
-/*
+
 // #todo
 // We need a ioctl for serial devices.
-int serial_ioctl ( int fd, unsigned long request, unsigned long arg );
 int serial_ioctl ( int fd, unsigned long request, unsigned long arg )
-{}
-*/
+{
+    debug_print("serial_ioctl: [TODO]\n");
+    return -1;
+}
+
 
 
 
