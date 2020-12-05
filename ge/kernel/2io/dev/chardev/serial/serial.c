@@ -27,15 +27,6 @@
 
 
 
-/*
-// #todo
-// We need a ioctl for serial devices.
-int serial_ioctl ( int fd, unsigned long request, unsigned long arg );
-int serial_ioctl ( int fd, unsigned long request, unsigned long arg )
-{}
-*/
-
-
 
 void serial1_handler (void)
 {
@@ -87,51 +78,57 @@ void serial4_handler (void)
 
 }
 
+//=====================================
 
 
-/*
-//created by fred nora.
-//not tested.
-//It reads only from the port COM1_PORT.
-char serial_read_char (void);
-char serial_read_char (void) 
+unsigned int serial_in(unsigned int base, int offset)
 {
-    while (( in8(COM1_PORT + 5) & 1 ) == 0);
-
-    return (char) in8 (COM1_PORT);
+    return (unsigned int) in8 (base + offset);
 }
-*/
 
+void serial_out(unsigned int base, int offset, int value)
+{
+    out8 (value, base + offset);
+}
+//====================================
 
 
 /*
  * serial_write_char:
- *     #bugbug:
- *     It writes only in the port COM1_PORT.
- *     Maybe we can select the port.
+ *     NOT tested yet.
  */
 
-void serial_write_char (char data) 
+char serial_read_char (unsigned int port) 
 {
-    while (( in8(COM1_PORT + 5) & 0x20 ) == 0);
+    while (( in8(port + 5) & 1 ) == 0);
 
-    out8 (COM1_PORT, data);
+    return (char) in8 (port);
 }
 
 
 /*
-void 
-serial_write_char ( int port, char data ) 
+ * serial_write_char:
+ * 
+ */
+
+void serial_write_char (unsigned int port, char data) 
 {
+    while (( in8(port + 5) & 0x20 ) == 0);
 
-    //#check
-    //if ( port ...
-
-    while (( in8(port + 5) & 0x20 ) == 0) ;
-    
     out8 (port, data);
 }
-*/
+
+
+void serial_print (unsigned int port, char *data )
+{
+    register int i=0;
+    
+    for ( i=0; data[i] != '\0'; i++ )
+    {
+        serial_write_char ( port ,data[i] );
+    };
+}
+
 
 
 /*
@@ -149,7 +146,9 @@ void serial_write ( struct tty_d * tty, int port )
 */
 
 
+
 /*
+ ******************************
  * serial_init_port:
  * 
  */
@@ -177,25 +176,67 @@ int serial_init_port ( uint16_t port ){
          PortBase != COM3_PORT &&
          PortBase != COM4_PORT )
     {
+        // #bugbug
+        // E se falhar aqui ???
+        // We can't use panic yet.
+        
         return -1;
     }
 
 
-    // ??
-    // Qual foi inicializada ??
+    // Disable all interrupts
+    out8 (PortBase + 1, 0x00);  
     
-    out8 (PortBase + 1, 0x00);  // Disable all interrupts
-    out8 (PortBase + 3, 0x80);  // Enable DLAB (set baud rate divisor)
-    out8 (PortBase + 0, 0x03);  // Set divisor to 3 (lo byte) 38400 baud (hi byte)
+    // Set baud rate.
+    // Baud Rate
+    // The serial controller (UART) has an internal clock 
+    // which runs at 115200 ticks per second and a clock divisor 
+    // which is used to control the baud rate. 
+    // This is exactly the same type of system used by 
+    // the Programmable Interrupt Timer (PIT).
+    // In order to set the speed of the port, 
+    // calculate the divisor required for the given baud rate and 
+    // program that in to the divisor register. 
+    // For example, a divisor of 1 will give 115200 baud, 
+    // a divisor of 2 will give 57600 baud, 3 will give 38400 baud, etc.
+    // Do not be tempted to use a divisor of 0.
+    // =============
+    // To set the divisor to the controller:
+    // > Set the most significant bit of the Line Control Register. 
+    //   This is the DLAB bit, 
+    //   and allows access to the divisor registers.
+    // > Send the least significant byte of the divisor value to [PORT + 0].
+    // > Send the most significant byte of the divisor value to [PORT + 1].
+    // > Clear the most significant bit of the Line Control Register. 
+    // #define LCR  3
+    // See: serial.h
+    // credits: https://wiki.osdev.org/Serial_Ports
+   
+    // Enable DLAB (set baud rate divisor)
+    out8 (PortBase + LCR, 0x80);  
 
-
+    // Set divisor to 3 (lo byte) 38400 baud (hi byte)
+    out8 (PortBase + 0, 0x03);  
     out8 (PortBase + 1, 0x00);
-    out8 (PortBase + 3, 0x03);  // 8 bits, no parity, one stop bit
-    out8 (PortBase + 2, 0xC7);  // Enable FIFO, clear then with 14-byte threshold
-
-
-    out8 (PortBase + 4, 0x0B);  // IRQs enables, RTS/DSR set
     
+    // In the next command we will clear the msb of the LCR.
+    // ======================
+    
+    // Line Protocol
+    // These days you could consider 
+    // 8N1 (8 bits, no parity, one stop bit) pretty much the default. 
+    // 8 bits, no parity, one stop bit
+    out8 (PortBase + LCR, 0x03);  
+    
+    // Enable FIFO, clear then with 14-byte threshold
+    // #define FCR  2
+    out8 (PortBase + FCR, 0xC7);  
+
+    // IRQs enables, RTS/DSR set
+    // modem control register
+    // #define MCR   4 
+    out8 (PortBase + MCR, 0x0B);  
+
     return 0;
 }
 
@@ -248,19 +289,13 @@ int serial_init (void){
 }
 
 
+
 /*
-int 
-serial_ioctl ( 
-    int fd, 
-    unsigned long request, 
-    unsigned long arg );
-int 
-serial_ioctl ( 
-    int fd, 
-    unsigned long request, 
-    unsigned long arg )
-{
-}
+// #todo
+// We need a ioctl for serial devices.
+int serial_ioctl ( int fd, unsigned long request, unsigned long arg );
+int serial_ioctl ( int fd, unsigned long request, unsigned long arg )
+{}
 */
 
 
@@ -281,30 +316,6 @@ void init_serial() {
 */
 
 
-
-/*
-//credits: osdev
-//Receiving data
-int serial_received() {
-   return inb(PORT + 5) & 1;
-}
-char read_serial() {
-   while (serial_received() == 0);
-   return inb(PORT);
-}
-*/
-
-/*
-//credits: osdev
-//Sending data
-int is_transmit_empty() {
-   return inb(PORT + 5) & 0x20;
-}
-void write_serial(char a) {
-   while (is_transmit_empty() == 0);
-   outb(PORT,a);
-}
-*/
 
 //
 // End.

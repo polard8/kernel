@@ -271,14 +271,14 @@ debugDumpMemory(
  * 
  */
 
-void debug_print ( char *data ){
-
+void debug_print ( char *data )
+{
     register int i=0;
-    //uint32_t i=0;
     
-    for ( i=0; data[i] != '\0'; i++ ){
-        serial_write_char (data[i]);
-    }
+    for ( i=0; data[i] != '\0'; i++ )
+    {
+        serial_write_char ( COM1_PORT ,data[i] );
+    };
 }
 
 

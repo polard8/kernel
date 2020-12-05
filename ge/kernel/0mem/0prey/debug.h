@@ -14,6 +14,7 @@ void debug_breakpoint (void);
 //retorna um checksum dado um buffer e um tamanho.
 unsigned long debug_compute_checksum( unsigned char *Buffer, unsigned long Lenght);
 
+
 //escreve na porta seria.
 void debug_print ( char *data );
 

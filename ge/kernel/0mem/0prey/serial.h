@@ -1,12 +1,20 @@
 
-
 // serial.h
-
-
 
 
 #ifndef ____SERIAL_H
 #define ____SERIAL_H
+
+
+// See:
+// https://wiki.osdev.org/Serial_Ports
+// https://wiki.osdev.org/Serial_Port
+
+// glossary:
+// UART
+// for Universal Asynchronous Receiver/Transceiver: 
+// the chip that picks a byte a send it bit per bit on the serial line 
+// and vice versa. 
 
 
 /*
@@ -72,6 +80,46 @@ controle de fluxo?
 
 
 
+//static unsigned long early_serial_base = 0x3f8;  /* ttyS0 */
+//static unsigned long early_serial_base = COM1_PORT;  /* ttyS0 */
+
+
+#define XMTRDY          0x20
+#define DLAB            0x80
+#define TXR             0       /*  Transmit register (WRITE) */
+#define RXR             0       /*  Receive register  (READ)  */
+#define IER             1       /*  Interrupt Enable          */
+#define IIR             2       /*  Interrupt ID              */
+#define FCR             2       /*  FIFO control              */
+#define LCR             3       /*  Line control              */
+#define MCR             4       /*  Modem control             */
+#define LSR             5       /*  Line Status               */
+#define MSR             6       /*  Modem Status              */
+#define DLL             0       /*  Divisor Latch Low         */
+#define DLH             1       /*  Divisor latch High        */
+
+//Offset |Setting of DLAB |Register mapped to this port
+//+0      0                Data register. 
+                           // Reading this registers read from the Receive buffer. 
+                           // Writing to this register writes to the Transmit buffer.
+//+1      0                Interrupt Enable Register.
+//+0      1                With DLAB set to 1, 
+                           // this is the least significant byte of the divisor value for setting the baud rate.
+//+1      1                With DLAB set to 1, 
+                           // this is the most significant byte of the divisor value.
+//+2      -                Interrupt Identification and FIFO control registers
+//+3      -                Line Control Register. The most significant bit of this register is the DLAB.
+//+4      -                Modem Control Register.
+//+5      -                Line Status Register.
+//+6      -                Modem Status Register.
+//+7      -                Scratch Register. 
+
+
+
+// #define SERIAL_INTERNAL_CLOCK_HZ 115200
+// #define DEFAULT_BAUD 9600
+
+
 /*
 typedef struct serial_port_d serial_port_t;
 struct serial_port_d
@@ -100,12 +148,27 @@ int serialportError;
 
 
 
+//
+// == prototypes ==============================================
+//
+
 void serial1_handler (void);
 void serial2_handler (void);
 void serial3_handler (void);
 void serial4_handler (void);
 
-void serial_write_char ( char data );
+//===================
+
+unsigned int serial_in(unsigned int base, int offset);
+void serial_out(unsigned int base, int offset, int value);
+
+//==========================
+
+char serial_read_char (unsigned int port);
+void serial_write_char (unsigned int port, char data);
+
+void serial_print (unsigned int port, char *data );
+
 
 // Method to init an serial port (for debugging)
 int serial_init_port ( uint16_t port );	

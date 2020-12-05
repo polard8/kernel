@@ -681,7 +681,7 @@ int print ( char **out, int *varg ){
 // Vamos substtuir essa função por uma de licensa bsd.
 // Olhar na biblioteca.
 
-int printf ( const char *format, ... )
+int printk ( const char *format, ... )
 {
     register int *varg = (int *) (&format);
 

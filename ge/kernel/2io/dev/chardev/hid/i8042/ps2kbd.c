@@ -325,6 +325,7 @@ int KEYBOARD_SEND_MESSAGE (unsigned char SC){
 
     //Variáveis para tecla digitada.
     unsigned char scancode=0;
+    unsigned long tmp_sc=0;
     unsigned char key=0;         //Tecla (uma parte do scancode).  
 
     //int fakewin;             //arg1
@@ -335,6 +336,8 @@ int KEYBOARD_SEND_MESSAGE (unsigned char SC){
     int msg_status = -1;
     
     int save_pos = 0;
+
+
 
 
     // Step1
@@ -643,7 +646,12 @@ done:
     */
 
 
+    // #bugbug
+    // Aplicativos como o gdeshell estao usado essas teclas de funçao.
+    // como o gdeshell eh um aplicativo muito recorrente,
+    // podemos escoler outra forma de mudar de console.
 
+    /*
     if ( (ctrl_status == 1) && (ch == VK_F1) ){
         debug_print ("KEYBOARD_SEND_MESSAGE: [Console 1] alt + f1\n");
         //reboot ();
@@ -661,6 +669,7 @@ done:
         //reboot ();
         console_switch_to(3);
     }
+    */
 
 
 	// Nesse momento temos duas opções:
@@ -716,7 +725,6 @@ done:
     // Scan code.
     //
 
-    unsigned long tmp_sc=0;
     tmp_sc = (unsigned long) scancode;
     tmp_sc = (unsigned long) ( tmp_sc & 0x000000FF );
 

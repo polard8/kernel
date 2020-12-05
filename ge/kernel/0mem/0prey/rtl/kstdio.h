@@ -499,15 +499,16 @@ static __inline int bsd__sputc (int _c, FILE *_p)
 
 
 //
-// == kprintf ===============================================
+// == printk ===============================================
 //
 
+//https://en.wikipedia.org/wiki/Printk
 
-// #todo
-// Deletar printf eusar kprintf
-#define kprintf printf
+#define  printf printk
+#define kprintf printk
 
-int printf (const char *format, ...);
+int printk (const char *format, ...);
+
 int sprintf (char *str, const char *format, ...);
 int fprintf (file *f, const char *format, ...);
 int putchar ( int ch );
