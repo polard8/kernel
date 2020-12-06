@@ -1,0 +1,14 @@
+
+	appmx:
+	Application multiplexer.
+	This is the entrypoint for the applications via software interrupt.
+
+	bootmx:
+	Boot multiplexer.
+	This is called by boot.asm to make the initialization.
+
+	iomx:
+	This is the entrypoint for the devices via hardware interrupt.
+
+	boot.asm:
+	This is the entrypoint of thekernel via BL.BIN.

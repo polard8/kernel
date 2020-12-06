@@ -327,7 +327,7 @@ all-c:
 	$(CC) -c 1pump/pump.c  $(KINCLUDE) $(CFLAGS) -o pump.o
 
     #arch
-	$(NASM)  1pump/arch/x86/boot.asm -I 1pump/arch/x86/ -f elf -o boot.o
+	$(NASM)  1pump/arch/x86/pumpcore/boot.asm -I 1pump/arch/x86/pumpcore/ -f elf -o boot.o
 	$(CC) -c 1pump/arch/x86/x86init.c   $(KINCLUDE) $(CFLAGS) -o x86init.o
 	$(CC) -c 1pump/arch/hal.c           $(KINCLUDE) $(CFLAGS) -o hal.o
 	$(CC) -c 1pump/arch/detect.c        $(KINCLUDE) $(CFLAGS) -o detect.o

@@ -99,7 +99,7 @@ mboot_end:
 
 align 4
 
-    %include "header.inc"
+    %include "bootmx/header.inc"
     ;; ...
 
 ; Restart the boot routine.
@@ -139,16 +139,16 @@ loop:
 
     ;Inicialização.
     ;Funções de apoio à inicialização do Kernel 32bit.
-    %include "head.asm" 
-    %include "headlib.asm" 
+    %include "bootmx/head.asm" 
+    %include "bootmx/headlib.asm" 
 
-	;Interrupções de hardware (irqs) e faults.
-    %include "hw.asm"
-    %include "hwlib.asm"
+    ;Interrupções de hardware (irqs) e faults.
+    %include "iomx/hw.asm"
+    %include "iomx/hwlib.asm"
 
-	;Interrupções de software.
-	%include "sw.asm"
-    %include "swlib.asm"
+    ;Interrupções de software.
+    %include "appmx/sw.asm"
+    %include "appmx/swlib.asm"
 
 
 ; DATA: 
