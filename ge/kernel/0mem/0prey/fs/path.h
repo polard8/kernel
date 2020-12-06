@@ -9,14 +9,16 @@
 // ...
 
 
-// string support
 
-#define  PS1                     "/"  
-#define  PS2                     "\\"
+// pathname separator and terminator.
 #define  FS_PATHNAME_SEPARATOR   "/"
+#define  FS_PATHNAME_SEPARATOR2   "\\"
 #define  FS_PATHNAME_TERMINATOR  "\0"
-#define  FS_STRING_TERMINATOR   "\0" 
 
+// string separator and terminator.
+#define  FS_STRING_SEPARATOR    "/"
+#define  FS_STRING_SEPARATOR2   "\\"
+#define  FS_STRING_TERMINATOR   "\0" 
 
 
 // volume support
@@ -25,8 +27,6 @@
 #define  FS_VOLUME1_STRING        "volume1"   //boot volume
 #define  FS_VOLUME2_STRING        "volume2"   //system volume.
 #define  FS_UNKNOWNVOLUME_STRING  "unknown-volume"
-
-
 
 #define  FS_VFSWORKINGDIRECTORY_STRING      "volume1"
 #define  FS_BOOTWORKINGDIRECTORY_STRING     "volume1"

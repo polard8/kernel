@@ -133,17 +133,15 @@ struct hardware_d
 	// Volumes dos discos.
     //ponteiro para array de estruturas de volumes.
 	
-	struct volumeinfo_d *Volumes; 
-	
-	
-	// Keyboard info.
-	
-	struct keyboard_d *Keyboard;
-	
-	
-	// Mouse info.
-	
-	
+    struct volumeinfo_d *Volumes; 
+
+
+    //ps2 support.
+    struct ps2_keyboard_d *ps2_keyboard;
+    struct ps2_mouse_d    *ps2_mouse;
+
+
+
 	//floppy fdd
 	struct fdd_d *Fdd;
 	//struct floppy_d *Floppy;

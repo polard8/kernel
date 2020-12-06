@@ -150,36 +150,13 @@ uint8_t kybrd_ctrl_read_status () {
 
 // Enumerando os tipos de teclados.
 typedef enum {
+
     KEYBOARD_VIRTUAL,
     KEYBOARD_PS2,
     KEYBOARD_USB,
-    //...
+    // ...
+
 }keyboard_type_t;
-
-
-
-
-// structure for hardware keyboard info.
-// As informações sobre o hardware de teclado devem ser mantidas 
-// pelo kernel base, mas não é aqui o lugagr dessa estrutura.
-
-struct keyboard_d
-{
-    object_type_t  objectType;
-    object_class_t objectClass;
-
-    keyboard_type_t type;
-    //...
-    int dummy;
-    //int VendorId;
-    //...
-
-    //unsigned long normal_charmap_address;
-    //unsigned long shift_charmap_address;
-    //unsigned long control_charmap_address;
-
-    //unsigned long keyboard_handler_address;
-};
 
 
 
@@ -201,6 +178,19 @@ struct keyboardMessage
     unsigned long long1;
     unsigned long long2;
 };
+
+
+// this is gonna be used by PS2 structure in ps2.h
+struct ps2_keyboard_d
+{
+    object_type_t  objectType;
+    object_class_t objectClass;
+    
+    keyboard_type_t type;
+
+    int dummy;
+};
+
 
 
 //

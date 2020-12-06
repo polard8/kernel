@@ -7,6 +7,7 @@
  * 2018 - Created by Fred Nora.
  */
 
+
  
 // When the keyboard and mouse are USB devices, the BIOS uses SMM code 
 // to emulate PS/2 devices. 
@@ -18,23 +19,35 @@
 
 
 
-void 
-prepare_for_input (void){
+
+
+
+
+// =======================
+// prepare ..
+
+void prepare_for_input (void)
+{
     kbdc_wait(0);
 }
-void 
-prepare_for_output (void){
+
+void prepare_for_output (void)
+{
     kbdc_wait (1);
 }
 
 
-unsigned char 
-wait_then_read (int port){
+// =======================
+// wait then ...
+
+unsigned char wait_then_read (int port)
+{
     prepare_for_input();
     return (unsigned char) in8 (port);
 }
-void 
-wait_then_write ( int port, int data ){
+
+void wait_then_write ( int port, int data )
+{
     prepare_for_output();
     out8 ( port, data );
 }
@@ -59,11 +72,20 @@ wait_then_write ( int port, int data ){
 
 // Essa eh uma inicializaçao completa.
 
-void ps2 (void){
-
+void ps2 (void)
+{
 	// #debug
     printf ("ps2: Initializing..\n");
     refresh_screen();
+
+    // The main structure fisrt of all.
+    // #todo: create ps_initialize_main_structure();
+    PS2.used = 1;
+    PS2.magic = 1234;
+    PS2.pooling = FALSE;
+    PS2.keyboard_initialized = FALSE;
+    PS2.mouse_initialized = FALSE;
+
 
     // ======================================
     // Deactivate ports!
@@ -74,11 +96,13 @@ void ps2 (void){
     printf ("ps2: Initializing keyboard ..\n");
     refresh_screen();
     ps2kbd_initialize_device ();
-
+    PS2.keyboard_initialized = TRUE;
+        
     // Mouse.
     printf ("ps2: Initializing mouse ..\n");
     refresh_screen();
     ps2mouse_initialize_device ();
+    PS2.mouse_initialized = TRUE;
 
     // ======================================
     // Reactivate ports!
@@ -129,6 +153,14 @@ void early_ps2_init (void){
 	printf ("early_ps2_init: Initializing..\n");
 	refresh_screen();
 
+    // The main structure fisrt of all.
+    // #todo: create ps_initialize_main_structure();
+    PS2.used = 1;
+    PS2.magic = 1234;
+    PS2.pooling = FALSE;
+    PS2.keyboard_initialized = FALSE;
+    PS2.mouse_initialized = FALSE;
+
 
     // ======================================
     // Deactivate ports!
@@ -140,12 +172,13 @@ void early_ps2_init (void){
     printf ("early_ps2_init: Initializing keyboard ..\n");
     refresh_screen();
     ps2kbd_initialize_device ();
-
+    PS2.keyboard_initialized = TRUE;
 
     // Mouse.
     //printf ("ps2: Initializing mouse ..\n");
     //refresh_screen();
     //ps2mouse_initialize_device ();
+    PS2.mouse_initialized = FALSE;
 
 
     // ======================================
@@ -187,6 +220,15 @@ int PS2_early_initialization(void)
 	return 0;
 }
 
+
+
+// See:
+// ps2.h
+int ps2_ioctl ( int fd, unsigned long request, unsigned long arg )
+{
+    debug_print("ps2_ioctl: [TODO]\n");
+    return -1;
+}
 
 
 //

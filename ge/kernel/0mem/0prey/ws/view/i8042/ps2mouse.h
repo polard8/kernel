@@ -82,6 +82,17 @@
 //
 
 
+// this is gonna be used by PS2 structure in ps2.h
+struct ps2_mouse_d
+{
+    object_type_t  objectType;
+    object_class_t objectClass;
+
+    int dummy;
+};
+
+
+
 
 //
 // Stop

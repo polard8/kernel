@@ -215,6 +215,7 @@ extern unsigned long stack0_krn_ptr;
 #include "ws/view/mouse.h"
 #include "ws/view/vk.h"
 #include "ws/view/kbdabnt2.h"
+
 // #view. drawing routines.
 #include "ws/view/ldisc.h"
 
@@ -315,16 +316,14 @@ extern unsigned long stack0_krn_ptr;
 
 
 
+// =============================
+// ws - i8042 ps2 controller.
+#include "ws/view/i8042/i8042.h"
+#include "ws/view/i8042/ps2mouse.h"
+#include "ws/view/i8042/ps2kbd.h"
+#include "ws/view/i8042/ps2.h"
 
-// ws - 
-// view - input support.
-#include "ws/view/i8042.h"
-#include "ws/view/ps2mouse.h"
-#include "ws/view/ps2kbd.h"
 
-
-//isso estava la em cima, vem pra ca se possivel.
-#include "ws/view/ps2.h"
 
 
 
