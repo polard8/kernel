@@ -37,15 +37,34 @@ void show_cpu_intel_parameters (void){
     // Vendor, Name, is apic supported ?, Max feature id,
     // L2 Line size, L2 cache size,
     //
-	
-	printf("          Vendor: {%s}\n", &processor->Vendor[0] );
-	printf("             Cpu: {%s}\n", &processor->BrandName[0] );	
+
+    printf("            Vendor: {%s}\n", &processor->Vendor[0] );
+    printf("               Cpu: {%s}\n", &processor->BrandName[0] );
+
+
+
+    printf("       Stepping ID: {%d}\n", 
+        (unsigned long) processor->Stepping_ID );
+    printf("             Model: {%d}\n", 
+        (unsigned long) processor->Model );
+    printf("         Family ID: {%d}\n", 
+        (unsigned long) processor->Family_ID );
+    printf("    Processor Type: {%d}\n", 
+        (unsigned long) processor->Processor_Type );
+    printf(" Extended Model ID: {%d}\n", 
+        (unsigned long) processor->Extended_Model_ID );
+    printf("Extended Family ID: {%d}\n", 
+        (unsigned long) processor->Extended_Family_ID );
+
+
+
+
 	//printf("ApicSupport={%x}\n", processor->isApic);
-	printf("  Max feature id: {%d}\n", 
-	    (unsigned long) processor->MaxFeatureId );
+    printf("    Max feature id: {%d}\n", 
+        (unsigned long) processor->MaxFeatureId );
 	
 	//Bits 0-7: Cache Line Size.
-	printf("    L2 line size: {%d Byte}\n", 
+	printf("      L2 line size: {%d Byte}\n", 
 	    (unsigned long) processor->L2LineSize ); 	
 
 
@@ -55,30 +74,30 @@ void show_cpu_intel_parameters (void){
 
         //Bits 12-15: L2 Associativity.
         case 0x00:
-            printf ("L2 Associativity: {Disabled}\n");
+            printf ("  L2 Associativity: {Disabled}\n");
             break; 
         case 0x01:
-            printf ("L2 Associativity: {Direct mapped}\n");
+            printf ("  L2 Associativity: {Direct mapped}\n");
             break; 
         case 0x02:
-            printf ("L2 Associativit: {2-way associative}\n");
+            printf ("  L2 Associativit: {2-way associative}\n");
             break; 
         case 0x04:
-            printf ("L2 Associativity: {4-way associative}\n");
+            printf ("  L2 Associativity: {4-way associative}\n");
             break; 
         case 0x06:
-            printf ("L2 Associativity: {8-way associative}\n");
+            printf ("  L2 Associativity: {8-way associative}\n");
             break; 
         case 0x08:
-            printf ("L2 Associativity: {16-way associative}\n");
+            printf ("  L2 Associativity: {16-way associative}\n");
             break; 
         case 0x0F:
-            printf ("L2 Associativity: {Fully associative}\n");
+            printf ("  L2 Associativity: {Fully associative}\n");
             break; 
     };
 
 	//Bits 16-31: Cache size in 1K units.
-	printf("   L2 cache size: {%d KB}\n", 
+	printf("     L2 cache size: {%d KB}\n", 
 	    (unsigned long) processor->L2Cachesize ); 	
 
 	//
@@ -93,10 +112,10 @@ void show_cpu_intel_parameters (void){
 	
 	printf("[Largest virtual and physical address sizes]\n");
 	
-	printf("          PA Lim: {%d}\n", 
+	printf("            PA Lim: {%d}\n", 
 	    (unsigned long) processor->Physical_Address_Size );
 		
-	printf("          VA Lim: {%d}\n", 
+	printf("            VA Lim: {%d}\n", 
 	    (unsigned long) processor->Virtual_Address_Size );
 	
 	//printf("     Memory Size: {%d}\n",(unsigned long) processor->MemorySize);

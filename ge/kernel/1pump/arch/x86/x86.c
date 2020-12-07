@@ -537,6 +537,12 @@ void tss_set_kernel_stack (unsigned long stack_address )
 // The CPUID.01h:EDX[bit 9] flag 
 // specifies whether a CPU has a built-in local APIC. 
 
+
+// According to the Intel CPUID application note, 
+// we should first check the Vendor ID String for "GenuineIntel" 
+// before taking out information, such as 
+// the Processor Signature, Processor Feature Flags, etc. 
+
 void get_cpu_intel_parameters (void)
 {
 
@@ -549,8 +555,12 @@ void get_cpu_intel_parameters (void)
 
     int MASK_LSB_8 = 0xFF;
 
-    debug_print ("get_cpu_intel_parameters:\n");
 
+    debug_print ("get_cpu_intel_parameters: [FIXME]\n");
+
+
+    //========================================
+    // EAX=0: Highest Function Parameter and Manufacturer ID
 
     // Vendor.
     //eax = Maximum meaningful value for the InfoType parameter. @todo:
@@ -580,6 +590,9 @@ void get_cpu_intel_parameters (void)
         hal_set_machine_type(1);    
     }
 
+
+    //========================================
+    // EAX=1: Processor Info and Feature Bits
 
 	//
 	// Output para argumento 1. 
@@ -650,23 +663,26 @@ void get_cpu_intel_parameters (void)
 
     cpuid ( 1, eax, ebx, ecx, edx );
 
-	//eax:
-	//processor->xx = (unsigned long)( eax & 0xF);       //stepping
-	//processor->xx = (unsigned long)((eax >> 4) & 0xf); //model
-	//processor->xx = (unsigned long)((eax >> 8) & 0xf); //family
-	//processor->xx = (unsigned long)((eax >> 12) & 0x3); //processor type
-	//processor->xx = (unsigned long)((eax >> 16) & 0xf); //extended model
-	//processor->xx = (unsigned long)((eax >> 20) & 0xff); //extended family
-	//...
-	
+	// eax:
+	// Processor Version Information 
+	processor->Stepping_ID        = (unsigned long)( eax        & 0xF);  //stepping
+	processor->Model              = (unsigned long)((eax >> 4)  & 0xf);  //model
+	processor->Family_ID          = (unsigned long)((eax >> 8)  & 0xf);  //family
+	processor->Processor_Type     = (unsigned long)((eax >> 12) & 0x3);  //processor type
+	processor->Extended_Model_ID  = (unsigned long)((eax >> 16) & 0xf);  //extended model
+	processor->Extended_Family_ID = (unsigned long)((eax >> 20) & 0xff); //extended family
+
+
 	//ebx:
+	// Additional Information 
 	//processor->xx = (unsigned long)((ebx >> 9) & 0x0001);
     //... 
-	
-	//ecx:
-	//processor->xx = (unsigned long)((ebx >> 9) & 0x0001);
-	//...
-	
+
+
+
+    // ecx e edx:
+    // Feature Information 
+
 	//edx:
 	// The CPUID.01h:EDX[bit 9] flag 
 	// specifies whether a CPU has a built-in local APIC. 
@@ -681,14 +697,57 @@ void get_cpu_intel_parameters (void)
 	
 	// #todo:
 	// Mostrar uma mensagem, se tem ou não apic;
-	
+
+
+    //========================================
+    // EAX=2: Cache and TLB Descriptor information
+    
+    // ...
+    
+    //========================================
+    // EAX=3: Processor Serial Number
+    
 	//Serial number ???
 	//cpuid( 3, eax, ebx, ecx, edx );
-	
+
+
+    //========================================
+    // EAX=4 and EAX=Bh: Intel thread/core and cache topology
+    
 	//Check number of cores.
 	//cpuid( 4, eax, ebx, ecx, edx );
-	
-   /*name part 1*/
+
+
+
+    //========================================
+    // EAX=6: Thermal and power management
+    
+
+    //========================================
+    // EAX=7, ECX=0: Extended Features
+    // EAX=7, ECX=1: Extended Features
+    
+   
+    //========================================
+    // EAX=80000000h: Get Highest Extended Function Implemented
+
+    // Max feature id.
+    cpuid ( 0x80000000, eax, ebx, ecx, edx);
+    name[0] = eax;  //Maximum meaningful value of InfoType for extended function CPUID information.
+    name[1] = ebx;  //reserved
+    name[2] = ecx;  //reserved
+    name[3] = edx;  //reserved
+    name[4] = 0; 
+    processor->MaxFeatureId = (unsigned long)(eax & MASK_LSB_8);
+    //printf("Max feature id ={%d}\n", (unsigned long) processor->MaxFeatureId);
+
+    //========================================
+    // EAX=80000001h: Extended Processor Info and Feature Bits
+    
+    //========================================
+    // EAX=80000002h,80000003h,80000004h: Processor Brand String
+    
+    /*name part 1*/
     cpuid ( 0x80000002, eax, ebx, ecx, edx);
     name[0] = eax;  //Processor Brand String
     name[1] = ebx;  //Processor Brand String
@@ -730,40 +789,37 @@ void get_cpu_intel_parameters (void)
     processor->BrandName[10] = ecx;
     processor->BrandName[11] = edx;
 	//printf("%s}\n",&name[0]);	
-	
-	
-	//Max feature id.
-    cpuid ( 0x80000000, eax, ebx, ecx, edx);
-    name[0] = eax;  //Maximum meaningful value of InfoType for extended function CPUID information.
-    name[1] = ebx;  //reserved
-    name[2] = ecx;  //reserved
-    name[3] = edx;  //reserved
-    name[4] = 0; 
-    processor->MaxFeatureId = (unsigned long)(eax & MASK_LSB_8);
-	//printf("Max feature id ={%d}\n", (unsigned long) processor->MaxFeatureId);
 
 
-    if ( processor->MaxFeatureId < 6){
+    //========================================
+    // EAX=80000005h: L1 Cache and TLB Identifiers
+
+
+
+
+    //========================================
+    // EAX=80000006h: Extended L2 Cache Features
+ 
+    // pegamos logo acima.
+    if ( processor->MaxFeatureId < 6)
+    {
         debug_print ("get_cpu_intel_parameters: Cache Extended Feature not supported\n");
         //printf("Cache Extended Feature not supported\n");
         //goto done;
         return;
     }
 
-
-
-
-	/*
+    /*
      * L2 cache information (Intel)
-	 *
-	 * EAX Reserved
-	 * EBX Reserved
-	 * ECX Bits:  
-	 *     Bits 0-7: Cache Line Size.
-	 *     Bits 12-15: L2 Associativity.
-	 *     Bits 16-31: Cache size in 1K units.   
-	 * EDX Reserved
-	 */
+     *
+     * EAX Reserved
+     * EBX Reserved
+     * ECX Bits:  
+     *     Bits 0-7: Cache Line Size.
+     *     Bits 12-15: L2 Associativity.
+     *     Bits 16-31: Cache size in 1K units.   
+     * EDX Reserved
+     */
 
     cpuid ( 0x80000006, eax, ebx, ecx, edx );
     name[0] = eax;
@@ -777,15 +833,20 @@ void get_cpu_intel_parameters (void)
 	//printf("L2LineSize={%d Byte}\n",(unsigned long) processor->L2LineSize);	
 	//printf("L2Cachesize={%d KB}\n",(unsigned long) processor->L2Cachesize);
 
-    //EAX=80000007h: Advanced Power Management Information
-	
-	/*
-	 * Virtual and physical memory sizes.
-	 */
-	
+
+    //========================================
+    // EAX=80000007h: Advanced Power Management Information
+
+
+
+    //========================================
     //EAX=80000008h: 
     //Virtual and Physical address Sizes	
     //Returns largest virtual and physical address sizes.
+
+    /*
+     * Virtual and physical memory sizes.
+     */
 
     cpuid ( 0x80000008, eax, ebx, ecx, edx );
     name[0] = eax;    //Virtual and physical memory sizes.
@@ -795,9 +856,14 @@ void get_cpu_intel_parameters (void)
     name[4] = 0;
     processor->Physical_Address_Size = (unsigned long) ( eax       & 0x00FF); //7-0
     processor->Virtual_Address_Size  = (unsigned long) ((eax >> 8) & 0x00FF); //15-8	
-	//printf("Physical_Address_Size={%d}\n",(unsigned long) processor->Physical_Address_Size);
-	//printf("Virtual_Address_Size={%d}\n", (unsigned long) processor->Virtual_Address_Size);
+    //printf("Physical_Address_Size={%d}\n",(unsigned long) processor->Physical_Address_Size);
+    //printf("Virtual_Address_Size={%d}\n", (unsigned long) processor->Virtual_Address_Size);
+
+
+
+
 }
+
 
 /*
  ***********************************************

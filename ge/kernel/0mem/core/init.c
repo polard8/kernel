@@ -718,6 +718,14 @@ int init (void){
         panic("init_architecture_dependent: processor\n");
     }
 
+
+    // #todo
+    // Check if cpuid instruction is available.
+    // See: _x86_test_cpuid_support on bootmx/headlib.asm
+    // #todo: extern int x86_test_cpuid_support(void);
+
+
+
     // Sonda pra ver qual é a marca do processador.
     // #todo: 
     // É a segunda vez que fazemos a sondagem ?!
@@ -727,8 +735,10 @@ int init (void){
     // Let's make some initialization and 
     // get more information about the processor
     // using the cpuid instruction.
-    // See: hal/x86 and hal/amd.
-
+    // See: 
+    // arch/x86/x86.c
+    // arch/amd/cpuamd.c
+    
     ProcessorType = (int) hal_probe_processor_type();
 
     if (ProcessorType==0){
@@ -739,7 +749,7 @@ int init (void){
 
     switch (ProcessorType){
         case Processor_INTEL:  x86_init_intel();   break;
-        case Processor_AMD:    init_amd();     break;
+        case Processor_AMD:    init_amd();         break;
         // ...
         default:
             panic ("init_architecture_dependent: default Type\n");

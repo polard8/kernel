@@ -11,4 +11,4 @@
 	This is the entrypoint for the devices via hardware interrupt.
 
 	boot.asm:
-	This is the entrypoint of thekernel via BL.BIN.
+	This is the entrypoint of the kernel via BL.BIN.

@@ -27,17 +27,22 @@
  *   Sonda a CPU pra saber seus parâmetros. (OEM)
  *   ??header 
  */ 
-int cpu_get_parameters (void){
-	
+
 	// @todo: Mudar nome para KeProbeCPU(
-	
-	//#bugbug: A inicial Ke está errada nessa situação.
-	
+
+int cpu_get_parameters (void)
+{
+
+    // #bugbug: 
+    // O prefixo Ke está errada nessa situação.
+
     return (int) KeTestCPU (); 
 }
  
 
+
 /*
+ **************************************
  * KeTestCPU:
  *     Pega os parametros do CPU.
  * 
@@ -50,7 +55,8 @@ int cpu_get_parameters (void){
  *     ??header
  */
 
-int KeTestCPU (void){
+int KeTestCPU (void)
+{
 
     int i=0;
 
@@ -92,7 +98,8 @@ int KeTestCPU (void){
  * nao sei qual ha instruções diferentes para arquiteturas diferentes.
  */
 
-int hal_probe_cpu (void){
+int hal_probe_cpu (void)
+{
 
     unsigned long eax, ebx, ecx, edx;
 

@@ -451,67 +451,14 @@ int hal_showpciinfo (void){
 // #todo 
 // O retorno deve ser int, para refletir o status.
     
-void init_cpu (void){
-
-    int Status=0;
-
-	// #bugbug
-	// Precisamos dar suporte à vários processadores,
-	// e nessa rotina estamos usando uma estrutura para 
-	// um processador específico.
-	// Podemos atribuílo como Current ao fim da rotina.
-	
-	//
-	// Processor struct
-	//
-
-    processor = (void *) kmalloc( sizeof(struct processor_d) );
-
-    if ( (void *) processor == NULL ){
-        panic ("hal-init_cpu: processor");
-
-    } else {
-
-		//@todo: set processor id: escolhe o processador atual. ??
-	
-	    //Inicializa alguns valores da estrurura.
-		
-        processor->Gdt = (unsigned long) getGdt();
-        processor->Idt = (unsigned long) getIdt();
-        processor->Tss = 0;  //getTss();
-        
-		// ...
-		
-        if ( (void *) Hardware == NULL )
-            panic ("hal-init_cpu: Hardware");
-        
-        if ( (void *) Hardware != NULL ){ 
-            Hardware->Processor = processor;
-        }
-
-        // Nothing.
-    };
-
-
-	//sonda.
-	//Checa qual cpu é, e inicializa mais variáveis.
-
-    Status = (int) hal_probe_cpu(); 
-
-    if ( Status != 0 ){
-        panic ("init_cpu: hal_probe_cpu Status \n"); 
-    }
-
-    //More?!	
-
-
-#ifdef HAL_VERBOSE
-    printf("Done\n");
-#endif	
-
-    //#todo, o retorno deve ser int, para refletir o status.
-    return;
+void init_cpu (void)
+{
+    debug_print("init_cpu: deprecated\n");
+    // See:
+    // init() on init.c
+    // hal_probe_processor_type() on detect.c
 }
+
 
 
 void hal_set_machine_type ( unsigned long type )

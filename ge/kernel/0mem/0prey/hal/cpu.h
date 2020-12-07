@@ -88,15 +88,17 @@ struct processor_d
 	//cpuid vars.
     unsigned long Vendor[4];
 
+    //0x1(eax)
+    int Stepping_ID;   //4 bit stepping
+    int Model;         //4 bit model
+    int Family_ID;     //4 bit family
+    int Processor_Type;  // 2 bitprocessor type
+    // 2bit reserved
+    int Extended_Model_ID;  // 4 bit extended model
+    int Extended_Family_ID;  // 8bit extended family
+    // 4bit reserved
 
-	//0x1(eax)
-	//unsigned long stepping;
-	//model
-	//family
-	//processor type
-	//extended model
-	//extended family
-	
+
 	//0x1(ebx)
 	//Brand Index
 	//CLFLUSH cache line size / 8
