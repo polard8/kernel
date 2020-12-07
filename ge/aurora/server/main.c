@@ -1547,7 +1547,6 @@ int initGraphics (void){
         debug_print ("gwssrv: initGraphics [PANIC] Couldn't initialize the graphics\n");
         printf      ("gwssrv: initGraphics [PANIC] Couldn't initialize the graphics\n");
         exit(1);
-        //while(1);
     }
 
    
@@ -1567,8 +1566,7 @@ int initGraphics (void){
     }
 
 
-    // background.
-    // Clean background.
+    // Create background.
 
     create_background();
 

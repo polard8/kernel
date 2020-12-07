@@ -17,6 +17,12 @@ struct gws_display_d
     int fd;    // Network socket. 
     int lock;  // is someone in critical section?  
  
+ 
+    // #todo
+    // The IP of the host where we're gonna display.
+    //char IP[4];
+ 
+ 
     //#todo:
     //See: r_render.h
     //int render_mode;

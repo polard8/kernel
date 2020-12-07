@@ -41,7 +41,8 @@
 
 //int socket ( int family, int type, int protocol ){
 
-int socket ( int domain, int type, int protocol ){
+int socket ( int domain, int type, int protocol )
+{
 
     int __fd = -1;
 
@@ -61,8 +62,8 @@ int socket ( int domain, int type, int protocol ){
 
 //interna
 //int __socket_pipe ( int pipefd[2] );
-int __socket_pipe ( int pipefd[2] ){
-
+int __socket_pipe ( int pipefd[2] )
+{
     return (int) gramado_system_call ( 247, 
                      (unsigned long) pipefd, 
                      (unsigned long) pipefd, 
@@ -77,8 +78,8 @@ int __socket_pipe ( int pipefd[2] ){
 // clones of the BSD socket layer (including System V variants).
 // #bugbug: Porque o termo pipe é usado ???
 
-int socketpair (int domain, int type, int protocol, int sv[2]){
-
+int socketpair (int domain, int type, int protocol, int sv[2])
+{
     int fd = -1; 
     int pipefd[2];
 
@@ -156,7 +157,8 @@ bind (
 // On success, zero is returned.  
 // On error, -1 is returned, and errno is set appropriately.     
 
-int listen (int sockfd, int backlog){
+int listen (int sockfd, int backlog)
+{
 
     int __status = -1;
 
@@ -613,19 +615,32 @@ in_addr_t inet_netof (struct in_addr in)
 
 
 int getsockopt (int sockfd, int level, int optname, void *optval, socklen_t *optlen)
-{ return -1; }
+{ 
+    return -1; 
+}
 
 int setsockopt (int sockfd, int level, int optname, const void *optval, socklen_t optlen)
-{ return -1; }
-
-
+{ 
+    return -1; 
+}
 
 int sendfd(int sockfd, int fd)
-{ return -1; }
+{
+    if ( sockfd < 0)
+        return -1;
+ 
+    return -1; 
+}
 
 
 int recvfd(int sockfd)
-{ return -1; }
+{
+    if ( sockfd < 0)
+        return -1;
+        
+    return -1; 
+}
+
 
 //
 // End.

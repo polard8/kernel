@@ -719,8 +719,9 @@ void console_putchar ( int c, int console_number ){
 
 
     //  Console limits
-    if ( console_number < 0 || console_number >= 4 ){
-        panic ("console_putchar: console_number");        
+    if ( console_number < 0 || console_number >= 4 )
+    {
+        panic ("console_putchar: console_number");
     }
 
     // Desenhar o char no backbuffer
@@ -839,7 +840,8 @@ console_write (
     //debug_print ("console_write: [test]\n");
 
     // Console number.
-    if ( console_number < 0 || console_number > 3 ){
+    if ( console_number < 0 || console_number > 3 )
+    {
         printf ("console_write: console_number\n");
         goto fail;
     }
@@ -866,6 +868,10 @@ console_write (
     // Vamos percorret todos os bytes da sequencia quando
     // encontrarmos o marcador.
     
+    // #todo
+    // Esse marcador de estagio deve ser especifico para
+    // cada console. CONSOLE[i].esc_stage
+    
     __EscapeSequenceStage = 0; 
      StringSize = count;
   
@@ -891,12 +897,12 @@ console_write (
                if (ch >31 && ch <127){
                     console_putchar ( ch, console_number );
                
-               // Escape.
-               // >>>> Entramos em uma escape sequence,
+               // >>>> [ Escape ]
+               // Entramos em uma escape sequence,
                // entao o proximo case inicia o tratamento da escape sequence.
-               } else if (ch==27){ 
+               } else if (ch==27){
                    __EscapeSequenceStage=1;  // <<<<<<<--
-               
+
                // ?? \n
                }else if (ch==10 || ch==11 || ch==12){
                    console_putchar ( ch, console_number );  // \n ???
@@ -1094,12 +1100,13 @@ console_write (
 						break;
 
                     // Outros tratadores.
-					case 'J': csi_J  (par[0]);                 break;
-					case 'K': csi_K  (par[0]);                 break;
-					case 'L': csi_L  (par[0], console_number); break;
-					case 'M': csi_M  (par[0], console_number); break;
-					case 'P': csi_P  (par[0], console_number); break;
-					case '@': csi_at (par[0], console_number); break;
+                    case 'J': csi_J  (par[0]);                 break;
+                    case 'K': csi_K  (par[0]);                 break;
+                    case 'L': csi_L  (par[0], console_number); break;
+                    case 'M': csi_M  (par[0], console_number); break;
+                    case 'P': csi_P  (par[0], console_number); break;
+                    case '@': csi_at (par[0], console_number); break;
+
 
                     // FIM.
                     // Isso marca o fim da escape sequence,

@@ -107,6 +107,23 @@ dessa conta.
 //#define HIBYTE(w) ((char)((((unsigned long)(w)) >> 8) & 0xff))
 
 
+// user
+//#define SUPER_USER    0
+
+
+
+/*
+// Classes of processes queues.
+#define NQ          0
+#define SYSTEM_Q    1
+#define SERVICES_Q  2
+#define USER_Q      3
+*/
+
+
+
+
+// ===================================================
 
 
 // salvando o último endereço válido de memória ram.

@@ -226,6 +226,10 @@ __local_ps2kbd_procedure (
     int Status = -1;
 
 
+    if (msg<0)
+        return 0;
+
+
     switch (msg){
 
         case MSG_SYSKEYUP: 
@@ -248,7 +252,7 @@ __local_ps2kbd_procedure (
                     // #se o processo não existe vai dar problema.
                     //tty_send_message (103,buffer, 32, 444, 0, 0);
                     //tty_send_message (104,buffer, 32, 444, 0, 0);
-                    refresh_screen();
+                    //refresh_screen();
                     break;
 
                 // Test 1.
@@ -269,22 +273,28 @@ __local_ps2kbd_procedure (
                     //}else{
                     //    printf("not found\n");
                     //};
-                    refresh_screen();
+                    //refresh_screen();
                     break;
 
                 // Test 2.
                 case VK_F8:
                     printf (">> %x \n", get_new_frame() );
-                    refresh_screen();
+                    //refresh_screen();
                     // testNIC ();
                     //pciInfo ();
                     // ahciSATAInitialize (1);
                     //refresh_screen();
                     break;
+            
+                default:
+                    // nothing
+                    return 0;
+            
             }
     };
 
-
+//done
+    refresh_screen();
     return 0;
 }
 

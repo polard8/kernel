@@ -23,10 +23,13 @@ tcgetwinsize(int fd, struct winsize *ws)
 */
 
 
-int tcgetattr (int fd, struct termios *termios_p){
+// #maybe: TIOCGETA ?
+int tcgetattr (int fd, struct termios *termios_p)
+{
+    if (fd<0)
+        return -1;
 
-    // TIOCGETA ?
-    return ioctl (fd, TCGETS, termios_p);
+    return (int) ioctl (fd, TCGETS, termios_p);
 }
 
 
@@ -37,19 +40,16 @@ tcsetattr (
     const struct termios *termios_p )
 {
 
-    switch ( optional_actions)
-    {
-        case TCSANOW:
-            return ioctl (fd, TCSETS , termios_p);
+    if (fd<0)
+        return -1;
 
-        case TCSADRAIN:
-            return ioctl (fd, TCSETSW, termios_p);
 
-        case TCSAFLUSH:
-            return ioctl (fd, TCSETSF, termios_p);
-
+    switch ( optional_actions){
+        case TCSANOW:    return (int) ioctl (fd, TCSETS , termios_p);
+        case TCSADRAIN:  return (int) ioctl (fd, TCSETSW, termios_p);
+        case TCSAFLUSH:  return (int) ioctl (fd, TCSETSF, termios_p);
         default:
-            debug_print ("tcsetattr: default\n");
+            debug_print ("tcsetattr: [FAIL] default\n");
             break;
     };
 
@@ -62,19 +62,30 @@ tcsetattr (
 int tcsendbreak (int fd, int duration)
 {
     debug_print ("tcsendbreak: [TODO]\n");
+
+    if (fd<0)
+        return -1;
+
     return -1; 
 }
 
 
 int tcdrain (int fd)
 {
-    return ( ioctl(fd, TIOCDRAIN, 0) );
+    if (fd<0)
+        return -1;
+
+    return (int) ioctl(fd, TIOCDRAIN, 0);
 }
 
 
 int tcflush (int fd, int queue_selector){
 
     debug_print ("tcflush: [TODO]\n"); 
+
+    if (fd<0)
+        return -1;
+
     return -1;
 
 
@@ -110,9 +121,11 @@ int tcflow (int fd, int action)
 
 
 
-void cfmakeraw (struct termios *termios_p){
+void cfmakeraw (struct termios *termios_p)
+{
 
-    if ( (void *) termios_p == NULL ){
+    if ( (void *) termios_p == NULL )
+    {
         debug_print ("cfmakeraw: termios_p\n");  
         return;
     }
@@ -136,7 +149,8 @@ void cfmakeraw (struct termios *termios_p){
 
 speed_t cfgetispeed (const struct termios* tp)
 {
-    if ( (void *) tp == NULL ){
+    if ( (void *) tp == NULL )
+    {
         debug_print ("cfgetispeed: tp\n");  
         return 0;
     }

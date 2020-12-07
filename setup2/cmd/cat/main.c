@@ -16,6 +16,7 @@ int main ( int argc, char *argv[] ){
 
     FILE *fp;
     char buffer[1024];
+    //char buffer[2048];
 
     // Counters.
     register int nreads  = 0;
@@ -32,8 +33,12 @@ int main ( int argc, char *argv[] ){
         exit (-1);
     }
 
+    // #todo
+    // Deveriamos pegar o tamanho do arquivo e ler somente o 
+    // tamanho do arquivo e nao o buffer todo. ??
+
     // Read
-    nreads = read( fileno(fp), buffer, sizeof(buffer) );
+    nreads = read ( fileno(fp), buffer, sizeof(buffer) );
     if ( nreads <= 0 ){
         printf ("cat: read fail\n");
         exit (-1);
@@ -51,6 +56,9 @@ int main ( int argc, char *argv[] ){
         printf ("cat: write fail\n");
         exit(-1);
     }
+
+    // close() ??
+    // vai salvar ??
 
     return 0;
 }

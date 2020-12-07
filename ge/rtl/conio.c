@@ -27,10 +27,11 @@ int cputs (const char *str)
 // Interna.
 // Suporte ao echo.
 /* Read 1 character - echo defines echo mode */
-static char getchEcho (int echo){
-	
-    char ch;
-    	
+static char getchEcho (int echo)
+{
+    char ch=0;
+
+
 	switch (echo)
 	{			
 		//sem echo
@@ -54,15 +55,15 @@ static char getchEcho (int echo){
 
 
 /* Read 1 character without echo */
-int getch (void){
-	
+int getch (void)
+{
     return (int) getchEcho (0);
 }
 
 
 /* Read 1 character with echo */
-int getche (void){
-	
+int getche (void)
+{
     return (int) getchEcho (1);
 }
 

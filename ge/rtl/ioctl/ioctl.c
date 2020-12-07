@@ -1,4 +1,3 @@
- 
 
 
 #include <sys/ioctl.h>
@@ -8,10 +7,11 @@
 
 
 /*
-  The ioctl() system call manipulates the underlying device parameters
-       of special files.  In particular, many operating characteristics of
-       character special files (e.g., terminals) may be controlled with
-       ioctl() requests. 
+  The ioctl() system call manipulates the 
+  underlying device parameters of special files.  
+  In particular, many operating characteristics of
+  character special files (e.g., terminals) may be controlled with
+  ioctl() requests. 
  */
 
 
@@ -33,7 +33,8 @@
 */
 
 
-int ioctl (int fd, unsigned long request, ...){
+int ioctl (int fd, unsigned long request, ...)
+{
 
     int __ret = -1;
     

@@ -34,5 +34,16 @@ __gws_recv (
 
 
 
+ssize_t gws_write_to_server (int fd, const void *buf, size_t count)
+{
+    return (ssize_t) write ( fd, (const void *) buf, count );
+}
 
-
+ssize_t gws_read_from_server (int fd, const void *buf, size_t count)
+{
+   return (ssize_t) read ( fd, (const void *) buf, count );
+}   
+   
+	
+	
+	
