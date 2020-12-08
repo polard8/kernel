@@ -678,37 +678,41 @@ void fs_show_file_table(void)
 
 void fs_show_inode_info (struct inode_d *i)
 {
-    if ((void*)i==NULL)
+
+    if ( (void *) i == NULL )
     {
         //??
         return;
-    }{
-        
-        if (i->used==1)
+    }
+
+    if (i->used == 1)
+    {
+        if ( (void*)i->path != NULL )
         {
-    
-            if( (void*)i->path != NULL ){
-                printf ("Name={%s}\n",i->path);
-            //refresh_screen();
-            }
+            printf ("Name={%s}\n",i->path);
         }
-    }; 
+    }  
 }
+
 
 void fs_show_inode_table(void)
 {
-    int i=0;
     struct inode_d *inode;
 
+    register int i=0;
 
-    printf ("\ninode_table:\n");
+    printf ("\n inode_table: \n");
     
-    for(i=0; i<32; i++)
+    for (i=0; i<32; ++i)
     {
-        inode=(struct inode_d *)inode_table[i];
+        inode = (struct inode_d *) inode_table[i];
         
-        if ( (void*)inode!=NULL ){
-            fs_show_inode_info(inode);
+        if ( (void*)inode != NULL )
+        {
+            if( inode->used == 1 && inode->magic == 1234 )
+            {
+                fs_show_inode_info(inode);
+            }
         }
     };
 
@@ -753,7 +757,9 @@ int get_free_slots_in_the_inode_table(void)
     {
         tmp = (void*) inode_table[i];
         
-        // Nenhum descritor de estrutura de arquivo está usando essa estrutura inode.
+        // Se nenhum descritor de estrutura de arquivo 
+        // está usando essa estrutura inode.
+        
         if (tmp->used == 1 && 
             tmp->magic == 1234 && 
             tmp->filestruct_counter == 0)

@@ -591,10 +591,13 @@ unsigned long g_proc_status;    // Procedure status.
 
 
 //Drivers support.
+int g_driver_ps2keyboard_initialized;   //ps2 keyboard
+int g_driver_ps2mouse_initialized;      //ps2 mouse
+
 int g_driver_video_initialized;
 int g_driver_apic_initialized;
 int g_driver_hdd_initialized;
-int g_driver_keyboard_initialized;
+
 int g_driver_pci_initialized;
 int g_driver_rtc_initialized;
 int g_driver_timer_initialized;

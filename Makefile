@@ -268,6 +268,7 @@ vhd-copy-files:
 #	-sudo cp setup2/cmd/bin/TRUE.BIN       base/
 #	-sudo cp setup2/cmd/bin/FALSE.BIN      base/
 #	-sudo cp setup2/cmd/bin/SHOWFUN.BIN       base/
+	#-sudo cp setup2/cmd/bin/MINIYACC.BIN       base/
 	# ...
 
 	#-sudo cp setup2/cmd/bin/SHELL.BIN       base/

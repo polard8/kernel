@@ -75,15 +75,22 @@ unsigned long inode_table[32];
 
 // #bugbug
 // Not tested yet.
+// See: search.c
 int search_path_in_the_inode_table( const char *path );
 
 
 //OUT: inode structure.
+//See: fs.c
 struct inode_d *file_inode (file *f);
 
 
-#endif    
+void fs_show_inode_info (struct inode_d *i);
+void fs_show_inode_table(void);
 
+int get_free_slots_in_the_inode_table(void);
+
+
+#endif    
 
 
 

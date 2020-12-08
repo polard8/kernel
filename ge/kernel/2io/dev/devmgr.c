@@ -1,6 +1,5 @@
 /*
- * File: bottom/devmgr.c 
- *
+ * File: dev/devmgr.c 
  * 
  * Descrição: 
  *     Arquivo principal do device manager. 
@@ -69,15 +68,16 @@ typedef enum {
 
 
 // Initialize the list.
-int devmgr_init_device_list(void){
-
+int devmgr_init_device_list(void)
+{
     int i=0;
 
     debug_print ("devmgr_init_device_list: Initializing the mount table. deviceList[].\n");
 
-    for (i=0; i<DEVICE_LIST_MAX; i++){
+    for (i=0; i<DEVICE_LIST_MAX; i++)
+    {
         deviceList[i] = 0; 
-    }
+    };
 
     //...
     
@@ -193,76 +193,90 @@ devmgr_register_device (
     struct device_d *d;
     int id= -1;
 
-    
-    debug_print ("devmgr_register_device:\n");
-    
-    
-    //
+
     // mount point
-    //
-    
     char __tmp_mount_point[64];
-    char *new_mount_point = (char *) kmalloc (64);
+    char *new_mount_point;
+
+
+    debug_print ("devmgr_register_device:\n");
+
+
+    new_mount_point = (char *) kmalloc(64);
+    
     if ( (void*) new_mount_point == NULL )
-        panic("devmgr_register_device: new_mount_point");
-                
+    {
+        panic ("devmgr_register_device: new_mount_point");
+    }
 
+    // =======================
+    // FILE. Device object.
 
-    if ( (void *) f == NULL ){
-        panic ("devmgr_register_device: f \n");
+    if ( (void *) f == NULL )
+    {
+        panic ("devmgr_register_device: [FAIL] f \n");
+    }
 
-    }else{
+    if ( f->used != 1 || f->magic != 1234){
+        panic("devmgr_register_device: f validation \n");
+    }
 
-        if ( f->used != 1 || f->magic != 1234){
-            panic("devmgr_register_device: f validation \n");
-        }
+    if ( f->isDevice != 1 ){
+        panic ("devmgr_register_device: This file is NOT a device!\n");
+    }
 
-        if ( f->isDevice != 1 ){
-            panic ("devmgr_register_device: This file is NOT a device!\n");
-        }
+    // =======================
+    // Device structure.
+
+    d = (struct device_d *) devmgr_device_object();
+        
+    if ( (void *) d == NULL )
+    {
+        panic ("devmgr_register_device: d. Couldn't create device object\n");
+    }
+
+    if ( d->deviceUsed != 1 || d->deviceMagic != 1234 )
+    {
+        panic ("devmgr_register_device: d validation \n");
+    }
+
+    // ID
+    
+    id = d->deviceId;
+            
+    if (id < 0 || id >= DEVICE_LIST_MAX )
+    {
+        panic ("devmgr_register_device: id limits \n");
+    }
+
+    f->deviceId = d->deviceId; 
+
+    d->__file = (file *) f;
+    d->__class = class;
+    d->type = type;
+
+    // #test 
+    //Todo: create the file.
+    
+    sprintf( (char *) &__tmp_mount_point[0], "/DEV%d", id);
+    strcpy (new_mount_point,__tmp_mount_point);
+
+    // /dev/tty0
+    d->mount_point = (char *) new_mount_point; 
+   
+    // DEV_8086_8086
+    d->name = (char *) name;
+
+    // pci device.
+    // Passado via argumento
+    d->pci_device = (struct pci_device_d *) pci_device;
+
+    // tty driver.
+    // Passado via argumento.
+    d->ttydrv = (struct ttydrv_d *) tty_driver;
 
         
-        d = (struct device_d *) devmgr_device_object ();
-        
-        if ( (void *) d == NULL ){
-            panic ("devmgr_register_device: d. Couldn't create device object\n");
-
-        }else{
-
-            if ( d->deviceUsed != 1 || d->deviceMagic != 1234 ){
-                panic ("devmgr_register_device: d validation \n");
-            }
-
-            id = d->deviceId;
-            
-            if (id < 0 || id >= DEVICE_LIST_MAX ){
-                panic ("devmgr_register_device: id limits \n");
-            }
-
-            f->deviceId = d->deviceId; 
-
-            d->__file = (file *) f;
-            d->__class = class;
-            d->type = type;
-
-            //#test 
-            //Todo: create the file.
-            sprintf( (char *) &__tmp_mount_point[0], "/DEV%d", id);
-            strcpy (new_mount_point,__tmp_mount_point);
-
-            // /dev/tty0
-            d->mount_point = (char *) new_mount_point; 
-            
-            // DEV_8086_8086
-            d->name = (char *) name;
-
-            d->pci_device = (struct pci_device_d *) pci_device;
-            d->ttydrv = (struct ttydrv_d *) tty_driver;
-
-            // continua ...
-        };
-        //...
-    };
+    // ...
 
     return 0;
 }
@@ -272,15 +286,12 @@ devmgr_register_device (
 void devmgr_show_device_list(void)
 {
     struct device_d *d;
-    int i=0;
+    register int i=0;
 
 
-//#ifdef KERNEL_VERBOSE
-	printf ("\n devmgr_show_device_list: \n");
-//#endif
+    printf ("\n devmgr_show_device_list: \n");
 
-
-    for (i=0; i<DEVICE_LIST_MAX; i++)
+    for (i=0; i<DEVICE_LIST_MAX; ++i)
     {
         d = ( struct device_d *) deviceList[i];
 
@@ -303,7 +314,6 @@ void devmgr_show_device_list(void)
         }
     };
 
-
     printf ("Done\n");
     refresh_screen();
 }
@@ -313,27 +323,16 @@ void devmgr_show_device_list(void)
  ********************************
  * init_device_manager:
  * 
- * 
  */
 
-void init_device_manager (void){
-
-
+void init_device_manager (void)
+{
     debug_print ("init_device_manager:\n");
-    devmgr_init_device_list ();
-
+ 
+    devmgr_init_device_list();
     //...
 }
 
-
-/*
-int devicemanagerInit()
-{}
-*/
-
-//int deveiceInit(){
-//
-//}
 
 
 //

@@ -75,7 +75,8 @@ KiSearchFile (
 
     // Invalid first char.
 
-    if ( file_name[0] == '/' || file_name[0] == 0 ){
+    if ( file_name[0] == '/' || file_name[0] == 0 )
+    {
         printf ("KiSearchFile: Invalid first char\n");
         goto fail;
     }
@@ -214,12 +215,10 @@ int fsSearchFile (unsigned char *file_name){
 
 
 	//More?!
-	
+
 fail:
     Status = (int) 1;
     printf ("fsSearchFile: File not found\n");
-
-
 done:
     return (int) Status;
 }
@@ -334,6 +333,7 @@ int search_path_in_the_inode_table( const char *path )
 
 // #bugbug
 // empty uninitialized.
+// Search in file_cluster_list[]
 
 unsigned short fs_find_n_empty_entries ( int n ){
 
@@ -368,7 +368,6 @@ unsigned short fs_find_n_empty_entries ( int n ){
 done:
     //Retorna o primeiro da lista.
     return (unsigned short) file_cluster_list[0];
-
 
 fail:
     return (unsigned short) 0;

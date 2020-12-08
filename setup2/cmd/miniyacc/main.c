@@ -132,9 +132,11 @@ FILE *fhdr;
 
 
 
-void die (char *s){
-	
+void die (char *s)
+{
 	fprintf (stderr, "%s (on line %d)\n", s, lineno);
+    fflush(stderr);
+    fflush(stdout);
 	exit (1);
 }
 
@@ -983,9 +985,13 @@ getdecls(void)
 	nsy = MaxTk+1;
 	sstart = S;
 	prec = 0;
+
 	tk = nexttk();
-	for (;;)
-	switch (tk) {
+
+    for (;;)
+    
+    switch (tk) {
+	
 	case TStart:
 		tk = nexttk();
 		if (tk!=TIdnt)
@@ -1325,11 +1331,18 @@ int main (int ac, char *av[]){
 
     printf ("miniyacc: \n");
 
+    printf ("miniyacc: init\n");
 	init(ac, av);
-	
+
+    printf ("miniyacc: getdecls\n");
 	getdecls();
+
+    printf ("miniyacc: getgram\n");
 	getgram();
+
+    printf ("miniyacc: ginit\n");
 	ginit();
+
 	stgen();
 	tblgen();
 	stdump();

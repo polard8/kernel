@@ -829,6 +829,20 @@ done:
                             (unsigned long) tmp_sc );
                         debug_print ("KEYBOARD_SEND_MESSAGE: >>>> [MSG_SYSKEYUP.function] to wwf\n");        
                     }
+                    
+                    //#test
+                    //sent to 'stdin' 'KSTDIN.TXT' 'prompt[]'
+                    //prompt[0] = '1';
+                    //prompt[1] = '2';
+                    //prompt[2] = '3';
+                    //prompt[3] = '4';
+                    //prompt[4] = 0;
+                    //*stdin->_base = '1';
+                    //*(stdin->_base +1)= '2';
+                    //*(stdin->_base +2)= '3';
+                    //*(stdin->_base +3)= '4';
+                    //*(stdin->_base +4)= 0;
+                    
                     return 0; 
                     break;
             };
@@ -1172,7 +1186,14 @@ int ps2kbd_globals_initialize (void){
  * 2018 - Fred Nora.
  */
 
-void ps2kbd_initialize_device (void){
+void ps2kbd_initialize_device (void)
+{
+    // register device.
+    file *__file;
+    char __tmpname[64];
+    char *newname;
+
+
 
     __breaker_ps2keyboard_initialized = 0;
 
@@ -1259,42 +1280,32 @@ void ps2kbd_initialize_device (void){
     kbdc_wait (1);
     kbdc_wait (1);
 
-
-
 //
 // ==========================================
 //
-
 
     //
     // name
     //
     
-    char __tmpname[64];
-    
     //#test
     // isso não é o ponto de montagem.
     sprintf( (char *) &__tmpname[0], "/DEV_I8042_KEYBOARD");
-    
-    char *newname = (char *) kmalloc (64);
+    newname = (char *) kmalloc (64);
     if ( (void*) newname == NULL )
         panic("ps2kbd_initialize_device: newname");
     strcpy (newname,__tmpname);
 
 
-    //
+
     // Agora registra o dispositivo pci na lista genérica
     // de dispositivos.
     // #importante: ele precisa de um arquivo 'file'.
-    //
-    
-    file *__file;
     
     __file = (file *) kmalloc ( sizeof(file) );
     
     if ( (void *) __file == NULL ){
         panic ("ps2kbd_initialize_device: __file fail, can't register device");
-    
     }else{
         __file->used = 1;
         __file->magic = 1234;
@@ -1311,29 +1322,25 @@ void ps2kbd_initialize_device (void){
         // Mas podemos ter mais de um nome.
         // vamos criar uma string aqui usando sprint e depois duplicala.
      
-        
-        devmgr_register_device ( (file *) __file, 
+        devmgr_register_device ( 
+            (file *) __file,             // file
              newname,                    // device name.                  
-             0,                    //class (char, block, network)
+             0,                          //class (char, block, network)
              1,                          //type (pci, legacy
              (struct pci_device_d *) 0,  //pci device
              NULL );                     //tty driver
     
     };
 
-
-
     // #test
-    // Drain the output buffer.
+    // Drain the output buffer for the first time. Residual.
     ps2kbd_drain();
-
 
 //
 // ==========================================
 //
 
-
-    g_driver_keyboard_initialized = (int) 1;
+    g_driver_ps2keyboard_initialized = (int) 1;
     
     __breaker_ps2keyboard_initialized = 1;
 }

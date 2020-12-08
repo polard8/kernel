@@ -196,10 +196,22 @@ int main ( int argc, char *argv[] ){
     //====================
     gws_debug_print ("gws.bin: hang in a loop \n");
     //printf          ("gws.bin: hang in a loop \n");
+
+    char buf[32];
     //#debug
     while(1)
     {
-        gws_draw_char ( client_fd, main_window, 
+        //read fake event
+        read (client_fd, buf, 4);
+        
+        if( buf[0] != '?'){  //se for ? ignora.
+            buf[4] = 0;
+            printf ("%s",buf); 
+            fflush(stdout);
+        }
+        
+        gws_draw_char ( client_fd, 
+            main_window, 
             w/3, 8, COLOR_RED, 'C' );
     }
     //================

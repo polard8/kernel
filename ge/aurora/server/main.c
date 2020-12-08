@@ -2226,6 +2226,19 @@ int main (int argc, char **argv){
 
 
     /*
+    FILE *input_fp;
+    fflush(stdin);
+    close(fileno(stdin));
+    input_fp = fopen("kstdin.txt","r+");
+    if( (void*) input_fp == NULL ){
+        printf ("gwssrv: input_fp fail\n");
+        exit(1);
+    }
+    */
+
+
+
+    /*
     //#test
     char display[100];
     hostName    = "gramado";
@@ -2249,6 +2262,8 @@ int main (int argc, char **argv){
     // Main loop!
     // This loop will make the server restart and
     // call the childs again.
+    
+    char buf[32];
     
     while (1){
 
@@ -2460,8 +2475,25 @@ int main (int argc, char **argv){
             gwssrv_debug_print("gwssrv: accept returned\n");
             //printf ("gwssrv: newconn %d\n",newconn);
             
-            if (newconn>0)
+            if (newconn>0){
+                
                 xxxHandleNextClientRequest (newconn);
+                
+                // read input from the server's socket?
+                // if it is invalid, we ignore it.
+                //read (serverClient->fd, buf, 4);
+                //read (fileno(stdin), buf, 4);
+                //if( buf[0] != '?'){  //se for ? ignora.
+                //    buf[4] = 0;
+                //    printf ("%s",buf); fflush(stdout);
+                //}
+                
+                //fake event
+                //sprintf(buf,"?uck");    // nothing
+                //sprintf(buf,"fuck");  // valid
+                //write (newconn,buf, 4);
+            }
+            
             
             //close(newconn);
             

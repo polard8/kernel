@@ -94,25 +94,37 @@ fail:
 
 
 
-
 /*
  * debug_check_drivers:
  *    Checar se os drivers estão inicializados.
  */
  
-int debug_check_drivers (void){
+int debug_check_drivers (void)
+{
 
     int Status = 0;
+
+
+    // #todo
+    // This routine is very cool.
+
+    debug_print("debug_check_drivers: TODO\n");
+
+    /*
+     
+	if (g_driver_ps2keyboard_initialized != 1){
+	    //erro
+	}
+
+	if (g_driver_ps2mouse_initialized != 1){
+	    //erro
+	}
 
 
 	if (g_driver_hdd_initialized != 1){
 	    //erro
 	}
 
-	if (g_driver_keyboard_initialized != 1){
-	    //erro
-	}
-	
     if (g_driver_pci_initialized != 1){
 	    //erro
 	}
@@ -125,6 +137,7 @@ int debug_check_drivers (void){
 	    //erro
 	}
 
+    */
 
     return (int) Status;
 }
@@ -137,10 +150,10 @@ int debug_check_drivers (void){
  *     @todo: isso pode ir para o arquivo debug.c.
  */
 
-void debug_breakpoint (void){
-
+void debug_breakpoint (void)
+{
     printf ("debug_breakpoint:\n");
-    die ();
+    die();
 }
 
 
