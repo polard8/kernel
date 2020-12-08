@@ -339,13 +339,19 @@ struct file_d
     fpos_t _offset;     // current lseek offset 		
 
 
+    //
+    // == device ============
+    //
+
+    struct device_d *device;
+        
     // 1= is a device; 0= is a file.
     // Se � um dispositivo ou n�o.
     // Se for um dispositivo ent�o o dispositivo ter�
-    // na lista deviceList[] o mesmo offset da stream 
-    // na list Streams[].
+    // na lista deviceList[] 
 
     int isDevice;
+    
     int deviceId;  //�ndice na lista deviceList[]
 
 	// old stuff

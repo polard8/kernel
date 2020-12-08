@@ -1,5 +1,5 @@
 /*
- * File: device.h  
+ * File: devmgr.h  
  *
  * Descrição:
  *     Header para o device manager.
@@ -18,9 +18,6 @@
  * pararece algum que apresente bom desempenho, pois é apenas uma forma de se eleger
  * prioridades.
  *
- * Histórico:
- *     Versão 1.0, 2015 - Esse arquivo foi criado.
- *     Versão 1.0, 2016 - Revisão.
  *     ... 
  */
 
@@ -88,6 +85,10 @@ struct device_d
     // ?? Talvez pudesse ser 'device driver' e não 'tty driver'
     // mas está bom assim.
     struct ttydrv_d *ttydrv;
+    
+    
+    //struct tty_d *tty;
+
 
 	//
 	// Continua ...
@@ -102,6 +103,11 @@ struct device_d *devices;  //?? What
 //...
 
 
+// List of legacy devices.
+// 'file->device'
+struct device_d *PS2KeyboardDevice;
+struct device_d *PS2MouseDevice;
+// ...
 
 
 // #todo: 
@@ -125,7 +131,43 @@ unsigned long deviceList[DEVICE_LIST_MAX];
 
 
 //
-// Protótipo de funções.
+// == Objects ======================
+//
+
+// #bugbug
+// Temos um header no lugar certo para isso?
+
+file *PS2KeyboardDeviceObject;
+file *PS2MouseDeviceObject;
+// ...
+
+
+//
+// == ttys ======================
+//
+
+// #bugbug
+// Temos um header no lugar certo para isso?
+
+struct tty_d *PS2KeyboardDeviceTTY;
+struct tty_d *PS2MouseDeviceTTY;
+// ...
+
+
+//
+// == tty drivers ======================
+//
+
+// #bugbug
+// Temos um header no lugar certo para isso?
+
+struct ttydrv_d *PS2KeyboardDeviceTTYDriver;
+struct ttydrv_d *PS2MouseDeviceTTYDriver;
+// ...
+
+
+//
+// == prototypes ========================================
 //
 
 

@@ -176,6 +176,10 @@ struct device_d *devmgr_device_object (void){
 }
 
 
+
+//==============
+// registrando um dispositivo dado o ponteiro para o arquivo
+// que representa seu objeto.
 // #todo: 
 // Tem vários argumentos.
 // Possivelmente ampliaremos o número de argumentos no futuro.
@@ -249,7 +253,10 @@ devmgr_register_device (
         panic ("devmgr_register_device: id limits \n");
     }
 
+    // Saving.
+    f->device = (struct device_d *) d;
     f->deviceId = d->deviceId; 
+    
 
     d->__file = (file *) f;
     d->__class = class;
@@ -275,7 +282,12 @@ devmgr_register_device (
     // Passado via argumento.
     d->ttydrv = (struct ttydrv_d *) tty_driver;
 
-        
+    // #todo
+    // We really need this thing. 
+
+    // d->tty = NULL;
+
+
     // ...
 
     return 0;

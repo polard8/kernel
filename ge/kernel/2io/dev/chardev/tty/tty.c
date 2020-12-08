@@ -366,6 +366,8 @@ __ok_register:
  *     nr     = How many bytes.
  */
 
+// Called by tty_read.
+
 int 
 __tty_read ( 
     struct tty_d *tty, 
@@ -438,15 +440,18 @@ __tty_read (
     // #debug       
     //printf ("__tty_read: Copiando para o buffer. \n");
     //refresh_screen ();
-     
-    memcpy ( (void *) buffer, (const void *) tty->_rbuffer->_base, nr ); 
-    
-    
+
+    memcpy ( 
+        (void *) buffer, 
+        (const void *) tty->_rbuffer->_base, 
+        nr ); 
+
+
     //#debug
     //printf ( "debug_read >>>%s \n", buffer );
     //refresh_screen ();
            
-    return nr; 
+    return (int) nr; 
 }
 
 
@@ -814,6 +819,20 @@ tty_send_message (
 }
 
 
+
+/*
+ *********************************
+ * tty_read:
+ *     Ler uma certa quantidade de bytes, 
+ * da tty para o buffer indicado no argumento.
+ */
+
+// #todo
+// O aplicativo ou servidor poderia chamar essa rotina
+// se ele tiver o fd do dispositivo tty onde o teclado esta
+// colocando os bytes.
+// /PS2KBD
+
 // IN: 
 // fd = indice na lista de arquivos abertos pelo processo.
 
@@ -869,7 +888,8 @@ tty_read (
 
     // Read tty.
 
-     return (int) __tty_read ( (struct tty_d *) __tty, 
+     return (int) __tty_read ( 
+                      (struct tty_d *) __tty, 
                       (char *) buffer, 
                       (int) n );
 }
@@ -1295,14 +1315,32 @@ void tty_start (struct tty_d *tty){
 }
 
 
+
 /*
-void termios_init(struct termios *tm);
-void termios_init(struct termios *tm)
-{}
+//linux-like
+void tty_init_termios(struct tty_d *tty);
+void tty_init_termios(struct tty_d *tty)
+{
+    tty_reset_termios(tty);
+}
+*/
+
+
+
+/*
+ //linux-like.
+int tty_driver_install_tty (struct ttydrv_d *driver,struct tty_d *tty);
+int tty_driver_install_tty (struct ttydrv_d *driver,struct tty_d *tty)
+{
+    // plug a tty to a ttydvr.
+    // ttydvr->tty = tty;
+    // ttydvr->ttys[i] = tty;
+}
 */
 
 
 /*
+ **********************************************
  * tty_reset_termios: 
  *    Reset termios in a given tty.
  */

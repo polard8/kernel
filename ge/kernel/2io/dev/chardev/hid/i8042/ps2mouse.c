@@ -570,6 +570,8 @@ void ps2mouse_initialize_device (void)
     // de dispositivos.
     // #importante: ele precisa de um arquivo 'file'.
 
+    int register_status = -1;
+    
     __file = (file *) kmalloc ( sizeof(file) );
     
     if ( (void *) __file == NULL ){
@@ -589,7 +591,7 @@ void ps2mouse_initialize_device (void)
         // Mas podemos ter mais de um nome.
         // vamos criar uma string aqui usando sprint e depois duplicala.
         
-        devmgr_register_device ( 
+        register_status = devmgr_register_device ( 
             (file *) __file,             // file
              newname,                    // device name.                  
              0,                          //class (char, block, network)
@@ -597,6 +599,16 @@ void ps2mouse_initialize_device (void)
              (struct pci_device_d *) 0,  //pci device
              NULL );                     //tty driver
     
+        if (register_status<0){
+            panic("ps2mouse_initialize_device: devmgr_register_device fail");
+        } 
+        
+        PS2MouseDeviceObject = (file *) __file;  //object file
+        PS2MouseDevice = (struct device_d *) __file->device;   //device structure.
+        //PS2MouseDeviceTTY = (struct tty_d) 0; // tty struct. #todo
+        PS2MouseDeviceTTYDriver = (struct ttydrv_d *) __file->device->ttydrv; // driver struct.
+        
+        // ...
     };
 //
 // ==========================================

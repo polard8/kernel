@@ -830,18 +830,12 @@ done:
                         debug_print ("KEYBOARD_SEND_MESSAGE: >>>> [MSG_SYSKEYUP.function] to wwf\n");        
                     }
                     
-                    //#test
-                    //sent to 'stdin' 'KSTDIN.TXT' 'prompt[]'
-                    //prompt[0] = '1';
-                    //prompt[1] = '2';
-                    //prompt[2] = '3';
-                    //prompt[3] = '4';
-                    //prompt[4] = 0;
-                    //*stdin->_base = '1';
-                    //*(stdin->_base +1)= '2';
-                    //*(stdin->_base +2)= '3';
-                    //*(stdin->_base +3)= '4';
-                    //*(stdin->_base +4)= 0;
+                    // #todo
+                    // We are building a set of info about the ps2 devices.
+                    // We're gonna use the TTY here.
+                    // See: devmgr.h
+                    
+                    // PS2KeyboardTTY ??
                     
                     return 0; 
                     break;
@@ -1189,7 +1183,7 @@ int ps2kbd_globals_initialize (void){
 void ps2kbd_initialize_device (void)
 {
     // register device.
-    file *__file;
+    file *__file;   //device object
     char __tmpname[64];
     char *newname;
 
@@ -1302,6 +1296,8 @@ void ps2kbd_initialize_device (void)
     // de dispositivos.
     // #importante: ele precisa de um arquivo 'file'.
     
+    int register_status = -1;
+    
     __file = (file *) kmalloc ( sizeof(file) );
     
     if ( (void *) __file == NULL ){
@@ -1322,7 +1318,7 @@ void ps2kbd_initialize_device (void)
         // Mas podemos ter mais de um nome.
         // vamos criar uma string aqui usando sprint e depois duplicala.
      
-        devmgr_register_device ( 
+        register_status = devmgr_register_device ( 
             (file *) __file,             // file
              newname,                    // device name.                  
              0,                          //class (char, block, network)
@@ -1330,7 +1326,18 @@ void ps2kbd_initialize_device (void)
              (struct pci_device_d *) 0,  //pci device
              NULL );                     //tty driver
     
+        if (register_status<0){
+            panic("ps2kbd_initialize_device: devmgr_register_device fail");
+        }
+        
+        PS2KeyboardDeviceObject = (file *) __file;               // object file
+        PS2KeyboardDevice = (struct device_d *) __file->device;  // device struct
+        //PS2KeyboardDeviceTTY = (struct tty_d) 0; // tty struct. #todo
+        PS2KeyboardDeviceTTYDriver = (struct ttydrv_d *) __file->device->ttydrv; // driver struct.
+        
+        // ...
     };
+
 
     // #test
     // Drain the output buffer for the first time. Residual.

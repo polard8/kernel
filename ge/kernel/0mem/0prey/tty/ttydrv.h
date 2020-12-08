@@ -60,6 +60,12 @@ struct ttydrv_d
     struct process_d *thread;
     
     
+    struct tty_d *tty;
+    
+    // #todo
+    // Maybe we need a tty list.
+    
+    
     // #todo:
     // termios(s), tty(s)
     // obs: cada tty já tem um termios.
