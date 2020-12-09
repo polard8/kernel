@@ -1137,6 +1137,10 @@ pciHandleDevice (
 	//#debug
 	//printf ("bus=%d dev=%d fun=%d \n", bus, dev, fun);
 
+    //
+    // PCI device
+    //
+
 
     D = (void *) kmalloc ( sizeof( struct pci_device_d  ) );
 
@@ -1408,8 +1412,13 @@ pciHandleDevice (
         // file structure, device name, class (char,block,network).
         // type (pci, legacy), pci device structure, tty driver struct.
  
-        devmgr_register_device ( (file *) __file, newname, __class, 
-            1, (struct pci_device_d *) D, NULL );
+        devmgr_register_device ( 
+            (file *) __file, 
+            newname, 
+            __class, 
+            1, 
+            (struct pci_device_d *) D,   // <<<< The PCI device.
+            NULL );
     };
 
     return 0;

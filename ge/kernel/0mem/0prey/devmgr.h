@@ -87,7 +87,7 @@ struct device_d
     struct ttydrv_d *ttydrv;
     
     
-    //struct tty_d *tty;
+    struct tty_d *tty;
 
 
 	//

@@ -184,6 +184,12 @@ struct device_d *devmgr_device_object (void){
 // Tem vários argumentos.
 // Possivelmente ampliaremos o número de argumentos no futuro.
 
+//
+// This is called by pciHandleDevice() in pci.c to register
+// every found device and for the ps2 devices initialization.
+// The pcidevice argument is null in this case.
+//
+
 int 
 devmgr_register_device ( 
     file *f, 
@@ -230,7 +236,7 @@ devmgr_register_device (
     }
 
     // =======================
-    // Device structure.
+    // Device structure. (It is NOT the pci device struct)
 
     d = (struct device_d *) devmgr_device_object();
         
@@ -273,6 +279,10 @@ devmgr_register_device (
    
     // DEV_8086_8086
     d->name = (char *) name;
+    
+    //
+    // The PCI device structure. It is NOT the device structure.
+    //
 
     // pci device.
     // Passado via argumento
@@ -284,9 +294,14 @@ devmgr_register_device (
 
     // #todo
     // We really need this thing. 
+    // But it will use a lot of memory.
+    
+    // #bugbug: 
+    // It fail. Crash!!
+    // We don't have all these resources for now.
+    // Let the ps2 devices create their own tty for now.
 
-    // d->tty = NULL;
-
+    //d->tty = (struct tty_d *) tty_create();
 
     // ...
 

@@ -605,9 +605,18 @@ void ps2mouse_initialize_device (void)
         
         PS2MouseDeviceObject = (file *) __file;  //object file
         PS2MouseDevice = (struct device_d *) __file->device;   //device structure.
-        //PS2MouseDeviceTTY = (struct tty_d) 0; // tty struct. #todo
         PS2MouseDeviceTTYDriver = (struct ttydrv_d *) __file->device->ttydrv; // driver struct.
-        
+
+        // #hackhack
+        // Actually we need to create a tty for all the devices.
+        // And it needs to be done in devmgr_register_device
+        // But we do not have all these resources roght now.
+            
+        PS2MouseDeviceTTY = (struct tty_d *) tty_create();
+        if ( (void *) PS2MouseDeviceTTY == NULL ){
+           panic("ps2mouse_initialize_device: PS2MouseDeviceTTY fail");   
+        }
+     
         // ...
     };
 //
