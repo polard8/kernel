@@ -76,23 +76,23 @@ extern unsigned long stack0_krn_ptr;
 
 
 // oh boy
-#include "0boy/0boy.h"
+#include "gramado/0boy/0boy.h"
 
 // config
-#include "0config/version.h"    // Product. 
-#include "0config/u.h"          // User
-#include "0config/config.h"     // Compiling.
+#include "gramado/0config/version.h"    // Product. 
+#include "gramado/0config/u.h"          // User
+#include "gramado/0config/config.h"     // Compiling.
 
 // globals
-#include "0globals/limits.h"
-#include "0globals/gpa.h"
-#include "0globals/gva.h"
-#include "0globals/gentry.h"
-#include "0globals/gdef.h"
-#include "0globals/gdevice.h"
-#include "0globals/gobject.h"
-#include "0globals/gspin.h"
-#include "0globals/gwd.h"   //whatch dogs
+#include "gramado/0globals/limits.h"
+#include "gramado/0globals/gpa.h"
+#include "gramado/0globals/gva.h"
+#include "gramado/0globals/gentry.h"
+#include "gramado/0globals/gdef.h"
+#include "gramado/0globals/gdevice.h"
+#include "gramado/0globals/gobject.h"
+#include "gramado/0globals/gspin.h"
+#include "gramado/0globals/gwd.h"   //whatch dogs
 
 
 // rtl 
@@ -118,49 +118,44 @@ extern unsigned long stack0_krn_ptr;
 
 
 // memory management support.
-#include "mm/mm.h"
-#include "mm/memmap.h" 
-#include "mm/intelmm.h"
-
+#include "gramado/mm/mm.h"
+#include "gramado/mm/memmap.h" 
+#include "gramado/mm/intelmm.h"
 
 
 // ws -
 // #view presentation output.
-#include "ws/view/display.h"
-#include "ws/view/screen.h"
-#include "ws/view/video.h"
+#include "gramado/ws/view/display.h"
+#include "gramado/ws/view/screen.h"
+#include "gramado/ws/view/video.h"
 
 
-//
 // Render
-//
-
-#include "render/r_render.h"
-
+#include "hal/render/r_render.h"
 
 
 // #model. data model.
-#include "ws/model/fonts.h"
-#include "ws/model/ascii.h" 
+#include "gramado/ws/model/fonts.h"
+#include "gramado/ws/model/ascii.h" 
 
 
 
 // fs
-#include "fs/path.h"         // path.
-#include "fs/fat.h"          // fat16.
-#include "fs/inode.h"
-#include "fs/exec_elf.h"
-#include "fs/pipe.h" 
-#include "fs/fs.h"
-#include "fs/vfs.h"
+#include "rtl/fs/path.h"         // path.
+#include "rtl/fs/fat.h"          // fat16.
+#include "rtl/fs/inode.h"
+#include "rtl/fs/exec_elf.h"
+#include "rtl/fs/pipe.h" 
+#include "rtl/fs/fs.h"
+#include "rtl/fs/vfs.h"
 
 
 // ws - 
 // view - input and presentation
-#include "ws/view/prompt.h"
+#include "gramado/ws/view/prompt.h"
 
 // view - showing the data.
-#include "ws/view/bmp2.h"
+#include "gramado/ws/view/bmp2.h"
 
 
 
@@ -178,26 +173,21 @@ extern unsigned long stack0_krn_ptr;
 #include "hal/x86gdt.h"
 #include "hal/cpuamd.h"
 #include "hal/detect.h"
-
-
-// drivers
-#include "serial.h"
+#include "hal/serial.h"
 
 
 //todo: podemos mover isso de lugar para perto de net/
-#include "net/mac.h"
+#include "rtl/net/mac.h"
 
 
 
-// storage
-#include "storage/floppy.h"
-#include "storage/ata.h"
-#include "storage/super.h"
-#include "storage/volume.h"
-#include "storage/disk.h"  
-#include "storage/storage.h" 
-
-
+// hal/storage
+#include "hal/storage/floppy.h"
+#include "hal/storage/ata.h"
+#include "hal/storage/super.h"
+#include "hal/storage/volume.h"
+#include "hal/storage/disk.h"  
+#include "hal/storage/storage.h" 
 
 // hal
 #include "hal/pit.h"
@@ -210,19 +200,18 @@ extern unsigned long stack0_krn_ptr;
 
 // ws - window server
 // inputs
-#include "ws/view/xproc.h"
-#include "ws/view/keyboard.h"
-#include "ws/view/mouse.h"
-#include "ws/view/vk.h"
-#include "ws/view/kbdabnt2.h"
+#include "gramado/ws/view/xproc.h"
+#include "gramado/ws/view/keyboard.h"
+#include "gramado/ws/view/mouse.h"
+#include "gramado/ws/view/vk.h"
+#include "gramado/ws/view/kbdabnt2.h"
 
 // #view. drawing routines.
-#include "ws/view/ldisc.h"
+#include "gramado/ws/view/ldisc.h"
 
 
 //storage (^)
-#include "storage/ide.h"
-
+#include "hal/storage/ide.h"
 
 
 //pci
@@ -230,99 +219,90 @@ extern unsigned long stack0_krn_ptr;
 
 
 //storage (^)
-#include "storage/ahci.h"
-#include "storage/sata.h"
-
-
-//usb bus.
-#include "usb.h"
+#include "hal/storage/ahci.h"
+#include "hal/storage/sata.h"
 
 
 // hal (^)
+#include "hal/usb.h"
 #include "hal/up.h"
 #include "hal/mp.h"
 #include "hal/breaker.h"
 #include "hal/hal.h"
 
 
-
 // ps
-#include "ps/x86cont.h"
-#include "ps/ts.h"
-#include "ps/tasks.h"
-#include "ps/image.h"
-#include "ps/clone.h"
-#include "ps/process.h"
-#include "ps/thread.h"
-#include "ps/sched.h"
-#include "ps/ipc.h"
-#include "ps/ipccore.h"
-#include "ps/sem.h"
-#include "ps/queue.h"
-#include "ps/realtime.h"
-#include "ps/dispatch.h"
-#include "ps/event.h"
-#include "ps/ps.h"
-#include "ps/mk.h"
+#include "gramado/ps/x86cont.h"
+#include "gramado/ps/ts.h"
+#include "gramado/ps/tasks.h"
+#include "gramado/ps/image.h"
+#include "gramado/ps/clone.h"
+#include "gramado/ps/process.h"
+#include "gramado/ps/thread.h"
+#include "gramado/ps/sched.h"
+#include "gramado/ps/ipc.h"
+#include "gramado/ps/ipccore.h"
+#include "gramado/ps/sem.h"
+#include "gramado/ps/queue.h"
+#include "gramado/ps/realtime.h"
+#include "gramado/ps/dispatch.h"
+#include "gramado/ps/event.h"
+#include "gramado/ps/ps.h"
+#include "gramado/ps/mk.h"
 
 
 
 // ws - 
 // model business logic
-#include "ws/model/kgwm.h"
-#include "ws/model/ws.h"
+#include "gramado/ws/model/kgwm.h"
+#include "gramado/ws/model/ws.h"
 
 // #view - designers
-#include "ws/view/window.h"
-#include "ws/view/menu.h"
-#include "ws/view/pbar.h"
-#include "ws/view/bmp.h"
-#include "ws/view/line.h"
+#include "gramado/ws/view/window.h"
+#include "gramado/ws/view/menu.h"
+#include "gramado/ws/view/pbar.h"
+#include "gramado/ws/view/bmp.h"
+#include "gramado/ws/view/line.h"
 
 // #view. presentation
-#include "ws/view/terminal.h"
-#include "ws/view/guiconf.h"
+#include "gramado/ws/view/terminal.h"
+#include "gramado/ws/view/guiconf.h"
 
 
 //
 // == Security ===============================
 //
 
-#include "security/usession.h"
-#include "security/room.h"
-#include "security/desktop.h"
-#include "security/user.h"
-#include "security/security.h"
-
+#include "gramado/security/usession.h"
+#include "gramado/security/room.h"
+#include "gramado/security/desktop.h"
+#include "gramado/security/user.h"
+#include "gramado/security/security.h"
 
 
 // ws - window server, and beyond
-#include "ws/logon.h"
-#include "ws/logoff.h"
+#include "gramado/ws/logon.h"
+#include "gramado/ws/logoff.h"
 
 // model. business logic
-#include "ws/model/kgws.h"
-
-
+#include "gramado/ws/model/kgws.h"
 
 
 // tty
-#include "tty/ttyldisc.h"
-#include "tty/ttydrv.h"
-#include "tty/tty.h"
-#include "tty/pty.h"
-#include "tty/vt.h"
-#include "tty/console.h"
-
+#include "rtl/tty/ttyldisc.h"
+#include "rtl/tty/ttydrv.h"
+#include "rtl/tty/tty.h"
+#include "rtl/tty/pty.h"
+#include "rtl/tty/vt.h"
+#include "rtl/tty/console.h"
 
 
 // =============================
 // ws - i8042 ps2 controller.
-#include "ws/view/i8042/i8042.h"
-#include "ws/view/i8042/ps2mouse.h"
-#include "ws/view/i8042/ps2kbd.h"
-#include "ws/view/i8042/ps2.h"
-
+#include "gramado/ws/view/i8042/i8042.h"
+#include "gramado/ws/view/i8042/ps2mouse.h"
+#include "gramado/ws/view/i8042/ps2kbd.h"
+#include "gramado/ws/view/i8042/ps2.h"
 
 
 
@@ -331,28 +311,27 @@ extern unsigned long stack0_krn_ptr;
 //  ==== NETWORK ====
 //
 
-#include "net/connect.h" 
-#include "net/host.h"
-#include "net/ethernet.h"
-#include "net/arp.h"
-#include "net/udp.h"
-#include "net/tcp.h"
-#include "net/nicintel.h"    //intel nic - network interface controller.
-#include "net/in.h"
-#include "net/un.h"
-#include "net/nports.h"     //(network) Network Ports  (sw)
-#include "net/ip.h"         //(network) IP info.      (sw)
-#include "net/ipv4.h" 
-//#include "net/ipv6.h" 
-#include "net/ipv4mac.h" 
-#include "net/icmp.h" 
-#include "net/packet.h"      // network packets.
-#include "net/channel.h"     //(network) Channel       (sw)
-#include "net/client.h"      //(network) Client process support. 
-#include "net/ns.h"          //(network) Network Server.
-#include "net/network.h"     //(network) Gerenciamento de rede.  
-#include "net/socket.h"      //last always
-
+#include "rtl/net/connect.h" 
+#include "rtl/net/host.h"
+#include "rtl/net/ethernet.h"
+#include "rtl/net/arp.h"
+#include "rtl/net/udp.h"
+#include "rtl/net/tcp.h"
+#include "rtl/net/nicintel.h"    //intel nic - network interface controller.
+#include "rtl/net/in.h"
+#include "rtl/net/un.h"
+#include "rtl/net/nports.h"     //(network) Network Ports  (sw)
+#include "rtl/net/ip.h"         //(network) IP info.      (sw)
+#include "rtl/net/ipv4.h" 
+//#include "rtl/net/ipv6.h" 
+#include "rtl/net/ipv4mac.h" 
+#include "rtl/net/icmp.h" 
+#include "rtl/net/packet.h"      // network packets.
+#include "rtl/net/channel.h"     //(network) Channel       (sw)
+#include "rtl/net/client.h"      //(network) Client process support. 
+#include "rtl/net/ns.h"          //(network) Network Server.
+#include "rtl/net/network.h"     //(network) Gerenciamento de rede.  
+#include "rtl/net/socket.h"      //last always
 
 
 //
@@ -361,86 +340,74 @@ extern unsigned long stack0_krn_ptr;
 
 
 // devices
-#include "devices.h"
-#include "devmgr.h"       
-#include "io.h"               //io.
+#include "hal/devices.h"
+#include "hal/devmgr.h"       
+#include "hal/io.h"               //io.
 
 
-#include "modules.h"     //module manager.
-#include "debug.h"
-#include "system.h"    //system manager.
-#include "init.h"
+#include "gramado/modules.h"     //module manager.
+#include "gramado/debug.h"
+#include "gramado/system.h"    //system manager.
+#include "gramado/init.h"
+#include "gramado/execve.h"  
+// mm
+#include "gramado/mm/mmglobal.h"  // Deve ficar mais acima.
+#include "gramado/mm/heap.h"      // Heap pointer support.
+#include "gramado/mm/aspace.h"    // Address Space, (data base account).
 
-#include "execve.h"  
-
+// storage 
+#include "hal/dspace.h"    // Disk Space, (data base account). storage stuff
 
 // mm
-#include "mm/mmglobal.h"  // Deve ficar mais acima.
-#include "mm/heap.h"      // Heap pointer support.
-#include "mm/aspace.h"    // Address Space, (data base account).
-
-// storage ?
-#include "dspace.h"    // Disk Space, (data base account). storage stuff
-
-// mm
-#include "mm/bank.h"      // Bank. database
-#include "mm/x86mm.h"     // mm, memory manager support.
+#include "gramado/mm/bank.h"      // Bank. database
+#include "gramado/mm/x86mm.h"     // mm, memory manager support.
 
 
 
 // ws - 
 // view. input support.
-#include "ws/view/cursor.h"
+#include "gramado/ws/view/cursor.h"
 
 
-#include "messages.h"
-#include "events.h"
-#include "object.h"
-#include "ss.h"
+#include "gramado/messages.h"
+#include "gramado/events.h"
+#include "gramado/object.h"
+#include "gramado/ss.h"
 
 
 // profiler
-#include "pints.h"
+#include "gramado/pints.h"
 
 
-#include "runtime.h"
+#include "rtl/runtime.h"
+
 
 // kernel
-#include "ke.h"
-#include "ki.h"
-#include "info.h"
-#include "request.h"
-#include "reboot.h"
-#include "sub.h"       // gramado sub systems
+#include "gramado/ke.h"
+#include "gramado/ki.h"
+#include "gramado/info.h"
+#include "gramado/request.h"
+#include "gramado/reboot.h"
+#include "gramado/sub.h"       // gramado sub systems
+#include "gramado/utsname.h"
+#include "gramado/gpid.h"      // Globals. PIDs support.
 
 
-#include "utsname.h"
-
-
-// Globals. PIDs support.
-
-#include "gpid.h"
-
-
-//
 // sci - system call interface
-//
-
 // All the functions in this folder can be called
 // by the ring3 apps via system call.
 // This is the last #include. :^)
 
-#include "zi/sci/syscall.h"        
-#include "zi/sci/sys.h"
+#include "rtl/sci/syscall.h"        
+#include "rtl/sci/sys.h"
 
-//
 // si - services interfce
-//
+#include "rtl/si/sifs.h"
+#include "rtl/si/sins.h"
+#include "rtl/si/siws.h"
 
-#include "zi/si/sifs.h"
-#include "zi/si/sins.h"
-#include "zi/si/siws.h"
 
+// ==============================
 
 //keyboard suppport 
 //abnt2 flag.

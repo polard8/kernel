@@ -1,4 +1,6 @@
-	setup/ folder.
+	setup0/ folder.
+
+        grass/   (Grasspatch environent)
 
 	GUI application to setup the system.
 	It's runs using the kgws window server,

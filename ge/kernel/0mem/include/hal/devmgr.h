@@ -25,10 +25,22 @@
 #define ____DEVMGR_H
 
 
+// struct more complete, with a lot of information.
+struct device_class_d 
+{
+    //object_type_t  objectType;
+    //object_class_t objectClass;
+    
+
+    int device_class;
+    int device_subclass;    
+};
+
+
 // Device structure.
 struct device_d 
 {
-    object_type_t objectType;
+    object_type_t  objectType;
     object_class_t objectClass;
 
 
@@ -49,9 +61,14 @@ struct device_d
     char *name;
     
 
-
+    // #todo: merge.
     // char, block, network
+
     int __class;
+    
+    // struct more complete, with a lot of information.
+    struct device_class_d *_class; 
+
 
     // pci, legacy ...
     int type;

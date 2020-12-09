@@ -285,9 +285,13 @@ struct mmsghdr {
 #define IPX_TYPE	1
 
 
+
 /* 
  *  ** Sock types  ** 
  */
+
+// bsd-like and linux-like ?
+// #todo: do the same on ring3.
  
 /*
        SOCK_STREAM     Provides sequenced, reliable, two-way, connection-
@@ -310,12 +314,19 @@ struct mmsghdr {
 #define SOCK_RAW        3    /* raw socket			        */
 #define SOCK_RDM        4    /* reliably-delivered message	*/
 #define SOCK_SEQPACKET  5    /* sequential packet socket	*/
+#define SOCK_DCCP       6
+// ...
 #define SOCK_PACKET    10    /* linux specified 		    */
 
 //#test
 #define SOCK_GRAMADO_MSG    8000    /* window, msg, long1, long2 */
 
+// ?? Repensar.
+#define SOCK_MAX            (SOCK_GRAMADO_MSG+1)
 
+
+
+//======================
 
 
 #define  _NETINET_IN_H_
@@ -351,10 +362,12 @@ typedef unsigned socklen_t;
 /*
  * Structure used for manipulating linger option.
  */
-struct	linger {
-	int	l_onoff;		/* option on/off */
-	int	l_linger;		/* linger time in seconds */
+struct	linger 
+{
+    int	l_onoff;		/* option on/off */
+    int	l_linger;		/* linger time in seconds */
 };
+
 
 
 //bsd
@@ -537,9 +550,13 @@ struct socket_d
     unsigned short port;
 
     //
-    // Connection
+    // == Connection ====================
     //
-    
+
+    int state;   // SOCKET_CONNECTED, SOCKET_NOT_CONNECTED
+
+    struct socket_d *conn;
+       
     // The list of pending connections
     // updated by listen
     int backlog_max;
@@ -550,14 +567,15 @@ struct socket_d
     // write() copy the data to the connected socket.
     int conn_copy; 
     
-    struct socket_d *conn;
-    int state;   // SOCKET_CONNECTED, SOCKET_NOT_CONNECTED
+
+
 
     // The server finds a place in the server_process->Objects[i].
     int clientfd_on_server;
     
     
-    // Nosso arquivo, nosso buffer ?
+    // Nosso arquivo.
+    // Eh o objecto socket ??
     file *private_file;
 
     ///testing

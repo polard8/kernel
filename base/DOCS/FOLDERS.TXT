@@ -2,12 +2,33 @@
     Three main folders of the project:
 
 
-    base/ This folder will be cloned into the real hd to test it in the real machine.
+    //=========================
+    base/ 
+    This folder will be cloned into the real hd to test it in the real machine.
 
-    gramci/ Gramado consistent interface.
+    //=========================
+    ge/
+    game engine or gramado engine.
+    (gramnt ) Gramado New Technologies. This is the core system.
 
-    gramnt/ Gramado New Technologies. This is the core system.
-
-    rtl/ ring3 runtime library. 
+    ge/init/
+        The init process.
+    ge/aurora/
+        Rhe ring window server.
+    ge/rtl/ 
+    ring3 runtime library. 
     It has a unix-like low level stuff, but it exports some routines
      using the rtl_ prefix.
+
+
+    //=========================
+    (gramci) Gramado consistent interface.
+
+    setup0/  
+        grass/  grasspath environment
+    setup1/ 
+        apps/
+    setup2/
+        cmd/
+
+    

@@ -2,12 +2,26 @@
  * File: console.c 
  *
  *     Console interface.
- *     Interface to handle all the virtual console management.
- *     Writing on the console device.
+ * 
+ *     This is a generic interface for a frame buffer based 
+ * graphical consoles.
+ * 
+ *     The system have only '4' virtual consoles. 
+ * Define in the struct list CONSOLE[].
+ *     #bugbug: It uses the TTY structure. But the configuration
+ * is kinda buggy and there is no buffers for now.
+ *     
+ *     We are using these console only to print chars 
+ * in the screen in graphics mode.
+ *     The scroll only works on full screen for now.
+ * 
+ *     This is a kind of emergency console, used by the developer
+ * to test the system and to fix some critical condition.
+ * 
  *     See: chardev/tty/ in 2io/
  */
 
-
+// notes:
 // Esse console é full screen e não precisa de muitos recursos gráficos.
 // Somete o super user poderá usá-lo.
 // Só existem quatro consoles virtuais. Um deles será usado para

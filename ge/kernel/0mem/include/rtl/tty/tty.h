@@ -123,16 +123,52 @@ struct tty_line_d
 
 struct tty_d
 {
+
+    //
+    // == Identification =============
+    //
+    
     object_type_t  objectType;
     object_class_t objectClass;
     
+    // In the TTYs table?
     int index;
     
     int used;
     int magic;
 
+    // tty name
+    char __ttyname[64];    // 
+    size_t ttyName_len;    // len 
+
+    //
+    // == Device info ==================
+    //
+    
+    // Device.
+    struct device_d *device;
+    struct ttydrv_d *driver;
+
+    // i don't like this
+    // line discipline
+    struct ttyldisc_d *ldisc;
+
+    // ??
+    file *_fp;
+
+
+   // Owner process.
+    struct process_d *process;
+
+    // #todo: merge
+    // Thread de input.
+    struct thread_d *thread;
     // Control thread;
     struct thread_d *control;
+
+    // termios
+    struct termios termios;
+
 
     //
     // == Security ============================================
@@ -149,28 +185,6 @@ struct tty_d
     // ===================================================
 
 
-    // file pointer
-    // #importante
-    // Esse é o arquivo que aponta para essa estrutura.
-    file *_fp;
-    
-    // tty name
-    char __ttyname[64];    // 
-    size_t ttyName_len;    // len 
-
-
-    //#todo: Indice do dispositivo.
-    //int device;
-
-    // device driver, line discipline
-    
-    struct ttydrv_d *driver;
-    struct ttyldisc_d *ldisc;
-
-    // termios
-    struct termios termios;
-
-
     // process group.
     // Usando quanto tiver uma interrupção de tty.
     // Quais processos estão no mesmo grupo quanto tiver a interrupção.
@@ -182,6 +196,11 @@ struct tty_d
     int pid_count;
 
     //=========================
+    
+
+    //
+    // ==  properties ========================
+    //
     
     // Qual eh o modo de operacao do terminal virtual.
     // graphics, text ...
@@ -197,16 +216,13 @@ struct tty_d
     
     unsigned long flags;        // tty flags.   
 
-    
+    //
+    // == Actions ==============
+    //
+
     //status
     int stopped;
 
-
-   // Owner process.
-    struct process_d *process;
-
-    // Thread de input.
-    struct thread_d *thread;
 
     // Qual terminal virtual esta usando essa tty.
     int virtual_terminal_pid;
@@ -271,8 +287,10 @@ struct tty_d
 
 
 
-
-    // Connection
+    //
+    // == Connection ===========================
+    //
+    
     // pty associa a tty 'to' com a tty 'from'
     // master/slave.
     struct tty_d *link;
