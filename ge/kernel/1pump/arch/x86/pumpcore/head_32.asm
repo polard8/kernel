@@ -19,13 +19,17 @@
 ;      nunca incluir outros arquivos.
 
 
+%include "gramado/head.inc"
+
 
 ;
 ; Segmento .head_x86:
 ;     Parte inicial do kernel. 
 ;     Esse marcador precisa ficar no começo do arquivo.
 ;
-segment .head_x86
+
+; segment .head_x86
+__HEAD
 
 [bits 32]
 

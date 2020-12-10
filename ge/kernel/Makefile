@@ -77,8 +77,7 @@ KINCLUDE = -I 0mem/include/
 
 ifeq ($(ARCH),x86)
 
-	#deveria ser headx86.o
-	ENTRY_OBJECTS := boot.o main.o x86init.o 
+	ENTRY_OBJECTS := head_32.o main.o x86init.o 
 
 	EXECVE_OBJECTS := socket.o ctype.o  kstdio.o stdlib.o string.o unistd.o \
 	devmgr.o \
@@ -159,8 +158,18 @@ endif
 
 
 
-all: all-c link-kernel clean
+all: kernel-head all-c link-kernel clean
 
+# The head of the monster.
+kernel-head:
+
+	$(NASM)  1pump/arch/x86/pumpcore/head_32.asm \
+	-I 0mem/include/ \
+	-I 1pump/arch/x86/pumpcore/ \
+	-f elf -o head_32.o
+
+# all c files.
+# order: 0mem, 1pumpt, 2io
 all-c:
 
 	##
@@ -325,9 +334,6 @@ all-c:
 
     #pump
 	$(CC) -c 1pump/pump.c  $(KINCLUDE) $(CFLAGS) -o pump.o
-
-    #arch
-	$(NASM)  1pump/arch/x86/pumpcore/boot.asm -I 1pump/arch/x86/pumpcore/ -f elf -o boot.o
 	$(CC) -c 1pump/arch/x86/x86init.c   $(KINCLUDE) $(CFLAGS) -o x86init.o
 	$(CC) -c 1pump/arch/hal.c           $(KINCLUDE) $(CFLAGS) -o hal.o
 	$(CC) -c 1pump/arch/detect.c        $(KINCLUDE) $(CFLAGS) -o detect.o
