@@ -2,7 +2,7 @@
 PRODUCT_NAME  = Gramado Operating System
 VERSION_MAJOR = 1
 VERSION_MINOR = 0
-VERSION_BUILD = 178
+VERSION_BUILD = 177
 # See: config/version.h
 
 # Documentation.
@@ -114,12 +114,6 @@ ge-boot:
 	$(Q) $(NASM)    ge/boot/x86/0vhd/main.asm -I ge/boot/x86/0vhd/ -o GRAMADO.VHD   
 	$(Q) $(MAKE) -C ge/boot/x86/1bm/ 
 	$(Q) $(MAKE) -C ge/boot/x86/2bl/ 
-	sudo cp ge/boot/x86/bin/BM.BIN  base/
-	sudo cp ge/boot/x86/bin/BM.BIN  base/BOOT
-	sudo cp ge/boot/x86/bin/BM.BIN  base/PORTALS
-	sudo cp ge/boot/x86/bin/BL.BIN  base/
-	sudo cp ge/boot/x86/bin/BL.BIN  base/BOOT
-	sudo cp ge/boot/x86/bin/BL.BIN  base/PORTALS
 
 # KERNEL.BIN  - Creating the kernel image.
 ge-kernel:
@@ -127,10 +121,6 @@ ge-kernel:
 	@echo "================================="
 	@echo "(Step 1) Creating the kernel image ..."
 	$(Q) $(MAKE) -C ge/kernel
-	sudo cp ge/kernel/KERNEL.BIN  base/
-	sudo cp ge/kernel/KERNEL.BIN  base/BOOT
-	sudo cp ge/kernel/KERNEL.BIN  base/PORTALS
-
 ge-rtl:
 	#::rtl
 	@echo "==================="
@@ -146,28 +136,17 @@ ge-init:
 	@echo "==================="
 	@echo "Compiling init ..."
 	$(Q) $(MAKE) -C ge/init/
-	sudo cp ge/init/INIT.BIN  base/
-	sudo cp ge/init/INIT.BIN  base/PORTALS
-
 ge-aurora:
 	#::aurora Aurora Window Server.
 	@echo "==================="
 	@echo "Compiling Aurora window server ..."
 	$(Q) $(MAKE) -C ge/aurora/
-	# gws
-	-sudo cp ge/aurora/bin/GWS.BIN     base/ 
-	-sudo cp ge/aurora/bin/GWSSRV.BIN  base/
-	-sudo cp ge/aurora/bin/GWSSRV.BIN  base/PORTALS
-
 ge-services:
 	#::services Services
 	@echo "==================="
 	@echo "Compiling services..."
 	$(Q) $(MAKE) -C ge/services/gnssrv/ 
-	# gns
-	-sudo cp ge/services/gnssrv/bin/GNS.BIN     base/
-	-sudo cp ge/services/gnssrv/bin/GNSSRV.BIN  base/
-	-sudo cp ge/services/gnssrv/bin/GNSSRV.BIN  base/PORTALS
+
 
 
 #===================================================
@@ -183,54 +162,15 @@ setup2-cmd
 setup0-grass:
 	#::grass
 	$(Q) $(MAKE) -C setup0/grass/
-	sudo cp setup0/grass/bin/GDESHELL.BIN  base/
-	sudo cp setup0/grass/bin/GDESHELL.BIN  base/PORTALS
-	# setup
-	#-sudo cp setup0/grass/bin/*.BIN    base/
-	sudo cp setup0/grass/bin/LAUNCHER.BIN  base/
-	sudo cp setup0/grass/bin/GRAMCODE.BIN  base/
-	sudo cp setup0/grass/bin/GFE.BIN       base/
-	sudo cp setup0/grass/bin/SYSMON.BIN    base/
-	#sudo cp setup0/grass/bin/REBOOT2.BIN    base/
-	#sudo cp setup0/grass/bin/NORATERM.BIN  base/
-	#tests interpreters.
-	#sudo cp setup0/grass/bin/C4.BIN       base/
-	#sudo cp setup0/grass/bin/GRAMC.BIN    base/
-	sudo cp setup0/grass/bin/GRAMC4.BIN   base/
-	#sudo cp setup0/grass/bin/GRAMCNF.BIN  base/
-	# ====================================================
-
 setup1-apps:
 	#::apps
 	$(Q) $(MAKE) -C setup1/apps/
-	# apps
-#	-sudo cp setup1/apps/bin/*.BIN  base/
-#	-sudo cp setup1/apps/bin/*.BIN  base/PROGRAMS
-	#-sudo cp setup1/apps/bin/GWM.BIN     base/
-	-sudo cp setup1/apps/bin/EDITOR.BIN  base/
-	-sudo cp setup1/apps/bin/FILEMAN.BIN  base/
-	-sudo cp setup1/apps/bin/LAUNCH1.BIN  base/
-	#-sudo cp setup1/apps/bin/TERMINAL.BIN  base/
-
 setup1-net:
 	#::net
 	$(Q) $(MAKE) -C setup1/net/
-	-sudo cp setup1/net/bin/*.BIN  base/
-	-sudo cp setup1/net/bin/*.BIN  base/PROGRAMS
-
 setup2-cmd:
 	#::cmd
 	$(Q) $(MAKE) -C setup2/cmd/
-	#-sudo cp setup2/cmd/bin/*.BIN  base/
-	#-sudo cp setup2/cmd/bin/*.BIN  base/BIN
-	-sudo cp setup2/cmd/bin/REBOOT.BIN     base/
-	-sudo cp setup2/cmd/bin/CAT.BIN        base/
-	-sudo cp setup2/cmd/bin/FASM.BIN       base/
-#	-sudo cp setup2/cmd/bin/TRUE.BIN       base/
-#	-sudo cp setup2/cmd/bin/FALSE.BIN      base/
-#	-sudo cp setup2/cmd/bin/SHOWFUN.BIN      base/
-	#-sudo cp setup2/cmd/bin/MINIYACC.BIN    base/
-	#-sudo cp setup2/cmd/bin/SHELL.BIN       base/
 
 
 #===================================================
@@ -254,15 +194,99 @@ vhd-mount:
 #===================================================
 #:::4
 # ~ Step 4 vhd-copy-files  - Copying files into the mounted VHD.
-# Copying the base folder into the mounted VHD.
 vhd-copy-files:
 	@echo "================================="
 	@echo "(Step 4) Copying files into the mounted VHD ..."
 
+	#
+	# == ge ======================================
+	#
+
+	# ====================================================
+	# 1) First of all
+	# bm, bl, kernel, init, gdeshell.
+	# Only on ge/
+
+	sudo cp ge/boot/x86/bin/BM.BIN  base/
+	sudo cp ge/boot/x86/bin/BM.BIN  base/BOOT
+	sudo cp ge/boot/x86/bin/BM.BIN  base/PORTALS
+
+	sudo cp ge/boot/x86/bin/BL.BIN  base/
+	sudo cp ge/boot/x86/bin/BL.BIN  base/BOOT
+	sudo cp ge/boot/x86/bin/BL.BIN  base/PORTALS
+
+	sudo cp ge/kernel/KERNEL.BIN  base/
+	sudo cp ge/kernel/KERNEL.BIN  base/BOOT
+	sudo cp ge/kernel/KERNEL.BIN  base/PORTALS
+
+	sudo cp ge/init/INIT.BIN  base/
+	sudo cp ge/init/INIT.BIN  base/PORTALS
+
+	sudo cp setup0/grass/bin/GDESHELL.BIN  base/
+	sudo cp setup0/grass/bin/GDESHELL.BIN  base/PORTALS
+
+	# setup
+	#-sudo cp setup0/grass/bin/*.BIN    base/
+
+	sudo cp setup0/grass/bin/LAUNCHER.BIN  base/
+	sudo cp setup0/grass/bin/GRAMCODE.BIN  base/
+	sudo cp setup0/grass/bin/GFE.BIN       base/
+	sudo cp setup0/grass/bin/SYSMON.BIN    base/
+	#sudo cp setup0/grass/bin/REBOOT2.BIN    base/
+	#sudo cp setup0/grass/bin/NORATERM.BIN  base/
+
+	#tests interpreters.
+	#sudo cp setup0/grass/bin/C4.BIN       base/
+	#sudo cp setup0/grass/bin/GRAMC.BIN    base/
+	sudo cp setup0/grass/bin/GRAMC4.BIN   base/
+	#sudo cp setup0/grass/bin/GRAMCNF.BIN  base/
+	
+	# ====================================================
+
+	# apps
+#	-sudo cp setup1/apps/bin/*.BIN  base/
+#	-sudo cp setup1/apps/bin/*.BIN  base/PROGRAMS
+	#-sudo cp setup1/apps/bin/GWM.BIN     base/
+	-sudo cp setup1/apps/bin/EDITOR.BIN  base/
+	-sudo cp setup1/apps/bin/FILEMAN.BIN  base/
+	-sudo cp setup1/apps/bin/LAUNCH1.BIN  base/
+	#-sudo cp setup1/apps/bin/TERMINAL.BIN  base/
+	
+	-sudo cp setup1/net/bin/*.BIN  base/PROGRAMS
+
+	# net
+	-sudo cp setup1/net/bin/*.BIN  base/
+
+	# ...
+
+	# cmd
+	#-sudo cp setup2/cmd/bin/*.BIN  base/
+	#-sudo cp setup2/cmd/bin/*.BIN  base/BIN
+	-sudo cp setup2/cmd/bin/REBOOT.BIN     base/
+	-sudo cp setup2/cmd/bin/CAT.BIN        base/
+	-sudo cp setup2/cmd/bin/FASM.BIN       base/
+#	-sudo cp setup2/cmd/bin/TRUE.BIN       base/
+#	-sudo cp setup2/cmd/bin/FALSE.BIN      base/
+#	-sudo cp setup2/cmd/bin/SHOWFUN.BIN       base/
+	#-sudo cp setup2/cmd/bin/MINIYACC.BIN       base/
+	# ...
+
+	#-sudo cp setup2/cmd/bin/SHELL.BIN       base/
+	
+	# gws
+	-sudo cp ge/aurora/bin/GWS.BIN     base/ 
+	-sudo cp ge/aurora/bin/GWSSRV.BIN  base/
+	-sudo cp ge/aurora/bin/GWSSRV.BIN  base/PORTALS
+
+	# gns
+	-sudo cp ge/services/gnssrv/bin/GNS.BIN     base/
+	-sudo cp ge/services/gnssrv/bin/GNSSRV.BIN  base/
+	-sudo cp ge/services/gnssrv/bin/GNSSRV.BIN  base/PORTALS
+
+
 	# Copy base
 	# sends everything from base to root.
-	sudo cp -r base/*  /mnt/gramadovhd
-
+	sudo cp -r base/* /mnt/gramadovhd
 
 
 #===================================================
