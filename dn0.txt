@@ -1,2 +1,9 @@
-	gramnt - new technologies. (for developers)
+	
+
+
+        gramnt - new technologies. (for developers)
 	gramci - consitent interface. (User point of view)
+
+
+        ge/ is the gramado engine. or game engine.
+        eh o motor de partida.

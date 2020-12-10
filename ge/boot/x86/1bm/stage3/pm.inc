@@ -38,36 +38,17 @@
 
 pmInit:
 
-    ; Pega o modo no metafile e poe em BL.
-    ; retorno em 'AL'.
-
-    call get_boot_mode  
-
-    ; Saving boot mode.
-
-    xor bx, bx
-    mov bl, al 
-
-
-    ;pusha
-    ;call Window.StatusBar
-    ;mov si, msg_Test
-    ;call PoeString
-    ;popa
-
-    ;debug
-    ;jmp $
-
-;;
-;; == Trampoline ===============================================
-;;
-
-trampoline:
-
-    ; Setup registers 
     ; Keep the interrupts disabled.
+    ; Setup registers 
+    ; GDTR - Carrega o gdtr do stage 2.
+    ; CR0 - PE ; Muda PE.
+    ; clear register
+    ; switch to protected mode.
+    ; get boot mode.
+    ; flush pipeline. jmp.
 
     cli
+
     mov ax, 0 
     mov ds, ax
     mov es, ax
@@ -77,37 +58,27 @@ trampoline:
     mov ss, ax
     mov sp, 0x6000 
 
-    ; GDTR
-    ; Carrega o gdtr do stage 2.
-    
     lgdt [stage2_gdtr]
-
-    ; CR0 - PE
-    ; Muda PE.
 
     mov eax, cr0
     or al, 1
     mov cr0, eax
 
+    mov edx, dword 0
+    mov ecx, dword 0
+    mov ebx, dword 0
+    mov eax, dword 0
 
-;;
-;; == Flush pipeline ==================================================
-;;
+    call get_boot_mode
+    mov bl, al
 
-
-;CS.
-
-pmFlushPipeline:
-
-    jmp stage2_CODE_SEL:pmFlush32 
-
-    ;;
-    ;; == 32 ===============================================
-    ;;
-
+    ;; Flush pipeline.
+    
+pmTrampoline:
+    jmp stage2_CODE_SEL:Gramado_pm32
     [BITS 32]
+Gramado_pm32:
 
-pmFlush32:
 
     ;debug em modo texto.
     ;mov byte [0B8000h], byte 'P'

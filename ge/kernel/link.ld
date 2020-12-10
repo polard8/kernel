@@ -1,13 +1,30 @@
+/* 
+ * File: link.ld
+ * 
+ * Linker script for i386 kernel image.
+ *
+ * Base:
+ *     0xc0000000
+ *
+ * Entry point: 
+ *     0xc0001000
+ *     Kernel entry point in 1pump/arch/x86/boot.asm. 
+ */
+
+
 OUTPUT_FORMAT("elf32-i386")
-ENTRY(_kernel_begin)       /* Kernel entry point. (head.s) */
+OUTPUT_ARCH(i386)
+ENTRY(_kernel_begin)  
+
 SECTIONS
 { 
-    
-    /*Opção??:  _kernel_begin  = .;  */
 
-    /* 0xc0001000 = .text = _kernel_begin =  _code_begin =  .head_x86 */
+    /* 0xc0000000: elf header.*/
 
-    .text 0xC0001000:      /* kernel text segment. Executable code of the program */
+    /* _kernel_begin  = .; */
+
+    /* kernel text segment. Executable code of the program */
+    .text 0xC0001000:      
     {
         _code_begin = .;            
         *(.head_x86)       /* x86 asm stuff */

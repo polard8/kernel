@@ -1,4 +1,4 @@
-;; File: hwi/init/x86/boot.asm
+;; File: 1pump/arch/x86/boot.asm
 ;; 
 ;; para dar suporte ao multiboot.
 ;; Esse será o primeiro ponto de entrada do kernel para x86

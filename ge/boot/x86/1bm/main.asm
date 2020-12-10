@@ -1,5 +1,5 @@
 ;
-; File: bm/main.asm 
+; File: 1bm/main.asm 
 ; 
 ;    Main file of Boot manager.
 ;
