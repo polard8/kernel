@@ -14,9 +14,11 @@ all:
 	make -C ./tprintf
 	make -C ./uname
 	
-	
-	make -C ./zfasm
-	
+	# todo
+	# The problem here is that the user needs to install fasm on linux
+	# to build this command.
+	# make -C ./zfasm
+
 	
 	# gramc thing.    
 #	make -C ./gramc

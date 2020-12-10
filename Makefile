@@ -225,7 +225,7 @@ setup2-cmd:
 	#-sudo cp setup2/cmd/bin/*.BIN  base/BIN
 	-sudo cp setup2/cmd/bin/REBOOT.BIN     base/
 	-sudo cp setup2/cmd/bin/CAT.BIN        base/
-	-sudo cp setup2/cmd/bin/FASM.BIN       base/
+	#-sudo cp setup2/cmd/bin/FASM.BIN       base/
 #	-sudo cp setup2/cmd/bin/TRUE.BIN       base/
 #	-sudo cp setup2/cmd/bin/FALSE.BIN      base/
 #	-sudo cp setup2/cmd/bin/SHOWFUN.BIN      base/
