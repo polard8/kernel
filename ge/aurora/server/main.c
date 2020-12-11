@@ -2477,6 +2477,13 @@ int main (int argc, char **argv){
             
             if (newconn>0){
                 
+                //fake event
+                //sprintf(buf,"?uck");    // 
+                //sprintf(buf,"nonono");    // the client can't send request
+                //sprintf(buf,"yes");    // the client can send requests.
+                //write (newconn,buf, 4);
+
+
                 xxxHandleNextClientRequest (newconn);
                 
                 // read input from the server's socket?
@@ -2488,10 +2495,6 @@ int main (int argc, char **argv){
                 //    printf ("%s",buf); fflush(stdout);
                 //}
                 
-                //fake event
-                //sprintf(buf,"?uck");    // nothing
-                //sprintf(buf,"fuck");  // valid
-                //write (newconn,buf, 4);
             }
             
             

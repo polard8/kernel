@@ -240,42 +240,27 @@ struct __sbuf
 
 struct file_d
 {
+
+    //
+    // == Identification =============
+    //
+
     // Indica qual tipo de objeto esse arquivo representa.
     // See: globals/gobject.h
     object_type_t ____object;
 
+    //index int the global file table??
+
     int used;
     int magic;
+  
+    char *_tmpfname;  
 
-    // inode structure
-    struct inode_d *inode;
-
-
-    // A estrutura de arquivos aponta para tabela global de 
-    // arquivos abertos.
-    int filetable_index;
-
-    // A estrutura de arquivos aponta para a tabela de inodes.
-    int inodetable_index;
-
-
-    // #bugbug
-    // Identificador do primeiro processo à abrir o arquivo
-    // ou o processo que tem as permissões.
-
-    pid_t pid;  // Process
-    uid_t uid;  // User 
-    gid_t gid;  // Group
-
-
-    // Contador de descritores de arquivo que usam essa mesma estrutura.
-    int fd_counter;
-
-    // If the file is a tty, we need a tty structure.
-    struct tty_d *tty;
-
-
-    int iopl;
+    //
+    // == (1) storage ========
+    //
+    
+    // The buffer. The box.
 
 	//Current position of file pointer (absolute address).
     unsigned char *_p;    
@@ -285,16 +270,6 @@ struct file_d
 
 	// write space left for putc()
     int _w;
-
-	// flags, below; this FILE is free if 0 	
-	// Flags (see FileFlags). the state of the stream
-    short _flags;
-
-
-	// fileno, if Unix descriptor, else -1
-	// UNIX System file descriptor
-    short _file;
-
 
 	// the buffer (at least 1 byte, if !NULL)
     struct __sbuf _bf;
@@ -308,35 +283,117 @@ struct file_d
     
     // cookie passed to io functions
     void *_cookie; 
+
+
+    //file extension 
+    struct __sbuf _ext;
+
+	// separate buffer for long sequences of ungetc() 
+	// saved _p when _p is doing ungetc data 
+    unsigned char *_up;
+    // saved _r when _r is counting ungetc data
+    int _ur;
+
+    // tricks to meet minimum requirements even when malloc() fails 
+    unsigned char _ubuf[3];   // guarantee an ungetc() buffer 
+    unsigned char _nbuf[1];   // guarantee a getc() buffer 	
+
+    //separate buffer for fgetln() when line crosses buffer boundary 
+    struct __sbuf _lb;	// buffer for fgetln() 
+
+	//Unix stdio files get aligned to block boundaries on fseek() 
+    int _blksize;       // stat.st_blksize (may be != _bf._size) 
+    fpos_t _offset;     // current lseek offset 		
+
+	// old stuff
+	// isso pertence a estrutura no formato antigo
+	// e os elementos ainda est�o presentes em v�rias rotinas.
+	//No futuro vamos deletar isso. (Talvez n�o.)
+    int   _cnt;
+    unsigned char *_base;    
+    int   _charbuf;
+   // =============================
+
+
+    //
+    // == (2) synchronization ========
+    //
+
+	// flags, below; this FILE is free if 0 	
+	// Flags (see FileFlags). the state of the stream
+    short _flags;
+
+    // Contador de descritores de arquivo que usam essa mesma estrutura.
+    // we need to synchronize the readers.
+    int fd_counter;
+
+    // Que thread está esperando por
+    // alguma operação no arquivo.
+    // pode ser um socket, um pipe.
+    // >>> a thread pode esperar quando quer ler mais está vazio.
+    // pode esperar quando quer escrever mas ta cheio.
+    // ?? pode esperar por escrita ??
+    // >> acorda quem estava esperando pra escrever.
+    //struct thread_d *thread_waiting; 
+    int tid_waiting;
+    int socket_buffer_full;
+
+    //??
+    //int stopped;
+
+   // =============================
+    //
+    // == (3) transmition ========
+    //
+
+    // The file it self is the transmitions agent.
+
+	// fileno, if Unix descriptor, else -1
+	// UNIX System file descriptor
+    short _file;
+
+    // inode structure
+    struct inode_d *inode;
+
+
+    struct socket_d *socket;
     
+    //pipe ??
+    
+    // A estrutura de arquivos aponta para tabela global de 
+    // arquivos abertos.
+    int filetable_index;
+
+    // A estrutura de arquivos aponta para a tabela de inodes.
+    int inodetable_index;
+
+
+    // =============================
+    
+    // #bugbug
+    // Identificador do primeiro processo à abrir o arquivo
+    // ou o processo que tem as permissões.
+
+    pid_t pid;  // Process
+    uid_t uid;  // User 
+    gid_t gid;  // Group
+
+
+    // If the file is a tty, we need a tty structure.
+    struct tty_d *tty;
+
+
+    int iopl;
+
+
+
+    // dead line discipline    
     // #todo: delete?
     int (*_close) __P((void *));
     int (*_read)  __P((void *, char *, int));
     fpos_t (*_seek)  __P((void *, fpos_t, int));
     int (*_write) __P((void *, const char *, int));
 
-
-	//file extension 
-    struct __sbuf _ext;
-
-	// separate buffer for long sequences of ungetc() 
-	// saved _p when _p is doing ungetc data 
-    unsigned char *_up;
-	// saved _r when _r is counting ungetc data
-    int _ur;
-
-	
-	// tricks to meet minimum requirements even when malloc() fails 
-    unsigned char _ubuf[3];   // guarantee an ungetc() buffer 
-    unsigned char _nbuf[1];   // guarantee a getc() buffer 	
-	
-	
-	//separate buffer for fgetln() when line crosses buffer boundary 
-    struct __sbuf _lb;	// buffer for fgetln() 
-
-	//Unix stdio files get aligned to block boundaries on fseek() 
-    int _blksize;       // stat.st_blksize (may be != _bf._size) 
-    fpos_t _offset;     // current lseek offset 		
 
 
     //
@@ -353,32 +410,6 @@ struct file_d
     int isDevice;
     
     int deviceId;  //�ndice na lista deviceList[]
-
-	// old stuff
-	// isso pertence a estrutura no formato antigo
-	// e os elementos ainda est�o presentes em v�rias rotinas.
-	//No futuro vamos deletar isso. (Talvez n�o.)
-    int   _cnt;
-    unsigned char *_base;    
-    int   _charbuf;
-    char *_tmpfname;
-    
-    
-    struct socket_d *socket;
-    
-    // Que thread está esperando por
-    // alguma operação no arquivo.
-    // pode ser um socket, um pipe.
-    // >>> a thread pode esperar quando quer ler mais está vazio.
-    // pode esperar quando quer escrever mas ta cheio.
-    // ?? pode esperar por escrita ??
-    // >> acorda quem estava esperando pra escrever.
-    
-    //struct thread_d *thread_waiting;
-    
-    int tid_waiting;
-    
-    int socket_buffer_full;
 };
 
 typedef struct file_d file; 

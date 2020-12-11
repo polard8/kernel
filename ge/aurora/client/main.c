@@ -141,19 +141,61 @@ int main ( int argc, char *argv[] ){
     int client_fd = -1;
     int main_window = -1;
 
-
-    //===============
+    //================================
+    
     // connection.
+    // Only connect. Nothing more.
+    
     client_fd = gws();
 
-    if ( client_fd < 0 )
-    {
+    if ( client_fd < 0 ){
          gws_debug_print ("gws.bin: gws initialization fail \n");
          printf          ("gws.bin: gws initialization fail \n");
          exit(1);
     }
+    
     //===============
 
+    //========================================
+    
+    // Waiting ...
+    // Wait for the moment where the server says: 'yes'
+
+    gws_debug_print ("gws.bin: Waiting ... \n");
+             printf ("gws.bin: Waiting ... \n");
+    
+    /*
+    char buf[32];
+    while (1)
+    {
+        read (client_fd, buf, 4);
+        
+        // Not yes
+        if( buf[0] != 'y')
+        { 
+            buf[4] = 0;
+            printf ("%s",buf); 
+            fflush(stdout);
+        }
+        
+        // yes!
+        if( buf[0] == 'y')
+        {
+            printf ("YES babe!\n");
+            break;
+            //exit(0);
+        }
+        
+        //gws_draw_char ( client_fd, 
+        //    main_window, 
+        //    w/3, 8, COLOR_RED, 'C' );
+    }
+    //================
+    */
+
+
+    //========================================
+    
     // Metrics.
     unsigned long w = gws_get_system_metrics(1);
     unsigned long h = gws_get_system_metrics(2);
@@ -189,33 +231,7 @@ int main ( int argc, char *argv[] ){
     //printf          ("gws.bin: Drawing a char \n");
     gws_draw_char ( client_fd, main_window, 
         16, 8, COLOR_RED, 'C' );
-    //====================
-
-
-   
-    //====================
-    gws_debug_print ("gws.bin: hang in a loop \n");
-    //printf          ("gws.bin: hang in a loop \n");
-
-    char buf[32];
-    //#debug
-    while(1)
-    {
-        //read fake event
-        read (client_fd, buf, 4);
-        
-        if( buf[0] != '?'){  //se for ? ignora.
-            buf[4] = 0;
-            printf ("%s",buf); 
-            fflush(stdout);
-        }
-        
-        gws_draw_char ( client_fd, 
-            main_window, 
-            w/3, 8, COLOR_RED, 'C' );
-    }
-    //================
-   
+    //====================   
     
     
 
@@ -343,7 +359,7 @@ int main ( int argc, char *argv[] ){
     while (1){
 
         gws_draw_char ( client_fd, main_window, 
-            48, 40, COLOR_RED, 'X' );
+            20, 20, COLOR_RED, 'X' );
    
         // ...
 

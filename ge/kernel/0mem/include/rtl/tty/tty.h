@@ -3,6 +3,16 @@
  * Header para o gerenciado de fluxo de caractere.
  */
 
+
+// #important
+// The TTY driver is in the charge of the job control.
+// This is why it can send the input to the forground process.
+
+
+// See:
+// http://www.linusakesson.net/programming/tty/index.php
+
+
 #ifndef ____TTY_H
 #define ____TTY_H  1
 
@@ -140,6 +150,75 @@ struct tty_d
     // tty name
     char __ttyname[64];    // 
     size_t ttyName_len;    // len 
+    
+    
+    //
+    // == (1) storage ========
+    //
+    
+    // The buffer. The box.
+
+    
+    //
+    // Buffers.
+    //
+    
+    // If the buffer are used or not.
+    // options: TRUE, FALSE.
+    int nobuffers;
+
+    // Canonical. (cooked mode)
+    // Applications programs reading from the terminal 
+    // receive entire lines, after line editing has been 
+    // completed by the user pressing return.
+
+
+    //===================
+    // Input buffers.
+    // Raw input buffer.
+    // Canonical buffer.
+
+    file *_rbuffer;    // raw
+    file *_cbuffer;    // canonical
+
+    //====================
+    // Output buffer.
+    file *_obuffer;
+
+
+    //
+    // == (2) synchronization ========
+    //
+
+    // Synch and job control.
+    // This way the TTY driver can send the input to the forground process.
+
+    // If a process try to write in a stopped TTY it will be blocked.
+    int stopped;
+    
+    //int lock;
+
+   // Owner process.
+    struct process_d *process;
+
+    // #todo: merge
+    // Thread de input.
+    struct thread_d *thread;
+    // Control thread;
+    struct thread_d *control;
+
+
+    //
+    // == (3) transmition ========
+    //
+    
+    // The pipe fd, the socket fd, the read write operation.
+
+    file *_fp;    
+    
+    struct tty_d *link;
+
+    // ===============================
 
     //
     // == Device info ==================
@@ -153,18 +232,7 @@ struct tty_d
     // line discipline
     struct ttyldisc_d *ldisc;
 
-    // ??
-    file *_fp;
 
-
-   // Owner process.
-    struct process_d *process;
-
-    // #todo: merge
-    // Thread de input.
-    struct thread_d *thread;
-    // Control thread;
-    struct thread_d *control;
 
     // termios
     struct termios termios;
@@ -220,8 +288,7 @@ struct tty_d
     // == Actions ==============
     //
 
-    //status
-    int stopped;
+
 
 
     // Qual terminal virtual esta usando essa tty.
@@ -233,31 +300,6 @@ struct tty_d
 
 
  
-    //
-    // Buffers.
-    //
-    
-    // If the buffer are used or not.
-    // options: TRUE, FALSE.
-    int nobuffers;
-
-    // Canonical. (cooked mode)
-    // Applications programs reading from the terminal 
-    // receive entire lines, after line editing has been 
-    // completed by the user pressing return.
-
-
-    //===================
-    // Input buffers.
-    // Raw input buffer.
-    // Canonical buffer.
-
-    file *_rbuffer;    // raw
-    file *_cbuffer;    // canonical
-
-    //====================
-    // Output buffer.
-    file *_obuffer;
 
     //
     // system metrics.
@@ -293,7 +335,7 @@ struct tty_d
     
     // pty associa a tty 'to' com a tty 'from'
     // master/slave.
-    struct tty_d *link;
+    
 
 
     // navigation

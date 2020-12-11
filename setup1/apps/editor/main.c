@@ -716,6 +716,8 @@ int main ( int argc, char *argv[] ){
 
 
 
+    // ============================================
+
     //
     // Socket
     //
@@ -755,6 +757,41 @@ int main ( int argc, char *argv[] ){
         
         }else{ break; }; 
     };
+
+    // ============================================
+
+    /*
+    char buf[32];
+    while (1)
+    {
+        read (client_fd, buf, 4);
+        
+        // Not yes
+        if( buf[0] != 'y')
+        { 
+            buf[4] = 0;
+            printf ("%s",buf); 
+            fflush(stdout);
+        }
+        
+        // yes!
+        if( buf[0] == 'y')
+        {
+            printf ("YES babe!\n");
+            break;
+            //exit(0);
+        }
+        
+        //gws_draw_char ( client_fd, 
+        //    main_window, 
+        //    w/3, 8, COLOR_RED, 'C' );
+    }
+    //================
+    */
+
+
+
+    // ============================================
 
     //
     // messages
