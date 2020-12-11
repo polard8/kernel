@@ -320,11 +320,11 @@ struct inode_d *fs_load_file (char *pathname)
 }
 
 
+
 /*
  **************
  * fsLoadFile:
  *    Carrega um arquivo na memória.
- *
  * 
  * IN:
  *     fat_address  = FAT address.
@@ -809,6 +809,33 @@ fail:
 }
 
 
+//not tested yet
+unsigned long 
+fsLoadFile2 ( 
+    struct file_context_d *fc, 
+    unsigned char *file_name )
+{
+
+    if ( (void*) fc == NULL ){
+        debug_print("fsLoadFile2: fc\n"); 
+        return 0;
+    }
+
+    if ( (void*) file_name == NULL ){
+        debug_print("fsLoadFile2: file_name\n"); 
+        return 0;
+    }
+
+    fc->file_name = file_name;
+    
+    return fsLoadFile ( 
+               (unsigned long)   fc->fat_address,
+               (unsigned long)   fc->dir_address,
+               (int)             fc->dir_entries,
+               (unsigned char *) fc->file_name, 
+               (unsigned long)   fc->file_address,
+               (unsigned long)   fc->buffer_limit );
+}
 
 /*
  ****************************************

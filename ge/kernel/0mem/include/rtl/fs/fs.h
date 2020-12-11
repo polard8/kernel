@@ -63,6 +63,8 @@
 #define CACHE_NOT_LOADED    0
 
 
+
+
 //
 //  == Variables =================================
 //
@@ -313,43 +315,67 @@ struct filesystem_d *root;
 
 
 
+
 /*
- * file_access_d:
- *     Estrutura para os elementos necessários 
- *     para acessar um arquivo.
- */
- 
-struct file_access_d
+file_access_d
+*/
+
+//
+// == file context ===========================================
+//
+
+// file context.
+// It is gonna help us to load a file.
+// Let's put in here all the data we need to handle the file.
+
+struct file_context_d
 {
+    //
+    // security
+    //
+    
     pid_t pid;
     uid_t uid;
     gid_t gid;
 
-    //disk
-    struct diskinfo_d *Disk;
-    
-    //volume
-    struct volumeinfo_d *Volume;
+    //
+    // storage
+    //
 
-    //filesystem
-    struct filesystem_d *FileSystem;
+    // Em que disco o arquivo esta.
+    struct disk_d   *disk;
     
-       
-    //directory
+    // Em que volume o arquivo esta.
+    struct volume_d *volume;
+    
+    struct filesystem_d *FileSystem;
+
     struct dir_d *Directory;
 
-    struct inode_d *inode;
     file *File;
 
-
-    //flags
-    //int flag;	
-
-    // ...
+    struct inode_d *inode;
     
-    struct file_access_d *next;
-};
+    // The FAT is alread loaded in this address.
+    unsigned long fat_address;
 
+    // The directory is alread loaded in this address.
+    unsigned long dir_address;
+    // Number of entries.
+    int dir_entries;
+    
+    unsigned char *file_name;
+    
+    // Buffer to load the file;
+    unsigned long file_address;
+    
+    // The size of the buffer
+    unsigned long buffer_limit;
+    
+    //...
+
+    struct file_context_d *next;
+};
 
 
 
@@ -477,8 +503,10 @@ int get_spc (void);
  
 
 
-unsigned long path_count (unsigned char *path);
-int load_path ( unsigned char *path, unsigned long address );
+unsigned long fs_count_path_levels (unsigned char *path);
+
+int fs_load_path ( unsigned char *path, unsigned long address );
+
 int sys_load_path ( unsigned char *path, unsigned long u_address );
 
 
@@ -550,12 +578,16 @@ fsLoadFile (
     unsigned long file_address,
     unsigned long buffer_limit );
 
+//not tested yet
+unsigned long 
+fsLoadFile2 ( 
+    struct file_context_d *fc, 
+    unsigned char *file_name );
 
 // #bugbug
 // Get file size.
 // Only on root dir!
 unsigned long fsRootDirGetFileSize ( unsigned char *file_name );
-
 
 
 //

@@ -87,7 +87,7 @@ ifeq ($(ARCH),x86)
 	init.o system.o \
 	execve.o 
 	
-	HAL_OBJECTS := cpuamd.o portsx86.o x86.o x86info.o detect.o \
+	HAL_OBJECTS := portsx86.o x86.o x86info.o cpuamd.o detect.o \
 	hal.o 
 
 	KDRIVERS_OBJECTS := ahci.o \

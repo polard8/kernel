@@ -21,45 +21,6 @@
 
 
 
-//#todo
-/*
-// Carrega um arquivo dado a estrutura do diretorio ao qual ele pertence
-// Retorna a estrutura de acesso ao arquivo, que tem muitas informaçoes
-// sobre o arquivo.
-struct file_access_d *fs_load_file_and_get_access( 
-    struct dir_d *directory,
-    char *filename );
-struct file_access_d *fs_load_file_and_get_access ( 
-    struct dir_d *directory,
-    char *filename )
-{
-
-    struct file_access_d *file_access;
-
-    file_access = (struct file_access_d *) kmalloc( sizeof(struct file_access_d) );
-    if ( (void*) file_access == NULL )
-    {
-        debug_print ("fs_load_file_and_get_access: [FAIL] Couldn't allocate\n");
-        return (struct file_access_d *) 0;
-    }else{
-
-        file_access->Directory = (struct dir_d *) directory;
-        
-        // ...
-
-
-    };  
-    
-    // #todo
-    // Load the file and fill the file access structure.
-    
-    // ...
-
-    debug_print ("fs_load_file_and_get_access: [TODO]\n");
-    return (struct file_access_d *) 0;
-}
-*/
-
 /*
  //Credits: HOPPY OS.
 void 
@@ -933,19 +894,21 @@ void set_filesystem_type (int type)
 
 
 // Credits: Sirius OS.
-unsigned long path_count (unsigned char *path)
+unsigned long fs_count_path_levels (unsigned char *path)
 {
-    int i=0;
-    unsigned long val=0;
-    int max = (80*25);
+    unsigned long Counter=0;
+    int Max = (80*25);   //25 lines.
+    
+    register int i=0;
 
-    for ( i=0; i < max; i++ )
+
+    for ( i=0; i < Max; ++i )
     {
-        if (path[i] == '/') { val++; }
+        if (path[i] == '/') { Counter++; }
         if (path[i] == '\0'){ break; }
     };
 
-    return (unsigned long) val;
+    return (unsigned long) Counter;
 }
 
 
@@ -1063,7 +1026,7 @@ from_FAT_name (
 
 /*
  ********************************** 
- * load_path:
+ * fs_load_path:
  *     Carrega nesse endereço o arquivo que está nesse path.
  */
 
@@ -1076,10 +1039,11 @@ from_FAT_name (
 // Carregou um arquivo com 3 niveis.
 
 
-//   0 ---> ok.
+//    0 ---> ok.
 // != 0 ---> fail
 
-int load_path ( unsigned char *path, unsigned long address ){
+int fs_load_path ( unsigned char *path, unsigned long address )
+{
 
     int i=0;         // Deslocamento dentro do buffer.
     int level=0;
@@ -1103,7 +1067,7 @@ int load_path ( unsigned char *path, unsigned long address ){
 
     // Address
     if (address == 0){
-        panic ("load_path: address\n");
+        panic ("fs_load_path: address\n");
     }
 
     // File buffer.
@@ -1111,13 +1075,13 @@ int load_path ( unsigned char *path, unsigned long address ){
 
 
     // Counting the levels.
-    n_levels = path_count(path);
+    n_levels = fs_count_path_levels(path);
     
     if (n_levels==0){
-        panic ("load_path: n_levels\n");
+        panic ("fs_load_path: n_levels\n");
     }
     
-    printf ("path with %d levels\n",n_levels);
+    printf ("fs_load_path: path with %d levels\n",n_levels);
 
 
     // Start with 0.
@@ -1137,9 +1101,8 @@ int load_path ( unsigned char *path, unsigned long address ){
 
     
     // Not absolute   
-    if ( p[0] != '/' )
-    {
-        panic ("load_path: Not absolute pathname \n");
+    if ( p[0] != '/' ){
+        panic ("fs_load_path: Not absolute pathname \n");
     }
 
     
@@ -1154,7 +1117,7 @@ int load_path ( unsigned char *path, unsigned long address ){
         
         // The level needs to start with '/', even the first one.
         if ( p[0] != '/' ){
-            panic ("load_path: All levels need to start with '/' \n");
+            panic ("fs_load_path: All levels need to start with '/' \n");
         }
         
         //Skip the '/'.
@@ -1177,13 +1140,13 @@ int load_path ( unsigned char *path, unsigned long address ){
             if ( *p == '.' )
             {
                 if ( l != (n_levels-1) ){
-                    panic ("load_path: Directory name with '.'\n");
+                    panic ("fs_load_path: Directory name with '.'\n");
                 }
                 
                 // Se o ponto está além do limite permitido.
                 //if (i>7){
                 if (i>=7){
-                    printf ("load_path: '.' fail.\n");
+                    printf ("fs_load_path: '.' fail.\n");
                     panic ("Name size bigger than 8.\n");
                 }
                 
@@ -1212,7 +1175,7 @@ int load_path ( unsigned char *path, unsigned long address ){
                      buffer[11] = 0;
                      
                      printf ("\n");
-                     printf ("load_path: This is the name {%s}\n",buffer);   
+                     printf ("fs_load_path: This is the name {%s}\n",buffer);   
                 }
 
 
@@ -1224,7 +1187,7 @@ int load_path ( unsigned char *path, unsigned long address ){
                 __dst_buffer = (void *) __file_buffer;
     
                 if ( (void *) __dst_buffer == NULL ){
-                    panic ("load_path: __dir\n");
+                    panic ("fs_load_path: __dir\n");
                 }
 
                       // IN: 
@@ -1246,16 +1209,16 @@ int load_path ( unsigned char *path, unsigned long address ){
                     // Esse nível tinha ponto, então deveria ser o último.
                     if ( l != (n_levels-1) )
                     {
-                        printf ("load_path: Directory name with '.'\n");
+                        printf ("fs_load_path: Directory name with '.'\n");
                         panic ("It needs to be the last level.\n");
                     }
 
                     // SUCCESS ?!!
-                    debug_print ("load_path: done\n");
+                    debug_print ("fs_load_path: done\n");
                     return 0;
 
                 }else{
-                    panic ("load_path: [FAIL] Loading level 0\n");
+                    panic ("fs_load_path: [FAIL] Loading level 0\n");
                 };
             }
 
@@ -1289,7 +1252,7 @@ int load_path ( unsigned char *path, unsigned long address ){
                 buffer[11] = 0;
                 
                 printf ("\n");
-                printf ("load_path: This is the name {%s}\n",buffer);
+                printf ("fs_load_path: This is the name {%s}\n",buffer);
 
                 //
                 // Load directory.
@@ -1305,7 +1268,7 @@ int load_path ( unsigned char *path, unsigned long address ){
                 __dst_buffer = (void *) kmalloc (    BUGBUG_OVERFLOW    ); 
     
                 if ( (void *) __dst_buffer == NULL ){
-                    panic ("load_path: __dir\n");
+                    panic ("fs_load_path: __dir\n");
                 }
                           
                       //IN: fat address, dir address, filename, file address.
@@ -1330,7 +1293,7 @@ int load_path ( unsigned char *path, unsigned long address ){
                     break;
 
                 }else{
-                    panic ("load_path: [*FAIL] Loading level 0\n");
+                    panic ("fs_load_path: [*FAIL] Loading level 0\n");
                 };
             }
 
@@ -1342,8 +1305,8 @@ int load_path ( unsigned char *path, unsigned long address ){
 
 
 fail:
-    debug_print ("load_path: Fail\n");
-    printf      ("load_path: Fail\n");
+    debug_print ("fs_load_path: Fail\n");
+    printf      ("fs_load_path: Fail\n");
     refresh_screen();
     return (-1);
 }
@@ -1357,14 +1320,18 @@ fail:
 
 int sys_load_path ( unsigned char *path, unsigned long u_address )
 {
-    int status = -1;
-
+    int Status = -1;
 
     debug_print ("sys_load_path:\n");
     
-    status = load_path ( (unsigned char *) path, (unsigned long) u_address );
-    
-    return (int) status;
+    Status = fs_load_path ( 
+                 (unsigned char *) path, 
+                 (unsigned long) u_address );
+
+    if (Status<0)
+            debug_print ("sys_load_path: fail\n");
+            
+    return (int) Status;
 }
 
 

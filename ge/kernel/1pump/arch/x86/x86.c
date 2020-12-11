@@ -561,9 +561,9 @@ void get_cpu_intel_parameters (void)
 
     //========================================
     // EAX=0: Highest Function Parameter and Manufacturer ID
-
+    // #todo: eax
+    //eax = Maximum meaningful value for the InfoType parameter. 
     // Vendor.
-    //eax = Maximum meaningful value for the InfoType parameter. @todo:
     //ebx = Identification String (part 1)
     //ecx = Identification String (part 3)
     //edx = Identification String (part 2)
@@ -579,15 +579,15 @@ void get_cpu_intel_parameters (void)
     processor->Vendor[2] = ecx;
     processor->Vendor[3] = 0;
 
-
+    hal_set_machine_type(Processor_NULL);
+    
     // Intel?
+    // #todo: definir Intel como 1.
     if ( ebx == CPUID_VENDOR_INTEL_1 && 
          edx == CPUID_VENDOR_INTEL_2 && 
          ecx == CPUID_VENDOR_INTEL_3 )
     {
-        // #todo: 
-        // definir Intel como 1.
-        hal_set_machine_type(1);    
+        hal_set_machine_type(Processor_INTEL);
     }
 
 
@@ -598,22 +598,22 @@ void get_cpu_intel_parameters (void)
 	// Output para argumento 1. 
 	//
 	
-	//eax:
-    //0-3 Stepping ID
-    //4-7 Model
-	//8-11 Family
-	//12-13 Processor Type
-   //14-15 Reserved
+    //eax:
+    // 0- 3 Stepping ID
+    // 4- 7 Model
+    // 8-11 Family
+    //12-13 Processor Type
+    //14-15 Reserved
     //16-19 Extended model
     //20-27 Extended family
     //28-31 Reserved
 
     //ebx:
-	//0-7 Brand Index
-	//8-15 CLFLUSH cache line size / 8
-	//16-23 Reserved
-	//24-31 APIC Physical ID
-	
+    // 0- 7 Brand Index
+    // 8-15 CLFLUSH cache line size / 8
+    //16-23 Reserved
+    //24-31 APIC Physical ID
+
 	//ecx:
 	//0 SSE3 New Instructions
 	//1-2 Reserved
@@ -671,7 +671,7 @@ void get_cpu_intel_parameters (void)
 	processor->Processor_Type     = (unsigned long)((eax >> 12) & 0x3);  //processor type
 	processor->Extended_Model_ID  = (unsigned long)((eax >> 16) & 0xf);  //extended model
 	processor->Extended_Family_ID = (unsigned long)((eax >> 20) & 0xff); //extended family
-
+    // 31 ~ 28 Reserved??
 
 	//ebx:
 	// Additional Information 
@@ -740,6 +740,7 @@ void get_cpu_intel_parameters (void)
     name[4] = 0; 
     processor->MaxFeatureId = (unsigned long)(eax & MASK_LSB_8);
     //printf("Max feature id ={%d}\n", (unsigned long) processor->MaxFeatureId);
+
 
     //========================================
     // EAX=80000001h: Extended Processor Info and Feature Bits
@@ -859,9 +860,7 @@ void get_cpu_intel_parameters (void)
     //printf("Physical_Address_Size={%d}\n",(unsigned long) processor->Physical_Address_Size);
     //printf("Virtual_Address_Size={%d}\n", (unsigned long) processor->Virtual_Address_Size);
 
-
-
-
+    //...
 }
 
 

@@ -1,8 +1,7 @@
-
-
+// TEST1.CPP
 int main()
 {
-	printf("TEST1.CPP: Hello World!\n");
-	return 0;
+  printf("Hi\n");
+  return 0;
 }
 

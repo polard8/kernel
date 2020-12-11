@@ -57,10 +57,9 @@ void __load_path_test(void)
     //__address = (void *) kmalloc(600*1024);
 
 
-
-    //load_path ("/ETC/HELLO.CPP",(unsigned long) __address);
-    //load_path ("/ETC/NEWDIR/HELLO.CPP",(unsigned long) __address);
-    status = load_path ("/ETC/NEWDIR/LASTDIR/HELLO.CPP",(unsigned long) __address);
+    //fs_load_path ("/ETC/HELLO.CPP",(unsigned long) __address);
+    //fs_load_path ("/ETC/NEWDIR/HELLO.CPP",(unsigned long) __address);
+    status = fs_load_path ("/ETC/NEWDIR/LASTDIR/HELLO.CPP",(unsigned long) __address);
 
     if ( status < 0 )
         printf ("__load_path_test: load_path fail\n");

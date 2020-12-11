@@ -42,11 +42,19 @@ void bg_load_image (void)
     unsigned long tmp_size = (512*4096);
     void *__buffer = (void *) allocPages ( 512 );
 
+    debug_print("bg_load_image: \n");
+    
+    
+    if ( (void*) __buffer == NULL ){
+        debug_print("bg_load_image: __buffer\n");
+        return;
+    }
+
 
     // # not tested.
     // See: fs.c
     // IN: path os two levels, address.
-    status = (int) load_path ( "/BOOT/ANIMAL.BMP", 
+    status = (int) fs_load_path ( "/BOOT/ANIMAL.BMP", 
                        (unsigned long) __buffer );
                        
     if (status < 0)
