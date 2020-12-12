@@ -251,19 +251,15 @@ sc_again:
      if ( __raw == 0xE0 ){ __has_e0_prefix = 1; goto done;  }
      if ( __raw == 0xE1 ){ __has_e1_prefix = 1; goto done;  }
 
-     // Build the message and send it to the thread's queue.
+     
+     
+     // + Build the message and send it to the thread's queue.
      // This routine will select the target thread.
+     // + Or send the message to the input TTY.
+     // This way the foreground process is able to get this data.
      // See: ps2kbd.c
 
-     //#debug
-     //int key = __raw;  key &= LDISC_KEY_MASK;    
-     //printf ("KEY{%x}\n", key ); 
-     //refresh_screen();
-     //if (__has_e0_prefix == 1){ printf ("e0: key{%x}\n", key ); refresh_screen(); }
-     //if (__has_e1_prefix == 1){ printf ("e1: key{%x}\n", key ); refresh_screen(); }
-
- 
-     KEYBOARD_SEND_MESSAGE (__raw);
+    KEYBOARD_SEND_MESSAGE (__raw);
 
     // Clean the mess.
     __has_e0_prefix = 0;

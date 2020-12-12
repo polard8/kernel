@@ -297,9 +297,6 @@ struct tty_d
     // When we are using the kgws.
     struct window_d *window;
 
-
- 
-
     //
     // system metrics.
     //
@@ -327,14 +324,12 @@ struct tty_d
     unsigned long cursor_bottom;   // margem inferior dada em linhas
 
 
-
     //
     // == Connection ===========================
     //
     
     // pty associa a tty 'to' com a tty 'from'
     // master/slave.
-    
 
 
     // navigation
@@ -360,6 +355,10 @@ int current_vc;
 // Virtual consoles.
 static struct tty_d CONSOLE[CONSOLE_COUNT_MAX];
 // ==============================================================
+
+
+
+
 
 //
 // == prototyes =================================================

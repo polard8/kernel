@@ -931,18 +931,38 @@ done:
 
 
 
-    // ==========================
-    // Emergency keys.
-    // We need to press the emergency keys for all the input modes.
-    // F5 F6 F7 F8
-    // These messages are used by the developer.
-    // + Reboot system
-    // + Switch focus.
-    // + Test 1
-    // + Test 2
     
     // ===========================
+
+    // #todo
+    // Send the message to the TYY,
+    // this way the foreground process is able to read it
+    // using stdin.
+    // See:
+    // devmgr.h ps2kbd.c
+    // ...
     
+    // only one standard event
+    unsigned long event_buffer[5];
+    
+    if ( (void *) PS2KeyboardDeviceTTY != NULL )
+    {
+       // ok. This is a valid tty pointer.
+       
+       // #test
+       // Let's write something ...
+       event_buffer[0] = 0;        // window 
+       event_buffer[1] = message;  // msg
+       event_buffer[2] = ch;       // char
+       event_buffer[3] = tmp_sc;   // sc
+       
+       // it is gonna write in the base of the buffer.
+       __tty_write ( 
+           (struct tty_d *) PS2KeyboardDeviceTTY, 
+           (char *) event_buffer, 
+           (int) (4*4) );  //16 bytes 
+    }
+   
         
     switch (message){
        

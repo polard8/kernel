@@ -460,7 +460,7 @@ __tty_read (
 
 /*
  *************************************************
- * __tty_read:
+ * __tty_write:
  *     Write n bytes to a tty.
  * 
  * IN:
@@ -480,6 +480,8 @@ __tty_write (
     int nr )
 {
 
+    debug_print ("__tty_write: [DEBUG]\n");
+        
     // tty
     if ( (void *) tty == NULL ){
         debug_print ("__tty_write: tty\n");
@@ -536,7 +538,10 @@ __tty_write (
     //printf ("__tty_write: Copiando para tty->_buffer->_base \n");
     //refresh_screen();
 
-    memcpy ( (void *) tty->_rbuffer->_base, (const void *) buffer, nr ); 
+    memcpy ( 
+        (void *) tty->_rbuffer->_base, 
+        (const void *) buffer, 
+        nr ); 
 
     //#debug
     //printf ( "debug_write >>>%s \n", tty->_buffer->_base );
@@ -570,16 +575,16 @@ __tty_write (
     // o parent 
     int PPID = (int) __p->ppid;
 
-
     if (PPID<0)
         panic("__tty_write: PPID\n");
 
 
-    printf ("__tty_write: PID  %d\n", __p->pid);
-    printf ("__tty_write: PPID %d\n", __p->ppid);
-    refresh_screen();
+    //#debug
+    //printf ("__tty_write: PID  %d\n", __p->pid);
+    //printf ("__tty_write: PPID %d\n", __p->ppid);
+    //refresh_screen();
 
-    
+
     //
     // alert!!
     //
@@ -604,6 +609,7 @@ __tty_write (
     // ou drivers.
     
 
+   /*
     unsigned long message_address[8];
 
     message_address[0] = (unsigned long) 0; //w
@@ -618,8 +624,8 @@ __tty_write (
     ipc_send_message_to_process ( 
         (unsigned long) &message_address[0], 
         (int) PPID );
-
-
+   */
+    
     // #bugbug
     // Não devemos copiar aqui, pois assim damos a chance
     // do processo pai escrever diretamente na tty do filho
