@@ -18,7 +18,7 @@
 #include <kernel.h>
 
 
-
+// local
 void ps2kbd_drain(void);
 void ps2kbd_drain(void)
 {
@@ -231,18 +231,100 @@ __local_ps2kbd_procedure (
 
     switch (msg){
 
-        case MSG_SYSKEYUP: 
+        // Pressionadas: teclas de funçao
+        case MSG_SYSKEYDOWN: 
             switch (long1)  
             {
+
+                case VK_F1:
+                    if (ctrl_status == 1){
+                        printf ("__local_ps2kbd_procedure: control + f1\n");
+                        refresh_screen();
+                    }
+                    if (alt_status == 1){
+                        printf ("__local_ps2kbd_procedure: alt + f1\n");
+                        refresh_screen();
+                    }
+                    if (shift_status == 1){
+                        printf ("__local_ps2kbd_procedure: shift + f1\n");
+                        console_switch_to(1);
+                        refresh_screen();
+                    }
+                    return 0;
+                    break;
+
+                case VK_F2:
+                    if (ctrl_status == 1){
+                        printf ("__local_ps2kbd_procedure: control + f2\n");
+                        refresh_screen();
+                    }
+                    if (alt_status == 1){
+                        printf ("__local_ps2kbd_procedure: alt + f2\n");
+                        refresh_screen();
+                    }
+                    if (shift_status == 1){
+                        printf ("__local_ps2kbd_procedure: shift + f2\n");
+                        console_switch_to(2);
+                        refresh_screen();
+                    }
+                    return 0;
+                    break;
+
+                case VK_F3:
+                    if (ctrl_status == 1){
+                        printf ("__local_ps2kbd_procedure: control + f3\n");
+                        refresh_screen();
+                    }
+                    if (alt_status == 1){
+                        printf ("__local_ps2kbd_procedure: alt + f3\n");
+                        refresh_screen();
+                    }
+                    if (shift_status == 1){
+                        printf ("__local_ps2kbd_procedure: shift + f3\n");
+                        console_switch_to(3);
+                        refresh_screen();
+                    }
+                    return 0;
+                    break;
+
+                case VK_F4:
+                    if (ctrl_status == 1){
+                        printf ("__local_ps2kbd_procedure: control + f4\n");
+                        refresh_screen();
+                    }
+                    if (alt_status == 1){
+                        printf ("__local_ps2kbd_procedure: alt + f4\n");
+                        refresh_screen();
+                    }
+                    if (shift_status == 1){
+                        printf ("__local_ps2kbd_procedure: shift + f4\n");
+                        refresh_screen();
+                    }
+                    return 0;
+                    break;
+
+
                 // Reboot
                 case VK_F5:
+                    if (ctrl_status == 1){
                     reboot();
                     //__load_path_test(); //local ok
                     //do_clone_execute_process ("init2.bin");
+                    }
+                    if (alt_status == 1){
+                        printf ("__local_ps2kbd_procedure: alt + f5\n");
+                        refresh_screen();
+                    }
+                    if (shift_status == 1){
+                        printf ("__local_ps2kbd_procedure: shift + f5\n");
+                        refresh_screen();
+                    }
+                    return 0;
                     break;
 
                 // 
                 case VK_F6:
+                    if (ctrl_status == 1){
                     ws_show_info();
                     //initialize_frame_table();
                     //printf (">> %x \n", get_new_frame() );
@@ -252,10 +334,21 @@ __local_ps2kbd_procedure (
                     //tty_send_message (103,buffer, 32, 444, 0, 0);
                     //tty_send_message (104,buffer, 32, 444, 0, 0);
                     //refresh_screen();
+                    }
+                    if (alt_status == 1){
+                        printf ("__local_ps2kbd_procedure: alt + f6\n");
+                        refresh_screen();
+                    }
+                    if (shift_status == 1){
+                        printf ("__local_ps2kbd_procedure: shift + f6\n");
+                        refresh_screen();
+                    }
+                    return 0;
                     break;
 
                 // Test 1.
                 case VK_F7:
+                    if (ctrl_status == 1){
                     //fs_show_file_info(stdin);
                     //fs_show_file_info(stdout);
                     //fs_show_file_info(stderr);
@@ -273,18 +366,103 @@ __local_ps2kbd_procedure (
                     //    printf("not found\n");
                     //};
                     //refresh_screen();
+                    }
+                    if (alt_status == 1){
+                        printf ("__local_ps2kbd_procedure: alt + f7\n");
+                        refresh_screen();
+                    }
+                    if (shift_status == 1){
+                        printf ("__local_ps2kbd_procedure: shift + f7\n");
+                        refresh_screen();
+                    }
+                    return 0;
                     break;
 
                 // Test 2.
                 case VK_F8:
-                    printf (">> %x \n", get_new_frame() );
+                    if (ctrl_status == 1){
+                    //printf (">> %x \n", get_new_frame() );
                     //refresh_screen();
                     // testNIC ();
                     //pciInfo ();
                     // ahciSATAInitialize (1);
                     //refresh_screen();
+                    }
+                    if (alt_status == 1){
+                        printf ("__local_ps2kbd_procedure: alt + f8\n");
+                        refresh_screen();
+                    }
+                    if (shift_status == 1){
+                        printf ("__local_ps2kbd_procedure: shift + f8\n");
+                        refresh_screen();
+                    }
+                    return 0;
                     break;
-            
+
+                case VK_F9:
+                    if (ctrl_status == 1){
+                        printf ("__local_ps2kbd_procedure: control + f9\n");
+                        refresh_screen();
+                    }
+                    if (alt_status == 1){
+                        printf ("__local_ps2kbd_procedure: alt + f9\n");
+                        refresh_screen();
+                    }
+                    if (shift_status == 1){
+                        printf ("__local_ps2kbd_procedure: shift + f9\n");
+                        refresh_screen();
+                    }
+                    return 0;
+                    break;
+
+                case VK_F10:
+                    if (ctrl_status == 1){
+                        printf ("__local_ps2kbd_procedure: control + f10\n");
+                        refresh_screen();
+                    }
+                    if (alt_status == 1){
+                        printf ("__local_ps2kbd_procedure: alt + f10\n");
+                        refresh_screen();
+                    }
+                    if (shift_status == 1){
+                        printf ("__local_ps2kbd_procedure: shift + f10\n");
+                        refresh_screen();
+                    }
+                    return 0;
+                    break;
+
+                case VK_F11:
+                    if (ctrl_status == 1){
+                        printf ("__local_ps2kbd_procedure: control + f11\n");
+                        refresh_screen();
+                    }
+                    if (alt_status == 1){
+                        printf ("__local_ps2kbd_procedure: alt + f11\n");
+                        refresh_screen();
+                    }
+                    if (shift_status == 1){
+                        printf ("__local_ps2kbd_procedure: shift + f11\n");
+                        refresh_screen();
+                    }
+                    return 0;
+                    break;
+
+                case VK_F12:
+                    if (ctrl_status == 1){
+                        printf ("__local_ps2kbd_procedure: control + f12\n");
+                        refresh_screen();
+                    }
+                    if (alt_status == 1){
+                        printf ("__local_ps2kbd_procedure: alt + f12\n");
+                        refresh_screen();
+                    }
+                    if (shift_status == 1){
+                        printf ("__local_ps2kbd_procedure: shift + f12\n");
+                        refresh_screen();
+                    }
+                    return 0;
+                    break;
+
                 default:
                     // nothing
                     return 0;
@@ -292,7 +470,6 @@ __local_ps2kbd_procedure (
             }
     };
 
-//done
     refresh_screen();
     return 0;
 }
@@ -660,73 +837,12 @@ int KEYBOARD_SEND_MESSAGE (unsigned char SC){
     
 done:
 
-    // The host machine normally intercept shortcuts 
-    // started with 'alt' or 'control'. So, this way, 
-    // new hobby operating systems will use shortcuts 
-    // started with 'shift'.
-
-
-    // #test
-    // Maybe it is gonna work on my real machine.
-    // Maybe it fails on a vm.
-    
-    /*
-    // control + alt + del.
-    if ( (ctrl_status == 1) && (alt_status == 1) && (ch == KEY_DELETE) && (message == MSG_SYSKEYDOWN) )
-    {
-        debug_print ("KEYBOARD_SEND_MESSAGE: ctrl + alt + del\n");
-        hal_reboot();
-    }
-    */
-
-    
-    if ( (shift_status == 1) && (ch == VK_F1) && (message == MSG_SYSKEYDOWN) ){
-        debug_print ("KEYBOARD_SEND_MESSAGE: [Console 1] shift + f1\n");
-        printf ("KEYBOARD_SEND_MESSAGE: Switch to console 1\n"); 
-        console_switch_to(1);
-        refresh_screen();
-        return 0;
-    }
-
-    if ( (shift_status == 1) && (ch == VK_F2) && (message == MSG_SYSKEYDOWN) ){
-        debug_print ("KEYBOARD_SEND_MESSAGE: [Console 2] shift + f2\n");
-        printf ("KEYBOARD_SEND_MESSAGE: Switch to console 2\n"); 
-        console_switch_to(2);
-        refresh_screen();
-        return 0;
-    }
-
-    if ( (shift_status == 1) && (ch == VK_F3) && (message == MSG_SYSKEYDOWN) ){
-        debug_print ("KEYBOARD_SEND_MESSAGE: [Console 3] shift + f3\n");
-        printf ("KEYBOARD_SEND_MESSAGE: Switch to console 3\n"); 
-        console_switch_to(3);
-        refresh_screen();
-        return 0;
-    }
-
-    //===========================
-
-    // control + f1
-    // print the list of keyboard shortcuts.
-    if ( (ctrl_status == 1) && (ch == VK_F1) && (message == MSG_SYSKEYDOWN) )
-    {
-         //todo: create helper functions for this.
-         printf("~ keyboard shortcuts:\n");
-         printf("control + f1: This list\n");
-         printf("alt + f4: Close application\n");
-         printf("shift + f1: switch console\n");
-         printf("shift + f2: switch console\n");
-         printf("shift + f3: switch console\n");
-         refresh_screen();
-         return 0;
-    }
-
-
     // Fixing the Scan code.
     tmp_sc = (unsigned long) scancode;
     tmp_sc = (unsigned long) ( tmp_sc & 0x000000FF );
 
 
+    /*
     // Sending commands to the application
     // Only for the setup input mode.
     if (current_input_mode == INPUT_MODE_SETUP)
@@ -745,7 +861,7 @@ done:
         }
         //...
     }
-
+    */
 
 	// Nesse momento temos duas opções:
 	// Devemos saber se a janela com o foco de entrada é um terminal ou não ...
@@ -849,28 +965,35 @@ done:
     // ===========================
     
         
-    switch (message)
-    {
-        case MSG_SYSKEYUP: 
-
+    switch (message){
+       
+        // Para os dois casos.
+        // quando o control ou a tecla de funçao forem pressionadas ou liberadas.
+        case MSG_SYSKEYDOWN: 
+        case MSG_SYSKEYUP:
             switch (ch){
 
-                // Emergency keys.
-                // Sending these keys to the system procedure.
-                // It needs to work in all the input modes.
-                // This is a local routine.
+                // function key
+                // Quando pressionarmos uma tecla de funçao.
+                // no metodo olharemos control ou alt.
+                case VK_F1:  case VK_F2:  case VK_F3:  case VK_F4:
                 case VK_F5:  case VK_F6:  case VK_F7:  case VK_F8:
+                case VK_F9:  case VK_F10:  case VK_F11:  case VK_F12:
                     // For all the input modes.
-                    debug_print ("KEYBOARD_SEND_MESSAGE: >>>> [MSG_SYSKEYUP] to system procedure\n"); 
-                    __local_ps2kbd_procedure ( 
-                        w, 
-                        (int) message, 
-                        (unsigned long) ch, 
-                        (unsigned long) tmp_sc );       
+                    if (message == MSG_SYSKEYDOWN)
+                    {
+                        debug_print ("KEYBOARD_SEND_MESSAGE: >>>> [MSG_SYSKEYUP] to system procedure\n"); 
+                        __local_ps2kbd_procedure ( 
+                            w, 
+                            (int) message, 
+                            (unsigned long) ch, 
+                            (unsigned long) tmp_sc );
+                        debug_print("out of sysm procedure\n");       
+                    }
                     return 0;
                     break;
 
-
+                // todas as outras teclas de controle.
                 // Default syskeyups dent to control thread.
                 // This is a window of the embedded window server.
                 // Not the loadable window server.
@@ -897,9 +1020,11 @@ done:
                     return 0; 
                     break;
             };
+            return 0;
             break;
 
-        // Para todas as outras mensagens alem de syskeyup.
+        //===============
+        // Para todas as outras mensagens alem de syskeyup e syskeydown.
         // kgws:
         // Send a message to the thread associated with the
         // window with focus.

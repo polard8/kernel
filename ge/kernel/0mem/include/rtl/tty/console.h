@@ -7,6 +7,13 @@
 
 
 
+// Control sequence introducer 
+// Parameter    - (zero or more characters)
+// Intermediate - (zero or more characters)
+// Final        - (one character)
+// See: https://vt100.net/emu/ctrlseq_dec.html
+
+
 struct virtual_console_login_d
 {
     int id;
