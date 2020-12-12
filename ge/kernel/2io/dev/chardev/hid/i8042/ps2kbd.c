@@ -842,27 +842,6 @@ done:
     tmp_sc = (unsigned long) ( tmp_sc & 0x000000FF );
 
 
-    /*
-    // Sending commands to the application
-    // Only for the setup input mode.
-    if (current_input_mode == INPUT_MODE_SETUP)
-    {
-        // alt + f4
-        // it works on virtualbox.
-        // 
-        if ( (alt_status == 1) && (ch == VK_F4) && (message == MSG_SYSKEYDOWN) ){
-            kgws_send_to_controlthread_of_currentwindow ( 
-                w,
-               (int) MSG_CLOSE, 
-               (unsigned long) 0, 
-               (unsigned long) 0);
-            refresh_screen();
-            return 0;
-        }
-        //...
-    }
-    */
-
 	// Nesse momento temos duas opções:
 	// Devemos saber se a janela com o foco de entrada é um terminal ou não ...
 	// se ela for um terminal chamaremos o porcedimento de janelas de terminal 
@@ -982,13 +961,30 @@ done:
                     // For all the input modes.
                     if (message == MSG_SYSKEYDOWN)
                     {
-                        debug_print ("KEYBOARD_SEND_MESSAGE: >>>> [MSG_SYSKEYUP] to system procedure\n"); 
-                        __local_ps2kbd_procedure ( 
+                       // se alguma tecla de controle esta pressionada, chamaremos o procedimento local.
+                       if ( shift_status == 1 || ctrl_status == 1 || alt_status == 1 )
+                       {
+                           debug_print ("KEYBOARD_SEND_MESSAGE: >>>> [MSG_SYSKEYUP] to system procedure\n"); 
+                            __local_ps2kbd_procedure ( 
                             w, 
                             (int) message, 
                             (unsigned long) ch, 
                             (unsigned long) tmp_sc );
-                        debug_print("out of sysm procedure\n");       
+                        debug_print("out of sysm procedure\n");
+                        return 0;
+                        }
+                        // caso nenhuma tecla de controle esteja pressionada,
+                        //enviaremos a tecla de funçao para a alicaçao.
+                        if (current_input_mode == INPUT_MODE_SETUP)
+                        {
+                            kgws_send_to_controlthread_of_currentwindow ( 
+                                w,
+                                (int) message, 
+                                (unsigned long) ch, 
+                                (unsigned long) tmp_sc );
+                            debug_print ("KEYBOARD_SEND_MESSAGE: >>>> [MSG_SYSKEYUP.function] to wwf\n");        
+                            return 0;
+                        }
                     }
                     return 0;
                     break;

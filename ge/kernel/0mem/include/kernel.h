@@ -473,6 +473,16 @@ int current_group;
 // Organização dos processos
 
 
+// Process used by the console during the job control.
+// #hackhack: 
+// For now we are using the control thread associated with the
+// window with focus.
+// #todo
+// But we need to use the control thread of the foreground process
+// associated with the console TTY.
+int foreground_process;
+
+
 // [Processing time]
 // Only these can read the keyboard input.
 // Sometime it's the terminal.

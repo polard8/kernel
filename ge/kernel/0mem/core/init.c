@@ -192,9 +192,12 @@ void init_globals (void){
     current_desktop     = (int) 0;
 
     // =========================================
-    //Process, Thread.
-    current_process = (int) 0;
-    current_thread  = (int) 0;
+    // Process, Thread.
+    // See: kernel.h
+    
+    foreground_process = (int) 0;
+    current_process    = (int) 0;
+    current_thread     = (int) 0;
 
 
     // =========================================
