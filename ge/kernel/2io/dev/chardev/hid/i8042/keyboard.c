@@ -298,7 +298,15 @@ done:
 	// Criar a variável keyboard_type no kernel base.
 	// Não aqui ... pois cada driver deve ser para um tipo de teclado.
 
-void irq1_KEYBOARD (void){
+
+// #todo
+// We need to send the input data to the TTY.
+// The foreground process is able to read it using stdin.
+
+
+__VOID_IRQ 
+irq1_KEYBOARD (void)
+{
 
 
 	// Se o teclado ps2 não estiver inicializado !

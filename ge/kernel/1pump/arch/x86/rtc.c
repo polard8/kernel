@@ -71,8 +71,9 @@ int rtcError;
  *     Isso é uma interface para chamar a rotina verdadeira.
  */
 
-void irq8_RTC (void){
-
+__VOID_IRQ 
+irq8_RTC (void)
+{
 
 	// Se o rtc não estiver inicializado !
     if ( __breaker_rtc_initialized == 0 )

@@ -551,7 +551,8 @@ static const char* sbc_subclass_strings[] = {
  * para a rotina de serviço aproriada.
  */
 
-void irq_SHARED0 (void)
+__VOID_IRQ 
+irq_SHARED0 (void)
 {
     debug_print ("irq_SHARED0:\n");
     //...
@@ -573,7 +574,8 @@ void irq_SHARED0 (void)
  * para a rotina de serviço aproriada.
  */
 
-void irq_SHARED1 (void)
+__VOID_IRQ 
+irq_SHARED1 (void)
 {
     debug_print ("irq_SHARED1:\n");
     //...
@@ -594,7 +596,9 @@ void irq_SHARED1 (void)
  * sinalizou que efetuou uma interrupção. Então direcionar 
  * para a rotina de serviço aproriada.
  */
-void irq_SHARED2 (void)
+
+__VOID_IRQ 
+irq_SHARED2 (void)
 {
     debug_print ("irq_SHARED2:\n");
     //...
@@ -616,12 +620,17 @@ void irq_SHARED2 (void)
  * para a rotina de serviço aproriada.
  */
 
-void irq_SHARED3 (void)
+__VOID_IRQ 
+irq_SHARED3 (void)
 {
     debug_print ("irq_SHARED3:\n");
 	//...
     return;
 }
+
+
+
+//=======================================
 
 
 /**

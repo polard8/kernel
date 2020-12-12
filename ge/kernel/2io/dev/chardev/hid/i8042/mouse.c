@@ -29,10 +29,11 @@
 // Chamaremos o mouse handler dentro do kernel base.
 // ps2mouse.c
 
-void irq12_MOUSE (void)
+__VOID_IRQ 
+irq12_MOUSE (void)
 {
 
-	// Se o mouse ps2 não estiver inicializado !
+    // Se o mouse ps2 não estiver inicializado !
     if ( __breaker_ps2mouse_initialized == 0 )
         return;
 

@@ -25,10 +25,10 @@ void disk_reset_ata_irq_invoked (void);
  *     irq 14 handler
  */
 
-void irq14_PRIMARY_IDE (void)
+__VOID_IRQ 
+irq14_PRIMARY_IDE (void)
 {
-	
-	// Se o ata1 não estiver inicializado !
+    // Se o ata1 não estiver inicializado !
     if ( __breaker_ata1_initialized == 0 )
         return;
 
@@ -37,7 +37,7 @@ void irq14_PRIMARY_IDE (void)
     //
     
 	// Contando as interrupções desse tipo.
-	g_profiler_ints_irq14++;	
+	g_profiler_ints_irq14++;
 	
     ata_irq_invoked = 1; 
 }
@@ -49,9 +49,10 @@ void irq14_PRIMARY_IDE (void)
  *     irq 15 handler
  */
 
-void irq15_SECONDARY_IDE (void)
+__VOID_IRQ 
+irq15_SECONDARY_IDE (void)
 {
-	// Se o ata2 não estiver inicializado !
+    // Se o ata2 não estiver inicializado !
     if ( __breaker_ata2_initialized == 0 )
         return;
 
@@ -60,7 +61,7 @@ void irq15_SECONDARY_IDE (void)
     //
     
 	// Contando as interrupções desse tipo.
-	g_profiler_ints_irq15++;	
+	g_profiler_ints_irq15++;
 	
     ata_irq_invoked = 1; 
 }

@@ -411,7 +411,9 @@ e1000_init_nic (
 
 // Isso é chamado pelo assembly.
 
-void irq_E1000 (void){
+__VOID_IRQ 
+irq_E1000 (void)
+{
 
     uint32_t status=0;
     uint32_t val=0;

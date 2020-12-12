@@ -22,7 +22,11 @@
 
 /* Void */
 typedef void VOID; 
- 
+
+// It will help us to find the irq handlers.
+typedef void __VOID_IRQ; 
+
+
 /* Basics */
 typedef char  CHAR;
 typedef short SHORT;

@@ -121,7 +121,9 @@ void timer (void);
  * #todo: Observar alguns procedimentos antes de chamar a rotina.
  */
  
-void irq0_TIMER (void){
+__VOID_IRQ 
+irq0_TIMER (void)
+{
 
     // Se o timer não estiver inicializado !
     if ( __breaker_timer_initialized == 0 )
