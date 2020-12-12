@@ -1224,8 +1224,12 @@ shellProcedure (
             goto done;
             break;
 
-
-        case MSG_CLOSE:   printf ("MSG_CLOSE\n");   break;
+       //#todo
+        case MSG_CLOSE:   
+            printf ("MSG_CLOSE\n");   
+            exit(0);
+            break;
+            
         case MSG_DESTROY: printf ("MSG_DESTROY\n"); break;
 
 

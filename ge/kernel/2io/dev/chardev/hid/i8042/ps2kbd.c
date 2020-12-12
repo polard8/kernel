@@ -660,40 +660,91 @@ int KEYBOARD_SEND_MESSAGE (unsigned char SC){
     
 done:
 
+    // The host machine normally intercept shortcuts 
+    // started with 'alt' or 'control'. So, this way, 
+    // new hobby operating systems will use shortcuts 
+    // started with 'shift'.
+
+
+    // #test
+    // Maybe it is gonna work on my real machine.
+    // Maybe it fails on a vm.
+    
     /*
     // control + alt + del.
-    if ( (ctrl_status == 1) && (alt_status == 1) && (ch == KEY_DELETE) )
+    if ( (ctrl_status == 1) && (alt_status == 1) && (ch == KEY_DELETE) && (message == MSG_SYSKEYDOWN) )
     {
         debug_print ("KEYBOARD_SEND_MESSAGE: ctrl + alt + del\n");
-        //reboot ();
+        hal_reboot();
     }
     */
 
-
-    // #bugbug
-    // Aplicativos como o gdeshell estao usado essas teclas de funçao.
-    // como o gdeshell eh um aplicativo muito recorrente,
-    // podemos escoler outra forma de mudar de console.
-
-    /*
-    if ( (ctrl_status == 1) && (ch == VK_F1) ){
-        debug_print ("KEYBOARD_SEND_MESSAGE: [Console 1] alt + f1\n");
-        //reboot ();
+    
+    if ( (shift_status == 1) && (ch == VK_F1) && (message == MSG_SYSKEYDOWN) ){
+        debug_print ("KEYBOARD_SEND_MESSAGE: [Console 1] shift + f1\n");
+        printf ("KEYBOARD_SEND_MESSAGE: Switch to console 1\n"); 
         console_switch_to(1);
+        refresh_screen();
+        return 0;
     }
 
-    if ( (ctrl_status == 1) && (ch == VK_F2) ){
-        debug_print ("KEYBOARD_SEND_MESSAGE: [Console 2] alt + f2\n");
-        //reboot ();
+    if ( (shift_status == 1) && (ch == VK_F2) && (message == MSG_SYSKEYDOWN) ){
+        debug_print ("KEYBOARD_SEND_MESSAGE: [Console 2] shift + f2\n");
+        printf ("KEYBOARD_SEND_MESSAGE: Switch to console 2\n"); 
         console_switch_to(2);
+        refresh_screen();
+        return 0;
     }
 
-    if ( (ctrl_status == 1) && (ch == VK_F3) ){
-        debug_print ("KEYBOARD_SEND_MESSAGE: [Console 3] alt + f3\n");
-        //reboot ();
+    if ( (shift_status == 1) && (ch == VK_F3) && (message == MSG_SYSKEYDOWN) ){
+        debug_print ("KEYBOARD_SEND_MESSAGE: [Console 3] shift + f3\n");
+        printf ("KEYBOARD_SEND_MESSAGE: Switch to console 3\n"); 
         console_switch_to(3);
+        refresh_screen();
+        return 0;
     }
-    */
+
+    //===========================
+
+    // control + f1
+    // print the list of keyboard shortcuts.
+    if ( (ctrl_status == 1) && (ch == VK_F1) && (message == MSG_SYSKEYDOWN) )
+    {
+         //todo: create helper functions for this.
+         printf("~ keyboard shortcuts:\n");
+         printf("control + f1: This list\n");
+         printf("alt + f4: Close application\n");
+         printf("shift + f1: switch console\n");
+         printf("shift + f2: switch console\n");
+         printf("shift + f3: switch console\n");
+         refresh_screen();
+         return 0;
+    }
+
+
+    // Fixing the Scan code.
+    tmp_sc = (unsigned long) scancode;
+    tmp_sc = (unsigned long) ( tmp_sc & 0x000000FF );
+
+
+    // Sending commands to the application
+    // Only for the setup input mode.
+    if (current_input_mode == INPUT_MODE_SETUP)
+    {
+        // alt + f4
+        // it works on virtualbox.
+        // 
+        if ( (alt_status == 1) && (ch == VK_F4) && (message == MSG_SYSKEYDOWN) ){
+            kgws_send_to_controlthread_of_currentwindow ( 
+                w,
+               (int) MSG_CLOSE, 
+               (unsigned long) 0, 
+               (unsigned long) 0);
+            refresh_screen();
+            return 0;
+        }
+        //...
+    }
 
 
 	// Nesse momento temos duas opções:
@@ -743,14 +794,6 @@ done:
 	//	t = x_server_thread;
 	//}
 
-
-
-    //
-    // Scan code.
-    //
-
-    tmp_sc = (unsigned long) scancode;
-    tmp_sc = (unsigned long) ( tmp_sc & 0x000000FF );
 
 
 
