@@ -377,9 +377,8 @@ int KEYBOARD_SEND_MESSAGE (unsigned char SC){
 
     // ================================================
     // Se a tecla for (liberada).
-    // Dá '0' se o bit de paridade for '0'.
-
-    if ( (scancode & LDISC_KEY_RELEASED) == 0 )
+    // ligado. tecla liberada.
+    if ( (scancode & LDISC_KEY_RELEASED) != 0 ) // liberada.
     {
         // Desativando o bit de paridade caso esteja ligado.
 
@@ -398,42 +397,50 @@ int KEYBOARD_SEND_MESSAGE (unsigned char SC){
 			//left Shift liberado.
             case VK_LSHIFT: 
                 shift_status = 0;  message = MSG_SYSKEYUP;
+                printf ("VK_LSHIFT: Liberada\n"); refresh_screen();
                 break;
 
 			//Left Control liberado.
             case VK_LCONTROL:
                 ctrl_status = 0;  message = MSG_SYSKEYUP;
+                printf ("VK_LCONTROL: Liberada\n"); refresh_screen();
                 break;
 
 			//left Winkey liberada.
             case VK_LWIN:
                 winkey_status = 0;  message = MSG_SYSKEYUP;
+                printf ("VK_LWIN: Liberada\n"); refresh_screen();
                 break;
 
 			//Left Alt liberado.
             case VK_LMENU:
                 alt_status = 0;  message = MSG_SYSKEYUP;
+                printf ("VK_LMENU: Liberada\n"); refresh_screen();
                 break;
 
 			//right winkey liberada.
             case VK_RWIN:
                 winkey_status = 0;  message = MSG_SYSKEYUP;
+                printf ("VK_RWIN: Liberada\n"); refresh_screen();
                 break;
 
 			//control menu.
             case VK_CONTROL_MENU:
                 //controlmenu_status = 0; //@todo
                 message = MSG_SYSKEYUP;
+                printf ("VK_CONTROL_MENU: Liberada\n"); refresh_screen();
                 break;
 
             //right control liberada.
             case VK_RCONTROL:
                 ctrl_status = 0;  message = MSG_SYSKEYUP;
+                printf ("VK_RCONTROL: Liberada\n"); refresh_screen();
                 break;
 
 			//right Shift liberado.
             case VK_RSHIFT:
                 shift_status = 0;  message = MSG_SYSKEYUP;
+                printf ("VK_RSHIFT: Liberada\n"); refresh_screen();
                 break;
 
             // Funções liberadas.
@@ -487,7 +494,8 @@ int KEYBOARD_SEND_MESSAGE (unsigned char SC){
 
     // ================================================
     // * Tecla (pressionada) ...........
-    if ( (scancode & LDISC_KEY_RELEASED) != 0 )
+    // bit desligado. tecla pressionada.
+    if ( (scancode & LDISC_KEY_RELEASED) == 0 )  // pressionada.
     { 
         key = scancode;
         key &= LDISC_KEY_MASK; //Desativando o bit de paridade caso esteja ligado.
@@ -522,22 +530,26 @@ int KEYBOARD_SEND_MESSAGE (unsigned char SC){
             case VK_LSHIFT:
             //case KEY_SHIFT:
                 shift_status = 1; message = MSG_SYSKEYDOWN;
+                printf ("VK_LSHIFT: Pressionada\n"); refresh_screen();
                 break;
 
 			//left control pressionada.
 			//case KEY_CTRL:
             case VK_LCONTROL:
                 ctrl_status = 1; message = MSG_SYSKEYDOWN;
+                printf ("VK_LCONTROL: Pressionada\n"); refresh_screen();
                 break;
 
 			//Left Winkey pressionada.
             case VK_LWIN:
                 winkey_status = 1; message = MSG_SYSKEYDOWN;
+                printf ("VK_LWIN: Pressionada\n"); refresh_screen();
                 break;
 
             //left Alt pressionada.
             case VK_LMENU:
                 alt_status = 1;  message = MSG_SYSKEYDOWN;
+                printf ("VK_LMENU: Pressionada\n"); refresh_screen();
                 break;
 
 			//@todo alt gr.	
@@ -545,6 +557,7 @@ int KEYBOARD_SEND_MESSAGE (unsigned char SC){
 			//Right Winkey pressionada.
             case VK_RWIN:
                 winkey_status = 1;  message = MSG_SYSKEYDOWN;
+                printf ("VK_RWIN: Pressionada\n"); refresh_screen();
                 break;
 
             //@todo: Control menu.
@@ -552,11 +565,13 @@ int KEYBOARD_SEND_MESSAGE (unsigned char SC){
 			//Right control pressionada.
             case VK_RCONTROL:
                 ctrl_status = 1; message = MSG_SYSKEYDOWN;
+                printf ("VK_RCONTROL: Pressionada\n"); refresh_screen();
                 break;
 
 			//Right shift pressionada.
             case VK_RSHIFT:
                 shift_status = 1; message = MSG_SYSKEYDOWN;
+                printf ("VK_RSHIFT: Pressionada\n"); refresh_screen();
                 break;
 
             case VK_F1: case VK_F2: case VK_F3: case VK_F4:
