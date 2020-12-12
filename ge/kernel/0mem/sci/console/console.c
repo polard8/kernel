@@ -1471,8 +1471,8 @@ void console_init_virtual_console (int n){
     // CONSOLE[ConsoleIndex]._fp
     
     // tty name
-    //CONSOLE[ConsoleIndex].__ttyname[?] 
-    CONSOLE[ConsoleIndex].ttyName_len = 0;  //initialized
+    //CONSOLE[ConsoleIndex].name[?] 
+    CONSOLE[ConsoleIndex].Name_len = 0;  //initialized
 
     //#todo: Indice do dispositivo.
     // CONSOLE[ConsoleIndex].device = 0;   // initialized.

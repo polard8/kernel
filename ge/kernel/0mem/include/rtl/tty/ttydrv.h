@@ -34,13 +34,17 @@
 
 struct ttydrv_d 
 {
+
+    //
+    // == Identification =============
+    //
+
     int index;
-    
     int used;
     int magic;
     
     char name[64];
-
+    size_t Name_len;
 
     // Versionamento simplificado.
     unsigned short major;
@@ -59,12 +63,27 @@ struct ttydrv_d
     // control thread.
     struct process_d *thread;
     
-    
+
+    //
+    // == (1) storage ========
+    //
+
+
     struct tty_d *tty;
-    
     // #todo
     // Maybe we need a tty list.
     
+    
+    //
+    // == (2) synchronization ========
+    //
+
+    //int stopped;
+
+    //
+    // == (3) transmition ========
+    //
+
     
     // #todo:
     // termios(s), tty(s)

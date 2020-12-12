@@ -150,14 +150,16 @@ struct device_d *devmgr_device_object (void){
                  panic ("devmgr_device_object: d"); 
              }
 
-             d->deviceId = i;
+             d->index = i;
+             d->used = 1;
+             d->magic = 1234;
              
-             d->deviceUsed = 1;
-             d->deviceMagic = 1234;
+            
+             //#todo
+             //d->name 
+             d->name[0] = 'x';
+             d->name[1] = 0;
              
-             // ?? name.
-             
-             d->name = (char *) &__noname[0];
              //
              // ...
              //
@@ -245,14 +247,14 @@ devmgr_register_device (
         panic ("devmgr_register_device: d. Couldn't create device object\n");
     }
 
-    if ( d->deviceUsed != 1 || d->deviceMagic != 1234 )
+    if ( d->used != 1 || d->magic != 1234 )
     {
         panic ("devmgr_register_device: d validation \n");
     }
 
     // ID
     
-    id = d->deviceId;
+    id = d->index;
             
     if (id < 0 || id >= DEVICE_LIST_MAX )
     {
@@ -261,7 +263,9 @@ devmgr_register_device (
 
     // Saving.
     f->device = (struct device_d *) d;
-    f->deviceId = d->deviceId; 
+    
+    
+    f->deviceId = d->index; 
     
 
     d->__file = (file *) f;
@@ -278,7 +282,11 @@ devmgr_register_device (
     d->mount_point = (char *) new_mount_point; 
    
     // DEV_8086_8086
-    d->name = (char *) name;
+    //d->name ??
+    
+    //#todo
+    d->name[0] = 'x';
+    d->name[0] = 0;
     
     //
     // The PCI device structure. It is NOT the device structure.
@@ -325,12 +333,12 @@ void devmgr_show_device_list(void)
         if ( (void *) d != NULL )
         {
             //dispositivo válido.
-            if ( d->deviceUsed == 1 && 
-                 d->deviceMagic == 1234 )
+            if ( d->used == 1 && 
+                 d->magic == 1234 )
             {
                 //#todo: more ...
                 printf ( "id=%d class=%d type=%d name={%s} mount_point={%s} \n", 
-                    d->deviceId, 
+                    d->index, 
                     d->__class, 
                     d->type, 
                     d->name,

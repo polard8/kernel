@@ -40,15 +40,37 @@ struct device_class_d
 // Device structure.
 struct device_d 
 {
+    //
+    // == Identification =============
+    //
+
     object_type_t  objectType;
     object_class_t objectClass;
 
 
-    int deviceId;
+    int index;
+    int used;
+    int magic;
 
-    int deviceUsed;
-    int deviceMagic;
+    //name for pci devices: "/DEV_8086_8086"  
+    char name[64];
+    size_t Name_len;    
 
+    // #todo: merge.
+    // char, block, network
+    int __class;
+    // struct more complete, with a lot of information.
+    struct device_class_d *_class; 
+
+    // pci, legacy ...
+    int type;
+
+
+    //
+    // == (1) storage ========
+    //
+
+    // object? or buffer ?
     file *__file;  //??
 
     // #importante
@@ -57,21 +79,7 @@ struct device_d
     // /dev/tty0
     char *mount_point;
     
-    //name for pci devices: "/DEV_8086_8086"  
-    char *name;
-    
 
-    // #todo: merge.
-    // char, block, network
-
-    int __class;
-    
-    // struct more complete, with a lot of information.
-    struct device_class_d *_class; 
-
-
-    // pci, legacy ...
-    int type;
     
     // Se o tipo for pci.
     struct pci_device_d *pci_device;
@@ -103,9 +111,22 @@ struct device_d
     // mas está bom assim.
     struct ttydrv_d *ttydrv;
     
+    //
+    // == (1) storage ========
+    //
+
     
     struct tty_d *tty;
 
+    //
+    // == (2) synchronization ========
+    //
+
+    //int stopped;
+
+    //
+    // == (3) transmition ========
+    //
 
 	//
 	// Continua ...

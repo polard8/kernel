@@ -143,14 +143,13 @@ struct tty_d
     
     // In the TTYs table?
     int index;
-    
     int used;
     int magic;
 
     // tty name
-    char __ttyname[64];    // 
-    size_t ttyName_len;    // len 
-    
+    char name[64];      // 
+    size_t Name_len;    // len 
+
     
     //
     // == (1) storage ========
@@ -430,16 +429,19 @@ __tty_read (
     int nr );
 
 int 
-__tty_write ( struct tty_d *tty, 
-              char *buffer, 
-              int nr );
+__tty_write ( 
+    struct tty_d *tty, 
+    char *buffer, 
+    int nr );
 
 
+// flush the output buffer to the current virtual console.
+void tty_flush( struct tty_d *tty );
 
-int tty_ioctl ( int fd, unsigned long request,  unsigned long arg );
 
 void tty_reset_termios ( struct tty_d *tty );
 
+int tty_ioctl ( int fd, unsigned long request,  unsigned long arg );
 
 
 // Escreve na tty de um processo alvo e envia uma mensagem pra

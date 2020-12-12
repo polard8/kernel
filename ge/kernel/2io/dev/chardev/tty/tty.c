@@ -107,6 +107,8 @@ struct tty_d *tty_create (void){
     }else{
         __tty->objectType  = ObjectTypeTTY;
         __tty->objectClass = ObjectClassKernelObjects;
+        
+        //__tty->index = ?;
         __tty->used = 1;
         __tty->magic = 1234;
 
@@ -134,8 +136,8 @@ struct tty_d *tty_create (void){
     
         // tty name
         // isso sera tratado la em baixo.
-        //__tty->__ttyname[?] 
-        __tty->ttyName_len = 0;  //initialized
+        //__tty->name[?] 
+        __tty->Name_len = 0;  //initialized
 
         //#todo: Indice do dispositivo.
         // __tty->device = 0;   // initialized.
@@ -954,6 +956,16 @@ tty_write (
 }
 
 
+
+// #todo
+// flush the output buffer to the current virtual console.
+void tty_flush( struct tty_d *tty )
+{
+    // todo
+    debug_print("tty_flush: [TODO]\n");
+}
+
+
 // Copia a estrutura de termios
 // para o aplicativo em ring3 poder ler.
 int 
@@ -1613,6 +1625,70 @@ int initialize_tty_struct (struct tty_d *tty)
 }
 */
 
+
+/*
+const char *tty_name( struct tty_d *tty );
+const char *tty_name( struct tty_d *tty )
+{
+    if ( (void *) tty == NULL )
+    {
+        //return "NULL tty";
+        return NULL;
+    }
+
+    return (const char *) tty->name;
+}
+*/
+
+
+/*
+const char *tty_driver_name( struct tty_d *tty);
+const char *tty_driver_name( struct tty_d *tty)
+{
+    struct ttydrv_d *driver;
+    
+    if ( (void *) tty == NULL )
+    {
+        //return "NULL tty";
+        return NULL;
+    }
+    
+    driver = (struct ttydrv_d *) tty->driver;
+
+    if ( (void *) driver == NULL )
+    {
+        //return "NULL tty driver";
+        return NULL;
+    }
+    
+   return (const char *) driver->name;
+}
+*/
+
+
+/*
+const char *tty_device_name( struct tty_d *tty);
+const char *tty_device_name( struct tty_d *tty)
+{
+    struct device_d *device;
+
+    if ( (void *) tty == NULL )
+    {
+        //return "NULL tty";
+        return NULL;
+    }
+    
+    device = (struct device_d *) tty->device;
+
+    if ( (void *) device == NULL )
+    {
+        //return "NULL tty device";
+        return NULL;
+    }
+    
+   return (const char *) device->name;
+}
+*/
 
 
 int tty_init_module (void)
