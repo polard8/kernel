@@ -107,17 +107,31 @@ void ps2 (void)
     wait_then_write (0x64,0xAD);  // Disable keyboard port.
     wait_then_write (0x64,0xA7);  // Disable mouse port.
 
+
+    // #bugbug
+    // A inicializaçao de um esta afetando a inicializaçao do outro.
+    // As vezes prejudicando a inicializaçao de ambos.
+
     // Keyboard.
     printf ("ps2: Initializing keyboard ..\n");
     refresh_screen();
     ps2kbd_initialize_device ();
     PS2.keyboard_initialized = TRUE;
         
+        
     // Mouse.
     printf ("ps2: Initializing mouse ..\n");
     refresh_screen();
     ps2mouse_initialize_device ();
     PS2.mouse_initialized = TRUE;
+
+
+    // Keyboard.
+    //printf ("ps2: Initializing keyboard ..\n");
+    //refresh_screen();
+    //ps2kbd_initialize_device ();
+    //PS2.keyboard_initialized = TRUE;
+
 
     // ======================================
     // Reactivate ports!
