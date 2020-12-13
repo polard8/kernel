@@ -2416,7 +2416,6 @@ do_compare:
     {
         printf("\n");
         gramado_system_call ( 350, 1, 0, 0 );
-        gramado_system_call ( 350, 1, 0, 0 );
         goto exit_cmp; 
     }
 
@@ -2668,9 +2667,7 @@ do_compare:
         //stdout
         printf ("t4: Open and reading a file\n");
         f1 = fopen ("gramado.txt","rb");
-        //f1 = stdin;
-        //f1 = stdout;
-        //f1 = stderr;
+        
         if ( f1 == NULL ){
             printf ("fopen fail\n");  //stdout
             goto exit_cmp;

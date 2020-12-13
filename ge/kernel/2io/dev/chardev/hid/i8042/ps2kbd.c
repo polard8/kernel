@@ -1528,9 +1528,9 @@ void ps2kbd_initialize_device (void)
             panic("ps2kbd_initialize_device: devmgr_register_device fail");
         }
         
-        PS2KeyboardDeviceObject    = (file *)            __file;                  // object file
-        PS2KeyboardDevice          = (struct device_d *) __file->device;          // device struct
-        PS2KeyboardDeviceTTYDriver = (struct ttydrv_d *) __file->device->ttydrv;  // driver struct.
+        PS2KeyboardDeviceObject = (file *) __file;               // object file
+        PS2KeyboardDevice = (struct device_d *) __file->device;  // device struct
+        PS2KeyboardDeviceTTYDriver = (struct ttydrv_d *) __file->device->ttydrv; // driver struct.
 
         // #hackhack
         // Actually we need to create a tty for all the devices.
@@ -1541,9 +1541,6 @@ void ps2kbd_initialize_device (void)
         if ( (void *) PS2KeyboardDeviceTTY == NULL ){
            panic("ps2kbd_initialize_device: PS2KeyboardDeviceTTY fail");   
         }
-        
-        
-        
         // ...
     };
 
