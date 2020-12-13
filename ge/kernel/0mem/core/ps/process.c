@@ -1150,10 +1150,11 @@ struct process_d *create_process (
     // Process.
     //
 
-    Process = (void *) kmalloc ( sizeof(struct process_d) );
-
     // #todo: 
     // Aqui pode retornar NULL.
+    
+    Process = (void *) kmalloc ( sizeof(struct process_d) );
+    
     if ( (void *) Process == NULL ){
         panic ("process-create_process: Process");
     }
@@ -1262,16 +1263,24 @@ struct process_d *create_process (
         panic ("create_process: [TEST] stderr");
     }
         
-        // #bugbug
-        // precisamos colocar os arquivos também na lista
-        // global de arquivos abertos. openfileList[]
-        // See: fs.c
+    // #bugbug
+    // precisamos colocar os arquivos também na lista
+    // global de arquivos abertos. openfileList[]
+    // See: fs.c
      
-        // O fluxo padrão foi criando antes em klib/kstdio.c
-        // #todo: Checar as características desses arquivos.
-    Process->Objects[0] = (unsigned long) stdin;
+    // O fluxo padrão foi criando antes em klib/kstdio.c
+    // #todo: Checar as características desses arquivos.
+
+    // #bugbug: PS2KeyboardDeviceObject is not initialized.
+    // if ( (void *) PS2KeyboardDeviceObject == NULL ){
+    //    panic ("create_process: [TEST] PS2KeyboardDeviceObject");
+    // }
+
+    //Process->Objects[0] = (unsigned long) PS2KeyboardDeviceObject;  
+    Process->Objects[0] = (unsigned long) stdin; 
     Process->Objects[1] = (unsigned long) stdout;
     Process->Objects[2] = (unsigned long) stderr;
+
 
 
     //Process->terminal =
@@ -1767,15 +1776,14 @@ void show_currentprocess_info (void){
         printf (">>DirectoryVA={%x} \n", Current->DirectoryVA );
 
 		//Heap and stack.
-        printf("Heap={%x}  HeapSize={%d KB}  \n", Current->Heap, 
-            Current->HeapSize );
+        printf ("Heap={%x}  HeapSize={%d KB}  \n", 
+            Current->Heap, Current->HeapSize );
 
-        printf("Stack={%x} StackSize={%d KB} \n", Current->Stack, 
-            Current->StackSize );
+        printf("Stack={%x} StackSize={%d KB} \n", 
+            Current->Stack, Current->StackSize );
 
 		//...
     };
-
 
     refresh_screen();
 }
@@ -1813,21 +1821,22 @@ void show_process_information (void)
                       p->magic == 1234 )
         { 
 
-            //printf("\n");
-            printf("\n=====================================\n");
+            printf("\n ===================== \n");
             printf(">>[%s]\n",p->__processname);
-            printf("PID=%d PPID=%d \n", p->pid,  p->ppid );
+            printf("PID=%d PPID=%d \n", p->pid, p->ppid );
             
-            printf("image-base =%x image-size =%d \n", p->Image, p->ImageSize );
-            printf("heap-base  =%x heap-size  =%d \n", p->Heap, p->HeapSize );
-            printf("stack-base =%x stack-size =%d \n", p->Stack, p->StackSize );
-
-            printf("dir-pa=%x dir-va=%x \n", p->DirectoryPA, p->DirectoryVA );
-
-            printf("iopl=%d prio=%d state=%d \n", p->iopl, p->priority, p->state );
+            printf("image-base =%x image-size =%d \n", 
+                p->Image, p->ImageSize );
+            printf("heap-base  =%x heap-size  =%d \n", 
+                p->Heap, p->HeapSize );
+            printf("stack-base =%x stack-size =%d \n", 
+                p->Stack, p->StackSize );
+            printf("dir-pa=%x dir-va=%x \n", 
+                p->DirectoryPA, p->DirectoryVA );
+            printf("iopl=%d prio=%d state=%d \n", 
+                p->iopl, p->priority, p->state );
         }
-
-		//Nothing.
+    //Nothing.
     };
 
     refresh_screen();
@@ -1945,8 +1954,8 @@ void init_tasks (void)
  * usadas no gerenciamento de processo.
  */
  
-void init_processes (void){
-
+void init_processes (void)
+{
     int i=0;
 
 	//
@@ -1972,7 +1981,6 @@ void init_processes (void){
         i++;
     };
 
-
     // More ?
 }
 
@@ -1994,11 +2002,11 @@ void init_processes (void){
  * Fechar as threads seguindo a lista encadeada.
  */
 
-void exit_process ( pid_t pid, int code ){
+void exit_process ( pid_t pid, int code )
+{
+    struct process_d  *Process;
+    struct thread_d   *__Thread;    
 
-    struct process_d *Process;
-    struct thread_d *__Thread;    
-    
     //list;
     struct thread_d *Threads;
     
@@ -2216,8 +2224,8 @@ void set_caller_process_id (int pid)
  *     processInitializeProcessManager();
  */
 
-int init_process_manager (void){
-
+int init_process_manager (void)
+{
     caller_process_id = (int) 0;
 
     processNewPID = (int) USER_BASE_PID;
@@ -2536,8 +2544,9 @@ int process_get_tty (int pid){
 
     // Usada para debug.
   
-    struct process_d *p;
-    struct tty_d *tty;
+    struct process_d  *p;
+    struct tty_d      *tty;
+
 
     //#debug
     //printf ("process_get_tty: pid %d \n", pid);
@@ -2960,10 +2969,8 @@ format_ok:
 
     Thread = (struct thread_d *) threadList[current_thread];
 
-    if ( (void *) Thread == NULL )
-    {
+    if ( (void *) Thread == NULL ){
         panic ("process_execve: Thread fail\n");
-
     }else{
 
 		// #importante:
@@ -3037,10 +3044,9 @@ format_ok:
         // Next thread.
         Thread->next = NULL;
 
-		// Thread queue.
-        queue_insert_data ( queue, 
-            (unsigned long) Thread, 
-            QUEUE_INITIALIZED );
+        // Thread queue.
+        queue_insert_data ( 
+            queue, (unsigned long) Thread, QUEUE_INITIALIZED );
 
 
 		// #importante:
@@ -3049,7 +3055,6 @@ format_ok:
 
         SelectForExecution (Thread); 
 
-        
         // #debug
         //printf ("do_execve: Spawn thread \n");
         //refresh_screen();
@@ -3062,13 +3067,10 @@ format_ok:
         panic ("process_execve: KiSpawnTask returned ");
     };
 
-	// fail
-	
+// fail
 fail:
-
     printf ("process_execve: Fail\n");
-	// refresh_screen ();
-
+    // refresh_screen ();
 done:
 
 	//#debug
