@@ -603,19 +603,39 @@ void ps2mouse_initialize_device (void)
             panic("ps2mouse_initialize_device: devmgr_register_device fail");
         } 
         
+        
+        
+        //object
         PS2MouseDeviceObject = (file *) __file;  //object file
+        if ( (void *) PS2MouseDeviceObject == NULL ){
+           panic("ps2kbd_initialize_device: PS2MouseDeviceObject fail");   
+        }
+        
+        
+        //device
         PS2MouseDevice = (struct device_d *) __file->device;   //device structure.
-        PS2MouseDeviceTTYDriver = (struct ttydrv_d *) __file->device->ttydrv; // driver struct.
-
+        if ( (void *) PS2MouseDevice == NULL ){
+           panic("ps2kbd_initialize_device: PS2MouseDevice fail");   
+        }
+        
+        //driver
+        //PS2MouseDeviceTTYDriver = (struct ttydrv_d *) __file->device->ttydrv; // driver struct.
+        //if ( (void *) PS2MouseDeviceTTYDriver == NULL ){
+        //   panic("ps2kbd_initialize_device: PS2MouseDeviceTTYDriver fail");   
+        //}
+        
+        
         // #hackhack
         // Actually we need to create a tty for all the devices.
         // And it needs to be done in devmgr_register_device
         // But we do not have all these resources roght now.
-            
+        
+        //tty
         PS2MouseDeviceTTY = (struct tty_d *) tty_create();
         if ( (void *) PS2MouseDeviceTTY == NULL ){
-           panic("ps2mouse_initialize_device: PS2MouseDeviceTTY fail");   
+           panic("ps2kbd_initialize_device: PS2MouseDeviceTTY fail");   
         }
+
      
         // ...
     };

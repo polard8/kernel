@@ -50,13 +50,20 @@ static const char *ata_sub_class_code_register_strings[] = {
 extern st_dev_t *current_dev;
 
 
-void ata_wait (int val){
+void ata_wait (int val)
+{
+
+    if ( val <= 0 )
+    {
+        val = 400;
+    }
 
     val = ( val/100 );
 
     while (val--)
     {
-        io_delay ();
+        io_delay();
+        //io_delay();
     };
 }
 
@@ -64,11 +71,14 @@ void ata_wait (int val){
 // Forces a 400 ns delay.
 void ata_delay (void)
 {
-    int i;
+    int i=0;
 
     // Waste some time.
     for (i = 0; i < 5; i++)
+    {
         __x86_io_delay ();
+        //__x86_io_delay ();
+    };
 }
 
 
@@ -76,8 +86,9 @@ void ata_delay (void)
 // TODO: 
 // Ao configurar os bits BUSY e DRQ devemos verificar retornos de erros.
 
-unsigned char ata_wait_not_busy (void){
-	
+unsigned char ata_wait_not_busy (void)
+{
+
     while ( ata_status_read() & ATA_SR_BSY )
         if ( ata_status_read() & ATA_SR_ERR )
             return 1;
@@ -86,7 +97,8 @@ unsigned char ata_wait_not_busy (void){
 }
 
 
-unsigned char ata_wait_busy (void){
+unsigned char ata_wait_busy (void)
+{
 
     while (!(ata_status_read() & ATA_SR_BSY ))
         if ( ata_status_read() & ATA_SR_ERR )
@@ -96,7 +108,8 @@ unsigned char ata_wait_busy (void){
 }
 
 
-unsigned char ata_wait_no_drq (void){
+unsigned char ata_wait_no_drq (void)
+{
 
     while ( ata_status_read() & ATA_SR_DRQ )
         if ( ata_status_read() & ATA_SR_ERR )
@@ -106,7 +119,8 @@ unsigned char ata_wait_no_drq (void){
 }
 
 
-unsigned char ata_wait_drq (void){
+unsigned char ata_wait_drq (void)
+{
 
     while (!(ata_status_read () & ATA_SR_DRQ))
         if ( ata_status_read () & ATA_SR_ERR )
@@ -115,9 +129,10 @@ unsigned char ata_wait_drq (void){
     return 0;
 }
 
- 
-void ata_soft_reset (void){
 
+// ata soft reset. 
+void ata_soft_reset (void)
+{
     //unsigned char data = in8 ( ata.ctrl_block_base_address + 2 );
     unsigned char data = in8 ( ata.ctrl_block_base_address );
     
@@ -130,14 +145,14 @@ void ata_soft_reset (void){
 // Lê o status de um disco determinado, se os valores na estrutura 
 // estiverem certos.
 
-unsigned char ata_status_read (void){
-
+unsigned char ata_status_read (void)
+{
     return in8 ( ata.cmd_block_base_address + ATA_REG_STATUS );
 }
 
 
-void ata_cmd_write (int cmd_val){
-
+void ata_cmd_write (int cmd_val)
+{
     // no_busy 
 
     ata_wait_not_busy ();
@@ -153,7 +168,11 @@ void ata_cmd_write (int cmd_val){
 // ?
 // Salvando canal e número do dispositivo de acordo com a porta.
 
-unsigned char ata_assert_dever (char nport){
+unsigned char ata_assert_dever (char nport)
+{
+
+    // todo
+    // filtrar limits.
 
     switch (nport){
 
@@ -178,7 +197,8 @@ unsigned char ata_assert_dever (char nport){
         break;
 
     default:
-        kprintf ("Port %d not used\n", nport );
+        // panic ?
+        printk ("Port %d not used\n", nport );
         return -1;
         break;
     };
@@ -195,13 +215,14 @@ unsigned char ata_assert_dever (char nport){
  * ide_identify_device:
  */
 
-int ide_identify_device ( uint8_t nport ){
+int ide_identify_device ( uint8_t nport )
+{
+    unsigned char status=0;
 
-    unsigned char status;
-    unsigned char lba1, lba2;
+    unsigned char lba1 = 0; 
+    unsigned char lba2 = 0;
 
     struct disk_d *disk;
-    
     
     char name_buffer[32];
 
@@ -272,12 +293,11 @@ int ide_identify_device ( uint8_t nport ){
         ide_ports[nport].dev_num = ata.dev_num;
 
         //salvando o tipo em estrutura de porta.
-        ide_ports[nport].id = (uint8_t) nport;
-        ide_ports[nport].used = (int) 1;
+        ide_ports[nport].id    = (uint8_t) nport;
+        ide_ports[nport].used  = (int) 1;
         ide_ports[nport].magic = (int) 1234;
-        ide_ports[nport].name = "PATA";
-        ide_ports[nport].type = (int) idedevicetypesPATA;
-
+        ide_ports[nport].name  = "PATA";
+        ide_ports[nport].type  = (int) idedevicetypesPATA;
 
         disk = (struct disk_d *) kmalloc ( sizeof(struct disk_d) );
 
@@ -292,7 +312,6 @@ int ide_identify_device ( uint8_t nport ){
             
             disk->used = 1;
             disk->magic = 1234;
-            
             
             // name = "sd?"
             //disk->name = "PATA-TEST";
@@ -325,11 +344,11 @@ int ide_identify_device ( uint8_t nport ){
         ide_ports[nport].dev_num = ata.dev_num;
 
         //salvando o tipo em estrutura de porta.
-        ide_ports[nport].id = (uint8_t) nport;
-        ide_ports[nport].used = (int) 1;
+        ide_ports[nport].id    = (uint8_t) nport;
+        ide_ports[nport].used  = (int) 1;
         ide_ports[nport].magic = (int) 1234;
-        ide_ports[nport].name = "SATA";
-        ide_ports[nport].type = (int) idedevicetypesSATA;
+        ide_ports[nport].name  = "SATA";
+        ide_ports[nport].type  = (int) idedevicetypesSATA;
 
         disk = (struct disk_d *) kmalloc (  sizeof(struct disk_d) );
 
@@ -371,14 +390,14 @@ int ide_identify_device ( uint8_t nport ){
         ata_wait_no_drq();
 
 		ide_ports[nport].channel = ata.channel;
-		ide_ports[nport].dev_num = ata.dev_num;			
+		ide_ports[nport].dev_num = ata.dev_num;
 		
         //salvando o tipo em estrutura de porta.
-        ide_ports[nport].id = (uint8_t) nport;
-        ide_ports[nport].used = (int) 1;
+        ide_ports[nport].id    = (uint8_t) nport;
+        ide_ports[nport].used  = (int) 1;
         ide_ports[nport].magic = (int) 1234;
-        ide_ports[nport].name = "PATAPI";
-        ide_ports[nport].type = (int) idedevicetypesPATAPI;
+        ide_ports[nport].name  = "PATAPI";
+        ide_ports[nport].type  = (int) idedevicetypesPATAPI;
 		
 		
 		disk = (struct disk_d *) kmalloc (  sizeof(struct disk_d) );
@@ -419,11 +438,11 @@ int ide_identify_device ( uint8_t nport ){
         ide_ports[nport].dev_num = ata.dev_num;
 
         //salvando o tipo em estrutura de porta.
-        ide_ports[nport].id = (uint8_t) nport;
-        ide_ports[nport].used = (int) 1;
+        ide_ports[nport].id    = (uint8_t) nport;
+        ide_ports[nport].used  = (int) 1;
         ide_ports[nport].magic = (int) 1234;
-        ide_ports[nport].name = "SATAPI";
-        ide_ports[nport].type = (int) idedevicetypesSATAPI;
+        ide_ports[nport].name  = "SATAPI";
+        ide_ports[nport].type  = (int) idedevicetypesSATAPI;
 
 		disk = (struct disk_d *) kmalloc (  sizeof(struct disk_d) );
 		if ((void *) disk != NULL )
@@ -448,17 +467,21 @@ int ide_identify_device ( uint8_t nport ){
         return (int) 0x80;
     }
 
-
-    return 0;   
+    return 0; 
 }
+
 
 
 // #atenção.
 extern st_dev_t *current_dev;
 
 
-void set_ata_addr (int channel){
+void set_ata_addr (int channel)
+{
 
+    // #todo
+    // filtrar limites.
+    
     switch (channel){
 
         case ATA_PRIMARY:
@@ -481,11 +504,10 @@ void set_ata_addr (int channel){
 
 
 
-/* *
+/* 
  * Obs:
  * O que segue são rotinas de suporte ao controlador IDE.
  */
-
 
 st_dev_t *current_dev;       // A unidade atualmente selecionada.
 st_dev_t *ready_queue_dev;   // O início da lista.
@@ -499,9 +521,9 @@ uint32_t  dev_next_pid = 0;  // O próximo ID de unidade disponível.
  *     Rotina de inicialização de dispositivo de armazenamento de dados.
  */
 
-void ide_mass_storage_initialize (void){
-
-    int port;
+void ide_mass_storage_initialize (void)
+{
+    int port=0;
 
     //
     // Vamos trabalhar na lista de dispositivos.
@@ -513,7 +535,7 @@ void ide_mass_storage_initialize (void){
 
     if ( (void *) ready_queue_dev == NULL )
     {
-        panic ("ide_mass_storage_initialize:");
+        panic ("ide_mass_storage_initialize: ready_queue_dev\n");
     }
 
 
@@ -521,10 +543,10 @@ void ide_mass_storage_initialize (void){
 
     current_dev->dev_id = dev_next_pid++;
 
-    current_dev->dev_type = -1;
-    current_dev->dev_num = -1;
+    current_dev->dev_type    = -1;
+    current_dev->dev_num     = -1;
     current_dev->dev_channel = -1;
-    current_dev->dev_nport = -1;
+    current_dev->dev_nport   = -1;
 
     current_dev->next = NULL;
 
@@ -534,7 +556,7 @@ void ide_mass_storage_initialize (void){
 
     if ( (void *) ata_identify_dev_buf == NULL )
     {
-        panic ("ide_mass_storage_initialize: buffer");
+        panic ("ide_mass_storage_initialize: ata_identify_dev_buf \n");
     }
 
 
@@ -548,7 +570,7 @@ void ide_mass_storage_initialize (void){
     for ( port=0; port < 4; port++ )
     {
         ide_dev_init (port);
-    }
+    };
 }
 
 
@@ -558,9 +580,9 @@ void ide_mass_storage_initialize (void){
  *     ?? Alguma rotina de configuração de dispositivos.
  */
 
-int ide_dev_init (char port){
-
-    int data;
+int ide_dev_init (char port)
+{
+    int data=0;
 
     // #bugbug
     // Mudar esse jeito de declarar esse ponteiro de estrutura.
@@ -744,7 +766,8 @@ int ide_dev_init (char port){
  *     ?? Porque esse tipo ?? 
  */
 
-static inline void dev_switch (void){
+static inline void dev_switch (void)
+{
 
     // ??
     // Pula, se ainda não tiver nenhuma unidade.
@@ -773,10 +796,13 @@ static inline void dev_switch (void){
  *     ?? Deve ser algum suporte a Processos.
  */
 
-static inline int getpid_dev (void){
+static inline int getpid_dev (void)
+{
 
     if ( (void *) current_dev == NULL )
+    {
         return -1;
+    }
 
 
     return current_dev->dev_id;
@@ -787,7 +813,8 @@ static inline int getpid_dev (void){
  * getnport_dev: 
  */
 
-static inline int getnport_dev (void){
+static inline int getnport_dev (void)
+{
 
     if ( (void *) current_dev == NULL )
         return -1;
@@ -801,7 +828,8 @@ static inline int getnport_dev (void){
  * nport_ajuste:
  */
 
-int nport_ajuste ( char nport ){
+int nport_ajuste ( char nport )
+{
 
     char i = 0;
 
@@ -835,26 +863,29 @@ int nport_ajuste ( char nport ){
  */
 
 
+// #todo:
+// avoid this for compatibility with another compiler.
 
-void ata_pio_read ( void *buffer, int bytes ){
-
-    __asm__ __volatile__ (\
-                "cld;\
-                rep; insw"::"D"(buffer),\
-                "d"(ata.cmd_block_base_address + ATA_REG_DATA),\
-                "c"(bytes/2) );
+void ata_pio_read ( void *buffer, int bytes )
+{
+    asm volatile  (\
+        "cld;\
+        rep; insw"::"D"(buffer),\
+        "d"(ata.cmd_block_base_address + ATA_REG_DATA),\
+        "c"(bytes/2) );
 }
 
+// #todo:
+// avoid this for compatibility with another compiler.
 
-void ata_pio_write ( void *buffer, int bytes ){
-
-    __asm__ __volatile__ (\
-                "cld;\
-                rep; outsw"::"S"(buffer),\
-                "d"(ata.cmd_block_base_address + ATA_REG_DATA),\
-                "c"(bytes/2) );
+void ata_pio_write ( void *buffer, int bytes )
+{
+    asm volatile  (\
+        "cld;\
+        rep; outsw"::"S"(buffer),\
+        "d"(ata.cmd_block_base_address + ATA_REG_DATA),\
+        "c"(bytes/2) );
 }
-
 
 
 /*
@@ -874,13 +905,17 @@ extern uint8_t *dma_addr;
  * 
  */
  
-static inline void atapi_pio_read ( void *buffer, uint32_t bytes ){
+static inline void atapi_pio_read ( void *buffer, uint32_t bytes )
+{
 
-    __asm__ __volatile__ (\
-                "cld;\
-                rep; insw"::"D"(buffer),\
-                "d"(ata.cmd_block_base_address + ATA_REG_DATA),\
-                "c"(bytes/2) );
+// #todo
+// Avoid this for compatibility with another compiler.
+
+    asm volatile  (\
+        "cld;\
+        rep; insw"::"D"(buffer),\
+        "d"(ata.cmd_block_base_address + ATA_REG_DATA),\
+        "c"(bytes/2) );
 }
 
  
@@ -895,30 +930,32 @@ unsigned char *dma_addr;
  *     Inicializa o IDE e mostra informações sobre o disco.
  */
  
-int ata_initialize ( int ataflag ){
-
+int ata_initialize ( int ataflag )
+{
     __breaker_ata1_initialized = 0;
     __breaker_ata2_initialized = 0;
-    
-    int Status = 1;  
-    int port;
 
-    unsigned char bus;
-    unsigned char dev;
-    unsigned char fun;
+
+    int Status = 1;  
+    int port=0;
+
+    unsigned char bus=0;
+    unsigned char dev=0;
+    unsigned char fun=0;
 
     int Ret = -1;
 
 
 	//
-	//    ## IMPORTANTE ##   HACK HACK !!
+	//  HACK HACK !!
 	//
 
-
+	// #importante:
 	// Isso é provisório.
 	// #todo: 
 	// Criar rotina que identifica em qual canal e dispositivo estamos atuando.
 	// Isso foi definido em config.h
+    // See: config.h
 
     g_current_ide_channel =  __IDE_PORT;
     g_current_ide_device =  __IDE_SLAVE;
@@ -945,52 +982,55 @@ int ata_initialize ( int ataflag ){
 	// #test
 	// Sondando na lista de dispositivos encontrados pra ver se tem algum
 	// controlador de disco IDE.
+	// #importante:
+	// Estamos sondando uma lista que contruimos quando fizemos
+	// uma sondagem no começo da inicializaçao do kernel.
+	// #todo: podemos salvar essa lista.
+	
+	// #todo
+	// O que eh PCIDeviceATA?
+	// Eh uma estrutura para dispositivos pci. (pci_device_d)
+	// Vamos mudar de nome.
 
-    ata_pci = (struct pci_device_d *) scan_pci_device_list2 ( (unsigned char) PCI_CLASSCODE_MASS, 
-                                          (unsigned char) PCI_SUBCLASS_IDE );
+    PCIDeviceATA = (struct pci_device_d *) scan_pci_device_list2 ( 
+                                        (unsigned char) PCI_CLASSCODE_MASS, 
+                                        (unsigned char) PCI_SUBCLASS_IDE );
 
-
-    if ( (void *) ata_pci == NULL )
-    {
-        panic ("ata_initialize: ata_pci");
-
+    if ( (void *) PCIDeviceATA == NULL ){
+        panic ("ata_initialize: PCIDeviceATA\n");
     }else{
-
-        if ( ata_pci->used != 1 || ata_pci->magic != 1234 )
+        if ( PCIDeviceATA->used != 1 || PCIDeviceATA->magic != 1234 )
         {
-            panic ("ata_initialize: Validation");
+            panic ("ata_initialize: Validation\n");
         }
 
 		//#debug
 		//kprintf ("ata-diskATAInitialize: IDE device found\n");
-		//kprintf ("[ Vendor=%x Device=%x ]\n", ata_pci->Vendor, ata_pci->Device );
+		//kprintf ("[ Vendor=%x Device=%x ]\n", PCIDeviceATA->Vendor, PCIDeviceATA->Device );
 
     };
-
 
 	//
 	// Vamos saber mais sobre o dispositivo encontrado. 
 	//
 
-
 	// #bugbug: 
 	// Esse data é só um código de erro.
 
-    Ret = (unsigned long) diskATAPCIConfigurationSpace ( ata_pci );
+    Ret = (unsigned long) diskATAPCIConfigurationSpace(PCIDeviceATA);
 
-    if ( Ret == PCI_MSG_ERROR ){
-        kprintf ("ata_initialize: Error Driver [%x]\n", Ret );
+    if ( Ret == PCI_MSG_ERROR )
+    {
+        printk ("ata_initialize: Error Driver [%x]\n", Ret );
         Status = (int) 1;
         goto fail;  
     }
-
 
 	//
 	// Salvando informações.
 	//
 
-
-	// Aqui estamos pegando informações na estrutura ata_pci sobre as BARs 
+	// Aqui estamos pegando informações na estrutura PCIDeviceATA sobre as BARs 
 	// e manipulando essas informações.
 	// ?? Não sei o que está fazendo aqui, talvez procurando endereço de porta.
 
@@ -998,14 +1038,13 @@ int ata_initialize ( int ataflag ){
     // Initialize base address
     // AHCI/IDE Compativel com portas IO IDE legado
 
-    ATA_BAR0 = ( ata_pci->BAR0 & ~7 ) + ATA_IDE_BAR0 * ( !ata_pci->BAR0 );
-    ATA_BAR1 = ( ata_pci->BAR1 & ~3 ) + ATA_IDE_BAR1 * ( !ata_pci->BAR1 );       
-    ATA_BAR2 = ( ata_pci->BAR2 & ~7 ) + ATA_IDE_BAR2 * ( !ata_pci->BAR2 );
-    ATA_BAR3 = ( ata_pci->BAR3 & ~3 ) + ATA_IDE_BAR3 * ( !ata_pci->BAR3 );
+    ATA_BAR0 = ( PCIDeviceATA->BAR0 & ~7 ) + ATA_IDE_BAR0 * ( !PCIDeviceATA->BAR0 );
+    ATA_BAR1 = ( PCIDeviceATA->BAR1 & ~3 ) + ATA_IDE_BAR1 * ( !PCIDeviceATA->BAR1 );       
+    ATA_BAR2 = ( PCIDeviceATA->BAR2 & ~7 ) + ATA_IDE_BAR2 * ( !PCIDeviceATA->BAR2 );
+    ATA_BAR3 = ( PCIDeviceATA->BAR3 & ~3 ) + ATA_IDE_BAR3 * ( !PCIDeviceATA->BAR3 );
 
-    ATA_BAR4 = ( ata_pci->BAR4 & ~0x7 ) + ATA_IDE_BAR4 * ( !ata_pci->BAR4 );
-    ATA_BAR5 = ( ata_pci->BAR5 & ~0xf ) + ATA_IDE_BAR5 * ( !ata_pci->BAR5 );
-
+    ATA_BAR4 = ( PCIDeviceATA->BAR4 & ~0x7 ) + ATA_IDE_BAR4 * ( !PCIDeviceATA->BAR4 );
+    ATA_BAR5 = ( PCIDeviceATA->BAR5 & ~0xf ) + ATA_IDE_BAR5 * ( !PCIDeviceATA->BAR5 );
 
 
 	//
@@ -1133,9 +1172,7 @@ int ata_initialize ( int ataflag ){
 
 
 fail:
-    kprintf ("ata_initialize: fail\n"); 
-
-
+    printk ("ata_initialize: fail\n"); 
 done:
 
 //#ifdef KERNEL_VERBOSE 
@@ -1167,23 +1204,21 @@ void show_ide_info (void){
 
     int i = 0;
 
-    kprintf ("\n  show_ide_info:  \n");
+    printk ("\n  show_ide_info:  \n");
 
     for ( i=0; i<4; i++ )
     {
-        kprintf ("id=%d\n", ide_ports[i].id );
-
-        kprintf ("channel=%d dev_num=%d \n", ide_ports[i].channel, ide_ports[i].dev_num);
-
-        kprintf ("used=%d magic=%d \n", ide_ports[i].used, ide_ports[i].magic );
-
-        kprintf ("type=%d\n", ide_ports[i].type );
-
-        kprintf ("base_port=%x\n", ide_ports[i].base_port );
-
-        kprintf ("name=%s\n", ide_ports[i].name );
+        printk ("id=%d \n", ide_ports[i].id );
+        printk ("channel=%d dev_num=%d \n", 
+            ide_ports[i].channel, 
+            ide_ports[i].dev_num );
+        //printk ("used=%d magic=%d \n", 
+        //    ide_ports[i].used, 
+        //    ide_ports[i].magic );
+        printk ("type=%d      \n", ide_ports[i].type );
+        printk ("base_port=%x \n", ide_ports[i].base_port );
+        printk ("name=%s      \n", ide_ports[i].name );
     };
-
 
     //
     // # debug.

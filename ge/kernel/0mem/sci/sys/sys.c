@@ -47,6 +47,7 @@ int sys_signal(int signum, long handler, long restorer)
 
 // Helper function to initialize system's component
 // after kernel initialization.
+//  This is called by ring3 apps.
 
 int sys_initialize_component (int n)
 {
@@ -55,10 +56,13 @@ int sys_initialize_component (int n)
         return -1;
 
 
-    switch(n)
+    switch (n)
     {
+        
         case 1:
-            ps2();
+            //PS2_early_initialization();
+            PS2_initialize();
+            return 0;
             break;
 
         //case 2:
@@ -704,7 +708,7 @@ int sys_read (unsigned int fd, char *ubuf, int count){
     // if ( __file->____object == ObjectTypeVirtualConsole ){}
 
     //
-    // == Socket file ====
+    // == Socket file ===========================================
     //
 
 
@@ -861,7 +865,7 @@ int sys_read (unsigned int fd, char *ubuf, int count){
 
 
     //
-    // == Regular file ====================================
+    // == Regular file ============================================
     //
 
 
@@ -927,6 +931,35 @@ int sys_read (unsigned int fd, char *ubuf, int count){
 
     } //-- regular file.
 
+    //pseudo terminal multiplexer.
+    if ( __file->____object == ObjectTypePTMX )
+    {
+        printk ("sys_read: [TODO] trying to read a PTMX device file\n");
+        refresh_screen();
+        return 0;
+    }
+
+    // pty () pseudo terminal.
+    if ( __file->____object == ObjectTypePTY )
+    {
+        printk ("sys_read: [TODO] trying to read a PTY device file\n");
+        refresh_screen();
+        return 0;
+    }
+
+
+    // file system
+    if ( __file->____object == ObjectTypeFileSystem )
+    {
+        printk ("sys_read: [TODO] trying to read a file system\n");
+        refresh_screen();
+        return 0;
+    }
+
+    // ...
+    
+    // ======================================================
+    
     debug_print ("sys_read: [FAIL] Unknown object type\n");
 
 
@@ -984,8 +1017,8 @@ fail:
 // 0 = Couldn't read.
 // -1 = Error.
 
-int sys_write (unsigned int fd, char *ubuf, int count){
-
+int sys_write (unsigned int fd, char *ubuf, int count)
+{
     // #todo
     // Copiar deve ser uma opcao e nao uma regra!
     // Precisamos de uma flag para copyonwrite.
@@ -1232,7 +1265,7 @@ int sys_write (unsigned int fd, char *ubuf, int count){
     // Arquivos normais (regular)
     //
     
-    // == Regular file ===============================
+    // == Regular file =========================================
     
 
     // Tem que retonar o tanto de bytes escritos.
@@ -1293,6 +1326,36 @@ int sys_write (unsigned int fd, char *ubuf, int count){
         debug_print ("sys_write: [FAIL] Something is wrong!\n");
     } //regular file.
 
+    //======================================================
+
+    //pseudo terminal multiplexer.
+    if ( __file->____object == ObjectTypePTMX )
+    {
+        printk ("sys_write: [TODO] trying to write a PTMX device file\n");
+        refresh_screen();
+        return 0;
+    }
+
+    // pty () pseudo terminal.
+    if ( __file->____object == ObjectTypePTY )
+    {
+        printk ("sys_write: [TODO] trying to write a PTY device file\n");
+        refresh_screen();
+        return 0;
+    }
+
+
+    // file system
+    if ( __file->____object == ObjectTypeFileSystem )
+    {
+        printk ("sys_write: [TODO] trying to write a file system\n");
+        refresh_screen();
+        return 0;
+    }
+
+    // ...
+
+    //==============================================
 
     debug_print ("sys_write: [FAIL] Unknown object type!\n");
 

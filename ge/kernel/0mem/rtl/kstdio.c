@@ -686,23 +686,28 @@ int printk ( const char *format, ... )
     register int *varg = (int *) (&format);
 
     // #bugbug:
+    
     // Se print() está usando '0' como buffer,
     // então ele está sujando a IVT. 
 
     // Durante a inicializaçao
     // A partir da fase 3 teremos printf novamente.
 
-    // Esse runlevel eh o modo grafico completo.
+    // #define DEFAULT_RUNLEVEL 5
+    // Esse runlevel 5 eh o modo grafico completo.
     // entao essa funçao nao funciona ?
-
+    // See: config.h
+    // See: main.c in init.bin.
+    
     if ( KeInitPhase < 3 )
     {
-        if ( current_runlevel == 5 ){
-            debug_print("kernel: printf quiet for KeInitPhase < 3 and runlevel 5\n");
+        if ( current_runlevel == DEFAULT_RUNLEVEL ){
+            debug_print("kernel: printk quiet for KeInitPhase < 3 and runlevel 5\n");
             return 0;
         }
     }
     
+
     //Atençao:
     // print() nao analisa flags.
 

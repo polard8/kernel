@@ -1596,7 +1596,9 @@ int init_executive (void){
     debug_print ("init_executive:\n");
 
 
-	// PCI - Pega informações da PCI.
+    // PCI - Pega informações da PCI.
+    // As informaçoes serao salvas em uma lista e usadas depois.
+    // por isso temos que sondar agora.
     init_pci ();
 
 

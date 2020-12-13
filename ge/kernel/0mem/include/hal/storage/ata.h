@@ -143,6 +143,7 @@
 #define ATA_LBA48    48
 
 
+// ===========================================================
 
 //
 // Variables.
@@ -160,16 +161,22 @@ int g_current_ide_device;   //master or slave
 
 /*
  **************************************************************
- * ata_pci:
- *     Estrutura para dispositivos PCI.
+ * PCIDeviceATA:
+ *     Estrutura de dispositivos pci para um disco ata.
+ *     #bugbug: E se tivermos mais que um instalado ???
+ *
  *     #importante
- *     Esssa é uma estrutura do gramado, definida em pci.h
+ *     Esssa é uma estrutura de dispositivos pci criada para o gramado, 
+ * definida em pci.h
  */
 
-struct pci_device_d *ata_pci;
+struct pci_device_d *PCIDeviceATA;
+// struct pci_device_d *PCIDeviceATA2;
+// ...
 
 
 /*
+ **********************************
  * dev_nport:
  *     AHCI ports;
  */
@@ -274,11 +281,9 @@ typedef struct st_dev
 
 
 
-
 //
-// Prototypes.
+// == Prototypes ==============================================
 //
-
 
 
 int nport_ajuste(char nport);

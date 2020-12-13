@@ -86,6 +86,21 @@ void ps2 (void)
     PS2.keyboard_initialized = FALSE;
     PS2.mouse_initialized = FALSE;
 
+    // Zerando estruturas que precisam serem reinicializadas.
+    
+    //keyboard
+    PS2KeyboardDeviceObject = NULL;
+    PS2KeyboardDevice = NULL;
+    PS2KeyboardDeviceTTYDriver = NULL;
+    PS2KeyboardDeviceTTY = NULL;
+    
+    //mouse
+    PS2MouseDeviceObject = NULL;
+    PS2MouseDevice = NULL;
+    PS2MouseDeviceTTYDriver = NULL;
+    PS2MouseDeviceTTY = NULL;
+
+
 
     // ======================================
     // Deactivate ports!
@@ -144,8 +159,8 @@ void ps2 (void)
 // Ao fim dessa rotina, reabilitamos apenas a porta de teclado.
 // A porta de mouse permaneçe fechada.
 
-void early_ps2_init (void){
-
+void early_ps2_init (void)
+{
     // mas simples...
     // apenas teclado.
 
@@ -160,6 +175,21 @@ void early_ps2_init (void){
     PS2.pooling = FALSE;
     PS2.keyboard_initialized = FALSE;
     PS2.mouse_initialized = FALSE;
+
+
+    // Zerando estruturas que precisam serem reinicializadas.
+    
+    //keyboard
+    PS2KeyboardDeviceObject = NULL;
+    PS2KeyboardDevice = NULL;
+    PS2KeyboardDeviceTTYDriver = NULL;
+    PS2KeyboardDeviceTTY = NULL;
+    
+    //mouse
+    PS2MouseDeviceObject = NULL;
+    PS2MouseDevice = NULL;
+    PS2MouseDeviceTTYDriver = NULL;
+    PS2MouseDeviceTTY = NULL;
 
 
     // ======================================
@@ -206,14 +236,14 @@ void early_ps2_init (void){
 
 
 
-
+// This is called by gdeshell.
 int PS2_initialize(void)
 {
 	ps2();
 	return 0;
 }
 
-
+// this is called during the kernel initialization.
 int PS2_early_initialization(void)
 {
 	early_ps2_init();

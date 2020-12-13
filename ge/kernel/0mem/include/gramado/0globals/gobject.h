@@ -51,8 +51,11 @@ typedef enum {
     ObjectTypeDirectory,          // diretório de arquivos
     ObjectTypeFile,               // (Regular file)
     ObjectTypePipe,               //
-    ObjectTypeFileSystem,  
-    ObjectTypeMetafile, 
+    ObjectTypeFileSystem,         // <<<< This file represents a 'File System'.
+    
+    // metafile just like GRAMADO or BRAMADO.
+    // or even a hidden lba with no entry in the directory
+    ObjectTypeMetafile,           
 
     // hwi/
     ObjectTypeDevice,         // device ??
@@ -61,7 +64,8 @@ typedef enum {
     ObjectTypeDiskPartition,  // info struct    
     ObjectTypeVolume,         // disk volume 
     ObjectTypeTerminal,       // 
-    ObjectTypeLine,           //  
+    ObjectTypeLine,           //
+    ObjectTypePTMX,           // <<<< This file represents a pty multiplexer.  
     ObjectTypeTTY,            //
     ObjectTypePTY,            //
     ObjectTypeVirtualConsole, //
