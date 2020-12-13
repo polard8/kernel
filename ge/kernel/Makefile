@@ -297,7 +297,7 @@ all-c:
 	# == SCI - System Call Interface ==============================
 	$(CC) -c 0mem/sci/sci.c $(KINCLUDE) $(CFLAGS) -o sci.o
 	
-	$(CC) -c 0mem/sci/console/console.c    $(KINCLUDE) $(CFLAGS) -o console.o
+
 
 	# fs
 	$(CC) -c 0mem/sci/fs/cf.c      $(KINCLUDE) $(CFLAGS) -o cf.o
@@ -321,8 +321,6 @@ all-c:
 	$(CC) -c 0mem/sci/net/network/network.c   $(KINCLUDE) $(CFLAGS) -o network.o
 
 	$(CC) -c 0mem/sci/sys/sys.c   $(KINCLUDE) $(CFLAGS) -o sys.o
-	
-	$(CC) -c 0mem/sci/terminal/terminal.c  $(KINCLUDE) $(CFLAGS) -o terminal.o
 
 
 
@@ -391,6 +389,10 @@ all-c:
 
 	$(CC) -c 2io/dev/chardev/tty/tty.c        $(KINCLUDE) $(CFLAGS) -o tty.o
 	$(CC) -c 2io/dev/chardev/tty/vt.c         $(KINCLUDE) $(CFLAGS) -o vt.o
+
+	$(CC) -c 2io/dev/chardev/tty/console.c    $(KINCLUDE) $(CFLAGS) -o console.o
+	$(CC) -c 2io/dev/chardev/tty/terminal.c  $(KINCLUDE) $(CFLAGS) -o terminal.o
+
 
 	# netdev
 	$(CC) -c 2io/dev/netdev/e1000/e1000.c   $(KINCLUDE) $(CFLAGS) -o e1000.o

@@ -226,6 +226,39 @@ struct tty_d *tty_create (void){
         __tty->_obuffer->_base  = (char *) newPage();
 
 
+        // buffer validation
+        if ( (void *) __tty->_rbuffer->_base == NULL ||
+             (void *) __tty->_cbuffer->_base == NULL ||
+             (void *) __tty->_obuffer->_base == NULL   )
+        {
+            panic("tty_create: [FAIL] buffer validation\n");
+        }
+
+        // #todo
+        // o buffer tem o tamanho de uma pagina.
+        // mas vamos usar o tamanho padraao por enquanto.
+        __tty->_rbuffer->_lbfsize = BUFSIZ;
+        __tty->_cbuffer->_lbfsize = BUFSIZ;
+        __tty->_obuffer->_lbfsize = BUFSIZ; 
+        
+        //o quanto falta pra acabar.
+        __tty->_rbuffer->_cnt = BUFSIZ;
+        __tty->_cbuffer->_cnt = BUFSIZ;
+        __tty->_obuffer->_cnt = BUFSIZ; 
+        
+        //offset de leitura.
+        __tty->_rbuffer->_r = 0;
+        __tty->_cbuffer->_r = 0;
+        __tty->_obuffer->_r = 0; 
+        
+        //offset de escrita
+        __tty->_rbuffer->_w = 0;
+        __tty->_cbuffer->_w = 0;
+        __tty->_obuffer->_w = 0; 
+
+
+
+
         // system metrics .
         
         // cursor dimentions in pixels.
@@ -427,18 +460,33 @@ __tty_read (
          return -1;
     }
 
+    // nao queremos ler mais que o tamanho do buffer.
+    if ( nr > tty->_rbuffer->_lbfsize )
+    {
+        //#debug
+        //panic("__tty_read: FAIL\n");
+        
+        printk("__tty_read: [FAIL] buffer overflow\n");
+        refresh_screen();
+        
+        return 0; //escreveu '0' bytes.
+    }
 
-    // #todo
-    // temos dois modos de leitura a serem considerados.
-    // O raw e o canonical.
+    // #debug
+    // o offset de escrita indica o quanto foi escrito.
+    if ( nr > tty->_rbuffer->_w )
+    {
+        debug_print("__tty_read: Reading extra bytes\n");
+    }
+
+
+    // #bugbug
+    // tty se le tudo desde a base?
+    tty->_rbuffer->_r = 0;
+
     
-    
-    //
     // Copy
-    //
-
     // Copia da tty de leitura para o buffer indicado pelo aplicativo.
-       
     // #debug       
     //printf ("__tty_read: Copiando para o buffer. \n");
     //refresh_screen ();
@@ -455,6 +503,11 @@ __tty_read (
            
     return (int) nr; 
 }
+
+
+
+
+
 
 
 
@@ -479,7 +532,6 @@ __tty_write (
     char *buffer, 
     int nr )
 {
-
     debug_print ("__tty_write: [DEBUG]\n");
         
     // tty
@@ -537,6 +589,30 @@ __tty_write (
 
     //printf ("__tty_write: Copiando para tty->_buffer->_base \n");
     //refresh_screen();
+
+    
+    if ( nr > tty->_rbuffer->_lbfsize )
+    {
+        //#debug
+        //panic("__tty_write: FAIL\n");
+        
+        printk("__tty_write: [FAIL] buffer overflow\n");
+        refresh_screen();
+        
+        return 0; //escreveu '0' bytes.
+    }
+
+    // Estamos escrevendo no inicio da tty.
+    // manteremos os offsets na base.
+    
+    tty->_rbuffer->_r = 0;
+    
+    // proximo para escreita.
+    // mas essa rotina sempre vai escrever na base.
+    tty->_rbuffer->_w = nr; 
+    
+    // quanto falta pra acabar.
+    tty->_rbuffer->_cnt = ( tty->_rbuffer->_lbfsize - nr );
 
     memcpy ( 
         (void *) tty->_rbuffer->_base, 
@@ -637,6 +713,11 @@ __tty_write (
  
     return nr;
 }
+
+
+
+
+
 
 
 // Escreve na tty de um processo alvo e envia uma mensagem pra
