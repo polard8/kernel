@@ -38,6 +38,10 @@
 //#define FAT32_LINK_TERMINATOR           0x0FFFFFFF
 
 
+#define	FAT12_MASK	0x00000fff	/* mask for 12 bit cluster numbers */
+#define	FAT16_MASK	0x0000ffff	/* mask for 16 bit cluster numbers */
+#define	FAT32_MASK	0x0fffffff	/* mask for FAT32 cluster numbers */
+
 
 #define  FAT16_CLUSTER_AVAILABLE    0x0000
 #define  FAT16_CLUSTER_RESERVED     0xfff0

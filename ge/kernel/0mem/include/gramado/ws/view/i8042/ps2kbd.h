@@ -55,6 +55,13 @@
 
 
 
+/*
+#define KBC_DEVCMD_ACK		0xfa
+#define KBC_DEVCMD_RESEND	0xfe
+#define KBC_DEVCMD_BAT_DONE	0xaa
+#define KBC_DEVCMD_BAT_FAIL	0xfc
+*/
+
 // keyboard commands.
 #define  KEYBOARD_SET_LEDS       0xED    // Set keyboard leds.
 #define  KEYBOARD_ECHO           0xEE

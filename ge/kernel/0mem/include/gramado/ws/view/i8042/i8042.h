@@ -27,6 +27,11 @@
 #define I8042_BUFFER 0x60
 #define I8042_STATUS 0x64
 #define I8042_BUFFER_FULL 0x01
+#define I8042_KEYBOARD_BUFFER 0x00
+#define I8042_MOUSE_BUFFER 0x20
+#define I8042_WHICH_BUFFER 0x20
+
+
 
 
 #define I8042_DATAPORT          0x60	//Read/Write

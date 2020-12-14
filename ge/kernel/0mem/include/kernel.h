@@ -209,22 +209,21 @@ extern unsigned long stack0_krn_ptr;
 // #view. drawing routines.
 #include "gramado/ws/view/ldisc.h"
 
-
 //storage (^)
 #include "hal/storage/ide.h"
 
 
 //pci
-#include "hal/pci.h"
-
+//#include "hal/bus/isa.h"   //#todo
+#include "hal/bus/pci.h"
 
 //storage (^)
 #include "hal/storage/ahci.h"
 #include "hal/storage/sata.h"
 
+#include "hal/bus/usb.h"
 
-// hal (^)
-#include "hal/usb.h"
+
 #include "hal/up.h"
 #include "hal/mp.h"
 #include "hal/breaker.h"

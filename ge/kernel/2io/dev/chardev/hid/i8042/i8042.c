@@ -106,6 +106,74 @@ void prepare_for_output(void)
 
 //====================================================================
 
+
+/*
+void I8042Controller_prepare_for_input(unsigned char device);
+void I8042Controller_prepare_for_input(unsigned char device)
+{
+    // #define I8042_KEYBOARD_BUFFER 0x00
+    // #define I8042_MOUSE_BUFFER 0x20
+    // #define I8042_WHICH_BUFFER 0x20
+    
+    // 1 = KEYBOARD
+    // 2 = MOUSE
+
+    unsigned char status=0;
+    unsigned char buffer_type = 0; 
+
+    //ASSERT(m_lock.is_locked());
+    
+        
+    switch (device)
+    {
+        // keyboard.
+        case 1:
+            buffer_type = I8042_KEYBOARD_BUFFER;
+            break;
+
+        // mouse.
+        case 2:
+            buffer_type = I8042_MOUSE_BUFFER;
+            break;
+
+        // invilid device.
+        default:
+            return;
+            break; 
+    };
+
+
+    for (;;) {
+        
+        status = in8(I8042_STATUS);
+        
+        if (   (status & I8042_BUFFER_FULL) && 
+             ( (status & I8042_WHICH_BUFFER) == buffer_type ) )
+        {
+            return;
+        }
+    };
+}
+*/
+
+
+/*
+void I8042Controller_prepare_for_output(void);
+void I8042Controller_prepare_for_output(void)
+{
+    //ASSERT(m_lock.is_locked());
+    
+    for (;;) {
+        if (!(in8(I8042_STATUS) & 2))
+            return;
+    };
+}
+*/
+
+
+
+//====================================================================
+
 /*
 u8 I8042Controller::do_write_to_device(Device device, u8 data)
 {
