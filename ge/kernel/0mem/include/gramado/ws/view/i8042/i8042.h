@@ -24,6 +24,10 @@
 //#define MOUSE_VECTOR  12
 
 
+#define I8042_BUFFER 0x60
+#define I8042_STATUS 0x64
+#define I8042_BUFFER_FULL 0x01
+
 
 #define I8042_DATAPORT          0x60	//Read/Write
 #define I8042_STATUSREGISTER    0x64	//Read
@@ -101,6 +105,10 @@
 #define I8042_DEVICETYPE_5BUTTON_MOUSE            0x04  //5-button mouse
 //0xAB, 0x41 or 0xAB, 0xC1	MF2 keyboard with translation enabled in the PS/Controller (not possible for the second PS/2 port)
 //0xAB, 0x83	MF2 keyboard
+
+
+
+void I8042Controller_do_drain(void);
 
 
 void prepare_for_input (void);

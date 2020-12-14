@@ -18,18 +18,6 @@
 #include <kernel.h>
 
 
-// local
-void ps2kbd_drain(void);
-void ps2kbd_drain(void)
-{
-    int i=0;
-    char _byte=0;
-    
-    for(i=0; i<9; i++){
-        _byte = (char) in8(60);
-           // #todo: delay
-    }
-}
 
 
 
@@ -1567,7 +1555,7 @@ void ps2kbd_initialize_device (void)
 
     // #test
     // Drain the output buffer for the first time. Residual.
-    ps2kbd_drain();
+    I8042Controller_do_drain();
 
 //
 // ==========================================

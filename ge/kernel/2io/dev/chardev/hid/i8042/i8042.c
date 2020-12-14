@@ -19,6 +19,21 @@
 
 
 
+void I8042Controller_do_drain(void)
+{
+    //#define I8042_BUFFER 0x60
+    //#define I8042_STATUS 0x64
+    //#define I8042_BUFFER_FULL 0x01
+    
+    unsigned char status=0;
+    
+    for (;;) {
+        status = in8(0x64);
+        if (!(status & 0x01)){ return;}  //empty
+        in8(0x60);
+    }
+}
+
 
 /*
  *********************
@@ -89,7 +104,45 @@ void prepare_for_output(void)
     kbdc_wait(1);
 }
 
+//====================================================================
 
+/*
+u8 I8042Controller::do_write_to_device(Device device, u8 data)
+{
+    ASSERT(device != Device::None);
+    ASSERT(m_lock.is_locked());
+
+    ASSERT(!Processor::current().in_irq());
+
+    int attempts = 0;
+    u8 response;
+    do {
+        if (device != Device::Keyboard) {
+            prepare_for_output();
+            IO::out8(I8042_STATUS, 0xd4);
+        }
+        prepare_for_output();
+        IO::out8(I8042_BUFFER, data);
+
+        response = do_wait_then_read(I8042_BUFFER);
+    } while (response == I8042_RESEND && ++attempts < 3);
+    if (attempts >= 3)
+        dbg() << "Failed to write byte to device, gave up";
+    return response;
+}
+*/
+
+/*
+u8 I8042Controller::do_read_from_device(Device device)
+{
+    ASSERT(device != Device::None);
+
+    prepare_for_input(device);
+    return IO::in8(I8042_BUFFER);
+}
+*/
+
+//====================================================================
 
 
 // =======================
@@ -129,6 +182,12 @@ void wait_then_write ( int port, int data )
 
 void ps2 (void)
 {
+
+    unsigned char configuration=0;
+    int keyboard_available = 0;
+    int mouse_available = 0;
+ 
+ 
 	// #debug
     printf ("ps2: Initializing..\n");
     refresh_screen();
@@ -159,45 +218,86 @@ void ps2 (void)
 
     // ======================================
     // Deactivate ports!
+    // Disable devices
     wait_then_write (0x64,0xAD);  // Disable keyboard port.
-    wait_then_write (0x64,0xA7);  // Disable mouse port.
+    wait_then_write (0x64,0xA7);  // Disable mouse port. ignored if it doesn't exist
+
+    // Drain buffers
+    I8042Controller_do_drain();
+
+    // # todo
+    // # Essa rotina desabilita as irqs
+    // precisamos reabilita-las ao fim da inicializaçao
+    wait_then_write (0x64,I8042_READ);    // I8042_READ = 0x20    
+    configuration = wait_then_read(0x60);
+    //wait_then_write (0x64,I8042_WRITE);   // I8042_WRITE = 0x60
+    //configuration &= ~3; // Disable IRQs for all
+    //wait_then_write (0x60,configuration);   
+
+    //checa um bit.
+    int is_dual_channel=0;
+    is_dual_channel = (configuration & (1 << 5)) != 0;
+    if(is_dual_channel == 1)
+        printk("Dual\n");
+    if(is_dual_channel == 0)
+        printk("Single\n");
 
 
-    // #bugbug
-    // A inicializaçao de um esta afetando a inicializaçao do outro.
-    // As vezes prejudicando a inicializaçao de ambos.
+    // Perform controller self-test
+    wait_then_write(I8042_STATUS, 0xaa);
+    if (wait_then_read(I8042_BUFFER) == 0x55) {
+        // Restore configuration in case the controller reset
+        wait_then_write(I8042_STATUS, 0x60);
+        wait_then_write(I8042_BUFFER, configuration);
+     } else {
+         printk( "I8042: Controller self test failed\n");
+     };
 
-    // Keyboard.
-    printf ("ps2: Initializing keyboard ..\n");
-    refresh_screen();
-    ps2kbd_initialize_device ();
-    PS2.keyboard_initialized = TRUE;
-        
+
+    // ==============================
+    // Test ports and enable them if available
+
+    // testar se o keyboard esta disponivel.
+    wait_then_write(I8042_STATUS, 0xab); // test
+    keyboard_available = (wait_then_read(I8042_BUFFER) == 0);
+
+    // testar se o mouse esta disponivel.
+    // pra isso precisamos ser dual channel.
+    if (is_dual_channel == 1) {
+        wait_then_write(I8042_STATUS, 0xa9); // test
+        mouse_available = (wait_then_read(I8042_BUFFER) == 0);
+    }
+
+    // imprimir o resultado da disponibilidade.
     
-    // #bugbug
-    // Talvez seja a inicializaçao do mouse que esta com problemas ...
-    // estragando alguma coisa.
-    // Pois o teclado so da problemas na presença 
-    // da tentativa de inicializar o mouse.
-    
-    // Mouse.
-    printf ("ps2: Initializing mouse ..\n");
-    refresh_screen();
-    ps2mouse_initialize_device ();
-    PS2.mouse_initialized = TRUE;
+    if (keyboard_available ==1){
+        printk("~ Keyboard available\n");
+        ps2kbd_initialize_device ();
+        PS2.keyboard_initialized = TRUE;
+        wait_then_write(I8042_STATUS, 0xae); //enable
+        configuration |= 1;
+        configuration &= ~(1 << 4);
+    }
 
+    if (mouse_available ==1){
+        printk("~ Mouse available\n");
+        ps2mouse_initialize_device ();
+        PS2.mouse_initialized = TRUE;
+        wait_then_write(I8042_STATUS, 0xa8); // enable
+        configuration |= 2;
+        configuration &= ~(1 << 5);
+    }
+    // ==============================
+  
+  //#todo
+  // Enable IRQs for the ports that are usable
+   if (keyboard_available || mouse_available) {
+       // configuration &= ~0x30; // renable clocks
+       // wait_then_write(I8042_STATUS, 0x60);
+       // wait_then_write(I8042_BUFFER, configuration);
+    }  
 
-    // Keyboard.
-    //printf ("ps2: Initializing keyboard ..\n");
-    //refresh_screen();
-    //ps2kbd_initialize_device ();
-    //PS2.keyboard_initialized = TRUE;
-
-
-    // ======================================
-    // Reactivate ports!
-    wait_then_write (0x64,0xAE);  // Reenavle keyboard port.
-    wait_then_write (0x64,0xA8);  // Renable mouse port.
+    //==========================
 
     // Wait for nothing!
     kbdc_wait (1);
