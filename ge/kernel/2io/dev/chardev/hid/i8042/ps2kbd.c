@@ -25,8 +25,10 @@ void ps2kbd_drain(void)
     int i=0;
     char _byte=0;
     
-    for(i=0; i<9; i++)
+    for(i=0; i<9; i++){
         _byte = (char) in8(60);
+           // #todo: delay
+    }
 }
 
 

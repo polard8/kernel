@@ -44,24 +44,19 @@ void kbdc_wait (unsigned char type)
             Status = in8(0x64);
            
            // Sinalizado que o buffer ta cheio.
-           if ( (Status & __I8042_BUFFER_FULL) != 0 )  //somente para mouse.
+           // # Somente para mouse.
+           // See: serenity os.
+           if ( (Status & __I8042_BUFFER_FULL) != 0 )  
                return;
-        };
-        
-        /*
-        while ( !in8(0x64) & 1 )  //#bugbug '!'
-        {
-            __local_out_any_b (0x80);
-            __local_out_any_b (0x80);
-            __local_out_any_b (0x80);
-            __local_out_any_b (0x80);
 
-            wait_ns (400);  //See: portsx86.c
+            // #todo: delay
+            // __local_out_any_b (0x80);
+            // wait_ns (400);
+
         };
-        return;
-        */
     }
-    
+
+
     // 1 = WRITE
     if (type==1)
     {
@@ -69,20 +64,11 @@ void kbdc_wait (unsigned char type)
         {
             if ( !(in8(0x64) & 2) )
                 return;
+            
+            // #todo: delay
+            // __local_out_any_b (0x80);
+            // wait_ns (400);
         };
-        
-        /*
-        while ( in8(0x64) & 2 )
-        {
-            __local_out_any_b (0x80);
-            __local_out_any_b (0x80);
-            __local_out_any_b (0x80);
-            __local_out_any_b (0x80);
-
-            wait_ns (400);    //See: portsx86.c
-        };
-        return;
-        */
     };
 }
 
