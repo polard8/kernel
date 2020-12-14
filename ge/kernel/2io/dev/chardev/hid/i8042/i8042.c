@@ -118,7 +118,13 @@ void ps2 (void)
     ps2kbd_initialize_device ();
     PS2.keyboard_initialized = TRUE;
         
-        
+    
+    // #bugbug
+    // Talvez seja a inicializaçao do mouse que esta com problemas ...
+    // estragando alguma coisa.
+    // Pois o teclado so da problemas na presença 
+    // da tentativa de inicializar o mouse.
+    
     // Mouse.
     printf ("ps2: Initializing mouse ..\n");
     refresh_screen();

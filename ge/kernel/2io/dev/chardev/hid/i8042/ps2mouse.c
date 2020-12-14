@@ -14,6 +14,11 @@
 // #todo
 // talvez fazer estruturas para controlar as configurações de mouse.
 
+// See:
+// https://wiki.osdev.org/Mouse_Input
+// https://wiki.osdev.org/PS/2_Mouse
+// ...
+
 
 #include <kernel.h>
 
@@ -169,8 +174,12 @@ int MOUSE_SEND_MESSAGE (void *buffer) {
 
 //mudar o arg para data;
 
-void xxx_mouse_write (unsigned char data){
+void xxx_mouse_write (unsigned char data)
+{
+	// See:
+	// kbdc_wait(?)  .. in  ps2kbd.c
 
+    // 0xD4 diz que eh para enviar o comando para o mouse.
     prepare_for_output();
     out8 (I8042_STATUS, 0xD4);
 
@@ -398,6 +407,11 @@ void ps2mouse_initialize_device (void)
 
 //__enable_second_port :
 
+    // reset mouse
+    //out8(0xD4, 0x64);      // tell the controller to address the mouse
+    //out8(0xFF, 0x60);
+    xxx_mouse_write(0xFF); 
+
     //++
     //======================================================
     // #obs:
@@ -412,13 +426,19 @@ void ps2mouse_initialize_device (void)
 
     // Dizemos para o controlador entrar no modo leitura.
     // Esperamos para ler e lemos.
+    // 0x20 Read Command Byte
     wait_then_write (0x64,I8042_READ);    // I8042_READ = 0x20    
     status = wait_then_read(0x60) | 2;
+    
+    // #bugbug
+    // O defeito pode estar aqui
+    //ja que nosso maior problema eh ficar se interrupçao.
 
     // Dizemos para o controlador entrar no modo escrita.
     // Esperamos para escrever e escrevemos.
     // Enable the PS/2 mouse IRQ (12).
     // The keyboard uses IRQ 1 (and is enabled by bit 0 in this register).
+    // 0x60 Write Command Byte
     wait_then_write (0x64,I8042_WRITE);   // I8042_WRITE = 0x60
     wait_then_write (0x60,status);   
     
@@ -427,15 +447,17 @@ void ps2mouse_initialize_device (void)
     // #todo: See i8042.h for the commands used in the initialization.
 
     // #test
-    // Habilitando o dispositivo secundario na forla bruta.
+    // Habilitando o dispositivo secundario na forma bruta.
     // Reenable mouse port.
     // #bugbug: a rotina de inicializaçao da controladora ps2,
     // esta fazendo isso ao fim da rotina. nao precisamos fazer isso aqui.
     // Talvez atrapalhe a inicializaçao.
+    // 0xA8 Enable Mouse
+    // 0xA7 Disable Mouse
+    // 0xA9 Check Mouse InterfaceReturns 0, if OK
+    wait_then_write (0x64,0xA8);
+    for (i=0;i<20000;i++);
     
-    wait_then_write (0x64,0xA8);   // I8042_WRITE = 0x60
-    for (i=0;i<10000;i++);
-        
     //======================================================
     //--    
 
@@ -506,24 +528,44 @@ void ps2mouse_initialize_device (void)
         kprintf ("ps2mouse_initialize_device: No mouse wheel detected!\n");
     };
 
+
+/*
+0xFF ResetMouse reset
+0xFE ResendFor serial communications errors
+0xF6 Set DefaultsSet default values
+0xF5 Disable (Data Reporting)In stream mode, 
+     should be sentbefore any other command
+0xF4 Enable (Data Reporting)In stream mode only
+0xF3 Set Sample RateSets state sampling rate
+0xF0 Set Remote modeSend data on request only
+0xEB Read DataSend data packet request
+0xEA Set Stream ModeSend data on events
+0xE9 Status RequestGet mouse configuration (3 bytes)
+0xE8 Set Resolution
+0xE7 Set Scaling 2:1Accelerationmode
+0xE6 Set Scaling 1:1Linear mode
+*/
+
     //=================================================
     //--
-    
     
     
     // 0xF6 Set default settings.
     xxx_mouse_write (PS2MOUSE_SET_DEFAULTS);
     expect_ack();
 
-    // ??
+    // 0xE6 Set Scaling. 
     xxx_mouse_write (0xE6);
     expect_ack();
 
     // 0xF4 Enable streaming.
-    xxx_mouse_write (PS2MOUSE_ENABLE_PACKET_STREAMING);
+    // Enable Data Reporting 
+    // 0xF5 Disable (Data Reporting)
+    xxx_mouse_write (PS2MOUSE_ENABLE_PACKET_STREAMING);  //0xf4
     expect_ack();
 
     // 0xF3 set sample rate.
+    // Set Sample Rate, valid values are 10, 20, 40, 60, 80, 100, and 200. 
     xxx_mouse_write (0xF3);
     expect_ack();
 
@@ -532,6 +574,11 @@ void ps2mouse_initialize_device (void)
     xxx_mouse_write (0x64);
     expect_ack();
     
+    
+    // 0xEA Set Stream Mode Send data on events
+    // 0xE9 Status Request
+    // 0xE7 Set Scaling 2:1 Accelerationmode
+    // 0xE6 Set Scaling 1:1 Linear mode
     
     // 0xE8 set resolution
     xxx_mouse_write (0xE8);

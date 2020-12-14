@@ -1404,6 +1404,7 @@ void ps2kbd_initialize_device (void)
     
     // #obs:
     // A rotina abaixo reseta o teclado.
+    // #bugbug: Isso reseta o controlador ps2.
     
     wait_then_write ( 0x60, 0xFF );
 
