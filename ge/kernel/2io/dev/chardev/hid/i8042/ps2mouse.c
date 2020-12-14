@@ -570,10 +570,7 @@ void ps2mouse_initialize_device (void)
     // Set Sample Rate, valid values are 10, 20, 40, 60, 80, 100, and 200. 
     xxx_mouse_write (0xF3);
     expect_ack();
-
-
-    // 0x64 ??
-    xxx_mouse_write (0x64);
+    xxx_mouse_write (0x64);  //rate value
     expect_ack();
     
     
@@ -585,9 +582,7 @@ void ps2mouse_initialize_device (void)
     // 0xE8 set resolution
     xxx_mouse_write (0xE8);
     expect_ack();
-    
-    // 0x03 ??
-    xxx_mouse_write (0x03);
+    xxx_mouse_write (0x03);  //resolution
     expect_ack();
     
 

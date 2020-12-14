@@ -1933,44 +1933,6 @@ int get_shift_status (void)
 }
 
 
-/*
- *********************
- * kbdc_wait:
- *     Espera por flag de autorização para ler ou escrever.
- */
-
-
-// Espera para ler ou para escrever!
-
-void kbdc_wait (unsigned char type){
-
-    if (type==0){
-
-        while ( !in8(0x64) & 1 )
-        {
-            outanyb (0x80);
-            outanyb (0x80);
-            outanyb (0x80);
-            outanyb (0x80);
-
-            wait_ns (400);
-        };
-
-    }else{
-
-        while ( in8(0x64) & 2 )
-        {
-            outanyb (0x80);
-            outanyb (0x80);
-            outanyb (0x80);
-            outanyb (0x80);
-
-            wait_ns (400);
-        };
-    };
-}
-
-
 // events.h
 void set_current_keyboard_responder ( int i )
 {

@@ -144,14 +144,6 @@ int mouse_button_action;
 //=========================================================
 
 
-// #bugbug
-// This is very ugly!
-// Please, use the standard io/out routines.
-
-#define outanyb(p)  asm volatile ( "outb %%al,%0" : : "dN"((p)) : "eax" )
-
-
-
 //
 // Mouse support
 //

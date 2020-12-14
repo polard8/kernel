@@ -20,21 +20,90 @@
 
 
 
+/*
+ *********************
+ * kbdc_wait:
+ *     Espera por flag de autorização para ler ou escrever.
+ */
+
+#define __local_out_any_b(p)  asm volatile ( "outb %%al,%0" : : "dN"((p)) : "eax" )
+
+// Espera para ler ou para escrever!
+
+#define __I8042_BUFFER_FULL 0x01
+
+void kbdc_wait (unsigned char type)
+{
+    unsigned char Status=0;
+
+    // 0 = READ
+    if (type==0)
+    {
+        for (;;) 
+        {
+            Status = in8(0x64);
+           
+           // Sinalizado que o buffer ta cheio.
+           if ( (Status & __I8042_BUFFER_FULL) != 0 )  //somente para mouse.
+               return;
+        };
+        
+        /*
+        while ( !in8(0x64) & 1 )  //#bugbug '!'
+        {
+            __local_out_any_b (0x80);
+            __local_out_any_b (0x80);
+            __local_out_any_b (0x80);
+            __local_out_any_b (0x80);
+
+            wait_ns (400);  //See: portsx86.c
+        };
+        return;
+        */
+    }
+    
+    // 1 = WRITE
+    if (type==1)
+    {
+        for (;;)
+        {
+            if ( !(in8(0x64) & 2) )
+                return;
+        };
+        
+        /*
+        while ( in8(0x64) & 2 )
+        {
+            __local_out_any_b (0x80);
+            __local_out_any_b (0x80);
+            __local_out_any_b (0x80);
+            __local_out_any_b (0x80);
+
+            wait_ns (400);    //See: portsx86.c
+        };
+        return;
+        */
+    };
+}
 
 
 
 // =======================
 // prepare ..
 
-void prepare_for_input (void)
+void prepare_for_input(void)
 {
+    // 0 = READ
     kbdc_wait(0);
 }
 
-void prepare_for_output (void)
+void prepare_for_output(void)
 {
-    kbdc_wait (1);
+    // 1 = WRITE
+    kbdc_wait(1);
 }
+
+
 
 
 // =======================
