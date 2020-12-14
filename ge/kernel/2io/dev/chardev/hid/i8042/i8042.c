@@ -289,13 +289,16 @@ void ps2 (void)
     }
     // ==============================
   
-  //#todo
-  // Enable IRQs for the ports that are usable
+
+
+   //#todo
+   // Enable IRQs for the ports that are usable
    if (keyboard_available || mouse_available) {
-       // configuration &= ~0x30; // renable clocks
-       // wait_then_write(I8042_STATUS, 0x60);
-       // wait_then_write(I8042_BUFFER, configuration);
+       configuration &= ~0x30; // renable clocks
+       wait_then_write(I8042_STATUS, 0x60);
+       wait_then_write(I8042_BUFFER, configuration);
     }  
+
 
     //==========================
 
