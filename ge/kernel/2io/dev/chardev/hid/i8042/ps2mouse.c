@@ -17,6 +17,8 @@
 // See:
 // https://wiki.osdev.org/Mouse_Input
 // https://wiki.osdev.org/PS/2_Mouse
+// https://www.win.tue.nl/~aeb/linux/kbd/scancodes-13.html
+// http://users.utcluj.ro/~baruch/media/sie/labor/PS2/PS-2_Mouse_Interface.htm
 // ...
 
 
