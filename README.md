@@ -45,9 +45,16 @@
 * API for setup environment. (libcore)
 * Lib for the window server's clients. (libgws)
 
+## Fred's compilation on Linux.
+
+    Linux 5.4.0-42-generic x86_64
+    gcc (Ubuntu) 7.5.0
+    GNU ld (GNU Binutils for Ubuntu) 2.30
+    NASM version 2.13.02
+
 ## How to Build?
 
-See the [Gramado OS build instructions](https://github.com/frednora/gramado/blob/master/documentation/BuildInstructions.md)
+See the [Gramado OS build instructions](https://github.com/frednora/gramado/blob/master/base/DOCS/BUILD.MD)
 
 ## VHD
 
