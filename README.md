@@ -45,14 +45,9 @@
 * API for setup environment. (libcore)
 * Lib for the window server's clients. (libgws)
 
+## How to Build?
 
-## Compiling Gramado on Linux.
-
-    Linux 5.3.0-53-generic x86_64
-    gcc (Ubuntu) 7.5.3
-    GNU ld (GNU Binutils for Ubuntu) 2.30
-    NASM version 2.13.02
-
+See the [Gramado OS build instructions](https://github.com/frednora/gramado/blob/master/documentation/BuildInstructions.md)
 
 ## VHD
 
