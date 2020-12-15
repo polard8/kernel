@@ -46,10 +46,10 @@
 * Lib for the window server's clients. (libgws)
 
 
-## Compiling Gramado on Linux.
+## Fred's compilation on Linux.
 
-    Linux 5.3.0-53-generic x86_64
-    gcc (Ubuntu) 7.5.3
+    Linux 5.4.0-42-generic x86_64
+    gcc (Ubuntu) 7.5.0
     GNU ld (GNU Binutils for Ubuntu) 2.30
     NASM version 2.13.02
 
