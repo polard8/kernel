@@ -585,7 +585,8 @@ fail:
 // 0 = Couldn't read.
 // -1 = Error.
 
-int sys_read (unsigned int fd, char *ubuf, int count){
+int sys_read (unsigned int fd, char *ubuf, int count)
+{
 
     struct process_d  *__P;
     file              *__file;
@@ -777,7 +778,21 @@ int sys_read (unsigned int fd, char *ubuf, int count){
         // #debug 
         // printf ("sys_read: pid %d reading socket file %d\n",
         //      current_process, __file->_file );
+ 
          
+         // Se o buffer estiver vazio, nao tem o que ler.
+        if (__file->socket_buffer_full == 0)
+        { 
+            debug_print("sys_read: [fail] socket_buffer_full not full\n");
+            
+            // #todo:
+            //do_thread_waiting (current_thread);
+            //__file->tid_waiting = current_thread;
+            
+            __file->_flags |= __SWR;  //pode escrever.
+            //scheduler();   //??? #bugbug!!!
+            return 0;  //not fail ... just waiting.
+        }
 
         // Buffer cheio:
         // + Lemos uma quantidade de bytes.
@@ -836,28 +851,6 @@ int sys_read (unsigned int fd, char *ubuf, int count){
             goto fail;
             
         } // if it's full.
-         
-         
-        // Se, no caso de socket, o buffer está vazio:
-        // + A thread dorme.
-        // + Sinaliza que a thread está esperando.
-        // + Reescalonamos as threads;
-        // + Sinalizamos que podem escrever no arquivo.
-
-        //if (nbytes == 0)
-        if (__file->socket_buffer_full == 0)
-        { 
-            debug_print("sys_read: [fail] socket_buffer_full not full\n");
-            //#debug
-            //printf ("thread %d is waiting now \n", current_thread);
-            //refresh_screen();
-
-            //do_thread_waiting (current_thread);
-            //__file->tid_waiting = current_thread;
-            __file->_flags |= __SWR;  //pode escrever.
-            scheduler();   //??? #bugbug!!!
-            return 0;  //not fail ... just waiting.
-        }  // if it's not full.
 
 
         panic ("sys_read: unexpected socket_buffer_full value \n");
@@ -1173,88 +1166,50 @@ int sys_write (unsigned int fd, char *ubuf, int count)
 
     if ( __file->____object == ObjectTypeSocket )
     {
-        // Pega a estrutura de soquete do processo atual.
-        // #bugbug: 
-        // Um processo não pode escrever no socket de outro processo?
-        // Pode sim, eh o que o servidor faz !!!!
-        
-        // pegamos o privado.
-        // mas nao significa que vamos escrever nele.
-        s1 = __P->priv;
-        if ( (void *) s1 == NULL )
-        { 
-            debug_print ("sys_write: s1 \n"); 
-            goto fail;
-        }    
-        
-        // #bugbug: Podemos escrever em qualquer socket registrado 
-        // na estrutura do processo atual.
-        // O socket tem um buffer, que é um arquivo. 
-        //if (__file != s1->private_file){
-        //    debug_print ("sys_write: __file\n"); 
-        //    goto fail;
-        //}  
 
-        //#debug
-        //printf ("sys_write: (1) pid %d Writing in the socket file %d \n", 
-            //current_process, __file->_file );
-        //refresh_screen();
-
-        //
-        // == Write! =======================================
-        //
+        // e se o buffer do arquivo estiver cheio,
+        // entao nao vamos escrever.
+        if (__file->socket_buffer_full == 1)
+        {
+            __file->_flags |= __SRD;   //pode ler.
+            return 0;  //escrevemos '0' bytes.
+        }
         
-        // Write in the socket buffer.
-        
-        nbytes = (int) file_write_buffer ( 
-                           (file *) __file, 
-                           (char *) ubuf, 
-                           (int) count );
+        // Se o buffer estiver vazio, entao pode escrever.
+        if (__file->socket_buffer_full == 0)
+        {
+            // Pega a estrutura de soquete do processo atual.
+            // #bugbug: 
+            // Um processo não pode escrever no socket de outro processo?
+            // Pode sim, eh o que o servidor faz !!!!
+            // pegamos o privado.
+            // mas nao significa que vamos escrever nele.
+            s1 = __P->priv;
+            if ( (void *) s1 == NULL )
+            { 
+                debug_print ("sys_write: s1 \n"); goto fail;
+            }    
 
-        // fail
-        if (nbytes < 0){
-            debug_print("sys_write: file_write_buffer fail \n");
-            goto fail;
-         }
-         
-        // fail
-        // Retorna sem mudar as flags do arquivo.
-        if (nbytes == 0){ 
-            debug_print("sys_write: file_write_buffer fail 0\n");
-            return 0; 
+            // == Write! =======================================
+            // Write in the socket buffer.
+            nbytes = (int) file_write_buffer ( (file *) __file, 
+                               (char *) ubuf, (int) count );
+
+            if (nbytes <= 0){
+                debug_print("sys_write: file_write_buffer fail \n");
+                goto fail;
+            }
+            
+            __file->socket_buffer_full = 1;
+            
+            __file->_flags |= __SRD;   //pode ler.
+                     
+            debug_print("sys_write: done\n");
+            return nbytes;
         }
 
-        // ok, write funcionou.
-        if (nbytes>0) 
-             __file->socket_buffer_full = 1;
-        
-        
-        // #debug
-        // printf ("sys_write: written\n");
-        // refresh_screen();
-     
-         // Flags!
-         // Agora nosso arquivo esta pronto para leitura,
-         // pois esperamos uma resposta.    
-         // >>> nao posso ler ... 
-         // so poderei ler quando alguem mandar alguma coisa.
-        __file->_flags |= __SRD;  
-
-         
-        // Connected ??
-        // Vamos checar se esse socket está conectado à outro socket.
-        // Nesse caso iremos escrever também no arquivo conectado.
-        // #todo #importante
-        // Precisamos de uma falg que nos diga que devemos
-        // escrever também no socket conectado.
-    
-        // NO, don't copy!
-        // #todo
-        // Retornaremos se não é para copiar para o socket conectado.
-        
-        // ok.
-        // retornamos o numero de bytes escritos.
-        return nbytes;
+        debug_print("sys_write: [FAIL] unexpected error \n");
+        return -1;
         
     }  //socket file 
 

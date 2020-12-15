@@ -91,152 +91,11 @@ void dispatcher ( int type ){
         panic("dispatcher: type\n");
     }
 
+
     //dispatch the current_thread.
-    goto do_dispatch;
 
-
-
-    /*
-	//
-	// Seleciona o tipo.
-	//
-
-    // #todo:
-    // All the different types of dispatch need to be implemented.
-
-//SelectDispatcherType:
-
-
-    switch (type)
-    {
-
-        // It's not implemented.
-        case DISPATCHER_NULL:
-            goto dispatchCurrent;     
-            break;
-
-        // It's not implemented.
-        case DISPATCHER_SYSCOOP:
-            goto dispatchSyscoop;
-            break;
-
-        // It's not implemented.
-        case DISPATCHER_USERCOOP:
-            goto dispatchUsercoop; 
-            break;
-
-        // It's not implemented.
-        case DISPATCHER_SYSCONC: 
-            goto dispatchSysconc;
-            break;
-
-        // It's not implemented.
-        case DISPATCHER_USERCONC: 
-            goto dispatchUserconc;
-            break;
-
-        // It's not implemented.
-        //System.
-        case DISPATCHER_SYSTEM:
-            goto dispatchCurrent;
-            break;
-
-        // It's not implemented.
-        //Idle.
-        case DISPATCHER_IDLE:
-            goto dispatchCurrent;
-            break;
-
-        // It's not implemented.
-        //Periodic. 
-        case DISPATCHER_PERIODIC:
-            goto dispatchCurrent;
-            break;
-
-        // It's not implemented.
-        //Round Robin. (RR).
-        case DISPATCHER_RR:
-            goto dispatchCurrent;
-            break;
-
-        // It's not implemented.
-        //Realtime.
-        case DISPATCHER_REALTIME:
-            goto dispatchRealtime;
-            break;
-
-
-        // This is working ...
-        case DISPATCHER_CURRENT:
-            goto dispatchCurrent;
-            break;
- 
-        // It's not implemented.
-        //Despacha da fila do dispatcher(ready queue)
-        case DISPATCHER_READY:
-            goto dispatchReady;
-            break; 
-
-        //default.
-        default:
-            goto dispatchCurrent;
-            break;
-     };
-
-
-	// Obs: 
-	// E se escapar do laço acima ?!
-
-
-//Dispatch sys coop.
-dispatchSyscoop: 
-    current_thread = syscoopDispatcher();
-    goto do_dispatch;
-  
-//Dispatch user coop.
-dispatchUsercoop:
-    current_thread = usercoopDispatcher();
-    goto do_dispatch;
-   
-//Dispatch system conc.
-dispatchSysconc:
-    current_thread = sysconcDispatcher();
-    goto do_dispatch;
-   
-//Dispatch user conc.
-dispatchUserconc:
-    current_thread = userconcDispatcher();
-    goto do_dispatch; 
-
-//Dispatch realtime.
-dispatchRealtime:
-    current_thread = realtimeDispatcher();
-    goto do_dispatch;
-
-//Dispatch ready.
-dispatchReady:
-    current_thread = readyDispatcher();
-    goto do_dispatch;
-
-
-//Dispatch current.
-dispatchCurrent:
-    //current_thread = current_thread;
-    goto do_dispatch;
-
-
-    //
-    //    ####  DO DISPATCH ####
-    //
-
-//----------------------------------------
-// Do Dispatch: Dispatch 'current_thread'.
-//----------------------------------------
-
-
-*/
-
-do_dispatch:
+//    goto do_dispatch;
+//do_dispatch:
 
 
 	// Checa estrutura.
@@ -244,13 +103,13 @@ do_dispatch:
     dispatch_Pointer = (void *) threadList[current_thread];
 
     if ( (void *) dispatch_Pointer == NULL ){
-        panic ("dispatch-dispatcher: struct\n");
+        panic ("dispatcher: struct\n");
     }
 
 	// Checa o 'state'.
 
     if ( dispatch_Pointer->state != READY ){
-        panic ("dispatch-dispatcher: State ERROR\n");
+        panic ("dispatcher: State ERROR\n");
     }
 
 

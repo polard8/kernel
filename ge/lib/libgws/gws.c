@@ -1334,24 +1334,25 @@ response_loop:
                   sizeof(__gws_message_buffer), 
                   0 );
     
-    //if (n_reads<=0){
-    //     gws_yield(); 
+    if (n_reads<=0){
+         gws_yield(); 
+         gws_yield(); 
+         return n_reads;
+    }
+    
+    // Se retornou 0, podemos tentar novamente.
+    //if (n_reads == 0){
+    //    gws_yield(); 
     //    goto response_loop;
     //}
     
-    // Se retornou 0, podemos tentar novamente.
-    if (n_reads == 0){
-        gws_yield(); 
-        goto response_loop;
-    }
-    
     // Se retornou -1 é porque algo está errado com o arquivo.
-    if (n_reads < 0){
-        gws_debug_print ("__gws_plotcube_response: recv fail.\n");
-        printf          ("__gws_plotcube_response: recv fail.\n");
-        printf ("Something is wrong with the socket.\n");
-        exit (1);
-    }
+    //if (n_reads < 0){
+    //    gws_debug_print ("__gws_plotcube_response: recv fail.\n");
+    //    printf          ("__gws_plotcube_response: recv fail.\n");
+    //    printf ("Something is wrong with the socket.\n");
+    //    exit (1);
+    //}
 
     //
     // The msg index.
@@ -1559,24 +1560,26 @@ response_loop:
                   sizeof(__gws_message_buffer), 
                   0 );
     
-    //if (n_reads<=0){
-    //     gws_yield(); 
+    if (n_reads<=0){
+         gws_yield(); 
+         gws_yield(); 
+         return n_reads;
+    }
+    
+    // Se retornou 0, podemos tentar novamente.
+    //if (n_reads == 0){
+    //    gws_yield(); 
     //    goto response_loop;
     //}
     
-    // Se retornou 0, podemos tentar novamente.
-    if (n_reads == 0){
-        gws_yield(); 
-        goto response_loop;
-    }
-    
     // Se retornou -1 é porque algo está errado com o arquivo.
-    if (n_reads < 0){
-        gws_debug_print ("__gws_plotrectangle_response: recv fail.\n");
-        printf          ("__gws_plotrectangle_response: recv fail.\n");
-        printf ("Something is wrong with the socket.\n");
-        exit (1);
-    }
+    //if (n_reads < 0){
+    //    gws_debug_print ("__gws_plotrectangle_response: recv fail.\n");
+    //    printf          ("__gws_plotrectangle_response: recv fail.\n");
+    //    printf ("Something is wrong with the socket.\n");
+    //    exit (1);
+    //}
+
 
     //
     // The msg index.
@@ -1676,7 +1679,7 @@ __gws_drawchar_request (
 
 
     // #debug
-    gws_debug_print ("__gws_drawchar_request: Writing ...\n");      
+    gws_debug_print ("__gws_drawchar_request: Writing ...\n"); 
 
     // Enviamos um request para o servidor.
     // ?? Precisamos mesmo de um loop para isso. ??
@@ -1704,11 +1707,18 @@ __gws_drawchar_request (
                        sizeof(__gws_message_buffer), 
                        0 );
        
-        if(n_writes>0){ break; }
+        if(n_writes>0)
+        { 
+            gws_debug_print ("__gws_drawchar_request: done\n\n"); 
+            return n_writes;
+            //break; 
+        }
         
+        gws_debug_print ("__gws_drawchar_request: fail\n"); 
         return -1;
     }
 
+    gws_debug_print ("__gws_drawchar_request: fail2\n"); 
     return 0; 
 }
 
@@ -1768,8 +1778,8 @@ response_loop:
     if (n_reads<=0){
          gws_debug_print ("__gws_drawchar_response: recv fail\n");      
          gws_yield(); 
-         return -1;
-         //goto response_loop;
+         gws_yield(); 
+         return n_reads;
     }
 
     // Se retornou 0, podemos tentar novamente.
@@ -1829,6 +1839,8 @@ response_loop:
 // A resposta tras o window id no início do buffer.
     
 process_reply:
+     
+     gws_debug_print ("__gws_drawchar_response: process_reply\n");      
 
     // #test
     //gws_debug_print ("terminal: Testing close() ...\n"); 
@@ -1842,7 +1854,9 @@ process_reply:
     // Podemos usar a biblioteca e testarmos
     // vários serviços da biblioteca nesse momento.
 
-    //return 0;
+    // done.
+    gws_debug_print ("__gws_drawchar_response: done\n\n");      
+     
     return (int) message_buffer[0];
 
 //
@@ -2388,12 +2402,11 @@ gws_draw_char (
         (unsigned long) color,
         (unsigned long) c );
 
-    // #todo
-    // We realy need a response ?
+    // #todo: We realy need a response ?
     gws_debug_print("gws_draw_char: response\n");
     response = __gws_drawchar_response((int) fd);  
 
-    gws_debug_print("gws_draw_char: done\n");
+    gws_debug_print("gws_draw_char: done\n\n");
     return (int) response;
 }
 
