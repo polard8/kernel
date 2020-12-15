@@ -483,8 +483,10 @@ int x86main (void)
         asm ("cli");  
         taskswitch_lock();
         scheduler_lock();
-        schedulerType = SCHEDULER_RR; 
-
+        
+       
+         Scheduler.policy = SCHEDULER_RR;
+         Dispatcher.policy = DISPATCHER_CURRENT;
 
 		// Obs: 
 		// O video já foi inicializado em main.c.

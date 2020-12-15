@@ -56,13 +56,13 @@
 struct scheduler_d
 {
     int policy;
+    int _class;   // fair, realtime ...
     // ...
 };
 struct scheduler_d Scheduler;
 
-int schedulerType;
-
 // ==========================================================
+
 
 
 //@todo: deletar isso, usa-se a fila do dispatcher. 

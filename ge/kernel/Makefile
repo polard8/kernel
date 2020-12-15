@@ -111,7 +111,7 @@ ifeq ($(ARCH),x86)
 
 
 	MK_OBJECTS := x86cont.o x86fault.o x86start.o \
-	dispatch.o pheap.o process.o clone.o queue.o spawn.o \
+	disp.o pheap.o process.o clone.o queue.o spawn.o \
 	tasks.o theap.o thread.o threadi.o ts.o tstack.o \
 	callout.o callfar.o ipc.o ipccore.o sem.o \
 	memory.o mminfo.o mmpool.o pages.o \
@@ -210,7 +210,7 @@ all-c:
 	$(CC) -c 0mem/core/system.c   $(KINCLUDE) $(CFLAGS) -o system.o
 
 	# ps/disp
-	$(CC) -c 0mem/core/ps/disp/dispatch.c      $(KINCLUDE)  $(CFLAGS) -o dispatch.o
+	$(CC) -c 0mem/core/ps/disp/disp.c          $(KINCLUDE)  $(CFLAGS) -o disp.o
 	$(CC) -c 0mem/core/ps/disp/ts.c            $(KINCLUDE)  $(CFLAGS) -o ts.o
 	$(CC) -c 0mem/core/ps/disp/spawn.c         $(KINCLUDE)  $(CFLAGS) -o spawn.o
 	$(CC) -c 0mem/core/ps/disp/x86/x86cont.c   $(KINCLUDE)  $(CFLAGS) -o x86cont.o

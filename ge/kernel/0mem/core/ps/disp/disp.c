@@ -87,10 +87,16 @@ void dispatcher ( int type ){
 
     if ( type != DISPATCHER_CURRENT )
     {
-        type = DISPATCHER_CURRENT;
+        //type = DISPATCHER_CURRENT;
+        panic("dispatcher: type\n");
     }
 
+    //dispatch the current_thread.
+    goto do_dispatch;
 
+
+
+    /*
 	//
 	// Seleciona o tipo.
 	//
@@ -227,6 +233,9 @@ dispatchCurrent:
 // Do Dispatch: Dispatch 'current_thread'.
 //----------------------------------------
 
+
+*/
+
 do_dispatch:
 
 
@@ -288,23 +297,7 @@ do_dispatch:
 }
 
 
-//
-//  ## IMPORTANTE  ##
-//  Todos os outros modelos de dispacher abaixo ainda 
-//  não foram habilitados.
-//
-
-/*
- * readyDispatcher:
- *     Dispatcher principal. 
- *     Pega da fila do dispatcher. Que é a fila de READY tasks.
- *     Pega a head da fila de ready quando vencer o tempo dela de espera.
- *     Obs: Esse tipo de dispacher ainda não foi habilitado.
- */
-
-// #todo
-// It's not implemented.
-
+// deprecated!
 int readyDispatcher (void)
 {
 	struct thread_d *dispatch_Pointer;
@@ -344,14 +337,7 @@ done:
 
 
 
-/*
- * syscoopDispatcher:
- *  Obs: Esse tipo de dispacher ainda não foi habilitado.
- */
- 
-// #todo
-// It's not implemented.
-
+// deprecated!
 int syscoopDispatcher (void)
 {
 	struct thread_d *dispatch_Pointer;
@@ -383,14 +369,8 @@ fail:
 }
 
 
-/*
- * usercoopDispatcher:
- *  Obs: Esse tipo de dispacher ainda não foi habilitado.
- */
- 
-// #todo
-// It's not implemented.
 
+// deprecated!
 int usercoopDispatcher (void)
 {
 	struct thread_d *dispatch_Pointer;
@@ -422,14 +402,7 @@ fail:
 }
 
 
-/*
- * sysconcDispatcher:
- *  Obs: Esse tipo de dispacher ainda não foi habilitado.
- */
- 
-// #todo
-// It's not implemented.
-
+// deprecated!
 int sysconcDispatcher (void)
 {
 	struct thread_d *dispatch_Pointer;
@@ -461,14 +434,7 @@ fail:
 }
 
 
-/*
- * userconcDispatcher:
- *  Obs: Esse tipo de dispacher ainda não foi habilitado.
- */
-
-// #todo
-// It's not implemented.
-
+// deprecated!
 int userconcDispatcher (void)
 {
 	struct thread_d *dispatch_Pointer;
@@ -500,44 +466,14 @@ fail:
 }
 
 
-/*
- ******************************************************
- * systemDispatcher:
- *     System dispatcher.
- *     ?? Penso que isso seja uma interface para 
- * chamar o dispacher. 
- */
-
-// #todo
-// It's not implemented.
-
-// # suspensa #
+// deprecated!
 int systemDispatcher (void)
 { 
     return 0; 
 }
 
 
-/*
- *****************************************************
- * idleDispatcher:
- *     Despachar a thread idle atual.
- *     current_idle_thread.
- *         
- * Obs:
- *     A tarefa idle pode ter qualquer id.
- *     Devemos despachar a idle quando o sistema estiver 
- * ocioso ou quanto a thread idle é a única thread.
- *     Se o kernel detectar quen não há mas nenhuma thread 
- * no sistema então o kernel deve selecionar uma nova 
- * idle atual e despacha-la. 
- */
- 
-// #todo
-// It's not implemented.
-
-// ## suspensa ##
-
+// deprecated!
 int idleDispatcher (void)
 { 
     //current_idle_thread
@@ -546,15 +482,7 @@ int idleDispatcher (void)
 }
 
 
-/*
- * periodicDispatcher:
- *     Periodic dispatcher.
- *     Obs: Esse tipo de dispacher ainda não foi habilitado.
- */
-
-// #todo
-// It's not implemented.
-
+// deprecated!
 int periodicDispatcher (void)
 { 
     // struct thread_d *New;
@@ -563,38 +491,14 @@ int periodicDispatcher (void)
 }
 
 
-/*
- * rrDispatcher:
- *     Round robin dispatcher.
- *     Obs: Esse tipo de dispacher ainda não foi habilitado.
- */
- 
-// #todo
-// It's not implemented.
-
+// deprecated!
 int rrDispatcher (void)
 { 
     return 0; 
 }
 
 
-/*
- * realtimeDispatcher:
- *     ## bugbug, na verdade ainda estou aprendendo sobre isso. :) sorry.
- *     Real time dispatcher.
- *     Pega uma tarefa na fila de tarefas com prioridade e tipo realtime.
- *
- * * IMPORTANTE:
- *   Normalmente essas tarefas ficam confinadas em um processador, destinado 
- * pra tarefas de tempo real.
- * Obs:
- *     Na verdade não é tão real time assim.
- *     Obs: Esse tipo de dispacher ainda não foi habilitado.
- */
-
-// #todo
-// It's not implemented.
-
+// deprecated!
 int realtimeDispatcher (void)
 {
 	
@@ -627,16 +531,9 @@ fail:
 }
 
 
-/*
- * dispatch_Default:
- *  Obs: Esse tipo de dispacher ainda não foi habilitado.
- */
- 
-// #todo
-// It's not implemented.
-
-int dispatch_Default (void){
-
+// deprecated!
+int dispatch_Default (void)
+{
     struct thread_d *New;
     struct thread_d *Current;
     int qNext=0;
@@ -906,9 +803,10 @@ int init_dispatcher (void){
 
     int i=0;
 
-	//
-	// Para um dispatcher na forma de array.
-	//
+    debug_print ("init_dispatcher:\n");
+    
+    //Seleciona o tipo de dispatcher.
+    Dispatcher.policy = DISPATCHER_CURRENT;
 
 
 //dispatcher_array:
@@ -916,8 +814,6 @@ int init_dispatcher (void){
 	//Index
     dispatcherQueueIndex = (int) 0;
 
-	//Seleciona o tipo de dispatcher.
-    dispatcherType = DISPATCHER_SYSTEM;
 
 	//inicializa a fila do dispacher.
 
