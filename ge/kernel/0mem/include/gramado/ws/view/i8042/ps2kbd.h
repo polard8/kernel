@@ -196,6 +196,14 @@ struct ps2_keyboard_d
     keyboard_type_t type;
 
     int dummy;
+    //================
+    //int scan_enabled;
+    //int translate;
+    //int scancode_set; /* 1=XT, 2=AT, 3=PS/2 */
+    //int ledstate;
+    //bool need_high_bit;
+    //unsigned int modifiers; /* bitmask of MOD_* constants above */
+    //================
 };
 
 
