@@ -25,10 +25,6 @@
 #define LOCKED    0
 #define UNLOCKED  1  
 
-//Tipo de scheduler.
-#define SCHEDULER_NULL   0
-#define SCHEDULER_RR     1
-#define SCHEDULER_READY  2
 
 
 // Hz padrão. 100Hz. 
@@ -40,13 +36,33 @@
 
 
 
+
+
+
 //
-// Tipos diferentes de scheduler. 
-// Usado pelo desenvolvedor.
-// RR. Priority ....
+// == scheduler policies ======================================
 //
 
+// scheduler policies.
+#define SCHED_NULL    0
+#define SCHED_IDLE    1
+#define SCHED_RR      2
+
+// aliases
+#define SCHEDULER_NULL   SCHED_NULL
+#define SCHEDULER_IDLE   SCHED_IDLE
+#define SCHEDULER_RR     SCHED_RR
+
+struct scheduler_d
+{
+    int policy;
+    // ...
+};
+struct scheduler_d Scheduler;
+
 int schedulerType;
+
+// ==========================================================
 
 
 //@todo: deletar isso, usa-se a fila do dispatcher. 

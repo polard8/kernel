@@ -8,6 +8,7 @@
  *     2014~2018 - Resision.
  */
 
+
 //
 // == gramado modes =================================================
 //
@@ -244,7 +245,7 @@ extern unsigned long stack0_krn_ptr;
 #include "gramado/ps/sem.h"
 #include "gramado/ps/queue.h"
 #include "gramado/ps/realtime.h"
-#include "gramado/ps/dispatch.h"
+#include "gramado/ps/disp.h"
 #include "gramado/ps/event.h"
 #include "gramado/ps/ps.h"
 #include "gramado/ps/mk.h"

@@ -1,31 +1,51 @@
 /*
- * Arquivo: dispatch.h
- *
- * Descrição:
- *     Header do módulo dispatcher do kernel base.
- *
- * Histórico:
- *     Versão 1.0, 2015 - Esse arquivo foi criado por Fred Nora.
+ * File: disp.h
+ * 
+ * 2015 - Created by Fred Nora.
  */
 
 
-/*
- * Tipos de dispatcher.
- */ 
-#define DISPATCHER_NULL      0 
-#define DISPATCHER_SYSCOOP   1  // Sistema, cooperação.   (64)*rr
-#define DISPATCHER_USERCOOP  2  // Usuário, cooperação.   (32)
-#define DISPATCHER_SYSCONC   3  // Sistema, concorrência. (16)
-#define DISPATCHER_USERCONC  4  // Usuário, concorrência.  (8)
-#define DISPATCHER_SYSTEM    5  // Primeiras tarefas rodando.
-#define DISPATCHER_IDLE      6  // Esclusivo para tarefas idle.(mais de uma)
-#define DISPATCHER_PERIODIC  7  // Tarefas periodicas. (rodam de tempos em tempos)(como o dead taskcollector.)
-#define DISPATCHER_RR        8  // Round robin. (confinadas em um processador...Nao importa a prioridade)
-#define DISPATCHER_REALTIME  9  // Realtime ,round robin. (confinadas em um processador...Importa a prioridade)
-#define DISPATCHER_CURRENT  10  // Dispacha a tarefa atual. 
-#define DISPATCHER_READY    11  // A fila do dispatcher.
+//
+// == dispatcher policies ======================================
+//
 
 
+#define DISP_NULL     0
+#define DISP_CURRENT  1 // Dispacha a tarefa atual. 
+
+
+#define DISPATCHER_NULL     DISP_NULL
+#define DISPATCHER_CURRENT  DISP_CURRENT  // Dispacha a tarefa atual. 
+#define DISPATCHER_SYSTEM    2  // Primeiras tarefas rodando.
+#define DISPATCHER_SYSCOOP   3  // Sistema, cooperação.   (64)*rr
+#define DISPATCHER_USERCOOP  4  // Usuário, cooperação.   (32)
+#define DISPATCHER_SYSCONC   5  // Sistema, concorrência. (16)
+#define DISPATCHER_USERCONC  6  // Usuário, concorrência.  (8)
+#define DISPATCHER_IDLE      7  // Esclusivo para tarefas idle.(mais de uma)
+#define DISPATCHER_PERIODIC  8  // Tarefas periodicas. (rodam de tempos em tempos)(como o dead taskcollector.)
+#define DISPATCHER_RR        9  // Round robin. (confinadas em um processador...Nao importa a prioridade)
+#define DISPATCHER_REALTIME  10  // Realtime ,round robin. (confinadas em um processador...Importa a prioridade)
+#define DISPATCHER_READY     11  // A fila do dispatcher.
+//--------------
+
+
+// #obs
+// O dispatcher possui suas proprias politicas,
+// ele desconhece o trabalho feito pelo scheduler,
+// que organizou as filas. Pois o scheduler pode ate mesmo ser
+// um processo externo, dedicado a analizar a performance das
+// politicas adotadas.
+
+struct dispatcher_d
+{
+    int policy;
+    int _class;   // fair, realtime ...
+};
+struct dispatcher_d Dispatch;
+
+int dispatcherType;
+
+// ===================================
 
 //Enumerador de criterio de seleção de thread.
 #define SELECT_IDLE_COUNT         1
@@ -36,10 +56,6 @@
 #define SELECT_IDEAL_COUNT        6
 #define SELECT_DISPATCHER_COUNT   7
 
-/*
- * Seleciona o tipo de dispatcher sendo usado no momento.
- */
-int dispatcherType;
 int dispatcherQueueIndex;
 
 
