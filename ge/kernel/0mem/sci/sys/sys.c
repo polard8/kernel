@@ -321,8 +321,8 @@ sys_open (
 // https://man7.org/linux/man-pages/man2/close.2.html
 // https://pubs.opengroup.org/onlinepubs/009695399/functions/close.html
 
-int sys_close ( int fd ){
-
+int sys_close ( int fd )
+{
     file *object;
     struct process_d *p;
 
@@ -660,6 +660,25 @@ int sys_read (unsigned int fd, char *ubuf, int count)
         goto fail; 
     }
 
+    // stdin
+    // read from prompt
+    if ( __file->_file == 0 )
+    {
+        //ubuf[0] = prompt[0];
+        //ubuf[1] = 0; 
+        //return -1;  //lemos um byte.
+
+        if ( PS2KeyboardDeviceTTY->new_event == TRUE ){
+            __tty_read( PS2KeyboardDeviceTTY, ubuf, 16 );
+            PS2KeyboardDeviceTTY->new_event = FALSE;  //mensagem consumida.
+            return 16;
+        }
+        
+        PS2KeyboardDeviceTTY->new_event = FALSE; //mensagem consumida.
+        return 0;
+    }
+
+
 
     /*
     int object = (int) __file->____object; 
@@ -803,8 +822,10 @@ int sys_read (unsigned int fd, char *ubuf, int count)
         {
             // OUT:
             // > 0 or EOF.
-            nbytes = (int) file_read_buffer ( (file *) __file, 
-                              (char *) ubuf, (int) count );
+            nbytes = (int) file_read_buffer ( 
+                              (file *) __file, 
+                              (char *) ubuf, 
+                              (int) count );
         
             // Se lemos alguma coisa:
             // + Sinalizamos que o buffer não está mais cheio.

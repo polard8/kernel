@@ -715,6 +715,25 @@ gde_extra_services (
         return (void *) getthreadname ( (int) arg2, (char *) arg3);
     }
 
+    //#test: promptme(fp)
+    //esse funçao eh muito legal
+    //struct process_d *__prompt_p;
+    //file *__prompt_file;
+    //if ( number == 887 )
+    //{
+        //#todo check validation
+        //__prompt_p = processList[current_process];
+        //__prompt_file = __prompt_p->Objects[arg2];
+        //__prompt_file->_base = (char*) &prompt[0];
+    //}
+
+    //read kernel prompt
+    //if ( number == 888 )
+    //{
+    //     return (void*) prompt[0]; //get char
+    //}
+
+
     //==========================
     // 890 ~ 899 network stuff 
     

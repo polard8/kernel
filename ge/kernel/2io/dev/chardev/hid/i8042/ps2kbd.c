@@ -489,10 +489,10 @@ __local_ps2kbd_procedure (
 // para assim usar o array certo. ke0 indica o teclado estendido.
 
 
-int KEYBOARD_SEND_MESSAGE (unsigned char SC){
-
-    struct process_d  *__p;
-    struct thread_d   *t;
+int KEYBOARD_SEND_MESSAGE (unsigned char SC)
+{
+    //struct process_d  *__p;
+    //struct thread_d   *t;
 
     struct window_d   *w;
 
@@ -934,6 +934,8 @@ done:
     
     // only one standard event
     unsigned long event_buffer[5];
+    //struct process_d *__p;
+    //struct file_d    *__file;
     
     if ( (void *) PS2KeyboardDeviceTTY != NULL )
     {
@@ -947,13 +949,47 @@ done:
        event_buffer[3] = tmp_sc;   // sc
        
        // it is gonna write in the base of the buffer.
-       __tty_write ( 
+       
+       // write in the keyboard tty.
+       __tty_write( 
            (struct tty_d *) PS2KeyboardDeviceTTY, 
            (char *) event_buffer, 
            (int) (4*4) );  //16 bytes 
-    }
-   
         
+        PS2KeyboardDeviceTTY->new_event = TRUE;  //temos uma mensagem.
+    
+        // write in the stdin of the current process.
+        //__p = processList[current_process]; //get process structure
+        //__file = __p->Objects[0];           //get stdin structure.
+        
+        //if( (void*) __file == NULL){ panic("NOFILE");   }
+        //if( (void*) __file != NULL)
+        //{
+        //    if(__file->used != 1){ panic("NOTUSED");   }
+        //    if(__file->used == 1)
+        //    {
+                //bugbug: a base existe mas o endereço eh invalido #PF
+        //        if( (void*) __file->_base == NULL){ panic("NOBASE");   }
+                //if( (void*) __file->_base != NULL ){
+                //     k_fputc('x',__file);  //__file->_base[0] = 'x';
+                //}
+        //    } 
+        //}
+        //k_ftell(__file);                    // volta ao inicio do arquivo.
+        //sys_write(
+        //    stdin->_file,            // stdin fd
+        //    (char*) event_buffer,   // buffer
+        //    (int) (4*4) );          // size
+        
+        //stdin
+        //prompt[0] = 'k';
+        //prompt[1] = 'b';
+        //prompt[2] = 'd';
+        //prompt[3] = 0;
+    }
+
+
+
     switch (message){
        
         // Para os dois casos.

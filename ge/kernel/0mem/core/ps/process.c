@@ -1202,8 +1202,8 @@ struct process_d *create_process (
     // PID. PPID. UID. GID.
     Process->pid  = (int) PID; 
     Process->ppid = (int) ppid; 
-    Process->uid  = (int) GetCurrentUserId (); 
-    Process->gid  = (int) GetCurrentGroupId (); 
+    Process->uid  = (int) GetCurrentUserId(); 
+    Process->gid  = (int) GetCurrentGroupId(); 
     // ...
 
     // sessão crítica.
@@ -1250,28 +1250,28 @@ struct process_d *create_process (
     // Limpando todos slots.
     for ( i=0; i<32; ++i ){ Process->Objects[i] = 0; }
 
+    // standard stream.
+    // #bugbug
+    // precisamos colocar os arquivos também na lista
+    // global de arquivos abertos. openfileList[]
+    // See: fs.c
+    // O fluxo padrão foi criando antes em stdioInitialize em rtl/kstdio.c
+    // #todo: Checar as características desses arquivos.
+
     if ( (void *) stdin == NULL ){
         panic ("create_process: [TEST] stdin");
     }
-
     if ( (void *) stdout == NULL ){
         panic ("create_process: [TEST] stdout");
     }
-
     if ( (void *) stderr == NULL ){
         panic ("create_process: [TEST] stderr");
     }
-        
-        // #bugbug
-        // precisamos colocar os arquivos também na lista
-        // global de arquivos abertos. openfileList[]
-        // See: fs.c
-     
-        // O fluxo padrão foi criando antes em klib/kstdio.c
-        // #todo: Checar as características desses arquivos.
     Process->Objects[0] = (unsigned long) stdin;
     Process->Objects[1] = (unsigned long) stdout;
     Process->Objects[2] = (unsigned long) stderr;
+
+
 
 
     //Process->terminal =

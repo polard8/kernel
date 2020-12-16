@@ -2662,29 +2662,66 @@ do_compare:
     // ok funcionou com fgetc e getc.
     FILE *f1;
     int ch_test;
+    char t4buf[32];
+    int t4_nbytes=0;
     if ( gramado_strncmp( prompt, "t4", 2 ) == 0 )
     {
-        //stdout
-        printf ("t4: Open and reading a file\n");
-        f1 = fopen ("gramado.txt","rb");
+        //prompt me: aponta o prompt do kernel para esse arquivo.
+        //significa que o teclado vai escrever nele, 
+        //pois o teclado sempre escreve no prompt
+        //e nao em arquivo.
+        //ch_test = gramado_system_call(888,0,0,0);
+        //printf("%c", ch_test);  fflush(stdout);
         
+        printf ("t4: Open and reading a file\n");
+        //fprintf(stdin,"stdin dirty\n");
+        //f1 = fopen ("gramado.txt","rb");
+        f1 = stdin;
         if ( f1 == NULL ){
             printf ("fopen fail\n");  //stdout
             goto exit_cmp;
         }
+        //prompt me
+        //gramado_system_call( 887, fileno(f1),fileno(f1),fileno(f1));
+        ftell(f1);
         printf ("Testing getc ... \n\n");  
-        while (1){
+        while (1)
+        {
+            t4_nbytes = read(0,t4buf,16);
+            if(t4_nbytes>0){
+            printf("%c", t4buf[0]);  fflush(stdout);
+            printf("%c", t4buf[1]);  fflush(stdout);
+            printf("%c", t4buf[2]);  fflush(stdout);
+            printf("%c", t4buf[3]);  fflush(stdout);
+
+            printf("%c", t4buf[4]);  fflush(stdout);
+            printf("%c", t4buf[5]);  fflush(stdout);
+            printf("%c", t4buf[6]);  fflush(stdout);
+            printf("%c", t4buf[7]);  fflush(stdout);
+
+            printf("%c", t4buf[8]);  fflush(stdout);
+            printf("%c", t4buf[9]);  fflush(stdout);
+            printf("%c", t4buf[10]);  fflush(stdout);
+            printf("%c", t4buf[11]);  fflush(stdout);
+
+            printf("%c", t4buf[12]);  fflush(stdout);
+            printf("%c", t4buf[13]);  fflush(stdout);
+            printf("%c", t4buf[14]);  fflush(stdout);
+            printf("%c", t4buf[15]);  fflush(stdout);
+            }
+            //goto exit_cmp;
+        }
+        //while (1){
             //ch_test = (int) fgetc (f1);    //funcionou.
-            ch_test = (int) getc  (f1);  //funcionou. 
-            if ( ch_test == EOF ){
-                printf("  EOF reached :)\n\n"); 
-                goto exit_cmp;
-            }else{
-                  printf("%c", ch_test);  fflush(stdout);  
-            };
-        };
+        //    ch_test = (int) getc(f1);  //funcionou. 
+        //    if ( ch_test == EOF || ch_test == 'q' ){
+        //        printf("  EOF reached :)\n\n"); 
+        //        goto exit_cmp;
+        //    }else{ printf("%c", ch_test);  fflush(stdout); };
+        //};
         goto exit_cmp;
     }
+
 
     int crI;
     char crName[11];
@@ -2768,6 +2805,46 @@ do_compare:
         printf ("t8: Creating buttons \n");
         shellTestButtons ();
         gde_show_backbuffer ();
+        goto exit_cmp;
+    }
+
+
+    char t9buf[32];
+    int t9_nreads=0;
+    if ( gramado_strncmp( prompt, "t9", 2 ) == 0 )
+    {
+        printf("t9:\n");
+        t9_nreads = read(0,t9buf,sizeof(t9buf));
+        if(t9_nreads>0){
+        // window
+        putc(t9buf[0],stdout);
+        putc(t9buf[1],stdout);
+        putc(t9buf[2],stdout);
+        putc(t9buf[3],stdout);
+
+        // msg
+        putc(t9buf[4],stdout);
+        putc(t9buf[5],stdout);
+        putc(t9buf[6],stdout);
+        putc(t9buf[7],stdout);
+
+        // long1
+        putc(t9buf[8],stdout);
+        putc(t9buf[9],stdout);
+        putc(t9buf[10],stdout);
+        putc(t9buf[11],stdout);
+
+        // long2
+        putc(t9buf[12],stdout);
+        putc(t9buf[13],stdout);
+        putc(t9buf[14],stdout);
+        putc(t9buf[15],stdout);
+
+        fflush(stdout);
+        }
+        
+        //t9buf[9] = 0;
+        //printf("%s done n=%d \n",t9buf,t9_nreads);
         goto exit_cmp;
     }
 

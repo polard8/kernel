@@ -184,6 +184,8 @@ struct tty_d
     // Output buffer.
     file *_obuffer;
 
+    //#test
+    int new_event;  //flag
 
     //
     // == (2) synchronization ========

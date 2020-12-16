@@ -43,8 +43,8 @@ extern unsigned long SavedBPP;
 // #todo:
 // See: sys_close().
 
-int k_fclose (file *f){
-
+int k_fclose (file *f)
+{
 
     debug_print("k_fclose: [FIXME]\n");
 
@@ -52,7 +52,6 @@ int k_fclose (file *f){
     if ( (void *) f == NULL ){
         debug_print("k_fclose: f\n");
         return EOF;
-
     }else{
         f->used = 1;
         f->magic = 1234;
@@ -826,8 +825,8 @@ int fprintf ( file *f, const char *format, ... )
  * 
  */
 
-int k_fputs ( const char *str, file *f ){
-
+int k_fputs ( const char *str, file *f )
+{
     int size = 0;
 
 
@@ -1125,11 +1124,10 @@ int __swbuf (int c, file *fp)
  * fputc:
  */
 
-int k_fputc ( int ch, file *f ){
-
+int k_fputc ( int ch, file *f )
+{
     if ( (void *) f == NULL ){
         return EOF;
-
     }else{
 
 		// se tivermos um posicionamento válido de escrita no buffer ou
@@ -1177,8 +1175,7 @@ int k_fputc ( int ch, file *f ){
         //File is not writable. 
         //if (!(stream->flags & _IOWRITE))
              //return (EOF);        
-        
-        
+
         // ...
     };
 
@@ -1306,9 +1303,8 @@ void printchar (char **str, int c){
  *     Essa rotina é chamada pelas funções: /printchar/input/.
  */
 
-int putchar (int ch){ 
-   
-   
+int putchar (int ch)
+{ 
     // Para virtual consoles.
     // Em tty/console.c
 
@@ -1320,6 +1316,7 @@ int putchar (int ch){
 
     return (int) ch;    
 }
+
 
 
 /*
@@ -1540,8 +1537,8 @@ input_done:
 // em memória compartilhada, usado o alocaro apropriado.
 // kmalloc com certeza e ring0.
 
-int stdioInitialize (void){
-
+int stdioInitialize (void)
+{
     int Status = 0;
     int i=0;
     int slot=-1;
@@ -1569,18 +1566,15 @@ int stdioInitialize (void){
     prompt_pos = 0;
 
 
-    //
-    // file_table and inode_table
-    //
+    
 
     // file table
+    printf ("kstdio-stdioInitialize: Create file_table\n");
     file *tmp;
     for (i=0; i<NUMBER_OF_FILES;i++)
     {
         tmp = (void*) kmalloc (sizeof(file));
-        if ((void*)tmp==NULL)
-            panic("init_globals: tmp");
-            
+        if ((void*)tmp==NULL){ panic("kstdio-stdioInitialize: tmp"); }
         tmp->used = 1;
         tmp->magic = 1234;
         tmp->____object = ObjectTypeFile; //Regular file
@@ -1594,13 +1588,12 @@ int stdioInitialize (void){
     };
 
     // inode table
+    printf ("kstdio-stdioInitialize: Create inode_table\n");
     struct inode_d *tmp_inode;    
     for (i=0; i<32;i++)
     {
         tmp_inode = (void*) kmalloc (sizeof(struct inode_d));
-        if ((void*)tmp_inode==NULL)
-            panic("init_globals: tmp_inode");
-            
+        if ((void*)tmp_inode==NULL){panic("kstdio-stdioInitialize: tmp_inode");}
         tmp_inode->used = 1;
         tmp_inode->magic = 1234;
         tmp_inode->filestruct_counter = 0;
@@ -1612,17 +1605,17 @@ int stdioInitialize (void){
     };
 
 
-
+    //setup standard stream.
     // #bugbug
     // 0 - regular file.
     // 1 - virtual console.
     // 2 - regular file.
-
+    printf ("kstdio-stdioInitialize: Setup standard stream\n");
+    
 
     // pega slot em file_table[] para stdin
     slot = get_free_slots_in_the_file_table();
-    if(slot<0 || slot >=NUMBER_OF_FILES)
-        panic("klibc-stdioInitialize: file slot");
+    if(slot<0 || slot >=NUMBER_OF_FILES){panic("klibc-stdioInitialize: file slot");}
     stdin = file_table[slot];
     stdin->filetable_index = slot;
     // Configurando a estrutura de stdin. 
@@ -1645,8 +1638,7 @@ int stdioInitialize (void){
     // inode support.
     // pega slot em inode_table[] 
     slot = get_free_slots_in_the_inode_table();
-    if(slot<0 || slot >=32)
-        panic("klibc-stdioInitialize: stdin inode slot");
+    if(slot<0 || slot >=32){panic("klibc-stdioInitialize: stdin inode slot");}
     stdin->inode = inode_table[slot];
     stdin->inodetable_index = slot;
     if( (void*) stdin->inode == NULL ){
@@ -1660,8 +1652,7 @@ int stdioInitialize (void){
 
     // pega slot em file_table[] para stdout
     slot = get_free_slots_in_the_file_table();
-    if(slot<0 || slot >=NUMBER_OF_FILES)
-        panic("klibc-stdioInitialize: slot");
+    if(slot<0 || slot >=NUMBER_OF_FILES){ panic("klibc-stdioInitialize: slot"); }
     stdout = file_table[slot];
     stdout->filetable_index = slot;
     // Configurando a estrutura de stdout.
@@ -1685,8 +1676,7 @@ int stdioInitialize (void){
     // inode support.
     // pega slot em inode_table[] 
     slot = get_free_slots_in_the_inode_table();
-    if(slot<0 || slot >=32)
-        panic("klibc-stdioInitialize: stdout inode slot");
+    if(slot<0 || slot >=32){ panic("klibc-stdioInitialize: stdout inode slot"); }
     stdout->inode = inode_table[slot];
     stdout->inodetable_index = slot;
     if( (void*) stdout->inode == NULL ){
@@ -1699,8 +1689,7 @@ int stdioInitialize (void){
 
     // pega slot em file_table[] para stderr
     slot = get_free_slots_in_the_file_table();
-    if(slot<0 || slot >=NUMBER_OF_FILES)
-        panic("klibc-stdioInitialize: slot");
+    if(slot<0 || slot >=NUMBER_OF_FILES){ panic("klibc-stdioInitialize: slot"); }
     stderr = file_table[slot];
     stderr->filetable_index = slot;
     // Configurando a estrutura de stderr.
@@ -1722,8 +1711,7 @@ int stdioInitialize (void){
     // inode support.
     // pega slot em inode_table[] 
     slot = get_free_slots_in_the_inode_table();
-    if(slot<0 || slot >=32)
-        panic("klibc-stdioInitialize: stderr inode slot");
+    if(slot<0 || slot >=32){ panic("klibc-stdioInitialize: stderr inode slot"); }
     stderr->inode = inode_table[slot];
     stderr->inodetable_index = slot;
     if( (void*) stderr->inode == NULL ){
