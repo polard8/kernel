@@ -660,6 +660,25 @@ int sys_read (unsigned int fd, char *ubuf, int count){
     }
 
 
+
+    //==========================================================
+    // stdin
+    // read keyboard tty
+    if ( __file->_file == 0 )
+    {
+        if ( PS2KeyboardDeviceTTY->new_event == TRUE ){
+            __tty_read( PS2KeyboardDeviceTTY, ubuf, 16 );
+            PS2KeyboardDeviceTTY->new_event = FALSE;  //mensagem consumida.
+            return 16;
+        }
+        PS2KeyboardDeviceTTY->new_event = FALSE; //mensagem consumida.
+        return 0;
+    }
+    //==========================================================
+
+
+
+
     /*
     int object = (int) __file->____object; 
     switch(object)

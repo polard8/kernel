@@ -817,14 +817,9 @@ int KEYBOARD_SEND_MESSAGE (unsigned char SC){
         
     };  // Fim do else
 
-
-    //
     // Done.
-    //
+    // Para finalizar, vamos enviar a mensagem para fila certa.
 
-	// Para finalizar, 
-	// vamos enviar a mensagem para fila certa.
-    
 done:
 
     // Fixing the Scan code.
@@ -920,8 +915,6 @@ done:
     // em unsigned long.
 
 
-
-    
     // ===========================
 
     // #todo
@@ -946,14 +939,17 @@ done:
        event_buffer[2] = ch;       // char
        event_buffer[3] = tmp_sc;   // sc
        
-       // it is gonna write in the base of the buffer.
-       __tty_write ( 
-           (struct tty_d *) PS2KeyboardDeviceTTY, 
-           (char *) event_buffer, 
-           (int) (4*4) );  //16 bytes 
+        // it is gonna write in the base of the buffer.
+        __tty_write ( 
+            (struct tty_d *) PS2KeyboardDeviceTTY, 
+            (char *) event_buffer, 
+            (int) (4*4) );  //16 bytes 
+         
+         // Sinalizamos que temos um novo evento.
+         PS2KeyboardDeviceTTY->new_event = TRUE;
     }
-   
-        
+
+
     switch (message){
        
         // Para os dois casos.

@@ -189,6 +189,11 @@ struct tty_d
     // == (2) synchronization ========
     //
 
+
+    // flag para sincronizaçao de leitura e escrita de eventos.
+    int new_event;
+
+
     // Synch and job control.
     // This way the TTY driver can send the input to the forground process.
 

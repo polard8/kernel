@@ -234,6 +234,35 @@ int main ( int argc, char *argv[] ){
     //====================   
     
     
+    
+    
+    //
+    // == stdin ===================================================
+    //
+    char evBuf[32];
+    int ev_nreads=0;
+    unsigned long lMessage[8];
+    //struct
+    while(TRUE){
+        //read from keyboard tty
+        ev_nreads = read(0,evBuf,16);
+        //if (ev_nreads>0){ printf ("E\n"); }  //funcionou.
+        if(ev_nreads>0)
+        {
+            memcpy( (void*) &lMessage[0],(const void*) &evBuf[0], 16); //16 bytes 
+            if( lMessage[1] != 0 )
+            {
+                 printf( "%c", lMessage[2] ); //long1
+                 fflush(stdout);
+            }
+        }  
+        gws_draw_char ( client_fd, main_window, 
+        32, 8, COLOR_RED, 'I' );
+    };
+    // ============================================================
+    
+    
+    
 
     // Create a little window in the top left corner.
     //gws_create_window (client_fd,
