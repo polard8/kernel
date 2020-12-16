@@ -6,22 +6,22 @@
 
 - [Gramado on Github](https://github.com/frednora/gramado)
 
-# Gramado 1.0.
-
-<p align=center>
-  <a href="https://github.com/frednora/gramado">
-    <img alt="Gramado" src="https://github.com/gramado/img/blob/master/gramado2.png">
-  </a>
-</p>
-
 ---
 
 <p align=center>
   <a href="https://github.com/frednora/gramado/archive/master.zip">
   <img alt="Download " src="https://img.shields.io/badge/Download-latest-green.svg">
   </a>
-  <a href="https://gramado.github.io/projects">
+  <a href="https://gramadoprojects.github.io/projects">
     <img alt="Donate" src="https://img.shields.io/badge/%24-Donate-orange.svg">
+  </a>
+</p>
+
+# Gramado 1.0.
+
+<p align=center>
+  <a href="https://github.com/frednora/gramado">
+    <img alt="Gramado" src="https://github.com/gramado/img/blob/master/gramado2.png">
   </a>
 </p>
 
