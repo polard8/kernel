@@ -21,7 +21,6 @@
 
 - [Gramado on Github](https://github.com/frednora/gramado)
 
-
 ## What is Gramado?
 
     Gramado (c) is a 32 bit multithreaded operating system.
@@ -67,12 +66,11 @@ $ make qemu-test
 
 Please, give us some feedback.
 
-
 ## More information
 
 Gramado is a Free and Open Source operating system created by Fred Nora.
 The source code uses the BSD license.
 
 # Quotes:
-	Oh boy, there is no spoon!
+	Oh boy, there is no spoon! \o/
 
