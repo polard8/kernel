@@ -1,3 +1,11 @@
+## What is Gramado?
+
+    Gramado (c) is a 32 bit multithreaded operating system.
+
+## Links:
+
+- [Gramado on Github](https://github.com/frednora/gramado)
+
 # Gramado 1.0.
 
 <p align=center>
@@ -17,13 +25,6 @@
   </a>
 </p>
 
-## Links:
-
-- [Gramado on Github](https://github.com/frednora/gramado)
-
-## What is Gramado?
-
-    Gramado (c) is a 32 bit multithreaded operating system.
 
 ## Kernel features.
 
