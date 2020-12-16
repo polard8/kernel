@@ -1,16 +1,5 @@
-## Gramado OS build instructions
 
-## Linux dependencies
+## todo
 
-**Debian / Ubuntu**
-```bash
-sudo apt install build-essential make qemu-system-i386 qemu-utils nasm
-```
+How to build the system.
 
-## Build
-
-```bash
-$ cd gramado
-$ make
-$ ./run
-```

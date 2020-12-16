@@ -2264,8 +2264,6 @@ int main (int argc, char **argv){
     // call the childs again.
     
     char buf[32];
-    char evBuf[32];
-    int ev_nreads = 0;
     
     while (1){
 
@@ -2478,17 +2476,13 @@ int main (int argc, char **argv){
             //printf ("gwssrv: newconn %d\n",newconn);
             
             if (newconn>0){
-
-
-                //read from keyboard tty
-                //ev_nreads = read(0,evBuf,16);
-                //if (ev_nreads>0){ printf ("E\n"); }
-
+                
                 //fake event
                 //sprintf(buf,"?uck");    // 
                 //sprintf(buf,"nonono");    // the client can't send request
                 //sprintf(buf,"yes");    // the client can send requests.
                 //write (newconn,buf, 4);
+
 
                 xxxHandleNextClientRequest (newconn);
                 

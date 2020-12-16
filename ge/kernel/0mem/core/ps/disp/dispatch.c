@@ -87,15 +87,147 @@ void dispatcher ( int type ){
 
     if ( type != DISPATCHER_CURRENT )
     {
-        //type = DISPATCHER_CURRENT;
-        panic("dispatcher: type\n");
+        type = DISPATCHER_CURRENT;
     }
 
 
-    //dispatch the current_thread.
+	//
+	// Seleciona o tipo.
+	//
 
-//    goto do_dispatch;
-//do_dispatch:
+    // #todo:
+    // All the different types of dispatch need to be implemented.
+
+//SelectDispatcherType:
+
+
+    switch (type)
+    {
+
+        // It's not implemented.
+        case DISPATCHER_NULL:
+            goto dispatchCurrent;     
+            break;
+
+        // It's not implemented.
+        case DISPATCHER_SYSCOOP:
+            goto dispatchSyscoop;
+            break;
+
+        // It's not implemented.
+        case DISPATCHER_USERCOOP:
+            goto dispatchUsercoop; 
+            break;
+
+        // It's not implemented.
+        case DISPATCHER_SYSCONC: 
+            goto dispatchSysconc;
+            break;
+
+        // It's not implemented.
+        case DISPATCHER_USERCONC: 
+            goto dispatchUserconc;
+            break;
+
+        // It's not implemented.
+        //System.
+        case DISPATCHER_SYSTEM:
+            goto dispatchCurrent;
+            break;
+
+        // It's not implemented.
+        //Idle.
+        case DISPATCHER_IDLE:
+            goto dispatchCurrent;
+            break;
+
+        // It's not implemented.
+        //Periodic. 
+        case DISPATCHER_PERIODIC:
+            goto dispatchCurrent;
+            break;
+
+        // It's not implemented.
+        //Round Robin. (RR).
+        case DISPATCHER_RR:
+            goto dispatchCurrent;
+            break;
+
+        // It's not implemented.
+        //Realtime.
+        case DISPATCHER_REALTIME:
+            goto dispatchRealtime;
+            break;
+
+
+        // This is working ...
+        case DISPATCHER_CURRENT:
+            goto dispatchCurrent;
+            break;
+ 
+        // It's not implemented.
+        //Despacha da fila do dispatcher(ready queue)
+        case DISPATCHER_READY:
+            goto dispatchReady;
+            break; 
+
+        //default.
+        default:
+            goto dispatchCurrent;
+            break;
+     };
+
+
+	// Obs: 
+	// E se escapar do laço acima ?!
+
+
+//Dispatch sys coop.
+dispatchSyscoop: 
+    current_thread = syscoopDispatcher();
+    goto do_dispatch;
+  
+//Dispatch user coop.
+dispatchUsercoop:
+    current_thread = usercoopDispatcher();
+    goto do_dispatch;
+   
+//Dispatch system conc.
+dispatchSysconc:
+    current_thread = sysconcDispatcher();
+    goto do_dispatch;
+   
+//Dispatch user conc.
+dispatchUserconc:
+    current_thread = userconcDispatcher();
+    goto do_dispatch; 
+
+//Dispatch realtime.
+dispatchRealtime:
+    current_thread = realtimeDispatcher();
+    goto do_dispatch;
+
+//Dispatch ready.
+dispatchReady:
+    current_thread = readyDispatcher();
+    goto do_dispatch;
+
+
+//Dispatch current.
+dispatchCurrent:
+    //current_thread = current_thread;
+    goto do_dispatch;
+
+
+    //
+    //    ####  DO DISPATCH ####
+    //
+
+//----------------------------------------
+// Do Dispatch: Dispatch 'current_thread'.
+//----------------------------------------
+
+do_dispatch:
 
 
 	// Checa estrutura.
@@ -103,13 +235,13 @@ void dispatcher ( int type ){
     dispatch_Pointer = (void *) threadList[current_thread];
 
     if ( (void *) dispatch_Pointer == NULL ){
-        panic ("dispatcher: struct\n");
+        panic ("dispatch-dispatcher: struct\n");
     }
 
 	// Checa o 'state'.
 
     if ( dispatch_Pointer->state != READY ){
-        panic ("dispatcher: State ERROR\n");
+        panic ("dispatch-dispatcher: State ERROR\n");
     }
 
 
@@ -156,7 +288,23 @@ void dispatcher ( int type ){
 }
 
 
-// deprecated!
+//
+//  ## IMPORTANTE  ##
+//  Todos os outros modelos de dispacher abaixo ainda 
+//  não foram habilitados.
+//
+
+/*
+ * readyDispatcher:
+ *     Dispatcher principal. 
+ *     Pega da fila do dispatcher. Que é a fila de READY tasks.
+ *     Pega a head da fila de ready quando vencer o tempo dela de espera.
+ *     Obs: Esse tipo de dispacher ainda não foi habilitado.
+ */
+
+// #todo
+// It's not implemented.
+
 int readyDispatcher (void)
 {
 	struct thread_d *dispatch_Pointer;
@@ -196,7 +344,14 @@ done:
 
 
 
-// deprecated!
+/*
+ * syscoopDispatcher:
+ *  Obs: Esse tipo de dispacher ainda não foi habilitado.
+ */
+ 
+// #todo
+// It's not implemented.
+
 int syscoopDispatcher (void)
 {
 	struct thread_d *dispatch_Pointer;
@@ -228,8 +383,14 @@ fail:
 }
 
 
+/*
+ * usercoopDispatcher:
+ *  Obs: Esse tipo de dispacher ainda não foi habilitado.
+ */
+ 
+// #todo
+// It's not implemented.
 
-// deprecated!
 int usercoopDispatcher (void)
 {
 	struct thread_d *dispatch_Pointer;
@@ -261,7 +422,14 @@ fail:
 }
 
 
-// deprecated!
+/*
+ * sysconcDispatcher:
+ *  Obs: Esse tipo de dispacher ainda não foi habilitado.
+ */
+ 
+// #todo
+// It's not implemented.
+
 int sysconcDispatcher (void)
 {
 	struct thread_d *dispatch_Pointer;
@@ -293,7 +461,14 @@ fail:
 }
 
 
-// deprecated!
+/*
+ * userconcDispatcher:
+ *  Obs: Esse tipo de dispacher ainda não foi habilitado.
+ */
+
+// #todo
+// It's not implemented.
+
 int userconcDispatcher (void)
 {
 	struct thread_d *dispatch_Pointer;
@@ -325,14 +500,44 @@ fail:
 }
 
 
-// deprecated!
+/*
+ ******************************************************
+ * systemDispatcher:
+ *     System dispatcher.
+ *     ?? Penso que isso seja uma interface para 
+ * chamar o dispacher. 
+ */
+
+// #todo
+// It's not implemented.
+
+// # suspensa #
 int systemDispatcher (void)
 { 
     return 0; 
 }
 
 
-// deprecated!
+/*
+ *****************************************************
+ * idleDispatcher:
+ *     Despachar a thread idle atual.
+ *     current_idle_thread.
+ *         
+ * Obs:
+ *     A tarefa idle pode ter qualquer id.
+ *     Devemos despachar a idle quando o sistema estiver 
+ * ocioso ou quanto a thread idle é a única thread.
+ *     Se o kernel detectar quen não há mas nenhuma thread 
+ * no sistema então o kernel deve selecionar uma nova 
+ * idle atual e despacha-la. 
+ */
+ 
+// #todo
+// It's not implemented.
+
+// ## suspensa ##
+
 int idleDispatcher (void)
 { 
     //current_idle_thread
@@ -341,7 +546,15 @@ int idleDispatcher (void)
 }
 
 
-// deprecated!
+/*
+ * periodicDispatcher:
+ *     Periodic dispatcher.
+ *     Obs: Esse tipo de dispacher ainda não foi habilitado.
+ */
+
+// #todo
+// It's not implemented.
+
 int periodicDispatcher (void)
 { 
     // struct thread_d *New;
@@ -350,14 +563,38 @@ int periodicDispatcher (void)
 }
 
 
-// deprecated!
+/*
+ * rrDispatcher:
+ *     Round robin dispatcher.
+ *     Obs: Esse tipo de dispacher ainda não foi habilitado.
+ */
+ 
+// #todo
+// It's not implemented.
+
 int rrDispatcher (void)
 { 
     return 0; 
 }
 
 
-// deprecated!
+/*
+ * realtimeDispatcher:
+ *     ## bugbug, na verdade ainda estou aprendendo sobre isso. :) sorry.
+ *     Real time dispatcher.
+ *     Pega uma tarefa na fila de tarefas com prioridade e tipo realtime.
+ *
+ * * IMPORTANTE:
+ *   Normalmente essas tarefas ficam confinadas em um processador, destinado 
+ * pra tarefas de tempo real.
+ * Obs:
+ *     Na verdade não é tão real time assim.
+ *     Obs: Esse tipo de dispacher ainda não foi habilitado.
+ */
+
+// #todo
+// It's not implemented.
+
 int realtimeDispatcher (void)
 {
 	
@@ -390,9 +627,16 @@ fail:
 }
 
 
-// deprecated!
-int dispatch_Default (void)
-{
+/*
+ * dispatch_Default:
+ *  Obs: Esse tipo de dispacher ainda não foi habilitado.
+ */
+ 
+// #todo
+// It's not implemented.
+
+int dispatch_Default (void){
+
     struct thread_d *New;
     struct thread_d *Current;
     int qNext=0;
@@ -662,10 +906,9 @@ int init_dispatcher (void){
 
     int i=0;
 
-    debug_print ("init_dispatcher:\n");
-    
-    //Seleciona o tipo de dispatcher.
-    Dispatcher.policy = DISPATCHER_CURRENT;
+	//
+	// Para um dispatcher na forma de array.
+	//
 
 
 //dispatcher_array:
@@ -673,6 +916,8 @@ int init_dispatcher (void){
 	//Index
     dispatcherQueueIndex = (int) 0;
 
+	//Seleciona o tipo de dispatcher.
+    dispatcherType = DISPATCHER_SYSTEM;
 
 	//inicializa a fila do dispacher.
 

@@ -12,8 +12,7 @@
 #include <errno.h>
 
 
-int main ( int argc, char *argv[] )
-{
+int main ( int argc, char *argv[] ){
 
     FILE *fp;
     char buffer[1024];
@@ -28,11 +27,10 @@ int main ( int argc, char *argv[] )
 
     // Open
     fp = fopen ( (char *) argv[1], "r+" );
-    if ( (void *) fp == NULL )
-    {
+    if ( (void *) fp == NULL ){
         printf ("cat: fopen fail\n");
         //perror ("cat: fopen fail  ... testing perror\n");
-         exit (-1);
+        exit (-1);
     }
 
     // #todo

@@ -89,18 +89,6 @@ struct ps2_mouse_d
     object_class_t objectClass;
 
     int dummy;
-    //================
-    //uint8_t mouse_status;
-    //uint8_t mouse_resolution;
-    //uint8_t mouse_sample_rate;
-    //uint8_t mouse_wrap;
-    //uint8_t mouse_type; /* 0 = PS2, 3 = IMPS/2, 4 = IMEX */
-    //uint8_t mouse_detect_state;
-    //int mouse_dx; /* current values, needed for 'poll' mode */
-    //int mouse_dy;
-    //int mouse_dz;
-    //uint8_t mouse_buttons;
-    //================
 };
 
 

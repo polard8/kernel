@@ -348,10 +348,6 @@ void init_scheduler (void)
 {
     debug_print ("init_scheduler: [TODO]\n");
     // ...
-    
-    Scheduler.policy = SCHEDULER_RR;
-    Scheduler._class = 0; // nothing for now!
-    // ...
 }
 
 
