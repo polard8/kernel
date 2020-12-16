@@ -12,7 +12,7 @@
   <a href="https://github.com/frednora/gramado/archive/master.zip">
   <img alt="Download " src="https://img.shields.io/badge/Download-latest-green.svg">
   </a>
-  <a href="https://gramado.github.io/projects">
+  <a href="https://gramadoprojects.github.io/projects">
     <img alt="Donate" src="https://img.shields.io/badge/%24-Donate-orange.svg">
   </a>
 </p>
