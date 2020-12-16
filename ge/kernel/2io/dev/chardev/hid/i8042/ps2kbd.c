@@ -950,13 +950,14 @@ done:
        
        // it is gonna write in the base of the buffer.
        
+       
        // write in the keyboard tty.
        __tty_write( 
            (struct tty_d *) PS2KeyboardDeviceTTY, 
            (char *) event_buffer, 
            (int) (4*4) );  //16 bytes 
         
-        PS2KeyboardDeviceTTY->new_event = TRUE;  //temos uma mensagem.
+       PS2KeyboardDeviceTTY->new_event = TRUE;  //temos uma mensagem.
     
         // write in the stdin of the current process.
         //__p = processList[current_process]; //get process structure

@@ -660,6 +660,7 @@ int sys_read (unsigned int fd, char *ubuf, int count)
         goto fail; 
     }
 
+    
     // stdin
     // read from prompt
     if ( __file->_file == 0 )
