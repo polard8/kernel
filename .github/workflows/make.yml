@@ -1,0 +1,19 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [ autobuild ]
+  pull_request:
+    branches: [ autobuild ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: install build requirements
+      run: sudo apt install build-essential make qemu-system-i386 qemu-utils nasm -y
+    - name: build
+      run: make
