@@ -116,10 +116,10 @@ ge-boot:
 	$(Q) $(MAKE) -C ge/boot/x86/2bl/ 
 	sudo cp ge/boot/x86/bin/BM.BIN  base/
 	sudo cp ge/boot/x86/bin/BM.BIN  base/BOOT
-	sudo cp ge/boot/x86/bin/BM.BIN  base/PORTALS
+	sudo cp ge/boot/x86/bin/BM.BIN  base/SBIN
 	sudo cp ge/boot/x86/bin/BL.BIN  base/
 	sudo cp ge/boot/x86/bin/BL.BIN  base/BOOT
-	sudo cp ge/boot/x86/bin/BL.BIN  base/PORTALS
+	sudo cp ge/boot/x86/bin/BL.BIN  base/SBIN
 
 # KERNEL.BIN  - Creating the kernel image.
 ge-kernel:
@@ -129,7 +129,7 @@ ge-kernel:
 	$(Q) $(MAKE) -C ge/kernel
 	sudo cp ge/kernel/KERNEL.BIN  base/
 	sudo cp ge/kernel/KERNEL.BIN  base/BOOT
-	sudo cp ge/kernel/KERNEL.BIN  base/PORTALS
+	sudo cp ge/kernel/KERNEL.BIN  base/SBIN
 
 ge-rtl:
 	#::rtl
@@ -147,7 +147,7 @@ ge-init:
 	@echo "Compiling init ..."
 	$(Q) $(MAKE) -C ge/init/
 	sudo cp ge/init/INIT.BIN  base/
-	sudo cp ge/init/INIT.BIN  base/PORTALS
+	sudo cp ge/init/INIT.BIN  base/SBIN
 
 ge-aurora:
 	#::aurora Aurora Window Server.
@@ -157,7 +157,7 @@ ge-aurora:
 	# gws
 	-sudo cp ge/aurora/bin/GWS.BIN     base/ 
 	-sudo cp ge/aurora/bin/GWSSRV.BIN  base/
-	-sudo cp ge/aurora/bin/GWSSRV.BIN  base/PORTALS
+	-sudo cp ge/aurora/bin/GWSSRV.BIN  base/SBIN
 
 ge-services:
 	#::services Services
@@ -167,7 +167,7 @@ ge-services:
 	# gns
 	-sudo cp ge/services/gnssrv/bin/GNS.BIN     base/
 	-sudo cp ge/services/gnssrv/bin/GNSSRV.BIN  base/
-	-sudo cp ge/services/gnssrv/bin/GNSSRV.BIN  base/PORTALS
+	-sudo cp ge/services/gnssrv/bin/GNSSRV.BIN  base/SBIN
 
 
 #===================================================
@@ -184,7 +184,7 @@ setup0-grass:
 	#::grass
 	$(Q) $(MAKE) -C setup0/grass/
 	sudo cp setup0/grass/bin/GDESHELL.BIN  base/
-	sudo cp setup0/grass/bin/GDESHELL.BIN  base/PORTALS
+	sudo cp setup0/grass/bin/GDESHELL.BIN  base/SBIN
 	# setup
 	#-sudo cp setup0/grass/bin/*.BIN    base/
 	sudo cp setup0/grass/bin/LAUNCHER.BIN  base/
@@ -216,7 +216,7 @@ setup1-net:
 	#::net
 	$(Q) $(MAKE) -C setup1/net/
 	-sudo cp setup1/net/bin/*.BIN  base/
-	-sudo cp setup1/net/bin/*.BIN  base/PROGRAMS
+#	-sudo cp setup1/net/bin/*.BIN  base/PROGRAMS
 
 setup2-cmd:
 	#::cmd
@@ -308,8 +308,8 @@ clean4:
 	-rm -rf base/BOOT/*.BIN 
 	-rm -rf base/BIN/*.BIN 
 	-rm -rf base/SBIN/*.BIN 
-	-rm -rf base/PROGRAMS/*.BIN 
-	-rm -rf base/PORTALS/*.BIN 
+#	-rm -rf base/PROGRAMS/*.BIN 
+#	-rm -rf base/SBIN/*.BIN 
 # clean system files.
 PHONY := clean-system-files
 clean-system-files:

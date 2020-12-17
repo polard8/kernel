@@ -96,13 +96,14 @@ int load_kernel (){
                        //(unsigned long) kernel_pa );
      
     //#importante: Esse funciona.                 
-    Status = (int) load_path ( "/PORTALS/KERNEL.BIN", 
+    Status = (int) load_path(
+                       "/SBIN/KERNEL.BIN", 
                        (unsigned long) kernel_pa );
-    
+
     if ( Status != 0 )
     {
-
-        Status = (int) load_path ( "/BOOT/KERNEL.BIN", 
+        Status = (int) load_path(
+                           "/BOOT/KERNEL.BIN", 
                            (unsigned long) kernel_pa );
 
         if ( Status != 0 ){
@@ -116,21 +117,17 @@ int load_kernel (){
         //                   kernel_pa, FAT16_ROOTDIR_ADDRESS );
     }
 
-
     if (Status != 0 ){
-        printf("load_kernel fail: Load\n");  
-        goto fail;    
+        printf("load_kernel fail: Load\n");  goto fail;    
     }
-
-
-
 
 	// Check for .ELF file. 0x7f 0x45 0x4c 0x46 (.ELF)	
 
     if ( kernel[0] != 0x7F || 
          kernel[1] != 'E' || kernel[2] != 'L' || kernel[3] != 'F' )
     {
-        printf ("load_kernel: [FAIL] %s ELF image validation\n", kernel_name );  
+        printf ("load_kernel: [FAIL] %s ELF image validation\n", 
+            kernel_name );  
         goto fail;
     }
 
