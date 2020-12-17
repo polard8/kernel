@@ -29,10 +29,11 @@ int running = 1;
  
 
 int 
-gfeProcedure ( struct window_d *window, 
-               int msg, 
-               unsigned long long1, 
-               unsigned long long2 );
+gfeProcedure ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 );
  
 
 
@@ -57,7 +58,7 @@ gfeProcedure (
 
         case MSG_CREATE: 
             printf ("MSG_CREATE:\n"); 
-            goto done;
+            return 0;
             break;
 
        case MSG_SYSKEYDOWN:
@@ -148,15 +149,14 @@ done:
 int main ( int argc, char *argv[] ){
 
     struct window_d *hWindow;
-
     FILE *fp;
-
     int ch;
     int char_count = 0;
 
 
+
 #ifdef TEDITOR_VERBOSE
-	printf("\n");
+	//printf("\n");
 	printf("Initializing File explorer:\n");
 	//printf("mainTextEditor: # argv={%s} # \n", &argv[0] );
 #endif
@@ -186,18 +186,55 @@ int main ( int argc, char *argv[] ){
 	// ## app window ##
 	//
 
+    unsigned long deviceWidth  = gde_get_system_metrics(1);
+    unsigned long deviceHeight = gde_get_system_metrics(2);
+
+    //main window
+    unsigned long left=0;
+    unsigned long top=0;
+    unsigned long width=0;
+    unsigned long height=0;
+    unsigned long color;
+
+    // grid window
+    unsigned long gw_left=0;
+    unsigned long gw_top=0;
+    unsigned long gw_width=0;
+    unsigned long gw_height=0;
+    unsigned long gw_color;
+
+    // menu window
+    unsigned long mw_left=0;
+    unsigned long mw_top=0;
+    unsigned long mw_width=0;
+    unsigned long mw_height=0;
+    unsigned long mw_color;
+
+
+    if ( deviceWidth == 0 || deviceHeight == 0 ){
+        printf ("GFE.BIN: [FAIL] device metrics\n");
+        exit(1);
+    }
+
+    // main window
+    left = 0;
+    top  = 0;  
+    width  = deviceWidth;
+    height = deviceHeight;
+    color = COLOR_GRAY;
+
+
     //++
     gde_begin_paint (); 
-    hWindow = (void *) gde_create_window ( WT_OVERLAPPED, 1, 1, 
-                           "Setup: gfe",
-                           10, 10, 640, 480,    
-                           0, 0, COLOR_BLUE, COLOR_BLUE ); 
+    hWindow = (void *) gde_create_window ( 
+                           WT_OVERLAPPED, 1, 1, "GFE",
+                           left, top, width, height,    
+                           0, 0, color, color ); 
 
     if ( (void *) hWindow == NULL ){
         printf ("gfe: hWindow fail");
         gde_end_paint ();
         goto fail;
-
     }else{
         gde_register_window (hWindow);
         gde_show_window (hWindow);
@@ -226,7 +263,6 @@ int main ( int argc, char *argv[] ){
     if ( (void *) b == NULL ){
         debug_print ("gfe: allocation fail\n");
         goto fail;
-
     }else{
         gramado_system_call ( SYSTEMCALL_READ_FILE, 
             (unsigned long) "FOLDER  BMP", 
@@ -245,18 +281,23 @@ int main ( int argc, char *argv[] ){
 	// Grid.
 	//
 
+    gw_left    = 4;
+    gw_top     = 4;
+    gw_width   = width/3;
+    gw_height  = height/2;
+    gw_color   = COLOR_RED;
 
 	//++
-    gde_begin_paint (); 
-    gWindow = (void *) gde_create_window ( WT_SIMPLE, 1, 1, "GRID-WINDOW",
-                           40, 80, 100, 320,    
-                           hWindow, 0, 0x303030, 0x303030 );
+    gde_begin_paint(); 
+    gWindow = (void *) gde_create_window ( 
+                           WT_SIMPLE, 1, 1, "GRID-WINDOW",
+                           gw_left, gw_top, gw_width, gw_height,    
+                           hWindow, 0, gw_color, gw_color );
 
     if ( (void *) gWindow == NULL ){
         debug_print ("gfe: gWindow fail");
         gde_end_paint();
         goto fail;
-
     }else{
         gde_register_window (gWindow);
 
@@ -339,13 +380,19 @@ int main ( int argc, char *argv[] ){
     //está quase funcionando novamente.
     //é questão de posicionamento.
 
+    mw_left    = width/2;
+    mw_top     = 2;
+    mw_width   = width/3;
+    mw_height  = height/2;
+    mw_color   = COLOR_GREEN;
 
     
 	//++
 	gde_begin_paint (); 
-    mWindow = (void *) gde_create_window ( WT_SIMPLE, 1, 1, "MENU-WINDOW",
-                           300, 100, 320, 200,
-                           hWindow, 0, COLOR_PINK, COLOR_PINK );
+    mWindow = (void *) gde_create_window ( 
+                           WT_SIMPLE, 1, 1, "MENU-WINDOW",
+                           mw_left, mw_top, mw_width, mw_height,
+                           hWindow, 0, mw_color, mw_color );
                            
     if ( (void *) mWindow == NULL ){
         debug_print ("gfe: mWindow fail");
@@ -390,17 +437,17 @@ Mainloop:
 
     while (running)
     {
-		gde_enter_critical_section(); 
-		gramado_system_call ( 111,
-		    (unsigned long)&message_buffer[0],
-			(unsigned long)&message_buffer[0],
-			(unsigned long)&message_buffer[0] );
-		gde_exit_critical_section(); 
-
+        gde_enter_critical_section(); 
+        gramado_system_call ( 111,
+            (unsigned long)&message_buffer[0],
+            (unsigned long)&message_buffer[0],
+            (unsigned long)&message_buffer[0] );
+        gde_exit_critical_section(); 
 
         if ( message_buffer[1] != 0 )
         {
-            gfeProcedure ( (struct window_d *) message_buffer[0], 
+            gfeProcedure ( 
+                (struct window_d *) message_buffer[0], 
                 (int) message_buffer[1], 
                 (unsigned long) message_buffer[2], 
                 (unsigned long) message_buffer[3] );
@@ -412,11 +459,10 @@ Mainloop:
         }
     };
 
-fail:
-    debug_print ("fail.\n");
 
+fail:
+    debug_print ("GFE: fail.\n");
 done:
-    running = 0;
     return 0;
 }
 

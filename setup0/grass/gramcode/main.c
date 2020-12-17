@@ -844,6 +844,13 @@ skip_test:
     unsigned long deviceWidth  = gde_get_system_metrics(1);
     unsigned long deviceHeight = gde_get_system_metrics(2);
 
+
+    if ( deviceWidth == 0 || deviceHeight == 0 ){
+        printf ("GRAMCODE.BIN: [FAIL] device metrics\n");
+        exit(1);
+    }
+
+
 	//
 	// Window
 	//
@@ -858,19 +865,30 @@ skip_test:
 
 
     //
-    // frame
+    // frame ================
     //
+    
+    unsigned long bgw_left;
+    unsigned long bgw_top;
+    unsigned long bgw_width;
+    unsigned long bgw_height;
+
+    unsigned long ebw_left;
+    unsigned long ebw_top;
+    unsigned long ebw_width;
+    unsigned long ebw_height;
+
 
     // frame
     // Criando uma janela para meu editor de textos.
 
     //++
     gde_begin_paint (); 
-    hWindow = (void *) gde_create_window ( WT_OVERLAPPED, 1, 1, 
-                          argv[1],
-                          wpWindowLeft, wpWindowTop, 
-                          wsWindowWidth, wsWindowHeight,    
-                          0, 0, 0x303030, 0x303030 );
+    hWindow = (void *) gde_create_window ( 
+                           WT_OVERLAPPED, 1, 1, argv[1],
+                           wpWindowLeft, wpWindowTop, 
+                           wsWindowWidth, wsWindowHeight,    
+                           0, 0, COLOR_GRAY, COLOR_GRAY );
 
     if ( (void *) hWindow == NULL ){
         gde_end_paint ();
@@ -890,16 +908,21 @@ skip_test:
     // Background
     //
 
+    bgw_left   = 4;
+    bgw_top    = 4 +36;
+    bgw_width  = (wsWindowWidth -8);
+    bgw_height = (wsWindowHeight -36 -8);
+
 	//++
     gde_enter_critical_section ();  
-    editbox_bg_Window = (void *) gde_create_window ( WT_SIMPLE, 1, 1, 
-                                    "editbox-bg",     
-                                    4, 4 +36, 
-                                    wsWindowWidth -4 -40, wsWindowHeight -36 -40, 
-                                    hWindow, 0, 
-                                    0x303030, 0x303030 );
-                                    
-    if ( (void *) editbox_bg_Window == NULL){
+    editbox_bg_Window = (void *) gde_create_window ( 
+                                     WT_SIMPLE, 1, 1, "editbox-bg",     
+                                     bgw_left, bgw_top, 
+                                     bgw_width, bgw_height, 
+                                     hWindow, 0, 0x303030, 0x303030 );
+
+    if ( (void *) editbox_bg_Window == NULL)
+    {
         gde_exit_critical_section (); 
         printf ("editbox_bg_Window fail");
         while(1){}
@@ -914,11 +937,19 @@ skip_test:
     // Editbox.
     //
 
+    ebw_left   = 1;
+    ebw_top    = 1;
+    ebw_width  = (bgw_width  -2); 
+    ebw_height = (bgw_height -2); 
+
+    // #bugbug
+    // A janelas eh realmente relativa a janela mae?
+
     //++
     gde_enter_critical_section ();  
     editboxWindow = (void *) gde_create_window ( WT_EDITBOX, 1, 1, "editbox",     
-                                1, 1, wsWindowWidth -8, wsWindowHeight -8 -36, 
-                                editbox_bg_Window, 0, COLOR_RED, COLOR_RED );
+                                ebw_left, ebw_top, ebw_width, ebw_height, 
+                                editbox_bg_Window, 0, COLOR_WHITE, COLOR_WHITE );
     if ( (void *) editboxWindow == NULL){
         gde_exit_critical_section ();  
         printf ("editboxWindow fail");

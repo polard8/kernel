@@ -391,9 +391,7 @@ done:
 int main ( int argc, char *argv[] ){
 
     struct window_d *hWindow;
-
     FILE *fp;
-
     int ch=0;
     int char_count = 0;
 
@@ -428,6 +426,13 @@ int main ( int argc, char *argv[] ){
     unsigned long dw_width=0;
     unsigned long dw_height=0;
     unsigned long dw_color;
+    
+    
+    if ( deviceWidth == 0 || deviceHeight == 0 ){
+        printf ("SYSMON.BIN: [FAIL] device metrics\n");
+        exit(1);
+    }
+    
 
     // main window
     left = 0;
@@ -457,7 +462,7 @@ int main ( int argc, char *argv[] ){
     dw_top  = cbw_height + 8;  
     dw_width  = cw_width -2;
     dw_height = cw_height - cbw_height - 8;
-    dw_color = COLOR_WHITE;  //COLOR_WHITE
+    dw_color = COLOR_WHITE;
 
 
 //
@@ -467,9 +472,9 @@ int main ( int argc, char *argv[] ){
     //++
     // The main window.
     gde_begin_paint (); 
-    hWindow = (void *) gde_create_window (  WT_OVERLAPPED, 1, 1, 
-                           "Setup: sysmon",
-                           left, top, width, height,    
+    hWindow = (void *) gde_create_window (  
+                           WT_OVERLAPPED, 1, 1, "SYSMON", 
+                           left, top, width, height, 
                            0, 0, color, color );  
 
     if ( (void *) hWindow == NULL ){
@@ -502,8 +507,8 @@ int main ( int argc, char *argv[] ){
     // Client background.
     // Almost the same size of the main window.
     gde_enter_critical_section ();  
-    client_window = (void *) gde_create_window ( WT_SIMPLE, 1, 1, 
-                                "client-bg",     
+    client_window = (void *) gde_create_window ( 
+                                 WT_SIMPLE, 1, 1, "client-bg",     
                                 cw_left, cw_top, cw_width, cw_height, 
                                 main_window, 0, 
                                 cw_color, cw_color); //0xF5DEB3, 0xF5DEB3 );
