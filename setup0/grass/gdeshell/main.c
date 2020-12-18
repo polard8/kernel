@@ -543,7 +543,7 @@ void process_stats(void){
 
     register int i=0;
     
-    unsigned long __process_image_pa;    
+    unsigned long __process_image_pa;
     unsigned long __process_image_va;
     unsigned long __process_image_size;
 
@@ -561,8 +561,8 @@ void process_stats(void){
 }
 
 
-void fake_sleep (unsigned long t){
-
+void fake_sleep (unsigned long t)
+{
     unsigned long i = (unsigned long) ( t * 512 );
     
     if(i == 0)
@@ -1228,6 +1228,7 @@ shellProcedure (
         case MSG_CLOSE:   
             printf ("MSG_CLOSE\n");   
             exit(0);
+            gdeshell_exit();
             break;
             
         case MSG_DESTROY: printf ("MSG_DESTROY\n"); break;
@@ -1360,8 +1361,8 @@ void shellWaitCmd (void)
 #define SPACE " "
 #define TOKENLIST_MAX_DEFAULT 80
  
-unsigned long shellCompare (struct window_d *window){
-
+unsigned long shellCompare (struct window_d *window)
+{
     //
     // Token support.
     //
@@ -1531,26 +1532,14 @@ commandlineOk:
 
     absolute = absolute_pathname ( (char *) prompt );
 
-    switch (absolute)
-    {
-		//N�o � absoluto ou falhar
-		case 0:
-		    goto this_directory;
-		    break;
-			
-		//� absoluto	
-		case 1:
-		    goto check_directory; 
-			break;
-		//falha	
-		case 2:
-		default:
-		    goto this_directory;
-			break;
+    switch (absolute){
+        case 0:  goto this_directory;  break;
+        case 1:  goto check_directory; break;
+        case 2:
+        default:
+            goto this_directory;
+            break;
     };
-
-
-
 
 
 //precisamos checar em que diret�rio 
@@ -1762,11 +1751,9 @@ do_compare:
         {
             token = (char *) tokenList[__z];
 
-            if ( token == NULL )
-            {
+            if ( token == NULL ){
                 goto exit_cmp;
             }else{
-
                 printf ("%d = {%s}\n", __z, tokenList[__z] );
             };
         };
@@ -1986,9 +1973,11 @@ do_compare:
 
 
     // exit - Exit the application.
-    if ( gramado_strncmp( prompt, "exit", 4 ) == 0 ){
-        exit_builtins();
-        ShellFlag = SHELLFLAG_EXIT;
+    if ( gramado_strncmp( prompt, "exit", 4 ) == 0 )
+    {
+        //exit_builtins();
+        //ShellFlag = SHELLFLAG_EXIT;
+        gdeshell_exit();
         goto exit_cmp;
     }
     
@@ -6688,6 +6677,21 @@ int desktopInitialize (void)
     return 0;
 }
 
+
+// Exit the application.
+void gdeshell_exit(void)
+{
+    printf ("gdeshell_exit: Exiting ...\n");
+    
+    //fprintf(stderr,"GDESHELL: Exiting with no error...\n");
+    //fflush(stderr);
+     
+    _running = 0;
+    
+    // ...
+    
+    exit(0);
+}
 
 /*
  *********************************************************

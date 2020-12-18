@@ -2636,6 +2636,7 @@ void windowUnblockFocus (void)
 /*
  *****************************************************
  * SetFocus:
+ * 
  *     + Seta o foco em uma janela.
  *     + Configura o cursor.
  *     + Reinicia um buffer.
@@ -2660,28 +2661,32 @@ void windowUnblockFocus (void)
 // #bugbug
 // Revendo a questão de repintar a janela mãe quando se seta o foco. 
  
-void SetFocus ( struct window_d *window ){
-
+void SetFocus ( struct window_d *window )
+{
     // priority stuff
     struct thread_d *thread;
-
 
 	// #debug
 	// Testando com uma versão simplificada, pois isso está falhado na máquina real.
 	// Sem foco do teclado não funciona.
 
-    if ( (void *) window == NULL ){
-        panic ("SetFocus: window");
 
+    debug_print("wm-Setfocus:\n");
+
+    if ( (void *) window == NULL ){
+        panic ("SetFocus: window\n");
     }else{
         if ( window->used != 1 || window->magic != 1234 ){
             panic("SetFocus: Validation");
         }
 
-        // ... 
-
-        // ok: Let's set the focus.
-
+        // #todo
+        // process ad thread
+        
+        // foreground_process = (int) 
+        // foreground_thread  = (int)
+        
+        
         window_with_focus = (int) window->id;
         
         window->focus = 1; 

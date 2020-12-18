@@ -195,6 +195,10 @@ int BAT_TEST (void);
 
 // Local function.
 
+// #bugbug
+// Isso nao seria trabalho do window manager?
+// kgwm
+
 unsigned long 
 __local_ps2kbd_procedure ( 
     struct window_d *window, 
@@ -399,6 +403,7 @@ __local_ps2kbd_procedure (
                         refresh_screen();
                     }
                     if (shift_status == 1){
+                        //kgwm_mode = KGWM_SINGLE;
                         printf ("__local_ps2kbd_procedure: shift + f9\n");
                         refresh_screen();
                     }
@@ -415,6 +420,7 @@ __local_ps2kbd_procedure (
                         refresh_screen();
                     }
                     if (shift_status == 1){
+                        //kgwm_mode = KGWM_DOUBLE;
                         printf ("__local_ps2kbd_procedure: shift + f10\n");
                         refresh_screen();
                     }
@@ -431,6 +437,7 @@ __local_ps2kbd_procedure (
                         refresh_screen();
                     }
                     if (shift_status == 1){
+                        //kgwm_mode = KGWM_TRIPLE;
                         printf ("__local_ps2kbd_procedure: shift + f11\n");
                         refresh_screen();
                     }
@@ -447,6 +454,7 @@ __local_ps2kbd_procedure (
                         refresh_screen();
                     }
                     if (shift_status == 1){
+                        //kgwm_mode = KGWM_QUAD;
                         printf ("__local_ps2kbd_procedure: shift + f12\n");
                         refresh_screen();
                     }

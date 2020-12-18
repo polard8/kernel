@@ -1268,6 +1268,9 @@ int shellTestButtons (void);
 void testCreateWindow (void);
 
 
+// Exit the application.
+void gdeshell_exit(void);
+
 //
 // End.
 //

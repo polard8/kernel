@@ -469,11 +469,10 @@ int x86main (void)
 	// ## BUGBUG ##
 	// As mensagens do abort podem não funcionarem nesse caso.
 	// AINDA NÃO INICIALIZAMOS O RECURSO DE MENSAGENS.
-	
-    if ( KeInitPhase != 0 )
-    {
+
+
+    if ( KeInitPhase != 0 ){
         KiAbort();
-    
     }else{
         
         // Disable interrupts, lock taskswitch and scheduler.

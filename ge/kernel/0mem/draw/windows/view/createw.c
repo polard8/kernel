@@ -448,17 +448,15 @@ void *CreateWindow (
 	// ?? Qual deve ser a janela mãe ? Limites ?
 	// @todo: devemos checar used e magic da janela mãe.
 	// #bugbug: E quando formos criar a gui->screen, quem será a janela mãe ?
-	
-	if ( (void *) pWindow == NULL ){
-		
-		Parent = (void *) gui->screen;
 
-	} else {
 
-		Parent = (void *) pWindow;
-	};
+    if ( (void *) pWindow == NULL ){
+        Parent = (void *) gui->screen;
+    } else {
+        Parent = (void *) pWindow;
+    };
 
-	
+
 	// Devemos checar se a janela está no mesmo desktop 
 	// que a ajnela mãe.
 	// No caso aqui, criarmos uma janela no mesmo desktop que a 
@@ -491,22 +489,17 @@ void *CreateWindow (
 	
 	// *Importante: 
 	// Checando se o esquema de cores está funcionando.
-	
-	if ( (void *) CurrentColorScheme == NULL ){
-		
-		panic ("CreateWindow: CurrentColorScheme");
-		
-	}else{
-		
+
+    if ( (void *) CurrentColorScheme == NULL ){
+        panic ("CreateWindow: CurrentColorScheme\n");
+    }else{
 		if ( CurrentColorScheme->used != 1 || 
 		     CurrentColorScheme->magic != 1234 )
 		{
 		    panic ("CreateWindow: CurrentColorScheme validation");
 		}
-
 		//Nothing.
-	}
-
+    };
 
 	//
 	// ## New window ##
@@ -621,14 +614,14 @@ void *CreateWindow (
 		// inclui as bordas e a barra de títulos.
 
 		// Dimensões.
-        window->width = width;
-        window->height = height;  
+        window->width  = width;
+        window->height = height;
 
 		// Margens.
-        window->left = x;    
-        window->top = y;
-        window->right = (unsigned long) ( window->left + window->width );
-        window->bottom = (unsigned long) ( window->top + window->height ); 
+        window->left   = x;
+        window->top    = y;
+        window->right  = (unsigned long) ( window->left + window->width );
+        window->bottom = (unsigned long) ( window->top  + window->height ); 
 
 		// Deslocamentos em relação às margens.
 		// Os deslocamentos servem para inserir elementos na janela, 
@@ -776,24 +769,26 @@ void *CreateWindow (
 	    //Continua ...
 	
         //Abaixo, elementos referenciados com menor frequência.
-	    
-		window->desktop = NULL; //@todo: Definir à qual desktop a janela perence.
-		window->process = NULL; //@todo: Definir à qual processo a janela perence.
-		
+
+
+        window->desktop = NULL; //@todo: Definir à qual desktop a janela perence.
+        
+        // process and thread
+        // #todo: We need these for jog control.
+        window->process = NULL;
+        window->control = NULL;
+
 		//Trava.
 		window->locked = 0;
 		
 		//Linked list.
 		//window->linkedlist = NULL;
-		
-		//Prev e next.
-		window->prev = (void *) Parent;
-		window->next = NULL;
-			
-		//#debug
-		//printf("config1 %s %d %d %d %d \n",
-		//    window->name, window->left, window->top, window->width, window->height );
-	};
+
+        // navigation
+        window->prev = (void *) Parent;
+        window->next = NULL;
+    };
+
 
     //Exemplos de tipos de janelas, segundo MS.	
     //Overlapped Windows
@@ -824,13 +819,11 @@ void *CreateWindow (
 	// @todo: Salvar as flags para os elementos presentes
 	// na estrutura da janela.
 
-    switch (type)
-    {
+    switch (type){
 
         case WT_NULL:
             return NULL; 
             break;
-
 
         // Simple window. (Sem barra de títulos).
         case WT_SIMPLE:
@@ -840,13 +833,13 @@ void *CreateWindow (
 
 
 		// Popup. (um tipo de overlapped mais simples).
-		case WT_POPUP:
-	        Shadow = 1;        
+        case WT_POPUP:
+            Shadow = 1;        
 		    window->shadowUsed = 1;	        
 	        Background = 1;
 		    window->backgroundUsed = 1;
 		    //if(titulo){} TitleBar = 1;    //titulo + borda
-		    break;
+            break;
  
 
 		// Button.
@@ -954,9 +947,8 @@ void *CreateWindow (
 		
 		//@todo: Não retornar. 
 		//como teste estamos retornando.
-		
-		goto done;
-	    //return (void *) window;
+
+        goto done;
     }
 
 
@@ -1374,12 +1366,10 @@ void *CreateWindow (
 
 
 
-
-
+    // #test
     // #simple #
     if ( (unsigned long) type == WT_SIMPLE )
     {
-       //#test
         window->parent = Parent;
     }
 
@@ -1412,12 +1402,11 @@ void *CreateWindow (
     {
         bmpDisplayBMP ( shared_buffer_app_icon, 
             (window->left +8), (window->top +8) );
-            
+
         draw_string ( 
             (window->left +8), (window->top +16 +8 +8), 
             xCOLOR_GRAY7, window->name );  
     }
-
 
 done:
     return (void *) window;
@@ -1443,6 +1432,7 @@ void *kgws_create_window (
 {
 
     struct window_d *__w;
+    int z=0;
 
  
     // No caso dos tipos com moldura então criaremos em duas etapas.
@@ -1510,6 +1500,9 @@ void *kgws_create_window (
     }
 
 
+    // #bugbug
+    // Precisamos checar se o tipo eh valido.
+
     //================
     
     
@@ -1530,8 +1523,7 @@ void *kgws_create_window (
     goto done;
 
 
-
-
+// draw frame.
 
 draw_frame:
 
@@ -1539,38 +1531,30 @@ draw_frame:
     //DESENHA O FRAME DOS TIPOS QUE PRECISAM DE FRAME.
     //OVERLAPED, EDITBOX, CHECKBOX ...
 
-    if ( type == WT_OVERLAPPED || type == WT_EDITBOX || type == WT_CHECKBOX )
-    {
-        if (type == WT_EDITBOX)
-        { __w->isEditBox = 1; }
-
-        if (type == WT_CHECKBOX)
-        { __w->isCheckBox = 1; }
-
         // draw frame.
         // Nessa hora essa rotina podera criar a barra de títulos.
         // o wm poderá chamar a rotina de criar frame.
-        
+
+    if ( type == WT_OVERLAPPED || type == WT_EDITBOX || type == WT_CHECKBOX )
+    {
+        if (type == WT_EDITBOX)  {  __w->isEditBox = 1;  }
+        if (type == WT_CHECKBOX) {  __w->isCheckBox = 1; }
+
         DrawFrame ( (struct window_d *) __w, 
-            x, y,
-            width, height, 
+            x, y, width, height, 
             1 );  //style
-            
+
         goto done;
    }
-    
-  
-    
-    // =====
-    
+
 done:
 
     //
     // Thread.
     //
 
-	// Associando a janela criada a trhead atual, 
-	// que chamou essa rotina. O problema é na hora da inicialização.
+    // Associando a janela criada a trhead atual, 
+    // que chamou essa rotina. O problema é na hora da inicialização.
     // #importante: Quando criarmos uma janela do tipo controle
     // uma thread será associada à ela. Então o window manager
     // poderá mandar mensagem para o procedimento de janela
@@ -1578,12 +1562,19 @@ done:
 
     __w->control = (struct thread_d *) threadList[current_thread];
 
-        if ( (void *) __w->control != NULL )
+    if ( (void *) __w->control == NULL ){
+        debug_print ("CreateWindow: [FAIL] control thread\n");
+    }
+
+    if ( (void *) __w->control != NULL )
+    {
+        if ( __w->used != 1 || __w->magic != 1234 )
         {
-            if ( __w->used != 1 || __w->magic != 1234 ){
-                __w->control = NULL;
-            }
+            __w->control = NULL;
+            debug_print ("CreateWindow: [FAIL] control thread validation\n");
         }
+        // Thread ok.
+    }
 
 
     //
@@ -1623,12 +1614,10 @@ done:
 			}
 		}        
     };
-    
-    //
+
+
     // z order support.
-    //
-    
-    int z;
+
     z = (int) z_order_get_free_slot();
     
     if ( z >= 0 && z < KGWS_ZORDER_MAX )
@@ -1636,13 +1625,11 @@ done:
         __w->z = z;
         Windows[z] = (unsigned long) __w;
     }else{
-        panic ("kgws_create_window: No free slot on zorder.\n");
+        panic ("kgws_create_window: No free slot on zorder\n");
     };
-
 
     return (void *) __w;
 }
-
 
 
 //

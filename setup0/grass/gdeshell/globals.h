@@ -6,7 +6,7 @@
  * History:
  *     2018 - Created by Fred Nora.
  */
- 
+
 
 #ifndef __GLOBALS_H 
 #define __GLOBALS_H 1
@@ -317,16 +317,11 @@ static unsigned long screen_buffer_saved_y = 0;
 
 //...
 
-
 //
 // WINDOW SUPPORT
 //
 
-
-
 //...
-
-
 
 //
 // Colors

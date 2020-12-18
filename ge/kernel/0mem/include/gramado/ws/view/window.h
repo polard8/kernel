@@ -803,6 +803,7 @@ struct window_d
 
 
     unsigned long id;    //Window Id. 
+
     char *name;          //Window name.
     unsigned long type;  //tipo ... (editbox, normal, ...)  style???
 
@@ -1184,7 +1185,7 @@ struct window_d
 //==================================================    
 
     //  A que processo a janela pertence??
-    struct process_d *process;	
+    struct process_d *process;
 
 //==================================================    
 

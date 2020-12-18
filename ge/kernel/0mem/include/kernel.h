@@ -8,6 +8,7 @@
  *     2014~2018 - Resision.
  */
 
+
 //
 // == gramado modes =================================================
 //
@@ -480,6 +481,8 @@ int current_group;
 // But we need to use the control thread of the foreground process
 // associated with the console TTY.
 int foreground_process;
+
+int foreground_thread;
 
 
 // [Processing time]

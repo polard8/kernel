@@ -11,6 +11,11 @@
  */
 
 
+//kgws.h
+
+#ifndef __KGWS_H
+#define __KGWS_H    1
+
 
 // Aqui o servidor de janelas escaneia as janelas para saber 
 // se o mouse está sobre alguma ... durante a rotina
@@ -46,6 +51,10 @@ int init_gramado (void);
 
 
 int KGWS_initialize(void);
+
+
+#endif    
+
 
 
 //
