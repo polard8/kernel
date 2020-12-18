@@ -11,10 +11,31 @@
  */
 
 
-//kgws.h
+/*
+
+    KGWS
+    The KGWS subsystem handles all the kernel input and output.
+    kgws_keyboard for keyboard input
+    kgws_mouse for mouse input.
+
+ */
+
+
 
 #ifndef __KGWS_H
 #define __KGWS_H    1
+
+
+/*
+#define KGWS_MAGIC 1234
+#define KGWS_KEYBOARD    1000
+#define KGWS_MOUSE       2000
+#define KGWS_DISPLAY     3000
+*/
+
+//
+// == prototypes ==========================================
+//
 
 
 // Aqui o servidor de janelas escaneia as janelas para saber 

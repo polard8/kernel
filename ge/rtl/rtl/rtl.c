@@ -1134,6 +1134,23 @@ int rtl_GetTimeInMillis(void)
 */
 
 
+/*
+ #danger
+int rtl_vector_count (char **vector);
+int rtl_vector_count (char **vector)
+{
+    int i     =0;
+    int count =0;
+
+    // #danger!!!
+    if (vector == NULL) 
+        return 0;
+
+    for (i=0; vector[i] != NULL; i++){  count++;  }
+
+    return (int) count;
+}
+*/
 
 
 

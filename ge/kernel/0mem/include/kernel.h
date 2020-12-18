@@ -93,6 +93,7 @@ extern unsigned long stack0_krn_ptr;
 #include "gramado/0globals/gdevice.h"
 #include "gramado/0globals/gobject.h"
 #include "gramado/0globals/gspin.h"
+#include "gramado/0globals/ginput.h"   // input manager support.
 #include "gramado/0globals/gwd.h"   //whatch dogs
 
 

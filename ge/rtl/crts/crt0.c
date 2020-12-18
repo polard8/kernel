@@ -38,21 +38,25 @@ $SHELL: Gives location of current user's shell program.
 
 static char *my_environ[] = { 
 
-    "USER=anon",  
-    "PATH=/",
-    "PWD=/",
-    "HOME=/",
-    "HOSTNAME=rtl-hostname",
-    "LANG=en-us",
+    "DISPLAY=kgws-or-gwssrv"  //#todo
     "EDITOR=gramcode",
-    "SHELL=gdeshell",
-    "TERM=noraterm",
+    "HOME=/HOME",
+    "HOSTNAME=gramado",
+    "LANG=en-us",
+    "LANG2=pt-br",
+    "LANGX=en-br",
+    "OSTYPE=gramado",   //#todo
+    "PATH=/:/BIN:/SBIN",
     "PS1=~$",  
     "PS2=:>",  
-
+    "PWD=/",             //#bugbug: This is the working directory.
+    "SHELL=gdeshell",
+    "TERM=noraterm",     //#bugbug
+    "TMP=/TMP"
+    "UID=no-id"          //#todo
+    "USER=anon",  
     NULL 
 };
-
 
 
 //See: sysdeps/x86/x86start.c

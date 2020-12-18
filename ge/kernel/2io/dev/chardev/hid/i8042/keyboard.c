@@ -208,6 +208,7 @@ sc_again:
     // #define KBIT		0x80	/* bit used to ack characters to keyboard */
     
     __raw = in8(0x60);		/* get the scan code for the key struck */
+   
     val   = in8(0x61);		/* strobe the keyboard to ack the char */
     out8(0x61, val | 0x80);	/* strobe the bit high */
     out8(0x61, val);		/* now strobe it low */

@@ -255,7 +255,7 @@ uint8_t xxx_keyboard_read (void);
 // Pega um scancode, transforma em caractere e envia na forma de mensagem
 // para a thread de controle associada com a janela que tem o foco de entrada.
 
-int KEYBOARD_SEND_MESSAGE ( unsigned char SC );
+int KEYBOARD_SEND_MESSAGE ( unsigned char raw_byte );
 
 
 

@@ -22,36 +22,60 @@ void serial_write_char (char data)
 }
 
 
+//
+// main
+//
+
 int main ( int argc, char *argv[] ){
 
-    char *env_string;
-
-    puts ("\n");
-    printf ("reboot\n");
-
-    // Getting the user name.
-    env_string = (char *) getenv ("USER");
-
-    // Showing the user name.
-    printf (">>> Bye %s! :) \n", env_string);
+    char *env_host;
+    char *env_user;
+    unsigned char good=0;
 
 
     //testing serial port
     //ok isso funcionou.
-    serial_write_char('x');
-    serial_write_char('y');
-    serial_write_char('z');
-    serial_write_char(' ');
+    serial_write_char('r');
+    serial_write_char('e');
+    serial_write_char('b');
+    serial_write_char('o');
+    serial_write_char('o');
+    serial_write_char('t');
+    serial_write_char('i');
+    serial_write_char('n');
+    serial_write_char('g');
+    serial_write_char('.');
+    serial_write_char('.');
+    serial_write_char('.');
 
 
-    // reboot via rtl
-    // printf ("reboot via rtl\n");
-    // rtl_reboot();
+    puts        ("\n");
+    printf      ("REBOOT.BIN: Rebooting ...\n");
+    debug_print ("REBOOT.BIN: Rebooting ...\n");
 
- 
+
+    // get info from crt0.o
+
+    env_host = (char *) getenv ("HOSTNAME");
+    env_user = (char *) getenv ("USER");
+    
+    // Showing the info.
+    
+    if ( (void *) env_host != NULL )
+        printf ("Host name:  %s \n", env_host);
+    
+    if ( (void *) env_user != NULL )
+        printf ("User:       %s \n", env_user);
+    
+    printf ("Good Bye!\n");
+    
+    
+
+    //===================================
     // reboot via libio.
+via_libio:
     printf ("reboot via libio\n");
-    unsigned char good = 0x02;
+    good = 0x02;
     while (good & 0x02)
     {
         good = libio_inport8(0x64);
@@ -63,10 +87,19 @@ int main ( int argc, char *argv[] ){
     libio_outport8(0x64, 0xFE);
     //halt();       
      
-     
-    debug_print("reboot.bin: fail\n");
-         printf("reboot.bin: fail\n");
-    
+    debug_print("reboot.bin: via_libio fail\n");
+         printf("reboot.bin: via_libio fail\n");
+
+
+    //===================================
+    // reboot via rtl
+via_rtl:
+    printf ("reboot via rtl\n");
+    debug_print("reboot.bin: Go!\n");
+         printf("reboot.bin: Go!\n");
+    rtl_reboot();
+    exit(1);
+
     return (int) (-1);
 }
 

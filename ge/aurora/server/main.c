@@ -8,6 +8,12 @@
  */
 
 
+// See: 
+// https://wiki.osdev.org/Graphics_stack
+// https://wayland-book.com/introduction/high-level-design.html
+// ...
+
+
 // hostname:D.S
 // [host]:<display>[.screen]
 // [host]:<display>.[screen]
