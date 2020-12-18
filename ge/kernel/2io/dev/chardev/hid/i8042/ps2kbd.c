@@ -960,10 +960,14 @@ done:
         event_buffer[3] = (unsigned long) Event_LongRawByte;    // raw byte
        
         // #todo
-        // Podemos colocar os eventos num tipo de fila e
-        // e apenas os ascii codes em outra fila.
-        // Pois unix-like gosta de ler ascii code de teclas pressionadas
-        // e ascci codes de controle.
+        // >> PS2KeyboardDeviceTTY->_rbuffer
+        // No buffer 'bruto' colocamos os raw bytes.
+        // >> PS2KeyboardDeviceTTY->_cbuffer
+        // No buffer 'canonico' colocamos os ascii codes.
+        // ps: nao usaremos o buffer de output no caso do teclado. 
+
+        // #bugbug
+        // Estamos colocando um evento no buffer 'bruto'.
        
         // it is gonna write in the base of the buffer.
         // >> Essa rotina escreve na fila bruta. (raw buffer).
