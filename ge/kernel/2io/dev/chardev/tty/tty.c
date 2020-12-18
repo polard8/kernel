@@ -393,7 +393,7 @@ __ok_register:
 /*
  *************************************************
  * __tty_read:
- *     Read n bytes from a tty.
+ *     Read n bytes from a tty. raw buffer
  * 
  * IN:
  *     tty    = Pointer to tty structure.
@@ -514,7 +514,7 @@ __tty_read (
 /*
  *************************************************
  * __tty_write:
- *     Write n bytes to a tty.
+ *     Write n bytes to a tty. raw buffer.
  * 
  * IN:
  *     tty    = Pointer to tty structure.

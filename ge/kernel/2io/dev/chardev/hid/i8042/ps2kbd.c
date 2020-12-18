@@ -950,20 +950,29 @@ done:
     
     if ( (void *) PS2KeyboardDeviceTTY != NULL )
     {
-       // ok. This is a valid tty pointer.
+        // ok. This is a valid tty pointer.
        
-       // #test
-       // Let's write something ...
-       event_buffer[0] = (unsigned long) Event_Window;         // window pointer 
-       event_buffer[1] = (unsigned long) Event_Message;        // message number.
-       event_buffer[2] = (unsigned long) Event_LongASCIICode;  // ascii code
-       event_buffer[3] = (unsigned long) Event_LongRawByte;    // raw byte
+        // #test
+        // Let's write something ...
+        event_buffer[0] = (unsigned long) Event_Window;         // window pointer 
+        event_buffer[1] = (unsigned long) Event_Message;        // message number.
+        event_buffer[2] = (unsigned long) Event_LongASCIICode;  // ascii code
+        event_buffer[3] = (unsigned long) Event_LongRawByte;    // raw byte
+       
+        // #todo
+        // Podemos colocar os eventos num tipo de fila e
+        // e apenas os ascii codes em outra fila.
+        // Pois unix-like gosta de ler ascii code de teclas pressionadas
+        // e ascci codes de controle.
        
         // it is gonna write in the base of the buffer.
+        // >> Essa rotina escreve na fila bruta. (raw buffer).
+        // See: tty.c
+        
         __tty_write ( 
             (struct tty_d *) PS2KeyboardDeviceTTY, 
             (char *) event_buffer, 
-            (int) (4*4) );  //16 bytes 
+            (int) (4*4) );  //16 bytes = apenas um evento.
          
          // Sinalizamos que temos um novo evento.
          PS2KeyboardDeviceTTY->new_event = TRUE;
