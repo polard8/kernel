@@ -947,6 +947,7 @@ done:
     
     // only one standard event
     unsigned long event_buffer[5];
+    char xxxbug[4];
     
     if ( (void *) PS2KeyboardDeviceTTY != NULL )
     {
@@ -956,8 +957,8 @@ done:
         // Let's write something ...
         event_buffer[0] = (unsigned long) Event_Window;         // window pointer 
         event_buffer[1] = (unsigned long) Event_Message;        // message number.
-        event_buffer[2] = (unsigned long) Event_LongASCIICode;  // ascii code
-        event_buffer[3] = (unsigned long) Event_LongRawByte;    // raw byte
+        event_buffer[2] = (unsigned long) Event_LongASCIICode & 0x000000ff;  // ascii code
+        event_buffer[3] = (unsigned long) Event_LongRawByte   & 0x000000ff;    // raw byte
        
         // #todo
         // >> PS2KeyboardDeviceTTY->_rbuffer
@@ -965,7 +966,28 @@ done:
         // >> PS2KeyboardDeviceTTY->_cbuffer
         // No buffer 'canonico' colocamos os ascii codes.
         // ps: nao usaremos o buffer de output no caso do teclado. 
+        
+        //devemos cheacar se o tty esta configurado para
+        //escrever na fila bruta ou canonica e escrevermos no lugar certo
+        //Do mesmo modo deve ser a leitura.
+        //a configuraçao pode ser feita em ring3// see:ioctl
+        // esse tipo de decisao deve ficar dentro das rotinas de leitura e escrita e nao aqui.
+        
+        //quanto a fila eh canonica, escrevemos somente os keydown.
+                
+        //xxxbug[0] = 'x';  //fake bytes
+        xxxbug[0] = Event_LongASCIICode & 0x000000ff;
 
+        //if ( Event_Message == MSG_KEYDOWN)
+        sys_write(0,xxxbug,1);
+        
+        // coloca o raw byte no buffer de raw byte.
+        //file_write_buffer ( PS2KeyboardDeviceTTY->_rbuffer, "dirty", 5);
+        
+        //canonica
+        //if ( Event_Message == MSG_KEYDOWN)
+        file_write_buffer ( PS2KeyboardDeviceTTY->_cbuffer, xxxbug , 1);
+        
         // #bugbug
         // Estamos colocando um evento no buffer 'bruto'.
        
@@ -973,10 +995,10 @@ done:
         // >> Essa rotina escreve na fila bruta. (raw buffer).
         // See: tty.c
         
-        __tty_write ( 
-            (struct tty_d *) PS2KeyboardDeviceTTY, 
-            (char *) event_buffer, 
-            (int) (4*4) );  //16 bytes = apenas um evento.
+        //__tty_write ( 
+        //    (struct tty_d *) PS2KeyboardDeviceTTY, 
+        //    (char *) event_buffer, 
+        //    (int) (4*4) );  //16 bytes = apenas um evento.
          
          // Sinalizamos que temos um novo evento.
          PS2KeyboardDeviceTTY->new_event = TRUE;

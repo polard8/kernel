@@ -459,7 +459,8 @@ int permission (file *f)
 // File read.
 // It's called by sys_read.
 // Copia à partir do início do arquivo.
-int file_read_buffer ( file *f, char *buffer, int len ){
+int file_read_buffer ( file *f, char *buffer, int len )
+{
 
     char *p;
 
@@ -476,10 +477,20 @@ int file_read_buffer ( file *f, char *buffer, int len ){
         printf ("file_read_buffer: p\n");
         goto fail;
     }
+    
+    
+    if ( len > BUFSIZ ){
+        printf ("file_read_buffer: len > BUFSIZ\n");
+        goto fail;
+    }
+    
 
     //
     // Copy!
     //
+    
+    // #todo
+    // nao podemos ler mais que o limite do arquivo.
     
     // A próxima leitura precisa ser depois dessa.
     
@@ -489,10 +500,63 @@ int file_read_buffer ( file *f, char *buffer, int len ){
         return len;
     }
 
-    // Normal file.
-    memcpy ( (void *) buffer, (const void *) f->_p, len ); 
-    f->_p = f->_p + len;
-    return (int) len;
+    //não concatenaremos
+    if ( f->____object == ObjectTypePipe ){    
+        memcpy ( (void *) buffer, (const void *) f->_base, len ); 
+        return len;
+    }
+
+
+
+    // nesse caso a leitura tem que respeitar os offsets e limites.
+    if ( f->____object == ObjectTypeFile ||
+         f->____object == ObjectTypeTTY  ||
+         f->____object == ObjectTypeIoBuffer)
+    {
+        
+        // se o tamanho do buffer for maior que o padrao.
+        if ( f->_lbfsize > BUFSIZ ){
+            printf ("file_read_buffer: _lbfsize\n");
+            goto fail;
+        }
+    
+
+        // se o offset de escrita ultrapassa os limites.
+        // arquivo circular?? depende do tipo. #todo
+        if( f->_r < 0 || f->_r > BUFSIZ )
+        {
+            //#bugbug
+            printf ("file_read_buffer: _r [TEST] RESETING ...\n");
+            //goto fail;
+            f->_p = f->_base;
+            f->_r = 0; 
+            return 0;
+        }
+    
+        // se o que desejamos escrever eh maior que o espaço que temos.
+        if( len < 0 || len > f->_lbfsize )
+        {
+            printf ("file_read_buffer: len limits\n");
+            goto fail;
+        }
+ 
+        // vamos ler daqui.
+        f->_p = (f->_base + f->_r);
+
+        // read
+        
+        //---
+        memcpy ( (void *) buffer, (const void *) f->_p, len ); 
+        
+        //atualizamos o ponteiro de escrita
+        f->_p = (f->_p + len);
+
+        // atualizamos o offset de escrita.
+        f->_r = (f->_r + len);
+        
+        return (int) len;
+    }
+
 
 
 fail:
@@ -509,7 +573,9 @@ fail:
 // Escreve no arquivo uma certa quantidade de caracteres de uma dada string 
 
 // It's called by sys_write.
-int file_write_buffer ( file *f, char *string, int len ){
+
+int file_write_buffer ( file *f, char *string, int len )
+{
 
     char *p;
 
@@ -526,6 +592,12 @@ int file_write_buffer ( file *f, char *string, int len ){
         goto fail;
     }
 
+    if ( len > BUFSIZ ){
+        printf ("file_write_buffer: len > BUFSIZ\n");
+        goto fail;
+    }
+
+
     //
     // Copy!
     //
@@ -533,7 +605,13 @@ int file_write_buffer ( file *f, char *string, int len ){
     // Socket file.
     // Se o arquivo é um socket, então não concatenaremos 
     // escrita ou leitura.
-    if ( f->____object == ObjectTypeSocket ){ 
+    if ( f->____object == ObjectTypeSocket ){
+        memcpy ( (void *) f->_base, (const void *) string, len ); 
+        return len;
+    }
+
+    //não concatenaremos
+    if ( f->____object == ObjectTypePipe ){
         memcpy ( (void *) f->_base, (const void *) string, len ); 
         return len;
     }
@@ -547,14 +625,94 @@ int file_write_buffer ( file *f, char *string, int len ){
     // open(), então o ponteiro deve estar no fim do arquivo.
     
     //#todo: Normal file object
-    //if ( f->____object == ObjectTypeFile )
+    if ( f->____object == ObjectTypeFile ||
+         f->____object == ObjectTypeTTY  ||
+         f->____object == ObjectTypeIoBuffer)
+    {
+        // #bugbug
+        // Temos que ter um limite aqui ... !!!
+        // #todo
+    
+        // se o tamanho do buffer for maior que o padrao.
+        if ( f->_lbfsize > BUFSIZ ){
+            printf ("file_write_buffer: _lbfsize\n");
+            goto fail;
+        }
+    
+
+        // se o offset de escrita ultrapassa os limites.
+        // arquivo circular?? depende do tipo. #todo
+        if( f->_w < 0 || f->_w > BUFSIZ )
+        {
+            //#bugbug
+            printf ("file_write_buffer: _w [TEST] RESETING ...\n");
+            //goto fail;
+            f->_p = f->_base;
+            f->_w = 0; 
+            f->_cnt = f->_lbfsize;
+            return 0;
+        }
+    
+        // recalculando quanto espaço temos.
+        f->_cnt = (f->_lbfsize - f->_w);
+    
+        // se a qunatidade que temos ultrapassa os limites.
+        if( f->_cnt < 0 || f->_cnt > BUFSIZ )
+        {
+            printf ("file_write_buffer: _cnt\n");
+            //goto fail;
+                f->_p = f->_base; 
+                f->_w = 0;
+                f->_cnt = f->_lbfsize; 
+        }
+
+        // se o que desejamos escrever eh maior que o espaço que temos.
+        if( len < 0 || len > f->_cnt || len > f->_lbfsize)
+        {
+            printf ("file_write_buffer: len limits %d\n",len);
+            //goto fail;
+            
+            //se o len eh maior que o espaço disponivel
+            //mas o espaço disponivel eh maior que zero.
+            if ( f->_cnt > 0 )
+            {
+                len = f->_cnt; 
+            }
+            
+            //fim do arquivo
+            if ( f->_cnt <= 0 )
+            {
+                f->_p = f->_base; 
+                f->_w = 0;
+                f->_cnt = f->_lbfsize; 
+            }
+        }
+
+        // write.
         
-    memcpy ( (void *) f->_p, (const void *) string, len ); 
-    f->_p = f->_p + len;
-    return len;
+        // vamos escrever aqui.
+        f->_p = (f->_base + f->_w);
+    
+        //escrevemos usando o ponteiro de escrita.
+        memcpy ( (void *) f->_p, (const void *) string, len ); 
+    
+        //atualizamos o ponteiro de escrita
+        f->_p = (f->_p + len);
 
-
+        // atualizamos o offset de escrita.
+        f->_w = (f->_w + len);
+    
+        //atualizamos o quanto nos falta.
+        f->_cnt = (f->_cnt - len);
+    
+        // retornamos a quantidade escrita no buffer.
+        return len;
+    }
+    
+    // unknown type.
+    
 fail:
+    //printf ("file_write_buffer: fail\n");
     refresh_screen ();
     return EOF;
 }
@@ -585,7 +743,8 @@ fail:
 // 0 = Couldn't read.
 // -1 = Error.
 
-int sys_read (unsigned int fd, char *ubuf, int count){
+int sys_read (unsigned int fd, char *ubuf, int count)
+{
 
     struct process_d  *__P;
     file              *__file;
@@ -666,13 +825,23 @@ int sys_read (unsigned int fd, char *ubuf, int count){
     // read keyboard tty
     if ( __file->_file == 0 )
     {
-        if ( PS2KeyboardDeviceTTY->new_event == TRUE ){
-            __tty_read( PS2KeyboardDeviceTTY, ubuf, 16 );
-            PS2KeyboardDeviceTTY->new_event = FALSE;  //mensagem consumida.
-            return 16;
-        }
-        PS2KeyboardDeviceTTY->new_event = FALSE; //mensagem consumida.
-        return 0;
+        // vamos ler da fila bruta. raw
+        nbytes = 0;
+        nbytes = (int) file_read_buffer ( (file *) PS2KeyboardDeviceTTY->_rbuffer, 
+                           (char *) ubuf, (int) count );
+        
+        if(nbytes>0)
+        PS2KeyboardDeviceTTY->_rbuffer->_flags |= __SWR;
+        
+        return nbytes;
+        
+        //if ( PS2KeyboardDeviceTTY->new_event == TRUE ){
+        //    __tty_read( PS2KeyboardDeviceTTY, ubuf, 16 );
+        //    PS2KeyboardDeviceTTY->new_event = FALSE;  //mensagem consumida.
+        //    return 16;
+        //}
+        //PS2KeyboardDeviceTTY->new_event = FALSE; //mensagem consumida.
+        //return 0;
     }
     //==========================================================
 
@@ -1134,6 +1303,22 @@ int sys_write (unsigned int fd, char *ubuf, int count)
         debug_print ("sys_write: __file not open\n");
         //printf ("sys_write: __file not open\n");
         goto fail;
+    }
+
+
+    // escrevendo no stdin
+    if ( __file->_file == 0 )
+    {
+        nbytes = 0;
+        nbytes = (int) file_write_buffer ( 
+                           (file *) PS2KeyboardDeviceTTY->_rbuffer, 
+                           (char *) ubuf, 
+                           (int) count );
+                           
+        if (nbytes>0)
+            PS2KeyboardDeviceTTY->_rbuffer->_flags |= __SRD;
+        
+        return nbytes;
     }
 
 

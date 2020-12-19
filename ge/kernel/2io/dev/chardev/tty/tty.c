@@ -234,6 +234,11 @@ struct tty_d *tty_create (void){
             panic("tty_create: [FAIL] buffer validation\n");
         }
 
+        //#test: objeto do tipo buffer de io.
+        __tty->_rbuffer->____object = ObjectTypeIoBuffer;
+        __tty->_cbuffer->____object = ObjectTypeIoBuffer;
+        __tty->_obuffer->____object = ObjectTypeIoBuffer; 
+
         // #todo
         // o buffer tem o tamanho de uma pagina.
         // mas vamos usar o tamanho padraao por enquanto.

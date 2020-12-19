@@ -2651,12 +2651,13 @@ do_compare:
     // ok funcionou com fgetc e getc.
     FILE *f1;
     int ch_test;
+    char t4buf[8];
     if ( gramado_strncmp( prompt, "t4", 2 ) == 0 )
     {
         //stdout
         printf ("t4: Open and reading a file\n");
-        f1 = fopen ("gramado.txt","rb");
-        
+        //f1 = fopen ("gramado.txt","rb");
+        f1 = stdin;
         if ( f1 == NULL ){
             printf ("fopen fail\n");  //stdout
             goto exit_cmp;
@@ -2664,8 +2665,10 @@ do_compare:
         printf ("Testing getc ... \n\n");  
         while (1){
             //ch_test = (int) fgetc (f1);    //funcionou.
-            ch_test = (int) getc  (f1);  //funcionou. 
-            if ( ch_test == EOF ){
+            //ch_test = (int) getc(f1);  //funcionou. 
+            read(0,t4buf,1);
+            ch_test = t4buf[0];
+            if ( ch_test == 'q' ){
                 printf("  EOF reached :)\n\n"); 
                 goto exit_cmp;
             }else{
@@ -2711,10 +2714,10 @@ do_compare:
     if ( gramado_strncmp ( prompt, "t6", 2 ) == 0 )
     {
         printf ("t6: Testing close()\n");
-        write (2,_buftest,sizeof(_buftest));
+        write (0,_buftest,sizeof(_buftest));
         //close(0); //regular file
         //close(1); //virtual console
-        close(2); //regular file
+        //close(2); //regular file
         goto exit_cmp;
     }
 

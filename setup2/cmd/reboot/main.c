@@ -33,6 +33,29 @@ int main ( int argc, char *argv[] ){
     unsigned char good=0;
 
 
+
+   //=================
+   // testing read() stdin
+    char buf[32];
+    int n;
+    while(1){
+
+       //sprintf(buf,"durty");
+       //write(0,buf,5);
+
+       n = read(0,buf,1);
+       if(n>0)
+           printf(">>>>%c\n",buf[0]);
+       
+       
+    }
+   //=================
+
+
+
+
+
+
     //testing serial port
     //ok isso funcionou.
     serial_write_char('r');
