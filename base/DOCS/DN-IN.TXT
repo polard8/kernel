@@ -1,0 +1,5 @@
+Input modes support:
+Now the system has two input modes: The 'setup mode' and the 'tty mode'.
+For the 'setup mode' we are getting input events from the control thread.
+For the 'tty mode', we are getting input from the keyboard tty.
+Tested on qemu and my real machine.
