@@ -34,6 +34,7 @@ int main ( int argc, char *argv[] ){
 
 
 
+   /*
    //=================
    // testing read() stdin
     char buf[32];
@@ -46,11 +47,9 @@ int main ( int argc, char *argv[] ){
        n = read(0,buf,1);
        if(n>0)
            printf(">>>>%c\n",buf[0]);
-       
-       
     }
    //=================
-
+   */
 
 
 

@@ -260,7 +260,7 @@ sc_again:
      // This way the foreground process is able to get this data.
      // See: ps2kbd.c
 
-    KEYBOARD_SEND_MESSAGE (__raw);
+    KGWS_SEND_KEYBOARD_MESSAGE (__raw);
 
     // Clean the mess.
     __has_e0_prefix = 0;
@@ -304,6 +304,15 @@ done:
 __VOID_IRQ 
 irq1_KEYBOARD (void)
 {
+
+    // #importante
+    // O que faria um driver que nao esta dentro do kernel?
+    // O driver carregavel se resume em pegar o RAW BYTE e 
+    // entregar para o kernel. Nenhum processamento eh feito.
+    // Nem mesmo o kernel deve fazer processamento, ele deve
+    // passar para o window serve o raw byte e o window server 
+    // vai ver o que faz.
+    //  
 
 
 	// Se o teclado ps2 não estiver inicializado !

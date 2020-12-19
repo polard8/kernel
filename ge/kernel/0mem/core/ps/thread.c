@@ -1490,13 +1490,18 @@ int thread_getchar (void){
 	//pega o char em current_stdin.
 	//isso est� em kdrivers/x/i8042/keyboard.c
 
-    SC = (unsigned char) get_scancode();
-
     // Translate and put the event in the threds event queue.
     // Isso coloca a mensagem na thread de controle da 
     // janela com o foco de entrada.
 
-    KEYBOARD_SEND_MESSAGE ( SC );
+    SC = (unsigned char) get_scancode(); // #BUGBUG THIS IS A RAW BYTE, NOT A SCANCODE.
+
+    KGWS_SEND_KEYBOARD_MESSAGE ( SC );   // #BUGBUG THIS IS A RAW BYTE, NOT A SCANCODE.
+
+
+
+
+
 
     // Get the event.
     // #importante

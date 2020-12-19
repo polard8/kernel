@@ -825,16 +825,25 @@ int sys_read (unsigned int fd, char *ubuf, int count)
     // read keyboard tty
     if ( __file->_file == 0 )
     {
-        // vamos ler da fila bruta. raw
-        nbytes = 0;
-        nbytes = (int) file_read_buffer ( (file *) PS2KeyboardDeviceTTY->_rbuffer, 
-                           (char *) ubuf, (int) count );
+        // anda nao pode ler porque nao chegou no fim da linha.
+        // isso eh um console
+        if ( PS2KeyboardDeviceTTY->new_event == TRUE ){
         
-        if(nbytes>0)
-        PS2KeyboardDeviceTTY->_rbuffer->_flags |= __SWR;
+            // vamos ler da fila bruta. raw
+            nbytes = 0;
+            nbytes = (int) file_read_buffer ( 
+                               (file *) PS2KeyboardDeviceTTY->_rbuffer, 
+                               (char *) ubuf, 
+                               (int) count );
         
-        return nbytes;
+            if(nbytes>0)
+                PS2KeyboardDeviceTTY->_rbuffer->_flags |= __SWR;
         
+            // acabamos a leitura, pode ter sido um byte ou varios.
+            return nbytes;
+        }
+        //nao podemos ler ainda
+        return 0;  // 
         //if ( PS2KeyboardDeviceTTY->new_event == TRUE ){
         //    __tty_read( PS2KeyboardDeviceTTY, ubuf, 16 );
         //    PS2KeyboardDeviceTTY->new_event = FALSE;  //mensagem consumida.

@@ -251,13 +251,6 @@ void xxx_keyboard_write (uint8_t data);
 uint8_t xxx_keyboard_read (void);
 
 
-// Send message.
-// Pega um scancode, transforma em caractere e envia na forma de mensagem
-// para a thread de controle associada com a janela que tem o foco de entrada.
-
-int KEYBOARD_SEND_MESSAGE ( unsigned char raw_byte );
-
-
 
 
 int ps2kbd_globals_initialize (void);

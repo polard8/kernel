@@ -1211,7 +1211,8 @@ tty_ioctl (
         tty = f->tty;
     };
 
-
+    int xxxi=0;
+    
     // The command!
 
     switch (request){
@@ -1271,8 +1272,14 @@ tty_ioctl (
          // TIOCINQ, TIOCSTI, TIOCMGET, TIOCMBIS, TIOCMBIC, TIOCMSET,
          // TIOCGSOFTCAR, TIOCSSOFTCAR
          
-        //case ?:
-            //break;
+        //CLEAN
+        case 900:
+             tty->_rbuffer->_w = 0;
+             tty->_rbuffer->_r = 0;
+             tty->_rbuffer->_p = tty->_rbuffer->_base; 
+             tty->_rbuffer->_cnt = tty->_rbuffer->_lbfsize;
+             for( xxxi=0; xxxi<BUFSIZ; xxxi++){ tty->_rbuffer->_p[xxxi] = 0; };
+            break;
         
       
         default:

@@ -38,6 +38,13 @@
 //
 
 
+// Send message.
+// Pega um scancode, transforma em caractere e envia na forma de mensagem
+// para a thread de controle associada com a janela que tem o foco de entrada.
+
+int KGWS_SEND_KEYBOARD_MESSAGE ( unsigned char raw_byte );
+
+
 // Aqui o servidor de janelas escaneia as janelas para saber 
 // se o mouse está sobre alguma ... durante a rotina
 // são solicitadas informações diretamente no driver de mouse ps2.

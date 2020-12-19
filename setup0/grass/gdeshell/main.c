@@ -2191,7 +2191,7 @@ do_compare:
 
         // fd request
         debug_print("stdin ============\n");
-        ioctl ( STDIN_FILENO,  TCIFLUSH, 0 ); // normal
+        ioctl ( STDIN_FILENO,  TCIFLUSH, 0 ); // 
         debug_print("stdout ============\n");
         ioctl ( STDOUT_FILENO, TCIFLUSH, 0 ); // console
         debug_print("stderr ============\n");
@@ -2651,11 +2651,17 @@ do_compare:
     // ok funcionou com fgetc e getc.
     FILE *f1;
     int ch_test;
-    char t4buf[8];
+    char t4buf[64];  //line
+    int t4_line_offset=0;
+    int t4nbytes=0;
     if ( gramado_strncmp( prompt, "t4", 2 ) == 0 )
     {
         //stdout
         printf ("t4: Open and reading a file\n");
+        printf ("t4: Change the input mode.\n");
+        //gramado_system_call(912,2000,2000,2000);  // INPUT_MODE_TTY
+        rtl_set_input_mode(2000);
+        
         //f1 = fopen ("gramado.txt","rb");
         f1 = stdin;
         if ( f1 == NULL ){
@@ -2666,15 +2672,28 @@ do_compare:
         while (1){
             //ch_test = (int) fgetc (f1);    //funcionou.
             //ch_test = (int) getc(f1);  //funcionou. 
-            read(0,t4buf,1);
-            ch_test = t4buf[0];
-            if ( ch_test == 'q' ){
-                printf("  EOF reached :)\n\n"); 
-                goto exit_cmp;
-            }else{
-                  printf("%c", ch_test);  fflush(stdout);  
-            };
+            t4nbytes = read(0, &t4buf[t4_line_offset], 1);
+            if ( t4nbytes > 0 )
+            {
+                ch_test = t4buf[t4_line_offset]; //ultimo que pegamos.
+                if ( ch_test == 'q' ){ printf( "String={%s}\n",t4buf); break; }
+                
+                t4_line_offset++; 
+                if(t4_line_offset>64){ printf("overflow\n"); break; }
+                
+                //if ( ch_test == 'q' ){
+                //    printf("  EOF reached :)\n\n"); 
+                //    goto exit_cmp;
+                //}else{
+                //     printf("[%c]", ch_test);  fflush(stdout);  
+                //};
+            }
         };
+        t4_line_offset = 0;
+        t4nbytes=0;
+        printf ("t4: Change the input mode.\n");
+        //gramado_system_call(912,1000,1000,1000);  // INPUT_MODE_SETUP
+        rtl_set_input_mode(1000);
         goto exit_cmp;
     }
 

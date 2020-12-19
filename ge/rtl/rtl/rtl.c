@@ -33,6 +33,18 @@ void *gramado_system_call (
 
 
 
+int rtl_get_input_mode(void)
+{
+    gramado_system_call(911,0,0,0);
+}
+
+void rtl_set_input_mode(int mode)
+{
+    gramado_system_call(912,mode,mode,mode);
+}
+
+
+
 // Get an event from the thread's event queue.
 // That old 'get system message'
 // Using a buffer

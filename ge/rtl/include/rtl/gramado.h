@@ -30,6 +30,15 @@ void *gramado_system_call (
     unsigned long c, 
     unsigned long d );
 
+
+
+
+// input mode
+int rtl_get_input_mode(void);
+void rtl_set_input_mode(int mode);
+
+
+
 //
 // == events ===========================================
 //

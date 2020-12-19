@@ -748,9 +748,7 @@ gde_extra_services (
 
     // IN: name, dir address.
     if ( number == 900 ){
-
-        return (void *) clone_and_execute_process( 
-                            (char *) arg2 );
+        return (void *) clone_and_execute_process( (char *) arg2 );
     }
 
 
@@ -758,6 +756,18 @@ gde_extra_services (
     // Trying another fork() implementation. 
     // Nothing for now.
     if ( number == 901 ){ return NULL; }
+    
+    
+    
+    
+    // get current input mode.
+    if ( number == 911 ){ return (void*) current_input_mode; }
+    
+    // set current input mode.
+    if ( number == 912 ){ current_input_mode=arg2; return NULL; }
+    
+    
+    
     
     // get screen window.
     // #todo. checar validade
