@@ -127,18 +127,18 @@ extern unsigned long stack0_krn_ptr;
 
 // ws -
 // #view presentation output.
-#include "gramado/ws/view/display.h"
-#include "gramado/ws/view/screen.h"
-#include "gramado/ws/view/video.h"
+#include "hal/dev/tty/vt/ws/view/display.h"
+#include "hal/dev/tty/vt/ws/view/screen.h"
+#include "hal/dev/tty/vt/ws/view/video.h"
 
 
 // Render
-#include "hal/render/r_render.h"
+#include "hal/dev/tty/vt/render/r_render.h"
 
 
 // #model. data model.
-#include "gramado/ws/model/fonts.h"
-#include "gramado/ws/model/ascii.h" 
+#include "hal/dev/tty/vt/ws/model/fonts.h"
+#include "hal/dev/tty/vt/ws/model/ascii.h" 
 
 
 
@@ -154,10 +154,10 @@ extern unsigned long stack0_krn_ptr;
 
 // ws - 
 // view - input and presentation
-#include "gramado/ws/view/prompt.h"
+#include "hal/dev/tty/vt/ws/view/prompt.h"
 
 // view - showing the data.
-#include "gramado/ws/view/bmp2.h"
+#include "hal/dev/tty/vt/ws/view/bmp2.h"
 
 
 
@@ -175,7 +175,9 @@ extern unsigned long stack0_krn_ptr;
 #include "hal/x86gdt.h"
 #include "hal/cpuamd.h"
 #include "hal/detect.h"
-#include "hal/serial.h"
+
+
+#include "hal/dev/tty/serial.h"
 
 
 //todo: podemos mover isso de lugar para perto de net/
@@ -183,13 +185,13 @@ extern unsigned long stack0_krn_ptr;
 
 
 
-// hal/storage
-#include "hal/storage/floppy.h"
-#include "hal/storage/ata.h"
-#include "hal/storage/super.h"
-#include "hal/storage/volume.h"
-#include "hal/storage/disk.h"  
-#include "hal/storage/storage.h" 
+// hal/dev/blkdev
+#include "hal/dev/blkdev/floppy.h"
+#include "hal/dev/blkdev/ata.h"
+#include "hal/dev/blkdev/super.h"
+#include "hal/dev/blkdev/volume.h"
+#include "hal/dev/blkdev/disk.h"  
+#include "hal/dev/blkdev/storage.h" 
 
 // hal
 #include "hal/pit.h"
@@ -202,17 +204,17 @@ extern unsigned long stack0_krn_ptr;
 
 // ws - window server
 // inputs
-#include "gramado/ws/view/xproc.h"
-#include "gramado/ws/view/keyboard.h"
-#include "gramado/ws/view/mouse.h"
-#include "gramado/ws/view/vk.h"
-#include "gramado/ws/view/kbdabnt2.h"
+#include "hal/dev/tty/vt/ws/view/xproc.h"
+#include "hal/dev/tty/vt/ws/view/keyboard.h"
+#include "hal/dev/tty/vt/ws/view/mouse.h"
+#include "hal/dev/tty/vt/ws/view/vk.h"
+#include "hal/dev/tty/vt/ws/view/kbdabnt2.h"
 
 // #view. drawing routines.
-#include "gramado/ws/view/ldisc.h"
+#include "hal/dev/tty/vt/ws/view/ldisc.h"
 
 //storage (^)
-#include "hal/storage/ide.h"
+#include "hal/dev/blkdev/ide.h"
 
 
 //pci
@@ -220,8 +222,8 @@ extern unsigned long stack0_krn_ptr;
 #include "hal/bus/pci.h"
 
 //storage (^)
-#include "hal/storage/ahci.h"
-#include "hal/storage/sata.h"
+#include "hal/dev/blkdev/ahci.h"
+#include "hal/dev/blkdev/sata.h"
 
 #include "hal/bus/usb.h"
 
@@ -255,19 +257,19 @@ extern unsigned long stack0_krn_ptr;
 
 // ws - 
 // model business logic
-#include "gramado/ws/model/kgwm.h"
-#include "gramado/ws/model/ws.h"
+#include "hal/dev/tty/vt/ws/model/kgwm.h"
+#include "hal/dev/tty/vt/ws/model/ws.h"
 
 // #view - designers
-#include "gramado/ws/view/window.h"
-#include "gramado/ws/view/menu.h"
-#include "gramado/ws/view/pbar.h"
-#include "gramado/ws/view/bmp.h"
-#include "gramado/ws/view/line.h"
+#include "hal/dev/tty/vt/ws/view/window.h"
+#include "hal/dev/tty/vt/ws/view/menu.h"
+#include "hal/dev/tty/vt/ws/view/pbar.h"
+#include "hal/dev/tty/vt/ws/view/bmp.h"
+#include "hal/dev/tty/vt/ws/view/line.h"
 
 // #view. presentation
-#include "gramado/ws/view/terminal.h"
-#include "gramado/ws/view/guiconf.h"
+#include "hal/dev/tty/vt/ws/view/terminal.h"
+#include "hal/dev/tty/vt/ws/view/guiconf.h"
 
 
 //
@@ -282,28 +284,30 @@ extern unsigned long stack0_krn_ptr;
 
 
 // ws - window server, and beyond
-#include "gramado/ws/logon.h"
-#include "gramado/ws/logoff.h"
+#include "hal/dev/tty/vt/ws/logon.h"
+#include "hal/dev/tty/vt/ws/logoff.h"
 
 // model. business logic
-#include "gramado/ws/model/kgws.h"
+#include "hal/dev/tty/vt/ws/model/kgws.h"
 
 
 // tty
-#include "rtl/tty/ttyldisc.h"
-#include "rtl/tty/ttydrv.h"
-#include "rtl/tty/tty.h"
-#include "rtl/tty/pty.h"
-#include "rtl/tty/vt.h"
-#include "rtl/tty/console.h"
+#include "hal/dev/tty/ttyldisc.h"
+#include "hal/dev/tty/ttydrv.h"
+#include "hal/dev/tty/tty.h"
+#include "hal/dev/tty/pty.h"
+
+
+#include "hal/dev/tty/vt/vt.h"
+#include "hal/dev/tty/vt/console.h"
 
 
 // =============================
 // ws - i8042 ps2 controller.
-#include "gramado/ws/view/i8042/i8042.h"
-#include "gramado/ws/view/i8042/ps2mouse.h"
-#include "gramado/ws/view/i8042/ps2kbd.h"
-#include "gramado/ws/view/i8042/ps2.h"
+#include "hal/dev/tty/vt/ws/view/i8042/i8042.h"
+#include "hal/dev/tty/vt/ws/view/i8042/ps2mouse.h"
+#include "hal/dev/tty/vt/ws/view/i8042/ps2kbd.h"
+#include "hal/dev/tty/vt/ws/view/i8042/ps2.h"
 
 
 
@@ -341,8 +345,9 @@ extern unsigned long stack0_krn_ptr;
 
 
 // devices
-#include "hal/devices.h"
-#include "hal/devmgr.h"       
+#include "hal/dev/devices.h"
+#include "hal/dev/devmgr.h"      
+ 
 #include "hal/io.h"               //io.
 
 
@@ -356,8 +361,8 @@ extern unsigned long stack0_krn_ptr;
 #include "gramado/mm/heap.h"      // Heap pointer support.
 #include "gramado/mm/aspace.h"    // Address Space, (data base account).
 
-// storage 
-#include "hal/dspace.h"    // Disk Space, (data base account). storage stuff
+// dspace
+#include "hal/dev/blkdev/dspace.h"    // Disk Space, (data base account). storage stuff
 
 // mm
 #include "gramado/mm/bank.h"      // Bank. database
@@ -367,7 +372,7 @@ extern unsigned long stack0_krn_ptr;
 
 // ws - 
 // view. input support.
-#include "gramado/ws/view/cursor.h"
+#include "hal/dev/tty/vt/ws/view/cursor.h"
 
 
 #include "gramado/messages.h"

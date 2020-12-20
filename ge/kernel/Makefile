@@ -247,37 +247,6 @@ all-c:
 	$(CC) -c  0mem/core/ps/mk.c        $(KINCLUDE)  $(CFLAGS) -o mk.o
 
 
-    # Draw
-    # Window Manager.
-    # Window system ring 0 support.
-    # model business logic
-	$(CC) -c 0mem/draw/windows/model/kgwm.c  $(KINCLUDE) $(CFLAGS) -o kgwm.o
-	$(CC) -c 0mem/draw/windows/model/wm.c    $(KINCLUDE) $(CFLAGS) -o wm.o
-	$(CC) -c 0mem/draw/windows/model/kgws.c  $(KINCLUDE) $(CFLAGS) -o kgws.o
-	# data model
-	$(CC) -c 0mem/draw/windows/model/font.c  $(KINCLUDE) $(CFLAGS) -o font.o
-
-	# Window Server.
-	$(CC) -c 0mem/draw/windows/view/bg.c        $(KINCLUDE) $(CFLAGS) -o bg.o
-	$(CC) -c 0mem/draw/windows/view/bmp.c       $(KINCLUDE) $(CFLAGS) -o bmp.o
-	$(CC) -c 0mem/draw/windows/view/button.c    $(KINCLUDE) $(CFLAGS) -o button.o
-	$(CC) -c 0mem/draw/windows/view/char.c      $(KINCLUDE) $(CFLAGS) -o char.o
-	$(CC) -c 0mem/draw/windows/view/createw.c   $(KINCLUDE) $(CFLAGS) -o createw.o
-	$(CC) -c 0mem/draw/windows/view/dtext.c     $(KINCLUDE) $(CFLAGS) -o dtext.o
-	$(CC) -c 0mem/draw/windows/view/line.c      $(KINCLUDE) $(CFLAGS) -o line.o
-	$(CC) -c 0mem/draw/windows/view/menu.c      $(KINCLUDE) $(CFLAGS) -o menu.o
-	$(CC) -c 0mem/draw/windows/view/mbar.c      $(KINCLUDE) $(CFLAGS) -o mbar.o
-	$(CC) -c 0mem/draw/windows/view/pixel.c     $(KINCLUDE) $(CFLAGS) -o pixel.o
-	$(CC) -c 0mem/draw/windows/view/pbar.c      $(KINCLUDE) $(CFLAGS) -o pbar.o
-	$(CC) -c 0mem/draw/windows/view/rect.c      $(KINCLUDE) $(CFLAGS) -o rect.o
-	$(CC) -c 0mem/draw/windows/view/sbar.c      $(KINCLUDE) $(CFLAGS) -o sbar.o
-	$(CC) -c 0mem/draw/windows/view/tbar.c      $(KINCLUDE) $(CFLAGS) -o tbar.o
-	$(CC) -c 0mem/draw/windows/view/xproc.c     $(KINCLUDE) $(CFLAGS) -o xproc.o
-
-	$(CC) -c 0mem/draw/windows/logoff.c  $(KINCLUDE) $(CFLAGS) -o logoff.o
-	$(CC) -c 0mem/draw/windows/logon.c   $(KINCLUDE) $(CFLAGS) -o logon.o
-
-
 	# memdev
 	$(CC) -c 0mem/mm/memory.c  $(KINCLUDE)  $(CFLAGS) -o memory.o
 	$(CC) -c 0mem/mm/mminfo.c  $(KINCLUDE)  $(CFLAGS) -o mminfo.o
@@ -369,34 +338,72 @@ all-c:
 	$(CC) -c 2io/dev/blkdev/ide/hdd.c      $(KINCLUDE) $(CFLAGS) -o hdd.o
 	$(CC) -c 2io/dev/blkdev/storage/storage.c  $(KINCLUDE) $(CFLAGS) -o storage.o
 
-
+    # =======================================
+    # Console support:
+    # The console is responsable for the output.
+    # It can be virtual terminal, serial or even network output.
+    # ttys are used in char devices and netdevices
+    
     # chardev
-	$(CC) -c 2io/dev/chardev/hid/i8042/i8042.c     $(KINCLUDE) $(CFLAGS) -o i8042.o
-	$(CC) -c 2io/dev/chardev/hid/i8042/keyboard.c  $(KINCLUDE) $(CFLAGS) -o keyboard.o
-	$(CC) -c 2io/dev/chardev/hid/i8042/ps2kbd.c    $(KINCLUDE) $(CFLAGS) -o ps2kbd.o
-	$(CC) -c 2io/dev/chardev/hid/i8042/mouse.c     $(KINCLUDE) $(CFLAGS) -o mouse.o
-	$(CC) -c 2io/dev/chardev/hid/i8042/ps2mouse.c  $(KINCLUDE) $(CFLAGS) -o ps2mouse.o
-
-	$(CC) -c 2io/dev/chardev/hid/input.c      $(KINCLUDE) $(CFLAGS) -o input.o
-	$(CC) -c 2io/dev/chardev/hid/output.c     $(KINCLUDE) $(CFLAGS) -o output.o
-	$(CC) -c 2io/dev/chardev/hid/render/r_render.c    $(KINCLUDE) $(CFLAGS) -o r_render.o
-	$(CC) -c 2io/dev/chardev/hid/screen.c     $(KINCLUDE) $(CFLAGS) -o screen.o
-	$(CC) -c 2io/dev/chardev/hid/video.c      $(KINCLUDE) $(CFLAGS) -o video.o
-	$(CC) -c 2io/dev/chardev/hid/vsync.c      $(KINCLUDE) $(CFLAGS) -o vsync.o
-	$(CC) -c 2io/dev/chardev/tty/ldisc.c      $(KINCLUDE) $(CFLAGS) -o ldisc.o
-	$(CC) -c 2io/dev/chardev/tty/pty.c        $(KINCLUDE) $(CFLAGS) -o pty.o
-	$(CC) -c 2io/dev/chardev/serial/serial.c  $(KINCLUDE) $(CFLAGS) -o serial.o
-
-	$(CC) -c 2io/dev/chardev/tty/tty.c        $(KINCLUDE) $(CFLAGS) -o tty.o
-	$(CC) -c 2io/dev/chardev/tty/vt.c         $(KINCLUDE) $(CFLAGS) -o vt.o
-
-	$(CC) -c 2io/dev/chardev/tty/console.c    $(KINCLUDE) $(CFLAGS) -o console.o
-	$(CC) -c 2io/dev/chardev/tty/terminal.c  $(KINCLUDE) $(CFLAGS) -o terminal.o
-
+	$(CC) -c 2io/dev/tty/chardev/hid/i8042/i8042.c      $(KINCLUDE) $(CFLAGS) -o i8042.o
+	$(CC) -c 2io/dev/tty/chardev/hid/i8042/keyboard.c   $(KINCLUDE) $(CFLAGS) -o keyboard.o
+	$(CC) -c 2io/dev/tty/chardev/hid/i8042/ps2kbd.c     $(KINCLUDE) $(CFLAGS) -o ps2kbd.o
+	$(CC) -c 2io/dev/tty/chardev/hid/i8042/mouse.c      $(KINCLUDE) $(CFLAGS) -o mouse.o
+	$(CC) -c 2io/dev/tty/chardev/hid/i8042/ps2mouse.c   $(KINCLUDE) $(CFLAGS) -o ps2mouse.o
+	$(CC) -c 2io/dev/tty/chardev/hid/input.c            $(KINCLUDE) $(CFLAGS) -o input.o
+	$(CC) -c 2io/dev/tty/chardev/hid/output.c           $(KINCLUDE) $(CFLAGS) -o output.o
+	$(CC) -c 2io/dev/tty/chardev/hid/render/r_render.c  $(KINCLUDE) $(CFLAGS) -o r_render.o
+	$(CC) -c 2io/dev/tty/chardev/hid/screen.c           $(KINCLUDE) $(CFLAGS) -o screen.o
+	$(CC) -c 2io/dev/tty/chardev/hid/video.c            $(KINCLUDE) $(CFLAGS) -o video.o
+	$(CC) -c 2io/dev/tty/chardev/hid/vsync.c            $(KINCLUDE) $(CFLAGS) -o vsync.o
+	$(CC) -c 2io/dev/tty/chardev/serial/serial.c        $(KINCLUDE) $(CFLAGS) -o serial.o
 
 	# netdev
-	$(CC) -c 2io/dev/netdev/e1000/e1000.c   $(KINCLUDE) $(CFLAGS) -o e1000.o
+	$(CC) -c 2io/dev/tty/netdev/e1000/e1000.c   $(KINCLUDE) $(CFLAGS) -o e1000.o
+    
+    
+    
+    
 
+    # Draw
+    # Window Manager.
+    # Window system ring 0 support.
+    # model business logic
+	$(CC) -c 2io/dev/tty/vt/draw/model/kgwm.c  $(KINCLUDE) $(CFLAGS) -o kgwm.o
+	$(CC) -c 2io/dev/tty/vt/draw/model/wm.c    $(KINCLUDE) $(CFLAGS) -o wm.o
+	$(CC) -c 2io/dev/tty/vt/draw/model/kgws.c  $(KINCLUDE) $(CFLAGS) -o kgws.o
+	# data model
+	$(CC) -c 2io/dev/tty/vt/draw/model/font.c  $(KINCLUDE) $(CFLAGS) -o font.o
+
+	# Window Server.
+	$(CC) -c 2io/dev/tty/vt/draw/view/bg.c        $(KINCLUDE) $(CFLAGS) -o bg.o
+	$(CC) -c 2io/dev/tty/vt/draw/view/bmp.c       $(KINCLUDE) $(CFLAGS) -o bmp.o
+	$(CC) -c 2io/dev/tty/vt/draw/view/button.c    $(KINCLUDE) $(CFLAGS) -o button.o
+	$(CC) -c 2io/dev/tty/vt/draw/view/char.c      $(KINCLUDE) $(CFLAGS) -o char.o
+	$(CC) -c 2io/dev/tty/vt/draw/view/createw.c   $(KINCLUDE) $(CFLAGS) -o createw.o
+	$(CC) -c 2io/dev/tty/vt/draw/view/dtext.c     $(KINCLUDE) $(CFLAGS) -o dtext.o
+	$(CC) -c 2io/dev/tty/vt/draw/view/line.c      $(KINCLUDE) $(CFLAGS) -o line.o
+	$(CC) -c 2io/dev/tty/vt/draw/view/menu.c      $(KINCLUDE) $(CFLAGS) -o menu.o
+	$(CC) -c 2io/dev/tty/vt/draw/view/mbar.c      $(KINCLUDE) $(CFLAGS) -o mbar.o
+	$(CC) -c 2io/dev/tty/vt/draw/view/pixel.c     $(KINCLUDE) $(CFLAGS) -o pixel.o
+	$(CC) -c 2io/dev/tty/vt/draw/view/pbar.c      $(KINCLUDE) $(CFLAGS) -o pbar.o
+	$(CC) -c 2io/dev/tty/vt/draw/view/rect.c      $(KINCLUDE) $(CFLAGS) -o rect.o
+	$(CC) -c 2io/dev/tty/vt/draw/view/sbar.c      $(KINCLUDE) $(CFLAGS) -o sbar.o
+	$(CC) -c 2io/dev/tty/vt/draw/view/tbar.c      $(KINCLUDE) $(CFLAGS) -o tbar.o
+	$(CC) -c 2io/dev/tty/vt/draw/view/xproc.c     $(KINCLUDE) $(CFLAGS) -o xproc.o
+
+	$(CC) -c 2io/dev/tty/vt/draw/logoff.c  $(KINCLUDE) $(CFLAGS) -o logoff.o
+	$(CC) -c 2io/dev/tty/vt/draw/logon.c   $(KINCLUDE) $(CFLAGS) -o logon.o
+
+
+	$(CC) -c 2io/dev/tty/vt/console.c   $(KINCLUDE) $(CFLAGS) -o console.o
+	$(CC) -c 2io/dev/tty/vt/terminal.c  $(KINCLUDE) $(CFLAGS) -o terminal.o
+	$(CC) -c 2io/dev/tty/vt/vt.c        $(KINCLUDE) $(CFLAGS) -o vt.o
+
+    # tty infra structure
+	$(CC) -c 2io/dev/tty/ldisc.c        $(KINCLUDE) $(CFLAGS) -o ldisc.o
+	$(CC) -c 2io/dev/tty/tty.c          $(KINCLUDE) $(CFLAGS) -o tty.o
+	$(CC) -c 2io/dev/tty/pty.c          $(KINCLUDE) $(CFLAGS) -o pty.o
 
 
 
