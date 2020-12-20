@@ -1,5 +1,5 @@
 /*
- * File: init/x86/x86init.c 
+ * File: x86/x86init.c 
  *
  * Description:
  *     It's is the initialization for x86 architechture.
@@ -317,13 +317,12 @@ void __x86StartInit (void){
 
 
 	//====================================================
-	//Create Idle Thread. tid=0. ppid=0.
-	
-    InitThread = (void *) createCreateInitThread ();
+	//Create  
+
+    InitThread = (void *) create_CreateRing3InitThread();
 
     if ( (void *) InitThread == NULL ){
-        panic ("__x86StartInit: IdleThread\n");
-
+        panic ("__x86StartInit: InitThread\n");
     }else{
 
         //IdleThread->ownerPID = (int) InitProcess->pid;
@@ -615,9 +614,10 @@ int x86main (void)
     debug_print ("[x86] x86main: processes and threads\n");
     printf      ("[x86] x86main: processes and threads\n");
 
-	//
-	// # Processes
-	//
+
+    //
+    // == kernel process ========================================
+    //
 
     //=================================================
     // processes and threads initialization.
@@ -637,6 +637,10 @@ int x86main (void)
     // Room, Desktop, Window
     // base address, priority, ppid, name, iopl, page directory address.
     // See: ps/action/process.c
+    
+    
+    // Creating kernel process.
+    
     KernelProcess = (void *) create_process ( NULL, NULL, NULL, 
                                  (unsigned long) 0xC0000000, 
                                  PRIORITY_HIGH, 
@@ -647,32 +651,30 @@ int x86main (void)
 
     if ( (void *) KernelProcess == NULL ){
         panic ("[x86] x86main: KernelProcess\n");
-
     }else{
         fs_initialize_process_pwd ( KernelProcess->pid, "no-directory" ); 
         //...
     };
-    
-    
+
     // Criando thread em ring 0 (idle)
     // pertence ao processo kernel.
     
     
-//#ifdef ENTRY_CREATE_KERNELTHREAD_RING0
-    //===================================
     // Cria uma thread em ring 0.
     // Ok. isso funcionou bem.
 
 	// >>>>> Como essa thread pertence ao processo kernel, então mudaremos ela 
 	// um pouco pra cima, onde criamos o processo kernel.
 	// obs: Mesmo não sendo ela o primeiro TID.
-	// See: threadi.c
+	// See: core/ps/create.c
 
-    RING0IDLEThread = (void *) KiCreateRing0Idle ();
+
+    // Creating a ring 0 thread for the kernel.
+
+    RING0IDLEThread = (void *) create_CreateRing0IdleThread();
 
     if ( (void *) RING0IDLEThread == NULL ){
         panic ("x86main: RING0IDLEThread\n");
-
     }else{
 
         // #todo
@@ -710,8 +712,9 @@ int x86main (void)
 		dead_thread_collector_status = 0;
 		//...
     };
-//#endif
 
+
+    //============================================================
 
 
 	// Cria e inicializa apenas o INIT.BIN

@@ -32,18 +32,8 @@ int KiSignal(void);
 void KiSpawnTask (int id);
 
 
-//ipc.
-//void KiCalloutTest (void);
-//void KiCallfarTest (void);
 
 
-//## bugbug ##
-// Isso deveria estar no módulo /pc em microkernel.
-
-void *createCreateInitThread (void);
-
-
-void *KiCreateRing0Idle (void);
 
 
 // #todo: 

@@ -1,0 +1,6 @@
+
+kernel base e idle thread.
+
+O kernel base nao termina num loop em ring0. Ele cria o processo kernel, para gerenciar seus proprios recursos, cria uma thread em ring 0 para o processo kernel, cria um processo em ring 3 para o programa init.bin e uma thread de controle para o processo init. Por fim salta para a thread de controle do processo init.
+
+A thread idle em ring 0 fica num loop STI/HALT ... isso da um folego para o processador. sti garante que as interrupçoes estao habilitadas e halt para o processador ate que uma interrupçao aconteca.

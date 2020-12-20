@@ -79,7 +79,11 @@ The role of the terminal emulator process is:
 #define  PTY_TYPE_MASTER  0x0001
 #define  PTY_TYPE_SLAVE   0x0002
 
- 
+
+
+//
+// == prototypes ================================================
+//
 
 
 //Ligar duas tty dados os pids dos processos que possuem as tty.
@@ -90,7 +94,7 @@ int pty_link ( struct tty_d *master, struct tty_d *slave );
 int pty_unlink ( struct tty_d *tty );
 
 int ptmx_open (void);
- 
+
 
 #endif    
 

@@ -127,17 +127,18 @@ typedef enum {
  
 typedef enum {
 
-	TYPE_NULL,
-	TYPE_SYSTEM,     // first-come-first-served.
-	TYPE_IDLE,       // 
-	TYPE_PERIODIC,   // periodic threads with predefined intervals.
-	TYPE_RR,         // first-come-first-served cooperative.
-	TYPE_REALTIME,
-	//TYPE_UI, //@todo
-	//TYPE_IO, //@todo
-	//...
+    THREAD_TYPE_NULL,
+    THREAD_TYPE_SYSTEM,     // first-come-first-served.
+    THREAD_TYPE_IDLE,       // 
+    THREAD_TYPE_PERIODIC,   // periodic threads with predefined intervals.
+    THREAD_TYPE_RR,         // first-come-first-served cooperative.
+    THREAD_TYPE_REALTIME,
+    THREAD_TYPE_UI, 
+    THREAD_TYPE_IO, 
+    // ...
 
 }thread_type_t;
+
 
 
 /*
@@ -768,6 +769,12 @@ struct thread_list_d
 //
 // ==  prototypes ============================================
 //
+
+void ring0_IdleThread (void);
+
+
+void *create_CreateRing0IdleThread (void);
+void *create_CreateRing3InitThread (void);
 
 
 //clona uma thread e retorna o ponteira da clone.

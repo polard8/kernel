@@ -824,14 +824,12 @@ struct thread_d *create_thread (
 
     if ( (void *) Thread == NULL ){
         panic ("create_thread: Thread\n");
-  
     }else{  
         //Indica � qual proesso a thread pertence.
        //Thread->process = (void*) Process;
     };
 
 	//Nothing.
-
 
 //Loop.
 get_next:	
@@ -928,9 +926,8 @@ get_next:
         Thread->MsgQueueTail = 0;
 
         // Caracteristicas.
-        
-        // TYPE_IDLE;    //?? //Type...@todo: Rever. 
-        Thread->type = TYPE_SYSTEM; 
+
+        Thread->type  = THREAD_TYPE_SYSTEM; 
         Thread->state = INITIALIZED;  
 
         // Apenas Initialized, pois a fun��o SelectForExecution

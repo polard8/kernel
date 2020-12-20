@@ -5564,6 +5564,106 @@ write_char (
 */
 
 
+/*
+char *minix_gets(char *s);
+char *minix_gets(char *s)
+{
+	register FILE *stream = stdin;
+	register int ch;
+	register char *ptr;
+
+	ptr = s;
+	while ((ch = getc(stream)) != EOF && ch != '\n')
+		*ptr++ = ch;
+
+	if (ch == EOF) {
+		if (feof(stream)) {
+			if (ptr == s) return NULL;
+		} else return NULL;
+	}
+
+	*ptr = '\0';
+	return s;
+}
+*/
+
+
+/*
+char *minix_fgets (char *s, register int n, register FILE *stream);
+char *minix_fgets (char *s, register int n, register FILE *stream)
+{
+	register int ch;
+	register char *ptr;
+
+	ptr = s;
+	while (--n > 0 && (ch = getc(stream)) != EOF) {
+		*ptr++ = ch;
+		if ( ch == '\n')
+			break;
+	}
+	if (ch == EOF) {
+		if (feof(stream)) {
+			if (ptr == s) return NULL;
+		} else return NULL;
+	}
+	*ptr = '\0';
+	return s;
+}
+*/
+
+
+/*
+int minix_fgetpos(FILE *stream, fpos_t *pos);
+int minix_fgetpos(FILE *stream, fpos_t *pos)
+{
+	*pos = ftell(stream);
+	
+	if (*pos == -1) 
+	    return -1;
+	
+	return 0;
+}
+*/
+
+/*
+int minix_fsetpos(FILE *stream, fpos_t *pos);
+int minix_fsetpos(FILE *stream, fpos_t *pos)
+{
+	return fseek(stream, *pos, SEEK_SET);
+}
+*/
+
+/*
+int minix_puts(register const char *s);
+int minix_puts(register const char *s)
+{
+	register FILE *file = stdout;
+	register int i = 0;
+
+	while (*s) {
+		if (putc(*s++, file) == EOF) return EOF;
+		else i++;
+	}
+	if (putc('\n', file) == EOF) return EOF;
+	return i + 1;
+}
+*/
+
+
+/*
+int minx_fputs(register const char *s, register FILE *stream);
+int minx_fputs(register const char *s, register FILE *stream)
+{
+	register int i = 0;
+
+	while (*s) 
+		if (putc(*s++, stream) == EOF) return EOF;
+		else i++;
+
+	return i;
+}
+*/
+
 
 //
 // End.
