@@ -31,6 +31,10 @@ int sys_open ( const char *pathname, int flags, mode_t mode );
 int sys_close ( int fd );
 
 
+
+int sys_sleep_if_socket_is_empty ( int fd );
+
+
 //
 // read and write
 //

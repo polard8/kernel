@@ -766,9 +766,18 @@ gde_extra_services (
     // set current input mode.
     if ( number == 912 ){ current_input_mode=arg2; return NULL; }
     
-    
-    
-    
+
+
+    // is it full ?
+    //See: sys.c
+    // IN: fd
+    // OUT: -1= error; FALSE= nao pode ler; TRUE= pode ler.
+    if ( number == 913 ){
+        return (void *) sys_sleep_if_socket_is_empty(arg2);
+    }
+
+
+
     // get screen window.
     // #todo. checar validade
     if ( number == 955 ){  return (void *) gui->screen;  } 

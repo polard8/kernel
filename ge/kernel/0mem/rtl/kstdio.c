@@ -43,8 +43,8 @@ extern unsigned long SavedBPP;
 // #todo:
 // See: sys_close().
 
-int k_fclose (file *f){
-
+int k_fclose (file *f)
+{
 
     debug_print("k_fclose: [FIXME]\n");
 
@@ -108,7 +108,8 @@ int k_fclose (file *f){
 // Precisamos inicializar corretamente a estrutura antes de 
 // retornarmos o ponteiro.
 
-file *k_fopen ( const char *filename, const char *mode ){
+file *k_fopen ( const char *filename, const char *mode )
+{
 
     struct process_d *Process;
     file *f;
@@ -858,7 +859,8 @@ int k_fputs ( const char *str, file *f ){
  * ungetc:
  */
 
-int k_ungetc ( int c, file *f ){
+int k_ungetc ( int c, file *f )
+{
 
     // c fail.
     if (c == EOF){ return (int) c; }
@@ -908,7 +910,8 @@ int k_fileno ( file *f )
  *     #precisamos exportar isso como serviço. (#136)
  */
 
-int k_fgetc ( file *f ){
+int k_fgetc(file *f)
+{
 
     int ch = 0;
 
@@ -917,7 +920,6 @@ int k_fgetc ( file *f ){
         printf ("k_fgetc: f\n");
         refresh_screen();
         return EOF;
- 
     }else{
 
 		 //(--(p)->_r < 0 ? __srget(p) : (int)(*(p)->_p++))
@@ -985,14 +987,13 @@ int k_fgetc ( file *f ){
 // ??
 // REVER.
 
-int k_feof ( file *f ){
-
+int k_feof ( file *f )
+{
     int ch = 0;
 
  
     if ( (void *) f == NULL ){
         return (int) (-1);
-
     } else {
         ch = k_fgetc (f);
 
@@ -1251,8 +1252,8 @@ int vfprintf(file *stream, const char *format, va_list ap)
  *
  */
 
-void k_rewind ( file *f ){
-
+void k_rewind ( file *f )
+{
     //fseek (f, 0L, SEEK_SET);
 
     if ( (void *) f == NULL ){ return; }

@@ -2271,6 +2271,8 @@ int main (int argc, char **argv){
     
     char buf[32];
     
+    int CanRead=-1;
+    
     while (1){
 
         // #todo:
@@ -2488,9 +2490,22 @@ int main (int argc, char **argv){
                 //sprintf(buf,"nonono");    // the client can't send request
                 //sprintf(buf,"yes");    // the client can send requests.
                 //write (newconn,buf, 4);
-
-
-                xxxHandleNextClientRequest (newconn);
+                
+                // Se o cliente ainda nao escreveu, vamos dormir.
+                // #bugbug: 
+                CanRead = rtl_sleep_if_socket_is_empty(newconn);
+                
+                if ( CanRead != TRUE ){
+                    gwssrv_debug_print("gwssrv: [FAIL] rtl_sleep_if_socket_is_empty fail\n");
+                    gwssrv_yield();
+                    gwssrv_yield();
+                    gwssrv_yield();
+                    gwssrv_yield();
+                    CanRead = rtl_sleep_if_socket_is_empty(newconn);
+                }
+                // sim podemos ler o socket.
+                if ( CanRead == TRUE )
+                    xxxHandleNextClientRequest (newconn);
                 
                 // read input from the server's socket?
                 // if it is invalid, we ignore it.

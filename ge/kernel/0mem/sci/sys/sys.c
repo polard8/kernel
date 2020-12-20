@@ -307,6 +307,89 @@ sys_open (
 }
 
 
+// IN: fd
+// OUT: -1= error; FALSE= nao pode ler; TRUE= pode ler.
+int sys_sleep_if_socket_is_empty ( int fd )
+{
+
+    struct process_d *p;
+    file *object;
+
+
+    if (fd<0)
+        return -1;
+
+
+    if ( fd < 0 || fd >= NUMBER_OF_FILES )
+    {
+        debug_print("sys_sleep_if_socket_is_empty: fd\n");
+        return (int) (-1);
+    }
+
+    if ( current_process < 0 ){
+        debug_print("sys_sleep_if_socket_is_empty: current_process\n");
+        return (int) (-1);
+    }
+
+    // process
+    
+    p = (void *) processList[current_process];
+
+    if ( (void *) p == NULL ){
+        debug_print("sys_sleep_if_socket_is_empty: p\n");
+        return (int) (-1);
+    }else{
+        
+        object = (file *) p->Objects[fd];
+        
+        // validation
+        if ( (void *) object == NULL ){
+            debug_print("sys_sleep_if_socket_is_empty: object\n");
+            return (int) (-1);
+        }else{
+            
+            //validation
+            if (object->used != 1 || object->magic != 1234 ){
+                debug_print("sys_sleep_if_socket_is_empty: calidation\n");
+                return -1;
+            }
+            
+            if ( object->____object != ObjectTypeSocket )
+            {
+                debug_print ("sys_sleep_if_socket_is_empty: [ERROR] only for sockets\n");
+                return -1;
+            }
+            
+            // TRUE or FALSE
+            //return (int) object->socket_buffer_full;   
+        
+           // sim esta vazio, nao pode ler;  retorna FALSE
+           if( object->socket_buffer_full == FALSE )
+           {
+               debug_print("sys_sleep_if_socket_is_empty: Buffer is empty. we can not read. sleeping\n");
+               object->_flags |= __SWR;                  // pode escrever
+               //todo: falg que nege a leitura.
+               object->tid_waiting = current_thread;     // thread atual dorme   
+               do_thread_waiting (current_thread);
+               return FALSE;  // nao pode ler
+           }
+           
+           // O buffer esta cheio, pode ler. retorna TRUE
+           if( object->socket_buffer_full == TRUE )
+           {
+               debug_print("sys_sleep_if_socket_is_empty: Buffer is empty. we can read\n");
+               object->_flags |= __SRD;
+               return TRUE;
+           }
+        };
+    };  
+    
+    debug_print ("sys_sleep_if_socket_is_empty: [FAIL] Unexpected error \n");
+    return -1;
+}
+
+
+
 
 /*
  **************************
@@ -321,10 +404,12 @@ sys_open (
 // https://man7.org/linux/man-pages/man2/close.2.html
 // https://pubs.opengroup.org/onlinepubs/009695399/functions/close.html
 
-int sys_close ( int fd ){
+int sys_close ( int fd )
+{
 
-    file *object;
     struct process_d *p;
+    file *object;
+
 
 
     //#bugbug
@@ -338,7 +423,7 @@ int sys_close ( int fd ){
     }
     */
 
-    if ( fd < 0 || fd >= NUMBER_OF_FILES)
+    if ( fd < 0 || fd >= NUMBER_OF_FILES )
     {
         debug_print("sys_close: fd\n");
         return (int) (-1);
@@ -359,10 +444,10 @@ int sys_close ( int fd ){
         
         object = (file *) p->Objects[fd];
 
+        // validation
         if ( (void *) object == NULL ){
             debug_print("sys_close: object\n");
             return (int) (-1);
-
         }else{
 
             //socket
@@ -916,149 +1001,53 @@ int sys_read (unsigned int fd, char *ubuf, int count)
     // Se o arquivo for um socket.
     if ( __file->____object == ObjectTypeSocket )
     {
-
-        // O socket do processo.
-        // #bugbug
-        // temos que inicializar essa variável, na hora da 
-        // clonagem de processo e na hora da criação de processo.
-        
-        // podemos pegar o socket privado, sem problemas,
-        // o que nao podemos eh apenas lermos do socket privado.
-        
-        if ( (void *) __P->priv == NULL )
-        {
-            debug_print ("sys_read: __P->priv fail\n");
-            printf      ("sys_read: __P->priv fail\n");
-            goto fail;
-        }
-         
-        // Pega a estrutura de soquete.
-        s = __P->priv;
-        if ( (void *) s == NULL){
-            debug_print ("sys_read: s fail\n");
-            printf      ("sys_read: s fail\n");
-            goto fail;
-        }
-
-
-        // O arquivo usado pelo socket.
-        // atenção
-        // temos que inicializar essa variável, na hora da 
-        // criação do socket.
-
-        // podemos pegar o socket privado, sem problemas,
-        // o que nao podemos eh apenas lermos do socket privado.
-
-        if ( (void *) s->private_file == NULL ){
-            debug_print ("sys_read: s->private_file fail\n");
-            printf      ("sys_read: s->private_file fail\n");
-            goto fail;
-        }
-
-        // #bugbug
-        // Nao podemos ler apenas o socket privado.
-        // temos o direito de lermos qualquer socket registrado na estrutura
-        // do processo atual.
-        
-        // O arquivo do socket precisa ser esse arquivo.
-        //if (__file != s->private_file){
-        //    debug_print ("sys_read: __file fail\n");
-        //    printf      ("sys_read: __file fail\n");
-        //    goto fail;
-        //}
-
-        // Read!
-
         nbytes = 0;
 
-        // #debug 
-        // printf ("sys_read: pid %d reading socket file %d\n",
-        //      current_process, __file->_file );
-         
+        // vazio? acorda escritores e dorme.
+        if (__file->socket_buffer_full == FALSE)
+        { 
+            debug_print("sys_read: WAKEUP WRITER\n");
+            __file->_flags |= __SWR;                  // pode escrever
+            do_thread_ready( __file->tid_waiting );   // acorda escritores. 
+            
+            debug_print("sys_read: SLEEP READER\n");
+            panic("sys_read: [DEBUG] Couldn't read socket. Buffer not full\n");
 
-        // Buffer cheio:
-        // + Lemos uma quantidade de bytes.
-        // #ps: Um buffer de socket tem o tamanho de BUFSIZ,
-        // mas foi criada alguma limitacao logo acima.
+            do_thread_waiting (current_thread);
+            __file->tid_waiting = current_thread;
+        }
 
-        if (__file->socket_buffer_full == 1)
+        // cheio? le e acorda escritores.
+        if (__file->socket_buffer_full == TRUE)
         {
-            // OUT:
-            // > 0 or EOF.
-            nbytes = (int) file_read_buffer ( (file *) __file, 
-                              (char *) ubuf, (int) count );
+            // read!
+            nbytes = (int) file_read_buffer ( 
+                               (file *) __file, 
+                              (char *) ubuf, 
+                              (int) count );
         
-            // Se lemos alguma coisa:
-            // + Sinalizamos que o buffer não está mais cheio.
-            // + sinalizamos que podem escrever novamente.
-            // + Acordar quem espera para escrever.
-
-            if (nbytes > 0){
-                debug_print("sys_read: o read funcionou\n");
-                // printf ("read ok. %d bytes \n",nbytes);
-                __file->socket_buffer_full = 0;
-                __file->_flags |= __SWR;
-                do_thread_ready( __file->tid_waiting );
-                return (int) nbytes;
-            }
-
-            // error
-            if (nbytes < 0){
-                debug_print("sys_read: nbytes less than zero\n");
+            if (nbytes <= 0){
+                debug_print("sys_read: [FAIL] file_read_buffer fail when reading a socket \n");
                 goto fail;
             }
-            
-            // Se nenhum byte foi lido: 
-            // + A thread atual dorme,
-            // + reescalonamos as threads e
-            // + sinalizamos que podem escrever no arquivo.
- 
-            if (nbytes == 0){
 
-                debug_print("sys_read: nbytes equal zero\n");
-             
-                // #debug
-                //printf ("sys_read: The thread %d is waiting now \n", 
-                    //current_thread);
-                //refresh_screen();
-                
-                //do_thread_waiting (current_thread);
-                //__file->tid_waiting = current_thread;
-                __file->_flags |= __SWR;  //pode escrever      
-                scheduler();  //#bugbug: Isso é um teste
-                return 0;   //not fail ... just waiting.
+            // ok
+            if (nbytes > 0)
+            {
+                debug_print("sys_read: [DEBUG] lemos mais que 0 bytes em um socket.\n");
+                __file->socket_buffer_full = FALSE;     // buffer vazio
+                __file->_flags |= __SWR;                // pode escrever.
+                debug_print("sys_read: WAKEUP WRITER\n");
+                do_thread_ready( __file->tid_waiting ); // acorda escritores.
+                debug_print("sys_read:done\n");
+                return (int) nbytes;                    // bytes escritos.
             }
-            
-            debug_print("sys_read: nbytes with a full buffer.\n");
-            goto fail;
-            
-        } // if it's full.
-         
-         
-        // Se, no caso de socket, o buffer está vazio:
-        // + A thread dorme.
-        // + Sinaliza que a thread está esperando.
-        // + Reescalonamos as threads;
-        // + Sinalizamos que podem escrever no arquivo.
+        } 
 
-        //if (nbytes == 0)
-        if (__file->socket_buffer_full == 0)
-        { 
-            debug_print("sys_read: [fail] socket_buffer_full not full\n");
-            //#debug
-            //printf ("thread %d is waiting now \n", current_thread);
-            //refresh_screen();
-
-            //do_thread_waiting (current_thread);
-            //__file->tid_waiting = current_thread;
-            __file->_flags |= __SWR;  //pode escrever.
-            scheduler();   //??? #bugbug!!!
-            return 0;  //not fail ... just waiting.
-        }  // if it's not full.
+        panic ("sys_read: [FAIL] Unexpected error when reading socket\n \n");
+    } 
 
 
-        panic ("sys_read: unexpected socket_buffer_full value \n");
-    } //-- socket file  
 
 
     //
@@ -1386,89 +1375,57 @@ int sys_write (unsigned int fd, char *ubuf, int count)
 
     if ( __file->____object == ObjectTypeSocket )
     {
-        // Pega a estrutura de soquete do processo atual.
-        // #bugbug: 
-        // Um processo não pode escrever no socket de outro processo?
-        // Pode sim, eh o que o servidor faz !!!!
+        nbytes = 0;
         
-        // pegamos o privado.
-        // mas nao significa que vamos escrever nele.
-        s1 = __P->priv;
-        if ( (void *) s1 == NULL )
-        { 
-            debug_print ("sys_write: s1 \n"); 
-            goto fail;
-        }    
-        
-        // #bugbug: Podemos escrever em qualquer socket registrado 
-        // na estrutura do processo atual.
-        // O socket tem um buffer, que é um arquivo. 
-        //if (__file != s1->private_file){
-        //    debug_print ("sys_write: __file\n"); 
-        //    goto fail;
-        //}  
-
-        //#debug
-        //printf ("sys_write: (1) pid %d Writing in the socket file %d \n", 
-            //current_process, __file->_file );
-        //refresh_screen();
-
-        //
-        // == Write! =======================================
-        //
-        
-        // Write in the socket buffer.
-        
-        nbytes = (int) file_write_buffer ( 
-                           (file *) __file, 
-                           (char *) ubuf, 
-                           (int) count );
-
-        // fail
-        if (nbytes < 0){
-            debug_print("sys_write: file_write_buffer fail \n");
-            goto fail;
-         }
-         
-        // fail
-        // Retorna sem mudar as flags do arquivo.
-        if (nbytes == 0){ 
-            debug_print("sys_write: file_write_buffer fail 0\n");
-            return 0; 
+        // cheio? acorde os leitores para esvaziar.
+        if ( __file->socket_buffer_full == TRUE )
+        {
+            debug_print("sys_write: WAKEUP READER\n");
+            __file->_flags |= __SRD;                 // pode ler.
+            do_thread_ready( __file->tid_waiting );  // acorda leitores
+            
+            // dorme. 
+            // Se dormirmos sem escrever e retornarmos, 
+            // o aplicativo nao chamara a escrita novamente.
+            debug_print("sys_write: SLEEP WRITER\n");
+            panic ("sys_write: [DEBUG] Couldn't write in the socket. Buffer full!\n");
+            do_thread_waiting(current_thread);
+            __file->tid_waiting = current_thread;
         }
+        
+        // vazio? escreva e acorde os leitores.
+        if ( __file->socket_buffer_full == FALSE )
+        {
+            // Write in the socket buffer.
+            nbytes = (int) file_write_buffer ( 
+                               (file *) __file, 
+                               (char *) ubuf, 
+                               (int) count );
 
-        // ok, write funcionou.
-        if (nbytes>0) 
-             __file->socket_buffer_full = 1;
-        
-        
-        // #debug
-        // printf ("sys_write: written\n");
-        // refresh_screen();
-     
-         // Flags!
-         // Agora nosso arquivo esta pronto para leitura,
-         // pois esperamos uma resposta.    
-         // >>> nao posso ler ... 
-         // so poderei ler quando alguem mandar alguma coisa.
-        __file->_flags |= __SRD;  
+            // fail
+            if (nbytes <= 0){
+                debug_print("sys_write: [FAIL] file_write_buffer couldn't write on socket \n");
+                goto fail;
+            }
 
-         
-        // Connected ??
-        // Vamos checar se esse socket está conectado à outro socket.
-        // Nesse caso iremos escrever também no arquivo conectado.
-        // #todo #importante
-        // Precisamos de uma falg que nos diga que devemos
-        // escrever também no socket conectado.
-    
-        // NO, don't copy!
-        // #todo
-        // Retornaremos se não é para copiar para o socket conectado.
+            // ok, write funcionou.
+            if (nbytes>0)
+            { 
+                debug_print("sys_write: WAKEUP READER\n");
+                __file->socket_buffer_full = TRUE;       // buffer cheio
+                __file->_flags |= __SRD;                 // pode ler 
+                do_thread_ready( __file->tid_waiting );  // acorda leitores
+                
+                debug_print("sys_write: SLEEP WRITER\n");
+                __file->tid_waiting = current_thread;
+                do_thread_waiting(current_thread);
+                  
+                
+                return nbytes;                           // bytes written
+            }
+        }
         
-        // ok.
-        // retornamos o numero de bytes escritos.
-        return nbytes;
-        
+        panic("sys_write: [FAIL] unexpected error when writing on socket.\n");         
     }  //socket file 
 
 

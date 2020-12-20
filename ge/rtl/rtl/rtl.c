@@ -382,6 +382,21 @@ void rtl_reboot(void)
 }
 
 
+// check if a file is full or not.
+// whe can't read an empty file.
+// IN: fd
+// OUT: -1= error; FALSE= nao pode ler; TRUE= pode ler.
+int rtl_sleep_if_socket_is_empty(int fd)
+{
+    if (fd<0)
+        return -1;   //error
+    
+    return (int) gramado_system_call( 913,fd,fd,fd);
+}
+
+
+
+
 /*
 void rtl_set_line_buffering(void);
 void rtl_set_line_buffering(void)

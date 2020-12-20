@@ -177,7 +177,6 @@ unsigned char lfn_checksum(const unsigned char *pFCBName)
 
 
 
-
 void file_close (file *_file)
 {
     debug_print("file_close: todo\n");
@@ -292,8 +291,8 @@ int fs_count_separators( const char *path){
 // 0 = OK. #todo: Isso poderia ser '1'.
 // < 0 Means error.
 
-int fsCheckELFFile ( unsigned long address ){
-
+int fsCheckELFFile ( unsigned long address )
+{
     unsigned char *buffer = (unsigned char *) address;
 
 
@@ -495,8 +494,8 @@ fsFAT16ListFiles (
  *     Get the pointer given the index in file_table[].
  */
 // na lista de arquivos do kernel.
-void *get_file (int Index){
-
+void *get_file (int Index)
+{
 	//Limits.
 	//@todo: max.
 
@@ -515,7 +514,8 @@ void *get_file (int Index){
  *     Put the pointer in the list, given the index.
  */
 // na lista de arquivos do kernel.
-void set_file ( void *file, int Index ){
+void set_file ( void *file, int Index )
+{
 
     if (Index < 0){
         // ?? todo: message

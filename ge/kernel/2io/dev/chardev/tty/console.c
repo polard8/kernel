@@ -1549,7 +1549,7 @@ void console_init_virtual_console (int n){
 
 
     if( ConsoleIndex == 0)
-            CONSOLE[ConsoleIndex].cursor_color = COLOR_GRAY; 
+            CONSOLE[ConsoleIndex].cursor_color = COLOR_WHITE; 
 
     if( ConsoleIndex == 1)
             CONSOLE[ConsoleIndex].cursor_color = COLOR_RED; 

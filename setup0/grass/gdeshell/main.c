@@ -2656,6 +2656,7 @@ do_compare:
     int t4nbytes=0;
     if ( gramado_strncmp( prompt, "t4", 2 ) == 0 )
     {
+        
         //stdout
         printf ("t4: Open and reading a file\n");
         printf ("t4: Change the input mode.\n");
@@ -2668,7 +2669,8 @@ do_compare:
             printf ("fopen fail\n");  //stdout
             goto exit_cmp;
         }
-        printf ("Testing getc ... \n\n");  
+        printf ("Testing getc ... \n\n");
+        t4_line_offset=0;  
         while (1){
             //ch_test = (int) fgetc (f1);    //funcionou.
             //ch_test = (int) getc(f1);  //funcionou. 
@@ -2679,7 +2681,7 @@ do_compare:
                 if ( ch_test == 'q' ){ printf( "String={%s}\n",t4buf); break; }
                 
                 t4_line_offset++; 
-                if(t4_line_offset>64){ printf("overflow\n"); break; }
+                if(t4_line_offset>=64){ printf("overflow: {%s}\n",t4buf); break; }
                 
                 //if ( ch_test == 'q' ){
                 //    printf("  EOF reached :)\n\n"); 

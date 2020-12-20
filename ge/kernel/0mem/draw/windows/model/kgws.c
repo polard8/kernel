@@ -607,16 +607,18 @@ done:
          }
          //pode ler
          if ( (Event_Message == MSG_KEYDOWN) && ((char)xxxbug[0] == 'q') )
+         {
              PS2KeyboardDeviceTTY->new_event = TRUE;
+
+             // da proxima vez escreveremos no inicio do buffer.
+             //PS2KeyboardDeviceTTY->_rbuffer->_w = 0;
+             // PS2KeyboardDeviceTTY->_rbuffer->_r = 0;
+             //PS2KeyboardDeviceTTY->_rbuffer->_p = PS2KeyboardDeviceTTY->_rbuffer->_base; 
+             //PS2KeyboardDeviceTTY->_rbuffer->_cnt = PS2KeyboardDeviceTTY->_rbuffer->_lbfsize;
+             //for( xxxi=0; xxxi<BUFSIZ; xxxi++){ PS2KeyboardDeviceTTY->_rbuffer->_p[xxxi] = 0; };
+         }
          
-         //#bugbug: teste: limpando o buffer
-         //if ( (Event_Message == MSG_KEYDOWN) && ((char)xxxbug[0] == 'w') ){
-         //    PS2KeyboardDeviceTTY->_rbuffer->_w = 0;
-         //    PS2KeyboardDeviceTTY->_rbuffer->_r = 0;
-         //    PS2KeyboardDeviceTTY->_rbuffer->_p = PS2KeyboardDeviceTTY->_rbuffer->_base; 
-         //    PS2KeyboardDeviceTTY->_rbuffer->_cnt = PS2KeyboardDeviceTTY->_rbuffer->_lbfsize;
-         //    for( xxxi=0; xxxi<BUFSIZ; xxxi++){ PS2KeyboardDeviceTTY->_rbuffer->_p[xxxi] = 0; };
-         //}
+
     }
     } //fim do current input mode. (TTY MODE)
 

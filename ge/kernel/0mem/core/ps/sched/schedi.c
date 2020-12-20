@@ -650,10 +650,10 @@ void do_thread_dead (int tid){
 
 
 //4  
-void do_thread_ready (int tid){
+void do_thread_ready (int tid)
+{
 
     struct thread_d *t; 
-
 
     // tid
     if (tid < 0 || tid >= THREAD_COUNT_MAX){

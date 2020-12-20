@@ -140,6 +140,7 @@ int main ( int argc, char *argv[] ){
 
     int client_fd = -1;
     int main_window = -1;
+    
 
     //================================
     
@@ -161,8 +162,8 @@ int main ( int argc, char *argv[] ){
     // Waiting ...
     // Wait for the moment where the server says: 'yes'
 
-    gws_debug_print ("gws.bin: Waiting ... \n");
-             printf ("gws.bin: Waiting ... \n");
+    gws_debug_print ("gws.bin:  \n");
+             printf ("gws.bin:  \n");
     
     /*
     char buf[32];
@@ -211,9 +212,10 @@ int main ( int argc, char *argv[] ){
     //
 
     //===============================
-    gws_debug_print ("gws.bin: Creating window \n");
-    //printf          ("gws.bin: Creating window \n");
+    gws_debug_print ("gws.bin: 1 Creating window \n");
+    printf          ("gws.bin: Creating window \n");
 
+       
     main_window = gws_create_window (client_fd,
                       WT_SIMPLE, 1, 1, "gws-client",
                       0, 0, w, h,
@@ -227,7 +229,7 @@ int main ( int argc, char *argv[] ){
 
 
     //===================
-    gws_debug_print ("gws.bin: Drawing a char \n");
+    gws_debug_print ("gws.bin: 2 Drawing a char \n");
     //printf          ("gws.bin: Drawing a char \n");
     gws_draw_char ( client_fd, main_window, 
         16, 8, COLOR_RED, 'C' );
@@ -235,7 +237,7 @@ int main ( int argc, char *argv[] ){
     
     
     
-    
+    /*
     //
     // == stdin ===================================================
     //
@@ -260,7 +262,7 @@ int main ( int argc, char *argv[] ){
         32, 8, COLOR_RED, 'I' );
     };
     // ============================================================
-    
+    */
     
     
 
@@ -276,8 +278,8 @@ int main ( int argc, char *argv[] ){
         //16, 8, COLOR_RED, 'C' );
 
 
-    gws_debug_print ("gws.bin: Testing Plot0 4x\n");
-    printf          ("gws.bin: Testing Plot0 4x\n");
+    gws_debug_print ("gws.bin: 3 Testing Plot0 4x\n");
+    printf          ("gws.bin: 3 Testing Plot0 4x\n");
 
     //test: plot point;
     //um ponto em cada quadrante.
@@ -291,8 +293,8 @@ int main ( int argc, char *argv[] ){
     //
 
     
-    gws_debug_print ("gws.bin: Testing Plot cube \n");
-    printf          ("gws.bin: Testing Plot cube \n");
+    gws_debug_print ("gws.bin: 4 Testing Plot cube \n");
+    printf          ("gws.bin: 4 Testing Plot cube \n");
 
 
     struct gr_cube_d *cube;

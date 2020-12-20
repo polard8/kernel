@@ -109,6 +109,11 @@ rtl_copy_text (
 
 void rtl_reboot(void);
 
+
+
+int rtl_sleep_if_socket_is_empty(int fd);
+
+
 #endif
 
 
