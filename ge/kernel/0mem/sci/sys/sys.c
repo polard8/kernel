@@ -1347,7 +1347,7 @@ int sys_write (unsigned int fd, char *ubuf, int count)
             panic("sys_write: Wrong object for stdout");
         }
         return (int) console_write ( 
-                         (int) current_vc, 
+                         (int) fg_console, 
                          (const void *) ubuf, 
                          (size_t) count );
     }

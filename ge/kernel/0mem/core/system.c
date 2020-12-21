@@ -184,26 +184,21 @@ set_up_text_color (
 
 
 /*
- **********************************************************
  * set_up_cursor:
  *     Setup cursor for the current virtual console.
- *
  */
 
 // We can move this to another place.
 
 void set_up_cursor ( unsigned long x, unsigned long y )
 {
+    if (fg_console<0){ return; }
 
-    if (current_vc<0){ return; }
-
-    CONSOLE[current_vc].cursor_x = (unsigned long) x;
-    CONSOLE[current_vc].cursor_y = (unsigned long) y;
+    CONSOLE[fg_console].cursor_x = (unsigned long) x;
+    CONSOLE[fg_console].cursor_y = (unsigned long) y;
 }
 
-
 /*
- **************************************************
  * get_cursor_x:
  *     Pega o valor de x.
  *     @todo: Isso pode ir para outro lugar.
@@ -211,12 +206,10 @@ void set_up_cursor ( unsigned long x, unsigned long y )
 
 unsigned long get_cursor_x (void)
 {
-    return (unsigned long) CONSOLE[current_vc].cursor_x;
+    return (unsigned long) CONSOLE[fg_console].cursor_x;
 }
 
-
 /*
- **************************************************
  * get_cursor_y:
  *     Pega o valor de y.
  *     @todo: Isso pode ir para outro lugar.
@@ -224,7 +217,7 @@ unsigned long get_cursor_x (void)
 
 unsigned long get_cursor_y (void)
 {
-    return (unsigned long) CONSOLE[current_vc].cursor_y; 
+    return (unsigned long) CONSOLE[fg_console].cursor_y; 
 }
 
 
@@ -295,12 +288,9 @@ void systemSetupVersion (void){
     // pois existem aplicações que dependem da versão do sistema 
     // para funcionarem corretamente.. 
 
-    if ( (void *) Version == NULL )
-    {
+    if ( (void *) Version == NULL ){
         panic("systemSetupVersion: Version");
-
     } else {
-
         Version->Major = VERSION_MAJOR;
         Version->Minor = VERSION_MINOR;
         Version->Build = VERSION_BUILD;
@@ -1066,9 +1056,9 @@ unsigned long systemGetSystemMetrics ( int index )
 
 	//print ("#debug: systemGetSystemMetrics: i={%d} \n",index)
 
-    if ( index <= 0 )
+    if ( index <= 0 ){
         return (unsigned long) 0;
-
+    }
 
     switch ( index ){
 
@@ -1085,23 +1075,23 @@ unsigned long systemGetSystemMetrics ( int index )
 
         //cursor width in pixels.
         case 3:
-            return (unsigned long) CONSOLE[current_vc].cursor_width_in_pixels;
+            return (unsigned long) CONSOLE[fg_console].cursor_width_in_pixels;
             break;
-        //cursor hight in pixels.
+
+        //cursor height in pixels.
         case 4:
-            return (unsigned long) CONSOLE[current_vc].cursor_height_in_pixels;
+            return (unsigned long) CONSOLE[fg_console].cursor_height_in_pixels;
             break;
 
 
-
-		//mouse pointer width.
-		case 5:
-		    return (unsigned long) g_mousepointer_width;
+        // mouse pointer width.
+        case 5:
+            return (unsigned long) g_mousepointer_width;
             break;
          
-		//mouse pointer height. 
-		case 6:
-		    return (unsigned long) g_mousepointer_height;
+        // mouse pointer height. 
+        case 6:
+            return (unsigned long) g_mousepointer_height;
             break;
 
 		//char width.

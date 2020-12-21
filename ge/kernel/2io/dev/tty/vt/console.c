@@ -88,7 +88,9 @@ void __local_gotoxy ( int new_x, int new_y, int console_number )
 
 // #bugbug
 // Isso tá errado.
+
 #define __RESPONSE "\033[?1;2c"
+
 void __respond (int console_number)
 {
     char * p = __RESPONSE;
@@ -159,6 +161,7 @@ void __local_insert_char ( int console_number )
     
     console_putchar (0x20, console_number);
 }
+
 
 void __local_insert_line (int console_number)
 {
@@ -399,8 +402,8 @@ void csi_at (int nr, int console_number)
 
 // Called by console_outbyte.
 
-void _console_outbyte (int c, int console_number){
-
+void _console_outbyte (int c, int console_number)
+{
     int cWidth  = get_char_width();
     int cHeight = get_char_height();
 
@@ -1286,16 +1289,15 @@ int kclear (int color, int console_number)
 }
 
 
-/* 
- * kclearClientArea: 
- */
-
+ 
+// kclearClientArea: 
 // Limpa a tela em text mode.
-// Isso não faz parte da lib c. Deletar.
-
+// deprecated
 int kclearClientArea (int color)
 {
-    return (int) kclear (color, current_vc);
+    debug_print("kclearClientArea: deprecated\n");
+
+    return (int) kclear (color, fg_console);
 }
 
 
@@ -1329,8 +1331,8 @@ int insert_line ( char *string, int line )
 // Change this name. 
 // Do not use stream in the base kernel.
 
-void REFRESH_STREAM ( file *f ){
-
+void REFRESH_STREAM ( file *f )
+{
     //loop
     int i=0;
     int j=0;
@@ -1339,6 +1341,9 @@ void REFRESH_STREAM ( file *f ){
     int cHeight = get_char_height();
 
     char *c;
+
+
+    debug_print("console.c-REFRESH_STREAM: [FIXME] It is wrong!\n");
 
     if ( cWidth == 0 || cHeight == 0 ){
         panic ("REFRESH_STREAM: char w h ");
@@ -1374,9 +1379,12 @@ void REFRESH_STREAM ( file *f ){
     {
         printf ("%c", *c );
 
+        // #bugbug
+        // It is very wrong!
+        
         refresh_rectangle ( 
-            (CONSOLE[current_vc].cursor_x * cWidth), 
-            (CONSOLE[current_vc].cursor_y * cHeight),  
+            (CONSOLE[fg_console].cursor_x * cWidth), 
+            (CONSOLE[fg_console].cursor_y * cHeight),  
             cWidth, 
             cHeight );
 
@@ -1394,13 +1402,13 @@ void console_set_current_virtual_console (int n)
         return;
     }
 
-    current_vc = n;
+    fg_console = n;
 }
 
 
 int console_get_current_virtual_console (void)
 {
-    return (int) current_vc;
+    return (int) fg_console;
 }
 
 
@@ -1408,6 +1416,10 @@ void console_switch_to(int n)
 {
     // #todo:
     // maybe we can do somo other configuration here.
+ 
+    if( n<0 || n >= CONSOLE_COUNT_MAX ){
+        debug_print("console_switch_to: Limits\n");
+    }
     
     console_set_current_virtual_console (n);
 }
@@ -1431,17 +1443,18 @@ void console_switch_to(int n)
 
 // See: console.h and tty.h
 
-void console_init_virtual_console (int n){
-
+void console_init_virtual_console (int n)
+{
     int ConsoleIndex = -1;
+
+    ConsoleIndex = n;
+
 
 
     debug_print ("console_init_virtual_console:\n");
 
-
-    ConsoleIndex = n;
-
-    if ( ConsoleIndex < 0 || ConsoleIndex > 3 ){
+    if ( ConsoleIndex < 0 || ConsoleIndex >= CONSOLE_COUNT_MAX  )
+    {
         debug_print ("console_init_virtual_console: [FAIL] ConsoleIndex\n");
         panic       ("console_init_virtual_console: [FAIL] ConsoleIndex\n");
     }
@@ -1526,11 +1539,10 @@ void console_init_virtual_console (int n){
     CONSOLE[ConsoleIndex]._obuffer = (file *) 0;
 
 
-
     // cursor dimentions in pixel.
     // #bugbug: determinado
-    CONSOLE[current_vc].cursor_width_in_pixels = 8; 
-    CONSOLE[current_vc].cursor_height_in_pixels = 8;
+    CONSOLE[ConsoleIndex].cursor_width_in_pixels = 8; 
+    CONSOLE[ConsoleIndex].cursor_height_in_pixels = 8;
 
     //cursor position in chars.
     CONSOLE[ConsoleIndex].cursor_x = 0;
@@ -1615,27 +1627,31 @@ console_ioctl (
     // Change the color of the char for the current virtual console.
     // ok. it is working.
     case 1000:
-        CONSOLE[current_vc].cursor_color = (unsigned long) arg;
+        CONSOLE[fg_console].cursor_color = (unsigned long) arg;
         return 0;  //ok
         break;
 
     // cursor x position
+    // #bugbug #todo  limits
     case 1001:
-        CONSOLE[current_vc].cursor_x = 0;
-        return 0;  //ok
+        CONSOLE[fg_console].cursor_x = 0;  return 0;
         break;
 
     // cursor y position
+    // #bugbug #todo  limits
     case 1002:
-        CONSOLE[current_vc].cursor_y = 0;
-        return 0;  //ok
+        CONSOLE[fg_console].cursor_y = 0;  return 0;
         break;
 
     // switching the current virtual console.
     // We have onlu 4 virtual consoles.
     case 1003:
-        if ( arg >= 0 && arg <= 3 ){ current_vc = arg; }
-        return 0;
+        if ( arg >= 0 && arg < CONSOLE_COUNT_MAX )
+        { 
+            fg_console = arg;
+            return 0; 
+        }
+        return -1;
         break; 
 
     // #todo:
@@ -1648,8 +1664,11 @@ console_ioctl (
     // #todo: Yes, we can return data from the console tty termios. 
     // case TCGETS:
     // ...
+    
+    default:
+        debug_print ("console_ioctl: [TODO] request\n");
+        break;
     };
-
 
     return -1;
 }

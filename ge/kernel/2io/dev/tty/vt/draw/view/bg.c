@@ -109,13 +109,12 @@ void backgroundDraw (unsigned long color){
     };
 
 
-	//#bugbug
-	//estamos determinando as dimensoes do char.
-	//?? ja' podemos usar a variável. ??
-
+    //#todo
+    //Criar uma funçao para isso.
+    
     // Cursor.
-    CONSOLE[current_vc].cursor_x = 0;
-    CONSOLE[current_vc].cursor_y = 0;
+    CONSOLE[fg_console].cursor_x = 0;
+    CONSOLE[fg_console].cursor_y = 0;
 
 	// #bugbug
 	// Será que nesse momento as dimensões do char já estão configuradas ??
@@ -162,8 +161,8 @@ void backgroundRedraw (unsigned long color)
 
 void backgroundBackground (void)
 {
-    CONSOLE[current_vc].cursor_x = 0;
-    CONSOLE[current_vc].cursor_y = 0; 
+    CONSOLE[fg_console].cursor_x = 0;
+    CONSOLE[fg_console].cursor_y = 0; 
 }
 
 

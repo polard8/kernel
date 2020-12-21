@@ -599,10 +599,10 @@ done:
              PS2KeyboardDeviceTTY->new_event = FALSE;
          
              console_write ( 
-                 (int) current_vc, 
+                 (int) fg_console, 
                  (const void *) xxxbug, 
                  (size_t) 1 );
-             
+
              refresh_screen(); //#bugbug: teste
          }
          //pode ler
@@ -617,8 +617,7 @@ done:
              //PS2KeyboardDeviceTTY->_rbuffer->_cnt = PS2KeyboardDeviceTTY->_rbuffer->_lbfsize;
              //for( xxxi=0; xxxi<BUFSIZ; xxxi++){ PS2KeyboardDeviceTTY->_rbuffer->_p[xxxi] = 0; };
          }
-         
-
+  
     }
     } //fim do current input mode. (TTY MODE)
 

@@ -354,7 +354,8 @@ struct tty_d
 #define CONSOLE_COUNT_MAX    4
 
 // Index.
-int current_vc;
+extern int fg_console;
+
 
 // Virtual consoles.
 static struct tty_d CONSOLE[CONSOLE_COUNT_MAX];

@@ -1,5 +1,5 @@
 /*
- * File: windows/model/wm.c 
+ * File: model/wm.c 
  *
  *  wm. - kernel Window Manager.
  * 
@@ -1157,9 +1157,9 @@ void windowShowWindowList (void){
 	//@todo: Chamar método.	
 	//Cursor.
 
-    CONSOLE[current_vc].cursor_x = (left/8);
-    CONSOLE[current_vc].cursor_y = (top/8);  
-	//set_up_cursor(0,10);
+    CONSOLE[fg_console].cursor_x = (left/8);
+    CONSOLE[fg_console].cursor_y = (top/8);  
+    //set_up_cursor(0,10);
 
 
 	//
@@ -1213,18 +1213,18 @@ void windowShowWindowList (void){
 		// #bugbug
 		// Cuidado para não dividir por '0'.
 
-		CONSOLE[current_vc].cursor_left   = (hWindow->left/8);
-		CONSOLE[current_vc].cursor_top    = (hWindow->top/8) + 4;   //Queremos o início da área de clente.
-		CONSOLE[current_vc].cursor_right  = CONSOLE[current_vc].cursor_left + (width/8);
-		CONSOLE[current_vc].cursor_bottom = CONSOLE[current_vc].cursor_top  + (height/8);
+        CONSOLE[fg_console].cursor_left   = (hWindow->left/8);
+        CONSOLE[fg_console].cursor_top    = (hWindow->top/8) + 4;   //Queremos o início da área de clente.
+        CONSOLE[fg_console].cursor_right  = CONSOLE[fg_console].cursor_left + (width/8);
+        CONSOLE[fg_console].cursor_bottom = CONSOLE[fg_console].cursor_top  + (height/8);
 
-		//cursor (0, mas com margem nova).
-		CONSOLE[current_vc].cursor_x = CONSOLE[current_vc].cursor_left; 
-		CONSOLE[current_vc].cursor_y = CONSOLE[current_vc].cursor_top; 
+        // cursor (0, mas com margem nova).
+        CONSOLE[fg_console].cursor_x = CONSOLE[fg_console].cursor_left; 
+        CONSOLE[fg_console].cursor_y = CONSOLE[fg_console].cursor_top; 
 
         //Mostrando as informações de todas as janelas registradas.
         while( i < WINDOW_COUNT_MAX )
-        {	
+        {
 	        hWnd = (void *) windowList[i];
 		
 		    
@@ -1249,21 +1249,20 @@ void windowShowWindowList (void){
         SetFocus(hWindow);
 
 
-		//voltando a margem normal a margem
-		CONSOLE[current_vc].cursor_left   = (left/8); 
-		CONSOLE[current_vc].cursor_top    = (top/8);
-		CONSOLE[current_vc].cursor_right  = (width/8);
-		CONSOLE[current_vc].cursor_bottom = (height/8); 
+        // Voltando a margem normal a margem
+        CONSOLE[fg_console].cursor_left   = (left/8); 
+        CONSOLE[fg_console].cursor_top    = (top/8);
+        CONSOLE[fg_console].cursor_right  = (width/8);
+        CONSOLE[fg_console].cursor_bottom = (height/8); 
 
-		//cursor (0, mas com margem nova)
-		CONSOLE[current_vc].cursor_x = CONSOLE[current_vc].cursor_left; 
-		CONSOLE[current_vc].cursor_y = CONSOLE[current_vc].cursor_top;
+        // cursor (0, mas com margem nova)
+        CONSOLE[fg_console].cursor_x = CONSOLE[fg_console].cursor_left; 
+        CONSOLE[fg_console].cursor_y = CONSOLE[fg_console].cursor_top;
         //set_up_cursor(g_cursor_left,g_cursor_top); 
-
 
 		//StatusBar ( hWindow, "Esc=EXIT","Enter=?" );
 		//Nothing.
-	};	   
+    };
 
     // Continua ...
 
@@ -2714,7 +2713,7 @@ void SetFocus ( struct window_d *window )
         active_thread  = window->control->tid;
       
         // Current virtual console.
-        CONSOLE[current_vc].control = (struct thread_d *) window->control;
+        CONSOLE[fg_console].control = (struct thread_d *) window->control;
       
         // ...
       

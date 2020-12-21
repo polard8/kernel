@@ -79,7 +79,25 @@ terminal_ioctl (
 // all the tty features (there is a bug)
 
 
-void systemSetTerminalWindow ( struct window_d *window ){
+// #todo
+// Podemos melhorar esse nome.
+//int terminal_set_vt_window( int console_number, struct window_d *window ){
+
+void systemSetTerminalWindow ( struct window_d *window )
+{
+
+    //#todo
+    /*
+    unsigned long deviceWidth=0; 
+    unsigned long deviceHeight=0; 
+    deviceWidth  = systemGetSystemMetrics(1);
+    deviceHeight = systemGetSystemMetrics(2);
+    if ( deviceWidth == 0 || deviceHeight == 0 )
+    {
+        panic("systemSetTerminalWindow: deviceWidth deviceHeight\n");
+    }
+    */
+
 
 	// Obs: ?? Como faremos para pintar dentro da janela do terminal.
 	// Obs: a rotina de configuração do terminal deverá ajustar as margens 
@@ -131,14 +149,11 @@ void systemSetTerminalWindow ( struct window_d *window ){
     //window->terminal_height = 0;
 	//..
 
-    window->terminal_left = window->left;
-    window->terminal_top  = window->top;
-
+    window->terminal_left   = window->left;
+    window->terminal_top    = window->top;
     window->terminal_width  = window->width;
     window->terminal_height = window->height;
-    
-    
-    
+
 
     // #bugbug
     // Qual eh o current no momento dessa inicializaçao
@@ -158,22 +173,24 @@ void systemSetTerminalWindow ( struct window_d *window ){
 // Both will use the tty structure,
 // but the console is not able to use
 // all the tty features (there is a bug)
- 
- 
-    if (current_vc < 0 || current_vc>3)
-        panic("systemSetTerminalWindow: current_vc");
+
+
+    if (fg_console < 0 || fg_console >= CONSOLE_COUNT_MAX )
+    {
+        panic("systemSetTerminalWindow: fg_console\n");
+    }
 
     //position
-    CONSOLE[current_vc].cursor_x = (window->left / 8);
-    CONSOLE[current_vc].cursor_y = (window->top  / 8);
+    CONSOLE[fg_console].cursor_x = (window->left / 8);
+    CONSOLE[fg_console].cursor_y = (window->top  / 8);
 
     //margin
-    CONSOLE[current_vc].cursor_left = CONSOLE[current_vc].cursor_x; 
-    CONSOLE[current_vc].cursor_top  = CONSOLE[current_vc].cursor_y;
+    CONSOLE[fg_console].cursor_left = CONSOLE[fg_console].cursor_x; 
+    CONSOLE[fg_console].cursor_top  = CONSOLE[fg_console].cursor_y;
 
     //limits
-    CONSOLE[current_vc].cursor_right  = 0+(SavedX/8) -1;  // (screen width / char width)
-    CONSOLE[current_vc].cursor_bottom = 0+(SavedY/8) -1;  // (screen height/ char height)
+    CONSOLE[fg_console].cursor_right  = 0+(SavedX/8) -1;  // (screen width / char width)
+    CONSOLE[fg_console].cursor_bottom = 0+(SavedY/8) -1;  // (screen height/ char height)
 
 
 	//
@@ -243,64 +260,45 @@ void systemSetTerminalWindow ( struct window_d *window ){
     }
     */
 
-	//limits
-	//@todo: corrigir.
-	// ajustes temporários caso tenha havido um erro anteriormente...
+    // #bugbug
+    // This is very ugly, i know!
+    // We need to fix it.
 
-    //#bugbug
-    //isso tá errado. limite   80;
-
-    if ( CONSOLE[current_vc].cursor_left > 800 )
+    if ( CONSOLE[fg_console].cursor_left > 800 )
     {
-        CONSOLE[current_vc].cursor_left = 795;
+        CONSOLE[fg_console].cursor_left = 795;
     }
 
-    if ( CONSOLE[current_vc].cursor_top > 600 )
+    if ( CONSOLE[fg_console].cursor_top > 600 )
     {
-         CONSOLE[current_vc].cursor_top = 595;
+         CONSOLE[fg_console].cursor_top = 595;
     }
 
-    if ( CONSOLE[current_vc].cursor_right > 800 )
+    if ( CONSOLE[fg_console].cursor_right > 800 )
     {
-         CONSOLE[current_vc].cursor_right = 795;
+         CONSOLE[fg_console].cursor_right = 795;
     }
 
-    if ( CONSOLE[current_vc].cursor_bottom > 600 )
+    if ( CONSOLE[fg_console].cursor_bottom > 600 )
     {
-         CONSOLE[current_vc].cursor_bottom = 595;
+         CONSOLE[fg_console].cursor_bottom = 595;
     }
 
 
-    // Cursor.
+    // Cursor
 
-    CONSOLE[current_vc].cursor_width_in_pixels  = 8; 
-    CONSOLE[current_vc].cursor_height_in_pixels = 8; 
-    CONSOLE[current_vc].cursor_color  = COLOR_WHITE;
+    CONSOLE[fg_console].cursor_width_in_pixels  = 8;
+    CONSOLE[fg_console].cursor_height_in_pixels = 8;
+    CONSOLE[fg_console].cursor_color  = COLOR_WHITE;
 
-
-	//
-	// Terminal struct
-	//
-	
-	// #todo
-	// Se a estrutura do terminal atual for válida,
-	// então vamos configurá-la.
-	
-	/*
-	if ( current_terminal < 0 || current_terminal > 7 )
-	{
-	    kprintf ("systemSetTerminalWindow: current_terminal fail");
-		die ();
-	}
-	*/
-
-
-    // continua ...
+    // ...
 }
+
 
 
 // o ID da janela que tem o terminal virtual ativo.
 // isso deve ir para kgws
+// int terminal_get_vt_window_id(int console_number)
 
 int systemGetTerminalWindow (void)
 {
@@ -325,10 +323,13 @@ systemSetTerminalRectangle (
 
 int terminalInit (void)
 {
-	// seleciona o primeiro terminal
-	current_terminal = 0;
-		
-	// Continua ...
+    // ??
+    // seleciona o primeiro terminal
+
+    current_terminal = 0;
+
+    // ...
+    
     return 0;
 }
 

@@ -2841,9 +2841,12 @@ unsigned long serviceCreateWindow ( char *message_buffer ){
  * stdio_terminalmode_flag = n�o transparente.
  */
 
+// #todo
+// Change the name. service_console_putchar()
+
 void servicesPutChar ( int c )
 {
-    console_putchar ( (int) c, current_vc );
+    console_putchar ( (int) c, fg_console );
 }
 
 

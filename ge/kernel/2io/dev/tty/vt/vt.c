@@ -14,6 +14,8 @@
 #include <kernel.h>
 
 
+int fg_console;
+
 // Wrapper to tty_ioctl
 // #bugbug:
 // We already have this thing on terminal.c in sci/
