@@ -1764,13 +1764,13 @@ int stdioInitialize (void){
     // console.h
 
     for (i=0; i<4; i++){
-        vc_cons[fg_console].tty->cursor_x = 0;   
-        vc_cons[fg_console].tty->cursor_y = 0;     
-        vc_cons[fg_console].tty->cursor_left = 0; 
-        vc_cons[fg_console].tty->cursor_top = 0;  
-        vc_cons[fg_console].tty->cursor_right  = (SavedX/cWidth); 
-        vc_cons[fg_console].tty->cursor_bottom = (SavedY/cHeight); 
-        vc_cons[fg_console].tty->cursor_color = COLOR_WHITE;  
+        CONSOLE_TTYS[i].cursor_x = 0;   
+        CONSOLE_TTYS[i].cursor_y = 0;     
+        CONSOLE_TTYS[i].cursor_left = 0; 
+        CONSOLE_TTYS[i].cursor_top = 0;  
+        CONSOLE_TTYS[i].cursor_right  = (SavedX/cWidth); 
+        CONSOLE_TTYS[i].cursor_bottom = (SavedY/cHeight); 
+        CONSOLE_TTYS[i].cursor_color = COLOR_WHITE;  
     };
 
 	// Done !

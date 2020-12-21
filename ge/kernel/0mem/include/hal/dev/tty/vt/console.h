@@ -82,17 +82,11 @@ void REFRESH_STREAM ( file *f );
 // Virtual console support.
 void console_set_current_virtual_console ( int n );
 int console_get_current_virtual_console (void);
-
-
-
+void console_init_virtual_console (int n);
 
 void console_switch_to(int n);
 
 int console_ioctl ( int fd, unsigned long request, unsigned long arg );
-
-
-
-void console_init_virtual_consoletty (int n);
 
 int VirtualConsole_initialize(void);
 
