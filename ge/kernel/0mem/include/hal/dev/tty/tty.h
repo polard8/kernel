@@ -364,6 +364,21 @@ static struct tty_d CONSOLE[CONSOLE_COUNT_MAX];
 
 
 
+//=============================================================
+// #todo
+/*
+struct vc_d
+{
+    //
+    // de repente pode apontar para uma das ttys em CONSOLE. ??
+    struct tty_d *tty;
+    
+    //struct vc_info_d *vc_info;
+};
+static struct vc_d vc_cons[CONSOLE_COUNT_MAX];
+*/
+//=============================================================
+
 
 //
 // == prototyes =================================================
