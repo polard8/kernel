@@ -1,5 +1,5 @@
 /*
- * File: windows/view/bg.c 
+ * File: view/bg.c 
  *
  * 
  * Descrição:
@@ -113,8 +113,8 @@ void backgroundDraw (unsigned long color){
     //Criar uma funçao para isso.
     
     // Cursor.
-    CONSOLE_TTYS[fg_console].cursor_x = 0;
-    CONSOLE_TTYS[fg_console].cursor_y = 0;
+    vc_cons[fg_console].tty->cursor_x = 0;
+    vc_cons[fg_console].tty->cursor_y = 0;
 
 	// #bugbug
 	// Será que nesse momento as dimensões do char já estão configuradas ??
@@ -161,8 +161,8 @@ void backgroundRedraw (unsigned long color)
 
 void backgroundBackground (void)
 {
-    CONSOLE_TTYS[fg_console].cursor_x = 0;
-    CONSOLE_TTYS[fg_console].cursor_y = 0; 
+    vc_cons[fg_console].tty->cursor_x = 0;
+    vc_cons[fg_console].tty->cursor_y = 0; 
 }
 
 

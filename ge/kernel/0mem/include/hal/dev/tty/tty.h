@@ -352,21 +352,22 @@ struct tty_d
 // Criados a unha pelo kernel.
 
 
-#define CONSOLETTYS_COUNT_MAX    4
-
 // Index.
 extern int fg_console;
 
 
+#define CON_TTYS_COUNT_MAX    4
+
 // Virtual consoles.
-static struct tty_d CONSOLE_TTYS[CONSOLETTYS_COUNT_MAX];
+// vamos trocar o nome so para achar onde precisa ser editado.
+static struct tty_d CON_TTYS[CON_TTYS_COUNT_MAX];
 // ==============================================================
 
 
 
 
 //=============================================================
-// #todo
+// Virtual consoles.
 
 struct vc_d
 {
@@ -378,9 +379,11 @@ struct vc_d
     //struct vc_info_d *vc_info;
 };
 
-// #define CONSOLE_COUNT_MAX    4
 
-//static struct vc_d vc_cons[CONSOLE_COUNT_MAX];
+#define CONSOLE_COUNT_MAX    8
+
+static struct vc_d vc_cons[CONSOLE_COUNT_MAX];
+
 
 //=============================================================
 
