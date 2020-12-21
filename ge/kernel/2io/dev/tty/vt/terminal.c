@@ -175,22 +175,22 @@ void systemSetTerminalWindow ( struct window_d *window )
 // all the tty features (there is a bug)
 
 
-    if (fg_console < 0 || fg_console >= CONSOLE_COUNT_MAX )
+    if (fg_console < 0 || fg_console >= CONSOLETTYS_COUNT_MAX )
     {
         panic("systemSetTerminalWindow: fg_console\n");
     }
 
     //position
-    CONSOLE[fg_console].cursor_x = (window->left / 8);
-    CONSOLE[fg_console].cursor_y = (window->top  / 8);
+    CONSOLE_TTYS[fg_console].cursor_x = (window->left / 8);
+    CONSOLE_TTYS[fg_console].cursor_y = (window->top  / 8);
 
     //margin
-    CONSOLE[fg_console].cursor_left = CONSOLE[fg_console].cursor_x; 
-    CONSOLE[fg_console].cursor_top  = CONSOLE[fg_console].cursor_y;
+    CONSOLE_TTYS[fg_console].cursor_left = CONSOLE_TTYS[fg_console].cursor_x; 
+    CONSOLE_TTYS[fg_console].cursor_top  = CONSOLE_TTYS[fg_console].cursor_y;
 
     //limits
-    CONSOLE[fg_console].cursor_right  = 0+(SavedX/8) -1;  // (screen width / char width)
-    CONSOLE[fg_console].cursor_bottom = 0+(SavedY/8) -1;  // (screen height/ char height)
+    CONSOLE_TTYS[fg_console].cursor_right  = 0+(SavedX/8) -1;  // (screen width / char width)
+    CONSOLE_TTYS[fg_console].cursor_bottom = 0+(SavedY/8) -1;  // (screen height/ char height)
 
 
 	//
@@ -264,32 +264,32 @@ void systemSetTerminalWindow ( struct window_d *window )
     // This is very ugly, i know!
     // We need to fix it.
 
-    if ( CONSOLE[fg_console].cursor_left > 800 )
+    if ( CONSOLE_TTYS[fg_console].cursor_left > 800 )
     {
-        CONSOLE[fg_console].cursor_left = 795;
+        CONSOLE_TTYS[fg_console].cursor_left = 795;
     }
 
-    if ( CONSOLE[fg_console].cursor_top > 600 )
+    if ( CONSOLE_TTYS[fg_console].cursor_top > 600 )
     {
-         CONSOLE[fg_console].cursor_top = 595;
+         CONSOLE_TTYS[fg_console].cursor_top = 595;
     }
 
-    if ( CONSOLE[fg_console].cursor_right > 800 )
+    if ( CONSOLE_TTYS[fg_console].cursor_right > 800 )
     {
-         CONSOLE[fg_console].cursor_right = 795;
+         CONSOLE_TTYS[fg_console].cursor_right = 795;
     }
 
-    if ( CONSOLE[fg_console].cursor_bottom > 600 )
+    if ( CONSOLE_TTYS[fg_console].cursor_bottom > 600 )
     {
-         CONSOLE[fg_console].cursor_bottom = 595;
+         CONSOLE_TTYS[fg_console].cursor_bottom = 595;
     }
 
 
     // Cursor
 
-    CONSOLE[fg_console].cursor_width_in_pixels  = 8;
-    CONSOLE[fg_console].cursor_height_in_pixels = 8;
-    CONSOLE[fg_console].cursor_color  = COLOR_WHITE;
+    CONSOLE_TTYS[fg_console].cursor_width_in_pixels  = 8;
+    CONSOLE_TTYS[fg_console].cursor_height_in_pixels = 8;
+    CONSOLE_TTYS[fg_console].cursor_color  = COLOR_WHITE;
 
     // ...
 }

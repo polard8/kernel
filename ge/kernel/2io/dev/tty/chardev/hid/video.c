@@ -795,7 +795,7 @@ int videoInit (void){
     // eles ja estao inicializados.
     // #todo: podeia ter uma flag que diz se ja inicializamos os consoles.
     
-    if (fg_console < 0 || fg_console >= CONSOLE_COUNT_MAX)
+    if (fg_console < 0 || fg_console >= CONSOLETTYS_COUNT_MAX)
     {
         panic("videoInit: fg_console\n");
     }
@@ -806,22 +806,22 @@ int videoInit (void){
     // #todo
     // chamar uma funçao helper pra fazer isso
     
-    CONSOLE[fg_console].cursor_width_in_pixels  = 8;
-    CONSOLE[fg_console].cursor_height_in_pixels = 8;
+    CONSOLE_TTYS[fg_console].cursor_width_in_pixels  = 8;
+    CONSOLE_TTYS[fg_console].cursor_height_in_pixels = 8;
        
-    CONSOLE[fg_console].cursor_color = COLOR_WHITE;
+    CONSOLE_TTYS[fg_console].cursor_color = COLOR_WHITE;
 
     //position
-    CONSOLE[fg_console].cursor_x = 0;
-    CONSOLE[fg_console].cursor_y = 8;
+    CONSOLE_TTYS[fg_console].cursor_x = 0;
+    CONSOLE_TTYS[fg_console].cursor_y = 8;
 
     //margin
-    CONSOLE[fg_console].cursor_left = 0;      // Margem esquerda dada em linhas.
-    CONSOLE[fg_console].cursor_top = 0;       // Margem superior dada em linhas.
+    CONSOLE_TTYS[fg_console].cursor_left = 0;      // Margem esquerda dada em linhas.
+    CONSOLE_TTYS[fg_console].cursor_top = 0;       // Margem superior dada em linhas.
     
     //limits
-    CONSOLE[fg_console].cursor_right  = 256;  // Margem direita dada em linhas.
-    CONSOLE[fg_console].cursor_bottom = 256;  // Margem inferior dada em linhas.
+    CONSOLE_TTYS[fg_console].cursor_right  = 256;  // Margem direita dada em linhas.
+    CONSOLE_TTYS[fg_console].cursor_bottom = 256;  // Margem inferior dada em linhas.
 
     // Onde esta isso?
     set_up_cursor(0,0);

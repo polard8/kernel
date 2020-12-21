@@ -351,14 +351,15 @@ struct tty_d
 // Consoles virtuais em full screen.
 // Criados a unha pelo kernel.
 
-#define CONSOLE_COUNT_MAX    4
+
+#define CONSOLETTYS_COUNT_MAX    4
 
 // Index.
 extern int fg_console;
 
 
 // Virtual consoles.
-static struct tty_d CONSOLE[CONSOLE_COUNT_MAX];
+static struct tty_d CONSOLE_TTYS[CONSOLETTYS_COUNT_MAX];
 // ==============================================================
 
 
@@ -366,17 +367,21 @@ static struct tty_d CONSOLE[CONSOLE_COUNT_MAX];
 
 //=============================================================
 // #todo
-/*
+
 struct vc_d
 {
-    //
-    // de repente pode apontar para uma das ttys em CONSOLE. ??
-    struct tty_d *tty;
+    //#todo
+    //vamos pegar um dos endereços de &CONSOLE_TTYS[i]
+    //OU OUTRO QUALQUER,
+    struct tty_d *tty;  //&CONSOLE_TTYS[i]
     
     //struct vc_info_d *vc_info;
 };
-static struct vc_d vc_cons[CONSOLE_COUNT_MAX];
-*/
+
+// #define CONSOLE_COUNT_MAX    4
+
+//static struct vc_d vc_cons[CONSOLE_COUNT_MAX];
+
 //=============================================================
 
 

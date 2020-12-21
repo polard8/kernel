@@ -1157,8 +1157,8 @@ void windowShowWindowList (void){
 	//@todo: Chamar método.	
 	//Cursor.
 
-    CONSOLE[fg_console].cursor_x = (left/8);
-    CONSOLE[fg_console].cursor_y = (top/8);  
+    CONSOLE_TTYS[fg_console].cursor_x = (left/8);
+    CONSOLE_TTYS[fg_console].cursor_y = (top/8);  
     //set_up_cursor(0,10);
 
 
@@ -1213,14 +1213,14 @@ void windowShowWindowList (void){
 		// #bugbug
 		// Cuidado para não dividir por '0'.
 
-        CONSOLE[fg_console].cursor_left   = (hWindow->left/8);
-        CONSOLE[fg_console].cursor_top    = (hWindow->top/8) + 4;   //Queremos o início da área de clente.
-        CONSOLE[fg_console].cursor_right  = CONSOLE[fg_console].cursor_left + (width/8);
-        CONSOLE[fg_console].cursor_bottom = CONSOLE[fg_console].cursor_top  + (height/8);
+        CONSOLE_TTYS[fg_console].cursor_left   = (hWindow->left/8);
+        CONSOLE_TTYS[fg_console].cursor_top    = (hWindow->top/8) + 4;   //Queremos o início da área de clente.
+        CONSOLE_TTYS[fg_console].cursor_right  = CONSOLE_TTYS[fg_console].cursor_left + (width/8);
+        CONSOLE_TTYS[fg_console].cursor_bottom = CONSOLE_TTYS[fg_console].cursor_top  + (height/8);
 
         // cursor (0, mas com margem nova).
-        CONSOLE[fg_console].cursor_x = CONSOLE[fg_console].cursor_left; 
-        CONSOLE[fg_console].cursor_y = CONSOLE[fg_console].cursor_top; 
+        CONSOLE_TTYS[fg_console].cursor_x = CONSOLE_TTYS[fg_console].cursor_left; 
+        CONSOLE_TTYS[fg_console].cursor_y = CONSOLE_TTYS[fg_console].cursor_top; 
 
         //Mostrando as informações de todas as janelas registradas.
         while( i < WINDOW_COUNT_MAX )
@@ -1250,14 +1250,14 @@ void windowShowWindowList (void){
 
 
         // Voltando a margem normal a margem
-        CONSOLE[fg_console].cursor_left   = (left/8); 
-        CONSOLE[fg_console].cursor_top    = (top/8);
-        CONSOLE[fg_console].cursor_right  = (width/8);
-        CONSOLE[fg_console].cursor_bottom = (height/8); 
+        CONSOLE_TTYS[fg_console].cursor_left   = (left/8); 
+        CONSOLE_TTYS[fg_console].cursor_top    = (top/8);
+        CONSOLE_TTYS[fg_console].cursor_right  = (width/8);
+        CONSOLE_TTYS[fg_console].cursor_bottom = (height/8); 
 
         // cursor (0, mas com margem nova)
-        CONSOLE[fg_console].cursor_x = CONSOLE[fg_console].cursor_left; 
-        CONSOLE[fg_console].cursor_y = CONSOLE[fg_console].cursor_top;
+        CONSOLE_TTYS[fg_console].cursor_x = CONSOLE_TTYS[fg_console].cursor_left; 
+        CONSOLE_TTYS[fg_console].cursor_y = CONSOLE_TTYS[fg_console].cursor_top;
         //set_up_cursor(g_cursor_left,g_cursor_top); 
 
 		//StatusBar ( hWindow, "Esc=EXIT","Enter=?" );
@@ -2713,7 +2713,7 @@ void SetFocus ( struct window_d *window )
         active_thread  = window->control->tid;
       
         // Current virtual console.
-        CONSOLE[fg_console].control = (struct thread_d *) window->control;
+        CONSOLE_TTYS[fg_console].control = (struct thread_d *) window->control;
       
         // ...
       
