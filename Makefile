@@ -195,14 +195,8 @@ setup0-grass:
 setup1-apps:
 	#::apps
 	$(Q) $(MAKE) -C setup1/apps/
-	# apps
-#	-sudo cp setup1/apps/bin/*.BIN  base/
-#	-sudo cp setup1/apps/bin/*.BIN  base/PROGRAMS
-	#-sudo cp setup1/apps/bin/GWM.BIN     base/
 	-sudo cp setup1/apps/bin/EDITOR.BIN  base/
 	-sudo cp setup1/apps/bin/FILEMAN.BIN  base/
-	-sudo cp setup1/apps/bin/LAUNCH1.BIN  base/
-	#-sudo cp setup1/apps/bin/TERMINAL.BIN  base/
 
 setup1-net:
 	#::net
@@ -213,16 +207,10 @@ setup1-net:
 setup2-cmd:
 	#::cmd
 	$(Q) $(MAKE) -C setup2/cmd/
-	#-sudo cp setup2/cmd/bin/*.BIN  base/
-	#-sudo cp setup2/cmd/bin/*.BIN  base/BIN
-	-sudo cp setup2/cmd/bin/REBOOT.BIN     base/
 	-sudo cp setup2/cmd/bin/CAT.BIN        base/
-	#-sudo cp setup2/cmd/bin/FASM.BIN       base/
-#	-sudo cp setup2/cmd/bin/TRUE.BIN       base/
 #	-sudo cp setup2/cmd/bin/FALSE.BIN      base/
-#	-sudo cp setup2/cmd/bin/SHOWFUN.BIN      base/
-	#-sudo cp setup2/cmd/bin/MINIYACC.BIN    base/
-	#-sudo cp setup2/cmd/bin/SHELL.BIN       base/
+	-sudo cp setup2/cmd/bin/REBOOT.BIN     base/
+#	-sudo cp setup2/cmd/bin/TRUE.BIN       base/
 
 desert:
 
