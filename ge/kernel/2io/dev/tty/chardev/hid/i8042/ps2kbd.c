@@ -241,7 +241,7 @@ __local_ps2kbd_procedure (
                     }
                     if (shift_status == 1){
                         printf ("__local_ps2kbd_procedure: shift + f1\n");
-                        console_switch_to(1);
+                        jobcontrol_switch_console(1);
                         refresh_screen();
                     }
                     return 0;
@@ -258,7 +258,7 @@ __local_ps2kbd_procedure (
                     }
                     if (shift_status == 1){
                         printf ("__local_ps2kbd_procedure: shift + f2\n");
-                        console_switch_to(2);
+                        jobcontrol_switch_console(2);
                         refresh_screen();
                     }
                     return 0;
@@ -275,7 +275,7 @@ __local_ps2kbd_procedure (
                     }
                     if (shift_status == 1){
                         printf ("__local_ps2kbd_procedure: shift + f3\n");
-                        console_switch_to(3);
+                        jobcontrol_switch_console(3);
                         refresh_screen();
                     }
                     return 0;

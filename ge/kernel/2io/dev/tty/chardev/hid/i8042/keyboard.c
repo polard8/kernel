@@ -260,8 +260,11 @@ sc_again:
      // This way the foreground process is able to get this data.
      // See: ps2kbd.c
 
-    KGWS_SEND_KEYBOARD_MESSAGE (__raw);
-
+    // IN: device type and data.
+    // 1=keyboard
+    console_interrupt(CONSOLE_DEVICE_KEYBOARD,__raw);
+    //KGWS_SEND_KEYBOARD_MESSAGE (__raw);
+  
     // Clean the mess.
     __has_e0_prefix = 0;
     __has_e1_prefix = 0;

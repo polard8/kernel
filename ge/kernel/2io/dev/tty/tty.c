@@ -145,7 +145,8 @@ struct tty_d *tty_create (void){
         __tty->driver = NULL;  //driver struct
         __tty->ldisc  = NULL;  //line discipline struct
         
-        //__tty->termios       //termios struct (not a pointer)
+        //termios struct (not a pointer)
+        tty_reset_termios(__tty);
         
         
         // process group.
@@ -1458,7 +1459,10 @@ int tty_driver_install_tty (struct ttydrv_d *driver,struct tty_d *tty)
 
 // See: ttydef.h
 
-void tty_reset_termios ( struct tty_d *tty ){
+// #todo: use int as return.
+
+void tty_reset_termios ( struct tty_d *tty )
+{
 
     // #todo: Limits messages
     if ( (void *) tty == NULL ){

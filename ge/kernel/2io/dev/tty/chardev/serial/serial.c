@@ -34,8 +34,14 @@ void serial1_handler (void)
     // Se a porta não estiver inicializado !
     if ( __breaker_com1_initialized == 0 )
         return;
-	
-	
+
+
+    // #test
+    // IN: device type and data.
+    // 1=keyboard
+    // 2=COM port
+    console_interrupt(CONSOLE_DEVICE_SERIAL,0);
+    
     //
     // profiler
     //
@@ -50,6 +56,13 @@ void serial2_handler (void)
 	// Se a porta não estiver inicializado !
     if ( __breaker_com2_initialized == 0 )
         return;
+
+
+    // #test
+    // IN: device type and data.
+    // 1=keyboard
+    // 2=COM port
+    console_interrupt(CONSOLE_DEVICE_SERIAL,0);
 
     //
     // profiler
@@ -66,6 +79,12 @@ void serial3_handler (void)
 	// Se a porta não estiver inicializado !
     if ( __breaker_com3_initialized == 0 )
         return;
+
+    // #test
+    // IN: device type and data.
+    // 1=keyboard
+    // 2=COM port
+    console_interrupt(CONSOLE_DEVICE_SERIAL,0);
 }
 
 
@@ -76,6 +95,11 @@ void serial4_handler (void)
     if ( __breaker_com4_initialized == 0 )
         return;
 
+    // #test
+    // IN: device type and data.
+    // 1=keyboard
+    // 2=COM port
+    console_interrupt(CONSOLE_DEVICE_SERIAL,0);
 }
 
 //=====================================

@@ -1412,16 +1412,20 @@ int console_get_current_virtual_console (void)
 }
 
 
-void console_switch_to(int n)
+// Called by: 
+// __local_ps2kbd_procedure in ps2kbd.c
+//
+void jobcontrol_switch_console(int n)
 {
     // #todo:
     // maybe we can do somo other configuration here.
  
     if( n<0 || n >= CONSOLETTYS_COUNT_MAX ){
-        debug_print("console_switch_to: Limits\n");
+        debug_print("jobcontrol_switch_console: Limits\n");
+        // return something
     }
-    
-    console_set_current_virtual_console (n);
+
+    console_set_current_virtual_console(n);
 }
 
 
@@ -1681,11 +1685,15 @@ int VirtualConsole_initialize(void)
     // Virtual Console:
     // The kernel only have four virtual consoles.
 
+    fg_console = 0;
+
     console_init_virtual_console(0);
     console_init_virtual_console(1);
     console_init_virtual_console(2);
     console_init_virtual_console(3);
-    console_switch_to(0);
+    
+    jobcontrol_switch_console(0);
+
 
 		// Obs: 
 		// O video já foi inicializado em main.c.
@@ -1702,6 +1710,38 @@ int VirtualConsole_initialize(void)
 
 
 
+//============================================
+// input:
+// called by devices that are not block devices.
+// probably keyboard and serial devices.
+// See: keyboard.c and serial.c
+
+void console_interrupt(int device_type, int data)
+{
+    switch (device_type){
+
+        // keyboard
+        // data =  raw byte.
+        case CONSOLE_DEVICE_KEYBOARD:
+            debug_print("console_interrupt: input from keyboard device\n");
+            KGWS_SEND_KEYBOARD_MESSAGE (data);
+            break;
+
+        // COM port
+        case CONSOLE_DEVICE_SERIAL:
+            debug_print("console_interrupt: input from serial device\n");
+            break;
+ 
+        //network device.
+        case CONSOLE_DEVICE_NETWORK:
+            debug_print("console_interrupt: input from network device\n");
+            break;
+
+        default:
+            debug_print("console_interrupt: [FAIL] Default input device\n");
+            break;
+    };
+}
 
 
 //

@@ -299,14 +299,19 @@ _irq1:
 
 
 
-;------------
+;=======================================
 ; _irq2 - IRQ 2 – cascaded signals from IRQs 8–15 
 ; (any devices configured to use IRQ 2 will actually be using IRQ 9)
+;
+; Nothing.
+;
+
 
 
 ;=======================================================
 ; IRQ 3 - serial port controller for serial port 2 
 ; (shared with serial port 4, if present)
+; See: serial.c
 
 extern _serial2_handler
 extern _serial4_handler
@@ -317,7 +322,8 @@ _irq3:
     cli
     pushad
 
-    ;call _second_serial_port_Handler
+    call _serial2_handler
+    ;call _serial4_handler
 
     ;; EOI - Only the first PIC.
     mov al, 0x20
@@ -332,6 +338,7 @@ _irq3:
 ;====================================================
 ; IRQ 4 - serial port controller for serial port 1 
 ;(shared with serial port 3, if present)
+; See: serial.c
 
 extern _serial1_handler
 extern _serial3_handler
@@ -342,7 +349,8 @@ _irq4:
     cli
     pushad
 
-    ;call _first_serial_port_Handler
+    call _serial1_handler
+    ;call _serial3_handler
 
     ;; EOI - Only the first PIC.
     mov al, 0x20

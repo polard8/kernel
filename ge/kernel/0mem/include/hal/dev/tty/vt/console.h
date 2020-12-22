@@ -6,6 +6,11 @@
 #define ____CONSOLE_H  1
 
 
+#define CONSOLE_DEVICE_KEYBOARD  1
+#define CONSOLE_DEVICE_SERIAL    2
+#define CONSOLE_DEVICE_NETWORK   3
+
+
 
 // Control sequence introducer 
 // Parameter    - (zero or more characters)
@@ -84,11 +89,13 @@ void console_set_current_virtual_console ( int n );
 int console_get_current_virtual_console (void);
 void console_init_virtual_console (int n);
 
-void console_switch_to(int n);
+void jobcontrol_switch_console(int n);
 
 int console_ioctl ( int fd, unsigned long request, unsigned long arg );
 
 int VirtualConsole_initialize(void);
+
+void console_interrupt(int device_type, int data);
 
 #endif    
 

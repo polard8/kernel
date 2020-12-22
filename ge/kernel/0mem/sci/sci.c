@@ -2844,6 +2844,9 @@ unsigned long serviceCreateWindow ( char *message_buffer ){
 // #todo
 // Change the name. service_console_putchar()
 
+// #bugbug
+// Where is the prototype?
+
 void servicesPutChar ( int c )
 {
     console_putchar ( (int) c, fg_console );
@@ -2867,22 +2870,6 @@ void *gde_133 (
     unsigned long arg4 )
 {
     debug_print("gde_133: [TODO]\n");
-    
-	/*
-    void *ret;
-
-
-	//Salva contexto dos registradores.
-    save_current_context ();
-
-
-   // ret = (void *) ?????();
-
-	//Restaura os registradores e o cr3.
-    restore_current_context ();
-
-    return (void *) ret; 
-    */
 }
 
 
