@@ -178,7 +178,10 @@ build-applications: \
 setup0-grass \
 setup1-apps \
 setup1-net \
-setup2-cmd    
+setup2-cmd \
+setup3-test    
+
+
 
 setup0-grass:
 	#::grass
@@ -231,6 +234,13 @@ setup2-cmd:
 #	-sudo cp setup2/cmd/bin/SHOWFUN.BIN      base/
 	#-sudo cp setup2/cmd/bin/MINIYACC.BIN    base/
 	#-sudo cp setup2/cmd/bin/SHELL.BIN       base/
+
+setup3-test:
+	-sudo cp ../desert/setup3/test/bin/TESTBIN.TXT  base/
+
+# 
+# more setups ? ...
+#
 
 
 #===================================================
