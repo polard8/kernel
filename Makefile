@@ -186,22 +186,11 @@ desert
 setup0-grass:
 	#::grass
 	$(Q) $(MAKE) -C setup0/grass/
+	sudo cp setup0/grass/bin/GRAMCODE.BIN  base/
 	sudo cp setup0/grass/bin/GDESHELL.BIN  base/
 	sudo cp setup0/grass/bin/GDESHELL.BIN  base/SBIN
-	# setup
-	#-sudo cp setup0/grass/bin/*.BIN    base/
 	sudo cp setup0/grass/bin/LAUNCHER.BIN  base/
-	sudo cp setup0/grass/bin/GRAMCODE.BIN  base/
-	sudo cp setup0/grass/bin/GFE.BIN       base/
 	sudo cp setup0/grass/bin/SYSMON.BIN    base/
-	#sudo cp setup0/grass/bin/REBOOT2.BIN    base/
-	#sudo cp setup0/grass/bin/NORATERM.BIN  base/
-	#tests interpreters.
-	#sudo cp setup0/grass/bin/C4.BIN       base/
-	#sudo cp setup0/grass/bin/GRAMC.BIN    base/
-	sudo cp setup0/grass/bin/GRAMC4.BIN   base/
-	#sudo cp setup0/grass/bin/GRAMCNF.BIN  base/
-	# ====================================================
 
 setup1-apps:
 	#::apps

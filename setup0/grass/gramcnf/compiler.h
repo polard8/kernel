@@ -1,7 +1,0 @@
-
-
-
-FILE *compiler (void);
-
-
-

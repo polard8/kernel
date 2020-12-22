@@ -1,7 +1,0 @@
-
-
-
-int loginCheckPassword (void);
-
-
-
