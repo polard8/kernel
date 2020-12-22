@@ -179,7 +179,7 @@ setup0-grass \
 setup1-apps \
 setup1-net \
 setup2-cmd \
-setup3-cmd    
+desert    
 
 
 
@@ -235,9 +235,13 @@ setup2-cmd:
 	#-sudo cp setup2/cmd/bin/MINIYACC.BIN    base/
 	#-sudo cp setup2/cmd/bin/SHELL.BIN       base/
 
-setup3-cmd:
-	#-sudo cp ../desert/setup3/test/bin/*.BIN  base/
-	#-sudo cp ../desert/setup3/test/bin/TESTBIN.TXT  base/
+desert:
+
+	# todo
+	# Copy only the base of the desert inside the base of gramado.
+	-sudo cp ../desert/base/*.BIN  base/
+	-sudo cp ../desert/base/*.TXT  base/
+
 	-sudo cp ../desert/setup3/cmd/bin/*.BIN  base/
 	
 # 
