@@ -1,22 +1,9 @@
 
+    gramcode - text editor for gramado os.
 
-Esse é um aplicativo para rodar no sistema operacional gramado.
-Roda apenas no ambiente gramado core, no processo init.
+    It runs on grass path environment.
+    It uses the event messages for input.
+    This messages are grabbed from the queue in the control thread.
 
-É um editor de testes para testar funcionalidades do sistema.
-No momento usamos ele para testar o envio de uma string do shell
-para o editor através do kernel via memória compartilhada.
-O envio da mensagem funcionou.
-
-crt0.asm contém o entry point, chamando main em seguida.
-
-
-entry point em crt0.asm
-__crt0Main:
-  
-
-
-//função principal em main.c
-mainGetMessage()
 
 
