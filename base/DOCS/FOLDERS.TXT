@@ -1,5 +1,4 @@
-
-    Three main folders of the project:
+	Main folders of the project:
 
 
     //=========================

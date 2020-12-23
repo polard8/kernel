@@ -1,12 +1,8 @@
+	32 MB Virtual disk.
 
- Descrição dos setores no disco de 32MB usado pelo Gramado 0.4.
-
-
-==============================================
-Descrição segundo o setor inicial.
 
 MBR        0
-VBR        63          VBR da primeira partição.    
+VBR        63    - The VBR for the first partition.
 fat1       67
 root       559
 data area  591

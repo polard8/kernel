@@ -1,11 +1,7 @@
-
-    Where the kernel starts?
-
+	Where the kernel starts?
 
     x86:
-        1) kernel/hwi/init/x86/boot.asm
-        2) kernel/main.c
-        3) kernel/hwi/init/x86/x86main.c
-
-
+        1) kernel/1pump/arch/x86/pumpcore/head_32.asm
+        2) kernel/0mem/main.c
+        3) kernel/1pump/arch/x86/x86init.c
 
