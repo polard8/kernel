@@ -1173,9 +1173,14 @@ void *sci0 (
 
     // Counter and size.
     
-    int __len;  //usado para strings.
-    int __i;    //usado na string
+    int __len=0;  //usado para strings.
+    int __i=0;    //usado na string
 
+
+    //======================
+
+    // #debug
+    // debug_print("sci0:\n");
 
     // Profiler
     // Counting interrupt of this type. 
@@ -1184,23 +1189,23 @@ void *sci0 (
     g_profiler_ints_gde_services++;
 
 
+    // #todo
+    // We need a lot of helper functions here in this routine.
 
-	// ================================
-	// Color scheme.
+
+    // ================================
+    // Color scheme.
 
     if ( (void *) CurrentColorScheme == NULL ){
-        panic ("sci: CurrentColorScheme");
- 
+        panic ("sci0: CurrentColorScheme\n");
     }else{
-
         if ( CurrentColorScheme->used != 1 || 
              CurrentColorScheme->magic != 1234 )
         {
-            debug_print ("sci: CurrentColorScheme \n");
-            panic       ("sci: CurrentColorScheme");
+            debug_print ("sci0: CurrentColorScheme\n");
+            panic       ("sci0: CurrentColorScheme\n");
         }
-        
-        WindowColor = CurrentColorScheme->elements[csiWindowBackground]; 
+        WindowColor           = CurrentColorScheme->elements[csiWindowBackground]; 
         WindowClientAreaColor = CurrentColorScheme->elements[csiWindow]; 
     };
 
@@ -1214,29 +1219,26 @@ void *sci0 (
 	// main window
 
     if (gui->main == NULL){
-        debug_print ("sci: gui->main\n");
-        panic       ("sci: gui->main");
+        debug_print ("sci0: gui->main\n");
+        panic       ("sci0: gui->main\n");
     }
 
 
-    //
     // =====================================
     // == Special ============
     // =====================================
-    //
 
     if ( number > 256 ){
-        return (void *) gde_extra_services ( number, 
-                            arg2, arg3, arg4 );
+        return (void *) gde_extra_services(number,arg2,arg3,arg4);
     }
 
 
+    // 0~256
+    // Normal services.
 
-	// Normal services.
-	// 0~256
 
-    switch (number)
-    {
+    switch (number){
+
         // 0 - Null, O processo pode ser malicioso.
         case SYS_NULL: 
             return NULL;
@@ -1245,16 +1247,16 @@ void *sci0 (
         // 1 (i/o) Essa rotina pode ser usada por 
         // um driver em user mode.
         case SYS_READ_LBA: 
-            my_read_hd_sector ( (unsigned long) arg2, 
-               (unsigned long) arg3, 0 , 0 ); 
+            my_read_hd_sector ( 
+                (unsigned long) arg2, (unsigned long) arg3, 0 , 0 ); 
             break;
 
 
         // 2 (i/o) Essa rotina pode ser usada por 
         // um driver em user mode.
         case SYS_WRITE_LBA: 
-            my_write_hd_sector ( (unsigned long) arg2, 
-                (unsigned long) arg3, 0 , 0 ); 
+            my_write_hd_sector ( 
+                (unsigned long) arg2, (unsigned long) arg3, 0 , 0 ); 
             break;
 
 
@@ -1264,10 +1266,11 @@ void *sci0 (
 
         // IN: name, flags, mode
         case SYS_READ_FILE:
-            return (void *) sys_read_file_from_disk ( (char *) a2, 
-                                (int) arg3, (mode_t) arg4 ); 
+            return (void *) sys_read_file_from_disk ( 
+                                (char *) a2, 
+                                (int)    arg3, 
+                                (mode_t) arg4 ); 
             break;
-
 
 
         // 4 
@@ -1276,20 +1279,22 @@ void *sci0 (
         // IN: name, size in sectors, size in bytes, adress, flag.
         case SYS_WRITE_FILE:
             sys_write_file_to_disk ( 
-                (char *) message_address[0],  
-                (unsigned long) message_address[1],   
-                (unsigned long) message_address[2],  
-                (char *) message_address[3],  
-                (char) message_address[4] );  
+                (char *)        message_address[0],
+                (unsigned long) message_address[1],
+                (unsigned long) message_address[2],
+                (char *)        message_address[3],
+                (char)          message_address[4] ); 
+            return NULL;
             break;
 
 
         // 5
         // See: sci/sys/sys.c 
         case SYS_VSYNC:
-            sys_vsync (); 
+            sys_vsync();  
             return NULL;
             break;
+
 
         // 6 - Put pixel. 
         // Coloca um pixel no backbuffer.
@@ -1297,8 +1302,12 @@ void *sci0 (
         // cor, x, y, 0.
         // todo: chamar kgws_backbuffer_putpixel
         case SYS_BUFFER_PUTPIXEL:
-            backbuffer_putpixel ( (unsigned long) a2, 
-                (unsigned long) a3, (unsigned long) a4, 0 ); 
+            backbuffer_putpixel ( 
+                (unsigned long) a2, 
+                (unsigned long) a3, 
+                (unsigned long) a4, 
+                0 );
+            return NULL; 
             break;
 
 		// 7
@@ -1335,66 +1344,82 @@ void *sci0 (
                 (unsigned long) (focusWnd->top + arg3),  
                 CurrentColorScheme->elements[csiTerminalFontColor],   
                 (unsigned long) arg4 ); 
+            return NULL;
             break;
 
 
         // 8 @todo: BugBug, aqui precisamos de 4 par�metros.
         case SYS_BUFFER_DRAWLINE:
-            my_buffer_horizontal_line ( (unsigned long) a2, 
-                (unsigned long) a3, (unsigned long) a4, COLOR_WHITE ); 
+            my_buffer_horizontal_line ( 
+                (unsigned long) a2, 
+                (unsigned long) a3, 
+                (unsigned long) a4, 
+                COLOR_WHITE ); 
+            return NULL;
             break;
 
         // 9 @todo: BugBug, aqui precisamos de 5 par�metros.
         case SYS_BUFFER_DRAWRECT:
-            drawDataRectangle ( 0, (unsigned long) a2, (unsigned long) a3, 
-                (unsigned long) a4, COLOR_WHITE );  
+            drawDataRectangle ( 
+                0, 
+                (unsigned long) a2, 
+                (unsigned long) a3, 
+                (unsigned long) a4, 
+                COLOR_WHITE );  
+            return NULL;
             break;
 
 
         // 10 - livre.
 
-
         //11, Coloca o conte�do do backbuffer no LFB.
         case SYS_REFRESHSCREEN: 
-            refresh_screen ();
+            refresh_screen();
             return NULL;
             break;
 
-        //rede: 12,13,14,15	
 
+        //rede: 12,13,14,15
 
         // 16 - open()
         //See: sys.c
         // IN: pathname, flags, mode
         //OUT: fd
         case SYS_OPEN:
-            debug_print ("sci: SYS_OPEN\n");
-            return (void *) sys_open ( (const char *) arg2, 
-                                (int) arg3, (mode_t) arg4 ); 
+            debug_print ("sci0: SYS_OPEN\n");
+            return (void *) sys_open ( 
+                                (const char *) arg2, 
+                                (int)          arg3, 
+                                (mode_t)       arg4 ); 
             break;
+
 
         // 17 - close()
         // See: sys.c
         // IN: fd
         case SYS_CLOSE:
-            debug_print ("sci: SYS_CLOSE\n");
+            debug_print ("sci0: SYS_CLOSE\n");
             return (void *) sys_close( (int) arg2 );
             break;
 
 
         // 18 - read() 
-        // See:
+        // See: sys.c
         case SYS_READ:
-            return (void *) sys_read ( (unsigned int) arg2, 
-                                (char *) arg3, (int) arg4 );  
+            return (void *) sys_read ( 
+                                (unsigned int) arg2, 
+                                (char *)       arg3, 
+                                (int)          arg4 );  
             break;
 
 
         // 19 - write()
-        // See:
+        // See: sys.c
         case SYS_WRITE:
-            return (void *) sys_write ( (unsigned int) arg2, 
-                                (char *) arg3, (int) arg4 );  
+            return (void *) sys_write ( 
+                                (unsigned int) arg2, 
+                                (char *)       arg3, 
+                                (int)          arg4 );  
             break;
 
 
@@ -1404,13 +1429,11 @@ void *sci0 (
         // show window rect.
         // See: window.c
         case 24:
-            return (void *) show_window_rect ( (struct window_d *) arg2 );
+            return (void *) show_window_rect( (struct window_d *) arg2 );
             break;
 
-        //livre
-        //case 33:
-            //break;
-
+        // 33 - free number.
+        
 
         // 34 - Setup cursor for the current virtual console.
         // See: core/system.c
@@ -1436,18 +1459,15 @@ void *sci0 (
 
         // 37 - Chama o procedimento procedimento default. 
         case SYS_CALLSYSTEMPROCEDURE:
-            
             return (void *) system_procedure ( 
                                 (struct window_d *) message_address[0], 
-                                (int) message_address[1], 
-                                (unsigned long) message_address[2], 
-                                (unsigned long) message_address[3] );
+                                (int)               message_address[1], 
+                                (unsigned long)     message_address[2], 
+                                (unsigned long)     message_address[3] );
             break; 
-            
-            
-        //38 39 40 41
-             
-             
+
+        // free: 38 39 40 41
+
         //38
         //get host name  
         case SYS_GETHOSTNAME:
@@ -1510,8 +1530,6 @@ void *sci0 (
             break;
 
         // 48 - livre
-        case 48:
-            break;
 
         // 49 - livre
         // Show system info
@@ -1524,38 +1542,44 @@ void *sci0 (
 
         // 50 resize window (handle,x,y)
         case SYS_BUFFER_RESIZEWINDOW:
-            return (void *) resize_window ( (struct window_d *) arg2, 
-                                arg3, arg4 );
+            return (void *) resize_window ( 
+                                (struct window_d *) arg2, arg3, arg4 );
             break;
+
 
         // 51 redraw window. (handle)
         case SYS_BUFFER_REDRAWWINDOW:
             return (void *) redraw_window ( (struct window_d *) arg2, arg3 );
             break;
 
+
         // 52 - IN: (handle,x,y)
         case SYS_BUFFER_REPLACEWINDOW:
-            return (void *) replace_window ( (struct window_d *) arg2, 
-                                arg3, arg4);
+            return (void *) replace_window ( 
+                                (struct window_d *) arg2, arg3, arg4);
             break;
 
-		//53 maximize window 
-		//(handle)
-		case SYS_BUFFER_MAXIMIZEWINDOW:
-		    MaximizeWindow ((struct window_d*) arg2);
-		    break;
-		
-		//54 minimize window
-		//(handle)
-		case SYS_BUFFER_MINIMIZEWINDOW:
-		    MinimizeWindow ( (struct window_d *) arg2);
-		    break;
-		
-		//55 Get foreground window.
-		case SYS_BUFFER_GETFOREGROUNDWINDOW:
-		    return (void *) windowGetForegroundWindow ();
-		    break;
-		
+
+        // 53 maximize window 
+        // IN: handle.
+        case SYS_BUFFER_MAXIMIZEWINDOW:
+            MaximizeWindow ((struct window_d*) arg2);
+            return NULL;
+            break;
+
+        // 54 minimize window
+        // IN: handle.
+        case SYS_BUFFER_MINIMIZEWINDOW:
+            MinimizeWindow ((struct window_d *) arg2);
+            return NULL;
+            break;
+
+
+        //55 Get foreground window.
+        case SYS_BUFFER_GETFOREGROUNDWINDOW:
+            return (void *) windowGetForegroundWindow();
+            break;
+
 		//56 set foreground window.
 		case SYS_BUFFER_SETFOREGROUNDWINDOW:
 		    return (void *) windowSetForegroundWindow ( (struct window_d *) arg2 );
@@ -1566,17 +1590,21 @@ void *sci0 (
 		case SYS_REGISTERWINDOW: 
 			return (void *) RegisterWindow ( (struct window_d *) hWnd );
 			break;
-			
-		//58.	
-		case SYS_CLOSEWINDOW: 
-			CloseWindow ( (struct window_d *) hWnd ); 
-			break;
+
+        //58.
+        case SYS_CLOSEWINDOW: 
+            CloseWindow ( (struct window_d *) hWnd ); 
+            //#todo: return status.
+            return NULL;
+            break;
+
 
         //59 - nothing
-        
+
         // 60
         case SYS_SETACTIVEWINDOW:
             set_active_window (hWnd);
+            return NULL;
             break;
 
         // 61 - Id. (int).
@@ -1587,6 +1615,7 @@ void *sci0 (
         // 62
         case SYS_SETFOCUS: 
             SetFocus ( (struct window_d *) hWnd ); 
+            return NULL;
             break;
 
         // 63 id
@@ -1597,6 +1626,7 @@ void *sci0 (
         // 64
         case SYS_KILLFOCUS:
             KillFocus ( (struct window_d *) hWnd ); 
+            return NULL;
             break;
 
 
@@ -1648,15 +1678,12 @@ void *sci0 (
 		//	break;
 
 
-        //#usando para debug 
-		// 69 - Reservado pra input de teclado.
-        case 69:
-            printf ("Service 69: #todo\n");
+        // #usando para debug 
+        // 69 - Reservado pra input de teclado.
+        //case 69:
+            //printf ("sci0: [Service 69] [TODO]\n");
+            //break;
 
-            // #obs: Isso � bem pesado. Mas funciona.
-            //refresh_rectangle ( 0, 0, 20, 20 );
-            //bmpDisplayMousePointerBMP (terminalIconBuffer, 0, 0 ); 		
-            break;
 
         //
         // ## EXIT ##
@@ -1674,8 +1701,9 @@ void *sci0 (
         // Criar um wrapper em sci/sys.c ou kernel/exit.c
         // See: request.c
         // Request number 12. (Exit thread)
+  
         case SYS_EXIT:
-            debug_print ("[70]: SYS_EXIT\n");
+            debug_print ("sci0: SYS_EXIT\n");
             create_request ( (unsigned long) 12,  // number 
                 (int) 1,                          // status 
                 (int) 0,                          // timeout. 0=imediatamente.
@@ -1685,6 +1713,7 @@ void *sci0 (
                 (int) 0,                          // msg  ??
                 (unsigned long) arg2,             // long1  
                 (unsigned long) arg3 );           // long2
+            return NULL;
             break;
 
 
@@ -1694,17 +1723,18 @@ void *sci0 (
         // Talvez alguma variante.
         // A libcore porde virar algum tipo de api.
         // See: core/ps/action/clone.c
+
         case SYS_FORK:
-            debug_print("[71]: SYS_FORK\n");
+            debug_print("sci0: SYS_FORK\n");
             return (void *) sys_fork_process();
             break;
-
 
 
         // 72
         // See: sci/sys/sys.c
         // Cria uma thread e coloca ela pra rodar.
         case SYS_CREATETHREAD:
+            debug_print("sci0: [FIXME] SYS_CREATETHREAD\n");
             return (void *) sys_create_thread ( NULL,  NULL, NULL, 
                                 arg2,             // init eip
                                 arg3,             // init stack
@@ -1739,7 +1769,7 @@ void *sci0 (
         // arg3 = process priority
         // arg4 = nothing
         case SYS_CREATEPROCESS:
-            debug_print ("[73]: [FIXME] SYS_CREATEPROCESS\n");
+            debug_print("sci0: [FIXME] SYS_CREATEPROCESS\n");
             return (void *) sys_create_process ( NULL, NULL, NULL, 
                                 0, arg3,        //res, priority
                                 0, (char *) a2, //ppid, name
@@ -1753,18 +1783,20 @@ void *sci0 (
 		//apenas do processo atual. 
         case SYS_CURRENTPROCESSINFO:
             show_currentprocess_info();
+            return NULL;
             break;
 
         // 81
         // See: sci/sys/sys.c
         case SYS_GETPPID: 
-            return (void *) sys_getppid ();
+            return (void *) sys_getppid();
             break;
 
 
         // 82 - Mostra informações sobre todos os processos.
         case 82:
             show_process_information();
+            return NULL;
             break;
 
 		// 83
@@ -1775,9 +1807,13 @@ void *sci0 (
 		// TID � a thread atual.
 		// PID veio via argumento.
         // IN: pid, status, option
+ 
         case SYS_WAIT4PID: 
-            return (void *) do_waitpid ( (pid_t) arg2, 
-                                (int *) arg3, (int) arg4 );
+            debug_print("sci0: [FIXME] SYS_WAIT4PID\n");
+            return (void *) do_waitpid( 
+                                (pid_t) arg2, 
+                                (int *) arg3, 
+                                (int)   arg4 );
                 
             //block_for_a_reason ( (int) current_thread, (int) arg2 ); //suspenso
             break;
@@ -1789,7 +1825,7 @@ void *sci0 (
         // 85
         // See: sci/sys/sys.c
         case SYS_GETPID: 
-            return (void *) sys_getpid ();
+            return (void *) sys_getpid();
             break;
 
 
@@ -1798,6 +1834,7 @@ void *sci0 (
 
         // 87 Down.
         case SYS_SEMAPHORE_DOWN:
+            debug_print("sci0: SYS_SEMAPHORE_DOWN\n");
             return (void *) Down ( (struct semaphore_d *) arg2);
             break;
 
@@ -1810,6 +1847,7 @@ void *sci0 (
 
         // 89 Up. 
         case SYS_SEMAPHORE_UP:
+            debug_print("sci0: SYS_SEMAPHORE_UP\n");
             return (void *) Up ( (struct semaphore_d *) arg2 );
             break;
 
@@ -1817,17 +1855,19 @@ void *sci0 (
         // 90
         // See: sci/sys/sys.c 
         case SYS_DEADTHREADCOLLECTOR: 
-            sys_dead_thread_collector ();
+            sys_dead_thread_collector();
+            return NULL;
             break;
 
 
-        // 91 92 93
+        // free: 91 92 93
 
 
         // 94
         //REAL (coloca a thread em standby para executar pela primeira vez.)
         // * MOVEMENT 1 (Initialized --> Standby).
         case SYS_STARTTHREAD:
+            debug_print("sci0: SYS_STARTTHREAD\n");
             //t = (struct thread_d *) arg2;
             //sys_SelectForExecution (t);
             SelectForExecution ( (struct thread_d *) arg2 );
@@ -1835,38 +1875,33 @@ void *sci0 (
             break;
 
  
-        //99: #todo: usar para manipulação de processos.
-
+        // free: 99 
+        // #todo: usar para manipulação de processos.
         // #importante:
         // 100 ~ 109: Usar para rotinas de ipc.
-        
         // 100, 101, 102 (Livres)  
 
  
-		//103, SYS_RECEIVEMESSAGE	
+        //103, SYS_RECEIVEMESSAGE
         //Um processo consumidor solicita mensagem deixada em seu PCB.
         //Argumentos: servi�o, produtor, consumidor, mensagem.		
         //@todo: 
-		case SYS_RECEIVEMESSAGE:
-			break;
+        // case SYS_RECEIVEMESSAGE:  break;
 
 
-		//104, SYS_SENDMESSAGE
-		//Um processo produtor envia uma mensagem para o PCB de outr processo.
-		//Argumentos: servi�o, produtor, consumidor, mensagem.
-		//@todo:		
-		case SYS_SENDMESSAGE:	
-			break;
+        //104, SYS_SENDMESSAGE
+        //Um processo produtor envia uma mensagem para o PCB de outr processo.
+        //Argumentos: servi�o, produtor, consumidor, mensagem.
+        // case SYS_SENDMESSAGE:  break;
 
 
 
-        // 110
+        // 110 - Reboot.
         // See: sci/sys/sys.c
-        // The higher level routine for reboot.
-        // It's a wrapper, an interface.
         case SYS_REBOOT: 
+            debug_print("sci0: SYS_REBOOT\n");
             sys_reboot();
-            panic("sci: SYS_REBOOT!");
+            panic("sci0: SYS_REBOOT!");
             break;
 
 
@@ -1876,6 +1911,7 @@ void *sci0 (
         // IN: buffer para mensagens.
         // // See: ps2kbd.c
         case 111:
+            //debug_print("sci0: 111\n");
             return (void *) __do_111 ( (unsigned long) &message_address[0] );
             break;
 
@@ -1889,6 +1925,7 @@ void *sci0 (
 		// O kernel l� o buffer e dentro do buffer tem uma mensagem 
 		// que ser� colocada na thread de cotrole do processo;
         case SYS_SENDMESSAGETOPROCESS:
+            debug_print("sci0: SYS_SENDMESSAGETOPROCESS\n");
             //printf ("112: PID=%d\n", arg3 );
             ipc_send_message_to_process ( (unsigned long) &message_address[0], 
                (int) arg3 );
@@ -1907,9 +1944,12 @@ void *sci0 (
 		// 114
 		// Envia uma mensagem para a thread atual.
 		// endereço do buffer da mensagem, tid.
+        
         case SYS_SENDMESSAGETOCURRENTTHREAD:
-            ipc_send_message_to_thread ( (unsigned long) &message_address[0], 
+            ipc_send_message_to_thread ( 
+                (unsigned long) &message_address[0], 
                 (int) current_thread );
+            return 0;
             break;
 
 
@@ -1922,8 +1962,9 @@ void *sci0 (
         // Envia uma mensagem para uma thread, dado o tid.
         // #todo: poderíamos retornar o retorno da função.
         case 117:
-            ipc_send_message_to_thread ( (unsigned long) &message_address[0], 
-                 (int) arg3 );
+            ipc_send_message_to_thread ( 
+                (unsigned long) &message_address[0], 
+                (int) arg3 );
             return NULL;
             break;
 
@@ -1956,11 +1997,9 @@ void *sci0 (
             return NULL;
             break;
 
-
         // 125 - system procedure call.
         case 125:
-            return (void *) system_procedure ( NULL, 
-                                arg2, arg3, arg4 );
+            return (void *) system_procedure(NULL,arg2,arg3,arg4);
             break;
 
 
@@ -1972,7 +2011,8 @@ void *sci0 (
 			// #todo: 
 			// Tem que resolver as quest�es de privil�gios.
 			//bits, port
-            return (void *) portsx86_IN ( (int) arg2, 
+            return (void *) portsx86_IN ( 
+                                (int) arg2, 
                                 (unsigned long) arg3 );
             break;
 
@@ -1985,8 +2025,10 @@ void *sci0 (
 			//#todo: 
 			// Tem que resolver as quest�es de privil�gios.
 			//bits, port, value
-            portsx86_OUT ( (int) arg2, 
-                (unsigned long) arg3, (unsigned long) arg4 );
+            portsx86_OUT ( 
+                (int) arg2, 
+                (unsigned long) arg3, 
+                (unsigned long) arg4 );
             return NULL;
             break;
 
@@ -2013,11 +2055,13 @@ void *sci0 (
 		// IN: window, x, y, color, string.
 
         case SYS_DRAWTEXT:
-            draw_text ( (struct window_d *) message_address[0], 
-                (unsigned long) message_address[1],  
-                (unsigned long) message_address[2],  
-                (unsigned long) message_address[3],   
-                (unsigned char *) message_address[4] ); 
+            draw_text ( 
+                (struct window_d *) message_address[0],
+                (unsigned long)     message_address[1],
+                (unsigned long)     message_address[2],
+                (unsigned long)     message_address[3],
+                (unsigned char *)   message_address[4] ); 
+            return NULL;
             break;
 
 
@@ -2026,14 +2070,14 @@ void *sci0 (
         // foco de entrada.          
         case SYS_BUFFER_DRAWCHAR_WWF: 
             focusWnd = (void *) windowList[window_with_focus];
-            if ( (void *) focusWnd == NULL ){
-                break;
-            }
-            // x,y,color,char.
-            my_buffer_char_blt ( (unsigned long) (arg2 + focusWnd->left),
+            if ( (void *) focusWnd == NULL ){  break;  }
+            // IN: x,y,color,char.
+            my_buffer_char_blt ( 
+                (unsigned long) (arg2 + focusWnd->left),
                 (unsigned long) (arg3 + focusWnd->top),
                 COLOR_BLACK,     
                 (unsigned long) arg4);  
+            return NULL;
             break;
 
 
@@ -2046,6 +2090,7 @@ void *sci0 (
 		// ponteiro para a3. um buffer de longs.
         // #bugbug: Ja podemos deletar esse trem ?!
         case 134:
+            debug_print("sci0: [BUGBUG] 134\n");
             hWnd = (struct window_d *) arg3;
             if ( (void *) hWnd != NULL ){
                 a3[0] = (unsigned long) hWnd->rcClient->left;
@@ -2054,6 +2099,7 @@ void *sci0 (
                 a3[3] = (unsigned long) hWnd->rcClient->height;
                 a3[4] = (unsigned long) hWnd->rcClient->bg_color;
             }
+            return NULL;
             break;
 
 
@@ -2078,9 +2124,7 @@ void *sci0 (
             break;
 
 
-		//138 - get key state.
-		// #importante: 
-		// #todo: isso precisa ir para a API.
+        // 138 - get key state.
         case 138:
             return (void *) keyboardGetKeyState ( (unsigned char) arg2 );
             break;
@@ -2129,6 +2173,7 @@ void *sci0 (
         // via argumento.
         case SYS_SETCLIENTAREARECT:
             setClientAreaRect ( arg2, arg3, arg4, 0);
+            return NULL;
             break;
 
         // 146
@@ -2136,32 +2181,36 @@ void *sci0 (
         // isso n�o parece seguro, precismos checar a validade 
         // da estrutura antes, mas vai ficar assim por enquanto.
         // Perigo!
-        case 146:  return (void *) gui->screen;  break;
+        case 146:  
+            debug_print("sci0: [BUGBUG] 146\n");
+            return (void *) gui->screen;  
+            break;
+
 
         // 147
         // #bugbug: 
         // isso n�o parece seguro, precismos checar a validade da 
         // estrutura antes, mas vai ficar assim por enquanto.
         // Perigo!
-        case 147:  return (void *) gui->main;  break;
+        case 147:  
+            debug_print("sci0: [BUGBUG] 147\n");
+            return (void *) gui->main;  
+            break;
 
-		// 148 
-		// Create grid and itens.
-		// window, n, view. 
+        // 148 - Create grid and itens.
         case 148:
-            debug_print("148: deprecated\n");
+            debug_print("sci0: [DEPRECATED] 148\n");
             return NULL;
             break;
 
 
-        // 149 - Testing system menu.
-        // Essa eh uma rotina de teste, qua chama v�rias fun��es.
         case 149:
-            // MainMenu ( (struct window_d *) arg2 );
+            // Deprecated.
             break;
 
+
         // 152 - get uid
-        case SYS_GETCURRENTUSERID: 
+        case SYS_GETCURRENTUSERID:  
             return (void *) current_user; 
             break;
  
@@ -2196,8 +2245,9 @@ void *sci0 (
 		// Gramado API socket support. (not libc)
 		// Essa chamada passa argumentos ... ip e porta.
 		// See:
+
         case 160:
-            printf ("160: [FIXME] create socket!\n"); 
+            printf ("sci0: [FIXME] 160. create socket!\n"); 
             refresh_screen();
             //create_socket_object ();
             return NULL;
@@ -2224,9 +2274,10 @@ void *sci0 (
         // retorno 0=ok 1=fail		
         // Gramado API socket support. (not libc)
         case 163:
-            return (void *) update_socket ( (struct socket_d *) arg2, 
-                                (unsigned long) arg3, 
-                                (unsigned short) arg4 );
+            return (void *) update_socket ( 
+                                (struct socket_d *) arg2, 
+                                (unsigned long)     arg3, 
+                                (unsigned short)    arg4 );
             break;
 
 
@@ -2241,22 +2292,17 @@ void *sci0 (
        // livre
        // IN: filename, argv, envp
        case 168:
-           return (void *) __execute_new_process ( (const char *) arg2, 
-                               (char **) arg3, 
-                               (char **) arg4 );
+           debug_print("sci0: [TODO] 168\n");
+           return (void *) __execute_new_process ( 
+                               (const char *) arg2, 
+                               (char **)      arg3, 
+                               (char **)      arg4 );
            break;
 
 
-
-       // write
-       // See: unistd.c em garden/lib/libcore.
+       // ??
        case 169:
-           //essa rotina mudou de n�mero.
-           return NULL;
-           // IN: fd, buf, count.         
-           //return (void *) tty_write ( (unsigned int) arg2,  //channel 
-             //                  (char *) arg3,                //buf
-               //                (int) arg4 );                 //nr
+           debug_print("sci0: [deprecated] 169\n");
            break;
 
 
@@ -2279,6 +2325,7 @@ void *sci0 (
 		//#bugbug: Estamos modificando, sem aplicar nenhum filtro.
         case SYS_SETCURRENTVOLUMEID:
             current_volume = (int) arg2;
+            return NULL;
             break;
 
         // 173
@@ -2293,9 +2340,10 @@ void *sci0 (
 
         // 174
         case SYS_SEARCHFILE:
+            debug_print ("sci0: SYS_SEARCHFILE\n");
             return (void *) KiSearchFile ( 
                                 (unsigned char *) arg2, 
-                                (unsigned long) arg3 );
+                                (unsigned long)   arg3 );
             break;
 
 
@@ -2305,7 +2353,7 @@ void *sci0 (
         // +Carrega o arquivo referente ao diretório atual.
         // See: fs.c
         case 175:
-            debug_print ("175: cd command\n");
+            debug_print ("sci0: 175\n");
             sys_cd_command ( (char *) arg2 );
             return NULL;
             break;
@@ -2316,7 +2364,9 @@ void *sci0 (
         // indicado no argumento.
         // Copia o nome para a string global.
         case 176:
+            debug_print ("sci0: 176\n");
             fs_pathname_backup ( current_process, (int) arg3 );
+            return NULL;
             break;
 
 
@@ -2324,7 +2374,7 @@ void *sci0 (
         // Comando dir no shell.
         // Listando arquivos em um diretório dado seu nome.
         case 177:
-            debug_print ("177:\n");
+            debug_print ("sci0: 177\n");
             fsList ( (const char *) arg2 );
             return NULL;
             break;
@@ -2346,13 +2396,7 @@ void *sci0 (
             return (void *) GetProcessHeapStart ( (int) arg2 );
             break;
 
-
-
-       // 193 - livre.
-       // 194 - livre.
-       // 195 - livre.
-       // 196 - livre.
-
+        // free: 193,194,195,196
 
         // 197
         // scroll de area de cliente de uma janela;
@@ -2454,18 +2498,18 @@ void *sci0 (
 
         //219
         //case SYS_DESTROYTERMINAL:  break; 
- 
-         //220 - reboot             #todo
-         //221 - execute a program. #todo
+        //220 - reboot             #todo
+        //221 - execute a program. #todo
 
 
         // 222 - Create timer.
         // IN: pid, ms, type
         case 222:
+            debug_print ("sci0: 222 Create timer\n");
             return (void *) create_timer ( 
-                                (pid_t) arg2, 
+                                (pid_t)         arg2, 
                                 (unsigned long) arg3, 
-                                (int) arg4 );
+                                (int)           arg4 );
             break;
 
 
@@ -2532,18 +2576,22 @@ void *sci0 (
         case SYS_GETCURSORY:  return (void *) get_cursor_y();  break;
 
 
-		//244 enable text cursor.	
-		case 244:
-		    timerEnableTextCursor ();
-		    //timerShowTextCursor = 1;
-		    //gwsEnableTextCursor ();
-            break;		
+        // 244 - Enable text cursor.
+        case 244:
+            debug_print ("sci0: 244 Enable text cursor\n");
+            timerEnableTextCursor ();
+            //timerShowTextCursor = 1;
+            //gwsEnableTextCursor ();
+            return NULL;
+            break;
 
-        //245 disable text cursor.
+        // 245 - Disable text cursor.
         case 245:
+            debug_print ("sci0: 245 Disable text cursor\n");
             timerDisableTextCursor ();
             //timerShowTextCursor = 0;
             //gwsDisableTextCursor ();
+            return NULL;
             break;
 
         // =====================================
@@ -2554,13 +2602,17 @@ void *sci0 (
         // See: sci/posix/kstdio.c
         // IN: dirfd, pathname, flags.
         case 246:
-            return (void *) k_openat ( (int) arg2, 
-                                (const char *) arg3, (int) arg4 ); 
+            debug_print ("sci0: 246 k_openat\n");
+            return (void *) k_openat ( 
+                                (int)          arg2, 
+                                (const char *) arg3, 
+                                (int)          arg4 ); 
             break;
 
         // 247 - pipe() support.
         // IN: array, flags.
         case 247:
+            debug_print ("sci0: 247 sys_pipe\n");
             return (void *) sys_pipe ( (int *) arg2, (int) arg3 ); 
             break;
 
@@ -2572,10 +2624,16 @@ void *sci0 (
         // e continuar usando o processo clone criado pelo fork().
         // #todo: 
         // Implementar com base em outro execve existente.
+        
+        // #todo: Tem um outro numero fazendo praticamente a mesma coisa.
+        
         // IN: pathname, argv, envp.
         case 248:
-            return (void *) sys_execve ( (const char *) arg2, 
-                                (char **) arg3, (char **) arg4 ); 
+            debug_print ("sci0: 248 sys_execve\n");
+            return (void *) sys_execve ( 
+                                (const char *) arg2, 
+                                (char **)      arg3, 
+                                (char **)      arg4 ); 
             break;
 
 
@@ -2619,7 +2677,8 @@ void *sci0 (
 		// If it s invalid, return ENOSYS Function not implemented error
 
         default:
-            printf ("sci: Default {%d}\n", number );
+            debug_print ("sci0: Default\n");
+            printf      ("sci0: Default {%d}\n", number );
             refresh_screen ();
             return NULL;
             break;
@@ -2827,7 +2886,7 @@ void servicesPutChar ( int c )
 
 /*
  ***************************************
- * sci2:
+ * sci1:
  * int 0x81
  */
 
