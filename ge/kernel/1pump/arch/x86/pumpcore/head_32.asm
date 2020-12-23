@@ -1,22 +1,11 @@
-;; File: 1pump/arch/x86/boot.asm
-;; 
-;; para dar suporte ao multiboot.
-;; Esse será o primeiro ponto de entrada do kernel para x86
-;; Ele será simples e pequeno, dando uma visão geral
-;; de todas as áreas do kernel. (code,data,stack)
-
-
-; Ordem padrão dos arquivos em assembly:
-; ======================================
-; (0) boot.asm
-; (1) head.asm
-; (2) headlib.asm
-; (3) hw.asm
-; (4) hwlib.asm
-; (5) sw.asm
-; (6) swlib.asm
-; Obs: Essa é uma ordem padrão, nunca mudar, nunca excluir arquivos, 
-;      nunca incluir outros arquivos.
+;;
+;; File: 1pump/arch/x86/pumpcore/head_32.asm
+;;
+;; The entry point of the base kernel for the x86 arch.
+;; This documment will includo some other files.
+;;
+;; 2020 - Created by Fred Nora.
+;;
 
 
 %include "gramado/head.inc"
@@ -103,7 +92,7 @@ mboot_end:
 
 align 4
 
-    %include "bootmx/header.inc"
+    %include "head/header.inc"
     ;; ...
 
 ; Restart the boot routine.
@@ -128,33 +117,34 @@ START:
     ; AL e EBX foram configurados pelo BL.BIN ??
 
     call head_init
-    cli
 
 loop:
+    cli
     hlt
     jmp loop
 
 
-;
+
 ; Includes:
 ; ========
 ; Esses includes são padronizados. Não acrescentar outros.
-;
+
 
     ;Inicialização.
     ;Funções de apoio à inicialização do Kernel 32bit.
-    %include "bootmx/head.asm" 
-    %include "bootmx/headlib.asm" 
+    %include "head/head.asm" 
+    %include "head/headlib.asm" 
 
     ;Interrupções de hardware (irqs) e faults.
-    %include "iomx/hw.asm"
-    %include "iomx/hwlib.asm"
+    %include "hw/hw.asm"
+    %include "hw/hwlib.asm"
 
     ;Interrupções de software.
-    %include "appmx/sw.asm"
-    %include "appmx/swlib.asm"
+    %include "sw/sw.asm"
+    %include "sw/swlib.asm"
 
 
+;=================================================================
 ; DATA: 
 ;     Início do Segmento de dados.
 ;     Coloca uma assinatura no todo.
@@ -162,10 +152,11 @@ loop:
 segment .data
 global _data_start
 _data_start:
-    db 0x55    ;data magic.
-    db 0xAA    ;data magic.
+    db 0x55
+    db 0xAA
 
 
+;=================================================================
 ; BSS:
 ;     Início do segmento BSS.
 ;     Coloca uma assinatura no todo.
@@ -173,8 +164,8 @@ _data_start:
 segment .bss
 global _bss_start
 _bss_start:
-    ;db 0x55    ;data magic.
-    ;db 0xAA    ;data magic.
+    ;db 0x55
+    ;db 0xAA
 
 
 

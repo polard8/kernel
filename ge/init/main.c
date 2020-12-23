@@ -34,7 +34,7 @@
  *
  * History:
  *     2015 - Created by Fred Nora.
- *     2019 - The int 129 support.
+ *     2019 - The int 199 support.
  *     ...
  */
 
@@ -133,13 +133,16 @@ static inline void rep_nop (void)
 
 void enable_maskable_interrupts(void)
 {
-    asm ("int $129 \n");
+    debug_print ("init.bin: Enable maskable interrupts\n");
+    debug_print ("init.bin: Calling int 199\n");
+    
+    asm ("int $199 \n");
 }
 
 
-void initialize_product_type (void){
-
-    debug_print ("init.bin: Initializing product type ...\n");
+void initialize_product_type (void)
+{
+    debug_print ("init.bin: [TODO] Initializing product type ...\n");
  
     //
     // This is the only product we have for now!
@@ -179,14 +182,8 @@ void Logoff (void)
 {
     printf ("init.bin: Logoff()\n");
 
-
-    if (gReboot == 1){
-        Reboot();
-    }
-
-    if (gShutdown == 1){
-         Shutdown();
-    }
+    if (gReboot == 1)  {  Reboot();  }
+    if (gShutdown == 1){  Shutdown();  }
 }
 
 
@@ -208,7 +205,7 @@ int main ( int argc, char *argv[] ){
 
 
     debug_print ("---------------------------\n"); 
-    debug_print ("init.bin: Initializing Portals environment ...\n");
+    debug_print ("init.bin: Initializing ...\n");
 
 
     // Initialize with error value.
@@ -382,7 +379,7 @@ int main ( int argc, char *argv[] ){
         // "Initialize in terminal mode"?
         
         default:
-
+            debug_print ("init.bin: Calling gdeshell.bin\n");
             gramado_system_call ( 900, 
                 (unsigned long) "gdeshell.bin", 0, 0 ); 
 

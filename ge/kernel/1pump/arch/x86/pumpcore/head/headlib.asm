@@ -447,45 +447,38 @@ setup_vectors:
 	;#obs: 
 	;Utilizamos uma chamada diferente para configurar essa interrupção.
 
+    ;; 0x80
     mov eax, dword _int128
     mov ebx, dword 128
     call _setup_system_interrupt  
 
+    ;; 0x81
+    mov eax, dword _int129
+    mov ebx, dword 129
+    call _setup_system_interrupt  
+
+    ;; 0x82
+    mov eax, dword _int130
+    mov ebx, dword 130
+    call _setup_system_interrupt  
+
+    ;; ...
 
     ;;#test
     ;;Uma interrupção para habilitar as interrupções mascaráveis.
     ;; quem usará isso será a thread primária do processo init.
     ;; apenas uma vez.
     
-    mov eax, dword _int129
-    mov ebx, dword 129
+    mov eax, dword _int199
+    mov ebx, dword 199
     call _setup_system_interrupt  
 
 
-    ;;test
-    ;;fork
-	mov eax, dword _int133
-	mov ebx, dword 133
-	call _setup_system_interrupt  
 
-    ;213
-	;Executa nova tarefa.
-	mov eax, dword _int213
-	mov ebx, dword 213   
-	call _setup_system_interrupt
-	
-	
-    ;216
-	;Fast Create Window.
-	mov eax, dword _int216
-	mov ebx, dword 216        
-	call _setup_system_interrupt
-
-	;; ...
-
+    ;; ...
     
-	pop ebx
-	pop eax
+    pop ebx
+    pop eax
     ret
 
 

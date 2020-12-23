@@ -115,16 +115,19 @@ extern unsigned long fault_N29;
 extern unsigned long fault_N30;
 extern unsigned long fault_N31;
 
-
+// hw
 extern unsigned long timer_test;  //32
 extern unsigned long irq1;
 extern unsigned long irq8;
 extern unsigned long irq12;
 extern unsigned long irq14;
 extern unsigned long irq15;
+
+
+// sw
 extern unsigned long int128;  // 0x80, system interrupt
-extern unsigned long int213;
-extern unsigned long int216;
+extern unsigned long int129;
+// ..
 
 
 
@@ -183,17 +186,12 @@ void hal_init_vectors_table (void)
 	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &irq12 );
 	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &irq14 );
 	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &irq15 );
-	
-	//interrupts
-	
+
+
+    // Software interrupts
+
 	//128 - 0x80 system interrupt
 	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &int128 );
-	
-	//213 - Executa nova tarefa.
-	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &int213 );
-	
-	//216 - fast create window.
-	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &int216 );
 	
 	//...
 }

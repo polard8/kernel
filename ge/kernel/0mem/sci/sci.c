@@ -1135,40 +1135,11 @@ gde_extra_services (
 
 /*
  ****************************************
- * sci:
- *     Rotina que atende os pedidos feitos pelos aplicativos em user mode 
- *     via int 200. Ou ainda o kernel pode chamar essa rotina diretamente.
- *     S�o v�rios servi�os.
- *
- *
- * Obs: 
- * TODOS OS SERVI�OS DESSA ROTINA PODEM CHAMAR ROTINAS DE CLASSES 'system.x.x'.
- *
- * @todo: 
- *    Pode haver algum tipo de autoriza��o para essa rotina.
- *    Ou ainda, autoriza��o por grupo de servi�os. Sendo os servi�os
- *    de i/o os de maior privil�gio.
- *
- *    +Identificar o processo que fez a chamada e i/o e
- *    configurar a vari�vel que identifica esse processo.
- *    'caller_process_id' � uma vari�vem encapsulada em process.c
- *    'set_caller_process_id(int pid)' configura a vari�vel.
- *
- *    Uma chamada como OpenDevice pode liberar o acesso
- *    para um determinado processo e CloseDevice cancela o acesso.  
- * 
- *    @todo: O Nome da fun��o, para pertencer � essa pasta, deveria ser:
- *           servicesSystemServices(....).
- *
- *@todo: *importante: Essa rotina deve identificar quem est� chamando, PID TID.
- *
- *
- * *IMPORTANTE:
- *  DEPENDEND DO N�MERO DO SERVI�O ELE PODER� SER TRATADO EM OUTRO ARQUIVO
- *  E N�O NO KERNEL BASE.
+ * sci0:
+ * int 0x80
  */
 
-void *sci ( 
+void *sci0 ( 
     unsigned long number, 
     unsigned long arg2, 
     unsigned long arg3, 
@@ -2856,22 +2827,33 @@ void servicesPutChar ( int c )
 
 /*
  ***************************************
- * gde_133:
- *
- *     This routine was called by the interrupt 133.
- *     See the handler at: x86/entry/head/sw.inc.
- *     At function: _int133.
+ * sci2:
+ * int 0x81
  */
 
-void *gde_133 ( 
+void *sci1 ( 
     unsigned long number, 
     unsigned long arg2, 
     unsigned long arg3, 
     unsigned long arg4 )
 {
-    debug_print("gde_133: [TODO]\n");
+    debug_print("sci1: [TODO]\n");
 }
 
+/*
+ ***************************************
+ * sci2:
+ * int 0x82
+ */
+
+void *sci2 ( 
+    unsigned long number, 
+    unsigned long arg2, 
+    unsigned long arg3, 
+    unsigned long arg4 )
+{
+    debug_print("sci2: [TODO]\n");
+}
 
 
 //

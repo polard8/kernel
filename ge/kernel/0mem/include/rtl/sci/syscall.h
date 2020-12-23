@@ -714,22 +714,30 @@ systemcall_t *CurrentSystemCall;
 // int 0x80
 // See: sci.c
 
-void *sci ( 
+void *sci0 ( 
     unsigned long number, 
     unsigned long arg2, 
     unsigned long arg3, 
     unsigned long arg4 );
 
 
+// int 0x81
+// See: sci.c
 
-// int 133
-// See: gde_serv.c
-void *gde_133 ( 
+void *sci1 ( 
     unsigned long number, 
     unsigned long arg2, 
     unsigned long arg3, 
     unsigned long arg4 );
 
+// int 0x82
+// See: sci.c
+
+void *sci2 ( 
+    unsigned long number, 
+    unsigned long arg2, 
+    unsigned long arg3, 
+    unsigned long arg4 );
 
 
 #endif    

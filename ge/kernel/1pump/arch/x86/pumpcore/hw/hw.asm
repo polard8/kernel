@@ -187,7 +187,8 @@ dummy_flush:
     ; EOI - Only the first PIC.
     mov al, 20h
     out 20h, al  
-
+    IODELAY  
+    
     ; Acumulator.
     mov eax, dword [_contextEAX]
 
@@ -290,7 +291,8 @@ _irq1:
     xor eax, eax 
     MOV AL, 020h
     OUT 020h, AL
-
+    IODELAY  
+    
     ;; The acumulator.
     pop eax
 
@@ -328,7 +330,8 @@ _irq3:
     ;; EOI - Only the first PIC.
     mov al, 0x20
     out 0x20, al
-
+    IODELAY  
+    
     popad
     sti
     iretd
@@ -355,7 +358,8 @@ _irq4:
     ;; EOI - Only the first PIC.
     mov al, 0x20
     out 0x20, al
-
+    IODELAY  
+    
     popad
     sti
     iretd
@@ -422,7 +426,8 @@ _irq7:
     ;; for irq7
     mov al, 0x20
     out 0x20, al   
-
+    IODELAY  
+    
 __RETURN_Spurious:
 
     ;; No eoi for irq 7 spurious
@@ -452,8 +457,10 @@ _irq8:
     ;; Order: Second, first.
     mov al, 0x20
     out 0xA0, al  
+    IODELAY  
     out 0x20, al
-
+    IODELAY  
+    
     popad
     sti
     iret
@@ -480,8 +487,10 @@ _irq9:
     ;; Order: Second, first.
     mov al, 0x20
     out 0xA0, al  
+    IODELAY  
     out 0x20, al
-
+    IODELAY  
+    
     popad
     sti
     iretd
@@ -504,8 +513,10 @@ _irq10:
     ;; Order: Second, first.
     mov al, 0x20
     out 0xA0, al  
+    IODELAY  
     out 0x20, al
-
+    IODELAY  
+    
     popad
     sti
     iretd
@@ -550,8 +561,10 @@ _irq11:
     ;; Order: Second, first.
     mov al, 0x20
     out 0xA0, al  
+    IODELAY  
     out 0x20, al
-
+    IODELAY  
+    
     popad
     sti
 
@@ -615,8 +628,10 @@ _irq13:
     ;; Order: Second, first.
     mov al, 0x20
     out 0xA0, al  
+    IODELAY  
     out 0x20, al
-
+    IODELAY  
+    
     pop ax
     sti
 
@@ -646,8 +661,10 @@ _irq14:
     MOV AL,020h
     OUT 0A0h,AL
     IODELAY
+    IODELAY  
     OUT 020h,AL
     IODELAY
+    IODELAY  
     
     POPAD
     pop eax
@@ -694,9 +711,10 @@ _irq15:
     MOV AL, 020h
     OUT 0A0h, AL
     IODELAY
+    IODELAY  
     OUT 020h, AL
     IODELAY
-    
+    IODELAY  
     POPAD
     pop eax
     sti
@@ -721,9 +739,11 @@ unhandled_irq:
     mov al, 0x20
     out 0xA0, al
     IODELAY  
+    IODELAY  
     out 0x20, al
     IODELAY
-    
+    IODELAY  
+
     pop eax
     sti 
 
