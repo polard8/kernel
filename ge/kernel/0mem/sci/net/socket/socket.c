@@ -320,15 +320,13 @@ socket_gramado (
     debug_print ("socket_gramado:\n");
 
 
-   
-    if ( (void*) sock == NULL )
-    {
+    if ( (void*) sock == NULL ){
         debug_print ("socket_gramado: [FAIL] sock\n");
         goto fail;
     }
-    
-    if (family != AF_GRAMADO)
-    {
+
+
+    if (family != AF_GRAMADO){
         debug_print ("socket_gramado: [FAIL] bad family\n");
         goto fail;
     }
@@ -341,9 +339,7 @@ socket_gramado (
     if ( (void *) Process == NULL ){
         printf("socket_gramado: [FAIL] Process\n");
         goto fail;
-
     }else{
-
         if ( Process->used != 1 || Process->magic != 1234 ){
             printf("socket_gramado: [FAIL] Process validation\n");
             goto fail;
@@ -418,6 +414,8 @@ socket_gramado (
         _file->uid = (uid_t) current_user;
         _file->gid = (gid_t) current_group;
         _file->____object = ObjectTypeSocket;
+        
+        _file->_flags = __SWR;
 
         // No name for now.
         _file->_tmpfname = NULL;
@@ -596,7 +594,8 @@ socket_unix (
         _file->gid = (gid_t) current_group;
         _file->____object = ObjectTypeSocket;
 
-
+        _file->_flags = __SWR;
+        
         // No name for now.
         // #bugbug: 
         // unix sockets has names.
@@ -769,6 +768,8 @@ socket_inet (
         _file->gid = (gid_t) current_group;
         _file->____object = ObjectTypeSocket;
 
+        //flags 
+        _file->_flags = __SWR;
 
         // No name for now.
         _file->_tmpfname = NULL;
@@ -1016,8 +1017,8 @@ fail:
 
 // OUT: ?
 
-int sys_socket ( int family, int type, int protocol ){
-
+int sys_socket ( int family, int type, int protocol )
+{
 
     //#todo
     // call create_socket(...)
@@ -1068,7 +1069,6 @@ int sys_socket ( int family, int type, int protocol ){
     if (family < 0){
         debug_print ("sys_socket: [FAIL] family not supported\n");
         goto fail;
-        //return -1;
     }
 
     // Check if this is a valid type.
@@ -1079,7 +1079,6 @@ int sys_socket ( int family, int type, int protocol ){
     {
         debug_print ("sys_socket: [FAIL] type not supported\n");
         goto fail;
-        //return -1;
     }
 
     if (protocol < 0){
@@ -1095,8 +1094,7 @@ int sys_socket ( int family, int type, int protocol ){
     if ( (void *) p == NULL )
     {
         debug_print ("sys_socket: p fail\n");
-        printf      ("sys_socket: p fail\n");
-        goto fail;
+        panic       ("sys_socket: p fail\n");
     }
 
 
@@ -1481,26 +1479,30 @@ sys_connect (
     // #importante
     // opções de domínio se o endereço é no estilo unix. 
     // >>> sockaddr
-    switch (addr->sa_family)
-    {
+    switch (addr->sa_family){
+
         // AF_GRAMADO = 8000
         // Vamos obter o número do processo alvo dado o endereço.
         // 32 ports only.
+        
         case AF_GRAMADO:
             debug_print ("sys_connect: AF_GRAMADO ok\n");
             
             // window server
-            if ( addr->sa_data[0] == 'w' && addr->sa_data[1] == 's' ){   
+            if ( addr->sa_data[0] == 'w' && addr->sa_data[1] == 's' )
+            {   
                 target_pid = (int) gramado_ports[GRAMADO_WS_PORT]; 
             }
 
             // network server
-            if ( addr->sa_data[0] == 'n' && addr->sa_data[1] == 's' ){   
+            if ( addr->sa_data[0] == 'n' && addr->sa_data[1] == 's' )
+            { 
                 target_pid = (int) gramado_ports[GRAMADO_NS_PORT]; 
             }
 
             // file system server
-            if ( addr->sa_data[0] == 'f' && addr->sa_data[1] == 's' ){   
+            if ( addr->sa_data[0] == 'f' && addr->sa_data[1] == 's' )
+            {   
                 target_pid = (int) gramado_ports[GRAMADO_FS_PORT]; 
             }
 
@@ -1515,12 +1517,13 @@ sys_connect (
             printf ("sys_connect: target pid %d \n", target_pid);
             
             // não tente inet, somos af_gramado
-            ____in = 0;
+            ____in = FALSE;
             break;
         
         // #todo
         // Podemos usar isso no caso do  window server.
         // Pois se trata de uma conexão local.
+        
         //case AF_LOCAL:
         case AF_UNIX:
             // Essa conexão local usa endereços no sistema de arquivos.
@@ -1528,14 +1531,14 @@ sys_connect (
             debug_print ("sys_connect: [TODO] AF_UNIX \n");
             //target_pid = -1;
             // não tente inet, somos af_unix
-            ____in = 0;
+            ____in = FALSE;
 
             goto fail;
             break;
     };
 
     // >>> sockaddr_in
-    if ( ____in == 1 )
+    if ( ____in == TRUE )
     {
       // opções de domínio se o endereço é no estilo internet.
       switch (addr_in->sin_family)
@@ -1548,74 +1551,79 @@ sys_connect (
             printf      ("sys_connect: AF_INET port %d \n", 
                 addr_in->sin_port);
             
-            // WS
+            // WS - 4040
             // Se a porta for , então usaremos o pid do WS.
-            // 4040
-            if (addr_in->sin_port == PORTS_WS){
+            if (addr_in->sin_port == PORTS_WS)
+            {
                 printf ("sys_connect: Connecting to the Window Server on port %d ...\n",
                     addr_in->sin_port);
                 printf("sys_connect: IP {%x}\n",
                     addr_in->sin_addr.s_addr );
-                refresh_screen();
                 target_pid = (int) gramado_ports[GRAMADO_WS_PORT]; 
+                refresh_screen();
                 break;
             }
-     
-            // NS
+
+            // NS - 4041
             // Se a porta for , então usaremos o pid do NS.
-            // 4041
-            if (addr_in->sin_port == PORTS_NS){
+            if (addr_in->sin_port == PORTS_NS)
+            {
                 printf ("sys_connect: Connecting to the Network Server on port %d...\n",
                     addr_in->sin_port);
                 printf("sys_connect: IP {%x}\n",
                     addr_in->sin_addr.s_addr );
-                refresh_screen();
-                //while(1){}
                 target_pid = (int) gramado_ports[GRAMADO_NS_PORT]; 
+                refresh_screen();
                 break;
             }
             
             // PORTS_FS
 
             // 21 - FTP
-            if (addr_in->sin_port == 21){
+            if (addr_in->sin_port == 21)
+            {
                 printf("$$$$ FTP $$$$\n");
-                //refresh_screen();
+                refresh_screen();
                 goto fail;
             }
 
             // 23 - Telnet
-            if (addr_in->sin_port == 23){
+            if (addr_in->sin_port == 23)
+            {
                 printf("$$$$ Telnet $$$$\n");
-                //refresh_screen();
+                refresh_screen();
                 goto fail;
             }
 
             // 67 - DHCP
-            if (addr_in->sin_port == 67){
+            if (addr_in->sin_port == 67)
+            {
                 printf("$$$$ DHCP $$$$\n");
-                //refresh_screen();
+                refresh_screen();
                 goto fail;
             }
             
             // 80 - HTTP
-            if (addr_in->sin_port == 80){
+            if (addr_in->sin_port == 80)
+            {
                 printf("$$$$ HTTP $$$$\n");
-                //refresh_screen();
+                refresh_screen();
                 goto fail;
             }
             
 
             // 443 - HTTPS 
-            if (addr_in->sin_port == 443){
+            if (addr_in->sin_port == 443)
+            {
                 printf("$$$$ HTTPS $$$$\n");
-                //refresh_screen();
+                refresh_screen();
                 goto fail;
             }
 
             
             printf("sys_connect: [FAIL] Port not valid {%d}\n",
                 addr_in->sin_port);
+            
             goto fail;
             break;
              
@@ -1629,6 +1637,11 @@ sys_connect (
             break;
       };
     }
+
+// ====================================================================
+     // Check
+     // Have a valid target_pid ?
+
 
 
 //__go:
@@ -1656,7 +1669,7 @@ sys_connect (
 
     if ( (void *) f == NULL )
     {
-        printf ("sys_connect: f fail\n");
+        printf ("sys_connect: [FAIL] f\n");
         goto fail;
     }
 
@@ -1685,8 +1698,9 @@ sys_connect (
     }
 
     // The client socket needs to be unconnected.
-    if (client_socket->state != SS_UNCONNECTED) {
-        printf ("sys_connect: socket not SS_UNCONNECTED\n");
+    if (client_socket->state != SS_UNCONNECTED) 
+    {
+        printf ("sys_connect: [FAIL] client socket is not SS_UNCONNECTED\n");
         goto fail;
     }
 
@@ -1728,9 +1742,6 @@ sys_connect (
     };
     panic ("sys_connect: [FIXME] We need a slot in the server\n");
 __OK_new_slot:
-
-
-
 
 
     // Esse é o socket do processo servidor.
@@ -1804,8 +1815,7 @@ __OK_new_slot:
     // o servidor pode ter mais de uma socket.
     
     sProcess->socket_pending_list[0] = (unsigned long) client_socket;
-    
- 
+
     //ok.
     refresh_screen();
     return 0;
@@ -2708,8 +2718,8 @@ fail:
 
 // IN: ip and port.
 
-struct socket_d *create_socket_object (void){
-
+struct socket_d *create_socket_object (void)
+{
     struct socket_d *s;
     int i=0;
 
@@ -2720,7 +2730,6 @@ struct socket_d *create_socket_object (void){
         printf ( "create_socket_object: allocation fail \n");
         refresh_screen();
         return NULL;
-
     }else{
 
         //s->objectType =
@@ -2770,9 +2779,7 @@ struct socket_d *create_socket_object (void){
         }
           
         //...
-        
     };
-
 
     return (struct socket_d *) s;
 }

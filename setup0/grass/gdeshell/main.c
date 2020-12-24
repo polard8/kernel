@@ -2497,42 +2497,9 @@ do_compare:
     // Criar um funçao para isso em net.c
     // ex: test_xxxx()
 
-    int socket_fd = -1;
-    char __socket_buffer[32];
-    if ( gramado_strncmp( prompt, "socket", 6 ) == 0 )
+    if ( gramado_strncmp( prompt, "socket1", 7 ) == 0 )
     {
-        printf("\n");
-        socket_fd = (int) socket ( 
-                             (int) AF_INET, 
-                             (int) SOCK_STREAM, 
-                             (int) 0 );
-        
-        printf ("socket_fd = %d\n",socket_fd);
-
-
-        sprintf( __socket_buffer, "Magic string");
-        
-        send (socket_fd , __socket_buffer , strlen(__socket_buffer) , 0 ); 
-        //write (socket_fd, &__socket_buffer[0], 12 );
-        
-        //suja o buffer
-        sprintf( __socket_buffer, "============");
-        
-        //read (socket_fd, &__socket_buffer[0], 5 );
-        recv (socket_fd, (void *) &__socket_buffer[0], 5, 0 );
-        
-        printf(">>%s \n",__socket_buffer);
-        
-
-        // Pede para o kernel usar esse descritor para
-        // mandar mensagens atrav�s dessa stream.
-        // O procedimento de janela tratar� a mensagem MSG_AF_INET.
-        
-        //gramado_system_call ( 966, 
-           // (unsigned long) socket_fd,
-           // (unsigned long) socket_fd,
-           // (unsigned long) socket_fd );
-            
+        net_socket_test1();
         goto exit_cmp;
     }
 
@@ -2541,22 +2508,9 @@ do_compare:
     // Testando a funçao socket() da libc
     // Pedimos para o servidor de rede enviar dados para o
     // processo atraves da stream configurada anteriormente.
-    if ( gramado_strncmp( prompt, "test-net", 8 ) == 0 )
+    if ( gramado_strncmp( prompt, "socket2", 7 ) == 0 )
     {
-        socket_fd = (int) socket ( 
-                              (int) AF_INET, 
-                              (int) SOCK_STREAM, 
-                              (int) 0 );
-        
-        if (socket_fd < 0) 
-            printf("ERROR opening socket");
-         
-        printf ("socket_fd = %d\n",socket_fd);
- 
-        gramado_system_call ( 967, 
-            (unsigned long) socket_fd,
-            (unsigned long) socket_fd,
-            (unsigned long) socket_fd );
+        net_socket_test2();
         goto exit_cmp;
     }
 
@@ -2577,17 +2531,6 @@ do_compare:
          };
          goto exit_cmp;
     }
-
-
-	// socket-test
-	// Rotina de teste de soquetes.
-	// Atençao: Nao eh o soquete da libc unix-like.
-    if ( gramado_strncmp( prompt, "socket-test", 11 ) == 0 )
-    {
-        //shellSocketTest ();
-        goto exit_cmp;
-    }
-
 
     // streams
     if ( gramado_strncmp( prompt, "streams", 7 ) == 0 )

@@ -121,6 +121,11 @@ void network(void);
 void shellSocketTest (void);
 
 
+void net_socket_test1(void);
+void net_socket_test2(void);
+// ...
+
+
 #endif    
 
 

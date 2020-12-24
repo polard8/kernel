@@ -623,98 +623,84 @@ void network_loop(void)
 }
 
 
-/*
- ************************************** 
- * shellSocketTest: 
- * 
- */
-
-//rotina de testes de socket
-
-void shellSocketTest (void){
-
-	//#todo: isso precisa ser um porteiro de estrutura.
-	void *ClientHandle;
-	
-	unsigned long iplong=0;
-	unsigned long port=0; //short
-	
-	unsigned char ip[4];
-
-
-    printf("\n");
-    printf("shellSocketTest: Testing socket stuff ...\n");
-
-	
-	//
-	// Creating socket
-	//
-	
-	
-	// Queremos nos conectar com o host 192.168.1.100, na porta 8000.
-	//#todo: mudar para 127.0.0.1:8000
-	//um servidor pode ser criado para ouvir essa porta.
-
-
-    printf ("Creating client socket ...\n");
-    ClientHandle = (void *) system_call ( 160, 
-	                            (unsigned long) 0xC0A80164,  // ip 192.168.1.100
-	                            (unsigned long) 8000,        // porta 8000
-	                            (unsigned long) 0x22C3 );    // ??
-
-    //printf ("Updating socket ...\n");
-    //system_call ( 163, 
-	//    (unsigned long) socketHandle, 
-	//    (unsigned long) 0xC0A80165, 
-	//    (unsigned long) 0x22C2 );
-
-
-	//
-	// Check socket info.
-	//
-
-
-    printf ("Getting ip from socket ...\n");
-    iplong = (unsigned long) system_call ( 161, 
-	                             (unsigned long) ClientHandle, 
-	                             (unsigned long) ClientHandle, 
-	                             (unsigned long) ClientHandle );
-	
-    printf ("Getting port from socket ...\n");
-    port = (unsigned long) system_call ( 162, 
-	                           (unsigned long) ClientHandle, 
-	                           (unsigned long) ClientHandle, 
-	                           (unsigned long) ClientHandle );
-
-	//
-	// Output
-	//
-
-    unsigned long tmp = 0;
-
-	tmp = iplong;
-	ip[3] = (char) ( tmp & 0x000000FF ); 
-
-	tmp = iplong;
-	tmp = (tmp >> 8);
-	ip[2] = (char) ( tmp & 0x000000FF );
-
-	tmp = iplong;
-	tmp = (tmp >> 16);
-	ip[1] = (char) ( tmp & 0x000000FF );
-
-	tmp = iplong;
-	tmp = (tmp >> 24);
-	ip[0] = (char) ( tmp & 0x000000FF );
-
-
-    printf ("\n");
-    printf ("Socket: ( %d.%d.%d.%d:%d )\n", 
-        ip[0], ip[1], ip[2], ip[3], port );
-	//printf("iplong=%x\n",iplong);
-    printf ("Done\n");
+void shellSocketTest(void)
+{
+    printf("shellSocketTest: Deprecated\n");
 }
 
+
+void net_socket_test1(void)
+{
+    int socket_fd = -1;
+    char message[32];
+
+    debug_print("=============================\n");
+    debug_print("net_socket_test1:\n");
+
+    printf("\n");
+    printf("net_socket_test1: socket(), send() and recv()\n");
+
+    //printf("Creating...\n");
+
+    socket_fd = (int) socket ( 
+                          (int) AF_INET, 
+                          (int) SOCK_STREAM, 
+                          (int) 0 );
+
+    if ( socket_fd <= 0 )
+    {
+        printf("Couldn't create\n");
+        return;
+    }
+
+    printf ("socket_fd:  %d\n",socket_fd);
+
+    // Write message in the buffer.
+    
+    sprintf ( message, "Magic string");
+
+    // Send the message.
+    
+    send (socket_fd , message , strlen(message) , 0 ); 
+
+    // Setup buffer for error message.
+
+    sprintf( message, "==FAIL==");
+
+    recv (socket_fd, (void *) &message[0], 5, 0 );
+    
+    // finalize.
+    message[9] = 0;
+    
+    printf("Message:{%s}\n",message);
+
+    printf("net_socket_test1: done\n");
+
+    debug_print("net_socket_test1: done\n");
+}
+
+
+void net_socket_test2(void)
+{
+    int socket_fd = -1;
+    char __socket_buffer[32];
+
+        socket_fd = (int) socket ( 
+                              (int) AF_INET, 
+                              (int) SOCK_STREAM, 
+                              (int) 0 );
+        
+        if (socket_fd < 0) 
+            printf("ERROR opening socket");
+         
+        printf ("socket_fd = %d\n",socket_fd);
+ 
+        // ??
+        gramado_system_call ( 967, 
+            (unsigned long) socket_fd,
+            (unsigned long) socket_fd,
+            (unsigned long) socket_fd );
+}
 
 
 //

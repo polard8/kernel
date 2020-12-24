@@ -1021,6 +1021,7 @@ int sys_read (unsigned int fd, char *ubuf, int count)
         // not reading yet
         if ((__file->_flags & __SRD) == 0) 
         {
+            debug_print("sys_read: [FAIL] flag __SRD \n");
             goto fail;
         }
 
@@ -1434,6 +1435,7 @@ int sys_write (unsigned int fd, char *ubuf, int count)
         // not writing yet
         if ((__file->_flags & __SWR) == 0) 
         {
+            debug_print("sys_write: [FAIL] flag __SWR \n");
             goto fail;
         }
         
