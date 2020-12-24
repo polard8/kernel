@@ -1350,7 +1350,8 @@ response_loop:
         gws_debug_print ("__gws_plotcube_response: recv fail.\n");
         printf          ("__gws_plotcube_response: recv fail.\n");
         printf ("Something is wrong with the socket.\n");
-        exit (1);
+        return -1;
+        //exit (1);
     }
 
     //
@@ -1575,7 +1576,8 @@ response_loop:
         gws_debug_print ("__gws_plotrectangle_response: recv fail.\n");
         printf          ("__gws_plotrectangle_response: recv fail.\n");
         printf ("Something is wrong with the socket.\n");
-        exit (1);
+        return -1;
+        //exit (1);
     }
 
     //
@@ -2025,7 +2027,8 @@ response_loop:
         gws_debug_print ("gws_drawtext_response: recv fail.\n");
         printf          ("gws_drawtext_response: recv fail.\n");
         printf ("Something is wrong with the socket.\n");
-        exit (1);
+        return -1;
+        //exit (1);
     }
 
 
@@ -2323,14 +2326,14 @@ gws_plot0 (
     __gws_plot0_request ( fd, x, y, z, color );
     
 
-    int CanRead=-1;
-    CanRead = rtl_sleep_if_socket_is_empty(fd);
+    //int CanRead=-1;
+    //CanRead = rtl_sleep_if_socket_is_empty(fd);
     
-    if(CanRead != TRUE)
-        return -1; // no response.
+    //if(CanRead != TRUE)
+    //    return -1; // no response.
     
     // YES, We can read the response.
-    if(CanRead == TRUE)
+    //if(CanRead == TRUE)
         __gws_plot0_response( fd );
 
     return 0;
@@ -2349,14 +2352,14 @@ gws_plotcube (
         
     __gws_plotcube_request  (fd, (struct gr_cube_d *) cube );
     
-    int CanRead=-1;
-    CanRead = rtl_sleep_if_socket_is_empty(fd);
+    //int CanRead=-1;
+    //CanRead = rtl_sleep_if_socket_is_empty(fd);
     
-    if(CanRead != TRUE)
-        return -1; // no response.
+    //if(CanRead != TRUE)
+    //    return -1; // no response.
     
     // YES, We can read the response.
-    if(CanRead == TRUE)
+    //if(CanRead == TRUE)
     __gws_plotcube_response (fd);
     return 0;
 }
@@ -2377,14 +2380,14 @@ gws_plotrectangle (
     __gws_plotrectangle_request  (fd, (struct gr_rectangle_d *) rect );
     
 
-    int CanRead=-1;
-    CanRead = rtl_sleep_if_socket_is_empty(fd);
+    //int CanRead=-1;
+    //CanRead = rtl_sleep_if_socket_is_empty(fd);
     
-    if(CanRead != TRUE)
-        return -1; // no response.
+    //if(CanRead != TRUE)
+    //    return -1; // no response.
     
     // YES, We can read the response.
-    if(CanRead == TRUE)
+    //if(CanRead == TRUE)
         __gws_plotrectangle_response (fd);
     
     return 0;
@@ -2426,14 +2429,14 @@ gws_draw_char (
     gws_debug_print("gws_draw_char: response\n");
 
     // Response
-    int CanRead=-1;
-    CanRead = rtl_sleep_if_socket_is_empty(fd);
+    //int CanRead=-1;
+    //CanRead = rtl_sleep_if_socket_is_empty(fd);
     
-    if(CanRead != TRUE)
-        return -1; // no response.
+    //if(CanRead != TRUE)
+    //    return -1; // no response.
     
     // YES, We can read the response.
-    if(CanRead == TRUE)
+    //if(CanRead == TRUE)
         response = __gws_drawchar_response((int) fd);  
 
     gws_debug_print("gws_draw_char: done\n");
@@ -2465,14 +2468,14 @@ gws_draw_text (
 
     gws_debug_print("gws_draw_text: response\n");
     
-    int CanRead=-1;
-    CanRead = rtl_sleep_if_socket_is_empty(fd);
+    //int CanRead=-1;
+    //CanRead = rtl_sleep_if_socket_is_empty(fd);
     
-    if(CanRead != TRUE)
-        return -1; // no response.
+    //if(CanRead != TRUE)
+    //    return -1; // no response.
     
     // YES, We can read the response.
-    if(CanRead == TRUE)
+    //if(CanRead == TRUE)
         response = __gws_drawtext_response ((int) fd);  
 
     gws_debug_print("gws_draw_text: done\n");
@@ -2765,14 +2768,14 @@ gws_create_window (
         color, type, parentwindow, windowname);
     
     // Response
-    int CanRead=-1;
-    CanRead = rtl_sleep_if_socket_is_empty(fd);
+    //int CanRead=-1;
+    //CanRead = rtl_sleep_if_socket_is_empty(fd);
     
-    if(CanRead != TRUE)
-        return -1; // no response.
+    //if(CanRead != TRUE)
+    //    return -1; // no response.
     
     // YES, We can read the response.
-    if(CanRead == TRUE)
+    //if(CanRead == TRUE)
         wid = (int) __gws_createwindow_response(fd); 
 
     // Return the index returned by the window server.
@@ -3170,6 +3173,58 @@ int gws_create_empty_directory ( char *dir_name ){
 
     return (int) __ret;
 }
+
+
+
+
+
+void
+gws_async_command ( 
+    int fd, 
+    unsigned long request)
+{
+
+    // Isso permite ler a mensagem na forma de longs.
+    unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];   
+
+    int n_writes = 0;   // For sending requests.
+
+    //char *name = "Window name 1";
+
+    //
+    // Send request.
+    //
+
+    // #debug
+    gws_debug_print ("__gws_change_window_position_request: Writing ...\n");      
+
+    // Enviamos um request para o servidor.
+    // ?? Precisamos mesmo de um loop para isso. ??
+    // msg = 369 (get input event)
+
+    while (1)
+    {
+        message_buffer[0] = 0;        // window. 
+        message_buffer[1] = 2222;     // message number.
+        message_buffer[2] = request;  // x
+        message_buffer[3] = request;  // y
+        //...
+
+        // Write!
+        // Se foi possível enviar, então saimos do loop.  
+
+        // n_writes = write (fd, __buffer, sizeof(__buffer));
+        n_writes = send ( fd,
+                        __gws_message_buffer, 
+                        sizeof(__gws_message_buffer), 
+                        0 );
+
+        if (n_writes>0){ break; }
+    }
+
+    return; 
+}
+
 
 
 //

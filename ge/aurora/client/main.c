@@ -134,9 +134,11 @@ int gws(void)
 }
 
 
+//==========================================
 // Main
 
-int main ( int argc, char *argv[] ){
+int main ( int argc, char *argv[] )
+{
 
     int client_fd = -1;
     int main_window = -1;
@@ -353,7 +355,10 @@ int main ( int argc, char *argv[] ){
     //
     // == rectangle ==================================
     //
-    
+
+    gws_debug_print ("gws.bin: 5 Testing Plot rect \n");
+    printf          ("gws.bin: 5 Testing Plot rect \n");
+
     
     struct gr_rectangle_d *rect;
     rect = (void *) malloc( sizeof( struct gr_rectangle_d ) );
@@ -387,7 +392,7 @@ int main ( int argc, char *argv[] ){
    
    
     // #debug
-    while (1){
+    //while (1){
 
         gws_draw_char ( client_fd, main_window, 
             20, 20, COLOR_RED, 'X' );
@@ -405,7 +410,10 @@ int main ( int argc, char *argv[] ){
         
         //gws_refresh_window (client_fd, main_window);
         //gws_yield();
-    }
+    //}
+    
+    gws_debug_print ("gws: Sending command to close. \n");
+    gws_async_command(client_fd,1);
 
 
     // exit

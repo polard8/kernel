@@ -683,23 +683,51 @@ void net_socket_test1(void)
 void net_socket_test2(void)
 {
     int socket_fd = -1;
-    char __socket_buffer[32];
+    char message[32];
 
-        socket_fd = (int) socket ( 
-                              (int) AF_INET, 
-                              (int) SOCK_STREAM, 
-                              (int) 0 );
-        
-        if (socket_fd < 0) 
-            printf("ERROR opening socket");
-         
-        printf ("socket_fd = %d\n",socket_fd);
- 
-        // ??
-        gramado_system_call ( 967, 
-            (unsigned long) socket_fd,
-            (unsigned long) socket_fd,
-            (unsigned long) socket_fd );
+    debug_print("=============================\n");
+    debug_print("net_socket_test2:\n");
+
+    printf("\n");
+    printf("net_socket_test2: socket(), send() and recv()\n");
+
+    //printf("Creating...\n");
+
+    socket_fd = (int) socket ( 
+                          (int) AF_INET, 
+                          (int) SOCK_STREAM, 
+                          (int) 0 );
+
+    if ( socket_fd <= 0 )
+    {
+        printf("Couldn't create\n");
+        return;
+    }
+
+    printf ("socket_fd:  %d\n",socket_fd);
+
+    // Write message in the buffer.
+    
+    sprintf ( message, "Magic string");
+
+    // Send the message.
+    
+    send (socket_fd , message , strlen(message) , 0 ); 
+
+    // Setup buffer for error message.
+
+    sprintf( message, "==FAIL==");
+
+    recv (socket_fd, (void *) &message[0], 5, 0 );
+    
+    // finalize.
+    message[9] = 0;
+    
+    printf("Message:{%s}\n",message);
+
+    printf("net_socket_test2: done\n");
+
+    debug_print("net_socket_test2: done\n");
 }
 
 

@@ -32,6 +32,8 @@ int serviceClientEvent(void);
 // When a client get the next event from it's own queue.
 int serviceNextEvent(void);
 
+int serviceAsyncCommand (void);
+
 
 
 

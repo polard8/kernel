@@ -1027,16 +1027,19 @@ int sys_read (unsigned int fd, char *ubuf, int count)
 
         nbytes = 0;
 
-        // vazio? acorda escritores e dorme.
+        // vazio? 
+        // nao podemos ler.
+        // acorda escritores e dorme.
         if (__file->socket_buffer_full == FALSE)
         { 
-            debug_print("sys_read: can't read an empty buffer\n");
-            goto fail;
+            debug_print("sys_read: [FAIL] can't read an empty buffer\n");
+            //goto fail;
             
             debug_print("sys_read: WAKEUP WRITER\n");
+            __file->_flags = 0;
             __file->_flags |= __SWR;                  // pode escrever
-
             do_thread_ready( __file->tid_waiting );   // acorda escritores. 
+            goto fail;
             
             debug_print("sys_read: SLEEP READER\n");
             panic("sys_read: [DEBUG] Couldn't read socket. Buffer not full\n");
@@ -1439,23 +1442,28 @@ int sys_write (unsigned int fd, char *ubuf, int count)
             goto fail;
         }
         
-        // cheio? acorde os leitores para esvaziar.
+        // cheio? 
+        // Nao podemos escrever.
+        // Acorde os leitores para esvaziar.
         if ( __file->socket_buffer_full == TRUE )
         {
-               debug_print("sys_write: can't write on a full buffer\n");
-               goto fail;
-                __file->_flags = 0;
-                debug_print("sys_write: WAKEUP READER\n");
-                __file->_flags |= __SRD;                 // pode ler.
-                do_thread_ready( __file->tid_waiting );  // acorda leitores
+            debug_print("sys_write: [FAIL] can't write on a full buffer\n");
+            //goto fail;
+                
             
-                // dorme. 
-                // Se dormirmos sem escrever e retornarmos, 
-                // o aplicativo nao chamara a escrita novamente.
-                debug_print("sys_write: SLEEP WRITER\n");
-                panic ("sys_write: [DEBUG] Couldn't write in the socket. Buffer full!\n");
-                do_thread_waiting(current_thread);
-                __file->tid_waiting = current_thread;
+            debug_print("sys_write: WAKEUP READER\n");
+            __file->_flags = 0;
+            __file->_flags |= __SRD;                 // pode ler.
+            do_thread_ready( __file->tid_waiting );  // acorda leitores
+            goto fail;
+            
+            // dorme. 
+            // Se dormirmos sem escrever e retornarmos, 
+            // o aplicativo nao chamara a escrita novamente.
+            debug_print("sys_write: SLEEP WRITER\n");
+            panic ("sys_write: [DEBUG] Couldn't write in the socket. Buffer full!\n");
+            do_thread_waiting(current_thread);
+            __file->tid_waiting = current_thread;
         }
 
         // vazio? escreva e acorde os leitores.

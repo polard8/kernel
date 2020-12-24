@@ -1450,6 +1450,13 @@ gwsProcedure (
         // Segue serviços graficos 3d.
         // ...
 
+        // #test
+        // async command: 
+        case 2222:
+            gwssrv_debug_print ("gwssrv: [2222] TODO. Closing server\n");
+                        printf ("gwssrv: [2222] TODO. Closing server\n");
+            exit(0);
+            break;
 
         //MSG_GWS_PROTOCOL
         //case 3000:
@@ -2175,6 +2182,50 @@ int serviceNextEvent (void)
 
 
 
+int serviceAsyncCommand (void)
+{
+    //O buffer é uma global nesse documento.
+    unsigned long *message_address = (unsigned long *) &__buffer[0];
+
+    unsigned long message_id =0;
+    unsigned long request_id =0;
+
+
+
+
+    message_id  = message_address[1]; 
+    request_id  = message_address[2]; 
+
+    if(message_id != 2222)
+    {
+        gwssrv_debug_print ("gwssrv_init_client_support: [ERROR] message id\n");
+                    printf ("gwssrv_init_client_support: [ERROR] message id\n");
+        return -1;
+    }
+    
+    switch (request_id){
+
+        // 1 =  Close server.
+        case 1:
+            gwssrv_debug_print ("gwssrv_init_client_support: [request 1] Closing server\n");
+                        printf ("gwssrv_init_client_support: [request 1] Closing server\n");
+            exit(0);
+            break;
+        
+        //case 2:
+        
+        
+        default:
+            gwssrv_debug_print ("gwssrv_init_client_support: [ERROR] bad request\n");
+                        printf ("gwssrv_init_client_support: [ERROR] bad request\n");
+
+            break;
+    };
+    
+    return -1;
+}
+
+
 
 
 
@@ -2382,13 +2433,17 @@ int main (int argc, char **argv){
         // Calling child.
         //printf ("gwssrv: Calling child \n");  
 
+        // main tests
         gwssrv_clone_and_execute ("gws.bin");      // command gws.bin
-        //gwssrv_clone_and_execute ("gwm.bin");      // window manager
+        //gwssrv_clone_and_execute ("browser.bin");
         //gwssrv_clone_and_execute ("fileman.bin");  
         //gwssrv_clone_and_execute ("editor.bin");           
-        //gwssrv_clone_and_execute ("terminal.bin");  
-        //gwssrv_clone_and_execute ("browser.bin");
         //gwssrv_clone_and_execute ("launch1.bin"); 
+
+        
+        // extra        
+        //gwssrv_clone_and_execute ("gwm.bin");      // window manager
+        //gwssrv_clone_and_execute ("terminal.bin");  
         //gwssrv_clone_and_execute ("s2.bin");      // shell  
         //gwssrv_clone_and_execute ("s3.bin");    // hello        
         // ...
