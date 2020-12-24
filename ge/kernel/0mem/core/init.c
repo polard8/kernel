@@ -438,13 +438,6 @@ int init (void){
     debug_print ("core-init: [FIXME] Initialize mounted list in fs.c\n");
 
 
-
-#ifdef EXECVE_VERBOSE
-    printk ("core-init: initialize_system_message_queue\n");
-#endif
-
-    initialize_system_message_queue (); 
-
 	//
 	// Network
 	//

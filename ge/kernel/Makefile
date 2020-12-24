@@ -94,10 +94,10 @@ ifeq ($(ARCH),x86)
 	ata.o atadma.o atainit.o atairq.o atapci.o hdd.o \
 	channel.o network.o e1000.o \
 	pci.o pciinfo.o pciscan.o \
-	console.o tty.o pty.o vt.o\
+	console.o tty.o tty_io.o pty.o vt.o\
 	usb.o \
 	video.o vsync.o screen.o r_render.o xproc.o \
-	i8042.o keyboard.o mouse.o ps2kbd.o ps2mouse.o ldisc.o \
+	i8042.o keyboard.o mouse.o ps2kbd.o ps2mouse.o \
 	apic.o pic.o rtc.o serial.o pit.o  
 	
 	KSERVERS_OBJECTS := cf.o format.o pipe.o fs.o read.o search.o write.o \
@@ -401,10 +401,9 @@ all-c:
 	$(CC) -c 2io/dev/tty/vt/vt.c        $(KINCLUDE) $(CFLAGS) -o vt.o
 
     # tty infra structure
-	$(CC) -c 2io/dev/tty/ldisc.c        $(KINCLUDE) $(CFLAGS) -o ldisc.o
-	$(CC) -c 2io/dev/tty/tty.c          $(KINCLUDE) $(CFLAGS) -o tty.o
-	$(CC) -c 2io/dev/tty/pty.c          $(KINCLUDE) $(CFLAGS) -o pty.o
-
+	$(CC) -c 2io/dev/tty/tty_io.c  $(KINCLUDE) $(CFLAGS) -o tty_io.o
+	$(CC) -c 2io/dev/tty/tty.c     $(KINCLUDE) $(CFLAGS) -o tty.o
+	$(CC) -c 2io/dev/tty/pty.c     $(KINCLUDE) $(CFLAGS) -o pty.o
 
 
 ## Step2 link-kernel-image  - Linking the kernel image.
