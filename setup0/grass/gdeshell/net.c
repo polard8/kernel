@@ -315,7 +315,7 @@ void network_initialize (void)
  */
  
 // Initialize ring0 network support.
-// Reading the buffers sended by the kernel.
+// Reading the buffers sent by the kernel.
 
 void network(void)
 {
@@ -380,8 +380,8 @@ print_ethernet_header (
         eth->src[0], eth->src[1], eth->src[2], 
         eth->src[3], eth->src[4], eth->src[5] );
  
-    printf ("   |-Protocol            : %u \n",
-        (unsigned short)eth->type);
+    printf ("   |-Ethertype           : %x \n",
+        (unsigned short) eth->type);
 }
 
 
@@ -412,9 +412,26 @@ void print_arp_header ( char *Buffer )
     for( i=0; i<6; i++){ printf("%x ",h->arp_tha[i]); }
     printf ("\n target: ip ");
     for( i=0; i<4; i++){ printf("%d ",h->arp_tpa[i]); }
+
+    // Se enviaram o request para o ip do gramado.
+    // 192.168.1.112
+    if ( h->arp_tpa[0] == 192 &&
+         h->arp_tpa[1] == 168 &&
+         h->arp_tpa[2] == 1   &&
+         h->arp_tpa[3] == 112 )
+    {
+        printf ("  ==  MY IP ==  ");
+    }
+
     printf ("\n\n");
 
     //==================================
+}
+
+void print_ipv4_header ( char *Buffer )
+{
+    printf ("print_ipv4_header:\n");
+    printf ("\n\n");
 }
 
 
@@ -458,11 +475,9 @@ int network_decode_buffer ( unsigned long buffer_address )
     
     eh = (void *) buffer_address;
 
-    if ( (void *) eh == NULL )
-    {
+    if ( (void *) eh == NULL ){
         printf ("network_decode_buffer: [FAIL] Ethernet header\n");
         return -1;
-
     }else{
 
         // Print ethernet header.
@@ -490,7 +505,7 @@ int network_decode_buffer ( unsigned long buffer_address )
     
     Type = gdeshell_FromNetByteOrder16(eh->type);
     
-    switch ( (uint16_t) Type){
+    switch ( (uint16_t) Type ){
 
         // ::: IPV4
         // 0x0800	Internet Protocol version 4 (IPv4)
@@ -499,7 +514,8 @@ int network_decode_buffer ( unsigned long buffer_address )
         
         case 0x0800:
             printf ("[0x0800]: IPV4 received.\n");
-           
+            print_ipv4_header ((char *)buffer_address);
+
            //#test
            //notificando ...(ok funcionou.)
            //network_procedure ( NULL, 3000, 0,0 ); 
@@ -599,10 +615,10 @@ void network_loop(void)
 
     // + Get the packet.
     // + Decode the buffer.
+    // + 
+    
+    while (TRUE){
 
-    while (1)
-    {
-        // Input
         // IN: Service, buffer, lenght, nothing.
         gramado_system_call ( 890, 
             (unsigned long) &buf[0], (unsigned long) 1500, 0);

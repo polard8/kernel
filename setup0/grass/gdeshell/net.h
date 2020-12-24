@@ -7,10 +7,21 @@
 #define __NET_H    1
 
 
+// A TCP packet is constructed like this
+// Packet =                   { IP Header + TCP Header + Data }
+// Packet = { Ethernet header + Ip header + TCP header + Data }
+
 
 #define ETH_TYPE_IP     0x0800  
 #define ETH_TYPE_ARP    0x0806
- 
+// ...
+
+
+// payload size
+// mtu ??
+#define ETHERNET_PAYLOAD_MINIMUM  42
+#define ETHERNET_PAYLOAD_MAXIMUM  1500
+
  
 #define ARP_OPC_REQUEST  0x01
 #define ARP_OPC_REPLY    0x02
@@ -102,18 +113,24 @@ void __shellTestARP (void);
 
 void gdeshell_send_packet( unsigned long packet_buffer );
 
+
+//========================
+// printing the headers
 void 
 print_ethernet_header ( 
     const unsigned char *Buffer, 
     int Size );
-
 void print_arp_header ( char *Buffer );
+void print_ipv4_header ( char *Buffer );
 
+
+//========================
 // Testing network.
 int network_decode_buffer ( unsigned long buffer_address );
 void network_loop(void);
 void network_initialize (void);
 void network(void);
+
 
 
 // Testa rotinas do kernel.
