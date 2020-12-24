@@ -1,6 +1,8 @@
 /*
  * File: stdio.h
  *
+ *     Standard IO facilities.
+ * 
  *     I/O routines support.
  *     c99 - ISO/IEC 9899:1999
  *
@@ -383,8 +385,25 @@ int prompt_status;
 
 
 
+//======================================================
+// facility
 
 
+/*
+#define FACILITY_SETUP_READ   __SRD
+#define FACILITY_SETUP_WRITE  __SWR
+#define FACILITY_SETUP_RW     (__SRD|__SWR)
+#define facility_putc(__c, __stream)   fputc(__c, __stream)
+#define facility_putchar(__c)   fputc(__c, stdout)
+#define facility_getc(__stream)   fgetc(__stream)
+#define facility_getchar()   fgetc(stdin)
+
+
+#define facility__sfeof(p)      (((p)->_flags & __SEOF) != 0)
+#define facility__sferror(p)    (((p)->_flags & __SERR) != 0)
+#define facility__sclearerr(p)  ((void)((p)->_flags &= ~(__SERR|__SEOF)))
+#define facility__sfileno(p)    ((p)->_file)
+*/
 
 
 //===========================================
@@ -556,9 +575,21 @@ void perror (const char *str);
 int stdout_printf (const char *format, ...);
 int stderr_printf (const char *format, ...);
 
+
+
+
 //
-// printf saga.
+// == printf saga ============================================
 //
+
+
+/*
+// #todo
+// Parece que essa versao pode ser usado com nosso helper de printf.
+// See: https://man7.org/linux/man-pages/man3/asprintf.3.html
+//int asprintf(char **strp, const char *fmt, ...);
+//int vasprintf(char **strp, const char *fmt, va_list ap);
+*/
 
 // Non traditional. It is working very well.
 int printf(const char *format, ...); 

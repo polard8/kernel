@@ -855,11 +855,17 @@ int sys_read (unsigned int fd, char *ubuf, int count)
     }
 
     // count.
-    if (count<=0){
-        debug_print ("sys_read: count\n");
-        printf      ("sys_read: count\n");
-        goto fail;
+    
+    if ( count < 0 ){ 
+        debug_print ("sys_read: count < 0\n");
+        return -1; 
     }
+    
+    if ( count == 0 ){ 
+        debug_print ("sys_read: count 0\n");
+        return 0; 
+    }
+    
 
     // Size of the buffer.
     ubuf_len = strlen( (const char *) ubuf );
@@ -889,8 +895,7 @@ int sys_read (unsigned int fd, char *ubuf, int count)
     if ( (void *) __P == NULL )
     {
         debug_print ("sys_read: __P\n");
-        printf      ("sys_read: __P\n");
-        goto fail; 
+        panic       ("sys_read: __P\n");
     }
 
     // File.
@@ -902,6 +907,17 @@ int sys_read (unsigned int fd, char *ubuf, int count)
         printf      ("sys_read: __file not open\n");
         goto fail; 
     }
+
+
+    /*
+    // #todo
+    // ainda nao inicializamos esse elemento.
+    if( __file->is_readable == 0)
+    {
+        debug_print ("sys_read: Not readable\n");
+        return -1;
+    }
+    */
 
 
 
@@ -1001,13 +1017,24 @@ int sys_read (unsigned int fd, char *ubuf, int count)
     // Se o arquivo for um socket.
     if ( __file->____object == ObjectTypeSocket )
     {
+
+        // not reading yet
+        if ((__file->_flags & __SRD) == 0) 
+        {
+            goto fail;
+        }
+
         nbytes = 0;
 
         // vazio? acorda escritores e dorme.
         if (__file->socket_buffer_full == FALSE)
         { 
+            debug_print("sys_read: can't read an empty buffer\n");
+            goto fail;
+            
             debug_print("sys_read: WAKEUP WRITER\n");
             __file->_flags |= __SWR;                  // pode escrever
+
             do_thread_ready( __file->tid_waiting );   // acorda escritores. 
             
             debug_print("sys_read: SLEEP READER\n");
@@ -1020,11 +1047,16 @@ int sys_read (unsigned int fd, char *ubuf, int count)
         // cheio? le e acorda escritores.
         if (__file->socket_buffer_full == TRUE)
         {
-            // read!
-            nbytes = (int) file_read_buffer ( 
-                               (file *) __file, 
-                              (char *) ubuf, 
-                              (int) count );
+            if( __file->_flags & __SRD )
+            {
+                debug_print ("sys_read: >>>> READ\n");
+            
+            
+                // read!
+                nbytes = (int) file_read_buffer ( 
+                                   (file *) __file, 
+                                   (char *) ubuf, 
+                                   (int) count );
         
             if (nbytes <= 0){
                 debug_print("sys_read: [FAIL] file_read_buffer fail when reading a socket \n");
@@ -1036,11 +1068,13 @@ int sys_read (unsigned int fd, char *ubuf, int count)
             {
                 debug_print("sys_read: [DEBUG] lemos mais que 0 bytes em um socket.\n");
                 __file->socket_buffer_full = FALSE;     // buffer vazio
+                __file->_flags &= ~__SRD;                 //nao posso mais LER.            
                 __file->_flags |= __SWR;                // pode escrever.
                 debug_print("sys_read: WAKEUP WRITER\n");
                 do_thread_ready( __file->tid_waiting ); // acorda escritores.
                 debug_print("sys_read:done\n");
                 return (int) nbytes;                    // bytes escritos.
+            }
             }
         } 
 
@@ -1244,8 +1278,16 @@ int sys_write (unsigned int fd, char *ubuf, int count)
         debug_print ("sys_write: invalid ubuf address\n");  goto fail;
     }
 
-    if (count<=0){
-        debug_print ("sys_write: count\n");  goto fail;
+    // count.
+    
+    if ( count < 0 ){ 
+        debug_print ("sys_read: count < 0\n");
+        return -1; 
+    }
+    
+    if ( count == 0 ){ 
+        debug_print ("sys_read: count 0\n");
+        return 0; 
     }
 
 
@@ -1284,12 +1326,11 @@ int sys_write (unsigned int fd, char *ubuf, int count)
 
     __P = (struct process_d *) processList[current_process];
 
-    if ( (void *) __P == NULL ){
+    if ( (void *) __P == NULL )
+    {
         debug_print ("sys_write: __P\n");
-        //printf ("sys_write: __P\n");
-        goto fail;
+        panic       ("sys_write: __P\n");
     }
-
 
     //
     // __file.
@@ -1297,11 +1338,24 @@ int sys_write (unsigned int fd, char *ubuf, int count)
 
     __file = (file *) __P->Objects[fd]; 
     
-    if ( (void *) __file == NULL ){
+    if ( (void *) __file == NULL )
+    {
         debug_print ("sys_write: __file not open\n");
-        //printf ("sys_write: __file not open\n");
+        printf      ("sys_write: __file not open\n");
         goto fail;
     }
+    
+
+    /*
+    // #todo
+    // ainda nao inicializamos esse elemento.
+    if( __file->is_writable == 0)
+    {
+        debug_print ("sys_write: Not writable\n");
+        return -1;
+    }
+    */
+
 
 
     // escrevendo no stdin
@@ -1376,31 +1430,46 @@ int sys_write (unsigned int fd, char *ubuf, int count)
     if ( __file->____object == ObjectTypeSocket )
     {
         nbytes = 0;
+
+        // not writing yet
+        if ((__file->_flags & __SWR) == 0) 
+        {
+            goto fail;
+        }
         
         // cheio? acorde os leitores para esvaziar.
         if ( __file->socket_buffer_full == TRUE )
         {
-            debug_print("sys_write: WAKEUP READER\n");
-            __file->_flags |= __SRD;                 // pode ler.
-            do_thread_ready( __file->tid_waiting );  // acorda leitores
+               debug_print("sys_write: can't write on a full buffer\n");
+               goto fail;
+                __file->_flags = 0;
+                debug_print("sys_write: WAKEUP READER\n");
+                __file->_flags |= __SRD;                 // pode ler.
+                do_thread_ready( __file->tid_waiting );  // acorda leitores
             
-            // dorme. 
-            // Se dormirmos sem escrever e retornarmos, 
-            // o aplicativo nao chamara a escrita novamente.
-            debug_print("sys_write: SLEEP WRITER\n");
-            panic ("sys_write: [DEBUG] Couldn't write in the socket. Buffer full!\n");
-            do_thread_waiting(current_thread);
-            __file->tid_waiting = current_thread;
+                // dorme. 
+                // Se dormirmos sem escrever e retornarmos, 
+                // o aplicativo nao chamara a escrita novamente.
+                debug_print("sys_write: SLEEP WRITER\n");
+                panic ("sys_write: [DEBUG] Couldn't write in the socket. Buffer full!\n");
+                do_thread_waiting(current_thread);
+                __file->tid_waiting = current_thread;
         }
-        
+
         // vazio? escreva e acorde os leitores.
         if ( __file->socket_buffer_full == FALSE )
         {
-            // Write in the socket buffer.
-            nbytes = (int) file_write_buffer ( 
-                               (file *) __file, 
-                               (char *) ubuf, 
-                               (int) count );
+            
+            if( __file->_flags & __SWR )
+            {
+                debug_print ("sys_write: >>>> WRITE\n");
+                __file->_flags = 0;
+            
+                // Write in the socket buffer.
+                nbytes = (int) file_write_buffer ( 
+                                   (file *) __file, 
+                                   (char *) ubuf, 
+                                   (int) count );
 
             // fail
             if (nbytes <= 0){
@@ -1413,6 +1482,7 @@ int sys_write (unsigned int fd, char *ubuf, int count)
             { 
                 debug_print("sys_write: WAKEUP READER\n");
                 __file->socket_buffer_full = TRUE;       // buffer cheio
+                __file->_flags &= ~__SWR;                 //nao posso mais ESCREVER.            
                 __file->_flags |= __SRD;                 // pode ler 
                 do_thread_ready( __file->tid_waiting );  // acorda leitores
                 
@@ -1422,6 +1492,8 @@ int sys_write (unsigned int fd, char *ubuf, int count)
                   
                 
                 return nbytes;                           // bytes written
+            }
+            
             }
         }
         

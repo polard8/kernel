@@ -1444,6 +1444,20 @@ int init_threads (void){
 }
 
 
+
+/*
+// #todo
+// Retorna o ponteiro para estrutura dado o tid.
+struct thread_d *process_from_tid( int thread_tid );
+struct thread_d *process_from_tid( int thread_tid )
+{
+	//#todo
+    return (struct thread_d *) ??;
+}
+*/
+
+
+
 /*
  **********************************************************
  * thread_getchar:
@@ -1464,7 +1478,8 @@ int init_threads (void){
 
 // only keydown
 
-int thread_getchar (void){
+int thread_getchar (void)
+{
 
     unsigned char SC=0;
     int save=0;

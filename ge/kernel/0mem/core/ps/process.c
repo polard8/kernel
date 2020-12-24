@@ -2210,13 +2210,97 @@ void set_caller_process_id (int pid)
 
 
 /*
+// #todo
+// Retorna o ponteiro para estrutura dado o pid.
+struct process_d *process_from_pid( pid_t process_pid );
+struct process_d *process_from_pid( pid_t process_pid )
+{
+	//#todo
+    return (struct process_d *) ??;
+}
+*/
+
+
+/*
+char *process_cwd_string( pid_t process_pid );
+char *process_cwd_string( pid_t process_pid )
+{
+	//todo retorna o ponteiro para a string
+    return (char *) ?;
+}
+*/
+
+
+/*
+int process_finalize(pid_t process_pid);
+int process_finalize(pid_t process_pid)
+{
+	//todo
+    return 0;
+}
+*/
+
+
+/*
+int process_unblock_waiters(pid_t process_pid);
+int process_unblock_waiters(pid_t process_pid)
+{}
+*/
+
+/*
+int process_die(pid_t process_pid);
+int process_die(pid_t process_pid)
+{
+    //todo
+    // process_kill_all_threads ();
+}
+*/
+
+
+/*
+int process_kill_all_threads(pid_t process_pid);
+int process_kill_all_threads(pid_t process_pid)
+{
+    //todo
+}
+*/
+
+
+/*
+//int process_create_kernel_thread(...);
+//int process_create_kernel_thread(...){}
+*/
+
+
+/*
+void process_set_tty( tty_d *tty);
+void process_set_tty( tty_d *tty)
+{}
+*/
+
+
+/*
+//ja teve ter um helper que faz isso.
+pid_t process_allocate_pid(void);
+pid_t process_allocate_pid(void)
+{}
+*/
+
+
+
+
+
+
+
+/*
  *************************************************
  * init_process_manager:
  *     Initialize process manager.
  *     processInitializeProcessManager();
  */
 
-int init_process_manager (void){
+int init_process_manager (void)
+{
 
     caller_process_id = (int) 0;
 

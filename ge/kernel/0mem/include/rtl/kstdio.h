@@ -260,6 +260,12 @@ struct file_d
     // == (1) storage ========
     //
     
+    /*
+     #todo
+    unsigned long size_in_image;    //KB
+    unsigned long size_in_memory;   //KB
+    */
+    
     // The buffer. The box.
 
 	//Current position of file pointer (absolute address).
@@ -318,6 +324,13 @@ struct file_d
     //
     // == (2) synchronization ========
     //
+
+    // isso eh coisa do fs
+    // deve ficar na entrada do diretrio ou no inode?
+    int is_readable;
+    int is_writable;
+    int is_executable;
+
 
 	// flags, below; this FILE is free if 0 	
 	// Flags (see FileFlags). the state of the stream
