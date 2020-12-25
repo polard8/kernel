@@ -47,6 +47,10 @@
 //  == Product version ==========================================
 //
 
+// #todo
+// Now we are generating some files in the build time.
+// We can read these files to get all that info.
+// Maybe we will delete all these defines here.
 
 #define VERSION_MAJOR     1
 #define VERSION_MINOR     0

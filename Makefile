@@ -1,9 +1,12 @@
 # License: BSD License
+# Product configuration
+# See: 0config/version.h
 PRODUCT_NAME  = Gramado Operating System
+EDITION_NAME  = Gramado 1.0
 VERSION_MAJOR = 1
 VERSION_MINOR = 0
-VERSION_BUILD = 195
-# See: config/version.h
+VERSION_BUILD = 196
+KERNELVERSION = $(VERSION_MAJOR)$(if $(VERSION_MINOR),.$(VERSION_MINOR)$(if $(VERSION_BUILD),.$(VERSION_BUILD)))
 
 # Documentation.
 # See: docs/
@@ -16,7 +19,6 @@ _all: all
 
 # ==========================================
 # Variables.
-KERNELVERSION = $(VERSION_MAJOR)$(if $(VERSION_MINOR),.$(VERSION_MINOR)$(if $(VERSION_BUILD),.$(VERSION_BUILD)))
 
 export KBUILD_IMAGE ?= KERNEL.BIN 
 
@@ -80,7 +82,8 @@ vhd-mount \
 vhd-copy-files \
 vhd-unmount \
 clean \
-clean-system-files
+clean-system-files \
+generate    
 
 # Giving permitions to run ./run hahaha
 	chmod 755 ./run
@@ -88,6 +91,7 @@ clean-system-files
 # Product info:
 	@echo "$(PRODUCT_NAME) $(KERNELVERSION)"
 #	@echo "$(ARCH)"
+
 
 
 #===================================================
@@ -470,6 +474,31 @@ kernel-section-headers:
 gcc-test:
 #	chmod 755 ./scripts/gcccheck
 #	./scripts/gcccheck
+
+
+# product configuration
+generate:
+	# Create files.
+	touch PRODUCT.TXT
+	touch EDITION.TXT
+	touch MAJOR.TXT
+	touch MINOR.TXT
+	touch BUILD.TXT
+	touch VERSION.TXT
+	# Save information.
+	@echo $(PRODUCT_NAME)  > PRODUCT.TXT
+	@echo $(EDITION_NAME)  > EDITION.TXT
+	@echo $(VERSION_MAJOR) > MAJOR.TXT
+	@echo $(VERSION_MINOR) > MINOR.TXT
+	@echo $(VERSION_BUILD) > BUILD.TXT
+	@echo $(KERNELVERSION) > VERSION.TXT
+	# Install in the base folder.
+	-mv PRODUCT.TXT  base/
+	-mv EDITION.TXT  base/
+	-mv MAJOR.TXT    base/
+	-mv MINOR.TXT    base/
+	-mv BUILD.TXT    base/
+	-mv VERSION.TXT  base/
 
 
 #
