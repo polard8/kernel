@@ -54,7 +54,7 @@ main.o:
 
 all-c:
 
-	gcc  -c  api.c   $(CFLAGS) -I include/ -I ../../../ge/rtl/include/ -o api.o
+	gcc  -c  api.c   $(CFLAGS) -I include/ -I ../rtl/include/ -o api.o
 
 
 #create 'ar'

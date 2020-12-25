@@ -103,6 +103,7 @@ build-system-files: \
 ge-boot \
 ge-kernel \
 ge-rtl \
+ge-libcore \
 ge-lib \
 ge-init \
 ge-aurora \
@@ -140,6 +141,14 @@ ge-rtl:
 	@echo "==================="
 	@echo "Compiling rtl ..."
 	$(Q) $(MAKE) -C ge/rtl/
+
+ge-libcore:
+	#::libcore
+	@echo "==================="
+	@echo "Compiling libcore ..."
+	$(Q) $(MAKE) -C ge/libcore/
+
+
 ge-lib:
 	#::lib
 	@echo "==================="
@@ -288,6 +297,10 @@ clean:
 	@echo "(Step 6) Deleting the object files ..."
 	-rm *.o
 	-rm -rf ge/rtl/obj/*.o
+	-rm -rf ge/libcore/obj/*.o
+	-rm -rf ge/lib/libgns/obj/*.o
+	-rm -rf ge/lib/libgws/obj/*.o
+	-rm -rf ge/lib/libio01/obj/*.o
 	@echo "Success?"
 # clean ISO and VHD.
 clean2:

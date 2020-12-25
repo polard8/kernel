@@ -2,9 +2,6 @@
 
 all:
 
-	# lib
-	make -C libcore
-
 	# main apps.
 	make -C gramcode
 	make -C gdeshell

@@ -49,10 +49,8 @@ CFLAGS = -m32 \
 
 LIBC    = ../../../ge/rtl/include/
 LIBCOBJ = ../../../ge/rtl/obj
-
-API     = ../libcore/include/
-APIOBJ  = ../libcore/obj
-
+API     = ../../../ge/libcore/include/
+APIOBJ  = ../../../ge/libcore/obj
 
 	##
 	## Objects

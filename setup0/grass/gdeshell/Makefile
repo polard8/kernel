@@ -54,9 +54,8 @@ CFLAGS = -m32 \
 # depois vamos mudar  alib de lugar.
 LIB     = ../../../ge/rtl/include/
 LIBOBJ  = ../../../ge/rtl/obj
-
-API     = ../libcore/include/
-APIOBJ  = ../libcore/obj
+API     = ../../../ge/libcore/include/
+APIOBJ  = ../../../ge/libcore/obj
 
 
 	#
