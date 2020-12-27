@@ -58,11 +58,12 @@ See the [Gramado OS build instructions](https://github.com/frednora/gramado/blob
 
 ## Testing
 
+```
+	$ ./run
+	$ make qemu-test
+```
+
 You can run the VHD on Oracle Virtual Box and qemu.
-
-$ ./run
-$ make qemu-test
-
 Please, give us some feedback.
 
 ## Documentation
