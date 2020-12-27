@@ -226,13 +226,11 @@ setup2-cmd:
 #	-sudo cp setup2/cmd/bin/TRUE.BIN       base/
 
 desert:
-
 	# todo
 	# Copy only the base of the desert inside the base of gramado.
-	-sudo cp ../desert/base/*.BIN  base/
-	-sudo cp ../desert/base/*.TXT  base/
-
-	-sudo cp ../desert/setup3/cmd/bin/*.BIN  base/
+	#-sudo cp ../desert/base/*.BIN  base/
+	#-sudo cp ../desert/base/*.TXT  base/
+	#-sudo cp ../desert/setup3/cmd/bin/*.BIN  base/
 	
 # 
 # more setups ? ...
