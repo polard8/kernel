@@ -335,7 +335,12 @@ bind (
 // The  listen()  function	call first appeared in 4.2BSD.
 int listen (int sockfd, int backlog);
 
+
+
+int accept4 (int sockfd, struct sockaddr *addr, socklen_t *addrlen, int flags);
+
 // alternative way
+// Created by Fred Nora.
 int accept2 (int sockfd, struct sockaddr *addr, socklen_t *addrlen);
 
 // accept

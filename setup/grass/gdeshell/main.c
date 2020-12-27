@@ -2716,7 +2716,7 @@ do_compare:
     }
 
 
-    // t18
+    // t8
     // Testando a criaçao de botao e a interaçao com ele 
     // atraves do mouse.
     if ( gramado_strncmp( prompt, "t8", 2 ) == 0 )
@@ -2724,6 +2724,15 @@ do_compare:
         printf ("t8: Creating buttons \n");
         shellTestButtons ();
         gde_show_backbuffer ();
+        goto exit_cmp;
+    }
+
+    // t9: Test pipe.
+    // See: rtl.c
+    if ( gramado_strncmp( prompt, "t9", 2 ) == 0 )
+    {
+        printf ("t9: Test pipe \n");
+        rtl_test_pipe();
         goto exit_cmp;
     }
 

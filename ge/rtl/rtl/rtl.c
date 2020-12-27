@@ -1181,3 +1181,54 @@ int rtl_vector_count (char **vector)
 
 
 
+void rtl_test_pipe (void)
+{
+  int pipefd[2];
+  char buf[1024];
+  
+  int bytes_read=0;
+  int res=0;
+
+
+  printf ("rtl_test_pipe:\n");
+
+  //0 if no error.
+  res = pipe (pipefd);
+  if (res<0)
+  {
+      printf("res fail\n");
+      return;
+  }
+
+  // write on pipe 1
+  write (pipefd[1], "hello", sizeof ("hello"));
+  
+  // clear buffer.
+  memset (buf, 0, sizeof (buf));
+  
+  // read pipe 0
+  bytes_read = read (pipefd[0], buf, sizeof(buf) - 1);
+
+  if (bytes_read<0)
+  {
+      printf("bytes_read fail\n");
+      return;
+  }
+
+  // finalize the string.  
+  buf[bytes_read] = '\0';
+
+  // Close both pipes.
+  close (pipefd[0]);
+  close (pipefd[1]);
+
+  // show buffer.
+  printf("BUFFER={%s}\n",buf);
+  
+  return;
+}
+
+
+
+
+

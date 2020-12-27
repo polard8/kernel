@@ -175,6 +175,15 @@ int listen (int sockfd, int backlog)
 }
 
 
+// #todo
+// See: https://linux.die.net/man/2/accept4
+int accept4 (int sockfd, struct sockaddr *addr, socklen_t *addrlen, int flags)
+{
+    printf ("accept4: [TODO] Not implemented yet\n");
+    return -1;
+}
+
+
 /*
   The accept() system call is used with connection-based socket 
   types (SOCK_STREAM, SOCK_SEQPACKET).  
@@ -190,6 +199,9 @@ int listen (int sockfd, int backlog)
 //  that is a file descriptor for the accepted socket.  
 // On error, -1 is returned, errno is set appropriately, 
 // and addrlen is left unchanged.
+
+// #test
+// Created by Fred Nora.
 
 int accept2 (int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 {

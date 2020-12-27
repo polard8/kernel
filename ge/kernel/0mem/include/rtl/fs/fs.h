@@ -19,6 +19,20 @@
 //
 
 
+
+#ifndef DIRECTORY_SEPARATOR
+# define DIRECTORY_SEPARATOR '/'
+#endif
+
+
+
+#ifndef ISSLASH
+# define ISSLASH(C) ((C) == DIRECTORY_SEPARATOR)
+#endif
+
+
+
+
 // Filesystem types.
 #define  FS_TYPE_NULL   0
 #define  FS_TYPE_GVFS   1000  // Gramado Virtual File System.
