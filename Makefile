@@ -188,49 +188,49 @@ ge-services:
 # ~ Step 1 Setup directories.
 PHONY := build-applications 
 build-applications: \
-setup0-grass \
-setup1-apps \
-setup1-net \
-setup2-cmd \
+setup-grass \
+setup-apps \
+setup-net \
+setup-cmd \
 desert    
 
-
-
-setup0-grass:
+setup-grass:
 	#::grass
-	$(Q) $(MAKE) -C setup0/grass/
-	sudo cp setup0/grass/bin/GRAMCODE.BIN  base/
-	sudo cp setup0/grass/bin/GDESHELL.BIN  base/
-	sudo cp setup0/grass/bin/GDESHELL.BIN  base/SBIN
-	sudo cp setup0/grass/bin/LAUNCHER.BIN  base/
-	sudo cp setup0/grass/bin/SYSMON.BIN    base/
+	$(Q) $(MAKE) -C setup/grass/
+	sudo cp setup/grass/bin/GRAMCODE.BIN  base/
+	sudo cp setup/grass/bin/GDESHELL.BIN  base/
+	sudo cp setup/grass/bin/GDESHELL.BIN  base/SBIN
+	sudo cp setup/grass/bin/LAUNCHER.BIN  base/
+	sudo cp setup/grass/bin/SYSMON.BIN    base/
 
-setup1-apps:
+setup-apps:
 	#::apps
-	$(Q) $(MAKE) -C setup1/apps/
-	-sudo cp setup1/apps/bin/EDITOR.BIN  base/
-	-sudo cp setup1/apps/bin/FILEMAN.BIN  base/
+	$(Q) $(MAKE) -C setup/apps/
+	-sudo cp setup/apps/bin/EDITOR.BIN   base/
+	-sudo cp setup/apps/bin/FILEMAN.BIN  base/
 
-setup1-net:
+setup-net:
 	#::net
-	$(Q) $(MAKE) -C setup1/net/
-	-sudo cp setup1/net/bin/*.BIN  base/
-#	-sudo cp setup1/net/bin/*.BIN  base/PROGRAMS
+	$(Q) $(MAKE) -C setup/net/
+	-sudo cp setup/net/bin/*.BIN  base/
+#	-sudo cp setup/net/bin/*.BIN  base/PROGRAMS
 
-setup2-cmd:
+setup-cmd:
 	#::cmd
-	$(Q) $(MAKE) -C setup2/cmd/
-	-sudo cp setup2/cmd/bin/CAT.BIN        base/
-#	-sudo cp setup2/cmd/bin/FALSE.BIN      base/
-	-sudo cp setup2/cmd/bin/REBOOT.BIN     base/
-#	-sudo cp setup2/cmd/bin/TRUE.BIN       base/
+	$(Q) $(MAKE) -C setup/cmd/
+	-sudo cp setup/cmd/bin/CAT.BIN        base/
+#	-sudo cp setup/cmd/bin/FALSE.BIN      base/
+	-sudo cp setup/cmd/bin/REBOOT.BIN     base/
+#	-sudo cp setup/cmd/bin/TRUE.BIN       base/
+
+#========================================
 
 desert:
 	# todo
 	# Copy only the base of the desert inside the base of gramado.
 	#-sudo cp ../desert/base/*.BIN  base/
 	#-sudo cp ../desert/base/*.TXT  base/
-	#-sudo cp ../desert/setup3/cmd/bin/*.BIN  base/
+	#-sudo cp ../desert/setup/cmd/bin/*.BIN  base/
 	
 # 
 # more setups ? ...
@@ -306,10 +306,10 @@ clean2:
 	-rm *.VHD
 # clean setup
 clean3:
-	-rm setup0/grass/bin/*.BIN
-	-rm setup1/apps/bin/*.BIN
-	-rm setup1/net/bin/*.BIN
-	-rm setup2/cmd/bin/*.BIN
+	-rm setup/grass/bin/*.BIN
+	-rm setup/apps/bin/*.BIN
+	-rm setup/net/bin/*.BIN
+	-rm setup/cmd/bin/*.BIN
 # clean base
 clean4:
 	-rm -rf base/*.BIN 
@@ -323,23 +323,18 @@ PHONY := clean-system-files
 clean-system-files:
 	@echo "==================="
 	@echo "Cleaning all system binaries ..."
-	# Gramado
+
 	-rm -rf ge/boot/x86/bin/*.BIN
 	-rm -rf ge/kernel/KERNEL.BIN
-	# Init
 	-rm -rf ge/init/*.BIN
-	# fonts
 	-rm -rf ge/fonts/bin/*.FON
-	# aurora
 	-rm -rf ge/aurora/bin/*.BIN
-	# Services
 	-rm -rf ge/services/gnssrv/bin/*.BIN
-	# ...
-	# Setup
-	-rm -rf setup0/grass/bin/*.BIN
-	-rm -rf setup1/apps/bin/*.BIN
-	-rm -rf setup1/net/bin/*.BIN
-	-rm -rf setup2/cmd/bin/*.BIN
+
+	-rm -rf setup/grass/bin/*.BIN
+	-rm -rf setup/apps/bin/*.BIN
+	-rm -rf setup/net/bin/*.BIN
+	-rm -rf setup/cmd/bin/*.BIN
 # ...
 
 
