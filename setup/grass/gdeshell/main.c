@@ -1353,36 +1353,32 @@ void shellWaitCmd (void)
  * + Stephen Brennan - https://brennan.io/2015/01/16/write-a-shell-in-c/
  * + Frederico Martins Nora (frednora)
  */
- 
-//#TEST 
-//#define LSH_TOK_DELIM " \t\r\n\a+!:=/.<>;|&" 
- 
-#define LSH_TOK_DELIM " \t\r\n\a" 
+
+
+#define LSH_TOK_DELIM   " \t\r\n\a" 
+#define LSH_TOK_DELIM2  " \t\r\n\a+!:=/.<>;|&" 
 #define SPACE " "
 #define TOKENLIST_MAX_DEFAULT 80
- 
+
+
 unsigned long shellCompare (struct window_d *window)
 {
-    //
     // Token support.
-    //
 
-    //char **stringarray1;
     char *tokenList[TOKENLIST_MAX_DEFAULT];
     char *token;
-    int ____token_count;
-    int ____last;
+    int ____token_count=0;
+    int ____last=0;
     int i = 0;
     int j = 0;
 
+
     int __background = 0;   //&
-
-    unsigned long ret_value;
-    int q;    //di�logo
+    unsigned long ret_value=0;
+    int q=0;    //dialog
     char *c;
+    int absolute=0;     // #bugbug: Absolute pathname?
 
-    // #bugbug: Absolute pathname?
-    int absolute; 
 
 	// #importante:
 	// Transferir toda alinha de comando para a mem�ria compartilhada.
@@ -1392,8 +1388,9 @@ unsigned long shellCompare (struct window_d *window)
     unsigned char *shared_memory = (unsigned char *) (0xC0800000 -0x100);
 
     // Linha de 80 chars no max.
-    for ( i=0; i<80; i++ ){
-        shared_memory[i] = prompt[i];
+    for ( i=0; i<80; i++ )
+    {  
+        shared_memory[i] = prompt[i];  
     };
 
 
@@ -1453,7 +1450,7 @@ fixing_command_line:
             j++;
             if ( j > wlMaxColumns ){
                printf ("shellCompare: The command line is too long or there is no terminator! \n");
-               exit (1);
+               exit(1);
             }
 
             c++; 
@@ -1464,7 +1461,8 @@ fixing_command_line:
 		// de fim de string, significa que o usu�rio digitou um monte 
 		// de espa�os depois apertou enter. N�o h� mais o que fazer.
 
-        if ( *c == '\0' ){
+        if ( *c == '\0' )
+        {
             shellInsertLF();
             goto exit_cmp;
         }
@@ -1481,7 +1479,7 @@ fixing_command_line:
 		// do buffer?
 		// Tamanho da janela menos a quantidade de espa�os encontrados.
  
-		int ____coolbytes = (wlMaxColumns-j);
+        int ____coolbytes = (wlMaxColumns-j);
 
 		// Copia todo o resto da linha para o inpicio da linha.
 		// Se enquanto estamos copiando, ja copiamos o finalizador 
@@ -1492,9 +1490,7 @@ fixing_command_line:
         {
             prompt[j] = c[j];
 
-            if ( *c == '\0' ){
-                goto commandlineOk;
-            }
+            if ( *c == '\0' ){  goto commandlineOk;  }
         };
 
 
@@ -1502,10 +1498,7 @@ fixing_command_line:
         //se estamos aqui � porque copiamos quase 80 chars.		
     };
 
-
-    //
     // Command line ok.
-    //
 
 commandlineOk:
 
@@ -1782,9 +1775,9 @@ do_compare:
     // =============================================================
 
 
-//
+// =================================================================
 // == The commands start here ======================================
-//
+// =================================================================
 
     // #obs:
     // Em ordem alfabética.
@@ -1806,7 +1799,6 @@ do_compare:
         goto exit_cmp;
     }
 
-
     // arp-test
     if ( strncmp ( prompt, "arp-test", 8 ) == 0 ){
         //testSendARP ();
@@ -1820,8 +1812,8 @@ do_compare:
     // Cuidado.
     unsigned long __bi_disk_number;
     if ( strncmp ( prompt, "boot", 4 ) == 0 ){
-        __bi_disk_number = (unsigned long) gramado_system_call ( 293, 
-                                               3, 0, 0 );
+        __bi_disk_number = (unsigned long) gramado_system_call ( 
+                                               293, 3, 0, 0 );
         printf ("disk_number %x \n", __bi_disk_number );
         goto exit_cmp;
     }
@@ -1862,10 +1854,32 @@ do_compare:
     }
 
 
-
     // close
-    if ( strncmp( prompt, "close", 5 ) == 0 ){
-        shellSendMessage ( NULL, MSG_CLOSE, 0, 0 );
+    if ( strncmp( prompt, "close", 5 ) == 0 )
+    {
+        printf ("gdeshell: Testing close and fclose\n");
+        
+        // ok
+        //shellSendMessage ( NULL, MSG_CLOSE, 0, 0 );
+        
+        // ok
+        //close(0); close(1); close(2);
+        //close(STDIN_FILENO); close(STDOUT_FILENO); close(STDERR_FILENO);
+        //close(fileno(stdin)); close(fileno(stdout)); close(fileno(stderr));
+        
+        // #bugbug: 
+        // It fails. 
+        // Something is wrong when we create these structures in ring3
+        // see: stdio initialization on rtl.
+        fclose(stdin);  fclose(stdout);  fclose(stderr);
+        
+        goto exit_cmp;
+    }
+    
+    if ( strncmp( prompt, "flush", 5 ) == 0 )
+    {
+        printf ("gdeshell: Testing fflush\n");
+        fflush(stdin);  fflush(stdout);  fflush(stderr);
         goto exit_cmp;
     }
 
@@ -1880,8 +1894,10 @@ do_compare:
         goto exit_cmp;
     }
 
+    // ??
     // copy - Esse comando pode ser usado pra testar o fs.
-    if ( strncmp( prompt, "copy", 4 ) == 0 ){
+    if ( strncmp( prompt, "copy", 4 ) == 0 )
+    {
         copy_builtins ();
         goto exit_cmp;
     }
@@ -2508,21 +2524,24 @@ do_compare:
     // Testando a funçao socket() da libc
     // Pedimos para o servidor de rede enviar dados para o
     // processo atraves da stream configurada anteriormente.
-    if ( gramado_strncmp( prompt, "socket2", 7 ) == 0 )
-    {
-        net_socket_test2();
-        goto exit_cmp;
-    }
+    // if ( gramado_strncmp( prompt, "socket2", 7 ) == 0 )
+    // {
+    //     goto exit_cmp;
+    // }
+  
 
-
-    // ??
+    // t500 - Setup a ring3 net buffer for the current process.
+    // process->net_buffer = arg.
+    // Testando o servico 550.
+    // See: sci.c
     int __net_ret;
-    if ( gramado_strncmp( prompt, "test-net-2", 10 ) == 0 )
+    if ( gramado_strncmp( prompt, "t550", 4 ) == 0 )
     {
-         //#obs: Esse buffer eh global 
-         // para que o procedimento de janela possa acessalo
-         __net_ret = (int) gde_setup_net_buffer ( getpid(), 
-                               __net_buffer, sizeof(__net_buffer) );
+         // service 550.
+         __net_ret = (int) gde_setup_net_buffer ( 
+                               getpid(),                // PID 
+                               __net_buffer,            // buffer
+                               sizeof(__net_buffer) );  // buffer size
 
          if (__net_ret == 0){
              printf ("Ok buffer configurado\n");
@@ -2642,6 +2661,7 @@ do_compare:
         goto exit_cmp;
     }
 
+
     int crI;
     char crName[11];
     if ( gramado_strncmp( prompt, "tcreat", 6 ) == 0 )
@@ -2747,9 +2767,9 @@ do_compare:
         printf ("t11: Sending message to this process \n");
         gde_send_message ( 
              (struct window_d *) 0, 
-             (int) MSG_COMMAND, 
-             (unsigned long) CMD_ABOUT, 
-             (unsigned long) 0 );
+             (int)               MSG_COMMAND, 
+             (unsigned long)     CMD_ABOUT, 
+             (unsigned long)     0 );
         goto exit_cmp;
     }
 
@@ -2840,13 +2860,13 @@ do_compare:
     if ( gramado_strncmp ( prompt, "tty3", 4 ) == 0 )
     {
         if ( isatty(fileno(stdin)) == 0 ){
-            printf ("stdin is not a tty.\n");
+            printf ("stdin is not a tty\n");
         }
         if ( isatty(fileno(stdout)) == 0 ){
-            printf ("stdout is not a tty.\n");
+            printf ("stdout is not a tty\n");
         }
         if ( isatty(fileno(stderr)) == 0 ){
-            printf ("stderr is not a tty.\n");
+            printf ("stderr is not a tty\n");
         }
         goto exit_cmp;
     }
@@ -3128,9 +3148,9 @@ do_compare:
 
 
 
-	//
-	// Clone !
-	//
+    //
+    // == Clone ===============================================
+    //
 
     // Clonning the process!
     // Clone e executa o processo filho.
@@ -3138,17 +3158,20 @@ do_compare:
     // (&) podemos usar o 'e' comercial no fim da linha de comandos.  
 
     int fake_pid=-1;
-    fake_pid = (int) system_call ( 900, 
-                         (unsigned long) tokenList[0], 0, 0 ); 
+    
+    //fake_pid = (int) system_call ( 900, 
+    //                     (unsigned long) tokenList[0], 0, 0 ); 
 
+    fake_pid = (int) gde_clone_and_execute( (char *) tokenList[0] );
+    
     if (fake_pid < 0){
-        debug_print ("gdeshell: system call 900 fail!\n");
+        debug_print ("gdeshell: gde_clone_and_execute fail!\n");
         goto fail;
     }
 
 
     //
-    // Wait support   
+    // == Wait support =============================================   
     //
 
     int Wait_status=0;
@@ -3219,21 +3242,20 @@ fail:
     goto done;
     
 
-   //==========================================================
-   //                          EXIT CMP 
-   //==========================================================
+
+//
+// == exit_cmp =======================================================
+//
 
 exit_cmp:
 
     ret_value = 0;
 
-   // ===============
-   //      done 
-   // ================
-
 done:
-    
-    // Clean the list.
+
+    // Clean the token list.
+    // Show the prompt.
+
     for ( i=0; i<TOKENLIST_MAX_DEFAULT; i++ ){ tokenList[i] = NULL; };
 
     shellPrompt();

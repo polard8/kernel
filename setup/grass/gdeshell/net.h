@@ -132,14 +132,7 @@ void network_initialize (void);
 void network(void);
 
 
-
-// Testa rotinas do kernel.
-// Nao eh socket unix.
-void shellSocketTest (void);
-
-
 void net_socket_test1(void);
-void net_socket_test2(void);
 // ...
 
 

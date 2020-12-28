@@ -61,10 +61,10 @@ typedef struct
  * by a three-character attempt at a mnemonic.
  */
 
+// stdio buffers 
 
-/* stdio buffers */
-struct __sbuf {
-
+struct __sbuf 
+{
     unsigned char *_base;
     int _size;
 };
@@ -168,18 +168,25 @@ struct _iobuf
     int iopl;
 };
 
-// glibc-like
-#define  __stdio_file  _iobuf  
 
-// bsd-like
-#define  __sFILE _iobuf  
+// ===========================
+// _iobuf
+
+#define  __stdio_file  _iobuf  // glibc-like
+#define  __sFILE       _iobuf  // bsd-like
+// ...
 
 
 //++
 #ifndef  __FILE_defined
-// The opaque type of streams.
-typedef struct _iobuf FILE; 
-#define  __FILE_defined  1
+
+    // The opaque type of streams.
+    typedef struct _iobuf FILE; 
+    // typedef struct _iobuf GRAMADO_FILE; 
+
+    #define  __FILE_defined   1
+    // #define  __GRAMADO_FILE_defined   1
+
 #endif  //FILE not defined.  
 //--
 

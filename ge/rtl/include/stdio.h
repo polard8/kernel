@@ -126,9 +126,11 @@ typedef char *stdio_va_list;
 #define _IOWRT	 2
 #define _IORW	 0x0080
 
-#define	STDIN_FILENO   0
-#define	STDOUT_FILENO  1
-#define	STDERR_FILENO  2
+
+// standard stream file descriptors.
+#define STDIN_FILENO   0
+#define STDOUT_FILENO  1
+#define STDERR_FILENO  2
 
 
 
@@ -165,10 +167,9 @@ typedef char *stdio_va_list;
 // this is the wrong way to do this, do *not* use these.
 
 #if defined(_XOPEN_SOURCE) || defined(_NETBSD_SOURCE)
-#define	P_tmpdir	"/var/tmp/"
+#define P_tmpdir    "/var/tmp/"
 #endif
-#define	L_tmpnam	1024	/* XXX must be == PATH_MAX */
-
+#define L_tmpnam    1024    /* XXX must be == PATH_MAX */
 
 
 //bsd-like
@@ -177,7 +178,7 @@ typedef char *stdio_va_list;
 //#define TMP_MAX			308915776	/* Legacy */
 //#endif
 
-#define TMP_MAX	32767
+#define TMP_MAX 32767
 
 
 #define _IOMYBUF  0x0008  /* stdio malloc()'d buffer */
@@ -186,34 +187,45 @@ typedef char *stdio_va_list;
 #define _IOSTRG   0x0040  /* Strange or no file descriptor */
 
 #ifdef __POSIX__
-#define	_IOAPPEND 0x0200
+#define _IOAPPEND  0x0200
 #endif
 
 
-/* Always ensure that these are consistent with <fcntl.h> and <unistd.h>! */
+// Consistence:
+// Always ensure that these are consistent 
+// with <fcntl.h> and <unistd.h>! 
 
-/* It moves file pointer position to the beginning of the file. */
+//SEEK_SET  
+//The new position is equal to offset bytes from the beginning of the file
+//SEEK_CUR  
+//The new position is equal to offset bytes from the current read position in the file
+//SEEK_END  
+//The new position is equal to offset bytes from the end of the file 
+//Isso cause confusao. Vai para alem do fim ou para antes do fim ?
+//Me parece que para alem do fim do arquivo. para expandi-lo.
+
+
 #ifndef SEEK_SET
-#define	SEEK_SET	0	/* set file offset to offset */
+#define SEEK_SET    0
 #endif
 
-/* It moves file pointer position to given location. */
 #ifndef SEEK_CUR
-#define	SEEK_CUR	1	/* set file offset to current plus offset */
+#define SEEK_CUR    1
 #endif
 
-/*  It moves file pointer position to the end of file. */
+//  set file offset to EOF plus offset
 #ifndef SEEK_END
-#define	SEEK_END	2	/* set file offset to EOF plus offset */
+#define SEEK_END    2
 #endif
-
 
 
 /*      
- * This is fairly grotesque, but pure ANSI code must not inspect the
- * innards of an fpos_t anyway.  The library internally uses off_t,
+ * This is fairly grotesque, 
+ * but pure ANSI code must not inspect the innards 
+ * of an fpos_t anyway.  The library internally uses off_t,
  * which we assume is exactly as big as eight chars.
  */
+
 
 /*
 #if (!defined(_ANSI_SOURCE) && !defined(__STRICT_ANSI__)) || defined(_LIBC)
@@ -224,6 +236,7 @@ typedef struct __sfpos {
 } fpos_t;
 #endif
 */
+
 
 // glibc-style
 /* The type of the second argument to `fgetpos' and `fsetpos'.  */

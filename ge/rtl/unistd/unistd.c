@@ -595,18 +595,33 @@ void sysbeep()
 
 
 /*
+//#todo:
+//Duplicates an opened file descriptor.
+void fcntl_dup(int fd);
+void fcntl_dup(int fd)
+{
+    if(fd<0)
+        return;
+
+    fcntl(fd, F_DUPFD, 0)
+}
+*/
+
+
+/*
  *************************************
  * dup:
  *
  */
 
-int dup (int oldfd){
+int dup (int oldfd)
+{
 
     //if ( oldfd < 0 ) 
         //return -1;
 
-    return (int) gramado_system_call ( (unsigned long) oldfd, 
-                     0, 0, 0 );
+    return (int) gramado_system_call ( 
+                     (unsigned long) oldfd, 0, 0, 0 );
 }
 
 
@@ -615,13 +630,17 @@ int dup (int oldfd){
  *
  */
 
-int dup2 (int oldfd, int newfd){
+int dup2 (int oldfd, int newfd)
+{
 
     //if ( oldfd < 0 ) 
         //return -1;
 
-    return (int) gramado_system_call ( (unsigned long) oldfd, 
-                     (unsigned long) newfd, 0, 0 );
+    return (int) gramado_system_call ( 
+                     (unsigned long) oldfd, 
+                     (unsigned long) newfd, 
+                     0, 
+                     0 );
 }
 
 
@@ -630,7 +649,8 @@ int dup2 (int oldfd, int newfd){
  *
  */
 
-int dup3 (int oldfd, int newfd, int flags){
+int dup3 (int oldfd, int newfd, int flags)
+{
 
     //if ( oldfd < 0 ) 
         //return -1;
@@ -638,7 +658,8 @@ int dup3 (int oldfd, int newfd, int flags){
     //if ( newfd < 0 ) 
         //return -1;
 
-    return (int) gramado_system_call ( (unsigned long) oldfd, 
+    return (int) gramado_system_call ( 
+                     (unsigned long) oldfd, 
                      (unsigned long) newfd, 
                      (unsigned long) flags, 
                      0 );

@@ -404,7 +404,7 @@ int sys_sleep_if_socket_is_empty ( int fd )
 // https://man7.org/linux/man-pages/man2/close.2.html
 // https://pubs.opengroup.org/onlinepubs/009695399/functions/close.html
 
-int sys_close ( int fd )
+int sys_close (int fd)
 {
 
     struct process_d *p;
@@ -419,6 +419,7 @@ int sys_close ( int fd )
     if (fd == 0 || fd == 1 || fd == 2 )
     {
         debug_print("sys_close: [FIXME] We can't close the standard stream\n");
+        // WHY NOT ???!!
         return (int) (-1);
     }
     */
@@ -428,6 +429,8 @@ int sys_close ( int fd )
         debug_print("sys_close: fd\n");
         return (int) (-1);
     }
+
+    // Process.
 
     if ( current_process < 0 ){
         debug_print("sys_close: current_process\n");
@@ -439,20 +442,24 @@ int sys_close ( int fd )
     if ( (void *) p == NULL ){
         debug_print("sys_close: p\n");
         return (int) (-1);
-
     }else{
+
+        // object
         
         object = (file *) p->Objects[fd];
-
-        // validation
+        
         if ( (void *) object == NULL ){
             debug_print("sys_close: object\n");
             return (int) (-1);
         }else{
 
+            // What type of object?
+            // socket, pipe, virtual console, tty, regular file ??
+            
             //socket
             if ( object->____object == ObjectTypeSocket )
             {
+                debug_print("sys_close: Trying to close a socket object\n");
                 object = NULL;
                 p->Objects[fd] = (unsigned long) 0;
                 debug_print("sys_close: Done. socket closed!\n");
@@ -462,6 +469,7 @@ int sys_close ( int fd )
             //pipe
             if ( object->____object == ObjectTypePipe )
             {
+                debug_print("sys_close: Trying to close a pipe object\n");
                 object = NULL;
                 p->Objects[fd] = (unsigned long) 0;
                 debug_print("sys_close: Done. pipe closed!\n");
@@ -471,16 +479,17 @@ int sys_close ( int fd )
             // virtual console.
             if ( object->____object == ObjectTypeVirtualConsole )
             {
+                debug_print("sys_close: Trying to close a virtual console object\n");
                 //object = NULL;
                 //p->Objects[fd] = (unsigned long) 0;
                 debug_print("sys_close: [FIXME] trying to close a virtual console.\n");
                 return 0;
             }
  
- 
              // tty
             if ( object->____object == ObjectTypeTTY )
             {
+                debug_print("sys_close: Trying to close a tty object\n");
                 object = NULL;
                 p->Objects[fd] = (unsigned long) 0;
                 debug_print("sys_close: Done. tty closed!\n");
@@ -493,31 +502,41 @@ int sys_close ( int fd )
 
             // #bugbug
             // ugly test
-            debug_print("sys_close: [FIXME] fsSaveFile\n");
             
-            if (object->_lbfsize < 512) 
-               object->_lbfsize = 512;
+            // regular file
+            if ( object->____object == ObjectTypeFile )
+            {
+                debug_print("sys_close: [FIXME] trying to close a regular file\n");
+
+                debug_print("sys_close: [FIXME] fsSaveFile\n");
+                
+                // #fixme: buffer limit
+                if (object->_lbfsize < 512){  object->_lbfsize = 512;  }
+
+                fsSaveFile ( 
+                    VOLUME1_FAT_ADDRESS, 
+                    VOLUME1_ROOTDIR_ADDRESS, 
+                    FAT16_ROOT_ENTRIES,
+                    (char *)         object->_tmpfname, 
+                    (unsigned long)  (object->_lbfsize/512),  // file_size, in sectors       
+                    (unsigned long)  object->_lbfsize,        // size_in_bytes,  
+                    (char *)         object->_base,           // buffer address          
+                    (char)           0x20 );                  // flag ??
+
+                object = NULL;
+                p->Objects[fd] = (unsigned long) 0;
+                debug_print("sys_close: [FIXME] Done. Closing regular file\n");
+                return 0;
+            }
             
-            fsSaveFile ( VOLUME1_FAT_ADDRESS, VOLUME1_ROOTDIR_ADDRESS, FAT16_ROOT_ENTRIES,
-                    (char *) object->_tmpfname, 
-                    (unsigned long) (object->_lbfsize/512), //file_size, in sectors       
-                    (unsigned long) object->_lbfsize, //size_in_bytes,  
-                    (char *) object->_base, //address          
-                    (char) 0x20 );  //flag
-  
-            // regular file.
-            object = NULL;
-            p->Objects[fd] = (unsigned long) 0;
-            debug_print("sys_close: [FIXME] Done. Closing regular file\n");
-            
-            
-            // ok.
-            return 0;
-        }
+            debug_print("sys_close:[FAIL] Object type not supported yet \n");
+            return -1;
+        };
+        
+        debug_print("sys_close: [ERROR] Something is wrong\n");
     };
 
-
-    debug_print("sys_close: FAIL\n");
+    debug_print("sys_close: [FAIL] \n");
     return -1;
 }
 
@@ -1018,6 +1037,8 @@ int sys_read (unsigned int fd, char *ubuf, int count)
     if ( __file->____object == ObjectTypeSocket )
     {
 
+        // debug_print("sys_read: [DEBUG] Trying to read a socket object\n");
+            
         // not reading yet
         if ((__file->_flags & __SRD) == 0) 
         {
@@ -1108,6 +1129,8 @@ int sys_read (unsigned int fd, char *ubuf, int count)
     
     if ( __file->____object == ObjectTypeFile )
     { 
+        //debug_print("sys_read: [DEBUG] Trying to read a regular file object\n");
+        
         //Se não pode ler.
         if ( (__file->_flags & __SRD) == 0 )
         {
@@ -1433,6 +1456,8 @@ int sys_write (unsigned int fd, char *ubuf, int count)
 
     if ( __file->____object == ObjectTypeSocket )
     {
+        //debug_print("sys_write: [DEBUG] Trying to write on a socket object \n");
+           
         nbytes = 0;
 
         // not writing yet
@@ -1525,6 +1550,8 @@ int sys_write (unsigned int fd, char *ubuf, int count)
 
     if ( __file->____object == ObjectTypeFile )
     {
+        //debug_print("sys_write: [DEBUG] Trying to write on a regular file object \n");
+        
         //can't write!
         if ( (__file->_flags & __SWR) == 0)
         {

@@ -639,12 +639,6 @@ void network_loop(void)
 }
 
 
-void shellSocketTest(void)
-{
-    printf("shellSocketTest: Deprecated\n");
-}
-
-
 void net_socket_test1(void)
 {
     int socket_fd = -1;
@@ -693,57 +687,6 @@ void net_socket_test1(void)
     printf("net_socket_test1: done\n");
 
     debug_print("net_socket_test1: done\n");
-}
-
-
-void net_socket_test2(void)
-{
-    int socket_fd = -1;
-    char message[32];
-
-    debug_print("=============================\n");
-    debug_print("net_socket_test2:\n");
-
-    printf("\n");
-    printf("net_socket_test2: socket(), send() and recv()\n");
-
-    //printf("Creating...\n");
-
-    socket_fd = (int) socket ( 
-                          (int) AF_INET, 
-                          (int) SOCK_STREAM, 
-                          (int) 0 );
-
-    if ( socket_fd <= 0 )
-    {
-        printf("Couldn't create\n");
-        return;
-    }
-
-    printf ("socket_fd:  %d\n",socket_fd);
-
-    // Write message in the buffer.
-    
-    sprintf ( message, "Magic string");
-
-    // Send the message.
-    
-    send (socket_fd , message , strlen(message) , 0 ); 
-
-    // Setup buffer for error message.
-
-    sprintf( message, "==FAIL==");
-
-    recv (socket_fd, (void *) &message[0], 5, 0 );
-    
-    // finalize.
-    message[9] = 0;
-    
-    printf("Message:{%s}\n",message);
-
-    printf("net_socket_test2: done\n");
-
-    debug_print("net_socket_test2: done\n");
 }
 
 

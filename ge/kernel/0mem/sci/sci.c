@@ -523,11 +523,11 @@ gde_extra_services (
         return NULL; //fail
     }    
 
-
-    // ??
-    // setup net buffer for a process.
+    // 500 - Setup a ring3 net buffer for the current process.
+    // #todo: check args validation.
     if (number == 550)
     {
+        debug_print("sci: [550] Setup net buffer for a process\n");
         __net_process = (struct process_d *) processList[arg2];
         if ( (void *) __net_process != NULL )
         {
@@ -538,10 +538,8 @@ gde_extra_services (
                  return (void *) 0;
              }
         }
-        //?? fail
         return (void *) -1;
     }
-
 
 
     // 600 - dup

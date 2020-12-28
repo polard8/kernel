@@ -277,11 +277,26 @@ FILE *__make_FILE (int fd)
 */
 
 
+
+/*
+ ************************************************
+ * remove:
+ *     It removes a file from the file system.
+ */
+
+// It calls unlink(2) for files, and rmdir(2) for directories. 
+
+// But here in ring3 we do not know if the file is a diretory or a file.
+// Maybe we need to call a function to tell us if the file is a file
+// or a diretory ... or simply call the the remove() system call 
+// and the kernel will do all the job.
+ 
 // #todo
 // https://linux.die.net/man/3/remove
+
 int remove (const char *pathname)
 {
-    debug_print ("remove: [TODO] \n");
+    debug_print ("remove: [TODO] It removes a file from the file system\n");
     return (int) (-1);
 }
 
@@ -912,6 +927,21 @@ int putw (int w, FILE *stream)
 
 int fclose (FILE *stream)
 {
+    // #bugbug
+    // Vamos simplificar pois esta falhando.
+    // Mas close ja funciona.
+    
+    debug_print ("fclose: [FIXME]\n");
+
+    if ( (void *) stream == NULL )
+    {  
+        return EOF;  
+    }
+
+    return (int) close( fileno(stream) ); 
+
+
+    /*
     int __ret = -1;
 
 
@@ -919,7 +949,6 @@ int fclose (FILE *stream)
     {
        return EOF;
     }
-
 
     fflush(stream);
 
@@ -948,6 +977,7 @@ int fclose (FILE *stream)
 
     //fail
     return EOF;
+    */
 }
 
 

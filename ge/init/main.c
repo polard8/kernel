@@ -439,15 +439,21 @@ Mainloop:
             gramado_system_call (265,0,0,0); 
         }
 
-        // We've got a message. Call the procedure.
-        
+        // We've got a message. 
+        // Call the procedure.
+        // 
+
         if ( message_buffer[1] == 9216 )
         {
+            printf ("init.bin: Message 9216\n");
             gReboot   = message_buffer[2];
             gShutdown = message_buffer[3];
             goto logoff; 
         }
 
+        // Messages:
+        // + Kill all childs ...
+        // +  ...
         // ...
         
         message_buffer[0] = 0;
@@ -455,6 +461,13 @@ Mainloop:
         message_buffer[2] = 0;
         message_buffer[3] = 0;
     };
+
+
+// =================================
+
+// #todo:
+// We can open a alog and close a log.
+// INIT.LOG
 
     //
     // Logoff
