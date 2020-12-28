@@ -43,5 +43,5 @@
 	It is a ring3 libc plus some wrappers with the rtl_ prefix.
 
 	========================================================
-	sevices:
+	services:
 	Some system servies. Drivers and server.
