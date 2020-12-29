@@ -12,6 +12,10 @@
  */ 
 
 
+#ifndef __REALTIME_H
+#define __REALTIME_H    1
+
+
 /*
  * Flag para tornar realtime uma opção.
  */
@@ -20,6 +24,10 @@ int realtimeStatus;
 //lista de processadores dedicados a tarefa de realtime.
 unsigned long realtimeprocessorList[32];
 
+
+#endif    
+
+
 //
-//fim.
+// End.
 //

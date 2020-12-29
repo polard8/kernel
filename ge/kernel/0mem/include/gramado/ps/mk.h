@@ -3,6 +3,9 @@
  *
  */
 
+#ifndef  __MK_H
+#define __MK_H    1
+
 
 /*
  * Segments @todo: Include this constants.
@@ -28,19 +31,22 @@
 int microkernelStatus; 
  
  
-
+//
+// == prototypes =================================================
+//
 
 int jobcontrol ( int type, int id, int plane );
 int jobcheck ( int type, int id );
 
-
 void microkernelTestLimit (void);
  
-//inicializa o microkernel do kernel.
+// Inicializa o microkernel do kernel.
 int init_microkernel (void);
 
 
-	
+#endif    
+
+
 //
 // End.
 //

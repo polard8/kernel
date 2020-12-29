@@ -9,6 +9,10 @@
  */
 
 
+#ifndef __THREAD_H
+#define __THREAD_H    1
+
+
 #define THREAD_MAGIC  1234
 
 
@@ -898,7 +902,7 @@ int thread_profiler( int service );
 // pegar a porcentagem de vezes que a thread rodou durante um determinado
 //período.
 unsigned long 
-thread_get_profiler_percentage ( struct thread_d *thread);
+thread_get_profiler_percentage ( struct thread_d *thread );
 
 void thread_show_profiler_info (void);
 
@@ -907,6 +911,9 @@ int getthreadname ( int tid, char *buffer );
 
 
 unsigned long __GetThreadStats ( int tid, int index );
+
+
+#endif    
 
 
 //

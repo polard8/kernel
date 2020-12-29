@@ -20,6 +20,9 @@
  * oct 2016 - Created.
  */
 
+#ifndef __X86COUNT_H
+#define __X86COUNT_H    1
+
 
 void save_current_context (void);
 
@@ -28,6 +31,10 @@ void restore_current_context (void);
 int contextCheckThreadRing0Context (int tid);
 
 int contextCheckThreadRing3Context (int tid); 
+
+
+
+#endif    
 
 
 //

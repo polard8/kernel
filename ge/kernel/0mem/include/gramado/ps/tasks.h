@@ -5,6 +5,10 @@
  */
 
 
+#ifndef __TASKS_H
+#define __TASKS_H    1
+
+
 
 //Status do mecanismo de task switch. 
 unsigned long task_switch_status;
@@ -195,6 +199,10 @@ void show_tasks_parameters (void);
 
 
 void show_preempted_task (void);
+
+
+#endif    
+
 
 
 //

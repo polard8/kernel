@@ -5,11 +5,15 @@
 // quantidade de páginas usadas pela imagem etc ...
 
 
+#ifndef __IMAGE_H  
+#define __IMAGE_H    1
+
 
 struct image_info_d
 {
+
     int used;
-	int magic;
+    int magic;
 	
 	unsigned long ImageBase;
 	unsigned long ImageSize;
@@ -29,6 +33,9 @@ struct image_info_d
 	
 	//...
 };
+
+
+#endif    
 
 
 

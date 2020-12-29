@@ -11,6 +11,10 @@
  */
 
 
+#ifndef __QUEUE_H
+#define __QUEUE_H    1
+
+
 // Ordenação das listas de filas.
 
 #define QUEUE_NULL     0
@@ -230,25 +234,31 @@ int init_queue(struct queue_d *q);
 
 //queue_insert_head: Coloca um dado no fim da fila. (LIFO)
 int 
-queue_insert_head( struct queue_d *q, 
-                   unsigned long data, 
-				   int type );
+queue_insert_head ( 
+    struct queue_d *q, 
+    unsigned long data, 
+     int type );
 
 int 
-queue_insert_data( struct queue_d *q, 
-                   unsigned long data, 
-				   int type );
+queue_insert_data( 
+    struct queue_d *q, 
+    unsigned long data, 
+    int type );
 
 
 struct thread_d *queue_get_data ( struct queue_d *q, int type );
 
-					  
+  
 void show_queue_information(struct queue_d *q);
 void ScanReadyQueue(struct queue_d *q);
 
 void 
-feed_ready_queue( struct queue_d *q, 
-                  int type );
+feed_ready_queue( 
+    struct queue_d *q, 
+    int type );
+
+
+#endif    
 
 
 //

@@ -1,17 +1,18 @@
 /*
- * Arquivo: dispatch.h
+ * File: dispatch.h
  *
- * Descrição:
- *     Header do módulo dispatcher do kernel base.
- *
- * Histórico:
- *     Versão 1.0, 2015 - Esse arquivo foi criado por Fred Nora.
+ *     Dispatcher support.
+ * 
+ * History:
+ *     2015 - Created by Fred Nora.
  */
 
 
-/*
- * Tipos de dispatcher.
- */ 
+#ifndef __DISPATCH_H  
+#define __DISPATCH_H    1
+
+
+// types 
 #define DISPATCHER_NULL      0 
 #define DISPATCHER_SYSCOOP   1  // Sistema, cooperação.   (64)*rr
 #define DISPATCHER_USERCOOP  2  // Usuário, cooperação.   (32)
@@ -126,6 +127,12 @@ void dispatcher (int type);
 int init_dispatcher (void);
 
 void IncrementDispatcherCount ( int type );
+
+
+
+#endif    
+
+
 
 //
 // End.

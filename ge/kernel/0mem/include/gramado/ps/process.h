@@ -39,6 +39,11 @@
  */
 
 
+#ifndef __PROCESS_H
+#define __PROCESS_H    1
+
+
+
 #define PROCESS_MAGIC  1234
 
 
@@ -1167,6 +1172,10 @@ process_execve (
     const char *arg1, 
     const char *arg2, 
     const char *arg3 );
+
+
+
+#endif    
 
 
 

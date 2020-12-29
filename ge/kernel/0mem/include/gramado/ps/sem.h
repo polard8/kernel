@@ -1,5 +1,5 @@
 /*
- * Arquivo: semaphore.h
+ * File: semaphore.h
  *
  * Descrição:
  *     Header do módulo semaphore do microkernel.
@@ -8,11 +8,14 @@
  *     Os processos entram e saem da sua região crítica
  *     utilizando as rotinas de Down e Up. 
  *
- * Versão 1.0, 2015.
+ * 2015 - Created by Fred Nora.
  */
 
 
- 
+#ifndef __SEM_H
+#define __SEM_H    1
+
+
 #define SEMAPHORE_MAX 256    //Número máximo de semáforos por enquanto.
 #define VERMELHO 0
 #define VERDE    1
@@ -25,8 +28,6 @@
  */
  
 
-
- 
 /*
  * semaphore_d:
  *     Estrutura para criação de um semáforo.        
@@ -119,6 +120,10 @@ void delete_semaphore(struct semaphore_d *s);
 void open_semaphore(struct semaphore_d *s);
 
 void close_semaphore(struct semaphore_d *s);
+
+
+#endif    
+
 
 //
 // End.

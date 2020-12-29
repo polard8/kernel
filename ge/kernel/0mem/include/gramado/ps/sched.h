@@ -16,6 +16,11 @@
  *     2015 - Created by Fred Nora.
  */
 
+
+#ifndef __SCHED_H
+#define __SCHED_H    1
+
+
  
 //#define NR_TASKS ??
 //#define FIRST_TASK ?
@@ -162,6 +167,9 @@ void yield (int tid);
 void check_for_standby (void);
 
 int check_quantum (void);
+
+
+#endif    
 
 
 //

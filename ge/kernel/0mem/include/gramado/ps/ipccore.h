@@ -6,6 +6,12 @@
  *    2019 - Created by Fred Nora. 
  */
 
+
+#ifndef  ____IPCCORE_H
+#define ____IPCCORE_H    1
+
+
+
 // #todo
 // Repensar a finalidade disso.
 // Me parece um gerenciamento de um grupo de componentes do sistema.
@@ -32,6 +38,11 @@ ipccore_services (
 
 int ipccore_open ( int pid, int server_index );
 int ipccore_close ( int pid, int server_index );
+
+
+
+#endif    
+
 
 
 //
