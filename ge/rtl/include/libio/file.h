@@ -21,20 +21,24 @@
 //#define	FILENAME_MAX	1024	/* must be <= PATH_MAX <sys/syslimits.h> */
 
 
-#define FOPEN_MAX	(32)
+#define FOPEN_MAX  (32)
 
-
+// #todo
 #ifndef FILENAME_MAX
     //#define  FILENAME_MAX  (260)    // Nope! 
     #define  FILENAME_MAX  (64) 
     //#define  FILENAME_MAX  (11)     // 8.3
 #endif
 
+// #todo
+// #define TMP_MAX 	32767
+
 
 #define NUMBER_OF_FILES (32)
 #define GRAMADO_NUMBER_OF_FILES (32)
 
 
+// =========================================================
 
 // mode:
 // The mode of I/O, as given in the MODE argument to fopen, etc.

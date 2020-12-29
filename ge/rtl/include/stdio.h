@@ -374,28 +374,49 @@ int prompt_status;
 
 
 //
-// Macros.
+// == Macros ==================================================
 //
 
+//=======================
+// fileno
+
+#define  __sfileno(_stream)  ((_stream)->_file)
+#define   __fileno(_stream)  ((_stream)->_file)
+
+#define  facility_fileno(_stream)  ((_stream)->_file)
 
 
-// Animal.
-#define  __fileno(_stream)  ((_stream)->_file)
-// ...
+//=======================
+// feof
 
-// bsd-like
-#define  __sfileno(p)   ((p)->_file)
-
-// bsd-like eof.
 #define  __sfeof(p)     (((p)->_flags & __SEOF) != 0)
-#define  bsd_feof(p)      __sfeof(p)
+#define  __bsd_feof(p)  (((p)->_flags & __SEOF) != 0)
 
-// bsd-like error.
+#define  bsd_feof(p)       __sfeof(p)
+#define  facility_feof(p)  __sfeof(p)
+
+
+//=======================
+// ferror
+
 #define  __sferror(p)   (((p)->_flags & __SERR) != 0)
-#define  __sclearerr(p)  ((void)((p)->_flags &= ~(__SERR|__SEOF)))
-#define  bsd_ferror(p)    __sferror(p)
-#define  bsd_clearerr(p)  __sclearerr(p)
 
+#define  bsd_ferror(p)       __sferror(p)
+#define  facility_ferror(p)  __sferror(p)
+
+//=======================
+// clearerr
+
+#define  __sclearerr(p)  ((void)((p)->_flags &= ~(__SERR|__SEOF)))
+
+#define  bsd_clearerr(p)       __sclearerr(p)
+#define  facility_clearerr(p)  __sclearerr(p)
+
+// =========================
+// __fgetchar
+
+// #test
+// #define  __fgetchar  fgetc(stdin)
 
 
 //======================================================

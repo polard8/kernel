@@ -228,7 +228,22 @@ struct __sbuf
 };
 
 
+#define KSTDIO_SYNC_NULL                     0
+#define KSTDIO_SYNC_REQUEST_SENT             1
+#define KSTDIO_SYNC_REPLY_SENT               2
+#define KSTDIO_SYNC_EVENT_NOTIFICATION_SENT  3
+#define KSTDIO_SYNC_ERROR_NOTIFICATION_SENT  4
 
+
+struct kstdio_sync_d
+{
+    pid_t sender;
+    pid_t receiver;
+    
+    int stage;
+    
+    // ...
+};
 
 
 /*
@@ -324,9 +339,18 @@ struct file_d
     //
     // == (2) synchronization ========
     //
+    
+    // #test
+    // Sincronizando a leitura e a escrita
+    // para arquivos como socket, tty, buffer ... etc.
+    
+    //struct kstdio_sync_d sync;
+    //pid_t sync_sender;
+    //pid_t sync_receiver;
+
 
     // isso eh coisa do fs
-    // deve ficar na entrada do diretrio ou no inode?
+    // deve ficar na entrada do diretorio ou no inode?
     int is_readable;
     int is_writable;
     int is_executable;

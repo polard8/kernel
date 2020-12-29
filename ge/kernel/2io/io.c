@@ -136,6 +136,7 @@ int io_ioctl ( int fd, unsigned long request, unsigned long arg )
             break;
 
         // tty object
+        // See: tty.c ? tty_io.c ?
         case ObjectTypeTTY:
         //case ObjectTypeTerminal: 
             debug_print ("io_ioctl: ObjectTypeTTY\n"); 
@@ -145,6 +146,7 @@ int io_ioctl ( int fd, unsigned long request, unsigned long arg )
             break;
         
         // socket object
+        // see: socket.c ??
         case ObjectTypeSocket:
             debug_print ("io_ioctl: ObjectTypeSocket\n");
             return (int) socket_ioctl ( (int) fd, 

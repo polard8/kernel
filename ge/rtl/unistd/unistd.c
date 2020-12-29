@@ -188,14 +188,30 @@ ssize_t write_VC (int fd, const void *buf, size_t count)
  * read:
  *     Standard read() function.
  */
+
 // Usam a lista de arquivos abertos do processo.
-ssize_t read (int fd, const void *buf, size_t count){
+
+ssize_t read (int fd, const void *buf, size_t count)
+{
 
     if (fd<0){
         debug_print ("read: fd\n");
         return -1;
     }
 
+    // #todo
+    // Check buffer
+    
+    // Nothing to read.
+    if ( count <= 0 )
+    {
+        printf ("read: [FAIL] count\n");
+        return -1;
+    }
+
+    // #todo
+    // Maybe we need to call another layer, not the kernel service.
+    
     return (ssize_t) gramado_system_call ( 18, 
                          (unsigned long) fd,
                          (unsigned long) buf, 
@@ -210,12 +226,26 @@ ssize_t read (int fd, const void *buf, size_t count){
  *     Standard write() function. 
  */
 // Usam a lista de arquivos abertos do processo. 
-ssize_t write (int fd, const void *buf, size_t count){
+ssize_t write (int fd, const void *buf, size_t count)
+{
 
     if (fd<0){
         debug_print ("write: fd\n");
         return -1;
     }
+
+    // #todo
+    // Check buffer
+    
+    // Nothing to write.
+    if ( count <= 0 )
+    {
+        printf ("write: [FAIL] count\n");
+        return -1;
+    }
+
+    // #todo
+    // Maybe we need to call another layer, not the kernel service.
 
     return (ssize_t) gramado_system_call ( 19, 
                          (unsigned long) fd,

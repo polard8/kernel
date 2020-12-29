@@ -8,16 +8,24 @@
 ;
 
 
+;;================================================
+;;...
+;;SW_ExitHelper3:
+SW_ExitHelper2:
+    sti
+SW_ExitHelper1:
+    iretd
+    
 
 ;======================================
 ; _int128:  0x80
 ;
 ;    System interrupt
 ;
-; eax = ;arg1 (numero)
-; ebx = ;arg2 (arg2)
-; ecx = ;arg3 (arg3)
-; edx = ;arg4 (arg4)
+; (eax) = arg1 (Service number)
+; (ebx) = arg2 (32bit argument)
+; (ecx) = arg3 (32bit argument)
+; (edx) = arg4 (32bit argument)
 ; ...  
 ; 
 ; #todo: 
@@ -30,6 +38,16 @@ extern _sci0
 
 global _int128
 _int128: 
+
+    ;; Environment:
+    ;; + Interrupçoes desabilitadas.
+    ;; + Usamos os segmentos do processo em ring3.
+
+
+    ;; #bugbug
+    ;; Com as interrupçoes desabilitadas, se a systemcall
+    ;; realizar alguma operaçao em algum dispositivo, entao
+    ;; nao tera como esperar por interrupçoes do dispositivo.
 
     cli 
     pushad 
@@ -60,23 +78,37 @@ _int128:
     ;; Sera preciso um gerenciamento melhor dos registradores de segmento
     ;; para podermos pegar informaçao tanto no kernel quanto no aplicativo.
         
-    ;xor eax, eax
-    ;mov ax, word 0x10 
-    ;mov ds, ax
-    ;mov es, ax
-    ;mov fs, ax
-    ;mov gs, ax
-
 
     ;;---------------
     push dword edx    ; arg4
     push dword ecx    ; arg3 
     push dword ebx    ; arg2 
     push dword eax    ; arg1 {Service number}.
-    
+
+    ;; #todo
+    ;; Podemos usar um arranjo diferente de segmentos dependendo
+    ;; do numero da chamada.
+    ;; por exemplo, uma chamada feita para pegar dados do kernel
+    ;; ou setar dados do kernel.
+
+    ; #test
+    ; Podemos tentar usar fs para acessar coisas dentro do kernel.
+    ; ok. testado.
+    ; xor eax, eax
+    ; mov ax, word KERNEL_DS 
+    ; mov fs, ax
+
+    ;; ds, es, xx, gs, ss permaneçem em ring3.
+    ;; Dessa forma podemos pegar facilmente dados 
+    ;; do processo.
+    ;; #bugbug: Mas e se quem chamou nao esta em ring 3??
+
+;.TheCall:
     call _sci0
-    
     mov dword [.int128Ret], eax 
+
+;.Restore128:
+   
     pop eax
     pop ebx
     pop ecx
@@ -92,10 +124,11 @@ _int128:
     
     popad
     mov eax, dword [.int128Ret] 
-    sti
-
-    iretd
     
+    jmp SW_ExitHelper2  ; sti and iretd
+    ;sti
+    ;iretd
+
 .int128Ret: dd 0
 ;--  
 
@@ -104,9 +137,49 @@ _int128:
 ;; _int129: 0x81
 extern _sci1
 global _int129
-_int129:  
-    ;; Nothing
+_int129:
+
+    ;; Environment:
+    ;; + Interrupçoes permanece habilitadas.
+    ;; + Usamos os segmentos do kernel.
+
+    pushad
+    push ds
+    push es
+    push fs
+    push gs
+    
+    ;;---------------
+    push dword edx    ; arg4
+    push dword ecx    ; arg3 
+    push dword ebx    ; arg2 
+    push dword eax    ; arg1 {Service number}.
+
+    xor eax, eax
+    mov ax, word KERNEL_DS 
+    mov ds, ax
+    mov es, ax
+    ;mov fs, ax
+    ;mov gs, ax
+
+    ;; call _sci1
+
+    mov dword [.int129Ret], eax 
+    pop eax
+    pop ebx
+    pop ecx
+    pop edx 
+    ;;---------------
+    
+    pop gs
+    pop fs
+    pop es
+    pop ds
+    popad
+    mov eax, dword [.int129Ret] 
     iretd
+
+.int129Ret: dd 0
 ;;============================================
 
 
@@ -115,8 +188,47 @@ _int129:
 extern _sci2
 global _int130
 _int130:  
-    ;; Nothing
+    ;; Environment:
+    ;; + Interrupçoes permanece habilitadas.
+    ;; + Usamos os segmentos do kernel.
+
+    pushad
+    push ds
+    push es
+    push fs
+    push gs
+    
+    ;;---------------
+    push dword edx    ; arg4
+    push dword ecx    ; arg3 
+    push dword ebx    ; arg2 
+    push dword eax    ; arg1 {Service number}.
+
+    xor eax, eax
+    mov ax, word KERNEL_DS 
+    mov ds, ax
+    mov es, ax
+    ;mov fs, ax
+    ;mov gs, ax
+
+    ;; call _sci2
+
+    mov dword [.int130Ret], eax 
+    pop eax
+    pop ebx
+    pop ecx
+    pop edx 
+    ;;---------------
+    
+    pop gs
+    pop fs
+    pop es
+    pop ds
+    popad
+    mov eax, dword [.int130Ret] 
     iretd
+
+.int130Ret: dd 0
 ;;============================================
 
 

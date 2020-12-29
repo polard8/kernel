@@ -669,6 +669,26 @@ void net_socket_test1(void)
     
     sprintf ( message, "Magic string");
 
+
+    // #bugbug
+    // PF ao testar na maquina real.
+
+    // request 4000: Passando o pid do sender via argumento.
+    // ring0: f->sync.sender See; socket.c in the kernel.
+    // ioctl ( socket_fd, 4000, getpid() );
+
+    //getting the sender.
+    //pra checar se a rotina acima funcionou.
+    
+    // #bugbug
+    // Realmente o salvamento nao funciona.
+    // O problema esta nos segmentos de dados.
+    // Do mesmo modo nao conseguiremos configurar 'termios'.
+    
+    // int sender;
+    // sender = ioctl ( socket_fd, 4001, 0 );
+    // printf ("#BUGBUG SENDER %d (PROBLEMAS COM OS SEGMENTOS DE DADOS)\n",sender);
+
     // Send the message.
     
     send (socket_fd , message , strlen(message) , 0 ); 

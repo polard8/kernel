@@ -1304,7 +1304,76 @@ int socket_connection_waiting_for_validation (struct socket_d *mysock, struct so
 
 int socket_ioctl ( int fd, unsigned long request, unsigned long arg )
 {
+    struct process_d *p;
+    file *f;
+
+
     debug_print ("socket_ioctl: TODO\n");
+
+    if (fd<=0){
+        debug_print ("socket_ioctl: fd <= 0\n");
+        return -1;
+    }
+    
+    if (fd>=32){
+        debug_print ("socket_ioctl: fd >= 32\n");
+        return -1;
+    }
+
+    f = (file *) p->Objects[fd];
+
+    if ( (void *) f == NULL )
+    {
+        debug_print("socket_ioctl: [FAIL] f\n");
+        return -1;
+    }
+    
+    // #bugbug
+    // Se eh uma chamada vinda de ring3, entao nao conseguira
+    // acessar a estrutura ... problemas com registrador de segmentos.
+    
+    if (f->used != 1 || f->magic != 1234 )
+    {
+        panic("socket_ioctl: validation\n");
+    }
+
+    switch (request)
+    {
+        // #bugbug
+        // Nao conseguimos usar direito os elementos da estrutura
+        // Precisamos trabalhar na interrupçao do sistema,
+        // na coisa dos segmentos de dados ...
+        // Por causa do tipo de segmento, estamos escrevendo 
+        // ou lendo no lugar errado.
+
+        case 4000:
+            debug_print ("socket_ioctl: [4000]\n");
+            printf("socket_ioctl: [4000] fd %d pid %d #debug\n", fd, arg);
+            refresh_screen();
+            //f->sync.sender = (pid_t) arg;
+            //f->sync_sender = (pid_t) arg;
+            return 0;
+            break;
+        
+        case 4001:
+            //return f->sync.sender;
+            //return f->sync_sender;
+            break;
+        
+        case 4002:
+            return f->is_readable;
+            break;
+
+        case 4003:
+            return f->is_writable;
+            break;
+
+        case 4004:
+            return f->is_executable;
+            break;
+            
+    };
+
     return -1;
 }
 

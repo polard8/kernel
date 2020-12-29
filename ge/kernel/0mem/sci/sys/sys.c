@@ -181,6 +181,7 @@ int sys_ioctl ( int fd, unsigned long request, unsigned long arg )
 
     // Enquanto sys_ioctl eh chamada pelos applicativos,
     // io_ioctl eh chamada pelas rotinas dentro do kernel.
+    // See: io.c
     
     return (int) io_ioctl (fd,request,arg);
 }
@@ -1457,8 +1458,17 @@ int sys_write (unsigned int fd, char *ubuf, int count)
     if ( __file->____object == ObjectTypeSocket )
     {
         //debug_print("sys_write: [DEBUG] Trying to write on a socket object \n");
-           
+        
         nbytes = 0;
+
+        // #test
+        // checking the synchronization struct
+        //if( __file->sync.sender != current_process )
+        //{
+        //    printf("sys_write: sender %d current %d #debug\n",__file->sync.sender, current_process);
+        //    refresh_screen();
+        //    panic("sys_write: __file->sync.sender\n");
+        //}
 
         // not writing yet
         if ((__file->_flags & __SWR) == 0) 

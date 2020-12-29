@@ -12,7 +12,12 @@
  */
 
 
+// It starts with the kernel data and
+// it has the main routine for the kernel.
+
+
 #include <kernel.h>
+
 
 // This variables came from BL.BIN.
 
@@ -23,8 +28,27 @@ extern unsigned long SavedBootMode;
 extern unsigned long SavedBootBlock;
 
 
+
+//
+// == kernel data ================================================
+//
+
 // char copyright[] =
 // "Copyright (c) 2005-2020 \n\tFred Nora. All rights reserved.\n\n";
+
+
+// Salvaremos aqui o endereço da idle thread.
+// Isso podera ser importado pelo assembly.
+// unsigned long Ring0IdleThreadAddress;
+
+
+// Algum componente em ring0 pode configurar esse callout
+// o assmebly pode importar e chamar isso.
+// Entao com isso rodariamos uma rotina em ring0 mas fora do kernel.
+// unsigned long Ring0CallOut;
+
+
+// ...
 
 
 /*

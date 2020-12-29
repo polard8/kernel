@@ -1368,42 +1368,70 @@ size_t fread (void *ptr, size_t size, size_t n, FILE *fp)
     int nreads = 0;
     int number_of_bytes = -1;
 
-    if ( (void *) ptr == NULL ){
+
+    if ( (void *) ptr == NULL )
+    {
         printf ("fread: ptr \n");
         return (size_t) -1;
     }
 
-    if ( size <= 0 ){
+    if ( size <= 0 )
+    {
         printf ("fread: size \n");
         return (size_t) -1;
     }
 
     // Quantidade inválida.
-    if ( n <= 0 ){
+    if ( n <= 0 )
+    {
         printf ("fread: n \n");
         return (size_t) -1;
     }
     
     // Se não temos o ponteiro, então não teremos o fd
     // para usarmos em read().
-    if ( (void *) fp == NULL ){
+    if ( (void *) fp == NULL )
+    {
         printf ("fread: fp \n");
         return (size_t) -1;
     }
- 
 
+    // buffer size
     size_t _max = sizeof(ptr);
     
+    if (_max <= 0)
+    {
+        printf("fread: [DEBUG] buffer size <= 0 \n");
+        return (size_t) -1;
+    }
+
+    if (_max > BUFSIZ)
+    {
+        printf("fread: [DEBUG] buffer size\n");
+        _max = BUFSIZ;
+    }
+
+
     // Read.
+    
     if ( number_of_bytes >= _max ){
         nreads = read ( fileno(fp), ptr, _max );
     }else{
         nreads = read ( fileno(fp), ptr, number_of_bytes );
     };
 
-
-    if (nreads <= 0){
+    if (nreads <= 0)
+    {
         printf ("fread: read() fail \n");
+        fp->_flags |= _IOERR;
+        return (size_t) -1;   
+    }
+
+    // menos do que desejavamos.
+    if (nreads < number_of_bytes)
+    {
+        printf ("fread: read() fail. Less than desired \n");
+        fp->_flags |= _IOERR;
         return (size_t) -1;   
     }
 
@@ -1414,10 +1442,10 @@ size_t fread (void *ptr, size_t size, size_t n, FILE *fp)
 /*
  ************************
  * fwrite:
- *
+ *     write in a file. (fp)
  */
 
-//IN:
+// IN:
 // ptr = pointer.
 // size = Tamanho do elemento dado em bytes.
 // n = quantidade de elementos.
@@ -1432,20 +1460,23 @@ size_t fwrite (const void *ptr, size_t size, size_t n, FILE *fp){
     int number_of_bytes = -1;
 
 
-    if ( (void *) ptr == NULL ){
+    if ( (void *) ptr == NULL )
+    {
         printf ("fwrite: ptr \n");
         return (size_t) -1;
     }
  
  
     // tamanho do elemento dado em bytes.
-    if ( size <= 0 ){
+    if ( size <= 0 )
+    {
         printf ("fwrite: size \n");
         return (size_t) -1;
     }
 
     // Quantidade de elementos.
-    if ( n <= 0 ){
+    if ( n <= 0 )
+    {
         printf ("fwrite: n \n");
         return (size_t) -1;
     }
@@ -1453,7 +1484,8 @@ size_t fwrite (const void *ptr, size_t size, size_t n, FILE *fp){
    
     // Se não temos o ponteiro, então não teremos o fd
     // para usarmos em read().
-    if ( (void *) fp == NULL ){
+    if ( (void *) fp == NULL )
+    {
         printf ("fwrite: fp \n");
         return (size_t) -1;
     }
@@ -1471,12 +1503,24 @@ size_t fwrite (const void *ptr, size_t size, size_t n, FILE *fp){
     //nwrite = write ( fileno(fp), ptr, n );
     nwrite = write ( fileno(fp), ptr, number_of_bytes );
 
-    if (nwrite <= 0){
+    // Se nao conseguimos escrever.
+    if (nwrite <= 0)
+    {
         printf ("fwrite: write() fail \n");
+        fp->_flags |= _IOERR;
         return (size_t) -1;   
     }
+    
+    // Se escrevemos menos do que desejavamos.
+    if (nwrite < number_of_bytes)
+    {
+        printf ("fwrite: write() less than desired \n");
+        fp->_flags |= _IOERR;
+        return (size_t) -1;   
+    }
+    
 
-    return (size_t) nwrite;    
+    return (size_t) nwrite; 
 }
 
 
@@ -2686,18 +2730,61 @@ static __inline__ off_t ftell(FILE *__f)
 
 
 // Deixaremos o kernel manipular a estrutura.
-//This function returns the current file position of the stream stream. 
-long ftell (FILE *stream){
+// This function returns the current file position of the stream stream. 
 
+long ftell (FILE *stream)
+{
+    int fd=-1;
+    
+    int offset=0;
+    long file_pos=0;
+    
+    int rCount=0;
+    
+    
+    
     if ( (void *) stream == NULL ){
         debug_print ("ftell: stream\n");
         return 0;
     }else{
 
+        fd = fileno(stream);
+        
+        if (fd<0){
+            printf("ftell: [FAIL] fd\n");
+            return 0;
+        }
+        
+        // Corrigir overflow.
+        // local. (ring3)
+        if (stream->_cnt < 0){
+            stream->_cnt = 0;
+        }
+        
         //fflush (stream);
-        return (long) lseek ( fileno(stream) , 0, SEEK_CUR);    
+        
+        // Pegamos o valor, assim podemos atualizar a estrutura local.
+        
+        file_pos = (long) lseek ( fd, 0, SEEK_CUR); 
+        
+        // offset
+        // offset = stream->_ptr - stream->_base;
+        
+        // ??
+        //if (filepos == 0)
+        //    return((long)offset);
+        
+        // local
+        //if (stream->_cnt == 0)
+        //    offset = 0;
+
+        // rCount = stream->_cnt + (stream->_ptr - stream->_base);
+        
+        return (long) file_pos;
     };
 
+    debug_print ("ftell: [ERROR] Something is wrong\n");
+    
     return 0;
 }
 
@@ -3024,14 +3111,28 @@ int fseek ( FILE *stream, long offset, int whence )
     }
  
 
-    off = lseek( fileno(stream), offset, whence);
-    if (off < 0){
+    // lseek
+    
+    off = lseek ( fileno(stream), offset, whence );
+    
+    if (off < 0)
+    {
         debug_print ("fseek: lseek fail \n");
         return off;
     }
-   
-    //stream->eof = false;
-    //stream->error = 0;
+
+    // local
+    
+    // Not the end.
+    // stream->_flags &= ~_IOEOF;
+    // stream->eof = FALSE;
+        
+    // We do not know what is the next operation.
+    // if (stream->_flags & _IORW)
+    //     stream->_flags &= ~(_IOWRT|_IOREAD);
+
+    // stream->error = 0;
+
     stream->have_ungotten = FALSE;
     stream->ungotten = 0;
 
@@ -4190,16 +4291,35 @@ void perror (const char *str)
 
 // O ponto de leitura e escrita volta a ser a base.
 // Isso é válido apenas para a stream aqui em ring3.
-void rewind (FILE *stream){
 
+void rewind (FILE *stream)
+{
+    int fd=-1;
 
     if ( (void *) stream == NULL )
     {
+        printf ("rewind: [FAIL] stream\n");
         return;
     }
-     
-    //:^)
-    stream->_p = stream->_base;
+    
+    // local
+    //stream->_p = stream->_base;
+
+    // #todo:
+    // fflush(stream);
+
+    // Clear errors
+    // local.
+    //stream->_flags &= ~(_IOERR|_IOEOF);
+
+    // flags
+    // local
+    //if (stream->_flags & _IORW)
+    //    stream->_flags &= ~(_IOREAD|_IOWRT);
+
+
+    // #todo
+    // We need to do the same in the file.
 
 	//unix 32V
 	//fflush(stream);
@@ -4211,6 +4331,18 @@ void rewind (FILE *stream){
     //clearerr(stream);
     //(void) fseek(stream, 0L, SEEK_SET);
     //clearerr(stream);
+
+    fd = fileno(stream);
+    if(fd<0){
+        printf("rewind: [ERROR] fd\n");
+        return;
+    }
+
+    // do !
+    
+    stream->_p = stream->_base;
+    stream->_cnt = 0;
+    lseek(fd,0,0);
 }
 
 
@@ -4489,6 +4621,7 @@ int libcStartTerminal (void)
 
 // see: 
 // https://linux.die.net/man/3/setvbuf
+// #ugly: See: setbuf_test1
 
 void setbuf (FILE *stream, char *buf)
 {
@@ -4502,6 +4635,22 @@ void setbuf (FILE *stream, char *buf)
 
     setvbuf (stream, buf, buf ? _IOFBF : _IONBF, BUFSIZ);
 }
+
+
+/*
+void setbuf_test1 (FILE *stream, char *buf);
+void setbuf_test1 (FILE *stream, char *buf)
+{
+    if ( (void*) stream == NULL )
+        return;
+
+	if (buf == NULL)
+		setvbuf(stream, NULL, _IONBF, 0);
+	else
+		setvbuf(stream, buf, _IOFBF, BUFSIZ);
+}
+*/
+
 
 
 //If buf is a null pointer, this function makes stream unbuffered. 
@@ -5322,7 +5471,9 @@ int fgetpos (FILE *stream, fpos_t *pos )
 int fsetpos (FILE *stream, const fpos_t *pos)
 {
 
-    if ( (void *) stream == NULL ){
+    if ( (void *) stream == NULL )
+    {
+       printf("fsetpos: [FAIL] stream\n");
        return EOF;
     }
 
@@ -5691,6 +5842,47 @@ int minx_fputs(register const char *s, register FILE *stream)
 		else i++;
 
 	return i;
+}
+*/
+
+//===============================
+
+
+/*
+int data_getc(FILE *_stream);
+int data_getc(FILE *_stream)
+{
+    int data = 0;
+    
+    _stream->_cnt--;
+    
+    if ( _stream->_cnt >= 0 )
+    {
+        data =  (int) (_stream->_ptr & 0xFF);
+        _stream->_ptr++;
+        return (int) data;
+    }else{
+        _filbuf(_stream);
+    };
+}
+*/
+
+
+/*
+void data_putc (int ch,FILE *_stream);
+void data_putc (int ch,FILE *_stream)  
+{
+    _stream->_cnt--;
+    
+    if ( _stream->_cnt >= 0 )
+    {
+        _stream->_ptr[0] = (char) ( ch & 0xFF );
+        _stream->_ptr++;
+        return;
+    }else{
+        _flsbuf (ch,_stream);
+        return;
+    };
 }
 */
 

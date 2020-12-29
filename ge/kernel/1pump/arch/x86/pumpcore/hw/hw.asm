@@ -128,7 +128,7 @@ _irq0:
     ;; Kernel data segments and stack.
 
     xor eax, eax
-    mov ax, word 0x10
+    mov ax, word KERNEL_DS
     mov ds, ax
     mov es, ax
     mov fs, ax
@@ -208,11 +208,13 @@ dummy_flush:
 
 global _timer_test
 _timer_test:
-    cli
-    mov al, 20h
-    out 20h, al  
-    sti
-    iretd
+    jmp unhandled_irq
+    jmp $
+    ;cli
+    ;mov al, 20h
+    ;out 20h, al  
+    ;sti
+    ;iretd
 
 
 
@@ -262,7 +264,7 @@ _irq1:
 
     ;; Kernel data segments
     xor eax, eax
-    mov ax, word 0x10 
+    mov ax, word KERNEL_DS 
     mov ds, ax
     mov es, ax
     mov fs, ax
@@ -734,6 +736,7 @@ _irq15:
 unhandled_irq:
 
     cli
+    ;pushad  ;;#todo
     push eax
 
     mov al, 0x20
@@ -745,6 +748,7 @@ unhandled_irq:
     IODELAY  
 
     pop eax
+    ;popad;;#todo
     sti 
 
     iretd
@@ -1060,7 +1064,7 @@ all_faults:
     
     ; Load the Kernel Data Segment descriptor.
     xor eax, eax
-    mov ax, word 0x10   
+    mov ax, word KERNEL_DS   
     mov ds, ax
     mov es, ax
     mov fs, ax
