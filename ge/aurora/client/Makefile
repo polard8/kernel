@@ -37,12 +37,10 @@ CFLAGS = -m32 \
 	
 
 
-LIBC      = ../../../ge/rtl/include/
-LIBCOBJ   = ../../../ge/rtl/obj
-
+LIBC      = ../../rtl/include/
+LIBCOBJ   = ../../rtl/obj
 LIBGWS    = ../../lib/libgws/include/
 LIBGWSOBJ = ../../lib/libgws/obj
-
 
 	#
 	# Objects
@@ -89,8 +87,6 @@ all-c:
 	
 hello-link:
 	ld -m elf_i386 -T ../link.ld -o GWS.BIN $(myObjects)    
-
-
 
 finalize:
 	cp GWS.BIN  ../bin

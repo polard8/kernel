@@ -80,6 +80,9 @@ int running = 0;
 int ____saved_server_fd = -1;
 
 
+int Notify_PongClient=FALSE;
+int NoReply = FALSE;
+
 // #test
 #define MSG_OFFSET_SHORTSTRING  64
 #define SHORTSTRING_SIZE        64
@@ -856,8 +859,8 @@ __again:
 // No loop precisamos de accept() read() e write();
 // Get client's request from socket.
 
-void xxxHandleNextClientRequest (int fd){
-
+void xxxHandleNextClientRequest (int fd)
+{
     // Isso permite ler a mensagem na forma de longs.
     unsigned long *message_buffer = (unsigned long *) &__buffer[0];   
 
@@ -965,6 +968,11 @@ void xxxHandleNextClientRequest (int fd){
     // from the system messages. Maybe it is not a good ideia.
     // Or is it?
     
+    
+    // 369 
+    // suspended!
+    
+    /*
     if (message_buffer[1] == 369)
     {
         debug_print ("xxxHandleNextClientRequest: [TEST] 369 INPUT request !!! \n");
@@ -1014,6 +1022,7 @@ void xxxHandleNextClientRequest (int fd){
         debug_print("xxxHandleNextClientRequest: response sent\n");
         return;
     }
+    */
 
     //
     // == Got a request! ============
@@ -1065,9 +1074,13 @@ void xxxHandleNextClientRequest (int fd){
     // o kernel precisa copiar para aquele conectado em accept[]
 
     //
-    // Sending reply.
+    // == Sending reply =======================================
     // 
-     
+
+    // Alguns requests nao exigem resposta,
+    if (NoReply == TRUE)
+        return;
+
     //gwssrv_debug_print ("Sending response ...\n");  
 
     //# it works.
@@ -1080,7 +1093,8 @@ void xxxHandleNextClientRequest (int fd){
     message_buffer[2] = next_response[2];         // Return value (long1)
     message_buffer[3] = next_response[3];         // Return value (long2)
 
-__again:
+
+//__again:
 
     //
     // == Response ============================
@@ -1127,8 +1141,15 @@ __again:
         next_response[c] = 0;
 
     // NO. We couldn't send a response.
+    // O que acontece se nao conseguirmos enviar uma resposta?
+    // Certamente o cliente tentara ler e tera problemas.
+    // Deveriamos fechar a conexao?
+    // Deveriamos enviar um alerta
+    
     if (n_writes<=0){
         gwssrv_debug_print ("xxxHandleNextClientRequest: write fail. response fail\n");
+        printf("gwssrv-xxxHandleNextClientRequest: Couldn't send reply\n");
+        //close(fd);
         gwssrv_yield();
         return;
     }
@@ -1311,28 +1332,31 @@ gwsProcedure (
                 //}
             } 
             gws_show_backbuffer();
+            NoReply = FALSE;
             break;
-
 
         // Create Window REQUEST!
         // Usará o buffer global
         // case MSG_CREATE_WINDOW:
         //MSG_GWS_CREATEWINDOW
         case 1001:
-            gwssrv_debug_print ("gwssrv: [FIXME] Message number 1001\n");
+            gwssrv_debug_print ("gwssrv: [1001] serviceCreateWindow\n");
             serviceCreateWindow();
+            NoReply = FALSE;
             break; 
 
         // backbuffer putpixel
         //MSG_GWS_BACKBUFFERPUTPIXEL
         case 1002:
             servicepixelBackBufferPutpixel(); 
+            NoReply = FALSE;
             break;
 
         // backbuffer draw horizontal line
         //MSG_GWS_BACKBUFFERHORIZONTALLINE
         case 1003:
             servicelineBackbufferDrawHorizontalLine();
+            NoReply = FALSE;
             break;
 
 
@@ -1340,8 +1364,9 @@ gwsProcedure (
         // MSG_GWS_DRAWCHAR
         // See: char.c
         case 1004:
-            gwssrv_debug_print ("gwssrv: Message number 1004\n");
+            gwssrv_debug_print ("gwssrv: [1004] serviceDrawChar\n");
             serviceDrawChar();
+            NoReply = FALSE;
             break;
 
 
@@ -1349,37 +1374,42 @@ gwsProcedure (
         // MSG_GWS_DRAWTEXT
         // See: dtext.c
         case 1005:
-           gwssrv_debug_print ("gwssrv: Message number 1005\n");
+           gwssrv_debug_print ("gwssrv: [1005] serviceDrawText\n");
            serviceDrawText();
+           NoReply = FALSE;
            break;
 
 
         // Refresh window
         //MSG_GWS_REFRESHWIDNOW
         case 1006:
-           gwssrv_debug_print ("gwssrv: Message number 1006\n");
+           gwssrv_debug_print ("gwssrv: [1006] serviceRefreshWindow\n");
            serviceRefreshWindow();
+           NoReply = FALSE;
            break;
            
 
         // Redraw window
         //MSG_GWS_REDRAWWINDOW
         case 1007:
-           gwssrv_debug_print ("gwssrv: Message number 1007\n");
+           gwssrv_debug_print ("gwssrv: [1007] serviceRedrawWindow\n");
            serviceRedrawWindow();
+           NoReply = FALSE;
            break;
 
         // Resize window
         //MSG_GWS_RESIZEWINDOW
         case 1008:
-           gwssrv_debug_print ("gwssrv: Message number 1008\n");
+           gwssrv_debug_print ("gwssrv: [1008] serviceResizeWindow\n");
            serviceResizeWindow();
+           NoReply = FALSE;
            break;
 
         //MSG_GWS_CHANGEWINDOWPOSITION
         case 1009:
-           gwssrv_debug_print ("gwssrv: Message number 1009\n");
+           gwssrv_debug_print ("gwssrv: [1009] serviceChangeWindowPosition\n");
            serviceChangeWindowPosition();
+           NoReply = FALSE;
            break;
 
     
@@ -1388,8 +1418,11 @@ gwsProcedure (
         // backbuffer putpixel. (again)
         // IN: Color, x, y
         case 2000:
-            pixelBackBufferPutpixel ( (unsigned long) COLOR_PINK,   
-                (unsigned long) long1, (unsigned long) long2 );
+            pixelBackBufferPutpixel ( 
+                (unsigned long) COLOR_PINK,   
+                (unsigned long) long1, 
+                (unsigned long) long2 );
+            NoReply = FALSE;
             break;
  
  
@@ -1406,20 +1439,25 @@ gwsProcedure (
         //MSG_GWS_SHUTDOWN
         case 2010:
             gwssrv_debug_print ("gwssrv: [2010] Disconnect\n");
+            //NoReply = FALSE;
             break;
             
         // Refresh screen 
         // refresh screen using kgws service. 
         //MSG_GWS_REFRESHSCREEN
         case 2020:
+            gwssrv_debug_print ("gwssrv: [2020] gws_show_backbuffer\n");
             gws_show_backbuffer();
+            //NoReply = FALSE;
             break;
              
 
         // Refresh rectangle ... 
         //MSG_GWS_REFRESHRECTANGLE
         case 2021:
+            gwssrv_debug_print ("gwssrv: [2021] serviceRefreshRectangle\n");
             serviceRefreshRectangle();
+            //NoReply = FALSE;
             break;
 
         // When a client send us an event
@@ -1427,6 +1465,7 @@ gwsProcedure (
         case 2030:
             gwssrv_debug_print ("gwssrv: [2030] serviceClientEvent\n");
             //serviceClientEvent();
+            //NoReply = FALSE;
             break;
 
         // When a client get the next event from it's own queue.
@@ -1434,17 +1473,30 @@ gwsProcedure (
         case 2031:
             gwssrv_debug_print ("gwssrv: [2031] serviceNextEvent\n");
             //serviceNextEvent();
+            //NoReply = FALSE;
             break;
             
 
         // See: grprim.c
-        case 2040:  serviceGrPlot0();  break;
+        case 2040:  
+            gwssrv_debug_print ("gwssrv: [2040] serviceGrPlot0\n");
+            serviceGrPlot0();  
+            NoReply = FALSE;
+            break;
 
         // See: grprim.c
-        case 2041:  serviceGrCubeZ();  break;
+        case 2041:  
+            gwssrv_debug_print ("gwssrv: [2041] serviceGrCubeZ\n");
+            serviceGrCubeZ();  
+            NoReply = FALSE;
+            break;
 
         // See: grprim.c
-        case 2042:  serviceGrRectangle();  break;
+        case 2042:  
+            gwssrv_debug_print ("gwssrv: [2042] serviceGrRectangle\n");
+            serviceGrRectangle();  
+            NoReply = FALSE;
+            break;
 
         // #todo
         // Segue serviços graficos 3d.
@@ -1453,9 +1505,10 @@ gwsProcedure (
         // #test
         // async command: 
         case 2222:
-            gwssrv_debug_print ("gwssrv: [2222] TODO. Closing server\n");
-                        printf ("gwssrv: [2222] TODO. Closing server\n");
-            exit(0);
+            gwssrv_debug_print ("gwssrv: [2222] calling serviceAsyncCommand\n");
+                        printf ("gwssrv: [2222] calling serviceAsyncCommand\n");
+            serviceAsyncCommand();
+            NoReply = TRUE;
             break;
 
         //MSG_GWS_PROTOCOL
@@ -1621,15 +1674,15 @@ int initGraphics (void){
     if (current_mode == GRAMADO_JAIL)
     {
          
-         //demos_startup_animation(1);  //ok
-         //demos_startup_animation(2);  //it works
-         //demos_startup_animation(3);    //it works
-         //demos_startup_animation(4);     //it works.
-         //demos_startup_animation(5);      // it works.
+         //demos_startup_animation(1);   //ok
+         //demos_startup_animation(2);   //it works
+         //demos_startup_animation(3);   //it works
+         //demos_startup_animation(4);   //it works.
+         //demos_startup_animation(5);   // it works.
          //demos_startup_animation(6);   //ok
          //demos_startup_animation(7);   //ok
-         //demos_startup_animation(8);  //ok
-         demos_startup_animation(9);  //ok
+         //demos_startup_animation(8);   //ok
+         demos_startup_animation(9);    //ok
          
          gwssrv_show_backbuffer();
          //while(1){}
@@ -2013,8 +2066,8 @@ int initGraphics (void){
 // This is an array of connections.
 // See: clients.h
 
-void gwssrv_init_client_support (void){
-
+void gwssrv_init_client_support (void)
+{
     int i=0;
 
 
@@ -2192,7 +2245,6 @@ int serviceAsyncCommand (void)
 
 
 
-
     message_id  = message_address[1]; 
     request_id  = message_address[2]; 
 
@@ -2202,22 +2254,40 @@ int serviceAsyncCommand (void)
                     printf ("gwssrv_init_client_support: [ERROR] message id\n");
         return -1;
     }
-    
+
+
+
+    //#debug
+    printf ("gwssrv_init_client_support: [request %d] \n", request_id);
+ 
     switch (request_id){
 
         // 1 =  Close server.
         case 1:
             gwssrv_debug_print ("gwssrv_init_client_support: [request 1] Closing server\n");
-                        printf ("gwssrv_init_client_support: [request 1] Closing server\n");
+                       // printf ("gwssrv_init_client_support: [request 1] Closing server\n");
             exit(0);
             break;
         
-        //case 2:
-        
-        
+        case 2:
+            gwssrv_debug_print ("gwssrv_init_client_support: [request 2] \n");
+            printf("PING\n");
+            //Notify_CloseClient = TRUE;
+            //Notify_PongClient = TRUE;
+            //exit(0);
+            break;
+
+        case 3:
+            gwssrv_debug_print ("gwssrv_init_client_support: [request 3] hello\n");
+            printf("HELLO\n");
+            //exit(0);
+            break;
+
+        // ...
+                
         default:
             gwssrv_debug_print ("gwssrv_init_client_support: [ERROR] bad request\n");
-                        printf ("gwssrv_init_client_support: [ERROR] bad request\n");
+                       // printf ("gwssrv_init_client_support: [ERROR] bad request\n");
 
             break;
     };
@@ -2252,9 +2322,9 @@ int serviceAsyncCommand (void)
  *           message found in the sockeck we readed.
  */
 
-int main (int argc, char **argv){
 
-
+int main (int argc, char **argv)
+{
     //==================
     struct sockaddr server_address;
     socklen_t addrlen;
@@ -2531,63 +2601,35 @@ int main (int argc, char **argv){
             
             // Seja profissional e aceite a conexaozinha \o/
 
-            newconn = accept ( serverClient->fd, 
+            newconn = accept ( 
+                          serverClient->fd, 
                           (struct sockaddr *) &server_address, 
                           (socklen_t *) addrlen );
         
-            gwssrv_debug_print("gwssrv: accept returned\n");
+            //gwssrv_debug_print("gwssrv: accept returned\n");
             //printf ("gwssrv: newconn %d\n",newconn);
             
-            if (newconn>0){
-                
-                //fake event
-                //sprintf(buf,"?uck");    // 
-                //sprintf(buf,"nonono");    // the client can't send request
-                //sprintf(buf,"yes");    // the client can send requests.
-                //write (newconn,buf, 4);
-                
-                xxxHandleNextClientRequest (newconn);
-                
-                // read input from the server's socket?
-                // if it is invalid, we ignore it.
-                //read (serverClient->fd, buf, 4);
-                //read (fileno(stdin), buf, 4);
-                //if( buf[0] != '?'){  //se for ? ignora.
-                //    buf[4] = 0;
-                //    printf ("%s",buf); fflush(stdout);
-                //}
-                
+            if (newconn<=0)
+            {
+                gwssrv_debug_print("gwssrv: accept returned FAIL\n");
             }
             
-            
-            //close(newconn);
-            
-            /*
-            if (newconn <= 0) {
-                gwssrv_debug_print ("gwssrv: ERROR on Accepting\n");
-                gwssrv_yield();
- 
-            // Request from the new connection
-            }else{
-
-                //mensagens de clientes.
+            if (newconn>0)
+            {
+                gwssrv_debug_print("gwssrv: accept returned OK\n");
                 xxxHandleNextClientRequest (newconn);
-
-                //close ?
-                // #importante:
-                // Se isso fechar o arquivo que o accept criou para o cliente,
-                // entao o novo accept vai criar um novo arquivo quando sondar a lista 
-                // de conexoes pendentes. 
-                //#bugbug: We can not close if we are using accept2.
-                //shutdown(newconn, SHUT_RDWR);
-                //shutdown(newconn, 0);         
+                
+                // #??
+                // Entao nos lemos o socket e escrevemos no socket.
+                // precisamos dar um tempo para o cliente ler,
+                // e nao simplesmente aceitarmos a proxima conexao pendente.
+                gwssrv_yield();
+                gwssrv_yield();
+                gwssrv_yield();
+                gwssrv_yield();
                 //close(newconn);
-            };
-            */
-            
-            //#talvez aqui podemos pegar as mensages de sistema.
+            }
         };
-
 
         // ...
         

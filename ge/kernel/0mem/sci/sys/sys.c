@@ -1506,29 +1506,27 @@ int sys_write (unsigned int fd, char *ubuf, int count)
                                    (char *) ubuf, 
                                    (int) count );
 
-            // fail
-            if (nbytes <= 0){
-                debug_print("sys_write: [FAIL] file_write_buffer couldn't write on socket \n");
-                goto fail;
-            }
+                // fail
+                if (nbytes <= 0){
+                    debug_print("sys_write: [FAIL] file_write_buffer couldn't write on socket \n");
+                    goto fail;
+                }
 
-            // ok, write funcionou.
-            if (nbytes>0)
-            { 
-                debug_print("sys_write: WAKEUP READER\n");
-                __file->socket_buffer_full = TRUE;       // buffer cheio
-                __file->_flags &= ~__SWR;                 //nao posso mais ESCREVER.            
-                __file->_flags |= __SRD;                 // pode ler 
-                do_thread_ready( __file->tid_waiting );  // acorda leitores
+                // ok, write funcionou.
+                if (nbytes>0)
+                { 
+                    debug_print("sys_write: WAKEUP READER\n");
+                    __file->socket_buffer_full = TRUE;       // buffer cheio
+                    __file->_flags &= ~__SWR;                // nao posso mais ESCREVER.            
+                    __file->_flags |= __SRD;                 // pode ler 
+                    do_thread_ready( __file->tid_waiting );  // acorda leitores
                 
-                debug_print("sys_write: SLEEP WRITER\n");
-                __file->tid_waiting = current_thread;
-                do_thread_waiting(current_thread);
+                    debug_print("sys_write: SLEEP WRITER\n");
+                    __file->tid_waiting = current_thread;
+                    do_thread_waiting(current_thread);
                   
-                
-                return nbytes;                           // bytes written
-            }
-            
+                    return nbytes;                           // bytes written
+                }
             }
         }
         

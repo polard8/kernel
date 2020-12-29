@@ -208,6 +208,11 @@ int main ( int argc, char *argv[] )
         exit(1);
     }
 
+    //while(1){
+    // Hello
+    //gws_async_command(client_fd,3);
+    //}
+
 
     //
     // Window
@@ -412,12 +417,51 @@ int main ( int argc, char *argv[] )
         //gws_yield();
     //}
     
-    gws_debug_print ("gws: Sending command to close. \n");
+
+    // Isso ehestranho ... um cliente remoto nao deve poder fazer isso.
+    //gws_debug_print ("gws: Sending command to close the server. \n");
     gws_async_command(client_fd,1);
 
+    // Asking to server to send me an notification
+    // telling me to close myself
+    
+    //gws_debug_print ("gws: Pinging\n");
+    //gws_async_command(client_fd,2);
 
+
+    while(1){}
+    // ...
+
+    /*
+    unsigned long event_buffer[8];
+    // Event loop
+    while (TRUE)
+    {
+        // Get next event.
+        read ( client_fd, event_buffer, sizeof(event_buffer) );
+        
+        //event: Close my self
+        //if ( event_buffer[1] == 12344321 )
+        //{
+        //    gws_debug_print ("gws: [EVENT] We got the event 12344321\n \n");
+        //    break;
+        //}
+        
+        if ( event_buffer[0] == 'p' &&
+             event_buffer[1] == 'o' &&
+             event_buffer[2] == 'n' &&
+             event_buffer[3] == 'g' )
+        {
+            printf("PONG\n");
+            gws_async_command(client_fd,1);
+        }
+    };
+    */
+ 
     // exit
     gws_debug_print ("gws: bye :) \n");
+    exit(0);
+    
     return 0;
 }
 
