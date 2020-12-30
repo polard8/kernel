@@ -166,6 +166,7 @@ ldt1:
 
 ;;==================================================================
 ; _setup_system_interrupt: 
+;
 ;    Configura um vetor da IDT para a interrupção do sistema. 
 ;    O endereço do ISR e o número do vetor são passados via argumento.
 ;
@@ -209,8 +210,8 @@ _setup_system_interrupt:
     popad
     ret
 
-.address: dd 0
-.number: dd 0
+.address:  dd 0
+.number:   dd 0
 ;;--
 
 
@@ -237,17 +238,17 @@ setup_faults:
 	;#2  
 	mov eax, dword _fault_N2
 	mov ebx, dword 2
-	call _setup_system_interrupt	
+	call _setup_system_interrupt
 	
 	;#3  
 	mov eax, dword _fault_N3
 	mov ebx, dword 3
-	call _setup_system_interrupt	
-	
+	call _setup_system_interrupt
+
 	;#4  
 	mov eax, dword _fault_N4
 	mov ebx, dword 4
-	call _setup_system_interrupt	
+	call _setup_system_interrupt
 	
 	;#5  
 	mov eax, dword _fault_N5
@@ -392,7 +393,8 @@ setup_faults:
 
 ;=====================================
 ; setup_vectors:
-;    Configura alguns vetores da idt.
+;
+;     Setup some IDT vectors.
 ;
 
 setup_vectors:
@@ -400,83 +402,77 @@ setup_vectors:
     push eax
     push ebx 
 
-	;32
-	;Timer.
-	;Iniciamos um timer provisório, depois o main() inicia o definitivo.
-    mov eax, dword _timer_test    
-    mov ebx, dword 32
+    ; 32 - Timer.
+    ; Iniciamos um timer provisório, depois o main() inicia o definitivo.
+    mov eax,  dword _timer_test    
+    mov ebx,  dword 32
     call _setup_system_interrupt
 
-	;33
-	;Keyboard.
-    mov eax, dword  _irq1
-    mov ebx, dword 33
+    ; 33 - Keyboard.
+    mov eax,  dword _irq1
+    mov ebx,  dword 33
     call _setup_system_interrupt
 
-	;40
-	;Clock, rtc.
-	mov eax, dword  _irq8
-	mov ebx, dword 40
-	call _setup_system_interrupt
-	
-	;44
-	;Mouse.
-	mov eax, dword  _irq12
-	mov ebx, dword 44
-	call _setup_system_interrupt
-	
-	;46
-	;ide
-	mov eax,  dword _irq14 
-	mov ebx, dword 46
-	call _setup_system_interrupt
+    ; 40 - Clock, rtc.
+    mov eax,  dword _irq8
+    mov ebx,  dword 40
+    call _setup_system_interrupt
 
-	;47
-	;ide
-	mov eax,  dword _irq15 
-	mov ebx, dword 47
-	call _setup_system_interrupt
+    ; 44 - Mouse.
+    mov eax,  dword _irq12
+    mov ebx,  dword 44
+    call _setup_system_interrupt
 
+    ; 46 - ide
+    mov eax,  dword _irq14 
+    mov ebx,  dword 46
+    call _setup_system_interrupt
+
+    ; 47 - ide
+    mov eax,  dword _irq15 
+    mov ebx,  dword 47
+    call _setup_system_interrupt
 
     ;;
     ;; == System calls ===========================
     ;;
 
-    ;128 - 0x80
-	;A interrupção de sistema.
-	;#obs: 
-	;Utilizamos uma chamada diferente para configurar essa interrupção.
+    ; System interrupts
+    ; 128 - 0x80
+    ; 129 - 0x81
+    ; 130 - 0x82
+    ; ...
 
     ;; 0x80
-    mov eax, dword _int128
-    mov ebx, dword 128
+    mov eax,  dword _int128
+    mov ebx,  dword 128
     call _setup_system_interrupt  
 
     ;; 0x81
-    mov eax, dword _int129
-    mov ebx, dword 129
+    mov eax,  dword _int129
+    mov ebx,  dword 129
     call _setup_system_interrupt  
 
     ;; 0x82
-    mov eax, dword _int130
-    mov ebx, dword 130
+    mov eax,  dword _int130
+    mov ebx,  dword 130
     call _setup_system_interrupt  
 
     ;; ...
 
-    ;;#test
-    ;;Uma interrupção para habilitar as interrupções mascaráveis.
+    ;; =====================
+    
+    ;; #test
+    ;; Uma interrupção para habilitar as interrupções mascaráveis.
     ;; quem usará isso será a thread primária do processo init.
     ;; apenas uma vez.
     
-    mov eax, dword _int199
-    mov ebx, dword 199
+    mov eax,  dword _int199
+    mov ebx,  dword 199
     call _setup_system_interrupt  
 
-
-
     ;; ...
-    
+
     pop ebx
     pop eax
     ret

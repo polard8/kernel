@@ -1,6 +1,12 @@
 BugBug
 Eu tenho um problema pra resolver com a segmentaçao na hora da interrupçao do sistema.
+
 --------
+[editando]
+resolvido +-: Criei mais interrupçoes e com elas consigo acessar tudo da forma em que queria. Agora consigo configurar direito as estruturas e estou entrando com as interrupçoes habilitadas. Estou feliz.
+
+--------
+Descriçao do problema:
 Com as IRQs esta tudo bem. Implementei de uma maneira que tudo esta funcionando como o esperado, mais ainda ha muito o que fazer. Mas estou feliz com isso.
 Ja as interrupçoes de software sao outra historia ... a coisa ta feia.
 Eu tenho uma interrupçao do sistema com um monte de serviços. Entao eh meio complicado fazer mudanças nela nesse momento. Eh pedir pra ter problemas. Mas vou descrever os problemas.
