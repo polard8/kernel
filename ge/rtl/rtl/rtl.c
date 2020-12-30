@@ -12,6 +12,7 @@
 #include <rtl/gramado.h> 
 #include <sysdeps/gramado/syscall.h>
 
+// =============================================================
 
 // system call.
 void *gramado_system_call ( 
@@ -32,6 +33,62 @@ void *gramado_system_call (
 }
 
 
+
+void *sc80 ( 
+    unsigned long a, 
+    unsigned long b, 
+    unsigned long c, 
+    unsigned long d )
+{
+    int __Ret = 0;
+
+    // System interrupt.
+
+    asm volatile ( " int %1 \n"
+                 : "=a"(__Ret)
+                 : "i"(0x80), "a"(a), "b"(b), "c"(c), "d"(d) );
+
+    return (void *) __Ret; 
+}
+
+void *sc81 ( 
+    unsigned long a, 
+    unsigned long b, 
+    unsigned long c, 
+    unsigned long d )
+{
+    int __Ret = 0;
+
+    // System interrupt.
+
+    asm volatile ( " int %1 \n"
+                 : "=a"(__Ret)
+                 : "i"(0x81), "a"(a), "b"(b), "c"(c), "d"(d) );
+
+    return (void *) __Ret; 
+}
+
+void *sc82 ( 
+    unsigned long a, 
+    unsigned long b, 
+    unsigned long c, 
+    unsigned long d )
+{
+    int __Ret = 0;
+
+    // System interrupt.
+
+    asm volatile ( " int %1 \n"
+                 : "=a"(__Ret)
+                 : "i"(0x82), "a"(a), "b"(b), "c"(c), "d"(d) );
+
+    return (void *) __Ret; 
+}
+
+// ...
+
+
+// =============================================================
 
 int rtl_get_input_mode(void)
 {

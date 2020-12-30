@@ -162,7 +162,7 @@ _int129:
     ;mov fs, ax
     ;mov gs, ax
 
-    ;; call _sci1
+    call _sci1
 
     mov dword [.int129Ret], eax 
     pop eax
@@ -211,7 +211,7 @@ _int130:
     ;mov fs, ax
     ;mov gs, ax
 
-    ;; call _sci2
+    call _sci2
 
     mov dword [.int130Ret], eax 
     pop eax

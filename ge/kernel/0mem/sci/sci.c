@@ -2908,8 +2908,21 @@ void *sci1 (
     unsigned long arg3, 
     unsigned long arg4 )
 {
-    debug_print("sci1: [TODO]\n");
+    debug_print ("sci1: [TODO]\n");
+
+    switch (number)
+    {
+        case 1:
+            return NULL;
+            break;  
+        
+        default:
+            break;
+    };
+
+    panic (" @ sci1\n");
 }
+
 
 /*
  ***************************************
@@ -2924,6 +2937,26 @@ void *sci2 (
     unsigned long arg4 )
 {
     debug_print("sci2: [TODO]\n");
+
+
+    switch (number)
+    {
+        //set magic
+        case 1:
+            CONSOLE_TTYS[fg_console].magic = arg2;
+            return NULL;
+            break;  
+            
+        //get magic
+        case 2:
+            return (void*) CONSOLE_TTYS[fg_console].magic;
+            break;  
+        
+        default:
+            break;
+    };
+    
+    panic (" @ sci2\n");
 }
 
 

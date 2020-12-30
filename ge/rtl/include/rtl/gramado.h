@@ -28,15 +28,35 @@
 //
 
 
+// =====================================================
 
 // system call
 void *gramado_system_call ( 
-    unsigned long a, 
+    unsigned long a,  //Service number. 
     unsigned long b, 
     unsigned long c, 
     unsigned long d );
 
 
+void *sc80 ( 
+    unsigned long a,  //Service number. 
+    unsigned long b, 
+    unsigned long c, 
+    unsigned long d );
+
+void *sc81 ( 
+    unsigned long a,  //Service number. 
+    unsigned long b, 
+    unsigned long c, 
+    unsigned long d );
+
+void *sc82 ( 
+    unsigned long a,  //Service number. 
+    unsigned long b, 
+    unsigned long c, 
+    unsigned long d );
+
+// =====================================================
 
 
 // input mode

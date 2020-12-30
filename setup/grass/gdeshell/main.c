@@ -2756,6 +2756,18 @@ do_compare:
         goto exit_cmp;
     }
 
+    int magic_value=0;
+    if ( gramado_strncmp( prompt, "t10", 3 ) == 0 )
+    {
+        printf ("t10:  \n");
+        //sc80 (0,0,0,0);
+        //sc81 (0,0,0,0);
+        sc82 (1,5678,0,0);               //set magic of fg_console
+        magic_value = sc82 (2,0,0,0); //get magic of fg_console
+        printf("MAGIC={%d}\n",magic_value);
+        goto exit_cmp;
+    }
+
 
     // t11 
     // Testando o envio de mensagens para o 
