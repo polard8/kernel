@@ -190,7 +190,8 @@ int sys_ioctl ( int fd, unsigned long request, unsigned long arg )
 //#todo: rever esses argumentos.
 // SVr4, 4.3BSD, POSIX.1-2001. and more.
 //See: https://man7.org/linux/man-pages/man2/fcntl.2.html
-int sys_fcntl ( int fd, int cmd, unsigned long arg ){
+int sys_fcntl ( int fd, int cmd, unsigned long arg )
+{
 
     debug_print ("sys_fcntl:\n");
 

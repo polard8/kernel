@@ -2952,6 +2952,19 @@ void *sci2 (
             return (void*) CONSOLE_TTYS[fg_console].magic;
             break;  
         
+
+        case 3:
+            return (void*) systemGetSystemMetrics(arg2);
+            break;
+        
+        case 4:
+            return (void*) sys_ioctl ( (int) arg2, (unsigned long) arg3, (unsigned long) arg4 );
+            break;
+            
+        case 5:
+            return (void*) sys_fcntl ( (int) arg2, (int) arg3, (unsigned long) arg4 );
+            break;
+        
         default:
             break;
     };

@@ -1320,6 +1320,18 @@ int socket_ioctl ( int fd, unsigned long request, unsigned long arg )
         return -1;
     }
 
+    // process
+    
+    p = (void*) processList[current_process];
+
+    if ( (void *) p == NULL )
+    {
+        debug_print("socket_ioctl: [FAIL] p\n");
+        return -1;
+    }
+
+    // file
+    
     f = (file *) p->Objects[fd];
 
     if ( (void *) f == NULL )
@@ -1350,14 +1362,12 @@ int socket_ioctl ( int fd, unsigned long request, unsigned long arg )
             debug_print ("socket_ioctl: [4000]\n");
             printf("socket_ioctl: [4000] fd %d pid %d #debug\n", fd, arg);
             refresh_screen();
-            //f->sync.sender = (pid_t) arg;
-            //f->sync_sender = (pid_t) arg;
+            f->sync.sender = (pid_t) arg;
             return 0;
             break;
         
         case 4001:
-            //return f->sync.sender;
-            //return f->sync_sender;
+            return (int) f->sync.sender;
             break;
         
         case 4002:

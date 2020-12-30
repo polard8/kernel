@@ -344,7 +344,7 @@ struct file_d
     // Sincronizando a leitura e a escrita
     // para arquivos como socket, tty, buffer ... etc.
     
-    //struct kstdio_sync_d sync;
+    struct kstdio_sync_d sync;
     //pid_t sync_sender;
     //pid_t sync_receiver;
 

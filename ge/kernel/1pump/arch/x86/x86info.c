@@ -27,8 +27,8 @@ void x86_info (void)
  *                    ShowCPUIntelParameters()
  */
 
-void show_cpu_intel_parameters (void){
-	
+void show_cpu_intel_parameters (void)
+{
     //Title.
     printf("\nx86 CPU Info:\n\n");
 	//printf("=============\n");

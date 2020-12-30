@@ -1042,7 +1042,6 @@ unsigned long systemGetSystemMetrics ( int index )
 {
 
 
-
     // #bugbug
     // We have a HUGE problem here.
     // We can't properly get the data inside the structures. 
@@ -1052,7 +1051,9 @@ unsigned long systemGetSystemMetrics ( int index )
     // and review all the moment when the ring3 app tryes to
     // get data from a ring0 struct.
 
-
+    // # The solution.
+    // We are trying to have more system calls. sc80 sc81 sc82.
+    // These system calls uses different set of selectors.
 
 	//print ("#debug: systemGetSystemMetrics: i={%d} \n",index)
 
@@ -1255,7 +1256,7 @@ unsigned long systemGetSystemMetrics ( int index )
             
         case 67:
             return (unsigned long) mm_used_extraheap3;
-            break;               
+            break; 
             
 
         //
@@ -1312,13 +1313,11 @@ unsigned long systemGetSystemMetrics ( int index )
             
         case 102:
             return (unsigned long) g_profiler_ints_irq2;
-            break;              
-            
-            
+            break; 
+
         case 103:
             return (unsigned long) g_profiler_ints_irq3;
-            break;              
-            
+            break;
 
         case 104:
             return (unsigned long) g_profiler_ints_irq4;
