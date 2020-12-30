@@ -152,8 +152,22 @@ gde_extra_services (
 
     // Yield the current thread.
     // O seu tempo rodando vai para perto do fim.
-    //todo: debug_print
-    if (number == 265){  yield (current_thread); return NULL; }
+    
+    // #bugbug
+    // Isso muda o estado da thread e retorna.
+    // Mas certamente nao podera retornar, pois seu estado
+    // foi alterado. Outro problema eh que a chamada ao sistema
+    // nao salva o contexto da thread, entao, quando a thread
+    // for reescalonada, tera que usar o ultimo contexto salvo, 
+    // que eh um contexto bem anterior ao da chamada ao sistema.
+    
+    if (number == 265)
+    {
+        debug_print("sci0: [FIXME] Service 265 suspended!\n");   
+        // yield (current_thread); 
+        return NULL; 
+    }
+
 
     // Pega o n�mero da tty de um processo, dado o pid.
     // ps/action/process.c

@@ -1,5 +1,5 @@
 /*
- * Arquivo: queue.c
+ * File: queue.c
  *
  *     Faz parte do Process Manager, parte fundamental do Kernel Base.
  *
@@ -8,22 +8,34 @@
  *     Obs: As rotinas de queue aqui usam uma abordagem não convencional
  * e pouco eficiente. 
  *
- * Versão 1.0, 2015.
+ * 2015 - Created by Fred Nora.
  */
- 
+
+
+// #todo
+// podemos colocar filas nas estruturas dos objetos.
+// As threads esperam nessas filas.
+
+
+// #bugbug
+// A estrutura de fila usada nessa rotinas esta fora do padrao.
+// Tem um monte de vetores na estrutura de fila.
+// nao eh isso que queremos.
 
 #include <kernel.h>
 
 
 /*
+ **********************************
  * init_queue:
- *     Inicializa a estrutura de fila.
+ *     Inicializa uma estrutura de fila.
  */
 
-int init_queue (struct queue_d *q){	
- 
-	unsigned int i;
-	
+int init_queue (struct queue_d *q)
+{
+
+    unsigned int i=0;
+
 	// #importante
 	// MAX_QUEUES é o número máximo de filas que pode haver na lista.
 	// A lista contém o potneiro head de uma lista encadeada.

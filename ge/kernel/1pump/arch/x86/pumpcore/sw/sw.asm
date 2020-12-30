@@ -49,7 +49,7 @@ _int128:
     ;; realizar alguma operaçao em algum dispositivo, entao
     ;; nao tera como esperar por interrupçoes do dispositivo.
 
-    cli 
+    ;cli 
     pushad 
 
     push ds
@@ -125,9 +125,9 @@ _int128:
     popad
     mov eax, dword [.int128Ret] 
     
-    jmp SW_ExitHelper2  ; sti and iretd
+    ;jmp SW_ExitHelper2  ; sti and iretd
     ;sti
-    ;iretd
+    iretd
 
 .int128Ret: dd 0
 ;--  
