@@ -879,7 +879,8 @@ int sys_read (unsigned int fd, char *ubuf, int count)
     
     if ( count < 0 ){ 
         debug_print ("sys_read: count < 0\n");
-        return -1; 
+        return -1;
+        // return -EINVAL; 
     }
     
     if ( count == 0 ){ 
@@ -920,6 +921,7 @@ int sys_read (unsigned int fd, char *ubuf, int count)
     }
 
     // File.
+    
     __file = (file *) __P->Objects[fd];  
 
     if ( (void *) __file == NULL )
@@ -930,16 +932,27 @@ int sys_read (unsigned int fd, char *ubuf, int count)
     }
 
 
+    if ( __file->sync.can_read != TRUE )
+    {
+        debug_print ("sys_read: [PERMISSION] Can NOT read the file\n");
+        printf      ("sys_read: [PERMISSION] Can NOT read the file\n");
+        goto fail; 
+    }
+
+
     /*
     // #todo
     // ainda nao inicializamos esse elemento.
-    if( __file->is_readable == 0)
+    if( __file->is_readable == FALSE )
     {
         debug_print ("sys_read: Not readable\n");
         return -1;
     }
     */
 
+    // #todo: Create thie element in the structure.
+    // if( __file->is_directory == TRUE ){}
+    
 
 
     //==========================================================
@@ -1380,19 +1393,30 @@ int sys_write (unsigned int fd, char *ubuf, int count)
         printf      ("sys_write: __file not open\n");
         goto fail;
     }
-    
+
+
+    if ( __file->sync.can_write != TRUE )
+    {
+        debug_print ("sys_write: [PERMISSION] Can NOT write the file\n");
+        printf      ("sys_write: [PERMISSION] Can NOT write the file\n");
+        goto fail; 
+    }
+
 
     /*
     // #todo
     // ainda nao inicializamos esse elemento.
-    if( __file->is_writable == 0)
+    if( __file->is_writable == FALSE )
     {
         debug_print ("sys_write: Not writable\n");
         return -1;
     }
     */
 
+    //#todo: Create thie element in the structure.
+    //if( __file->is_directory == TRUE ){}
 
+//=======================================================
 
     // escrevendo no stdin
     if ( __file->_file == 0 )

@@ -1230,24 +1230,15 @@ struct process_d *create_process (
     Process->processName_len = sizeof(Process->__processname);
 
 
-    // Lista de streams ...
-    // Zerando essa lista e criando 3 streams para o processo.
-    // Mas vamos improvisar e usar os ponteiros do kernel.
-		
-        //for ( i=0; i< NUMBER_OF_FILES; i++ ){
-            //Process->Streams[i] = 0;
-        //}
-
-        //Process->Streams[0] = (unsigned long) stdin;
-        //Process->Streams[1] = (unsigned long) stdout;
-        //Process->Streams[2] = (unsigned long) stderr;
-
-        // #todo
-        // Podemos colocar 3 arquivos em Objects[]
-        // Ou seriam tty ? 
-
-    // loop
-    // Limpando todos slots.
+    // Standard stream.
+    // See: kstdio.c for the streams initialization.
+    // #todo: We need a flag.
+    
+    if (kstdio_standard_streams_initialized != TRUE )
+    {
+        panic ("create_process: [ERROR] Standard stream is not initialized\n");
+    }
+    
     for ( i=0; i<32; ++i ){ Process->Objects[i] = 0; }
 
     if ( (void *) stdin == NULL ){
@@ -1261,14 +1252,7 @@ struct process_d *create_process (
     if ( (void *) stderr == NULL ){
         panic ("create_process: [TEST] stderr");
     }
-        
-        // #bugbug
-        // precisamos colocar os arquivos também na lista
-        // global de arquivos abertos. openfileList[]
-        // See: fs.c
-     
-        // O fluxo padrão foi criando antes em klib/kstdio.c
-        // #todo: Checar as características desses arquivos.
+
     Process->Objects[0] = (unsigned long) stdin;
     Process->Objects[1] = (unsigned long) stdout;
     Process->Objects[2] = (unsigned long) stderr;
@@ -1669,6 +1653,11 @@ struct process_d *create_process (
 
     processList[PID] = (unsigned long) Process;
 
+    // #todo
+    // last_created = PID;
+    
+    // ok
+    
     return (void *) Process;
 
 // Fail

@@ -116,6 +116,15 @@ dispatch_count_t *DispatchCountBlock;
 unsigned long dispatcherReadyList[PRIORITY_MAX +1];
 
 
+//
+// == prototypes ===============================
+//
+
+
+/*
+void rabbit_hole(void);
+void rabbit_hole(void){  asm ("iret \n");  }
+*/
 
 /*
  * dispatcher:

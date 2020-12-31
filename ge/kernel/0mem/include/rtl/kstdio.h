@@ -242,6 +242,17 @@ struct kstdio_sync_d
     
     int stage;
     
+    // for files, ttys, sockets ...
+    int can_read;
+    int can_write;
+    
+    // for images.
+    int can_execute;
+    
+    // for sockets.
+    int can_accept;
+    int can_connect;
+        
     // ...
 };
 
@@ -345,15 +356,6 @@ struct file_d
     // para arquivos como socket, tty, buffer ... etc.
     
     struct kstdio_sync_d sync;
-    //pid_t sync_sender;
-    //pid_t sync_receiver;
-
-
-    // isso eh coisa do fs
-    // deve ficar na entrada do diretorio ou no inode?
-    int is_readable;
-    int is_writable;
-    int is_executable;
 
 
 	// flags, below; this FILE is free if 0 	
@@ -463,6 +465,8 @@ file *volume2_rootdir;  // 5 - system volume root dir.
  
 unsigned long file_table[NUMBER_OF_FILES]; 
 
+
+int kstdio_standard_streams_initialized;
 
 
 // N� usaremos o array de estrutura.

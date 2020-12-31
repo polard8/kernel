@@ -415,6 +415,17 @@ socket_gramado (
         _file->gid = (gid_t) current_group;
         _file->____object = ObjectTypeSocket;
         
+        // sync
+        _file->sync.sender = -1;
+        _file->sync.receiver = -1;
+        _file->sync.stage = 0;
+        _file->sync.can_read = TRUE;
+        _file->sync.can_write = TRUE;
+        _file->sync.can_execute = FALSE;
+        _file->sync.can_accept = TRUE;
+        _file->sync.can_connect = TRUE;
+        
+        
         _file->_flags = __SWR;
 
         // No name for now.
@@ -594,6 +605,17 @@ socket_unix (
         _file->gid = (gid_t) current_group;
         _file->____object = ObjectTypeSocket;
 
+        // sync
+        _file->sync.sender = -1;
+        _file->sync.receiver = -1;
+        _file->sync.stage = 0;
+        _file->sync.can_read = TRUE;
+        _file->sync.can_write = TRUE;
+        _file->sync.can_execute = FALSE;
+        _file->sync.can_accept = TRUE;
+        _file->sync.can_connect = TRUE;
+
+
         _file->_flags = __SWR;
         
         // No name for now.
@@ -649,6 +671,12 @@ fail:
     return (int) (-1);  
 }
 
+
+/*
+ it creates a raw socket ... is it an option.
+int socket_raw( ...);
+int socket_raw( ...){}
+*/
 
 // Configura a estrutura de socket para um socket da
 // família AF_INET.
@@ -767,6 +795,16 @@ socket_inet (
         _file->uid = (uid_t) current_user;
         _file->gid = (gid_t) current_group;
         _file->____object = ObjectTypeSocket;
+
+        // sync
+        _file->sync.sender = -1;
+        _file->sync.receiver = -1;
+        _file->sync.stage = 0;
+        _file->sync.can_read = TRUE;
+        _file->sync.can_write = TRUE;
+        _file->sync.can_execute = FALSE;
+        _file->sync.can_accept = TRUE;
+        _file->sync.can_connect = TRUE;
 
         //flags 
         _file->_flags = __SWR;
@@ -1371,15 +1409,18 @@ int socket_ioctl ( int fd, unsigned long request, unsigned long arg )
             break;
         
         case 4002:
-            return f->is_readable;
+            //return -1;
+            return f->sync.can_read;
             break;
 
         case 4003:
-            return f->is_writable;
+            //return -1;
+            return f->sync.can_write;
             break;
 
         case 4004:
-            return f->is_executable;
+            //return -1;
+            return f->sync.can_execute;
             break;
             
     };
@@ -1741,28 +1782,34 @@ sys_connect (
         goto fail;
     }
 
-    // sender's file
-    // Objeto do tipo socket.
-    // O cliente criou esse socket antes de chamar o connect().
+    // The client's socket.
+
     f = (file *) cProcess->Objects[client_socket_fd];
 
     if ( (void *) f == NULL )
     {
-        printf ("sys_connect: [FAIL] f\n");
+        printf ("sys_connect: [FAIL] f. The client's socket\n");
         goto fail;
     }
 
-    //is socket??
+    // Is it a socket??
     
     int __is = -1;
     
     __is = is_socket ((file *)f);
-    if (__is != 1)
+    if (__is != TRUE)
     {
         printf ("sys_connect: [FAIL] f is not a socket\n");
         goto fail;
     }
 
+    // Yes. It is a socket.
+    
+    if (f->sync.can_connect != TRUE)
+    {
+        printf ("sys_connect: [PERMISSION FAIL] Client can NOT connect\n");
+        goto fail;
+    }
 
     // Pega a estrutura de socket associada ao arquivo.
     // socket structure in the senders file.
@@ -1798,7 +1845,6 @@ sys_connect (
         goto fail;
     }
 
-
     // process
     // O processo cliente chamou essa função e
     // então pegaremos agora o processo alvo,
@@ -1832,8 +1878,15 @@ __OK_new_slot:
     server_socket->clientfd_on_server = __slot;
     client_socket->clientfd_on_server = __slot;
 
+    // #todo
+    // Temos que rever as coisas por aqui. kkk
+
     // incluimos como objeto do servidor o ponteiro para 
     // o arquivo que representa o socket do cliente.
+    
+    // O arquivo de socket do cliente agora tem um fd
+    // no processo servidor.
+        
     sProcess->Objects[__slot] = (file *) f;  // no que encontramos
     sProcess->Objects[31]     = (file *) f;  // no 31.
 
@@ -2197,6 +2250,13 @@ sys_accept (
     {
         debug_print ("sys_accept: sFile is not a socket object\n");
              printf ("sys_accept: sFile is not a socket object\n");
+        goto fail;
+    }
+    
+    if (sFile->sync.can_accept != TRUE )
+    {
+        debug_print ("sys_accept: sFile can NOT accept connections\n");
+             printf ("sys_accept: sFile can NOT accept connections\n");
         goto fail;
     }
 

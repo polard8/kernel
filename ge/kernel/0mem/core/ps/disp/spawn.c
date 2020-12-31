@@ -69,17 +69,17 @@ void KiSpawnTask (int id){
 	// Archtecture dependent stuff.
 	// x86.
  
-void spawn_thread (int id){
-
+void spawn_thread (int id)
+{
     struct thread_d *Current;
     struct thread_d *spawn_Pointer;
 
-    //int Status=0;
 
 	// #todo: 
 	// Filtrar tid.
 
-    if ( id < 0 || id >= THREAD_COUNT_MAX){
+    if ( id < 0 || id >= THREAD_COUNT_MAX)
+    {
         printf ("spawn-spawn_thread: TID=%d", id );
         die ();
     }
@@ -298,17 +298,25 @@ void spawn_thread (int id){
     asm ("pushl %0" :: "r" ((unsigned long) spawn_Pointer->eip             )  );    //eip.
     
 
-	// #importante
-	// Precismos disso pois foi o irq0 quem nos trouxe aqui.
-
-    asm ("movb $0x20, %al \n");
-    asm ("outb %al, $0x20 \n");
-
+    // #bugbug
+    // Why the EOI ?
+    
+    // #importante
+    // Precismos disso pois foi o irq0 quem nos trouxe aqui.
+    // Atravez de um request ?
+    
+    // #todo
+    //if ( eoi_needed == TRUE )
+    //{
+        asm ("movb $0x20, %al \n");
+        asm ("outb %al, $0x20 \n");
+    //}
+    
 	//
 	// Fly!
 	//
 
-    asm ("iret \n");    
+    asm ("iret \n"); 
 
     /*
 	// # teste sujo

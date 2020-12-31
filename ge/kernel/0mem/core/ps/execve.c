@@ -22,31 +22,35 @@
 /*
  *******************************************
  * sys_execve:
+ * 
  */
 
-        // service 248
-        // execve support.
-        // executa um programa usando o processo atual.
-        // #bugbug: A intenção é carregar a imagem num novo endereço físico
-        // e continuar usando o processo clone criado pode fork.
-        // IN: pathname, argv, envp.
+// service 248
+// execve support.
+// executa um programa usando o processo atual.
+// #bugbug: A intenção é carregar a imagem num novo endereço físico
+// e continuar usando o processo clone criado pode fork.
 
 
 // IN: name, argv, envp.
 int 
-sys_execve ( const char *pathname, 
-             char *argv[], 
-             char *envp[] ) 
+sys_execve ( 
+    const char *pathname, 
+    char *argv[], 
+    char *envp[] ) 
 {
 
+    debug_print("sys_execve: [TODO] Not implemented yet\n");
 
-    debug_print("sys_execve: TODO: Not implemented yet\n");
+    if ( (void*) pathname == NULL )
+    {
+        debug_print("sys_execve: [ERROR] pathname \n");
+    }
+    
+    // ...
+    
     return -1;
 }
-
-
-
-
 
 
 

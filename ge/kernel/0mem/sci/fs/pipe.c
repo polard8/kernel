@@ -303,7 +303,14 @@ int sys_pipe ( int *pipefd, int flags )
 
 
     debug_print ("sys_pipe:\n");
+    
+    // Why ?    
+    // Reject flags other than O_CLOEXEC.
+    //if ((flags & O_CLOEXEC) != flags)
+    //    return -EINVAL;
 
+    // unsigned long fd_flags = (flags & O_CLOEXEC) ? FD_CLOEXEC : 0;
+    
     // Process.
 
     Process = (void *) processList[current_process];
@@ -408,6 +415,30 @@ int sys_pipe ( int *pipefd, int flags )
         f2->pid = (pid_t) current_process;
         f2->uid = (uid_t) current_user;
         f2->gid = (gid_t) current_group;
+
+
+        // full duplex ?
+
+        // sync: 
+        f1->sync.sender = -1;
+        f1->sync.receiver = -1;
+        f1->sync.stage = 0;
+        f1->sync.can_read = TRUE;
+        f1->sync.can_write = TRUE;
+        f1->sync.can_execute = FALSE;
+        f1->sync.can_accept = FALSE;
+        f1->sync.can_connect = FALSE;
+
+        // sync: 
+        f2->sync.sender = -1;
+        f2->sync.receiver = -1;
+        f2->sync.stage = 0;
+        f2->sync.can_read = TRUE;
+        f2->sync.can_write = TRUE;
+        f2->sync.can_execute = FALSE;
+        f2->sync.can_accept = FALSE;
+        f2->sync.can_connect = FALSE;
+
 
         // No name for now.
         f1->_tmpfname = NULL;

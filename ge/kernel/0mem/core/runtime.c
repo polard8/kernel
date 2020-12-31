@@ -28,7 +28,8 @@
  *     @todo: Mudar para runtimeInit().
  */
 
-int init_runtime (void){
+int init_runtime (void)
+{
 
     int Status = 0;
 

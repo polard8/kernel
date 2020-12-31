@@ -19,25 +19,12 @@
  * fs_create_file:
  *     Cria um arquivo.
  */
-
 // #todo
 // This function could be used to support libc function creat()
-
+// See: we have this on fs.c
 int fs_create_file ( char *name )
 {
-    //char empty_buffer[1024+1];
-    
-    debug_print("fs_create_file: [TODO]\n");
-
-    /*
-    return (int) fsSaveFile ( 
-                     (char *) name, 
-                     (unsigned long) 2,     // sectors
-                     (unsigned long) 1024,  // bytes
-                     (char *) file_address, // address
-                     (char) 0x20 );         // flags  
-    */                 
-
+    debug_print("fs_create_file: [FIXME]\n");
     return -1;
 }
 
@@ -46,22 +33,10 @@ int fs_create_file ( char *name )
  * fs_create_dir:
  *     Cria um diretório.
  */
-
+// See: we have this on fs.c
 unsigned long fs_create_dir ( char *name, unsigned long id )
 {
-    //char empty_buffer[1024+1];
-    
-    debug_print("fs_create_dir: [TODO]\n");
-
-    /*
-    return (int) fsSaveFile ( 
-                     (char *) name, 
-                     (unsigned long) 2,     // sectors
-                     (unsigned long) 1024,  // bytes
-                     (char *) file_address, // address
-                     (char) 0x10 );         // flags  ??? #bugbug: Conferir.
-    */                 
-
+    debug_print("fs_create_dir: [FIXME]\n");
     return -1;
 }
 
@@ -75,7 +50,7 @@ fs_create_entry (
     unsigned long cluster,  //numero do cluster inicial na fat
     unsigned long size )    //tamanho do arquivo.
 {
-   // return;
+    debug_print("fs_create_entry: [TODO]\n");
 }   
 
 
@@ -85,7 +60,7 @@ fs_create_name (
     unsigned long id, 
     unsigned long eid )
 {
-    //return;
+    debug_print("fs_create_name: [TODO]\n");
 }  
 
 

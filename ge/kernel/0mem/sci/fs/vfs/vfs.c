@@ -17,13 +17,13 @@
  *     Initializing VFS.
  */
 
-int vfsInit (void){
-
+int vfsInit (void)
+{
     int i=0;
     int slot = -1;
+    size_t Size=0;
 
     debug_print ("vfsInit: [FIXME]\n");
-
 
     // Inicializando a estrutura do VFS.
 
@@ -31,13 +31,17 @@ int vfsInit (void){
     printf("Initilizing VFS..\n");
 #endif
 
+    if ( (void*) storage == NULL ){
+        panic ("vfsInit: [FAIL] storage\n");
+    }
+
+
+    // storage->vfs 
+
     storage->vfs = kmalloc ( sizeof(struct vfs_d) );
 
-
-    if ( (void *) storage->vfs == NULL )
-    {
-        panic ("vfsInit: [FAIL] storage->vfs");
-
+    if ( (void *) storage->vfs == NULL ){
+        panic ("vfsInit: [FAIL] storage->vfs\n");
     }else{
         // todo: object 
         
@@ -45,15 +49,22 @@ int vfsInit (void){
         storage->vfs->magic = 1234;
 
         storage->vfs->status = VFSStatusInitialized;
-        storage->vfs->name = "VFS NAME";
-        storage->vfs->description = "VIRTUAL FILE SYSTEM";
-        storage->vfs->help_string = "Virtual File System help string @todo";
+        storage->vfs->name        = "VFS Name";
+        storage->vfs->description = "Virtual File System";
+        storage->vfs->help_string = "[TODO] VFS help string";
 
-        // ## root dir address  ##
-        storage->vfs->rootdir_address = (unsigned long) kmalloc( VFS_ROOTDIR_NUMBER_OF_ENTRIES * VFS_ROOTDIR_ENTRY_SIZE );
+        // root dir address
+        
+        Size = (size_t) ( VFS_ROOTDIR_NUMBER_OF_ENTRIES * VFS_ROOTDIR_ENTRY_SIZE );
+        
+        if ( Size <= 0 )
+            panic ("vfsInit: Size\n");
+            
+        storage->vfs->rootdir_address = (unsigned long) kmalloc(Size);
 
-        if ( storage->vfs->rootdir_address = 0 ){
-            panic ("vfsInit: storage->vfs->rootdir_address\n");	
+        if ( (void *) storage->vfs->rootdir_address == NULL )
+        {
+            panic ("vfsInit: storage->vfs->rootdir_address\n");
         }
  
         // ...
@@ -67,69 +78,105 @@ int vfsInit (void){
 
     // pega slot em file_table[] para
     slot = get_free_slots_in_the_file_table();
-    if (slot<0 || slot >= NUMBER_OF_FILES){
-        panic ("fsInit: slot");
+    if (slot<0 || slot >= NUMBER_OF_FILES)
+    {
+        panic ("vfsInit: No more file slots\n");
     }
+
+
+    // vfs ??
+    // Is it a file structure ?
+
     vfs = file_table[slot];
+
+    if ( (void*) vfs == NULL )
+    {
+        panic ("vfsInit: [FAIL] vfs\n");
+    }
+
+    
     vfs->filetable_index = slot;
 
-    if ( (void *) vfs == NULL )
-    {
-        panic ("vfsInit: [FAIL] vfs");
+    // #bugbug: 
+    // Não usar o termo 'stream'.
+    
+    storage->vfs->_file = vfs;
 
-    }else{
+    vfs->used = 1;
+    vfs->magic = 1234;
+    vfs->____object = ObjectTypeFileSystem;
 
-        // #bugbug: 
-        // Não usar o termo 'stream'.
-        storage->vfs->_file = vfs;
+    // sync 
 
-        vfs->used = 1;
-        vfs->magic = 1234;
-        vfs->____object = ObjectTypeFileSystem;
+    // Can not read/write a file like this.
+    vfs->sync.can_read = FALSE;
+    vfs->sync.can_write = FALSE;
+    vfs->sync.can_execute = FALSE;
+
+    vfs->sync.can_accept = FALSE; 
+    vfs->sync.can_connect = FALSE;
+
+    // buffer.
+    
+    // Why we need a buffer?
+    // The buffer is the directory itself.
+
+    vfs->_base = (unsigned char *) storage->vfs->rootdir_address;
+    vfs->_p = vfs->_base;
+
+    vfs->_cnt = Size;
+    //vfs->_cnt = ( VFS_ROOTDIR_NUMBER_OF_ENTRIES * VFS_ROOTDIR_ENTRY_SIZE );
         
-        // todo: object
-        
-        vfs->_base = (unsigned char *) storage->vfs->rootdir_address;
-        vfs->_p = vfs->_base;
-        vfs->_cnt = ( VFS_ROOTDIR_NUMBER_OF_ENTRIES * VFS_ROOTDIR_ENTRY_SIZE );
-        
-        
-        // #bugbug: 
-        // Precisamos de um index.
-        // Mas a lista é própria. fileList[]
-        
-        vfs->_file = 0; //? 
-        vfs->_tmpfname = "VFS1    VFS";
-        vfs->fd_counter =1;
+
+    // #todo:
+    // This is gonna be the fd when 
+    // some process opening the file system.
+
+    vfs->_file = -1;
+
+
+    vfs->_tmpfname = "VFS1    VFS";
+    vfs->fd_counter =1;
   
-        // ...
-        // inode support.
-        // pega slot em inode_table[] 
-        slot = get_free_slots_in_the_inode_table();
-        if (slot<0 || slot >=32){
-            panic ("vfsInit: vfs inode slot");
-        }
-        vfs->inode = inode_table[slot];
-        vfs->inodetable_index = slot;
-        if ( (void*) vfs->inode == NULL ){
-            panic ("vfsInit: vfs inode struct");
-        }
-        vfs->inode->filestruct_counter = 1;  //inicialize
-        memcpy ( 
-            (void*) vfs->inode->path, 
-            (const void*) vfs->_tmpfname, 
-            sizeof( vfs->inode->path ) );
+    // ...
+    // inode support.
+    // pega slot em inode_table[] 
+
+    slot = get_free_slots_in_the_inode_table();
+    if (slot<0 || slot >=32)
+    {
+        panic ("vfsInit: No more inode slots\n");
+    }
+    
+    // inode.
+    
+    vfs->inode = inode_table[slot];
+    vfs->inodetable_index = slot;
+    
+    if ( (void*) vfs->inode == NULL )
+    {
+        panic ("vfsInit: inode struct \n");
+    }
+    vfs->inode->filestruct_counter = 1;  //inicialize
+    
+    // copy name.
+    memcpy ( 
+        (void*)        vfs->inode->path, 
+        (const void*)  vfs->_tmpfname, 
+        sizeof( vfs->inode->path ) );
         
-        // ... 
-    };
+    // ... 
 
-
-	//  selecionando o primeiro diretório,
-	// que deve ser o volume do vfs
+    // #bugbug
+    // Selecionando o primeiro diretório,
+    // que deve ser o volume do vfs
+    
     current_directory = 0;
+
 
 	// #importante
 	// É possivel fazer mais inicializações.
+
 
 #ifdef KERNEL_VERBOSE
     printf("VFS Initialized\n");
@@ -137,6 +184,7 @@ int vfsInit (void){
 
     debug_print("vfsInit: done\n");
 
+    // ok
     return 0;
 }
 
@@ -183,8 +231,9 @@ void vfs_show_handle_list (void)
  * vfsShowVFSInfo:
  *     Monstrando informações sobre VFS.
  */
-void vfsShowVFSInfo (void){
-	
+void vfsShowVFSInfo (void)
+{
+
 	/*
 	
 	int i;

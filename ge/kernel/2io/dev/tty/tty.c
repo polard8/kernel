@@ -336,6 +336,9 @@ __ok_register:
         panic ("tty_create: __file fail, can't register device");
     
     }else{
+
+       // file
+       
         __file->____object = ObjectTypeTTY;
         __file->used  = 1;
         __file->magic = 1234;
@@ -345,6 +348,17 @@ __ok_register:
         // A estrutura de tty associada com esse arquivo.
         __file->tty = __tty;
 
+        // sync
+        __file->sync.sender = -1;
+        __file->sync.receiver = -1;
+        __file->sync.stage = 0;
+        __file->sync.can_read = TRUE;
+        __file->sync.can_write = TRUE;
+        __file->sync.can_execute = FALSE;
+        
+        // tty is not a socket.
+        __file->sync.can_accept = FALSE;
+        __file->sync.can_connect = FALSE;
 
         //Todo: create the file name.
         //__file->_tmpfname = "TTYX    TTY";

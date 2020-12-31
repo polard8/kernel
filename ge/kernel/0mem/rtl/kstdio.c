@@ -52,13 +52,17 @@ int k_fclose (file *f)
     if ( (void *) f == NULL ){
         debug_print("k_fclose: f\n");
         return EOF;
-
     }else{
         f->used = 1;
         f->magic = 1234;
         f->pid = (pid_t) 0;
         f->uid = (uid_t) 0;
         f->gid = (gid_t) 0;
+        
+        // #todo: sync 
+        
+        // #todo: free.
+        // free(f->_base);
         
         f->_p = NULL;
         f->_cnt = 0;
@@ -73,6 +77,10 @@ int k_fclose (file *f)
         f->_charbuf = 0;
         f->_lbfsize = 0;
         f->_tmpfname = NULL;
+        
+        // kill
+        // free() ?
+        
         f = NULL;
     };
 
@@ -133,7 +141,6 @@ file *k_fopen ( const char *filename, const char *mode )
     if ( (void *) Process == NULL ){
         printf("k_fopen: Process\n");
         goto fail;
-
     }else{
         if ( Process->used != 1 || Process->magic != 1234 ){
             printf("k_fopen: Process validation\n");
@@ -359,15 +366,16 @@ fail:
 // See: https://linux.die.net/man/2/openat
 // Wrapper
 
-int k_openat (int dirfd, const char *pathname, int flags){
-
+int k_openat (int dirfd, const char *pathname, int flags)
+{
     file *f;
 
 
     debug_print ("k_openat: [FIXME]\n");
 
     // The directory
-    if ( dirfd < 0 ){ 
+    if ( dirfd < 0 )
+    { 
         debug_print("k_openat: [FAIL] dirfd\n");
         goto fail; 
     }
@@ -378,20 +386,21 @@ int k_openat (int dirfd, const char *pathname, int flags){
 
     // #bugbug
     // Improvisando com essa que funciona o carregamento.
-    
+
     f = (file *) k_fopen ( (const char *) pathname, "r" );
 
-    // fail
-    if ( (void *) f == NULL ){
+    if ( (void *) f == NULL )
+    {
         kprintf ("k_openat: f\n");
         goto fail;
     }
 
+    // #todo
+    // We need to setup the structure.
 
     debug_print ("k_openat: done\n");
     
     return (int) f->_file;
-
 
 fail:
     refresh_screen();
@@ -827,14 +836,13 @@ int fprintf ( file *f, const char *format, ... )
  * 
  */
 
-int k_fputs ( const char *str, file *f ){
-
+int k_fputs ( const char *str, file *f )
+{
     int size = 0;
 
 
     if ( (void *) f == NULL ){
         return (int) (-1);
-
     } else {
         size = (int) strlen (str);
 
@@ -1126,11 +1134,10 @@ int __swbuf (int c, file *fp)
  * fputc:
  */
 
-int k_fputc ( int ch, file *f ){
-
+int k_fputc ( int ch, file *f )
+{
     if ( (void *) f == NULL ){
         return EOF;
-
     }else{
 
 		// se tivermos um posicionamento válido de escrita no buffer ou
@@ -1200,16 +1207,18 @@ int k_fputc ( int ch, file *f ){
 
 int k_fscanf (file *f, const char *format, ... )
 {
-	
-    if ( (void *) f == NULL ){
-       return EOF; 
+
+    printf ("k_fscanf: [TODO] \n");
+    
+    if ( (void *) f == NULL )
+    {
+        return EOF; 
     }
 
     // #obs:
     // Existe um scanf completo em ring3.
     // Talvez não precisamos de outro aqui.
 
-    printf ("k_fscanf: [TODO] \n");
     return (int) -1;
 }
 
@@ -1271,8 +1280,8 @@ void k_rewind ( file *f )
  * Essa rotina é chamada pelas funções: /print/printi/prints.
  */
 
-void printchar (char **str, int c){
-
+void printchar (char **str, int c)
+{
 	// #importante
 	// Se a string existe colocamos nela,
 	// caso contrário imprimimos no backbuffer.
@@ -1421,8 +1430,8 @@ void stdio_ClearToStartOfLine()
  *     ...
  */
 
-unsigned long input ( unsigned long ch ){
-
+unsigned long input ( unsigned long ch )
+{
     int i=0;
 
 	// Converte 'unsigned long' em 'char'.
@@ -1431,29 +1440,26 @@ unsigned long input ( unsigned long ch ){
 
     if ( g_inputmode == INPUT_MODE_LINE )
     {
-        //Limite.
-	    if(prompt_pos >= PROMPT_SIZE)
-	    {
-	        printf ("input: INPUT_MODE_LINE full buffer!\n");
-	        refresh_screen ();
-			return (unsigned long) 0; 
-	    };
-    };
-
+        if (prompt_pos >= PROMPT_SIZE)
+        {
+            printf ("kstdio-input: INPUT_MODE_LINE full buffer!\n");
+            refresh_screen ();
+            return (unsigned long) 0; 
+        }
+    }
 
     //tem que ter o tamanho de um arquivo.
     if (g_inputmode == INPUT_MODE_MULTIPLE_LINES )
     {
         if (prompt_pos >= PROMPT_SIZE)
         {
-            printf("input: INPUT_MODE_MULTIPLE_LINES full buffer\n");
+            printf("kstdio-input: INPUT_MODE_MULTIPLE_LINES full buffer\n");
             refresh_screen();
             return (unsigned long) 0; 
         }
     }
 
-
-	// Trata o caractere digitado. 
+    // Trata o caractere digitado. 
 
     switch (c){
 
@@ -1539,7 +1545,10 @@ input_done:
 // em memória compartilhada, usado o alocaro apropriado.
 // kmalloc com certeza e ring0.
 
-int stdioInitialize (void){
+int stdioInitialize (void)
+{
+    
+    kstdio_standard_streams_initialized =  FALSE;
 
     int Status = 0;
     int i=0;
@@ -1633,6 +1642,13 @@ int stdioInitialize (void){
     stdin->____object = ObjectTypeTTY;  //ObjectTypeFile; //Regular file
     stdin->used = 1;
     stdin->magic = 1234;
+    stdin->sync.sender = -1;
+    stdin->sync.receiver = -1;
+    stdin->sync.can_read = TRUE;
+    stdin->sync.can_write = FALSE;  //#this is a test
+    stdin->sync.can_execute = FALSE;
+    stdin->sync.can_accept = FALSE;
+    stdin->sync.can_connect = FALSE;
     stdin->_flags = (__SWR | __SRD); 
     stdin->_base = &prompt[0];    //See: include/kernel/stdio.h
     stdin->_p =  &prompt[0];
@@ -1675,6 +1691,13 @@ int stdioInitialize (void){
     stdout->____object = ObjectTypeVirtualConsole;
     stdout->used = 1;
     stdout->magic = 1234;
+    stdout->sync.sender = -1;
+    stdout->sync.receiver = -1;
+    stdout->sync.can_read = TRUE;
+    stdout->sync.can_write = TRUE;
+    stdout->sync.can_execute = FALSE;
+    stdout->sync.can_accept = FALSE;
+    stdout->sync.can_connect = FALSE;
     stdout->_flags = (__SWR | __SRD); 
     stdout->_base = &prompt_out[0];  //See: include/kernel/stdio.h
     stdout->_p = &prompt_out[0];
@@ -1715,6 +1738,13 @@ int stdioInitialize (void){
     stderr->____object = ObjectTypeFile;
     stderr->used = 1;
     stderr->magic = 1234;
+    stderr->sync.sender = -1;
+    stderr->sync.receiver = -1;
+    stderr->sync.can_read = TRUE;
+    stderr->sync.can_write = TRUE;
+    stderr->sync.can_execute = FALSE;
+    stderr->sync.can_accept = FALSE;
+    stderr->sync.can_connect = FALSE;
     stderr->_flags = (__SWR | __SRD); 
     stderr->_base = &prompt_err[0];  //See: include/kernel/stdio.h
     stderr->_p =  &prompt_err[0];
@@ -1738,8 +1768,9 @@ int stdioInitialize (void){
         panic("klib-stdioInitialize: stderr inode struct");
     }
     stderr->inode->filestruct_counter = 1; //inicialize
+    //copy the name.
     memcpy ( 
-        (void*) stderr->inode->path, 
+        (void*)       stderr->inode->path, 
         (const void*) stderr->_tmpfname, 
         sizeof( stderr->inode->path ) );
     // ... 
@@ -1774,6 +1805,8 @@ int stdioInitialize (void){
     };
 
 	// Done !
+
+    kstdio_standard_streams_initialized = TRUE;
 
     return 0;
 
@@ -1831,7 +1864,8 @@ void k_setbuf (file *f, char *buf)
  * 
  */
  
-void k_setbuffer (file *f, char *buf, size_t size){
+void k_setbuffer (file *f, char *buf, size_t size)
+{
 
     if ( (void *) f == NULL )
     {
