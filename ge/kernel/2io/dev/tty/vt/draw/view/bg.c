@@ -93,7 +93,8 @@ void bg_load_image (void)
 
 // #atenção: rotina sensível.
 
-void backgroundDraw (unsigned long color){
+void backgroundDraw (unsigned long color)
+{
 
     //loop
     register unsigned long i=0;

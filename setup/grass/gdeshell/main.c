@@ -2680,12 +2680,13 @@ do_compare:
     // Saving a file.
     // It's running on qemu.
     // It's not running on real machine.
-    if ( gramado_strncmp ( prompt, "t5", 2 ) == 0 )
+    // if ( gramado_strncmp ( prompt, "t5", 2 ) == 0 )
+    if ( gramado_strncmp ( prompt, "redpill", 7 ) == 0 )
     {
-        printf ("t5: Saving a file\n");
-        //shell_save_file ();  //local
-        gde_test_save_file("FILE1UM TXT");  // See: libcore.
-        printf ("t5: Done :)\n");
+        printf ("redpill: Saving a file\n");
+        shell_save_file ();  //local
+        //gde_test_save_file("FILE1UM TXT");  // See: libcore.
+        printf ("redpill: Done :)\n");
         goto exit_cmp;
     }
 
@@ -6239,13 +6240,13 @@ void show_shell_version (void)
 	// 512*4 = 2048  (4 setores) 2KB
 	// Se a quantidade de bytes for '0'. ???
 
-int shell_save_file (void){
-
+int shell_save_file (void)
+{
 	int Ret=0;
 	
-	char file_1[] = "t5: Arquivo \n escrito \n em \n user mode. \n";
-	char file_1_name[] = "FILE1UM TXT";
-		
+	char file_1[] = "REDPILL    ";        // REDPILL
+	char file_1_name[] = "REDPILL INI";   // redpill.ini
+
 	unsigned long number_of_sectors = 0;
     size_t len = 0;
 	
@@ -6295,7 +6296,8 @@ int shell_save_file (void){
     }
 	
 	
-    Ret = (int) gde_save_file ( file_1_name,  // name 
+    Ret = (int) gde_save_file ( 
+                    file_1_name,            // name 
                     number_of_sectors,      // number of sectors.
                     len,                    // size in bytes
                     file_1,                 // address

@@ -12,8 +12,8 @@
 #include <errno.h>
 
 
-int main ( int argc, char *argv[] ){
-
+int main ( int argc, char *argv[] )
+{
     FILE *fp;
     char buffer[1024];
     //char buffer[2048];

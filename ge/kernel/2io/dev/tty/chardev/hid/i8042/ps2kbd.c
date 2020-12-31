@@ -396,6 +396,7 @@ __local_ps2kbd_procedure (
                 case VK_F9:
                     if (ctrl_status == 1){
                         printf ("__local_ps2kbd_procedure: control + f9\n");
+                        kgws_disable();  // Disable kgws
                         refresh_screen();
                     }
                     if (alt_status == 1){
@@ -413,6 +414,7 @@ __local_ps2kbd_procedure (
                 case VK_F10:
                     if (ctrl_status == 1){
                         printf ("__local_ps2kbd_procedure: control + f10\n");
+                        kgws_enable();  // Enable kgws
                         refresh_screen();
                     }
                     if (alt_status == 1){

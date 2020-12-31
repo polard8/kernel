@@ -3,3 +3,15 @@ https://en.wikipedia.org/wiki/Red_pill_and_blue_pill
 I will create some red pills programs that will change the setup files for a new initialization for testing not well tested new features.
 So, this way i can share with the community a well tested version of the system, and the developers can activate the new features simply running the red pill application.
 I'm not sure about that ... i'm still learning the concept ... but i like the idea of having a consistent interface to help the people to learn how to use the system.
+
+redpill
+O processo init.bin vai obedecer o esquema de runlevels ... igual antigamente ,,,
+Mas agora ele tambem esta abrindo um arquivo de configuraçao, que se presente vai determinar qual programa inicializar.
+Talvez eu use esse arquivo de configuraçoes que o init.bin le para configurar o sistema, nao somente a inicializaçao ... mas todos os 'features'.
+Esse arquivo que o init le na verdade nao existe ... ele eh criado durante uma sessao quando a gente roda um comando ...
+Entao so vai valer quando reiniciarmos o sistema. cool!!
+Eh importante ativar o recurso pra rodar na proxima sessao.
+>>> A intençao eh que a maioria dos usuarios use a interface consistente ... ja bem testada ... e que os recursos que ainda estao sendo implementados ou em teste so apareceçam se digitar um comando que desbloqueie eles ... por fim os recursos ficarao disponibilizados definitivamente quando estiverem prontos e testados.
+
+o usuario que esta rodando o gramado pela primeira vez nao precisa dar de cara com as coisas que eu estou implementando e que estao inacabadas ou falhando ... eh como ativar o 'preview' da proxima release. Isso ajuda a manter a consistencia da interface.
+

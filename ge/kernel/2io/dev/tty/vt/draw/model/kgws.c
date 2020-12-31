@@ -11,6 +11,10 @@
 
 #include <kernel.h>
 
+
+static int EnableKGWS = TRUE;
+
+
 int kgws_status;
 int kgws_ws_PID;
 int kgws_ws_status;
@@ -49,6 +53,35 @@ unsigned long kgws_current_totalticks;
 unsigned long kgws_last_totalticks;
 unsigned long kgws_delta_totalticks;
 
+//==========================================================
+
+
+void kgws_enable(void)
+{
+    debug_print("kgws_enable: Enable KGWS\n");
+         printf("kgws_enable: Enable KGWS\n");
+    refresh_screen();
+    
+    // Sending event messages to the thread associated with the wwf.
+    current_input_mode = INPUT_MODE_SETUP;
+    
+    EnableKGWS = TRUE;
+}
+
+
+void kgws_disable(void)
+{
+    debug_print("kgws_disable: Disable KGWS\n");
+         printf("kgws_disable: Disable KGWS\n");
+    backgroundDraw(COLOR_RED);
+    refresh_screen();
+        
+    // Using unix-like TTY mode for input.
+    // using the stdin.
+    current_input_mode = INPUT_MODE_TTY;
+    
+    EnableKGWS = FALSE;
+}
 
 
 //==========================================================
@@ -166,50 +199,50 @@ int KGWS_SEND_KEYBOARD_MESSAGE (unsigned char raw_byte)
 			//left Shift liberado.
             case VK_LSHIFT: 
                 shift_status = 0;  Event_Message = MSG_SYSKEYUP;
-                printf ("VK_LSHIFT: Liberada\n"); refresh_screen();
+                //printf ("VK_LSHIFT: Liberada\n"); refresh_screen();
                 break;
 
 			//Left Control liberado.
             case VK_LCONTROL:
                 ctrl_status = 0;  Event_Message = MSG_SYSKEYUP;
-                printf ("VK_LCONTROL: Liberada\n"); refresh_screen();
+                //printf ("VK_LCONTROL: Liberada\n"); refresh_screen();
                 break;
 
 			//left Winkey liberada.
             case VK_LWIN:
                 winkey_status = 0;  Event_Message = MSG_SYSKEYUP;
-                printf ("VK_LWIN: Liberada\n"); refresh_screen();
+                //printf ("VK_LWIN: Liberada\n"); refresh_screen();
                 break;
 
 			//Left Alt liberado.
             case VK_LMENU:
                 alt_status = 0;  Event_Message = MSG_SYSKEYUP;
-                printf ("VK_LMENU: Liberada\n"); refresh_screen();
+                //printf ("VK_LMENU: Liberada\n"); refresh_screen();
                 break;
 
 			//right winkey liberada.
             case VK_RWIN:
                 winkey_status = 0;  Event_Message = MSG_SYSKEYUP;
-                printf ("VK_RWIN: Liberada\n"); refresh_screen();
+                //printf ("VK_RWIN: Liberada\n"); refresh_screen();
                 break;
 
 			//control menu.
             case VK_CONTROL_MENU:
                 //controlmenu_status = 0; //@todo
                 Event_Message = MSG_SYSKEYUP;
-                printf ("VK_CONTROL_MENU: Liberada\n"); refresh_screen();
+                //printf ("VK_CONTROL_MENU: Liberada\n"); refresh_screen();
                 break;
 
             //right control liberada.
             case VK_RCONTROL:
                 ctrl_status = 0;  Event_Message = MSG_SYSKEYUP;
-                printf ("VK_RCONTROL: Liberada\n"); refresh_screen();
+                //printf ("VK_RCONTROL: Liberada\n"); refresh_screen();
                 break;
 
 			//right Shift liberado.
             case VK_RSHIFT:
                 shift_status = 0;  Event_Message = MSG_SYSKEYUP;
-                printf ("VK_RSHIFT: Liberada\n"); refresh_screen();
+                //printf ("VK_RSHIFT: Liberada\n"); refresh_screen();
                 break;
 
             // Funções liberadas.
@@ -299,26 +332,26 @@ int KGWS_SEND_KEYBOARD_MESSAGE (unsigned char raw_byte)
             case VK_LSHIFT:
             //case KEY_SHIFT:
                 shift_status = 1; Event_Message = MSG_SYSKEYDOWN;
-                printf ("VK_LSHIFT: Pressionada\n"); refresh_screen();
+                //printf ("VK_LSHIFT: Pressionada\n"); refresh_screen();
                 break;
 
 			//left control pressionada.
 			//case KEY_CTRL:
             case VK_LCONTROL:
                 ctrl_status = 1; Event_Message = MSG_SYSKEYDOWN;
-                printf ("VK_LCONTROL: Pressionada\n"); refresh_screen();
+                //printf ("VK_LCONTROL: Pressionada\n"); refresh_screen();
                 break;
 
 			//Left Winkey pressionada.
             case VK_LWIN:
                 winkey_status = 1; Event_Message = MSG_SYSKEYDOWN;
-                printf ("VK_LWIN: Pressionada\n"); refresh_screen();
+                //printf ("VK_LWIN: Pressionada\n"); refresh_screen();
                 break;
 
             //left Alt pressionada.
             case VK_LMENU:
                 alt_status = 1;  Event_Message = MSG_SYSKEYDOWN;
-                printf ("VK_LMENU: Pressionada\n"); refresh_screen();
+                //printf ("VK_LMENU: Pressionada\n"); refresh_screen();
                 break;
 
 			//@todo alt gr.	
@@ -326,7 +359,7 @@ int KGWS_SEND_KEYBOARD_MESSAGE (unsigned char raw_byte)
 			//Right Winkey pressionada.
             case VK_RWIN:
                 winkey_status = 1;  Event_Message = MSG_SYSKEYDOWN;
-                printf ("VK_RWIN: Pressionada\n"); refresh_screen();
+                //printf ("VK_RWIN: Pressionada\n"); refresh_screen();
                 break;
 
             //@todo: Control menu.
@@ -334,13 +367,13 @@ int KGWS_SEND_KEYBOARD_MESSAGE (unsigned char raw_byte)
 			//Right control pressionada.
             case VK_RCONTROL:
                 ctrl_status = 1; Event_Message = MSG_SYSKEYDOWN;
-                printf ("VK_RCONTROL: Pressionada\n"); refresh_screen();
+                //printf ("VK_RCONTROL: Pressionada\n"); refresh_screen();
                 break;
 
 			//Right shift pressionada.
             case VK_RSHIFT:
                 shift_status = 1; Event_Message = MSG_SYSKEYDOWN;
-                printf ("VK_RSHIFT: Pressionada\n"); refresh_screen();
+                //printf ("VK_RSHIFT: Pressionada\n"); refresh_screen();
                 break;
 
             case VK_F1: case VK_F2: case VK_F3: case VK_F4:
@@ -657,6 +690,7 @@ done:
                         //enviaremos a tecla de funçao para a alicaçao.
                         if (current_input_mode == INPUT_MODE_SETUP)
                         {
+                            //if ( EnableKGWS == FALSE ){ return 0; }
                             kgws_send_to_controlthread_of_currentwindow ( 
                                                 Event_Window,
                                 (int)           Event_Message, 
@@ -678,6 +712,7 @@ done:
                     // Only for the setup input mode.
                     if (current_input_mode == INPUT_MODE_SETUP)
                     {
+                        //if ( EnableKGWS == FALSE ){ return 0; }
                         kgws_send_to_controlthread_of_currentwindow ( 
                                             Event_Window,
                             (int)           Event_Message, 
@@ -709,6 +744,7 @@ done:
            // Only for the setup input mode.
            if (current_input_mode == INPUT_MODE_SETUP)
            {
+               //if ( EnableKGWS == FALSE ){ return 0; }
                kgws_send_to_controlthread_of_currentwindow ( 
                                    Event_Window,
                    (int)           Event_Message, 

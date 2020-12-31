@@ -198,8 +198,8 @@ void Logoff (void)
 // Uma interrupção para habilitar as interrupções mascaráveis.
 // Só depois disso a interrupção de timer vai funcionar.
 
-int main ( int argc, char *argv[] ){
-
+int main ( int argc, char *argv[] )
+{
     char *_string = "init.bin: Init is alive! Calling int 129";
     char runlevel_string[128];
 
@@ -321,25 +321,66 @@ int main ( int argc, char *argv[] ){
     }
     */
 
+ 
+
+
+
     
-    /*
+    // ==================
     // #test
+    int redpill = FALSE;
     // Open syslog file.
     FILE *fp;
-    fp = (FILE*) fopen("syslog.txt","r+");
-    if ( (void*)  fp == NULL ){
-        printf("error");
-        fflush(stdout);
-        exit(1);
+    //fp = (FILE*) fopen ("init.ini","r+");
+    fp = (FILE*) fopen ("redpill.ini","r+");
+    if ( (void*)  fp == NULL )
+    {
+        //printf("init.bin: ERROR\n");
+        //fflush(stdout);
+        //exit(1);
+        
+        //ok se falhar ... o arquivo nao existe.
+        redpill = FALSE;
     }
-    if ( (void*)  fp != NULL ){
-        write( fileno(fp), "test\n", 5);
-        fprintf(fp,"init.bin: test\n");
-        fflush(fp);
-        close(fileno(fp));
-        //fclose(fp); 
-    }
-    */
+
+    char buffer[128];
+    int nreads=0;
+    int nwrites=0;
+    
+    if ( (void*)  fp != NULL )
+    {
+        // Read
+        nreads = read ( fileno(fp), buffer, sizeof(buffer) );
+        if ( nreads <= 0 ){
+            printf ("init.bin: read fail\n");
+            exit (-1);
+        }
+        fclose(fp);
+     }
+
+    // Write
+    //nwrites = write ( 1, buffer, sizeof(buffer) );
+    //if ( nwrites <= 0 ){
+    //    printf ("init.bin: write fail\n");
+    //    exit(-1);
+    //}
+
+    if ( buffer[0] == 'R' &&
+         buffer[1] == 'E' &&
+         buffer[2] == 'D' &&
+         buffer[3] == 'P' &&
+         buffer[4] == 'I' &&
+         buffer[5] == 'L' &&
+         buffer[6] == 'L' )
+     {
+          redpill = TRUE;
+     }
+    //while(1){}
+    // ==================
+   
+    
+    
+    
     
     
     
@@ -379,6 +420,15 @@ int main ( int argc, char *argv[] ){
         // "Initialize in terminal mode"?
         
         default:
+        
+            if( redpill == TRUE )
+            {
+                debug_print ("init.bin: [REDPILL] Calling gramcode.bin\n");
+                gramado_system_call ( 900, 
+                    (unsigned long) "sysmon.bin", 0, 0 ); 
+                break;
+            }
+            
             debug_print ("init.bin: Calling gdeshell.bin\n");
             gramado_system_call ( 900, 
                 (unsigned long) "gdeshell.bin", 0, 0 ); 

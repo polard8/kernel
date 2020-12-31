@@ -163,7 +163,7 @@ gde_extra_services (
     
     if (number == 265)
     {
-        debug_print("sci0: [FIXME] Service 265 suspended!\n");   
+        // debug_print("sci0: [FIXME] Service 265 suspended!\n");   
         // yield (current_thread); 
         return NULL; 
     }

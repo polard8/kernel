@@ -37,6 +37,11 @@
 // == prototypes ==========================================
 //
 
+void kgws_enable(void);
+void kgws_disable(void);
+
+
+
 
 // Send message.
 // Pega um scancode, transforma em caractere e envia na forma de mensagem
