@@ -289,7 +289,8 @@ fail:
 // Isso precisa ter duas estruturas de arquivos,
 // dois descritores, mas apenas um buffer.
 
-int sys_pipe ( int *pipefd, int flags ){
+int sys_pipe ( int *pipefd, int flags )
+{
 
     file *f1;
     file *f2;
@@ -342,9 +343,7 @@ int sys_pipe ( int *pipefd, int flags ){
     {
         if ( Process->Objects[i] == 0 )
         {
-            Process->Objects[i] = 216;
-            slot1 = i;
-            break;
+            Process->Objects[i] = 216;  slot1 = i;  break;
         }
     };
 
@@ -353,9 +352,7 @@ int sys_pipe ( int *pipefd, int flags ){
     {
         if ( Process->Objects[i] == 0 )
         {
-            Process->Objects[i] = 216;
-            slot2 = i;
-            break;
+            Process->Objects[i] = 216;  slot2 = i;  break;
         }
     };
 
@@ -411,7 +408,6 @@ int sys_pipe ( int *pipefd, int flags ){
         f2->pid = (pid_t) current_process;
         f2->uid = (uid_t) current_user;
         f2->gid = (gid_t) current_group;
-        
 
         // No name for now.
         f1->_tmpfname = NULL;
@@ -453,6 +449,10 @@ int sys_pipe ( int *pipefd, int flags ){
         pipefd[0] = slot1;
         pipefd[1] = slot2; 
 
+        //#debug
+        //printf ("sys_pipe: %d %d\n",slot1,slot2);
+        //refresh_screen();
+        
         //OK
         debug_print("sys_pipe: done\n");
         return 0;

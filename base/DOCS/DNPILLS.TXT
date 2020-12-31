@@ -1,0 +1,5 @@
+https://en.wikipedia.org/wiki/Red_pill_and_blue_pill
+
+I will create some red pills programs that will change the setup files for a new initialization for testing not well tested new features.
+So, this way i can share with the community a well tested version of the system, and the developers can activate the new features simply running the red pill application.
+I'm not sure about that ... i'm still learning the concept ... but i like the idea of having a consistent interface to help the people to learn how to use the system.

@@ -1205,6 +1205,13 @@ int sys_read (unsigned int fd, char *ubuf, int count)
         return 0;
     }
 
+    // See: pipe.c
+    if ( __file->____object == ObjectTypePipe )
+    {
+        printk ("sys_read: [TODO] trying to read a pipe\n");
+        return sys_read_pipe ( (int) fd, (char *)ubuf, (int) count ); 
+    }
+
     // ...
     
     // ======================================================
@@ -1639,6 +1646,13 @@ int sys_write (unsigned int fd, char *ubuf, int count)
         printk ("sys_write: [TODO] trying to write a file system\n");
         refresh_screen();
         return 0;
+    }
+    
+    // See: pipe.c
+    if ( __file->____object == ObjectTypePipe )
+    {
+        printk ("sys_write: [TODO] trying to write a pipe\n");
+        return sys_write_pipe ( (int) fd, (char *)ubuf, (int) count ); 
     }
 
     // ...
