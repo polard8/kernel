@@ -1,11 +1,11 @@
 # License: BSD License
 # Product configuration
 # See: 0config/version.h
-PRODUCT_NAME  = Gramado Operating System
-EDITION_NAME  = Gramado 1.0
+PRODUCT_NAME  = Gramado Land
+EDITION_NAME  = Gramado Land
 VERSION_MAJOR = 1
 VERSION_MINOR = 0
-VERSION_BUILD = 200
+VERSION_BUILD = 201
 KERNELVERSION = $(VERSION_MAJOR)$(if $(VERSION_MINOR),.$(VERSION_MINOR)$(if $(VERSION_BUILD),.$(VERSION_BUILD)))
 
 # Documentation.
@@ -100,128 +100,136 @@ generate
 PHONY := build-system-files
 build-system-files: \
 /usr/local/gramado-build \
-ge-boot \
-ge-kernel \
-ge-rtl \
-ge-libcore \
-ge-lib \
-ge-init \
-ge-aurora \
-ge-services    
+land-boot \
+land-kernel \
+land-rtl \
+land-libcore \
+land-lib \
+land-init \
+land-grass    
+
+
+
 
 /usr/local/gramado-build:
 	-sudo mkdir /usr/local/gramado-build
 
-ge-boot:
+land-boot:
 	#::boot
 	@echo "=================== "
 	@echo "Compiling boot/ ... "
-	$(Q) $(NASM)    ge/boot/x86/0vhd/main.asm -I ge/boot/x86/0vhd/ -o GRAMADO.VHD   
-	$(Q) $(MAKE) -C ge/boot/x86/1bm/ 
-	$(Q) $(MAKE) -C ge/boot/x86/2bl/ 
-	sudo cp ge/boot/x86/bin/BM.BIN  base/
-	sudo cp ge/boot/x86/bin/BM.BIN  base/BOOT
-	sudo cp ge/boot/x86/bin/BM.BIN  base/SBIN
-	sudo cp ge/boot/x86/bin/BL.BIN  base/
-	sudo cp ge/boot/x86/bin/BL.BIN  base/BOOT
-	sudo cp ge/boot/x86/bin/BL.BIN  base/SBIN
+	$(Q) $(NASM)    land/boot/x86/0vhd/main.asm -I land/boot/x86/0vhd/ -o GRAMADO.VHD   
+	$(Q) $(MAKE) -C land/boot/x86/1bm/ 
+	$(Q) $(MAKE) -C land/boot/x86/2bl/ 
+	sudo cp land/boot/x86/bin/BM.BIN  base/
+	sudo cp land/boot/x86/bin/BM.BIN  base/BOOT
+	sudo cp land/boot/x86/bin/BM.BIN  base/SBIN
+	sudo cp land/boot/x86/bin/BL.BIN  base/
+	sudo cp land/boot/x86/bin/BL.BIN  base/BOOT
+	sudo cp land/boot/x86/bin/BL.BIN  base/SBIN
 
 # KERNEL.BIN  - Creating the kernel image.
-ge-kernel:
+land-kernel:
 	#::kernel
 	@echo "================================="
 	@echo "(Step 1) Creating the kernel image ..."
-	$(Q) $(MAKE) -C ge/kernel
-	sudo cp ge/kernel/KERNEL.BIN  base/
-	sudo cp ge/kernel/KERNEL.BIN  base/BOOT
-	sudo cp ge/kernel/KERNEL.BIN  base/SBIN
+	$(Q) $(MAKE) -C land/kernel
+	sudo cp land/kernel/KERNEL.BIN  base/
+	sudo cp land/kernel/KERNEL.BIN  base/BOOT
+	sudo cp land/kernel/KERNEL.BIN  base/SBIN
 
-ge-rtl:
+land-rtl:
 	#::rtl
 	@echo "==================="
 	@echo "Compiling rtl ..."
-	$(Q) $(MAKE) -C ge/rtl/
+	$(Q) $(MAKE) -C land/rtl/
 
-ge-libcore:
+land-libcore:
 	#::libcore
 	@echo "==================="
 	@echo "Compiling libcore ..."
-	$(Q) $(MAKE) -C ge/libcore/
+	$(Q) $(MAKE) -C land/libcore/
 
 
-ge-lib:
+land-lib:
 	#::lib
 	@echo "==================="
 	@echo "Compiling  lib ..."
-	$(Q) $(MAKE) -C ge/lib/
-ge-init:
+	$(Q) $(MAKE) -C land/lib/
+land-init:
 	#::init
 	@echo "==================="
 	@echo "Compiling init ..."
-	$(Q) $(MAKE) -C ge/init/
-	sudo cp ge/init/INIT.BIN  base/
-	sudo cp ge/init/INIT.BIN  base/SBIN
+	$(Q) $(MAKE) -C land/init/
+	sudo cp land/init/INIT.BIN  base/
+	sudo cp land/init/INIT.BIN  base/SBIN
 
-ge-aurora:
-	#::aurora Aurora Window Server.
-	@echo "==================="
-	@echo "Compiling Aurora window server ..."
-	$(Q) $(MAKE) -C ge/aurora/
-	# gws
-	-sudo cp ge/aurora/bin/GWS.BIN     base/ 
-	-sudo cp ge/aurora/bin/GWSSRV.BIN  base/
-	-sudo cp ge/aurora/bin/GWSSRV.BIN  base/SBIN
-
-ge-services:
-	#::services Services
-	@echo "==================="
-	@echo "Compiling services..."
-	$(Q) $(MAKE) -C ge/services/gnssrv/ 
-	# gns
-	-sudo cp ge/services/gnssrv/bin/GNS.BIN     base/
-	-sudo cp ge/services/gnssrv/bin/GNSSRV.BIN  base/
-	-sudo cp ge/services/gnssrv/bin/GNSSRV.BIN  base/SBIN
+land-grass:
+	$(Q) $(MAKE) -C land/grass/
+	sudo cp land/grass/bin/GDESHELL.BIN  base/
+	sudo cp land/grass/bin/GDESHELL.BIN  base/SBIN
 
 
 #===================================================
 #:::1
-# ~ Step 1 Setup directories.
+# ~ Step 1 gramado directories.
 PHONY := build-applications 
 build-applications: \
-setup-grass \
-setup-apps \
-setup-net \
-setup-cmd \
+gramado-aurora \
+gramado-grass \
+gramado-apps \
+gramado-net \
+gramado-cmd \
+gramado-services \
 desert    
 
-setup-grass:
+gramado-aurora:
+	#::aurora Aurora Window Server.
+	@echo "==================="
+	@echo "Compiling Aurora window server ..."
+	$(Q) $(MAKE) -C gramado/aurora/
+	# gws
+	-sudo cp gramado/aurora/bin/GWS.BIN     base/ 
+	-sudo cp gramado/aurora/bin/GWSSRV.BIN  base/
+	-sudo cp gramado/aurora/bin/GWSSRV.BIN  base/SBIN
+
+gramado-grass:
 	#::grass
-	$(Q) $(MAKE) -C setup/grass/
-	sudo cp setup/grass/bin/GRAMCODE.BIN  base/
-	sudo cp setup/grass/bin/GDESHELL.BIN  base/
-	sudo cp setup/grass/bin/GDESHELL.BIN  base/SBIN
-	sudo cp setup/grass/bin/LAUNCHER.BIN  base/
-	sudo cp setup/grass/bin/SYSMON.BIN    base/
+	$(Q) $(MAKE) -C gramado/grass/
+	sudo cp gramado/grass/bin/GRAMCODE.BIN  base/
+	sudo cp gramado/grass/bin/LAUNCHER.BIN  base/
+	sudo cp gramado/grass/bin/SYSMON.BIN    base/
 
-setup-apps:
+gramado-apps:
 	#::apps
-	$(Q) $(MAKE) -C setup/apps/
-	-sudo cp setup/apps/bin/EDITOR.BIN   base/
-	-sudo cp setup/apps/bin/FILEMAN.BIN  base/
+	$(Q) $(MAKE) -C gramado/apps/
+	-sudo cp gramado/apps/bin/EDITOR.BIN   base/
+	-sudo cp gramado/apps/bin/FILEMAN.BIN  base/
 
-setup-net:
+gramado-net:
 	#::net
-	$(Q) $(MAKE) -C setup/net/
-	-sudo cp setup/net/bin/*.BIN  base/
-#	-sudo cp setup/net/bin/*.BIN  base/PROGRAMS
+	$(Q) $(MAKE) -C gramado/net/
+	-sudo cp gramado/net/bin/*.BIN  base/
+#	-sudo cp gramado/net/bin/*.BIN  base/PROGRAMS
 
-setup-cmd:
+gramado-cmd:
 	#::cmd
-	$(Q) $(MAKE) -C setup/cmd/
-	-sudo cp setup/cmd/bin/CAT.BIN        base/
-#	-sudo cp setup/cmd/bin/FALSE.BIN      base/
-	-sudo cp setup/cmd/bin/REBOOT.BIN     base/
-#	-sudo cp setup/cmd/bin/TRUE.BIN       base/
+	$(Q) $(MAKE) -C gramado/cmd/
+	-sudo cp gramado/cmd/bin/CAT.BIN        base/
+#	-sudo cp gramado/cmd/bin/FALSE.BIN      base/
+	-sudo cp gramado/cmd/bin/REBOOT.BIN     base/
+#	-sudo cp gramado/cmd/bin/TRUE.BIN       base/
+
+
+gramado-services:
+	#::services Services
+	@echo "==================="
+	@echo "Compiling services..."
+	$(Q) $(MAKE) -C gramado/services/gnssrv/ 
+	# gns
+	-sudo cp gramado/services/gnssrv/bin/GNS.BIN     base/
+	-sudo cp gramado/services/gnssrv/bin/GNSSRV.BIN  base/
+	-sudo cp gramado/services/gnssrv/bin/GNSSRV.BIN  base/SBIN
 
 #========================================
 
@@ -294,22 +302,22 @@ clean:
 	@echo "================================="
 	@echo "(Step 6) Deleting the object files ..."
 	-rm *.o
-	-rm -rf ge/rtl/obj/*.o
-	-rm -rf ge/libcore/obj/*.o
-	-rm -rf ge/lib/libgns/obj/*.o
-	-rm -rf ge/lib/libgws/obj/*.o
-	-rm -rf ge/lib/libio01/obj/*.o
+	-rm -rf land/rtl/obj/*.o
+	-rm -rf land/libcore/obj/*.o
+	-rm -rf land/lib/libgns/obj/*.o
+	-rm -rf land/lib/libgws/obj/*.o
+	-rm -rf land/lib/libio01/obj/*.o
 	@echo "Success?"
 # clean ISO and VHD.
 clean2:
 	-rm *.ISO
 	-rm *.VHD
-# clean setup
+# clean gramado
 clean3:
-	-rm setup/grass/bin/*.BIN
-	-rm setup/apps/bin/*.BIN
-	-rm setup/net/bin/*.BIN
-	-rm setup/cmd/bin/*.BIN
+	-rm gramado/grass/bin/*.BIN
+	-rm gramado/apps/bin/*.BIN
+	-rm gramado/net/bin/*.BIN
+	-rm gramado/cmd/bin/*.BIN
 # clean base
 clean4:
 	-rm -rf base/*.BIN 
@@ -324,17 +332,19 @@ clean-system-files:
 	@echo "==================="
 	@echo "Cleaning all system binaries ..."
 
-	-rm -rf ge/boot/x86/bin/*.BIN
-	-rm -rf ge/kernel/KERNEL.BIN
-	-rm -rf ge/init/*.BIN
-	-rm -rf ge/fonts/bin/*.FON
-	-rm -rf ge/aurora/bin/*.BIN
-	-rm -rf ge/services/gnssrv/bin/*.BIN
+	-rm -rf land/boot/x86/bin/*.BIN
+	-rm -rf land/kernel/KERNEL.BIN
+	-rm -rf land/init/*.BIN
+	-rm -rf land/grass/bin/*.BIN
+	-rm -rf land/fonts/bin/*.FON
 
-	-rm -rf setup/grass/bin/*.BIN
-	-rm -rf setup/apps/bin/*.BIN
-	-rm -rf setup/net/bin/*.BIN
-	-rm -rf setup/cmd/bin/*.BIN
+
+	-rm -rf gramado/aurora/bin/*.BIN
+	-rm -rf gramado/grass/bin/*.BIN
+	-rm -rf gramado/apps/bin/*.BIN
+	-rm -rf gramado/net/bin/*.BIN
+	-rm -rf gramado/cmd/bin/*.BIN
+	-rm -rf gramado/services/gnssrv/bin/*.BIN
 # ...
 
 
@@ -368,7 +378,7 @@ makeiso-x86:
 geniso-x86:
 	
 	#stage1
-	$(NASM) ge/kernel/boot/x86/iso/stage1/stage1.asm -f bin -o stage1.bin
+	$(NASM) land/kernel/boot/x86/iso/stage1/stage1.asm -f bin -o stage1.bin
 	cp stage1.bin bin/boot/gramado/
 	rm stage1.bin
 
