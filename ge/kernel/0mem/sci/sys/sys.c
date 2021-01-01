@@ -1076,6 +1076,10 @@ int sys_read (unsigned int fd, char *ubuf, int count)
             __file->_flags |= __SWR;                  // pode escrever
             do_thread_ready( __file->tid_waiting );   // acorda escritores. 
             goto fail;
+
+                    // #bugbug
+                    // Isso pode ser ruim pela natureza da chamada sys_read()
+                    // que vem de uma syscall que nao salvou o contexto.
             
             debug_print("sys_read: SLEEP READER\n");
             panic("sys_read: [DEBUG] Couldn't read socket. Buffer not full\n");
@@ -1523,7 +1527,11 @@ int sys_write (unsigned int fd, char *ubuf, int count)
             __file->_flags |= __SRD;                 // pode ler.
             do_thread_ready( __file->tid_waiting );  // acorda leitores
             goto fail;
-            
+ 
+                    // #bugbug
+                    // Isso pode ser ruim pela natureza da chamada sys_write()
+                    // que vem de uma syscall que nao salvou o contexto.
+        
             // dorme. 
             // Se dormirmos sem escrever e retornarmos, 
             // o aplicativo nao chamara a escrita novamente.
@@ -1563,9 +1571,13 @@ int sys_write (unsigned int fd, char *ubuf, int count)
                     __file->_flags |= __SRD;                 // pode ler 
                     do_thread_ready( __file->tid_waiting );  // acorda leitores
                 
-                    debug_print("sys_write: SLEEP WRITER\n");
-                    __file->tid_waiting = current_thread;
-                    do_thread_waiting(current_thread);
+                    // #bugbug
+                    // Isso pode ser ruim pela natureza da chamada sys_write()
+                    // que vem de uma syscall que nao salvou o contexto.
+                    
+                    //debug_print("sys_write: SLEEP WRITER\n");
+                    //__file->tid_waiting = current_thread;
+                    //do_thread_waiting(current_thread);
                   
                     return nbytes;                           // bytes written
                 }

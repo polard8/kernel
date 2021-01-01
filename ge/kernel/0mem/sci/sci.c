@@ -2939,35 +2939,44 @@ void *sci2 (
     debug_print("sci2: [TODO]\n");
 
 
-    switch (number)
-    {
         //set magic
-        case 1:
+    if ( number == 1 ){
             CONSOLE_TTYS[fg_console].magic = arg2;
             return NULL;
-            break;  
+     }
             
         //get magic
-        case 2:
+    if ( number == 2 ){
             return (void*) CONSOLE_TTYS[fg_console].magic;
-            break;  
+     }
         
-
-        case 3:
+    if ( number == 3 ){
             return (void*) systemGetSystemMetrics(arg2);
-            break;
+    }
         
-        case 4:
+    if ( number == 4 ){
             return (void*) sys_ioctl ( (int) arg2, (unsigned long) arg3, (unsigned long) arg4 );
-            break;
+    }
             
-        case 5:
+    if ( number == 5 ){
             return (void*) sys_fcntl ( (int) arg2, (int) arg3, (unsigned long) arg4 );
-            break;
-        
-        default:
-            break;
-    };
+    }
+
+    
+    if ( number == 8000 ){
+        return (void *) sys_ioctl ( (int) arg2, 
+                            (unsigned long) arg3, 
+                            (unsigned long) arg4 );
+    }
+
+    // fcntl()
+    // See: sci/sys/sys.c    
+    if ( number == 8001 ){
+        return (void *) sys_fcntl ((int) arg2, 
+                            (int) arg3, 
+                            (unsigned long) arg4 );
+    }
+
     
     panic (" @ sci2\n");
 }

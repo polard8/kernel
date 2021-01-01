@@ -50,11 +50,17 @@ int ioctl (int fd, unsigned long request, ...)
     unsigned arg = va_arg(ap, unsigned long);
     
 
-    __ret = (int) gramado_system_call ( 8000,
+    //__ret = (int) gramado_system_call ( 8000,
+    //                  (unsigned long) fd,
+    //                  (unsigned long) request,
+    //                  (unsigned long) arg );
+    
+    // # Using this syscall to have full access to the ring0 data.
+    __ret = (int) sc82 ( 8000,
                       (unsigned long) fd,
                       (unsigned long) request,
                       (unsigned long) arg );
-    
+                      
     va_end (ap);
     //--
     

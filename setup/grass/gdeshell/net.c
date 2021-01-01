@@ -675,8 +675,8 @@ void net_socket_test1(void)
 
     // request 4000: Passando o pid do sender via argumento.
     // ring0: f->sync.sender See; socket.c in the kernel.
-    // ioctl ( socket_fd, 4000, getpid() );
-    sc82 (4,socket_fd,4000,getpid());
+    ioctl ( socket_fd, 4000, getpid() );
+    //sc82 (4,socket_fd,4000,getpid());
 
     //getting the sender.
     //pra checar se a rotina acima funcionou.
@@ -687,8 +687,8 @@ void net_socket_test1(void)
     // Do mesmo modo nao conseguiremos configurar 'termios'.
     
     int sender;
-    // sender = ioctl ( socket_fd, 4001, 0 );
-    sender = sc82 (4,socket_fd,4001,0);
+    sender = ioctl ( socket_fd, 4001, 0 );
+    //sender = sc82 (4,socket_fd,4001,0);
     printf ("SENDER {%d} \n",sender);
 
     // Send the message.
@@ -697,7 +697,7 @@ void net_socket_test1(void)
 
     // Setup buffer for error message.
 
-    sprintf( message, "==FAIL==");
+    sprintf( message, "=FAIL=");
 
     recv (socket_fd, (void *) &message[0], 5, 0 );
     

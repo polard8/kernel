@@ -2763,10 +2763,9 @@ do_compare:
         printf ("t10:  \n");
         //sc80 (0,0,0,0);
         //sc81 (0,0,0,0);
-        //sc82 (1,5678,0,0);               //set magic of fg_console
-        //magic_value = sc82 (2,0,0,0); //get magic of fg_console
-        //printf("MAGIC={%d}\n",magic_value);
-        
+        sc82 (1,5678,0,0);               //set magic of fg_console
+        magic_value = sc82 (2,0,0,0); //get magic of fg_console
+        printf("MAGIC={%d}\n",magic_value);
         
         goto exit_cmp;
     }

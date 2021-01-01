@@ -22,8 +22,8 @@
  *
  */
 
-int fcntl ( int fd, int cmd, ... ){
-
+int fcntl ( int fd, int cmd, ... )
+{
     int __ret = -1;
 
     if (fd<0) {
@@ -36,7 +36,14 @@ int fcntl ( int fd, int cmd, ... ){
     va_start(ap, cmd);
     unsigned arg = va_arg(ap,int);
 
-    __ret = (int) gramado_system_call ( 8001,
+    //__ret = (int) gramado_system_call ( 8001,
+    //                  (unsigned long) fd,
+    //                  (unsigned long) cmd,
+    //                  (unsigned long) arg );
+
+    // # This way we're gonna have full access 
+    // to the ring 0 data structures.
+    __ret = (int) sc82 ( 8001,
                       (unsigned long) fd,
                       (unsigned long) cmd,
                       (unsigned long) arg );
