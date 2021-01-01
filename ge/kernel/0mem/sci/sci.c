@@ -163,11 +163,12 @@ gde_extra_services (
     
     if (number == 265)
     {
-        // debug_print("sci0: [FIXME] Service 265 suspended!\n");   
-        // yield (current_thread); 
+        debug_print("sci0: [FIXME] Service 265 suspended!\n");  
+        //printf ("pid %d\n",current_process);
+        //refresh_screen();
+        //yield (current_thread); 
         return NULL; 
     }
-
 
     // Pega o n�mero da tty de um processo, dado o pid.
     // ps/action/process.c
@@ -1921,12 +1922,11 @@ void *sci0 (
         // No queue. See: thread structure.
         // rotina interna, veja nesse documento.
         // IN: buffer para mensagens.
-        // // See: ps2kbd.c
+        // // See: hid/i8042/ps2kbd.c
         case 111:
             //debug_print("sci0: 111\n");
             return (void *) __do_111 ( (unsigned long) &message_address[0] );
             break;
-
 
 
 		// 112
@@ -2936,7 +2936,8 @@ void *sci2 (
     unsigned long arg3, 
     unsigned long arg4 )
 {
-    debug_print("sci2: [TODO]\n");
+
+    //debug_print("sci2: [TODO]\n");
 
 
         //set magic
@@ -2955,15 +2956,41 @@ void *sci2 (
     }
         
     if ( number == 4 ){
-            return (void*) sys_ioctl ( (int) arg2, (unsigned long) arg3, (unsigned long) arg4 );
+        debug_print("sc2: [4] ioctl\n");
+        return (void*) sys_ioctl ( (int) arg2, (unsigned long) arg3, (unsigned long) arg4 );
     }
             
     if ( number == 5 ){
-            return (void*) sys_fcntl ( (int) arg2, (int) arg3, (unsigned long) arg4 );
+        debug_print("sc2: [5] fcntl\n");
+        return (void*) sys_fcntl ( (int) arg2, (int) arg3, (unsigned long) arg4 );
     }
 
-    
+    if ( number == 18 ){
+        debug_print("sc2: [18] read\n");
+        return (void *) sys_read ( 
+                            (unsigned int) arg2, 
+                            (char *)       arg3, 
+                            (int)          arg4 );
+    }
+     
+
+    if ( number == 19 ){
+        debug_print("sc2: [19] write\n");
+        return (void *) sys_write ( 
+                            (unsigned int) arg2, 
+                            (char *)       arg3, 
+                            (int)          arg4 );
+    }
+
+    if (number == 265)
+    {
+        //debug_print("sci2: [FIXME] Service 265 suspended!\n");   
+        yield (current_thread); 
+        return NULL; 
+    }
+
     if ( number == 8000 ){
+        debug_print("sc2: [8000] ioctl\n");
         return (void *) sys_ioctl ( (int) arg2, 
                             (unsigned long) arg3, 
                             (unsigned long) arg4 );
@@ -2972,13 +2999,13 @@ void *sci2 (
     // fcntl()
     // See: sci/sys/sys.c    
     if ( number == 8001 ){
+        debug_print("sc2: [8001] fcntl\n");
         return (void *) sys_fcntl ((int) arg2, 
                             (int) arg3, 
                             (unsigned long) arg4 );
     }
 
-    
-    panic (" @ sci2\n");
+    panic (" @ sci2: default \n");
 }
 
 

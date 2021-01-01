@@ -2788,7 +2788,8 @@ gws_create_window (
 // Yield thread.
 void gws_yield (void)
 {
-    gws_system_call (265,0,0,0); 
+    //gws_system_call (265,0,0,0);
+    sc82 (265,0,0,0); 
 }
 
 // refresh the background and yield the current thread
@@ -2798,7 +2799,8 @@ void gws_refresh_yield (int fd)
     gws_refresh_window (fd, -4);  
     
     //yield
-    gws_system_call (265,0,0,0); 
+    //gws_system_call (265,0,0,0); 
+    sc82 (265,0,0,0);
 }
 
 
@@ -2806,7 +2808,8 @@ void gws_refresh_yield (int fd)
 void gws_refresh_yield2 (int fd, int window)
 {
     gws_refresh_window (fd, window);
-    gws_system_call (265,0,0,0); 
+    //gws_system_call (265,0,0,0); 
+    sc82 (265,0,0,0);
 }
 
 

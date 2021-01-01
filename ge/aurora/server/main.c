@@ -2681,7 +2681,8 @@ int main (int argc, char **argv)
 //yield thread.
 void gwssrv_yield(void)
 {
-    gramado_system_call(265,0,0,0);
+    //gramado_system_call(265,0,0,0);
+    sc82 (265,0,0,0);
 }
 
 

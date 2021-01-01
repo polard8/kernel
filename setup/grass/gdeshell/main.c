@@ -1055,6 +1055,7 @@ shellProcedure (
                 // #obs: talvez esse refresh nem seja necessário.
                 // cada rotina chamada que fará seu próprio refresh 
                 // se conseguir.
+                
                 case VK_RETURN:
                     input('\0');
                     shellCompare (window);
@@ -3208,11 +3209,11 @@ do_compare:
 
         //exit(0);
                 
-        gramado_system_call (265,0,0,0); //yield thread.
-        gramado_system_call (265,0,0,0); //yield thread.
-        gramado_system_call (265,0,0,0); //yield thread.
-        gramado_system_call (265,0,0,0); //yield thread.
-
+        //gramado_system_call (265,0,0,0); //yield thread.
+        //gramado_system_call (265,0,0,0); //yield thread.
+        //gramado_system_call (265,0,0,0); //yield thread.
+        //gramado_system_call (265,0,0,0); //yield thread.
+        sc82 (265,0,0,0);
         
         fake_sleep (8000);
         fake_sleep (8000);
@@ -6735,8 +6736,8 @@ void gdeshell_exit(void)
 
   
 
-int main ( int argc, char *argv[] ){
-
+int main ( int argc, char *argv[] )
+{
     FILE *default_input = stdin;
     
     int i=0;
@@ -6958,7 +6959,8 @@ noArgs:
     {
         printf ("shellCreateMainWindow FAIL!\n");
         gde_exit_critical_section ();
-        while (1){}
+        exit(1);
+        //while (1){}
     }
     gde_register_window (hWindow);
     gde_show_window (hWindow);
@@ -6985,7 +6987,8 @@ noArgs:
 	// Nesse momento estamos configurando os 
 	// limites do terminal gerenciado pelo kernel.
 
-    system_call ( SYSTEMCALL_SETTERMINALWINDOW, 
+    gramado_system_call ( 
+        SYSTEMCALL_SETTERMINALWINDOW, 
         (unsigned long) hWindow, 
         (unsigned long) hWindow, 
         (unsigned long) hWindow );
@@ -7004,8 +7007,8 @@ noArgs:
 	// Se der problema no tamanho da area de cliente 
 
     if ( terminal_rect.left < wpWindowLeft ||
-         terminal_rect.top < wpWindowTop ||
-         terminal_rect.width > wsWindowWidth ||
+         terminal_rect.top  < wpWindowTop ||
+         terminal_rect.width  > wsWindowWidth ||
          terminal_rect.height > wsWindowHeight )
     {
         //#debug
@@ -7014,7 +7017,9 @@ noArgs:
         printf ("l={%d} t={%d} w={%d} h={%d}\n", 
             terminal_rect.left, terminal_rect.top,
             terminal_rect.width, terminal_rect.height );
-        while (1){ asm ("pause"); }
+        
+        exit(1);
+        //while (1){ asm ("pause"); }
     }
 
     //printf("#debug breakpoint");
@@ -7054,18 +7059,14 @@ noArgs:
     //++
     gde_enter_critical_section ();
     Status = (int) shellInit(hWindow); 
-    if ( Status != 0 )
-    {
-        die ("gdeshell: main: shellInit fail");
+    if ( Status != 0 ){
+        die ("gdeshell-main: shellInit fail\n");
     }
     gde_exit_critical_section (); 
     //--
 
-
-
     //printf ("gdeshell: breakpoint \n");
     //while(1){}
-
 
 
 	// #importante:
@@ -7106,8 +7107,9 @@ read_and_execute:
 
 Mainloop:
 
-    while (_running)
-    {
+    while (_running){
+
+        // See: ge/libcore/api.c
         EventStatus = (int) libcore_get_event();
         
         // We've got en event. 

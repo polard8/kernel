@@ -1058,6 +1058,7 @@ int sys_read (unsigned int fd, char *ubuf, int count)
         if ((__file->_flags & __SRD) == 0) 
         {
             debug_print("sys_read: [FAIL] flag __SRD \n");
+            yield (current_thread);
             goto fail;
         }
 
@@ -1075,17 +1076,24 @@ int sys_read (unsigned int fd, char *ubuf, int count)
             __file->_flags = 0;
             __file->_flags |= __SWR;                  // pode escrever
             do_thread_ready( __file->tid_waiting );   // acorda escritores. 
-            goto fail;
-
+            __file->tid_waiting = -1;
+            
                     // #bugbug
                     // Isso pode ser ruim pela natureza da chamada sys_read()
                     // que vem de uma syscall que nao salvou o contexto.
             
-            debug_print("sys_read: SLEEP READER\n");
-            panic("sys_read: [DEBUG] Couldn't read socket. Buffer not full\n");
+            if (__file->sync.block_on_read_empty == TRUE )
+            {
+                debug_print("sys_read: SLEEP READER\n");
+                panic("sys_read: [DEBUG] Couldn't read socket. Buffer not full\n");
 
-            do_thread_waiting (current_thread);
-            __file->tid_waiting = current_thread;
+                __file->tid_waiting = current_thread;
+                do_thread_waiting (current_thread);
+                yield (current_thread);
+                goto fail;
+            }
+            yield (current_thread);
+            goto fail;
         }
 
         // cheio? le e acorda escritores.
@@ -1104,6 +1112,7 @@ int sys_read (unsigned int fd, char *ubuf, int count)
         
             if (nbytes <= 0){
                 debug_print("sys_read: [FAIL] file_read_buffer fail when reading a socket \n");
+                yield (current_thread);
                 goto fail;
             }
 
@@ -1114,9 +1123,13 @@ int sys_read (unsigned int fd, char *ubuf, int count)
                 __file->socket_buffer_full = FALSE;     // buffer vazio
                 __file->_flags &= ~__SRD;                 //nao posso mais LER.            
                 __file->_flags |= __SWR;                // pode escrever.
+                
+                
                 debug_print("sys_read: WAKEUP WRITER\n");
                 do_thread_ready( __file->tid_waiting ); // acorda escritores.
+                __file->tid_waiting = -1;
                 debug_print("sys_read:done\n");
+                
                 return (int) nbytes;                    // bytes escritos.
             }
             }
@@ -1399,6 +1412,11 @@ int sys_write (unsigned int fd, char *ubuf, int count)
     }
 
 
+    //while (TRUE){
+    //    if ( __file->sync.lock == FALSE ){ break; }
+    //     yield (current_thread); 
+    //};
+
     if ( __file->sync.can_write != TRUE )
     {
         debug_print ("sys_write: [PERMISSION] Can NOT write the file\n");
@@ -1510,6 +1528,7 @@ int sys_write (unsigned int fd, char *ubuf, int count)
         if ((__file->_flags & __SWR) == 0) 
         {
             debug_print("sys_write: [FAIL] flag __SWR \n");
+            yield (current_thread);
             goto fail;
         }
         
@@ -1519,26 +1538,24 @@ int sys_write (unsigned int fd, char *ubuf, int count)
         if ( __file->socket_buffer_full == TRUE )
         {
             debug_print("sys_write: [FAIL] can't write on a full buffer\n");
-            //goto fail;
-                
-            
+
             debug_print("sys_write: WAKEUP READER\n");
             __file->_flags = 0;
             __file->_flags |= __SRD;                 // pode ler.
             do_thread_ready( __file->tid_waiting );  // acorda leitores
+            __file->tid_waiting = -1;
+
+
+            if ( __file->sync.block_on_write_full == TRUE )
+            {
+                 debug_print("sys_write: SLEEP WRITER\n");
+                 __file->tid_waiting = current_thread;
+                 do_thread_waiting(current_thread);
+                 yield (current_thread);
+                 goto fail;
+            }
+            yield (current_thread); 
             goto fail;
- 
-                    // #bugbug
-                    // Isso pode ser ruim pela natureza da chamada sys_write()
-                    // que vem de uma syscall que nao salvou o contexto.
-        
-            // dorme. 
-            // Se dormirmos sem escrever e retornarmos, 
-            // o aplicativo nao chamara a escrita novamente.
-            debug_print("sys_write: SLEEP WRITER\n");
-            panic ("sys_write: [DEBUG] Couldn't write in the socket. Buffer full!\n");
-            do_thread_waiting(current_thread);
-            __file->tid_waiting = current_thread;
         }
 
         // vazio? escreva e acorde os leitores.
@@ -1559,26 +1576,40 @@ int sys_write (unsigned int fd, char *ubuf, int count)
                 // fail
                 if (nbytes <= 0){
                     debug_print("sys_write: [FAIL] file_write_buffer couldn't write on socket \n");
+                    yield (current_thread);
                     goto fail;
                 }
 
                 // ok, write funcionou.
                 if (nbytes>0)
                 { 
+                    
+                    
                     debug_print("sys_write: WAKEUP READER\n");
                     __file->socket_buffer_full = TRUE;       // buffer cheio
                     __file->_flags &= ~__SWR;                // nao posso mais ESCREVER.            
                     __file->_flags |= __SRD;                 // pode ler 
                     do_thread_ready( __file->tid_waiting );  // acorda leitores
+                    __file->tid_waiting = -1;
                 
                     // #bugbug
                     // Isso pode ser ruim pela natureza da chamada sys_write()
                     // que vem de uma syscall que nao salvou o contexto.
                     
-                    //debug_print("sys_write: SLEEP WRITER\n");
-                    //__file->tid_waiting = current_thread;
-                    //do_thread_waiting(current_thread);
-                  
+                    if ( __file->sync.block_on_write == TRUE )
+                    {
+                        debug_print("sys_write: SLEEP WRITER\n");
+                        __file->tid_waiting = current_thread;
+                        do_thread_waiting(current_thread);
+                    }
+                    
+                    // #bugbug: test ...
+                    //  impedir que eu mesmo me leia.
+                    yield (current_thread);
+                    //yield (current_thread);
+                    //yield (current_thread);
+                    //yield (current_thread);
+                    
                     return nbytes;                           // bytes written
                 }
             }

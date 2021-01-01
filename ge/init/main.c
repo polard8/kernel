@@ -485,8 +485,10 @@ Mainloop:
         rtl_exit_critical_section(); 
 
         // No message. Yield.
-        if ( message_buffer[1] == 0 ){ 
-            gramado_system_call (265,0,0,0); 
+        if ( message_buffer[1] == 0 )
+        { 
+            //gramado_system_call (265,0,0,0); 
+            sc82 (265,0,0,0);
         }
 
         // We've got a message. 

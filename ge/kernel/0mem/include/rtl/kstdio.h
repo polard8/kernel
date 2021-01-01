@@ -252,7 +252,15 @@ struct kstdio_sync_d
     // for sockets.
     int can_accept;
     int can_connect;
-        
+    
+    int block_on_write;
+    int block_on_write_full;
+    
+    int block_on_read;
+    int block_on_read_empty;
+    
+    int lock;
+    
     // ...
 };
 

@@ -127,7 +127,9 @@ int rtl_get_event (void)
     // No, we do not have an event. Yield.
     if ( RTLEventBuffer[1] == 0 )
     {
-        gramado_system_call (265,0,0,0); 
+        //gramado_system_call (265,0,0,0); 
+        
+        sc82 (265,0,0,0);
         
         // clear
         RTLEventBuffer[0] = 0;
@@ -150,21 +152,23 @@ int rtl_get_event (void)
 
 
 //P (Proberen) testar.
-void rtl_enter_critical_section (void){
-
+void rtl_enter_critical_section (void)
+{
     int S=0;
 
     // Pega o valor do spinlock rpincipal.
     while (1){
-        S = (int) gramado_system_call ( SYSTEMCALL_GET_KERNELSEMAPHORE, 
-                      0, 0, 0 );
-                      
+
+        S = (int) gramado_system_call ( 
+                      SYSTEMCALL_GET_KERNELSEMAPHORE, 0, 0, 0 );
+     
 		// Se deixou de ser 0 então posso entrar.
 		// Se ainda for 0, continuo no while.
         if ( S == 1 ){ goto done; }
         
         //#wait
-        gramado_system_call (265,0,0,0); //yield thread.
+        //gramado_system_call (265,0,0,0); //yield thread.
+        sc82 (265,0,0,0);
     };
 
     //Nothing

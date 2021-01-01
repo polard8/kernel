@@ -2054,21 +2054,23 @@ fail:
 
 
 //P (Proberen) testar.
-void gde_enter_critical_section (void){
-
+void gde_enter_critical_section (void)
+{
     int S=0;
 
     // Pega o valor do spinlock rpincipal.
     while (1){
-        S = (int) system_call ( SYSTEMCALL_GET_KERNELSEMAPHORE, 
-                      0, 0, 0 );
+
+        S = (int) system_call ( 
+                      SYSTEMCALL_GET_KERNELSEMAPHORE, 0, 0, 0 );
                       
 		// Se deixou de ser 0 então posso entrar.
 		// Se ainda for 0, continuo no while.
         if ( S == 1 ){ goto done; }
         
         //#wait
-        gramado_system_call (265,0,0,0); //yield thread.
+        // gramado_system_call (265,0,0,0); //yield thread.
+        sc82(265,0,0,0);
     };
 
     //Nothing
@@ -3145,7 +3147,9 @@ int libcore_get_event (void)
     // No, we do not have an event. Yield.
     if ( LibCoreEventBuffer[1] == 0 )
     {
-        gramado_system_call (265,0,0,0); 
+        //gramado_system_call (265,0,0,0); 
+        //debug_print("*\n");
+        sc82 (265,0,0,0);
         
         // clear
         LibCoreEventBuffer[0] = 0;

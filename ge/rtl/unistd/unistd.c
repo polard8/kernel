@@ -193,7 +193,8 @@ ssize_t write_VC (int fd, const void *buf, size_t count)
 
 ssize_t read (int fd, const void *buf, size_t count)
 {
-
+    int res = -1;
+    
     if (fd<0){
         debug_print ("read: fd\n");
         return -1;
@@ -212,10 +213,19 @@ ssize_t read (int fd, const void *buf, size_t count)
     // #todo
     // Maybe we need to call another layer, not the kernel service.
     
-    return (ssize_t) gramado_system_call ( 18, 
-                         (unsigned long) fd,
-                         (unsigned long) buf, 
-                         (unsigned long) count ); 
+    //return (ssize_t) gramado_system_call ( 18, 
+    //                     (unsigned long) fd,
+    //                     (unsigned long) buf, 
+    //                     (unsigned long) count ); 
+                         
+    
+    //rtl_enter_critical_section();
+    //rtl_exit_critical_section();
+    
+    return (ssize_t) sc82 ( 18, 
+              (unsigned long) fd,
+              (unsigned long) buf, 
+              (unsigned long) count ); 
 }
 
 
@@ -229,6 +239,8 @@ ssize_t read (int fd, const void *buf, size_t count)
 ssize_t write (int fd, const void *buf, size_t count)
 {
 
+    int res = -1;
+    
     if (fd<0){
         debug_print ("write: fd\n");
         return -1;
@@ -247,10 +259,19 @@ ssize_t write (int fd, const void *buf, size_t count)
     // #todo
     // Maybe we need to call another layer, not the kernel service.
 
-    return (ssize_t) gramado_system_call ( 19, 
-                         (unsigned long) fd,
-                         (unsigned long) buf, 
-                         (unsigned long) count ); 
+    //return (ssize_t) gramado_system_call ( 19, 
+    //                     (unsigned long) fd,
+    //                     (unsigned long) buf, 
+    //                     (unsigned long) count ); 
+
+    //rtl_enter_critical_section();
+    //rtl_exit_critical_section();
+        
+    return (ssize_t) sc82 ( 19, 
+              (unsigned long) fd,
+              (unsigned long) buf, 
+              (unsigned long) count );
+               
 }
 
 

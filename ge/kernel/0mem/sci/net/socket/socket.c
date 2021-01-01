@@ -424,7 +424,14 @@ socket_gramado (
         _file->sync.can_execute = FALSE;
         _file->sync.can_accept = TRUE;
         _file->sync.can_connect = TRUE;
+
+        _file->sync.block_on_read = FALSE;
+        _file->sync.block_on_read_empty = TRUE;
+
+        _file->sync.block_on_write = TRUE;
+        _file->sync.block_on_write_full = TRUE;
         
+        _file->sync.lock = FALSE;
         
         _file->_flags = __SWR;
 
@@ -615,6 +622,13 @@ socket_unix (
         _file->sync.can_accept = TRUE;
         _file->sync.can_connect = TRUE;
 
+        _file->sync.block_on_read = FALSE;
+        _file->sync.block_on_read_empty = TRUE;
+
+        _file->sync.block_on_write = TRUE;
+        _file->sync.block_on_write_full = TRUE;
+        
+        _file->sync.lock = FALSE;
 
         _file->_flags = __SWR;
         
@@ -806,6 +820,14 @@ socket_inet (
         _file->sync.can_accept = TRUE;
         _file->sync.can_connect = TRUE;
 
+        _file->sync.block_on_read = FALSE;
+        _file->sync.block_on_read_empty = TRUE;
+
+        _file->sync.block_on_write = TRUE;
+        _file->sync.block_on_write_full = TRUE;     
+        
+        _file->sync.lock = FALSE;   
+        
         //flags 
         _file->_flags = __SWR;
 

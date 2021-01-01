@@ -1514,8 +1514,8 @@ void *__do_35 ( unsigned long buffer )
 // Isso eh valido para todos os tipos de mensagens nao somente teclado
 // isso deveria sair daqui desse arquivo.
 
-void *__do_111 ( unsigned long buffer ){
-
+void *__do_111 ( unsigned long buffer )
+{
     struct thread_d *t;
 
     unsigned long *message_address = (unsigned long *) buffer;
@@ -1524,16 +1524,14 @@ void *__do_111 ( unsigned long buffer ){
     // Buffer
     // Se o buffer for inválido, não há o que fazer.
     if ( buffer == 0 ){ 
-        panic ("__do_111: buffer"); 
+        panic ("__do_111: buffer\n"); 
     }
-
 
    // Again. 
    // Se o buffer for inválido.
-   if ( &message_address[0] == 0 )
-   {
-       panic ("__do_111: buffer");
-
+   
+   if ( &message_address[0] == 0 ){
+       panic ("__do_111: &message_address[0] buffer\n");
    }else{
 
         t = (void *) threadList[current_thread];
@@ -1566,7 +1564,6 @@ void *__do_111 ( unsigned long buffer ){
         t->long4_list[ t->head_pos ]  = 0;
         //...
         
-
         // Circula
         t->head_pos++;
         if ( t->head_pos >= 31 )
