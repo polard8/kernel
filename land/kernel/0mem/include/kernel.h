@@ -76,6 +76,9 @@ extern unsigned long stack0_krn_ptr;
 // =========================================================
 
 
+// (NT)
+// Land OS headers.
+
 // oh boy
 #include "land/0boy/0boy.h"
 
