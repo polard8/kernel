@@ -1,0 +1,161 @@
+    
+    ### Isso eh um rascunho.
+
+    Commands on Gramado OS.
+    
+    See: 
+    https://gramadoprojects.github.io/man/
+    https://gramadoprojects.github.io/man/pt/
+    ...
+    
+    See:
+    shellCompare() on main.c on land/grass/gdeshell/
+    
+    These is a list of commands that can be used on the 
+    command interpreter, called gdeshell.bin
+    
+    This is a work in progress and not all commands are available.
+
+    
+
+Comandos do usuário:
+
+?     - Exibe essa ajuda.
+cls     - Limpa a tela.
+dir     - Lista os arquivos do diretório atual.
+ls - lista arquivos.
+exit     - Sai do terminal de comandos.
+gramcode     - Editor de textos.
+sysmon
+help     - Exibe essa ajuda.
+help --tests     - Exibe os comandos que estamos construindo.
+pwd     - Exibe o endereço completo do diretório atual.
+reboot     - Reinicia o sistema. 
+devices
+exit
+fprintf
+fputs
+gethostname
+sethostname [name]
+setusername
+user-info
+ws
+mbr -  read the mbr metafile
+process-stats
+current-process
+process-info
+ram
+streams
+system-info
+timer-test
+
+Comandos para administração do sistema:
+
+
+kernel-info     - Exibe informações sobre o gerenciamento do kernel.
+mm-info     - Exibe informações sobre o gerenciamento de memória.
+mm-size
+mm-kernelheap
+mm-processheap
+
+disk-info     - Exbe informações sobre o gerenciamento de disco.
+volume-info     - Exibe informações sobre o gerenciamento de partições.
+pci-info     - Exibe informações sobre os dispositivos na interface PCI.
+cpu-info
+ints -  profiler. exibe a contagem de interrupçoes
+
+
+network - [danger] Testa os recursos de rede.
+redpill - [danger] faz mudanças nos arquivos de configuraçao da inicializaçao.
+ps2-init - [danger] inicializa o suporte ao controlador ps2 para mouse e teclado
+     no ambiente kgws.
+
+
+
+recorrentes:
+    gwssrv 
+    gnssrv &
+    gns
+    reboot
+    
+
+outros:
+
+mkdir
+creat
+newfile
+newdir
+
+socket1 - testing sockets.
+ioctl
+
+
+Comandos extras:
+
+Obs: Esses comandos estão em fase de testes. Eles servem para auxiliar o desenvolvedor na criação e testes dos recursos do sistema.
+about     - Testando a exibição de mensagens.
+
+arp-test
+
+boot
+
+cd     - cd
+
+close
+
+
+current-process     - Mostra informações sobre o processo atual.
+exit     - Sair do terminal de comandos.
+fork     - Testando a função fork.
+heap     - Testando o heap do processo.
+mbr     - Realizando testes no MBR dos discos.
+socket-test     - Testando algum mecanismo de comunicação via soquetes.
+system-info     - Exibe informações sobre o sistema.
+timer-test     - Testando a criação e uso de timers.
+
+flush
+
+getpid     - Exibe o identificador do processo atual.
+getppid     - Exibe o identificador do processo pai do processo atual.
+getuid     - Exibe o identificador do usuário atual.
+getgid     - Exibe o identificador do grupo atual.
+
+// security info
+get-usersession     - Exibe o identificador de sessão de usuário.
+get-room     - Exibe o identificador de room, que é um pool de desktops.
+get-desktop     - Exibe o identificador do desktop atual.
+
+gws     - Testando funcionalidades do servidor GWS, que fica dentro do shell.
+dialog-box     - Testa uma janela de diálogo.
+edit-box     - Testa uma janela de edição.
+message-box     - Testa uma janela de mensagem.
+metrics     - Mostra algumas informações de métrica do sistema.
+mm-info     - Exibe informações sobre o uso de memória.
+mm-kernelheap     - Exibe informações sobre o heap do kernel.
+mm-processheap     - Exibe informações sobre o heap do processo.
+test-taskman-server     - Testa o servidor taskman.
+t1     - Carrega um arquivo.
+t2     - Carrega e exibe um arquivo .BMP.
+t3     - Testa uma thread em user mode.
+t6     - Testa função fopen.
+t5     - Testa o salvamento de um arquivo no disco.
+t6     - ?
+t7 ou keys     - Exibe informações sobre o estado das teclas de modificação.
+t8     - Testa botões.
+t9     - Teste de linhas.
+t10     - Muda a área visível do shell.
+t11     - Testando o envio de mensagens para o procedimento de janelas do terminal, usando o kernel.
+t12     - Testando mudar um retângulo de lugar.
+t13     - Escrevendo em stdout e mostrando.
+t14     - Testando a criação de uma janela.
+t15     - Testando a função open.
+t16     - Testando a função close.
+t17     - Chamado rotinas para abrir e fechar um servidor do modulo gramado core.
+flush-stdout     - Testa a função fflush
+tasklist     - Lista informações sobre os processos.
+timer-test     - Essa rotina cria um objeto timer que gera um interrupção de tempos em tempos e é tratado pelo procedimento de janelas.
+taskbar     - Cria uma taskbar.
+tree     - Exibe uma árvore de brincadeira.
+window     - Informação sobre janela. 
+    
+    
