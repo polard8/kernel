@@ -261,6 +261,19 @@ struct kstdio_sync_d
     
     int lock;
     
+    // save into the disk.
+    // TRUE = Save the content of the _base into the physical media.
+    // FALSE = Nothing to be saved.
+    
+    // #todo: See: O_SYNC O_DSYNC O_RSYNC and O_DIRECT. 
+    
+    // O_SYNC: The file is opened for synchronous I/O. 
+    // Any write () s on the resulting file descriptor 
+    // will block the calling process until the data has been 
+    // physically written to the underlying hardware.   
+    
+    int _sync;
+    
     // ...
 };
 

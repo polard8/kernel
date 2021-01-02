@@ -1042,10 +1042,11 @@ int k_ferror ( file *f ){
  *     and whence is what that offset is relative to.
  */
 
-int k_fseek ( file *f, long offset, int whence ){
+int k_fseek ( file *f, long offset, int whence )
+{
 
-
-    if ( (void *) f == NULL ){
+    if ( (void *) f == NULL )
+    {
         debug_print ("k_fseek: f\n");
         goto fail;
     }
@@ -1058,6 +1059,8 @@ int k_fseek ( file *f, long offset, int whence ){
         case SEEK_SET:
 		    //printf ("SEEK_SET\n");   
             f->_p = (f->_base + offset); 
+            f->_r = offset;
+            f->_w = offset;
             f->_cnt = (f->_lbfsize - offset);
 			goto done;
 			break;
@@ -1065,6 +1068,8 @@ int k_fseek ( file *f, long offset, int whence ){
         case SEEK_CUR:
 		    //printf ("SEEK_CUR\n");
 		    f->_p = (f->_p + offset);
+            f->_r = (f->_p - f->_base);
+            f->_w = (f->_p - f->_base);
 		    f->_cnt = (f->_cnt - offset); 
 		    goto done;
 			break;
@@ -1072,6 +1077,8 @@ int k_fseek ( file *f, long offset, int whence ){
         case SEEK_END:
 		    //printf ("SEEK_END stream->_lbfsize=%d \n",stream->_lbfsize);
 		    f->_p = ((f->_base + f->_lbfsize) + offset); 
+            f->_r = ( f->_lbfsize + offset );
+            f->_w = ( f->_lbfsize + offset );
 		    f->_cnt = 0;
 		    goto done;
 			break;

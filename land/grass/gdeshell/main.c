@@ -2563,6 +2563,16 @@ do_compare:
         goto exit_cmp;
     }
 
+    // sync - salva os buffers em ring0 no disco fisico.
+    // Isso pode ser um programa.
+    // See: unistd.c
+    if ( gramado_strncmp( prompt, "sync", 4 ) == 0 )
+    {
+        printf ("sync: \n");
+        sync();
+        goto exit_cmp;
+    }
+
 
     // system-info
     if ( gramado_strncmp( prompt, "system-info", 11 ) == 0 )

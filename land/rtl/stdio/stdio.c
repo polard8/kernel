@@ -342,19 +342,71 @@ _strout (
 // ================= low level =====================
 //
 
+// #importante
+// A informaçao eh entregue para ser salva no disco,
+// Ela nao eh salva no disco.
+// O sistema operacional decide qual eh a melhor hora,
+// Ao menos que seja explicitamente chamado alguma rotina
+// dizendo que eh pra salvar no disco ... sync.
+// Eh um tipo de commit. Um comprometimento.
 
-// #todo:
-// Se for NULL faz flush em todos.
+// Note that fflush() only flushes the user space buffers 
+// provided by the C library. To ensure that the data is 
+// physically stored on disk the kernel buffers must be flushed too. 
+
+// The contents of the stream buffer are written 
+// to the underlying file or device and the buffer is discarded.
+
+// A call to fflush negates the effect of any prior 
+// call to ungetc for the stream. The stream remains open after the call.
+
+// ms-commit
+// The commit-to-disk feature of the run-time library 
+// lets you ensure that critical data is written directly to disk 
+// rather than to the operating-system buffers.
+
+// The fflush() function ensures that data has been written 
+// to the kernel buffer pools from your application's buffer 
+// (either for a single file, or for all output files if you use fflush(0) or fflush(NULL)).
+
+// If a file is open, can write and is buffered,
+// so we flush the ring3 buffer. It will send the data
+// to the file in ring0.
+// + if the stream is a console device, so the data will be show in the screen
+// + if it is a regular file, so it will be saved into the disk, i guess (commit)
+
+// See:
+// sync, syncfs - commit buffer cache to disk.
+// sync() causes all buffered modifications to file metadata and 
+// data to be written to the underlying file systems.
+// fflush - flush a stream
+// For  output  streams,  fflush() forces a write of all 
+// user-space buffered data for the given output or 
+// update stream via the stream's underlying write function.  
+// For input streams, fflush() discards any buffered data 
+// that has been fetched from the underlying file, 
+// but has not been consumed by the application.  
+// The open status  of the stream is unaffected.
+
+// See:
+// for sync(), see unistd.c
+
 int fflush (FILE *stream)
 {
+    // NULL is ok.
+    // NULL will flush all the streams in the table[].
+    // #todo: We need a talbe here in the lib.
+    
     return (int) __fflush(stream);
 }
 
 
 // real flush.
-int __fflush (FILE *stream){
-
-    int nwrite = -1;
+// called by fflush();
+int __fflush (FILE *stream)
+{
+    ssize_t nwrite = -1;
+    size_t Count = 0;
 
      //debug_print( "__fflush:\n");
 	
@@ -362,42 +414,56 @@ int __fflush (FILE *stream){
     //ASSERT(stream);
     
     if ( (void *) stream == NULL ){
-        debug_print( "__fflush: stream\n");
+        debug_print( "__fflush: [FAIL] stream\n");
         return (int) (-1);
     }else{
-
         // Check something!
     };
 
 
-
-	//Not buffered. 
-	//if (stream->_flags & _IONBF)
+    // #todo
+    // Not buffered. 
+	// if (stream->_flags & _IONBF)
 		//return (0);
 
-	//Not writable. 
+    // #todo
+    // Not writable. 
 	//if (!(stream->flags & _IOWRITE))
 		//return (0);
-
 
 
     //if ( !stream->_w )
         //return 0;
         
     
-    // Buffer ?    
+    // Have an invalid ring3 buffer.
     if ( (void *) stream->_base == NULL )
     {
-        debug_print( "__fflush: _base\n");
+        debug_print( "__fflush: [ERROR] Invalid ring3 buffer\n");
         return (int) (-1);
     } 
 
 
-    if ( stream->_w <= 0 )
+    // The 'write offset' is the number of bytes to write.
+    // So, it can't be '0' or negative.
+    
+    // #todo
+    // Return '0' if there is nothing to flush.
+
+    //Count = stream->_ptr - stream->_base;
+    
+    Count = (size_t) stream->_w;
+   
+    if ( Count <= 0 )
     { 
-        stream->_w = 0; 
-        debug_print( "__fflush: [FAIL] _w\n");
-        return (int) (-1);
+        stream->_p = stream->_base;
+        stream->_w = 0;  // ajust.
+
+        // #debug
+        debug_print ( "__fflush: [FAIL] _w\n");
+        
+        return 0; // OK.
+        //return (int) (-1);
     } 
 
 
@@ -411,17 +477,45 @@ int __fflush (FILE *stream){
     // que é um dispositivo do tipo console. O kernel escreverá no 
     // console 0.  
 
-    nwrite = write ( fileno(stream), stream->_base, stream->_w );
+//#ifdef _POSIX_
+    nwrite = write ( fileno(stream), stream->_base, Count );
+//#else
+//    nwrite = __write ( fileno(stream), stream->_base, Count );
+//#endif
+
  
     if (nwrite <= 0)
     {
         printf ("__fflush: [FAIL] nwrite\n");
-        //stream->_flags |= _IOERROR; //#todo
-        //stream->error = errno;
+
+        // Ajust to the next flush.
+        stream->_p = stream->_base;
+        stream->_w = 0;
+         
+        // #todo
+        // stream->_flags |= _IOERROR; 
+        // stream->error = errno;
+
         return EOF;
     }
+    
+    // #todo
+    // Something is wrong
+    if ( nwrite != Count )
+    {
+        debug_print("__fflush: [DEBUG] nwrite != Count\n");
 
+        // #todo
+        // stream->_flags |= _IOERROR; 
+        // stream->error = errno;
+        
+        // #todo
+        //return -1;
+    }
+
+    stream->_p = stream->_base;
     stream->_w = 0;
+    
     //stream->error = 0;
     //stream->eof = 0;
     //stream->have_ungotten = false;
@@ -740,18 +834,15 @@ int __putc (int ch, FILE *stream)
 }
 
 
-
 // don't change it
 int getc (FILE *stream){
     return (int) __getc (stream);
 }
 
-
 // don't change it
 int putc (int ch, FILE *stream){
     return (int) __putc (ch, stream);
 }
-
 
 // don't change it
 // See: unix v7
@@ -759,7 +850,6 @@ int fgetc ( FILE *stream )
 {
     return (int) getc(stream);
 }
-
 
 // don't change it
 // See: unix v7
@@ -794,8 +884,8 @@ int putchar (int ch){
 // Do not use this. Use fgets instead.
 // Using gets we can read more than we need.
 
-char *gets (char *s){
-
+char *gets (char *s)
+{
     register c;
     register char *cs;
 
@@ -815,7 +905,8 @@ int puts (const char *s)
 {
     register int c=0;
 
-    while (c = *s++){
+    while (c = *s++)
+    {
         putchar(c);
     };
     
@@ -828,8 +919,8 @@ int puts (const char *s)
 //
 
 //s n iop
-char *fgets (char *s, int size, FILE *stream){
-
+char *fgets (char *s, int size, FILE *stream)
+{
     //int c=0;
     register c;
     register char *cs;
@@ -4341,9 +4432,21 @@ void rewind (FILE *stream)
     // do !
     
     stream->_p = stream->_base;
-    stream->_cnt = 0;
+    stream->_w = 0;
+    stream->_r = 0;
+    
+    // #bugbug
+    // No gramado essa variavel se refere a quantidade de bytes disponiveis
+    // entao deve ser o tamanho do buffer.
+    // O kernel ja esta fazendo isso.
+    // Vamos ajustar isso aqui tambem.
+
+    //stream->_cnt = 0;    
+    stream->_cnt = stream->_lbfsize;
+
     lseek(fd,0,0);
 }
+
 
 
 /*
@@ -5443,11 +5546,6 @@ int fgetpos(FILE* stream, fpos_t* pos)
 int fgetpos (FILE *stream, fpos_t *pos )
 {
 
-    if ( (void *) stream == NULL )
-    {
-       return EOF;
-    }
-
     // #todo
     /*
     if ( !__validfp(stream) )
@@ -5456,12 +5554,19 @@ int fgetpos (FILE *stream, fpos_t *pos )
         return EOF;
     }
     */
+
+
+    if ( (void *) stream == NULL )
+    {
+       printf("fgetpos: [FAIL] stream\n");
+       return EOF;
+    }
     
     *pos = ftell(stream);
 
     if (*pos < 0L)
     {
-        return(-1);
+        return (-1);
     }
  
     return 0;
@@ -5486,8 +5591,9 @@ int fpurge (FILE *stream){
 
     debug_print ("fpurge: TODO: \n");
     
-    if ( (void *) stream == NULL ){
-       return EOF;
+    if ( (void *) stream == NULL )
+    {
+        return EOF;
     }
  
     return -1; 
@@ -5530,8 +5636,8 @@ char *ctermid (char *s)
 // Precisamos usar os arquivos herdados do processo pai.
 // Eles estão na estrutura de processo desse processo.
 
-void stdioInitialize(void){
-
+void stdioInitialize(void)
+{
     int status = 0;
     int i=0;
     

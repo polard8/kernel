@@ -894,47 +894,36 @@ long sysconf (int name)
 }
 
 
-/*
- * fsync:
- *
- */
-
-int fsync (int fd)
-{
-    debug_print ("fsync: [TODO]\n");
-    
-    if (fd<0){
-        debug_print ("fsync: fd\n");
-        return -1;
-    }    
-    
-    return -1;    //#todo
-}
-
-
-/*
- * fdatasync:
- *
- */
-
-int fdatasync (int fd)
-{
-    debug_print ("fdatasync: [TODO]\n");
-
-    if (fd<0){
-        debug_print ("fdatasync: fd\n");
-        return -1;
-    }    
-    return -1; //#todo
-}
-
-
-
+// ==========================
+// sync - salva no disco.
 // commit buffer cache to disk 
+// sync, syncfs - commit buffer cache to disk.
+// sync() causes all buffered modifications to file metadata and 
+// data to be written to the underlying file systems.
+// fflush - flush a stream
+// See also: fsync and syncfs.
+// sync() won't write buffers from your process 
+// (or any other process) to the kernel buffer pool; it is wholly unrelated to fflush().
+// sync() affects all data written by all processes 
+// on the system — you can become unpopular if your application 
+// uses it very often; it subverts the good work the kernel does caching data.
+
+
+// daemon
+// Unix systems typically run some kind of flush or update daemon, 
+// which calls the sync function on a regular basis.
+
+// See:
+// https://en.wikipedia.org/wiki/Sync_(Unix)
+// ...
+
 void sync(void)
 {
     debug_print ("sync: [TODO]\n");
-	//todo: use syscall!!
+    
+    // #todo: 
+    // use syscall!!
+
 }
 
 
@@ -951,6 +940,64 @@ int syncfs(int fd)
     return -1;
 }
 
+
+/*
+ * fsync:
+ *
+ */
+
+// Isso salva no disco o buffer que esta em ring0 .
+
+// fsync: synchronize a file's in-core state with storage device
+// fflsush: flush a stream
+
+// fsync works on a lower level, 
+// it tells the OS to flush its (ring0) buffers to the physical media.
+
+// OSs heavily cache data you write to a file. 
+// If the OS enforced every write to hit the drive, 
+// things would be very slow. fsync (among other things) 
+// allows you to control when the data should hit the drive.
+
+// fsync() will synchronize all of the given file's data and 
+// metadata with the permanent storage device. 
+// It should be called just before the corresponding file has been closed.
+// sync() will commit all modified files to disk.
+
+// The related system call fsync() commits just the 
+// buffered data relating to a specified file descriptor.[1] 
+
+int fsync (int fd)
+{
+    debug_print ("fsync: [TODO]\n");
+    
+    if (fd<0){
+        debug_print ("fsync: [ERROR] fd\n");
+        return -1;
+    }    
+    
+    return -1;    //#todo
+}
+
+
+/*
+ * fdatasync:
+ *
+ */
+
+// fdatasync() is also available to write out just the changes made 
+// to the data in the file, and not necessarily the file's related metadata.
+
+int fdatasync (int fd)
+{
+    debug_print ("fdatasync: [TODO]\n");
+
+    if (fd<0){
+        debug_print ("fdatasync: fd\n");
+        return -1;
+    }    
+    return -1; //#todo
+}
 
 
 

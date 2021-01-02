@@ -3076,6 +3076,16 @@ void gde_debug_print (char *string)
 
 int gde_clone_and_execute ( char *name )
 {
+    if ( (void *) name == NULL ){
+        printf ("gde_clone_and_execute: [TEST] Name pointer\n");
+        return -1;
+    }
+
+    if ( *name == 0 ){
+        printf ("gde_clone_and_execute: [TEST] Invalid name\n");
+        return -1;
+    }
+
     return (int) gramado_system_call ( 900, (unsigned long) name, 0, 0 );
 }
 
