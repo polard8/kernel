@@ -351,7 +351,7 @@ __ok_register:
         // sync
         __file->sync.sender = -1;
         __file->sync.receiver = -1;
-        __file->sync.stage = 0;
+        __file->sync.action = ACTION_NULL;
         __file->sync.can_read = TRUE;
         __file->sync.can_write = TRUE;
         __file->sync.can_execute = FALSE;

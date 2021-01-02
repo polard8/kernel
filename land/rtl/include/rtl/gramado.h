@@ -23,6 +23,19 @@
 // ...
 
 
+
+// usado em 'file sync'
+#define ACTION_NULL       0
+#define ACTION_REQUEST    1000
+#define ACTION_REPLY      2000
+#define ACTION_EVENT      3000
+#define ACTION_ERROR      4000
+
+#define SYNC_REQUEST_SET_ACTION 1
+#define SYNC_REQUEST_GET_ACTION 2
+// ...
+
+
 //
 // == prototypes =============================================
 //
@@ -62,6 +75,12 @@ void *sc82 (
 // input mode
 int rtl_get_input_mode(void);
 void rtl_set_input_mode(int mode);
+
+
+
+// ========================
+void rtl_set_file_sync(int fd, int request, int data);
+int rtl_get_file_sync(int fd, int request);
 
 
 

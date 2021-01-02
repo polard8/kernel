@@ -422,7 +422,7 @@ int sys_pipe ( int *pipefd, int flags )
         // sync: 
         f1->sync.sender = -1;
         f1->sync.receiver = -1;
-        f1->sync.stage = 0;
+        f1->sync.action = ACTION_NULL;
         f1->sync.can_read = TRUE;
         f1->sync.can_write = TRUE;
         f1->sync.can_execute = FALSE;
@@ -432,7 +432,7 @@ int sys_pipe ( int *pipefd, int flags )
         // sync: 
         f2->sync.sender = -1;
         f2->sync.receiver = -1;
-        f2->sync.stage = 0;
+        f2->sync.action = ACTION_NULL;
         f2->sync.can_read = TRUE;
         f2->sync.can_write = TRUE;
         f2->sync.can_execute = FALSE;

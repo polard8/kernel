@@ -1,7 +1,10 @@
 
 // Ok. This is the system's API. 
-// But now we are creating a window server called gws.bin
-// and we will use the client-side library for this window server.
+// It uses the kgws window server for the gui stuff.
+// kgws is a window server embedded inside the base kernel.
+// But now we are creating a ring3 loadable window server 
+// called gwssrv.bin, codename aurora and we will use a 
+// client-side library called libgws for this window server.
 
 /*
  * File: api.c 
@@ -9,66 +12,19 @@
  * Description:
  *     Application Programming Interface - (API).
  *
- *     Arquivo principal da API 32bit.
- *     Call Kernel via interrupt.
- *     Estamos em User Mode e usaremos os serviços do Kernel através de 
- * chamadas via interrupção.
- *     +As interrupções de serviços do KERNEL vão de 48 à 199.
- *     +A interrupções principal é a 200.
- *     +As interrupções de chamadas especiais vão de 201 até 215. 
- *     +As interrupções de serviços da GUI vão de 216 à 219.
- *
- * Attention: 
- *    Atenção ao passar argumentos via memória, pois utilizamos 
- * endereços lógicos.
- *
- *  @todo: logon, segurança, autenticação, bancodedados de autenticação.
- *         Heap support:
- *  @todo: Get PID, TID.       
- *
- * Obs:
- *     O kernel base deve proteger suas estruturas. Os processos devem 
- * proteger suas estruturas uns dos outros. É natural então que seja
- * passado somente o índice de uma lista de ponteiros de estruturas.
- * Quem tiver em mão o índice, solicita algum elemento da estrutura
- * para quem tem permissão de manipular a estrutura. 
- *     Passar o ponteiro de uma estrutura pode ser um problema de segurança,
- * além do transtorno de converter endereço lógico e físico. Mas existem
- * heaps de memória compartilhada, onde devem ficar algumas estruturas.
- * 
- * Obs:
- * Podemos passar todos os argumentos de uma estrutura para kernelmode
- * onde o kernel criou um estrutura semelhante e protegida. O kernel nos
- * devolve um índice que só pode ser manipulado pelo processo que pediu
- * para o kernel criar a estrutura. Assim essa estrutura fica protegida
- * dentro do heap do kernel. 
- *
- * Obs: Muitos dos recursos oferecidos aqui por essa api, que é ligada 
- *      às aplicações em tempo de compilação, serão oferecidos
- *      por uma api em user mode na forma de server, ou biblioteca
- *      de link dinâmico. (.so, .dll ...).
- *
- * In this file:
- * ============
- *     +sustem_call(....); - Interrupção do systema. Número 200.
- *     +system() - Interpreta um comando via argumento. 
- *     + Muitas outras ...
- *
  *
  * History: 
  *     2014 - Created by Fred Nora.
- *     ...
  */
 
 
-//rtl
+// rtl
 #include <types.h>        
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <heap.h>   
 #include "include/api.h"  
-
 
 
 
@@ -120,24 +76,24 @@ dbProcedure (
  *     ...
  */
 
+// #define  IA32_SYSCALL_VECTOR    0x80 
 
-void *
-system_call ( 
+// #todo
+// We can create gde_sc80, gde_sc81, gde_sc82
+// just like in the rtl.
+
+void *system_call ( 
     unsigned long ax, 
     unsigned long bx, 
     unsigned long cx, 
     unsigned long dx )
 {
-
-	//##BugBug: Aqui 0 retorno não pode ser inteiro.
-	//Temos que pegar unsigned long?? void*. ??
-	//unsigned long RET = 0;
-
     unsigned long __RET = 0;
 
-    asm volatile ("int %1 \n"
-                  : "=a"(__RET)
-                  : "i"(IA32_SYSCALL_VECTOR), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
+    asm volatile ( 
+        "int %1 \n"
+        : "=a"(__RET)
+        : "i"(0x80), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
 
     return (void *) __RET;
 }
@@ -146,13 +102,22 @@ system_call (
 
 /*
  ***********************************
- * gde_system: 
- *     Maybe it will call the shell.
+ * gde_system:
+ *  
+ *     #todo: 
+ *     It runs a command using fork/execve or something else.
  */
 
 int gde_system (const char *command)
 {
     gde_debug_print ("gde_system: [TODO]\n");
+    
+    //if ( (void*) command == NULL )
+        // ...
+    
+    //if ( *command == 0 )
+         // ...
+         
     return -1;
 }
 
@@ -176,10 +141,9 @@ int gde_system (const char *command)
 void gde_refresh_buffer (unsigned long n)
 {
     //n=0;
-    gde_debug_print ("gde_refresh_buffer: [DEPRECATED]\n");
-    return;
+    gde_debug_print ("gde_refresh_buffer: [FIXME]\n");
+    //return;
 }
-
 
 
 
@@ -204,7 +168,8 @@ gde_print_string (
  **********************
  * gde_vsync:
  *     Int 0x80, serviço 15.
- *     Sincroniza o retraço vertical do monitor.  (rever) 
+ *     Call the kernel to make a vertical retrace synchronization.
+ *     Is this an old crt thing? hahaha
  */
 
 int gde_vsync (void)
@@ -216,13 +181,11 @@ int gde_vsync (void)
 /*
  ******************************************************
  * gde_system_procedure:
- *     Chama o procedimento de janela padrão do sistema.
- *     Ele está no kernel.
+ *
+ *    It calls a window procedure inside the base kernel.
  */
 
-
-void *
-gde_system_procedure ( 
+void *gde_system_procedure ( 
     struct window_d *window,
     int msg,
     unsigned long long1,
@@ -236,6 +199,7 @@ gde_system_procedure (
     message_buffer[3] = (unsigned long) long2;
     
     if ( (void *) window == NULL ){ return NULL; }
+    if ( msg <= 0 )               { return NULL; }
 
     return (void *) system_call ( SYSTEMCALL_CALL_SYSTEMPROCEDURE, 
                         (unsigned long) &message_buffer[0], 
@@ -259,6 +223,7 @@ int __gde_set_cursor (unsigned long x, unsigned long y)
 
 
 /*
+ *************************************************
  * __gde_put_char:
  *     Put char.
  */
@@ -275,7 +240,9 @@ __gde_put_char (
 
 
 /*
+ ************************************************************
  *  gde_load_bitmap_16x16:
+ * 
  *     Coloca um bitmap no buffer.
  *     interrupção 200, serviço SYSTEMCALL_LOAD_BITMAP_16x16, 
  *     pôe um bitmap no buffer.
@@ -297,14 +264,47 @@ gde_load_bitmap_16x16 (
     unsigned long x, 
     unsigned long y )
 {
+    
+    // NULL pointer
+    if ( img_address == 0 )
+    {
+        // msg
+        return;
+    }
+
     system_call ( SYSTEMCALL_LOAD_BITMAP_16x16, img_address, x, y ); 
 }
 
 
-int gde_load_path ( char *path, unsigned long buffer, unsigned long buffer_len )
+/*
+ *************************
+ * gde_load_path 
+ * 
+ */
+
+// IN: ??
+
+int 
+gde_load_path ( 
+    char *path, 
+    unsigned long buffer, 
+    unsigned long buffer_len )
 {
     int status = -1;
-    
+
+
+    if ( (void*) path == NULL )
+    {
+        // msg
+        return -1;
+    }
+
+    //if ( buffer = 0 )
+    //{
+        // msg
+    //    return -1;
+    //}
+
     status = (int) gramado_system_call ( 4004, 
                        (unsigned long) path, 
                        (unsigned long) buffer, 
@@ -330,20 +330,19 @@ void gde_shutdown (void)
 
 
 
-
-
-
 /*
  * gde_init_background:
- *     Initialize default background configuration.  (rever) 
+ *     Initialize default background configuration. 
  */
 
 void gde_init_background (void)
 {
-    gde_debug_print ("gde_init_background: [DEPRECATED]\n");
-    //todo: Implementar.	
-    //Não há uma chamada para isso ainda.
+    // todo: Implementar.	
+    // Não há uma chamada para isso ainda.
+
+    gde_debug_print ("gde_init_background: [TODO]\n");
 }
+
 
 
 /*
@@ -391,9 +390,8 @@ gde_message_box (
 
 
     // Colors.
-    WindowClientAreaColor = xCOLOR_GRAY3;   
-    WindowColor = COLOR_TERMINAL2; 
-
+    WindowClientAreaColor = xCOLOR_GRAY3;
+    WindowColor           = COLOR_TERMINAL2;
 
     // Seleciona o botão 1. first responder;
     __mb_current_button = 1;
@@ -432,10 +430,7 @@ gde_message_box (
             break;
     };
 
-
-//
 // == Create Window ==============================================
-//
 
 do_create_messagebox_3:
 
@@ -447,33 +442,31 @@ do_create_messagebox_3:
     //++
     gde_enter_critical_section ();
     
-    hWnd = (void *) gde_create_window ( WT_OVERLAPPED, 1, 1, string1, 
+    hWnd = (void *) gde_create_window ( 
+                        WT_OVERLAPPED, 1, 1, string1, 
                         x, y, cx, cy, 
                         NULL, 0, 
                         WindowClientAreaColor, WindowColor );
 
 
-    if ( (void *) hWnd == NULL )
-    {
+    if ( (void *) hWnd == NULL ){
         printf ("gde_message_box: hWnd\n");
         return (int) -1;
-
     }else{
 
         gde_register_window (hWnd);
         //APISetActiveWindow (hWnd);
         //gde_set_focus (hWnd);
         
-        gde_draw_text ( (struct window_d *) hWnd,
-            1*(cx/16), 1*(cy/3), 
-            COLOR_WHITE, string2 );
+        gde_draw_text ( 
+            (struct window_d *) hWnd,
+            1*(cx/16), 1*(cy/3), COLOR_WHITE, string2 );
 
         gde_show_window (hWnd);
     };
 
     gde_exit_critical_section ();
     //--
-
 
 	//======================================
 	// button support
@@ -493,7 +486,8 @@ do_create_messagebox_3:
 	// button 1
     gde_enter_critical_section ();
 
-    messagebox_button1 = (void *) gde_create_window ( WT_BUTTON, 1, 1, "OK", 
+    messagebox_button1 = (void *) gde_create_window ( 
+                                      WT_BUTTON, 1, 1, "OK", 
                                       (cx/3), ((cy/8)*5), 
                                       80, 24,    
                                       hWnd, 0, 
@@ -502,7 +496,6 @@ do_create_messagebox_3:
     if ( (void *) messagebox_button1 == NULL ){
         printf ("OK button fail\n");
         return (int) -1;
-
     }else{
         gde_register_window (messagebox_button1); 
         gde_show_window (messagebox_button1);
@@ -516,7 +509,8 @@ do_create_messagebox_3:
 	// button 2
 	gde_enter_critical_section ();
 
-	messagebox_button2 = (void *) gde_create_window ( WT_BUTTON, 1, 1, "CANCEL",     
+	messagebox_button2 = (void *) gde_create_window ( 
+	                                  WT_BUTTON, 1, 1, "CANCEL",     
                                       ((cx/3)*2), ((cy/8)*5), 
                                       80, 24,    
                                       hWnd, 0, 
@@ -525,7 +519,6 @@ do_create_messagebox_3:
     if ( (void *) messagebox_button2 == NULL ){
         printf (" CANCEL button fail \n");
         return (int) -1;
-
     }else{
         gde_register_window (messagebox_button2); 
         gde_show_window (hWnd);
@@ -533,9 +526,6 @@ do_create_messagebox_3:
     
     gde_exit_critical_section();
     //--
-
-
-
 
     // string
     // apiDrawText ( (struct window_d *) hWnd,
@@ -545,12 +535,7 @@ do_create_messagebox_3:
     // Show window.
     // apiShowWindow (hWnd);
 
-
-
-
-//
 // == Message loop ===============================================
-//
 
     // buffer.
     unsigned long message_buffer[5];
@@ -834,9 +819,11 @@ __release_current_button:
  *     @todo: Devemos considerar o retorno? E se a chamada falhar? 
  */
 
-int gde_dialog_box ( int type, char *string1, char *string2 ){
+// Antes nós chamávamos o kernel, agora tentaremos implantar na api.
     
-    // Antes nós chamávamos o kernel, agora tentaremos implantar na api.
+int gde_dialog_box ( int type, char *string1, char *string2 )
+{
+
 	
 	//system_call ( SYSTEMCALL_MESSAGE_BOX, (unsigned long) type, 
 	//	(unsigned long) string1, (unsigned long) string2 );
@@ -889,11 +876,15 @@ int gde_dialog_box ( int type, char *string1, char *string2 ){
             gde_begin_paint();
             Button = 1;
             //janela tipo simples.
-            hWnd = (void*) gde_create_window (  WT_SIMPLE, 1, 1, string1, 
+            hWnd = (void *) gde_create_window (  
+                               WT_SIMPLE, 1, 1, string1, 
                                x, y, cx, cy, NULL, 0, 
                                WindowClientAreaColor, WindowColor); 
-            if ( (void *) hWnd == NULL ){ 
-                printf("hWnd fail\n"); 
+            if ( (void *) hWnd == NULL )
+            {  
+                gde_end_paint ();
+                printf("gde_dialog_box: hWnd fail\n");
+                break;
             }
             gde_end_paint ();
 
@@ -904,12 +895,14 @@ int gde_dialog_box ( int type, char *string1, char *string2 ){
 
 		// Sem botão, considera o título.	
 	    case 2:
-		    Button = 0;
-	        hWnd = (void*) gde_create_window ( WT_POPUP, 1, 1, string1, 
-			                x, y, cx, cy, NULL, 0, 
-							WindowClientAreaColor, WindowColor); 
+            Button = 0;
+            hWnd = (void*) gde_create_window ( 
+                               WT_POPUP, 1, 1, string1, 
+                               x, y, cx, cy, NULL, 0, 
+                               WindowClientAreaColor, WindowColor); 
 	        break;
-			
+
+
 		// Com botão, Título de alerta.	
 	    case 3:
 		    //janela de aplicativo.
@@ -1126,15 +1119,12 @@ dbProcedure (
 /*
  *******************************************************************
  * gde_create_window: 
+ * 
  *     Cria uma janela com base em uma struct.
  *     Retorna o endereço da estrutura da janela criada. 
  *     Para que possa ser registrada na lista windowList[].
+ *     Essa lista tambem fica em kgws no kernel.
  * 
- *    Não é necessário passar todos os argumentos de uma vez só.
- *	  Podemos realizar 3 ou 4 chamadas para construírmos a janela.
- *	  Essa rotina tem 12 argumentos mas ela poderá realizar 3 chamadas
- *	  ao sistema para passar todos os argumentos.	
- *
  * Cria a janela dependendo do tipo:                              
  * =================================
  * 1 - POP-UP.
@@ -1150,9 +1140,7 @@ dbProcedure (
  *
  */
 
-
-void *
-gde_create_window ( 
+void *gde_create_window ( 
     unsigned long type,        //1, Tipo de janela (popup,normal,...)
     unsigned long status,      //2, Estado da janela (ativa ou nao)
     unsigned long view,        //3, (min, max ...)
@@ -1197,13 +1185,14 @@ gde_create_window (
     // functions.
     gde_debug_print ("gde_create_window: [DEPRECATED]\n");
 
-    Window = (void *) system_call ( 118 , 
+    Window = (void *) system_call ( 
+                          118 , 
                           (unsigned long) &message_buffer[0], 
                           (unsigned long) &message_buffer[0], 
                           (unsigned long) &message_buffer[0] );
-    
 
-    if ( (void *) Window == NULL ){
+    if ( (void *) Window == NULL )
+    {
         gde_debug_print ("gde_create_window: fail\n");
         return NULL;  
     }
@@ -1225,12 +1214,11 @@ gde_create_window (
  *     Register Window. 
  */
 
-int gde_register_window (struct window_d *window){
-
+int gde_register_window (struct window_d *window)
+{
     if ( (void *) window == NULL ){
         gde_debug_print ("gde_register_window: fail\n");
         return 1;
-
     }else{
         return (int) system_call ( SYSTEMCALL_REGISTERWINDOW, 
                         (unsigned long) window, 
@@ -1249,14 +1237,14 @@ int gde_register_window (struct window_d *window){
  *     Close Window. 
  */
 
-int gde_close_window (struct window_d *window){
+int gde_close_window (struct window_d *window)
+{
 
     gde_debug_print ("gde_close_window: [DEPRECATED]\n");
         
     if ( (void *) window == NULL ){
         gde_debug_print ("gde_close_window: fail\n");
         return (int) 1;
-
     }else{
         return (int) system_call ( SYSTEMCALL_CLOSEWINDOW, 
                          (unsigned long) window, 
@@ -1274,13 +1262,12 @@ int gde_close_window (struct window_d *window){
  *     Set Focus. 
  */
 
-int gde_set_focus (struct window_d *window){
-
+int gde_set_focus (struct window_d *window)
+{
 
     if ( (void *) window == NULL ){
         gde_debug_print ("gde_set_focus: fail\n");
         return (int) 1;
-
     }else{
         return (int) system_call ( SYSTEMCALL_SETFOCUS, 
                         (unsigned long) window, 
@@ -1298,6 +1285,8 @@ int gde_set_focus (struct window_d *window){
  *     Get Focus. 
  */
 
+// ??
+
 int gde_get_focus (void)
 {
     return (int) system_call ( SYSTEMCALL_GETFOCUS, 0, 0, 0 );
@@ -1312,13 +1301,12 @@ int gde_get_focus (void)
 
 // deprecated
 
-int gde_kill_focus (struct window_d *window){
-
+int gde_kill_focus (struct window_d *window)
+{
 
     if ( (void *) window == NULL ){
         gde_debug_print ("gde_kill_focus: fail\n");
         return (int) 1;
- 
     }else{
 
         return (int) system_call ( SYSTEMCALL_KILLFOCUS, 
@@ -1340,12 +1328,11 @@ int gde_kill_focus (struct window_d *window){
 
 // deprecated.
 
-int gde_set_active_window (struct window_d *window){
-
+int gde_set_active_window (struct window_d *window)
+{
     if ( (void *) window == NULL ){
         gde_debug_print ("gde_set_active_window: fail\n");
         return (int) 1;
-
     }else{
         return (int) system_call ( SYSTEMCALL_SETACTIVEWINDOW, 
                          (unsigned long) window, 
@@ -1376,12 +1363,13 @@ int gde_get_active_window (void)
  *     Mostra informações sobre o processo atual.
  */
 
+	// #todo: 
+	// Essa rotina deveria apenas pegar os valores via system call
+	// e imprimir os valores obtidos usando rotinas em user mode.
+
 void gde_show_current_process_info (void)
 {
-	// @todo: Essa rotina devira apenas pegar os valores via system call
-	//        e imprimir os valores obtidos usando rotinas em user mode.
-	
-	system_call ( SYSTEMCALL_CURRENTPROCESSINFO, 0, 0, 0 );
+    system_call ( SYSTEMCALL_CURRENTPROCESSINFO, 0, 0, 0 );
 }
 
 
@@ -1392,8 +1380,8 @@ gde_resize_window (
     unsigned long y )
 {
 
-    gramado_system_call ( SYSTEMCALL_RESIZEWINDOW, 
-        (unsigned long) window, x, y );
+    gramado_system_call ( 
+        SYSTEMCALL_RESIZEWINDOW, (unsigned long) window, x, y );
 }
 
 
@@ -1408,7 +1396,12 @@ gde_redraw_window (
     struct window_d *window, 
     unsigned long flags )
 {
-    gramado_system_call ( SYSTEMCALL_REDRAWWINDOW, 
+
+    if ( (void*) window == NULL )
+        return;
+
+    gramado_system_call ( 
+        SYSTEMCALL_REDRAWWINDOW, 
         (unsigned long) window, 
         (unsigned long) flags, 
         (unsigned long) flags );
@@ -1421,23 +1414,36 @@ gde_replace_window (
     unsigned long x, 
     unsigned long y )
 {
-    system_call ( SYSTEMCALL_REPLACEWINDOW, 
-        (unsigned long) window, x, y );
+    if ( (void*) window == NULL )
+        return;
+
+    system_call ( 
+        SYSTEMCALL_REPLACEWINDOW, (unsigned long) window, x, y );
 }
 
 
-void gde_maximize_window (struct window_d *window){
+void gde_maximize_window (struct window_d *window)
+{
 
-    gramado_system_call ( SYSTEMCALL_MAXIMIZEWINDOW, 
+    if ( (void*) window == NULL )
+        return;
+
+    gramado_system_call ( 
+        SYSTEMCALL_MAXIMIZEWINDOW, 
         (unsigned long) window, 
         (unsigned long) window, 
         (unsigned long) window);
 }
 
 
-void gde_minimize_window (struct window_d *window){
+void gde_minimize_window (struct window_d *window)
+{
 
-    gramado_system_call ( SYSTEMCALL_MINIMIZEWINDOW, 
+    if ( (void*) window == NULL )
+        return;
+
+    gramado_system_call ( 
+        SYSTEMCALL_MINIMIZEWINDOW, 
         (unsigned long) window, 
         (unsigned long) window, 
         (unsigned long) window);
@@ -1448,9 +1454,14 @@ void gde_minimize_window (struct window_d *window){
 // Envia uma mensagem PAINT para o aplicativo atualizar 
 // a área de trabalho.
 
-void gde_update_window (struct window_d *window){
+void gde_update_window (struct window_d *window)
+{
 
-    gramado_system_call ( 279, 
+    if ( (void*) window == NULL )
+        return;
+
+    gramado_system_call ( 
+        279, 
         (unsigned long) window, 
         (unsigned long) window, 
         (unsigned long) window );
@@ -1463,9 +1474,14 @@ void *gde_get_foregroung_window (void)
 }
 
 
-void gde_set_foregroung_window (struct window_d *window){
+void gde_set_foregroung_window (struct window_d *window)
+{
 
-    system_call ( SYSTEMCALL_SETFOREGROUNDWINDOW, 
+    if ( (void*) window == NULL )
+        return;
+
+    system_call ( 
+        SYSTEMCALL_SETFOREGROUNDWINDOW, 
         (unsigned long) window, 
         (unsigned long) window, 
         (unsigned long) window );
@@ -1481,11 +1497,16 @@ void gde_set_foregroung_window (struct window_d *window){
  *     liberar os recursos que o processo estava usando.
  */
 
-void gde_exit (int exit_code){
+void gde_exit (int exit_code)
+{
 
     gde_debug_print ("gde_exit:\n");
 
-    system_call ( SYSTEMCALL_EXIT, 
+    // #todo:
+    // exit(exit_code);
+
+    system_call ( 
+        SYSTEMCALL_EXIT, 
         (unsigned long) exit_code, 
         (unsigned long) exit_code, 
         (unsigned long) exit_code );
@@ -1504,6 +1525,7 @@ void gde_exit (int exit_code){
 void gde_kill (int exit_code)
 {
     gde_debug_print ("gde_kill: [TODO]\n");
+    gde_exit(exit_code);
 }
 
 
@@ -1522,24 +1544,20 @@ void gde_kill (int exit_code)
 
 // What a cool thing !
 
-void gde_dead_thread_collector (void){
-
-    system_call ( SYSTEMCALL_DEAD_THREAD_COLLECTOR, 
+void gde_dead_thread_collector (void)
+{
+    system_call ( 
+        SYSTEMCALL_DEAD_THREAD_COLLECTOR, 
         (unsigned long) 0, 
         (unsigned long) 0, 
         (unsigned long) 0 );
 }
 
 
-/*
- ****************************
- * gde_strncmp:
- *     Compara duas strings.
- *     @todo: Isso deve ser oferecido peloa libC e não pela api. 
- */
+// Compare two strings.
 
-int gde_strncmp (char *s1, char *s2, int len){
-
+int gde_strncmp (char *s1, char *s2, int len)
+{
     int n = len;
 
 
@@ -1551,7 +1569,8 @@ int gde_strncmp (char *s1, char *s2, int len){
     {
          n--;
         
-        if (*s1 != *s2){ 
+        if (*s1 != *s2)
+        { 
             return (int) 1; 
         }
 
@@ -1634,8 +1653,8 @@ void gde_get_cursor ( unsigned long *x, unsigned long *y )
  */
 unsigned long gde_get_cursor_x (void)
 {
-    return (unsigned long) gramado_system_call ( SYSTEMCALL_GETCURSORX, 
-                               0, 0, 0 );
+    return (unsigned long) gramado_system_call ( 
+                               SYSTEMCALL_GETCURSORX, 0, 0, 0 );
 }
 
 /*
@@ -1644,8 +1663,8 @@ unsigned long gde_get_cursor_x (void)
  */
 unsigned long gde_get_cursor_y (void)
 {
-    return (unsigned long) gramado_system_call (SYSTEMCALL_GETCURSORY, 
-                               0, 0, 0 );
+    return (unsigned long) gramado_system_call (
+                               SYSTEMCALL_GETCURSORY, 0, 0, 0 );
 }
 
 
@@ -1684,7 +1703,14 @@ void *gde_create_process (
 {
     gde_debug_print ("gde_create_process:\n");
 
-    return (void *) system_call ( SYSTEMCALL_CREATEPROCESS, 
+    if ( (void*) name == NULL )
+    {
+        gde_debug_print ("gde_create_process: [ERROR] no name provided\n");
+        return NULL;
+    }
+
+    return (void *) system_call ( 
+                        SYSTEMCALL_CREATEPROCESS, 
                         (unsigned long) name, 
                         (unsigned long) process_priority, 
                         (unsigned long) 0 );
@@ -1707,7 +1733,27 @@ void *gde_create_thread (
 {
     gde_debug_print ("gde_create_thread:\n");
 
-    return (void *) system_call ( SYSTEMCALL_CREATETHREAD, 
+
+    if (init_eip == 0)
+    {
+        gde_debug_print ("gde_create_thread: [ERROR] init_eip\n");
+        return NULL;
+    }
+    
+    if (init_stack == 0)
+    {
+        gde_debug_print ("gde_create_thread: [ERROR] init_stack\n");
+        return NULL;
+    }
+
+    if ( (void*) name == NULL )
+    {
+        gde_debug_print ("gde_create_thread: [ERROR] no name provided\n");
+        return NULL;
+    }
+
+    return (void *) system_call ( 
+                        SYSTEMCALL_CREATETHREAD, 
                         init_eip, 
                         init_stack, 
                         (unsigned long) name );
@@ -1720,7 +1766,14 @@ void *gde_create_thread (
  *     Coloca no estado standby para executar pela primeira vez
  */
 
-void gde_start_thread (void *thread){
+void gde_start_thread (void *thread)
+{
+
+    if ( (void*) thread == NULL )
+    {
+        gde_debug_print ("gde_start_thread: [ERROR] thread pointer\n");
+        return;
+    }
 
     system_call ( SYSTEMCALL_STARTTHREAD, 
         (unsigned long) thread, 
@@ -1747,7 +1800,14 @@ void *gde_fopen (const char *filename, const char *mode){
 
     gde_debug_print ("gde_fopen:\n");
 
-    Ret = (void *) system_call ( SYSTEMCALL_READ_FILE, 
+    if ( (void*) filename == NULL )
+    {
+        gde_debug_print ("gde_fopen: [ERROR] no filename provided\n");
+        return NULL;
+    }
+
+    Ret = (void *) system_call ( 
+                       SYSTEMCALL_READ_FILE, 
                        (unsigned long) filename, 
                        (unsigned long) mode, 
                        0 );
@@ -1797,9 +1857,21 @@ gde_save_file (
     //message_buffer[6] = (unsigned long) x;
     // ...
 
+    if ( (void*) file_name == NULL )
+    {
+        gde_debug_print ("gde_save_file: [ERROR] no filename provided\n");
+        return -1;
+    }
+
+    if ( (void*) file_address == NULL )
+    {
+        gde_debug_print ("gde_save_file: [ERROR] file_address\n");
+        return -1;
+    }
 
     gde_enter_critical_section();
-    Ret = (int) gramado_system_call ( SYSTEMCALL_WRITE_FILE,
+    Ret = (int) gramado_system_call ( 
+                    SYSTEMCALL_WRITE_FILE,
                     (unsigned long) &message_buffer[0], 
                     (unsigned long) &message_buffer[0],  
                     (unsigned long) &message_buffer[0] ); 
@@ -1823,8 +1895,8 @@ gde_save_file (
 	// Se a quantidade de bytes for '0'. ???
 
 
-int gde_test_save_file (char *file_name){
-
+int gde_test_save_file (char *file_name)
+{
     int Ret=0;
 
     char *file_1_name;
@@ -1839,6 +1911,11 @@ int gde_test_save_file (char *file_name){
     
     file_1_name = file_name;
 
+    if ( (void*) file_name == NULL )
+    {
+        gde_debug_print ("gde_test_save_file: [ERROR] no filename provided\n");
+        return -1;
+    }
 
 
     // Lenght in bytes.
@@ -1906,26 +1983,40 @@ int gde_test_save_file (char *file_name){
 
 
 
-int gde_create_empty_file ( char *file_name ){
-
+int gde_create_empty_file ( char *file_name )
+{
     int __ret = 0;
-    
+
+
+    if ( (void*) file_name == NULL )
+    {
+        gde_debug_print ("gde_create_empty_file: [ERROR] no filename provided\n");
+        return -1;
+    }
+  
     
     gde_enter_critical_section();
-    __ret = (int) gramado_system_call ( 43, 
-                      (unsigned long) file_name, 0, 0);
+    __ret = (int) gramado_system_call ( 
+                      43, 
+                      (unsigned long) file_name, 
+                      0, 
+                      0);
     gde_exit_critical_section();    
-    
     
     return __ret;
 }
 
 
 // (fs)
-int gde_create_empty_directory ( char *dir_name ){
-
+int gde_create_empty_directory ( char *dir_name )
+{
     int __ret=0;
 
+    if ( (void*) dir_name == NULL )
+    {
+        gde_debug_print ("gde_create_empty_directory: [ERROR] no dir_name provided\n");
+        return -1;
+    }
 
     gde_enter_critical_section();
     
@@ -1943,8 +2034,8 @@ int gde_create_empty_directory ( char *dir_name ){
 // gde_down:
 // Operação down em um semáforo indicado no argumento.
 
-void gde_down (struct semaphore_d *s){
-
+void gde_down (struct semaphore_d *s)
+{
     int Status = 1;    //fail.
 
 
@@ -1990,7 +2081,6 @@ tryAgain:
 		goto tryAgain;
     }
 
-
 fail:
     goto tryAgain;
 }
@@ -1999,8 +2089,8 @@ fail:
 // gde_up:
 // Operação up em um semáforo indicado no argumento.
 
-void gde_up (struct semaphore_d *s){
-
+void gde_up (struct semaphore_d *s)
+{
     int Status = 1; 
 
        //Semáforo inválido, 
@@ -2024,13 +2114,11 @@ tryAgain:
                        (unsigned long) s, 
                        (unsigned long) s );
 
-
 	//Ok , podemos sair sa sessão crítica.
 	if (Status == 0)
 	{
 		return;
 	}
-
 
 	//Deu errado a nossa tentativa d sair da sessão crítica.
 	if (Status == 1)
@@ -2169,14 +2257,17 @@ gde_def_dialog (
  *     #importante
  */
  
-unsigned long gde_get_system_metrics (int index){
-
+unsigned long gde_get_system_metrics (int index)
+{
+    // #todo
+    
     //if (index<0){
         //gde_debug_print ("gde_get_system_metrics: fail\n");
         //return 0;
     //}
 
-    return (unsigned long) system_call ( SYSTEMCALL_GETSYSTEMMETRICS, 
+    return (unsigned long) system_call ( 
+                               SYSTEMCALL_GETSYSTEMMETRICS, 
                                (unsigned long) index, 
                                (unsigned long) index, 
                                (unsigned long) index );
@@ -2211,8 +2302,8 @@ void api_receive_message( struct api_receive_message_d *m )
 // Ninguem esta usando essa rotina no momento. hahaha
 // precisamos testar rotinas de input.
 
-int gde_dialog ( const char *string ){
-
+int gde_dialog ( const char *string )
+{
     int Status = 1; // Yes!
     int ch = 0;
 
@@ -2258,7 +2349,6 @@ int gde_dialog ( const char *string ){
         // ?? rever isso.
         asm ("pause");
     };
-
 
     return (int) Status;
 }
@@ -2827,7 +2917,14 @@ struct timer_d *gde_create_timer (
     int type )
 {
     gde_debug_print ("gde_create_timer:\n");
-    return (struct timer_d *) gramado_system_call ( 222, 
+
+    if ( pid<0 ){
+        gde_debug_print ("gde_create_timer: [FAIL] pid \n");
+        return -1;
+    }
+
+    return (struct timer_d *) gramado_system_call ( 
+                                  222, 
                                   (unsigned long) pid, 
                                   (unsigned long) ms, 
                                   (unsigned long) type );

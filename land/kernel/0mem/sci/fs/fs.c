@@ -21,6 +21,8 @@
 
 
 
+
+
 /*
  //Credits: HOPPY OS.
 void 
@@ -2404,7 +2406,7 @@ __OK:
         __file->sync.can_read = TRUE;
         __file->sync.can_write = TRUE;
 
-        __file->sync.stage = 0;
+        __file->sync.action = ACTION_NULL;
         
         // ==================
   

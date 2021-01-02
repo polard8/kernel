@@ -100,6 +100,22 @@ void rtl_set_input_mode(int mode)
     gramado_system_call(912,mode,mode,mode);
 }
 
+// ========================
+void rtl_set_file_sync(int fd, int request, int data)
+{
+    debug_print ("rtl_set_file_sync:\n");
+    sc82 (10000,fd,request,data);
+}
+
+int rtl_get_file_sync(int fd, int request)
+{
+    debug_print ("rtl_get_file_sync:\n");
+    return (int) sc82 (10001,fd,request,0);
+}
+
+
+
+
 
 
 // Get an event from the thread's event queue.

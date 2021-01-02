@@ -418,7 +418,7 @@ socket_gramado (
         // sync
         _file->sync.sender = -1;
         _file->sync.receiver = -1;
-        _file->sync.stage = 0;
+        _file->sync.action = ACTION_NULL;
         _file->sync.can_read = TRUE;
         _file->sync.can_write = TRUE;
         _file->sync.can_execute = FALSE;
@@ -615,7 +615,7 @@ socket_unix (
         // sync
         _file->sync.sender = -1;
         _file->sync.receiver = -1;
-        _file->sync.stage = 0;
+        _file->sync.action = ACTION_NULL;
         _file->sync.can_read = TRUE;
         _file->sync.can_write = TRUE;
         _file->sync.can_execute = FALSE;
@@ -813,7 +813,7 @@ socket_inet (
         // sync
         _file->sync.sender = -1;
         _file->sync.receiver = -1;
-        _file->sync.stage = 0;
+        _file->sync.action = ACTION_NULL;
         _file->sync.can_read = TRUE;
         _file->sync.can_write = TRUE;
         _file->sync.can_execute = FALSE;

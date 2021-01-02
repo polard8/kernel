@@ -3004,6 +3004,24 @@ void *sci2 (
                             (int) arg3, 
                             (unsigned long) arg4 );
     }
+    
+    
+    // #ok: podemos usar ioctl
+    if ( number == 10000 )
+    {
+        debug_print("sc2: [10000] sys_set_file_sync\n");
+        // IN: fd, request, data
+        sys_set_file_sync( (int) arg2, (int) arg3, (int) arg4 );
+        return NULL;
+    }
+
+    // #ok: podemos usar ioctl
+    if ( number == 10001 )
+    {
+        debug_print("sc2: [10000] sys_get_file_sync\n");
+        // IN: fd, request
+        return (void*) sys_get_file_sync( (int) arg2, (int) arg3 );
+    }
 
     panic (" @ sci2: default \n");
 }

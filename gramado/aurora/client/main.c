@@ -47,6 +47,7 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 
+#include <rtl/gramado.h>
 
 
 // libgws - The client-side library.
@@ -166,7 +167,23 @@ int main ( int argc, char *argv[] )
 
     gws_debug_print ("gws.bin:  \n");
              printf ("gws.bin:  \n");
+             
     
+    /*
+    rtl_set_file_sync( client_fd, SYNC_REQUEST_SET_ACTION, ACTION_ERROR );
+    int value = rtl_get_file_sync( client_fd, SYNC_REQUEST_GET_ACTION );
+    
+    printf ("VALUE {%d} \n", value);
+    
+    if( value == ACTION_ERROR )
+        printf("OK\n");
+
+    rtl_set_file_sync( client_fd, SYNC_REQUEST_SET_ACTION, ACTION_NULL );
+    //close(client_fd);
+    //exit(0);
+    //while(1){}
+    */ 
+        
     /*
     char buf[32];
     while (1)
@@ -285,6 +302,7 @@ int main ( int argc, char *argv[] )
         //16, 8, COLOR_RED, 'C' );
 
 
+    /*
     gws_debug_print ("gws.bin: 3 Testing Plot0 4x\n");
     printf          ("gws.bin: 3 Testing Plot0 4x\n");
 
@@ -294,6 +312,7 @@ int main ( int argc, char *argv[] )
     gws_plot0 ( client_fd,  50,  50, 0, COLOR_GREEN );
     gws_plot0 ( client_fd,  50, -50, 0, COLOR_BLUE );
     gws_plot0 ( client_fd, -50, -50, 0, COLOR_YELLOW );
+    */
 
     //
     // == cube ==================================
@@ -361,6 +380,7 @@ int main ( int argc, char *argv[] )
     // == rectangle ==================================
     //
 
+    /*
     gws_debug_print ("gws.bin: 5 Testing Plot rect \n");
     printf          ("gws.bin: 5 Testing Plot rect \n");
 
@@ -394,10 +414,13 @@ int main ( int argc, char *argv[] )
         // plot rectangle 
         gws_plotrectangle ( client_fd, (struct gr_rectangle_d *) rect );
     }
+    */
    
+   
+    printf ("LOOP:\n");
    
     // #debug
-    //while (1){
+    while (1){
 
         gws_draw_char ( client_fd, main_window, 
             20, 20, COLOR_RED, 'X' );
@@ -415,7 +438,7 @@ int main ( int argc, char *argv[] )
         
         //gws_refresh_window (client_fd, main_window);
         //gws_yield();
-    //}
+    }
     
 
     // Isso ehestranho ... um cliente remoto nao deve poder fazer isso.

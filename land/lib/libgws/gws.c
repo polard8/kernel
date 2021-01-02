@@ -27,6 +27,8 @@
 #include <stdlib.h>
 #include <heap.h>   
 
+#include <rtl/gramado.h>   
+
 
 // libgws
 #include "include/connect.h"  
@@ -1333,23 +1335,11 @@ response_loop:
                   __gws_message_buffer, 
                   sizeof(__gws_message_buffer), 
                   0 );
-    
-    //if (n_reads<=0){
-    //     gws_yield(); 
-    //    goto response_loop;
-    //}
-    
-    // Se retornou 0, podemos tentar novamente.
-    if (n_reads == 0){
-        gws_yield(); 
-        goto response_loop;
-    }
-    
+        
     // Se retornou -1 é porque algo está errado com o arquivo.
-    if (n_reads < 0){
+    if (n_reads <= 0){
         gws_debug_print ("__gws_plotcube_response: recv fail.\n");
         printf          ("__gws_plotcube_response: recv fail.\n");
-        printf ("Something is wrong with the socket.\n");
         return -1;
         //exit (1);
     }
@@ -2323,6 +2313,7 @@ gws_plot0 (
     //Maybe we will not have a response.
     //int Response=-1;
 
+    rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );
     __gws_plot0_request ( fd, x, y, z, color );
     
 
@@ -2334,6 +2325,14 @@ gws_plot0 (
     
     // YES, We can read the response.
     //if(CanRead == TRUE)
+
+    // Waiting to read the response.
+    int value=0;
+    while(1){
+        value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
+        if (value == ACTION_REPLY ) { break; }
+        gws_yield();
+    };
         __gws_plot0_response( fd );
 
     return 0;
@@ -2349,7 +2348,9 @@ gws_plotcube (
     
     if ( (void*) cube == NULL )
         return -1;
-        
+    
+    
+    rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );
     __gws_plotcube_request  (fd, (struct gr_cube_d *) cube );
     
     //int CanRead=-1;
@@ -2360,6 +2361,15 @@ gws_plotcube (
     
     // YES, We can read the response.
     //if(CanRead == TRUE)
+    
+    // Waiting to read the response.
+    int value=0;
+    while(1){
+        value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
+        if (value == ACTION_REPLY ) { break; }
+        gws_yield();
+    };
+
     __gws_plotcube_response (fd);
     return 0;
 }
@@ -2376,7 +2386,8 @@ gws_plotrectangle (
     
     if ( (void*) rect == NULL )
         return -1;
-        
+    
+    rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );
     __gws_plotrectangle_request  (fd, (struct gr_rectangle_d *) rect );
     
 
@@ -2388,6 +2399,15 @@ gws_plotrectangle (
     
     // YES, We can read the response.
     //if(CanRead == TRUE)
+   
+    // Waiting to read the response.
+    int value=0;
+    while(1){
+        value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
+        if (value == ACTION_REPLY ) { break; }
+        gws_yield();
+    };
+
         __gws_plotrectangle_response (fd);
     
     return 0;
@@ -2413,6 +2433,9 @@ gws_draw_char (
     int response =0;
 
     gws_debug_print("gws_draw_char: request\n");
+    
+    
+    rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );
     __gws_drawchar_request (
         (int) fd,             // fd,
         (int) window,         // window id,
@@ -2437,7 +2460,15 @@ gws_draw_char (
     
     // YES, We can read the response.
     //if(CanRead == TRUE)
-        response = __gws_drawchar_response((int) fd);  
+     
+    // Waiting to read the response.
+    int value=0;
+    while(1){
+        value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
+        if (value == ACTION_REPLY ) { break; }
+        gws_yield();
+    };
+     response = __gws_drawchar_response((int) fd);  
 
     gws_debug_print("gws_draw_char: done\n");
     return (int) response;
@@ -2761,6 +2792,7 @@ gws_create_window (
     //#todo
     // use more arguments.
 
+    rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );
 
     // Request.
     __gws_createwindow_request ( fd, 
@@ -2773,10 +2805,18 @@ gws_create_window (
     
     //if(CanRead != TRUE)
     //    return -1; // no response.
-    
+
     // YES, We can read the response.
     //if(CanRead == TRUE)
-        wid = (int) __gws_createwindow_response(fd); 
+
+    // Waiting to read the response.
+    int value=0;
+    while(1){
+        value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
+        if (value == ACTION_REPLY ) { break; }
+        gws_yield();
+    };
+    wid = (int) __gws_createwindow_response(fd); 
 
     // Return the index returned by the window server.
     

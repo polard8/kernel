@@ -228,19 +228,26 @@ struct __sbuf
 };
 
 
-#define KSTDIO_SYNC_NULL                     0
-#define KSTDIO_SYNC_REQUEST_SENT             1
-#define KSTDIO_SYNC_REPLY_SENT               2
-#define KSTDIO_SYNC_EVENT_NOTIFICATION_SENT  3
-#define KSTDIO_SYNC_ERROR_NOTIFICATION_SENT  4
+#define ACTION_NULL       0
+#define ACTION_REQUEST    1000
+#define ACTION_REPLY      2000
+#define ACTION_EVENT      3000
+#define ACTION_ERROR      4000
 
+#define SYNC_REQUEST_SET_ACTION 1
+#define SYNC_REQUEST_GET_ACTION 2
+// ...
 
 struct kstdio_sync_d
 {
     pid_t sender;
     pid_t receiver;
     
-    int stage;
+    
+    // REQUEST, REPLY, EVENT, ERROR
+    // See: defines above.
+    int action;
+    
     
     // for files, ttys, sockets ...
     int can_read;
@@ -595,6 +602,10 @@ static __inline int bsd__sputc (int _c, FILE *_p)
 // == prototypes ===============================================
 //
 
+//See: sys.c
+void sys_set_file_sync(int fd, int request, int data);
+//See: sys.c
+int sys_get_file_sync(int fd, int request);
 
 
 //

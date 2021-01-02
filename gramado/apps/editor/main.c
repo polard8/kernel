@@ -812,7 +812,7 @@ int main ( int argc, char *argv[] ){
     // na string do title bar.
     // =============================================================
     
-    _hello(client_fd);
+    //_hello(client_fd);
 
 
     /*

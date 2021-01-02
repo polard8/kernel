@@ -9,6 +9,151 @@
 
 #include <kernel.h>
 
+
+
+void sys_set_file_sync(int fd, int request, int data)
+{
+    struct process_d *p;
+    file *object;
+
+
+    //#bugbug
+    // Pensaremos nessa possibilidade.
+    
+    /*
+    if (fd == 0 || fd == 1 || fd == 2 )
+    {
+        debug_print("sys_close: [FIXME] We can't close the standard stream\n");
+        // WHY NOT ???!!
+        return (int) (-1);
+    }
+    */
+
+    if ( fd < 0 || fd >= NUMBER_OF_FILES )
+    {
+        debug_print("sys_set_file_sync: fd\n");
+        return (int) (-1);
+    }
+
+    // == Process ================
+
+    if ( current_process < 0 ){
+        debug_print("sys_set_file_sync: current_process\n");
+        return (int) (-1);
+    }
+
+    p = (void *) processList[current_process];
+
+    if ( (void *) p == NULL )
+    {
+        debug_print("sys_set_file_sync: p\n");
+        return (int) (-1);
+    }
+
+    // object
+        
+    object = (file *) p->Objects[fd];
+
+    if ( (void*) object == NULL )
+    {
+        debug_print("sys_set_file_sync: object\n");
+        return (int) (-1);
+    }
+
+    if( object->used != 1 || object->magic != 1234 )
+    {
+        debug_print("sys_set_file_sync: validation\n");
+        return (int) (-1);
+    }
+    
+    switch (request){
+
+        // set last action
+        case SYNC_REQUEST_SET_ACTION:
+            object->sync.action = data;
+            break;
+        
+        // ...
+    };
+
+    // ...
+}
+
+
+
+int sys_get_file_sync(int fd, int request)
+{
+    struct process_d *p;
+    file *object;
+
+
+    //#bugbug
+    // Pensaremos nessa possibilidade.
+    
+    /*
+    if (fd == 0 || fd == 1 || fd == 2 )
+    {
+        debug_print("sys_close: [FIXME] We can't close the standard stream\n");
+        // WHY NOT ???!!
+        return (int) (-1);
+    }
+    */
+
+    if ( fd < 0 || fd >= NUMBER_OF_FILES )
+    {
+        debug_print("sys_set_file_sync: fd\n");
+        return (int) (-1);
+    }
+
+    // == Process ================
+
+    if ( current_process < 0 ){
+        debug_print("sys_set_file_sync: current_process\n");
+        return (int) (-1);
+    }
+
+    p = (void *) processList[current_process];
+
+    if ( (void *) p == NULL )
+    {
+        debug_print("sys_set_file_sync: p\n");
+        return (int) (-1);
+    }
+
+    // object
+        
+    object = (file *) p->Objects[fd];
+
+    if ( (void*) object == NULL )
+    {
+        debug_print("sys_set_file_sync: object\n");
+        return (int) (-1);
+    }
+
+    if( object->used != 1 || object->magic != 1234 )
+    {
+        debug_print("sys_set_file_sync: validation\n");
+        return (int) (-1);
+    }
+
+
+    switch (request){
+
+        // get last action
+        case SYNC_REQUEST_GET_ACTION:
+            return (int) object->sync.action;
+            break;
+        
+        // ...
+    };
+
+    // ...
+    return 0;
+}
+
+
+
+
 //credits: linux gpl
 /*
 int sys_alarm(long seconds)
@@ -92,15 +237,6 @@ unsigned long sys_get_system_metrics ( int n )
 {
     return (unsigned long) systemGetSystemMetrics ( (int) n );
 }
-
-
-
-
-
-
-
-
-
 
 
 

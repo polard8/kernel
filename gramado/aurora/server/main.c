@@ -905,6 +905,19 @@ void xxxHandleNextClientRequest (int fd)
     }
     */
 
+    int value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
+    
+    //printf ("VALUE {%d} \n", value);
+    
+    if ( value != ACTION_REQUEST )
+    {
+        //printf("not a request\n");
+        gwssrv_yield();
+        // exit(0);  //debug
+        
+        // drop it!
+        //return;
+    }
 
     // #todo
     // Devemos escrever em nosso próprio
@@ -1114,7 +1127,9 @@ void xxxHandleNextClientRequest (int fd)
     }
     */
 
-
+    // set response
+    rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REPLY );
+    
     //
     // Send
     //
@@ -1158,6 +1173,8 @@ void xxxHandleNextClientRequest (int fd)
     if (n_writes>0)
        gwssrv_debug_print ("xxxHandleNextClientRequest: Response sent\n");  
 
+
+    gwssrv_yield();
 }
 
 
@@ -2504,10 +2521,10 @@ int main (int argc, char **argv)
         //printf ("gwssrv: Calling child \n");  
 
         // main tests
-        gwssrv_clone_and_execute ("gws.bin");      // command gws.bin
+        //gwssrv_clone_and_execute ("gws.bin");      // command gws.bin
         //gwssrv_clone_and_execute ("browser.bin");
         //gwssrv_clone_and_execute ("fileman.bin");  
-        //gwssrv_clone_and_execute ("editor.bin");           
+        gwssrv_clone_and_execute ("editor.bin");           
         //gwssrv_clone_and_execute ("launch1.bin"); 
 
         
