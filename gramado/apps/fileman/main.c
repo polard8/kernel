@@ -715,7 +715,7 @@ int main ( int argc, char *argv[] ){
     // Mas como sabemos que é um soquete,
     // então sabemos que é possível ler.
 
-    _hello(client_fd);
+    // _hello(client_fd);
 
 
     /*
@@ -792,14 +792,16 @@ int main ( int argc, char *argv[] ){
         exit(1);
     }
      
-     gws_draw_text (
+    /*
+    gws_draw_text (
         (int) client_fd,             // fd,
         (int) addressbar_window,              // window id,
         (unsigned long) 8,    // left,
         (unsigned long) 8,    // top,
         (unsigned long) COLOR_BLACK,
         "file://");
-
+    */
+    
     //
     // == Button =========================================
     //
@@ -852,18 +854,21 @@ int main ( int argc, char *argv[] ){
     int e=0;
     int max=22;
     if (current_mode==GRAMADO_JAIL){max=5;}
+    /*
     for (e=3; e<max; e++){
     // fd, window_id, left, top, color, name.
     gws_draw_text ( (int) client_fd, (int) client_window,
         8, (e*16), COLOR_BLACK, "FAKEFILE.TXT");
     }
-
+    */
+    
+    
     //
     // Loop
     //
 
     // Loop de requests para o gws.
-    _loop (client_fd);
+    //_loop (client_fd);
 
 
     // #importante
@@ -896,6 +901,7 @@ int main ( int argc, char *argv[] ){
     */
 
 
+    while(1){}
 
     debug_print ("gwm: bye\n"); 
     printf      ("gwm: bye\n");

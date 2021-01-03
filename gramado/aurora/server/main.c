@@ -916,7 +916,7 @@ void xxxHandleNextClientRequest (int fd)
         // exit(0);  //debug
         
         // drop it!
-        //return;
+        return;
     }
 
     // #todo
@@ -2522,11 +2522,10 @@ int main (int argc, char **argv)
 
         // main tests
         //gwssrv_clone_and_execute ("gws.bin");      // command gws.bin
-        //gwssrv_clone_and_execute ("browser.bin");
-        //gwssrv_clone_and_execute ("fileman.bin");  
         gwssrv_clone_and_execute ("editor.bin");           
+        //gwssrv_clone_and_execute ("fileman.bin");  
         //gwssrv_clone_and_execute ("launch1.bin"); 
-
+        //gwssrv_clone_and_execute ("browser.bin");
         
         // extra        
         //gwssrv_clone_and_execute ("gwm.bin");      // window manager
