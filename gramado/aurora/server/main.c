@@ -907,7 +907,9 @@ void xxxHandleNextClientRequest (int fd)
     // Request packets are numbered sequentially by the server 
     // as soon as it receives them.
 
-
+    // See:
+    // https://en.wikipedia.org/wiki/Round-trip_delay
+    
     // If the request is (XNextEvent), so the reply will be the event.
 
     /*

@@ -1,0 +1,15 @@
+
+	Libraries:
+
+	lib/
+	A set of client-side libraries.
+	These are protocols to some system services.
+
+	libcore/
+	A API to provide direct access to kernel services.
+	It includes some graphical routines in the kgws.
+
+	rtl/
+	C library, c runtime library and system runtime library.
+
+
