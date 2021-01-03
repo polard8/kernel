@@ -14,6 +14,12 @@
 // ...
 
 
+// See:
+// x window system core protocol
+// https://en.wikipedia.org/wiki/X_Window_System_core_protocol
+// ...
+
+
 // hostname:D.S
 // [host]:<display>[.screen]
 // [host]:<display>.[screen]
@@ -895,6 +901,14 @@ void xxxHandleNextClientRequest (int fd)
     //
     // == Request ============================
     //
+    
+    
+    // Requests may generate replies, events, and errors;
+    // Request packets are numbered sequentially by the server 
+    // as soon as it receives them.
+
+
+    // If the request is (XNextEvent), so the reply will be the event.
 
     /*
     // Is current client connected.
@@ -2522,14 +2536,14 @@ int main (int argc, char **argv)
 
         // main tests
         //gwssrv_clone_and_execute ("gws.bin");      // command gws.bin
-        gwssrv_clone_and_execute ("editor.bin");           
+        //gwssrv_clone_and_execute ("editor.bin");           
         //gwssrv_clone_and_execute ("fileman.bin");  
+        gwssrv_clone_and_execute ("terminal.bin");  
+        
+        
         //gwssrv_clone_and_execute ("launch1.bin"); 
         //gwssrv_clone_and_execute ("browser.bin");
-        
-        // extra        
         //gwssrv_clone_and_execute ("gwm.bin");      // window manager
-        //gwssrv_clone_and_execute ("terminal.bin");  
         //gwssrv_clone_and_execute ("s2.bin");      // shell  
         //gwssrv_clone_and_execute ("s3.bin");    // hello        
         // ...

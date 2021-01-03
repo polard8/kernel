@@ -2313,9 +2313,8 @@ gws_plot0 (
     //Maybe we will not have a response.
     //int Response=-1;
 
-    rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );
     __gws_plot0_request ( fd, x, y, z, color );
-    
+    rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );    
 
     //int CanRead=-1;
     //CanRead = rtl_sleep_if_socket_is_empty(fd);
@@ -2331,6 +2330,7 @@ gws_plot0 (
     while(1){
         value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
         if (value == ACTION_REPLY ) { break; }
+        if (value == ACTION_ERROR ) { return -1; }
         gws_yield();
     };
         __gws_plot0_response( fd );
@@ -2350,9 +2350,10 @@ gws_plotcube (
         return -1;
     
     
-    rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );
+
     __gws_plotcube_request  (fd, (struct gr_cube_d *) cube );
-    
+    rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );
+        
     //int CanRead=-1;
     //CanRead = rtl_sleep_if_socket_is_empty(fd);
     
@@ -2367,6 +2368,7 @@ gws_plotcube (
     while(1){
         value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
         if (value == ACTION_REPLY ) { break; }
+        if (value == ACTION_ERROR ) { return -1; }
         gws_yield();
     };
 
@@ -2387,9 +2389,10 @@ gws_plotrectangle (
     if ( (void*) rect == NULL )
         return -1;
     
-    rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );
+
     __gws_plotrectangle_request  (fd, (struct gr_rectangle_d *) rect );
-    
+    rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );    
+
 
     //int CanRead=-1;
     //CanRead = rtl_sleep_if_socket_is_empty(fd);
@@ -2405,6 +2408,7 @@ gws_plotrectangle (
     while(1){
         value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
         if (value == ACTION_REPLY ) { break; }
+        if (value == ACTION_ERROR ) { return -1; }
         gws_yield();
     };
 
@@ -2435,7 +2439,6 @@ gws_draw_char (
     gws_debug_print("gws_draw_char: request\n");
     
     
-    rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );
     __gws_drawchar_request (
         (int) fd,             // fd,
         (int) window,         // window id,
@@ -2443,8 +2446,7 @@ gws_draw_char (
         (unsigned long) y,    // top,
         (unsigned long) color,
         (unsigned long) c );
-
-
+    rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );
 
 
     // #todo
@@ -2466,6 +2468,7 @@ gws_draw_char (
     while(1){
         value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
         if (value == ACTION_REPLY ) { break; }
+        if (value == ACTION_ERROR ) { return -1; }
         gws_yield();
     };
      response = __gws_drawchar_response((int) fd);  
@@ -2792,13 +2795,15 @@ gws_create_window (
     //#todo
     // use more arguments.
 
-    rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );
+
 
     // Request.
     __gws_createwindow_request ( fd, 
         x, y, width, height, 
         color, type, parentwindow, windowname);
-    
+    rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );
+
+     
     // Response
     //int CanRead=-1;
     //CanRead = rtl_sleep_if_socket_is_empty(fd);
@@ -2814,6 +2819,7 @@ gws_create_window (
     while(1){
         value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
         if (value == ACTION_REPLY ) { break; }
+        if (value == ACTION_ERROR ) { return -1; }
         gws_yield();
     };
     wid = (int) __gws_createwindow_response(fd); 

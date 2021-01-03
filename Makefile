@@ -205,6 +205,8 @@ gramado-apps:
 	$(Q) $(MAKE) -C gramado/apps/
 	-sudo cp gramado/apps/bin/EDITOR.BIN   base/
 	-sudo cp gramado/apps/bin/FILEMAN.BIN  base/
+	-sudo cp gramado/apps/bin/TERMINAL.BIN  base/
+	# ...
 
 gramado-net:
 	#::net
