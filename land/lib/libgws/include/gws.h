@@ -9,6 +9,44 @@
 
 
 
+// =======================================
+// Protocol request constants
+//
+
+// #todo:
+// Create a consistent interface.
+// See: xxxHandleNextClientRequest() and gwsProcedure on aurora/server/main.c 
+//
+
+
+
+// See: 
+// All the standar messages, just like MSG_SYSKEYUP ...
+// There are some old messages below 369.
+#define GWS_GetInputMessage        369
+#define GWS_Hello                 1000
+#define GWS_CreateWindow          1001
+#define GWS_BackbufferPutPixel    1002 
+#define GWS_DrawHorizontalLine    1003 
+#define GWS_DrawChar              1004    
+#define GWS_DrawText              1005
+#define GWS_RefreshWindow         1006
+#define GWS_RedrawWindow          1007
+#define GWS_ResizeWindow          1008
+#define GWS_ChangeWindowPosition  1009
+#define GWS_BackbufferPutPixel2   2000
+#define GWS_Disconnect            2010
+#define GWS_RefreshScreen         2020
+#define GWS_RefreshRectangle      2021
+#define GWS_GetNextEvent          2031
+#define GWS_GrPlot0               2040
+#define GWS_GrCubeZ               2041
+#define GWS_GrRectangle           2042
+#define GWS_AsyncCommand          2222
+#define GWS_DRAIN_INPUT           8080
+// ...
+
+
 // Virtual keys.
 #include "vk.h"
 

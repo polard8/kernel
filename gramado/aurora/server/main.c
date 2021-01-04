@@ -19,6 +19,9 @@
 // https://en.wikipedia.org/wiki/X_Window_System_core_protocol
 // ...
 
+// See:
+// https://www.x.org/wiki/Releases/History/
+
 
 // hostname:D.S
 // [host]:<display>[.screen]
@@ -1493,9 +1496,8 @@ gwsProcedure (
             //NoReply = FALSE;
             break;
 
-        // When a client send us an event
-        // MSG_GWS_CLIENTEVENT
-        case 2030:
+         // ?? #bugbug: The client only sends requests.
+         case 2030:
             gwssrv_debug_print ("gwssrv: [2030] serviceClientEvent\n");
             //serviceClientEvent();
             //NoReply = FALSE;
