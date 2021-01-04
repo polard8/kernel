@@ -1,0 +1,11 @@
+====================
+easy   - grass
+tudo dentro de grass usara kgws.
+
+=====================
+medium - cmd
+os comandos rodarao no gdeshell e no terminal virtual.
+
+====================
+hard   - services.
+tudo dentro de services usara libgws.

@@ -1,4 +1,0 @@
-	services/
-	Services running in ring3.
-	gns, gws, file systems, device drivers ...
-

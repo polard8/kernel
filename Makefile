@@ -5,7 +5,7 @@ PRODUCT_NAME  = Gramado Land
 EDITION_NAME  = Gramado Land
 VERSION_MAJOR = 1
 VERSION_MINOR = 0
-VERSION_BUILD = 202
+VERSION_BUILD = 203
 KERNELVERSION = $(VERSION_MAJOR)$(if $(VERSION_MINOR),.$(VERSION_MINOR)$(if $(VERSION_BUILD),.$(VERSION_BUILD)))
 
 # Documentation.
@@ -100,74 +100,64 @@ generate
 PHONY := build-system-files
 build-system-files: \
 /usr/local/gramado-build \
-land-boot \
-land-kernel \
-land-rtl \
-land-libcore \
-land-lib \
-land-init \
-land-grass    
-
-
+land-easy \
+land-medium \
+land-hard    
 
 
 /usr/local/gramado-build:
 	-sudo mkdir /usr/local/gramado-build
 
-land-boot:
-	#::boot
-	@echo "=================== "
-	@echo "Compiling boot/ ... "
-	$(Q) $(NASM)    land/boot/x86/0vhd/main.asm -I land/boot/x86/0vhd/ -o GRAMADO.VHD   
-	$(Q) $(MAKE) -C land/boot/x86/1bm/ 
-	$(Q) $(MAKE) -C land/boot/x86/2bl/ 
-	sudo cp land/boot/x86/bin/BM.BIN  base/
-	sudo cp land/boot/x86/bin/BM.BIN  base/BOOT
-	sudo cp land/boot/x86/bin/BM.BIN  base/SBIN
-	sudo cp land/boot/x86/bin/BL.BIN  base/
-	sudo cp land/boot/x86/bin/BL.BIN  base/BOOT
-	sudo cp land/boot/x86/bin/BL.BIN  base/SBIN
+land-easy:
+	# nothing
+	# fonts
 
-# KERNEL.BIN  - Creating the kernel image.
-land-kernel:
-	#::kernel
-	@echo "================================="
-	@echo "(Step 1) Creating the kernel image ..."
-	$(Q) $(MAKE) -C land/kernel
-	sudo cp land/kernel/KERNEL.BIN  base/
-	sudo cp land/kernel/KERNEL.BIN  base/BOOT
-	sudo cp land/kernel/KERNEL.BIN  base/SBIN
-
-land-rtl:
+land-medium:
 	#::rtl
 	@echo "==================="
 	@echo "Compiling rtl ..."
-	$(Q) $(MAKE) -C land/rtl/
+	$(Q) $(MAKE) -C land/medium/rtl/
 
-land-libcore:
 	#::libcore
 	@echo "==================="
 	@echo "Compiling libcore ..."
-	$(Q) $(MAKE) -C land/libcore/
+	$(Q) $(MAKE) -C land/medium/libcore/
 
-
-land-lib:
 	#::lib
 	@echo "==================="
 	@echo "Compiling  lib ..."
-	$(Q) $(MAKE) -C land/lib/
-land-init:
+	$(Q) $(MAKE) -C land/medium/lib/
+
+land-hard:
+	#::boot
+	@echo "=================== "
+	@echo "Compiling hard/boot/ ... "
+	# todo: Create a makefile inside  the boot/ folder.
+	$(Q) $(NASM)    land/hard/boot/x86/0vhd/main.asm -I land/hard/boot/x86/0vhd/ -o GRAMADO.VHD   
+	$(Q) $(MAKE) -C land/hard/boot/x86/1bm/ 
+	$(Q) $(MAKE) -C land/hard/boot/x86/2bl/ 
+	sudo cp land/hard/boot/x86/bin/BM.BIN  base/
+	sudo cp land/hard/boot/x86/bin/BM.BIN  base/BOOT
+	sudo cp land/hard/boot/x86/bin/BM.BIN  base/SBIN
+	sudo cp land/hard/boot/x86/bin/BL.BIN  base/
+	sudo cp land/hard/boot/x86/bin/BL.BIN  base/BOOT
+	sudo cp land/hard/boot/x86/bin/BL.BIN  base/SBIN
+
+	# KERNEL.BIN  - Creating the kernel image.
+	#::kernel
+	@echo "================================="
+	@echo "(Step 1) Creating the kernel image ..."
+	$(Q) $(MAKE) -C land/hard/kernel
+	sudo cp land/hard/kernel/KERNEL.BIN  base/
+	sudo cp land/hard/kernel/KERNEL.BIN  base/BOOT
+	sudo cp land/hard/kernel/KERNEL.BIN  base/SBIN
+
 	#::init
 	@echo "==================="
 	@echo "Compiling init ..."
-	$(Q) $(MAKE) -C land/init/
-	sudo cp land/init/INIT.BIN  base/
-	sudo cp land/init/INIT.BIN  base/SBIN
-
-land-grass:
-	$(Q) $(MAKE) -C land/grass/
-	sudo cp land/grass/bin/GDESHELL.BIN  base/
-	sudo cp land/grass/bin/GDESHELL.BIN  base/SBIN
+	$(Q) $(MAKE) -C land/hard/init/
+	sudo cp land/hard/init/INIT.BIN  base/
+	sudo cp land/hard/init/INIT.BIN  base/SBIN
 
 
 #===================================================
@@ -175,63 +165,64 @@ land-grass:
 # ~ Step 1 gramado directories.
 PHONY := build-applications 
 build-applications: \
-gramado-aurora \
-gramado-grass \
-gramado-apps \
-gramado-net \
-gramado-cmd \
-gramado-services \
+gramado-easy \
+gramado-medium \
+gramado-hard \
 desert    
 
-gramado-aurora:
+
+gramado-easy:
+	#::easy
+	$(Q) $(MAKE) -C gramado/easy/
+	sudo cp gramado/easy/bin/LAUNCHER.BIN  base/
+	sudo cp gramado/easy/bin/LEASY.BIN     base/
+	sudo cp gramado/easy/bin/LMEDIUM.BIN   base/
+	sudo cp gramado/easy/bin/LHARD.BIN     base/
+	sudo cp gramado/easy/bin/GDESHELL.BIN  base/
+	sudo cp gramado/easy/bin/GDESHELL.BIN  base/SBIN
+	sudo cp gramado/easy/bin/GRAMCODE.BIN  base/
+	sudo cp gramado/easy/bin/SYSMON.BIN    base/
+
+#cmd - commands.
+gramado-medium:
+	#::medium
+	$(Q) $(MAKE) -C gramado/medium/
+	-sudo cp gramado/medium/bin/CAT.BIN        base/
+#	-sudo cp gramado/medium/bin/FALSE.BIN      base/
+	-sudo cp gramado/medium/bin/REBOOT.BIN     base/
+#	-sudo cp gramado/medium/bin/TRUE.BIN       base/
+
+
+gramado-hard:
+	#::hard Services
+	@echo "==================="
+	@echo "Compiling hard..."
+	$(Q) $(MAKE) -C gramado/hard/gnssrv/ 
+	# gns
+	-sudo cp gramado/hard/gnssrv/bin/GNS.BIN     base/
+	-sudo cp gramado/hard/gnssrv/bin/GNSSRV.BIN  base/
+	-sudo cp gramado/hard/gnssrv/bin/GNSSRV.BIN  base/SBIN
+
 	#::aurora Aurora Window Server.
 	@echo "==================="
 	@echo "Compiling Aurora window server ..."
-	$(Q) $(MAKE) -C gramado/aurora/
+	$(Q) $(MAKE) -C gramado/hard/aurora/
 	# gws
-	-sudo cp gramado/aurora/bin/GWS.BIN     base/ 
-	-sudo cp gramado/aurora/bin/GWSSRV.BIN  base/
-	-sudo cp gramado/aurora/bin/GWSSRV.BIN  base/SBIN
+	-sudo cp gramado/hard/aurora/bin/GWS.BIN     base/ 
+	-sudo cp gramado/hard/aurora/bin/GWSSRV.BIN  base/
+	-sudo cp gramado/hard/aurora/bin/GWSSRV.BIN  base/SBIN
 
-gramado-grass:
-	#::grass
-	$(Q) $(MAKE) -C gramado/grass/
-	sudo cp gramado/grass/bin/GRAMCODE.BIN  base/
-	sudo cp gramado/grass/bin/LAUNCHER.BIN  base/
-	sudo cp gramado/grass/bin/SYSMON.BIN    base/
-
-gramado-apps:
 	#::apps
-	$(Q) $(MAKE) -C gramado/apps/
-	-sudo cp gramado/apps/bin/EDITOR.BIN   base/
-	-sudo cp gramado/apps/bin/FILEMAN.BIN  base/
-	-sudo cp gramado/apps/bin/TERMINAL.BIN  base/
-	# ...
+	$(Q) $(MAKE) -C gramado/hard/apps/
+	-sudo cp gramado/hard/apps/bin/EDITOR.BIN   base/
+	-sudo cp gramado/hard/apps/bin/FILEMAN.BIN  base/
+	-sudo cp gramado/hard/apps/bin/TERMINAL.BIN  base/
 
-gramado-net:
 	#::net
-	$(Q) $(MAKE) -C gramado/net/
-	-sudo cp gramado/net/bin/*.BIN  base/
-#	-sudo cp gramado/net/bin/*.BIN  base/PROGRAMS
+	$(Q) $(MAKE) -C gramado/hard/net/
+	-sudo cp gramado/hard/net/bin/*.BIN  base/
+#	-sudo cp gramado/hard/net/bin/*.BIN  base/PROGRAMS
 
-gramado-cmd:
-	#::cmd
-	$(Q) $(MAKE) -C gramado/cmd/
-	-sudo cp gramado/cmd/bin/CAT.BIN        base/
-#	-sudo cp gramado/cmd/bin/FALSE.BIN      base/
-	-sudo cp gramado/cmd/bin/REBOOT.BIN     base/
-#	-sudo cp gramado/cmd/bin/TRUE.BIN       base/
-
-
-gramado-services:
-	#::services Services
-	@echo "==================="
-	@echo "Compiling services..."
-	$(Q) $(MAKE) -C gramado/services/gnssrv/ 
-	# gns
-	-sudo cp gramado/services/gnssrv/bin/GNS.BIN     base/
-	-sudo cp gramado/services/gnssrv/bin/GNSSRV.BIN  base/
-	-sudo cp gramado/services/gnssrv/bin/GNSSRV.BIN  base/SBIN
 
 #========================================
 
@@ -240,7 +231,7 @@ desert:
 	# Copy only the base of the desert inside the base of gramado.
 	#-sudo cp ../desert/base/*.BIN  base/
 	#-sudo cp ../desert/base/*.TXT  base/
-	#-sudo cp ../desert/setup/cmd/bin/*.BIN  base/
+	#-sudo cp ../desert/setup/medium/bin/*.BIN  base/
 	
 # 
 # more setups ? ...
@@ -304,11 +295,11 @@ clean:
 	@echo "================================="
 	@echo "(Step 6) Deleting the object files ..."
 	-rm *.o
-	-rm -rf land/rtl/obj/*.o
-	-rm -rf land/libcore/obj/*.o
-	-rm -rf land/lib/libgns/obj/*.o
-	-rm -rf land/lib/libgws/obj/*.o
-	-rm -rf land/lib/libio01/obj/*.o
+	-rm -rf land/medium/rtl/obj/*.o
+	-rm -rf land/medium/libcore/obj/*.o
+	-rm -rf land/medium/lib/libgns/obj/*.o
+	-rm -rf land/medium/lib/libgws/obj/*.o
+	-rm -rf land/medium/lib/libio01/obj/*.o
 	@echo "Success?"
 # clean ISO and VHD.
 clean2:
@@ -316,10 +307,10 @@ clean2:
 	-rm *.VHD
 # clean gramado
 clean3:
-	-rm gramado/grass/bin/*.BIN
-	-rm gramado/apps/bin/*.BIN
-	-rm gramado/net/bin/*.BIN
-	-rm gramado/cmd/bin/*.BIN
+	-rm gramado/easy/bin/*.BIN
+	-rm gramado/medium/bin/*.BIN
+	-rm gramado/hard/apps/bin/*.BIN
+	-rm gramado/hard/net/bin/*.BIN
 # clean base
 clean4:
 	-rm -rf base/*.BIN 
@@ -334,19 +325,17 @@ clean-system-files:
 	@echo "==================="
 	@echo "Cleaning all system binaries ..."
 
-	-rm -rf land/boot/x86/bin/*.BIN
-	-rm -rf land/kernel/KERNEL.BIN
-	-rm -rf land/init/*.BIN
-	-rm -rf land/grass/bin/*.BIN
-	-rm -rf land/fonts/bin/*.FON
+	-rm -rf land/easy/fonts/bin/*.FON
+	-rm -rf land/hard/boot/x86/bin/*.BIN
+	-rm -rf land/hard/kernel/KERNEL.BIN
+	-rm -rf land/hard/init/*.BIN
 
-
-	-rm -rf gramado/aurora/bin/*.BIN
-	-rm -rf gramado/grass/bin/*.BIN
-	-rm -rf gramado/apps/bin/*.BIN
-	-rm -rf gramado/net/bin/*.BIN
-	-rm -rf gramado/cmd/bin/*.BIN
-	-rm -rf gramado/services/gnssrv/bin/*.BIN
+	-rm -rf gramado/easy/bin/*.BIN
+	-rm -rf gramado/medium/bin/*.BIN
+	-rm -rf gramado/hard/gnssrv/bin/*.BIN
+	-rm -rf gramado/hard/aurora/bin/*.BIN
+	-rm -rf gramado/hard/apps/bin/*.BIN
+	-rm -rf gramado/hard/net/bin/*.BIN
 # ...
 
 
@@ -380,9 +369,9 @@ makeiso-x86:
 geniso-x86:
 	
 	#stage1
-	$(NASM) land/kernel/boot/x86/iso/stage1/stage1.asm -f bin -o stage1.bin
-	cp stage1.bin bin/boot/gramado/
-	rm stage1.bin
+	#$(NASM) land/hard/boot/x86/iso/stage1/stage1.asm -f bin -o stage1.bin
+	#cp stage1.bin bin/boot/gramado/
+	#rm stage1.bin
 
 	#.ISO
 #	mkisofs -R -J -c boot/gramado/boot.catalog -b boot/gramado/stage1.bin -no-emul-boot -boot-load-size 4 -boot-info-table -o GRAMADO.ISO bin
@@ -405,7 +394,7 @@ hdd-unmount:
 	-sudo umount /mnt/gramadohdd
 	
 hdd-copy-kernel:
-	sudo cp bin/boot/KERNEL.BIN /mnt/gramadohdd/BOOT 
+	#sudo cp bin/boot/KERNEL.BIN /mnt/gramadohdd/BOOT 
 
 # Danger!!
 # This is gonna copy th image into the real HD.
@@ -479,10 +468,9 @@ kernel-program-headers:
 #	cat docs/KPH.TXT
 
 kernel-section-headers:
-	-rm docs/KSH.TXT
-	readelf -S bin/boot/KERNEL.BIN > docs/KSH.TXT
-	cat docs/KSH.TXT
-	
+	#-rm docs/KSH.TXT
+	#readelf -S bin/boot/KERNEL.BIN > docs/KSH.TXT
+	#cat docs/KSH.TXT
 
 
 #

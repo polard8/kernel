@@ -1,0 +1,25 @@
+	Half duplex intergalactic river protocol.
+
+	Fragments:
+
+	========================
+	2io:
+	Superior - input. HOT
+	Final    - output. COLD
+
+	=======================
+	1pump:
+	destination - to the middle.
+	destination - to the final.
+
+	======================
+	0mem:
+	Middle.
+
+============================================
+
+	Respect the gravity.
+
+	2io_superior()
+	2io_final()
+
