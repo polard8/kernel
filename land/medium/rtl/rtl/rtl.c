@@ -1316,5 +1316,85 @@ void rtl_test_pipe (void)
 
 
 
+// =========================
+// path count
+// Credits: Sirius OS.
+
+size_t rtl_path_count (unsigned char *path)
+{
+    size_t Value = 0;
+
+    int i=0;
+    int max = (80*25);
+
+    if ( (void*) path == NULL ){
+        printf ("rtl_path_count: [FAIL] path\n");
+        return (size_t) -1;
+    }
+
+    if (*path == 0){
+        printf ("rtl_path_count: [FAIL] *path\n");
+        return (size_t) -1;
+    }
+
+    for ( i=0; i < max; i++ )
+    {
+        if (path[i] == '/') {  Value++;  }
+        if (path[i] == '\0'){  break;  }
+    };
+
+    return (size_t) Value;
+}
+
+
+int 
+rtl_load_path ( 
+    char *path, 
+    unsigned long buffer, 
+    unsigned long buffer_len )
+{
+    int status = -1;
+
+
+    if ( (void*) path == NULL ){
+        printf ("rtl_load_path: [FAIL] path\n");
+        return (int) -1;
+    }
+
+    if (*path == 0){
+        printf ("rtl_load_path: [FAIL] *path\n");
+        return (int) -1;
+    }
+
+
+    //if ( buffer = 0 )
+    //{
+        // msg
+    //    return -1;
+    //}
+
+    status = (int) gramado_system_call ( 4004, 
+                       (unsigned long) path, 
+                       (unsigned long) buffer, 
+                       (unsigned long) buffer_len );
+
+    return (int) status;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

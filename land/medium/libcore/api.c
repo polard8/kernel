@@ -19,11 +19,14 @@
 
 
 // rtl
-#include <types.h>        
+#include <types.h> 
+//#include <sys/types.h>    //#todo    
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <heap.h>   
+#include <rtl/gramado.h>   //#test
+
 #include "include/api.h"  
 
 
@@ -293,11 +296,16 @@ gde_load_path (
     int status = -1;
 
 
-    if ( (void*) path == NULL )
-    {
-        // msg
-        return -1;
+    if ( (void*) path == NULL ){
+        printf ("gde_load_path: [FAIL] path\n");
+        return (int) -1;
     }
+
+    if (*path == 0){
+        printf ("gde_load_path: [FAIL] *path\n");
+        return (int) -1;
+    }
+
 
     //if ( buffer = 0 )
     //{
@@ -373,15 +381,38 @@ gde_message_box (
     int running = 1;          // Loop.
 
 
-    //#todo
-    //unsigned long deviceWidth  = gde_get_system_metrics(?); 
-    //unsigned long deviceHeight = gde_get_system_metrics(?);
+    unsigned long deviceWidth  = gde_get_system_metrics(1); 
+    unsigned long deviceHeight = gde_get_system_metrics(2);
 
-    unsigned long x  = (unsigned long) 10;       //deslocamento x
-    unsigned long y  = (unsigned long) 300;      //deslocamento y
-    unsigned long cx = (unsigned long) (800/2);  //largura 
-    unsigned long cy = (unsigned long) (600/3);  //altura
+    if ( deviceWidth == 0 || deviceHeight == 0 )
+    {
+        printf ("gde_message_box: device size\n");
+        return -1;
+    }
 
+    // dimensoes
+    unsigned long cx = (unsigned long) (deviceWidth/3);   // largura 
+    unsigned long cy = (unsigned long) (deviceHeight/3);  // altura
+
+    // posicionamento.
+    unsigned long x  = (unsigned long) ( ( deviceWidth  - cx ) >> 1 ); 
+    unsigned long y  = (unsigned long) ( ( deviceHeight - cy ) >> 1 ); 
+    
+    
+    int current_mode = rtl_get_system_metrics(130);
+    if (current_mode == GRAMADO_JAIL ){
+        x=0;  y=0;  cx=deviceWidth;  cy=deviceHeight;
+    }
+    
+    // check
+
+    if ( cx == 0 || cy == 0 )
+    {
+        printf ("gde_message_box: cx cy\n");
+        return -1;
+    }
+
+    
     int Button = 0;
 
     // Colors;
@@ -487,9 +518,8 @@ do_create_messagebox_3:
     gde_enter_critical_section ();
 
     messagebox_button1 = (void *) gde_create_window ( 
-                                      WT_BUTTON, 1, 1, "OK", 
-                                      (cx/3), ((cy/8)*5), 
-                                      80, 24,    
+                                      WT_BUTTON, 1, 1, "[F1] OK", 
+                                      ((cx/2)*0), ((cy/8)*6), (cx/2), 24,
                                       hWnd, 0, 
                                       xCOLOR_GRAY1, xCOLOR_GRAY1 );
 
@@ -510,9 +540,8 @@ do_create_messagebox_3:
 	gde_enter_critical_section ();
 
 	messagebox_button2 = (void *) gde_create_window ( 
-	                                  WT_BUTTON, 1, 1, "CANCEL",     
-                                      ((cx/3)*2), ((cy/8)*5), 
-                                      80, 24,    
+	                                  WT_BUTTON, 1, 1, "[F2] CANCEL",     
+                                      ((cx/2)*1), ((cy/8)*6), (cx/2), 24,    
                                       hWnd, 0, 
                                       xCOLOR_GRAY1, xCOLOR_GRAY1 );
 
@@ -841,16 +870,38 @@ int gde_dialog_box ( int type, char *string1, char *string2 )
     struct window_d *pWnd;    //Parent.
     struct window_d *bWnd;    //Button.
 
-	
-	//#todo: usar get system metrics
-	
-	// x and y
-	// @todo centralizado: metade | um terço.
-	// @todo: Pegar a métrica do dispositivo.
-    unsigned long x  = (unsigned long) 10;       //deslocamento x
-    unsigned long y  = (unsigned long) 300;      //deslocamento y
-    unsigned long cx = (unsigned long) (800/2);  //largura   
-    unsigned long cy = (unsigned long) (600/3);  //altura
+
+
+    unsigned long deviceWidth  = gde_get_system_metrics(1); 
+    unsigned long deviceHeight = gde_get_system_metrics(2);
+
+    if ( deviceWidth == 0 || deviceHeight == 0 )
+    {
+        printf ("gde_dialog_box: device size\n");
+        return -1;
+    }
+
+    // dimensoes
+    unsigned long cx = (unsigned long) (deviceWidth/3);   // largura 
+    unsigned long cy = (unsigned long) (deviceHeight/3);  // altura
+
+    // posicionamento.
+    unsigned long x  = (unsigned long) ( ( deviceWidth - cx ) >> 1 ); 
+    unsigned long y  = (unsigned long) ( ( deviceHeight - cy) >> 1 ); 
+
+
+    int current_mode = rtl_get_system_metrics(130);
+    if (current_mode == GRAMADO_JAIL ){
+        x=0;  y=0;  cx=deviceWidth;  cy=deviceHeight;
+    }
+    
+    // check
+
+    if ( cx == 0 || cy == 0 )
+    {
+        printf ("gde_dialog_box: cx cy\n");
+        return -1;
+    }
 
     int Button = 0;
 

@@ -13,6 +13,10 @@
 
 
 
+#include <types.h>
+#include <sys/types.h>
+#include <stddef.h>
+
 // Modes.
 #define GRAMADO_JAIL        0x00
 #define GRAMADO_P1          0x01
@@ -159,6 +163,14 @@ int rtl_sleep_if_socket_is_empty(int fd);
 
 void rtl_test_pipe (void);
 
+
+size_t rtl_path_count (unsigned char *path);
+
+int 
+rtl_load_path ( 
+    char *path, 
+    unsigned long buffer, 
+    unsigned long buffer_len );
 
 #endif
 

@@ -4,8 +4,9 @@
  */
 
 
-
+#include <types.h>
 #include <sys/types.h>
+#include <stddef.h>
 #include <errno.h>
 #include <signal.h>
 #include <rtl/gramado.h> 
@@ -13,6 +14,7 @@
 
 
 const char *sys_siglist[NSIG] = {
+
     "Invalid signal number",
     "Hangup",
     "Interrupt",
@@ -58,8 +60,8 @@ const char *sys_siglist[NSIG] = {
 
     //#todo
     
-sighandler_t signal (int signum, sighandler_t handler){
-
+sighandler_t signal (int signum, sighandler_t handler)
+{
     struct sigaction new_act;
     struct sigaction old_act;
     
@@ -72,10 +74,13 @@ sighandler_t signal (int signum, sighandler_t handler){
     
     int rc = sigaction(signum, &new_act, &old_act);
     
-    if (rc < 0)
+    if (rc < 0){
+        debug_print("signal: rc\n");
         return SIG_ERR;
+    }
     
     // ?? #bugbug: Qual é esse valor ??
+    
     return old_act.sa_handler;
 }
 
@@ -98,9 +103,8 @@ sigaction (
 
 // #todo
 // Sends a signal to a process or a process group.
-int kill (pid_t pid, int sig){
-
-
+int kill (pid_t pid, int sig)
+{
     debug_print ("kill: [TODO] \n");
 
 	// #todo
@@ -130,15 +134,19 @@ int raise (int sig)
 
 
 
-int sigismember (const sigset_t* set, int signum){
+int sigismember (const sigset_t* set, int signum)
+{
 
-    if (signum < 1 || signum > 32) {
+    if (signum < 1 || signum > 32) 
+    {
         errno = EINVAL;
         return -1;
     }
 
     if (*set & (1 << (signum - 1)))
+    {
         return 1;
+    }
 
     return 0;
 }
@@ -170,7 +178,8 @@ int sigfillset (sigset_t *set)
 
 int sigaddset (sigset_t *set, int signum){
 
-    if (signum < 1 || signum > 32) {
+    if (signum < 1 || signum > 32) 
+    {
         errno = EINVAL;
         return -1;
     }
@@ -182,16 +191,19 @@ int sigaddset (sigset_t *set, int signum){
 
 
 
-int sigdelset (sigset_t *set, int signum){
+int sigdelset (sigset_t *set, int signum)
+{
 
-    if (signum < 1 || signum > 32) {
+    if (signum < 1 || signum > 32) 
+    {
         errno = EINVAL;
         return -1;
     }
+    
     *set &= ~(1 << (signum - 1));
+    
     return 0;
 }
-
 
 
 /*

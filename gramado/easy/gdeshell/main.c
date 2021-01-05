@@ -2284,7 +2284,7 @@ do_compare:
     // message-box
     if ( gramado_strncmp( prompt, "message-box", 11 ) == 0 )
     {
-        gde_message_box ( 3, "MessageBox", "type 3. Press F1" );
+        gde_message_box ( 3, "MessageBox", "Testing message box." );
         goto exit_cmp;
     }
 
