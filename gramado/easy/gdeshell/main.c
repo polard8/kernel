@@ -886,26 +886,50 @@ static inline void rep_nop (void)
 #define cpu_relax()  rep_nop()
 
 
-//vamos apenas carregar um arquivo qualquer.
+// vamos apenas carregar um arquivo qualquer.
+// OK: funcionou no qemu.
 void __load_path_test(void)
 {
 
-    char __path[] = "/TMP/TMP2/ANIMAL.BMP";
+    char __path[] = "/ETC/TEST1.CPP";
 
     void *__address = 0;
+    unsigned long ___size_limit=0;
+
+    //___size_limit = (200*1024); // 200KB
+    ___size_limit = (1*1024);
+
+    // endereço para carregar o arquivo
+    __address = (void *) malloc (___size_limit);
     
-    //endereço para carregar o arquivo
-    __address = (void *) malloc(200*1024);
-    //__address = (void *) kmalloc(600*1024);
+    if ( (void*) __address == NULL )
+    {
+        printf ("__load_path_test: [FAIL] __address\n");
+        return;
+    }
+
+    char *buffer = (char *) __address;
+
+    // Load
+    // Using the libcore.
     
-    gramado_system_call ( 4004, (unsigned long) __path, (unsigned long)__address, 0 );
-    //load_path ("/TMP/TMP2/ANIMAL.BMP",(unsigned long) __address);
-    //load_path ("/BOOT/BL.BIN",(unsigned long) __address);
-    //load_path ("/BOOT/KERNEL.BIN",(unsigned long) __address);
+    gde_load_path ( 
+        (char *)         __path, 
+        (unsigned long)  buffer, 
+        (unsigned long)  ___size_limit );
+
+    
+    int mark = (___size_limit - 1);
+    buffer[mark] = 0;
+    
+    // show:
+    printf ( "File = {%s}\n", buffer );
+    
+    printf ("__load_path_test: done\n");
 }
 
 
- 
+
 void quit ( int status )
 {
     _running = 0;
@@ -2907,10 +2931,9 @@ do_compare:
 
 
     // test-path
-    // #bugbug: It is not working
     if ( gramado_strncmp( prompt, "test-path", 9 ) == 0 )
     {
-        //__load_path_test();
+        __load_path_test();
         goto exit_cmp;
     }
 

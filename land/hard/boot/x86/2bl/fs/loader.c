@@ -14,8 +14,6 @@
  *
  * History:
  *     2015 - Created by Fred Nora.
- *     2016 - Revision.
- *     ...
  */
 
 
@@ -95,7 +93,7 @@ int load_kernel (){
     //Status = (int) load_path ( "BOOT       /KERNEL  BIN", 
                        //(unsigned long) kernel_pa );
      
-    //#importante: Esse funciona.                 
+    //#importante: Esse funciona. 
     Status = (int) load_path(
                        "/SBIN/KERNEL.BIN", 
                        (unsigned long) kernel_pa );

@@ -1027,19 +1027,25 @@ from_FAT_name (
 
 
 /*
- ********************************** 
+ *********************************************************
  * fs_load_path:
  *     Carrega nesse endereço o arquivo que está nesse path.
+ *     ??: O endereço pode ser ring3?
  */
 
-
 // IN:
-// path de dois níveis, endereço onde carregar.
-// Ex: "/BIN/GDESHELL.BIN"
+// @path:
+//     Path de dois níveis, endereço onde carregar.
+//     Ex: "/BIN/GDESHELL.BIN"
+// @address:
+//     Address to load the file.
+//
 
 // #ok
 // Carregou um arquivo com 3 niveis.
 
+// See:
+// sys_load_path() and service 4004.
 
 //    0 ---> ok.
 // != 0 ---> fail
@@ -1320,19 +1326,56 @@ fail:
  *     Load file given a pathname.
  */
 
+// Service 4004
+
+// IN:
+//    path: "/BIN/FILE.BIN"
+//    u_address: Where to load the file.
+
+// See:
+// gde_load_path() on libcore.
+
+// #bugbug
+// Temos que considerar a questao do tamanho do arquivo.
+
+//    0 ---> ok.
+// != 0 ---> fail
+
 int sys_load_path ( unsigned char *path, unsigned long u_address )
 {
+
+    // #bugbug
+    // Temos que considerar a questao do tamanho do arquivo.
+
+
     int Status = -1;
 
     debug_print ("sys_load_path:\n");
     
+    if ( (void*) path == NULL )
+    {
+        debug_print ("sys_load_path: [FAIL] path\n");
+        return (int) -1;
+    }
+
+    if (*path == 0)
+    {
+        debug_print ("sys_load_path: [FAIL] *path\n");
+        return (int) -1;
+    }
+    
+
     Status = fs_load_path ( 
                  (unsigned char *) path, 
                  (unsigned long) u_address );
 
-    if (Status<0)
-            debug_print ("sys_load_path: fail\n");
-            
+    if (Status<0){
+        debug_print ("sys_load_path: fail\n");
+        return (int) -1;
+    }
+
+    debug_print ("sys_load_path: done\n");
+    
     return (int) Status;
 }
 

@@ -145,6 +145,7 @@ land-hard:
 
 	# KERNEL.BIN  - Creating the kernel image.
 	#::kernel
+	# The boot loader will search on /SBIN/ and on /BOOT/ folders.
 	@echo "================================="
 	@echo "(Step 1) Creating the kernel image ..."
 	$(Q) $(MAKE) -C land/hard/kernel
