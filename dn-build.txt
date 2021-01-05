@@ -1,0 +1,12 @@
+
+	some commands:
+
+	make
+	make clean
+	make clean-all
+	make land-lib
+	make land-os
+	make gramado-core
+	make gramado-cmd
+	make gramado-setup
+
