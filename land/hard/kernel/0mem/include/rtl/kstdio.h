@@ -142,6 +142,14 @@ int g_inputmode;
 #endif
 
 
+
+// #define  TMP_MAX    32767
+// #define  L_tmpnam    1024    /* XXX must be == PATH_MAX */
+// #define  P_tmpdir    "/tmp/"
+// #define  L_ctermid   1024    /* size for ctermid(); PATH_MAX */
+
+
+
 //
 // == prompt =============================
 //

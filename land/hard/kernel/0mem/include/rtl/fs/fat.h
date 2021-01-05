@@ -4,20 +4,21 @@
  *     2015 - Created by Fred Nora.
  */
 
-
 // definições, variáveios, estruturas e protótipos
 // específicos para o sistema de arquivos fat16.
 // Isolando pra talvez tirarmos isso do kernel.
-
 // fat16 é o sistema da partição de boot apenas.
 
 
-
+// fat16 file attributes.
+// See:
+// https://en.wikipedia.org/wiki/Design_of_the_FAT_file_system
 
 #define FAT_FILE_FLAG_READ              0x01
 #define FAT_FILE_FLAG_HIDDEN            0x02
 #define FAT_FILE_FLAG_SYSTEM            0x04   //HARDWARE.
 #define FAT_FILE_FLAG_VOLUME_LABEL      0x08
+
 #define FAT_FILE_FLAG_DIRECTORY         0x10
 #define FAT_FILE_FLAG_FILE              0x20
 #define FAT_FILE_FLAG_DEVICE            0x40   
