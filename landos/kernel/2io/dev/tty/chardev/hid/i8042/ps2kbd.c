@@ -970,6 +970,7 @@ void ps2kbd_initialize_device (void)
 
     // #test
     // Drain the output buffer for the first time. Residual.
+
     I8042Controller_do_drain();
 
 //

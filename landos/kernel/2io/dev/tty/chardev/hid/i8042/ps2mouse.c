@@ -395,10 +395,7 @@ void ps2mouse_initialize_device (void)
     __breaker_ps2mouse_initialized = 0;
 
 
-    
-    
 
-    
     //
     // Globals first.
     //
@@ -683,6 +680,12 @@ void ps2mouse_initialize_device (void)
      
         // ...
     };
+    
+    // #test
+    // Drain the output buffer for the first time. Residual.
+
+    I8042Controller_do_drain();
+    
 //
 // ==========================================
 //

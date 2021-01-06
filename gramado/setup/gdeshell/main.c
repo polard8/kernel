@@ -1159,14 +1159,7 @@ shellProcedure (
         case MSG_SYSKEYDOWN: 
             switch (long1)
             {
-                // #bugbug
-                // Nao temos retorno.
-                // Se falhar, trava.
 
-                // grass:  f1,  f2,  f3,  f4
-                // system: f5,  f6,  f7,  f9
-                // cmd:    f9, f10, f11, f12
-                
                 case VK_F1: 
                     debug_print(" [F1] "); 
                     gde_clone_and_execute ("launcher.bin");
@@ -1175,19 +1168,19 @@ shellProcedure (
                     
                 case VK_F2: 
                     debug_print(" [F2] "); 
-                    gde_clone_and_execute ("gfe.bin");
+                    gde_clone_and_execute ("gramcode.bin");
                     exit(0);
                     break;
                     
                 case VK_F3: 
                     debug_print(" [F3] "); 
-                    gde_clone_and_execute ("gramcode.bin");
+                    gde_clone_and_execute ("sysmon.bin");
                     exit(0);
                     break;
                     
                 case VK_F4: 
                     debug_print(" [F4] "); 
-                    gde_clone_and_execute ("sysmon.bin");
+                    gde_clone_and_execute ("gwssrv.bin");
                     exit(0);
                     break;
 
