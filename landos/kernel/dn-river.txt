@@ -4,20 +4,17 @@
 
 	========================
 	2io:
-	>> View
-	Superior - input. HOT
-	Final    - output. COLD
+	Superior - input. COLD
+	Final    - output. HOT
 
 
 	=======================
 	1pump:
-	>> Controller
-	destination - to the middle.
-	destination - to the final.
+	To the middle.
+	To the final.
 
 	======================
 	0mem:
-	>> Model
 	Middle.
 
 ============================================

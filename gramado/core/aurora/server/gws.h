@@ -22,9 +22,9 @@ int current_mode;
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/socket.h>
-// ...
-
 #include <rtl/gramado.h>
+
+
 
 // 
 #include "globals.h"

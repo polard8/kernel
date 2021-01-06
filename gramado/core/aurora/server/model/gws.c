@@ -298,9 +298,29 @@ int gwssrv_init_globals(void)
  
     current_mode = gwssrv_get_system_metrics(130);
 
+
+    //
+    // framebuffer and backbuffer.
+    //
+
     // buffers
-    ____FRONTBUFFER_VA = (unsigned long) gwssrv_get_system_metrics(11);
-    ____BACKBUFFER_VA  = (unsigned long) gwssrv_get_system_metrics(12); // #todo: check
+    // We need to find a better way to get these addresses,
+    // maybe a library. (direct framebuffer library thing)
+    // I guess it uses a shared memory allocator.That is why we can
+    // use these addresses.
+    // #test:
+    // We have the rtl included in this project,
+    // let's give rtl a chance for now.
+    
+    // #todo #todo
+    // Is this call using the sc82 syscall ? or the sc80 ?
+    // We need full access to the kernel structure.
+
+    //____FRONTBUFFER_VA = (unsigned long) gwssrv_get_system_metrics(11);
+    //____BACKBUFFER_VA  = (unsigned long) gwssrv_get_system_metrics(12); // #todo: check
+
+    ____FRONTBUFFER_VA = (unsigned long) rtl_get_system_metrics(11);
+    ____BACKBUFFER_VA  = (unsigned long) rtl_get_system_metrics(12);
 
 
     // Screen
@@ -399,7 +419,9 @@ int gwsInit(void)
     //
 
     CurrentDisplay = (void *) malloc (sizeof(struct gws_display_d));
-    if( (void*) CurrentDisplay == NULL){
+    
+    if ( (void*) CurrentDisplay == NULL )
+    {
         debug_print("gwsInit: CurrentDisplay\n");
         return -1;
         //while(1);
@@ -419,7 +441,9 @@ int gwsInit(void)
     
     
     DeviceScreen  = (void *) malloc (sizeof(struct gws_screen_d));
-    if ( (void*) DeviceScreen == NULL){
+    
+    if ( (void*) DeviceScreen == NULL )
+    {
         debug_print("gwsInit: DeviceScreen\n");
         //while(1);
         
@@ -445,6 +469,13 @@ int gwsInit(void)
         DeviceScreen->font_size   = 0;    //todo
         DeviceScreen->char_width  = 0;    //todo
         DeviceScreen->char_height = 0;    //todo
+        
+        // # ??
+        // We simply used gwssrv_get_system_metrics() to get these addresses.
+        // See: gwssrv_init_globals()
+        // We need to find a better way to get these addresses,
+        // maybe a library. (direct framebuffer library thing)
+        
         DeviceScreen->backbuffer  = (void *) ____BACKBUFFER_VA;
         DeviceScreen->frontbuffer = (void *) ____FRONTBUFFER_VA;
         

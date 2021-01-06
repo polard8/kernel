@@ -1640,6 +1640,7 @@ int initGraphics (void){
 
     // Initialize the window server infrastructure.
     // The current display and the current screen.
+    // See: model/gws.c
 
     __init_status = gwsInit();
 
@@ -2531,7 +2532,7 @@ int main (int argc, char **argv)
         // Init gws infrastructure.
         // Initialize the 3d graphics support.
         // Let's create the traditional green background.
- 
+        
         initGraphics();
 
 
