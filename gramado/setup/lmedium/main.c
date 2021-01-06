@@ -189,7 +189,7 @@ launcherProcedure (
                             (unsigned long) window, 
                             (unsigned long) window );
 
-                        gramado_system_call (900, "gramcode.bin", 0, 0);                          
+                        gramado_system_call (900, "reboot.bin", 0, 0);                          
                         exit(0);
                         break;
                     }
@@ -201,7 +201,7 @@ launcherProcedure (
                             (unsigned long) window, 
                             (unsigned long) window );
                             
-                        gramado_system_call (900, "sysmon.bin", 0, 0);                             
+                        gramado_system_call (900, "reboot.bin", 0, 0);                             
                         exit(0);
                         break;
                     }
