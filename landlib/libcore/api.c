@@ -1752,15 +1752,27 @@ void *gde_create_process (
     char *name,
     unsigned long process_priority )
 {
+
     gde_debug_print ("gde_create_process:\n");
 
-    if ( (void*) name == NULL )
-    {
+
+    if ( (void*) name == NULL ){
         gde_debug_print ("gde_create_process: [ERROR] no name provided\n");
         return NULL;
     }
 
-    return (void *) system_call ( 
+    if ( *name == 0 ){
+        gde_debug_print ("gde_create_process: [ERROR] invalid name\n");
+        return NULL;
+    }
+
+    //return (void *) system_call ( 
+    //                    SYSTEMCALL_CREATEPROCESS, 
+    //                    (unsigned long) name, 
+    //                    (unsigned long) process_priority, 
+    //                    (unsigned long) 0 );
+
+    return (void *) sc82 ( 
                         SYSTEMCALL_CREATEPROCESS, 
                         (unsigned long) name, 
                         (unsigned long) process_priority, 
@@ -1785,25 +1797,33 @@ void *gde_create_thread (
     gde_debug_print ("gde_create_thread:\n");
 
 
-    if (init_eip == 0)
-    {
+    if (init_eip == 0){
         gde_debug_print ("gde_create_thread: [ERROR] init_eip\n");
         return NULL;
     }
-    
-    if (init_stack == 0)
-    {
+
+    if (init_stack == 0){
         gde_debug_print ("gde_create_thread: [ERROR] init_stack\n");
         return NULL;
     }
 
-    if ( (void*) name == NULL )
-    {
+    if ( (void*) name == NULL ){
         gde_debug_print ("gde_create_thread: [ERROR] no name provided\n");
         return NULL;
     }
 
-    return (void *) system_call ( 
+    if ( *name == 0 ){
+        gde_debug_print ("gde_create_thread: [ERROR] invalid name\n");
+        return NULL;
+    }
+
+    //return (void *) system_call ( 
+    //                    SYSTEMCALL_CREATETHREAD, 
+    //                    init_eip, 
+    //                    init_stack, 
+    //                    (unsigned long) name );
+
+    return (void *) sc82 ( 
                         SYSTEMCALL_CREATETHREAD, 
                         init_eip, 
                         init_stack, 

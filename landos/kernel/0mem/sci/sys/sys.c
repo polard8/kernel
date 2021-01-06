@@ -1900,6 +1900,7 @@ fail2:
         // qual é o processo atual e determina que ele será o 
         // processo pai. 
 
+// Service 73
 
 void *sys_create_process ( 
     struct room_d     *room,
@@ -1911,6 +1912,11 @@ void *sys_create_process (
     char *name,
     unsigned long iopl ) 
 {
+
+    // #bugbug
+    // Lembrando que quando entramos nesse serviço (73)
+    // estavamos usando o diretorio de paginas do processo.
+
 
     // #todo: 
     // Esse ultimo argumento eh o endereço do diretorio de paginas.
@@ -1940,8 +1946,8 @@ void *sys_create_process (
     int fileret = -1;
     
     
-    
-    debug_print ("sys_create_process: [FIXME]\n");
+
+    debug_print ("sys_create_process: [FIXME] It's a work in progress\n");
 
 
     //
@@ -1980,7 +1986,8 @@ void *sys_create_process (
     
     //printf ("sys_create_process: Loading the image in the address %x\n", tmp_va);
 
-    fileret = (unsigned long) fsLoadFile ( VOLUME1_FAT_ADDRESS, 
+    fileret = (unsigned long) fsLoadFile ( 
+                                  VOLUME1_FAT_ADDRESS, 
                                   VOLUME1_ROOTDIR_ADDRESS, 
                                   32, //#bugbug: Number of entries.
                                   name, 
@@ -2012,17 +2019,17 @@ void *sys_create_process (
     // de seu proprio diretorio de paginas, que eh um clone do
     // diretorio do kernel.
 
-    p = (void *) create_process ( room, desktop, window, 
-                      (unsigned long) 0x00400000, //base
-                      priority, 
-                      ppid, 
-                      name, 
-                      RING3, 
-                      (unsigned long ) CloneKernelPageDirectory() );
+    p = (void *) create_process ( 
+                     room, desktop, window, 
+                     (unsigned long) 0x00400000, //base
+                     priority, 
+                     ppid, 
+                     name, 
+                     RING3, 
+                     (unsigned long ) CloneKernelPageDirectory() );
 
     if ( (void *) p == NULL ){
         panic ("sys_create_process: [FAIL] p\n");
-
     }else{
         fs_initialize_process_pwd ( p->pid, "no-pwd" );
     };
@@ -2051,10 +2058,11 @@ void *sys_create_process (
      // Isso fara com que o endereço 0x400000 aponte para o 
      // endereço fisico de onde carregamos a imagem.
      
-     CreatePageTable ( (unsigned long) p->DirectoryVA, 
+     CreatePageTable ( 
+         (unsigned long) p->DirectoryVA, 
          ENTRY_USERMODE_PAGES, 
          p->ImagePA );
-            
+ 
      // Com base no endereço físico, usamos a função acima
      // para atribuírmos um novo endereço virtual para a imagem.
      p->Image = 0x400000; // com base na entrada escolhida (ENTRY_USERMODE_PAGES)            
@@ -2065,21 +2073,21 @@ void *sys_create_process (
     //
 
 	// Create thread.
-    t = (struct thread_d *) create_thread ( room, desktop, window, 
-                        0x00401000,  //entrypoint 
-                        priority, 
-                        p->pid, 
-                        "control-thread" ); 
+    t = (struct thread_d *) create_thread ( 
+                                room, desktop, window, 
+                                0x00401000,    //entrypoint 
+                                priority, 
+                                p->pid, 
+                                "control-thread" ); 
 
-    if ( (void *) t == NULL )
-    {
+    if ( (void *) t == NULL ){
         debug_print ("sys_create_process: t fail\n");
         goto fail;
     }
 
-    // Marca ela como thread de cotnrole.
+    // Marca ela como thread de controle do processo.
     p->control = t;
-    
+
     SelectForExecution ( (struct thread_d *) t );
 
     //ok

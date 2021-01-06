@@ -1,0 +1,11 @@
+
+	gramado os model:
+
+	> boot  
+	> land-os 
+	> land-lib
+	> gramado cmd 
+	> gramado setup 
+	> gramado core 
+	> gramado edge 
+	> desert

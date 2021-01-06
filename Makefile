@@ -161,10 +161,14 @@ land-os:
 # ~ Step 1 gramado directories.
 PHONY := build-applications 
 build-applications: \
-gramado-core \
 gramado-cmd \
 gramado-setup \
+gramado-core \
+gramado-edge \
 desert    
+
+# order
+# cmd > setup > core > edge > desert
 
 #cmd - commands.
 gramado-cmd:
@@ -174,7 +178,6 @@ gramado-cmd:
 #	-sudo cp gramado/cmd/bin/FALSE.BIN      base/
 	-sudo cp gramado/cmd/bin/REBOOT.BIN     base/
 #	-sudo cp gramado/cmd/bin/TRUE.BIN       base/
-
 
 gramado-setup:
 	#::setup
@@ -187,8 +190,6 @@ gramado-setup:
 	sudo cp gramado/setup/bin/GDESHELL.BIN  base/SBIN
 	sudo cp gramado/setup/bin/GRAMCODE.BIN  base/
 	sudo cp gramado/setup/bin/SYSMON.BIN    base/
-
-
 
 gramado-core:
 	#::hard Services
@@ -215,11 +216,12 @@ gramado-core:
 	-sudo cp gramado/core/apps/bin/FILEMAN.BIN  base/
 	-sudo cp gramado/core/apps/bin/TERMINAL.BIN  base/
 
-	#::net
-	$(Q) $(MAKE) -C gramado/core/net/
-	-sudo cp gramado/core/net/bin/*.BIN  base/
-#	-sudo cp gramado/core/net/bin/*.BIN  base/PROGRAMS
+gramado-edge:
 
+	#::net
+	$(Q) $(MAKE) -C gramado/edge/net/
+	-sudo cp gramado/edge/net/bin/*.BIN  base/
+#	-sudo cp gramado/edge/net/bin/*.BIN  base/PROGRAMS
 
 #========================================
 
@@ -304,10 +306,10 @@ clean2:
 	-rm *.VHD
 # clean gramado
 clean3:
-	-rm gramado/core/apps/bin/*.BIN
-	-rm gramado/core/net/bin/*.BIN
 	-rm gramado/cmd/bin/*.BIN
 	-rm gramado/setup/bin/*.BIN
+	-rm gramado/core/apps/bin/*.BIN
+	-rm gramado/edge/net/bin/*.BIN
 
 	
 # clean base
@@ -331,14 +333,12 @@ clean-system-files:
 	-rm -rf landos/kernel/KERNEL.BIN
 	-rm -rf landos/init/*.BIN
 
+	-rm -rf gramado/cmd/bin/*.BIN
+	-rm -rf gramado/setup/bin/*.BIN
 	-rm -rf gramado/core/aurora/bin/*.BIN
 	-rm -rf gramado/core/gnssrv/bin/*.BIN
 	-rm -rf gramado/core/apps/bin/*.BIN
-	-rm -rf gramado/core/net/bin/*.BIN
-	-rm -rf gramado/cmd/bin/*.BIN
-	-rm -rf gramado/setup/bin/*.BIN
-
-
+	-rm -rf gramado/edge/net/bin/*.BIN
 # ...
 
 

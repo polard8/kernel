@@ -2937,6 +2937,11 @@ void *sci2 (
     unsigned long arg4 )
 {
 
+    // Array de longs.
+    unsigned long *a2 = (unsigned long*) arg2;
+    unsigned long *a3 = (unsigned long*) arg3;
+    unsigned long *a4 = (unsigned long*) arg4;
+
     //debug_print("sci2: [TODO]\n");
 
 
@@ -2981,6 +2986,36 @@ void *sci2 (
                             (char *)       arg3, 
                             (int)          arg4 );
     }
+
+
+        // 72
+        // See: sci/sys/sys.c
+        // Cria uma thread e coloca ela pra rodar.
+        // SYS_CREATETHREAD:
+    if (number == 72){
+            debug_print("sci2: [FIXME] SYS_CREATETHREAD\n");
+            return (void *) sys_create_thread ( NULL,  NULL, NULL, 
+                                arg2,             // init eip
+                                arg3,             // init stack
+                                current_process,  // pid
+                                (char *) a4 );    // name
+    }
+
+        // 73
+        // See: sci/sys/sys.c
+        // syscall: 
+        // arg2 = name
+        // arg3 = process priority
+        // arg4 = nothing
+        // SYS_CREATEPROCESS:
+    if (number==73){
+            debug_print("sci2: [FIXME] SYS_CREATEPROCESS\n");
+            return (void *) sys_create_process ( NULL, NULL, NULL, 
+                                0, arg3,        //res, priority
+                                0, (char *) a2, //ppid, name
+                                RING3 ); 
+    }
+
 
     if (number == 265)
     {

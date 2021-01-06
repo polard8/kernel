@@ -2842,12 +2842,13 @@ do_compare:
         // ?? critical session ??
         //#bugbug: O primeiro argumento está errado.
         P = (void *) gde_create_process ( "SYSMON  BIN", PRIORITY_HIGH ); 
-                       
-        if ( (void *) P == NULL ){ printf ("Fail creating process\n"); }
+
+        if ( (void *) P == NULL ){ printf ("t17: Fail creating process\n"); }
         
         printf ("t17: Done\n");
         goto exit_cmp;
     }
+
 
 
 	// t18 - OpenTTY.
