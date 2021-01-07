@@ -71,9 +71,21 @@ db 0x00, 0x02
 ;; For volumes larger than 65536 sectors, 
 ;; this field has a value of 0 and the Large Sectors field is used instead.
 ;; 0xF8000 = 63488 setores = 31744 KB
+
+;; ok, this is working with 3 mb of unallocated space.
+;; This way we have a partition of 32mb. see: partition table in the mbr.
+;; but we have 3 mb of unallocated space.
+
+db 0xFE, 0xE3
+
+;; for smaller partition
+; db 0xFE, 0xC3
+; db 0xFE, 0x93
+; db 0xFE, 0x53
+; db 0xFE, 0x43 
 ;; 0x43FE = 17406 setores  = 8703 KB.
-;db 0x00, 0xF8 
-db 0xFE, 0x43 
+
+
 
 ;; ??
 ;; unsigned char Media;

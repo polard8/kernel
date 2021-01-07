@@ -5,7 +5,7 @@ PRODUCT_NAME  = Gramado Land
 EDITION_NAME  = Gramado Land
 VERSION_MAJOR = 1
 VERSION_MINOR = 0
-VERSION_BUILD = 205
+VERSION_BUILD = 206
 KERNELVERSION = $(VERSION_MAJOR)$(if $(VERSION_MINOR),.$(VERSION_MINOR)$(if $(VERSION_BUILD),.$(VERSION_BUILD)))
 
 # Documentation.
@@ -387,7 +387,8 @@ geniso-x86:
 # == HDD ================================
 #
 
-
+# 32256 means the start of the partition in bytes.
+# sector 63.
 hdd-mount:
 	-sudo umount /mnt/gramadohdd
 	sudo mount -t vfat -o loop,offset=32256 /dev/sda /mnt/gramadohdd/
@@ -406,6 +407,11 @@ hdd-copy-kernel:
 danger-hdd-clone-vhd:
 	sudo dd if=./GRAMADO.VHD of=/dev/sda
 #	sudo dd if=./GRAMADO.VHD of=/dev/sdb
+
+# it will generate a file ...
+# change the permission using cat MBR.VHD > MBR.BIN
+#danger-copy-mbr:
+#	sudo dd if=/dev/sda of=./MBR.VHD bs=512 count=1
 
 
 #

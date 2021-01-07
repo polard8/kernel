@@ -668,23 +668,43 @@ FAILURE:
 ;;     EFI system partition. 
 ;;     Can be a FAT12, FAT16, FAT32 (or other) file system.
 
+; bios = limits: h=4, c=3FF, s=A
+; vhd = CHS=963/4/17
 
 ; Partition 0. 
 P0:
 
 ;; begin (4 bytes)
 .flag:                db  0x80     
-.hcs_inicial:         db  1, 1, 0       ; h,c,s      
+.hcs_inicial:         db  0x01, 0x01, 0       ; h,c,s      
 
 ; end (4 bytes)
 .os_type:             db  0xEF          ; EFI FAT12/FAT16.       
-.hcs_final:           db  0x03, 0x4A, 0xCF  ; h,c,s (3, 255, 16)    0001 0000b
+
+; limits:
+; bios = limits: h=4, c=3FF, s=A
+; vhd = CHS=963/4/17
+
+; .hcs_final:           db  0x03, 0x4A, 0xCF  ; h,c,s (3, 255, 16)    0001 0000b
+;.hcs_final:           db  0x03, 0xFE, 0x0A
+.hcs_final:           db 0,0,0
+
 
 ; relative
 .lba_inicial:         dd  0x3F          ; First sector. (63, vbr).
 
-; size
-.tamanho_da_particao: dd  65512         ; in sectors. 
+;; size
+;; #bugbug: This is the size of the disk,
+;; We can not have a partition this big.
+;; 0x0000FFA7 = 65477
+;; 65512 = 32 MB. (#bugbug: We ca not use this one. We have reserved sectors.)
+
+;; #important:
+;; See 'small sector' in the VBR.
+;; It is used by gparted application.
+
+.tamanho_da_particao: dd  0x0000FFA7 ; in sectors. almost 32 mb
+
 
 
 ; (obs: Os dois bits mais altos de s pertencem al c)
@@ -697,12 +717,18 @@ P0:
 ; (11)01 0000b  *bits exportados;
 ; 11010000 = d0
 ; 11001111 = cf
+; 0000 1010 = 0A
+; 1100 1010 = CA (exportando dois bits)
 
 ; c
 ; 34a = 842 ...    
 ; 34a = 0011 0100 1010
 ; 00(11) 0100 1010   *bits inportados de s.
+; 3FF =   11 1111 11(11)
+; 3FF =   1111 1111 (11) = FF mais dois importados
+;
 
+     
 ;size
 ;0x0000FFE8 = 65512
 
