@@ -26,6 +26,9 @@ char __gws_events_message_buffer[512];
 // from the queue of a client.
 struct gws_event_d *gws_next_event(int fd)
 {
+
+    //
+    
     return (struct gws_event_d *) 0;
 }
 
@@ -51,7 +54,6 @@ gws_send_event (
     int msg=-1;
     unsigned long long1=0; 
     unsigned long long2=0;
-
 
 
     if ( (void*) event == NULL )

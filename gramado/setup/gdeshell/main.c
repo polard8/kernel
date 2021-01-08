@@ -1,9 +1,12 @@
 /*
  * File: main.c
- * Setup - Shell
- * A simple shell
- * This shell uses the virtual console, not the virtual terminal.
- * This shell uses the window server embeded into the base kernel.
+ * 
+ *     gdeshell - Gramado Desktop Environment Shell
+ * 
+ *     This is a simple command interpreter.
+ *     It uses a Land OS library called libcore.
+ *     It uses the kgws window server, embedded into the base kernel.
+ * 
  * History:
  *     2016 - Created by Fred Nora.
  */
@@ -179,8 +182,8 @@ int indirection_level = 0;
 int shell_level = 0;
 
 
-char *shell_name = "GDESHELL.BIN";
-char *dist_version = "0.1";
+char *shell_name    = "GDESHELL.BIN";
+char *dist_version  = "0.1";
 char *build_version = "1";
 
 
@@ -215,8 +218,8 @@ int no_brace_expansion = 0;	/* Non-zero means no foo{a,b} -> fooa fooa. */
 
 
 /* Some long-winded argument names.  These are obviously new. */
-#define Int 1
-#define Charp 2
+#define Int    1
+#define Charp  2
 
 struct {
 
@@ -598,8 +601,8 @@ SendARP (
 
 
 // testando o envio de um arp request usando os servi�os do kernel.
-void testSendARP (void){
-
+void testSendARP (void)
+{
 	uint8_t source_ip_address[4];
 	source_ip_address[0] = 192;
 	source_ip_address[1] = 168;
@@ -622,7 +625,8 @@ void testSendARP (void){
 
     int status = -1;
 
-    status = (int) SendARP ( (unsigned long) &source_ip_address[0], 
+    status = (int) SendARP ( 
+                       (unsigned long) &source_ip_address[0], 
                        (unsigned long) &target_ip_address[0], 
                        (unsigned long) &target_mac_address[0] );
 
@@ -689,8 +693,10 @@ void update_cpu_usage (void)
     //CPU_USAGE[__count] = __value;
     CPU_USAGE[__count] = __idle_value;
     
-    if (__count < 32){
+    if (__count < 32)
+    {
         return;
+    
     }else{
 
         __count = 0;
@@ -702,7 +708,8 @@ void update_cpu_usage (void)
         for (i=1; i<32; i++)
         {
             // IN:
-            gde_draw_text ( cpu_window, 
+            gde_draw_text ( 
+                cpu_window, 
                 (i*smCharHeight), CPU_USAGE[i], 
                  COLOR_BLACK, "+");
         };
@@ -768,15 +775,19 @@ void *xmas_tree_buffer;
 void
 xmas_tree_create ( char *file_name)
 {
-    xmas_tree_window = (void *) gde_create_window ( WT_SIMPLE, 1, 1, 
+    
+    xmas_tree_window = (void *) gde_create_window ( 
+                                    WT_SIMPLE, 1, 1, 
                                     "XTREE",     
                                     10, 10, 90, 130,    
                                     0, 0, COLOR_GREEN, COLOR_GREEN );
-    
-    if ( (void *) xmas_tree_window == NULL ){ return; }
+
+    if ( (void *) xmas_tree_window == NULL )
+    { 
+        return; 
+    }
     
     gde_register_window ( (struct window_d *) xmas_tree_window );
-    
 
     // testando malloc.
     xmas_tree_buffer = (void *) malloc (1024*50); 
@@ -788,17 +799,19 @@ xmas_tree_create ( char *file_name)
     // Usar alguma rotina da API especifica para carregar arquivo.
     // na verdade tem que fazer essas rotinas na API.
 
-    gramado_system_call ( SYSTEMCALL_READ_FILE, 
+    // load file.
+
+    gramado_system_call ( 
+        SYSTEMCALL_READ_FILE, 
         (unsigned long) file_name, 
         (unsigned long) xmas_tree_buffer, 
         (unsigned long) xmas_tree_buffer );
 }
 
 
-//interna
-//voce a janela
-void
-xmas_tree (void)
+// interna
+// voce a janela
+void xmas_tree (void)
 {
    //RECT rc;
    //GetClientRect(hwnd, &rc);
@@ -844,8 +857,10 @@ xmas_tree (void)
 	//printf ("%c", (char) 'X');
 	//shellDisplayBMPEx ( (char *) tokenList[i], (int) (200) );
 	
-    gde_replace_window ( (struct window_d *) xmas_tree_window, 
-        objectX, objectY );
+    gde_replace_window ( 
+        (struct window_d *) xmas_tree_window, 
+        objectX, 
+        objectY );
     
     //decodificando ??
 	gde_display_bmp ( (char *) xmas_tree_buffer, objectX, objectY ); 

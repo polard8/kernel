@@ -12,23 +12,18 @@
 // =======================================
 // Protocol request constants
 //
-
 // #todo:
 // Create a consistent interface.
 // See: xxxHandleNextClientRequest() and gwsProcedure on aurora/server/main.c 
-//
-
-
-
 // See: 
 // All the standar messages, just like MSG_SYSKEYUP ...
 // There are some old messages below 369.
 #define GWS_GetInputMessage        369
 #define GWS_Hello                 1000
 #define GWS_CreateWindow          1001
-#define GWS_BackbufferPutPixel    1002 
-#define GWS_DrawHorizontalLine    1003 
-#define GWS_DrawChar              1004    
+#define GWS_BackbufferPutPixel    1002
+#define GWS_DrawHorizontalLine    1003
+#define GWS_DrawChar              1004
 #define GWS_DrawText              1005
 #define GWS_RefreshWindow         1006
 #define GWS_RedrawWindow          1007
@@ -38,12 +33,13 @@
 #define GWS_Disconnect            2010
 #define GWS_RefreshScreen         2020
 #define GWS_RefreshRectangle      2021
+//#define GWS_GetSendEvent          2030  // send event #
 #define GWS_GetNextEvent          2031
 #define GWS_GrPlot0               2040
 #define GWS_GrCubeZ               2041
 #define GWS_GrRectangle           2042
 #define GWS_AsyncCommand          2222
-#define GWS_DRAIN_INPUT           8080
+#define GWS_DrainInput            8080
 // ...
 
 
@@ -288,27 +284,6 @@ gws_create_window (
     unsigned long onde,        //10, Ambiente.( Está no desktop, barra, cliente ...)
     unsigned long clientcolor, //11, Cor da área de cliente
     unsigned long color );     //12, Color (bg) (para janela simples).
-
-
-// #bugbug
-// This is redundant.
-// We alread have a function like this one. gws_create_window.
-int
-gws_create_window_using_socket (
-    int fd, 
-    unsigned long type,        //1, Tipo de janela (popup,normal,...)
-    unsigned long status,      //2, Estado da janela (ativa ou nao)
-    unsigned long view,        //3, (min, max ...)
-    char *windowname,          //4, Título.                          
-    unsigned long x,           //5, Deslocamento em relação às margens do Desktop.                           
-    unsigned long y,           //6, Deslocamento em relação às margens do Desktop.
-    unsigned long width,       //7, Largura da janela.
-    unsigned long height,      //8, Altura da janela.
-    int parentwindow,  //9, Endereço da estrutura da janela mãe.
-    unsigned long onde,        //10, Ambiente.( Est� no desktop, barra, cliente ...)
-    unsigned long clientcolor, //11, Cor da área de cliente
-    unsigned long color );     //12, Color (bg) (para janela simples).
-
 
 
 void gws_reboot (void);

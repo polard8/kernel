@@ -2250,37 +2250,33 @@ typedef enum {
 
 
 
-
-
-//
-// Application support.
-//
-
+// socket structure for the grass api.
+// It is not the same of the kernel.
 struct socket_d
 {
-	object_type_t objectType;
-	object_class_t objectClass;
-	
-	unsigned long ip_long;
-	unsigned short port;	
-	
-	//podemos fazer mais coisa aqui.
+    object_type_t  objectType;
+    object_class_t objectClass;
+
+    unsigned long ip_long;
+    unsigned short port;
+
 	//...
 };
+
 
 /*
  * ApplicationInfo_d:
  *     Informações básicas sobre uma applicação.
  *     Talvez o nome poderia ser ApplicationHook. 
  */
-typedef struct ApplicationInfo_d ApplicationInfo_t;
+
 struct ApplicationInfo_d
 {
     int pid;       //Process Id.
     char *name;    //Name.
     //...
 };
-ApplicationInfo_t *ApplicationInfo;
+struct ApplicationInfo_d *ApplicationInfo;
 // 
 
 
@@ -2288,39 +2284,34 @@ ApplicationInfo_t *ApplicationInfo;
  * buffer_info_d:
  *     Informações básicas sobre um buffer.
  */
-typedef struct buffer_info_d buffer_info_t;
+
 struct buffer_info_d
 {    
     unsigned long address;
 	//...
 };
-buffer_info_t *BufferInfo;
+struct buffer_info_d *BufferInfo;
 //
 
-  
-//
 // Estruturas para recursos gráficos:
 //     Aqui deve ficar apenas as estruturas básicas que o cliente    
 // pode acessar através da API. Haverá uma biblioteca exclusivamente 
 // para recursos gráficos. Obs: Não pode haver conflito quando o
 // cliente incluir a API e a biblioteca de recursos grpaficos.
-//
   
-  
-//Client area info.  
-typedef struct client_area_info_d client_area_info_t;  
+
+// Client area info.  
 struct client_area_info_d 
 {    
     struct window_d *window;
     struct rect_d *rect;
     int dummy;
 };
-client_area_info_t *ClientAreaInfo;
+struct client_area_info_d *ClientAreaInfo;
 //
 
 
-//Cursor info.
-typedef struct cursor_info_d cursor_info_t; //deletar essa linha.
+// Cursor info.
 struct cursor_info_d 
 {    
     unsigned long x;
@@ -2331,26 +2322,8 @@ struct cursor_info_d
 	//...
 };
 struct cursor_info_d *CursorInfo;
-//cursor_info_t *CursorInfo; 
 //
 
-
-//
-// rectangle support.
-//
- 
-/* 
-typedef struct rect_d rect_t; //deletar essa linha.
-struct rect_d 
-{
-    unsigned long x;
-    unsigned long y;
-    unsigned long cx;
-    unsigned long cy;	
-};
-struct rect_d *rect;
-//rect_t *rect;
-*/
 
 /*
  **************************************************
@@ -2426,10 +2399,6 @@ struct rect_d
 // #todo
 // Temos que atualizar essa estrutura para ficar igual
 // a que está em ring0.
-// 
-
-//#todo: deletar isso.
-typedef struct window_d window_t;
 
 // Deve estar em conformidade com a estrutura em user mode.
 //=========================================================
@@ -2942,10 +2911,6 @@ struct window_d
 };
 
 struct window_d *CurrentWindow;
-//window_t *CurrentWindow;
-//window_t *Window;
-// As principais janelas usadas pelos utilitários
-// dos subsistemas em user mode podem ser definidas aqui.
 //...
 
 
@@ -2957,52 +2922,41 @@ struct window_d *CurrentWindow;
  * controlar o fluxo em um determinado recurso.
  *  Obs: Aqui em user mode talvez não precise criar a estrtutura inteira somente o handle.
  */ 
-typedef struct semaphore_d semaphore_descriptor_t;
+
 struct semaphore_d 
 {
 	//object_type_t objectType;   //@todo: criar esses enum
 	//object_class_t objectClass; //@todo: criar esses enum
     
     //call back. @todo: Create.
-	//unsigned long callback; //d
-	
-	//Identificadores do semáforo.   	
-	int id;         //c
-	int used;       //b
-	int magic;      //a
-	int taskId;    	//g, A tarefa que esta usando o dispositivo. 
-	
+	//unsigned long callback; 
+
+	//Identificadores do semáforo.   
+	int id;
+	int used;
+	int magic; 
+	int taskId;
+
 	//Estado do semáforo. (verde, vermelho)
-	int color;          //G
-	int status;         //F Flag.
-	unsigned int count; //>=0   //E
-   
+	int color; 
+	int status; 
+	unsigned int count;
+
     //...
 	
-    struct d_wait_queue *sema_wait;   //ext1    	
+    struct d_wait_queue *sema_wait; 
 	//...	
 };
-semaphore_descriptor_t *current_semaphore; 
+struct semaphore_d *current_semaphore;
 //...
 
-/*
-typedef struct api_receive_message_d api_receive_message_t;
-struct api_receive_message_d
-{
-	int full;
-	struct window_d *window;
-	int msg;
-	unsigned long long1;
-	unsigned long long2;
-}
-*/
-
 
 //
-// ## BMP support ##
+// BMP support
 //
 
-#define BMP_TYPE 0x4D42             /* "MB" */
+// "MB"
+#define BMP_TYPE 0x4D42
 
 //OFFSETS
 #define BMP_OFFSET_WIDTH      18
@@ -3011,8 +2965,7 @@ struct api_receive_message_d
 #define BMP_OFFSET_BITCOUNT   28
 //...
 
-typedef struct bmp_header_d bmp_header_t;   
-struct bmp_header_d                     
+struct bmp_header_d 
 {
     unsigned short bmpType;           /* Magic number for file */
     unsigned long  bmpSize;           /* Size of file */
@@ -3021,8 +2974,7 @@ struct bmp_header_d
     unsigned long  bmpOffBits;        /* Offset to bitmap data */
 };
 
-typedef struct bmp_infoheader_d bmp_infoheader_t;   
-struct bmp_infoheader_d                     
+struct bmp_infoheader_d  
 {
     unsigned long  bmpSize;           /* Size of info header */
     unsigned long  bmpWidth;          /* Width of image */
@@ -3088,11 +3040,11 @@ struct timer_d
 };
 
 
+//
+// == Prototypes ====================================================
+//
 
-    //
-    // Prototypes.
-    //
- 
+
 /*
  **************************************************
  * gde_system:
@@ -3127,19 +3079,6 @@ system_call (
 
 
 /*
- * Outras chamadas.
- */
-
-
-
-
-//
-// Messages support, (IPC).
-// 
-
-
-
-/*
  ******************************************************
  * gde_system_procedure:
  *     Chama o procedimento de janela padrão do sistema.
@@ -3162,7 +3101,12 @@ gde_load_bitmap_16x16 (
     unsigned long y );
 
 
-int gde_load_path ( char *path, unsigned long buffer, unsigned long buffer_len );
+int 
+gde_load_path ( 
+    char *path, 
+    unsigned long buffer, 
+    unsigned long buffer_len );
+
 
 //int 0x80 - serviço 241.
 void gde_init_background (void);
@@ -3437,7 +3381,6 @@ gde_save_file (
 int gde_test_save_file(char *file_name);
 
 
-
 int gde_create_empty_file (char *file_name);
 
 int gde_create_empty_directory (char *dir_name);
@@ -3607,7 +3550,6 @@ int __gde_set_cursor (unsigned long x, unsigned long y);
 // IN: pid, ponteiro para o buffer, comprimento do buffer;
 // OUT: 0=Ok -1=fail
 int gde_setup_net_buffer (int pid, char *buffer, size_t len);
-
 
 
 // cria um novo processo, 

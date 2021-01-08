@@ -4,6 +4,116 @@
 #define __GWSSRV_GLOBALS_H  1
 
 
+// =======================================
+// Protocol request constants
+// Os primeiros sao os mesmos encontrados na api.
+ 
+//window (1-19)  
+#define GWS_Create   1
+#define GWS_Destroy  2
+#define GWS_Move     3
+#define GWS_Size     4
+#define GWS_Resize   5
+//#define GWS_Open     6
+#define GWS_Close      7
+#define GWS_Paint      8
+#define GWS_SetFocus   9
+#define GWS_KillFocus    10
+#define GWS_Activate     11 
+#define GWS_ShowWindow   12
+#define GWS_SetCursor    13 
+#define GWS_Hide         14
+#define GWS_Maximize     15
+#define GWS_Restore      16
+#define GWS_ShowDefault  17
+
+// keyboard (20-29)
+#define GWS_KeyDown    20
+#define GWS_KeyUp      21
+#define GWS_SysKeyDown 22
+#define GWS_SysKeyUp   23
+
+// mouse (30 - 39)
+// tem uma lista de eventos de mouse em events.h
+#define GWS_MouseKeyDown     30 
+#define GWS_MouseKeyUp       31
+#define GWS_MouseButtonDown  30
+#define GWS_MouseButtonUp    31
+#define GWS_MouseMove        32
+#define GWS_MouseOver        33
+#define GWS_MouseWheel       34
+#define GWS_MousePressed     35
+#define GWS_MouseReleased    36
+#define GWS_MouseClicked     37
+#define GWS_MouseEntered     38
+#define GWS_MouseExited      39
+//#define GWS_MouseMoveByOffset
+//#define GWS_MouseMoveToElement
+
+//outros (40 - ...)
+#define GWS_Command  40
+#define GWS_Cut      41
+#define GWS_Copy     42
+#define GWS_Paste    43
+#define GWS_Clear    44
+#define GWS_Undo     45
+#define GWS_Insert   46
+#define GWS_Process  47
+#define GWS_Thread   48
+//Quando um comando é enviado para o console. ele será atendido pelo
+//módulo /sm no procedimento de janela do sistema.
+//Todas as mensagens de console serão atencidas pelo procedimento de janela 
+//nessa mensagem.
+#define GWS_ConsoleCommand  49
+#define GWS_ConsoleShutDown 50
+#define GWS_ConsoleReboot   51
+#define GWS_Developer       52
+
+//UM TIMER SE ESGOTOU,
+#define GWS_Timer  53 
+//...
+
+
+// =======================================
+// Protocol request constants
+//
+// #todo:
+// Create a consistent interface.
+// See: xxxHandleNextClientRequest() and gwsProcedure on aurora/server/main.c 
+// See: 
+// All the standar messages, just like MSG_SYSKEYUP ...
+// There are some old messages below 369.
+#define GWS_GetInputMessage        369
+#define GWS_Hello                 1000
+#define GWS_CreateWindow          1001
+#define GWS_BackbufferPutPixel    1002
+#define GWS_DrawHorizontalLine    1003
+#define GWS_DrawChar              1004
+#define GWS_DrawText              1005
+#define GWS_RefreshWindow         1006
+#define GWS_RedrawWindow          1007
+#define GWS_ResizeWindow          1008
+#define GWS_ChangeWindowPosition  1009
+#define GWS_BackbufferPutPixel2   2000
+#define GWS_Disconnect            2010
+#define GWS_RefreshScreen         2020
+#define GWS_RefreshRectangle      2021
+//#define GWS_GetSendEvent          2030  // send event #
+#define GWS_GetNextEvent          2031
+#define GWS_GrPlot0               2040
+#define GWS_GrCubeZ               2041
+#define GWS_GrRectangle           2042
+#define GWS_AsyncCommand          2222
+#define GWS_DrainInput            8080
+// ...
+
+
+
+// =====================================================
+
+
+
+
 // ## button support ##
 #define GWS_COLOR_BUTTONFACE            0x00F0F0F0
 #define GWS_COLOR_BUTTONFACE2           0x00E0E0E0
@@ -126,7 +236,6 @@ typedef enum {
  *     Estrutura para esquema de cores. 
  *     O esquema de cores se aplica ao servidor 
  * de recursos gráficos. GWS.
- *
  */ 
 
 struct gws_color_scheme_d

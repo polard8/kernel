@@ -1,0 +1,10 @@
+	===========================
+	What we do already have?
+
+	All the libraries here are independent each other,
+	all everyone can call the kernel.
+
+	kernel < rtl < process
+	kernel < rtl < libcore < process
+	kernel < rtl < libgws  < process 
+

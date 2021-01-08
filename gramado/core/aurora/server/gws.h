@@ -9,7 +9,6 @@
 #define GRAMADO_CALIFORNIA  0x05
 // ...
 
-
 int current_mode;
 
 
@@ -24,9 +23,7 @@ int current_mode;
 #include <sys/socket.h>
 #include <rtl/gramado.h>
 
-
-
-// 
+ 
 #include "globals.h"
 
 

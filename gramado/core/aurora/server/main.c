@@ -1277,16 +1277,7 @@ gwsProcedure (
   
     switch (msg)
     {
-        // Se o cliente enviar essa mensagem, significa
-        // que ele quer que drenemos o input que o
-        // ws recebe via mensagens tradicionais e passemos
-        // pra ele via socket.
-        case 8080:
-            gwssrv_debug_print("gwssrv: gwsProcedure 8080\n");
-            service_drain_input();
-            break;
-
-        case MSG_SYSKEYUP:
+        case GWS_SysKeyUp: //MSG_SYSKEYUP:
             switch ( long1)
             {
                 // #debug
@@ -1338,7 +1329,7 @@ gwsProcedure (
 
         // #test
         // Tentando receber uma mensagem de digitação.
-        case MSG_KEYDOWN:
+        case GWS_KeyDown: //MSG_KEYDOWN:
             
             //#bugbug: Isso está falhando.
             //mas o f1 funciona.
@@ -1348,14 +1339,16 @@ gwsProcedure (
             gwssrv_debug_print ("gwssrv: MSG_KEYDOWN\n");
             break;
 
+        // ===========================
+        // Here starts the gws requests
+
         // Hello!
         // Draw text inside a window.
         // #bugbug: 
         // O window server não tem esse ponteiro de janela.
         // ele até aceitaria um handle.
         // #bugbug: Something is very wrong with this routine.
-        //MSG_GWS_HELLO
-        case 1000:
+        case GWS_Hello:
             gwssrv_debug_print ("gwssrv: Message number 1000\n");
             //#bugbug: Esse endereço de estrutura esta mudando para um valor
             //que nao podemos acessar em ring3.
@@ -1373,33 +1366,28 @@ gwsProcedure (
 
         // Create Window REQUEST!
         // Usará o buffer global
-        // case MSG_CREATE_WINDOW:
-        //MSG_GWS_CREATEWINDOW
-        case 1001:
+        case GWS_CreateWindow:
             gwssrv_debug_print ("gwssrv: [1001] serviceCreateWindow\n");
             serviceCreateWindow();
             NoReply = FALSE;
             break; 
 
         // backbuffer putpixel
-        //MSG_GWS_BACKBUFFERPUTPIXEL
-        case 1002:
+        case GWS_BackbufferPutPixel:
             servicepixelBackBufferPutpixel(); 
             NoReply = FALSE;
             break;
 
         // backbuffer draw horizontal line
-        //MSG_GWS_BACKBUFFERHORIZONTALLINE
-        case 1003:
+        case GWS_DrawHorizontalLine:
             servicelineBackbufferDrawHorizontalLine();
             NoReply = FALSE;
             break;
 
 
         // Draw char
-        // MSG_GWS_DRAWCHAR
         // See: char.c
-        case 1004:
+        case GWS_DrawChar:
             gwssrv_debug_print ("gwssrv: [1004] serviceDrawChar\n");
             serviceDrawChar();
             NoReply = FALSE;
@@ -1407,9 +1395,8 @@ gwsProcedure (
 
 
         // Draw text
-        // MSG_GWS_DRAWTEXT
         // See: dtext.c
-        case 1005:
+        case GWS_DrawText:
            gwssrv_debug_print ("gwssrv: [1005] serviceDrawText\n");
            serviceDrawText();
            NoReply = FALSE;
@@ -1417,8 +1404,7 @@ gwsProcedure (
 
 
         // Refresh window
-        //MSG_GWS_REFRESHWIDNOW
-        case 1006:
+        case GWS_RefreshWindow:
            gwssrv_debug_print ("gwssrv: [1006] serviceRefreshWindow\n");
            serviceRefreshWindow();
            NoReply = FALSE;
@@ -1426,23 +1412,20 @@ gwsProcedure (
            
 
         // Redraw window
-        //MSG_GWS_REDRAWWINDOW
-        case 1007:
+        case GWS_RedrawWindow:
            gwssrv_debug_print ("gwssrv: [1007] serviceRedrawWindow\n");
            serviceRedrawWindow();
            NoReply = FALSE;
            break;
 
         // Resize window
-        //MSG_GWS_RESIZEWINDOW
-        case 1008:
+        case GWS_ResizeWindow:
            gwssrv_debug_print ("gwssrv: [1008] serviceResizeWindow\n");
            serviceResizeWindow();
            NoReply = FALSE;
            break;
 
-        //MSG_GWS_CHANGEWINDOWPOSITION
-        case 1009:
+        case GWS_ChangeWindowPosition:
            gwssrv_debug_print ("gwssrv: [1009] serviceChangeWindowPosition\n");
            serviceChangeWindowPosition();
            NoReply = FALSE;
@@ -1453,18 +1436,13 @@ gwsProcedure (
                
         // backbuffer putpixel. (again)
         // IN: Color, x, y
-        case 2000:
+        case GWS_BackbufferPutPixel2:
             pixelBackBufferPutpixel ( 
                 (unsigned long) COLOR_PINK,   
                 (unsigned long) long1, 
                 (unsigned long) long2 );
             NoReply = FALSE;
             break;
- 
- 
-        //case 2001: break;
-        //case 2002: break;
-        //case 2003: break;
 
         // ...
 
@@ -1472,16 +1450,14 @@ gwsProcedure (
         // Disconnect.
         // shutdown.
         // Um cliente quer se desconectar.
-        //MSG_GWS_SHUTDOWN
-        case 2010:
+        case GWS_Disconnect:
             gwssrv_debug_print ("gwssrv: [2010] Disconnect\n");
             //NoReply = FALSE;
             break;
             
         // Refresh screen 
         // refresh screen using kgws service. 
-        //MSG_GWS_REFRESHSCREEN
-        case 2020:
+        case GWS_RefreshScreen:
             gwssrv_debug_print ("gwssrv: [2020] gws_show_backbuffer\n");
             gws_show_backbuffer();
             //NoReply = FALSE;
@@ -1489,14 +1465,14 @@ gwsProcedure (
              
 
         // Refresh rectangle ... 
-        //MSG_GWS_REFRESHRECTANGLE
-        case 2021:
+        case GWS_RefreshRectangle:
             gwssrv_debug_print ("gwssrv: [2021] serviceRefreshRectangle\n");
             serviceRefreshRectangle();
             //NoReply = FALSE;
             break;
 
          // ?? #bugbug: The client only sends requests.
+         // GWS_GetSendEvent
          case 2030:
             gwssrv_debug_print ("gwssrv: [2030] serviceClientEvent\n");
             //serviceClientEvent();
@@ -1504,8 +1480,7 @@ gwsProcedure (
             break;
 
         // When a client get the next event from it's own queue.
-        // MSG_GWS_NEXTEVENT
-        case 2031:
+        case GWS_GetNextEvent:
             gwssrv_debug_print ("gwssrv: [2031] serviceNextEvent\n");
             //serviceNextEvent();
             //NoReply = FALSE;
@@ -1513,21 +1488,21 @@ gwsProcedure (
             
 
         // See: grprim.c
-        case 2040:  
+        case GWS_GrPlot0:  
             gwssrv_debug_print ("gwssrv: [2040] serviceGrPlot0\n");
             serviceGrPlot0();  
             NoReply = FALSE;
             break;
 
         // See: grprim.c
-        case 2041:  
+        case GWS_GrCubeZ:  
             gwssrv_debug_print ("gwssrv: [2041] serviceGrCubeZ\n");
             serviceGrCubeZ();  
             NoReply = FALSE;
             break;
 
         // See: grprim.c
-        case 2042:  
+        case GWS_GrRectangle:  
             gwssrv_debug_print ("gwssrv: [2042] serviceGrRectangle\n");
             serviceGrRectangle();  
             NoReply = FALSE;
@@ -1539,16 +1514,22 @@ gwsProcedure (
 
         // #test
         // async command: 
-        case 2222:
+        case GWS_AsyncCommand:
             gwssrv_debug_print ("gwssrv: [2222] calling serviceAsyncCommand\n");
                         printf ("gwssrv: [2222] calling serviceAsyncCommand\n");
             serviceAsyncCommand();
             NoReply = TRUE;
             break;
 
-        //MSG_GWS_PROTOCOL
-        //case 3000:
-            //break;
+        // Se o cliente enviar essa mensagem, significa
+        // que ele quer que drenemos o input que o
+        // ws recebe via mensagens tradicionais e passemos
+        // pra ele via socket.
+        case GWS_DrainInput:
+            gwssrv_debug_print("gwssrv: gwsProcedure 8080\n");
+            service_drain_input();
+            break;
+
 
         // ...
 
