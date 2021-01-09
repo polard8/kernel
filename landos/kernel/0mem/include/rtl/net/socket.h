@@ -111,6 +111,40 @@ typedef	_BSD_SSIZE_T_	ssize_t;
 
 
 
+/* 
+ *  ** Sock types  ** 
+ */
+
+// bsd-like and linux-like ?
+// #todo: do the same on ring3.
+ 
+/*
+       SOCK_STREAM     Provides sequenced, reliable, two-way, connection-
+                       based byte streams.  An out-of-band data transmission
+                       mechanism may be supported.
+       SOCK_DGRAM      Supports datagrams (connectionless, unreliable
+                       messages of a fixed maximum length).
+       SOCK_SEQPACKET  Provides a sequenced, reliable, two-way connection-
+                       based data transmission path for datagrams of fixed
+                       maximum length; a consumer is required to read an
+                       entire packet with each input system call.
+       SOCK_RAW        Provides raw network protocol access.
+       SOCK_RDM        Provides a reliable datagram layer that does not
+                       guarantee ordering.
+       SOCK_PACKET     Obsolete and should not be used in new programs;
+*/
+
+#define SOCK_STREAM     1    /* stream (connection) socket	*/
+#define SOCK_DGRAM      2    /* datagram (conn.less) socket	*/
+#define SOCK_RAW        3    /* raw socket			        */
+#define SOCK_RDM        4    /* reliably-delivered message	*/
+#define SOCK_SEQPACKET  5    /* sequential packet socket	*/ /* sequenced packet stream */
+#define SOCK_DCCP       6
+// ...
+#define SOCK_PACKET    10    /* linux specified 		    */
+#define SOCK_GRAMADO_MSG    8000    /* window, msg, long1, long2 */
+#define SOCK_MAX            (SOCK_GRAMADO_MSG+1)
+
 
 //=========
 /* Supported address families. */
@@ -147,11 +181,22 @@ typedef	_BSD_SSIZE_T_	ssize_t;
 #define AF_BLUETOOTH  31            /* Bluetooth sockets 		*/
 #define AF_IUCV       32            /* IUCV sockets			*/
 #define AF_RXRPC      33            /* RxRPC sockets 		*/
-#define AF_MAX        34            /* For now.. ??? */
 #define AF_RS232      35            /* Serial socket (NEW!) */
 #define AF_GRAMADO    8000
-//#define AF_MAX        AF_GRAMADO  //#todo
+#define AF_MAX        AF_GRAMADO  //#todo
 
+/*
+ * Definitions for network related sysctl, CTL_NET.
+ *
+ * Second level is protocol family.
+ * Third level is protocol number.
+ *
+ * Further levels are defined by the individual families below.
+ */
+#define NET_MAXID	AF_MAX
+
+
+#define MAXHOSTNAMELEN	256
 
 
 /* Protocol families, same as address families. */
@@ -187,13 +232,13 @@ typedef	_BSD_SSIZE_T_	ssize_t;
 #define PF_BLUETOOTH	AF_BLUETOOTH
 #define PF_IUCV		AF_IUCV
 #define PF_RXRPC	AF_RXRPC
-#define PF_MAX		AF_MAX
 #define PF_RS232	AF_RS232
+#define PF_MAX		AF_MAX
 
 
-/* Maximum queue length specifiable by listen.  */
-#define SOMAXCONN	128
-
+/* Maximum queue length specifiable by listen().  */
+//#define SOMAXCONN	128
+#define SOMAXCONN    32
 
 
 /* Flags we can use with send/ and recv. 
@@ -286,61 +331,45 @@ struct mmsghdr {
 
 
 
-/* 
- *  ** Sock types  ** 
- */
-
-// bsd-like and linux-like ?
-// #todo: do the same on ring3.
- 
 /*
-       SOCK_STREAM     Provides sequenced, reliable, two-way, connection-
-                       based byte streams.  An out-of-band data transmission
-                       mechanism may be supported.
-       SOCK_DGRAM      Supports datagrams (connectionless, unreliable
-                       messages of a fixed maximum length).
-       SOCK_SEQPACKET  Provides a sequenced, reliable, two-way connection-
-                       based data transmission path for datagrams of fixed
-                       maximum length; a consumer is required to read an
-                       entire packet with each input system call.
-       SOCK_RAW        Provides raw network protocol access.
-       SOCK_RDM        Provides a reliable datagram layer that does not
-                       guarantee ordering.
-       SOCK_PACKET     Obsolete and should not be used in new programs;
-*/
+ * Option flags per-socket.
+ */
+// credits: openbsd
+#define	SO_DEBUG	0x0001		/* turn on debugging info recording */
+#define	SO_ACCEPTCONN	0x0002		/* socket has had listen() */
+#define	SO_REUSEADDR	0x0004		/* allow local address reuse */
+#define	SO_KEEPALIVE	0x0008		/* keep connections alive */
+#define	SO_DONTROUTE	0x0010		/* just use interface addresses */
+#define	SO_BROADCAST	0x0020		/* permit sending of broadcast msgs */
+#define	SO_USELOOPBACK	0x0040		/* bypass hardware when possible */
+#define	SO_LINGER	0x0080		/* linger on close if data present */
+// #define SO_DONTLINGER	~SO_LINGER
+#define	SO_OOBINLINE	0x0100		/* leave received OOB data in line */
+#define	SO_REUSEPORT	0x0200		/* allow local address & port reuse */
+#define SO_TIMESTAMP	0x0800		/* timestamp received dgram traffic */
+#define SO_BINDANY	0x1000		/* allow bind to any address */
+#define SO_ZEROIZE	0x2000		/* zero out all mbufs sent over socket */
 
-#define SOCK_STREAM     1    /* stream (connection) socket	*/
-#define SOCK_DGRAM      2    /* datagram (conn.less) socket	*/
-#define SOCK_RAW        3    /* raw socket			        */
-#define SOCK_RDM        4    /* reliably-delivered message	*/
-#define SOCK_SEQPACKET  5    /* sequential packet socket	*/
-#define SOCK_DCCP       6
-// ...
-#define SOCK_PACKET    10    /* linux specified 		    */
+/*
+ * Additional options, not kept in so_options.
+ */
+// credits: openbsd
+#define	SO_SNDBUF	0x1001		/* send buffer size */
+#define	SO_RCVBUF	0x1002		/* receive buffer size */
+#define	SO_SNDLOWAT	0x1003		/* send low-water mark */
+#define	SO_RCVLOWAT	0x1004		/* receive low-water mark */
+#define	SO_SNDTIMEO	0x1005		/* send timeout */
+#define	SO_RCVTIMEO	0x1006		/* receive timeout */
+#define	SO_ERROR	0x1007		/* get error status and clear */
+#define	SO_TYPE		0x1008		/* get socket type */
+#define	SO_NETPROC	0x1020		/* multiplex; network processing */
+#define	SO_RTABLE	0x1021		/* routing table to be used */
+#define	SO_PEERCRED	0x1022		/* get connect-time credentials */
+#define	SO_SPLICE	0x1023		/* splice data to other socket */
+#define	SO_DOMAIN	0x1024		/* get socket domain */
+#define	SO_PROTOCOL	0x1025		/* get socket protocol */
 
-//#test
-#define SOCK_GRAMADO_MSG    8000    /* window, msg, long1, long2 */
 
-// ?? Repensar.
-#define SOCK_MAX            (SOCK_GRAMADO_MSG+1)
-
-
-
-//======================
-
-
-#define  _NETINET_IN_H_
-#define  IPPROTO_IP      0  // Dummy for IP.
-#define  IPPROTO_ICMP    1  // Control message protocol.
-#define  IPPROTO_IGMP    2  // Group management protocol.
-#define  IPPROTO_TCP     6  // Transmission control protocol.
-#define  IPPROTO_UDP     17   // User datagram protocol.
-#define  IPPROTO_RAW    255          // Raw IP packet.
-#define  IPPROTO_MAX    256          // Maximum protocol identifier.
-#define  IPPORT_RESERVED 1024        // Last reserved port number.
-#define  IPPORT_USERRESERVED   5000  // User reserved port number.
-#define  INADDR_ANY   (unsigned long)0x00000000 // Any IP address.
-#define  INADDR_BROADCAST   (unsigned long)0xffffffff // Broadcast IP address.
 
 
 
@@ -351,6 +380,16 @@ struct mmsghdr {
 #define  SHUT_RD      0    /* Disallow further receives. */
 #define  SHUT_WR      1    /* Disallow further sends. */
 #define  SHUT_RDWR    2    /* Disallow further sends/receives. */
+
+
+/* Read using getsockopt() with SOL_SOCKET, SO_PEERCRED */
+struct sockpeercred {
+	uid_t		uid;		/* effective user id */
+	gid_t		gid;		/* effective group id */
+	pid_t		pid;
+};
+
+
 
 
 
@@ -386,32 +425,25 @@ struct	accept_filter_arg {
 
 
 
-//bsd
-/*
- * Structure used by kernel to store most
- * addresses.
- */
-/* 
-struct sockaddr {
-	__uint8_t	sa_len;         // total length 
-	sa_family_t	sa_family;      //address family 
-	char		sa_data[14];    //actually longer; address value 
+// See:
+// http://alas.matf.bg.ac.rs/manuals/lspe/snode=25.html
+// not bsd.
+struct sockaddr{
+    //unsigned char   sa_len;
+    unsigned short  sa_family;
+    char            sa_data[14];
 };
-*/
 
 
-
-//bsd
 /*
  * Structure used by kernel to pass protocol
  * information in raw sockets.
+ * bsd
  */
-/*
 struct sockproto {
-	u_short	sp_family;		    // address family 
-	u_short	sp_protocol;		// protocol 
+    unsigned short sp_family;    // address family 
+    unsigned short sp_protocol;  // protocol 
 };
-*/
 
 
 
@@ -449,29 +481,8 @@ typedef struct socket_context {
 }socket_t;
 
 
+typedef struct {
 
-// See:
-// http://alas.matf.bg.ac.rs/manuals/lspe/snode=25.html
-struct sockaddr
-{
-    unsigned short sa_family;
-    char sa_data[14];
-};
-
-
-//#todo
-//isso deve ficar em in.h
-typedef struct
-{
-    int sin_family;
-    int sin_port;
-    char *sin_addr;
-
-}sockaddr_in;
-
-
-typedef struct
-{
     char *h_addr;
     unsigned h_length;
 

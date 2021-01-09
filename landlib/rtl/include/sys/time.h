@@ -18,15 +18,24 @@
  * and used in other calls.
  */
 
-struct timeval {
+struct timeval 
+{
     long tv_sec;     /* seconds */
     long tv_usec;    /* and microseconds */
+
+    //fred: i guess this is better.
+    //unsigned long tv_sec;     /* seconds */
+    //unsigned long tv_usec;    /* and microseconds */
 };
 
-
-struct timezone {
+struct timezone 
+{
     int tz_minuteswest;    /* minutes west of Greenwich */
     int tz_dsttime;        /* type of dst correction */
+
+    //fred: i guess this is better.
+    //unsigned long tz_minuteswest;    /* minutes west of Greenwich */
+    //unsigned long tz_dsttime;        /* type of dst correction */
 };
 
 
