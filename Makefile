@@ -5,7 +5,7 @@ PRODUCT_NAME  = Gramado Land
 EDITION_NAME  = Gramado Land
 VERSION_MAJOR = 1
 VERSION_MINOR = 0
-VERSION_BUILD = 206
+VERSION_BUILD = 207
 KERNELVERSION = $(VERSION_MAJOR)$(if $(VERSION_MINOR),.$(VERSION_MINOR)$(if $(VERSION_BUILD),.$(VERSION_BUILD)))
 
 # Documentation.
@@ -164,6 +164,7 @@ build-applications: \
 gramado-cmd \
 gramado-setup \
 gramado-core \
+gramado-shell \
 gramado-edge \
 desert    
 
@@ -210,12 +211,17 @@ gramado-core:
 	-sudo cp gramado/core/aurora/bin/GWSSRV.BIN  base/
 	-sudo cp gramado/core/aurora/bin/GWSSRV.BIN  base/SBIN
 
+gramado-shell:
 	#::apps
-	$(Q) $(MAKE) -C gramado/core/apps/
-	-sudo cp gramado/core/apps/bin/EDITOR.BIN   base/
-	-sudo cp gramado/core/apps/bin/FILEMAN.BIN  base/
-	-sudo cp gramado/core/apps/bin/TERMINAL.BIN  base/
+	$(Q) $(MAKE) -C gramado/shell/apps/
+	-sudo cp gramado/shell/apps/bin/EDITOR.BIN   base/
+	-sudo cp gramado/shell/apps/bin/FILEMAN.BIN  base/
+	-sudo cp gramado/shell/apps/bin/TERMINAL.BIN  base/
 
+	#::ui
+	$(Q) $(MAKE) -C gramado/shell/ui/
+	-sudo cp gramado/shell/ui/bin/LAUNCH1.BIN   base/
+	
 gramado-edge:
 
 	#::net
@@ -308,10 +314,10 @@ clean2:
 clean3:
 	-rm gramado/cmd/bin/*.BIN
 	-rm gramado/setup/bin/*.BIN
-	-rm gramado/core/apps/bin/*.BIN
+	-rm gramado/shell/apps/bin/*.BIN
+	-rm gramado/shell/ui/bin/*.BIN
 	-rm gramado/edge/net/bin/*.BIN
 
-	
 # clean base
 clean4:
 	-rm -rf base/*.BIN 
@@ -337,7 +343,8 @@ clean-system-files:
 	-rm -rf gramado/setup/bin/*.BIN
 	-rm -rf gramado/core/aurora/bin/*.BIN
 	-rm -rf gramado/core/gnssrv/bin/*.BIN
-	-rm -rf gramado/core/apps/bin/*.BIN
+	-rm -rf gramado/shell/apps/bin/*.BIN
+	-rm -rf gramado/shell/ui/bin/*.BIN
 	-rm -rf gramado/edge/net/bin/*.BIN
 # ...
 

@@ -141,6 +141,11 @@ void rtl_show_backbuffer (void);
 
 unsigned long rtl_get_system_metrics (int index);
 
+
+pid_t rtl_current_process(void);
+int rtl_current_thread(void);
+
+
 // ms
 // tempo total em ms.
 // usado para calcular o tempo de execuçao de uma funcao.

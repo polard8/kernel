@@ -453,16 +453,14 @@ uid_t geteuid (void)
 } 
 
 
-
-
 /*
  * getpid:
  *
  */
 
-pid_t getpid (void){
-	
-	return (pid_t) gramado_system_call ( UNISTD_SYSTEMCALL_GETPID, 0, 0, 0 );
+pid_t getpid (void)
+{
+    return (pid_t) gramado_system_call ( UNISTD_SYSTEMCALL_GETPID, 0, 0, 0 );
 }
 
 
@@ -471,9 +469,9 @@ pid_t getpid (void){
  *
  */
 
-pid_t getppid (void){
-
-	return (pid_t) gramado_system_call ( UNISTD_SYSTEMCALL_GETPPID, 0, 0, 0 );
+pid_t getppid (void)
+{
+    return (pid_t) gramado_system_call ( UNISTD_SYSTEMCALL_GETPPID, 0, 0, 0 );
 }
 
 
@@ -484,12 +482,19 @@ foreground process group on the terminal associated to fd,
 which must be the controlling terminal of the calling process. 
 See: https://linux.die.net/man/3/tcsetpgrp
 */
-pid_t tcgetpgrp (int fd){
 
+pid_t tcgetpgrp (int fd)
+{
     int s=0;
 
-    //#todo: work in ring0 to implement this.
-    if ( ioctl(fd, TIOCGPGRP, &s) < 0 ){
+    if(fd<0)
+       return -1;
+
+
+    // #todo: 
+    // work in ring0 to implement this.
+    if ( ioctl(fd, TIOCGPGRP, &s) < 0 )
+    {
         debug_print ("tcgetpgrp: error\n");
         return ((pid_t)-1);
     }
@@ -507,14 +512,22 @@ Moreover, pgrp must be a (nonempty) process group belonging
 to the same session as the calling process.   
 See: https://linux.die.net/man/3/tcsetpgrp 
  */
-int tcsetpgrp (int fd, pid_t pgrp){
-
+int tcsetpgrp (int fd, pid_t pgrp)
+{
     int s=0;
+
+    if(fd<0)
+       return -1;
+
+    if(pgrp<0)
+       return -1;
+
     s = pgrp;
 
     //#todo: work in ring0 to implement this.
-    return ( ioctl(fd, TIOCSPGRP, &s) );
+    return (int) ( ioctl(fd, TIOCSPGRP, &s) );
 }
+
 
 int setpgid(pid_t pid, pid_t pgid)
 {
@@ -522,6 +535,8 @@ int setpgid(pid_t pid, pid_t pgid)
 
     if(pid<0)
         debug_print ("setpgid: pid\n");
+
+    // #todo
         
     return -1;
 }
@@ -564,6 +579,7 @@ gid_t getgid (void)
 /* System V version */
 int setpgrp(void)
 {
+    debug_print ("setpgrp: [TODO]\n");
    return -1;
 }
 
@@ -580,7 +596,8 @@ pid_t getpgrp(void)
 /* BSD version */
 int bsd_setpgrp(pid_t pid, pid_t pgid)
 {
-   return -1;
+    debug_print ("bsd_setpgrp: [TODO]\n");
+    return -1;
 }
 
 /* BSD version */
@@ -594,8 +611,7 @@ pid_t bsd_getpgrp(pid_t pid)
     return -1;
 }
 
-
-char *getcwd(char *buf, size_t size)
+char *getcwd (char *buf, size_t size)
 {
     debug_print ("getcwd: [TODO]\n");
 
@@ -668,8 +684,8 @@ void fcntl_dup(int fd)
 int dup (int oldfd)
 {
 
-    //if ( oldfd < 0 ) 
-        //return -1;
+    if ( oldfd < 0 ) 
+        return -1;
 
     return (int) gramado_system_call ( 
                      (unsigned long) oldfd, 0, 0, 0 );
@@ -789,11 +805,19 @@ int mkdir (const char *pathname, mode_t mode)
 
     debug_print ("mkdir: [TODO]\n");
 
-    //gde_enter_critical_section();
-    
-    __ret = (int) gramado_system_call ( 44, 
-                      (unsigned long) pathname, 0, 0);
+    if ( (void*) pathname == NULL )
+        return -1;
 
+    if ( *pathname == 0 )
+        return -1;
+
+
+    //gde_enter_critical_section();
+    __ret = (int) gramado_system_call ( 
+                      44, 
+                      (unsigned long) pathname, 
+                      0, 
+                      0);
     //gde_exit_critical_section();    
 
     return (int) __ret;
@@ -808,6 +832,14 @@ int mkdir (const char *pathname, mode_t mode)
 int rmdir (const char *pathname)
 {
     debug_print ("rmdir: [TODO]\n");
+
+    if ( (void*) pathname == NULL )
+        return -1;
+
+    if ( *pathname == 0 )
+        return -1;
+
+
     return -1; //#todo
 }
 
@@ -830,6 +862,13 @@ int link (const char *oldpath, const char *newpath)
 int unlink (const char *pathname)
 {
     debug_print ("unlink: [TODO]\n");
+
+    if ( (void*) pathname == NULL )
+        return -1;
+
+    if ( *pathname == 0 )
+        return -1;
+
     return (int) (-1);
 }
 
@@ -1406,14 +1445,29 @@ int fstat(int fd, struct stat *buf)
 //sys/stat.h
 int stat(const char *path, struct stat *buf)
 {
+    int _fd = 0;
+    int _ret = 0;
+
 
     debug_print ("stat: [TODO]\n");
-    
-	int _fd = open(path, 0, 0);
-	int ret = fstat(_fd, buf);
-	close(_fd);
 
-    return (int) ret;
+    if ( (void*) path == NULL )
+        return -1;
+
+    if ( *path == 0 )
+        return -1;
+
+    // open
+    _fd = open (path, 0, 0);
+    
+    if (_fd<0)
+        return -1;
+    
+    _ret = fstat(_fd, buf);
+
+    close(_fd);
+
+    return (int) _ret;
 }
 
 
@@ -1421,6 +1475,13 @@ int stat(const char *path, struct stat *buf)
 int lstat(const char *path, struct stat *buf)
 {
     debug_print ("lstat: [TODO]\n");
+
+    if ( (void*) path == NULL )
+        return -1;
+
+    if ( *path == 0 )
+        return -1;
+
     return (int) stat (path, buf);
 }
 
@@ -1477,6 +1538,14 @@ execvpe (
 int chown (const char *pathname, uid_t owner, gid_t group)
 {
     debug_print ("chown: [TODO]\n");
+
+    if ( (void*) pathname == NULL )
+        return -1;
+
+    if ( *pathname == 0 )
+        return -1;
+
+
     return -1; 
 }
 
@@ -1485,6 +1554,10 @@ int chown (const char *pathname, uid_t owner, gid_t group)
 int fchown(int fd, uid_t owner, gid_t group)
 {
     debug_print ("fchown: [TODO]\n");
+    
+    if(fd<0)
+        return -1;
+    
     return -1; 
 }
 
@@ -1493,6 +1566,13 @@ int fchown(int fd, uid_t owner, gid_t group)
 int lchown (const char *pathname, uid_t owner, gid_t group)
 {
     debug_print ("lchown: [TODO]\n");
+
+    if ( (void*) pathname == NULL )
+        return -1;
+
+    if ( *pathname == 0 )
+        return -1;
+
     return -1; 
 }
 
@@ -1502,6 +1582,7 @@ int lchown (const char *pathname, uid_t owner, gid_t group)
 int chdir(const char *path)
 {
     debug_print ("chdir: [TODO]\n");
+
     return -1; 
 }
 
@@ -1510,6 +1591,10 @@ int chdir(const char *path)
 int fchdir(int fd)
 {
     debug_print ("fchdir: [TODO]\n");
+
+    if(fd<0)
+        return -1;
+
     return -1; 
 }
        
@@ -1537,6 +1622,14 @@ void swab_w (const short *from, short *to, ssize_t n)
 {
     n /= 2;
 
+
+    //if ( (void*) from == NULL )
+    //    return;
+
+    //if ( (void*) to == NULL )
+    //    return;
+
+
     while (--n >= 0)
     {
         *to++ = (*from << 8) + ((*from >> 8) & 0377);
@@ -1547,6 +1640,12 @@ void swab_w (const short *from, short *to, ssize_t n)
 
 void swab (const void *from, void *to, ssize_t n)
 {
+    //if ( (void*) from == NULL )
+    //    return;
+
+    //if ( (void*) to == NULL )
+    //    return;
+
     swab_w ( (const short *) from, (short *) to, (ssize_t) n );
 }
 
@@ -1556,19 +1655,27 @@ void swab (const void *from, void *to, ssize_t n)
 off_t lseek (int fd, off_t offset, int whence)
 { 
     //debug_print ("lseek: [TODO]\n");
- 
-    // #isso muda o posicionamento dentro do arquivo lá no kernel.
+
+    //if (fd<0)
+       //return 0; ??
+
+    // # isso muda o posicionamento dentro do arquivo lá no kernel.
     // isso está certo, pois precisamos disso pra sabermos
-    //o tamanho do arquivo.
-    return (off_t) gramado_system_call ( 603, 
-               (unsigned long) fd,
-               (unsigned long) offset,
-               (unsigned long) whence );
+    // o tamanho do arquivo.
+    return (off_t) gramado_system_call ( 
+                       603, 
+                       (unsigned long) fd,
+                       (unsigned long) offset,
+                       (unsigned long) whence );
 }
 
 
 off_t tell (int fildes)
 {
+
+    //if( fildes<0)
+       //return ?;
+       
     return lseek (fildes, 0, SEEK_CUR);
     //maybe: return(lseek(fildes, 0, 1));
 }
@@ -1577,7 +1684,13 @@ off_t tell (int fildes)
 int access (const char *pathname, int mode)
 {
     debug_print ("access: [TODO]\n");
-    
+
+    if( (void*) pathname == NULL )
+        return -1;
+
+    if( *pathname == 0 )
+        return -1;
+
 	// #todo
 	//struct stat foo;
 	//return ( stat(pathname, &foo) );
@@ -1693,48 +1806,46 @@ int tcreat ( int a)
 */
 
 
-
-
-int eq (char *a, char *b){
-
+int eq (char *a, char *b)
+{
     int i=0;
 
 l:
-    if (a[i] != b[i])
-        return (0);
+    if (a[i] != b[i])  {  return (0);  }
 
-    if (a[i++] == '\0')
-        return (1);
+    if (a[i++] == '\0'){  return (1);  }
 
     goto l;
 }
 
 
 
-
-
-
-
 // pega uma label em uma linha do arquivo
 // para comparar strings;
-int getlin (char s[]){
 
-    int ch, i;
+int getlin (char s[])
+{
+    int ch=0;
+    int i=0;
+
 
     i = 0;
 l:
 
     // Se acabou a string.
-    if ( ( ch=getc() ) == '\0' ) 
+    if ( ( ch=getc() ) == '\0' )
+    {
         return (1);
-
+    }
 
     // Se não for o marcador de label.
     if ( ch != ':' )
     {
         // Avançamos até o fim da linha ou até o fim da string;
         while ( ch != '\n' && ch != '\0' )
+        {
             ch = getc();
+        };
 
         goto l;
     }
@@ -1744,18 +1855,20 @@ l:
     // Não queremos os espaços.
 
     // Pulamos os espaços.
-    while ((ch=getc())==' ');
+    while ((ch=getc())==' '){};
 
     
-    while ( ch != ' ' && ch != '\n' && ch != '\0' ) 
+    while ( ch != ' '  && 
+            ch != '\n' && 
+            ch != '\0' ) 
     {
         s[i++] = ch;
         ch = getc();
-    }
+    };
 
     s[i] = '\0';
 
-    return(0);
+    return (0);
 }
 
 
@@ -1909,10 +2022,11 @@ int umatch(char *s, char *p){
 
 // Compare
 // Not tested yet.
-int compar (char *s1, char *s2){
-
-    int c1, c2;
-
+int compar (char *s1, char *s2)
+{
+    int c1=0;
+    int c2=0;
+    
 loop:
 
     if ((c1 = *s1++) == 0) 
@@ -1988,9 +2102,10 @@ int __dup ( char **l, char s[] ){
 /*
  **************************
  * xxx_todo_int133:
- *     Isso é uma systemcall especial.
- *     #todo: mudar o retorno.
  */
+
+// #bugbug
+// Deprecated.
 
 pid_t 
 xxx_todo_int133 ( 
@@ -2001,18 +2116,20 @@ xxx_todo_int133 (
 {
     pid_t Ret = 0;
 
+    printf ("rtl-unistd-xxx_todo_int133: deprecated \n");
+    return -1;
 
+    /*
     asm volatile ( " int %1 \n"
                  : "=a"(Ret)
                  : "i"(133), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
-
+     
     return (pid_t) Ret;
+    */
 }
 
 
 
-
-    
 //Count occurrences of a char.
 int 
 StrOcc (
@@ -2034,13 +2151,12 @@ StrOcc (
 
 	
 //Point to 1st occurrence of marker set in str.
-unsigned char *
-StrFirstOcc (
-	unsigned char *src,
-	unsigned char *marker )
+unsigned char *StrFirstOcc (
+    unsigned char *src,
+    unsigned char *marker )
 {
 
-    int ch;
+    int ch=0;
 
     while ( (ch=*src++) && !StrOcc(marker,ch) );
     if (ch)
@@ -2053,13 +2169,12 @@ StrFirstOcc (
 
 	
 //Point to last occurrence of market set in str.
-unsigned char *
-StrLastOcc (
-	unsigned char *src,
-	unsigned char *marker)
+unsigned char *StrLastOcc (
+    unsigned char *src,
+    unsigned char *marker)
 {
 
-    int ch;
+    int ch=0;
 
     unsigned char *res=NULL;
     

@@ -311,6 +311,17 @@ unsigned long rtl_get_system_metrics (int index)
 }
 
 
+pid_t rtl_current_process(void)
+{
+    return (int) rtl_get_system_metrics(140);
+}
+
+int rtl_current_thread(void)
+{
+    return (int) rtl_get_system_metrics(141);
+}
+
+
 // ms
 // tempo total em ms.
 // usado para calcular o tempo de execuçao de uma funcao.

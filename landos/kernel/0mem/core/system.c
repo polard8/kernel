@@ -1397,9 +1397,16 @@ unsigned long systemGetSystemMetrics ( int index )
         // ...
 
        // gramado mode, gamemode.
-       case 130: 
-           return (unsigned long) current_mode; 
-           break;
+       case 130:  return (unsigned long) current_mode;  break;
+
+       // When a thread is running to call this service,
+       // so, this thread is the current thread.
+       // But, current for what processor?
+       case 140:  return (unsigned long) current_process;  break;
+       case 141:  return (unsigned long) current_thread;   break;
+
+       //case 150:  break;
+       //case 151:  break;
 
         // 200 ~ 2xx window server info.
         // See: ws.h
