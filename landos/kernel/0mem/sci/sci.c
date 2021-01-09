@@ -2385,8 +2385,10 @@ void *sci0 (
         // 177 -  'dir' command.
         // Comando dir no shell.
         // Listando arquivos em um diretório dado seu nome.
+        // #bugbug: Talvez tenhamos que usr a sci2.
+        // See: fs.c
         case 177:
-            debug_print ("sci0: 177\n");
+            debug_print ("sci0: [177]\n");
             fsList ( (const char *) arg2 );
             return NULL;
             break;

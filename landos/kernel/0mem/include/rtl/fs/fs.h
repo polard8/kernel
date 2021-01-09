@@ -176,14 +176,17 @@ struct target_dir_d
 
 	//ponteiro para a string do caminho
 	//char *pwd_string;  
-	
-	//file name 8.3 (11 bytes;)
+
+    //file name 8.3 (11 bytes;)
     char name[32];
 
-    //onde esse direto'rio esta' carregado.
+    // Buffer where the directory was loaded.
     unsigned long current_dir_address;
 
-	//...
+    // ??
+    // The number of entries ?
+
+    // ...
 };
 
 struct target_dir_d current_target_dir;

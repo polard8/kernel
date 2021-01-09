@@ -120,6 +120,7 @@ struct fat16_directory_entry_d *fs_new_fat16_directory_entry(void)
         debug_print("fs_new_fat16_directory_entry: [FAIL]\n");
         return (struct fat16_directory_entry_d *) 0;
     }
+    
     return (struct fat16_directory_entry_d *) new;
 }
 
@@ -200,7 +201,8 @@ size_t file_get_len(file *_file)
 //OUT: inode structure.
 struct inode_d *file_inode (file *f)
 {
-    if ( (void *)f==NULL ){
+    if ( (void *)f==NULL )
+    {
         return (struct inode_d *) 0;
     }
 
@@ -208,8 +210,10 @@ struct inode_d *file_inode (file *f)
 }
 
 
+
 // Pega um fd na lista de arquivos do processo, dado o PID.
 // Objects[i]
+
 int fs_get_free_fd_from_pid (int pid)
 {
     struct process_d *p;
@@ -218,9 +222,12 @@ int fs_get_free_fd_from_pid (int pid)
 
     //#todo max
     if ( pid<0 ){
-        debug_print ("fs_get_free_fd_from_pid: pid\n");
-        //return -1;
+        debug_print ("fs_get_free_fd_from_pid: [FAIL] pid\n");
+        return -1;
     }
+
+    // #bugbug
+    // Check limit
 
     //
     // Process.
@@ -297,11 +304,11 @@ int fsCheckELFFile ( unsigned long address )
 {
     unsigned char *buffer = (unsigned char *) address;
 
+    if ( (void*) buffer == NULL )
+        return -1;
 
     if ( buffer[0] != 0x7F ||
-         buffer[1] != 0x45 ||
-         buffer[2] != 0x4C ||
-         buffer[3] != 0x46 )
+         buffer[1] != 0x45 || buffer[2] != 0x4C || buffer[3] != 0x46 )
     {
         printf ("fsCheckELFFile: Sig \n");
         return -1;
@@ -357,10 +364,8 @@ fsListFiles (
 
     goto done;
 
-
 fail:
     printf ("fail\n");
-
 done:
     refresh_screen ();
     return;
@@ -370,59 +375,84 @@ done:
 /*
  **********************
  * fsList
- *     dir command support.
- *     #bugbug: We don't want this in the kernel.
+ *     Ring 0 routine to list files.
  */
 
-int fsList ( const char *dir_name ){
+// #todo
+// Use 'pathname'.
 
+int fsList ( const char *dir_name )
+{
+    int Absolute = FALSE;
+    
     debug_print ("fsList:\n");
 
-
     // dir name.
-    if ( (void *) dir_name == NULL )
+
+    if ( (void *) dir_name == NULL ){
+        debug_print ("fsList: [FAIL] dir_name\n");
+        goto fail;
+    }
+
+    if ( *dir_name == 0 ){
+        debug_print ("fsList: [FAIL] *dir_name\n");
+        goto fail;
+    }
+    
+    if ( *dir_name != '/' )
     {
-        debug_print ("fsList: dir_name fail\n");
-        
-        // usar o atual.
-        dir_name = current_target_dir.name;
-
-        if ( (void *) dir_name == NULL )
-        {
-            debug_print ("fsList: dir_name fail\n");
-            return -1;
-        }
+        debug_print ("fsList: Absolute pathname\n");
+        Absolute = TRUE;
     }
 
+    // #bugbug
+    // We are using the current directory address,
+    // not the directory provide by the user.
+    
+    // #todo
+    // Set up the current dir address, based on the
+    // name provided by the user.
 
-    // address.
-    if ( current_target_dir.current_dir_address == 0 ){
-        debug_print ("fsList: current_target_dir.current_dir_address fail\n");
-        debug_print ("fsList: using root dir [FIXME]\n");
-        current_target_dir.current_dir_address = VOLUME1_ROOTDIR_ADDRESS; 
-    }
+    //
+    // == current_target_dir ====================
+    //
 
-
-    if ( (void *) dir_name != NULL && 
-         current_target_dir.current_dir_address != 0 )
+    // directory address.
+    
+    if ( current_target_dir.current_dir_address == 0 )
     {
-        // IN:
-        // name, dir address, number of entries;
-        fsFAT16ListFiles ( (const char *) dir_name,         
-            (unsigned short *) current_target_dir.current_dir_address, 
-            256 );
-        
-        debug_print ("fsList: done\n");
-        return 0;  
+        debug_print ("fsList: [FAIL] current_target_dir.current_dir_address \n");
+        goto fail;
     }
+    
+    // #bugbug
+    // Missing string finalization.
+    // printk ("fsList: current_target_dir.name = {%s}\n", current_target_dir.name);
+    
 
-    //fail
+    // Listing ...
+
+    // IN:
+    // name, dir address, number of entries;
+    // No return value.
+    
+    fsFAT16ListFiles ( 
+        (const char *)     dir_name,         
+        (unsigned short *) current_target_dir.current_dir_address, 
+        256 );
+
+    debug_print ("fsList: done\n");
+    return 0;  
+
+fail:
     debug_print ("fsList: fail\n");
+    refresh_screen();
     return -1;
 }
 
 
 /*
+ ****************************************
  * fsFAT16ListFiles:
  *     Mostra os nomes dos arquivos de um diret�rio.
  *     Sistema de arquivos fat16.
@@ -434,58 +464,101 @@ int fsList ( const char *dir_name ){
 
 void 
 fsFAT16ListFiles ( 
-    const char *dir_name, 
+    const char     *dir_name, 
     unsigned short *dir_address, 
-    int number_of_entries )
+    int            number_of_entries )
 {
 
+    // iterator
     int i=0;
-    unsigned long j=0;  // Deslocamento
+
+    // offset
+    int j=0;  
     
-    int max = number_of_entries;         // N�mero m�ximo de entradas.
+    // Max number of entries.
+    int max = number_of_entries;
 
-    unsigned short *DirBaseAddress = (unsigned short *) dir_address;
+    char NameString[ 12 ];  //8.3
 
+    // Buffer.
+    unsigned short *shortBuffer = (unsigned short *) dir_address;
+    unsigned char  *charBuffer  = (unsigned char *)  dir_address;
 
-
-    if ( number_of_entries <= 0 )
+    if ( (void *) dir_name == NULL )
     {
-        debug_print ("fsFAT16ListFiles: [FAIL] number_of_entries\n");
-        return;
+        printf ("fsFAT16ListFiles: [FAIL] dir_name\n");
+        goto fail;
     }
+
+    if ( *dir_name == 0 )
+    {
+        printf ("fsFAT16ListFiles: [FAIL] *dir_name\n");
+        goto fail;
+    }
+
+    // banner message.
+
+    // #bugbug
+    // Missing string finalization.
+        
+    // printf ("fsFAT16ListFiles: Listing names in [%s]\n\n", 
+    //        dir_name );
+            
+    // Number of entries.
+
+    if ( number_of_entries <= 0 ){
+        debug_print ("fsFAT16ListFiles: [FAIL] number_of_entries\n");
+        goto fail;
+    }
+
+    // #bugbug
+    // Number of entries.
 
     if ( number_of_entries >= 512 )
     {
         debug_print ("fsFAT16ListFiles: [FAIL] number_of_entries is too big\n");
-        return;
+        goto fail;
     }
 
 
-    if ( (void *) dir_name != NULL ){
-        printf ("fsFAT16ListFiles: Listing names in [%s]\n\n", 
-            dir_name );
-    }
-
-	// Mostra o nao vazio.
+    // Show 'max' entries in the directory.
 
     i=0; 
+    j=0;
     while (i < max)
     {
-        if ( DirBaseAddress[j] != 0 )
+        // Not invalid and not free.
+        if ( charBuffer[j] != FAT_DIRECTORY_ENTRY_LAST &&
+             charBuffer[j] != FAT_DIRECTORY_ENTRY_FREE )
         {
-            //#bugbug
-            printf ("%s\n", &DirBaseAddress[j] );
+             // #bugbug
+             
+             memcpy( 
+                 (char*) NameString, 
+                 (const char *) &charBuffer[j],
+                 11 );
+             
+             NameString[11] = 0;  //finalize string
+             
+             printf ("%s\n", NameString );
         } 
 
         // (32/2) proxima entrada! 
         // (16 words) 512 vezes!
+ 
+        //j += 16;  //short buffer  
+          j += 32;  //char buffer
         
-        j += 16;  
         i++;  
     }; 
 
     // ...
+ 
+    goto done;
 
+fail:
+    printk ("fsFAT16ListFiles: fail\n");
+done:
     refresh_screen();
 }
 
@@ -742,11 +815,11 @@ int get_free_slots_in_the_inode_table(void)
  *     Check mbr file, given a buffer.
  */
 
-
 // #todo
 // Check the command 'mbr' in gdeshell.bin.
 
-void fsCheckMbrFile ( unsigned char *buffer ){
+void fsCheckMbrFile ( unsigned char *buffer )
+{
 
 	//#todo
 	//mudar os argumentos para chamarmos as portas ide.
@@ -755,48 +828,54 @@ void fsCheckMbrFile ( unsigned char *buffer ){
     int i=0;
 
 
-	//setor 0.
-    my_read_hd_sector ( (unsigned long) &mbr[0] , 0, 0 , 0 ); 
-
-	//message:
-    //printf ("\n");
     printf ("fsCheckMbrFile: Testing MBR ...\n");
 
-	// @todo:
-	// Checar uma estrutura do mbr do disco do sistema,
-	// para validar o acesso � ele.	
+    if ( (void *) mbr == NULL )
+    {
+         printf ("fsCheckMbrFile: buffer fail\n");
+         return;
+    }
+
+    // Read sector '0'
+    // See: ??
+    // return value ?
+    
+    my_read_hd_sector ( (unsigned long) &mbr[0] , 0, 0 , 0 ); 
+
 
     // Check signature.
-    if ( mbr[0x1FE] != 0x55 || mbr[0x1FF] != 0xAA ){
+
+    if ( mbr[0x1FE] != 0x55 || mbr[0x1FF] != 0xAA )
+    {
         printf ("fsCheckMbrFile: Sig FAIL \n" );
         goto fail;
     }
 
-	//jmp
-    printf ("JMP: [ %x ", mbr[ BS_JmpBoot + 0 ] );
-    printf ("%x ", mbr[ BS_JmpBoot + 1 ] );
-    printf ("%x ]\n", mbr[ BS_JmpBoot + 2 ] );
+    printf ("Sig: %x %x\n" , mbr[0x1FE], mbr[0x1FF] );
 
+    
+    // Check jmp opcodes
 
-	//name
-    printf ("OS name: [ ");
-    for ( i=0; i<8; i++ ){
-        printf ("%c", mbr[ BS_OEMName + i ] );
+    printk ("JMP: [ %x ", mbr[ BS_JmpBoot + 0 ] );
+    printk ("%x ",        mbr[ BS_JmpBoot + 1 ] );
+    printk ("%x ]\n",     mbr[ BS_JmpBoot + 2 ] );
+
+    // Check os name
+    
+    printf ("OS name: {");
+    for ( i=0; i<8; i++ )
+    {
+        printk ("%c", mbr[ BS_OEMName + i ] );
     };
-    printf (" ]\n");
-
+    printk ("}\n");
 
 	//...
-
-
-    printf ("Signature: [ %x %x ] \n" , mbr[0x1FE], mbr[0x1FF] );
 
 	// Continua ...
     goto done;
 
 fail:
     printf ("Fail\n");
-
 done:
     printf ("Done\n");
     refresh_screen ();
@@ -811,8 +890,8 @@ done:
  *     e confere as informa��es sobre o volume.
  */
 
-void fsCheckVbrFile ( unsigned char *buffer ){
-
+void fsCheckVbrFile ( unsigned char *buffer )
+{
     unsigned char *vbr = (unsigned char *) buffer; 
 
 	//#todo: check address validation.
@@ -823,7 +902,8 @@ void fsCheckVbrFile ( unsigned char *buffer ){
 
 	// Check signature.
 
-    if ( vbr[0x1FE] != 0x55 || vbr[0x1FF] != 0xAA ){
+    if ( vbr[0x1FE] != 0x55 || vbr[0x1FF] != 0xAA )
+    {
         printf ("fsCheckVbrFile: Sig Fail\n");
         goto fail;
     }
@@ -904,6 +984,13 @@ unsigned long fs_count_path_levels (unsigned char *path)
     register int i=0;
 
 
+    if ( (void*) path == NULL )
+        return 0;
+
+
+    if ( *path == 0 )
+        return 0;
+
     for ( i=0; i < Max; ++i )
     {
         if (path[i] == '/') { Counter++; }
@@ -971,6 +1058,15 @@ from_FAT_name (
     int i=0;
     int j=0;
     int k=0;
+
+
+    // #todo: debug messages.
+    
+    if ( (void *) src == NULL ){ return; }
+    if ( (void *) dst == NULL ){ return; }
+
+    if (*src == 0){ return;}
+    if (*dst == 0){ return;}
 
 
     // dirty
@@ -1071,6 +1167,16 @@ int fs_load_path ( unsigned char *path, unsigned long address )
     void *__dst_buffer;
     void *__file_buffer;
 
+
+    // path
+
+    if ( (void*) path == NULL ){
+        panic ("fs_load_path: path\n"); 
+    }
+
+    if (*path == 0){
+        panic ("fs_load_path: *path\n"); 
+    }
 
 
     // Address
@@ -1352,14 +1458,12 @@ int sys_load_path ( unsigned char *path, unsigned long u_address )
 
     debug_print ("sys_load_path:\n");
     
-    if ( (void*) path == NULL )
-    {
+    if ( (void*) path == NULL ){
         debug_print ("sys_load_path: [FAIL] path\n");
         return (int) -1;
     }
 
-    if (*path == 0)
-    {
+    if (*path == 0){
         debug_print ("sys_load_path: [FAIL] *path\n");
         return (int) -1;
     }
@@ -1390,7 +1494,8 @@ int sys_load_path ( unsigned char *path, unsigned long u_address )
 
 // #todo: Usar tipo 'int'.
 
-void fs_init_fat (void){
+void fs_init_fat (void)
+{
 
     //
     // The root file system structure.
@@ -1412,15 +1517,23 @@ void fs_init_fat (void){
 
     if ( (void *) fat == NULL ){
         panic ("fs_init_fat: No fat struture \n");
-
     }else{
 
         // Info.
         fat->address = root->fat_address; 
         fat->type    = root->type;
 
-
         // Continua ...
+
+        // #todo
+        // Check this values.
+
+        if ( fat->address == 0 )
+            panic ("fs_init_fat: fat address \n");
+
+        // is it int ?
+        if ( fat->type <= 0 )
+            panic ("fs_init_fat: fat type \n");
     };
 
 
@@ -1442,8 +1555,8 @@ void fs_init_fat (void){
 
 // #todo: Usar tipo 'int'.
 
-void fs_init_structures (void){
-
+void fs_init_structures (void)
+{
     int Type=0;
 
     //
@@ -1456,13 +1569,14 @@ void fs_init_structures (void){
 
     if ( (void *) root == NULL ){
         panic ("fs_init_structures: Couldn't create the root structure.\n");
-
     }else{
         root->objectType  = ObjectTypeFileSystem;
         root->objectClass = ObjectClassKernelObjects;
         root->used  = 1;
         root->magic = 1234;
 
+        // pointer
+        
         root->name = (char *) ____root_name;
         
         // Se o volume do vfs ainda não foi criado 
@@ -1482,6 +1596,7 @@ void fs_init_structures (void){
 
 
     // Type.
+    
     // #bugbug: 
     // Em qual disco e volume pegamos o tipo de sistema de arquivos?
 
@@ -1490,14 +1605,12 @@ void fs_init_structures (void){
 
     if ( Type <= 0 ){
         panic ("fs_init_structures: [PANIC] Type");
-
     }else{
         root->type = (int) Type;
     };
 
+    switch (Type){
 
-    switch (Type)
-    {
         case FS_TYPE_FAT16:
 
             // Disk stuff.
@@ -1809,8 +1922,8 @@ int fsInit (void){
  *     This is used by the system's volume.
  */
 
-int fat16Init (void){
-
+int fat16Init (void)
+{
     debug_print ("fat16Init:\n");
     
     fat_cache_loaded = CACHE_NOT_LOADED;
@@ -1879,8 +1992,19 @@ int fat16Init (void){
  * 'pwd'> 
  */
  
-void fsInitializeWorkingDiretoryString (void){
+void fsInitializeWorkingDiretoryString (void)
+{
 
+    // #bugbug
+    // We have some issues with string sizes.
+    // Buffer overflow!
+
+    // vamos contar o tamanho da string que estamos construindo.
+    int string_count = 0;  
+    
+    //
+    int string_size = 0;
+    
     struct volume_d  *v;
 
     char volume_string[8];   
@@ -1889,6 +2013,8 @@ void fsInitializeWorkingDiretoryString (void){
     debug_print ("fsInitializeWorkingDiretoryString:\n");
 
 
+    // volume string 
+    
     volume_string[0] = 'v';
     volume_string[1] = 'o';
     volume_string[2] = 'l';
@@ -1916,12 +2042,9 @@ void fsInitializeWorkingDiretoryString (void){
 
     v = (struct volume_d *) volumeList[current_volume];
 
-    if ( (void *) v == NULL )
-    {
+    if ( (void *) v == NULL ){
         panic ("fsInitializeWorkingDiretoryString: v\n");
-
     }else{
-
         if ( v->used != 1 || v->magic != 1234 ){
             panic ("fsInitializeWorkingDiretoryString: validation\n");
         }
@@ -1946,17 +2069,40 @@ void fsInitializeWorkingDiretoryString (void){
                 break;
         };
 
-
-		//path string na estrutura do volume.
+        // #bugbug
+        // We need to finalize the string.
+        // limit 32.
+        // See: volume.h
+        
+        // path string na estrutura do volume.
+        
+        string_size = sizeof(current_volume_string);
+        
+        if(string_size >= 32)
+        {
+            debug_print ("fsInitializeWorkingDiretoryString: [FIXME] string size\n"); 
+            return;
+        }
+        
+        // copy the string. limit 32 bytes.
         sprintf ( v->path_string, current_volume_string );
+        
+        // finalize.
+        v->path_string[31] = 0;
 
-	    //'volumeX'
+        // #bugbug
+        // What is the limit for this string ? 32 bytes.
+        // See: rtl/fs/path.h and globals.h
+
         strcat ( current_workingdiretory_string, v->path_string );
 	    //strcat ( current_workingdiretory_string, current_volume_string );
     };
 
+    // #bugbug
+    // What is the limit for this string ? 32 bytes.
+    // See: rtl/fs/path.h and globals.h
 
-	// ## separador ##
+    // ## separador ##
     strcat ( current_workingdiretory_string, FS_PATHNAME_SEPARATOR );
 
 	//More ?...
@@ -1975,7 +2121,8 @@ void fsInitializeWorkingDiretoryString (void){
 void fsInitTargetDir (void)
 {
     current_target_dir.current_dir_address = VOLUME1_ROOTDIR_ADDRESS;
-    //current_target_dir.name = ?;
+    current_target_dir.name[0] = '/';  //root dir
+    current_target_dir.name[1] = 0;
 }
 
 
@@ -1985,8 +2132,12 @@ void fsInitTargetDir (void)
  *     Cada processo deve inicialiar seus dados aqui. 
  */
 
-int fs_initialize_process_pwd ( int pid, char *string ){
+// #todo:
+// handle return value ...
+// What functions is calling us?
 
+int fs_initialize_process_pwd ( int pid, char *string )
+{
     struct process_d *p;
     int i=0;
 
@@ -1996,10 +2147,16 @@ int fs_initialize_process_pwd ( int pid, char *string ){
         return 1;
     }
 
+    // string
 
     if ( (void *) string == NULL ){
-        debug_print ("fs_initialize_process_pwd: string\n");
-        return 1;
+        panic ("fs_initialize_process_pwd: string\n");
+        //return 1;
+    }
+
+    if (*string == 0){
+        panic ("fs_initialize_process_pwd: *string\n");
+        //return 1;
     }
 
     // Current process.
@@ -2011,7 +2168,6 @@ int fs_initialize_process_pwd ( int pid, char *string ){
 
     if ( (void *) p == NULL ){
         panic ("fs_initialize_process_pwd: p\n");
-
     }else{
         if ( p->used != 1 || p->magic != 1234 ){
             panic ("fs_initialize_process_pwd: validation\n");
@@ -2019,6 +2175,8 @@ int fs_initialize_process_pwd ( int pid, char *string ){
 
         // ?? fixed size.
         for ( i=0; i<32; i++ ){ p->pwd_string[i] = string[i]; }
+        
+        p->pwd_string[31] = 0; // finalizing 
     };
 
 
@@ -2035,8 +2193,8 @@ int fs_initialize_process_pwd ( int pid, char *string ){
 
 // this is used by the pwd command. service 170.
 
-int fs_print_process_pwd (int pid){
-
+int fs_print_process_pwd (int pid)
+{
     struct process_d *p;
 
 
@@ -2055,18 +2213,27 @@ int fs_print_process_pwd (int pid){
 
     if ( (void *) p == NULL ){
         panic ("fs_print_process_pwd: p\n");
-
     }else{
         if ( p->used != 1 || p->magic != 1234 ){
             panic ("fs_print_process_pwd: validation\n");
         }
 
-        if ( (void *) p->pwd_string != NULL ){
+        // #bugbug
+        // Is this element a pointer or a buffer ?
+        
+        if ( (void *) p->pwd_string != NULL )
+        {
+            //p->pwd_string[31] = 0;
             printf ("> PID=%d p->pwd_string {%s} \n", 
                 p->pid, p->pwd_string);
         }
-        
-        if ( (void *) current_target_dir.name != NULL ){
+
+        // #bugbug
+        // Is this element a pointer or a buffer ?
+
+        if ( (void *) current_target_dir.name != NULL )
+        {
+            //current_target_dir.name[31] = 0;
             printf ("> PID=%d current_target_dir.name {%s} \n", 
                 p->pid, current_target_dir.name);
         }
@@ -2097,26 +2264,47 @@ void sys_pwd(void)
 
 // Used by the service 175, cd command.
 
-void fsUpdateWorkingDiretoryString ( char *string ){
-
+void fsUpdateWorkingDiretoryString ( char *string )
+{
     struct process_d  *p;
     char *tmp;
     int i=0; 
 
+    int string_size = 0;
 
-    tmp = string;
 
     debug_print ("fsUpdateWorkingDiretoryString:\n"); 
 
+    tmp = string;
+    string_size = sizeof(string);
+
+
     // Initialized ?
-    if ( pwd_initialized == 0 ){
-        debug_print ("fsUpdateWorkingDiretoryString: pwd_initialized\n"); 
+    if ( pwd_initialized == 0 )
+    {
+        debug_print ("fsUpdateWorkingDiretoryString: [FAIL] pwd_initialized\n"); 
+        
+        // #todo
+        // Call the initialization routine.
+        
         return;
     }
 
     // string
+
     if ( (void *) string == NULL ){
         debug_print ("fsUpdateWorkingDiretoryString: string\n"); 
+        return;  
+    }
+
+    if (*string == 0){
+        debug_print ("fsUpdateWorkingDiretoryString: *string\n"); 
+        return;  
+    }
+
+
+    if (string_size <= 0){
+        debug_print ("fsUpdateWorkingDiretoryString: string size\n"); 
         return;  
     }
 
@@ -2126,9 +2314,7 @@ void fsUpdateWorkingDiretoryString ( char *string ){
 
     if ( (void *) p == NULL ){
         panic ("fsUpdateWorkingDiretoryString: p\n");
-
     }else{
-
         if ( p->used != 1 || p->magic != 1234 ){
             panic ("fsUpdateWorkingDiretoryString: validation\n");
         }
@@ -2136,6 +2322,9 @@ void fsUpdateWorkingDiretoryString ( char *string ){
         // Atualiza a string do processo atual. Concatenando.
         if ( (void *) string != NULL )
         {
+            // #bugbug
+            // We need to handle the string size limit.
+            
             // Concatena string.
             strcat ( p->pwd_string, string );
 
@@ -2144,16 +2333,24 @@ void fsUpdateWorkingDiretoryString ( char *string ){
 
             // Atualiza a string global usando a string do 
             // processo atual.
-            for ( i=0; i<32; i++ ){
+            
+            // #importante
+            // Respeitar o limite.
+            
+            for ( i=0; i<32; i++ )
+            {
                 current_workingdiretory_string[i] = p->pwd_string[i];
-            }
+            };
+            current_workingdiretory_string[31] = 0; //finaliza
 
             // #bugbug: rever isso.
             // Nome do diretório alvo atual.
-            for ( i=0; i< 11; i++ ){
+            for ( i=0; i< 11; i++ )
+            {
                 current_target_dir.name[i] = *tmp;
                 tmp++;
-            }
+            };
+            current_target_dir.name[11] = 0; //finaliza
         }
     };
 
@@ -2161,11 +2358,26 @@ void fsUpdateWorkingDiretoryString ( char *string ){
 }
 
 
+/*
+ *****************************
+ *  sys_cd_command:
+ * 
+ */
+
 // Service 175. cd command.
-void sys_cd_command( char *string)
+
+void sys_cd_command( char *string )
 {
-    fsUpdateWorkingDiretoryString ( (char *) string );
-    fsLoadFileFromCurrentTargetDir ();
+    if ( (void*) string == NULL )
+        return;
+        
+    if ( *string == 0 )
+        return;
+
+    fsUpdateWorkingDiretoryString( (char *) string );
+
+    fsLoadFileFromCurrentTargetDir();
+
     // ...
 }
 
@@ -2315,6 +2527,18 @@ sys_read_file_from_disk (
 
     debug_print ("sys_read_file_from_disk:\n");
 
+
+    if ( (void*) file_name == NULL ){
+        debug_print ("sys_read_file_from_disk: file_name\n");
+        return -1;
+    }
+
+    if ( *file_name == 0 ){
+        debug_print ("sys_read_file_from_disk: *file_name\n");
+        return -1;
+    }
+
+
     // Convertendo o formato do nome do arquivo.    
     // >>> "12345678XYZ"
     
@@ -2345,7 +2569,8 @@ sys_read_file_from_disk (
              debug_print ("sys_read_file_from_disk: [O_CREAT] Creating a new file\n"); 
 
              buff = (void*) kmalloc(1024);
-             if ((void*)buff==NULL){
+             if ((void*)buff==NULL)
+             {
                  debug_print("sys_read_file_from_disk: buff fail\n");
                  return -1; 
              }
@@ -2355,7 +2580,10 @@ sys_read_file_from_disk (
              taskswitch_lock ();
              scheduler_lock ();
 
-             __ret = (int) fsSaveFile ( VOLUME1_FAT_ADDRESS, VOLUME1_ROOTDIR_ADDRESS, FAT16_ROOT_ENTRIES, 
+             __ret = (int) fsSaveFile ( 
+                               VOLUME1_FAT_ADDRESS, 
+                               VOLUME1_ROOTDIR_ADDRESS, 
+                               FAT16_ROOT_ENTRIES, 
                               (char *) file_name, 
                               (unsigned long) 2,      // size in sectors 
                               (unsigned long) 1024,   // size in bytes  
@@ -2367,8 +2595,9 @@ sys_read_file_from_disk (
               //--
               
               // Ok
-              if (__ret == 0)
+              if (__ret == 0){
                   goto __go;
+              }
          }
          
          return (int) (-1);
@@ -2419,9 +2648,7 @@ __OK:
         printf ("sys_read_file_from_disk: __file\n");
         refresh_screen();
         return -1;
-
     }else{
-
         __file->used = 1;
         __file->magic = 1234;
         __file->pid = (pid_t) current_process;
@@ -2446,7 +2673,7 @@ __OK:
         // As permissoes dependem do tipo de arquivo.
        
         // #bugbug: Let's do this for normal files for now.
-        __file->sync.can_read = TRUE;
+        __file->sync.can_read  = TRUE;
         __file->sync.can_write = TRUE;
 
         __file->sync.action = ACTION_NULL;
@@ -2560,7 +2787,8 @@ __OK:
     
     // Carrega o arquivo na memória.
  
-    Status = (int) fsLoadFile ( VOLUME1_FAT_ADDRESS, 
+    Status = (int) fsLoadFile ( 
+                       VOLUME1_FAT_ADDRESS, 
                        VOLUME1_ROOTDIR_ADDRESS, 
                        32, //#bugbug: Number of entries.
                        file_name, 
@@ -2687,13 +2915,20 @@ __OK:
  *     Usa-se a estrutura current_target_dir pra gerenciar isso.
  */
 
-int fsLoadFileFromCurrentTargetDir (void){
+// #bugbug
+// too much allocation.
+// How many times this function is called ??
+// 4KB each time ?
+
+int fsLoadFileFromCurrentTargetDir (void)
+{
 
     int Ret = -1;
     int i=0;
     unsigned long new_address = 0;
 
-    debug_print ("fsLoadFileFromCurrentTargetDir: Loading dir \n");
+
+    debug_print ("fsLoadFileFromCurrentTargetDir: [FIXME] Loading dir \n");
 
 	//#bugbug
 	//Isso 'e um limite para o tamanho do arquivo (apenas dir).
@@ -2701,13 +2936,22 @@ int fsLoadFileFromCurrentTargetDir (void){
 	//aqui no m'aquimo o arquivo pode ter 4kb.
 	//acho ques estamos falando somente de diret'orio aqui.
 
+    // #bugbug
+    // too much allocation.
+    // How many times this function is called ??
+    // 4KB each time ?
+
     new_address = (unsigned long) kmalloc (4096);
 
-    if ( new_address == 0 ){
+    if ( new_address == 0 )
+    {
         debug_print ("fsLoadFileFromCurrentTargetDir: new_address\n");
         return -1;
     }
 
+    // #todo
+    // clean memory
+    // memset()
 
     // ??
     // Se o endereço atual falhar, resetamos ele.
@@ -2734,7 +2978,8 @@ int fsLoadFileFromCurrentTargetDir (void){
     taskswitch_lock ();
     scheduler_lock ();
 
-    Ret = (int) fsLoadFile ( VOLUME1_FAT_ADDRESS,  
+    Ret = (int) fsLoadFile ( 
+                    VOLUME1_FAT_ADDRESS,  
                     current_target_dir.current_dir_address,    //src dir address 
                     32, //#bugbug: Number of entries.
                     (unsigned char *) current_target_dir.name, 
@@ -2744,6 +2989,8 @@ int fsLoadFileFromCurrentTargetDir (void){
     scheduler_unlock ();
     taskswitch_unlock ();
     //--
+
+    // We have a new target directory address.
 
     current_target_dir.current_dir_address = new_address;
 
@@ -2786,6 +3033,18 @@ sys_write_file_to_disk (
     int __ret = -1;
 
     debug_print ("sys_write_file_to_disk:\n");
+
+
+    if ( (void*) file_name == NULL ){
+        debug_print ("sys_write_file_to_disk: file_name\n");
+        return -1;
+    }
+
+    if ( *file_name == 0 ){
+        debug_print ("sys_write_file_to_disk: *file_name\n");
+        return -1;
+    }
+
 
     //++
     // See: sci/fs/write.c
@@ -2837,7 +3096,25 @@ int fs_create_empty_file ( char *file_name, int type )
     int __ret= -1;
 
 
-    f = (file *) kmalloc( sizeof(size_in_bytes) );
+    // check
+
+    if ( (void*) file_name == NULL )
+    {
+        debug_print ("fs_create_empty_directory: file_name\n");
+        return -1;
+    }
+
+    if (*file_name == 0)
+    {
+        debug_print ("fs_create_empty_directory: *file_name\n");
+        return -1;
+    }
+
+
+    // file structure
+    
+    f = (file *) kmalloc ( sizeof( struct file_d ) );
+
     
     if ( (void *) f == NULL )
     {
@@ -2845,6 +3122,10 @@ int fs_create_empty_file ( char *file_name, int type )
         return -1;
     }
         
+
+    // #todo
+    // Here we create a file in the root dir.
+    // But we want to create in the curent dir or cwd.
         
     //f->type = type;
     // #todo: fd ...
@@ -2863,6 +3144,8 @@ int fs_create_empty_file ( char *file_name, int type )
     // #todo
     // the file structure.
 
+    debug_print("fs_create_empty_file: done\n");
+        
     return __ret;
 }
 
@@ -2885,9 +3168,14 @@ int sys_create_empty_file ( char *file_name )
 
     debug_print ("sys_create_empty_file:\n");
 
-    if ( (void*) file_name == NULL )
-    {
-        debug_print ("sys_create_empty_file: file name\n");
+
+    if ( (void*) file_name == NULL ){
+        debug_print ("sys_create_empty_file: file_name\n");
+        return -1;
+    }
+
+    if ( *file_name == 0 ){
+        debug_print ("sys_create_empty_file: *file_name\n");
         return -1;
     }
 
@@ -2914,6 +3202,13 @@ int sys_create_empty_file ( char *file_name )
 }
 
 
+/*
+ *************************************** 
+ * fs_create_empty_directory:
+ * 
+ */
+
+// Create empty directory
 
 int fs_create_empty_directory ( char *dir_name, int type )
 {
@@ -2926,9 +3221,25 @@ int fs_create_empty_directory ( char *dir_name, int type )
     int size_in_bytes = 512;  
 
     debug_print ("fs_create_empty_directory:\n");
-    
 
-    f = (file *) kmalloc( sizeof(size_in_bytes) );
+
+    // check
+
+    if ( (void*) dir_name == NULL )
+    {
+        debug_print ("fs_create_empty_directory: dir_name\n");
+        return -1;
+    }
+
+    if (*dir_name == 0)
+    {
+        debug_print ("fs_create_empty_directory: *dir_name\n");
+        return -1;
+    }
+
+    // file structure
+    
+    f = (file *) kmalloc ( sizeof( struct file_d ) );
     
     if ( (void *) f == NULL )
     {
@@ -2936,6 +3247,10 @@ int fs_create_empty_directory ( char *dir_name, int type )
         return -1;
     }
    
+   
+    // #todo
+    // Here we create a file in the root dir.
+    // But we want to create in the curent dir or cwd.
    
     //f->type = type;
     // #todo: fd ...
@@ -2953,6 +3268,8 @@ int fs_create_empty_directory ( char *dir_name, int type )
 
     //#todo
     //the file structure.
+
+    debug_print ("fs_create_empty_directory: done\n");
 
     return (int) __ret;
 }
@@ -2972,10 +3289,15 @@ int sys_create_empty_directory ( char *dir_name )
     int __ret=0;    
     
     debug_print ("sys_create_empty_directory:\n");
-    
-    if ( (void*) dir_name == NULL )
-    {
-        debug_print ("sys_create_empty_directory: dir name\n");
+
+
+    if ( (void*) dir_name == NULL ){
+        debug_print ("sys_create_empty_directory: dir_name\n");
+        return -1;
+    }
+
+    if ( *dir_name == 0 ){
+        debug_print ("sys_create_empty_directory: *dir_name\n");
         return -1;
     }
 

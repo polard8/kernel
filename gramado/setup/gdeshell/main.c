@@ -103,6 +103,9 @@ char *primary_prompt = PPROMPT;
 char *secondary_prompt = SPROMPT;
 
 
+#define ROOT_STRING "/"
+char *root_string = ROOT_STRING;
+
 COMMAND *global_command = (COMMAND *) NULL;
 
 
@@ -1956,22 +1959,23 @@ do_compare:
 
     // dir and ls.
     // List files and folders.
+    // #todo: Maybe use the sc82.
     if ( gramado_strncmp ( prompt, "dir", 3 ) == 0 || 
-         gramado_strncmp ( prompt, "ls", 2 ) == 0 )
+         gramado_strncmp ( prompt, "ls",  2 ) == 0 )
     {
-        i++;
+        // Argument 1.
+        i=1;
         token = (char *) tokenList[i];
 
         // Listar sem indicar o nome o diretório.
-        if ( token == NULL )
-        {
+        if ( token == NULL ){
+
             gde_enter_critical_section ();
             system_call ( 177,
-                (unsigned long) 0,  //no name 
+                (unsigned long) root_string,  // "/" 
                 (unsigned long) 0, 
                 (unsigned long) 0 ); 
             gde_exit_critical_section ();
-
 
         // Listar indicando o nome do diretório.
         }else{
@@ -1979,19 +1983,20 @@ do_compare:
             // Listar os arquivos em um diretório dado seu nome.
             gde_enter_critical_section ();
             system_call ( 177,
-                (unsigned long) tokenList[i], 
+                (unsigned long) tokenList[i],  //typed pathname.
                 (unsigned long) tokenList[i], 
                 (unsigned long) tokenList[i] ); 
             gde_exit_critical_section ();
 
-			//...
+            // ...
         };
 
 		// o que segue o comando dir � um pathname.
 		//@todo: podemos checar se o pathname � absoluto,
 		//e onde se encontra o arquivo que queremos.
         //se o pathname for null ent�o o comando atua sobre o pwd
-		//dir_builtins();
+        
+        //dir_builtins();
         goto exit_cmp;
     };
 
