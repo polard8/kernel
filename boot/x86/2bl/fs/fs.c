@@ -114,7 +114,7 @@ fatLoadCluster (
     {
         read_lba ( address, sector + i );
 
-        address = (unsigned long) address + SECTOR_SIZE;
+        address = (unsigned long) (address + SECTOR_SIZE);
     };
 }
 
@@ -482,14 +482,21 @@ fsLoadFile (
     unsigned short cluster=0;   
 
 
-	//char name_buffer[32];
 
-	//FILE f;
-	//f = (void *) malloc( sizeof(FILE) );
-	//if( (void*) f == NULL ){
-		//fail.
-	//};
-	
+
+    // Check
+
+    if ( (void*) name == NULL ){
+        printf("fsLoadFile: [FAIL] name\n");
+        goto fail;
+    }
+
+    if (*name == 0){
+        printf("fsLoadFile: [FAIL] *name\n");
+        goto fail;
+    }
+
+
 	//#bugbug
 	//Essa refresh screen leva muito tempo.
 
@@ -801,11 +808,38 @@ int load_path ( unsigned char *path, unsigned long address )
     void *__dst_buffer;
     void *__file_buffer;
 
-    __file_buffer = (void *) address;
-
     unsigned long n_levels = 0;
+    int l=0;
+
+
+
+    //
+    // Checks.
+    //
     
+    //====================
+    // path
     
+    if ( (void*) path == NULL )
+    {
+        printf ("bl-load_path: path\n");
+        abort ();
+    }    
+
+    if (*path == 0)
+    {
+        printf ("bl-load_path: *path\n");
+        abort ();
+    }
+
+    if (*path != '/')
+    {
+        printf ("bl-load_path: It's not an absolute path.\n");
+        abort ();
+    }
+
+    p = path;
+
     n_levels = path_count(path);
     
     if(n_levels==0){
@@ -813,26 +847,30 @@ int load_path ( unsigned char *path, unsigned long address )
         abort ();
     }    
 
+    level = 0;
 
-    // Address
+    //====================
+    // address
 
     if (address == 0){
         printf ("bl-load_path: address\n");
         abort ();
     }
 
-    level = 0;
+    // =======================
+    // buffers.
+
+    __file_buffer = (void *) address;
     
-    p = path;
-
-
     // primeiro src =  root address;
     __src_buffer = (void *) FAT16_ROOTDIR_ADDRESS;
+    
 
-    int l=0;
+    // =======================
+    // levels
+
     for(l=0; l<n_levels; l++)
     {
-
         printf ("\n[LEVEL %d]\n\n",l);
         
         // Tem que começar o level com '/'
@@ -881,7 +919,7 @@ int load_path ( unsigned char *path, unsigned long address )
                      {
                           buffer[i] = ' ';
                           i++;
-                     }
+                     };
 
                      p++;   // pulamos o ponto.
                      
@@ -891,7 +929,7 @@ int load_path ( unsigned char *path, unsigned long address )
                          buffer[i] = (char) *p;
                          i++;
                          p++;
-                     } 
+                     };
                        
                      // Finaliza a string no buffer. 8+3=11
                      buffer[11] = 0;   
@@ -937,16 +975,13 @@ int load_path ( unsigned char *path, unsigned long address )
                      
                     //sai do for??
                     break;
-                    
-                    
+
                 }else{
                     printf ("load_path: fail loading level 0\n");
                     abort ();
                 };
             }
-            
-            
-            
+
             // Se encontramos um indicador de próximo nível,
             // então esse nível não será considerado binário.
             // obs: Ao iniciar o for ele precisa encontrar esse mesmo char.
@@ -960,7 +995,7 @@ int load_path ( unsigned char *path, unsigned long address )
                     {
                         buffer[i] = ' ';   
                         i++;    
-                    } 
+                    };
                 }
                 buffer[11] = 0;
 
@@ -1027,68 +1062,66 @@ unsigned long fsSearchFile (unsigned char *name)
     unsigned short *root = (unsigned short *) FAT16_ROOTDIR_ADDRESS;
 
 
+    // Check args.
 
-	// Carrega diretório raiz na memória.
-    fs_load_rootdirEx ();
+    if ( (void*) name == NULL ){
+        printf("fsSearchFile: [ERROR] invalid name\n");
+        goto file_not_found;
+    }
+
+    if (*name == 0){
+        printf("fsSearchFile: [ERROR] invalid name\n");
+        goto file_not_found;
+    }
+
+
+    // Load root dir.
+    fs_load_rootdirEx();
+
 
 	// Fixa o número máximo de entradas de acordo 
 	// com o tipo de sistema de arquivos.
 
     switch (g_file_system_type)
     {
-		//fat16
-		case 1:
-		    max = 512;
-		    break; 
-	    
-		//fat32
-		case 2:
-		    break;
+        // Not standard.
+        case 1:  //fat16
+        case 2:  //fat32
+        case 3:  //ext2
+        default:
+            max = 512;
+            break;
+    };
 
-        //ext2
-	    case 3:
-		    break; 
-        //...
-		
-		default:
-		    max = 512;
-		    break;
-	};	
-	
-	
-	// Procura o arquivo no diretório raiz. 
-	// Dado o nome via argumento.
-	
-	while (max > 0)
-    {     
-        //Checa a primeira letra do nome.
-		if (root[z] != 0)
-        {           			
-			//Copia o nome e termina incluindo um 0.
-			memcpy(name_x, &root[z], 11);
-			name_x[11] = 0;
-			
-            //Compara 11 caracteres.
-			Status = strncmp(name, name_x, 11);
+
+    // Procura o arquivo no diretório raiz. 
+    // Dado o nome via argumento.
+    // Checa a primeira letra do nome.
+    // Copia o nome e termina incluindo um 0.
+    // Compara 11 caracteres.
+
+    while (max > 0)
+    {
+        if (root[z] != 0)
+        {
+            memcpy (name_x, &root[z], 11);
+            name_x[11] = 0;
+
+            Status = strncmp(name, name_x, 11);
             
-			if (Status == 0){
-                goto found;
-			}
-		}; 
+            if (Status == 0){  goto found;  }
+        }
 
         z += 16;    //(32/2) próxima entrada!
         max--;      //512 vezes!
     }; 
 
+    // Nothing.
 
-	//Nothing.
-
-
-//Se o arquivo não for encontrado.
+// Se o arquivo não for encontrado.
 file_not_found:
-    printf("fsSearchFile: File not found\n"); 
+    printf("fsSearchFile: [FAIL] File not found\n"); 
     return (unsigned long) 1;
-
 
 //Se o arquivo for encontrado.    
 found:
@@ -1101,8 +1134,12 @@ found:
  *     Procura um nome de arquivo no diretório.
  *     @todo: Rever o tipo de retorno.
  */
-unsigned long fsSearchFileName ( unsigned char *name ){   
 
+unsigned long fsSearchFileName ( unsigned char *name )
+{
+    //if ( (void*) name == NULL )
+        //return ?;
+         
     return fsSearchFile (name);
 }
 
@@ -1117,28 +1154,28 @@ unsigned long fsSearchFileName ( unsigned char *name ){
  *    512 entradas de 32 bytes cada.
  */
  
-void fs_load_rootdirEx (){
-
+void fs_load_rootdirEx()
+{
     unsigned long i=0;
-    unsigned long n = 0;
-    unsigned long root_size = 32;    //@todo: Pegar de estrutura. 
+    unsigned long n=0;
+    unsigned long RootSize = 32;    //@todo: Pegar de estrutura. 
 
 
 	// debug
 	// printf("Loading root dir ...\n");
 
-	//
-	// Carregar 32 setores na memória.
-	//
+    // Carregar 32 setores na memória.
+    // Carrega um e incrementa o buffer.
 
- 
-    for ( i=0; i < root_size; i++ )
+    for ( i=0; i < RootSize; i++ )
     {
-		read_lba ( FAT16_ROOTDIR_ADDRESS + n, FAT16_ROOTDIR_LBA + i); 
-		n = n+512;    //Incrementa buffer.
+        read_lba ( 
+            ( FAT16_ROOTDIR_ADDRESS + n ), 
+            ( FAT16_ROOTDIR_LBA + i ) );
+
+        n = (n +512);
     };
 }
-
 
 
 /*
@@ -1146,24 +1183,35 @@ void fs_load_rootdirEx (){
  *     Carrega a FAT na memória. (size = 64 setores). 
  */
 
-void fs_load_fatEx (){
-
+void fs_load_fatEx()
+{
     unsigned long i=0;
-    unsigned long n = 0;
+    unsigned long n=0;
 
-	//@todo: Pegar de estrutura.
-    unsigned long fat_size = 64;    //64 setores de tamanho.    
+    // #bugbug
+    // We need to load the whole fat table.
+    // Or we will have problems to load the kernel.
+    // 64 setores de tamanho.
+    // Talvez seja 246.
 
+    //unsigned long FatSize = 64; 
+    unsigned long FatSize = 128; 
+    
 	// debug
 	// printf("Loading Cluster Table.\n");//fat
-	
-	// Carregar FAT na memória.
-	
-	for ( i=0; i < fat_size; i++ )
-	{
-	    read_lba ( FAT16_FAT_ADDRESS + n, FAT16_FAT_LBA + i);   
-		n = n+512;    //Incrementa Buffer
-	};
+
+    // Carregar FAT na memória.
+    // Carregar 32 setores na memória.
+    // Carrega um e incrementa o buffer.
+
+    for ( i=0; i < FatSize; i++ )
+    {
+        read_lba ( 
+            ( FAT16_FAT_ADDRESS + n), 
+            ( FAT16_FAT_LBA + i ) );
+ 
+        n = (n +512);
+    };
 }
 
 
@@ -1466,11 +1514,11 @@ done:
  *     Cria um diretório. 
  */
 
-unsigned long fsCreateDir ( char *name , unsigned long id ){
+unsigned long fsCreateDir ( char *name , unsigned long id )
+{
+    //#bugbug 
 
-	//#bugbug 
-
-	return fsCreateFile ( name, id );   
+    return fsCreateFile ( name, id );   
 }
 
 
@@ -1479,8 +1527,8 @@ unsigned long fsCreateDir ( char *name , unsigned long id ){
  *     Cria um arquivo. 
  */
 
-unsigned long fsCreateFile ( char *name, unsigned long id ){
-	
+unsigned long fsCreateFile ( char *name, unsigned long id )
+{
     unsigned long fat_entry=0;
     unsigned long dir_entry=0;
 	unsigned long size = 1;
@@ -1563,13 +1611,17 @@ void fsClearFat ()
  *     @todo: Usar estrutura.
  */
 
-int fsCheckFat (){
-	
-	unsigned long i=0;
-	unsigned long fat_entry=0;
-	
-	printf("\n");
-	
+int fsCheckFat ()
+{
+    unsigned long i=0;
+    unsigned long fat_entry=0;
+
+
+    printf("\n");
+
+    // #bugbug:
+    // size ?
+
     for (i = 0; i < 256; i++)
 	{
         //Pega a FAT entry.
@@ -1605,7 +1657,8 @@ fail:
  *    Inicializa as estruturas da FAT.
  */
 
-void fsInitFat(){
+void fsInitFat()
+{
 	//return;  //Ainda não implementada.
 }
 
@@ -1619,7 +1672,8 @@ void fsInitFat(){
  * OBS: Quem vai usar essas estuturas é o bootloader.
  */
 
-void fsInitStructures(){
+void fsInitStructures()
+{
 	//return;  //Ainda não implementada.
 }
 
@@ -1630,9 +1684,9 @@ void fsInitStructures(){
  *     Inicializa o sistema de arquivos da partição do sistema.
  *     Obs: Isso deve ficar no fim do arquivo. 
  */
- 
-int fsInit (){
 
+int fsInit()
+{
 
 #ifdef BL_VERBOSE
     printf ("fsInit: Initializing structures..\n");

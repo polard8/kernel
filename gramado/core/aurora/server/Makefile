@@ -16,6 +16,25 @@ SUBLEVEL = 0
 EXTRAVERSION = 
 #NAME = GWS
 
+# Make variables (CC, etc...)
+AS	= as
+LD	= ld
+CC	= gcc
+AR	= ar
+MAKE	= make
+NASM	= nasm
+OBJCOPY	= objcopy
+OBJDUMP	= objdump
+LEX	= flex
+YACC	= bison
+PERL	= perl
+PYTHON	= python
+PYTHON2	= python2
+PYTHON3	= python3
+RUBY	= ruby
+
+
+
 
 #CFLAGS = -m32 \
 #	--std=gnu89 \
@@ -82,36 +101,35 @@ all: main.o all-c gws-link finalize clean
 	@echo "Ok?"
 
 main.o:
-	gcc  -c  main.c $(CFLAGS) -I $(LIBC) -I $(API02)  -I include/ -I . -o main.o
+	$(CC)  -c  main.c $(CFLAGS) -I $(LIBC) -I $(API02)  -I include/ -I . -o main.o
 
 all-c:
 
-	gcc  -c  render/r_render.c    $(CFLAGS) -I $(LIBC) -I include/ -I .  -o r_render.o
+	$(CC)  -c  render/r_render.c    $(CFLAGS) -I $(LIBC) -I include/ -I .  -o r_render.o
 	
 	# view-like component
-	gcc  -c  view/pixel.c    $(CFLAGS) -I $(LIBC) -I include/ -I .  -o pixel.o
-	gcc  -c  view/char.c     $(CFLAGS) -I $(LIBC) -I include/ -I .  -o char.o
-	gcc  -c  view/dtext.c    $(CFLAGS) -I $(LIBC) -I include/ -I .  -o dtext.o
-	gcc  -c  view/line.c     $(CFLAGS) -I $(LIBC) -I include/ -I .  -o line.o
-	gcc  -c  view/rect.c     $(CFLAGS) -I $(LIBC) -I include/ -I .  -o rect.o
-	gcc  -c  view/createw.c  $(CFLAGS) -I $(LIBC) -I include/ -I .  -o createw.o
-	gcc  -c  view/window.c   $(CFLAGS) -I $(LIBC) -I include/ -I .  -o window.o
-	gcc  -c  view/button.c   $(CFLAGS) -I $(LIBC) -I include/ -I .  -o button.o
-	gcc  -c  view/comp.c     $(CFLAGS) -I $(LIBC) -I include/ -I .  -o comp.o
+	$(CC)  -c  view/pixel.c    $(CFLAGS) -I $(LIBC) -I include/ -I .  -o pixel.o
+	$(CC)  -c  view/char.c     $(CFLAGS) -I $(LIBC) -I include/ -I .  -o char.o
+	$(CC)  -c  view/dtext.c    $(CFLAGS) -I $(LIBC) -I include/ -I .  -o dtext.o
+	$(CC)  -c  view/line.c     $(CFLAGS) -I $(LIBC) -I include/ -I .  -o line.o
+	$(CC)  -c  view/rect.c     $(CFLAGS) -I $(LIBC) -I include/ -I .  -o rect.o
+	$(CC)  -c  view/createw.c  $(CFLAGS) -I $(LIBC) -I include/ -I .  -o createw.o
+	$(CC)  -c  view/window.c   $(CFLAGS) -I $(LIBC) -I include/ -I .  -o window.o
+	$(CC)  -c  view/button.c   $(CFLAGS) -I $(LIBC) -I include/ -I .  -o button.o
+	$(CC)  -c  view/comp.c     $(CFLAGS) -I $(LIBC) -I include/ -I .  -o comp.o
 
-	gcc  -c  view/bmp.c      $(CFLAGS) -I $(LIBC) -I include/ -I .  -o bmp.o
+	$(CC)  -c  view/bmp.c      $(CFLAGS) -I $(LIBC) -I include/ -I .  -o bmp.o
 
-	gcc  -c  view/grprim.c   $(CFLAGS) -I $(LIBC) -I include/ -I .  -o grprim.o
-	gcc  -c  view/sprite.c   $(CFLAGS) -I $(LIBC) -I include/ -I .  -o sprite.o
+	$(CC)  -c  view/grprim.c   $(CFLAGS) -I $(LIBC) -I include/ -I .  -o grprim.o
+	$(CC)  -c  view/sprite.c   $(CFLAGS) -I $(LIBC) -I include/ -I .  -o sprite.o
 
-	gcc  -c  view/demos.c      $(CFLAGS) -I $(LIBC) -I include/ -I .  -o demos.o
+	$(CC)  -c  view/demos.c      $(CFLAGS) -I $(LIBC) -I include/ -I .  -o demos.o
 	
 	# model-like component
-	gcc  -c  model/font.c     $(CFLAGS) -I $(LIBC) -I include/ -I .  -o font.o
-	gcc  -c  model/connect.c  $(CFLAGS) -I $(LIBC) -I include/ -I .  -o connect.o
-	gcc  -c  model/gws.c      $(CFLAGS) -I $(LIBC) -I include/ -I .  -o gws.o
+	$(CC)  -c  model/font.c     $(CFLAGS) -I $(LIBC) -I include/ -I .  -o font.o
+	$(CC)  -c  model/connect.c  $(CFLAGS) -I $(LIBC) -I include/ -I .  -o connect.o
+	$(CC)  -c  model/gws.c      $(CFLAGS) -I $(LIBC) -I include/ -I .  -o gws.o
 	# ...
-
 
 	#
 	# == imported objects =============================
@@ -136,8 +154,7 @@ all-c:
 
 
 gws-link:
-	ld -m elf_i386 -T ../link.ld -o GWSSRV.BIN $(myObjects)  
-	
+	$(LD) -m elf_i386 -T ../link.ld -o GWSSRV.BIN $(myObjects)  
 
 finalize:
 	cp GWSSRV.BIN ../bin

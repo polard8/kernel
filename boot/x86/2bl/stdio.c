@@ -21,19 +21,24 @@ extern unsigned long SavedY;
 extern unsigned long SavedBPP; 
 
  
-extern void my_buffer_load_bitmap_16x16();  
+extern void my_buffer_load_bitmap_16x16();
 
 
-/*
- * panic:
- *     Mensagem para erro fatal.
- *     @todo: Change system color to red.
- */
- 
+// =====================
+// panic:
+// Message support for fatal error.
+
 void panic (const char *msg)
 {
-    printf ("panic: (BL.BIN) %s", msg );
-    die ();
+    if ( (void*) msg != NULL )
+    {
+        if ( *msg != 0 )
+        {
+            printf ("BL.BIN: [PANIC] %s\n", msg );
+        }
+    }
+
+    die();
 }
 
 
@@ -43,8 +48,8 @@ void panic (const char *msg)
  *     #bugbug: Na verdade só usmos modo gráfico ainda.
  */
  
-void scroll (void){
-
+void scroll (void)
+{
 
     //loop
     register unsigned short i=0;
@@ -52,8 +57,8 @@ void scroll (void){
 
 
 	//inicio da tela
-	unsigned short *p1 = (unsigned short *) ScreenStart;
-	
+    unsigned short *p1 = (unsigned short *) ScreenStart;
+
 	//inicio da segunda linha
     unsigned short *p2 = (unsigned short *) (ScreenStart + 2 * SCREEN_WIDTH) ;
 
@@ -67,12 +72,12 @@ void scroll (void){
             *p1++ = *p2++;
         };
     };
-	
+
 	//80 vezes
     for (i=0; i < SCREEN_WIDTH; i++)
     {
-		*p1++ = 0x07*256 + ' '; 
-		//*p1++ = REVERSE_ATTRIB*256 + ' ';
+        *p1++ = 0x07*256 + ' '; 
+        //*p1++ = REVERSE_ATTRIB*256 + ' ';
     };
 }
 
@@ -85,8 +90,8 @@ void scroll (void){
 // #bugbug
 // Não usamos mas esse modo de vídeo. 
  
-int bl_clear (int color){
-
+int bl_clear (int color)
+{
 
     //loop
     register unsigned int i=0;
@@ -115,13 +120,19 @@ int bl_clear (int color){
 // #bugbug
 // Não usamos mas esse modo de vídeo. 
 
+// #deprecated
+
 int kprintf ( char *message, unsigned int line, int color )
 {
     //loop
     register unsigned int i = 0;
 
-	char *vidmemp = (char *) 0x000B8000; 
-	
+    char *vidmemp = (char *) 0x000B8000; 
+
+
+    //if ( (void*) message == NULL ){ return -1; };
+    //if ( *message == 0 )          { return -1; };
+
     i = (unsigned int) (line*80*2); 
 
     while (*message != 0) 
@@ -286,8 +297,8 @@ done:
  *     Parte da função printf()
  */
 
-static int print (char **out, int *varg){
-
+static int print (char **out, int *varg)
+{
 	register int width, pad;
 	register int pc = 0;
 	register char *format = (char *)(*varg++);
@@ -372,15 +383,16 @@ static int print (char **out, int *varg){
 
 
 /*
+ *****************************************
  * printf:
  *     Função printf() da lib C.
  * Obs:
  *     Assuming sizeof(void *) == sizeof(int). 
  */
 
-int printf ( const char *format, ... ){
-
-    //sincronisa.  
+int printf ( const char *format, ... )
+{
+    // sincronisa.  
     // vsync();
     
     register int *varg = (int *)(&format);
@@ -394,8 +406,8 @@ int printf ( const char *format, ... ){
  *     Lib C.
  */
  
-int sprintf (char *out, const char *format, ... ){
-
+int sprintf (char *out, const char *format, ... )
+{
     // vsync();
 
     register int *varg = (int *)(&format);
@@ -409,7 +421,8 @@ int sprintf (char *out, const char *format, ... ){
  *     Print a char.
  */
 
-static void printchar (char **str, int c){
+static void printchar (char **str, int c)
+{
 
 	//extern int putchar(int c);
     if (str) 
@@ -431,17 +444,18 @@ int putchar (int ch)
 {
     outbyte (ch);
 
-    return ch;    
+    return ch; 
 }
 
 
 /*
+ ****************************
  * outbyte:
  *     Trata o caractere antes de por na memória de video.
  */
 
-void outbyte (int c){
-
+void outbyte (int c)
+{
     // Copy.
     register int Ch=c;
 
@@ -558,7 +572,8 @@ void outbyte (int c){
 
 // Called by outbyte().
 
-void _outbyte (int c){
+void _outbyte (int c)
+{
 
     unsigned long i=0;
 

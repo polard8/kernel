@@ -8,6 +8,25 @@ EXTRAVERSION =
 #NAME = Init
 
 
+# Make variables (CC, etc...)
+AS	= as
+LD	= ld
+CC	= gcc
+AR	= ar
+MAKE	= make
+NASM	= nasm
+OBJCOPY	= objcopy
+OBJDUMP	= objdump
+LEX	= flex
+YACC	= bison
+PERL	= perl
+PYTHON	= python
+PYTHON2	= python2
+PYTHON3	= python3
+RUBY	= ruby
+
+
+
 #CFLAGS = -m32 \
 #	--std=gnu89 \
 #	-nodefaultlibs \
@@ -66,8 +85,7 @@ crt0.o:
 #	gcc  -c  crt0.c -I $(LIBC) -I $(API) $(CFLAGS) -o crt0.o
 
 main.o:
-	gcc  -c  main.c -I $(LIBC) $(CFLAGS) -o main.o
-
+	$(CC)  -c  main.c -I $(LIBC) $(CFLAGS) -o main.o
 
 all-c:
 
@@ -92,8 +110,7 @@ all-c:
 
 
 shell-link:
-	ld -m elf_i386 -T link.ld -o INIT.BIN $(myObjects)    
-
+	$(LD) -m elf_i386 -T link.ld -o INIT.BIN $(myObjects)    
 
 finalize:
 #	cp INIT.BIN ../../bin/

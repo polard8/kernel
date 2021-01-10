@@ -279,16 +279,26 @@ struct inode_d *fs_load_file (char *pathname)
 {
     struct inode_d *inode;
 
-
     debug_print ("fs_load_file: [TODO] It's a work in progress\n");
+
+
+
+    if ( (void*) pathname == NULL ){
+        printk("fs_load_file: [ERROR] pathname\n");
+        return (struct inode_d *) 0;
+    }
+
+    if (*pathname == 0){
+        printk("fs_load_file: [ERROR] *pathname\n");
+        return (struct inode_d *) 0;
+    }
+
 
     inode = (struct inode_d *) kmalloc( sizeof(struct inode_d) );
     
-    if ( (void *) inode == NULL )
-    {
+    if ( (void *) inode == NULL ){
         debug_print ("fs_load_file: [FAIL] inode\n");
         return (struct inode_d *) 0;
-
     }else{
         
         //inode->id ?
@@ -857,8 +867,8 @@ fsLoadFile2 (
 // Precisamos de uma estrutura com as informações sobre
 // a FAT atual.
 
-void fs_load_fat(void){
-
+void fs_load_fat(void)
+{
     unsigned long i=0;
     unsigned long b=0;
 
@@ -866,6 +876,7 @@ void fs_load_fat(void){
 	// #bugbug 
 	// Estamos atribuindo um tamanho, mas tem que calcular.
 	// Salvo engano o tamanho é 246 setores.
+
     unsigned long szFat = 128;
 
 
@@ -930,7 +941,7 @@ __load_sequential_sectors (
     unsigned long b=0;
 
 
-    debug_print ("load_directory:\n");
+    debug_print ("__load_sequential_sectors:\n");
     
     for ( i=0; i < sectors; i++ ){
         my_read_hd_sector ( address + b, lba + i, 0, 0 );
@@ -1015,9 +1026,10 @@ void fs_load_rootdir (void)
 
 // #bubug
 // Only on rootdir.
+// Create the 'dir address' parameter.
 
-unsigned long fsRootDirGetFileSize ( unsigned char *file_name ){
-
+unsigned long fsRootDirGetFileSize ( unsigned char *file_name )
+{
     unsigned long FileSize=0;
     
     int i=0;
@@ -1048,12 +1060,24 @@ unsigned long fsRootDirGetFileSize ( unsigned char *file_name ){
 	// devemos chamar uma função que carregue um diretório no endereço passado 
 	//via argumento.
     //...
+
+
+    if ( (void*) file_name == NULL ){
+        printk("fsRootDirGetFileSize: [ERROR] file_name\n");
+        goto fail;
+    }
+
+    if (*file_name == 0){
+        printk("fsRootDirGetFileSize: [ERROR] *file_name\n");
+        goto fail;
+    }
+
 	
 	// Lock ??.
 	
 	//taskswitch_lock();
 	//scheduler_lock();	
-		
+
 		
 	//	
 	// ## ROOT ##
@@ -1095,10 +1119,8 @@ unsigned long fsRootDirGetFileSize ( unsigned char *file_name ){
     //
 
 
-    if ( (void *) root == NULL )
-    {
+    if ( (void *) root == NULL ){
         panic ("fsRootDirGetFileSize: [FAIL] No root file system!\n");
-
     }else{
 
         // Setores por cluster.

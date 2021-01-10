@@ -60,35 +60,35 @@ static unsigned char HeapBuffer[HEAP_BUFFER_SIZE];
  *     Estrutura para heap.
  *     Cada processo tem seu heap.
  *     Cada heap tem uma lista encadeada de blocos.  
- */  
+ */
 
-//typedef struct heap_d heap_descriptor_t;
 struct heap_d 
 {
     int Id;
+    
     int Used;
     int Magic;
-    //int ObjectType; //tipo de objeto ao qual pertence o heap.(process, ...)	
-	
-	unsigned long HeapStart;             
-	unsigned long HeapEnd;
-	unsigned long HeapPointer;            
-	unsigned long AvailableHeap; 	
-	
-	//struct mmblock_d *nextblock; //lista linkada de blocos. 
+
+    unsigned long HeapStart;
+    unsigned long HeapEnd;
+
+    unsigned long HeapPointer;
+    unsigned long AvailableHeap; 
+
+    //lista linkada de blocos. 
+    //struct mmblock_d *nextblock; 
 };
 struct heap_d *libcHeap;
-//heap_descriptor_t *libcHeap;
 //...
 
 
 //Heap list.
-//obs:. heapList[0] = The Kernel Heap !!!    
-unsigned long heapList[HEAP_COUNT_MAX];     
+//obs:. heapList[0] = The Kernel Heap !
+unsigned long heapList[HEAP_COUNT_MAX];
 
 
 //
-// Protótipos.
+// == prototypes ===============================================
 //
 
 int heapInit(void);

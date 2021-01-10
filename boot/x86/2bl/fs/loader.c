@@ -51,29 +51,28 @@ void updateProgressBar();
  *     Carrega o KERNEL.BIN na memória. 
  */
 
-    // Address.
-    // pa = 0x00100000.
-    // va = 0xC0000000.
+// Address.
+// pa = 0x00100000.
+// va = 0xC0000000.
  
-int load_kernel (){
-
+int load_kernel ()
+{
     int Status = -1;
 
-    unsigned long kernel_pa = KERNEL_ADDRESS;  
-    unsigned long kernel_va = KERNEL_VA;      
+    unsigned long kernel_pa = KERNEL_ADDRESS;
+    unsigned long kernel_va = KERNEL_VA;
 
     // Buffer.
     // 0x00100000.
-    
+
     unsigned char *kernel = (unsigned char *) KERNEL_ADDRESS;      
 
-
-	// Name.
+    // Name.
     char *kernel_name = "KERNEL.BIN";
 
-	//Message.
+    // Message.
 
-#ifdef BL_VERBOSE	
+#ifdef BL_VERBOSE
     printf ("load_kernel: Loading %s .. PA=%x | VA=%x \n", 
         kernel_name, kernel_pa, kernel_va );
 #endif

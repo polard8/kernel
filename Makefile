@@ -100,12 +100,29 @@ generate
 PHONY := build-system-files
 build-system-files: \
 /usr/local/gramado-build \
+land-boot \
 land-lib \
 land-os    
 
 
 /usr/local/gramado-build:
 	-sudo mkdir /usr/local/gramado-build
+
+land-boot:
+	#::boot
+	@echo "=================== "
+	@echo "Compiling boot/ ... "
+	# todo: Create a makefile inside  the boot/ folder.
+	$(Q) $(NASM)    boot/x86/0vhd/main.asm -I boot/x86/0vhd/ -o GRAMADO.VHD   
+	$(Q) $(MAKE) -C boot/x86/1bm/ 
+	$(Q) $(MAKE) -C boot/x86/2bl/ 
+	sudo cp boot/x86/bin/BM.BIN  base/
+	sudo cp boot/x86/bin/BM.BIN  base/BOOT
+	sudo cp boot/x86/bin/BM.BIN  base/SBIN
+	sudo cp boot/x86/bin/BL.BIN  base/
+	sudo cp boot/x86/bin/BL.BIN  base/BOOT
+	sudo cp boot/x86/bin/BL.BIN  base/SBIN
+
 
 land-lib:
 	#::rtl
@@ -124,19 +141,6 @@ land-lib:
 	$(Q) $(MAKE) -C landlib/lib/
 
 land-os:
-	#::boot
-	@echo "=================== "
-	@echo "Compiling boot/ ... "
-	# todo: Create a makefile inside  the boot/ folder.
-	$(Q) $(NASM)    boot/x86/0vhd/main.asm -I boot/x86/0vhd/ -o GRAMADO.VHD   
-	$(Q) $(MAKE) -C boot/x86/1bm/ 
-	$(Q) $(MAKE) -C boot/x86/2bl/ 
-	sudo cp boot/x86/bin/BM.BIN  base/
-	sudo cp boot/x86/bin/BM.BIN  base/BOOT
-	sudo cp boot/x86/bin/BM.BIN  base/SBIN
-	sudo cp boot/x86/bin/BL.BIN  base/
-	sudo cp boot/x86/bin/BL.BIN  base/BOOT
-	sudo cp boot/x86/bin/BL.BIN  base/SBIN
 
 	# KERNEL.BIN  - Creating the kernel image.
 	#::kernel

@@ -361,10 +361,7 @@ all-c:
 	# netdev
 	$(CC) -c 2io/dev/tty/netdev/e1000/e1000.c   $(KINCLUDE) $(CFLAGS) -o e1000.o
     
-    
-    
-    
-
+ 
     # Draw
     # Window Manager.
     # Window system ring 0 support.
