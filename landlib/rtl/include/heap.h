@@ -9,13 +9,18 @@
  *     Obs: O kernel poderá usar tanto o heap do processo quanto o heap 
  * do desktop ao qual o processo pertence.
  * 
- * Histórico:
- *     Versão 1.0, 2016 - Esse arquivo foi criado por Fred Nora.
+ * History:
+ *     2016 - Created by Fred Nora.
  */
- 
- 
+
+#ifndef __HEAP_H
+#define __HEAP_H  1
+
+
+
 //Contagem de heap.
 #define HEAP_COUNT_MAX  256 
+
 
 unsigned long HEAP_START; 
 unsigned long HEAP_END;
@@ -60,7 +65,7 @@ static unsigned char HeapBuffer[HEAP_BUFFER_SIZE];
 //typedef struct heap_d heap_descriptor_t;
 struct heap_d 
 {
-	int Id;
+    int Id;
     int Used;
     int Magic;
     //int ObjectType; //tipo de objeto ao qual pertence o heap.(process, ...)	
@@ -97,6 +102,10 @@ void heapSetLibcHeap( unsigned long HeapStart, unsigned long HeapSize);
 unsigned long heapAllocateMemory ( unsigned long size );
 
 unsigned long FreeHeap( unsigned long size );
+
+
+#endif    
+
 
 //
 // End.
