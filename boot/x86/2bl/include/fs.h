@@ -4,11 +4,15 @@
  * Descrição:
  *    Header do sistema de arquivos do Boot Loader.
  *
- * Version 1.0, 2015 - Created.
- * Version 1.0, Nov 2016 - Revision.
+ * 2015 - Created by Fred Nora.
  */
- 
- 
+
+
+#ifndef ___FS_H
+#define ___FS_H    1
+
+
+
 #define SECTOR_SIZE 512 
 //#define SECTOR_SIZE 4096  //Novo padrão. 
 
@@ -79,20 +83,18 @@ unsigned short file_cluster_list[1024];    //@todo: Tamanho de arquivos ?
  * @todo:    
  *     Na verdade essa é uma estrutura para um entrada na tabela de 
  * partições do MBR.
- *          
  */ 
-typedef struct partition_table_d partition_table_t;
+
 struct partition_table_d
 {
-	unsigned char boot_indicator;    //80h, active.
+    unsigned char boot_indicator;    //80h, active.
     unsigned char start_chs[3];
     unsigned char partition_type;
     unsigned char end_chs[3];
     unsigned long start_sector;
     unsigned long partition_size;    //In sectors.
 };
-partition_table_t partition;
-//partition_table_t partitionEntry;
+struct partition_table_d partition;
 //...
 
 
@@ -115,15 +117,19 @@ void fsInitFat();
 //
 
 
-unsigned long fatClustToSect( unsigned short cluster, 
-                              unsigned long spc, 
-							  unsigned long first_data_sector );
-void fatLoadCluster( unsigned long sector, 
-                     unsigned long address, 
-					 unsigned long spc );
-					 
-					 
-					 
+unsigned long 
+fatClustToSect ( 
+    unsigned short cluster, 
+    unsigned long spc, 
+    unsigned long first_data_sector );
+
+void 
+fatLoadCluster ( 
+    unsigned long sector, 
+    unsigned long address, 
+     unsigned long spc );
+
+ 
 //
 // Loading files.
 //
@@ -131,18 +137,16 @@ void fatLoadCluster( unsigned long sector,
 int load_kernel();
 
 
- 
-				
-				
+
 //
 // File support.
 //
- 
-int 
-fsLoadFile ( unsigned char *name, 
-			 unsigned long file_address, 
-			 unsigned long dir_address );
 
+int 
+fsLoadFile ( 
+    unsigned char *name, 
+    unsigned long file_address, 
+    unsigned long dir_address );
 
 unsigned long path_count (unsigned char *path);
 
@@ -151,15 +155,20 @@ int load_path ( unsigned char *path, unsigned long address );
 
 
 unsigned long fsSearchFile(unsigned char *name);
-unsigned long fsSaveFile( unsigned char *file_name, 
-                                   unsigned long file_size, 
-								   unsigned long file_address );
-								   
+
+unsigned long 
+fsSaveFile ( 
+    unsigned char *file_name, 
+    unsigned long file_size, 
+    unsigned long file_address );
+   
 unsigned long fsSearchFileName( unsigned char *name);
-void fsSaveFileName( unsigned char *name, 
-                     unsigned long id, 
-				     unsigned long eid, 
-				     unsigned long initial_cluster);
+void 
+fsSaveFileName ( 
+    unsigned char *name, 
+    unsigned long id, 
+    unsigned long eid, 
+    unsigned long initial_cluster);
 
 unsigned long fsCreateFile( char *name, unsigned long id);
 
@@ -216,11 +225,15 @@ unsigned long fs_check_cluster(unsigned long id);
 void fs_show_entry(unsigned long id, unsigned long eid);
 unsigned long fs_get_entry_status(unsigned long id, unsigned long eid);
 void fs_set_entry_status(unsigned long id, unsigned long eid, unsigned long status);
-void fs_create_entry( char *name, 
-                      unsigned long id, 
-					  unsigned long eid, 
-					  unsigned long cluster, 
-					  unsigned long size );
+
+void 
+fs_create_entry ( 
+    char *name, 
+    unsigned long id, 
+    unsigned long eid, 
+    unsigned long cluster, 
+    unsigned long size );
+
 void fs_delete_entry(unsigned long id, unsigned long eid);
 
 //
@@ -247,8 +260,12 @@ void fs_save_structure();
 void fs_format();
 
 
+#endif    
+
+
 //
-//fim.
+// End.
 //
+
 
 

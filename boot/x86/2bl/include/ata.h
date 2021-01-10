@@ -1,11 +1,22 @@
 /*
- * File: disk1.h
+ * File: ata.h
  *
  * Essas rotinas fazem parte do projeto Sirius e são usadas aqui
  * para suporte à IDE/AHCI.
  *
  * 2018 - Created by Nelson Cole. 
  */
+
+/*
+ * credits:
+ * Khole Operating System
+ * ata/ata.h 
+ * Copyright (C) 2017,2018 Nelson Cole <nelsoncole72@gmail.com>
+ */
+
+
+#ifndef __ATA_H__
+#define __ATA_H__
 
 
 // nelson cole
@@ -25,16 +36,6 @@ int ATAFlag;
 #define FORCEPIO 1234
 
 
-/*
- * Khole Operating System
- * ata/ata.h
- * 
- * Copyright (C) 2017,2018 Nelson Cole <nelsoncole72@gmail.com>
- */
- 
- 
-#ifndef __ATA_H__
-#define __ATA_H__
 
 
 /*

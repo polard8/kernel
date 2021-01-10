@@ -6,6 +6,11 @@
  *     Padrão próprio e C99.
  */
 
+
+#ifndef __TYPES_H
+#define __TYPES_H    1
+
+
 #define TRUE 1
 #define FALSE 0
 
@@ -22,15 +27,16 @@ typedef void VOID;
 /*
  *  Basics
  */
-typedef char CHAR;
-typedef short SHORT;
-typedef int INT;        //32bit
-typedef long  LONG;     //32bit
+typedef char   CHAR;
+typedef short  SHORT;
+typedef int    INT;      //32bit
+typedef long   LONG;     //32bit
+
 
 /*
  *  Unsigned Basics
  */
-typedef unsigned char UCHAR;
+typedef unsigned char  UCHAR;
 typedef unsigned short USHORT;
 typedef unsigned int   UINT;      //32bit
 typedef unsigned long  ULONG;     //32bit
@@ -87,8 +93,10 @@ typedef  unsigned int        __uint32_t;
 
 
 
+#endif    
+
 
 //
-//End.
+// End.
 //
 

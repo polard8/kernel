@@ -1,5 +1,7 @@
 /*
  * File: bootloader.h 
+ * 
+ *     #todo: Change the naem to 'bl.h'
  *
  * Descrição:
  *     Header principal do Boot Loader de 32 bits, BL.BIN.

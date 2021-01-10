@@ -10,11 +10,14 @@
  * Pelo jeito estamos usando o padrão americano. Mas é possível adaptar para 
  * ABNT2 sem muitos problemas. @todo: Podemos copiar do driver do núcleo.
  *
- * Histórico:
- *     Versão: 1.0, 2015 - Adaptado de versões antigas.
- *     Versão: 1.0, Nov 2016 - Revisão.
- *     ... 
+ * History:
+ *     2015 - Ported from older versions.
  */
+
+
+#ifndef __KEYBOARD_H
+#define __KEYBOARD_H    1
+
 
 //
 // Buffer.
@@ -242,6 +245,9 @@ char keyboard_wait_key(void);
 
 //Keyboard handler.
 void keyboardHandler();
+
+#endif    
+
 
 //
 // End.

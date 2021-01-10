@@ -1,13 +1,15 @@
 /*
  * File: stddef.h 
  *
- * Descrição:
  *     Lib C. - C99.
  *
- * Autor: Frederico Martins Nora - (frednora)
- *
- * Versão 1.0, 2015.
+ * 2015 - Created by Fred Nora.
  */
+
+
+#ifndef __STDDEF_H
+#define __STDDEF_H  1
+
 
 /* 
 Macros:
@@ -55,6 +57,10 @@ typedef unsigned int size_t;
  */
 #define offset_of(tp, member) (((char*) &((tp*)0)->member) - (char*)0)
 //#define offsetof(s,m)	(size_t)&(((s *)0)->m) 
+
+
+#endif    
+
 
 //
 // End.

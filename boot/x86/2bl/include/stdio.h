@@ -5,7 +5,11 @@
  *     Parte da lib C, C99.
  */
 
- 
+
+#ifndef __STDIO_H
+#define __STDIO_H    1
+
+
 //
 // Defines.
 // 
@@ -31,7 +35,7 @@
 
 
 //
-// Protótipos.
+// == prototypes ============================================
 //
 
 
@@ -60,9 +64,11 @@ void my_buffer_horizontal_line( unsigned long  x1,unsigned long  y, unsigned lon
 void my_buffer_char_blt( unsigned long x, unsigned long y, unsigned long color, unsigned long c);
 void carrega_bitmap_16x16( unsigned long ax, unsigned long bx, unsigned long cx, unsigned long dx );
 
+void clear_backbuffer(void);
 
-void
-clear_backbuffer(void);
+
+#endif    
+
 
 //
 // End.
