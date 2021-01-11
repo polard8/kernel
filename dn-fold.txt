@@ -2,10 +2,13 @@
 	folders:
 
 	admin/ scripts and design notes.
+
 	base/ rootdir.
-	boot/ The boot loader for Land OS.
+
 	gramado/ Gramado Operating system.
-	landlib/ User API.
-	landos/ Land OS.
+
+	landboot/ The boot loader for Land OS.
+	landlib/  User API.
+	landos/   Land OS.
 
  

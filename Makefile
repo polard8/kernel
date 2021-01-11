@@ -111,17 +111,17 @@ land-os
 land-boot:
 	#::boot
 	@echo "=================== "
-	@echo "Compiling boot/ ... "
+	@echo "Compiling landboot/ ... "
 	# todo: Create a makefile inside  the boot/ folder.
-	$(Q) $(NASM)    boot/x86/0vhd/main.asm -I boot/x86/0vhd/ -o GRAMADO.VHD   
-	$(Q) $(MAKE) -C boot/x86/1bm/ 
-	$(Q) $(MAKE) -C boot/x86/2bl/ 
-	sudo cp boot/x86/bin/BM.BIN  base/
-	sudo cp boot/x86/bin/BM.BIN  base/BOOT
-	sudo cp boot/x86/bin/BM.BIN  base/SBIN
-	sudo cp boot/x86/bin/BL.BIN  base/
-	sudo cp boot/x86/bin/BL.BIN  base/BOOT
-	sudo cp boot/x86/bin/BL.BIN  base/SBIN
+	$(Q) $(NASM)    landboot/x86/0vhd/main.asm -I landboot/x86/0vhd/ -o GRAMADO.VHD   
+	$(Q) $(MAKE) -C landboot/x86/1bm/ 
+	$(Q) $(MAKE) -C landboot/x86/2bl/ 
+	sudo cp landboot/x86/bin/BM.BIN  base/
+	sudo cp landboot/x86/bin/BM.BIN  base/BOOT
+	sudo cp landboot/x86/bin/BM.BIN  base/SBIN
+	sudo cp landboot/x86/bin/BL.BIN  base/
+	sudo cp landboot/x86/bin/BL.BIN  base/BOOT
+	sudo cp landboot/x86/bin/BL.BIN  base/SBIN
 
 
 land-lib:
@@ -336,10 +336,8 @@ clean-system-files:
 	@echo "==================="
 	@echo "Cleaning all system binaries ..."
 
-	-rm -rf boot/x86/bin/*.BIN
-
+	-rm -rf landboot/x86/bin/*.BIN
 	-rm -rf landlib/fonts/bin/*.FON
-
 	-rm -rf landos/kernel/KERNEL.BIN
 	-rm -rf landos/init/*.BIN
 
