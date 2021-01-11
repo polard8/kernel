@@ -15,9 +15,19 @@
 
 
 
-
 int search_in_root ( char *filename )
 {
+
+    if ( (void*) filename == NULL ){
+        debug_print ("search_in_root: [ERROR] filename\n");
+        return -1;
+    }
+
+    if ( *filename == 0 ){
+        debug_print ("search_in_root: [ERROR] *filename\n");
+        return -1;
+    }
+
     return (int) KiSearchFile ( filename, VOLUME1_ROOTDIR_ADDRESS );
 }
 
@@ -73,11 +83,19 @@ KiSearchFile (
     char *dir = (char *) address;
 
 
-    // Invalid first char.
+    if ( (void*) file_name == NULL ){
+        printf ("KiSearchFile: [ERROR] file_name\n");
+        goto fail;
+    }
 
-    if ( file_name[0] == '/' || file_name[0] == 0 )
-    {
-        printf ("KiSearchFile: Invalid first char\n");
+
+    if ( *file_name == 0 ){
+        printf ("KiSearchFile: [ERROR] *file_name\n");
+        goto fail;
+    }
+
+    if ( *file_name == '/' ){
+        printf ("KiSearchFile: [FIXME] absolute pathname not supported yet.\n");
         goto fail;
     }
 
@@ -129,7 +147,6 @@ KiSearchFile (
     };
 
 
-
 	// Fail!
 
 fail:
@@ -152,27 +169,39 @@ fail:
  *    +...
  */
 
+// #todo
+// Include 'dir address' as parameter.
+
 //int fsSearchFile( const char *name ) 
-
-int fsSearchFile (unsigned char *file_name){
-
+int fsSearchFile (unsigned char *file_name)
+{
     int Status = 1;
     unsigned long i = 0;
     unsigned long j = 0;                  //Deslocamento do rootdir. 
     unsigned long NumberOfEntries = 512;  //Número máximo de entradas em fat16.
-	//...
+    // ...
 
     char NameX[13];
     char *dir = (char *) VOLUME1_ROOTDIR_ADDRESS;    //rootDir->address;
 
 
 
-    //#obs
-    // Não procura um nome começado com '/'
-    if ( file_name[0] == '/' || file_name[0] == 0 )
-    {
+    if ( (void*) file_name == NULL ){
+        printf ("fsSearchFile: [ERROR] file_name\n");
         goto fail;
     }
+
+
+    if ( *file_name == 0 ){
+        printf ("fsSearchFile: [ERROR] *file_name\n");
+        goto fail;
+    }
+
+    if ( *file_name == '/' ){
+        printf ("fsSearchFile: [FIXME] absolute pathname not supported yet.\n");
+        goto fail;
+    }
+
 
  
     //Obs:
@@ -195,13 +224,14 @@ int fsSearchFile (unsigned char *file_name){
         //pegar o tamanho da string para determinar o quanto comparar.
 
 
-		// Entrada normal. Diferente de zero.
+        // Entrada normal. Diferente de zero.
+        // Copia o nome e termina incluindo o char 0.
+
         if ( dir[j] != 0 )
         {
-			// Copia o nome e termina incluindo o char 0.
-			memcpy ( NameX, &dir[j], 11 );
-			NameX[11] = 0;
-			
+            memcpy ( NameX, &dir[j], 11 );
+            NameX[11] = 0;
+
             Status = (int) strncmp ( file_name, NameX, 11 );
 
             if (Status == 0){ goto done; }
@@ -210,7 +240,7 @@ int fsSearchFile (unsigned char *file_name){
         };  
 
 		//Próxima entrada. Repete 512 vezes.
-        j += 0x20;  
+        j += 0x20; 
     };
 
 
@@ -294,9 +324,20 @@ int search_path_in_the_inode_table( const char *path )
     size_t PathSize = 0;
     int Status = -1;
     
-    
+
     debug_print("search_path_in_the_inode_table: [FIXME] Not tested yet\n");
-    
+
+
+    if ( (void*) path == NULL ){
+        debug_print("search_path_in_the_inode_table: [ERROR] path\n");
+        return -1;
+    }
+
+    if (*path == 0){
+        debug_print("search_path_in_the_inode_table: [ERROR] *path\n");
+        return -1;
+    }
+ 
     PathSize = (size_t) strlen(path);
     
     for (i=0; i<32; i++)
@@ -335,8 +376,8 @@ int search_path_in_the_inode_table( const char *path )
 // empty uninitialized.
 // Search in file_cluster_list[]
 
-unsigned short fs_find_n_empty_entries ( int n ){
-
+unsigned short fs_find_n_empty_entries ( int n )
+{
     int i = 0;
     int l = 0;
     unsigned short empty = 0;
@@ -386,9 +427,18 @@ fail:
 
 int fsSearchFileName (unsigned char *name)
 {
+    if ( (void*) name == NULL ){
+        debug_print("fsSearchFileName: [ERROR] name\n");
+        return -1;
+    }
+    
+    if ( *name == 0 ){
+        debug_print("fsSearchFileName: [ERROR] *name\n");
+        return -1;
+    }
+
     return (int) fsSearchFile (name);
 }
-
 
 
 //

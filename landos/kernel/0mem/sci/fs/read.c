@@ -401,9 +401,10 @@ fsLoadFile (
 
     int Spc=0;
 
+
     // #debug:
     debug_print ("fsLoadFile:\n");
-    printf      ("fsLoadFile:\n");
+    //printf      ("fsLoadFile:\n");
 
     // Updating fat address and dir address.
 
@@ -471,10 +472,8 @@ fsLoadFile (
     //    máximo de entradas.
     // ...
 
-    if ( (void *) root == NULL )
-    {
+    if ( (void *) root == NULL ){
         panic ("fsLoadFile: No root file system.\n");
-
     }else{
 
         // #todo
@@ -509,34 +508,21 @@ fsLoadFile (
 	// outros ...
 	// ATENÇÃO:
 	// Na verdade a variável 'root' é do tipo short.
-	 
 
 
-    //
     // file name
-    //
-    
-    // #todo
-    // Ponteiro inválido para o nome do arquivo.
-    // if ( (void *) file_name == NULL ){
-    //    return 1;
-    // }
-    
-    
-    // Se o path começa com / então é absoluto.
-    // Devemos começar pelo diretório raiz.
-    //if ( *file_name == '/' )
-    //{
-        //Absolute = 1;
-        //file_name++;
+
+    if ( (void *) file_name == NULL ){
+        printf ("fsLoadFile: [FAIL] file_name\n");
+        goto fail;
+    }
+
+    if ( *file_name == 0 ){
+        printf ("fsLoadFile: [FAIL] *file_name\n");
+        goto fail;
+    }
 
 
-
-    //while (*file_name == '/')
-        //file_name++;
-        
-
-    
     //#debug
     //vamos mostrar a string.
     //printf ("fsLoadFile: file_name={%s}\n", file_name);
@@ -833,6 +819,11 @@ fsLoadFile2 (
 
     if ( (void*) file_name == NULL ){
         debug_print("fsLoadFile2: file_name\n"); 
+        return 0;
+    }
+
+    if (*file_name == 0){
+        debug_print("fsLoadFile2: *file_name\n"); 
         return 0;
     }
 
@@ -1174,7 +1165,7 @@ unsigned long fsRootDirGetFileSize ( unsigned char *file_name )
     //vamos ajustar.
     if ( szFileName > 11 )
     {
-        printf ("fsGetFileSize: [FIXME] name size fail %d\n",
+        printf ("fsRootDirGetFileSize: [FIXME] name size fail %d\n",
             szFileName );   
         szFileName = 11;
     }
@@ -1209,12 +1200,15 @@ unsigned long fsRootDirGetFileSize ( unsigned char *file_name )
 
     // Not found!
 
-    printf ("fsGetFileSize: %s not found\n", file_name );
-    printf ("fsGetFileSize: %s not found\n", NameX );
-
 fail:
 
-    printf ("fsGetFileSize: file={%s}\n", file_name );
+    if ( (void*) file_name != NULL ){
+        printf ("fsRootDirGetFileSize: [FAIL] %s not found\n", file_name );
+     }
+
+    //if ( (void*) NameX != NULL )
+        // printf ("fsRootDirGetFileSize: %s not found\n", NameX );
+
     refresh_screen ();
     return (unsigned long) 0;
 
@@ -1241,9 +1235,9 @@ found:
 	//refresh_screen();
 	//while(1){ asm("hlt"); }
 
-    //#debug
-    printf ("fsGetFileSize: FileSize=%d \n" , FileSize );
-    refresh_screen ();
+    // #debug
+    // printf ("fsRootDirGetFileSize: FileSize=%d \n" , FileSize );
+    // refresh_screen ();
 
     return (unsigned long) FileSize;
 }

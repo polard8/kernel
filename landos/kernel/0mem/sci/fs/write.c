@@ -28,8 +28,8 @@
  *     Credits: Luiz Felipe 
  */
 
-void write_fntos (char *name){
-
+void write_fntos (char *name)
+{
     int i=0; 
     int ns = 0;
 
@@ -40,6 +40,11 @@ void write_fntos (char *name){
     ext[2] = 0;
     ext[3] = 0;
 
+
+    // #todo
+    // fail
+    //if ( (void*) name == NULL )
+    //    return;
 
 
     //Transforma em maiúscula enquanto não achar um ponto.
@@ -151,12 +156,10 @@ void write_lba ( unsigned long address, unsigned long lba ){
 	// #todo: 
 	// Check lba limits.
 
-    if (address == 0)
-    {
+    if (address == 0){
         debug_print ("write_lba: Limits\n");
         goto fail;
     }
-
 
     // See: volume.h
     switch (g_currentvolume_fatbits)
@@ -270,7 +273,7 @@ fsSaveFile (
 
     // #debug:
     debug_print ("fsSaveFile:\n");
-    printf      ("fsSaveFile:\n");
+    //printf      ("fsSaveFile:\n");
 
 
     // Updating fat address and dir address.
@@ -290,16 +293,24 @@ fsSaveFile (
     // #debug
     // We only support one address for now.
     if ( fat_address != VOLUME1_FAT_ADDRESS ){
-        panic("fsSaveFile: [FIXME] Sorry. We only support ONE fat address for now!\n");
+        panic("fsSaveFile: [FIXME] We only support ONE fat address for now!\n");
     }
 
 
     if ( (void *) file_name == NULL )
     {
-        debug_print ("fsSaveFile: [FIXME] No filename\n");
-        printf      ("fsSaveFile: [FIXME] No filename\n"); 
+        debug_print ("fsSaveFile: [ERROR] file_name\n");
+        printf      ("fsSaveFile: [ERROR] file_name\n"); 
         goto fail;
     }
+
+    if ( *file_name == 0 )
+    {
+        debug_print ("fsSaveFile: [ERROR] *file_name\n");
+        printf      ("fsSaveFile: [ERROR] *file_name\n"); 
+        goto fail;
+    }
+
 
     // #bugbug
     // Esse endereço eh valido ?
@@ -726,7 +737,8 @@ fail:
  *     @todo: Identificar parâmetros do sistema de arquivos atual. 
  */
 
-int fs_save_rootdir (void){
+int fs_save_rootdir (void)
+{
 
     int r=0;
     int roff=0;
@@ -763,22 +775,24 @@ int fs_save_rootdir (void){
         // #bugbug: 
         // Não podemos determinar os valores. Precisamos de estruturas.
 
-        my_write_hd_sector ( (unsigned long) ( VOLUME1_ROOTDIR_ADDRESS + roff), 
-            (unsigned long) ( VOLUME1_ROOTDIR_LBA + rlbaoff ), 0, 0  );
+        my_write_hd_sector ( 
+            (unsigned long) ( VOLUME1_ROOTDIR_ADDRESS + roff), 
+            (unsigned long) ( VOLUME1_ROOTDIR_LBA     + rlbaoff ), 
+            0, 
+            0 );
 
-        roff = (roff + 0x200);
+        roff    = (roff    + 0x200);
         rlbaoff = (rlbaoff + 1);
         
         // ?? esperar
     };
 
-
     return 0;
 }
 
 
-int fs_save_fat (void){
-
+int fs_save_fat (void)
+{
     int f=0;
     int off=0;
     int lbaoff=0;
@@ -809,10 +823,13 @@ int fs_save_fat (void){
         disk_ata_wait_irq ();
 
 
-        my_write_hd_sector ( (unsigned long) ( VOLUME1_FAT_ADDRESS + off), 
-            (unsigned long) ( VOLUME1_FAT_LBA + lbaoff ), 0, 0  );
+        my_write_hd_sector ( 
+            (unsigned long) ( VOLUME1_FAT_ADDRESS + off), 
+            (unsigned long) ( VOLUME1_FAT_LBA     + lbaoff ), 
+            0, 
+            0 );
 
-        off = (off + 0x200);
+        off    = (off    + 0x200);
         lbaoff = (lbaoff + 1);
         
         // esperar ??
@@ -821,7 +838,7 @@ int fs_save_fat (void){
 
     // #debug
     debug_print ("fs_save_fat: Done\n");
-    printf ("fs_save_fat: done\n"); 
+    printf      ("fs_save_fat: Done\n"); 
     refresh_screen ();
 
     return 0;
@@ -870,13 +887,27 @@ fs_save_file (
     char flag )  
 {
 
-    debug_print ("fs_save_file: [Testing]\n");
-    return (int) fsSaveFile ( VOLUME1_FAT_ADDRESS, VOLUME1_ROOTDIR_ADDRESS, FAT16_ROOT_ENTRIES, 
-                    (char *) file_name,    
-                    (unsigned long) file_size,       
-                    (unsigned long) size_in_bytes,  
-                    (char *) file_address,          
-                    (char) flag );                  
+    debug_print ("fs_save_file: [TEST]\n");
+
+    if( (void*) file_name == NULL ){
+        debug_print ("fs_save_file: [ERROR] file_name\n");
+        return -1;
+    }
+
+    if(*file_name == 0){
+        debug_print ("fs_save_file: [ERROR] *file_name\n");
+        return -1;
+    }
+
+    return (int) fsSaveFile ( 
+                     VOLUME1_FAT_ADDRESS, 
+                     VOLUME1_ROOTDIR_ADDRESS, 
+                     FAT16_ROOT_ENTRIES, 
+                     (char *)        file_name,    
+                     (unsigned long) file_size,       
+                     (unsigned long) size_in_bytes,  
+                     (char *)        file_address,          
+                     (char)          flag );                  
 }
 
 

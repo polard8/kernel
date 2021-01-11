@@ -75,8 +75,7 @@ unsigned long cwArg12;     // WindowColor
 // ====
 //
 
-void *
-gde_extra_services ( 
+void *gde_extra_services ( 
     unsigned long number, 
     unsigned long arg2, 
     unsigned long arg3, 
@@ -84,8 +83,8 @@ gde_extra_services (
 
 
 // Services abouve 256.
-void *
-gde_extra_services ( 
+// Helper function called by sci0().
+void *gde_extra_services ( 
     unsigned long number, 
     unsigned long arg2, 
     unsigned long arg3, 
@@ -1246,9 +1245,8 @@ void *sci0 (
     }
 
 
-    // 0~256
-    // Normal services.
-
+    //   0~255  - Basic services.
+    // 256~xxxx - Extra services.
 
     switch (number){
 
@@ -1633,6 +1631,7 @@ void *sci0 (
 
         // 63 id
         case SYS_GETFOCUS: 
+            //#todo: use method.
             return (void *) window_with_focus;  
             break;
 

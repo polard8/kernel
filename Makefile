@@ -1,8 +1,8 @@
 # License: BSD License
 # Product configuration
 # See: 0config/version.h
-PRODUCT_NAME  = Gramado Land
-EDITION_NAME  = Gramado Land
+PRODUCT_NAME  = Gramado
+EDITION_NAME  = Land
 VERSION_MAJOR = 1
 VERSION_MINOR = 0
 VERSION_BUILD = 208
@@ -513,7 +513,7 @@ generate:
 	touch VERSION.TXT
 	# Save information.
 	@echo $(PRODUCT_NAME)  > PRODUCT.TXT
-	@echo $(EDITION_NAME)  > EDITION.TXT
+	@echo $(PRODUCT_NAME) $(VERSION_MAJOR).$(VERSION_MINOR) $(EDITION_NAME)  > EDITION.TXT
 	@echo $(VERSION_MAJOR) > MAJOR.TXT
 	@echo $(VERSION_MINOR) > MINOR.TXT
 	@echo $(VERSION_BUILD) > BUILD.TXT

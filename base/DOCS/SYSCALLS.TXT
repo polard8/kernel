@@ -1,375 +1,265 @@
+	sci - system call inteface.
+ 
+	The goal here is to describe the syscalls used by
+	the software interrupts.
+	See the functions sci0(), sci1() and sci2
+	on kernel/0mem/sci/sci.c
 
-//
-//  int 0x80   (gde_services)
-//
-
-
-	#BUGBUG
-
-	THIS IS KINDA WRONG!!
+	======================================
+	>> THIS IS KINDA WRONG YET !
 	WE NEED TO UPDATE THIS THING.
-
 	WE ARE BUILDING INTERFACES BASED IN THE PREFIX ORGANIZATION..
 	JUST LIKE: sys_ rtl_ ...
+	=====================================
 
 
-          col 10                        col 40
-[Number]  [Entry point]                 [Implementation (path)]
-  
-  0       Nothing                       Nothing
-  
-  1       my_read_hd_sector             sysio/kdrivers/ide/hdd.c
-  2       my_write_hd_sector            sysio/kdrivers/ide/hdd.c
+==============================================
+sci0():
 
-  3       sys_read_file                 sysio/kservers/fs/fs.c
-  4       sys_write_file                sysio/kservers/fs/fs.c
+	Describing the calls for this interrupt.
+	This interrupt enter in the base kernel
+	with the data segments pointing to ring3.
+	This is goot to access the user buffer,
+	but it is not goot to access the kernel structures.
 
-  5       vsync                         sysio/kdrivers/x/video/vsync.c
-
-  6       backbuffer_putpixel           sysio/kservers/kgws/kgws/comp/pixel.c
-  7       my_buffer_char_blt            sysio/kservers/kgws/kgws/comp/char.c
-  8       my_buffer_horizontal_line     sysio/kservers/kgws/kgws/comp/line.c
-  9       drawDataRectangle             sysio/kservers/kgws/kgws/comp/rect.c
-  
-  10      Nothing 
-  
-  11      refresh_screen
-
-
-  rede: 12,13,14,15
-  
-  
-  unix  
-  16      sys_open                      sci/sys/sys.c
-  17      sys_close                     sci/sys/sys.c
-  18      sys_read                      sci/sys/sys.c
-  19      sys_write                     sci/sys/sys.c
-  
+Number | Function | File
   
 
-  buffers: 20, 21, 22, 23
+0    Nothing                  Nothing
+1    my_read_hd_sector             sysio/kdrivers/ide/hdd.c
+2    my_write_hd_sector            sysio/kdrivers/ide/hdd.c
+3    sys_read_file                 sysio/kservers/fs/fs.c
+4    sys_write_file                sysio/kservers/fs/fs.c
+5    sys_vsync                     sysio/kdrivers/x/video/vsync.c
+6    backbuffer_putpixel           sysio/kservers/kgws/kgws/comp/pixel.c
+7    my_buffer_char_blt            sysio/kservers/kgws/kgws/comp/char.c
+8    my_buffer_horizontal_line     sysio/kservers/kgws/kgws/comp/line.c
+9    drawDataRectangle             sysio/kservers/kgws/kgws/comp/rect.c
+
+11    refresh_screen
+16    sys_open                      sci/sys/sys.c
+17    sys_close                     sci/sys/sys.c
+18    sys_read                      sci/sys/sys.c
+19    sys_write                     sci/sys/sys.c
+
+24    show_window_rect              sysio/kservers/kgwm/wm.c
+
+34    set_up_cursor                 syssm/execve/sm/system.c
+35    __do_35                       sysio/kdrivers/x/i8042/ps2kbd.c
+37    system_procedure              sysio/kdrivers/x/xproc.c
+38    __gethostname       syslib/libcore/unistd.c
+39    __sethostname       syslib/libcore/unistd.c
+
+40    __getusername       sysio/kservers/kgws/user/userenv.c
+41    __setusername       sysio/kservers/kgws/user/userenv.c
+43    sys_create_empty_file         fs/fs.c 
+44    sys_create_empty_directory    fs/fs.c
+46    get_processor_feature
+49    sys_show_system_info
+
+50    resize_window
+51    redraw_window
+52    replace_window
+53    MaximizeWindow
+54    MinimizeWindow
+55    windowGetForegroundWindow
+56    windowSetForegroundWindow
+57    RegisterWindow
+58    CloseWindow
+
+60    set_active_window
+61    get_active_window
+62    SetFocus
+64    KillFocus
+65    console_putchar               tty/console ?
+
+71    sys_fork_process
+72    sys_create_thread             sci/sys/sys.c
+73    sys_create_process            sci/sys/sys.c
+  
+80    show_currentprocess_info 
+81    sys_getppid                   sci/sys/sys.c
+82    show_process_information
+83    do_waitpid
+85    sys_getpid                    sci/sys/sys.c
+87    Down
+88    processTesting
+89    Up
+
+90    sys_dead_thread_collector     sci/sys/sys.c
+  
+110    sys_reboot                    sci/sys/sys.c
+111    __do_111
+112    ipc_send_message_to_process
+113    windowUpdateWindow
+114    ipc_send_message_to_thread (current)
+117    ipc_send_message_to_thread (PID)
+118    serviceCreateWindow
+119    windowSelectColorScheme
+  
+125    system_procedure
+126    portsx86_IN
+127    portsx86_OUT
+129    systemLinkDriver
+
+130    draw_text
+137    thread_getchar   
+138    keyboardGetKeyState
+139    get_scancode
+
+140    set_current_keyboard_responder ??
+141    get_current_keyboard_responder
+142    set_current_mouse_responder
+143    get_current_mouse_responder
+144    getClientAreaRect
+145    setClientAreaRect
+146    Get Screen window (root)
+147    Get Main window
+148    grid
+149    MainMenu
+
+152     get current uid
+154     get current gid
+156     ShowUserInfo
+157     get user session id
+158     get window station id
+159     get desktop id
+160     create_socket
+161     getSocketIP
+162     getSocketPort
+163     update_socket
+  
+170     fs_print_process_pwd
+171     get current volume
+172     set current volume  
+173     fsListFiles
+174     KiSearchFile
+175     'cd' command support
+176     fs_pathname_backup
+177     fsList
+178     fsGetFileSize
+179     do_gexecve
+  
+184     GetProcessHeapStart
+  
+199     gc
+
+200     signalSend
+  
+211     (Get current terminal)
+212     (Set current terminal)
+215     systemGetTerminalWindow
+216     systemSetTerminalWindow
+  
+222     create_timer
+223     get_systime_info
+224     get_time
+225     get_date
+226     spinlock stuff
+227     spinlock stuff  
+228     spinlock stuff  
+  
+236     (Get current tty)
  
+240     get_cursor_x
+241     get_cursor_y
+244     timerEnableTextCursor
+245     timerDisableTextCursor
+246     __openat
+247     pipe
+248     do_execve
+249     ?
+  
+250     syssm_get_system_metrics      syssm/syssm.c
+251     sys_show_system_info          sci/sys/sys.c
+252     sys_show_system_info          sci/sys/sys.c
+253     sys_show_system_info          sci/sys/sys.c
+254     sys_show_system_info          sci/sys/sys.c
+255     sys_show_system_info          sci/sys/sys.c
+
+Right here we start to use a helper function.
+  
+260    Deprecated. 
+261    Deprecated.
+262     console_read
+263     console_write
+264     ??
+265     yield
+266     process_get_tty
+267     pty_link_by_pid
+268     tty_read_ttyList              kdrivers/tty/tty.c
+269     tty_write_ttyList             kdrivers/tty/tty.c
+
+270     vt_create
+271     vt_set_child
+272     tty_read                      kdrivers/tty/tty.c
+273     tty_write                     kdrivers/tty/tty.c
+277     console_get_current_virtual_console
+278     console_set_current_virtual_console 
+279     windowUpdateWindow
+  
+289     sys_serial_debug_printk       sci/sys/sys.c
+  
+300     UpdateStatusBar
+  
+518     redraw_screen
+  
+600     sys_dup
+601     sys_dup2
+602     sys_dup3
+  
+770     systemShowDevicesInfo
+  
+801     __gethostname
+801     __sethostname
+803     __getusername
+804     __setusername
+808     __ptsname ?
+809     __ptsname ?
+
+880     __GetProcessStats
+881     __GetThreadStats
+882     getprocessname
+883     getthreadname
+  
+900     do_clone_execute_process
+901     fork again ?
  
- 
-  24      show_window_rect              sysio/kservers/kgwm/wm.c
+967     network_procedure
+  
+4002    sys_fopen
+4003    sys_fopen
+  
+7000    sys_socket                    syslib/libcore/socket.c
+7001    sys_connect                   syslib/libcore/socket.c
+7002    sys_accept                    syslib/libcore/socket.c
+7003    sys_bind                      syslib/libcore/socket.c
+7004    sys_listen                    syslib/libcore/socket.c
+  
+8000    sys_ioctl                     sci/sys/sys.c
+8001    sys_fcntl                     sci/sys/sys.c
+  
+9700    raise_window
+  
+9800    ps2_mouse_dialog
+  
+9900    button_down
+9901    button_up
+  
+9999    system_get_pid
+  
+  
+=====================================================
+sci1():
 
-  Nothing: 25 ~ 33
+	todo: describe the call for this interrupt.
 
-  34      set_up_cursor                 syssm/execve/sm/system.c
-  
-  35      __do_35                       sysio/kdrivers/x/i8042/ps2kbd.c
-  
-  36      system_dispatch_to_procedure  syssm/execve/sm/system.c
-  
-  37      system_procedure              sysio/kdrivers/x/xproc.c
-  
-  38      __gethostname       syslib/libcore/unistd.c
-  39      __sethostname       syslib/libcore/unistd.c
-  
-  40      __getusername       sysio/kservers/kgws/user/userenv.c
-  41      __setusername       sysio/kservers/kgws/user/userenv.c
+====================================================
+sci2():
+	todo: describe the calls for this interrupt.
 
-  
-  42      Deprecated!
-  
-  43      sys_create_empty_file         fs/fs.c 
-  44      sys_create_empty_directory    fs/fs.c
-  
-  
-  Nothing:  45 ~ 49
-  
-  
-  50      resize_window
-  51      redraw_window
-  52      replace_window
-  53      MaximizeWindow
-  54      MinimizeWindow
-  55      windowGetForegroundWindow
-  56      windowSetForegroundWindow
-  57      RegisterWindow
-  58      CloseWindow
-  59      Nothing
-  60      set_active_window
-  61      get_active_window
-  62      SetFocus
-  63      window_with_focus
-  64      KillFocus
-  65      console_putchar               tty/console ?
-  66      local ?
-  67      Nothing
-  68      Nothing
-  69      Used for tests.
-  70      create_request (exit)
-  71      fork (suspended for now)
-
-
-  72      sys_create_thread             sci/sys/sys.c
-  73      sys_create_process            sci/sys/sys.c
-  
-  
-  Nothing: 74 ~79
-  
-  80      show_currentprocess_info 
-  81      sys_getppid                   sci/sys/sys.c
-  82      (Set PPID)
-  83      do_waitpid
-  84      Nothing
-  85      sys_getpid                    sci/sys/sys.c
-  86      (Set PID)  
-  87      Down
-  88      processTesting
-  89      Up
-  90      sys_dead_thread_collector     sci/sys/sys.c
-  
-  Nothing: 91 92 93
-  
-  94      SelectForExecution
-  
-  Nothing:  95 ~ 99
-  
-  //#todo: Delete 99 100 101 102 (msg)
-  
-  
-  103      (receive message ?)
-  104      (send message ?)
-  
-  Nothing 105 ~ 109
-  
-  110     sys_reboot                    sci/sys/sys.c
-  111     __do_111
-  112     pty_send_message_to_process
-  113     sys_windowUpdateWindow
-  114     pty_send_message_to_thread (current)
-  115     (Local)
-  116     (Local)  
-  117     pty_send_message_to_thread (PID)
-  118     serviceCreateWindow
-  119     windowSelectColorScheme
-  
-  Nothing: 120 ~ 123
-  
-  124      defered request ??
-  125      system_procedure
-  126      portsx86_IN
-  127      portsx86_OUT
-  128      Nothing.
-  129      systemLinkDriver
-  130      draw_text
-  131      my_buffer_char_blt (local?)
-  132      Nothing
-  133      Nothing
-  134      wrong thing.
-  135      (feed terminal ??)
-  136      ?
-  137      thread_getchar (???)   
-  138      keyboardGetKeyState
-  139      get_scancode
-  140      set_current_keyboard_responder ??
-  141      get_current_keyboard_responder
-  142      set_current_mouse_responder
-  143      get_current_mouse_responder
-  144      getClientAreaRect
-  145      setClientAreaRect
-  146      Get Screen window (root)
-  147      Get Main window
-  148      grid
-  149      MainMenu
-  150      Nothing
-  151      Nothing
-  152     get current uid
-  153     Nothing
-  154     get current gid
-  155     Nothing
-  156     ShowUserInfo
-  157     get user session id
-  158     get window station id
-  159     get desktop id
-  160     create_socket
-  161     getSocketIP
-  162     getSocketPort
-  163     update_socket
-  
-  164 ~ 169  (?)
-  
-  170     fs_print_process_pwd
-  171     get current volume
-  172     set current volume  
-  173     fsListFiles
-  174     KiSearchFile
-  175     'cd' command support
-  176     fs_pathname_backup
-  177     fsList
-  178     fsGetFileSize
-  179     do_gexecve
-  
-  Nothing: 180 ~ 183
-  
-  184     GetProcessHeapStart
-  
-  Nothing: 185 ~ 198
-  
-  
-  199     gc
-  200     signalSend
-  
-  
-  Nothing: 201 ~ 210 
-  
-  211     (Get current terminal)
-  212     (Set current terminal)
-  213      nothing
-  214      nothing
-  215     systemGetTerminalWindow
-  216     systemSetTerminalWindow
-  
-  217 ~ 221  (??)
-  
-  222     create_timer
-  223     get_systime_info
-  224     get_time
-  225     get_date
-  226     spinlock stuff
-  227     spinlock stuff  
-  228     spinlock stuff  
-  
-  229 ~ 235  ??
-  
-  236     (Get current tty)
-  
-  237 - 239  ??
-  
-  240     get_cursor_x
-  241     get_cursor_y
-  242     ?
-  243     ?
-  244     timerEnableTextCursor
-  245     timerDisableTextCursor
-  
-  246 ~ 249   libc support
-  
-  246     __openat
-  247     pipe
-  248     do_execve
-  249     ?
-  
-  250     syssm_get_system_metrics      syssm/syssm.c
-  
-  251     sys_show_system_info          sci/sys/sys.c
-  252     sys_show_system_info          sci/sys/sys.c
-  253     sys_show_system_info          sci/sys/sys.c
-  254     sys_show_system_info          sci/sys/sys.c
-  255     sys_show_system_info          sci/sys/sys.c
-  
-  
-  //
-  //  There is more.   (gde_extra_services)
-  //
-  
-  
-  
-  260    Deprecated. 
-  261    Deprecated.
-  
-  262     console_read
-  263     console_write
-  264     ??
-  265     yield
-  266     process_get_tty
-  267     pty_link_by_pid
-  268     tty_read_ttyList              kdrivers/tty/tty.c
-  269     tty_write_ttyList             kdrivers/tty/tty.c
-  270     vt_create
-  271     vt_set_child
-  272     tty_read                      kdrivers/tty/tty.c
-  273     tty_write                     kdrivers/tty/tty.c
-  
-  
-  277     console_get_current_virtual_console
-  278     console_set_current_virtual_console 
-  279     windowUpdateWindow
-  
-  289     sys_serial_debug_printk       sci/sys/sys.c
-  
-  300     UpdateStatusBar
-  
-  518     redraw_screen
-  
-  600     sys_dup
-  601     sys_dup2
-  602     sys_dup3
-  
-  
-  770     systemShowDevicesInfo
-  
-  801     __gethostname
-  801     __sethostname
-  803     __getusername
-  804     __setusername
-  
-  808     __ptsname ?
-  809     __ptsname ?
-  880     __GetProcessStats
-  881     __GetThreadStats
-  882     getprocessname
-  883     getthreadname
-  
-  
-  900     do_clone_execute_process
-  901     fork again ?
-  
-  
-  967     network_procedure
-  
-  4002    sys_fopen
-  4003    sys_fopen
-  
-  7000    sys_socket                    syslib/libcore/socket.c
-  7001    sys_connect                   syslib/libcore/socket.c
-  7002    sys_accept                    syslib/libcore/socket.c
-  7003    sys_bind                      syslib/libcore/socket.c
-  7004    sys_listen                    syslib/libcore/socket.c
-  //...
-  
-  
-  8000    sys_ioctl                     sci/sys/sys.c
-  8001    sys_fcntl                     sci/sys/sys.c
-  
-  9700    raise_window
-  
-  9800    ps2_mouse_dialog
-  
-  
-  9900    button_down
-  9901    button_up
-  
-  9999    system_get_pid
-  
-  
-  // =====================================================
-  
-  //
-  // Special. int 133 
-  //
-  
-  ?       gde_133
-  
-  // =====================================================  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
+	This interrupt enter in the base kernel changing the
+	data segments to access the kernel structures.
   
   
   

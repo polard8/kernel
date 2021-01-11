@@ -1251,7 +1251,9 @@ shellProcedure (
             switch (long1)
             {
                 case CMD_ABOUT:
-                    printf ("MSG_COMMAND-CMD_ABOUT\n");
+                    // printf ("MSG_COMMAND-CMD_ABOUT\n");
+                    show_system_version();
+                    show_shell_version();
                     break;
 
                 // Nothing for now!
@@ -6255,14 +6257,37 @@ int is_sh1 ( char *cmd ){
 }
 
 
+void show_system_version (void)
+{
+    FILE *fp;
+    fp=(FILE*) fopen("edition.txt","r+");
+    char buffer[32];
+    int nreads=0;
+
+    puts("\n");
+    printf("Gramado edition:\n");
+    
+    nreads=read(fileno(fp),buffer,sizeof(buffer));
+    if(nreads>0)
+    {
+        buffer[31]=0;
+        printf("%s\n",buffer);
+        fclose(fp);
+    }
+}
+
+
 /* 
  * Give version information about this shell. 
  */
 
 void show_shell_version (void)
 {
-    if ( (void *) shell_name != NULL &&
-         (void *) dist_version != NULL &&
+    puts("\n");
+    printf("Application info:\n");
+
+    if ( (void *) shell_name    != NULL &&
+         (void *) dist_version  != NULL &&
          (void *) build_version != NULL )
     {
         printf ("%s version %s.%s \n", 
