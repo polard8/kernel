@@ -1,9 +1,13 @@
 
 	gramado os model:
 
+        ========================
+        flexible interface
 	> boot  
 	> land-os 
 	> land-lib
+        ========================
+        consistent interface.
 	> gramado cmd 
 	> gramado setup 
 	> gramado core 
