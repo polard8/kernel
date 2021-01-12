@@ -1,18 +1,43 @@
+/*
+ * File: vk.h
+ * 
+ * 
+ *     This header should be included by including "gws.h".
+ */
 
-// File: vk.h
+
+#ifndef  __LIBGWS_VK_H
+#define  __LIBGWS_VK_H    1
 
 
+
+// ======================================
 // Virtual keys.
+//
+// #bugbug: 
+// Some parts here are very windows-like.
+// We need to review this thing in the whole system.
+//
+
 #define VK_LBUTTON   0x01
 #define VK_RBUTTON   0x02
+
+// ??
 #define VK_CANCEL    0x03
-#define VK_POWER     0x03  //??
+#define VK_POWER     0x03
+
 #define VK_MBUTTON   0x04
+
+// ??
 #define VK_XBUTTON1  0x05
 #define VK_XBUTTON2  0x06
+
 #define VK_CLEAR     0x0C  //12
 #define VK_BACK      0x0E  //14  //8
 #define VK_TAB       0x0F  //15  //9
+
+// ?? We don't need this here.
+// It goes to the end.
 #define VK_KANA      0x15
 #define VK_HANGEUL   0x15
 #define VK_HANGUL    0x15
@@ -20,25 +45,49 @@
 #define VK_FINAL     0x18
 #define VK_HANJA     0x19
 #define VK_KANJI     0x19
-#define VK_ACENTO_AGUDO  0x1A  //26 //0xb4 abnt	
-#define VK_ACENTO_GRAVE  0x1A  //26  //0x60	abnt
-#define VK_ESCAPE      0x1B  //27 
-#define VK_RETURN      0x1C  //28  //13    //Return.
-#define VK_CONVERT     0x1C  //??
-#define VK_CONTROL     0x1D  //29
-#define VK_CTRL        0x1D  //29   
-#define VK_LCONTROL    0x1D  //0xA2
-#define VK_NONCONVERT  0x1D  //??
+
+
+// #todo
+// We need english names for these.
+#define VK_ACENTO_AGUDO  0x1A    //26   //0xb4  abnt
+#define VK_ACENTO_GRAVE  0x1A    //26   //0x60  abnt
+
+
+//27
+#define VK_ESCAPE      0x1B   
+
+//28  //13   //Return.
+#define VK_RETURN      0x1C
+
+
+#define VK_CONVERT     0x1C  // ??
+#define VK_NONCONVERT  0x1D  // ??
+
+#define VK_CONTROL     0x1D  // 29
+#define VK_CTRL        0x1D  // 29
+#define VK_LCONTROL    0x1D  // 0xA2
+
+
 #define VK_ACCEPT      0x1E
 #define VK_MODECHANGE  0x1F
-#define VK_ACENTO_TIL  0x28  //40 //0x7e	abnt
-#define VK_LSHIFT      0x2A  //0xA0 
-#define VK_PRINT       0x2A  //42 ??
+
+//40  //0x7e  abnt
+#define VK_ACENTO_TIL  0x28
+
+// ??
+#define VK_LSHIFT      0x2A    //0xA0 
+#define VK_PRINT       0x2A    //42 ??
+
 #define VK_EXECUTE     0x2B  //43
+
 #define VK_SNAPSHOT    0x2C  //44
-#define VK_VIRGULA     0x33       //51 abnt
-#define VK_PONTO       0x34       //52 abnt
+
+// #todo
+// We need english names for these things.
+#define VK_VIRGULA       0x33  //51 abnt
+#define VK_PONTO         0x34  //52 abnt
 #define VK_PONTOVIRGULA  0x35  //53 abnt
+
 #define VK_RSHIFT      0x36  //54  //0xA1
 #define VK_ALT         0x38  //56   
 #define VK_LMENU       0x38  //56   //Não mudar.
@@ -47,6 +96,8 @@
 #define VK_ALTGR       0x38  //56 abnt //100 //56
 #define VK_SPACE       0x39  //57  //Space.
 #define VK_CAPITAL     0x3A  //58  //20  
+
+// functions.
 #define VK_F1    0x3B  //59    // No DOS é 0x170.  
 #define VK_F2    0x3C  //60 
 #define VK_F3    0x3D  //61 
@@ -57,18 +108,21 @@
 #define VK_F8    0x42  //66 
 #define VK_F9    0x43  //67 
 #define VK_F10   0x44  //68
+
+
 #define VK_NUMLOCK  0x45  //69 //0x90
 #define VK_SCROLL   0x46  //70 //0x91
+
 #define VK_HOME     0x47  //71 
 
 
-// keyboad arrow keys
+// keyboard arrow keys
 #define VK_ARROW_UP     0x48
 #define VK_ARROW_LEFT   0x4B
 #define VK_ARROW_RIGHT  0x4D
 #define VK_ARROW_DOWN   0x50
 
-         
+
 #define VK_END      0x4F  //79
 #define VK_DELETE_TECLADONUMERICO 0x53  //83  
 #define VK_F11    0x57  //87 
@@ -170,6 +224,10 @@
 //#define VK_
 //#define VK_
 //#define VK_
+
+
+#endif    
+
 
 
 //

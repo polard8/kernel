@@ -2,8 +2,12 @@
  * File: colours.h
  * 
  *     Colours support for libgws.
- * 
+ *     This header should be included by including "gws.h".
  */
+
+
+#ifndef __LIBGWS_COLOURS_H
+#define __LIBGWS_COLOURS_H  1
 
 
 //
@@ -433,13 +437,7 @@
 #define SKYBLUE    0xA6CAF0
 
 
-
-
-
-
-
-
-
+#endif    
 
 
 

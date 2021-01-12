@@ -77,10 +77,9 @@ pixelBackBufferPutpixel (
     char b, g, r, a;
 
     b = (color & 0xFF);
-    g = (color & 0xFF00) >> 8;
+    g = (color & 0xFF00)   >> 8;
     r = (color & 0xFF0000) >> 16;
     a = (color >> 24) + 1;
-
 
 
 	// 3 = 24 bpp
@@ -96,30 +95,16 @@ pixelBackBufferPutpixel (
 
     switch (SavedBPP){
 
-        case 32:
-            bytes_count = 4;
-            break;
-
-        case 24:
-            bytes_count = 3;
-            break;
-
-		//#testando
-		//case 16:
-		//	bytes_count = 2;
-		//	break;
-		
-		//case 8:
-		//	bytes_count = 1;
-		//	break;
-
+        case 32:  bytes_count = 4;  break;
+        case 24:  bytes_count = 3;  break;
+        //case 16:  bytes_count = 2;  break;
+        //case 8:   bytes_count = 1;  break;
+        
         default:
-		    //panic ("backbuffer_putpixel: SavedBPP");
-            //gde_message_box (3,"xxx","backbuffer_putpixel: SavedBPP");
-            printf("backbuffer_putpixel: SavedBPP\n");
+            printf("backbuffer_putpixel: [ERROR] SavedBPP\n");
+            //panic ("backbuffer_putpixel: SavedBPP");
             break;
     };
-
 
 	// #importante
 	// Pegamos a largura do dispositivo.

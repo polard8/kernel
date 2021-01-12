@@ -20,7 +20,9 @@ set_rect (
     unsigned long height )
 {
     if ( (void*) rect == NULL )
+    {
         return FALSE;
+    }
     
     rect->left   = left;
     rect->top    = top;
@@ -159,6 +161,10 @@ int is_rect_dirty( struct gws_rect_d *rect )
 
 
 
+// #todo
+// Do not check the validation.
+// We need a prefix that tellus that we will no chack the validation
+// os the addresses
 
 void *rect_memcpy32 ( void *v_dst, const void *v_src, unsigned long c )
 {
@@ -240,7 +246,8 @@ gws_refresh_rectangle (
     //unsigned long ScreenHeight = (unsigned long) gws_get_device_height();
 
     if ( ScreenWidth == 0 ){
-        printf ("gws_refresh_rectangle: ScreenWidth\n");  exit(1);
+        printf ("gws_refresh_rectangle: [ERROR] ScreenWidth\n");  
+        exit(1);
     }
 
     line_size = (unsigned int) width; 
@@ -251,7 +258,8 @@ gws_refresh_rectangle (
         case 24:  bytes_count = 3;  break;
         // ... #todo
         default:
-            printf ("gws_refresh_rectangle: SavedBPP\n");  exit(1);
+            printf ("gws_refresh_rectangle: [ERROR] SavedBPP\n");  
+            exit(1);
             break;
     };
 

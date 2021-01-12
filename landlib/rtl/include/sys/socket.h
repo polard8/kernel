@@ -262,25 +262,24 @@
 
 
 
-
-
-
+// #bugbug: Moved to 'in.h'
 // See:
 // https://man7.org/linux/man-pages/man7/ip.7.html
-
 // Any IP address.
-#define  INADDR_ANY        (unsigned long) 0x00000000  
-
+//#define  INADDR_ANY        (unsigned long) 0x00000000  
 // Broadcast IP address.
-#define  INADDR_BROADCAST  (unsigned long) 0xffffffff  
+//#define  INADDR_BROADCAST  (unsigned long) 0xffffffff  
 
 
 
-/* Read using getsockopt() with SOL_SOCKET, SO_PEERCRED */
+/* 
+ * Read using getsockopt() with SOL_SOCKET, SO_PEERCRED 
+ */
+
 struct sockpeercred {
-	uid_t		uid;		/* effective user id */
-	gid_t		gid;		/* effective group id */
-	pid_t		pid;
+    uid_t  uid;    /* effective user id */
+    gid_t  gid;    /* effective group id */
+    pid_t  pid;
 };
 
 

@@ -174,13 +174,14 @@ void *gws_system_call (
 // Debug via serial port. (COM1)
 void gws_debug_print (char *string)
 {
-    if ( (void*) string == NULL )
-        return;
+    if ( (void*) string == NULL ){ return; }
     
-    if ( *string == 0 )
+    if ( *string == 0 ){
         return;
+    }
 
-    gws_system_call ( 289, 
+    gws_system_call ( 
+        289, 
         (unsigned long) string,
         (unsigned long) string,
         (unsigned long) string );
@@ -202,7 +203,7 @@ int gws_initialize_library (void)
     int wsPID = -1;
     
 
-    wsPID = gws_initialize_connection();    
+    wsPID = gws_initialize_connection();
 
     if (wsPID < 0){
         gws_debug_print("gws_initialize_library: Fail\n");
@@ -2815,8 +2816,9 @@ gws_create_window (
     gws_debug_print("gws_create_window:\n");
         
 
-    if (fd<0)
+    if (fd<0){
         return -1;
+    }
 
     //#todo
     //Um argumento passa o display usado
@@ -2862,24 +2864,21 @@ gws_create_window (
 }
 
 
-// Yield thread.
+// Yield current thread.
 void gws_yield (void)
 {
-    //gws_system_call (265,0,0,0);
-    sc82 (265,0,0,0); 
+    sc82(265,0,0,0);
 }
 
 // refresh the background and yield the current thread
 void gws_refresh_yield (int fd)
 {
-    if (fd<0)
-        return;
+    if (fd<0){  return;  }
 
     //refresh background
-    gws_refresh_window (fd, -4);  
+    gws_refresh_window (fd, -4); 
     
     //yield
-    //gws_system_call (265,0,0,0); 
     sc82 (265,0,0,0);
 }
 
@@ -2887,25 +2886,24 @@ void gws_refresh_yield (int fd)
 // refresh a given window and yield the current thread
 void gws_refresh_yield2 (int fd, int window)
 {
-    if (fd<0)
-        return;
 
-    if (window<0)
-        return -1;
+    if (fd<0)    {  return;  }
+    if (window<0){  return;  }
 
     gws_refresh_window (fd, window);
-    //gws_system_call (265,0,0,0); 
+
     sc82 (265,0,0,0);
 }
-
 
 void gws_yield_n_times (unsigned long n)
 {
     int i=0;
-    for(i=0;i<n;i++)
-        gws_system_call(265,0,0,0); 
-}
 
+    for (i=0;i<n;i++){
+        sc82 (265,0,0,0);
+        //gws_system_call(265,0,0,0); 
+    };
+}
 
 
 
@@ -2941,6 +2939,9 @@ void gws_payment(void)
  *     Essa será uma rotina de baixo nível para pthreads.
  */
 
+// OUT:
+// Is it a pointer to the ring0 thread structure?
+
 void *gws_create_thread ( 
     unsigned long init_eip, 
     unsigned long init_stack, 
@@ -2949,20 +2950,36 @@ void *gws_create_thread (
     //#define	SYSTEMCALL_CREATETHREAD     72
     debug_print ("gws_create_thread:\n");
 
-    if ( init_eip == 0 )
+    if ( init_eip == 0 ){
+        debug_print ("gws_create_thread: init_eip\n");
         return NULL;
+    }
         
-    if ( init_stack == 0 )
+    if ( init_stack == 0 ){
+        debug_print ("gws_create_thread: init_stack\n");
         return NULL;
+    }
 
+    if ( (void*) name == NULL ){
+        debug_print ("gws_create_thread: name\n");
+        return NULL;
+    }
 
-    return (void *) gws_system_call ( 72, //SYSTEMCALL_CREATETHREAD, 
+    if (*name == 0){
+        debug_print ("gws_create_thread: *name\n");
+        return NULL;
+    }
+
+// OUT:
+// Is it a pointer to the ring0 thread structure?
+
+    //SYSTEMCALL_CREATETHREAD,
+    return (void *) gws_system_call ( 
+                        72,  
                         init_eip, 
                         init_stack, 
                         (unsigned long) name );
 }
-
-
 
 
 /*
@@ -2976,11 +2993,18 @@ void gws_start_thread (void *thread)
     // #define	SYSTEMCALL_STARTTHREAD  94 
 
     debug_print ("gws_start_thread:\n");
-    
-    if ( (void*) thread == NULL )
-        return;
 
-    gramado_system_call ( 94, //SYSTEMCALL_STARTTHREAD, 
+    // Is it a pointer to the ring0 thread structure?
+
+    if ( (void*) thread == NULL )
+    {
+        debug_print ("gws_start_thread: thread\n");
+        return;
+    }
+
+    //SYSTEMCALL_STARTTHREAD,
+    gramado_system_call ( 
+        94,  
         (unsigned long) thread, 
         (unsigned long) thread, 
         (unsigned long) thread );
@@ -3262,8 +3286,8 @@ unsigned long gws_explode_byte (unsigned char data)
 
 
 // Create empty file.
-int gws_create_empty_file ( char *file_name ){
-
+int gws_create_empty_file ( char *file_name )
+{
     int __ret = 0;
     
     if( (void*) file_name == NULL )
@@ -3274,10 +3298,8 @@ int gws_create_empty_file ( char *file_name ){
 
 
     //gde_enter_critical_section();
-    
     __ret = (int) gramado_system_call ( 43, 
                       (unsigned long) file_name, 0, 0);
-
     //gde_exit_critical_section();    
     
     return __ret;
@@ -3292,12 +3314,12 @@ int gws_create_empty_directory ( char *dir_name )
     if ( (void*) dir_name == NULL )
         return -1;
 
+    if ( *dir_name == 0 )
+        return -1;
 
     //gde_enter_critical_section();
-    
     __ret = (int) gramado_system_call ( 44, 
                       (unsigned long) dir_name, 0, 0);
-
     //gde_exit_critical_section();    
 
 

@@ -34,8 +34,8 @@
 static unsigned long ____old=0;
 static unsigned long ____new=0;
 
-void wm_process_windows (void){
-
+void wm_process_windows (void)
+{
     unsigned long t_start = 0;
     unsigned long t_end   = 0;
 
@@ -177,9 +177,9 @@ void wm_process_windows (void){
     unsigned long dt=0;
     ____new = rtl_get_progress_time();
     
-    dt = ____new - ____old;
+    dt = (____new - ____old);
 
-    
+
 //===================================================================
 // ++  End
 
@@ -223,6 +223,13 @@ void yellow_status( char *string )
     unsigned long offset_string1 = 8;  //( 8*1 );
     unsigned long offset_string2 = ( 8*5 );
     unsigned long bar_size = w;
+
+
+    //#todo
+    //if ( (void*) string == NULL ){ return; }
+    //if ( *string == 0 ){ return; }
+
+
 
     if ( current_mode == GRAMADO_JAIL ){
         //bar_size = w;

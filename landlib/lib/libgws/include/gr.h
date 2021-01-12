@@ -1,11 +1,14 @@
+/*
+ * File: gr.h
+ * 
+ *     3D graphics support for libgws.
+ *     This header should be included by including "gws.h".
+ */
 
 
-// #todo
-// 3d graphics support.
+#ifndef __LIBGWS_GR_H
+#define __LIBGWS_GR_H   1
 
-
-#ifndef __GR_H
-#define __GR_H   1
 
 struct gr_vec3D_d
 {

@@ -5,8 +5,13 @@
  *      It's part of the gws project.
  * 
  * History:
- *     2019 - Created fy Fred Nora.
+ *     2019 - Created by Fred Nora.
  */
+
+// #bugbug
+// #todo
+// Para lidarmos com essas estruturas do kernel
+// devemos usar a chamada sci2. int 0x82. ??
 
 
 // todo
@@ -84,9 +89,19 @@ void demoTerry(void)
 // Dependendo do estilo do frame, podemos ou nao criar a caption bar.
 // Por exemplo: Uma editbox tem um frame mas não tem uma caption bar.
 
+
 // IN:
+// parent = parent window ??
+// window = The window where to build the frame.
+// x
+// y
+// width
+// height
 // style = Estilo do frame.
 
+// OUT:
+// 0   = ok, no erros;
+// < 0 = not ok. something is wrong.
 
 int 
 createwDrawFrame ( 
@@ -99,6 +114,10 @@ createwDrawFrame (
     int style ) 
 {
 
+    // Overlapped.
+    // Janela de aplicativos.
+    struct gws_window_d *TitleBar;
+
     unsigned long border_color=0;
     unsigned long border_size=0;
     
@@ -107,6 +126,18 @@ createwDrawFrame (
     
     
     // #todo
+    // check parent;
+    //if ( (void*) parent == NULL ){}
+
+    // #todo
+    // check window.
+    if ( (void*) window == NULL )
+    {
+        gwssrv_debug_print ("createwDrawFrame: window\n");
+        return -1;
+    }
+
+    // #todo
     // Desenhar o frame e depois desenhar a barra de títulos
     // caso esse estilo de frame precise de uma barra.
 
@@ -114,11 +145,14 @@ createwDrawFrame (
     // EDITBOX NÃO PRECISA DE BARRA DE TÍTULOS.
     // MAS PRECISA DE FRAME ... QUE SERÃO AS BORDAS.
     
+    
+    // ===============================================
+    // editbox
+    
     if ( window->type == WT_EDITBOX )
     {
             // Se tiver o foco.
-            if ( window->focus == 1 )
-            {
+            if ( window->focus == 1 ){
                 border_color = COLOR_BLUE;
                 border_size = 4;
             }else{
@@ -148,13 +182,13 @@ createwDrawFrame (
             window->width, border_size, 
             border_color, 1 );
 
+        // ok
         return 0;
     }
 
 
-    // Overlapped.
-    // Janela de aplicativos.
-    struct gws_window_d *TitleBar;
+    // ===============================================
+    // overlapped
 
     // string at center?
     size_t tmp_size = (size_t) strlen ( (const char *) window->name );
@@ -213,9 +247,11 @@ createwDrawFrame (
                                     (struct gws_window_d *) window, 
                                     0, COLOR_BLUE1, COLOR_BLUE1 );  
 
-        if ( (void *) TitleBar == NULL )
+        if ( (void *) TitleBar == NULL ){
             gwssrv_debug_print ("createwCreateWindow: TitleBar fail \n");
-    
+            return -1;
+        }
+        
         TitleBar->type = WT_SIMPLE;
         window->titlebar = TitleBar;
 
@@ -241,10 +277,13 @@ createwDrawFrame (
         //  control ?
         // ... 
         
+        // ok
         return 0;
     }
 
 
+    // ===============================================
+    // button
 
     //button
     if ( window->type == WT_BUTTON )
@@ -252,14 +291,18 @@ createwDrawFrame (
         gwssrv_debug_print ("[DEBUG]: desenha o frame do botao\n");
         
         //todo frame or not
-        //just like the edit box.        
+        //just like the edit box.   
+        
+        // ok     
         return 0;
     }
 
-    return 1;
+    // ===============================================
+    // more ... ??
+
+    // ok
+    return 0;
 }
-
-
 
 
 /*
@@ -555,15 +598,15 @@ void *createwCreateWindow2 (
 		// Id. A janela recebe um id somente na hora de registrar.
 		// window->id = ??.
 
-        window->name = windowname;
         window->used = 1;
         window->magic = 1234;
+
+        window->name = windowname;
 
 		// Window type.
 		// Tipo é unsigned long pois poderá ser um conjunto de flags.
         window->type = (unsigned long) type;
-        
-        
+
         //#test
         window->parent = Parent;
 
@@ -648,8 +691,7 @@ void *createwCreateWindow2 (
         //++
         // Margens.
         // Deslocamento em relação a tela. (Screen)
-        if ( window->parent != NULL )
-        {
+        if ( window->parent != NULL ){
             window->left = (window->parent->left + window->x); //x; 
             window->top  = (window->parent->top  + window->y); //y;
             
@@ -788,24 +830,28 @@ void *createwCreateWindow2 (
 		//Desktop support.
 		//window->desktop = (void*) Desktop; //configurado anteriormente.
 		//window->desktop_id = Desktop->id;  //@todo: verificar elemento.
-		
-		// # Menu support #
-        window->menu_window = NULL;    
-        window->sysMenu = NULL;  
-        window->barMenu = NULL;  
-        window->defaultMenu = NULL; 
-        window->isMenu = 0;
-        window->isButton = 0;
+
+        // Menu support
+        window->menu_window  = NULL;
+        window->sysMenu      = NULL;
+        window->barMenu      = NULL;
+        window->defaultMenu  = NULL;
+        
+        // What is that?
+        window->isMenu    = 0;
+        window->isButton  = 0;
         window->isEditBox = 0;
+        
         window->selected = 0;  //Caso a janela seja um ítem de menu.
-		//window->text = NULL; //Texto, caso a janela seja um ítem de menu
+        
+        //window->text = NULL; //Texto, caso a janela seja um ítem de menu
 
         // Draw support.
-        window->draw = 0;      //@todo: Cuidado com isso.
+        window->draw   = 0;      //@todo: Cuidado com isso.
         window->redraw = 0;
-        window->show = 1; //Inicialmente presumimos que precisamos mostrar essa janela.
+        window->show   = 1; //Inicialmente presumimos que precisamos mostrar essa janela.
 	    //Continua ...
-	
+
         //Abaixo, elementos referenciados com menor frequência.
 	    
 		//window->desktop = NULL; //@todo: Definir à qual desktop a janela perence.
@@ -814,16 +860,16 @@ void *createwCreateWindow2 (
 		//Trava.
         window->locked = 0;
 
-		//Linked list.
-		//window->linkedlist = NULL;
-
-		// Prev e next.
-        window->prev = (void *) Parent;
-        window->next = NULL;
-
 		//#debug
 		//printf("config1 %s %d %d %d %d \n",
 		//    window->name, window->left, window->top, window->width, window->height );
+
+		//Linked list.
+		//window->linkedlist = NULL;
+
+        // Prev e next.
+        window->prev = (void *) Parent;
+        window->next = NULL;
     };
 
     //Exemplos de tipos de janelas, segundo MS.	
@@ -1176,12 +1222,9 @@ void *createwCreateWindow2 (
 
         if ( (unsigned long) type == WT_OVERLAPPED )
         {
-			if (window->focus == 1)
-			{ __tmp_color = xCOLOR_GRAY1; }    //mais escuro
-			if (window->focus == 0)
-			{ __tmp_color = xCOLOR_GRAY2; }    //mais claro
+            if (window->focus == 1){ __tmp_color = xCOLOR_GRAY1; }
+            if (window->focus == 0){ __tmp_color = xCOLOR_GRAY2; }
 
-            
             //ok funciona
             //rectBackbufferDrawRectangle ( window->left +1, window->top +1, 
             //    window->width +1 +1, window->height +1 +1, 
@@ -1509,6 +1552,16 @@ createwCreateWindow (
     // CreateWindow será mais imples.
     
     
+    // #todo
+    // check parent window validation.
+    //if ( (void*) pWindow == NULL ){}
+    
+
+    // #todo
+    // check window name validation.
+    //if ( (void*) windowname == NULL ){}
+    //if ( *windowname == 0 ){}
+
     // Overlapped
     if ( type == WT_OVERLAPPED )
     {
@@ -1604,14 +1657,16 @@ draw_frame:
          type == WT_EDITBOX || 
          type == WT_BUTTON )
     {
+        // if __w is valid.
+        
+        if ( (void*) __w != NULL ) {
         createwDrawFrame ( 
             (struct gws_window_d *) pWindow,  //parent.
             (struct gws_window_d *) __w,      //bg do botão em relação à sua parent. 
             0, 0, width, height, 
             1 );  //style
-        
+        }
     }
-
 
 //draw_menubar:
 // ...

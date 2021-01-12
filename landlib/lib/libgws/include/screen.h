@@ -1,3 +1,13 @@
+/*
+ * File: screen.h
+ * 
+ * 
+ *     This header should be included by including "gws.h".
+ */
+
+
+#ifndef __LIBGWS_SCREEN_H
+#define __LIBGWS_SCREEN_H  1
 
 
 struct gws_screen_d
@@ -24,5 +34,7 @@ struct gws_screen_d
     struct gws_screen_d *next;
 };
 
+
+#endif    
 
 

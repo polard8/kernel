@@ -2539,9 +2539,10 @@ int main (int argc, char **argv)
         // Wait
         // printf ("gwssrv: [FIXME] yield \n");
         //for (i=0; i<11; i++)
-        for (i=0; i<22; i++)
+        for (i=0; i<22; i++){
             gwssrv_yield();
- 
+        }
+
         //
         // =======================================
         //

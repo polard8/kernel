@@ -1,5 +1,13 @@
+/*
+ * File: menu.h 
+ * 
+ * 
+ *     This header should be included by including "gws.h".
+ */
 
 
+#ifndef __LIBGWS_MENU_H
+#define __LIBGWS_MENU_H  1
 
 struct gws_menu_item_d
 {
@@ -39,3 +47,8 @@ struct gws_menu_d
     int itens_count;
     struct gws_menu_item_d *list;
 };
+
+
+#endif    
+
+

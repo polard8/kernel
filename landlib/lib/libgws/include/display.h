@@ -1,3 +1,14 @@
+/*
+ * File: display.h 
+ * 
+ *     Display structure support.
+ *     This header should be included by including "gws.h".
+ */
+
+#ifndef __LIBGWS_DISPLAY_H
+#define __LIBGWS_DISPLAY_H    1
+
+
 struct gws_display_d
 {
     int id;
@@ -20,14 +31,13 @@ struct gws_display_d
     //#test
     //only one screen for now.
     //struct gws_screen_d *screen;
-    
 
-    
-    
     //...
 
     struct gws_display_d *next;
 };
+
+#endif    
 
 
 
