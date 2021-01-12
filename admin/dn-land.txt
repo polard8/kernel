@@ -1,0 +1,10 @@
+
+	Project Land:
+
+
+MAJOR: gramado   The root of gramado os project.
+MINOR: landboot  The boot loader for land os.    
+MINOR: landlib   The ring3 libraries for landos and gramado os.
+MINOR: landos    The kernel image and the init process.
+
+

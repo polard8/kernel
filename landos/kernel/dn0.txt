@@ -1,0 +1,8 @@
+
+	kernel:
+
+MAJOR: landos
+MINOR: kernel
+
+	This is the base kernel, the kernel image.
+
