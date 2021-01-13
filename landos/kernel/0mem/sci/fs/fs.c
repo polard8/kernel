@@ -2174,11 +2174,10 @@ int fs_initialize_process_pwd ( int pid, char *string )
         }
 
         // ?? fixed size.
-        for ( i=0; i<32; i++ ){ p->pwd_string[i] = string[i]; }
+        for ( i=0; i<32; i++ ){ p->cwd_string[i] = string[i]; }
         
-        p->pwd_string[31] = 0; // finalizing 
+        p->cwd_string[31] = 0; // finalizing 
     };
-
 
     return 0;
 }
@@ -2220,12 +2219,13 @@ int fs_print_process_pwd (int pid)
 
         // #bugbug
         // Is this element a pointer or a buffer ?
+        // >>> This element is an array.
         
-        if ( (void *) p->pwd_string != NULL )
+        if ( (void *) p->cwd_string != NULL )
         {
-            //p->pwd_string[31] = 0;
-            printf ("> PID=%d p->pwd_string {%s} \n", 
-                p->pid, p->pwd_string);
+            //p->cwd_string[31] = 0;
+            printf ("> PID=%d p->cwd_string {%s} \n", 
+                p->pid, p->cwd_string);
         }
 
         // #bugbug
@@ -2326,10 +2326,10 @@ void fsUpdateWorkingDiretoryString ( char *string )
             // We need to handle the string size limit.
             
             // Concatena string.
-            strcat ( p->pwd_string, string );
+            strcat ( p->cwd_string, string );
 
             // Concatena separador.
-            strcat ( p->pwd_string, FS_PATHNAME_SEPARATOR );
+            strcat ( p->cwd_string, FS_PATHNAME_SEPARATOR );
 
             // Atualiza a string global usando a string do 
             // processo atual.
@@ -2339,7 +2339,7 @@ void fsUpdateWorkingDiretoryString ( char *string )
             
             for ( i=0; i<32; i++ )
             {
-                current_workingdiretory_string[i] = p->pwd_string[i];
+                current_workingdiretory_string[i] = p->cwd_string[i];
             };
             current_workingdiretory_string[31] = 0; //finaliza
 
@@ -2424,8 +2424,7 @@ void fs_pathname_backup ( int pid, int n ){
             panic ("fsUpdateWorkingDiretoryString: validation\n");
         }
 
-
-        char *path = (char *) p->pwd_string;
+        char *path = (char *) p->cwd_string;
 
         register char *s = path + strlen( path );
  
@@ -2441,7 +2440,7 @@ void fs_pathname_backup ( int pid, int n ){
 
         // Atualizando a string global.
         for ( i=0; i<32; i++ ){
-            current_workingdiretory_string[i] = p->pwd_string[i];
+            current_workingdiretory_string[i] = p->cwd_string[i];
         }
 
         // Name.

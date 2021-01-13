@@ -21,8 +21,10 @@
  * Opções:
  * Virtual box: // 8086, 2829  //Intel(R) ICH8M SATA AHCI Controller.
  *
- * Versão 1.0, 2015.
+ * 2015 - Created by Fred Nora.
  */
+
+
 
 #ifndef ____SATA_H
 #define ____SATA_H

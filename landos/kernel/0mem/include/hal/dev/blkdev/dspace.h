@@ -1,5 +1,5 @@
 /*
- * File: mm\dspace.h 
+ * File: blkdev\dspace.h 
  * 
  * Disk Space. 
  *    Gerenciamento de espaço em disco. Isso está no módulo de memória 
@@ -12,14 +12,21 @@
  * de páginas.  
  */
 
- 
+
+#ifndef  __DSPACE_H
+#define  __DSPACE_H    1
+
+
 typedef enum {
-	dspacetypeShared,
-	dspacetypePersonal,
+
+    dspacetypeNull,
+    dspacetypeShared,
+    dspacetypePersonal
+
 }dspace_type_t;
 
 
-typedef struct dspace_d dspace_t;
+
 struct dspace_d
 {
 	//Object.
@@ -53,5 +60,10 @@ struct dspace_d
 	//navegação.
 	struct dspace_d *next;
 };
-dspace_t *DSpace;
+struct dspace_d *DSpace;
+// dspace_t *DSpace;
 //...
+
+#endif    
+
+

@@ -162,10 +162,10 @@ void write_lba ( unsigned long address, unsigned long lba ){
     }
 
     // See: volume.h
-    switch (g_currentvolume_fatbits)
-    {
+    switch (g_currentvolume_fatbits){
+
         case 32:
-            printf ("write_lba: FAT32 not supported\n");
+            printf ("write_lba: [ERROR] FAT32 not supported\n");
             goto fail;
             break;
 
@@ -176,12 +176,12 @@ void write_lba ( unsigned long address, unsigned long lba ){
             break;
 
         case 12:
-            printf ("write_lba: FAT12 not supported\n");
+            printf ("write_lba: [ERROR] FAT12 not supported\n");
             goto fail;
             break;
 
         default:
-            printf ("write_lba: g_currentvolume_fatbits NOT SUPPORTED\n");
+            printf ("write_lba: [ERROR] g_currentvolume_fatbits NOT SUPPORTED\n");
             goto fail;
             break;
     };
@@ -193,6 +193,42 @@ fail:
     return;
 }
 
+
+/*
+int 
+write_clusters ( 
+    int volume_number,  // partition index in a table.
+    char *buffer, 
+    unsigned long cluster_number, 
+    unsigned long count );
+int 
+write_clusters ( 
+    int volume_number,  // partition index in a table.
+    char *buffer, 
+    unsigned long cluster_number, 
+    unsigned long count )  // how many
+{
+    struct volume_d *v;
+    int i=0;
+    int Max=0;
+    
+    v = (struct volume_d *) volumeList[volume_number];
+
+    if ( (void*)v == NULL )
+        return -1;
+    
+    i=0;
+    Max=count;
+    while (i<Max)
+    {
+        // write ...
+        
+        i++;
+    };
+    
+    return 0;
+}
+*/
 
 /*
  **************************************************
@@ -454,12 +490,9 @@ save_file:
 	// #debug
 	// printf("first={%x}\n",first);
 
-
-    //
-    // == Create directory entry ==================================
-    //
-
+    // Create directory entry
     // Name/ext 8.3
+
     DirEntry[0]  = (char) file_name[0];
     DirEntry[1]  = (char) file_name[1];
     DirEntry[2]  = (char) file_name[2];
@@ -557,12 +590,10 @@ save_file:
                           dir_address, 
                           dir_entries );
 
-    if ( FreeIndex == -1 )
-    {
+    if ( FreeIndex == -1 ){
         printf ("fsSaveFile: [FAIL] No empty entry\n");
         goto fail;
     }
-
 
     // 32/2 = 16 words.
     // Offset:
@@ -628,13 +659,15 @@ save_file:
         next = list[i];
 
         // #debug.
-        printf ("next={%x}\n", next);
+        printf ("fsSaveFile: [DEBUG] next={%x}\n", next);
 
-        if ( next == 0xFFF8 )
-        {
+        if ( next == 0xFFF8 ){
+
             next = list[i-1];
-            fat[next] = 0xFFF8; 
-            goto do_save_dir_and_fat;    //goto done; 
+            
+            fat[next] = 0xFFF8;
+
+            goto do_save_dir_and_fat;
 
         // Se não é assinatura ainda.
         }else{
@@ -650,8 +683,11 @@ save_file:
 
             //grava - aqui next esta certo!!!
             //write_lba ( (unsigned long) address, VOLUME1_DATAAREA_LBA + next -2 );
-            my_write_hd_sector ( (unsigned long) address, 
-                (unsigned long) ( VOLUME1_DATAAREA_LBA + next -2), 0, 0  );
+            my_write_hd_sector ( 
+                (unsigned long) address, 
+                (unsigned long) ( VOLUME1_DATAAREA_LBA + next -2), 
+                0, 
+                0 );
 
             address += 512; 
         }; 
@@ -717,10 +753,6 @@ do_save_dir_and_fat:
     printf      ("fsSaveFile: done\n");
     refresh_screen();
     return 0;
-
-    //
-    // == fail ========================================
-    //
 
 fail:
     debug_print ("fsSaveFile: [FAIL]\n");

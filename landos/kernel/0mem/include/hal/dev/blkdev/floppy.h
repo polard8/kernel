@@ -2,6 +2,7 @@
  * File: floppy.h
  * 
  *     Why not ?
+ *     Somewhere we have a 32bit fdd driver in assembly.
  *
  * 2015 - Created by Fred Nora.
  */
@@ -25,8 +26,6 @@
 #define DOR   DOR1
 #define DSR   MSR1
 
-
-typedef struct floppy_d floppy_t;
 struct floppy_d
 {
 	//...
@@ -34,9 +33,6 @@ struct floppy_d
     int dummy;	
 };
 
-
-
-typedef struct fdd_d fdd_t;
 struct fdd_d
 {
 	//...
@@ -44,9 +40,7 @@ struct fdd_d
 };
 
 
-
 #endif
-
 
 
 //

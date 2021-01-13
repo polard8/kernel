@@ -381,26 +381,29 @@ typedef struct tagHBA_CMD_TBL
 	uint8_t  rsv[48];	// Reserved
  
 	// 0x80
-	HBA_PRDT_ENTRY	prdt_entry[1];	// Physical region descriptor table entries, 0 ~ 65535
+	// Physical region descriptor table entries, 0 ~ 65535
+	HBA_PRDT_ENTRY	prdt_entry[1];
+
 } HBA_CMD_TBL;
- 
 
 
-
-
+//
+// == prototypes =============================================
+//
 
 
 //usar isso
 //struct pci_device_d *sata_pci;
 
-int ahciSetupDeviceStructure ( struct pci_device_d *D, char bus, char dev, char fun );
+int 
+ahciSetupDeviceStructure ( 
+    struct pci_device_d *D, 
+    char bus, 
+    char dev, 
+    char fun );
 
 int ahciSATAInitialize ( int ataflag );
 
 
-
 #endif   
-
-
-
 

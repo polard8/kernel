@@ -121,6 +121,15 @@ dessa conta.
 */
 
 
+//
+// socket support
+//
+
+// used by listen()
+// See: process.h
+
+#define SOCKET_MAX_PENDING_CONNECTIONS 32
+
 
 
 // ===================================================

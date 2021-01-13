@@ -2768,6 +2768,14 @@ int sys_listen (int sockfd, int backlog)
 
     // #hackhack
     // We need to do something
+    if( backlog > SOCKET_MAX_PENDING_CONNECTIONS )
+    { 
+        debug_print ("sys_listen: [ERROR] backlog overflow\n");
+        panic       ("sys_listen: [ERROR] backlog overflow\n");
+    }
+
+    // #hackhack
+    // We need to do something
     if( backlog > 8 )
     { 
         debug_print ("sys_listen: [FIXME] backlog too long\n");
@@ -2844,7 +2852,15 @@ int sys_listen (int sockfd, int backlog)
         
     }else{
 
+        // updating the socket structure.
         s->backlog_max = backlog;
+        
+        // #todo
+        // updating the process structure.
+        
+        //p->socket_pending_list_head
+        //p->socket_pending_list_tail
+        //p->socket_pending_list_max = backlog;
     };
 
     // ...

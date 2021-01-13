@@ -1,8 +1,13 @@
 /*
- * File: storage/storage.h
- * 
+ * File: dev/blkdev/storage.h
+ *
  * 2019 - Created by Fred Nora.
  */
+
+
+#ifndef  __STORAGE_H
+#define  __STORAGE_H    1
+
 
 
 //===============================================================
@@ -80,7 +85,6 @@ struct storage_d
 	//o processo tem acesso, também devemos indicar quais são 
 	//as streams abertas pelo processo.
 
-
     file *__file;
 };
 
@@ -90,6 +94,8 @@ struct storage_d
 struct storage_d *storage;
 //struct storage_d *CurrentStorage;
 // ...
+
+#endif    
 
 
 

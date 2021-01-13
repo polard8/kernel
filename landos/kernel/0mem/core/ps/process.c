@@ -892,24 +892,19 @@ int processCopyProcess ( pid_t p1, pid_t p2 ){
     Process2->base_priority = (unsigned long) BasePriority;
     Process2->priority      = (unsigned long) Process1->priority;
 
-
-    //
     // == Security ====================================
-    //
-    
+
     Process2->usession = Process1->usession;
     Process2->room     = Process1->room;
     Process2->desktop  = Process1->desktop;
 
-    // pathname absolute.
-    Process2->root       = Process1->root;
+    // absolute pathname and relative pathname. 
+
+    Process2->file_root  = Process1->file_root;
+    Process2->file_cwd   = Process1->file_cwd;
+
     Process2->inode_root = Process1->inode_root;
-    
-    // pathname relative.
-    Process2->cwd        = Process1->cwd;
     Process2->inode_cwd  = Process1->inode_cwd;
-
-
 
     // =============
     // #IMPORTANTE
@@ -1568,14 +1563,13 @@ struct process_d *create_process (
     Process->desktop  = desktop;             // Passado via argumento.
 
 
-    // absolute pathname.
-    Process->root = (file *) 0;
-    Process->inode_root = (struct inode_d *) 0;
-    
-    // relative pathname.
-    Process->cwd  = (file *) 0;
-    Process->inode_cwd = (struct inode_d *) 0;
+    // absolute pathname and relative pathname. 
 
+    Process->file_root = (file *) 0;
+    Process->file_cwd  = (file *) 0;
+
+    Process->inode_root = (struct inode_d *) 0;
+    Process->inode_cwd  = (struct inode_d *) 0;
 
     // wait4pid: 
     // O processo esta esperando um processo filho fechar.
@@ -1621,14 +1615,17 @@ struct process_d *create_process (
     //
 
     // loop
-    for (sIndex=0; sIndex<32; ++sIndex){
+    
+    // pending connections;
+    
+    for (sIndex=0; sIndex<SOCKET_MAX_PENDING_CONNECTIONS; ++sIndex)
+    {
         Process->socket_pending_list[sIndex] = 0; 
     };
 
     Process->socket_pending_list_head =0;
     Process->socket_pending_list_tail =0;
-    Process->socket_pending_list_max = 0; //atualizado pelo listen();
-
+    Process->socket_pending_list_max  =0; //atualizado pelo listen();
 
     // tty support
         

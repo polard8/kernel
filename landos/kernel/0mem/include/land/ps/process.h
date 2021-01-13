@@ -807,19 +807,27 @@ struct process_d
     
     // #todo
     // NOT initialized yet!
-
-    // pathname absoludo
-    file *root;  
-    struct inode_d *inode_root;
     
-    // pathname relativo
-    file *cwd;   
+    // #todo #test
+    // Colocando um pouco de simetria nos simbolos.
+
+    // absolute pathname and relative pathname. 
+    
+    file *file_root;
+    file *file_cwd;
+
+    struct inode_d *inode_root;
     struct inode_d *inode_cwd;
 
+	// #todo #bugbug
+	// Size ?? 
+	// Esse tamanho deve ser igual ao 
+	// encontrado no modulo /fs.
+ 
+    char root_string[32];
+    char  cwd_string[32];
 
-	// #todo: 
-	// Esse tamanho deve ser igual ao encontrado no m�dulo /fs.
-	char pwd_string[32];
+    // ===================================================
 
     // The search paths for a process.
     // It's a list of pointer to strings.
@@ -899,24 +907,34 @@ struct process_d
     //
 
     // list of sockets to accept connection.
-    int accept[5];
+    //int accept[5];
     file *file_accept;   //aceitando através de ponteiro de arquivo.
-    
 
     // Vamos colocar aqui a estrutura de socket.
     void *priv;
-
 
     // #todo
     // Precisamos de uma lista de conexoes pendentes.
     // O cliente invocou a conexao apenas uma vez
     // e precisa uasr o servidor varias vezes
+    
     // Lista de ponteiros para estruturas de sockets.
     // max =  32 cliente com conexoes pendentes.
-    unsigned long socket_pending_list[32];
-    int socket_pending_list_head;  
+    // See: rtl/net/gdef.h
+    // See: rtl/net/socket.h
+
+    unsigned long socket_pending_list[SOCKET_MAX_PENDING_CONNECTIONS];
+
+    int socket_pending_list_head;
     int socket_pending_list_tail;
-    int socket_pending_list_max; //listen() will setup this thing.
+    
+    //listen() will setup this thing.
+    //nao pode ser mais que 32. que eh o tamanho do array
+    // SOCKET_MAX_PENDING_CONNECTIONS is the limit for this.
+    int socket_pending_list_max;    
+
+    //========================================
+
 
 
     //Motivo do processo fechar.

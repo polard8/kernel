@@ -56,6 +56,8 @@ int gramado_ports[GRAMADO_PORT_MAX];
 //=====================================================
 
 
+//=====================================================
+
 // #atenção. 
 // Variável global;
 int current_socket;
@@ -713,7 +715,10 @@ sys_getsockname (
     struct sockaddr *addr, 
     socklen_t *addrlen );
 
+
+
 int sys_listen (int sockfd, int backlog);          
+
                
 
 int socket_read (unsigned int fd, char *buf, int count);

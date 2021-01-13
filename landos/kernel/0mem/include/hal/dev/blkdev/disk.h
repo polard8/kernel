@@ -1,5 +1,5 @@
 /*
- * File: storage/disk.h 
+ * File: blkdev/disk.h 
  *
  * Descrição:
  *     Gerenciador de discos. 
@@ -14,10 +14,12 @@
 
 // See:
 // https://thestarman.pcministry.com/asm/mbr/PartTables.htm
- 
- 
- 
- 
+
+
+#ifndef  __DISK_H
+#define  __DISK_H    1
+
+
 #define DISK_COUNT_MAX 1024    //8
 
 #define DISK_BYTES_PER_SECTOR  512 
@@ -191,7 +193,8 @@ struct ?????_block_d
 
 struct mbr_d
 {
-
+    int dummy;
+    
 /*
 	//jmp code (3 bytes)
 	
@@ -253,9 +256,12 @@ struct partition_table_d
 {    
     unsigned char boot_indicator;  //80h active
     unsigned char start_chs[3];
+    
     unsigned char partition_type;
     unsigned char end_chs[3];
+    
     unsigned long start_sector;
+    
     unsigned long partition_size;  //in sectors.
 };
 struct partition_table_d *partition; 
@@ -310,14 +316,12 @@ struct disk_d
     int used;
     int magic;
 
-
     int id;                 // ID na lista de discos.
     char boot_disk_number;  // ID herado do boot block.
 
 	// Ponteiro para o nome do disco,
     // Talvez não precise ser um ponteiro, pode ser um array.
     char *name;  
-
 
     //#todo
     // se está funcionando ... se está inicializado ...
@@ -366,7 +370,6 @@ unsigned long diskList[DISK_COUNT_MAX];
 // == variables ==================================
 //
 
-
 // ...
 
 
@@ -393,6 +396,10 @@ void init_test_disk (void);
 int get_ide_disk_info ( int port, unsigned long buffer, int master );
 
 void show_ideports_info (void);
+
+
+#endif    
+
 
 
 //

@@ -1,7 +1,10 @@
 /*
- * File: storage/super.h
+ * File: blkdev/super.h
  */
 
+
+#ifndef  __SUPER_H
+#define  __SUPER_H    1
 
 
 // Superbloco de um disco.
@@ -17,7 +20,6 @@ struct superblock_d
     struct superblock_d *next;
 };
 
-
-
+#endif    
 
 
