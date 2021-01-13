@@ -420,7 +420,7 @@ int main ( int argc, char *argv[] )
     printf ("LOOP:\n");
    
     // #debug
-    while (1){
+    //while (1){
 
         gws_draw_char ( client_fd, main_window, 
             20, 20, COLOR_RED, 'X' );
@@ -438,12 +438,13 @@ int main ( int argc, char *argv[] )
         
         //gws_refresh_window (client_fd, main_window);
         //gws_yield();
-    }
+    //}
     
 
     // Isso ehestranho ... um cliente remoto nao deve poder fazer isso.
     //gws_debug_print ("gws: Sending command to close the server. \n");
     gws_async_command(client_fd,1);
+    //exit(0);
 
     // Asking to server to send me an notification
     // telling me to close myself

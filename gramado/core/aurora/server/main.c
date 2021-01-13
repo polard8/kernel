@@ -1,18 +1,14 @@
 /*
  * File: main.c
- *
  *    Main file for the Gramado Window Server.
- * 
  *    History:
  *        2020 - Created by Fred Nora.
  */
 
-
-// See: 
+// See:
 // https://wiki.osdev.org/Graphics_stack
 // https://wayland-book.com/introduction/high-level-design.html
 // ...
-
 
 // See:
 // x window system core protocol
@@ -22,17 +18,14 @@
 // See:
 // https://www.x.org/wiki/Releases/History/
 
-
 // hostname:D.S
 // [host]:<display>[.screen]
 // [host]:<display>.[screen]
-
 
 // main.c
 // Arquivo principal do gws.
 // As funções começam com o nome do módulo
 // para que em client side começem com gws_
-
 
 /*
 See: https://wiki.osdev.org/Graphics_stack
@@ -51,10 +44,9 @@ See: https://wiki.osdev.org/Graphics_stack
 
 */
 
-
-
-// This is part of this project. 
+// This file is part of this project.
 // It is NOT a library.
+
 #include <gws.h>
 
 
@@ -62,7 +54,7 @@ See: https://wiki.osdev.org/Graphics_stack
 // == Gramado Network Protocol ===============================
 //
 
-// Standard. (First version)
+// #standard
 #define GNP_WID        0
 #define GNP_MESSAGE    1
 #define GNP_LONG1      2
@@ -72,22 +64,18 @@ See: https://wiki.osdev.org/Graphics_stack
 #define GNP_LONG4      5
 #define GNP_LONG5      6
 #define GNP_LONG6      7
-//#body
+// #body
 #define GNP_BODY_OFFSET    16
 // ...
 
-
-
+// =========================
 // h:d.s
 char *hostName;
 char *displayNum;
 char *screenNum;
 
-
-
 int running = 0;
 int ____saved_server_fd = -1;
-
 
 int Notify_PongClient=FALSE;
 int NoReply = FALSE;
@@ -99,9 +87,7 @@ int NoReply = FALSE;
 #define LONGSTRING_SIZE        256
 // ...
 
-
 int connection_status = 0;
-
 
 
 // Window.
@@ -111,14 +97,17 @@ int connection_status = 0;
 //struct gws_window_d  *__taskbar_button; 
 // ...
 
+//
+// == Mouse ++ ==================================================
+//
 
-//
-// == Mouse ++ =======================================================
-//
+// #test
+// #bugbug 
+// ps2-mouse driver?
+// This is not what we wont.
 
 
 int MOUSE_WINDOW = -1;
-
 
 // i8042 mouse status bit.
 #define MOUSE_LEFT_BTN    0x01
@@ -149,24 +138,21 @@ char mouse_packet_scroll = 0;
 char saved_mouse_x =0;
 char saved_mouse_y =0;
 
-
 //Estado dos botões do mouse
-int mouse_buttom_1; 
+int mouse_buttom_1;
 int mouse_buttom_2;
 int mouse_buttom_3;
 
 //Estado anterior dos botões do mouse.
-int old_mouse_buttom_1; 
+int old_mouse_buttom_1;
 int old_mouse_buttom_2;
 int old_mouse_buttom_3;
 
-//se ouve alguma modificação no estado 
-//dos botões.
+//Ae ouve alguma modificação no estado dos botões.
 int mouse_button_action;
 
-
 //=============================
-//mouse control
+// mouse control
 
 // habilitar e desabilitar o mouse.
 // usada pelos aplicativos.
@@ -174,7 +160,7 @@ int ps2_mouse_status;
 
 int ps2_mouse_has_wheel;
 
-//1= pressionado 0=liberado
+// 1=pressionado 0=liberado
 int ps2_button_pressed;
 
 int ps2_mouse_moving;
@@ -187,13 +173,10 @@ int window_mouse_over;
 // == prototypes ===================================
 //
 
-
-
 void update_mouse (void);
 void parse_data_packet ( char data, char x, char y);
 int top_at ( int x, int y );
 int mouse_scan_windows (void);
-
 
 /*
  * =====================================================
@@ -201,32 +184,27 @@ int mouse_scan_windows (void);
  *     Updates the mouse position.
  */
 
-
-void update_mouse (void){
+void update_mouse (void)
+{
 
 //======== X ==========
 // Testando o sinal de x.
 // Do the x pos first.
 
-//pega o delta x
-//testa o sinal para x
+// Pega o delta x
+// testa o sinal para x
 do_x:
-
     if ( mouse_packet_data & MOUSE_X_SIGN ) {
         goto x_neg;
     }
 
-
-//Caso x seja positivo.
+// Caso x seja positivo.
 x_pos:
-
     mouse_x += mouse_packet_x;
     goto do_y;
 
-
-//Caso x seja negativo.
+// Caso x seja negativo.
 x_neg:
-
     mouse_x -= ( ~mouse_packet_x + 1 );
 
     if (mouse_x > 0)
@@ -234,24 +212,21 @@ x_neg:
         goto do_y;
     }
     mouse_x = 0;
- 
- 
+
 //======== Y ==========
-// Testando o sinal de x. 
+// Testando o sinal de x.
 // Do the same for y position.
 
-//Pega o delta y.
-//Testa o sinal para y.
+// Pega o delta y.
+// Testa o sinal para y.
 do_y:
-
     if ( mouse_packet_data & MOUSE_Y_SIGN )
     {
         goto y_neg;
     }
 
-//Caso y seja positivo.
+// Caso y seja positivo.
 y_pos:
-
     mouse_y -= mouse_packet_y;
 
     if ( mouse_y > 0 )
@@ -262,7 +237,7 @@ y_pos:
     mouse_y = 0;
     goto quit;
 
-//Caso y seja negativo. 
+// Caso y seja negativo. 
 y_neg:
 
     mouse_y += ( ~mouse_packet_y + 1 );
@@ -271,7 +246,6 @@ y_neg:
 quit:
     return;
 }
-
 
 void parse_data_packet ( char data, char x, char y)
 {
@@ -284,13 +258,14 @@ void parse_data_packet ( char data, char x, char y)
 	// Isso ficará assim caso não haja overflow.
     // acho que isso sera usado na rotina de update.
     
-    mouse_packet_data = (char) data;    // Primeiro char
+    mouse_packet_data = (char) data; // Primeiro char
     mouse_packet_x    = (char) x;    // Segundo char.
     mouse_packet_y    = (char) y;    // Terceiro char.
 
-	// Salvando o antigo antes de atualizar.
-	// Para poder apagar daqui a pouco.
-	// Atualizando.
+    // Salvando o antigo antes de atualizar.
+    // Para poder apagar daqui a pouco.
+    // Atualizando.
+
     saved_mouse_x = mouse_x;
     saved_mouse_y = mouse_y;
     
@@ -306,7 +281,6 @@ void parse_data_packet ( char data, char x, char y)
     // mouse_x e mouse_y.
     mouse_x = (mouse_x & 0x000003FF );
     mouse_y = (mouse_y & 0x000003FF );
-
 
     // Limits
     //if ( mouse_x < 1 ){ mouse_x = 1; }
@@ -347,17 +321,15 @@ void parse_data_packet ( char data, char x, char y)
     };
     */
 
-
-    //Apenas obtendo o estado dos botões.
+    // Apenas obtendo o estado dos botões.
     mouse_buttom_1 = 0;
     mouse_buttom_2 = 0;
     mouse_buttom_3 = 0;
 
-
     // ## LEFT ##
     if ( ( mouse_packet_data & MOUSE_LEFT_BUTTON ) == 0 )
     {
-        //liberada.
+        // liberada.
         mouse_buttom_1 = 0;
         ps2_button_pressed = 0;
 
@@ -380,13 +352,11 @@ void parse_data_packet ( char data, char x, char y)
             //refresh_rectangle ( saved_mouse_x, saved_mouse_y, 20, 20 );
             //bmpDisplayMousePointerBMP ( appIconBuffer, mouse_x, mouse_y ); 
      };
-     
-     
-     
-	// ## RIGHT ##
+
+    // ## RIGHT ##
     if ( ( mouse_packet_data & MOUSE_RIGHT_BUTTON ) == 0 )
     {
-	    //liberada.
+        // liberada.
         mouse_buttom_2 = 0;
         ps2_button_pressed = 0;
 
@@ -400,12 +370,10 @@ void parse_data_packet ( char data, char x, char y)
             ps2_button_pressed = 1;
         };
 
-     
-     
-	// ## MIDDLE ##
+    // ## MIDDLE ##
     if ( ( mouse_packet_data & MOUSE_MIDDLE_BUTTON ) == 0 )
     {
-	    //liberada.
+        // liberada.
         mouse_buttom_3 = 0;
         ps2_button_pressed = 0;
 
@@ -418,8 +386,7 @@ void parse_data_packet ( char data, char x, char y)
 	        mouse_buttom_3 = 1;
 	        ps2_button_pressed = 1;
         };
-   
- 
+
     // ===
     // Confrontando o estado atual com
     // o estado anterior para saber se ouve
@@ -431,17 +398,15 @@ void parse_data_packet ( char data, char x, char y)
          mouse_buttom_3 != old_mouse_buttom_3 )
     {
         mouse_button_action = 1;
-
     }else{
         mouse_button_action = 0;
     };
 
-    //#isso ainda eh um teste.
+    // # isso ainda eh um teste.
     old_mouse_buttom_1 = mouse_buttom_1;
     old_mouse_buttom_2 = mouse_buttom_2;
     old_mouse_buttom_3 = mouse_buttom_3;
 }
-
 
 /*
  **************** 
@@ -464,8 +429,7 @@ int top_at ( int x, int y ){
     struct gws_window_d *__last_found;
     struct gws_window_d *tmp;
 
-
-    //max 1024 janelas.
+    // max 1024 janelas.
     for ( z=0; z<ZORDER_MAX; z++ )
     {
         //pega a próxima na zorderlist;
@@ -499,7 +463,6 @@ __found:
 }
 
 
-
 int mouse_scan_windows (void)
 {
     struct gws_window_d *Window;
@@ -507,18 +470,17 @@ int mouse_scan_windows (void)
 
     wID = (int) top_at ( mouse_x, mouse_y );
 
-
     //================
     // -1 = Se não temos uma janela.
     if ( wID < -1 ) //( wID == -1 )
-    { 
-		//... 
+    {
+        // ...
     }
 
     //============================ 
     // Se estamos sobre uma janela válida.
     if ( wID >= 0 )  //if ( wID > -1 )
-    { 
+    {
         Window = (struct gws_window_d *) windowList[wID];
 
         if ( (void *) Window == NULL ) { return -1; }
@@ -530,34 +492,28 @@ int mouse_scan_windows (void)
         //if ( mouse_button_action == 1 )
         //{ ... }
 
-
         //===============================================
         // *** Se NÃO ouve alteração no estado dos botões, então apenas 
         // enviaremos a mensagem de movimento do mouse e sinalizamos 
         // qual é a janela que o mouse está em cima.
         // Não houve alteração no estado dos botões, mas o mouse
         // pode estar se movendo com o botão pressionado.
-        //a não ser que quando pressionamos o botão ele envie várias
-        //interrupções, igual no teclado.
-        //if ( mouse_button_action == 0 )
-        //{ ... }
-        
+        // a não ser que quando pressionamos o botão ele envie várias
+        // interrupções, igual no teclado.
+        // if ( mouse_button_action == 0 )
+        // { ... }
     }
-
-
 
     return -1;
 }
 
-
-
 //
-// == Mouse -- =======================================================
+// == Mouse --===============================================
 //
 
 
 //
-// Prototypes.
+// == Prototypes ============================================
 //
 
 // Get system message from the thread's queue.
@@ -565,35 +521,30 @@ void xxxHandleNextSystemMessage (void);
 // Get client's request from socket.
 void xxxHandleNextClientRequest (int fd);
 
-
-int 
-gwsProcedure ( 
-    struct gws_window_d *window, 
-    int msg, 
-    unsigned long long1, 
+int
+gwsProcedure (
+    struct gws_window_d *window,
+    int msg,
+    unsigned long long1,
     unsigned long long2 );
-
 
 int initGraphics(void);
 void create_background (void);
 
-
-void
-gwssrv_init_client_support(void);
+void gwssrv_init_client_support (void);
 void init_client_struct ( struct gws_client_d *c );
 
-
-
-
 //
-//===================================================================
+// ==============================================================
 //
-
 
 // Print a simple string in the serial port.
 void gwssrv_debug_print (char *string)
 {
-    gramado_system_call ( 289, 
+    //if( (void*) string == NULL ){ return; }
+    //if(*string == 0){ return; }
+
+    gramado_system_call ( 289,
         (unsigned long) string,
         (unsigned long) string,
         (unsigned long) string );
@@ -604,6 +555,9 @@ void gwssrv_debug_print (char *string)
 // #todo: We can use the rtl.
 int gwssrv_clone_and_execute ( char *name )
 {
+    //if( (void*) name == NULL ){ return -1; }
+    //if(*name == 0){ return -1 }
+
     return (int) gramado_system_call ( 900, (unsigned long) name, 0, 0 );
 }
 
@@ -618,7 +572,8 @@ unsigned long gwssrv_get_system_metrics (int index)
         //return 0;
     //}
     //#define	SYSTEMCALL_GETSYSTEMMETRICS  250 
-    return (unsigned long) gramado_system_call ( 250, 
+
+   return (unsigned long) gramado_system_call ( 250, 
                                (unsigned long) index, 
                                (unsigned long) index, 
                                (unsigned long) index );
@@ -626,10 +581,11 @@ unsigned long gwssrv_get_system_metrics (int index)
 
 
 
-// #todo: We can use the rtl.
-//P (Proberen) testar.
-void gwssrv_enter_critical_section (void){
-
+// #todo:
+// We can use the rtl.
+// P (Proberen) testar.
+void gwssrv_enter_critical_section (void)
+{
     int S=0;
 
     //#define	SYSTEMCALL_GET_KERNELSEMAPHORE    226
@@ -645,6 +601,7 @@ void gwssrv_enter_critical_section (void){
         if ( S == 1 ){ goto done; }
         
         //#wait
+        //#todo use the sc82()
         gramado_system_call (265,0,0,0); //yield thread.
     };
 
@@ -658,11 +615,12 @@ done:
 }
 
 
-//V (Verhogen)incrementar.
+// V (Verhogen) incrementar.
 void gwssrv_exit_critical_section (void)
 {
 	//#define	SYSTEMCALL_OPEN_KERNELSEMAPHORE   228
 	//Hora de sair. Mudo para 1 para que outro possa entrar.
+
     gramado_system_call ( 228, //SYSTEMCALL_OPEN_KERNELSEMAPHORE, 
         0, 0, 0 );
 }
@@ -684,12 +642,9 @@ void gwssrv_show_backbuffer (void)
         0, 0, 0 );
 }
 
-
-
 //
 // =============================================================
 //
-
 
 
 //??
@@ -766,9 +721,6 @@ void set_client_id ( int id )
 */
 
 
-
-
-
 /*
 int
 __WriteToClient ( 
@@ -784,8 +736,6 @@ __WriteToClient (
     return -1;
 }
 */
-    
-
 
 
 /*
@@ -794,7 +744,7 @@ int WriteToClient (int fd)
 {
     unsigned long *message_buffer = (unsigned long *) &__buffer[0];   
     int n_writes = 0;    // For responses.
-    
+ 
     char *m = (char *) (&__buffer[0] + 16);
     sprintf( m, "gwssrv: This is a response from GWS!\n");
 
@@ -803,7 +753,6 @@ int WriteToClient (int fd)
     message_buffer[1] = SERVER_PACKET_TYPE_REPLY; // next_response[1] 
     message_buffer[2] = next_response[2];         // Return value (long1)
     message_buffer[3] = next_response[3];         // Return value (long2)
-
 
     if (fd<0)
         return 0;
@@ -848,15 +797,11 @@ __again:
 }
 */
 
-    
-
-
 
 /*
  ****************************
  * xxxGetNextClientRequest:
- * 
- * 
+ *
  */
 
 // internal.
@@ -864,7 +809,7 @@ __again:
 // obs: read and write use the buffer '__buffer'
 // in the top of this file.
 
-//#todo:
+// #todo:
 // No loop precisamos de accept() read() e write();
 // Get client's request from socket.
 
@@ -876,7 +821,7 @@ void xxxHandleNextClientRequest (int fd)
     int n_reads = 0;     // For requests.
     int n_writes = 0;    // For responses.
 
-    //#todo:
+    // #todo:
     // No loop precisamos de accept() read() e write();
 
     //#atenção:
@@ -898,21 +843,19 @@ void xxxHandleNextClientRequest (int fd)
         return;
     }
 
-
 //__loop:
 
     //
     // == Request ============================
     //
-    
-    
+
     // Requests may generate replies, events, and errors;
     // Request packets are numbered sequentially by the server 
     // as soon as it receives them.
 
     // See:
     // https://en.wikipedia.org/wiki/Round-trip_delay
-    
+
     // If the request is (XNextEvent), so the reply will be the event.
 
     /*
@@ -925,9 +868,9 @@ void xxxHandleNextClientRequest (int fd)
     */
 
     int value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
-    
+
     //printf ("VALUE {%d} \n", value);
-    
+
     if ( value != ACTION_REQUEST )
     {
         //printf("not a request\n");
@@ -953,28 +896,9 @@ void xxxHandleNextClientRequest (int fd)
 
     // Precisamos fechar o client e yield.
     if (n_reads <= 0)
-    { 
+    {
         gwssrv_debug_print ("xxxHandleNextClientRequest: read fail\n");
         gwssrv_yield(); 
-        // Cleaning
-        message_buffer[0] = 0;
-        message_buffer[1] = 0;
-        message_buffer[2] = 0;
-        message_buffer[3] = 0;
-        return; 
-    }
-
-    // Nesse momento lemos alguma coisa.   
- 
-    //
-    // == Processing the request =============================
-    //
- 
-    // Invalid request.
-    if (message_buffer[1] == 0 )
-    {
-        gwssrv_debug_print ("xxxHandleNextClientRequest: Invalid request!\n");
-        gwssrv_yield();
         // Cleaning
         message_buffer[0] = 0;
         message_buffer[1] = 0;
@@ -983,6 +907,23 @@ void xxxHandleNextClientRequest (int fd)
         return;
     }
 
+    // Nesse momento lemos alguma coisa.   
+ 
+    //
+    // == Processing the request =============================
+    //
+ 
+    // Invalid request. Yield and clean.
+    if (message_buffer[1] == 0 )
+    {
+        gwssrv_debug_print ("xxxHandleNextClientRequest: Invalid request!\n");
+        gwssrv_yield();
+        message_buffer[0] = 0;
+        message_buffer[1] = 0;
+        message_buffer[2] = 0;
+        message_buffer[3] = 0;
+        return;
+    }
 
     // #test
     // Input solicitado por um cliente
@@ -1062,17 +1003,16 @@ void xxxHandleNextClientRequest (int fd)
 
     debug_print ("xxxHandleNextClientRequest: Got a request!\n");
     debug_print ("xxxHandleNextClientRequest: Calling window procedure\n");
-    
-    
+
     // #todo.
     // Dependendo do tipo de request, então construiremos
     // a resposta ou prestatemos os serviço.
-    // Para cada tipo de request o servidor precisa construir 
+    // Para cada tipo de request o servidor precisa construir
     // uma resposta diferente.
     // O request afeta os campos da mensagem.
     // Esses campos estão em um buffer, mas poderiam estar
     // em um arquivo json.
-    
+
     // Types:
     // + Null: fail.
     // + Identify: The server needs to identify itself.
@@ -1082,18 +1022,16 @@ void xxxHandleNextClientRequest (int fd)
     // + Disconnect:
     // ...
 
-    //#debug: para a máquina real.
-    //printf ("gws: got a message!\n");
-    //printf ("gws: xxxGetNextClientRequest: calling window procedure \n");
+    // #debug: para a máquina real.
+    // printf ("gws: got a message!\n");
+    // printf ("gws: xxxGetNextClientRequest: calling window procedure \n");
  
-                
     // Realiza o serviço.
-    gwsProcedure ( 
+    gwsProcedure (
        (struct gws_window_d *) message_buffer[0], 
        (int)                   message_buffer[1], 
        (unsigned long)         message_buffer[2], 
        (unsigned long)         message_buffer[3] );
-
 
     // #todo
     // Se o request foi um request de evento,
@@ -1107,11 +1045,12 @@ void xxxHandleNextClientRequest (int fd)
 
     //
     // == Sending reply =======================================
-    // 
+    //
 
     // Alguns requests nao exigem resposta,
-    if (NoReply == TRUE)
+    if (NoReply == TRUE){
         return;
+    }
 
     //gwssrv_debug_print ("Sending response ...\n");  
 
@@ -1125,13 +1064,12 @@ void xxxHandleNextClientRequest (int fd)
     message_buffer[2] = next_response[2];         // Return value (long1)
     message_buffer[3] = next_response[3];         // Return value (long2)
 
-
 //__again:
 
     //
     // == Response ============================
     //
-      
+
     gwssrv_debug_print ("xxxHandleNextClientRequest: Sending response ...\n");
 
     // #todo:
@@ -1148,15 +1086,14 @@ void xxxHandleNextClientRequest (int fd)
 
     // set response
     rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REPLY );
-    
+
     //
     // Send
     //
 
     n_writes = write ( fd, __buffer, sizeof(__buffer) );
     //n_writes = send ( fd, __buffer, sizeof(__buffer), 0 );
-   
-   
+
     // limpa.
     // se a resposta der certo ou se der errado.
 
@@ -1166,37 +1103,38 @@ void xxxHandleNextClientRequest (int fd)
     message_buffer[2] = 0;
     message_buffer[3] = 0;
     register int b=0;
-    for (b=0; b<MSG_BUFFER_SIZE; ++b)
+    for (b=0; b<MSG_BUFFER_SIZE; ++b){
         __buffer[b] = 0;
+    };
 
     // Cleaning
+    // 32. #todo 512.
     register int c=0;
-    for (c=0; c<NEXTRESPONSE_BUFFER_SIZE; ++c)  //32. todo: 512
+    for (c=0; c<NEXTRESPONSE_BUFFER_SIZE; ++c){
         next_response[c] = 0;
+    };
 
-    // NO. We couldn't send a response.
+    // No. We couldn't send a response.
     // O que acontece se nao conseguirmos enviar uma resposta?
     // Certamente o cliente tentara ler e tera problemas.
     // Deveriamos fechar a conexao?
     // Deveriamos enviar um alerta
     
     if (n_writes<=0){
-        gwssrv_debug_print ("xxxHandleNextClientRequest: write fail. response fail\n");
+        gwssrv_debug_print ("xxxHandleNextClientRequest:  response fail\n");
         printf("gwssrv-xxxHandleNextClientRequest: Couldn't send reply\n");
         //close(fd);
         gwssrv_yield();
         return;
     }
-    
-    // YES, We sent a response.
-    if (n_writes>0)
-       gwssrv_debug_print ("xxxHandleNextClientRequest: Response sent\n");  
 
+    // YES, We sent a response.
+    if (n_writes>0){
+       gwssrv_debug_print ("xxxHandleNextClientRequest: Response sent\n");
+    }
 
     gwssrv_yield();
 }
-
-
 
 /*
  //#test
@@ -1216,17 +1154,16 @@ void ____get_system_message( unsigned long buffer )
 /*
  ********************************** 
  * xxxGetNextSystemMessage: 
- * 
- * 
+ *
  */
 
 // internal
 // System ipc messages. (It's like a signal)
 // Get system message from the thread's queue.
-void xxxHandleNextSystemMessage (void){
-    
-    unsigned long message_buffer[5];   
 
+void xxxHandleNextSystemMessage (void)
+{
+    unsigned long message_buffer[5];
 
     // Get message.
     gwssrv_enter_critical_section();
@@ -1242,11 +1179,13 @@ void xxxHandleNextSystemMessage (void){
         return;
     }
 
-    // Send message to the window procedure.
-    gwsProcedure ( (struct gws_window_d *) message_buffer[0], 
-        (int) message_buffer[1], 
-        (unsigned long) message_buffer[2], 
-        (unsigned long) message_buffer[3] );
+    // Send message to the window procedure and clean.
+
+    gwsProcedure ( 
+        (struct gws_window_d *) message_buffer[0], 
+        (int)                   message_buffer[1], 
+        (unsigned long)         message_buffer[2], 
+        (unsigned long)         message_buffer[3] );
 
      message_buffer[0] = 0;
      message_buffer[1] = 0;
@@ -1261,7 +1200,7 @@ void xxxHandleNextSystemMessage (void){
  *     Main dialog.
  */
 
-int 
+int
 gwsProcedure ( 
     struct gws_window_d *window, 
     int msg, 
@@ -1270,7 +1209,6 @@ gwsProcedure (
 {
 
     int my_pid = -1;
-
 
     // #debug
     debug_print ("gwssrv: gwsProcedure\n");
@@ -1308,34 +1246,32 @@ gwsProcedure (
                     gwssrv_debug_print ("gwssrv: F4 [EXIT] Exiting the server ...\n");
                     running = 0;
                     break;
-                    
-                    
+
                 case VK_F9:
                     gwssrv_debug_print ("gwssrv: F9\n");
                     //gws_draw_text(
                     break;
-                    
-                  
 
                 // ...
-                  
+
                 // Enviar a mensagem para o processo associado
                 // com a janela que tem o foco de entrada.
+
                 default:
                     gwssrv_debug_print ("gwssrv: MSG_SYSKEYUP\n");
                     break;
-            }    
+            }
             break;
 
         // #test
         // Tentando receber uma mensagem de digitação.
-        case GWS_KeyDown: //MSG_KEYDOWN:
-            
+        case GWS_KeyDown:
+
             //#bugbug: Isso está falhando.
             //mas o f1 funciona.
-            //printf ("%c", (char) long1); 
+            //printf ("%c", (char) long1);
             //gws_show_backbuffer ();
-            
+
             gwssrv_debug_print ("gwssrv: MSG_KEYDOWN\n");
             break;
 
@@ -1344,7 +1280,7 @@ gwsProcedure (
 
         // Hello!
         // Draw text inside a window.
-        // #bugbug: 
+        // #bugbug:
         // O window server não tem esse ponteiro de janela.
         // ele até aceitaria um handle.
         // #bugbug: Something is very wrong with this routine.
@@ -1355,9 +1291,10 @@ gwsProcedure (
             if ( (void*) gui->screen != NULL)
             {
                 //if ( gui->screen->used == 1 && gui->screen->magic == 1234 ){
-                    dtextDrawText ( (struct gws_window_d *) gui->screen,
-                      long1, long2, COLOR_GREEN,
-                      "gwssrv: Hello friend. This is the Gramado Window Server!");
+                    dtextDrawText ( 
+                        (struct gws_window_d *) gui->screen,
+                        long1, long2, COLOR_GREEN,
+                        "gwssrv: Hello friend. This is the Gramado Window Server!");
                 //}
             } 
             gws_show_backbuffer();
@@ -1384,7 +1321,6 @@ gwsProcedure (
             NoReply = FALSE;
             break;
 
-
         // Draw char
         // See: char.c
         case GWS_DrawChar:
@@ -1392,7 +1328,6 @@ gwsProcedure (
             serviceDrawChar();
             NoReply = FALSE;
             break;
-
 
         // Draw text
         // See: dtext.c
@@ -1402,14 +1337,12 @@ gwsProcedure (
            NoReply = FALSE;
            break;
 
-
         // Refresh window
         case GWS_RefreshWindow:
            gwssrv_debug_print ("gwssrv: [1006] serviceRefreshWindow\n");
            serviceRefreshWindow();
            NoReply = FALSE;
            break;
-           
 
         // Redraw window
         case GWS_RedrawWindow:
@@ -1431,9 +1364,8 @@ gwsProcedure (
            NoReply = FALSE;
            break;
 
-    
         // ...
-               
+
         // backbuffer putpixel. (again)
         // IN: Color, x, y
         case GWS_BackbufferPutPixel2:
@@ -1462,7 +1394,6 @@ gwsProcedure (
             gws_show_backbuffer();
             //NoReply = FALSE;
             break;
-             
 
         // Refresh rectangle ... 
         case GWS_RefreshRectangle:
@@ -1516,7 +1447,7 @@ gwsProcedure (
         // async command: 
         case GWS_AsyncCommand:
             gwssrv_debug_print ("gwssrv: [2222] calling serviceAsyncCommand\n");
-                        printf ("gwssrv: [2222] calling serviceAsyncCommand\n");
+                        //printf ("gwssrv: [2222] calling serviceAsyncCommand\n");
             serviceAsyncCommand();
             NoReply = TRUE;
             break;
@@ -1530,7 +1461,6 @@ gwsProcedure (
             service_drain_input();
             break;
 
-
         // ...
 
         default:
@@ -1539,23 +1469,19 @@ gwsProcedure (
             break;
     }
 
-
     // #todo: 
     // Call the system's window procedure.    
     // Rever esse retorno.
     //return (int) gde_system_procedure (window,msg,long1,long2);
- 
+
     return 0;
 }
-
-
 
 void create_background (void)
 {
     unsigned long w = gws_get_device_width();
     unsigned long h = gws_get_device_height();
     int WindowId = -1;
-
 
     gwssrv_debug_print ("gwssrv: create_background\n");
 
@@ -1584,12 +1510,10 @@ void create_background (void)
 
     if (WindowId<0){
         gwssrv_debug_print ("create_background: Couldn't register window\n");
-        //return -1;
+        //return;
     }
 
-
     //__bg_window->dirty = 1;
-    
 
     if (current_mode == GRAMADO_JAIL){
         refresh_screen();
@@ -1604,7 +1528,6 @@ void create_background (void)
 /*
  ****************************** 
  * initGraphics:
- *
  *     Initialize the graphics support.
  */
 
@@ -1632,7 +1555,6 @@ int initGraphics (void){
         exit(1);
     }
 
-   
     if ( (void*) gui == NULL ){
         debug_print ("initGraphics: gui\n");
         printf      ("initGraphics: gui\n");
@@ -1644,7 +1566,8 @@ int initGraphics (void){
     // pelo menos essa mensagem.
     if ( (void*) gui->screen != NULL )
     {
-        dtextDrawText ( (struct gws_window_d *) gui->screen,
+        dtextDrawText ( 
+            (struct gws_window_d *) gui->screen,
             8, 8, COLOR_RED, "gwssrv: Initializing graphics" );
     }
 
@@ -1653,8 +1576,7 @@ int initGraphics (void){
 
     create_background();
 
- 
-    // Testing bmp.
+     // Testing bmp.
     // See:
     if (current_mode == GRAMADO_JAIL){
         gwssrv_display_system_icon ( 1, 8, 100 );
@@ -1667,50 +1589,44 @@ int initGraphics (void){
         gwssrv_display_system_icon ( 2, 8, 120 );
     };
 
-
     //#debug breakpoint
     //while(1){}
 
-
     // Initialize the graphics support.
     // Now we can use 3d routines.
-    
+
     // See: grprim.c
     grInit();
-    
+ 
     //
     // == demos =================================================
     //
-    
+ 
     // Always run some demo if we are in JAIL mode.
     // It's an animation in the initialization.
-    
-        // Seleciona a animaçao.
-        // Nao deve travar, deve ter timeout.
+    // Seleciona a animaçao.
+    // Nao deve travar, deve ter timeout.
 
     if (current_mode == GRAMADO_JAIL)
     {
-         
          //demos_startup_animation(1);   //ok
          //demos_startup_animation(2);   //it works
          //demos_startup_animation(3);   //it works
          //demos_startup_animation(4);   //it works.
-         //demos_startup_animation(5);   // it works.
+         //demos_startup_animation(5);   //it works.
          //demos_startup_animation(6);   //ok
          //demos_startup_animation(7);   //ok
          //demos_startup_animation(8);   //ok
-         demos_startup_animation(9);    //ok
-         
+         demos_startup_animation(9);     //ok
          gwssrv_show_backbuffer();
          //while(1){}
          // ...
     }
 
-
     //
     // == tests =================================================
     //
-    
+ 
     /*
      //testes com z positivo
     grPlot0(0, 4, 4,COLOR_RED);     // q1
@@ -1889,7 +1805,7 @@ int initGraphics (void){
             //plotEllipseRectZ ( i%20, i%20, i, i, COLOR_BLUE,i%20);
     };
     */
-    
+
  
     /*
     plotCharBackbufferDrawcharTransparentZ (  (8*0), 0, COLOR_RED, 'G', 0 );
@@ -2030,7 +1946,6 @@ int initGraphics (void){
         rect->p[3].z = 0;
         rect->p[3].color = COLOR_PINK;
         
-        
         // plot rectangle 
         rectangleZZ ( (struct gr_rectangle_d *) rect );
     }
@@ -2048,16 +1963,15 @@ int initGraphics (void){
     */
     
     // refresh
-    gws_show_backbuffer();              
-    
+    gws_show_backbuffer();
 
     // Change
     // Se encontrar o 0x80 muda para 0x50 caso contrario mude para 0x00
     //grDCMono ( CurrentDisplay, 0x80, 0x50, 0x00 );
-    
+ 
     // Se encontrar 0x80 mude para 0x50.
     //grDCColorChg ( CurrentDisplay, 0x80, 0x50 );
-    
+  
     // filtro
     // atenuando
     //grDCColorChg ( CurrentDisplay, 0x80, 0x80 - 0x30 );
@@ -2065,18 +1979,14 @@ int initGraphics (void){
     //grDCColorChg ( CurrentDisplay, 0xFF, 0x80 - 0x30 );
     //grDCColorChg ( CurrentDisplay, 0x00, 0x80 - 0x30 );
     //while(1){}
-    
-        
+
     debug_print("gwssrv: InitGraphics done\n");
     //printf     ("gwssrv: InitGraphics done *hang\n");
     //while(1){}
-        
-    
+ 
     // ok
     return 0;
 }
-
-
 
 
 // Initialize the client list.
@@ -2087,39 +1997,31 @@ void gwssrv_init_client_support (void)
 {
     int i=0;
 
-
     gwssrv_debug_print ("gwssrv_init_client_support:\n");
 
     for (i=0; i<CLIENT_COUNT_MAX; i++)
     {
         connections[i] = 0;
     };
-    
+ 
     // The current client
     currentClient = (struct gws_client_d *) 0;
     
     
     // The server client.
     serverClient = (struct gws_client_d *) malloc ( sizeof( struct gws_client_d ) );
-    if ( (void *) serverClient == NULL )
-    {
+    if ( (void *) serverClient == NULL ){
         gwssrv_debug_print ("gwssrv_init_client_support: [FATAL] Couldn't create serverClient\n");
         printf             ("gwssrv_init_client_support: [FATAL] Couldn't create serverClient\n");
         exit(1);
-    
     }else{
-        
         serverClient->id = 0;
         serverClient->used = 1;
         serverClient->magic = 1234;
-        
         serverClient->is_connected = 0;  //no
-        
         serverClient->fd = -1;
-        
         serverClient->pid = getpid();
         serverClient->gid = getgid();
-        
         // ...
         
         // #todo
@@ -2145,16 +2047,14 @@ void gwssrv_init_client_support (void)
 void init_client_struct ( struct gws_client_d *c )
 {
     int i=0;
-    
+
     if ( (void*) c == NULL )
         return;
-    
+ 
     c->id = -1;  //fail
     c->used = 1;
     c->magic = 1234;
-    
     c->is_connected = 0;  //no
-    
     c->fd = -1;
     c->pid = -1;
     c->gid = -1;
@@ -2169,7 +2069,6 @@ void init_client_struct ( struct gws_client_d *c )
     c->tail_pos = 0;
     c->head_pos = 0;
 }
-
 
 /*
  //Send the message in the buffer to all the clients.
@@ -2192,7 +2091,6 @@ int serviceClientEvent(void)
     unsigned long msg    =0;
     unsigned long long1  =0;
     unsigned long long2  =0;
-
 
     //struct gws_client_d *client;
     //struct gws_window_d *hWindow;
@@ -2251,7 +2149,6 @@ int serviceNextEvent (void)
 }
 
 
-
 int serviceAsyncCommand (void)
 {
     //O buffer é uma global nesse documento.
@@ -2259,7 +2156,6 @@ int serviceAsyncCommand (void)
 
     unsigned long message_id =0;
     unsigned long request_id =0;
-
 
 
     message_id  = message_address[1]; 
@@ -2273,19 +2169,19 @@ int serviceAsyncCommand (void)
     }
 
 
-
-    //#debug
-    printf ("gwssrv_init_client_support: [request %d] \n", request_id);
+    // #debug
+    // printf ("gwssrv_init_client_support: [request %d] \n", request_id);
  
     switch (request_id){
 
         // 1 =  Close server.
         case 1:
             gwssrv_debug_print ("gwssrv_init_client_support: [request 1] Closing server\n");
-                       // printf ("gwssrv_init_client_support: [request 1] Closing server\n");
+                        //printf ("gwssrv_init_client_support: [request 1] Closing server\n");
+            printf("gwssrv: Close server\n");
             exit(0);
             break;
-        
+
         case 2:
             gwssrv_debug_print ("gwssrv_init_client_support: [request 2] \n");
             printf("PING\n");
@@ -2313,14 +2209,6 @@ int serviceAsyncCommand (void)
 }
 
 
-
-
-
-
-
-
-
-
 /*
  ******************************
  * main: 
@@ -2333,12 +2221,11 @@ int serviceAsyncCommand (void)
  *     + bind it.
  *     + Spawn a client process. (gwst.bin)
  *     + Enter in the main loop, waiting for some types of event.
- *          The possible events are: Reading messages from the kernel,
- *          or Reading our socket.
+ *       The possible events are: Reading messages from the kernel,
+ *       or Reading our socket.
  *       In this moment we can send a response. It depends on the
- *           message found in the sockeck we readed.
+ *       message found in the sockeck we readed.
  */
-
 
 int main (int argc, char **argv)
 {
@@ -2368,7 +2255,6 @@ int main (int argc, char **argv)
     // Flag usada no loop.
     running = 1;
 
-
     /*
     FILE *input_fp;
     fflush(stdin);
@@ -2379,7 +2265,6 @@ int main (int argc, char **argv)
         exit(1);
     }
     */
-
 
 
     /*
@@ -2406,11 +2291,11 @@ int main (int argc, char **argv)
     // Main loop!
     // This loop will make the server restart and
     // call the childs again.
-    
+
     char buf[32];
-    
     int CanRead=-1;
-    
+
+    // major loop.
     while (1){
 
         // #todo:
@@ -2422,14 +2307,12 @@ int main (int argc, char **argv)
         gwssrv_debug_print ("-----------------------\n");
         gwssrv_debug_print ("gwssrv: Initializing...\n");
         printf             ("gwssrv: Initializing...\n");
-        
-        
+
         // Inicializa a lista de clientes.
         gwssrv_init_client_support();
-         
 
         // Register.
- 
+
         // #bugbug
         // I don't know if we can register more than one time.
         // We can fix it!
@@ -2442,6 +2325,7 @@ int main (int argc, char **argv)
         // Precisamos a opcao de desregistrar, para tentarmos 
         // mais de um window server.
         // See: connect.c
+
         _status = (int) register_ws();
 
         if (_status<0){
@@ -2482,16 +2366,15 @@ int main (int argc, char **argv)
 
         serverClient->fd    = server_fd;
         ____saved_server_fd = server_fd;
-        
 
         //
         // bind
-        // 
-    
+        //
+
         // #debug
         printf ("gwssrv: bind\n");
- 
-        bind_status = bind ( 
+
+        bind_status = bind (
                           server_fd, 
                           (struct sockaddr *) &server_address, 
                           addrlen );
@@ -2502,39 +2385,35 @@ int main (int argc, char **argv)
             exit(1);
         }
 
-
         // #todo
         // It will setup how many connection the kernel
         // is able to have in the list.
         // 5 clients in the list.
+
         listen(server_fd,5);
 
         // Draw !!!
         // Init gws infrastructure.
         // Initialize the 3d graphics support.
         // Let's create the traditional green background.
-        
+ 
         initGraphics();
-
 
         // Calling child.
         //printf ("gwssrv: Calling child \n");  
 
         // main tests
-        //gwssrv_clone_and_execute ("gws.bin");      // command gws.bin
-        //gwssrv_clone_and_execute ("editor.bin");           
-        //gwssrv_clone_and_execute ("fileman.bin");  
-        gwssrv_clone_and_execute ("terminal.bin");  
-        
-        
+        gwssrv_clone_and_execute ("gws.bin");      // command gws.bin
+        //gwssrv_clone_and_execute ("editor.bin"); 
+        //gwssrv_clone_and_execute ("fileman.bin"); 
+        //gwssrv_clone_and_execute ("terminal.bin"); 
+
         //gwssrv_clone_and_execute ("launch1.bin"); 
         //gwssrv_clone_and_execute ("browser.bin");
-        //gwssrv_clone_and_execute ("gwm.bin");      // window manager
+        //gwssrv_clone_and_execute ("gwm.bin");     // window manager
         //gwssrv_clone_and_execute ("s2.bin");      // shell  
-        //gwssrv_clone_and_execute ("s3.bin");    // hello        
+        //gwssrv_clone_and_execute ("s3.bin");      // hello
         // ...
-
-
 
         // Wait
         // printf ("gwssrv: [FIXME] yield \n");
@@ -2563,7 +2442,7 @@ int main (int argc, char **argv)
         // Então logo após enviarmos a resposta precisamos
         // fechar o arquivo? Acabaria com o socket?
         // #atenção:
-        // A função accept vai retornar o descritor do 
+        // A função accept vai retornar o descritor do
         // socket que usaremos ... por isso poderemos fecha-lo
         // para assim obtermos um novo da próxima vez.
     
@@ -2573,7 +2452,7 @@ int main (int argc, char **argv)
         //#todo:
         // No loop precisamos de accept() read() e write();
 
-        // + Compositor. (Redraw dirty rectangles)    
+        // + Compositor. (Redraw dirty rectangles)
         // + Socket requests.
         // + Normal messages. (It's like signals.)
  
@@ -2584,7 +2463,6 @@ int main (int argc, char **argv)
         //curconn = serverClient->fd;
         newconn = -1;
 
-    
         // #todo:
         // Precisamos criar uma fila de mensagens para o sistema
         // e uma fila de mensagens para cada aplicativo.
@@ -2594,17 +2472,17 @@ int main (int argc, char **argv)
         // a fila do sistema é global.See: input.c
         // ntuser faz isso também. tem dois inputs,
         // um do sistema e outro dos apps.
-        
+ 
         //initialize frames counter,
         frames_count = 0;
         fps = 0;
-        
+ 
         while (running == 1)
         {
             // Se tem ou não retângulos sujos.
             // #bugbug: Talvez isso seja trabalho do window manager.
             // mas ele teria que chamar o window server pra efetuar o refresh
-            //dos retângulos.
+            // dos retângulos.
             // See comp.c
 
             //compositor();
@@ -2612,10 +2490,9 @@ int main (int argc, char **argv)
             //process_events(); //todo
 
             //if (isTimeToQuit == 1) { break; };
-         
 
-            // Accept connection from a client. 
-            
+            // Accept connection from a client.
+
             // Seja profissional e aceite a conexaozinha \o/
 
             newconn = accept ( 
@@ -2625,17 +2502,16 @@ int main (int argc, char **argv)
         
             //gwssrv_debug_print("gwssrv: accept returned\n");
             //printf ("gwssrv: newconn %d\n",newconn);
-            
-            if (newconn<=0)
-            {
+
+            if (newconn<=0){
                 gwssrv_debug_print("gwssrv: accept returned FAIL\n");
             }
-            
+ 
             if (newconn>0)
             {
                 gwssrv_debug_print("gwssrv: accept returned OK\n");
                 xxxHandleNextClientRequest (newconn);
-                
+      
                 // #??
                 // Entao nos lemos o socket e escrevemos no socket.
                 // precisamos dar um tempo para o cliente ler,
@@ -2674,8 +2550,8 @@ int main (int argc, char **argv)
     // Done.
     //close(server_fd);
     
-    gwssrv_debug_print ("gwssrv: exited. \n");
-    printf             ("gwssrv: exited. \n");
+    gwssrv_debug_print ("gwssrv: exited \n");
+    printf             ("gwssrv: exited \n");
     
     // #todo
     // The kernel needs to react when the window server closes.
@@ -2684,28 +2560,19 @@ int main (int argc, char **argv)
     // #debug
     // #bugbug:
     // Page fault  when exiting ... 
-    
+ 
     // HANG
     while(1){ }
-
     //suspended.
     return 0; 
 }
 
 
-
-
-//yield thread.
+// yield thread.
 void gwssrv_yield(void)
 {
-    //gramado_system_call(265,0,0,0);
-    sc82 (265,0,0,0);
+    sc82(265,0,0,0);
 }
-
-
-
-
-
 
 
 

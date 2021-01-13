@@ -3375,7 +3375,10 @@ gws_async_command (
                        sizeof(__gws_message_buffer), 
                        0 );
 
-        if (n_writes>0){ break; }
+        if (n_writes>0){ 
+            rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );
+            break; 
+        }
     };
 
     // No return.
