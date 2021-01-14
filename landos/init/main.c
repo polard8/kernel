@@ -427,17 +427,19 @@ int main ( int argc, char *argv[] )
                 // initialize ps2 mouse and keyboard..  it fail on real machine.
                 // Open de difficulty level launcher.
                 //gramado_system_call ( 350, 1, 0, 0 );  //ps2 initialization #bugbug
-                gramado_system_call ( 900, 
-                    (unsigned long) "launcher.bin", 0, 0 ); 
+                sc82 ( 900, (unsigned long) "launcher.bin", 0, 0 ); 
+                //gramado_system_call ( 900, 
+                    //(unsigned long) "launcher.bin", 0, 0 ); 
                 //gramado_system_call ( 900, 
                 //    (unsigned long) "sysmon.bin", 0, 0 ); 
                 break;
             }
             
             debug_print ("init.bin: Calling gdeshell.bin\n");
-            gramado_system_call ( 900, 
-                (unsigned long) "gdeshell.bin", 0, 0 ); 
-
+            //gramado_system_call ( 900, 
+                //(unsigned long) "gdeshell.bin", 0, 0 ); 
+            sc82 ( 900, (unsigned long) "gdeshell.bin", 0, 0 ); 
+ 
             //gramado_system_call ( 900, 
                 //(unsigned long) "gramcode.bin", 0, 0 ); 
 

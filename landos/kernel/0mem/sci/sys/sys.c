@@ -2018,6 +2018,7 @@ void *sys_create_process (
     // Criamos um processo no endereço virtual 0x00400000
     // de seu proprio diretorio de paginas, que eh um clone do
     // diretorio do kernel.
+    // See: ps/process.c
 
     p = (void *) create_process ( 
                      room, desktop, window, 

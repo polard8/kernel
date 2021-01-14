@@ -3254,7 +3254,8 @@ int gde_clone_and_execute ( char *name )
         return -1;
     }
 
-    return (int) gramado_system_call ( 900, (unsigned long) name, 0, 0 );
+    //return (int) gramado_system_call ( 900, (unsigned long) name, 0, 0 );
+    return (int) sc82 ( 900, (unsigned long) name, 0, 0 );
 }
 
 

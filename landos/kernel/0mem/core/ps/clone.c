@@ -63,7 +63,10 @@ pid_t clone_process (void){
         // Virtual Address of the current process.
         dir = (unsigned long *) Current->DirectoryVA;
         //old_dir_entry0 = dir[0];    // Saving it.
-        old_dir_entry1 = dir[1];    // Saving it.
+        //old_dir_entry1 = dir[1];    // Saving it.
+        
+        if( (void*) Current->DirectoryVA == NULL )
+            panic("clone_process: Current->DirectoryVA\n");
 
         // Saving the physical address.
         //old_image_pa = (unsigned long) virtual_to_physical ( Current->Image, gKernelPageDirectoryAddress ); 		
@@ -100,7 +103,8 @@ do_clone:
 
 
     // Get a empty slot in the list of processes.
-
+    // Register. Saving into the list.
+    
     PID = (int) getNewPID();
 
     if ( PID <= 0 )
@@ -110,14 +114,9 @@ do_clone:
         goto fail;
     }
 
-
     Clone->pid = PID;
     Clone->used = 1;
     Clone->magic = 1234;
-
-    // Register!
-
-    // Saving into the list.
 
     processList[PID] = (unsigned long) Clone;
 
@@ -176,16 +175,26 @@ do_clone:
         // 4MB ??
 
 
+    // #bugbug
+    // Checando a validade dos valores obtidos pelas rotinas
+    // chamadas logo acima.
+
+    if( (void*) Clone->DirectoryVA == NULL )
+        panic("clone_process: Clone->DirectoryVA\n");
+
+    if( (void*) Clone->ImagePA == NULL )
+        panic("clone_process: Clone->ImagePA\n");
+
+
     void *__pt;
 
     __pt = (void *) CreatePageTable( 
                         (unsigned long) Clone->DirectoryVA, 
                         ENTRY_USERMODE_PAGES, 
-                        Clone->ImagePA );
+                        (unsigned long) Clone->ImagePA );
 
     if ( (void*) __pt == NULL )
-        panic ("clone_process: __pt");
-
+        panic ("clone_process: __pt\n");
 
 
     // Com base no endereço físico, usamos a função acima
@@ -338,6 +347,10 @@ do_clone:
     Clone->control->esp = (unsigned long) Current->childStack;  // #Atention!
 
 
+    if ( (void*) Clone->control->esp == NULL )
+        panic ("clone_process: Clone->control->esp\n");
+
+
         //podemos copiar a stack do pai numa área de memória compartilhada
         //e pasasrmos o ponteiro
         //Clone->control->esp = (unsigned long) allocPages(2); //8KB
@@ -379,6 +392,13 @@ do_clone:
     printf (">> child eip  = %x\n",Clone->control->eip);
 
 
+    if ( (void*) Clone->control->eip == NULL )
+        panic ("clone_process: Clone->control->eip\n");
+
+    if ( (void*) Clone->control->initial_eip == NULL )
+        panic ("clone_process: Clone->control->initial_eip\n");
+
+
     // More registers.
     Clone->control->ds = Current->control->ds;
     Clone->control->es = Current->control->es;
@@ -396,55 +416,55 @@ do_clone:
     // mesma tss
     Clone->control->tss = Current->control->tss;
 
-        Clone->control->next = NULL;
+    Clone->control->next = NULL;
 
-        Clone->control->exit_code = 0;
-        //====
+    Clone->control->exit_code = 0;
+    //====
 
-        //todo: tem outros elementos ...
-        Clone->ppid = Current->pid; 
-        Clone->uid  = Current->uid;
-        Clone->gid  = Current->gid;
-        Clone->tty  = Current->tty;
-        //strncpy(proc->name, curr_proc->name, NAME_MAX);
-        Clone->plane         = Current->plane;
-        Clone->personality   = Current->personality;
-        Clone->base_priority = Current->base_priority;       
-        Clone->priority      = Current->priority;
-        Clone->step = 0;
-        Clone->quantum       = Current->quantum;
-        Clone->bound_type    = Current->bound_type;
-        Clone->preempted     = Current->preempted;
-        Clone->usession      = Current->usession;
-        Clone->room          = Current->room;
-        Clone->desktop       = Current->desktop;
-        Clone->wait4pid = 0;
-        Clone->exit_code = 0;
-        Clone->nchildren = 0;
+    //todo: tem outros elementos ...
+    Clone->ppid = Current->pid; 
+    Clone->uid  = Current->uid;
+    Clone->gid  = Current->gid;
+    Clone->tty  = Current->tty;
+    //strncpy(proc->name, curr_proc->name, NAME_MAX);
+    Clone->plane         = Current->plane;
+    Clone->personality   = Current->personality;
+    Clone->base_priority = Current->base_priority;       
+    Clone->priority      = Current->priority;
+    Clone->step = 0;
+    Clone->quantum       = Current->quantum;
+    Clone->bound_type    = Current->bound_type;
+    Clone->preempted     = Current->preempted;
+    Clone->usession      = Current->usession;
+    Clone->room          = Current->room;
+    Clone->desktop       = Current->desktop;
+    Clone->wait4pid = 0;
+    Clone->exit_code = 0;
+    Clone->nchildren = 0;
        
-        Current->nchildren++;
+    Current->nchildren++;
        
-        //Clone->signal = 0;  //todo
-        Clone->umask = Current->umask;
+    //Clone->signal = 0;  //todo
+    Clone->umask = Current->umask;
        
-        Clone->iopl = Current->iopl;
-        //Clone->prev = NULL;
-        Clone->next = NULL;
+    Clone->iopl = Current->iopl;
+    //Clone->prev = NULL;
+    Clone->next = NULL;
 
-        // Objects.
-        for (i=0; i<32; i++){  
-            Clone->Objects[i] = Current->Objects[i]; 
-        }
+    // Objects.
+    for (i=0; i<32; i++){  
+        Clone->Objects[i] = Current->Objects[i]; 
+    }
 
 
-        //
-        // # debug
-        //
+    //
+    // # debug
+    //
 
-        // Showing registers.
+    // Showing registers.
 
-        // #obs
-        // regs ok ?!
+    // #obs
+    // regs ok ?!
 
         // Current.
         //printf("\n\n");
@@ -470,20 +490,23 @@ do_clone:
         //refresh_screen();
         //while(1){}
 
-        Clone->control->DirectoryPA = Clone->DirectoryPA;
+    Clone->control->DirectoryPA = Clone->DirectoryPA;
 
-        // [pai]
-        Current->control->quantum = 30;
-        Current->control->saved = 1;
-        Current->control->state = READY;
+    if ( (void*) Clone->control->DirectoryPA == NULL )
+        panic ("clone_process: Clone->control->DirectoryPA\n");
+
+    // [pai]
+    Current->control->quantum = 30;
+    Current->control->saved = 1;
+    Current->control->state = READY;
 
 
-        // [filho]
-        // Esse é o melhor jeito.
-        // Não podemos usar o spawn.
-        Clone->control->quantum = 30;
-        Clone->control->saved = 1;        // Está salvo
-        Clone->control->state = READY;    // Está pronta para ser escalonada. 
+    // [filho]
+    // Esse é o melhor jeito.
+    // Não podemos usar o spawn.
+    Clone->control->quantum = 30;
+    Clone->control->saved = 1;        // Está salvo
+    Clone->control->state = READY;    // Está pronta para ser escalonada. 
 
         //
         // return
@@ -493,14 +516,14 @@ do_clone:
         // Retornamos para o processo pai o PID do filho.
 
         // pai
-        current_process = Current->pid;
-        current_thread = Current->control->tid;
+    current_process = Current->pid;
+    current_thread  = Current->control->tid;
 
         // #test
         // Isso retornou corretamente para o processo pai
         // o pid do filho.
 
-        Current->control->eax = (unsigned long) Clone->pid;
+    Current->control->eax = (unsigned long) Clone->pid;
 
     debug_print ("clone_process: done\n");
     return (pid_t) Clone->pid;
@@ -593,7 +616,10 @@ pid_t clone_and_execute_process ( char *filename )
     int Status = -1;
     int PID = -1;
 
+    // # What is this?
+    // The directory virtual address of the current process. ??
     unsigned long *dir;
+    
     unsigned long old_dir_entry1=0;
 
 
@@ -611,8 +637,18 @@ pid_t clone_and_execute_process ( char *filename )
 
 
 
+    if ( (void*) filename == NULL ){
+        panic ("clone_and_execute_process: [ERROR] filename\n");
+    }
+
+    if ( *filename == 0 ){
+        panic ("clone_and_execute_process: [ERROR] *filename\n");
+    }
+
     path = filename;
     name = filename;
+
+
     
     // #todo
     // Essas rotinas de procura e garregamento podem ir para outro lugar.
@@ -824,19 +860,21 @@ __found:
     if ( (void *) Current == NULL ){
         printf ("clone_and_execute_process: Current struct \n");
         goto fail;
-
     }else{
         if ( Current->used != 1 || Current->magic != 1234 ){ 
             printf ("clone_and_execute_process: Current validation \n");
             goto fail;
         }
 
-
         // #test
         dir = (unsigned long *) Current->DirectoryVA;
         //old_dir_entry0 = dir[0];    // Saving it.
-        old_dir_entry1 = dir[1]; //salvando
+        //old_dir_entry1 = dir[1]; //salvando
+        
+       if( (void*) Current->DirectoryVA == NULL )
+            panic("clone_and_execute_process: Current->DirectoryVA\n");
 
+        
 
         // Salvando o endereço fisico da imagem 
         // que existe no processo.
@@ -966,8 +1004,15 @@ do_clone:
         //                   (unsigned long) Clone->Image );
 
 
-    Status = (int) fsLoadFile ( VOLUME1_FAT_ADDRESS, 
-                       dir_address,
+    if( dir_address == 0 )
+        panic("clone_and_execute_process: dir_address\n");
+
+    if( (void*) Clone->Image == NULL )
+        panic("clone_and_execute_process: Clone->Image\n");
+
+    Status = (int) fsLoadFile ( 
+                       VOLUME1_FAT_ADDRESS, 
+                       (unsigned long) dir_address,
                        32, //#bugbug: Number of entries. 
                        name, 
                        (unsigned long) Clone->Image,
@@ -989,6 +1034,9 @@ do_clone:
         Clone->used = 0;
         Clone->magic = 0;  
         Clone = NULL;
+        
+        //#todo
+        //check number of entries in the routine above 
 
         debug_print ("clone_and_execute_process: [FAIL] Couldn't load the file\n");
         printf      ("clone_and_execute_process: [FAIL] Couldn't load the file %s\n", 
@@ -1034,12 +1082,19 @@ do_clone:
        // Retornaremos o endereço virtual da pagetable.
        // See: core/ps/x86/pages.c
 
+    if( (void*) Clone->DirectoryVA == NULL )
+        panic("clone_and_execute_process: Clone->DirectoryVA\n");
+
+    if( (void*) Clone->ImagePA == NULL )
+        panic("clone_and_execute_process: Clone->ImagePA\n");
+
+
     void *__pt;
 
     __pt = (void *) CreatePageTable ( 
                         (unsigned long) Clone->DirectoryVA, 
                         ENTRY_USERMODE_PAGES, 
-                        Clone->ImagePA );
+                        (unsigned long) Clone->ImagePA );
 
     if ( (void*) __pt == NULL )
         panic ("clone_and_execute_process: __pt");

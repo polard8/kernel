@@ -8,8 +8,6 @@
 #include <kernel.h>
 
 
-
-
 /*
  ******************************************************
  * KiCreateRing0Idle:
@@ -20,7 +18,6 @@
 
 void *create_CreateRing0IdleThread(void)
 {
-
     struct thread_d  *t;
 
     // loops

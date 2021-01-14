@@ -723,9 +723,7 @@ int processCopyProcess ( pid_t p1, pid_t p2 ){
     // Check Process1
     if ( (void *) Process1 == NULL ){
         printf ("processCopyProcess: Process1\n"); goto fail;
-
     }else{
-
         if ( Process1->used != 1 || Process1->magic != 1234 )
         {
            printf ("processCopyProcess: Process1 validation \n");
@@ -738,10 +736,8 @@ int processCopyProcess ( pid_t p1, pid_t p2 ){
     Process2 = (struct process_d *) processList[p2];
 
     if ( (void *) Process2 == NULL ){
-        printf ("processCopyProcess: Process1\n"); goto fail;
-    
+        printf ("processCopyProcess: Process1\n"); goto fail; 
     }else{
-
         if ( Process2->used != 1 || Process2->magic != 1234 )
         {
            printf ("processCopyProcess: Process2 validation \n");
@@ -824,9 +820,9 @@ int processCopyProcess ( pid_t p1, pid_t p2 ){
         panic ("processCopyProcess: CloneKernelPageDirectory fail");
     }
 
-    Process2->DirectoryPA = (unsigned long) virtual_to_physical ( Process2->DirectoryVA, 
-                                                gKernelPageDirectoryAddress ); 
-
+    Process2->DirectoryPA = (unsigned long) virtual_to_physical ( 
+                                              Process2->DirectoryVA, 
+                                              gKernelPageDirectoryAddress ); 
 
     // #bugbug
     // Lembrando que na rotina de fork() nos obtemos
@@ -1092,9 +1088,9 @@ fail:
 // Cria uma tty pra esse processo.
 
 struct process_d *create_process ( 
-    struct room_d *room,
+    struct room_d    *room,
     struct desktop_d *desktop,
-    struct window_d *window,
+    struct window_d  *window,
     unsigned long base_address, 
     unsigned long priority, 
     int ppid, 
@@ -1117,12 +1113,53 @@ struct process_d *create_process (
     // conexoes pendentes do processo servidor.
     register int sIndex=0;
 
-
     unsigned long BasePriority=0;
     unsigned long Priority=0;
 
 
-    debug_print ("process-create_process: It's a work in progress!\n");
+    debug_print ("create_process: [FIXME] It's a work in progress!\n");
+
+
+    //=================================
+    // check parameters
+
+    if( (void*) room == NULL ){
+        debug_print ("create_process: [FIXME] room parameter is NULL\n");
+    }
+    
+    if( (void*) desktop == NULL ){
+        debug_print ("create_process: [FIXME] desktop parameter is NULL\n");
+    }
+    
+    if( (void*) window == NULL ){
+        debug_print ("create_process: [FIXME] window parameter is NULL\n");
+    }
+
+    // #todo
+    // Maybe the virtual 0 is n option in the future. Maybe.
+    if( base_address == 0 ){
+        panic ("create_process: [ERROR] base_address\n");
+    }
+
+    if( ppid < 0 )
+    {
+        panic ("create_process: [ERROR] ppid\n");
+    }
+  
+    if( (void*) name == NULL ){
+        panic ("create_process: [ERROR] name\n");
+    }
+  
+    if( *name == 0 ){
+        panic ("create_process: [ERROR] *name\n");
+    }
+
+    if( directory_address == 0 ){
+        panic ("create_process: [ERROR] directory_address\n");
+    }
+
+    // ...
+    //=================================
 
 	// @todo:
 	// Melhorar esse esquema de numera��o e 

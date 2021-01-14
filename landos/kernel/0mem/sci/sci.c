@@ -162,7 +162,7 @@ void *gde_extra_services (
     
     if (number == 265)
     {
-        debug_print("sci0: [FIXME] Service 265 suspended!\n");  
+        debug_print("gde_extra_services: [FIXME] Service 265 suspended!\n");  
         //printf ("pid %d\n",current_process);
         //refresh_screen();
         //yield (current_thread); 
@@ -328,7 +328,7 @@ void *gde_extra_services (
     
     // 377 - todo: implement uname() libc support.
     if ( number == 377 ){
-        printf ("service 377: uname. [todo] \n");
+        printf ("gde_extra_services: [377] uname. [todo] \n");
         sys_uname ( (struct utsname *) arg2 );        
         refresh_screen();
     }
@@ -471,7 +471,7 @@ void *gde_extra_services (
     // ws para o desktop atual
     if ( number == SYS_SHOW_X_SERVER_INFO )
     {
-        kprintf ("516: ws PID=%d \n", CurrentDesktop->ws );
+        kprintf ("gde_extra_services: [516] ws PID=%d \n", CurrentDesktop->ws );
         refresh_screen ();
         return NULL;
     }
@@ -479,7 +479,8 @@ void *gde_extra_services (
     // 517 - show wm info
     // wm para o desktop atual
     if ( number == SYS_SHOW_WM_INFO ){
-        kprintf ("window manager info: PID=%d \n", CurrentDesktop->wm);
+        kprintf ("gde_extra_services: [517] window manager info: PID=%d \n", 
+            CurrentDesktop->wm );
         refresh_screen ();
         return NULL;
     }
@@ -541,7 +542,7 @@ void *gde_extra_services (
     // #todo: check args validation.
     if (number == 550)
     {
-        debug_print("sci: [550] Setup net buffer for a process\n");
+        debug_print("gde_extra_services: [550] Setup net buffer for a process\n");
         __net_process = (struct process_d *) processList[arg2];
         if ( (void *) __net_process != NULL )
         {
@@ -696,11 +697,11 @@ void *gde_extra_services (
 
     // Deprecated!
     if ( number == 810 ){
-        debug_print ("gde_serv.c: [810] Deprecated\n");  return NULL;
+        debug_print ("gde_extra_services: [810] Deprecated\n");  return NULL;
     }
     // Deprecated!
     if ( number == 811 ){
-        debug_print ("gde_serv.c: [811] Deprecated\n");  return NULL;
+        debug_print ("gde_extra_services: [811] Deprecated\n");  return NULL;
     }
 
 
@@ -760,6 +761,7 @@ void *gde_extra_services (
 
     // IN: name, dir address.
     if ( number == 900 ){
+        debug_print("gde_extra_services: [900] clone and execute\n"); 
         return (void *) clone_and_execute_process( (char *) arg2 );
     }
 
@@ -793,7 +795,7 @@ void *gde_extra_services (
     // get screen window.
     // #todo. checar validade
     if ( number == 955 ){  return (void *) gui->screen;  } 
-
+    
     if ( number == 956 ){  return (void *) gui->background; } 
     
     // get main window.
@@ -805,9 +807,10 @@ void *gde_extra_services (
     // Um descritor de soquete é enviado via argumento.
     if ( number == 967 )
     {
-        return (void *) network_procedure ( NULL,
-                            (int) 2000, //envie dados para o processo.
-                            (unsigned long) arg2,   //fd
+        return (void *) network_procedure ( 
+                            NULL,
+                            (int) 2000,              //envie dados para o processo.
+                            (unsigned long) arg2,    //fd
                             (unsigned long) arg3 );  //fd
     }
     
@@ -819,18 +822,20 @@ void *gde_extra_services (
     // 970 - Create request.
     // A interrupção n�o conseguir� retornar para a mesma thread.
     // Chamar� o scheduler por conta pr�pria;
-    // IN: reson, reason
+    // IN: reason, reason
+
     if ( number == 970 )
     {
-            create_request ( (unsigned long) 15, // number 
-                (int) 1,                             // status 
-                (int) 0,                             // timeout. 0=imediatamente.
-                (int) current_process,               // target_pid
-                (int) current_thread,                // target_tid
-                NULL,                                // window 
-                (int) 0,                             // msg  
-                (unsigned long) arg2,                // long1  
-                (unsigned long) arg3 );              // long2
+            create_request ( 
+                (unsigned long) 15,      // number 
+                (int) 1,                 // status 
+                (int) 0,                 // timeout. 0=imediatamente.
+                (int) current_process,   // target_pid
+                (int) current_thread,    // target_tid
+                NULL,                    // window 
+                (int) 0,                 // msg  
+                (unsigned long) arg2,    // long1  
+                (unsigned long) arg3 );  // long2
                 
 		//wait_for_a_reason ( current_thread, (int) arg2 );
         return NULL;
@@ -839,47 +844,46 @@ void *gde_extra_services (
 
     // Deprecated!
     if ( number == 1000 ){
-        debug_print ("gde_serv.c: [1000] Deprecated\n");
+        debug_print ("gde_extra_services: [1000] Deprecated\n");
         return NULL;
     }
 
     // Deprecated!
     if ( number == 1002 ){
-        debug_print ("gde_serv.c: [1002] Deprecated\n");
+        debug_print ("gde_extra_services: [1002] Deprecated\n");
         return NULL;
     }
 
     // Deprecated!
     if ( number == 1003 ){
-        debug_print ("gde_serv.c: [1003] Deprecated\n");
+        debug_print ("gde_extra_services: [1003] Deprecated\n");
         return NULL;
     }
 
     // Deprecated!
     if ( number == 1004 ){
-        debug_print ("gde_serv.c: [1004] Deprecated\n");
+        debug_print ("gde_extra_services: [1004] Deprecated\n");
         return NULL;
     }
 
     // Deprecated!
     if ( number == 1005 ){
-        debug_print ("gde_serv.c: [1005] Deprecated\n");
+        debug_print ("gde_extra_services: [1005] Deprecated\n");
         return NULL;
     }
 
     // Deprecated!
     if ( number == 1006 ){
-        debug_print ("gde_serv.c: [1006] Deprecated\n");
+        debug_print ("gde_extra_services: [1006] Deprecated\n");
         return NULL;
     }
 
     // Deprecated!
     if (number == 1008){
-        debug_print ("gde_serv.c: [1008] Deprecated\n");
+        debug_print ("gde_extra_services: [1008] Deprecated\n");
         return NULL;
     }
-    
-    
+
     
     /*
     // retorna o id da tty do processo atualatual.
@@ -908,11 +912,10 @@ void *gde_extra_services (
     //#todo: Tem que retornar algum identificador para a api.
     //#bugbug: Podemos retornar o endere�o base. Isso pode dar problemas?
     if ( number == 4003 ){
-        panic ("service 4003: bugbug\n");
+        panic ("gde_extra_services: [4003] bugbug\n");
         //__fp = kernel_fopen ( (const char *) arg2, "r+" );
         //return (void *) __fp->_base;
     }
-    
 
     // Load path. ex: "/BOOT/BM.BIN"
     // See: fs.c
@@ -921,7 +924,7 @@ void *gde_extra_services (
     // (arg2=path)  (arg3=user buffer) (arg4 = buffer size)
     if ( number == 4004 )
     {
-        debug_print ("service 4004:\n");
+        debug_print ("gde_extra_services: 4004\n");
         sys_load_path ( (unsigned char *) arg2, (unsigned long) arg3 );
         // #todo; sys_load_path ( (unsigned char *) arg2, (unsigned long) arg3, (unsigned long) arg4 );
         refresh_screen();
@@ -932,7 +935,7 @@ void *gde_extra_services (
     // fstat support.
     if ( number == 4005 )
     {
-        debug_print ("service 4005: [TODO]\n");
+        debug_print ("gde_extra_services: 4005 [TODO]\n");
         
         //#todo
         //IN: fd, stat struct pointer.
@@ -945,37 +948,34 @@ void *gde_extra_services (
         fs_show_root_fs_info();
         return NULL;
     }
-    
-
 
     //7000 ~ 7020 for network sockets
-    
-        
+
     // socket() 
     // See: socket.c
     // family, type, protocol
+
     if ( number == 7000 ){
         return (void *) sys_socket ( (int) arg2, (int) arg3, (int) arg4 );
     }
 
-    
     // connect()
     // fd, sockaddr struct pointer, addr len.
     if ( number == 7001 ){
-        return (void *) sys_connect ( (int) arg2, 
+        return (void *) sys_connect ( 
+                            (int) arg2, 
                             (const struct sockaddr *) arg3,
                             (socklen_t) arg4 );
-
     }
-    
-    
+
     // accept()
     // This is the unix standard method.
     // Our major goal is to return the fd for the client socket file.
     // #bugbug: Work in progress.
     // fd, sockaddr struct pointer, addr len pointer.
     if ( number == 7002 ){
-        return (void *) sys_accept ( (int) arg2, 
+        return (void *) sys_accept ( 
+                            (int) arg2, 
                             (struct sockaddr *) arg3, 
                             (socklen_t *) arg4 ); 
     }
@@ -983,27 +983,24 @@ void *gde_extra_services (
     // bind()
     // fd, sockaddr struct pointer, addr len.
     if ( number == 7003 ){
-        return (void *) sys_bind ( (int) arg2, 
+        return (void *) sys_bind ( 
+                            (int) arg2, 
                             (const struct sockaddr *) arg3,
                             (socklen_t) arg4 );
-
      }
-    
     
     // listen()
     // fd, backlog
     if ( number == 7004 ){
         return (void *) sys_listen ( (int) arg2, (int) arg3 );  
     }
-    
 
     // See: net/socket.c
     // IN: índice em p->accept[i].
     if (number == 7005){
         return (void *) sys_accept_sender ( (int) arg2 );  
     }
-    
-    
+
     // Salvar um pid em uma das portas.
     // IN: gramado port, PID
     if (number == 7006){
@@ -1013,20 +1010,19 @@ void *gde_extra_services (
     // sys_getsockname()
     // fd, sockaddr struct pointer, addr len.
     if ( number == 7007 ){
-        return (void *) sys_getsockname ( (int) arg2, 
+        return (void *) sys_getsockname ( 
+                            (int) arg2, 
                             (struct sockaddr *) arg3,
                             (socklen_t *) arg4 );
-
      }
-    
-    
-    //socket info
-    //IN: pid
+
+    // socket info
+    // IN: pid
     if ( number == 7008 ){
         show_socket_for_a_process( (int) arg2 );
         return NULL;
     }
-    
+
     // libc: shutdown() IN: fd, how
     if ( number == 7009 ){
         sys_socket_shutdown( (int) arg2, (int) arg3 );
@@ -1039,22 +1035,21 @@ void *gde_extra_services (
     // It returns the fd of the server and write() will copy the data.  
     // fd, sockaddr struct pointer, addr len pointer.
     if ( number == 7010 ){
-        return (void *) sys_accept2 ( (int) arg2, 
+        return (void *) sys_accept2 ( 
+                            (int) arg2, 
                             (struct sockaddr *) arg3, 
                             (socklen_t *) arg4 ); 
     }
- 
- 
+
     //...
-    
-        
 
     // ioctl ()
     // IN: fd, request, arg
     // See: sci/sys/sys.c    
     
     if ( number == 8000 ){
-        return (void *) sys_ioctl ( (int) arg2, 
+        return (void *) sys_ioctl ( 
+                            (int) arg2, 
                             (unsigned long) arg3, 
                             (unsigned long) arg4 );
     }
@@ -1062,16 +1057,15 @@ void *gde_extra_services (
     // fcntl()
     // See: sci/sys/sys.c    
     if ( number == 8001 ){
-        return (void *) sys_fcntl ((int) arg2, 
+        return (void *) sys_fcntl ( 
+                            (int) arg2, 
                             (int) arg3, 
                             (unsigned long) arg4 );
     }
-    
 
     // Deprecated    
     // Mostra a lista de volumes montados.
     if (number == 8500){  return NULL;  }
-
 
     // #test
     // [FAIL]
@@ -1112,10 +1106,11 @@ void *gde_extra_services (
         return (void *) raise_window ( (struct window_d *) arg2 );
     }
 
-    //ps2 mouse controller dialog
+    // ps2 mouse controller dialog
     // msg, long1, long2
     if ( number == 9800 ){
-        return (void *) ps2_mouse_dialog ( (int) arg2, 
+        return (void *) ps2_mouse_dialog ( 
+                            (int) arg2, 
                             (unsigned long) arg3, 
                             (unsigned long) arg4 );
     }
@@ -1137,7 +1132,6 @@ void *gde_extra_services (
     if ( number == 9999 ){
         return (void *) system_get_pid ( (int) arg2 );
     }
-
 
 //fail
     return NULL;  
@@ -1780,9 +1774,11 @@ void *sci0 (
         // arg2 = name
         // arg3 = process priority
         // arg4 = nothing
+        
         case SYS_CREATEPROCESS:
             debug_print("sci0: [FIXME] SYS_CREATEPROCESS\n");
-            return (void *) sys_create_process ( NULL, NULL, NULL, 
+            return (void *) sys_create_process ( 
+                                NULL, NULL, NULL, 
                                 0, arg3,        //res, priority
                                 0, (char *) a2, //ppid, name
                                 RING3 ); 
@@ -3002,16 +2998,18 @@ void *sci2 (
                                 (char *) a4 );    // name
     }
 
-        // 73
-        // See: sci/sys/sys.c
-        // syscall: 
-        // arg2 = name
-        // arg3 = process priority
-        // arg4 = nothing
-        // SYS_CREATEPROCESS:
+    // 73
+    // See: sci/sys/sys.c
+    // syscall: 
+    // arg2 = name
+    // arg3 = process priority
+    // arg4 = nothing
+    // SYS_CREATEPROCESS:
+        
     if (number==73){
             debug_print("sci2: [FIXME] SYS_CREATEPROCESS\n");
-            return (void *) sys_create_process ( NULL, NULL, NULL, 
+            return (void *) sys_create_process ( 
+                                NULL, NULL, NULL, 
                                 0, arg3,        //res, priority
                                 0, (char *) a2, //ppid, name
                                 RING3 ); 
@@ -3024,6 +3022,20 @@ void *sci2 (
         yield (current_thread); 
         return NULL; 
     }
+
+	// 900
+	// Clona e executa o filho dado o nome do filho.
+	// O filho inicia sua execução do início da imagem.
+	// #bugbug: Isso às vezes falha na máquina real.
+	// #todo: Use more arguments.
+	// See: See: ps/action/clone.c
+
+    // IN: name, dir address.
+    if ( number == 900 ){
+        debug_print("sc2: [900] clone and execute\n");
+        return (void *) clone_and_execute_process( (char *) arg2 );
+    }
+
 
     if ( number == 8000 ){
         debug_print("sc2: [8000] ioctl\n");

@@ -2901,7 +2901,8 @@ do_compare:
     {
         printf ("t900: Testing the systemcall 900.\n");
         printf ("Clone and execute a new process. (sysmon.bin)\n");
-        system_call ( 900, (unsigned long) "sysmon.bin", 0, 0 );
+        //system_call ( 900, (unsigned long) "sysmon.bin", 0, 0 );
+        sc82 ( 900, (unsigned long) "sysmon.bin", 0, 0 );
         goto exit_cmp;
     }
 
@@ -3065,8 +3066,9 @@ do_compare:
     if ( gramado_strncmp ( prompt, "wait-reason", 11 ) == 0)
     {
         printf ("gdeshell: child ...\n");
-        system_call ( 900, (unsigned long) "false.bin", 0, 0 );
-    
+        //system_call ( 900, (unsigned long) "false.bin", 0, 0 );
+        sc82( 900, (unsigned long) "false.bin", 0, 0 );
+        
         printf ("gdeshell: still alive 1 ...\n");
         
         // Wait for a reason. (current thread.)

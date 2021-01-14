@@ -443,8 +443,18 @@ struct thread_d *threadCopyThread ( struct thread_d *thread ){
     // initial eip, initial stack, 
     // pid, thread name.
     
+    // #bugbug
+    // Bad parameters,
+    // eip and stack are '0'
+    // This way the routine will fail.
+    
+    // Como isso eh uma rotina de clonagem entao podemos usar
+    // os valores atuais da thread original
+    // thread->eip
+    // thread->esp
+    
     clone = (struct thread_d *) create_thread ( NULL, NULL, NULL, 
-                                    0, 0,  
+                                    thread->eip, thread->esp, //0, 0,  
                                     current_process, "clone-thread" );
 
     // The copy.
@@ -587,7 +597,10 @@ struct thread_d *threadCopyThread ( struct thread_d *thread ){
 	//O endere�o incial, para controle.
 	
     clone->initial_eip = thread->initial_eip; 
-		
+    
+    // #bugbug:
+    // We need the initial stack address
+
 	// (0x20 | 3)
     clone->ds = thread->ds; 
     clone->es = thread->es; 
@@ -777,6 +790,48 @@ struct thread_d *create_thread (
     register int w=0;  //loop
 
 
+//======================================
+// check parameters.
+
+    if( (void*) room == NULL ){
+        debug_print ("create_thread: [FIXME] room parameter is NULL\n");
+    }
+    
+    if( (void*) desktop == NULL ){
+        debug_print ("create_thread: [FIXME] desktop parameter is NULL\n");
+    }
+    
+    if( (void*) window == NULL ){
+        debug_print ("create_thread: [FIXME] window parameter is NULL\n");
+    }
+
+    // #bugbug
+    // Nao podemos usar isso aqui porque a rotina declonagem
+    // chama essa funçao mas reconfigura esse valor logo em seguida.
+    if( init_eip == 0 ){
+        panic ("create_thread: [ERROR] init_eip\n");
+    }
+
+    // #bugbug
+    // Nao podemos usar isso aqui porque a rotina declonagem
+    // chama essa funçao mas reconfigura esse valor logo em seguida.
+    if( init_stack == 0 ){
+        panic ("create_thread: [ERROR] init_stack\n");
+    }
+
+    if( pid < 0 ){
+        panic ("create_thread: [ERROR] pid\n");
+    }
+
+    if( (void*) name == NULL ){
+        panic ("create_thread: [ERROR] name\n");
+    }
+  
+    if( *name == 0 ){
+        panic ("create_thread: [ERROR] *name\n");
+    }
+
+//======================================
 	// Limits da thread atual.
 	// #bugbug: 
 	// N�o sei pra que isso. 
