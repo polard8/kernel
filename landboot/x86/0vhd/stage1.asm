@@ -655,83 +655,25 @@ FAILURE:
 ;; ======================================================
 ;; http://cars.car.coocan.jp/misc/chs2lba.html
 ;; https://en.wikipedia.org/wiki/Partition_type
-;; VHD info:
-;;(CHS=963/4/17)
-;; Types:
-;; 0x04 - FAT16, less than 32 MB
-;; 0x06 - FAT16, greater than 32 MB
-;; 0xEF - EFI FAT12/FAT16 
-;; ...
-;; 0xEF:
-;;     EFI, FAT12/FAT16.
-;;     MBR, Service FS,	Intel,	EFI.
-;;     EFI system partition. 
-;;     Can be a FAT12, FAT16, FAT32 (or other) file system.
-
 ; bios = limits: h=4, c=3FF, s=A
 ; vhd = CHS=963/4/17
 
 ; Partition 0. 
 P0:
 
-;; begin (4 bytes)
-.flag:                db  0x80     
-.hcs_inicial:         db  0x01, 0x01, 0       ; h,c,s      
+.flag:      db  0x80
+.startH:    db  0x01
+.startC:    db  0x01
+.startS:    db  0
 
-; end (4 bytes)
-.os_type:             db  0xEF          ; EFI FAT12/FAT16.       
+.osType:    db  0xEF             ;; efi
+.endH:      db  0
+.endC:      db  0
+.endS:      db  0
 
-; limits:
-; bios = limits: h=4, c=3FF, s=A
-; vhd = CHS=963/4/17
+.startLBA:       dd  0x3F        ;; 63
 
-; .hcs_final:           db  0x03, 0x4A, 0xCF  ; h,c,s (3, 255, 16)    0001 0000b
-;.hcs_final:           db  0x03, 0xFE, 0x0A
-.hcs_final:           db 0,0,0
-
-
-; relative
-.lba_inicial:         dd  0x3F          ; First sector. (63, vbr).
-
-;; size
-;; #bugbug: This is the size of the disk,
-;; We can not have a partition this big.
-;; 0x0000FFA7 = 65477
-;; 65512 = 32 MB. (#bugbug: We ca not use this one. We have reserved sectors.)
-
-;; #important:
-;; See 'small sector' in the VBR.
-;; It is used by gparted application.
-
-.tamanho_da_particao: dd  0x0000FFA7 ; in sectors. almost 32 mb
-
-
-
-; (obs: Os dois bits mais altos de s pertencem al c)
-; (17406*512)=8911872
-; (8911872/1024) = 8703 kb
-
-
-; s
-; 0001 0000b
-; (11)01 0000b  *bits exportados;
-; 11010000 = d0
-; 11001111 = cf
-; 0000 1010 = 0A
-; 1100 1010 = CA (exportando dois bits)
-
-; c
-; 34a = 842 ...    
-; 34a = 0011 0100 1010
-; 00(11) 0100 1010   *bits inportados de s.
-; 3FF =   11 1111 11(11)
-; 3FF =   1111 1111 (11) = FF mais dois importados
-;
-
-     
-;size
-;0x0000FFE8 = 65512
-
+.partitionSize:  dd  0x0000FFA7  ;; in sectors. almost 32 mb
 
 ; Partition 1, 2 and 3.
 P1: dd 0,0,0,0 
