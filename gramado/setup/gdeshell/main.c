@@ -5115,8 +5115,7 @@ void shellUpdateWorkingDiretoryString ( char *string )
     // YES, it is.
     }else{
 
-        if ( (void *) string == NULL )
-        {
+        if ( (void *) string == NULL ){
             gde_debug_print ("shellUpdateWorkingDiretoryString: [FAIL] invalid string\n");
             return;
 
@@ -5132,10 +5131,13 @@ void shellUpdateWorkingDiretoryString ( char *string )
 
             //++
             // Atualizar no gerenciamento feito pelo kernel.
-            system_call ( 175, 
-                (unsigned long) string,
-                (unsigned long) string, 
-                (unsigned long) string );
+            //system_call ( 175, 
+                //(unsigned long) string,
+                //(unsigned long) string, 
+                //(unsigned long) string );
+           
+            // #test
+            chdir ( (const char *) string );
         };
     };
 }

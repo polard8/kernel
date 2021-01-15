@@ -144,10 +144,10 @@ extern unsigned long stack0_krn_ptr;
 #include "hal/dev/tty/vt/ws/model/ascii.h" 
 
 
-
 // fs
-#include "rtl/fs/path.h"         // path.
-#include "rtl/fs/fat.h"          // fat16.
+#include "rtl/fs/path.h"       // path.
+#include "rtl/fs/fat.h"        // fat16.
+#include "rtl/fs/fat_lfn.h"    // fat16 lfn.
 #include "rtl/fs/inode.h"
 #include "rtl/fs/exec_elf.h"
 #include "rtl/fs/pipe.h" 

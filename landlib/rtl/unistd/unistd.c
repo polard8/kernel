@@ -200,8 +200,9 @@ ssize_t read (int fd, const void *buf, size_t count)
         return -1;
     }
 
-    // #todo
-    // Check buffer
+    if( (void*) buf == NULL )
+        return -1;
+    
     
     // Nothing to read.
     if ( count <= 0 )
@@ -246,8 +247,9 @@ ssize_t write (int fd, const void *buf, size_t count)
         return -1;
     }
 
-    // #todo
-    // Check buffer
+    if( (void*) buf == NULL )
+        return -1;
+    
     
     // Nothing to write.
     if ( count <= 0 )
@@ -284,6 +286,10 @@ ssize_t pread (int fd, void *buf, size_t count, off_t offset)
         return -1;
     }
 
+    if( (void*) buf == NULL )
+        return -1;
+    
+
     return -1;
 
     /*   
@@ -311,6 +317,10 @@ pwrite (
         return -1;
     }
 
+    if( (void*) buf == NULL )
+        return -1;
+    
+
     debug_print ("pwrite: [TODO]\n");
     return -1;
 }
@@ -320,6 +330,13 @@ pwrite (
 int truncate(const char *path, off_t length)
 { 
     debug_print ("truncate: [TODO]\n");
+
+    if( (void*) path == NULL )
+        return -1;
+    
+    if(*path == 0)
+        return -1;
+
     return -1;
 }
 
@@ -404,7 +421,8 @@ pid_t fork (void)
 
     debug_print("fork: \n");
 
-    __ret = (pid_t) gramado_system_call ( UNISTD_SYSTEMCALL_FORK, 
+    __ret = (pid_t) gramado_system_call ( 
+                        UNISTD_SYSTEMCALL_FORK, 
                         0, 0, 0 );
     
     if (__ret<0)
@@ -431,8 +449,8 @@ pid_t fork (void)
 // Not quite	compatible with	the 4.4BSD call, which
 // sets all	of the real, saved, and	effective user IDs.	  
 
-int setuid ( uid_t uid ){
-	
+int setuid ( uid_t uid )
+{
 	//#todo: ainda não temos a suystem call.
 	//SYSTEMCALL_SETCURRENTUSERID
 	return (uid_t) gramado_system_call ( 151, 0, 0, 0 );
@@ -615,6 +633,14 @@ char *getcwd (char *buf, size_t size)
 {
     debug_print ("getcwd: [TODO]\n");
 
+
+    if( (void*) buf == NULL )
+        return (char *) 0;
+    
+    
+    if ( size<0 )
+        return (char *) 0;
+
     /*
     if (!buffer) {
         size = size ? size : PATH_MAX;
@@ -626,9 +652,13 @@ char *getcwd (char *buf, size_t size)
 }
 
 
-char *getwd(char *buf)
+char *getwd (char *buf)
 {
     debug_print ("getwd: [TESTING]\n");
+    
+    if( (void*) buf == NULL )
+        return (char *) 0;
+    
     
     char *p = getcwd(buf, PATH_MAX);
     
@@ -869,6 +899,8 @@ int unlink (const char *pathname)
     if ( *pathname == 0 )
         return -1;
 
+    // ...
+    
     return (int) (-1);
 }
 
@@ -881,6 +913,15 @@ int unlink (const char *pathname)
 int mlock (const void *addr, size_t len)
 {
     debug_print ("mlock: [TODO]\n");
+
+    if( (void*) addr == NULL )
+        return -1;
+    
+    if(len<0)
+        return -1;
+
+    // ...
+    
 	return -1; //#todo
 }
 
@@ -893,6 +934,13 @@ int mlock (const void *addr, size_t len)
 int munlock (const void *addr, size_t len)
 {
     debug_print ("munlock: [TODO]\n");
+
+    if( (void*) addr == NULL )
+        return -1;
+    
+    if(len<0)
+        return -1;
+
     return -1; //#todo
 }
 
@@ -976,6 +1024,8 @@ int syncfs(int fd)
         return -1;
     }    
     
+    // ...
+    
     return -1;
 }
 
@@ -1015,6 +1065,8 @@ int fsync (int fd)
         return -1;
     }    
     
+    // ...
+    
     return -1;    //#todo
 }
 
@@ -1035,6 +1087,9 @@ int fdatasync (int fd)
         debug_print ("fdatasync: fd\n");
         return -1;
     }    
+    
+    // ...
+    
     return -1; //#todo
 }
 
@@ -1056,7 +1111,6 @@ int fdatasync (int fd)
 int close (int fd){
 
     int __ret = -1;
-
 
     
     if (fd<0){
@@ -1110,6 +1164,13 @@ long fpathconf (int fildes, int name)
 long pathconf (const char *pathname, int name)
 {
     debug_print ("pathconf: [TODO]\n");
+
+    if( (void*) pathname == NULL )
+        return -1;
+    
+    if(*pathname == 0)
+        return -1;
+
     return -1;
 } 
 
@@ -1129,7 +1190,6 @@ char *__gethostname (void)
        (unsigned long) &__Hostname_buffer[0],
        (unsigned long) &__Hostname_buffer[0] );
 
-
     return __Hostname_buffer;
 }
 
@@ -1146,9 +1206,18 @@ char *__gethostname (void)
 
 // Passando para o kernel o buffer que está no app.
 
-int gethostname (char *name, size_t len){
-
+int gethostname (char *name, size_t len)
+{
     int len_ret = -1;
+
+    if( (void*) name == NULL )
+        return -1;
+    
+    if(*name == 0)
+        return -1;
+
+    if(len<0)
+        return -1;
     
     len_ret = (int) gramado_system_call ( 38, 
                         (unsigned long) name,
@@ -1161,7 +1230,17 @@ int gethostname (char *name, size_t len){
 
 
 //See: http://man7.org/linux/man-pages/man2/sethostname.2.html
-int sethostname (const char *name, size_t len){
+int sethostname (const char *name, size_t len)
+{
+
+    if( (void*) name == NULL )
+        return -1;
+    
+    if(*name == 0)
+        return -1;
+
+    if(len<0)
+        return -1;
 
     return (int) gramado_system_call ( 39, 
                     (unsigned long) name,
@@ -1210,11 +1289,18 @@ char *getlogin (void)
 
 
 
-int setlogin (const char *name){
+int setlogin (const char *name)
+{
+
+    if( (void*) name == NULL )
+        return -1;
+    
+    if(*name == 0)
+        return -1;
+
 
     //#todo: pegar retorno da função
     //return (int) 
-
     gramado_system_call ( 804, 
         (unsigned long) name,
         (unsigned long) name,
@@ -1234,9 +1320,16 @@ int setlogin (const char *name){
 // #todo
 // usar  setlogin 
  
-int getusername (char *name, size_t len){
+int getusername (char *name, size_t len)
+{
+    int __len_ret=0;
 
-    int __len_ret;
+
+    if( (void*) name == NULL )
+        return -1;
+    
+    if(*name == 0)
+        return -1;
 
 
     if ( len < 0 || len > HOST_NAME_MAX )
@@ -1280,10 +1373,22 @@ int getusername (char *name, size_t len){
 // #todo
 //usar  setlogin
  
-int setusername (const char *name, size_t len){
+int setusername (const char *name, size_t len)
+{
+    size_t __name_len = 0;
 
-    size_t __name_len = strlen(name) + 1;
 
+    if( (void*) name == NULL )
+        return -1;
+    
+    if(*name == 0)
+        return -1;
+
+    if(len<0)
+        return -1;
+
+
+    __name_len = strlen(name) + 1;
 
     // Limite dado pelo sistema.
     if (len < 0 || len >= HOST_NAME_MAX )
@@ -1292,13 +1397,11 @@ int setusername (const char *name, size_t len){
         return 1;
     }
 
-
     // Tamanho indicado pelo aplicativo.
     if ( __name_len > len ){
         printf ("setusername: len\n");
         return 1;     
     }
-
 
     return (int) gramado_system_call ( 41, 
                     (unsigned long) name,
@@ -1329,8 +1432,8 @@ int setusername (const char *name, size_t len){
 // Chamremos o kernel e diremos, coloque o nome aqui nesse buffer.
 //char __ttyname_buffer[64];
 
-char *ttyname (int fd){
-
+char *ttyname (int fd)
+{
     static char buf[PATH_MAX];
     int rv=0;
     
@@ -1346,8 +1449,7 @@ char *ttyname (int fd){
         return NULL;
     }
 
-
-    return buf;
+    return (char *) buf;
 }
 
 
@@ -1356,6 +1458,21 @@ char *ttyname (int fd){
 int ttyname_r(int fd, char *buf, size_t buflen)
 { 
     debug_print ("ttyname_r: [TODO]\n");
+    
+    if ( fd<0 )
+        return -1;
+    
+    if( (void*) buf == NULL )
+        return -1;
+     
+    if(buflen<0)
+        return -1;
+    
+    if(buflen >= PATH_MAX)
+        return -1;
+
+    // ...
+    
     return -1; 
 }
 
@@ -1578,14 +1695,22 @@ int lchown (const char *pathname, uid_t owner, gid_t group)
 
 
 
-
 int chdir(const char *path)
 {
     debug_print ("chdir: [TODO]\n");
 
-    return -1; 
-}
+    if ( (void*) path == NULL )
+        return -1;
 
+    if (*path == 0)
+        return -1;
+
+    // Atualizar no gerenciamento feito pelo kernel.
+    return (int) gramado_system_call ( 175, 
+                     (unsigned long) path,
+                     (unsigned long) path, 
+                     (unsigned long) path );
+}
 
 
 int fchdir(int fd)
@@ -1597,7 +1722,7 @@ int fchdir(int fd)
 
     return -1; 
 }
-       
+   
 
 // sleep - sleep for a specified number of seconds
 unsigned int sleep(unsigned int seconds)

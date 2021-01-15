@@ -4,6 +4,11 @@
  *     2015 - Created by Fred Nora.
  */
 
+
+#ifndef  __FAT_H
+#define  __FAT_H    1
+
+
 // definições, variáveios, estruturas e protótipos
 // específicos para o sistema de arquivos fat16.
 // Isolando pra talvez tirarmos isso do kernel.
@@ -142,23 +147,9 @@ struct fat16_directory_entry_d
 };  
 
 
-
-/*
- #todo
-// LFN Entry
-struct fat16_lfn_directory_entry_d 
-{
-    unsigned char ordinal_field;    // 0x4?
-    unsigned short name1[5];        // name part1
-    unsigned char flag_byte;        // Flag
-    unsigned char reserved;         // Reserved
-    unsigned char checksum;         // Checksum.
-    unsigned short name2[6];        // name part2
-    unsigned short thing;           // ??
-    unsigned short name3[2];        // name part3
-};
-*/
-
+// 
+// == prototypes ==========================================
+//
 
 void 
 to_FAT_name (
@@ -172,6 +163,9 @@ from_FAT_name (
 
 
 int fat16Init (void);
+
+
+#endif    
 
 
 //
