@@ -4689,7 +4689,7 @@ void testScrollChar ( int c )
  ***************************************************
  * shellInsertNextChar:
  *     Insert the char into the file buffer;
- *     Print it iinto the stream.
+ *     Print it into the virtual console.
  */
 
 void shellInsertNextChar (char c)
