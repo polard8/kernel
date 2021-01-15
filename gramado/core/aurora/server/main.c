@@ -1592,14 +1592,16 @@ int initGraphics (void){
     //#debug breakpoint
     //while(1){}
 
+
     // Initialize the graphics support.
     // Now we can use 3d routines.
-
     // See: grprim.c
+    
     grInit();
+
  
     //
-    // == demos =================================================
+    // == demos ==================================
     //
  
     // Always run some demo if we are in JAIL mode.
@@ -2417,10 +2419,11 @@ int main (int argc, char **argv)
 
         // Wait
         // printf ("gwssrv: [FIXME] yield \n");
-        //for (i=0; i<11; i++)
-        for (i=0; i<22; i++){
+        
+        for (i=0; i<22; i++)
+        {
             gwssrv_yield();
-        }
+        };
 
         //
         // =======================================
@@ -2493,20 +2496,21 @@ int main (int argc, char **argv)
 
             // Accept connection from a client.
 
-            // Seja profissional e aceite a conexaozinha \o/
+            // Se nao estamos aceitqando conexoes.
 
             newconn = accept ( 
                           serverClient->fd, 
                           (struct sockaddr *) &server_address, 
                           (socklen_t *) addrlen );
-        
+            
             //gwssrv_debug_print("gwssrv: accept returned\n");
             //printf ("gwssrv: newconn %d\n",newconn);
 
             if (newconn<=0){
                 gwssrv_debug_print("gwssrv: accept returned FAIL\n");
             }
- 
+
+            // if (newconn>0 && AcceptingConnections)
             if (newconn>0)
             {
                 gwssrv_debug_print("gwssrv: accept returned OK\n");
@@ -2516,10 +2520,12 @@ int main (int argc, char **argv)
                 // Entao nos lemos o socket e escrevemos no socket.
                 // precisamos dar um tempo para o cliente ler,
                 // e nao simplesmente aceitarmos a proxima conexao pendente.
-                gwssrv_yield();
-                gwssrv_yield();
-                gwssrv_yield();
-                gwssrv_yield();
+                
+                //gwssrv_yield();
+                //gwssrv_yield();
+                //gwssrv_yield();
+                //gwssrv_yield();
+                
                 //close(newconn);
             }
         };

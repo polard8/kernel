@@ -19,7 +19,8 @@ typedef unsigned short  u_short;
 typedef unsigned int    u_int;
 typedef unsigned long   u_long;
 //typedef unsigned long long u_int64;
-
+//struct	_quad	  {     long   val[2];  };
+//struct	_quad	  {     unsigned long   val[2];  };
 
 #endif /* _BSDTYPES_DEFINED */
 

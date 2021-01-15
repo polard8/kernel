@@ -1359,6 +1359,22 @@ char *__findenv ( const char *name, int *offset ){
 }
 
 
+/*
+void bak2for(char *str);
+void bak2for(char *str) 
+{
+    //#todo: check pointer validation
+    
+	while (*str) 
+	{
+		if (*str == '\\')
+			*str = '/';
+		
+		str++;
+	};
+}
+*/
+
 
 /*
  ***********************************
@@ -1368,7 +1384,7 @@ char *__findenv ( const char *name, int *offset ){
 
 char *getenv (const char *name)
 {
-    int offset;
+    int offset=0;
     char *result;
 
     debug_print ("getenv:\n");
@@ -1378,8 +1394,15 @@ char *getenv (const char *name)
     //printf ("getenv2: %s \n", (const char *) name);
     //return NULL;
 
-    if ( (void *) name == NULL ){
-        debug_print ("getenv: name fail\n");
+    if ( (void *) name == NULL )
+    {
+        debug_print ("getenv: [FAIL] name\n");
+        return (char *) 0;
+    }
+
+    if (*name == 0)
+    {
+        debug_print ("getenv: [FAIL] *name\n");
         return (char *) 0;
     }
 
@@ -2212,6 +2235,37 @@ qsort_r (
     debug_print("qsort_r: [TODO]\n");
 }
 
+// See:
+// https://linux.die.net/man/3/putenv
+int putenv(char *string)
+{
+    int rval=0;
+    register char *p; 
+    register char *equal;
+
+    if ( (void*) string == NULL )
+        return -1;
+    
+    if (*string == 0)
+        return -1;
+
+    if (!(p = strdup(string)))
+        return(1);
+
+    if (!(equal = index(p, '='))) 
+    {
+        //free(p);
+        return(1);
+    }
+
+    *equal = '\0';
+
+    rval = setenv(p, equal + 1, 1);
+    
+    //free(p);
+
+    return (int) rval;
+}
 
 
 //

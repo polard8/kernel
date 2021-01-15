@@ -1395,8 +1395,15 @@ rtl_load_path (
 
 
 
-
-
+ssize_t rtl_console_beep(void)
+{
+    char BeepChar = '\a';
+    
+    return (ssize_t) write ( 
+                         fileno(stdout), 
+                         (const void *) &BeepChar, 
+                         1 );
+}
 
 
 

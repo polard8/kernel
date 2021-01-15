@@ -437,7 +437,11 @@ pid_t fork (void)
 }
 
 
-
+// #todo
+pid_t vfork(void)
+{
+    return (pid_t) fork();
+}
 
 
 /*

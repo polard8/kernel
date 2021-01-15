@@ -162,6 +162,7 @@ void exit (int status);
 
 
 pid_t fork (void);
+pid_t vfork(void);
 
 
 int setuid ( uid_t uid );

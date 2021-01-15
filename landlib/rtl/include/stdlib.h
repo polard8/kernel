@@ -271,6 +271,8 @@ qsort_r (
     );
 
 
+int putenv(char *string);
+
 
 int abs( int j);
 

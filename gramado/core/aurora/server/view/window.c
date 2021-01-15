@@ -257,15 +257,15 @@ is_within (
     unsigned long x, 
     unsigned long y )
 {
-    // validation
+
     if ( (void*) window != NULL )
     {
         if ( window->used == 1 && window->magic == 1234 )
         {
             // yes!
-            if ( x >= window->left && 
-                 x <= window->right &&
-                 y >= window->top &&
+            if ( x >= window->left   && 
+                 x <= window->right  &&
+                 y >= window->top    &&
                  y <= window->bottom )
             {
                 return 1;
@@ -1315,18 +1315,13 @@ fail:
 
 int gws_show_window_rect (struct gws_window_d *window)
 {
-
     struct gws_window_d  *p;
 
 
-    if ( (void *) window == NULL )
-    {
+    if ( (void *) window == NULL ){
         debug_print ("gws_show_window_rect: window\n");
         return (int) -1;
-        //return (int) 1;
-
     }else{
-
         if ( window->used == 1 || window->magic == 1234 )
         {
 
@@ -1487,9 +1482,6 @@ void set_active_window (int id){
 }
 
 
-
-
-
 int get_window_with_focus(void)
 {
    return (int) window_with_focus;
@@ -1506,17 +1498,15 @@ int set_window_with_focus(int id)
 }
 
 
-
 // Pegando a z-order de uma janela.
-int get_zorder ( struct gws_window_d *window ){
-
+int get_zorder ( struct gws_window_d *window )
+{
     if ( (void *) window != NULL ){
         return (int) window->zIndex;
     }
 
     return (int) -1;
 }
-
 
 
 int get_top_window (void)
@@ -1530,7 +1520,6 @@ void set_top_window (int id)
 {
     top_window = (int) id;
 }
-
 
 
 int gwssrv_get_number_of_itens (struct gwsssrv_menu_d *menu)
@@ -1559,9 +1548,11 @@ struct gwsssrv_menu_d *gwssrv_create_menu (
 
     gwssrv_debug_print("gwssrv_create_menu:\n");
 
-    menu = (struct gwsssrv_menu_d *) malloc( sizeof(struct gwsssrv_menu_d) );
 
-    if ( (void *) menu == NULL ){
+    menu = (struct gwsssrv_menu_d *) malloc ( sizeof(struct gwsssrv_menu_d) );
+
+    if ( (void *) menu == NULL )
+    {
         gwssrv_debug_print("gwssrv_create_menu: [FAIL] menu\n");
         return (struct gwsssrv_menu_d *) 0;
     }
@@ -1638,20 +1629,29 @@ struct gwsssrv_menu_item_d *gwssrv_create_menu_item (
     item->y = (item->height*id);
     
 
-   if( menu->window != NULL )
-   {
-
-        window = (struct gws_window_d *) createwCreateWindow ( WT_BUTTON,//WT_SIMPLE, 
+    if( menu->window != NULL )
+    {
+        window = (struct gws_window_d *) createwCreateWindow ( 
+                                             WT_BUTTON,
                                              1, 1, (char *) label,  
                                              item->x, item->y, item->width, item->height,   
                                              menu->window, 0, 
-                                            COLOR_GRAY, COLOR_GRAY );    
+                                             COLOR_GRAY, COLOR_GRAY );    
 
-         item->window = window;
+        if ( (void*) window == NULL )
+        {
+            item->window = NULL;
+            goto fail;
+        }
+
+        item->window = window;
+        
+        //ok
+        return (struct gwsssrv_menu_item_d *) item;
     }
 
-
-    return (struct gwsssrv_menu_item_d *) item;
+fail:
+    return (struct gwsssrv_menu_item_d *) 0;
 }
 
 
@@ -1830,13 +1830,11 @@ gwssrv_change_window_position (
     unsigned long x, 
     unsigned long y )
 {
-
     // #??
     // Isso deve mudar apenas o deslocamento em relacao
     // a margem e nao a margem ?
 
-    if ( (void *) window == NULL )
-    {
+    if ( (void *) window == NULL ){
         gwssrv_debug_print("gwssrv_change_window_position: window\n");
         return -1;
     }
@@ -1869,11 +1867,11 @@ gwssrv_change_window_position (
  *     @todo: Quem pode realizar essa operação??
  */
  
-void gwsWindowLock (struct gws_window_d *window){
+void gwsWindowLock (struct gws_window_d *window)
+{
 
     if ( (void *) window == NULL )
         return;
-
 
     window->locked = (int) WINDOW_LOCKED;  //1.
 }
@@ -1885,11 +1883,10 @@ void gwsWindowLock (struct gws_window_d *window){
  *     @todo: Quem pode realizar essa operação??
  */
  
-void gwsWindowUnlock (struct gws_window_d *window){
-
+void gwsWindowUnlock (struct gws_window_d *window)
+{
     if ( (void *) window == NULL )
         return;
-
 
     window->locked = (int) WINDOW_UNLOCKED;  //0.
 }
