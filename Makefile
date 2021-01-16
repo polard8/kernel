@@ -530,13 +530,17 @@ generate:
 #
 
 help:
-	@echo " help:"
-	@echo " all          - make all"
-	@echo " clean        - Remove all .o files"
-	@echo " clean2       - Remove .VHD and .ISO files"
-	@echo " vhd-mount    - Mount VHD"
-	@echo " vhd-unmount  - Unmount VHD"
-	@echo " qemu-test    - Run on qemu" 
-	@echo " oracle-virtual-box-test - Run on virtual-box"
-	@echo " ..."
-
+	@echo " [Usage]"
+	@echo " $ make               - make all"
+	@echo " $ make land-boot     - make landos bootloader"
+	@echo " $ make land-lib      - make landos library"
+	@echo " $ make land-os       - make landos kernel and init process"
+	@echo " $ make gramado-core  - make gramado os core applications"
+	@echo " $ make gramado-cmd   - make gramado os commands"
+	@echo " $ make gramado-setup - make gramado os setup applications"
+	@echo " $ make gramado-shell - make gramado os shell applications"
+	@echo " $ make gramado-edge  - make gramado os edge applications"
+	@echo " $ make clean         - Remove all .o files"
+	@echo " $ make clean-all     - Remove all the object files"
+	@echo " $ ./run              - Run the system on qemu"
+	

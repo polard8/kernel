@@ -64,6 +64,7 @@
 
 int __current_runlevel;
 
+int __redpill;
 
 
 //=================================
@@ -187,6 +188,105 @@ void Logoff (void)
 }
 
 
+void CheckRedPill(void)
+{
+    FILE *fp;
+
+    char buffer[128];
+
+    int nreads  =0;
+    int nwrites =0;
+
+
+    // flag
+    
+    __redpill = FALSE;
+
+
+    fp = (FILE*) fopen ("redpill.ini","r+");
+    //fp = (FILE*) fopen ("init.ini","r+");
+    
+    if ( (void*)  fp == NULL )
+    {
+        //printf("init.bin: ERROR\n");
+        //fflush(stdout);
+        //exit(1);
+        
+        //ok se falhar ... o arquivo nao existe.
+        __redpill = FALSE;
+        return;
+    }
+
+    
+    if ( (void*)  fp != NULL )
+    {
+        // Read
+        nreads = read ( fileno(fp), buffer, sizeof(buffer) );
+        if ( nreads <= 0 ){
+            printf ("init.bin: read fail\n");
+            //exit (-1);
+            __redpill = FALSE;
+            return;
+        }
+        fclose(fp);
+    }
+
+    // Check buffer
+    
+    if ( buffer[0] == 'R' &&
+         buffer[1] == 'E' &&
+         buffer[2] == 'D' &&
+         buffer[3] == 'P' &&
+         buffer[4] == 'I' &&
+         buffer[5] == 'L' &&
+         buffer[6] == 'L' )
+     {
+          __redpill = TRUE;
+     }
+    //while(1){}
+    // ==================
+
+}
+
+// Execute the standard command interpreter.
+// It's is not a shell with a virtual terminal,
+// it's only a command interpreter that uses the 
+// the base kernel embedded virtual console.
+
+// #todo
+// Use sc82 system call.
+
+void ExecCommandInterpreter(void)
+{
+    int Status = -1;
+    
+    debug_print ("init.bin: Launching gdeshell.bin\n");
+
+    // We will not wait here.
+    // We need to use the event loop in the main funcion.
+    
+    Status = sc82 ( 900, (unsigned long) "gdeshell.bin", 0, 0 ); 
+
+    //if (Status<0)
+        // ...
+}
+
+void ExecRedPillApplication(void)
+{
+    int Status = -1;
+    
+    debug_print ("init.bin: Launching launcher.bin\n");
+
+    // We will not wait here.
+    // We need to use the event loop in the main funcion.
+    
+    Status = sc82 ( 900, (unsigned long) "launcher.bin", 0, 0 ); 
+
+    //if (Status<0)
+        // ...
+}
+
+
 /*
  **********************
  * main:
@@ -198,13 +298,17 @@ void Logoff (void)
 // Uma interrupção para habilitar as interrupções mascaráveis.
 // Só depois disso a interrupção de timer vai funcionar.
 
+// #todo
+// Checar se temos uma linha de comandos.
+// Mas o fato eh que essa funçao nao deve retornar para o crt0.c.
+
 int main ( int argc, char *argv[] )
 {
     char *_string = "init.bin: Init is alive! Calling int 129";
     char runlevel_string[128];
 
 
-    debug_print ("---------------------------\n"); 
+    debug_print ("--------------------------\n"); 
     debug_print ("init.bin: Initializing ...\n");
 
 
@@ -236,35 +340,24 @@ int main ( int argc, char *argv[] )
     // Delete /tmp files.
     // Delete ?/history files
 
-    // Using api.
-    // obs: nao temos a variavel window.
-
-    //gde_draw_text ( NULL,
-    //    0, 0, COLOR_YELLOW, _string );
 
     // #debug
+    // It is working.
+    // #bugbug: We need the to finalize the string ?
+    
     rtl_draw_text ( 0, 0, COLOR_YELLOW, _string );
     rtl_show_backbuffer();
 
-
     // #debug
+    // asm ("int $3 \n");
     // while(1){}
 
     //
     // Enable the maskable interrupts.
     //
 
-    // #DEBUG
-    // Olhando eflags.
-    // asm ("int $3 \n");
-
     enable_maskable_interrupts ();
     //asm ("int $129 \n");
-
-    // #DEBUG
-    // Olhando eflags.
-    // asm ("int $3 \n");
-
 
 
     //
@@ -299,6 +392,9 @@ int main ( int argc, char *argv[] )
 
     __current_runlevel = (int) gramado_system_call ( 288, 0, 0, 0 );
 
+    // #todo
+    // Check validation.
+
     itoa (__current_runlevel, runlevel_string);
 
     printf ("The current runlevel is %s \n",runlevel_string);
@@ -323,64 +419,9 @@ int main ( int argc, char *argv[] )
 
  
 
-
-
+    // red pill
     
-    // ==================
-    // #test
-    int redpill = FALSE;
-    // Open syslog file.
-    FILE *fp;
-    //fp = (FILE*) fopen ("init.ini","r+");
-    fp = (FILE*) fopen ("redpill.ini","r+");
-    if ( (void*)  fp == NULL )
-    {
-        //printf("init.bin: ERROR\n");
-        //fflush(stdout);
-        //exit(1);
-        
-        //ok se falhar ... o arquivo nao existe.
-        redpill = FALSE;
-    }
-
-    char buffer[128];
-    int nreads=0;
-    int nwrites=0;
-    
-    if ( (void*)  fp != NULL )
-    {
-        // Read
-        nreads = read ( fileno(fp), buffer, sizeof(buffer) );
-        if ( nreads <= 0 ){
-            printf ("init.bin: read fail\n");
-            exit (-1);
-        }
-        fclose(fp);
-     }
-
-    // Write
-    //nwrites = write ( 1, buffer, sizeof(buffer) );
-    //if ( nwrites <= 0 ){
-    //    printf ("init.bin: write fail\n");
-    //    exit(-1);
-    //}
-
-    if ( buffer[0] == 'R' &&
-         buffer[1] == 'E' &&
-         buffer[2] == 'D' &&
-         buffer[3] == 'P' &&
-         buffer[4] == 'I' &&
-         buffer[5] == 'L' &&
-         buffer[6] == 'L' )
-     {
-          redpill = TRUE;
-     }
-    //while(1){}
-    // ==================
-   
-    
-    
-    
+    CheckRedPill();
     
     
     
@@ -420,68 +461,31 @@ int main ( int argc, char *argv[] )
         // "Initialize in terminal mode"?
         
         default:
-        
-            if( redpill == TRUE )
+            if( __redpill == TRUE )
             {
-                debug_print ("init.bin: [REDPILL] Calling gramcode.bin\n");
-                // initialize ps2 mouse and keyboard..  it fail on real machine.
-                // Open de difficulty level launcher.
-                //gramado_system_call ( 350, 1, 0, 0 );  //ps2 initialization #bugbug
-                sc82 ( 900, (unsigned long) "launcher.bin", 0, 0 ); 
-                //gramado_system_call ( 900, 
-                    //(unsigned long) "launcher.bin", 0, 0 ); 
-                //gramado_system_call ( 900, 
-                //    (unsigned long) "sysmon.bin", 0, 0 ); 
+                debug_print ("init.bin: Launching redpill application\n");
+                ExecRedPillApplication();
                 break;
             }
-            
-            debug_print ("init.bin: Calling gdeshell.bin\n");
-            //gramado_system_call ( 900, 
-                //(unsigned long) "gdeshell.bin", 0, 0 ); 
-            sc82 ( 900, (unsigned long) "gdeshell.bin", 0, 0 ); 
- 
-            //gramado_system_call ( 900, 
-                //(unsigned long) "gramcode.bin", 0, 0 ); 
-
-            //gramado_system_call ( 900, 
-                //(unsigned long) "gnssrv.bin", 0, 0 );      
-
-            //gramado_system_call ( 900, 
-                //(unsigned long) "gwssrv.bin", 0, 0 );  
-
+            debug_print ("init.bin: Launching the command interpreter\n");
+            ExecCommandInterpreter();
             break;
     };
 
 
-    //
-    // == Main loop ==============================================
-    //
+//
+// == Main loop ==============================================
+//
 
+// Buffer for system messages.
 
-    /*
-    // Yield This thread.
-    while (1){
-        asm ("pause");
-        gramado_system_call (265,0,0,0);
-        //if (gShutdown == 1){ goto shutdown; };
-    };
-    */
-
-    
-    //
-    // == Get system message ==============================
-    //
-
-    // Buffer.
     unsigned long message_buffer[5];
 
-    //
-    // == Main loop =================================================
-    //
+// Mainloop:
 
-Mainloop:
+    debug_print ("init.bin: Message loop\n");
 
-    while (1){
+    while (TRUE){
 
         // Get message.
         rtl_enter_critical_section(); 
@@ -494,13 +498,11 @@ Mainloop:
         // No message. Yield.
         if ( message_buffer[1] == 0 )
         { 
-            //gramado_system_call (265,0,0,0); 
-            sc82 (265,0,0,0);
+            sc82(265,0,0,0);
         }
 
         // We've got a message. 
         // Call the procedure.
-        // 
 
         if ( message_buffer[1] == 9216 )
         {
