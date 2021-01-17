@@ -1,18 +1,16 @@
 /*
- * Arquivo host.h
+ * File: host.h
  *
- * Descrição:
- *     Gerenciamneto de host.
+ *     Host manager support.
  *
- * Versão: 1.0, 2016.
+ * 2016 - Created by Fred Nora.
  */
- 
+
 
 #ifndef ____HOST_H
 #define ____HOST_H
- 
- 
- 
+
+
 
 /*
    exemplo
@@ -88,32 +86,34 @@ struct sockaddr_in {
 };	  
 */
 
+
 //#test
-#define HOST_DEFAULTNAME  "gramado" 
-////#define HOST_NAME_MAX 64   //klibc
-#define HOSTNAME_BUFFER_SIZE 80
+#define HOST_DEFAULTNAME       "gramado" 
+#define HOST_NAME_MAX  64
+
 //static char hostname_buffer[HOSTNAME_BUFFER_SIZE];
 
 
+/*
+ * host_info_d:
+ * 
+ *     The host structure.
+ */
 
-//typedef struct host_info_d host_info_t;
 struct host_info_d
 {
-    object_type_t objectType;
+    object_type_t  objectType;
     object_class_t objectClass;
 
-    // id da estrutura para lista interna.
     int id;
-    
     int used;
     int magic;
 
     // Número identificador dentro da rede interna.
-    int hostIdentifier;  
+    int hostIdentifier;
 
-
-    char __hostname[64];    // HOSTNAME_BUFFER_SIZE
-    size_t hostName_len;    // len
+    char __hostname[HOST_NAME_MAX];
+    size_t hostName_len;
 
     char *hostVersion;   // string mostrando a versão. ex: (1.1.1234)
     unsigned short hostVersionMajor;

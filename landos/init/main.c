@@ -417,7 +417,12 @@ int main ( int argc, char *argv[] )
     }
     */
 
- 
+
+    // #test
+    //setenv("PWD" , "/", TRUE);
+    //setenv("HOME", "/HOME", TRUE);
+    //setenv("PATH", "/BIN:/SBIN:/USR/BIN", TRUE);
+
 
     // red pill
     

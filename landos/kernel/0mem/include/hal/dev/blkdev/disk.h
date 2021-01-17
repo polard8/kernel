@@ -78,6 +78,11 @@
 
 
 
+/* number of partitions per table partition  */
+//#define N_PART 4 
+
+//#define PARTOFF 0x1be
+
 // partition table
 // mbr partition table offsets.
 #define  MBR_Table       446  /* MBR: Offset of partition table in the MBR */ 
@@ -166,135 +171,41 @@ struct bpb_d
 };
 
 
-/*
-struct ?????_block_d
-{
-    int id;
-    int used;
-    int magic;
-    
-    struct bpb_d bpb;
-
-    struct ????_block_d *next;
-};
-*/
-
-
-
-/*
- * mbr_d:
- *     ? para obter informações sobre o disco.
- *     Porém devemos ter um boot block mais completo.
- */ 
-
-// #bugbug
-// É desnecessário ter isso dentro do kernel.
-// Deletar.
-
-struct mbr_d
-{
-    int dummy;
-    
-/*
-	//jmp code (3 bytes)
-	
-	//os name 
-	//Sistem info. 
-    char OEM_ID[5];  //"NORA "
-    char VERSION[3]; //"1.0"
-	
-	//bpb 
-	  
-    //Bpb.	
-    unsigned short BytesPerSector;  // dw 512
-	char SectorsPerCluster;         // db 1
-	short ReservedSectors;          // dw 2
-	char TotalFATs;                 // db 2
-	short MaxRootEntries;           // dw 512         ;512 entradas de 32bytes=32 setores.
-	short TotalSectorsSmall;        // dw 0
-	char MediaDescriptor;           // db 0xF0
-	short SectorsPerFAT;            // dw 64          ;64.      
-	short SectorsPerTrack;          // dw 0           ;pegar via bios.     
-	
-	short NumHeads;                 // dw 0           ;pegar via bios.        
-	long HiddenSectors;             // dd 0x00000000
-	long TotalSectorsLarge;         // dd 0x00000000
-	
-	//;for extended.
-	char DriveNumber;               // db 0x80        ;pegar via bios.
-	char Flags;                     // db 0x00
-	char bootSignature;             // db 0           ;Extended Boot Signature.
-	long VolumeID;                  // dd 0x00000001
-	char VolumeLabel[11];           // db "FREDNORA8MB"
-	char SystemID[8];               // db "FAT16   "		
-	
-	//PointerTable
-	//unsigned short SystemName;
-	//unsigned short SystemVersion;
-	//unsigned short SystemBPB;
-	//unsigned short SystemSignature;
-	
-	//Partition Table
-	//unsigned long p0[3];
-	//unsigned long p1[3];
-	//unsigned long p2[3];
-	//unsigned long p3[3];
-	
-	//Signature.
-	unsigned short Signature;
-*/
-}; 
-struct mbr_d *mbr; 
-
-
 
 /*
  * partition_table_d:
  *     Structure for partition table.
  */ 
 struct partition_table_d
-{    
-    unsigned char boot_indicator;  //80h active
+{
+    // //0x80=active  0x00=inactive
+    unsigned char active;
     unsigned char start_chs[3];
-    
-    unsigned char partition_type;
+
+    unsigned char type;
     unsigned char end_chs[3];
     
-    unsigned long start_sector;
+    // Sectors between MBR and first sector.
+    unsigned long offset;
     
-    unsigned long partition_size;  //in sectors.
+    // Sectors in partition.
+    unsigned long size;
 };
 struct partition_table_d *partition; 
 
 
 
-//As informações na partition table apresentadas na forma de 'char'.  
-struct partition_table_chars_d
-{ 
-    unsigned char BootFlag;         // Bootable or not
-    
-    unsigned char StartingCHS0;     // Not used
-    unsigned char StartingCHS1;     // Not used
-    unsigned char StartingCHS2;     // Not used
-    
-    unsigned char PartitionType;     
-    
-    unsigned char EndingCHS0;       // Not used
-    unsigned char EndingCHS1;       // Not used
-    unsigned char EndingCHS2;       // Not used
-    
-    unsigned char StartingSector0;  // Hidden sectors
-    unsigned char StartingSector1;
-    unsigned char StartingSector2;
-    unsigned char StartingSector3;
-    
-    unsigned char PartitionLength0;  // Sectors in this partition
-    unsigned char PartitionLength1;
-    unsigned char PartitionLength2;
-    unsigned char PartitionLength3; 
- 
-};
-struct partition_table_chars_d *partition_chars; 
+// This is a good code.
+// It is easy to handle the partition table values.
+
+struct mbr_d
+{
+    unsigned char boot_code[446];
+    struct partition_table_d p[4];
+    unsigned short signature;
+}; 
+struct mbr_d *mbr; 
+
 
 
 

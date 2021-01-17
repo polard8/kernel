@@ -44,16 +44,27 @@
  // Isso modifica a string lá em ring3.
  // prejudicando uma segunda chamada com a mesma string
  // pois já virá formatada.
- 
-void read_fntos ( char *name ){
 
-    int  i, ns = 0;
+void read_fntos ( char *name )
+{
+    int i  = 0;
+    int ns = 0;
+
     char ext[4];
 
     ext[0] = 0;
     ext[1] = 0;
     ext[2] = 0;
     ext[3] = 0;
+
+
+    //#test
+    if ( (void*) name == NULL )
+        return;
+    
+    //#test
+    if (*name == 0)
+        return;
 
 
     // Transforma em maiúscula enquanto não achar um ponto.
@@ -118,8 +129,9 @@ _complete:
 
 	//Acrescentamos a extensão
 
-    for (i=0; i < 3; i++)
+    for (i=0; i < 3; i++){
         *name++ = ext[i];
+    };
 
     *name = '\0';
 }
@@ -186,13 +198,13 @@ fatLoadCluster (
  *     Talvez essa rotina tenha que ter algum retorno no caso de falhas. 
  */
  
-void read_lba ( unsigned long address, unsigned long lba ){
-
-
+void read_lba ( unsigned long address, unsigned long lba )
+{
     // #todo
     // Fazer algum filtro de argumentos ??
 
     // See: volume.h
+
     switch (g_currentvolume_fatbits){
 
         case 32:
@@ -208,12 +220,12 @@ void read_lba ( unsigned long address, unsigned long lba ){
 
         // Nothing.
         case 12:
-            debug_print ("read_lba: FAT12 not supported\n");
+            debug_print ("read_lba: [FAIL] FAT12 not supported\n");
             return;
             break;
 
         default:
-            debug_print ("read_lba: g_currentvolume_fatbits not supported\n");
+            debug_print ("read_lba: [FAIL] g_currentvolume_fatbits not supported\n");
             break;
     };
 }
@@ -300,35 +312,29 @@ struct inode_d *fs_load_file (char *pathname)
         debug_print ("fs_load_file: [FAIL] inode\n");
         return (struct inode_d *) 0;
     }else{
-        
-        //inode->id ?
-        inode->used = 1;
+
+        inode->used  = 1;
         inode->magic = 1234;
-        
-        //todo: copiar em path
-        //inode->path[]
-        
+
         inode->uid = current_user;
         inode->gid = current_group;
-        
-        //inode->____object (todo: inode structure)
-        
-        
+
         inode->isfat16 = 0;
         inode->fat16_dirent.FileSize = 0;
-        //...
-        
         inode->size_in_bytes = 0;
-        
-        //...
-        
-        inode->next = NULL;
-    };
 
+        inode->next = NULL;
+
+        //todo: copiar em path
+        //inode->path[]
+        //inode->id ?
+        //inode->____object (todo: inode structure)
+
+        // ...
+    };
 
     return (struct inode_d *) 0;
 }
-
 
 
 /*
@@ -891,18 +897,17 @@ void fs_load_fat(void)
          return;
     }
 
+    // Load the sectors in the memory.
 
-	// Carregar fat na memória.
     for ( i=0; i < szFat; i++ ){
-        
+
         my_read_hd_sector ( 
-            VOLUME1_FAT_ADDRESS + b, 
-            VOLUME1_FAT_LBA + i, 
+            (VOLUME1_FAT_ADDRESS + b), 
+            (VOLUME1_FAT_LBA + i), 
             0, 
             0 );
 
-        // Incrementa buffer para o próximo setor.
-        b = (b +512);    
+        b = (b +512);
     };
     
     // Changing the status
@@ -922,6 +927,9 @@ void fs_load_fat(void)
 // Isso serve para carregar o diretório raiz em fat16.
 // Mas nao server para carregar subdiretorios.
 
+// #todo
+// Create __read_sequential_sectors and __write_sequential_sectors
+
 int
 __load_sequential_sectors ( 
     unsigned long address, 
@@ -936,7 +944,7 @@ __load_sequential_sectors (
     
     for ( i=0; i < sectors; i++ ){
         my_read_hd_sector ( address + b, lba + i, 0, 0 );
-        b = (b +512);    
+        b = (b +512);
     };
     
     return 0;
@@ -954,13 +962,16 @@ fs_load_metafile (
 
     debug_print ("fs_load_metafile:\n");
     
-    if (buffer == 0)
+    if (buffer == 0){
+        debug_print ("fs_load_metafile: [ERROR] buffer\n");
         return;
+    }
 
-    if ( size == 0 )
+    if ( size == 0 ){
+        debug_print ("fs_load_metafile: [ERROR] size\n");
         return;
-    
-   
+    }
+
     __load_sequential_sectors ( 
         buffer, 
         first_lba, 
@@ -1017,7 +1028,6 @@ void fs_load_rootdir (void)
 
 // #bubug
 // Only on rootdir.
-// Create the 'dir address' parameter.
 
 unsigned long fsRootDirGetFileSize ( unsigned char *file_name )
 {

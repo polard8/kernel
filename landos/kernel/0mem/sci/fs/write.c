@@ -128,17 +128,20 @@ fatWriteCluster (
 {
     unsigned long i=0;
 
+    // #todo
+    // We need some limits here for now.
 
     for ( i=0; i < spc; i++ )
     {
         write_lba ( address, (sector + i) );
+
         address = (address +512); 
     };
 
 
     //...
 
-    return;
+    //return;
     //return 0;  //#todo
 }
 
@@ -151,8 +154,8 @@ fatWriteCluster (
 
 //int write_lba ( unsigned long address, unsigned long lba ) 
 
-void write_lba ( unsigned long address, unsigned long lba ){
-
+void write_lba ( unsigned long address, unsigned long lba )
+{
 	// #todo: 
 	// Check lba limits.
 
@@ -436,12 +439,10 @@ fsSaveFile (
         c++;    // Incrementa o deslocamento na fat. 
         i++;    // Incrementa a quantidade de busca.
     }; 
- 
- 
+
     // Fail
     // Nossa busca por clusters livres dentro da fat não deu certo.
     // Provavelmente não encontramos uma quantidade sufciente.
-
 
 out_of_range:  
 
@@ -452,7 +453,6 @@ out_of_range:
     // #debug
     //refresh_screen();
     //while(1){ asm("hlt"); }
-
 
 // #importante:
 // Deu certo. Encontramos na fat todos os clusters que o arquivo precisa.   
@@ -480,12 +480,10 @@ save_file:
     // Limite máximo improvisado.
     // 2KB.
 
-    j = (512*4);    
- 
- 
+    j = (512*4); 
+
     // Pegamos o primeiro da lista.
     first = list[i];
-
 
 	// #debug
 	// printf("first={%x}\n",first);
@@ -504,7 +502,6 @@ save_file:
     DirEntry[8]  = (char) file_name[8];
     DirEntry[9]  = (char) file_name[9];
     DirEntry[10] = (char) file_name[10];
-
 
     // Flag. (attributes ?)
     //====================
@@ -555,14 +552,13 @@ save_file:
     // size_in_bytes - File size in bytes.
     // 4 bytes: (28,29,30,31)
 
-    DirEntry[28] = (char) size_in_bytes;   
+    DirEntry[28] = (char) size_in_bytes;
     size_in_bytes = (size_in_bytes >> 8);
     DirEntry[29] = (char) size_in_bytes;
     size_in_bytes = (size_in_bytes >> 8);
     DirEntry[30] = (char) size_in_bytes;
     size_in_bytes = (size_in_bytes >> 8);
     DirEntry[31] = (char) size_in_bytes;
-
 
 	// #importante:
 	// Vamos encontrar uma entrada livre no diretório para
@@ -653,9 +649,17 @@ save_file:
     //next = list[0];
     //if (next == 0xFFF8)
         //what??
-    
-    while (1)
-    { 
+
+
+    // Loop
+
+    while (TRUE){
+ 
+        // Pegamos o atual na lista.
+        // Se ele eh o sinalizador de fim de lista, 
+        // entao entao colocamos o sinalizador de fim de arquivo
+        // no offset indicado pelo penultimo elemento da lista.
+        
         next = list[i];
 
         // #debug.
@@ -672,6 +676,10 @@ save_file:
         // Se não é assinatura ainda.
         }else{
 
+            // #bugbug
+            // Estamos usando isso sem nem mesmo checar seu valor.
+            // precisamos de limtes aqui. Para evitarmos overflow.
+            
             // Grava na fat o endereço do próximo cluster
             fat[next] = list[i+1];
  
@@ -921,6 +929,7 @@ fs_save_file (
 
     debug_print ("fs_save_file: [TEST]\n");
 
+
     if( (void*) file_name == NULL ){
         debug_print ("fs_save_file: [ERROR] file_name\n");
         return -1;
@@ -931,25 +940,24 @@ fs_save_file (
         return -1;
     }
 
+
+    // #todo
+    // Check more parameters.
+
     return (int) fsSaveFile ( 
-                     VOLUME1_FAT_ADDRESS, 
-                     VOLUME1_ROOTDIR_ADDRESS, 
-                     FAT16_ROOT_ENTRIES, 
-                     (char *)        file_name,    
-                     (unsigned long) file_size,       
-                     (unsigned long) size_in_bytes,  
-                     (char *)        file_address,          
-                     (char)          flag );                  
+                     VOLUME1_FAT_ADDRESS,
+                     VOLUME1_ROOTDIR_ADDRESS,
+                     FAT16_ROOT_ENTRIES,
+                     (char *)        file_name,
+                     (unsigned long) file_size,
+                     (unsigned long) size_in_bytes,
+                     (char *)        file_address,
+                     (char)          flag );
 }
 
 
-/*
- * fs_save_entry_on_root:
- *     Salva uma entrada do diretório raiz, dado o id da estrutura do arquivo.
- * @todo: Checa os parametros do sistema de arquivos e 
- * salva a entrada no diretorio raiz.
- */
-
+// ??
+// #todo
 void fs_save_entry_on_root (unsigned long eid)
 {
     //return;

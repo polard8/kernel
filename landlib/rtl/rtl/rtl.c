@@ -1407,12 +1407,28 @@ ssize_t rtl_console_beep(void)
 
 
 
+/* compare two ASCII strings ignoring case */
+// #todo: toupper support.
+/*
+int 
+rtl_strcaseequal (
+    const char *d, 
+    const char *s );
+int 
+rtl_strcaseequal (
+    const char *d, 
+    const char *s )
+{
 
+    char ch=0;
 
+    while ((ch = toupper(*s++)) == toupper(*d++))
+        if (ch == '\0')
+            return 1;
 
-
-
-
+    return 0;
+}
+*/
 
 
 

@@ -179,21 +179,36 @@ unsigned char lfn_checksum(const unsigned char *pFCBName)
 */
 
 
-
+// #todo: use int return.
 void file_close (file *_file)
 {
     debug_print("file_close: todo\n");
+
+    if ( (void*) _file == NULL )
+        return;
 }
+
 
 int file_truncate ( file *_file, size_t len)
 {
     debug_print("file_truncate: todo\n");
+
+    if ( (void*) _file == NULL )
+        return -1;
+
+    if(len<0)
+        return -1;
+
     return -1;
 }
 
 size_t file_get_len(file *_file)
 {
     debug_print("file_get_len: todo\n");
+
+    if ( (void*) _file == NULL )
+        return -1;
+
     return (size_t) -1;
 }
 
@@ -300,6 +315,9 @@ int fs_count_separators( const char *path){
 // 0 = OK. #todo: Isso poderia ser '1'.
 // < 0 Means error.
 
+// #todo
+// We can do the same for some other types.
+
 int fsCheckELFFile ( unsigned long address )
 {
     unsigned char *buffer = (unsigned char *) address;
@@ -343,7 +361,7 @@ fsListFiles (
 
     if ( disk_id == -1 || volume_id == -1 || directory_id == -1 )
     {
-        debug_print ("fsListFiles: [FAIL]\n");
+        debug_print ("fsListFiles: [FAIL] parameters\n");
         goto fail;
     }
 
@@ -355,6 +373,8 @@ fsListFiles (
 
     if ( current_disk == 0 && current_volume == 0 && current_directory == 0 )
     {
+        debug_print ("fsListFiles: [FIXME] current\n");
+        
         //vfsListFiles ();
         goto done;
     }
@@ -650,12 +670,8 @@ void *get_global_open_file (int Index){
 }
 
 
-void set_global_open_file ( void *file, int Index ){
-
-    if (Index < 0){
-        // ?? todo: message
-        return;
-    }
+void set_global_open_file ( void *file, int Index )
+{
 
 	// #todo:
 	// Limite m�ximo da lista.
@@ -664,6 +680,12 @@ void set_global_open_file ( void *file, int Index ){
 
     if ( (void *) file == NULL )
     {
+        // ?? todo: message
+        return;
+    }
+
+
+    if (Index < 0){
         // ?? todo: message
         return;
     }
@@ -677,20 +699,21 @@ void set_global_open_file ( void *file, int Index ){
 
 void fs_show_file_info (file *f)
 {
+
     if ((void*)f==NULL)
     {
-        //??
+        debug_print("fs_show_file_info: fail\n");
         return;
-    }{
-        if (f->used==1)
+    }
+
+    if (f->used==1)
+    {
+        if ( (void*) f->_tmpfname != NULL )
         {
-            
-            if ( (void*) f->_tmpfname != NULL ){
-                printf ("Name={%s}\n",f->_tmpfname);
+            printf ("Name={%s}\n",f->_tmpfname);
             //refresh_screen();
-            }
         }
-    }; 
+    }
 }
 
 void fs_show_file_table(void)
@@ -703,21 +726,21 @@ void fs_show_file_table(void)
     
     for (i=0; i<32; i++)
     {
-        f=(file*)file_table[i];
-        if( (void*)f!=NULL )
+        f = (file*) file_table[i];
+        
+        if( (void*)f != NULL )
             fs_show_file_info(f);
     };
-    
+
     refresh_screen();
 }
 
 
 void fs_show_inode_info (struct inode_d *i)
 {
-
     if ( (void *) i == NULL )
     {
-        //??
+        debug_print("fs_show_inode_info: fail\n");
         return;
     }
 
@@ -734,8 +757,8 @@ void fs_show_inode_info (struct inode_d *i)
 void fs_show_inode_table(void)
 {
     struct inode_d *inode;
-
     register int i=0;
+
 
     printf ("\n inode_table: \n");
     
@@ -984,12 +1007,10 @@ unsigned long fs_count_path_levels (unsigned char *path)
     register int i=0;
 
 
-    if ( (void*) path == NULL )
-        return 0;
+    if ( (void*) path == NULL ){  return 0;  }
 
+    if ( *path == 0 ){  return 0;  }
 
-    if ( *path == 0 )
-        return 0;
 
     for ( i=0; i < Max; ++i )
     {
@@ -1011,40 +1032,50 @@ to_FAT_name (
 {
     int i=0;
     char *ptr;
-    
-    if (!strcmp(src,"..")) {
+
+
+    // Parent directory
+    if ( !strcmp(src,"..") ) {
         strcpy(dst,src);
         i=2;
     
+    // Current directory
     } else if (!strcmp(src,".")) {
         strcpy(dst,src);
         i=1;
     
+    // Regular file.
     } else {
         
-        ptr=src;
-        
+        ptr = src;
+
         i=0;
         
+        // Começamos com o nome.
         while (i<8 && *ptr && *ptr != '.') 
         {
             dst[i++] = *ptr++;
         };
         
-        // Completa com '0' ate 8.
+        // Completa com ' ' ate 8.
         while (i<8){ dst[i++] = 0x20; };
         
         if (*ptr == '.') { ptr++; }
         
-        // Ext
+        // Agora a extensao
         while (i<11 && *ptr){
             dst[i++] = *ptr++;
         };
     };
 
-    // Completa com '0' ate o fim.
+    // Completa com espaço ate o fim.
+    // 'i' indica o offset de onde devemos começar.
+    // Isso tambem vai completar com espaço quando a extensao
+    // tiver menos que 3 chars.
+
     while (i<11){ dst[i++] = 0x20; };
 }
+
 
 // credits: hoppy os.
 // from 8.3
@@ -1102,12 +1133,12 @@ from_FAT_name (
         if (k==1){
            dst[k]=0;
         } else {
-			
+
             if (dst[0]=='.'){
-	            dst[k]=0;
+                dst[k]=0;
             }else{
-	            dst[k-1]=0;
-	        };
+                dst[k-1]=0;
+            };
         };
     
     } else {
@@ -1136,6 +1167,9 @@ from_FAT_name (
 // @address:
 //     Address to load the file.
 //
+
+// #bugbug
+// Starts only on root dir.
 
 // #ok
 // Carregou um arquivo com 3 niveis.
@@ -1177,7 +1211,6 @@ int fs_load_path ( unsigned char *path, unsigned long address )
     if (*path == 0){
         panic ("fs_load_path: *path\n"); 
     }
-
 
     // Address
     if (address == 0){
@@ -1665,14 +1698,12 @@ void fs_show_root_fs_info(void)
     printf ("\n");
     printf ("fs_show_root_fs_info:\n");
 
-    //
+
     // root fs structure.
-    //
 
     if ( (void *) root == NULL ){
         printf ("No root structure\n");
         goto fail;
- 
     }else{
 
         if ( root->used != 1 || root->magic != 1234 ){
@@ -1752,10 +1783,8 @@ int fsInit (void){
     volume1_rootdir = file_table[slot];
     volume1_rootdir->filetable_index = slot;
 
-    if ( (void *) volume1_rootdir == NULL )
-    {
+    if ( (void *) volume1_rootdir == NULL ){
         panic ("fsInit: volume1_rootdir \n");
-
     } else {
 
         volume1_rootdir->used = 1;
@@ -1930,7 +1959,6 @@ int fat16Init (void)
     fat_cache_saved  = CACHE_NOT_SAVED;
 
 
-
 	// Type - Configura o tipo de sistema de arquivos usado. 
 	// No caso, (fat16).
 	//
@@ -1977,9 +2005,7 @@ int fat16Init (void)
     fs_init_fat();
 
 
-    // Done.
     debug_print ("fat16Init: done\n");
-    
     return 0;
 }
 
@@ -3079,6 +3105,14 @@ sys_write_file_to_disk (
 // #todo
 // Maybe we need to return the pointer to the 'file' strucure.
 
+// #bugbug
+// Only on root dir.
+// We need to provide the directory address and the max number of
+// entries as parameters.
+
+// #todo
+// We can do the same to create a directory.
+
 // IN:
 // file name, type
 int fs_create_empty_file ( char *file_name, int type )
@@ -3091,41 +3125,38 @@ int fs_create_empty_file ( char *file_name, int type )
     char buffer[512];
     
     int number_of_sectors = 1;
-    int size_in_bytes = 512;  
+    int size_in_bytes = 512;
     int __ret= -1;
 
 
     // check
 
-    if ( (void*) file_name == NULL )
-    {
-        debug_print ("fs_create_empty_directory: file_name\n");
+    if ( (void*) file_name == NULL ){
+        debug_print ("fs_create_empty_directory: [FAIL] file_name\n");
         return -1;
     }
 
-    if (*file_name == 0)
-    {
-        debug_print ("fs_create_empty_directory: *file_name\n");
+    if (*file_name == 0){
+        debug_print ("fs_create_empty_directory: [FAIL] *file_name\n");
         return -1;
     }
-
 
     // file structure
     
     f = (file *) kmalloc ( sizeof( struct file_d ) );
 
-    
-    if ( (void *) f == NULL )
-    {
-        debug_print("fs_create_empty_file: f\n");
+    if ( (void *) f == NULL ){
+        debug_print("fs_create_empty_file: [FAIL] f\n");
         return -1;
     }
-        
 
     // #todo
     // Here we create a file in the root dir.
     // But we want to create in the curent dir or cwd.
-        
+
+    // We need to provide the directory address and the max number of
+    // entries as parameters.
+
     //f->type = type;
     // #todo: fd ...
     

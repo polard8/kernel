@@ -23,7 +23,7 @@
 //#todo: arguments.
 void *CreateChannel (void)
 {
-	debug_print ("CreateChannel: [TODO]\n");
+    debug_print ("CreateChannel: [TODO]\n");
     return NULL;
 }
 
@@ -35,11 +35,10 @@ void *CreateChannel (void)
  *     ...
  */
 
-int DestroyChannel (struct channel_d *channel){
-
+int DestroyChannel (struct channel_d *channel)
+{
     if ( (void *) channel == NULL ){
         return 0;   
-
     }else{
 
         //channel = NULL;
@@ -57,9 +56,9 @@ int DestroyChannel (struct channel_d *channel){
  */
 
 //#todo: arguments.
-int OpenChannel ( void ){
-
-	debug_print ("OpenChannel: [TODO]\n");
+int OpenChannel ( void )
+{
+    debug_print ("OpenChannel: [TODO]\n");
     return -1;
 }
 
@@ -71,15 +70,14 @@ int OpenChannel ( void ){
  *     Mas não destroi.
  */
 
-int CloseChannel (struct channel_d *channel){
-
+int CloseChannel (struct channel_d *channel)
+{
     if ( (void *) channel == NULL ){
+        debug_print ("CloseChannel: fail\n");
         return (int) 1;
-
     }else{
         //channel->state = 0;
     };
-
 
     return 0;
 }

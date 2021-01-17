@@ -155,7 +155,6 @@ struct volume_d
     struct superblock_d super;
 
 
-
     // Ponteiro para um buffer se o tipo permitir.
     void *priv_buffer;
     unsigned long buffer_size_in_sectors;

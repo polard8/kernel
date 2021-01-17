@@ -600,14 +600,15 @@ void network_loop(void)
     int i=0;
 
     debug_print("network_loop:\n");
-    printf("\n");
+
     printf("\n");
     printf("=========================\n");
     printf("network_loop: [LOOP] Reading the buffers in ring3\n");
+    printf("\n");
     
-    
-    for (i=0; i<4096; i++)
+    for (i=0; i<4096; i++){
         buf[i] = 0;
+    };
 
     //
     // == Loop ======================================
