@@ -50,9 +50,7 @@ int diskShowDiskInfo ( int descriptor ){
     if ( (void *) d == NULL ){
         printf ("struct fail\n");
         goto fail;
-
     } else {
-
 
         if ( d->used != 1 || d->magic != 1234 ){
 			printf("flags fail\n");
@@ -73,29 +71,31 @@ int diskShowDiskInfo ( int descriptor ){
 
 	goto done;
 
-	
 fail:
     printf("fail\n");
     return (int) 1;
-
 done:
-
     printf ("done\n");
     return 0;
 }
 
 
-//show info for all disks in the list.
+// Show info for all disks in the list.
+// Called by service 251
 void disk_show_info (void)
 {
-    int i;
     struct disk_d *disk;
+    int i=0;
+
+
+    // All disks in the list.
     
-    for(i=0; i<DISK_COUNT_MAX; i++)
+    for (i=0; i<DISK_COUNT_MAX; i++)
     {
         disk = (struct disk_d *) diskList[i];
         
-        if ( (void *) disk != NULL ){
+        if ( (void *) disk != NULL )
+        {
             diskShowDiskInfo(i);
         }
     };
@@ -109,22 +109,20 @@ void disk_show_info (void)
  *     Obtem o ponteiro da estrutura dado o descritor.
  */
  
-void *disk_get_disk_handle ( int number ){
-
-	if ( number < 0 || number >= DISK_COUNT_MAX ){
-		return NULL;
-	}
-
+void *disk_get_disk_handle ( int number )
+{
+    if ( number < 0 || number >= DISK_COUNT_MAX )
+    {
+        return NULL;
+    }
 
     return (void *) diskList[number];
 }
 
-
 /* #deletar */
-
 void *disk_get_current_disk_info (void)
 {
-	return NULL;
+    return NULL;
 }
 
 
@@ -135,14 +133,23 @@ void *disk_get_current_disk_info (void)
  *     Que � um m�dulo do tipo MB.
  *
  */
- 
+
+
+// #bugbug
+// #fixme
+// The boot disk was not include in the diskList[]
+// Probably the 'ide module' will discover all the ide disks
+// and rebuild the list. This way all the information made here
+// was gone. #fixme
+
+
 //int diskInit() 
 
 int disk_init (void){
 
     int i=0;
-    
-    unsigned char __boot_disk;
+
+    unsigned char BootDisk=0;
 
 
 #ifdef KERNEL_VERBOSE
@@ -150,8 +157,10 @@ int disk_init (void){
 #endif
 
 
-    // Clean.
-    for ( i=0; i<DISK_COUNT_MAX; i++ ){
+    // Clean the disk list.
+
+    for ( i=0; i<DISK_COUNT_MAX; i++ )
+    {
         diskList[i] = 0;
     };
 
@@ -166,65 +175,61 @@ int disk_init (void){
 	//Essa estrutura � vital, n�o podemos ficar sem ela.
 	
     d = (void *) kmalloc( sizeof(struct disk_d) );
-    
 
-    if( (void *) d == NULL )
-        panic ("disk_init: d");
- 
+    if( (void *) d == NULL ){
+        panic ("disk_init: d\n");
+    }
  
     if( (void *) storage == NULL ){
         panic ("disk_init: storage");
+    }else{
+        d->used  = (int) 1;
+        d->magic = (int) 1234;
 
-	}else{
-		
-		
-		d->diskType = DISK_TYPE_NULL;
-		
-	    d->id = 0;
-	    d->boot_disk_number = (char) info_get_boot_info (3);
-	    
-		d->used = (int) 1;
-	    d->magic = (int) 1234;
-	    
-	    __boot_disk = (char) d->boot_disk_number;
-        switch (__boot_disk)
-        {
-            case 0x80:
-                d->name = "sda";
-                break;
+        // This is the boot disk.
+        // So, it will be the number '0'.
+        d->id = 0;
+        current_disk             = d->id;
+        diskList[ current_disk ] = (unsigned long) d;   //#test
 
-            case 0x81:
-                d->name = "sdb";
-                break;
+        d->diskType = DISK_TYPE_NULL;
 
-            case 0x82:
-                d->name = "sdc";
-                break;
+        // Get the number of the boot disk.
+        // This info was provide by BIOS at boot time.
+        // That is why we call this 'boot_disk_number'.
+        // See: core/info.c
 
-            case 0x83:
-                d->name = "sdd";
-                break;
-           
+        d->boot_disk_number = (char) info_get_boot_info(3);
+
+        BootDisk = (char) d->boot_disk_number;
+
+        switch (BootDisk){
+
+            case 0x80:  d->name = "sda";  break;
+            case 0x81:  d->name = "sdb";  break;
+            case 0x82:  d->name = "sdc";  break;
+            case 0x83:  d->name = "sdd";  break;
+
             default:
+                debug_print("disk_init: [FAIL] default boot disk number\n");
                 d->name = "sd?";
                 break;
         };
 
-		
-		d->next = NULL;
-		
-		//global
-	    current_disk = 0;
-	
-        storage->system_disk = (struct disk_d *) d;
+        d->next = NULL;
 
+        // #bugbug
+        // Is this structure initialized ?
+
+        if ( (void*) storage != NULL ){
+            storage->system_disk = (struct disk_d *) d;
+        }
+
+        // global.
         ____boot____disk =  (struct disk_d *) d;
     };
 
-
-
    //more?
- 
 
 //done:
 
@@ -232,7 +237,6 @@ int disk_init (void){
 
     return 0;
 }
-
 
 
 /*

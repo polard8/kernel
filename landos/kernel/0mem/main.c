@@ -131,7 +131,6 @@ int kernel_main (int arch_type)
     BootBlock.boot_mode          = (unsigned long) base[10]; // 40
     BootBlock.gramado_mode       = (unsigned long) base[11]; // 44
 
-
     //
     // == gramado mode =============================================
     //

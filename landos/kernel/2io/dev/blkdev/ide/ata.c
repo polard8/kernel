@@ -580,107 +580,148 @@ void ide_mass_storage_initialize (void)
  *     ?? Alguma rotina de configuração de dispositivos.
  */
 
+// This routine was called by ata_initialize.
+
 int ide_dev_init (char port)
 {
+
+    struct st_dev *tmp_dev;
     int data=0;
 
-    // #bugbug
-    // Mudar esse jeito de declarar esse ponteiro de estrutura.
 
-    //#todo: struct st_dev *new_dev;
+    // #?
+    // We have four ports in the ide controller.
+    // See: ata_initialize.
+    
+    if (port<0){
+        panic("ide_dev_init: [ERROR] port\n");
+    }
 
-    st_dev_t *new_dev;
+    
+    // See: hal/dev/blkdev/ata.h
+    // st_dev_t *new_dev;
+        
+    struct st_dev *new_dev;
 
     new_dev = ( struct st_dev * ) kmalloc ( sizeof( struct st_dev) );
 
-    if ( (void *) new_dev ==  NULL )
-    {
-        panic ("ide_dev_init: struct");
+    if ( (void *) new_dev ==  NULL ){
+        panic ("ide_dev_init: [FAIL] new_dev\n");
     }
 
 
+    //
+    // data thing ??
+    //
+
     data = (int) ide_identify_device (port);
 
+    // #todo:
+    // Penso que esse valor de '-1' for determinado 
+    // por Nelson como erro.
+    
+    //if ( data < 0 )
     if ( data == -1 )
     {
-		//@todo: 
-		//   Message.
-
+        debug_print ("ide_dev_init: [FIXME] data\n");
         return (int) 1;
     }
 
 
+    // Unidades ATA.
     if ( data == 0 )
     {
-        // Unidades ATA.
 
+        // Is it an ata device?
         new_dev->dev_type = (ata_identify_dev_buf[0] & 0x8000) ? 0xffff : ATA_DEVICE_TYPE;
 
+        // What kind of lba?
         new_dev->dev_access = (ata_identify_dev_buf[83] & 0x0400) ? ATA_LBA48 : ATA_LBA28;
 
-
-        if (ATAFlag == FORCEPIO)
-        {
-			//com esse só funciona em pio
+        // Let's set up the PIO support.
+        // Where ATAFlag was defined?
+        // Where FORCEPIO was defined?
+        
+        // Com esse só funciona em pio
+        if (ATAFlag == FORCEPIO){
             new_dev->dev_modo_transfere = 0;
 
+        // Com esse pode funcionar em dma
         }else{
-
-			//com esse pode funcionar em dma
             new_dev->dev_modo_transfere = ( ata_identify_dev_buf[49] & 0x0100 ) ? ATA_DMA_MODO : ATA_PIO_MODO;
         };
 
 
-        new_dev->dev_total_num_sector = ata_identify_dev_buf[60];
+        new_dev->dev_total_num_sector  = ata_identify_dev_buf[60];
         new_dev->dev_total_num_sector += ata_identify_dev_buf[61];
+
+        // #bugbug
+        // We can not do this.
+        // We need to check the supported sector size.
+        // 512 or 4096 ?
 
         new_dev->dev_byte_per_sector = 512;
 
-        new_dev->dev_total_num_sector_lba48 = ata_identify_dev_buf[100];
+        new_dev->dev_total_num_sector_lba48  = ata_identify_dev_buf[100];
         new_dev->dev_total_num_sector_lba48 += ata_identify_dev_buf[101];
         new_dev->dev_total_num_sector_lba48 += ata_identify_dev_buf[102];
         new_dev->dev_total_num_sector_lba48 += ata_identify_dev_buf[103];
 
+        // #bugbug
+        // We can not do this.
+        // We need to check the supported sector size.
+        // 512 or 4096 ?
+
         new_dev->dev_size = (new_dev->dev_total_num_sector_lba48 * 512);
 
-        
+
+          // Unidades ATAPI. 
     }else if( data == 0x80 )
           {
-
-              // Unidades ATAPI.
-
+              //  Is this an ATAPI device ?
               new_dev->dev_type = (ata_identify_dev_buf[0] & 0x8000) ? ATAPI_DEVICE_TYPE : 0xffff;
 
+              // What kind of lba?
               new_dev->dev_access = ATA_LBA28;
-              
-              if (ATAFlag == FORCEPIO)
-              {
-                  //com esse só funciona em pio 
+
+              // Let's set up the PIO support.
+              // Where ATAFlag was defined?
+              // Where FORCEPIO was defined?
+
+              // Com esse só funciona em pio 
+              if (ATAFlag == FORCEPIO){
                   new_dev->dev_modo_transfere = 0; 
 
+              // Com esse pode funcionar em dma
               }else{
-
-                  //com esse pode funcionar em dma
                   new_dev->dev_modo_transfere = (ata_identify_dev_buf[49] & 0x0100) ? ATA_DMA_MODO : ATA_PIO_MODO;
               };
 
-              new_dev->dev_total_num_sector = 0;
+              // ??
+              new_dev->dev_total_num_sector  = 0;
               new_dev->dev_total_num_sector += 0;
+
+              // #bugbug
+              // 2024
+              // Is this standard for all kind of CD?
+              // We need to get this information in some place.
 
               new_dev->dev_byte_per_sector = 2048; 
 
-              new_dev->dev_total_num_sector_lba48 = 0;
+              new_dev->dev_total_num_sector_lba48  = 0;
               new_dev->dev_total_num_sector_lba48 += 0;
               new_dev->dev_total_num_sector_lba48 += 0;
               new_dev->dev_total_num_sector_lba48 += 0;
+
+              // #bugbug
+              // 2024
+              // Is this standard for all kind of CD?
+              // We need to get this information in some place.
 
               new_dev->dev_size = (new_dev->dev_total_num_sector_lba48 * 2048);
 
           }else{
-
-			// @todo: Message.
-			// Identificar o erro
-
+               debug_print ("ide_dev_init: [ERROR] not ATA, not ATAPI.\n");
                return (int) 1;
           };
 
@@ -689,65 +730,62 @@ int ide_dev_init (char port)
 
     new_dev->dev_id = dev_next_pid++;
 
-    new_dev->dev_num = ata.dev_num;
-    new_dev->dev_channel= ata.channel;
+    new_dev->dev_num     = ata.dev_num;
+    new_dev->dev_channel = ata.channel;
+
     new_dev->dev_nport = port;
 
 
-	//
-	// port
-	//
+    //
+    // == port ====================================
+    //
 
+    // #bugbug
+    // Nao devemos confundir esses numeros com os numeros
+    // gerados pelo BIOS, pois bios tambem considera
+    // outras midias alem do ide.
 
     switch (port){
 
-        case 0:
-            dev_nport.dev0 = 0x81;
-            break;
-            
-        case 1:
-            dev_nport.dev1 = 0x82;
-            break;
-        
-        case 2:
-            dev_nport.dev2 = 0x83;
-            break;
-            
-        case 3:
-            dev_nport.dev3 = 0x84;
-            break;
+        case 0:  dev_nport.dev0 = 0x81;  break;
+        case 1:  dev_nport.dev1 = 0x82;  break;
+        case 2:  dev_nport.dev2 = 0x83;  break;
+        case 3:  dev_nport.dev3 = 0x84;  break;
 
+        // #atenção
+        // Essa estrutura é para 32 portas.
+        // para listar as portas AHCI.
+        // Mas aqui está apenas listando as 4 portas IDE.
 
-		//#atenção
-		//Essa estrutura é para 32 portas.
-		//para listar as portas AHCI.
-		//Mas aqui está apenas listando as 4 portas IDE.
-
+        default:
+            debug_print ("ide_dev_init: [ERROR] default port number\n");
+            break;
     };
 
 
-#ifdef KERNEL_VERBOSE
+    new_dev->next = NULL;
+
+
+//#ifdef KERNEL_VERBOSE
     // #todo
     // kprintf("[ Detected Disk type: %s ]\n", dev_type[new_dev->dev_type] );
     // refresh_screen ();
-#endif
+//#endif
 
-    new_dev->next = NULL;
+
+    // =========================================
 
     //
     // Add no fim da lista (ready_queue_dev).
     //
 
-    //st_dev_t *tmp_dev;
-    struct st_dev *tmp_dev;
-
     tmp_dev = ( struct st_dev * ) ready_queue_dev;
 
-    if ( (void *) tmp_dev ==  NULL )
-    {
-        panic ("ide_dev_init: tmp_dev");
+    if ( (void *) tmp_dev ==  NULL ){
+        panic ("ide_dev_init: [FAIL] tmp_dev\n");
     }
 
+    // Linked list
 
     while ( tmp_dev->next )
     {
@@ -756,6 +794,8 @@ int ide_dev_init (char port)
 
     tmp_dev->next = new_dev;
 
+
+    debug_print ("ide_dev_init: done\n");
 
     return 0;
 }
@@ -935,9 +975,9 @@ int ata_initialize ( int ataflag )
     __breaker_ata1_initialized = 0;
     __breaker_ata2_initialized = 0;
 
-
     int Status = 1;  
-    int port=0;
+
+    int PortNumber=0;
 
     unsigned char bus=0;
     unsigned char dev=0;
@@ -958,7 +998,7 @@ int ata_initialize ( int ataflag )
     // See: config.h
 
     g_current_ide_channel =  __IDE_PORT;
-    g_current_ide_device =  __IDE_SLAVE;
+    g_current_ide_device  =  __IDE_SLAVE;
 
 
 	// Configurando flags do driver.
@@ -1078,7 +1118,7 @@ int ata_initialize ( int ataflag )
         out8 ( ATA_BAR1, 0x00 );
         out8 ( ATA_BAR3, 0x00 );
 
-        ata_record_dev = 0xff;
+        ata_record_dev     = 0xff;
         ata_record_channel = 0xff;
 
 
@@ -1099,37 +1139,43 @@ int ata_initialize ( int ataflag )
         // Vamos trabalhar na lista de dispositivos.
         //
 
-	    // Iniciando a lista.
+        // Iniciando a lista.
+        // st_dev structure.
+
         ready_queue_dev = ( struct st_dev * ) kmalloc ( sizeof( struct st_dev) );
-	
-	    //#todo:
-	    //Checar a validade da estrutura.
-	
+
+        if ( (void*) ready_queue_dev == NULL ){
+            panic("ata_initialize: ready_queue_dev\n");
+        }
+
         current_dev = ( struct st_dev * ) ready_queue_dev;
 
-        current_dev->dev_id = dev_next_pid++;
-        current_dev->dev_type = -1;
-        current_dev->dev_num = -1;
+        current_dev->dev_id      = dev_next_pid++;
+        current_dev->dev_type    = -1;
+        current_dev->dev_num     = -1;
         current_dev->dev_channel = -1;
-        current_dev->dev_nport = -1;
+        current_dev->dev_nport   = -1;
         current_dev->next = NULL;
 
+        // #bugbug
+        // Is this a buffer ? For what ?
+        // Is this bugger enough ?
 
         ata_identify_dev_buf = (unsigned short *) kmalloc (4096);
 
-        if ( (void *) ata_identify_dev_buf == NULL )
-        {
-            panic ("ata_initialize: ata_identify_dev_buf");
+        if ( (void *) ata_identify_dev_buf == NULL ){
+            panic ("ata_initialize: ata_identify_dev_buf\n");
         }
 
-
-
 		// Sondando dispositivos e imprimindo na tela.
-		// As primeiras quatro portas do controlador IDE.  
+		// As primeiras quatro portas do controlador IDE. 
+		
+        // #todo
+        // Create a constant for 'max'. 
 
-        for ( port=0; port < 4; port++ )
+        for ( PortNumber=0; PortNumber < 4; PortNumber++ )
         {
-            ide_dev_init (port);
+            ide_dev_init (PortNumber);
         };
 
 
@@ -1186,7 +1232,6 @@ done:
         __breaker_ata1_initialized = 1;    
         __breaker_ata2_initialized = 1;        
     }
-
 
     return (int) Status;
 }

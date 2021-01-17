@@ -2659,6 +2659,10 @@ void *sci0 (
             return (void *) sys_get_system_metrics ( (int) arg2 );
             break;
 
+        // #bugbug
+        // Maybe all these calls using sys_show_system_info(), needs 
+        // to use the sci2. int 0x82.
+
         // 251
         // See: sci/sys/sys.c
         case SYS_SHOWDISKINFO:  sys_show_system_info(1);  break;
@@ -2670,7 +2674,6 @@ void *sci0 (
         // 253
         // See: sci/sys/sys.c
         case SYS_MEMORYINFO:  sys_show_system_info(3);  break;
-
 
         // 254
         // See: sci/sys/sys.c

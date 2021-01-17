@@ -343,7 +343,7 @@ int init (void){
 
 
 #ifdef EXECVE_VERBOSE
-    printf ("core-init: init_globals ok\n");     
+    printk ("core-init: init_globals ok\n");     
 #endif  
 
 	
@@ -355,7 +355,7 @@ int init (void){
 
     //Object manager.
 #ifdef EXECVE_VERBOSE
-    printf ("core-init: init_object_manager\n");
+    printk ("core-init: init_object_manager\n");
 #endif
 
 
@@ -364,7 +364,7 @@ int init (void){
 
     // i/o Manager.
 #ifdef EXECVE_VERBOSE
-    printf("core-init: ioInit\n");
+    printk ("core-init: ioInit\n");
 #endif
 
     debug_print ("core-init: io manager\n");
@@ -708,14 +708,17 @@ int init (void){
     // == Processor ===================================
     //
 
-	//
-	// A estrutura para informações sobre o processador. 
-	//
+    // #test
+    // This initialization was missing ...
+    // We are trying to implement it here.
 
-	// Check structure.
-    if ( (void *) processor == NULL ){
+    processor = (void *) kmalloc ( sizeof( struct processor_d ) ); 
+
+    if ( (void *) processor == NULL )
+    {
         panic("init_architecture_dependent: processor\n");
     }
+
 
 
     // #todo

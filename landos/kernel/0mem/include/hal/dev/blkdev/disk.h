@@ -228,11 +228,13 @@ struct disk_d
     int magic;
 
     int id;                 // ID na lista de discos.
-    char boot_disk_number;  // ID herado do boot block.
+    char boot_disk_number;  // ID herdado do boot block.
 
-	// Ponteiro para o nome do disco,
+    // Ponteiro para o nome do disco,
     // Talvez não precise ser um ponteiro, pode ser um array.
+    
     char *name;  
+
 
     //#todo
     // se está funcionando ... se está inicializado ...

@@ -135,8 +135,8 @@ dessa conta.
 // ===================================================
 
 
-// salvando o último endereço válido de memória ram.
-//usado em head.asm
+// Salvando o último endereço válido de memória ram.
+// usado em head.asm
 unsigned long blSavedLastValidAddress;
 unsigned long blSavedMetafileAddress;
 unsigned long blSavedDiskNumber;
@@ -144,7 +144,6 @@ unsigned long blSavedHeads;
 unsigned long blSavedSPT;
 unsigned long blSavedCylinders;
 //...
-
 
 
 int gdefShowLogo;

@@ -259,42 +259,55 @@ void infoShowKernelInfo()
 };
 */
 
+// ================================================
+// The data comes from boot block and beyond.
 
-
-
+// #test
+// Lets use the info that omes from the BootBlock structure.
+// This structure was initialized for kernel_main() in main.c
 
 unsigned long info_get_boot_info ( int i )
 {
-	
-	// The data comes from boot block and beyond.
 
-    if (i<0)
+    if (i<0){
         return 0;
-        
+    }
+
     switch (i)
     {
+
+        // #bugbug
+        // If we use the BootBlock structure, maybe the info
+        // will be accessible only using the sci2. int 0x82.
+
         case 1:
-           return (unsigned long) blSavedLastValidAddress;
+           return (unsigned long) BootBlock.last_valid_address;
+           // return (unsigned long) blSavedLastValidAddress;
            break;
 
         case 2:
-           return (unsigned long) blSavedMetafileAddress;
+           return (unsigned long) BootBlock.metafile_address;
+           //return (unsigned long) blSavedMetafileAddress;
            break;
 
         case 3:
-           return (unsigned long) blSavedDiskNumber;
+           return (unsigned long) BootBlock.disk_number;
+           //return (unsigned long) blSavedDiskNumber;
            break;
 
         case 4:
-           return (unsigned long) blSavedHeads;
+           return (unsigned long) BootBlock.heads;
+           //return (unsigned long) blSavedHeads;
            break;
 
         case 5:
-           return (unsigned long) blSavedSPT;
+           return (unsigned long) BootBlock.spt;
+           //return (unsigned long) blSavedSPT;
            break;
 
         case 6:
-           return (unsigned long) blSavedCylinders;
+           return (unsigned long) BootBlock.cylinders;
+           //return (unsigned long) blSavedCylinders;
            break;
 
         case 7:

@@ -53,18 +53,13 @@
 
 struct processor_d   
 {
-
-    // Object
-    object_type_t objectType;
+    object_type_t  objectType;
     object_class_t objectClass;
 
-
-    int id;
-
-    // Struct validation.
     int used;
     int magic;
 
+    int id;
 
 
 	// #todo: 
@@ -89,15 +84,14 @@ struct processor_d
     unsigned long Vendor[4];
 
     //0x1(eax)
-    int Stepping_ID;   //4 bit stepping
-    int Model;         //4 bit model
-    int Family_ID;     //4 bit family
-    int Processor_Type;  // 2 bitprocessor type
+    int Stepping_ID;           // 4 bit stepping
+    int Model;                 // 4 bit model
+    int Family_ID;             // 4 bit family
+    int Processor_Type;        // 2 bit processor type
     // 2bit reserved
-    int Extended_Model_ID;  // 4 bit extended model
-    int Extended_Family_ID;  // 8bit extended family
+    int Extended_Model_ID;     // 4 bit extended model
+    int Extended_Family_ID;    // 8 bit extended family
     // 4bit reserved
-
 
 	//0x1(ebx)
 	//Brand Index
@@ -191,7 +185,6 @@ struct processor_d
     unsigned long Tss;
 
 
-
 	//...
 
 
@@ -199,10 +192,8 @@ struct processor_d
     struct processor_d *next;
 };
 struct processor_d *processor;
- 
 
 
- 
 /*
  ******************************************************
  * ProcessorBlock_d:
