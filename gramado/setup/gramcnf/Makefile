@@ -27,10 +27,10 @@ CFLAGS = -m32 \
 	-Werror=strict-prototypes    
 	
 
-LIBC    = ../../../ge/rtl/include/
-LIBCOBJ = ../../../ge/rtl/obj
-API     = ../../../ge/libcore/include/
-APIOBJ  = ../../../ge/libcore/obj
+LIBC    = ../../../landlib/rtl/include/
+LIBCOBJ = ../../../landlib/rtl/obj
+API     = ../../../landlib/libcore/include/
+APIOBJ  = ../../../landlib/libcore/obj
 
 
 # Objects

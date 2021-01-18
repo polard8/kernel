@@ -37,14 +37,10 @@ CFLAGS = -m32 \
 	
 
 
-
-
-LIBC      = ../../../ge/rtl/include/
-LIBCOBJ   = ../../../ge/rtl/obj
-
-LIBGWS    = ../../../ge/lib/libgws/include/
-LIBGWSOBJ = ../../../ge/lib/libgws/obj
-
+LIBC      = ../../../../landlib/rtl/include/
+LIBCOBJ   = ../../../../landlib/rtl/obj
+LIBGWS    = ../../../../landlib/lib/libgws/include/
+LIBGWSOBJ = ../../../../landlib/lib/libgws/obj
 
 
 	##

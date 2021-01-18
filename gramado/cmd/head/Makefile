@@ -29,10 +29,10 @@ CFLAGS = -m32 \
 	-fno-stack-protector \
 	-s \
 	-Werror=strict-prototypes    
-	
 
-LIBC    = ../../../rtl/include/
-LIBCOBJ = ../../../rtl/obj
+
+LIBC    = ../../../landlib/rtl/include/
+LIBCOBJ = ../../../landlib/rtl/obj
 
 #bugbug we do not use this here
 API     = ../lib/api02/include/

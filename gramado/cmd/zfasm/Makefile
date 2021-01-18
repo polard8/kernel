@@ -29,8 +29,8 @@ CFLAGS = -m32 \
 	-Werror=strict-prototypes    
 	
 
-LIBC    = ../../../rtl/include/
-LIBCOBJ = ../../../rtl/obj
+LIBC    = ../../../landlib/rtl/include/
+LIBCOBJ = ../../../landlib/rtl/obj
 
 	##
 	## Objects

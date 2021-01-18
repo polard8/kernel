@@ -28,8 +28,8 @@ CFLAGS = -m32 \
 
 # desert rtl
 
-LIBC    = ../../../ge/rtl/include/
-LIBCOBJ = ../../../ge/rtl/obj
+LIBC    = ../../../landlib/rtl/include/
+LIBCOBJ = ../../../landlib/rtl/obj
 
 
 	##

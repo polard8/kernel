@@ -35,8 +35,8 @@ CFLAGS = -m32 \
 	
 
 
-LIBC    = ../../../rtl/include/
-LIBCOBJ = ../../../rtl/obj
+LIBC    = ../../../landlib/rtl/include/
+LIBCOBJ = ../../../landlib/rtl/obj
 
 
 	##

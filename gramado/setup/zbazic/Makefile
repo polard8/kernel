@@ -29,10 +29,10 @@ CFLAGS = -m32 \
 
 # libs 
 
-LIBC    = ../../../ge/rtl/include/
-LIBCOBJ = ../../../ge/rtl/obj
-API02   = ../../../ge/libcore/include/
-APIOBJ  = ../../../ge/libcore/obj
+LIBC    = ../../../landlib/rtl/include/
+LIBCOBJ = ../../../landlib/rtl/obj
+API02   = ../../../landlib/libcore/include/
+APIOBJ  = ../../../landlib/libcore/obj
 
 
 # Objects
