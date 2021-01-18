@@ -1,0 +1,7 @@
+	We are almost there!
+
+	This app uses a lot of libc functions.
+	We are facing problams to save the file when the app
+	calls fclose.
+	Probably it is a problems with the pointer to the name of the file.
+	This pointer was given by fopen.
