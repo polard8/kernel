@@ -135,6 +135,28 @@ int gws(void)
 }
 
 
+// local
+int 
+gwsProcedure ( 
+    void *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 )
+{
+    switch (msg){
+
+        // 20 = MSG_KEYDOWN
+        case 20:
+            printf("%c",long1); fflush(stdout);
+            break;
+            
+        // 22 = MSG_SYSKEYDOWN
+        case 22:
+            printf ("MSG_SYSKEYDOWN\n");
+            break;
+    };
+}
+
 //==========================================
 // Main
 
@@ -439,7 +461,21 @@ int main ( int argc, char *argv[] )
         //gws_refresh_window (client_fd, main_window);
         //gws_yield();
     //}
+
+    //=================================
     
+    //get current thread
+    int cThread = (int) sc82 (10010,0,0,0);
+    //set foreground thread.
+    sc82 (10011,cThread,cThread,cThread);
+    
+    while(1){
+        if ( rtl_get_event() == TRUE ){  
+            gwsProcedure( (void*) RTLEventBuffer[0], RTLEventBuffer[1], RTLEventBuffer[2], RTLEventBuffer[3] );
+        }
+    };
+    //=================================
+
 
     // Isso ehestranho ... um cliente remoto nao deve poder fazer isso.
     //gws_debug_print ("gws: Sending command to close the server. \n");

@@ -2958,51 +2958,35 @@ fail:
  
 void KillFocus ( struct window_d *window )
 {
-	
-	// #debug
-	// suspensa para testes na máquina real
-	
-	return;
-	
+
+    // #debug
+    // suspensa para testes na máquina real
+    // Nao queremos ficar sem foco algum.
+
+    return;
+
 	//
 	// ====== cut here for now =====
 	//
-	
-	
-	if ( (void *) window == NULL )
-	{
-		printf ("KillFocus: window\n");
-	    goto fail; 
-	}else {
-		
-		if ( window->used == 1 && window->magic == 1234 )
-		{
-			window->focus = 0;
-			
-			window_with_focus = 0; //#test
-			WindowWithFocus = NULL;
-			
 
-            // Validade da thread.
-            if ( (void *) window->control != NULL )
-            {
-                // Validade da thread.
-                if ( window->control->used == 1 || 
-                     window->control->magic == 1234 )
-			    {
-			        // mandamos a mensagem
-			        // o aplicativo decide o que fazer com ela.
-			        window->control->window = window;
-			        window->control->msg = MSG_KILLFOCUS;
-			        window->control->long1 = 0;
-			        window->control->long2 = 0;
-			        window->control->newmessageFlag = 1;
-			    }
-		    }
-		
-		};
-	};
 
+    if ( (void *) window == NULL ){
+        printf ("KillFocus: window\n");
+        goto fail; 
+    }else {
+        if ( window->used == 1 && window->magic == 1234 )
+        {
+            window_with_focus = 0; //#test
+
+            window->focus = 0;
+
+            WindowWithFocus = NULL;
+
+            foreground_process = 0;
+            foreground_thread = 0;
+            return;
+        };
+    };
 
 fail:
     return;

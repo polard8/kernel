@@ -1579,27 +1579,25 @@ void *sci0 (
             return NULL;
             break;
 
-
         //55 Get foreground window.
         case SYS_BUFFER_GETFOREGROUNDWINDOW:
             return (void *) windowGetForegroundWindow();
             break;
 
-		//56 set foreground window.
-		case SYS_BUFFER_SETFOREGROUNDWINDOW:
-		    return (void *) windowSetForegroundWindow ( (struct window_d *) arg2 );
-		    break;
-		
-		
-		//57.	
-		case SYS_REGISTERWINDOW: 
-			return (void *) RegisterWindow ( (struct window_d *) hWnd );
-			break;
+        //56 set foreground window.
+        case SYS_BUFFER_SETFOREGROUNDWINDOW:
+            return (void *) windowSetForegroundWindow ( (struct window_d *) arg2 );
+            break;
+
+        //57
+        case SYS_REGISTERWINDOW: 
+            return (void *) RegisterWindow ( (struct window_d *) hWnd );
+            break;
 
         //58.
+        //#todo: return status.
         case SYS_CLOSEWINDOW: 
             CloseWindow ( (struct window_d *) hWnd ); 
-            //#todo: return status.
             return NULL;
             break;
 
@@ -1618,14 +1616,17 @@ void *sci0 (
             break;
 
         // 62
+        // Set focus on a given window and
+        // put the thread associated in foreground
+        // to receive keyboard input events. 
         case SYS_SETFOCUS: 
             SetFocus ( (struct window_d *) hWnd ); 
             return NULL;
             break;
 
         // 63 id
+        //#todo: use method.
         case SYS_GETFOCUS: 
-            //#todo: use method.
             return (void *) window_with_focus;  
             break;
 
@@ -3072,6 +3073,22 @@ void *sci2 (
         debug_print("sc2: [10000] sys_get_file_sync\n");
         // IN: fd, request
         return (void*) sys_get_file_sync( (int) arg2, (int) arg3 );
+    }
+    
+    // get the tid of the current thread.
+    if ( number == 10010 )
+    {
+        debug_print("sc2: [10010] GetCurrentThreadId\n");
+        return (void*) GetCurrentThreadId();
+    }
+    
+    // Se the foreground thread tid.
+    // #todo: We need a method for that.
+    if ( number == 10011 )
+    {
+        debug_print("sc2: [10011] set foreground thread tid\n");
+        foreground_thread = (int) arg2;
+        return NULL;
     }
 
     panic (" @ sci2: default \n");
