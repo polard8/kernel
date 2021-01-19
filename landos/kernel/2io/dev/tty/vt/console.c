@@ -1722,9 +1722,12 @@ void console_interrupt(int device_type, int data)
 
         // keyboard
         // data =  raw byte.
+        // See: vt/draw/model/kgws.c
         case CONSOLE_DEVICE_KEYBOARD:
             debug_print("console_interrupt: input from keyboard device\n");
-            KGWS_SEND_KEYBOARD_MESSAGE (data);
+            
+            //#todo: trocar isso por foreground_thread.
+            KGWS_SEND_KEYBOARD_MESSAGE (foreground_thread, data);
             break;
 
         // COM port

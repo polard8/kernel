@@ -47,7 +47,7 @@ void kgws_disable(void);
 // Pega um scancode, transforma em caractere e envia na forma de mensagem
 // para a thread de controle associada com a janela que tem o foco de entrada.
 
-int KGWS_SEND_KEYBOARD_MESSAGE ( unsigned char raw_byte );
+int KGWS_SEND_KEYBOARD_MESSAGE ( int tid, unsigned char raw_byte );
 
 
 // Aqui o servidor de janelas escaneia as janelas para saber 
@@ -78,9 +78,24 @@ kgws_send_to_controlthread_of_currentwindow (
     unsigned long long1, 
     unsigned long long2 );
 
+int
+kgws_send_to_tid ( 
+    int tid, 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 );
+
+
+int
+kgws_send_to_foreground_thread ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 );
+
 
 int init_gramado (void);
-
 
 
 int KGWS_initialize(void);

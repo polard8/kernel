@@ -2654,15 +2654,24 @@ void windowUnblockFocus (void)
  *
  * ...
  */
- 
+
 // wm.
- 
+
 // #bugbug
 // Revendo a questão de repintar a janela mãe quando se seta o foco. 
- 
+
+// #todo
+// Setar o foco na janela e marcar a thread de controle associada a
+// essa janela como foreground thread, para que ela receba input.
+
 void SetFocus ( struct window_d *window )
 {
     // priority stuff
+    
+    
+    // Essa eh a thread associada com a janela que esta recebendo o foco.
+    // Ela deve se tornar a foreground thread, para que receba o input.
+    // Usamos a tid 'foreground_thread'
     struct thread_d *thread;
 
 	// #debug
@@ -2707,10 +2716,17 @@ void SetFocus ( struct window_d *window )
     // Focus, priority and quantum.
     if ( (void *) window->control != NULL )
     {
+        
+        
         // Focus!!
         // Who can read the input.
+        
         active_process = window->control->ownerPID; 
         active_thread  = window->control->tid;
+        
+        foreground_process = active_process;
+        foreground_thread  = active_thread;
+      
       
         // Current virtual console.
         CONSOLE_TTYS[fg_console].control = (struct thread_d *) window->control;

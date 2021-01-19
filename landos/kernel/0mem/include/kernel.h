@@ -501,6 +501,9 @@ int foreground_thread;
 int current_process;   // Currently having the processing time.
 int current_thread;    // Currently having the processing time.
 
+
+
+
 int criticalsection_pid;
 
 // [Focus]

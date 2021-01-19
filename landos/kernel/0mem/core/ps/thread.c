@@ -1563,9 +1563,9 @@ int thread_getchar (void)
 
     SC = (unsigned char) get_scancode(); // #BUGBUG THIS IS A RAW BYTE, NOT A SCANCODE.
 
-    KGWS_SEND_KEYBOARD_MESSAGE ( SC );   // #BUGBUG THIS IS A RAW BYTE, NOT A SCANCODE.
-
-
+    // #todo
+    //  trocar isso por foreground_thread.
+    KGWS_SEND_KEYBOARD_MESSAGE ( foreground_thread, SC );   // #BUGBUG THIS IS A RAW BYTE, NOT A SCANCODE.
 
 
 

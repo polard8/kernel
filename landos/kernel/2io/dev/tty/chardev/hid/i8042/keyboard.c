@@ -252,13 +252,12 @@ sc_again:
      if ( __raw == 0xE0 ){ __has_e0_prefix = 1; goto done;  }
      if ( __raw == 0xE1 ){ __has_e1_prefix = 1; goto done;  }
 
-     
-     
-     // + Build the message and send it to the thread's queue.
-     // This routine will select the target thread.
-     // + Or send the message to the input TTY.
-     // This way the foreground process is able to get this data.
-     // See: ps2kbd.c
+    // + Build the message and send it to the thread's queue.
+    // This routine will select the target thread.
+    // + Or send the message to the input TTY.
+    // This way the foreground process is able to get this data.
+    // See: ps2kbd.c
+    // See: vt/console.c
 
     // IN: device type and data.
     // 1=keyboard
