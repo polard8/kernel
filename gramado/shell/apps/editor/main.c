@@ -47,6 +47,8 @@
 #include <sys/socket.h>
 #include <packet.h>
 
+#include <rtl/gramado.h>
+
 
 // The client-side library.
 #include <gws.h>
@@ -672,6 +674,29 @@ void _hello(int fd)
 }
 
 
+// local
+int 
+editorProcedure ( 
+    void *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 )
+{
+    switch (msg){
+
+        // 20 = MSG_KEYDOWN
+        case 20:
+            printf("%c",long1); fflush(stdout);
+            break;
+            
+        // 22 = MSG_SYSKEYDOWN
+        case 22:
+            printf ("MSG_SYSKEYDOWN\n");
+            break;
+    };
+}
+
+
 /*
  **********************************************
  * main:
@@ -978,7 +1003,27 @@ int main ( int argc, char *argv[] ){
     //
 
     // Loop de requests para o gws.
-    _loop (client_fd);
+    //_loop (client_fd);
+
+
+
+    // loop
+    //=================================
+    //get current thread
+    int cThread = (int) sc82 (10010,0,0,0);
+    //set foreground thread.
+    sc82 (10011,cThread,cThread,cThread);
+    
+    while(1){
+        if ( rtl_get_event() == TRUE ){  
+            editorProcedure( (void*) RTLEventBuffer[0], RTLEventBuffer[1], RTLEventBuffer[2], RTLEventBuffer[3] );
+        }
+    };
+    //=================================
+
+
+
+
 
 
     // #importante
