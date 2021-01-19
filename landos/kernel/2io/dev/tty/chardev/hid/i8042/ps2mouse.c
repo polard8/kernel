@@ -1,5 +1,5 @@
 /*
- * File: hid/ps2mouse.c
+ * File: i8042/ps2mouse.c
  *
  *      + ps2 mouse controler support.
  *      + mouse event support.
@@ -123,7 +123,6 @@ static char buffer_mouse[3];
 //=====================================================================
 
 
-
 //
 // Prototype
 //
@@ -145,9 +144,10 @@ int MOUSE_BAT_TEST (void);
 // #bugbug
 // TODO
 
-int MOUSE_SEND_MESSAGE (void *buffer) {
-
-    if ( (void *) buffer == NULL ){
+int MOUSE_SEND_MESSAGE (void *buffer)
+{
+    if ( (void *) buffer == NULL )
+    {
         return (int) -1;
     }
 
@@ -159,6 +159,7 @@ int MOUSE_SEND_MESSAGE (void *buffer) {
     //char char3 = (char) &chars[3];
     //...
 
+    debug_print ("MOUSE_SEND_MESSAGE: fixme\n");
 
 	// #todo
 	// Colocar esses dados em uma mesnagem e enviar para thread.
@@ -216,40 +217,35 @@ unsigned char xxx_mouse_read (void)
 // 0xaa êxito, 0xfc erro.
 // Created by Fed Nora.
 
-int MOUSE_BAT_TEST (void){
-
+int MOUSE_BAT_TEST (void)
+{
     int val = -1;
     int i = 0;
-
 
 	// #todo:
 	// Cuidado.
 	// Diminuir isso se for possivel.
 	// Nao funciona na maquina reala sem esse delay.
 
-    for (i=0; i<99000; i++)
-    {
-        wait_ns (400);
-    };
+    // #bugbug: Max
+    
+    for (i=0; i<99000; i++){  wait_ns (400);  };
 
-
-	//while (1)
+    // #bugbug: Max
 
     for ( i=0; i<999; i++ )
     {
+        // #todo
+        // Mask only the used bits. 0x000000FF
+        
         val = xxx_mouse_read();
 
-        if (val == 0xAA)
-        {
-            printf ("MOUSE_BAT_TEST OK\n");
-            return 0;
-
+        if (val == 0xAA){
+            printf ("MOUSE_BAT_TEST: [OK]  \n");  return 0;
         }else if (val == 0xFC){
-
-            printf ("MOUSE_BAT_TEST fail\n");
-            return (int) -1; 
+            printf ("MOUSE_BAT_TEST: [FAIL]\n");  return (int) -1; 
         };
-    
+
         // Reenviar o comando. 
         // OBS: este comando não é colocado em buffer
 
@@ -273,8 +269,8 @@ int MOUSE_BAT_TEST (void){
  *     2018 - Created by Fred Nora.  
  */
 
-int ps2_mouse_globals_initialize (void){
-
+int ps2_mouse_globals_initialize (void)
+{
     unsigned char response = 0;
     unsigned char deviceId = 0;
     int i = 0; 
@@ -285,18 +281,16 @@ int ps2_mouse_globals_initialize (void){
 	//printf("ps2_mouse_globals_initialize: inicializando estrutura\n");
 	//refresh_screen ();
 
-
-	//user.h
+    // See: user.h   ??
+    
     ioControl_mouse = (struct ioControl_d *) kmalloc ( sizeof(struct ioControl_d) );
 
     if ( (void *) ioControl_mouse == NULL ){
-        panic ("ps2_mouse_globals_initialize: ioControl_mouse fail\n");
-
+        panic("ps2_mouse_globals_initialize: ioControl_mouse fail\n");
     }else{
-        ioControl_mouse->id = 0;
-        ioControl_mouse->used = 1;
+        ioControl_mouse->used  = 1;
         ioControl_mouse->magic = 1234;
-
+        ioControl_mouse->id = 0;
 		//Qual thread está usando o dispositivo.
         ioControl_mouse->tid = 0;  
         //ioControl_mouse->
@@ -334,7 +328,7 @@ int ps2_mouse_globals_initialize (void){
 
 
 	//#bugbug. Cuidado com essa inicializaçao.
-    g_mousepointer_width = 16;
+    g_mousepointer_width  = 16;
     g_mousepointer_height = 16;
 
 
@@ -356,9 +350,10 @@ int ps2_mouse_globals_initialize (void){
 	// Carregando o bmp do disco para a memória
 	// e apresentando pela primeira vez.
 
-    mouse_ret = (int) load_mouse_bmp ();
+    mouse_ret = (int) load_mouse_bmp();
 
-    if (mouse_ret != 0){
+    if (mouse_ret != 0)
+    {
         panic ("ps2_mouse_globals_initialize: load_mouse_bmp\n");
     }
 
@@ -455,8 +450,8 @@ void ps2mouse_initialize_device (void)
     // 0xA7 Disable Mouse
     // 0xA9 Check Mouse InterfaceReturns 0, if OK
     wait_then_write (0x64,0xA8);
-    for (i=0;i<20000;i++);
-    
+    for (i=0;i<20000;i++){};
+
     //======================================================
     //--    
 
@@ -618,7 +613,7 @@ void ps2mouse_initialize_device (void)
     if ( (void *) __file == NULL ){
         panic ("ps2mouse_initialize_device: __file fail, can't register device");    
     }else{
-        __file->used = 1;
+        __file->used  = 1;
         __file->magic = 1234;
         __file->isDevice = 1;
 
@@ -673,7 +668,9 @@ void ps2mouse_initialize_device (void)
         
         //tty
         PS2MouseDeviceTTY = (struct tty_d *) tty_create();
-        if ( (void *) PS2MouseDeviceTTY == NULL ){
+        
+        if ( (void *) PS2MouseDeviceTTY == NULL )
+        {
            panic("ps2kbd_initialize_device: PS2MouseDeviceTTY fail");   
         }
 
@@ -706,15 +703,17 @@ void ps2mouse_initialize_device (void)
  * there for us.
  */
 
-static unsigned char getMouseData (void){
-
+static unsigned char getMouseData (void)
+{
     unsigned char data = 0;
 
-    while ((data & 0x21) != 0x21)
-        data = in8 (0x64);
 
+    while ( (data & 0x21) != 0x21 )
+    {
+        data = in8(0x64);
+    };
 
-    data = in8 (0x60);
+    data = in8(0x60);
 
     return (data);
 }
@@ -749,8 +748,8 @@ void kernelPS2MouseDriverReadData (void)
  *     2018 - Created by Fred Nora.
  */
 
-int load_mouse_bmp (void){
-
+int load_mouse_bmp (void)
+{
     int Status = 1;
     int Index = 0; 
     unsigned long fileret = 0;
@@ -760,12 +759,11 @@ int load_mouse_bmp (void){
     //printf ("load_mouse_bmp:\n");
 #endif
 
-
+    // #bugbug
     // Alocando duas páginas para um BMP pequeno. 8KB.
 
     unsigned long tmp_size = (2*4096);
     mouseBMPBuffer = (void *) allocPages (2);
-
 
 
     if ( (void *) mouseBMPBuffer == NULL ){
@@ -784,20 +782,20 @@ int load_mouse_bmp (void){
 	//===================================
 	// MOUSE
 
-    fileret = (unsigned long) fsLoadFile ( VOLUME1_FAT_ADDRESS,
+    // #todo
+    // We need to load from any directory, not only root.
+
+    fileret = (unsigned long) fsLoadFile ( 
+                                  VOLUME1_FAT_ADDRESS,
                                   VOLUME1_ROOTDIR_ADDRESS, 
                                   32, //#bugbug: Number of entries.
                                   "MOUSE   BMP", 
                                   (unsigned long) mouseBMPBuffer,
                                   tmp_size );
 
-    if ( fileret != 0 )
-    {
-        printf ("MOUSE.BMP FAIL\n");
-        
-		// Escrevendo string na janela.
-		//draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "MOUSE.BMP FAIL");
-
+    if ( fileret != 0 ){
+        //debug_print ("load_mouse_bmp: [FAIL] MOUSE.BMP\n");
+        printf        ("load_mouse_bmp: [FAIL] MOUSE.BMP\n");
         goto fail;
     }
 
@@ -815,7 +813,6 @@ int load_mouse_bmp (void){
 
     Status = (int) 0;
     goto done;
-
 
 fail:
     printf ("fail\n");
@@ -846,17 +843,18 @@ int get_current_mouse_responder (void)
 }
 
 
-
-
-
-
 /*
  * =====================================================
  * update_mouse:
  *     Updates the mouse position.
  */
 
-void update_mouse (void){
+// #todo
+// Describe this funcion.
+// Change name to ps2mouse_update_mouse()
+
+void update_mouse (void)
+{
 
 //======== X ==========
 // Testando o sinal de x.
@@ -865,32 +863,21 @@ void update_mouse (void){
 //pega o delta x
 //testa o sinal para x
 do_x:
-
-    if ( mouse_packet_data & MOUSE_X_SIGN ) 
-    {
-        goto x_neg;
-    }
-
+    if ( mouse_packet_data & MOUSE_X_SIGN ){  goto x_neg;  }
 
 //Caso x seja positivo.
 x_pos:
-
     mouse_x += mouse_packet_x;
     goto do_y;
 
-
 //Caso x seja negativo.
 x_neg:
-
     mouse_x -= ( ~mouse_packet_x + 1 );
 
-    if (mouse_x > 0)
-    {
-        goto do_y;
-    }
+    if (mouse_x > 0){  goto do_y;  }
+
     mouse_x = 0;
- 
- 
+
 //======== Y ==========
 // Testando o sinal de x. 
 // Do the same for y position.
@@ -898,30 +885,19 @@ x_neg:
 //Pega o delta y.
 //Testa o sinal para y.
 do_y:
-
-    if ( mouse_packet_data & MOUSE_Y_SIGN )
-    {
-        goto y_neg;
-    }
-
+    if ( mouse_packet_data & MOUSE_Y_SIGN ){  goto y_neg;  }
 
 //Caso y seja positivo.
 y_pos:
-
     mouse_y -= mouse_packet_y;
 
-    if ( mouse_y > 0 )
-    {
-        goto quit;
-    }
+    if ( mouse_y > 0 ){  goto quit; }
 
     mouse_y = 0;
     goto quit;
 
-
 //Caso y seja negativo. 
 y_neg:
-
     mouse_y += ( ~mouse_packet_y + 1 );
 
 // Quit
@@ -934,8 +910,12 @@ quit:
 // para quem pedir. Como o servidor de janelas atual.
 unsigned long ps2_mouse_get_info ( int i )
 {
-    switch (i)
-    {
+
+    //if (i<0)
+        //return 0;
+
+    switch (i){
+
         case 1:
             return (unsigned long) saved_mouse_x;
             break;
@@ -964,7 +944,6 @@ unsigned long ps2_mouse_get_info ( int i )
             return (unsigned long) mouse_button_action;
             break;            
 
-
         case 8:
             return (unsigned long) mouse_buttom_1;
             break;
@@ -976,8 +955,6 @@ unsigned long ps2_mouse_get_info ( int i )
         case 10:
             return (unsigned long) mouse_buttom_3;
             break;
-
-
 
         case 11:
             return (unsigned long) old_mouse_buttom_1;
@@ -997,62 +974,79 @@ unsigned long ps2_mouse_get_info ( int i )
             break;
 
           //...
-    }	
+    };
 }
 
 
 
-void ps2mouse_change_and_show_pointer_bmp ( int number ){
+void ps2mouse_change_and_show_pointer_bmp ( int number )
+{
 
-    switch (number)
-    {
-		
-		case 1:
-	       refresh_rectangle ( saved_mouse_x, saved_mouse_y, 20, 20 );
-	       bmpDisplayMousePointerBMP ( mouseBMPBuffer, mouse_x, mouse_y ); 		
-		   break;
+    if ( number<0 )
+        return;
+
+
+    switch (number){
+
+        case 1:
+           refresh_rectangle ( 
+               saved_mouse_x, saved_mouse_y, 20, 20 );
+           bmpDisplayMousePointerBMP ( 
+               mouseBMPBuffer, mouse_x, mouse_y ); 
+           break;
 
         // app icon
-		case 2:
-	        refresh_rectangle ( saved_mouse_x, saved_mouse_y, 20, 20 );
-	        bmpDisplayMousePointerBMP ( shared_buffer_app_icon, mouse_x, mouse_y ); 
-		    break;
+        case 2:
+            refresh_rectangle ( 
+                saved_mouse_x, saved_mouse_y, 20, 20 );
+            bmpDisplayMousePointerBMP ( 
+                shared_buffer_app_icon, mouse_x, mouse_y ); 
+            break;
 
         // file icon
         case 3:
-            refresh_rectangle ( saved_mouse_x, saved_mouse_y, 20, 20 );
-            bmpDisplayMousePointerBMP (shared_buffer_file_icon, mouse_x, mouse_y );
+            refresh_rectangle ( 
+                saved_mouse_x, saved_mouse_y, 20, 20 );
+            bmpDisplayMousePointerBMP ( 
+                shared_buffer_file_icon, mouse_x, mouse_y );
             break;
-
 
         // folder icon
         case 4:
-            refresh_rectangle ( saved_mouse_x, saved_mouse_y, 20, 20 );
-            bmpDisplayMousePointerBMP (shared_buffer_folder_icon, mouse_x, mouse_y ); 
+            refresh_rectangle ( 
+                saved_mouse_x, saved_mouse_y, 20, 20 );
+            bmpDisplayMousePointerBMP ( 
+                shared_buffer_folder_icon, mouse_x, mouse_y ); 
             break;
 
         // terminal icon
         case 5:
-           refresh_rectangle ( saved_mouse_x, saved_mouse_y, 20, 20 );
-           bmpDisplayMousePointerBMP (shared_buffer_terminal_icon, mouse_x, mouse_y ); 
+           refresh_rectangle ( 
+               saved_mouse_x, saved_mouse_y, 20, 20 );
+           bmpDisplayMousePointerBMP (
+               shared_buffer_terminal_icon, mouse_x, mouse_y ); 
            break;
 
 
         case 6:
-            refresh_rectangle ( saved_mouse_x, saved_mouse_y, 20, 20 );
-            bmpDisplayMousePointerBMP (shared_buffer_cursor_icon, mouse_x, mouse_y );
+            refresh_rectangle ( 
+                saved_mouse_x, saved_mouse_y, 20, 20 );
+            bmpDisplayMousePointerBMP ( 
+                shared_buffer_cursor_icon, mouse_x, mouse_y );
             break;
  
+        // #test
+        // Estamos usando os ícones previamente carregados.  
+
+        //...  
  
-		 //#estamos usando os ícones previamente carregados.  
-		   
-		 //...  
-		   
-		default:
-	      refresh_rectangle ( saved_mouse_x, saved_mouse_y, 20, 20 );
-	       bmpDisplayMousePointerBMP ( mouseBMPBuffer, mouse_x, mouse_y ); 		
-		   break;
-    }
+        default:
+           refresh_rectangle ( 
+               saved_mouse_x, saved_mouse_y, 20, 20 );
+           bmpDisplayMousePointerBMP ( 
+               mouseBMPBuffer, mouse_x, mouse_y ); 
+           break;
+    };
 }
 
 
@@ -1208,8 +1202,6 @@ void ps2mouse_parse_data_packet (void)
         };
 
 
-
-
 	// ===
 	// Confrontando o estado atual com o estado anterior para saber se ouve 
 	// alguma alteração ou não.
@@ -1219,13 +1211,11 @@ void ps2mouse_parse_data_packet (void)
          mouse_buttom_2 != old_mouse_buttom_2 ||
          mouse_buttom_3 != old_mouse_buttom_3 )
     {
-        mouse_button_action = 1;
-
+        mouse_button_action = TRUE;
     }else{
-        mouse_button_action = 0;
+        mouse_button_action = FALSE;
     };
 }
-
 
 
 /*
@@ -1346,14 +1336,20 @@ void mouseHandler (void)
                     // na forma de mensagens.
                     // Tambem nao precisamos escanear janelas ... o ws fara isso.
                 ps2mouse_parse_data_packet();
-            
-                    // #bugbug
-                    // escaneando janelas.
-                    // O window server deveria fazer isso.
-                    // sci/windows/kgws.c
+
+                // #bugbug
+                // Escaneando janelas.
+                // O window server deveria fazer isso.
+
+                // Estamos mandando o evento para a thread associada `a
+                // janela 'a qual o mouse esta passando por cima.
+                 // Isso nao muda a thread que esta em foreground.
+
+                // vt/draw/model/kgws.c
+
                 kgws_mouse_scan_windows();
             }
-            
+
             
             // O driver precisa do old pra configurar a variável de ação.
             // #todo Talvez precise de outras
@@ -1396,6 +1392,7 @@ void set_ps2_mouse_status(int status)
     ps2_mouse_status = status;
 }
 
+
 int get_ps2_mouse_status(void)
 {
     return (int) ps2_mouse_status;
@@ -1403,10 +1400,10 @@ int get_ps2_mouse_status(void)
 
 
 /*
- * 
- * 
- * 
+ * ps2_mouse_dialog:
+ *  
  */
+
 unsigned long 
 ps2_mouse_dialog ( 
     int msg,
@@ -1414,9 +1411,12 @@ ps2_mouse_dialog (
     unsigned long long2 )
 {
 
-    switch (msg)
-    {
-		//habilitar
+    //if ( msg<0 )
+        //return 0;
+
+    switch (msg){
+
+        //habilitar
         case 4000:
             printf ("ps2_mouse_dialog: 4000\n");
             refresh_screen();

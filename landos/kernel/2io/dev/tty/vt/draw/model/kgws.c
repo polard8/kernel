@@ -820,12 +820,16 @@ done:
 // #obs
 // Isso é chamado pelo mouse em ps2mouse.c
 
-int kgws_mouse_scan_windows (void){
+// Estamos mandando o evento para a thread associada `a
+// janela 'a qual o mouse esta passando por cima.
+// Isso nao muda a thread que esta em foreground.
 
-	// #importante:
-	// Essa será a thread que receberá a mensagem.
+int kgws_mouse_scan_windows (void)
+{
+    // #importante:
+    // Essa será a thread que receberá a mensagem.
+
     struct thread_d *t;
-
 
 	// #importante:
 	// Essa será a janela afetada por qualquer evento de mouse.
@@ -1796,7 +1800,6 @@ int register_ws_process ( pid_t pid ){
     }
 
     __gpidWindowServer = (pid_t) pid;
-
 
     return 0;
 }
