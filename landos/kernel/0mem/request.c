@@ -300,8 +300,8 @@ int request (void){
         // também sairemos do processo.
         case 12:
             debug_print ("request: [12] Exit thread\n");
-            printf      ("request: [12] Exiting thread %d\n", 
-                REQUEST.target_tid);
+            //printf      ("request: [12] [DEBUG] Exiting thread %d\n", 
+            //    REQUEST.target_tid);
             do_request_12( (int) REQUEST.target_tid );
             break;
 

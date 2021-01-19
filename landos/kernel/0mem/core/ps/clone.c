@@ -629,12 +629,13 @@ pid_t clone_and_execute_process ( char *filename )
     char *path;
     char *name;
 
+    // page table.
+    void *__pt;
 
 
     // #debug
     debug_print ("clone_and_execute_process: [FIXME] It's a work in progress\n");
-    printf      ("clone_and_execute_process:\n");
-
+    //printf      ("clone_and_execute_process:\n");
 
 
     if ( (void*) filename == NULL ){
@@ -738,18 +739,15 @@ pid_t clone_and_execute_process ( char *filename )
 // Loop.
 //
 
-__search:
-
-
     // Search
     // Convertendo o formato do nome do arquivo.
     // >>> "12345678XYZ"
-    //read_fntos ( (char *) filename );
-    read_fntos ( (char *) name );
-    
-
     // Procura o nome no diretorio carregado anteriormente.
     // Que eh o diretorio raiz
+
+__search:
+
+    read_fntos ( (char *) name );
 
     Status = (int) KiSearchFile ( name, dir_address );
     if (Status == 1)
@@ -892,9 +890,9 @@ __found:
     // == Clone =========================================
     //
 
-do_clone:
-
     // Cria uma estrutura do tipo processo, mas não inicializada.
+
+do_clone:
 
     Clone = (struct process_d *) processObject();
 
@@ -904,12 +902,10 @@ do_clone:
         printf      ("clone_and_execute_process: [FAIL] Clone\n");
         goto fail;
     }
- 
 
-        // Obtêm um índice para um slot vazio na lista de processos.
-        // Precisa estar dentro do range válido para processos
-        // em ring3.
-
+    // Obtêm um índice para um slot vazio na lista de processos.
+    // Precisa estar dentro do range válido para processos
+    // em ring3.
 
     PID = (int) getNewPID();
 
@@ -921,12 +917,12 @@ do_clone:
         goto fail;
     }
 
-    Clone->used = 1;
+    Clone->used  = 1;
     Clone->magic = 1234;
-
-    Clone->pid = (pid_t) PID;
+    Clone->pid   = (pid_t) PID;
     
-    //#todo: Deletar. Isso iremos herdar?
+    // #todo: 
+    // Deletar. Isso iremos herdar?
     Clone->uid = (uid_t) current_user;
     Clone->gid = (gid_t) current_group;
 
@@ -1010,6 +1006,11 @@ do_clone:
     if( (void*) Clone->Image == NULL )
         panic("clone_and_execute_process: Clone->Image\n");
 
+
+    // Se falhar o carregamento. 
+    // Vamos destruir a thread e o processo.
+
+
     Status = (int) fsLoadFile ( 
                        VOLUME1_FAT_ADDRESS, 
                        (unsigned long) dir_address,
@@ -1017,24 +1018,18 @@ do_clone:
                        name, 
                        (unsigned long) Clone->Image,
                        BUGBUG_IMAGE_SIZE_LIMIT );
-
-
-    // Se falhou o carregamento. 
-    // Vamos destruir a thread e o processo.
     
     if ( Status != 0 )
     {
-        // Kill thread.
         Clone->control->used = 0;
         Clone->control->magic = 0;
         Clone->control->state = DEAD;
         Clone->control == NULL;
 
-        // kill process.
         Clone->used = 0;
         Clone->magic = 0;  
         Clone = NULL;
-        
+
         //#todo
         //check number of entries in the routine above 
 
@@ -1088,8 +1083,7 @@ do_clone:
     if( (void*) Clone->ImagePA == NULL )
         panic("clone_and_execute_process: Clone->ImagePA\n");
 
-
-    void *__pt;
+    // page table.
 
     __pt = (void *) CreatePageTable ( 
                         (unsigned long) Clone->DirectoryVA, 
@@ -1235,9 +1229,8 @@ do_clone:
     // #debug: 
     // Para a máquina real.
 
-    printf ("clone_and_execute_process: [DEBUG] Returning to father\n");
+    //printf ("clone_and_execute_process: [DEBUG] Returning to father\n");
     refresh_screen();
-
 
 	// Return.
 	// #obs:

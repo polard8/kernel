@@ -1,72 +1,62 @@
 /*
-* C program to Display the Function Names 
-* defined in C Source File
-*/
+ * C program to Display the Function Names
+ * defined in C Source File
+ */
 
-// rtl
+#include <types.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <string.h>
-
 
 void check (char *c,int p1, int p2);
 void display (char *c, int p1);
 
-     
-void main (int argc, char **argv)
-{
 
+int main (int argc, char **argv)
+{
     FILE *fp;
     char ch[100];
     char *pos1, *pos2, *pos3;
 
-     
     fp = fopen(argv[1], "r");
 
     if (fp == NULL){
        printf("\nFile unable to open");
-       return;
- 
+       return -1;
     }else{
        printf("\nFile Opened to display function names :\n");
     };
 
 
-    while (1)
-    {
-            if ((fgets(ch, 100, fp)) != NULL)
+    while (TRUE){
+
+        if ((fgets(ch, 100, fp)) != NULL)
+        {
+            if ((strstr(ch, "/*")) == NULL)
             {
-
-                if ((strstr(ch, "/*")) == NULL)
+                pos1 = strchr(ch, '(');          /* check opening brace */
+                
+                if (pos1)
                 {
-
-                    pos1 = strchr(ch, '(');                /* check opening brace */
-
-                    if (pos1)
+                    pos2 = strchr(ch,')');   /* check oclosing brace */
+                    
+                    if (pos2)
                     {
+                        pos3 = strchr(ch,';');   /* check for semicolon */
 
-                        pos2 = strchr(ch,')');            /* check oclosing brace */
-
-                        if (pos2)
+                        if ((pos1 < pos2) && (pos3 == NULL) || (pos3 < pos1))
                         {
-                            pos3 = strchr(ch,';');        /* check for semicolon */
+                            check (ch, pos1 - ch, pos2 - ch);
+                        }else{ continue; }
+                    }else{ continue; }
+                }else{  continue; }
+            }else{ continue; }
+        }else{ break; }
+    };
 
-                            if ((pos1 < pos2) && (pos3 == NULL) || (pos3 < pos1))
-                            {
-                                check(ch, pos1 - ch, pos2 - ch);
-                            }
-                            else    continue;
-                        }
-                        else    continue;
-                    }
-                    else    continue;
-                }
-                else    continue;
-            }
-            else    break;
-        }
-        
-    //#bugbug
     fclose(fp);
+
+    return 0;
 }
 
 
@@ -79,55 +69,38 @@ void check (char *c, int p1, int p2)
 
     if ((c[p1 + 1] == ')'))
     {
-         display(c, p1);
-         return;
+         display(c, p1);  return;
     }
 
     for (i = p1 + 1; i < p2; i++)
     {
-        if ((c[i] != ' ') || (c[i] == ')'))
-            {
-                flag = 1;
-            }
+        if (c[i] != ' ') {  flag = 1; }
+        if (c[i] == ')') {  flag = 1; }
+        
+        if (flag == 0){  display(c, p1);  return;  }
 
-            if (flag == 0)
-            {
-                display(c, p1);
-                return;
-            }
-            else
-            {
+        flag = 0;
 
-                flag = 0;
+        while (c[--temp] != ' '){  };
 
-                while (c[--temp] != ' ');
+        for (i = 0; i < temp; i++)
+        {
+            if (c[i]==' '){  flag = 1;  }
+        };
 
-                for (i = 0; i < temp; i++)
-                    if (c[i]==' ')
-                    {
-                        flag = 1;
-                    }
-
-                    if (flag == 0)
-                    {
-                        display(c, p1);
-                        return;
-                    }
-                    else
-                        return;
-              }
-        }
+        if (flag == 0){  display(c, p1);  return;  } 
+        
+        return; 
+    };
 }
 
 
 /* To display function name */
 void display (char *c, int p1)
 {
-   int temp = p1, i;
+    int temp = p1, i;
 
-
-    while (c[--temp] != ' ');
-
+    while (c[--temp] != ' '){  };
 
     /* Print name of function character by character */
     for (i = temp + 1; i < p1; i++)
@@ -135,12 +108,7 @@ void display (char *c, int p1)
         printf ("%c", c[i]);
     };
 
-        //flush.
-        printf("\n");
-
-        return;
+    printf("\n");
+    return;
 }
-
-
-
 

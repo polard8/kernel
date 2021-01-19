@@ -1,10 +1,7 @@
+// UNAME.BIN
 
-
-
-// rtl
 #include <stdio.h>
 #include <sys/utsname.h>
-
 
 
 /*
@@ -24,17 +21,18 @@ void print_4_chars( unsigned long value )
 }
 */
 
-int main (int argc, char **argv){
-
+int main (int argc, char **argv)
+{
     struct utsname name;
 
-
-    uname (&name);
+    uname(&name);
 
     printf ("%s version %s %s, on %s machine named %s.\n",
-        name.sysname, name.release, name.version,
-        name.machine, name.nodename );
-
+        name.sysname, 
+        name.release, 
+        name.version,
+        name.machine, 
+        name.nodename );
 
     //crazy test  efgh
     //while(1){

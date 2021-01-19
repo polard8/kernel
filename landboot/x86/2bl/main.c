@@ -424,8 +424,8 @@ void BlSetupPaging(void)
  *     Rotina para abortar o bootloader em caso de erro grave.
  */
 
-void BlAbort (){
-
+void BlAbort()
+{
 
 	//@todo: 
 	//    Talvez poderia ter uma interface antes de chamar a rotina abort().
@@ -433,7 +433,7 @@ void BlAbort (){
 	//ex:
 	//checks()
 
-    abort (); 
+    abort(); 
 }
 
 
@@ -468,8 +468,8 @@ unsigned long init_testing_memory_size (int mb)
     int i=0;
 
     // Salvando os valores durante o test.
-    unsigned char ____value1 = 0;             
-    unsigned char ____value2 = 0;                 
+    unsigned char ____value1 = 0;
+    unsigned char ____value2 = 0;
     
     
     //
@@ -482,7 +482,7 @@ unsigned long init_testing_memory_size (int mb)
 
 
     printf ("=========================================\n");
-    printf ("__testing_memory_size: Looking for %d MB base...\n", mb);
+    printf ("init_testing_memory_size: Looking for %d MB base...\n", mb);
     refresh_screen();
 
 

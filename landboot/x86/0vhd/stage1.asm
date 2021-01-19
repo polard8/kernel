@@ -17,12 +17,15 @@
 ;;     2017 - Fred Nora.
 ;;
 
-
 ;;
 ;; Partition table:
 ;; See:
 ;;     https://thestarman.pcministry.com/asm/mbr/PartTables.htm
 ;;
+
+
+;; org = 0
+;; See: main.asm 
 
 
 END_OF_CLUSTER EQU 0xFFFF
@@ -109,6 +112,26 @@ msgFailure    db "R", 0x00
 ;; START:
 ;;     Real Start.
 ;;
+
+    ;; Start here 0x07C0:0.
+    ;; Stack here 0:6000h.
+    ;; Root dir in 0x07C0:0x0200.
+    ;; Load the FAT in es:bx 0x17C0:0x0200.
+    ;; Load image in 0:8000h.
+
+
+;; #todo
+;BootSegment   equ 0x07C0
+;BootOffset    equ 0
+;StackSegment  equ 0
+;StackOffset   equ 0x6000
+;RootSegment   equ 0x07C0
+;RootOffset    equ 0x0200
+;FATSegment    equ 0x17C0
+;FATOffset     equ 0x0200
+;ImageSegment  equ 0
+;ImageOffset   equ 0x8000
+
 
 START:
     ;nop
@@ -236,7 +259,7 @@ LOAD_ROOT:
 	;; [datasector] = Início da área de dados.
 
 	;;
-	;; * Carregar o diretório raiz em es:bx 0x07C0:0200.
+	;; * Carregar o diretório raiz em es:bx 0x07C0:0x0200.
 	;;
 
 	;;
@@ -306,10 +329,8 @@ LOAD_ROOT:
     jmp  FAILURE
 
 
-	;;
 	;; Load the FAT in es:bx 0x17C0:0200.
 	;; #bugbug Size?
-	;;
 
 LOAD_FAT:
 
@@ -333,7 +354,7 @@ LOAD_FAT:
 
 
     ;; Efetuando o carregamento da fat no buffer es:bx. 
-    ;; 0x17C0:0200.
+    ;; 0x17C0:0x0200.
 
 
 	;;===================================

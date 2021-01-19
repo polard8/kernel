@@ -5627,6 +5627,8 @@ char *ctermid (char *s)
  *     O retorno deve ser (int) e falhar caso dê algo errado.
  */
 
+// This routine ws called by crt0() in crt0.c
+
 // #bugbug
 // Essa estrutura lida com elementos de estrutura em ring3.
 // #atenção: Algumas rotinas importantes estão usando esses elementos.
@@ -5635,6 +5637,14 @@ char *ctermid (char *s)
 // #bugbug
 // Precisamos usar os arquivos herdados do processo pai.
 // Eles estão na estrutura de processo desse processo.
+
+// #bugbug
+// Talvez não seria o caso de apenas abrirmos os arquivos herdados.
+// E o heap ??
+// Em que momento foi inicializado o heap do processo? 
+// crt0 chamou libcInitRT antes de chamar essa função.
+// See: stdlib/stdlib.c
+// See: crts/crt0.c
 
 void stdioInitialize(void)
 {
@@ -5660,10 +5670,8 @@ void stdioInitialize(void)
     //unsigned char buffer2_data[BUFSIZ];
 
     // #debug
-    // #todo: Testar esse debug.
-    // debug_print ("stdioInitialize: TODO: \n");  
-    
-    
+    debug_print ("stdioInitialize:\n");  
+
     //
     // Pointers.
     //    
@@ -5672,21 +5680,31 @@ void stdioInitialize(void)
     //stdout = (FILE *) &buffer1[0];
     //stderr = (FILE *) &buffer2[0];
 
+    // #bugbug
+    // Se essa inicializaçao falhar, nao temos como mostrar
+    // mensagens de erro.
+
     stdin = (FILE *) malloc( sizeof(FILE) );
-    if( (void*) stdin == NULL ){
-        printf ("stdioInitialize: stdin fail\n");
+    if( (void*) stdin == NULL )
+    {
+        debug_print ("stdioInitialize: stdin fail\n");
+        //printf      ("stdioInitialize: stdin fail\n");
         exit(1);
     }
     
     stdout = (FILE *) malloc( sizeof(FILE) );
-    if( (void*) stdout == NULL ){
-        printf ("stdioInitialize: stdout fail\n");
+    if( (void*) stdout == NULL )
+    {
+        debug_print ("stdioInitialize: stdout fail\n");
+        //printf ("stdioInitialize: stdout fail\n");
         exit(1);
     }
 
     stderr = (FILE *) malloc( sizeof(FILE) );
-    if( (void*) stderr == NULL ){
-        printf ("stdioInitialize: stderr fail\n");
+    if( (void*) stderr == NULL )
+    {
+        debug_print ("stdioInitialize: stderr fail\n");
+        //printf ("stdioInitialize: stderr fail\n");
         exit(1);
     }
 
@@ -5699,7 +5717,8 @@ void stdioInitialize(void)
 
     stdin->_base = (char *) malloc(BUFSIZ);
     if( (void*) stdin->_base == NULL ){
-        printf ("stdioInitialize: stdin->_base fail\n");
+        debug_print ("stdioInitialize: stdin->_base fail\n");
+        //printf ("stdioInitialize: stdin->_base fail\n");
         exit(1);
     }
     stdin->_lbfsize  = BUFSIZ;
@@ -5711,12 +5730,13 @@ void stdioInitialize(void)
       
     stdout->_base = (char *) malloc(BUFSIZ);
     if( (void*) stdout->_base == NULL ){
-        printf ("stdioInitialize: stdout->_base fail\n");
+        debug_print ("stdioInitialize: stdout->_base fail\n");
+        //printf ("stdioInitialize: stdout->_base fail\n");
         exit(1);
     }
     stdout->_lbfsize = BUFSIZ;
     stdout->_p = stdout->_base;
-    stdout->_cnt = BUFSIZ-1;    
+    stdout->_cnt = BUFSIZ-1; 
     stdout->_w = 0;    
     stdout->_r = 0;
     stdout->_file = 1;
@@ -5724,7 +5744,8 @@ void stdioInitialize(void)
             
     stderr->_base = (char *) malloc(BUFSIZ);
     if( (void*) stderr->_base == NULL ){
-        printf ("stdioInitialize: stderr->_base fail\n");
+        debug_print ("stdioInitialize: stderr->_base fail\n");
+        //printf ("stdioInitialize: stderr->_base fail\n");
         exit(1);
     }
     stderr->_lbfsize = BUFSIZ;    
@@ -5762,18 +5783,31 @@ void stdioInitialize(void)
       // Deveria ser o contrário.
       // O pai ser master e o filho slave.
  
-      gramado_system_call ( 267,
-           getpid(),    //master
-           getppid(),   //slave pai(terminal)
-           0 );
+   // #fixme
+   // Something is not working.
+   // Suspended for now.
+   // I don't wanna see error messages everytime we launch a command.
 
-    __libc_tty_id = (int) gramado_system_call ( 266, getpid(), 0, 0 );        
+    /*
+      gramado_system_call ( 
+          267,
+          getpid(),    //master
+          getppid(),   //slave pai(terminal)
+          0 );
+    */
+
+    // ok
+    // This is the tty of this process.
+    
+    __libc_tty_id = (int) gramado_system_call ( 266, getpid(), 0, 0 ); 
 
 
     // Limpando o prompt[];
     prompt_clean();
-}
 
+    // #debug
+    debug_print ("stdioInitialize: done\n");  
+}
 
 
 // #test

@@ -8,4 +8,8 @@ all:
 	make -C ./reboot
 	make -C ./true
 
+	# tests
+	make -C ./showfun
+	make -C ./uname
+	
 

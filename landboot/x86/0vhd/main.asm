@@ -46,9 +46,6 @@
 
 
 
-
-
-
 ;16bit. Entry point do MBR.
 [bits 16]
 

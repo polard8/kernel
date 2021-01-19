@@ -177,9 +177,6 @@ int pty_create_link ( struct tty_d *tty )
 int pty_link_by_pid ( int master_pid, int slave_pid )
 {
 
-    debug_print("pty_link_by_pid: [FIXME] \n");
-
-
     // O slave é o terminal. pts. remember ?!
 
     struct tty_d *__master;
@@ -191,6 +188,11 @@ int pty_link_by_pid ( int master_pid, int slave_pid )
     int master_tty_id = -1;
     int slave_tty_id = -1;
 
+    file *f_master;
+    file *f_slave;
+
+
+    debug_print("pty_link_by_pid: [FIXME] \n");
 
     //
     // Process
@@ -198,9 +200,8 @@ int pty_link_by_pid ( int master_pid, int slave_pid )
 
     if ( master_pid < 0 || slave_pid < 0 )
     {
-        printf ("pty_link_by_pid: pid\n");
-        refresh_screen();
-        return -1; 
+        printf ("pty_link_by_pid:  [FAIL] pid\n");
+        goto fail;
     }
 
 
@@ -208,23 +209,17 @@ int pty_link_by_pid ( int master_pid, int slave_pid )
 
     if ( (void *) pm == NULL )
     {
-        printf ("pty_link_by_pid: pm\n");
-        refresh_screen();
-        return -1; 
+        printf ("pty_link_by_pid:  [FAIL] pm\n");
+        goto fail;
     }
-
 
     ps = ( struct process_d *) processList[slave_pid];
 
     if ( (void *) ps == NULL )
     {
-        printf ("pty_link_by_pid: ps\n");
-        refresh_screen();
-        return -1; 
+        printf ("pty_link_by_pid:  [FAIL] ps\n");
+        goto fail;
     }
-
-
-
 
     //
     // tty
@@ -233,47 +228,44 @@ int pty_link_by_pid ( int master_pid, int slave_pid )
     if ( ( void * ) pm->tty == NULL || 
          ( void * ) ps->tty == NULL )
     {
-        printf ("pty_link_by_pid: tty\n");
-        refresh_screen();
-        return -1; 
+        printf ("pty_link_by_pid:  [FAIL] tty\n");
+        goto fail;
     }
-    
 
     master_tty_id = pm->tty->index;
     slave_tty_id  = ps->tty->index;
 
-
     if ( master_tty_id < 0 || slave_tty_id < 0 )
     {
-        printf ("pty_link_by_pid: tty id\n");
-        refresh_screen();
-        return -1; 
+        printf ("pty_link_by_pid: [FAIL] tty id\n");
+        goto fail;
     }
 
-    file *f_master;
     f_master = (file*) pm->Objects[master_tty_id];
     __master = ( struct tty_d *) f_master->tty; 
  
     if ( (void *) __master == NULL ) 
     {
-        printf ("pty_link_by_pid: * __master\n");
-        refresh_screen();
-        return -1; 
+        printf ("pty_link_by_pid:  [FAIL] __master\n");
+        goto fail;
     }
 
-    file *f_slave;
     f_slave = (file*) ps->Objects[slave_tty_id];
     __slave = ( struct tty_d *) f_slave->tty; 
  
     if ( (void *) __slave == NULL ) 
     {
-        printf ("pty_link_by_pid: __slave\n");
-        refresh_screen();
-        return -1; 
+        printf ("pty_link_by_pid:  [FAIL] __slave\n");
+        goto fail;
     }
 
+    // ok.
     // Link!
     return (int) pty_link ( __master, __slave );
+
+fail:
+    refresh_screen();
+    return -1; 
 }
 
 
@@ -330,6 +322,8 @@ int pty_unlink ( struct tty_d *tty ){
 
 int ptmx_open (void){
 
+    int status = -1;
+    
     int ptm_fd = -1;
     
     struct tty_d *master;
@@ -341,8 +335,7 @@ int ptmx_open (void){
 
 
     //#todo check validation
-    
-    int status = -1;
+  
     status = pty_link(master,slave);
 
     if (status < 0){

@@ -184,6 +184,9 @@ gramado-cmd:
 	-sudo cp gramado/cmd/bin/REBOOT.BIN     base/
 #	-sudo cp gramado/cmd/bin/TRUE.BIN       base/
 
+#	-sudo cp gramado/cmd/bin/SHOWFUN.BIN       base/
+#	-sudo cp gramado/cmd/bin/UNAME.BIN       base/
+
 gramado-setup:
 	#::setup
 	$(Q) $(MAKE) -C gramado/setup/
