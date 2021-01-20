@@ -71,7 +71,6 @@ int pciShowDeviceInfo (int number){
         }
     };
 
-
     return 0;
 }
 

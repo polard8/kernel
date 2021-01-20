@@ -135,33 +135,47 @@ void *CreateUser ( char *name, int type ){
     int i=0;
 
 
+    // #bugbug
+    // We don't wanna kill the initialization 
+    // only for a wrong name.
+
+    // #alert
+    if ( (void*) name == NULL )
+    {
+        debug_print ("CreateUser: [FAIL] name\n");
+    }
+
+    // #alert
+    if (*name == 0)
+    {
+        debug_print ("CreateUser: [FAIL] *name\n");
+    }
+
+
     New = (void *) kmalloc ( sizeof(struct user_info_d) ); 
 
     if ( (void *) New == NULL ){
         panic ("CreateUser: New");
- 
     } else {
-
-		//New->ObjectType = ObjectTypeUser;
-
         New->used = 1;
         New->magic = 1234;
 
         New->path = NULL;
         
-        strcpy( New->__username, (const char *) name);
-        New->userName_len = strlen(name);
+        if ( (void*) name != NULL ){
+            strcpy( New->__username, (const char *) name);
+            New->userName_len = strlen(name);
+        }
  
-
         New->userType = type;  
 
- 		//Session.
-        //Window Station. (Desktop pool).
-        //Desktop.		 
-	
-	    New->usessionId = current_usersession; 
-	    New->roomId     = current_room;   
-	    New->desktopId  = current_desktop;   
+        //Session.
+        //room. Window Station. (Desktop pool).
+        //Desktop.
+
+        New->usessionId = current_usersession;
+        New->roomId     = current_room;
+        New->desktopId  = current_desktop;
     
         // Inicializando a lista de objetos permitidos.
         // Proibindo tudo.
@@ -174,26 +188,27 @@ void *CreateUser ( char *name, int type ){
 	    //New->h_token = HAL_TOKEN_NULL;
 		
 	    //...
-	};		
-	
+    };
 
-	//Procurando uma entrada livre na lista.
-	while ( Index < USER_COUNT_MAX )
-	{	
+
+    // Procurando uma entrada livre na lista.
+    while ( Index < USER_COUNT_MAX )
+    {
         if ( (void *) userList[Index] == NULL )
-		{
-		    //User Id. 
-			New->userId = Index;     
+        {
+            // User Id. 
+            New->userId = Index; 
 
-		    userList[Index] = (unsigned long) New;
+            userList[Index] = (unsigned long) New;
 
-            //printf("CreateUser: Done.\n"); 
-	        return (void *) New;
-		};
-        
-		Index++;
-	};
-	
+            // printf("CreateUser: Done.\n"); 
+            return (void *) New;
+        }
+
+        Index++;
+    };
+
+
 //Fail: 
 //Fim do loop. 
 //Não encontramos uma entrada livre.
@@ -208,14 +223,14 @@ fail:
  *     Configura o ID do usuário atual.  
  */
 
-void SetCurrentUserId (int user_id){
-	
-	if ( user_id < 0 || user_id >= USER_COUNT_MAX )
-	{
-		printf("user-userenv-SetCurrentUserId:\n");
-		return;
-	}
-	
+void SetCurrentUserId (int user_id)
+{
+    if ( user_id < 0 || user_id >= USER_COUNT_MAX )
+    {
+        printf ("SetCurrentUserId: [FAIL]\n");
+        return;
+    }
+
     current_user = (int) user_id;
 }
 
@@ -226,7 +241,7 @@ void SetCurrentUserId (int user_id){
  */
 
 int GetCurrentUserId (void)
-{	
+{
    return (int) current_user;
 }
 
@@ -271,7 +286,13 @@ UpdateUserInfo (
     int desktop_id )
 {
 
-    if ( (void *) user == NULL ){
+    //#todo
+    //if ( (void*) name == NULL){}
+    //if ( *name == 0 ){}
+
+
+    if ( (void *) user == NULL )
+    {
         //todo: message.
         return;
 
@@ -279,13 +300,14 @@ UpdateUserInfo (
 		
 		//Estamos tentando atualizar uma estrutura válida.
 
-        if ( user->used != 1 || user->magic != 1234 ){
+        if ( user->used != 1 || user->magic != 1234 )
+        {
 			// todo: message
             return;
         } 
 
-        user->userId = (int) id;                      //Id.     
-        user->userType = type;                        //Type.
+        user->userId   = (int) id;    // Id 
+        user->userType = type;        // Type
 
         user->usessionId = user_session_id;    //Session.
         user->roomId     = room_id;            //room (Window Station).
@@ -358,10 +380,8 @@ void init_user_info (void){
     //DefaultUser = (void *) CreateUser (default_user_name, USER_TYPE_INTERACTIVE);
     DefaultUser = (void *) CreateUser (USER_DEFAULT, USER_TYPE_INTERACTIVE);
 
-    if ( (void *) DefaultUser == NULL )
-    {
-        panic ("init_user_info: DefaultUser");
-
+    if ( (void *) DefaultUser == NULL ){
+        panic ("init_user_info: DefaultUser\n");
     }else{
 
         // Atualizando a lista de permissões.
@@ -405,22 +425,20 @@ void init_user_info (void){
 
 int __getusername (char *buffer)
 {
-
     char *login_buffer = (char *) buffer;
 
 
-	// #cancelando
-	// Isso tá falhando na máquina real.
-	// Provavelmente problemas com ponteiro.
-	
+    if ( (void*) buffer == NULL ){
+        debug_print ("__getusername: [FAIL] buffer\n");
+        return -1;
+    }
 
 	//Estrutura default para informações sobre o host.
 	//host.h
 
     if ( (void *) CurrentUser== NULL ){
         printf ("__getusername: CurrentUser\n");
-        return (int) -1;
- 
+        return (int) -1; 
     }else{
         
         //64 bytes
@@ -445,14 +463,22 @@ int __getusername (char *buffer)
 // Ele tem o limite de 64 bytes.
 // Vamos colocar ele na estrutura de usuário.
 
-int __setusername ( const char *new_username){
+int __setusername ( const char *new_username)
+{
 
-     // Estrutura de usuário.
+    if ( (void*) new_username == NULL ){
+        debug_print ("__setusername: [FAIL] new_username\n");
+        return -1;
+    }
+
+    // Estrutura de usuário.
+     
+    // #todo
+    // Where is this structure defined?
 
     if ( (void *) CurrentUser == NULL ){
         printf ("__setusername: CurrentUser\n");
         return (int) -1;
- 
     }else{
 
         CurrentUser->userName_len = (size_t) strlen (new_username) + 1;
@@ -483,9 +509,9 @@ init_user_environment_manager ( int argc, char *argv[] )
     //...
 
     //g_module_uem_initialized = 1;
-    userenvironmentStatus = 1;
+    userenvironmentStatus = TRUE;
 
-	return 0;
+    return 0;
 }
 
 

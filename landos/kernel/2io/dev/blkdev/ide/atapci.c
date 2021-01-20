@@ -155,8 +155,8 @@ uint32_t diskPCIScanDevice ( int class ){
  *     Espaço de configuraçao PCI Mass Storage.
  */
 
-int diskATAPCIConfigurationSpace ( struct pci_device_d *D ){
-
+int diskATAPCIConfigurationSpace ( struct pci_device_d *D )
+{
     uint32_t data=0;
 
 
@@ -385,10 +385,7 @@ int diskATAPCIConfigurationSpace ( struct pci_device_d *D ){
     D->bist          = data >> 24 & 0xff;
 
 
-
-    //
-    // == BARs =================================================
-    //
+    // BARs
 
     D->BAR0 = diskReadPCIConfigAddr ( D->bus, D->dev, D->func, 0x10 );
     D->BAR1 = diskReadPCIConfigAddr ( D->bus, D->dev, D->func, 0x14 );

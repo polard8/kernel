@@ -637,7 +637,7 @@ void e1000_setup_irq (void){
 	// #obs: Essas variáveis são declaradas nesse arquivo
 	// o assembly terá que pegar.
 
-    nic_idt_entry_new_number = (uint8_t) idt_num;   
+    nic_idt_entry_new_number  = (uint8_t) idt_num;   
     nic_idt_entry_new_address = (unsigned long) handler; 
 
 
@@ -835,17 +835,15 @@ int e1000_reset_controller (void){
 	//for ( i=0; i < 32; i++ )
     //    printf ("PA={%x} VA={%x} \n",currentNIC->legacy_rx_descs[i].addr, currentNIC->rx_descs_virt[i]);
 	
-	
-	//
+
 	// ???
-	//
-	
+
     for (i=0; i < 0x80; i++){
         E1000WriteCommand ( currentNIC, 0x5200 + (i * 4), 0 );
     };
 
-
-    currentNIC->rx_cur = currentNIC->tx_cur = 0;
+    currentNIC->rx_cur = 0;
+    currentNIC->tx_cur = 0;
 
 	//irq #todo
 	//PCIRegisterIRQHandler ( bus, dev, fun, (unsigned long) E1000Handler, currentNIC );
@@ -1017,7 +1015,13 @@ E1000WriteCommand (
     uint16_t addr, 
     uint32_t val )
 {
-	
+
+    // #todo
+    // Check the pointer validation
+    
+    //if( (void*) d == NULL )
+        //return 0;
+
 	// Use the IO ports?
 	//if (dev->use_io) 
 	//{
@@ -1040,6 +1044,13 @@ E1000ReadCommand (
     struct intel_nic_info_d *d, 
     uint16_t addr )
 {
+
+    // #todo
+    // Check the pointer validation
+    
+    //if( (void*) d == NULL )
+        //return 0;
+
 
 	// Use the IO ports?
 	//if (dev->use_io) 
@@ -1072,15 +1083,19 @@ E1000ReadCommand (
 // + convertemos para fisico
 
 // IN: size, return pointer.
-uint32_t E1000AllocCont ( uint32_t amount, uint32_t *virt )
+
+uint32_t 
+E1000AllocCont ( 
+    uint32_t amount, 
+    uint32_t *virt )
 {
     uint32_t va=0;
     uint32_t pa=0;
 
 
-    if (amount==0)
+    if (amount==0){
         panic ("E1000AllocCont: [FAIL] amount");
-
+    }
 
     // ============
     // va
@@ -1264,17 +1279,25 @@ void nic_i8254x_transmit (void)
 }
 
 
-
-uint32_t E1000ReadEEPROM ( struct intel_nic_info_d *d, uint8_t addr )
+uint32_t 
+E1000ReadEEPROM ( 
+    struct intel_nic_info_d *d, 
+    uint8_t addr )
 {
-
     uint32_t data = 0;
 
+
+    // #todo
+    // Check the pointer validation.
+
+    //if ( (void*) d == NULL )
+        //return 0;
+
 	// We have the EEPROM?
-    
+ 
 	//#debug
 	//printf("E1000ReadEEPROM:\n");
-	
+
     // Yes :)	
     if (d->eeprom == 1) {
         E1000WriteCommand ( d, 0x14, 1 | (addr << 8) );

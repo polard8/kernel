@@ -269,16 +269,14 @@ fail:
 }
 
 
-
-
-
 /*
+ ********************************
  * ahciSATAInitialize:
  * 
  */
 
-int ahciSATAInitialize ( int ataflag ){
-
+int ahciSATAInitialize ( int ataflag )
+{
     int Status = 1;  //error
     int port=0;  // #bugbug: Maybe 'unsigned int'.
 

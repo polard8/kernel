@@ -35,8 +35,8 @@
 
 // Essa rotina chamara pciHandleDevice() em pci.c
 
-int pci_setup_devices (void){
-
+int pci_setup_devices (void)
+{
     unsigned short Vendor=0;    // Offset 0.
     unsigned short Device=0;    // Offset 2.
 

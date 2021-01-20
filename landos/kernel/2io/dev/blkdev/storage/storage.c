@@ -629,40 +629,42 @@ void volume_show_info (void)
  * se olharmos na tabela de parti��es.
  */
 
-int get_ide_disk_info ( int port, unsigned long buffer, int master ){
-	
-	int i = 0;
+int get_ide_disk_info ( int port, unsigned long buffer, int master )
+{
     unsigned char *mbr = (unsigned char *) buffer; 
-	
-	// (buffer, lba, rw flag, port number )
-    
-	pio_rw_sector ( (unsigned long) &mbr[0], // buffer
-	                (unsigned long) 0,       // 0 = mbr
-					(int) 0x20,              // 20 = ler
-					(int) port,              // port 0-3
-                    (int) master );          // 1 = master  0 = slave
-	
-	
-	// Check signature.
-	if ( mbr[0x1FE] != 0x55 || mbr[0x1FF] != 0xAA )
-	{	
-	    //printf("get_ide_disk_info: Sig FAIL \n" );
-        return -1;	
-	}	
-	
-	
+
+    int i = 0;
+
+    // IN:
+    // (buffer, lba, rw flag, port number )
+
+    pio_rw_sector ( 
+        (unsigned long) &mbr[0],  // buffer
+        (unsigned long) 0,        // 0 = mbr
+        (int) 0x20,               // 20 = ler
+        (int) port,               // port 0-3
+        (int) master );           // 1 = master  0 = slave
+
+    // Check signature.
+    if ( mbr[0x1FE] != 0x55 || mbr[0x1FF] != 0xAA )
+    {
+        //printf("get_ide_disk_info: Sig FAIL \n" );
+        return -1;
+    }
+
+
 	//print OS name.
 	//#define BS_OEMName 2
-		
-	printf("OS name: [ ");
-	
-	for ( i=0; i<8; i++ ){
-	    printf("%c", mbr[ BS_OEMName + i ] );
-	};
-	
-	printf(" ]\n");	
-	
-    return 0;	
+
+    printf("OS name: [ ");
+
+    for ( i=0; i<8; i++ ){
+        printf("%c", mbr[ BS_OEMName + i ] );
+    };
+
+    printf(" ]\n");
+
+    return 0;
 }
 
 
@@ -674,27 +676,27 @@ int get_ide_disk_info ( int port, unsigned long buffer, int master ){
  *     que est� presente no BPB.
  */
 
-void show_ideports_info (void){
-	
+void show_ideports_info (void)
+{
+
     printf("\n show_ideports_info: Testing ports, looking for signature\n");  
 	
 	//primary master 
-	printf("\n Testing primary master \n");
-    if ( ide_ports[0].used ==  1 )
-	{
-	    if ( get_ide_disk_info ( (int) 0, (unsigned long) kmalloc(512), 1 ) == -1 )
+    printf("\n Testing primary master \n");
+    if ( ide_ports[0].used ==  1 ){
+
+        if ( get_ide_disk_info ( (int) 0, (unsigned long) kmalloc(512), 1 ) == -1 )
         {
-	        printf("primary master signature FAIL\n");	
-	    }else{
-	        printf("primary master signature OK\n");
-	    };				
-			
-	} else {
-		printf("No disk in primary master\n");
-	};
-	
-	
-	//primary slave 
+            printf("primary master signature FAIL\n");	
+        }else{
+            printf("primary master signature OK\n");
+        };
+
+    } else {
+        printf("No disk in primary master\n");
+    };
+
+    // primary slave 
     printf("\n Testing primary slave \n");
 	if ( ide_ports[0].used ==  1 )
 	{

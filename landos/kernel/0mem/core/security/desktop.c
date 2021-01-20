@@ -22,13 +22,11 @@
  * específico no próprio heap do desktop ao qual o processo pertence. 
  *
  * 
- * History
+ * History:
  *     2015 - Created by Fred Nora.
- *     2016 - Revision.
- *     ...
  */
 
- 
+
 #include <kernel.h>
 
 
@@ -50,13 +48,13 @@
  *     @todo: Mudar para desktopRegisterDesktop(.). 
  */
 
-int RegisterDesktop (struct desktop_d *d){
-
+int RegisterDesktop (struct desktop_d *d)
+{
     int Offset = 0;
 
 
     if ( (void *) d == NULL ){
-        //todo: messsage
+        debug_print ("RegisterDesktop: [FAIL] d\n");
         return (int) 1;  
     }
 
@@ -127,7 +125,7 @@ set_current_desktop ( struct desktop_d *desktop )
 
 int get_current_desktop_id (void)
 {
-	return (int) current_desktop;
+    return (int) current_desktop;
 }
 
 
@@ -139,9 +137,8 @@ int get_current_desktop_id (void)
 void init_desktop_list (void)
 {
     int i=0;
-
-
-    while ( i < DESKTOP_COUNT_MAX ){
+    while ( i < DESKTOP_COUNT_MAX )
+    {
         desktopList[i] = 0;
         i++; 
     };
@@ -153,58 +150,55 @@ void init_desktop_list (void)
  *     Cria um desktop em uma window station.
  */
 
-void *CreateDesktop ( struct room_d *room ){
-	
-	int i=0;
-	
-	struct desktop_d *Current;
-    struct desktop_d *Empty;	
+void *CreateDesktop ( struct room_d *room )
+{
+    struct desktop_d *Current;
+    struct desktop_d *Empty;
+
+    int i=0;
     //... 
-	
-	//Check.
-    
-	if ( (void *) room == NULL )
-	{ 
-		return NULL; 
-	}
-	
-	//
-	// @todo: O usuário precisa de permissão pra criar desktops.
-	//
-	
-	// Struct.
-    
-	Current = (void *) kmalloc ( sizeof(struct desktop_d) );
-	
-	if ( (void *) Current == NULL ){
-	    panic ("CreateDesktop:");
 
-	} else {
-	    
-		//section.
-	    Current->room = (void *) room;
-		
+
+    if ( (void *) room == NULL ){
+        debug_print ("CreateDesktop: [FAIL] room\n");
+        return NULL; 
+    }
+
+	//
+	// #todo: 
+	// O usuário precisa de permissão pra criar desktops.
+	//
+
+
+    Current = (void *) kmalloc ( sizeof(struct desktop_d) );
+
+    if ( (void *) Current == NULL ){
+        panic ("CreateDesktop: Current\n");
+    } else {
+
+        Current->room = (void *) room;
+
 		//continua...
-	};
-	
-	
-	while ( i < DESKTOP_COUNT_MAX )
-	{	
-        Empty = (void *) desktopList[i]; 			
-        
-		if ( (void *) Empty == NULL )
-		{
-		    desktopList[i] = (unsigned long) Current;
-		    
-			Current->desktopId = i;    		
-		    
-			return (void *) Current;
-		};	
-		
-		i++;
-	};
+    };
 
-    return NULL;	
+
+    while ( i < DESKTOP_COUNT_MAX )
+    {
+        Empty = (void *) desktopList[i];
+
+        if ( (void *) Empty == NULL )
+        {
+            desktopList[i] = (unsigned long) Current;
+
+            Current->desktopId = i;
+
+            return (void *) Current;
+        }
+
+        i++;
+    };
+
+    return NULL;
 }
 
 
@@ -216,13 +210,11 @@ void *CreateDesktop ( struct room_d *room ){
 void 
 set_current_menuwindow ( 
     struct desktop_d *desktop, 
-    struct window_d *window )
+    struct window_d  *window )
 {
-
-	//Check.
-	
     if ( (void *) desktop == NULL || (void *) window == NULL )
-    { 
+    {
+        debug_print ("set_current_menuwindow: parameters\n");
         return; 
     }
 
@@ -240,10 +232,9 @@ set_current_foreground (
     struct desktop_d *desktop, 
     struct window_d *window )
 {
-    //Check.
-	
     if ( (void *) desktop == NULL || (void *) window == NULL )
     { 
+        debug_print ("set_current_foreground: parameters\n");
         return; 
     }  
     
@@ -261,10 +252,9 @@ set_current_messagewindow (
     struct desktop_d *desktop, 
     struct window_d *window )
 {
-    //Check.
-	
     if ( (void *) desktop == NULL || (void *) window == NULL )
     { 
+        debug_print ("set_current_messagewindow: parameters\n");
         return; 
     }  
 
@@ -282,10 +272,9 @@ set_current_traywindow (
     struct desktop_d *desktop, 
     struct window_d *window )
 {
-    //Check.
-
     if ( (void *) desktop == NULL || (void *) window == NULL )
-    { 
+    {
+        debug_print ("set_current_traywindow: parameters\n");
         return; 
     }  
 
@@ -303,10 +292,9 @@ set_current_tooltipwindow (
     struct desktop_d *desktop, 
     struct window_d *window )
 {
-    //Check.
-
     if ( (void *) desktop == NULL || (void *) window == NULL )
     { 
+        debug_print ("set_current_tooltipwindow: parameters\n");
         return; 
     }  
 
@@ -324,33 +312,32 @@ void change_foreground ( struct desktop_d *desktop ){
     //Foreground window.
     struct window_d *fw;
 
-    //Check Desktop.
-	
+
     if ( (void *) desktop == NULL )
     { 
+        debug_print ("change_foreground: desktop\n");
         return; 
     }  
 
 
-	fw = (void *) desktop->foregroundWindow;
-	
-	if ( (void *) fw == NULL )
-	{
-	    return;
+    fw = (void *) desktop->foregroundWindow;
+
+    if ( (void *) fw == NULL ){
+        debug_print ("change_foreground: fw\n");
+        return;
     }
 
-	//Use a próxima janela indicada na estrutura da atual.
-	
-	if ( (void *) fw->next == NULL )
-	{
-		//Deixa a mesma que estava.
-   	    desktop->foregroundWindow = (void *) fw;
-    }else{
+    //Use a próxima janela indicada na estrutura da atual.
 
-		//Muda para a próxima.
-		desktop->foregroundWindow = (void *) fw->next;
-	    return;		
-	};  
+    // Deixa a mesma que estava.
+    if ( (void *) fw->next == NULL ){
+        desktop->foregroundWindow = (void *) fw;
+
+    // Muda para a próxima.
+    }else{
+        desktop->foregroundWindow = (void *) fw->next;
+        return;
+    };
 }
 
 
@@ -364,10 +351,9 @@ set_current_sysMenu (
     struct desktop_d *desktop, 
     struct menu_d *menu )
 {
-    //Check.
-
     if ( (void *) desktop == NULL || (void *) menu == NULL )
-    { 
+    {
+        debug_print ("set_current_sysMenu: parameters\n");
         return; 
     }
 
@@ -386,10 +372,9 @@ set_current_dialogsysMenu (
     struct desktop_d *desktop, 
     struct menu_d *menu )
 {
-	//Check.
-	
     if ( (void *) desktop == NULL || (void *) menu == NULL )
     { 
+        debug_print ("set_current_dialogsysMenu: parameters\n");
         return; 
     }
 
@@ -407,13 +392,11 @@ set_current_menuHScroll (
     struct desktop_d *desktop, 
     struct menu_d *menu )
 {
-    //Check.
-	
     if ( (void *) desktop == NULL || (void *) menu == NULL )
     { 
+        debug_print ("set_current_menuHScroll: parameters\n");
         return; 
     }
-
 
     desktop->menuHScroll = (void *) menu; 
 }
@@ -429,12 +412,11 @@ set_current_menuVScroll (
     struct desktop_d *desktop, 
     struct menu_d *menu )
 {
-    //Check.
-	
-	if ( (void *) desktop == NULL || (void *) menu == NULL )
-	{ 
+    if ( (void *) desktop == NULL || (void *) menu == NULL )
+    {
+        debug_print ("set_current_menuVScroll: parameters\n");
         return; 
-	}
+    }
 
     desktop->menuVScroll = (void *) menu;
 }
@@ -466,17 +448,16 @@ void init_desktop (void){
     desktop0 = (void *) kmalloc ( sizeof(struct desktop_d) );
 
     if ( (void *) desktop0 == NULL ){
-        panic ("init_desktop: desktop0");
-
+        panic ("init_desktop: desktop0\n");
     }else{
+        desktop0->desktopUsed  = 1;
+        desktop0->desktopMagic = 1234;
 
         //todo: object
-                 
+        
         desktops_count = 1;
- 
         desktop0->desktopId = 0;
-        desktop0->desktopUsed = 1;
-        desktop0->desktopMagic = 1234;
+
     
 	    // #todo
 	    // Depois precisamos colocar aqui

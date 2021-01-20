@@ -20,23 +20,26 @@
 
 
 
+// #bugbug
+// This module is for usb support.
+// and not that legacy serial constroller.
 
 int 
-serial_bus_controller_init ( unsigned char bus, 
-                         unsigned char dev, 
-                         unsigned char fun, 
-                         struct pci_device_d *pci_device )
-
+serial_bus_controller_init ( 
+    unsigned char bus, 
+    unsigned char dev, 
+    unsigned char fun, 
+    struct pci_device_d *pci_device )
 {
-	//pci info.
-    uint32_t data;
-    unsigned long phy_address;
-    unsigned short tmp16;
-    uint32_t i; 
+    // pci info.
+    
+    uint32_t data=0;
+    unsigned long phy_address=0;
+    unsigned short tmp16=0;
+    uint32_t i=0; 
 
 
-
-	// #debug
+    // #debug
     printf ("serial_bus_controller_init:\n");
     debug_print ("serial_bus_controller_init:\n");
 
@@ -47,7 +50,7 @@ serial_bus_controller_init ( unsigned char bus,
 
     return 0;
 
-
+   // ================================================================
 
     data = (uint32_t) diskReadPCIConfigAddr ( bus, dev, fun, 0 );
 
@@ -72,7 +75,7 @@ serial_bus_controller_init ( unsigned char bus,
     if ( (void *) pci_device ==  NULL )
     {
 
-        panic ("e1000_init_nic: pci_device\n");
+        panic ("serial_bus_controller_init: pci_device\n");
     }else{
 
         pci_device->used = 1;
@@ -171,9 +174,16 @@ serial_bus_controller_init ( unsigned char bus,
     return 0;
 }
 
+
+
+/*
+ ************************************
+ * usbInit
+ * 
+ */
 void usbInit (void)
-{	
-	//return;
+{
+    //return;
 }
 
 

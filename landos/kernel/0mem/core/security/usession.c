@@ -11,10 +11,10 @@
  *     Quando um usuário loga, ele cria uma 'seção', que conterá uma 
  * 'window station', que conterá um 'desktop', que conterá 'janelas'.
  *
- * Versão 1.0, 2015, 2016.
+ * 2015 - Created by Fred Nora.
  */
- 
- 
+
+
 #include <kernel.h>
 
 
@@ -23,8 +23,9 @@
  *     Get the current user session handle.
  */
 
-void *get_current_user_session (void){
-	
+void *get_current_user_session (void)
+{
+
     //return (void*) CurrentUserSession;
 
     if ( current_usersession < 0 || 
@@ -32,7 +33,6 @@ void *get_current_user_session (void){
     {
         return NULL;
     }
-
 
     return (void *) usessionList[current_usersession];
 }
@@ -59,15 +59,17 @@ set_current_user_session ( struct usession_d *usession )
  *     Cria uma user section para um usuário válido.
  */
 
-void *CreateUserSession (int userID){
-
+void *CreateUserSession (int userID)
+{
 
     struct usession_d *NewUserSession;
     int i=0;
 
 
 	// Check limits.
-    if ( userID < 0 || userID >= USER_COUNT_MAX ){
+    if ( userID < 0 || userID >= USER_COUNT_MAX )
+    {
+        debug_print ("CreateUserSession: [FAIL] userID\n");
         return NULL;
     }
 
@@ -77,14 +79,11 @@ void *CreateUserSession (int userID){
     NewUserSession = (void *) kmalloc ( sizeof(struct usession_d) );
 
     if ( (void *) NewUserSession == NULL ){
-        panic ("CreateUserSection:");
- 
+        panic ("CreateUserSection:\n");
     } else {
+        NewUserSession->used  = (int) 1;
+        NewUserSession->magic = (int) 1234;
 
-
-		NewUserSession->used  = (int) 1;         //flag, está em uso.
-		NewUserSession->magic = (int) 1234;      //magic
-	    
 		NewUserSession->uid  = (int) userID;    //*IMPORTANTE id do usuário da seção.
 		//@todo: group.
 		NewUserSession->initialized = 0;           //Apenas criada, não inicializada.
@@ -115,8 +114,8 @@ void *CreateUserSession (int userID){
     // ?? debug ??
     panic ("CreateUserSession error: Can't create!\n");
 
-	//#bugbug: Talvez devamos retornar.
-	return NULL;
+    //#bugbug: Talvez devamos retornar.
+    return NULL;
 }
 
 

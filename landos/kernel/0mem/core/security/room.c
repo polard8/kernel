@@ -38,11 +38,8 @@ void *get_current_room (void)
 
 void set_current_room (struct room_d *room)
 {
-    //Check.
+    if ( (void *) room == NULL ){ return; }
 
-    if ( (void *) room == NULL ){ return; }  
-    
-    
     current_room = (int) room->id;
     CurrentRoom = room;
 }
@@ -52,10 +49,13 @@ void set_current_room (struct room_d *room)
  * CreateWindowStation:
  *     Cria uma window station em uma seção de usuário.
  */
-void *CreateRoom (struct room_d *room){
-	
-	int i=0;
-	
+
+// Create a room given an empty object.
+
+void *CreateRoom (struct room_d *room)
+{
+    int i=0;
+
 	struct room_d *Current;    
     struct room_d *Empty;	
 	
@@ -97,57 +97,57 @@ void *CreateRoom (struct room_d *room){
 		};	
 		
 		i++;
-	};
-	
+    };
+
     return NULL;    
-};
+}
 
 
 /*
  * RegisterWindowStation:
  *     Registrando uma windowstation numa lista de window stations.
  */
-int RegisterRoom (struct room_d *room){
-	
+
+int RegisterRoom (struct room_d *room)
+{
     int i=0;
-		
-	//Struct.
-    
-	if ( (void *) room == NULL )
-	{
+
+
+    if ( (void *) room == NULL )
+    {
+        debug_print ("RegisterRoom: [FAIL] room\n");
         return (int) 1;    
-    };
-	
-	while (i < ROOM_COUNT_MAX)
-	{
+    }
+
+
+    while (i < ROOM_COUNT_MAX)
+    {
         if ( (void *) roomList[i] == NULL )
-		{
-       	    roomList[i] = (unsigned long) room; 
-            
-			return 0;
-	    };
-		
-	    i++;
-    };		
+        {
+            roomList[i] = (unsigned long) room;
+
+            return 0;
+        }
+
+        i++;
+    };
 
     return (int) 1;
 }
 
 
 /*
- * init_windowstation_list:
+ * init_room_list:
  */
 
-void init_room_list (void){
-	
+void init_room_list (void)
+{
     int i=0;
-	
     while ( i < ROOM_COUNT_MAX )
-	{
+    {
         roomList[i] = 0;
-		
-		i++; 
-	};
+        i++; 
+    };
 }
 
 
@@ -157,29 +157,31 @@ void init_room_list (void){
  *     Inicializa o gerenciamento de room. (window stations).
  */
 
-void init_room_manager (void){
+void init_room_manager (void)
+{
 
-    debug_print ("init_room_manager:\n");	
-
+    debug_print ("init_room_manager:\n");
     //printf("init_window_station: Initializing ...\n");
 
-    
-	rooms_count = 0;
+    rooms_count = 0;
 
-	//List.
-	init_room_list();
+    // List.
+    init_room_list();
 
+    // #todo
+    // Where is it defined?
 
     room0 = (void *) kmalloc ( sizeof(struct room_d) );
 
-    if ( (void *) room0 == NULL )
-    {
-        panic ("init_room_manager: room0");
+    if ( (void *) room0 == NULL ){
+        panic ("init_room_manager: [FAIL] room0\n");
     }else{
+
+        // #todo
+        // Initialize some elements?
 
         roomList[0] = (unsigned long) room0;
         //RegisterRoom (room0);
-        
         set_current_room (room0);   
     };
 }
