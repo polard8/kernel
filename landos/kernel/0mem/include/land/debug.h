@@ -18,6 +18,7 @@ unsigned long debug_compute_checksum( unsigned char *Buffer, unsigned long Lengh
 //escreve na porta seria.
 void debug_print ( char *data );
 
+void PROGRESS( char *string );
 
 //
 // End.

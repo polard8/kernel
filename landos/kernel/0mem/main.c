@@ -69,39 +69,22 @@ static void clear_bss(void)
 
 
 /*
- ********************************************
- * kernel_main:
- *
- *  Gramado OS kernel C entry point. :)
- * 
- *  This is where C execution begins, after head.asm 
- *  transfers control here.
- * 
- *  The purpose is to initialize the virtual console support,
- *  the video support, the runtime support and starts the
- *  architecture initialization routine.
- * 
- */
-
-int kernel_main (int arch_type)
+struct kernel_d
 {
-
-    int Status = (-1);
-
-
-    // #test
-    // clear_bss();
-
-    //
-    // == Globals ====================================================
-    //
+    int hasBooted;
+    void *scheduler;
+};
+struct kernel_d Kernel;
+*/
 
 
+// internal
+void preinit_Globals(int arch_type)
+{
     // Current arch support.
     // We received this arg from Assembly.
 
     current_arch = arch_type;
-
 
     // Kernel status.
     KernelStatus = KERNEL_NULL;
@@ -109,7 +92,6 @@ int kernel_main (int arch_type)
     gdefShowLogo = FALSE;
     gdefShowProgressBar = TRUE;
     // ...
-    
 
 
     // #bugbug
@@ -130,7 +112,7 @@ int kernel_main (int arch_type)
     BootBlock.cylinders          = (unsigned long) base[9];  // 36
     BootBlock.boot_mode          = (unsigned long) base[10]; // 40
     BootBlock.gramado_mode       = (unsigned long) base[11]; // 44
-
+    
     //
     // == gramado mode =============================================
     //
@@ -154,101 +136,130 @@ int kernel_main (int arch_type)
     // a ring3 window server.
     
     current_input_mode = INPUT_MODE_SETUP;
- 
 
- 
-    //
-    // == serial ======================================================
-    //
+    // Initializing the global spinlock.
+    // #todo: Isso pode ir para init_globals
 
+    //## pre initialization globals.
+
+    __spinlock_ipc = TRUE;
+
+
+	//
+	// Verbose mode.
+	//
+
+	// #obs:
+	// Verbose mode do kernel.
+	// Initializes a new line when '\n' is found.
+
+    stdio_verbosemode_flag = TRUE;
+}
+
+void preinit_Serial(void)
+{
+    // Serial
     // See: bottom/dd/serial/serial.c
-    Status = serial_init();
-    if (Status != 0)
-    {
-        // #bugbug
-        // Não temos uma mensagem pra alertar que alguma coisa
-        // falhou na inicialização das portas seriais.
-        // Vamos continuar por enquanto.
-    }
 
-    
-    debug_print ("============================================\n");
-    debug_print ("== main.c: Architechture independent part ==\n");
-    debug_print ("============================================\n");
-    debug_print ("[Kernel] kernel_main: \n");
-    debug_print ("[Kernel] kernel_main: Initializing the part in C ...\n");
+    serial_init();
+}
 
-
-    //gramado mode
-    //game mode
-    
-    switch (current_mode){
-
-        case GRAMADO_JAIL:
-            debug_print ("kernel_main: GRAMADO_JAIL: \n");
-            break;
-
-        case GRAMADO_P1:
-            debug_print ("kernel_main: GRAMADO_P1: \n");
-            break;
-
-        case GRAMADO_HOME:
-            debug_print ("kernel_main: GRAMADO_HOME: \n");
-            break;
-
-        case GRAMADO_P2:
-            debug_print ("kernel_main: GRAMADO_P2: \n");
-            break;
-
-        case GRAMADO_CASTLE:
-            debug_print ("kernel_main: GRAMADO_CASTLE: \n");
-            break;
-
-        //case GRAMADO_CALIFORNIA:
-        // ...
-        default:
-            debug_print ("kernel_main: current_mode not defined!\n");
-            break;
-    };
-
+void preinit_OutputSupport(void)
+{
 
     // Virtual Console.
     // See: tty/console.c
-    
     debug_print ("[Kernel] kernel_main: Initializing virtual consoles ...\n");
     VirtualConsole_initialize();
+}
 
 
+/*
+ ********************************************
+ * kernel_main:
+ *
+ *  Gramado OS kernel C entry point. :)
+ * 
+ *  This is where C execution begins, after head.asm 
+ *  transfers control here.
+ * 
+ *  The purpose is to initialize the virtual console support,
+ *  the video support, the runtime support and starts the
+ *  architecture initialization routine.
+ * 
+ */
+
+int kernel_main (int arch_type)
+{
+
+    int Status = (-1);
+
+    // Globals
+    // We do not have output yet
+
+    preinit_Globals(arch_type);
+
+    // Serial
+    // We do not have output yet
+
+    preinit_Serial();
+
+
+    // #progress
+    // name:level:sublevel
+
+    PROGRESS("-------------------------------------------------\n");
+    // Now we have serial port output.
+
+    PROGRESS("Kernel:0:1\n");
+    // Initialize the virtual console structures.
+    // We do not have all the runtime support yet.
+
+    preinit_OutputSupport();
+
+
+    PROGRESS("Kernel:0:2\n");
+    // Show some basic info.
+    // Banner.
+
+    debug_print ("Initializing landos kernel ...\n");
+    debug_print ("mode: ");
+
+    switch (current_mode){
+        case GRAMADO_JAIL:   debug_print ("GRAMADO_JAIL\n");   break;
+        case GRAMADO_P1:     debug_print ("GRAMADO_P1\n");     break;
+        case GRAMADO_HOME:   debug_print ("GRAMADO_HOME\n");   break;
+        case GRAMADO_P2:     debug_print ("GRAMADO_P2\n");     break;
+        case GRAMADO_CASTLE: debug_print ("GRAMADO_CASTLE\n"); break;
+        //case GRAMADO_CALIFORNIA:
+        // ...
+        default:  debug_print ("Not defined\n");  break;
+    };
+
+    // The architecture.
+    debug_print ("arch: ");
+    
     switch (current_arch){
-
-        case CURRENT_ARCH_X86:
-            debug_print ("[Kernel] kernel_main: x86? \n");
+        case CURRENT_ARCH_X86:  
+            debug_print ("x86\n");  
             break;
-
         case CURRENT_ARCH_X86_64:
-            debug_print ("[Kernel] kernel_main: x86_64? \n");
-            debug_print ("[Kernel] kernel_main: x86_64 not supported!\n *hang");
+            debug_print ("x86_64 (Not supported)\n");
             goto fail;
             break;
-
         // ...
-
         default:
-            debug_print ("[Kernel] kernel_main: Current arch not defined!\n");
-            debug_print ("*Hang\n");
+            debug_print ("Not defined\n");
             goto fail;
             break; 
     };
 
 
-    // Initializing the global spinlock.
-    // #todo: Isso pode ir para init_globals
-
-    __spinlock_ipc = 1;
-
-    //
+    PROGRESS("Kernel:0:3\n");
     // Video support
-    //
+
+
+    debug_print ("[Kernel] kernel_main: Initializing video support ...\n");
 
     // First of all.
     // #ps:
@@ -278,43 +289,17 @@ int kernel_main (int arch_type)
         while (1){  asm ("hlt \n");  };
     };
 
-
-    debug_print ("[Kernel] kernel_main: Initializing video support ...\n");
-    
-	//
-	// Verbose mode.
-	//
-
-	// #obs:
-	// Verbose mode do kernel.
-	// Initializes a new line when '\n' is found.
-
-    stdio_verbosemode_flag = 1;
-
+    if (VideoBlock.useGui == GUI_ON){
+        debug_print ("[Kernel] kernel_main: Using GUI\n");
+    }
 
     // In dd/hid/video.c
     Video_initialize();
 
-    // Init screen
 
 
-// If we are using graphics mode.
-#ifdef ENTRY_VERBOSE
-    if (VideoBlock.useGui == GUI_ON){
-        debug_print ("[Kernel] kernel_main: Using GUI\n");
-    }
-#endif
-
-
-	// #debug
-	// breakpoint
-	// lfb_putpixel ( COLOR_YELLOW, 11, 11, 0 );
-	// while(1){}
-
-
-	//
-	// Runtime
-	//
+    PROGRESS("Kernel:0:4\n");
+    // Runtime
 
     // #bugbug:
     // We need the runtime initialization for the messages.
@@ -325,10 +310,9 @@ int kernel_main (int arch_type)
     Runtime_initialize();
 
 
-	// #DEBUG
-	// breakpoint
-	// lfb_putpixel ( COLOR_YELLOW, 11, 11, 0 );
-	// while(1){}
+    PROGRESS("Kernel:0:5\n");
+    // Clear the screen.
+    // print some basic info.
 
     // obs:
     // Nesse momento o bl deixou a tela suja.
@@ -337,35 +321,23 @@ int kernel_main (int arch_type)
     // #test:
     // Se possivel vamos limpara a tela agora. Pois ja inicializamos
     // a runtime.
+    // #bugbug: slow.
 
     backgroundDraw ( (unsigned long) COLOR_BLACK );
-
-    //#debug.
-    //refresh_screen();
-    //while(1){}
-
-    // #debug
-    // breakpoint
-    // Consegumos pegar varios valores do boot block
-    // menos o ultimo, que o que mais nos interessa.
-
     printf ("kernel_main: breakpoint. pegando valores do boot block\n");
     printf ("Boot block pa %x\n",SavedBootBlock); //isso esta certo.
     printf ("lfb %x\n",BootBlock.lfb);
     printf ("x   %d\n",BootBlock.x);
     printf ("y   %d\n",BootBlock.y);
     printf ("bpp %d\n",BootBlock.bpp);
-    //...
     printf (">>>  Gramado mode %d\n", BootBlock.gramado_mode);
-
-    // #bugbug: slow.
     refresh_screen();
     //while(1){}
 
 
-    //
-    // == Select arch ==============================
-    //
+    PROGRESS("Kernel:0:6\n"); 
+    // Initialize current archtecture.
+
 
 	// #todo
 	// A partir daqui faremos inicializações de partes
@@ -401,7 +373,12 @@ int kernel_main (int arch_type)
             break;
     };
 
+    // Something is wrong
+    PROGRESS("Kernel:0:7\n"); 
+    debug_print ("kernel_main: Something is wrong\n");
+
 fail:
+    PROGRESS("Kernel:0:0\n"); 
     debug_print ("[Kernel] kernel_main-fail:  *hang \n");
     return (-1);
 }

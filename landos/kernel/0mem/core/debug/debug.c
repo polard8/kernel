@@ -295,6 +295,28 @@ void debug_print ( char *data )
 }
 
 
+// We will use this function to track 
+// the main kernel initialization progress.
+// It will print into the serial port for now.
+
+void PROGRESS( char *string )
+{
+    if( (void*) string == NULL ){
+        return;
+    }
+
+    if(*string == 0){
+        return;
+    }
+
+    // #todo
+    // Select the available method.
+    // switch(...
+
+    debug_print("\n");
+    debug_print(string);
+}
+
 
 //
 // End.

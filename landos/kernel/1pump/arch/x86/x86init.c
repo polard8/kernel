@@ -85,33 +85,37 @@ void x86mainStartFirstThread (void){
     int i=0;
 
 
+    debug_print("x86mainStartFirstThread:\n");
+
     // Select the idle thread.
 
     Thread = InitThread; 
-    
 
-    if ( (void *) Thread == NULL ){
+
+    if ( (void *) Thread == NULL )
+    {
         panic ("x86mainStartFirstThread: Thread\n");
+    } 
 
-    } else {
+    if ( Thread->used != 1 || Thread->magic != 1234)
+    {
+        printf ("x86mainStartFirstThread: tid={%d} magic \n", 
+            Thread->tid);
+         die();
+    }
 
-        if ( Thread->saved != 0 ){
-            panic ("x86mainStartFirstThread: saved\n");
-        }
+    if ( Thread->saved != 0 )
+    {
+        panic ("x86mainStartFirstThread: saved\n");
+    }
 
+    set_current ( Thread->tid );       
 
-        if ( Thread->used != 1 || Thread->magic != 1234){
-            printf ("x86mainStartFirstThread: tid={%d} magic \n", 
-                Thread->tid);
-            die();
-        }
-
-        set_current ( Thread->tid );       
-        // ...
-    };
+    // ...
 
     // State  
-    if ( Thread->state != STANDBY ){
+    if ( Thread->state != STANDBY )
+    {
         printf ("x86mainStartFirstThread: state tid={%d}\n", 
             Thread->tid);
         die();
@@ -142,7 +146,7 @@ void x86mainStartFirstThread (void){
 	//  + Creates a vector for timer irq, IRQ0.
 	//  + Enable taskswitch. 
 
-    turn_task_switch_on ();
+    turn_task_switch_on();
 
 
     // timerInit8253 ( HZ );
@@ -221,9 +225,12 @@ void x86mainStartFirstThread (void){
 
 
     // #debug
-    printf ("[x86] Go to user mode!  IRET\n");
+    debug_print("[x86] Go to user mode!  IRET\n");
+    printf     ("[x86] Go to user mode!  IRET\n");
     refresh_screen ();
 
+
+    PROGRESS("-- Fly --------------------------------------------\n");
 
     // Fly!
     // We need to have the same stack in the TSS.
@@ -382,60 +389,31 @@ int x86main (void)
     int Status=0;
 
 
-    if (current_arch != CURRENT_ARCH_X86){
+    if (current_arch != CURRENT_ARCH_X86)
+    {
         debug_print ("[x86] x86main: Arch fail\n");
         panic       ("[x86] x86main: Arch fail\n"); 
     }
 
+
     debug_print ("==============\n");
     debug_print ("[x86] x86main:\n");
 
-
-    // SSE
-    x86_sse_init ();
-
+    // x86 global thing.
     // Threads counter.
     UPProcessorBlock.threads_counter = 0;
 
 
+    PROGRESS("Kernel:1:1\n"); 
+    // sse support.
 
-
+    x86_sse_init ();
 
 
 
 //
-//=======================================================================================================
+// =====================================================================
 //
-
-    // # system
-    // #bugbug
-    // Daqui pra frente tem coisa que é dependente da arquitetura x86 e 
-    // coisa que não é ... 
-    // precisamos que aqui tudo seja dependente da arquitetura x86.
-    // As outras coisas podem ser chamadas em main.
-    // Talvez possamos mandar coisas que não são dependentes 
-    // para main.c
-
-
-    // System initialization.
-    // See: core/system.c
-
-    printf ("[x86] x86main: Calling systemInit\n");
-
-    //Status = (int) systemInit();
-
-    //if ( Status != 0 )
-    //{
-    //    KernelStatus = KERNEL_ABORTED;
-        
-    //    debug_print ("[x86] x86main: systemInit fail\n");
-    //    printf      ("[x86] x86main: systemInit fail\n");
-    //    goto fail;
-    //}
-
-
-
-
 
     //
     // == phase 0 ========================================
@@ -451,16 +429,16 @@ int x86main (void)
     gSystemEdition = 0;
 
     debug_print ("====\n");
-    debug_print ("systemInit:\n");
-    printf      ("systemInit:\n");
+    debug_print ("x86main:\n");
+    printf      ("x86main:\n");
 
 //
-//=======================================================================================================
+// ====================================================================
 //
 
     debug_print ("====\n");
-    debug_print ("==== systemStartUp:\n");
-    printf("systemStartUp:\n");
+    debug_print ("==== x86main:\n");
+    printf("x86main:\n");
 
 	// Antes de tudo: 
 	// CLI, Video, runtime.
@@ -470,48 +448,47 @@ int x86main (void)
 	// AINDA NÃO INICIALIZAMOS O RECURSO DE MENSAGENS.
 
 
-    if ( KeInitPhase != 0 ){
+    if ( KeInitPhase != 0 )
+    {
         KiAbort();
-    }else{
+    }
+
+    // Disable interrupts, lock taskswitch and scheduler.
+    //Set scheduler type. (Round Robin).
+    // #todo: call a hal routine for cli.
+
+    asm ("cli");  
+    taskswitch_lock();
+    scheduler_lock();
+    schedulerType = SCHEDULER_RR; 
+
+
+	// Obs: 
+	// O video já foi inicializado em main.c.
+	// Isso atualiza a estrutura de console do console atual.
+    // #test: mudamos isso para o momento em que inicializamos os consoles.
         
-        // Disable interrupts, lock taskswitch and scheduler.
-        //Set scheduler type. (Round Robin).
-        // #todo: call a hal routine for cli.
-
-        asm ("cli");  
-        taskswitch_lock();
-        scheduler_lock();
-        schedulerType = SCHEDULER_RR; 
-
-
-		// Obs: 
-		// O video já foi inicializado em main.c.
-		// Isso atualiza a estrutura de console do console atual.
-        // #test: mudamos isso para o momento em que inicializamos os consoles.
+	// BANNER !
+    //Welcome message. (Poderia ser um banner.) 
         
-		// BANNER !
-        //Welcome message. (Poderia ser um banner.) 
-        
-        //set_up_cursor (0,1);
+    //set_up_cursor (0,1);
 
 
-        //
-        // == INIT ! ===========================================
-        //  
+    PROGRESS("Kernel:1:2\n"); 
+    // Calling 'init' kernel module. 
 
-        // See: 
-        // core/init.c
+    // See: 
+    // core/init.c
 
-        Status = (int) init(); 
-        
-        if ( Status != 0 )
-        {
-            debug_print ("systemStartUp: init fail\n");
-            panic       ("systemStartUp: init fail\n");
-        }
-        //...
+    Status = (int) init(); 
+ 
+    if ( Status != 0 )
+    {
+        debug_print ("x86main: init fail\n");
+        panic       ("x86main: init fail\n");
+    }
 
-    }; //--else
+    // ...
 
     //printf("*breakpoint\n");
     //refresh_screen();
@@ -523,7 +500,7 @@ int x86main (void)
 //     @todo: Na verdade serão mais fases..
 //           as fases estão em init().
 
-    printf ("systemStartUp: done\n");
+    printf ("x86main: done\n");
 
 //
 //=======================================================================================================
@@ -535,14 +512,14 @@ int x86main (void)
 
 
 #ifdef BREAKPOINT_TARGET_AFTER_SYSTEM
-    printf ("systemInit: *breakpoint\n");
+    printf ("x86main: *breakpoint\n");
     refresh_screen(); 
     while (1){ asm ("hlt"); }
 #endif
 
 
-    printf("=========================\n");
-    printf("core-init: end of phase 2\n");
+    printf("======================\n");
+    printf("x86main: end of phase 2\n");
 
     // 3 - fim da fase 2.
     IncrementProgressBar();
@@ -555,13 +532,21 @@ int x86main (void)
 //
     
     KeInitPhase = 3; 
-    
+
+
+    PROGRESS("Kernel:1:3\n"); 
+    // Initialize all the kernel graphics support.
+
     // Initialize all the kernel graphics support.
     // some extra things like virtual terminal and tty.
     // #todo: rever essa inicializaçao.
     // See; windows/model/kgws.c
     KGWS_initialize();
-    
+
+
+    PROGRESS("Kernel:1:4\n"); 
+    // Initialize window server manager.
+
     //ws.c
     ws_init();
 
@@ -572,7 +557,7 @@ int x86main (void)
     // Quem chamou essa funçao foi o começo da inicializaçao do kernel.
     // Retornamos para x86main.c para arch x86.
 
-    debug_print ("systemInit: done\n");
+    debug_print ("x86main: done\n");
     debug_print ("====\n");
     
     //printf("*breakpoint\n");
@@ -583,13 +568,11 @@ int x86main (void)
 //=======================================================================================================
 //
 
-    //
-    //=======================================================
-    //
 
-	//
-	// # GDT
-	//
+    PROGRESS("Kernel:1:5\n"); 
+    // Setup GDT again.
+    // We already made this at kernel startup.
+
 
     // # Caution.
     // Lets create a TSS and setup a GDT.
@@ -615,9 +598,8 @@ int x86main (void)
     printf      ("[x86] x86main: processes and threads\n");
 
 
-    //
-    // == kernel process ========================================
-    //
+    PROGRESS("Kernel:1:6\n"); 
+    // Creating kernel process.
 
     //=================================================
     // processes and threads initialization.
@@ -625,21 +607,12 @@ int x86main (void)
     // The processes are: Kernel, Idle, Shell, Taskman.
     // ps: The images are loaded in the memory.
 
-
-//createProcesses:
-
-	// #debug
-    // printf ("creating kernel process ...\n");
-
     // Creating Kernel process. PID=0.
 
     // IN: 
     // Room, Desktop, Window
     // base address, priority, ppid, name, iopl, page directory address.
     // See: ps/action/process.c
-    
-    
-    // Creating kernel process.
     
     KernelProcess = (void *) create_process ( NULL, NULL, NULL, 
                                  (unsigned long) 0xC0000000, 
@@ -656,6 +629,10 @@ int x86main (void)
         //...
     };
 
+
+    PROGRESS("Kernel:1:7\n"); 
+    // Creating a ring 0 thread for the kernel.
+
     // Criando thread em ring 0 (idle)
     // pertence ao processo kernel.
     
@@ -667,9 +644,6 @@ int x86main (void)
 	// um pouco pra cima, onde criamos o processo kernel.
 	// obs: Mesmo não sendo ela o primeiro TID.
 	// See: core/ps/create.c
-
-
-    // Creating a ring 0 thread for the kernel.
 
     RING0IDLEThread = (void *) create_CreateRing0IdleThread();
 
@@ -716,26 +690,18 @@ int x86main (void)
 
     //============================================================
 
+    PROGRESS("Kernel:1:8\n"); 
+    // Cria e inicializa apenas o INIT.BIN
 
-	// Cria e inicializa apenas o INIT.BIN
     __x86StartInit ();
-
 
     //printf("*breakpoint\n");
     //refresh_screen();
     //while(1){}
 
 
-	//
-	//===============================================
-	//
-
-
-	//...
-
-
-//Kernel base Debugger.
-//doDebug:
+    PROGRESS("Kernel:1:9\n"); 
+    // Check some initialization flags.
 
 #ifdef  ENTRY_DEBUG_CHECK_VALIDATIONS
 
@@ -745,7 +711,6 @@ int x86main (void)
         printf ("[x86] x86main: debug\n");
         KernelStatus = KERNEL_ABORTED;
         goto fail;
-
     }else{
         KernelStatus = KERNEL_INITIALIZED;
     };
@@ -764,19 +729,15 @@ int x86main (void)
     timer_cursor_status = 0;
 
 
+    PROGRESS("Kernel:1:10\n"); 
+    // Early ps/2 initialization.
 
-
-	//
-	// ========= ## ps2 ## =============
-	//
 
 	// Initializing ps/2 controller.
-
 
 	//#DEBUG
 	//printf ("testing ps2\n");
 	//refresh_screen(); 
-
 
     debug_print ("[x86] x86main: ps2\n");    
     
@@ -794,10 +755,11 @@ int x86main (void)
 
 
 
+    PROGRESS("Kernel:1:11\n"); 
+    // Loading some system files.
+    // icons, bmps, etc ...
 
-	//
 	// Loading file tests.
-	//
 
     // #test:
     // Background support.
@@ -822,6 +784,9 @@ int x86main (void)
     //refresh_screen();
     //while(1){}
 
+
+    PROGRESS("Kernel:1:12\n"); 
+    // font support.
 
     //
     // Fonts.
@@ -874,10 +839,12 @@ int x86main (void)
 
 
 
-	//
-	// ## testando suporte a salvamento de retângulo ##
-	//
-	
+    PROGRESS("Kernel:1:13\n"); 
+    // Testing some rectangle support.
+
+
+    // Testando suporte a salvamento de retângulo ##
+
 	//#debug
 	//printf ("testando salvamento de retangulo\n");
 	//refresh_screen();
@@ -918,17 +885,22 @@ int x86main (void)
 
 	// done !
 done:
+
+    PROGRESS("Kernel:1:14\n"); 
+    // Start first thread ever.
+
     debug_print ("[x86] x86main: done\n");
     debug_print ("==============\n");
+
+    //
+    // Starting idle thread.
+    //
 
     // Return to assembly file, (head.s).
     if ( KernelStatus == KERNEL_INITIALIZED )
     {
-        //
-        // Starting idle thread.
-        //
-
-        printf("[x86] x86main: Initializing INIT ..\n");
+        debug_print ("[x86] x86main: Initializing INIT ..\n");
+        printf      ("[x86] x86main: Initializing INIT ..\n");
         
 #ifdef KERNEL_VERBOSE
     refresh_screen();
@@ -943,6 +915,8 @@ done:
     // ok
     return 0;
 
+    // ===============================
+
     // fail
 	// #todo
 	// Uma opção aqui é usarmos a tipagem void para essa função
@@ -950,6 +924,9 @@ done:
 	// em ring 0, isso depois de criadas as threads em user mode.
 
 fail:
+    
+    PROGRESS("Kernel:1:00\n"); 
+    
     debug_print ("[x86] x86main: fail\n");
     refresh_screen (); 
     return -1;

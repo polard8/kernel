@@ -317,10 +317,11 @@ int init (void){
         panic       ("core-init: KeInitPhase fail\n");
     }
 
-	//
-	// #IMPORTANT
-	//
 
+    PROGRESS("Kernel:2:1\n"); 
+    // Globals.
+
+    // #IMPORTANT
     // Globals.
     debug_print ("core-init: Globals\n");
     init_globals();
@@ -331,6 +332,10 @@ int init (void){
     // Ou usarmos a barra de progresso. Depende do runlevel.
     // ==============================================================
 
+
+
+    PROGRESS("Kernel:2:2\n"); 
+    // Create the progress bar.
 
     //
     // == progress bar ===================================
@@ -346,7 +351,10 @@ int init (void){
     printk ("core-init: init_globals ok\n");     
 #endif  
 
-	
+
+    PROGRESS("Kernel:2:3\n"); 
+    // io manager
+
 	//#bugbug:
 	//Depois de iniciar as globais, provavelmente o cursor mude 
 	//para o início da tela.
@@ -357,7 +365,6 @@ int init (void){
 #ifdef EXECVE_VERBOSE
     printk ("core-init: init_object_manager\n");
 #endif
-
 
     debug_print ("core-init: Object manager\n");
     init_object_manager ();
@@ -370,15 +377,23 @@ int init (void){
     debug_print ("core-init: io manager\n");
     ioInit ();
 
+
+    PROGRESS("Kernel:2:4\n"); 
+    // device manager.
+
     // Inicializa o gerenciamento de dispositivos.
     // Inicializa a lista de dispositivos.
     debug_print ("core-init: device manager\n");
     
     init_device_manager ();
 
-    //
+
+
+    PROGRESS("Kernel:2:5\n"); 
+    // storage manager
+
+
     // == STORAGE ===========================
-    //
 
     // #ordem:
     // +storage
@@ -438,6 +453,9 @@ int init (void){
     debug_print ("core-init: [FIXME] Initialize mounted list in fs.c\n");
 
 
+    PROGRESS("Kernel:2:6\n"); 
+    // network
+
 	//
 	// Network
 	//
@@ -446,9 +464,9 @@ int init (void){
     networkInit ();
 
 
-    //
+    PROGRESS("Kernel:2:7\n"); 
     // Initialize Platform structure.
-    //
+
 
 #ifdef EXECVE_VERBOSE
     printk ("core-init: Platform\n");
@@ -462,7 +480,6 @@ int init (void){
 
     if ( (void *) Platform ==  NULL ){
         panic ("core-init: Platform\n");
-
     }else{
 
         // UP or MP.
@@ -515,20 +532,17 @@ int init (void){
 // ====================================================================
 //
 
-    debug_print ("init_architecture_independent\n");
-
 
     // #important
     // We need to be in the phase 0.
     
     if (KeInitPhase != 0){
-        panic ("init_architecture_independent: KeInitPhase\n");
+        panic ("init: KeInitPhase\n");
     }
 
 
-	//
-	// == hal ===================================
-	//
+    PROGRESS("Kernel:2:8\n"); 
+    // hal
 
 
 	// #bugbug
@@ -538,7 +552,7 @@ int init (void){
 
 //#todo: Mudar o nome EXECVE_VERBOSE
 #ifdef EXECVE_VERBOSE
-    printk ("init_architecture_independent: Initializing HAL..\n");
+    printk ("init: Initializing HAL..\n");
 #endif
 
     // #bugbug
@@ -547,10 +561,12 @@ int init (void){
     Status = init_hal();
 
     if (Status != 0){
-        panic ("init_architecture_independent: init_hal fail\n");
+        panic ("init: init_hal fail\n");
     }
 
 
+    PROGRESS("Kernel:2:9\n"); 
+    // microkernel components:
     // mm, ipc, ps ...
 
     // ================
@@ -573,13 +589,14 @@ int init (void){
     }
 
 
+    PROGRESS("Kernel:2:10\n"); 
+    // Executive components
 
     // =====================
     // Executive:
 #ifdef EXECVE_VERBOSE
     printk ("init_architecture_independent: Initializing Executive..\n");
 #endif
-
 
     Status = init_executive();
 
@@ -593,7 +610,11 @@ int init (void){
     printk ("init_architecture_independent: Initializing Gramado..\n");
 #endif
 
-   
+
+    PROGRESS("Kernel:2:11\n"); 
+    // some gui components.
+    // #todo: rever 
+
     // #bugbug
     // Deprecated?
     // onde?
@@ -603,6 +624,10 @@ int init (void){
     if (Status != 0){
         panic ("init_architecture_independent: init_gramado fail\n"); 
     }
+
+
+    PROGRESS("Kernel:2:12\n"); 
+    // window manager
 
     //
     // == window manager ================================
@@ -673,7 +698,7 @@ int init (void){
 
 
 
-    debug_print ("init_architecture_dependent:\n");
+    //debug_print ("init:\n");
 
     //
     // Fase. 
@@ -682,7 +707,7 @@ int init (void){
     //
 
     if ( KeInitPhase != 1 ){
-        panic ("init_architecture_dependent: KeInitPhase\n");
+        panic ("init: KeInitPhase\n");
     }
 
 
@@ -704,6 +729,11 @@ int init (void){
     //while(1){};		
 	
 
+
+    PROGRESS("Kernel:2:13\n"); 
+    // processor structure.
+
+
     //
     // == Processor ===================================
     //
@@ -716,7 +746,7 @@ int init (void){
 
     if ( (void *) processor == NULL )
     {
-        panic("init_architecture_dependent: processor\n");
+        panic("init: processor\n");
     }
 
 
@@ -760,32 +790,26 @@ int init (void){
 
 
 
-	//
-	// #todo: ?? maybe 
-	// GDT, IDT (usar extern).
-	//
 
+    PROGRESS("Kernel:2:14\n"); 
+    // process manager.
 
 	// #obs: O contexto é depedente.
 	// Inicializando o Process manager.
 
     init_process_manager();
 
-
-    //
     // Continua ...
-    //
 
     // Done.
-
-
-
 
 //
 // ====================================================================
 //
 
-
+    PROGRESS("Kernel:2:15\n"); 
+    // Load root dir.
+    // #todo: We can move this above to the 'storage' section.
 
     // #importante
     // Só podemos carregar o diretório raiz depois que 
@@ -807,6 +831,10 @@ int init (void){
     asm ("cli");
     set_task_status(LOCKED); 
     scheduler_lock();
+
+
+    PROGRESS("Kernel:2:16\n"); 
+    // keyboard stuff.
 
     // #todo
     // Talvez devamos antecipar isso, pois faz parte do teclado.
