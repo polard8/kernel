@@ -99,8 +99,8 @@ ifeq ($(ARCH),x86)
 	video.o vsync.o screen.o r_render.o xproc.o \
 	i8042.o keyboard.o mouse.o ps2kbd.o ps2mouse.o \
 	apic.o pic.o rtc.o serial.o pit.o  
-	
-	KSERVERS_OBJECTS := cf.o format.o pipe.o fs.o read.o search.o write.o \
+
+	KSERVERS_OBJECTS := cf.o format.o pipe.o fs.o disk_r.o disk_w.o search.o \
 	bg.o bmp.o button.o char.o createw.o dtext.o font.o pbar.o \
 	line.o menu.o mbar.o pixel.o rect.o sbar.o tbar.o wm.o \
 	logoff.o logon.o \
@@ -273,9 +273,10 @@ all-c:
 	$(CC) -c 0mem/sci/fs/format.c  $(KINCLUDE) $(CFLAGS) -o format.o
 	$(CC) -c 0mem/sci/fs/fs.c      $(KINCLUDE) $(CFLAGS) -o fs.o
 	$(CC) -c 0mem/sci/fs/pipe.c    $(KINCLUDE) $(CFLAGS) -o pipe.o
-	$(CC) -c 0mem/sci/fs/read.c    $(KINCLUDE) $(CFLAGS) -o read.o
 	$(CC) -c 0mem/sci/fs/search.c  $(KINCLUDE) $(CFLAGS) -o search.o
-	$(CC) -c 0mem/sci/fs/write.c   $(KINCLUDE) $(CFLAGS) -o write.o
+
+	$(CC) -c 0mem/sci/fs/sdi/disk_r.c  $(KINCLUDE) $(CFLAGS) -o disk_r.o
+	$(CC) -c 0mem/sci/fs/sdi/disk_w.c  $(KINCLUDE) $(CFLAGS) -o disk_w.o
 
 	# fs/vfs
 	$(CC) -c 0mem/sci/fs/vfs/vfs.c     $(KINCLUDE) $(CFLAGS) -o vfs.o

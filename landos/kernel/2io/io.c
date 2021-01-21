@@ -1,24 +1,7 @@
 /*
  * File: io.c
  *
- * Descrição:
- *     Arquivo principal do I/O Manager.
- *     I/O control. 
- *     Obs: Note que o I/O Manager está fora do executive, mas faz parte 
- *          do Kernel Base.
- *
- * Todo gerenciamento de dispositivos, toda concessão de acesso passará por 
- * esse gerenciador, que faz parte da camada de abstração de hardware 
- * oferecida pelo kernel base.
- * Essa parte do gerenciamento de i/o está no kernel base em kernel mode. 
- * Porem haverá outras partes. Haverá um subsistema em user mode, e talvez 
- * um módulo externo do kernel em kernel mode.
- *
- * I/O system: Inclui I/O manager
- *
- *  @todo: Cria funções para gerenciar ioBuffers.
- * The actual fileList modules lives in kernel space on Unix, and are 
- * installed (pushed) and removed (popped) by the ioctl system call.
+ *     i/o manager.
  * 
  *    2016 - Created by Fred Nora.
  */
@@ -60,7 +43,7 @@
     // arg is the address for the arguments.
     // We are using argument not as an address sometimes.
     // it depends on the request number.
-       
+
 // Called by sys_ioctl().
 // But this routine can be called by the routines inside the kernel.
 
@@ -190,13 +173,12 @@ int io_ioctl ( int fd, unsigned long request, unsigned long arg )
  *     Initialize i/o manager.
  */
 
-int ioInit(void){
-
+int ioInit(void)
+{
     int Status = 0;
 
-
     debug_print ("ioInit: [TODO]\n");
-    
+
     // ...
 
     return (int) Status;
