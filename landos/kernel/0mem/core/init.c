@@ -823,7 +823,8 @@ int init (void){
     // o diretorio raiz, mas ainda nao temos estrutura de processo.
 
     debug_print ("core-init: load root dir.\n");
-    fs_load_rootdir ();
+	// Carregando o diretório raiz.
+    fs_load_rootdir( VOLUME1_ROOTDIR_ADDRESS, VOLUME1_ROOTDIR_LBA, 32 );
 
 
     // Disable interrupts, lock task switch and scheduler.

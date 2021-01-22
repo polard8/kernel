@@ -505,8 +505,13 @@ int sys_load_path ( unsigned char *path, unsigned long u_address );
 void fsClearFat (void);   
 void fs_init_fat (void);
 
- 
-void fs_load_fat(void);
+// fat support
+int fs_save_fat (unsigned long fat_address, unsigned long fat_lba, size_t fat_size);
+void fs_load_fat(unsigned long fat_address, unsigned long fat_lba, size_t fat_size);
+
+// root dir support
+int fs_save_rootdir (unsigned long root_address, unsigned long root_lba, size_t root_size);
+void fs_load_rootdir(unsigned long root_address, unsigned long root_lba, size_t root_size); 
 
 
 
@@ -517,11 +522,6 @@ fs_load_metafile (
     unsigned long first_lba, 
     unsigned long size );
 
-// root dir support
-void fs_load_rootdir (void);
-
-int fs_save_rootdir (void);
-int fs_save_fat (void);
 
 void fs_save_entry_on_root(unsigned long eid);
 

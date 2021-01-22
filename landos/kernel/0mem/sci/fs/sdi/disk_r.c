@@ -175,76 +175,6 @@ const char *break_path (const char *pathname, char *filename)
 */
 
 
-/*
- ****************************************
- * fs_load_fat:
- *    Carrega a fat na memória.
- *    Sistema de arquivos fat16.
- *    ? qual disco ?
- *    ? qual volume ? 
- *    #obs: Essa rotina poderia carregar a fat do volume atual do 
- * disco atual. É só checar na estrutura.
- *
- * current disk, current volume, fat status.
- *
- * + Se o status da fat para o vulume atual indicar que 
- * ela já está carregada, então não precisamos carregar novamente.
- */
-
-// #todo
-// Precisamos de uma estrutura com as informações sobre
-// a FAT atual.
-
-void fs_load_fat(void)
-{
-    unsigned long i=0;
-    unsigned long b=0;
-
-
-	// #bugbug 
-	// Estamos atribuindo um tamanho, mas tem que calcular.
-	// Salvo engano o tamanho é 246 setores.
-
-    unsigned long szFat = 128;
-
-
-    debug_print ("fs_load_fat:\n");
-
-	//#todo:
-	//+checar qual é o disco atual.
-	//+checar qual é o volume atual.
-	//+checar o status da FAT. Talvez ela já esteja na memória.
-	//obs: a estrutura deve informar onde está a fat do volume,
-	//caso ja esteja na memória.
-	//obs: padronizaremos alguns endereços, e alocaremos outros.
-
-    //
-    // Check cache state.
-    //
-    
-    // Se ja está na memória, então não precisamos carregar novamente.
-    if (fat_cache_loaded==CACHE_LOADED){
-         debug_print("fs_load_fat: FAT cache already loaded!\n");
-         return;
-    }
-
-    // Load the sectors in the memory.
-
-    for ( i=0; i < szFat; i++ ){
-
-        my_read_hd_sector ( 
-            (VOLUME1_FAT_ADDRESS + b), 
-            (VOLUME1_FAT_LBA + i), 
-            0, 
-            0 );
-
-        b = (b +512);
-    };
-    
-    // Changing the status
-    fat_cache_loaded = CACHE_LOADED;
-}
-
 
 /*
  ***********************************************************
@@ -311,6 +241,66 @@ fs_load_metafile (
 
 
 
+
+/*
+ ****************************************
+ * fs_load_fat:
+ *    Carrega a fat na memória.
+ *    Sistema de arquivos fat16.
+ *    ? qual disco ?
+ *    ? qual volume ? 
+ *    #obs: Essa rotina poderia carregar a fat do volume atual do 
+ * disco atual. É só checar na estrutura.
+ *
+ * current disk, current volume, fat status.
+ *
+ * + Se o status da fat para o vulume atual indicar que 
+ * ela já está carregada, então não precisamos carregar novamente.
+ */
+
+// #todo
+// Precisamos de uma estrutura com as informações sobre
+// a FAT atual.
+
+void fs_load_fat(unsigned long fat_address, unsigned long fat_lba, size_t fat_size)
+{
+
+    unsigned long __fatAddress=0;
+    unsigned long __fatLBA=0;
+    size_t        __fatSize=0;
+    
+    __fatAddress = fat_address;
+    __fatLBA     = fat_lba;
+    __fatSize    = fat_size;   //fat size in sectors. 246?
+
+
+    debug_print ("fs_load_fat:\n");
+
+    //
+    // Check cache state.
+    //
+    
+    // Se ja está na memória, então não precisamos carregar novamente.
+    if (fat_cache_loaded==CACHE_LOADED){
+         debug_print("fs_load_fat: FAT cache already loaded!\n");
+         return;
+    }
+
+    //__load_sequential_sectors ( 
+    //    VOLUME1_FAT_ADDRESS, 
+    //    VOLUME1_FAT_LBA, 
+    //    128 );
+
+    __load_sequential_sectors ( 
+        __fatAddress, 
+        __fatLBA, 
+        __fatSize );
+
+    // Changing the status
+    fat_cache_loaded = CACHE_LOADED;
+}
+
+
 /*
  ****************************** 
  * fs_load_rootdir:
@@ -326,14 +316,28 @@ fs_load_metafile (
 // O ponteiro para essa estrutura sera salvo na estrutura de processo
 // juntamente com o ponteiro da estrutura de cwd.
 
-void fs_load_rootdir (void)
+void fs_load_rootdir(unsigned long root_address, unsigned long root_lba, size_t root_size)
 {
+    unsigned long RootAddress=0;
+    unsigned long RootLBA=0;
+    size_t        RootSize=0;
+
+
+    RootAddress = root_address;
+    RootLBA     = root_lba;
+    RootSize    = root_size;    // number of sectors.
+
     debug_print ("fs_load_rootdir:\n");
-    
+
+    //__load_sequential_sectors ( 
+    //    VOLUME1_ROOTDIR_ADDRESS, 
+    //    VOLUME1_ROOTDIR_LBA, 
+    //    32 );
+
     __load_sequential_sectors ( 
-        VOLUME1_ROOTDIR_ADDRESS, 
-        VOLUME1_ROOTDIR_LBA, 
-        32 );
+        RootAddress, 
+        RootLBA, 
+        RootSize );
 }
 
 

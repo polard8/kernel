@@ -2309,7 +2309,7 @@ void sys_reboot (void)
 
     
     debug_print("sys_reboot: Saving FAT cache\n");
-    fs_save_fat();
+    fs_save_fat(VOLUME1_FAT_ADDRESS,VOLUME1_FAT_LBA,246);
 
 
     //

@@ -145,18 +145,34 @@ write_clusters (
 
 
 /*
+ ***************************************************
  * fs_save_rootdir:
  *     Salva o diretório raiz no disco.
  *     @todo: Identificar parâmetros do sistema de arquivos atual. 
  */
 
-int fs_save_rootdir (void)
+
+//int fs_save_rootdir (void)
+int fs_save_rootdir (unsigned long root_address, unsigned long root_lba, size_t root_size)
 {
 
     int r=0;
     int roff=0;
     int rlbaoff=0;
 
+
+    unsigned long RootAddress=0;
+    unsigned long RootLBA=0;
+    size_t        RootSize=0;
+
+
+    RootAddress = root_address;
+    RootLBA     = root_lba;
+    RootSize    = root_size;    // number of sectors.
+
+    // size = number of sectors
+    // 512*32
+    // 512 entradas de 32 bytes.
 
     // #obs:
     // Não precisamos fazer isso o tempo todo.
@@ -172,8 +188,12 @@ int fs_save_rootdir (void)
 	// Precisamos saber o tamanho do root ... 
 	// Precismos de estrututra de root
 
-
-    for ( r=0; r<32; r++ )
+    // size = number of sectors
+    // 512*32
+    // 512 entradas de 32 bytes.
+    
+    //for ( r=0; r<32; r++ )
+    for ( r=0; r< RootSize; r++ )
     {
         // #debug
         //printf("write_lba n={%d} \n",r); 
@@ -188,9 +208,15 @@ int fs_save_rootdir (void)
         // #bugbug: 
         // Não podemos determinar os valores. Precisamos de estruturas.
 
+        //my_write_hd_sector ( 
+        //    (unsigned long) ( VOLUME1_ROOTDIR_ADDRESS + roff), 
+        //    (unsigned long) ( VOLUME1_ROOTDIR_LBA     + rlbaoff ), 
+        //    0, 
+        //    0 );
+
         my_write_hd_sector ( 
-            (unsigned long) ( VOLUME1_ROOTDIR_ADDRESS + roff), 
-            (unsigned long) ( VOLUME1_ROOTDIR_LBA     + rlbaoff ), 
+            (unsigned long) ( RootAddress + roff), 
+            (unsigned long) ( RootLBA + rlbaoff ), 
             0, 
             0 );
 
@@ -206,14 +232,23 @@ int fs_save_rootdir (void)
 
 
 // Save fat into the disk.
-int fs_save_fat (void)
+int fs_save_fat (unsigned long fat_address, unsigned long fat_lba, size_t fat_size)
 {
     int f=0;
     int off=0;
     int lbaoff=0;
 
 
-
+    unsigned long __fatAddress=0;
+    unsigned long __fatLBA=0;
+    size_t        __fatSize=0;
+    
+    __fatAddress = fat_address;
+    __fatLBA     = fat_lba;
+    __fatSize    = fat_size;   //fat size in sectors. 246?
+    
+    
+    //#bugbug: provisorio
     debug_print ("fs_save_fat:\n");
     printf ("Saving fat..\n");
     refresh_screen ();
@@ -227,7 +262,8 @@ int fs_save_fat (void)
 	// Estamos salvando 246 setores da FAT,
 
 
-    for ( f=0; f<246; f++ )
+    //for ( f=0; f<246; f++ )
+    for ( f=0; f<__fatSize; f++ )
     {
  
        //#debug
@@ -238,11 +274,18 @@ int fs_save_fat (void)
         disk_ata_wait_irq ();
 
 
+        //my_write_hd_sector ( 
+        //    (unsigned long) ( VOLUME1_FAT_ADDRESS + off), 
+        //    (unsigned long) ( VOLUME1_FAT_LBA     + lbaoff ), 
+        //    0, 
+        //    0 );
+
         my_write_hd_sector ( 
-            (unsigned long) ( VOLUME1_FAT_ADDRESS + off), 
-            (unsigned long) ( VOLUME1_FAT_LBA     + lbaoff ), 
+            (unsigned long) ( __fatAddress + off), 
+            (unsigned long) ( __fatLBA     + lbaoff ), 
             0, 
             0 );
+
 
         off    = (off    + 0x200);
         lbaoff = (lbaoff + 1);

@@ -3971,9 +3971,9 @@ __found:
 
 //loadFAT:
 
-    fs_load_fat();
-
-
+    //fs_load_fat(VOLUME1_FAT_ADDRESS,VOLUME1_FAT_LBA,128);
+    fs_load_fat(VOLUME1_FAT_ADDRESS,VOLUME1_FAT_LBA,246);
+    
     // Load clusters.
     // Carregar o arquivo, cluster por cluster.
     // #todo: 
@@ -4216,8 +4216,7 @@ unsigned long fsRootDirGetFileSize ( unsigned char *file_name )
 
 
 	// Carregando o diretório raiz.
-    fs_load_rootdir();
-    //__load_sequential_sectors ( VOLUME1_ROOTDIR_ADDRESS, VOLUME1_ROOTDIR_LBA, 32 );
+    fs_load_rootdir( VOLUME1_ROOTDIR_ADDRESS, VOLUME1_ROOTDIR_LBA, 32 );
 
 	
 	//#todo:
@@ -4562,10 +4561,10 @@ fsSaveFile (
 
 
     // Load root dir and FAT.
-    fs_load_rootdir();
-    fs_load_fat();
+    fs_load_rootdir( VOLUME1_ROOTDIR_ADDRESS, VOLUME1_ROOTDIR_LBA, 32 );
 
-
+    //fs_load_fat(VOLUME1_FAT_ADDRESS,VOLUME1_FAT_LBA,128);
+    fs_load_fat(VOLUME1_FAT_ADDRESS,VOLUME1_FAT_LBA,246);
 
     // Procurando cluster livre na fat.
     // Nesse momento construimos uma lista de clusters livres.
@@ -4924,8 +4923,10 @@ do_save_dir_and_fat:
     // Save root
     // #bugbug: We need to save a directory, not the root.
 
+    // IN: root dir address, root dir lba, root dir size in sectors.
+
     //if ( dir_address == ROO...
-    fs_save_rootdir();
+    fs_save_rootdir( VOLUME1_ROOTDIR_ADDRESS, VOLUME1_ROOTDIR_LBA, 32 );
     
     // Save FAT
     
