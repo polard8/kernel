@@ -1,11 +1,8 @@
 /*
  * File: pipe.c
- *     Pipe support for klibc.
- *     ?? Pipes, socketpairs and FIFOs ??
- *     ?? pipe() and mkfifo(). ??
- *     pipe() which "returns" two file descriptors. 
- *     Internally the pipe is (normally) a circular buffer/queue.
  * 
+ *    Pipe support.
+ *  
  * History:
  *     2019 -  Created by Fred Nora.
  */
@@ -35,20 +32,18 @@ int sys_dup ( int oldfd ){
     Process = (void *) processList[current_process];
 
     if ( (void *) Process == NULL ){
-        debug_print("sys_dup:[FAIL]\n");
+        debug_print("sys_dup: [FAIL]\n");
         return -1;
-
     }else{
-
         if ( Process->used != 1 || Process->magic != 1234 ){
-            debug_print("sys_dup:[FAIL]\n");
+            debug_print("sys_dup: [FAIL]\n");
             return -1;
         }
-
         //ok
     };
 
 
+    // Get an empty slot.
 
     for ( i=3; i< NUMBER_OF_FILES; i++ )
     {
@@ -61,11 +56,15 @@ int sys_dup ( int oldfd ){
         }
     };
 
-
-    if ( slot == -1 ){
+    // fail
+    if ( slot == -1 )
+    {
         Process->Objects[i] = (unsigned long) 0;
+        
+        // #todo
+        // We need a message here.
         return -1;
-    };
+    }
 
 
     // #todo: 
@@ -76,29 +75,29 @@ int sys_dup ( int oldfd ){
     if ( (void *) f_old == NULL ){
         Process->Objects[i] = (unsigned long) 0;
         return -1;
- 
     }else{
+
         f_new = (void *) kmalloc ( sizeof(file) );
 
-        if ( (void *) f_new == NULL ){
+        if ( (void *) f_new == NULL )
+        {
             Process->Objects[i] = (unsigned long) 0;
+            
+            // #todo
+            // We need a message here?
             return -1;
         }
 
-        f_new->used = 1;
+        f_new->used  = 1;
         f_new->magic = 1234;
-        
+
+        // herdando.
         f_new->____object = f_old->____object;
-
-        f_new->_base = f_old->_base;
-        f_new->_p    = f_old->_p;
-
-        f_new->_tmpfname = f_old->_tmpfname;
-
-        f_new->_lbfsize = f_old->_lbfsize; 
-
-        //quanto falta é igual ao tamanho.
-        f_new->_cnt = f_old->_cnt; 
+        f_new->_base      = f_old->_base;
+        f_new->_p         = f_old->_p;
+        f_new->_tmpfname  = f_old->_tmpfname;
+        f_new->_lbfsize   = f_old->_lbfsize; 
+        f_new->_cnt       = f_old->_cnt; 
 
         Process->Objects[slot] = (unsigned long) f_new;
 
@@ -122,24 +121,20 @@ int sys_dup2 (int oldfd, int newfd){
     struct process_d *Process;
 
 
+    Process = (void *) processList[current_process];
 
-	Process = (void *) processList[current_process];
-	
     if ( (void *) Process == NULL ){
-		return -1;
-
-	}else{
-	
-	     if ( Process->used != 1 || Process->magic != 1234 )
-		 {
-		     return -1;
-		 }
-		
+        //#todo: We need a message here.
+        return -1;
+    }else{
+        if ( Process->used != 1 || Process->magic != 1234 )
+        {
+            return -1;
+        }
 		 //ok
-	};
+    };
 
-	
-    int slot = newfd;	
+    int slot = newfd;
 
 
     if ( slot == -1 ){
@@ -151,38 +146,32 @@ int sys_dup2 (int oldfd, int newfd){
 	//#todo: filtrar oldfd
 	
     f_old = (file *) Process->Objects[oldfd];
-	
-	if ( (void *) f_old == NULL ){
+
+    if ( (void *) f_old == NULL ){
 		Process->Objects[slot] = (unsigned long) 0;
 	    return -1;
-	    
-	}else{
-        
-				
-		f_new = (file *) Process->Objects[slot];
-		
-		if ( (void *) f_new == NULL ){
+    }else{
+
+        f_new = (file *) Process->Objects[slot];
+
+        if ( (void *) f_new == NULL ){
 		    Process->Objects[slot] = (unsigned long) 0;
-	        return -1;			
-		}
+	        return -1;
+        }
 
-        f_new->used = 1;
+        f_new->used  = 1;
         f_new->magic = 1234;
-        f_new->____object = f_old->____object;
-        
-		f_new->_base = f_old->_base;	
-		f_new->_p    = f_old->_p;
-		
-		f_new->_tmpfname = f_old->_tmpfname;
-		
-		f_new->_lbfsize  = f_old->_lbfsize; 
-		
-		//quanto falta é igual ao tamanho.
-		f_new->_cnt = f_old->_cnt; 
-				
-		return (int) slot;
-	}
 
+        // Herdado.
+        f_new->____object = f_old->____object;
+        f_new->_base      = f_old->_base;
+        f_new->_p         = f_old->_p;
+        f_new->_tmpfname  = f_old->_tmpfname;
+        f_new->_lbfsize   = f_old->_lbfsize; 
+        f_new->_cnt       = f_old->_cnt; 
+
+        return (int) slot;
+    };
 
 	// On success, these system calls return the new file descriptor.  
 	// On error, -1 is returned, and errno is set appropriately.	
@@ -236,31 +225,26 @@ int sys_dup3 (int oldfd, int newfd, int flags){
 
     }else{
 
-	
         f_new = (file *) Process->Objects[slot];
-		
+
 		if ( (void *) f_new == NULL ){
 		    Process->Objects[slot] = (unsigned long) 0;
-	        return -1;			
+	        return -1;
 		}
 
-
-        f_new->used = 1;
+        f_new->used  = 1;
         f_new->magic = 1234;
+
+        // Herdado
         f_new->____object = f_old->____object;
-        
-		f_new->_base = f_old->_base;	
-		f_new->_p = f_old->_p;
-		
-		f_new->_tmpfname = f_old->_tmpfname;
-		
-		f_new->_lbfsize = f_old->_lbfsize; 
-		
-		//quanto falta é igual ao tamanho.
-		f_new->_cnt = f_old->_cnt; 
-				
-		return (int) slot;
-	}
+        f_new->_base      = f_old->_base;
+        f_new->_p         = f_old->_p;
+        f_new->_tmpfname  = f_old->_tmpfname;
+        f_new->_lbfsize   = f_old->_lbfsize; 
+        f_new->_cnt       = f_old->_cnt; 
+
+        return (int) slot;
+    };
 
 	// On success, these system calls return the new file descriptor.  
 	// On error, -1 is returned, and errno is set appropriately.	

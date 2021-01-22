@@ -1,20 +1,16 @@
 /*
  * File: fs/format.c
- *
- * 
- * Descrição:
- *     Serviços de formatação de disco e volumes.
- *     Formata a tabela de partições no mbr.
- *     Altera valores no mbr e metafile. 
- *
- * todo:
- *     Serviços de formatação podem ir para um aplicativo.
  * 
  * History:
  *    2015 - Created by Fred Nora.
  *    ...
  */
- 
+
+
+// #todo
+// This is a job for applications.
+// But we can create some helper functions here.
+
 
 #include <kernel.h>
 
