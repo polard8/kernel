@@ -15,26 +15,11 @@
 
 
 
-int search_in_root ( char *filename )
-{
-
-    if ( (void*) filename == NULL ){
-        debug_print ("search_in_root: [ERROR] filename\n");
-        return -1;
-    }
-
-    if ( *filename == 0 ){
-        debug_print ("search_in_root: [ERROR] *filename\n");
-        return -1;
-    }
-
-    return (int) KiSearchFile ( filename, VOLUME1_ROOTDIR_ADDRESS );
-}
 
 
 /*
  **********************************************************************
- * KiSearchFile:
+ * search_in_dir:
  *    Procura por um arquivo, dado o endereço do diretório, com o diretório 
  * já carregado na memória.
  *
@@ -61,9 +46,9 @@ int search_in_root ( char *filename )
 // 1 = Found.
 
 int 
-KiSearchFile ( 
-    unsigned char *file_name, 
-    unsigned long address )
+search_in_dir ( 
+    const char *file_name, 
+    unsigned long dir_address )
 {
 
     int Status = -1;
@@ -80,22 +65,21 @@ KiSearchFile (
 	// #importante: 
 	// O endereço do diretório foi passado via argumento.
 
-    char *dir = (char *) address;
+    char *dir = (char *) dir_address;
 
 
     if ( (void*) file_name == NULL ){
-        printf ("KiSearchFile: [ERROR] file_name\n");
+        printf ("search_in_dir: [ERROR] file_name\n");
         goto fail;
     }
 
-
     if ( *file_name == 0 ){
-        printf ("KiSearchFile: [ERROR] *file_name\n");
+        printf ("search_in_dir: [ERROR] *file_name\n");
         goto fail;
     }
 
     if ( *file_name == '/' ){
-        printf ("KiSearchFile: [FIXME] absolute pathname not supported yet.\n");
+        printf ("search_in_dir: [FIXME] absolute pathname not supported yet.\n");
         goto fail;
     }
 
@@ -103,16 +87,12 @@ KiSearchFile (
     // Address Limits:
     // Endereço de memória onde o diretório está.
     
-    if (address == 0){
-        printf ("KiSearchFile: Invalid dir address\n");
+    if (dir_address == 0){
+        printf ("search_in_dir: Invalid dir address\n");
         goto fail;
     }
 
-    
-    //
-    // Search.
-    //
-
+    // Search
 
     for ( i=0; i < NumberOfEntries; i++ )
     {
@@ -121,18 +101,17 @@ KiSearchFile (
 
         // diretório atual ou diretório pai.
         // '.' ou '..'
-        if ( dir[j] == '.' ){ j += 0x20; continue; }
+        if ( dir[j] == '.' )        { j += 0x20; continue; }
 
         //#TODO
         //pegar o tamanho da string para determinar o quanto comparar.
 
         // Entrada normal. Diferente de zero.
+        // Copia o nome e termina incluindo o char 0.
         if ( dir[j] != 0 )
         {
-
-			// Copia o nome e termina incluindo o char 0.
-			memcpy( NameX, &dir[j], 11 );
-			NameX[11] = 0;
+            memcpy( NameX, &dir[j], 11 );
+            NameX[11] = 0;
 
             Status = (int) strncmp ( file_name, NameX, 11 );
 
@@ -141,17 +120,31 @@ KiSearchFile (
             
             //Nothing.
         };   
-		
 		//Próxima entrada. Repete 512 vezes.
-        j += 0x20;              
+        j += 0x20;
     };
 
-
-	// Fail!
-
 fail:
-    printf ("KiSearchFile: File not found\n");
+    printf ("search_in_dir: File not found\n");
     return (int) -1;
+}
+
+
+int search_in_root ( const char *file_name )
+{
+
+    if ( (void*) file_name == NULL ){
+        debug_print ("search_in_root: [ERROR] file_name\n");
+        return -1;
+    }
+
+    if ( *file_name == 0 ){
+        debug_print ("search_in_root: [ERROR] *file_name\n");
+        return -1;
+    }
+
+    // IN: filename, dir address
+    return (int) search_in_dir ( file_name, VOLUME1_ROOTDIR_ADDRESS );
 }
 
 
@@ -172,86 +165,21 @@ fail:
 // #todo
 // Include 'dir address' as parameter.
 
+// only on root dir.
+
 //int fsSearchFile( const char *name ) 
-int fsSearchFile (unsigned char *file_name)
+int fsSearchFile (const char *file_name)
 {
-    int Status = 1;
-    unsigned long i = 0;
-    unsigned long j = 0;                  //Deslocamento do rootdir. 
-    unsigned long NumberOfEntries = 512;  //Número máximo de entradas em fat16.
-    // ...
+    debug_print ("fsSearchFile:\n");
+    
+    // #todo
+    // Well, here we can search on different places 
+    // using search_in_dir(,);
 
-    char NameX[13];
-    char *dir = (char *) VOLUME1_ROOTDIR_ADDRESS;    //rootDir->address;
-
-
-
-    if ( (void*) file_name == NULL ){
-        printf ("fsSearchFile: [ERROR] file_name\n");
-        goto fail;
-    }
-
-
-    if ( *file_name == 0 ){
-        printf ("fsSearchFile: [ERROR] *file_name\n");
-        goto fail;
-    }
-
-    if ( *file_name == '/' ){
-        printf ("fsSearchFile: [FIXME] absolute pathname not supported yet.\n");
-        goto fail;
-    }
-
-
- 
-    //Obs:
-    //0x00      Entry never used
-    //0xe5      File is deleted
-    //0x2e      (A ".") Directory
-
-
-	//Compare.
-    for ( i=0; i < NumberOfEntries; i++ )
-    {
-        // FAT_DIRECTORY_ENTRY_FREE
-        if ( dir[j] == (char) 0xE5 ){ j += 0x20; continue; }
-
-		// diretório atual ou diretório pai.
-		// '.' ou '..'
-        if ( dir[j] == '.' ){ j += 0x20; continue; }
-
-        //#TODO
-        //pegar o tamanho da string para determinar o quanto comparar.
-
-
-        // Entrada normal. Diferente de zero.
-        // Copia o nome e termina incluindo o char 0.
-
-        if ( dir[j] != 0 )
-        {
-            memcpy ( NameX, &dir[j], 11 );
-            NameX[11] = 0;
-
-            Status = (int) strncmp ( file_name, NameX, 11 );
-
-            if (Status == 0){ goto done; }
-
-			//Nothing.
-        };  
-
-		//Próxima entrada. Repete 512 vezes.
-        j += 0x20; 
-    };
-
-
-	//More?!
-
-fail:
-    Status = (int) 1;
-    printf ("fsSearchFile: File not found\n");
-done:
-    return (int) Status;
+    return (int) search_in_root(file_name);
 }
+
+
 
 
 /*
@@ -291,9 +219,6 @@ findEmptyDirectoryEntry (
     unsigned char *dir = (unsigned char *) dir_address;
 
 
-	// Filtrando limites.
-
-
     if ( dir_address == 0 )     { goto fail; }
     if ( number_of_entries < 0 ){ goto fail; }
 
@@ -305,7 +230,6 @@ findEmptyDirectoryEntry (
         // Next entry.
         j = (j+32);
     };
-
 
 fail:
     return (int) (-1);
@@ -412,32 +336,6 @@ done:
 
 fail:
     return (unsigned short) 0;
-}
-
-
-
-/*
- ***************************************************
- * fsSearchFileName:
- *     Procurar um nome de arquivo em uma pasta.
- *     No caso é o diretório raiz.
- */
-
-//int fsSearchFileName( const char *name ) 
-
-int fsSearchFileName (unsigned char *name)
-{
-    if ( (void*) name == NULL ){
-        debug_print("fsSearchFileName: [ERROR] name\n");
-        return -1;
-    }
-    
-    if ( *name == 0 ){
-        debug_print("fsSearchFileName: [ERROR] *name\n");
-        return -1;
-    }
-
-    return (int) fsSearchFile (name);
 }
 
 

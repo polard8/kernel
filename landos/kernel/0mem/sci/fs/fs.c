@@ -2798,7 +2798,7 @@ sys_read_file_from_disk (
 
     // Searching for the file only on the root dir.
 
-    Status = (int) KiSearchFile ( file_name, VOLUME1_ROOTDIR_ADDRESS );
+    Status = (int) search_in_dir ( file_name, VOLUME1_ROOTDIR_ADDRESS );
 
     if (Status != 1)
     {

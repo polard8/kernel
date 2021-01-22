@@ -18,6 +18,9 @@ char *rindex (const char *s, int c);
 
 
 
+char *strrev(char *str);
+
+
 
 #endif    //__STRINGS_H__
 

@@ -749,7 +749,7 @@ __search:
 
     read_fntos ( (char *) name );
 
-    Status = (int) KiSearchFile ( name, dir_address );
+    Status = (int) search_in_dir ( name, dir_address );
     if (Status == 1)
     { 
         goto __found; 
@@ -784,7 +784,7 @@ __search:
     }
 
     // Procura o nome no diretorio carregado
-    __Status = (int) KiSearchFile ( name, dir_address );
+    __Status = (int) search_in_dir ( name, dir_address );
     if (__Status == 1){ goto __found; }
     */
  
@@ -816,7 +816,7 @@ __search:
     }
 
     // Procura o nome no diretorio carregado
-    __Status = (int) KiSearchFile ( name, dir_address );
+    __Status = (int) search_in_dir ( name, dir_address );
     if (__Status == 1){ goto __found; }
     */
 

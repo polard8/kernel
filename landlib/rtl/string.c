@@ -1,15 +1,11 @@
 /*
  * File: string.c
  *
- * Descrição:
- *     Operações com strings.
- *     Parte da biblioteca da linguagem C.
- *
- * Ambiente:
- *     User mode.
+ *    String support.
+ *    landlib rtl.
  */
 
- 
+
 #include <ctype.h>
 #include <stddef.h>
 #include <string.h>
@@ -301,6 +297,10 @@ char *strdup (const char *str){
     size_t len=0;
 
 
+    //if ( (void*) s == NULL )
+       //return (char *) 0;
+
+
     len = strlen(str) + 1;
 
     // ugly!
@@ -315,12 +315,18 @@ char *strdup (const char *str){
 }
 
 
-char *strndup (const char *s, size_t n){
-
+char *strndup (const char *s, size_t n)
+{
     char *d;
 
     size_t l = strnlen (s, n);
 
+
+    // src
+    //if ( (void*) s == NULL )
+       //return (char *) 0;
+
+    // dst
     d = (char *) malloc (l + 1);
 
     if (!d){
@@ -396,9 +402,10 @@ char *strim(char *s)
  * @c: The character to search for
  */
 
+char *strnchr (const char *s, size_t count, int c)
+{
 
-char *strnchr (const char *s, size_t count, int c){
-
+    // #ugly
     for (; count-- && *s != '\0'; ++s)
         if (*s == (char)c)
             return (char *) s;
@@ -422,6 +429,12 @@ char *strrchr (const char *p, int ch){
 
     c = ch;
 
+
+    //if ( (void*) p == NULL )
+       //return (char) 0;
+
+
+    // #ugly
     for ( save = NULL;; ++p ) 
     {
         if (*p == c){
@@ -630,6 +643,10 @@ void *memset ( void *ptr, int value, int size ){
 
     register int i=0;
 
+    //if ( (void*) ptr == NULL )
+       //return NULL;
+
+
     if ( ptr != NULL && size > 0 )
     {
         unsigned char *temp = ptr;
@@ -645,9 +662,13 @@ void *memset ( void *ptr, int value, int size ){
 
 
 //#todo: mover para memory.c ??
-void *memoryZeroMemory ( void *ptr, size_t cnt ){
-
+void *memoryZeroMemory ( void *ptr, size_t cnt )
+{
     volatile char *vptr = (volatile char *) ptr;
+
+
+    //if ( (void*) ptr == NULL )
+       //return NULL;
 
     while (cnt)
     {
@@ -668,11 +689,18 @@ void *memoryZeroMemory ( void *ptr, size_t cnt ){
 
 // Simple, byte oriented memcpy. 
 
-void *memcpy ( void *v_dst, const void *v_src, unsigned long c ){
-
+void *memcpy ( 
+    void       *v_dst, 
+    const void *v_src, 
+    unsigned long c )
+{
     const char *src = v_src;
+    char       *dst = v_dst;
 
-    char *dst = v_dst;
+
+    //if ( (void*) v_dst == NULL )
+       //return NULL;
+
 
     while (c--)
     {
@@ -691,6 +719,9 @@ void *memcpy ( void *v_dst, const void *v_src, unsigned long c ){
 char *strcpy ( char *to, const char *from )
 {
     register int i=0;
+
+    //if ( (void*) to == NULL )
+       //return (char *) 0;
 
     while ( to[i] = from[i] ){  i += 1;  };
 
@@ -748,6 +779,10 @@ char *strcat ( char *to, const char *from ){
 
     char *ret = to;
 
+    //if ( (void*) to == NULL )
+       //return (char *) 0;
+
+
     while ( *to ){  to += 1;  };
 
     strcpy ( to, from );
@@ -769,6 +804,10 @@ char *strcat ( char *to, const char *from ){
 
 char *strchrnul (const char *s, int c)
 {
+
+    //if ( (void*) s == NULL )
+       //return (char *) 0;
+
     while (*s && *s != (char)c){  s++;  };
 
     return (char *) s;
@@ -801,10 +840,11 @@ size_t strlcat (char *dst, const char *src, size_t size)
     //ugly
     while ((ch = *p++))
     {
+        if (bytes + 1 < size){
+            *q++ = ch;
+        }
 
-		if (bytes + 1 < size)
-			*q++ = ch;
-		bytes++;
+        bytes++;
     };
 
     *q = '\0';
@@ -843,7 +883,14 @@ char *strncat (char *dst, const char *src, size_t n)
  * bcopy: Copia. 
  */
 
-void bcopy ( char *from, char *to, int len ){
+void bcopy ( char *from, char *to, int len )
+{
+
+    //if ( (void*) from == NULL )
+       //return;
+
+    //if ( (void*) to == NULL )
+       //return;
 
 	//if ( len < 0 )
 	//    return;
@@ -860,7 +907,11 @@ void bcopy ( char *from, char *to, int len ){
  *      zeros. 
  */
 
-void  bzero ( char *cp, int len ){
+void  bzero ( char *cp, int len )
+{
+
+    //if ( (void*) cp == NULL )
+       //return;
 
     //if ( len < 0 )
     //    return;
@@ -880,6 +931,9 @@ void  bzero ( char *cp, int len ){
 size_t strlen (const char *s){
 
     register size_t i=0;
+
+    //if ( (void*) s == NULL )
+       //return -1;
 
     for ( i=0; s[i] != '\0'; i++ )
     { 
@@ -901,14 +955,18 @@ size_t strnlen ( const char *s, size_t maxlen )
 {
     const char *e;
     register size_t n=0;
-        
+
+
+    //if ( (void*) s == NULL )
+       //return -1;
+
     //#bugbug
     // E se maxlen for negativo.
 
     //if ( maxlen <=0 )
         //return -1;
 
-    //very ugly
+    //# very ugly  shit
     for ( e=s, n=0; *e && n<maxlen; e++, n++ )
     { 
         ; 
@@ -923,8 +981,17 @@ char *strpbrk (const char *cs, const char *ct)
     const char *sc1;
     const char *sc2;
 
+
+    //if( (void*) cs == NULL )
+        //return (char*) 0;
+
+    //if( (void*) ct == NULL )
+        //return (char*) 0;
+
+    // #ugly
     for ( sc1 = cs; *sc1 != '\0'; ++sc1 )
     {
+        // #ugly
         for ( sc2 = ct; *sc2 != '\0'; ++sc2 )
         {
             if (*sc1 == *sc2){ return (char *) sc1; }
@@ -960,9 +1027,11 @@ char *strsep (char **s, const char *ct){
 
     end = strpbrk (sbegin, ct);
 
-	if (end)
-		*end++ = '\0';
-	*s = end;
+    if (end){
+        *end++ = '\0';
+    }
+    
+    *s = end;
 
     return (char *) sbegin;
 }
@@ -1083,13 +1152,14 @@ void *memset32 (uint32_t *s, uint32_t v, size_t count)
 */
 
 
-// ?? - Não é padrão. Mas deixe aqui.
-void *
-check_bytes8 ( 
+void *check_bytes8 ( 
     const char *start, 
     char value, 
     unsigned int bytes )
 {
+
+    //if( (void*) start == NULL )
+        //return NULL;
 
     while (bytes)
     {
@@ -1117,6 +1187,10 @@ check_bytes8 (
 
 char *strreplace (char *s, char old, char new)
 {
+
+    //if( (void*) s == NULL ){
+    //    return (char*) 0;
+    //}
 
     //ugly
     for (; *s; ++s)
@@ -1147,7 +1221,6 @@ size_t strcspn ( const char *str, const char *reject ){
     size_t Result=0;
 
     // Iterators.
-    //size_t reject_length = 0;
     register int reject_length = 0;
     register int i=0;
 
@@ -1160,8 +1233,7 @@ size_t strcspn ( const char *str, const char *reject ){
         reject_length++;
     };
 
-	// ?? Não seria "result==1" ??
-	//for ( size_t result = 0; 1; result++ )
+
     for ( Result=0; Result=1; Result++ )
     {
         char c = str[Result];
@@ -1170,10 +1242,7 @@ size_t strcspn ( const char *str, const char *reject ){
 
         for ( i=0; i < reject_length; i++ )
         {
-            if ( str[Result] != reject[i] )
-            { 
-                continue; 
-            }
+            if ( str[Result] != reject[i] ){ continue; }
 
             matches = 1;
             break;
@@ -1197,42 +1266,42 @@ size_t strspn ( const char *str, const char *accept ){
     int result=0;
 
     //iterators
-	//size_t accept_length = 0;
     register int accept_length = 0; 
     register int i=0;
 
-		//bool matches = false;
     int matches = 0;
 
 
-	while ( accept[accept_length] )
-		accept_length++;
-	
-	
-	// ?? Não seria "result==1" ??
-	//for ( size_t result = 0; true; result++ )
+    //if( (void*) str == NULL )
+        //return -1;
+
+
+    while ( accept[accept_length] )
+    {
+        accept_length++;
+    };
+
     
     for ( result = 0; result = 1; result++ )
     {
         char c = str[result];
 
-		if ( !c )
-			return (size_t) result;
-		
-		
-		//for ( size_t i = 0; i < accept_length; i++ )
-		
-	    for ( i=0; i<accept_length; i++ )
-		{
-			if ( str[result] != accept[i] )
-				continue;
-			matches = 1;
-			break;
-		};
-		
-		if ( !matches )
-			return (size_t) result;
-	};
+        if ( !c ){
+            return (size_t) result;
+        }
+
+        for ( i=0; i<accept_length; i++ )
+        {
+            if ( str[result] != accept[i] ){ continue; }
+
+            matches = 1;
+            break;
+        };
+
+        if ( !matches ){
+            return (size_t) result;
+        }
+    };
 }
 
 
@@ -1254,6 +1323,9 @@ char *strtok_r ( char *s, const char *delim, char **last )
     register int c=0; 
     register int sc=0;
 
+
+    //#ugly
+
     if ( s == NULL && (s = *last) == NULL )
     {
         return NULL;
@@ -1264,6 +1336,8 @@ char *strtok_r ( char *s, const char *delim, char **last )
 cont:
     
     c = *s++;
+
+    // #ugly
     
     for ( spanp = (char *) delim; (sc = *spanp++) != 0; )
     {
@@ -1277,7 +1351,7 @@ cont:
         *last = NULL;
 
         return NULL;
-    };
+    }
 
     tok = s -1;
 
@@ -1286,16 +1360,15 @@ cont:
 	 
     for (;;)
     {
-	    c = *s++;
-	    spanp = (char *) delim;
-	    
+        c = *s++;
+        spanp = (char *) delim;
+
         do
         {
-	        if ( (sc = *spanp++) == c )
-	        {
+            if ( (sc = *spanp++) == c )
+            {
                 if ( c == 0 ){
                     s = NULL;
-
                 }else{
 
                     char *w = s -1;
@@ -1303,11 +1376,11 @@ cont:
                     *w = '\0';
                 };
 
-		        *last = s;
-				
-		        return tok;
-	        };
-			
+                *last = s;
+
+                return tok;
+            };
+
         } while( sc != 0 );
         
 		//Nothing.
@@ -1327,6 +1400,12 @@ char *strtok ( char *s, const char *delim )
 {
     static char *last;
 
+    //if( (void*) s == NULL )
+        //return (char *) 0;
+
+    //if( (void*) delim == NULL )
+        //return (char *) 0;
+
     return strtok_r ( s, delim, &last );
 }
 
@@ -1340,32 +1419,48 @@ char *strtok ( char *s, const char *delim )
 char *strchr (const char *s, int c)
 {
 
-	for (; *s != (char) c; ++s)
-		if (*s == '\0')
-			return NULL;
+    //if( (void*) s == NULL )
+        //return (char *) 0;
+
+    //#ugly
+    for (; *s != (char) c; ++s)
+    {
+        if (*s == '\0'){
+            return NULL;
+        }
+    };
 
     return (char *) s;
 }
 
 
 /*linux style*/
-void *memmove (void *dest, const void *src, size_t count){
-
+void *memmove (void *dest, const void *src, size_t count)
+{
     char *tmp;
     const char *s;
 
+
+    //if(count<0)
+        //return NULL;
+
     if (dest <= src) {
-		tmp = dest;
-		s = src;
-		while (count--)
-			*tmp++ = *s++;
+        tmp = dest;
+        s = src;
+        
+        while (count--){
+            *tmp++ = *s++;
+        };
+
     } else {
-		tmp = dest;
-		tmp += count;
-		s = src;
-		s += count;
-		while (count--)
-			*--tmp = *--s;
+        tmp = dest;
+        tmp += count;
+        s = src;
+        s += count;
+
+        while (count--){
+            *--tmp = *--s;
+        };
     };
 
     return dest;
@@ -1384,18 +1479,27 @@ void *memmove (void *dest, const void *src, size_t count){
  * the area if @c is not found
  */
  
-void *memscan (void *addr, int c, size_t size){
-
+void *memscan (void *addr, int c, size_t size)
+{
     unsigned char *p = addr;
 
-    while (size){
 
-		if (*p == c)
-			return (void *)p;
-		p++;
-		size--;
+    //if( (void*) addr == NULL ){
+    //    return NULL;
+    //}
+
+    //if(size<0)
+        //return NULL;
+
+    while (size)
+    {
+        if (*p == c){
+            return (void *) p;
+        }
+
+        p++;
+        size--;
     };
-
 
     return (void *) p;
 }
@@ -1408,24 +1512,31 @@ void *memscan (void *addr, int c, size_t size){
  * @s2: The string to search for
  */
 
-char *strstr (const char *s1, const char *s2){
-
+char *strstr (const char *s1, const char *s2)
+{
     register size_t l1=0; 
     register size_t l2=0;
 
 
     l2 = strlen(s2);
 
-	if (!l2)
-		return (char *)s1;
-	l1 = strlen(s1);
-	
+    if (!l2){
+        return (char *) s1;
+    }
+
+    l1 = strlen(s1);
+
     while (l1 >= l2)
     {
-		l1--;
-		if (!memcmp(s1, s2, l2))
-			return (char *)s1;
-		s1++;
+        l1--;
+        
+        // #ugly
+        if ( !memcmp(s1, s2, l2) )
+        {
+            return (char *)s1;
+        }
+
+        s1++;
     };
 
     return NULL;
@@ -1488,18 +1599,20 @@ char *__strdup (char *l){
 char *index (const char *s, int c){
 
     do {
-        if (*s == c)
+
+        if (*s == c){
             return (char *) (s);
+        }
 
     } while (*s++);
 
-    return(NULL);
+    return (NULL);
 }
 
 
 char *rindex (const char *s, int c)
 {
-    return (char *) strrchr (s, c);
+    return (char *) strrchr(s,c);
 }
 
 
@@ -1512,8 +1625,8 @@ char *rindex (const char *s, int c)
  
 // Credits: apple open source 
 
-size_t strxfrm (char *dst, const char *src, size_t n){
-
+size_t strxfrm (char *dst, const char *src, size_t n)
+{
     // The return.
     size_t srclen=0; 
     
@@ -1604,11 +1717,19 @@ strerror_r (
     char *buf, 
     size_t buflen )
 {
-    char *msg = strerror (errnum);
+    size_t tmp=0;
+    char *msg = strerror(errnum);
+  
 
-    if (strlen(msg) >= buflen)
+    if( (void*) buf == NULL ){
+        return -1;
+    }
+
+    tmp = strlen(msg);
+
+    if (tmp >= buflen){
         return -1;  //return ERANGE;
-
+    }
 
     strcpy(buf, msg);
 
@@ -1643,24 +1764,27 @@ char *strsignal (int sig)
 }
 
 
-//isso ja existe no atacama.
+
 //#define tolower(c)	(isupper(c) ? c + 'a' - 'A' : c)
 //#define toupper(c)	(islower(c) ? c + 'A' - 'a' : c)
-
 // Converte a string para tudo maiusculo.
-void strtoupper (char *src){
 
+void strtoupper (char *src)
+{
     char *c;
 
-    if (!src){
+    if ( (void*) src == NULL ){
         return;
     }
+    
+    //if( *src == 0 ){ return; }
 
     c = src;
   
     while ((*c)!='\0')
     {
         (*c) = toupper (*c);
+
         c++;
     };
 }
@@ -1691,6 +1815,33 @@ ll:
     return (1);
 }
 */
+
+
+// #not tested.
+char *strrev(char *str)
+{
+    int   start=0;
+    int   end=0;
+    char  tmp=0;
+
+    start = 0;
+
+    end = strlen(str);
+    end = end-1;
+
+    while (start < end)
+    {
+        tmp = str[start];
+        
+        str[start] = str[end];
+        str[end] = tmp;
+
+        start++;
+        end--;
+    };
+
+    return (char *) str;
+}
 
 
 //

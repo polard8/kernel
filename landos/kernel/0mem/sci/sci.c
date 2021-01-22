@@ -2349,8 +2349,8 @@ void *sci0 (
         // 174
         case SYS_SEARCHFILE:
             debug_print ("sci0: SYS_SEARCHFILE\n");
-            return (void *) KiSearchFile ( 
-                                (unsigned char *) arg2, 
+            return (void *) search_in_dir ( 
+                                (const char *) arg2, 
                                 (unsigned long)   arg3 );
             break;
 
