@@ -19,13 +19,10 @@ asm-stuff:
 
 
 cp-stuff:
-#	-cp BM.BIN ../../../../../bin/boot/
-	-cp BM.BIN ../bin/
-
+	-cp BM.BIN ../../bin/
 clean:
 #	find . -type f -name '*.o' -delete
 	-rm BM.BIN
-	
 clean2:
 	-rm BM.BIN
 	

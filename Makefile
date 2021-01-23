@@ -113,9 +113,15 @@ land-boot:
 	@echo "=================== "
 	@echo "Compiling landboot/ ... "
 	# todo: Create a makefile inside  the boot/ folder.
-	$(Q) $(NASM)    landboot/x86/0vhd/main.asm -I landboot/x86/0vhd/ -o GRAMADO.VHD   
-	$(Q) $(MAKE) -C landboot/x86/1bm/ 
-	$(Q) $(MAKE) -C landboot/x86/2bl/ 
+
+	# virtual disks.
+	# Generic name to avoid proprietary stuff.
+	$(Q) $(NASM)  landboot/x86/legacy/vd0/main.asm -I landboot/x86/legacy/vd0/ -o GRAMADO.VHD 
+#	$(Q) $(NASM)  landboot/x86/legacy/vd1/main.asm -I landboot/x86/legacy/vd1/ -o GRAMADO.VHD   
+# ...
+
+	$(Q) $(MAKE) -C landboot/x86/legacy/bm1632/ 
+	$(Q) $(MAKE) -C landboot/x86/legacy/bl32/ 
 	sudo cp landboot/x86/bin/BM.BIN  base/
 	sudo cp landboot/x86/bin/BM.BIN  base/BOOT
 	sudo cp landboot/x86/bin/BM.BIN  base/SBIN
@@ -356,43 +362,11 @@ clean-system-files:
 
 ## ==================================================================
 ## The extra stuff.
-## 1) ISO support.
 ## 2) HDD support.
 ## 3) VM support.
 ## 4) Serial debug support.
 ## 5) Clean files support.
 ## 6) Usage support.
-
-#
-# ======== ISO ========
-#
-
-# test
-# todo
-# Create a .ISO file using nasm.
-makeiso-x86:
-	#todo:  
-	#nasm -I kernel/boot/x86/iso/stage1/ \
-	#-I kernel/boot/x86/iso/???/  kernel/boot/x86/iso/main.asm  -o  GRAMADO.ISO
-	
-	@echo "#todo Create ISO using nasm"
-	
-# ISO
-# Mount stage1.bin file with nasm.
-# Create a .ISO file and move all the content of the /bin folder
-# into the .ISO file.
-geniso-x86:
-	
-	#stage1
-	#$(NASM) land/boot/x86/iso/stage1/stage1.asm -f bin -o stage1.bin
-	#cp stage1.bin bin/boot/gramado/
-	#rm stage1.bin
-
-	#.ISO
-#	mkisofs -R -J -c boot/gramado/boot.catalog -b boot/gramado/stage1.bin -no-emul-boot -boot-load-size 4 -boot-info-table -o GRAMADO.ISO bin
-	
-	@echo "iso Success?"	
-
 
 
 #

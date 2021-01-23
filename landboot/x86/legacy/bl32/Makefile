@@ -120,15 +120,13 @@ bl-x86:
 link-x86:
 	$(LD) -m i386pe -T link.ld -o BL.BIN $(myObjects)    
 
-
 finalize:
-	cp BL.BIN ../bin/
-
+	cp BL.BIN ../../bin/
 
 clean:
 	find . -type f -name '*.o' -delete
 	-rm BL.BIN
-	
+
 clean2:
 	-rm BL.BIN
 	
