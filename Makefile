@@ -116,18 +116,19 @@ land-boot:
 
 	# virtual disks.
 	# Generic name to avoid proprietary stuff.
-	$(Q) $(NASM)  landboot/x86/legacy/vd0/main.asm -I landboot/x86/legacy/vd0/ -o GRAMADO.VHD 
-#	$(Q) $(NASM)  landboot/x86/legacy/vd1/main.asm -I landboot/x86/legacy/vd1/ -o GRAMADO.VHD   
+	$(Q) $(NASM)  landboot/vd/fat/main.asm -I landboot/vd/fat/ -o GRAMADO.VHD 
+#	$(Q) $(NASM)  landboot/vd/mbr/main.asm -I landboot/vd/mbr/ -o GRAMADO.VHD 
 # ...
 
-	$(Q) $(MAKE) -C landboot/x86/legacy/bm1632/ 
-	$(Q) $(MAKE) -C landboot/x86/legacy/bl32/ 
-	sudo cp landboot/x86/bin/BM.BIN  base/
-	sudo cp landboot/x86/bin/BM.BIN  base/BOOT
-	sudo cp landboot/x86/bin/BM.BIN  base/SBIN
-	sudo cp landboot/x86/bin/BL.BIN  base/
-	sudo cp landboot/x86/bin/BL.BIN  base/BOOT
-	sudo cp landboot/x86/bin/BL.BIN  base/SBIN
+	$(Q) $(MAKE) -C landboot/bm1632/x86/ 
+	$(Q) $(MAKE) -C landboot/bl32/x86/ 
+
+	sudo cp landboot/bin/BM.BIN  base/
+	sudo cp landboot/bin/BM.BIN  base/BOOT
+	sudo cp landboot/bin/BM.BIN  base/SBIN
+	sudo cp landboot/bin/BL.BIN  base/
+	sudo cp landboot/bin/BL.BIN  base/BOOT
+	sudo cp landboot/bin/BL.BIN  base/SBIN
 
 
 land-lib:
@@ -345,7 +346,7 @@ clean-system-files:
 	@echo "==================="
 	@echo "Cleaning all system binaries ..."
 
-	-rm -rf landboot/x86/bin/*.BIN
+	-rm -rf landboot/bin/*.BIN
 	-rm -rf landlib/fonts/bin/*.FON
 	-rm -rf landos/kernel/KERNEL.BIN
 	-rm -rf landos/init/*.BIN

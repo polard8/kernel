@@ -1,0 +1,4 @@
+
+
+	this bootcode does not support any file system ...
+	it simply loads the code, just lie grub.
