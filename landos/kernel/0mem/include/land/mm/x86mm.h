@@ -155,7 +155,12 @@ kernel fica com o 1GB superior."
  
 
 
-
+/*
+// Uma página de 4KB pode ter no máximo 1024 PDEs.
+#define PDE_PER_4KBPAGE    1024
+// Uma página de 4KB pode ter no máximo 1024 PTEs.
+#define PTE_PER_4KBPAGE    1024
+*/
 
 
 

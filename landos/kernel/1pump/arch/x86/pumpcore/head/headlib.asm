@@ -658,9 +658,11 @@ _idle_halt_cpu:
     jmp _idle_halt_cpu
 
 
+
 ;; =============================
-global _refresh_tlb
-_refresh_tlb:
+;; flush TLB
+global _hal_flush_tlb
+_hal_flush_tlb:
     push eax
     mov eax, cr3
     ;; todo: delay ?
@@ -670,23 +672,20 @@ _refresh_tlb:
     ret
 
 
-;; =============================
 global _arch_pause
 _arch_pause:
     pause
     ret
-
 
 global _interrupts_enable
 _interrupts_enable:
     sti
     ret
 
-
 global _interrupts_disable
 _interrupts_disable:
     cli
-	ret
+    ret
 
 
 ;================================================
@@ -707,12 +706,13 @@ setup_gdt:
 ;++
 
 setup_idt:
+
     pushad
-	mov edx, unhandled_int  
-	
-	mov eax, dword 0x00080000    ;/* selector = 0x0008 = cs */	
-	mov ax, dx		             ;uma parte do endereço
-    
+    mov edx, unhandled_int  
+
+    mov eax, dword 0x00080000    ; selector = 0x0008 = cs 
+    mov ax, dx                   ; uma parte do endereço
+ 
     ;; #test
     ;; Se a intenção é nos proteger
     ;; das interrupções de hardware inesperadas, então devemos
@@ -726,26 +726,30 @@ setup_idt:
     
     ;;obs: 0xEE00 tem funcionado bem para todos os casos.
  
-    
-	;mov dx, word 0x8E00	         ;/* interrupt gate - dpl=0, present */
+    ;interrupt gate - dpl=0, present
+    ;mov dx, word 0x8E00
+
+    ;; Use this one.
     mov dx, word 0xEE00
-	
-	mov edi, dword _idt                
-	
-	mov ecx, dword 256
-rp_sidt:	
-	mov dword [edi+0], eax
-	mov dword [edi+4], edx
-	add  edi, dword 8	
-	dec ecx
-	jne rp_sidt	
-	
+
+    mov edi, dword _idt
+
+    mov ecx, dword 256
+
+rp_sidt:
+
+    mov dword [edi+0], eax
+    mov dword [edi+4], edx
+    add  edi, dword 8
+    dec ecx
+    jne rp_sidt
+
 	;#bugbug
 	;lidt [IDT_register]	
-		
-	popad
-	ret
-;;--	
+
+    popad
+    ret
+;;--
 
 
 ;=====================================
@@ -755,41 +759,44 @@ rp_sidt:
 ; eax = endereço
 ; ebx = número do vetor
 ;
+
 global _setup_idt_vector
 _setup_idt_vector:
+
     ;cli
-	pushad
+    pushad
 
     mov dword [.address], eax    ;endereço.
     mov dword [.number],  ebx    ;numero do vetor.
 
-	;calcula o deslocamaneto
-	mov eax, dword 8
-	mov ebx, dword [.number]
-	mul ebx
-	;resuldado em eax
-	
-	;adiciona o deslocamento à base.
-	mov edi, dword _idt               
-	add edi, eax
-		
-	mov edx, dword [.address]    ;unhandled_int ;ignore_int       ;lea edx, ignore_int
-	
-	mov eax, dword 0x00080000    ;/* selector = 0x0008 = cs */	
-	mov ax, dx		             ;uma parte do endereço
-	
-	mov dx, word 0xEE00	 ;;para hardware
-	
-    ;coloca o vetor na idt
-	mov dword [edi+0], eax
-	mov dword [edi+4], edx
-	
- 	;recarrega a nova idt
+    ;calcula o deslocamaneto
+    mov eax, dword 8
+    mov ebx, dword [.number]
+    mul ebx
+    ;resuldado em eax
+
+    ;adiciona o deslocamento à base.
+    mov edi, dword _idt
+    add edi, eax
+
+    mov edx, dword [.address]
+
+    mov eax, dword 0x00080000    ;/* selector = 0x0008 = cs */	
+    mov ax, dx                   ;uma parte do endereço
+
+    ;;para hardware
+    mov dx, word 0xEE00
+
+    ; coloca o vetor na idt
+    mov dword [edi+0], eax
+    mov dword [edi+4], edx
+
+	;recarrega a nova idt
 	;lidt [IDT_register]	
-	
-	popad
-	;sti
-	ret
+
+    popad
+    ;sti
+    ret
 .address: dd 0
 .number: dd 0
 
@@ -816,6 +823,7 @@ _x86_enable_pse:
 ; * shut down
 ; @todo: ainda não implementada.
 ;
+
 global _asm_shut_down
 _asm_shut_down:
     jmp _asm_reboot  ;;Errado.      

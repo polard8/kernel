@@ -918,6 +918,35 @@ void x86_sse_init (void)
 }
 
 
+
+/*
+ #todo
+void x86_firmware_dialog( int routine_number );
+void x86_firmware_dialog( int routine_number )
+{
+    switch(routine_number){
+    
+        //reboot
+        case 1:
+            hal_reboot();
+            break;
+        
+        //shutdown
+        case 2:
+            hal_shutdown();
+            break;
+        
+        // ...
+        
+        default:
+            break;
+
+    };
+}
+*/
+
+
+
 //
 // End.
 //

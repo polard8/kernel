@@ -78,47 +78,37 @@ int load_kernel ()
 #endif
 
 
-    // Carregando KERNEL.BIN no endereço físico.
+    //
+    // Load kernel image
+    //
 
-    //isso funciona.
-    //Status = (int) fsLoadFile ("KERNEL  BIN", kernel_pa, FAT16_ROOTDIR_ADDRESS );
+    // Load KERNEL.BIN on a physical address.
+    // Search the file in the /SBIN/ and /BOOT/ subdirectories
+    // of the boot partition.
 
-    // #test
-    // Carregador usando path.
-    // Isso só suporta dois níveis por enquanto.
-    // Caso não for encontrado no subdiretório, tenta no diretório raiz.
-        
-    //#importante: Esse funciona.    
-    //Status = (int) load_path ( "BOOT       /KERNEL  BIN", 
-                       //(unsigned long) kernel_pa );
-     
-    //#importante: Esse funciona. 
+
     Status = (int) load_path(
                        "/SBIN/KERNEL.BIN", 
                        (unsigned long) kernel_pa );
-
-    if ( Status != 0 )
-    {
+    // Fail
+    if ( Status != 0 ){
+        // Try again
         Status = (int) load_path(
                            "/BOOT/KERNEL.BIN", 
                            (unsigned long) kernel_pa );
-
-        if ( Status != 0 ){
-            printf("load_kernel: FAIL *hang breakpoint \n");
-            refresh_screen();
-            while(1){}
-        }
-
-        //PLANO B;
-        //Status = (int) fsLoadFile ( "KERNEL  BIN", 
-        //                   kernel_pa, FAT16_ROOTDIR_ADDRESS );
     }
 
     if (Status != 0 ){
-        printf("load_kernel fail: Load\n");  goto fail;    
+        printf("load_kernel: [FAIL] Couldn't load the kernel image\n");
+        goto fail;    
     }
 
-	// Check for .ELF file. 0x7f 0x45 0x4c 0x46 (.ELF)	
+    //
+    // Check signature.
+    //
+
+    // Check for .ELF file signature. 
+    // 0x7f 0x45 0x4c 0x46 (.ELF)
 
     if ( kernel[0] != 0x7F || 
          kernel[1] != 'E' || kernel[2] != 'L' || kernel[3] != 'F' )

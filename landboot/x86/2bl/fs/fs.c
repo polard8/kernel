@@ -456,7 +456,7 @@ fsLoadFile (
 
     unsigned long i = 0;
     unsigned long j = 0;
-    unsigned short next;
+    unsigned short next=0;
 
 
     //dir support.
@@ -479,7 +479,7 @@ fsLoadFile (
     
     // Cluster inicial.
     
-    unsigned short cluster=0;   
+    unsigned short cluster=0;
 
 
 
@@ -507,14 +507,12 @@ fsLoadFile (
 
     // check
 
-    if ( file_address == 0 )
-    {
+    if ( file_address == 0 ){
         printf("fsLoadFile: [FAIL] file_address\n");
         goto fail;
     }
 
-    if ( dir_address == 0 )
-    {
+    if ( dir_address == 0 ){
         printf("fsLoadFile: [FAIL] dir_address\n");
         goto fail;
     }
@@ -529,8 +527,7 @@ fsLoadFile (
 	//fs_load_rootdirEx();
 
 
-    if ( g_fat16_root_status != 1 )
-    {
+    if ( g_fat16_root_status != 1 ){
         printf ("fsLoadFile: Root Status \n");
         goto fail;
     }
@@ -630,14 +627,11 @@ found:
 	// Ele será previamente carregado em main().
     // Carrega a FAT na memória. 
 	//fs_load_fatEx();
-	
 
-    if ( g_fat16_fat_status != 1 )
-    {
-        printf("fsLoadFile: FAT Status \n");     
+    if ( g_fat16_fat_status != 1 ){
+        printf("fsLoadFile: [FAIL] FAT Status \n");
         goto fail;
     }
-
 
 	//#debug. 
 	//printf("carregar_arquivo: Loading file ...\n"); 
@@ -717,15 +711,11 @@ while(1)
 
     goto LOOP_next_entry;
 
-// ==============================
-// Fail: 
+// ===================================
 // O arquivo não pode ser carregado.
-
 fail:
-
     printf ("fsLoadFile: Fail\n");
     refresh_screen ();
-
     return 1;
 
 // ==============================
@@ -742,7 +732,6 @@ done:
     // #debug
     
     printf ("bl.bin: File LOADED!\n");
-
     return 0;
 }
 
@@ -757,16 +746,14 @@ unsigned long path_count (unsigned char *path)
     int i=0;
     int max = (80*25);
 
-    if ( (void*) path == NULL )
-    {
+
+    if ( (void*) path == NULL ){
         printf ("path_count: [FAIL] path\n");
     }
 
-    if (*path == 0)
-    {
+    if (*path == 0){
         printf ("path_count: [FAIL] *path\n");
     }
-
 
     for ( i=0; i < max; i++ )
     {

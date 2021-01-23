@@ -25,6 +25,8 @@
 // Isso porque precisamos de endereços que terminem com pelo menos 
 // 12bits zerados.
 // #todo: 
+// Podemos fazer uma contagem de alocaçao possivel nesse heap
+// #todo: 
 // Precisamos encontrar outro lugar para esse heap, tendo em vista que
 // o número de diretórios criados será grande e o heap invadirá 
 // outras áreas.
@@ -34,6 +36,10 @@
 // See: mm/x86/pages.c
 
 #define  ____DANGER_TABLE_POINTER_HEAP_BASE    0x1000
+
+//#todo
+// Define min and max
+// Quantos diretórios podemos alocar aqui?
 
 
 // ===================================================
@@ -68,6 +74,13 @@
 
 // #todo
 // Tem espaço sobrando aqui ??
+
+
+// #todo
+// Deveria ter uma área de memória de onde pegaríamos 
+// as pagetables que precisamos, em ordem,
+// podendo contar um numero mínimo e máximo de pagetables
+// no sistema.
 
 
 // 0x0008F000 Tabela para mapear a parte mais baixa da memória física. Começa em 0.
