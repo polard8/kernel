@@ -11,12 +11,17 @@
 ;;
 
 ;; unsigned char JumpInstruction[3];
-db 0xEB, 0x3C, 0x90
+vbr1_jmp:
+    db 0xEB, 0x3C, 0x90
 
 ;; unsigned char OemName[8];
 ;; Compatibilidade com host.
-db "MSDOS5.0" 
 ;;db 0x4D, 0x53, 0x44, 0x4F, 0x53, 0x35, 0x2E, 0x30
+vbr1_OsName:
+    DB  "MSDOS" 
+vbr1_OsVersion:
+    DB  "5.0"
+
 
 ;; unsigned short BytesPerSector;
 ;; 0x0200

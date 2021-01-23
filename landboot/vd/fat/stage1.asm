@@ -46,8 +46,15 @@ ROOTDIRSIZE  EQU (BUFFER_NAME+4)
 
     jmp START
 
-;BPB Personalizado para o VHD de 32MB usado pelo Gramado.
-BUFFER_NAME           db "MSDOS5.0"    ;GRAMADO.
+; BPB Personalizado para o VHD de 32MB usado pelo Gramado.
+; Na inicialização, reaproveitamos esse endereço como buffer.
+
+BUFFER_NAME:
+    DB "MSDOS"
+    DB "5.0"
+
+; The BPB itself.
+
 BPB:
 BytesPerSector        dw 0x0200
 SectorsPerCluster     db 1
