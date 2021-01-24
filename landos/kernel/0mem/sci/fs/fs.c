@@ -5028,6 +5028,87 @@ void fs_save_entry_on_root (unsigned long eid)
 
 
 
+/*
+// vamos colocar um nome em um dir path que ja existe.
+int build_path( const char *path, char *dir_path, char *file_name );
+int build_path( const char *path, char *dir_path, char *file_name )
+{
+
+    // check pointer validation
+
+
+    // target
+
+    if ( (void*) path == NULL )
+        return FALSE;
+
+    // dir path
+
+    if ( (void*) dir_path == NULL )
+        return FALSE;
+
+    if ( *dir_path == 0)
+        return FALSE;
+
+    // file name
+    
+    if ( (void*) file_name == NULL )
+        return FALSE;
+
+    if ( *file_name == 0)
+        return FALSE;
+
+
+
+    // root dir.
+    *(path + 0 ) = '/';
+
+    // se o trem ja veio com a barra.
+    // evita barra dupla.
+    if ( *dir_path == '/' )
+        dir_path++;
+ 
+    // copia um monte menos um.
+    strncat( path, dir_path, 63 );
+ 
+    // copia o nome no final.
+    strcat( path, file_name );
+}
+*/
+
+
+/*
+int is_valid_path( const char *path );
+int is_valid_path( const char *path )
+{
+    int size=0;
+
+    if ( (void*) path == NULL )
+        return FALSE;
+    
+    if (*path == 0)
+        return FALSE;
+    
+    Size = strlen(path);
+    
+    if(Size == 0)
+        return FALSE;
+
+
+    // root "/"
+    if(Size == 1)
+        return FALSE;
+
+    // #todo
+    // Check more stuff
+    
+    return TRUE;
+}
+*/
+
+
+
+
 //
 // End.
 //
