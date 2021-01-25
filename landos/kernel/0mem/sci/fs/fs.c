@@ -3639,7 +3639,7 @@ fsLoadFile (
     unsigned long fat_address,
     unsigned long dir_address,
     int dir_entries,
-    unsigned char *file_name, 
+    const char *file_name, 
     unsigned long file_address,
     unsigned long buffer_limit )
 {

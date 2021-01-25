@@ -490,7 +490,6 @@ void set_spc(int spc);
 int get_spc (void);
  
 
-
 unsigned long fs_count_path_levels (unsigned char *path);
 
 int fs_load_path ( unsigned char *path, unsigned long address );
@@ -562,7 +561,7 @@ fsLoadFile (
     unsigned long fat_address,
     unsigned long dir_address,
     int dir_entries,
-    unsigned char *file_name, 
+    const char *file_name, 
     unsigned long file_address,
     unsigned long buffer_limit );
 

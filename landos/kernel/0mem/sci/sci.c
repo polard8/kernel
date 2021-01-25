@@ -762,17 +762,13 @@ void *gde_extra_services (
     // IN: name, dir address.
     if ( number == 900 ){
         debug_print("gde_extra_services: [900] clone and execute\n"); 
-        return (void *) clone_and_execute_process( (char *) arg2 );
+        return (void *) clone_and_execute_process( (const char *) arg2 );
     }
-
 
     // 901
     // Trying another fork() implementation. 
     // Nothing for now.
     if ( number == 901 ){ return NULL; }
-    
-    
-    
     
     // get current input mode.
     if ( number == 911 ){ return (void*) current_input_mode; }
@@ -926,7 +922,6 @@ void *gde_extra_services (
     {
         debug_print ("gde_extra_services: 4004\n");
         sys_load_path ( (unsigned char *) arg2, (unsigned long) arg3 );
-        // #todo; sys_load_path ( (unsigned char *) arg2, (unsigned long) arg3, (unsigned long) arg4 );
         refresh_screen();
         return NULL;
     }
@@ -1082,7 +1077,7 @@ void *gde_extra_services (
          //OUT: status
          fsLoadFile ( VOLUME1_FAT_ADDRESS, 
                       VOLUME1_ROOTDIR_ADDRESS, 
-                      (unsigned char*) arg2, //name 
+                      (const char*) arg2, //name 
                        (unsigned long) buf_to_r3 ); //shared address.
         
         //return the shared address
@@ -1092,16 +1087,14 @@ void *gde_extra_services (
 
     //test: pegando o endereço de um buffer de icone..
     //queremos saber se ele eh compartilhado.
+    // shared_buffer_terminal_icon
     // See: wm.c
-    if (number == 9100)
-    {
-        //return (void *) shared_buffer_terminal_icon;
-        return (void *) ui_get_system_icon( (int) arg2 );
+    if (number == 9100){
+        return (void *) ui_get_system_icon ( (int) arg2 );
     }
 
-
-    //test
-    //raise window.
+    // test
+    // raise window.
     if ( number == 9700 ){
         return (void *) raise_window ( (struct window_d *) arg2 );
     }
@@ -3037,13 +3030,13 @@ void *sci2 (
     // IN: name, dir address.
     if ( number == 900 ){
         debug_print("sc2: [900] clone and execute\n");
-        return (void *) clone_and_execute_process( (char *) arg2 );
+        return (void *) clone_and_execute_process( (const char *) arg2 );
     }
-
 
     if ( number == 8000 ){
         debug_print("sc2: [8000] ioctl\n");
-        return (void *) sys_ioctl ( (int) arg2, 
+        return (void *) sys_ioctl ( 
+                            (int) arg2, 
                             (unsigned long) arg3, 
                             (unsigned long) arg4 );
     }
@@ -3052,7 +3045,8 @@ void *sci2 (
     // See: sci/sys/sys.c    
     if ( number == 8001 ){
         debug_print("sc2: [8001] fcntl\n");
-        return (void *) sys_fcntl ((int) arg2, 
+        return (void *) sys_fcntl (
+                            (int) arg2, 
                             (int) arg3, 
                             (unsigned long) arg4 );
     }

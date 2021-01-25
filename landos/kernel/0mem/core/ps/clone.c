@@ -595,7 +595,7 @@ pid_t sys_fork_process (void)
 // IN: ??
 // OUT: ??
 
-pid_t clone_and_execute_process ( char *filename )
+pid_t clone_and_execute_process ( const char *filename )
 {
 
     // #bugbug (fs)
