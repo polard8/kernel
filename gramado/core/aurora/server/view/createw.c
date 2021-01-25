@@ -600,7 +600,6 @@ void *createwCreateWindow2 (
 
         window->used = 1;
         window->magic = 1234;
-
         window->name = windowname;
 
 		// Window type.

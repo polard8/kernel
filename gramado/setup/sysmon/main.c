@@ -3,6 +3,9 @@
 // Environment: Setup.
 
 
+// #bugbug
+// Adicionar bibliotecas causou problemas. 
+
 #include "sysmon.h"
 
 
@@ -509,9 +512,9 @@ int main ( int argc, char *argv[] ){
     gde_enter_critical_section ();  
     client_window = (void *) gde_create_window ( 
                                  WT_SIMPLE, 1, 1, "client-bg",     
-                                cw_left, cw_top, cw_width, cw_height, 
-                                main_window, 0, 
-                                cw_color, cw_color); //0xF5DEB3, 0xF5DEB3 );
+                                 cw_left, cw_top, cw_width, cw_height, 
+                                 main_window, 0, 
+                                 cw_color, cw_color); //0xF5DEB3, 0xF5DEB3 );
 
     if ( (void *) client_window == NULL)
     {
@@ -519,11 +522,10 @@ int main ( int argc, char *argv[] ){
         gde_show_backbuffer();
         gde_exit_critical_section ();
         exit(1);
-        //while(1){}
     }
     gde_register_window (client_window);
     gde_show_window (client_window);
-    gde_exit_critical_section ();  
+    gde_exit_critical_section ();
     //--
 
 
@@ -638,13 +640,12 @@ int main ( int argc, char *argv[] ){
 	// == Loop ===================
 	//
 
-
     unsigned long message_buffer[5];
 
 Mainloop:
 
-    while (running)
-    {
+    while (running){
+
         gde_enter_critical_section (); 
         system_call ( 111,
             (unsigned long) &message_buffer[0],
@@ -655,23 +656,22 @@ Mainloop:
 
         if ( message_buffer[1] != 0 )
         {
-            sysmonProcedure ( (struct window_d *) message_buffer[0], 
-               (int) message_buffer[1], 
-               (unsigned long) message_buffer[2], 
-               (unsigned long) message_buffer[3] );
+            sysmonProcedure ( 
+                (struct window_d *) message_buffer[0], 
+                (int)               message_buffer[1], 
+                (unsigned long)     message_buffer[2], 
+                (unsigned long)     message_buffer[3] );
 
             message_buffer[0] = 0;
             message_buffer[1] = 0;
             message_buffer[2] = 0;
             message_buffer[3] = 0;
-        };
+        }
     };
-
 
 fail:
     printf ("sysmon: Exit with error\n");
     return -1;
-
 done:
     printf ("sysmon: Exit\n");
     return 0;

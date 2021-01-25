@@ -5,7 +5,6 @@
  *
  * History:
  *     2019 - Created by Fred Nora.
- *     2020    
  */
 
 
@@ -44,17 +43,19 @@ gws_WriteToClient (
  * xxxThread:
  *     Um thread dentro para testes.
  */
+
 void xxxThread (void){
-	printf("\n");
-	printf("$\n");
-	printf("$$\n");
-	//printf("$$$\n");
-    printf("#### This is a thread ####\n");
-	//printf("$$$\n");
-	printf("$$\n");
-	printf("$\n");
+
     printf("\n");
-	
+    printf("$\n");
+    //printf("$$\n");
+    //printf("$$$\n");
+    printf("#### This is a thread ####\n");
+    //printf("$$$\n");
+    //printf("$$\n");
+    printf("$\n");
+    printf("\n");
+
     gws_show_backbuffer ();
 
     //while(1){}
@@ -223,20 +224,12 @@ void gwssrv_start_thread (void *thread)
 }
 
 
-
-
-
-
 int service_drain_input (void)
 {
     gwssrv_debug_print ("gwssrv: service_drain_input [TODO]\n");
     //handle_ipc_message();
     return -1;
 }
-
-
-
-
 
 
 // #todo
@@ -280,12 +273,10 @@ unsigned long gws_get_device_width(void)
 }
 
 
-
 unsigned long gws_get_device_height(void)
 {
     return (unsigned long) __device_height;
 }
-
 
 
 int gwssrv_init_globals(void)
@@ -420,9 +411,8 @@ int gwsInit(void)
 
     CurrentDisplay = (void *) malloc (sizeof(struct gws_display_d));
     
-    if ( (void*) CurrentDisplay == NULL )
-    {
-        debug_print("gwsInit: CurrentDisplay\n");
+    if ( (void*) CurrentDisplay == NULL ){
+        debug_print("gwsInit: [FAIL] CurrentDisplay\n");
         return -1;
         //while(1);
     }else{
@@ -439,14 +429,11 @@ int gwsInit(void)
     // == Screen ===============================================
     //
     
-    
     DeviceScreen  = (void *) malloc (sizeof(struct gws_screen_d));
-    
-    if ( (void*) DeviceScreen == NULL )
-    {
-        debug_print("gwsInit: DeviceScreen\n");
+
+    if ( (void*) DeviceScreen == NULL ){
+        debug_print("gwsInit: [FAIL] DeviceScreen\n");
         //while(1);
-        
     }else{
         DeviceScreen->id = 0; 
         DeviceScreen->used = 1; 
@@ -667,6 +654,7 @@ void refresh_valid_screen(void)
 
 // Função padrão para todos os servidores ???
 // #todo: temos que criar isso.
+
 int serverInit (void)
 {
     printf ("serverInit: Initializing gws server ...\n");

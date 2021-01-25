@@ -5,14 +5,15 @@
  */
 
 
-
-//#include <api.h>
-
 #include <gws.h>
 
 
-
-void plotLineRect4 ( int x1, int y1, int x2, int y2, int color )
+//#bugbug: use ul for 'color'.
+void 
+plotLineRect4 ( 
+    int x1, int y1, 
+    int x2, int y2, 
+    int color )
 {
     plotLine3d ( x1,y1,0, x2,y1,0, color );
     plotLine3d ( x2,y1,0, x2,y2,0, color );
@@ -21,7 +22,12 @@ void plotLineRect4 ( int x1, int y1, int x2, int y2, int color )
 }
 
 
-void plotLineRectZ ( int x1, int y1, int z1, int x2, int y2, int z2, int color )
+//#bugbug: use ul for 'color'.
+void 
+plotLineRectZ ( 
+    int x1, int y1, int z1, 
+    int x2, int y2, int z2, 
+    int color )
 {
     plotLine3d ( x1,y1,z1, x2,y1,z2, color );
     plotLine3d ( x2,y1,z1, x2,y2,z2, color );
@@ -29,9 +35,13 @@ void plotLineRectZ ( int x1, int y1, int z1, int x2, int y2, int z2, int color )
     plotLine3d ( x1,y2,z1, x1,y1,z2, color );
 }
 
-
+//#bugbug: use ul for 'color'.
 //ok triangulo invertido.
-void testLines ( int x1, int y1, int x2, int y2, int color )
+void 
+testLines ( 
+    int x1, int y1, 
+    int x2, int y2, 
+    int color )
 {
    int dx = x2-x1;
    int dy = y2-y1;
@@ -43,16 +53,21 @@ void testLines ( int x1, int y1, int x2, int y2, int color )
 }
 
 
+//#bugbug: use ul for 'color'.
 //ok triangulo invertido.
-void testLinesZ ( int x1, int y1, int z1, int x2, int y2, int z2, int color )
+void 
+testLinesZ ( 
+    int x1, int y1, int z1, 
+    int x2, int y2, int z2, 
+    int color )
 {
-   int dx = x2-x1;
-   int dy = y2-y1;
-     
-  plotLine3d(   x1,  y1-dy, z1,   x1+dx, y1   , z2, color);
-  plotLine3d(x1+dx,     y1, z1,     x1, y1+dy , z2, color);
-  plotLine3d(   x1,  y1+dy, z1,  x1-dx, y1    , z2, color);
-  plotLine3d(x1-dx,     y1, z1,     x1, y1-dy , z2, color);
+    int dx = (x2-x1);
+    int dy = (y2-y1);
+
+    plotLine3d (   x1,  y1-dy, z1,   x1+dx, y1   , z2, color);
+    plotLine3d (x1+dx,     y1, z1,     x1, y1+dy , z2, color);
+    plotLine3d (   x1,  y1+dy, z1,  x1-dx, y1    , z2, color);
+    plotLine3d (x1-dx,     y1, z1,     x1, y1-dy , z2, color);
 }
 
 
@@ -108,15 +123,13 @@ void test_draw_line(void)
      };
 
     gwssrv_show_backbuffer();
-    //while(1){}
 }
 
 
-//test2
+// test2
 // illusion
 void test_draw_line2(void)
 {
-    
     register int g=0;
     
     unsigned long w = gws_get_device_width();
@@ -155,29 +168,22 @@ void test_draw_line2(void)
                 COLOR_BLUE );
      };
 
-
     gwssrv_show_backbuffer();
-    //while(1){}
 }
 
 
-
-
+// O buffer é uma global nesse documento.
 int servicelineBackbufferDrawHorizontalLine (void)
 {
-
-	//o buffer é uma global nesse documento.
     unsigned long *message_address = (unsigned long *) &__buffer[0];
 
-    //x1,y,x2, color
+    // x1,y,x2,color
     unsigned long x1,y,x2,color;
       
-    x1 = message_address[4];  // 
-    y  = message_address[5];   // 
-    x2 = message_address[6];  // 
+    x1    = message_address[4];
+    y     = message_address[5];
+    x2    = message_address[6];
     color = message_address[7];
-
-
 
     lineBackbufferDrawHorizontalLine ( x1, y, x2, color );
     

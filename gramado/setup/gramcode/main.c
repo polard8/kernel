@@ -11,9 +11,7 @@
  * 2018 - Created by Fred Nora.
  */
 
-
 #include "gramcode.h"
-
 
 
 #define WINDOW_LEFT      0
@@ -22,13 +20,11 @@
 #define WINDOW_HEIGHT  200
 
 
-    // main window.
-    struct window_d *hWindow;
+// main window.
+struct window_d *hWindow;
 
-    // save button.
-    struct window_d *save_button;
-
-
+// save button.
+struct window_d *save_button;
 
 
 //static int running = 1;
@@ -39,8 +35,6 @@ int running = 1;
 //static unsigned char dest_msg[512];
 
 
-
-
 //
 // internal
 //
@@ -48,28 +42,20 @@ int running = 1;
 
 void editorClearScreen(void); 
 int editor_save_file (void);
-
 void teditorTeditor (void);
-
 void shellInitSystemMetrics(void);
 void shellInitWindowLimits(void);
 void shellInitWindowPosition(void);
 void shellInitWindowSizes(void);
-
-
-
 void teditorInsertNextChar (char c);
 void teditorRefreshCurrentChar (void); 
-
 void gramcodeLinesInsertChar ( int line_number, int at, int c );
-
 
 void *teditorProcedure ( 
     struct window_d *window, 
     int msg, 
     unsigned long long1, 
     unsigned long long2 );
-
 
 int
 __SendMessageToProcess ( 
@@ -80,7 +66,6 @@ __SendMessageToProcess (
     unsigned long long2 );
 
 
-
 /*
  * editorClearScreen:
  * Limpar a tela 
@@ -89,15 +74,15 @@ __SendMessageToProcess (
 
 void editorClearScreen (void){
 
-
-    int lin=0; 
+    int lin=0;
     int col=0;
 
 
-	// @todo:
-	//system( "cls" ); // calls the cls command.
-	
-    gde_set_cursor (0,0);
+    // #todo
+    // We need to get the system metrics
+    // for display info.
+
+    gde_set_cursor(0,0);
 
 	// Tamanho da tela. 80x25
 
@@ -114,7 +99,6 @@ void editorClearScreen (void){
             printf ("%c",' ');
         };
     };
-
 
     gde_set_cursor (0,2);
 }
@@ -185,7 +169,6 @@ int editor_save_file (void){
 	//len = (size_t) strlen (file_1);
     len = (size_t) strlen ( RAW_TEXT );
 
-
     if (len <= 0)
     {
         printf ("editor_save_file: [FAIL] Empty file.\n");
@@ -227,16 +210,16 @@ int editor_save_file (void){
         return (int) 1;
     }
 
-	//
-	// Save
-	//
 
+    // Save
     // name, number of sectors, size in bytes, address, flag.
 
-    Ret = (int) gde_save_file ( file_1_name, 
-                    number_of_sectors, len,            
+    Ret = (int) gde_save_file ( 
+                    file_1_name,
+                    number_of_sectors, 
+                    len,
                     &RAW_TEXT[0], 
-                    0x20 );    
+                    0x20 );
 
     printf ("done\n");
 
@@ -265,7 +248,6 @@ void *teditorProcedure (
 
     switch (msg)
     {
-
         case MSG_CREATE: 
             saveCreateButton(); 
             goto done;
@@ -411,9 +393,6 @@ void *teditorProcedure (
             break;
     };
 
-
-    // done
-
 done:
 
     // Esse tratamento pode ir para essa chamada na api.
@@ -431,7 +410,7 @@ done:
  * teditorTeditor:
  *     Contrutor e inicialização.
  */
- 
+
 void teditorTeditor (void){
 
     int i=0;
@@ -482,7 +461,7 @@ void shellInitSystemMetrics (void){
     smMousePointerHeight = gde_get_system_metrics(6);
 
     smCharWidth =  gde_get_system_metrics(7);
-    smCharHeight = gde_get_system_metrics(8);	
+    smCharHeight = gde_get_system_metrics(8);
     
     //...
 }
@@ -564,10 +543,8 @@ void shellInitWindowPosition (void)
  *     Memória de vídeo virtual, semelhante a vga.
  */
 
-void teditorInsertNextChar (char c){
-	
-
-    // Isso funcionou.
+void teditorInsertNextChar (char c)
+{
     char buff[2];
     buff[0] = (char) c;
     buff[1] = (char) '\0';
@@ -592,30 +569,31 @@ void teditorInsertNextChar (char c){
 
     if (textCurrentCol >= 80 )
     {
-		textCurrentCol = 0;
-		
-		textCurrentRow++;
-		
-		if ( textCurrentRow >= 25 )
-		{
+        textCurrentCol = 0;
+        textCurrentRow++;
+
+        if ( textCurrentRow >= 25 )
+        {
 			//teditorScroll ();
 			printf(" *SCROLL");
 			while(1){ asm("pause"); }
-		}
-    };
+        }
+    }
 
-
-    LINES[textCurrentRow].pos = textCurrentCol;
+    LINES[textCurrentRow].pos   = textCurrentCol;
     LINES[textCurrentRow].right = textCurrentCol;
 }
 
 
-
 void 
-gramcodeLinesInsertChar ( int line_number, 
-                          int at, 
-                          int c )
+gramcodeLinesInsertChar ( 
+    int line_number, 
+    int at, 
+    int c )
 {
+    if (line_number<0){ return; }
+    if (at<0)         { return; }
+    
     LINES[line_number].CHARS[at] = (char) c;
 }
 
@@ -690,8 +668,7 @@ __SendMessageToProcess (
 	message_buffer[3] = (unsigned long) long2;
 	//...
 
-
-    return (int) gramado_system_call ( 112 , 
+    return (int) gramado_system_call ( 112, 
                      (unsigned long) &message_buffer[0], 
                      (unsigned long) pid, 
                      (unsigned long) pid );
@@ -946,12 +923,17 @@ skip_test:
     // A janelas eh realmente relativa a janela mae?
 
     //++
-    gde_enter_critical_section ();  
-    editboxWindow = (void *) gde_create_window ( WT_EDITBOX, 1, 1, "editbox",     
-                                ebw_left, ebw_top, ebw_width, ebw_height, 
-                                editbox_bg_Window, 0, COLOR_WHITE, COLOR_WHITE );
-    if ( (void *) editboxWindow == NULL){
-        gde_exit_critical_section ();  
+    gde_enter_critical_section();
+    editboxWindow = (void *) gde_create_window ( 
+                                 WT_EDITBOX, 1, 1, "editbox", 
+                                 ebw_left, ebw_top, 
+                                 ebw_width, ebw_height, 
+                                 editbox_bg_Window, 0, 
+                                 COLOR_WHITE, COLOR_WHITE );
+
+    if ( (void *) editboxWindow == NULL)
+    {
+        gde_exit_critical_section();
         printf ("editboxWindow fail");
         while(1){}
     }
@@ -960,7 +942,6 @@ skip_test:
     gde_show_window (editboxWindow);
     gde_exit_critical_section ();  
     //--
-
 
 
     // #test 
@@ -1056,7 +1037,6 @@ skip_test:
 
         while (1){
             ch_test = (int) fgetc (fp);
-
             if ( ch_test == EOF ){
                 goto out;
             }else{
@@ -1154,35 +1134,25 @@ Mainloop:
             
         if ( message_buffer[1] != 0 )
         {
-            teditorProcedure ( (struct window_d *) message_buffer[0], 
-                (int) message_buffer[1], 
-                (unsigned long) message_buffer[2], 
-                (unsigned long) message_buffer[3] );
+            teditorProcedure ( 
+                (struct window_d *) message_buffer[0], 
+                (int)               message_buffer[1], 
+                (unsigned long)     message_buffer[2], 
+                (unsigned long)     message_buffer[3] );
 
             message_buffer[0] = 0;
             message_buffer[1] = 0;
             message_buffer[2] = 0;
             message_buffer[3] = 0;
-        };
+        }
     };
 
-
-
 fail:
-    printf ("fail.\n");
-
-
+    printf ("fail\n");
 done:
     //running = 0;
     printf ("Exiting editor ...\n");
-    printf ("done.\n");
-
-
+    printf ("done\n");
     return 0;
 }
-
-
-
-
-
 

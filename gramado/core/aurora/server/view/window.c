@@ -106,7 +106,6 @@ void wm_process_windows (void)
     }
 
 
-
     // #todo
     // redraw using zorder.
     // refresh using zorder.
@@ -350,7 +349,7 @@ int serviceCreateWindow (void){
     for (i=0; i<256; ++i){
         name_buffer[i] = message_address[string_off];
         string_off++;
-    }
+    };
     name_buffer[i] = 0;
     //--
 
@@ -392,12 +391,11 @@ int serviceCreateWindow (void){
     // Draw
     //
 
-    Window = (struct gws_window_d *) createwCreateWindow ( type, 
-                                        1, 1, name_buffer, 
-                                        x, y, w, h, 
-                                        Parent, 0, 
-                                        COLOR_PINK, color ); 
-
+    Window = (struct gws_window_d *) createwCreateWindow ( 
+                                         type, 1, 1, name_buffer, 
+                                         x, y, w, h, 
+                                         Parent, 0, 
+                                         COLOR_PINK, color ); 
 
     if ( (void *) Window == NULL )
     {
@@ -433,7 +431,6 @@ int serviceCreateWindow (void){
     // Show the screen.
     //gws_show_backbuffer(); 
 
-
     return 0;
 }
 
@@ -441,7 +438,6 @@ int serviceCreateWindow (void){
 
 int serviceChangeWindowPosition(void)
 {
-
 	//o buffer é uma global nesse documento.
     unsigned long *message_address = (unsigned long *) &__buffer[0];
 
@@ -671,13 +667,13 @@ int serviceRefreshRectangle (void){
 
     unsigned long left,top,width,height;
       
-    left   = message_address[4];  
-    top    = message_address[5];  
-    width  = message_address[6];  
-    height = message_address[7];  
+    left   = message_address[4];
+    top    = message_address[5];
+    width  = message_address[6];
+    height = message_address[7];
 
     gws_refresh_rectangle ( left, top, width, height );
-        
+
     return 0;
 }
 
@@ -778,7 +774,6 @@ gwssrv_redraw_window (
     struct gws_window_d *window, 
     unsigned long flags )
 {
-
     unsigned long __tmp_color=0;
 
 
@@ -1056,7 +1051,6 @@ gwssrv_redraw_window (
     
     // more types ?...
 
-
 draw_frame:
 
     if ( window->type == WT_OVERLAPPED || 
@@ -1065,20 +1059,17 @@ draw_frame:
     {
         createwDrawFrame ( 
             (struct gws_window_d *) window->parent,  //parent.
-            (struct gws_window_d *) window,      //bg do botão em relação à sua parent. 
+            (struct gws_window_d *) window,          //bg do botão em relação à sua parent. 
             0, 0, window->width, window->height, 
-            1 );  //style
-        
+            1 );                                     //style
     }
 
-    if(flags == 1)
+    if (flags == 1){
         gws_show_window_rect(window);
+    }
 
     return 0;
 }
-
-
-
 
 
 /*
@@ -1106,7 +1097,6 @@ draw_frame:
 void 
 gwssrv_initialize_color_schemes (int selected_type)
 {
-
     struct gws_color_scheme_d *humility;
     struct gws_color_scheme_d *pride;
 
@@ -1221,28 +1211,22 @@ gwssrv_initialize_color_schemes (int selected_type)
 }
 
 
-//seleciona o tipo ...isso é um serviço.
+// seleciona o tipo ...isso é um serviço.
 int gwssrv_select_color_scheme (int type){
-	//#debug
-	//printf("windowSelectColorScheme: type={%d} \n", type);
-	
-    switch (type)
-	{
-		case ColorSchemeHumility:
-		    goto do_humility;
-		    break;
-			
-		case ColorSchemePride:
-		    goto do_pride;
-			break;
-			
-		default:
-		    gwssrv_debug_print("windowSelectColorScheme: Type not defined\n");
-			goto fail;
-			break;
-	};
 
-	
+	//#debug
+	//printf("gwssrv_select_color_scheme: type={%d} \n", type);
+
+    switch (type){
+        case ColorSchemeHumility:  goto do_humility;  break;
+        case ColorSchemePride:     goto do_pride;     break;
+        default:
+            gwssrv_debug_print("gwssrv_select_color_scheme: [FAIL] Type not defined\n");
+            goto fail;
+            break;
+    };
+
+
 do_humility:
 
     if ( (void *) GWSHumilityColorScheme == NULL )
@@ -1262,17 +1246,14 @@ do_humility:
 		gwssrv_debug_print("Humility selected\n");
 	    GWSCurrentColorScheme = GWSHumilityColorScheme;	
 	    goto done;
-	};		
-	
-	
-do_pride:	
+	};
 
-    if ( (void *) GWSPrideColorScheme == NULL )
-    {
-		gwssrv_debug_print("GWSPrideColorScheme fail\n");
-        goto fail; 
-            	    	
-	}else{
+do_pride:
+
+    if ( (void *) GWSPrideColorScheme == NULL ){
+        gwssrv_debug_print("GWSPrideColorScheme fail\n");
+        goto fail;
+    }else{
 	    if( GWSPrideColorScheme->used != 1 || 
 		    GWSPrideColorScheme->magic != 1234 )
 		{
@@ -1281,25 +1262,16 @@ do_pride:
 		}
 		
 	    gwssrv_debug_print ("Pride selected\n"); 
-		GWSCurrentColorScheme = GWSPrideColorScheme;	
+		GWSCurrentColorScheme = GWSPrideColorScheme;
 	    goto done;
-	};		
+    };
 
 done:
-
-    return 0;	
-    
+    return 0;
 fail:
-
-    gwssrv_debug_print ("fail\n");
+    gwssrv_debug_print ("gwssrv_select_color_scheme: fail\n");
     return 1;
 }
-
-
-
-
-
-
 
 
 
@@ -1308,7 +1280,8 @@ fail:
  * show_window_rect:
  * 
  *     Mostra o retângulo de uma janela que está no backbuffer.
- *     Tem uma janela no backbuffer e desejamos enviar ela para o frontbuffer.
+ *     Tem uma janela no backbuffer e desejamos enviar ela 
+ * para o frontbuffer.
  *     A rotina de refresh rectangle tem que ter o vsync
  *     #todo: criar um define chamado refresh_window.
  */
@@ -1463,7 +1436,7 @@ int gwsRegisterWindow (struct gws_window_d *window)
  */
 int get_active_window (void)
 {
-    return (int) active_window;  
+    return (int) active_window;
 }
 
 
@@ -1569,15 +1542,16 @@ struct gwsssrv_menu_d *gwssrv_create_menu (
     menu->itens_count = count;
 
 
-    window = (struct gws_window_d *) createwCreateWindow ( WT_SIMPLE, 
-                                         1, 1, "menu-bg",  
-                                         menu->x, menu->y, menu->width, menu->height,   
+    window = (struct gws_window_d *) createwCreateWindow ( 
+                                         WT_SIMPLE, 1, 1, "menu-bg",  
+                                         menu->x, menu->y, 
+                                         menu->width, menu->height,   
                                          (struct gws_window_d *) parent, 0, 
-                                         color, color );    
+                                         color, color ); 
 
     if ( (void *) window == NULL )
     {
-        gwssrv_debug_print ("gwssrv: window fail\n");  
+        gwssrv_debug_print ("gwssrv_create_menu: window fail\n");  
         return NULL;
     }
 
@@ -1586,7 +1560,7 @@ struct gwsssrv_menu_d *gwssrv_create_menu (
         
     menu->window = window; 
     menu->parent = parent;
-    
+
     return (struct gwsssrv_menu_d *) menu;
 }
 
@@ -1911,17 +1885,12 @@ int gwssrv_init_windows (void)
     top_window         =0;
     //...
 
-
     // Window list
-    for (i=0; i<WINDOW_COUNT_MAX; ++i)
-        windowList[i] = 0;
-
+    for (i=0; i<WINDOW_COUNT_MAX; ++i){  windowList[i] = 0;  };
 
     // z order list
-    for (i=0; i<ZORDER_MAX; ++i)
-        zList[i] = 0;
+    for (i=0; i<ZORDER_MAX; ++i){  zList[i] = 0;  };
         
-
     // ...
 
     return 0;
@@ -2006,8 +1975,6 @@ set_window_vert (
     tss->window_bottom = j;
 }
 */
-
-
 
 //
 // End.

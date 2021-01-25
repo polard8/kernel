@@ -145,9 +145,9 @@ int grInit (void)
     
     // initialize the current projection.
     projection_initialize();
+
     // change the view for the current projection.
     view(0,40);
-    
      
     // ...
 
@@ -278,9 +278,8 @@ int view (int near, int far)
 // History:
 //     2020 - Created by Fred Nora.
 
-
-int grPlot0 (int z, int x, int y, unsigned long color){
-
+int grPlot0 (int z, int x, int y, unsigned long color)
+{
     // #todo
     // We need a z-buffer or (depth buffer)
     // it is used to depth testing.
@@ -532,9 +531,9 @@ plotLine3d (
     x1 = (dm >> 1);
     y1 = x1;
     z1 = x1;
- 
- 
-    for (;;) {  /* loop */
+
+
+    for (;;) {
 
       grPlot0 ( z0, x0, y0, color);
       
@@ -676,14 +675,13 @@ ras_rectangleZ (
     int right, int bottom, int z1,
     unsigned long color )
 {
-
     register int h=0;
 
-    // COmewça com a linha de cima.
+    // Começa com a linha de cima.
     for ( h=top; h >= bottom; h-- )
     {
         plotLine3d ( left,  h, z0, right, h, z1, color );
-    }
+    };
 }
 
 
@@ -1021,6 +1019,8 @@ plotCircle (
       
       r = err;
       
+      // #ugly routine.
+      
       /* e_xy+e_y < 0 */
       if (r <= y) 
       { 
@@ -1068,6 +1068,8 @@ plotCircleZ (
       grPlot0 ( z, xm+y, ym+x, color);
       
       r = err;
+      
+      // #ugly routine.
       
       /* e_xy+e_y < 0 */
       if (r <= y) 
@@ -1229,7 +1231,6 @@ plotEllipseRectZ (
 
 void noraDrawingStuff(void)
 {
-
     register int x=0;
     register int y=0;
 
@@ -1359,10 +1360,7 @@ multiplyMatrices (
    // Initializing elements of matrix mult to 0.
    for (i = 0; i < rr; ++i) 
    {
-      for (j = 0; j < cr; ++j) 
-      {
-          result[i][j] = 0;
-      };
+      for (j = 0; j < cr; ++j){  result[i][j] = 0;  };
    };
 
 

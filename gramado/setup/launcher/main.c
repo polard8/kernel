@@ -1,10 +1,9 @@
 // main.c 
 // app launcher
+// Environment: setup.
 
 
 #include "launcher.h"
-
-
 
 
 #define GRID_HORIZONTAL  1000
@@ -43,12 +42,8 @@ launcherProcedure (
     unsigned long long2 );
 
 
-/*
- * *********************************
- * launcherProcedure:
- *     Procedimento de janela.
- */
 
+// Window procedure.
 int 
 launcherProcedure ( 
     struct window_d *window, 
@@ -76,20 +71,20 @@ launcherProcedure (
             {  
                 case VK_F1:
                     debug_print("F1\n");
-                    gramado_system_call (900, "leasy.bin", 0, 0);
-                    exit(0);   
+                    gde_clone_and_execute("leasy.bin");
+                    exit(0);
                     break;
 
                 case VK_F2: 
-                    debug_print("F2\n"); 
-                    gramado_system_call (900, "lmedium.bin", 0, 0);
-                    exit(0);   
+                    debug_print("F2\n");
+                    gde_clone_and_execute("lmedium.bin");
+                    exit(0);
                     break;
                     
                 case VK_F3: 
-                    debug_print("F3\n"); 
-                    gramado_system_call (900, "lhard.bin", 0, 0);
-                    exit(0);   
+                    debug_print("F3\n");
+                    gde_clone_and_execute("lhard.bin");
+                    exit(0);
                     break;
      
             };
@@ -143,18 +138,17 @@ launcherProcedure (
                         printf("menu window\n");
                     }
 
-					//se
-					if ( window == main_window )
-					{
-						//raise window.
+                    if ( window == main_window )
+                    {
+                         //raise window.
 	                     //system_call ( 9700, 
 	                        // (unsigned long) window, 
 		                     //(unsigned long) window, 
 		                     //(unsigned long) window );
 		                 break;
-					}
+                    }
 
-					break;
+                    break;
             };
             goto done;
             break;
@@ -164,21 +158,21 @@ launcherProcedure (
             switch (long1)
             {
                 case 1:
-					if (window == main_window)
-					{
-						gde_set_focus (window);
-					    gde_redraw_window (window,1);
-					    break;
-					}
-                                     
+                    if (window == main_window)
+                    {
+                        gde_set_focus (window);
+                        gde_redraw_window (window,1);
+                        break;
+                    }
+
                     if ( window == launcher_button_1 )
                     {
-                        gramado_system_call ( 9901,   
+                        gramado_system_call ( 9901, 
                             (unsigned long) window, 
                             (unsigned long) window, 
                             (unsigned long) window );
                        
-                        gramado_system_call (900, "leasy.bin", 0, 0);   
+                        gde_clone_and_execute("leasy.bin");
                         exit(0);
                         break;
                     }
@@ -189,19 +183,18 @@ launcherProcedure (
                             (unsigned long) window, 
                             (unsigned long) window );
 
-                        gramado_system_call (900, "lmedium.bin", 0, 0);                          
+                        gde_clone_and_execute("lmedium.bin");
                         exit(0);
                         break;
                     }
-                    
                     if ( window == launcher_button_3 )
                     {
                         gramado_system_call ( 9901,   
                             (unsigned long) window, 
                             (unsigned long) window, 
                             (unsigned long) window );
-                            
-                        gramado_system_call (900, "lhard.bin", 0, 0);                             
+                        
+                        gde_clone_and_execute("lhard.bin");
                         exit(0);
                         break;
                     }
@@ -210,19 +203,16 @@ launcherProcedure (
             goto done;
             break;
 
-
-		case MSG_SETFOCUS:
-		    gde_redraw_window (main_window, 1);
-		    gde_redraw_window (launcher_button_1, 1);
-		    gde_redraw_window (launcher_button_2, 1);
-		    gde_redraw_window (launcher_button_3, 1);
-		    break;
-
-
-        case MSG_KILLFOCUS:
-            gde_message_box (3, "launcher","MSG_KILLFOCUS");
+        case MSG_SETFOCUS:
+            gde_redraw_window (main_window, 1);
+            gde_redraw_window (launcher_button_1, 1);
+            gde_redraw_window (launcher_button_2, 1);
+            gde_redraw_window (launcher_button_3, 1);
             break;
 
+        //case MSG_KILLFOCUS:
+            //gde_message_box (3,"launcher","MSG_KILLFOCUS");
+            //break;
 
         //PARA MOSTRAR A ÁREA DE CLIENTE.
         case MSG_PAINT:
@@ -230,16 +220,15 @@ launcherProcedure (
             gde_redraw_window (launcher_button_2, 1);
             gde_redraw_window (launcher_button_3, 1);
             break;
-        
+
         case MSG_CLOSE:
-            gde_message_box (3, "launcher","MSG_CLOSE");
+            gde_message_box (3,"launcher","MSG_CLOSE");
             gde_close_window (main_window );
-            gde_exit (0);
+            gde_exit(0);
             break;
 
-
         default:
-            debug_print("launcher: default message");
+            debug_print("launcher: default message\n");
             break;
     };
 
@@ -253,30 +242,21 @@ done:
  * main:
  */
 
-int main ( int argc, char *argv[] ){
-
+int main ( int argc, char *argv[] )
+{
     struct window_d *hWindow;
 
     FILE *fp;
 
-    int ch;
     int char_count = 0;
 
-    //#bugbug
-    //Ele falha se a largura for pouco.
-
-    //unsigned long left = 600;
-    //unsigned long top = 100;
-    //unsigned long width = 320;
-    //unsigned long height = 480;
-    
     unsigned long left;
     unsigned long top;
     unsigned long width;
     unsigned long height;
 
-    unsigned long deviceWidth  = gde_get_system_metrics (1); 
-    unsigned long deviceHeight = gde_get_system_metrics (2);
+    unsigned long deviceWidth  = gde_get_system_metrics(1);
+    unsigned long deviceHeight = gde_get_system_metrics(2);
 
 
     if ( deviceWidth == 0 || deviceHeight == 0 )
@@ -285,11 +265,12 @@ int main ( int argc, char *argv[] ){
         exit(1);
     }
 
-    left = 0;  
-    top  = 0;  
-    
-    width  = deviceWidth/4;
-    height = deviceHeight/2;
+    left   = 0;
+    top    = 0;
+    width  = (deviceWidth >> 2);
+    height = (deviceHeight >> 1);
+    //width  = (deviceWidth/4);
+    //height = (deviceHeight/2);
 
     // #hackhack
     if ( deviceWidth == 320 && deviceHeight == 200 )
