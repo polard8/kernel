@@ -1,33 +1,35 @@
 ;
-; File: lib16\s2fat12.inc
+; File: lib16/s2fat12.inc
 ;
 ; Descrição:
 ;     Suporte ao sistema de arquivos fat12 para 16bit real mode.
 ; Obs: fat12 também pode ser usado em HDs, VHDs e outras mídias, como 
 ; emuladores de floppy.
 ;
-; Histórico:
-; Versão: 1.0, 2013 - Created.
-; Versão: 1.0, 2016 - Revision.
+; History:
+;     2013 - Created by Fred Nora.
 ;
 
 
-;------------------------------------------------------------------------------
+;---------------------------------------------------------------------
 ; ReadSectors: 
 ;   
-; Reads "cx" sectors from disk starting at "ax" into memory location "es:bx".
-; ~Lê 'cx' setores do 'disco' começando em 'ax' e coloca na memória em 'es:bx'.
-;------------------------------------------------------------------------------
+; Reads "cx" sectors from disk starting at "ax" into 
+; memory location "es:bx".
+; ~Lê 'cx' setores do 'disco' começando em 'ax' e coloca na 
+; memória em 'es:bx'.
+;---------------------------------------------------------------------
+
 ;s2fat12ReadSectors:
 ReadSectors:
 rmain:
-    mov di, word 0x0005                ;five retries for error
+    mov di, word 0x0005    ;five retries for error
 .SECTORLOOP:
     push ax
     push bx
     push cx
     call LBACHS
-	mov ax, 0x0201                 ;BIOS read sector. Read one sector. 
+    mov ax, 0x0201                 ;BIOS read sector. Read one sector. 
     mov ch, BYTE [absoluteTrack]   ;track
     mov cl, BYTE [absoluteSector]  ;sector
     mov dh, BYTE [absoluteHead]    ;head
@@ -47,12 +49,13 @@ rmain:
     loop rmain                          ;read next sector
     ret
 
-	
+
 ;----------------------------------------------------------------------
 ; ClusterLBA - convert FAT cluster into LBA addressing scheme
 ;
 ; LBA = (cluster - 2) * sectors per cluster
 ;----------------------------------------------------------------------
+
 ClusterLBA:
     sub ax, 0x0002                   ;zero base cluster number
     xor cx, cx
@@ -60,14 +63,15 @@ ClusterLBA:
     mul cx
     add ax, WORD [datasector]        ;base data sector
     ret
-	
-;---------------------------------------------------------------------------
+
+;----------------------------------------------------------------------
 ; LBACHS - Convert LBA addressing scheme to CHS addressing scheme.
 ;
 ; absolute sector = (logical sector / sectors per track) + 1
 ; absolute head   = (logical sector / sectors per track) MOD number of heads
 ; absolute track  =  logical sector / (sectors per track * number of heads)
-;---------------------------------------------------------------------------
+;-----------------------------------------------------------------------
+
 LBACHS:
     xor dx, dx                       ;prepare dx:ax for operation
     div WORD [SectorsPerTrack]       ;'18' calculate
@@ -79,27 +83,26 @@ LBACHS:
     mov BYTE [absoluteTrack], al
     ret
 
-
 ;------------------------------------
 ; carregar_begin:
 ;     @todo: renomear.
 ;
 ;load_begin:
 carregar_begin:
-	;@todo , rever esse salvamento de cs:ip
-	pop ax  
-	mov word [salva_carregar_ip], ax
+    ;;@todo , rever esse salvamento de cs:ip
     pop ax  
-	mov word [salva_carregar_cs], ax	
-	
+    mov word [salva_carregar_ip], ax
+    pop ax  
+    mov word [salva_carregar_cs], ax
+
     cli
-   	;registradores
-	xor ax, ax
-	xor bx, bx
-	xor cx, cx
-	xor dx, dx
-	;segmentos
-	mov ax, word 0x0000  ;segmento 0
+    ;registradores
+    xor ax, ax
+    xor bx, bx
+    xor cx, cx
+    xor dx, dx
+    ;segmentos
+    mov ax, word 0x0000    ;segmento 0
     mov ds, ax
     mov es, ax
     mov fs, ax
@@ -109,16 +112,16 @@ carregar_begin:
     mov ss, ax
     mov sp, word 0xFFFF
     sti
-	call Device.ResetFloppy    ;reseta FDC.	 
+    call Device.ResetFloppy    ;reseta FDC.
     ;Carrega o arquivo.
 load_kernel32_sys: 
 
     push ax
-	mov ax, word [carregar_nome]	
+	mov ax, word [carregar_nome]
 	mov word [ImageNamePos], ax     ;; Atualiza o endereço do nome do arquivo a ser lido    
 	mov ax, word [carregar_seg]
 	mov word [destino_seg] , ax     ;; Atualiza o Segmento que será carregado o arquivo
-	mov ax, word [carregar_off]	
+	mov ax, word [carregar_off]
 	mov word [destino_off] , ax     ;; Atualiza o Offset que será carregado o arquivo
 	pop ax
     ;Load root. 
@@ -158,10 +161,10 @@ LOAD_ROOT:
     add     di, 0x0020      ;; queue next directory entry
     loop    .LOOP
     jmp     FAILURE
-	;Load fat.
-LOAD_FAT:	
+    ;Load fat.
+LOAD_FAT:
     mov  dx, WORD [di + 0x001A]   ;; di= 200+20+1a
-    mov  WORD [cluster], dx       ; file's first cluster
+    mov  WORD [cluster], dx       ;; file's first cluster
                   
     ;compute size of  FAT and store in "cx" 
     xor     ax, ax
@@ -177,12 +180,11 @@ LOAD_FAT:
     call    ReadSectors
 
     ; read image file into memory ;; 'es:bx' (0050:0000)
-                            
-    ;
-    ; Obs: 
-	; Os segmentos sarão atualizados para carregar o arquivo, depois de 
-	; carregado o arquivo, os segmentos precisam voltar pra zero.
-    ;
+
+    ; #obs: 
+    ; Os segmentos sarão atualizados para carregar o arquivo, depois de 
+    ; carregado o arquivo, os segmentos precisam voltar pra zero.
+    
     mov   ax, word [destino_seg]    ;Destination for image.
     mov   es, ax                       
     mov   bx, word [destino_off]    ;Destination for image.
@@ -218,33 +220,32 @@ LOAD_IMAGE:
    jb  LOAD_IMAGE  
 carregar_end:
     ;Post message.
-	pusha
-	call Window.ClearScreen          
+    pusha
+    call Window.ClearScreen          
     call Window.StatusBar 
     mov si, word [carregar_msg]  
     call PoeString
     popa
 
-	; Retornando de forma segura, usando cs:ip salvos.
-	mov ax, word [salva_carregar_cs]	
-	push ax
-	mov ax, word [salva_carregar_ip]
-    push ax	
-	xor ax, ax
-	retf
+    ; Retornando de forma segura, usando cs:ip salvos.
+    mov ax, word [salva_carregar_cs]
+    push ax
+    mov ax, word [salva_carregar_ip]
+    push ax
+    xor ax, ax
+    retf
 
-	
 ;----------------------------	
 ; FAILURE: 
 ;     Erro fatal, abortar.
-;
+
 FAILURE:
     call Window.StatusBar
     mov si, msgFailure
     call PoeString
-    mov ah, 0x00
-    int 0x16              
-    int 0x19              
+    xor ax,ax
+    int 0x16
+    int 0x19
 
 ;Variáveis.
 carregar_nome: dw 0    ;Nome.
@@ -257,11 +258,11 @@ msg_debug_fat  db "fat12: 2 fat",0
 msg_debug_img  db "fat12: 3 image",0
 msg_debug_end  db "fat12: 4 Ok",0
 
-;----------------------------------------
+;; ===================================================
 ; buffer: 
 ;     BUFFER, usado para carregar FAT e ROOTDIR.
 ;     @todo: Rever esse buffer, precisamos de espaço no boot manager.
-;
+
 buffer:       
     times (512*2) db 0
 ;

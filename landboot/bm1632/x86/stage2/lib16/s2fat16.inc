@@ -28,9 +28,8 @@ s2fat16_fat16_datasector:
     dw 0
 s2_fat16_Selected_Drive_Number:
     db 0
-;;...
-	
-	
+;; ...
+
 
 ;; ==================================================================
 ;; s2fat16ReadFile:
@@ -52,7 +51,7 @@ s2_fat16_Selected_Drive_Number:
 ;; @todo: Fazer debug dessa rotina e corrigir as partes 
 ;; que não são eficazes.
 ;;
-;;
+
 s2fat16ReadFile:
 
     pusha 
@@ -66,11 +65,11 @@ s2fat16ReadFile:
 	;; Suportamos apenas o HD master por enquanto. 
 	;; Talvez devessemos considerar as opções de disco.
 	;;
-.checkDiskNumber:	
+.checkDiskNumber:
     ;Confere o número do disco.
-	;@todo: Trocar pelo bpb do stage 2.
-	
-	;hd slave
+    ;@todo: Trocar pelo bpb do stage 2.
+
+    ;hd slave
     ;cmp byte [fat16_bpb.DriveNumber], byte 0x81
     ;jne .fail
 
@@ -78,7 +77,7 @@ s2fat16ReadFile:
     cmp byte [fat16_bpb.DriveNumber], byte 0x80
     jne .fail
 
-	;;...
+    ;; ...
 
 .setupRegisters:
     xor ax, ax  
@@ -166,13 +165,13 @@ s2fat16ReadFile:
 	;Message.
 	;mov si, S2_FAT16_IMAGE_ADDRESS ;@todo.  
     ;call DisplayMessage	
-	
-	;popad
-    ret	 ;Retorna para quem chamou.
-	;; *FAIL !!
+
+    ;popad
+    ret    ;Retorna para quem chamou.
+    ;; *FAIL !!
 .fail:
-    
-	;Message.
+
+    ;Message.
     mov si, msg_s2fat16_diskfail
     call DisplayMessage
 
@@ -190,7 +189,7 @@ s2fat16ReadFile:
 ;     Calcular o início da área de dados.
 ;     *IMPORTANTE.
 ;
-s2fat16_get_dataarea_init:   
+s2fat16_get_dataarea_init:
 
     pusha
     xor ax, ax  
@@ -223,9 +222,9 @@ s2fat16_get_dataarea_init:
     mov WORD [fat16_datasector], ax           ;coloca 2 fats + setor reservado em 'ax'          
     add WORD [fat16_datasector], cx           ;adiciona o tamanho do diretorio raiz. 
 
-	;Obs:
-	;    O valor de data sector esta salvo em 'fat16_datasector'.
-	
+    ; #obs:
+    ; O valor de data sector esta salvo em 'fat16_datasector'.
+
     popa
     ret
 
@@ -280,7 +279,6 @@ s2fat16SearchFileName:
 	;jmp $
 .fail:
 
-    ;message.
     mov si, msg_s2fat16_Failure 
     call DisplayMessage
 
@@ -290,7 +288,6 @@ s2fat16SearchFileName:
 
 .sf_root_fail:
 
-    ;message.
     mov si, msg_s2fat16_sf_root_fail
     call DisplayMessage
 
@@ -301,12 +298,9 @@ s2fat16SearchFileName:
 .exit_arquivo_encontrado:
     pop cx    ;Faltava o contador.
 
-    ;message
     mov si, msg_s2file_ok  
     call DisplayMessage
 
-	
-	
 	;pega o valor do primeiro cluster do arquivo.
     xor dx, dx
     mov dx, WORD [di + 0x001A]   ;di= 200+20+1a.
@@ -321,12 +315,13 @@ s2fat16SearchFileName:
 
 .name: dw 0
 
-	
+
 ;;==============================================================
 ;; s2fat16LOADROOT:
 ;;     Carregar o diretório razi na memória.
 ;;     Na verdade estamos carregando apenas o primeiro setor.
 ;;
+
 s2fat16LOADROOT:
     ;nop
     call s2_fat16_load_root_first_sector
@@ -337,6 +332,7 @@ s2fat16LOADROOT:
 ; load_root_first_sector:
 ;     Carrega o primeiro setor do root no buffer.
 ;
+
 s2_fat16_load_root_first_sector:
 
     ;cmp byte [s2_fat16_Selected_Drive_Number], 1
@@ -376,36 +372,38 @@ s2_fat16_load_root_first_sector:
 
 	;LBA a se lido.
     mov ax, word ROOT_LBA        ;lba - (root dir) 
-	
+
     ;Carregar apenas um setor na memória. O primeiro setor do diretório raiz.
-	; cx = Quantidade de setores a serem lidos.
+    ; cx = Quantidade de setores a serem lidos.
     ; ax = Número do primeiro setor a ser lido.
     ; es:bx = Buffer. Localização na memória onde serão carregados os setores.	
-	;call hd0_read_sector
+    ;call hd0_read_sector
     call s2fat16ReadSectors
-	
+
 	;pop cx
 	;pop bx
 	;pop ax
-		
+
     popa
     ret
 
 ;@todo: Checar se essa mensagem está sendo usada.	
 ;msg_s2fat16_load_root_fail db "load_root_first_sector fail: Dir.",13, 10,0	
-	
-	
-;;==============================================================
+
+
+
+;; ==============================================================
 ;; s2fat16LOADFAT:
 ;;     Carrega a fat na memória.
 ;;
+
 s2fat16LOADFAT:
 	
     ;@todo: chamar rotina do BIOS para inicializar o dispositivo.	
 	;call init_ide0_master    ;reset ide.
 	
     pusha
-	
+
 	push ax
 	;buffer. (es:bx)
 	xor ax, ax
@@ -447,9 +445,9 @@ s2fat16LOADFAT:
     ; es:bx = Buffer. Localização na memória onde serão carregados os setores.	
 	;call hd0_read_sector
     call s2fat16ReadSectors
-    
-	pop cx
-	
+
+    pop cx
+
 	dec cx
 	cmp cx, word 0
 	je .done_load_fat
@@ -463,45 +461,39 @@ s2fat16LOADFAT:
 	mov ax, word [.lba]
 	add ax, word 1
 	mov word [.lba], ax
-	
-	jmp .loop	
-  
+
+    jmp .loop
 
 .fail:
-   
-    ;msg
+
     ;mov esi, msg_fat16_FatFail
     ;call os_output
 
-	;msg
 	;mov esi, msg_fat16_FatFail   
 	;call lib32PrintString
-	
+
     popa
     ret
 
 .done_load_fat:
-    
-	;;
+
 	;; #bug bug... Isso tá errado tem que considerar es:bx
 	;; Para pegar o valor que está no início da fat.
-	
+
 	;Ver se a FAT está no lugar certo.  
 	;cmp word [FAT_OFFSET], word 0xFFF8              
     ;jne .fail 
-	
-	;msg.
-	;mov esi, msg_fat16_FatOk
+
+    ;mov esi, msg_fat16_FatOk
     ;call os_output
     
-	popa
-	ret
+    popa
+    ret
 
-.address: dd 0
-.lba: dd 0
+.address:  dd 0
+.lba:      dd 0
 
 
-	
 ;;==============================================================
 ;; s2fat16LOADIMAGE:
 ;;      Carrega um arquivo na memória, setor por setor.
@@ -514,10 +506,11 @@ s2fat16LOADFAT:
 ; es:bx = Buffer. 
 ; Localização na memória onde serão carregados os setores.
 ;
+
 s2fat16LOADIMAGE:
 	;pusha
 
-	mov word [s2fat16_fat16_cluster], ax
+    mov word [s2fat16_fat16_cluster], ax
 
 	;Essa rotina de inicialização do dispositivo não é necessaria em modo real.
 	;Tem uma rotina de interrupção que inicializa o dispositivo??
@@ -532,13 +525,13 @@ s2fat16LOADIMAGE:
     pop bx                          ; buffer to read into
 
     ;converte cluster em lba.
-	xor ax, ax
+    xor ax, ax
     mov ax, WORD [s2fat16_fat16_cluster]     ; cluster to read  	
-	call s2fat16_fat16_ClusterLBA            ; convert cluster to LBA (eax)
-	
-	;mov edx, eax                     ; coloca lba em edx
+    call s2fat16_fat16_ClusterLBA            ; convert cluster to LBA (eax)
+
+    ;mov edx, eax                   ; coloca lba em edx
     mov word [.lba], ax             ;salva lba
-    	
+
 	;quantidade de setores.
     xor cx, cx
     mov cl, BYTE 1 ;[fat16_bpb.SectorsPerCluster]  ;1 =  setores por cluster 
@@ -581,9 +574,8 @@ s2fat16LOADIMAGE:
 	;call barra_de_progresso ;(nao altera os registradores)
 	
 	;testa
-    cmp dx, word 0xFFFF              
+    cmp dx, word 0xFFFF 
     jne .next
-
 ;--
 .DONE:
     ;ajustar a pilha.
@@ -601,17 +593,19 @@ s2fat16LOADIMAGE:
 	;popa
 	ret
 
-.lba: dw 0
-s2fat16_msg_load_file_eof db "s2fat16LOADIMAGE: EOF.",13,10,0
+.lba: 
+    dw 0
+
+s2fat16_msg_load_file_eof: 
+    db "s2fat16LOADIMAGE: EOF.",13,10,0
 
 
-
-;*************************************************************************
+;; =========================================
 ; s2fat16_fat16_ClusterLBA:
 ;     Convert FAT cluster into LBA addressing scheme
 ;     LBA = ((cluster - 2) * sectors per cluster) + dataarea.
 ;
-;
+
 s2fat16_fat16_ClusterLBA:
     
     sub ax, 0x0002  ;Zero base cluster number.
@@ -626,7 +620,6 @@ s2fat16_fat16_ClusterLBA:
 
     add ax, WORD [s2fat16_fat16_datasector]        ; Base data sector.
     ret
-	
 .fail:
     
 	;Message.
@@ -641,8 +634,8 @@ s2fat16_fat16_ClusterLBA:
 	;xor ax, ax
 	;mov ax, WORD [fat16_datasector] 
 	;call print_hex	
-	
-	JMP $	
+
+    JMP $
 
 ;mensagem cancelada.	
 ;fail_datasector_s db "fat16_ClusterLBA: Data sector errado!",0
@@ -659,6 +652,7 @@ s2fat16_fat16_ClusterLBA:
 ; ax = Número do primeiro setor a ser lido.
 ; es:bx = Buffer. Localização na memória onde serão carregados os setores.
 ;
+
 s2fat16ReadSectors:
 s2_ReadSectors:
 s2_MAIN:
@@ -668,7 +662,7 @@ s2_MAIN:
     push bx
     push cx
     call s2_LBACHS
-	mov ax, 0x0201                       ;BIOS read sector. Read one sector. 
+    mov ax, 0x0201                       ;BIOS read sector. Read one sector. 
     mov ch, BYTE [s2_absoluteTrack]      ;Track.
     mov cl, BYTE [s2_absoluteSector]     ;Sector.
     mov dh, BYTE [s2_absoluteHead]       ;Head.
@@ -698,17 +692,18 @@ s2_MAIN:
 ;     absolute head   = (logical sector / sectors per track) MOD number of heads.
 ;     absolute track  = logical sector / (sectors per track * number of heads).
 ;
-s2_LBACHS:    
+
+s2_LBACHS:
     xor dx, dx                           ;Prepare dx:ax for operation.               
     div WORD [s2_bpb.SectorsPerTrack]    ;Divide por spt - 11h.
     inc dl                               ;Adjust for sector 0.  
     mov BYTE [s2_absoluteSector], dl
     xor dx, dx                           ;Prepare dx:ax for operation.                 
     div WORD [s2_bpb.NumHeads]               
-    mov BYTE [s2_absoluteHead], dl
+    mov BYTE [s2_absoluteHead],  dl
     mov BYTE [s2_absoluteTrack], al
     RET
-	
+
 ; Variáveis.
 s2_absoluteSector db 0x00
 s2_absoluteHead   db 0x00

@@ -1,16 +1,15 @@
 ;
-; File: stage2\lib16\lib16.inc
+; File: stage2/lib16/lib16.inc
+; 
+;     16 bit library.
 ;
-; Esse arquivo deve oferecerá a classe lib16, que agrupará
-; rotinas oferecidas em 16bit pelo bootmanager.
+; 2017 - Created by Fred Nora
 ;
-; Agosto 2017, Criado por Fred Nora.
-;
-
 
 lib16Init:
     nop
-	ret
+    ret
 
-;; Continua ...
+
+
 

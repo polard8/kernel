@@ -1,11 +1,9 @@
 ;
-; File: lib16\s2a20.inc
+; File: lib16/s2a20.inc
 ;
-; Descrição:
-;     Habilitar a linha A20 através do teclado.
+;     Enable a20 line using keyboard.
 ;
-; Versão: 1.0: 2005 - Created.
-; Versão: 1.0: 2016 - Revision.
+; 2005 - Created by Fred Nora.
 ;
 
 
@@ -78,14 +76,12 @@ A20_enable:
     jnz .done
     loop .start_attempt1
 
-;
 ; If method #1 failed, try method #2.
 ; Re-initialize CX. (note that CH is already zero, because LOOP stops looping 
 ; when CX is zero)
-;
+
     mov cl, 5
-	
-	
+
 ;
 ; Attempt 2 - Segunda tentativa. Segundo método. 
 .start_attempt2:
@@ -96,9 +92,8 @@ A20_enable:
     mov al, 0xDF
     out dx, al
 
-;
 ; Leia o byte  pra ter certeza.
-;
+
     call .get_data
     and al, 2
     jnz .done
@@ -106,7 +101,7 @@ A20_enable:
 .done:
     sti
     RET
-;--	
+;--
 
 ;
 ; End.

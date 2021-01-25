@@ -1,0 +1,16 @@
+	Senda: 
+
+
+	landboot > landos > landlib | w.gramado
+
+	-------------------------------
+
+	prefixes:
+
+	landboot - lb_
+	landlib  - ll_
+	landos   - land_
+
+	--------------------------
+
+	

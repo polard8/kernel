@@ -1,11 +1,11 @@
 ;
-; File: lib16\s2menu16.inc:
+; File: lib16/s2menu16.inc:
 ;
 ; Descrição:
 ;     Menu inicial do Boot Manager. (16bit).
 ;     OBS: O menu de 16bit do Boot Manager está cancelado.
 ;
-; Versão: 1.0, 2015.
+; 2015 - Created by Fred Nora.
 ;
 
 
@@ -15,7 +15,7 @@
 ;
 MenuMain:  	
     ;    #Cancelado!
-	RET
+    RET
 
 ;
 ; Estruturas de dados para o menu do Boot Manager.

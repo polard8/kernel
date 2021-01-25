@@ -1,10 +1,9 @@
 ;
-; File: lib16\s2lib.inc
+; File: lib16/s2lib.inc
 ;
-; Decrução:
 ;     Funções utilizadas pelo Stage 2.
 ;
-; Versão 1.0, 2015.
+; 2015 - Created by Fred Nora.
 ;
 
 
@@ -12,16 +11,17 @@
 ; s2_FAILURE:
 ;     Alguma falha fatal no stage 2.
 ;
+
 ;s2libFailure:
 s2_FAILURE:
     mov si, msg_s2_failure
     call DisplayMessage 
-    mov ah, 0x00
+    xor ax, ax
     int 0x16        ;Await keypress.
     int 0x19        ;Reboot.
 
-	
-;----------------------------------------------------------------------	
+
+;; =========================
 ;M$ - Singularity	
 ;s2_InitializeVideo:
 
@@ -49,82 +49,68 @@ s2_FAILURE:
 ;       ret	
 
 
-
-
-	
-;--------------------------------
+;; ==========================
 ; s2_turnoff_motor:
 ;     Desliga o motor do floppy disk.
-;
+
 s2_turnoff_motor:
     push ax
-	push dx	
-	mov dx, 3F2h 
+    push dx
+    mov dx, 3F2h 
     mov al, 0 
     out dx, al 
-	pop dx
-    pop ax	
-    ret	
+    pop dx
+    pop ax
+    ret
 
-
-;------------------------------------
+;;==================================
 ; s2_setup_registers:
 ;     Configura os registradores.
-;	
-s2_setup_registers:   
+;
+
+s2_setup_registers: 
     cli
-	mov  ax, DATA_SEGMENT    ;Data.        
+    ;; data
+    mov  ax, DATA_SEGMENT
     mov  ds, ax
-    mov  es, ax	
-    mov ax, DATA_SEGMENT     ;Stack.
+    mov  es, ax
+    ;; stack
+    mov ax, DATA_SEGMENT
     mov ss, ax
     mov sp, STACK_POINTER
-	xor ax, ax            
-	xor bx, bx
-	xor cx, cx
-	xor dx, dx
-	sti
+    ;; general purpose
+    xor ax, ax 
+    xor bx, bx
+    xor cx, cx
+    xor dx, dx
+    sti
     ret
-	
 
-;----------------------------------------	
+;; ===========================
 ; DisplayMessage:
 ;     Mostra uma string.
-;
+
 ;s2libDisplayMessage:
-DisplayMessage:	
-    mov ah, 0x0E	
-    mov bh, 0x00	
-    mov bl, 0x07		
-.proxCar:	
-    lodsb		
-    or al, al	
-    jz .volta	
-    int 0x10	
-    jmp .proxCar	
-.volta:
+
+DisplayMessage:
+    mov ah, 0x0E
+    mov bh, 0x00
+    mov bl, 0x07
+.nextChar:
+    lodsb
+    or al, al
+    jz .end
+    int 0x10
+    jmp .nextChar
+.end:
     ret
 
-	
-;----------------------------------------
-; PoeString:
-;     Mostra uma string.
-;     @todo: Deletar isso.
-;s2libPoeString:	
-PoeString:	
-    mov ah, 0x0E	
-    mov bh, 0x00	
-    mov bl, 0x07	
-.proxCar:	
-    lodsb		
-    or al, al	
-    jz .volta	
-    int 0x10	
-    jmp .proxCar	
-.volta:
-    ret		
+;; alias.
+PoeString:
+    jmp DisplayMessage
+    jmp $
 
- 
+
 ;-----------------------------------
 ; String:
 ;     Rotinas de string.
