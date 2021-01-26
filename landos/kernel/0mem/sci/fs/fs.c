@@ -1398,8 +1398,19 @@ from_FAT_name (
 //    0 ---> ok.
 // != 0 ---> fail
 
-int fs_load_path ( unsigned char *path, unsigned long address )
+int 
+fs_load_path ( 
+    const char *path, 
+    unsigned long address, 
+    unsigned long buffer_size )
 {
+
+    // #todo
+    // Work on that limit stuff.
+    // We have the limit given by the argument,
+    // that needs to be respected.
+    // And we have the size of the root dir.
+
 
     int i=0;         // Deslocamento dentro do buffer.
     int level=0;
@@ -1434,6 +1445,11 @@ int fs_load_path ( unsigned char *path, unsigned long address )
     if (address == 0){
         panic ("fs_load_path: address\n");
     }
+
+    if (buffer_size == 0){
+        panic ("fs_load_path: buffer_size\n");
+    }
+
 
     // File buffer.
     __file_buffer = (void *) address;
@@ -1698,12 +1714,15 @@ fail:
 //    0 ---> ok.
 // != 0 ---> fail
 
-int sys_load_path ( unsigned char *path, unsigned long u_address )
+int 
+sys_load_path ( 
+    const char *path, 
+    unsigned long u_address, 
+    unsigned long u_address_len )
 {
 
     // #bugbug
     // Temos que considerar a questao do tamanho do arquivo.
-
 
     int Status = -1;
 
@@ -1718,11 +1737,20 @@ int sys_load_path ( unsigned char *path, unsigned long u_address )
         debug_print ("sys_load_path: [FAIL] *path\n");
         return (int) -1;
     }
-    
+
+    if ( u_address_len == 0 ){
+        debug_print ("sys_load_path: [FAIL] u_addres_len\n");
+        return (int) -1;
+    }
+
+    //
+    // load
+    //
 
     Status = fs_load_path ( 
-                 (unsigned char *) path, 
-                 (unsigned long) u_address );
+                 (const char *) path, 
+                 (unsigned long) u_address,
+                 (unsigned long) u_address_len );
 
     if (Status<0){
         debug_print ("sys_load_path: fail\n");

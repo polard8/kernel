@@ -492,9 +492,19 @@ int get_spc (void);
 
 unsigned long fs_count_path_levels (unsigned char *path);
 
-int fs_load_path ( unsigned char *path, unsigned long address );
 
-int sys_load_path ( unsigned char *path, unsigned long u_address );
+
+int 
+fs_load_path ( 
+    const char *path, 
+    unsigned long address, 
+    unsigned long buffer_size );
+
+int 
+sys_load_path ( 
+    const char *path, 
+    unsigned long u_address, 
+    unsigned long u_address_len );
 
 
 //

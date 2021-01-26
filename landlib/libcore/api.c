@@ -285,19 +285,25 @@ gde_load_bitmap_16x16 (
  * 
  */
 
-// IN: ??
+// IN: 
+// pathname, ring3 buffer, ring3 buffer limit.
 
 int 
 gde_load_path ( 
-    char *path, 
+    const char *path, 
     unsigned long buffer, 
     unsigned long buffer_len )
 {
     int status = -1;
-
+    size_t Size=0;
 
     if ( (void*) path == NULL ){
         printf ("gde_load_path: [FAIL] path\n");
+        return (int) -1;
+    }
+
+    if (*path != '/'){
+        printf ("gde_load_path: [FAIL] It's not an absolute pathname\n");
         return (int) -1;
     }
 
@@ -306,12 +312,22 @@ gde_load_path (
         return (int) -1;
     }
 
+    Size = strlen(path);
+    
+    if (Size == 0){
+        printf ("gde_load_path: [FAIL] Size\n");
+        return (int) -1;
+    }
 
-    //if ( buffer = 0 )
-    //{
-        // msg
-    //    return -1;
-    //}
+    if (buffer == 0){
+        printf ("gde_load_path: [FAIL] buffer\n");
+        return (int) -1;
+    }
+
+    if (buffer_len == 0){
+        printf ("gde_load_path: [FAIL] buffer_len\n");
+        return (int) -1;
+    }
 
     status = (int) gramado_system_call ( 4004, 
                        (unsigned long) path, 

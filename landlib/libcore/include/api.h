@@ -3090,11 +3090,10 @@ gde_load_bitmap_16x16 (
     unsigned long y );
 
 
-
-// #todo: Change path type to 'const char *'
+// Load path
 int 
 gde_load_path ( 
-    char *path, 
+    const char *path, 
     unsigned long buffer, 
     unsigned long buffer_len );
 

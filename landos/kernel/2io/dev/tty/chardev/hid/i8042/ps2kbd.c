@@ -37,23 +37,26 @@
 void __load_path_test(void)
 {
     int status = -1;
-    
+
+    char __path[] = "/ETC/TEST1.CPP";
+
     void *__address = 0;
     
     // Endereço para carregar o arquivo
     // 400 KB.
+ 
+    size_t Size = (400*1024);
 
-    __address = (void *) kmalloc(400*1024);
-    //__address = (void *) kmalloc(600*1024);
+    __address = (void *) kmalloc(Size);
 
+    status = fs_load_path (
+                 (const char *) __path,
+                 (unsigned long) __address,
+                 (unsigned long) Size );
 
-    //fs_load_path ("/ETC/HELLO.CPP",(unsigned long) __address);
-    //fs_load_path ("/ETC/NEWDIR/HELLO.CPP",(unsigned long) __address);
-    status = fs_load_path ("/ETC/NEWDIR/LASTDIR/HELLO.CPP",(unsigned long) __address);
-
-    if ( status < 0 )
-        printf ("__load_path_test: load_path fail\n");
-
+    if ( status < 0 ){
+        printf ("__load_path_test: fs_load_path fail\n");
+    }
 
     // Show file.
 

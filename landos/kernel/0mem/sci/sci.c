@@ -915,13 +915,15 @@ void *gde_extra_services (
 
     // Load path. ex: "/BOOT/BM.BIN"
     // See: fs.c
-    // #todo 
-    // args: 
+    // IN:
     // (arg2=path)  (arg3=user buffer) (arg4 = buffer size)
     if ( number == 4004 )
     {
-        debug_print ("gde_extra_services: 4004\n");
-        sys_load_path ( (unsigned char *) arg2, (unsigned long) arg3 );
+        debug_print ("gde_extra_services: [4004] load path\n");
+        sys_load_path ( 
+            (const char *)  arg2, 
+            (unsigned long) arg3, 
+            (unsigned long) arg4 );
         refresh_screen();
         return NULL;
     }

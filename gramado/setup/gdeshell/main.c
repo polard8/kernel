@@ -908,7 +908,6 @@ static inline void rep_nop (void)
 // OK: funcionou no qemu.
 void __load_path_test(void)
 {
-
     char __path[] = "/ETC/TEST1.CPP";
 
     void *__address = 0;
@@ -930,9 +929,9 @@ void __load_path_test(void)
 
     // Load
     // Using the libcore.
-    
+
     gde_load_path ( 
-        (char *)         __path, 
+        (const char *)   __path, 
         (unsigned long)  buffer, 
         (unsigned long)  ___size_limit );
 
