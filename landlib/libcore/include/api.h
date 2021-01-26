@@ -1638,8 +1638,8 @@ static unsigned long vga_256colors_palette[256] = {
 //
 
 //Suporte para linha e coluna.
-#define COL_MAX      800  //1024,640, provisório.
-#define LINHA_MAX    600  //768,480, provisório. 
+//#define COL_MAX      800  //1024,640, provisório.
+//#define LINHA_MAX    600  //768,480, provisório. 
 //...
 
 
@@ -1683,12 +1683,12 @@ static unsigned long vga_256colors_palette[256] = {
 // Title Bar support.
 //
 
-#define TB_X           0
-#define TB_Y           0
-#define TB_LARGURA     800    //1024,640.
-#define TB_ALTURA      40
-#define TB_STRING_X    10  
-#define TB_STRING_Y    5
+//#define TB_X           0
+//#define TB_Y           0
+//#define TB_LARGURA     800    //1024,640.
+//#define TB_ALTURA      40
+//#define TB_STRING_X    10  
+//#define TB_STRING_Y    5
 
 
 //
@@ -1704,7 +1704,7 @@ static unsigned long vga_256colors_palette[256] = {
 // Bars support.
 //
 
-#define	BAR_STEPS   46
+// #define BAR_STEPS   46
 
 
 //
@@ -2406,7 +2406,7 @@ struct rect_d
 struct window_d
 {
     // Identificadores.
-    object_type_t objectType;
+    object_type_t  objectType;
     object_class_t objectClass;
 
 
@@ -2925,30 +2925,26 @@ struct window_d *CurrentWindow;
 
 struct semaphore_d 
 {
-	//object_type_t objectType;   //@todo: criar esses enum
-	//object_class_t objectClass; //@todo: criar esses enum
-    
-    //call back. @todo: Create.
-	//unsigned long callback; 
+    int used;
+    int magic; 
 
-	//Identificadores do semáforo.   
-	int id;
-	int used;
-	int magic; 
-	int taskId;
+    int id;
 
-	//Estado do semáforo. (verde, vermelho)
-	int color; 
-	int status; 
-	unsigned int count;
+    int taskId;
+
+    // Estado do semáforo. (verde, vermelho)
+    int color; 
+    int status; 
+    unsigned int count;
 
     //...
-	
+
     struct d_wait_queue *sema_wait; 
-	//...	
+    
+    // ...
 };
 struct semaphore_d *current_semaphore;
-//...
+// ...
 
 
 //
@@ -3045,12 +3041,7 @@ struct timer_d
 //
 
 
-/*
- **************************************************
- * gde_system:
- *     #todo: 
- */
-
+// Execute a command.
 int gde_system (const char *command);
 
 
@@ -3070,8 +3061,7 @@ int gde_system (const char *command);
  *    edx = arg4.
  */
 
-void *
-system_call ( 
+void *system_call ( 
     unsigned long ax, 
     unsigned long bx, 
     unsigned long cx, 
@@ -3085,8 +3075,7 @@ system_call (
  *     Ele está no kernel.
  */
 
-void *
-gde_system_procedure ( 
+void *gde_system_procedure ( 
     struct window_d *window,
     int msg,
     unsigned long long1,
@@ -3101,6 +3090,8 @@ gde_load_bitmap_16x16 (
     unsigned long y );
 
 
+
+// #todo: Change path type to 'const char *'
 int 
 gde_load_path ( 
     char *path, 
@@ -3111,10 +3102,11 @@ gde_load_path (
 //int 0x80 - serviço 241.
 void gde_init_background (void);
 
+// #todo: Change type to 'const char *'
 int gde_message_box ( int type, char *string1, char *string2 );
 
+// #todo: Change type to 'const char *'
 int gde_dialog_box ( int type, char *string1, char *string2 );
-
 
 
 //
@@ -3145,8 +3137,9 @@ int gde_dialog_box ( int type, char *string1, char *string2 );
 
 // Create a window using kgws.
 
-void *
-gde_create_window ( 
+// #todo: Change windowname type to 'const char *'
+
+void *gde_create_window ( 
     unsigned long type,        //1-Tipo de janela, (popup,normal,...).
     unsigned long status,      //2-Estado da janela, (ativa ou não).
     unsigned long view,        //3-(min, max ...).
@@ -3311,6 +3304,10 @@ void gde_get_cursor ( unsigned long *x, unsigned long *y );
 unsigned long gde_get_cursor_x(void);
 unsigned long gde_get_cursor_y(void);
 
+// set cursor.
+int __gde_set_cursor (unsigned long x, unsigned long y);
+
+
 
 //
 // Process support
@@ -3319,6 +3316,7 @@ unsigned long gde_get_cursor_y(void);
 
 // Create process.
 // #todo: This function needs more parameters.
+// #todo: Change name type to 'const char *'
 void *gde_create_process ( 
     char *name,
     unsigned long process_priority );
@@ -3329,8 +3327,8 @@ void *gde_create_process (
 
 // Create thread.
 // #todo: This function needs more parameters.
-void *
-gde_create_thread ( 
+// #todo: Change name type to 'const char *'
+void *gde_create_thread ( 
     unsigned long init_eip, 
     unsigned long init_stack, 
     char *name );
@@ -3355,10 +3353,8 @@ void gde_start_thread (void *thread);
 // File support.
 //
 
-//Open file.
+// Open file.
 void *gde_fopen (const char *filename, const char *mode);
-
-
 
 
 /*
@@ -3368,7 +3364,7 @@ void *gde_fopen (const char *filename, const char *mode);
  */
 
 //size in sectors 
-
+// #todo: Change file_name type to 'const char *'
 int
 gde_save_file ( 
     char *file_name, 
@@ -3385,33 +3381,46 @@ int gde_create_empty_file (char *file_name);
 
 int gde_create_empty_directory (char *dir_name);
 
-// semaphore
+//
+// Semaphore support
+//
+
 void gde_down (struct semaphore_d *s);
 void gde_up (struct semaphore_d *s);
 
-
+//
 // Critical section support.
-void gde_enter_critical_section (void);  // P (Proberen) testar.
-void gde_exit_critical_section (void);   // V (Verhogen) incrementar.
-void gde_p (void);                       // P (Proberen) 
-void gde_v (void);                       // V (Verhogen) 
+//
 
-
-//Inicializa em 1
+// Inicializa em 1
 void gde_initialize_critical_section (void);    
 
+// P (Proberen) testar.
+void gde_enter_critical_section (void);
+// V (Verhogen) incrementar.
+void gde_exit_critical_section (void);
+// P (Proberen)
+void gde_p (void); 
+// V (Verhogen)
+void gde_v (void);
 
-//Paint support.
+// Critical section for paint routines.
+
 void gde_begin_paint (void);
 void gde_end_paint (void);
 
-void gde_put_char (int c);
-
+// ====================
 
 
 /*
  ***********************************************
  * gde_def_dialog:
+ *     Simply default procedute call.
+ * 
+ *     It will call the kernel window procedure ...
+ *     #bugbug: In some cases this procedure will run for 
+ * the second time.
+ *     #bugbug: Actually this is not defered ... 
  *     Procedimento de janela adiado. 
  *     Usado pelos aplicativos ao fim dos seus 
  * procedimentos de janela.
@@ -3425,13 +3434,16 @@ gde_def_dialog (
     unsigned long long2 );
 
 
+// System metrics support.
 
 unsigned long gde_get_system_metrics ( int index );
 
+// ?? what ?
 int gde_dialog ( const char *string );
 
-int gde_getchar (void);
 
+
+// bmp
 
 int 
 gde_display_bmp ( 
@@ -3439,8 +3451,13 @@ gde_display_bmp (
     unsigned long x, 
     unsigned long y );
 
+//
+// == IPC ===========================
+//
 
+// send message to process
 // Envia uma mensagem para a thread de controle de um dado processo.
+
 int 
 gde_send_message_to_process ( 
     int pid, 
@@ -3449,7 +3466,7 @@ gde_send_message_to_process (
     unsigned long long1,
     unsigned long long2 );
 
-
+// Send message to thread
 // Envia uma mensagem para uma thread.
 int 
 gde_send_message_to_thread ( 
@@ -3468,7 +3485,26 @@ gde_send_message (
     unsigned long long1,
     unsigned long long2 );
 
-  
+
+//
+// char support.
+//
+
+// put char
+void gde_put_char (int c);
+// get char
+int gde_getchar (void);
+
+
+// Envia uma string para a porta serial COM1
+// #todo: Change type to 'const char *'.
+void gde_debug_print (char *string);
+
+
+//
+// text support.
+//
+
 int 
 gde_draw_text ( 
     struct window_d *window, 
@@ -3496,6 +3532,7 @@ struct timer_d *gde_create_timer (
 unsigned long gde_get_systime_info ( int n );
 
 
+// #bugbug: rever isso.
 // 'Clona' e executa o noraterm como processo filho. 
 // registra o terminal noraterm como terminal atual.
 // pega o pid do terminal atual
@@ -3504,6 +3541,8 @@ unsigned long gde_get_systime_info ( int n );
 int gde_start_terminal (void);
 
 
+// status bar.
+// change type to 'const char *'
 int 
 gde_update_statusbar ( 
     struct window_d *window, 
@@ -3511,31 +3550,64 @@ gde_update_statusbar (
     unsigned char *string2 );
 
 
+
+// Get the PID of some well known registered servers.
 // Usada para obter o pid de alguns drivers e servidores
 // do sistema. Aqueles servidores que só podem ter um do tipo 
 // rodando ao mesmo tempo.
+
 int gde_get_pid (int index);
 
+
+// The screen window for the kgws display server.
 struct window_d *gde_get_screen_window (void);
+
+// The background window for the kgws display server.
 struct window_d *gde_get_background_window (void);
+
+// The main window for the kgws display server.
+// This is a 'desktop area'. A'area de trabalho'.
 struct window_d *gde_get_main_window (void);
 
+//
+// process and thread
+//
+
+// name
 int gde_getprocessname (int pid, char *name, size_t len);
 int gde_getthreadname (int tid, char *name, size_t len);
 
+// stats
 unsigned long gde_get_process_stats (int pid, int index);
 unsigned long gde_get_thread_stats (int tid, int index);
 
-// Envia uma string para a porta serial COM1
-void gde_debug_print (char *string);
+//
+// == process support ======================================
+//
+
+// Clone and execute a process given it's name.
+// It doesn't support pathname yet.
+// You can use names in lower case.
+// #maybe: You do not need to provide the extension.
+
+// This is the only method that is working for now.
+// #todo: Cahnge type to 'const char *'.
 
 int gde_clone_and_execute ( char *name );
 
-int __gde_set_cursor (unsigned long x, unsigned long y);
+// ============================================================
 
 
+/*
+ *************************************************************
+ * gde_setup_net_buffer: 
+ * 
+ */
 
-// Enviamos para o kernel um buffer que está no app.
+// #todo
+// rever isso.
+
+// Enviamos para o kernel um buffer que está no app em ring3.
 // Associando esse buffer ao pid do app.
 // Desse modo o driver de rede pode colocar conteúdo no buffer
 // do aplicativo que está ouvindo determinada porta.
@@ -3544,22 +3616,29 @@ int __gde_set_cursor (unsigned long x, unsigned long y);
 
 // O kernel poderá guardar esse ponteiro para o net_buffer
 // na estrutura do processo cujo pid foi passado por essa função.
-// Também pode salvar o tamanho do buffer pou ele pode ter
-// tamanho padrçao. 4KB.
+// Também pode salvar o tamanho do buffer pois ele pode ter
+// tamanho padrao. 4KB.
 
 // IN: pid, ponteiro para o buffer, comprimento do buffer;
 // OUT: 0=Ok -1=fail
+
 int gde_setup_net_buffer (int pid, char *buffer, size_t len);
 
+// ==============================================
 
+
+// execute new process.
 // cria um novo processo, 
 // uma thread e carrega a imagem.
+// not tested
+
 int 
 execute_new_process ( 
     const char *filename, 
     char *argv[], 
     char *envp[] );
 
+// ==================================
 
 //
 // End.
