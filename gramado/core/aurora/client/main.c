@@ -146,16 +146,26 @@ gwsProcedure (
     switch (msg){
 
         // 20 = MSG_KEYDOWN
-        case 20:
+        case MSG_KEYDOWN:
             printf("%c",long1); fflush(stdout);
             break;
             
         // 22 = MSG_SYSKEYDOWN
-        case 22:
+        case MSG_SYSKEYDOWN:
             printf ("MSG_SYSKEYDOWN\n");
+            switch (long1){
+                case VK_F1: gws_clone_and_execute("editor.bin"); break;
+                case VK_F2: gws_clone_and_execute("browser.bin"); break;
+                case VK_F3: gws_clone_and_execute("fileman.bin"); break;
+                case VK_F4: gws_clone_and_execute("terminal.bin"); break;
+                // ...
+            };
             break;
     };
+
+    return 0;
 }
+
 
 //==========================================
 // Main

@@ -42,52 +42,52 @@
 #define GWS_DrainInput            8080
 // ...
 
+//
+// window
+//
 
 // Virtual keys.
-#include "vk.h"
-
+#include "window/vk.h"
 // Window Messages.
-#include "wm.h"
-
+#include "window/wm.h"
 // Window types.
-#include "wt.h"
-
+#include "window/wt.h"
 // Colors.
-#include "colours.h"
-
-
+#include "window/colours.h"
 // Windows.
-#include "window.h"
+#include "window/window.h"
+
+//
+// host
+//
 
 //h:d.s
-#include "screen.h"
-#include "display.h"
-#include "host.h"
+#include "host/screen.h"
+#include "host/display.h"
+#include "host/host.h"
 
 
 #include "ports.h"
 
 
-#include "menu.h"
+// menu
+#include "window/menu.h"
 
 
 // Events.
-#include "events.h"
+#include "io/events.h"
 
 
 // Connecting with the ws.
 //#include "connect.h"
 
-
 #include "gws_pack.h"
 
-
 // Read and write from socket.
-#include "rw.h"
-
+#include "io/rw.h"
 
 // 3d graphics support.
-#include "gr.h"
+#include "gr/gr.h"
 
 // ...
 
