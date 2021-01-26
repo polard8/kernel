@@ -2277,10 +2277,15 @@ do_compare:
     }
 
 
+    // dialog-box
+    if ( gramado_strncmp( prompt, "dialog-box", 10 ) == 0 ){
+        gde_dialog_box ( 3, "Dialog Box", "Testing dialog box" );
+        goto exit_cmp;
+    }
+
     // message-box
-    if ( gramado_strncmp( prompt, "message-box", 11 ) == 0 )
-    {
-        gde_message_box ( 3, "MessageBox", "Testing message box." );
+    if ( gramado_strncmp( prompt, "message-box", 11 ) == 0 ){
+        gde_message_box ( 3, "Message Box", "Testing message box" );
         goto exit_cmp;
     }
 
