@@ -14,53 +14,58 @@
 
 OUTPUT_FORMAT("elf32-i386")
 OUTPUT_ARCH(i386)
-ENTRY(_kernel_begin)  
+ENTRY(_kernel_begin)
 
-SECTIONS
-{ 
 
-    /* 0xc0000000: elf header.*/
+SECTIONS 
+{
+ 
+    /* >> This is the base */
+    /* 0xc0000000: The ELF header starts at this address */
+     . = 0xC0000000;
 
-    /* _kernel_begin  = .; */
+    /* _kernel_begin  = .; it belong to .head_x86 segment */
+    /* See: head_32.asm */
 
+    /* >> This is the entry point */
     /* kernel text segment. Executable code of the program */
-    .text 0xC0001000:      
+    .text 0xC0001000:
     {
-        _code_begin = .;            
-        *(.head_x86)       /* x86 asm stuff */
-        *(.text)
+        _code_begin = .;
+        *(.head_x86)  *(.text)
         _code_end = .; 
         . = ALIGN(4096);
     }
 
 
-    /* Read-only data. */
+    /* >> kernel read-only data. */
     .rodata :
     {
         _rodata_begin = .;
-        *(.rdata)          /*contains read-only data*/
-        *(.rodata)         /*contains read-only data*/
+        *(.rdata)  *(.rodata) 
         _rodata_end = .;
         . = ALIGN(4096);
     }
 
-
+    /* >> kernel data segment*/
     /* Read-write data (initialized) */
-    .data :                /* kernel data segment*/
+    /* data = Contains initialized global variables which are not constants */
+    .data :  
     { 
-        _data_begin = .;            
-        *(.data)           /*contains initialized global variables which are not constants*/
+        _data_begin = .; 
+        *(.data)
         _data_end = .; 
         . = ALIGN(4096);
     }
 
 
+    /* >> kernel bss segment, contains all the static uninitalized data */  
     /* Read-write data (uninitialized) and stack */
-    .bss :                 /* kernel bss segment, contains all the static uninitalized data */  
+    /*COMMON ?? Contains the un-initialized global variables (not static). ??*/
+    .bss : 
     { 
         _bss_begin = .; 
-        *(COMMON)          /*?? Contains the un-initialized global variables (not static). ??*/
-        *(.bss)
+        *(COMMON)  *(.bss)
         _bss_end = .; 
         . = ALIGN(4096);
     }

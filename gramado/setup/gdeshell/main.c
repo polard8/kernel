@@ -49,8 +49,7 @@ struct window_d *hWindow;
 struct window_d *cpu_window;  //cpu usage test;
 
 
-
-// Ser� configurado na inicializa��o.
+// Sera configurado na inicializaçao.
 int __stdin_fd;
 int __stdout_fd;
 int __stderr_fd;
@@ -60,6 +59,9 @@ int ShellFlag = 0;
 
 //O shell est� rodadndo.
 int _running = 1;
+
+int __home = FALSE;
+int __temple = FALSE;
 
 /* Non-zero when we are executing a top-level command. */
 //o shell est� executando um comando que 
@@ -885,6 +887,37 @@ void xmas_tree (void)
 // ==== Internals ====
 //
 
+void lionlionlion(void)
+{
+    if (__home == TRUE && __temple == TRUE)
+    { 
+        printf ("lion lion lion\n"); 
+        gde_clone_and_execute("gwssrv.bin");
+        exit(0);
+    } 
+    __home = FALSE;
+    __temple = FALSE; 
+}
+
+//backspace
+void do_back(void)
+{
+    // Apaga o char na tela, na linha de comandos e no buffer.
+    if ( textCurrentCol > 0 )
+    { 
+          // ok. funcionou. 
+          // a linha de comandos. prompt[]
+        putchar(0x8);  input(0x8);  // volta
+        putchar(0x20); input(0x20); // apaga
+        putchar(0x8);  input(0x8);  // volta
+        fflush(stdout);             // mostra sem mudar de linha.
+        //o buffer.
+        //volta um char no buffer e apaga na nova posiçao.
+        textCurrentCol--; 
+        LINES[textCurrentRow].CHARS[textCurrentCol] = 0; 
+    }
+}
+
 static inline void pause (void)
 {
     asm volatile ("pause" ::: "memory"); 
@@ -1051,7 +1084,6 @@ void reader_loop ()
  *     LOCAL
  */
 
-
 unsigned long 
 shellProcedure ( 
     struct window_d *window, 
@@ -1088,31 +1120,21 @@ shellProcedure (
                     goto done;
                     break; 
 
+                // #todo: tem que inserir no buffer tambem
                 case VK_TAB: 
-                    printf ("\t"); 
+                    printf ("\t");
+                    // for( shellInsertNextChar ( ' ' ); ...
                     goto done; 
                     break;
 
                 // #todo
                 // falta configurar prompt[] usado por input();
                 // falta configurar LINES[]...
-                //case 0x7f: // del
-                case 0x8: // backspace
-                case VK_BACK:  //0x0E
-                    // Apaga o char na tela, na linha de comandos e no buffer.
-                    if ( textCurrentCol > 0 )
-                    { 
-                        // ok. funcionou. 
-                        // a linha de comandos. prompt[]
-                        putchar(0x8);  input(0x8);  // volta
-                        putchar(0x20); input(0x20); // apaga
-                        putchar(0x8);  input(0x8);  // volta
-                        fflush(stdout);             // mostra sem mudar de linha.
-                        //o buffer.
-                        //volta um char no buffer e apaga na nova posiçao.
-                        textCurrentCol--; 
-                        LINES[textCurrentRow].CHARS[textCurrentCol] = 0;       
-                    }
+                
+                //case 0x7f:   // del
+                case 0x8:      // backspace
+                case VK_BACK:  // 0x0E
+                    do_back();
                     goto done;
                     break;
 
@@ -1123,8 +1145,17 @@ shellProcedure (
                 case 0x50: printf ("DOWN \n"); goto done; break;
 
                 // home end
-                case 0x47: printf ("HOME\n"); goto done; break;
-                case 0x4F: printf ("END \n"); goto done; break;
+                
+                case 0x47: 
+                    printf ("HOME\n");
+                    lionlionlion();
+                    goto done; 
+                    break;
+                    
+                case 0x4F: 
+                    printf ("END \n"); 
+                    goto done; 
+                    break;
 
                 //pageup pagedown
                 case 0x49: printf ("PAGEUP   \n"); goto done; break;
@@ -1150,77 +1181,44 @@ shellProcedure (
             break;
 
 
-        case MSG_KEYUP: 
-            break;
+        //case MSG_KEYUP: 
+            //break;
  
 
         case MSG_SYSKEYDOWN: 
             switch (long1)
             {
+                //case VK_F1:  printf("NOTHING\n");  break;
+                //case VK_F2:  printf("NOTHING\n");  break;
+                //case VK_F3:  printf("NOTHING\n");  break;
+                //case VK_F4:  printf("NOTHING\n");  break;
 
-                case VK_F1: 
-                    debug_print(" [F1] "); 
-                    gde_clone_and_execute ("launcher.bin");
-                    exit(0);
-                    break;
-                    
-                case VK_F2: 
-                    debug_print(" [F2] "); 
-                    gde_clone_and_execute ("gramcode.bin");
-                    exit(0);
-                    break;
-                    
-                case VK_F3: 
-                    debug_print(" [F3] "); 
-                    gde_clone_and_execute ("sysmon.bin");
-                    exit(0);
-                    break;
-                    
-                case VK_F4: 
-                    debug_print(" [F4] "); 
-                    gde_clone_and_execute ("gwssrv.bin");
-                    exit(0);
-                    break;
+                //case VK_F5:  printf("NOTHING\n");  break;
+                //case VK_F6:  printf("NOTHING\n");  break;
+                //case VK_F7:  printf("NOTHING\n");  break;
+                //case VK_F8:  printf("NOTHING\n");  break;
 
-                case VK_F9: 
-                    debug_print(" [F9] "); 
-                    gde_clone_and_execute ("reboot.bin");
-                    exit(0);
-                    break;
-
-                case VK_F10: 
-                    debug_print(" [F10] "); 
-                    gde_clone_and_execute ("reboot.bin");
-                    exit(0);
-                    break;
-
-                case VK_F11: 
-                    debug_print(" [F11] "); 
-                    gde_clone_and_execute ("reboot.bin");
-                    exit(0);
-                    break;
-
-                case VK_F12: 
-                    debug_print(" [F12] "); 
-                    gde_clone_and_execute ("reboot.bin");
-                    exit(0);
-                    break;
+                //case VK_F9:  printf("NOTHING\n");  break;
+                //case VK_F10: printf("NOTHING\n");  break;
+                //case VK_F11: printf("NOTHING\n");  break;
+                //case VK_F12: printf("NOTHING\n");  break;
 
             };
             goto done;
             break;
 
-		//Obs:
-		//essas teclas são tratadas pelo procedimento do sistema.
-		//mas alguma tecla personalizada pode ser  tratada pelo aplicativo,
-		//como o context menu [Application Key]
+        // #bugbug: rever
+        // essas teclas são tratadas pelo procedimento do sistema.
+        // mas alguma tecla personalizada pode ser  tratada pelo aplicativo,
+        // como o context menu [Application Key]
+
         case MSG_SYSKEYUP:
             switch (long1)
             {
                 // Menu.
-                case VK_APPS:
-                    gde_message_box ( 3, "gdeshell:", "VK_APPS" );
-                    break;
+                //case VK_APPS:
+                //    gde_message_box ( 3, "gdeshell:", "VK_APPS" );
+                //    break;
             };
             goto done;
             break;
@@ -1246,7 +1244,7 @@ shellProcedure (
         case MSG_CLOSE:   
             printf ("MSG_CLOSE\n");   
             exit(0);
-            gdeshell_exit();
+            //gdeshell_exit();
             break;
             
         case MSG_DESTROY: printf ("MSG_DESTROY\n"); break;
@@ -1731,6 +1729,7 @@ do_compare:
     // Podemos cancelar esse comandos extra no começo.
     // Pois estao sem uso.
 
+    /*
     if ( strncmp ( (char *) tokenList[0], "dobin", 5 ) == 0 ){
         goto dobin;
     }
@@ -1743,6 +1742,7 @@ do_compare:
     if ( strncmp ( (char *) tokenList[0], "dosh", 4 ) == 0 ){
         goto dosh;
     }
+    */
 
 
     // =============================================================
@@ -1793,6 +1793,7 @@ do_compare:
     // =============================================================
 
 
+
 // =================================================================
 // == The commands start here ======================================
 // =================================================================
@@ -1800,6 +1801,15 @@ do_compare:
     // #obs:
     // Em ordem alfabética.
 
+    if ( strncmp ( prompt, "350", 3 ) == 0 ){
+        __home = TRUE;
+        goto exit_cmp;
+    }
+
+    if ( strncmp ( prompt, "1156", 4 ) == 0 ){
+        __temple = TRUE;
+        goto exit_cmp;
+    }
 
     // about 
     if ( strncmp ( prompt, "about", 5 ) == 0 ){
@@ -4116,8 +4126,8 @@ void shellTree (void){
  *    prompt foi definido como stdin->_base.
  */
 
-void shellPrompt (void){
-
+void shellPrompt (void)
+{
     int i=0;
 
     // Clean prompt buffer.

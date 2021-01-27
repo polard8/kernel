@@ -1431,4 +1431,42 @@ rtl_strcaseequal (
 */
 
 
+/*
+int     __argc_save;
+char  **__argv_save;
+int rtl_check_parm (char *check);
+int rtl_check_parm (char *check)
+{
+    int i=0;
+
+    for (i = 1;i<__argc_save;i++)
+    {
+        if ( !strcasecmp(check, __argv_save[i]) ){
+            return (int) i;
+        }
+    };
+
+    return 0;
+}
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

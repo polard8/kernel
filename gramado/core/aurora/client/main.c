@@ -72,7 +72,7 @@ int gws(void)
     struct sockaddr addr; 
     int addrlen;
     
-    addr.sa_family = AF_GRAMADO;  //8000
+    addr.sa_family = AF_GRAMADO; 
     addr.sa_data[0] = 'w';
     addr.sa_data[1] = 's';  
 
@@ -153,11 +153,23 @@ gwsProcedure (
         // 22 = MSG_SYSKEYDOWN
         case MSG_SYSKEYDOWN:
             printf ("MSG_SYSKEYDOWN\n");
+
             switch (long1){
-                case VK_F1: gws_clone_and_execute("editor.bin"); break;
-                case VK_F2: gws_clone_and_execute("browser.bin"); break;
-                case VK_F3: gws_clone_and_execute("fileman.bin"); break;
+
+                case VK_F1: gws_clone_and_execute("editor.bin");   break;
+                case VK_F2: gws_clone_and_execute("gwm.bin");      break;
+                case VK_F3: gws_clone_and_execute("fileman.bin");  break;
                 case VK_F4: gws_clone_and_execute("terminal.bin"); break;
+
+                case VK_F5: gws_clone_and_execute("browser.bin"); break;
+                case VK_F6: gws_clone_and_execute("browser.bin"); break;
+                case VK_F7: gws_clone_and_execute("browser.bin"); break;
+                case VK_F8: gws_clone_and_execute("browser.bin"); break;
+                
+                case VK_F9 : gws_clone_and_execute("browser.bin"); break;
+                case VK_F10: gws_clone_and_execute("browser.bin"); break;
+                case VK_F11: gws_clone_and_execute("browser.bin"); break;
+                case VK_F12: gws_clone_and_execute("browser.bin"); break;
                 // ...
             };
             break;

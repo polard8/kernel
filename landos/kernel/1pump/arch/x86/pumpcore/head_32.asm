@@ -41,7 +41,7 @@ __HEAD
 ;;     The kernel starts here for x86 arch.
 ;;
 
-global _kernel_begin              
+global _kernel_begin 
 _kernel_begin:
 
     JMP START
@@ -52,18 +52,17 @@ align 4
 ;; =============================================================
 mboot_start:
 
-    ;	+-------------------+
-    ;0	| magic: 0x1BADB002 |	(required)
-    ;4	| flags		        |	(required)
-    ;8	| checksum	        |	(required)
-    ;	+-------------------+
-    ;8	| header_addr	    |	(present if flags[16] is set)
-    ;12	| load_addr	        |	(present if flags[16] is set)
-    ;16	| load_end_addr	    |	(present if flags[16] is set)
-    ;20	| bss_end_addr	    |	(present if flags[16] is set)
-    ;24	| entry_addr	    |	(present if flags[16] is set)
-    ;	+-------------------+
-
+    ;   +-------------------+
+    ;0  | magic: 0x1BADB002 |	(required)
+    ;4  | flags             |	(required)
+    ;8  | checksum          |	(required)
+    ;   +-------------------+
+    ;8  | header_addr       |	(present if flags[16] is set)
+    ;12 | load_addr         |	(present if flags[16] is set)
+    ;16 | load_end_addr     |	(present if flags[16] is set)
+    ;20 | bss_end_addr      |	(present if flags[16] is set)
+    ;24 | entry_addr        |	(present if flags[16] is set)
+    ;   +-------------------+
 
     dd  MULTIBOOT_MAGIC
     dd  multiboot_flags
@@ -114,6 +113,7 @@ START:
     ; ebp = BootBlock pointer.
     ; #importante
     ; AL e EBX foram configurados pelo BL.BIN ??
+    ; See: head.asm
 
     call head_init
 
@@ -160,6 +160,7 @@ _data_start:
 ;     Início do segmento BSS.
 ;     Coloca uma assinatura no todo.
 ;     Mas normalmente limpamos essa área.
+
 segment .bss
 global _bss_start
 _bss_start:

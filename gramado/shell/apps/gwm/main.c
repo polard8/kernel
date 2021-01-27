@@ -1561,7 +1561,7 @@ int main ( int argc, char *argv[] ){
     addr_in.sin_family = AF_INET;
     
     // Connecting to the window server in this machine.
-    addr_in.sin_port   = PORTS_WS;   
+    addr_in.sin_port   = PORTS_WS;
     addr_in.sin_addr.s_addr = IP(127,0,0,1); 
 
 
@@ -1580,9 +1580,9 @@ int main ( int argc, char *argv[] ){
     // cria o soquete.
     // AF_GRAMADO
     //fd = socket ( 8000, SOCK_STREAM, 0 );
-    //fd = socket ( AF_INET, SOCK_STREAM, 0 );
-    fd = socket ( AF_INET, SOCK_RAW, 0 );
-    
+    //fd = socket ( AF_INET, SOCK_RAW, 0 );
+    fd = socket ( AF_INET, SOCK_STREAM, 0 );
+        
     if ( fd < 0 ){
        printf ("gwm: Couldn't create socket\n");
        exit(1);
@@ -1595,7 +1595,7 @@ int main ( int argc, char *argv[] ){
     // Nessa hora colocamos no accept um fd.
     // então o servidor escreverá em nosso arquivo.
 
-    while(1){
+    while (1){
 
         // #debug
         //printf ("gnst: Connecting to the address 'ws' ...\n");      
@@ -1609,9 +1609,12 @@ int main ( int argc, char *argv[] ){
         }else{ break; }; 
     };
 
-
-    // Testing server.
-    hello(fd);
+    printf          ("gwm: DRAW\n");
+    
+    
+    
+    //#bugbug: It is wrong. hang
+    //hello(fd);
 
 
     //
@@ -1624,6 +1627,7 @@ int main ( int argc, char *argv[] ){
 
     // ...
 
+    
     gws_debug_print ("gwm: draw done!\n");
     //printf          ("gwm: draw done!\n");
 
@@ -1633,9 +1637,11 @@ int main ( int argc, char *argv[] ){
     //
     // == Loop ==============================
     //
+    
+    while(1){}
 
     // Loop de requests para o gws.
-    run (fd);
+    //run (fd);
 
 
     // #importante

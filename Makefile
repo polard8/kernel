@@ -230,6 +230,9 @@ gramado-shell:
 	$(Q) $(MAKE) -C gramado/shell/apps/
 	-sudo cp gramado/shell/apps/bin/EDITOR.BIN   base/
 	-sudo cp gramado/shell/apps/bin/FILEMAN.BIN  base/
+	-sudo cp gramado/shell/apps/bin/GWM.BIN      base/
+#	-sudo cp gramado/shell/apps/bin/S2.BIN  base/
+#	-sudo cp gramado/shell/apps/bin/S3.BIN  base/
 	-sudo cp gramado/shell/apps/bin/TERMINAL.BIN  base/
 
 	#::ui

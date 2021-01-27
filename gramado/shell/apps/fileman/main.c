@@ -900,6 +900,20 @@ int main ( int argc, char *argv[] ){
     };
     */
 
+    /*
+    //=================================
+    //get current thread
+    int cThread = (int) sc82 (10010,0,0,0);
+    //set foreground thread.
+    sc82 (10011,cThread,cThread,cThread);
+    
+    while(1){
+        if ( rtl_get_event() == TRUE ){  
+            filemanProcedure( (void*) RTLEventBuffer[0], RTLEventBuffer[1], RTLEventBuffer[2], RTLEventBuffer[3] );
+        }
+    };
+    //=================================
+    */
 
     while(1){}
 

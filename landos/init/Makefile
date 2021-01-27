@@ -110,7 +110,7 @@ all-c:
 
 
 shell-link:
-	$(LD) -m elf_i386 -T link.ld -o INIT.BIN $(myObjects)    
+	$(LD) -m elf_i386 -T ../applink.ld -o INIT.BIN $(myObjects)    
 
 finalize:
 #	cp INIT.BIN ../../bin/

@@ -888,8 +888,8 @@ int main ( int argc, char *argv[] ){
    // We need this or something is gonna fail in the title bar.
 
     //while(1){
-        browser_hello_request(client_fd);
-        browser_hello_response(client_fd);
+    //    browser_hello_request(client_fd);
+    //    browser_hello_response(client_fd);
     //}
 
     // The main window.
@@ -992,9 +992,10 @@ int main ( int argc, char *argv[] ){
     //
     // Loop.
     //
-
-
-    browser_loop(client_fd);
+ 
+    while(1){}
+        
+    // browser_loop(client_fd);
 
     debug_print ("browser: bye\n"); 
     printf      ("browser: bye\n");

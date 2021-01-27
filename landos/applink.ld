@@ -1,12 +1,3 @@
-/*
- * File: link.ld
- * 
- *    This file is used by ld.
- *    It's a common file for all the apps in this folder.
- *
- *    2018 - Created by Fred Nora.
- */
-
 
 OUTPUT_FORMAT("elf32-i386")
 ENTRY(__user_app__)
@@ -15,17 +6,18 @@ ENTRY(__user_app__)
 /* 0x00401000 = The entry point */
 
 SECTIONS
-{
+{ 
+
     .text 0x00401000: 
     {
-        code = .; 
+        code = .;  
         _code = .; 
         __code = .;
-        *(.head_x86)  *(.text)
-       . = ALIGN(4096);
+        *(.head_x86)  *(.text) 
+        . = ALIGN(4096);
     }
 
-    /* .rodata  ?? */
+    /* .rodata ? */
 
     .data :
     {
@@ -45,7 +37,6 @@ SECTIONS
         *(.bss)
         . = ALIGN(4096);
     }
-
 
     end = .; 
     _end = .; 
