@@ -51,9 +51,11 @@
 #include <sys/socket.h>
 #include <packet.h>
 
-// The client-side library.
-#include <gws.h>
 
+#include <rtl/gramado.h>
+
+// libgws - The client-side library.
+#include <gws.h>
 
 // gwm
 #include <gwm.h>
@@ -100,6 +102,45 @@ char mouse_packet_scroll = 0;
 
 char saved_mouse_x =0;
 char saved_mouse_y =0;
+
+
+
+// Window dialog
+// called by the event loop.
+int 
+gwmProcedure ( 
+    int window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 );
+int 
+gwmProcedure ( 
+    int window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 )
+{
+    //printf ("gwmProcedure:\n");
+    
+    
+    switch (msg)
+    {
+        case MSG_SYSKEYDOWN:
+            switch(long1)
+            {
+                case VK_F1:
+                    printf ("F1\n");
+                    break;
+            };
+            break;
+
+        case MSG_SYSKEYUP:
+            //printf ("MSG_SYSKEYUP:\n");
+            break;
+    };
+    
+    return 0;
+}
 
 
 /*
@@ -312,8 +353,8 @@ int fullscreen_client (int fd, struct wm_client_d *c)
     {
         if(c->used == 1)
         {
-            gws_change_window_position(fd,c->window, 0, 0);  //x,y
-            gws_resize_window(fd,c->window, w, h);     //w,h
+            gws_change_window_position(fd,c->window, 0, 0);  // x,y
+            gws_resize_window(fd,c->window, w, h);           // w,h
             gws_redraw_window(fd,c->window,1); 
         }  
     }
@@ -1637,8 +1678,22 @@ int main ( int argc, char *argv[] ){
     //
     // == Loop ==============================
     //
+
+    //=================================
+    //get current thread
+    int cThread = (int) sc82 (10010,0,0,0);
+    //set foreground thread.
+    sc82 (10011,cThread,cThread,cThread);
     
-    while(1){}
+    while(1){
+        if ( rtl_get_event() == TRUE ){  
+            gwmProcedure( RTLEventBuffer[0], RTLEventBuffer[1], RTLEventBuffer[2], RTLEventBuffer[3] );
+        }
+    };
+    //=================================
+
+
+    // while(1){}
 
     // Loop de requests para o gws.
     //run (fd);
