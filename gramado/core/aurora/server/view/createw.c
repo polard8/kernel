@@ -1518,9 +1518,9 @@ void *createwCreateWindow2 (
 // Não podemos usar a estrutura de janela
 // da api.
 
-                      
-void *
-createwCreateWindow ( 
+// #todo: change name to const char *
+
+void *createwCreateWindow ( 
     unsigned long type, 
     unsigned long status, 
     unsigned long view, 
@@ -1552,7 +1552,8 @@ createwCreateWindow (
     
     
     // #todo
-    // check parent window validation.
+    // Check parent window validation.
+    // APPLICATION window uses the screen margins for relative positions.
     //if ( (void*) pWindow == NULL ){}
     
 
@@ -1564,29 +1565,33 @@ createwCreateWindow (
     // Overlapped
     if ( type == WT_OVERLAPPED )
     {
-        __w = (void *) createwCreateWindow2 ( WT_SIMPLE, 
-                           status, 
-                           view, 
+        __w = (void *) createwCreateWindow2 ( 
+                           WT_SIMPLE, status, view, 
                            (char *) windowname, 
                            x, y, width, height, 
                            (struct gws_window_d *) pWindow, 
-                           desktopid, clientcolor, color );          
+                           desktopid, clientcolor, color );  
     
         // Pintamos simples, mas a tipagem será overlapped.
         __w->type = WT_OVERLAPPED;   
        goto draw_frame;
     }
 
-
+    // #todo
+    // It does not exist by itself. It needs a parent window.
+    
     //edit box
     if ( type == WT_EDITBOX )
     {
+        //if ( (void*) pWindow == NULL ){ return NULL; }
+        
         // Podemos usar o esquema padrão de cores ...
-        __w = (void *) createwCreateWindow2 ( WT_SIMPLE, 
-                           status, view, (char *) windowname, 
+        __w = (void *) createwCreateWindow2 ( 
+                           WT_SIMPLE, status, view, 
+                           (char *) windowname, 
                            x, y, width, height, 
                            (struct gws_window_d *) pWindow, 
-                           desktopid, clientcolor, color );      
+                           desktopid, clientcolor, color ); 
 
         //pintamos simples, mas a tipagem será  overlapped
         __w->type = WT_EDITBOX;   
@@ -1594,13 +1599,20 @@ createwCreateWindow (
     }
 
 
+    // #todo
+    // It does not exist by itself. It needs a parent window.
+
     //button
     if ( type == WT_BUTTON )
     {
         gwssrv_debug_print ("[DEBUG]: createwCreateWindow WT_BUTTON\n");
+      
+        //if ( (void*) pWindow == NULL ){ return NULL; }
+        
         // Podemos usar o esquema padrão de cores ...
-        __w = (void *) createwCreateWindow2 ( WT_BUTTON, 
-                           status, view, (char *) windowname, 
+        __w = (void *) createwCreateWindow2 ( 
+                           WT_BUTTON, status, view, 
+                           (char *) windowname, 
                            x, y, width, height, 
                            (struct gws_window_d *) pWindow, 
                            desktopid, clientcolor, color ); 
@@ -1614,11 +1626,12 @@ createwCreateWindow (
     // Types with no frame!
     if ( type == WT_SIMPLE )
     {
-        __w = (void *) createwCreateWindow2 ( type, 
-                       status, view, (char *) windowname, 
-                       x, y, width, height, 
-                       (struct gws_window_d *) pWindow, 
-                       desktopid, clientcolor, color );  
+        __w = (void *) createwCreateWindow2 ( 
+                           WT_SIMPLE, status, view, 
+                           (char *) windowname, 
+                           x, y, width, height, 
+                           (struct gws_window_d *) pWindow, 
+                           desktopid, clientcolor, color );  
 
          if ( (void *) __w == NULL )
             gwssrv_debug_print ("createwCreateWindow: createwCreateWindow2 fail \n");

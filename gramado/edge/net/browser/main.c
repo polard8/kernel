@@ -1,12 +1,7 @@
 /*
  * File: main.c
  *
- *    Client side application for Gramado Network Server.
- *    Using socket to connect with gns.
- *    AF_GRAMADO family.
- * 
- * 
- *       O propósito é testar o servidor gns.
+ *     Client side application using gwssrv.
  *
  * 2020 - Created by Fred Nora.
  */
@@ -921,14 +916,14 @@ int main ( int argc, char *argv[] ){
         w_width  = w;
         w_height = h;
         
-        //posicionamento
+        // posicionamento
         viewwindowx = 0;
         viewwindowy = 0;
     }
 
 
-
-    //main window
+    // ===================
+    // main window
     main_window = gws_create_window (client_fd,
                       WT_OVERLAPPED, 1, 1, "Browser",
                       viewwindowx, viewwindowy, w_width, w_height,
@@ -939,17 +934,17 @@ int main ( int argc, char *argv[] ){
         exit(1);
     }
 
+    // ===================
     // address bar
     addressbar_window = gws_create_window (client_fd,
         WT_EDITBOX,1,1,"address-bar",
         4, 32 +4, 
         (w_width-32-4-4-4), 32,
-        main_window,0,COLOR_WHITE, COLOR_WHITE);
+        main_window, 0, COLOR_WHITE, COLOR_WHITE );
 
     if ( addressbar_window < 0 )             
         debug_print("browser: addressbar_window fail\n"); 
-        
-     
+
      gws_draw_text (
         (int) client_fd,             // fd,
         (int) addressbar_window,              // window id,
@@ -958,24 +953,25 @@ int main ( int argc, char *argv[] ){
         (unsigned long) COLOR_BLACK,
         "http://www.google.com");
 
+    // ===================
     // button
     button = gws_create_window (client_fd,
         WT_BUTTON,1,1,">",
         (w_width-32-4), 32 +4, 
         32, 32,
-        main_window,0,COLOR_GRAY, COLOR_GRAY);
+        main_window, 0, COLOR_GRAY, COLOR_GRAY );
 
-    if ( button < 0 )             
+    if ( button < 0 ) 
         debug_print("browser: button fail\n"); 
 
 
-
+    // ===================
     // client window (White)
     client_window = gws_create_window (client_fd,
         WT_SIMPLE,1,1,"client",
         4, 32 +40, 
         w_width-8, w_height - 40 - 4 -32,
-        main_window,0,COLOR_WHITE, COLOR_WHITE);
+        main_window, 0, COLOR_WHITE, COLOR_WHITE );
 
     if ( client_window < 0 )             
         debug_print("browser: client_window fail\n"); 
@@ -988,6 +984,8 @@ int main ( int argc, char *argv[] ){
         (unsigned long) COLOR_BLACK,
         "Hello, from G**gle!");
 
+
+    gws_refresh_window( client_fd, main_window );
 
     //
     // Loop.
