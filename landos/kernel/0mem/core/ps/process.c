@@ -1967,10 +1967,15 @@ void init_tasks (void)
  *   #todo: rever esse nome, pois na verdade estamos inicializando variaveis 
  * usadas no gerenciamento de processo.
  */
- 
+
+// Called by init_microkernel in mk.c
+
 void init_processes (void){
 
     int i=0;
+
+    debug_print("init_processes:\n");
+
 
 	//
 	// Iniciando vari�veis globais.

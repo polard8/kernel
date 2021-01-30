@@ -255,9 +255,10 @@ struct thread_d
     unsigned long name_pointer; 
     char short_name[4];
     char *cmd;
-
-    //#test
-    //Assim fica mais fácil enviar para o aplicativo.
+    
+    // #test
+    // estamos usando esse aqui.
+    // Assim fica mais fácil enviar para o aplicativo.
     char __threadname[64];    // HOSTNAME_BUFFER_SIZE
     size_t threadName_len;    // len 
 
@@ -390,33 +391,26 @@ struct thread_d
 	// O que segue é referenciado durante o processo de dispatch.
 	//
 
-    // save:
+
     // Sinaliza que a tarefa teve o seu contexto salvo.
-    // #todo: Isso pode ser int, bool ou char.
+    // #todo: use 'int'
     unsigned long saved;
-
-
-    //
-    //  == Heap ==========================================
-    //
-
-    unsigned long Heap;
-    unsigned long HeapSize;
 
     //todo: Usar a estrutura. 
     //struct heap_d *heap;
 
-    //
-    //  == Stack ==========================================
-    //
+    // Heap and Stack.
+
+    unsigned long Heap;
+    unsigned long HeapSize;
 
     unsigned long Stack;
     unsigned long StackSize;
 
 
-	//Endereço de um array contendo ponteiros para variso serviços
-	//que a thread pode usar.
-	//unsigned long ServiceTable;
+	// Endereço de um array contendo ponteiros para variso serviços
+	// que a thread pode usar.
+	// unsigned long ServiceTable;
 
     //
     // == Time ===================================
@@ -569,42 +563,50 @@ struct thread_d
 
 
     //
-    // == Kernel ===========================================
+    // == kernel event ====================================
     //
 
     // #test
     // Sending a message to the kernel.
-    // #todo: no queue.
-
-    struct window_d *window;    //arg1.
-    int msg;                    //arg2.
-    unsigned long long1;        //arg3.
-    unsigned long long2;        //arg4.
+    // no queue.
 
     // Flag avisando que tem nova mensagem.
     // O kernel deve checar essa flag. Se ela estiver acionada,
     // significa que o kernel deve processar essa mensagem.
-    
-    int newmessageFlag;         
 
+    //++
+    struct window_d  *ke_window;
+    int               ke_msg;
+    unsigned long     ke_long1;
+    unsigned long     ke_long2;
+
+    int               ke_newmessageFlag; 
+    //--
 
 
     //
-    // == Notify ===========================================
+    // == Event queue ===========================================
     //
-
-    // O processo recebe uma notificaçao de que um evento ocorreu.
-    // a notificaçao eh o proprio evento em si. 
 
     // This is the event queue.
     // It is used by the ring 3 processes.
-    // Normally a server enter in a loop waiting for events,
-    // One of these events can be 
-    // the MSG_CLIENT_REQUEST/ EVENT_CLIENT_REQUEST.
+    // #todo: 
+    // We can put all these into a structure.
 
-    // lists
+    // Lists:
+    // window_list: pointer to window structure.
+    // msg_list:    event type.
+    // long1_list:  data 1
+    // long2_list:  data 2
+    // long3_list:  data 3
+    // long4_list:  data 4
+
+    // MAXEVENTS
+    // See: events.h
+    
+    //++
     struct window_d  *window_list[32];
-    int                  msg_list[32];  // <<< --- This is the event ID.
+    int                  msg_list[32];
     unsigned long      long1_list[32];
     unsigned long      long2_list[32];
     unsigned long      long3_list[32];
@@ -613,6 +615,7 @@ struct thread_d
     // offsets
     int tail_pos;
     int head_pos;
+    //--
 
     // ====================================================
 
@@ -674,26 +677,21 @@ struct thread_d
     object_class_t  woClass;  //obClass;  //woClass
 
 
-    //
-    // == Signal ======================================
-    //
-    
+    // Signal support
+
     unsigned long signal;
     unsigned long umask;
 
-    //
-    // == Exit ======================================
-    //
+    // Exit
+    // Reason to close the thread.
 
-    //Motivo da thread fechar.
     int exit_code;
 
     // Navigation
 
-    struct thread_d *prev;
-    struct thread_d *next;
+    struct thread_d  *prev;
+    struct thread_d  *next;
 };
-
 
 
 // Ponteiro para a idle thread atual

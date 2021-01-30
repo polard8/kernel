@@ -5,7 +5,7 @@
  *     2015 - Created by fred Nora.
  */
 
- 
+
 #include <kernel.h>
 
 
@@ -219,50 +219,54 @@ int init_microkernel (void){
     int Status = 0;
 
 
+    debug_print("init_microkernel:\n");
+
+
 #ifdef KERNEL_VERBOSE	
     printf ("MICROKERNEL:\n");
 #endif
 
 
-    // Lock task switch and lock scheduler. 
-    set_task_status(LOCKED);
-    scheduler_lock();
-
     // Init scheduler.
-    init_scheduler ();
+    // See: sched/sched.c
+
+    init_scheduler();
 
     // Init processes, threads, 
+    // See: process.c and thread.c
+
     init_processes();
-    init_threads();    
+    init_threads();
 
 
     // Init IPC and Semaphore.
+    // See: ??
+
     ipc_init ();
     create_semaphore(); 
 
 
-	//
-	// Queue.
-	// 
+    // Queue.
+    // Inicializar as filas que alimentarão a lista do dispatcher.
 
-    // Inicializar as filas que alimentarão a lista do dispatcher.	
     queue = kmalloc ( sizeof( struct queue_d ) );
 
     if( (void *) queue == NULL ){
         panic ("init_microkernel: queue\n");
     }else{
 
+        // Inicializa todas as filas do microkernel.
+        init_queue(queue);
 
-		//Inicializa todas as filas do microkernel.
-	    init_queue (queue);
-		
-		// Initializing the dispatcher list.
-		init_dispatcher ();
-		//...
-	};
-	
-	//...
-	
+        // Initializing the dispatcher list.
+        // See: disp/dispatch.c
+        init_dispatcher();
+
+        // ...
+    };
+
+    // ...
+
 	//
 	// Dispatch Count Block.
 	//
@@ -271,7 +275,6 @@ int init_microkernel (void){
 
     if ( (void *) DispatchCountBlock == NULL ){
         panic ("init_microkernel: DispatchCountBlock\n");
-
     } else {
 
         DispatchCountBlock->SelectIdleCount = 0;
@@ -286,7 +289,7 @@ int init_microkernel (void){
 
     //More?!
 
-    Initialization.microkernel = 1;
+    Initialization.microkernel = TRUE;
 
 
 #ifdef PS_VERBOSE
@@ -299,7 +302,7 @@ int init_microkernel (void){
 	//a primeira mensagem só aparece após a inicialização da runtime.
 	//por isso não deu pra limpar a tela antes.
     printf (">>>debug hang: after init_microkernel");
-    die ();
+    die();
 #endif
 
 

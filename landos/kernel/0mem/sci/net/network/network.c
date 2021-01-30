@@ -452,12 +452,16 @@ network_procedure (
                 refresh_screen();
                 break; 
             }
-            // Mensagem.
-           __process->control->window  = NULL;
-           __process->control->msg     = (int) MSG_AF_INET;    //Temos uma mensagem. 
-           __process->control->long1   = (unsigned long) 0;
-           __process->control->long2   = (unsigned long) 0;
-           __process->control->newmessageFlag = 1;
+
+            // Kernel single event.
+            // It is not the event queue.
+
+           __process->control->ke_window  = NULL;
+           __process->control->ke_msg     = (int) MSG_AF_INET;
+           __process->control->ke_long1   = (unsigned long) 0;
+           __process->control->ke_long2   = (unsigned long) 0;
+
+           __process->control->ke_newmessageFlag = TRUE;
 
             // pty_send_message_to_thread ( (unsigned long) msg_buffer, (int) t->tid );  
             //network_status = ; //apto a
@@ -479,11 +483,16 @@ network_procedure (
             sprintf( (char *) ____network_file->_base, "Hello friend!\n");
             //memcpy ( (void *), (const void *), (size_t) );
 
-           __process->control->window = NULL;
-           __process->control->msg = (int) MSG_NET_DATA_IN;  //temos uma mensagem. 
-           __process->control->long1 = (unsigned long) long1;  
-           __process->control->long2 = (unsigned long) long2;  
-           __process->control->newmessageFlag = 1;
+            // Kernel single event.
+            // It is not the event queue.
+
+           __process->control->ke_window = NULL;
+           __process->control->ke_msg    = (int) MSG_NET_DATA_IN;
+           __process->control->ke_long1  = (unsigned long) long1;
+           __process->control->ke_long2  = (unsigned long) long2;
+
+           __process->control->ke_newmessageFlag = TRUE;
+
            break;
 
 		//send ARP packet
@@ -523,11 +532,17 @@ network_procedure (
             sprintf( (char *) ____network_file->_base, 
                 "Hello process. We've got your ipv4 packet!\n");
             //memcpy ( (void *), (const void *), (size_t) );
-            __process->control->window = NULL;
-            __process->control->msg = (int) MSG_NETWORK_NOTIFY_PROCESS;   
-            __process->control->long1 = (unsigned long) long1; 
-            __process->control->long2 = (unsigned long) long2; 
-            __process->control->newmessageFlag = 1;
+
+            // Kernel single event.
+            // It is not the event queue.
+
+            __process->control->ke_window = NULL;
+            __process->control->ke_msg    = (int) MSG_NETWORK_NOTIFY_PROCESS;   
+            __process->control->ke_long1  = (unsigned long) long1; 
+            __process->control->ke_long2  = (unsigned long) long2; 
+
+            __process->control->ke_newmessageFlag = TRUE;
+
             break;
 
    
@@ -541,9 +556,9 @@ network_procedure (
         //...
     } 
 
-
 	//printf ("network_procedure: done\n");
 	//refresh_screen();
+
     return (unsigned long ) 0;
 }
 

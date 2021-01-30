@@ -950,16 +950,14 @@ get_next:
         // message support.
         //
 
-        // Single message;
-        // Msg support. //Argumentos.
-        Thread->window = NULL;  //arg1.
-        Thread->msg    = 0;     //arg2.
-        Thread->long1  = 0;     //arg3.
-        Thread->long2  = 0;     //arg4.
-        //Thread->long
-        //Thread->long
-        //Thread->long
-        //...
+        // Single kernel event.
+
+        Thread->ke_window = NULL;
+        Thread->ke_msg    = 0;
+        Thread->ke_long1  = 0;
+        Thread->ke_long2  = 0;
+
+        Thread->ke_newmessageFlag = FALSE;
 
         // loop
         for ( q=0; q<32; ++q )
@@ -1455,10 +1453,14 @@ void show_thread_information (void){
  *     que lidam com threads.
  */
 
+// Called by init_microkernel in mk.c
+
 int init_threads (void){
 
     int i=0;
 
+
+    debug_print("init_threads:\n");
 
 	//Globais.
 	current_thread = 0;  //Atual. 
@@ -1517,7 +1519,6 @@ struct thread_d *process_from_tid( int thread_tid )
  **********************************************************
  * thread_getchar:
  *     Esse eh o serviço 137.
-
  */
 
 // #bugbug
@@ -1544,8 +1545,8 @@ int thread_getchar (void)
 	// mas esteja rodando na janela do shell.
 
 
-    struct thread_d *t;
-    struct window_d *w;
+    struct thread_d  *t;
+    struct window_d  *w;
 
 	//
 	// Bloqueia pra que nenhum aplicativo pegue mensagens 
@@ -1561,13 +1562,12 @@ int thread_getchar (void)
     // Isso coloca a mensagem na thread de controle da 
     // janela com o foco de entrada.
 
-    SC = (unsigned char) get_scancode(); // #BUGBUG THIS IS A RAW BYTE, NOT A SCANCODE.
+    SC = (unsigned char) get_scancode(); 
 
     // #todo
     //  trocar isso por foreground_thread.
-    KGWS_SEND_KEYBOARD_MESSAGE ( foreground_thread, SC );   // #BUGBUG THIS IS A RAW BYTE, NOT A SCANCODE.
 
-
+    KGWS_SEND_KEYBOARD_MESSAGE ( foreground_thread, SC ); 
 
 
     // Get the event.
@@ -1579,7 +1579,6 @@ int thread_getchar (void)
 
     if ( (void *) w == NULL ){
         panic ("thread_getchar: w");
-
     }else{
         if ( w->used != 1 || w->magic != 1234 ){
             panic ("thread_getchar: w validation");
@@ -1592,33 +1591,32 @@ int thread_getchar (void)
         if ( (void *) t == NULL ){  goto fail;  }
     };
 
-
-    // with validation.
-    if ( (void*) t != NULL )
+    // Thread validation.
+    if ( (void *) t != NULL )
     {
         // validation
-        if ( t->used == 1 && t->magic == 1234 )
+        if ( t->used == TRUE && t->magic == 1234 )
         {
-            if ( t->newmessageFlag != 1 ){  goto fail; }
+            if ( t->ke_newmessageFlag != 1 ){  goto fail; }
             
             // == Only keydown ====================================
-            if ( t->msg != MSG_KEYDOWN ){  goto fail;  }
+            if ( t->ke_msg != MSG_KEYDOWN ){  goto fail;  }
     
             // salva o char.
-            save = (int) t->long1;
+            save = (int) t->ke_long1;
 
             // Limpa.
             // Sinaliza que a mensagem foi consumida, 
             // e que nao temos nova mensagem.
             
-            // event
-            t->window = 0;
-            t->msg = 0;
-            t->long1 = 0;
-            t->long2 = 0;
-            
-            //falg
-            t->newmessageFlag = 0;
+            // Kernel single event.
+
+            t->ke_window = NULL;
+            t->ke_msg    = 0;
+            t->ke_long1  = 0;
+            t->ke_long2  = 0;
+
+            t->ke_newmessageFlag = FALSE;
 
             // OK. Return the char.
             return (int) save;

@@ -1015,39 +1015,39 @@ kgwm_window_control_dialog (
 			        
                     if ( window->isMinimize == 1 )
                     {
-                      window->control->window = window; //afeta esse botão
-                      window->control->msg = MSG_HIDE;
-                      window->control->long1 = 0;
-                      window->control->long2 = 0;
-                      window->control->newmessageFlag = 1;
+                        window->control->ke_window = window; //afeta esse botão
+                        window->control->ke_msg    = MSG_HIDE;
+                        window->control->ke_long1  = 0;
+                        window->control->ke_long2  = 0;
+
+                        window->control->ke_newmessageFlag = TRUE;
                     }
                     //if ( window->isRestore == 1 ){} //#todo: Criar esse elemento na struct
                     if ( window->isMaximize == 1 )
                     {
-                      window->control->window = window; //afeta esse botão
-                      window->control->msg = MSG_MAXIMIZE;
-                      window->control->long1 = 0;
-                      window->control->long2 = 0;
-                      window->control->newmessageFlag = 1;
+                        window->control->ke_window = window; //afeta esse botão
+                        window->control->ke_msg    = MSG_MAXIMIZE;
+                        window->control->ke_long1  = 0;
+                        window->control->ke_long2  = 0;
+
+                        window->control->ke_newmessageFlag = TRUE;
                     }
                     if ( window->isClose == 1 )
                     {
-                      window->control->window = window; //afeta esse botão
-                      window->control->msg = MSG_CLOSE;
-                      window->control->long1 = 0;
-                      window->control->long2 = 0;
-                      window->control->newmessageFlag = 1;
+                        window->control->ke_window = window; //afeta esse botão
+                        window->control->ke_msg    = MSG_CLOSE;
+                        window->control->ke_long1  = 0;
+                        window->control->ke_long2  = 0;
+
+                        window->control->ke_newmessageFlag = TRUE;
                     }
 
-			        return 0;
-					}
-				    break;
-			};
-		    break;		
-				
-				
-	};
-
+                    return 0;
+                }
+                break;
+            };
+            break;
+    };
 
     return 0;
 }

@@ -901,10 +901,16 @@ fail:
  *
  * @todo: Mudar o nome para dispachInit();.
  */ 
- 
+
+// Called by init_microkernel in mk.c
+
 int init_dispatcher (void){
 
     int i=0;
+
+    // Lock task switch. (dispatcher)
+    // ts is part of dispatcher
+    set_task_status(LOCKED);
 
 	//
 	// Para um dispatcher na forma de array.

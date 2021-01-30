@@ -109,16 +109,16 @@ void *create_CreateRing0IdleThread(void)
     // == message support =============
     //
 
-    // Single message;
-    t->window = NULL;      // arg1.
-    t->msg = 0;            // arg2.
-    t->long1 = 0;          // arg3.
-    t->long2 = 0;          // arg4.
-    //t->long
-    //t->long
-    //t->long
-    //...
-    
+    // Single kernel event
+
+    t->ke_window = NULL;
+    t->ke_msg    = 0;
+    t->ke_long1  = 0;
+    t->ke_long2  = 0;
+
+    t->ke_newmessageFlag =  FALSE;
+
+
     // loop
     // Message queue.  
     for ( i=0; i<32; ++i )
@@ -404,15 +404,14 @@ void *create_CreateRing3InitThread (void)
     InitThread->procedure = (unsigned long) &system_procedure;
 
 
-    // Single message;
-    //Argumentos do procedimento de janela.	
-    InitThread->window = NULL; //window;//arg1.
-    InitThread->msg   = 0;     //arg2.
-    InitThread->long1 = 0;     //arg3.
-    InitThread->long2 = 0;     //arg4.
-    //InitThread->long
-    //InitThread->long
-    //...
+    // Single kernel event.
+
+    InitThread->ke_window = NULL;
+    InitThread->ke_msg    = 0;
+    InitThread->ke_long1  = 0;
+    InitThread->ke_long2  = 0;
+
+    InitThread->ke_newmessageFlag =  FALSE;
 
     // loop
     // Clean the message queue.

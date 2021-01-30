@@ -168,36 +168,30 @@ XPROC_SEND_MESSAGE (
         return -1;
     }
 
+    // window
 
     w = (void *) windowList[window_with_focus];
 
-	if ( (void *) w == NULL )
-	{
-		panic ("XPROC_SEND_MESSAGE: w");
+    if ( (void *) w == NULL ){
+        panic ("XPROC_SEND_MESSAGE: w\n");
+    }else{
+        if ( w->used != TRUE || w->magic != 1234 ){
+            panic ("XPROC_SEND_MESSAGE: w validation\n");
+        }
 
-	}else{
-		
-		if ( w->used != 1 || w->magic != 1234 ){
-			panic ("XPROC_SEND_MESSAGE: w validation");
-		}
+        // thread
+        // Pegamos a thread de input associada com a janela 
+        // que tem o foco de entrada.
 
-		//
-		// ## thread ##
-		//
-		
-		//#importante:
-		//Pegamos a thRead de input associada com a janela 
-		//que tem o foco de entrada.
-		
-		t = (void *) w->control;
-		
-		if ( (void *) t == NULL ){
-		    panic ("XPROC_SEND_MESSAGE: t");
-		}
+        t = (void *) w->control;
 
-		if ( t->used != 1 || t->magic != 1234 ){
-			panic ("XPROC_SEND_MESSAGE: t validation \n");
-		} 
+        if ( (void *) t == NULL ){
+            panic ("XPROC_SEND_MESSAGE: t\n");
+        }
+
+        if ( t->used != 1 || t->magic != 1234 ){
+            panic ("XPROC_SEND_MESSAGE: t validation \n");
+        }
 
 		//#importante:
 		//??
@@ -212,13 +206,15 @@ XPROC_SEND_MESSAGE (
 		
 		//??
 		//ja o input de mouse deve ir para a thread de qualquer janela.
-		
-		t->window = window;
-		t->msg    = (int) msg;
-		t->long1  = long1;
-		t->long2  = long2;
 
-		t->newmessageFlag = 1;
+        // Kernel single event.
+
+        t->ke_window = window;
+        t->ke_msg    = (int) msg;
+        t->ke_long1  = (unsigned long) long1;
+        t->ke_long2  = (unsigned long) long2;
+
+        t->ke_newmessageFlag = TRUE;
     };
 
     return 0;
@@ -257,7 +253,6 @@ void xxxtestlibc (void)
 // ?? Testando rotina de write sector.
 void procTestF6 (void)
 {
-
     debug_print ("procTestF6: deprecated\n");
     return;
     

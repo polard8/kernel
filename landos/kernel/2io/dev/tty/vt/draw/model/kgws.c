@@ -1082,22 +1082,29 @@ int kgws_mouse_scan_windows (void)
                         {
 							//ps2mouse_change_and_show_pointer_bmp(4); //folder bmp
 							//pegamos o total tick
-							kgws_current_totalticks = (unsigned long) get_systime_totalticks();
+                            kgws_current_totalticks = (unsigned long) get_systime_totalticks();
                             kgws_delta_totalticks = (kgws_current_totalticks - kgws_last_totalticks); 
                             //printf ( "x=%d l=%d d=%d \n",
                                //kgws_current_totalticks, kgws_last_totalticks, kgws_delta_totalticks ); 
                                //refresh_screen();
                             kgws_last_totalticks = kgws_current_totalticks;
-                            t->window = Window;
-                            t->msg = MSG_MOUSEKEYDOWN;
+                            
+                            // Kernel single event.
+                            
+                            // Normalizing.
+                            t->ke_window = Window;
+                            t->ke_msg    = MSG_MOUSEKEYDOWN;
+                            t->ke_long1  = 1;
+                            t->ke_long2  = 0;
+
+                            // Modifying event type.
                             if (kgws_delta_totalticks < 1000) //2000
                             {
-								t->msg = MSG_MOUSE_DOUBLECLICKED; 
-								kgws_delta_totalticks=8000; // delta inválido.
-							}
-                            t->long1 = 1;
-                            t->long2 = 0;
-                            t->newmessageFlag = 1;   
+                                t->ke_msg = MSG_MOUSE_DOUBLECLICKED; 
+                                kgws_delta_totalticks=8000; // delta inválido.
+                            }
+
+                            t->ke_newmessageFlag = TRUE;
 							//estamos carregando o objeto
 							//kgws_mouse_event_drag_status = 1;                        
                         }

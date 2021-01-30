@@ -3931,9 +3931,7 @@ int windowOverLappedScan ( unsigned long x, unsigned long y ){
 
 			};
 		};
-
-	}; //for
-
+    }; //for
 
     return (int) -1;
 }
@@ -3953,30 +3951,34 @@ void windowUpdateWindow ( struct window_d *window )
         //(unsigned long) 0 );
         
         
-		//window = (struct window_d *) arg2;
+    //window = (struct window_d *) arg2;
 
-        if ( (void *) window == NULL ){  return; }
+    if ( (void *) window == NULL ){  return; }
 
-        if ( window->type == WT_OVERLAPPED || window->type == WT_SIMPLE )
+    if ( window->type == WT_OVERLAPPED || window->type == WT_SIMPLE )
+    {
+
+        // Validade da thread.
+        // mandamos a mensagem
+        // o aplicativo decide o que fazer com ela.
+
+        if ( (void *) window->control != NULL )
         {
-		    // Validade da thread.
-            if ( (void *) window->control != NULL )
+            if ( window->control->used == 1 || 
+                 window->control->magic == 1234 )
             {
-			    // Validade da thread.
-			    if ( window->control->used == 1 || 
-			         window->control->magic == 1234 )
-			    {
-			       // mandamos a mensagem
-			       // o aplicativo decide o que fazer com ela.
-			        window->control->window = window;
-			        window->control->msg = MSG_PAINT;
-			        window->control->long1 = 0;
-			        window->control->long2 = 0;
-			        window->control->newmessageFlag = 1;
-			    }
-		    }
-        };
 
+                // Single kernel event.
+
+                window->control->ke_window = window;
+                window->control->ke_msg    = MSG_PAINT;
+                window->control->ke_long1  = 0;
+                window->control->ke_long2  = 0;
+
+                window->control->ke_newmessageFlag = TRUE;
+            }
+        }
+    }
 }
 
 

@@ -76,11 +76,11 @@
 
 // These values came from BL.BIN.
 // bootblock, lfb, device width, device height, bpp ...
-extern unsigned long SavedBootBlock; 
+//extern unsigned long SavedBootBlock; 
 extern unsigned long SavedLFB;
-extern unsigned long SavedX;
-extern unsigned long SavedY;
-extern unsigned long SavedBPP;
+//extern unsigned long SavedX;
+//extern unsigned long SavedY;
+//extern unsigned long SavedBPP;
 // ...
 
 
@@ -150,6 +150,7 @@ void *clone_kernel_page_directory (void)
 //
 // #important: DANGER !!!
 //
+// get_table_pointer:
 //
 // #bugbug
 // Isso eh um improviso, precisamos de outro endereço.
@@ -209,11 +210,12 @@ unsigned long get_table_pointer (void)
  *     Frame table to handle a pool of page frames.
  */
 
-
 int initialize_frame_table (void){
 
     int i=0;
 
+
+    debug_print("initialize_frame_table:\n");
 
     FT.total_frames = (FT.frame_table_size_in_bytes/4096);
 
@@ -232,12 +234,10 @@ int initialize_frame_table (void){
         panic("initialize_frame_table: frame_table_size_in_bytes");
     }
 
-
     // Clear frame table.
-    for (i=0; i< FT.total_frames; i++){
+    for (i=0; i < FT.total_frames; i++){
         FT.frame_table[i] = 0;
     }
-
 
     //#debug
     printf ("Table size in pages %d\n",FT.n_pages);
@@ -285,24 +285,47 @@ unsigned long get_new_frame (void){
  * 
  */
 
-// Para clonar um diretório.
+// Clona um diretório dado seu endereço.
 // Queremos clonar o diretório atual,
-// para que o processo filho tenha o memso diretório do processo pai. 
+// para que o processo filho tenha o mesmo diretório do processo pai. 
 
-void *clone_directory( unsigned long directory_va ){
+// #??
+// Esse endereço virtual eh valido?
+// Pertence ao diretorio que estamos usando no momento?
+
+// #todo
+// mm_clone_directory
+
+void *clone_directory ( unsigned long directory_va ){
 
     unsigned long destAddressVA=0; 
     int i=0;
+
+
+    // #test
+    // no directory in the address '0'
+
+    if ( directory_va == 0 )
+        panic("clone_directory: directory_va\n");
+
+
+    // Get a target address for the directory.
     
+    // #bugbug:
+    // We are using that routine to get a poiter for a table.
+    // Is that a virtual address ?
+    // What about the size?
 
     destAddressVA = (unsigned long) get_table_pointer(); 
-
+    
     if ( destAddressVA == 0 ){
         panic ("CreatePageDirectory: destAddressVA\n");
     }
 
+    // Initialization
+
     unsigned long *src = (unsigned long *) directory_va;
-    unsigned long *dst = (unsigned long *) destAddressVA; 
+    unsigned long *dst = (unsigned long *) destAddressVA;
 
     // Copy.
 
@@ -310,7 +333,6 @@ void *clone_directory( unsigned long directory_va ){
         dst[i] = (unsigned long) src[i]; 
     };
 
-    // Done.
     // The address of the new page diretory.
 
     return (void *) destAddressVA;
@@ -324,6 +346,9 @@ void *clone_directory( unsigned long directory_va ){
  *    Clone the kernel page diretory.
  *    OUT: The virtual address of the new directory.
  */
+
+// #todo
+// mmCloneKernelPageDirectory
 
 void *CloneKernelPageDirectory (void){
 
@@ -400,6 +425,8 @@ void *CloneKernelPageDirectory (void){
 // #bugbug:
 // Isso aparentemente est� com problema. #testando ...
 
+// #todo
+// mmCreatePageTable
 
 void *CreatePageTable ( 
     unsigned long directory_address_va, 
@@ -577,7 +604,7 @@ void *CreatePageTable (
 // N�o podemos usar um diret�rio de p�ginas que esteja
 // no in�cio da mem�ria RAM.
 // See: x86/headlib.asm
-    
+
 void x86_SetCR3 (unsigned long pa)
 {
     if (pa == 0){
@@ -608,10 +635,8 @@ unsigned long mm_get_current_directory_pa (void)
 // And then switch back to the current directory.
 void mm_switch_directory (unsigned long dir)
 {
-
-    if (dir == 0)
-    {
-        // #debug ?
+    if (dir == 0){
+        debug_print("mm_switch_directory: [FAIL] dir\n");
         return;
     }
 
@@ -670,6 +695,13 @@ void mm_free_directory ( unsigned long dir ){
  *     Mapeando um endere�i f�cico usado pelo driver AHCI.    
  */
 
+// #bugbug
+// Isso realmente eh um improviso.
+// Temos muito o que fazer ainda.
+
+// #todo
+// mm_mapping_ahci1_device_address
+
 unsigned long 
 mapping_ahci1_device_address ( unsigned long pa )
 {
@@ -726,6 +758,13 @@ mapping_ahci1_device_address ( unsigned long pa )
 //mapeando o nic principal.
 //considerando que tenhamos mais de uma placa de rede, 
 //esse mapeamento s� ser� v�lido para o primeiro.
+
+// #bugbug
+// Isso realmente eh um improviso.
+// Temos muito o que fazer ainda.
+
+// #todo
+// mm_mapping_nic1_device_address
 
 unsigned long 
 mapping_nic1_device_address ( unsigned long pa )
@@ -813,7 +852,7 @@ mapping_nic1_device_address ( unsigned long pa )
  */
 
 // Called by:
-// 
+// init_runtime in runtime.c
 
 int mmSetUpPaging (void)
 {

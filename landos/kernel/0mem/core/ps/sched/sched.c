@@ -248,7 +248,7 @@ int scheduler (void){
 
         if ( (void *) TmpThread != NULL )
         {
-            if ( TmpThread->used == 1 && 
+            if ( TmpThread->used  == TRUE && 
                  TmpThread->magic == 1234 && 
                  TmpThread->state == READY )
             {
@@ -274,46 +274,22 @@ int scheduler (void){
 }
 
 
-/*
- *************************************************
- * scheduler_start:
- *     +Inicializa o sheduler.
- *     +Trava o scheduler.
- *     +Torna IDLE a tarefa atual.
- *     //...
- *
- *    todo: nao seria init_scheduler
- *    todo: Mudar para schedulerInit,ou schedulerStart. ??
- */
+// #deprecated
+void scheduler_start (void)
+{
+    // #maybe
+    // scheduler_unlock();
 
-void scheduler_start (void){
-
-	//Lock Scheduler.
-	//Set current.
-
-    scheduler_lock ();  
-
-    // #bugbug 
-	// Esse negócio de selecionar pelo impondo um ID dá problemas.
-	// Temos que saber qual é o ID da thread que queremos.
-
-    set_current (IDLE);     
-    //...
+    panic("scheduler_start: deprecated\n");
 }
 
 
-/* 
- * scheduler_lock: 
- */
-void scheduler_lock (void)
-{
+// Lock scheduler
+void scheduler_lock (void){
     g_scheduler_status = (unsigned long) LOCKED;
 }
 
-
-/* 
- * scheduler_unlock: 
- */  
+// Unlock scheduler
 void scheduler_unlock (void)
 {
     g_scheduler_status = (unsigned long) UNLOCKED;
@@ -344,10 +320,20 @@ unsigned long scheduler_get_status (void)
 	// O nome poderia ser schedulerInit().
 	// Formato de classes.Init é um método. 
 
+// Called by init_microkernel in mk.c
+
 void init_scheduler (void)
 {
     debug_print ("init_scheduler: [TODO]\n");
     // ...
+    
+    scheduler_lock();
+    
+    // #bugbug
+    // Maybe there is no IDLE defined 
+    // at this point of the initialization.
+    
+    //set_current (IDLE);
 }
 
 
