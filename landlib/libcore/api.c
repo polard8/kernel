@@ -33,8 +33,14 @@
 
 // Buttons
 struct window_d  *first_responder;
+
+// Message box:
+// It only needs on button.
 struct window_d  *messagebox_button1;
-struct window_d  *messagebox_button2;
+//struct window_d  *messagebox_button2;
+
+// Dialog box:
+// Two buttons. [OK] and [CANCEL]
 struct window_d  *dialogbox_button1;
 struct window_d  *dialogbox_button2;
 // ...
@@ -372,6 +378,9 @@ void gde_init_background (void)
 /*
  ***************************************************
  * gde_message_box:
+ * 
+ *     Create and display a message box.
+ * 
  *     Message box on gui->screen.
  *     Types=[1~5]
  *     @todo: Devemos considerar o retorno? E se a chamada falhar?
@@ -381,6 +390,10 @@ void gde_init_background (void)
 // It can be usefull in the setup environment.
 // #todo: 
 // usar get system metrics
+
+
+// #todo
+// Message box only needs one button. [OK] 
 
 int __mb_current_button; 
 
@@ -509,8 +522,11 @@ do_create_messagebox_3:
     Button = 1;
     //...
     
+    // #bugbug
+    // Check NULL pointers.
 
     //++
+    // The main window.
     gde_enter_critical_section ();
     
     hWnd = (void *) gde_create_window ( 
@@ -559,7 +575,7 @@ do_create_messagebox_3:
 
     messagebox_button1 = (void *) gde_create_window ( 
                                       WT_BUTTON, 1, 1, "[F1] OK", 
-                                      ((cx/2)*0), ((cy/8)*6), (cx/2), 24,
+                                      ((cx/2)*1), ((cy/8)*6), (cx/2), 24,
                                       hWnd, 0, 
                                       xCOLOR_GRAY1, xCOLOR_GRAY1 );
 
@@ -575,6 +591,11 @@ do_create_messagebox_3:
     //--
 
 
+
+    // #test
+    // Message box only needs one button. [OK]
+
+    /*
     //++
 	// button 2
 	gde_enter_critical_section ();
@@ -595,6 +616,11 @@ do_create_messagebox_3:
     
     gde_exit_critical_section();
     //--
+    */
+
+
+
+
 
     // string
     // apiDrawText ( (struct window_d *) hWnd,
@@ -661,9 +687,12 @@ exit_messagebox:
 /*
  **************************************************
  * mbProcedure:
- *     O procedimento padrão de message box. 
- *     #interna
+ *     Dialog for message box.
  */
+
+// #todo
+// Message box does not need answers,
+// so, e need only one button.
 
 unsigned long 
 mbProcedure ( 
@@ -690,6 +719,7 @@ mbProcedure (
                         return (unsigned long) 0;
                         break;
                     }
+                    /*
                     if ( window == messagebox_button2 )
                     {
                         gramado_system_call ( 
@@ -700,6 +730,7 @@ mbProcedure (
                         return (unsigned long) 0;
                         break;
                     }
+                    */
                 break;
             };
             break;
@@ -720,6 +751,7 @@ mbProcedure (
                         return (unsigned long) 102;
                         break;
                     }
+                    /*
                     if ( window == messagebox_button2 )
                     {
                         gramado_system_call ( 
@@ -731,6 +763,7 @@ mbProcedure (
                         return (unsigned long) 101; 
                         break;
                     }
+                    */
                     break;
             };
             break;
@@ -804,9 +837,13 @@ mbProcedure (
  ******************************
  * gde_dialog_box:
  *     
+ *     Create and display a dialog box.
+ * 
  *     Types=[1~5]
  *     @todo: Devemos considerar o retorno? E se a chamada falhar? 
  */
+
+
 
 int gde_dialog_box ( int type, char *string1, char *string2 )
 {
@@ -1065,6 +1102,10 @@ exit_dialogbox:
  * dbProcedure:
  *     O procedimento padrão de dialog box. 
  */
+
+// Dialog box with two buttons,
+// YES and NO.
+// It depends on the type.
 
 unsigned long 
 dbProcedure ( 

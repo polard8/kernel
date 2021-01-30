@@ -110,27 +110,39 @@ void systemSetTerminalWindow ( struct window_d *window )
 
 //check_window:
 
-    if ( (void *) window == NULL )
-        return;
+    if ( (void *) window == NULL ){
+        panic("systemSetTerminalWindow: [FAIL] window\n");
+        //debug_print("systemSetTerminalWindow: [FAIL] window\n");
+        //return;
+    }
 
-    if ( window->used != 1 || window->magic != 1234 )
-        return;
-		
-       
+    if ( window->used != 1 || window->magic != 1234 ){
+        panic("systemSetTerminalWindow: [FAIL] window validation\n");
+        //debug_print("systemSetTerminalWindow: [FAIL] window validation\n");
+        //return;
+    }
+  
     // #bugbug
-	// De que janela estamos falando, de qual dos terminais virtuais?
-	// Pode ser da que esta em primeiro plano.
-	// Configurando a variável global que diz qual é 
-	// o ID da janela que tem o terminal virtual ativo.
+    // De que janela estamos falando, de qual dos terminais virtuais?
+    // Pode ser da que esta em primeiro plano.
+    // Configurando a variável global que diz qual é 
+    // o ID da janela que tem o terminal virtual ativo.
 
     terminal_window = (int) window->id;
+
+    if ( terminal_window < 0 )
+    {
+        panic("systemSetTerminalWindow: [FAIL] terminal_window\n");
+        //debug_print("systemSetTerminalWindow: [FAIL] terminal_window\n");
+        //return;
+    }
 
 	//configura o status do terminal dentro da janela
 	//validade e reusabilidade das variáveis de terminal 
 	//dentro da estrutura de janela.
 
-    window->terminal_used = 1;
-    window->terminal_magic = 1234; 
+    window->terminal_used  = TRUE;
+    window->terminal_magic = 1234;
 
 	//tab
 	//número da tab.
@@ -138,44 +150,50 @@ void systemSetTerminalWindow ( struct window_d *window )
 	//@todo:
 	// Criar uma forma de contar as tabs de terminal 
 	// dentro do gerenciador de terminais.
+
     window->terminal_tab = 0; 
 
 
-	//rect
-	//configura por último
-    //window->terminal_left = 0;
-    //window->terminal_top = 0;
-    //window->terminal_width = 0;
-    //window->terminal_height = 0;
-	//..
+    // #bugbug
+    // Are we respecting the limits here?
 
+    // rect
     window->terminal_left   = window->left;
     window->terminal_top    = window->top;
     window->terminal_width  = window->width;
     window->terminal_height = window->height;
 
 
+    //
+    //  Console
+    //
+    
+    // Are we using the current virtual console to handle 
+    // the terminal ?
+    // So the terminal is a window in kgws.
+
     // #bugbug
-    // Qual eh o current no momento dessa inicializaçao
-    // so temos 4.
-    // eles ja estao inicializados.
-    // #todo: podeia ter uma flag que diz se ja inicializamos os consoles.
+    // Qual é o current ? 
+    // no momento dessa inicializaçao so temos 4.
+    // Eles ja estao inicializados.
+    // #todo:
+    // Podeia ter uma flag que diz se ja inicializamos os consoles.
  
  
-// #bugbug
-// There is something wrong here.
-// The purpose of this routine is to setup the
-// window for the virtual terminal, not
-// for the virtual console.
-// So, we need two routines, 
-// one for the virtual consoles and
-// another one for the virtual terminals.
-// Both will use the tty structure,
-// but the console is not able to use
-// all the tty features (there is a bug)
+    // #bugbug
+    // There is something wrong here.
+    // The purpose of this routine is to setup the
+    // window for the virtual terminal, not
+    // for the virtual console.
+    // So, we need two routines, 
+    // one for the virtual consoles and
+    // another one for the virtual terminals.
+    // Both will use the tty structure,
+    // but the console is not able to use
+    // all the tty features (there is a bug)
 
 
-    if (fg_console < 0 || fg_console >= CONSOLETTYS_COUNT_MAX )
+    if ( fg_console < 0 || fg_console >= CONSOLETTYS_COUNT_MAX )
     {
         panic("systemSetTerminalWindow: fg_console\n");
     }

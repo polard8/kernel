@@ -725,7 +725,7 @@ __SendMessageToProcess (
  
 int main ( int argc, char *argv[] ){
 
-    //The pointer for the main window is in the top of the document.
+    // The pointer for the main window is in the top of the document.
     struct window_d *editbox_bg_Window;
     struct window_d *editboxWindow;
     
@@ -743,9 +743,8 @@ int main ( int argc, char *argv[] ){
 	
 	// #todo: 
 	// Analizar a contagem de argumentos.
-		
-	goto skip_test;
-	
+
+    goto skip_test;
 
 
     /*
@@ -811,8 +810,7 @@ hangz:
 	//
 	//  ========= skip test ============
 	//
-	
-	
+
 skip_test:
 
 
@@ -874,11 +872,10 @@ skip_test:
     // Forget the old configuration.
     // Let's do this again. full screen.
     
-    wpWindowLeft=0;
-    wpWindowTop=0;
+    wpWindowLeft   = 0;
+    wpWindowTop    = 0;
     wsWindowWidth  = deviceWidth;
     wsWindowHeight = deviceHeight;
-
 
     //
     // frame ================
@@ -898,10 +895,13 @@ skip_test:
     // =====================
     // main window.
 
+    // #bugbug
+    // The window name can NOT be NULL.
+
     //++
     gde_begin_paint (); 
     hWindow = (void *) gde_create_window ( 
-                           WT_OVERLAPPED, 1, 1, argv[1],
+                           WT_OVERLAPPED, 1, 1, "GRAMCODE",  //WT_OVERLAPPED, 1, 1, argv[1],
                            wpWindowLeft, wpWindowTop, 
                            wsWindowWidth, wsWindowHeight,    
                            0, 0, COLOR_GRAY, COLOR_GRAY );

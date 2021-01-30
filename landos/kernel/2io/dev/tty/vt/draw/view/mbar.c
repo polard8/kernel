@@ -1,9 +1,7 @@
 /*
  * File: menubar.c
- *
  *    Deprecated.
  *    No more menubar support for ring 0.
- *    
  * History:
  *     2015 - Created by Fred Nora.
  *     2020 - Deprecated.
@@ -13,20 +11,14 @@
 #include <kernel.h>
 
 
-/*
- * create_menubar:
- *     Deprecated.
- */ 
+// Deprecated.
 void *create_menubar ( struct window_d *pwindow )
 {
     debug_print ("create_menubar: Deprecated\n");
     return NULL;
 }
 
-/*
- * create_menubar_item:
- *     Deprecated. 
- */
+// Deprecated. 
 int 
 create_menubar_item ( 
     struct menu_d *menu, 
@@ -61,20 +53,14 @@ int get_menubar_selected_item (void)
     return -1;
 }
 
-/*
- * kgws_create_menubar:
- *     Deprecated.
- */
+// Deprecated.
 int kgws_create_menubar ( struct window_d *window )
 {
     debug_print ("kgws_create_menubar: Deprecated\n");
     return -1;
 }
 
-/*
- * MenuBarProcedure:
- *     Deprecated.
- */
+// Deprecated.
 unsigned long 
 MenuBarProcedure ( 
     struct window_d *window, 

@@ -920,19 +920,33 @@ struct window_d
 	// excluindo a moldura e a barra de rolagem.
 	// Tudo o que há dentro da janela menos o frame.
 	// É a parte que é exibida quando a janela está em full screen.
-    struct window_d *client_window; 
-    struct rect_d *rcClient;     
+
+    struct window_d  *client_window; 
+    struct rect_d    *rcClient; 
 
 
 	//cor do retângulo da área do cliente.
-    unsigned long clientrect_bg_color;    
+    unsigned long clientrect_bg_color; 
 
 //==================================================
 
-    // Cursor.
+    // Cursor
+    // #remember: 
+    // We want to use the cursor structure.
+    // We are using the current console structure.
+
+    // Cursor position inside the window in chars.
     unsigned long CursorX;
     unsigned long CursorY;
+
+    // #maybe
+    //unsigned long CursorXInPixels;
+    //unsigned long CursorYInPixels;
+
     unsigned long CursorColor;
+    //int CursorIconIndex;
+    //unsigned long CursorIconAddress;
+    // ...
 
 //==================================================
 
@@ -1007,17 +1021,6 @@ struct window_d
     // Será usado pelo produtor e pelo consumidor.
     // char read_buf[WINDOW_MSG_BUFFER_SIZE];
 
-//==================================================
-
-	// Cursor.
-	// Posição do cursor para texto dentro da janela.
-	// Obs: Deve ser multiplo da altura e largura do caractere.
-	// Obs: Para cada janela o cursor pode estar em uma posição diferente.
-	// @todo: Deletar isso e começar usar a estrutura.
-
-    unsigned long cursor_icon;
-    unsigned long cursor_x;
-    unsigned long cursor_y;
 
 //==================================================
 

@@ -24,32 +24,9 @@ extern unsigned long SavedY;
 extern unsigned long SavedBPP; 
 
 
+
 /*
- * lineDrawHorizontalLineWindowBuffer:
- *     Pinta uma linha horizontal no buffer da janela.
- *     Serve para pintar janelas que irão direto do seu buffer para o LFB da 
- * memória de vídeo, sem passar pelo back buffer. (OVERLAPPED)
- *
- */
-/* 
-void lineDrawHorizontalLineWindowBuffer(struct window_d *window,
-                                        unsigned long x1,
-										unsigned long y,
-										unsigned long x2,
-										unsigned long color );
-										
-void lineDrawHorizontalLineWindowBuffer(struct window_d *window,
-                                        unsigned long x1,
-										unsigned long y,
-										unsigned long x2,
-										unsigned long color )
-{
-    return;	
-}
-*/
-
-
-/* 
+ *****************************************
  * my_buffer_horizontal_line:
  *     Draw a horizontal line on backbuffer. 
  */
@@ -58,9 +35,12 @@ void
 my_buffer_horizontal_line ( 
     unsigned long x1,
     unsigned long y, 
-    unsigned long x2,  
+    unsigned long x2, 
     unsigned long color )
 {
+
+    //if (x1>x2)
+        //return;
 
     while (x1 < x2)
     {
