@@ -5,7 +5,7 @@ PRODUCT_NAME  = Gramado
 EDITION_NAME  = Land
 VERSION_MAJOR = 1
 VERSION_MINOR = 0
-VERSION_BUILD = 218
+VERSION_BUILD = 219
 KERNELVERSION = $(VERSION_MAJOR)$(if $(VERSION_MINOR),.$(VERSION_MINOR)$(if $(VERSION_BUILD),.$(VERSION_BUILD)))
 
 # Documentation.
@@ -123,13 +123,13 @@ land-boot:
 	$(Q) $(MAKE) -C landboot/bm1632/x86/ 
 	$(Q) $(MAKE) -C landboot/bl32/x86/ 
 
+	# O mbr só consegue ler o root dir para pegar o BM.BIN
+	# See: stage1.asm
+	# O BM.BIN só consegue ler o root dir pra pegar o BL.BIN
+	# See: main.asm
+	
 	sudo cp landboot/bin/BM.BIN  base/
-	sudo cp landboot/bin/BM.BIN  base/BOOT
-	sudo cp landboot/bin/BM.BIN  base/SBIN
 	sudo cp landboot/bin/BL.BIN  base/
-	sudo cp landboot/bin/BL.BIN  base/BOOT
-	sudo cp landboot/bin/BL.BIN  base/SBIN
-
 
 land-lib:
 	#::rtl
@@ -151,20 +151,25 @@ land-os:
 
 	# KERNEL.BIN  - Creating the kernel image.
 	#::kernel
-	# The boot loader will search on /SBIN/ and on /BOOT/ folders.
+	# The boot loader will search on /LANDOS/ and on /BOOT/ folders.
 	@echo "================================="
 	@echo "(Step 1) Creating the kernel image ..."
 	$(Q) $(MAKE) -C landos/kernel
-	sudo cp landos/kernel/KERNEL.BIN  base/
+
+	# O BL.BIN procura o kernel nos diretorios LANDOS/ E BOOT/
+	# See: fs/loader.c
+	sudo cp landos/kernel/KERNEL.BIN  base/LANDOS
 	sudo cp landos/kernel/KERNEL.BIN  base/BOOT
-	sudo cp landos/kernel/KERNEL.BIN  base/SBIN
 
 	#::init
 	@echo "==================="
 	@echo "Compiling init ..."
 	$(Q) $(MAKE) -C landos/init/
+
+	# O kernel carrega o initi do diretorio raiz.
+	# só consegue dessa forma por enquanto.
+	# See: x86/x86init.c
 	sudo cp landos/init/INIT.BIN  base/
-	sudo cp landos/init/INIT.BIN  base/SBIN
 
 
 #===================================================
@@ -197,14 +202,15 @@ gramado-cmd:
 gramado-setup:
 	#::setup
 	$(Q) $(MAKE) -C gramado/setup/
+
+	sudo cp gramado/setup/bin/GDESHELL.BIN  base/
 	sudo cp gramado/setup/bin/LAUNCHER.BIN  base/
+
+	sudo cp gramado/setup/bin/GRAMCODE.BIN  base/
+	sudo cp gramado/setup/bin/SYSMON.BIN    base/
 	sudo cp gramado/setup/bin/LEASY.BIN     base/
 	sudo cp gramado/setup/bin/LMEDIUM.BIN   base/
 	sudo cp gramado/setup/bin/LHARD.BIN     base/
-	sudo cp gramado/setup/bin/GDESHELL.BIN  base/
-	sudo cp gramado/setup/bin/GDESHELL.BIN  base/SBIN
-	sudo cp gramado/setup/bin/GRAMCODE.BIN  base/
-	sudo cp gramado/setup/bin/SYSMON.BIN    base/
 
 gramado-core:
 	#::hard Services
@@ -214,7 +220,7 @@ gramado-core:
 	# gns
 	-sudo cp gramado/core/gnssrv/bin/GNS.BIN     base/
 	-sudo cp gramado/core/gnssrv/bin/GNSSRV.BIN  base/
-	-sudo cp gramado/core/gnssrv/bin/GNSSRV.BIN  base/SBIN
+
 
 	#::aurora Aurora Window Server.
 	@echo "==================="
@@ -223,37 +229,46 @@ gramado-core:
 	# gws
 	-sudo cp gramado/core/aurora/bin/GWS.BIN     base/ 
 	-sudo cp gramado/core/aurora/bin/GWSSRV.BIN  base/
-	-sudo cp gramado/core/aurora/bin/GWSSRV.BIN  base/SBIN
+
 
 gramado-shell:
+
 	#::apps
 	$(Q) $(MAKE) -C gramado/shell/apps/
-	-sudo cp gramado/shell/apps/bin/EDITOR.BIN   base/
-	-sudo cp gramado/shell/apps/bin/FILEMAN.BIN  base/
-	-sudo cp gramado/shell/apps/bin/GWM.BIN      base/
-#	-sudo cp gramado/shell/apps/bin/S2.BIN  base/
-#	-sudo cp gramado/shell/apps/bin/S3.BIN  base/
-	-sudo cp gramado/shell/apps/bin/TERMINAL.BIN  base/
+	-sudo cp gramado/shell/apps/bin/EDITOR.BIN     base/
+	-sudo cp gramado/shell/apps/bin/FILEMAN.BIN    base/
+	-sudo cp gramado/shell/apps/bin/GWM.BIN        base/
+#	-sudo cp gramado/shell/apps/bin/S2.BIN         base/
+#	-sudo cp gramado/shell/apps/bin/S3.BIN         base/
+	-sudo cp gramado/shell/apps/bin/TERMINAL.BIN   base/
 
 	#::ui
 	$(Q) $(MAKE) -C gramado/shell/ui/
-	-sudo cp gramado/shell/ui/bin/LAUNCH1.BIN   base/
-	
+	-sudo cp gramado/shell/ui/bin/LAUNCH1.BIN      base/
+
 gramado-edge:
+
+	# todo aqui é frescura.
+	# podemos colocar no subdiretorio gramado/
+	# com isso vamos iniciar a aventura de pegar as coisas em subdiretórios.
 
 	#::net
 	$(Q) $(MAKE) -C gramado/edge/net/
-	-sudo cp gramado/edge/net/bin/*.BIN  base/
-#	-sudo cp gramado/edge/net/bin/*.BIN  base/PROGRAMS
+	-sudo cp gramado/edge/net/bin/*.BIN      base/GRAMADO/
+#	-sudo cp gramado/edge/net/bin/*.BIN      base/GRAMADO/
 
 #========================================
 
 desert:
+
+	# todo aqui é frescura.
+	# podemos colocar no subdiretorio gramado/
+
 	# todo
 	# Copy only the base of the desert inside the base of gramado.
-	#-sudo cp ../desert/base/*.BIN  base/
-	#-sudo cp ../desert/base/*.TXT  base/
-	#-sudo cp ../desert/setup/medium/bin/*.BIN  base/
+	#-sudo cp ../desert/base/*.BIN              base/GRAMADO/
+	#-sudo cp ../desert/base/*.TXT              base/GRAMADO/
+	#-sudo cp ../desert/setup/medium/bin/*.BIN  base/GRAMADO/
 	
 # 
 # more setups ? ...
@@ -341,8 +356,9 @@ clean4:
 	-rm -rf base/BOOT/*.BIN 
 	-rm -rf base/BIN/*.BIN 
 	-rm -rf base/SBIN/*.BIN 
-#	-rm -rf base/PROGRAMS/*.BIN 
-#	-rm -rf base/SBIN/*.BIN 
+	-rm -rf base/LANDOS/*.BIN 
+	-rm -rf base/GRAMADO/*.BIN 
+
 # clean system files.
 PHONY := clean-system-files
 clean-system-files:
@@ -498,13 +514,12 @@ generate:
 	@echo $(VERSION_BUILD) > BUILD.TXT
 	@echo $(KERNELVERSION) > VERSION.TXT
 	# Install in the base folder.
-	-mv PRODUCT.TXT  base/
-	-mv EDITION.TXT  base/
-	-mv MAJOR.TXT    base/
-	-mv MINOR.TXT    base/
-	-mv BUILD.TXT    base/
-	-mv VERSION.TXT  base/
-
+	-mv PRODUCT.TXT  base/GRAMADO/
+	-mv EDITION.TXT  base/GRAMADO/
+	-mv MAJOR.TXT    base/GRAMADO/
+	-mv MINOR.TXT    base/GRAMADO/
+	-mv BUILD.TXT    base/GRAMADO/
+	-mv VERSION.TXT  base/GRAMADO/
 
 #
 # == USAGE ========

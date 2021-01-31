@@ -299,7 +299,7 @@ void init_globals (void){
  *    Descrever aqui as fazer dessa rotina.
  */ 
 
-// It was called by systemStartUp() in core/system.c
+// It was called by x86Main() in x86/x86init.c
 
 int init (void){
 
@@ -880,6 +880,8 @@ int init (void){
     while (1){ asm ("hlt"); }
 #endif
 
+    // ??
+    // Volta para onde?
 
     // #debug
     //printf("*breakpoint\n");

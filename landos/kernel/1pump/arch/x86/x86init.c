@@ -275,15 +275,22 @@ void __x86StartInit (void){
     //
     // INIT.BIN
     //
-    
-    
+
+    // #importante
+    // Carregado do diretório raiz
+ 
     unsigned long BUGBUG_IMAGE_SIZE_LIMIT = (512 * 4096);
 
 	// loading image.
     
-    fileret = (unsigned long) fsLoadFile ( VOLUME1_FAT_ADDRESS, 
+    // #bugbug
+    // Como estamos carregando do diretoório raiz
+    // O número de entradas é 512.
+    
+    fileret = (unsigned long) fsLoadFile ( 
+                                  VOLUME1_FAT_ADDRESS, 
                                   VOLUME1_ROOTDIR_ADDRESS, 
-                                  32, //#bugbug: Number of entries.
+                                  512,  //32, //#bugbug: Number of entries ON ROOT DIR ?
                                   "INIT    BIN", 
                                   (unsigned long) 0x00400000,
                                   BUGBUG_IMAGE_SIZE_LIMIT );
@@ -306,7 +313,8 @@ void __x86StartInit (void){
 	// temos que checar a validade do endereço do dir criado
 	//antes de passarmos..
 
-    InitProcess = (void *) create_process ( NULL, NULL, NULL, 
+    InitProcess = (void *) create_process ( 
+                               NULL, NULL, NULL, 
                                (unsigned long) 0x00400000, 
                                PRIORITY_HIGH, 
                                (int) KernelProcess->pid, 
@@ -316,11 +324,9 @@ void __x86StartInit (void){
 
     if ( (void *) InitProcess == NULL ){
         panic ("__x86StartInit: InitProcess\n");
-
     }else{
         fs_initialize_process_pwd ( InitProcess->pid, "no-pwd" );
     };
-
 
 
 	//====================================================

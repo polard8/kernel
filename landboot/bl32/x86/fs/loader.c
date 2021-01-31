@@ -83,12 +83,12 @@ int load_kernel ()
     //
 
     // Load KERNEL.BIN on a physical address.
-    // Search the file in the /SBIN/ and /BOOT/ subdirectories
+    // Search the file in the /LANDOS/ and /BOOT/ subdirectories
     // of the boot partition.
 
 
     Status = (int) load_path(
-                       "/SBIN/KERNEL.BIN", 
+                       "/LANDOS/KERNEL.BIN", 
                        (unsigned long) kernel_pa );
     // Fail
     if ( Status != 0 ){
