@@ -14,6 +14,48 @@
 
 
 /*
+ // ?? not tested
+char rtl_convert_char_to_uppercase( char ch );
+char rtl_convert_char_to_uppercase( char ch )
+{
+    if (    (ch >= 'a') && 
+            (ch <= 'z') ) 
+    {
+        return ch + 'A' - 'a';
+    }
+
+    return ch;
+}
+*/
+
+/*
+// 2021 - Created by Fred Nora.
+// Not tested yet.
+char *rtl_new_string(const char *old_string);
+char *rtl_new_string(const char *old_string)
+{
+    size_t Size=0;
+    char *tmp;
+
+    if ( (void*) old_string == NULL )
+        return NULL;
+    
+    Size = strlen(old_string);
+    Size = Size+1;
+    
+    if (Size<=0)
+        return NULL;
+    
+    tmp = (char *) malloc(Size);
+    
+    if ( (void*) tmp == NULL )
+        return NULL;
+    
+    return (char *) strcpy ( tmp, old_string );
+}
+*/
+
+/*
 static char *int2str(int n);
 static char *int2str(int n)
 {
@@ -511,7 +553,18 @@ int strncasecmp(const char* s1, const char* s2, size_t n)
 }
 */
 
-
+/*
+// credits: chameleon boot loader.
+int strncasecmp(const char *s1, const char *s2, size_t len);
+int strncasecmp(const char *s1, const char *s2, size_t len)
+{
+	register int n = len;
+	while (--n >= 0 && tolower(*s1) == tolower(*s2++))
+		if (*s1++ == '\0')
+			return(0);
+	return(n<0 ? 0 : tolower(*s1) - tolower(*--s2));
+}
+*/
 
 
 
@@ -877,6 +930,33 @@ char *strncat (char *dst, const char *src, size_t n)
 
     return (char *) dst;
 }
+
+
+/*
+char *strncat2(char *s1, const char *s2, size_t n);
+char *strncat2(char *s1, const char *s2, size_t n)
+{
+	register char *ret = s1;
+
+	while (*s1)
+		s1++;
+
+	while (n-- && *s2)
+		*s1++ = *s2++;
+
+	*s1 = '\0';
+
+	return ret;
+}
+*/
+
+/*
+char *strcat2(char *s1, const char *s2);
+char *strcat2(char *s1, const char *s2)
+{
+    return (strncat(s1, s2, strlen(s2)));
+}
+*/
 
 
 /* 

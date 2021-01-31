@@ -4,7 +4,13 @@
  * Descrição:
  *     Operações com strings. Padrão C.
  */
- 
+
+#ifndef __STRING_H
+#define __STRING_H    1
+
+
+
+
 void *memset ( void *ptr, int value, int size );
 
 //@todo: void *memcpy(void *dst, const void *src, size_t c);  
@@ -28,14 +34,29 @@ void  bzero(char *cp, int len);
 /* Copyright (c) 2011, 2012 Jonas 'Sortie' Termansen. */
 size_t strcspn(const char* str, const char* reject);
 size_t strspn(const char* str, const char* accept);
-//char* strtok_r(char* str, const char* delim, char** saveptr);
-//char* strtok(char* str, const char* delim);
 
 
+
+//
+// == strtok ============
+//
+
+// #test
+// We're gonna need these routines to split the
+// pathname in the fs module.
+
+#define LSH_TOK_DELIM   " \t\r\n\a" 
+#define LSH_TOK_DELIM2  " \t\r\n\a+!:=/.<>;|&" 
+#define SPACE " "
+#define TOKENLIST_MAX_DEFAULT 80
 
 /*apple open source*/
-char *strtok_r (char *s, const char *delim, char **last);
-char *strtok (char *s, const char *delim);
+// See: string.c
+char *k_strtok_r (char *s, const char *delim, char **last);
+char *k_strtok (char *s, const char *delim);
 
 char *strdup (const char *str);
+
+#endif    
+
 

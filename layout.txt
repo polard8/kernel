@@ -1,0 +1,28 @@
+/admin
+	Some design notes and scripts.
+/base
+	The root directory for the target boot partition.
+/gramado
+	Gramado operating system.
+/landboot
+	Boot loader for the landos. KERNEL.BIN
+/landboot/bl32
+	Boot loader. BL.BIN.
+/landboot/bm1632
+	Boot manager. BM.BIN.
+/landlib
+	Ring 3 libraries.
+/landlib/fonts
+	The font support.
+/landlib/lib
+	Some ring 3 client-side libraries.
+/landlib/libcore
+	System's API. It uses kgws.
+/landlib/rtl
+	Ring 3 runtime library. The libc.
+/landos
+	The Land OS.
+/landos/init
+	The first ring 3 process for landos. INIT.BIN
+/landos/kernel
+	The landos base kernel.

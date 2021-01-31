@@ -172,17 +172,18 @@ char *strcpy ( char *to, const char *from ){
  * strcat - acrescenta uma string ao fim de outra. 
  */
 
-char *strcat (char *to, const char *from){
-	
+char *strcat (char *to, const char *from)
+{
     char *ret = to;
 
     while (*to) 
     {
         to += 1;
     };
-	
-	strcpy(to, from);
-	return (ret);
+
+    strcpy(to, from);
+
+    return (ret);
 }
 
 
@@ -208,27 +209,34 @@ char *strcat (char *to, const char *from){
 void bcopy (char *from, char *to, int len)
 {
 
+    //if (len < 0)
+        //return;
+
     //danger
-	while(len--) 
-	{
-		*to++ = *from++;
-	};
-    //return;
+    while(len--) 
+    {
+        *to++ = *from++;
+    };
 }
 
 
 /*
  *  bzero:
- *      Preenche com zeros. */
+ *      Preenche com zeros. 
+ */
 
-void bzero (char *cp, int len){
+void bzero (char *cp, int len)
+{
 
-    //danger
-	while(len--)
-	{
-		*(cp + len) = 0;
-	};
-    //return;
+    //if (len < 0)
+        //return;
+
+    // danger
+
+    while(len--)
+    {
+        *(cp + len) = 0;
+    };
 }
 
 
@@ -469,40 +477,6 @@ void *memset ( void *ptr, int value, int size ){
 
     return (void *) ptr;
 }
- 
-
-
-
-/*
- 
- // strtok_r 
- char *(strtok_r)(char *s, const char *delimiters, char **lasts); 
- char *(strtok_r)(char *s, const char *delimiters, char **lasts)
- {
-     char *sbegin, *send;
-     sbegin = s ? s : *lasts;
-     sbegin += strspn(sbegin, delimiters);
-     if (*sbegin == '\0') {
-         *lasts = "";
-         return NULL;
-     }
-     send = sbegin + strcspn(sbegin, delimiters);
-     if (*send != '\0')
-         *send++ = '\0';
-     *lasts = send;
-     return sbegin;
- }
-*/
- 
- /*
- //strtok 
- char *(strtok)(char *restrict s1, const char *restrict delimiters); 
- char *(strtok)(char *restrict s1, const char *restrict delimiters)
- {
-     static char *ssave = "";
-     return strtok_r(s1, delimiters, &ssave);
- }
-*/
 
 
 
@@ -546,77 +520,49 @@ size_t strcspn(const char* str, const char* reject)
 
 
 /* Copyright (c) 2011, 2012 Jonas 'Sortie' Termansen. */
+// ?? is it working?
 size_t strspn (const char* str, const char* accept)
 {
+
+    int matches = 0;
+    int i=0;
+
 	//size_t accept_length = 0;
     register int accept_length = 0; 
     while ( accept[accept_length] ){
         accept_length++;
     };
 
-	
+    // #bugbug ??
+ 
 	//for ( size_t result = 0; true; result++ )
     register int result=0;
     for ( result = 0; result = 1; result++ )
-	{
-		char c = str[result];
-		if ( !c )
-			return (size_t) result;
-		
-		//bool matches = false;
-		int matches = 0;
-		int i;
+    {
+        char c = str[result];
+        if ( !c )
+            return (size_t) result;
+
 		//for ( size_t i = 0; i < accept_length; i++ )
-		for( i=0; i<accept_length; i++ )
-		{
-			if ( str[result] != accept[i] )
-				continue;
-			matches = 1;
-			break;
-		}
-		if ( !matches )
-			return (size_t) result;
-	}
+        for( i=0; i<accept_length; i++ )
+        {
+            if ( str[result] != accept[i] ){ continue; }
+
+            matches = 1;
+            break;
+        };
+
+        if ( !matches )
+            return (size_t) result;
+    };
 }
 
 
-
-
-/* Copyright (c) 2011, 2012 Jonas 'Sortie' Termansen. */
-/*
-char* strtok_r(char* str, const char* delim, char** saveptr)
-{
-	if ( !str && !*saveptr )
-		return NULL;
-	if ( !str )
-		str = *saveptr;
-	str += strspn(str, delim); // Skip leading
-	if ( !*str )
-		return *saveptr = NULL;
-	size_t amount = strcspn(str, delim);
-	if ( str[amount] )
-		*saveptr = str + amount + 1;
-	else
-		*saveptr = NULL;
-	str[amount] = '\0';
-	return str;
-}
-*/
-
-
-
-/* Copyright (c) 2011, 2012 Jonas 'Sortie' Termansen. */
-/*
-char* strtok(char* str, const char* delim)
-{
-	static char* lasttokensaveptr = NULL;
-	return strtok_r(str, delim, &lasttokensaveptr);
-}
-*/
-
-
-/*apple*/
-char *strtok_r (char *s, const char *delim, char **last)
+/*apple open source*/
+char *k_strtok_r (
+    char *s, 
+    const char *delim, 
+    char **last )
 {
 
     register int sc=0;
@@ -631,61 +577,66 @@ char *strtok_r (char *s, const char *delim, char **last)
         return NULL;
     }
 
-    /*
-     * Skip (span) leading delimiters (s += strspn(s, delim), sort of).
-     */
+    //
+    // Skip (span) leading delimiters 
+    // (s += strspn(s, delim), sort of).
+    //
+
 cont:
+
     c = *s++;
-    for (spanp = (char *)delim; (sc = *spanp++) != 0; )
+  
+    for ( spanp = (char *) delim; (sc = *spanp++) != 0; )
     {
         if (c == sc){  goto cont;  }
-    }
+    };
 
-    if (c == 0)		/* no non-delimiter characters */
+    // no non-delimiter characters
+    if (c == 0)
     {
         *last = NULL;
+        
         return NULL;
     }
     tok = s - 1;
 
-    /*
-     * Scan token (scan for delimiters: s += strcspn(s, delim), sort of).
-     * Note that delim must have one NUL; we stop if we see that, too.
-     */
-    
+    // Scan token (scan for delimiters: s += strcspn(s, delim), sort of).
+    // Note that delim must have one NUL; 
+    // we stop if we see that, too.
+
     for (;;)
     {
         c = *s++;
-        spanp = (char *)delim;
+
+        spanp = (char *) delim;
         
         do
         {
-            if ((sc = *spanp++) == c)
-	    {
-		if (c == 0)
-		{
-		    s = NULL;
-		}
-		else
-		{
-		    char *w = s - 1;
-		    *w = '\0';
-		}
-		*last = s;
-            return tok;
+            if ( (sc = *spanp++) == c )
+            {
+                if (c == 0){
+                    s = NULL;
+                }else{
+                    char *w = s - 1;
+                    *w = '\0';
+                }
+                
+                *last = s;
+                
+                return tok;
             }
-
         } while (sc != 0);
     }
     /* NOTREACHED */
 }
 
-/*apple*/
-char *strtok(char *s, const char *delim)
+
+/*apple open source*/
+char *k_strtok (char *s, const char *delim)
 {
     static char *last;
 
-    return strtok_r (s, delim, &last);
+    return k_strtok_r (s, delim, &last);
 }
 
 
@@ -694,6 +645,16 @@ char *strdup (const char *str){
 
     char *copy;
     size_t len=0;
+
+
+    // #todo
+    //if ( (void*) str == NULL )
+        //return NULL;
+
+    // #todo
+    //if ( *str == 0 )
+        //return NULL;
+
 
     len = strlen(str) + 1;
 
