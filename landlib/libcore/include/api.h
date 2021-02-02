@@ -598,9 +598,17 @@ typedef enum {
 
 //Critical section. (kernel semaphore)
 //Um semáforo do kernel para uso geral.
-#define	SYSTEMCALL_GET_KERNELSEMAPHORE    226
-#define	SYSTEMCALL_CLOSE_KERNELSEMAPHORE  227
-#define	SYSTEMCALL_OPEN_KERNELSEMAPHORE   228
+
+#define SYSTEMCALL_GET_KERNELSEMAPHORE    226
+#define SYSTEMCALL_CLOSE_KERNELSEMAPHORE  227
+#define SYSTEMCALL_OPEN_KERNELSEMAPHORE   228
+
+// fixing the names above.
+
+#define SYSTEMCALL_GET_GATE_VALUE  226
+#define SYSTEMCALL_CLOSE_GATE      227
+#define SYSTEMCALL_OPEN_GATE       228
+
 
 //debug stuff
 #define	SYSTEMCALL_KERNELDEBUG  229

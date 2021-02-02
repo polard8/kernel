@@ -2183,15 +2183,12 @@ tryAgain:
                        (unsigned long) s, 
                        (unsigned long) s );
 
-	//Ok , podemos sair sa sessão crítica.
-	if (Status == 0)
-	{
-		return;
-	}
+    // Ok, podemos sair sa sessão crítica.
+    if (Status == 0){  return;  }
 
-	//Deu errado a nossa tentativa d sair da sessão crítica.
-	if (Status == 1)
-	{
+    // Deu errado a nossa tentativa d sair da sessão crítica.
+    if (Status == 1)
+    {
 		//
 		// Opções:
 		// + Bloqueamos a thread e quando ela acordar tentaremos novamente.
@@ -2203,8 +2200,7 @@ tryAgain:
 		
 		//Opção 2.
 		goto tryAgain;
-	}
-
+    }
 fail:
     goto tryAgain;
 }
@@ -2226,16 +2222,15 @@ void gde_enter_critical_section (void)
     while (1){
 
         S = (int) system_call ( 
-                      SYSTEMCALL_GET_KERNELSEMAPHORE, 0, 0, 0 );
-
+                      SYSTEMCALL_GET_GATE_VALUE, 0, 0, 0 );
         if ( S == TRUE ){ goto done; }
 
-        sc82(265,0,0,0);
+        sc82 (265,0,0,0);
     };
 
     // Close the gate. turn FALSE.
 done:
-    system_call ( SYSTEMCALL_CLOSE_KERNELSEMAPHORE, 0, 0, 0 );
+    system_call ( SYSTEMCALL_CLOSE_GATE, 0, 0, 0 );
     return;
 }
 
@@ -2244,9 +2239,30 @@ done:
 // open the gate.
 void gde_exit_critical_section (void)
 {
-    system_call ( SYSTEMCALL_OPEN_KERNELSEMAPHORE, 0, 0, 0 );
+    system_call ( SYSTEMCALL_OPEN_GATE, 0, 0, 0 );
 }
 
+
+//
+//Inicializa em 1 o semáforo do kernel para que 
+//o primeiro possa usar.
+// Temos que chamar isso na inicializaçao da biblioteca.??
+//
+
+void gde_initialize_critical_section (void)
+{
+    system_call ( SYSTEMCALL_OPEN_GATE, 0, 0, 0 );
+}
+
+void gde_begin_paint(void)
+{
+    gde_enter_critical_section();
+}
+
+void gde_end_paint(void)
+{
+    gde_exit_critical_section();
+}
 
 
 
@@ -2254,37 +2270,14 @@ void gde_exit_critical_section (void)
 void gde_p (void)
 {
     gde_debug_print ("gde_p: [TODO]\n");
-    //gde_enter_critical_section ();         
 }
 
 // V (Verhogen) incrementar.
 void gde_v (void)
 {
     gde_debug_print ("gde_v: [TODO]\n");
-    //gde_exit_critical_section ();          
 }
 
-
-//
-//Inicializa em 1 o semáforo do kernel para que 
-//o primeiro possa usar.
-
-void gde_initialize_critical_section (void)
-{
-    system_call ( SYSTEMCALL_OPEN_KERNELSEMAPHORE, 0, 0, 0 );
-}
-
-
-void gde_begin_paint(void)
-{
-    gde_enter_critical_section ();
-}
-
-
-void gde_end_paint(void)
-{
-    gde_exit_critical_section ();
-}
 
 
 /*
