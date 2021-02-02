@@ -2,8 +2,7 @@
  * File: fs/fs.c 
  *
  *     Top level file system support.
- *    
- *   
+ *
  * History: 
  *    2015 - Created by Fred Nora.
  *    ...
@@ -44,63 +43,73 @@ unsigned short fat16ClustersToSave[CLUSTERS_TO_SAVE_MAX];
 // ========================================
 
 
+// helper function to handle fat cache status.
+void fs_fat16_cache_not_saved(void)
+{
+    fat_cache_saved = CACHE_NOT_SAVED;
+}
+
+
 /*
  ************************************************
- * read_fntos:
+ * fs_fntos:
+ *     
+ *     'file name to string'.
+ * 
  *     rotina interna de support.
  *     isso deve ir para bibliotecas depois.
  *     não tem protótipo ainda.
- *     Credits: Luiz Felipe 
+ * 
+ * Created by: Luiz Felipe.
+ * 2020 - Adapted by Fred Nora.
  */
- 
+
  // #bugbug
  // Isso modifica a string lá em ring3.
  // prejudicando uma segunda chamada com a mesma string
  // pois já virá formatada.
 
-void read_fntos ( char *name )
+// #bugbug
+// const char * tornaria esse endereço em apenas leitura.
+
+void fs_fntos ( char *name )
 {
     int i  = 0;
     int ns = 0;
 
     char ext[4];
-
-    ext[0] = 0;
-    ext[1] = 0;
-    ext[2] = 0;
-    ext[3] = 0;
-
+    ext[0] = 0;  ext[1] = 0;  ext[2] = 0;  ext[3] = 0;
 
     //#test
-    if ( (void*) name == NULL )
-        return;
-    
-    //#test
-    if (*name == 0)
-        return;
+
+    if ( (void*) name == NULL ){ return; }
+
+    if (*name == 0){ return; }
 
 
     // Transforma em maiúscula enquanto não achar um ponto.
     // #bugbug: E se a string já vier maiúscula teremos problemas.
 
-    //while ( *name && *name != '.' )
-    while ( *name && *name != '.' )     // # testing
+    while ( *name && *name != '.' )
     {
         if ( *name >= 'a' && *name <= 'z' )
+        {
             *name -= 0x20;
+        }
 
         name++;
         ns++;
     };
 
- 
+    // #bugbug
+    // Esse negócio de acrescentar a extensão
+    // não é bom para todos os casos.
+
     if ( name[0] == '\0' && ns <= 8 )
     {
-        ext[0] = 'B';
-        ext[1] = 'I';
-        ext[2] = 'N';
-        ext[3] = '\0';        
-        goto _complete; //completa nome.
+        ext[0] = 'B';  ext[1] = 'I';  ext[2] = 'N';  ext[3] = '\0';
+
+        goto CompleteWithSpaces;
     }
 
     //if ( name[0] == '.' && ns < 8 )
@@ -111,7 +120,7 @@ void read_fntos ( char *name )
 
     for ( i=0; i < 3 && name[i+1]; i++ )
     {
-		//Transforma uma letra da extensão em maiúscula.
+        //Transforma uma letra da extensão em maiúscula.
  
         //if (name[i+1] >= 'a' && name[i+1] <= 'z')
         //    name[i+1] -= 0x20;
@@ -129,9 +138,9 @@ void read_fntos ( char *name )
         }
     };
 
-
 // Acrescentamos ' ' até completarmos as oito letras do nome.
-_complete:
+
+CompleteWithSpaces:
 
     while (ns < 8)
     {
@@ -139,106 +148,14 @@ _complete:
         ns++;
     };
 
+    // Acrescentamos a extensão
 
-	//Acrescentamos a extensão
+    for (i=0; i < 3; i++){  *name++ = ext[i];  };
 
-    for (i=0; i < 3; i++){
-        *name++ = ext[i];
-    };
-
-    *name = '\0';
-}
-
-/*
- ************************************
- * write_fntos
- *     Rotina interna de support.
- *     isso deve ir para bibliotecas depois.
- *     não tem protótipo ainda.
- *     Credits: Luiz Felipe 
- */
-
-
-//#bugbug
-//Temos duas rotinas iguais por nesse documento.
-// read_fntos e write_fntos
-void write_fntos (char *name)
-{
-    int i=0; 
-    int ns = 0;
-
-    //const char ext[4];
-    char ext[4];
-    ext[0] = 0;
-    ext[1] = 0;
-    ext[2] = 0;
-    ext[3] = 0;
-
-
-    // #todo
-    // fail
-    //if ( (void*) name == NULL )
-    //    return;
-
-
-    //Transforma em maiúscula enquanto não achar um ponto.
-
-    while ( *name && *name != '.' )
-    {
-        if ( *name >= 'a' && *name <= 'z' )
-        {
-            *name -= 0x20;
-        }
-
-        name++;
-        ns++;
-    };
-
-	// Aqui name[0] é o ponto.
-	// Então constrói a extensão.
-
-    for ( i=0; i < 3 && name[i+1]; i++ )
-    {
-		//Transforma uma letra da extensão em maiúscula.
-
-        //if (name[i+1] >= 'a' && name[i+1] <= 'z')
-        //    name[i+1] -= 0x20;
-
-        //ext[i] = name[i+1];
-    
-
-	    //#testando
-	    //Se não for letra então não colocamos no buffer de extensão;
-        if (name[i+1] >= 'a' && name[i+1] <= 'z')
-        {
-            name[i+1] -= 0x20;
-            ext[i] = name[i+1];
-        }
-    };
-
-
-	//Acrescentamos ' ' até completarmos as oito letras do nome.
-
-    while (ns < 8)
-    {
-        *name++ = ' ';
-        ns++;
-    };
-
-	//Acrescentamos a extensão
-
-    for (i=0; i<3; i++)
-    {
-        *name++ = ext[i];
-    };
-
+    // Finalizamos.
 
     *name = '\0';
 }
-
-
-
-
 
 
 /*
@@ -334,7 +251,8 @@ struct fat16_directory_entry_d *fs_new_fat16_directory_entry(void)
 
     new = (struct fat16_directory_entry_d *) kmalloc ( sizeof(struct fat16_directory_entry_d) );
     
-    if ( (void*) new == NULL ){
+    if ( (void*) new == NULL )
+    {
         debug_print("fs_new_fat16_directory_entry: [FAIL]\n");
         return (struct fat16_directory_entry_d *) 0;
     }
@@ -535,6 +453,8 @@ int fs_count_separators( const char *path){
 
 // #todo
 // We can do the same for some other types.
+// Use TRUE or FALSE.
+
 
 int fsCheckELFFile ( unsigned long address )
 {
@@ -2457,24 +2377,24 @@ int fs_initialize_process_pwd ( int pid, char *string )
 
 /*
  *********************************
- * fs_print_process_pwd
+ * fs_print_process_cwd
  *     Cada processo tem seu proprio pwd.
  *     Essa rotina mostra o pathname usado pelo processo. 
  */
 
 // this is used by the pwd command. service 170.
 
-int fs_print_process_pwd (int pid)
+int fs_print_process_cwd (int pid)
 {
     struct process_d *p;
 
 
-    debug_print ("fs_print_process_pwd:\n");
-    printf      ("fs_print_process_pwd:\n");
+    debug_print ("fs_print_process_cwd:\n");
+    printf      ("fs_print_process_cwd:\n");
 
 
     if (pid<0){
-        debug_print ("fs_print_process_pwd: pid\n");
+        debug_print ("fs_print_process_cwd: [FAIL] pid\n");
         return -1;
     }
 
@@ -2483,10 +2403,10 @@ int fs_print_process_pwd (int pid)
     p = (struct process_d *) processList[pid];
 
     if ( (void *) p == NULL ){
-        panic ("fs_print_process_pwd: p\n");
+        panic ("fs_print_process_cwd: p\n");
     }else{
         if ( p->used != 1 || p->magic != 1234 ){
-            panic ("fs_print_process_pwd: validation\n");
+            panic ("fs_print_process_cwd: validation\n");
         }
 
         // #bugbug
@@ -2514,15 +2434,21 @@ int fs_print_process_pwd (int pid)
         return 0;
     };
 
-    debug_print ("fs_print_process_pwd: fail\n");   
+    debug_print ("fs_print_process_cwd: fail\n");   
     return -1;
 }
 
 
-// Service 170. pwd.
-void sys_pwd(void)
+// sys_pwd -  Service 170.
+void sys_pwd (void)
 {
-    fs_print_process_pwd (current_process);
+    if ( current_process < 0 )
+    {
+        printf("sys_pwd: [FAIL] current_process\n");
+        return;
+    }
+
+    fs_print_process_cwd (current_process);
 }
 
 
@@ -2812,8 +2738,8 @@ sys_read_file_from_disk (
 
     // Convertendo o formato do nome do arquivo.    
     // >>> "12345678XYZ"
-    
-    read_fntos ( (char *) file_name );
+
+    fs_fntos ( (char *) file_name );
 
 
     // #bugbug
@@ -3455,10 +3381,8 @@ int sys_create_empty_file ( char *file_name )
         return -1;
     }
 
-    
-    //#test
-    read_fntos ( (char *) file_name );
-    
+
+    fs_fntos ( (char *) file_name );
     
     // See: write.c
     __ret = (int) fsSaveFile ( 
@@ -3577,8 +3501,7 @@ int sys_create_empty_directory ( char *dir_name )
         return -1;
     }
 
-    //#test
-    read_fntos ( (char *) dir_name );
+    fs_fntos ( (char *) dir_name );
 
      // See: write.c
     __ret = (int) fsSaveFile ( 
@@ -4486,7 +4409,7 @@ fsSaveFile (
     unsigned long fat_address,
     unsigned long dir_address,
     int dir_entries,
-    char *file_name, 
+    const char *file_name, 
     unsigned long file_size,
     unsigned long size_in_bytes,
     char *file_address,
@@ -4589,10 +4512,11 @@ fsSaveFile (
 
 
     // Load root dir and FAT.
+
     fs_load_rootdir( VOLUME1_ROOTDIR_ADDRESS, VOLUME1_ROOTDIR_LBA, 32 );
 
-    //fs_load_fat(VOLUME1_FAT_ADDRESS,VOLUME1_FAT_LBA,128);
     fs_load_fat(VOLUME1_FAT_ADDRESS,VOLUME1_FAT_LBA,246);
+
 
     // Procurando cluster livre na fat.
     // Nesse momento construimos uma lista de clusters livres.
@@ -4631,7 +4555,7 @@ fsSaveFile (
             //salvamos um índice na fat dentro da lista
             //incrementa a lista
 
-            fat16ClustersToSave[j] = (unsigned short) c;   
+            fat16ClustersToSave[j] = (unsigned short) c; 
             j++; 
 
             // Decrementa o tamanho do arquivo!
@@ -4717,20 +4641,16 @@ save_file:
     DirEntry[11] = flag; 
 
     // Reserved.
-    DirEntry[12] = 0;       
+    DirEntry[12] = 0; 
 
     // Creation time. 14 15 16
-    DirEntry[13] = 0x08; 
-    DirEntry[14] = 0x08; 
-    DirEntry[15] = 0xb6;
+    DirEntry[13] = 0x08;  DirEntry[14] = 0x08;  DirEntry[15] = 0xb6;
 
     // Creation date.
-    DirEntry[16] = 0xb6;
-    DirEntry[17] = 0x4c;
+    DirEntry[16] = 0xb6;  DirEntry[17] = 0x4c;
 
     // Access date.
-    DirEntry[18] = 0xb8;
-    DirEntry[19] = 0x4c;
+    DirEntry[18] = 0xb8;  DirEntry[19] = 0x4c;
 
 	// ??
 	// First cluster. 
@@ -4739,12 +4659,10 @@ save_file:
     DirEntry[21] = 0;
 
     // Modifield time.
-    DirEntry[22] = 0xa8;
-    DirEntry[23] = 0x49;
+    DirEntry[22] = 0xa8;  DirEntry[23] = 0x49;
 
     // Modifield date.
-    DirEntry[24] = 0xb8;
-    DirEntry[25] = 0x4c;
+    DirEntry[24] = 0xb8;  DirEntry[25] = 0x4c;
 
     // First cluster. Low word.
     // 0x1A and 0x1B
@@ -4778,11 +4696,9 @@ save_file:
 	// #bugbug: A quantidade de entrada depende to diretório.
 	// See: search.c
 
-    // IN: directory address, max number of entries.
 
-    //FreeIndex = (int) findEmptyDirectoryEntry ( 
-    //                      VOLUME1_ROOTDIR_ADDRESS, 
-    //                      FAT16_ROOT_ENTRIES );
+    // IN: 
+    // directory address, max number of entries.
     
     FreeIndex = (int) findEmptyDirectoryEntry ( 
                           dir_address, 
@@ -4955,11 +4871,10 @@ do_save_dir_and_fat:
 
     //if ( dir_address == ROO...
     fs_save_rootdir( VOLUME1_ROOTDIR_ADDRESS, VOLUME1_ROOTDIR_LBA, 32 );
-    
-    // Save FAT
-    
-    //fs_save_fat();
-    fat_cache_saved = CACHE_NOT_SAVED;
+
+    // Sinalizando que o cache de fat precisa ser salvo.
+
+    fs_fat16_cache_not_saved();
 
     debug_print ("fsSaveFile: done\n");
     printf      ("fsSaveFile: done\n");

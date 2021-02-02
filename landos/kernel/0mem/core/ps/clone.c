@@ -7,7 +7,6 @@
 #include <kernel.h>
 
 
-
 /*
  ***************************************
  * clone_process 
@@ -747,7 +746,7 @@ pid_t clone_and_execute_process ( const char *filename )
 
 __search:
 
-    read_fntos ( (char *) name );
+    fs_fntos ( (char *) name );
 
     Status = (int) search_in_dir ( name, dir_address );
     if (Status == 1)

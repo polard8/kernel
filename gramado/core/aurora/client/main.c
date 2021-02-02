@@ -156,6 +156,9 @@ gwsProcedure (
 
             switch (long1){
 
+                // #test: Chamando um demo.
+                // gws_async_command(client_fd,4,9); //cat
+
                 case VK_F1: gws_clone_and_execute("editor.bin");   break;
                 case VK_F2: gws_clone_and_execute("gwm.bin");      break;
                 case VK_F3: gws_clone_and_execute("fileman.bin");  break;
@@ -175,7 +178,11 @@ gwsProcedure (
             break;
     };
 
-    return 0;
+    // ok
+    // retorna TRUE quando o diálogo chamado 
+    // consumiu o evento passado à ele.
+    
+    return TRUE;
 }
 
 
@@ -271,7 +278,7 @@ int main ( int argc, char *argv[] )
 
     //while(1){
     // Hello
-    //gws_async_command(client_fd,3);
+    //gws_async_command(client_fd,3,0);
     //}
 
 
@@ -485,7 +492,8 @@ int main ( int argc, char *argv[] )
     //}
 
 
-
+    // #test: Chamando um demo.
+    // gws_async_command(client_fd,4,9); //cat
 
     // Loop
 
@@ -499,8 +507,19 @@ int main ( int argc, char *argv[] )
     sc82 (10011,cThread,cThread,cThread);
     
     while(1){
-        if ( rtl_get_event() == TRUE ){  
-            gwsProcedure( (void*) RTLEventBuffer[0], RTLEventBuffer[1], RTLEventBuffer[2], RTLEventBuffer[3] );
+        if ( rtl_get_event() == TRUE )
+        {  
+            // Podemos chamar mais de um diálogo
+            // Retorna TRUE quando o diálogo chamado 
+            // consumiu o evento passado à ele.
+            // Nesse caso chamados 'continue;'
+            // Caso contrário podemos chamar outros diálogos.
+
+            gwsProcedure ( 
+                (void*) RTLEventBuffer[0], 
+                RTLEventBuffer[1], 
+                RTLEventBuffer[2], 
+                RTLEventBuffer[3] );
         }
     };
     //=================================
@@ -508,14 +527,14 @@ int main ( int argc, char *argv[] )
 
     // Isso ehestranho ... um cliente remoto nao deve poder fazer isso.
     //gws_debug_print ("gws: Sending command to close the server. \n");
-    gws_async_command(client_fd,1);
+    gws_async_command(client_fd,1,0);
     //exit(0);
 
     // Asking to server to send me an notification
     // telling me to close myself
     
     //gws_debug_print ("gws: Pinging\n");
-    //gws_async_command(client_fd,2);
+    //gws_async_command(client_fd,2,0);
 
 
     while(1){}
@@ -542,7 +561,7 @@ int main ( int argc, char *argv[] )
              event_buffer[3] == 'g' )
         {
             printf("PONG\n");
-            gws_async_command(client_fd,1);
+            gws_async_command(client_fd,1,0);
         }
     };
     */

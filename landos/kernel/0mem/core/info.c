@@ -1,11 +1,10 @@
 /*
  * File: info.c
  *
- *     Rotinas de informaçoes sobre o sistema.
+ *     System info routines.
  *
  * History:
  *     2015 - Created by Fred Nora.
- *     2016 - Revision.
  */
 
 
@@ -54,27 +53,29 @@ void KiInformation (void)
 
     // The current mode.
     // This is not the product name.
+
+    printf ("\n");
     
     switch (current_mode){
 
         case GRAMADO_JAIL:
-            printf ("GRAMADO_JAIL: \n");
+            printf ("GRAMADO_JAIL: Good for games.\n");
             break;
             
         case GRAMADO_P1:
-            printf ("GRAMADO_P1: \n");
+            printf ("GRAMADO_P1: Good for applications.\n");
             break;
             
         case GRAMADO_HOME:
-            printf ("GRAMADO_HOME: \n");
+            printf ("GRAMADO_HOME: Good for applications.\n");
             break;
             
         case GRAMADO_P2:
-            printf ("GRAMADO_P2: \n");
+            printf ("GRAMADO_P2: Good for applications.\n");
             break;
             
         case GRAMADO_CASTLE:
-            printf ("GRAMADO_CASTLE: \n");
+            printf ("GRAMADO_CASTLE: Good for database.\n");
             break;
         
         //case GRAMADO_CALIFORNIA:
@@ -85,8 +86,8 @@ void KiInformation (void)
             break;
     };
 
-
     // Timing
+    printf ("\n");
     printf ("seconds %d | jiffies %d | %d HZ | sys time %d ms  \n", 
         seconds,
         jiffies, 
@@ -106,60 +107,53 @@ void KiInformation (void)
     printf ("UserSession={%d} Room={%d} Desktop={%d}\n",
         current_usersession, current_room, current_desktop );
 
-	//#bugbug Rever isso.
-    ShowUserInfo (0);  
+	// #bugbug: 
+	// Rever isso.
 
+    ShowUserInfo(0);  
 
-    // ## Status ##
+    //
+    // Status 
+    //
+    
+    // Status do mecanismo de task switch.
+    switch ( task_switch_status ){
+    case LOCKED:    printf("Task switch LOCKED\n");    break; 
+    case UNLOCKED:  printf("Task switch UNLOCKED\n");  break; 
+    };
 
-	// Status do mecanismo de task switch.
-	switch ( task_switch_status ){
-	    case LOCKED:
-		    printf("Task switch LOCKED\n");
-			break; 
-		case UNLOCKED:
-		    printf("Task switch UNLOCKED\n");
-		    break; 
-	};
-
-
-	// Status do Scheduler.
-	switch ( g_scheduler_status ){
-	    case LOCKED:
-		    printf("Scheduler LOCKED\n");
-		    break; 
-		case UNLOCKED:
-		    printf("Scheduler UNLOCKED\n");
-		    break; 
-	};
-
+    // Status do Scheduler.
+    switch ( g_scheduler_status ){
+    case LOCKED:    printf("Scheduler LOCKED\n");    break; 
+    case UNLOCKED:  printf("Scheduler UNLOCKED\n");  break; 
+    };
 
 	//
-	// ## Process and thread ##
+	// Process and thread
 	//
-	
-    printf ("[Process Info:]\n");
+
+    printf ("\n");
+    printf ("[Process Info]\n");
 
 	//Current process and current thread.
     printf ("CurrentProcess={%d} CurrentThread={%d}\n", 
         current_process, current_thread );
 
-    printf ("# thread info #\n");
+    printf ("\n");
+    printf ("[Thread Info]\n");
 
-    printf ("{ %d } threads_counter\n\n", 
+    printf ("Number of threads %d\n\n", 
         UPProcessorBlock.threads_counter );
-
 
     // See: thread.c
     show_thread_information ();
 
-
-	// Crit�rio de dispatch.
-	// Mostra o n�mero de vezes que um crit�rio de sele��o 
-	// de thread foi usado pelo dispatcher.
+    // Dispatch criteria
+    // Show how many times a dispatch criteria was used by
+    // the dispatcher.
 
     printf ("\n");
-    printf ("[Dispatch criteria:]\n");
+    printf ("[Dispatch criteria]\n");
     printf ("cIdle={%d} cInit={%d} cNext={%d} cCur={%d} "
             "cAny={%d} cIdeal={%d} cDisp={%d}\n\n",
         DispatchCountBlock->SelectIdleCount,
@@ -206,7 +200,7 @@ void KiInformation (void)
 	//printf("FrontbufferPA={%x} FrontbufferVA={%x} BackbufferVA={%x} \n",
 	//    g_frontbuffer_pa ,g_frontbuffer_va ,g_backbuffer_va);
 
-	
+
     //
     //  ## Memory ##
     //
@@ -215,49 +209,23 @@ void KiInformation (void)
 
     // Nothing. 
     goto done;
-
-
-//
-// Exit.
-//
+    
+    // ==========================
 
 fail:
     printf ("Fail\n");
 done:
-
-    // Show basics.
-    
-    // screen 
-    printf ("\n Screen Resolution: W=%d H=%d BPP=%d \n",
+    // Resolution
+    printf ("\n");
+    printf ("Screen Resolution: W=%d H=%d BPP=%d \n",
         g_device_screen_width, 
         g_device_screen_height, 
         g_device_screen_bpp );
-
-
 
     refresh_screen();
     return;
 }
 
-
-/*
- Salva as informa��es em um arquivo de texto.
-void infoSaveInfo();
-void infoSaveInfo()
-{
-	return;
-}
-*/
-
-/*
- * @todo:
- *
-void infoShowKernelInfo();
-void infoShowKernelInfo()
-{
-	return;
-};
-*/
 
 // ================================================
 // The data comes from boot block and beyond.
@@ -269,12 +237,9 @@ void infoShowKernelInfo()
 unsigned long info_get_boot_info ( int i )
 {
 
-    if (i<0){
-        return 0;
-    }
+    if (i<0){  return 0;  }
 
-    switch (i)
-    {
+    switch (i){
 
         // #bugbug
         // If we use the BootBlock structure, maybe the info
@@ -282,32 +247,26 @@ unsigned long info_get_boot_info ( int i )
 
         case 1:
            return (unsigned long) BootBlock.last_valid_address;
-           // return (unsigned long) blSavedLastValidAddress;
            break;
 
         case 2:
            return (unsigned long) BootBlock.metafile_address;
-           //return (unsigned long) blSavedMetafileAddress;
            break;
 
         case 3:
            return (unsigned long) BootBlock.disk_number;
-           //return (unsigned long) blSavedDiskNumber;
            break;
 
         case 4:
            return (unsigned long) BootBlock.heads;
-           //return (unsigned long) blSavedHeads;
            break;
 
         case 5:
            return (unsigned long) BootBlock.spt;
-           //return (unsigned long) blSavedSPT;
            break;
 
         case 6:
            return (unsigned long) BootBlock.cylinders;
-           //return (unsigned long) blSavedCylinders;
            break;
 
         case 7:
@@ -317,9 +276,6 @@ unsigned long info_get_boot_info ( int i )
         case 9:
            //return (unsigned long) 
            break;
-
-
-
     };
     
    //fail 

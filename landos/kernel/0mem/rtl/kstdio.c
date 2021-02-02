@@ -128,22 +128,48 @@ file *k_fopen ( const char *filename, const char *mode )
     int i=0;    
     int __slot = -1;
     unsigned long fileret=0;
-    size_t s = 0;
+    size_t Size = 0;
 
 
     debug_print ("k_fopen:\n");
-    
-    
+
+
+
+    //
+    // filename
+    //
+
+    if ( (void*) filename == NULL ){
+        printf ("k_fopen: [FAIL] filename\n");
+        goto fail;
+    }
+
+    if (*filename == 0){
+        printf ("k_fopen: [FAIL] *filename\n");
+        goto fail;
+    }
+
+    fs_fntos ( (char *) filename );
+
+    Size = (size_t) fsRootDirGetFileSize ( (unsigned char *) filename );
+
+    if ( Size <= 0 ){
+        printf ("k_fopen: [FAIL] Size\n");
+        goto fail;
+    }
+
+    //
     // Process.
+    //
 
     Process = (void *) processList[current_process];
 
     if ( (void *) Process == NULL ){
-        printf("k_fopen: Process\n");
+        printf("k_fopen: [FAIL] Process\n");
         goto fail;
     }else{
         if ( Process->used != 1 || Process->magic != 1234 ){
-            printf("k_fopen: Process validation\n");
+            printf("k_fopen: [FAIL] Process validation\n");
             goto fail;
         }
         //ok
@@ -159,38 +185,6 @@ file *k_fopen ( const char *filename, const char *mode )
     // Check slot validation. 
     if ( __slot == -1 ){
         printf ("k_fopen: No free slots\n");
-        goto fail;
-    }
-
-
-	// #bugbug
-	// Estamos com problemas com a string de nome.
-	// #debug: vamos exibí-la.
-
-	// #debug
-	//printf ("before_read_fntos: %s\n", filename );
-
-    read_fntos ( (char *) filename );
-
-	// #debug
-	//printf ("after_read_fntos: %s\n", filename );
-
-	// #debug
-	//refresh_screen ();
-	
-	
-    //#bugbug
-    //na máquina real falhou no momento de pegar o tamanho do arquivo.
-    //debug: vamos colocar verbose nessa rotina e olhar na máquina real
-    //se o problema aparece.
-	
-	//#test
-	//temos que fazer isso de um jeito melhor
-
-    s = (size_t) fsRootDirGetFileSize ( (unsigned char *) filename );
-
-    if ( s <= 0 ){
-        printf ("k_fopen: file size \n");
         goto fail;
     }
 
@@ -222,30 +216,48 @@ file *k_fopen ( const char *filename, const char *mode )
 	//obs: Essa alocação vai depender do tamanho do arquivo.
 
 
-    file_buffer = (char *) kmalloc(s);
-    //file_buffer = (char *) newPage();
+    // Check size.
+    // #todo
+    // Não devemos alocar se o arquivo for grande.
 
-    // fail
-    if ( (char *) file_buffer == NULL )
+    if ( Size <= 0 )
+    {
+        panic ("k_fopen: [FAIL] Size\n");
+    }
+
+    // 1 MB
+    if ( Size > (1024 * 1024 * 1) )
+    {
+        panic ("k_fopen: [FIXME] Size limits\n");
+    }
+
+    // #todo
+    // Aqui talvez podemos usar o outro alocador.
+
+    //file_buffer = (char *) newPage();
+    file_buffer = (char *) kmalloc(Size);
+
+    if ( (void *) file_buffer == NULL )
     {
         Process->Objects[__slot] = (unsigned long) 0;
+        
         kprintf ("k_fopen: file_buffer \n");
         goto fail;
     }
 
-
-	// File structure.
+    //
+    // File structure.
+    //
 
     f = (file *) kmalloc( sizeof(file) );
 
-    // fail
     if ( (void *) f == NULL ){
         Process->Objects[__slot] = (unsigned long) 0;
         kprintf ("k_fopen: f\n");
         goto fail;
-
     }else{
-        f->used = 1;
+        
+        f->used = TRUE;
         f->magic = 1234;
         f->pid = (pid_t) current_process;
         f->uid = (uid_t) current_user;
@@ -267,15 +279,17 @@ file *k_fopen ( const char *filename, const char *mode )
         f->_tmpfname = (char *) strdup(filename);
 
         if ( (void *) f->_tmpfname == NULL ){
-            panic ("kfopen: _tmpfname");
+            panic ("kfopen: _tmpfname\n");
         }
 
         f->_base     = file_buffer;
         f->_p        = file_buffer;
         f->_bf._base = file_buffer;
 
-        f->_lbfsize  = s;
-        f->_cnt      = s;
+        // Size.
+
+        f->_lbfsize  = Size;
+        f->_cnt      = Size;
 
         f->_r = 0;
         f->_w = 0;
@@ -292,18 +306,19 @@ file *k_fopen ( const char *filename, const char *mode )
 	// Atenção !!
 	// Por enquanto esse esquema de pwd mais atrapalha que ajuda.
 
-	// pwd support.
+    // pwd support.
+
     fsUpdateWorkingDiretoryString ( (char *) filename );
 
     // Fail.
     // Reset data.
+
     if ( current_target_dir.current_dir_address == 0 )
     {
         printf ("k_fopen: current_target_dir.current_dir_address fail \n");
         current_target_dir.current_dir_address = VOLUME1_ROOTDIR_ADDRESS;
         for ( i=0; i<11; i++ ){ current_target_dir.name[i] = '\0'; };
         goto fail;
-        //return (file *) 0;
     }
 
 
@@ -311,27 +326,26 @@ file *k_fopen ( const char *filename, const char *mode )
 	// Loading file.
 	//
 
+    // Loading from 'current_target_dir'
 
 	//#debug
 	//printf ("before_fsLoadFile: %s\n", filename );
 
-    fileret = fsLoadFile ( VOLUME1_FAT_ADDRESS, 
+    fileret = fsLoadFile ( 
+                  VOLUME1_FAT_ADDRESS, 
                   current_target_dir.current_dir_address,
                   32, //#bugbug: Number of entries.
                   (unsigned char *) filename, 
                   (unsigned long) f->_base,
                   f->_lbfsize );
 
-	//printf ("after_fsLoadFile: %s\n", filename );  
-
-    // fail
     if ( fileret != 0 )
     {
-        printf ("k_fopen: fsLoadFile fail\n");
+        printf ("k_fopen: [FAIL] fsLoadFile fail\n");
         f = NULL;
         goto fail;
     }
-    
+
     // #todo
     // We need to check the file type in the inode
     // to set the object type in the file structure.
@@ -342,17 +356,12 @@ file *k_fopen ( const char *filename, const char *mode )
     
     return (file *) f;
 
-
-//
-// fail
-//
-
 fail:
     debug_print ("k_fopen: Fail\n");
+    printf      ("k_fopen: Fail\n");
     refresh_screen ();
     return (file *) 0;
 }
-
 
 
 /*

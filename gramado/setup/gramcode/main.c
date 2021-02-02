@@ -332,18 +332,20 @@ void *teditorProcedure (
                     // Valido inclusive para o 's' caso o control
                     // nao estiver pressionado.
                    
-                    teditorInsertNextChar ( (char) long1 );  
+                    teditorInsertNextChar ( (char) long1 ); 
+                    
                     goto done;
                     break;
             };
             //...
-            return NULL; //break;
+            return NULL;
+            break;
 
 
-		case MSG_SYSKEYDOWN:
-		    //...
+        case MSG_SYSKEYDOWN:
+            // ...
             switch (long1)
-			{
+            {
 				//#bugbug
 				//vamos testar usando as teclas de função.
 				//mas no futuro usaremos as setas.
@@ -361,13 +363,12 @@ void *teditorProcedure (
                 case VK_F3: debug_print(" [F3] "); break;
                 case VK_F4: debug_print(" [F4] "); break;
 
-				default:
+            default:
                     gde_debug_print("teditorProcedure: [MSG_SYSKEYDOWN] default message\n");
-				    break;
-
-			};
-			//
-			return 0; //break;
+                    break;
+            };
+            return 0; 
+            break;
 
 
         // MSG_MOUSEKEYDOWN
@@ -599,7 +600,7 @@ void teditorInsertNextChar (char c)
     // Refresh
     //
     
-    teditorRefreshCurrentChar ();
+    teditorRefreshCurrentChar();
 
 
 	// Update
@@ -641,8 +642,16 @@ gramcodeLinesInsertChar (
 
 void teditorRefreshCurrentChar (void)
 {
+    // #todo
+    // O objetivo aqui é não mais usar as ferramentas de console
+    // e sim usar a api da libcore para imprimir os chars na
+    // janela do editor de textos.
+
+    //#bugbug: Isso são rotinas de console.
     printf ("%c", LINES[textCurrentRow].CHARS[textCurrentCol] );
     fflush(stdout);
+    
+    
 }
 
 

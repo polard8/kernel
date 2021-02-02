@@ -2151,6 +2151,7 @@ int serviceNextEvent (void)
 }
 
 
+// No response.
 int serviceAsyncCommand (void)
 {
     //O buffer é uma global nesse documento.
@@ -2158,10 +2159,12 @@ int serviceAsyncCommand (void)
 
     unsigned long message_id =0;
     unsigned long request_id =0;
+    unsigned long subrequest_id = 0;
 
 
-    message_id  = message_address[1]; 
-    request_id  = message_address[2]; 
+    message_id     = message_address[1]; 
+    request_id     = message_address[2]; 
+    subrequest_id  = message_address[3];
 
     if(message_id != 2222)
     {
@@ -2196,6 +2199,17 @@ int serviceAsyncCommand (void)
             gwssrv_debug_print ("gwssrv_init_client_support: [request 3] hello\n");
             printf("HELLO\n");
             //exit(0);
+            break;
+            
+        case 4:
+            if (current_mode == GRAMADO_JAIL)
+            {
+                printf("DEMO\n"); 
+                if( subrequest_id >=0 && subrequest_id < 10 ){
+                demos_startup_animation(subrequest_id);
+                }
+                gwssrv_show_backbuffer();
+            }
             break;
 
         // ...

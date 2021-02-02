@@ -3505,12 +3505,27 @@ void gde_debug_print (char *string);
 //
 
 int 
+gde_draw_char ( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long c,
+    unsigned long fg_color,
+    unsigned long bg_color );
+
+int 
+gde_drawchar_transparent ( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long color,
+    unsigned long c );
+
+int 
 gde_draw_text ( 
     struct window_d *window, 
     unsigned long x, 
     unsigned long y, 
     unsigned long color, 
-    char *string );
+    const char *string );
 
 
 // ?

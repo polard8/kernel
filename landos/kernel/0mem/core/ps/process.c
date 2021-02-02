@@ -2850,8 +2850,7 @@ process_execve (
 	// Transformando o nome do arquivo em mai�scula, pois estamos 
 	// usando FAT16, que exige isso.
 
-    read_fntos ( (char *) arg1 );
-
+    fs_fntos ( (char *) arg1 );
 
     //
     // Searching for the file only on the root dir.

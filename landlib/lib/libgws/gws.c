@@ -3333,7 +3333,8 @@ int gws_create_empty_directory ( char *dir_name )
 void
 gws_async_command ( 
     int fd, 
-    unsigned long request)
+    unsigned long request,
+    unsigned long sub_request )
 {
 
     // Isso permite ler a mensagem na forma de longs.
@@ -3360,10 +3361,10 @@ gws_async_command (
 
     while (1)
     {
-        message_buffer[0] = 0;        // window. 
-        message_buffer[1] = GWS_AsyncCommand;     // message number.
-        message_buffer[2] = request;  // x
-        message_buffer[3] = request;  // y
+        message_buffer[0] = 0;                 // window. 
+        message_buffer[1] = GWS_AsyncCommand;  // message number.
+        message_buffer[2] = request;           // request
+        message_buffer[3] = sub_request;       // sub request
         //...
 
         // Write!

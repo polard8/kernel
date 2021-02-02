@@ -2048,14 +2048,14 @@ void *sci0 (
             return (void *) systemLinkDriver (arg2,arg3,arg4); 
             break;
 
+        // 130
+        // Pinta um texto em uma dada janela.
+        // #todo: 
+        // Se não for expecificado a janela, 
+        // então é pra pintar na janela principal. gui->main.
 
-		// 130
-		// Pinta um texto em uma dada janela.
-		// #todo: 
-		// Se n�o for expecificado a janela, 
-		// ent�o � pra pintar na janela principal. gui->main.
-		// Repensar se qualquer um pode pintar na janela principal.	
-		// IN: window, x, y, color, string.
+        // IN: 
+        // window, x, y, color, string.
 
         case SYS_DRAWTEXT:
             draw_text ( 
@@ -2070,11 +2070,15 @@ void *sci0 (
 
         // 131
         // Pintar o caractere especificamente na janela com o 
-        // foco de entrada.          
+        // foco de entrada. 
+        // obs: a rotina 'my_buffer_char_blt' pinta em 
+        // qualquer lugar da tela,
+        // nao usa janelas.
+        // IN: x, y, color, char.
+
         case SYS_BUFFER_DRAWCHAR_WWF: 
             focusWnd = (void *) windowList[window_with_focus];
             if ( (void *) focusWnd == NULL ){  break;  }
-            // IN: x,y,color,char.
             my_buffer_char_blt ( 
                 (unsigned long) (arg2 + focusWnd->left),
                 (unsigned long) (arg3 + focusWnd->top),
@@ -2084,7 +2088,32 @@ void *sci0 (
             break;
 
 
-        // 133 - ??
+        // 132 - d_draw_char
+        // Desenha um caractere e pinta o pano de fundo.
+        // #todo: We do not hae an api routine yet.
+        // IN: x, y, c, fg color, bg color
+        case 132: 
+            d_draw_char(
+                (unsigned long)  message_address[0],  //x
+                (unsigned long)  message_address[1],  //y 
+                (unsigned long)  message_address[2],  //c
+                (unsigned long)  message_address[3],  //fg
+                (unsigned long)  message_address[4] ); //bg
+            return NULL;
+            break;
+
+        // 133 - d_drawchar_transparent
+        // Desenha um caractere sem alterar o pano de fundo.
+        // IN: x, y, color, c
+        case 133:
+            d_drawchar_transparent(
+                (unsigned long)  message_address[0],   // x
+                (unsigned long)  message_address[1],   // y 
+                (unsigned long)  message_address[2],   // color
+                (unsigned long)  message_address[3] ); // c
+            return NULL;
+            break;
+
 
 		// 134
 		// Pegar informa��es sobre a �rea de cliente de uma janela;
@@ -2134,7 +2163,7 @@ void *sci0 (
 
         // 139
         case SYS_GETSCANCODE:
-            return (void *) get_scancode ();
+            return (void *) get_scancode();
             break;
 
         // 140
@@ -2309,7 +2338,7 @@ void *sci0 (
            break;
 
 
-        // 170 - pwd
+        // 170 - command 'pwd'.
         // Cada processo tem seu proprio pwd.
         // Essa rotina mostra o pathname usado pelo processo.
         // See: fs.c

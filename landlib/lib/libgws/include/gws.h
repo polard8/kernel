@@ -381,7 +381,8 @@ unsigned long gws_explode_byte (unsigned char data);
 void
 gws_async_command ( 
     int fd, 
-    unsigned long request);
+    unsigned long request,
+    unsigned long sub_request );
 
 //
 // End.

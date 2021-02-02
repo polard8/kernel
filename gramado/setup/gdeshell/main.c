@@ -2277,14 +2277,11 @@ do_compare:
     }
     //--
 
-
     // kernel-info
-    if ( gramado_strncmp( prompt, "kernel-info", 11 ) == 0 )
-    {
-        shellShowKernelInfo ();
+    if ( gramado_strncmp( prompt, "kernel-info", 11 ) == 0 ){
+        shellShowKernelInfo();
         goto exit_cmp;
     }
-
 
     // dialog-box
     if ( gramado_strncmp( prompt, "dialog-box", 10 ) == 0 ){
@@ -5324,7 +5321,7 @@ void shellShowKernelHeapPointer (void)
 void shellShowDiskInfo (void)
 {
 	//@todo: atualizar api.h
-    system_call ( 251, 0, 0, 0 );
+    gramado_system_call ( 251, 0, 0, 0 );
 }
 
 
@@ -5333,28 +5330,26 @@ void shellShowVolumeInfo (void)
 {
 	
 	//@todo: atualizar api.h
-	system_call ( 252, 0, 0, 0 );
+   gramado_system_call ( 252, 0, 0, 0 );
 }
 
 
-//mostrar informa��es gerais sobre a mem�ria.
+// Show memory info.
 void shellShowMemoryInfo (void)
 {
-    system_call ( SYSTEMCALL_MEMORYINFO, 0, 0, 0 );
+    gramado_system_call ( SYSTEMCALL_MEMORYINFO, 0, 0, 0 );
 }
 
-
-//mostrar informa��es gerais sobre a mem�ria.
+// Show PCI devices info.
 void shellShowPCIInfo (void)
 {
-    system_call ( SYSTEMCALL_SHOWPCIINFO, 0, 0, 0 );
+    gramado_system_call ( SYSTEMCALL_SHOWPCIINFO, 0, 0, 0 );
 }
 
-
-//mostrar informa��es gerais sobre a mem�ria.
+// Show some system info.
 void shellShowKernelInfo (void)
 {
-    system_call ( SYSTEMCALL_SHOWKERNELINFO, 0, 0, 0 );
+    gramado_system_call ( SYSTEMCALL_SHOWKERNELINFO, 0, 0, 0 );
 }
 
 

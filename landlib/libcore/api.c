@@ -1929,6 +1929,8 @@ gde_save_file (
         gde_debug_print ("gde_save_file: [ERROR] no filename provided\n");
         return -1;
     }
+    
+    //if ( *file_name == 0 ){ return -1; }
 
     if ( (void*) file_address == NULL )
     {
@@ -2288,14 +2290,15 @@ void gde_end_paint(void)
  *******************************************
  * gde_put_char:
  *     Imprime um caractere usando o cursor do sistema.
- *     #todo; falar mais sobre isso.
  */
+
+// Isso coloca um char usando o console virtual atual.
+// See: service 65.
 
 void gde_put_char (int c)
 {
-    system_call ( SYSTEMCALL_SYS_PUTCHAR, c, c, c );
+    gramado_system_call ( SYSTEMCALL_SYS_PUTCHAR, c, c, c );
 }
-
 
 
 /*
@@ -2371,7 +2374,7 @@ void api_receive_message( struct api_receive_message_d *m )
 
 int gde_dialog ( const char *string )
 {
-    int Status = 1; // Yes!
+    int Status = TRUE; // Yes!
     int ch = 0;
 
 
@@ -2396,22 +2399,24 @@ int gde_dialog ( const char *string )
         {
             switch (ch)
             {
-                case VK_RETURN:  return (int) Status;  break;
+                case VK_RETURN:  
+                    return (int) Status;  
+                    break;
 
-			    case 'Y': case 'y':
-				    printf ("Yes\n");
-			        Status = 1;
-				    break;
-				   
-			    case 'N': case 'n':
-			        printf ("No\n");
-					Status = 0;
-				    break;
+                case 'Y': 
+                case 'y':
+                    printf ("Yes\n");  Status = TRUE;
+                    break;
+
+                case 'N': 
+                case 'n':
+                    printf ("No\n");  Status = FALSE;
+                    break;
 
 				//default:
 				//    break;
-		    };		   
-		};
+            };   
+        }
 
         // ?? rever isso.
         asm ("pause");
@@ -2490,11 +2495,12 @@ gde_display_bmp (
     unsigned char *c2 = (unsigned char *) &color2;
 
     unsigned long *palette = (unsigned long *) (address + 0x36);
-    unsigned char *palette_index = (unsigned char *) &pal_address;	
+    unsigned char *palette_index = (unsigned char *) &pal_address;
 
 
 	// Limits
-	
+
+    //#bugbug
 	xLimit = 800;
 	yLimit = 600;
 	
@@ -2570,9 +2576,9 @@ gde_display_bmp (
 	//@todo: checar validade da altura e da largura encontrada.
 	
 	// Salvar.
-	bi->bmpWidth  = (unsigned long) Width;
-	bi->bmpHeight = (unsigned long) Height;
-	
+    bi->bmpWidth  = (unsigned long) Width;
+    bi->bmpHeight = (unsigned long) Height;
+
 	
 	/* Number of bits per pixel */
 	//1, 4, 8, 16, 24 and 32.
@@ -2595,13 +2601,12 @@ gde_display_bmp (
 	//
 	// Draw !
 	//
-	
-	left = x;    
-	top = y; 
-	
-	
+
+    left = x;
+    top = y; 
+
 	//bottom = top + height;
-	bottom = (top + bi->bmpHeight );
+    bottom = (top + bi->bmpHeight );
 
 	// Início da área de dados do BMP.
 	
@@ -2609,31 +2614,21 @@ gde_display_bmp (
 	//a base é diferente para os tipos.
 	 
 
-	switch (bi->bmpBitCount){
-		
-		//case 1:
-		//    base = (0x36 + 0x40);
-		//    break;
-		    
-		//case 2:
-		//    base = (0x36 + 0x40);
-		//    break;
-			
-		case 4:
-		    //4bytes pra cada cor, 16 cores, 64bytes.
-		    base = (0x36 + 0x40);
-		    break; 
-			
-		case 8:
-		    //4bytes pra cada cor, 256 cores, 1024bytes.
-		    base = (0x36 + 0x400);
-		    break; 
-			
-		default:
-		    base = 0x36;
-			break;
-	};	
-	
+    switch (bi->bmpBitCount){
+
+        //case 1:  base = (0x36 + 0x40);  break;
+        //case 2:  base = (0x36 + 0x40);  break;
+
+        // 4 bytes pra cada cor, 16 cores, 64bytes.
+        case 4:  base = (0x36 + 0x40);  break; 
+
+        // 4bytes pra cada cor, 256 cores, 1024bytes.
+        case 8:  base = (0x36 + 0x400);  break; 
+
+        default:  
+            base = 0x36;  
+            break;
+    };
 
 //1 - 1 bpp (Mono)
 //4 - 4 bpp (Indexed)
@@ -2848,6 +2843,10 @@ gde_send_message_to_process (
         return -1;
     }
 
+    //if (message < 0)
+        //return -1;
+
+
     message_buffer[0] = (unsigned long) window;
     message_buffer[1] = (unsigned long) message;
     message_buffer[2] = (unsigned long) long1;
@@ -2882,6 +2881,10 @@ gde_send_message_to_thread (
         gde_debug_print ("gde_send_message_to_thread: fail\n");
         return -1;
     }
+
+
+    //if (message < 0)
+        //return -1;
 
 
     message_buffer[0] = (unsigned long) window;
@@ -2928,15 +2931,70 @@ gde_send_message (
 }
 
 
+
+
+// 132
+// IN: x, y, c, fg color, bg color
+int 
+gde_draw_char ( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long c,
+    unsigned long fg_color,
+    unsigned long bg_color )
+{
+    unsigned long msg[8];
+    
+    msg[0] = (unsigned long) x;
+    msg[1] = (unsigned long) y;
+    msg[2] = (unsigned long) c;
+    msg[3] = (unsigned long) fg_color;
+    msg[4] = (unsigned long) bg_color;
+    // ...
+
+    return (int) system_call ( 132, 
+                    (unsigned long) &msg[0], 
+                    (unsigned long) &msg[0], 
+                    (unsigned long) &msg[0] );
+}
+
+
+
+// 133
+// IN: x, y, color, c
+int 
+gde_drawchar_transparent ( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long color,
+    unsigned long c )
+{
+    unsigned long msg[8];
+
+    msg[0] = (unsigned long) x;
+    msg[1] = (unsigned long) y;
+    msg[2] = (unsigned long) color;
+    msg[3] = (unsigned long) c;
+    // ...
+
+    return (int) system_call ( 133, 
+                    (unsigned long) &msg[0], 
+                    (unsigned long) &msg[0], 
+                    (unsigned long) &msg[0] );
+}
+
+
+
+
 // Draw text.
-// deprecated.
+// Pinta um texto na janela indicada.
 int 
 gde_draw_text ( 
     struct window_d *window, 
     unsigned long x, 
     unsigned long y, 
     unsigned long color, 
-    char *string )
+    const char *string )
 {
 
     unsigned long msg[8];
@@ -2947,6 +3005,9 @@ gde_draw_text (
     msg[3] = (unsigned long) color;
     msg[4] = (unsigned long) string;
     // ...
+
+    // Service 130.
+    // Pinta um texto na janela indicada.
 
     return (int) system_call ( SYSTEMCALL_DRAWTEXT, 
                     (unsigned long) &msg[0], 
@@ -2990,6 +3051,12 @@ struct timer_d *gde_create_timer (
         return -1;
     }
 
+    //#todo
+    //if ( type<0 ){
+    //    gde_debug_print ("gde_create_timer: [FAIL] type \n");
+    //    return -1;
+    //}
+
     return (struct timer_d *) gramado_system_call ( 
                                   222, 
                                   (unsigned long) pid, 
@@ -2999,7 +3066,10 @@ struct timer_d *gde_create_timer (
 
 
 // pega informações varidas sobre o sys time.
-unsigned long gde_get_systime_info (int n){
+unsigned long gde_get_systime_info (int n)
+{
+
+    //if ( n<0 ){ return ?; }
 
     return (unsigned long) gramado_system_call ( 223, 
                                (unsigned long) n, 
@@ -3012,11 +3082,12 @@ unsigned long gde_get_systime_info (int n){
  * gde_show_window 
  * 
  */
- 
-//deprecated
-//mostra uma janela na tela. backbuffer ---> frontbuffer
 
-void gde_show_window (struct window_d *window){
+void gde_show_window (struct window_d *window)
+{
+
+    if ( (void*) window == NULL )
+        return;
 
     gramado_system_call ( 24, 
         (unsigned long) window, 
@@ -3039,13 +3110,15 @@ void gde_show_window (struct window_d *window){
 // #bugbug
 // Deprecated.
  
-int gde_start_terminal (void){
-
+int gde_start_terminal (void)
+{
     int PID = -1;
     
     
     gde_debug_print("gde_start_terminal: [DEPRECATED]\n");
+    return -1;
 
+    /*
     // Clona e executa o noraterm como processo filho. 
 
     PID = (int) system_call ( 900, (unsigned long) "noraterm.bin", 0, 0 );
@@ -3071,16 +3144,24 @@ int gde_start_terminal (void){
 	//manda uma mensagem pedindo para o terminal dizer hello.
 	//__SendMessageToProcess ( PID, NULL, MSG_TERMINALCOMMAND, 2001, 2001 );
 
-	return (int) PID;
+    return (int) PID;
+    */
 }
 
 
+// #??
+// Ainda temos suporte a esse tipo de rotina em kgws?
 int 
 gde_update_statusbar ( 
     struct window_d *window, 
     unsigned char *string1, 
     unsigned char *string2 )
 {
+
+    // A status bar pertence a uma janela.
+    if ( (void*) window == NULL )
+        return -1;
+ 
     return (int) system_call ( 300, 
                      (unsigned long) window, 
                      (unsigned long) string1, 
@@ -3130,6 +3211,14 @@ int gde_getprocessname (int pid, char *name, size_t len){
     int __len_ret = 0;
 
 
+    if ( (void*) name == NULL )
+        return -1;
+
+    if ( *name == 0 )
+        return -1;
+
+
+
     //HOST_NAME_MAX
     if ( len < 0 || len > 64 ){
         printf ("gde_getprocessname: len\n");
@@ -3161,10 +3250,18 @@ int gde_getprocessname (int pid, char *name, size_t len){
 }
 
 
-//pega o nome do thread dado o tid.
-int gde_getthreadname (int tid, char *name, size_t len){
-
+// pega o nome do thread dado o tid.
+int gde_getthreadname (int tid, char *name, size_t len)
+{
     int __len_ret = 0;
+
+
+
+    if ( (void*) name == NULL )
+        return -1;
+
+    if ( *name == 0 )
+        return -1;
 
 
     //HOST_NAME_MAX
@@ -3181,8 +3278,9 @@ int gde_getthreadname (int tid, char *name, size_t len){
                         (unsigned long) name );
 
     //HOST_NAME_MAX
-    if ( __len_ret < 0 || __len_ret > 64 ){
-        printf ("gde_getthreadname: __len_ret\n");
+    if ( __len_ret < 0 || __len_ret > 64 )
+    {
+        printf ("gde_getthreadname: [FAIL] __len_ret\n");
         return -1;
     }
 
@@ -3190,7 +3288,6 @@ int gde_getthreadname (int tid, char *name, size_t len){
     {
         __len_ret = len;
     }
-
 
     return 0;
 }
@@ -3205,8 +3302,8 @@ unsigned long gde_get_process_stats (int pid, int index)
                                (unsigned long) index );
 }
 
-unsigned long gde_get_thread_stats (int tid, int index){
-
+unsigned long gde_get_thread_stats (int tid, int index)
+{
     return (unsigned long) system_call ( 881, 
                                (unsigned long) tid, 
                                (unsigned long) index, 

@@ -371,6 +371,7 @@ struct file_context_d
 // == Prototypes ================================================
 //
 
+void fs_fat16_cache_not_saved(void);
 
 void file_close (file *_file);
 int file_truncate ( file *_file, size_t len);
@@ -389,8 +390,9 @@ int fs_get_free_fd_from_pid (int pid);
 // Atualiza a string do pwd na estrutura do processo. 
 int fs_initialize_process_pwd ( int pid, char *string ); 
 
-int fs_print_process_pwd ( int pid );
 
+// cwd
+int fs_print_process_cwd ( int pid );
 
 
 /*
@@ -596,7 +598,7 @@ fsSaveFile (
     unsigned long fat_address,
     unsigned long dir_address,
     int dir_entries,
-    char *file_name, 
+    const char *file_name, 
     unsigned long file_size,
     unsigned long size_in_bytes, 
     char *file_address,
@@ -719,9 +721,11 @@ findEmptyDirectoryEntry (
     int number_of_entries );
 
 
+
 // Modificador de string.
 // Deixa tudo em maiúscula.
-void read_fntos (char *name);
+
+void fs_fntos (char *name);
 
   
 int fsCheckELFFile ( unsigned long address );
