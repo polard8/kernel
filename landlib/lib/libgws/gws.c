@@ -3046,44 +3046,39 @@ unsigned long gws_get_system_metrics (int index)
 
 
 
-//P (Proberen) testar.
+// enter critical section
+// close the gate
 void gws_enter_critical_section (void)
 {
-
-//#define	SYSTEMCALL_GET_KERNELSEMAPHORE    226
-//#define	SYSTEMCALL_CLOSE_KERNELSEMAPHORE  227
-//#define	SYSTEMCALL_OPEN_KERNELSEMAPHORE   228
-
     int S=0;
 
-    // Pega o valor do spinlock rpincipal.
+    // Pega o valor do spinlock principal.
+    // Se deixou de ser 0 então posso entrar.
+    // Se ainda for 0, continuo no while.
+    // TRUE = OPEN.
+    // FALSE = CLOSED.
+    // yield thread if closed.
+
     while (1){
-        S = (int) gws_system_call ( 226,// SYSTEMCALL_GET_KERNELSEMAPHORE, 
-                      0, 0, 0 );
-                      
-		// Se deixou de ser 0 então posso entrar.
-		// Se ainda for 0, continuo no while.
+        S = (int) gws_system_call ( 226, 0, 0, 0 );
         if ( S == 1 ){ goto done; }
         
-        //#wait
-        gws_system_call (265,0,0,0); //yield thread.
+        //yield thread.
+        //gws_system_call (265,0,0,0); 
+        sc82 (265,0,0,0);
     };
 
-    //Nothing
-
+    // Close the gate. turn FALSE.
 done:
-    // Muda para zero para que ninguém entre.
-    //SYSTEMCALL_CLOSE_KERNELSEMAPHORE,
     gws_system_call ( 227, 0, 0, 0 );
     return;
 }
 
 
-//V (Verhogen)incrementar.
+// exit critical section
+// open the gate.
 void gws_exit_critical_section (void)
 {
-	//Hora de sair. Mudo para 1 para que outro possa entrar.
-    //SYSTEMCALL_OPEN_KERNELSEMAPHORE, 
     gws_system_call ( 228, 0, 0, 0 );
 }
 

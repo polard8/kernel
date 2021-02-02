@@ -581,48 +581,41 @@ unsigned long gwssrv_get_system_metrics (int index)
 
 
 
-// #todo:
-// We can use the rtl.
-// P (Proberen) testar.
+// enter critical section
+// close the gate
 void gwssrv_enter_critical_section (void)
 {
     int S=0;
 
-    //#define	SYSTEMCALL_GET_KERNELSEMAPHORE    226
-    //#define	SYSTEMCALL_CLOSE_KERNELSEMAPHORE  227
-
     // Pega o valor do spinlock principal.
+    // Se deixou de ser 0 então posso entrar.
+    // Se ainda for 0, continuo no while.
+    // TRUE = OPEN.
+    // FALSE = CLOSED.
+    // yield thread if closed.
+
     while (1){
-        S = (int) gramado_system_call ( 226, //SYSTEMCALL_GET_KERNELSEMAPHORE, 
-                      0, 0, 0 );
-                      
-		// Se deixou de ser 0 então posso entrar.
-		// Se ainda for 0, continuo no while.
+        S = (int) gramado_system_call ( 226, 0, 0, 0 );
+
         if ( S == 1 ){ goto done; }
         
-        //#wait
-        //#todo use the sc82()
-        gramado_system_call (265,0,0,0); //yield thread.
+        //yield thread.
+        //gramado_system_call (265,0,0,0); 
+        sc82 (265,0,0,0);
     };
 
-    //Nothing
-
+    // Close the gate. turn FALSE.
 done:
-    //Muda para zero para que ninguém entre.
-    gramado_system_call ( 227, //SYSTEMCALL_CLOSE_KERNELSEMAPHORE, 
-        0, 0, 0 );
+    gramado_system_call ( 227, 0, 0, 0 );
     return;
 }
 
 
-// V (Verhogen) incrementar.
+// exit critical section
+// open the gate.
 void gwssrv_exit_critical_section (void)
 {
-	//#define	SYSTEMCALL_OPEN_KERNELSEMAPHORE   228
-	//Hora de sair. Mudo para 1 para que outro possa entrar.
-
-    gramado_system_call ( 228, //SYSTEMCALL_OPEN_KERNELSEMAPHORE, 
-        0, 0, 0 );
+    gramado_system_call ( 228, 0, 0, 0 );
 }
 
 
