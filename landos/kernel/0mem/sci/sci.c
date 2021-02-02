@@ -2570,24 +2570,24 @@ void *sci0 (
             break;
 
 
-        // 227 - close critical section	
+        // 227 - close gate
+        // Entering critical section.
+        // See: process.c
         case SYS_CLOSE_KERNELSEMAPHORE:
-            //__spinlock_ipc = 0;
-            //criticalsection_pid = (pid_t) 0;
-            process_exit_criticalsection(current_process);
+            process_close_gate(current_process);
             return NULL;
             break;
 
 
-        // 228 - open critical section
+        // 228 - open gate
+        // Exiting critical section.
         // #todo: Quando um processo fechar e estiver
         // em sua sessão crítica, então devemos liberar
         // essa flag. Isso fica mais fácil de lembrar se
         // existir uma flag na estrutura de processo.
+        // See: process.c
         case SYS_OPEN_KERNELSEMAPHORE:
-            //__spinlock_ipc = 1;
-            //criticalsection_pid = (pid_t) current_process;
-            process_enter_criticalsection(current_process);
+            process_open_gate(current_process);
             return NULL;
             break;
 

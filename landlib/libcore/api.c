@@ -2210,39 +2210,43 @@ fail:
 }
 
 
-//P (Proberen) testar.
+// P (Proberen) testar.
+// TRUE = OPEN
+// FALSE =  CLOSED.
 void gde_enter_critical_section (void)
 {
     int S=0;
 
-    // Pega o valor do spinlock rpincipal.
+    // Pega o valor do spinlock principal.
+    // Se deixou de ser 0 então posso entrar.
+    // Se ainda for 0, continuo no while.
+    // TRUE = OPEN.
+    // FALSE = CLOSED.
+    // yield thread if closed.
+
     while (1){
 
         S = (int) system_call ( 
                       SYSTEMCALL_GET_KERNELSEMAPHORE, 0, 0, 0 );
-                      
-		// Se deixou de ser 0 então posso entrar.
-		// Se ainda for 0, continuo no while.
-        if ( S == 1 ){ goto done; }
-        
-        //#wait
-        // gramado_system_call (265,0,0,0); //yield thread.
+
+        if ( S == TRUE ){ goto done; }
+
         sc82(265,0,0,0);
     };
 
-    //Nothing
-
+    // Close the gate. turn FALSE.
 done:
-    //Muda para zero para que ninguém entre.
     system_call ( SYSTEMCALL_CLOSE_KERNELSEMAPHORE, 0, 0, 0 );
     return;
 }
 
 
-//V (Verhogen)incrementar.
+// V (Verhogen)incrementar.
+// Open.
+// It turns 'TRUE'.
+// Hora de sair. Mudo para 1 para que outro possa entrar.
 void gde_exit_critical_section (void)
 {
-	//Hora de sair. Mudo para 1 para que outro possa entrar.
     system_call ( SYSTEMCALL_OPEN_KERNELSEMAPHORE, 0, 0, 0 );
 }
 

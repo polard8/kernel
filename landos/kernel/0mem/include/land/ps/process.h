@@ -1155,9 +1155,13 @@ void exit_process ( pid_t pid, int code );
 // exit current process.
 void exit_current_process ( int code );
 
-//critical section
-void process_enter_criticalsection(int pid);
-void process_exit_criticalsection(int pid);
+
+
+// Critical section
+#define __GATE_CLOSED    0
+#define __GATE_OPEN      1
+void process_close_gate(int pid);   //227 close
+void process_open_gate(int pid);    //228 open
 
 
 void set_caller_process_id (int pid);

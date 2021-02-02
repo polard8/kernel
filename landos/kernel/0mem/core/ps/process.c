@@ -128,57 +128,61 @@ void power_pid (int pid, int power)
 }
 
 
-// Enter critical session.
-void process_enter_criticalsection (int pid){
-
-    struct process_d *p;
-
-    if (pid<0)
-        panic ("process_enter_criticalsection: pid \n");
-
-    // Process.
-
-    p = (void *) processList[pid];
-
-    if ( (void *) p == NULL ){
-        panic ("process_enter_criticalsection: p \n");
-
-    } else {
-
-        // todo: validation
-        
-        __spinlock_ipc = 1;
-        criticalsection_pid = (pid_t) pid;
-        p->_critical = 1;
-    };
-}
-
-
-// Exit critical session.
-void process_exit_criticalsection(int pid)
+// Service 227
+// Entering critical section.
+// Close gate. Turn it FALSE.
+void process_close_gate(int pid)
 {
     struct process_d *p;
 
 
     if (pid<0)
-        panic ("process_exit_criticalsection: pid \n");
+        panic ("process_close_gate: pid \n");
 
     // Process.
  
     p = (void *) processList[pid];
 
     if ( (void *) p == NULL ){
-        panic ("process_exit_criticalsection: p \n");
+        panic ("process_close_gate: p \n");
 
     } else {
 
         // todo: validation
         
-        __spinlock_ipc = 0;
+        __spinlock_ipc = __GATE_CLOSED; //0;
         criticalsection_pid = (pid_t) 0;
-        p->_critical = 0;
+        p->_critical = FALSE;  //0;
     };
 }
+
+
+// Service 228
+// Exiting critical section
+// Open gate. Turn it TRUE.
+void process_open_gate (int pid){
+
+    struct process_d *p;
+
+    if (pid<0)
+        panic ("process_open_gate: pid \n");
+
+    // Process.
+
+    p = (void *) processList[pid];
+
+    if ( (void *) p == NULL ){
+        panic ("process_open_gate: p \n");
+    } else {
+
+        // todo: validation
+        
+        __spinlock_ipc = __GATE_OPEN; //1;
+        criticalsection_pid = (pid_t) pid;
+        p->_critical = TRUE; //1;
+    };
+}
+
 
 
 
@@ -2094,7 +2098,7 @@ void exit_process ( pid_t pid, int code ){
         // Isso é para evitar deadlock.
         // Não queremos que um processo feche estando na sua
         // seção crítica.
-        process_exit_criticalsection(pid);
+        process_close_gate(pid);
         
         // ...
     };
