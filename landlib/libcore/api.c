@@ -2210,9 +2210,8 @@ fail:
 }
 
 
-// P (Proberen) testar.
-// TRUE = OPEN
-// FALSE =  CLOSED.
+// enter critical section
+// close the gate
 void gde_enter_critical_section (void)
 {
     int S=0;
@@ -2241,10 +2240,8 @@ done:
 }
 
 
-// V (Verhogen)incrementar.
-// Open.
-// It turns 'TRUE'.
-// Hora de sair. Mudo para 1 para que outro possa entrar.
+// exit critical section
+// open the gate.
 void gde_exit_critical_section (void)
 {
     system_call ( SYSTEMCALL_OPEN_KERNELSEMAPHORE, 0, 0, 0 );

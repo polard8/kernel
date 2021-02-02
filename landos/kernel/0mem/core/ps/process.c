@@ -2026,6 +2026,11 @@ void init_processes (void){
  * Fechar as threads seguindo a lista encadeada.
  */
 
+
+// #bugbug
+// When closing a process in it's critical section
+// we need do change open the gate.
+
 void exit_process ( pid_t pid, int code ){
 
     struct process_d *Process;
@@ -2092,14 +2097,22 @@ void exit_process ( pid_t pid, int code ){
         */
 
         Process->exit_code = (int) code; 
-        Process->state = PROCESS_TERMINATED; 
+        Process->state = PROCESS_TERMINATED;  //zombie.
         
         // #important
         // Isso é para evitar deadlock.
         // Não queremos que um processo feche estando na sua
         // seção crítica.
-        process_close_gate(pid);
-        
+        // Temos que deixar o portao aberto para que 
+        // outros processos possam entrar em suas sessoes criticas.
+
+        // #bugbug
+        // When closing a process in it's critical section
+        // we need do change open the gate.
+
+        //process_close_gate(pid);
+        process_open_gate(pid);
+  
         // ...
     };
 
