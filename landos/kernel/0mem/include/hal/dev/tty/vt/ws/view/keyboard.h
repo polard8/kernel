@@ -65,8 +65,8 @@ void abnt2_keyboard_handler (void);
 
 
 
-unsigned long get_scancode (void);
-void put_scancode( char c );
+int ps2tty_get_byte_from_input_buffer (void);
+void ps2tty_put_byte_into_input_buffer( char c );
 
 
 unsigned long 

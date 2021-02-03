@@ -91,6 +91,15 @@ int rtl_get_file_sync(int fd, int request);
 
 
 
+//==========================================
+
+unsigned char  rtl_to_uchar  (char ch);
+unsigned short rtl_to_ushort (short ch);
+unsigned long  rtl_to_ulong  (long ch);
+
+//==========================================
+
+
 //
 // == events ===========================================
 //

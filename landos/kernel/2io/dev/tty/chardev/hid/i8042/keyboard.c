@@ -1,7 +1,7 @@
 /*
  * File: i8042/keyboard.c
  *
- *     +handler for keyboard irq.    
+ *     Handler for keyboard irq.
  *
  * env:
  *     Ring 0. Kernel base persistent code.
@@ -33,10 +33,8 @@
  * serviço de sistema responsável.
  *     
  *
- * Histórico: 
- *     2005~2013 - Created by Fred nora.
- *     2017      - Rotines was moved to ldisc.
- *     ...
+ * History
+ *     2005 - Created by Fred nora.
  */
 
 
@@ -80,16 +78,26 @@
 // Renova a fila do teclado
 // O teclado esta lidando no momento com um buffer pequeno, 128 bytes.
 
-unsigned long get_scancode (void){
+// Called by thread_getchar in thread.c
 
+// #bugbug
+// Nada foi colocado do buffer de input ainda.
+// KGWS_SEND_KEYBOARD_MESSAGE colocou ascii code no buffer canonico.
+
+int ps2tty_get_byte_from_input_buffer (void)
+{
     unsigned long SC = 0;
 
-
+    // Getting a byte from the input buffer
+    // of the ps2 keyboard tty.
 
     SC = (unsigned char) PS2keyboardTTY._rbuffer->_base[keybuffer_head];
 
+    // Clean the slot.
 
     PS2keyboardTTY._rbuffer->_base[keybuffer_head] = 0;
+
+    // Increment and round the queue.
 
     keybuffer_head++;
 
@@ -98,12 +106,16 @@ unsigned long get_scancode (void){
         keybuffer_head = 0; 
     }
 
-    return (unsigned long) SC; 
+    // Return the byte.
+
+    return (int) SC; 
 }
 
 
-void put_scancode( char c )
+void ps2tty_put_byte_into_input_buffer( char c )
 {
+    debug_print ("ps2tty_put_byte_into_input_buffer: [FIXME]\n");
+    
     // #todo: 
     // Aqui podemos retornar.
     // Pois vamos precisar dessa estrutura para o buffer.
@@ -170,7 +182,9 @@ void abnt2_keyboard_handler (void){
     static int __has_e0_prefix = 0;
     static int __has_e1_prefix = 0;
 
-    wait_then_write (0x64,0xA7);  //Disable mouse port.
+
+    // Disable mouse port.
+    wait_then_write (0x64,0xA7);
 
 
     // ??
@@ -191,44 +205,27 @@ void abnt2_keyboard_handler (void){
 
 sc_again:
 
-    // old way
-    //__raw = in8(0x60);
-
-
     //===========================================
-    
-    //
     // #test
     // Testing with ack
     // credits: minix
-    //
-    
-    // #define KEYBD		0x60	/* I/O port for keyboard data */
-    // #define PORT_B          0x61	/* I/O port for 8255 port B (kbd, beeper...) */
-    // #define KBIT		0x80	/* bit used to ack characters to keyboard */
-    
-    __raw = in8(0x60);		/* get the scan code for the key struck */
-   
-    val   = in8(0x61);		/* strobe the keyboard to ack the char */
-    out8(0x61, val | 0x80);	/* strobe the bit high */
-    out8(0x61, val);		/* now strobe it low */
-    //===========================================
+    // #define KEYBD   0x60  /* I/O port for keyboard data */
+    // #define PORT_B  0x61  /* I/O port for 8255 port B (kbd, beeper...) */
+    // #define KBIT    0x80  /* bit used to ack characters to keyboard */
 
+
+    /* get the raw byte for the key struck */
+    __raw = in8(0x60);
+
+    val   = in8(0x61);       /* strobe the keyboard to ack the char */
+    out8(0x61, val | 0x80);  /* strobe the bit high */
+    out8(0x61, val);         /* now strobe it low */
+    //===========================================
 
 
     //
     // == Queue ====================================
     //
-
-    // Global keyboard tty.
-    // #bugbug: 
-    // Se estamos colocando na fila e retirando em seguida
-    // entao nao precisamos colocar.
-    // Vamos suspender o uso dessa fila ate termos um driver.
-
-    // put_scancode(__raw); 
-    // __raw = (unsigned char) get_scancode();
-
 
      // #bugbug
      // [Enter] in the numerical keyboard isn't working.
@@ -259,17 +256,19 @@ sc_again:
     // See: ps2kbd.c
     // See: vt/console.c
 
-    // IN: device type and data.
+    // IN: 
+    // device type, data.
     // 1=keyboard
+
     console_interrupt(CONSOLE_DEVICE_KEYBOARD,__raw);
-    //KGWS_SEND_KEYBOARD_MESSAGE (__raw);
   
     // Clean the mess.
     __has_e0_prefix = 0;
     __has_e1_prefix = 0;
 
 done:
-    wait_then_write (0x64,0xA8);  // Reenable the mouse port.
+    // Reenable the mouse port.
+    wait_then_write (0x64,0xA8);
     return;
 }
 

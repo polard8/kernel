@@ -103,6 +103,16 @@ typedef enum {
 }volume_type_t;
 
 
+// #todo
+typedef enum {
+
+    VOLUME_CLASS_NULL,
+    VOLUME_CLASS_2,
+    VOLUME_CLASS_3
+
+}volume_class_t;
+
+
 
 /*
  * vbr_d:
@@ -129,19 +139,37 @@ struct volume_d
     object_type_t  objectType;
     object_class_t objectClass;
 
-    int id;
+    volume_type_t   volumeType;
+    volume_class_t  volumeClass;
+    
     int used;
     int magic;
+
+    int id;
+    
+
+    //label
+    char *name;
+
+    //pathname
+    char *cmd;
+
+    //string usada no path para identificar o disco.
+    //isso não existe.
+    char path_string[32];  
+
     
     // Only one thread can call read and write routine at time.
     int blocked;
     struct thread_d *waiting;  //this thread is waiting.
 
     // This is the process that call the read/write operation on this volume.
+    // Qual processo está usando.
     pid_t pid;
+    gid_t gid;
 
-    // See the enum.
-    volume_type_t volumeType;
+
+
 
     // areas.
     // maybe we can find these in the superblock.
@@ -191,18 +219,6 @@ struct volume_d
     // strings
     //
 
-
-    //label
-    char *name;
-
-    //pathname
-    char *cmd;
-
-    //string usada no path para identificar o disco.
-    //isso não existe.
-    char path_string[32];  
-
-
     // Se o volume tiver um sistema de arquivos.
     // See: fs.h
     struct filesystem_d *fs;
@@ -212,24 +228,21 @@ struct volume_d
     struct volume_d *next;
 };
 
-struct volume_d *volume_vfs;             // volume 0
-struct volume_d *volume_bootpartition;   // volume 1
-struct volume_d *volume_systempartition; // volume 2
+// #importante:
+// Esses são os três volumes básicos do sistema 
+// mesmo que o disco só tenha um volume, essas 
+// estruturas vão existir.
+
+struct volume_d  *volume_vfs;             // volume 0
+struct volume_d  *volume_bootpartition;   // volume 1
+struct volume_d  *volume_systempartition; // volume 2
 // ...
 
-
-
-//#importante:
-//Esses são os três volumes básicos do sistema 
-//mesmo que o disco só tenha um volume, essas 
-//estruturas vão existir.
-
-
-//
-// Lista de volumes.
-//
+// Volume list
 
 unsigned long volumeList[VOLUME_COUNT_MAX];
+
+
 
 //
 // == prototypes ==========================================

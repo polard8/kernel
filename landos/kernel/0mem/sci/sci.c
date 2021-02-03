@@ -2162,8 +2162,9 @@ void *sci0 (
             break;
 
         // 139
+        // #bugbug: Is it a scancode. Maybe not.
         case SYS_GETSCANCODE:
-            return (void *) get_scancode();
+            return (void *) ps2tty_get_byte_from_input_buffer();
             break;
 
         // 140

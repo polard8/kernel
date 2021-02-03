@@ -185,7 +185,7 @@ int KGWS_SEND_KEYBOARD_MESSAGE (int tid, unsigned char raw_byte)
         // Desativando o bit de paridade caso esteja ligado.
 
         Keyboard_ScanCode = Keyboard_RawByte;
-        Keyboard_ScanCode &= LDISC_KEY_MASK;    
+        Keyboard_ScanCode &= LDISC_KEY_MASK;
 
 		// Configurando se é do sistema ou não.
 		// #todo: 
@@ -573,10 +573,10 @@ done:
        
         // #test
         // Let's write something ...
-        event_buffer[0] = (unsigned long) Event_Window;         // window pointer 
-        event_buffer[1] = (unsigned long) Event_Message;        // message number.
+        event_buffer[0] = (unsigned long) Event_Window;                      // window pointer 
+        event_buffer[1] = (unsigned long) Event_Message;                     // message number.
         event_buffer[2] = (unsigned long) Event_LongASCIICode & 0x000000ff;  // ascii code
-        event_buffer[3] = (unsigned long) Event_LongRawByte   & 0x000000ff;    // raw byte
+        event_buffer[3] = (unsigned long) Event_LongRawByte   & 0x000000ff;  // raw byte
        
         // #todo
         // >> PS2KeyboardDeviceTTY->_rbuffer

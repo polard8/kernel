@@ -116,7 +116,25 @@ int rtl_get_file_sync(int fd, int request)
 
 
 
+//=====================================
 
+
+unsigned char rtl_to_uchar (char ch)
+{
+    return (unsigned char) ch;
+}
+
+unsigned short rtl_to_ushort (short ch)
+{
+    return (unsigned short) ch;
+}
+
+unsigned long rtl_to_ulong (long ch)
+{
+    return (unsigned long) ch;
+}
+
+//=====================================
 
 // Get an event from the thread's event queue.
 // That old 'get system message'
@@ -1451,22 +1469,51 @@ int rtl_check_parm (char *check)
 */
 
 
+/*
+int rtl_ipow (int base, int exp);
+int rtl_ipow (int base, int exp)
+{
+    int Result = 1;
+
+    for (;;)
+    {
+        if (exp & 1){
+            Result *= base;
+        }
+
+        exp >>= 1;
+        
+        if (!exp){  break;  }
+        
+        base *= base;
+    };
+
+    return (int) Result;
+}
+*/
 
 
+/*
+uint32_t uipow (uint32_t base, uint32_t exp);
+uint32_t uipow (uint32_t base, uint32_t exp)
+{
+
+    uint32_t i=0;
+    uint32_t Result = base;
 
 
+    if (exp == 0) {
+        return 1;
+    }
 
+    for ( i=1; i < exp; i++ ) 
+    {
+        Result *= base;
+    };
 
-
-
-
-
-
-
-
-
-
-
+    return (uint32_t) Result;
+}
+*/
 
 
 

@@ -711,7 +711,8 @@ char *mktemp (char *template)
 /*
  *******
  * rand:
- *     Gera um número randômico. */
+ *     Gera um número randômico. 
+ */
 
 int rand (void)
 {
@@ -725,27 +726,28 @@ void srand (unsigned int seed)
 }
 
 
-void *xmalloc (int size){
-
-    register int value = (int) malloc(size);
-
-    if(value == 0)
-        stdlib_die ("xmalloc fail\n");
-
-    return (void *) value;
+void abort(void)
+{
+    exit(0);
+    //exit(1);
 }
 
+void stdlib_die (char *str)
+{
+    debug_print("stdlib_die:\n");
 
-void stdlib_die (char *str){
+    if ( (void*) str != NULL )
+    {
+        printf ("stdlib_die: %s \n", str);
 
-    printf ("stdlib_die: %s",str);
-	//@todo
-	fprintf(stderr,"%s\n",str);
+        if ( (void*) stderr != NULL ){
+            fprintf(stderr,"%s\n",str);
+        }
+    }
 
-    while (1){
-        asm ("pause");
-    };
+    abort();
 }
+
 
 
 /*
@@ -776,7 +778,8 @@ void stdlib_die (char *str){
  *     ... 
  */
  
-void *malloc ( size_t size ){
+void *malloc ( size_t size )
+{
 
     void *ret;
     unsigned long s = ( unsigned long) size;
@@ -814,11 +817,73 @@ void *malloc ( size_t size ){
     return (void *) ret; 
 }
 
+void *xmalloc (size_t size)
+{
+    void *Address;
 
-void *realloc ( void *start, size_t newsize ){
+    if (size<=0){
+        stdlib_die ("xmalloc: [FAIL] size\n");
+    }
 
+    Address = (void*) malloc(size);
+
+    if( (void*) Address == NULL ){
+        stdlib_die ("xmalloc: [FAIL] Address\n");
+    }
+
+    return (void *) Address;
+}
+
+
+void *xmemdup (void const *p, size_t s)
+{
+    void *Address;
+
+
+    if( (void*) p == NULL ){
+        stdlib_die ("xmemdup: [FAIL] p\n");
+    }
+
+    if (s<=0){
+        stdlib_die ("xmemdup: [FAIL] s\n");
+    }
+
+    Address = (void*) xmalloc(s);
+
+    if( (void*) Address == NULL ){
+        stdlib_die ("xmemdup: [FAIL] Address\n");
+    }
+
+    return (void *) memcpy (Address,p,s);
+}
+
+char *xstrdup(char const *string)
+{
+    size_t Size=0;
+
+    // #Atenção
+    // strlen já teria problemas de o ponteiro fosse inválido.
+
+    if( (void*) string == NULL ){
+        stdlib_die ("xstrdup: [FAIL] string\n");
+    }
+
+    Size = strlen (string);
+
+    if (Size<=0){
+        stdlib_die ("xstrdup: [FAIL] Size\n");
+    }
+
+    Size = (Size + 1);
+    
+    return (char *) xmemdup (string,Size);
+}
+
+
+
+void *realloc ( void *start, size_t newsize )
+{
     void *newstart;
-
 
     newstart = (void *) malloc(newsize);
     
@@ -941,11 +1006,9 @@ void *calloc(size_t num, size_t size)
  *     Aloca e preenche com zero. 
  */
  
-void *calloc (size_t count, size_t size){
-
+void *calloc (size_t count, size_t size)
+{
     size_t s = count * size;
-
-
 
     void *value = malloc(s);
 
@@ -954,23 +1017,46 @@ void *calloc (size_t count, size_t size){
         //free (value);
         return NULL;
     }else{
-
         memset (value, 0, s);
         return value;
     }
-
 
 	//fail
     return NULL;
 }
 
 
+void *xcalloc (size_t count, size_t size)
+{
+    void *Address;
+
+    if (size<=0){
+        stdlib_die ("xcalloc: [FAIL] size\n");
+    }
+
+    Address = (void*) calloc(count,size);
+
+    if( (void*) Address == NULL ){
+        stdlib_die ("xcalloc: [FAIL] Address\n");
+    }
+
+    return (void *) Address;
+}
+
+void *xzalloc (size_t n)
+{
+  return (void *) xcalloc (n, 1);
+}
+
+
+
 /*
  * zmalloc:
- *     Alloca memória e zera o conteúdo. */
+ *     Alloca memória e zera o conteúdo. 
+ */
 
-void *zmalloc ( size_t size){
-
+void *zmalloc ( size_t size )
+{
     void *mmnew;
 
     mmnew = malloc(size);
@@ -980,15 +1066,15 @@ void *zmalloc ( size_t size){
         return NULL;
 
     }else{
-
         memset (mmnew, 0, size);
-	    return mmnew;
+        return mmnew;
     };
-
 
     // fail
     return NULL;
 }
+
+
 
 
 /*
@@ -1430,6 +1516,43 @@ char *getenv (const char *name)
 int setenv (const char *name, const char *value, int overwrite)
 {
     debug_print("setenv: [TODO]\n"); 
+
+    //
+    // name
+    //
+
+    if ( (void *) name == NULL )
+    {
+        debug_print ("setenv: [FAIL] name\n");
+        return -1;
+    }
+
+    if (*name == 0)
+    {
+        debug_print ("setenv: [FAIL] *name\n");
+        return -1;
+    }
+
+
+    //
+    // value
+    //
+
+    if ( (void *) value == NULL )
+    {
+        debug_print ("setenv: [FAIL] value\n");
+        return -1;
+    }
+
+    if (*value == 0)
+    {
+        debug_print ("setenv: [FAIL] *value\n");
+        return -1;
+    }
+
+
+    // #todo:   ...
+
     return (int) (-1);
 }
 

@@ -233,7 +233,7 @@ struct disk_d
     // Ponteiro para o nome do disco,
     // Talvez não precise ser um ponteiro, pode ser um array.
     
-    char *name;  
+    char *name; 
 
 
     //#todo
@@ -270,8 +270,11 @@ struct disk_d
 
     struct disk_d *next;
 };
-struct disk_d *____boot____disk;
 
+// Disks
+
+struct disk_d  *____boot____disk;
+// ...
 
 // Disk list.
 // Essa lista é preenchida pelo driver de IDE.

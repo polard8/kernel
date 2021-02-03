@@ -1,3 +1,15 @@
-//tá aqui pra compilar o bison 1.25 
+/*
+ * File: config.h
+ * 
+ * 
+ */
+
+
+// ??
+
+// #define HAVE_SOMETHING    1
+
+
+
 
 

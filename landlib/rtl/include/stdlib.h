@@ -152,9 +152,6 @@ int mkstemp(char *template);
 long labs (long j);
 
 
-
-void stdlib_die (char *str);
-
 int atoi (const char *str);
 
 void itoa (int n, char s[]);
@@ -186,24 +183,35 @@ int unsetenv (const char *name);
 char *mktemp (char *template);
 
 
-/*
- * malloc:
- *    Allocates the requested memory and returns a pointer to it. */
+//
+// alloc
+//
 
 void *malloc (size_t size);
+void *xmalloc ( size_t size );
+void *xmemdup (void const *p, size_t s);
+char *xstrdup(char const *string);
+
+
 
 void *calloc (size_t count, size_t size);
+void *xcalloc (size_t count, size_t size);
+void *xzalloc (size_t n);
 
-void *zmalloc ( size_t size);
+void *zmalloc ( size_t size );
+
 
 void *realloc ( void *start, size_t newsize );
 
 
-/*
- * xmalloc:
- *     exit se malloc não der certo. */
+//
+// failure routines
+//
 
-void *xmalloc ( int size);
+void abort(void);
+void stdlib_die (char *str);
+
+
 
 
 
