@@ -84,12 +84,328 @@ void kgws_disable(void)
 }
 
 
+
+//=================================
+
+
+
+int 
+kgws_put_console ( 
+    struct window_d *window, 
+    int message,
+    unsigned long ascii_code,
+    unsigned long raw_byte )
+{
+
+
+    //==============
+    // [event block]
+    struct window_d  *Event_Window;            //arg1 - window pointer
+    int               Event_Message       =0;  //arg2 - message number
+    unsigned long     Event_LongASCIICode =0;  //arg3 - ascii code
+    unsigned long     Event_LongRawByte   =0;  //arg4 - raw byte
+    //===================
+
+
+    // setup event block
+    // get parameters.
+    
+    Event_Window        = (struct window_d  *) window;
+    Event_Message       = message;
+    Event_LongASCIICode = ascii_code;
+    Event_LongRawByte   = raw_byte;
+
+
+    // ===========================
+
+    // #todo
+    // Send the message to the TYY,
+    // this way the foreground process is able to read it
+    // using stdin.
+    // See:
+    // devmgr.h ps2kbd.c
+    // ...
+    
+    // only one standard event
+    unsigned long event_buffer[5];
+    char xxxbug[4];
+    int xxxi=0;//iterator.
+    
+    if ( current_input_mode == INPUT_MODE_TTY ){
+
+    if ( (void *) PS2KeyboardDeviceTTY != NULL )
+    {
+        // ok. This is a valid tty pointer.
+       
+        // #test
+        // Let's write something ...
+        event_buffer[0] = (unsigned long) Event_Window;                      // window pointer 
+        event_buffer[1] = (unsigned long) Event_Message;                     // message number.
+        event_buffer[2] = (unsigned long) Event_LongASCIICode & 0x000000ff;  // ascii code
+        event_buffer[3] = (unsigned long) Event_LongRawByte   & 0x000000ff;  // raw byte
+       
+        // #todo
+        // >> PS2KeyboardDeviceTTY->_rbuffer
+        // No buffer 'bruto' colocamos os raw bytes.
+        // >> PS2KeyboardDeviceTTY->_cbuffer
+        // No buffer 'canonico' colocamos os ascii codes.
+        // ps: nao usaremos o buffer de output no caso do teclado. 
+        
+        //devemos cheacar se o tty esta configurado para
+        //escrever na fila bruta ou canonica e escrevermos no lugar certo
+        //Do mesmo modo deve ser a leitura.
+        //a configuraçao pode ser feita em ring3// see:ioctl
+        // esse tipo de decisao deve ficar dentro das rotinas de leitura e escrita e nao aqui.
+        
+        //quanto a fila eh canonica, escrevemos somente os keydown.
+                
+        //xxxbug[0] = 'x';  //fake bytes
+        xxxbug[0] = Event_LongASCIICode & 0x000000ff;
+
+        // ?? #bugbug
+        // Explique melhor isso. ... estamos escrevendo um byte 
+        // no arquivo '0' ???
+        //if ( Event_Message == MSG_KEYDOWN)
+        sys_write(0,xxxbug,1);
+        
+        // coloca o raw byte no buffer de raw byte.
+        //file_write_buffer ( PS2KeyboardDeviceTTY->_rbuffer, "dirty", 5);
+        
+        //canonica
+        //if ( Event_Message == MSG_KEYDOWN)
+        file_write_buffer ( PS2KeyboardDeviceTTY->_cbuffer, xxxbug , 1);
+        
+        // #bugbug
+        // Estamos colocando um evento no buffer 'bruto'.
+       
+        // it is gonna write in the base of the buffer.
+        // >> Essa rotina escreve na fila bruta. (raw buffer).
+        // See: tty.c
+        
+        //__tty_write ( 
+        //    (struct tty_d *) PS2KeyboardDeviceTTY, 
+        //    (char *) event_buffer, 
+        //    (int) (4*4) );  //16 bytes = apenas um evento.
+         
+         // Sinalizamos que temos um novo evento.
+         
+   
+         
+         // o teclado esta escrevendo na tty
+         // ela decide se faz echo no console ou nao,
+         // dependendo da configuraçao da tty.
+         // #test: fazendo echo
+         if ( (Event_Message == MSG_KEYDOWN) && ((char)xxxbug[0] != '\n') )
+         {
+             // ainda nao pode ler.
+             PS2KeyboardDeviceTTY->new_event = FALSE;
+         
+             console_write ( 
+                 (int) fg_console, 
+                 (const void *) xxxbug, 
+                 (size_t) 1 );
+
+             refresh_screen(); //#bugbug: teste
+         }
+         //pode ler
+         if ( (Event_Message == MSG_KEYDOWN) && ((char)xxxbug[0] == 'q') )
+         {
+             PS2KeyboardDeviceTTY->new_event = TRUE;
+
+             // da proxima vez escreveremos no inicio do buffer.
+             //PS2KeyboardDeviceTTY->_rbuffer->_w = 0;
+             // PS2KeyboardDeviceTTY->_rbuffer->_r = 0;
+             //PS2KeyboardDeviceTTY->_rbuffer->_p = PS2KeyboardDeviceTTY->_rbuffer->_base; 
+             //PS2KeyboardDeviceTTY->_rbuffer->_cnt = PS2KeyboardDeviceTTY->_rbuffer->_lbfsize;
+             //for( xxxi=0; xxxi<BUFSIZ; xxxi++){ PS2KeyboardDeviceTTY->_rbuffer->_p[xxxi] = 0; };
+         }
+  
+    }
+    } //fim do current input mode. (TTY MODE)
+
+
+
+
+    return 0;
+}
+
+
+int 
+kgws_event_dialog ( 
+    int tid,
+    struct window_d *window, 
+    int message,
+    unsigned long ascii_code,
+    unsigned long raw_byte )
+{
+
+    //==============
+    // [event block]
+    struct window_d  *Event_Window;            //arg1 - window pointer
+    int               Event_Message       =0;  //arg2 - message number
+    unsigned long     Event_LongASCIICode =0;  //arg3 - ascii code
+    unsigned long     Event_LongRawByte   =0;  //arg4 - raw byte
+    //===================
+
+
+    // setup event block
+    // get parameters.
+    
+    Event_Window        = (struct window_d  *) window;
+    Event_Message       = message;
+    Event_LongASCIICode = ascii_code;
+    Event_LongRawByte   = raw_byte;
+
+
+   // -----
+
+
+    // Esse tratador é para todos os modos de input
+    // mas dentro dele tem rotinas para modos especificos.
+
+    // #todo
+    // Como essa rotina usa os quatro parametros começados com 'Event_'
+    // então talvez possamos chamar um diálogo.
+    // Mas precisa da tid também.
+    
+    switch (Event_Message){
+       
+        // Para os dois casos.
+        // quando o control ou a tecla de funçao forem pressionadas ou liberadas.
+        case MSG_SYSKEYDOWN: 
+        case MSG_SYSKEYUP:
+            switch (Event_LongASCIICode){
+
+                // function key
+                // Quando pressionarmos uma tecla de funçao.
+                // no metodo olharemos control ou alt.
+                case VK_F1:  case VK_F2:  case VK_F3:  case VK_F4:
+                case VK_F5:  case VK_F6:  case VK_F7:  case VK_F8:
+                case VK_F9:  case VK_F10:  case VK_F11:  case VK_F12:
+                    // For all the input modes.
+                    if (Event_Message == MSG_SYSKEYDOWN)
+                    {
+                       // se alguma tecla de controle esta pressionada, chamaremos o procedimento local.
+                       if ( shift_status == 1 || ctrl_status == 1 || alt_status == 1 )
+                       {
+                           debug_print ("kgws_event_dialog: >>>> [MSG_SYSKEYUP] to system procedure\n"); 
+                            __local_ps2kbd_procedure ( 
+                                            Event_Window, 
+                            (int)           Event_Message, 
+                            (unsigned long) Event_LongASCIICode, 
+                            (unsigned long) Event_LongRawByte );
+                        debug_print("out of sysm procedure\n");
+                        return 0;
+                        }
+                        // caso nenhuma tecla de controle esteja pressionada,
+                        //enviaremos a tecla de funçao para a alicaçao.
+                        if (current_input_mode == INPUT_MODE_SETUP)
+                        {
+                            //if ( EnableKGWS == FALSE ){ return 0; }
+                            //kgws_send_to_controlthread_of_currentwindow ( 
+                            //                    Event_Window,
+                            //    (int)           Event_Message, 
+                            //    (unsigned long) Event_LongASCIICode, 
+                            //    (unsigned long) Event_LongRawByte );
+
+                            kgws_send_to_tid (  tid,
+                                                Event_Window,
+                                (int)           Event_Message, 
+                                (unsigned long) Event_LongASCIICode, 
+                                (unsigned long) Event_LongRawByte );
+                                
+                            debug_print ("kgws_event_dialog: >>>> [MSG_SYSKEYUP.function] to wwf\n");        
+                            return 0;
+                        }
+                    }
+                    return 0;
+                    break;
+
+                // todas as outras teclas de controle.
+                // Default syskeyups dent to control thread.
+                // This is a window of the embedded window server.
+                // Not the loadable window server.
+                // Only for the setup input mode.
+                default:
+                    // Only for the setup input mode.
+                    if (current_input_mode == INPUT_MODE_SETUP)
+                    {
+                        //if ( EnableKGWS == FALSE ){ return 0; }
+                        //kgws_send_to_controlthread_of_currentwindow ( 
+                        //                    Event_Window,
+                        //    (int)           Event_Message, 
+                        //    (unsigned long) Event_LongASCIICode, 
+                        //    (unsigned long) Event_LongRawByte );
+
+                        kgws_send_to_tid (  tid,
+                                            Event_Window,
+                            (int)           Event_Message, 
+                            (unsigned long) Event_LongASCIICode, 
+                            (unsigned long) Event_LongRawByte );
+
+                            
+                        debug_print ("kgws_event_dialog: >>>> [MSG_SYSKEYUP.function] to wwf\n");        
+                    }
+                    
+                    // #todo
+                    // We are building a set of info about the ps2 devices.
+                    // We're gonna use the TTY here.
+                    // See: devmgr.h
+                    
+                    // PS2KeyboardTTY ??
+                    
+                    return 0; 
+                    break;
+            };
+            return 0;
+            break;
+
+        //===============
+        // Para todas as outras mensagens alem de syskeyup e syskeydown.
+        // kgws:
+        // Send a message to the thread associated with the
+        // window with focus.
+        // See: ws/kgws.c
+        default:
+           // Only for the setup input mode.
+           if (current_input_mode == INPUT_MODE_SETUP)
+           {
+               //if ( EnableKGWS == FALSE ){ return 0; }
+               //kgws_send_to_controlthread_of_currentwindow ( 
+               //                    Event_Window,
+               //    (int)           Event_Message, 
+               //    (unsigned long) Event_LongASCIICode, 
+               //    (unsigned long) Event_LongRawByte );
+
+               kgws_send_to_tid (  tid,
+                                   Event_Window,
+                   (int)           Event_Message, 
+                   (unsigned long) Event_LongASCIICode, 
+                   (unsigned long) Event_LongRawByte );
+                   
+               debug_print ("kgws_event_dialog: >>>> [default] to wwf\n");
+            
+               // #test
+               // Vamos escrever em stdin.
+               // Que tipo de objeto? file? tty?
+               // #bugbug: kernel panic!
+            
+               //sys_write ( 
+               //    (int) 0, (const void *) &ch, (size_t) 1 );
+            }
+            return 0;
+            break;
+    };
+
+    return 0;
+}
+
 //==========================================================
 
 
 /*
  ***************
- * KEYBOARD_SEND_MESSAGE:
+ * KGWS_SEND_KEYBOARD_MESSAGE:
  *     Envia uma mensagem de teclado para a janela com o 
  * foco de entrada.
  */
@@ -103,16 +419,24 @@ void kgws_disable(void)
 // Precisa conferir ke0 antes de construir a mensagem,
 // para assim usar o array certo. ke0 indica o teclado estendido.
 
+// #todo
+// Na verdade é 'translate' and 'dispatch'.
+// Cria o evento usando o rawbyte, traduz o raw byte para ascii,
+// e por fim envia para o buffer da tty de teclado e para
+// a thread do processo em foreground. Tudo depende
+// do input mode.
 
-int KGWS_SEND_KEYBOARD_MESSAGE (int tid, unsigned char raw_byte)
+int 
+KGWS_SEND_KEYBOARD_MESSAGE (
+    int tid, 
+    unsigned char raw_byte )
 {
 
-//
+
 // ==== #importante ====
 // Na verdade isso aqui eh trabalho do window server.
 // Eh ele que le na fila de RAW bytes de constroi uma fila de eventos.
 // Esses eventos serao lidos pelos cliente.
-//
 
     struct process_d  *__p;
     struct thread_d   *t;
@@ -134,10 +458,9 @@ int KGWS_SEND_KEYBOARD_MESSAGE (int tid, unsigned char raw_byte)
     unsigned long     Event_LongRawByte   =0;  //arg4 - raw byte
     //===================
 
-
-    //#todo:
+    // Inicializando a janela, 
+    // pois os outros elementos já foram incializados logo acima.
     Event_Window = NULL;
-
 
 
     
@@ -175,6 +498,7 @@ int KGWS_SEND_KEYBOARD_MESSAGE (int tid, unsigned char raw_byte)
 
     // Step 2
     // Tratar as mensagens.
+    // Traduzir rawbyte em evento.
 
 
     // ================================================
@@ -550,6 +874,17 @@ done:
     // em unsigned long.
 
 
+
+    //
+    // == dispatch event ======================================
+    //
+
+    // Mandaremos o evento para 3 lugares possiveis.
+    // + para o tty de teclado.
+    // + para o procedimento de janela do sistema ou
+    // + para a fila na thread em foreground.
+
+
     // ===========================
 
     // #todo
@@ -560,237 +895,40 @@ done:
     // devmgr.h ps2kbd.c
     // ...
     
-    // only one standard event
-    unsigned long event_buffer[5];
-    char xxxbug[4];
-    int xxxi=0;//iterator.
     
-    if ( current_input_mode == INPUT_MODE_TTY ){
-
-    if ( (void *) PS2KeyboardDeviceTTY != NULL )
+    if ( current_input_mode == INPUT_MODE_TTY )
     {
-        // ok. This is a valid tty pointer.
-       
-        // #test
-        // Let's write something ...
-        event_buffer[0] = (unsigned long) Event_Window;                      // window pointer 
-        event_buffer[1] = (unsigned long) Event_Message;                     // message number.
-        event_buffer[2] = (unsigned long) Event_LongASCIICode & 0x000000ff;  // ascii code
-        event_buffer[3] = (unsigned long) Event_LongRawByte   & 0x000000ff;  // raw byte
-       
-        // #todo
-        // >> PS2KeyboardDeviceTTY->_rbuffer
-        // No buffer 'bruto' colocamos os raw bytes.
-        // >> PS2KeyboardDeviceTTY->_cbuffer
-        // No buffer 'canonico' colocamos os ascii codes.
-        // ps: nao usaremos o buffer de output no caso do teclado. 
-        
-        //devemos cheacar se o tty esta configurado para
-        //escrever na fila bruta ou canonica e escrevermos no lugar certo
-        //Do mesmo modo deve ser a leitura.
-        //a configuraçao pode ser feita em ring3// see:ioctl
-        // esse tipo de decisao deve ficar dentro das rotinas de leitura e escrita e nao aqui.
-        
-        //quanto a fila eh canonica, escrevemos somente os keydown.
-                
-        //xxxbug[0] = 'x';  //fake bytes
-        xxxbug[0] = Event_LongASCIICode & 0x000000ff;
+         kgws_put_console ( 
+             (struct window_d *) Event_Window,
+             (int)               Event_Message,
+             (unsigned long)     Event_LongASCIICode,
+             (unsigned long)     Event_LongRawByte );
+    } 
 
-        //if ( Event_Message == MSG_KEYDOWN)
-        sys_write(0,xxxbug,1);
-        
-        // coloca o raw byte no buffer de raw byte.
-        //file_write_buffer ( PS2KeyboardDeviceTTY->_rbuffer, "dirty", 5);
-        
-        //canonica
-        //if ( Event_Message == MSG_KEYDOWN)
-        file_write_buffer ( PS2KeyboardDeviceTTY->_cbuffer, xxxbug , 1);
-        
-        // #bugbug
-        // Estamos colocando um evento no buffer 'bruto'.
-       
-        // it is gonna write in the base of the buffer.
-        // >> Essa rotina escreve na fila bruta. (raw buffer).
-        // See: tty.c
-        
-        //__tty_write ( 
-        //    (struct tty_d *) PS2KeyboardDeviceTTY, 
-        //    (char *) event_buffer, 
-        //    (int) (4*4) );  //16 bytes = apenas um evento.
-         
-         // Sinalizamos que temos um novo evento.
-         
-   
-         
-         // o teclado esta escrevendo na tty
-         // ela decide se faz echo no console ou nao,
-         // dependendo da configuraçao da tty.
-         // #test: fazendo echo
-         if ( (Event_Message == MSG_KEYDOWN) && ((char)xxxbug[0] != '\n') )
-         {
-             // ainda nao pode ler.
-             PS2KeyboardDeviceTTY->new_event = FALSE;
-         
-             console_write ( 
-                 (int) fg_console, 
-                 (const void *) xxxbug, 
-                 (size_t) 1 );
-
-             refresh_screen(); //#bugbug: teste
-         }
-         //pode ler
-         if ( (Event_Message == MSG_KEYDOWN) && ((char)xxxbug[0] == 'q') )
-         {
-             PS2KeyboardDeviceTTY->new_event = TRUE;
-
-             // da proxima vez escreveremos no inicio do buffer.
-             //PS2KeyboardDeviceTTY->_rbuffer->_w = 0;
-             // PS2KeyboardDeviceTTY->_rbuffer->_r = 0;
-             //PS2KeyboardDeviceTTY->_rbuffer->_p = PS2KeyboardDeviceTTY->_rbuffer->_base; 
-             //PS2KeyboardDeviceTTY->_rbuffer->_cnt = PS2KeyboardDeviceTTY->_rbuffer->_lbfsize;
-             //for( xxxi=0; xxxi<BUFSIZ; xxxi++){ PS2KeyboardDeviceTTY->_rbuffer->_p[xxxi] = 0; };
-         }
-  
-    }
-    } //fim do current input mode. (TTY MODE)
+    // Se o caso não é enviar para o tty,
+    // então vamos enviar para o procedimento do sistema
+    // ou para a thread em foreground, que recebemos como
+    // parametro.
+    
+    // mesmo que tenhamos enviado para a tty,
+    // ainda não vamos retornar,
+    // pois talvez tenhamos que chamar o 
+    // procedimento de janelas do sistema
 
 
+    kgws_event_dialog ( 
+        (int) tid,
+        (struct window_d *) Event_Window,
+        (int)               Event_Message,
+        (unsigned long)     Event_LongASCIICode,
+        (unsigned long)     Event_LongRawByte );
 
 
-    switch (Event_Message){
-       
-        // Para os dois casos.
-        // quando o control ou a tecla de funçao forem pressionadas ou liberadas.
-        case MSG_SYSKEYDOWN: 
-        case MSG_SYSKEYUP:
-            switch (Event_LongASCIICode){
-
-                // function key
-                // Quando pressionarmos uma tecla de funçao.
-                // no metodo olharemos control ou alt.
-                case VK_F1:  case VK_F2:  case VK_F3:  case VK_F4:
-                case VK_F5:  case VK_F6:  case VK_F7:  case VK_F8:
-                case VK_F9:  case VK_F10:  case VK_F11:  case VK_F12:
-                    // For all the input modes.
-                    if (Event_Message == MSG_SYSKEYDOWN)
-                    {
-                       // se alguma tecla de controle esta pressionada, chamaremos o procedimento local.
-                       if ( shift_status == 1 || ctrl_status == 1 || alt_status == 1 )
-                       {
-                           debug_print ("KGWS_KEYBOARD_SEND_MESSAGE: >>>> [MSG_SYSKEYUP] to system procedure\n"); 
-                            __local_ps2kbd_procedure ( 
-                                            Event_Window, 
-                            (int)           Event_Message, 
-                            (unsigned long) Event_LongASCIICode, 
-                            (unsigned long) Event_LongRawByte );
-                        debug_print("out of sysm procedure\n");
-                        return 0;
-                        }
-                        // caso nenhuma tecla de controle esteja pressionada,
-                        //enviaremos a tecla de funçao para a alicaçao.
-                        if (current_input_mode == INPUT_MODE_SETUP)
-                        {
-                            //if ( EnableKGWS == FALSE ){ return 0; }
-                            //kgws_send_to_controlthread_of_currentwindow ( 
-                            //                    Event_Window,
-                            //    (int)           Event_Message, 
-                            //    (unsigned long) Event_LongASCIICode, 
-                            //    (unsigned long) Event_LongRawByte );
-
-                            kgws_send_to_tid (  tid,
-                                                Event_Window,
-                                (int)           Event_Message, 
-                                (unsigned long) Event_LongASCIICode, 
-                                (unsigned long) Event_LongRawByte );
-                                
-                            debug_print ("KGWS_KEYBOARD_SEND_MESSAGE: >>>> [MSG_SYSKEYUP.function] to wwf\n");        
-                            return 0;
-                        }
-                    }
-                    return 0;
-                    break;
-
-                // todas as outras teclas de controle.
-                // Default syskeyups dent to control thread.
-                // This is a window of the embedded window server.
-                // Not the loadable window server.
-                // Only for the setup input mode.
-                default:
-                    // Only for the setup input mode.
-                    if (current_input_mode == INPUT_MODE_SETUP)
-                    {
-                        //if ( EnableKGWS == FALSE ){ return 0; }
-                        //kgws_send_to_controlthread_of_currentwindow ( 
-                        //                    Event_Window,
-                        //    (int)           Event_Message, 
-                        //    (unsigned long) Event_LongASCIICode, 
-                        //    (unsigned long) Event_LongRawByte );
-
-                        kgws_send_to_tid (  tid,
-                                            Event_Window,
-                            (int)           Event_Message, 
-                            (unsigned long) Event_LongASCIICode, 
-                            (unsigned long) Event_LongRawByte );
-
-                            
-                        debug_print ("KGWS_KEYBOARD_SEND_MESSAGE: >>>> [MSG_SYSKEYUP.function] to wwf\n");        
-                    }
-                    
-                    // #todo
-                    // We are building a set of info about the ps2 devices.
-                    // We're gonna use the TTY here.
-                    // See: devmgr.h
-                    
-                    // PS2KeyboardTTY ??
-                    
-                    return 0; 
-                    break;
-            };
-            return 0;
-            break;
-
-        //===============
-        // Para todas as outras mensagens alem de syskeyup e syskeydown.
-        // kgws:
-        // Send a message to the thread associated with the
-        // window with focus.
-        // See: ws/kgws.c
-        default:
-           // Only for the setup input mode.
-           if (current_input_mode == INPUT_MODE_SETUP)
-           {
-               //if ( EnableKGWS == FALSE ){ return 0; }
-               //kgws_send_to_controlthread_of_currentwindow ( 
-               //                    Event_Window,
-               //    (int)           Event_Message, 
-               //    (unsigned long) Event_LongASCIICode, 
-               //    (unsigned long) Event_LongRawByte );
-
-               kgws_send_to_tid (  tid,
-                                   Event_Window,
-                   (int)           Event_Message, 
-                   (unsigned long) Event_LongASCIICode, 
-                   (unsigned long) Event_LongRawByte );
-                   
-               debug_print ("KGWS_KEYBOARD_SEND_MESSAGE: >>>> [default] to wwf\n");
-            
-               // #test
-               // Vamos escrever em stdin.
-               // Que tipo de objeto? file? tty?
-               // #bugbug: kernel panic!
-            
-               //sys_write ( 
-               //    (int) 0, (const void *) &ch, (size_t) 1 );
-            }
-            return 0;
-            break;
-    };
+    // #todo #bugbug
+    // Esse retorno é o mesmo retorno do diálogo acima.
 
     return 0;
 }
-
-
-
 
 
 

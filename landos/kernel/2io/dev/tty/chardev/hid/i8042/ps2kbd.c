@@ -5,8 +5,8 @@
  *     Ring 0. Kernel base persistent code.
  *
  * Credits:
+ *     2018 - Created by Fred Nora.
  *     2018 - Nelson Cole.
- *     2019 - Fred Nora.
  */
 
 
@@ -16,8 +16,6 @@
 
 
 #include <kernel.h>
-
-
 
 
 
@@ -62,7 +60,7 @@ void __load_path_test(void)
 
     if ( status == 0 )
         printf("%s \n",__address);    
-    
+
     refresh_screen();
 }
 

@@ -770,12 +770,17 @@ void *gde_extra_services (
     // Nothing for now.
     if ( number == 901 ){ return NULL; }
     
+    
+    //
+    // input mode
+    //
+    
     // get current input mode.
     if ( number == 911 ){ return (void*) current_input_mode; }
     
     // set current input mode.
-    if ( number == 912 ){ current_input_mode=arg2; return NULL; }
-    
+    if ( number == 912 ){ current_input_mode = arg2; return NULL; }
+
 
 
     // is it full ?

@@ -41,7 +41,22 @@ void kgws_enable(void);
 void kgws_disable(void);
 
 
+// ========================================
 
+int 
+kgws_put_console ( 
+    struct window_d *window, 
+    int message,
+    unsigned long ascii_code,
+    unsigned long raw_byte );
+
+int 
+kgws_event_dialog ( 
+    int tid,
+    struct window_d *window, 
+    int message,
+    unsigned long ascii_code,
+    unsigned long raw_byte );
 
 // Send message.
 // Pega um scancode, transforma em caractere e envia na forma de mensagem
@@ -49,6 +64,8 @@ void kgws_disable(void);
 
 int KGWS_SEND_KEYBOARD_MESSAGE ( int tid, unsigned char raw_byte );
 
+
+// ==============================================
 
 // Aqui o servidor de janelas escaneia as janelas para saber 
 // se o mouse está sobre alguma ... durante a rotina

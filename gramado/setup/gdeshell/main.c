@@ -2653,6 +2653,12 @@ do_compare:
 
     // t4 - Testing fopen function.
     // ok funcionou com fgetc e getc.
+    
+    // #importante
+    // Estamos mudando o modo de input
+    // para testarmos o input via tty no estilo unix-like.
+    // Veja as rotinas de input no kernel em: kgws.c e ps2kbd.c
+
     FILE *f1;
     int ch_test;
     char t4buf[64];  //line
