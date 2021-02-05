@@ -542,7 +542,9 @@ done:
 int fsList ( const char *dir_name )
 {
     int Absolute = FALSE;
-    
+    int i=0;
+
+
     debug_print ("fsList:\n");
 
     // dir name.
@@ -556,12 +558,27 @@ int fsList ( const char *dir_name )
         debug_print ("fsList: [FAIL] *dir_name\n");
         goto fail;
     }
-    
-    if ( *dir_name != '/' )
+
+    // copy
+    for ( i=0; i<11; i++ ){
+        current_target_dir.name[i] = dir_name[i];
+    };
+    current_target_dir.name[i] = '\0';
+
+
+    if ( dir_name[0] == '[' && dir_name[1] == 0 )
     {
-        debug_print ("fsList: Absolute pathname\n");
+        debug_print ("fsList: root\n");
         Absolute = TRUE;
+
+        current_target_dir.current_dir_address = VOLUME1_ROOTDIR_ADDRESS;
+        for ( i=0; i<11; i++ ){
+            current_target_dir.name[i] = '\0';
+        };
+        current_target_dir.name[0] = '/';
+        current_target_dir.name[1] = '\0'; 
     }
+
 
     // #bugbug
     // We are using the current directory address,
@@ -585,7 +602,7 @@ int fsList ( const char *dir_name )
     
     // #bugbug
     // Missing string finalization.
-    // printk ("fsList: current_target_dir.name = {%s}\n", current_target_dir.name);
+    //printk ("fsList: current_target_dir.name = {%s}\n", current_target_dir.name);
     
 
     // Listing ...
@@ -593,9 +610,9 @@ int fsList ( const char *dir_name )
     // IN:
     // name, dir address, number of entries;
     // No return value.
-    
+
     fsFAT16ListFiles ( 
-        (const char *)     dir_name,         
+        (const char *)     current_target_dir.name,
         (unsigned short *) current_target_dir.current_dir_address, 
         256 );
 
@@ -2502,7 +2519,7 @@ void fsUpdateWorkingDiretoryString ( char *string )
 
 
     if (string_size <= 0){
-        debug_print ("fsUpdateWorkingDiretoryString: string size\n"); 
+        debug_print ("fsUpdateWorkingDiretoryString: [FAIL] string_size\n"); 
         return;  
     }
 
@@ -2514,10 +2531,12 @@ void fsUpdateWorkingDiretoryString ( char *string )
         panic ("fsUpdateWorkingDiretoryString: p\n");
     }else{
         if ( p->used != 1 || p->magic != 1234 ){
-            panic ("fsUpdateWorkingDiretoryString: validation\n");
+            panic ("fsUpdateWorkingDiretoryString: p validation\n");
         }
 
-        // Atualiza a string do processo atual. Concatenando.
+        // Atualiza a string do processo atual. 
+        // Concatenando.
+        
         if ( (void *) string != NULL )
         {
             // #bugbug
@@ -2531,6 +2550,8 @@ void fsUpdateWorkingDiretoryString ( char *string )
 
             // Atualiza a string global usando a string do 
             // processo atual.
+            // #bugbug: nao precisamos disso ...
+            // so precismos de cwd na estrutura de processo.
             
             // #importante
             // Respeitar o limite.
@@ -2543,6 +2564,11 @@ void fsUpdateWorkingDiretoryString ( char *string )
 
             // #bugbug: rever isso.
             // Nome do diretório alvo atual.
+            
+            // nao precismos disso ...
+            // ou usamos o cwd do processo ou
+            // o diretorio raiz para paths absolutos.
+            
             for ( i=0; i< 11; i++ )
             {
                 current_target_dir.name[i] = *tmp;
@@ -2564,16 +2590,44 @@ void fsUpdateWorkingDiretoryString ( char *string )
 
 // Service 175. cd command.
 
+// #todo
+// ou usamos o cwd do processo ou
+// o diretorio raiz para paths absolutos.
+
 void sys_cd_command( char *string )
 {
-    if ( (void*) string == NULL )
+    int i=0;
+
+    if ( (void*) string == NULL ){
+        debug_print("sys_cd_command: string\n");
         return;
-        
-    if ( *string == 0 )
+    }
+
+    if ( *string == 0 ){
+        debug_print("sys_cd_command: *string\n");
         return;
+    }
+    
+    // reset
+    if (string[0] == '/' && string[1] == 0 )
+    {
+        debug_print("sys_cd_command: reseting\n");
+        current_target_dir.current_dir_address = VOLUME1_ROOTDIR_ADDRESS;
+        for ( i=0; i<11; i++ ){
+            current_target_dir.name[i] = '\0';
+        };
+        current_target_dir.name[0] = '/';
+        current_target_dir.name[1] = '\0';
+        //return;
+    }
+
+
+    // Atualiza na estrutura de processo.
+    // Atualiza na estrutura global para diretorio alvo.
 
     fsUpdateWorkingDiretoryString( (char *) string );
 
+    // Isso carrega o diretorio que agora 'e o diretorio alvo.
     fsLoadFileFromCurrentTargetDir();
 
     // ...
@@ -3140,31 +3194,22 @@ int fsLoadFileFromCurrentTargetDir (void)
 
     new_address = (unsigned long) kmalloc (4096);
 
-    if ( new_address == 0 )
-    {
+    if ( new_address == 0 ){
         debug_print ("fsLoadFileFromCurrentTargetDir: new_address\n");
         return -1;
     }
 
-    // #todo
-    // clean memory
-    // memset()
+    current_target_dir.current_dir_address = new_address;
 
     // ??
-    // Se o endereço atual falhar, resetamos ele.
-    if ( current_target_dir.current_dir_address == 0 )
-    {
-        debug_print ("fsLoadFileFromCurrentTargetDir: current_target_dir.current_dir_address\n");
+    // Se o endereço atual falhar, 
+    // resetamos ele e retornamos.
 
-        // reset.
-        current_target_dir.current_dir_address = VOLUME1_ROOTDIR_ADDRESS;
-
-        for ( i=0; i< 11; i++ ){
-            current_target_dir.name[i] = '\0';
-        };
-
-        return -1;
+    if ( current_target_dir.current_dir_address == 0 ){
+        debug_print ("fsLoadFileFromCurrentTargetDir: [FAIL] invalid address\n");
+        goto fail;
     }
+
 
 	//#debug
 	//printf ("fsLoadFileFromCurrentTargetDir: dir_name=(%s) old_dir_addr=(%x) #debug \n",
@@ -3174,22 +3219,17 @@ int fsLoadFileFromCurrentTargetDir (void)
     //++
     taskswitch_lock ();
     scheduler_lock ();
-
     Ret = (int) fsLoadFile ( 
-                    VOLUME1_FAT_ADDRESS,  
-                    current_target_dir.current_dir_address,    //src dir address 
-                    32, //#bugbug: Number of entries.
-                    (unsigned char *) current_target_dir.name, 
-                    (unsigned long) new_address,
-                    4096 );             //dst dir address
-
+                    VOLUME1_FAT_ADDRESS,                       // fat cache address
+                    current_target_dir.current_dir_address,    // src dir address 
+                    32, //#bugbug: Number of entries.          // number of entries.
+                    (unsigned char *) current_target_dir.name,                 // file name 
+                    (unsigned long)   current_target_dir.current_dir_address,  // file address
+                    4096 );                                    // buffer limit 4KB.
     scheduler_unlock ();
     taskswitch_unlock ();
     //--
 
-    // We have a new target directory address.
-
-    current_target_dir.current_dir_address = new_address;
 
 	//#debug
 	//printf ("fsLoadFileFromCurrentTargetDir: dir_name=(%s) new_dir_addr=(%x) #debug \n",
@@ -3199,6 +3239,15 @@ int fsLoadFileFromCurrentTargetDir (void)
     debug_print ("fsLoadFileFromCurrentTargetDir: done\n");
     
     return (int) Ret;
+
+fail:
+        current_target_dir.current_dir_address = VOLUME1_ROOTDIR_ADDRESS;
+        for ( i=0; i<11; i++ ){
+            current_target_dir.name[i] = '\0';
+        };
+        current_target_dir.name[0] = '/';
+        current_target_dir.name[1] = '\0';
+        return -1;
 }
 
 

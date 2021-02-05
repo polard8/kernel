@@ -54,7 +54,7 @@
 ```
 ## How to Build?
 
-See the [Gramado OS build instructions](https://github.com/frednora/gramado/blob/master/base/DOCS/BUILD.MD)
+See the [Gramado OS build instructions](https://github.com/frednora/gramado/blob/master/base/GRAMADO/DOCS/BUILD.MD)
 
 ## Testing
 
@@ -68,7 +68,7 @@ Please, give us some feedback.
 
 ## Documentation
 
-See the [DOCS](https://github.com/frednora/gramado/blob/master/base/DOCS/)
+See the [DOCS](https://github.com/frednora/gramado/blob/master/base/GRAMADO/DOCS/)
 
 ## More information
 

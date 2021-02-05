@@ -88,13 +88,13 @@ int load_kernel ()
 
 
     Status = (int) load_path(
-                       "/LANDOS/KERNEL.BIN", 
+                       "/GRAMADO/KERNEL.BIN", 
                        (unsigned long) kernel_pa );
     // Fail
     if ( Status != 0 ){
         // Try again
         Status = (int) load_path(
-                           "/BOOT/KERNEL.BIN", 
+                           "/GRAMADO/KERNEL.BIN", 
                            (unsigned long) kernel_pa );
     }
 

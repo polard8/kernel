@@ -5,7 +5,7 @@ PRODUCT_NAME  = Gramado
 EDITION_NAME  = Land
 VERSION_MAJOR = 1
 VERSION_MINOR = 0
-VERSION_BUILD = 219
+VERSION_BUILD = 220
 KERNELVERSION = $(VERSION_MAJOR)$(if $(VERSION_MINOR),.$(VERSION_MINOR)$(if $(VERSION_BUILD),.$(VERSION_BUILD)))
 
 # Documentation.
@@ -151,15 +151,14 @@ land-os:
 
 	# KERNEL.BIN  - Creating the kernel image.
 	#::kernel
-	# The boot loader will search on /LANDOS/ and on /BOOT/ folders.
+	# The boot loader will search on /GRAMADO/
 	@echo "================================="
 	@echo "(Step 1) Creating the kernel image ..."
 	$(Q) $(MAKE) -C landos/kernel
 
-	# O BL.BIN procura o kernel nos diretorios LANDOS/ E BOOT/
+	# O BL.BIN procura o kernel no diretorio GRAMADO/
 	# See: fs/loader.c
-	sudo cp landos/kernel/KERNEL.BIN  base/LANDOS
-	sudo cp landos/kernel/KERNEL.BIN  base/BOOT
+	sudo cp landos/kernel/KERNEL.BIN  base/GRAMADO
 
 	#::init
 	@echo "==================="
@@ -254,8 +253,7 @@ gramado-edge:
 
 	#::net
 	$(Q) $(MAKE) -C gramado/edge/net/
-	-sudo cp gramado/edge/net/bin/*.BIN      base/GRAMADO/
-#	-sudo cp gramado/edge/net/bin/*.BIN      base/GRAMADO/
+	-sudo cp gramado/edge/net/bin/*.BIN      base/PROGRAMS/
 
 #========================================
 
@@ -353,12 +351,12 @@ clean3:
 # clean base
 clean4:
 	-rm -rf base/*.BIN 
-	-rm -rf base/BOOT/*.BIN 
-	-rm -rf base/BIN/*.BIN 
-	-rm -rf base/SBIN/*.BIN 
-	-rm -rf base/LANDOS/*.BIN 
 	-rm -rf base/GRAMADO/*.BIN 
-
+	-rm -rf base/PROGRAMS/*.BIN 
+	-rm -rf base/UBASE/BOOT/*.BIN 
+	-rm -rf base/UBASE/BIN/*.BIN 
+	-rm -rf base/UBASE/SBIN/*.BIN
+ 
 # clean system files.
 PHONY := clean-system-files
 clean-system-files:

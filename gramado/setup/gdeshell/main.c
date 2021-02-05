@@ -2679,6 +2679,7 @@ do_compare:
             printf ("fopen fail\n");  //stdout
             goto exit_cmp;
         }
+        rewind(f1);
         printf ("Testing getc ... \n\n");
         t4_line_offset=0;  
         while (1){
@@ -2716,8 +2717,9 @@ do_compare:
     {
         for (crI=0; crI<8; crI++)
         {
+            //crName[crI+5] = 'x';
+            //crName[crI+6] = 'y';
             itoa(crI,crName); 
-            crName[crI+1] = 'x';
             creat (crName, 0);
         }
             

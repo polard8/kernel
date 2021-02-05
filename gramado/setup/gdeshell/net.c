@@ -78,20 +78,18 @@ __SendARP (
     //==============================================
     // # ethernet header #
 
+	// Coloca na estrutura do ethernet header os seguintes valores: 
+	// > endereço mac da origem.
+	// > endereço mac do destion.
+	// O endereço mac da origem está na estrutura do controlador nic intel. 
+	// O endereço mac do destino foi passado via argumento.
+
     eh = (void *) malloc ( sizeof(struct gdeshell_ether_header ) );
 
-    if ( (void *) eh == NULL)
-    {
+    if ( (void *) eh == NULL){
         printf ("__SendARP: [FAIL] eh struct\n");
         return;
-
     }else{
-
-		// Coloca na estrutura do ethernet header os seguintes valores: 
-		// > endereço mac da origem.
-		// > endereço mac do destion.
-		// O endereço mac da origem está na estrutura do controlador nic intel. 
-		// O endereço mac do destino foi passado via argumento.
 
         for( i=0; i<6; i++)
         {
@@ -109,20 +107,33 @@ __SendARP (
     // # arp header #
     //
 
+    // Hardware type (HTYPE)   (00 01)
+    // Protocol type (PTYPE)   (08 00)
+    // Hardware address length (MAC)
+    // Protocol address length (IP)
+    // Operation (OPER) (dois bytes invertidos)
+    
+    // mac
+    //#todo: pegar o mec do host.
+    // Configurando na estrutura de arp o endereço mac de origem e destino.
+    // sender mac
+    // target mac
+    // O endereço mac de origem pegamos na estrutura no nic intel.
+    // O endereço mac de destino foi passado via argumento.
+
+    // ip
+    // Configurando na estrutura de arp o endereço do ip de origem e 
+    // o ip de destino.
+    // sender ip
+    // target ip
+    // Os endereços foram passados via argumento.
+
     h = (void *) malloc ( sizeof(struct  gdeshell_ether_arp) );
 
-    if ( (void *) h == NULL)
-    {
-        printf ("__SendARP: [FAIL] h struct");
+    if ( (void *) h == NULL){
+        printf ("__SendARP: [FAIL] h struct\n");
         return;
-
     }else{
-
-        // Hardware type (HTYPE)   (00 01)
-        // Protocol type (PTYPE)   (08 00)
-        // Hardware address length (MAC)
-        // Protocol address length (IP)
-        // Operation (OPER) (dois bytes invertidos)
  
         h->type  = 1;      // 0x0100;  // 1      ?? #bugbug order ??
         h->proto = 0x800;  // 0x0008;  // 0x800  ?? #bugbug order ??
@@ -131,28 +142,11 @@ __SendARP (
         h->op = ToNetByteOrder16(ARP_OPC_REQUEST);
         //h->op = ToNetByteOrder16(ARP_OPC_REPLY);
 
-
-// mac
-		// Configurando na estrutura de arp o endereço mac de origem e destino.
-		// sender mac
-		// target mac
-		// O endereço mac de origem pegamos na estrutura no nic intel.
-		// O endereço mac de destino foi passado via argumento.
-
-        //#todo: pegar o mec do host.
         for ( i=0; i<6; i++ )
         {
             h->arp_sha[i] = src_mac[i];
             h->arp_tha[i] = dst_mac[i]; 
         };
-
-
-		// ip
-		// Configurando na estrutura de arp o endereço do ip de origem e 
-		// o ip de destino.
-		// sender ip
-		// target ip
-		// Os endereços foram passados via argumento.
 
         for ( i=0; i<4; i++ )
         {
@@ -172,10 +166,10 @@ __SendARP (
     printf ("type={%x} proto={%x} hlen={%d} plen={%d} op={%x} \n", 
         h->type, h->proto, h->hlen, h->plen, h->op );
 
-    if ((h->type  != 1)     ||  /* ethernet */
-        (h->proto != 0x800) ||  /* IPv4 */
-        (h->hlen != 6)      ||  /* 6-byte MAC */
-        (h->plen != 4))         /* 4-byte protocol address */
+    if ((h->type  != 1)      ||  /* ethernet */
+        (h->proto != 0x800)  ||  /* IPv4 */
+        (h->hlen  != 6)      ||  /* 6-byte MAC */
+        (h->plen  != 4))         /* 4-byte protocol address */
     {
         printf ("__SendARP: [FAIL]\n");
         return;
@@ -200,11 +194,12 @@ __SendARP (
     //
     // Copiando o pacote no buffer.
     //
+
+    // #bugbug: standard size ??
     
     buffer = (unsigned char *) malloc(512);
     
-    if ( (void*) buffer == NULL )
-    {
+    if ( (void*) buffer == NULL ){
         printf ("__SendARP: [FAIL] buffer\n");
         return;
     }
@@ -284,7 +279,7 @@ void __shellTestARP (void){
 
    //#bugbug
    __SendARP ( 
-       source_ip_address, target_ip_address, 
+       source_ip_address,  target_ip_address, 
        source_mac_address, target_mac_address );
 }
 

@@ -67,9 +67,9 @@ CFLAGS = -m64 \
 endif
 
 
-#KINCLUDE = -I include/
-KINCLUDE = -I 0mem/include/
-#KINCLUDE = -I 0mem/0prey/
+KINCLUDE = -I include/
+#KINCLUDE = -I 0mem/include/
+
 
 ##
 ## Objects
@@ -164,7 +164,7 @@ all: kernel-head all-c link-kernel clean
 kernel-head:
 
 	$(NASM)  1pump/arch/x86/pumpcore/head_32.asm \
-	-I 0mem/include/ \
+	$(KINCLUDE) \
 	-I 1pump/arch/x86/pumpcore/ \
 	-f elf -o head_32.o
 

@@ -2368,8 +2368,9 @@ void *sci0 (
 
         // 173
         // Lista arquivos de um diret�rio, dado o n�mero do disco,
-        //o numero do volume e o n�mero do diret�rio,
-        //args in: disk id, volume id, directory id
+        // o numero do volume e o n�mero do diret�rio,
+        // args in: disk id, volume id, directory id
+        // See: fs.c
         case SYS_LISTFILES:
             fsListFiles ( arg2, arg3, arg4 );  
             return NULL;
