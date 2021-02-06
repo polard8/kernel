@@ -30,10 +30,8 @@
 #include <rtl/gramado.h>
 
 
-
 // target: i386.
 // #define int long long
-
 
 
 char *p;      // current position in source code
@@ -77,7 +75,7 @@ enum {
 
 
 // types
-enum { CHAR, INT, PTR };
+enum { TYPE_CHAR, TYPE_INT, TYPE_PTR };
 
 
 // identifier offsets (since we can't create an ident struct)
@@ -212,13 +210,13 @@ void expr (int lev){
 
   // Nothing| NUM | '"'  
   if (!tk) { printf("%d: unexpected eof in expression\n", line); exit(-1); }
-  else if (tk == Num) { *++e = IMM; *++e = ival; next(); ty = INT; }
+  else if (tk == Num) { *++e = IMM; *++e = ival; next(); ty = TYPE_INT; }
   else if (tk == '"') {
 
     *++e = IMM; *++e = ival; next();
     while (tk == '"') next();
     data = (char *) ( (int) data + sizeof(int) & -sizeof(int) ); 
-    ty = PTR;
+    ty = TYPE_PTR;
 
 
   // SIZEOF
@@ -226,11 +224,11 @@ void expr (int lev){
   else if (tk == Sizeof) {
 
     next(); if (tk == '(') next(); else { printf("%d: open paren expected in sizeof\n", line); exit(-1); }
-    ty = INT; if (tk == Int) next(); else if (tk == Char) { next(); ty = CHAR; }
-    while (tk == Mul) { next(); ty = ty + PTR; }
+    ty = TYPE_INT; if (tk == Int) next(); else if (tk == Char) { next(); ty = TYPE_CHAR; }
+    while (tk == Mul) { next(); ty = ty + TYPE_PTR; }
     if (tk == ')') next(); else { printf("%d: close paren expected in sizeof\n", line); exit(-1); }
-    *++e = IMM; *++e = (ty == CHAR) ? sizeof(char) : sizeof(int);
-    ty = INT;
+    *++e = IMM; *++e = (ty == TYPE_CHAR) ? sizeof(char) : sizeof(int);
+    ty = TYPE_INT;
 
 
   // ID
@@ -249,12 +247,12 @@ void expr (int lev){
       if (t) { *++e = ADJ; *++e = t; }
       ty = d[Type];
     }
-    else if (d[Class] == Num) { *++e = IMM; *++e = d[Val]; ty = INT; }
+    else if (d[Class] == Num) { *++e = IMM; *++e = d[Val]; ty = TYPE_INT; }
     else {
       if (d[Class] == Loc) { *++e = LEA; *++e = loc - d[Val]; }
       else if (d[Class] == Glo) { *++e = IMM; *++e = d[Val]; }
       else { printf("%d: undefined variable\n", line); exit(-1); }
-      *++e = ((ty = d[Type]) == CHAR) ? LC : LI;
+      *++e = ((ty = d[Type]) == TYPE_CHAR) ? LC : LI;
     }
 
 
@@ -264,8 +262,8 @@ void expr (int lev){
 
     next();
     if (tk == Int || tk == Char) {
-      t = (tk == Int) ? INT : CHAR; next();
-      while (tk == Mul) { next(); t = t + PTR; }
+      t = (tk == Int) ? TYPE_INT : TYPE_CHAR; next();
+      while (tk == Mul) { next(); t = t + TYPE_PTR; }
       if (tk == ')') next(); else { printf("%d: bad cast\n", line); exit(-1); }
       expr(Inc);
       ty = t;
@@ -281,8 +279,8 @@ void expr (int lev){
   else if (tk == Mul) {
 
     next(); expr(Inc);
-    if (ty > INT) ty = ty - PTR; else { printf("%d: bad dereference\n", line); exit(-1); }
-    *++e = (ty == CHAR) ? LC : LI;
+    if (ty > TYPE_INT) ty = ty - TYPE_PTR; else { printf("%d: bad dereference\n", line); exit(-1); }
+    *++e = (ty == TYPE_CHAR) ? LC : LI;
   
 
   // AND
@@ -291,19 +289,19 @@ void expr (int lev){
 
     next(); expr(Inc);
     if (*e == LC || *e == LI) --e; else { printf("%d: bad address-of\n", line); exit(-1); }
-    ty = ty + PTR;
+    ty = ty + TYPE_PTR;
 
 
   //  ! | ~ | ADD | SUB 
   }
-  else if (tk == '!') { next(); expr(Inc); *++e = PSH; *++e = IMM; *++e = 0; *++e = EQ;   ty = INT; }
-  else if (tk == '~') { next(); expr(Inc); *++e = PSH; *++e = IMM; *++e = -1; *++e = XOR; ty = INT; }
-  else if (tk == Add) { next(); expr(Inc); ty = INT; }
+  else if (tk == '!') { next(); expr(Inc); *++e = PSH; *++e = IMM; *++e = 0; *++e = EQ;   ty = TYPE_INT; }
+  else if (tk == '~') { next(); expr(Inc); *++e = PSH; *++e = IMM; *++e = -1; *++e = XOR; ty = TYPE_INT; }
+  else if (tk == Add) { next(); expr(Inc); ty = TYPE_INT; }
   else if (tk == Sub) {
 
     next(); *++e = IMM;
     if (tk == Num) { *++e = -ival; next(); } else { *++e = -1; *++e = PSH; expr(Inc); *++e = MUL; }
-    ty = INT;
+    ty = TYPE_INT;
   
 
   // INC | DEC
@@ -316,9 +314,9 @@ void expr (int lev){
     else if (*e == LI) { *e = PSH; *++e = LI; }
     else { printf("%d: bad lvalue in pre-increment\n", line); exit(-1); }
     *++e = PSH;
-    *++e = IMM; *++e = (ty > PTR) ? sizeof(int) : sizeof(char);
+    *++e = IMM; *++e = (ty > TYPE_PTR) ? sizeof(int) : sizeof(char);
     *++e = (t == Inc) ? ADD : SUB;
-    *++e = (ty == CHAR) ? SC : SI;
+    *++e = (ty == TYPE_CHAR) ? SC : SI;
   
   //
   }
@@ -338,7 +336,7 @@ void expr (int lev){
       
       next();
       if (*e == LC || *e == LI) *e = PSH; else { printf("%d: bad lvalue in assignment\n", line); exit(-1); }
-      expr(Assign); *++e = ((ty = t) == CHAR) ? SC : SI;
+      expr(Assign); *++e = ((ty = t) == TYPE_CHAR) ? SC : SI;
     
     
     // COND
@@ -356,23 +354,23 @@ void expr (int lev){
     
     // LOR | LAN | OR | XOR | AND | EQ | NE | LT | GT | LE | GE | SHL | SHR | ADD
     }
-    else if (tk == Lor) { next(); *++e = BNZ; d = ++e; expr(Lan); *d = (int)(e + 1); ty = INT; }
-    else if (tk == Lan) { next(); *++e = BZ;  d = ++e; expr(Or);  *d = (int)(e + 1); ty = INT; }
-    else if (tk == Or)  { next(); *++e = PSH; expr(Xor); *++e = OR;  ty = INT; }
-    else if (tk == Xor) { next(); *++e = PSH; expr(And); *++e = XOR; ty = INT; }
-    else if (tk == And) { next(); *++e = PSH; expr(Eq);  *++e = AND; ty = INT; }
-    else if (tk == Eq)  { next(); *++e = PSH; expr(Lt);  *++e = EQ;  ty = INT; }
-    else if (tk == Ne)  { next(); *++e = PSH; expr(Lt);  *++e = NE;  ty = INT; }
-    else if (tk == Lt)  { next(); *++e = PSH; expr(Shl); *++e = LT;  ty = INT; }
-    else if (tk == Gt)  { next(); *++e = PSH; expr(Shl); *++e = GT;  ty = INT; }
-    else if (tk == Le)  { next(); *++e = PSH; expr(Shl); *++e = LE;  ty = INT; }
-    else if (tk == Ge)  { next(); *++e = PSH; expr(Shl); *++e = GE;  ty = INT; }
-    else if (tk == Shl) { next(); *++e = PSH; expr(Add); *++e = SHL; ty = INT; }
-    else if (tk == Shr) { next(); *++e = PSH; expr(Add); *++e = SHR; ty = INT; }
+    else if (tk == Lor) { next(); *++e = BNZ; d = ++e; expr(Lan); *d = (int)(e + 1); ty = TYPE_INT; }
+    else if (tk == Lan) { next(); *++e = BZ;  d = ++e; expr(Or);  *d = (int)(e + 1); ty = TYPE_INT; }
+    else if (tk == Or)  { next(); *++e = PSH; expr(Xor); *++e = OR;  ty = TYPE_INT; }
+    else if (tk == Xor) { next(); *++e = PSH; expr(And); *++e = XOR; ty = TYPE_INT; }
+    else if (tk == And) { next(); *++e = PSH; expr(Eq);  *++e = AND; ty = TYPE_INT; }
+    else if (tk == Eq)  { next(); *++e = PSH; expr(Lt);  *++e = EQ;  ty = TYPE_INT; }
+    else if (tk == Ne)  { next(); *++e = PSH; expr(Lt);  *++e = NE;  ty = TYPE_INT; }
+    else if (tk == Lt)  { next(); *++e = PSH; expr(Shl); *++e = LT;  ty = TYPE_INT; }
+    else if (tk == Gt)  { next(); *++e = PSH; expr(Shl); *++e = GT;  ty = TYPE_INT; }
+    else if (tk == Le)  { next(); *++e = PSH; expr(Shl); *++e = LE;  ty = TYPE_INT; }
+    else if (tk == Ge)  { next(); *++e = PSH; expr(Shl); *++e = GE;  ty = TYPE_INT; }
+    else if (tk == Shl) { next(); *++e = PSH; expr(Add); *++e = SHL; ty = TYPE_INT; }
+    else if (tk == Shr) { next(); *++e = PSH; expr(Add); *++e = SHR; ty = TYPE_INT; }
     else if (tk == Add) {
       
       next(); *++e = PSH; expr(Mul);
-      if ((ty = t) > PTR) { *++e = PSH; *++e = IMM; *++e = sizeof(int); *++e = MUL;  }
+      if ((ty = t) > TYPE_PTR) { *++e = PSH; *++e = IMM; *++e = sizeof(int); *++e = MUL;  }
       *++e = ADD;
     
     // SUB
@@ -380,25 +378,25 @@ void expr (int lev){
     else if (tk == Sub) {
       
       next(); *++e = PSH; expr(Mul);
-      if (t > PTR && t == ty) { *++e = SUB; *++e = PSH; *++e = IMM; *++e = sizeof(int); *++e = DIV; ty = INT; }
-      else if ((ty = t) > PTR) { *++e = PSH; *++e = IMM; *++e = sizeof(int); *++e = MUL; *++e = SUB; }
+      if (t > TYPE_PTR && t == ty) { *++e = SUB; *++e = PSH; *++e = IMM; *++e = sizeof(int); *++e = DIV; ty = TYPE_INT; }
+      else if ((ty = t) > TYPE_PTR) { *++e = PSH; *++e = IMM; *++e = sizeof(int); *++e = MUL; *++e = SUB; }
       else *++e = SUB;
     
     
     // MUL | DIV | MOD | INC
     }
-    else if (tk == Mul) { next(); *++e = PSH; expr(Inc); *++e = MUL; ty = INT; }
-    else if (tk == Div) { next(); *++e = PSH; expr(Inc); *++e = DIV; ty = INT; }
-    else if (tk == Mod) { next(); *++e = PSH; expr(Inc); *++e = MOD; ty = INT; }
+    else if (tk == Mul) { next(); *++e = PSH; expr(Inc); *++e = MUL; ty = TYPE_INT; }
+    else if (tk == Div) { next(); *++e = PSH; expr(Inc); *++e = DIV; ty = TYPE_INT; }
+    else if (tk == Mod) { next(); *++e = PSH; expr(Inc); *++e = MOD; ty = TYPE_INT; }
     else if (tk == Inc || tk == Dec) {
 
       if (*e == LC) { *e = PSH; *++e = LC; }
       else if (*e == LI) { *e = PSH; *++e = LI; }
       else { printf("%d: bad lvalue in post-increment\n", line); exit(-1); }
-      *++e = PSH; *++e = IMM; *++e = (ty > PTR) ? sizeof(int) : sizeof(char);
+      *++e = PSH; *++e = IMM; *++e = (ty > TYPE_PTR) ? sizeof(int) : sizeof(char);
       *++e = (tk == Inc) ? ADD : SUB;
-      *++e = (ty == CHAR) ? SC : SI;
-      *++e = PSH; *++e = IMM; *++e = (ty > PTR) ? sizeof(int) : sizeof(char);
+      *++e = (ty == TYPE_CHAR) ? SC : SI;
+      *++e = PSH; *++e = IMM; *++e = (ty > TYPE_PTR) ? sizeof(int) : sizeof(char);
       *++e = (tk == Inc) ? SUB : ADD;
       next();
     
@@ -410,10 +408,10 @@ void expr (int lev){
       next(); 
       *++e = PSH; expr(Assign);
       if (tk == ']') next(); else { printf("%d: close bracket expected\n", line); exit(-1); }
-      if (t > PTR) { *++e = PSH; *++e = IMM; *++e = sizeof(int); *++e = MUL;  }
-      else if (t < PTR) { printf("%d: pointer type expected\n", line); exit(-1); }
+      if (t > TYPE_PTR) { *++e = PSH; *++e = IMM; *++e = sizeof(int); *++e = MUL;  }
+      else if (t < TYPE_PTR) { printf("%d: pointer type expected\n", line); exit(-1); }
       *++e = ADD;
-      *++e = ((ty = t - PTR) == CHAR) ? LC : LI;
+      *++e = ((ty = t - TYPE_PTR) == TYPE_CHAR) ? LC : LI;
     
     // 
     }
@@ -553,14 +551,21 @@ int main (int argc, char **argv){
     // Open!
     //
 
+    debug_print("gramc4: Open the file\n");
 
     if ((fd = open(*argv, 0, 0)) < 0){ 
         printf("could not open(%s)\n", *argv); return -1; 
     }
 
 
-    poolsz = (256*1024);    // arbitrary size
+    //
+    // alloc size
+    //
 
+    // arbitrary size
+
+    // poolsz = (256*1024);    
+    poolsz = (2*1024);
 
     // Buffer.
     // sym, le, data, sp
@@ -606,11 +611,9 @@ int main (int argc, char **argv){
         next(); 
         
         id[Class] = Sys; 
-        id[Type] = INT; 
-        id[Val] = i++; 
-    } 
-    
-    
+        id[Type]  = TYPE_INT; 
+        id[Val]   = i++; 
+    };
     
     
     //
@@ -626,6 +629,11 @@ int main (int argc, char **argv){
     next(); 
     idmain = id; 
 
+    //
+    // malloc
+    //
+
+    printf("poolsz = { %d bytes } \n",poolsz);
 
     if (!(lp = p = malloc(poolsz))) 
     { printf("could not malloc(%d) source area\n", poolsz); return -1; }
@@ -633,10 +641,14 @@ int main (int argc, char **argv){
 
     //
     // Read!
-    //    
+    //
+
+    debug_print("gramc4: Read the file\n");
 
     if ( (i = read(fd, p, poolsz-1)) <= 0 ){ 
-        printf ("read() returned %d\n", i); return -1; 
+        printf ("gramc4: [FAIL] read() returned %d\n", i);
+        printf("poolsz = { %d bytes } \n",poolsz);
+        return -1; 
     }
 
     // Finalize.
@@ -656,16 +668,16 @@ int main (int argc, char **argv){
 
        // Step 0 = type or enum
 
-        bt = INT;    // basetype
+        bt = TYPE_INT;    // basetype
         
-        // INT
+        // TYPE_INT
         if (tk == Int) { 
             next(); 
         
-        // CHAR
+        // TYPE_CHAR
         }
         else if (tk == Char) { 
-            next();  bt = CHAR; 
+            next();  bt = TYPE_CHAR; 
         
         // ENUM
         // Abre e fecha o corpo.
@@ -705,8 +717,8 @@ int main (int argc, char **argv){
                         next();
                     }
                     id[Class] = Num; 
-                    id[Type] = INT; 
-                    id[Val] = i++;
+                    id[Type]  = TYPE_INT; 
+                    id[Val]   = i++;
                 
                     // ','
                     if (tk == ',') next();
@@ -737,7 +749,7 @@ int main (int argc, char **argv){
             // MUL
             while (tk == Mul){ 
                 next(); 
-                ty = ty + PTR; 
+                ty = ty + TYPE_PTR; 
             }
 
             // Se não é um symbol.
@@ -774,13 +786,13 @@ int main (int argc, char **argv){
                 // Até encontrarmos o fim da pilha ')'
                 while (tk != ')') 
                 {
-                    ty = INT;
+                    ty = TYPE_INT;
                     
                     if (tk == Int)        next();
-                    else if (tk == Char){ next (); ty = CHAR; }
+                    else if (tk == Char){ next (); ty = TYPE_CHAR; }
 
                     // Is it a pointer ?
-                    while (tk == Mul){    next();  ty = ty + PTR; }
+                    while (tk == Mul){    next();  ty = ty + TYPE_PTR; }
 
                     // Tem que ser um symbol.
                     if (tk != Id) 
@@ -818,7 +830,7 @@ int main (int argc, char **argv){
                 // Declarações de variáveis dentro do corpo da função.
                 while (tk == Int || tk == Char)
                 {
-                    bt = (tk == Int) ? INT : CHAR;
+                    bt = (tk == Int) ? TYPE_INT : TYPE_CHAR;
                     
                     next();
 
@@ -828,7 +840,7 @@ int main (int argc, char **argv){
 
                         // pointer ??
                         while (tk == Mul) 
-                        { next(); ty = ty + PTR; }
+                        { next(); ty = ty + TYPE_PTR; }
 
                         // symbol
                         if (tk != Id) 
@@ -839,8 +851,8 @@ int main (int argc, char **argv){
                         { printf("%d: duplicate local definition\n", line); return -1; }
                         
                         id[HClass] = id[Class]; id[Class] = Loc;
-                        id[HType]  = id[Type];  id[Type] = ty;
-                        id[HVal]   = id[Val];   id[Val] = ++i;
+                        id[HType]  = id[Type];  id[Type]  = ty;
+                        id[HVal]   = id[Val];   id[Val]   = ++i;
                         
                         next();
                         

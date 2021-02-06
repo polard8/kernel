@@ -4,23 +4,17 @@
 #include "gfe.h"
 
 
-//#define TEDITOR_VERBOSE 1
-
-#define GRID_HORIZONTAL 1000
-#define GRID_VERTICAL 2000
+#define GRID_HORIZONTAL  1000
+#define GRID_VERTICAL    2000
 
 //static int running = 1;
 int running = 1;
 
 
-    //
-	// ## Janelas ##
-	//
-
-    struct window_d *main_window;
-    
-    struct window_d *gWindow;  //grid 
-    struct window_d *mWindow;  //menu
+// Windows
+struct window_d  *main_window;
+struct window_d  *gWindow;      // grid 
+struct window_d  *mWindow;      // menu
 
 //static char *dest_argv[] = { "-sujo0","-sujo1","-sujo2",NULL };
 //static unsigned char *dest_envp[] = { "-sujo", NULL };
@@ -129,7 +123,7 @@ gfeProcedure (
             //break;
 
         default:
-            debug_print ("gfe: default message"); 
+            debug_print ("gfe: default message\n"); 
             break;
     };
 
@@ -281,11 +275,13 @@ int main ( int argc, char *argv[] ){
 	// Grid.
 	//
 
+    debug_print ("gfe: Creating grid window\n");
+
     gw_left    = 4;
     gw_top     = 4;
     gw_width   = width/3;
     gw_height  = height/2;
-    gw_color   = COLOR_RED;
+    gw_color   = COLOR_RED;   //grid window.
 
 	//++
     gde_begin_paint(); 
@@ -295,7 +291,7 @@ int main ( int argc, char *argv[] ){
                            hWindow, 0, gw_color, gw_color );
 
     if ( (void *) gWindow == NULL ){
-        debug_print ("gfe: gWindow fail");
+        debug_print ("gfe: [FAIL] gWindow\n");
         gde_end_paint();
         goto fail;
     }else{
@@ -308,10 +304,14 @@ int main ( int argc, char *argv[] ){
         // #bugbug
         // Nessa chamada não temos o posicionamento do grid.
 
-	    //#obs: Acho que isso cria grid.
-	    int s = (int) gramado_system_call ( 148, (unsigned long) gWindow, 
-	                      4, (unsigned long) GRID_VERTICAL );
-	                      //4, (unsigned long) GRID_HORIZONTAL );
+        debug_print ("gfe: [148] Create a grid?\n");
+
+        //#obs: Acho que isso cria grid com 4 elementos.
+        int s = (int) gramado_system_call ( 
+                          148, 
+                          (unsigned long) gWindow, 
+                          4, 
+                          (unsigned long) GRID_VERTICAL );
 
         if (s != 0){
             debug_print ("gfe: 148 fail\n");
@@ -325,13 +325,11 @@ int main ( int argc, char *argv[] ){
     //--
 
 
-
-
-
 	//
 	// ## Mostrando bmps dentro da área de cliente ##
 	//
 
+    debug_print ("gfe: bmp?\n");
 
 	int i=0;
 	for ( i=0; i<15; i++ )
@@ -356,18 +354,18 @@ int main ( int argc, char *argv[] ){
 	    }
         apiEndPaint();
 		*/
-		
-		
-	    //Usando a API para exibir o bmp carregado. 
-	    //ACHO QUE ISSO SOMENTE PINTA NO BACKBUFFER
-	    gde_display_bmp ( (char *) b, 
-	        200, 
-	        1 + 60 + (i*24) ); 
+
+
+        // Usando a API para exibir o bmp carregado. 
+        // ACHO QUE ISSO SOMENTE PINTA NO BACKBUFFER
+
+        gde_display_bmp ( 
+            (char *) b, 
+            200, 
+            (1 + 60 + (i*24)) ); 
     };
-    
-    
-    
-	 
+ 
+ 
 	//
 	// Menu.
 	//
@@ -384,21 +382,20 @@ int main ( int argc, char *argv[] ){
     mw_top     = 2;
     mw_width   = width/3;
     mw_height  = height/2;
-    mw_color   = COLOR_GREEN;
+    mw_color   = COLOR_GREEN;    // menu window.
 
-    
+
 	//++
 	gde_begin_paint (); 
     mWindow = (void *) gde_create_window ( 
                            WT_SIMPLE, 1, 1, "MENU-WINDOW",
                            mw_left, mw_top, mw_width, mw_height,
                            hWindow, 0, mw_color, mw_color );
-                           
+
     if ( (void *) mWindow == NULL ){
-        debug_print ("gfe: mWindow fail");
+        debug_print ("gfe: [FAIL] mWindow\n");
         gde_end_paint ();
         goto fail;
-
     }else{
         gde_register_window (mWindow);            
         gde_show_window (mWindow); 

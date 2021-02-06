@@ -36,7 +36,7 @@ APIOBJ  = ../../../landlib/libcore/obj
 myObjects = crt0.o c4.o \
 ctype.o stdio.o stdlib.o string.o time.o \
 api.o \
-unistd.o math.o strtol.o strtoul.o fscanf.o fcntl.o termios.o ioctl.o \
+unistd.o strtol.o strtoul.o fscanf.o fcntl.o termios.o ioctl.o \
 rtl.o    
 
 
@@ -48,7 +48,6 @@ all: c4.o all-c jackpot-link finalize clean
 
 c4.o:
 	gcc  -c  c4.c  -Wall     $(CFLAGS) -I $(LIBC) -I $(API02) -o c4.o
-
 
 all-c:
 
@@ -62,7 +61,7 @@ all-c:
 	cp $(LIBCOBJ)/time.o    .
 	cp $(LIBCOBJ)/unistd.o  .
 
-	cp $(LIBCOBJ)/math.o  .
+#	cp $(LIBCOBJ)/math.o  .
 	cp $(LIBCOBJ)/fscanf.o  .
 
 	cp $(LIBCOBJ)/strtol.o  .

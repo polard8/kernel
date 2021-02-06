@@ -195,22 +195,31 @@ gramado-cmd:
 	-sudo cp gramado/cmd/bin/REBOOT.BIN     base/
 #	-sudo cp gramado/cmd/bin/TRUE.BIN       base/
 
-#	-sudo cp gramado/cmd/bin/SHOWFUN.BIN       base/
-#	-sudo cp gramado/cmd/bin/UNAME.BIN       base/
+#	-sudo cp gramado/cmd/bin/SHOWFUN.BIN    base/
+#	-sudo cp gramado/cmd/bin/UNAME.BIN      base/
 
 gramado-setup:
 	#::setup
 	$(Q) $(MAKE) -C gramado/setup/
 
 	sudo cp gramado/setup/bin/GDESHELL.BIN  base/
-	sudo cp gramado/setup/bin/LAUNCHER.BIN  base/
-
 	sudo cp gramado/setup/bin/GRAMCODE.BIN  base/
 	sudo cp gramado/setup/bin/SYSMON.BIN    base/
+
+	sudo cp gramado/setup/bin/LAUNCHER.BIN  base/
 	sudo cp gramado/setup/bin/LEASY.BIN     base/
 	sudo cp gramado/setup/bin/LMEDIUM.BIN   base/
 	sudo cp gramado/setup/bin/LHARD.BIN     base/
 
+	#sudo cp gramado/setup/bin/C4.BIN       base/
+	#sudo cp gramado/setup/bin/GRAMC.BIN    base/
+	#sudo cp gramado/setup/bin/GRAMC4.BIN   base/
+	#sudo cp gramado/setup/bin/GRAMCNF.BIN  base/
+
+	#sudo cp gramado/setup/bin/GFE.BIN       base/
+	#sudo cp gramado/setup/bin/REBOOT2.BIN       base/
+	sudo cp gramado/setup/bin/REBOOT3.BIN       base/
+	
 gramado-core:
 	#::hard Services
 	@echo "==================="

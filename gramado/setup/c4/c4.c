@@ -1,6 +1,11 @@
 // License: GPL-2.0
 // c4.c - C in four functions
 
+// #todo
+// This is the original code.
+// We will not change it.
+// See the project gramc4.
+
 // char, int, and pointer types
 // if, while, return, and expression statements
 // just enough features to allow self-compilation and a bit more
@@ -128,9 +133,9 @@ void next(void)
     else if (tk == '>') { if (*p == '=') { ++p; tk = Ge; } else if (*p == '>') { ++p; tk = Shr; } else tk = Gt; return; }
     else if (tk == '|') { if (*p == '|') { ++p; tk = Lor; } else tk = Or; return; }
     else if (tk == '&') { if (*p == '&') { ++p; tk = Lan; } else tk = And; return; }
-    else if (tk == '^') { tk = Xor; return; }
-    else if (tk == '%') { tk = Mod; return; }
-    else if (tk == '*') { tk = Mul; return; }
+    else if (tk == '^') { tk = Xor;  return; }
+    else if (tk == '%') { tk = Mod;  return; }
+    else if (tk == '*') { tk = Mul;  return; }
     else if (tk == '[') { tk = Brak; return; }
     else if (tk == '?') { tk = Cond; return; }
     else if (tk == '~' || tk == ';' || tk == '{' || tk == '}' || tk == '(' || tk == ')' || tk == ']' || tk == ',' || tk == ':') return;
@@ -201,7 +206,7 @@ void expr(int lev)
     if (*e == LC || *e == LI) --e; else { printf("%d: bad address-of\n", line); exit(-1); }
     ty = ty + PTR;
   }
-  else if (tk == '!') { next(); expr(Inc); *++e = PSH; *++e = IMM; *++e = 0; *++e = EQ; ty = INT; }
+  else if (tk == '!') { next(); expr(Inc); *++e = PSH; *++e = IMM; *++e = 0;  *++e = EQ;  ty = INT; }
   else if (tk == '~') { next(); expr(Inc); *++e = PSH; *++e = IMM; *++e = -1; *++e = XOR; ty = INT; }
   else if (tk == Add) { next(); expr(Inc); ty = INT; }
   else if (tk == Sub) {
@@ -216,8 +221,8 @@ void expr(int lev)
     else { printf("%d: bad lvalue in pre-increment\n", line); exit(-1); }
     *++e = PSH;
     *++e = IMM; *++e = (ty > PTR) ? sizeof(int) : sizeof(char);
-    *++e = (t == Inc) ? ADD : SUB;
-    *++e = (ty == CHAR) ? SC : SI;
+    *++e = (t == Inc)   ? ADD : SUB;
+    *++e = (ty == CHAR) ? SC  : SI;
   }
   else { printf("%d: bad expression\n", line); exit(-1); }
 
@@ -293,7 +298,7 @@ void stmt(void)
 
   if (tk == If) {
     next();
-    if (tk == '(') next(); else { printf("%d: open paren expected\n", line); exit(-1); }
+    if (tk == '(') next(); else { printf("%d: open paren expected\n", line);  exit(-1); }
     expr(Assign);
     if (tk == ')') next(); else { printf("%d: close paren expected\n", line); exit(-1); }
     *++e = BZ; b = ++e;
@@ -308,7 +313,7 @@ void stmt(void)
   else if (tk == While) {
     next();
     a = e + 1;
-    if (tk == '(') next(); else { printf("%d: open paren expected\n", line); exit(-1); }
+    if (tk == '(') next(); else { printf("%d: open paren expected\n", line);  exit(-1); }
     expr(Assign);
     if (tk == ')') next(); else { printf("%d: close paren expected\n", line); exit(-1); }
     *++e = BZ; b = ++e;
@@ -336,31 +341,35 @@ void stmt(void)
   }
 }
 
-int main(int argc, char **argv)
+
+//
+// main
+//
+
+int main (int argc, char **argv)
 {
+
   int fd, bt, ty, poolsz, *idmain;
-  int *pc, *sp, *bp, a, cycle; // vm registers
-  int i, *t; // temps
+  int *pc, *sp, *bp, a, cycle;    // vm registers
+  int i, *t;                      // temps
 
-
-    printf ("c4: Initializing ...\n");
+  printf ("c4: Initializing ...\n");
 
   --argc; ++argv;
-  if (argc > 0 && **argv == '-' && (*argv)[1] == 's') { src = 1; --argc; ++argv; }
+  if (argc > 0 && **argv == '-' && (*argv)[1] == 's') { src = 1;   --argc; ++argv; }
   if (argc > 0 && **argv == '-' && (*argv)[1] == 'd') { debug = 1; --argc; ++argv; }
   if (argc < 1) { printf("usage: c4 [-s] [-d] file ...\n"); return -1; }
 
-
-
-
-
-  if ((fd = open(*argv, 0, 0)) < 0) { printf("could not open(%s)\n", *argv); return -1; }
+  if ((fd = open(*argv, 0, 0)) < 0) { 
+    printf("could not open(%s)\n", *argv); 
+    return -1; 
+  }
 
   poolsz = 256*1024; // arbitrary size
-  if (!(sym = malloc(poolsz))) { printf("could not malloc(%d) symbol area\n", poolsz); return -1; }
-  if (!(le = e = malloc(poolsz))) { printf("could not malloc(%d) text area\n", poolsz); return -1; }
-  if (!(data = malloc(poolsz))) { printf("could not malloc(%d) data area\n", poolsz); return -1; }
-  if (!(sp = malloc(poolsz))) { printf("could not malloc(%d) stack area\n", poolsz); return -1; }
+  if (!(sym = malloc(poolsz)))    { printf("could not malloc(%d) symbol area\n", poolsz); return -1; }
+  if (!(le = e = malloc(poolsz))) { printf("could not malloc(%d) text area  \n", poolsz); return -1; }
+  if (!(data = malloc(poolsz)))   { printf("could not malloc(%d) data area  \n", poolsz); return -1; }
+  if (!(sp = malloc(poolsz)))     { printf("could not malloc(%d) stack area \n", poolsz); return -1; }
 
   memset(sym,  0, poolsz);
   memset(e,    0, poolsz);
@@ -443,8 +452,8 @@ int main(int argc, char **argv)
             if (tk != Id) { printf("%d: bad local declaration\n", line); return -1; }
             if (id[Class] == Loc) { printf("%d: duplicate local definition\n", line); return -1; }
             id[HClass] = id[Class]; id[Class] = Loc;
-            id[HType]  = id[Type];  id[Type] = ty;
-            id[HVal]   = id[Val];   id[Val] = ++i;
+            id[HType]  = id[Type];  id[Type]  = ty;
+            id[HVal]   = id[Val];   id[Val]   = ++i;
             next();
             if (tk == ',') next();
           }
@@ -457,8 +466,8 @@ int main(int argc, char **argv)
         while (id[Tk]) {
           if (id[Class] == Loc) {
             id[Class] = id[HClass];
-            id[Type] = id[HType];
-            id[Val] = id[HVal];
+            id[Type]  = id[HType];
+            id[Val]   = id[HVal];
           }
           id = id + Idsz;
         }
@@ -538,10 +547,13 @@ int main(int argc, char **argv)
     else if (i == EXIT) { printf("exit(%d) cycle = %d\n", *sp, cycle); return *sp; }
     else { printf("unknown instruction = %d! cycle = %d\n", i, cycle); return -1; }
   }
+
+  printf ("c4: done\n");
   
-  
-  
-      printf ("c4: done\n");
+  return 0;
 }
 
+//
+// End.
+//
 

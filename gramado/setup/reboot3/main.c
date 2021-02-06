@@ -4,7 +4,7 @@
 
 
 
-#include "reboot2.h"
+#include "reboot3.h"
 
 
 #define GRID_HORIZONTAL    1000
@@ -29,8 +29,12 @@ int running = 1;
     struct window_d *gWindow;          //grid 
     struct window_d *mWindow;          //menu
     struct window_d *reboot_button;    //reboot button;
+
     struct window_d *__icon1;
-    
+    struct window_d *__icon2;
+    struct window_d *__icon3;
+    struct window_d *__icon4;
+
     // criados peplo procediento de janela.
     struct window_d *test_button;
     struct window_d *check_box_window;
@@ -428,11 +432,10 @@ int main ( int argc, char *argv[] ){
     int char_count = 0;
 
 
-    unsigned long left   = 10;
-    unsigned long top    = 10;
-    unsigned long width  = 480;
-    unsigned long height = 320;
-
+    unsigned long left   = 100;
+    unsigned long top    = 100;
+    unsigned long width  = 400;
+    unsigned long height = 400;
 
 //#ifdef TEDITOR_VERBOSE
 	//printf("\n");
@@ -472,7 +475,7 @@ int main ( int argc, char *argv[] ){
                            WT_OVERLAPPED, 1, 1, 
                            "Reboot2",
                            left, top, width, height, 
-                           0, 0, COLOR_BLUE, COLOR_BLUE );  
+                           0, 0, COLOR_WINDOW, COLOR_WINDOW );  
 
     if ( (void *) hWindow == NULL ){
         printf ("reboot2: hWindow fail");
@@ -697,14 +700,41 @@ int main ( int argc, char *argv[] ){
 
 
 
+    //
+    // #test
+    //
+    
+    // Testando a criação de uma janela do tipo ícone.
+    // #obs: Esse apps não precisa desse tipo de janela. Foi somente
+    // usado para teste.
+
+    // #todo
+    // We need a way to select the icon's bmp label.
+
+	//++
+    gde_enter_critical_section (); 
+    __icon1 = (void *) gde_create_window ( 
+                           WT_ICON, 1, 1, " Icon1 ",  
+                           (10), (10), (64), (64),   
+                           hWindow, 0, xCOLOR_GRAY3, xCOLOR_GRAY3 );
+    if ( (void *) __icon1 == NULL ){
+        printf ("Couldn't create icon\n");
+        gde_exit_critical_section ();
+        return 1;
+    }else{
+        gde_register_window (__icon1);
+        gde_show_window (__icon1);
+        //gde_show_backbuffer ();  //deletar
+    };
+    gde_exit_critical_section (); 
+	//--
 
 	//++
     gde_enter_critical_section (); 
     reboot_button = (void *) gde_create_window ( 
                                  WT_BUTTON, 1, 1, 
-                                 " Reboot [F3] ",  
-                                 (width/3), ((height/4)*2), 
-                                 (width/3), (height/8),   
+                                 " Reboot [F1] ",  
+                                 (80), (10), (200), (64),   
                                  hWindow, 0, 
                                  xCOLOR_GRAY3, xCOLOR_GRAY3 );
 
@@ -721,35 +751,138 @@ int main ( int argc, char *argv[] ){
 	//--
 
 
-    //
-    // #test
-    //
-    
-    // Testando a criação de uma janela do tipo ícone.
-    // #obs: Esse apps não precisa desse tipo de janela. Foi somente
-    // usado para teste.
 
-    // #todo
-    // We need a way to select the icon's bmp label.
 
 	//++
     gde_enter_critical_section (); 
-    __icon1 = (void *) gde_create_window ( 
-                           WT_ICON, 1, 1, " Icon ",  
-                           (10), (10), (64), (64),   
+    __icon2 = (void *) gde_create_window ( 
+                           WT_ICON, 1, 1, " Icon2 ",  
+                           (10), (100), (64), (64),   
                            hWindow, 0, xCOLOR_GRAY3, xCOLOR_GRAY3 );
-    if ( (void *) __icon1 == NULL ){
+    if ( (void *) __icon2 == NULL ){
         printf ("Couldn't create icon\n");
         gde_exit_critical_section ();
         return 1;
     }else{
-        gde_register_window (__icon1);
-        gde_show_window (__icon1);
+        gde_register_window (__icon2);
+        gde_show_window (__icon2);
         //gde_show_backbuffer ();  //deletar
     };
     gde_exit_critical_section (); 
 	//--
 
+	//++
+    gde_enter_critical_section (); 
+    reboot_button = (void *) gde_create_window ( 
+                                 WT_BUTTON, 1, 1, 
+                                 " Reboot [F2] ",  
+                                 (80), (100), (200), (64),   
+                                 hWindow, 0, 
+                                 xCOLOR_GRAY3, xCOLOR_GRAY3 );
+
+    if ( (void *) reboot_button == NULL ){
+        printf ("Couldn't create button\n");
+        gde_exit_critical_section ();
+        return 1;
+    }else{
+        gde_register_window (reboot_button);
+        gde_show_window (reboot_button);
+        //gde_show_backbuffer (); //deletar
+    };
+    gde_exit_critical_section (); 
+	//--
+
+
+
+
+
+	//++
+    gde_enter_critical_section (); 
+    __icon3 = (void *) gde_create_window ( 
+                           WT_ICON, 1, 1, " Icon3 ",  
+                           (10), (200), (64), (64),   
+                           hWindow, 0, xCOLOR_GRAY3, xCOLOR_GRAY3 );
+    if ( (void *) __icon3 == NULL ){
+        printf ("Couldn't create icon\n");
+        gde_exit_critical_section ();
+        return 1;
+    }else{
+        gde_register_window (__icon3);
+        gde_show_window (__icon3);
+        //gde_show_backbuffer ();  //deletar
+    };
+    gde_exit_critical_section (); 
+	//--
+
+	//++
+    gde_enter_critical_section (); 
+    reboot_button = (void *) gde_create_window ( 
+                                 WT_BUTTON, 1, 1, 
+                                 " Reboot [F3] ",  
+                                 (80), (200), (200), (64),   
+                                 hWindow, 0, 
+                                 xCOLOR_GRAY3, xCOLOR_GRAY3 );
+
+    if ( (void *) reboot_button == NULL ){
+        printf ("Couldn't create button\n");
+        gde_exit_critical_section ();
+        return 1;
+    }else{
+        gde_register_window (reboot_button);
+        gde_show_window (reboot_button);
+        //gde_show_backbuffer (); //deletar
+    };
+    gde_exit_critical_section (); 
+	//--
+
+
+
+
+	//++
+    gde_enter_critical_section (); 
+    __icon4 = (void *) gde_create_window ( 
+                           WT_ICON, 1, 1, " Icon4 ",  
+                           (10), (300), (64), (64),   
+                           hWindow, 0, xCOLOR_GRAY3, xCOLOR_GRAY3 );
+    if ( (void *) __icon4 == NULL ){
+        printf ("Couldn't create icon\n");
+        gde_exit_critical_section ();
+        return 1;
+    }else{
+        gde_register_window (__icon4);
+        gde_show_window (__icon4);
+        //gde_show_backbuffer ();  //deletar
+    };
+    gde_exit_critical_section (); 
+	//--
+
+	//++
+    gde_enter_critical_section (); 
+    reboot_button = (void *) gde_create_window ( 
+                                 WT_BUTTON, 1, 1, 
+                                 " Reboot [F4] ",  
+                                 (80), (300), (200), (64),   
+                                 hWindow, 0, 
+                                 xCOLOR_GRAY3, xCOLOR_GRAY3 );
+
+    if ( (void *) reboot_button == NULL ){
+        printf ("Couldn't create button\n");
+        gde_exit_critical_section ();
+        return 1;
+    }else{
+        gde_register_window (reboot_button);
+        gde_show_window (reboot_button);
+        //gde_show_backbuffer (); //deletar
+    };
+    gde_exit_critical_section (); 
+	//--
+
+
+
+
+    //
+    // show
+    //
 
     gde_set_focus(main_window);
      

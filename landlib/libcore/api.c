@@ -1172,7 +1172,7 @@ dbProcedure (
  *     Para que possa ser registrada na lista windowList[].
  *     Essa lista tambem fica em kgws no kernel.
  * 
- * Cria a janela dependendo do tipo:                              
+ * Cria a janela dependendo do tipo:  
  * =================================
  * 1 - POP-UP.
  * 2 - EDIT-BOX.
@@ -1191,8 +1191,8 @@ void *gde_create_window (
     unsigned long type,        //1, Tipo de janela (popup,normal,...)
     unsigned long status,      //2, Estado da janela (ativa ou nao)
     unsigned long view,        //3, (min, max ...)
-    char *windowname,          //4, Título.                          
-    unsigned long x,           //5, Deslocamento em relação às margens do Desktop.                           
+    char *windowname,          //4, Título. 
+    unsigned long x,           //5, Deslocamento em relação às margens do Desktop. 
     unsigned long y,           //6, Deslocamento em relação às margens do Desktop.
     unsigned long width,       //7, Largura da janela.
     unsigned long height,      //8, Altura da janela.
@@ -1230,7 +1230,7 @@ void *gde_create_window (
     // Now we need to use the window server to create windows.
     // maybe this function can call the window server clint side
     // functions.
-    gde_debug_print ("gde_create_window: [DEPRECATED]\n");
+    gde_debug_print ("gde_create_window: \n");
 
     Window = (void *) system_call ( 
                           118 , 
@@ -1238,18 +1238,15 @@ void *gde_create_window (
                           (unsigned long) &message_buffer[0], 
                           (unsigned long) &message_buffer[0] );
 
-    if ( (void *) Window == NULL )
-    {
-        gde_debug_print ("gde_create_window: fail\n");
+    if ( (void *) Window == NULL ){
+        gde_debug_print ("gde_create_window: [FAIL] Window\n");
         return NULL;  
     }
-
 
     // ??
     // #teste
     // Vamos enviar a mensagem MSG_CREATE para o procedimento de janela.
     // Assim ele pode terminar de pintar nessa mesma janela.
-
 
     return (void *) Window;    
 }

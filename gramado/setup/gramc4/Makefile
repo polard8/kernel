@@ -49,9 +49,8 @@ APIOBJ  = ../../../landlib/libcore/obj
 myObjects = crt0.o gramc4.o \
 ctype.o stdio.o stdlib.o string.o time.o \
 api.o \
-unistd.o math.o strtol.o strtoul.o fscanf.o fcntl.o termios.o \
+unistd.o strtol.o strtoul.o fscanf.o fcntl.o termios.o \
 ioctl.o wait.o rtl.o    
-
 
 
 .PHONY: all all-c jackpot-link finalize clean
@@ -76,7 +75,7 @@ all-c:
 	cp $(LIBCOBJ)/time.o    .
 	cp $(LIBCOBJ)/unistd.o  .
 
-	cp $(LIBCOBJ)/math.o  .
+#	cp $(LIBCOBJ)/math.o  .
 	cp $(LIBCOBJ)/fscanf.o  .
 
 	cp $(LIBCOBJ)/strtol.o  .
@@ -94,7 +93,6 @@ all-c:
 
 jackpot-link:
 	ld -m elf_i386 -T ../link.ld -o GRAMC4.BIN $(myObjects)    
-	
 	
 
 finalize:
