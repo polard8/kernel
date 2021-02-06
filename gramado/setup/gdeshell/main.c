@@ -6623,6 +6623,111 @@ void gdeshell_exit(void)
     exit(0);
 }
 
+
+/*
+// #todo
+char gdeshell_cwd[ MAX_OSPATH ];
+void gdeshell_init_cwd( void );
+void gdeshell_init_cwd( void )
+{
+    char *p;
+    p = getenv("CWD");
+
+    if( (void*) p == NULL ){  return;  }
+
+    sprintf( gdeshell_cwd, "%s", p );
+
+    printf("gdeshell: cwd initialized.\n");
+}
+*/
+
+/*
+char *gdeshell_get_cwd( void );
+char *gdeshell_get_cwd( void )
+{
+    return (char *) gdeshell_cwd;
+}
+*/
+
+/*
+void gdeshell_StripExtension( const char *in, char *out );
+void gdeshell_StripExtension( const char *in, char *out )
+{
+	while( *in && *in != '.' )
+	{
+		*out++ = *in++;
+	}
+	
+	*out = '\0'; // NUL-terminate string.
+}
+*/
+
+/*
+char *gdeshell_FileExtension( const char *in );
+char *gdeshell_FileExtension( const char *in )
+{
+	static char exten[ 8 ];
+	char*		j;
+	char*       i;
+	
+	i = (char*)in + strlen(in);
+	j = (char*)exten + 7;
+	
+	exten[7] = '\0';
+	
+	while(*i != '.')
+	{
+		j--;
+		i--;
+		*j = *i;
+		//in--;
+	}
+	j++;
+	
+	//exten[7] = '\0'; // NUL-terminate string.
+	
+	return j;
+}
+*/
+
+/*
+void gdeshell_DirectoryPath(  char *in, char *out );
+void gdeshell_DirectoryPath(  char *in, char *out )
+{
+	char *s;
+	
+	s = in + strlen( in ) ;
+	out += strlen( in ) ;
+	
+	while( s != in && *s != '/' && *s != '\\')
+	{
+		s--;
+		out--;
+	}
+	
+	while( s != in-1)
+		*out-- = *s--;
+}
+*/
+
+/*
+char* gdeshell_GetExtensionAddress(char* string);
+char* gdeshell_GetExtensionAddress(char* string)
+{
+	char* extension;
+	
+	extension = &string[strlen(string)-1];
+	
+	while(*extension != '.' && extension != string)
+		extension--;
+	
+	return (extension+1);
+}
+*/
+
+
+
+
 /*
  *********************************************************
  * main: 

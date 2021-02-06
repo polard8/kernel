@@ -218,7 +218,7 @@ gramado-setup:
 
 	#sudo cp gramado/setup/bin/GFE.BIN       base/
 	#sudo cp gramado/setup/bin/REBOOT2.BIN       base/
-	sudo cp gramado/setup/bin/REBOOT3.BIN       base/
+	#sudo cp gramado/setup/bin/REBOOT3.BIN       base/
 	
 gramado-core:
 	#::hard Services

@@ -565,8 +565,10 @@ int main (int argc, char **argv){
     // arbitrary size
 
     // poolsz = (256*1024);    
-    poolsz = (2*1024);
-
+    // poolsz = (2*1024);
+    poolsz = 512;
+    
+    
     // Buffer.
     // sym, le, data, sp
     

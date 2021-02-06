@@ -1,0 +1,9 @@
+
+the user needs the 'data'
+not the system, not the apps.
+
+
+   users/fred/documents
+   users/fred/pictures
+   ...
+
