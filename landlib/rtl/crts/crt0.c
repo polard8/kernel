@@ -5,15 +5,12 @@
  * tentando criar um crt0 padrão
  */
 
-
-
 #include <types.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 #include <unistd.h>
-
 
 static char *argv[] = { 
     "-flag1", 
@@ -23,22 +20,21 @@ static char *argv[] = {
     NULL 
 };
 
-
 /*
-$USER: Gives current user's name.
-$PATH: Gives search path for commands.
-$PWD: Gives the path of present working directory.
-$HOME: Gives path of home directory.
-$HOSTNAME: Gives name of the host.
-$LANG: Gives the default system language.
-$EDITOR: Gives default file editor.
-$UID: Gives user ID of current user.
-$SHELL: Gives location of current user's shell program.
+	$USER:      Gives current user's name.
+	$PATH:      Gives search path for commands.
+	$PWD:       Gives the path of present working directory.
+	$HOME:      Gives path of home directory.
+	$HOSTNAME:  Gives name of the host.
+	$LANG:      Gives the default system language.
+	$EDITOR:    Gives default file editor.
+	$UID:       Gives user ID of current user.
+	$SHELL:     Gives location of current user's shell program.
 */
 
 static char *my_environ[] = { 
 
-    "DISPLAY=kgws-or-gwssrv"  //#todo
+    "DISPLAY=kgws-or-gwssrv",  //#todo
     "EDITOR=gramcode",
     "HOME=/HOME",
     "HOSTNAME=gramado",
@@ -46,21 +42,22 @@ static char *my_environ[] = {
     "LANG2=pt-br",
     "LANGX=en-br",
     "OSTYPE=gramado",   //#todo
-    "PATH=/:/BIN:/SBIN",
-    "PS1=~$",  
-    "PS2=:>",  
+    "PATH=/:/PROGRAMS:/GRAMADO",
+    "PS1=~$",
+    "PS2=:>",
     "PWD=/",             //#bugbug: This is the working directory.
     "SHELL=gdeshell",
     "TERM=noraterm",     //#bugbug
-    "TMP=/TMP"
-    "UID=no-id"          //#todo
+    "TMP=/TMP",
+    "UID=no-id",         //#todo
     "USER=anon",  
     NULL 
 };
 
 
-//See: sysdeps/x86/x86start.c
-//int x86start ( int argc, char *argv[], char *envp[] );
+// ??
+// See: sysdeps/x86/x86start.c
+// int x86start ( int argc, char *argv[], char *envp[] );
 
 
 extern int main ( int argc, char *argv[] );
@@ -71,10 +68,7 @@ extern int main ( int argc, char *argv[] );
 #define TOKENLIST_MAX_DEFAULT 80
 
 
-//
 // # importante
-//
-
 // Esses aplicativos rodam no terminal.
 // Esses aplicativos escrevem em stdout.
 // O terminal precisa conhecer esse stdout para ler.
@@ -90,15 +84,12 @@ int crt0 (void){
 
     // Retorno de main().
     int retval=0;
-    
 
     // Token support.
     char *tokenList[TOKENLIST_MAX_DEFAULT];
     char *token;
     int token_count=0;
     int index=0;
-
-
 
 
 	// #importante
@@ -109,13 +100,11 @@ int crt0 (void){
     // #define BACKBUFFER_VA     0xC0800000
     // So. We are using the top of the front buffer
     // as a shared memory. No problem for now.
-    
+ 
     char *shared_info = (char *) (0xC0800000 -0x100);
-
 
     // Environment.
     environ = my_environ;
-
 
 /*
  // #debug
@@ -130,7 +119,6 @@ int crt0 (void){
 	printf ("..\n");
 	//printf(".\n");
 	//printf("\n");
-	
 	//#debug
 	//while(1){ asm ("pause"); }
 #endif
@@ -166,11 +154,10 @@ int crt0 (void){
 
         // Salvando a contagem.
         token_count = index;
-    }; 
+    };
 
     //Finalizando a lista.
     tokenList[index] = NULL;
-
 
 
 /*
@@ -201,13 +188,12 @@ int crt0 (void){
     //
     // Initialize the library.
     //
-    
+
     // See: stdlib/stdlib.c
     libcInitRT();
-    
+
     // See: stdio/stdio.c
     stdioInitialize();
-
 
 
     // #todo
@@ -227,9 +213,7 @@ int crt0 (void){
   
     // Calling main().
 
-
     retval = (int) main ( token_count, tokenList );
-
 
     switch (retval)
     {
@@ -238,12 +222,10 @@ int crt0 (void){
             exit (0);
             break;
 
-
         case 1:
             //printf ("crt0: main returned 1\n");
             exit (1);
             break;
-
 
         //...
 
@@ -257,12 +239,10 @@ int crt0 (void){
     // No return!
     //
 
-
     //printf ("libc03-crts-crt0: *fail\n");
     exit (-1);
 
     //printf ("libc03-crts-crt0: *hang\n");
     while (1) { asm ("pause"); };
 }
-
 
