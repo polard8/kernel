@@ -864,6 +864,9 @@ void xxxHandleNextClientRequest (int fd)
 
     //printf ("VALUE {%d} \n", value);
 
+    // #important
+    // We can handle only requests.
+
     if ( value != ACTION_REQUEST )
     {
         //printf("not a request\n");
@@ -1041,7 +1044,13 @@ void xxxHandleNextClientRequest (int fd)
     //
 
     // Alguns requests nao exigem resposta,
-    if (NoReply == TRUE){
+    // Entao precisamos modificar a flag de sincronizaçao.
+    // que ainda deve estar sinalizando um request.
+    
+    if (NoReply == TRUE)
+    {
+        rtl_set_file_sync( 
+            fd, SYNC_REQUEST_SET_ACTION, ACTION_NULL );
         return;
     }
 
@@ -1125,6 +1134,9 @@ void xxxHandleNextClientRequest (int fd)
     if (n_writes>0){
        gwssrv_debug_print ("xxxHandleNextClientRequest: Response sent\n");
     }
+
+    // #bugbug
+    // Isso deixa as coisas mais lentas.
 
     gwssrv_yield();
 }
@@ -1442,7 +1454,7 @@ gwsProcedure (
             gwssrv_debug_print ("gwssrv: [2222] calling serviceAsyncCommand\n");
                         //printf ("gwssrv: [2222] calling serviceAsyncCommand\n");
             serviceAsyncCommand();
-            NoReply = TRUE;
+            NoReply = TRUE;         // No reply.
             break;
 
         // Se o cliente enviar essa mensagem, significa

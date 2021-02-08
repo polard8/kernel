@@ -138,6 +138,7 @@ int gws(void)
 // local
 int 
 gwsProcedure ( 
+    int fd,
     void *window, 
     int msg, 
     unsigned long long1, 
@@ -156,9 +157,6 @@ gwsProcedure (
 
             switch (long1){
 
-                // #test: Chamando um demo.
-                // gws_async_command(client_fd,4,9); //cat
-
                 case VK_F1: gws_clone_and_execute("editor.bin");   break;
                 case VK_F2: gws_clone_and_execute("gwm.bin");      break;
                 case VK_F3: gws_clone_and_execute("fileman.bin");  break;
@@ -169,10 +167,26 @@ gwsProcedure (
                 case VK_F7: gws_clone_and_execute("browser.bin"); break;
                 case VK_F8: gws_clone_and_execute("browser.bin"); break;
                 
-                case VK_F9 : gws_clone_and_execute("browser.bin"); break;
-                case VK_F10: gws_clone_and_execute("browser.bin"); break;
-                case VK_F11: gws_clone_and_execute("browser.bin"); break;
-                case VK_F12: gws_clone_and_execute("browser.bin"); break;
+                case VK_F9 : 
+                    gws_async_command(fd,4,1);
+                    //gws_async_command(fd,1,0);
+                    //gws_async_command(fd,4,9);  // cat
+                    //gws_async_command(fd,4,1);
+                    //gws_async_command(fd,4,2);
+                    //gws_clone_and_execute("browser.bin"); 
+                    break;
+                case VK_F10: 
+                    gws_async_command(fd,4,6);
+                    //gws_clone_and_execute("browser.bin"); 
+                    break;
+                case VK_F11: 
+                    gws_async_command(fd,4,7);
+                    //gws_clone_and_execute("browser.bin"); 
+                    break;
+                case VK_F12: 
+                    gws_async_command(fd,4,9);
+                    //gws_clone_and_execute("browser.bin"); 
+                    break;
                 // ...
             };
             break;
@@ -516,6 +530,7 @@ int main ( int argc, char *argv[] )
             // Caso contrário podemos chamar outros diálogos.
 
             gwsProcedure ( 
+                client_fd,
                 (void*) RTLEventBuffer[0], 
                 RTLEventBuffer[1], 
                 RTLEventBuffer[2], 

@@ -326,7 +326,9 @@ file *k_fopen ( const char *filename, const char *mode )
 	// Loading file.
 	//
 
+    // #bugbug
     // Loading from 'current_target_dir'
+    // But we're using the limit of the root dir. 512 entries
 
 	//#debug
 	//printf ("before_fsLoadFile: %s\n", filename );
@@ -334,14 +336,14 @@ file *k_fopen ( const char *filename, const char *mode )
     fileret = fsLoadFile ( 
                   VOLUME1_FAT_ADDRESS, 
                   current_target_dir.current_dir_address,
-                  32, //#bugbug: Number of entries.
+                  FAT16_ROOT_ENTRIES, //#bugbug: Number of entries.
                   (unsigned char *) filename, 
                   (unsigned long) f->_base,
                   f->_lbfsize );
 
     if ( fileret != 0 )
     {
-        printf ("k_fopen: [FAIL] fsLoadFile fail\n");
+        printf ("k_fopen: [FAIL] fsLoadFile\n");
         f = NULL;
         goto fail;
     }

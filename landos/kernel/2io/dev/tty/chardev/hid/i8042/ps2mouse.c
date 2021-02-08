@@ -784,17 +784,18 @@ int load_mouse_bmp (void)
 
     // #todo
     // We need to load from any directory, not only root.
+    
+    // Loading from root dir. 512 entries.
 
     fileret = (unsigned long) fsLoadFile ( 
                                   VOLUME1_FAT_ADDRESS,
                                   VOLUME1_ROOTDIR_ADDRESS, 
-                                  32, //#bugbug: Number of entries.
+                                  FAT16_ROOT_ENTRIES, //#bugbug: Number of entries.
                                   "MOUSE   BMP", 
                                   (unsigned long) mouseBMPBuffer,
                                   tmp_size );
 
     if ( fileret != 0 ){
-        //debug_print ("load_mouse_bmp: [FAIL] MOUSE.BMP\n");
         printf        ("load_mouse_bmp: [FAIL] MOUSE.BMP\n");
         goto fail;
     }
@@ -1123,13 +1124,8 @@ void ps2mouse_parse_data_packet (void)
         ps2_mouse_moving = 0;
     }; 
 
-
-    //
-    // ==== Botão ====
-    //            
-
-
-	//Apenas obtendo o estado dos botões.
+    // Botão
+    // Apenas obtendo o estado dos botões.
     mouse_buttom_1 = 0;
     mouse_buttom_2 = 0;
     mouse_buttom_3 = 0;

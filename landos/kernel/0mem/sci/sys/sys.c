@@ -1985,11 +1985,15 @@ void *sys_create_process (
     // endereço virtual começando em 0x400000 como desejado.
     
     //printf ("sys_create_process: Loading the image in the address %x\n", tmp_va);
+    
+    
+    // Loading from root dir
+    // 512 entries.
 
     fileret = (unsigned long) fsLoadFile ( 
                                   VOLUME1_FAT_ADDRESS, 
                                   VOLUME1_ROOTDIR_ADDRESS, 
-                                  32, //#bugbug: Number of entries.
+                                  FAT16_ROOT_ENTRIES, //#bugbug: Number of entries.
                                   name, 
                                   (unsigned long) tmp_va,      // virtual base address
                                   tmp_image_size );            // image size

@@ -70,13 +70,13 @@ int gwsInstallFont ( char *file_name ){
         panic ("gwsInstallFont: font_buffer\n");
     }
 
-	//
-	// Load file.
-	//
 
-    fileret = (unsigned long) fsLoadFile ( VOLUME1_FAT_ADDRESS, 
+    // Load file from root dir.
+
+    fileret = (unsigned long) fsLoadFile ( 
+                                  VOLUME1_FAT_ADDRESS, 
                                   VOLUME1_ROOTDIR_ADDRESS, 
-                                  32, //#bugbug: Number of entries.
+                                  FAT16_ROOT_ENTRIES, //#bugbug: Number of entries.
                                   (unsigned char *) file_name, 
                                   (unsigned long) font_buffer,
                                   tmp_size );

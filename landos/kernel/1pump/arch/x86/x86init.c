@@ -284,13 +284,12 @@ void __x86StartInit (void){
 	// loading image.
     
     // #bugbug
-    // Como estamos carregando do diretoório raiz
-    // O número de entradas é 512.
-    
+    // Loading from root dir. 512 entries limit.
+
     fileret = (unsigned long) fsLoadFile ( 
                                   VOLUME1_FAT_ADDRESS, 
                                   VOLUME1_ROOTDIR_ADDRESS, 
-                                  512,  //32, //#bugbug: Number of entries ON ROOT DIR ?
+                                  FAT16_ROOT_ENTRIES,    //#bugbug: number of entries.
                                   "INIT    BIN", 
                                   (unsigned long) 0x00400000,
                                   BUGBUG_IMAGE_SIZE_LIMIT );

@@ -1347,6 +1347,8 @@ fs_load_path (
     // We have the limit given by the argument,
     // that needs to be respected.
     // And we have the size of the root dir.
+    
+    unsigned long MaxEntries = FAT16_ROOT_ENTRIES;  //512
 
 
     int i=0;         // Deslocamento dentro do buffer.
@@ -1508,16 +1510,24 @@ fs_load_path (
                     panic ("fs_load_path: __dir\n");
                 }
 
-                      // IN: 
-                      // fat address, dir address, filename, file address.
+                
+                // #bugbug
+                // Se o diretório for o diretório raiz
+                // então não podemos sondr menos que 512 entradas.
+                // #todo: Temos que considerar o número de entradas
+                // exatos de um diretório.
+                // Podemos ter um limite estabelecido pelo sistema.
+                
+                // IN: 
+                // fat address, dir address, filename, file address.
+                
                 Ret = fsLoadFile ( 
                           (unsigned long) VOLUME1_FAT_ADDRESS,  // fat address
                           (unsigned long) __src_buffer,         // dir address. onde procurar. 
-                          32,                                   //#bugbug: Number of entries. 
+                          (unsigned long) MaxEntries,          // #bugbug: Number of entries. 
                           (unsigned char *) buffer,             // nome 
                           (unsigned long) __dst_buffer,         // addr. Onde carregar.
                           limits );                             // tamanho do buffer onde carregar.             
-
                 // ok.
                 if ( Ret == 0 )
                 {
@@ -1593,7 +1603,7 @@ fs_load_path (
                 Ret = fsLoadFile ( 
                           (unsigned long) VOLUME1_FAT_ADDRESS,  // fat address
                           (unsigned long) __src_buffer,         // dir address. onde procurar.
-                          32,                                   // #bugbug: Number of entries.  
+                          MaxEntries,                           // #bugbug: Number of entries.  
                           (unsigned char *) buffer,             // nome que pegamos no path 
                           (unsigned long) __dst_buffer,         // onde carregar. 
                           limits );                             // tamanho do buffer onde carregar.
@@ -3041,7 +3051,7 @@ __OK:
     Status = (int) fsLoadFile ( 
                        VOLUME1_FAT_ADDRESS, 
                        VOLUME1_ROOTDIR_ADDRESS, 
-                       32, //#bugbug: Number of entries.
+                       FAT16_ROOT_ENTRIES, //#bugbug: Number of entries.
                        file_name, 
                        (unsigned long) __file->_base,
                        __file->_lbfsize );
@@ -3634,6 +3644,11 @@ int fat16_create_new_file ( ... )
 // Podemos mudar o nome para fsFat16LoadFile().
 // Ou fs_Fat16_SFN_LoadFile()
 
+// #bugbug
+// This routine is nor respecting the number of entries
+// in the diretory. It is using the limit of the root dir
+// for all the directories, 512 entries.
+
 unsigned long 
 fsLoadFile ( 
     unsigned long fat_address,
@@ -3654,8 +3669,9 @@ fsLoadFile (
     // #bugbug: 
     // Esse eh o numero de entradas no diretorio raiz.
 
-    unsigned long MaxEntries = (unsigned long) dir_entries;
-    MaxEntries = 512;      
+    unsigned long DirEntries = (unsigned long) dir_entries;
+    unsigned long MaxEntries = (unsigned long) FAT16_ROOT_ENTRIES;
+
 
     unsigned long BufferLimit = (unsigned long) buffer_limit;
     
@@ -3729,16 +3745,31 @@ fsLoadFile (
     // usaremos o endereço passado por argumento.
     // Esperamos que nesse endereço tenha um diretório carregado.
 
+
+    if ( DirEntries > MaxEntries )
+    {
+        panic ("fsLoadFile: [FAIL] DirEntries\n");
+    }
+
+    // #test
+    // Used only for debug.
+    
+    if ( DirEntries < MaxEntries )
+    {
+        panic ("fsLoadFile: [DEBUG] DirEntries IS LESS THE 512\n");
+    }
+
+
 //load_DIR:
 
     if ( MaxEntries == 0 || MaxEntries > FAT16_ROOT_ENTRIES )
     {
-        panic ("fsLoadFile: [FAIL] max dir entries");
+        panic ("fsLoadFile: [FAIL] MaxEntries limits\n");
     }
 
 
     if ( BufferLimit == 0 ){
-        panic("fsLoadFile: [FAIL] BufferLimit fail\n");
+        panic("fsLoadFile: [FAIL] BufferLimit\n");
     }
 
     // limite maximo de uma imagem de processo.

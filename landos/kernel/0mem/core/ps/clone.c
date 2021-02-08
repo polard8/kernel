@@ -623,7 +623,9 @@ pid_t clone_and_execute_process ( const char *filename )
 
 
     // File support.
-    unsigned long dir_address = 0;
+    unsigned long dir_address = VOLUME1_ROOTDIR_ADDRESS;
+    unsigned long dir_entries = FAT16_ROOT_ENTRIES;
+
 
     char *path;
     char *name;
@@ -728,10 +730,6 @@ pid_t clone_and_execute_process ( const char *filename )
         goto __search;
     }
     */
-
-    // No caso de nenhum dos atalhos acima.
-    // Search in root dir. ("/")
-    dir_address = VOLUME1_ROOTDIR_ADDRESS;
 
 
 //
@@ -916,7 +914,7 @@ do_clone:
         goto fail;
     }
 
-    Clone->used  = 1;
+    Clone->used  = TRUE;
     Clone->magic = 1234;
     Clone->pid   = (pid_t) PID;
     
@@ -963,25 +961,31 @@ do_clone:
     }
 
 
-        // >> Load file:
-        // #importante: 
-        // Carregando a imagem do processo filho.
-        // Se o carregamento falhar, temos que abortar a clonagem,
-        // caso contrário, executa a cópia da imagem do pai. ??
-        // #bugbug: Essa rotina começou a falhar aqui. Convertendo 
-        // num formato errado.
-        // Movemos essa conversão para o início dessa função,
-        // onde checaremos se o arquivo está no diretório.
-        // #bugbug
-        // Se isso não está funcionando direito e uma thread 
-        // defeituosa fica remanescente quando digitamos um 
-        // comando errado então vamos matar a thread e o processo.
+    //
+    // Load image.
+    //
+    
+    // Loading from rootdir?
 
-        // #todo
-        // Num ambiente 'mp' precisaremos de um lock aqui.
-        
-        //#debug
-        //printf ("do_clone_execute_process: %s\n",filename);
+    // >> Load file:
+    // #importante: 
+    // Carregando a imagem do processo filho.
+    // Se o carregamento falhar, temos que abortar a clonagem,
+    // caso contrário, executa a cópia da imagem do pai. ??
+    // #bugbug: Essa rotina começou a falhar aqui. Convertendo 
+    // num formato errado.
+    // Movemos essa conversão para o início dessa função,
+    // onde checaremos se o arquivo está no diretório.
+    // #bugbug
+    // Se isso não está funcionando direito e uma thread 
+    // defeituosa fica remanescente quando digitamos um 
+    // comando errado então vamos matar a thread e o processo.
+
+    // #todo
+    // Num ambiente 'mp' precisaremos de um lock aqui.
+
+    //#debug
+    //printf ("do_clone_execute_process: %s\n",filename);
 
     unsigned long BUGBUG_IMAGE_SIZE_LIMIT = (unsigned long) (512 * 4096);
 
@@ -1009,18 +1013,20 @@ do_clone:
     // Se falhar o carregamento. 
     // Vamos destruir a thread e o processo.
 
+    // #obs:
+    // Loading from root dir. 512 entries.
 
     Status = (int) fsLoadFile ( 
                        VOLUME1_FAT_ADDRESS, 
-                       (unsigned long) dir_address,
-                       32, //#bugbug: Number of entries. 
+                       (unsigned long) dir_address,  //#bugbug: Is it the root dir?
+                       (unsigned long) dir_entries,  //#bugbug: Number of entries. 
                        name, 
                        (unsigned long) Clone->Image,
                        BUGBUG_IMAGE_SIZE_LIMIT );
     
     if ( Status != 0 )
     {
-        Clone->control->used = 0;
+        Clone->control->used  = FALSE;
         Clone->control->magic = 0;
         Clone->control->state = DEAD;
         Clone->control == NULL;

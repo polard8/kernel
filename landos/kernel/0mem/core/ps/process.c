@@ -931,7 +931,7 @@ int processCopyProcess ( pid_t p1, pid_t p2 ){
             // Quantos descritores de arquivo apontam para essa mesma estrutura.
             __f->fd_counter++;
         }
-    }
+    };
 
 
     // O fluxo padrão foi criando antes em klib/kstdio.c
@@ -1028,7 +1028,6 @@ int processCopyProcess ( pid_t p1, pid_t p2 ){
     }
     tty_start (Process2->tty);
     //--
-
 
     // panic()
     debug_print ("processCopyProcess: [FIXME] No slot for tty\n");
@@ -2933,6 +2932,9 @@ process_execve (
     // pois ate o momento somente o kernel tem mais que isso.
 
     unsigned long BUGBUG_IMAGE_SIZE_LIMIT = (512 * 4096);
+    
+    
+    // Load file from root dir.
 
     Status = (int) fsLoadFile ( VOLUME1_FAT_ADDRESS, 
                        VOLUME1_ROOTDIR_ADDRESS, 

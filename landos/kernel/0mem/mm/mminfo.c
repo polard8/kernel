@@ -345,13 +345,12 @@ void testingPageAlloc (void){
 	//8KB. Para imagem pequena.
 	unsigned long tmp_size = (2*4096);
 	RetAddress = (void *) allocPages (2); 
-	
-	if ( (void *) RetAddress == NULL )
-	{
-	    printf ("RetAddress fail\n");
-        goto fail;		
-	}
-		
+
+    if ( (void *) RetAddress == NULL ){
+        printf ("RetAddress fail\n");
+        goto fail;
+    }
+
 	//printf ("BaseOfList={%x} Showing #32 \n", RetAddress );
     
 	// show info.
@@ -371,15 +370,15 @@ void testingPageAlloc (void){
 
     //===================================
 
-    fileret = fsLoadFile (  VOLUME1_FAT_ADDRESS, 
+    fileret = fsLoadFile (  
+                  VOLUME1_FAT_ADDRESS, 
                   VOLUME1_ROOTDIR_ADDRESS, 
-                  32, //#bugbug: Number of entries. 
+                  FAT16_ROOT_ENTRIES, //#bugbug: Number of entries. 
                   "BMP1    BMP", 
                   (unsigned long) RetAddress,
                   tmp_size ); 
 
-	if (fileret != 0)
-	{
+    if (fileret != 0){
 		printf ("BMP1    BMP FAIL\n");
 		//escrevendo string na janela
 	    //draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "DENNIS  BMP FAIL");
@@ -387,13 +386,11 @@ void testingPageAlloc (void){
 		//draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "GOONIES BMP FAIL");	
         //draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "GRAMADO BMP FAIL");
 		//draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "BMP1    BMP FAIL");
-	}else{
-		
-	    bmpDisplayBMP ( (char *) RetAddress, 20, 20 );	
-	    refresh_rectangle ( 20, 20, 16, 16 );
+    }else{
+        bmpDisplayBMP ( (char *) RetAddress, 20, 20 );	
+        refresh_rectangle ( 20, 20, 16, 16 );
     };
     //===================================	
-
 
     panic ("mminfo-testingPageAlloc: *hang\n");
 

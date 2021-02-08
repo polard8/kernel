@@ -1082,6 +1082,7 @@ void *gde_extra_services (
          buf_to_r3 = (void*) allocPages (50); //50*4 = 200KB
  
          //OUT: status
+         // #bugbug: numero de parametros da funçao.
          fsLoadFile ( VOLUME1_FAT_ADDRESS, 
                       VOLUME1_ROOTDIR_ADDRESS, 
                       (const char*) arg2, //name 
@@ -1205,7 +1206,7 @@ void *sci0 (
     if ( (void *) CurrentColorScheme == NULL ){
         panic ("sci0: CurrentColorScheme\n");
     }else{
-        if ( CurrentColorScheme->used != 1 || 
+        if ( CurrentColorScheme->used  != TRUE || 
              CurrentColorScheme->magic != 1234 )
         {
             debug_print ("sci0: CurrentColorScheme\n");

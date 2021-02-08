@@ -11,7 +11,6 @@
  *
  * History:
  *     2013 - Created by Fred Nora.
- *     2016 - Revision.
  */
 
 
@@ -63,10 +62,13 @@ void bg_load_image (void)
   
     if (status < 0)
     {
+        // Load from root dir.
+        
         // See: read.c
-        status = (int) fsLoadFile ( VOLUME1_FAT_ADDRESS, 
+        status = (int) fsLoadFile ( 
+                           VOLUME1_FAT_ADDRESS, 
                            VOLUME1_ROOTDIR_ADDRESS, 
-                           32, //#bugbug: Number of entries.
+                           FAT16_ROOT_ENTRIES, //#bugbug: Number of entries.
                            "ANIMAL  BMP", 
                            (unsigned long) __buffer,
                            tmp_size );
