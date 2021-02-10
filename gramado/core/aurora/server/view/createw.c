@@ -131,9 +131,8 @@ createwDrawFrame (
 
     // #todo
     // check window.
-    if ( (void*) window == NULL )
-    {
-        gwssrv_debug_print ("createwDrawFrame: window\n");
+    if ( (void*) window == NULL ){
+        gwssrv_debug_print ("createwDrawFrame: [FAIL] window\n");
         return -1;
     }
 
@@ -195,15 +194,17 @@ createwDrawFrame (
     unsigned long offset = 
         ( ( (unsigned long) window->width - ( (unsigned long) tmp_size * (unsigned long) gcharWidth) ) / 2 );
 
-    if ( window->type == WT_OVERLAPPED)
+    if ( window->type == WT_OVERLAPPED )
     {
             // Se tiver o foco.
             if ( window->focus == 1 ){
                 border_color = COLOR_BLUE1;
                 border_size = 3;
+                //border_size = 8;
             }else{
                 border_color = COLOR_INACTIVEBORDER;
                 border_size = 2;
+                //border_size = 8;
             };
             
         // Quatro bordas.
@@ -236,14 +237,14 @@ createwDrawFrame (
         // We're gonna have a wm inside the window server.
         // The title bar will be very simple.
         // We're gonna have a client area.
+        
         window->titlebar_height = 32;
 
         // Title bar
         TitleBar = (void *) createwCreateWindow2 ( 
-                                    WT_SIMPLE, 
-                                    1, 1, "TITLE", 
-                                    3, 3, 
-                                    (window->width - 3 - border_size),     window->titlebar_height, 
+                                    WT_SIMPLE, 1, 1, "TITLE", 
+                                    border_size, border_size, 
+                                    (window->width - border_size - border_size), window->titlebar_height, 
                                     (struct gws_window_d *) window, 
                                     0, COLOR_BLUE1, COLOR_BLUE1 );  
 
@@ -272,7 +273,8 @@ createwDrawFrame (
         //dtextDrawString ( (window->left) + offset, (window->top)  +8, 
             //COLOR_WHITE, window->name );
             
-        dtextDrawString ( (TitleBar->left) + offset, (TitleBar->top)  +8, 
+        dtextDrawString ( 
+            (TitleBar->left) + offset, (TitleBar->top)  +8, 
             COLOR_WHITE, TitleBar->name );
         //  control ?
         // ... 

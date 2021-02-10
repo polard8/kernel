@@ -267,13 +267,12 @@ is_within (
                  y >= window->top    &&
                  y <= window->bottom )
             {
-                return 1;
+                return TRUE;
             }
         }
     }
-    
-    // No!
-    return 0;
+
+    return FALSE;
 }
 
 
