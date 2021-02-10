@@ -61,42 +61,73 @@ sysmonProcedure (
 // Usado para testar o timer.
 void update_cpu_usage (void)
 {
-    unsigned long __idle_value=0;
-    unsigned long __value=0;
-    int i=0;
+
+    unsigned long __idle_percentage_value=0;
+
+    // iterator to draw the indicators.
+    int ColumnCounter=0;
+
+    // Position of the indicator during the loop.
+    unsigned long xPos=0;
+    unsigned long yPos=0;
+
+
+    // The idle percentage given by the profiler.
+    // Get current idle value.
+    // See: profiler_percentage_idle_thread
+    __idle_percentage_value = (unsigned long) gramado_system_call ( 777, 0, 0, 0);
+
+
+    // Increment the counter.
+    //__count++;
 
 
 
-    __count++;
-    //printf ("%d ",__count);
+    // Save.
+    // Nunca maior que 32.
 
-    __idle_value = (unsigned long) gramado_system_call ( 777, 0, 0, 0);
+    if (__count<32){
+        CPU_USAGE[__count] = __idle_percentage_value;
+    }
 
-	//__value = (100 - __idle_value);
-	//CPU_USAGE[__count] = __value;
-    CPU_USAGE[__count] = __idle_value;
-
+    // After 32 times we have all the info we need.
 
     if (__count >= 32)
     {
+        // Reset the global counter.
         __count = 0;
+        
+        // Reset the idle percentage value.
+        __idle_percentage_value = 0;
 
-		//limpa
-		gde_redraw_window ( cpu_window, 1 );
-        //for (i=0; i<32; i++)
-        for (i=1; i<32; i++)
+        // Clean the target window.
+        gde_redraw_window ( cpu_window, 1 );
+
+        // Print 32 columns.
+
+        for (ColumnCounter=0; ColumnCounter<32; ColumnCounter++)
         {
-			//printf ("%d ", (unsigned long) CPU_USAGE[i]);
+            //#debug
+            //printf ("%d ", (unsigned long) CPU_USAGE[i]);
+            
+            // 8 is the char width.
+            xPos = (ColumnCounter*8);
+            yPos = CPU_USAGE[ColumnCounter];
+             
             gde_draw_text( 
-                cpu_window, 
-                (i*8), 
-                CPU_USAGE[i], 
-                COLOR_BLACK, "+");
+                cpu_window,   // Target window. 
+                xPos,         // x position.
+                yPos,         // y position.
+                COLOR_GREEN,  // indicator color. 
+                "." );        // indicator.
         };
         gde_show_window (cpu_window);
     }
 
-	//printf ("fim\n");
+    // Increment the counter.
+    __count++;
+
+    //debug
     //printf ("cpu usage: %d percent \n", __value);
 }
 
@@ -145,7 +176,7 @@ void test_cpu (struct window_d *window)
     cpu_window = (void *) gde_create_window ( 1, 1, 1, 
                               "cpu-usage",  
                                40+4, 2, (32*8), 40-4, 
-                               window, 0, COLOR_YELLOW, COLOR_YELLOW );
+                               window, 0, COLOR_BLACK, COLOR_BLACK );
     gde_register_window (cpu_window);
     gde_show_window (cpu_window);
     gde_exit_critical_section ();
@@ -170,8 +201,10 @@ void test_cpu (struct window_d *window)
 
 
 // internal
+// Mostra as informaçoes na area de cliente.
 // #todo: ordenar por pid
-void showinfo_button1(void)
+
+void ShowInfoOnClientArea(void)
 {
 
     char __pid_buffer[8];
@@ -238,7 +271,6 @@ void showinfo_button1(void)
          }
     };
 
-
     // refresh screen
     gde_show_backbuffer ();
 }
@@ -259,38 +291,36 @@ sysmonProcedure (
     unsigned long long2 )
 {
 
-
-    if ( msg<0 )
+    if ( msg<0 ){
         return -1;
+    }
 
-    switch (msg)
-    {
+
+    switch (msg){
 
         case MSG_SYSKEYDOWN:
             switch (long1)
             {  
                 case VK_F1: 
-                    debug_print("sysmon: [F1]"); 
-                    showinfo_button1();
+                    debug_print("sysmon: [F1]\n"); 
+                    ShowInfoOnClientArea();
                     return 0;
                     break;
 
                 case VK_F2: 
-                    debug_print("sysmon: [F2]"); 
+                    debug_print("sysmon: [F2]\n"); 
                     // IN: parent window.
                     test_cpu (client_bar_Window);
                     return 0;
                     break;
 
                 case VK_F3: 
-                    debug_print("sysmon: [F3]"); 
+                    debug_print("sysmon: [F3]\n"); 
                     return 0;
                     break;
 
                 case VK_F4: 
-                    debug_print("sysmon: [F4]"); 
-                    // IN: parent window.
-                    test_cpu (client_bar_Window);
+                    debug_print("sysmon: [F4]\n"); 
                     return 0;
                     break;
 
@@ -299,32 +329,27 @@ sysmonProcedure (
             break;
 
 
-        case MSG_SYSKEYUP:  
-            goto done;
+        case MSG_SYSKEYUP:
+            return 0;
             break;
-
 
         //case MSG_CREATE:  break;
 
 
         case MSG_TIMER:
             debug_print("sysmonProcedure: MSG_TIMER\n");
-            update_cpu_usage ();
+            update_cpu_usage();
             return 0;
             break;
 
-
         case MSG_SETFOCUS:
-            gde_redraw_window (main_window, 1);
-            gde_redraw_window (main_window, 1);
-            gde_redraw_window (main_window, 1);
-            gde_redraw_window (main_window, 1);
-            gde_redraw_window (main_window, 1);
+            debug_print("sysmonProcedure: MSG_SETFOCUS\n");
             gde_redraw_window (main_window, 1);
             break;
-        
-        
+
         case MSG_KILLFOCUS:  
+            debug_print("sysmonProcedure: MSG_KILLFOCUS\n");
+            return 0;
             break;
 
 
@@ -340,27 +365,46 @@ sysmonProcedure (
                 case 1:
                     if (window == main_window)
                     {
+                        debug_print("sysmonProcedure: [BU] main_window\n");
                         gde_set_focus (window);
                         gde_redraw_window (window,1);
                         // #todo: we need to redraw all other windows.
+                        gde_redraw_window (data_window,1);
+
+                        // Repintura no caso de button up
+                        gramado_system_call ( 9901,   
+                            (unsigned long) bar_button_1, 
+                            (unsigned long) bar_button_1, 
+                            (unsigned long) bar_button_1 ); 
+
+                        // Repintura no caso de button up
+                        gramado_system_call ( 9901,   
+                            (unsigned long) bar_button_2, 
+                            (unsigned long) bar_button_2, 
+                            (unsigned long) bar_button_2 ); 
+                            
                         return 0;
                     }
 
                     if ( window == bar_button_1 )
                     {
+                        debug_print("sysmonProcedure: [BU] bar_button_1\n");
                         gde_redraw_window (data_window,1);
+                        // Repintura no caso de button up
                         gramado_system_call ( 9901,   
                             (unsigned long) window, 
                             (unsigned long) window, 
                             (unsigned long) window ); 
-                        showinfo_button1();
+                        ShowInfoOnClientArea();
                         return 0;
                         break;
                     }
 
                     if ( window == bar_button_2 )
                     {
-                        gde_redraw_window (data_window,1);
+                        debug_print("sysmonProcedure: [BU] bar_button_2\n");
+                        //gde_redraw_window (data_window,1);
+                        // Repintura no caso de button up
                         gramado_system_call ( 9901,   
                             (unsigned long) window, 
                             (unsigned long) window, 
