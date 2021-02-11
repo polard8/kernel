@@ -2339,6 +2339,12 @@ void fsInitializeWorkingDiretoryString (void)
 
 void fsInitTargetDir (void)
 {
+    int i=0;
+    
+    for ( i=0; i<11; i++ ){
+        current_target_dir.name[i] = '\0';
+    };
+
     current_target_dir.current_dir_address = VOLUME1_ROOTDIR_ADDRESS;
     current_target_dir.name[0] = '/';  //root dir
     current_target_dir.name[1] = 0;
@@ -2355,26 +2361,26 @@ void fsInitTargetDir (void)
 // handle return value ...
 // What functions is calling us?
 
-int fs_initialize_process_pwd ( int pid, char *string )
+int fs_initialize_process_cwd ( int pid, char *string )
 {
     struct process_d *p;
     int i=0;
 
 
     if (pid<0){
-        debug_print ("fs_initialize_process_pwd: pid\n");
+        debug_print ("fs_initialize_process_cwd: pid\n");
         return 1;
     }
 
     // string
 
     if ( (void *) string == NULL ){
-        panic ("fs_initialize_process_pwd: string\n");
+        panic ("fs_initialize_process_cwd: string\n");
         //return 1;
     }
 
     if (*string == 0){
-        panic ("fs_initialize_process_pwd: *string\n");
+        panic ("fs_initialize_process_cwd: *string\n");
         //return 1;
     }
 
@@ -2386,10 +2392,10 @@ int fs_initialize_process_pwd ( int pid, char *string )
     p = (struct process_d *) processList[pid];
 
     if ( (void *) p == NULL ){
-        panic ("fs_initialize_process_pwd: p\n");
+        panic ("fs_initialize_process_cwd: p\n");
     }else{
         if ( p->used != 1 || p->magic != 1234 ){
-            panic ("fs_initialize_process_pwd: validation\n");
+            panic ("fs_initialize_process_cwd: validation\n");
         }
 
         // ?? fixed size.
@@ -2604,7 +2610,7 @@ void fsUpdateWorkingDiretoryString ( char *string )
 // ou usamos o cwd do processo ou
 // o diretorio raiz para paths absolutos.
 
-void sys_cd_command( char *string )
+void sys_cd_command ( const char *string )
 {
     int i=0;
 
@@ -2617,20 +2623,50 @@ void sys_cd_command( char *string )
         debug_print("sys_cd_command: *string\n");
         return;
     }
-    
-    // reset
-    if (string[0] == '/' && string[1] == 0 )
-    {
-        debug_print("sys_cd_command: reseting\n");
-        current_target_dir.current_dir_address = VOLUME1_ROOTDIR_ADDRESS;
-        for ( i=0; i<11; i++ ){
-            current_target_dir.name[i] = '\0';
-        };
-        current_target_dir.name[0] = '/';
-        current_target_dir.name[1] = '\0';
-        //return;
-    }
 
+
+    // Reset global structure and cwd on process structure.
+
+
+    // #bugbug
+    // Talvez esse tipo de tratamento precise 
+    // ser feito pelo próprio shell.
+
+    if ( string[1] == 0 )
+    {
+        //$ cd /
+        if (string[0] == '/')
+        {
+            debug_print("sys_cd_command: reseting\n");
+            
+            fsInitTargetDir();
+
+
+            // We also need to clean the name in the process structure.
+            
+            //#bugbug: invalid pid
+            //fs_initialize_process_cwd ( current_directory, "/" );
+
+            return;
+        }
+
+        //$ cd ~
+        if (string[0] == '~')
+        {
+            debug_print("sys_cd_command: going to Home\n");
+
+            // fsInitTargetDir();
+            
+            //#bugbug: invalid pid
+            //fs_initialize_process_cwd ( current_directory, "~" );
+            
+            return;
+        }
+
+        // ...
+
+        return;
+    }
 
     // Atualiza na estrutura de processo.
     // Atualiza na estrutura global para diretorio alvo.
@@ -3232,10 +3268,10 @@ int fsLoadFileFromCurrentTargetDir (void)
     Ret = (int) fsLoadFile ( 
                     VOLUME1_FAT_ADDRESS,                       // fat cache address
                     current_target_dir.current_dir_address,    // src dir address 
-                    32, //#bugbug: Number of entries.          // number of entries.
+                    FAT16_ROOT_ENTRIES, //#bugbug: Number of entries.          // number of entries.
                     (unsigned char *) current_target_dir.name,                 // file name 
                     (unsigned long)   current_target_dir.current_dir_address,  // file address
-                    4096 );                                    // buffer limit 4KB.
+                    4096 );                                    // #bugbug buffer limit 4KB.
     scheduler_unlock ();
     taskswitch_unlock ();
     //--
@@ -3632,6 +3668,7 @@ int fat16_create_new_file ( ... )
  *     dir_addresss = Directory address.
  *     dir_entries  = Number of entries in the given directory.
  *     file_name    = File name.
+ *     file_address = Where to load the file. The buffer.
  *     buffer_limit = Maximum buffer size.
  * 
  * OUT: 
@@ -3655,7 +3692,7 @@ fsLoadFile (
     unsigned long dir_address,
     int dir_entries,
     const char *file_name, 
-    unsigned long file_address,
+    unsigned long buffer,
     unsigned long buffer_limit )
 {
 
@@ -3672,10 +3709,10 @@ fsLoadFile (
     unsigned long DirEntries = (unsigned long) dir_entries;
     unsigned long MaxEntries = (unsigned long) FAT16_ROOT_ENTRIES;
 
-
+    // Where to load the file.
+    unsigned long Buffer      = (unsigned long) buffer;
     unsigned long BufferLimit = (unsigned long) buffer_limit;
-    
-    
+
     unsigned long z = 0;       //Deslocamento do rootdir 
     unsigned long n = 0;       //Deslocamento no nome.
 
@@ -4075,21 +4112,60 @@ __loop_next_entry:
     //tmp_table[tmp_table_index] = cluster;
     //tmp_table_index++;
 
+    // #todo
+    // Create some limits for 'Buffer'.
+    // We can not load a file in the same address of the
+    // base kernel or the rootdir ...
+    // See: gva.h
+    
+    // #test
+    // Protectng some core areas.
+    // We can use a helper function for this validation.
+
+    // fat
+    if ( Buffer == VOLUME1_FAT_ADDRESS_VA ){
+        panic("fsLoadFile: [FAIL] can not load at VOLUME1_FAT_ADDRESS_VA\n");
+    }
+
+    // rootdir
+    if ( Buffer == VOLUME1_ROOTDIR_ADDRESS_VA ){
+        panic("fsLoadFile: [FAIL] can not load at VOLUME1_ROOTDIR_ADDRESS_VA\n");
+    }
+
+    // base kernel
+    if ( Buffer == KERNEL_IMAGE_BASE ){
+        panic("fsLoadFile: [FAIL] can not load at KERNEL_IMAGE_BASE\n");
+    }
+
+    // lfb
+    if ( Buffer == DEFAULT_LFB_VIRTUALADDRESS ){
+        panic("fsLoadFile: [FAIL] can not load at DEFAULT_LFB_VIRTUALADDRESS\n");
+    }
+
+    // backbuffer
+    if ( Buffer == DEFAULT_BACKBUFFER_VIRTUALADDRESS ){
+        panic("fsLoadFile: [FAIL] can not load at DEFAULT_BACKBUFFER_VIRTUALADDRESS\n");
+    }
+
+
     //
     // Read LBA.
     //
 
-    read_lba ( file_address, VOLUME1_DATAAREA_LBA + cluster -2 ); 
-
-
     // Caution!
+    // Read lba.
     // Increment buffer base address.
     // Pega o próximo cluster na FAT.
     // Configura o cluster atual.
     // Ver se o cluster carregado era o último cluster do arquivo.
     // Vai para próxima entrada na FAT.
 
-    file_address = (unsigned long) (file_address + SectorSize); 
+
+    read_lba ( 
+        Buffer, 
+        ( VOLUME1_DATAAREA_LBA + cluster -2 ) ); 
+
+    Buffer = (unsigned long) (Buffer + SectorSize); 
 
     next = (unsigned short) fat[cluster];
 

@@ -2036,10 +2036,10 @@ void *sys_create_process (
     if ( (void *) p == NULL ){
         panic ("sys_create_process: [FAIL] p\n");
     }else{
-        fs_initialize_process_pwd ( p->pid, "no-pwd" );
+        fs_initialize_process_cwd ( p->pid, "/" );
     };
-    
-    
+
+
      //
      // == page table =========================
      //

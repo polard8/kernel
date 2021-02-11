@@ -388,7 +388,7 @@ int fs_get_free_fd_from_pid (int pid);
 
 
 // Atualiza a string do pwd na estrutura do processo. 
-int fs_initialize_process_pwd ( int pid, char *string ); 
+int fs_initialize_process_cwd ( int pid, char *string ); 
 
 
 // cwd
@@ -420,7 +420,7 @@ void fsUpdateWorkingDiretoryString ( char *string );
 
 void sys_pwd(void);
 
-void sys_cd_command( char *string);
+void sys_cd_command ( const char *string );
 
 
 /* 
@@ -574,7 +574,7 @@ fsLoadFile (
     unsigned long dir_address,
     int dir_entries,
     const char *file_name, 
-    unsigned long file_address,
+    unsigned long buffer,
     unsigned long buffer_limit );
 
 //not tested yet

@@ -46,7 +46,6 @@
 
 
 
-
 // Podemos alocar memória para isso, liberando esse espaço?
 #define MBR_ADDRESS            0x00020000  
 
@@ -141,7 +140,6 @@
 
 // pagetable para o lfb.
 #define PAGETABLE_FRONTBUFFER  0x0008B000
-
 
 // Pagetable para o CGA em user mode.
 // Aquele memoria de modo texto colorido.

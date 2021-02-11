@@ -324,7 +324,7 @@ void __x86StartInit (void){
     if ( (void *) InitProcess == NULL ){
         panic ("__x86StartInit: InitProcess\n");
     }else{
-        fs_initialize_process_pwd ( InitProcess->pid, "no-pwd" );
+        fs_initialize_process_cwd ( InitProcess->pid, "/" );
     };
 
 
@@ -630,7 +630,7 @@ int x86main (void)
     if ( (void *) KernelProcess == NULL ){
         panic ("[x86] x86main: KernelProcess\n");
     }else{
-        fs_initialize_process_pwd ( KernelProcess->pid, "no-directory" ); 
+        fs_initialize_process_cwd ( KernelProcess->pid, "/" ); 
         //...
     };
 
