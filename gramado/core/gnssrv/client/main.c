@@ -292,8 +292,8 @@ int gnst_hello (int fd)
  * main:
  * 
  * 
- * 
  */
+
 int main ( int argc, char *argv[] ){
 
 

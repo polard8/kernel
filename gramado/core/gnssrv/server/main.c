@@ -281,8 +281,7 @@ void __socket_messages (int fd){
     //
 
     n_writes = write ( fd, __buffer, sizeof(__buffer) );
-    if (n_writes<=0)
-    {
+    if (n_writes<=0){
         debug_print ("gnssrv: __socket_messages Response fail\n");
     }
 
@@ -358,9 +357,10 @@ gnsProcedure (
 
 
     debug_print ("gnssrv: gnsProcedure\n");
-  
-    switch (msg)
-    {
+
+
+    switch (msg){
+
         // Com essa mensagem o cliente solicita input.
         // então devemos drenar input usado loop de mensagens e
         // repassar para o cliente via socket.
@@ -422,29 +422,14 @@ gnsProcedure (
             printf ("\n");
             return 0;
             break; 
-           
-        case 1002:
-            break;
 
-               
-        case 1003:
-            break;
-               
-             
-        case 2000:
-            break;
- 
-        case 2001:
-            break;
-             
-             
-        case 2002:
-            break;
-             
-             
-        case 2003:
-            break;
+        //case 1002:  break;
+        //case 1003:  break;
 
+        //case 2000:  break;
+        //case 2001:  break;
+        //case 2002:  break;
+        //case 2003:  break;
 
         //MSG_GNS_SHUTDOWN
         case 2010:
@@ -453,12 +438,10 @@ gnsProcedure (
 
         case 2020:
              break;
-             
 
         // Refresh rectangle ... 
         case 2021:
             break;
-            
             
         //MSG_GNS_PROTOCOL
         case 3000:
@@ -610,8 +593,7 @@ int main (int argc, char **argv){
 
 
     // Global flag for the loop.
-    running = 1;
-
+    running = TRUE;
 
 
     // Serial debug.
@@ -679,13 +661,16 @@ int main (int argc, char **argv){
     //
     // Calling child.
     //
+    
+    // #obs
+    // Suspended ...
+    // We are launching the server in background
+    // and calling the child via command interpreter.
+
 
     //printf ("gnssrv: Calling child \n");
 
-    //xxxx_clone_and_execute ("gns.bin"); 
-    //xxxx_clone_and_execute ("??.bin");  
-    //xxxx_clone_and_execute ("??.bin");  
-    // ...
+    //rtl_clone_and_execute ("gns.bin"); 
 
 
     //
@@ -694,8 +679,9 @@ int main (int argc, char **argv){
 
     printf ("gnssrv: [FIXME] yield \n");
 
-    for (i=0; i<11; i++)
+    for (i=0; i<11; i++){
         gnssrv_yield();
+    };
 
 
     //
@@ -720,29 +706,20 @@ int main (int argc, char **argv){
     // Accept connection from a client. 
     
     while (1){
-
-        newconn = accept ( ____saved_server_fd, 
+        newconn = accept ( 
+                      ____saved_server_fd, 
                       (struct sockaddr *) &server_address, 
                       (socklen_t *) addrlen );
-    
 
-        if (newconn < 0) {
-            debug_print ("gnssrv: ERROR on accept\n");
+        if (newconn < 0){
+            debug_print ("gnssrv: [FAIL] Error on accept\n");
             gnssrv_yield(); 
-
-        // Request from the new connection 
         }else{
-
-            //accept2 esta retornando ofd do cliente. 
-            //vamos tentar usa-lo.
             __socket_messages (newconn);
-            
-
-            //#bugbug: We can not close if we are using accept2.
-            //shutdown(newconn, SHUT_RDWR);         
-            //close(newconn);
         };
     };
+
+
 
     //
     // =======================================
@@ -758,10 +735,13 @@ int main (int argc, char **argv){
 
 
 
-//yield thread.
+// yield thread.
 void gnssrv_yield(void)
 {
+    // #todo
+    // Use the sc 82. 
     gramado_system_call (265,0,0,0); 
+    //  sc82 (265,0,0,0);
 }
 
 
