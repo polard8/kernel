@@ -8,8 +8,9 @@
 // #todo: maybe create a 'enum'
 
 #define SPRITE_NULL   0
-#define SPRITE_LINE   1
-#define SPRITE_CIRCLE 2
+#define SPRITE_POINT  1
+#define SPRITE_LINE   2
+#define SPRITE_CIRCLE 3
 // ...
 
 
@@ -19,6 +20,18 @@ struct gws_sprite_d
     int magic;
     
     int type;
+    
+    // basics
+    int x1;
+    int y1;
+    int z1;
+    unsigned long color1;
+    int x2;
+    int y2;
+    int z2;
+    unsigned long color2;
+
+    int r;
     
     // ...
 };

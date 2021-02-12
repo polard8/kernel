@@ -237,6 +237,45 @@ void demoSA1(void)
 
 
 
+void demoTriangle(void)
+{
+    struct gr_triandle_d *triangle;
+
+
+    //printf("demoTriangle:\n");
+
+    triangle = (void *) malloc( sizeof( struct gr_triandle_d ) );
+    if ( (void*) triangle != NULL )
+    {
+
+        triangle->p[0].x = 0;
+        triangle->p[0].y = 0;
+        triangle->p[0].z = 0;
+        triangle->p[0].color = COLOR_RED;
+
+        triangle->p[1].x = 80;
+        triangle->p[1].y = 80;
+        triangle->p[1].z = 0;
+        triangle->p[1].color = COLOR_GREEN;
+
+        triangle->p[2].x = -80;
+        triangle->p[2].y = 80;
+        triangle->p[2].z = 0;
+        triangle->p[2].color = COLOR_BLUE;
+
+        rectBackbufferDrawRectangle ( 0, 0, 320, 200, COLOR_BLACK, 1 );
+        xxxTriangleZ(triangle);
+    }
+
+    gws_refresh_rectangle(0,0,320,200);
+     
+     //Debug
+     //exit(0);
+
+    //printf("demoTriangle: done\n");
+}
+
+
 // inflate varias vezes.
 //only on jail
 void demoCube1(void)
@@ -624,11 +663,11 @@ void demos_startup_animation(int i)
     
     case 9: demoCat();  break;
     
+    case 10: demoTriangle(); break;
+    
     default: break;
     };
 }
-
-
 
 
 

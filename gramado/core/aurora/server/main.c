@@ -2210,9 +2210,10 @@ int serviceAsyncCommand (void)
             if (current_mode == GRAMADO_JAIL)
             {
                 printf("DEMO\n"); 
-                if( subrequest_id >=0 && subrequest_id < 10 ){
-                demos_startup_animation(subrequest_id);
-                }
+                //if( subrequest_id >=0 && subrequest_id < 10 )
+                //{
+                    demos_startup_animation(subrequest_id);
+                //}
                 gwssrv_show_backbuffer();
             }
             break;

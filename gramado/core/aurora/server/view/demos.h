@@ -34,6 +34,8 @@ void demoSA1(void);
 // ...
 
 
+void demoTriangle(void);
+
 void demoCube1(void);
 void demoCube2(void);
 

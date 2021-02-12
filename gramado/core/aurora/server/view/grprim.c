@@ -779,6 +779,37 @@ int xxxDeflateCubeZ ( struct gr_cube_d *cube, int value )
 }
 
 
+
+//#test
+int xxxTriangleZ ( struct gr_triandle_d *triangle )
+{
+
+    if ( (void*) triangle == NULL )
+        return -1;
+
+
+    // circular, sentido horario, começando pelo ponto de cima.
+
+    plotLine3d (
+        triangle->p[0].x, triangle->p[0].y, triangle->p[0].z, 
+        triangle->p[1].x, triangle->p[1].y, triangle->p[1].z, 
+        triangle->p[1].color );
+
+    plotLine3d (
+        triangle->p[1].x, triangle->p[1].y, triangle->p[1].z, 
+        triangle->p[2].x, triangle->p[2].y, triangle->p[2].z, 
+        triangle->p[2].color );
+
+    plotLine3d (
+        triangle->p[2].x, triangle->p[2].y, triangle->p[2].z, 
+        triangle->p[0].x, triangle->p[0].y, triangle->p[0].z, 
+        triangle->p[0].color );
+
+
+    return 0;
+}
+
+
 // #test
 // cube mesh
 int xxxCubeZ ( struct gr_cube_d *cube )
@@ -989,7 +1020,7 @@ int serviceGrRectangle(void)
 
 //Circle
 //This is an implementation of the circle algorithm.
-
+// ?? what means 'm' ???
 void 
 plotCircle ( 
     int xm, 
@@ -1040,6 +1071,8 @@ plotCircle (
 }
    
 
+
+// ?? what means 'm' ???
 void 
 plotCircleZ ( 
     int xm, 

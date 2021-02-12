@@ -277,6 +277,14 @@ int serviceGrRectangle(void);
 
 
 
+
+//
+// == triangle =====================================================
+//
+
+int xxxTriangleZ ( struct gr_triandle_d *triangle );
+
+
 //
 // == Cube ========================================================
 //
@@ -284,7 +292,6 @@ int serviceGrRectangle(void);
 int xxxInflateCubeZ ( struct gr_cube_d *cube, int value );
 int xxxDeflateCubeZ ( struct gr_cube_d *cube, int value );
 int xxxCubeZ ( struct gr_cube_d *cube );
-
 //sevice 2041
 int serviceGrCubeZ(void);
 

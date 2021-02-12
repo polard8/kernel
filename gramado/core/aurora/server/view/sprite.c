@@ -5,6 +5,39 @@
 
 
 
+/*
+// #todo
+// create a sprite of given types and
+// return the structure.
+// The caller will put that pointer in a list
+// to call the loop function PlotSprite3D().
+struct gws_sprite_d *create_sprite_point()
+struct gws_sprite_d *create_sprite_line()
+struct gws_sprite_d *create_sprite_circle()
+*/
+
+
+/*
+//#todo
+struct gws_sprite_d *create_sprite_point (int z, int x, int y, unsigned long color);
+struct gws_sprite_d *create_sprite_point (int z, int x, int y, unsigned long color)
+{
+    struct gws_sprite_d *sprite;
+
+    sprite = (struct gws_sprite_d *) malloc( sizeof(struct gws_sprite_d) );
+    
+    // todo check.
+    
+    sprite->x1 = x;
+    sprite->y1 = y;
+    sprite->z1 = z;
+    sprite->color1 = color;
+
+    return (struct gws_sprite_d *) sprite;
+}
+*/
+
+
 
 /*
  * PlotSprite3D:
@@ -90,12 +123,35 @@ PlotSprite3D (
             gwssrv_debug_print("PlotSprite3D: [SPRITE_NULL] \n");
             break;
         
+        case SPRITE_POINT:
+            gwssrv_debug_print("PlotSprite3D: [SPRITE_POINT] \n");
+            grPlot0 ( 
+                (int) (z + sprite->z1), 
+                (int) (x + sprite->x1), 
+                (int) (y + sprite->y1), 
+                (unsigned long) sprite->color1 );
+            break;
+
         case SPRITE_LINE:
             gwssrv_debug_print("PlotSprite3D: [SPRITE_LINE] \n");
+            plotLine3d ( 
+               (int) (x + sprite->x1), 
+               (int) (y + sprite->y1), 
+               (int) (z + sprite->z1), 
+               (int) (x + sprite->x2), 
+               (int) (y + sprite->y2), 
+               (int) (z + sprite->z2), 
+               (unsigned long) sprite->color1 );
             break;
 
         case SPRITE_CIRCLE:
             gwssrv_debug_print("PlotSprite3D: [SPRITE_CIRCLE] \n");
+            plotCircleZ ( 
+                (int) (x + sprite->x1),           // xm 
+                (int) (y + sprite->y1),           // ym 
+                (int) sprite->r,                  // r 
+                (unsigned long) sprite->color1,   // color 
+                (int) (z + sprite->z1) );         // z 
             break;
             
         // ...

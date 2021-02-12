@@ -184,7 +184,8 @@ gwsProcedure (
                     //gws_clone_and_execute("browser.bin"); 
                     break;
                 case VK_F12: 
-                    gws_async_command(fd,4,9);
+                    //gws_async_command(fd,4,9);
+                    gws_async_command(fd,4,10);
                     //gws_clone_and_execute("browser.bin"); 
                     break;
                 // ...
