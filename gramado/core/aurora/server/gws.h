@@ -147,8 +147,7 @@ void xxxThread (void);
 void ____test_threads (void);
 
 
-void *
-gwssrv_create_thread ( 
+void *gwssrv_create_thread ( 
     unsigned long init_eip, 
     unsigned long init_stack, 
     char *name );
@@ -156,7 +155,7 @@ gwssrv_create_thread (
 void gwssrv_start_thread (void *thread);
 
 
-
+// Drain input
 int service_drain_input (void);
 
 
@@ -193,11 +192,8 @@ void gwssrv_wait_message(void);
 void gwssrv_yield(void);
 
 
-
-
-
-
-
-
+//
+// End.
+//
 
 

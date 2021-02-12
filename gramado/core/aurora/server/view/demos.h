@@ -3,6 +3,23 @@
 #define __DEMOS_H  1
 
 
+//
+// models
+//
+
+struct cat_model_d
+{
+    int eyesVisible;
+    int whiskersVisible;
+    int mouthVisible;
+    // ...
+};
+struct cat_model_d CatModel;
+
+void setupCatModel(int eyes, int whiskers, int mouth );
+
+
+
 
 //
 // == fred demo  ===========================================

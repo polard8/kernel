@@ -5276,30 +5276,41 @@ vsnprintf (
     va_list ap )
 {
     debug_print ("vsnprintf: [TODO]\n");
-	return -1; 
+    return -1; 
 }
 
 
 int vscanf (const char *format, va_list ap)
 { 
     debug_print ("vscanf: [TODO]\n");
-	return -1; 
+    return -1; 
 }
 
 
-int vsscanf (const char *str, const char *format, va_list ap)
-{ 
+int 
+vsscanf ( 
+    const char *str, 
+    const char *format, 
+    va_list ap )
+{
     debug_print ("vsscanf: [TODO]\n");
     return -1; 
 }
 
 
-int vfscanf (FILE *stream, const char *format, va_list ap)
+int 
+vfscanf (
+    FILE *stream, 
+    const char *format, 
+    va_list ap )
 { 
     debug_print ("vfscanf: [TODO]\n");
 
-    if ( (void *) stream == NULL )
+    if ( (void *) stream == NULL ){
        return EOF;
+    }
+
+    // ...
 
     return -1; 
 }
@@ -5314,17 +5325,20 @@ FILE *tmpfile (void)
     // + Abre esse arquivo com open.
     // + Cria uma stream para esse fd.
 
-	return (FILE *) 0;
+    return (FILE *) 0;
 }
 
 
 //tmpnam(): 
 //SVr4, 4.3BSD, C89, C99, POSIX.1-2001.  
 //POSIX.1-2008 marks tmpnam() as obsolete.
-char *tmpnam(char *s)
+char *tmpnam (char *s)
 {
     debug_print ("tmpnam: [TODO]\n");
-	return NULL; 
+
+    //if ( (void*) s == NULL ){}
+
+    return NULL; 
 }
 
 
@@ -5335,15 +5349,20 @@ char *tmpnam(char *s)
 char *tmpnam_r (char *s)
 {
     debug_print ("tmpnam_r: [TODO]\n");
-	return NULL; 
-}
 
+    //if ( (void*) s == NULL ){}
+
+    return NULL; 
+}
 
 
 char *tempnam (const char *dir, const char *pfx)
 {
     debug_print ("tempnam: [TODO]\n"); 
-	return NULL; 
+
+    //if ( (void*) dir == NULL ){}
+ 
+    return NULL; 
 }
 
 
@@ -5368,26 +5387,52 @@ char *tempnam (const char *dir, const char *pfx)
        EROFS  Read-only filesystem.
  */
 
+// helper function
+
+// IN: valid fd, mode
 FILE *stdio_make_file( int fd, const char *mode )
 {
     FILE *__file;
 
+
+    // #todo
     
+    //
+    // given fd.
+    //
+
+    //if (fd<0){
+    //    printf("stdio_make_file: [FAIL] not valid fd\n");
+    //    return NULL;
+    //}
+
+
     __file = (FILE *) malloc ( sizeof(FILE) );
 
     if ( (void *) __file == NULL )
     {
+        // debug_print(...)
         return NULL;
     }    
  
-    __file->used = 1;
+
+    __file->used  = TRUE;
     __file->magic = 1234;
-    __file->_cnt = 0;  
-    __file->_file = fd;
+ 
+    __file->_cnt = 0;
+
     
+    //
+    // given fd
+    //
+
+    __file->_file = fd;
+
+
     // flags
     __file->_flags = 0;
-    
+
+
     /*
     switch (*mode) {
 
@@ -5433,15 +5478,17 @@ FILE *stdio_make_file( int fd, const char *mode )
 
 // #test
 // Cria uma nova stream para o fd.
-// O fd foi obtido anteriormente,
+// O fd foi obtido anteriormente
+
+// IN: valid fd, mode
 FILE *fdopen (int fd, const char *mode)
 {
     if (fd<0){
-        printf("fdopen: fd\n");
+        printf("fdopen: [FAIL] not valid fd\n");
         return NULL;
     }
-    
-    return (FILE *) stdio_make_file(fd, (const char *) mode);
+
+    return (FILE *) stdio_make_file( fd, (const char *) mode);
 }
 
 
@@ -5466,6 +5513,7 @@ FILE *fdopen (int fd, const char *mode)
 
 // See:
 // https://linux.die.net/man/3/freopen
+
 FILE *freopen (
     const char *pathname, 
     const char *mode, 
@@ -5476,7 +5524,7 @@ FILE *freopen (
 
     if ( (void *) stream == NULL )
     {
-       printf ("freopen: stream fail\n");
+       printf ("freopen: [FAIL] stream\n");
        return (FILE *) 0;
     }
 
@@ -5575,21 +5623,18 @@ int fgetpos (FILE *stream, fpos_t *pos )
 
 int fsetpos (FILE *stream, const fpos_t *pos)
 {
-
-    if ( (void *) stream == NULL )
-    {
-       printf("fsetpos: [FAIL] stream\n");
-       return EOF;
+    if ( (void *) stream == NULL ){
+        printf("fsetpos: [FAIL] stream\n");
+        return EOF;
     }
 
     return (int) fseek (stream, (long) *pos, SEEK_SET);
 }
 
 
-
 int fpurge (FILE *stream){
 
-    debug_print ("fpurge: TODO: \n");
+    debug_print ("fpurge: [TODO] \n");
     
     if ( (void *) stream == NULL )
     {

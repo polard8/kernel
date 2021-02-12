@@ -614,7 +614,7 @@ int serviceRedrawWindow (void){
 
 
     // #debug
-    gwssrv_debug_print ("gwssrv: serviceRedrawWindow\n");
+    gwssrv_debug_print ("serviceRedrawWindow:\n");
 
 
     // Get wid and flag.
@@ -628,22 +628,21 @@ int serviceRedrawWindow (void){
    
     // Limits
     if ( window_id < 0 || window_id >= WINDOW_COUNT_MAX ){
-        gwssrv_debug_print ("gwssrv: [FAIL] serviceRefreshWindow window_id\n");
+        gwssrv_debug_print ("serviceRefreshWindow: [FAIL] window_id\n");
         return -1;
     }
 
-    //#todo
+
     // Get the window structure given the id.
+
     window = (struct gws_window_d *) windowList[window_id];
 
-    if ( (void *) window == NULL )
-    {
-        gwssrv_debug_print ("gwssrv: [FAIL] serviceRefreshWindow window\n");
+    if ( (void *) window == NULL ){
+        gwssrv_debug_print ("serviceRefreshWindow: [FAIL] window\n");
         return -1;
-        
     }else{
         if ( window->used != 1 || window->magic != 1234 ){
-            gwssrv_debug_print ("gwssrv: [FAIL] serviceRefreshWindow validation\n");
+            gwssrv_debug_print ("serviceRefreshWindow: [FAIL] window validation\n");
             return -1;
         }
 
@@ -693,7 +692,7 @@ int serviceRefreshWindow (void){
 
 
     // #debug
-    gwssrv_debug_print ("gwssrv: serviceRefreshWindow\n");
+    gwssrv_debug_print ("serviceRefreshWindow:\n");
 
 
     //
@@ -709,7 +708,7 @@ int serviceRefreshWindow (void){
     
     if ( window_id == (-4) )
     {
-        gwssrv_debug_print("gwssrv: serviceRefreshWindow\n");  //debug
+        gwssrv_debug_print("serviceRefreshWindow:\n");  //debug
         gwssrv_debug_print("== R (extra) ==\n");  //debug
         refresh_device_screen();
         return 0;
@@ -719,7 +718,7 @@ int serviceRefreshWindow (void){
     // Limits
     if ( window_id < 0 || window_id >= WINDOW_COUNT_MAX ){
         //printf("%d\n",window_id);
-        gwssrv_debug_print ("gwssrv: [FAIL] serviceRefreshWindow window_id\n");
+        gwssrv_debug_print ("serviceRefreshWindow: [FAIL] window_id\n");
         return -1;
     }
 
@@ -728,12 +727,12 @@ int serviceRefreshWindow (void){
     window = (struct gws_window_d *) windowList[window_id];
    
     if ( (void *) window == NULL ){
-        gwssrv_debug_print ("gwssrv: [FAIL] serviceRefreshWindow window\n");
+        gwssrv_debug_print ("serviceRefreshWindow: [FAIL] window\n");
         return -1;
     }
     
     if ( window->used != 1 || window->magic != 1234 ){
-        gwssrv_debug_print ("gwssrv: [FAIL] serviceRefreshWindow validation\n");
+        gwssrv_debug_print ("serviceRefreshWindow: [FAIL] window validation\n");
         return -1;
     }
 
@@ -756,9 +755,6 @@ int serviceRefreshWindow (void){
 }
 
 
-
-
-
 //
 //===================================================================
 //
@@ -777,10 +773,9 @@ gwssrv_redraw_window (
 
 
     gwssrv_debug_print ("gwssrv_redraw_window:\n");
-        
-    if ( (void *) window == NULL )
-    { 
-        gwssrv_debug_print ("gwssrv_redraw_window: window\n");
+
+    if ( (void *) window == NULL ){
+        gwssrv_debug_print ("gwssrv_redraw_window: [FAIL] window\n");
         return -1; 
     }
     
@@ -812,15 +807,14 @@ gwssrv_redraw_window (
 		// bordas horizontais e da barra de títulos.
 		// Cinza escuro.  CurrentColorScheme->elements[??] 
 		// @TODO: criar elemento sombra no esquema. 
-		
-		if ( (unsigned long) window->type == WT_OVERLAPPED )
-		{
-			if (window->focus == 1)
-			{ __tmp_color = xCOLOR_GRAY1; }    //mais escuro
-			if (window->focus == 0)
-			{ __tmp_color = xCOLOR_GRAY2; }    //mais claro
 
-            
+        if ( (unsigned long) window->type == WT_OVERLAPPED )
+        {
+            // mais escuro
+            if (window->focus == 1){ __tmp_color = xCOLOR_GRAY1; } 
+            // mais claro
+            if (window->focus == 0){ __tmp_color = xCOLOR_GRAY2; } 
+
             //ok funciona
             //rectBackbufferDrawRectangle ( 
             //    window->left +1, window->top +1, 
@@ -829,8 +823,8 @@ gwssrv_redraw_window (
             
             //test
             //remeber: the first window do not have a parent.
-            if ( (void*) window->parent == NULL )
-            { 
+            if ( (void*) window->parent == NULL ){
+ 
                 gwssrv_debug_print ("gwssrv_redraw_window: [Shadow] Parent"); 
                 //exit(1); 
                 rectBackbufferDrawRectangle ( 
@@ -1073,7 +1067,7 @@ draw_frame:
 
 /*
  * =====================================================
- * windowSetUpColorScheme:
+ * gwssrv_initialize_color_schemes:
  *     Isso configura os esquemas de cores utilizados 
  * pelo sistema.
  *     Essa rotina é chamada apenas uma vez na inicialização
@@ -1096,19 +1090,24 @@ draw_frame:
 void 
 gwssrv_initialize_color_schemes (int selected_type)
 {
-    struct gws_color_scheme_d *humility;
-    struct gws_color_scheme_d *pride;
+    struct gws_color_scheme_d  *humility;
+    struct gws_color_scheme_d  *pride;
 
 	//
-	// * HUMILITY
+	// HUMILITY
 	//
 	
     //Criando o esquema de cores humility. (cinza)
     humility = (void *) malloc ( sizeof(struct gws_color_scheme_d) );
     
 	if( (void *) humility == NULL ){
-		gwssrv_debug_print ("gwssrv_initialize_color_schemes: humility\n");
-		
+
+        gwssrv_debug_print ("gwssrv_initialize_color_schemes: humility\n");
+        printf ("gwssrv_initialize_color_schemes: humility\n"); 
+
+        // #bugbug
+        // ? return ????
+        
 	}else{
 		
 		//Object.
@@ -1150,7 +1149,12 @@ gwssrv_initialize_color_schemes (int selected_type)
     pride = (void *) malloc ( sizeof(struct gws_color_scheme_d) );
     
     if ( (void *) pride == NULL ){
+
         gwssrv_debug_print ("gwssrv_initialize_color_schemes: pride\n");
+        printf ("gwssrv_initialize_color_schemes: pride\n"); 
+
+        // #bugbug
+        // ? return ????
 
     }else{
 		
@@ -1191,22 +1195,29 @@ gwssrv_initialize_color_schemes (int selected_type)
 	
     switch (selected_type){
 
-		case ColorSchemeNull:
-		    GWSCurrentColorScheme = (void *) humility;
-		    break;
-		
-		case ColorSchemeHumility:
-		    GWSCurrentColorScheme = (void *) humility;
-		    break;
-		
-		case ColorSchemePride:
-	        GWSCurrentColorScheme = (void *) pride; 
-		    break;
-		
-		default:
-		    GWSCurrentColorScheme = (void *) humility;
-			break;
+    case ColorSchemeNull:
+        GWSCurrentColorScheme = (void *) humility;
+        break;
+
+    case ColorSchemeHumility:
+        GWSCurrentColorScheme = (void *) humility;
+        break;
+
+    case ColorSchemePride:
+        GWSCurrentColorScheme = (void *) pride; 
+        break;
+
+    default:
+        GWSCurrentColorScheme = (void *) humility;
+        break;
     };
+    
+    if ( (void*) GWSCurrentColorScheme == NULL )
+    {
+        gwssrv_debug_print ("gwssrv_initialize_color_schemes: GWSCurrentColorScheme\n");
+        printf             ("gwssrv_initialize_color_schemes: GWSCurrentColorScheme\n"); 
+        exit(1);
+    }
 }
 
 
@@ -1228,24 +1239,22 @@ int gwssrv_select_color_scheme (int type){
 
 do_humility:
 
-    if ( (void *) GWSHumilityColorScheme == NULL )
-    {
-		gwssrv_debug_print("HumilityColorScheme fail\n");
-        goto fail;  
-           	    	
-	}else{
-		
-	    if ( GWSHumilityColorScheme->used != 1 || 
-		     GWSHumilityColorScheme->magic != 1234 )
-		{
-			gwssrv_debug_print("HumilityColorScheme sig fail\n");
-			goto fail;
-		}
-		
-		gwssrv_debug_print("Humility selected\n");
-	    GWSCurrentColorScheme = GWSHumilityColorScheme;	
-	    goto done;
-	};
+    if ( (void *) GWSHumilityColorScheme == NULL ){
+        gwssrv_debug_print("HumilityColorScheme fail\n");
+        goto fail;
+    }else{
+
+        if ( GWSHumilityColorScheme->used != 1 || 
+             GWSHumilityColorScheme->magic != 1234 )
+        {
+            gwssrv_debug_print("HumilityColorScheme sig fail\n");
+            goto fail;
+        }
+
+        gwssrv_debug_print("Humility selected\n");
+        GWSCurrentColorScheme = GWSHumilityColorScheme;
+        goto done;
+    };
 
 do_pride:
 
@@ -1253,16 +1262,16 @@ do_pride:
         gwssrv_debug_print("GWSPrideColorScheme fail\n");
         goto fail;
     }else{
-	    if( GWSPrideColorScheme->used != 1 || 
-		    GWSPrideColorScheme->magic != 1234 )
-		{
-			gwssrv_debug_print("PrideColorScheme sig fail\n");
-			goto fail;
-		}
-		
-	    gwssrv_debug_print ("Pride selected\n"); 
-		GWSCurrentColorScheme = GWSPrideColorScheme;
-	    goto done;
+        if( GWSPrideColorScheme->used != 1 || 
+            GWSPrideColorScheme->magic != 1234 )
+        {
+            gwssrv_debug_print("PrideColorScheme sig fail\n");
+            goto fail;
+        }
+
+        gwssrv_debug_print ("Pride selected\n"); 
+        GWSCurrentColorScheme = GWSPrideColorScheme;
+        goto done;
     };
 
 done:
@@ -1273,10 +1282,9 @@ fail:
 }
 
 
-
 /*
  ***********************************************
- * show_window_rect:
+ * gws_show_window_rect:
  * 
  *     Mostra o retângulo de uma janela que está no backbuffer.
  *     Tem uma janela no backbuffer e desejamos enviar ela 

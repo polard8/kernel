@@ -58,15 +58,15 @@ void xxxThread (void){
 
     gws_show_backbuffer ();
 
-    //while(1){}
-    while(1)
+
+    while (1)
     {
         printf("$"); fflush(stdout);
 		asm ( "pause" );
 		asm ( "pause" );
 		asm ( "pause" );
 		asm ( "pause" );
-    }
+    };
 }
 
 
@@ -192,8 +192,7 @@ void ____test_threads (void){
  *     Essa será uma rotina de baixo nível para pthreads.
  */
 
-void *
-gwssrv_create_thread ( 
+void *gwssrv_create_thread ( 
     unsigned long init_eip, 
     unsigned long init_stack, 
     char *name )
@@ -388,7 +387,6 @@ int gwssrv_init_globals(void)
  *     Initialize the server. 
  *
  */
-//int gwsInit (void){
 
 int gwsInit(void)
 {
@@ -570,12 +568,12 @@ int gwsInit(void)
 
 void invalidate(void)
 {
-    dirty = 1;
+    dirty = TRUE;
 }
 
 void validate(void)
 {
-    dirty = 0;
+    dirty = FALSE;
 }
 
 int isdirty(void)
@@ -585,6 +583,7 @@ int isdirty(void)
 
 void invalidate_background(void)
 {
+    // #bugbug: Use background_dirty ??
     background = 1;
 }
 

@@ -251,7 +251,7 @@ int projection_initialize(void)
 }
 
 
-// Chaging the view for the current projection
+// Changing the view for the current projection.
 int view (int near, int far)
 {
     if ( (void*) CurrentProjection == NULL )
@@ -271,6 +271,7 @@ int view (int near, int far)
 /*
  ******************************* 
  * grPlot0:
+ *      plot pixel.
  *      Plot into a normalized screen. kinda.
  */
 
@@ -545,6 +546,7 @@ plotLine3d (
 }
 
 
+// #todo
 // plot line given two colors.
 // interpolation ?
 void 
@@ -569,13 +571,12 @@ plotLine3d2 (
     y1 = x1;
     z1 = x1;
     
-    
-    //nothing for now;
-    //interpolation flag.
+
+    // nothing for now;
+    // interpolation flag.
     flag=0;
-    
-    
- 
+
+
     //
     // Loop 
     //
@@ -649,21 +650,21 @@ void rectangleZZ ( struct gr_rectangle_d *rect )
      // cima
      //plotLine3d ( left, top,  z, right, top, z, color );
      plotLine3d2 ( rect->p[0].x, rect->p[0].y, rect->p[0].z, rect->p[0].color,
-                  rect->p[1].x, rect->p[1].y, rect->p[1].z, rect->p[1].color, 0 );
+                   rect->p[1].x, rect->p[1].y, rect->p[1].z, rect->p[1].color, 0 );
 
      // baixo
      //plotLine3d ( left, bottom, z, right,bottom, z, color );
      plotLine3d2 ( rect->p[3].x, rect->p[3].y, rect->p[3].z, rect->p[3].color,
-                  rect->p[2].x, rect->p[2].y, rect->p[2].z, rect->p[2].color, 0 );
+                   rect->p[2].x, rect->p[2].y, rect->p[2].z, rect->p[2].color, 0 );
 
      // esquerda
      //plotLine3d ( left, top, z, left, bottom, z, color );
      plotLine3d2 ( rect->p[0].x, rect->p[0].y, rect->p[0].z, rect->p[0].color,
-                  rect->p[3].x, rect->p[3].y, rect->p[3].z, rect->p[3].color, 0 );     
+                   rect->p[3].x, rect->p[3].y, rect->p[3].z, rect->p[3].color, 0 ); 
      // direita
      //plotLine3d ( right,  top, z, right, bottom, z, color );
      plotLine3d2 ( rect->p[1].x, rect->p[1].y, rect->p[1].z, rect->p[1].color,
-                  rect->p[2].x, rect->p[2].y, rect->p[2].z, rect->p[2].color, 0 );
+                   rect->p[2].x, rect->p[2].y, rect->p[2].z, rect->p[2].color, 0 );
 }
 
 
@@ -686,6 +687,7 @@ ras_rectangleZ (
 
 
 // scaling
+// Inflate cube
 int xxxInflateCubeZ ( struct gr_cube_d *cube, int value )
 {
     if ( (void*) cube == NULL )
@@ -732,6 +734,7 @@ int xxxInflateCubeZ ( struct gr_cube_d *cube, int value )
 }
 
 // scaling
+// Ieflate cube
 int xxxDeflateCubeZ ( struct gr_cube_d *cube, int value )
 {
     if ( (void*) cube == NULL )
@@ -1235,13 +1238,13 @@ void noraDrawingStuff(void)
     register int y=0;
 
     // colunas.
-    for (x=0; x< SavedX; x++)    
+    for (x=0; x< SavedX; x++)
     {
         for (y=0; y<SavedY; y++)
         {
             if ( x != 0 ){
-                if ( y % x == 0 ){
-                    pixelBackBufferPutpixel ( COLOR_BLACK, x, y );  
+                if ( (y % x) == 0 ){
+                    pixelBackBufferPutpixel ( COLOR_BLACK, x, y ); 
                 }
             }
         };

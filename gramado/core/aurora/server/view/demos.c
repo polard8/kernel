@@ -4,11 +4,29 @@
 #include <gws.h>
 
 
+void setupCatModel(int eyes, int whiskers, int mouth )
+{
+    CatModel.eyesVisible     = eyes;
+    CatModel.whiskersVisible = whiskers;
+    CatModel.mouthVisible    = mouth;
+}
+
 void demoCat (void)
 {
     register int i=0;
     int j=0;
     int count = 20;
+
+    //
+    // Setup model
+    //
+
+    // eyes, whiskers, mouth
+    setupCatModel(TRUE,TRUE,TRUE);
+
+    //
+    // Loop
+    //
 
     while (count>0){
     
@@ -20,9 +38,13 @@ void demoCat (void)
     plotCircleZ ( 0, 12, 25, COLOR_WHITE, 0); 
 
     // eyes
+    if ( CatModel.eyesVisible == TRUE ){
     plotCircleZ ( -10, 20, 1+i, COLOR_WHITE, 0); 
     plotCircleZ (  10, 20, 1+i, COLOR_WHITE, 0); 
+    }
 
+    // whiskers
+    if ( CatModel.whiskersVisible == TRUE ){
     // =
     plotLine3d ( -40, 8,0, -4, 5,0, COLOR_WHITE); 
     plotLine3d ( -40, 5,0, -4, 4,0, COLOR_WHITE); 
@@ -32,15 +54,18 @@ void demoCat (void)
     plotLine3d ( 4, 5,0, 40, 8,0, COLOR_WHITE); 
     plotLine3d ( 4, 4,0, 40, 5,0, COLOR_WHITE); 
     plotLine3d ( 4, 3,0, 40, 2,0, COLOR_WHITE); 
+    }
 
     // mouth
+    if ( CatModel.mouthVisible == TRUE ){
     plotLine3d ( -10, -2,0, 10, -2,0, COLOR_WHITE); 
-
+    }
+    
     gws_refresh_rectangle(0,0,320,200);
     for (j=0; j<200; j++){ gwssrv_yield();}
-    }
+    };
     count--;
-    }
+    };
 }
 
 
@@ -396,8 +421,8 @@ void demoCube2 (void)
 
         //porque o z eh reduzido duas vezes.
         //entao esse eh o limite da reduçao.
-        for (j=0; j<(40/2); j++){        
-            rectBackbufferDrawRectangle ( 0, 0, 320, 200, COLOR_BLACK, 1 );        
+        for (j=0; j<(40/2); j++){ 
+            rectBackbufferDrawRectangle ( 0, 0, 320, 200, COLOR_BLACK, 1 ); 
             if (action==1000){
                 xxxInflateCubeZ (cube, 1);
             }else{
@@ -421,28 +446,6 @@ void demoCube2 (void)
             default:   action = 1000; break;
         };
         }; //while--
-       
-        
-        //xxxInflateCubeZ (cube, 10);
-        //xxxCubeZ(cube);
-
-        //xxxInflateCubeZ (cube, 20);
-        //xxxCubeZ(cube);
-
-        //xxxDeflateCubeZ (cube, 5);
-        //xxxCubeZ(cube);
-        
-        //xxxDeflateCubeZ (cube, 10);
-        //xxxCubeZ(cube);
-
-        //plotCharBackbufferDrawcharTransparentZ ( cube->p[0].x,  cube->p[0].y, COLOR_BLACK, 'G', cube->p[0].z );
-        //plotCharBackbufferDrawcharTransparentZ ( cube->p[1].x,  cube->p[1].y, COLOR_BLACK, 'R', cube->p[1].z );
-        //plotCharBackbufferDrawcharTransparentZ ( cube->p[2].x,  cube->p[2].y, COLOR_BLACK, 'A', cube->p[2].z );
-        //plotCharBackbufferDrawcharTransparentZ ( cube->p[3].x,  cube->p[3].y, COLOR_BLACK, 'M', cube->p[3].z );
-        //plotCharBackbufferDrawcharTransparentZ ( cube->p[4].x,  cube->p[4].y, COLOR_BLACK, 'A', cube->p[4].z );
-        //plotCharBackbufferDrawcharTransparentZ ( cube->p[5].x,  cube->p[5].y, COLOR_BLACK, 'D', cube->p[5].z );
-        //plotCharBackbufferDrawcharTransparentZ ( cube->p[6].x,  cube->p[6].y, COLOR_BLACK, '0', cube->p[6].z );
-        //plotCharBackbufferDrawcharTransparentZ ( cube->p[7].x,  cube->p[7].y, COLOR_BLACK, '*', cube->p[7].z );
     }
 }
 
@@ -470,7 +473,8 @@ void demoCurve(void)
            100,  20+i+i, 0,  //x2, y2, z2, 
            COLOR_YELLOW );
 
-        //string! funny
+
+        //string! char by char
         plotCharBackbufferDrawcharTransparentZ ( 40+ (8*0), 20+i+i, COLOR_RED, 'G', 0 );
         plotCharBackbufferDrawcharTransparentZ ( 40+ (8*1), 20+i+i, COLOR_RED, 'R', 0 );   
         plotCharBackbufferDrawcharTransparentZ ( 40+ (8*2), 20+i+i, COLOR_RED, 'A', 0 );

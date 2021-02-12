@@ -1,17 +1,17 @@
 
-
 // sprite
 
 #include <gws.h>
 
 
-
+// #prototype.
 int 
 PlotSprite3D ( 
     struct gws_display_d *display,
     int x, int y, int z,
     struct gws_sprite_d *sprite_list,
     int list_size );
+
 
 /*
  * PlotSprite3D:
