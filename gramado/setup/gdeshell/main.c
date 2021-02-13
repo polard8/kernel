@@ -1091,6 +1091,7 @@ shellProcedure (
     unsigned long long1, 
     unsigned long long2 )
 {
+
     unsigned long input_ret=0;
     unsigned long compare_return=0;
     int q=0;
@@ -2608,7 +2609,7 @@ do_compare:
     // system-info
     if ( gramado_strncmp( prompt, "system-info", 11 ) == 0 )
     {
-        shellShowSystemInfo ();
+        shellShowSystemInfo();
         goto exit_cmp;
     }
 
@@ -3371,86 +3372,91 @@ void shellInitSystemMetrics (void){
     //printf("w={%d} h={%d}\n", smScreenWidth, smScreenHeight); 
     //while (1){ asm ("pause"); }	
 
-    sm_initialized = 1;
+    sm_initialized = TRUE;
 } 
 
 
 
-	// step2
-    //inicializa os limites da janela.
-void shellInitWindowLimits(void){
-	
+// step2
+//inicializa os limites da janela.
+
+void shellInitWindowLimits(void)
+{
     //
     // ## Window limits ##
     //
 
-    if ( sm_initialized != 1 )
+    if ( sm_initialized != TRUE )
     {
-		printf ("shellInitWindowLimits:");
-		while(1){}
-	} 
-
+        printf ("shellInitWindowLimits: sm_initialized *hang\n");
+        while(1){}
+        //exit(1);
+    } 
 
     //full screen support
-    wlFullScreenLeft = 0;
-    wlFullScreenTop = 0;
-    wlFullScreenWidth = smScreenWidth;
+    wlFullScreenLeft   = 0;
+    wlFullScreenTop    = 0;
+    wlFullScreenWidth  = smScreenWidth;
     wlFullScreenHeight = smScreenHeight;
-	
+
     //limite de tamanho da janela.
-    wlMinWindowWidth = smCharWidth * 80;
-    wlMinWindowHeight = smCharWidth * 25;
-    wlMaxWindowWidth = smScreenWidth;
-    wlMaxWindowHeight = smScreenHeight;	
-	
+    wlMinWindowWidth  = (smCharWidth * 80);
+    wlMinWindowHeight = (smCharWidth * 25);
+    wlMaxWindowWidth  = smScreenWidth;
+    wlMaxWindowHeight = smScreenHeight;
+
     //quantidade de linhas e colunas na �rea de cliente.
     wlMinColumns = 80;
     wlMinRows = 1;
     
     //#bugbug: temos que dividir pelo tamanho do char.
     //mas se for zero d� problema.
-    wlMaxColumns = (smScreenWidth / smCharWidth);
-    wlMaxRows = (smScreenHeight / smCharHeight);
-	
+    wlMaxColumns = (smScreenWidth  / smCharWidth);
+    wlMaxRows    = (smScreenHeight / smCharHeight);
+
 	//dado em quantidade de linhas.
     textMinWheelDelta = 1;  //m�nimo que se pode rolar o texto
     textMaxWheelDelta = 4;  //m�ximo que se pode rolar o texto	
-	textWheelDelta = textMinWheelDelta;
-	//...
-	
-	wl_initialized = 1;
+    textWheelDelta = textMinWheelDelta;
+    // ...
+
+
+    wl_initialized = TRUE;
 }
 
 
-	// step3
-	//inicia o tamanho da janela.
-void shellInitWindowSizes (void){
-	
-    if ( wl_initialized != 1 )
+// step3
+//inicia o tamanho da janela.
+void shellInitWindowSizes (void)
+{
+
+    if ( wl_initialized != TRUE )
     {
-		printf ("shellInitWindowSizes:");
-		while(1){}
-	} 	
-	
-	wsWindowWidth = smScreenWidth;
-	wsWindowHeight = smScreenHeight;	
-	
-	ws_initialized = 1;
+        printf ("shellInitWindowSizes: wl_initialized *hang\n");
+        while(1){}
+    }
+
+    wsWindowWidth  = smScreenWidth;
+    wsWindowHeight = smScreenHeight;
+
+    ws_initialized = TRUE;
 }
 
 
-	// step4
-	//inicializar a posi��o da janela.
-void shellInitWindowPosition (void){
-	
+// step4
+//inicializar a posi��o da janela.
+void shellInitWindowPosition (void)
+{
+
 	//window position
-	wpWindowLeft = WINDOW_LEFT;
-	wpWindowTop = WINDOW_TOP;
-	
+    wpWindowLeft = WINDOW_LEFT;
+    wpWindowTop  = WINDOW_TOP;
+
 	//wpWindowLeft = (unsigned long) ( (smScreenWidth - wsWindowWidth)/2 );
 	//wpWindowTop = (unsigned long) ( (smScreenHeight - wsWindowHeight)/2 );
-	
-	wp_initialized = 1;
+
+
+    wp_initialized = TRUE;
 }
 
 
@@ -3477,27 +3483,22 @@ void shellShell (void){
     shellError = 0;
 
 
+    // Inicializando as estruturas de linha
+    // Inicializamos com espaços
 
-	//
-	// ## Inicializando as estruturas de linha ##
-	//
-	
-	//inicializamos com espa�os.
-	for ( i=0; i<32; i++ )
-	{
-		for ( j=0; j<80; j++ )
-		{
-		    LINES[i].CHARS[j] = (char) ' ';
-		    LINES[i].ATTRIBUTES[j] = (char) 7;
-	    }
-		
-		LINES[i].left = 0;
-		LINES[i].right = 0;
-		LINES[i].pos = 0;
-	};
-	
-	
-	
+    for ( i=0; i<32; i++ )
+    {
+        for ( j=0; j<80; j++ )
+        {
+            LINES[i].CHARS[j]      = (char) ' ';
+            LINES[i].ATTRIBUTES[j] = (char) 7;
+        };
+        LINES[i].left  = 0;
+        LINES[i].right = 0;
+        LINES[i].pos   = 0;
+    };
+
+
 	// Deve ser pequena, clara e centralizada.
 	// Para ficar mais r�pido.
 	
@@ -3507,49 +3508,46 @@ void shellShell (void){
 		
 	// Usar o get system metrics para pegar o 
 	// tamanho da tela.
-	
-	// step1
-	//inicializa as metricas do sistema.
-	shellInitSystemMetrics ();
-	
-	// step2
-    //inicializa os limites da janela.
-	shellInitWindowLimits ();
-	
-	// step3
-	//inicia o tamanho da janela.
-	shellInitWindowSizes ();
-	
-	// step4
-	//inicializar a posi��o da janela.
-	shellInitWindowPosition ();
- 
- 
-    //
+
+    // step1 - inicializa as metricas do sistema.
+    shellInitSystemMetrics();
+
+    // step2 - inicializa os limites da janela.
+    shellInitWindowLimits();
+
+    // step3 - inicia o tamanho da janela.
+    shellInitWindowSizes();
+
+    // step4 - inicializar a posição da janela.
+    shellInitWindowPosition();
+
+
 	// initi visible area.
 	// #todo: criar fun��o para isso
-	
-	textTopRow = 0;
-	textBottomRow = 24;
-	
+
+    textTopRow    = 0;
+    textBottomRow = 24;
+
 	//limits.
 	//quantidade de linhas de colunas da janela.
 	//na verdade deve ser da �rea de cliente.
 	
-    wlMaxColumns = (wsWindowWidth/smCharWidth);    
-    wlMaxRows = (wsWindowHeight/smCharHeight);         
+    wlMaxColumns = (wsWindowWidth  / smCharWidth ); 
+    wlMaxRows    = (wsWindowHeight / smCharHeight); 
+ 
  
     if ( wlMaxColumns < wlMinColumns )
-	{
-	    wlMaxColumns = wlMinColumns;
-	}
-		
-	if ( wlMaxRows < wlMinRows )
-	{
-		wlMaxRows = wlMinRows;
-	}
-	
-	//...	
+    {  
+        wlMaxColumns = wlMinColumns;  
+    }
+
+    if ( wlMaxRows < wlMinRows )
+    {
+        wlMaxRows = wlMinRows;
+    }
+
+    // ...
+
 
 	//
 	// Setup buffers.
@@ -3584,19 +3582,22 @@ void shellShell (void){
 	//shellBufferMaxRows    = DEFAULT_BUFFER_MAX_ROWS;
 	
 	//buffersize = (shellBufferMaxColumns * shellBufferMaxRows);
-	
 
-	
-	//
-	// @todo: E o fluxo padr�o. Quem configurou os arquivos ???
-	//        o kernel configuroru???
-	//
-	
-	// N�mero m�ximo de colunas e linhas.
-	g_columns = wlMaxColumns;  // 80;
-	g_rows = wlMaxRows;        // 25;
+
+    // #todo: 
+    // E o fluxo padrão. 
+    // Quem configurou os arquivos ???
+    // o kernel configurou???
+
+
+    // Número máximo de colunas e linhas.
+    // 80x25
+
+    g_columns = wlMaxColumns;
+    g_rows    = wlMaxRows;
+
     //...
-	
+
 
     for ( i=0; i<WORKINGDIRECTORY_STRING_MAX; i++ )
     {
@@ -3708,20 +3709,12 @@ int shellInit ( struct window_d *window ){
 	// A estrutura est� em kernel mode e n�o podemos acessa-la.
 
     if ( (void *) window == NULL ){
-        printf ("shellInit: window fail.\n"); 
-
+        printf ("shellInit: [FAIL] window\n"); 
     } else {
         gde_set_focus(window);
-
-		// Welcome messages.
-
-#ifdef SHELL_VERBOSE
-        printf ("Starting gdeshell ...\n");
-#endif
-
     };
-    
-    
+
+
     // #tests
     // Getting the IDs for active window and window woth focus.
 
@@ -4059,7 +4052,8 @@ shellSetCursor (
 {
 
     // Setando o cursor usado pelo kernel base.
-    gde_set_cursor (x,y);
+
+    gde_set_cursor(x,y);
 
 
     // Atualizando as variaveis globais 
@@ -4082,43 +4076,28 @@ shellSetCursor (
  *     Um thread dentro para testes.
  */
 
-void shellThread (void){
-
-
-	printf("\n");
-	printf("$\n");
-	printf("$$\n");
-	//printf("$$$\n");
+void shellThread (void)
+{
+    printf("\n");  
+    printf("#\n");
     printf("#### This is a thread ####\n");
-	//printf("$$$\n");
-	printf("$$\n");
-	printf("$\n");
+    printf("#\n");
     printf("\n");
-	
-    gde_show_backbuffer ();
-	
-	while(1){}
-    while(1)
-	{	
-	    //printf("$");
-		asm ( "pause" );
-		asm ( "pause" );
-		asm ( "pause" );
-		asm ( "pause" );
-    }	
+
+    gde_show_backbuffer();
+    while(1){}
 }
 
 
-//help message
+// help message
 void shellHelp (void)
 {
-    printf (help_banner);	
+    printf (help_banner);
 }
 
-
-//drawing a tree
-void shellTree (void){
-
+// drawing a tree
+void shellTree(void)
+{
     printf (tree_banner);
 }
 
@@ -4144,7 +4123,7 @@ void shellPrompt (void)
     prompt_status = 0;
     prompt_max = PROMPT_MAX_DEFAULT;  
 
-    // Prompt.
+    // Prompt
     printf("\n");
     putc('$',stdout);
     putc(' ',stdout);
@@ -4218,8 +4197,8 @@ void shellTestLoadFile (void){
 	//#importante:
 	//precisa ser arquivo pequeno.
 	
-	
-	f = fopen ("gramado.txt","rb");  	
+
+    f = fopen ("gramado.txt","rb");  	
 	
 	//pequeno
 	//f = fopen ("init.txt","rb");  
@@ -4269,7 +4248,7 @@ void shellTestFork(void)
     int pid = -1;
 
 
-    debug_print("shellTestFork:\n");
+    debug_print("shellTestFork: [SAGA]\n");
     
     printf ("father pid = %d\n",getpid());
 
@@ -4440,27 +4419,24 @@ void shellClearScreen (void){
  * para sabermos a cor do caractere e de seu background.
  */
 
-void shellRefreshScreen (void){
-
-	int i=0;
-	int j=0;
+void shellRefreshScreen (void)
+{
+    int i=0;
+    int j=0;
 
 	//desabilita o cursor
 	system_call ( 245, 
 	    (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);
-	
-	
-	for ( i=textTopRow; i<textBottomRow; i++ )
-	{
-		for ( j=0; j<80; j++ )
-		{
-		    //LINES[i].CHARS[j] = (char) 'x';
-		    //LINES[i].ATTRIBUTES[j] = (char) 7;
-	        
-			printf ("%c", LINES[i].CHARS[j] );
-		}
-		printf ("\n");
-	};
+
+
+    // loop
+
+    for ( i=textTopRow; i<textBottomRow; i++ ){
+        for ( j=0; j<80; j++ ){
+            printf ("%c", LINES[i].CHARS[j] );
+        };
+        printf ("\n");
+    };
 
 	//reabilita o cursor
 	system_call ( 244, 
@@ -4468,23 +4444,25 @@ void shellRefreshScreen (void){
 }
 
 
-// a inten��o aqui � fazer o refresh de apenas uma linha do arquivo.
-//#todo podemos fazer o mesmo para um char apenas.
+// a intençaoo aqui é fazer o refresh 
+// de apenas uma linha do arquivo.
+// #todo podemos fazer o mesmo para um char apenas.
 
-void shellRefreshLine ( int line_number ){
+void shellRefreshLine ( int line_number )
+{
+    int col = 0;  
 
-	int col = 0;  
+
+    // Line number limits.
+    if ( line_number < 0 )        {  return;  }
+    if ( line_number > wlMaxRows ){  return;  }
 
 
-	if ( line_number > wlMaxRows )
-		return;	
-	
-	int lin = (int) line_number; 
+    int lin = (int) line_number; 
 
-	
-#ifdef SHELL_VERBOSE		
 	//#debug
-	printf("shellRefreshScreen:\n");
+#ifdef SHELL_VERBOSE
+    printf("shellRefreshScreen:\n");
 #endif 
 
 	//cursor apontando par ao in�cio da janela.
@@ -4492,15 +4470,17 @@ void shellRefreshLine ( int line_number ){
 	//@todo: podemos colocar o cursor no 
 	//in�cio da �rea de cliente.
 	//left ser� a coluna.
-	
-	shellSetCursor ( col, lin );
-		
-	//colunas.
-	for ( col=0; col < wlMaxColumns; col++ )
-	{
-	    //Mostra um char do screen buffer.
-		printf( "%c", LINES[lin].CHARS[col] );
-	};	
+
+
+    shellSetCursor(col,lin);
+
+    // colunas.
+    // Mostra um char do screen buffer.
+
+    for ( col=0; col < wlMaxColumns; col++ )
+    {
+        printf ( "%c", LINES[lin].CHARS[col] );
+    };
 }
 
 
@@ -4559,8 +4539,9 @@ void shellRefreshCurrentChar (void)
  * em alguma biblioteca, servidor ou kernel.
  */
 
-void shellScroll (void){
-	
+void shellScroll (void)
+{
+
 	//reajustando a �rea vis�vel do buffer 
  
 
@@ -4568,7 +4549,7 @@ void shellScroll (void){
 	//system_call ( 245, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);	
 
     testChangeVisibleArea();	//desloca a �rea vis�vel usando delta.
-	shellRefreshVisibleArea();
+    shellRefreshVisibleArea();
 	
 	//#todo:posicionar cursor
 	
@@ -4645,14 +4626,10 @@ shellInsertCharXY (
     unsigned long y, 
     char c )
 {
+    if ( x >= wlMaxColumns || y >= wlMaxRows ){  return;  }
 
-    if ( x >= wlMaxColumns || y >= wlMaxRows )
-    {
-        return;
-    }
-
-	LINES[y].CHARS[x] = (char) c;
-	LINES[y].ATTRIBUTES[x] = 7;
+    LINES[y].CHARS[x]      = (char) c;
+    LINES[y].ATTRIBUTES[x] = (char) 7;
 }
 
 
@@ -4695,11 +4672,13 @@ void testScrollChar ( int c )
 {
     int i=0;
 
+    // #bugbug: why 26?
+
     for ( i=0; i < (wlMaxColumns*26); i++ )
     {
         // Se chegamos no limite do screen_buffer
         // ...
-        shellInsertNextChar ((char) c);
+        shellInsertNextChar((char) c);
     };
 }
 
@@ -4770,22 +4749,19 @@ void shellInsertNextChar (char c)
     LINES[textCurrentRow].right = textCurrentCol;
 }
 
-
-void shellInsertCR (void)
+void shellInsertCR(void)
 {
-    shellInsertNextChar ( (char) '\r' );
+    shellInsertNextChar( (char) '\r' );
 }
 
-
-void shellInsertLF (void)
+void shellInsertLF(void)
 {
-    shellInsertNextChar ( (char) '\n' );
+    shellInsertNextChar( (char) '\n' );
 }
 
-
-void shellInsertNullTerminator (void)
+void shellInsertNullTerminator(void)
 {
-    shellInsertNextChar ( (char) '\0' );
+    shellInsertNextChar( (char) '\0' );
 }
 
 
@@ -4869,7 +4845,6 @@ void shellTestMBR (void)
     fsTypeString[9] = 0;  // finaliza
     printf("fs type string: %s\n",fsTypeString);
 
- 
     // signature
     printf("Signature: [ %x %x ] \n" , buffer[0x1FE], buffer[0x1FF] );
     
@@ -4900,8 +4875,10 @@ void move_to ( unsigned long x, unsigned long y )
 // show shell info
 void shellShowInfo (void)
 {
-	int PID, PPID;
-	
+    int PID = 0; 
+    int PPID = 0;
+
+
     printf (" # shellShowInfo: #\n");
 	
 	/*
@@ -4920,8 +4897,8 @@ void shellShowInfo (void)
 
     PID  = getpid();
     PPID = getppid();
-
     printf ("Process info: PID={%d} PPID={%d} \n", PID, PPID );
+
 
     printf ("wlMaxColumns={%d} \n", wlMaxColumns );
     printf ("wlMaxRows={%d}    \n", wlMaxRows );
@@ -4958,53 +4935,49 @@ void shellShowMetrics (void)
 	
 	printf ("charWidth={%d} charHeight={%d}\n", 
 	    smCharWidth, smCharHeight );	
-	
-	//...
-	
-    printf ("Done\n");	
+
+    // ...
+
+    printf ("Done\n");
 }
 
 
-//show system info
+
+// command "system-info"
+// #todo: Mostrar somente informaçoes de sistema
+// como versão do sistema, versão do kernel, nome do wm
+// nome do ws ...
 void shellShowSystemInfo (void)
 {
-	int ActiveWindowId=0;
-	int WindowWithFocusId=0;
-	
-
-	printf ("shellShowSystemInfo:\n");
+    unsigned long __mm_size_mb=0;
 
 
+    printf ("\n");
+    printf ("Gramado OS\n");
 
+    //
+    // Get
+    //
 
-	//Active
-	ActiveWindowId = (int) gde_get_active_window ();
+    // get memory size.
+    __mm_size_mb = (unsigned long) gramado_system_call (292,0,0,0);
+    
 
-	//valor de erro
-	if ( ActiveWindowId == (-1))
-	{
-	    printf("ERROR getting Active window ID\n");	
-	}	
-	printf ("ActiveWindowId={%d}\n", ActiveWindowId );
+    //
+    // Show
+    //
 
-
-	// Focus.
-	WindowWithFocusId = (int) gde_get_focus ();
-	
-	//valor de erro
-	if ( WindowWithFocusId == (-1))
-	{
-	    printf("ERROR getting Window With Focus ID\n");	
-	}	
-	printf ("WindowWithFocusId={%d}\n", WindowWithFocusId );	
+    printf ("Memory: %d MB \n",__mm_size_mb);
+    
+    // ...
 }
 
 
-//mostrar informa��es sobre janelas.
+// mostrar informações sobre janelas.
 void shellShowWindowInfo (void){
-	
-    int wID=0;	
-	
+
+    int wID=0;
+
 	// #bugbug.
 	// Testando a estrutura de janela.
 	// A janela foi criada pelo kernel e copiamos o ponteiro 
@@ -5028,11 +5001,11 @@ void shellShowWindowInfo (void){
 		
 	//obs: Isso � uma estrutura interna, n�o reflete 
     //a informa��o usada pelo kernel.	
-	
-	printf ("\n");		
-	printf ("Window info: \n");	
+
+    printf ("\n");		
+    printf ("Window info: \n");	
     printf ("l={%d} t={%d} w={%d} h={%d}\n", 
-	    wpWindowLeft, wpWindowTop, wsWindowWidth, wsWindowHeight );
+        wpWindowLeft, wpWindowTop, wsWindowWidth, wsWindowHeight );
 
 
 	//Obs: isso funcionou. setando o cursor.
@@ -5063,9 +5036,8 @@ shellSendMessage (
     unsigned long long1, 
     unsigned long long2 )
 {
-    //if(msg <=0)
-        //return 0;
-        
+    if (msg <= 0){  return 0;  }
+
     return (unsigned long) shellProcedure ( window, msg, long1, long2 );
 }
 
@@ -5111,22 +5083,22 @@ void shellExit (int code)
 
 void shellUpdateWorkingDiretoryString ( char *string )
 {
-    
+
     // Is it initialized in the gdeshell?
-    if ( pwd_initialized == 0 )
+    if ( pwd_initialized == FALSE )
     {
         gde_debug_print ("shellUpdateWorkingDiretoryString: [FAIL] pwd_initialized\n");
         return;
+    }
+    
 
     // YES, it is.
+    
+
+    if ( (void *) string == NULL ){
+        gde_debug_print ("shellUpdateWorkingDiretoryString: [FAIL] invalid string\n");
+        return;
     }else{
-
-        if ( (void *) string == NULL ){
-            gde_debug_print ("shellUpdateWorkingDiretoryString: [FAIL] invalid string\n");
-            return;
-
-        // OK, let's go!
-        }else{
 
             //++
             // Atualizando dentro do gdeshell.
@@ -5143,8 +5115,7 @@ void shellUpdateWorkingDiretoryString ( char *string )
                 //(unsigned long) string );
            
             // #test
-            chdir ( (const char *) string );
-        };
+        chdir ( (const char *) string );
     };
 }
 
@@ -5205,9 +5176,9 @@ void shellInitializeWorkingDiretoryString (void)
 	// #todo: Implementar isso na libc.
 	//int setenv(const char *name, const char *value, int overwrite);
 	//setenv ("PWD", (const char *) current_workingdiretory_string, 1);
-	
-    // Flag.
-    pwd_initialized = 1;
+
+
+    pwd_initialized = TRUE;
 }
 
 
@@ -5216,8 +5187,9 @@ void shellInitializeWorkingDiretoryString (void)
 
 void shellUpdateCurrentDirectoryID ( int id )
 {
-    if(id<0)
+    if (id<0){
         return;
+    }
 
     g_current_workingdirectory_id = id;
 }
@@ -5271,22 +5243,25 @@ void shellShowGID (void)
 
 void shellShowUserSessionID (void)
 {
-    printf ("Current user session %d\n", 
-        (int) system_call( SYSTEMCALL_GETCURRENTUSERSESSION, 0, 0, 0) );
+    int value=0;
+    value = system_call( SYSTEMCALL_GETCURRENTUSERSESSION, 0, 0, 0);
+    printf ("Current user session %d\n", (int) value );
 }
 
 
 void shellShowWindowStationID (void)
 {
-    printf ("Current room %d\n", 
-        (int) system_call( SYSTEMCALL_GETCURRENTWINDOWSTATION, 0, 0, 0) );
+    int value=0;
+    value = system_call( SYSTEMCALL_GETCURRENTWINDOWSTATION, 0, 0, 0);
+    printf ("Current room %d\n", (int) value );
 }
 
 
 void shellShowDesktopID (void)
 {
-    printf ("Current desktop %d\n", 
-        (int) system_call( SYSTEMCALL_GETCURRENTDESKTOP, 0, 0, 0) );
+    int value=0;
+    value = system_call( SYSTEMCALL_GETCURRENTDESKTOP, 0, 0, 0);
+    printf ("Current desktop %d\n", (int) value );
 }
 
 
@@ -5852,51 +5827,42 @@ int shellInitPathname (void){
 
     int i=0;
 
-    if (pathname_initilized == 1)
-    {
-        return 0;
-    }
 
+    if (pathname_initilized == TRUE){  return 0;  }
 
     for ( i=0; i<PATHNAME_LENGHT; i++ )
     {
-		pathname_buffer[i] = (char) '\0';
+        pathname_buffer[i] = (char) '\0';
     };
-
 
     pathname_lenght = 0;
 
-	//...
+    // ...
 
-    pathname_initilized = 1;
+    pathname_initilized = TRUE;
 
     return 0;
 }
 
- 
-//inicializaremos o supporte a filename
-int shellInitFilename (void){
 
+// inicializaremos o supporte a filename
+int shellInitFilename (void)
+{
     int i=0;
 
-    if (filename_initilized == 1)
+
+    if (filename_initilized == TRUE){  return 0;  }
+
+    for ( i=0; i<FILENAME_LENGHT; i++ )
     {
-        return 0;
-    }
-
-
-	for ( i=0; i<FILENAME_LENGHT; i++ )
-	{
-		filename_buffer[i] = (char) '\0';
-	};
-
+        filename_buffer[i] = (char) '\0';
+    };
 
     filename_lenght = 0;
 
-	//...
+    // ...
 
-
-    filename_initilized = 1;
+    filename_initilized = TRUE;
 
     return 0;
 }
@@ -6405,11 +6371,11 @@ void shellRefreshVisibleArea (void){
 	//
 	//seta o cursor no in�cio da janela.
 	//
-	
+
 	unsigned long left, top, right, bottom;
  
     left = (terminal_rect.left/smCharWidth);
-    top = (terminal_rect.top/smCharHeight);
+    top  = (terminal_rect.top /smCharHeight);
 	
     shellSetCursor ( left, top );
 	
@@ -6429,17 +6395,18 @@ void shellRefreshVisibleArea (void){
 	{
 		printf("shellRefreshVisibleArea: textTopRow fail\n");
 	}
-	
-	//toda a �rea vis�vel.
-	//for ( i=0; i<25; i++ )	
-	for ( i=textTopRow; i<textBottomRow; i++ )
-	{
-		for ( j=0; j<80; j++ )
-		{	
-	        //refresh
+
+
+    // loop
+    // toda a �rea vis�vel.
+    // refresh
+
+    for ( i=textTopRow; i<textBottomRow; i++ ){
+        for ( j=0; j<80; j++ ){
             printf ("%c", LINES[i].CHARS[j] );
-		}
-	};
+        }
+    };
+
 
 	//reabilita o cursor
     system_call ( 244, 
@@ -6971,9 +6938,13 @@ noArgs:
 	// #Aten��o
 	// Criaremos a janela tranquilamente usando os valores obtidos
 	// na inicializa��o.
-	
-	
-	//++
+
+
+    // #bugbug
+    // Por causa do gerenciamento da sessão crítica essa função 
+    // deverá retornar NULL se falhar.
+
+    //++
     gde_enter_critical_section ();    
     hWindow = shellCreateMainWindow (1);
     if ( (void *) hWindow == NULL )
