@@ -20,7 +20,14 @@ pixelBackBufferPutpixel (
     unsigned long x, 
     unsigned long y );
     
+
+
+unsigned long
+pixelBackBufferGetColor ( 
+    unsigned long x, 
+    unsigned long y );
     
+
 #endif    
 
 

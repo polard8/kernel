@@ -127,6 +127,80 @@ pixelBackBufferPutpixel (
 
 
 
+// pega uma cor dado sua posição
+unsigned long
+pixelBackBufferGetColor ( 
+    unsigned long x, 
+    unsigned long y )
+{
+
+    // 0xC0800000
+    unsigned char *where = (unsigned char *) ____BACKBUFFER_VA;
+
+
+	// 3 = 24 bpp
+
+    int bytes_count=0;
+
+    //
+    // bpp
+    //
+    
+    // #danger
+    // Esse valor foi herdado do bootloader.
+
+    switch (SavedBPP){
+
+        case 32:  bytes_count = 4;  break;
+        case 24:  bytes_count = 3;  break;
+        //case 16:  bytes_count = 2;  break;
+        //case 8:   bytes_count = 1;  break;
+        
+        default:
+            printf("backbuffer_putpixel: [ERROR] SavedBPP\n");
+            //panic ("backbuffer_putpixel: SavedBPP");
+            break;
+    };
+
+	// #importante
+	// Pegamos a largura do dispositivo.
+	
+    //int width = (int) SavedX; 
+    
+    int width = (int) SavedX; 
+    
+    int offset = (int) ( (bytes_count*width*y) + (bytes_count*x) );
+
+    //
+    // BGR and A
+    //
+
+    // bgra
+    char b, g, r, a;
+
+    // Get bytes.
+
+    b = where[offset];
+    g = where[offset +1];
+    r = where[offset +2];
+    if ( SavedBPP == 32 ){ a = where[offset +3]; };
+    
+    unsigned long ColorBuffer=0;
+    unsigned char *c = (unsigned char *) &ColorBuffer;
+
+    // Set bytes of ColorBuffer.
+
+    c[0] = b; 
+    c[1] = g;
+    c[2] = r;
+    c[3] = a;
+
+    // return the color value.
+    return (unsigned long) ColorBuffer;
+}
+
+
+
 //
 // End.
 //
