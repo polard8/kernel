@@ -14,22 +14,22 @@ This repository has the source code for:
 
 ## Kernel features.
 
-> Paging.
-> Threads.
-> FAT16 file system.
-> ps2/keyboard, serial port, IDE PATA, e1000 NIC.
+> * Paging.
+> * Threads.
+> * FAT16 file system.
+> * ps2/keyboard, serial port, IDE PATA, e1000 NIC.
 
 ## Userland features.
 
-* Working on a Window Server. (gws)
-* Working on a virtual terminal. 
-* unix-like commands running in the virtual console.
+> * Working on a Window Server. (gws)
+> * Working on a virtual terminal. 
+> * unix-like commands running in the virtual console.
 
 ## Libraries.
 
-> unix-like library. (rtl)
-> API for setup environment. (libcore)
-> Lib for the window server's clients. (libgws)
+> * unix-like library. (rtl)
+> * API for setup environment. (libcore)
+> * Lib for the window server's clients. (libgws)
 
 ## Fred's compilation on Linux.
 ```
