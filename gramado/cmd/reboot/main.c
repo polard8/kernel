@@ -78,20 +78,21 @@ int main ( int argc, char *argv[] ){
 
     // get info from crt0.o
 
-    env_host = (char *) getenv ("HOSTNAME");
-    env_user = (char *) getenv ("USER");
-    
+    env_host = (char *) getenv("HOSTNAME");
+    env_user = (char *) getenv("USER");
+
     // Showing the info.
     
-    if ( (void *) env_host != NULL )
+    if ( (void *) env_host != NULL ){
         printf ("Host name:  %s \n", env_host);
-    
-    if ( (void *) env_user != NULL )
+    }
+
+    if ( (void *) env_user != NULL ){
         printf ("User:       %s \n", env_user);
-    
+    }
+
     printf ("Good Bye!\n");
-    
-    
+
 
     //===================================
     // reboot via libio.
@@ -101,7 +102,7 @@ via_libio:
     while (good & 0x02)
     {
         good = libio_inport8(0x64);
-    }
+    };
 
     debug_print("reboot.bin: Go!\n");
          printf("reboot.bin: Go!\n");

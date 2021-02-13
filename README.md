@@ -1,26 +1,12 @@
-# Gramado 1.0.
+# Welcome to Gramado 1.0
 
-<p align=center>
-  <a href="https://github.com/frednora/gramado">
-    <img alt="Gramado" src="https://github.com/gramadoprojects/img/blob/master/gramado10.png">
-  </a>
-</p>
+This repository has the source code for:
 
----
-
-<p align=center>
-  <a href="https://github.com/frednora/gramado/archive/master.zip">
-  <img alt="Download " src="https://img.shields.io/badge/Download-latest-green.svg">
-  </a>
-  <a href="https://gramadoprojects.github.io/projects">
-    <img alt="Donate" src="https://img.shields.io/badge/%24-Donate-orange.svg">
-  </a>
-</p>
-
-## Links:
-
-- [Gramado on Github](https://github.com/frednora/gramado)
-
+* Gramado boot loader
+* Gramado kernel
+* Gramado Window Server
+* Applications
+* Commands
 
 ## What is Gramado?
 
@@ -28,10 +14,10 @@
 
 ## Kernel features.
 
-* Paging.
-* Threads.
-* IDE PATA, e1000 NIC, Serial Port, ps2 mouse and keyboard.
-* FAT16 file system.
+> Paging.
+> Threads.
+> FAT16 file system.
+> ps2/keyboard, serial port, IDE PATA, e1000 NIC.
 
 ## Userland features.
 
@@ -41,9 +27,9 @@
 
 ## Libraries.
 
-* unix-like library. (rtl)
-* API for setup environment. (libcore)
-* Lib for the window server's clients. (libgws)
+> unix-like library. (rtl)
+> API for setup environment. (libcore)
+> Lib for the window server's clients. (libgws)
 
 ## Fred's compilation on Linux.
 ```
@@ -76,5 +62,5 @@ Gramado is a Free and Open Source operating system created by Fred Nora.
 The source code uses the BSD license.
 
 # Quotes:
-	Oh boy, there is no spoon!
+> Oh boy, there is no spoon!
 

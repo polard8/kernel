@@ -18,6 +18,8 @@ int main (int argc, char **argv)
     char ch[100];
     char *pos1, *pos2, *pos3;
 
+    printf("showfun:\n");
+
     fp = fopen(argv[1], "r");
 
     if (fp == NULL){
