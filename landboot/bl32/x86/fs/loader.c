@@ -55,7 +55,7 @@ void updateProgressBar();
 // pa = 0x00100000.
 // va = 0xC0000000.
  
-int load_kernel ()
+int load_kernel (const char *file_name)
 {
     int Status = -1;
 
@@ -67,8 +67,16 @@ int load_kernel ()
 
     unsigned char *kernel = (unsigned char *) KERNEL_ADDRESS;      
 
+
+    // Path
+    char Path[64];
+    char DefaultPath[64];
+
     // Name.
-    char *kernel_name = "KERNEL.BIN";
+
+    char *kernel_name;
+    kernel_name = file_name;
+
 
     // Message.
 
@@ -82,26 +90,32 @@ int load_kernel ()
     // Load kernel image
     //
 
+    //
+    strcpy (Path, "/GRAMADO");
+    strcat (Path, "/");
+    strcat (Path, kernel_name );
+
+    // Default
+    strcpy (DefaultPath, "/GRAMADO/KERNEL.BIN");
+
     // Load KERNEL.BIN on a physical address.
     // Search the file in the /LANDOS/ and /BOOT/ subdirectories
     // of the boot partition.
 
 
-    Status = (int) load_path(
-                       "/GRAMADO/KERNEL.BIN", 
-                       (unsigned long) kernel_pa );
+    Status = (int) load_path( Path, (unsigned long) kernel_pa );
+
     // Fail
     if ( Status != 0 ){
         // Try again
-        Status = (int) load_path(
-                           "/GRAMADO/KERNEL.BIN", 
-                           (unsigned long) kernel_pa );
+        Status = (int) load_path( DefaultPath,(unsigned long) kernel_pa );
     }
 
     if (Status != 0 ){
         printf("load_kernel: [FAIL] Couldn't load the kernel image\n");
         goto fail;    
     }
+
 
     //
     // Check signature.
@@ -114,7 +128,7 @@ int load_kernel ()
          kernel[1] != 'E' || kernel[2] != 'L' || kernel[3] != 'F' )
     {
         printf ("load_kernel: [FAIL] %s ELF image validation\n", 
-            kernel_name );  
+            kernel_name ); 
         goto fail;
     }
 
@@ -145,14 +159,13 @@ int load_kernel ()
          kernel[0x1009] != 0xB0 ||
          kernel[0x100A] != 0xAD || 
          kernel[0x100B] != 0x1B )
-    {    
-        
+    {
+
 		//#debug
-		printf ("0x1BADB002 found!\n");
+		printf ("load_kernel: [FAIL] 0x1BADB002 found!\n");
 		//refresh_screen();
 		//while(1){}
     }
-
 
 
 	//Continua ...

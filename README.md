@@ -17,7 +17,11 @@ This repository has the source code for:
 > * Paging.
 > * Threads.
 > * FAT16 file system.
-> * ps2/keyboard, serial port, IDE PATA, e1000 NIC.
+> * ps/2 keyboard. 
+> * ps/2 mouse works fine only on qemu.
+> * serial port. 
+> * IDE PATA. 
+> * e1000 NIC.
 
 ## Userland features.
 

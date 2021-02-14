@@ -134,7 +134,7 @@ fatLoadCluster (
 // Loading files.
 //
 
-int load_kernel();
+int load_kernel (const char *file_name);
 
 
 

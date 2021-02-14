@@ -1507,53 +1507,58 @@ struct frontbufferinfo_d *FrontBufferInfo;
  */
 
 
+// #bugbug
+// Muita coisa nessa estrutura precis ser revista.
+// Tendo em vista que ela apenas contempla o kgws
+// como provedor de recursos gráficos.
+// Dessa forma essa estrutura só faz sentido no ambiente 
+// de setup, que usa o kgws.
+
+
 struct gui_d
 {
 
-	//Se a gui está ou não inicializada.
-	int initialised;		  
+    // Se a gui está ou não inicializada.
+    int initialised;
 
-	
-	//Procedimento da janela ativa.
-	unsigned long procedure;  
+    // Procedimento da janela ativa.
+    unsigned long procedure;  
 
-	
-	/*
-	 *    ****    BUFFERS    ****
-	 *    Ponteiros para os principais buffers usados pelo sistema.
-	 */
-	
-	
-	/*
-	 * LFB:
-	 * O endereço do início da memória de vídeo do cartão de memória.
-	 * Obs: Quantos desses ponteiros precisamos dentro da memória de
-	 * vídeo? E se tivermos várias placas de memória de vídeo, seria
-	 * um lfb para cada placa?
-	 * Esse valor foi configurado pelo BIOS pelo metodo VESA.
-	 */
-	
-	 unsigned long lfb;
-	 
-	/*
-	 * Backbuffers.
-	 *     O Backbuffer pe o buffer para colocar a imagem de pano de fundo.
-	 * Ele será o buffer dedicado da janela principal gui->main. 
-	 */
-	
+
+    // #bugbug
+    // precisamos de estrutura de device context,
+    // onde teremos informações sobre o hardware
+    // responsável pelos recursos gráficos.
+
+    // BUFFERS
+    // Ponteiros para os principais buffers usados pelo sistema.
+
+    // LFB:
+    // O endereço do início da memória de vídeo do cartão de memória.
+    // obs: Quantos desses ponteiros precisamos dentro da memória de
+    // vídeo? E se tivermos várias placas de memória de vídeo, seria
+    // um lfb para cada placa?
+    // Esse valor foi configurado pelo BIOS pelo metodo VESA.
+
+    unsigned long lfb;
+ 
+    // Backbuffer
+    // O Backbuffer pe o buffer para colocar a imagem de pano de fundo.
+    // Ele será o buffer dedicado da janela principal gui->main. 
+
 	// #importante.
 	// Um backbuffer pode cobrir a área de vários monitores.
 	// O conceito de backbuffer pode estar relacionado com o conceito de room,
 	// (window station), com vários desktops e monitores.
-	
-	unsigned long backbuffer;
-	
+
+    unsigned long backbuffer;
+
     void *backbuffer1; 
-	void *backbuffer2; 
-	void *backbuffer3;
-	//...
-	
-	
+    void *backbuffer2; 
+    void *backbuffer3;
+    // ...
+
+
 	/*
 	 * Default dedicated buffers.
 	 *     Esses ponteiros podem ser usados para aloca
@@ -1568,43 +1573,42 @@ struct gui_d
 	//void* defaultWindowDedicatedBuffer2;
 	//void* defaultWindowDedicatedBuffer3;
     //...	
-	
-	
-	/*
-	 * Flag para repintar todas as janelas.
-	 * @todo: #bugbug, Isso parece estranho. Cada janela
-	 * está pintada em seu buffer dedicado e fica por conta de
-	 * cada janela decidir se repinta ou não apenas ela.
-	 */
-	int redraw;	
 
-	
-	/*
-	 * Flag para enviar do backbuffer para a memória de video.
-	 * Seguindo uma lista linkada, copiaremos o conteúdo do buffer
-	 * dedicado de cada janela da lista no LFB. Primeiro é Backbuffer
-	 * que é o buffer da janela principal, que funcionará como
-	 * Head da lista.
-	 */
-	int refresh;			       
-    //struct window_d * redrawWindowListHead;	
-	
-	
-	//status das janelas usadas pelo sistema.
+
+    // redraw
+    // Flag para repintar todas as janelas.
+    // #todo: #bugbug, Isso parece estranho. Cada janela
+    // está pintada em seu buffer dedicado e fica por conta de
+    // cada janela decidir se repinta ou não apenas ela.
+
+    int redraw;
+
+
+    // refresh
+    // Flag para enviar do backbuffer para a memória de video.
+    // Seguindo uma lista linkada, copiaremos o conteúdo do buffer
+    // dedicado de cada janela da lista no LFB. Primeiro é Backbuffer
+    // que é o buffer da janela principal, que funcionará como
+    // Head da lista.
+
+    int refresh;
+
+
+    // status das janelas usadas pelo sistema.
 	int screenStatus;
 	int backgroundStatus;
 	int logoStatus;
 	int mainStatus;
-	int navigationbarStatus;	
+	int navigationbarStatus;
 	int menuStatus;
 	int taskbarStatus;
-	int statusbarStatus;	
+	int statusbarStatus;
 	int infoboxStatus;
 	int messageboxStatus;
 	int debugStatus;
 	int gridStatus;
-	
-	
+
+
 	/*
 	 *    ****    Windows    ****
 	 *
@@ -1628,35 +1632,43 @@ struct gui_d
 	 * Grupo 5: ??
 	 * Grupo 6: Outras.
 	 */
-	
-	//Screen: 
-	//      A tela. Tem as dimensões do monitor usado.
-	// Root window.   
-	
-    struct window_d *screen; 	
-	
+
+
+    // Screen: 
+    // A tela. Tem as dimensões do monitor usado.
+    // Root window.   
+
+    struct window_d  *screen; 
+
+
 	//
-	// Grupo 0: Background, Logo, Desktop, Taskbar.
+	// Grupo 0: 
+	// Background, Logo, Desktop, Taskbar.
 	//
-	
+
 	// A única janela em primeiro plano e com o foco de entrada. 
 	// Será usada pelo desenvolvedor durante a construção dos 
 	// elementos gráficos, até que o sistema gráfico fique mais robusto
 	// e permita ficar trocando a janela com o foco de entrada.
 	// Isso é para evitar confusão de output nesa fase.
-	
-    struct window_d *DEVELOPERSCREEN;    
-	
-    
-	// Background: 
-	//     Uma janela popup com as dimensões da tela.
-	struct window_d *background; 
 
-	//Logo: A imagem de pano de fundo.
-    struct window_d *logo;
-	
-	
-	
+    // #deprecated
+ 
+    struct window_d  *DEVELOPERSCREEN;    
+
+
+    // Background: 
+    // Uma janela popup com as dimensões da tela.
+
+    struct window_d  *background; 
+
+
+    // Logo: 
+    // A imagem de pano de fundo.
+
+    struct window_d  *logo;
+
+
 	/*
 	 * Desktop:
 	 *    A Área de trabalho.    
@@ -1665,23 +1677,27 @@ struct gui_d
 	 *    É a área onde ficam os ícones e as janelas dos
 	 *    programas.
 	 */
-    struct window_d *desktop; 
 
-	/*
-	 * Task Bar: (top bar) 
-	 *     A barra de tarefas.
-	 */
-	struct window_d *taskbar;
+    // #obs
+    // Essa é uma janela e não uma estrtura de desktop.
+
+    struct window_d  *desktop; 
+
+
+    // Task Bar: (top bar) 
+    // A barra de tarefas.
+
+    struct window_d *taskbar;
 
 
     //
     // Grupo 1: Main (Full Screen), Status Bar. 
     //
 
-	/*
-	 * Main:
-	 * A área de trabalho.
-	 */
+
+    // Main:
+    // A área de trabalho.
+
     struct window_d *main;
 
 	/*
@@ -1690,8 +1706,9 @@ struct gui_d
 	 *     Usada em qualquer condição.
 	 *     Fica posicionada dentro de uma janela mãe.
 	 */
-	struct window_d *statusbar;
-	
+
+    struct window_d *statusbar;
+
  
 	//
 	// Grupo 2: Grid. 
@@ -1705,9 +1722,10 @@ struct gui_d
 	 *    Essa área de grid pode ser reposicionada
 	 *    de acordo com o layout escolhido.
 	 */
-	struct window_d *grid;
-	
-	
+
+    struct window_d  *grid;
+
+
 	
 	//
 	// Grupo 3: Control menu.
@@ -1719,43 +1737,46 @@ struct gui_d
 	 *     Isso depende da janela ativa e da janela com o foco de entrada.
 	 *     Esse será o ponteiro para o control menu que deverá ser aberto.
 	 *     Varia conforme muda a janela com o foco de entrada.
-	 */	
-	struct window_d *menu; 
+	 */
 
-	
+    struct window_d *menu; 
+
+
 	//
 	// Grupo 4: Info Box, ToolTip.
 	//
 	
-	/*
-	 * Infobox:
-	 *     Janela usada para o sistema enviar mensagens de informações.   
-     * seria notification window ??	 
-	 */
-	struct window_d *infobox; 
-    
-	
+    /*
+    * Infobox:
+    *     Janela usada para o sistema enviar mensagens de informações.   
+    * seria notification window ??	 
+    */
+
+    struct window_d  *infobox; 
+
+
 	//
 	// Pequena janela de notificações, que desaparece depois de um tempo..
 	//
 	//struct window_d *notification;   	
 
-	
+
 	/*
 	 * ToolTip:
 	 *     Janelinha que aparece quando repousa o mouse sobre elemento gráfico.
 	 *      POPUP. A janela se adapta ao tamanho da string.
 	 */
-	struct window_d *tooltip;  
-	
-	
-	// Grupo 5: 
-	// MessageBox e DialogBox.
+
+    struct window_d *tooltip;  
+
+
+    // Grupo 5: 
+    // MessageBox e DialogBox.
     // Isso e' um test.
-	
-	struct window_d *messagebox;
-	struct window_d *dialogbox;
-	
+
+    struct window_d  *messagebox;
+    struct window_d  *dialogbox;
+
 	
 	//
 	// Grupo 6: Outras.
@@ -1768,7 +1789,7 @@ struct gui_d
     //Menu bar.
 	struct window_d *mbhWindow;       //Janela principal da menu bar.
 	struct menu_d *mb;               //a menu bar é um menu
-	struct menu_d *mbControlPanel;	 //Painel de controle
+	struct menu_d *mbControlPanel;   //Painel de controle
 	struct menu_d *mbComputer;       //Meu computador(discos, diretorios ...)
 	struct menu_d *mbFile;           //File manager. (abre e fecha arquivos)
 	struct menu_d *mbWindow;         //Window manager (igual sistem menu) 
@@ -1786,7 +1807,7 @@ struct gui_d
 	// Essas barras abaixo tem a finalidade de dar alguma navegabilidade
 	// mesmo sem algum programa de gerenciamento de arquivos.
 	// E também não há problemas em os dois conviverem.
-	
+
 	//TopBar.
 	struct window_d *topbar;	
 	struct menu_d *logonMenu;         //Logon
@@ -1794,9 +1815,9 @@ struct gui_d
 
     //Navigation Bar.
     struct window_d *navigationbar;	
-	struct menu_d *desktopMenu;       //Desktop 
-	struct menu_d *setupMenu;         //Ambiente de configuração.
-	
+    struct menu_d *desktopMenu;       //Desktop 
+    struct menu_d *setupMenu;         //Ambiente de configuração.
+
 	//Current Menu.
 	//Aponta para a estrutura do menu atual.
 	//Seja ele de qual tipo for.
@@ -1836,29 +1857,35 @@ struct gui_d
 	
 	// Frontbuffer support. (memória de vídeo)
 	struct frontbufferinfo_d *frontbufferInfo; 
-	
-    
-	//
-	// ## globais ##
-	//
-	
-	struct desktop_d *CurrentDesktop;
-	struct wstation_d *CurrentWindowStation;
-	struct usession_d *CurrentUserSession;
-	
-	//Lista de informações sobre usuários.
-    //@todo: Isso não precisa ficar aqui.	
-	struct user_info_d *User; 	
-	
-	//...
+
+
+//
+// Security.
+//
+
+
+    struct usession_d  *CurrentUserSession;
+    struct room_d      *CurrentRoom;
+    struct desktop_d   *CurrentDesktop;
+
+
+
+//
+// User info.
+//
+
+    struct user_info_d *User; 
+
+    //...
 };
+
 
 // #importante
 // Estrutura global. 
 // (Usada para passar estutura entre funções)
 // Primeira e única. 
 
-struct gui_d *gui; 
+struct gui_d  *gui; 
 
 
 
@@ -1875,33 +1902,38 @@ struct gui_d *gui;
  *     @todo: Limite de janelas (+- 10)
  */
 
-void SetGuiParameters( int refresh,         
-                       int screen,          
-                       int background,       
-                       int logo,            
-                       int taskbar,         
-                       int main,             
-                       int menu,            
-                       int infobox,         
-                       int messagebox,       
-                       int debug,           
-                       int navigationbar,    
-                       int grid );
+void 
+SetGuiParameters ( 
+    int refresh, 
+    int screen,
+    int background, 
+    int logo, 
+    int taskbar, 
+    int main, 
+    int menu,
+    int infobox, 
+    int messagebox,  
+    int debug, 
+    int navigationbar, 
+    int grid );
 
-  
+
 //
 // Bars support. (menubar)
 //
 
 int 
-UpdateStatusBar ( struct window_d *window, 
-                  unsigned char *string1, 
-		          unsigned char *string2 );
+UpdateStatusBar ( 
+    struct window_d *window, 
+    unsigned char *string1, 
+    unsigned char *string2 );
 
-struct window_d *
-StatusBar ( struct window_d *window, 
-            unsigned char *string1, 
-            unsigned char *string2 );
+
+struct window_d *StatusBar ( 
+    struct window_d *window, 
+    unsigned char *string1, 
+    unsigned char *string2 );
+
 
 struct window_d *ToolBar ( struct window_d *window );
 
@@ -1912,50 +1944,60 @@ struct window_d *ToolBar ( struct window_d *window );
 
 void *create_menubar (struct window_d *pwindow); 
 
-int create_menubar_item (struct menu_d *menu, unsigned char *string, int status);
+int 
+create_menubar_item (
+    struct menu_d *menu, 
+    unsigned char *string, 
+    int status );
 
-int draw_menubar_item ( struct window_d *window, unsigned char *string);
+int 
+draw_menubar_item ( 
+    struct window_d *window, 
+    unsigned char *string );
 
 //int select_menubar_item(struct menuitem_d *menuitem);
 
 
-//int menubarX (void);
-int kgws_create_menubar ( struct window_d *window);
+int kgws_create_menubar (struct window_d *window);
 
 
-//Color.
+// Color.
 void set_up_color(unsigned long color);
 
-void 
-set_up_text_color( unsigned char forecolor, 
-                   unsigned char backcolor );
 
 void 
-update_button (  struct button_d *button,
-               unsigned char *string,
-               int style,
-               int state,
-               int type,
-               unsigned long x, 
-               unsigned long y, 
-               unsigned long width, 
-               unsigned long height, 
-               unsigned long color );
+set_up_text_color ( 
+    unsigned char forecolor, 
+    unsigned char backcolor );
 
 
-void *draw_button ( unsigned char *string,
-                    int style,
-                    int state,
-                    int type, 
-                    unsigned long x, 
-                    unsigned long y, 
-                    unsigned long width, 
-                    unsigned long height, 
-                    unsigned long color );
+void 
+update_button (  
+    struct button_d *button,
+    unsigned char *string,
+    int style,
+    int state,
+    int type,
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long width, 
+    unsigned long height, 
+    unsigned long color );
+
+
+void *draw_button ( 
+    unsigned char *string,
+    int style,
+    int state,
+    int type, 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long width, 
+    unsigned long height, 
+    unsigned long color );
 
 
 int redraw_button ( struct button_d *button );
-
 
 int button_down ( struct window_d *window );
 
@@ -1966,7 +2008,7 @@ int button_up ( struct window_d *window );
 // Focus support.
 
 void SetFocus ( struct window_d *window );
-void *GetFocus (void);                             
+void *GetFocus (void); 
 void KillFocus ( struct window_d *window );
 
 //foreground window support
@@ -2034,11 +2076,11 @@ void *guiGetShellClientWindowWindow (void);
 void *getClientAreaRect (void);
 
 void 
-setClientAreaRect ( unsigned long x, 
-                    unsigned long y, 
-                    unsigned long cx, 
-                    unsigned long cy );
-
+setClientAreaRect ( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long cx, 
+    unsigned long cy );
 
 
 // Background support.
@@ -2057,25 +2099,28 @@ int backgroundInit (void);
 //
 
 void 
-draw_string ( unsigned long x, 
-              unsigned long y, 
-              unsigned long color, 
-              unsigned char *string );
+draw_string ( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long color, 
+    unsigned char *string );
 
 
 void 
-draw_text ( struct window_d *window,
-            unsigned long x,  
-            unsigned long y,  
-            unsigned long color, 
-            unsigned char *string );
+draw_text ( 
+    struct window_d *window,
+    unsigned long x,  
+    unsigned long y,  
+    unsigned long color, 
+    unsigned char *string );
 
 
 void 
-my_buffer_char_blt ( unsigned long x, 
-                     unsigned long y, 
-                     unsigned long color, 
-                     unsigned long c);
+my_buffer_char_blt ( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long color, 
+    unsigned long c);
 
 
 void set_char_width( int width );
@@ -2179,7 +2224,7 @@ struct saved_rect_d
 	// O buffer está cheio. 
 	// 1 retângulo foi salvo nele.
 
-    int full;    
+    int full; 
 };
 struct saved_rect_d *SavedRect;
 
@@ -2214,14 +2259,6 @@ show_saved_rect (
 
 //#todo: deprecated.
 void scroll_screen_rect (void);
-
-
-
-//
-// ...
-//
-
-
 
 
 // Pinta um pixel em um buffer de janela.

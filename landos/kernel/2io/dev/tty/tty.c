@@ -85,7 +85,7 @@ tty_write_from_of ( unsigned int fd,
 
 // See: tty.h
 
-struct tty_d *tty_create (void){
+struct tty_d *tty_create(void){
 
     struct tty_d *__tty;
 
@@ -103,13 +103,13 @@ struct tty_d *tty_create (void){
     if ( (void *) __tty == NULL ){
         panic ("tty_create: __tty kmalloc fail \n");   
         //return NULL;
- 
     }else{
         __tty->objectType  = ObjectTypeTTY;
         __tty->objectClass = ObjectClassKernelObjects;
         
         //__tty->index = ?;
-        __tty->used = 1;
+        
+        __tty->used  = TRUE;
         __tty->magic = 1234;
 
         // No thread for now.
@@ -124,7 +124,7 @@ struct tty_d *tty_create (void){
         // Maybe it will change when a user login into a terminal.
         // Nao sei se essas estruturas estao prontas para isso nesse momento
         // ou se esses ponteiros sao nulos.
-        __tty->user_session = NULL;  //CurrentUserSession;
+        __tty->user_session = NULL;  // CurrentUserSession;
         __tty->room         = NULL;  // CurrentRoom;
         __tty->desktop      = NULL;  // CurrentDesktop;
 
@@ -164,7 +164,7 @@ struct tty_d *tty_create (void){
 
 
         // not stopped
-        __tty->stopped = 0;
+        __tty->stopped = FALSE;
 
         // process
         // __tty->process = KernelProcess;
@@ -180,14 +180,12 @@ struct tty_d *tty_create (void){
         //__tty->window = NULL;
 
 
-
         //
         // == buffers ===========================
         //
 
         // YES, We are using buffer.
-        __tty->nobuffers = FALSE;   // No buffers.
-
+        __tty->nobuffers = FALSE;
 
         // Ponteiros para estruturas de arquivos.
         // Esses arquivos servem de buffers.
@@ -210,13 +208,13 @@ struct tty_d *tty_create (void){
 
         // Precisa validar
 
-        __tty->_rbuffer->used = 1;
-        __tty->_rbuffer->magic = 1234;  
+        __tty->_rbuffer->used  = TRUE;
+        __tty->_rbuffer->magic = 1234;
                
-        __tty->_cbuffer->used = 1;
+        __tty->_cbuffer->used  = TRUE;
         __tty->_cbuffer->magic = 1234;
         
-        __tty->_obuffer->used  = 1;
+        __tty->_obuffer->used  = TRUE;
         __tty->_obuffer->magic = 1234;
 
 
@@ -278,7 +276,7 @@ struct tty_d *tty_create (void){
         __tty->cursor_x = 0;
         __tty->cursor_y = 0;
         
-        // cursor margin
+        // cursor margin.
         __tty->cursor_left = 0;
         __tty->cursor_top  = 0;
         
@@ -299,7 +297,7 @@ struct tty_d *tty_create (void){
     };
 
 
-    panic ("tty_create: Crazy error!\n");   
+    panic ("tty_create: Crazy error!\n");
     //return NULL;
 
 
@@ -308,19 +306,20 @@ __ok_register:
 
 
     if ( (void *) __tty == NULL ){
-        panic("tty_create: __tty");
+        panic("tty_create: __tty\n");
     }
 
     //#test
     // isso não é o ponto de montagem.
     
-    sprintf ( (char *) &__tmpname[0], 
+    sprintf ( 
+        (char *) &__tmpname[0], 
         "/DEV_TTY%d", 
         __tty->index );
-    
+
     char *newname = (char *) kmalloc (64);
     if ( (void*) newname == NULL ){
-        panic("tty_create: newname");
+        panic("tty_create: newname\n");
     }
     strcpy (newname,__tmpname);
 
@@ -333,17 +332,17 @@ __ok_register:
     __file = (file *) kmalloc ( sizeof(file) );
     
     if ( (void *) __file == NULL ){
-        panic ("tty_create: __file fail, can't register device");
-    
+        panic ("tty_create: __file fail, can't register device\n");
     }else{
 
        // file
        
         __file->____object = ObjectTypeTTY;
-        __file->used  = 1;
+ 
+        __file->used  = TRUE;
         __file->magic = 1234;
 
-        __file->isDevice = 1;
+        __file->isDevice = TRUE;
 
         // A estrutura de tty associada com esse arquivo.
         __file->tty = __tty;
@@ -552,6 +551,10 @@ __tty_write (
     char *buffer, 
     int nr )
 {
+
+    struct process_d * __p;
+
+
     debug_print ("__tty_write: [DEBUG]\n");
         
     // tty
@@ -651,19 +654,20 @@ __tty_write (
     //indicando a tty pra ele ler.
     
     // current process. quem escreveu;
-    struct process_d * __p;
     
     __p = (struct process_d *) processList[current_process];
     
 
-    if ( (void *) __p == NULL )
+    if ( (void *) __p == NULL ){
         panic("__tty_write: __p\n");
+    }
 
 
-    if ( __p->used != 1 || __p->magic != 1234 )
+    if ( __p->used != 1 || __p->magic != 1234 ){
         panic("__tty_write: validation\n");
-    
-    
+    }
+
+
     // #bugbug
     // Atenção. O mecanismo de clonagem
     // pode gerar um ppid errado ?
@@ -1012,6 +1016,7 @@ tty_write (
     int n )
 {
     struct tty_d *__tty;
+
     struct process_d *p;
     file *f;
     
@@ -1415,12 +1420,13 @@ void tty_stop (struct tty_d *tty){
     }
 
     //se ela já está parada.
-    if (tty->stopped == 1){
+    if (tty->stopped == TRUE)
+    {
         //debug_print("tty_stop: already stopped\n");
         return;
     }
 
-    tty->stopped = 1;
+    tty->stopped = TRUE;
 }
 
 
@@ -1432,12 +1438,13 @@ void tty_start (struct tty_d *tty){
     }
 
     //Se não está parada.
-    if (tty->stopped == 0){
+    if (tty->stopped == FALSE)
+    {
         //debug_print("tty_start: not stopped\n");
         return;
     }
 
-    tty->stopped = 0;
+    tty->stopped = FALSE;
 }
 
 
@@ -1571,11 +1578,11 @@ struct ttyldisc_d *ttyldisc_create (void){
     if ( (void *) __ttyldisc == NULL ){
         debug_print("ttyldisc_create: __ttyldisc\n");
         return NULL;
- 
     }else{
-        __ttyldisc->used = 1;
+
+        __ttyldisc->used  = TRUE;
         __ttyldisc->magic = 1234;
-        
+
         // ...
         
         // OK
@@ -1628,7 +1635,7 @@ struct ttydrv_d *ttydrv_create (void) {
 
     }else{
 
-        __ttydrv->used = 1;
+        __ttydrv->used  = TRUE;
         __ttydrv->magic = 1234;
         
         // ...
@@ -1653,7 +1660,6 @@ int ttydrv_delete ( struct ttydrv_d *tty_driver ){
     if ( (void *) tty_driver == NULL ){
         debug_print ("ttydrv_delete: tty_driver\n");
         return -1;
-
     }else{
          
          //#bugbug: fast way
@@ -1697,12 +1703,14 @@ int tty_open (file *f, struct inode_d *inode)
 */
 
 
-//OUT: tty pointer.
+// file to tty.
+// OUT: tty pointer.
 struct tty_d *file_tty (file *f)
 {
     if ( (void *)f==NULL ){
         return (struct tty_d *) 0;
     }
+
     return (struct tty_d *) f->tty;
 }
 
@@ -1716,7 +1724,6 @@ int tty_delete ( struct tty_d *tty ){
         debug_print ("tty_delete: tty\n");
         //debug_print("...");
         return -1;
- 
     }else{
          
          //#bugbug: fast way

@@ -47,10 +47,9 @@
  *
  * History:
  *     2015 - Created by Fred Nora.
- *     2016 - Revision.
  */
- 
- 
+
+
 #include <kernel.h>
 
 
@@ -117,29 +116,27 @@ int init_logon_manager (void){
 
     //backgroundDraw ( (unsigned long) COLOR_GRAY ); 
 
-    kprintf ("*\n");
-    //kprintf ("**\n");
+    kprintf ("\n");
     kprintf ("init_logon_manager: Initializing user environment!\n");
-    //kprintf ("**\n");
-    kprintf ("*\n");
+    kprintf ("\n");
 
     // #todo:
     // Podemos mudar o nome dessa funçao para logonSetupVersion()
 
-    kprintf ("init_logon_manager: Initialize version support  \n");
+    kprintf ("init_logon_manager: Initialize version support \n");
     systemSetupVersion();
 
+    //
+    // gui structure. 
+    //
 
-	//
-	// GUI Structure. 
-	//
+    // 
+    // See: window.h
 
     gui = (void *) kmalloc ( sizeof(struct gui_d) );
 
-    if ( (void *) gui == NULL)
-    {
+    if ( (void *) gui == NULL){
         panic ("init_logon_manager: gui struct");
-
     }else{
 
         //
@@ -193,15 +190,21 @@ int init_logon_manager (void){
         // display and screen
         current_display = 0;
         current_screen = 0;
-        
+ 
+        //
+        // Security
+        //
+ 
         // User session, room (Window Station), desktop, 
-        current_usersession = 0;    
-        current_room = 0;           
-        current_desktop = 0;        
+        current_usersession  = 0;
+        current_room         = 0;
+        current_desktop      = 0;
+
 
         // window and menu.
-        current_window = 0;        
-        current_menu = 0;          
+        current_window  = 0;
+        current_menu    = 0;    
+
 
         // Initializing zorder list.
 
@@ -274,23 +277,26 @@ int init_logon_manager (void){
     logon_create_screen_window(); 
 
 
-    if ( (void *) gui->screen == NULL )
-        panic("init_logon_manager: No sreen window!");
+    if ( (void *) gui->screen == NULL ){
+        panic("init_logon_manager: No sreen window\n");
+    }
 
-    if ( (void *) gui->main == NULL )
-        panic("init_logon_manager: No main window!");
+    if ( (void *) gui->main == NULL ){
+        panic("init_logon_manager: No main window\n");
+    }
 
-    if ( (void *) gui->main != NULL ){
+    // Write something into the main window.
 
-        draw_text ( gui->main, 8, 8, 
+    if ( (void *) gui->main != NULL )
+    {
+        draw_text ( 
+            gui->main, 8, 8, 
             COLOR_WHITE, "Gramado Operating System" );
 
         //draw_text( gui->main, 400 +8, 8*3, 
             //COLOR_WHITE, "(under construction) ");
-
-        //draw_text( gui->main, 400 +8, 8*4, 
-            //COLOR_WHITE, "(This is the enviroment to run logon process)" );
     }
+
 
      //printf("*breakpoint\n");
      //refresh_screen();
@@ -300,9 +306,9 @@ int init_logon_manager (void){
 
 done:
 
-    logonStatus = 1;
-    
-    gui->initialised = 1;
+    logonStatus      = TRUE;
+    gui->initialised = TRUE;
+
 
     kprintf ("init_logon_manager: Done\n"); 
     
@@ -319,11 +325,18 @@ done:
  * reboot e shutdown.
  */
 
-int ExitLogon (void){
 
+int ExitLogon (void)
+{
+
+    if ( (void *) gui == NULL )
+    {
+        panic("ExitLogon: gui\n");
+    }
 
     if ( (void *) gui != NULL )
     {
+
         //CloseWindow();
 		//...
 		
@@ -359,10 +372,12 @@ void logon_create_screen_window (void){
 
     struct window_d *hWindow; 
 
-    unsigned long Left = 0;
-    unsigned long Top = 0;
+    unsigned long Left   = 0;
+    unsigned long Top    = 0;
+
     unsigned long Width  = (unsigned long) screenGetWidth();
     unsigned long Height = (unsigned long) screenGetHeight();
+
 
 
 	// Screen
@@ -378,10 +393,8 @@ void logon_create_screen_window (void){
 
 
     if ( (void *) hWindow == NULL ){
-       panic ("logon_create_screen_window:");
-
+       panic ("logon_create_screen_window: hWindow\n");
     }else{
-
         if ( hWindow->used != 1 || hWindow->magic != 1234 ){
             panic ("logon_create_screen_window: hWindow\n");
         }
@@ -389,8 +402,7 @@ void logon_create_screen_window (void){
         RegisterWindow (hWindow);
 
         if ( (void *) gui == NULL){
-            panic ("logon_create_screen_window: gui");
-
+            panic ("logon_create_screen_window: gui\n");
         }else{
 
             gui->screen = (void *) hWindow;
@@ -406,12 +418,16 @@ void logon_create_screen_window (void){
 			// #debug
 			// refresh_screen();
 			// while(1){}
-		};
+
+        };
     };
 }
 
 
-int register_logon_process ( pid_t pid ){
+
+// Register logon process.
+int register_logon_process ( pid_t pid )
+{
 
     if (pid<0 || pid >= PROCESS_COUNT_MAX ){
         debug_print("register_logon_process: pid fail\n");

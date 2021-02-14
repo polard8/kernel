@@ -946,8 +946,8 @@ int gde_dialog_box ( int type, char *string1, char *string2 )
             gde_set_focus(hWnd);
             break;
 
-		// Sem botão, considera o título.	
-	    case 2:
+        // Sem botão, considera o título.
+        case 2:
             Button = 0;
             hWnd = (void*) gde_create_window ( 
                                WT_POPUP, 1, 1, string1, 
@@ -966,23 +966,23 @@ int gde_dialog_box ( int type, char *string1, char *string2 )
                                WindowClientAreaColor, WindowColor ); 
             break;
 
-
-        // Com botão, título de mensagem do sistema.	
+        // Com botão, título de mensagem do sistema.
         case 4:
-		    Button = 1;
-	        hWnd = (void*) gde_create_window ( WT_OVERLAPPED, 1, 1, "System Message", 
-			                x, y, cx, cy, NULL, 0, 
-							WindowClientAreaColor, WindowColor); 
-	        break;
+            Button = 1;
+            hWnd = (void*) gde_create_window ( 
+                               WT_OVERLAPPED, 1, 1, "System Message", 
+                               x, y, cx, cy, NULL, 0, 
+                               WindowClientAreaColor, WindowColor); 
+            break;
 
-
-		//Tipo negligenciado. Usamos o formato padrão.	
-		default:
-		    Button = 1;
-	        hWnd = (void*) gde_create_window ( WT_OVERLAPPED, 1, 1, "Error", 
-			                x, y, cx, cy, NULL, 0, 
-							WindowClientAreaColor, WindowColor); 
-		    break;
+        // Tipo negligenciado. Usamos o formato padrão.	
+        default:
+            Button = 1;
+            hWnd = (void*) gde_create_window ( 
+                               WT_OVERLAPPED, 1, 1, "Error", 
+                               x, y, cx, cy, NULL, 0, 
+                               WindowClientAreaColor, WindowColor); 
+            break;
     };
 
 
@@ -1424,6 +1424,10 @@ gde_resize_window (
     unsigned long y )
 {
 
+    if ( (void*) window == NULL ){
+        return;
+    }
+
     gramado_system_call ( 
         SYSTEMCALL_RESIZEWINDOW, (unsigned long) window, x, y );
 }
@@ -1441,8 +1445,9 @@ gde_redraw_window (
     unsigned long flags )
 {
 
-    if ( (void*) window == NULL )
+    if ( (void*) window == NULL ){
         return;
+    }
 
     gramado_system_call ( 
         SYSTEMCALL_REDRAWWINDOW, 
@@ -1458,8 +1463,9 @@ gde_replace_window (
     unsigned long x, 
     unsigned long y )
 {
-    if ( (void*) window == NULL )
+    if ( (void*) window == NULL ){
         return;
+    }
 
     system_call ( 
         SYSTEMCALL_REPLACEWINDOW, (unsigned long) window, x, y );
@@ -1469,8 +1475,9 @@ gde_replace_window (
 void gde_maximize_window (struct window_d *window)
 {
 
-    if ( (void*) window == NULL )
+    if ( (void*) window == NULL ){
         return;
+    }
 
     gramado_system_call ( 
         SYSTEMCALL_MAXIMIZEWINDOW, 
@@ -1483,8 +1490,9 @@ void gde_maximize_window (struct window_d *window)
 void gde_minimize_window (struct window_d *window)
 {
 
-    if ( (void*) window == NULL )
+    if ( (void*) window == NULL ){
         return;
+    }
 
     gramado_system_call ( 
         SYSTEMCALL_MINIMIZEWINDOW, 
@@ -1501,8 +1509,9 @@ void gde_minimize_window (struct window_d *window)
 void gde_update_window (struct window_d *window)
 {
 
-    if ( (void*) window == NULL )
+    if ( (void*) window == NULL ){
         return;
+    }
 
     gramado_system_call ( 
         279, 
@@ -1608,13 +1617,11 @@ int gde_strncmp (char *s1, char *s2, int len)
 	//if ( len < 0 )
 		//return 3;
 
-
     while (n > 0)
     {
          n--;
-        
-        if (*s1 != *s2)
-        { 
+
+        if (*s1 != *s2){ 
             return (int) 1; 
         }
 
@@ -1730,7 +1737,8 @@ void *gde_get_client_area_rect (void)
 
 void gde_set_client_area_rect (struct rect_d *r)
 {
-    system_call ( SYSTEMCALL_SETCLIENTAREARECT, 
+    system_call ( 
+        SYSTEMCALL_SETCLIENTAREARECT, 
         (unsigned long) r, (unsigned long) r, (unsigned long) r );
 }
 
@@ -1759,11 +1767,6 @@ void *gde_create_process (
         return NULL;
     }
 
-    //return (void *) system_call ( 
-    //                    SYSTEMCALL_CREATEPROCESS, 
-    //                    (unsigned long) name, 
-    //                    (unsigned long) process_priority, 
-    //                    (unsigned long) 0 );
 
     return (void *) sc82 ( 
                         SYSTEMCALL_CREATEPROCESS, 
@@ -1810,11 +1813,6 @@ void *gde_create_thread (
         return NULL;
     }
 
-    //return (void *) system_call ( 
-    //                    SYSTEMCALL_CREATETHREAD, 
-    //                    init_eip, 
-    //                    init_stack, 
-    //                    (unsigned long) name );
 
     return (void *) sc82 ( 
                         SYSTEMCALL_CREATETHREAD, 
@@ -1847,7 +1845,7 @@ void gde_start_thread (void *thread)
 
 
 /*
- * apiFOpen:
+ * gde_fopen:
  *     Carrega na memória um arquivo.
  *     Usa um serviço do kernel para carregar um arquivo na memória.
  *     Obs: Devemos passar um endereço válido, previamente alocado. 
@@ -1857,6 +1855,10 @@ void gde_start_thread (void *thread)
 // Cuidado estamos entrando na sessão crítica.
 // O aplicativo pode desejar fazer o mesmo.
 
+// #todo
+// Qaul a diferença entre esse e fopen da libc?
+// Podemos fazer um wrapper ao invés?
+
 void *gde_fopen (const char *filename, const char *mode){
 	
     void *Ret;
@@ -1864,11 +1866,12 @@ void *gde_fopen (const char *filename, const char *mode){
 
     gde_debug_print ("gde_fopen:\n");
 
-    if ( (void*) filename == NULL )
-    {
+
+    if ( (void*) filename == NULL ){
         gde_debug_print ("gde_fopen: [ERROR] no filename provided\n");
         return NULL;
     }
+
 
     Ret = (void *) system_call ( 
                        SYSTEMCALL_READ_FILE, 
@@ -1921,13 +1924,15 @@ gde_save_file (
     //message_buffer[6] = (unsigned long) x;
     // ...
 
-    if ( (void*) file_name == NULL )
-    {
-        gde_debug_print ("gde_save_file: [ERROR] no filename provided\n");
+    if ( (void*) file_name == NULL ){
+        gde_debug_print ("gde_save_file: [ERROR] filename\n");
         return -1;
     }
-    
-    //if ( *file_name == 0 ){ return -1; }
+
+    if ( *file_name == 0 ){
+        gde_debug_print ("gde_save_file: [ERROR] *filename\n");
+        return -1;
+    }
 
     if ( (void*) file_address == NULL )
     {
@@ -1977,9 +1982,14 @@ int gde_test_save_file (char *file_name)
     
     file_1_name = file_name;
 
-    if ( (void*) file_name == NULL )
-    {
-        gde_debug_print ("gde_test_save_file: [ERROR] no filename provided\n");
+
+    if ( (void*) file_name == NULL ){
+        gde_debug_print ("gde_test_save_file: [ERROR] filename\n");
+        return -1;
+    }
+
+    if ( *file_name == 0 ){
+        gde_debug_print ("gde_test_save_file: [ERROR] *filename\n");
         return -1;
     }
 
@@ -1995,7 +2005,7 @@ int gde_test_save_file (char *file_name)
     }
 
     if (len > 2048){
-        printf ("gde_test_save_file:  Limit Fail. The  file is too long.\n");
+        printf ("gde_test_save_file:  Limit Fail. The  file is too long\n");
         return (int) 1;
         //return (int) -1;
     }
@@ -2054,13 +2064,17 @@ int gde_create_empty_file ( char *file_name )
     int __ret = 0;
 
 
-    if ( (void*) file_name == NULL )
-    {
-        gde_debug_print ("gde_create_empty_file: [ERROR] no filename provided\n");
+    if ( (void*) file_name == NULL ){
+        gde_debug_print ("gde_create_empty_file: [ERROR] file_name\n");
         return -1;
     }
-  
-    
+
+    if ( *file_name == 0 ){
+        gde_debug_print ("gde_create_empty_file: [ERROR] *file_name\n");
+        return -1;
+    }
+
+
     gde_enter_critical_section();
     __ret = (int) gramado_system_call ( 
                       43, 
@@ -2084,11 +2098,10 @@ int gde_create_empty_directory ( char *dir_name )
         return -1;
     }
 
+
     gde_enter_critical_section();
-    
     __ret = (int) gramado_system_call ( 44, 
                       (unsigned long) dir_name, 0, 0);
-
     gde_exit_critical_section();    
 
 
@@ -2475,8 +2488,8 @@ gde_display_bmp (
 
     unsigned long xLimit, yLimit;
 
-    struct bmp_header_d *bh;
-    struct bmp_infoheader_d *bi;
+    struct bmp_header_d      *bh;
+    struct bmp_infoheader_d  *bi;
 
 	// Endereço base do BMP que foi carregado na memória
     unsigned char *bmp = (unsigned char *) address;
@@ -2503,15 +2516,15 @@ gde_display_bmp (
 	}
 	
 
-	// @todo:
-	// Testar validade do endereço.
-	
-	
-	if ( address == 0 )
-	{
-		//goto fail;
-	}
-	
+    // #todo
+    // #important
+    // Buffer validation
+
+    if ( address == 0 )
+    {
+        //goto fail;
+    }
+
 	
 	//
 	// struct for Info header
@@ -2528,75 +2541,70 @@ gde_display_bmp (
 	//
 	// Signature.
 	//
-	
-    unsigned short sig;
-	
-	sig = *( unsigned short * ) &bmp[0];
-	
-	bh->bmpType = sig;
-	
+
+    unsigned short sig=0;
+    sig = *( unsigned short * ) &bmp[0];
+    bh->bmpType = sig;
+
 	
 	//
 	// Size. ( 2 bytes )
 	//
-	
-	unsigned short Size = *( unsigned short* ) &bmp[2];
-	
-	bh->bmpSize = Size;
-	
-	
+
+    unsigned short Size = *( unsigned short* ) &bmp[2];
+    bh->bmpSize = Size;
+
 	//
 	// struct for Info header
 	//
-	
-	//Windows bmp.
-	bi = (struct bmp_infoheader_d *) malloc ( sizeof(struct bmp_infoheader_d) );
-	
+
+    //Windows bmp.
+    bi = (struct bmp_infoheader_d *) malloc ( sizeof(struct bmp_infoheader_d) );
+
     if ( (void *) bi == NULL )
     {
-		//goto fail;
-    }	
+        //goto fail;
+    }
 
-	//The size of this header.
-	bi->bmpSize = *( unsigned long * ) &bmp[14];
-	
-	// Width and height.
+    // The size of this header.
+    bi->bmpSize = *( unsigned long * ) &bmp[14];
+
+    // Width and height.
     Width  = *( unsigned long * ) &bmp[18];
     Height = *( unsigned long * ) &bmp[22];
-	
+
 	//@todo: checar validade da altura e da largura encontrada.
-	
-	// Salvar.
+
+    // Salvar.
     bi->bmpWidth  = (unsigned long) Width;
     bi->bmpHeight = (unsigned long) Height;
 
-	
-	/* Number of bits per pixel */
-	//1, 4, 8, 16, 24 and 32.
-	bi->bmpBitCount = *( unsigned short * ) &bmp[28];
-	
-	// Único suportado ainda.
-	if ( bi->bmpBitCount != 24 )
-	{
-		//fail
-	}
-	
-	
-	// 0 = Nenhuma compressão.
-	if ( bi->bmpCompression != 0 )
-	{
-		//fail
-	}
-	
-	
+
+    // Number of bits per pixel
+    //1, 4, 8, 16, 24 and 32.
+    bi->bmpBitCount = *( unsigned short * ) &bmp[28];
+
+    // Único suportado ainda.
+    if ( bi->bmpBitCount != 24 )
+    {
+        // fail
+    }
+
+    // 0 = Nenhuma compressão.
+    if ( bi->bmpCompression != 0 )
+    {
+        // fail
+    }
+
+
 	//
-	// Draw !
+	// Draw
 	//
 
     left = x;
-    top = y; 
+    top  = y; 
 
-	//bottom = top + height;
+    //bottom = top + height;
     bottom = (top + bi->bmpHeight );
 
 	// Início da área de dados do BMP.
@@ -2611,13 +2619,13 @@ gde_display_bmp (
         //case 2:  base = (0x36 + 0x40);  break;
 
         // 4 bytes pra cada cor, 16 cores, 64bytes.
-        case 4:  base = (0x36 + 0x40);  break; 
+        case 4:  base = (0x36 + 0x40);   break; 
 
         // 4bytes pra cada cor, 256 cores, 1024bytes.
         case 8:  base = (0x36 + 0x400);  break; 
 
         default:  
-            base = 0x36;  
+            base = 0x36; 
             break;
     };
 
@@ -2649,19 +2657,18 @@ gde_display_bmp (
     //#define COLOR_GREEN 0x00FF0000
     //#define COLOR_BLUE  0x0000FF00
 
-	
-	for ( i=0; i < bi->bmpHeight; i++ )	
-	{		
-		for ( j=0; j < bi->bmpWidth; j++ )	
-		{	
-	        // 16 cores
+
+    for ( i=0; i < bi->bmpHeight; i++ )
+    {
+        for ( j=0; j < bi->bmpWidth; j++ )
+        {
+            // 16 cores
             // Um pixel por nibble.
-	        if ( bi->bmpBitCount == 4 )
-	        {				
-				offset = base;
-							    
-				palette_index[0] = bmp[offset];
-												
+            if ( bi->bmpBitCount == 4 )
+            {
+                offset = base;
+                palette_index[0] = bmp[offset];
+
                 //segundo nibble.
 				if( nibble_count_16colors == 2222 )
 				{
@@ -2680,18 +2687,18 @@ gde_display_bmp (
 					nibble_count_16colors = 2222;
 					base = base;
 				};
-	        };	
+            }
 
-			// 256 cores
-			// Próximo pixel para 8bpp
-	        if( bi->bmpBitCount == 8 )
-	        {   
-				offset = base;
-				color = (unsigned long) palette[  bmp[offset] ];
-				
-				base = base + 1;     
-	        };			
-			
+
+            // 256 cores
+            // Próximo pixel para 8bpp
+            if( bi->bmpBitCount == 8 )
+            {
+                offset = base;
+                color = (unsigned long) palette[  bmp[offset] ];
+                base = (base +1);
+            }
+
 			// 16bpp high color BMP
 			// Próximo pixel para 16bpp
 			// apenas 565 por enquanto.  
@@ -2701,7 +2708,7 @@ gde_display_bmp (
 			    //565
                 //if(565 )
                 //{
-				    offset = base;					
+				    offset = base;
 					
 				    //A
 			        c[0] = 0;	
@@ -2723,63 +2730,69 @@ gde_display_bmp (
 		        
 				    base = base + 2;    
 				//};
-	        };
+	        }
 			
 
-			// Próximo pixel para 24bpp
-	        if ( bi->bmpBitCount == 24 )
-	        {
-				offset = base;
-			    
-			    c[0] = 0; //A
-				
-				c[1] = bmp[offset];
-			    
-			    offset = base+1;
-			    c[2] = bmp[offset];
-			
-			    offset = base+2;
-			    c[3] = bmp[offset];
+            // Próximo pixel para 24bpp
+            if ( bi->bmpBitCount == 24 )
+            {
+                offset = base;
 
-		        base = base + 3;    
-	        };
-			
-			
-			// Próximo pixel para 32bpp
-	        if ( bi->bmpBitCount == 32 )
-	        { 
-				//A
-				//offset = base+3;
-			    c[0] = 0;
-				
-				offset = base;
-			    c[1] = bmp[offset];
-			
-			    offset = base+1;
-			    c[2] = bmp[offset];
-			
-			    offset = base+2;
-			    c[3] = bmp[offset];
-				
-		        base = base + 4;    
-	        };
-			
-			//todo: o window server tem rotina pra pintar no backbuffer
-			//que está em ring3.
-			system_call ( SYSTEMCALL_BUFFER_PUTPIXEL, (unsigned long) color, 
-				(unsigned long) left, (unsigned long) bottom );
-			
-			// Próximo pixel.
-			left++; 
-		};
-		
-		// Vamos para a linha anterior.
-		bottom = bottom-1;
-		
-		// Reiniciamos o x.
-		left = x;    
-	};	
-	
+                c[0] = 0; //A
+
+                c[1] = bmp[offset];
+
+                offset = (base +1);
+                c[2] = bmp[offset];
+
+                offset = (base +2);
+                c[3] = bmp[offset];
+
+                base = (base +3); 
+            }
+
+
+            // Próximo pixel para 32bpp
+            // ?? rever isso.
+            if ( bi->bmpBitCount == 32 )
+            { 
+                //A
+                //offset = base+3;
+                c[0] = 0;
+
+                offset = base;
+                c[1] = bmp[offset];
+
+                offset = (base +1);
+                c[2] = bmp[offset];
+
+                offset = (base +2);
+                c[3] = bmp[offset];
+
+                base = (base +4);
+            }
+
+            // #todo: 
+            // O window server tem rotina pra pintar no backbuffer
+            // que está em ring3.
+
+            system_call ( 
+                SYSTEMCALL_BUFFER_PUTPIXEL, 
+                (unsigned long) color, 
+                (unsigned long) left, 
+                (unsigned long) bottom );
+
+            // Próximo pixel
+            left++; 
+        };
+
+        // Vamos para a linha anterior.
+        bottom = bottom-1;
+
+         // Reiniciamos o x.
+        left = x;    
+    };
+
 	// ## test palette 
 	//int p;
 	
@@ -2962,6 +2975,7 @@ gde_drawchar_transparent (
 {
     unsigned long msg[8];
 
+
     msg[0] = (unsigned long) x;
     msg[1] = (unsigned long) y;
     msg[2] = (unsigned long) color;
@@ -2987,9 +3001,9 @@ gde_draw_text (
     unsigned long color, 
     const char *string )
 {
-
     unsigned long msg[8];
-    
+
+
     msg[0] = (unsigned long) window;
     msg[1] = (unsigned long) x;
     msg[2] = (unsigned long) y;
@@ -3077,8 +3091,9 @@ unsigned long gde_get_systime_info (int n)
 void gde_show_window (struct window_d *window)
 {
 
-    if ( (void*) window == NULL )
+    if ( (void*) window == NULL ){
         return;
+    }
 
     gramado_system_call ( 24, 
         (unsigned long) window, 
@@ -3150,9 +3165,11 @@ gde_update_statusbar (
 {
 
     // A status bar pertence a uma janela.
-    if ( (void*) window == NULL )
+
+    if ( (void*) window == NULL ){
         return -1;
- 
+    }
+
     return (int) system_call ( 300, 
                      (unsigned long) window, 
                      (unsigned long) string1, 
@@ -3202,12 +3219,13 @@ int gde_getprocessname (int pid, char *name, size_t len){
     int __len_ret = 0;
 
 
-    if ( (void*) name == NULL )
+    if ( (void*) name == NULL ){
         return -1;
+    }
 
-    if ( *name == 0 )
+    if ( *name == 0 ){
         return -1;
-
+    }
 
 
     //HOST_NAME_MAX
@@ -3247,12 +3265,14 @@ int gde_getthreadname (int tid, char *name, size_t len)
     int __len_ret = 0;
 
 
-
-    if ( (void*) name == NULL )
+    if ( (void*) name == NULL ){
         return -1;
+    }
 
-    if ( *name == 0 )
+
+    if ( *name == 0 ){
         return -1;
+    }
 
 
     //HOST_NAME_MAX
@@ -3261,6 +3281,10 @@ int gde_getthreadname (int tid, char *name, size_t len)
         return -1;
     }
 
+    // #todo
+    //if (tid<0){
+    //    return 0;
+    //}
 
     //coloca no buffer interno
     __len_ret = (int) gramado_system_call ( 883, 
@@ -3287,6 +3311,10 @@ int gde_getthreadname (int tid, char *name, size_t len)
 
 unsigned long gde_get_process_stats (int pid, int index)
 {
+    if (pid<0){
+        return 0;
+    }
+
     return (unsigned long) system_call ( 880, 
                                (unsigned long) pid, 
                                (unsigned long) index, 
@@ -3295,6 +3323,10 @@ unsigned long gde_get_process_stats (int pid, int index)
 
 unsigned long gde_get_thread_stats (int tid, int index)
 {
+    if (tid<0){
+        return 0;
+    }
+
     return (unsigned long) system_call ( 881, 
                                (unsigned long) tid, 
                                (unsigned long) index, 
@@ -3310,9 +3342,24 @@ unsigned long gde_get_thread_stats (int tid, int index)
 
 void gde_debug_print (char *string)
 {
-    // #todo
+    // #test
     // Check pointer validation.
-    
+
+    // #todo
+    // Test this filters.
+
+    /*
+    if ( (void *) string == NULL ){
+        //printf ("gde_debug_print: [FAIL] string\n");
+        return;
+    }
+
+    if ( *string == 0 ){
+        //printf ("gde_debug_print: [FAIL] *string\n");
+        return;
+    }
+    */
+
     gramado_system_call ( 289, 
         (unsigned long) string,
         (unsigned long) string,
@@ -3329,16 +3376,19 @@ void gde_debug_print (char *string)
 int gde_clone_and_execute ( char *name )
 {
     if ( (void *) name == NULL ){
-        printf ("gde_clone_and_execute: [TEST] Name pointer\n");
+        printf ("gde_clone_and_execute: [FAIL] name\n");
         return -1;
     }
 
     if ( *name == 0 ){
-        printf ("gde_clone_and_execute: [TEST] Invalid name\n");
+        printf ("gde_clone_and_execute: [FAIL] *name\n");
         return -1;
     }
 
-    //return (int) gramado_system_call ( 900, (unsigned long) name, 0, 0 );
+    // #todo
+    // Parameters vector.
+    // Maybe we can provide a default parameters vector.
+
     return (int) sc82 ( 900, (unsigned long) name, 0, 0 );
 }
 
@@ -3348,35 +3398,62 @@ int gde_clone_and_execute ( char *name )
 // Desse modo o driver de rede pode colocar conteúdo no buffer
 // do aplicativo que está ouvindo determinada porta.
 // Depois mandar uma mensagem para o app dizendo, pode ler seu buffer.
-//
-
 // O kernel poderá guardar esse ponteiro para o net_buffer
 // na estrutura do processo cujo pid foi passado por essa função.
 // Também pode salvar o tamanho do buffer pou ele pode ter
 // tamanho padrçao. 4KB.
-
 // IN: pid, ponteiro para o buffer, comprimento do buffer;
 // OUT: 0=Ok -1=fail
-int gde_setup_net_buffer (int pid, char *buffer, size_t len){
+
+int 
+gde_setup_net_buffer (
+     int pid, 
+     char *buffer, 
+     size_t len )
+{
+
+    // #bugbug
+    // The 'len' parameter is not used.
 
     int len_ret = 0;
-    
+
+    // #obs
+    // The kernel uses only two parameters.
+    // pid and buffer.
+
     len_ret = (int) gramado_system_call ( 550, 
                         (unsigned long) pid,
                         (unsigned long) buffer,
                         (unsigned long) buffer );
 
-     return len_ret;
+
+    //if ( len_ret <= 0 ){
+    //    printf ("gde_setup_net_buffer: len_ret\n");
+    //}
+
+    return (int) len_ret;
 }
 
 
+
 // cria um novo process, uma thread e carrega a imagem.
+// #todo
+// Conferir essa chamada ao system. 168?
 int 
 execute_new_process ( 
     const char *filename, 
     char *argv[], 
     char *envp[] )
 {
+
+    if ( (void*) filename == NULL ){
+        printf("execute_new_process: filename\n");
+    }
+
+    if (*filename == 0){
+        printf("execute_new_process: *filename\n");
+    }
+
     return (int) gramado_system_call ( 168, 
                      (unsigned long) filename,    // Nome
                      (unsigned long) argv,        // arg (endereço da linha de comando)

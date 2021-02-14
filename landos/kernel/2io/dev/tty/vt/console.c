@@ -62,23 +62,32 @@ void __local_ri (void)
     //#todo
 }
 
-void __local_gotoxy ( int new_x, int new_y, int console_number )
+
+// goto xy
+void 
+__local_gotoxy ( 
+    int new_x, 
+    int new_y, 
+    int console_number )
 {
 
-   //deletar.
+    // deletar.
 	//if (new_x>=columns || new_y>=lines)
 		//return;
 	//x=new_x;
 	//y=new_y;
 	//pos=origin+((y*columns+x)<<1);
-		
+
+
      if ( new_x >= (CONSOLE_TTYS[console_number].cursor_right-1) )
+     {
          return;
-         
-    
+     }
+
     if ( new_y >= (CONSOLE_TTYS[console_number].cursor_bottom-1) )
+    {
         return;
-        
+    }
 
     CONSOLE_TTYS[console_number].cursor_x = new_x; 
     CONSOLE_TTYS[console_number].cursor_y = new_y;
@@ -494,8 +503,9 @@ void console_outbyte (int c, int console_number)
     unsigned long __cHeight = gwsGetCurrentFontCharHeight();
 
 
-    if ( __cWidth == 0  ||  __cHeight == 0 ){
-        panic ("console_outbyte: char size\n");
+    if ( __cWidth == 0  ||  __cHeight == 0 )
+    {
+        panic ("console_outbyte: [FAIL] char size\n");
     }
 
 
@@ -696,10 +706,9 @@ void console_outbyte (int c, int console_number)
     // Nesse momento imprimiremos os caracteres.
     // Imprime os caracteres normais.
     // Atualisa o prev.
+
 draw:
-
     _console_outbyte (Ch, console_number);
-
     prev = Ch;
 }
 
@@ -726,19 +735,20 @@ void console_putchar ( int c, int console_number ){
     int cHeight = get_char_height();
 
 
-    if ( cWidth == 0 || cHeight == 0 ){
-        panic ("console_putchar: char");
+    if ( cWidth == 0 || cHeight == 0 )
+    {
+        panic ("console_putchar: char\n");
     }
 
 
 	// flag on.
-    stdio_terminalmode_flag = 1;  
+    stdio_terminalmode_flag = TRUE;
 
 
     //  Console limits
     if ( console_number < 0 || console_number >= 4 )
     {
-        panic ("console_putchar: console_number");
+        panic ("console_putchar: console_number\n");
     }
 
     // Desenhar o char no backbuffer
@@ -759,7 +769,7 @@ void console_putchar ( int c, int console_number ){
         cHeight );
 
 	// flag off.
-    stdio_terminalmode_flag = 0;  
+    stdio_terminalmode_flag = FALSE; 
 }
 
 
@@ -1221,14 +1231,15 @@ void console_scroll (int console_number){
     if ( VideoBlock.useGui != 1 )
     {
         debug_print ("console_scroll: no GUI\n");
-        panic       ("console_scroll: no GUI"); 
+        panic       ("console_scroll: no GUI\n");
     }
 
     // #bugbug
     // Max limits ?
  
-    if ( console_number < 0 )
-        panic ("console_scroll: console_number");
+    if ( console_number < 0 ){
+        panic ("console_scroll: [FAIL] console_number\n");
+    }
 
 
     // Scroll the screen rectangle.
@@ -1333,20 +1344,22 @@ int insert_line ( char *string, int line )
 
 void REFRESH_STREAM ( file *f )
 {
-    //loop
+    // loop
     int i=0;
     int j=0;
-    
+
+    char *c;
+
     int cWidth  = get_char_width();
     int cHeight = get_char_height();
 
-    char *c;
 
 
     debug_print("console.c-REFRESH_STREAM: [FIXME] It is wrong!\n");
 
-    if ( cWidth == 0 || cHeight == 0 ){
-        panic ("REFRESH_STREAM: char w h ");
+    if ( cWidth == 0 || cHeight == 0 )
+    {
+        panic ("REFRESH_STREAM: [FAIL] char w h\n");
     }
 
 
@@ -1374,7 +1387,7 @@ void REFRESH_STREAM ( file *f )
     // Seleciona o modo terminal.
 
     //++
-    stdio_terminalmode_flag = 1;  
+    stdio_terminalmode_flag = TRUE; 
     for ( i=0; i<j; i++ )
     {
         printf ("%c", *c );
@@ -1390,7 +1403,7 @@ void REFRESH_STREAM ( file *f )
 
         c++;
     };
-    stdio_terminalmode_flag = 0;  
+    stdio_terminalmode_flag = FALSE; 
     //--
 }
 
@@ -1466,7 +1479,7 @@ void console_init_virtual_console (int n)
     // Todo virtual console eh uma tty. Os 4.
     CONSOLE_TTYS[ConsoleIndex].objectType  = ObjectTypeTTY;
     CONSOLE_TTYS[ConsoleIndex].objectClass = ObjectClassKernelObjects;
-    CONSOLE_TTYS[ConsoleIndex].used = 1;
+    CONSOLE_TTYS[ConsoleIndex].used  = TRUE;
     CONSOLE_TTYS[ConsoleIndex].magic = 1234;
 
     // No thread for now.
@@ -1564,18 +1577,21 @@ void console_init_virtual_console (int n)
     CONSOLE_TTYS[ConsoleIndex].cursor_color = COLOR_WHITE; 
 
 
-    if( ConsoleIndex == 0)
-            CONSOLE_TTYS[ConsoleIndex].cursor_color = COLOR_WHITE; 
+    if ( ConsoleIndex == 0){
+        CONSOLE_TTYS[ConsoleIndex].cursor_color = COLOR_WHITE; 
+    }
 
-    if( ConsoleIndex == 1)
-            CONSOLE_TTYS[ConsoleIndex].cursor_color = COLOR_RED; 
+    if ( ConsoleIndex == 1){
+        CONSOLE_TTYS[ConsoleIndex].cursor_color = COLOR_RED; 
+    }
 
-    if( ConsoleIndex == 2)
-            CONSOLE_TTYS[ConsoleIndex].cursor_color = COLOR_GREEN; 
-            
-    if( ConsoleIndex == 3)
-            CONSOLE_TTYS[ConsoleIndex].cursor_color = COLOR_BLUE; 
-                
+    if ( ConsoleIndex == 2){
+        CONSOLE_TTYS[ConsoleIndex].cursor_color = COLOR_GREEN; 
+    }
+
+    if ( ConsoleIndex == 3){
+        CONSOLE_TTYS[ConsoleIndex].cursor_color = COLOR_BLUE; 
+    }
 
 
     //#todo

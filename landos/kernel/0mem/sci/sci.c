@@ -540,13 +540,14 @@ void *gde_extra_services (
 
     // 500 - Setup a ring3 net buffer for the current process.
     // #todo: check args validation.
+    // parameters: arg2 = pid ; arg3 = buffer address.
     if (number == 550)
     {
         debug_print("gde_extra_services: [550] Setup net buffer for a process\n");
         __net_process = (struct process_d *) processList[arg2];
         if ( (void *) __net_process != NULL )
         {
-             if ( __net_process->used == 1 && 
+             if ( __net_process->used  == TRUE && 
                   __net_process->magic == 1234 )
              {
                  __net_process->net_buffer = (char *) arg3;

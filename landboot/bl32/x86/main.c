@@ -370,7 +370,16 @@ void BlLoadKernel(void){
 
     int Status = -1;
 
-    Status = (int) load_kernel();
+    // #todo
+    // This way can chose the filename from a
+    // configuration file.
+    // This routine will try to load the default filename
+    // if the provide name fail.
+
+    // This routine will build the pathname
+    // to search in the default folder.
+
+    Status = (int) load_kernel("KERNEL.BIN");
 
     if ( Status != 0 ){
         printf ("BlLoadKernel:\n");
