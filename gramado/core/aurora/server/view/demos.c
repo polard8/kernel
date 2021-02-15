@@ -317,31 +317,6 @@ void demoPolygon(void)
     if((void*)v4==NULL){return;}
 
 
-    v0->x = -20;
-    v0->y =  20;
-    v0->z =   0;
-    v0->color = COLOR_WHITE;
-
-    v1->x = 0;
-    v1->y = 0;
-    v1->z = 0;
-    v1->color = COLOR_WHITE;
-
-    v2->x = 20;
-    v2->y = 20;
-    v2->z =  0;
-    v2->color = COLOR_WHITE;
-
-    v3->x =   0;
-    v3->y = -20;  
-    v3->z =   0;
-    v3->color = COLOR_WHITE;
-
-    v4->x = -20;
-    v4->y =  20;  
-    v4->z =  0;
-    v4->color = COLOR_WHITE;
-
     polygon_list[0] = (unsigned long) v0;
     polygon_list[1] = (unsigned long) v1;
     polygon_list[2] = (unsigned long) v2;
@@ -349,10 +324,55 @@ void demoPolygon(void)
     polygon_list[4] = (unsigned long) v4;
     polygon_list[5] = (unsigned long) v0;  //circular
     
+    
+    int Offset=0;
+    int j=0;
+
+    // loop
+    while(1){
+    Offset=0;
+    for (i=0; i<10; i++){
+
+        rectBackbufferDrawRectangle ( 
+            0, 0, 320, 200, COLOR_BLACK, 1 );
+
+    Offset = Offset+i;
+    
+    v0->x = -(20);
+    v0->y =  (20+Offset);
+    v0->z =   0;
+    v0->color = COLOR_WHITE;
+
+    // fixed
+    v1->x = (0);
+    v1->y = (0+Offset);
+    v1->z = 0;
+    v1->color = COLOR_WHITE;
+
+    v2->x = (20);
+    v2->y = (20+Offset);
+    v2->z =  0;
+    v2->color = COLOR_WHITE;
+
+    v3->x =   (0);
+    v3->y = -(20-Offset);  
+    v3->z =   0;
+    v3->color = COLOR_WHITE;
+
+    v4->x = -(20);
+    v4->y =  (20+Offset);  
+    v4->z =  0;
+    v4->color = COLOR_WHITE;
+        
     gwssrv_debug_print("calling xxxPolygonZ\n");
     xxxPolygonZ(p);
     
     gws_refresh_rectangle(0,0,320,200);
+    
+    for (j=0; j<20; j++){ gwssrv_yield();}
+    };
+    };   //while
+
     
     gwssrv_debug_print("DONE\n");
     //printf ("DONE\n");
