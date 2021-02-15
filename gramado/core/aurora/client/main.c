@@ -10,6 +10,11 @@
  */
 
 
+// #todo
+// We can have a custom status bar in this client.
+// goal: Identity purpose.
+
+
 
 // tutorial example taken from. 
 // https://www.tutorialspoint.com/unix_sockets/socket_server_example.htm
@@ -55,12 +60,23 @@
 
 
 
+#define MYGREEN 0x0b6623
+    
+    
+//
+// == prototypes =============
+//
+
+int gws (void);
+
+
+
+
 // initialize via AF_GRAMADO.
 // Ainda nao podemos mudar isso para a lib, pois precisamos
 // do suporte as rotinas de socket e as definiçoes.
 // tem que incluir mais coisa na lib.
 
-int gws (void);
 int gws(void)
 {
 
@@ -207,6 +223,11 @@ gwsProcedure (
 int main ( int argc, char *argv[] )
 {
 
+    // # config
+    int ShowCube = FALSE;
+    // ...
+
+
     int client_fd = -1;
     int main_window = -1;
     
@@ -283,6 +304,7 @@ int main ( int argc, char *argv[] )
     //========================================
     
     // Metrics.
+
     unsigned long w = gws_get_system_metrics(1);
     unsigned long h = gws_get_system_metrics(2);
 
@@ -302,14 +324,13 @@ int main ( int argc, char *argv[] )
     //
 
     //===============================
-    gws_debug_print ("gws.bin: 1 Creating window \n");
-    printf          ("gws.bin: Creating window \n");
+    gws_debug_print ("gws.bin: 1 Creating main window \n");
+    printf          ("gws.bin: Creating main window \n");
 
-       
     main_window = gws_create_window (client_fd,
                       WT_SIMPLE, 1, 1, "gws-client",
                       0, 0, w, h,
-                      0, 0, COLOR_PINK, COLOR_PINK);
+                      0, 0, MYGREEN, MYGREEN);
 
     if (main_window<0){
         printf ("gws.bin: main_window\n");
@@ -318,14 +339,17 @@ int main ( int argc, char *argv[] )
     //========================
 
 
+    // Drawing a char just for fun,not for profit.
+
     //===================
     gws_debug_print ("gws.bin: 2 Drawing a char \n");
     //printf          ("gws.bin: Drawing a char \n");
-    gws_draw_char ( client_fd, main_window, 
-        16, 8, COLOR_RED, 'C' );
+    gws_draw_char ( 
+        client_fd, main_window, 
+        8, 8, COLOR_RED, 'G' );
     //====================   
-    
-    
+
+
     
     /*
     //
@@ -384,62 +408,96 @@ int main ( int argc, char *argv[] )
     // == cube ==================================
     //
 
-    
+    // #maybe
+    // The custon status bar?
+    // Maybe the custon status bar can be a window.
+
     gws_debug_print ("gws.bin: 4 Testing Plot cube \n");
     printf          ("gws.bin: 4 Testing Plot cube \n");
 
+    
+    int backLeft   = (-(w/4)); 
+    int backRight  =   (w/4);
+    int backTop    = (h/2);
+    int backBottom = (h/2) - 32;
+    
+    int frontLeft   = (-(w/2)); 
+    int frontRight  =   (w/2);
+    int frontTop    = -((h/2) - 32);
+    int frontBottom = -(h/2);
+    
+
+    /*
+    int backLeft   =  -100;
+    int backRight  =  -50;
+    int backTop    =   0;
+    int backBottom =  -50;
+    int frontLeft   = -300; 
+    int frontRight  = -200;
+    int frontTop    = -100;
+    int frontBottom = -200;
+    */
+
+    int zTest = 0;
 
     struct gr_cube_d *cube;
     cube = (void *) malloc( sizeof( struct gr_cube_d ) );
+
+    //int Count=0;
+    //for (Count=0; Count<100; Count = Count+10 ){
+    //zTest = zTest - 10;
     if ( (void*) cube != NULL )
     {
+        // =========
+        // south (frente) 
+        cube->p[0].x = frontLeft; //-140;
+        cube->p[0].y = frontTop;  //-90;
+        cube->p[0].z = zTest;
+        cube->p[0].color = COLOR_YELLOW;
+        
+        cube->p[1].x = frontRight; //140;
+        cube->p[1].y = frontTop;   //-90;
+        cube->p[1].z = zTest;
+        cube->p[1].color = COLOR_YELLOW;
+        
+        cube->p[2].x = frontRight;  //140;
+        cube->p[2].y = frontBottom; //-100;
+        cube->p[2].z = zTest;
+        cube->p[2].color = COLOR_YELLOW;
+        
+        cube->p[3].x = frontLeft;   //-140;
+        cube->p[3].y = frontBottom; //-100;
+        cube->p[3].z = zTest;
+        cube->p[3].color = COLOR_YELLOW;
 
-        //south     
-        cube->p[0].x = -140;
-        cube->p[0].y = -90;
-        cube->p[0].z = 0;
-        cube->p[0].color = COLOR_WHITE;
+        // ===========
+        // north (trás)
+        cube->p[4].x = backLeft; //-140;
+        cube->p[4].y = backTop; //-90;
+        cube->p[4].z = zTest;
+        cube->p[4].color = COLOR_GREEN;
         
-        cube->p[1].x = 140;
-        cube->p[1].y = -90;
-        cube->p[1].z = 0;
-        cube->p[1].color = COLOR_WHITE;
+        cube->p[5].x = backRight; //140;
+        cube->p[5].y = backTop; //-90;
+        cube->p[5].z = zTest;
+        cube->p[5].color = COLOR_GREEN;
         
-        cube->p[2].x = 140;
-        cube->p[2].y = -100;
-        cube->p[2].z = 0;
-        cube->p[2].color = COLOR_WHITE;
+        cube->p[6].x = backRight;  //140;
+        cube->p[6].y = backBottom; //-100;
+        cube->p[6].z = zTest;
+        cube->p[6].color = COLOR_GREEN;
         
-        cube->p[3].x = -140;
-        cube->p[3].y = -100;
-        cube->p[3].z = 0;
-        cube->p[3].color = COLOR_WHITE;
-
-        //north
-        cube->p[4].x = -140;
-        cube->p[4].y = -90;
-        cube->p[4].z = 20;
-        cube->p[4].color = COLOR_YELLOW;
-        
-        cube->p[5].x = 140;
-        cube->p[5].y = -90;
-        cube->p[5].z = 20;
-        cube->p[5].color = COLOR_YELLOW;
-        
-        cube->p[6].x = 140;
-        cube->p[6].y = -100;
-        cube->p[6].z = 20;
-        cube->p[6].color = COLOR_YELLOW;
-        
-        cube->p[7].x = -140;
-        cube->p[7].y = -100;
-        cube->p[7].z = 20;
-        cube->p[7].color = COLOR_YELLOW;
-        
+        cube->p[7].x = backLeft; //-140;
+        cube->p[7].y = backBottom; //-100;
+        cube->p[7].z = zTest;
+        cube->p[7].color = COLOR_GREEN;
+ 
         // plot cube 
-        gws_plotcube ( client_fd, (struct gr_cube_d *) cube );
+        if (ShowCube==TRUE){
+            gws_plotcube ( client_fd, (struct gr_cube_d *) cube );
+        }
     }
-   
+    //}; //for
 
 
     //
@@ -488,9 +546,10 @@ int main ( int argc, char *argv[] )
     // #debug
     //while (1){
 
-        gws_draw_char ( client_fd, main_window, 
-            20, 20, COLOR_RED, 'X' );
-   
+    gws_draw_char ( 
+        client_fd, main_window, 
+        16, 16, COLOR_RED, 'X' );
+
         // ...
 
         // Saving the fd into the libgws.
@@ -513,6 +572,9 @@ int main ( int argc, char *argv[] )
     // Loop
 
 
+    // #test
+    gws_refresh_window (client_fd, main_window);
+        
 
     //=================================
     
