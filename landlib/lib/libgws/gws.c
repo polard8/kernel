@@ -1186,20 +1186,23 @@ process_event:
 //
 // =============================
 //
-//cube
+
+// request: plot cube.
 
 int __gws_plotcube_request ( int fd, struct gr_cube_d *cube )
 {
     // Isso permite ler a mensagem na forma de longs.
-    unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];   
+    unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0]; 
 
     int n_writes = 0;   // For sending requests.
-    
+
     //char *name = "Window name 1";
 
 
-    if ( (void*) cube == NULL )
+
+    if ( (void*) cube == NULL ){
         return -1;
+    }
 
 
     //
@@ -1215,14 +1218,18 @@ int __gws_plotcube_request ( int fd, struct gr_cube_d *cube )
 
     while (1)
     {
-        message_buffer[0] = 0;       // window. 
-        message_buffer[1] = GWS_GrCubeZ;    // msg (plot cube)
+
+        // The header.
+        message_buffer[0] = 0;            // window. 
+        message_buffer[1] = GWS_GrCubeZ;  // msg = plot cube.
         message_buffer[2] = 0;
         message_buffer[3] = 0;
-        
+
         // ...
-        
-        // os argumentos para rotinas graficas começam em '10'.
+
+        // The data.
+
+        // Os argumentos para rotinas graficas começam em '10'.
         // Sempre começa com x,y,z e color ...
         
         // south
@@ -2339,25 +2346,33 @@ gws_plot0 (
 }
 
 
-//plot cube
+// plot cube
 int 
 gws_plotcube (
     int fd,
     struct gr_cube_d *cube )
 {
+    int value=0;
 
-    if (fd<0)
+    if (fd<0){
         return -1;
+    }
 
-    
-    if ( (void*) cube == NULL )
+
+    if ( (void*) cube == NULL ){
         return -1;
-    
-    
+    }
+
+    //
+    // Request
+    //
+
+    // Enviamos um request e sinalizamos que tem um request no socket.
 
     __gws_plotcube_request  (fd, (struct gr_cube_d *) cube );
     rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );
-        
+
+
     //int CanRead=-1;
     //CanRead = rtl_sleep_if_socket_is_empty(fd);
     
@@ -2368,22 +2383,26 @@ gws_plotcube (
     //if(CanRead == TRUE)
     
     // Waiting to read the response.
-    int value=0;
-    while(1){
+
+    while (1){
         value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
         if (value == ACTION_REPLY ) { break; }
         if (value == ACTION_ERROR ) { return -1; }
         gws_yield();
     };
 
-    __gws_plotcube_response (fd);
+    //
+    // Response.
+    //
+
+    __gws_plotcube_response(fd);
+
     return 0;
 }
 
 
 
-
-//plot rectangle
+// plot rectangle
 int 
 gws_plotrectangle (
     int fd,

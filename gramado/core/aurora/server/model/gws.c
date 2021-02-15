@@ -566,6 +566,7 @@ int gwsInit(void)
 }
 
 
+// invalidate the frame.
 void invalidate(void)
 {
     dirty = TRUE;
@@ -581,6 +582,7 @@ int isdirty(void)
     return (int) dirty;
 }
 
+// invalidate all the background.
 void invalidate_background(void)
 {
     // #bugbug: Use background_dirty ??

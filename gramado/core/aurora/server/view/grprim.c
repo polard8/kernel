@@ -509,6 +509,7 @@ void plotLine(int x0, int y0, int x1, int y1)
  
 // Bresenham in 3D
 // The algorithm could be extended to three (or more) dimensions.
+
 void 
 plotLine3d (
     int x0, int y0, int z0, 
@@ -669,19 +670,34 @@ void rectangleZZ ( struct gr_rectangle_d *rect )
 
 
 
-// The upper-left corner and lower-right corner. 
+// Rectangle rasterization using lines.
+// It applies only on few cases.
+// The upper-left corner and lower-right corner.
+ 
 void
 ras_rectangleZ (
     int left, int top, int z0,
     int right, int bottom, int z1,
     unsigned long color )
 {
-    register int h=0;
+    register int Line=0;
+
+    // #todo
+    // No caso de inclinações da linha,
+    // precisamos considerar que temos dois 'top' diferentes.
+    // precisamos receber mais paâmetros de função,
+    // ou criarmos uma outra funções que tenha tais parâmetros,
+    // ficando essa somente para retâmgulos não inclinados.
 
     // Começa com a linha de cima.
-    for ( h=top; h >= bottom; h-- )
+    for ( Line=top; Line >= bottom; Line-- )
     {
-        plotLine3d ( left,  h, z0, right, h, z1, color );
+        // IN: 
+        // x0,y0,z0, x1,y1,z1, color.
+        plotLine3d ( 
+            left,  Line, z0, 
+            right, Line, z1, 
+            color );
     };
 }
 
@@ -811,99 +827,165 @@ int xxxTriangleZ ( struct gr_triandle_d *triangle )
 
 
 // #test
-// cube mesh
+// >>>> wired cube <<<< 
+// "with ugly rasterization in some of the fazes"
+// This rasterization uses lines and applies only in the faces
+// with not inclination.
+// #todo
+// Create function parameters to select if we will use some
+// kind of rasterization or not.
+// #todo
+// We can create a function only for wired cube, 
+// and another one for cube with some kind of rasterization.
+
+
 int xxxCubeZ ( struct gr_cube_d *cube )
 {
-
-    int h=0; 
+    int h=0;
     int d=0;
     int i=0;
 
-
-    if ( (void*) cube == NULL )
-        return -1;
+    // #todo
+    // Maybe we will receive a function parameter for that.
     
- 
-    //north
-    //primeiro desenha o north porque ele sera sobreposto pelo sul nessa camera.
+    int UseRasterization = TRUE;
 
-    // north;
-    plotLine3d (cube->p[4].x, cube->p[4].y, cube->p[4].z, 
-                cube->p[5].x, cube->p[5].y, cube->p[5].z, cube->p[4].color );
-    plotLine3d (cube->p[5].x, cube->p[5].y, cube->p[5].z, 
-                cube->p[6].x, cube->p[6].y, cube->p[6].z, cube->p[5].color );
-    plotLine3d (cube->p[7].x, cube->p[7].y, cube->p[7].z, 
-                cube->p[6].x, cube->p[6].y, cube->p[6].z, cube->p[6].color );
-    plotLine3d (cube->p[4].x, cube->p[4].y, cube->p[4].z, 
-                cube->p[7].x, cube->p[7].y, cube->p[7].z, cube->p[7].color );
 
+    if ( (void*) cube == NULL ){
+        return -1;
+    }
+
+
+    // #todo
+    // Temos que rever a forma em que estamos usado os parâmetros
+    // para pintarmos o objeto cubo.
+    // Tudo aqui ainda está bem improvisado.
+
+    // north
+    // Primeiro desenha o north porque ele sera sobreposto 
+    // pelo sul nessa camera.
+
+    // -- back face ----------------------------------------
+    // north - back
+    // Retângulo com os 4 pontos de trás.
+    plotLine3d (  // cima
+        cube->p[4].x, cube->p[4].y, cube->p[4].z, 
+        cube->p[5].x, cube->p[5].y, cube->p[5].z, cube->p[4].color );
+    plotLine3d (  // direita
+        cube->p[5].x, cube->p[5].y, cube->p[5].z, 
+        cube->p[6].x, cube->p[6].y, cube->p[6].z, cube->p[5].color );
+    plotLine3d (  // baixo 
+        cube->p[7].x, cube->p[7].y, cube->p[7].z, 
+        cube->p[6].x, cube->p[6].y, cube->p[6].z, cube->p[7].color );
+    plotLine3d (  // esquerda
+        cube->p[4].x, cube->p[4].y, cube->p[4].z, 
+        cube->p[7].x, cube->p[7].y, cube->p[7].z, cube->p[4].color );
+
+    // #improviso: 
+    // Isso é um teste de rasterização, não usando triangulo.
+    // #todo:
+    // Temos que criar a tasterização via retângulos.
+    // Isso só funciona para retângulos não inclinados.
+
+    // p4 = left top 
+    // p6 = right bottom
+    if (UseRasterization == TRUE){
     ras_rectangleZ ( 
         cube->p[4].x, cube->p[4].y, cube->p[4].z, 
-        cube->p[6].x, cube->p[6].y, cube->p[6].z,
-        cube->p[4].color  );
- 
+        cube->p[6].x, cube->p[6].y, cube->p[6].z, cube->p[4].color  );
+    }
+
     //=================================================================
     
+    // -- top face ----------------------------------------
+        
     // 1st line 
     plotLine3d (cube->p[0].x, cube->p[0].y, cube->p[0].z, 
                 cube->p[4].x, cube->p[4].y, cube->p[4].z, cube->p[0].color );
     // 2nd line
     plotLine3d (cube->p[1].x, cube->p[1].y, cube->p[1].z, 
                 cube->p[5].x, cube->p[5].y, cube->p[5].z, cube->p[1].color );
-    // 3rd line
+
+    // -- bottom face ----------------------------------------
+    
+    // 1rd line
     plotLine3d (cube->p[2].x, cube->p[2].y, cube->p[2].z, 
                 cube->p[6].x, cube->p[6].y, cube->p[6].z, cube->p[2].color );
-    // 4th line 
+    // 2th line 
     plotLine3d (cube->p[3].x, cube->p[3].y, cube->p[3].z, 
                 cube->p[7].x, cube->p[7].y, cube->p[7].z, cube->p[3].color );
 
     //=================================================================
 
-    //left ok
+    // left ok
+    // Isso só funciona para retângulos não inclinados.
+    // p0 = left top da frente 
+    // p7 = left bottom de trás
+    if (UseRasterization == TRUE){
     ras_rectangleZ ( 
         cube->p[0].x, cube->p[0].y, cube->p[0].z, 
-        cube->p[7].x, cube->p[7].y, cube->p[7].z,
-        cube->p[0].color  );
+        cube->p[7].x, cube->p[7].y, cube->p[7].z, cube->p[0].color  );
+    }
 
-
-    //right ok
+    // right ok
+    // Isso só funciona para retângulos não inclinados.
+    // p1 = right top da frente 
+    // p7 = right bottom de trás
+    if (UseRasterization == TRUE){
     ras_rectangleZ ( 
         cube->p[1].x, cube->p[1].y, cube->p[1].z, 
-        cube->p[6].x, cube->p[6].y, cube->p[6].z,
-        cube->p[1].color  );
+        cube->p[6].x, cube->p[6].y, cube->p[6].z, cube->p[1].color  );
+    }
 
-
+    // tampa de baixo
     //bottom fail
     //ras_rectangleZ ( 
     //    cube->p[3].x, cube->p[3].y, cube->p[3].z, 
     //    cube->p[6].x, cube->p[6].y, cube->p[6].z,
     //    cube->p[2].color  );
 
+    // tampa de cima.
     // top fail
     //ras_rectangleZ ( 
     //    cube->p[4].x, cube->p[4].y, cube->p[4].z, 
     //    cube->p[0].x, cube->p[0].y, cube->p[0].z,
     //    cube->p[3].color  );
 
-       
-    //south
-    plotLine3d (cube->p[0].x, cube->p[0].y, cube->p[0].z, 
-                cube->p[1].x, cube->p[1].y, cube->p[1].z, cube->p[0].color );
-    plotLine3d (cube->p[1].x, cube->p[1].y, cube->p[1].z, 
-                cube->p[2].x, cube->p[2].y, cube->p[2].z, cube->p[1].color );
-    plotLine3d (cube->p[3].x, cube->p[3].y, cube->p[3].z, 
-                cube->p[2].x, cube->p[2].y, cube->p[2].z, cube->p[2].color );
-    plotLine3d (cube->p[0].x, cube->p[0].y, cube->p[0].z, 
-                cube->p[3].x, cube->p[3].y, cube->p[3].z, cube->p[3].color );
 
-   ras_rectangleZ (  
-       cube->p[0].x, cube->p[0].y, cube->p[0].z,   //y=top? 
-       cube->p[2].x, cube->p[2].y, cube->p[2].z,
-       cube->p[0].color );
+    // -- front face ----------------------------------------
+    // south - front
+    // Retângulo com os 4 pontos da frente.
+    plotLine3d (  // cima
+        cube->p[0].x, cube->p[0].y, cube->p[0].z, 
+        cube->p[1].x, cube->p[1].y, cube->p[1].z, cube->p[0].color );
+    plotLine3d (  // direita
+        cube->p[1].x, cube->p[1].y, cube->p[1].z, 
+        cube->p[2].x, cube->p[2].y, cube->p[2].z, cube->p[1].color );
+    plotLine3d (  // baixo
+        cube->p[3].x, cube->p[3].y, cube->p[3].z,
+        cube->p[2].x, cube->p[2].y, cube->p[2].z, cube->p[3].color );
+    plotLine3d (  // esquerda
+        cube->p[0].x, cube->p[0].y, cube->p[0].z, 
+        cube->p[3].x, cube->p[3].y, cube->p[3].z, cube->p[0].color );
+
+    // #improviso: 
+    // Isso é um teste de rasterização, não usando triangulo.
+    // #todo:
+    // Temos que criar a tasterização via retãngulos.
+    // Isso só funciona para retângulos não inclinados.
+
+    // p0 = left top 
+    // p2 = right bottom
+    if (UseRasterization == TRUE){
+    ras_rectangleZ (  
+        cube->p[0].x, cube->p[0].y, cube->p[0].z, 
+        cube->p[2].x, cube->p[2].y, cube->p[2].z, cube->p[0].color );
+    }
 }
 
 
-//sevice 2041
+// sevice 2041
+// Called by gwsProcedure.
 int serviceGrCubeZ(void)
 {
     // #todo:
@@ -915,62 +997,63 @@ int serviceGrCubeZ(void)
     
     
     gwssrv_debug_print("serviceGrCubeZ: [2041]\n");
-    
+
     struct gr_cube_d cube;
-   
-    //south     
-    cube.p[0].x = message_address[10];
-    cube.p[0].y = message_address[11];
-    cube.p[0].z = message_address[12];
+
+    // Circular, sentido horário.
+
+    // south
+    cube.p[0].x     = message_address[10];
+    cube.p[0].y     = message_address[11];
+    cube.p[0].z     = message_address[12];
     cube.p[0].color = message_address[13];
-        
-    cube.p[1].x = message_address[14];
-    cube.p[1].y = message_address[15];
-    cube.p[1].z = message_address[16];
+
+    cube.p[1].x     = message_address[14];
+    cube.p[1].y     = message_address[15];
+    cube.p[1].z     = message_address[16];
     cube.p[1].color = message_address[17];
-        
-    cube.p[2].x = message_address[18];
-    cube.p[2].y = message_address[19];
-    cube.p[2].z = message_address[20];
+
+    cube.p[2].x     = message_address[18];
+    cube.p[2].y     = message_address[19];
+    cube.p[2].z     = message_address[20];
     cube.p[2].color = message_address[21];
-        
-    cube.p[3].x = message_address[22];
-    cube.p[3].y = message_address[23];
-    cube.p[3].z = message_address[24];
+
+    cube.p[3].x     = message_address[22];
+    cube.p[3].y     = message_address[23];
+    cube.p[3].z     = message_address[24];
     cube.p[3].color = message_address[25];
 
-    //north
-    cube.p[4].x = message_address[26];
-    cube.p[4].y = message_address[27];
-    cube.p[4].z = message_address[28];
+    // north
+    cube.p[4].x     = message_address[26];
+    cube.p[4].y     = message_address[27];
+    cube.p[4].z     = message_address[28];
     cube.p[4].color = message_address[29];
-       
-    cube.p[5].x = message_address[30];
-    cube.p[5].y = message_address[31];
-    cube.p[5].z = message_address[32];
+
+    cube.p[5].x     = message_address[30];
+    cube.p[5].y     = message_address[31];
+    cube.p[5].z     = message_address[32];
     cube.p[5].color = message_address[33];
-        
-    cube.p[6].x = message_address[34];
-    cube.p[6].y = message_address[35];
-    cube.p[6].z = message_address[36];
+
+    cube.p[6].x     = message_address[34];
+    cube.p[6].y     = message_address[35];
+    cube.p[6].z     = message_address[36];
     cube.p[6].color = message_address[37];
-        
-    cube.p[7].x = message_address[38];
-    cube.p[7].y = message_address[39];
-    cube.p[7].z = message_address[40];
+
+    cube.p[7].x     = message_address[38];
+    cube.p[7].y     = message_address[39];
+    cube.p[7].z     = message_address[40];
     cube.p[7].color = message_address[41];
-    
-   
-    //#test
-    //Temos que passar corretamente o endereço da estrutura.
+
+    // #test
+    // Temos que passar corretamente o endereço da estrutura.
+
     xxxCubeZ ( (struct gr_cube_d *) &cube );
-    
+
     return 0;
 }
 
 
-
-//sevice 2042
+// sevice 2042
 int serviceGrRectangle(void)
 {
     // #todo:

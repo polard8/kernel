@@ -87,6 +87,87 @@ int current_mode;
 #include "model/services.h"
 
 
+
+struct gws_graphics_d
+{
+    int used;
+    int magic;
+    
+    struct gui_d  *gui;
+
+};
+struct gws_graphics_d *Currentgraphics;
+
+
+struct engine_d
+{
+    // flag: When to quit the engine.
+    // We can quit the engine and reinitialize it again.
+    int quit;
+    
+    // engine status
+    int status;
+
+
+    // graphics support.
+    struct gws_graphics_d *graphics;
+
+    // ...
+
+};
+struct engine_d Engine;
+
+
+//
+// MAIN STRUCTURE
+//
+
+// This is the main data structure for the window server.
+
+struct gws_d 
+{
+
+    // The name of the window server.
+    char name[64];
+    char edition_name[64];
+
+    char version_string[16];
+
+    unsigned long version_major;
+    unsigned long version_minor;
+
+    int socket;
+
+    // flag: When to quit the window server.
+    int quit;
+
+ 
+    // window server status
+    int status;
+
+    // sinaliza que registramos o servidor no sistema.
+    int registration_status;
+    int graphics_initialization_status;
+    // ...
+    
+    // Se devemos ou não lançar o primeiro cliente.
+    int launch_first_client;
+
+    // graphics engine 
+
+    struct engine_d *engine;
+    
+    // os info.
+    
+    // input support
+    
+    // ...
+};
+
+// GWS - Gramado Window Server
+struct gws_d *gws;
+
+
 //
 // =============================================================
 //
@@ -127,19 +208,6 @@ char __buffer[MSG_BUFFER_SIZE];
 #define NEXTRESPONSE_BUFFER_SIZE  32
 unsigned long next_response[32];
 
-
-
-
-
-
-
-// MAIN STRUCTURE
-
-struct gws_d 
-{
-    struct gui_d *gui;
-};
-struct gws_d GWS;
 
 
 

@@ -224,7 +224,7 @@ int main ( int argc, char *argv[] )
 {
 
     // # config
-    int ShowCube = FALSE;
+    int ShowCube = TRUE;
     // ...
 
 
