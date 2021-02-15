@@ -276,6 +276,91 @@ void demoTriangle(void)
 }
 
 
+void demoPolygon(void)
+{
+    struct gr_polygon_d *p;
+    unsigned long polygon_list[8];
+    
+    struct gr_vec3D_d *v0;
+    struct gr_vec3D_d *v1;
+    struct gr_vec3D_d *v2;
+    struct gr_vec3D_d *v3;
+    struct gr_vec3D_d *v4;
+
+    // ...
+
+    int i=0;
+
+    p = (struct gr_polygon_d *) malloc( sizeof( struct gr_polygon_d ) );
+    if((void*)p==NULL){return;}
+    
+    p->n = 6;
+    p->list_address = (void*) polygon_list;
+
+    for(i=0; i<8; i++)
+        polygon_list[i] = 0;
+
+
+    v0 = (struct gr_vec3D_d *) malloc( sizeof( struct gr_vec3D_d ) );
+    if((void*)v0==NULL){return;}
+
+    v1 = (struct gr_vec3D_d *) malloc( sizeof( struct gr_vec3D_d ) );
+    if((void*)v1==NULL){return;}
+
+    v2 = (struct gr_vec3D_d *) malloc( sizeof( struct gr_vec3D_d ) );
+    if((void*)v2==NULL){return;}
+
+    v3 = (struct gr_vec3D_d *) malloc( sizeof( struct gr_vec3D_d ) );
+    if((void*)v3==NULL){return;}
+
+    v4 = (struct gr_vec3D_d *) malloc( sizeof( struct gr_vec3D_d ) );
+    if((void*)v4==NULL){return;}
+
+
+    v0->x = -20;
+    v0->y =  20;
+    v0->z =   0;
+    v0->color = COLOR_WHITE;
+
+    v1->x = 0;
+    v1->y = 0;
+    v1->z = 0;
+    v1->color = COLOR_WHITE;
+
+    v2->x = 20;
+    v2->y = 20;
+    v2->z =  0;
+    v2->color = COLOR_WHITE;
+
+    v3->x =   0;
+    v3->y = -20;  
+    v3->z =   0;
+    v3->color = COLOR_WHITE;
+
+    v4->x = -20;
+    v4->y =  20;  
+    v4->z =  0;
+    v4->color = COLOR_WHITE;
+
+    polygon_list[0] = (unsigned long) v0;
+    polygon_list[1] = (unsigned long) v1;
+    polygon_list[2] = (unsigned long) v2;
+    polygon_list[3] = (unsigned long) v3;
+    polygon_list[4] = (unsigned long) v4;
+    polygon_list[5] = (unsigned long) v0;  //circular
+    
+    gwssrv_debug_print("calling xxxPolygonZ\n");
+    xxxPolygonZ(p);
+    
+    gws_refresh_rectangle(0,0,320,200);
+    
+    gwssrv_debug_print("DONE\n");
+    //printf ("DONE\n");
+}
+
+
+
+
 // inflate varias vezes.
 //only on jail
 void demoCube1(void)
@@ -664,6 +749,8 @@ void demos_startup_animation(int i)
     case 9: demoCat();  break;
     
     case 10: demoTriangle(); break;
+
+    case 11: demoPolygon(); break;
     
     default: break;
     };

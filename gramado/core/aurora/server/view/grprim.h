@@ -47,6 +47,16 @@ struct gr_cube_d
 };
 
 
+struct gr_polygon_d 
+{
+    // number of elements.
+    int n;
+    
+    // List of vectors.
+    void *list_address;
+};
+
+
 
 /*
 struct gr_mat4x4_d 
@@ -283,6 +293,14 @@ int serviceGrRectangle(void);
 //
 
 int xxxTriangleZ ( struct gr_triandle_d *triangle );
+
+
+//
+// == polygon =====================================================
+//
+
+int xxxPolygonZ ( struct gr_polygon_d *polygon );
+
 
 
 //

@@ -2150,7 +2150,8 @@ int serviceAsyncCommand (void)
             printf("HELLO\n");
             //exit(0);
             break;
-            
+        
+        // See: demos.c
         case 4:
             if (current_mode == GRAMADO_JAIL)
             {

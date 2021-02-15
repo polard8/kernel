@@ -827,6 +827,62 @@ int xxxTriangleZ ( struct gr_triandle_d *triangle )
 
 
 // #test
+int xxxPolygonZ ( struct gr_polygon_d *polygon )
+{
+    int i=0;
+    int number_of_elements=0;
+    int Max = 32;
+
+    // list of polygon pointers.
+    unsigned long *list = (unsigned long *) polygon->list_address;
+
+
+    // two vectors to create a line.
+    struct gr_vec3D_d *v1;
+    struct gr_vec3D_d *v2;
+
+
+    if ( (void*) polygon == NULL )
+        return -1;
+
+    if ( (void*) list == NULL )
+        return -1;
+
+    number_of_elements = polygon->n;
+
+    if ( number_of_elements >= Max )
+        return -1;
+
+
+
+    for ( i=0; i<number_of_elements; i++)
+    {
+        // get the first element of two.
+        v1 = (struct gr_vec3D_d *) list[i];
+        // get the second element of two.
+        v2 = (struct gr_vec3D_d *) list[i+1];
+    
+        if ( (void*) v1 == NULL || 
+             (void*) v2 == NULL )
+        { 
+            gwssrv_debug_print(">>>> BREAK\n");
+            break; 
+        }
+
+        gwssrv_debug_print(">>>> DRAW LINE\n");
+    
+        plotLine3d (
+            v1->x, v1->y, v1->z, 
+            v2->x, v2->y, v2->z, 
+            v1->color );
+    };
+
+    return 0;
+}
+
+
+
+// #test
 // >>>> wired cube <<<< 
 // "with ugly rasterization in some of the fazes"
 // This rasterization uses lines and applies only in the faces
@@ -982,6 +1038,7 @@ int xxxCubeZ ( struct gr_cube_d *cube )
         cube->p[2].x, cube->p[2].y, cube->p[2].z, cube->p[0].color );
     }
 }
+
 
 
 // sevice 2041
