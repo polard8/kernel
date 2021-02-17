@@ -2228,11 +2228,10 @@ int main ( int argc, char *argv[] )
     // Nessa hora colocamos no accept um fd.
     // então o servidor escreverá em nosso arquivo.
 
+    //printf ("terminal: Connecting to the address 'ws' ...\n");  
+    printf ("terminal: Connecting to ws via inet  ...\n");  
+
     while (1){
-    
-        //printf ("terminal: Connecting to the address 'ws' ...\n");  
-        printf ("terminal: Connecting to ws via inet  ...\n");  
-        
         if (connect (client_fd, (void *) &addr_in, sizeof(addr_in)) < 0)
         { 
             debug_print ("terminal: Connection Failed \n"); 
@@ -2240,13 +2239,12 @@ int main ( int argc, char *argv[] )
             //close(client_fd);
             //exit(1);
             //return -1; 
-         
          //try again forever.
          }else{ break; };
     };
 
- 
- 
+
+
     //
     // messages
     //
@@ -2294,14 +2292,22 @@ int main ( int argc, char *argv[] )
     unsigned long wHeight =  mwHeight - 36 - 8;
 
 
+    //
+    // main window.
+    //
 
-     main_window = gws_create_window (client_fd,
+    main_window = gws_create_window (client_fd,
                       WT_OVERLAPPED, 1, 1, "Terminal",
                       mwLeft, mwTop, mwWidth, mwHeight,
                       0,0,COLOR_RED, COLOR_RED);
 
-    //#test
-     terminal_window = gws_create_window (client_fd,
+    //
+    // terminal window.
+    //
+
+    // #test
+    // Is this the client window?
+    terminal_window = gws_create_window (client_fd,
                           WT_SIMPLE, 1, 1, "ter-client",
                           wLeft, wTop, wWidth, wHeight,
                           main_window,0,COLOR_GRAY,COLOR_BLACK);
@@ -2351,9 +2357,19 @@ int main ( int argc, char *argv[] )
 
 
     // Inicializando prompt[].
-    // Write something in the standard stream and call shell.bin.
     input('\n');
     input('\0');
+
+    //
+    // Client
+    //
+
+    // #todo
+    // Vamos fazer isso outra hora.
+    // por hora vamos apenas usar o terminal,
+    // com o input no terminal
+    
+    // Write something in the standard stream and call shell.bin.
     test_standard_stream(client_fd);
 
     //
@@ -2362,8 +2378,24 @@ int main ( int argc, char *argv[] )
 
     // loop
     // This the loop that gets messages from the window server;
-    terminal_loop(client_fd);
+    //  terminal_loop(client_fd);
+
+    //get current thread
+    //int cThread = (int) sc82 (10010,0,0,0);
+    //set foreground thread.
+    //sc82 (10011,cThread,cThread,cThread);
+
     
+    while(1){
+    
+        // #todo
+        // Setup this thread as foreground thread
+        // to receive the input.
+        // See: gws.c
+        // rtl_get_event()
+    }; 
+
+ 
 //exit:
     
     debug_print ("terminal: bye\n"); 

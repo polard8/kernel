@@ -1,0 +1,12 @@
+
+	boot partition   - fat16 (required by EFI)
+	system partition - ext2
+
+
+	The EFI needs a boot partition formatted in fat16/fat32
+	to load the system. This is why we need to support this format.
+
+	The goal is to have a second partition. A system partition
+	formatted in ext2.
+
+

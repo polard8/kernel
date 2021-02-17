@@ -3053,7 +3053,7 @@ struct timer_d *gde_create_timer (
 
     if ( pid<0 ){
         gde_debug_print ("gde_create_timer: [FAIL] pid \n");
-        return -1;
+        return (struct timer_d *) 0;  //NULL
     }
 
     //#todo
@@ -3189,7 +3189,7 @@ int gde_get_pid (int index){
     // #todo
     // Lá no kernel tem que checar os limites.
 
-    return gramado_system_call ( 9999, index, index, index );
+    return (int) gramado_system_call ( 9999, index, index, index );
 }
 
 

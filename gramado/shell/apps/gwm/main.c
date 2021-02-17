@@ -109,12 +109,14 @@ char saved_mouse_y =0;
 // called by the event loop.
 int 
 gwmProcedure ( 
+    int fd,
     int window, 
     int msg, 
     unsigned long long1, 
     unsigned long long2 );
 int 
-gwmProcedure ( 
+gwmProcedure (
+    int fd, 
     int window, 
     int msg, 
     unsigned long long1, 
@@ -131,6 +133,12 @@ gwmProcedure (
                 case VK_F1:
                     printf ("F1\n");
                     break;
+
+                case VK_F2:
+                    printf ("F2\n");
+                    create_tester_client(fd);
+                    break;
+
             };
             break;
 
@@ -302,24 +310,6 @@ char __buffer[MSG_BUFFER_SIZE];
 
 #define IP(a, b, c, d) (a << 24 | b << 16 | c << 8 | d)
 
-// tipos de pacotes.
-//#define SERVER_PACKET_TYPE_REQUEST    1000 
-//#define SERVER_PACKET_TYPE_REPLY      1001 
-//#define SERVER_PACKET_TYPE_EVENT      1002
-//#define SERVER_PACKET_TYPE_ERROR      1003
-
-
-
-// Hello!
-// Podemos isso na lib.
-int _hello_request(int fd);
-int _hello_response(int fd);
-void hello(int fd);
-
-//message support
-int _getmessage_request(int fd);
-int _getmessage_response(int fd);
-int run(int fd);
 
 
 
@@ -418,13 +408,17 @@ int gwm_init_globals(void)
 }
 
 
+// Init windows.
+
 int gwm_init_windows(void)
 {
     int i=0;
 
-
     gws_debug_print("gwm_init_windows:\n");
-    
+
+
+    // Init window list.
+
     for(i=0; i<WINDOW_COUNT_MAX; i++)
     {
         windowList[i] = 0;
@@ -436,366 +430,7 @@ int gwm_init_windows(void)
     window_with_focus = -1;
     // ...   
     
-    
     //gws_debug_print("gwm_init_windows: done\n");
-    return 0;
-}
-
-
-
-int _getmessage_request(int fd)
-{
-    // Isso permite ler a mensagem na forma de longs.
-    unsigned long *message_buffer = (unsigned long *) &__buffer[0]; 
-
-    int n_writes = 0;   // For sending requests.
-
-
-
-    //if (fd<0){
-    //    gws_debug_print("_getmessage_request: fd\n");
-    //    return -1;
-    //}
-    
-
-    //
-    // Send request.
-    //
-
-    // #debug
-    //gws_debug_print ("gwm: Writing ...\n");      
-
-    // Enviamos um request para o servidor.
-    // ?? Precisamos mesmo de um loop para isso. ??
-    // msg = 369 (get input event)
-
-    while (1)
-    {
-        message_buffer[0] = 0;    // wid 
-        message_buffer[1] = 369;  // msg
-        message_buffer[2] = 0;    // long1
-        message_buffer[3] = 0;    // long2
-        // ...
-
-        // Write!
-        // Se foi possível enviar, então saimos do loop.  
-
-        // n_writes = write (fd, __buffer, sizeof(__buffer));
-        n_writes = send (fd, __buffer, sizeof(__buffer), 0);
-       
-        if (n_writes>0){ break; }
-    }
-
-    return 0; 
-}
-
-
-int _getmessage_response(int fd)
-{
-    unsigned long *message_buffer = (unsigned long *) &__buffer[0];   
-    int n_reads = 0;    // For receiving responses.
-
-
-    int window          = -1;
-    int msg             = 0; 
-    unsigned long long1 = 0;
-    unsigned long long2 = 0;
-    unsigned long long3 = 0;
-    unsigned long long4 = 0;
-
-
-    //if (fd<0){
-    //    gws_debug_print("_getmessage_response: fd\n");
-    //    return -1;
-    //}
-
-
-
-    //
-    // Waiting for response. ==================
-    //
-
-    // Espera para ler a resposta. 
-    // Esperando com yield como teste.
-    // Isso demora, pois a resposta só será enviada depois de
-    // prestado o servido.
-    // obs: Nesse momento deveríamos estar dormindo.
-
-    // #debug
-    //gws_debug_print ("gwm: Waiting ...\n");      
-
-    // #bugbug
-    // Do we need this ??
-
-    int y=0;
-    for(y=0; y<15; y++)
-        gws_yield();   // See: libgws/
-
-
-    // #todo
-    // Podemos checar antes se o fd 
-    // representa um objeto que permite leitura.
-    // Pode nem ser possível.
-    // Mas como sabemos que é um soquete,
-    // então sabemos que é possível ler.
-
-    //
-    // read
-    //
-
-    // #debug
-    //gws_debug_print ("gwm: reading ...\n");      
-
-    // #caution
-    // Waiting for response.
-    // We can stay here for ever.
-
-response_loop:
-
-    //n_reads = read ( fd, __buffer, sizeof(__buffer) );
-    n_reads = recv ( fd, __buffer, sizeof(__buffer), 0 );
-
-    // Se retornou -1 é porque algo está errado com o arquivo.
-    if (n_reads < 0)
-    {
-        gws_debug_print ("gwm-_getmessage_response: [FATAL] recv fail.\n");
-        printf          ("gwm-_getmessage_response: [FATAL] recv fail.\n");
-        //printf ("Something is wrong with the socket.\n");
-        exit (1);
-    }
-
-    // Se retornou 0, podemos tentar novamente.
-    if (n_reads == 0){ gws_yield(); goto response_loop; }
-
-
-    // Ok. Lemos alguma coisa.
-    // Vamos pegar a mensagem no buffer.
-    // Get the message sended by the server.
-
-    window  = (int)           message_buffer[0];
-    msg     = (int)           message_buffer[1];
-    long1   = (unsigned long) message_buffer[2];
-    long2   = (unsigned long) message_buffer[3];
-    long3   = (unsigned long) message_buffer[4];
-    long4   = (unsigned long) message_buffer[5];
-
-
-    //#debug
-    //if(msg!=0)
-        //printf ("%c",long1); //printf ("{%d%c} ",msg,long1);
-    
-        
-    switch (msg){
-
-        //
-        // == Mouse ===============================
-        //
-        
-        // #test
-        // Testando mensagem de mouse.
-        // A mensagem tem um pacote com 3 valores a serem decodificados.
-        // Raw mouse input!!!
-        case 4567:
-            //printf("gwm-4567: [TEST] Mouse raw input\n");
-            //parse_data_packet( fd,
-            //    (char) long1,    //data
-             //   (char) long2,    //x
-             //   (char) long3 );  //y
-            break;
-            
-        
-        //mensagem de mouse ja processada
-        //provisorio
-        case 4568:
-            //printf("gwm-4568: Mouse processed input x=%d y=%d\n", long1, long2);
-            //if ( MOUSE_WINDOW > 0 ){
-            //    gws_change_window_position(fd,MOUSE_WINDOW, long1, long2);
-            //    gws_redraw_window(fd,MOUSE_WINDOW,1); 
-            //}
-            break;
-
-
-        //OK isso funcionou.
-        case MSG_KEYDOWN:
-          //case 20:
-            //gws_debug_print ("MSG_KEYDOWN\n");
-            switch (long1)
-            {
-                //case 0:
-                    //relax cpu
-                    //break; 
-                    
-                //case VK_RETURN:
-                    //goto process_event;
-                    //break;
-                  
-                //case VK_TAB:
-                //case VK_BACK:
-                
-                //...
-                
-                
-                // We are in the terminal ...
-                // We will not process the chars ...
-                // We need to send it to the client via file.
-                default:
-                    //terminal_write_char(long1) #todo
-                    printf ("%c",long1);
-                    fflush(stdout);
-                    goto process_event;
-                    break;
-            };
-            break;
-
-
-        //case MSG_KEYUP:
-          case 21:  
-            //gws_debug_print ("MSG_KEYUP\n");
-            goto process_event;
-            break;
-
-            
-        case MSG_SYSKEYDOWN:
-            switch (long1)
-            {
-                case VK_F1:
-                    //printf ("gwm: VK_F1\n");
-                    create_main_menu(fd);
-                    return 0;
-                    break;
-
-                case VK_F2:
-                    //printf ("gwm: VK_F2\n");
-                    create_tester_client(fd);
-                    return 0;
-                    break;
-
-                // This sistem call is able to initialize a lot
-                // of system's components.
-                // IN: 1 = full initialization os ps2.
-                case VK_F3:
-                    //printf ("gwm: VK_F3\n");
-                    gramado_system_call ( 350, 1, 0, 0 );
-                    break;
-                    
-                case VK_F4:
-                    //printf ("gwm: VK_F4 reboot\n");
-                    gws_reboot();
-                    break;
-                    
-                case VK_F9:
-                    //printf ("gwm: VK_F9 update\n");
-                    update(fd);
-                    return 0;
-                    break;
-
-                case VK_F10:
-                    gws_clone_and_execute("editor.bin");
-                    return 0;
-                    break;
-
-                case VK_F11:
-                    //gws_clone_and_execute("init.bin");
-                    gws_clone_and_execute("launch1.bin");
-                    //exit(0);
-                    return 0;
-                    break;
-
-                case VK_F12:
-                    gws_clone_and_execute("terminal.bin");
-                    return 0;
-                    break;
-                    
-                default:
-                    gws_debug_print("gwm: default MSG_SYSKEYDOWN \n");
-                    goto process_event;
-                    break;
-            };
-            break;
-            
-
-        case MSG_SYSKEYUP:
-            switch (long1)
-            {
-                //case VK_F1:
-                default:
-                    gws_debug_print("gwm: default MSG_SYSKEYUP \n");
-                    goto process_event;
-                    break;
-            };
-            break;
-
-        // Commands.
-        case MSG_COMMAND:
-            switch (long1)
-            {
-                //case CMD_ABOUT:
-                    //printf ("terminal: CMD_ABOUT\n");
-                    //goto process_event;
-                    //break;
-                    
-                default:
-                    goto process_event;
-                    break;
-            };
-
- 
-        case SERVER_PACKET_TYPE_REQUEST:
-            gws_yield ();
-            goto response_loop;
-            break;
-            
-        // Reply!
-        case SERVER_PACKET_TYPE_REPLY:
-            goto process_reply;
-            break;
-            
-        case SERVER_PACKET_TYPE_EVENT:
-            goto process_event;
-            //goto response_loop;
-            break;
-            
-        case SERVER_PACKET_TYPE_ERROR:
-            gws_debug_print ("gwm: SERVER_PACKET_TYPE_ERROR\n");
-            goto response_loop;
-            //exit (-1);
-            break;
-        
-        default:
-            gws_debug_print ("@");
-            goto process_event;
-            //goto response_loop;
-            break; 
-    };
-
-//
-// Process reply.
-//
-
-// A resposta tras o window id no início do buffer.
-
-process_reply:
-
-    // #test
-    //gws_debug_print ("gwm: Testing close() ...\n"); 
-    //close (fd);
-
-    //gws_debug_print ("gwst: bye\n"); 
-    //printf ("gwm: Window ID %d \n", message_buffer[0] );
-    //printf ("gwm: Bye\n");
-    
-    // #todo
-    // Podemos usar a biblioteca e testarmos
-    // vários serviços da biblioteca nesse momento.
-
-    return 0;
-
-//
-// Process an event.
-//
-
-process_event:
-    gws_debug_print ("gwm: We've got an system message from ws!\n"); 
     return 0;
 }
 
@@ -830,29 +465,7 @@ update_all_windows(int fd);
 */
 
 
-// loop
-// Loop de requests para o gws.
-int run(int fd)
-{
-    //struct wm_client_d  *c;
-    
-    // Getting event messages from window server.
-    
-	//while(___running){
-    while(1){
- 
-        _getmessage_request(fd);
-        _getmessage_response(fd); 
-        
-        //if(isTimeToShutdown == 1) { break; }
-    };
-
-    return 0; 
-}
-
-
-//...
-
+// ...
 
 
 
@@ -865,173 +478,6 @@ struct sockaddr_in addr = {
     .sin_addr   = IP(192, 168, 1, 79),
 };
 */
-
-
-
-
-int _hello_response(int fd){
-
-    unsigned long *message_buffer = (unsigned long *) &__buffer[0];   
-    int n_reads = 0;    // For receiving responses.
-
-
-    //
-    // waiting
-    //
-
-    // Espera para ler a resposta. 
-    // Esperando com yield como teste.
-    // Isso demora, pois a resposta só será enviada depois de
-    // prestado o servido.
-    // obs: Nesse momento deveríamos estar dormindo.
-
-    // #debug
-    debug_print ("gwm: Waiting ...\n");      
-
-
-    int y;
-    for(y=0; y<15; y++)
-        gws_yield();
-
-
-
-    //
-    // read
-    //
-
-    // #debug
-    debug_print ("gwm: Reading ...\n");      
-
-
-       //#caution
-       //we can stay here for ever.
-       //it's a test yet.
-__again:
-    n_reads = read ( fd, __buffer, sizeof(__buffer) );
-    
-    // Não vamos insistir num arquivo vazio.
-    //if (n_reads<=0){
-    //     gws_yield();        
-    //    goto __again;
-    //}
-
-    if (n_reads == 0){
-        gws_yield();        
-        goto __again;
-    }
-    
-    if (n_reads < 0){
-        printf ("gwm: recv fail.\n");
-        printf ("Something is wrong with the socket.\n");
-        exit (1);
-    }
-    
-
-    
-    // Get the message sended by the server.
-    int msg = (int) message_buffer[1];
-    
-    switch (msg)
-    {
-        case SERVER_PACKET_TYPE_REQUEST:
-            gws_yield ();
-            goto __again;
-            break;
-            
-        case SERVER_PACKET_TYPE_REPLY:
-            debug_print ("gwm: SERVER_PACKET_TYPE_REPLY received\n"); 
-            goto process_reply;
-            break;
-            
-        case SERVER_PACKET_TYPE_EVENT:
-            //todo: call procedure.
-            goto __again;
-            break;
-            
-        case SERVER_PACKET_TYPE_ERROR:
-            debug_print ("gwm: SERVER_PACKET_TYPE_ERROR\n");
-            goto __again;
-            //exit (-1);
-            break;
-        
-        default:
-            goto __again;
-            break; 
-    };
-
-
-process_reply:
-
-    //
-    // done:
-    //
-
-    //printf("%d bytes readed\n",n_reads);
-    printf("RESPONSE: {%s} \n",__buffer+16);
-
-    return 0;
-}
-
-
-int _hello_request(int fd){
-
-    // Isso permite ler a mensagem na forma de longs.
-    unsigned long *message_buffer = (unsigned long *) &__buffer[0];   
-
-    int n_writes = 0;   // For sending requests.
-
-     //
-     // Loop for new message.
-     //
-
-    unsigned long ____color = 0x00FF00;
-
-// loop:
-new_message:
-
-    
-    //
-    // Write
-    //
-
-    // #debug
-    debug_print ("gwm: Writing ...\n");      
-
-    // Enviamos um request para o servidor.
-    // ?? Precisamos mesmo de um loop para isso. ??
-
-
-    // Write!
-    // Se foi possível enviar, então saimos do loop.        
-    // obs: podemos usar send();
-
-    while (1){
-
-        // Solicita um hello na posição x,y.      
-        message_buffer[0] = 0;       // window. 
-        message_buffer[1] = 1000;    // msg=hello.
-        message_buffer[2] = 10;       // x
-        message_buffer[3] = 40;       // y (Depois da topbar) 
-        // ...
-
-        n_writes = write (fd, __buffer, sizeof(__buffer));
-        if(n_writes>0)
-           break;
-    };
-
-    return 0;
-}
-
-
-void hello(int fd)
-{
-    if(fd<0)return;
-    
-    //while(1){
-        _hello_request(fd);
-        _hello_response(fd);
-    //}
-}
 
 
 /*
@@ -1610,13 +1056,12 @@ int main ( int argc, char *argv[] ){
     debug_print ("gwm: Initializing ...\n");
 
 
-
     //
     // socket
     // 
 
     // #debug
-    printf ("gwm: Creating socket\n");
+    //printf ("gwm: Creating socket\n");
 
     // cria o soquete.
     // AF_GRAMADO
@@ -1636,12 +1081,11 @@ int main ( int argc, char *argv[] ){
     // Nessa hora colocamos no accept um fd.
     // então o servidor escreverá em nosso arquivo.
 
+    // #debug
+    //printf ("gnst: Connecting to the address 'ws' ...\n");      
+    printf ("gwm: Connecting to ws via inet  ...\n");   
+
     while (1){
-
-        // #debug
-        //printf ("gnst: Connecting to the address 'ws' ...\n");      
-        printf ("gwm: Connecting to ws via inet  ...\n");   
-
         if (connect (fd, (void *) &addr_in, sizeof(addr_in)) < 0){ 
             gws_debug_print ("gwm: Connection Failed \n");
             printf          ("gwm: Connection Failed \n"); 
@@ -1650,12 +1094,12 @@ int main ( int argc, char *argv[] ){
         }else{ break; }; 
     };
 
-    printf          ("gwm: DRAW\n");
-    
-    
-    
-    //#bugbug: It is wrong. hang
-    //hello(fd);
+    //
+    // Draw
+    //
+
+    printf ("gwm: DRAW\n");
+
 
 
     //
@@ -1684,19 +1128,22 @@ int main ( int argc, char *argv[] ){
     int cThread = (int) sc82 (10010,0,0,0);
     //set foreground thread.
     sc82 (10011,cThread,cThread,cThread);
-    
-    while(1){
+    while (1){
         if ( rtl_get_event() == TRUE ){  
-            gwmProcedure( RTLEventBuffer[0], RTLEventBuffer[1], RTLEventBuffer[2], RTLEventBuffer[3] );
+            gwmProcedure ( 
+                fd,
+                RTLEventBuffer[0], 
+                RTLEventBuffer[1], 
+                RTLEventBuffer[2], 
+                RTLEventBuffer[3] );
         }
     };
     //=================================
 
 
+    // #debug
     // while(1){}
 
-    // Loop de requests para o gws.
-    //run (fd);
 
 
     // #importante

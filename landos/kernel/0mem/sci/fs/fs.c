@@ -9,6 +9,12 @@
  */
 
 
+// #
+// This fs module handles only the efi boot partition for now.
+// The goal is to support a system partition, bigger, and maybe
+// formatted in ext2.
+
+
 // #todo
 // A tabela de montagem guarda relação com os volumes existentes.
 // Esses volumes podem ser de vários tipos.

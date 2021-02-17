@@ -225,7 +225,7 @@ int main ( int argc, char *argv[] )
 {
 
     // # config
-    int ShowCube = TRUE;
+    int ShowCube = FALSE;
     // ...
 
 
@@ -245,7 +245,7 @@ int main ( int argc, char *argv[] )
          printf          ("gws.bin: gws initialization fail \n");
          exit(1);
     }
-    
+
     //===============
 
     //========================================
@@ -254,9 +254,9 @@ int main ( int argc, char *argv[] )
     // Wait for the moment where the server says: 'yes'
 
     gws_debug_print ("gws.bin:  \n");
-             printf ("gws.bin:  \n");
-             
-    
+    //         printf ("gws.bin:  \n");
+
+
     /*
     rtl_set_file_sync( client_fd, SYNC_REQUEST_SET_ACTION, ACTION_ERROR );
     int value = rtl_get_file_sync( client_fd, SYNC_REQUEST_GET_ACTION );
@@ -326,7 +326,7 @@ int main ( int argc, char *argv[] )
 
     //===============================
     gws_debug_print ("gws.bin: 1 Creating main window \n");
-    printf          ("gws.bin: Creating main window \n");
+    //printf          ("gws.bin: Creating main window \n");
 
     main_window = gws_create_window (client_fd,
                       WT_SIMPLE, 1, 1, "gws-client",
@@ -414,7 +414,7 @@ int main ( int argc, char *argv[] )
     // Maybe the custon status bar can be a window.
 
     gws_debug_print ("gws.bin: 4 Testing Plot cube \n");
-    printf          ("gws.bin: 4 Testing Plot cube \n");
+    //printf          ("gws.bin: 4 Testing Plot cube \n");
 
     
     int backLeft   = (-(w/4)); 
@@ -541,9 +541,9 @@ int main ( int argc, char *argv[] )
     }
     */
    
-   
-    printf ("LOOP:\n");
-   
+    gws_debug_print("LOOP:\n");
+    //printf ("LOOP:\n");
+
     // #debug
     //while (1){
 

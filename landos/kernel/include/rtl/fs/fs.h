@@ -10,6 +10,32 @@
 #define ____FS_H
 
 
+// -----------------
+
+// #todo
+// Talves possamos usar enum.
+
+// #bugbug
+// Essas definições provocam problemas de compilação.
+
+/*
+// file types
+#define BIN_FILE    1000
+#define TXT_FILE    1001
+#define CPP_FILE    1002
+#define ASM_FILE    1003
+// ...
+
+// file extensions
+#define BIN_FILE    2000
+#define TXT_FILE    2001
+#define CPP_FILE    2002
+#define ASM_FILE    2003
+// ...
+*/
+
+
+// -----------------
 
 #ifndef DIRECTORY_SEPARATOR
 # define DIRECTORY_SEPARATOR '/'
