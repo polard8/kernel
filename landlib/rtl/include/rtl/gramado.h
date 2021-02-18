@@ -120,9 +120,39 @@ int rtl_get_event (void);
 // ===========================================================
 
 
+// ===========================================================
+//  rtl event
+
+// #todo
+// Not tested yet.
+
+struct rtl_event_d
+{
+    // #bugbug
+    // The system call do not know the limit of arguments
+    // in this structure.
+    // maybe we need a pad for a 32 longs array,
+    
+    void *window;  // opaque
+    int msg;
+    unsigned long long1;
+    unsigned long long2;
+    
+    unsigned long long3;
+    unsigned long long4;
+    unsigned long long5;
+    unsigned long long6;
+    
+    // 32-8
+    //unsigned long pad[24];
+};
+
+struct rtl_event_d *rtl_next_event (void);
+
+// ===========================================================
 
 
-
+// critical section
 void rtl_enter_critical_section (void);
 void rtl_exit_critical_section (void);
 

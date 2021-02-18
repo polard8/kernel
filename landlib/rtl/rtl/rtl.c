@@ -139,6 +139,11 @@ unsigned long rtl_to_ulong (long ch)
 // Get an event from the thread's event queue.
 // That old 'get system message'
 // Using a buffer
+
+// #todo
+// Let's build another routines that returns a pointer
+// for a event structure.
+
 int rtl_get_event (void)
 {
     // clear
@@ -146,7 +151,6 @@ int rtl_get_event (void)
     RTLEventBuffer[1] = 0;
     RTLEventBuffer[2] = 0;
     RTLEventBuffer[3] = 0;
-    //...
 
     // Get event from the thread's event queue.
     rtl_enter_critical_section(); 
@@ -158,19 +162,14 @@ int rtl_get_event (void)
 
     // Check if it is a valid event.
 
-    // No, we do not have an event. Yield.
-    if ( RTLEventBuffer[1] == 0 )
-    {
-        //gramado_system_call (265,0,0,0); 
-        
+    // No, we do not have an event. Yield and clear.
+    if ( RTLEventBuffer[1] == 0 ){
         sc82 (265,0,0,0);
-        
-        // clear
+
         RTLEventBuffer[0] = 0;
         RTLEventBuffer[1] = 0;
         RTLEventBuffer[2] = 0;
         RTLEventBuffer[3] = 0;
-        //...
 
         return FALSE; 
     }
@@ -180,8 +179,61 @@ int rtl_get_event (void)
 }
 
 
+struct rtl_event_d *rtl_next_event (void)
+{
+    // Not a pointer.
+    struct rtl_event_d ev;
 
 
+    // clean
+    ev.window = NULL;
+    ev.msg = 0;
+    ev.long1 = 0;
+    ev.long2 = 0;
+
+    ev.long3 = 0;
+    ev.long4 = 0;
+    ev.long5 = 0;
+    ev.long6 = 0;
+
+    // Get event from the thread's event queue.
+    
+    // #bugbug
+    // For this routine the system call needs to respect 
+    // the limit of this structure. Only 8 elements.
+
+    rtl_enter_critical_section(); 
+    gramado_system_call ( 111,
+        (unsigned long) &ev,
+        (unsigned long) &ev,
+        (unsigned long) &ev );
+    rtl_exit_critical_section(); 
+
+    // Check if it is a valid event.
+
+    // No, we do not have an event. Yield and clear.
+    if ( ev.msg == 0 ){
+
+        sc82 (265,0,0,0);
+
+        // clean
+
+        ev.window = NULL;  
+        ev.msg = 0;  
+        ev.long1 = 0;  
+        ev.long2 = 0;
+        
+        ev.long3 = 0;  
+        ev.long4 = 0;  
+        ev.long5 = 0;  
+        ev.long6 = 0;
+
+        return NULL; 
+    }
+
+    // Yes, we have an event.
+    return (struct rtl_event_d *) &ev;
+}
 
 
 

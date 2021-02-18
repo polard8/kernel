@@ -501,14 +501,15 @@ int main ( int argc, char *argv[] )
         rtl_exit_critical_section(); 
 
         // No message. Yield.
-        if ( message_buffer[1] == 0 )
-        { 
-            sc82(265,0,0,0);
+        if ( message_buffer[1] == 0 ){ 
+            sc82 (265,0,0,0); 
+            sc82 (265,0,0,0); 
+            sc82 (265,0,0,0); 
+            sc82 (265,0,0,0); 
         }
 
         // We've got a message. 
-        // Call the procedure.
-
+        // Call the procedure and don't come back.
         if ( message_buffer[1] == 9216 )
         {
             printf ("init.bin: Message 9216\n");
@@ -517,11 +518,6 @@ int main ( int argc, char *argv[] )
             goto logoff; 
         }
 
-        // Messages:
-        // + Kill all childs ...
-        // +  ...
-        // ...
-        
         message_buffer[0] = 0;
         message_buffer[1] = 0;
         message_buffer[2] = 0;
