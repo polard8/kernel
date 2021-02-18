@@ -347,7 +347,7 @@ int main ( int argc, char *argv[] )
     //printf          ("gws.bin: Drawing a char \n");
     gws_draw_char ( 
         client_fd, main_window, 
-        8, 8, COLOR_RED, 'G' );
+        8, 8, COLOR_YELLOW, 'G' );
     //====================   
 
 
@@ -549,7 +549,7 @@ int main ( int argc, char *argv[] )
 
     gws_draw_char ( 
         client_fd, main_window, 
-        16, 16, COLOR_RED, 'X' );
+        16, 16, COLOR_YELLOW, 'X' );
 
         // ...
 

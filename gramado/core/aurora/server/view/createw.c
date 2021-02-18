@@ -118,13 +118,16 @@ createwDrawFrame (
     // Janela de aplicativos.
     struct gws_window_d *TitleBar;
 
+    int Type=0;
+
     unsigned long border_color=0;
     unsigned long border_size=0;
     
 
     gwssrv_debug_print ("createwDrawFrame:\n");
-    
-    
+
+
+ 
     // #todo
     // check parent;
     //if ( (void*) parent == NULL ){}
@@ -144,11 +147,30 @@ createwDrawFrame (
     // EDITBOX NÃO PRECISA DE BARRA DE TÍTULOS.
     // MAS PRECISA DE FRAME ... QUE SERÃO AS BORDAS.
     
+    //
+    // Type
+    //
     
+    Type = window->type;
+
+    int Valid=FALSE;
+
+    switch (Type){
+    case WT_EDITBOX:     Valid=TRUE; break;
+    case WT_OVERLAPPED:  Valid=TRUE; break;
+    case WT_BUTTON:      Valid=TRUE; break;
+    };
+
+    if ( Valid == FALSE ){
+        gwssrv_debug_print ("createwDrawFrame: Invalid type\n");
+        return -1;
+    }
+
+
     // ===============================================
     // editbox
     
-    if ( window->type == WT_EDITBOX )
+    if ( Type == WT_EDITBOX )
     {
             // Se tiver o foco.
             if ( window->focus == 1 ){
@@ -194,7 +216,7 @@ createwDrawFrame (
     unsigned long offset = 
         ( ( (unsigned long) window->width - ( (unsigned long) tmp_size * (unsigned long) gcharWidth) ) / 2 );
 
-    if ( window->type == WT_OVERLAPPED )
+    if ( Type == WT_OVERLAPPED )
     {
             // Se tiver o foco.
             if ( window->focus == 1 ){
@@ -249,7 +271,7 @@ createwDrawFrame (
                                     0, COLOR_BLUE1, COLOR_BLUE1 );  
 
         if ( (void *) TitleBar == NULL ){
-            gwssrv_debug_print ("createwCreateWindow: TitleBar fail \n");
+            gwssrv_debug_print ("createwDrawFrame: TitleBar fail \n");
             return -1;
         }
         
@@ -288,9 +310,9 @@ createwDrawFrame (
     // button
 
     //button
-    if ( window->type == WT_BUTTON )
+    if ( Type == WT_BUTTON )
     {
-        gwssrv_debug_print ("[DEBUG]: desenha o frame do botao\n");
+        gwssrv_debug_print ("createwDrawFrame: [TODO] frame for button\n");
         
         //todo frame or not
         //just like the edit box.   
@@ -904,115 +926,87 @@ void *createwCreateWindow2 (
 
     switch (type)
     {
-        //case WT_NULL:
-            //return NULL; 
-            //break;
-
         // Simple window. (Sem barra de títulos).
         case WT_SIMPLE:
-            Background = 1;
-            window->backgroundUsed = 1;
+            Background = TRUE;
+            window->backgroundUsed = TRUE;
             break;
-
 
         // Edit box. (Simples + borda preta).
         // Editbox não tem sombra, tem bordas. 
         case WT_EDITBOX:
-            Background = 1;
-            window->backgroundUsed = 1;
-            Border = 1;
-            //window->borderUsed = 1;
+            Background = TRUE;
+            Border     = TRUE;
+            window->backgroundUsed = TRUE;
             break;
 
-
-		// Overlapped. (completa, para aplicativos).
-		// Sombra, bg, título + borda, cliente area ...
-		// #obs: Teremos recursividade para desenhar outras partes.
+        // Overlapped. (completa, para aplicativos).
+        // Sombra, bg, título + borda, cliente area ...
+        // #obs: Teremos recursividade para desenhar outras partes.
         case WT_OVERLAPPED:
-            Shadow = 1;
-            window->shadowUsed = 1;
-            Background = 1;
-            window->backgroundUsed = 1;
-            TitleBar = 1;
-            window->titlebarUsed = 1;
-            ClientArea = 1;
-            window->clientAreaUsed = 1;
-
-            MinimizeButton = 1;   
-            MaximizeButton = 1;   
-            CloseButton = 1;       
-
-            //MenuBar       = 1;    // Barra de menu. 
-            //ButtonSysMenu = 1;    // System menu button. ??
-
-		    //set_active_window(window);
-		    break;
-
-
-		// Popup. (um tipo de overlapped mais simples).
-        case WT_POPUP:
-            Shadow = 1; 
-            window->shadowUsed = 1;
-            Background = 1;
-            window->backgroundUsed = 1;
-            //if(titulo){} TitleBar = 1;    //titulo + borda
+            Shadow         = TRUE;
+            Background     = TRUE;
+            TitleBar       = TRUE;
+            ClientArea     = TRUE;
+            MinimizeButton = TRUE;
+            MaximizeButton = TRUE;
+            CloseButton    = TRUE; 
+            window->shadowUsed     = TRUE;
+            window->backgroundUsed = TRUE;
+            window->titlebarUsed   = TRUE;
+            window->clientAreaUsed = TRUE;
             break;
- 
- 
+
+        // Popup. (um tipo de overlapped mais simples).
+        case WT_POPUP:
+            Shadow     = TRUE;
+            Background = TRUE;
+            window->shadowUsed     = TRUE;
+            window->backgroundUsed = TRUE;
+            break;
+  
         // Check box. (Simples + borda preta).
         // Caixa de seleção. Caixa de verificação. Quadradinho.
         case WT_CHECKBOX:
-            Background = 1;    
-            window->backgroundUsed = 1;
-            Border = 1;
- 			//window->borderUsed = 1;@todo: isso ainda não existe na extrutura ??
-            break;
-			
-		// Scroll bar. Para ser usada como janela filha.
-		case WT_SCROLLBAR:
-			//Background = 1;    //bg.
-		    //window->backgroundUsed = 1;
-            //bordas.
-            //Border = 1;
- 			//window->borderUsed = 1;@todo: isso ainda não existe na extrutura ??
+            Background = TRUE;
+            Border     = TRUE;
+            window->backgroundUsed = TRUE;
+            // #todo: structure element for 'border'
             break;
 
+        //case WT_SCROLLBAR:
+            // Nothing for now.
+            //break;
 
         // Only the bg for now.
         case WT_BUTTON:
-            Background = 1;
-            window->backgroundUsed = 1;
+            Background = TRUE;
+            window->backgroundUsed = TRUE;
             break;
-
-
 
         // Status bar.
         case WT_STATUSBAR:
-            Background = 1;
-            window->backgroundUsed = 1;
+            Background = TRUE;
+            window->backgroundUsed = TRUE;
             break;
 
         // Ícone da área de trabalho.
         case WT_ICON:
-            Background = 1;
-            window->backgroundUsed = 1;
+            Background = TRUE;
+            window->backgroundUsed = TRUE;
             break;
 
-		//barra de rolagem
-		//botões de radio .. 
-		//...
+        // barra de rolagem
+        // botões de radio 
+        // ...
 
-        // Continua ...
-
-        //Ainda não implementada.
         default:
-            //return NULL; 
-            //gde_message_box (3,"createwCreateWindow2","default");
-            debug_print("createwCreateWindow2: default\n");
+            debug_print("createwCreateWindow2: [DEBUG] default\n");
+                 printf("createwCreateWindow2: [DEBUG] default\n");
             while(1){}
+            //return NULL;
             break;
     };
-
 
 
     //gde_message_box (3,"xxx","xxxx");
@@ -1203,9 +1197,9 @@ void *createwCreateWindow2 (
 	//     A sombra é maior que a própria janela.
 	//     ?? Se estivermos em full screen não tem sombra ??
 
-    if ( Shadow == 1 )
+    if ( Shadow == TRUE )
     {
-        window->shadowUsed = 1;
+        window->shadowUsed = TRUE;
 
 		//CurrentColorScheme->elements[??]
 		
@@ -1235,10 +1229,10 @@ void *createwCreateWindow2 (
             //remeber: the first window do not have a parent.
             if ( (void*) Parent == NULL )
             { 
-                gwssrv_debug_print ("createwCreateWindow2: [Shadow] Parent"); 
+                gwssrv_debug_print ("createwCreateWindow2: [Shadow] Parent\n"); 
                 //exit(1); 
                 rectBackbufferDrawRectangle ( 
-                    (window->left +1), (window->top +1), 
+                    (window->left +1),     (window->top +1), 
                     (window->width +1 +1), (window->height +1 +1), 
                     __tmp_color, 1 ); 
             }
@@ -1246,21 +1240,19 @@ void *createwCreateWindow2 (
             if ( (void*) Parent != NULL ){
 
                 rectBackbufferDrawRectangle ( 
-                    (window->left +1), (window->top +1), 
+                    (window->left +1),     (window->top +1), 
                     (window->width +1 +1), (window->height +1 +1), 
                     __tmp_color, 1 ); 
             }
         }
 
-        // ??
         // E os outros tipos, não tem sombra ??
+   
         // Os outros tipos devem ter escolha para sombra ou não ??
         // Flat design pode usar sombra para definir se o botão 
         // foi pressionado ou não.
-
-       // ...
+        // ...
     }
-
 
 
     // ## Background ##
@@ -1270,46 +1262,27 @@ void *createwCreateWindow2 (
     // à sua janela mãe. Já uma overlapped pode ser relativo a janela 
     // gui->main ou relativo à janela mãe.
 
-    if ( Background == 1 )
+    if ( Background == TRUE )
     {
-        // Flag.
-        window->backgroundUsed = 1;
+        window->backgroundUsed = TRUE;
 
-        window->bg_color = COLOR_PINK;
-        //window->bg_color = CurrentColorScheme->elements[csiWindowBackground]; 
+        // Select background color.
+        switch (type){
+            case WT_SIMPLE:
+            case WT_POPUP:
+            case WT_EDITBOX:
+            case WT_CHECKBOX:
+            case WT_ICON:
+            case WT_BUTTON:
+                window->bg_color = color;
+                break;
+            default:
+                window->bg_color = COLOR_PINK;  //BLACK?
+                //window->bg_color = CurrentColorScheme->elements[csiWindowBackground]; 
+                break;
+        };
 
-        // O argumento 'color' será a cor do bg para alguns tipos.
-        // Talvez não deva ser assim. Talvez tenha que se respeitar o tema instalado.
-        if ( (unsigned long) type == WT_SIMPLE ) { window->bg_color = color; }
-        if ( (unsigned long) type == WT_POPUP )  { window->bg_color = color; }
-        if ( (unsigned long) type == WT_EDITBOX) { window->bg_color = color; }
-        if ( (unsigned long) type == WT_CHECKBOX){ window->bg_color = color; }
-        //if ( (unsigned long) type == WT_SCROLLBAR){ window->bg_color = color; }
-        if ( (unsigned long) type == WT_ICON )   { window->bg_color = color; }
-        if ( (unsigned long) type == WT_BUTTON ) { window->bg_color = color; }
-        // ...
-
-		// Pintar o retângulo.
-		// #todo: 
-		// ?? width Adicionar a largura da bordas bordas verticais.
-		// #todo: 
-		// ?? height Adicionar as larguras das bordas horizontais e da barra de títulos.
-
-        /*
-        if ( (unsigned long) type == WT_STATUSBAR )
-        {
-            drawDataRectangle ( window->left, window->top, 
-                window->width -1, window->height, window->bg_color ); 
-
-            dtextDrawString ( window->left +8, window->top +8, 
-                COLOR_TEXT, window->name ); 
-            goto done;
-        }
-        */
-
-        // 
-        // Draw background!
-        //
+        // Draw 
 
         //#bugbug
         //Remember: The first window do not have a parent.
@@ -1335,9 +1308,9 @@ void *createwCreateWindow2 (
     // == Button =============================================
     //
 
-    //Termina de desenhar o botão, mas não é frame
-    //é só o botão...
-    //caso o botão tenha algum frame, será alguma borda extra.
+    // Termina de desenhar o botão, mas não é frame
+    // é só o botão...
+    // caso o botão tenha algum frame, será alguma borda extra.
 
     if ( (unsigned long) type == WT_BUTTON )
     {
@@ -1396,6 +1369,13 @@ void *createwCreateWindow2 (
 
         if ( (void*) Parent != NULL )
         {
+
+            //
+            // Drawing a button
+            //
+            
+            // Maybe we can use a helper function to do this job.
+            // See: button.c
 
             //  ____
             // |
@@ -1492,7 +1472,6 @@ void *createwCreateWindow2 (
     } //button
 
 
-
 //done:
 
     return (void *) window;
@@ -1538,7 +1517,27 @@ void *createwCreateWindow (
 {
 
    struct gws_window_d *__w;
-   
+
+
+    // This function is able to create some few 
+    // kinds of windows for now:
+    // overlapped, editbox, button and simple.
+
+    int Valid=FALSE;
+
+    switch (type){
+    case WT_OVERLAPPED:  Valid=TRUE; break;
+    case WT_EDITBOX:     Valid=TRUE; break;
+    case WT_BUTTON:      Valid=TRUE; break;
+    case WT_SIMPLE:      Valid=TRUE; break;
+    };
+
+    if ( Valid == FALSE ){
+        gwssrv_debug_print ("createwCreateWindow: Invalid type\n");
+        return NULL;
+    }
+
+
     //1. Começamos criando uma janela simples
     //2. depois criamos o frame. que decide se vai ter barra de títulos ou nao.
     
@@ -1572,12 +1571,18 @@ void *createwCreateWindow (
                            (char *) windowname, 
                            x, y, width, height, 
                            (struct gws_window_d *) pWindow, 
-                           desktopid, clientcolor, color );  
-    
+                           desktopid, clientcolor, color ); 
+
+         if ( (void *) __w == NULL ){
+             gwssrv_debug_print ("createwCreateWindow: createwCreateWindow2 fail \n");
+             return NULL;
+         }
+
         // Pintamos simples, mas a tipagem será overlapped.
         __w->type = WT_OVERLAPPED;   
-       goto draw_frame;
+        goto draw_frame;
     }
+
 
     // #todo
     // It does not exist by itself. It needs a parent window.
@@ -1594,6 +1599,11 @@ void *createwCreateWindow (
                            x, y, width, height, 
                            (struct gws_window_d *) pWindow, 
                            desktopid, clientcolor, color ); 
+
+         if ( (void *) __w == NULL ){
+             gwssrv_debug_print ("createwCreateWindow: createwCreateWindow2 fail \n");
+             return NULL;
+         }
 
         //pintamos simples, mas a tipagem será  overlapped
         __w->type = WT_EDITBOX;   
@@ -1619,6 +1629,11 @@ void *createwCreateWindow (
                            (struct gws_window_d *) pWindow, 
                            desktopid, clientcolor, color ); 
 
+         if ( (void *) __w == NULL ){
+             gwssrv_debug_print ("createwCreateWindow: createwCreateWindow2 fail \n");
+             return NULL;
+         }
+
         //pintamos simples, mas a tipagem será  overlapped
         __w->type = WT_BUTTON;   
         goto draw_frame;
@@ -1635,9 +1650,10 @@ void *createwCreateWindow (
                            (struct gws_window_d *) pWindow, 
                            desktopid, clientcolor, color );  
 
-         if ( (void *) __w == NULL )
-            gwssrv_debug_print ("createwCreateWindow: createwCreateWindow2 fail \n");
-    
+         if ( (void *) __w == NULL ){
+             gwssrv_debug_print ("createwCreateWindow: createwCreateWindow2 fail \n");
+             return NULL;
+         }
 
         __w->type = WT_SIMPLE;
         return (void *) __w;
@@ -1666,7 +1682,7 @@ draw_frame:
     // #todo:
     // Nessa hora essa rotina podera criar a barra de títulos.
     // o wm poderá chamar a rotina de criar frame.
-    
+
     if ( type == WT_OVERLAPPED || 
          type == WT_EDITBOX || 
          type == WT_BUTTON )
