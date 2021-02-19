@@ -10,6 +10,22 @@
  */
 
 
+int game_window;
+int player_x;
+int player_y;
+int game_width;
+int game_height;
+
+int gameInitialize(void)
+{
+    player_x = 0;
+    player_y = 0;
+    
+    //...
+    
+    return 0;
+}
+
 // #todo
 // We can have a custom status bar in this client.
 // goal: Identity purpose.
@@ -164,7 +180,47 @@ gwsProcedure (
 
         // 20 = MSG_KEYDOWN
         case MSG_KEYDOWN:
-            printf("%c",long1); fflush(stdout);
+            switch(long1){
+                // keyboard arrows
+                case 0x48: 
+                    //printf ("UP   \n"); 
+                    player_y = (player_y - 8);
+                    if( player_y <= 0){ player_y = 0; }
+                    gws_draw_char ( fd, game_window, player_x, player_y, COLOR_YELLOW, 'G' );
+                    goto done; 
+                    break;
+                case 0x4B: 
+                    //printf ("LEFT \n"); 
+                    player_x = (player_x - 8);
+                    if ( player_x <= 0){ player_x = 0;}
+                    gws_draw_char ( fd, game_window, player_x, player_y, COLOR_YELLOW, 'G' );
+                    goto done; 
+                    break;
+                case 0x4D: 
+                    //printf ("RIGHT\n"); 
+                    player_x = (player_x + 8);
+                    if ( player_x >= game_width){ player_x = (game_width - 8);}
+                    gws_draw_char ( fd, game_window, player_x, player_y, COLOR_YELLOW, 'G' );
+                    goto done; 
+                    break;
+                case 0x50: 
+                    //printf ("DOWN \n"); 
+                    player_y = (player_y + 8);
+                    if( player_y >= game_height){ player_y = (game_height-8); }
+                    gws_draw_char ( fd, game_window, player_x, player_y, COLOR_YELLOW, 'G' );
+                    goto done; 
+                    break;
+                
+                // #bugbug: It does't work.
+                //case '1': 
+                    //gws_redraw_window(fd, game_window, 1); 
+                    //gws_refresh_window(fd, game_window);
+                    //break;
+                
+                default:
+                    printf("%c",long1); fflush(stdout);
+                    break;
+            }
             break;
             
         // 22 = MSG_SYSKEYDOWN
@@ -181,7 +237,11 @@ gwsProcedure (
                 case VK_F5: gws_clone_and_execute("browser.bin"); break;
                 case VK_F6: gws_clone_and_execute("browser.bin"); break;
                 case VK_F7: gws_clone_and_execute("browser.bin"); break;
-                case VK_F8: gws_clone_and_execute("browser.bin"); break;
+                
+                case VK_F8: 
+                    //gameInitialize();
+                    //gws_clone_and_execute("browser.bin"); 
+                    break;
                 
                 case VK_F9 : 
                     gws_async_command(fd,4,1);
@@ -205,6 +265,7 @@ gwsProcedure (
                     gws_async_command(fd,4,11); //polygon
                     //gws_clone_and_execute("browser.bin"); 
                     break;
+ 
                 // ...
             };
             break;
@@ -213,7 +274,8 @@ gwsProcedure (
     // ok
     // retorna TRUE quando o diálogo chamado 
     // consumiu o evento passado à ele.
-    
+
+done:
     return TRUE;
 }
 
@@ -314,6 +376,9 @@ int main ( int argc, char *argv[] )
         exit(1);
     }
 
+    game_width  = w;
+    game_height = h;
+
     //while(1){
     // Hello
     //gws_async_command(client_fd,3,0);
@@ -337,6 +402,7 @@ int main ( int argc, char *argv[] )
         printf ("gws.bin: main_window\n");
         exit(1);
     }
+    game_window = main_window;
     //========================
 
 
@@ -576,6 +642,12 @@ int main ( int argc, char *argv[] )
     // #test
     gws_refresh_window (client_fd, main_window);
         
+
+    //
+    // Game
+    // 
+
+    gameInitialize();
 
     //=================================
     
