@@ -1398,8 +1398,10 @@ int sys_read (unsigned int fd, char *ubuf, int count)
 // Zero representará fim de arquivo. 
 
 fail:
+
+    // #debug
     debug_print ("sys_read: [FAIL] something is wrong!\n");
-    printf      ("sys_read: [FAIL] something is wrong!\n");
+    // printf      ("sys_read: [FAIL] something is wrong!\n");
     refresh_screen();
 
     //bloqueando, autorizando a escrita e reescalonando.
@@ -1865,8 +1867,10 @@ int sys_write (unsigned int fd, char *ubuf, int count)
     debug_print ("sys_write: [FAIL] Unknown object type!\n");
 
 fail:
+
+    // #debug
     debug_print ("sys_write: [FAIL] Something is wrong!\n");
-    printf      ("sys_write: [FAIL] something is wrong!\n");
+    // printf      ("sys_write: [FAIL] something is wrong!\n");
 
 fail2:
     refresh_screen();

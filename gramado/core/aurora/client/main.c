@@ -9,23 +9,6 @@
  *     2020 - Created by Fred Nora.
  */
 
-
-int game_window;
-int player_x;
-int player_y;
-int game_width;
-int game_height;
-
-int gameInitialize(void)
-{
-    player_x = 0;
-    player_y = 0;
-    
-    //...
-    
-    return 0;
-}
-
 // #todo
 // We can have a custom status bar in this client.
 // goal: Identity purpose.
@@ -77,6 +60,8 @@ int gameInitialize(void)
 
 
 #define MYGREEN 0x0b6623
+
+
     
     
 //
@@ -86,6 +71,69 @@ int gameInitialize(void)
 int gws (void);
 
 
+
+// area de jogo
+int game_window;
+int player_x;
+int player_y;
+int game_width;
+int game_height;
+
+// barra de status
+int status_window;
+
+
+void gameTestASCIITable(int fd,unsigned long w, unsigned long h)
+{
+    int i=0;
+    int j=0;
+    int c=0;
+    
+    for(i=0; i<4; i++)
+    {
+        for(j=0; j<64; j++)
+        {
+            gws_draw_char ( 
+                fd, status_window, 
+                (w/64) * j, (i*8), 
+                COLOR_YELLOW, c );
+            c++;
+        };
+    };
+}
+
+
+//
+// initialize 'game' support.
+//
+
+int gameInitialize(int fd,unsigned long w, unsigned long h)
+{
+    player_x = 0;
+    player_y = 0;
+
+    // Test
+    // O refresh da tela faz à cada letra, 
+    // faz as letras aparecerem lentamente.
+
+    gws_draw_char ( fd, status_window, (w/30)  * 2, (8), COLOR_YELLOW, 127 );
+
+    
+    gws_draw_char ( fd, status_window, (w/30)  * 4, (8), COLOR_YELLOW, 'G' );
+    gws_draw_char ( fd, status_window, (w/30)  * 5, (8), COLOR_YELLOW, 'R' );
+    gws_draw_char ( fd, status_window, (w/30)  * 6, (8), COLOR_YELLOW, 'A' );
+    gws_draw_char ( fd, status_window, (w/30)  * 7, (8), COLOR_YELLOW, 'M' );
+    gws_draw_char ( fd, status_window, (w/30)  * 8, (8), COLOR_YELLOW, 'A' );
+    gws_draw_char ( fd, status_window, (w/30)  * 9, (8), COLOR_YELLOW, 'D' );
+    gws_draw_char ( fd, status_window, (w/30) * 10, (8), COLOR_YELLOW, '0' );
+    
+
+    gws_draw_char ( fd, status_window, (w/30)  * 12, (8), COLOR_YELLOW, 127 );
+    
+    //...
+    
+    return 0;
+}
 
 
 // initialize via AF_GRAMADO.
@@ -239,7 +287,6 @@ gwsProcedure (
                 case VK_F7: gws_clone_and_execute("browser.bin"); break;
                 
                 case VK_F8: 
-                    //gameInitialize();
                     //gws_clone_and_execute("browser.bin"); 
                     break;
                 
@@ -394,7 +441,7 @@ int main ( int argc, char *argv[] )
     //printf          ("gws.bin: Creating main window \n");
 
     main_window = gws_create_window (client_fd,
-                      WT_SIMPLE, 1, 1, "gws-client",
+                      WT_SIMPLE, 1, 1, "gws-main",
                       0, 0, w, h,
                       0, 0, MYGREEN, MYGREEN);
 
@@ -406,14 +453,31 @@ int main ( int argc, char *argv[] )
     //========================
 
 
+    //===============================
+    gws_debug_print ("gws.bin: 1 Creating main window \n");
+    //printf          ("gws.bin: Creating main window \n");
+    int tmp1;
+    tmp1 = gws_create_window (client_fd,
+                      WT_SIMPLE, 1, 1, "gws-status",
+                      0, h-40, w, 40,
+                      0, 0, COLOR_GRAY, COLOR_GRAY);
+
+    if (tmp1<0){
+        printf ("gws.bin: tmp1\n");
+        exit(1);
+    }
+    status_window = tmp1;
+    //========================
+
+
+
     // Drawing a char just for fun,not for profit.
 
     //===================
     gws_debug_print ("gws.bin: 2 Drawing a char \n");
     //printf          ("gws.bin: Drawing a char \n");
     gws_draw_char ( 
-        client_fd, main_window, 
-        8, 8, COLOR_YELLOW, 'G' );
+        client_fd, main_window, 0, 0, COLOR_YELLOW, 'G' );
     //====================   
 
 
@@ -614,8 +678,7 @@ int main ( int argc, char *argv[] )
     //while (1){
 
     gws_draw_char ( 
-        client_fd, main_window, 
-        16, 16, COLOR_YELLOW, 'X' );
+        client_fd, main_window, 8, 8, COLOR_YELLOW, 'x' );
 
         // ...
 
@@ -645,15 +708,18 @@ int main ( int argc, char *argv[] )
 
     //
     // Game
-    // 
+    //
 
-    gameInitialize();
+    gameInitialize(client_fd,w,h);
+    //gameTestASCIITable(client_fd,w,h);
 
     //=================================
     
-    //get current thread
-    int cThread = (int) sc82 (10010,0,0,0);
-    //set foreground thread.
+    // get current thread
+    // See: rtl.c
+    //int cThread = (int) sc82 (10010,0,0,0);
+    int cThread = (int) pthread_self();
+    // set foreground thread.
     sc82 (10011,cThread,cThread,cThread);
     
     while(1){

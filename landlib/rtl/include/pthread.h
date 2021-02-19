@@ -1,6 +1,11 @@
 
 // pthread.h
 
+
+#ifndef __PTHREAD_H
+#define __PTHREAD_H    1
+
+
 /*
 #define PTHREAD_MUTEX_DEFAULT	0
 #define PTHREAD_MUTEX_NORMAL	0
@@ -13,8 +18,9 @@
 
 
 
-/*
 typedef int pthread_t;
+
+/*
 typedef void* pthread_key_t;
 typedef void* pthread_once_t;
 typedef uint32_t pthread_mutex_t;
@@ -26,6 +32,9 @@ typedef void* pthread_rwlockatrr_t;
 typedef void* pthread_spinlock_t;
 typedef void* pthread_condattr_t;
 */
+
+
+#endif    
 
 
 

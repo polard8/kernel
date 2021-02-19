@@ -12,6 +12,9 @@
 #include <rtl/gramado.h> 
 #include <sysdeps/gramado/syscall.h>
 
+#include <pthread.h>
+
+
 // =============================================================
 
 // system call.
@@ -391,6 +394,12 @@ int rtl_current_thread(void)
     return (int) rtl_get_system_metrics(141);
 }
 
+
+pthread_t pthread_self(void)
+{
+    // #todo: __pthread_self ?
+    return (pthread_t) rtl_current_thread();
+}
 
 // ms
 // tempo total em ms.

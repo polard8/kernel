@@ -17,6 +17,9 @@
 #include <sys/types.h>
 #include <stddef.h>
 
+#include <pthread.h>
+
+
 // Modes.
 #define GRAMADO_JAIL        0x00
 #define GRAMADO_P1          0x01
@@ -186,6 +189,8 @@ unsigned long rtl_get_system_metrics (int index);
 
 pid_t rtl_current_process(void);
 int rtl_current_thread(void);
+
+pthread_t pthread_self(void);
 
 
 // ms

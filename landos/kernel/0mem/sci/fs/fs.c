@@ -2820,7 +2820,7 @@ sys_read_file_from_disk (
     
     struct process_d *p;
 
-    int __slot = -1;
+    int __slot = -1;  // ofd.
     int Status = -1;
     int __ret = -1;
 
@@ -2952,7 +2952,7 @@ __OK:
         refresh_screen();
         return -1;
     }else{
-        __file->used = 1;
+        __file->used  = TRUE;
         __file->magic = 1234;
         __file->pid = (pid_t) current_process;
         __file->uid = (uid_t) current_user;
