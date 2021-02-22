@@ -260,8 +260,11 @@ sc_again:
     // device type, data.
     // 1=keyboard
 
-    console_interrupt(CONSOLE_DEVICE_KEYBOARD,__raw);
-  
+    console_interrupt (
+        CONSOLE_DEVICE_KEYBOARD,
+        __raw );
+
+
     // Clean the mess.
     __has_e0_prefix = 0;
     __has_e1_prefix = 0;
@@ -317,8 +320,9 @@ irq1_KEYBOARD (void)
 
 
 	// Se o teclado ps2 não estiver inicializado !
-    if ( __breaker_ps2keyboard_initialized == 0 )
+    if ( __breaker_ps2keyboard_initialized == 0 ){
         return;
+    }
 
 
 	// Contando as interrupções desse tipo.

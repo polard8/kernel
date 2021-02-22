@@ -1734,6 +1734,18 @@ int VirtualConsole_initialize(void)
 
 void console_interrupt(int device_type, int data)
 {
+
+    // #todo
+    // E se não tivermos uma foreground thread ?
+    // foreground representa a thred com 'foco de entrada'
+    // >> então, se não tivermos uma thread com foco de entrada,
+    // podemos mandar a mensagem para outra thread ?
+
+    if ( foreground_thread < 0 ){
+        debug_print ("console_interrupt: [FAIL] foreground_thread\n");
+        return;
+    }
+
     switch (device_type){
 
         // keyboard

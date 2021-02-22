@@ -35,6 +35,10 @@
 #include "include/gws.h"  
 
 
+// Strings
+char *title_when_no_title = "Window";
+
+
 // #test
 // Tentando deixar o buffer aqui e aproveitar em mais funções.
 char __gws_message_buffer[512];
@@ -646,7 +650,7 @@ __gws_change_window_position_request (
 int 
 __gws_change_window_position_reponse ( int fd )
 {
-    unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];   
+    unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0]; 
     int n_reads = 0;    // For receiving responses.
 
     //
@@ -770,13 +774,9 @@ process_reply:
     // Podemos usar a biblioteca e testarmos
     // vários serviços da biblioteca nesse momento.
 
-    //return 0;
     return (int) message_buffer[0];
 
-//
 // Process an event.
-//
-
 process_event:
     gws_debug_print ("__gws_change_window_position_reponse: We got an event\n"); 
     return 0;
@@ -814,11 +814,11 @@ __gws_resize_window_request (
 
     while (1)
     {
-        message_buffer[0] = window;  // window. 
-        message_buffer[1] = GWS_ResizeWindow;    // Resize window
-        message_buffer[2] = w;       // x
-        message_buffer[3] = h;       // y
-        //...
+        message_buffer[0] = window;            // window
+        message_buffer[1] = GWS_ResizeWindow;  // Resize window
+        message_buffer[2] = w;                 // x
+        message_buffer[3] = h;                 // y
+        // ...
 
         // Write!
         // Se foi possível enviar, então saimos do loop.  
@@ -830,7 +830,7 @@ __gws_resize_window_request (
                        0 );
        
         if(n_writes>0){ break; }
-    }
+    };
 
     return 0; 
 }
@@ -966,9 +966,7 @@ process_reply:
     //return 0;
     return (int) message_buffer[0];
 
-//
 // Process an event.
-//
 
 process_event:
     gws_debug_print ("__gws_resize_window_reponse: We got an event\n"); 
@@ -1010,11 +1008,11 @@ __gws_plot0_request (
 
     while (1)
     {
-        message_buffer[0] = 0;       // window. 
-        message_buffer[1] = 2040;    // msg (plot point)
+        message_buffer[0] = 0;     // window 
+        message_buffer[1] = 2040;  // msg (plot point)
         message_buffer[2] = 0;
         message_buffer[3] = 0;
-        
+
         // ...
         
         // os argumentos para rotinas graficas começam em '10'.
@@ -1170,12 +1168,9 @@ process_reply:
     // Podemos usar a biblioteca e testarmos
     // vários serviços da biblioteca nesse momento.
 
-    //return 0;
     return (int) message_buffer[0];
 
-//
 // Process an event.
-//
 
 process_event:
     gws_debug_print ("__gws_plot0_response: We got an event\n"); 
@@ -1197,7 +1192,6 @@ int __gws_plotcube_request ( int fd, struct gr_cube_d *cube )
     int n_writes = 0;   // For sending requests.
 
     //char *name = "Window name 1";
-
 
 
     if ( (void*) cube == NULL ){
@@ -1407,12 +1401,9 @@ process_reply:
     // Podemos usar a biblioteca e testarmos
     // vários serviços da biblioteca nesse momento.
 
-    //return 0;
     return (int) message_buffer[0];
 
-//
 // Process an event.
-//
 
 process_event:
     gws_debug_print ("__gws_plotcube_response: We got an event\n"); 
@@ -1438,8 +1429,15 @@ int __gws_plotrectangle_request ( int fd, struct gr_rectangle_d *rect )
     //char *name = "Window name 1";
 
 
-    if ( (void*) rect == NULL )
+    // #todo
+    //if ( fd<0 ){
+    //    return -1;
+    //}
+
+
+    if ( (void*) rect == NULL ){
         return -1;
+    }
 
 
     //
@@ -1455,8 +1453,8 @@ int __gws_plotrectangle_request ( int fd, struct gr_rectangle_d *rect )
 
     while (1)
     {
-        message_buffer[0] = 0;       // window. 
-        message_buffer[1] = GWS_GrRectangle;    // msg (plot rectangle)
+        message_buffer[0] = 0;                // window 
+        message_buffer[1] = GWS_GrRectangle;  // msg (plot rectangle)
         message_buffer[2] = 0;
         message_buffer[3] = 0;
         
@@ -1473,7 +1471,6 @@ int __gws_plotrectangle_request ( int fd, struct gr_rectangle_d *rect )
         message_buffer[12] = rect->p[0].z;
         message_buffer[13] = rect->p[0].color;
 
-        
         message_buffer[14] = rect->p[1].x;
         message_buffer[15] = rect->p[1].y;
         message_buffer[16] = rect->p[1].z;
@@ -1510,6 +1507,12 @@ int __gws_plotrectangle_response (int fd)
 {
     unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];   
     int n_reads = 0;    // For receiving responses.
+
+
+    // #todo
+    //if (fd<0){
+    //    return -1;
+    //}
 
     //
     // Waiting for response. ==================
@@ -1632,12 +1635,9 @@ process_reply:
     // Podemos usar a biblioteca e testarmos
     // vários serviços da biblioteca nesse momento.
 
-    //return 0;
     return (int) message_buffer[0];
 
-//
 // Process an event.
-//
 
 process_event:
     gws_debug_print ("__gws_plotrectangle_response: We got an event\n"); 
@@ -1681,8 +1681,8 @@ __gws_drawchar_request (
 
     while (1){
 
-        message_buffer[0] = 0;       // window. 
-        message_buffer[1] = GWS_DrawChar;    // Draw char.
+        message_buffer[0] = 0;             // window
+        message_buffer[1] = GWS_DrawChar;  // Draw char
         message_buffer[2] = 0;
         message_buffer[3] = 0;
         message_buffer[4] = window_id;
@@ -1690,7 +1690,7 @@ __gws_drawchar_request (
         message_buffer[6] = top; 
         message_buffer[7] = color; 
         message_buffer[8] = c;        // The 'char'.
-        //...
+        // ...
 
         // Write!
         // Se foi possível enviar, então saimos do loop.  
@@ -1703,7 +1703,11 @@ __gws_drawchar_request (
        
         if(n_writes>0){ break; }
         
-        return -1;
+        
+        // #bugbug
+        // Is it right ??
+        // Estou tirando isso. fev 21, 2021
+        //return -1;
     }
 
     return 0; 
@@ -1839,12 +1843,9 @@ process_reply:
     // Podemos usar a biblioteca e testarmos
     // vários serviços da biblioteca nesse momento.
 
-    //return 0;
     return (int) message_buffer[0];
 
-//
 // Process an event.
-//
 
 process_event:
     gws_debug_print ("__gws_drawchar_response: We got an event\n"); 
@@ -1912,11 +1913,10 @@ __gws_drawtext_request (
     // Enviamos um request para o servidor.
     // ?? Precisamos mesmo de um loop para isso. ??
 
-
     while (1){
 
-        message_buffer[0] = 0;       // window. 
-        message_buffer[1] = GWS_DrawText;    // Draw text.
+        message_buffer[0] = 0;             // window
+        message_buffer[1] = GWS_DrawText;  // Draw text
         message_buffer[2] = 0;
         message_buffer[3] = 0;
         message_buffer[4] = window_id;
@@ -2082,12 +2082,9 @@ process_reply:
     // Podemos usar a biblioteca e testarmos
     // vários serviços da biblioteca nesse momento.
 
-    //return 0;
     return (int) message_buffer[0];
 
-//
 // Process an event.
-//
 
 process_event:
     gws_debug_print ("gws_drawtext_response: We got an event\n"); 
@@ -2114,9 +2111,12 @@ __gws_createwindow_request (
     int n_writes = 0;   // For sending requests.
 
 
-    //#todo: precisamos criar um buffer aqui e copiarmos em algum lugar...
-    //char *name = "label";
-
+    char *Name;
+    // O nome passado.
+    Name = name;
+    if ( (void*) Name == NULL ){
+        Name = title_when_no_title;
+    }
 
     //
     // Send request.
@@ -2131,27 +2131,27 @@ __gws_createwindow_request (
 
     while (1)
     {
-        message_buffer[0]  = 0;         // window. 
+        message_buffer[0]  = 0;                 // window 
         message_buffer[1]  = GWS_CreateWindow;  // msg. Create window REQUEST!
-        message_buffer[2]  = 0;         //long1
-        message_buffer[3]  = 0;         //long2
+        message_buffer[2]  = 0;                 // long1
+        message_buffer[3]  = 0;                 // long2
         message_buffer[4]  = left;
         message_buffer[5]  = top;
         message_buffer[6]  = width;
         message_buffer[7]  = height;
-        message_buffer[8]  = bg_color;  //xCOLOR_GRAY2; 
-        message_buffer[9]  = type;      //WT_SIMPLE;  //todo: type
+        message_buffer[8]  = bg_color;
+        message_buffer[9]  = type;
         message_buffer[10] = parent; 
-        //...
+        // ...
 
         //string support.
         char buf[256];
         int i=0;
-        int string_off= 14; // 8;
+        int string_off= 14;    // String offset.
         for(i=0; i<250; i++)
         {
-            message_buffer[string_off] = *name; //#todo: Temos que receber esse ponteiro via argumento
-            string_off++; name++;
+            message_buffer[string_off] = *Name; //#todo: Temos que receber esse ponteiro via argumento
+            string_off++; Name++;
         }
         message_buffer[string_off] = 0;
 
@@ -2289,9 +2289,7 @@ process_reply:
     //OUT: wid
     return (int) message_buffer[0];
 
-//
 // Process an event.
-//
 
 process_event:
     gws_debug_print ("libgws: We got an event\n"); 
@@ -2313,12 +2311,13 @@ gws_plot0 (
     unsigned long z,
     unsigned long color )
 {
-    //Maybe we will not have a response.
-    //int Response=-1;
+    // Maybe we will not have a response.
+    int value=0;
 
-    if (fd<0)
+
+    if (fd<0){
         return -1;
-
+    }
 
     __gws_plot0_request ( fd, x, y, z, color );
     rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );    
@@ -2333,14 +2332,13 @@ gws_plot0 (
     //if(CanRead == TRUE)
 
     // Waiting to read the response.
-    int value=0;
-    while(1){
+    while (1){
         value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
         if (value == ACTION_REPLY ) { break; }
         if (value == ACTION_ERROR ) { return -1; }
         gws_yield();
     };
-        __gws_plot0_response( fd );
+    __gws_plot0_response(fd);
 
     return 0;
 }
@@ -2354,10 +2352,10 @@ gws_plotcube (
 {
     int value=0;
 
+
     if (fd<0){
         return -1;
     }
-
 
     if ( (void*) cube == NULL ){
         return -1;
@@ -2408,13 +2406,16 @@ gws_plotrectangle (
     int fd,
     struct gr_rectangle_d *rect )
 {
+    int value=0;
 
-    if (fd<0)
-        return -1;
 
-    if ( (void*) rect == NULL )
+    if (fd<0){
         return -1;
-    
+    }
+
+    if ( (void*) rect == NULL ){
+        return -1;
+    }
 
     __gws_plotrectangle_request  (fd, (struct gr_rectangle_d *) rect );
     rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );    
@@ -2430,22 +2431,16 @@ gws_plotrectangle (
     //if(CanRead == TRUE)
    
     // Waiting to read the response.
-    int value=0;
     while(1){
         value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
         if (value == ACTION_REPLY ) { break; }
         if (value == ACTION_ERROR ) { return -1; }
         gws_yield();
     };
+    __gws_plotrectangle_response (fd);
 
-        __gws_plotrectangle_response (fd);
-    
     return 0;
 }
-
-
-
-
 
 
 
@@ -2461,12 +2456,16 @@ gws_draw_char (
 {
 
     int response =0;
+    int value=0;
 
-    if(fd<0)
-        return -1;
 
-    if(window<0)
+    if(fd<0){
         return -1;
+    }
+
+    if(window<0){
+        return -1;
+    }
 
     gws_debug_print("gws_draw_char: request\n");
     __gws_drawchar_request (
@@ -2494,14 +2493,13 @@ gws_draw_char (
     //if(CanRead == TRUE)
      
     // Waiting to read the response.
-    int value=0;
-    while(1){
+    while (1){
         value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
         if (value == ACTION_REPLY ) { break; }
         if (value == ACTION_ERROR ) { return -1; }
         gws_yield();
     };
-     response = __gws_drawchar_response((int) fd);  
+    response = __gws_drawchar_response((int) fd);  
 
     gws_debug_print("gws_draw_char: done\n");
     return (int) response;
@@ -2518,8 +2516,14 @@ gws_draw_text (
     unsigned long color,
     char *string )
 {
-
     int response =0;
+
+
+    // #bugbug
+    // We need to include the 'synchronization thing'.
+
+
+    gws_debug_print("gws_draw_text: [FIXME] sync\n");
 
     if(fd<0)
         return -1;
@@ -2536,6 +2540,7 @@ gws_draw_text (
         (unsigned long) y,    // top,
         (unsigned long) color,
         (char *) string );
+    //    rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );
 
     gws_debug_print("gws_draw_text: response\n");
     
@@ -2545,9 +2550,22 @@ gws_draw_text (
     //if(CanRead != TRUE)
     //    return -1; // no response.
     
+    
     // YES, We can read the response.
     //if(CanRead == TRUE)
-        response = __gws_drawtext_response ((int) fd);  
+    
+    
+    /*
+    // Waiting to read the response.
+    while (1){
+        value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
+        if (value == ACTION_REPLY ) { break; }
+        if (value == ACTION_ERROR ) { return -1; }
+        gws_yield();
+    };
+    */
+ 
+    response = __gws_drawtext_response ((int) fd);  
 
     gws_debug_print("gws_draw_text: done\n");
     return (int) response;
@@ -2690,17 +2708,26 @@ gws_load_path (
 {
     int status = -1;
 
-    if ( (void*) path == NULL )
-        return -1;
 
-    if ( *path == 0 )
+    if ( (void*) path == NULL ){
+        return -1;
+    }
+
+
+    if ( *path == 0 ){
          return -1;
+    }
 
-    if ( buffer == 0 )
+
+    if ( buffer == 0 ){
         return -1;
-    
-    if ( buffer_len == 0 )
+    }
+
+
+    if ( buffer_len == 0 ){
         return -1;
+    }
+
 
     status = (int) gws_system_call ( 
                        4004, 
@@ -2720,14 +2747,17 @@ gws_change_window_position (
     unsigned long x, 
     unsigned long y )
 {
-    if (fd<0)
+    if (fd<0){
         return -1;
+    }
 
-    if (window<0)
+    if (window<0){
         return -1;
+    }
 
     __gws_change_window_position_request(fd,window,x,y);
     __gws_change_window_position_reponse(fd);
+
     return 0;
 }
 
@@ -2741,11 +2771,17 @@ gws_resize_window(
     unsigned long w, 
     unsigned long h )
 {
-    if (fd<0)
-        return -1;
 
-    if (window<0)
+    // #bugbug
+    // We need the synchronization thing.
+
+    if (fd<0){
         return -1;
+    }
+
+    if (window<0){
+        return -1;
+    }
 
     __gws_resize_window_request(fd,window,w,h);
     __gws_resize_window_reponse(fd);
@@ -2761,11 +2797,16 @@ gws_redraw_window (
    int window, 
    unsigned long flags )
 {
-    if (fd<0)
-        return -1;
+    // #bugbug
+    // We need the synchronization thing.
 
-    if (window<0)
+    if (fd<0){
         return -1;
+    }
+
+    if (window<0){
+        return -1;
+    }
 
     // #todo
     // check the return values.
@@ -2789,11 +2830,17 @@ gws_redraw_window (
 
 int gws_refresh_window (int fd, int window )
 {
-    if (fd<0)
-        return -1;
 
-    if (window<0)
+    // #bugbug
+    // We need the synchronization thing.
+
+    if (fd<0){
         return -1;
+    }
+
+    if (window<0){
+        return -1;
+    }
 
     __gws_refresh_window_request(fd,window);
     __gws_refresh_window_reponse(fd);
@@ -2847,12 +2894,20 @@ gws_create_window (
     //#todo
     // use more arguments.
 
+    char *Name;
+    // O nome passado.
+    Name = windowname;
+    if ( (void*) Name == NULL ){
+        Name = title_when_no_title;
+    }
+
+
 
 
     // Request.
     __gws_createwindow_request ( fd, 
         x, y, width, height, 
-        color, type, parentwindow, windowname);
+        color, type, parentwindow, Name);
     rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );
 
      
@@ -3156,9 +3211,13 @@ struct gws_menu_d *gws_create_menu (
     unsigned long height,
     unsigned long color )
 {
-
     struct gws_menu_d *menu;
     int window=0;
+
+
+    // #
+    // The synchronization is made when we call gws_create_window.
+
 
 
     if (fd<0){
@@ -3226,7 +3285,12 @@ struct gws_menu_item_d *gws_create_menu_item (
     int window=0;    //menu item window
     
     struct gws_menu_item_d *item;
+
+
+    // #
+    // The synchronization is made when we call gws_create_window.
     
+
 
     if (fd<0){
         return (struct gws_menu_item_d *) 0;
@@ -3292,7 +3356,8 @@ struct gws_menu_item_d *gws_create_menu_item (
     return (struct gws_menu_item_d *) item;
 }
 
-// Expand a byt all over the long.
+
+// Expand a byte all over the long.
 unsigned long gws_explode_byte (unsigned char data)
 {
     return (unsigned long) (data << 24 | data << 16 | data << 8 | data);
@@ -3303,12 +3368,16 @@ unsigned long gws_explode_byte (unsigned char data)
 int gws_create_empty_file ( char *file_name )
 {
     int __ret = 0;
-    
-    if( (void*) file_name == NULL )
-        return -1;
 
-    if ( *file_name == 0 )
+
+    if( (void*) file_name == NULL ){
         return -1;
+    }
+
+
+    if ( *file_name == 0 ){
+        return -1;
+    }
 
 
     //gde_enter_critical_section();
@@ -3325,11 +3394,15 @@ int gws_create_empty_directory ( char *dir_name )
 {
     int __ret=0;
 
-    if ( (void*) dir_name == NULL )
-        return -1;
 
-    if ( *dir_name == 0 )
+    if ( (void*) dir_name == NULL ){
         return -1;
+    }
+
+
+    if ( *dir_name == 0 ){
+        return -1;
+    }
 
     //gde_enter_critical_section();
     __ret = (int) gramado_system_call ( 44, 
@@ -3359,9 +3432,9 @@ gws_async_command (
     //char *name = "Window name 1";
 
 
-    if (fd<0)
+    if (fd<0){
         return;
-
+    }
 
     //
     // Send request.

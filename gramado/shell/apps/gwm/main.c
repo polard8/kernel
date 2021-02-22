@@ -104,6 +104,56 @@ char saved_mouse_x =0;
 char saved_mouse_y =0;
 
 
+//
+// == ports ====================================
+//
+
+#define PORTS_WS 4040
+#define PORTS_NS 4041
+#define PORTS_FS 4042
+// ...
+
+
+// #test
+#define MSG_OFFSET_SHORTSTRING  64
+#define SHORTSTRING_SIZE        64
+#define MSG_OFFSET_LONGSTRING  128
+#define LONGSTRING_SIZE        256
+// ...
+
+// O buffer para  as mensagens recebidas via socket.
+#define MSG_BUFFER_SIZE 512
+char __buffer[MSG_BUFFER_SIZE];   
+
+
+#define IP(a, b, c, d) (a << 24 | b << 16 | c << 8 | d)
+
+
+
+unsigned long savedW;
+unsigned long savedH;
+
+
+//
+// == prototypes ======
+//
+
+int fullscreen_client (int fd, struct wm_client_d *c);
+int center_client (int fd, struct wm_client_d *c);
+
+int gwm_init_globals(void);
+int gwm_init_windows(void);
+int create_main_menu( int fd );
+
+// Clients
+int create_bg_client(int fd);
+int create_topbar_client(int fd);
+int create_taskbar_client(int fd);
+int create_tester_client(int fd);
+void test_create_menu ( int fd, int window );
+int update(int fd);
+
+
 
 // Window dialog
 // called by the event loop.
@@ -114,6 +164,91 @@ gwmProcedure (
     int msg, 
     unsigned long long1, 
     unsigned long long2 );
+
+
+
+//
+// ====================================================
+//
+
+
+// #test
+// Create a enu given a window
+void test_create_menu ( int fd, int window )
+{
+
+    int MenuOnTop=TRUE;
+
+    struct gws_menu_d *menu;
+
+    unsigned long menuX;
+    unsigned long menuY;
+
+
+    if(fd<0)
+        return;
+
+    if(window<0)
+        return;
+
+
+    menuX = 0;
+    menuY = (savedH -32 -300);   // altura, menos a taskbar, altura do menu
+
+    if (MenuOnTop == TRUE)
+    {
+        menuX = 0;
+        menuY = 32; // Depois da topbar
+    }
+
+
+    //#testing (NEW)
+    menu = gws_create_menu (
+                (int) fd,
+                (int) window,
+                (int) 0,            //highlight
+                (int) 4,            //count
+                (unsigned long) menuX,  //x
+                (unsigned long) menuY,
+                (unsigned long) 300,
+                (unsigned long) 300,
+                (unsigned long) COLOR_WINDOW );
+
+    if ((void*) menu == NULL)
+        return -1;
+ 
+  
+    //menu item
+    gws_create_menu_item (
+        (int) fd,
+        (char *) "F1",
+        (int) 0,
+        (struct gws_menu_d *) menu );
+
+    //menu item
+    gws_create_menu_item (
+        (int) fd,
+        (char *) "F2",
+        (int) 1,
+        (struct gws_menu_d *) menu );
+
+    //menu item
+    gws_create_menu_item (
+        (int) fd,
+        (char *) "F3",
+        (int) 2,
+        (struct gws_menu_d *) menu );
+
+    //menu item
+    gws_create_menu_item (
+        (int) fd,
+        (char *) "F4",
+        (int) 3,
+        (struct gws_menu_d *) menu );
+}
+
+
+
 int 
 gwmProcedure (
     int fd, 
@@ -136,9 +271,11 @@ gwmProcedure (
 
                 case VK_F2:
                     printf ("F2\n");
-                    create_tester_client(fd);
+                    //create_tester_client(fd);
+                    //test_create_menu (fd,c_tester->window);
+                    test_create_menu (fd,c_bg->window);
+                    //gws_refresh_window(fd,c_topbar->window);
                     break;
-
             };
             break;
 
@@ -277,60 +414,6 @@ void parse_data_packet (int fd, char data, char x, char y)
             //gws_redraw_window(fd,c_tester->title_window,1); 
         }
 }
-
-
-
-//
-// == ports ====================================
-//
-
-#define PORTS_WS 4040
-#define PORTS_NS 4041
-#define PORTS_FS 4042
-// ...
-
-
-
-
-// #test
-#define MSG_OFFSET_SHORTSTRING  64
-#define SHORTSTRING_SIZE        64
-#define MSG_OFFSET_LONGSTRING  128
-#define LONGSTRING_SIZE        256
-// ...
-
-// O buffer para  as mensagens recebidas via socket.
-#define MSG_BUFFER_SIZE 512
-char __buffer[MSG_BUFFER_SIZE];   
-
-
-
-
-
-
-#define IP(a, b, c, d) (a << 24 | b << 16 | c << 8 | d)
-
-
-
-
-int fullscreen_client (int fd, struct wm_client_d *c);
-int center_client (int fd, struct wm_client_d *c);
-
-
-int gwm_init_globals(void);
-int gwm_init_windows(void);
-int create_main_menu( int fd );
-
-//
-// Clients
-//
-
-int create_bg_client(int fd);
-int create_topbar_client(int fd);
-int create_taskbar_client(int fd);
-int create_tester_client(int fd);
-
-int update(int fd);
 
 
 
@@ -568,6 +651,10 @@ int create_bg_client(int fd)
     unsigned long h = gws_get_system_metrics(2);
     
     
+    
+    savedW = w;
+    savedH = h;
+    
     //if (fd<0)
         //return -1;
 
@@ -584,11 +671,9 @@ int create_bg_client(int fd)
     // Topbar
     gws_debug_print ("gwm: Create c_topbar client\n");
     c_bg = (struct wm_client_d *) malloc ( sizeof(struct wm_client_d) );
-    if( (void *) c_bg == NULL)
-    {
+    if( (void *) c_bg == NULL){
         printf ("gwm: c_bg fail\n");
         exit(1);
-    
     }else{
 
         //c_bg
@@ -745,6 +830,8 @@ int create_taskbar_client(int fd)
 //interna
 int create_tester_client(int fd)
 {
+    int CreateMenu=FALSE;
+
     struct gws_menu_d *menu;
 
     //
@@ -770,13 +857,13 @@ int create_tester_client(int fd)
 
     if ( (void *) c_tester != NULL )
     {
-        c_tester->used = 1;
+        c_tester->used  = TRUE;
         c_tester->magic = 1234;
 
-        // Window.
+        // Window
         c_tester->window = gws_create_window ( fd,
                                WT_SIMPLE, 1, 1,"Tester",
-                               100, 100, 480, 100,
+                               8, 100, 320, 200,
                                0, 0, COLOR_GRAY, COLOR_GRAY );
         
         if ( c_tester->window < 0){
@@ -789,7 +876,7 @@ int create_tester_client(int fd)
         // Title window.
         c_tester->title_window = gws_create_window ( fd,
                                      WT_SIMPLE,1,1,"Tester Title",
-                                     100, 100-32, 480, 32,
+                                     8, 100-32, 320, 32,
                                      0,0,0x2d89ef,0x2d89ef);
 
         if ( c_tester->title_window < 0 ){
@@ -802,11 +889,33 @@ int create_tester_client(int fd)
         // pagefault. The size of the string overflows the button size.
         tester_button = gws_create_window (fd,
              WT_BUTTON,1,1,"X", 
-             (480-36-2), 2, 36, 28, 
+             (320-36-2), 2, 36, 28, 
              c_tester->title_window, 0, COLOR_RED, COLOR_RED);
              
-             
-             
+        
+        // save
+        wmclientList[3] = (unsigned long) c_tester;
+    } 
+    //gws_exit_critical_section();
+
+
+//
+//  menu ==========
+//
+
+
+
+    if ( (void*) c_tester == NULL )
+        return -1;
+
+    if ( (void*) c_tester->window == NULL )
+        return -1;
+
+
+    if ( CreateMenu == FALSE )
+        return 0;
+
+
         //#testing (NEW)
         menu = gws_create_menu (
                 (int) fd,
@@ -819,8 +928,9 @@ int create_tester_client(int fd)
                 (unsigned long) 200,
                 (unsigned long) COLOR_WHITE );
 
-        if ((void*) menu != NULL)
-        {
+
+    if ((void*) menu != NULL)
+    {
             //menu item
             gws_create_menu_item (
                 (int) fd,
@@ -848,12 +958,9 @@ int create_tester_client(int fd)
                 (char *) "Item3",
                 (int) 3,
                 (struct gws_menu_d *) menu );
+    }
 
-        }
-             
-        wmclientList[3] = (unsigned long) c_tester;
-    } 
-    //gws_exit_critical_section();
+
 
 
 

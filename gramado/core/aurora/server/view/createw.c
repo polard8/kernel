@@ -32,6 +32,9 @@
 #include <gws.h>
 
 
+// Strings
+//char *title_when_no_title = "Window";
+
 
 void demoTerry(void)
 {
@@ -64,7 +67,6 @@ void demoTerry(void)
         dtextDrawText ( (struct gws_window_d *) terry,
             20, 32, COLOR_RED,  "by Fred Nora" );
     }
-
 }
 
 

@@ -534,7 +534,7 @@ int BAT_TEST (void){
 
     for (i=0; i<99000; i++)
     {
-        wait_ns (400);
+        wait_ns(400);
     };
 
 
@@ -542,29 +542,25 @@ int BAT_TEST (void){
     {
         val = (int) xxx_keyboard_read();
 
-		//Ok funcionou o auto teste
-        if(val == 0xAA)
-		{
-			printf ("ps2kbd.c: BAT_TEST OK\n");
-			return (int) 0;
-		
-		//falhou
-		}else if ( val == 0xFC ){
-        
-			printf ("ps2kbd.c: BAT_TEST fail\n");
+        // Ok funcionou o auto teste
+        if (val == 0xAA){
+            printf ("ps2kbd.c: BAT_TEST OK\n");
+            return (int) 0;
+        // falhou
+        }else if ( val == 0xFC ){
+            printf ("ps2kbd.c: BAT_TEST fail\n");
             return (int) -1; 
         }
-    
-		// #bugbug
-		// Tentar novamente, indefinidas vezes.
+
+        // #bugbug
+        // Tentar novamente, indefinidas vezes.
         // Esse é o problema. Vamos tentar apenas algumas vezes e falhar se não der certo.
-		// Reenviar o comando. 
+        // Reenviar o comando. 
         // obs: este comando não é colocado em buffer
         
         //printf ("ps2kbd.c: BAT_TEST %d\n", i);
         xxx_keyboard_write (0xFE);       
     };
-
 
     // Fail
     printf ("ps2kbd.c: BAT_TEST %d times\n",i);

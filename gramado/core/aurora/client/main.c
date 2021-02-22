@@ -62,7 +62,9 @@
 #define MYGREEN 0x0b6623
 
 
-    
+unsigned long savedW=0;
+unsigned long savedH=0;
+
     
 //
 // == prototypes =============
@@ -116,25 +118,38 @@ int gameInitialize(int fd,unsigned long w, unsigned long h)
     // O refresh da tela faz à cada letra, 
     // faz as letras aparecerem lentamente.
 
-    gws_draw_char ( fd, status_window, (w/30)  * 2, (8), COLOR_YELLOW, 127 );
-
+    gws_draw_char ( fd, status_window, (w/30)  * 2, (8), COLOR_BLUE, 127 );
+    gws_draw_char ( fd, status_window, (w/30)  * 3, (8), COLOR_BLUE, 127 );
     
-    gws_draw_char ( fd, status_window, (w/30)  * 4, (8), COLOR_YELLOW, 'G' );
-    gws_draw_char ( fd, status_window, (w/30)  * 5, (8), COLOR_YELLOW, 'R' );
-    gws_draw_char ( fd, status_window, (w/30)  * 6, (8), COLOR_YELLOW, 'A' );
-    gws_draw_char ( fd, status_window, (w/30)  * 7, (8), COLOR_YELLOW, 'M' );
+    gws_draw_char ( fd, status_window, (w/30)  * 2, (8), COLOR_YELLOW, '0' );
+    gws_draw_char ( fd, status_window, (w/30)  * 3, (8), COLOR_YELLOW, '0' );
+
+
+    gws_draw_char ( fd, status_window, (w/30)  * 6, (8), COLOR_YELLOW, 'G' );
+    gws_draw_char ( fd, status_window, (w/30)  * 7, (8), COLOR_YELLOW, 'R' );
     gws_draw_char ( fd, status_window, (w/30)  * 8, (8), COLOR_YELLOW, 'A' );
-    gws_draw_char ( fd, status_window, (w/30)  * 9, (8), COLOR_YELLOW, 'D' );
-    gws_draw_char ( fd, status_window, (w/30) * 10, (8), COLOR_YELLOW, '0' );
+    gws_draw_char ( fd, status_window, (w/30)  * 9, (8), COLOR_YELLOW, 'M' );
+    gws_draw_char ( fd, status_window, (w/30) * 10, (8), COLOR_YELLOW, 'A' );
+    gws_draw_char ( fd, status_window, (w/30) * 11, (8), COLOR_YELLOW, 'D' );
+    gws_draw_char ( fd, status_window, (w/30) * 12, (8), COLOR_YELLOW, 'O' );
     
 
-    gws_draw_char ( fd, status_window, (w/30)  * 12, (8), COLOR_YELLOW, 127 );
+    //gws_draw_char ( fd, status_window, (w/30)  * 12, (8), COLOR_YELLOW, 127 );
     
     //...
     
     return 0;
 }
 
+void updateStatusBar(int fd,unsigned long w, unsigned long h, int first_number, int second_number)
+{
+    gws_draw_char ( fd, status_window, (w/30)  * 2, (8), COLOR_BLUE, 127 );
+    gws_draw_char ( fd, status_window, (w/30)  * 3, (8), COLOR_BLUE, 127 );
+    
+    gws_draw_char ( fd, status_window, (w/30)  * 2, (8), COLOR_YELLOW, first_number );
+    gws_draw_char ( fd, status_window, (w/30)  * 3, (8), COLOR_YELLOW, second_number );
+
+}
 
 // initialize via AF_GRAMADO.
 // Ainda nao podemos mudar isso para a lib, pois precisamos
@@ -235,6 +250,7 @@ gwsProcedure (
                     player_y = (player_y - 8);
                     if( player_y <= 0){ player_y = 0; }
                     gws_draw_char ( fd, game_window, player_x, player_y, COLOR_YELLOW, 'G' );
+                    updateStatusBar(fd,savedW,savedH,0, 'U');
                     goto done; 
                     break;
                 case 0x4B: 
@@ -242,6 +258,7 @@ gwsProcedure (
                     player_x = (player_x - 8);
                     if ( player_x <= 0){ player_x = 0;}
                     gws_draw_char ( fd, game_window, player_x, player_y, COLOR_YELLOW, 'G' );
+                    updateStatusBar(fd,savedW,savedH,0, 'L');
                     goto done; 
                     break;
                 case 0x4D: 
@@ -249,6 +266,7 @@ gwsProcedure (
                     player_x = (player_x + 8);
                     if ( player_x >= game_width){ player_x = (game_width - 8);}
                     gws_draw_char ( fd, game_window, player_x, player_y, COLOR_YELLOW, 'G' );
+                    updateStatusBar(fd,savedW,savedH,0, 'R');
                     goto done; 
                     break;
                 case 0x50: 
@@ -256,9 +274,10 @@ gwsProcedure (
                     player_y = (player_y + 8);
                     if( player_y >= game_height){ player_y = (game_height-8); }
                     gws_draw_char ( fd, game_window, player_x, player_y, COLOR_YELLOW, 'G' );
+                    updateStatusBar(fd,savedW,savedH,0, 'D');
                     goto done; 
                     break;
-                
+ 
                 // #bugbug: It does't work.
                 //case '1': 
                     //gws_redraw_window(fd, game_window, 1); 
@@ -270,11 +289,9 @@ gwsProcedure (
                     break;
             }
             break;
-            
+
         // 22 = MSG_SYSKEYDOWN
         case MSG_SYSKEYDOWN:
-            printf ("MSG_SYSKEYDOWN\n");
-
             switch (long1){
 
                 case VK_F1: gws_clone_and_execute("editor.bin");   break;
@@ -699,8 +716,10 @@ int main ( int argc, char *argv[] )
     // #test: Chamando um demo.
     // gws_async_command(client_fd,4,9); //cat
 
-    // Loop
 
+    //
+    // Loop
+    //
 
     // #test
     gws_refresh_window (client_fd, main_window);
@@ -713,6 +732,9 @@ int main ( int argc, char *argv[] )
     gameInitialize(client_fd,w,h);
     //gameTestASCIITable(client_fd,w,h);
 
+    savedW = w;
+    savedH = h;
+
     //=================================
     
     // get current thread
@@ -723,6 +745,7 @@ int main ( int argc, char *argv[] )
     sc82 (10011,cThread,cThread,cThread);
     
     while(1){
+
         if ( rtl_get_event() == TRUE )
         {  
             // Podemos chamar mais de um diálogo

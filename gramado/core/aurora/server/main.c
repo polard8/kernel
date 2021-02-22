@@ -2197,6 +2197,10 @@ int serviceAsyncCommand (void)
 
 int main (int argc, char **argv)
 {
+
+    // #debug flags
+    int UseCompositor = TRUE;
+
     //==================
     struct sockaddr server_address;
     socklen_t addrlen;
@@ -2534,8 +2538,10 @@ int main (int argc, char **argv)
             // mas ele teria que chamar o window server pra efetuar o refresh
             // dos retângulos.
             // See comp.c
-
-            //compositor();
+            
+            if (UseCompositor==TRUE){
+                compositor();
+            }
 
             //process_events(); //todo
 

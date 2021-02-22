@@ -198,13 +198,19 @@ int serviceDrawChar (void){
     //
     // Refresh
     //  
-        
+
+    // Refresh only the char.
+
     //gws_show_backbuffer ();       // for debug   
     //gws_show_window_rect(window);   // something faster for now.
     //something faster.
 
     // x,y,w,h
-    gws_refresh_rectangle ( (window->left +x), (window->top +y), 8, 8 );
+    gws_refresh_rectangle ( 
+        (window->left +x), 
+        (window->top  +y), 
+        8, 
+        8 );
 
     gwssrv_debug_print ("gwssrv: serviceDrawChar done\n");
 

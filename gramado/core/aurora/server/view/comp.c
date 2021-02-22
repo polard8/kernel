@@ -22,7 +22,7 @@ void compositor (void)
     gwssrv_debug_print("compositor:\n");
 
     // Repinta as janelas e refresh nos retangulos ou tela toda.
-    //See: window.c
+    // See: window.c
     wm_process_windows();
     
     // rasterization();

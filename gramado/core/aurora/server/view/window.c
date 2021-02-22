@@ -36,13 +36,20 @@ static unsigned long ____new=0;
 
 void wm_process_windows (void)
 {
+
+    // #debug flags
+    
+    int UseYellowStatus=TRUE;
+
     unsigned long t_start = 0;
     unsigned long t_end   = 0;
-
 
     int dirty_status = -1;
     int background_status = -1;
     
+    // Internal flag, used for debug.
+    //int ShowYellowStatus = TRUE;
+
     
     gwssrv_debug_print("wm_process_windows:\n");
     
@@ -53,14 +60,15 @@ void wm_process_windows (void)
     dirty_status = isdirty();
     
     // Nothing to do.
-    if (dirty_status != 1)
+    if (dirty_status != TRUE)
     {
-        validate();   // torna 0.
+        validate();  // Validate again.
         return;
     }
 
 //===================================================================
 // ++  Start
+
     //t_start = rtl_get_progress_time();
     
     //
@@ -69,10 +77,12 @@ void wm_process_windows (void)
     
     background_status = is_background_dirty();
     
-    if (background_status == 1)
+    // The background is dirty.
+    // Show the whole screen.
+    if (background_status == TRUE)
     {
-        gws_show_backbuffer();              
-        validate_background();
+        gws_show_backbuffer();
+        validate_background();  // Validate again.
         return;
     }
 
@@ -82,11 +92,12 @@ void wm_process_windows (void)
     {
         if ( __bg_window->used == 1 && __bg_window->magic == 1234 )
         {
-            if (__bg_window->dirty == 1)
+            // The background window is dirty.
+            if (__bg_window->dirty == TRUE)
             {
                 //gws_show_window_rect(tmp);
-                gwssrv_redraw_window(__bg_window,1); //redesenha e mostra.
-                __bg_window->dirty=0;
+                gwssrv_redraw_window(__bg_window,1);  //redesenha e mostra.
+                __bg_window->dirty=FALSE;  // Validate again.
             }
         }
     }
@@ -96,17 +107,18 @@ void wm_process_windows (void)
     {
         if ( __taskbar_window->used == 1 && __taskbar_window->magic == 1234 )
         {
-            if (__taskbar_window->dirty == 1)
+            // The taskbar is dirty.
+            if (__taskbar_window->dirty == TRUE)
             {
                 //gws_show_window_rect(tmp);
                 gwssrv_redraw_window(__taskbar_window,1); //redesenha e mostra.
-                __taskbar_window->dirty=0;
+                __taskbar_window->dirty=FALSE;  // Validate again.
             }
         }
     }
 
 
-    // #todo
+    // Redrawing all the dirty windows.
     // redraw using zorder.
     // refresh using zorder.
 
@@ -116,13 +128,16 @@ void wm_process_windows (void)
 
     for (i=0; i<ZORDER_MAX; ++i)
     {
+        // Get a window structure.
+
         tmp = (struct gws_window_d  *) zList[i];
+
         if ( (void*) tmp != NULL )
         {
             if ( tmp->used == 1 && tmp->magic == 1234 )
             {
-                // Se foi corrompido por outra janela.
-                if (tmp->dirty == 1)
+                // This window is dirty.
+                if (tmp->dirty == TRUE)
                 {
                     //gws_show_window_rect(tmp);
                     
@@ -135,35 +150,45 @@ void wm_process_windows (void)
                     // #bugbug: Mas se nao efetuarmos o refresh agora,
                     // temos necessariamente que efetuar logo abaixo.
                     //gwssrv_redraw_window(tmp,1);
+                    
+                    // Redraw the window.
+                    
                     gwssrv_redraw_window(tmp,0); 
-                    tmp->dirty=0;
+                    
+                    // Validate again. 
+                    
+                    tmp->dirty = FALSE;
                 }
             }
         }
     };
 
+
     // #test
     // Let's refresh only the valid screen.
-    // We will refresh the device screen only if explicity called
-    // by the app.
-    
-    // #todo
+    // We will refresh the device screen only if 
+    // explicity called by the app.
     // Devemos dar refresh na tela toda apenas se estivermos usando
     // graficos em modo fullscreen.
-    // E claro, se o gramado mode for jail. Ou seja, resoluçao baixa.
+    // E claro, se o gramado mode for jail. 
+    // Ou seja, resoluçao baixa.
 
-    // explicity called.
+    // Explicity called by the app.
     // Essa flag estara sempre acionada se estivermos 
     // rodando graficos em modo fullscreen.
-    if ( refresh_device_screen_flag == 1 ){
+
+    // Refresh the device screen
+
+    if ( refresh_device_screen_flag == TRUE ){
         gwssrv_debug_print("== R (device) ==\n");  //debug 
         refresh_device_screen();
     
-    // Refresh only the 'valid screen'
+    // Refresh only the 'valid screen'.
     }else{
         gwssrv_debug_print("== R (valid) ==\n");  //debug
         refresh_valid_screen();
     };
+
 
     // counter
     frames_count++;
@@ -173,10 +198,12 @@ void wm_process_windows (void)
     //
     
     // delta
+
     unsigned long dt=0;
+
     ____new = rtl_get_progress_time();
-    
-    dt = (____new - ____old);
+
+    dt = (unsigned long) (____new - ____old);
 
 
 //===================================================================
@@ -192,13 +219,18 @@ void wm_process_windows (void)
     // fps++
     // conta quantos frames. 
     char rate_buffer[32];
-    // se passau um segundo.
-    if ( dt > 1000 ){
+    // se passou um segundo.
+    if ( dt > 1000 )
+    {
         ____old = ____new;
         
         fps = frames_count; // quantos frames em 1000 ms aproximadamente?
         itoa (fps, rate_buffer); 
-        yellow_status(rate_buffer);
+
+        if ( UseYellowStatus == TRUE){
+            yellow_status(rate_buffer);
+        }
+
         frames_count=0;
         fps=0;
         dt=0;
