@@ -2525,14 +2525,17 @@ gws_draw_text (
 
     gws_debug_print("gws_draw_text: [FIXME] sync\n");
 
-    if(fd<0)
+    if(fd<0){
         return -1;
+    }
 
-    if(window<0)
+    if(window<0){
         return -1;
+    }
 
 
     gws_debug_print("gws_draw_text: request\n");
+
     __gws_drawtext_request (
         (int) fd,             // fd,
         (int) window,         // window id,
@@ -2540,30 +2543,20 @@ gws_draw_text (
         (unsigned long) y,    // top,
         (unsigned long) color,
         (char *) string );
-    //    rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );
+    rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );
 
     gws_debug_print("gws_draw_text: response\n");
+
+
     
-    //int CanRead=-1;
-    //CanRead = rtl_sleep_if_socket_is_empty(fd);
-    
-    //if(CanRead != TRUE)
-    //    return -1; // no response.
-    
-    
-    // YES, We can read the response.
-    //if(CanRead == TRUE)
-    
-    
-    /*
     // Waiting to read the response.
+    int value=0;
     while (1){
         value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
         if (value == ACTION_REPLY ) { break; }
         if (value == ACTION_ERROR ) { return -1; }
         gws_yield();
     };
-    */
  
     response = __gws_drawtext_response ((int) fd);  
 
@@ -2811,7 +2804,18 @@ gws_redraw_window (
     // #todo
     // check the return values.
 
-    __gws_redraw_window_request (fd,window,flags); 
+    __gws_redraw_window_request (fd,window,flags);
+    rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );
+
+
+    // Waiting to read the response.
+    int value=0;
+    while (1){
+        value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
+        if (value == ACTION_REPLY ) { break; }
+        if (value == ACTION_ERROR ) { return -1; }
+        gws_yield();
+    };
     __gws_redraw_window_reponse (fd);
     return 0;
 }
@@ -2843,6 +2847,16 @@ int gws_refresh_window (int fd, int window )
     }
 
     __gws_refresh_window_request(fd,window);
+    rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );
+
+    // Waiting to read the response.
+    int value=0;
+    while (1){
+        value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
+        if (value == ACTION_REPLY ) { break; }
+        if (value == ACTION_ERROR ) { return -1; }
+        gws_yield();
+    };
     __gws_refresh_window_reponse(fd);
     return 0;
 }

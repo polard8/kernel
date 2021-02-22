@@ -125,6 +125,11 @@ int gameInitialize(int fd,unsigned long w, unsigned long h)
     gws_draw_char ( fd, status_window, (w/30)  * 3, (8), COLOR_YELLOW, '0' );
 
 
+    gws_draw_text(
+        fd, status_window,
+        (w/30)  * 6, 8, COLOR_YELLOW, "GRAMADO");
+
+    /*
     gws_draw_char ( fd, status_window, (w/30)  * 6, (8), COLOR_YELLOW, 'G' );
     gws_draw_char ( fd, status_window, (w/30)  * 7, (8), COLOR_YELLOW, 'R' );
     gws_draw_char ( fd, status_window, (w/30)  * 8, (8), COLOR_YELLOW, 'A' );
@@ -132,7 +137,7 @@ int gameInitialize(int fd,unsigned long w, unsigned long h)
     gws_draw_char ( fd, status_window, (w/30) * 10, (8), COLOR_YELLOW, 'A' );
     gws_draw_char ( fd, status_window, (w/30) * 11, (8), COLOR_YELLOW, 'D' );
     gws_draw_char ( fd, status_window, (w/30) * 12, (8), COLOR_YELLOW, 'O' );
-    
+    */
 
     //gws_draw_char ( fd, status_window, (w/30)  * 12, (8), COLOR_YELLOW, 127 );
     

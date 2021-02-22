@@ -134,6 +134,7 @@ unsigned long savedW;
 unsigned long savedH;
 
 
+
 //
 // == prototypes ======
 //
@@ -143,7 +144,6 @@ int center_client (int fd, struct wm_client_d *c);
 
 int gwm_init_globals(void);
 int gwm_init_windows(void);
-int create_main_menu( int fd );
 
 // Clients
 int create_bg_client(int fd);
@@ -275,6 +275,19 @@ gwmProcedure (
                     //test_create_menu (fd,c_tester->window);
                     test_create_menu (fd,c_bg->window);
                     //gws_refresh_window(fd,c_topbar->window);
+                    break;
+                
+                case VK_F3: 
+                    update(fd); 
+                    //gws_redraw_window (fd, c_bg->window, 1);
+                    //gws_redraw_window (fd, c_topbar->window, 1);
+                    //gws_redraw_window (fd, c_taskbar->window, 1);
+                    //gws_refresh_window(fd,c_topbar->window);
+                    
+                    //gws_draw_text(
+                    //    fd, c_bg->window,
+                    //    80, 80, COLOR_YELLOW, "DUCK");
+                        
                     break;
             };
             break;
@@ -916,52 +929,47 @@ int create_tester_client(int fd)
         return 0;
 
 
-        //#testing (NEW)
-        menu = gws_create_menu (
-                (int) fd,
-                (int) c_tester->window,
-                (int) 0,            //highlight
-                (int) 4,            //count
-                (unsigned long) 1,  //x
-                (unsigned long) 1,
-                (unsigned long) 200,
-                (unsigned long) 200,
-                (unsigned long) COLOR_WHITE );
+    // Create menu.
 
+    menu = gws_create_menu (
+               (int) fd,
+               (int) c_tester->window,
+               (int) 0,            //highlight
+               (int) 4,            //count
+               (unsigned long) 1,  //x
+               (unsigned long) 1,
+               (unsigned long) 200,
+               (unsigned long) 200,
+               (unsigned long) COLOR_WHITE );
+
+    // Create itens.
 
     if ((void*) menu != NULL)
     {
-            //menu item
-            gws_create_menu_item (
-                (int) fd,
-                (char *) "Item0",
-                (int) 0,
-                (struct gws_menu_d *) menu );
+        gws_create_menu_item (
+           (int) fd,
+           (char *) "Item0",
+           (int) 0,
+           (struct gws_menu_d *) menu );
 
-            //menu item
-            gws_create_menu_item (
-                (int) fd,
-                (char *) "Item1",
-                (int) 1,
-                (struct gws_menu_d *) menu );
+        gws_create_menu_item (
+            (int) fd,
+            (char *) "Item1",
+            (int) 1,
+            (struct gws_menu_d *) menu );
 
-            //menu item
-            gws_create_menu_item (
-                (int) fd,
-                (char *) "Item2",
-                (int) 2,
-                (struct gws_menu_d *) menu );
+        gws_create_menu_item (
+            (int) fd,
+            (char *) "Item2",
+            (int) 2,
+            (struct gws_menu_d *) menu );
 
-            //menu item
-            gws_create_menu_item (
-                (int) fd,
-                (char *) "Item3",
-                (int) 3,
-                (struct gws_menu_d *) menu );
+        gws_create_menu_item (
+            (int) fd,
+            (char *) "Item3",
+            (int) 3,
+            (struct gws_menu_d *) menu );
     }
-
-
-
 
 
     /*
@@ -1047,71 +1055,6 @@ int create_tester_client(int fd)
 }
 
 
-//internal
-int create_main_menu( int fd )
-{
-    struct gws_menu_d *menu;
-
-
-    if (fd<0)
-        return -1;
-
-    if ( (void *) c_bg == NULL )
-        return -1;
-    
-    if ( c_bg->window < 0 )
-        return -1;
-
-
-    // #testing (NEW)
-    menu = gws_create_menu (
-               (int) fd,
-               (int) c_bg->window,
-               (int) 0,   //highlight
-               (int) 4,   //count
-               (unsigned long) 2, //x
-               (unsigned long) 2+32,
-               (unsigned long) 200,
-               (unsigned long) 200,
-               (unsigned long) COLOR_WHITE );
-
-    if ( (void*) menu != NULL )
-    {
-               //menu item 0
-               gws_create_menu_item (
-                  (int) fd,
-                  (char *) "Test mouse F3",
-                  (int) 0,
-                  (struct gws_menu_d *) menu );
-
-               //menu item 1
-               gws_create_menu_item (
-                  (int) fd,
-                  (char *) "Editor F10",
-                  (int) 1,
-                  (struct gws_menu_d *) menu );
-
-               //menu item 2
-               gws_create_menu_item (
-                  (int) fd,
-                  (char *) "Terminal F12",
-                  (int) 2,
-                  (struct gws_menu_d *) menu );
-
-               //menu item 3
-               gws_create_menu_item (
-                  (int) fd,
-                  (char *) "Reboot F4",
-                  (int) 3,
-                  (struct gws_menu_d *) menu );
-
-    }
-
-    return 0;
-}
-
-
-
 // Update all
 int update(int fd)
 {
@@ -1119,19 +1062,25 @@ int update(int fd)
     int i=0;
 
 
+    debug_print ("update: [FIXME]\n");
+
+    // bg, topbar, taskbar
+
     if ( (void*) c_bg != NULL ){
         gws_redraw_window(fd,c_bg->window,1);
         if ( (void*) c_topbar != NULL ){
             gws_redraw_window(fd,c_topbar->window,1);
             if ( (void*) c_taskbar != NULL ){
                 gws_redraw_window(fd,c_taskbar->window,1);
-                goto _more;
+                //goto _more;
             }
         }
     }
-    return -1;
+    //return -1;
 
+/*
 _more:
+    
     //0=bg 1=topbar 2=taskbar
     for ( i=3; i<32; i++ )
     {
@@ -1140,6 +1089,8 @@ _more:
             gws_redraw_window(fd,c->window,1);
         }
     };
+*/
+
     return 0;
 }
 
@@ -1159,7 +1110,7 @@ int main ( int argc, char *argv[] ){
     addr_in.sin_addr.s_addr = IP(127,0,0,1); 
 
 
-    debug_print ("---------------------------\n");    
+    debug_print ("---------------------\n");    
     debug_print ("gwm: Initializing ...\n");
 
 
