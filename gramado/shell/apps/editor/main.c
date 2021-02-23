@@ -707,14 +707,15 @@ editorDrawChar(
     if ( pos_y < 0 )
         pos_y = 0;
 
-    // 
-    if ( pos_x > 40 )
+    // fim da linha
+    if ( pos_x >= 40 )
     {
         pos_x = 0;
         pos_y++;
     }
 
-    if ( pos_y > 20 )
+    // 'ultima linha
+    if ( pos_y >= 20 )
     {
         pos_y = 20;
     }
@@ -814,6 +815,9 @@ int main ( int argc, char *argv[] ){
         exit(1);
     }
 
+
+    cursor_x = 0;
+    cursor_y = 0;
 
 
     // ============================================
