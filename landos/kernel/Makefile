@@ -195,10 +195,10 @@ all-c:
 	$(CC) -c 0mem/core/security/usession.c  $(KINCLUDE) $(CFLAGS) -o usession.o
 
 	# debug
-	$(CC) -c 0mem/core/debug/debug.c      $(KINCLUDE) $(CFLAGS) -o debug.o
+	$(CC) -c 0mem/core/debug/debug.c  $(KINCLUDE) $(CFLAGS) -o debug.o
 
 	# ob
-	$(CC) -c 0mem/core/ob/object.c        $(KINCLUDE) $(CFLAGS) -o object.o
+	$(CC) -c 0mem/core/ob/object.c    $(KINCLUDE) $(CFLAGS) -o object.o
 
 	$(CC) -c 0mem/core/abort.c    $(KINCLUDE) $(CFLAGS) -o abort.o
 	$(CC) -c 0mem/core/info.c     $(KINCLUDE) $(CFLAGS) -o info.o

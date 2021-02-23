@@ -61,12 +61,22 @@
 // windows
 //
 
-    //#todo: salvar em global
-    //por enquanto aqui
-    int main_window=0;
-    int addressbar_window=0; 
-    int client_window=0;
-    int button=0;
+// #todo: 
+// salvar em global por enquanto aqui
+
+int main_window       = 0;
+int addressbar_window = 0; 
+int client_window     = 0;
+
+int button            = 0;
+
+
+//
+// cursor
+//
+
+int cursor_x = 0;
+int cursor_y = 0;
 
 
 //
@@ -76,6 +86,7 @@
 // #todo
 // we will copy all the iput support from the other editor.
 // for now we will use this tmp right here.
+
 int tmp_ip_x=8;
 int tmp_ip_y=8;
 
@@ -502,7 +513,8 @@ struct sockaddr_in addr = {
 
 
 
-int _hello_response(int fd){
+int _hello_response(int fd)
+{
 
     unsigned long *message_buffer = (unsigned long *) &__buffer[0];   
     int n_reads = 0;    // For receiving responses.
@@ -606,7 +618,8 @@ process_reply:
 }
 
 
-int _hello_request(int fd){
+int _hello_request(int fd)
+{
 
     // Isso permite ler a mensagem na forma de longs.
     unsigned long *message_buffer = (unsigned long *) &__buffer[0];   
@@ -674,9 +687,61 @@ void _hello(int fd)
 }
 
 
+
+void 
+editorDrawChar( 
+    int fd,
+    int ch)
+{
+    int pos_x;
+    int pos_y;
+
+    // get saved value
+    pos_x = cursor_x;
+    pos_y = cursor_y;
+
+
+    if ( pos_x < 0 )
+        pos_x = 0;
+
+    if ( pos_y < 0 )
+        pos_y = 0;
+
+    // 
+    if ( pos_x > 40 )
+    {
+        pos_x = 0;
+        pos_y++;
+    }
+
+    if ( pos_y > 20 )
+    {
+        pos_y = 20;
+    }
+
+    //save again
+    cursor_x = pos_x;
+    cursor_y = pos_y;
+    
+    // draw
+    
+    gws_draw_char ( 
+        fd, 
+        client_window, 
+        (cursor_x*8), 
+        (cursor_y*8), 
+        COLOR_BLACK, 
+        ch );
+
+    // increment
+    cursor_x++;
+}
+
+
 // local
 int 
 editorProcedure ( 
+    int fd,
     void *window, 
     int msg, 
     unsigned long long1, 
@@ -686,7 +751,17 @@ editorProcedure (
 
         // 20 = MSG_KEYDOWN
         case 20:
-            printf("%c",long1); fflush(stdout);
+            //printf("%c",long1); fflush(stdout);
+
+            //cursor_x = (cursor_x + 8);
+            //if( cursor_x > 100){ cursor_x = 0; cursor_y = cursor_y + 8; }
+            
+            
+            //gws_draw_char ( fd, client_window, 
+            //    cursor_x, cursor_y, COLOR_BLACK, long1 );
+ 
+            editorDrawChar(fd,long1);
+ 
             break;
             
         // 22 = MSG_SYSKEYDOWN
@@ -1015,8 +1090,14 @@ int main ( int argc, char *argv[] ){
     sc82 (10011,cThread,cThread,cThread);
     
     while(1){
-        if ( rtl_get_event() == TRUE ){  
-            editorProcedure( (void*) RTLEventBuffer[0], RTLEventBuffer[1], RTLEventBuffer[2], RTLEventBuffer[3] );
+        if ( rtl_get_event() == TRUE )
+        {  
+            editorProcedure( 
+                client_fd,
+                (void*) RTLEventBuffer[0], 
+                RTLEventBuffer[1], 
+                RTLEventBuffer[2], 
+                RTLEventBuffer[3] );
         }
     };
     //=================================

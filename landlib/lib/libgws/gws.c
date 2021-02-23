@@ -35,6 +35,12 @@
 #include "include/gws.h"  
 
 
+
+// #todo
+// + draw line
+// ...
+
+
 // Strings
 char *title_when_no_title = "Window";
 
@@ -2321,15 +2327,6 @@ gws_plot0 (
 
     __gws_plot0_request ( fd, x, y, z, color );
     rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );    
-
-    //int CanRead=-1;
-    //CanRead = rtl_sleep_if_socket_is_empty(fd);
-    
-    //if(CanRead != TRUE)
-    //    return -1; // no response.
-    
-    // YES, We can read the response.
-    //if(CanRead == TRUE)
 
     // Waiting to read the response.
     while (1){

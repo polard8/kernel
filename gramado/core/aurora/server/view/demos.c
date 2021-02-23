@@ -69,6 +69,34 @@ void demoCat (void)
 }
 
 
+void demoLine1(void)
+{
+
+    // #bugbug
+    // Needs to be a square ?
+
+    if (current_mode != GRAMADO_JAIL)
+        return;
+
+    //int width = getWidth();
+    //int height = getHeight();
+    int width  = 200/2;  //320/2;
+    int height = 200/2;
+
+    int x1 = 0, y1 = 0,
+        x2 = 0, y2 = height;
+    
+    while (y1 < height) {
+        //g.drawLine(x1, y1, x2, y2);
+        plotLine3d ( x1,y1,0, x2,y2,0, COLOR_WHITE); 
+            y1+=8;                 //You should modify this if
+            x2+=8;                 //it's not an equal square (like 250x250)
+    };
+
+    gws_refresh_rectangle(0,0,320,200);
+}
+
+
 //
 // == fred demo ========================================
 //
@@ -772,9 +800,12 @@ void demos_startup_animation(int i)
 
     case 11: demoPolygon(); break;
     
+    case 12: demoLine1(); break;
+    
     default: break;
     };
 }
+
 
 
 

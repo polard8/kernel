@@ -19,7 +19,7 @@ struct cat_model_d CatModel;
 void setupCatModel(int eyes, int whiskers, int mouth );
 
 
-
+void demoLine1(void);
 
 //
 // == fred demo  ===========================================

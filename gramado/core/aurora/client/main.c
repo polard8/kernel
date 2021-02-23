@@ -331,7 +331,8 @@ gwsProcedure (
                 case VK_F12: 
                     //gws_async_command(fd,4,9);
                     //gws_async_command(fd,4,10); //triangle
-                    gws_async_command(fd,4,11); //polygon
+                    //gws_async_command(fd,4,11); //polygon
+                    gws_async_command(fd,4,12); //lines
                     //gws_clone_and_execute("browser.bin"); 
                     break;
  
@@ -720,6 +721,7 @@ int main ( int argc, char *argv[] )
 
     // #test: Chamando um demo.
     // gws_async_command(client_fd,4,9); //cat
+
 
 
     //

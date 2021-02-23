@@ -649,7 +649,7 @@ int ps2kbd_globals_initialize (void){
     if(slot<0 || slot >=NUMBER_OF_FILES)
         panic("ps2kbd_globals_initialize: current_stdin file slot");
    
-    current_stdin = file_table[slot];
+    current_stdin =  (file *) file_table[slot];
     current_stdin->filetable_index = slot;
     current_stdin->____object = ObjectTypeFile; //Regular file (tty buffer)
     current_stdin->used = 1;
@@ -705,7 +705,7 @@ int ps2kbd_globals_initialize (void){
     if(slot<0 || slot >=NUMBER_OF_FILES)
         panic("ps2kbd_globals_initialize: current_stdout file slot");
    
-    current_stdout = file_table[slot];
+    current_stdout = (file *) file_table[slot];
     current_stdout->filetable_index = slot;
     current_stdout->____object = ObjectTypeFile; //Regular file (tty buffer)
     current_stdout->used = 1;
