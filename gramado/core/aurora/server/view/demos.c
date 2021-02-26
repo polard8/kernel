@@ -273,29 +273,48 @@ void demoTriangle(void)
     //printf("demoTriangle:\n");
 
     triangle = (void *) malloc( sizeof( struct gr_triandle_d ) );
+
+
+    int i=0;
+    int T=0;
+    for(i=0; i<10; i++){
+
     if ( (void*) triangle != NULL )
     {
+        // clear
 
-        triangle->p[0].x = 0;
+        rectBackbufferDrawRectangle ( 0, 0, 320, 200, COLOR_BLACK, 1 );
+
+        // down
+        triangle->p[0].x = 0;   // +T translation in x
         triangle->p[0].y = 0;
         triangle->p[0].z = 0;
         triangle->p[0].color = COLOR_RED;
 
-        triangle->p[1].x = 80;
+        // right
+        triangle->p[1].x = 80;  // +T
         triangle->p[1].y = 80;
-        triangle->p[1].z = 0;
+        triangle->p[1].z =  0;
         triangle->p[1].color = COLOR_GREEN;
 
-        triangle->p[2].x = -80;
-        triangle->p[2].y = 80;
-        triangle->p[2].z = 0;
+        // left
+        triangle->p[2].x = -80;  //+T
+        triangle->p[2].y =  80;
+        triangle->p[2].z =   0;
         triangle->p[2].color = COLOR_BLUE;
 
-        rectBackbufferDrawRectangle ( 0, 0, 320, 200, COLOR_BLACK, 1 );
+        // Draw
+
         xxxTriangleZ(triangle);
+
+        gws_refresh_rectangle(0,0,320,200);
+        
+        T++;
     }
 
-    gws_refresh_rectangle(0,0,320,200);
+    };
+
+
      
      //Debug
      //exit(0);
@@ -304,10 +323,12 @@ void demoTriangle(void)
 }
 
 
+// demo: polygon type polyline
+// asteroids space ship like.
 void demoPolygon(void)
 {
     struct gr_polygon_d *p;
-    unsigned long polygon_list[8];
+    unsigned long vecList[8];
     
     struct gr_vec3D_d *v0;
     struct gr_vec3D_d *v1;
@@ -317,17 +338,36 @@ void demoPolygon(void)
 
     // ...
 
+
     int i=0;
+    int TranslationOffset=0;
+    int j=0;
+
+
+    // structure
 
     p = (struct gr_polygon_d *) malloc( sizeof( struct gr_polygon_d ) );
     if((void*)p==NULL){return;}
     
+    // polygon type
+    
+    p->type = POLYGON_POLYLINE;
+    
+    // number of elements
+    
     p->n = 6;
-    p->list_address = (void*) polygon_list;
+    p->list_address = (void*) vecList;
 
-    for(i=0; i<8; i++)
-        polygon_list[i] = 0;
 
+    // clear vecList.
+    // This is a local list.
+
+    for(i=0; i<8; i++){
+        vecList[i] = 0;
+    };
+
+
+    // Creating some points.
 
     v0 = (struct gr_vec3D_d *) malloc( sizeof( struct gr_vec3D_d ) );
     if((void*)v0==NULL){return;}
@@ -344,60 +384,72 @@ void demoPolygon(void)
     v4 = (struct gr_vec3D_d *) malloc( sizeof( struct gr_vec3D_d ) );
     if((void*)v4==NULL){return;}
 
+    vecList[0] = (unsigned long) v0;
+    vecList[1] = (unsigned long) v1;
+    vecList[2] = (unsigned long) v2;
+    vecList[3] = (unsigned long) v3;
+    vecList[4] = (unsigned long) v4;
+    vecList[5] = (unsigned long) v0;  //circular
 
-    polygon_list[0] = (unsigned long) v0;
-    polygon_list[1] = (unsigned long) v1;
-    polygon_list[2] = (unsigned long) v2;
-    polygon_list[3] = (unsigned long) v3;
-    polygon_list[4] = (unsigned long) v4;
-    polygon_list[5] = (unsigned long) v0;  //circular
-    
-    
-    int Offset=0;
-    int j=0;
 
-    // loop
+    //
+    // loop forever.
+    //
+
+    // animation loop: forever
     while(1){
-    Offset=0;
+    
+    // translation in Y
+    TranslationOffset=0;
+    
+    // animation loop: 
+    // clear the screen and draw the the model 10 times.
+    
     for (i=0; i<10; i++){
 
-        rectBackbufferDrawRectangle ( 
-            0, 0, 320, 200, COLOR_BLACK, 1 );
+    rectBackbufferDrawRectangle ( 
+        0, 0, 320, 200, COLOR_BLACK, 1 );
 
-    Offset = Offset+i;
+    TranslationOffset = (TranslationOffset+i);
     
     v0->x = -(20);
-    v0->y =  (20+Offset);
+    v0->y =  (20+TranslationOffset);
     v0->z =   0;
     v0->color = COLOR_WHITE;
 
     // fixed
     v1->x = (0);
-    v1->y = (0+Offset);
+    v1->y = (0+TranslationOffset);
     v1->z = 0;
     v1->color = COLOR_WHITE;
 
     v2->x = (20);
-    v2->y = (20+Offset);
+    v2->y = (20+TranslationOffset);
     v2->z =  0;
     v2->color = COLOR_WHITE;
 
     v3->x =   (0);
-    v3->y = -(20-Offset);  
+    v3->y = -(20-TranslationOffset);  
     v3->z =   0;
     v3->color = COLOR_WHITE;
 
     v4->x = -(20);
-    v4->y =  (20+Offset);  
+    v4->y =  (20+TranslationOffset);  
     v4->z =  0;
     v4->color = COLOR_WHITE;
-        
+
     gwssrv_debug_print("calling xxxPolygonZ\n");
+
+    // Draw
+
     xxxPolygonZ(p);
-    
+
+    // Show
+
     gws_refresh_rectangle(0,0,320,200);
     
     for (j=0; j<20; j++){ gwssrv_yield();}
+
     };
     };   //while
 
@@ -406,6 +458,143 @@ void demoPolygon(void)
     //printf ("DONE\n");
 }
 
+void demoPolygon2(void)
+{
+    struct gr_polygon_d *p;
+    unsigned long vecList[8];
+    
+    struct gr_vec3D_d *v0;
+    struct gr_vec3D_d *v1;
+    struct gr_vec3D_d *v2;
+    struct gr_vec3D_d *v3;
+    struct gr_vec3D_d *v4;
+
+    // ...
+
+
+    int i=0;
+    int TranslationOffset=0;
+    int j=0;
+
+
+    // structure
+
+    p = (struct gr_polygon_d *) malloc( sizeof( struct gr_polygon_d ) );
+    if((void*)p==NULL){return;}
+    
+    // polygon type
+    
+    p->type = POLYGON_POLYPOINT;
+    //p->type = POLYGON_POLYLINE;
+    
+    // number of elements
+    
+    p->n = 6;
+    p->list_address = (void*) vecList;
+
+
+    // clear vecList.
+    // This is a local list.
+
+    for(i=0; i<8; i++){
+        vecList[i] = 0;
+    };
+
+
+    // Creating some points.
+
+    v0 = (struct gr_vec3D_d *) malloc( sizeof( struct gr_vec3D_d ) );
+    if((void*)v0==NULL){return;}
+
+    v1 = (struct gr_vec3D_d *) malloc( sizeof( struct gr_vec3D_d ) );
+    if((void*)v1==NULL){return;}
+
+    v2 = (struct gr_vec3D_d *) malloc( sizeof( struct gr_vec3D_d ) );
+    if((void*)v2==NULL){return;}
+
+    v3 = (struct gr_vec3D_d *) malloc( sizeof( struct gr_vec3D_d ) );
+    if((void*)v3==NULL){return;}
+
+    v4 = (struct gr_vec3D_d *) malloc( sizeof( struct gr_vec3D_d ) );
+    if((void*)v4==NULL){return;}
+
+    vecList[0] = (unsigned long) v0;
+    vecList[1] = (unsigned long) v1;
+    vecList[2] = (unsigned long) v2;
+    vecList[3] = (unsigned long) v3;
+    vecList[4] = (unsigned long) v4;
+    vecList[5] = (unsigned long) v0;  //circular
+
+
+    //
+    // loop forever.
+    //
+
+    // animation loop: forever
+    while(1){
+    
+    // translation in Y
+    TranslationOffset=0;
+    
+    // animation loop: 
+    // clear the screen and draw the the model 10 times.
+    
+    for (i=0; i<10; i++){
+
+    rectBackbufferDrawRectangle ( 
+        0, 0, 320, 200, COLOR_BLACK, 1 );
+
+    TranslationOffset = (TranslationOffset+i);
+    
+    v0->x = -(20);
+    v0->y =  (10+TranslationOffset);
+    v0->z =   0;
+    v0->color = COLOR_WHITE;
+
+    // fixed
+    v1->x = (20);
+    v1->y = (10+TranslationOffset);
+    v1->z =  0;
+    v1->color = COLOR_WHITE;
+
+    v2->x =  30;
+    v2->y = (0+TranslationOffset);
+    v2->z =  0;
+    v2->color = COLOR_WHITE;
+
+    v3->x = 0;
+    v3->y = -(10-TranslationOffset);  
+    v3->z =  0;
+    v3->color = COLOR_WHITE;
+
+    v4->x = -30;
+    v4->y = (0+TranslationOffset);  
+    v4->z = 0;
+    v4->color = COLOR_WHITE;
+
+    gwssrv_debug_print("calling xxxPolygonZ\n");
+
+
+    // Draw
+
+
+    //p->type = POLYGON_POLYPOINT;
+    //xxxPolygonZ(p);
+    //gws_refresh_rectangle(0,0,320,200);
+
+    p->type = POLYGON_POLYLINE;
+    xxxPolygonZ(p);
+    gws_refresh_rectangle(0,0,320,200);
+    
+    for (j=0; j<20; j++){ gwssrv_yield();}
+
+    };
+    };   //while
+
+    
+    gwssrv_debug_print("DONE\n");
+    //printf ("DONE\n");
+}
 
 
 
@@ -520,10 +709,18 @@ void demoCube2 (void)
     register int j=0;
  
     static int action = 1000; // inflate.
-    
-    
+
     int count=4;
-   
+
+    int modelX=0;
+    int modelY=0;
+    int modelZ=0;
+    
+    int zNear=0;
+    int zFar=0;
+    int zMaxModulus=0; // máximo em qualquer das direções.
+
+
     struct gr_cube_d *cube;
     cube = (void *) malloc( sizeof( struct gr_cube_d ) );
     if ( (void*) cube != NULL )
@@ -576,7 +773,9 @@ void demoCube2 (void)
         cube->p[7].y = 0;
         cube->p[7].z = 40;
         cube->p[7].color = COLOR_YELLOW;
-                
+
+        // =============================
+        // Drawing for the first time.
 
         rectBackbufferDrawRectangle ( 0, 0, 320, 200, COLOR_BLACK, 1 );
         xxxCubeZ(cube);
@@ -591,14 +790,26 @@ void demoCube2 (void)
         gws_refresh_rectangle(0,0,320,200);
         for(i=0;i<16;i++){ gwssrv_yield(); }
 
+        // =============================
+        // Drawing 20 times while inflate or while deflating.
+        
+        zNear       = -(40/2);  // max negative z.
+        zFar        =  (40/2);  // max positive z.
+        zMaxModulus =  (40/2);  // max z, negative or positive.
+        
         //porque o z eh reduzido duas vezes.
         //entao esse eh o limite da reduçao.
-        for (j=0; j<(40/2); j++){ 
+        for (j=0; j < zMaxModulus; j++){
+
             rectBackbufferDrawRectangle ( 0, 0, 320, 200, COLOR_BLACK, 1 ); 
             if (action==1000){
-                xxxInflateCubeZ (cube, 1);
+                modelZ = (modelZ-j);    // o objeto se aproxima.
+                //if (modelZ > zNear)
+                    xxxInflateCubeZ (cube, 1);  // go near
             }else{
-                xxxDeflateCubeZ (cube, 1);
+                modelZ = (modelZ+j);   // o objeto se afasta.
+                //if (modelZ < zFar)     // se nos afastamos mas não chegamos no limite.
+                    xxxDeflateCubeZ (cube, 1);  // go far
             };
             xxxCubeZ(cube);
             
@@ -611,12 +822,18 @@ void demoCube2 (void)
             plotCharBackbufferDrawcharTransparentZ ( cube->p[0].x + (8*6), cube->p[0].y, COLOR_RED, 'O', cube->p[0].z );
             gws_refresh_rectangle(0,0,320,200);
             for(i=0;i<32;i++){ gwssrv_yield(); }
-        }
+        };
+        
+        // Switch action.
+        // Alternating between inflate and deflate.
+        
         switch (action){
             case 1000: action = 2000; break;
             case 2000: action = 1000; break;
             default:   action = 1000; break;
         };
+
+        // 'count' times
         }; //while--
     }
 }
@@ -628,16 +845,20 @@ void demoCurve(void)
     register int j=0;
 
     int count=4;
+
+
     
     while (count>0){
+
         count--;
 
     for (i=0; i<10; i++){
-        // line
 
+        // clear
         rectBackbufferDrawRectangle ( 
             0, 0, 320, 200, COLOR_BLACK, 1 );
-        
+
+        // line
         //a variaçao de y2 me pareceu certa.
         plotQuadBezierSeg ( 
             0,   0,  0,      //x0, y0, z0, 
@@ -798,7 +1019,10 @@ void demos_startup_animation(int i)
     
     case 10: demoTriangle(); break;
 
-    case 11: demoPolygon(); break;
+    case 11: 
+        //demoPolygon(); 
+        demoPolygon2();
+        break;
     
     case 12: demoLine1(); break;
     

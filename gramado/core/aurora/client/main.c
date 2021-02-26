@@ -330,9 +330,9 @@ gwsProcedure (
                     break;
                 case VK_F12: 
                     //gws_async_command(fd,4,9);
-                    //gws_async_command(fd,4,10); //triangle
-                    //gws_async_command(fd,4,11); //polygon
-                    gws_async_command(fd,4,12); //lines
+                    //gws_async_command(fd,4,10);   //triangle
+                    gws_async_command(fd,4,11); //polygon
+                    //gws_async_command(fd,4,12); //lines
                     //gws_clone_and_execute("browser.bin"); 
                     break;
  
@@ -721,6 +721,61 @@ int main ( int argc, char *argv[] )
 
     // #test: Chamando um demo.
     // gws_async_command(client_fd,4,9); //cat
+
+
+
+
+
+/*
+//============================================================
+
+    int i=0;
+    int x=0;  int y=0;  int z=0;
+    int offset=0;
+    int T=0;
+
+    //no translation
+    offset=0;
+    for(i=0; i<50; i++){
+    gws_plot0(client_fd, x+offset,        0,        0, COLOR_RED   );
+    gws_plot0(client_fd,        0, y+offset,        0, COLOR_GREEN );
+    gws_plot0(client_fd,        0,        0, z+offset, COLOR_BLUE  );
+    offset++;
+    };
+
+    // x translation
+    T=8;
+    offset=0;
+    for(i=0; i<50; i++){
+    gws_plot0(client_fd, x+offset+T,        0,        0, COLOR_RED   );
+    gws_plot0(client_fd,        0+T, y+offset,        0, COLOR_GREEN );
+    gws_plot0(client_fd,        0+T,        0, z+offset, COLOR_BLUE  );
+    offset++;
+    };
+
+    
+    // y translation
+    T=8;
+    offset=0;
+    for(i=0; i<50; i++){
+    gws_plot0(client_fd, x+offset,        0+T,        0, COLOR_RED   );
+    gws_plot0(client_fd,        0, y+offset+T,        0, COLOR_GREEN );
+    gws_plot0(client_fd,        0,        0+T, z+offset, COLOR_BLUE  );
+    offset++;
+    };
+    
+    // z translation
+    T=8;
+    offset=0;
+    for(i=0; i<50; i++){
+    gws_plot0(client_fd, x+offset,        0,        0+T, COLOR_RED   );
+    gws_plot0(client_fd,        0, y+offset,        0+T, COLOR_GREEN );
+    gws_plot0(client_fd,        0,        0, z+offset+T, COLOR_BLUE  );
+    offset++;
+    };
+
+//============================================================
+*/
 
 
 

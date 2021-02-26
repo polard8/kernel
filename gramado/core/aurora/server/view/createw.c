@@ -174,6 +174,12 @@ createwDrawFrame (
     
     if ( Type == WT_EDITBOX )
     {
+
+            // #todo
+            // The window structure has a element for border size
+            // and a flag to indicate that border is used.
+            // It also has a border style.
+
             // Se tiver o foco.
             if ( window->focus == 1 ){
                 border_color = COLOR_BLUE;
@@ -220,6 +226,12 @@ createwDrawFrame (
 
     if ( Type == WT_OVERLAPPED )
     {
+
+            // #todo
+            // The window structure has a element for border size
+            // and a flag to indicate that border is used.
+            // It also has a border style.
+
             // Se tiver o foco.
             if ( window->focus == 1 ){
                 border_color = COLOR_BLUE1;
@@ -255,6 +267,17 @@ createwDrawFrame (
             window->width, border_size, 
             border_color, 1 );
 
+
+        //
+        // Title bar.
+        //
+
+        // #todo
+        // The window structure has a flag to indicate that
+        // we are using titlebar.
+        // It also has a title bar style.
+        // Based on this style, we can setup some
+        // ornaments for this title bar.
 
         // #todo
         // Simple title bar.
@@ -398,6 +421,14 @@ void *createwCreateWindow2 (
 	// Podemos ir usando apenas um estilo padrão por enquanto.
 
 
+    // #todo:
+    // Receberemos isso via parametro de função.
+    // Default is FALSE.
+    // We need to know the parent's bg color.
+    int Transparent = FALSE;
+
+    //unsigned long parent_bg_color;
+
 
 	// (min, max ...).
 	//int View;
@@ -406,30 +437,28 @@ void *createwCreateWindow2 (
     int Minimized;  //
 
 	// Bars.
-    int TitleBar = 0;
-    int MenuBar = 0;
-    int ToolBar = 0;
-    int StatusBar = 0;
-    int ScrollBar = 0;
-    //...
-
+    int TitleBar  = FALSE;
+    int MenuBar   = FALSE;
+    int ToolBar   = FALSE;
+    int StatusBar = FALSE;
+    int ScrollBar = FALSE;
+    // ...
 
 	// Title bar buttons. [v] [X] 
-    int MinimizeButton = 0; 
-    int MaximizeButton = 0; 
-    int CloseButton = 0;    
-    //..
-	
+    int MinimizeButton = FALSE;
+    int MaximizeButton = FALSE;
+    int CloseButton    = FALSE;
+    // ...
+
 	// Items.
-    int Background = 0;
-    int ClientArea = 0;
-    int Shadow = 0;
-    int ButtonDown = 0; //??
-    int ButtonUp = 0;   //??
-    int ButtonSysMenu = 0;  //system menu na barra de títulos.	
-    int Border = 0;         //New !!! usado no edit box.
-	//int ScrollBar;
-	//...
+    int Background    = FALSE;
+    int ClientArea    = FALSE;
+    int Shadow        = FALSE;
+    int ButtonDown    = FALSE; 
+    int ButtonUp      = FALSE;  // ??
+    int ButtonSysMenu = FALSE;  // system menu na barra de títulos.
+    int Border        = FALSE;  // New !!! usado no edit box.
+	// ...
 	
     // Desktop support.
     int ParentWindowDesktopId;    //Id do desktop da parent window.
@@ -460,17 +489,18 @@ void *createwCreateWindow2 (
     unsigned long border_size = 0;
     unsigned long border_color = COLOR_BORDER;
 
+    // ??
     unsigned long __tmp_color=0;
-    
-
-    // 
-    unsigned long WindowX = x;
-    unsigned long WindowY = y; 
-    unsigned long WindowWidth  = width; 
-    unsigned long WindowHeight = height; 
 
 
-    // Button suport.
+    // Position and dimension.
+    unsigned long WindowX      = x;
+    unsigned long WindowY      = y;
+    unsigned long WindowWidth  = width;
+    unsigned long WindowHeight = height;
+
+
+    // Button suport
     int buttonFocus=0;
     int buttonSelected=0;
     unsigned long buttonBorderColor1=0;
@@ -617,22 +647,22 @@ void *createwCreateWindow2 (
 		// com os parâmetros passados via argumento.
 
 		// Object support.
-		//window->objectType = ObjectTypeWindow;
+		//window->objectType  = ObjectTypeWindow;
 		//window->objectClass = ObjectClassGuiObjects;
 
 		// #importante
 		// Id. A janela recebe um id somente na hora de registrar.
 		// window->id = ??.
 
-        window->used = 1;
+        window->used  = TRUE;
         window->magic = 1234;
-        window->name = windowname;
+        window->name  = windowname;
 
 		// Window type.
 		// Tipo é unsigned long pois poderá ser um conjunto de flags.
         window->type = (unsigned long) type;
 
-        //#test
+
         window->parent = Parent;
 
 		//@todo: Criar instância.
@@ -692,9 +722,8 @@ void *createwCreateWindow2 (
             //...
         }
 
-        // Focus = No!
-        // Determinando que não temos o foco.
-        window->focus = 0; 
+        // Initialize focus flag.
+        window->focus = FALSE; 
 
 		// @todo:
 		// Se for uma janela filha o posicionamento deve ser somado às margens 
@@ -734,9 +763,8 @@ void *createwCreateWindow2 (
 		//saveLeft = window->left;
 		//saveTop  = window->top;
 
-		// Color
-		// Background support.
-        window->bg_color = (unsigned long) color; 
+        // Color
+        window->bg_color            = (unsigned long) color;
         window->clientrect_bg_color = (unsigned long) clientcolor;
 
         //input pointer
@@ -791,27 +819,6 @@ void *createwCreateWindow2 (
 		//serão acionadas mais tarde, na hora da pintuda, de acordo com
 		//o tipo de janela à ser pintada.
 
-		//Current message.
-		//Msg support.
-        window->msg_window = (void *) window;
-        window->msg = 0;
-        window->long1 = 0;
-        window->long2 = 0;
-
-		//Se tem ou não uma nova mensagem.
-        window->newmessageFlag = 0;
-		
-		//Filas de mensagens.
-		//São dessas filas que os programas em user mode
-		//são pegar as mensagens, solicitando através de system call.
-        window->hwndList[0]  = 0;
-        window->msgList[0]   = 0;
-        window->long1List[0] = 0;
-        window->long2List[0] = 0;
-
-		//Offsets
-        window->sendOffset = 0;
-        window->receiveOffset = 0;
 
 		//Buffers support.
 		
@@ -926,12 +933,50 @@ void *createwCreateWindow2 (
 	// @todo: Salvar as flags para os elementos presentes
 	// na estrutura da janela.
 
+    //
+    // flag
+    //
+
+    // Initializing the flag for all the elements.
+    // not used by default.
+
+    window->shadowUsed     = FALSE;  // 1
+    window->backgroundUsed = FALSE;  // 2
+    window->titlebarUsed   = FALSE;  // 3
+    window->controlsUsed   = FALSE;  // 4
+    window->borderUsed     = FALSE;  // 5  
+    window->menubarUsed    = FALSE;  // 6 
+    window->toolbarUsed    = FALSE;  // 7
+    window->clientAreaUsed = FALSE;  // 8
+    window->scrollbarUsed  = FALSE;  // 9
+    window->statusbarUsed  = FALSE;  // 10
+
+    //
+    // element style
+    //
+
+    // Initialize style indicators.
+
+    window->shadow_style     = 0;
+    window->background_style = 0;
+    window->titlebar_style   = 0;
+    window->controls_style   = 0;
+    window->border_style     = 0;
+    window->menubar_style    = 0;
+    window->toolbar_style    = 0;
+    window->clientarea_style = 0;
+    window->scrollbar_style  = 0;
+    window->statusbar_style  = 0;
+
+    // Each type has it's own elements.
+
     switch (type)
     {
         // Simple window. (Sem barra de títulos).
         case WT_SIMPLE:
             Background = TRUE;
             window->backgroundUsed = TRUE;
+            window->background_style = 0;
             break;
 
         // Edit box. (Simples + borda preta).
@@ -940,6 +985,7 @@ void *createwCreateWindow2 (
             Background = TRUE;
             Border     = TRUE;
             window->backgroundUsed = TRUE;
+            window->background_style = 0;
             break;
 
         // Overlapped. (completa, para aplicativos).
@@ -956,7 +1002,9 @@ void *createwCreateWindow2 (
             window->shadowUsed     = TRUE;
             window->backgroundUsed = TRUE;
             window->titlebarUsed   = TRUE;
+            window->controlsUsed   = TRUE;
             window->clientAreaUsed = TRUE;
+            window->background_style = 0;
             break;
 
         // Popup. (um tipo de overlapped mais simples).
@@ -965,15 +1013,18 @@ void *createwCreateWindow2 (
             Background = TRUE;
             window->shadowUsed     = TRUE;
             window->backgroundUsed = TRUE;
+            window->background_style = 0;
             break;
   
         // Check box. (Simples + borda preta).
         // Caixa de seleção. Caixa de verificação. Quadradinho.
+        // #todo: checkbox has borders.
         case WT_CHECKBOX:
             Background = TRUE;
             Border     = TRUE;
             window->backgroundUsed = TRUE;
             // #todo: structure element for 'border'
+            window->background_style = 0;
             break;
 
         //case WT_SCROLLBAR:
@@ -981,21 +1032,27 @@ void *createwCreateWindow2 (
             //break;
 
         // Only the bg for now.
+        // #todo: Button has borders.
         case WT_BUTTON:
             Background = TRUE;
             window->backgroundUsed = TRUE;
+            window->background_style = 0;
             break;
 
         // Status bar.
+        // #todo: checkbox has borders sometimes.
         case WT_STATUSBAR:
             Background = TRUE;
             window->backgroundUsed = TRUE;
+            window->background_style = 0;
             break;
 
         // Ícone da área de trabalho.
+        // #todo: icons has borders sometimes.
         case WT_ICON:
             Background = TRUE;
             window->backgroundUsed = TRUE;
+            window->background_style = 0;
             break;
 
         // barra de rolagem
@@ -1010,9 +1067,8 @@ void *createwCreateWindow2 (
             break;
     };
 
-
-    //gde_message_box (3,"xxx","xxxx");
-    //while(1){}
+    // #debug
+    // while(1){}
 
 
 
@@ -1199,6 +1255,7 @@ void *createwCreateWindow2 (
 	//     A sombra é maior que a própria janela.
 	//     ?? Se estivermos em full screen não tem sombra ??
 
+    // 1
     if ( Shadow == TRUE )
     {
         window->shadowUsed = TRUE;
@@ -1264,6 +1321,7 @@ void *createwCreateWindow2 (
     // à sua janela mãe. Já uma overlapped pode ser relativo a janela 
     // gui->main ou relativo à janela mãe.
 
+    // 2
     if ( Background == TRUE )
     {
         window->backgroundUsed = TRUE;

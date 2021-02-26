@@ -6,6 +6,10 @@
  */
 
 // See:
+// Transformations
+// http://math.hws.edu/graphicsbook/c2/s3.html
+
+// See:
 // https://wiki.osdev.org/Graphics_stack
 // https://wayland-book.com/introduction/high-level-design.html
 // ...
@@ -2160,6 +2164,14 @@ int serviceAsyncCommand (void)
                 gwssrv_show_backbuffer();
             }
             break;
+         
+        case 5:
+           if (current_mode == GRAMADO_JAIL)
+           {
+               rectBackbufferDrawRectangle ( 
+                   0, 0, 320, 200, COLOR_BLACK, 1 );
+           }
+           break;
 
         // ...
                 

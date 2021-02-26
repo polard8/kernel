@@ -47,8 +47,14 @@ struct gr_cube_d
 };
 
 
+#define POLYGON_POLYPOINT    1
+#define POLYGON_POLYLINE     2
+
 struct gr_polygon_d 
 {
+    // type: POLYLINE, POLYPOINT
+    int type;
+    
     // number of elements.
     int n;
     
@@ -56,6 +62,32 @@ struct gr_polygon_d
     void *list_address;
 };
 
+
+
+// #define RAY_TYPE_LIGHT    1
+// #define RAY_TYPE_??       2
+
+#define RAY_ORIGIN  0
+#define RAY_TARGET  1
+// todo: aliases
+
+// a vector with a starting point.
+struct gr_ray_d
+{
+    // primary ray, reflection ray, shadow ray.
+    
+    //int type;
+    
+    //int intensity;
+    
+    //int gradation;
+    
+    // ...
+    
+    // 0 = starting point
+    // 1 = vector
+    struct gr_vec3D_d p[2];
+};
 
 
 /*
@@ -150,6 +182,32 @@ struct gr_projection_d *CurrentProjection;
 // y' = (y*near)/z
 // x' = (x*near)/(-z)
 // y' = (y*near)/(-z)
+
+
+// array of chars.
+struct gr_bitmap_d
+{
+    int type;
+    
+    unsigned long width;
+    unsigned long height;
+    
+    // 32 falgs.
+    unsigned long flags;
+    
+    unsigned long color;
+    
+    // translation.
+    int x;
+    int y;
+    int z;
+    
+    // buffer
+    char *body;
+};
+
+// struct gr_bitmap_d *bitmap_screen;
+// ...
 
 
 

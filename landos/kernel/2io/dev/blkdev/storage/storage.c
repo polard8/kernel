@@ -5,8 +5,6 @@
  *     Manages disks and volumes. 
  *
  * 2015 - Created by Fred Nora.
- * 2018 - Revision.
- *
  */
 
 
@@ -16,27 +14,32 @@
 #include <kernel.h>
 
 
+
 //
-//    ### disk support ###
+//  disk support
 //
 
-
-//Mostra informa��es sobre o disco atual.
 
 void diskShowCurrentDiskInfo (void)
 {
+
+    if (current_disk<0)
+        return;
+ 
     printf ("The current disk is %d\n", current_disk );
+
     diskShowDiskInfo (current_disk);
 }
 
 
-//Mostra informa��es sobre um disco dado seu descritor.
-int diskShowDiskInfo ( int descriptor ){
-
+// Show disk information given its descriptor.
+int diskShowDiskInfo ( int descriptor )
+{
     struct disk_d *d;
 
     //#debug
     //printf ("diskShowDiskInfo:\n\n");
+
     printf ("\n\n");
 
     if ( descriptor < 0 || descriptor > DISK_COUNT_MAX ){
@@ -52,24 +55,21 @@ int diskShowDiskInfo ( int descriptor ){
         goto fail;
     } else {
 
-        if ( d->used != 1 || d->magic != 1234 ){
-			printf("flags fail\n");
-			goto fail;
+        if ( d->used != TRUE || d->magic != 1234 )
+        {
+            printf("flags fail\n");
+            goto fail;
         }
 
         printf ("disk %d - %s \n", d->id, d->name );
-
-        //printf ("id={%d} used={%d} magic={%d} \n", 
-            //d->id, d->used, d->magic );
-
         printf ("boot_disk={%d}\n",d->boot_disk_number);
         printf ("diskType={%d}\n", d->diskType );
         //printf ("name={%s}\n", d->name );
-		//...
-		goto done;
+        // ...
+        goto done;
     };
 
-	goto done;
+    goto done;
 
 fail:
     printf("fail\n");
@@ -119,7 +119,9 @@ void *disk_get_disk_handle ( int number )
     return (void *) diskList[number];
 }
 
-/* #deletar */
+
+
+// # Deprecated
 void *disk_get_current_disk_info (void)
 {
     return NULL;
@@ -129,8 +131,8 @@ void *disk_get_current_disk_info (void)
 /*
  ********************************************************
  * disk_init:
- *     Inicializa o Disk Manager.
- *     Que � um m�dulo do tipo MB.
+ *
+ *     Initialize the disk manager.
  *
  */
 
@@ -143,13 +145,14 @@ void *disk_get_current_disk_info (void)
 // was gone. #fixme
 
 
-//int diskInit() 
+int disk_init (void)
+{
+    struct disk_d *d;
 
-int disk_init (void){
+    unsigned char BootDisk=0;
 
     int i=0;
 
-    unsigned char BootDisk=0;
 
 
 #ifdef KERNEL_VERBOSE
@@ -166,10 +169,8 @@ int disk_init (void){
 
  
     //
-    //  Disk
+    //  Disk structure
     //
-
-    struct disk_d *d;
 
 	//#importante
 	//Essa estrutura � vital, n�o podemos ficar sem ela.
@@ -183,7 +184,7 @@ int disk_init (void){
     if( (void *) storage == NULL ){
         panic ("disk_init: storage");
     }else{
-        d->used  = (int) 1;
+        d->used  = (int) TRUE;
         d->magic = (int) 1234;
 
         // This is the boot disk.
@@ -204,12 +205,10 @@ int disk_init (void){
         BootDisk = (char) d->boot_disk_number;
 
         switch (BootDisk){
-
             case 0x80:  d->name = "sda";  break;
             case 0x81:  d->name = "sdb";  break;
             case 0x82:  d->name = "sdc";  break;
             case 0x83:  d->name = "sdd";  break;
-
             default:
                 debug_print("disk_init: [FAIL] default boot disk number\n");
                 d->name = "sd?";
@@ -617,7 +616,10 @@ void volume_show_info (void)
 
 
 /*
- * pegaremos informa��es sobre um disco ide checando o mbr.
+ *****************
+ * get_ide_disk_info:
+ *     
+ *     Pegaremos informa��es sobre um disco ide checando o mbr.
  * o �ndice determina qual informa��es pegaremos.
  * -1 = sem assinatura.
  * -2 = nenhuma parti��o ativa. (80)
@@ -669,6 +671,7 @@ int get_ide_disk_info ( int port, unsigned long buffer, int master )
 
 
 /*
+ **************************************
  * show_ideports_info:
  *     #importante: Testando se tem discos nas portas IDE.
  *     Se est� v�lida ent�o carregamos o primeiro setor do disco,
@@ -678,78 +681,100 @@ int get_ide_disk_info ( int port, unsigned long buffer, int master )
 
 void show_ideports_info (void)
 {
+    int value = (-1);
 
-    printf("\n show_ideports_info: Testing ports, looking for signature\n");  
-	
-	//primary master 
+
+    int idePort0Status=FALSE;
+    int idePort2Status=FALSE;
+
+    // Testing ports, looking for signature
+    printf ("show_ideports_info: \n \n");  
+
+
+    // #checking por 0 and port 2.
+    idePort0Status = ide_ports[0].used;
+    idePort2Status = ide_ports[2].used;
+
+
+    // #todo
+    // chamar kmallc e checar a validade do ponteiro.
+    // usar o ponteiro como parametro, e não kmalloc.
+
+    // =========================================
+    // primary master 
     printf("\n Testing primary master \n");
-    if ( ide_ports[0].used ==  1 ){
-
-        if ( get_ide_disk_info ( (int) 0, (unsigned long) kmalloc(512), 1 ) == -1 )
-        {
-            printf("primary master signature FAIL\n");	
+    if ( idePort0Status ==  TRUE )
+    {
+        value = get_ide_disk_info ( (int) 0, (unsigned long) kmalloc(512), 1 ); 
+        if ( value < 0 ){
+            printf("show_ideports_info: primary master signature FAIL\n");
         }else{
-            printf("primary master signature OK\n");
+            printf("show_ideports_info: primary master signature OK\n");
         };
 
     } else {
-        printf("No disk in primary master\n");
+        printf ("show_ideports_info: No disk in primary master\n");
     };
 
+
+    // =========================================
     // primary slave 
     printf("\n Testing primary slave \n");
-	if ( ide_ports[0].used ==  1 )
-	{
-	    if ( get_ide_disk_info ( (int) 0, (unsigned long) kmalloc(512), 0 ) == -1 )
-        {
-	        printf("primary slave signature FAIL\n");	
-	    }else{
-	        printf("primary slave signature OK\n");
-	    };				
-			
-	} else {
-		printf("No disk in primary slave\n");
-	};
-	
-	
-	//secondary master 
-	printf("\n Testing secondary master \n");
-    if ( ide_ports[2].used ==  1 )
-	{
-	    if ( get_ide_disk_info ( (int) 2, (unsigned long) kmalloc(512), 1 ) == -1 )
-        {
-	        printf("secondary master signature FAIL\n");	
-	    }else{
-	        printf("secondary master signature OK\n");
-	    };				
-			
-	} else {
-		printf("No disk in secondary master\n");
-	};
-	
-	//#bugbug
-	//como aqui o que temos � um disco (CD) a interface � ATAPI 
-	//e possivelmente SCSI, Ent�o as regras s�o diferentes,
-	//vamos testar isso depois.
-	//secondary slave (.ISO) (1024 bytes)
-	//Para teste vamos colocar outro disco HD aqui.
-	//ok, est� funcionando com os 4 discos hd
+    if ( idePort0Status ==  TRUE )
+    {
+        value = get_ide_disk_info ( (int) 0, (unsigned long) kmalloc(512), 0 ); 
+        if ( value < 0 ){
+            printf("primary slave signature FAIL\n");	
+        }else{
+            printf("primary slave signature OK\n");
+        };
+
+    }else{
+        printf("No disk in primary slave\n");
+    };
+
+
+    // =========================================
+    //secondary master 
+    printf("\n Testing secondary master \n");
+    if ( idePort2Status ==  TRUE )
+    {
+        value = get_ide_disk_info ( (int) 2, (unsigned long) kmalloc(512), 1 ); 
+        if ( value < 0 ){
+            printf("secondary master signature FAIL\n");
+        }else{
+            printf("secondary master signature OK\n");
+        };
+
+    } else {
+        printf("No disk in secondary master\n");
+    };
+
+    // =========================================
+    // secondary slave ??
+    //#bugbug
+    //como aqui o que temos � um disco (CD) a interface � ATAPI 
+    //e possivelmente SCSI, Ent�o as regras s�o diferentes,
+    //vamos testar isso depois.
+    //secondary slave (.ISO) (1024 bytes)
+    //Para teste vamos colocar outro disco HD aqui.
+    //ok, est� funcionando com os 4 discos hd
     printf("\n Testing secondary slave \n");
-	if ( ide_ports[2].used ==  1 )
-	{
-	    if ( get_ide_disk_info ( (int) 2, (unsigned long) kmalloc(1024), 0 ) == -1 )
-        {
-	        printf("secondary slave signature FAIL\n");	
-	    }else{
-	        printf("secondary slave signature OK\n");
-	    };				
-			
-	} else {
-		printf("No disk in secondary slave\n");
-	};
-	 
-	printf("done\n");
-	refresh_screen();	
+    if ( idePort2Status == TRUE )
+    {
+        value = get_ide_disk_info ( (int) 2, (unsigned long) kmalloc(1024), 0 ); 
+        if ( value < 0 ){
+            printf("secondary slave signature FAIL\n");	
+        }else{
+            printf("secondary slave signature OK\n");
+        };
+
+    } else {
+        printf("No disk in secondary slave\n");
+    };
+ 
+    printf("done\n");
+    refresh_screen();
 }
 
 

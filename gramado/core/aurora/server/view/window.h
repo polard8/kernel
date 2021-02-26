@@ -390,56 +390,87 @@ struct gws_window_d
 
 
     //
-    // == app window stack ================================
+    // == window stack ================================
     //
 
+    // This is a stack of elements to build 
+    // an application window.
+    // Some kinds of window do not use all these elements.
 
-    int backgroundUsed;
+    // 1
+    // Shadow
 
-
+    int shadow_style;
     int shadowUsed;
 
 
-    // title and border.
+    // 2
+    // Background
+
+    int background_style;
+    int backgroundUsed;
+
+
+    // 3
+    // Titlebar
+
     struct gws_window_d *titlebar;
-    struct gws_window_d *minimize;
-    struct gws_window_d *maximize;
-    struct gws_window_d *close;
+    struct gws_window_d *tb_minimize;
+    struct gws_window_d *tb_maximize;
+    struct gws_window_d *tb_close;
     int isMinimize;
     int isMaximize;
     int isClose;
     unsigned long titlebar_height;
+    int has_icon;     // If the title bar uses or not an icon.
+    int titlebar_style;
     int titlebarUsed;
 
+    // 4
+    // Controls
 
-    // If the title bar uses or not an icon.
-    int has_icon;
+    int minimizebuttonUsed;
+    int maximizebuttonUsed;
+    int closebuttonUsed;
+    int controls_style;
+    int controlsUsed;
 
+    // 5
+    // Borders
 
-    //border.
     unsigned long border_size;
+    int border_style;
     int borderUsed;
 
+    // 6
+    // Menubar
 
-    // menubar    
     struct gws_window_d *menubar;
     unsigned long menubar_height;
-    int menubarUsed;     
+    int menubar_style;
+    int menubarUsed; 
 
+    // 7
+    // Toolbar
 
-    // toolbar
     struct gws_window_d *toolbar;
     unsigned long toolbar_height;
+    int toolbar_style;
     int toolbarUsed;
  
- 
-    // client window
+    // 8
+    // Client window
+
     struct gws_window_d *client_window; 
     struct gws_rect_d *rcClient;     
     unsigned long clientrect_bg_color; //cor do retângulo da área do cliente.
     unsigned long clientwindow_height;
+    int clientarea_style;
     int clientAreaUsed;
 
+
+    // 9
+    // Scrollbar
 
     // vertical scrollbar
     // The wm will call the window server to create this 
@@ -451,20 +482,20 @@ struct gws_window_d
     int isScrollBarButton1;
     int isScrollBarButton2;
     int isScrollBarButton3;
-    int minimizebuttonUsed;
-    int maximizebuttonUsed;
-    int closebuttonUsed;
     unsigned long scrollbar_height;
+    // int scrollbarOrientation;  //horizontal or vertical
+    int scrollbar_style;
     int scrollbarUsed;
 
+    // 10
+    // Statusbar
 
-    // horizontal scrollbar
-    // ...
-
-    // status bar
     struct window_d *statusbar;
     unsigned long statusbar_height;
-    int statusbarUsed;    
+    int statusbar_style;
+    int statusbarUsed;
+
+    // ...
 
 // ======================================================
 
@@ -483,48 +514,6 @@ struct gws_window_d
     // ??
     // Um alerta de que exite uma mensagem para essa janela.
     int msgAlert;  
-
-
-    // ??
-    int sendOffset;
-    int receiveOffset;
-
-
-	//Filas para uma janela receber mensagens.
-	//São os quatro argumentos de um procedimento de janela padrão.
-
-
-	//
-	// CURRENT MESSAGE!
-	// 
-
-    // Standard layout of simple messages.
-    // It's used by the window procedure.
-    // arg1, arg2, arg3, arg4
-    
-    // O aplicativo depois de pegar os 4 elementos, autoriza o 
-    // kernel a colocar uma nova mensagem.
-    // '0' indica que não temos uma mensagem válida.
-    // '1' indica que temos uma nova mensagem.	
-    
-    struct gws_window_d *msg_window; 
-    int msg; 
-    unsigned long long1; 
-    unsigned long long2; 
-
-    int newmessageFlag;
-
-
-	//
-	// MESSAGE QUEUE!
-	//
-
-    // Queue:
-    // wnd, msg, long1, long2.
-    unsigned long hwndList[32];
-    unsigned long msgList[32];
-    unsigned long long1List[32];
-    unsigned long long2List[32];
 
 
     // ??

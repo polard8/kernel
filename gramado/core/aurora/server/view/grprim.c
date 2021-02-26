@@ -172,12 +172,12 @@ int camera_initialize(void)
     CurrentCamera->position.y = -40;
     CurrentCamera->position.z = 0;
 
-    //upview
+    // upview
     CurrentCamera->upview.x = -40;
     CurrentCamera->upview.y = +40;
     CurrentCamera->upview.z = 0;
 
-    //lookat. target poit origin.
+    // lookat. target point origin.
     CurrentCamera->lookat.x = 0;
     CurrentCamera->lookat.y = 0;
     CurrentCamera->lookat.z = 0;
@@ -826,11 +826,14 @@ int xxxTriangleZ ( struct gr_triandle_d *triangle )
 }
 
 
-// #test
+// Polyline
+// O segundo ponto da linha 
+// vira o primeiro ponto da próxima linha.
 int xxxPolygonZ ( struct gr_polygon_d *polygon )
 {
     int i=0;
-    int number_of_elements=0;
+    
+    int NumberOfElements=0;
     int Max = 32;
 
     // list of polygon pointers.
@@ -841,21 +844,68 @@ int xxxPolygonZ ( struct gr_polygon_d *polygon )
     struct gr_vec3D_d *v1;
     struct gr_vec3D_d *v2;
 
-
-    if ( (void*) polygon == NULL )
-        return -1;
-
-    if ( (void*) list == NULL )
-        return -1;
-
-    number_of_elements = polygon->n;
-
-    if ( number_of_elements >= Max )
-        return -1;
+    int PolygonType=0;
 
 
 
-    for ( i=0; i<number_of_elements; i++)
+    // structure
+
+    if ( (void*) polygon == NULL ){
+        goto fail;
+    }
+
+    // list
+ 
+    if ( (void*) list == NULL ){
+        goto fail;
+    }
+
+    // number of elements
+
+    NumberOfElements = polygon->n;
+
+    if ( NumberOfElements > Max ){
+        goto fail;
+    }
+
+    // polygon type
+
+    PolygonType = polygon->type;
+
+    switch(PolygonType){
+    case POLYGON_POLYPOINT:  goto do_polypoint;  break;
+    case POLYGON_POLYLINE:   goto do_polyline;   break;
+    default:
+        goto fail;
+        break;
+    };
+
+
+    // Draw polypoint
+do_polypoint:
+
+    // #todo
+    // Nothing for now
+
+    for ( i=0; i<NumberOfElements; i++ )
+    {
+        v1 = (struct gr_vec3D_d *) list[i];
+        if ( (void*) v1 == NULL )
+        { 
+            gwssrv_debug_print(">>>> BREAK\n");
+            break; 
+        }
+
+        // draw
+
+        grPlot0 ( v1->z, v1->x, v1->y, v1->color );
+    };
+    return 0;
+
+    // Draw polyline
+do_polyline:
+
+    for ( i=0; i<NumberOfElements; i++ )
     {
         // get the first element of two.
         v1 = (struct gr_vec3D_d *) list[i];
@@ -871,13 +921,18 @@ int xxxPolygonZ ( struct gr_polygon_d *polygon )
 
         gwssrv_debug_print(">>>> DRAW LINE\n");
     
+        // Plot
+        
         plotLine3d (
-            v1->x, v1->y, v1->z, 
-            v2->x, v2->y, v2->z, 
+            v1->x, v1->y, v1->z,  // first point
+            v2->x, v2->y, v2->z,  // second point
             v1->color );
     };
-
     return 0;
+
+fail:
+    gwssrv_debug_print("xxxPolygonZ: fail\n");
+    return -1;
 }
 
 
@@ -1185,7 +1240,7 @@ plotCircle (
       //setPixel(xm-y, ym-x); /*  II. Quadrant */
       //setPixel(xm+x, ym-y); /* III. Quadrant */
       //setPixel(xm+y, ym+x); /*  IV. Quadrant */
-      
+
       grPlot0 ( 0, xm-x, ym+y, color);
       grPlot0 ( 0, xm-y, ym-x, color);
       grPlot0 ( 0, xm+x, ym-y, color);

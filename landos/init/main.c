@@ -9,26 +9,21 @@
  * Purpose:
  *     + To call interrupt 129 to enable maskable interrupts.
  *     + Hang forever. Some new process will reuse this process.
- *
  *     Esse programa deverá ser chamado sempre que o sistema estiver ocioso,
  * ou com falta de opções viáveis. Então esse programa deve ficar 
  * responsável por alguma rotina de manutenção do equilíbrio de sitema, 
  * ou por gerência de energia, com o objetivo de poupar energia 
  * nesse momento de ociosidade.
- *
  * O processo idle pode solicitar que processos de gerencia de energia entrem em
  * atuação. Pois a chamada do processo idle em si já é um indicativo de ociosidade
  * do sistema. Pode-se também organizar bancos de dados, registros, memória, buffer,
  * cache etc.
- *
  *     O sistema pode configurar o que esse processo faz quando a máquina 
  * está em idle mode. Quando não há nenhum processo pra rodar ou a cpu se 
  * encontra ociosa, pode-se usar alguma rotina otimizada presente neste 
  * programa. Parece que a intel oferece sujestões pra esse caso, não sei.
- * 
  * Obs: O entry point está em head.s
  *      Agora idle pode fazer systemcalls. 
- *
  * #todo: 
  *     Criar argumento de entrada.
  *
@@ -40,11 +35,10 @@
 
 
 //
-// Includes.
+// Includes
 //
 
 #include "init.h"
-
 
 #define COLOR_YELLOW   0x00FFFF00
 
@@ -61,11 +55,8 @@
  6 	Reboot 	Reboots the system.  
  */
 
-
 int __current_runlevel;
-
 int __redpill;
-
 
 //=================================
 // See:
@@ -97,19 +88,11 @@ int idleError;
 // ...
 
 
-
 //
 // == Prototypes =============================================
 //
 
-
-//...
 void enable_maskable_interrupts(void);
-
-
-//
-// ==========
-//
 
 
 static inline void pause2 (void)
@@ -118,7 +101,11 @@ static inline void pause2 (void)
 }
 
 
-/* REP NOP (PAUSE) is a good thing to insert into busy-wait loops. */
+/*
+  REP NOP (PAUSE) 
+  is a good thing to insert into busy-wait loops. 
+*/
+
 static inline void rep_nop (void)
 {
     asm volatile ("rep;nop": : :"memory");
@@ -129,14 +116,13 @@ static inline void rep_nop (void)
 
 
 // interna
-// Uma interrupção para habilitar as interrupções mascaráveis.
-// So depois disso a interrupção de timer vai funcionar.
+// Uma interrupÃ§ao para habilitar as interrupÃ§oes mascaraveis.
+// So depois disso a interrupÃ§ao de timer vai funcionar.
 
 void enable_maskable_interrupts(void)
 {
     debug_print ("init.bin: Enable maskable interrupts\n");
     debug_print ("init.bin: Calling int 199\n");
-    
     asm ("int $199 \n");
 }
 
@@ -144,14 +130,14 @@ void enable_maskable_interrupts(void)
 void initialize_product_type (void)
 {
     debug_print ("init.bin: [TODO] Initializing product type ...\n");
- 
+
     //
     // This is the only product we have for now!
     //
 
-   // #todo:
-   // Temos que pegar isso com o kernel.
-   //__product_type = ??;  
+    // #todo:
+    // Temos que pegar isso com o kernel.
+    //__product_type = ??;
 
     // #todo:
     // Call the kernel to setup the product identification.
@@ -164,7 +150,7 @@ void Reboot (void)
     printf ("init.bin: Reboot()\n");
     while(1){}
     // ...
-    
+
     //gde_reboot();
 }
 
@@ -183,8 +169,8 @@ void Logoff (void)
 {
     printf ("init.bin: Logoff()\n");
 
-    if (gReboot == 1)  {  Reboot();  }
-    if (gShutdown == 1){  Shutdown();  }
+    if (gReboot   == TRUE){  Reboot();    }
+    if (gShutdown == TRUE){  Shutdown();  }
 }
 
 
@@ -194,30 +180,28 @@ void CheckRedPill(void)
 
     char buffer[128];
 
-    int nreads  =0;
-    int nwrites =0;
+    int nreads  = 0;
+    int nwrites = 0;
 
 
     // flag
-    
-    __redpill = FALSE;
 
+    __redpill = FALSE;
 
     fp = (FILE*) fopen ("redpill.ini","r+");
     //fp = (FILE*) fopen ("init.ini","r+");
-    
+
     if ( (void*)  fp == NULL )
     {
         //printf("init.bin: ERROR\n");
         //fflush(stdout);
         //exit(1);
-        
+
         //ok se falhar ... o arquivo nao existe.
         __redpill = FALSE;
         return;
     }
 
-    
     if ( (void*)  fp != NULL )
     {
         // Read
@@ -232,7 +216,7 @@ void CheckRedPill(void)
     }
 
     // Check buffer
-    
+
     if ( buffer[0] == 'R' &&
          buffer[1] == 'E' &&
          buffer[2] == 'D' &&
@@ -251,7 +235,7 @@ void CheckRedPill(void)
 // Execute the standard command interpreter.
 // It's is not a shell with a virtual terminal,
 // it's only a command interpreter that uses the 
-// the base kernel embedded virtual console.
+// base kernel embedded virtual console.
 
 // #todo
 // Use sc82 system call.
@@ -259,13 +243,14 @@ void CheckRedPill(void)
 void ExecCommandInterpreter(void)
 {
     int Status = -1;
-    
+
     debug_print ("init.bin: Launching gdeshell.bin\n");
 
     // We will not wait here.
     // We need to use the event loop in the main funcion.
-    
-    Status = sc82 ( 900, (unsigned long) "gdeshell.bin", 0, 0 ); 
+
+    //Status = (int) sc82 ( 900, (unsigned long) "gdeshell.bin", 0, 0 );
+    Status = (int) rtl_clone_and_execute("gdeshell.bin");
 
     //if (Status<0)
         // ...
@@ -274,14 +259,14 @@ void ExecCommandInterpreter(void)
 void ExecRedPillApplication(void)
 {
     int Status = -1;
-    
+
     debug_print ("init.bin: Launching launcher.bin\n");
 
     // We will not wait here.
     // We need to use the event loop in the main funcion.
-    
-    Status = sc82 ( 900, (unsigned long) "launcher.bin", 0, 0 ); 
 
+    //Status = (int) sc82 ( 900, (unsigned long) "launcher.bin", 0, 0 );
+    Status = (int) rtl_clone_and_execute("launcher.bin");
     //if (Status<0)
         // ...
 }
@@ -316,8 +301,8 @@ int main ( int argc, char *argv[] )
     __current_runlevel = (int) -1;
 
     // Reboot and shutdown flags.
-    gReboot = 0;
-    gShutdown = 0;
+    gReboot   = FALSE;
+    gShutdown = FALSE;
 
     // Product
     initialize_product_type();
@@ -531,14 +516,10 @@ int main ( int argc, char *argv[] )
 // We can open a alog and close a log.
 // INIT.LOG
 
-    //
-    // Logoff
-    //
 
 logoff:
     printf ("init: logoff\n");
     Logoff();
-
 fail:
     printf ("init: [FAIL] Rebooting ...\n");
     Reboot();

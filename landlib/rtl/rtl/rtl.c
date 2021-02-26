@@ -280,15 +280,14 @@ void rtl_exit_critical_section (void)
 
 /*
  **************************
- * gws_create_thread:
+ * rtl_create_thread:
  *     Create a thread.
  *     #todo: 
  *     Precisamos uma função que envie mais argumentos.
  *     Essa será uma rotina de baixo nível para pthreads.
  */
 
-void *
-rtl_create_thread ( 
+void *rtl_create_thread ( 
     unsigned long init_eip, 
     unsigned long init_stack, 
     char *name )
@@ -1483,6 +1482,28 @@ ssize_t rtl_console_beep(void)
                          (const void *) &BeepChar, 
                          1 );
 }
+
+
+int rtl_clone_and_execute ( char *name )
+{
+    if ( (void *) name == NULL ){
+        printf ("rtl_clone_and_execute: [FAIL] name\n");
+        return -1;
+    }
+
+    if ( *name == 0 ){
+        printf ("rtl_clone_and_execute: [FAIL] *name\n");
+        return -1;
+    }
+
+    // #todo
+    // Parameters vector.
+    // Maybe we can provide a default parameters vector.
+
+    return (int) sc82 ( 900, (unsigned long) name, 0, 0 );
+}
+
+
 
 
 
