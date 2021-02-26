@@ -84,8 +84,14 @@
 // from, to
 
 
+// Device hotspot.
 static unsigned long HotSpotX=0;
 static unsigned long HotSpotY=0;
+
+// Window hotspot.
+//static unsigned long WindowHotSpotX=0;
+//static unsigned long WindowHotSpotY=0;
+
 
 
 /*
@@ -279,8 +285,20 @@ int view (int near, int far)
 // History:
 //     2020 - Created by Fred Nora.
 
+// window ?
+// Essa rotina pode pintar em qualquer posição 
+// da tela do dispositivo. 
+// Com origem no centro da tela.
+
+// Aceitamos valores negativos e positivos.
+// O limite máximo será modular.
+
 int grPlot0 (int z, int x, int y, unsigned long color)
 {
+
+    // Clipping
+    int Draw = TRUE;
+
     // #todo
     // We need a z-buffer or (depth buffer)
     // it is used to depth testing.
@@ -308,16 +326,28 @@ int grPlot0 (int z, int x, int y, unsigned long color)
     unsigned long zBaseX=0;
     unsigned long zBaseY=0;
 
-    unsigned long X=0;
-    unsigned long Y=0;
+     // #bugbug
+     // Precisa ser 'int', nao podemos enviar 
+     // valores negativos para putpixel.
+     int X=0;
+     int Y=0;
 
+    //
+    // Device screen structure
+    //
 
+    // See: screen.h
 
     // #debug
-    if ( (void *) DeviceScreen == NULL ){
+    if ( (void *) DeviceScreen == NULL )
+    {
         printf("grPlot0: DeviceScreen\n");
         exit(1);
     }
+
+
+    // #todo
+    // precisamos checar algumas globais, como HotSpotX e HotSpotY.
 
 
     // z negativo
@@ -370,13 +400,19 @@ int grPlot0 (int z, int x, int y, unsigned long color)
         if ( 0 <= X < DeviceScreen->width && 
              0 <= Y < DeviceScreen->height )
         {
-            pixelBackBufferPutpixel ( color, X, Y ); 
-            return 0;
+            if (Draw == TRUE)
+            {
+                if (X<0){ return -1; }
+                if (Y<0){ return -1; }
+                pixelBackBufferPutpixel ( color, X, Y ); 
+                return 0;
+            }
+            return -1;
         }
         return -1;
     }
-    
-    
+
+
     // z maior que zero.
     if (z >= 0)
     {
@@ -424,8 +460,14 @@ int grPlot0 (int z, int x, int y, unsigned long color)
         if ( 0 <= X < DeviceScreen->width && 
              0 <= Y < DeviceScreen->height )
         {
-            pixelBackBufferPutpixel ( color, X, Y );  
-            return 0;
+            if (Draw == TRUE)
+            {
+                if (X<0){ return -1; }
+                if (Y<0){ return -1; }
+                pixelBackBufferPutpixel ( color, X, Y );  
+                return 0;
+            }
+            return -1;
         }
         return -1;
     }
@@ -537,7 +579,7 @@ plotLine3d (
 
     for (;;) {
 
-      grPlot0 ( z0, x0, y0, color);
+      grPlot0 ( z0, x0, y0, color );
       
         if (i-- == 0) { break; }
         x1 -= dx; if (x1 < 0) { x1 += dm; x0 += sx; } 

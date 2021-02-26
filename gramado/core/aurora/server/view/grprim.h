@@ -3,11 +3,9 @@
  * 
  *     Header for primitives.
  * 
- * 
  * History:
  *     2020 - Created by Fred Nora.
  */
-
 
 
 #ifndef __GRPRIM_H
@@ -24,15 +22,18 @@ struct gr_vec3D_d
     unsigned long color;
 };
 
+
 struct gr_line_d
 {
     struct gr_vec3D_d p[2];
 };
 
+
 struct gr_triandle_d
 {
     struct gr_vec3D_d p[3];
 };
+
 
 struct gr_rectangle_d
 {
@@ -216,7 +217,6 @@ struct gr_bitmap_d
 //
 
 // matrix
-
 
 static int projection4x4[4][4] = { 
         {1,0,0,0}, 
