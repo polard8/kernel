@@ -411,7 +411,7 @@ int serviceCreateWindow (void){
             gwssrv_debug_print ("serviceCreateWindow: gui fail\n");
         }
             
-        Parent = gui->screen;
+        Parent = gui->screen_window;
 
         //  #bugbug
         //  This is a test.
@@ -1718,7 +1718,7 @@ int create_main_menu(void){
 
     // #testing (NEW)
     menu = gwssrv_create_menu (
-               (int) gui->screen,
+               (int) gui->screen_window,
                (int) 0,   //highlight
                (int) 4,   //count
                (unsigned long) 8, 
@@ -1726,7 +1726,6 @@ int create_main_menu(void){
                (unsigned long) 320,
                (unsigned long) 280,
                (unsigned long) COLOR_WHITE );
-
 
 
     if ( (void*) menu != NULL )
@@ -1908,7 +1907,6 @@ void gwsWindowUnlock (struct gws_window_d *window)
 /*
  *****************************************
  * gwssrv_init_windows:
- * 
  * 
  */
 

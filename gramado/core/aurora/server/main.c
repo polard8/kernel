@@ -1240,11 +1240,11 @@ gwsProcedure (
             gwssrv_debug_print ("gwssrv: Message number 1000\n");
             //#bugbug: Esse endereço de estrutura esta mudando para um valor
             //que nao podemos acessar em ring3.
-            if ( (void*) gui->screen != NULL)
+            if ( (void*) gui->screen_window != NULL)
             {
                 //if ( gui->screen->used == 1 && gui->screen->magic == 1234 ){
                     dtextDrawText ( 
-                        (struct gws_window_d *) gui->screen,
+                        (struct gws_window_d *) gui->screen_window,
                         long1, long2, COLOR_GREEN,
                         "gwssrv: Hello friend. This is the Gramado Window Server!");
                 //}
@@ -1445,10 +1445,11 @@ void create_background (void)
     // Se estivermos em JAIL, podemos arriscar algum background melhor.
     // Talvez alguma imagem.
 
-    __bg_window = (struct gws_window_d *) createwCreateWindow ( WT_SIMPLE, 
+    __bg_window = (struct gws_window_d *) createwCreateWindow ( 
+                                            WT_SIMPLE, 
                                             1, 1, "gwssrv-bg",  
                                             0, 0, w, h,   
-                                            gui->screen, 0, 
+                                            gui->screen_window, 0, 
                                             COLOR_BACKGROUND, COLOR_BACKGROUND );    
 
     if ( (void *) __bg_window == NULL )
@@ -1518,10 +1519,10 @@ int initGraphics (void){
     // #debug
     // Se o background a seguir falhar, entao veremos
     // pelo menos essa mensagem.
-    if ( (void*) gui->screen != NULL )
+    if ( (void*) gui->screen_window != NULL )
     {
         dtextDrawText ( 
-            (struct gws_window_d *) gui->screen,
+            (struct gws_window_d *) gui->screen_window,
             8, 8, COLOR_RED, "gwssrv: Initializing graphics" );
     }
 

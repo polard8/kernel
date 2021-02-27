@@ -16,6 +16,18 @@ struct cat_model_d
 };
 struct cat_model_d CatModel;
 
+
+//
+// prototypes ===============
+//
+
+
+void demoClear(void);
+void demoRefresh(void);
+
+
+
+// cat model
 void setupCatModel(int eyes, int whiskers, int mouth );
 
 

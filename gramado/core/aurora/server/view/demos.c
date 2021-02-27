@@ -4,6 +4,28 @@
 #include <gws.h>
 
 
+void demoClear(void)
+{
+    // #todo
+    // We can do this for more resolutions. 
+
+    // Limpa em mostra na resolução 320x200
+    rectBackbufferDrawRectangle ( 
+           0, 0, 320, 200, COLOR_BLACK, 1 );
+}
+
+
+void demoRefresh(void)
+{
+    // #todo
+    // We can do this for more resolutions. 
+
+    // mostra na resolução 320x200
+
+    gws_refresh_rectangle(0,0,320,200);
+}
+
+
 void setupCatModel(int eyes, int whiskers, int mouth )
 {
     CatModel.eyesVisible     = eyes;
@@ -32,8 +54,11 @@ void demoCat (void)
     
     for (i=0; i<8; i++){
 
-       rectBackbufferDrawRectangle ( 
-           0, 0, 320, 200, COLOR_BLACK, 1 );
+       //rectBackbufferDrawRectangle ( 
+           //0, 0, 320, 200, COLOR_BLACK, 1 );
+      
+    demoClear();
+    
     // head
     plotCircleZ ( 0, 12, 25, COLOR_WHITE, 0); 
 
@@ -61,7 +86,8 @@ void demoCat (void)
     plotLine3d ( -10, -2,0, 10, -2,0, COLOR_WHITE); 
     }
     
-    gws_refresh_rectangle(0,0,320,200);
+    //gws_refresh_rectangle(0,0,320,200);
+    demoRefresh();
     for (j=0; j<200; j++){ gwssrv_yield();}
     };
     count--;
@@ -93,7 +119,8 @@ void demoLine1(void)
             x2+=8;                 //it's not an equal square (like 250x250)
     };
 
-    gws_refresh_rectangle(0,0,320,200);
+    //gws_refresh_rectangle(0,0,320,200);
+    demoRefresh();  
 }
 
 
@@ -215,9 +242,11 @@ void demoSA1(void)
         for (i=0; i<8; i++){
         
             // black background.
-            rectBackbufferDrawRectangle ( 
-               0, 0, 320, 200, COLOR_BLACK, 1 );
-            
+            //rectBackbufferDrawRectangle ( 
+               //0, 0, 320, 200, COLOR_BLACK, 1 );
+
+           demoClear();
+      
             // transform.
             multiply4 ( projection4x4, mat2, res );
        
@@ -283,8 +312,9 @@ void demoTriangle(void)
     {
         // clear
 
-        rectBackbufferDrawRectangle ( 0, 0, 320, 200, COLOR_BLACK, 1 );
-
+        //rectBackbufferDrawRectangle ( 0, 0, 320, 200, COLOR_BLACK, 1 );
+        demoClear();
+           
         // down
         triangle->p[0].x = 0;   // +T translation in x
         triangle->p[0].y = 0;
@@ -307,7 +337,8 @@ void demoTriangle(void)
 
         xxxTriangleZ(triangle);
 
-        gws_refresh_rectangle(0,0,320,200);
+        //gws_refresh_rectangle(0,0,320,200);
+        demoRefresh();  
         
         T++;
     }
@@ -407,9 +438,11 @@ void demoPolygon(void)
     
     for (i=0; i<10; i++){
 
-    rectBackbufferDrawRectangle ( 
-        0, 0, 320, 200, COLOR_BLACK, 1 );
-
+    //rectBackbufferDrawRectangle ( 
+        //0, 0, 320, 200, COLOR_BLACK, 1 );
+    
+    demoClear();
+           
     TranslationOffset = (TranslationOffset+i);
     
     v0->x = -(20);
@@ -446,7 +479,8 @@ void demoPolygon(void)
 
     // Show
 
-    gws_refresh_rectangle(0,0,320,200);
+    //gws_refresh_rectangle(0,0,320,200);
+    demoRefresh();  
     
     for (j=0; j<20; j++){ gwssrv_yield();}
 
@@ -541,9 +575,12 @@ void demoPolygon2(void)
     
     for (i=0; i<10; i++){
 
-    rectBackbufferDrawRectangle ( 
-        0, 0, 320, 200, COLOR_BLACK, 1 );
+    //rectBackbufferDrawRectangle ( 
+        //0, 0, 320, 200, COLOR_BLACK, 1 );
 
+    demoClear();
+    
+    
     TranslationOffset = (TranslationOffset+i);
     
     v0->x = -(20);
@@ -584,7 +621,9 @@ void demoPolygon2(void)
 
     p->type = POLYGON_POLYLINE;
     xxxPolygonZ(p);
-    gws_refresh_rectangle(0,0,320,200);
+    
+    //gws_refresh_rectangle(0,0,320,200);
+    demoRefresh();  
     
     for (j=0; j<20; j++){ gwssrv_yield();}
 
@@ -777,7 +816,9 @@ void demoCube2 (void)
         // =============================
         // Drawing for the first time.
 
-        rectBackbufferDrawRectangle ( 0, 0, 320, 200, COLOR_BLACK, 1 );
+        //rectBackbufferDrawRectangle ( 0, 0, 320, 200, COLOR_BLACK, 1 );
+        demoClear();
+    
         xxxCubeZ(cube);
         //string!
         plotCharBackbufferDrawcharTransparentZ ( cube->p[0].x + (8*0), cube->p[0].y, COLOR_RED, 'G', cube->p[0].z );
@@ -787,7 +828,8 @@ void demoCube2 (void)
         plotCharBackbufferDrawcharTransparentZ ( cube->p[0].x + (8*4), cube->p[0].y, COLOR_RED, 'A', cube->p[0].z );
         plotCharBackbufferDrawcharTransparentZ ( cube->p[0].x + (8*5), cube->p[0].y, COLOR_RED, 'D', cube->p[0].z );
         plotCharBackbufferDrawcharTransparentZ ( cube->p[0].x + (8*6), cube->p[0].y, COLOR_RED, 'O', cube->p[0].z );
-        gws_refresh_rectangle(0,0,320,200);
+        //gws_refresh_rectangle(0,0,320,200);
+        demoRefresh();  
         for(i=0;i<16;i++){ gwssrv_yield(); }
 
         // =============================
@@ -801,7 +843,8 @@ void demoCube2 (void)
         //entao esse eh o limite da reduçao.
         for (j=0; j < zMaxModulus; j++){
 
-            rectBackbufferDrawRectangle ( 0, 0, 320, 200, COLOR_BLACK, 1 ); 
+            //rectBackbufferDrawRectangle ( 0, 0, 320, 200, COLOR_BLACK, 1 ); 
+            demoClear();
             if (action==1000){
                 modelZ = (modelZ-j);    // o objeto se aproxima.
                 //if (modelZ > zNear)
@@ -820,7 +863,8 @@ void demoCube2 (void)
             plotCharBackbufferDrawcharTransparentZ ( cube->p[0].x + (8*4), cube->p[0].y, COLOR_RED, 'A', cube->p[0].z );
             plotCharBackbufferDrawcharTransparentZ ( cube->p[0].x + (8*5), cube->p[0].y, COLOR_RED, 'D', cube->p[0].z );
             plotCharBackbufferDrawcharTransparentZ ( cube->p[0].x + (8*6), cube->p[0].y, COLOR_RED, 'O', cube->p[0].z );
-            gws_refresh_rectangle(0,0,320,200);
+            //gws_refresh_rectangle(0,0,320,200);
+            demoRefresh();  
             for(i=0;i<32;i++){ gwssrv_yield(); }
         };
         
@@ -855,9 +899,11 @@ void demoCurve(void)
     for (i=0; i<10; i++){
 
         // clear
-        rectBackbufferDrawRectangle ( 
-            0, 0, 320, 200, COLOR_BLACK, 1 );
+        //rectBackbufferDrawRectangle ( 
+            //0, 0, 320, 200, COLOR_BLACK, 1 );
 
+        demoClear();
+        
         // line
         //a variaçao de y2 me pareceu certa.
         plotQuadBezierSeg ( 
@@ -876,7 +922,8 @@ void demoCurve(void)
         plotCharBackbufferDrawcharTransparentZ ( 40+ (8*5), 20+i+i, COLOR_RED, 'D', 0 );
         plotCharBackbufferDrawcharTransparentZ ( 40+ (8*6), 20+i+i, COLOR_RED, 'O', 0 );
 
-        gws_refresh_rectangle(0,0,320,200);
+        //gws_refresh_rectangle(0,0,320,200);
+        demoRefresh();  
         for (j=0; j<80; j++){ gwssrv_yield();}
     };
     
@@ -946,9 +993,11 @@ void demoMatrix1(void)
 
     for (i=0; i<8; i++){
 
-       rectBackbufferDrawRectangle ( 
-           0, 0, 320, 200, COLOR_BLACK, 1 );
-       
+       //rectBackbufferDrawRectangle ( 
+           //0, 0, 320, 200, COLOR_BLACK, 1 );
+
+       demoClear();
+        
        // See: Where is this projection?
        multiply4 ( projection4x4, mat2, res );
        

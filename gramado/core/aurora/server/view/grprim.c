@@ -293,6 +293,8 @@ int view (int near, int far)
 // Aceitamos valores negativos e positivos.
 // O limite máximo será modular.
 
+// 3D fullscreen, origin in center.
+
 int grPlot0 (int z, int x, int y, unsigned long color)
 {
 
@@ -349,6 +351,9 @@ int grPlot0 (int z, int x, int y, unsigned long color)
     // #todo
     // precisamos checar algumas globais, como HotSpotX e HotSpotY.
 
+    // Usaremos a janela chamada screen se nenhuma outra foi indicada.
+    //gui->screen
+
 
     // z negativo
     if (z < 0)
@@ -404,6 +409,7 @@ int grPlot0 (int z, int x, int y, unsigned long color)
             {
                 if (X<0){ return -1; }
                 if (Y<0){ return -1; }
+                // device screen
                 pixelBackBufferPutpixel ( color, X, Y ); 
                 return 0;
             }
@@ -464,6 +470,7 @@ int grPlot0 (int z, int x, int y, unsigned long color)
             {
                 if (X<0){ return -1; }
                 if (Y<0){ return -1; }
+                // device screen
                 pixelBackBufferPutpixel ( color, X, Y );  
                 return 0;
             }

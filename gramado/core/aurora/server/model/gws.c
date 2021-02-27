@@ -257,12 +257,14 @@ void gws_show_backbuffer(void)
     // if (!paint_ready) return;
 
 
-    if( (void *) gui->screen == NULL ){
+    if( (void *) gui->screen_window == NULL )
+    {
         debug_print("gws_show_backbuffer: [PANIC] screen window fail\n");
         return;
     }
-    //See: widnow.c
-    gws_show_window_rect (gui->screen);
+    
+    //See: window.c
+    gws_show_window_rect (gui->screen_window);
 }
 
 
@@ -414,10 +416,13 @@ int gwsInit(void)
         return -1;
         //while(1);
     }else{
+ 
         CurrentDisplay->id = 0; //
-        CurrentDisplay->used = 1; //
-        CurrentDisplay->magic = 1234; //
         
+        CurrentDisplay->used  = TRUE; 
+        CurrentDisplay->magic = 1234; 
+
+        // ??
         CurrentDisplay->fd = 0;
         
         //...
@@ -431,11 +436,14 @@ int gwsInit(void)
 
     if ( (void*) DeviceScreen == NULL ){
         debug_print("gwsInit: [FAIL] DeviceScreen\n");
+        return -1;
         //while(1);
     }else{
+
         DeviceScreen->id = 0; 
-        DeviceScreen->used = 1; 
-        DeviceScreen->magic = 1234; 
+
+        DeviceScreen->used  = TRUE;
+        DeviceScreen->magic = 1234;
         
         //#todo:
         DeviceScreen->flags = 0;
@@ -479,12 +487,12 @@ int gwsInit(void)
         // The device screen will be the valid screen for now.
         // Save the device screen in the diplay structure.
 
-        if ( (void *) CurrentDisplay != NULL ){
+        if ( (void *) CurrentDisplay != NULL )
+        {
             CurrentDisplay->device_screen = DeviceScreen;
             CurrentDisplay->valid_screen  = DeviceScreen;
         }
     };
-
 
     // font support.
     gwssrv_init_font();
@@ -493,8 +501,9 @@ int gwsInit(void)
     gwssrv_init_char();
 
     // windows
+    // Inicializamos algumas variáves ...
+    // as primeira janelas são criadas logo abaixo.
     gwssrv_init_windows();    
-            
 
     //
     // gui structure.
@@ -510,7 +519,9 @@ int gwsInit(void)
         //return -1;
     }
 
-
+    // tmp window
+    struct gws_window_d *tmpW;
+    
     // #bugbug
     // Its is not a screen. It is only a window.
     // It is the main window of the gui structure.
@@ -519,14 +530,34 @@ int gwsInit(void)
 
     if ( (void *) gui != NULL )
     {
-        // (root window)
-        gui->screen = (struct gws_window_d *) createwCreateWindow ( WT_SIMPLE, 
-                                                1, 1, "screen-window",  
-                                                0, 0, 
-                                                __device_width, __device_height,   
-                                                NULL, 0, xCOLOR_GRAY3, xCOLOR_GRAY3 );
 
-        if ( (void*) gui->screen == NULL)
+        //
+        // screen
+        //
+
+        // Isso foi criado logo acima.
+        gui->_screen = DeviceScreen;
+
+        //
+        // display
+        //
+        
+        // Isso foi criado logo acima.
+        gui->_display = CurrentDisplay;
+
+        //
+        // screen window
+        //
+
+        // (root window)
+        tmpW = (struct gws_window_d *) createwCreateWindow ( 
+                                           WT_SIMPLE, 
+                                           1, 1, "screen-window",  
+                                           0, 0, 
+                                           __device_width, __device_height,   
+                                           NULL, 0, xCOLOR_GRAY3, xCOLOR_GRAY3 );
+
+        if ( (void*) tmpW == NULL)
         {
             debug_print("gwsInit: [FAIL] screen window\n");
             printf     ("gwsInit: [FAIL] screen window\n");
@@ -534,17 +565,18 @@ int gwsInit(void)
             //return -1;    
         }
 
-        gui->screen->used = 1;
-        gui->screen->magic = 1234;
+        tmpW->used  = TRUE;
+        tmpW->magic = 1234;
         
         //#test
-        gwsDefineInitialRootWindow (gui->screen);
-    
-        // main window.
-        // desktop area without the bars.
-        // For maximized apps.
-        gui->main = gui->screen;
+        gwsDefineInitialRootWindow (tmpW);
+
+        // Screen window and main window.
+        gui->screen_window = tmpW;
+        gui->main_window   = tmpW;
     } 
+
+
 
     //
     // Refresh
