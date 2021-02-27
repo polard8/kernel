@@ -620,6 +620,11 @@ int main ( int argc, char *argv[] )
 	// == Loop ============================
 	//
 
+    // #todo
+    // #bugbug
+    // Maybe we need to setup this thread as
+    // a foreground thread.
+
 
     unsigned long message_buffer[5];
 

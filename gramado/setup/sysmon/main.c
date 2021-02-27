@@ -615,7 +615,6 @@ int main ( int argc, char *argv[] ){
         printf ("Couldn't create PID button\n");
         gde_exit_critical_section ();
         return 1;
-
     }else{
         gde_register_window (bar_button_1);
         gde_show_window (bar_button_1);
@@ -669,7 +668,6 @@ int main ( int argc, char *argv[] ){
         gde_show_backbuffer();
         gde_exit_critical_section ();
         while(1){}
- 
     }
     gde_register_window (data_window);
     gde_show_window (data_window);

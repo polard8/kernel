@@ -6822,162 +6822,133 @@ after_flags:
     //printf ("gdeshell: *breakpoint");
     //while (1){}
 
-	
-	
-	//
-	// Filtra a quantidade de argumentos.
-	//
-	
-	//goto noArgs; 
-	
-	//N�o usar verbose nessa fase de tratar os argumentos
-	//pois a janela ainda n�o foi inicializada.
-	
-	// Se n�o h� argumentos.
-	if (argc < 1)
-	{
-		//printf("No args !\n");
-		//#Test.
-        //fprintf( stderr,"Starting Shell with no arguments...\n");	 	
-		//die ("gdeshell: No args");
-		
-		interactive = 1;
-		login_shell = 1;
-		goto noArgs; 
 
-	}else{
-		
-         if (argc < 2){
-		     printf ("main: argc=%d We need 2 args or more\n", argc );
-		    interactive = 1;
-		    login_shell = 1;
-		    goto noArgs;
-		 }
+    // #args
+    // Filter by the number of arguments
 
-		//printf("Testing args ...\n");
-		
-		//#todo: (possibilidades)
-		//As flags poderia come�ar com f. Ex: fInteractive, fLoginShell,
-		
-	    if ( gramado_strncmp ( (char *) argv[0], "-interactive", 12 ) == 0 ){
-			interactive = 1;
-            //printf("Initializing an interactive shell ...\n");
-            //printf("arg[0]={%s}\n",argv[0]);			
-        };
+    //
+    // No args
+    //
 
-        //Se o shell foi iniciado com um arquivo de script para ser 
-        //executado.
-        //a Flag -f indica que o que segue � um arquivo de script.
-        //if( gramado_strncmp( (char *) argv[0], "-f", 2 ) == 0 )
-        //{
-		//	goto dosh2;
-		//}			
-		
-	    if ( gramado_strncmp ( (char *) argv[1], "-login", 6 ) == 0 ){
-			
-			login_shell = 1;
-			
-			//printf("Initializing login ...\n");
-            //printf("arg[1]={%s}\n",argv[1]);    
-        };	
-		
-		//Nome passado viar argumento.
-		//shell_name = (char*) argv[2];
+    // Less than one argument.
+    if (argc < 1)
+    {
+        debug_print ("gdeshell: Initializing with less than one argument\n");
+        interactive = TRUE;
+        login_shell = TRUE;
+        goto noArgs; 
+    }
 
-        // ...
-    };
 
-	//Nothing.
+    //
+    // Check args
+    //
+
+    // Less than two arguments.
+    if (argc < 2)
+    {
+        debug_print ("gdeshell: Initializing with less than two arguments\n");
+        interactive = TRUE;
+        login_shell = TRUE;
+        goto noArgs;
+    }
+
+    // Let's check the arguments if we have two or more arguments.
+    
+    debug_print ("gdeshell: Initializing with two or more arguments\n");
+
+    // Interactive mode.
+
+    if ( gramado_strncmp ( (char *) argv[0], "--interactive", 13 ) == 0 )
+    {
+        interactive = TRUE;
+    }
+
+    if ( gramado_strncmp ( (char *) argv[0], "-i", 2 ) == 0 )
+    {
+        interactive = TRUE;
+    }
+
+
+    // Login
+
+    if ( gramado_strncmp ( (char *) argv[1], "--login", 7 ) == 0 )
+    {
+        login_shell = TRUE;
+    }
+
+    if ( gramado_strncmp ( (char *) argv[1], "-l", 2 ) == 0 )
+    {
+        login_shell = TRUE;
+    }
+
+    // ...
+
+//
+// No arguments
+//
 
 noArgs:
     printf ("gdeshell: noArgs \n");
 
-	//ok
-    //printf ("gdeshell: *breakpoint");
-    //while (1){}
+_ok:
 
-	//...
-	
-	//@todo:
-	//Podemos come�ar pegando o id do processo atual e 
-	//melhorando a prioridade.
-	
-	
-	// get current dir
-	//pegamos o diret�rio atual.
-	
-	//get user dir
-	//pegamos o diret�rio do usu�rio /root/user/(name)
-	
-	//set current dir
-	//setamos para que o diret�rio do usu�rio seja o diret�rio atual.
-	
-	
-	// Isso configura alguns padr�es do aplicativo.
-	// Os argumentos tratados abaixo podem modificar esses padr�es
-	// Ex: Um argumento de entrada pode solicitar a troca de cor de fonte.
-	
-	
-	// #todo
-	// #importante
-	// Temos que usar as configura��es do terminal que o gdeshell est� rodando.
-	// Ent�o n�o podemos simplesmente criar uma janela do tamanho que quisermos.
-	
-    //gde_debug_print ("gdeshell: *breakpoint \n");
-    //while (1){}
+    if (interactive == TRUE)
+        debug_print ("gdeshell: ~ Interactive\n");
+
+    if (login_shell == TRUE)
+        debug_print ("gdeshell: ~ Login\n");
+
+    // #breakpoint
+    // printf ("gdeshell: *breakpoint\n");
+    // while (1){}
+
+
+    // Constructor
 
     shellShell();
 
-    //gde_debug_print ("gdeshell: *breakpoint \n");
-    //while (1){}
-
-	// Apenas inicialize. 
-	// Continuaremos com o procedimento do shell e n�o o da barra,	
-	
-	
-	// #Aten��o
-	// Criaremos a janela tranquilamente usando os valores obtidos
-	// na inicializa��o.
+    // #breakpoint
+    // printf ("gdeshell: *breakpoint\n");
+    // while (1){}
 
 
-    // #bugbug
-    // Por causa do gerenciamento da sessão crítica essa função 
-    // deverá retornar NULL se falhar.
+    //
+    // Main window
+    //
 
+    // Calling a helper function to create the main window.
+    // We need to manage the critical section. So this function
+    // needs to return NULL if it fails.
+    // See: shellui.c
+
+    // =================================
     //++
-    gde_enter_critical_section ();    
-    hWindow = shellCreateMainWindow (1);
+    gde_enter_critical_section ();
+    // IN: status.
+    hWindow = shellCreateMainWindow(1);
     if ( (void *) hWindow == NULL )
     {
-        printf ("shellCreateMainWindow FAIL!\n");
+        printf ("gdeshell: shellCreateMainWindow FAIL!\n");
         gde_exit_critical_section ();
         exit(1);
-        //while (1){}
     }
     gde_register_window (hWindow);
     gde_show_window (hWindow);
     gde_exit_critical_section ();
     //--
+    // =================================
 
+    // #breakpoint
+    // printf ("gdeshell: *breakpoint\n");
+    // while (1){}
 
-    //#debug
-    //printf ("*breakpoint");
-    //gde_debug_print ("gdeshell: *breakpoint \n");
-    //while (1){}
- 
-	//
-	// ++ terminal ++
-	//
-
-	// #importante
-	// Definindo a janela como sendo uma janela de terminal.
-	// Isso faz com que as digita��es tenham acesso ao procedimento de janela de terminal 
-	// para essa janela e n�o apenas ao procedimento de janela do sistema.
-	// # provavelmente isso marca os limites para a impress�o de caractere em modo terminal 
-	
-	// #importante
-	// Nesse momento estamos configurando os 
-	// limites do terminal gerenciado pelo kernel.
+    // ===============================================================
+    // Terminal window:
+    // Setup the terminal window.
+    // This way the kernel will use this window to print the chars
+    // in terminal mode.
+    //
 
     gramado_system_call ( 
         SYSTEMCALL_SETTERMINALWINDOW, 
@@ -6985,21 +6956,25 @@ noArgs:
         (unsigned long) hWindow, 
         (unsigned long) hWindow );
 
+    //
+    // Setup local structures.
+    //
+
+    // shell_info:
  
     //Salva ponteiro da janela principal e da janela do terminal. 
     shell_info.main_window     = (struct window_d *) hWindow;
     shell_info.terminal_window = (struct window_d *) hWindow;
 
+    // terminal_rect:
+
     terminal_rect.left   = wpWindowLeft;
     terminal_rect.top    = wpWindowTop;
-    
     terminal_rect.width  = wsWindowWidth;
     terminal_rect.height = wsWindowHeight;
 
-	// Se der problema no tamanho da area de cliente 
-
-    if ( terminal_rect.left < wpWindowLeft ||
-         terminal_rect.top  < wpWindowTop ||
+    if ( terminal_rect.left   < wpWindowLeft  ||
+         terminal_rect.top    < wpWindowTop   ||
          terminal_rect.width  > wsWindowWidth ||
          terminal_rect.height > wsWindowHeight )
     {
@@ -7009,20 +6984,26 @@ noArgs:
         printf ("l={%d} t={%d} w={%d} h={%d}\n", 
             terminal_rect.left, terminal_rect.top,
             terminal_rect.width, terminal_rect.height );
-        
         exit(1);
-        //while (1){ asm ("pause"); }
     }
 
-    //printf("#debug breakpoint");
-    //while(1){} 
-	//===============================
+    // #breakpoint
+    // printf ("gdeshell: *breakpoint\n");
+    // while (1){}
+
+    // ===============================
 
 
-
+    //
+    // Cursor
+    //
+    
+    // #bugbug
+    // The kernel is not doing this job for a while.
 
     //==========================
-    // Habilitando o cursor piscante de textos.
+    // enable the blinking text cursor
+
     shellSetCursor ( 
         (terminal_rect.left / smCharWidth), 
         (terminal_rect.top/smCharHeight) );
@@ -7031,65 +7012,75 @@ noArgs:
     //===========================
 
 
-    //ok funcinou
-    //gde_debug_print ("gdeshell: *breakpoint \n");
-    //while (1){}
+    // #breakpoint
+    // printf ("gdeshell: *breakpoint\n");
+    // while (1){}
+
+    // ========================================
 
 
+    //
+    // Init shell
+    //
 
-	// Init Shell:
-	//     Inicializa vari�veis, buffers e estruturas. 
-	//     Atualiza a tela.
-	// #BUGBUG
-	// Estamos passando um ponteiro que � uma vari�vel local.
+    // Initializing some variables and structures.
+    // Update the screen.
+    // #bugbug: 
+    // We're passing a local pointer as a function parameter.
 
-    // #bugbug
-    // alguma coisa esta falhando na maquina real nesse ponto ...
-    // vamos usar break point e verbose.
-
-
+    // ========================================
     //++
     gde_enter_critical_section ();
     Status = (int) shellInit(hWindow); 
     if ( Status != 0 ){
-        die ("gdeshell-main: shellInit fail\n");
+        die ("gdeshell: shellInit fail\n");
     }
-    gde_exit_critical_section (); 
+    gde_exit_critical_section(); 
     //--
-
-    //printf ("gdeshell: breakpoint \n");
-    //while(1){}
+    // ========================================
 
 
-	// #importante:
-	// Agora � a hora de pegar mensagens de input de teclado.
-	// Mas se o shell n�o for interativo, ent�o n�o pegaremos 
-	// mensagens de input de teclado.
+    // #breakpoint
+    // printf ("gdeshell: *breakpoint\n");
+    // while (1){}
 
-    if ( interactive != 1 ){
-        printf ("gdeshell is not interactive\n");
+
+    // ==============================================================
+
+    //
+    // Not interactive
+    //
+    
+    // If the shell is not interactive we will skip the prompt.
+
+    if ( interactive != TRUE )
+    {
+        debug_print ("gdeshell: The shell is not interactive\n");
+        debug_print ("Skiping the prompt thing\n");
         goto skip_input;
     }
 
 
-
     //
-    // == Get system message ==============================
+    // == Event loop ==============================
     //
 
-    // Buffer.
-    //unsigned long message_buffer[5];
 
-    // Stack.
-    //struct window_d *msg_Window;
-    //int msg_Message;
-    //void *msg_Long1;
-    //void *msg_Long2;
+    // #todo
+    // #bugbug
+    // Maybe we need to setup this thread as
+    // a foreground thread.
+    
+    // #todo
+    // Check what this routine is doing.
+    
+    gde_set_focus(hWindow);
 
+    // ...
 
-read_and_execute:
-    // Nothing.
-    shell_initialized = 1;
+// read_and_execute:
+
+    shell_initialized = TRUE;
 
     //
     // == Main loop =================================================
@@ -7099,12 +7090,13 @@ read_and_execute:
 
 Mainloop:
 
+    // See: libcore/api.c
+
     while (_running){
 
-        // See: ge/libcore/api.c
         EventStatus = (int) libcore_get_event();
-        
-        // We've got en event. 
+
+        // We've got an event. 
         // Call the window procedure. 
         // Call event handler!
         

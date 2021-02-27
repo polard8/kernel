@@ -150,10 +150,13 @@ struct window_d *shellCreateMainWindow ( int status ){
     //
     // Draw
     //
+    
+    // #todo
+    // We have the argument 'status'.
+    // Is it used here?
 
     w = (void *) gde_create_window ( 
-                     1, 1, 1, 
-                    "gdeshell-main",
+                     1, 1, 1, "gdeshell",
                      wpWindowLeft, wpWindowTop, 
                      wsWindowWidth, wsWindowHeight,    
                      0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
