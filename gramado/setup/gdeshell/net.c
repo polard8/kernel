@@ -64,9 +64,9 @@ unsigned char host_mac_address[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
 void 
 __SendARP ( 
-    uint8_t src_ip[4], 
+    uint8_t src_ip[4],
     uint8_t dst_ip[4],
-    uint8_t src_mac[6], 
+    uint8_t src_mac[6],
     uint8_t dst_mac[6] )
 {
 
@@ -93,13 +93,13 @@ __SendARP (
 
         for( i=0; i<6; i++)
         {
-            eh->src[i] = src_mac[i];     // src mac 
+            eh->src[i] = src_mac[i];     // src mac
             eh->dst[i] = dst_mac[i];     // dst mac
         };
 
         eh->type = (uint16_t) ToNetByteOrder16(ETH_TYPE_ARP);
 
-		//...
+        // ...
     };
 
 
@@ -212,20 +212,19 @@ __SendARP (
     unsigned char *src_arp      = (unsigned char *) h;
 
 
-
     //
-    // Copy.
+    // Copy
     //
 
 	// Copiando as estruturas para o buffer.
 	// >Copiando o header ethernet.
 	// >Copiando o arp logo após do header ethernet.
 
-	// ethernet, arp.
-    for (i=0; i<14;i++){ buffer[i]      = src_ethernet[i]; };
-    for (i=0; i<28;i++){ buffer[i + 14] = src_arp[i]; };
-	
-	
+    // ethernet, arp.
+    for (i=0; i<14; i++){ buffer[i]      = src_ethernet[i]; };
+    for (i=0; i<28; i++){ buffer[i + 14] = src_arp[i];      };
+
+
 // lenght:
 	// Vamos configurar na estrutura do nic intel o tamanho do pacote.
 	// Ethernet frame length = ethernet header (MAC + MAC + ethernet type) + ethernet data (ARP header)
@@ -241,9 +240,10 @@ __SendARP (
 
 // Testing ARP.
 // Sending arp.
-void __shellTestARP (void){
-
-    printf ("\n\n ==== gdeshell: __shellTestARP ==== \n\n"); 
+void __shellTestARP (void)
+{
+    printf ("\n");
+    printf ("==== gdeshell: __shellTestARP ==== \n"); 
 
     // Source
     uint8_t source_ip_address[4];
@@ -298,6 +298,7 @@ void network_initialize (void)
 
     debug_print("network_initialize: Sending arp\n");
     printf     ("network_initialize: Sending arp\n");
+
     __shellTestARP();
 }
 
@@ -346,10 +347,12 @@ void network(void)
 void gdeshell_send_packet ( unsigned long packet_buffer )
 {
     if (packet_buffer == 0){ return; };
-    gramado_system_call ( 891, 
-            (unsigned long) packet_buffer,   //buf
-            (unsigned long) 1500,            //len
-            0);
+
+    gramado_system_call ( 
+        891, 
+        (unsigned long) packet_buffer,  // buf
+        (unsigned long) 1500,           // len
+        0 );
 }
 
 
@@ -361,7 +364,7 @@ print_ethernet_header (
     struct gdeshell_ether_header *eth = (struct gdeshell_ether_header *) Buffer;
 
     printf("\n");
-    printf ("Ethernet Header\n");
+    printf("Ethernet Header\n");
 
     // Destination MAC
     // Source MAC
@@ -386,6 +389,12 @@ void print_arp_header ( char *Buffer )
     struct gdeshell_ether_arp *h = (struct gdeshell_ether_arp *) (Buffer + ETHERNET_HEADER_LENGHT);
     int i=0;
 
+    // Filter
+
+    if ( (void*) Buffer == NULL ){
+        printf ("print_arp_header: [FAIL] Buffer\n");
+        return;
+    }
 
     //==================================
     // #debug
@@ -425,7 +434,7 @@ void print_arp_header ( char *Buffer )
 
 void print_ipv4_header ( char *Buffer )
 {
-    printf ("print_ipv4_header:\n");
+    printf ("print_ipv4_header: [TODO]\n");
     printf ("\n\n");
 }
 
@@ -457,7 +466,7 @@ int network_decode_buffer ( unsigned long buffer_address )
     //printf ("network_decode_buffer:\n");
 
     if ( buffer_address == 0 ){
-        printf ("network_decode_buffer: [FAIL] null buffer address\n");
+        printf ("network_decode_buffer: [FAIL] buffer_address\n");
         return -1;
     }
 
@@ -591,7 +600,13 @@ int network_decode_buffer ( unsigned long buffer_address )
 
 void network_loop(void)
 {
+
+    // #bugbug
+    // We don't need this big buffer here.
+    // Maybe it is time to dynalloc a new one.
+
     char buf[4096];
+
     int i=0;
 
     debug_print("network_loop:\n");

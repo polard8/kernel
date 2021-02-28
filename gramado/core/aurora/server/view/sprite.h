@@ -19,20 +19,50 @@ struct gws_sprite_d
     int used;
     int magic;
     
+    //  shape
     int type;
+
+    unsigned long flags;
+    
+
+    // ??
+    // what is this?
     
     // basics
     int x1;
     int y1;
     int z1;
     unsigned long color1;
+
     int x2;
     int y2;
     int z2;
     unsigned long color2;
 
+    // ??
     int r;
     
+    // z-order
+    int z;
+    
+    
+    unsigned long transparent_color;
+    
+    // next
+    // struct gws_sprite_d *next;
+    
+    // associated window.
+    struct gws_window_d *window;
+    
+    // #todo
+    // Rectangles
+    
+    // rcSprite =  the rectangle that represents the sprint in the screen
+    // rcBackbuffer
+    // rcSrc
+    // rcDst
+    // ...
+
     // ...
 };
 
@@ -41,6 +71,20 @@ struct gws_sprite_d
 unsigned long spriteList[SPRITE_MAX_NUMBER];
 
 
+/*
+struct gws_spritedata_d
+{
+    int id;
+    
+    // window
+    struct gws_window_d *window;
+    int x;  // inside the client widnow.
+    int y;
+
+    struct gws_sprite_d *sprite;
+    struct gws_sprite_d *next;
+};
+*/
 
 
 //

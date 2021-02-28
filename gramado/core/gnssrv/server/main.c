@@ -1,70 +1,13 @@
 /*
  * File: main.c
  * 
+ *    ??
  *    Main file for the Gramado Network Server.
  * 
- *    O propósito é servir 'arquivos' e 'aplicações' para a rede.
- *    Talvez ele chame o servidor de protocolos como helper.
  *
  *    History:
  *        2020 - Created by Fred Nora. 
  */
-
-
-// main.c
-// Arquivo principal do gws.
-// As funções começam com o nome do módulo
-// para que em client side começem com gws_
-
-
-/*
-See: https://wiki.osdev.org/Graphics_stack
-
-    > Application Layer
-    > Interoperation Layers
-        +Desktop Management Layer
-        +Window Management Layer 
-    > Presentation Layers
-        +Compositing Layer
-        +Widget Toolkit Layer
-        +Rendering Layer 
-    > Display Layers
-        +Device Driver Layer
-        +Hardware Layer 
-
-*/
-
-/*	$NetBSD: tty.c,v 1.8 2011/09/06 18:34:57 joerg Exp $	*/
-
-/*
- * Copyright (c) 1988, 1993
- *	The Regents of the University of California.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the University nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- */
-
 
 
 #include <gns.h>
@@ -75,41 +18,69 @@ See: https://wiki.osdev.org/Graphics_stack
 //
 
 // Standard. (First version)
+// This is the standard header.
 #define GNP_WID        0
 #define GNP_MESSAGE    1
 #define GNP_LONG1      2
 #define GNP_LONG2      3
 // #extension
+// extended data.
 #define GNP_LONG3      4
 #define GNP_LONG4      5
 #define GNP_LONG5      6
 #define GNP_LONG6      7
-//#body
+// #body
+// Here starts the data section.
+// It goes untill the end of the socket. 
+// Maybe 512-(16*4).
 #define GNP_BODY_OFFSET    16
 // ...
 
+int NoReply = FALSE;
+
+//
+// Buffer
+//
+
+// Buffer for the messages.
+
+#define GNS_BUFFER_SIZE  512
+
+char __buffer[GNS_BUFFER_SIZE];
+
+//
+// Status
+//
+
+int running = FALSE;
 
 
 //
-// O buffer para  as mensagens recebidas via socket.
+// Server fd
 //
-
-char __buffer[512];   
-
-
-int running = 0;
-
-
-
 
 int ____saved_server_fd = -1;
 
+//
+// Current client fd
+//
+
+int ____saved_current_client_fd = -1;
+
+
+//
+// Buffer
+//
+
+// This is the buffer ussed for the next response.
+// Marsheling ...
 
 // Esses valores serão enviados como 
 // resposta ao serviço atual.
 // Eles são configurados pelo dialogo na hora da 
 // prestação do serviço.
 // No início desse array fica o header.
+
 unsigned long next_response[32];
 
 
@@ -119,18 +90,11 @@ unsigned long next_response[32];
 // == Prototypes =========================
 //
 
-
-void gnssrv_yield(void);
 int serviceInitializeNetwork(void);
 
+void gnssrv_yield(void);
 
-
-/*
- ************************************
- * gwsProcedure:
- *     Dialog to handle the event loop.
- */
- 
+// dialog
 int 
 gnsProcedure ( 
     void *window, 
@@ -138,8 +102,15 @@ gnsProcedure (
     unsigned long long1, 
     unsigned long long2 );
 
+void xxxHandleNextRequest (int fd);
+
+
 void gns_send_error_response (int fd, int code, char *error_message);
 
+
+//
+// ===============================
+//
 
 void gns_send_error_response (int fd, int code, char *error_message)
 {
@@ -155,7 +126,7 @@ void gns_send_error_response (int fd, int code, char *error_message)
 // obs: read and write use the buffer '__buffer'
 // in the top of this file.
 
-void __socket_messages (int fd){
+void xxxHandleNextRequest(int fd){
 
     // Isso permite ler a mensagem na forma de longs.
     unsigned long *message_buffer = (unsigned long *) &__buffer[0];   
@@ -164,10 +135,10 @@ void __socket_messages (int fd){
     int n_writes = 0;    // For responses.
 
 
+    // Fail. Cleaning
     if (fd<0)
     {
-        debug_print ("gnssrv: __socket_messages fd\n");
-        // Cleaning
+        debug_print ("gnssrv: xxxHandleNextRequest fd\n");
         message_buffer[0] = 0;
         message_buffer[1] = 0;
         message_buffer[2] = 0;
@@ -175,6 +146,17 @@ void __socket_messages (int fd){
         gnssrv_yield(); 
         return;
     }
+
+
+    // Check if we heave a new request.
+    
+    int value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
+    if ( value != ACTION_REQUEST )
+    {
+        gnssrv_yield();
+        return;           // drop it!
+    }
+
 
 
 //__loop:
@@ -189,7 +171,7 @@ void __socket_messages (int fd){
 
     if (n_reads <= 0)
     { 
-        debug_print ("gnssrv: __socket_messages n_reads\n");
+        debug_print ("gnssrv: xxxHandleNextRequest n_reads\n");
         // Cleaning
         message_buffer[0] = 0;
         message_buffer[1] = 0;
@@ -206,7 +188,7 @@ void __socket_messages (int fd){
     //  mensagem invalida  
     if (message_buffer[1] == 0)
     { 
-        debug_print ("gnssrv: __socket_messages Unknown message\n");
+        debug_print ("gnssrv: xxxHandleNextRequest Unknown message\n");
         // Cleaning
         message_buffer[0] = 0;
         message_buffer[1] = 0;
@@ -246,6 +228,14 @@ void __socket_messages (int fd){
     // espera ate conseguir enviar a resposta.
     // o kernel precisa copiar para aquele conectado em accept[]
 
+    if (NoReply == TRUE)
+    {
+        rtl_set_file_sync( 
+            fd, SYNC_REQUEST_SET_ACTION, ACTION_NULL );
+        return;
+    }
+
+
     //
     // Sending reply.
     // 
@@ -261,7 +251,7 @@ void __socket_messages (int fd){
 
 
     // Primeiros longs do buffer.
-    message_buffer[0] = next_response[0];         //  Window ID.
+    message_buffer[0] = next_response[0];         // Window ID.
     message_buffer[1] = SERVER_PACKET_TYPE_REPLY; // next_response[1] 
     message_buffer[2] = next_response[2];         // Return value (long1)
     message_buffer[3] = next_response[3];         // Return value (long2)
@@ -276,13 +266,17 @@ void __socket_messages (int fd){
     
     debug_print ("gnssrv: Sending response ...\n");
 
+
+    // set response
+    rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REPLY );
+    
     //
     // Send
     //
 
     n_writes = write ( fd, __buffer, sizeof(__buffer) );
     if (n_writes<=0){
-        debug_print ("gnssrv: __socket_messages Response fail\n");
+        debug_print ("gnssrv: xxxHandleNextRequest Response fail\n");
     }
 
 
@@ -298,42 +292,9 @@ void __socket_messages (int fd){
         next_response[c] = 0;
 
 
-    debug_print ("gnssrv: Response sent\n");  
-}
-
-
-
-// internal
-// Get system messages.
-void __ipc_message (void){
-
-    unsigned long message_buffer[5];   
-
-
-    // Get message.
-    rtl_enter_critical_section();
-    gramado_system_call ( 111,
-            (unsigned long) &message_buffer[0],
-            (unsigned long) &message_buffer[0],
-            (unsigned long) &message_buffer[0] );
-    rtl_exit_critical_section();
-
-    // No message.
-    if ( message_buffer[1] == 0 ){
-        gramado_system_call (265,0,0,0);
-        return;
-    }
-
-    // Send message to the window procedure.
-    gnsProcedure ( (void *) message_buffer[0], 
-        (int) message_buffer[1], 
-        (unsigned long) message_buffer[2], 
-        (unsigned long) message_buffer[3] );
-
-     message_buffer[0] = 0;
-     message_buffer[1] = 0;
-     message_buffer[2] = 0;
-     message_buffer[3] = 0;
+    debug_print ("gnssrv: Response sent\n"); 
+    
+    gnssrv_yield(); 
 }
 
 
@@ -341,9 +302,7 @@ void __ipc_message (void){
  **********************************
  * gnsProcedure:
  *     Main dialog.
- * 
  */
- 
 
 int 
 gnsProcedure ( 
@@ -358,6 +317,8 @@ gnsProcedure (
 
     debug_print ("gnssrv: gnsProcedure\n");
 
+    if (msg<0)
+        return -1;
 
     switch (msg){
 
@@ -373,7 +334,7 @@ gnsProcedure (
             {
                 // #debug
                 case VK_F1:
-                    //reboot ();
+                    //reboot();
                     break;
                     
                 // #debug
@@ -410,6 +371,7 @@ gnsProcedure (
             printf ("\n");
             printf ("gnssrv: [1000] Hello from Gramado Network Server!\n");
             printf ("\n");
+            NoReply = FALSE;
             return 0;
             break;
 
@@ -418,8 +380,8 @@ gnsProcedure (
         case 1001:
             printf ("\n");
             printf ("gnssrv: [1001]\n");
-            serviceInitializeNetwork();
-            printf ("\n");
+            // serviceInitializeNetwork();
+            //printf ("\n");
             return 0;
             break; 
 
@@ -560,6 +522,26 @@ ip_calculate_checksum(void *ip)
 */
 
 
+// yield thread.
+void gnssrv_yield(void)
+{
+    // #todo
+    // Use the sc 82. 
+    gramado_system_call (265,0,0,0); 
+    //  sc82 (265,0,0,0);
+}
+
+
+int serviceInitializeNetwork(void)
+{
+    // Ring0 routine to initialize network infrastructure.
+    gramado_system_call (968,0,0,0);
+    return 0;
+}
+
+
+
+
 
 /*
  ******************************
@@ -588,8 +570,8 @@ int main (int argc, char **argv){
     int i=0;
     int _status = -1;
      
-    unsigned long w=0;
-    unsigned long h=0;
+    //unsigned long w=0;
+    //unsigned long h=0;
 
 
     // Global flag for the loop.
@@ -670,7 +652,7 @@ int main (int argc, char **argv){
 
     //printf ("gnssrv: Calling child \n");
 
-    //rtl_clone_and_execute ("gns.bin"); 
+    rtl_clone_and_execute ("gns.bin"); 
 
 
     //
@@ -715,7 +697,7 @@ int main (int argc, char **argv){
             debug_print ("gnssrv: [FAIL] Error on accept\n");
             gnssrv_yield(); 
         }else{
-            __socket_messages (newconn);
+            xxxHandleNextRequest (newconn);
         };
     };
 
@@ -733,25 +715,9 @@ int main (int argc, char **argv){
     return 0; 
 }
 
-
-
-// yield thread.
-void gnssrv_yield(void)
-{
-    // #todo
-    // Use the sc 82. 
-    gramado_system_call (265,0,0,0); 
-    //  sc82 (265,0,0,0);
-}
-
-
-int serviceInitializeNetwork(void)
-{
-    // Ring0 routine to initialize network infrastructure.
-    gramado_system_call (968,0,0,0);
-    return 0;
-}
-
+//
+// End
+//
 
 
 

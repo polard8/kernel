@@ -25,6 +25,8 @@
 #include <netinet/udp.h>
 #include <netinet/tcp.h>
 
+// for sync
+#include <rtl/gramado.h>
 
 // gnssrv
 #include <wm.h>

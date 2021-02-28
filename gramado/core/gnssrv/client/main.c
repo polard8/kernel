@@ -52,6 +52,8 @@
 #include <sys/socket.h>
 
 
+#include <rtl/gramado.h>
+
 // gns
 #include <packet.h>
 
@@ -265,7 +267,7 @@ new_message:
         
         for (i=0; i<9; i++){
             gramado_system_call (265,0,0,0); //yield thread.
-            //gns_yield();
+            //gnst_yield();
         }
     }
 
@@ -273,7 +275,9 @@ new_message:
 }
 
 
-//internal
+// internal
+// #todo: 
+// Move these routine to the client-side library.
 int gnst_hello (int fd)
 {
     
@@ -283,6 +287,18 @@ int gnst_hello (int fd)
 
     gnst_hello_request(fd);
     
+    // Avisamos que um request foi enviado.
+    rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );
+
+    // Waiting to read the response.
+    int value=0;
+    while (1){
+        value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
+        if (value == ACTION_REPLY ) { break; }
+        if (value == ACTION_ERROR ) { return -1; }
+        gnst_yield();
+    };
+
     return (int) gnst_hello_response(fd);
 }
 
@@ -360,17 +376,31 @@ int main ( int argc, char *argv[] ){
     };
 
 
+    if (client_fd<0){
+        printf("gns.bin: fd fail\n");
+        exit(1);
+    }
+
     // no loop.
-    gnst_hello (client_fd);
-    gnst_hello (client_fd);
-    gnst_hello (client_fd);
-    gnst_hello (client_fd);
+    //gnst_hello (client_fd);
+    //gnst_hello (client_fd);
+    //gnst_hello (client_fd);
+    //gnst_hello (client_fd);
     
-    int i=0;
-    for(i=0; i<50; i++)
+    //int i=0;
+    //for(i=0; i<50; i++)
+    //    gnst_yield();
+
+    while(1){
+
+        printf("gns.bin: Send message\n");
+        gnst_hello (client_fd);
+
+        printf("gns.bin: Sleep\n");
         gnst_yield();
+    };
     
-    
+
     close(client_fd);
     
     debug_print ("gns.bin: bye\n"); 

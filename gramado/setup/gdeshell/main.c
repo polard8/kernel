@@ -13,6 +13,11 @@
 
 #include "gdeshell.h"
 
+
+char *gdeshell_name            = "GDESHELL.BIN";
+char *gdeshell_version_string  = "0.1";
+
+
 // #hackhack
 #define gramado_strncmp strncmp 
 
@@ -124,52 +129,49 @@ char __username[64];
 //char *current_user_name = (char *) &__current_user_name[0]; //NULL;
 
 
-/* Non-zero means that this shell is a login shell.
-   Specifically:
-   0 = not login shell.
-   1 = login shell from getty (or equivalent fake out)
-  -1 = login shell from "-login" flag.
-  -2 = both from getty, and from flag.
+// Initialize login.
+
+int login_shell = FALSE;
+
+// The shell is interative.
+
+int interactive = TRUE;
+
+
+/* 
+   Non-zero means to remember lines typed to the shell 
+   on the history list.  
+   This is different than the user-controlled behaviour; 
+   this becomes zero when we read lines from a file, for example. 
+*/
+
+int remember_on_history = FALSE;
+
+
+/* 
+ * ??
+ * Non-zero means this shell is restricted. 
  */
 
-//Se o shell vai ser usado para login.
-//Obs: Uma vari�vel no kernel guardo o id do processo 
-//que fez login. 
+int restricted = FALSE;
 
-int login_shell = 0;
+/* 
+ * ??
+ * Special debugging helper. 
+ */
 
-
-/* Non-zero means this shell is running interactively. */
-
-//Se for diferente de zero ent�o esse shell � interativo.
-//Se for zero ele pode apenas estar executando um script.
-// #importante: Inicializa interativo.
-// Se quem chamou deseja que o shell n�o seja interativo,
-// tem que enviar os argumentos necess�rios.
-
-int interactive = 1;
+int debugging_login_shell = FALSE;
 
 
-/* Non-zero means to remember lines typed to the shell on the history
-   list.  This is different than the user-controlled behaviour; this
-   becomes zero when we read lines from a file, for example. */
-int remember_on_history = 1;
+// A double pointer to save the environment.
+// The environment that the shell passes to other commands. 
 
-
-/* Non-zero means this shell is restricted. */
-int restricted = 0;
-
-/* Special debugging helper. */
-int debugging_login_shell = 0;
-
-
-/* The environment that the shell passes to other commands. */
-//O ambiente que o shell passa para 
-//o comando que ele executou.
 char **shell_environment;
 
 
-/* The number of commands executed so far. */
+
+// The number of commands executed so far. 
+
 int current_command_number = 1;
 
 
@@ -182,14 +184,12 @@ int current_command_number = 1;
 int indirection_level = 0;
 
 
-/* The number of times BASH has been executed.  This is set
-   by initialize_variables () in variables.c. */
+/* 
+ * The number of times BASH has been executed.  
+ * This is set by initialize_variables () in variables.c. 
+ */
+
 int shell_level = 0;
-
-
-char *shell_name    = "GDESHELL.BIN";
-char *dist_version  = "0.1";
-char *build_version = "1";
 
 
 /* The name of the .(shell)rc file. */
@@ -988,6 +988,9 @@ void quit ( int status )
 
 
 /*
+
+ // ?? what is this ??
+
 void reader_loop ();
 void reader_loop ()
 {
@@ -6096,18 +6099,13 @@ void show_shell_version (void)
     puts("\n");
     printf("Application info:\n");
 
-    if ( (void *) shell_name    != NULL &&
-         (void *) dist_version  != NULL &&
-         (void *) build_version != NULL )
+    if ( (void *) gdeshell_name != NULL &&
+         (void *) gdeshell_version_string  != NULL )
     {
-        printf ("%s version %s.%s \n", 
-            shell_name, 
-            dist_version, 
-            build_version );
-   }
+        printf ("%s version %s \n", 
+            gdeshell_name, gdeshell_version_string );
+    }
 }
-
-
 
 
 //testando a rotina de salvar um arquivo.
@@ -6753,7 +6751,6 @@ int main ( int argc, char *argv[] )
     // This pointer has an invalid address ?
     // Is this in a shared mamory area ??
     
-    // shell_name = (char *) argv[0];
     // printf("%s\n",shell_name);
     // while(1){}
 
