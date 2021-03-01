@@ -29,6 +29,9 @@ set_rect (
     rect->width  = width;
     rect->height = height;
 
+    // #text
+    // rect->is_empty = TRUE;
+
     return TRUE;
 }
 
@@ -40,8 +43,9 @@ inflate_rect (
     unsigned long cx, 
     unsigned long cy )
 {
-    if ( (void*) rect == NULL )
+    if ( (void*) rect == NULL ){
         return;
+    }
     
     rect->left   -= cx;
     rect->top    -= cy;
@@ -60,13 +64,15 @@ copy_inflate_rect (
     unsigned long cx, 
     unsigned long cy )
 {
-    if ( (void*) rectDest == NULL )
+    if ( (void*) rectDest == NULL ){
         return;
+    }
 
-    if ( (void*) rectSrc == NULL )
+    if ( (void*) rectSrc == NULL ){
         return;
-    
-    
+    }
+
+
     // inflate and copy.
     // todo: fazer isso em duas etapas.
     rectDest->left   = rectSrc->left   -= cx;
@@ -82,14 +88,18 @@ copy_inflate_rect (
 }
 
 
+// ??
+// #todo: Comment what is happening here.
+// Move
 void 
 offset_rect ( 
     struct gws_rect_d *rect, 
     unsigned long cx, 
     unsigned long cy )
 {
-    if ( (void*) rect == NULL )
+    if ( (void*) rect == NULL ){
         return;
+    }
     
     //offset rect
     rect->left   += cx;
@@ -102,7 +112,8 @@ offset_rect (
     rect->height = (rect->bottom - rect->top);
 }
 
-
+// ??
+// #todo: Comment what is happening here.
 void 
 copy_offset_rect ( 
     struct gws_rect_d *rectDest, 
@@ -110,12 +121,14 @@ copy_offset_rect (
     unsigned long cx, 
     unsigned long cy )
 {
-    if ( (void*) rectDest == NULL )
+    if ( (void*) rectDest == NULL ){
         return;
+    }
 
-    if ( (void*) rectSrc == NULL )
+    if ( (void*) rectSrc == NULL ){
         return;
-    
+    }
+
     // offset and copy the rect.
     rectDest->left   = rectSrc->left   += cx;
     rectDest->top    = rectSrc->top    += cy;
@@ -130,43 +143,192 @@ copy_offset_rect (
 }
 
 
+// ??
+// #todo: Comment what is happening here.
+// Checando alguma falha nos valores.
+// Devemos ajustar quando falhar?
+// Talvez o termo empty nao seja o apropriado aqui,
+// pois empty pode significar apenas nao pintado. not fill.
+int rect_validate_size( struct gws_rect_d *rect )
+{
+    if ( (void*) rect == NULL ){
+        return -1;
+    }
+
+    if ((rect->left >= rect->right) || 
+        (rect->top  >= rect->bottom))
+    {
+        return FALSE;
+    }
+
+    return TRUE;
+}
+
+int rect_validate_size2( struct gws_rect_d *rect )
+{
+    if ( (void*) rect == NULL ){
+        return -1;
+    }
+
+    if ( (rect->width  <= 0 ) || 
+         (rect->height <= 0 ) )
+    {
+        return FALSE;
+    }
+     
+    return TRUE;
+}
+
+int is_rect_null( struct gws_rect_d *rect )
+{
+    if ( (void*) rect == NULL ){
+        return -1;
+    }
+    
+    if (rect->width == 0 && rect->height == 0 )
+    {
+        return TRUE;
+    }
+    
+    return FALSE;
+}
+
+
 
 int is_rect_empty( struct gws_rect_d *rect )
 {
-    if ( (void*) rect == NULL )
+    if ( (void*) rect == NULL ){
         return -1;
+    }
 
-
-    if ((rect->left >= rect->right) || (rect->top >= rect->bottom))
+    if (rect->is_empty == TRUE)
     {
         return (int) TRUE;
     }
-     
+ 
+    rect->is_empty = FALSE;
     return FALSE;
 }
 
 
-
+// ??
+// #todo: Comment what is happening here.
 int is_rect_dirty( struct gws_rect_d *rect )
 {
-    if ( (void*) rect == NULL )
+    // Error!
+    if ( (void*) rect == NULL ){
         return -1;
+    }
 
-    if ( rect->dirty == 1  ){
+    // true
+    if ( rect->dirty == TRUE  ){
         return (int) TRUE;
     }
-     
+    
+    //false
     return FALSE;
 }
 
 
+int 
+rect_contains_vertically ( 
+    struct gws_rect_d *rect,  
+    unsigned long y ) 
+{
+    if ( (void*) rect == NULL ){
+        return -1;
+    }
+
+    // ta dentro
+    if ( y >= rect->top &&
+         y <= rect->bottom )
+    {
+        return TRUE;
+    }
+
+    // ta fora
+    return FALSE;
+}
+
+
+int 
+rect_contains_horizontally ( 
+    struct gws_rect_d *rect,
+    unsigned long x )
+{
+    if ( (void*) rect == NULL ){
+        return -1;
+    }
+    
+    // ta dentro
+    if ( x >= rect->left &&
+         x <= rect->right )
+    {
+        return TRUE;
+    }
+
+    // ta fora
+    return FALSE;
+}
+
+
+void 
+rect_set_left ( 
+    struct gws_rect_d *rect, 
+    unsigned long value )
+{
+    if ( (void*) rect == NULL ){
+        return;
+    }
+    
+    rect->left = value;
+}
+
+void 
+rect_set_top ( 
+    struct gws_rect_d *rect, 
+    unsigned long value )
+{
+    if ( (void*) rect == NULL ){
+        return;
+    }
+    
+    rect->top = value;
+}
+
+void 
+rect_set_right ( 
+    struct gws_rect_d *rect, 
+    unsigned long value )
+{
+    if ( (void*) rect == NULL ){
+        return;
+    }
+    
+    rect->right = value;
+}
+
+void 
+rect_set_bottom ( 
+    struct gws_rect_d *rect, 
+    unsigned long value )
+{
+    if ( (void*) rect == NULL ){
+        return;
+    }
+    
+    rect->bottom = value;
+}
 
 // #todo
 // Do not check the validation.
 // We need a prefix that tellus that we will no chack the validation
 // os the addresses
 
-void *rect_memcpy32 ( void *v_dst, const void *v_src, unsigned long c )
+void *rect_memcpy32 ( 
+    void *v_dst, 
+    const void *v_src, 
+    unsigned long c )
 {
 
     long *src = (long *) v_src;
@@ -184,7 +346,7 @@ void *rect_memcpy32 ( void *v_dst, const void *v_src, unsigned long c )
         *dst++ = *src++;
     };
 
-    return v_dst;
+    return (void *) v_dst;
 }
 
 
@@ -207,7 +369,6 @@ int gwssrv_refresh_this_rect ( struct gws_rect_d *rect )
 /*
  *************************************************** 
  * gws_refresh_rectangle:
- * 
  * 
  */
 
@@ -383,12 +544,21 @@ rectBackbufferDrawRectangle (
     rect.bg_color = color;
 
 
-    // empty rectangle
-
-
+    //
+    // empty
+    //
+    
+    if ( fill == FALSE ){
+        rect.is_empty = TRUE;
+    }
 
 
     /*
+
+    // #todo
+    // Desenhar as bordas com linhas
+    // ou com retangulos
+   
     if (fill==0)
     {
             //  ____
@@ -427,11 +597,16 @@ rectBackbufferDrawRectangle (
     //
     // fill
     //
+    
+    if ( fill == TRUE ){
+        rect.is_empty = FALSE;
+    }
 
     // Draw lines on backbuffer.
 
     while (rect.height--){
-        lineBackbufferDrawHorizontalLine ( rect.left, rect.top, 
+        lineBackbufferDrawHorizontalLine ( 
+            rect.left, rect.top, 
             rect.right, rect.bg_color );
        
        rect.top++;

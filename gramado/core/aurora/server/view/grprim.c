@@ -275,6 +275,38 @@ int view (int near, int far)
 
 
 /*
+// #bugbug
+// Not tested.
+// negative numbers ??
+// #todo: inclue libc file.
+void 
+gr_clamp( 
+    struct gr_vec3D_d *vect, 
+    int min_value, 
+    int max_value);
+void 
+gr_clamp( 
+    struct gr_vec3D_d *vect, 
+    int min_value, 
+    int max_value)
+{
+    if ( (void*) vect == NULL ){
+        return;
+    }
+
+    vect->x = max(min_value, vect->x);
+    vect->y = max(min_value, vect->y);
+    vect->z = max(min_value, vect->z);
+        
+    vect->x = min(max_value, vect->x);
+    vect->y = min(max_value, vect->y);
+    vect->z = min(max_value, vect->z);
+}
+*/
+
+
+
+/*
  ******************************* 
  * grPlot0:
  *      plot pixel.

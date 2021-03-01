@@ -1,0 +1,27 @@
+
+
+	List of supported hardware and virtualized hardware:
+
+
+	=====================================
+	real machine:
+
+	Fred's machine
+	Motherboard: Gigabyte GA-VM900M
+	Chipset:     VIA
+	Processor:   Intel Core 2 Duo / E4500  
+
+
+	=====================================
+	qemu:
+
+
+	=====================================
+	virtualbox:
+
+	NIC:     Intel PRO/1000 MT Desktop (82540EM)
+	chipset: PIIX3 - PCI IDE ISA Xcelerator (PIIX)
+	IDE:     ICH6
+
+
+

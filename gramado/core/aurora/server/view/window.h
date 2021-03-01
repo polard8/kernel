@@ -189,6 +189,9 @@ struct gws_rect_d
     //estilo de design
     int style;
 
+    // Filled or not.
+    int is_empty;
+
     int dirty;
 
     // ??
@@ -200,7 +203,7 @@ struct gws_rect_d
     unsigned long width;
     unsigned long height;
 
-    unsigned long bg_color; //color_bg;
+    unsigned long bg_color;
 
 
     //Essa é  ajanela à qual o retângulo pertence.
@@ -957,8 +960,49 @@ gws_draw_button (
 
 
 
+int rect_validate_size( struct gws_rect_d *rect );
+int rect_validate_size2( struct gws_rect_d *rect );
+
+
+int 
+rect_contains_vertically ( 
+    struct gws_rect_d *rect,  
+    unsigned long y );
+    
+int 
+rect_contains_horizontally ( 
+    struct gws_rect_d *rect,
+    unsigned long x );
+
+
+
+void 
+rect_set_left ( 
+    struct gws_rect_d *rect, 
+    unsigned long value );
+
+void 
+rect_set_top ( 
+    struct gws_rect_d *rect, 
+    unsigned long value );
+
+void 
+rect_set_right ( 
+    struct gws_rect_d *rect, 
+    unsigned long value );
+
+void 
+rect_set_bottom ( 
+    struct gws_rect_d *rect, 
+    unsigned long value );
+
+
+
+
+int is_rect_null( struct gws_rect_d *rect );
 
 int is_rect_empty( struct gws_rect_d *rect );
+
 int is_rect_dirty( struct gws_rect_d *rect );
 
 
@@ -1036,8 +1080,7 @@ createwDrawFrame (
     int style );          
 
 
-void *
-createwCreateWindow2 ( 
+void *createwCreateWindow2 ( 
     unsigned long type, 
     unsigned long status, 
     unsigned long view, 
@@ -1058,8 +1101,7 @@ createwCreateWindow2 (
 //esse é o serviço de criação da janela.
 // talvez ampliaremos o número de argumentos
 
-void *
-createwCreateWindow ( 
+void *createwCreateWindow ( 
     unsigned long type, 
     unsigned long status, 
     unsigned long view, 
