@@ -93,6 +93,10 @@ void preinit_Globals(int arch_type)
     gdefShowProgressBar = TRUE;
     // ...
 
+    // Kernel symbol table.
+    // #todo: maybe we will load a kernel.map file.
+    g_kernel_symbols_available = FALSE;
+
 
     // #bugbug
     // Talvez esse endereço nao esteja acessivel ao kernel.

@@ -177,6 +177,7 @@ extern unsigned long stack0_krn_ptr;
 #include "hal/x86iv.h"
 #include "hal/x86gdt.h"
 #include "hal/cpuamd.h"
+#include "hal/dmi.h"
 #include "hal/detect.h"
 
 
@@ -618,6 +619,13 @@ unsigned long KernelPages;
 unsigned long KeInitPhase;
 unsigned long KernelStatus;
 //...
+
+
+//
+// symbol table
+//
+
+int g_kernel_symbols_available;
 
 
 //Task support variables.

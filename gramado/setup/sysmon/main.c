@@ -18,6 +18,15 @@
 int running = 1;
 
 
+// window list used 
+// in the data window.
+int totalSaved=0;
+struct window_d *CurrentWindow;
+struct window_d *wLabels;
+#define TOTAL_WINDOWS 32
+unsigned long windowList[TOTAL_WINDOWS];
+
+
 // Windows.
 struct window_d  *main_window;
 struct window_d  *client_window;
@@ -207,6 +216,8 @@ void test_cpu (struct window_d *window)
 void ShowInfoOnClientArea(void)
 {
 
+    struct window_d *window;
+
     char __pid_buffer[8];
     char __processname_buffer[64];
     char __priority_buffer[8];
@@ -218,58 +229,80 @@ void ShowInfoOnClientArea(void)
     unsigned long __process_priority=0;
     unsigned long __state=0;
 
- 
+
   
     //#todo
     //Criar um for para mostrar vários processos.
   
     //unsigned long x = 0;
-    unsigned long y = 32;
+    //unsigned long y = 32;
   
     // Labels
-    gde_draw_text ( data_window,    4, 8, COLOR_BLACK, "PID" );
-    gde_draw_text ( data_window,   40, 8, COLOR_BLACK, "Name" );
-    gde_draw_text ( data_window,  180, 8, COLOR_BLACK, "Prio" );     
-    gde_draw_text ( data_window,  220, 8, COLOR_BLACK, "State" );     
-    //...
-        
-    //for ( i=100; i<104; i++ )
-    for ( i=100; i<110; i++ )
+    window = (struct window_d *) wLabels;
+    if ( (void*) window == NULL ){ return; }
+    gde_draw_text ( window,    8, 8, COLOR_BLACK, "PID"   );
+    gde_draw_text ( window,   40, 8, COLOR_BLACK, "Name"  );
+    gde_draw_text ( window,  180, 8, COLOR_BLACK, "Prio"  );
+    gde_draw_text ( window,  220, 8, COLOR_BLACK, "State" );
+    // ...
+
+
+    // Onde começam os programas em usermode.
+    int Offset=100;
+    int tmpPID=0;
+    int total = (totalSaved+1);
+    if( total >= TOTAL_WINDOWS )
     {
+        //#debug
+        //printf("ShowInfoOnClientArea: total\n");
+        //return;
+        
+        total = TOTAL_WINDOWS;
+    }
+    for ( i=0; i<total; i++ )
+    {
+        tmpPID = (i+Offset);
+ 
         // get process name.
-        name_len = gde_getprocessname  ( i,  
+        name_len = gde_getprocessname( 
+                       tmpPID,
                        __processname_buffer, 
                        sizeof(__processname_buffer) );
         
         if (name_len>0)
         {
             //Get PID string
-            itoa(i, __pid_buffer); 
+            itoa ( tmpPID, __pid_buffer); 
             
             // get process priority
-            __process_priority = gde_get_process_stats (i,33);  
+            __process_priority = gde_get_process_stats (tmpPID,33);  
             itoa(__process_priority, __priority_buffer);
 
             // get process state
-            __state = gde_get_process_stats (i,5);  
+            __state = gde_get_process_stats (tmpPID,5);
             itoa(__state, __state_buffer);
 
-            //...
-        
-            gde_draw_text ( data_window,   4, y, 
-                COLOR_BLACK, (char *) __pid_buffer );
-            gde_draw_text ( data_window,  40, y, 
-                COLOR_BLACK, (char *) __processname_buffer );
-            gde_draw_text ( data_window, 180, y, 
-                COLOR_BLACK, (char *) __priority_buffer ); 
-            gde_draw_text ( data_window, 220, y, 
-                COLOR_BLACK, (char *) __state_buffer );      
-            //...
-    
-            //update y
-            y = (y+10);
+            // ...
+            
+            // começamos da 1, porque a 0 eh a labels.
+            window = (struct window_d *) windowList[ i+1 ];
+            if ( (void*) window != NULL )
+            { 
+                gde_draw_text ( window,  8,  8, 
+                    COLOR_BLACK, (char *) __pid_buffer );
+                gde_draw_text ( window,  40, 8, 
+                    COLOR_BLACK, (char *) __processname_buffer );
+                gde_draw_text ( window, 180, 8, 
+                    COLOR_BLACK, (char *) __priority_buffer ); 
+                gde_draw_text ( window, 220, 8, 
+                    COLOR_BLACK, (char *) __state_buffer ); 
+                // ...
+                // update y
+                // y = (y+10);
+            }
          }
     };
+
 
     // refresh screen
     gde_show_backbuffer ();
@@ -674,7 +707,66 @@ int main ( int argc, char *argv[] ){
     gde_exit_critical_section ();  
     //--
 
+    // ===========================================================
 
+    //
+    // Create some horizontal windows inside the data window.
+    //
+
+
+    int i=0;
+    
+    for(i=0; i<TOTAL_WINDOWS; i++){
+        windowList[i] = 0;
+    };
+
+    int Width  = dw_width;
+    int Height = 16;
+    int total = (dw_height/Height);
+    totalSaved = total;
+    total = (total+1);
+    unsigned long window_color=COLOR_WHITE;
+    if( total>=TOTAL_WINDOWS )
+    {
+        //#debug
+        //printf("sysmon: [FAIL] total\n");
+        //return 1;
+        
+        totalSaved = TOTAL_WINDOWS;
+        total = totalSaved+1;
+    } 
+    for( i=0; i < total; i++){
+    //++
+    // White window.
+    if(i==0){ window_color = COLOR_GRAY; }else{ window_color = COLOR_WHITE; };
+    gde_enter_critical_section ();  
+    CurrentWindow = (void *) gde_create_window ( 
+                               WT_SIMPLE, 1, 1, 
+                               "DataWindow",     
+                                0, (i*Height), Width, Height,  
+                                data_window, 0, 
+                                window_color, window_color );
+
+    if ( (void *) CurrentWindow == NULL){
+        printf ("CurrentWindow fail");
+        gde_show_backbuffer();
+        gde_exit_critical_section ();
+        while(1){}
+    }
+    
+    if(i==0){ wLabels = CurrentWindow; };   // primeira janela.
+    
+    windowList[i] = (unsigned long) CurrentWindow;
+    gde_register_window (CurrentWindow);
+    gde_show_window (CurrentWindow);
+
+    gde_exit_critical_section ();  
+    //--
+   
+    };
+
+
+    // ====================================================
 
     gde_set_focus(hWindow);
 

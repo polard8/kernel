@@ -10,6 +10,9 @@
 #include <kernel.h>
 
 
+// #todo
+// Comment the purpose of this routine.
+// It is used on socket communication.
 
 void sys_set_file_sync(int fd, int request, int data)
 {
@@ -50,6 +53,9 @@ void sys_set_file_sync(int fd, int request, int data)
         return (int) (-1);
     }
 
+    // #todo
+    // check validation
+
     // object
         
     object = (file *) p->Objects[fd];
@@ -60,7 +66,8 @@ void sys_set_file_sync(int fd, int request, int data)
         return (int) (-1);
     }
 
-    if( object->used != 1 || object->magic != 1234 )
+    if ( object->used != TRUE || 
+         object->magic != 1234 )
     {
         debug_print("sys_set_file_sync: validation\n");
         return (int) (-1);
@@ -80,8 +87,11 @@ void sys_set_file_sync(int fd, int request, int data)
 }
 
 
+// #todo
+// Comment the purpose of this routine.
+// It is used on socket communication.
 
-int sys_get_file_sync(int fd, int request)
+int sys_get_file_sync (int fd, int request)
 {
     struct process_d *p;
     file *object;
@@ -101,38 +111,40 @@ int sys_get_file_sync(int fd, int request)
 
     if ( fd < 0 || fd >= NUMBER_OF_FILES )
     {
-        debug_print("sys_set_file_sync: fd\n");
+        debug_print("sys_get_file_sync: fd\n");
         return (int) (-1);
     }
 
     // == Process ================
 
     if ( current_process < 0 ){
-        debug_print("sys_set_file_sync: current_process\n");
+        debug_print("sys_get_file_sync: current_process\n");
         return (int) (-1);
     }
 
     p = (void *) processList[current_process];
 
-    if ( (void *) p == NULL )
-    {
-        debug_print("sys_set_file_sync: p\n");
+    if ( (void *) p == NULL ){
+        debug_print("sys_get_file_sync: p\n");
         return (int) (-1);
     }
+
+    // #todo
+    // check validation
 
     // object
         
     object = (file *) p->Objects[fd];
 
-    if ( (void*) object == NULL )
-    {
-        debug_print("sys_set_file_sync: object\n");
+    if ( (void*) object == NULL ){
+        debug_print("sys_get_file_sync: object\n");
         return (int) (-1);
     }
 
-    if( object->used != 1 || object->magic != 1234 )
+    if ( object->used != TRUE || 
+         object->magic != 1234 )
     {
-        debug_print("sys_set_file_sync: validation\n");
+        debug_print("sys_get_file_sync: validation\n");
         return (int) (-1);
     }
 
@@ -323,12 +335,14 @@ int sys_ioctl ( int fd, unsigned long request, unsigned long arg )
 }
 
 
-//#todo: rever esses argumentos.
+// #todo: 
+// Rever esses argumentos.
 // SVr4, 4.3BSD, POSIX.1-2001. and more.
-//See: https://man7.org/linux/man-pages/man2/fcntl.2.html
+// See: 
+// https://man7.org/linux/man-pages/man2/fcntl.2.html
+
 int sys_fcntl ( int fd, int cmd, unsigned long arg )
 {
-
     debug_print ("sys_fcntl:\n");
 
 
@@ -549,9 +563,8 @@ int sys_close (int fd)
     file *object;
 
 
-
-    //#bugbug
-    // Pensaremos nessa possibilidade.
+    // ??
+    // Can we close this devices?
     
     /*
     if (fd == 0 || fd == 1 || fd == 2 )
@@ -565,117 +578,140 @@ int sys_close (int fd)
     if ( fd < 0 || fd >= NUMBER_OF_FILES )
     {
         debug_print("sys_close: fd\n");
-        return (int) (-1);
+        goto fail;
     }
 
     // Process.
 
     if ( current_process < 0 ){
         debug_print("sys_close: current_process\n");
-        return (int) (-1);
+        goto fail;
     }
 
     p = (void *) processList[current_process];
 
     if ( (void *) p == NULL ){
         debug_print("sys_close: p\n");
+        goto fail;
+    }
+
+    if ( p->used != TRUE || p->magic != 1234 )
+    {
+        debug_print("sys_close: p validation\n");
+        goto fail;
+    }
+
+    // object
+    // The object is a file structure.
+
+    object = (file *) p->Objects[fd];
+        
+    if ( (void *) object == NULL )
+    {
+        debug_print("sys_close: object\n");
         return (int) (-1);
-    }else{
+    }
 
-        // object
-        
-        object = (file *) p->Objects[fd];
-        
-        if ( (void *) object == NULL ){
-            debug_print("sys_close: object\n");
-            return (int) (-1);
-        }else{
+    if ( object->used != TRUE || object->magic != 1234 )
+    {
+        debug_print("sys_close: object validation\n");
+        goto fail;
+    }
 
-            // What type of object?
-            // socket, pipe, virtual console, tty, regular file ??
-            
-            //socket
-            if ( object->____object == ObjectTypeSocket )
-            {
-                debug_print("sys_close: Trying to close a socket object\n");
-                object = NULL;
-                p->Objects[fd] = (unsigned long) 0;
-                debug_print("sys_close: Done. socket closed!\n");
-                return 0;
-            }
 
-            //pipe
-            if ( object->____object == ObjectTypePipe )
-            {
-                debug_print("sys_close: Trying to close a pipe object\n");
-                object = NULL;
-                p->Objects[fd] = (unsigned long) 0;
-                debug_print("sys_close: Done. pipe closed!\n");
-                return 0;
-            }
-
-            // virtual console.
-            if ( object->____object == ObjectTypeVirtualConsole )
-            {
-                debug_print("sys_close: Trying to close a virtual console object\n");
-                //object = NULL;
-                //p->Objects[fd] = (unsigned long) 0;
-                debug_print("sys_close: [FIXME] trying to close a virtual console.\n");
-                return 0;
-            }
+    // What type of object?
+    // socket, pipe, virtual console, tty, regular file ??
  
-             // tty
-            if ( object->____object == ObjectTypeTTY )
-            {
-                debug_print("sys_close: Trying to close a tty object\n");
-                object = NULL;
-                p->Objects[fd] = (unsigned long) 0;
-                debug_print("sys_close: Done. tty closed!\n");
-                return 0;
-            }
+    // ===============================================
+    // socket
+    if ( object->____object == ObjectTypeSocket )
+    {
+        debug_print("sys_close: Trying to close a socket object\n");
+        object = NULL;
+        p->Objects[fd] = (unsigned long) 0;
+        debug_print("sys_close: [FIXME] Done\n");
+        return 0;
+    }
 
-            //#bugbug
-            //Poderemos ter problemas aqui com os diversos tipos
-            //de arquivos.
+    // ==============================================
+    // pipe
+    if ( object->____object == ObjectTypePipe )
+    {
+        debug_print("sys_close: Trying to close a pipe object\n");
+        object = NULL;
+        p->Objects[fd] = (unsigned long) 0;
+        debug_print("sys_close: [FIXME] Done\n");
+        return 0;
+    }
 
-            // #bugbug
-            // ugly test
-            
-            // regular file
-            if ( object->____object == ObjectTypeFile )
-            {
-                debug_print("sys_close: [FIXME] trying to close a regular file\n");
 
-                debug_print("sys_close: [FIXME] fsSaveFile\n");
+    // ====================================================
+    // virtual console.
+    if ( object->____object == ObjectTypeVirtualConsole ){
+        debug_print("sys_close: Trying to close a virtual console object\n");
+        return 0;
+    }
+ 
+    // =====================================================
+    // tty
+    if ( object->____object == ObjectTypeTTY )
+    {
+        debug_print("sys_close: Trying to close a tty object\n");
+        object = NULL;
+        p->Objects[fd] = (unsigned long) 0;
+        debug_print("sys_close: [FIXME] Done\n");
+        return 0;
+    }
+
+    // #bugbug
+    // Poderemos ter problemas aqui com os diversos tipos
+    // de arquivos.
+
+    // #bugbug
+    // ugly test
+
+    // ===========================================
+    // regular file
+    if ( object->____object == ObjectTypeFile )
+    {
+        debug_print("sys_close: [FIXME] trying to close a regular file\n");
+        debug_print("sys_close: [FIXME] fsSaveFile\n");
                 
-                // #fixme: buffer limit
-                if (object->_lbfsize < 512){  object->_lbfsize = 512;  }
+        // #fixme: buffer limit
+        if (object->_lbfsize < 512)
+        {  
+            debug_print("sys_close: [FIXME] Ajusting file size\n");
+            object->_lbfsize = 512; 
+        }
 
-                fsSaveFile ( 
-                    VOLUME1_FAT_ADDRESS, 
-                    VOLUME1_ROOTDIR_ADDRESS, 
-                    FAT16_ROOT_ENTRIES,
-                    (char *)         object->_tmpfname, 
-                    (unsigned long)  (object->_lbfsize/512),  // file_size, in sectors       
-                    (unsigned long)  object->_lbfsize,        // size_in_bytes,  
-                    (char *)         object->_base,           // buffer address          
-                    (char)           0x20 );                  // flag ??
+        // Save file in the root dir.
+        // #bugbug: Where to save?
 
-                object = NULL;
-                p->Objects[fd] = (unsigned long) 0;
-                debug_print("sys_close: [FIXME] Done. Closing regular file\n");
-                return 0;
-            }
-            
-            debug_print("sys_close:[FAIL] Object type not supported yet \n");
-            return -1;
-        };
-        
-        debug_print("sys_close: [ERROR] Something is wrong\n");
-    };
+        fsSaveFile ( 
+            VOLUME1_FAT_ADDRESS, 
+            VOLUME1_ROOTDIR_ADDRESS, 
+            FAT16_ROOT_ENTRIES,
+            (char *)         object->_tmpfname, 
+            (unsigned long) (object->_lbfsize/512),  // file_size, in sectors       
+            (unsigned long)  object->_lbfsize,       // size_in_bytes,  
+            (char *)         object->_base,          // buffer address          
+            (char)           0x20 );                 // flag ??
 
+        object = NULL;
+        p->Objects[fd] = (unsigned long) 0;
+        debug_print("sys_close: [FIXME] Done\n");
+        return 0;
+    }
+
+    //
+    // Object type not supported.
+    //
+    
+    debug_print("sys_close:[FAIL] Object type not supported yet \n");
+
+fail:
     debug_print("sys_close: [FAIL] \n");
-    return -1;
+    return (int) (-1);
 }
 
 
@@ -2161,6 +2197,7 @@ int sys_fork (void)
     // #todo
     // We need to change this name. fork() will be used only on ring3.
     // See: gramado/kernel/middle/sysmk/ps/action/threadi.c
+
     return (int) kfork();
 }
 
@@ -2170,7 +2207,7 @@ int sys_fork (void)
 //serviço do sistema.
 
 void sys_exit_process ( int pid, int code ){
-	
+
     if ( pid < 0 ){
         //todo: message
         return;
@@ -2347,58 +2384,58 @@ void sys_shutdown (void)
 // 178
 unsigned long sys_get_file_size ( char *path ){
 
-    unsigned long __size=0;
+    unsigned long Size=0;
+
+
+    if ( (void*) path == NULL ){
+        debug_print("sys_get_file_size: [FAIL] path\n");
+        return 0;
+    }
+
+    if ( *path == 0 ){
+        debug_print("sys_get_file_size: [FAIL] *path\n");
+        return 0;
+    }
+
+
+    taskswitch_lock();
+    scheduler_lock();
     
-    //#todo
-    // Checar a validade do ponteiro de string
-    // passado via argumento.
+    Size = (unsigned long) fsRootDirGetFileSize ( (unsigned char *) path ); 
     
-    taskswitch_lock ();
-    scheduler_lock ();
+    scheduler_unlock();
+    taskswitch_unlock();
     
-    __size = (unsigned long) fsRootDirGetFileSize ( (unsigned char *) path ); 
-    
-    scheduler_unlock ();
-    taskswitch_unlock ();
-    
-    return (unsigned long) __size; 
+    return (unsigned long) Size; 
 }
 
 
 // Usada por vários serviços de debug.
 // Usada para debug.
+
 void sys_show_system_info ( int n ){
 
     if (n<0){
-        //todo: message
+        debug_print("sys_show_system_info: [FAIL] n\n");
         return;
     }
 
+    switch (n){
 
-    switch (n)
-    {
-        case 1:
-            disk_show_info();
-            break;
-
-        case 2:
-            volume_show_info();
-            break;
-
-        case 3:
-            memoryShowMemoryInfo();
-            break;
-
+        case 1:  disk_show_info();        break;
+        case 2:  volume_show_info();      break;
+        case 3:  memoryShowMemoryInfo();  break;
+        
         case 4:
             systemShowDevicesInfo();
             pciInfo();
             break;
             
-        case 5:
-            KiInformation ();
+        case 5:  
+            KiInformation(); 
             break;
         
-        //See: detect.c
+        // See: detect.c
         case 6:
             show_cpu_info();
             break;
@@ -2406,8 +2443,7 @@ void sys_show_system_info ( int n ){
         // ...
     };
 
-
-    refresh_screen ();
+    refresh_screen();
 }
 
 

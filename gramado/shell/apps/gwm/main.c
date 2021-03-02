@@ -10,6 +10,12 @@
  * 2020 - Created by Fred Nora.
  */
 
+
+// #todo
+// #important
+// You select an item by releasing the button over the menu item.
+
+
 // Connecting via AF_INET.
 
 // tutorial example taken from. 
@@ -206,16 +212,22 @@ void test_create_menu ( int fd, int window )
     menu = gws_create_menu (
                 (int) fd,
                 (int) window,
-                (int) 0,            //highlight
-                (int) 4,            //count
-                (unsigned long) menuX,  //x
-                (unsigned long) menuY,
+                (int) 0,                // highlight
+                (int) 4,                // count
+                (unsigned long) menuX,  // x
+                (unsigned long) menuY,  // y
                 (unsigned long) 300,
                 (unsigned long) 300,
                 (unsigned long) COLOR_WINDOW );
 
-    if ((void*) menu == NULL)
+    if ((void*) menu == NULL){
         return -1;
+    }
+ 
+ 
+    // #todo
+    // Check in the lib if the function returns something.
+    // It is good to return some pointer to menuitem struct.
  
   
     //menu item
