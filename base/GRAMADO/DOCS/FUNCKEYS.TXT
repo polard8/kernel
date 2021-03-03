@@ -1,0 +1,14 @@
+
+	Design note sobre o uso de teclas de funções:
+
+	O plano é que as teclas F1, F2, F3 e F4 sejam usadas
+	para tomadas de decisões mais recorrentes e simples.
+	Podendo elas serem representações dos botões virtuais
+	presentes nos diálogos.
+
+	Para qualquer tipo de diálogo recorrente, devemos
+	usar essas teclas de função representando as opções
+	do diálogo na mesma ordem das teclas de função.
+	Podemos chamá-las de teclas de diálogo.
+
+

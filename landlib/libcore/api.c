@@ -404,12 +404,18 @@ gde_message_box (
     char *string2 )
 {
 
-    struct window_d *hWnd;    // Window.
     int Response = 0;
 
-    int running = 1;          // Loop.
+    // Loop
+    int running = TRUE;
 
+    // Window
 
+    struct window_d  *hWnd;
+
+    int WindowType = WT_SIMPLE;
+
+    // Device
     unsigned long deviceWidth  = gde_get_system_metrics(1); 
     unsigned long deviceHeight = gde_get_system_metrics(2);
 
@@ -444,14 +450,14 @@ gde_message_box (
     
     int Button = 0;
 
-    // Colors;
-    unsigned long WindowClientAreaColor=0;
-    unsigned long WindowColor=0;
+    // Colors
 
+    unsigned long WindowClientAreaColor = COLOR_WHITE;
+    unsigned long WindowColor           = COLOR_WHITE;
 
-    // Colors.
     WindowClientAreaColor = xCOLOR_GRAY3;
     WindowColor           = COLOR_TERMINAL2;
+
 
     // Seleciona o botão 1. first responder;
     __mb_current_button = 1;
@@ -494,7 +500,7 @@ gde_message_box (
     // Qual eh o tipo de message box.
     switch (type){
 
-        // fail
+        // #todo
         case 1:
         case 2:
             printf ("message box type not supported\n");
@@ -503,6 +509,7 @@ gde_message_box (
 
         // ok
         case 3:
+            WindowType = WT_OVERLAPPED;
             goto do_create_messagebox_3;
             break;
 
@@ -525,12 +532,16 @@ do_create_messagebox_3:
     // #bugbug
     // Check NULL pointers.
 
+    //
+    // Main window
+    //
+
     //++
     // The main window.
     gde_enter_critical_section ();
     
     hWnd = (void *) gde_create_window ( 
-                        WT_OVERLAPPED, 1, 1, string1, 
+                        WindowType, 1, 1, string1, 
                         x, y, cx, cy, 
                         NULL, 0, 
                         WindowClientAreaColor, WindowColor );
@@ -549,7 +560,7 @@ do_create_messagebox_3:
             (struct window_d *) hWnd,
             1*(cx/16), 1*(cy/3), COLOR_WHITE, string2 );
 
-        gde_show_window (hWnd);
+        // gde_show_window (hWnd);
     };
 
     gde_exit_critical_section ();
@@ -567,15 +578,16 @@ do_create_messagebox_3:
 	//unsigned long app1Top = ( (ScreenHeight/10) * 8); 
 	//unsigned long app2Top = app1Top; 
 
-
+    // #test
+    // Message box only needs one button. [OK]
 
     //++
-	// button 1
+    // button 1 - [OK]
     gde_enter_critical_section ();
 
     messagebox_button1 = (void *) gde_create_window ( 
                                       WT_BUTTON, 1, 1, "[F1] OK", 
-                                      ((cx/2)*1), ((cy/8)*6), (cx/2), 24,
+                                      ((cx/3)*2), ((cy/8)*6), (cx/3)-8, 24,
                                       hWnd, 0, 
                                       xCOLOR_GRAY1, xCOLOR_GRAY1 );
 
@@ -584,51 +596,15 @@ do_create_messagebox_3:
         return (int) -1;
     }else{
         gde_register_window (messagebox_button1); 
-        gde_show_window (messagebox_button1);
+        //gde_show_window (messagebox_button1);
     };
 
-    gde_exit_critical_section ();
-    //--
-
-
-
-    // #test
-    // Message box only needs one button. [OK]
-
-    /*
-    //++
-	// button 2
-	gde_enter_critical_section ();
-
-	messagebox_button2 = (void *) gde_create_window ( 
-	                                  WT_BUTTON, 1, 1, "[F2] CANCEL",     
-                                      ((cx/2)*1), ((cy/8)*6), (cx/2), 24,    
-                                      hWnd, 0, 
-                                      xCOLOR_GRAY1, xCOLOR_GRAY1 );
-
-    if ( (void *) messagebox_button2 == NULL ){
-        printf (" CANCEL button fail \n");
-        return (int) -1;
-    }else{
-        gde_register_window (messagebox_button2); 
-        gde_show_window (hWnd);
-    };
-    
     gde_exit_critical_section();
     //--
-    */
 
+    // Show the main window.
+    gde_show_window (hWnd);
 
-
-
-
-    // string
-    // apiDrawText ( (struct window_d *) hWnd,
-    //    1*(cx/16), 1*(cy/3), COLOR_WINDOWTEXT, string1 );	
-
-    // #sustenso:
-    // Show window.
-    // apiShowWindow (hWnd);
 
 // == Message loop ===============================================
 
@@ -844,15 +820,26 @@ mbProcedure (
  */
 
 
-
-int gde_dialog_box ( int type, char *string1, char *string2 )
+int 
+gde_dialog_box ( 
+    int type, 
+    char *string1, 
+    char *string2 )
 {
     int Response = 0;
-    int running = 1;
 
-    struct window_d *hWnd;    //Window.
-    struct window_d *pWnd;    //Parent.
-    struct window_d *bWnd;    //Button.
+    // Loop
+    int running = TRUE;
+
+    // Windows: main and parent.
+
+    struct window_d  *hWnd;
+    struct window_d  *pWnd;
+
+    // Button
+    struct window_d *bWnd;
+
+    // Device
 
     unsigned long deviceWidth  = gde_get_system_metrics(1); 
     unsigned long deviceHeight = gde_get_system_metrics(2);
@@ -886,12 +873,14 @@ int gde_dialog_box ( int type, char *string1, char *string2 )
 
     int Button = 0;
 
-    // Color
-    unsigned long WindowClientAreaColor=0;
-    unsigned long WindowColor=0;
+    // Colors
 
-    WindowClientAreaColor = COLOR_YELLOW;
-    WindowColor           = COLOR_PINK;
+    unsigned long WindowClientAreaColor = COLOR_WHITE;
+    unsigned long WindowColor           = COLOR_WHITE;
+
+    WindowClientAreaColor = xCOLOR_GRAY3;
+    WindowColor           = COLOR_TERMINAL2;
+
 
     gde_debug_print ("gde_dialog_box:\n");
 
@@ -917,6 +906,10 @@ int gde_dialog_box ( int type, char *string1, char *string2 )
     }
 
 
+    //
+    // Draw main window
+    //
+
     // Obs: 
     // Por enquanto para todos os tipos de messagebox 
     // estamos usando o mesmo tipo de janela.
@@ -932,7 +925,7 @@ int gde_dialog_box ( int type, char *string1, char *string2 )
             hWnd = (void *) gde_create_window (  
                                WT_SIMPLE, 1, 1, string1, 
                                x, y, cx, cy, NULL, 0, 
-                               WindowClientAreaColor, WindowColor); 
+                               WindowClientAreaColor, WindowColor );
             if ( (void *) hWnd == NULL )
             {  
                 gde_end_paint ();
@@ -942,6 +935,8 @@ int gde_dialog_box ( int type, char *string1, char *string2 )
             gde_end_paint ();
 
             gde_register_window(hWnd);
+            
+            // ?? cuidado
             gde_set_active_window(hWnd);
             gde_set_focus(hWnd);
             break;
@@ -952,7 +947,7 @@ int gde_dialog_box ( int type, char *string1, char *string2 )
             hWnd = (void*) gde_create_window ( 
                                WT_POPUP, 1, 1, string1, 
                                x, y, cx, cy, NULL, 0, 
-                               WindowClientAreaColor, WindowColor); 
+                               WindowClientAreaColor, WindowColor );
             break;
 
 
@@ -963,7 +958,7 @@ int gde_dialog_box ( int type, char *string1, char *string2 )
             hWnd = (void*) gde_create_window ( 
                                WT_OVERLAPPED, 1, 1, "Alert", 
                                x, y, cx, cy, NULL, 0, 
-                               WindowClientAreaColor, WindowColor ); 
+                               WindowClientAreaColor, WindowColor );
             break;
 
         // Com botão, título de mensagem do sistema.
@@ -972,7 +967,7 @@ int gde_dialog_box ( int type, char *string1, char *string2 )
             hWnd = (void*) gde_create_window ( 
                                WT_OVERLAPPED, 1, 1, "System Message", 
                                x, y, cx, cy, NULL, 0, 
-                               WindowClientAreaColor, WindowColor); 
+                               WindowClientAreaColor, WindowColor );
             break;
 
         // Tipo negligenciado. Usamos o formato padrão.	
@@ -981,15 +976,15 @@ int gde_dialog_box ( int type, char *string1, char *string2 )
             hWnd = (void*) gde_create_window ( 
                                WT_OVERLAPPED, 1, 1, "Error", 
                                x, y, cx, cy, NULL, 0, 
-                               WindowClientAreaColor, WindowColor); 
+                               WindowClientAreaColor, WindowColor );
             break;
     };
 
 
-	//
-	// button
-	//
-	
+    //
+    // Buttons
+    //
+
 	//obs: o procedure vai precisar dos botões então tem que declarar global.
 	
 	//unsigned long app1Left = ((ScreenWidth/8) * 2);
@@ -1000,10 +995,10 @@ int gde_dialog_box ( int type, char *string1, char *string2 )
 
 
     // =========
-    // button 1 
+    // button 1 - [OK]
     dialogbox_button1 = (void *) gde_create_window ( 
                                      WT_BUTTON, 1, 1, "OK", 
-                                     (cx/3), ((cy/8)*5), 80, 24,
+                                     ((cx/3)*2), ((cy/8)*6), (cx/3)-8, 24,
                                      hWnd, 0, 
                                      xCOLOR_GRAY1, xCOLOR_GRAY1 );
 
@@ -1014,12 +1009,11 @@ int gde_dialog_box ( int type, char *string1, char *string2 )
         gde_register_window (dialogbox_button1);
     };
 
-
     // ============
-    // button 2
+    // button 2 - [CANCEL]
     dialogbox_button2 = (void *) gde_create_window ( 
-                                     WT_BUTTON, 1, 1, "CANCEL",     
-                                     ((cx/3)*2), ((cy/8)*5), 80, 24,    
+                                     WT_BUTTON, 1, 1, "CANCEL",
+                                     ((cx/3)*1), ((cy/8)*6), (cx/3)-8, 24,
                                      hWnd, 0, 
                                      xCOLOR_GRAY1, xCOLOR_GRAY1 );
 
@@ -1038,7 +1032,11 @@ int gde_dialog_box ( int type, char *string1, char *string2 )
         1*(cx/16), 1*(cy/3), 
         COLOR_WHITE, string1 );
 
-    gde_show_window (hWnd);
+
+    // At the end, we simply show the main window.
+
+    gde_show_window(hWnd);
+
 
 // ================================
 // event loop

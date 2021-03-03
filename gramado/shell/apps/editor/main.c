@@ -1030,7 +1030,7 @@ int main ( int argc, char *argv[] ){
     client_window = gws_create_window (client_fd,
         WT_EDITBOX,1,1,"client",
         4, 32 +40, 
-        (w_width -4 -2), ( w_height -32 - 40 -4 ),
+        (w_width -4 -4), ( w_height -32 - 40 -4 ),
         main_window,0,COLOR_WHITE, COLOR_WHITE);
 
     if ( client_window < 0 ) 
