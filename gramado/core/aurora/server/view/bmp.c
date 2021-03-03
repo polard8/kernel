@@ -465,7 +465,7 @@ fail:
  *     x       = posicionamento 
  *     y       = posicionamento
  *
- *	// @todo: Criar defines para esses deslocamentos.
+ *     @todo: Criar defines para esses deslocamentos.
  */
 
 int 
@@ -509,7 +509,10 @@ bmpDisplayBMP (
 
 
     // Limits
-    // #todo: Get system metrics.
+
+    // #todo: 
+    // Get system metrics.
+
     xLimit = 800;
     yLimit = 600;
 
@@ -526,7 +529,7 @@ bmpDisplayBMP (
 
 
     // #todo:
-    // Testar validade do endere�o.
+    // Testar validade do endereço.
     if ( address == 0 ){
         gwssrv_debug_print ("bmpDisplayBMP: address fail \n");
         printf             ("bmpDisplayBMP: address fail \n");
@@ -761,7 +764,7 @@ bmpDisplayBMP (
             };
 
             // >> 256 cores
-            // Pr�ximo pixel para 8bpp
+            // Próximo pixel para 8bpp
             if ( bi->bmpBitCount == 8 )
             {   
                 offset = base;
@@ -795,12 +798,11 @@ bmpDisplayBMP (
                 c[3] = c[3] & 0x1F;        // 0000 0000 '0001 1111' 
 
                 base = base + 2; 
-            };
+            }
 
-
-            // Pr�ximo pixel para 24bpp.
+            // Próximo pixel para 24bpp.
             if ( bi->bmpBitCount == 24 )
-            {  
+            { 
                 c[0] = 0; //A
 
                 offset = base;
@@ -812,11 +814,11 @@ bmpDisplayBMP (
                 offset = base+2;
                 c[3] = bmp[offset];
 
-                base = base + 3;    
-            };
+                base = base + 3; 
+            }
 
 
-            // Pr�ximo pixel para 32bpp.
+            // Próximo pixel para 32bpp.
             if ( bi->bmpBitCount == 32 )
             {
                 c[0] = 0;  //A
@@ -831,7 +833,7 @@ bmpDisplayBMP (
                 c[3] = bmp[offset];
 
                 base = base + 4;    
-            };
+            }
 
 			//
 			// # Put pixel #
@@ -841,7 +843,7 @@ bmpDisplayBMP (
 			//no formato 0xaarrggbb ... 
 			//Agora se a flag de mascara estiver selecionada,
 			//ent�o devemos ignora o pixel e n�o pint�-lo.	
-			
+
             switch (bmp_change_color_flag)
             {
 				//1000
@@ -867,7 +869,7 @@ bmpDisplayBMP (
 						    //(unsigned long) bottom, 
 						    //0 );
 
-                    };
+                    }
                     break;
 
 				//2000	
@@ -879,8 +881,8 @@ bmpDisplayBMP (
                 case BMP_CHANGE_COLOR_SUBSTITUTE:
                     if ( color == bmp_selected_color )
                     {
-
-                        pixelBackBufferPutpixel ( (unsigned long) bmp_substitute_color, 
+                        pixelBackBufferPutpixel ( 
+                            (unsigned long) bmp_substitute_color, 
                             (unsigned long) left, 
                             (unsigned long) bottom );
 
@@ -894,9 +896,10 @@ bmpDisplayBMP (
 						//    (unsigned long) bottom, 
 						//     0 );
 
-                    } else {
+                    }else{
 
-                        pixelBackBufferPutpixel ( (unsigned long) bmp_substitute_color, 
+                        pixelBackBufferPutpixel ( 
+                            (unsigned long) bmp_substitute_color, 
                             (unsigned long) left, 
                             (unsigned long) bottom );
 
@@ -915,12 +918,14 @@ bmpDisplayBMP (
 
                 // ...
 
-				// 0 and default
-				// Pintamos normalmente a cor atual.
+                // 0 and default
+                // Pintamos normalmente a cor atual.
+
                 case BMP_CHANGE_COLOR_NULL:
                 default:
 
-                    pixelBackBufferPutpixel ( (unsigned long) bmp_substitute_color, 
+                    pixelBackBufferPutpixel( 
+                        (unsigned long) bmp_substitute_color, 
                         (unsigned long) left, 
                         (unsigned long) bottom );
 
@@ -937,14 +942,17 @@ bmpDisplayBMP (
                     break;
             };
 
-			// Pr�ximo pixel.
+            // next pixel
+
             left++; 
         };
 
-		// Vamos para a linha anterior.
+        // Vamos para a linha anterior.
+
         bottom = (bottom-1);
 
-		// Reiniciamos o x.
+        // Reiniciamos o x.
+
         left = x;    
     };
 
@@ -957,34 +965,32 @@ bmpDisplayBMP (
 	//    printf("\n");
 	//    for( p=0; p<16; ++p )
 	//    {
-	//	   printf("%x\n",palette[p]);
+	//        printf("%x\n",palette[p]);
 	//    }
 	//    printf("\n");
 	//};
 
 
 done:
-    
+
     gws_refresh_rectangle (X,Y,Width,Height);
-        
+
     // #debug
     gwssrv_debug_print ("bmpDisplayBMP: done \n");
     //printf            ("bmpDisplayBMP: done \n");
     //printf("w={%d} h={%d}\n", bi->bmpWidth, bi->bmpHeight );
-    
     return 0;
 
 fail:
     gwssrv_debug_print ("bmpDisplayBMP: Fail \n");
     printf             ("bmpDisplayBMP: Fail \n");
-    
     return (int) 1;
     //return (int) -1;
 }
 
 
-//mostra no lfb
-//levando em considera��o tratamento de transpar�ncia.
+// mostra no lfb
+// levando em consideraçao tratamento de transparencia.
 
 // #todo: precisamos de put pixel direto no lfb.
 /*
@@ -1072,56 +1078,117 @@ bmpDisplayCursorBMP (
 */
 
 
+/*
+ * gwssrv_get_system_icon:
+ *     Get an address to a shared memory buffer
+ * where there is an icon previously loaded by the kernel.
+ * 
+ */
 
+// Called by gwssrv_display_system_icon.
 
-//funciona
-//void __test_load_bmp2(void)
-int gwssrv_display_system_icon ( int index, unsigned long x, unsigned long y )
+void *gwssrv_get_system_icon (int n)
 {
-	
-	//testando um endereço compartilhado.
-	//o icone foi carregado pelo kernel.
-    char *bmp_buffer;
-    
-    
-    
-    //#todo: limits for x and y.
-    
-    //bmp_buffer =  gramado_system_call (9100,1,1,1);
-    //bmp_buffer =  gramado_system_call (9100,2,0,0);    
-    
-    bmp_buffer = gwssrv_get_system_icon(index);
-    //bmp_buffer = gwssrv_get_system_icon(2);
-    //...
-    
-    if ( (void *) bmp_buffer == NULL ){
-        printf ("gwssrv: gwssrv_display_system_icon: bmp_buffer fail\n");
+    if (n<0){
+        return NULL;
+    }
+
+    return (void *) gramado_system_call(9100,n,n,n);
+}
+
+
+/*
+ * gwssrv_display_system_icon:
+ * 
+ * 
+ */
+ 
+// Called by createwDrawFrame on createw.c
+
+int 
+gwssrv_display_system_icon ( 
+    int index, 
+    unsigned long x, 
+    unsigned long y )
+{
+
+    int RefreshScreen= FALSE;
+
+    // Shared memory
+    // Um endereço compartilhado onde o ícone
+    // foi carregado pelo kernel.
+
+    char *sm_buffer;
+
+    // #todo: 
+    // limits for x and y.
+
+
+
+
+    //
+    // Get buffer address.
+    //
+
+    sm_buffer = (char *) gwssrv_get_system_icon(index);
+    //sm_buffer = gwssrv_get_system_icon(2);
+    // ...
+
+    //
+    // check
+    //
+
+    // Check pointer validation
+
+    if ( (void *) sm_buffer == NULL )
+    {
+        printf ("gwssrv_display_system_icon: bmp_buffer fail\n");
         return -1;
     }
 
+    // Check BM header.
 
-    if ( bmp_buffer[0] != 'B' || bmp_buffer[1] != 'M' )
+    if ( sm_buffer[0] != 'B' || sm_buffer[1] != 'M' )
     {
-        printf (">>>> %c %c\n",&bmp_buffer[0],&bmp_buffer[1]);
-        gwssrv_debug_print ("gwssrv: gwssrv_display_system_icon SIG FAIL \n");
-        printf("gwssrv_display_system_icon: *hang1\n");
+        // #debug
+
+        gwssrv_debug_print ("gwssrv_display_system_icon: [FAIL] header\n");
+        printf             ("gwssrv_display_system_icon: [FAIL] header\n");
+
+        printf ("gwssrv_display_system_icon: %c %c\n", 
+            &sm_buffer[0], 
+            &sm_buffer[1] );
+
+
+        // #debug
+        // Show the whole screen if fail
         gws_show_backbuffer();
+        
+        //return -1;
         while(1);
     }
 
+    // Check BM header. Again.
 
-    if ( bmp_buffer[0] == 'B' && bmp_buffer[1] == 'M' )
+    if ( sm_buffer[0] == 'B' && sm_buffer[1] == 'M' )
     {
-		
-    //#flags
+        // #flags
         bmp_change_color_flag = BMP_CHANGE_COLOR_TRANSPARENT;
         //bmp_change_color_flag = BMP_CHANGE_COLOR_SUBSTITUTE;
         //bmp_change_color_flag = BMP_CHANGE_COLOR_NULL;
         bmp_selected_color = COLOR_WHITE;
 
+        // Decode on backbuffer ?
  
-        bmpDisplayBMP ((char *) bmp_buffer, (unsigned long) x, (unsigned long) y);    
-        //gde_display_bmp((char *)bmp_buffer, (unsigned long) 80, (unsigned long) 80); 
+        // See:
+        // ??
+        
+        bmpDisplayBMP( 
+            (char *) sm_buffer, 
+            (unsigned long) x, 
+            (unsigned long) y ); 
+
+        //gde_display_bmp((char *)sm_buffer, (unsigned long) 80, (unsigned long) 80); 
     }
     
      //#debug
@@ -1129,17 +1196,12 @@ int gwssrv_display_system_icon ( int index, unsigned long x, unsigned long y )
      
      // #bugbug #todo
      // We need to use the routine to refresh the rectangle.
-     gws_show_backbuffer();
-     //while(1);
+     
+     if (RefreshScreen == TRUE){
+         gws_show_backbuffer();
+     }
      
      return 0;
-}
-
-
-
-void *gwssrv_get_system_icon (int n)
-{
-    return (void *) gramado_system_call (9100,n,n,n);
 }
 
 

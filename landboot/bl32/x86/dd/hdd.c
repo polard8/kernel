@@ -166,13 +166,15 @@ pio_rw_sector (
 
     unsigned long tmplba = (unsigned long) lba;
 
-	//#bugbug
-	//só funcionaram as portas 0 e 2.
-	//para primary e secondary.
+	// #bugbug
+	// só funcionaram as portas 0 e 2.
+	// para primary e secondary.
 
-	if ( port < 0 || port >= 4 )
-		return -1;
-
+    if ( port < 0 || port >= 4 )
+    {
+        // #todo: Message
+        return -1;
+    }
 
 	//Selecionar se é master ou slave.
 	//outb (0x1F6, slavebit<<4)
@@ -182,37 +184,44 @@ pio_rw_sector (
 	//5	1	Always set.
 	//6	LBA	Uses CHS addressing if clear or LBA addressing if set.
 	//7	1	Always set.
-	
+
 	//0x01F6 ; Port to send drive and bit 24 - 27 of LBA
-	tmplba = tmplba >> 24;	
-	
+
+    tmplba = tmplba >> 24;
+
+
 	// no bit 4.
 	// 0 = master 
 	// 1 = slave
 	
 	//master. bit 4 = 0
-	if (slave == 0)
-	{
-		tmplba = tmplba | 0x000000E0;    //1110 0000b;
-	}
-	
+    if (slave == 0)
+    {
+        tmplba = tmplba | 0x000000E0;    //1110 0000b;
+    }
+
 	//slave. bit 4 = 1
-	if (slave == 1)
-	{
-		tmplba = tmplba | 0x000000F0;    //1111 0000b;
-	}
+    if (slave == 1)
+    {
+        tmplba = tmplba | 0x000000F0;    //1111 0000b;
+    }
 
-    out8 ( (int) ide_ports[port].base_port + 6 , (int) tmplba );
+    out8( 
+        (int) ( ide_ports[port].base_port + 6 ), 
+        (int) tmplba );
 
-      
-    //testando
+
+    // testando
     //out8 ( (int) ide_ports[port].base_port + 6, (int) 0xE0 | (master << 4) | ((tmplba >> 24) & 0x0F));
     
-  	
+ 
 	//0x01F2 ; Port to send number of sectors
-	out8 ( (int) ide_ports[port].base_port + 2 , (int) 1 );
-	
-	
+    
+    out8( 
+        (int) ( ide_ports[port].base_port + 2 ), 
+        (int) 1 );
+
+
 	//0x1F3  ; Port to send bit 0 - 7 of LBA
 	tmplba = lba;
 	tmplba = tmplba & 0x000000FF;	
@@ -257,56 +266,67 @@ pio_rw_sector (
 
 again:
 
-	c = (unsigned char) in8 ( (int) ide_ports[port].base_port + 7);
+    c = (unsigned char) in8( (int) ide_ports[port].base_port + 7);
 
-	c = ( c & 8 );
+    // Select a bit.
 
-	if ( c == 0 )
-	{
-		timeout--;
-		if ( timeout == 0 )
-		{
-			printf ("rw sector timeout fail.\n");
-			return -3;
-		}
-		
-	   // #bugbug: 
-	   // Isso pode enrroscar aqui.
-	   goto again;
-	}
-	
-	
-	switch (rw)
-	{
-		//read
-		case 0x20:
-		    hdd_ata_pio_read ( (int) port, (void *) buffer, (int) 512 );
-		    break;
+    c = ( c & 8 );
 
-		//write
-		case 0x30:
-		    hdd_ata_pio_write ( (int) port, (void *) buffer, (int) 512 );
+    if ( c == 0 )
+    {
+        timeout--;
+        if ( timeout == 0 )
+        {
+            printf ("pio_rw_sector: [FAIL] rw sector timeout\n");
+            return -3;
+        }
 
-            //Flush Cache
-    
-	        //ata_cmd_write(p,ATA_CMD_FLUSH_CACHE);
-	        hdd_ata_cmd_write( (int) port, (int) ATA_CMD_FLUSH_CACHE );
-            hdd_ata_wait_not_busy(port);
-            if ( hdd_ata_wait_no_drq(port) != 0)
-	        {
-                return -1;
-            }
+        // #bugbug: 
+        // Isso pode enrroscar aqui.
+        
+        goto again;
+    }
+
+    //
+    // read or write.
+    //
+
+    switch (rw){
+
+        // read
+        case 0x20:
+            hdd_ata_pio_read ( 
+                (int)    port, 
+                (void *) buffer, 
+                (int)    512 );
+            return 0;
             break;
 
+        // write
+        case 0x30:
+ 
+            hdd_ata_pio_write ( 
+                (int)    port, 
+                (void *) buffer, 
+                (int)    512 );
 
-		//fail
+            //Flush Cache
+            hdd_ata_cmd_write( (int) port, (int) ATA_CMD_FLUSH_CACHE );
+            hdd_ata_wait_not_busy(port);
+            if ( hdd_ata_wait_no_drq(port) != 0)
+            {
+                // #todo: Message.
+                return -1;
+            }
+            return 0;
+            break;
 
-		default:
+        // fail
+        default:
             printf ("pio_rw_sector: fail *hang");
-			die ();
-			break;
-	};
-
+            die();
+            break;
+    };
 
     return 0;
 }

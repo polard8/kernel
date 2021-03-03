@@ -228,12 +228,13 @@ CPS|L,     0,     0,     0,     0,     0,     0,     0,		/* scan 64-71 */
 
 
 /*
+ *************************************************
  * keyboardHandler:
+ * 
  *     Keyboard interrupt handler. 
- *     A interrupcao de teclado vai chamar isso.
  */
- 
-void keyboardHandler (){
+
+void keyboardHandler(void){
 
 
     // Step 0: 
@@ -242,45 +243,61 @@ void keyboardHandler (){
 
     // Variáveis para armazenar valores que pegaremos.
 
+    unsigned char raw_byte=0;
     unsigned char scancode=0;
+
     unsigned long status=0;
 
 	//@todo: ?? Por que esses valores ??
 	
     //Suporte ao envio de mensagens. 
 
-    unsigned char *msg = (unsigned char *) 0x00090500;   
+    unsigned char *msg = (unsigned char *) 0x00090500; 
     unsigned long mensagem=0; 
 
 	//Suporte ao envio de char.
 
-    unsigned char *wParam  = ( unsigned char *) 0x00090120;       
+    unsigned char *wParam  = ( unsigned char *) 0x00090120; 
     unsigned long ch=0;
 
 
 	// @todo: 
 	// Uma biblioteca de video satisfatória deve existir no Boot Loader.
-	
-	//Tela para debug.
-    unsigned char *screen = (unsigned char *) 0x000B8000;   
 
 
+    // Text mode screen buffer.
+
+    unsigned char *screen = (unsigned char *) 0x000B8000; 
 
 
     // Step1: 
-    // Pegar o scancode.       
+    
+    // Get the raw byte.
+    // This is not the scancode.
+    
 
-    scancode = in8 (0x60); 
+    raw_byte = in8(0x60);
+
+    // #todo
+    // Temos que considerar o teclado extendido.
+
+    // Elimina o último bit.
+    scancode = (raw_byte & 0x7F);
+
 
     //
-    // Step 2: Trata a mensagem.
+    // Step 2: 
+    // Trata a mensagem.
     //    
     
-	//Se a tecla foi liberada.
-	if (scancode & 0x80)
+    // Vamos checar o bit no raw byte que
+    // diz se a tecla foi liberada ou não.
+    
+    // Se a tecla foi liberada.
+    if (raw_byte & 0x80)
     {
         //Analiza a tecla.
-        status = map[scancode];  
+        status = map[scancode]; 
 
         //Se for teclas especiais, que são importantes para o sistema.         
         if ( status == KEY_ALT || 
@@ -324,7 +341,8 @@ void keyboardHandler (){
 
         //Nothing.
 
-    }else{  //Se a tecla foi pressionada ---------------------
+    // Se a tecla foi pressionada ---------------------
+    }else{  
 
 
         // Pegando status.   
@@ -380,15 +398,19 @@ void keyboardHandler (){
 
     // Haha!
     screen[76] = (char) ch;
-    screen[77] = (char) 9;     
+    screen[77] = (char) 9; 
 
 
 
 	// Step 4: 
 	// Send message to Boot Loader procedure.
 
+    //
+    // procedure
+    //
 
-    bl_procedure ( 0, 
+    bl_procedure ( 
+        0, 
         (int) mensagem, 
         (unsigned long) ch, 
         (unsigned long) status );
@@ -399,12 +421,13 @@ void keyboardHandler (){
     keyboard_queue[keyboard_queue_tail] = ch;
     
     keyboard_queue_tail++;
-    if( keyboard_queue_tail > 8 )
+    if( keyboard_queue_tail > 8 ){
         keyboard_queue_tail = 0;
-   
+    }
 
-    //avisa que uma tecla foi digitada.
-    keyboard_flag = 1;
+    // Avisa que uma tecla foi digitada.
+
+    keyboard_flag = TRUE;
 
 	// Step 5: 
 	// EOI.
@@ -416,21 +439,22 @@ void keyboardHandler (){
 
 char keyboad_get_char(void)
 {
-	char ch=0;
-	
-	ch = keyboard_queue[keyboard_queue_head];
-	
-    keyboard_queue_head++;
-    if( keyboard_queue_head > 8 )
-        keyboard_queue_head = 0;
+    char ch=0;
 
-    keyboard_flag = 0;
+    ch = keyboard_queue[keyboard_queue_head];
+
+    keyboard_queue_head++;
+    if( keyboard_queue_head > 8 ){
+        keyboard_queue_head = 0;
+    }
+
+    keyboard_flag = FALSE;
 }
 
 
 char keyboard_wait_key(void)
 {
-    while(keyboard_flag != 1)
+    while(keyboard_flag != TRUE)
     {
          //nothing
     };

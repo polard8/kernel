@@ -162,11 +162,15 @@ int gdefShowProgressBar;
  * serial.
  *     O sistema pode atuar como cliente.
  */
+
 typedef enum {
+	
 	OsTypeClient,
 	OsTypeServer,
-	OsTypeHeadlessServer,  //Headless Server. ??
-    //...	
+	OsTypeHeadlessServer,
+
+    // ...
+    
 }os_type_t;
 
 
@@ -195,26 +199,41 @@ struct boot_block_d BootBlock;
 
 
 
-// Window server and window manager.
-// Somente um processo pode ser o ws.
-// Somente um processo pode ser o wm.
-
-//int g_ws_pid;
-//int g_wm_pid;
-
 //
 // buffer support
 //
 
-// ??@todo: Talvez essas globais deva ir para o microkernel/pc
+// #todo: 
+// Talvez essas globais deva ir para o microkernel/pc
 
-//frontbuffer lfb
-unsigned long g_frontbuffer_va;         
-unsigned long g_frontbuffer_pa;         
 
-//backbuffer
+// frontbuffer lfb
+// The framebuffer
+unsigned long g_frontbuffer_va;   
+unsigned long g_frontbuffer_pa; 
+
+// backbuffer
 unsigned long g_backbuffer_va;
 unsigned long g_backbuffer_pa;
+
+
+
+//
+//
+//
+
+/*
+struct display_info_d
+{
+    // The LFB. (frontbuffer)
+    unsigned long framebuffer;
+    unsigned long width;
+    unsigned long height;
+    unsigned long depth;    // bits per pixel.
+};
+*/
+
+
 
 //pagedpool virtual address
 unsigned long g_pagedpool_va;

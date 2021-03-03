@@ -11,8 +11,8 @@
 #define __STRING_H    1
 
 
-int strcmp(char * s1, char * s2);
-int strncmp(char * s1, char * s2, int len);
+int strcmp(char *s1, char *s2);
+int strncmp(char *s1, char *s2, int len);
 int str_cmp(unsigned char *str1, unsigned char *str2);
 
 void *memcpy(void *v_dst, const void *v_src, unsigned long c);

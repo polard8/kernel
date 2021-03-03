@@ -90,7 +90,8 @@ void wm_process_windows (void)
     // bg window (root window)
     if ( (void*) __bg_window != NULL )
     {
-        if ( __bg_window->used == 1 && __bg_window->magic == 1234 )
+        if ( __bg_window->used  == TRUE && 
+             __bg_window->magic == 1234 )
         {
             // The background window is dirty.
             if (__bg_window->dirty == TRUE)
@@ -105,13 +106,14 @@ void wm_process_windows (void)
     // taskbar window
     if ( (void*) __taskbar_window != NULL )
     {
-        if ( __taskbar_window->used == 1 && __taskbar_window->magic == 1234 )
+        if ( __taskbar_window->used == TRUE && 
+             __taskbar_window->magic == 1234 )
         {
             // The taskbar is dirty.
             if (__taskbar_window->dirty == TRUE)
             {
                 //gws_show_window_rect(tmp);
-                gwssrv_redraw_window(__taskbar_window,1); //redesenha e mostra.
+                gwssrv_redraw_window(__taskbar_window,TRUE); //redesenha e mostra.
                 __taskbar_window->dirty=FALSE;  // Validate again.
             }
         }
@@ -134,7 +136,7 @@ void wm_process_windows (void)
 
         if ( (void*) tmp != NULL )
         {
-            if ( tmp->used == 1 && tmp->magic == 1234 )
+            if ( tmp->used == TRUE && tmp->magic == 1234 )
             {
                 // This window is dirty.
                 if (tmp->dirty == TRUE)
@@ -149,11 +151,15 @@ void wm_process_windows (void)
                     // nao da refresh da janela agora.
                     // #bugbug: Mas se nao efetuarmos o refresh agora,
                     // temos necessariamente que efetuar logo abaixo.
-                    //gwssrv_redraw_window(tmp,1);
+
+                    // #bugbug
+                    // Tem a possiblidade de construirmos um box
+                    // contendo todos os retângulos sujos e
+                    // da somente dar refresh do box.
                     
                     // Redraw the window.
                     
-                    gwssrv_redraw_window(tmp,0); 
+                    gwssrv_redraw_window(tmp,TRUE); 
                     
                     // Validate again. 
                     
@@ -274,7 +280,7 @@ void yellow_status( char *string )
             0, 0, bar_size, 24, COLOR_YELLOW, 1 );
     };
 
-    dtextDrawString ( offset_string1, 8, COLOR_BLACK, string );    
+    dtextDrawString ( offset_string1, 8, COLOR_BLACK, string );
     dtextDrawString ( offset_string2, 8, COLOR_BLACK, "FPS" );
         
     gws_refresh_rectangle(0,0,bar_size,24);
@@ -291,7 +297,7 @@ is_within (
 
     if ( (void*) window != NULL )
     {
-        if ( window->used == 1 && window->magic == 1234 )
+        if ( window->used == TRUE && window->magic == 1234 )
         {
             // yes!
             if ( x >= window->left   && 
@@ -311,12 +317,11 @@ is_within (
 
 void invalidate_window (struct gws_window_d *window)
 {
-    // bg window (root window)
     if ( (void*) window != NULL )
     {
-        if ( window->used == 1 && window->magic == 1234 )
+        if ( window->used == TRUE && window->magic == 1234 )
         {
-            window->dirty=1;
+            window->dirty = TRUE;
         }
     }
 }
@@ -361,6 +366,10 @@ int serviceCreateWindow (void){
 
     gwssrv_debug_print ("serviceCreateWindow:\n");
     //printf ("serviceCreateWindow:\n");
+
+
+    // #todo
+    // Check all the header.
 
     // Get the arguments.
 
@@ -543,6 +552,9 @@ int serviceResizeWindow(void)
     // #debug
     gwssrv_debug_print ("gwssrv: serviceChangeWindowPosition\n");
 
+    // #todo
+    // Check all the header.
+
 
     // Get
     
@@ -596,12 +608,11 @@ int serviceDrawButton(void)
 {
 
     // Deprecated !!
-    
-    printf("serviceDrawButton: deprecated\n");
     gwssrv_debug_print("serviceDrawButton: deprecated\n");
+    printf            ("serviceDrawButton: deprecated\n");
     exit(1);
     return -1;
-    
+
     /*
     //O buffer é uma global nesse documento.
     unsigned long *message_address = (unsigned long *) &__buffer[0];
@@ -640,8 +651,10 @@ int serviceRedrawWindow (void){
     unsigned long *message_address = (unsigned long *) &__buffer[0];
 
     struct gws_window_d *window;
-    int window_id = -1;
 
+    // parameters
+    int window_id = -1;
+    int msg_code  = 0;
     unsigned long flags = 0;
 
 
@@ -650,10 +663,19 @@ int serviceRedrawWindow (void){
 
 
     // Get wid and flag.
-    window_id = message_address[0]; 
-    flags     = message_address[2];
- 
- 
+    window_id  = message_address[0];  // window id 
+    msg_code   = message_address[1];  // message code
+    flags      = message_address[2];  // flags
+    //??       = message_address[3];  // nothing 
+
+    // #todo
+    //  Not tested yet.
+    //if ( msg_code <= 0 ){
+    //    gwssrv_debug_print ("serviceRedrawWindow:\n");
+    //    goto fail;
+    //}
+
+
     //
     // Window ID
     //
@@ -661,9 +683,8 @@ int serviceRedrawWindow (void){
     // Limits
     if ( window_id < 0 || window_id >= WINDOW_COUNT_MAX ){
         gwssrv_debug_print ("serviceRefreshWindow: [FAIL] window_id\n");
-        return -1;
+        goto fail;
     }
-
 
     // Get the window structure given the id.
 
@@ -671,11 +692,12 @@ int serviceRedrawWindow (void){
 
     if ( (void *) window == NULL ){
         gwssrv_debug_print ("serviceRefreshWindow: [FAIL] window\n");
-        return -1;
+        goto fail;
     }else{
-        if ( window->used != 1 || window->magic != 1234 ){
+        if ( window->used != TRUE || window->magic != 1234 )
+        {
             gwssrv_debug_print ("serviceRefreshWindow: [FAIL] window validation\n");
-            return -1;
+            goto fail;
         }
 
         // redraw!
@@ -685,7 +707,8 @@ int serviceRedrawWindow (void){
 
         return 0;
     };
-    
+
+fail:
     return -1;
 }
 
@@ -696,11 +719,17 @@ int serviceRefreshRectangle (void){
     unsigned long *message_address = (unsigned long *) &__buffer[0];
 
     unsigned long left,top,width,height;
-      
+
+    // #todo
+    // Check all the header.
+
     left   = message_address[4];
     top    = message_address[5];
     width  = message_address[6];
     height = message_address[7];
+
+    // #todo
+    // Maybe we can test some limits here.
 
     gws_refresh_rectangle ( left, top, width, height );
 
@@ -726,6 +755,9 @@ int serviceRefreshWindow (void){
     // #debug
     gwssrv_debug_print ("serviceRefreshWindow:\n");
 
+
+    // #todo
+    // Check all the header.
 
     //
     // == Window ID ============================
@@ -1131,25 +1163,25 @@ gwssrv_initialize_color_schemes (int selected_type)
 	
     //Criando o esquema de cores humility. (cinza)
     humility = (void *) malloc ( sizeof(struct gws_color_scheme_d) );
-    
-	if( (void *) humility == NULL ){
 
+    if( (void *) humility == NULL ){
         gwssrv_debug_print ("gwssrv_initialize_color_schemes: humility\n");
-        printf ("gwssrv_initialize_color_schemes: humility\n"); 
+        printf             ("gwssrv_initialize_color_schemes: humility\n"); 
+
+        GWSHumilityColorScheme = NULL;
 
         // #bugbug
         // ? return ????
         
-	}else{
+    }else{
 		
 		//Object.
 		//humility->objectType = ObjectTypeColorScheme;
 		//humility->objectClass = ObjectClassGuiObjects;
-		
 
-        humility->used = 1;
+        humility->used  = TRUE;
         humility->magic = 1234;
-        humility->name = "Humility";
+        humility->name  = "Humility";
 		
 		//Colors
 		//Definidas em ws.h
@@ -1170,33 +1202,34 @@ gwssrv_initialize_color_schemes (int selected_type)
         // ...
 
 		//Sanvando na estrutura padrão para o esquema humility.
-		GWSHumilityColorScheme = (void*) humility;
-	};	
-	
+        GWSHumilityColorScheme = (void*) humility;
+    };
+
 	//
-	// * PRIDE 
+	// PRIDE 
 	//
 	
     //Criando o esquema de cores PRIDE. (colorido)
     pride = (void *) malloc ( sizeof(struct gws_color_scheme_d) );
-    
-    if ( (void *) pride == NULL ){
 
+    if ( (void *) pride == NULL ){
         gwssrv_debug_print ("gwssrv_initialize_color_schemes: pride\n");
         printf ("gwssrv_initialize_color_schemes: pride\n"); 
+
+        GWSPrideColorScheme = NULL;
 
         // #bugbug
         // ? return ????
 
     }else{
-		
+
 		//Object.
 		//pride->objectType  = ObjectTypeColorScheme;
 		//pride->objectClass = ObjectClassGuiObjects;
 
-        pride->used = 1;
+        pride->used  = TRUE;
         pride->magic = 1234;
-        pride->name = "Pride";
+        pride->name  = "Pride";
 
 		//Colors
 		//Definidas em ws.h
@@ -1216,33 +1249,43 @@ gwssrv_initialize_color_schemes (int selected_type)
         pride->elements[csiTerminalFontColor] = PRIDE_COLOR_TERMINALFONT;  //13		
         // ...
 
-		//Sanvando na estrutura padrão para o esquema pride.
-		GWSPrideColorScheme = (void *) pride;
-	};	
-		
-	
-	// Configurando qual será o esquema padrão.
-	// @todo; Criar uma função que selecione qual dois esquemas serão usados
-	//        apenas selecionando o ponteiro da estrutura.  
-	
+		// Sanvando na estrutura padrão para o esquema pride.
+        GWSPrideColorScheme = (void *) pride;
+    };
+
+
+    //
+    // Select
+    //
+
+    // Configurando qual será o esquema padrão.
+    // #todo: 
+    // Criar uma função que selecione qual dois esquemas serão usados
+    // apenas selecionando o ponteiro da estrutura.  
+
+
     switch (selected_type){
 
     case ColorSchemeNull:
-        GWSCurrentColorScheme = (void *) humility;
+        GWSCurrentColorScheme = (void *) GWSHumilityColorScheme;
         break;
 
     case ColorSchemeHumility:
-        GWSCurrentColorScheme = (void *) humility;
+        GWSCurrentColorScheme = (void *) GWSHumilityColorScheme;
         break;
 
     case ColorSchemePride:
-        GWSCurrentColorScheme = (void *) pride; 
+        GWSCurrentColorScheme = (void *) GWSPrideColorScheme; 
         break;
 
     default:
-        GWSCurrentColorScheme = (void *) humility;
+        GWSCurrentColorScheme = (void *) GWSHumilityColorScheme;
         break;
     };
+    
+    //
+    // Check current
+    //
     
     if ( (void*) GWSCurrentColorScheme == NULL )
     {
@@ -1254,8 +1297,8 @@ gwssrv_initialize_color_schemes (int selected_type)
 
 
 // seleciona o tipo ...isso é um serviço.
-int gwssrv_select_color_scheme (int type){
-
+int gwssrv_select_color_scheme (int type)
+{
 	//#debug
 	//printf("gwssrv_select_color_scheme: type={%d} \n", type);
 
@@ -1276,7 +1319,7 @@ do_humility:
         goto fail;
     }else{
 
-        if ( GWSHumilityColorScheme->used != 1 || 
+        if ( GWSHumilityColorScheme->used  != TRUE || 
              GWSHumilityColorScheme->magic != 1234 )
         {
             gwssrv_debug_print("HumilityColorScheme sig fail\n");
@@ -1294,7 +1337,7 @@ do_pride:
         gwssrv_debug_print("GWSPrideColorScheme fail\n");
         goto fail;
     }else{
-        if( GWSPrideColorScheme->used != 1 || 
+        if( GWSPrideColorScheme->used  != TRUE || 
             GWSPrideColorScheme->magic != 1234 )
         {
             gwssrv_debug_print("PrideColorScheme sig fail\n");
@@ -1334,7 +1377,7 @@ int gws_show_window_rect (struct gws_window_d *window)
         debug_print ("gws_show_window_rect: window\n");
         return (int) -1;
     }else{
-        if ( window->used == 1 || window->magic == 1234 )
+        if ( window->used == TRUE || window->magic == 1234 )
         {
 
 			//#shadow 
@@ -1427,9 +1470,10 @@ int gwsRegisterWindow (struct gws_window_d *window)
 
 
 
-    if ( (void *) window == NULL ){
+    if ( (void *) window == NULL )
+    {
         //gws_debug_print ("gwsRegisterWindow: window struct\n");
-        return (int) -1;    
+        return (int) -1;
     }
 
 
@@ -1483,12 +1527,13 @@ int get_active_window (void)
  * set_active_window:
  */
 
-void set_active_window (int id){
+void set_active_window (int id)
+{
 
 	// @todo: Limits. Max.
-    if (id < 0)
+    if (id < 0){
         return;
-    
+    }
 
     active_window = (int) id;
 }
@@ -1496,16 +1541,17 @@ void set_active_window (int id){
 
 int get_window_with_focus(void)
 {
-   return (int) window_with_focus;
+    return (int) window_with_focus;
 }
 
 
 int set_window_with_focus(int id)
 {
     
-    if(id<0)
+    if(id<0){
         return -1;
-   
+    }
+
     window_with_focus = (int) id;
 }
 
@@ -1536,9 +1582,10 @@ void set_top_window (int id)
 
 int gwssrv_get_number_of_itens (struct gwsssrv_menu_d *menu)
 {
-    if ( (void*) menu == NULL )
+    if ( (void*) menu == NULL ){
         return -1;
-   
+    }
+
     return (int) menu->itens_count;
 }
 
@@ -1554,8 +1601,9 @@ struct gwsssrv_menu_d *gwssrv_create_menu (
     unsigned long color )
 {
 
-    struct gwsssrv_menu_d *menu;
-    struct gws_window_d *window;
+    struct gwsssrv_menu_d  *menu;
+
+    struct gws_window_d  *window;
 
 
     gwssrv_debug_print("gwssrv_create_menu:\n");
@@ -1779,9 +1827,9 @@ gws_resize_window (
     unsigned long cy )
 {
 
-    if ( (void *) window == NULL )
+    if ( (void *) window == NULL ){
         return -1;
-
+    }
 
     // Só precisa mudar se for diferente.
     if ( window->width  != cx ||
@@ -1792,8 +1840,9 @@ gws_resize_window (
     }
     
 
-    //#test
-    window->dirty = 1;
+    // #test
+
+    window->dirty = TRUE;
     //__bg_window->dirty = 1;
 
     return 0;
@@ -1817,7 +1866,7 @@ void reset_zorder(void)
          w = (struct gws_window_d *) windowList[i];
          if ( (void*) w != NULL )
          {
-             if ( w->used == 1 && w->magic == 1234 )
+             if ( w->used == TRUE && w->magic == 1234 )
              {
                  // Coloca na zorder as janelas overlapped.
                  if ( w->type == WT_OVERLAPPED )
@@ -1882,8 +1931,9 @@ gwssrv_change_window_position (
 void gwsWindowLock (struct gws_window_d *window)
 {
 
-    if ( (void *) window == NULL )
+    if ( (void *) window == NULL ){
         return;
+    }
 
     window->locked = (int) WINDOW_LOCKED;  //1.
 }
@@ -1897,8 +1947,9 @@ void gwsWindowLock (struct gws_window_d *window)
  
 void gwsWindowUnlock (struct gws_window_d *window)
 {
-    if ( (void *) window == NULL )
+    if ( (void *) window == NULL ){
         return;
+    }
 
     window->locked = (int) WINDOW_UNLOCKED;  //0.
 }

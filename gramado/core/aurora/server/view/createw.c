@@ -118,16 +118,15 @@ createwDrawFrame (
 
     // Overlapped.
     // Janela de aplicativos.
-    struct gws_window_d *TitleBar;
+    struct gws_window_d  *TitleBar;
 
     int Type=0;
 
     unsigned long border_color=0;
     unsigned long border_size=0;
-    
+
 
     gwssrv_debug_print ("createwDrawFrame:\n");
-
 
  
     // #todo
@@ -175,20 +174,20 @@ createwDrawFrame (
     if ( Type == WT_EDITBOX )
     {
 
-            // #todo
-            // The window structure has a element for border size
-            // and a flag to indicate that border is used.
-            // It also has a border style.
+        // #todo
+        // The window structure has a element for border size
+        // and a flag to indicate that border is used.
+        // It also has a border style.
 
-            // Se tiver o foco.
-            if ( window->focus == 1 ){
-                border_color = COLOR_BLUE;
-                border_size = 4;
-            }else{
-                border_color = COLOR_BLACK;  // COLOR_INACTIVEBORDER;
-                border_size = 2;
-            };
-        
+        // Se tiver o foco.
+        if ( window->focus == TRUE ){
+            border_color = COLOR_BLUE;
+            border_size = 4;
+        }else{
+            border_color = COLOR_BLACK;  // COLOR_INACTIVEBORDER;
+            border_size = 2;
+        };
+
         // board1, borda de cima e esquerda.
         rectBackbufferDrawRectangle( 
             window->left, window->top, 
@@ -227,22 +226,22 @@ createwDrawFrame (
     if ( Type == WT_OVERLAPPED )
     {
 
-            // #todo
-            // The window structure has a element for border size
-            // and a flag to indicate that border is used.
-            // It also has a border style.
+        // #todo
+        // The window structure has a element for border size
+        // and a flag to indicate that border is used.
+        // It also has a border style.
 
-            // Se tiver o foco.
-            if ( window->focus == 1 ){
-                border_color = COLOR_BLUE1;
-                border_size = 3;
-                //border_size = 8;
-            }else{
-                border_color = COLOR_INACTIVEBORDER;
-                border_size = 2;
-                //border_size = 8;
-            };
-            
+        // Se tiver o foco.
+        if ( window->focus == TRUE ){
+            border_color = COLOR_BLUE1;
+            border_size = 3;
+            //border_size = 8;
+        }else{
+            border_color = COLOR_INACTIVEBORDER;
+            border_size = 2;
+            //border_size = 8;
+        };
+
         // Quatro bordas.
          
         // board1, borda de cima e esquerda.
@@ -289,18 +288,19 @@ createwDrawFrame (
 
         // Title bar
         TitleBar = (void *) createwCreateWindow2 ( 
-                                    WT_SIMPLE, 1, 1, "TITLE", 
-                                    border_size, border_size, 
-                                    (window->width - border_size - border_size), window->titlebar_height, 
-                                    (struct gws_window_d *) window, 
-                                    0, COLOR_BLUE1, COLOR_BLUE1 );  
+                                WT_SIMPLE, 1, 1, "TITLE", 
+                                border_size, border_size, 
+                                (window->width - border_size - border_size), window->titlebar_height, 
+                                (struct gws_window_d *) window, 
+                                0, COLOR_BLUE1, COLOR_BLUE1 );  
 
         if ( (void *) TitleBar == NULL ){
             gwssrv_debug_print ("createwDrawFrame: TitleBar fail \n");
             return -1;
         }
-        
+
         TitleBar->type = WT_SIMPLE;
+
         window->titlebar = TitleBar;
 
         rectBackbufferDrawRectangle ( 
@@ -308,10 +308,19 @@ createwDrawFrame (
             TitleBar->width, 1, 
             COLOR_BLACK, 1 );
 
-        //icon
-        //gwssrv_display_system_icon ( 1, window->left +8, window->top +8 );
-        gwssrv_display_system_icon ( 1, TitleBar->left +4, TitleBar->top +4 );
-        window->has_icon = 1;  //#test
+        //
+        // icon
+        //
+
+        // See:
+        // bmp.c
+        // IN: index, x, y.
+
+        gwssrv_display_system_icon( 
+            1, 
+            (TitleBar->left +4), 
+            (TitleBar->top  +4) );
+        window->has_icon = TRUE;
 
     
         // string
@@ -1576,7 +1585,7 @@ void *createwCreateWindow (
     unsigned long color ) 
 {
 
-   struct gws_window_d *__w;
+   struct gws_window_d  *__w;
 
 
     // This function is able to create some few 

@@ -206,7 +206,7 @@ typedef void _void;
  * dev_nport:
  *
  */
-//typedef struct dev_nport dev_nport_t;  
+
 struct dev_nport 
 { 
     unsigned char dev0;
@@ -245,16 +245,12 @@ struct dev_nport
 struct dev_nport dev_nport;
 
 
-
-
 //
 // História:
 //     Programação do ATA a partir do ICH5/9 e suporte a IDE legado.
 //     ICH5 integraçao do SATA e suporte total ACPI 2.0.
 //     ICH6 implementaram os controladores AHCI SATA pela primeira vez.
 //
-
-
 
 
 /*
@@ -268,13 +264,13 @@ struct ata_pci
     _u16 device_id;
     _u16 command;
     _u16 status;
-    _u8 prog_if;
-    _u8 revision_id;
-    _u8 classe;
-    _u8 subclasse;
-    _u8 primary_master_latency_timer;
-    _u8 header_type;
-    _u8 BIST;
+    _u8  prog_if;
+    _u8  revision_id;
+    _u8  classe;
+    _u8  subclasse;
+    _u8  primary_master_latency_timer;
+    _u8  header_type;
+    _u8  BIST;
     _u32 bar0;
     _u32 bar1; 
     _u32 bar2;
@@ -284,17 +280,14 @@ struct ata_pci
     _u16 subsystem_vendor_id;
     _u16 subsystem_id;  
     _u32 capabilities_pointer;
-    _u8 interrupt_line;
-    _u8 interrupt_pin;
+    _u8  interrupt_line;
+    _u8  interrupt_pin;
 
     // AHCI
 
-    // "Emos" de acrescer com o tempo de acordo nossas necessidades.
 };
+
 struct ata_pci ata_pci;
-
-
-
 
 
 
@@ -302,17 +295,18 @@ struct ata_pci ata_pci;
  * ata:
  *     Estrutura para o controle de execução do programa.
  */ 
+
 struct ata
 {
-	//int used;
-    //int magic;	
-	
-    uint8_t chip_control_type;
-    uint8_t channel;
-    uint8_t dev_type;  
-    uint8_t dev_num;
-    uint8_t access_type;
-    uint8_t cmd_read_modo;
+    //int used;
+    //int magic;
+
+    uint8_t  chip_control_type;
+    uint8_t  channel;
+    uint8_t  dev_type;
+    uint8_t  dev_num;
+    uint8_t  access_type;
+    uint8_t  cmd_read_modo;
     uint32_t cmd_block_base_address;
     uint32_t ctrl_block_base_address;
     uint32_t bus_master_base_address;
@@ -326,6 +320,7 @@ struct ata ata;
  * st_dev:
  *
  */
+
 typedef struct st_dev st_dev_t;
 typedef struct st_dev 
 {
@@ -345,17 +340,19 @@ typedef struct st_dev
 }st_dev;
 
 
-/*************************** variáves *************************************/
-
+//
+// variables
+//
 
 _u16 *ata_identify_dev_buf;
 _u8 ata_record_dev;
 _u8 ata_record_channel;
 
 
+//
+// prototypes
+//
 
-
-/**************************** Libs ***************************************/
 
 // ata_dev.c
 int nport_ajuste(char nport);
@@ -387,26 +384,22 @@ void ata_pio_write(_void *buffer,_i32 bytes);
 
 // ide.c
 
- 
- 
 
 
 //ide_dma.c
-void ide_dma_data( void *addr, 
-                   uint16_t byte_count, 
-				   uint8_t flg, 
-				   uint8_t nport );
+void 
+ide_dma_data ( 
+    void *addr, 
+    uint16_t byte_count, 
+    uint8_t flg, 
+    uint8_t nport );
 void ide_dma_start();
 void ide_dma_stop();
 int ide_dma_read_status();
 
 
- 
-
-
 //ahci.c
 void ahci_mass_storage_init();
-
 
 
 //
@@ -414,47 +407,59 @@ void ahci_mass_storage_init();
 //
 
 
-
 // PCI READ.
-uint32_t diskReadPCIConfigAddr( int bus, 
-                               int dev,
-							   int fun, 
-							   int offset );
+uint32_t 
+diskReadPCIConfigAddr ( 
+    int bus, 
+    int dev,
+    int fun, 
+    int offset );
 
-// PCI WRITE.							   
-void diskWritePCIConfigAddr( int bus, 
-                            int dev,
-							int fun, 
-							int offset, 
-							int data );
+
+// PCI WRITE.
+void 
+diskWritePCIConfigAddr ( 
+    int bus, 
+    int dev,
+    int fun, 
+    int offset, 
+    int data );
 
 uint32_t diskPCIScanDevice( int class );
 
-int diskATAPCIConfigurationSpace( char bus, char dev, char fun );
+
+int 
+diskATAPCIConfigurationSpace ( 
+    char bus, 
+    char dev, 
+    char fun );
+
 
 /*
  ****************************************************************
  * diskATAInitialize:
  *     Inicializa o IDE e mostra informações sobre o disco.
- *
  */
+
 int diskATAInitialize( int ataflag );
+
 
 /*
  *******************************************
  * diskATADialog:
  *     Rotina de diálogo com o driver ATA.
  */
-int diskATADialog( int msg, 
-                   unsigned long long1, 
-				   unsigned long long2 );
-				   
 
-				   
-				   
-int disk_ata_wait_irq ();
+int 
+diskATADialog ( 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 );
+
+int disk_ata_wait_irq();
 
 void show_ide_info();
+
 
 #endif
 

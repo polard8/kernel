@@ -242,9 +242,8 @@ int keyboard_flag;
 
 char keyboad_get_char(void);
 char keyboard_wait_key(void);
+void keyboardHandler(void);
 
-//Keyboard handler.
-void keyboardHandler();
 
 #endif    
 

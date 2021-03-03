@@ -423,7 +423,10 @@ process_event:
 
 
 int 
-__gws_redraw_window_request ( int fd, int window, unsigned long flags )
+__gws_redraw_window_request ( 
+    int fd, 
+    int window, 
+    unsigned long flags )
 {
     // Isso permite ler a mensagem na forma de longs.
     unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];   

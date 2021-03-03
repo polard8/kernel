@@ -17,14 +17,14 @@
 #define SCREEN_START 0x000B8000
 #define ScreenStart SCREEN_START
 
-#define COLUMNS 80
-#define ROWS    25
+#define COLUMNS  80
+#define ROWS     25
 
 #define SCREEN_WIDTH COLUMNS
 #define REVERSE_ATTRIB 0x70
 
-#define PAD_RIGHT 1
-#define PAD_ZERO 2
+#define PAD_RIGHT  1
+#define PAD_ZERO   2
 
 /* the following should be enough for 32 bit int */
 #define PRINT_BUF_LEN 12
