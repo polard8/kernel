@@ -1,5 +1,12 @@
 // gws.h 
 
+
+// Current protocol version
+#define GWS_PROTOCOL  1
+
+
+
+// ============================
 // Modes.
 #define GRAMADO_JAIL        0x00
 #define GRAMADO_P1          0x01
@@ -8,8 +15,9 @@
 #define GRAMADO_CASTLE      0x04
 #define GRAMADO_CALIFORNIA  0x05
 // ...
-
 int current_mode;
+
+
 
 
 // rtl

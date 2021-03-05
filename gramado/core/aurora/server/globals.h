@@ -9,15 +9,15 @@
 // Os primeiros sao os mesmos encontrados na api.
  
 //window (1-19)  
-#define GWS_Create   1
-#define GWS_Destroy  2
-#define GWS_Move     3
-#define GWS_Size     4
-#define GWS_Resize   5
-//#define GWS_Open     6
-#define GWS_Close      7
-#define GWS_Paint      8
-#define GWS_SetFocus   9
+#define GWS_Create        1
+#define GWS_Destroy       2
+#define GWS_Move          3
+#define GWS_Size          4
+#define GWS_Resize        5
+//#define GWS_Open        6
+#define GWS_Close         7
+#define GWS_Paint         8
+#define GWS_SetFocus      9
 #define GWS_KillFocus    10
 #define GWS_Activate     11 
 #define GWS_ShowWindow   12

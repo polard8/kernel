@@ -207,9 +207,6 @@ gramado-setup:
 	sudo cp gramado/setup/bin/SYSMON.BIN    base/
 
 	sudo cp gramado/setup/bin/LAUNCHER.BIN  base/
-	sudo cp gramado/setup/bin/LEASY.BIN     base/
-	sudo cp gramado/setup/bin/LMEDIUM.BIN   base/
-	sudo cp gramado/setup/bin/LHARD.BIN     base/
 
 	#sudo cp gramado/setup/bin/C4.BIN       base/
 	#sudo cp gramado/setup/bin/GRAMC.BIN    base/

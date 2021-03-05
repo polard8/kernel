@@ -60,10 +60,10 @@ launcherProcedure (
 		// A janela principal é uma overlapped,
 		// então colocou uma mensagem na fila,
 		// e o app vai pegar quando entrar no loop.
-        case MSG_CREATE: 
+        //case MSG_CREATE: 
             //printf ("MSG_CREATE:\n");
-            debug_print ("MSG_CREATE:\n"); 
-            break;
+            //debug_print ("MSG_CREATE:\n"); 
+            //break;
 
         case MSG_SYSKEYDOWN:
             //...
@@ -71,22 +71,21 @@ launcherProcedure (
             {  
                 case VK_F1:
                     debug_print("F1\n");
-                    gde_clone_and_execute("leasy.bin");
+                    gde_clone_and_execute("gdeshell.bin");
                     exit(0);
                     break;
 
                 case VK_F2: 
                     debug_print("F2\n");
-                    gde_clone_and_execute("lmedium.bin");
+                    gde_clone_and_execute("gramcode.bin");
                     exit(0);
                     break;
                     
                 case VK_F3: 
                     debug_print("F3\n");
-                    gde_clone_and_execute("lhard.bin");
+                    gde_clone_and_execute("sysmon.bin");
                     exit(0);
                     break;
-     
             };
             goto done;
             break;
@@ -172,7 +171,7 @@ launcherProcedure (
                             (unsigned long) window, 
                             (unsigned long) window );
                        
-                        gde_clone_and_execute("leasy.bin");
+                        gde_clone_and_execute("gdeshell.bin");
                         exit(0);
                         break;
                     }
@@ -183,7 +182,7 @@ launcherProcedure (
                             (unsigned long) window, 
                             (unsigned long) window );
 
-                        gde_clone_and_execute("lmedium.bin");
+                        gde_clone_and_execute("gramcode.bin");
                         exit(0);
                         break;
                     }
@@ -194,7 +193,7 @@ launcherProcedure (
                             (unsigned long) window, 
                             (unsigned long) window );
                         
-                        gde_clone_and_execute("lhard.bin");
+                        gde_clone_and_execute("sysmon.bin");
                         exit(0);
                         break;
                     }
@@ -267,12 +266,11 @@ int main ( int argc, char *argv[] )
 
     left   = 0;
     top    = 0;
-    width  = (deviceWidth >> 2);
+    width  = (deviceWidth  >> 2);
     height = (deviceHeight >> 1);
-    //width  = (deviceWidth/4);
-    //height = (deviceHeight/2);
 
     // #hackhack
+
     if ( deviceWidth == 320 && deviceHeight == 200 )
     {
         width  = deviceWidth;
@@ -316,7 +314,8 @@ int main ( int argc, char *argv[] )
 
     //++
     gde_begin_paint ();
-    hWindow = (void *) gde_create_window (  WT_OVERLAPPED, 1, 1, 
+    hWindow = (void *) gde_create_window ( 
+                           WT_OVERLAPPED, 1, 1, 
                            "Launcher",
                            left, top, width, height,  
                            0, 0, COLOR_BLUE, COLOR_BLUE ); 
@@ -541,8 +540,9 @@ int main ( int argc, char *argv[] )
     // button 1
     //++
     gde_enter_critical_section ();
-    launcher_button_1 = (void *) gde_create_window ( WT_BUTTON, 1, 1, 
-                                     "[F1] Easy",  
+    launcher_button_1 = (void *) gde_create_window ( 
+                                     WT_BUTTON, 1, 1, 
+                                     "[F1] gdeshell",  
                                      2, (height/4)*0, (width -4), (height/4), 
                                      hWindow, 0, 
                                      xCOLOR_GRAY3, xCOLOR_GRAY3 );
@@ -565,7 +565,7 @@ int main ( int argc, char *argv[] )
     //++
     gde_enter_critical_section (); 
     launcher_button_2 = (void *) gde_create_window ( WT_BUTTON, 1, 1, 
-                                     "[F2] Medium", 
+                                     "[F2] gramcode", 
                                      2, (height/4)*1, (width -4), (height/4),
                                      hWindow, 0, 
                                      xCOLOR_GRAY3, xCOLOR_GRAY3 );
@@ -588,7 +588,7 @@ int main ( int argc, char *argv[] )
     //++
     gde_enter_critical_section (); 
     launcher_button_3 = (void *) gde_create_window ( WT_BUTTON, 1, 1, 
-                                     "[F3] Hard", 
+                                     "[F3] sysmon", 
                                      2, (height/4)*2, (width -4), (height/4),
                                      hWindow, 0, 
                                      xCOLOR_GRAY3, xCOLOR_GRAY3 );

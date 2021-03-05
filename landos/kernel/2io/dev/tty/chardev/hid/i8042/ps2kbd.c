@@ -320,7 +320,17 @@ __local_ps2kbd_procedure (
                 // 
                 case VK_F6:
                     if (ctrl_status == 1){
-                    ws_show_info();
+
+                        // Call init process: [9216] Launch launcher
+                        kgws_event_dialog ( 
+                            (int) InitProcess->control->tid,
+                            (struct window_d *) 0,
+                            (int)               9216,
+                            (unsigned long)     0,
+                            (unsigned long)     0 );
+
+                   
+                    //ws_show_info();
                     //initialize_frame_table();
                     //printf (">> %x \n", get_new_frame() );
                     //pages_calc_mem();
@@ -344,11 +354,21 @@ __local_ps2kbd_procedure (
                 // Test 1.
                 case VK_F7:
                     if (ctrl_status == 1){
+                    
+                        // Call init process: [9217] Launch gdeshell
+                        kgws_event_dialog ( 
+                            (int) InitProcess->control->tid,
+                            (struct window_d *) 0,
+                            (int)               9217,
+                            (unsigned long)     0,
+                            (unsigned long)     0 );
+
+                    
                     //fs_show_file_info(stdin);
                     //fs_show_file_info(stdout);
                     //fs_show_file_info(stderr);
-                    fs_show_file_table();
-                    fs_show_inode_table();
+                    //fs_show_file_table();
+                    //fs_show_inode_table();
                    
                     
                     //bg_load_image(); //ok

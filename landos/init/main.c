@@ -265,11 +265,41 @@ void ExecRedPillApplication(void)
     // We will not wait here.
     // We need to use the event loop in the main funcion.
 
-    //Status = (int) sc82 ( 900, (unsigned long) "launcher.bin", 0, 0 );
     Status = (int) rtl_clone_and_execute("launcher.bin");
     //if (Status<0)
         // ...
 }
+
+
+int initDialog (int message)
+{
+    switch (message)
+    {
+        case 9216:
+            debug_print ("init.bin: Launching redpill application\n");
+            printf ("init.bin: Message 9216\n");
+            ExecRedPillApplication();
+            break;
+     
+        case 9217:
+            debug_print ("init.bin: Launching the command interpreter\n");
+            printf ("init.bin: Message 9217\n");
+            ExecCommandInterpreter();
+            break;
+        
+        // ...
+        
+        default:
+            sc82 (265,0,0,0); 
+            sc82 (265,0,0,0); 
+            sc82 (265,0,0,0); 
+            sc82 (265,0,0,0); 
+            break; 
+    };
+
+    return 0;
+}
+
 
 
 /*
@@ -479,30 +509,19 @@ int main ( int argc, char *argv[] )
 
         // Get message.
         rtl_enter_critical_section(); 
-        gramado_system_call ( 111,
+        gramado_system_call ( 
+            (unsigned long) 111,
             (unsigned long) &message_buffer[0],
             (unsigned long) &message_buffer[0],
             (unsigned long) &message_buffer[0] );
         rtl_exit_critical_section(); 
 
-        // No message. Yield.
-        if ( message_buffer[1] == 0 ){ 
-            sc82 (265,0,0,0); 
-            sc82 (265,0,0,0); 
-            sc82 (265,0,0,0); 
-            sc82 (265,0,0,0); 
-        }
+        // Dialog
+        // These messages came from base kernel.
 
-        // We've got a message. 
-        // Call the procedure and don't come back.
-        if ( message_buffer[1] == 9216 )
-        {
-            printf ("init.bin: Message 9216\n");
-            gReboot   = message_buffer[2];
-            gShutdown = message_buffer[3];
-            goto logoff; 
-        }
+        initDialog( (int) message_buffer[1] );
 
+        // Clear
         message_buffer[0] = 0;
         message_buffer[1] = 0;
         message_buffer[2] = 0;

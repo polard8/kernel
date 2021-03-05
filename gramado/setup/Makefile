@@ -2,17 +2,16 @@
 
 all:
 
-	# main apps.
+	# launcher
+	# The redpill makes the system initializes here.
+	make -C launcher
+
+	# launcher's itens
 	make -C gdeshell
 	make -C gramcode
 	make -C sysmon
 	# ...
 
-	# launchers
-	make -C launcher
-	make -C leasy
-	make -C lmedium
-	make -C lhard
 
 	# compilers and interpreter
 	#make -C c4

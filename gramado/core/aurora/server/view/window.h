@@ -11,6 +11,7 @@
 
 #define IS_OPAQUE       1000
 #define IS_TRANSPARENT  2000
+#define IS_ICON         3000
 
 
 //apresentação.
