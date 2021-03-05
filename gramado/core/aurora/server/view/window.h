@@ -9,11 +9,8 @@
 #define ____WINDOW_H    1
 
 
-// Window.
-struct gws_window_d  *__bg_window;   //root window?
-struct gws_window_d  *__taskbar_window; 
-struct gws_window_d  *__taskbar_button; 
-// ...
+#define IS_OPAQUE       1000
+#define IS_TRANSPARENT  2000
 
 
 //apresentação.
@@ -24,27 +21,31 @@ struct gws_window_d  *__taskbar_button;
 #define VIEW_NORMAL    1003 //Normal (restaurada)
 //...
 
-//botões
+
+// button
+// #todo: Check these numbers.
+
 #define BN_CLICKED  200
 #define BN_DOWN     1
 #define BN_UP       2
 #define BN_SELECTED 3
-//...
- 
+// ...
+
+
+
 //
 // ## botoes  ##
 //
 
 //button state
-#define BS_NULL 0 
-#define BS_DEFAULT 1
-#define BS_FOCUS   2
-#define BS_PRESS   3
-#define BS_HOVER   4
-#define BS_DISABLED 5
-#define BS_PROGRESS 6
-//...
-
+#define BS_NULL      0 
+#define BS_DEFAULT   1
+#define BS_FOCUS     2
+#define BS_PRESS     3
+#define BS_HOVER     4
+#define BS_DISABLED  5
+#define BS_PROGRESS  6
+// ...
 
 
 #define WINDOW_LOCKED    1
@@ -55,6 +56,7 @@ struct gws_window_d  *__taskbar_button;
 // window status
 #define WINDOW_STATUS_ACTIVE       1
 #define WINDOW_STATUS_INACTIVE     0
+
 
 //window relationship status. (seu status em relação as outras janelas.)
 //Obs: tem uma estreita ligação com o status da thread que está trabalahndo com ela 
@@ -69,7 +71,7 @@ struct gws_window_d  *__taskbar_button;
 
 
 //
-// == Variables =======================================
+// == prototypes =======================================
 //
 
 
@@ -321,6 +323,10 @@ struct gws_window_d
     char *name;          //Window name.
 
     unsigned long type;  //tipo ... (editbox, normal, ...)  style???
+
+
+    // The window belongs to this client.
+    struct gws_client_d  *client;
 
 
 	// Características dessa janela..
@@ -879,8 +885,14 @@ struct gws_window_d
     struct gws_window_d *next; 
 };
 
-struct gws_window_d *ROOT;
-//...
+
+
+// Window.
+struct gws_window_d  *__root_window; 
+struct gws_window_d  *__taskbar_window; 
+struct gws_window_d  *__taskbar_button; 
+// ...
+
 
 
 // #todo

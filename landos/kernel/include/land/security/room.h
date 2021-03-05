@@ -17,7 +17,8 @@
  *     Uma window station tem vários desktops.
  *     Os desktops tem várias janelas e menus.
  *
- * Versão 1.0, 2015.
+ * History:
+ *     2015 - Created by Fred Nora.
  */
 
 
@@ -27,16 +28,18 @@
 
  
 /*
- * Window Station:
- *
+ * room:
+ * 
+ *     A room os a place to handle a set of desktops.
+ *     ( window stations )
  */ 
-//struct wstation_d
 
 struct room_d
 {
-	object_type_t objectType;
-	object_class_t objectClass;
-	
+    object_type_t  objectType;
+    object_class_t objectClass;
+
+
 	//object control
 	struct object_d *object;
 	
@@ -46,10 +49,15 @@ struct room_d
 	int magic;
 	
 	int userID;
-	
-    //@todo: fazer uma lista encadeada. de desktops
-	unsigned long desktops[32];    //@todo: usar alocação dinamica.
-	
+
+
+    //
+    // Desktops
+    //
+
+    unsigned long desktop_list[32];
+
+
 	//struct wstation_d *next_wstation;
 	
 	//struct desktop_d *arrayDesktop; //ponteiro para um array de estruturas de desktop.
@@ -72,9 +80,19 @@ struct room_d *CurrentRoom;
 unsigned long roomList[ROOM_COUNT_MAX];
 
 
+//
+// == prototypes ==================================
+//
+
+//
+// #todo
+// Change the name of all these functions.
+// Use the prefix 'room_'.
+//
+
+
 /*
  * Contagem de window stations.
- *
  */
 
 //movido para gws.h 

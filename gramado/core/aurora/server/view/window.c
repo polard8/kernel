@@ -88,17 +88,17 @@ void wm_process_windows (void)
 
 
     // bg window (root window)
-    if ( (void*) __bg_window != NULL )
+    if ( (void*) __root_window != NULL )
     {
-        if ( __bg_window->used  == TRUE && 
-             __bg_window->magic == 1234 )
+        if ( __root_window->used  == TRUE && 
+             __root_window->magic == 1234 )
         {
             // The background window is dirty.
-            if (__bg_window->dirty == TRUE)
+            if (__root_window->dirty == TRUE)
             {
                 //gws_show_window_rect(tmp);
-                gwssrv_redraw_window(__bg_window,1);  //redesenha e mostra.
-                __bg_window->dirty=FALSE;  // Validate again.
+                gwssrv_redraw_window(__root_window,TRUE);  //redesenha e mostra.
+                __root_window->dirty=FALSE;  // Validate again.
             }
         }
     }
@@ -325,6 +325,26 @@ void invalidate_window (struct gws_window_d *window)
         }
     }
 }
+
+
+
+/*
+void destroy_window (struct gws_window_d *window);
+void destroy_window (struct gws_window_d *window)
+{
+    // #todo
+    // if( window == __root_window)
+        // return;
+  
+    if ( (void*) window != NULL )
+    {
+        if ( window->used == TRUE && window->magic == 1234 )
+        {
+            // ...
+        }
+    }
+}
+*/
 
 
 
@@ -1444,13 +1464,13 @@ int gwsDefineInitialRootWindow ( struct gws_window_d *window )
         //return -1;
     }
     
-    ROOT = window;
+    __root_window = window;
     
     // ...
     
     return 0;  //ok
 }
-   
+
 /*
  *******************************************************
  * gwsRegisterWindow: 
@@ -1843,7 +1863,7 @@ gws_resize_window (
     // #test
 
     window->dirty = TRUE;
-    //__bg_window->dirty = 1;
+    //__root_window->dirty = 1;
 
     return 0;
 }

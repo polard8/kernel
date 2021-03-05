@@ -39,16 +39,23 @@ void *get_current_user_session (void)
 
 
 
-
 void 
-set_current_user_session ( struct usession_d *usession )
+set_current_user_session ( 
+    struct usession_d *usession )
 {
-    if ( (void *) usession == NULL )
-    { 
+
+    if ( (void *) usession == NULL ){ 
+        debug_print ("set_current_user_session: [FAIL] usession \n");
+        return; 
+    }
+
+    if ( usession->id < 0 ){
+        debug_print ("set_current_user_session: [FAIL] id \n");
         return; 
     }
 
     current_usersession = (int) usession->id;
+
     CurrentUserSession = usession;
 }
 
@@ -59,7 +66,7 @@ set_current_user_session ( struct usession_d *usession )
  *     Cria uma user section para um usuário válido.
  */
 
-void *CreateUserSession (int userID)
+void *CreateUserSession (int user_id)
 {
 
     struct usession_d *NewUserSession;
@@ -67,43 +74,53 @@ void *CreateUserSession (int userID)
 
 
 	// Check limits.
-    if ( userID < 0 || userID >= USER_COUNT_MAX )
+    if ( user_id < 0 || user_id >= USER_COUNT_MAX )
     {
-        debug_print ("CreateUserSession: [FAIL] userID\n");
+        debug_print ("CreateUserSession: [FAIL] user_id\n");
         return NULL;
     }
 
 
-	// Create a new user section struct.
-    
+    //
+    // User session structure.
+    //
+
+    // Create a new user section struct.
+
     NewUserSession = (void *) kmalloc ( sizeof(struct usession_d) );
 
     if ( (void *) NewUserSession == NULL ){
-        panic ("CreateUserSection:\n");
+        panic ("CreateUserSection: [FAIL] NewUserSession\n");
     } else {
-        NewUserSession->used  = (int) 1;
+
+        NewUserSession->used  = (int) TRUE;
         NewUserSession->magic = (int) 1234;
 
-		NewUserSession->uid  = (int) userID;    //*IMPORTANTE id do usuário da seção.
-		//@todo: group.
-		NewUserSession->initialized = 0;           //Apenas criada, não inicializada.
-		
-		//@todo: Setar ponteiro.
-		//CurrentUserSession = (void *) NewUserSession;
-		
-		//continua...
+        // user for this session.
+        NewUserSession->uid  = (int) user_id;
+
+        // Not initialized yet.
+        NewUserSession->initialized = FALSE;
+
+        // ...
+
+        // #todo
+        // CurrentUserSession = (void *) NewUserSession;
     };
-			
-	//Procura uma entrada vazia na lista.
-	
+
+
+    // We need an empty slot in the list usessionList[].
+    // Coloca na lista em um lugar vazio.
+
     while ( i < USER_SESSION_COUNT_MAX )
     {
-
-        // Coloca na lista em um lugar vazio.
-        if ( (void *) usessionList[i] == NULL ){
-            
+        if ( (void *) usessionList[i] == NULL )
+        {
+            // The structure pointer.
             usessionList[i] = (unsigned long) NewUserSession; 
-            NewUserSession->id = i;    //User session id.
+
+            // User session id.
+            NewUserSession->id = i;
 
             return (void *) NewUserSession;
         }
@@ -111,53 +128,64 @@ void *CreateUserSession (int userID)
         i++;
     };
     
-    // ?? debug ??
-    panic ("CreateUserSession error: Can't create!\n");
+    // #debug
+    // hanging for debug.
 
-    //#bugbug: Talvez devamos retornar.
+    panic ("CreateUserSession: [DEBUG] Can't create!\n");
     return NULL;
 }
 
 
-
-//Open User Session.
+// ??
+// Open current user session.
 void open_user_session (void){
-	
-    if ( (void *) CurrentUserSession == NULL ){
-        printf ("open_user_session: fail \n");
+
+    if ( (void *) CurrentUserSession == NULL )
+    {
+        printf ("open_user_session: [FAIL] CurrentUserSession\n");
         return;
     }
-	
-	//@todo: Criar tempo de início de sessão.
-	//tempo de inicio de sessão
-	
-	CurrentUserSession->BeginTime = (unsigned long) 0;	
-	CurrentUserSession->initialized = 1; 
+
+	// #todo: 
+	// Criar tempo de início de sessão.
+	// tempo de inicio de sessão
+
+    CurrentUserSession->BeginTime = (unsigned long) 0;
+
+    // ...
+
+    CurrentUserSession->initialized = TRUE; 
 }
 
-//Close User Session.
 
-void close_user_session (void){
+// ??
+// Close current user session.
+void close_user_session (void)
+{
 
-
-    if ( (void *) CurrentUserSession == NULL ){
-        printf ("close_user_session: fail \n");
+    if ( (void *) CurrentUserSession == NULL )
+    {
+        printf ("close_user_session: [FAIL] CurrentUserSession \n");
         return;
     }
 
-	//@todo: Criar tempo de fim de sessão.
-	//tempo de fim de sessão
-	
+	// #todo: 
+	// Criar tempo de fim de sessão.
+	// tempo de fim de sessão
+
     CurrentUserSession->EndTime = (unsigned long) 0;
-	
-	
+
+
     CurrentUserSession->id = 0; 
-    CurrentUserSession->used = 0; 
+
+    CurrentUserSession->used  = FALSE; 
     CurrentUserSession->magic = 0; 
+
     CurrentUserSession->uid = 0; 
-    CurrentUserSession->initialized = 0; 
-	
-	//...
+
+    // ...
+
+    CurrentUserSession->initialized = FALSE; 
 }
 
 
@@ -165,7 +193,8 @@ void close_user_session (void){
 /*
  *****************************
  * init_user_session:
- *     Inicializa user session. 
+ * 
+ *     Inicializa user session support.
  */
 
 void init_user_session (void){
@@ -177,19 +206,18 @@ void init_user_session (void){
     debug_print ("init_user_session:\n");
 
 
-	//Init list
+    //  Clear the list of user sessions.
 
-    while ( i < USER_SESSION_COUNT_MAX ){
-        usessionList[i] = 0;
-        i++;
+    for (i=0; i<USER_SESSION_COUNT_MAX; i++)
+    {
+        usessionList[i] = (unsigned long) 0;
     };
-
 
 	//
 	// User.
 	//
 
-    CurrentUser_ID = (int) GetCurrentUserId ();
+    CurrentUser_ID = (int) GetCurrentUserId();
 
     if ( CurrentUser_ID < 0 || CurrentUser_ID >= USER_COUNT_MAX )
     {
@@ -207,8 +235,9 @@ void init_user_session (void){
 	
     usession0 = (void *) CreateUserSession (CurrentUser_ID);
 
-    if ( (void *) usession0 == NULL ){
-        panic ("init_user_session: usession0");
+    if ( (void *) usession0 == NULL )
+    {
+        panic ("init_user_session: [FAIL] usession0\n");
     }
 
     
@@ -220,10 +249,8 @@ void init_user_session (void){
 
 	//...
 
-    CurrentUserSession->initialized = 1;
+    CurrentUserSession->initialized = TRUE;
 }
-
-
 
 
 //

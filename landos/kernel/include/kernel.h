@@ -128,11 +128,11 @@ extern unsigned long stack0_krn_ptr;
 #include "land/mm/intelmm.h"
 
 
-// ws -
+// rawgr -
 // #view presentation output.
-#include "hal/dev/tty/vt/ws/view/display.h"
-#include "hal/dev/tty/vt/ws/view/screen.h"
-#include "hal/dev/tty/vt/ws/view/video.h"
+#include "hal/dev/tty/vt/rawgr/view/display.h"
+#include "hal/dev/tty/vt/rawgr/view/screen.h"
+#include "hal/dev/tty/vt/rawgr/view/video.h"
 
 
 // Render
@@ -140,8 +140,8 @@ extern unsigned long stack0_krn_ptr;
 
 
 // #model. data model.
-#include "hal/dev/tty/vt/ws/model/fonts.h"
-#include "hal/dev/tty/vt/ws/model/ascii.h" 
+#include "hal/dev/tty/vt/rawgr/model/fonts.h"
+#include "hal/dev/tty/vt/rawgr/model/ascii.h" 
 
 
 // fs
@@ -155,12 +155,12 @@ extern unsigned long stack0_krn_ptr;
 #include "rtl/fs/vfs.h"
 
 
-// ws - 
+// rawgr - 
 // view - input and presentation
-#include "hal/dev/tty/vt/ws/view/prompt.h"
+#include "hal/dev/tty/vt/rawgr/view/prompt.h"
 
 // view - showing the data.
-#include "hal/dev/tty/vt/ws/view/bmp2.h"
+#include "hal/dev/tty/vt/rawgr/view/bmp2.h"
 
 
 
@@ -206,16 +206,16 @@ extern unsigned long stack0_krn_ptr;
 
 
 
-// ws - window server
+// rawgr - window server
 // inputs
-#include "hal/dev/tty/vt/ws/view/xproc.h"
-#include "hal/dev/tty/vt/ws/view/keyboard.h"
-#include "hal/dev/tty/vt/ws/view/mouse.h"
-#include "hal/dev/tty/vt/ws/view/vk.h"
-#include "hal/dev/tty/vt/ws/view/kbdabnt2.h"
+#include "hal/dev/tty/vt/rawgr/view/xproc.h"
+#include "hal/dev/tty/vt/rawgr/view/keyboard.h"
+#include "hal/dev/tty/vt/rawgr/view/mouse.h"
+#include "hal/dev/tty/vt/rawgr/view/vk.h"
+#include "hal/dev/tty/vt/rawgr/view/kbdabnt2.h"
 
 // #view. drawing routines.
-#include "hal/dev/tty/vt/ws/view/ldisc.h"
+#include "hal/dev/tty/vt/rawgr/view/ldisc.h"
 
 //storage (^)
 #include "hal/dev/blkdev/ide.h"
@@ -259,21 +259,21 @@ extern unsigned long stack0_krn_ptr;
 
 
 
-// ws - 
+// rawgr - 
 // model business logic
-#include "hal/dev/tty/vt/ws/model/kgwm.h"
-#include "hal/dev/tty/vt/ws/model/ws.h"
+#include "hal/dev/tty/vt/rawgr/model/kgwm.h"
+#include "hal/dev/tty/vt/rawgr/model/ws.h"
 
 // #view - designers
-#include "hal/dev/tty/vt/ws/view/window.h"
-#include "hal/dev/tty/vt/ws/view/menu.h"
-#include "hal/dev/tty/vt/ws/view/pbar.h"
-#include "hal/dev/tty/vt/ws/view/bmp.h"
-#include "hal/dev/tty/vt/ws/view/line.h"
+#include "hal/dev/tty/vt/rawgr/view/window.h"
+#include "hal/dev/tty/vt/rawgr/view/menu.h"
+#include "hal/dev/tty/vt/rawgr/view/pbar.h"
+#include "hal/dev/tty/vt/rawgr/view/bmp.h"
+#include "hal/dev/tty/vt/rawgr/view/line.h"
 
 // #view. presentation
-#include "hal/dev/tty/vt/ws/view/terminal.h"
-#include "hal/dev/tty/vt/ws/view/guiconf.h"
+#include "hal/dev/tty/vt/rawgr/view/terminal.h"
+#include "hal/dev/tty/vt/rawgr/view/guiconf.h"
 
 
 //
@@ -287,12 +287,12 @@ extern unsigned long stack0_krn_ptr;
 #include "land/security/security.h"
 
 
-// ws - window server, and beyond
-#include "hal/dev/tty/vt/ws/logon.h"
-#include "hal/dev/tty/vt/ws/logoff.h"
+// rawgr - window server, and beyond
+#include "hal/dev/tty/vt/rawgr/logon.h"
+#include "hal/dev/tty/vt/rawgr/logoff.h"
 
 // model. business logic
-#include "hal/dev/tty/vt/ws/model/kgws.h"
+#include "hal/dev/tty/vt/rawgr/model/kgws.h"
 
 
 // tty
@@ -307,11 +307,11 @@ extern unsigned long stack0_krn_ptr;
 
 
 // =============================
-// ws - i8042 ps2 controller.
-#include "hal/dev/tty/vt/ws/view/i8042/i8042.h"
-#include "hal/dev/tty/vt/ws/view/i8042/ps2mouse.h"
-#include "hal/dev/tty/vt/ws/view/i8042/ps2kbd.h"
-#include "hal/dev/tty/vt/ws/view/i8042/ps2.h"
+// rawgr - i8042 ps2 controller.
+#include "hal/dev/tty/vt/rawgr/view/i8042/i8042.h"
+#include "hal/dev/tty/vt/rawgr/view/i8042/ps2mouse.h"
+#include "hal/dev/tty/vt/rawgr/view/i8042/ps2kbd.h"
+#include "hal/dev/tty/vt/rawgr/view/i8042/ps2.h"
 
 
 
@@ -374,9 +374,9 @@ extern unsigned long stack0_krn_ptr;
 
 
 
-// ws - 
+// rawgr - 
 // view. input support.
-#include "hal/dev/tty/vt/ws/view/cursor.h"
+#include "hal/dev/tty/vt/rawgr/view/cursor.h"
 
 
 #include "land/messages.h"

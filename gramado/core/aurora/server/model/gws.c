@@ -567,8 +567,16 @@ int gwsInit(void)
 
         tmpW->used  = TRUE;
         tmpW->magic = 1234;
-        
-        //#test
+
+        // Register.
+        // WindowId = gwsRegisterWindow (__root_window);
+
+        // if (WindowId<0){
+        // gwssrv_debug_print ("create_background: Couldn't register window\n");
+        //return;
+        //}
+
+        // Root window
         gwsDefineInitialRootWindow (tmpW);
 
         // Screen window and main window.

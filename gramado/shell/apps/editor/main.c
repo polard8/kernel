@@ -738,6 +738,18 @@ editorDrawChar(
     cursor_x++;
 }
 
+void
+editorSetCursor( 
+    int x,
+    int y )
+{
+    if (cursor_x >= 0 && cursor_x < 80)
+        cursor_x = x;
+
+    if (cursor_y >= 0 && cursor_y < 25)
+        cursor_y = y;
+}
+
 
 // local
 int 
@@ -748,28 +760,60 @@ editorProcedure (
     unsigned long long1, 
     unsigned long long2 )
 {
+
+    if (msg<0)
+        return -1;
+
+
     switch (msg){
 
         // 20 = MSG_KEYDOWN
         case 20:
-            //printf("%c",long1); fflush(stdout);
-
-            //cursor_x = (cursor_x + 8);
-            //if( cursor_x > 100){ cursor_x = 0; cursor_y = cursor_y + 8; }
-            
-            
-            //gws_draw_char ( fd, client_window, 
-            //    cursor_x, cursor_y, COLOR_BLACK, long1 );
- 
-            editorDrawChar(fd,long1);
- 
+            switch(long1){
+                
+                // keyboard arrows
+                case 0x48: 
+                    //printf ("UP   \n"); 
+                    cursor_y--;
+                    editorSetCursor(cursor_x,cursor_y);
+                    goto done; 
+                    break;
+                case 0x4B: 
+                    //printf ("LEFT \n"); 
+                    cursor_x--;
+                    editorSetCursor(cursor_x,cursor_y);
+                    goto done; 
+                    break;
+                case 0x4D: 
+                    //printf ("RIGHT\n"); 
+                    cursor_x++;
+                    editorSetCursor(cursor_x,cursor_y);
+                    goto done; 
+                    break;
+                case 0x50: 
+                    //printf ("DOWN \n"); 
+                    cursor_y++;
+                    editorSetCursor(cursor_x,cursor_y);
+                    goto done; 
+                    break;
+                
+                default:
+                    editorDrawChar(fd,long1);
+                    break;
+            };
             break;
-            
+
         // 22 = MSG_SYSKEYDOWN
         case 22:
             printf ("MSG_SYSKEYDOWN\n");
             break;
+
+        default:
+            return 0;
+            break;
     };
+done:
+    return 0;
 }
 
 

@@ -27,22 +27,23 @@
 /*
  * desktop_d:
  *     Desktop structure.
+ *     It handles a set of gui objects like 'windows'.
  */
 
 struct desktop_d
 {
-    object_type_t objectType;
-    object_class_t objectClass;
+    object_type_t   objectType;
+    object_class_t  objectClass;
 
     //object control
     struct object_d *object;
-
 
 
     int desktopId;
 
     int desktopUsed;
     int desktopMagic;
+
 
     // usando o mesmo esquema do usuário.
     char __name[64];
@@ -54,8 +55,17 @@ struct desktop_d
     int wm;   // window manager
     int ns;   // network server
     // ...
-      
-  
+
+
+    //
+    // Background
+    //
+
+    // #todo
+    // We need a structure to handle the background image 
+    // used by this desktop.
+    
+
     // #todo
     // A estrutura de eventos também desve estar associado
     // a um desktop;
@@ -148,10 +158,22 @@ struct desktop_d
 	//struct window_d *shell; 
 	//struct window_d *taskmanager;
 	//struct window_d *programmanager;
-	
-	
-    unsigned long windows[256];    //@todo: Usar alocação dinâmica, igual nos menus.
-    unsigned long menus[256];      //@todo: Usar alocação dinâmica, igual nos menus.
+
+    //
+    // Windows
+    //
+
+    // Only the app window. 'Overlapped'.
+
+    unsigned long windows[256];
+
+    //
+    // Menus
+    //
+
+    unsigned long menus[256]; 
+
+
 	//Continua ...
 	
 	//Linked List. 
@@ -191,27 +213,29 @@ struct desktop_d *CurrentDesktop;
 unsigned long desktopList[DESKTOP_COUNT_MAX];
 
 
-/*
- * desktop_info_d:
- *
- */
-typedef struct desktop_info_d desktop_info_t;
+
+// Desktop info
 struct desktop_info_d 
 {
-    struct window_d *wnd; 
-    int processId;        
-    int threadId;        
+    // struct desktop_d *desktop; 
+
+    struct window_d  *window; 
+
+    int pid;
+    int tid;
 };
-//desktop_info_t *DesktopInfo;
-
-
+// struct desktop_info_d  *DesktopInfo;
 
 
 //
-// variables.
+// == prototypes ==================================
 //
 
-
+//
+// #todo
+// Change the name of all these functions.
+// Use the prefix 'desktop_'.
+//
 
 
 void init_desktop (void);
@@ -228,48 +252,70 @@ int get_current_desktop_id (void);
 
 void *CreateDesktop (struct room_d *room);
 
+void 
+set_current_menuwindow ( 
+    struct desktop_d *desktop, 
+    struct window_d *window ); 
+
+// ??
+//  what is this?
+void 
+set_current_foreground ( 
+    struct desktop_d *desktop, 
+    struct window_d *window ); 
+
+// ??
+void change_foreground (struct desktop_d *desktop);
+
+// Window for messages on desktop
+void 
+set_current_messagewindow ( 
+    struct desktop_d *desktop, 
+    struct window_d *window ); 
+
+// main tray window for a desktop.
+void 
+set_current_traywindow ( 
+    struct desktop_d *desktop, 
+    struct window_d *window ); 
+
 
 void 
-set_current_menuwindow ( struct desktop_d *desktop, 
-                         struct window_d *window ); 
+set_current_tooltipwindow ( 
+    struct desktop_d *desktop, 
+     struct window_d *window ); 
+
+
+// sysmenu is the default menu when we click
+// on the main window with the right mouse button
 
 void 
-set_current_foreground ( struct desktop_d *desktop, 
-                         struct window_d *window ); 
+set_current_sysMenu ( 
+    struct desktop_d *desktop, 
+    struct menu_d *menu );
+
 
 void 
-set_current_messagewindow ( struct desktop_d *desktop, 
-                            struct window_d *window ); 
-
-void 
-set_current_traywindow ( struct desktop_d *desktop, 
-                         struct window_d *window ); 
-
-void 
-set_current_tooltipwindow ( struct desktop_d *desktop, 
-                            struct window_d *window ); 
-
-void 
-change_foreground (struct desktop_d *desktop);
-
-void 
-set_current_sysMenu ( struct desktop_d *desktop, 
-                      struct menu_d *menu );
-
-void 
-set_current_dialogsysMenu ( struct desktop_d *desktop, 
-                            struct menu_d *menu );
+set_current_dialogsysMenu ( 
+    struct desktop_d *desktop, 
+    struct menu_d *menu );
                             
 void 
-set_current_menuHScroll ( struct desktop_d *desktop, 
-                          struct menu_d *menu );
-                          
+set_current_menuHScroll ( 
+    struct desktop_d *desktop, 
+    struct menu_d *menu );
+
+
 void 
-set_current_menuVScroll ( struct desktop_d *desktop, 
-                          struct menu_d *menu );
+set_current_menuVScroll ( 
+    struct desktop_d *desktop, 
+    struct menu_d *menu );
 
 
+// Set up the current window server for a desktop.
 int desktop_setup_ws ( struct desktop_d *desktop, int ws_pid );
+
+// Set up the current window manager for a desktop.
 int desktop_setup_wm ( struct desktop_d *desktop, int wm_pid );
 
 

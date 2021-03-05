@@ -95,13 +95,6 @@ int NoReply = FALSE;
 int connection_status = 0;
 
 
-// Window.
-// See: window.h
-//struct gws_window_d  *__bg_window;
-//struct gws_window_d  *__taskbar_window; 
-//struct gws_window_d  *__taskbar_button; 
-// ...
-
 //
 // == Mouse ++ ==================================================
 //
@@ -1445,30 +1438,30 @@ void create_background (void)
     // Se estivermos em JAIL, podemos arriscar algum background melhor.
     // Talvez alguma imagem.
 
-    __bg_window = (struct gws_window_d *) createwCreateWindow ( 
+    __root_window = (struct gws_window_d *) createwCreateWindow ( 
                                             WT_SIMPLE, 
                                             1, 1, "gwssrv-bg",  
                                             0, 0, w, h,   
                                             gui->screen_window, 0, 
                                             COLOR_BACKGROUND, COLOR_BACKGROUND );    
 
-    if ( (void *) __bg_window == NULL )
+    if ( (void *) __root_window == NULL )
     {
-        gwssrv_debug_print ("gwssrv: __bg_window fail\n"); 
-        printf             ("gwssrv: __bg_window fail\n");
+        gwssrv_debug_print ("gwssrv: __root_window fail\n"); 
+        printf             ("gwssrv: __root_window fail\n");
         exit (1);
         return;
     }
 
     // Register.
-    WindowId = gwsRegisterWindow (__bg_window);
+    WindowId = gwsRegisterWindow (__root_window);
 
     if (WindowId<0){
         gwssrv_debug_print ("create_background: Couldn't register window\n");
         //return;
     }
 
-    //__bg_window->dirty = 1;
+    //__root_window->dirty = 1;
 
     if (current_mode == GRAMADO_JAIL){
         refresh_screen();
@@ -1495,18 +1488,20 @@ int initGraphics (void){
     int __init_status = -1;
 
 
-    debug_print("gwssrv: initGraphics\n");
+    debug_print("initGraphics\n");
 
     // Initialize the window server infrastructure.
     // The current display and the current screen.
     // See: model/gws.c
 
+    // It will create the root window.
+
     __init_status = gwsInit();
 
     if (__init_status != 0)
     {
-        debug_print ("gwssrv: initGraphics [PANIC] Couldn't initialize the graphics\n");
-        printf      ("gwssrv: initGraphics [PANIC] Couldn't initialize the graphics\n");
+        debug_print ("initGraphics: [PANIC] Couldn't initialize the graphics\n");
+        printf      ("initGraphics: [PANIC] Couldn't initialize the graphics\n");
         exit(1);
     }
 
@@ -1519,15 +1514,19 @@ int initGraphics (void){
     // #debug
     // Se o background a seguir falhar, entao veremos
     // pelo menos essa mensagem.
+
     if ( (void*) gui->screen_window != NULL )
     {
         dtextDrawText ( 
             (struct gws_window_d *) gui->screen_window,
-            8, 8, COLOR_RED, "gwssrv: Initializing graphics" );
+            8, 8, COLOR_RED, "Initializing graphics" );
     }
 
 
     // Create background.
+
+    // #bugbug
+    // This is creating the root window again.
 
     create_background();
 
@@ -1546,6 +1545,23 @@ int initGraphics (void){
 
     //#debug breakpoint
     //while(1){}
+    
+    
+    //
+    // == checks ===============================================
+    //
+
+
+    // Check if we already have the root window.
+
+    if ( (void*) __root_window == NULL )
+    {
+        gwssrv_debug_print ("initGraphics: [FAIL] root window doesn't exist\n");
+        printf             ("initGraphics: [FAIL] root window doesn't exist\n");
+        exit(1);
+    }
+
+
 
 
     // Initialize the graphics support.
