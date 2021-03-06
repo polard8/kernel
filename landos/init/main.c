@@ -286,6 +286,12 @@ int initDialog (int message)
             printf ("init.bin: Message 9217\n");
             ExecCommandInterpreter();
             break;
+
+        case 9218:
+            debug_print ("init.bin: Launching sysmon\n");
+            printf ("init.bin: Message 9218\n");
+            rtl_clone_and_execute("sysmon.bin");
+            break;
         
         // ...
         

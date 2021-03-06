@@ -330,8 +330,12 @@ gr_clamp(
 int grPlot0 (int z, int x, int y, unsigned long color)
 {
 
-    // Clipping
+    // Draw flag.
     int Draw = TRUE;
+    
+    // z translation
+    int Z_Translation = TRUE;
+
 
     // #todo
     // We need a z-buffer or (depth buffer)
@@ -375,6 +379,7 @@ int grPlot0 (int z, int x, int y, unsigned long color)
     // #debug
     if ( (void *) DeviceScreen == NULL )
     {
+        Draw = FALSE;
         printf("grPlot0: DeviceScreen\n");
         exit(1);
     }
@@ -388,129 +393,135 @@ int grPlot0 (int z, int x, int y, unsigned long color)
 
 
     // z negativo
+    //  _
+    //   |
+
     if (z < 0)
     {
-        //positivo, para direita.
+        // z é módulo para todos os casos em que z é menor que 0.
+        z = abs(z);
+
+        // positivo, para direita.
+        // Desloca a base x para esquerda, onde fica o z negativo
         if (x >= 0 )
         {
-            z = abs(z);
-            zBaseX = (unsigned long) (HotSpotX - (unsigned long) z);
-            
-            X = (unsigned long) (zBaseX + (unsigned long) x);
-        }
-        
-        // negativo, para esquerda.
-        if (x < 0 )
-        {
-            z = abs(z);
-            zBaseX = (unsigned long) (HotSpotX - (unsigned long) z);
-            x = abs(x);   
-            X = (unsigned long) (zBaseX - (unsigned long) x);
+            X = (unsigned long) ( (unsigned long)HotSpotX  + (unsigned long)x);
         }
 
-        //positivo, para cima.
+        // negativo, para esquerda.
+        // Desloca a base x para esquerda, onde fica o z negativo
+        if (x < 0 )
+        {
+            x = abs(x); 
+            X = (unsigned long) (  (unsigned long)HotSpotX - (unsigned long)x );
+        }
+
+        // positivo, para cima.
+        // Desloca a base y para baixo, onde fica o z negativo
         if ( y >= 0 )
         {
-            z = abs(z);
-            zBaseY = (unsigned long) (HotSpotY + (unsigned long) z);
-            
-            Y = (unsigned long) (zBaseY - (unsigned long) y); 
+            Y = (unsigned long) ( (unsigned long)HotSpotY - (unsigned long)y );
         }
 
         // negativo, para baixo
+        // Desloca a base y para baixo, onde fica o z negativo
         if ( y < 0 )
         {
-            z = abs(z);
-            zBaseY = (unsigned long) (HotSpotY + (unsigned long) z);
             y = abs(y);
-            Y = (unsigned long) (zBaseY + (unsigned long) y);           
+            Y = (unsigned long) ( (unsigned long) HotSpotY + (unsigned long) y );
+        }
+
+        if (Z_Translation == TRUE){
+            X = ( (unsigned long) X - (unsigned long) z );
+            Y = ( (unsigned long) Y + (unsigned long) z );
         }
         
-        // ??
-        // Device screen.
-        // #todo: 
-        // In the future we will have a situation when we are plotting
-        // inside a valid screen, inside a window. and the 'origin'
-        // will be in the center of the window and not in the center 
-        // of the device screen. 
-        
-        if ( 0 <= X < DeviceScreen->width && 
-             0 <= Y < DeviceScreen->height )
-        {
-            if (Draw == TRUE)
-            {
-                if (X<0){ return -1; }
-                if (Y<0){ return -1; }
-                // device screen
-                pixelBackBufferPutpixel ( color, X, Y ); 
-                return 0;
-            }
-            return -1;
-        }
-        return -1;
+        //if (Draw == FALSE){ return -1; }
+        goto draw;
     }
 
 
-    // z maior que zero.
+    // z maior ou igual a zero.
+    //    |
+    //    ----
+    //
     if (z >= 0)
     {
-         
-        //positivo, para direita.
+        // z é positivo para todos os casos onde z é maior igual a 0.
+        
+        // positivo, para direita.
+        // Desloca a base x para direita, onde fica o z positivo
         if (x >= 0 )
         {
-            zBaseX = (unsigned long) (HotSpotX + (unsigned long) z);
-            
-            X = (unsigned long) (zBaseX + (unsigned long) x);
+            X = (unsigned long) ( (unsigned long) HotSpotX + (unsigned long) x );
         }
         
         // negativo, para esquerda.
+        // Desloca a base x para direita, onde fica o z positivo
         if (x < 0 )
         {
-            zBaseX = (unsigned long) (HotSpotX + (unsigned long) z);
             x = abs(x);   
-            X = (unsigned long) (zBaseX - (unsigned long) x);
+            X = (unsigned long) ( (unsigned long)HotSpotX - (unsigned long)x  );
         }
 
-        //positivo, para cima.
+        // positivo, para cima.
+        // Desloca a base y para cima, onde fica o z positivo
         if ( y >= 0 )
         {
-            zBaseY = (unsigned long) (HotSpotY - (unsigned long) z);
-            
-            Y = (unsigned long) (zBaseY - (unsigned long) y); 
+            Y = (unsigned long) ( (unsigned long)HotSpotY - (unsigned long)y );
         }
 
         // negativo, para baixo
+        // Desloca a base y para cima, onde fica o z positivo
         if ( y < 0 )
         {
-            zBaseY = (unsigned long) (HotSpotY - (unsigned long) z);
             y = abs(y);
-            Y = (unsigned long) (zBaseY + (unsigned long) y);           
+            Y = (unsigned long) ( (unsigned long)HotSpotY + (unsigned long)y );
         }
 
-        // ??
-        // Device screen.
-        // #todo: 
-        // In the future we will have a situation when we are plotting
-        // inside a valid screen, inside a window. and the 'origin'
-        // will be in the center of the window and not in the center 
-        // of the device screen. 
+        if (Z_Translation == TRUE){
+            X = ( (unsigned long) X + (unsigned long) z );
+            Y = ( (unsigned long) Y - (unsigned long) z );
+        }
+        
+        //if (Draw == FALSE){ return -1; }
+        goto draw;
+    }
 
-        if ( 0 <= X < DeviceScreen->width && 
-             0 <= Y < DeviceScreen->height )
+    //
+    // fail
+    //
+    
+    Draw = FALSE;
+    
+    return -1;
+
+    //
+    // draw
+    //
+    
+draw:
+    
+    //
+    // Clipping
+    //
+    
+    if ( 0 <= X < DeviceScreen->width && 
+         0 <= Y < DeviceScreen->height )
+    {
+        if (Draw == TRUE)
         {
-            if (Draw == TRUE)
-            {
-                if (X<0){ return -1; }
-                if (Y<0){ return -1; }
-                // device screen
-                pixelBackBufferPutpixel ( color, X, Y );  
-                return 0;
-            }
-            return -1;
+            if (X<0){ return -1; }
+            if (Y<0){ return -1; }
+            // device screen
+            pixelBackBufferPutpixel ( color, X, Y ); 
+            return 0;
         }
         return -1;
     }
-
+    
+    // fail 
+    
     return -1;
 }
 

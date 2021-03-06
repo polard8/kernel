@@ -185,6 +185,23 @@ int BAT_TEST (void);
 
 
 
+// internal
+// Only one parameter.
+void __initDialog ( int message )
+{
+
+    if(message < 0)
+        return;
+
+    // Call init process: [9216] Launch launcher
+    kgws_event_dialog ( 
+        (int) InitProcess->control->tid,
+        (struct window_d *) 0,
+        (int)               message,
+        (unsigned long)     0,
+        (unsigned long)     0 );
+}
+
 
 /*
  ******************************************************************* 
@@ -321,13 +338,15 @@ __local_ps2kbd_procedure (
                 case VK_F6:
                     if (ctrl_status == 1){
 
+                        __initDialog(9216);
+                        
                         // Call init process: [9216] Launch launcher
-                        kgws_event_dialog ( 
-                            (int) InitProcess->control->tid,
-                            (struct window_d *) 0,
-                            (int)               9216,
-                            (unsigned long)     0,
-                            (unsigned long)     0 );
+                        //kgws_event_dialog ( 
+                          //  (int) InitProcess->control->tid,
+                          //  (struct window_d *) 0,
+                          //  (int)               9216,
+                          //  (unsigned long)     0,
+                          //  (unsigned long)     0 );
 
                    
                     //ws_show_info();
@@ -354,14 +373,16 @@ __local_ps2kbd_procedure (
                 // Test 1.
                 case VK_F7:
                     if (ctrl_status == 1){
-                    
+
+                        __initDialog(9217);
+                        
                         // Call init process: [9217] Launch gdeshell
-                        kgws_event_dialog ( 
-                            (int) InitProcess->control->tid,
-                            (struct window_d *) 0,
-                            (int)               9217,
-                            (unsigned long)     0,
-                            (unsigned long)     0 );
+                        //kgws_event_dialog ( 
+                          //  (int) InitProcess->control->tid,
+                          //  (struct window_d *) 0,
+                          //  (int)               9217,
+                          //  (unsigned long)     0,
+                          //  (unsigned long)     0 );
 
                     
                     //fs_show_file_info(stdin);
@@ -396,6 +417,9 @@ __local_ps2kbd_procedure (
                 // Test 2.
                 case VK_F8:
                     if (ctrl_status == 1){
+
+                    __initDialog(9218);
+
                     //printf (">> %x \n", get_new_frame() );
                     //refresh_screen();
                     // testNIC ();
