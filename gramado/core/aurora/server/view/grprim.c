@@ -330,11 +330,27 @@ gr_clamp(
 int grPlot0 (int z, int x, int y, unsigned long color)
 {
 
+
+    // #todo
+    // This is the reflection routine.
+    // We need to create a helper function for reflection
+    // and separate plot from reflection.
+
+
+
     // Draw flag.
     int Draw = TRUE;
     
-    // z translation
-    int Z_Translation = TRUE;
+    
+    int UsingDepthBuffer = FALSE;
+    
+    int UsingAlphaBlending = FALSE;
+
+    // left hand orientation
+    // z+ on top/right corner.
+    
+    int FixOrientation = TRUE;
+
 
 
     // #todo
@@ -431,7 +447,7 @@ int grPlot0 (int z, int x, int y, unsigned long color)
             Y = (unsigned long) ( (unsigned long) HotSpotY + (unsigned long) y );
         }
 
-        if (Z_Translation == TRUE){
+        if (FixOrientation == TRUE){
             X = ( (unsigned long) X - (unsigned long) z );
             Y = ( (unsigned long) Y + (unsigned long) z );
         }
@@ -479,7 +495,7 @@ int grPlot0 (int z, int x, int y, unsigned long color)
             Y = (unsigned long) ( (unsigned long)HotSpotY + (unsigned long)y );
         }
 
-        if (Z_Translation == TRUE){
+        if (FixOrientation == TRUE){
             X = ( (unsigned long) X + (unsigned long) z );
             Y = ( (unsigned long) Y - (unsigned long) z );
         }
@@ -506,15 +522,43 @@ draw:
     // Clipping
     //
     
+    // #todo: 
+    // We need to check the window limits
+    // if we are drawing inside a given window.
+
+    // Checking the device screen limits.
+        
     if ( 0 <= X < DeviceScreen->width && 
          0 <= Y < DeviceScreen->height )
     {
         if (Draw == TRUE)
         {
+            // #bugbug
+            // Já fizemos isso logo acima.
+            
             if (X<0){ return -1; }
             if (Y<0){ return -1; }
+            
+            if ( UsingAlphaBlending == TRUE )
+            {
+                // #todo
+                // Get the color and modify it.
+                
+                //color = get??()
+            }
+            
             // device screen
+            // 2D, No clipping or transformation.
             pixelBackBufferPutpixel ( color, X, Y ); 
+            
+            // #todo
+            // This is a work in progress
+            
+            //if( UsingDepthBuffer == TRUE )
+            //{
+            //    depth_buffer[ offset ] = Z;
+            //}
+            
             return 0;
         }
         return -1;
