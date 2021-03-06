@@ -330,12 +330,8 @@ gr_clamp(
 int grPlot0 (int z, int x, int y, unsigned long color)
 {
 
-
     // #todo
-    // This is the reflection routine.
-    // We need to create a helper function for reflection
-    // and separate plot from reflection.
-
+    // This is a work in progress
 
 
     // Draw flag.
