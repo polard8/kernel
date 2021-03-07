@@ -264,8 +264,8 @@ int main ( int argc, char *argv[] )
         exit(1);
     }
 
-    left   = 0;
-    top    = 0;
+    left   = 2;
+    top    = 2;
     width  = (deviceWidth  >> 2);
     height = (deviceHeight >> 1);
 
@@ -273,39 +273,15 @@ int main ( int argc, char *argv[] )
 
     if ( deviceWidth == 320 && deviceHeight == 200 )
     {
-        width  = deviceWidth;
-        height = deviceHeight;
+        width  = (deviceWidth  -4);
+        height = (deviceHeight -4);
     }
 
-	//
-	// ## vamos repetir o que dá certo ...
-	//
-
-	//vamos passar mais coisas via registrador.
-
-	//ok
-	//foi passado ao crt0 via registrador
-	//printf("argc={%d}\n", argc ); 
-	
-	//foi passado ao crt0 via memória compartilhada.
-	//printf("argvAddress={%x}\n", &argv[0] ); //endereço.
-	
-	
-	//unsigned char* buf = (unsigned char*) (0x401000 - 0x100) ;
-	//printf("argvString={%s}\n" ,  &argv[0] );
-	//printf("argvString={%s}\n" , &buf[0] );
-	
-	//printf("argv={%s}\n", &argv[2] );
-
-	//
-	// ## app window ##
-	//
-
-	//green crocodile = 0x44541C 
-	//orange royal = 0xF9812A
-	//window = 0xF5DEB3
-	//client window = 0x2d89ef 
-	//...
+	// #remember: Colors
+	// green crocodile = 0x44541C 
+	// orange royal    = 0xF9812A
+	// window          = 0xF5DEB3
+	// client window   = 0x2d89ef 
 
 
     //
@@ -313,18 +289,16 @@ int main ( int argc, char *argv[] )
     //
 
     //++
-    gde_begin_paint ();
+    gde_begin_paint();
     hWindow = (void *) gde_create_window ( 
-                           WT_OVERLAPPED, 1, 1, 
-                           "Launcher",
+                           WT_OVERLAPPED, 1, 1, "Launcher",
                            left, top, width, height,  
-                           0, 0, COLOR_BLUE, COLOR_BLUE ); 
+                           0, 0, COLOR_BLUE2CYAN, COLOR_BLUE2CYAN ); 
 
     if ( (void *) hWindow == NULL ){
         printf ("launcher: hWindow fail\n");
-        gde_end_paint ();
+        gde_end_paint();
         goto fail;
-        
     }else{
         //Registrar e mostrar.
         gde_register_window  (hWindow);
@@ -333,219 +307,21 @@ int main ( int argc, char *argv[] )
         //global, pra acessar via procedimento de janela.
         main_window = ( struct window_d *) hWindow;
     };
-    gde_end_paint ();
+    gde_end_paint();
     //--
 
 
-
-	//printf("Nothing for now! \n");
-    //goto done;
-
-	//gde_begin_paint();    
-	//topbarInitializeTopBar();
-	//statusInitializeStatusBar();
-	//update_statuts_bar("# Status bar string 1","# Status bar string 2");
-	//gde_end_paint ();
-	
-	//
-	//  ## Testing file support. ##
-	//
-	
-	//++
-	/*
-	void *b = (void *) malloc (1024*30); 	 
-    
-	if ( (void *) b == NULL )
-	{
-		printf ("gfe: allocation fail\n");
-		
-		goto fail;
-	}else{
-		
-        // @todo: 
-	    // Usar alguma rotina da API específica para carregar arquivo.
-	    // na verdade tem que fazer essas rotinas na API.
-	
-	    system_call ( SYSTEMCALL_READ_FILE, (unsigned long) "BMP1    BMP", 
-		    (unsigned long) b, (unsigned long) b );	
-		    
-		apiDisplayBMP ( (char *) b, 200, 200 ); 
-		
-		//não sei se é necessário.
-		gde_show_backbuffer ();		
-	};
-	 */
-    //--
-
-	
-
-	
-	//
-    // ## testes ##
-    //
- 
-
-	
-	//
-	// Grid.
-	//
-	
-	/*
-	//++
-	gde_begin_paint (); 
-	gWindow = (void *) APICreateWindow ( WT_SIMPLE, 1, 1, "GRID-WINDOW",
-	                       (1024-150), 10, 100, 320,    
-                           hWindow, 0, 0x303030, 0x303030 );	  
-	if ( (void *) gWindow == NULL )
-	{	
-		printf ("gfe: gWindow fail");
-		gde_end_paint ();
-
-		goto fail;
-	}else{
-		
-        APIRegisterWindow (gWindow);		
-		
-		// #bugbug
-		// problemas na largura dos ítens quando pintamos no modo vertical;
-		// ver a rotina no kgws,
-		
-	    //#obs: Acho que isso cria grid.
-	    int s = (int) system_call ( 148, (unsigned long) gWindow, 
-	                      4, (unsigned long) GRID_VERTICAL );
-	                      //4, (unsigned long) GRID_HORIZONTAL );		
-	
-        if (s == 1)	
-        {
-		    printf ("gfe: 148 fail.\n");
-	        gde_end_paint ();
-	        
-	        goto fail;
-	    }
-	    
-	    apiShowWindow (gWindow);
-	};
-	gde_end_paint ();
-	//--
-	*/
-	
-	
-	//
-	// Menu.
-	//
-	
-	/*
-	//++
-	gde_begin_paint (); 
-	mWindow = (void *) APICreateWindow ( WT_SIMPLE, 1, 1, "MENU-WINDOW",
-	                       (1024-350), 400, 320, 200,
-	                       hWindow, 0, COLOR_PINK, COLOR_PINK );	    
-                           //hWindow, 0, 0x303030, 0x303030 );	  
-
-	if ( (void *) mWindow == NULL )
-	{	
-		printf ("gfe: mWindow fail");
-		gde_end_paint ();
-		
-		goto fail;
-	}else{
-		
-        APIRegisterWindow (mWindow);		
-
-	    // #obs: Acho que isso cria menu.
-	    // Criaremos o menu de acordo com a janela mãe
-	    // mas usaremos apenas o posicionamento da janela mãe. left top
-	    // ou o ponteiro do mouse, quando clicarmos com o botão direito.
-	    
-        system_call ( 149, (unsigned long) mWindow, 
-            (unsigned long) mWindow, (unsigned long) mWindow );
-            
-    	apiShowWindow (mWindow);            
-	};
-	gde_end_paint ();
-    //--	
-	*/
-	
-	
-	//
-	// ## Mostrando bmps dentro da área de cliente ##
-	//
-	
-	// #todo:
-	// Ainda em planejamento.
-	 	
-	//struct window *tmpWindow;
-	//struct window *icon1;
-	//struct window *icon2;
-	//struct window *icon3;
-	//struct window *icon4;
-	//...
-	
-	/*
-	int i;
-	for ( i=0; i<15; i++ )
-	{
-		// #isso é um teste.
-		// Criando janelas para os ícones, mas deveria 
-		// criar grid ou menu.
-		// #bugbug: Não temos acesso aos elementos da estrutura 
-		// da janela, pois estão em ring0.
-	    
-        gde_begin_paint(); 
-	    tmpWindow = (void*) APICreateWindow( WT_SIMPLE, 1, 1,"ICON-WINDOW",
-	                    20, 1+20+(i*24), 
-						800-40, 24,    
-                        0, 0, COLOR_BLUE, COLOR_BLUE );	  
-
-	    if((void*) tmpWindow == NULL)
-	    {	
-		    printf("WINDOW-FAIL");
-		    gde_end_paint();
-		    goto fail;
-	    }
-        gde_end_paint();		
-		
-		
-		
-	    //Usando a API para exibir o bmp carregado. 
-	    //ACHO QUE ISSO SOMENTE PINTA NO BACKBUFFER
-	    apiDisplayBMP ( (char *) b, 40, 1 + 60 + (i*24) ); 
-    };
-    */
-    
-    
-    
-	 //
-	 // Novo menu.
-	 //
-	 
-	 // #obs: Acho que isso cria menu.
-	 // Criaremos o menu de acordo com a janela mãe
-	 // mas usaremos apenas o posicionamento da janela mãe. left top
-	 // ou o ponteiro do mouse, quando clicarmos com o botão direito.
-	    
-     //system_call ( 149, (unsigned long) hWindow, 
-     //    (unsigned long) hWindow, (unsigned long) hWindow );    
-	
-			
-	//
-	// ## Refresh Window ##
-	//
-	
-	// #bugbug
-	// Talvez não precisemos disso.
-	//gde_show_backbuffer ();
+    gde_draw_text ( main_window, 8, 8, COLOR_WHITE, "Gramado OS 1.0");
 
 
+    // =========
     // button 1
     //++
     gde_enter_critical_section ();
     launcher_button_1 = (void *) gde_create_window ( 
-                                     WT_BUTTON, 1, 1, 
-                                     "[F1] gdeshell",  
-                                     2, (height/4)*0, (width -4), (height/4), 
-                                     hWindow, 0, 
-                                     xCOLOR_GRAY3, xCOLOR_GRAY3 );
+                                     WT_BUTTON, 1, 1, "[F1] gdeshell",  
+                                     2, (height/8)*4, (width -4), (height/8), 
+                                     hWindow, 0, xCOLOR_GRAY3, xCOLOR_GRAY3 );
 
     if ( (void *) launcher_button_1 == NULL )
     {
@@ -560,13 +336,13 @@ int main ( int argc, char *argv[] )
     gde_exit_critical_section ();
     //--
 
-
+    // =========
     // button 2
     //++
     gde_enter_critical_section (); 
-    launcher_button_2 = (void *) gde_create_window ( WT_BUTTON, 1, 1, 
-                                     "[F2] gramcode", 
-                                     2, (height/4)*1, (width -4), (height/4),
+    launcher_button_2 = (void *) gde_create_window ( 
+                                     WT_BUTTON, 1, 1, "[F2] gramcode", 
+                                     2, (height/8)*5, (width -4), (height/8),
                                      hWindow, 0, 
                                      xCOLOR_GRAY3, xCOLOR_GRAY3 );
 
@@ -584,12 +360,13 @@ int main ( int argc, char *argv[] )
     gde_exit_critical_section (); 
     //--
 
+    // =========
     // button 3
     //++
     gde_enter_critical_section (); 
-    launcher_button_3 = (void *) gde_create_window ( WT_BUTTON, 1, 1, 
-                                     "[F3] sysmon", 
-                                     2, (height/4)*2, (width -4), (height/4),
+    launcher_button_3 = (void *) gde_create_window ( 
+                                     WT_BUTTON, 1, 1, "[F3] sysmon", 
+                                     2, (height/8)*6, (width -4), (height/8),
                                      hWindow, 0, 
                                      xCOLOR_GRAY3, xCOLOR_GRAY3 );
 

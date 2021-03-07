@@ -901,7 +901,7 @@ typedef enum {
 #define PRIORITY_LOW3      2  //3
 #define PRIORITY_LOW2      3  //2
 #define PRIORITY_LOW1      4  //1 
-#define PRIORITY_NORMAL    5  //*0 (Normal).
+#define PRIORITY_NORMAL    5  //0 (Normal).
 #define PRIORITY_HIGH1     6  //1
 #define PRIORITY_HIGH2     7  //2
 #define PRIORITY_HIGH3     8  //3
@@ -914,43 +914,43 @@ typedef enum {
 #define PRIORITY_SUPERHIGH  PRIORITY_HIGH4
 #define PRIORITY_MAX        PRIORITY_SUPERHIGH    
 //Definição especial.
-#define PRIORITY_REALTIME  10    
+#define PRIORITY_REALTIME  10
 
 
  
 //
 //  ## COLOR DEFINES ##
 // 
- 
- 
-//CORES BÁSICAS.
-#define rgbBlack   0x000000
-#define rgbBlue    0x0000FF
-#define rgbCyan    0x00FFFF
-#define rgbGreen   0x00FF00
-#define rgbMagenta 0xFF00FF
-#define rgbRed     0xFF0000
-#define rgbYellow  0xFFFF00
-#define rgbWhite   0xFFFFFF 
+
+
+// basic colors
+#define rgbBlack    0x000000
+#define rgbBlue     0x0000FF
+#define rgbCyan     0x00FFFF
+#define rgbGreen    0x00FF00
+#define rgbMagenta  0xFF00FF
+#define rgbRed      0xFF0000
+#define rgbYellow   0xFFFF00
+#define rgbWhite    0xFFFFFF 
 
 // ## blue support ##
-#define COLOR_BLUE1 0x067AB5
-#define COLOR_BLUE2CYAN   0x1BA1E2
-#define COLOR_BLUE3COBALT 0x0050EF
-#define COLOR_BLUE4INDIGO 0x6A00FF
+#define COLOR_BLUE1        0x067AB5
+#define COLOR_BLUE2CYAN    0x1BA1E2
+#define COLOR_BLUE3COBALT  0x0050EF
+#define COLOR_BLUE4INDIGO  0x6A00FF
 
 // ## gray support ## 
 //cinza para pintar janela
 //a janela tem camadas que vai do mais escuro para o mais claro.
-#define xCOLOR_BLACK 0x000000  //preto
-#define xCOLOR_GRAY1 0x202020  //cinza mais escuro
-#define xCOLOR_GRAY2 0x404040  //cinza
-#define xCOLOR_GRAY3 0x606060  //cinza
-#define xCOLOR_GRAY4 0x808080  //cinza
-#define xCOLOR_GRAY5 0xa0a0a0  //cinza
-#define xCOLOR_GRAY6 0xc0c0c0  //cinza
-#define xCOLOR_GRAY7 0xe0e0e0  //cinza mais clarinho
-#define xCOLOR_WHITE 0xffffff  //branco  
+#define xCOLOR_BLACK  0x000000  //preto
+#define xCOLOR_GRAY1  0x202020  //cinza mais escuro
+#define xCOLOR_GRAY2  0x404040  //cinza
+#define xCOLOR_GRAY3  0x606060  //cinza
+#define xCOLOR_GRAY4  0x808080  //cinza
+#define xCOLOR_GRAY5  0xa0a0a0  //cinza
+#define xCOLOR_GRAY6  0xc0c0c0  //cinza
+#define xCOLOR_GRAY7  0xe0e0e0  //cinza mais clarinho
+#define xCOLOR_WHITE  0xffffff  //branco  
  
 
 //WIN23 - TRÊS TIPOS DE CINZA.
