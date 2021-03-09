@@ -54,6 +54,11 @@ See: https://wiki.osdev.org/Graphics_stack
 #include <gws.h>
 
 
+#define VERSION  "0.1"
+#define VERSION_MAJOR  0
+#define VERSION_MINOR  1
+
+
 
 //
 // == Gramado Network Protocol ===============================
@@ -98,6 +103,11 @@ int connection_status = 0;
 //
 // == Mouse ++ ==================================================
 //
+
+
+// #bugbug
+// It was a test.
+// Why we still havell all this code here?
 
 // #test
 // #bugbug 
@@ -1539,17 +1549,17 @@ int initGraphics (void){
 
     create_background();
 
-     // Testing bmp.
+    // Testing bmp.
     // See:
     if (current_mode == GRAMADO_JAIL){
         gwssrv_display_system_icon ( 1, 8, 100 );
         gwssrv_display_system_icon ( 2, 8, 120 );
-        gwssrv_display_system_icon ( 3, 8, 140 );
-        gwssrv_display_system_icon ( 4, 8, 160 );
+        //gwssrv_display_system_icon ( 3, 8, 140 );
+        //gwssrv_display_system_icon ( 4, 8, 160 );
         // ...
     }else{
         gwssrv_display_system_icon ( 1, 8, 100 );
-        gwssrv_display_system_icon ( 2, 8, 120 );
+        //gwssrv_display_system_icon ( 2, 8, 120 );
     };
 
     //#debug breakpoint
@@ -1979,6 +1989,7 @@ void gwssrv_init_client_support (void)
 {
     int i=0;
 
+
     gwssrv_debug_print ("gwssrv_init_client_support:\n");
 
     for (i=0; i<CLIENT_COUNT_MAX; i++)
@@ -1998,14 +2009,14 @@ void gwssrv_init_client_support (void)
         exit(1);
     }else{
         serverClient->id = 0;
-        serverClient->used = 1;
+        serverClient->used  = TRUE;
         serverClient->magic = 1234;
-        serverClient->is_connected = 0;  //no
+        serverClient->is_connected = FALSE;
         serverClient->fd = -1;
         serverClient->pid = getpid();
         serverClient->gid = getgid();
         // ...
-        
+
         // #todo
         // Limpar a fila de mensagens para esse cliente.
         
@@ -2030,13 +2041,19 @@ void init_client_struct ( struct gws_client_d *c )
 {
     int i=0;
 
+
     if ( (void*) c == NULL )
+    {
+        gwssrv_debug_print("init_client_struct: c fail\n");
         return;
- 
+    }
+
+
     c->id = -1;  //fail
-    c->used = 1;
+
+    c->used  = TRUE;
     c->magic = 1234;
-    c->is_connected = 0;  //no
+    c->is_connected = FALSE;
     c->fd = -1;
     c->pid = -1;
     c->gid = -1;
@@ -2212,6 +2229,13 @@ int serviceAsyncCommand (void)
 }
 
 
+
+char *gwssrv_get_version(void)
+{
+    return VERSION;
+}
+
+
 /*
  ******************************
  * main: 
@@ -2278,8 +2302,8 @@ int main (int argc, char **argv)
 
     // Version.
     
-    window_server->version_major    = 0;
-    window_server->version_minor    = 1;
+    window_server->version_major = VERSION_MAJOR;
+    window_server->version_minor = VERSION_MINOR;
 
     // strings
     // #todo: we need to finalize these strings?

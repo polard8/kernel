@@ -29,17 +29,20 @@
 // ===================
 // Defines
 // Credits: serenity OS
-#define IRQ_MOUSE 1
+
+// ??
+// #define IRQ_MOUSE  1
+
 
 // ?
-#define I8042_BUFFER 0x60
-#define I8042_STATUS 0x64
+#define I8042_BUFFER  0x60
+#define I8042_STATUS  0x64
 
-#define I8042_ACK 0xFA
-#define I8042_BUFFER_FULL 0x01
-#define I8042_WHICH_BUFFER 0x20
-#define I8042_MOUSE_BUFFER 0x20
-#define I8042_KEYBOARD_BUFFER 0x00
+#define I8042_ACK              0xFA
+#define I8042_BUFFER_FULL      0x01
+#define I8042_WHICH_BUFFER     0x20
+#define I8042_MOUSE_BUFFER     0x20
+#define I8042_KEYBOARD_BUFFER  0x00
 
 #define PS2MOUSE_SET_RESOLUTION            0xE8
 #define PS2MOUSE_STATUS_REQUEST            0xE9
@@ -215,7 +218,7 @@ unsigned char xxx_mouse_read (void)
 
 // Esta rotina faz o Auto-teste. 
 // 0xaa êxito, 0xfc erro.
-// Created by Fed Nora.
+// Created by Fred Nora.
 
 int MOUSE_BAT_TEST (void)
 {
@@ -286,9 +289,9 @@ int ps2_mouse_globals_initialize (void)
     ioControl_mouse = (struct ioControl_d *) kmalloc ( sizeof(struct ioControl_d) );
 
     if ( (void *) ioControl_mouse == NULL ){
-        panic("ps2_mouse_globals_initialize: ioControl_mouse fail\n");
+        panic("ps2_mouse_globals_initialize: [FAIL] ioControl_mouse\n");
     }else{
-        ioControl_mouse->used  = 1;
+        ioControl_mouse->used  = TRUE;
         ioControl_mouse->magic = 1234;
         ioControl_mouse->id = 0;
 		//Qual thread está usando o dispositivo.
@@ -302,6 +305,9 @@ int ps2_mouse_globals_initialize (void)
 
     // #importante
     // habilitando o mouse ps2.
+    // ?? Is this a global thing ?
+    // Where is it defined?
+
     ps2_mouse_status = 1;
 
 
@@ -327,7 +333,11 @@ int ps2_mouse_globals_initialize (void)
 	// Fazer com cuidado.
 
 
-	//#bugbug. Cuidado com essa inicializaçao.
+    // #bugbug. 
+    // Cuidado com essa inicializaçao.
+    // #todo
+    // We need a helper to set this thing up.
+
     g_mousepointer_width  = 16;
     g_mousepointer_height = 16;
 
@@ -340,12 +350,13 @@ int ps2_mouse_globals_initialize (void)
 
 
 	//
-	// ## BMP ##
+	// BMP
 	//
 
-
-	//printf ("ps2_mouse_globals_initialize: carregando bmp\n");
-	//refresh_screen();
+    // #todo
+    // We need to change the name of this function.
+    // It's because we're gonna need to use another
+    // format of file.
 
 	// Carregando o bmp do disco para a memória
 	// e apresentando pela primeira vez.
@@ -354,14 +365,15 @@ int ps2_mouse_globals_initialize (void)
 
     if (mouse_ret != 0)
     {
-        panic ("ps2_mouse_globals_initialize: load_mouse_bmp\n");
+        panic ("ps2_mouse_globals_initialize: [FAIL] load_mouse_bmp\n");
     }
 
-	//printf("ps2_mouse_globals_initialize: done\n");
-	//refresh_screen ();
-
+    // ??
     //initialized = 1;
+
     //return (kernelDriverRegister(mouseDriver, &defaultMouseDriver));
+
+    debug_print("done\n");
 
     return 0;
 }
@@ -387,7 +399,7 @@ void ps2mouse_initialize_device (void)
     unsigned char device_id=0;
     
 
-    __breaker_ps2mouse_initialized = 0;
+    __breaker_ps2mouse_initialized = FALSE;
 
 
 
@@ -421,9 +433,12 @@ void ps2mouse_initialize_device (void)
     // Dizemos para o controlador entrar no modo leitura.
     // Esperamos para ler e lemos.
     // 0x20 Read Command Byte
-    wait_then_write (0x64,I8042_READ);    // I8042_READ = 0x20    
+    // I8042_READ = 0x20
+
+    wait_then_write(0x64,I8042_READ);
     status = wait_then_read(0x60) | 2;
-    
+
+
     // #bugbug
     // O defeito pode estar aqui
     //ja que nosso maior problema eh ficar se interrupçao.
@@ -449,12 +464,14 @@ void ps2mouse_initialize_device (void)
     // 0xA8 Enable Mouse
     // 0xA7 Disable Mouse
     // 0xA9 Check Mouse InterfaceReturns 0, if OK
-    wait_then_write (0x64,0xA8);
-    for (i=0;i<20000;i++){};
+
+    wait_then_write(0x64,0xA8);
+    for (i=0; i<20000; i++)
+    {
+    };
 
     //======================================================
-    //--    
-
+    //-- 
 
 
 	// 0xFF

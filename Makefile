@@ -62,8 +62,8 @@ endif
 #
 
 ## ===============================================================
-## Step0 build-system-files - Libraries and apps.
-## Step1 build-applications - setupx files. 
+## Step0 build-landos-files - landos files.
+## Step1 build-gws-files    - Gramado Window System files. 
 ## Step2 /mnt/gramadovhd    - Creating the directory to mount the VHD.
 ## Step3 vhd-mount          - Mounting the VHD.
 ## Step4 vhd-copy-files     - Copying files into the mounted VHD.
@@ -75,15 +75,16 @@ PHONY := all
 
 # All the steps.
 all:  \
-build-system-files \
-build-applications \
-/mnt/gramadovhd  \
-vhd-mount \
-vhd-copy-files \
-vhd-unmount \
-clean \
+build-landos-files \
+build-gws-files    \
+/mnt/gramadovhd    \
+vhd-mount          \
+vhd-copy-files     \
+vhd-unmount        \
+clean              \
 clean-system-files \
 generate    
+
 
 # Giving permitions to run ./run hahaha
 	chmod 755 ./run
@@ -96,9 +97,10 @@ generate
 
 #===================================================
 #:::0
-# ~ Step 0: Building system files.
-PHONY := build-system-files
-build-system-files: \
+# ~ Step 0: landos files.
+
+PHONY := build-landos-files
+build-landos-files: \
 /usr/local/gramado-build \
 land-boot \
 land-lib \
@@ -173,9 +175,10 @@ land-os:
 
 #===================================================
 #:::1
-# ~ Step 1 gramado directories.
-PHONY := build-applications 
-build-applications: \
+# ~ Step 1 - Gramado Window System files.
+
+PHONY := build-gws-files 
+build-gws-files: \
 gramado-cmd \
 gramado-setup \
 gramado-core \

@@ -67,6 +67,15 @@
 #include <gwm.h>
 
 
+int topbarList[8];
+int taskbarList[8];
+
+
+struct gws_menu_d *menu0;
+
+unsigned long menu0Itens[8];
+
+
 //
 // == Gramado Network Protocol ===============================
 //
@@ -187,6 +196,8 @@ void test_create_menu ( int fd, int window )
 
     struct gws_menu_d *menu;
 
+    struct gws_menu_item_d *menu_item;
+
     unsigned long menuX;
     unsigned long menuY;
 
@@ -224,39 +235,50 @@ void test_create_menu ( int fd, int window )
         return -1;
     }
  
+    // save menu pointer
+    menu0 = menu;
  
     // #todo
     // Check in the lib if the function returns something.
     // It is good to return some pointer to menuitem struct.
  
-  
+    //====================================
     //menu item
-    gws_create_menu_item (
+    menu_item = gws_create_menu_item (
         (int) fd,
         (char *) "F1",
         (int) 0,
         (struct gws_menu_d *) menu );
+    menu0Itens[0] = (unsigned long) menu_item;
 
+    //====================================
     //menu item
-    gws_create_menu_item (
+    menu_item = gws_create_menu_item (
         (int) fd,
         (char *) "F2",
         (int) 1,
         (struct gws_menu_d *) menu );
+    menu0Itens[1] = (unsigned long) menu_item;
 
+    //====================================
     //menu item
-    gws_create_menu_item (
+    menu_item = gws_create_menu_item (
         (int) fd,
         (char *) "F3",
         (int) 2,
         (struct gws_menu_d *) menu );
+    menu0Itens[2] = (unsigned long) menu_item;
 
+    //====================================
     //menu item
-    gws_create_menu_item (
+    menu_item = gws_create_menu_item (
         (int) fd,
         (char *) "F4",
         (int) 3,
         (struct gws_menu_d *) menu );
+    menu0Itens[3] = (unsigned long) menu_item;
+    
+    
 }
 
 
@@ -693,13 +715,21 @@ int create_bg_client(int fd)
     // == bg (Client) ==================================
     // 
     
-    // Topbar
-    gws_debug_print ("gwm: Create c_topbar client\n");
+    gws_debug_print ("gwm: Create c_bg client\n");
+
     c_bg = (struct wm_client_d *) malloc ( sizeof(struct wm_client_d) );
+
     if( (void *) c_bg == NULL){
         printf ("gwm: c_bg fail\n");
         exit(1);
     }else{
+
+        c_bg->used  = TRUE;
+        c_bg->magic = 1234;
+
+        c_bg->dirty = FALSE;
+        c_bg->focus = FALSE;
+        sprintf( c_bg->name, "name");
 
         //c_bg
         c_bg->window = gws_create_window (fd,
@@ -725,21 +755,22 @@ int create_bg_client(int fd)
     
     // Window.
     MOUSE_WINDOW = gws_create_window (fd,
-                                    WT_SIMPLE,1,1,"Mouse",
-                                    hot_spot.x, hot_spot.y, 
-                                    4, 4,
-                                    0,0, COLOR_BLACK, COLOR_BLACK);
+                       WT_SIMPLE,1,1,"Mouse",
+                       hot_spot.x, hot_spot.y, 4, 4,
+                       0,0, COLOR_BLACK, COLOR_BLACK);
         
     if ( MOUSE_WINDOW < 0){
         printf ("gwm: MOUSE_WINDOW fail\n");
         exit(1);
     }
-    
+
     return 0;
 }
 
 
-//interna
+// internal
+// Create the top bar and one button.
+
 int create_topbar_client(int fd)
 {
     unsigned long w = gws_get_system_metrics(1);
@@ -759,17 +790,27 @@ int create_topbar_client(int fd)
     // Topbar
     gws_debug_print ("gwm: Create c_topbar client\n");
     c_topbar = (struct wm_client_d *) malloc ( sizeof(struct wm_client_d) );
+
     if( (void *)c_topbar == NULL){
         printf ("gwm: c_topbar fail\n");
         exit(1);
-    
     }else{
 
-        //topbar
+        c_topbar->used  = TRUE;
+        c_topbar->magic = 1234;
+
+        c_topbar->dirty = FALSE;
+        c_topbar->focus = FALSE;
+        sprintf( c_topbar->name, "name");
+        
+        // topbar widnow.
         c_topbar->window = gws_create_window (fd,
-            WT_SIMPLE,1,1,"Topbar",
-            0, 0, w, 32,
-            0,0,xCOLOR_GRAY3, xCOLOR_GRAY3);
+                             WT_SIMPLE, 1, 1, "Topbar",
+                             0, 0, w, 32,
+                             0, 0, xCOLOR_GRAY3, xCOLOR_GRAY3 );
+
+        // #todo
+        // We need to register this window.
         
         if(c_topbar->window < 0){
             printf ("gwm: c_topbar->window fail\n");
@@ -783,6 +824,11 @@ int create_topbar_client(int fd)
                              WT_BUTTON,1,1,"=",
                              2, 2, 32, 28,
                              c_topbar->window, 0,COLOR_GRAY, COLOR_GRAY);
+        
+        // #todo
+        // We need to register this window.
+        
+        topbarList[0] = button1_window;
         
         c_topbar->title_window = -1;  //todo;
         wmclientList[1] = (unsigned long) c_topbar;
@@ -815,35 +861,51 @@ int create_taskbar_client(int fd)
     c_taskbar = (struct wm_client_d *) malloc ( sizeof(struct wm_client_d) );
     if( (void *)c_taskbar == NULL ){
         printf ("gwm: c_taskbar fail\n");
-        exit(1);
-    
+        exit(1); 
     }else{
+
+        c_taskbar->used  = TRUE;
+        c_taskbar->magic = 1234;
+
+        c_taskbar->dirty = FALSE;
+        c_taskbar->focus = FALSE;
+        sprintf( c_taskbar->name, "name");
 
         c_taskbar->window = gws_create_window (fd,
                                  WT_SIMPLE,1,1,"Taskbar",
                                  0, (h-32), w, 32,
                                  0,0,COLOR_GRAY, COLOR_GRAY);
 
+        // #todo
+        // We need to register this window.
+
         if( c_taskbar->window < 0){
             printf ("gwm: c_taskbar->window fail\n");
             exit(1);
         }
+        
         //printf ("w={%x}\n",c_taskbar->window);
         gws_refresh_window(fd,c_taskbar->window);
          
         c_taskbar->title_window = -1;  //todo 
 
+        // ================================
         // button1
         button1_window = gws_create_window (fd,
                               WT_BUTTON,1,1,"App1",
                               2, 2, 120, 28,
                               c_taskbar->window, 0,COLOR_GRAY, COLOR_GRAY);
 
+        taskbarList[0] = button1_window;
+
+        // ================================
          // button2
         button2_window = gws_create_window (fd,
                               WT_BUTTON,1,1,"App2",
                               2 + 120 + 2, 2, 120, 28,
                               c_taskbar->window, 0,COLOR_GRAY, COLOR_GRAY);
+
+        taskbarList[1] = button2_window;
 
         wmclientList[2] = (unsigned long) c_taskbar;
     };
@@ -872,7 +934,8 @@ int create_tester_client(int fd)
     
     //gws_enter_critical_section();
     gws_debug_print ("gwm: Create c_tester client\n");
-    //struct wm_client_d *tester_client;
+
+
     c_tester = (struct wm_client_d *) malloc( sizeof(struct wm_client_d ) );
 
     if( (void *) c_tester == NULL){
@@ -885,6 +948,10 @@ int create_tester_client(int fd)
         c_tester->used  = TRUE;
         c_tester->magic = 1234;
 
+        c_tester->dirty = FALSE;
+        c_tester->focus = FALSE;
+        sprintf( c_tester->name, "name");
+        
         // Window
         c_tester->window = gws_create_window ( fd,
                                WT_SIMPLE, 1, 1,"Tester",
@@ -1114,11 +1181,11 @@ int main ( int argc, char *argv[] ){
     int fd = -1;
 
     // Porta para o Window Server 'ws' em gramado_ports[]
-    struct sockaddr_in addr_in;
-    addr_in.sin_family = AF_INET;
-    
     // Connecting to the window server in this machine.
-    addr_in.sin_port   = PORTS_WS;
+    struct sockaddr_in  addr_in;
+
+    addr_in.sin_family      = AF_INET;
+    addr_in.sin_port        = PORTS_WS;
     addr_in.sin_addr.s_addr = IP(127,0,0,1); 
 
 
@@ -1179,7 +1246,6 @@ int main ( int argc, char *argv[] ){
     create_bg_client(fd);
     create_topbar_client(fd);
     create_taskbar_client(fd);
-
     // ...
 
     

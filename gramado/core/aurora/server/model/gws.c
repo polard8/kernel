@@ -291,6 +291,14 @@ int gwssrv_init_globals(void)
     current_mode = gwssrv_get_system_metrics(130);
 
 
+    // #todo
+    // Check valiation and panic if fail.
+    
+    if (current_mode<0){
+        printf("gwssrv_init_globals: [PANIC] current_mode\n");
+        exit(1);
+    }
+
     //
     // framebuffer and backbuffer.
     //
@@ -362,18 +370,19 @@ int gwssrv_init_globals(void)
          screens[SCREEN_BACKBUFFER] == 0 )
     {
         printf ("gwssrv_init_globals: [FAIL] screens\n");
-        exit (1);
+        exit(1);
     }
 
 
     // refresh the device screen ??
-    refresh_device_screen_flag = 0;
+
+    refresh_device_screen_flag = FALSE;
 
 
     //background_color = xCOLOR_GRAY3;
    
    
-    // Color scheme
+    // Color scheme: Humility
     gwssrv_initialize_color_schemes(ColorSchemeHumility);
     gwssrv_select_color_scheme(ColorSchemeHumility);
 
@@ -457,6 +466,9 @@ int gwsInit(void)
         DeviceScreen->height = SavedY;
         DeviceScreen->bpp    = SavedBPP;  // bits per pixel
         
+        // #todo
+        // Maybe we can check the validation of w h bpp.
+        
         DeviceScreen->pitch = ( SavedX * (SavedBPP/8) );
 
         DeviceScreen->font_size   = 0;    //todo
@@ -472,16 +484,24 @@ int gwsInit(void)
         DeviceScreen->backbuffer  = (void *) ____BACKBUFFER_VA;
         DeviceScreen->frontbuffer = (void *) ____FRONTBUFFER_VA;
         
+        // #todo
+        // Maybe we can check the validation of the buffers.
         
-        DeviceScreen->hotspot_x = ( DeviceScreen->width  / 2 );
-        DeviceScreen->hotspot_y = ( DeviceScreen->height / 2 );
+        
+        //DeviceScreen->hotspot_x = ( DeviceScreen->width  / 2 );
+        //DeviceScreen->hotspot_y = ( DeviceScreen->height / 2 );
+        DeviceScreen->hotspot_x = ( DeviceScreen->width  >> 1 );
+        DeviceScreen->hotspot_y = ( DeviceScreen->height >> 1 );
+
         
         // Limites para a tela em cruz. '+'
         DeviceScreen->min_x = 0;
         DeviceScreen->min_y = 0;
-        DeviceScreen->max_x = ( DeviceScreen->width  / 2 );
-        DeviceScreen->max_y = ( DeviceScreen->height / 2 );
-       
+        //DeviceScreen->max_x = ( DeviceScreen->width  / 2 );
+        //DeviceScreen->max_y = ( DeviceScreen->height / 2 );
+        DeviceScreen->max_x = ( DeviceScreen->width  >> 1 );
+        DeviceScreen->max_y = ( DeviceScreen->height >> 1 );
+
         //...
 
         // The device screen will be the valid screen for now.
@@ -612,11 +632,13 @@ void invalidate(void)
     dirty = TRUE;
 }
 
+// validate the frame.
 void validate(void)
 {
     dirty = FALSE;
 }
 
+//
 int isdirty(void)
 {
     return (int) dirty;
@@ -626,12 +648,12 @@ int isdirty(void)
 void invalidate_background(void)
 {
     // #bugbug: Use background_dirty ??
-    background = 1;
+    background = TRUE;
 }
 
 void validate_background(void)
 {
-    background = 0;
+    background = FALSE;
 }
 
 int is_background_dirty(void)

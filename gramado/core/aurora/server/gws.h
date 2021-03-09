@@ -247,7 +247,7 @@ void gwssrv_exit_critical_section (void);
 void gwssrv_show_backbuffer (void);
 
 
-
+char *gwssrv_get_version(void);
 
 int gwsInit(void);
 

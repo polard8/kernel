@@ -1,17 +1,11 @@
+landos/
 
-	Prefixes for the name of the files.
+
+	This is the system folder.
+
+	init/    The init process.
+	kernel/  The base kernel.
 
 
-	i_  = Initialization.
-	s_  = System
-	d_  = Drawing.
-	r_  = Render.
-	f_  = Finalization.
-
- ===========================================
-
-  r_:
-       The folders draw/ and render/ will provide an easy
-	access to routines that has the hability to improve
-	the performance of the system.
-
+	todo: 
+	We can put all the loadable drivers inside this window.

@@ -436,12 +436,20 @@ int serviceCreateWindow (void){
     {
         gwssrv_debug_print ("serviceCreateWindow: parent window struct fail\n");
         
-        if ( (void*) gui == NULL ){
+        
+        // #bugbug
+        // #todo: panic here.
+        if ( (void*) gui == NULL )
+        {
             gwssrv_debug_print ("serviceCreateWindow: gui fail\n");
+            //exit(1);
         }
-            
-        Parent = gui->screen_window;
-
+        
+        //if ( (void*) gui != NULL ) )
+        //{
+        //    Parent = gui->screen_window;
+        //}
+        
         //  #bugbug
         //  This is a test.
         exit(1); 
@@ -464,12 +472,12 @@ int serviceCreateWindow (void){
        return -1;
     }
 
-    // Register window.
-    id = gwsRegisterWindow ( Window );
+    // Register window
+    id = gwsRegisterWindow(Window);
 
     if (id<0){
         gwssrv_debug_print ("gwssrv: serviceCreateWindow Couldn't register window\n");
-        next_response[1] = 0;
+        next_response[1] = 0;  // msg code.
         return -1;
     }
 
@@ -478,13 +486,16 @@ int serviceCreateWindow (void){
     // It will be sent in the socket loop.
 
     next_response[0] = (unsigned long) id;        // window
-    next_response[1] = SERVER_PACKET_TYPE_REPLY;  // msg 
+    next_response[1] = SERVER_PACKET_TYPE_REPLY;  // msg code
     next_response[2] = 0;
     next_response[3] = 0;
 
     // #debug
     // Show the window. 
     // Delete this in the future.
+
+    // #todo: We need a flag here. Came from parameters.
+    // if( Show == TRUE )
     gws_show_window_rect(Window);
 
     // #debug
@@ -539,8 +550,8 @@ int serviceChangeWindowPosition(void)
         gwssrv_debug_print ("gwssrv: serviceChangeWindowPosition window\n");
         return -1;
     }
-    
-    if ( window->used != 1 || window->magic != 1234 ){
+
+    if ( window->used != TRUE || window->magic != 1234 ){
         gwssrv_debug_print ("gwssrv: serviceChangeWindowPosition validation\n");
         return -1;
     }
@@ -1672,7 +1683,7 @@ struct gwsssrv_menu_d *gwssrv_create_menu (
 }
 
 
-
+// Create menu item
 struct gwsssrv_menu_item_d *gwssrv_create_menu_item (
     char *label,
     int id,
