@@ -273,26 +273,58 @@ void ExecRedPillApplication(void)
 
 int initDialog (int message)
 {
+
+    // See:
+    // landos/kernel/2io/dev/tty/chardev/hid/i8042/ps2kbd.c
+
     switch (message)
     {
+        // redpill application
         case 9216:
-            debug_print ("init.bin: Launching redpill application\n");
-            printf ("init.bin: Message 9216\n");
+            debug_print ("init.bin: [9216] Launching redpill application\n");
+            printf      ("init.bin: [9216] Launching redpill application\n");
             ExecRedPillApplication();
             break;
      
+        // gdeshell
         case 9217:
-            debug_print ("init.bin: Launching the command interpreter\n");
-            printf ("init.bin: Message 9217\n");
+            debug_print ("init.bin: [9217] Launching the command interpreter\n");
+            printf      ("init.bin: [9217] Launching the command interpreter\n");
             ExecCommandInterpreter();
             break;
 
+        // sysmon
         case 9218:
-            debug_print ("init.bin: Launching sysmon\n");
-            printf ("init.bin: Message 9218\n");
+            debug_print ("init.bin: [9218] Launching sysmon\n");
+            printf      ("init.bin: [9218] Launching sysmon\n");
             rtl_clone_and_execute("sysmon.bin");
             break;
+
+        // reboot
+        case 9219:
+            debug_print ("init.bin: [9219] Launching reboot\n");
+            printf      ("init.bin: [9219] Launching reboot\n");
+            rtl_clone_and_execute("reboot.bin");
+            break;
+
+        // servers ...
         
+        // ??
+        case 9220:
+            debug_print ("init.bin: [9220] Launching gwssrv\n");
+            printf      ("init.bin: [9220] Launching gwssrv\n");
+            rtl_clone_and_execute("gwssrv.bin");
+            break;
+
+
+        // ??
+        case 9221:
+            debug_print ("init.bin: [9221] Launching gnssrv\n");
+            printf      ("init.bin: [9221] Launching gnssrv\n");
+            rtl_clone_and_execute("gnssrv.bin");
+            break;
+
+
         // ...
         
         default:
@@ -524,8 +556,13 @@ int main ( int argc, char *argv[] )
 
         // Dialog
         // These messages came from base kernel.
+        // The signature is 12 34
 
-        initDialog( (int) message_buffer[1] );
+        if ( message_buffer[2] == 12 && 
+             message_buffer[3] == 34 )
+        {
+            initDialog ( (int) message_buffer[1] );
+        }
 
         // Clear
         message_buffer[0] = 0;

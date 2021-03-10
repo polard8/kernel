@@ -551,20 +551,22 @@ void process_stats(void){
 
     register int i=0;
     
-    unsigned long __process_image_pa;
-    unsigned long __process_image_va;
-    unsigned long __process_image_size;
+    unsigned long __process_image_pa = 0;
+    unsigned long __process_image_va = 0;
+    unsigned long __process_image_size = 0;
 
-    for (i=100; i<109; i++){
-        __process_image_pa  = gde_get_process_stats (i,18);
-        __process_image_va  = gde_get_process_stats (i,17);  
+
+    for (i=100; i<109; i++)
+    {
+        __process_image_pa = gde_get_process_stats(i,18);
+        __process_image_va = gde_get_process_stats(i,17);  
         
         __process_image_size = gde_get_process_stats (i,51);  
         printf ("> pid %d: image_size=%d ", i, __process_image_size);
         printf ("pa=%x ", __process_image_pa);
         printf ("va=%x \n", __process_image_va);
     };
-    
+
     gde_show_backbuffer();
 }
 
@@ -572,9 +574,11 @@ void process_stats(void){
 void fake_sleep (unsigned long t)
 {
     unsigned long i = (unsigned long) ( t * 512 );
-    
-    if(i == 0)
+
+
+    if (i == 0){
         i=512;
+    }
     
     while (i > 0){ i--; }
 }
@@ -773,20 +777,26 @@ void updateObject (void)
 
 
 
-//interna
-//cria a janela
+// interna
+// cria a janela
+// #todo: 
+// This was a cool test, but it is time to delete it.
+
 struct window_d *xmas_tree_window;
 void *xmas_tree_buffer;
-void
-xmas_tree_create ( char *file_name)
+
+void xmas_tree_create (char *file_name)
 {
+
+    debug_print("xmas_tree_create: deprecated\n");
+    return;
     
+    /*
     xmas_tree_window = (void *) gde_create_window ( 
                                     WT_SIMPLE, 1, 1, 
                                     "XTREE",     
                                     10, 10, 90, 130,    
                                     0, 0, COLOR_GREEN, COLOR_GREEN );
-
     if ( (void *) xmas_tree_window == NULL )
     { 
         return; 
@@ -811,11 +821,15 @@ xmas_tree_create ( char *file_name)
         (unsigned long) file_name, 
         (unsigned long) xmas_tree_buffer, 
         (unsigned long) xmas_tree_buffer );
+    */
 }
 
 
 // interna
 // voce a janela
+// #todo: 
+// This was a cool test, but it is time to delete it.
+
 void xmas_tree (void)
 {
    //RECT rc;
@@ -887,6 +901,9 @@ void xmas_tree (void)
 // ==== Internals ====
 //
 
+// #todo
+// Delete this test.
+
 void lionlionlion(void)
 {
     if (__home == TRUE && __temple == TRUE)
@@ -895,9 +912,10 @@ void lionlionlion(void)
         gde_clone_and_execute("gwssrv.bin");
         exit(0);
     } 
-    __home = FALSE;
+    __home   = FALSE;
     __temple = FALSE; 
 }
+
 
 //backspace
 void do_back(void)
@@ -939,6 +957,7 @@ static inline void rep_nop (void)
 
 // vamos apenas carregar um arquivo qualquer.
 // OK: funcionou no qemu.
+
 void __load_path_test(void)
 {
     char __path[] = "/GRAMADO/TEST1.CPP";
@@ -979,10 +998,12 @@ void __load_path_test(void)
 }
 
 
+// #bugbug: 
+// parameter?
 
 void quit ( int status )
 {
-    _running = 0;
+    _running = FALSE;
 }
  
 
@@ -4863,22 +4884,21 @@ void shellTestMBR (void)
 
 void move_to ( unsigned long x, unsigned long y )
 {
-	if ( x > wlMaxColumns || y > wlMaxRows )
-		return;
-	
-	//screen_buffer_x = x;
-	//screen_buffer_y = y;
-	
-	textCurrentCol = x;
-	textCurrentRow = y;
-	
-	//screen_buffer_pos = ( screen_buffer_y * wlMaxColumns + screen_buffer_x ) ;
+    if ( x > wlMaxColumns || y > wlMaxRows )
+    {
+        return;
+    }
+
+    textCurrentCol = x;
+    textCurrentRow = y;
 }
+
 
 // show shell info
 void shellShowInfo (void)
 {
-    int PID = 0; 
+    //#bugbug: Why '0' ?
+    int PID  = 0; 
     int PPID = 0;
 
 
@@ -6122,22 +6142,21 @@ void show_shell_version (void)
 
 int shell_save_file (void)
 {
-	int Ret=0;
-	
-	char file_1[] = "REDPILL    ";        // REDPILL
-	char file_1_name[] = "REDPILL INI";   // redpill.ini
+    int Ret=0;
 
-	unsigned long number_of_sectors = 0;
+    char file_1[]      = "REDPILL    ";  // REDPILL
+    char file_1_name[] = "REDPILL INI";  // redpill.ini
+
+    unsigned long number_of_sectors = 0;
     size_t len = 0;
-	
-	
-	printf ("shell_save_file: Salvando um arquivo ...\n");
-	
-	//
-	// Lenght in bytes.
-	//
-	
-    len = (size_t) strlen (file_1);
+
+
+    printf ("shell_save_file: Saving a file\n");
+
+
+    // string lenght in bytes.
+
+    len = (size_t) strlen(file_1);
 
     if (len <= 0){
         printf ("shell_save_file:  Fail. Empty file.\n");
@@ -6170,12 +6189,12 @@ int shell_save_file (void)
 	//Se tivermos que salvar mais que 4 setores.
     if ( number_of_sectors > 4 )
     {
-	    printf ("shell_save_file:  Limit Fail. (%d) sectors so save.\n",
-		    number_of_sectors );
+        printf("shell_save_file:  Limit Fail. (%d) sectors so save.\n",
+            number_of_sectors );
+        
         return (int) 1;
     }
-	
-	
+
     Ret = (int) gde_save_file ( 
                     file_1_name,            // name 
                     number_of_sectors,      // number of sectors.
@@ -6274,7 +6293,8 @@ read_name (str, infile)
 */
 
 
-//Qual ser� a linha que estar� no topo da janela.
+// Qual sera a linha que estara no topo da janela.
+
 void textSetTopRow ( int number )
 {
     textTopRow = (int) number; 
@@ -6303,7 +6323,7 @@ int textGetBottomRow (void)
 void clearLine ( int line_number )
 {
     int lin = (int) line_number; 
-    int col=0;  
+    int col=0; 
 
     int Offset = 0; //Deslocamento dentro do screen buffer.
 
@@ -6312,19 +6332,23 @@ void clearLine ( int line_number )
 	//@todo: podemos colocar o cursor no 
 	//in�cio da �rea de cliente.
 	//left ser� a coluna.
-	
-	shellSetCursor ( col, lin );
-		
-	//colunas.
-	for ( col=0; col < wlMaxColumns; col++ )
-	{
-	    //Mostra um char do screen buffer.
-		printf( "%c", screen_buffer[Offset] );
-		    
-		Offset++; //ignora o atributo.
-	    Offset++;
-	};
-	
+
+    shellSetCursor ( col, lin );
+
+
+    //colunas.
+    //Mostra um char do screen buffer.
+    //ignora o atributo.
+
+    for ( col=0; col < wlMaxColumns; col++ )
+    {
+        printf ( "%c", screen_buffer[Offset] );
+
+        Offset++;
+        Offset++;
+    };
+
+
     //shell_buffer_pos = 0;  //?? posi��o dentro do buffer do shell.	
 }
 
@@ -6574,17 +6598,19 @@ int desktopInitialize (void)
 
 
 // Exit the application.
+
 void gdeshell_exit(void)
 {
     printf ("gdeshell_exit: Exiting ...\n");
     
-    //fprintf(stderr,"GDESHELL: Exiting with no error...\n");
-    //fflush(stderr);
      
-    _running = 0;
+    // _running = FALSE;
     
     // ...
-    
+
+    //fprintf(stderr,"GDESHELL: Exiting with no error...\n");
+    //fflush(stderr);
+
     exit(0);
 }
 
@@ -6691,6 +6717,48 @@ char* gdeshell_GetExtensionAddress(char* string)
 */
 
 
+// void gdeshell_os_polling(void);
+void gdeshell_os_polling(void)
+{
+    //
+    // == Main loop =================================================
+    //
+    
+    int EventStatus=FALSE;  // No event.
+
+// Mainloop:
+
+    // See: libcore/api.c
+
+    while (_running){
+
+        // Polling on gramado os.
+
+        EventStatus = (int) libcore_get_event();
+
+        // We've got an event. 
+        // Call the window procedure. 
+        // Call event handler!
+        
+        if ( EventStatus == TRUE )
+        {
+            shellProcedure ( 
+                (struct window_d *) LibCoreEventBuffer[0], 
+                (int)               LibCoreEventBuffer[1], 
+                (unsigned long)     LibCoreEventBuffer[2], 
+                (unsigned long)     LibCoreEventBuffer[3] );
+        }
+        
+        // #bugbug
+        // #todo
+        // Check if we need to clean the buffer.
+        // LibCoreEventBuffer[0] = 0;
+        // ...
+        
+        //pool or sleep.
+        //if ( mode == ??
+    };
+}
 
 
 /*
@@ -7082,9 +7150,10 @@ _ok:
     //
     // == Main loop =================================================
     //
-    
-    int EventStatus=FALSE;  // No event.
 
+
+/*
+    int EventStatus=FALSE;  // No event
 Mainloop:
 
     // See: libcore/api.c
@@ -7109,6 +7178,12 @@ Mainloop:
         //pool or sleep.
         //if ( mode == ??
     };
+*/
+
+
+    // Polling on gramado os.
+    
+    gdeshell_os_polling();
 
 
     // Entramos aqui se running for igual a 0.
@@ -7122,34 +7197,33 @@ Mainloop:
     };
 
 
-	// Pulamos a parte que pega mensgens de input de teclado 
-	// porque esse shell n�o est� configurado como interativo.
-
 //
 // == Run script ====================================
 //
 
+// We skipped the event loop because the gdeshell
+// isn't interactive.
+
 skip_input:
 
-    shellExecuteThisScript(argv[3]);
+    debug_print ("gdeshell.bin: skip_input\n");
 
-//
-// == Exit ===========================================================
-//
+    shellExecuteThisScript( argv[3] );
+
+    // Exit
     // Desabilitando o cursor de texto.
     // Quando outro aplicativo precisar ele clica em uma janela, 
     // ela ganha o foco e habilita o cursor piscante.
-    
     // Retornar para o crt0.
-    
+
 end:
-    system_call ( 245, 
-        (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);
 
-#ifdef SHELL_VERBOSE
+    // What is this? pointer ?
+    system_call ( 
+        245, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);
+
     printf ("gdeshell: Exiting. Code '0' ...\n");
-#endif 
-
+    
     return 0;
 }
 

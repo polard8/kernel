@@ -31,42 +31,6 @@
 #define I8042_KEYBOARD_BUFFER 0x00
  */
 
-//vamos apenas carregar um arquivo qualquer.
-void __load_path_test(void)
-{
-    int status = -1;
-
-    char __path[] = "/ETC/TEST1.CPP";
-
-    void *__address = 0;
-    
-    // Endereço para carregar o arquivo
-    // 400 KB.
- 
-    size_t Size = (400*1024);
-
-    __address = (void *) kmalloc(Size);
-
-    status = fs_load_path (
-                 (const char *) __path,
-                 (unsigned long) __address,
-                 (unsigned long) Size );
-
-    if ( status < 0 ){
-        printf ("__load_path_test: fs_load_path fail\n");
-    }
-
-    // Show file.
-
-    if ( status == 0 )
-        printf("%s \n",__address);    
-
-    refresh_screen();
-}
-
-
-
-
 
 /*
 enum KYBRD_ENCODER_IO {
@@ -185,21 +149,75 @@ int BAT_TEST (void);
 
 
 
+// #test
+// Loadng a file using a pathname as parameter.
+// vamos apenas carregar um arquivo qualquer.
+
+void __load_path_test(void)
+{
+    int status = -1;
+
+    char __path[] = "/ETC/TEST1.CPP";
+
+    void *__address;
+
+    // Endereço para carregar o arquivo
+    // 400 KB.
+ 
+    size_t Size = (400*1024);
+
+
+
+
+    __address = (void *) kmalloc(Size);
+
+    status = fs_load_path (
+                 (const char *)  __path,
+                 (unsigned long) __address,
+                 (unsigned long) Size );
+
+    if ( status < 0 ){
+        printf ("__load_path_test: fs_load_path fail\n");
+    }
+
+    // Show file.
+
+    if ( status == 0 ){
+        printf("%s \n",__address);    
+    }
+
+    refresh_screen();
+}
+
+
+
 // internal
 // Only one parameter.
 void __initDialog ( int message )
 {
+    int tid = -1;
 
-    if(message < 0)
+    if(message < 0){
+        debug_print("__initDialog: [FAIL] message\n");
         return;
+    }
 
-    // Call init process: [9216] Launch launcher
-    kgws_event_dialog ( 
-        (int) InitProcess->control->tid,
-        (struct window_d *) 0,
-        (int)               message,
-        (unsigned long)     0,
-        (unsigned long)     0 );
+    tid = (int) InitProcess->control->tid;
+
+    if (tid<0){
+        panic("__initDialog: [ERROR] tid\n");
+    }
+
+    // Calling the init process.
+    // keyboard events only
+    // IN: tid, window, ascii code, raw byte.
+
+    kgws_send_to_tid (
+        (int) tid,                       // tid
+        (struct window_d *) 0,           // NULL
+        (int)               message,     // Message Code
+        (unsigned long)     12,          // MAGIC signature, ascii code
+        (unsigned long)     34 );        // MAGIC signature, raw byte
 }
 
 
@@ -334,30 +352,10 @@ __local_ps2kbd_procedure (
                     return 0;
                     break;
 
-                // 
+
                 case VK_F6:
                     if (ctrl_status == 1){
-
-                        __initDialog(9216);
-                        
-                        // Call init process: [9216] Launch launcher
-                        //kgws_event_dialog ( 
-                          //  (int) InitProcess->control->tid,
-                          //  (struct window_d *) 0,
-                          //  (int)               9216,
-                          //  (unsigned long)     0,
-                          //  (unsigned long)     0 );
-
-                   
-                    //ws_show_info();
-                    //initialize_frame_table();
-                    //printf (">> %x \n", get_new_frame() );
-                    //pages_calc_mem();
-                    //testNIC();
-                    // #se o processo não existe vai dar problema.
-                    //tty_send_message (103,buffer, 32, 444, 0, 0);
-                    //tty_send_message (104,buffer, 32, 444, 0, 0);
-                    //refresh_screen();
+                        __initDialog(9216);  // launch redpill application
                     }
                     if (alt_status == 1){
                         printf ("__local_ps2kbd_procedure: alt + f6\n");
@@ -373,35 +371,7 @@ __local_ps2kbd_procedure (
                 // Test 1.
                 case VK_F7:
                     if (ctrl_status == 1){
-
-                        __initDialog(9217);
-                        
-                        // Call init process: [9217] Launch gdeshell
-                        //kgws_event_dialog ( 
-                          //  (int) InitProcess->control->tid,
-                          //  (struct window_d *) 0,
-                          //  (int)               9217,
-                          //  (unsigned long)     0,
-                          //  (unsigned long)     0 );
-
-                    
-                    //fs_show_file_info(stdin);
-                    //fs_show_file_info(stdout);
-                    //fs_show_file_info(stderr);
-                    //fs_show_file_table();
-                    //fs_show_inode_table();
-                   
-                    
-                    //bg_load_image(); //ok
-                    //console_write (0, buffer,62);
-                    //Status = (int) KiSearchFile ( "GRAMADO TXT", VOLUME1_ROOTDIR_ADDRESS );
-                    //Status = (int) KiSearchFile ( "GRAMADOxTXT", VOLUME1_ROOTDIR_ADDRESS );
-                    //if (Status == 1){
-                    //    printf("found\n");
-                    //}else{
-                    //    printf("not found\n");
-                    //};
-                    //refresh_screen();
+                        __initDialog(9217);  // launch gdeshell
                     }
                     if (alt_status == 1){
                         printf ("__local_ps2kbd_procedure: alt + f7\n");
@@ -417,15 +387,7 @@ __local_ps2kbd_procedure (
                 // Test 2.
                 case VK_F8:
                     if (ctrl_status == 1){
-
-                    __initDialog(9218);
-
-                    //printf (">> %x \n", get_new_frame() );
-                    //refresh_screen();
-                    // testNIC ();
-                    //pciInfo ();
-                    // ahciSATAInitialize (1);
-                    //refresh_screen();
+                        __initDialog(9218);  // launch sysmon
                     }
                     if (alt_status == 1){
                         printf ("__local_ps2kbd_procedure: alt + f8\n");
@@ -440,9 +402,7 @@ __local_ps2kbd_procedure (
 
                 case VK_F9:
                     if (ctrl_status == 1){
-                        printf ("__local_ps2kbd_procedure: control + f9\n");
-                        kgws_disable();  // Disable kgws
-                        refresh_screen();
+                        __initDialog(9219);  // launch reboot application
                     }
                     if (alt_status == 1){
                         printf ("__local_ps2kbd_procedure: alt + f9\n");
@@ -458,9 +418,7 @@ __local_ps2kbd_procedure (
 
                 case VK_F10:
                     if (ctrl_status == 1){
-                        printf ("__local_ps2kbd_procedure: control + f10\n");
-                        kgws_enable();  // Enable kgws
-                        refresh_screen();
+                        __initDialog(9220); // launch gwssrv
                     }
                     if (alt_status == 1){
                         printf ("__local_ps2kbd_procedure: alt + f10\n");
@@ -476,8 +434,7 @@ __local_ps2kbd_procedure (
 
                 case VK_F11:
                     if (ctrl_status == 1){
-                        printf ("__local_ps2kbd_procedure: control + f11\n");
-                        refresh_screen();
+                        __initDialog(9221); // launch gnssrv
                     }
                     if (alt_status == 1){
                         printf ("__local_ps2kbd_procedure: alt + f11\n");
@@ -603,7 +560,7 @@ int BAT_TEST (void){
         // obs: este comando não é colocado em buffer
         
         //printf ("ps2kbd.c: BAT_TEST %d\n", i);
-        xxx_keyboard_write (0xFE);       
+        xxx_keyboard_write (0xFE);
     };
 
     // Fail
@@ -612,29 +569,34 @@ int BAT_TEST (void){
 }
 
 
+// Initialize globals.
 
 int ps2kbd_globals_initialize (void){
 
-
     int i=0;
-    
-	//user.h
+
+    // slot na file table.
+    int slot=-1;  
+
+
+    // See: user.h
+
     ioControl_keyboard = (struct ioControl_d *) kmalloc ( sizeof(struct ioControl_d) );
 
-    if ( (void *) ioControl_keyboard == NULL )
-    {
-        panic ("ps2_keyboard_initialize: ioControl_keyboard fail");
+    if ( (void *) ioControl_keyboard == NULL ){
+        panic ("ps2_keyboard_initialize: [FAIL] ioControl_keyboard\n");
+    }else{
+        
+        ioControl_keyboard->id = 0;
 
-    } else {
+        ioControl_keyboard->used  = TRUE;
+        ioControl_keyboard->magic = 1234;
 
-	    ioControl_keyboard->id = 0;
-	    ioControl_keyboard->used = 1;
-	    ioControl_keyboard->magic = 1234;
-
-		//qual thread está usando o dispositivo.
-		ioControl_keyboard->tid = 0;  
+		// qual thread está usando o dispositivo ?
+        ioControl_keyboard->tid = 0;  
 	    //ioControl_keyboard->
     };
+
 
 
     //int Type = 0;
@@ -676,11 +638,6 @@ int ps2kbd_globals_initialize (void){
 
 
 
-
-    int slot=-1;  //slot na file table.
-
-
-
     //
     // == _rbuffer =========================================
     //
@@ -696,14 +653,14 @@ int ps2kbd_globals_initialize (void){
     current_stdin =  (file *) file_table[slot];
     current_stdin->filetable_index = slot;
     current_stdin->____object = ObjectTypeFile; //Regular file (tty buffer)
-    current_stdin->used = 1;
+    current_stdin->used  = TRUE;
     current_stdin->magic = 1234;
     current_stdin->_flags = (__SWR | __SRD); 
     
     // Struct.
     // Allocate memory for the struct.
     unsigned char *current_stdin_struct_buffer;
-    current_stdin_struct_buffer = (unsigned char *) newPage ();
+    current_stdin_struct_buffer = (unsigned char *) newPage();
     current_stdin = (file *) &current_stdin_struct_buffer[0];
 
     // Buffer.
@@ -752,14 +709,14 @@ int ps2kbd_globals_initialize (void){
     current_stdout = (file *) file_table[slot];
     current_stdout->filetable_index = slot;
     current_stdout->____object = ObjectTypeFile; //Regular file (tty buffer)
-    current_stdout->used = 1;
+    current_stdout->used  = TRUE;
     current_stdout->magic = 1234;
     current_stdout->_flags = (__SWR | __SRD); 
     
     // Struct.
     // Allocate memory for the struct.
     unsigned char *current_stdout_struct_buffer;
-    current_stdout_struct_buffer = (unsigned char *) newPage ();
+    current_stdout_struct_buffer = (unsigned char *) newPage();
     current_stdout = (file *) &current_stdout_struct_buffer[0];
 
     // Buffer.
@@ -784,9 +741,9 @@ int ps2kbd_globals_initialize (void){
 	// Set abnt2.
 	//
 
-    abnt2 = (int) 1;
+    abnt2 = (int) TRUE;
 
-    //Checar quem está tentando inicializar o módulo.    
+    //Checar quem está tentando inicializar o módulo.
 
 	//model.
 	
@@ -794,16 +751,17 @@ int ps2kbd_globals_initialize (void){
 
 
     //Key status.
-    key_status = 0;
-    escape_status = 0;
-    tab_status = 0;
-    winkey_status = 0;
-    ctrl_status = 0;
-    alt_status = 0;
-    shift_status = 0;
-    capslock_status = 0;
+ 
+    key_status        = 0;
+    escape_status     = 0;
+    tab_status        = 0;
+    winkey_status     = 0;
+    ctrl_status       = 0;
+    alt_status        = 0;
+    shift_status      = 0;
+    capslock_status   = 0;
     scrolllock_status = 0;
-    numlock_status = 0;
+    numlock_status    = 0;
     //...
 
 

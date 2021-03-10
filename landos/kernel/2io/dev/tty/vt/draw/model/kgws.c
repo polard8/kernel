@@ -230,6 +230,7 @@ kgws_put_console (
 }
 
 
+// keyboard events.
 int 
 kgws_event_dialog ( 
     int tid,
@@ -1871,6 +1872,11 @@ kgws_send_to_controlthread_of_currentwindow (
 // We need to associate the current thread and the current tty.
 // tty->control
 // window->control
+
+// #bugbug
+// Only keyboard messages,
+// long1 and long2 will mask to single byte.
+// IN: tid, window, message code, ascii code, raw byte.
 
 int
 kgws_send_to_tid ( 

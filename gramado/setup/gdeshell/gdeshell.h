@@ -1,5 +1,5 @@
 //
-// File: shell.h 
+// File: gdeshell.h 
 // 2016 - Created by Fred Nora.
 //
 
@@ -73,8 +73,8 @@ struct window_d *close_button;
 
 
 /* Values that can be returned by execute_command (). */
-#define EXECUTION_FAILURE 1
-#define EXECUTION_SUCCESS 0
+#define EXECUTION_FAILURE  1
+#define EXECUTION_SUCCESS  0
 
 /* The list of characters that are quoted in double-quotes with a
    backslash.  Other characters following a backslash cause nothing
@@ -94,62 +94,79 @@ can be written to handle the general case for linked lists.
 typedef struct g_list_d g_list;
 typedef struct g_list_d GENERIC_LIST; 
 typedef struct g_list_d g_list_t;
+
 struct g_list_d 
 {
     struct g_list_d *next;
 };
 
 
-/* Instructions describing what kind of thing to do for a redirection. */
+/* 
+ * Instructions describing what kind of thing to do 
+ * for a redirection. 
+ */
+
 typedef enum r_instruction_t r_instruction;
+
 typedef enum {
+
     r_output_direction, 
-	r_input_direction, 
-	r_inputa_direction,
-	r_appending_to, 
-	r_reading_until, 
-	r_duplicating,
-	r_deblank_reading_until, 
-	r_close_this, 
-	r_err_and_out 
+    r_input_direction, 
+    r_inputa_direction,
+    r_appending_to, 
+    r_reading_until, 
+    r_duplicating,
+    r_deblank_reading_until, 
+    r_close_this, 
+    r_err_and_out 
+
 }r_instruction_t;
 
 
 /* Command Types: */
 typedef enum command_type_t command_type;
+
 typedef enum { 
+
     cm_for, 
-	cm_case, 
-	cm_while, 
-	cm_if, 
-	cm_simple,
-	cm_connection, 
-	cm_function_def, 
-	cm_until, 
-	cm_group 
+    cm_case, 
+    cm_while, 
+    cm_if, 
+    cm_simple,
+    cm_connection, 
+    cm_function_def, 
+    cm_until, 
+    cm_group 
+
 }command_type_t;
 
 
-
 /* A structure which represents a word. */
-
 
 typedef struct word_desc_d word_desc; 
 typedef struct word_desc_d WORD_DESC;
 typedef struct word_desc_d word_desc_t;
 struct word_desc_d
 {
-  char *word;			/* Zero terminated string. */
-  int dollar_present;		/* Non-zero means dollar sign present. */
-  int quoted;			/* Non-zero means single, double, or back quote
-				   or backslash is present. */
-  int assignment;		/* Non-zero means that this word contains an assignment. */
+    char *word;          /* Zero terminated string. */
+    int dollar_present;  /* Non-zero means dollar sign present. */
+
+    /* 
+     * Non-zero means single, double, or 
+     * back quote or backslash is present. 
+     */
+
+    int quoted; 
+
+    int assignment;  /* Non-zero means that this word contains an assignment. */
 };
+
 
 /* A linked list of words. */
 typedef struct word_list_d word_list; 
 typedef struct word_list_d WORD_LIST;
 typedef struct word_list_d word_list_t;
+
 struct word_list_d
 {
     struct word_list_d *next;
@@ -355,13 +372,14 @@ struct group_com_d
 // # env. support # 
 //
 
-/*POSIX*/
+/* POSIX */
 
-//colunas e linhas
-#define ENV_COLUMNS "COLUMNS"
-#define ENV_LINES "LINES"
+// colunas e linhas
 
-#define ENV_LOGNAME "LOGNAME"
+#define ENV_COLUMNS  "COLUMNS"
+#define ENV_LINES    "LINES"
+
+#define ENV_LOGNAME  "LOGNAME"
 
 #define ENV_PATH "PATH"
 
@@ -383,23 +401,20 @@ struct group_com_d
 #define ENV_LANG "LANG"
 
 //the default printer to be used
-#define ENV_PRINTER "PRINTER"
-#define ENV_LPDEST "LPDEST"
-
-
-
+#define ENV_PRINTER  "PRINTER"
+#define ENV_LPDEST   "LPDEST"
 
 
 //
 // ## pathname suppport ##
 //
 
-#define PATH_SEPARATOR '/'
-#define PATH_TERMINATOR '\0'
-
+#define PATH_SEPARATOR   '/'
+#define PATH_TERMINATOR  '\0'
 #define PATHNAME_LENGHT (64)
+
 char pathname_buffer[PATHNAME_LENGHT];
-int pathname_lenght; //tamanho do atual pathname.
+int pathname_lenght;              //tamanho do atual pathname.
 int pathname_initilized;
 
 
@@ -492,39 +507,43 @@ connection_t *current_connection;
 //*.gra  usar esse >>> (*.gl1)
 
 static char *RESERVED[] = {
-	"start",      //início do script
-	"finish",      //fim do script
-	"super",       //tipo genérico.
-	"rules",       //fecha declaração (;)
-	"condition",   //
-	"open",        //( 
-	"close",       //)
-	"run",         //{
-	"stop",        //} 
-	"guarantee",   //while
-	"mix",         //done: ?? 
-	"here",        //system() command 
-	"there",       // fecha (;)
+
+    "start",      //início do script
+    "finish",      //fim do script
+    "super",       //tipo genérico.
+    "rules",       //fecha declaração (;)
+    "condition",   //
+    "open",        //( 
+    "close",       //)
+    "run",         //{
+    "stop",        //} 
+    "guarantee",   //while
+    "mix",         //done: ?? 
+    "here",        //system() command 
+    "there",       // fecha (;)
 };
 
 
+// Why we have two '+' signals ?
 static unsigned char SPECIAL[] = {
-	'(',
-	')',
-	'{',
-	'}',
-	'/',
-	'*',
-	'-',
-	'+',
-	'|',
-	'\'',
-	'@',
-	'$',
-	'%',
-	'&',
-	'+',	
-	//...
+
+    '(', 
+    ')',
+    '{', 
+    '}',
+    '/', 
+    '*', 
+    '-', 
+    '+',
+    '|',
+    '\'',
+    '@',
+    '$',
+    '%',
+    '&',
+    '+',
+
+    // ...
 }; 
 
 
@@ -554,31 +573,22 @@ static unsigned char SPECIALMATH[] = {
 }; 
 
 
-
-
- 
- 
-//
-// File suppport.
-//
- 
-//#define FILENAME_LENGTH (8+3) 
-//...
-
+// eof
 
 int EOF_Reached;
+
 
 //
 // SCREEN SUPPORT
 //
 
-#define DEFAULT_WINDOW_X 0
-#define DEFAULT_WINDOW_Y 0
+#define DEFAULT_WINDOW_X  0
+#define DEFAULT_WINDOW_Y  0
 
 //Obs: aumentar essas constantes aumenta o tamanho da janela.
-#define DEFAULT_MAX_COLUMNS 80
-#define DEFAULT_MAX_ROWS    50 //25 
-  
+#define DEFAULT_MAX_COLUMNS  80
+#define DEFAULT_MAX_ROWS     50 //25 
+
 
 //linux 
 //#define SCREEN_START 0xb8000
@@ -595,6 +605,9 @@ int EOF_Reached;
 // Messages support.
 //
 
+// #bugbug
+// This is not the place for that thing.
+// See: API.
 
 #define CMD_ABOUT 1000
 //#define CMD_ABOUT 1001
@@ -609,33 +622,40 @@ int EOF_Reached;
 // Strings
 //
 
-#define SHELL_PATHNAME_SEPARATOR "/"
-#define SHELL_PATHNAME_TERMINATOR "\0"
+#define SHELL_PATHNAME_SEPARATOR   "/"
+#define SHELL_PATHNAME_TERMINATOR  "\0"
 
 #define SHELL_STRING_TERMINATOR "\0" 
 
 
-//@todo: 
-//a versão do sistema operacional deve-se obter através de uma chamada ao sistema. 
+
+// #bugbug
+// This is not a place for that.
+// Put this in main.c
+
 #define OS_VERSION     "0.1"  
 #define SHELL_VERSION  "0.1"
 
-//prompt
+
+// prompt sign
 #define SHELL_PROMPT   "$"
 #define SHELL_PROMPT2  "#"
 #define SHELL_PROMPT3  "%"
 #define SHELL_PROMPT4  ">"
-//... 
-
+// ... 
 
 
 //
 // Volume support
 //
 
-//Volume list
+// Volume list
+// #deprecated
+// We are not using this string anymore.
+
 #define SHELL_ROOT_STRING        "root:"
 #define SHELL_VOLUMELIST_STRING  "root:"
+
 
 //volumes
 #define SHELL_UNKNOWNVOLUME_STRING "unknown-volume"
@@ -643,6 +663,7 @@ int EOF_Reached;
 #define SHELL_VOLUME1_STRING "volume1"   //boot volume
 #define SHELL_VOLUME2_STRING "volume2"   //system volume.
 //...
+
 
 char *current_volume_string;
 int current_volume_id;
@@ -657,11 +678,11 @@ int current_volume_id;
 #define SHELL_SYSTEMWORKINGDIRECTORY_ID  2
 
 
-#define SHELL_VFSWORKINGDIRECTORY_STRING     "volume1"
-#define SHELL_BOOTWORKINGDIRECTORY_STRING    "volume1"
-#define SHELL_SYSTEMWORKINGDIRECTORY_STRING  "volume2"
-#define SHELL_UNKNOWNWORKINGDIRECTORY_STRING "unknown-directory"
-//...
+#define SHELL_VFSWORKINGDIRECTORY_STRING      "volume1"
+#define SHELL_BOOTWORKINGDIRECTORY_STRING     "volume1"
+#define SHELL_SYSTEMWORKINGDIRECTORY_STRING   "volume2"
+#define SHELL_UNKNOWNWORKINGDIRECTORY_STRING  "unknown-directory"
+// ...
 
 int g_current_disk_id;
 int g_current_volume_id;
@@ -673,15 +694,15 @@ int g_current_workingdirectory_id;  //??
 char current_workingdiretory_string[WORKINGDIRECTORY_STRING_MAX];
 int pwd_initialized;
 
+// #todo
+// Delete these macros and create helper functions instead.
+
 #define CalculateRowScanLine(WindowY,CharHeight) \
     ( WindowY * CharHeight )
 
-
 #define CalculateColumnScanLine(WindowX,CharWidth) \
     ( WindowX * CharWidth )
-	
-	
-	
+
  
 //usado para salvar um comando atual  
 //char tmp_command[32];      
@@ -692,83 +713,58 @@ int pwd_initialized;
  
  
 // help 
+// #bugbug: Not used.
 static const char help_banner[] =
     "\n Commands: \n \n"
-	" ?         - This help\n"
-	" cd        - Change current directory\n"
-	" cls       - Clear screen\n"
-	" copy      - Copy file or directory\n"
-	" date      - Date\n"
-	" del       - Delete file or directory\n"
-	" dir       - List\n"
-	" echo      - This ---\n"
-	" exit      - Exit shell\n"
-	" help      - This help\n"
+    " ?         - This help\n"
+    " cd        - Change current directory\n"
+    " cls       - Clear screen\n"
+    " copy      - Copy file or directory\n"
+    " date      - Date\n"
+    " del       - Delete file or directory\n"
+    " dir       - List\n"
+    " echo      - This ---\n"
+    " exit      - Exit shell\n"
+    " help      - This help\n"
     " mov       - Move file or diretory\n"
     " new       - New file or directory\n"
-	" pwd       - Print working directory\n"
+    " pwd       - Print working directory\n"
     " reboot    - Reboot system\n"
     " rename    - Rename file or directory\n"
-	" shutdown  - Shutdown your computer locally or remotely\n"
-	" time      - Time\n"
-	" version   - Shell version\n"
-	"\n";
+    " shutdown  - Shutdown your computer locally or remotely\n"
+    " time      - Time\n"
+    " version   - Shell version\n"
+    "\n";
 
-	
 // tree
-static const char tree_banner[] =
-"\n"
-"\n"	
-"     \\o/    \n"
-"      d      \n"
-"     ccc     \n"
-"    bbbbb    \n"
-"   aaaaaaa   \n"
-"  ggggggggg  \n" 
-" fffffffffff \n"
-"eeeeeeeeeeeee\n" 
-"     ||      \n"  
-"     ||      \n"
-"     ||      \n"
-"    ~~~~     \n"
-"\n";	
-//... 
+// #deprecated.
+
+static const char tree_banner[] = 
+    "\n"
+    "T"
+    "\n";
+
+
 
 // usage	
 static const char usage[] =
     "Usage: shell [arguments...]\n"
     "       shell -help             Display this help message and exit.\n"
     "       shell -version          Output version information and exit.\n";
-	//...
-	
-	
+    // ...
+
+
 //
 // Files (strings).
-//	
-	
+//
+
 static const char bmp1_file_name[] = "BMP1    BMP";
 static const char bmp2_file_name[] = "BMP2    BMP";
 static const char bmp3_file_name[] = "BMP3    BMP";
-static const char bmp4_file_name[] = "BMP4    BMP";	
-static const char init_file_name[] = "INIT    TXT";	
-//... 
- 	
-//static const char file_bmp1[] = "BMP1.BMP";
-//static const char file_bmp2[] = "BMP2.BMP";
-//static const char file_bmp3[] = "BMP3.BMP";
-//static const char file_bmp4[] = "BMP4.BMP";	
-//static const char file_init[] = "INIT.TXT";	
-//... 
- 
+static const char bmp4_file_name[] = "BMP4    BMP";
+static const char init_file_name[] = "INIT    TXT";
+// ... 
 
-/*
-    Fluxo padrão: definido em <stdio.h>
-	
-    FILE *stdin; 
-    FILE *stdout; 
-    FILE *stderr; 
- 
-*/
 
 //
 // font support.
@@ -776,17 +772,19 @@ static const char init_file_name[] = "INIT    TXT";
 
 //FILE *font_file;
 
- 
-//Diretórios para o shell comparar os comandos com os nomes dos arquivos lá. 
 
-struct _iobuf *pwd; 
-struct _iobuf *root;
-//...
+// 
+// Diretórios para o shell comparar os comandos 
+// com os nomes dos arquivos lá. 
+
+// #todo
+// Use the alias 'FILE *'
+
+struct _iobuf  *pwd; 
+struct _iobuf  *root;
+// ...
 
 
-
-
-	
 
 //
 // Structures.
@@ -872,14 +870,14 @@ typedef enum terminal_api_message_number_d {
 //
  
  
-//screen info 
+// screen info 
 typedef struct terminal_screen_info_d terminal_screen_info_t; 
+
 struct terminal_screen_info_d
 {
-	unsigned long width;
-	unsigned long height;
+    unsigned long width;
+    unsigned long height;
 }; 
- 
 
  
 //#importante. 
@@ -888,11 +886,11 @@ struct terminal_screen_info_d
 typedef struct terminal_rect_info_d terminal_rect_info_t; 
 struct terminal_rect_info_d
 {
-	unsigned long top;
-	unsigned long left;
-	unsigned long width;
-	unsigned long height;
-	//...
+    unsigned long top;
+    unsigned long left;
+    unsigned long width;
+    unsigned long height;
+    // ...
 };
 struct terminal_rect_info_d terminal_rect; 
 
@@ -901,9 +899,9 @@ struct terminal_rect_info_d terminal_rect;
 typedef struct terminal_cursor_info_d terminal_cursor_info_t; 
 struct terminal_cursor_info_d
 {
-	unsigned long width;
-	unsigned long height;
-	//...
+    unsigned long width;
+    unsigned long height;
+    // ...
 }; 
 
 
@@ -911,15 +909,15 @@ struct terminal_cursor_info_d
 typedef struct terminal_char_info_d terminal_char_info_t; 
 struct terminal_char_info_d
 {
-	unsigned long width;
-	unsigned long height;
+    unsigned long width;
+    unsigned long height;
 }; 
 
 //...
 
-#define SHELL_STREAM_STATUS_INPUT  1    // input
-#define SHELL_STREAM_STATUS_OUTPUT 2    // output
-#define SHELL_STREAM_STATUS_ERROR  3    // error
+#define SHELL_STREAM_STATUS_INPUT   1    // input
+#define SHELL_STREAM_STATUS_OUTPUT  2    // output
+#define SHELL_STREAM_STATUS_ERROR   3    // error
 
 
 //
@@ -989,24 +987,29 @@ typedef struct COMMANDHISTORY_D COMMANDHISTORY_T;
 struct COMMANDHISTORY_D
 {
     int NumberOfCommands;
-	int MaximumNumberOfCommands;
-	
+    int MaximumNumberOfCommands;
 };
 COMMANDHISTORY_T *CommandHistory;  
 
 
 
- 
- 
-//
-// Macros.
-// 
- 
+// Ta aqui so pra lembrar como faz, hahaha
 //#define DeclareStructHandle(name) struct nameJABUTICABA__ { int unused; }; typedef struct nameJABUTICABA__ *name 
 //#define DeclareHandle(name) typedef void* name 
-  
+
+
+//
+// == prototypes ===========================================
+//
+
+
+// #bugbug
+// We already have this in the crt0.c
+// #todo
+// Delete this thing.
+
 int main ( int argc, char *argv[] );
- 
+
  
 //
 // Screen support.
@@ -1014,17 +1017,14 @@ int main ( int argc, char *argv[] );
 
 void shellClearScreen (void);
 
-//copia o conteúdo do buffer para a tela. (dentro da janela)
-void shellRefreshScreen (void); 
-
-void shellRefreshLine ( int line_number );
-
-void shellRefreshChar ( int line_number, int col_number );
-
 //refresh do char que está na posição usada pelo input.
 void shellRefreshCurrentChar (void); 
 
+void shellRefreshChar ( int line_number, int col_number );
+void shellRefreshLine ( int line_number );
 
+// copia o conteúdo do buffer para a tela. (dentro da janela)
+void shellRefreshScreen (void); 
 
 //scroll dentro da screen_buffer. (VGA emulada)
 void shellScroll (void);
@@ -1113,13 +1113,24 @@ shellSendMessage (
 //Isso não é usado, temos um while.
 void shellWaitCmd (void);             
  
- // Compare comands.
+
+
+//
+// Compare comands.
+//
+
 unsigned long shellCompare (struct window_d *window);   
- 
+
+
+//
 // Initialization. 
-int shellInit ( struct window_d *window );    // Init.
-void shellShell (void);                           // Constructor. 
- 
+//
+
+
+int shellInit ( struct window_d *window );  // Init.
+void shellShell (void);                     // Constructor. 
+
+
 // Finalizing ... 
 // ??exit, die... 
  
@@ -1149,19 +1160,15 @@ void shellShowPPID (void);
 void shellShowUID (void);
 void shellShowGID (void);
 
-
 void shellShowUserSessionID (void);
 void shellShowWindowStationID (void);
 void shellShowDesktopID (void);
 
-
 void shellShowProcessHeapPointer (void);
 void shellShowKernelHeapPointer (void);
 
-
 void shellShowDiskInfo (void);
 void shellShowVolumeInfo (void);
-
 
 void shellShowMemoryInfo (void);
 void shellShowPCIInfo (void);
@@ -1192,13 +1199,13 @@ struct window_d *shellCreateMainWindow( int status );
 //struct window_d *shellCreatemainWindow ();
 
 
+//
+// BMP file.
+//
+
 int shellDisplayBMP ( char *file_name );
-
 int shellDisplayBMPEx (char *file_name, int size );
-
 void shellTestDisplayBMP (void);
-
-
 void 
 bmpDisplayBMP ( 
     void* address, 
@@ -1206,10 +1213,10 @@ bmpDisplayBMP (
     unsigned long y, 
     int width, 
     int height );
-    
+
 
 //um comando no shell aponta o script para executar.
-int shellExecuteThisScript ( char* script_name );
+int shellExecuteThisScript ( char *script_name );
 
 
 /*
@@ -1225,6 +1232,7 @@ int shellExecuteThisScript ( char* script_name );
  *
  * Credits: bash 1.05
  */
+
 int absolute_pathname ( char *string );
 
 
@@ -1266,7 +1274,6 @@ int shellTestButtons (void);
 
 //tests
 void testCreateWindow (void);
-
 
 // Exit the application.
 void gdeshell_exit(void);
