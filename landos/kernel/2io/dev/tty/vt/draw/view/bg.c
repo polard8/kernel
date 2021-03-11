@@ -1,5 +1,5 @@
 /*
- * File: windows/view/bg.c 
+ * File: dev/tty/vt/draw/view/bg.c 
  *
  * 
  * Descrição:
@@ -174,6 +174,7 @@ void backgroundBackground (void)
 
 
 // Initialize background.
+// Not good
 
 int backgroundInit (void){
 
@@ -200,6 +201,43 @@ int backgroundInit (void){
     return 0; 
 }
 
+
+int Background_initialize(void)
+{
+
+    // Clear the screen.
+    // print some basic info.
+
+    // obs:
+    // Nesse momento o bl deixou a tela suja.
+    // Entao as mensagens nessa fase da inicializaçao
+    // sao apresentadas em cima da sujeira deixada pelo boot loader.
+    // #test:
+    // Se possivel vamos limpara a tela agora. Pois ja inicializamos
+    // a runtime.
+    // #bugbug: slow.
+
+    backgroundDraw ( (unsigned long) COLOR_BLACK );
+
+
+    // #debug
+    // Breakpoint
+    // This is used to debug.
+    // Show info and hang.
+
+    printf ("kernel_main: [BREAKPOINT] Show bootblock\n");
+    printf ("Boot block pa %x\n",SavedBootBlock); 
+    printf ("lfb %x\n",BootBlock.lfb);
+    printf ("x   %d\n",BootBlock.x);
+    printf ("y   %d\n",BootBlock.y);
+    printf ("bpp %d\n",BootBlock.bpp);
+    printf (">>>  Gramado mode %d\n", BootBlock.gramado_mode);
+    refresh_screen();
+    //while(1){}
+
+
+    return 0;
+}
 
 //
 // End.

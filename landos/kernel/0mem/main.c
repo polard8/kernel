@@ -227,6 +227,21 @@ int kernel_main (int arch_type)
     // Banner.
 
     debug_print ("Initializing landos kernel ...\n");
+
+
+
+    /*
+    // #test
+    // precisamos importar essa vari'avel?
+    if ( kernel_end >= (0xC0000000 + 0x300000) )
+    {
+        debug_print ("kernel_main: The kernel image is too large\n");
+        asm volatile("cli;hlt");
+    }
+    */
+
+
+
     debug_print ("mode: ");
 
     switch (current_mode){
@@ -318,25 +333,9 @@ int kernel_main (int arch_type)
     // Clear the screen.
     // print some basic info.
 
-    // obs:
-    // Nesse momento o bl deixou a tela suja.
-    // Entao as mensagens nessa fase da inicializaçao
-    // sao apresentadas em cima da sujeira deixada pelo boot loader.
-    // #test:
-    // Se possivel vamos limpara a tela agora. Pois ja inicializamos
-    // a runtime.
-    // #bugbug: slow.
+    // See: dev/tty/vt/draw/view/bg.c
+    Background_initialize();
 
-    backgroundDraw ( (unsigned long) COLOR_BLACK );
-    printf ("kernel_main: breakpoint. pegando valores do boot block\n");
-    printf ("Boot block pa %x\n",SavedBootBlock); //isso esta certo.
-    printf ("lfb %x\n",BootBlock.lfb);
-    printf ("x   %d\n",BootBlock.x);
-    printf ("y   %d\n",BootBlock.y);
-    printf ("bpp %d\n",BootBlock.bpp);
-    printf (">>>  Gramado mode %d\n", BootBlock.gramado_mode);
-    refresh_screen();
-    //while(1){}
 
 
     PROGRESS("Kernel:0:6\n"); 

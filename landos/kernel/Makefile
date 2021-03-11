@@ -21,7 +21,8 @@ PYTHON2	= python2
 PYTHON3	= python3
 RUBY	= ruby
 
-
+# ===================
+# x86
 ifeq ($(ARCH),x86)
 
 CFLAGS = -m32 \
@@ -43,7 +44,8 @@ LDFLAGS = -m elf_i386
 
 endif
 
-
+# ===================
+# x86_64
 ifeq ($(ARCH),x86_64)
 
 CFLAGS = -m64 \

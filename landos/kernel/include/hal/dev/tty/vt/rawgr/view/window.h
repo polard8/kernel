@@ -2089,9 +2089,12 @@ void backgroundDraw(unsigned long color);
 void backgroundSetColor(unsigned long color);
 void backgroundRedraw(unsigned long color);
 void backgroundBackground (void);    
+
+// Not good
 int backgroundInit (void);
 
 
+int Background_initialize(void);
 
 
 //
