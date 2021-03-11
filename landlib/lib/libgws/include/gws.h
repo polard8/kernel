@@ -42,6 +42,14 @@
 #define GWS_DrainInput            8080
 // ...
 
+// internal
+// used only by the lib;
+#define __PORTS_WS 4040
+#define __PORTS_NS 4041
+#define __PORTS_FS 4042
+
+#define __IP(a, b, c, d) (a << 24 | b << 16 | c << 8 | d)
+
 //
 // window
 //
@@ -383,6 +391,12 @@ gws_async_command (
     int fd, 
     unsigned long request,
     unsigned long sub_request );
+
+
+
+struct gws_display_d *gws_open_display(char *display_name);
+
+void gws_close_display( struct gws_display_d *display);
 
 //
 // End.

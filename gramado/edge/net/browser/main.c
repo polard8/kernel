@@ -805,8 +805,9 @@ int main ( int argc, char *argv[] ){
 
     // Porta para o Window Server 'ws' em gramado_ports[]
     struct sockaddr_in addr_in;
-    addr_in.sin_family = AF_INET;
-    addr_in.sin_port   = PORTS_WS;   
+
+    addr_in.sin_family      = AF_INET;
+    addr_in.sin_port        = PORTS_WS;   
     addr_in.sin_addr.s_addr = IP(192, 168, 1, 112); 
 
 

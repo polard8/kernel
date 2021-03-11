@@ -825,29 +825,25 @@ done:
 
 int main ( int argc, char *argv[] ){
 
-    struct gws_display_d *Display;
-    int client_fd = -1;
 
-    // IN: hostname:number.screen_number
-    Display = (struct gws_display_d *) gws_open_display("display:name.0");
-
-    if ( (void*) Display == NULL )
-    {
-        debug_print ("editor: Couldn't open display\n");
-        printf      ("editor: Couldn't open display\n");
-        exit(1);
-    }
-
-    client_fd = Display->fd;
     
-    if ( client_fd <= 0 )
-    {
-        debug_print ("editor: bad fd\n");
-        printf      ("editor: bad fd\n");
-        exit(1);
-    }
+    //=========================
+
+    struct sockaddr_in addr_in;
+
+    addr_in.sin_family      = AF_INET;
+    addr_in.sin_port        = PORTS_WS;   
+    addr_in.sin_addr.s_addr = IP(127,0,0,1); 
+
+    //=========================
+
+    int addrlen=0;
+    
+    addrlen = sizeof(addr_in);
 
 
+
+    int client_fd = -1;
     
     // #todo:
     // check validation od w h
@@ -880,24 +876,21 @@ int main ( int argc, char *argv[] ){
     //printf          ("editor: Creating socket\n");
 
 
-    /*
     // cria o soquete.
     // AF_GRAMADO
     //client_fd = socket ( 8000, SOCK_STREAM, 0 );
     client_fd = socket ( AF_INET, SOCK_STREAM, 0 );
+    
     if ( client_fd < 0 ){
        printf ("editor: Couldn't create socket\n");
        exit(1);
     }
-    */
 
 
     //
     // connect
     // 
 
-
-    /*
     //nessa hora colocamos no accept um fd.
     //então o servidor escreverá em nosso arquivo.
     // #debug
@@ -913,10 +906,8 @@ int main ( int argc, char *argv[] ){
         
         }else{ break; }; 
     };
+
     // ============================================
-     */
-
-
 
     /*
     char buf[32];

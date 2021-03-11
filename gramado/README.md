@@ -1,4 +1,4 @@
-# gramci - setup
+# gramci
 
 	gramci - Gramado Consistent Interface
 

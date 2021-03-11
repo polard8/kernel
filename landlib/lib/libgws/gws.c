@@ -27,13 +27,15 @@
 #include <stdlib.h>
 #include <heap.h>   
 
+//#test: usado por gws_open_display
+#include <sys/socket.h>
+
 #include <rtl/gramado.h>   
 
 
 // libgws
 #include "include/connect.h"  
 #include "include/gws.h"  
-
 
 
 // #todo
@@ -3490,6 +3492,97 @@ gws_async_command (
 }
 
 
+// Create the display structure and create the socket.
+struct gws_display_d *gws_open_display(char *display_name)
+{
+    struct gws_display_d *Display;
+
+
+    // ??
+    // O header está incluido?
+    struct sockaddr_in addr_in;
+
+    addr_in.sin_family      = AF_INET;
+    addr_in.sin_port        = __PORTS_WS;   
+    addr_in.sin_addr.s_addr = __IP(127,0,0,1); 
+
+    int addrlen=0;
+    addrlen = sizeof(addr_in);
+
+    int client_fd = -1;
+    
+    
+    // Create the display structure.
+
+    Display = (struct gws_display_d *) malloc ( sizeof( struct gws_display_d ) );
+    
+    if ( (void*) Display == NULL )
+    {
+        printf ("gws_open_display: Couldn't create display\n");
+        return NULL;
+    }
+
+    // Create the socket.
+
+    client_fd = socket ( AF_INET, SOCK_STREAM, 0 );
+    
+    if ( client_fd < 0 ){
+       printf ("gws_open_display: Couldn't create socket\n");
+       return NULL;
+    }
+
+    Display->used  = TRUE;
+    Display->magic = 1234;
+
+    Display->fd = client_fd;
+    
+    Display->lock = FALSE;
+    Display->connected = FALSE;
+    // ...
+    
+    if( (void*) display_name == NULL )
+    {
+        printf ("gws_open_display: display_name\n");
+        return NULL;
+    }
+
+    if( *display_name == 0 )
+    {
+        printf ("gws_open_display: *display_name\n");
+        return NULL;
+    }
+
+
+    while (1){
+
+        // #bugbug Loop infinito.
+        
+        if (connect (client_fd, (void *) &addr_in, addrlen ) < 0)
+        { 
+            gws_debug_print("gws_open_display: Connection Failed \n");
+            printf         ("gws_open_display: Connection Failed \n"); 
+        
+        }else{ break; }; 
+    };
+
+    Display->connected = TRUE;
+    
+    return (struct gws_display_d *) Display;
+}
+
+
+void gws_close_display( struct gws_display_d *display)
+{
+    // #todo
+    
+    if ( (void*) display == NULL )
+        return;
+
+    display->used = 0;
+    display->magic = 0;
+
+    display = NULL;
+}
 
 //
 // End.
