@@ -24,7 +24,7 @@
  *    talvez perteça ao driver do controlador 8042
  */
 
-//*importante:
+// #importante:
 // Estamos no driver de mouse.
 // Chamaremos o mouse handler dentro do kernel base.
 // ps2mouse.c
@@ -34,29 +34,17 @@ irq12_MOUSE (void)
 {
 
     // Se o mouse ps2 não estiver inicializado !
-    if ( __breaker_ps2mouse_initialized == 0 )
+    if ( __breaker_ps2mouse_initialized == 0 ){
         return;
+    }
 
 
-	// Contando as interrupções desse tipo.
+    // Contando as interrupções desse tipo.
     g_profiler_ints_irq12++;
 
 
     mouseHandler();
-
-	 
-	 //#bugbug
-	 /*
-	//int status;
-
-    //status = get_ps2_mouse_status ();
-    
-    //if ( status == 1 )
-    //   mouseHandler ();
-    */
 }
-
-
 
 
 

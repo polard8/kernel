@@ -1107,14 +1107,20 @@ int kgws_mouse_scan_windows (void)
     */    
     
 
-    //#test
-    wID = (int) top_at ( kgws_mouse_event_mouse_x, kgws_mouse_event_mouse_y );
+    // #test
+    // Estamos em cima de qual janela?
+    
+    wID = (int) top_at ( 
+                    kgws_mouse_event_mouse_x, 
+                    kgws_mouse_event_mouse_y );
+
 
     // #bugbug
     // Estamos sempre recebendo a janela gui->screen
 
     //================
     // -1 = Se não temos uma janela.
+    // if ( wID < 0 )
     if ( wID == -1 )
     { 
 		//printf ("x");
@@ -1252,21 +1258,29 @@ int kgws_mouse_scan_windows (void)
                             kgws_last_totalticks = kgws_current_totalticks;
                             
                             // Kernel single event.
-                            
-                            // Normalizing.
-                            t->ke_window = Window;
-                            t->ke_msg    = MSG_MOUSEKEYDOWN;
-                            t->ke_long1  = 1;
-                            t->ke_long2  = 0;
+                            // #bugbug: 
+                            // Não estamos usando esse tipo de mensagem,
+                            // somente a fila.
+
+
+                            // New way. Use this one!
+                            t->window_list[ t->tail_pos ] = Window;
+                            t->msg_list[ t->tail_pos ]    = MSG_MOUSEKEYDOWN;
+                            t->long1_list[ t->tail_pos ]  = 1;
+                            t->long2_list[ t->tail_pos ]  = 0;
 
                             // Modifying event type.
                             if (kgws_delta_totalticks < 1000) //2000
                             {
                                 t->ke_msg = MSG_MOUSE_DOUBLECLICKED; 
+                                t->msg_list[ t->tail_pos ] = MSG_MOUSE_DOUBLECLICKED;
                                 kgws_delta_totalticks=8000; // delta inválido.
                             }
 
-                            t->ke_newmessageFlag = TRUE;
+                            t->tail_pos++;
+                            if ( t->tail_pos >= 31 )
+                                t->tail_pos = 0;
+
 							//estamos carregando o objeto
 							//kgws_mouse_event_drag_status = 1;                        
                         }
@@ -1292,9 +1306,9 @@ int kgws_mouse_scan_windows (void)
                     { 
                         // New way. Use this one!
                         t->window_list[ t->tail_pos ] = Window;
-                        t->msg_list[ t->tail_pos ] = MSG_MOUSEKEYUP;
-                        t->long1_list[ t->tail_pos ] = 1;
-                        t->long2_list[ t->tail_pos ] = 0;
+                        t->msg_list[ t->tail_pos ]    = MSG_MOUSEKEYUP;
+                        t->long1_list[ t->tail_pos ]  = 1;
+                        t->long2_list[ t->tail_pos ]  = 0;
                         t->tail_pos++;
                         if ( t->tail_pos >= 31 )
                            t->tail_pos = 0;
@@ -1370,19 +1384,6 @@ int kgws_mouse_scan_windows (void)
                             if ( t->tail_pos >= 31 )
                                 t->tail_pos = 0;
 
-                            
-                            // Old way. Delete it!
-                            //t->window = Window;
-                            //t->msg = MSG_MOUSEKEYDOWN;
-                            //if (kgws_delta_totalticks < 1000){
-                            //    t->msg = MSG_MOUSE_DOUBLECLICKED; 
-                            //    kgws_delta_totalticks=8000; // delta inválido.
-                            //}
-                            //t->long1 = 2;
-                            //t->long2 = 0;
-                            //t->newmessageFlag = 1;
-							
-							
 							
 							//estamos carregando o objeto
 							//kgws_mouse_event_drag_status = 1;
@@ -1405,20 +1406,13 @@ int kgws_mouse_scan_windows (void)
 
                         // New way. Use this one!
                         t->window_list[ t->tail_pos ] = Window;
-                        t->msg_list[ t->tail_pos ] = MSG_MOUSEKEYUP;
-                        t->long1_list[ t->tail_pos ] = 2;
-                        t->long2_list[ t->tail_pos ] = 0;
+                        t->msg_list[ t->tail_pos ]    = MSG_MOUSEKEYUP;
+                        t->long1_list[ t->tail_pos ]  = 2;
+                        t->long2_list[ t->tail_pos ]  = 0;
                         t->tail_pos++;
                         if ( t->tail_pos >= 31 )
                            t->tail_pos = 0;
 
-
-                        // Old way. Delete it!
-                        //t->window = Window;
-                        //t->msg = MSG_MOUSEKEYUP;
-                        //t->long1 = 2;
-                        //t->long2 = 0;
-                        //t->newmessageFlag = 1;
 
 						// Não estamos mais carregando um objeto.
 						kgws_mouse_event_drag_status = 0;                        
@@ -1463,7 +1457,7 @@ int kgws_mouse_scan_windows (void)
 
                             // New way. Use this one!
                             t->window_list[ t->tail_pos ] = Window;
-                            t->msg_list[ t->tail_pos ] = MSG_MOUSEKEYDOWN;
+                            t->msg_list[ t->tail_pos ]    = MSG_MOUSEKEYDOWN;
                             if (kgws_delta_totalticks < 1000){
                                 t->msg_list[ t->tail_pos ] = MSG_MOUSE_DOUBLECLICKED; 
                                 kgws_delta_totalticks=8000; // delta inválido.
@@ -1473,20 +1467,8 @@ int kgws_mouse_scan_windows (void)
                             t->tail_pos++;
                             if ( t->tail_pos >= 31 )
                                 t->tail_pos = 0;
-                                
-                            // Old way. Delete it!
-                            //t->window = Window;
-                            //t->msg = MSG_MOUSEKEYDOWN;
-                            //if (kgws_delta_totalticks < 1000){
-                                //t->msg = MSG_MOUSE_DOUBLECLICKED; 
-                                //kgws_delta_totalticks=8000; // delta inválido.
-                            //}
-                            //t->long1 = 3;
-                            //t->long2 = 0;
-                            //t->newmessageFlag = 1;
 
-							
-							
+
 							//estamos carregando o objeto
 							//kgws_mouse_event_drag_status = 1;
                         }
@@ -1509,19 +1491,13 @@ int kgws_mouse_scan_windows (void)
 
                         // New way. Use this one!
                         t->window_list[ t->tail_pos ] = Window;
-                        t->msg_list[ t->tail_pos ] = MSG_MOUSEKEYUP;
-                        t->long1_list[ t->tail_pos ] = 3;
-                        t->long2_list[ t->tail_pos ] = 0;
+                        t->msg_list[ t->tail_pos ]    = MSG_MOUSEKEYUP;
+                        t->long1_list[ t->tail_pos ]  = 3;
+                        t->long2_list[ t->tail_pos ]  = 0;
                         t->tail_pos++;
                         if ( t->tail_pos >= 31 )
                            t->tail_pos = 0;
-                          
-                        // Old way. Delete it! 
-                        //t->window = Window;
-                        //t->msg = MSG_MOUSEKEYUP;
-                        //t->long1 = 3;
-                        //t->long2 = 0;
-                        //t->newmessageFlag = 1;
+
 
 						// Não estamos mais carregando um objeto.
 						kgws_mouse_event_drag_status = 0;                        
@@ -1576,19 +1552,13 @@ int kgws_mouse_scan_windows (void)
 
                     // New way. Use this one!
                     t->window_list[ t->tail_pos ] = Window;
-                    t->msg_list[ t->tail_pos ] = MSG_MOUSEMOVE;
-                    t->long1_list[ t->tail_pos ] = 0;
-                    t->long2_list[ t->tail_pos ] = 0;
+                    t->msg_list[ t->tail_pos ]    = MSG_MOUSEMOVE;
+                    t->long1_list[ t->tail_pos ]  = 0;
+                    t->long2_list[ t->tail_pos ]  = 0;
                     t->tail_pos++;
                     if ( t->tail_pos >= 31 )
                         t->tail_pos = 0;
-                           
-                    // Old way. Delete it!
-                    //t->window = Window;
-                    //t->msg = MSG_MOUSEMOVE;
-                    //t->long1 = 0;
-                    //t->long2 = 0;
-                    //t->newmessageFlag = 1;
+
                     
                     if ( Window->type == WT_EDITBOX )
                     {
@@ -1599,22 +1569,15 @@ int kgws_mouse_scan_windows (void)
 
                         // New way. Use this one!
                         t->window_list[ t->tail_pos ] = Window;
-                        t->msg_list[ t->tail_pos ] = MSG_MOUSE_DRAG;
-                        t->long1_list[ t->tail_pos ] = 0;
-                        t->long2_list[ t->tail_pos ] = 0;
+                        t->msg_list[ t->tail_pos ]    = MSG_MOUSE_DRAG;
+                        t->long1_list[ t->tail_pos ]  = 0;
+                        t->long2_list[ t->tail_pos ]  = 0;
                         t->tail_pos++;
                         if ( t->tail_pos >= 31 )
                             t->tail_pos = 0;
 
-
-                        // Old way. Delete it!
-                        //t->window = Window;
-                        //t->msg = MSG_MOUSE_DRAG;
-                        //t->long1 = 0;
-                        //t->long2 = 0;
-                        //t->newmessageFlag = 1;
-				    }
-				}
+                    }
+                }
 
                 // Não estamos em cima da janela que estávamos antes.
                 // Então estamos em cima de outra janela.
@@ -1629,24 +1592,14 @@ int kgws_mouse_scan_windows (void)
                    
                     // New way. Use this one!
                     t->window_list[ t->tail_pos ] = (struct window_d *) windowList[mouseover_window];
-                    t->msg_list[ t->tail_pos ] = MSG_MOUSEOVER;
-                    t->long1_list[ t->tail_pos ] = 0;
-                    t->long2_list[ t->tail_pos ] = 0;
+                    t->msg_list[ t->tail_pos ]    = MSG_MOUSEOVER;
+                    t->long1_list[ t->tail_pos ]  = 0;
+                    t->long2_list[ t->tail_pos ]  = 0;
                     t->tail_pos++;
                     if ( t->tail_pos >= 31 )
                         t->tail_pos = 0;
-                   
-                   
-                    // Old way. Delete it!
-                    //if ( (void *) Window != NULL ){
-                    //t->window = (struct window_d *) windowList[mouseover_window];
-                    //t->msg = MSG_MOUSEOVER; 
-                    //t->long1 = 0;
-                    //t->long2 = 0;
-                    //t->newmessageFlag = 1;
-                    //}
- 
-                    
+
+
                    //#bugbug
                    //aqui entraria a fila de mensagens.
                    //onde diríamos que também saímos de uma janela.
@@ -1723,8 +1676,6 @@ int kgws_mouse_scan_windows (void)
             kgws_mouse_event_button_action = 0;
             return 0;
         };
-    
-
     };
     //--
     

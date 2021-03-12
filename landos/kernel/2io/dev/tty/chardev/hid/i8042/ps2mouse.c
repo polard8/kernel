@@ -58,14 +58,21 @@
 #define PS2MOUSE_INTELLIMOUSE_ID 0x03
 //--
 
+
+
 // i8042 mouse status bit.
-#define MOUSE_LEFT_BTN    0x01
-#define MOUSE_RIGHT_BTN   0x02
-#define MOUSE_MIDDLE_BTN  0x04
-#define MOUSE_X_SIGN      0x10
-#define MOUSE_Y_SIGN      0x20
-#define MOUSE_X_OVERFLOW  0x40
-#define MOUSE_Y_OVERFLOW  0x80
+// The bit in the first byte.
+
+#define MOUSE_FLAGS_LEFT_BUTTON    0x01
+#define MOUSE_FLAGS_RIGHT_BUTTON   0x02
+#define MOUSE_FLAGS_MIDDLE_BUTTON  0x04
+#define MOUSE_FLAGS_ALWAYS_1       0x08
+#define MOUSE_FLAGS_X_SIGN         0x10
+#define MOUSE_FLAGS_Y_SIGN         0x20
+#define MOUSE_FLAGS_X_OVERFLOW     0x40
+#define MOUSE_FLAGS_Y_OVERFLOW     0x80
+
+
 
 //  mouseHandler support
 #define MOUSE_DATA_BIT  1
@@ -73,6 +80,9 @@
 #define MOUSE_F_BIT     0x20
 #define MOUSE_V_BIT     0x08 
 
+// bits: 
+// Y overflow, X overflow, Y sign bit, X sign bit, 
+// Always 1,   Middle Btn, Right Btn,  Left Btn 
 
 
 
@@ -105,10 +115,19 @@ int ps2_mouse_drag_status;
 long mouse_x = 0;
 long mouse_y = 0;
 
-char mouse_packet_data = 0;
-char mouse_packet_x = 0;
-char mouse_packet_y = 0;
+
+// #bugbug: Isso deveria ser 'unsigned char'
+//char mouse_packet_data = 0;   // várias flags;
+//char mouse_packet_x = 0;      // delta x
+//char mouse_packet_y = 0;      // delta y
+//char mouse_packet_scroll = 0;
+
+//#test: testando com 'unsigned char'.
+unsigned char mouse_packet_data = 0;   // várias flags;
+char mouse_packet_x = 0;      // delta x
+char mouse_packet_y = 0;      // delta y
 char mouse_packet_scroll = 0;
+
 //=====================================================================
 
 
@@ -871,8 +890,22 @@ int get_current_mouse_responder (void)
 // Describe this funcion.
 // Change name to ps2mouse_update_mouse()
 
+
 void update_mouse (void)
 {
+
+// O primeiro byte comtém um monte de flags.
+// O segundo byte comtém o delta x
+// O terceiro byte comtém o delta y
+
+    unsigned char Flags;
+    char DeltaX;
+    char DeltaY;
+    
+    Flags  = mouse_packet_data;
+    DeltaX = mouse_packet_x;
+    DeltaY = mouse_packet_y;
+
 
 //======== X ==========
 // Testando o sinal de x.
@@ -881,16 +914,16 @@ void update_mouse (void)
 //pega o delta x
 //testa o sinal para x
 do_x:
-    if ( mouse_packet_data & MOUSE_X_SIGN ){  goto x_neg;  }
+    if ( Flags & MOUSE_FLAGS_X_SIGN ){  goto x_neg;  }
 
 //Caso x seja positivo.
 x_pos:
-    mouse_x += mouse_packet_x;
+    mouse_x += DeltaX;
     goto do_y;
 
 //Caso x seja negativo.
 x_neg:
-    mouse_x -= ( ~mouse_packet_x + 1 );
+    mouse_x -= ( ~DeltaX + 1 );
 
     if (mouse_x > 0){  goto do_y;  }
 
@@ -903,11 +936,11 @@ x_neg:
 //Pega o delta y.
 //Testa o sinal para y.
 do_y:
-    if ( mouse_packet_data & MOUSE_Y_SIGN ){  goto y_neg;  }
+    if ( Flags & MOUSE_FLAGS_Y_SIGN ){  goto y_neg;  }
 
 //Caso y seja positivo.
 y_pos:
-    mouse_y -= mouse_packet_y;
+    mouse_y -= DeltaY;
 
     if ( mouse_y > 0 ){  goto quit; }
 
@@ -916,7 +949,7 @@ y_pos:
 
 //Caso y seja negativo. 
 y_neg:
-    mouse_y += ( ~mouse_packet_y + 1 );
+    mouse_y += ( ~DeltaY + 1 );
 
 // Quit
 quit:
@@ -1068,20 +1101,51 @@ void ps2mouse_change_and_show_pointer_bmp ( int number )
 }
 
 
+
+
 // #todo: 
 // Isso aqui deveria colocar um pacote na fila
 // para o window server pegar depois.
+
+// chamada por mouseHandler.
+
+
+/*
+The top two bits of the first byte (values 0x80 and 0x40) supposedly show Y and X overflows, respectively. They are not useful. If they are set, you should probably just discard the entire packet.
+
+Bit number 5 of the first byte (value 0x20) indicates that delta Y (the 3rd byte) is a negative number, if it is set. This means that you should OR 0xFFFFFF00 onto the value of delta Y, as a sign extension (if using 32 bits).
+
+Bit number 4 of the first byte (value 0x10) indicates that delta X (the 2nd byte) is a negative number, if it is set. This means that you should OR 0xFFFFFF00 onto the value of delta X, as a sign extension (if using 32 bits).
+
+Bit number 3 of the first byte (value 0x8) is supposed to be always set. This helps to maintain and verify packet alignment. Unfortunately, some older mice (such as 10 year old Microspeed 2 button trackballs) do not set this bit. RBIL claims that this bit should be 0, but it is wrong.
+
+The bottom 3 bits of the first byte indicate whether the middle, right, or left mouse buttons are currently being held down, if the respective bit is set. Middle = bit 2 (value=4), right = bit 1 (value=2), left = bit 0 (value=1). 
+*/
+
+// See:
+// https://wiki.osdev.org/Mouse_Input
+
 void ps2mouse_parse_data_packet (void)
 {
+
+    unsigned char Flags;
 
 	// A partir de agora já temos os três chars.
 	// Colocando os três chars em variáveis globais.
 	// Isso ficará assim caso não haja overflow.
 
+    // O primeiro byte comtém um monte de flags.
+    // O segundo byte comtém o delta x
+    // O terceiro byte comtém o delta y
+
+    // Salvando em global
     mouse_packet_data = buffer_mouse[0];    // Primeiro char
     mouse_packet_x    = buffer_mouse[1];    // Segundo char.
     mouse_packet_y    = buffer_mouse[2];    // Terceiro char.
             
+    // Para uso interno.
+    Flags = mouse_packet_data;
+
     //
     // ==== Posicionamento ====
     //            
@@ -1090,6 +1154,8 @@ void ps2mouse_parse_data_packet (void)
 	// Salvando o antigo antes de atualizar.
 	// Para poder apagar daqui a pouco.
 	// Atualizando.
+	// Essa função esta nesse documento.
+
     saved_mouse_x = mouse_x;
     saved_mouse_y = mouse_y;
     update_mouse (); 
@@ -1120,7 +1186,7 @@ void ps2mouse_parse_data_packet (void)
 		// se o botão estiver pressionado então temos um drag (carregar.)
 		// um release cancela o carregar.
 		
-        ps2_mouse_moving = 1;
+        ps2_mouse_moving = TRUE;
 
        // draw
 
@@ -1138,87 +1204,84 @@ void ps2mouse_parse_data_packet (void)
     }else{
 		
 		// Não redesenhamos quando o evento for um click, sem movimento.
-        ps2_mouse_moving = 0;
+        ps2_mouse_moving = FALSE;
     }; 
+
+
+    //
+    // Buttons state.
+    //
 
     // Botão
     // Apenas obtendo o estado dos botões.
-    mouse_buttom_1 = 0;
-    mouse_buttom_2 = 0;
-    mouse_buttom_3 = 0;
+
+    mouse_buttom_1 = FALSE;
+    mouse_buttom_2 = FALSE;
+    mouse_buttom_3 = FALSE;
 
 
-
-	// ## LEFT ##
-    if ( ( mouse_packet_data & MOUSE_LEFT_BUTTON ) == 0 )
+    // ======================================
+    // ## LEFT ##
+    if ( ( Flags & MOUSE_LEFT_BUTTON ) == 0 )
     {
-		//liberada.
-        mouse_buttom_1 = 0;
-        ps2_button_pressed = 0;
-        
-        //mudamos sempre que pressionar.
-        //todo: mudaremos sempre que pressionar numa title bar.
-        //refresh_rectangle ( saved_mouse_x, saved_mouse_y, 20, 20 );
-        //bmpDisplayMousePointerBMP ( mouseBMPBuffer, mouse_x, mouse_y ); 
+        //liberada.
+        ps2_button_pressed = FALSE;  //action
+        mouse_buttom_1     = FALSE;  //button state
 
-    }else if( ( mouse_packet_data & MOUSE_LEFT_BUTTON ) != 0 )
+    }else if( ( Flags & MOUSE_LEFT_BUTTON ) != 0 )
      {
-		    //pressionada.
-		    //Não tem como pressionar mais de um botão por vez.
-            mouse_buttom_1 = 1;
-            mouse_buttom_2 = 0;
-            mouse_buttom_3 = 0;
-            ps2_button_pressed = 1;
-            
-            //mudamos sempre que pressionar.
-            //todo: mudaremos sempre que pressionar numa title bar.
-            //refresh_rectangle ( saved_mouse_x, saved_mouse_y, 20, 20 );
-            //bmpDisplayMousePointerBMP ( appIconBuffer, mouse_x, mouse_y ); 
+            //pressionada.
+            ps2_button_pressed = TRUE;  //action
+            mouse_buttom_1     = TRUE;  //button state
+            //goto done;
      };
 
 
-
-	// ## RIGHT ##
-    if ( ( mouse_packet_data & MOUSE_RIGHT_BUTTON ) == 0 )
+    // ======================================
+    // ## RIGHT ##
+    if ( ( Flags & MOUSE_RIGHT_BUTTON ) == 0 )
     {
-	    //liberada.
-        mouse_buttom_2 = 0;
-        ps2_button_pressed = 0;
+        //liberada.
+        ps2_button_pressed = FALSE;  //action
+        mouse_buttom_2     = FALSE;  //button state
 
-    }else if( ( mouse_packet_data & MOUSE_RIGHT_BUTTON ) != 0 )
+    }else if( ( Flags & MOUSE_RIGHT_BUTTON ) != 0 )
         {
-		    //pressionada.
-		    //Não tem como pressionar mais de um botão por vez.
-            mouse_buttom_1 = 0;
-            mouse_buttom_2 = 1;
-            mouse_buttom_3 = 0;
-            ps2_button_pressed = 1;
+            //pressionada.
+            ps2_button_pressed = TRUE;  //action
+            mouse_buttom_2     = TRUE;  //button state
+            //goto done;
+        };
+
+
+    // ======================================
+    // ## MIDDLE ##
+    if ( ( Flags & MOUSE_MIDDLE_BUTTON ) == 0 )
+    {
+        //liberada.
+        ps2_button_pressed = FALSE;  //action
+        mouse_buttom_3     = FALSE;  //button state
+
+    }else if( ( Flags & MOUSE_MIDDLE_BUTTON ) != 0 )
+        {
+            //pressionada.
+            ps2_button_pressed = TRUE;  //action
+            mouse_buttom_3     = TRUE;  //buttons state
+            //goto done;
         };
 
 
 
-	// ## MIDDLE ##
-    if ( ( mouse_packet_data & MOUSE_MIDDLE_BUTTON ) == 0 )
-    {
-	    //liberada.
-        mouse_buttom_3 = 0;
-        ps2_button_pressed = 0;
+done:
 
-    }else if( ( mouse_packet_data & MOUSE_MIDDLE_BUTTON ) != 0 )
-        {
-	        //pressionada.
-	        //Não tem como pressionar mais de um botão por vez.
-	        mouse_buttom_1 = 0;
-	        mouse_buttom_2 = 0;
-	        mouse_buttom_3 = 1;
-	        ps2_button_pressed = 1;
-        };
-
+    //
+    // Some action ?
+    //
 
 	// ===
 	// Confrontando o estado atual com o estado anterior para saber se ouve 
 	// alguma alteração ou não.
-	// 1 = ouve alteração.
+	// 1 = ouve alteração em relação ao estado anterior.
 
     if ( mouse_buttom_1 != old_mouse_buttom_1 ||
          mouse_buttom_2 != old_mouse_buttom_2 ||
@@ -1236,7 +1299,7 @@ void ps2mouse_parse_data_packet (void)
  * mouseHandler:
  *     Handler de mouse. 
  *
- * *Importante: 
+ * Importante: 
  *     Se estamos aqui é porque os dados disponíveis no controlador 8042 
  * pertencem ao mouse.
  *
@@ -1249,7 +1312,8 @@ void mouseHandler (void)
 
 	// #importante:
 	// Essa será a thread que receberá a mensagem.
-	//struct thread_d *t;
+
+    //struct thread_d *t;
 
 
 	// #importante:
@@ -1314,16 +1378,35 @@ void mouseHandler (void)
 
     *_byte = (char) xxx_mouse_read();
 
+
+    // count_mouse is a global variable.
+    // É 'static int'.
+
+    // O primeiro byte tem bits de controle.
+    // os outros dois bytes representam o posicionamento na tela.
+    // https://wiki.osdev.org/Mouse_Input
+
     switch (count_mouse){
 
         // > Essa foi a primeira interrupção.
+        // The first byte has a bunch of bit flags.
+        // bits: 
+        // Y overflow, X overflow, Y sign bit, X sign bit, 
+        // Always 1,   Middle Btn, Right Btn,  Left Btn 
         case 0:
             //Pegamos o primeiro char.
             buffer_mouse[0] = (char) *_byte;
-            if (*_byte & MOUSE_V_BIT){ count_mouse++; }
+            // #bugbug:
+            // O primeiro byte tem que tem esse bit acionado,
+            // mas o que impede os outros bytes de também terem?
+            if (*_byte & MOUSE_FLAGS_ALWAYS_1)
+            { 
+                count_mouse++; 
+            }
             break;
 
         // >> Essa foi a segunda interrupção.
+        // x delta value
         case 1:
             //Pegamos o segundo char.
             buffer_mouse[1] = (char) *_byte;
@@ -1331,6 +1414,7 @@ void mouseHandler (void)
             break;
 
         // >>> Essa foi a terceira interrupção. É a última.
+        // y delta value.
         case 2:
             //Pegamos o terceiro char.
             buffer_mouse[2] = (char) *_byte;
@@ -1341,13 +1425,18 @@ void mouseHandler (void)
             //
             
             
+            // Nesse input mode mandamos os dados para thread.
+            // No caso de outro input mode, deixaremos os
+            // dados num arquivo. 
+            
             if (current_input_mode == INPUT_MODE_SETUP )
             {
-                    // #todo
-                    // Nao precisamos fazer esse parse aqui ...
-                    // apenas mandar o pacote para o window server em ring3
-                    // na forma de mensagens.
-                    // Tambem nao precisamos escanear janelas ... o ws fara isso.
+                // #todo
+                // Nao precisamos fazer esse parse aqui ...
+                // apenas mandar o pacote para o window server em ring3
+                // na forma de mensagens.
+                // Tambem nao precisamos escanear janelas ... o ws fara isso.
+                // essa função esta nesse documento.
                 ps2mouse_parse_data_packet();
 
                 // #bugbug
@@ -1372,11 +1461,18 @@ void mouseHandler (void)
             old_mouse_buttom_3 = mouse_buttom_3;
             break;
 
-
+        // And if we have more than 3 interrupts ??
 
         // Problemas na contagem de interrupções.
+        // Voltamos ao início
         default:
             count_mouse = 0;
+            old_mouse_buttom_1 = 0;
+            old_mouse_buttom_2 = 0;
+            old_mouse_buttom_3 = 0;
+            mouse_buttom_1 = 0;
+            mouse_buttom_2 = 0;
+            mouse_buttom_3 = 0;
             break;
     };
 

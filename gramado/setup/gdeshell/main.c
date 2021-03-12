@@ -1232,24 +1232,27 @@ shellProcedure (
             goto done;
             break;
 
-        // #bugbug: rever
-        // essas teclas são tratadas pelo procedimento do sistema.
-        // mas alguma tecla personalizada pode ser  tratada pelo aplicativo,
-        // como o context menu [Application Key]
 
-        case MSG_SYSKEYUP:
-            switch (long1)
-            {
-                // Menu.
-                //case VK_APPS:
-                //    gde_message_box ( 3, "gdeshell:", "VK_APPS" );
-                //    break;
-            };
+        //case MSG_SYSKEYUP:
+            //break;
+
+
+        case MSG_MOUSEKEYDOWN:
+        // case 30:
+            printf ("gdeshell: MSG_MOUSEKEYDOWN\n");
             goto done;
             break;
 
 
-        // Commands.
+        case MSG_MOUSEKEYUP:
+        //case 31:
+            printf ("gdeshell: MSG_MOUSEKEYUP\n"); 
+            goto done;
+            break;
+
+
+
+        // Commands
         case MSG_COMMAND:
             switch (long1)
             {
@@ -1260,7 +1263,8 @@ shellProcedure (
                     break;
 
                 // Nothing for now!
-                default: break;
+                default: 
+                    break;
             };
             goto done;
             break;
@@ -1272,19 +1276,9 @@ shellProcedure (
             //gdeshell_exit();
             break;
             
-        case MSG_DESTROY: printf ("MSG_DESTROY\n"); break;
-
-
-        // MSG_MOUSEKEYDOWN
-        case 30:
-            debug_print ("gdeshell: MSG_MOUSEKEYDOWN\n"); goto done;
+        case MSG_DESTROY: 
+            printf ("MSG_DESTROY\n"); 
             break;
-
-        // MSG_MOUSEKEYUP
-        case 31:
-            debug_print ("gdeshell: MSG_MOUSEKEYUP\n"); goto done;
-            break;
-
 
         //Quando a aplicativo em user mode chama o kernel para 
         //que o kernel crie uma janela, depois que o kernel criar a janela,
@@ -1317,7 +1311,7 @@ shellProcedure (
         // Como estamos em fullscreen, n�o h� o que fazer aqui.
         //case MSG_PAINT: break;
 
-        
+        // #test
         // o driver de rede notifica o aplicativo de que
         // tem conte�do no buffer previamente configurado pelo aplicativo.
         // veja gde_setup_net_buffer;
@@ -1329,27 +1323,35 @@ shellProcedure (
            break;
 
 
+         // #test
          // Receberemos uma mensagem vida do servidor de rede.
          case MSG_AF_INET:
              printf ("gdeshell: MSG_AF_INET\n");
              break;
 
-
+         // #test
          // Receberemos uma mensagem vida do servidor de rede.
          case MSG_NET_DATA_IN:
              printf ("gdeshell: MSG_NET_DATA_IN\n");
              while ( (c = fgetc( (FILE *) long1)) >= 0 )
+             {
                  printf ("%c", c); 
+             };
+             printf("\n");
              break;
 
-
+         // #test
          // esse processo � notificado sobre o recebimento de um pacote ipv4    
          //receberemos uma mensagem vida do servidor de rede.
          case MSG_NETWORK_NOTIFY_PROCESS:
              printf ("gdeshell: MSG_NETWORK_NOTIFY_PROCESS\n");
-              while ( (c = fgetc( (FILE *) long1)) >= 0 )
+             while ( (c = fgetc( (FILE *) long1)) >= 0 )
+             { 
                   printf ("%c", c); 
-             break;             
+             };
+             printf("\n");
+             break;
+
 
 		//Faz algumas inicializa��es de posicionamento e dimens�es.
         //case MSG_INITDIALOG:

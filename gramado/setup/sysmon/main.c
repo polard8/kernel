@@ -386,12 +386,13 @@ sysmonProcedure (
             break;
 
 
-        // MSG_MOUSEKEYDOWN
-        // case 30:  break;
+        //case 30: 
+        //case MSG_MOUSEKEYDOWN:
+            //printf("nothing\n");
+            //break;
 
-
-        // Mouse button up
-        case 31:
+        //case 31:
+        case MSG_MOUSEKEYUP:
             switch (long1)
             {
                 // button 1
