@@ -13,7 +13,7 @@
 //==========================================
 // This is called by ioctl() in ring3.
 
-// OK Isso é um wrapper.
+// OK Isso ï¿½ um wrapper.
 // Chamaremos tty_ioctl() ou outros ...  
 // ...
 
@@ -51,12 +51,15 @@ int io_ioctl ( int fd, unsigned long request, unsigned long arg )
 {
     struct process_d *p;
     file *f;
+    int ObjectType = -1;
 
 
     debug_print ("io_ioctl: [TODO]\n");
 
     // fd must to be on open file descriptor.
-    if ( fd<0 || fd>31 ){
+
+    if ( fd<0 || fd>31 )
+    {
        debug_print("io_ioctl: [FAIL] Invalid fd\n");
        return -1;  //EBADF
     }
@@ -67,6 +70,11 @@ int io_ioctl ( int fd, unsigned long request, unsigned long arg )
     // We are using argument not as an address sometimes.
     // it depends on the request number.
 
+
+    //if (current_process<0)
+    //{
+    //    return -1;
+    //}
 
     // #todo
     // Check the arg pointer validation
@@ -79,8 +87,8 @@ int io_ioctl ( int fd, unsigned long request, unsigned long arg )
         debug_print("io_ioctl: [FAIL] p fail\n");
         return -1;
     }
-        
-    if ( p->used != 1 || p->magic != 1234 ){
+
+    if ( p->used != TRUE || p->magic != 1234 ){
         debug_print("io_ioctl: [FAIL] validation fail\n");
         return -1;
     }
@@ -106,16 +114,21 @@ int io_ioctl ( int fd, unsigned long request, unsigned long arg )
         return -1;
     }
 
-    switch (f->____object){
+    // Object types.
+
+    ObjectType = (int) f->____object;
+
+    switch (ObjectType){
 
         // Pode isso ??
         // Normal file ???
         // See: kstdio.c
         case ObjectTypeFile:
             debug_print ("io_ioctl: ObjectTypeFile [TEST]\n");
-            return (int) regularfile_ioctl ( (int) fd, 
-                            (unsigned long) request, 
-                            (unsigned long) arg );
+            return (int) regularfile_ioctl ( 
+                             (int) fd, 
+                             (unsigned long) request, 
+                             (unsigned long) arg );
             break;
 
         // tty object

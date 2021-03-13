@@ -36,7 +36,6 @@
 // ...
 
 
-
 #include <kernel.h>
 
 
@@ -50,11 +49,11 @@ static unsigned long __EscapeSequenceStage = 0;
 
 
 
-#define NPAR 16
-static unsigned long npar, par[NPAR];
-static unsigned long ques=0;
-static unsigned char attr=0x07;
-
+#define NPAR  16
+static unsigned long par[NPAR];
+static unsigned long npar = 0;
+static unsigned long ques = 0;
+static unsigned char attr = 0x07;
 
 
 void __local_ri (void)
@@ -71,25 +70,21 @@ __local_gotoxy (
     int console_number )
 {
 
-    // deletar.
-	//if (new_x>=columns || new_y>=lines)
-		//return;
-	//x=new_x;
-	//y=new_y;
-	//pos=origin+((y*columns+x)<<1);
+    if (console_number<0){
+        return;
+    }
 
-
-     if ( new_x >= (CONSOLE_TTYS[console_number].cursor_right-1) )
-     {
-         return;
-     }
+    if ( new_x >= (CONSOLE_TTYS[console_number].cursor_right-1) )
+    {
+        return;
+    }
 
     if ( new_y >= (CONSOLE_TTYS[console_number].cursor_bottom-1) )
     {
         return;
     }
 
-    CONSOLE_TTYS[console_number].cursor_x = new_x; 
+    CONSOLE_TTYS[console_number].cursor_x = new_x;
     CONSOLE_TTYS[console_number].cursor_y = new_y;
 }
 
@@ -137,6 +132,10 @@ void __local_restore_cur (int console_number)
 void __local_insert_char ( int console_number )
 {
 
+    if(console_number<0){
+        return;
+    }
+
 	//int i=x;
 	//unsigned short tmp,old=0x0720;
 	//unsigned short * p = (unsigned short *) pos;
@@ -174,8 +173,12 @@ void __local_insert_char ( int console_number )
 
 void __local_insert_line (int console_number)
 {
-    int oldtop=0;
-    int oldbottom=0;
+    int oldtop    = 0;
+    int oldbottom = 0;
+
+    if(console_number<0){
+        return;
+    }
 
 
     oldtop    = CONSOLE_TTYS[console_number].cursor_top;
@@ -199,6 +202,10 @@ void __local_insert_line (int console_number)
 void __local_delete_char(int console_number)
 {
 
+    if(console_number<0){
+        return;
+    }
+
     console_putchar ( ' ', console_number);
 
 /*
@@ -216,14 +223,19 @@ void __local_delete_char(int console_number)
 	}
 	*p=0x0720;
 */
+
 }
 
 
 void __local_delete_line(int console_number)
 {
-    int oldtop=0;
-    int oldbottom=0;
+    int oldtop    = 0;
+    int oldbottom = 0;
 
+
+    if(console_number<0){
+        return;
+    }
 
     oldtop    = CONSOLE_TTYS[console_number].cursor_top;
     oldbottom = CONSOLE_TTYS[console_number].cursor_bottom;
@@ -245,6 +257,7 @@ void __local_delete_line(int console_number)
 
 void csi_J (int par)
 {
+
 	/*
 	long count __asm__("cx");
 	long start __asm__("di");
@@ -311,10 +324,9 @@ void csi_K(int par)
 }
 
 
-// FIM da escape sequence.
+// Fim da escape sequence.
 // isso eh chamado quando encontramos um 'm'.
 // O 'm' eh um marcador de fim de escape sequence.
-
 // Entao vamos checar os parametros no buffer.
 // Configuramos a variavel de atributo de acordo
 // com o parametro encontrado.
@@ -323,11 +335,20 @@ void csi_K(int par)
 void csi_m(void)
 {
     int i=0;
+    int Ch=0;
+
+    // #bugbug
+    // Check 'npar'
+
+    if (npar == 0){
+        return;
+    }
 
     for (i=0; i <= npar; i++)
     {
+        Ch = (int) par[i];
 
-        switch (par[i]) {
+        switch (Ch) {
 
         case 0:  attr=0x07;  break;
         case 1:  attr=0x0f;  break;
@@ -373,26 +394,54 @@ void csi_L (int nr, int console_number)
 void csi_P (int nr, int console_number)
 {
 
-	if (nr > CONSOLE_TTYS[console_number].cursor_right -1 )
-		nr = CONSOLE_TTYS[console_number].cursor_right -1 ;
-	else if (!nr)
-		nr=1;
-	while (nr--)
-		__local_delete_char(console_number);
+    if (console_number<0){
+        return;
+    }
+
+    if (nr > CONSOLE_TTYS[console_number].cursor_right -1 )
+    {
+        nr = CONSOLE_TTYS[console_number].cursor_right -1 ;
+    } else {
+        
+        if (!nr)
+        {
+            nr = 1;
+        }
+    };
+
+    if (nr<0)
+        return;
+
+    while (nr--){
+        __local_delete_char(console_number);
+    };
 }
 
 
 void csi_at (int nr, int console_number)
 {
 
-	if (nr > CONSOLE_TTYS[console_number].cursor_right -1 )
-		nr = CONSOLE_TTYS[console_number].cursor_right -1 ;
-	else if (!nr)
-		nr=1;
-	while (nr--)
-		__local_insert_char(console_number);
-}
+    if( console_number<0){
+        return;
+    }
 
+    if (nr > CONSOLE_TTYS[console_number].cursor_right -1 )
+    {
+        nr = CONSOLE_TTYS[console_number].cursor_right -1 ;
+    }else {
+        
+        if (!nr){
+            nr=1;
+        }
+    };
+
+    if (nr<0)
+        return;
+
+    while (nr--){
+        __local_insert_char(console_number);
+    };
+}
 
 
 /*
@@ -417,6 +466,10 @@ void _console_outbyte (int c, int console_number)
     int cHeight = get_char_height();
 
 
+    if(console_number<0)
+        return;
+
+
     if ( cWidth == 0 || cHeight == 0 )
     {
         debug_print ("_console_outbyte: char w h\n");
@@ -424,22 +477,20 @@ void _console_outbyte (int c, int console_number)
     }
 
 
-	// #bugbug
-	// Caso estejamos em modo texto.
-	// Isso ainda não é suportado.
+    // #bugbug
+    // Caso estejamos em modo texto.
+    // Isso ainda não é suportado.
 
-    if ( VideoBlock.useGui == 0 )
+    if ( VideoBlock.useGui == FALSE )
     {
         debug_print ("_console_outbyte: kernel in text mode\n");
-        panic       ("_console_outbyte: kernel in text mode");
+        panic       ("_console_outbyte: kernel in text mode\n");
     }
 
-	
-	// #Importante: 
-	// Essa rotina não sabe nada sobre janela, ela escreve na tela como 
-	// um todo. Só está considerando as dimensões do 'char'.
 
-
+    // #Importante: 
+    // Essa rotina não sabe nada sobre janela, ela escreve na tela como 
+    // um todo. Só está considerando as dimensões do 'char'.
     // Caso estivermos em modo gráfico.
     // #importante: 
     // Essa rotina de pintura deveria ser exclusiva 
@@ -447,8 +498,7 @@ void _console_outbyte (int c, int console_number)
     // Então essa flag não faz sentido.
     // See: windows/char.c
 
-
-    if ( VideoBlock.useGui == 1 )
+    if ( VideoBlock.useGui == TRUE )
     {
 
         // ## NÃO TRANPARENTE ##
@@ -495,7 +545,7 @@ void console_outbyte (int c, int console_number)
 {
 
     // Copy.
-    register int Ch=c;
+    register int Ch = c;
 
     static char prev = 0;
 
@@ -503,18 +553,21 @@ void console_outbyte (int c, int console_number)
     unsigned long __cHeight = gwsGetCurrentFontCharHeight();
 
 
+    if(console_number<0)
+        return;
+
     if ( __cWidth == 0  ||  __cHeight == 0 )
     {
         panic ("console_outbyte: [FAIL] char size\n");
     }
 
 
-	// Obs:
-	// Podemos setar a posição do curso usando método,
-	// simulando uma variável protegida.
-	
-//checkChar:        
-      
+    // Obs:
+    // Podemos setar a posição do curso usando método,
+    // simulando uma variável protegida.
+
+//checkChar:
+
     //Opção  
     //switch ?? 
 
@@ -527,14 +580,12 @@ void console_outbyte (int c, int console_number)
         return;
     }
 
-
     // #obs: #m$. 
     // É normal \n retornar sem imprimir nada.
-    
-    
 
     // Início da próxima linha. 
     // not used!!!  "...\r\n";
+
     if ( Ch == '\n' && prev == '\r' ) 
     {
         // #todo: 
@@ -555,9 +606,9 @@ void console_outbyte (int c, int console_number)
     }
 
 
-
     // Próxima linha no modo terminal.
     // "...\n"
+
     if ( Ch == '\n' && prev != '\r' ) 
     {
         // se o line feed apareceu quando estamos na ultima linha
@@ -600,7 +651,7 @@ void console_outbyte (int c, int console_number)
     // TAB
     // #todo: 
     // Criar a variável 'g_tab_size'.
-    
+
     if ( Ch == '\t' ) 
     {
         CONSOLE_TTYS[console_number].cursor_x += (8);
@@ -647,18 +698,18 @@ void console_outbyte (int c, int console_number)
     //{
     //    g_cursor_x++; 
     //    prev = c;
-    //    return;         
+    //    return; 
     //};
-    
- 
-    // backspace ??
+
+
+    // Backspace ?
+
     if ( Ch == 8 )
     {
         CONSOLE_TTYS[console_number].cursor_x--; 
         prev = Ch;
         return;
-    }        
-        
+    }
 
 
     //
@@ -697,11 +748,6 @@ void console_outbyte (int c, int console_number)
         CONSOLE_TTYS[console_number].cursor_y = CONSOLE_TTYS[console_number].cursor_bottom;
     }
 
-
-    //
-    // ============================================
-    //
-
     // Imprime os caracteres normais.
     // Nesse momento imprimiremos os caracteres.
     // Imprime os caracteres normais.
@@ -735,6 +781,9 @@ void console_putchar ( int c, int console_number ){
     int cHeight = get_char_height();
 
 
+    //if(console_number<0)
+        //return;
+
     if ( cWidth == 0 || cHeight == 0 )
     {
         panic ("console_putchar: char\n");
@@ -744,31 +793,32 @@ void console_putchar ( int c, int console_number ){
 	// flag on.
     stdio_terminalmode_flag = TRUE;
 
+    // #todo
+    // Check these limits.
 
     //  Console limits
-    if ( console_number < 0 || console_number >= 4 )
+    // CONSOLETTYS_COUNT_MAX
+    // See: tty.h
+
+    if ( console_number < 0 || console_number > 3 )
     {
         panic ("console_putchar: console_number\n");
     }
 
-    // Desenhar o char no backbuffer
-	
-	// #todo: 
-	// Escolher um nome de função que reflita
-	// essa condição de desenharmos o char no backbuffer.
-	
+    // Draw the char into the backbuffer and
+    // copy a small rectangle to the frontboffer.
+
+    // Draw
     console_outbyte  ( (int) c, console_number );
 
-
-	// Copiar o retângulo na memória de vídeo.
-
+    // Copy
     refresh_rectangle ( 
         (CONSOLE_TTYS[console_number].cursor_x * cWidth), 
         (CONSOLE_TTYS[console_number].cursor_y * cHeight), 
         cWidth, 
         cHeight );
 
-	// flag off.
+    // flag off.
     stdio_terminalmode_flag = FALSE; 
 }
 
@@ -782,13 +832,14 @@ __console_write (
     size_t count )
 {
     // loop
-    size_t __i=0;
-    
-    char ch=0; 
+    size_t __i = 0;
+
+    char ch = 0; 
     char *data = (char *) buf;
 
 
-    if ( console_number < 0 || console_number > 3 ){
+    if ( console_number < 0 || console_number > 3 )
+    {
        kprintf ("__console_write: console_number\n");
        goto fail;
     }
@@ -866,20 +917,20 @@ console_write (
 
     //debug_print ("console_write: [test]\n");
 
-    // Console number.
+    // Console number
     if ( console_number < 0 || console_number > 3 )
     {
-        printf ("console_write: console_number\n");
+        printf ("console_write: [FAIL] console_number\n");
         goto fail;
     }
 
-    // Buffer.
+    // Buffer
     if ( (void *) buf == NULL ){
         printf ("console_write: buf\n");
         goto fail;
     }
 
-    // Count.
+    // Count
     if (!count){
         printf ("console_write: count\n");
         goto fail;
@@ -900,8 +951,9 @@ console_write (
     // cada console. CONSOLE[i].esc_stage
     
     __EscapeSequenceStage = 0; 
+
      StringSize = count;
-  
+
     for (i=0; i<StringSize; i++)
     {
         // Get next char from the string.
@@ -1194,7 +1246,7 @@ fail:
 
 /*
  ********************************************
- * scroll:
+ * console_scroll:
  *     Isso pode ser útil em full screen e na inicialização do kernel.
  *
  * *Importante: 
@@ -1348,7 +1400,7 @@ void REFRESH_STREAM ( file *f )
     int i=0;
     int j=0;
 
-    char *c;
+    char *ptr;
 
     int cWidth  = get_char_width();
     int cHeight = get_char_height();
@@ -1368,17 +1420,18 @@ void REFRESH_STREAM ( file *f )
     //
     // File
     //
-    
+
     // #bugbug
     // Tem que checar a validade da estrutura e do ponteiro base.
-    //if ( (void *) f == NULL ){ ? }
+    if ( (void *) f == NULL )
+    { 
+        panic ("REFRESH_STREAM: [FAIL] f\n");
+    }
 
 
-    //
-    // Pointer.
-    //
+    // Pointer
 
-    c = f->_base;
+    ptr = f->_base;
 
     // #bugbug
     // Tem que checar a validade da estrutura e do ponteiro base.
@@ -1390,7 +1443,7 @@ void REFRESH_STREAM ( file *f )
     stdio_terminalmode_flag = TRUE; 
     for ( i=0; i<j; i++ )
     {
-        printf ("%c", *c );
+        printf ("%c", *ptr );
 
         // #bugbug
         // It is very wrong!
@@ -1401,7 +1454,7 @@ void REFRESH_STREAM ( file *f )
             cWidth, 
             cHeight );
 
-        c++;
+        ptr++;
     };
     stdio_terminalmode_flag = FALSE; 
     //--
@@ -1427,15 +1480,16 @@ int console_get_current_virtual_console (void)
 
 // Called by: 
 // __local_ps2kbd_procedure in ps2kbd.c
-//
+
 void jobcontrol_switch_console(int n)
 {
     // #todo:
     // maybe we can do somo other configuration here.
  
-    if( n<0 || n >= CONSOLETTYS_COUNT_MAX ){
+    if ( n<0 || n >= CONSOLETTYS_COUNT_MAX )
+    {
         debug_print("jobcontrol_switch_console: Limits\n");
-        // return something
+        return;
     }
 
     console_set_current_virtual_console(n);
@@ -1741,10 +1795,16 @@ void console_interrupt(int device_type, int data)
     // >> então, se não tivermos uma thread com foco de entrada,
     // podemos mandar a mensagem para outra thread ?
 
-    if ( foreground_thread < 0 ){
+    if ( foreground_thread < 0 )
+    {
         debug_print ("console_interrupt: [FAIL] foreground_thread\n");
+        
+        // #todo
+        // Maybe we can set the idle thread if it fail.
+
         return;
     }
+
 
     switch (device_type){
 

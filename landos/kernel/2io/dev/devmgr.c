@@ -125,11 +125,10 @@ int mount_root (void)
 
 struct device_d *devmgr_device_object (void){
 
-    struct device_d *d;
-    
-    unsigned long __tmp=0;
+    struct device_d  *d;
     int i=0;
-    
+    unsigned long __tmp=0;
+
     char __noname[] = "no-name";
 
 
@@ -140,21 +139,28 @@ struct device_d *devmgr_device_object (void){
          __tmp = (unsigned long) deviceList[i];
     
          // slot livre.
-         if ( __tmp == 0 )  //unsigned long
+         // unsigned long
+         if ( __tmp == 0 ) 
          {
-             
+            //
+            // Device structure.
+            //
+
+            // #bugbug
+            // Maybe it will spend a lot of memory.
+
              d = (struct device_d *) kmalloc ( sizeof (struct device_d) );
              
              // #debug
              if ( (void *) d == NULL ){
-                 panic ("devmgr_device_object: d"); 
+                 panic ("devmgr_device_object: [ERROR] d\n"); 
              }
 
              d->index = i;
-             d->used = 1;
+
+             d->used  = TRUE;
              d->magic = 1234;
-             
-            
+
              //#todo
              //d->name 
              d->name[0] = 'x';
@@ -163,17 +169,17 @@ struct device_d *devmgr_device_object (void){
              //
              // ...
              //
-             
-             // Salva.
+
+             // Save and return.
+
              deviceList[i] = (unsigned long) d;
-             
-             // Done.
+
              return (struct device_d *) d;
          }
     };
 
     // fail
-    panic ("devmgr_device_object: Overflow!");
+    panic ("devmgr_device_object: [FAIL] Overflow!\n");
     //return NULL;
 }
 
@@ -218,7 +224,7 @@ devmgr_register_device (
     
     if ( (void*) new_mount_point == NULL )
     {
-        panic ("devmgr_register_device: new_mount_point");
+        panic ("devmgr_register_device: new_mount_point\n");
     }
 
     // =======================
@@ -229,11 +235,11 @@ devmgr_register_device (
         panic ("devmgr_register_device: [FAIL] f \n");
     }
 
-    if ( f->used != 1 || f->magic != 1234){
+    if ( f->used != TRUE || f->magic != 1234){
         panic("devmgr_register_device: f validation \n");
     }
 
-    if ( f->isDevice != 1 ){
+    if ( f->isDevice != TRUE ){
         panic ("devmgr_register_device: This file is NOT a device!\n");
     }
 
@@ -247,7 +253,7 @@ devmgr_register_device (
         panic ("devmgr_register_device: d. Couldn't create device object\n");
     }
 
-    if ( d->used != 1 || d->magic != 1234 )
+    if ( d->used != TRUE || d->magic != 1234 )
     {
         panic ("devmgr_register_device: d validation \n");
     }
@@ -266,7 +272,6 @@ devmgr_register_device (
     
     
     f->deviceId = d->index; 
-    
 
     d->__file = (file *) f;
     d->__class = class;
@@ -328,6 +333,8 @@ void devmgr_show_device_list(void)
 
     for (i=0; i<DEVICE_LIST_MAX; ++i)
     {
+        // Get the device structure.
+
         d = ( struct device_d *) deviceList[i];
 
         if ( (void *) d != NULL )

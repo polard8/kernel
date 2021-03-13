@@ -1,42 +1,42 @@
 /*
  * File: logon.c
  *
- * Descrição:
+ * Descriï¿½ï¿½o:
  *     Kernel Mode Logon Support Routines.
- *     @todo: Esse módulo deve prepara o ambiente para rodar o processo logon.bin.
+ *     @todo: Esse mï¿½dulo deve prepara o ambiente para rodar o processo logon.bin.
  *     Esse logon pode ser usado par um eventual boot loader ou system installer.
  *
- *     Arquivo principal do módulo logon do executive.
- *     *IMPORTANTE: Esse é o ambiente de logon.
- *                  É onde o programa de logon vai rodar.
+ *     Arquivo principal do mï¿½dulo logon do executive.
+ *     *IMPORTANTE: Esse ï¿½ o ambiente de logon.
+ *                  ï¿½ onde o programa de logon vai rodar.
  *                  Cria um desktop para o Logon.
  *
- *     MB - Módulos incluídos no Kernel Base.
- *     No momento aparece a janela do Shell, que é um processo em user mode.
- *     Esse shell que aparece no momento do logon servirá para
- *     configurações. 
- *     No ambiente de logon o comando será passado para o procedimento do
+ *     MB - Mï¿½dulos incluï¿½dos no Kernel Base.
+ *     No momento aparece a janela do Shell, que ï¿½ um processo em user mode.
+ *     Esse shell que aparece no momento do logon servirï¿½ para
+ *     configuraï¿½ï¿½es. 
+ *     No ambiente de logon o comando serï¿½ passado para o procedimento do
  *     Shell.
  *
  *     Mesma coisa se o ambiente for a gui.(user environment).O comando
- *     deve ser passado para o Shell, para configurações.
+ *     deve ser passado para o Shell, para configuraï¿½ï¿½es.
  *
- *     O Logon está na WindowStation0 e no Desktop0. 
+ *     O Logon estï¿½ na WindowStation0 e no Desktop0. 
  *     O desktop do logon tem a main window e a navigation bar, mas pode 
- * ser predefido, assim como na criação da gui.
+ * ser predefido, assim como na criaï¿½ï¿½o da gui.
  *
- * Observação:
- *     É nesse momento, antes de ativar o sistema multitarefas que pode-se
- * instalar as atualizações ou configurações pendentes.
- *     A pendência de configurações ou atualizações serão gravadas em arquivos
- * de configuraçãoou em metafiles, que serão lidos nesse momento.
+ * Observaï¿½ï¿½o:
+ *     ï¿½ nesse momento, antes de ativar o sistema multitarefas que pode-se
+ * instalar as atualizaï¿½ï¿½es ou configuraï¿½ï¿½es pendentes.
+ *     A pendï¿½ncia de configuraï¿½ï¿½es ou atualizaï¿½ï¿½es serï¿½o gravadas em arquivos
+ * de configuraï¿½ï¿½oou em metafiles, que serï¿½o lidos nesse momento.
  * 
  *
  * Obs: 
- * A tela de logon poderia, como opção, apresentar as configurações
- * gravadas em um metafile do sistema. Pois as configurações são
+ * A tela de logon poderia, como opï¿½ï¿½o, apresentar as configuraï¿½ï¿½es
+ * gravadas em um metafile do sistema. Pois as configuraï¿½ï¿½es sï¿½o
  * realizadas nesse momento. 
- * Poderia mostrar configurações salvas em variáveis globais.
+ * Poderia mostrar configuraï¿½ï¿½es salvas em variï¿½veis globais.
  *
  * IMPORTANTE: 
  * O logon deve ser um programa em user mode que chama rotinas aqui contidas.
@@ -66,13 +66,13 @@ int ExitLogon (void);
  ***************************************************
  * init_logon_manager:
  * 
- *     Cria a interface gráfica do Logon.
- *     É o ambiente onde o processo de logon deve rodar. 
+ *     Cria a interface grï¿½fica do Logon.
+ *     ï¿½ o ambiente onde o processo de logon deve rodar. 
  *
  *     Fundo -> Screen, Background.
  *     Logo  -> Sobreposto. 
  *     Navigation bar.
- *     Usuário.
+ *     Usuï¿½rio.
  */
 
 // It was called by init() in init.c
@@ -97,20 +97,20 @@ int init_logon_manager (void){
     // Hora de mudar isso ... par aa fase pos-azul,
     // onde retomam as mensagens de texto.
     // obs: Essa tela nao dura muito tempo,
-    // pois logo vem a inicializaçao das janelas.
+    // pois logo vem a inicializaï¿½ao das janelas.
 
     backgroundDraw ( (unsigned long) COLOR_BLACK ); 
 
 	//
-	// Atenção
+	// Atenï¿½ï¿½o
 	//
 	
 	// #
-	// Estamos começando um ambiente novo.
+	// Estamos comeï¿½ando um ambiente novo.
 	// Vamos limpar a tela para as mensagens desse ambiente.
-	// Não será mais azul, igual quanto estávamos iniciando o hardware
+	// Nï¿½o serï¿½ mais azul, igual quanto estï¿½vamos iniciando o hardware
 	// e nem preto como no bootloader.
-	// Será uma cor mais clara.
+	// Serï¿½ uma cor mais clara.
 	
 	// Limpa a tela e reinicia o curso em (0,0);
 
@@ -121,7 +121,7 @@ int init_logon_manager (void){
     kprintf ("\n");
 
     // #todo:
-    // Podemos mudar o nome dessa funçao para logonSetupVersion()
+    // Podemos mudar o nome dessa funï¿½ao para logonSetupVersion()
 
     kprintf ("init_logon_manager: Initialize version support \n");
     systemSetupVersion();
@@ -130,13 +130,15 @@ int init_logon_manager (void){
     // gui structure. 
     //
 
-    // 
+    // #bugbug ?
+    // NÃ£o sei se essa estrutura Ã© inicializada em outr lugar tambÃ©m.
+
     // See: window.h
 
     gui = (void *) kmalloc ( sizeof(struct gui_d) );
 
     if ( (void *) gui == NULL){
-        panic ("init_logon_manager: gui struct");
+        panic ("init_logon_manager: gui struct\n");
     }else{
 
         //
@@ -150,7 +152,7 @@ int init_logon_manager (void){
 	
 	    //#importante
 	    //Logo antes user session, room e desktop.
-	    //Assim essas informaç~oes ficar~ao na estrutura de tty.
+	    //Assim essas informaï¿½~oes ficar~ao na estrutura de tty.
 	    //assim saberemos qual usu'ario est'a usando a tty0
 	    // deve ser o 'root'.
 
@@ -159,7 +161,7 @@ int init_logon_manager (void){
         printf ("init_logon_manager: Initializing tty module\n");
         tty_init_module();
 
-        // Limpa a lista de terminais virtuais também.
+        // Limpa a lista de terminais virtuais tambï¿½m.
         printf ("init_logon_manager: Initializing vt module\n");
         vt_init_module();
 
@@ -167,9 +169,9 @@ int init_logon_manager (void){
 
 	// =========
 	//
-	// @todo: Usuário e sessão devem ser independentes do modo de vídeo. 
+	// @todo: Usuï¿½rio e sessï¿½o devem ser independentes do modo de vï¿½deo. 
 	//        Text ou Graphics.
-	// @todo: Essas informações são independentes da arquitetura,
+	// @todo: Essas informaï¿½ï¿½es sï¿½o independentes da arquitetura,
 	//      Essa rotina pode ir pra outro lugar.
 	
 //UserInfo:
@@ -189,8 +191,8 @@ int init_logon_manager (void){
 
         // display and screen
         current_display = 0;
-        current_screen = 0;
- 
+        current_screen  = 0;
+
         //
         // Security
         //
@@ -208,9 +210,10 @@ int init_logon_manager (void){
 
         // Initializing zorder list.
 
-        for ( z=0; z < KGWS_ZORDER_MAX; z++ ){
+        for ( z=0; z < KGWS_ZORDER_MAX; z++ )
+        {
             Windows[z] = (unsigned long) 0;
-        }
+        };
         zorderCounter = 0;
 
 
@@ -220,19 +223,21 @@ int init_logon_manager (void){
 #ifdef KERNEL_VERBOSE		
 		printf ("init_logon_manager: initializing user session\n");
 #endif
-		init_user_session ();
+        init_user_session();
+
 
 		//initialize window station default.
 #ifdef KERNEL_VERBOSE
 		printf ("init_logon_manager: initializing room\n");   
 #endif
-		init_room_manager ();	
+        init_room_manager();
+
 
 	    //initialize desktop default.
 #ifdef KERNEL_VERBOSE
 		printf ("init_logon_manager: initializing desktop\n");   
 #endif
-		init_desktop ();
+        init_desktop();
 
 
         // #test
@@ -240,6 +245,7 @@ int init_logon_manager (void){
         
         //#debug
         //breakpoint
+
         refresh_screen();
         //while(1){}
 
@@ -249,22 +255,22 @@ int init_logon_manager (void){
 #ifdef KERNEL_VERBOSE
 		printf ("init_logon_manager: initializing windows\n");   
 #endif
-		init_windows(); 
+        init_windows();
 
 
 		//menus.
 #ifdef KERNEL_VERBOSE
 		printf("create_logon: initializing menus\n");
 #endif
-		init_menus();        
+        init_menus();
 
-	    //...
-	};
+	    // ...
+    };
 
 
     if ( (void *) CurrentUser == NULL )
     {
-        panic("init_logon_manager: CurrentUser");
+        panic ("init_logon_manager: CurrentUser\n");
     }
 
      //printf("*breakpoint\n");
@@ -292,9 +298,6 @@ int init_logon_manager (void){
         draw_text ( 
             gui->main, 8, 8, 
             COLOR_WHITE, "Gramado Operating System" );
-
-        //draw_text( gui->main, 400 +8, 8*3, 
-            //COLOR_WHITE, "(under construction) ");
     }
 
 
@@ -309,9 +312,8 @@ done:
     logonStatus      = TRUE;
     gui->initialised = TRUE;
 
-
     kprintf ("init_logon_manager: Done\n"); 
-    
+
     return 0;
 }
 
@@ -364,50 +366,49 @@ int ExitLogon (void)
  *     ( * ROOT WINDOW )
  * 
  *     Cria a tela. 
- *     Atribuindo as dimensões.
+ *     Atribuindo as dimensï¿½es.
  *     ...
  */
 
 void logon_create_screen_window (void){
 
-    struct window_d *hWindow; 
+    struct window_d *hWindow;
 
     unsigned long Left   = 0;
     unsigned long Top    = 0;
-
     unsigned long Width  = (unsigned long) screenGetWidth();
     unsigned long Height = (unsigned long) screenGetHeight();
 
 
+    if ( Width == 0 || Height == 0 )
+        panic("logon_create_screen_window: w h\n");
+
 
 	// Screen
-	// Obs: Não tem 'parent window' !!!
+	// Obs: Nï¿½o tem 'parent window' !!!
 
 	// # minimized
-	// não pode ser pintada nem repintada.
+	// nï¿½o pode ser pintada nem repintada.
 
     hWindow = (void *) CreateWindow ( 
                            WT_SIMPLE, 0, VIEW_FULL, "Screen",
                            Left, Top, Width, Height, 
-                           NULL, 0, 0, COLOR_BLACK );  
-
+                           NULL, 0, 0, COLOR_BLACK ); 
 
     if ( (void *) hWindow == NULL ){
        panic ("logon_create_screen_window: hWindow\n");
     }else{
-        if ( hWindow->used != 1 || hWindow->magic != 1234 ){
+        if ( hWindow->used != TRUE || hWindow->magic != 1234 ){
             panic ("logon_create_screen_window: hWindow\n");
         }
 
-        RegisterWindow (hWindow);
+        RegisterWindow(hWindow);
 
         if ( (void *) gui == NULL){
             panic ("logon_create_screen_window: gui\n");
         }else{
-
             gui->screen = (void *) hWindow;
             gui->main   = (void *) hWindow;
-
 
             // z order
             // Primeira janela da ordem;
@@ -418,7 +419,6 @@ void logon_create_screen_window (void){
 			// #debug
 			// refresh_screen();
 			// while(1){}
-
         };
     };
 }
@@ -429,8 +429,9 @@ void logon_create_screen_window (void){
 int register_logon_process ( pid_t pid )
 {
 
-    if (pid<0 || pid >= PROCESS_COUNT_MAX ){
-        debug_print("register_logon_process: pid fail\n");
+    if ( pid<0 || pid >= PROCESS_COUNT_MAX )
+    {
+        debug_print("register_logon_process: [FAIL] pid\n");
         return -1;
     }
 
@@ -439,8 +440,10 @@ int register_logon_process ( pid_t pid )
         return -1;
     }
 
+    // Global variable.
+
     __gpidLogon = (pid_t) pid;
-    
+
     return 0;
 }
 

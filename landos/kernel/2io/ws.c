@@ -45,13 +45,14 @@ int ws_init (void)
     WindowServer_name[3] = 's';
     WindowServer_name[4] = 0;
     
-    
     WindowServer_virtual_console = 0;
 
-    WindowServer_initialized = 1;
-        
+    // ...
+
+    WindowServer_initialized = TRUE;
     return 0;
 }
+
 
 void ws_show_info(void)
 {

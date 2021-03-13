@@ -1,25 +1,23 @@
 /*
- * File: windows/logoff.c
+ * File: logoff.c
  *
  *  Kernel Mode Logoff Support Routines.
  *
  * isso prepara um ambiente para rodar o processo logoff
  *
- * Descrição:
- *     Módulo do kernel responsável por rotinas de logoff.
- *     Esse módulo faz parte do kernel base.
- *     Encerra uma seção de usuário.
- *     Um usuário sai.
- *     Fecha todos os programas e enserra a sessão do usuário.
+ * Descriï¿½ï¿½o:
+ *     Mï¿½dulo do kernel responsï¿½vel por rotinas de logoff.
+ *     Esse mï¿½dulo faz parte do kernel base.
+ *     Encerra uma seï¿½ï¿½o de usuï¿½rio.
+ *     Um usuï¿½rio sai.
+ *     Fecha todos os programas e enserra a sessï¿½o do usuï¿½rio.
  *
  * History:
  *     2015 - Created by Fred Nora.
- *     2016 - Revision.
  */
 
 
 #include <kernel.h>
-
 
 
 
@@ -30,6 +28,8 @@ int register_logoff_process ( pid_t pid ){
         debug_print("register_logoff_process: pid fail\n");
         return -1;
     }
+
+    // Global variable.
 
     if ( __gpidLogoff != 0 ){
         debug_print("register_logoff_process:\n");

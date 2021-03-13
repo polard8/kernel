@@ -16,6 +16,7 @@
 
 int fg_console;
 
+
 // Wrapper to tty_ioctl
 // #bugbug:
 // We already have this thing on terminal.c in sci/
@@ -26,51 +27,52 @@ vt_ioctl (
     unsigned long arg )
 {
     debug_print ("vt_ioctl:\n");
-    
-    return (int) tty_ioctl ( (int) fd, 
-                            (unsigned long) request, 
-                            (unsigned long) arg );
+
+    //if(fd<0)
+        //return -1;
+
+    return (int) tty_ioctl ( 
+                     (int) fd, 
+                     (unsigned long) request, 
+                     (unsigned long) arg );
 }
 
 
 /*
  ***************************************
  * _vt_outbyte:
- * 
- * 
- *    Outputs a char on the pseudo terminal device.
- *    pts
+ *
+ *     Draw the char into the backbuffer ?
+ *     Low level helper.
  */
- 
+
 // #todo
 // precisamos de uma flag para vt vt_stdio_terminalmode_flag.
 
- 
-void _vt_outbyte ( int c, struct tty_d *tty ){
+void _vt_outbyte ( int c, struct tty_d *tty )
+{
+    // unsigned long i=0;
 
-    unsigned long i=0;
     unsigned long x=0;
     unsigned long y=0;
 
 
     //O caractere.
 
-    char ch = (char) c;
+    // char Ch = (char) c;
 
 
 
     //
     // Check tty
     //
-    
 
     if ( (void *) tty == NULL ){
         debug_print ("_vt_outbyte: tty\n");
         return;
-        
     }else{
 
-         if ( tty->used != 1 || tty->magic != 1234 ){
+         if ( tty->used != TRUE || tty->magic != 1234 ){
              debug_print ("_vt_outbyte: tty validation\n");
              return;
          }
@@ -86,67 +88,58 @@ void _vt_outbyte ( int c, struct tty_d *tty ){
 	// Não pode ser 0, pois poderíamos ter divisão por zero.
 	
 
-    int cWidth = get_char_width();
+    int cWidth  = get_char_width();
     int cHeight = get_char_height();
 
-    if ( cWidth == 0 || cHeight == 0 ){
-        debug_print ("_vt_outbyte: char w h");
-        panic       ("_vt_outbyte: fail w h ");
+    if ( cWidth == 0 || cHeight == 0 )
+    {
+        debug_print ("_vt_outbyte: char w h\n");
+        panic       ("_vt_outbyte: fail w h\n");
+    }
+
+    // #bugbug
+    // Caso estejamos em modo texto.
+    // Isso ainda não é suportado.
+
+    if ( VideoBlock.useGui == FALSE )
+    {
+        debug_print ("_vt_outbyte: kernel in text mode\n");
+        panic       ("_vt_outbyte: kernel in text mode\n");
     }
 
 
-	// #bugbug
-	// Caso estejamos em modo texto.
-	// Isso ainda não é suportado.
-
-    if ( VideoBlock.useGui == 0 ){
-        debug_print ("_vt_outbyte: kernel in text mode");
-        panic       ("_vt_outbyte: kernel in text mode");
-    }
-
-	
-	// #Importante: 
-	// Essa rotina não sabe nada sobre janela, ela escreve na tela como 
-	// um todo. Só está considerando as dimensões do 'char'.
+    // #Importante: 
+    // Essa rotina não sabe nada sobre janela, ela escreve na tela como 
+    // um todo. Só está considerando as dimensões do 'char'.
 
 
     // Caso estivermos em modo gráfico.
- 
-    if ( VideoBlock.useGui == 1 )
+
+    if ( VideoBlock.useGui == TRUE )
     {
 
         //#importante: Essa rotina de pintura deveria ser exclusiva para 
         //dentro do terminal.
         //então essa flag não faz sentido.		
- 
-        if ( stdio_terminalmode_flag == 1 ){
 
-            // ## NÃO TRANPARENTE ##
-            // se estamos no modo terminal então usaremos as cores 
-            // configuradas na estrutura do terminal atual.
-            // Branco no preto é um padrão para terminal.
+        // ## NÃO TRANPARENTE ##
+        // se estamos no modo terminal então usaremos as cores 
+        // configuradas na estrutura do terminal atual.
+        // Branco no preto é um padrão para terminal.
+        // ## TRANSPARENTE ##
+        // se não estamos no modo terminal então usaremos
+        // char transparente.
+        // Não sabemos o fundo. Vamos selecionar o foreground.
 
-            //draw_char ( cWidth * TTY[console_number].cursor_x, cHeight * TTY[console_number].cursor_y, c, 
-            //  COLOR_TERMINALTEXT, COLOR_TERMINAL2 );
+        x = (cWidth  * tty->cursor_x);
+        y = (cHeight * tty->cursor_y);
 
+        if ( stdio_terminalmode_flag == TRUE ){
             d_draw_char ( 
-                (cWidth * tty->cursor_x), (cHeight * tty->cursor_y), 
-                c, COLOR_WHITE, 0x303030 );
-
+                x, y, c, COLOR_WHITE, 0x303030 );
         }else{
-
-            // ## TRANSPARENTE ##
-            // se não estamos no modo terminal então usaremos
-            // char transparente.
-            // Não sabemos o fundo. Vamos selecionar o foreground.
-
-			//drawchar_transparent ( 
-			    //cWidth* TTY[console_number].cursor_x, cHeight * TTY[console_number].cursor_y, 
-				//TTY[console_number].cursor_color, c );
-
             d_drawchar_transparent ( 
-                (cWidth * tty->cursor_x), (cHeight * tty->cursor_y), 
-                tty->cursor_color, c );
+                x, y, tty->cursor_color, c );
         };
     };
 }
@@ -177,10 +170,9 @@ void vt_outbyte ( int c, struct tty_d *tty ){
     if ( (void *) tty == NULL ){
         debug_print ("vt_outbyte: tty\n");
         return;
-
     }else{
 
-         if ( tty->used != 1 || tty->magic != 1234 ){
+         if ( tty->used != TRUE || tty->magic != 1234 ){
              debug_print ("vt_outbyte: tty validation\n");
              return;
          }
@@ -308,25 +300,25 @@ void vt_outbyte ( int c, struct tty_d *tty ){
     {
         tty->cursor_x = tty->cursor_left;  
         prev = c;
-        return;    
+        return;
     }
 
 
-    //#@todo#bugbug 
-    //retirei esse retorno para o espaço, com isso 
+    // #todo 
+    // #bugbug 
+    // retirei esse retorno para o espaço, com isso 
     // o ascii 32 foi pintado, mas como todos os 
-    //bits estão desligados, não pintou nada.
-    //space 
+    // bits estão desligados, não pintou nada.
+    // space 
     //if( c == ' ' )  
     //{
     //    g_cursor_x++; 
     //    prev = c;
-    //    return;         
-    //};
-    
- 
-    //Delete. 
-    //#bugbug: Limits.
+    //    return;
+    //}
+
+    // Delete
+    // #bugbug: Limits.
     if ( c == 8 )  
     {
         tty->cursor_x--; 
@@ -339,55 +331,50 @@ void vt_outbyte ( int c, struct tty_d *tty ){
 	// limits
 	//
 
-	// Filtra as dimensões da janela onde está pintando.
-	// @todo: Esses limites precisam de variável global.
-	//        mas estamos usando printf pra tudo.
-	//        cada elemento terá que impor seu próprio limite.
-	//        O processo shell impõe seu limite.
-	//        a janela impõe seu limite etc...
-	//        Esse aqui é o limite máximo de uma linha.
-	// Poderia ser o limite imposto pela disciplina de linha
-	// do kernel para o máximo de input. Pois o input é
-	// armazenado em uma linha.	 
-
+    // Filtra as dimensões da janela onde está pintando.
+    // #todo: 
+    // Esses limites precisam de variável global.
+    // mas estamos usando printf pra tudo.
+    // cada elemento terá que impor seu próprio limite.
+    // O processo shell impõe seu limite.
+    // a janela impõe seu limite etc...
+    // Esse aqui é o limite máximo de uma linha.
+    // Poderia ser o limite imposto pela disciplina de linha
+    // do kernel para o máximo de input. Pois o input é
+    // armazenado em uma linha.
 
 //checkLimits:
 
-    //Limites para o número de caracteres numa linha.
+    // Limites para o número de caracteres numa linha.
     if ( tty->cursor_x >= (tty->cursor_right-1) )
     {
         tty->cursor_x = tty->cursor_left;
-        tty->cursor_y++;  
-
-    }else{   
+        tty->cursor_y++;
+    }else{
 
 		// Incrementando.
 		// Apenas incrementa a coluna.
 
-        tty->cursor_x++;  
+        tty->cursor_x++;
     };
 
-	// #bugbug
-	// Tem um scroll logo acima que considera um valor
-	// de limite diferente desse.
+    // #bugbug
+    // Tem um scroll logo acima que considera um valor
+    // de limite diferente desse.
 
-	// Número máximo de linhas. (8 pixels por linha.)
+    // Número máximo de linhas. (8 pixels por linha.)
     if ( tty->cursor_y >= tty->cursor_bottom )  
     { 
         vt_scroll (tty);
-
         tty->cursor_y = tty->cursor_bottom;
     }
 
-	//
-	// Imprime os caracteres normais.
-	//
-
-	// Nesse momento imprimiremos os caracteres.
     // Imprime os caracteres normais.
-	// Atualisa o prev.
+    // Nesse momento imprimiremos os caracteres.
+    // Imprime os caracteres normais.
+    // Atualisa o prev.
 
-    _vt_outbyte (c, tty);
+    _vt_outbyte (c,tty);
 
     prev = c;
 }
@@ -397,70 +384,65 @@ void vt_outbyte ( int c, struct tty_d *tty ){
 // scroll no pseudo terminal
 // #bugbug
 
-void vt_scroll (struct tty_d *tty){
+void vt_scroll (struct tty_d *tty)
+{
 
     // Salvar cursor.
-    unsigned long OldX, OldY;
 
+    unsigned long OldX=0; 
+    unsigned long OldY=0;
     int i=0;
-
 
     // Check tty
 
     if ( (void *) tty == NULL ){
         debug_print ("vt_scroll: tty\n");
         return;
-        
     }else{
 
-         if ( tty->used != 1 || tty->magic != 1234 )
+         if ( tty->used != TRUE || tty->magic != 1234 )
          {
              debug_print ("vt_scroll: tty validation\n");
              return;
          }
-         
          // tty ok.
     };
 
+    // We are in graphics mode.
 
-	
-	// Se estamos em Modo gráfico (GUI).
-	
-    if ( VideoBlock.useGui == 1 )
+    if ( VideoBlock.useGui == TRUE )
     {
-	
+
 		// copia o retângulo.
 		// #todo: olhar as rotinas de copiar retângulo.
 		//See: comp/rect.c
-        scroll_screen_rect ();
-		
-        //Limpa a última linha.
-		
-		//salva cursor
-		OldX = tty->cursor_x;  //g_cursor_x;
-		OldY = tty->cursor_y;  //g_cursor_y;
-		
-		//cursor na ultima linha.
-		
-		//g_cursor_x = 0;
-		tty->cursor_x = tty->cursor_left;          //g_cursor_x = g_cursor_left;
-		tty->cursor_y = ( tty->cursor_bottom -1);  //g_cursor_y = (g_cursor_bottom-1);
-		
-		// limpa a linha.
-		
-		//for ( i = g_cursor_x; i < g_cursor_right; i++ )
-		for ( i = tty->cursor_x; i < tty->cursor_right; i++ )
-		{
-		    _vt_outbyte ( ' ',tty); 
-		};
-	
-		// Reposiciona o cursor na última linha.
 
-		tty->cursor_x = tty->cursor_left;   //g_cursor_x = g_cursor_left;
-		tty->cursor_y = OldY;   //g_cursor_y = OldY;
-		
-		refresh_screen ();
-	}
+        scroll_screen_rect ();
+
+        //Limpa a última linha.
+
+        // Save cursor
+        OldX = tty->cursor_x;
+        OldY = tty->cursor_y;
+
+		//cursor na ultima linha.
+
+        tty->cursor_x = tty->cursor_left;
+        tty->cursor_y = ( tty->cursor_bottom -1);
+
+        // Clear line
+        // Put the cursor in the last line
+
+        for ( i = tty->cursor_x; i < tty->cursor_right; i++ )
+        {
+            _vt_outbyte ( ' ',tty); 
+        };
+
+        tty->cursor_x = tty->cursor_left; 
+        tty->cursor_y = OldY;
+
+        refresh_screen ();
+    }
 }
 
 
@@ -473,10 +455,10 @@ vt_create (
     int father_pid )
 {
 
-    struct vt_d *terminal;
-    int i=0;  
-    
-        
+    struct vt_d  *terminal;
+    int i=0;
+
+
     if ( father_pid < 0 ){
         debug_print ("vt_create: father_ip\n");
         return -1;
@@ -488,7 +470,7 @@ vt_create (
         return -1;
     }
 
-    if ( window->used == 1 && window->magic == 1234 )
+    if ( window->used == TRUE && window->magic == 1234 )
     {
          terminal = (struct vt_d *) kmalloc ( sizeof (struct vt_d) );
          
@@ -498,37 +480,37 @@ vt_create (
          }
              
          //terminal->id = ?;
-         terminal->used = 1;
+         terminal->used  = TRUE;
          terminal->magic = 1234;
          
          
          terminal->father_pid = father_pid;
-         terminal->child_pid = -1;
-    
+         terminal->child_pid  = -1;
+
          terminal->state = 0;
          
-         window->isTerminal = 1;
+         window->isTerminal = TRUE;
          window->terminal = terminal;
-    }   
-    
-    
+    }
+
     // register
     // Pra usar isso pela primeira vez tem que inicializar.
+    // #todo: Check this limit.
+    // Save and return the index.
 
     for (i=0; i<32; i++)
     {
-         if ( vtList[i] == 0 )
-         {
-             //save
-             vtList[i] = (unsigned long) terminal;
-             
-             return i;
-         } 
-    }; 
+        if ( vtList[i] == 0 )
+        {
+            vtList[i] = (unsigned long) terminal;
+            return (int) i;
+        }
+    };
 
-   //fail 
-    panic ("vt_create: no slots");
+    // fail 
+    panic ("vt_create: [FIXME] no empty slot\n");
 
+    // Not reached
     return -1;
 }
 
@@ -545,14 +527,12 @@ vt_set_child (
         return -1;
     }
 
-
     if ( (void *) window == NULL ){
         debug_print ("vt_set_child: window\n");
         return -1;
     }
 
-
-    if ( window->isTerminal != 1 ){
+    if ( window->isTerminal != TRUE ){
         debug_print ("vt_set_child: not terminal\n");
         return -1;
     }
@@ -563,15 +543,16 @@ vt_set_child (
     }
 
 
-
-    if ( window->terminal->used == 1 && 
+    if ( window->terminal->used  == TRUE && 
          window->terminal->magic == 1234 )
     {
         window->terminal->child_pid = child_pid;
         return 0;
     }
     
-    
+    // ??
+    // Do we need a message here ?
+
     //fail
     return -1;
 }
@@ -590,11 +571,10 @@ vt_set_pty (
         return -1;
     }
 
-
-    if ( terminal->used == 1 && terminal->magic == 1234 )
+    if ( terminal->used == TRUE && terminal->magic == 1234 )
     {
         terminal->master = master;
-        terminal->slave = slave;
+        terminal->slave  = slave;
         return 0;
     }
 
@@ -602,20 +582,20 @@ vt_set_pty (
 }
 
 
-
-//init module.
+// init module.
 int vt_init_module (void){
 
-    int i=0;  
-    
+    register int i=0;
 
     debug_print("vt_init_module:\n");
 
+    // init list
+    // #todo: Check this limit
 
-    //init list
-    for (i=0; i<32; i++)
+    for (i=0; i<32; ++i)
+    {
         vtList[i] = (unsigned long) 0;
-
+    };
 
     // ...
     

@@ -72,7 +72,7 @@ PCIRegisterIRQHandler (
     unsigned long handler,
     void *priv ) 
 {
-    panic ("E1000-PCIRegisterIRQHandler: [FIXME]");
+    panic ("E1000-PCIRegisterIRQHandler: [FIXME]\n");
 }
 
 
@@ -105,14 +105,15 @@ e1000_init_nic (
     // pci info.
     uint32_t data=0;
 
-    unsigned short Vendor=0;
-    unsigned short Device=0;
+    unsigned short Vendor = 0;
+    unsigned short Device = 0;
 
-    unsigned long phy_address=0;
-    unsigned long virt_address=0;
+    unsigned long phy_address  = 0;
+    unsigned long virt_address = 0;
 
     unsigned short tmp16=0;
 
+    uint32_t Val=0;
 
     // #debug
     debug_print ("e1000_init_nic:\n");
@@ -157,15 +158,12 @@ e1000_init_nic (
 
     if ( (void *) pci_device ==  NULL ){
         panic ("e1000_init_nic: pci_device\n");
-
     }else{
-        pci_device->used = 1;
-        pci_device->magic = 1234;
-        
-        pci_device->bus  = (unsigned char) bus;
-        pci_device->dev  = (unsigned char) dev;
-        pci_device->func = (unsigned char) fun;
-
+        pci_device->used   = TRUE;
+        pci_device->magic  = 1234;
+        pci_device->bus    = (unsigned char) bus;
+        pci_device->dev    = (unsigned char) dev;
+        pci_device->func   = (unsigned char) fun;
         pci_device->Vendor = (unsigned short) (data       & 0xffff);
         pci_device->Device = (unsigned short) (data >> 16 & 0xffff);
 
@@ -231,9 +229,8 @@ e1000_init_nic (
         phy_address = (unsigned long) ( pci_device->BAR0 & 0xFFFFFFF0 );
 
         if (phy_address == 0){
-            panic ("e1000_init_nic: Invalid phy_address");
+            panic ("e1000_init_nic: Invalid phy_address\n");
         }
-
         // ...
     };
 
@@ -249,7 +246,7 @@ e1000_init_nic (
     virt_address = (unsigned long) mapping_nic1_device_address (phy_address);
 
     if (virt_address == 0){
-        panic ("e1000_init_nic: Invalid virt_address");
+        panic ("e1000_init_nic: Invalid virt_address\n");
     }
 
     // Endereço base.
@@ -270,11 +267,10 @@ e1000_init_nic (
 
     if ( (void *) currentNIC ==  NULL ){
         panic ("e1000_init_nic: currentNIC struct\n");
-
     } else {
-        currentNIC->used = 1;
+        currentNIC->used  = TRUE;
         currentNIC->magic = 1234;
-        
+
         currentNIC->interrupt_count = 0;
 
         currentNIC->pci = (struct pci_device_d *) pci_device;
@@ -302,13 +298,12 @@ e1000_init_nic (
 		currentNIC->eeprom = 0; 
 
 		// Let's try to discover reading the status field!
-        uint32_t val=0;
         for ( i=0; i < 1000 && !currentNIC->eeprom; ++i ) 
         {
-             val = E1000ReadCommand ( currentNIC, 0x14 );
+            Val = E1000ReadCommand ( currentNIC, 0x14 );
 
-		    // We have? Yes!.
-            if ( (val & 0x10) == 0x10) { currentNIC->eeprom = 1; }
+            // We have? Yes!.
+            if ( (Val & 0x10) == 0x10) { currentNIC->eeprom = 1; }
         };
 
 
@@ -439,12 +434,11 @@ irq_E1000 (void)
 	// Essa flag precisa ser acionada para a rotina funcionar.
 	// F6 tem acionado essa flag.
 
-
-    if ( e1000_interrupt_flag != 1 ){
+    if ( e1000_interrupt_flag != TRUE )
+    {
         printf ("irq_E1000: locked\n");
         refresh_screen();
         return;
-
     }else{
 
 		//#debug
@@ -463,9 +457,8 @@ irq_E1000 (void)
         currentNIC->interrupt_count++; 
     }
 
-
     // Without this, the card may spam interrupts...
-    E1000WriteCommand( currentNIC, 0xD0, 1);
+    E1000WriteCommand( currentNIC, 0xD0, 1 );
 
 
     //
@@ -577,7 +570,7 @@ irq_E1000 (void)
         // a flag que libera esse diálogo.
 
         //#todo
-        if(____network_late_flag == 1)
+        if(____network_late_flag == TRUE)
         {
             // Enfileirar o buffer
             network_buffer_in ( (void *) buffer, (int) len );
@@ -624,7 +617,7 @@ void e1000_setup_irq (void){
 	
 	// handler address
 	
-    uint32_t handler = (uint32_t) &irq_E1000;  
+    uint32_t handler = (uint32_t) &irq_E1000; 
 
 	// #importante
 	// Transformando irq em número de interrupção.
@@ -637,7 +630,7 @@ void e1000_setup_irq (void){
 	// #obs: Essas variáveis são declaradas nesse arquivo
 	// o assembly terá que pegar.
 
-    nic_idt_entry_new_number  = (uint8_t) idt_num;   
+    nic_idt_entry_new_number  = (uint8_t) idt_num; 
     nic_idt_entry_new_address = (unsigned long) handler; 
 
 
@@ -709,10 +702,11 @@ int e1000_reset_controller (void){
     //esse será o endereço oficial.
     //currentNIC->mem_base	
 
-    if ( currentNIC->mem_base == 0 ){
-        printf ("e1000_reset_controller: currentNIC->mem_base fail");
-        refresh_screen ();
-        while (1){}
+    if ( currentNIC->mem_base == 0 )
+    {
+        panic ("e1000_reset_controller: currentNIC->mem_base fail\n");
+        // refresh_screen ();
+        // while (1){}
     }
 
 
@@ -740,10 +734,11 @@ int e1000_reset_controller (void){
 
 	// We failed, unmap everything
 
-    if ( currentNIC->tx_descs_phys == 0 ){
-        printf ("e1000_reset_controller: currentNIC->tx_descs_phys fail");
-        refresh_screen ();
-        while (1){};
+    if ( currentNIC->tx_descs_phys == 0 )
+    {
+        panic ("e1000_reset_controller: currentNIC->tx_descs_phys fail\n");
+        //refresh_screen ();
+        //while (1){};
     }
 
 
@@ -760,10 +755,11 @@ int e1000_reset_controller (void){
 
 		// We failed, unmap everything
 
-        if (currentNIC->legacy_tx_descs[i].addr == 0){
-            printf ("e1000_reset_controller: dev->rx_descs[i].addr fail");
-            refresh_screen ();
-            while (1){};
+        if (currentNIC->legacy_tx_descs[i].addr == 0)
+        {
+            panic ("e1000_reset_controller: dev->rx_descs[i].addr fail\n");
+            //refresh_screen ();
+            //while (1){};
         }
 
         //cmd: bits
@@ -801,10 +797,11 @@ int e1000_reset_controller (void){
     currentNIC->rx_descs_phys = E1000AllocCont (0x1000, (uint32_t *)(&currentNIC->legacy_rx_descs));
 
     // We failed, unmap everything
-    if (currentNIC->rx_descs_phys == 0){
-        printf ("e1000_reset_controller: currentNIC->rx_descs_phys fail");
-        refresh_screen ();
-        while (1){};
+    if (currentNIC->rx_descs_phys == 0)
+    {
+        panic ("e1000_reset_controller: currentNIC->rx_descs_phys fail\n");
+        //refresh_screen ();
+        //while (1){};
     }
 
 	//rx
@@ -820,9 +817,9 @@ int e1000_reset_controller (void){
         // We failed, unmap everything
         if (currentNIC->legacy_rx_descs[i].addr == 0)
         {
-            printf ("e1000_reset_controller: dev->rx_descs[i].addr fail");
-            refresh_screen ();
-            while (1){};
+            panic ("e1000_reset_controller: dev->rx_descs[i].addr fail\n");
+            //refresh_screen ();
+            //while (1){};
         }
 
         currentNIC->legacy_rx_descs[i].status = 0;
@@ -1094,7 +1091,7 @@ E1000AllocCont (
 
 
     if (amount==0){
-        panic ("E1000AllocCont: [FAIL] amount");
+        panic ("E1000AllocCont: [FAIL] amount\n");
     }
 
     // ============
@@ -1102,7 +1099,7 @@ E1000AllocCont (
     va = (uint32_t) kmalloc ( (size_t) amount );
     *virt = va;
     if (*virt == 0){
-        panic ("E1000AllocCont: [FAIL] va allocation");
+        panic ("E1000AllocCont: [FAIL] va allocation\n");
     }
 
     
@@ -1112,7 +1109,7 @@ E1000AllocCont (
     pa = (uint32_t) virtual_to_physical (
                         va, gKernelPageDirectoryAddress ); 
     if (pa == 0){
-        panic ("E1000AllocCont: [FAIL] pa");
+        panic ("E1000AllocCont: [FAIL] pa\n");
     }
 
     return (uint32_t) pa;
