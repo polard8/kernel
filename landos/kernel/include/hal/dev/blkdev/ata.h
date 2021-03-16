@@ -20,6 +20,30 @@
 // Defines.
 //
 
+
+
+// Bus.
+#define ATA_PRIMARY   0x00
+#define ATA_SECONDARY 0x01
+
+// Devices.
+#define ATA_MASTER    0
+#define ATA_SLAVE     1 
+#define ATA_MASTER_DEV 0x00
+#define ATA_SLAVE_DEV  0x01
+
+
+
+// ATA type.
+#define ATA_DEVICE_TYPE   0x00
+#define ATAPI_DEVICE_TYPE 0x01
+
+// Modo de transferência.
+#define ATA_PIO_MODO 0 
+#define ATA_DMA_MODO 1
+#define ATA_LBA28    28
+#define ATA_LBA48    48
+
 #define FORCEPIO 1234
 
 
@@ -124,25 +148,6 @@
 #define ATA_REG_STATUS   0x07
 
 
-// Devices.
-#define ATA_MASTER_DEV 0x00
-#define ATA_SLAVE_DEV  0x01
-
-// Bus.
-#define ATA_PRIMARY   0x00
-#define ATA_SECONDARY 0x01
-
-// ATA type.
-#define ATA_DEVICE_TYPE   0x00
-#define ATAPI_DEVICE_TYPE 0x01
-
-// Modo de transferência.
-#define ATA_PIO_MODO 0 
-#define ATA_DMA_MODO 1
-#define ATA_LBA28    28
-#define ATA_LBA48    48
-
-
 // ===========================================================
 
 //
@@ -155,8 +160,24 @@ unsigned short  *ata_identify_dev_buf;
 unsigned char ata_record_dev;
 unsigned char ata_record_channel;
 
+
+// #important
+// Qual é o canal e o dispositivo usado no momento
+// pela rotina de leitura e escrita.
+// See: config.h ata.c hdd.c
+
 int g_current_ide_channel;  //primary or secondary.
 int g_current_ide_device;   //master or slave
+
+
+// #important
+// Qual é o canal e o dispositivo usado no momento do boot 
+// pela rotina de leitura e escrita.
+// See: config.h ata.c hdd.c
+
+int g_boottime_ide_channel;  //primary or secondary.
+int g_boottime_ide_device;   //master or slave
+
 
 
 /*
@@ -284,6 +305,20 @@ typedef struct st_dev
 //
 // == Prototypes ==============================================
 //
+
+
+// current channel and device.
+int ata_get_current_ide_channel(void);
+int ata_get_current_ide_device(void);
+void ata_set_current_ide_channel(int channel);
+void ata_set_current_ide_device(int device);
+
+// current channel and device during the boottime.
+int ata_get_boottime_ide_channel(void);
+int ata_get_boottime_ide_device(void);
+void ata_set_boottime_ide_channel(int channel);
+void ata_set_boottime_ide_device(int device);
+
 
 
 int nport_ajuste(char nport);

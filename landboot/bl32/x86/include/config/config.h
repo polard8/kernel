@@ -29,13 +29,15 @@
 //BAR2 = base port 170   (channel 1 secondary master) (channel 1 secondary slave)
 //BAR3 = base port 376   channel ??
 
+#define __BAR0  0
+#define __BAR1  1
+#define __BAR2  2
+#define __BAR3  3
 
-
-
-#define __CHANNEL0 0  // BAR 0 primary ide channel. master and slave
-#define __CHANNEL1 2  // BAR 2 secondary ide channel. master and slave
-#define __CHANNEL2 1  // BAR 1 extra (sata emulating ide)
-#define __CHANNEL3 3  // BAR 3 extra (sata emulating ide)
+#define __CHANNEL0  __BAR0  // BAR 0 primary ide channel. master and slave
+#define __CHANNEL1  __BAR2  // BAR 2 secondary ide channel. master and slave
+#define __CHANNEL2  __BAR1  // BAR 1 extra (sata emulating ide)
+#define __CHANNEL3  __BAR3  // BAR 3 extra (sata emulating ide)
 
 
 // #importante
@@ -54,8 +56,23 @@
 // Partições:
 // sda1, sda2, sda3, sda4 ...
 
-#define __IDE_PORT __CHANNEL0    // primary
-#define __IDE_SLAVE  0           // 0=master 1=slave
+// #bugbug
+// Nesse momento estamos determinando que o driver do
+// controlador ide deve usar o canal 0 e que ele é master.
+// primary/master.
+// Então essas definições aqui são encontradas no driver do controlador.
+// Mas não deve ser assim. Devemos usar uma variável para isso.
+// Talvez algum arquivo de configuração devesse nos dizer 
+// qual canal devemos usar.
+// Ou ainda o número do driver de boot nos de alguma dica.
+// See: diskATAInitialize in ide.c
+
+
+#define __IDE_PORT    __CHANNEL0    // primary
+#define __IDE_SLAVE   0             // 0=master 1=slave
+
+
+
 
 
 

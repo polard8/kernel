@@ -63,7 +63,6 @@ void ata_wait (int val)
     while (val--)
     {
         io_delay();
-        //io_delay();
     };
 }
 
@@ -76,8 +75,7 @@ void ata_delay (void)
     // Waste some time.
     for (i = 0; i < 5; i++)
     {
-        __x86_io_delay ();
-        //__x86_io_delay ();
+        __x86_io_delay();
     };
 }
 
@@ -133,6 +131,9 @@ unsigned char ata_wait_drq (void)
 // ata soft reset. 
 void ata_soft_reset (void)
 {
+    // #todo
+    // Review this thing.
+
     //unsigned char data = in8 ( ata.ctrl_block_base_address + 2 );
     unsigned char data = in8 ( ata.ctrl_block_base_address );
     
@@ -165,9 +166,10 @@ void ata_cmd_write (int cmd_val)
 }
 
 
-// ?
-// Salvando canal e número do dispositivo de acordo com a porta.
 
+// De acordo com a porta, saberemos se é 
+// primary ou secondary e se é
+// master ou slave.
 unsigned char ata_assert_dever (char nport)
 {
 
@@ -177,23 +179,23 @@ unsigned char ata_assert_dever (char nport)
     switch (nport){
 
     case 0:
-        ata.channel = 0;
-        ata.dev_num = 0;
+        ata.channel = ATA_PRIMARY; //0;  // primary
+        ata.dev_num = ATA_MASTER;  //0;  // not slave ATA_MASTER
         break;
 
     case 1: 
-        ata.channel = 0;
-        ata.dev_num = 1;
+        ata.channel = ATA_PRIMARY; //0;  // primary
+        ata.dev_num = ATA_SLAVE;   //1;  // slave    ATA_SLAVE
         break;
 
     case 2:
-        ata.channel = 1;
-        ata.dev_num = 0;
+        ata.channel = ATA_SECONDARY;  //1;  // secondary
+        ata.dev_num = ATA_MASTER;     //0;  // not slave ATA_MASTER
         break;
 
     case 3:
-        ata.channel = 1;
-        ata.dev_num = 1;
+        ata.channel = ATA_SECONDARY;  //1;  // secondary
+        ata.dev_num = ATA_SLAVE;      //1;  // slave    ATA_SLAVE
         break;
 
     default:
@@ -246,7 +248,9 @@ int ide_identify_device ( uint8_t nport )
 
 
     // Select device,
-    out8 ( ata.cmd_block_base_address + ATA_REG_DEVSEL, 0xE0 | ata.dev_num << 4 );
+    out8 ( 
+        ( ata.cmd_block_base_address + ATA_REG_DEVSEL), 
+        0xE0 | ata.dev_num << 4 );
 
     // cmd
     ata_wait (400);
@@ -294,7 +298,7 @@ int ide_identify_device ( uint8_t nport )
 
         //salvando o tipo em estrutura de porta.
         ide_ports[nport].id    = (uint8_t) nport;
-        ide_ports[nport].used  = (int) 1;
+        ide_ports[nport].used  = (int) TRUE;
         ide_ports[nport].magic = (int) 1234;
         ide_ports[nport].name  = "PATA";
         ide_ports[nport].type  = (int) idedevicetypesPATA;
@@ -308,9 +312,9 @@ int ide_identify_device ( uint8_t nport )
             
             // ID and index.
             disk->id = nport;
-            disk->boot_disk_number = 0; // ??
+            disk->boot_disk_number = 0; // ?? #todo
             
-            disk->used = 1;
+            disk->used  = TRUE;
             disk->magic = 1234;
             
             // name = "sd?"
@@ -345,7 +349,7 @@ int ide_identify_device ( uint8_t nport )
 
         //salvando o tipo em estrutura de porta.
         ide_ports[nport].id    = (uint8_t) nport;
-        ide_ports[nport].used  = (int) 1;
+        ide_ports[nport].used  = (int) TRUE;
         ide_ports[nport].magic = (int) 1234;
         ide_ports[nport].name  = "SATA";
         ide_ports[nport].type  = (int) idedevicetypesSATA;
@@ -355,16 +359,15 @@ int ide_identify_device ( uint8_t nport )
         if ((void *) disk != NULL )
         {
 
-			disk->channel = ata.channel;
-			disk->dev_num = ata.dev_num;
-			
+            disk->channel = ata.channel;
+            disk->dev_num = ata.dev_num;
+
             // ID and index.
             disk->id = nport;
-            disk->boot_disk_number = 0; // ??
+            disk->boot_disk_number = 0; // ?? #todo
 
-			
-			disk->used = 1;
-			disk->magic = 1234;
+            disk->used  = TRUE;
+            disk->magic = 1234;
 
             //disk->name = "SATA-TEST";
             sprintf ( (char *) name_buffer, "SATA-TEST-%d",nport);
@@ -394,29 +397,31 @@ int ide_identify_device ( uint8_t nport )
 		
         //salvando o tipo em estrutura de porta.
         ide_ports[nport].id    = (uint8_t) nport;
-        ide_ports[nport].used  = (int) 1;
+        ide_ports[nport].used  = (int) TRUE;
         ide_ports[nport].magic = (int) 1234;
         ide_ports[nport].name  = "PATAPI";
         ide_ports[nport].type  = (int) idedevicetypesPATAPI;
-		
-		
-		disk = (struct disk_d *) kmalloc (  sizeof(struct disk_d) );
-		if ((void *) disk != NULL )
-		{
+
+
+        disk = (struct disk_d *) kmalloc (  sizeof(struct disk_d) );
+
+        if ((void *) disk != NULL )
+        {
 			disk->channel = ata.channel;
 			disk->dev_num = ata.dev_num;
-			
+
 			disk->id = nport;  
-			disk->used = 1;
-			disk->magic = 1234;
-			
+
+            disk->used  = TRUE;
+            disk->magic = 1234;
+
 			//disk->name = "PATAPI-TEST";
             sprintf ( (char *) name_buffer, "PATAPI-TEST-%d",nport);
             disk->name = (char *) strdup ( (const char *) name_buffer);  
             
 			disk->diskType = DISK_TYPE_PATAPI;
 			diskList[nport] = (unsigned long) disk;
-		}
+        }
 
         return (int) 0x80;
 
@@ -439,22 +444,23 @@ int ide_identify_device ( uint8_t nport )
 
         //salvando o tipo em estrutura de porta.
         ide_ports[nport].id    = (uint8_t) nport;
-        ide_ports[nport].used  = (int) 1;
+        ide_ports[nport].used  = (int) TRUE;
         ide_ports[nport].magic = (int) 1234;
         ide_ports[nport].name  = "SATAPI";
         ide_ports[nport].type  = (int) idedevicetypesSATAPI;
 
-		disk = (struct disk_d *) kmalloc (  sizeof(struct disk_d) );
-		if ((void *) disk != NULL )
-		{
+        disk = (struct disk_d *) kmalloc (  sizeof(struct disk_d) );
+
+        if ((void *) disk != NULL )
+        {
 			
 			disk->channel = ata.channel;
 			disk->dev_num = ata.dev_num;
-			
+
 			disk->id = nport;  
-			disk->used = 1;
-			disk->magic = 1234;
-			
+            disk->used  = TRUE;
+            disk->magic = 1234;
+
 			//disk->name = "SATAPI-TEST";
             sprintf ( (char *) name_buffer, "SATAPI-TEST-%d",nport);
             disk->name = (char *) strdup ( (const char *) name_buffer);  
@@ -462,7 +468,7 @@ int ide_identify_device ( uint8_t nport )
 
 			disk->diskType = DISK_TYPE_SATAPI;
 			diskList[nport] = (unsigned long) disk;
-		}
+        }
 
         return (int) 0x80;
     }
@@ -972,12 +978,11 @@ unsigned char *dma_addr;
  
 int ata_initialize ( int ataflag )
 {
-    __breaker_ata1_initialized = 0;
-    __breaker_ata2_initialized = 0;
 
     int Status = 1;  
 
-    int PortNumber=0;
+    // iterator.
+    int iPortNumber=0;
 
     unsigned char bus=0;
     unsigned char dev=0;
@@ -986,19 +991,42 @@ int ata_initialize ( int ataflag )
     int Ret = -1;
 
 
-	//
-	//  HACK HACK !!
-	//
+    // Setup interrupt breaker.
+     debug_print("ata_initialize: Turn on interrupt breaker\n");
 
-	// #importante:
-	// Isso é provisório.
-	// #todo: 
-	// Criar rotina que identifica em qual canal e dispositivo estamos atuando.
-	// Isso foi definido em config.h
+    __breaker_ata1_initialized = FALSE;
+    __breaker_ata2_initialized = FALSE;
+
+
+    //
+    // ===============================================================
+    //
+
+    // #importante 
+    // HACK HACK
+    // usando as definições feitas em config.h
+    // até que possamos encontrar o canal e o dispositivo certos.
+    // __IDE_PORT indica qual é o canal.
+    // __IDE_SLAVE indica se é master ou slave.
+    // ex: primary/master.
     // See: config.h
 
-    g_current_ide_channel =  __IDE_PORT;
-    g_current_ide_device  =  __IDE_SLAVE;
+
+    g_boottime_ide_channel =  __IDE_PORT;   // primary
+    g_boottime_ide_device  =  __IDE_SLAVE;  // master
+
+    // Configumos o atual como sendo o mesmo
+    // usado durante o boot.
+    // #todo
+    // Poderemos mudar o atual conforme nossa intenção
+    // de acessarmos outros discos.
+    
+    g_current_ide_channel =  g_boottime_ide_channel;
+    g_current_ide_device  =  g_boottime_ide_device;
+
+    //
+    // ===============================================================
+    //
 
 
 	// Configurando flags do driver.
@@ -1039,7 +1067,7 @@ int ata_initialize ( int ataflag )
     if ( (void *) PCIDeviceATA == NULL ){
         panic ("ata_initialize: PCIDeviceATA\n");
     }else{
-        if ( PCIDeviceATA->used != 1 || PCIDeviceATA->magic != 1234 )
+        if ( PCIDeviceATA->used != TRUE || PCIDeviceATA->magic != 1234 )
         {
             panic ("ata_initialize: Validation\n");
         }
@@ -1173,9 +1201,9 @@ int ata_initialize ( int ataflag )
         // #todo
         // Create a constant for 'max'. 
 
-        for ( PortNumber=0; PortNumber < 4; PortNumber++ )
+        for ( iPortNumber=0; iPortNumber < 4; iPortNumber++ )
         {
-            ide_dev_init (PortNumber);
+            ide_dev_init (iPortNumber);
         };
 
 
@@ -1188,6 +1216,8 @@ int ata_initialize ( int ataflag )
           {
 
               // Nothing for now !!!
+              
+              panic ("ata_initialize: AHCI not supported yet\n");
 
               // Aqui, vamos mapear o BAR5
               // Estou colocando na marca 28MB
@@ -1219,23 +1249,79 @@ int ata_initialize ( int ataflag )
 
 fail:
     printk ("ata_initialize: fail\n"); 
+
 done:
 
-//#ifdef KERNEL_VERBOSE 
-    //#debug
-    //kprintf("done!\n");
-    //refresh_screen();
-//#endif 
+    // Setup interrupt breaker.
+    // Só liberamos se a inicialização fncionou.
 
-
-    if ( Status == 0){
-        __breaker_ata1_initialized = 1;    
-        __breaker_ata2_initialized = 1;        
+    if ( Status == 0 ){
+        debug_print("ata_initialize: Turn off interrupt breaker\n");
+        __breaker_ata1_initialized = TRUE; 
+        __breaker_ata2_initialized = TRUE; 
     }
 
     return (int) Status;
 }
- 
+
+
+
+// primary or secondary
+int ata_get_current_ide_channel(void)
+{
+    return (int) g_current_ide_channel;
+}
+
+
+// master or slave
+int ata_get_current_ide_device(void)
+{
+    return (int) g_current_ide_device;
+}
+
+
+// primary or secondary
+void ata_set_current_ide_channel(int channel)
+{
+    g_current_ide_channel = channel;
+}
+
+
+// master or slave
+void ata_set_current_ide_device(int device)
+{
+    g_current_ide_device = device;
+}
+
+// ====================================
+
+
+// primary or secondary
+int ata_get_boottime_ide_channel(void)
+{
+    return (int) g_boottime_ide_channel;
+}
+
+
+// master or slave
+int ata_get_boottime_ide_device(void)
+{
+    return (int) g_boottime_ide_device;
+}
+
+
+// primary or secondary
+void ata_set_boottime_ide_channel(int channel)
+{
+    g_boottime_ide_channel = channel;
+}
+
+
+// master or slave
+void ata_set_boottime_ide_device(int device)
+{
+    g_boottime_ide_device = device;
+}
 
 
 /*
@@ -1245,9 +1331,12 @@ done:
  * do controlador.
  */
 
+// #todo
+// Not used. Please, call this routine.
+
 void show_ide_info (void){
 
-    int i = 0;
+    int i=0;
 
     printk ("\n  show_ide_info:  \n");
 

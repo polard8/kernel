@@ -14,13 +14,11 @@
 
 
 
-#define IDE_ATA 0
-#define IDE_ATAPI 1
+#define IDE_ATA    0
+#define IDE_ATAPI  1
 
-#define ATA_MASTER 0
-#define ATA_SLAVE 1 
- 
- 
+
+
 //#define HDD1_IRQ 14 
 //#define HDD2_IRQ 15 
 

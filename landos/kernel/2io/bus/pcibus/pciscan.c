@@ -1,5 +1,5 @@
 /*
- * File: pciscan.c 
+ * File: pcibus/pciscan.c 
  * 
  * Created by Fred Nora.
  */
@@ -91,7 +91,7 @@ int pci_setup_devices (void)
 
                 // Function.
                 // Handle device info.
-                for ( k=0; k<funcCount; k++)
+                for ( k=0; k<funcCount; k++ )
                 { 
                     pciHandleDevice(i,j,k); 
                 }; 
@@ -127,8 +127,9 @@ struct pci_device_d *scan_pci_device_list (
 
     register int i=0;
 
-	//#bugbug
-	//Nossa lista só tem 32 slots por enquanto.
+
+	// #bugbug
+	// Nossa lista só tem 32 slots por enquanto.
 
     for ( i=0; i<32; i++ )
     {
@@ -136,7 +137,7 @@ struct pci_device_d *scan_pci_device_list (
 
         if ( (void *) D != NULL )
         {
-            if ( D->used == 1 && D->magic == 1234 )
+            if ( D->used == TRUE && D->magic == 1234 )
             {
                 if ( D->Vendor == vendor && D->Device == device )
                 {
@@ -173,7 +174,7 @@ struct pci_device_d *scan_pci_device_list2 (
 
         if ( (void *) D != NULL )
         {
-            if ( D->used == 1 && D->magic == 1234 )
+            if ( D->used == TRUE && D->magic == 1234 )
             {
                 if ( D->classCode == class && D->subclass == subclass )
                 {
@@ -183,10 +184,8 @@ struct pci_device_d *scan_pci_device_list2 (
         }
     };
 
-
     return NULL;
 }
-
 
 
 //

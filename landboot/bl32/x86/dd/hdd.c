@@ -22,12 +22,11 @@
  *
  * #obs: Vamos montar dispositivos em /DEV
  *
+ * History:
  *    2013 - Created by Fred Nora.
- *    2016 - Revision.
  */
 
- 
- 
+
 /*
  hd info:
  =======
@@ -67,19 +66,26 @@ int hddError;
 
 
 // interna
+
+// #bugbug
+// inline is not good
+
 static void hdd_ata_pio_read ( 
     int p, 
     void *buffer, 
     int bytes )
 {
 
-    __asm__ __volatile__ (\
-                "cld;\
-                rep; insw":: "D" (buffer),\
-                "d" ( ide_ports[p].base_port + 0 ),\
-                "c" (bytes/2));
+    asm volatile (\
+        "cld;\
+         rep; insw":: "D" (buffer),\
+         "d" ( ide_ports[p].base_port + 0 ),\
+          "c" (bytes/2));
 }
 
+
+// #bugbug
+// inline is not good
 
 void 
 hdd_ata_pio_write ( 
@@ -87,8 +93,7 @@ hdd_ata_pio_write (
     void *buffer, 
     int bytes )
 {
-
-    __asm__ __volatile__ (\
+    asm volatile (\
                 "cld;\
                 rep; outsw"::"S"(buffer),\
                 "d"( ide_ports[p].base_port + 0 ),\
@@ -96,8 +101,8 @@ hdd_ata_pio_write (
 }
 
 
-uint8_t hdd_ata_status_read (int p){
-
+uint8_t hdd_ata_status_read (int p)
+{
 	//#bugbug: 
 	//rever o offset
 
@@ -107,7 +112,8 @@ uint8_t hdd_ata_status_read (int p){
 }
  
 
-int hdd_ata_wait_not_busy (int p){
+int hdd_ata_wait_not_busy (int p)
+{
 
     while( hdd_ata_status_read(p) & ATA_SR_BSY )
     if ( hdd_ata_status_read(p) & ATA_SR_ERR )

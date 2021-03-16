@@ -22,10 +22,10 @@ int g_current_ide_device;
 
 
 
-//0 primary master 
-//1 primary slave 
-//2 secondary master 
-//3 secondary slave.
+// 0 primary master 
+// 1 primary slave 
+// 2 secondary master 
+// 3 secondary slave.
 
 typedef enum {
 

@@ -1474,13 +1474,26 @@ int diskATAInitialize ( int ataflag )
 
 
 
+    //
+    // ===============================================================
+    //
 
-	//#importante HACK HACK
-	// usando as definições feitas em config.h
-	// até que possamos encontrar o canal e o dispositivo certos.
-	
-	g_current_ide_channel = __IDE_PORT;
-	g_current_ide_device = __IDE_SLAVE;
+    // #importante 
+    // HACK HACK
+    // usando as definições feitas em config.h
+    // até que possamos encontrar o canal e o dispositivo certos.
+    // __IDE_PORT indica qual é o canal.
+    // __IDE_SLAVE indica se é master ou slave.
+    // ex: primary/master.
+    // See: config.h
+
+    g_current_ide_channel =  __IDE_PORT;
+    g_current_ide_device  =  __IDE_SLAVE;
+
+
+    //
+    // ===============================================================
+    //
 
 
 	//
@@ -1534,16 +1547,15 @@ int diskATAInitialize ( int ataflag )
 	// Error.
     if( data == PCI_MSG_ERROR ){
         printf ("diskATAInitialize: Error Driver [%X]\n", data );
-		Status = (int) 1;
-		goto fail;  
+        Status = (int) 1;
+        goto fail;  
 
     }else if( data == PCI_MSG_AVALIABLE )
           {
               printf ("diskATAInitialize: RAID Controller Not supported.\n");
-		      Status = (int) 1;
-		      goto fail;  
+              Status = (int) 1;
+              goto fail;  
           };
-
 
 	//
     // Salvando informações.
@@ -1581,14 +1593,15 @@ int diskATAInitialize ( int ataflag )
 	// De acordo com o tipo.
 	//
 	
-	
+
+
 	//
 	// Se for IDE.
 	//
-	
-	// Type
+
+    // Type  ATA
     if ( ata.chip_control_type == ATA_IDE_CONTROLLER )
-	{
+    {
 
         //Soft Reset, defina IRQ
         
@@ -1680,19 +1693,16 @@ int diskATAInitialize ( int ataflag )
               //kputs("[ AHCI Mass Storage initialize ]\n");
               //ahci_mass_storage_init();
 
+              printf (" # Panic! # \n");
+              printf ("diskATAInitialize: AHCI not found \n");
+              die();
+
+          // Panic!
           }else{
-
-			   //
-			   // Panic !!
-			   //
-
-
-			   printf (" # Panic! # \n");
-			   printf ("diskATAInitialize: IDE and AHCI not found \n");
-			   die ();
-
+              printf (" # Panic! # \n");
+              printf ("diskATAInitialize: IDE and AHCI not found \n");
+              die();
           };
-
 
 //
 // Ok
@@ -1715,11 +1725,8 @@ fail:
 
 done:
 
-//#ifdef KERNEL_VERBOSE 
-    //#debug
-    //kprintf("done!\n");
-    //refresh_screen();
-//#endif 
+    // #debug
+    // printf ("diskATAInitialize: done\n");
 
     return (int) Status;
 }
@@ -1810,21 +1817,18 @@ void show_ide_info (){
 
     int i=0;
 
-
     printf ("show_ide_info:\n");
 
-    for ( i=0; i<4; i++ )
-    {
-		printf ("\n\n");
-		
-		printf ("id=%d\n",        ide_ports[i].id );
-		printf ("used=%d\n",      ide_ports[i].used );
-		printf ("magic=%d\n",     ide_ports[i].magic );
-		printf ("type=%d\n",      ide_ports[i].type );
-		printf ("name=%s\n",      ide_ports[i].name );
-		printf ("base_port=%x\n", ide_ports[i].base_port );
-	};
-
+    // four ports.
+    for ( i=0; i<4; i++ ){
+        printf ("\n");
+        printf ("id        = %d \n", ide_ports[i].id );
+        printf ("used      = %d \n", ide_ports[i].used );
+        printf ("magic     = %d \n", ide_ports[i].magic );
+        printf ("type      = %d \n", ide_ports[i].type );
+        printf ("name      = %s \n", ide_ports[i].name );
+        printf ("base_port = %x \n", ide_ports[i].base_port );
+    };
 
 
 	/*
@@ -1876,20 +1880,22 @@ int disk_ata_wait_irq (){
    _u32 tmp = 0x10000;
    _u8 data=0;
 
- 
+
+    // #bugbug
+    // Em nenhum momento a flag ata_irq_invoked vira TRUE.
+
     while (!ata_irq_invoked)
     {
-        data = ata_status_read ();
-        
-		if ( (data &ATA_SR_ERR) )
-		{
 
-			//ok por status do controlador.
+        data = ata_status_read();
+
+        // #bugbug: Review this code.
+        if ( (data &ATA_SR_ERR) )
+        {
             ata_irq_invoked = 0;
-            
-			return (int) -1;
+            return (int) -1;
         }
-        
+
 		//ns
         if (tmp--)  //??
 		{

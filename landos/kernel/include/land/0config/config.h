@@ -8,21 +8,6 @@
 #define ____CONFIG_H_
 
 
-//#define DEFAULT_HZ 100
-//#define DEFAULT_HZ 600 
-#define DEFAULT_HZ 1000
-
-
-// Where are the types defines?
-// See:
-// core/init.c
-	// 5 	Start the system normally with appropriate 
-	// display manager (with GUI) 	
-	// Same as runlevel 3 + display manager.
-	// Full multi-user graphical mode. 
-#define DEFAULT_RUNLEVEL 5
-
-
 
 
 //
@@ -50,18 +35,35 @@
 // #importante
 // master e slave é coisa do PATA
 // então 3f6 pode ser canal 2 e 376 pode ser canal 3.
-	
-
-#define __CHANNEL0 0  // BAR 0 primary, master and slave
-#define __CHANNEL1 2  // BAR 2 secondary, master and slave
-#define __CHANNEL2 1  // BAR 1 extra (sata emulating ide)
-#define __CHANNEL3 3  // BAR 3 extra (sata emulating ide)
 
 
-// #importante
-// Esses valores são usados pelo driver.
-#define __IDE_PORT __CHANNEL0    //primary
-#define __IDE_SLAVE  0           // 0=master 1=slave
+#define __BAR0  0
+#define __BAR1  1
+#define __BAR2  2
+#define __BAR3  3
+
+#define __CHANNEL0  __BAR0  // BAR 0 primary ide channel. master and slave
+#define __CHANNEL1  __BAR2  // BAR 2 secondary ide channel. master and slave
+#define __CHANNEL2  __BAR1  // BAR 1 extra (sata emulating ide)
+#define __CHANNEL3  __BAR3  // BAR 3 extra (sata emulating ide)
+
+// #bugbug
+// Nesse momento estamos determinando que o driver do
+// controlador ide deve usar o canal 0 e que ele é master.
+// primary/master.
+// Então essas definições aqui são encontradas no driver do controlador.
+// Mas não deve ser assim. Devemos usar uma variável para isso.
+// Talvez algum arquivo de configuração devesse nos dizer 
+// qual canal devemos usar.
+// Ou ainda o número do driver de boot nos de alguma dica.
+// See: ata_initialize in ata.c
+
+
+#define __IDE_PORT    __CHANNEL0    // primary
+//#define __IDE_PORT    __CHANNEL1  // secondary
+
+#define __IDE_SLAVE   0             // 0=master 1=slave
+//#define __IDE_SLAVE   1           // 0=master 1=slave
 
 
 
@@ -120,6 +122,21 @@ fifth..     ide4, usually PCI, probed
 sixth..     ide5, usually PCI, probed
 */
 
+
+
+//#define DEFAULT_HZ 100
+//#define DEFAULT_HZ 600 
+#define DEFAULT_HZ 1000
+
+
+// Where are the types defines?
+// See:
+// core/init.c
+	// 5 	Start the system normally with appropriate 
+	// display manager (with GUI) 	
+	// Same as runlevel 3 + display manager.
+	// Full multi-user graphical mode. 
+#define DEFAULT_RUNLEVEL 5
 
 
 

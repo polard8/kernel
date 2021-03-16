@@ -87,7 +87,67 @@ void disk_show_info (void)
     struct disk_d *disk;
     int i=0;
 
+    // #test
+    int CurrentIDEChannel = -1;
+    int CurrentIDEdevice  = -1;
+    int BootTimeIDEChannel = -1;
+    int BootTimeIDEdevice  = -1;
 
+    printf ("~Disk info:\n");
+
+    CurrentIDEChannel = ata_get_current_ide_channel();
+    CurrentIDEdevice  = ata_get_current_ide_device();
+    BootTimeIDEChannel = ata_get_boottime_ide_channel();
+    BootTimeIDEdevice  = ata_get_boottime_ide_device();
+
+
+    //printf ("CurrentIDEChannel %d\n", CurrentIDEChannel);
+    //printf ("CurrentIDEdevice %d\n", CurrentIDEdevice);
+    //printf ("BootTimeIDEChannel %d\n", BootTimeIDEChannel);
+    //printf ("BootTimeIDEdevice %d\n", BootTimeIDEdevice);
+
+    // ======================================================
+    printf("Current:  ");
+
+    if ( CurrentIDEChannel == ATA_PRIMARY )
+        printf("Primary ");
+    
+    if ( CurrentIDEChannel == ATA_SECONDARY )
+        printf("Secondary ");
+    
+
+    if ( CurrentIDEdevice == ATA_MASTER )
+        printf("Master ");
+    
+    if ( CurrentIDEdevice == ATA_SLAVE )
+        printf("Slave ");
+
+    printf("\n");
+    // ======================================================
+    
+
+    // ======================================================
+    printf("Boottime:  ");
+
+    if ( BootTimeIDEChannel == ATA_PRIMARY )
+        printf("Primary ");
+    
+    if ( BootTimeIDEChannel == ATA_SECONDARY )
+        printf("Secondary ");
+    
+
+    if ( BootTimeIDEdevice == ATA_MASTER )
+        printf("Master ");
+    
+    if ( BootTimeIDEdevice == ATA_SLAVE )
+        printf("Slave ");
+
+    printf("\n");
+    // ======================================================
+
+
+    
+    
     // All disks in the list.
     
     for (i=0; i<DISK_COUNT_MAX; i++)

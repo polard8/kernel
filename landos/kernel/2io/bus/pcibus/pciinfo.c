@@ -1,5 +1,5 @@
 /*
- * File: pciinfo.c 
+ * File: pcibus/pciinfo.c 
  * 
  * Created by Fred Nora.
  */
@@ -43,28 +43,27 @@ static const char* pci_class_strings[] = {
 /*
  * pciShowDeviceInfo:
  *     Mostra informações sobre um dispositivo PCI da lista.
+ *     Apenas um dispositivo.
  */
 
 int pciShowDeviceInfo (int number){
 
-    struct pci_device_d *D;
+    struct pci_device_d  *D;
 
     // Limits
+    // Pega um ponteiro de estrutura na lista.
 
-    if (number < 0 || number > 32){
-        // message?
-        return 0;
-        //return 1; //#todo: Usar ese retorno.
-
+    if (number < 0 || number >= 32){
+        debug_print("pciShowDeviceInfo: number\n");
+        return -1;
     }else{
 
-		// Pega um ponteiro de estrutura na lista.
         D = (void *) pcideviceList[number];
 
         if ( (void *) D != NULL )
         {
-            //if ( D->used == 1 && D->magic == 1234 )
-            if (D->magic == 1234){
+            if ( D->used == TRUE && D->magic == 1234 )
+            {
                 printf ("Vend={%x} Dev={%x} ClassCode={%x} IntLine={%x} \n",
                     D->Vendor, D->Device, D->classCode, D->irq_line );
             }
@@ -104,16 +103,12 @@ int pciInfo (void){
 
     for ( i=0; i<Max; i++ )
     {
-		//Pega um ponteiro de estrutura na lista.
         D = (void *) pcideviceList[i];
 
         if ( (void *) D != NULL )
         {
-			// #todo: 
-			// Mostrar mais informações.
-			// Separar isso em mais de um printf.
-
-            if (D->magic == 1234){
+            if ( D->used == TRUE && D->magic == 1234 )
+            {
                 printf ("\n [%d/%d/%d] Vend=%x Dev=%x Class=%s SubClass=%x iLine=%d iPin=%d \n",
                     D->bus, D->dev , D->func,
                     D->Vendor, D->Device, 
@@ -122,7 +117,6 @@ int pciInfo (void){
             }
         }
     };
-
 
     printf ("Done\n");
 
