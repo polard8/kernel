@@ -16,9 +16,8 @@
 
 void sys_set_file_sync(int fd, int request, int data)
 {
-    struct process_d *p;
+    struct process_d  *p;
     file *object;
-
 
     //#bugbug
     // Pensaremos nessa possibilidade.
@@ -34,23 +33,23 @@ void sys_set_file_sync(int fd, int request, int data)
 
     if ( fd < 0 || fd >= NUMBER_OF_FILES )
     {
-        debug_print("sys_set_file_sync: fd\n");
-        return (int) (-1);
+        debug_print("sys_set_file_sync: [FAIL] fd\n");
+        return;
     }
 
     // == Process ================
 
     if ( current_process < 0 ){
-        debug_print("sys_set_file_sync: current_process\n");
-        return (int) (-1);
+        debug_print("sys_set_file_sync: [FAIL] current_process\n");
+        return;
     }
 
     p = (void *) processList[current_process];
 
     if ( (void *) p == NULL )
     {
-        debug_print("sys_set_file_sync: p\n");
-        return (int) (-1);
+        debug_print("sys_set_file_sync:  [FAIL] p\n");
+        return;
     }
 
     // #todo
@@ -62,15 +61,14 @@ void sys_set_file_sync(int fd, int request, int data)
 
     if ( (void*) object == NULL )
     {
-        debug_print("sys_set_file_sync: object\n");
-        return (int) (-1);
+        debug_print("sys_set_file_sync: [FAIL] object\n");
+        return;
     }
 
-    if ( object->used != TRUE || 
-         object->magic != 1234 )
+    if ( object->used != TRUE || object->magic != 1234 )
     {
         debug_print("sys_set_file_sync: validation\n");
-        return (int) (-1);
+        return;
     }
     
     switch (request){
@@ -80,7 +78,15 @@ void sys_set_file_sync(int fd, int request, int data)
             object->sync.action = data;
             break;
         
+        //case ?:
+            //break;
+        
         // ...
+        
+        default:
+            debug_print("sys_set_file_sync: [FAIL] Default request\n");
+            return;
+            break;
     };
 
     // ...
@@ -93,9 +99,8 @@ void sys_set_file_sync(int fd, int request, int data)
 
 int sys_get_file_sync (int fd, int request)
 {
-    struct process_d *p;
+    struct process_d  *p;
     file *object;
-
 
     //#bugbug
     // Pensaremos nessa possibilidade.
@@ -111,7 +116,7 @@ int sys_get_file_sync (int fd, int request)
 
     if ( fd < 0 || fd >= NUMBER_OF_FILES )
     {
-        debug_print("sys_get_file_sync: fd\n");
+        debug_print("sys_get_file_sync: [FAIL] fd\n");
         return (int) (-1);
     }
 
@@ -137,12 +142,11 @@ int sys_get_file_sync (int fd, int request)
     object = (file *) p->Objects[fd];
 
     if ( (void*) object == NULL ){
-        debug_print("sys_get_file_sync: object\n");
+        debug_print("sys_get_file_sync: [FAIL] object\n");
         return (int) (-1);
     }
 
-    if ( object->used != TRUE || 
-         object->magic != 1234 )
+    if ( object->used != TRUE || object->magic != 1234 )
     {
         debug_print("sys_get_file_sync: validation\n");
         return (int) (-1);
@@ -156,7 +160,16 @@ int sys_get_file_sync (int fd, int request)
             return (int) object->sync.action;
             break;
         
+
+        //case ?:
+            //break;
+        
         // ...
+        
+        default:
+            debug_print("sys_get_file_sync: [FAIL] Default request\n");
+            return (int) (-1);
+            break;
     };
 
     // ...

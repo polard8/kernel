@@ -1587,6 +1587,8 @@ int set_window_with_focus(int id)
 }
 
 
+
+
 // Pegando a z-order de uma janela.
 int get_zorder ( struct gws_window_d *window )
 {

@@ -662,6 +662,16 @@ int is_background_dirty(void)
 }
 
 
+
+void gwssrv_set_keyboard_focus(int window)
+{
+    if(window<0)
+        return;
+
+    set_window_with_focus(window);
+}
+
+
 // Refresh the device screen
 // #todo: move to view/
 void refresh_screen(void)

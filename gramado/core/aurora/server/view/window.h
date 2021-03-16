@@ -887,13 +887,19 @@ struct gws_window_d
 };
 
 
-
-// Window.
+// Windows.
 struct gws_window_d  *__root_window; 
+// If the window server has a taskbar.
+// maybe we don't need that.
 struct gws_window_d  *__taskbar_window; 
 struct gws_window_d  *__taskbar_button; 
-// ...
 
+struct gws_window_d  *keyboard_window;  // keyboard focus.
+struct gws_window_d  *mouse_window;     // ??
+
+struct gws_window_d  *cursor_window;  // Where cursor came from.
+struct gws_window_d  *button_window;  // Where button was pressed.
+// ...
 
 
 // #todo

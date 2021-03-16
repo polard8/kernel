@@ -85,24 +85,21 @@ LIBCOBJ = ../../../../landlib/rtl/obj
 	## Objects
 	##
 	
-	
+
 myObjects = crt0.o main.o rtl.o \
 ctype.o stdio.o stdlib.o string.o conio.o socket.o signal.o unistd.o \
 r_render.o \
-pixel.o line.o rect.o char.o dtext.o createw.o gws.o comp.o window.o \
+pixel.o line.o rect.o xxxinput.o char.o dtext.o createw.o gws.o comp.o window.o \
 grprim.o sprite.o demos.o bmp.o connect.o button.o font.o\
 termios.o ioctl.o fcntl.o    
-
 
 
 .PHONY: all all-c gws-link finalize clean
 
 all: main.o all-c gws-link finalize clean
 	@echo "Ok?"
-
 main.o:
 	$(CC)  -c  main.c $(CFLAGS) -I $(LIBC) -I $(API02)  -I include/ -I . -o main.o
-
 all-c:
 
 	$(CC)  -c  render/r_render.c    $(CFLAGS) -I $(LIBC) -I include/ -I .  -o r_render.o
@@ -113,6 +110,9 @@ all-c:
 	$(CC)  -c  view/dtext.c    $(CFLAGS) -I $(LIBC) -I include/ -I .  -o dtext.o
 	$(CC)  -c  view/line.c     $(CFLAGS) -I $(LIBC) -I include/ -I .  -o line.o
 	$(CC)  -c  view/rect.c     $(CFLAGS) -I $(LIBC) -I include/ -I .  -o rect.o
+
+	$(CC)  -c  view/xxxinput.c  $(CFLAGS) -I $(LIBC) -I include/ -I .  -o xxxinput.o
+
 	$(CC)  -c  view/createw.c  $(CFLAGS) -I $(LIBC) -I include/ -I .  -o createw.o
 	$(CC)  -c  view/window.c   $(CFLAGS) -I $(LIBC) -I include/ -I .  -o window.o
 	$(CC)  -c  view/button.c   $(CFLAGS) -I $(LIBC) -I include/ -I .  -o button.o

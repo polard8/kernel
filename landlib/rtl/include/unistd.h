@@ -393,19 +393,19 @@ StrOcc (
 
 
 //Point to 1st occurrence of marker set in str.
-unsigned char *
-StrFirstOcc (
-	unsigned char *src,
-	unsigned char *marker );
-	
-	
-	
+unsigned char *StrFirstOcc (
+    unsigned char *src,
+    unsigned char *marker );
+
+
 //Point to last occurrence of market set in str.
-unsigned char *
-StrLastOcc (
-	unsigned char *src,
-	unsigned char *marker);
-	
+unsigned char *StrLastOcc (
+    unsigned char *src,
+    unsigned char *marker );
+
+
+
+int getdtablesize(void);
 
 #endif /* _UNISTD_H */
 

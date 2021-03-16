@@ -2411,8 +2411,14 @@ int spawnveg(const char* command, char** argv, char** envv, pid_t pgid)
 }
 
 
-
-
+// #todo
+// get file descriptor table size
+// See: https://www.man7.org/linux/man-pages/man2/getdtablesize.2.html
+int getdtablesize(void)
+{
+    debug_print ("getdtablesize: [TODO] not implemented yet\n"); 
+    return -1;
+}
 
 
  

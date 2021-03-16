@@ -46,6 +46,9 @@ int current_mode;
 #include "view/vk.h"       // # view input events
 #include "view/wt.h"
 #include "view/menu.h"
+
+#include "view/xxxinput.h"   //#test
+
 #include "view/window.h"
 #include "view/bmp.h"
 #include "view/screen.h"   // X-like
@@ -193,11 +196,14 @@ int is_background_dirty(void);
 
 // #test
 // from x window system.
-struct gws_window_d *keyboard_window;
-struct gws_window_d *mouse_window;
-struct gws_window_d *cursor_window;  // Where cursor came from.
-struct gws_window_d *button_window;  // Where button was pressed.
+// #todo: move these to window.h
+//struct gws_window_d *keyboard_window;
+//struct gws_window_d *mouse_window;
+//struct gws_window_d *cursor_window;  // Where cursor came from.
+//struct gws_window_d *button_window;  // Where button was pressed.
 
+
+void gwssrv_set_keyboard_focus(int window);
 
 
 //

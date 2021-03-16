@@ -235,7 +235,7 @@ devmgr_register_device (
         panic ("devmgr_register_device: [FAIL] f \n");
     }
 
-    if ( f->used != TRUE || f->magic != 1234){
+    if ( f->used != TRUE || f->magic != 1234 ){
         panic("devmgr_register_device: f validation \n");
     }
 
@@ -340,7 +340,7 @@ void devmgr_show_device_list(void)
         if ( (void *) d != NULL )
         {
             //dispositivo válido.
-            if ( d->used == 1 && 
+            if ( d->used  == TRUE && 
                  d->magic == 1234 )
             {
                 //#todo: more ...

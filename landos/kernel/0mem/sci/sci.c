@@ -3092,7 +3092,11 @@ void *sci2 (
     }
     
     
+    // Configurando sincronização de leitura e escrita em arquivo.
+    // principalmente socket.
+    // A estrutura de arquivo contém uma estrutura de sincronização de leitura e escrita.
     // #ok: podemos usar ioctl
+    // See: sys.c
     if ( number == 10000 )
     {
         debug_print("sc2: [10000] sys_set_file_sync\n");
@@ -3101,7 +3105,11 @@ void *sci2 (
         return NULL;
     }
 
+    // Pegando informação sobre sincronização de leitura e escrita de arquivos.
+    // principalmente para socket.
+    // A estrutura de arquivo contém uma estrutura de sincronização de leitura e escrita.
     // #ok: podemos usar ioctl
+    // See: sys.c
     if ( number == 10001 )
     {
         debug_print("sc2: [10000] sys_get_file_sync\n");

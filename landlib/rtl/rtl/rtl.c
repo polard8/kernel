@@ -103,13 +103,25 @@ void rtl_set_input_mode(int mode)
     gramado_system_call(912,mode,mode,mode);
 }
 
-// ========================
+
+
+
+//
+// sync
+//
+
+// Configurando sincronização de leitura e escrita em arquivo.
+// principalmente socket.
+// A estrutura de arquivo contém uma estrutura de sincronização de leitura e escrita.
 void rtl_set_file_sync(int fd, int request, int data)
 {
     debug_print ("rtl_set_file_sync:\n");
     sc82 (10000,fd,request,data);
 }
 
+// Pegando informação sobre sincronização de leitura e escrita de arquivos.
+// principalmente para socket.
+// A estrutura de arquivo contém uma estrutura de sincronização de leitura e escrita.
 int rtl_get_file_sync(int fd, int request)
 {
     debug_print ("rtl_get_file_sync:\n");
