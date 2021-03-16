@@ -79,23 +79,29 @@ struct ide_ports_d
     //int id;
     uint8_t id;
 
-	//PATA, SATA, PATAPI, SATAPI
-	int type;
-	
-	char *name;
-	
-    unsigned short base_port;
-	
-	
-	uint8_t channel;
-	uint8_t dev_num;
+    //PATA, SATA, PATAPI, SATAPI
+    int type;
 
-    //...
+    char *name;
+
+    unsigned short base_port;
+
+    //
+    // #todo
+    // Salvar aqui o canal usado pela porta
+    // e se o dispositivo é master ou slave.
+    //
+  
+    uint8_t channel;   // #bugbug: penso que seja para primary ou secondary.
+    uint8_t dev_num;   // #bugbug: penso que seja para master e slave.
+
+
+    // ...
+
 
     // Dá pra colocar aqui mais informações sobre 
     // o dispositivo conectado a porta.
     // podemos usar ponteiros para estruturas.
-	
 };
 struct ide_ports_d ide_ports[4];
 

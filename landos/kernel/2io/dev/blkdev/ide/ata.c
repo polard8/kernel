@@ -591,9 +591,8 @@ void ide_mass_storage_initialize (void)
 int ide_dev_init (char port)
 {
 
-    struct st_dev *tmp_dev;
+    struct st_dev  *tmp_dev;
     int data=0;
-
 
     // #?
     // We have four ports in the ide controller.
@@ -607,7 +606,7 @@ int ide_dev_init (char port)
     // See: hal/dev/blkdev/ata.h
     // st_dev_t *new_dev;
         
-    struct st_dev *new_dev;
+    struct st_dev  *new_dev;
 
     new_dev = ( struct st_dev * ) kmalloc ( sizeof( struct st_dev) );
 
@@ -736,8 +735,20 @@ int ide_dev_init (char port)
 
     new_dev->dev_id = dev_next_pid++;
 
-    new_dev->dev_num     = ata.dev_num;
+
+    //
+    // ??
+    // Salvando na estrutura de dispositivo as
+    // informações sobre a porta ide.
+    // channel and device.
+    // ex: primary/master.
+    // #bugbug
+    // Mas temos um problema. Talvez quando essa função
+    // foi chamada o dev_num ainda não tenha cido inicializado.
+    //
+
     new_dev->dev_channel = ata.channel;
+    new_dev->dev_num     = ata.dev_num;
 
     new_dev->dev_nport = port;
 
@@ -879,7 +890,11 @@ int nport_ajuste ( char nport )
 
     char i = 0;
 
-    while ( nport != getnport_dev () )
+
+    // #todo
+    // Simplify this thing.
+ 
+    while ( nport != getnport_dev() )
     {
         if ( i == 4 )
         { 
@@ -909,11 +924,13 @@ int nport_ajuste ( char nport )
  */
 
 
-// #todo:
-// avoid this for compatibility with another compiler.
 
 void ata_pio_read ( void *buffer, int bytes )
 {
+
+// #todo:
+// avoid this for compatibility with another compiler.
+
     asm volatile  (\
         "cld;\
         rep; insw"::"D"(buffer),\
@@ -921,11 +938,13 @@ void ata_pio_read ( void *buffer, int bytes )
         "c"(bytes/2) );
 }
 
-// #todo:
-// avoid this for compatibility with another compiler.
 
 void ata_pio_write ( void *buffer, int bytes )
 {
+
+// #todo:
+// avoid this for compatibility with another compiler.
+
     asm volatile  (\
         "cld;\
         rep; outsw"::"S"(buffer),\
@@ -1180,8 +1199,13 @@ int ata_initialize ( int ataflag )
 
         current_dev->dev_id      = dev_next_pid++;
         current_dev->dev_type    = -1;
-        current_dev->dev_num     = -1;
+        
+        // Channel and device.
+        // ex: primary/master.
+
         current_dev->dev_channel = -1;
+        current_dev->dev_num     = -1;
+
         current_dev->dev_nport   = -1;
         current_dev->next = NULL;
 

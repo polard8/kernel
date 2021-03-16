@@ -1,3 +1,8 @@
+
+
+// #todo
+// isso é uma camada de alto nível para a interface ata.
+
 /*
  * File: ide/hdd.c 
  * 
@@ -202,10 +207,15 @@ pio_rw_sector (
     tmplba = tmplba >> 24;
 
 
+
+    // #todo
+    // O número da porta já indica se o dispositivo é 
+    // master ou slave.
+    // Nesse caso nem precisamos do parâmetro 'slave'.
+
 	// no bit 4.
 	// 0 = master 
 	// 1 = slave
-
 
 	// master. bit 4 = 0
 	// 1110 0000b;

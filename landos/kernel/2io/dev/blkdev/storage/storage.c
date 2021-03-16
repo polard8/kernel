@@ -35,14 +35,15 @@ void diskShowCurrentDiskInfo (void)
 // Show disk information given its descriptor.
 int diskShowDiskInfo ( int descriptor )
 {
-    struct disk_d *d;
+    struct disk_d  *d;
 
     //#debug
     //printf ("diskShowDiskInfo:\n\n");
 
     printf ("\n\n");
 
-    if ( descriptor < 0 || descriptor > DISK_COUNT_MAX ){
+    if ( descriptor < 0 || descriptor > DISK_COUNT_MAX )
+    {
         printf ("descriptor fail\n");
         goto fail;
     }
@@ -738,6 +739,9 @@ int get_ide_disk_info ( int port, unsigned long buffer, int master )
  *     checamos pela assinatura no fim do MBR e imprimimos o nome do disco,
  *     que est� presente no BPB.
  */
+
+// ??
+// Isso é chamado por quem?
 
 void show_ideports_info (void)
 {

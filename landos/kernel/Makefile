@@ -93,7 +93,7 @@ ifeq ($(ARCH),x86)
 	hal.o 
 
 	KDRIVERS_OBJECTS := ahci.o \
-	ata.o atadma.o atainit.o atairq.o atapci.o hdd.o \
+	ata.o atadma.o atainit.o atairq.o atapci.o atahdd.o \
 	channel.o network.o e1000.o \
 	pci.o pciinfo.o pciscan.o \
 	console.o tty.o tty_io.o pty.o vt.o\
@@ -338,7 +338,7 @@ all-c:
 	$(CC) -c 2io/dev/blkdev/ide/atainit.c  $(KINCLUDE) $(CFLAGS) -o atainit.o
 	$(CC) -c 2io/dev/blkdev/ide/atairq.c   $(KINCLUDE) $(CFLAGS) -o atairq.o
 	$(CC) -c 2io/dev/blkdev/ide/atapci.c   $(KINCLUDE) $(CFLAGS) -o atapci.o
-	$(CC) -c 2io/dev/blkdev/ide/hdd.c      $(KINCLUDE) $(CFLAGS) -o hdd.o
+	$(CC) -c 2io/dev/blkdev/ide/atahdd.c   $(KINCLUDE) $(CFLAGS) -o atahdd.o
 	$(CC) -c 2io/dev/blkdev/storage/storage.c  $(KINCLUDE) $(CFLAGS) -o storage.o
 
     # =======================================
