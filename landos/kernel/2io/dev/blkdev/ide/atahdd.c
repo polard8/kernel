@@ -154,9 +154,30 @@ int hdd_ata_wait_no_drq (int p){
             return 1;
     };
 
-
     return 0;
 }
+
+
+
+/*
+ #todo
+int 
+pio_rw_sector2 ( 
+    unsigned long buffer, 
+    unsigned long lba, 
+    int rw, 
+    int port );
+int 
+pio_rw_sector2 ( 
+    unsigned long buffer, 
+    unsigned long lba, 
+    int rw, 
+    int port )
+{
+	return -1;
+}
+*/
+
 
 
 /*
@@ -212,6 +233,19 @@ pio_rw_sector (
     // O número da porta já indica se o dispositivo é 
     // master ou slave.
     // Nesse caso nem precisamos do parâmetro 'slave'.
+    // #todo
+    // A intenção aqui é não usar mais o parametro 'slave'
+
+    // See:
+    // ide_ports[port].channel
+    // ide_ports[port].dev_num
+    
+    // #debug
+    if ( ide_ports[port].dev_num != slave )
+    {
+        panic("pio_rw_sector: [DEBUG] WRONG PARAMETER\n");
+    }
+    
 
 	// no bit 4.
 	// 0 = master 
@@ -220,6 +254,7 @@ pio_rw_sector (
 	// master. bit 4 = 0
 	// 1110 0000b;
 
+    // not slave
     if (slave == 0)
     { 
         tmplba = tmplba | 0x000000E0;
@@ -229,6 +264,7 @@ pio_rw_sector (
 	// slave. bit 4 = 1
 	//1111 0000b;
 
+    // slave
     if (slave == 1)
     {
         tmplba = tmplba | 0x000000F0;
