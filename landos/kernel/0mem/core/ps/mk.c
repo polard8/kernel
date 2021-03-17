@@ -1,6 +1,8 @@
 /*
- *  mk ?
+ * File: ps/mk.c
  *
+ *     microkernel routines.
+ * 
  * History:
  *     2015 - Created by fred Nora.
  */
@@ -18,7 +20,7 @@
 
 
 
-// Coloca um processo ou thread em um dos planos de execução
+// Coloca um processo ou thread em um dos planos de execuï¿½ï¿½o
 
 int jobcontrol ( int type, int id, int plane ){
 
@@ -102,8 +104,8 @@ done:
 
 
 
-//se o processo ou thread estiver em background o retorno será -1
-//indicando que ele não pode pegar input de teclado.
+//se o processo ou thread estiver em background o retorno serï¿½ -1
+//indicando que ele nï¿½o pode pegar input de teclado.
 int jobcheck ( int type, int id ){
 	
 	struct process_d *p;
@@ -141,7 +143,7 @@ do_process:
 			//Pode pegar input de teclado
 			if( p->plane == FOREGROUND ){
 				goto done;;
-			//Está impedido de pegar input de teclado.
+			//Estï¿½ impedido de pegar input de teclado.
 			}else{
 				goto done;
 			};
@@ -166,7 +168,7 @@ do_thread:
 			//Pode pegar input de teclado
 			if( t->plane == FOREGROUND ){
 				goto done;;
-			//Está impedido de pegar input de teclado.
+			//Estï¿½ impedido de pegar input de teclado.
 			}else{
 				goto done;
 			};
@@ -247,7 +249,7 @@ int init_microkernel (void){
 
 
     // Queue.
-    // Inicializar as filas que alimentarão a lista do dispatcher.
+    // Inicializar as filas que alimentarï¿½o a lista do dispatcher.
 
     queue = kmalloc ( sizeof( struct queue_d ) );
 
@@ -299,8 +301,8 @@ int init_microkernel (void){
 
 #ifdef BREAKPOINT_TARGET_AFTER_MK
     //#debug 
-	//a primeira mensagem só aparece após a inicialização da runtime.
-	//por isso não deu pra limpar a tela antes.
+	//a primeira mensagem sï¿½ aparece apï¿½s a inicializaï¿½ï¿½o da runtime.
+	//por isso nï¿½o deu pra limpar a tela antes.
     printf (">>>debug hang: after init_microkernel");
     die();
 #endif

@@ -4,7 +4,6 @@
  *   cria a thread idle do processo init;
  */
 
- 
 #include <kernel.h>
 
 

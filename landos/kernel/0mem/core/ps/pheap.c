@@ -1,24 +1,19 @@
 /*
- * File: pheap.c
+ * File: ps/pheap.c
  *
- * Descrição:
- *     PHM - Process Heap Manager.
- *     Faz parte do Process Manager, parte fundamental do Kernel Base.
+ * PHM - Process Heap Manager.
+ * 
+ * Each desktop has your own memory heap.
+ * A process uses the memory heap of the
+ * desktop it belongs to.
  *
- *     Cada desktop tem seu próprio heap de memória. 
- *     Um processo usa o heap de memória usado pelo seu desktop.
- *
- * History:
+  * History:
  *     2016 - Created by Fred Nora.
  */
- 
- 
+
 #include <kernel.h>
 
 
-//
-// Variáveis internas.
-//
 
 //int phmStatus;
 //int phmError;
@@ -41,7 +36,7 @@
 
 /*
  * GetProcessHeapStart:
- *     Obtem o início do heap de um processo.
+ *     Obtem o inï¿½cio do heap de um processo.
  *     Return 0 if error.
  */
  

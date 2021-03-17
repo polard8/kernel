@@ -1,9 +1,7 @@
 /*
- * File: pc\theap.c
+ * File: ps/theap.c
  *
- * Descrição:
  *     THM - Thread Heap Manager.
- *     Faz parte do Process Manager, parte fundamental do Kernel Base.
  *
  *    Cada desktop tem seu próprio heap de memória. Uma thread usa o heap de 
  * memória herdado do seu processo. Um processo usa o heap de memória herdado 
@@ -23,7 +21,8 @@
  *     O tanto de heap que os processos podem receber à mais, está limitado 
  * ao tamanho do heap do desktop ao qual ele pertence.
  *
- * Versão 1.0. 2015, 2016.
+ * History:
+ *     2015 - Created by Fred Nora.
  */
 
 

@@ -35,24 +35,8 @@ RUBY	= ruby
 
 
 
-
-#CFLAGS = -m32 \
-#	--std=gnu89 \
-#	-nodefaultlibs \
-#	-nostdinc \
-#	-nostdlib \
-#	-static \
-#	-fgnu89-inline \
-#	-ffreestanding \
-#	-fno-builtin \
-#	-fno-pie \
-#	-no-pie \
-#	-fno-stack-protector \
-#	-s
-
-
-
-CFLAGS = -m32 \
+# usermode cross compiler flags.
+user_ccflags = -m32 \
 	-std=gnu89 \
 	-nodefaultlibs \
 	-nostdinc \
@@ -66,7 +50,12 @@ CFLAGS = -m32 \
 	-fno-stack-protector \
 	-s \
 	-Werror=strict-prototypes    
-	
+
+
+# usermode linker flags.
+user_ldflags = -m elf_i386 -T ../link.ld
+
+
 
 
 #todo
@@ -99,36 +88,36 @@ termios.o ioctl.o fcntl.o
 all: main.o all-c gws-link finalize clean
 	@echo "Ok?"
 main.o:
-	$(CC)  -c  main.c $(CFLAGS) -I $(LIBC) -I $(API02)  -I include/ -I . -o main.o
+	$(CC)  -c  main.c $(user_ccflags) -I $(LIBC) -I $(API02)  -I include/ -I . -o main.o
 all-c:
 
-	$(CC)  -c  render/r_render.c    $(CFLAGS) -I $(LIBC) -I include/ -I .  -o r_render.o
+	$(CC)  -c  render/r_render.c    $(user_ccflags) -I $(LIBC) -I include/ -I .  -o r_render.o
 	
 	# view-like component
-	$(CC)  -c  view/pixel.c    $(CFLAGS) -I $(LIBC) -I include/ -I .  -o pixel.o
-	$(CC)  -c  view/char.c     $(CFLAGS) -I $(LIBC) -I include/ -I .  -o char.o
-	$(CC)  -c  view/dtext.c    $(CFLAGS) -I $(LIBC) -I include/ -I .  -o dtext.o
-	$(CC)  -c  view/line.c     $(CFLAGS) -I $(LIBC) -I include/ -I .  -o line.o
-	$(CC)  -c  view/rect.c     $(CFLAGS) -I $(LIBC) -I include/ -I .  -o rect.o
+	$(CC)  -c  view/pixel.c    $(user_ccflags) -I $(LIBC) -I include/ -I .  -o pixel.o
+	$(CC)  -c  view/char.c     $(user_ccflags) -I $(LIBC) -I include/ -I .  -o char.o
+	$(CC)  -c  view/dtext.c    $(user_ccflags) -I $(LIBC) -I include/ -I .  -o dtext.o
+	$(CC)  -c  view/line.c     $(user_ccflags) -I $(LIBC) -I include/ -I .  -o line.o
+	$(CC)  -c  view/rect.c     $(user_ccflags) -I $(LIBC) -I include/ -I .  -o rect.o
 
-	$(CC)  -c  view/xxxinput.c  $(CFLAGS) -I $(LIBC) -I include/ -I .  -o xxxinput.o
+	$(CC)  -c  view/xxxinput.c  $(user_ccflags) -I $(LIBC) -I include/ -I .  -o xxxinput.o
 
-	$(CC)  -c  view/createw.c  $(CFLAGS) -I $(LIBC) -I include/ -I .  -o createw.o
-	$(CC)  -c  view/window.c   $(CFLAGS) -I $(LIBC) -I include/ -I .  -o window.o
-	$(CC)  -c  view/button.c   $(CFLAGS) -I $(LIBC) -I include/ -I .  -o button.o
-	$(CC)  -c  view/comp.c     $(CFLAGS) -I $(LIBC) -I include/ -I .  -o comp.o
+	$(CC)  -c  view/createw.c  $(user_ccflags) -I $(LIBC) -I include/ -I .  -o createw.o
+	$(CC)  -c  view/window.c   $(user_ccflags) -I $(LIBC) -I include/ -I .  -o window.o
+	$(CC)  -c  view/button.c   $(user_ccflags) -I $(LIBC) -I include/ -I .  -o button.o
+	$(CC)  -c  view/comp.c     $(user_ccflags) -I $(LIBC) -I include/ -I .  -o comp.o
 
-	$(CC)  -c  view/bmp.c      $(CFLAGS) -I $(LIBC) -I include/ -I .  -o bmp.o
+	$(CC)  -c  view/bmp.c      $(user_ccflags) -I $(LIBC) -I include/ -I .  -o bmp.o
 
-	$(CC)  -c  view/grprim.c   $(CFLAGS) -I $(LIBC) -I include/ -I .  -o grprim.o
-	$(CC)  -c  view/sprite.c   $(CFLAGS) -I $(LIBC) -I include/ -I .  -o sprite.o
+	$(CC)  -c  view/grprim.c   $(user_ccflags) -I $(LIBC) -I include/ -I .  -o grprim.o
+	$(CC)  -c  view/sprite.c   $(user_ccflags) -I $(LIBC) -I include/ -I .  -o sprite.o
 
-	$(CC)  -c  view/demos.c      $(CFLAGS) -I $(LIBC) -I include/ -I .  -o demos.o
+	$(CC)  -c  view/demos.c      $(user_ccflags) -I $(LIBC) -I include/ -I .  -o demos.o
 	
 	# model-like component
-	$(CC)  -c  model/font.c     $(CFLAGS) -I $(LIBC) -I include/ -I .  -o font.o
-	$(CC)  -c  model/connect.c  $(CFLAGS) -I $(LIBC) -I include/ -I .  -o connect.o
-	$(CC)  -c  model/gws.c      $(CFLAGS) -I $(LIBC) -I include/ -I .  -o gws.o
+	$(CC)  -c  model/font.c     $(user_ccflags) -I $(LIBC) -I include/ -I .  -o font.o
+	$(CC)  -c  model/connect.c  $(user_ccflags) -I $(LIBC) -I include/ -I .  -o connect.o
+	$(CC)  -c  model/gws.c      $(user_ccflags) -I $(LIBC) -I include/ -I .  -o gws.o
 	# ...
 
 	#
@@ -154,7 +143,8 @@ all-c:
 
 
 gws-link:
-	$(LD) -m elf_i386 -T ../link.ld -o GWSSRV.BIN $(myObjects)  
+	$(LD) $(user_ldflags) -o GWSSRV.BIN $(myObjects)
+#	$(LD) -m elf_i386 -T ../link.ld -o GWSSRV.BIN $(myObjects)  
 
 finalize:
 	cp GWSSRV.BIN ../bin

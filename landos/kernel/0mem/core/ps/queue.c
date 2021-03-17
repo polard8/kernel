@@ -1,26 +1,22 @@
 /*
- * File: queue.c
+ * File: ps/queue.c
  *
- *     Faz parte do Process Manager, parte fundamental do Kernel Base.
- *
- * Descrição:
  *     Rotinas de queue para o kernel.
- *     Obs: As rotinas de queue aqui usam uma abordagem não convencional
+ *     Obs: As rotinas de queue aqui usam uma abordagem nï¿½o convencional
  * e pouco eficiente. 
  *
  * 2015 - Created by Fred Nora.
  */
 
-
 // #todo
 // podemos colocar filas nas estruturas dos objetos.
 // As threads esperam nessas filas.
-
 
 // #bugbug
 // A estrutura de fila usada nessa rotinas esta fora do padrao.
 // Tem um monte de vetores na estrutura de fila.
 // nao eh isso que queremos.
+
 
 #include <kernel.h>
 
@@ -37,8 +33,8 @@ int init_queue (struct queue_d *q)
     unsigned int i=0;
 
 	// #importante
-	// MAX_QUEUES é o número máximo de filas que pode haver na lista.
-	// A lista contém o potneiro head de uma lista encadeada.
+	// MAX_QUEUES ï¿½ o nï¿½mero mï¿½ximo de filas que pode haver na lista.
+	// A lista contï¿½m o potneiro head de uma lista encadeada.
 	
     q->standbyHead = 0; 
     q->standbyTail = 0;
@@ -76,24 +72,24 @@ int init_queue (struct queue_d *q)
     q->initializedMax   = MAX_QUEUES; 
 	
 	
-  //Cooperação, sistema.
+  //Cooperaï¿½ï¿½o, sistema.
     q->syscoopHead = 0; 
     q->syscoopTail = 0;
     q->syscoopMax = MAX_QUEUES;
 
 
-	//Concorrência, sistema.
+	//Concorrï¿½ncia, sistema.
     q->sysconcHead = 0; 
     q->sysconcTail = 0;
     q->sysconcMax = MAX_QUEUES;
 
 
-	//Concorrência, usuário.
+	//Concorrï¿½ncia, usuï¿½rio.
     q->userconcHead = 0; 
     q->userconcTail = 0;
     q->userconcMax = MAX_QUEUES; 
 	
-	//Cooperação, usuário.
+	//Cooperaï¿½ï¿½o, usuï¿½rio.
     q->usercoopHead = 0; 
     q->usercoopTail = 0;
     q->usercoopMax = MAX_QUEUES;
@@ -633,7 +629,7 @@ standbyGetData:
     q->standbyList[q->standbyHead] = 0;
     goto done;
 	
-//#bugbug: Haha ... esse tipo não faz sentido.	
+//#bugbug: Haha ... esse tipo nï¿½o faz sentido.	
 runningGetData:
     Thread = (void *) q->runningList[q->runningHead];
     q->runningList[q->runningHead] = 0;
@@ -711,7 +707,7 @@ done:
 /*
  *********************************************
  * show_queue_information:
- *      Mostra informações sobre a queue.
+ *      Mostra informaï¿½ï¿½es sobre a queue.
  *      #todo: put this in a info file.
  */
 
@@ -738,14 +734,14 @@ void show_queue_information(struct queue_d *q)
         ++i;
     };
 
-	//@todo: Informações de outras filas.
+	//@todo: Informaï¿½ï¿½es de outras filas.
 }
 
 
 /*
  * ScanReadyQueue:
  *     Procura na fila de threads ready por threads com timeout vencido.
- *     e põe na frente da fila.
+ *     e pï¿½e na frente da fila.
  */
 void ScanReadyQueue(struct queue_d *q)
 {

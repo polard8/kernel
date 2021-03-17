@@ -1,8 +1,8 @@
 /*
  * File: ps/process.c 
  *
+ *     PM - Process Manager 
  *     Gerenciamento de processos.
- *     PM - Process Manager (Parte fundamental do Kernel Base).
  *     Interfaces para o kernel chamar as rotinas de gerenciamento de
  * processos. 
  *     As rotinas aqui s�o independentes da arquitetura, quem se preocupa

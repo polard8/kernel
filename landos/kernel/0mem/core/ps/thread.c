@@ -17,7 +17,6 @@
  * 
  * History:
  *     2015 - Create by Fred Nora.
- *     2016 - Revision.
  */
 
 
