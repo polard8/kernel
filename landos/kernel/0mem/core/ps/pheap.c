@@ -36,7 +36,7 @@
 
 /*
  * GetProcessHeapStart:
- *     Obtem o in�cio do heap de um processo.
+ *     Obtem o início do heap de um processo.
  *     Return 0 if error.
  */
  

@@ -3,11 +3,11 @@
  *
  *      Thread internal.    
  *
- *     'Ki_' � para rotinas com threads oferecidas
+ *     'Ki_' é para rotinas com threads oferecidas
  *     pelo modulo interno dentro do kernel base.
  *
  *     O kernel acessa as rotinas envolvendo threads
- *     atrav�z dessas chamadas.
+ *     atravéz dessas chamadas.
  *
  *     Faz parte do Process Manager, 
  *     parte fundamental do Kernel Base. 
@@ -28,12 +28,12 @@
  * kfork: 
  *
  * @todo:
- *     Semelhante ao unix, isso deve criar um processo filho fazendo uma c�pia 
- * dos par�metros presentes no PCB do processo pai. Um tipo de clonagem. 
- * Depois obviamente a imagem do processo filho ser� carregada em um endere�o 
- * f�sico diferente da imagem do processo pai.
- * Essa n�o precisa ser a rotina, pode ser apenas uma interface, que chama a 
- * rotina dofork() e outras se necess�rio.
+ *     Semelhante ao unix, isso deve criar um processo filho fazendo uma cópia 
+ * dos parâmetros presentes no PCB do processo pai. Um tipo de clonagem. 
+ * Depois obviamente a imagem do processo filho será carregada em um endereço 
+ * físico diferente da imagem do processo pai.
+ * Essa não precisa ser a rotina, pode ser apenas uma interface, que chama a 
+ * rotina dofork() e outras se necessário.
  */
 
 
@@ -51,7 +51,7 @@ int kfork (void){
 
 	//return (int) p->pid;
 	
-	//Ainda n�o implementada.
+	//Ainda não implementada.
 	
     return -1;
 }
@@ -60,11 +60,11 @@ int kfork (void){
 /*
  **************************************
  * KiFork:
- *    Inicio do m�dulo interno que chama a fun��o fork.
- *    Isso � uma interface para a chamada � rotina fork.
+ *    Inicio do módulo interno que chama a função fork.
+ *    Isso é uma interface para a chamada à rotina fork.
  *    #todo: 
- *    As fun��es relativas �s rotinas de fork
- *    podem ir para um arquivo que ser� compilado junto com o kernel.
+ *    As funções relativas às rotinas de fork
+ *    podem ir para um arquivo que será compilado junto com o kernel.
  *    ex: fork.c
  */
 
@@ -106,7 +106,7 @@ void KiSetTaskStatus (unsigned long status)
 /*
  * KiGetTaskStatus #deletar
  * @todo: Substituir a palavra task por thread. KiGetThreadStatus
- * #bugbgu task n�o � um termo usado.
+ * #bugbgu task não é um termo usado.
  */
 
 unsigned long KiGetTaskStatus (void)
@@ -120,7 +120,7 @@ unsigned long KiGetTaskStatus (void)
  * KiSaveContextOfNewTask
  * @todo: Substituir a palavra task por thread. KiSaveContextOfNewThread
  *
- * ?? isso est� muito estranho !!
+ * ?? isso está muito estranho !!
  */
  
 void KiSaveContextOfNewTask ( 
@@ -198,7 +198,7 @@ int KiGetFocus (void)
 
 /* 
  #todo: 
- chamar fun��o em debug.c 
+ chamar função em debug.c 
  */
 void KiDebugBreakpoint (void)
 {
@@ -232,7 +232,7 @@ void show_slots(){
 
 
     // Loop.
-    // Mostra as tarefas v�lidas, mesmo que estejam com problemas.
+    // Mostra as tarefas válidas, mesmo que estejam com problemas.
 
     for ( i=0; i<THREAD_COUNT_MAX; i++ )
     {
@@ -436,8 +436,8 @@ void threadi_power(
 /*
  ************************************************************
  * SetThreadDirectory:
- *     Altera o endere�o do diret�rio de p�ginas de uma thread.
- *     Apenas a vari�vel. N�o altera o CR3.
+ *     Altera o endereço do diretório de páginas de uma thread.
+ *     Apenas a variável. Não altera o CR3.
  */
  
 void 
@@ -464,7 +464,7 @@ SetThreadDirectory (
 /*
  ***********************************************************
  * GetThreadDirectory:
- *     Pega o endere�o do diret�rio de p�ginas de uma thread.
+ *     Pega o endereço do diretório de páginas de uma thread.
  */
  
 unsigned long GetThreadDirectory ( struct thread_d *thread ){
@@ -490,7 +490,7 @@ unsigned long GetThreadDirectory ( struct thread_d *thread ){
 /*
  * show_preempted_task: #deletar
  *
- *    Mostrar informa��es sobre a tarefa de baixa prioridade
+ *    Mostrar informações sobre a tarefa de baixa prioridade
  *    que teve seu contexto salvo e deu a vez pra outra de
  *    maior prioridade.
  *
@@ -517,7 +517,7 @@ void show_tasks_parameters (void)
  * #importante
  * Isso deve liberar uma thread que estava esperando 
  * ou bloqueada por algum motivo.
- * Obs: Aqui n�o devemos julgar se ela pode ou n�o ser 
+ * Obs: Aqui não devemos julgar se ela pode ou não ser
  * liberada, apenas alteramos se estado.
  *
  */
@@ -547,8 +547,8 @@ void release ( int tid ){
 		}
 		
 		//#importante:
-		//N�o estamos selecionando ela para execu��o
-		//Apenas estamos dizendo que ela est� pronta para 
+		//Não estamos selecionando ela para execução
+		//Apenas estamos dizendo que ela está pronta para
 		//executar.
 		
 		Thread->state = READY; 
@@ -561,8 +561,8 @@ void release ( int tid ){
 /*
  *****************************************************
  * kill_thread:
- *     Destr�i uma thread.
- *     Destroi a estrutura e libera o espa�o na lista. 
+ *     Destrói uma thread.
+ *     Destroi a estrutura e libera o espaço na lista.
  */
 
 void kill_thread (int tid){
@@ -600,9 +600,9 @@ void kill_thread (int tid){
 	
 	//
 	// @todo: 
-	//    Deve acordar o pai que est� esperando o filho fechar.
+	//    Deve acordar o pai que está esperando o filho fechar.
 	//    Mas no caso estamos apenas fechando uma thread.
-    //    Caso essa n�o seja a thread prim�ria, isso n�o deve 
+    //    Caso essa não seja a thread primária, isso não deve 
     // causar o fechamento do processo.	
     //
 
@@ -733,12 +733,12 @@ void dead_thread_collector (void){
 				// Nessa hora precisamos notificar o 
 				// a thread que estava esperando essa thread  
 				// terminar.
-				// Se essa for a thread prim�ria ent�o o processo 
-				// ir� terminar tamb�m, ent�o o processo que esperava 
-				// tamb�m dever� ser notificado.
+				// Se essa for a thread primária então o processo 
+				// irá terminar também, então o processo que esperava 
+				// também deverá ser notificado.
 				
                 //Thread = NULL;
-	            //threadList[i] = NULL;   //@todo: Liberar o espa�o na lista.
+	            //threadList[i] = NULL;   //@todo: Liberar o espaço na lista.
 
 
 				//ProcessorBlock.threads_counter--;
@@ -770,12 +770,12 @@ void kill_all_threads (void)
 }
 
 
-// se a flag estiver habilitada, ent�o devemos acorar a
+// se a flag estiver habilitada, então devemos acorar a
 // thread do dead thread collector.
 void check_for_dead_thread_collector (void){
 	
 	// #importante
-	// Essa flag � acionada quando uma thread entra em estado zombie.
+	// Essa flag é acionada quando uma thread entra em estado zombie.
 	
 	switch (dead_thread_collector_flag)
 	{
@@ -783,7 +783,7 @@ void check_for_dead_thread_collector (void){
 		case 1:
 			
 			// Liberamos a thread.
-			// O pr�prio dead thread collector vai sinalizar que 
+			// O próprio dead thread collector vai sinalizar que 
 			// quer dormir, dai o case default faz isso.
 			
             release ( RING0IDLEThread->tid );

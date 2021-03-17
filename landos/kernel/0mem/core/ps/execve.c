@@ -21,7 +21,7 @@
 // service 248
 // execve support.
 // executa um programa usando o processo atual.
-// #bugbug: A inten��o � carregar a imagem num novo endere�o f�sico
+// #bugbug: A intenção é carregar a imagem num novo endereço físico
 // e continuar usando o processo clone criado pode fork.
 
 
