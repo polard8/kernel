@@ -318,7 +318,9 @@ e1000_init_nic (
     struct pci_device_d *pci_device );
 
 
-void e1000_setup_irq (void);
+
+void e1000_setup_irq (int irq_line);
+
 
 int e1000_reset_controller (void); 
 

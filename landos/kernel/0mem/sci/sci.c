@@ -733,7 +733,7 @@ void *gde_extra_services (
     // 890 ~ 899 network stuff 
     
     // 890 - Receive.
-    // O usuário recebe um buffer com um pacote.
+    // Colocaremos um pacode em um endereço indicado pelo usuário.
     // See: sci/net/network/network.c
     // IN: ubuf, len.
     if ( number == 890 ){
@@ -818,7 +818,16 @@ void *gde_extra_services (
     
 
     // 968 - Testing network.
-    if (number == 968){  network_test();  return NULL;  }
+    // Initialize the network infrastructure
+    // this way a ring3 process will be able to 
+    // use some buffer ro send/receive packets.
+    // See: network.c
+
+    if (number == 968)
+    {  
+        network_test();  
+        return NULL;  
+    }
 
 
     // 970 - Create request.

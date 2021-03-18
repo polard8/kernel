@@ -127,7 +127,12 @@ int network_buffer_in( void *buffer, int len )
     }
 
     if(len>1500){
+        debug_print("network_buffer_in: [FIXME] len\n");
         return -1;
+    }
+
+    if (NETWORK_BUFFER.initialized != TRUE){
+        panic ("network_buffer_in: Shared buffers not initialized\n");
     }
 
     tail = (int) NETWORK_BUFFER.receive_tail;
@@ -174,6 +179,15 @@ int network_buffer_in( void *buffer, int len )
  *     The app receives a packet from the system.
  */
 
+// IN:
+// usermode buffer, max size.
+
+// #bugbug
+// Na verdade o tamanho total é no mínimo 
+// 14 + 20 + 20 + 1460.
+// #todo:
+// Devemos respeitar o tamanho indicado pelo usuário.
+
 int 
 sys_network_receive (
     void *ubuf, 
@@ -186,12 +200,19 @@ sys_network_receive (
     debug_print("sys_network_receive:\n");
 
 
-    if ( (void*) ubuf == NULL )
-    {
+    if ( (void*) ubuf == NULL ){
         debug_print("sys_network_receive: [ERROR] ubuf\n");
         return -1;
     }
 
+    if (size<=0){
+        debug_print("sys_network_receive: [ERROR] size\n");
+        return -1;
+    }
+
+    // #todo
+    // Onde está essa estrutura?
+    // See: include/rtl/net/network.h
 
     // Pega do head. 
     // Primeiro da fila.
@@ -254,13 +275,20 @@ int network_buffer_out ( void *buffer, int len )
     // check args
 
     if ( (void*) buffer == NULL ){
-        panic ("network_buffer_out: buffer");
+        panic ("network_buffer_out: [FAIL] buffer\n");
     }
 
+    // #bugbug:
+    // Isso pode ser maior se considerarmos todos os headers.
     if (len>1500){
+        debug_print("network_buffer_out: [FIXME] len\n");
         return -1;
     }
 
+    if (NETWORK_BUFFER.initialized != TRUE){
+        panic ("network_buffer_out: Shared buffers not initialized\n");
+    }
+    
     // Vamos pegar um numero de buffer para enviarmos o pacote.
     // o kernel vai retirar do head ... 
     // o que foi colocado pelo aplicativo em tail.
@@ -585,6 +613,12 @@ int networkGetStatus (void)
  * 
  * It only initializes some network structures. 
  * Not the adapters.
+ * 
+ *     Initialize the buffers used by the NIC adapter.
+ *     Initialize HostInfo structure.
+ *     Create a default socket structure for localhost. 
+ *     CurrentSocket = LocalHostHTTPSocket
+ * 
  */ 
 
 int networkInit (void)
@@ -606,40 +640,48 @@ int networkInit (void)
     // We will create 32 buffers to receive data and
     // 8 buffers to send data.
     //
+    
+    // 
 
     void *nbuffer;
     int i=0;
 
+    debug_print ("networkInit: Initializing buffers for the NIC controller.\n");
+
+    NETWORK_BUFFER.initialized = FALSE;
+
     // =====================================
     // receive buffers
 
-    for (i=0;i<32;i++)
+    for (i=0; i<32; i++)
     {
         nbuffer = (void*) newPage();
         
-        if ((void *)nbuffer == NULL)
-            panic("networkInit: receive nbuffer");
-    
+        if ((void *)nbuffer == NULL){
+            panic("networkInit: [FAIL] receive nbuffer\n");
+        }
         NETWORK_BUFFER.receive_buffer[i] = (unsigned long) nbuffer;
-    }
+    };
     NETWORK_BUFFER.receive_tail =0;
     NETWORK_BUFFER.receive_head =0;
 
     // ========================================
     // send buffers
 
-    for (i=0;i<8;i++)
+    for (i=0; i<8; i++)
     {
         nbuffer = (void*) newPage();
         
-        if((void *)nbuffer == NULL)
-            panic("networkInit: send nbuffer");
-    
+        if((void *)nbuffer == NULL){
+            panic("networkInit: [FAIL] send nbuffer\n");
+        }
         NETWORK_BUFFER.send_buffer[i] = (unsigned long) nbuffer;
-    }
+    };
     NETWORK_BUFFER.send_tail =0;
     NETWORK_BUFFER.send_head =0;
 
+    // flag.
+    NETWORK_BUFFER.initialized = TRUE;
 
     // =====================================
 
@@ -656,20 +698,25 @@ int networkInit (void)
     if ( (void *) HostInfo == NULL ){
         panic("networkInit: HostInfo\n");
     }else{
-        HostInfo->used = 1;
+        HostInfo->used  = TRUE;
         HostInfo->magic = 1234;
         // #todo object header
 
         // #todo
+        // We need a name.
+        
         HostInfo->__hostname[0] = 'h';
         HostInfo->hostName_len = (size_t) HOST_NAME_MAX;
 
         HostInfo->hostVersion = NULL;
 
-        HostInfo->hostVersionMajor = 0;
-        HostInfo->hostVersionMinor = 0; 
+        // #todo
+        // Call some helpers to get these values.
+
+        HostInfo->hostVersionMajor    = 0;
+        HostInfo->hostVersionMinor    = 0; 
         HostInfo->hostVersionRevision = 0;
-        HostInfo->hostArchitecture = 0; 
+        HostInfo->hostArchitecture    = 0; 
 
         // ...
     };
@@ -697,6 +744,9 @@ int networkInit (void)
 
 	// ...
 
+    // ??
+    // What is this?
+    
     socket_init();
 
 	// Status
@@ -877,6 +927,12 @@ int handle_ipv6 ( struct ipv6_header_d *header )
  *     Called by a ring3 process.
  */
 
+// This is the service 968
+    // 968 - Testing network.
+    // Initialize the network infrastructure
+    // this way a ring3 process will be able to 
+    // use some buffer ro send/receive packets.
+
 void network_test(void)
 {
     debug_print("network_test:\n");
@@ -911,6 +967,9 @@ void network_test(void)
 // Subrotina chamada por rotinas de teste.
 // Essa rotina aciona uma flag que (DESTRAVA) o handler da interrupção.
 
+// Called by network_test().
+// 
+
 void testNIC (void){
 
     debug_print ("testNIC:\n");
@@ -938,7 +997,7 @@ void testNIC (void){
     target_ip_address[0] = 192;
     target_ip_address[1] = 168;
     target_ip_address[2] = 1; 
-    target_ip_address[3] = 105;//111; 
+    target_ip_address[3] = 88; //105;//111; 
 
     // MAC for broadcast.
     // 0xFF 0xFF 0xFF 0xFF 0xFF 0xFF.

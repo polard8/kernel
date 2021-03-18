@@ -75,7 +75,7 @@ int pci_setup_devices (void)
         for ( j=0; j < PCI_MAX_DEVICES; j++ )
         {
              // Valid device ?
-             Vendor = (unsigned short) pciCheckVendor (i,j);
+            Vendor = (unsigned short) pciCheckVendor (i,j);
 
             if ( Vendor != 0 && Vendor != PCI_INVALID_VENDORID )
             {
@@ -91,6 +91,8 @@ int pci_setup_devices (void)
 
                 // Function.
                 // Handle device info.
+                // See: pci.c
+                
                 for ( k=0; k<funcCount; k++ )
                 { 
                     pciHandleDevice(i,j,k); 

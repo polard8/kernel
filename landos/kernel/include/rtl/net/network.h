@@ -61,6 +61,9 @@ struct network_device_d
 };
 */
 
+
+
+
 struct network_buffer_d
 {
     int receive_tail;
@@ -69,9 +72,13 @@ struct network_buffer_d
 
     int send_tail;
     int send_head;
-    unsigned long send_buffer[8];    
+    unsigned long send_buffer[8];
+    
+    int initialized;
 };
 struct network_buffer_d NETWORK_BUFFER;
+
+
 
 
 

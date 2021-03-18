@@ -572,7 +572,11 @@ irq_E1000 (void)
         //#todo
         if(____network_late_flag == TRUE)
         {
+            // #importante
+            // Coloca o pacote em um dos buffers de entrada.
+            // Esses buffers são compartilhados e os aplicativos poderão ler.
             // Enfileirar o buffer
+
             network_buffer_in ( (void *) buffer, (int) len );
             
             // Decodificar o buffer.
@@ -602,18 +606,25 @@ irq_E1000 (void)
 // Essa função é chamada pelo driver de PCI quando encontrar
 // o dispositivo Intel apropriado.
 
+// #bugbug
+// Called by pciHandleDevice.
+
 //o assembly tem que pegar aqui.
 uint8_t nic_idt_entry_new_number;
 uint32_t nic_idt_entry_new_address;
 
-void e1000_setup_irq (void){
+
+void e1000_setup_irq (int irq_line){
 
     debug_print ("e1000_setup_irq: [FIXME]\n");
 
+    // #test
+
 
 	// pegando o número da irq.
-	
-    uint8_t irq = (uint8_t) currentNIC->pci->irq_line;
+
+    //uint8_t irq = (uint8_t) currentNIC->pci->irq_line;
+    uint8_t irq = (uint8_t) irq_line;
 	
 	// handler address
 	
@@ -704,9 +715,7 @@ int e1000_reset_controller (void){
 
     if ( currentNIC->mem_base == 0 )
     {
-        panic ("e1000_reset_controller: currentNIC->mem_base fail\n");
-        // refresh_screen ();
-        // while (1){}
+        panic ("e1000_reset_controller: [FAIL] currentNIC->mem_base\n");
     }
 
 
@@ -724,8 +733,7 @@ int e1000_reset_controller (void){
 	//
 	//    ## TX ##
 	//
-	
-	
+
     // And alloc the phys/virt address of the transmit buffer
     // tx_descs_phys conterá o endereço físico e
     // legacy_tx_descs conterá o endereço virtual.
@@ -736,9 +744,7 @@ int e1000_reset_controller (void){
 
     if ( currentNIC->tx_descs_phys == 0 )
     {
-        panic ("e1000_reset_controller: currentNIC->tx_descs_phys fail\n");
-        //refresh_screen ();
-        //while (1){};
+        panic ("e1000_reset_controller: [FAIL] currentNIC->tx_descs_phys\n");
     }
 
 
@@ -757,9 +763,7 @@ int e1000_reset_controller (void){
 
         if (currentNIC->legacy_tx_descs[i].addr == 0)
         {
-            panic ("e1000_reset_controller: dev->rx_descs[i].addr fail\n");
-            //refresh_screen ();
-            //while (1){};
+            panic ("e1000_reset_controller: [FAIL] dev->rx_descs[i].addr\n");
         }
 
         //cmd: bits
@@ -799,10 +803,9 @@ int e1000_reset_controller (void){
     // We failed, unmap everything
     if (currentNIC->rx_descs_phys == 0)
     {
-        panic ("e1000_reset_controller: currentNIC->rx_descs_phys fail\n");
-        //refresh_screen ();
-        //while (1){};
+        panic ("e1000_reset_controller: [FAIL] currentNIC->rx_descs_phys\n");
     }
+
 
 	//rx
 	//i já foi declarado
@@ -817,9 +820,7 @@ int e1000_reset_controller (void){
         // We failed, unmap everything
         if (currentNIC->legacy_rx_descs[i].addr == 0)
         {
-            panic ("e1000_reset_controller: dev->rx_descs[i].addr fail\n");
-            //refresh_screen ();
-            //while (1){};
+            panic ("e1000_reset_controller: [FAIL] dev->rx_descs[i].addr\n");
         }
 
         currentNIC->legacy_rx_descs[i].status = 0;
@@ -988,7 +989,7 @@ int e1000_reset_controller (void){
 	//printf("tx_ring_pa=%x rx_ring_pa=%x \n", 
 	//    currentNIC->rx_descs_phys, 
 	//	currentNIC->tx_descs_phys );
-	
+
 
 	// Linkup
 
@@ -1207,7 +1208,7 @@ void E1000Send ( void *ndev, uint32_t len, uint8_t *data )
 
     dev->legacy_tx_descs[old].length = len;
 
-    dev->legacy_tx_descs[old].cmd = 0x1B;
+    dev->legacy_tx_descs[old].cmd    = 0x1B;
     dev->legacy_tx_descs[old].status = 0;
 
     //SEND_BUFFER_MAX = 8
@@ -1303,16 +1304,14 @@ E1000ReadEEPROM (
 		//#obs: loop		
         while (( (data = E1000ReadCommand ( d, 0x14)) & 0x10 ) != 0x10 );
 
-	// Nope...	
+	// Nope ...
     } else {
-
         E1000WriteCommand ( d, 0x14, 1 | (addr << 2) );
 
 		//#bugbug
 		//#obs: loop
         while (( (data = E1000ReadCommand(d, 0x14)) & 0x01 ) != 0x01 );
     };
-
 
     return (data >> 16) & 0xFFFF; 
 }
@@ -1332,7 +1331,8 @@ e1000_ioctl (
 {
 }
 */
-    
+
+
 //
 // End.
 //

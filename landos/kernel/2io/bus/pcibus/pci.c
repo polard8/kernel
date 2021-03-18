@@ -1231,6 +1231,11 @@ pciHandleDevice (
         // == NIC Intel. ===================
         //
 
+        // #bugbug
+        // Ver em que hora que os buffers são configurados.
+        // precisam ser os mesmos encontrados na 
+        // infraestrutura de network e usados pelos aplicativos.
+
         // e1000 = 0x8086 0x100E
         // 82540EM Gigabit Ethernet Controller
         if ( (D->Vendor == 0x8086)  && 
@@ -1238,11 +1243,12 @@ pciHandleDevice (
              (D->classCode == PCI_CLASSCODE_NETWORK) )
         {
             //serial debug
-            debug_print ("0x8086:0x100E found \n"); 
+            debug_print ("pciHandleDevice: [0x8086:0x100E] e1000 found \n"); 
             //printf("b=%d d=%d f=%d \n", D->bus, D->dev, D->func );
             //printf("82540EM Gigabit Ethernet Controller found\n");
 
-            //See: network/nicintel.c
+            // See: 
+            // 2io/dev/tty/netdev/e1000/e1000.c
 
             Status = (int) e1000_init_nic ( 
                                (unsigned char) D->bus, 
@@ -1254,7 +1260,17 @@ pciHandleDevice (
             if (Status == 0)
             {
                 //irq and reset.
-                e1000_setup_irq();
+                // See: 
+                // 2io/dev/tty/netdev/e1000/e1000.c
+                
+                // #debug
+                // currentNIC foi configurado pela rotina acima.
+                if ( D->irq_line != currentNIC->pci->irq_line )
+                {
+                     panic("pciHandleDevice: D->irq_line fail\n");
+                }
+                
+                e1000_setup_irq( D->irq_line );  //currentNIC->pci->irq_line
                 e1000_reset_controller();
                 printf ("pciHandleDevice: Unlocking interrupt handler \n");
                 e1000_interrupt_flag = TRUE;
@@ -1408,9 +1424,10 @@ pciHandleDevice (
 /*
  ***************************************
  * init_pci:
+ * 
  *     Inicializa o módulo PCI em Kernel Mode, dentro do Kernel Base. 
  * 
- * @todo: 
+ * todo: 
  *     +Pega informações sobre PCI.
  *     +Pegar as informações e por em estrutura e registro.
  *
@@ -1479,6 +1496,7 @@ int init_pci (void){
 
 	// Encontrar os dispositivos PCI e salvar as informações sobre eles
 	// em suas respectivas estruturas.
+	// See: pciscan.c
 
     Status = (int) pci_setup_devices();
     

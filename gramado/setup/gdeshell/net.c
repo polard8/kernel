@@ -257,9 +257,9 @@ void __shellTestARP (void)
     target_ip_address[0] = 192;
     target_ip_address[1] = 168;
     target_ip_address[2] = 1; 
-    target_ip_address[3] = 100;
+    target_ip_address[3] = 88; //100;
 
-    // sorce mac #bugbug
+    // source mac #bugbug
     uint8_t source_mac_address[6];
     source_mac_address[0] = 0x00;
     source_mac_address[1] = 0x00;
@@ -292,13 +292,22 @@ void __shellTestARP (void)
 
 void network_initialize (void)
 {
+
+    //
+    // Initialize network support.
+    //
+
+
     debug_print("network_initialize:\n");
     printf     ("network_initialize: Initializing the ring0 network manager...\n");
     gramado_system_call (968,0,0,0);
 
+    //
+    // Send ARP packet.
+    //
+
     debug_print("network_initialize: Sending arp\n");
     printf     ("network_initialize: Sending arp\n");
-
     __shellTestARP();
 }
 
@@ -448,6 +457,16 @@ void print_ipv4_header ( char *Buffer )
 
 int network_decode_buffer ( unsigned long buffer_address )
 {
+
+    int ShowEthernetHeader = FALSE;
+
+    int IgnoreARP = TRUE;
+    int IgnoreIPV4 = FALSE;
+    int IgnoreSNMP = TRUE;
+    int IgnoreIPV6 = TRUE;
+    int IgnorePPP = TRUE;
+
+
     // The ethernet header.
     struct gdeshell_ether_header *eh;
     uint16_t Type=0;
@@ -485,8 +504,11 @@ int network_decode_buffer ( unsigned long buffer_address )
     }else{
 
         // Print ethernet header.
-        print_ethernet_header ( 
-            (const unsigned char*) buffer_address, 1500 );
+        if(ShowEthernetHeader == TRUE){
+            print_ethernet_header ( 
+                (const unsigned char*) buffer_address, 
+                1500 );
+        }
     };
 
 
@@ -506,7 +528,11 @@ int network_decode_buffer ( unsigned long buffer_address )
     // 0x0806 	Address Resolution Protocol (ARP) 
     // ... 
 
-    
+    int i=0;
+    int c;
+    char *buf     = (char *) buffer_address;
+    char *payload = (char *) buffer_address + 54;
+
     Type = gdeshell_FromNetByteOrder16(eh->type);
     
     switch ( (uint16_t) Type ){
@@ -517,12 +543,26 @@ int network_decode_buffer ( unsigned long buffer_address )
         // de que recebemos um pacote ipv4
         
         case 0x0800:
-            printf ("[0x0800]: IPV4 received.\n");
-            print_ipv4_header ((char *)buffer_address);
+            if ( IgnoreIPV4 == TRUE ){ return 0; }
+ 
+            // printf ("[0x0800]: IPV4 received\n");
+
+
+            //print_ipv4_header ((char *)buffer_address);
+            
 
            //#test
            //notificando ...(ok funcionou.)
            //network_procedure ( NULL, 3000, 0,0 ); 
+
+           printf("[PAYLOAD]: %s\n", &buf[54] );
+                       
+           //printf("[PAYLOAD]:\n");
+           //for(i=54; i< 200; i++)
+           //{
+           //    c = buf[i];
+           //    printf("%c",c);
+           //}
            
            // #debug
            //printf("todo: Internet Protocol version 4 (IPv4)\n");
@@ -537,9 +577,11 @@ int network_decode_buffer ( unsigned long buffer_address )
         //#todo: devemos chamar uma rotina para tratamento de ARP e n�o
         //fazermos tudo aqui. kkk.
         case 0x0806:
+            if ( IgnoreARP == TRUE ){ return 0; }
+
             printf ("[0x0806]: ARP received\n");
+
             print_arp_header ((char *)buffer_address);
-            //refresh_screen ();
                    
             //printf("\nARP ");
             //do_arp ((unsigned long) buffer_address );
@@ -550,6 +592,7 @@ int network_decode_buffer ( unsigned long buffer_address )
         //::: SNMP
         // Simple Network Management Protocol.
         case 0x814C:
+            if ( IgnoreSNMP == TRUE ){ return 0; }
             printf ("[0x814C]: SNMP received\n");
             return 0;
             break;
@@ -559,7 +602,9 @@ int network_decode_buffer ( unsigned long buffer_address )
         //::: IPV6
         //0x86DD	Internet Protocol Version 6 (IPv6)
         case 0x86DD:
+            if ( IgnoreIPV6 == TRUE ){ return 0; }
             printf ("[0x86DD]: IPV6 received\n");
+
             //refresh_screen ();
         
             //printf ("IPv6 ");
@@ -571,7 +616,8 @@ int network_decode_buffer ( unsigned long buffer_address )
         //:::PPP
         //Point-to-Point Protocol.
         case 0x880B:
-            printf ("[0x880B]: SNMP received\n");
+            if ( IgnorePPP == TRUE ){ return 0; }
+            printf ("[0x880B]: PPP received\n");
             return 0;
             break;
 
@@ -626,13 +672,16 @@ void network_loop(void)
 
     // + Get the packet.
     // + Decode the buffer.
-    // + 
-    
+    // + ...
+
     while (TRUE){
 
         // IN: Service, buffer, lenght, nothing.
-        gramado_system_call ( 890, 
-            (unsigned long) &buf[0], (unsigned long) 1500, 0);
+        gramado_system_call ( 
+            890, 
+            (unsigned long) &buf[0], 
+            (unsigned long) 1500, 
+            0 );
 
         network_decode_buffer ((unsigned long) &buf[0]);
         
