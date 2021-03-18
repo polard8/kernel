@@ -17,7 +17,7 @@ PHONY := _all
 _all: all
 	@echo "That's all!"
 
-# ==========================================
+# =========================================
 # Variables.
 
 export KBUILD_IMAGE ?= KERNEL.BIN 
