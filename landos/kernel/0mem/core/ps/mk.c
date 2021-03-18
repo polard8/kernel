@@ -20,7 +20,7 @@
 
 
 
-// Coloca um processo ou thread em um dos planos de execu��o
+// Coloca um processo ou thread em um dos planos de execução
 
 int jobcontrol ( int type, int id, int plane ){
 
@@ -104,8 +104,8 @@ done:
 
 
 
-//se o processo ou thread estiver em background o retorno ser� -1
-//indicando que ele n�o pode pegar input de teclado.
+//se o processo ou thread estiver em background o retorno será -1
+//indicando que ele não pode pegar input de teclado.
 int jobcheck ( int type, int id ){
 	
 	struct process_d *p;
@@ -143,7 +143,7 @@ do_process:
 			//Pode pegar input de teclado
 			if( p->plane == FOREGROUND ){
 				goto done;;
-			//Est� impedido de pegar input de teclado.
+			//Está impedido de pegar input de teclado.
 			}else{
 				goto done;
 			};
@@ -168,7 +168,7 @@ do_thread:
 			//Pode pegar input de teclado
 			if( t->plane == FOREGROUND ){
 				goto done;;
-			//Est� impedido de pegar input de teclado.
+			//Está impedido de pegar input de teclado.
 			}else{
 				goto done;
 			};
@@ -301,8 +301,8 @@ int init_microkernel (void){
 
 #ifdef BREAKPOINT_TARGET_AFTER_MK
     //#debug 
-	//a primeira mensagem s� aparece ap�s a inicializa��o da runtime.
-	//por isso n�o deu pra limpar a tela antes.
+	//a primeira mensagem só aparece após a inicialização da runtime.
+	//por isso não deu pra limpar a tela antes.
     printf (">>>debug hang: after init_microkernel");
     die();
 #endif

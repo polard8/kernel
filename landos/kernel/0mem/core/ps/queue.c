@@ -2,7 +2,7 @@
  * File: ps/queue.c
  *
  *     Rotinas de queue para o kernel.
- *     Obs: As rotinas de queue aqui usam uma abordagem n�o convencional
+ *     Obs: As rotinas de queue aqui usam uma abordagem não convencional
  * e pouco eficiente. 
  *
  * 2015 - Created by Fred Nora.
@@ -33,8 +33,8 @@ int init_queue (struct queue_d *q)
     unsigned int i=0;
 
 	// #importante
-	// MAX_QUEUES � o n�mero m�ximo de filas que pode haver na lista.
-	// A lista cont�m o potneiro head de uma lista encadeada.
+	// MAX_QUEUES é o número máximo de filas que pode haver na lista.
+	// A lista contém o potneiro head de uma lista encadeada.
 	
     q->standbyHead = 0; 
     q->standbyTail = 0;
@@ -72,24 +72,24 @@ int init_queue (struct queue_d *q)
     q->initializedMax   = MAX_QUEUES; 
 	
 	
-  //Coopera��o, sistema.
+  //Cooperação, sistema.
     q->syscoopHead = 0; 
     q->syscoopTail = 0;
     q->syscoopMax = MAX_QUEUES;
 
 
-	//Concorr�ncia, sistema.
+	//Concorrência, sistema.
     q->sysconcHead = 0; 
     q->sysconcTail = 0;
     q->sysconcMax = MAX_QUEUES;
 
 
-	//Concorr�ncia, usu�rio.
+	//Concorrência, usuário.
     q->userconcHead = 0; 
     q->userconcTail = 0;
     q->userconcMax = MAX_QUEUES; 
 	
-	//Coopera��o, usu�rio.
+	//Cooperação, usuário.
     q->usercoopHead = 0; 
     q->usercoopTail = 0;
     q->usercoopMax = MAX_QUEUES;
@@ -629,7 +629,7 @@ standbyGetData:
     q->standbyList[q->standbyHead] = 0;
     goto done;
 	
-//#bugbug: Haha ... esse tipo n�o faz sentido.	
+//#bugbug: Haha ... esse tipo não faz sentido.	
 runningGetData:
     Thread = (void *) q->runningList[q->runningHead];
     q->runningList[q->runningHead] = 0;
@@ -707,7 +707,7 @@ done:
 /*
  *********************************************
  * show_queue_information:
- *      Mostra informa��es sobre a queue.
+ *      Mostra informações sobre a queue.
  *      #todo: put this in a info file.
  */
 
@@ -734,14 +734,14 @@ void show_queue_information(struct queue_d *q)
         ++i;
     };
 
-	//@todo: Informa��es de outras filas.
+	//@todo: Informações de outras filas.
 }
 
 
 /*
  * ScanReadyQueue:
  *     Procura na fila de threads ready por threads com timeout vencido.
- *     e p�e na frente da fila.
+ *     e põe na frente da fila.
  */
 void ScanReadyQueue(struct queue_d *q)
 {
