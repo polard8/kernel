@@ -353,6 +353,9 @@ void get_cpu_amd_parameters (void)
 int init_amd (void)
 {
 
+    // ?? The same from intel?
+    x86fault_initialize();
+
     //todo:
     //trazer as rotinas da amd para esse arquivo.
 

@@ -1261,9 +1261,13 @@ int main ( int argc, char *argv[] ){
 
     //=================================
     //get current thread
-    int cThread = (int) sc82 (10010,0,0,0);
-    //set foreground thread.
-    sc82 (10011,cThread,cThread,cThread);
+    //set foreground thread
+
+    //int cThread = (int) sc82 (10010,0,0,0);
+    //sc82 (10011,cThread,cThread,cThread);
+
+    rtl_focus_on_this_thread();
+
     while (1){
         if ( rtl_get_event() == TRUE ){  
             gwmProcedure ( 

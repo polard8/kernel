@@ -1,5 +1,5 @@
 /*
- * File: hal/arch/x86/x86.c
+ * File: 1pump/arch/x86/x86.c
  *
  *    x86 misc support.
  *    #todo: Review all this thing.
@@ -881,6 +881,9 @@ void get_cpu_intel_parameters (void)
 int x86_init_intel (void)
 {
     debug_print ("[x86] x86_init_intel:");
+
+
+    x86fault_initialize();
 
     // #bugbug
     // Suspended.

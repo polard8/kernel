@@ -38,10 +38,30 @@ int thread_failed_flag;
 int fatal_error_flag;
 
 
-//Protótipo de função interna.
+// Protótipo de função interna.
 void do_pagefault (void);
 
 
+//
+// Re-Entrant Exceptions ?
+// Avoiding infinity loop.
+//
+
+int x86fault_InProgress_CurrentException;  // exception number.
+int x86fault_InProgress_Finished;          // finifhed or not.
+
+
+void x86fault_initialize(void)
+{
+
+    // Re-Entrant Exceptions ?
+    // Avoiding infinity loop.
+
+    x86fault_InProgress_CurrentException = -1;
+    x86fault_InProgress_Finished = TRUE;
+
+    // ...
+}
 
 
 /*
@@ -58,13 +78,38 @@ void do_pagefault (void);
 
 void faults ( unsigned long number ){
 
-    struct thread_d *t;
+    struct thread_d  *t;
 
-
+    // ??
+    // Isso impede a reentrada ??
     asm ("cli");
 
     kprintf ("\n\n ======================= \n\n");
     kprintf ("x86fault-faults: *FAULTS: totalticks=%d \n\n", jiffies );
+
+
+    //
+    // re-entrant exception support
+    //
+
+    // ==================
+
+    // #todo
+    // This is a work in progress.
+
+    if (x86fault_InProgress_CurrentException == number ){
+        debug_print ("faults: [ERROR] re-entrant exception, number\n");
+    }
+    x86fault_InProgress_CurrentException = number;
+
+    if (x86fault_InProgress_Finished == FALSE ){
+        debug_print ("faults: [ERROR] re-entrant exception, not finished\n");
+    }
+    x86fault_InProgress_Finished = FALSE;
+
+    // ==================
+ 
+
 
 
 	//
@@ -76,7 +121,7 @@ void faults ( unsigned long number ){
 	// #todo max.
 
     if ( current_thread < 0 ){
-        printf ("x86fault-faults: current_thread fail\n");
+        printf ("x86fault-faults: [FAIL] current_thread\n");
         goto fail;
     }
 
@@ -84,9 +129,8 @@ void faults ( unsigned long number ){
     t = (void *) threadList[current_thread];
 
     if ( (void *) t == NULL ){
-        printf ("x86fault-faults: t fail\n");
+        printf ("x86fault-faults: [FAIL] t\n");
         goto fail;
-
     }else{
 
 	    // Salva o contexto se a tarefa já esteve rodando.
@@ -112,16 +156,20 @@ void faults ( unsigned long number ){
         // que refletem o momento em que houve a exceção.
         // Isso é perfeito para a int 3.
         printf ("x86fault-faults: Saving context\n");
-        save_current_context ();            
- 
- 
-        printf ("Number={%d}\n", number);               
-        printf ("TID %d Step %d \n", current_thread, t->step );
-        printf ("Running Threads %d \n", UPProcessorBlock.threads_counter );  
+        save_current_context();
+
+        printf ("Number={%d}\n", 
+            number);               
+        printf ("TID %d Step %d \n", 
+            current_thread, 
+            t->step );
+        printf ("Running Threads %d \n", 
+            UPProcessorBlock.threads_counter ); 
+
         //printf ("Init Phase %d \n", KeInitPhase);
         //printf ("logonStatus %d | guiStatus %d \n", logonStatus, guiStatus );
 
-        refresh_screen (); 
+        refresh_screen(); 
     };
 
 
@@ -131,10 +179,9 @@ void faults ( unsigned long number ){
 	
 	// Mostra erro de acordo com o número.
 
-    switch (number)
-    {
+    switch (number){
 
-       //EXCEPTION
+       // EXCEPTION
        case 1:
             printf("EXCEPTION\n");
             show_reg (current_thread);
@@ -143,51 +190,53 @@ void faults ( unsigned long number ){
 
         // Debug breakpoint interrupt.
         case 3:
-			printf("BREAKPOINT\n");
-			show_slot (current_thread);
-			show_reg (current_thread);
+            printf("BREAKPOINT\n");
+            show_slot (current_thread);
+            show_reg (current_thread);
             break;
 
-
-        //DOUBLE FAULT
-        //#todo: dump tss
+        // DOUBLE FAULT
+        // #todo: dump tss
         case 8:
             printf("DOUBLE FAULT\n");
             show_slot (current_thread);
             break;
 
-        //STACK
+        // STACK
         case 12:
             printf("STACK FAULT\n");
             show_reg (current_thread);
             break;
 
-        //GP
+        // GP
         case 13:
             printf("GP\n");
             show_reg (current_thread);
             break;
 
-		//PAGE FAULT
-		//Obs: é o contrário de page hit.
-	    case 14:
+        // PAGE FAULT
+        // Obs: é o contrário de page hit.
+        // #todo: Check current instruction info.
+        case 14:
             printf ("PF\n");
-		    do_pagefault ();
-		    break;
-	    
-	    default:			
-			printf("Default number\n");
-            show_reg (current_thread);
-	        //show_slots ();	
-			show_slot (current_thread);
-			break;
-	};
+            do_pagefault();
+            break;
 
-	
-	//
-	// # Flags #
-	//
-	
+        // ...
+
+        default:
+            printf("Default number\n");
+            show_reg (current_thread);
+            //show_slots();
+            show_slot (current_thread);
+            break;
+    };
+
+    //
+    // # Flags #
+    //
+
+
     /*
 	if( fatal_error_flag == 1 ){
         
@@ -203,15 +252,20 @@ void faults ( unsigned long number ){
 		goto tryagain;
 	};
     */
-	
+
+
     //
-	// * DIE.
-	//
-	
-done:	
+    // die or continue running.
+    //
+
+
+done:
+    // Reinicializa o gerenciamento e faltas reentrantes
+    // x86fault_initialize();
+
     //printf("done");
     //die();
-	
+
 fail:
     //printf("# FAIL #");
     //die();
@@ -231,11 +285,11 @@ tryagain:
 
 /* Interface */
  
-void KiCpuFaults ( unsigned long number ){
-    
+void KiCpuFaults ( unsigned long number )
+{
 	// #todo
 	// Checar a validade do argumento.
-	
+
     faults (number);
 }
 
@@ -281,19 +335,26 @@ void do_pagefault (void){
 	
 	//Page Fault Linear Address - PFLA.
 
-    page_fault_address = (unsigned long) get_page_fault_adr ();
+    page_fault_address = (unsigned long) get_page_fault_adr();
 
-    printf ("Address={%x}\n", (unsigned long) page_fault_address);
+    printf ("Address={%x}\n", 
+        (unsigned long) page_fault_address );
 
     //
     // Mostra registradores.
     //
     
-	// #bugbug
-	// Precisamos mudar os nomes.
-	
-    show_reg (current_thread);
-    show_slots ();
+    // #bugbug
+    // Precisamos mudar os nomes.
+
+    //if (current_thread<0)
+    //    return;
+
+    show_reg(current_thread);
+
+
+    show_slots();
+
 
 	/*
 	// Se o endereço for igual a 0 é porque o eip está perdido.
@@ -305,8 +366,7 @@ void do_pagefault (void){
 		kill_thread ( current_thread );
 		current_thread = idle;
         thread_failed_flag = 1;
-		
-		return;	
+		return;
 	}
 	*/
 	

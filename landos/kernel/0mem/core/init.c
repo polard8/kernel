@@ -516,8 +516,8 @@ int init (void){
         if ( (void *) System ==  NULL ){
             panic ("core-init: System\n");
         }else{
-            System->used  = 1;    //Sinaliza que a estrutura esta em uso.
-            System->magic = 1234; //sinaliza que a estrutura não esta corrompida.
+            System->used  = TRUE;  // Sinaliza que a estrutura esta em uso.
+            System->magic = 1234;  // Sinaliza que a estrutura não esta corrompida.
             
             Platform->System = (void *) System;
             //printf(".");
@@ -744,11 +744,9 @@ int init (void){
 
     processor = (void *) kmalloc ( sizeof( struct processor_d ) ); 
 
-    if ( (void *) processor == NULL )
-    {
+    if ( (void *) processor == NULL ){
         panic("init: processor\n");
     }
-
 
 
     // #todo
@@ -768,9 +766,9 @@ int init (void){
     // get more information about the processor
     // using the cpuid instruction.
     // See: 
-    // arch/x86/x86.c
-    // arch/amd/cpuamd.c
-    
+    // 1pump/arch/x86/x86.c
+    // 1pump/arch/amd/cpuamd.c
+
     ProcessorType = (int) hal_probe_processor_type();
 
     if (ProcessorType==0){

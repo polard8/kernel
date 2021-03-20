@@ -1517,6 +1517,16 @@ int rtl_clone_and_execute ( char *name )
 
 
 
+// get current thread
+// set foreground thread.
+int rtl_focus_on_this_thread(void)
+{
+    int cThread = (int) pthread_self();
+
+    sc82 (10011,cThread,cThread,cThread);
+
+    return cThread;
+}
 
 
 /* compare two ASCII strings ignoring case */

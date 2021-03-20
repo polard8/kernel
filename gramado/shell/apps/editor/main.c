@@ -828,6 +828,7 @@ int main ( int argc, char *argv[] ){
     struct gws_display_d *Display;
     int client_fd = -1;
 
+
     // IN: hostname:number.screen_number
     Display = (struct gws_display_d *) gws_open_display("display:name.0");
 
@@ -863,7 +864,6 @@ int main ( int argc, char *argv[] ){
         printf ("editor: w h \n");
         exit(1);
     }
-
 
     cursor_x = 0;
     cursor_y = 0;
@@ -1017,7 +1017,7 @@ int main ( int argc, char *argv[] ){
 
 
     //
-    // == main window ============================================
+    // main window
     //
 
     main_window = gws_create_window (client_fd,
@@ -1139,15 +1139,20 @@ int main ( int argc, char *argv[] ){
     //_loop (client_fd);
 
 
-
+    //
     // loop
+    //
+    
     //=================================
     //get current thread
-    int cThread = (int) sc82 (10010,0,0,0);
     //set foreground thread.
-    sc82 (10011,cThread,cThread,cThread);
+     
+    //int cThread = (int) sc82 (10010,0,0,0);
+    //sc82 (10011,cThread,cThread,cThread);
     
-    while(1){
+    rtl_focus_on_this_thread();
+    
+    while (1){
         if ( rtl_get_event() == TRUE )
         {  
             editorProcedure( 

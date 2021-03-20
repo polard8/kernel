@@ -297,8 +297,9 @@ unsigned long __device_bpp;
 // refresh rate of the whole screen.
 static unsigned long fps;
 
-// refresh rate for all dirty objects.
+// refresh rate for all dirty objects. In one round.
 static unsigned long frames_count;
+// static unsigned long frames_count_in_this_round;
 
 // Vamos usar ou nao.
 int use_vsync;

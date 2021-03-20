@@ -90,7 +90,7 @@
 // == prototypes ============================================
 //
 
-// Instructions.
+void x86fault_initialize(void);
 
 void x86_init_fpu (void);
 

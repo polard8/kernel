@@ -1735,16 +1735,29 @@ int serviceAsyncCommand (void)
     //O buffer é uma global nesse documento.
     unsigned long *message_address = (unsigned long *) &__buffer[0];
 
+
+
+    // int window_id=0;
     unsigned long message_id =0;
     unsigned long request_id =0;
     unsigned long subrequest_id = 0;
 
 
+    //
+    // parameters
+    //
+
+    // window_id      = message_address[0];
     message_id     = message_address[1]; 
     request_id     = message_address[2]; 
     subrequest_id  = message_address[3];
 
-    if(message_id != 2222)
+    // ...
+
+
+    // Validate our message number.
+
+    if (message_id != 2222)
     {
         gwssrv_debug_print ("gwssrv_init_client_support: [ERROR] message id\n");
                     printf ("gwssrv_init_client_support: [ERROR] message id\n");
@@ -1788,7 +1801,8 @@ int serviceAsyncCommand (void)
                 gwssrv_show_backbuffer();
             }
             break;
-         
+
+        // Draw black rectangle.
         case 5:
            if (current_mode == GRAMADO_JAIL)
            {
@@ -1797,15 +1811,25 @@ int serviceAsyncCommand (void)
            }
            break;
 
+        // Setup if we will show or not the 'fps window'.
+        case 6:
+            if( subrequest_id == TRUE )
+            {
+                show_fps_window = TRUE;
+                return 0;
+            }
+            show_fps_window = FALSE;
+            break;
+
         // ...
                 
         default:
             gwssrv_debug_print ("gwssrv_init_client_support: [ERROR] bad request\n");
-                       // printf ("gwssrv_init_client_support: [ERROR] bad request\n");
-
+                     // printf ("gwssrv_init_client_support: [ERROR] bad request\n");
+            // return -1;
             break;
     };
-    
+
     return -1;
 }
 

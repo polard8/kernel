@@ -230,6 +230,9 @@ ssize_t rtl_console_beep(void);
 
 int rtl_clone_and_execute ( char *name );
 
+// get current thread
+// set foreground thread.
+int rtl_focus_on_this_thread(void);
 
 #endif
 

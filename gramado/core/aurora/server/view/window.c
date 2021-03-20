@@ -17,6 +17,61 @@
 //GetClientRect
 
 
+static unsigned long ____old_time=0;
+static unsigned long ____new_time=0;
+
+// Internal
+// Called by wm_process_windows().
+
+void __update_fps(void)
+{
+    // counter
+    frames_count++;
+
+    //
+    // == time =========================================
+    //
+    
+    // delta
+    unsigned long dt=0;
+    ____new_time = rtl_get_progress_time();
+    dt = (unsigned long) (____new_time - ____old_time);
+
+//===================================================================
+// ++  End
+
+    //t_end = rtl_get_progress_time();
+    //__refresh_rate =  t_end - t_start;
+    //__refresh_rate = __refresh_rate/1000;
+    //printf ("@ %d %d %d \n",__refresh_rate, t_now, t_old);
+
+
+    //====================================
+    // fps++
+    // conta quantos frames. 
+    char rate_string[32];
+    // se passou um segundo.
+    if ( dt > 1000 )
+    {
+        // Save old time.
+        ____old_time = ____new_time;
+        
+        fps = frames_count; // quantos frames em 1000 ms aproximadamente?
+        itoa(fps,rate_string); 
+
+        if ( show_fps_window == TRUE ){
+            yellow_status(rate_string);
+        }
+
+        // Clean for next round.
+        frames_count=0;
+        fps=0;
+        dt=0;
+    }
+    //fps--
+    //=======================
+}
+
 
 /*
  *************************************************************** 
@@ -30,27 +85,12 @@
  *     se estivermos usando graficos em full screen.
  */
 
-
-static unsigned long ____old=0;
-static unsigned long ____new=0;
-
 void wm_process_windows (void)
 {
-
-    // #debug flags
-    
-    int UseYellowStatus=TRUE;
-
-    unsigned long t_start = 0;
-    unsigned long t_end   = 0;
-
     int dirty_status = -1;
     int background_status = -1;
-    
-    // Internal flag, used for debug.
-    //int ShowYellowStatus = TRUE;
 
-    
+
     gwssrv_debug_print("wm_process_windows:\n");
     
     //
@@ -81,6 +121,9 @@ void wm_process_windows (void)
     // Show the whole screen.
     if (background_status == TRUE)
     {
+        // #todo
+        // update fps
+    
         gws_show_backbuffer();
         validate_background();  // Validate again.
         return;
@@ -196,53 +239,10 @@ void wm_process_windows (void)
     };
 
 
-    // counter
-    frames_count++;
+    // #todo
+    // call a helper function for that.
 
-    //
-    // == time =========================================
-    //
-    
-    // delta
-
-    unsigned long dt=0;
-
-    ____new = rtl_get_progress_time();
-
-    dt = (unsigned long) (____new - ____old);
-
-
-//===================================================================
-// ++  End
-
-    //t_end = rtl_get_progress_time();
-    //__refresh_rate =  t_end - t_start;
-    //__refresh_rate = __refresh_rate/1000;
-    //printf ("@ %d %d %d \n",__refresh_rate, t_now, t_old);
-
-
-    //====================================
-    // fps++
-    // conta quantos frames. 
-    char rate_buffer[32];
-    // se passou um segundo.
-    if ( dt > 1000 )
-    {
-        ____old = ____new;
-        
-        fps = frames_count; // quantos frames em 1000 ms aproximadamente?
-        itoa (fps, rate_buffer); 
-
-        if ( UseYellowStatus == TRUE){
-            yellow_status(rate_buffer);
-        }
-
-        frames_count=0;
-        fps=0;
-        dt=0;
-    }
-    //fps--
-    //=======================
+    __update_fps();
 }   
 
 
@@ -2005,6 +2005,9 @@ int gwssrv_init_windows (void)
     active_window      =0;
     top_window         =0;
     //...
+    
+    show_fps_window = FALSE;
+
 
     // Window list
     for (i=0; i<WINDOW_COUNT_MAX; ++i){  windowList[i] = 0;  };

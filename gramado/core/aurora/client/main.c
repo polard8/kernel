@@ -299,19 +299,25 @@ gwsProcedure (
         case MSG_SYSKEYDOWN:
             switch (long1){
 
+                // 1~4
                 case VK_F1: gws_clone_and_execute("editor.bin");   break;
                 case VK_F2: gws_clone_and_execute("gwm.bin");      break;
                 case VK_F3: gws_clone_and_execute("fileman.bin");  break;
                 case VK_F4: gws_clone_and_execute("terminal.bin"); break;
 
+                // 4~8
                 case VK_F5: gws_clone_and_execute("browser.bin"); break;
                 case VK_F6: gws_clone_and_execute("browser.bin"); break;
                 case VK_F7: gws_clone_and_execute("browser.bin"); break;
-                
                 case VK_F8: 
-                    //gws_clone_and_execute("browser.bin"); 
+                    // #test
+                    // Setup the flag to show or not the fps window.
+                    // Request number 6.
+                    gws_async_command(fd,6,TRUE);
                     break;
-                
+
+
+                // 9~12
                 case VK_F9 : 
                     gws_async_command(fd,4,1);
                     //gws_async_command(fd,1,0);
@@ -448,6 +454,8 @@ int main ( int argc, char *argv[] )
 
     game_width  = w;
     game_height = h;
+    savedW      = w;
+    savedH      = h;
 
     //while(1){
     // Hello
@@ -789,21 +797,35 @@ int main ( int argc, char *argv[] )
     // Game
     //
 
+    // ??
+    // What is this?
+    // Is this a prototype, a test?
+
     gameInitialize(client_fd,w,h);
     //gameTestASCIITable(client_fd,w,h);
 
-    savedW = w;
-    savedH = h;
+
+    // #test
+    // Setup the flag to show or not the fps window.
+    // Request number 6.
+
+    gws_async_command(client_fd,6,FALSE);
+
 
     //=================================
     
     // get current thread
-    // See: rtl.c
-    //int cThread = (int) sc82 (10010,0,0,0);
-    int cThread = (int) pthread_self();
     // set foreground thread.
-    sc82 (10011,cThread,cThread,cThread);
-    
+    // #todo: We need to create a rtl function for this.
+    // See: rtl.c
+
+    //int cThread = (int) pthread_self();
+    //sc82 (10011,cThread,cThread,cThread);
+
+    rtl_focus_on_this_thread();
+
+    //=================================
+
     while(1){
 
         if ( rtl_get_event() == TRUE )
