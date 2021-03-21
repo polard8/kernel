@@ -46,15 +46,14 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <packet.h>
-
 #include <rtl/gramado.h>
 
 
 // The client-side library.
 #include <gws.h>
 
-// editor
-#include <fileman.h>
+// Internal
+#include <editor.h>
 
 
 //
@@ -65,7 +64,7 @@
 // salvar em global por enquanto aqui
 
 int main_window       = 0;
-int addressbar_window = 0; 
+int addressbar_window = 0;
 int client_window     = 0;
 
 int button            = 0;
@@ -162,20 +161,20 @@ int fileman_init_windows(void)
 int _getmessage_request(int fd)
 {
     // Isso permite ler a mensagem na forma de longs.
-    unsigned long *message_buffer = (unsigned long *) &__buffer[0];   
+    unsigned long *message_buffer = (unsigned long *) &__buffer[0];
 
     int n_writes = 0;   // For sending requests.
 
     //char *name = "Window name 1";
 
-   
+
     //
     // Send request.
     //
 
 
     // #debug
-    //gws_debug_print ("gwm: Writing ...\n");      
+    //gws_debug_print ("gwm: Writing ...\n");
 
     // Enviamos um request para o servidor.
     // ?? Precisamos mesmo de um loop para isso. ??
@@ -761,9 +760,13 @@ editorProcedure (
     unsigned long long2 )
 {
 
-    if (msg<0)
+    if (fd<0){
         return -1;
+    }
 
+    if (msg<0){
+        return -1;
+    }
 
     switch (msg){
 
