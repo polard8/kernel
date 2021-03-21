@@ -2996,30 +2996,6 @@ void gws_yield_n_times (unsigned long n)
 }
 
 
-
-// #test
-// It's time to pay!
-void gws_payment(void)
-{
-    gws_debug_print("==== PAYMENT ====\n");
-        
-    // o aplicativo salvou na biblioteca estatica o fd do window server.
-    // entao agora pegamos o fd e efetuamos o refresh do background
-    //e o yield da thread.
-    // See: connect.c
-    
-    int fd = (int) gws_get_client_fd();
-    
-    if (fd<0){
-        gws_debug_print("payment: fd\n");
-        return;
-    }
-    
-    gws_refresh_yield(fd);
-}
-
-
-
 /*
  **************************
  * gws_create_thread:
@@ -3027,6 +3003,7 @@ void gws_payment(void)
  *     #todo: 
  *     Precisamos uma função que envie mais argumentos.
  *     Essa será uma rotina de baixo nível para pthreads.
+ *     Use const char
  */
 
 // OUT:
@@ -3101,21 +3078,32 @@ void gws_start_thread (void *thread)
 }
 
 
-// Clone the current and execute the clone.
+// Clone the current process and execute the clone.
+// #todo: Use const char.
+// OUT: ??
+
 int gws_clone_and_execute ( char *name )
 {
-    if( (void*) name == NULL )
-    { 
-        return -1; 
-    }
-        
-    if( *name == 0 )
-    { 
+
+    int Ret = -1;
+
+    if ( (void*) name == NULL ){ 
+        debug_print("gws_clone_and_execute: name\n");
         return -1; 
     }
 
-    //return (int) gws_system_call ( 900, (unsigned long) name, 0, 0 );
-    return (int) sc82 ( 900, (unsigned long) name, 0, 0 );
+    if ( *name == 0 ){ 
+        debug_print("gws_clone_and_execute: *name\n");
+        return -1; 
+    }
+
+    Ret = (int) sc82 ( 900, (unsigned long) name, 0, 0 );
+
+    if (Ret<0){
+        debug_print("gws_clone_and_execute: Fail\n");
+    }
+
+    return (int) Ret;
 }
 
 
@@ -3228,42 +3216,49 @@ struct gws_menu_d *gws_create_menu (
     unsigned long height,
     unsigned long color )
 {
-    struct gws_menu_d *menu;
-    int window=0;
 
+    struct gws_menu_d  *menu;
+    int window = 0;
 
     // #
     // The synchronization is made when we call gws_create_window.
 
 
-
     if (fd<0){
+        debug_print("gws_create_menu: [FAIL] fd\n");
         return (struct gws_menu_d *) 0;
     }
 
     menu = (struct gws_menu_d *) malloc( sizeof(struct gws_menu_d) );
 
-    if ( (void *) menu == NULL )
-    {
-        // msg?
+    if ( (void *) menu == NULL ){
+        debug_print("gws_create_menu: [FAIL] menu\n");
         return (struct gws_menu_d *) 0;
     }
 
 
-    // Deslocamento em relação a janela mãe.
+    // Offset related to the window.
     menu->x = x;
     menu->y = y;
+
+    // Dimensions.
     menu->width  = width;
     menu->height = height;
-    
+
     menu->color=color;
+
+    // ??
+    // Are we selection am item.
     menu->highlight = highlight;
+
+    // Number of itens.
     menu->itens_count = count;
 
 
     // Create menu window.
 
-    window = gws_create_window ( fd,
+    window = gws_create_window ( 
+                 fd,
                  WT_SIMPLE,1,1,"Menu",
                  menu->x,  //Deslocamento em relação a janela mãe. 
                  menu->y,  //Deslocamento em relação a janela mãe. 
@@ -3271,14 +3266,14 @@ struct gws_menu_d *gws_create_menu (
                  height,
                  parent, 0, color, color );
 
-
-    if (window<=0)
+    if (window <= 0)
     { 
-        // msg?
+        debug_print("gws_create_menu: [FAIL] window\n");
         //free(menu);
         menu->window = 0;  //#bugbug !!!!
         return (struct gws_menu_d *) 0;
     }
+
 
     //primeiro salva.
         
@@ -3287,7 +3282,7 @@ struct gws_menu_d *gws_create_menu (
     
     // Ok.
     // Return the pointer.
-    
+
     return (struct gws_menu_d *) menu;
 }
 
@@ -3299,50 +3294,49 @@ struct gws_menu_item_d *gws_create_menu_item (
     int id,
     struct gws_menu_d *menu)
 {
-    int window=0;    //menu item window
-    
-    struct gws_menu_item_d *item;
 
+    int window=0;    //menu item window
+    struct gws_menu_item_d  *item;
 
     // #
     // The synchronization is made when we call gws_create_window.
-    
 
 
     if (fd<0){
+        debug_print("gws_create_menu_item: [FAIL] fd\n");
         return (struct gws_menu_item_d *) 0;
     }
-    
-    // Check
-    if ( (void *) menu == NULL )
-    {
-        // ? msg ?
+
+    if ( (void *) menu == NULL ){
+        debug_print("gws_create_menu_item: [FAIL] menu\n");
         return (struct gws_menu_item_d *) 0;
     }
-    
+
     //create menu item.
     item = (struct gws_menu_item_d *) malloc( sizeof(struct gws_menu_item_d) );
 
-    if ( (void *) item == NULL )
-    {
-        // msg ?
+    if ( (void *) item == NULL ){
+        debug_print("gws_create_menu_item: [FAIL] item\n");
         return (struct gws_menu_item_d *) 0;
     }
 
-
     // Provisório
-    if (id>5 || id>menu->itens_count){
+
+    if (id>5 || id>menu->itens_count)
+    {
         // ? msg ?
         return (struct gws_menu_item_d *) 0;
     }
+
 
     item->id = id;
 
     item->width  = (menu->width -8);
     item->height = (menu->height / menu->itens_count);
+
     item->x = 4;
     item->y = (item->height*id);
-    
+
 
     // Create a window for a menu item.
 
@@ -3387,22 +3381,28 @@ int gws_create_empty_file ( char *file_name )
     int __ret = 0;
 
 
-    if( (void*) file_name == NULL ){
+    if ( (void*) file_name == NULL ){
+        debug_print("gws_create_empty_file: [FAIL] file_name\n");
         return -1;
     }
 
-
     if ( *file_name == 0 ){
+        debug_print("gws_create_empty_file: [FAIL] *file_name\n");
         return -1;
     }
 
 
     //gde_enter_critical_section();
-    __ret = (int) gramado_system_call ( 43, 
-                      (unsigned long) file_name, 0, 0);
+    __ret = (int) gramado_system_call ( 
+                      43, (unsigned long) file_name, 0, 0);
     //gde_exit_critical_section();    
-    
-    return __ret;
+
+
+    if(__ret<0){
+        debug_print("gws_create_empty_file: [FAIL] __ret\n");
+    }
+
+    return (int) __ret;
 }
 
 
@@ -3413,27 +3413,31 @@ int gws_create_empty_directory ( char *dir_name )
 
 
     if ( (void*) dir_name == NULL ){
+        debug_print("gws_create_empty_directory: [FAIL] dir_name\n");
         return -1;
     }
 
-
     if ( *dir_name == 0 ){
+        debug_print("gws_create_empty_directory: [FAIL] *dir_name\n");
         return -1;
     }
 
     //gde_enter_critical_section();
-    __ret = (int) gramado_system_call ( 44, 
-                      (unsigned long) dir_name, 0, 0);
+    __ret = (int) gramado_system_call ( 
+                      44, (unsigned long) dir_name, 0, 0);
     //gde_exit_critical_section();    
 
+    if(__ret<0){
+        debug_print("gws_create_empty_directory: [FAIL] __ret\n");
+    }
 
     return (int) __ret;
 }
 
 
-
-
-
+// Send async request.
+// No response.
+// IN: fd, request number, subrequest.
 void
 gws_async_command ( 
     int fd, 
@@ -3442,14 +3446,14 @@ gws_async_command (
 {
 
     // Isso permite ler a mensagem na forma de longs.
-    unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];   
+    unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0]; 
 
     int n_writes = 0;   // For sending requests.
 
     //char *name = "Window name 1";
 
-
     if (fd<0){
+        debug_print("gws_async_command: [FAIL] fd\n");
         return;
     }
 
@@ -3458,18 +3462,17 @@ gws_async_command (
     //
 
     // #debug
-    gws_debug_print ("__gws_change_window_position_request: Writing ...\n");      
+    gws_debug_print ("gws_async_command: send...\n"); 
 
     // Enviamos um request para o servidor.
     // ?? Precisamos mesmo de um loop para isso. ??
 
-    while (1)
-    {
+    while (1){
         message_buffer[0] = 0;                 // window. 
         message_buffer[1] = GWS_AsyncCommand;  // message number.
         message_buffer[2] = request;           // request
         message_buffer[3] = sub_request;       // sub request
-        //...
+        // ...
 
         // Write!
         // Se foi possível enviar, então saimos do loop.  
@@ -3480,14 +3483,17 @@ gws_async_command (
                        sizeof(__gws_message_buffer), 
                        0 );
 
-        if (n_writes>0){ 
-            rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );
+        if (n_writes > 0){ 
+            rtl_set_file_sync ( 
+                fd, 
+                SYNC_REQUEST_SET_ACTION, 
+                ACTION_REQUEST );
             break; 
         }
     };
 
     // No return.
-    
+
     return; 
 }
 
@@ -3497,27 +3503,25 @@ struct gws_display_d *gws_open_display(char *display_name)
 {
     struct gws_display_d *Display;
 
-
     // ??
     // O header está incluido?
-    struct sockaddr_in addr_in;
+
+    struct sockaddr_in  addr_in;
 
     addr_in.sin_family      = AF_INET;
-    addr_in.sin_port        = __PORTS_WS;   
+    addr_in.sin_port        = __PORTS_WS;
     addr_in.sin_addr.s_addr = __IP(127,0,0,1); 
 
     int addrlen=0;
     addrlen = sizeof(addr_in);
 
     int client_fd = -1;
-    
-    
+
     // Create the display structure.
 
     Display = (struct gws_display_d *) malloc ( sizeof( struct gws_display_d ) );
     
-    if ( (void*) Display == NULL )
-    {
+    if ( (void*) Display == NULL ){
         printf ("gws_open_display: Couldn't create display\n");
         return NULL;
     }
@@ -3531,24 +3535,20 @@ struct gws_display_d *gws_open_display(char *display_name)
        return NULL;
     }
 
-    Display->used  = TRUE;
-    Display->magic = 1234;
-
-    Display->fd = client_fd;
-    
-    Display->lock = FALSE;
+    Display->used      = TRUE;
+    Display->magic     = 1234;
+    Display->fd        = client_fd;
+    Display->lock      = FALSE;
     Display->connected = FALSE;
     // ...
-    
-    if( (void*) display_name == NULL )
-    {
-        printf ("gws_open_display: display_name\n");
+
+    if( (void*) display_name == NULL ){
+        printf ("gws_open_display: [FAIL] display_name\n");
         return NULL;
     }
 
-    if( *display_name == 0 )
-    {
-        printf ("gws_open_display: *display_name\n");
+    if( *display_name == 0 ){
+        printf ("gws_open_display: [FAIL] *display_name\n");
         return NULL;
     }
 
@@ -3566,7 +3566,7 @@ struct gws_display_d *gws_open_display(char *display_name)
     };
 
     Display->connected = TRUE;
-    
+
     return (struct gws_display_d *) Display;
 }
 
@@ -3575,14 +3575,19 @@ void gws_close_display( struct gws_display_d *display)
 {
     // #todo
     
-    if ( (void*) display == NULL )
+    if ( (void*) display == NULL ){
         return;
+    }
 
-    display->used = 0;
+    display->used  = FALSE;
     display->magic = 0;
+
+    // ??
+    // close(display->fd);
 
     display = NULL;
 }
+
 
 //
 // End.

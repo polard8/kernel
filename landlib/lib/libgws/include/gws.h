@@ -8,7 +8,6 @@
  */
 
 
-
 // =======================================
 // Protocol request constants
 //
@@ -18,6 +17,7 @@
 // See: 
 // All the standar messages, just like MSG_SYSKEYUP ...
 // There are some old messages below 369.
+
 #define GWS_GetInputMessage        369
 #define GWS_Hello                 1000
 #define GWS_CreateWindow          1001
@@ -43,10 +43,11 @@
 // ...
 
 // internal
-// used only by the lib;
-#define __PORTS_WS 4040
-#define __PORTS_NS 4041
-#define __PORTS_FS 4042
+// used only by the lib
+#define __PORTS_WS  4040
+#define __PORTS_NS  4041
+#define __PORTS_FS  4042
+// ...
 
 #define __IP(a, b, c, d) (a << 24 | b << 16 | c << 8 | d)
 
@@ -76,7 +77,6 @@
 
 
 #include "ports.h"
-
 
 // menu
 #include "window/menu.h"
@@ -117,12 +117,6 @@ struct libgws_version_d
 };
 // Version struct.
 struct libgws_version_d libgwsVersion;
-
-
-
-
-
-
 
 
 
@@ -191,8 +185,7 @@ gws_send_message_to_thread (
 // == 3d ==============================================
 //
 
-//test
-//plot a point
+// Plot a point.
 int 
 gws_plot0 (
     int fd,
@@ -201,32 +194,27 @@ gws_plot0 (
     unsigned long z,
     unsigned long color );
 
-
-
+// Plot a cube.
 int 
 gws_plotcube (
     int fd,
     struct gr_cube_d *cube );
 
 
-
-
-//plot rectangle
+// Plot a rectangle.
 int 
 gws_plotrectangle (
     int fd,
     struct gr_rectangle_d *rect );
-    
-    
-    
-// ...
 
+// ...
 
 //
 // == 2d ==============================================
 //
 
-//draw a char
+
+// Draw a char.
 int 
 gws_draw_char (
     int fd, 
@@ -235,7 +223,8 @@ gws_draw_char (
     unsigned long y,
     unsigned long color,
     unsigned long c );
-    
+
+// Draw a text.
 int 
 gws_draw_text (
     int fd, 
@@ -245,16 +234,17 @@ gws_draw_text (
     unsigned long color,
     char *string );
 
-
+// Redraw a window.
 int 
 gws_redraw_window (
     int fd, 
     int window, 
     unsigned long flags );
 
-
+// Refresh a window.
 int gws_refresh_window (int fd, int window );
 
+// Change window position.
 int 
 gws_change_window_position (
     int fd, 
@@ -262,6 +252,7 @@ gws_change_window_position (
     unsigned long x, 
     unsigned long y );
 
+// Resize a window.
 int 
 gws_resize_window ( 
     int fd, 
@@ -269,22 +260,15 @@ gws_resize_window (
     unsigned long w, 
     unsigned long h );
 
-
-
-/*
- *********************************** 
- * gws_create_window:
- * 
- */
-
+// Create a window.
 int
 gws_create_window ( 
     int fd,
     unsigned long type,        //1, Tipo de janela (popup,normal,...)
     unsigned long status,      //2, Estado da janela (ativa ou nao)
     unsigned long view,        //3, (min, max ...)
-    char *windowname,          //4, Título.                          
-    unsigned long x,           //5, Deslocamento em relação às margens do Desktop.                           
+    char *windowname,          //4, Título. #todo maybe const char.
+    unsigned long x,           //5, Deslocamento em relação às margens do Desktop. 
     unsigned long y,           //6, Deslocamento em relação às margens do Desktop.
     unsigned long width,       //7, Largura da janela.
     unsigned long height,      //8, Altura da janela.
@@ -293,36 +277,29 @@ gws_create_window (
     unsigned long clientcolor, //11, Cor da área de cliente
     unsigned long color );     //12, Color (bg) (para janela simples).
 
-
+// Reboot.
 void gws_reboot (void);
 
-
+// #test 
+// Load a file given a path.
+// We are testing the path support.
 int 
 gws_load_path ( 
     char *path, 
     unsigned long buffer, 
     unsigned long buffer_len );
 
-
+// Yield the current thread.
 void gws_yield(void);
 
-// refresh the background and yield the current thread
+// Refresh the background and yield the current thread.
 void gws_refresh_yield (int fd);
 
-
-// refresh a given window and yield the current thread
+// Refresh a given window and yield the current thread.
 void gws_refresh_yield2 (int fd, int window);
 
-
+// Yield the current thread n times.
 void gws_yield_n_times (unsigned long n);
-
-
-//
-// payment
-//
-
-void gws_payment(void);
-
 
 
 
