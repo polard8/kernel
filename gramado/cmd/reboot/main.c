@@ -9,11 +9,12 @@
 #include <string.h>
 #include <stdbool.h>
 
+// libio
 #include <libio.h>
 
 
-//isso eh uma rotina de test
-//vai escrever em uma porta ja inicializada pelo kernel.
+// isso eh uma rotina de test
+// Vai escrever em uma porta ja inicializada pelo kernel.
 void serial_write_char (char data) 
 {
     while (( libio_inport8(0x3F8 + 5) & 0x20 ) == 0);
@@ -52,8 +53,31 @@ int main ( int argc, char *argv[] ){
    */
 
 
+    // ==============================================
+
+    // #test
+    // Testing shutdown in virtual machines.
+    // #todo:
+    // We can ask the system if we are in qemu or not.
+    // See: https://wiki.osdev.org/Shutdown
+
+    // In Bochs, and older versions of QEMU(than 2.0), you can do the following:
+    // outw(0xB004, 0x2000);
+    // libio_outport16(0xB004, 0x2000);
+
+    // In newer versions of QEMU, you can do shutdown with:
+    // outw(0x604, 0x2000);
+    //libio_outport16(0x604, 0x2000);
+    
+    // In Virtualbox, you can do shutdown with:
+    // outw(0x4004, 0x3400);
+    // libio_outport16(0x4004, 0x3400);
 
 
+    // #status
+    // OK. it is working on qemu. 
+    
+    // ==============================================
 
     //testing serial port
     //ok isso funcionou.

@@ -772,33 +772,37 @@ unsigned long path_count (unsigned char *path)
  */
 
 // IN:
-// path de dois níveis, andereço onde carregar.
+// path de dois níveis, endereço onde carregar.
+
+// IN:
+// pathname, virtual address.
 
 //   0 ---> ok.
 // !=0 ---> fail
 
 int load_path ( unsigned char *path, unsigned long address )
 {
-
-    int level=0;
+    int Ret = -1;    // fail. Usado na função que carrega o arquivo.
     
     int i=0;         // Deslocamento dentro do buffer.
-
     char buffer[12];
+
+    // path pointer.
     unsigned char *p;
 
-    int Ret = -1;    // fail. Usado na função que carrega o arquivo.
 
+    //#todo
+    //unsigned long ImageBase=0;
+    //unsigned long ImageSize=0;
 
     //onde carregaremos o diretório.
     void *__src_buffer;
     void *__dst_buffer;
     void *__file_buffer;
 
+    int level=0;
     unsigned long n_levels = 0;
     int l=0;
-
-
 
     //
     // Checks.
@@ -807,20 +811,17 @@ int load_path ( unsigned char *path, unsigned long address )
     //====================
     // path
     
-    if ( (void*) path == NULL )
-    {
+    if ( (void*) path == NULL ){
         printf ("bl-load_path: path\n");
         abort();
     }    
 
-    if (*path == 0)
-    {
+    if (*path == 0){
         printf ("bl-load_path: *path\n");
         abort();
     }
 
-    if (*path != '/')
-    {
+    if (*path != '/'){
         printf ("bl-load_path: It's not an absolute path\n");
         abort();
     }

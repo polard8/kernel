@@ -34,40 +34,46 @@
 //static char **envp = { NULL, NULL, NULL };
 
 
-
-// Prototypes.
+//
+// == Prototypes ==========================================
+//
 
 unsigned long init_testing_memory_size (int mb);
-
 void BlLoadKernel(void);
-
 void BlSetupPaging(void);
 
 
 
+
+// Show menu.
 void blShowMenu (void){
 
     int i=0;
 
 
+    // Cursor.
     g_cursor_x = 0;
     g_cursor_y = 0;
-    clear_backbuffer();  //black
-    
+
+    // Clear backbuffer.
+    // Black color.
+    clear_backbuffer();
+
+
     for (i=0; i<8; i++)
     {
         printf ("\n");
-        
-        if (MENU[i].used == 1)
+
+        if (MENU[i].used == TRUE)
         {
-            if( i == menu_highlight){
+            if ( i == menu_highlight){
                 printf ("* %s \n",MENU[i].string);
             }else{
                 printf ("  %s \n",MENU[i].string);
             };
         }
     };
-    
+
     refresh_screen(); 
 }
 
@@ -99,9 +105,10 @@ BlMenu(void)
     
     //mostra o menu.
     //blShowMenu(); 
-    
-    while(1)
-    {
+
+
+    while (1){
+
         blShowMenu();
         
         Key = keyboard_wait_key();
@@ -150,10 +157,10 @@ void BlMain (void){
     int Status = (-1);
 
     // main flags.
-    gdefLegacyBIOSBoot = FALSE;
-    gdefEFIBoot = FALSE;
-    gdefSafeBoot = FALSE;
-    gdefShowLogo = FALSE;
+    gdefLegacyBIOSBoot  = FALSE;
+    gdefEFIBoot         = FALSE;
+    gdefSafeBoot        = FALSE;
+    gdefShowLogo        = FALSE;
     gdefShowProgressBar = FALSE;
     // ...
 
@@ -267,18 +274,15 @@ void BlMain (void){
 #endif
 
 
-	// #importante:
-	// Carregando o diret�rio raiz e a fat na mem�ria.
-	// Evitando repeti��o de carregamento.
-
+    // Load root dir.
 
     fs_load_rootdirEx();
+    g_fat16_root_status = TRUE;
+
+    // Load FAT.
+
     fs_load_fatEx();
-
-
-    g_fat16_root_status = 1;
-    g_fat16_fat_status = 1;
-
+    g_fat16_fat_status = TRUE;
 
 
     // #todo
@@ -366,9 +370,12 @@ void BlMain (void){
  *     The entry point is at 0x00101000.
  */ 
 
-void BlLoadKernel(void){
-
+void BlLoadKernel(void)
+{
     int Status = -1;
+
+    char *image_name = "KERNEL.BIN";
+
 
     // #todo
     // This way can chose the filename from a
@@ -379,7 +386,8 @@ void BlLoadKernel(void){
     // This routine will build the pathname
     // to search in the default folder.
 
-    Status = (int) load_kernel("KERNEL.BIN");
+    //Status = (int) load_kernel("KERNEL.BIN");
+    Status = (int) load_kernel(image_name);
 
     if ( Status != 0 ){
         printf ("BlLoadKernel:\n");

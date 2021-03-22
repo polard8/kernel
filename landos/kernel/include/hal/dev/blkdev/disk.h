@@ -218,14 +218,16 @@ struct mbr_d *mbr;
 
 struct disk_d
 { 
+    // Object header.
     object_type_t  objectType;
     object_class_t objectClass;
 
-    disk_type_t  diskType;
-    disk_class_t diskClass;
-
+    // Structure validation
     int used;
     int magic;
+
+    disk_type_t  diskType;
+    disk_class_t diskClass;
 
     int id;                 // ID na lista de discos.
     char boot_disk_number;  // ID herdado do boot block.
@@ -245,10 +247,10 @@ struct disk_d
     // se ele está ocupoado o escretor terá que esperar.
     //int state;
 
-    // Qual processo está usando.
-    pid_t pid;
+    // Security
+    pid_t pid;     // Qual processo está usando.
     gid_t gid;
-
+    // ...
 
     //#todo
     //struct mbr_d mbr;

@@ -167,9 +167,14 @@ void ata_cmd_write (int cmd_val)
 
 
 
+
+// Set up the ata.xxx structure.
+// #todo: Where is that structure defined?
+// See: hal/dev/blkdev/ata.h
 // De acordo com a porta, saberemos se é 
 // primary ou secondary e se é
 // master ou slave.
+
 unsigned char ata_assert_dever (char nport)
 {
 
@@ -292,38 +297,64 @@ int ide_identify_device ( uint8_t nport )
         ata_wait_not_busy();
         ata_wait_no_drq();
 
+        // See:
+        // ide.h
 
-        ide_ports[nport].channel = ata.channel;
-        ide_ports[nport].dev_num = ata.dev_num;
+        ide_ports[nport].used    = (int) TRUE;
+        ide_ports[nport].magic   = (int) 1234;
+        ide_ports[nport].id      = (uint8_t) nport;           // Port index.
+        ide_ports[nport].type    = (int) idedevicetypesPATA;  // Device type.
+        ide_ports[nport].name    = "PATA";
+        ide_ports[nport].channel = ata.channel;  // Primary or secondary.
+        ide_ports[nport].dev_num = ata.dev_num;  // Master or slave.
 
-        //salvando o tipo em estrutura de porta.
-        ide_ports[nport].id    = (uint8_t) nport;
-        ide_ports[nport].used  = (int) TRUE;
-        ide_ports[nport].magic = (int) 1234;
-        ide_ports[nport].name  = "PATA";
-        ide_ports[nport].type  = (int) idedevicetypesPATA;
+
+        // Disk
 
         disk = (struct disk_d *) kmalloc ( sizeof(struct disk_d) );
 
         if ((void *) disk != NULL )
         {
-            disk->channel = ata.channel;
-            disk->dev_num = ata.dev_num;
-            
+
+            // See:
+            // disk.h
+
+            // Object header.
+            // #todo
+            //disk->objectType = ?
+            //disk->objectClass = ?
+
+            disk->used  = TRUE;
+            disk->magic = 1234;
+
+            // type and class.
+            disk->diskType = DISK_TYPE_PATA;
+            // disk->diskClass = ? // #todo:
+
             // ID and index.
             disk->id = nport;
             disk->boot_disk_number = 0; // ?? #todo
-            
-            disk->used  = TRUE;
-            disk->magic = 1234;
-            
+
+
+            // name
+ 
             // name = "sd?"
             //disk->name = "PATA-TEST";
             sprintf ( (char *) name_buffer, "PATA-TEST-%d",nport);
             disk->name = (char *) strdup ( (const char *) name_buffer);  
-            
-            disk->diskType = DISK_TYPE_PATA;
 
+            // Security
+            disk->pid = current_process;
+            disk->gid = current_group;
+            // ...
+
+            disk->channel = ata.channel;  // Primary or secondary.
+            disk->dev_num = ata.dev_num;  // Master or slave.
+
+            // disk->next = NULL;
+            
+            // #bugbug
+            // #todo: Check overflow.
             diskList[nport] = (unsigned long) disk;
         }
 
@@ -344,36 +375,60 @@ int ide_identify_device ( uint8_t nport )
         ata_wait_not_busy();
         ata_wait_no_drq();
 
-        ide_ports[nport].channel = ata.channel;
-        ide_ports[nport].dev_num = ata.dev_num;
+        // See:
+        // ide.h
 
-        //salvando o tipo em estrutura de porta.
-        ide_ports[nport].id    = (uint8_t) nport;
-        ide_ports[nport].used  = (int) TRUE;
-        ide_ports[nport].magic = (int) 1234;
-        ide_ports[nport].name  = "SATA";
-        ide_ports[nport].type  = (int) idedevicetypesSATA;
+        ide_ports[nport].used    = (int) TRUE;
+        ide_ports[nport].magic   = (int) 1234;
+        ide_ports[nport].id      = (uint8_t) nport;
+        ide_ports[nport].type    = (int) idedevicetypesSATA;  // Device type.
+        ide_ports[nport].name    = "SATA";                    // Port name.
+        ide_ports[nport].channel = ata.channel;  // Primary or secondary.
+        ide_ports[nport].dev_num = ata.dev_num;  // Master or slave.
+
+        // Disk
 
         disk = (struct disk_d *) kmalloc (  sizeof(struct disk_d) );
 
         if ((void *) disk != NULL )
         {
 
-            disk->channel = ata.channel;
-            disk->dev_num = ata.dev_num;
+            // See:
+            // disk.h
+
+            // Object header.
+            // #todo
+            //disk->objectType = ?
+            //disk->objectClass = ?
+
+            disk->used  = TRUE;
+            disk->magic = 1234;
+
+            disk->diskType = DISK_TYPE_SATA;
+            // disk->diskClass = ?
+
 
             // ID and index.
             disk->id = nport;
             disk->boot_disk_number = 0; // ?? #todo
 
-            disk->used  = TRUE;
-            disk->magic = 1234;
+
+            // name
 
             //disk->name = "SATA-TEST";
             sprintf ( (char *) name_buffer, "SATA-TEST-%d",nport);
             disk->name = (char *) strdup ( (const char *) name_buffer);  
-     
-            disk->diskType = DISK_TYPE_SATA;
+
+            // Security
+            disk->pid = current_process;
+            disk->gid = current_group;
+              
+            disk->channel = ata.channel;  // Primary or secondary.
+            disk->dev_num = ata.dev_num;  // Master or slave.
+ 
+            // disk->next = NULL;
+            
+            // #todo: Check overflow.
             diskList[nport] = (unsigned long) disk;
         }
 
@@ -392,35 +447,48 @@ int ide_identify_device ( uint8_t nport )
         ata_wait_not_busy();
         ata_wait_no_drq();
 
-		ide_ports[nport].channel = ata.channel;
-		ide_ports[nport].dev_num = ata.dev_num;
-		
-        //salvando o tipo em estrutura de porta.
-        ide_ports[nport].id    = (uint8_t) nport;
-        ide_ports[nport].used  = (int) TRUE;
-        ide_ports[nport].magic = (int) 1234;
-        ide_ports[nport].name  = "PATAPI";
-        ide_ports[nport].type  = (int) idedevicetypesPATAPI;
+        // See:
+        // ide.h
+        
+        ide_ports[nport].used    = (int) TRUE;
+        ide_ports[nport].magic   = (int) 1234;
+        ide_ports[nport].id      = (uint8_t) nport;
+        ide_ports[nport].type    = (int) idedevicetypesPATAPI;
+        ide_ports[nport].name    = "PATAPI";
+        ide_ports[nport].channel = ata.channel;  // Primary or secondary.
+        ide_ports[nport].dev_num = ata.dev_num;  // Master or slave.
 
-
+        // Disk
+        
         disk = (struct disk_d *) kmalloc (  sizeof(struct disk_d) );
 
         if ((void *) disk != NULL )
         {
-			disk->channel = ata.channel;
-			disk->dev_num = ata.dev_num;
+            // See:
+            // disk.h
 
-			disk->id = nport;  
 
             disk->used  = TRUE;
             disk->magic = 1234;
 
-			//disk->name = "PATAPI-TEST";
+            disk->diskType = DISK_TYPE_PATAPI;
+            // disk->diskClass = ?
+
+            disk->id = nport;  
+                        
+            // name
+            
+            //disk->name = "PATAPI-TEST";
             sprintf ( (char *) name_buffer, "PATAPI-TEST-%d",nport);
             disk->name = (char *) strdup ( (const char *) name_buffer);  
-            
-			disk->diskType = DISK_TYPE_PATAPI;
-			diskList[nport] = (unsigned long) disk;
+
+
+
+            disk->channel = ata.channel;  // Primary or secondary.
+            disk->dev_num = ata.dev_num;  // Master or slave.
+
+            // #todo: Check overflow.
+            diskList[nport] = (unsigned long) disk;
         }
 
         return (int) 0x80;
@@ -438,40 +506,53 @@ int ide_identify_device ( uint8_t nport )
         ata_wait_not_busy();
         ata_wait_no_drq();
 
+        // See:
+        // ide.h
 
-        ide_ports[nport].channel = ata.channel;
-        ide_ports[nport].dev_num = ata.dev_num;
+        ide_ports[nport].used    = (int) TRUE;
+        ide_ports[nport].magic   = (int) 1234;
+        ide_ports[nport].type    = (int) idedevicetypesSATAPI;
+        ide_ports[nport].id      = (uint8_t) nport;
+        ide_ports[nport].name    = "SATAPI";
+        ide_ports[nport].channel = ata.channel;  // Primary or secondary.
+        ide_ports[nport].dev_num = ata.dev_num;  // Master or slave.
 
-        //salvando o tipo em estrutura de porta.
-        ide_ports[nport].id    = (uint8_t) nport;
-        ide_ports[nport].used  = (int) TRUE;
-        ide_ports[nport].magic = (int) 1234;
-        ide_ports[nport].name  = "SATAPI";
-        ide_ports[nport].type  = (int) idedevicetypesSATAPI;
-
+        // Disk
+        
         disk = (struct disk_d *) kmalloc (  sizeof(struct disk_d) );
 
-        if ((void *) disk != NULL )
+        if ( (void *) disk != NULL )
         {
-			
-			disk->channel = ata.channel;
-			disk->dev_num = ata.dev_num;
 
-			disk->id = nport;  
+            // See:
+            // disk.h
+
             disk->used  = TRUE;
             disk->magic = 1234;
 
-			//disk->name = "SATAPI-TEST";
+            disk->diskType = DISK_TYPE_SATAPI;
+            //disk->diskClass = ?
+
+            disk->id = nport;  
+
+            // name
+            
+            //disk->name = "SATAPI-TEST";
             sprintf ( (char *) name_buffer, "SATAPI-TEST-%d",nport);
             disk->name = (char *) strdup ( (const char *) name_buffer);  
 
+            disk->channel = ata.channel;  // Primary or secondary.
+            disk->dev_num = ata.dev_num;  // Master or slave.
 
-			disk->diskType = DISK_TYPE_SATAPI;
-			diskList[nport] = (unsigned long) disk;
+            // #todo: Check overflow.
+            diskList[nport] = (unsigned long) disk;
         }
 
         return (int) 0x80;
     }
+
+    // fail ??
+    // Is something wrong here?
 
     return 0; 
 }

@@ -101,7 +101,7 @@ int load_kernel (const char *file_name)
     // Load KERNEL.BIN on a physical address.
     // Search the file in the /LANDOS/ and /BOOT/ subdirectories
     // of the boot partition.
-
+    // See: fs.c
 
     Status = (int) load_path( Path, (unsigned long) kernel_pa );
 

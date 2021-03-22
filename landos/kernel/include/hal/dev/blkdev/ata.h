@@ -251,24 +251,29 @@ struct dev_nport dev_nport;
  * ata:
  *     Estrutura para o controle de execução do programa.
  */ 
-struct ata
+
+struct ata_d
 {
     //int used;
     //int magic;
 
+    uint8_t channel;  // Primary or secondary.
+    uint8_t dev_num;  // Master or slave.
+
     uint8_t chip_control_type;
-    uint8_t channel;
     uint8_t dev_type;  
-    uint8_t dev_num;
     uint8_t access_type;
     uint8_t cmd_read_modo;
     uint32_t cmd_block_base_address;
     uint32_t ctrl_block_base_address;
     uint32_t bus_master_base_address;
     uint32_t ahci_base_address;
-
 };
-struct ata ata;
+
+// Not a pointer.
+
+struct ata_d ata;
+
 
 
 /*
@@ -277,7 +282,6 @@ struct ata ata;
  * É uma estrutura para dispositivos de armazenamento.
  */
 
-typedef struct st_dev st_dev_t;
 typedef struct st_dev 
 {
     unsigned long dev_id;
@@ -292,13 +296,21 @@ typedef struct st_dev
     unsigned long dev_byte_per_sector;
     unsigned long dev_total_num_sector;
     
+    // #??
+    // 64bit type ?
+    // Maybe we need some other type of representation here.
+
     unsigned long long dev_total_num_sector_lba48;
-    
+
+
     unsigned long dev_size;
        
     struct st_dev *next;
+
 }st_dev;
 
+// Defining the type.
+typedef struct st_dev st_dev_t;
 
 
 

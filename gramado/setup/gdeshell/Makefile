@@ -75,17 +75,13 @@ rtl.o
 all: main.o all-c shell-link finalize clean
 	@echo "Ok?"
 
-
 main.o:
 	gcc  -c  main.c  $(CFLAGS) -I $(LIB) -I $(API) -o main.o
 
-
 all-c:
-
 	gcc  -c  shellui.c   $(CFLAGS) -I $(LIB) -I $(API)  -o shellui.o
 	gcc  -c  builtins.c  $(CFLAGS) -I $(LIB) -I $(API)  -o builtins.o
 	gcc  -c  net.c       $(CFLAGS) -I $(LIB) -I $(API)  -o net.o
-
 
 # Getting objects from libcore.
 	cp $(LIBOBJ)/crt0.o .
@@ -108,8 +104,6 @@ all-c:
 
 shell-link:
 	ld -m elf_i386 -T ../link.ld -o GDESHELL.BIN $(myObjects)    
-
-	
 
 finalize:
 	cp GDESHELL.BIN ../bin

@@ -66,20 +66,32 @@ typedef enum {
 	idedevicetypesSATAPI      // 3
 	
 }ide_device_types_t;	
- 
+
+
+
+
  //
  // IDE ports support
  //
- 
-struct ide_ports_d 
+
+// Structure for a ide port.
+
+struct ide_port_d 
 {
+
+    // #todo
+    // Obeject header ?
+
+    // Structure validation.
     int used;
     int magic;
 
+
+    // The port number.
     //int id;
     uint8_t id;
 
-    //PATA, SATA, PATAPI, SATAPI
+    // PATA, SATA, PATAPI, SATAPI
     int type;
 
     char *name;
@@ -103,7 +115,9 @@ struct ide_ports_d
     // o dispositivo conectado a porta.
     // podemos usar ponteiros para estruturas.
 };
-struct ide_ports_d ide_ports[4];
+
+// Four ports.
+struct ide_port_d  ide_ports[4];
 
 
 
@@ -141,7 +155,7 @@ struct ide_channel_d
 
 
 //estrutura para discos controlados pela controladora ide.
-typedef struct ide_disk_d ide_disk_t;
+
 struct ide_disk_d
 {
 
@@ -169,6 +183,8 @@ struct ide_disk_d
 	//
 };
 
+typedef struct ide_disk_d ide_disk_t;
+
 
 
 /*
@@ -179,7 +195,6 @@ struct ide_disk_d
  * Essa será a estrutura raiz para gerenciamento do controlador de IDE.
  */
 
-typedef struct ide_d ide_t;
 struct ide_d
 {
     // devemos colocar aqui um ponteiro para estrutura de informações 
@@ -192,23 +207,32 @@ struct ide_d
     struct ide_ports_d *secondary_master; 
     struct ide_ports_d *secondary_slave; 
 };
+
+typedef struct ide_d ide_t;
+
 struct ide_d IDE;
 
 
 
-typedef struct hdd_d hdd_t;
 struct hdd_d
 {
 	//...
 	int dummy;
 	//unsigned long hdd_handler_address;
 };
-//hdd_t *Hdd;
+typedef struct hdd_d hdd_t;
+
+//
+// == prototypes ========================================
+//
+
 
 
 void write_lba ( unsigned long address, unsigned long lba);   //ide
 void read_lba ( unsigned long address, unsigned long lba);    //ide
 
+
+// #maybe
 //int pio_rw_sector ( unsigned long buffer, unsigned long lba, int rw, int port ) ; 
 
 int 
