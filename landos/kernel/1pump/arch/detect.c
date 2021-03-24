@@ -22,6 +22,33 @@
 #include <kernel.h>
 
 
+int detect_IsQEMU(void)
+{
+
+
+    if( (void*) processor == NULL )
+    {
+        panic ("detect_IsQEMU: FAIL\n");
+        //return -1;
+    }
+
+    if ( processor->hvName[0] == CPUID_HV_QEMU_1 &&
+         processor->hvName[1] == CPUID_HV_QEMU_2 &&
+         processor->hvName[2] == CPUID_HV_QEMU_3 )
+    {
+         //panic ("detect_IsQEMU: TRUE\n");
+         g_is_qemu = TRUE;
+         return TRUE;
+    }
+
+    //panic ("detect_IsQEMU: FALSE\n");
+    g_is_qemu = FALSE;
+
+    return FALSE;
+}
+
+
+
 /*
  * cpu_get_parameters:
  *   Sonda a CPU pra saber seus parâmetros. (OEM)
@@ -100,8 +127,11 @@ int KeTestCPU (void)
 
 int hal_probe_cpu (void)
 {
+    unsigned long eax=0;
+    unsigned long ebx=0;
+    unsigned long ecx=0;
+    unsigned long edx=0;
 
-    unsigned long eax, ebx, ecx, edx;
 
     debug_print ("hal_probe_cpu:\n");
 
@@ -111,15 +141,16 @@ int hal_probe_cpu (void)
 
     // Check processor structure.
     if ( (void *) processor == NULL ){
-        panic ("hal_probe_cpu: struct\n");
+        panic ("hal_probe_cpu: [FAIL] processor\n");
     }
 
 
-    //Check vendor.
+    // Check vendor.
     cpuid ( 0, eax, ebx, ecx, edx ); 
 
-    //Confere se é intel.
-    //TestIntel:
+    //=======================
+    // Confere se é intel.
+    // TestIntel:
 
     if ( ebx == CPUID_VENDOR_INTEL_1 && 
          edx == CPUID_VENDOR_INTEL_2 && 
@@ -129,9 +160,9 @@ int hal_probe_cpu (void)
         return 0;
     }
 
-
-    //Confere se é Amd.
-    //TestAmd:
+    //=======================
+    // Confere se é Amd.
+    // TestAmd:
 
     if ( ebx == CPUID_VENDOR_AMD_1 && 
          edx == CPUID_VENDOR_AMD_2 && 
@@ -147,7 +178,7 @@ int hal_probe_cpu (void)
 
     processor->Type = Processor_NULL;
 
-    panic ("hal_probe_cpu: Processor not supported");
+    panic ("hal_probe_cpu: [FAIL] Processor not supported\n");
 
     //return (int) (-1);
 }
@@ -184,7 +215,7 @@ int hal_probe_processor_type (void){
     name[0] = ebx;
     name[1] = edx;
     name[2] = ecx;
-    name[3] = 0;	
+    name[3] = 0;
 	//salva na estrutura.
     processor->Vendor[0] = ebx;
     processor->Vendor[1] = edx;
@@ -227,7 +258,10 @@ const unsigned long CPUID_FLAG_MSR = (1 << 5);
  
 int cpuHasMSR (void)
 {
-    unsigned long a, b,c, d;
+    unsigned long a=0;
+    unsigned long b=0;
+    unsigned long c=0;
+    unsigned long d=0;
 
     cpuid(1, a, b, c, d);
     return (int) (d & CPUID_FLAG_MSR);
@@ -260,10 +294,15 @@ void show_cpu_info(void)
     //#todo
     //Ver a flag que indica qual processado encontramos.
 
+    // #bugbug
+    // Essa mesma função é usada pra
+    // mostrar as informações do cpu AMD.
+
     //See: x86info.c
     //if intel
     show_cpu_intel_parameters();
 }
+
 
 
 
@@ -275,18 +314,17 @@ unsigned long get_processor_feature(int i)
     
     Index = i;
 
-    
+
     if( (void*) processor == NULL ){
-        panic("get_processor_feature: processor");
+        panic("get_processor_feature: [FAIL] processor\n");
     }else{
-        if( processor->used != 1 || processor->magic != 1234 )
+        if( processor->used != TRUE || processor->magic != 1234 )
         {
-            panic("get_processor_feature: validation");
+            panic("get_processor_feature: [FAIL] validation\n");
         }
-        
-        
-        switch(Index)
-        {
+
+        switch (Index){
+
             //max feature id.
             case 1:
                 return (unsigned long) processor->MaxFeatureId;

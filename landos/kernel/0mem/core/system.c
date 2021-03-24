@@ -1449,6 +1449,12 @@ unsigned long systemGetSystemMetrics ( int index )
            //refresh_screen();
            return (unsigned long) WindowServer_initialized; 
            break;
+        
+        // is quemu
+        case 300:
+            return (unsigned long) g_is_qemu;
+            break;
+           
 
         // ...
                 

@@ -432,6 +432,10 @@ int x86main (void)
     KeInitPhase = 0;
     gSystemStatus = 1;
     gSystemEdition = 0;
+    
+    
+    g_is_qemu = FALSE;
+
 
     debug_print ("====\n");
     debug_print ("x86main:\n");

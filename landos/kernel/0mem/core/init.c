@@ -787,6 +787,18 @@ int init (void){
     };
 
 
+    //
+    // qemu
+    //
+
+    // Check if we are running on qemu.
+    // and set flag.
+
+    int isQEMU=FALSE;
+    isQEMU = detect_IsQEMU();
+    if( isQEMU == TRUE ){
+        printf ("Running on QEMU\n");
+    }
 
 
     PROGRESS("Kernel:2:14\n"); 

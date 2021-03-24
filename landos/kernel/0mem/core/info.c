@@ -81,7 +81,8 @@ void KiInformation (void)
         //case GRAMADO_CALIFORNIA:
         // ...
         default:
-            printf ("INFO: mode={%d} current_mode not defined!\n", current_mode);
+            printf ("INFO: mode={%d} current_mode not defined!\n", 
+                current_mode);
             goto fail;
             break;
     };

@@ -5,7 +5,7 @@ PRODUCT_NAME  = Gramado
 EDITION_NAME  = Land
 VERSION_MAJOR = 1
 VERSION_MINOR = 0
-VERSION_BUILD = 225
+VERSION_BUILD = 226
 KERNELVERSION = $(VERSION_MAJOR)$(if $(VERSION_MINOR),.$(VERSION_MINOR)$(if $(VERSION_BUILD),.$(VERSION_BUILD)))
 
 # Documentation.
@@ -196,6 +196,7 @@ gramado-cmd:
 	-sudo cp gramado/cmd/bin/CAT.BIN        base/
 #	-sudo cp gramado/cmd/bin/FALSE.BIN      base/
 	-sudo cp gramado/cmd/bin/REBOOT.BIN     base/
+	-sudo cp gramado/cmd/bin/SHUTDOWN.BIN     base/
 #	-sudo cp gramado/cmd/bin/TRUE.BIN       base/
 
 #	-sudo cp gramado/cmd/bin/SHOWFUN.BIN    base/

@@ -25,11 +25,14 @@
 
 void get_cpu_amd_parameters (void)
 {
-    unsigned long eax=0; 
-    unsigned long ebx=0; 
+
+    // Used by cpuid.
+    unsigned long eax=0;
+    unsigned long ebx=0;
     unsigned long ecx=0;
     unsigned long edx=0;
 
+    // name.
     unsigned long name[32];
 
     int MASK_LSB_8 = 0xFF;
@@ -40,6 +43,8 @@ void get_cpu_amd_parameters (void)
     // We need to build this routine to get the amd cpu info.
 
 
+    // #todo
+    // Check processor structure pointer validation.
 
 
     debug_print ("get_cpu_amd_parameters: [TODO]\n");
@@ -137,7 +142,15 @@ void get_cpu_amd_parameters (void)
     //CPUID Fn0000_000D_ECX_x3E Processor Extended State Enumeration (ECX=62)
     //CPUID Fn0000_000D_EDX_x3E Processor Extended State Enumeration (ECX=62)
     
-    
+    // ==========================================================
+    // hypervisor level 4000_0000h
+    cpuid ( 0x40000000, eax, ebx, ecx, edx );
+    processor->hvName[0] = ebx;
+    processor->hvName[1] = ecx;
+    processor->hvName[2] = edx;
+    processor->hvName[3] = 0;
+
+
     //========================================
     //cpuid ( 0x80000000, eax, ebx, ecx, edx);
     // eax: largest extended function number.
@@ -172,7 +185,7 @@ void get_cpu_amd_parameters (void)
     processor->BrandName[2] = ecx;
     processor->BrandName[3] = edx;
 	//printf("CPU={%s", &name[0]);
-	//printf("%s",&name[0]);		
+	//printf("%s",&name[0]);
 
    /*name part 2*/
     cpuid ( 0x80000003, eax, ebx, ecx, edx);

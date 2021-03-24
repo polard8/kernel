@@ -63,8 +63,8 @@ int main ( int argc, char *argv[] ){
     // See: https://wiki.osdev.org/Shutdown
 
 
-     //int isQEMU = FALSE;
-     //isQEMU = rtl_get_system_metrics(300);
+    int isQEMU = FALSE;
+    isQEMU = rtl_get_system_metrics(300);
 
 
     // In Bochs, and older versions of QEMU(than 2.0), you can do the following:
@@ -72,10 +72,17 @@ int main ( int argc, char *argv[] ){
     // libio_outport16(0xB004, 0x2000);
 
     // In newer versions of QEMU, you can do shutdown with:
-    //if (isQEMU==TRUE){
+    if (isQEMU==TRUE){
         // outw(0x604, 0x2000);
-    //    libio_outport16(0x604, 0x2000);
-    //}
+        libio_outport16(0x604, 0x2000);
+    }
+
+    if (isQEMU != TRUE)
+    {
+        printf ("shutdown: [FAIL] Not running on qemu.\n");
+        //return 0;
+        exit(0);
+    }
 
 
     // In Virtualbox, you can do shutdown with:

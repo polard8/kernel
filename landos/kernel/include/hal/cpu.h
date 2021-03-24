@@ -53,8 +53,8 @@
 
 struct processor_d   
 {
-    object_type_t  objectType;
-    object_class_t objectClass;
+    object_type_t   objectType;
+    object_class_t  objectClass;
 
     int used;
     int magic;
@@ -78,9 +78,9 @@ struct processor_d
 	
 	//@todo: ULONG MHz;
 	
-	
-	//0x0.
-	//cpuid vars.
+
+    // 0x0.
+    // cpuid vars.
     unsigned long Vendor[4];
 
     //0x1(eax)
@@ -144,8 +144,12 @@ struct processor_d
 	//30 n/a Reserved
 	//31 PBE Pend. Brk. En.	
 	//...
-	
-	
+
+
+    // hypervisor level 4000_0000h
+    unsigned long hvName[4];
+
+
 	//0x80000000 (eax) (Max feature id.).
 	//Maximum meaningful value of InfoType for extended function CPUID information.
     unsigned long MaxFeatureId;
@@ -189,7 +193,7 @@ struct processor_d
 
 
 	// Next.
-    struct processor_d *next;
+    struct processor_d  *next;
 };
 struct processor_d *processor;
 
@@ -280,14 +284,13 @@ unsigned long processorsList[PROCESSORS_MAX_COUNT];
 
 
 
+//
+// == prototypes ===========================================
+//
 
 
+int detect_IsQEMU(void);
 
-
-
-/*
- * Prototypes.
- */
  
 int cpuHasMSR (void);
 void cpuGetMSR(unsigned long msr, unsigned long *lo, unsigned long *hi);

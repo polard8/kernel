@@ -41,7 +41,10 @@ void show_cpu_intel_parameters (void)
     printf("            Vendor: {%s}\n", &processor->Vendor[0] );
     printf("               Cpu: {%s}\n", &processor->BrandName[0] );
 
-
+    // #test
+    // #todo: pegamos o vhName apenas para AMD, precisamos
+    // fazer o mesmo para intel.
+    printf("                HV: {%s}\n", &processor->hvName[0] );
 
     printf("       Stepping ID: {%d}\n", 
         (unsigned long) processor->Stepping_ID );
