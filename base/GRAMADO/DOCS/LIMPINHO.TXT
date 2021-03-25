@@ -13,7 +13,7 @@ que não funcione."
 
 Bem, mas todo mundo aqui sabe que existem  códigos feios, 
 minha fala não acrescenta nada até agora. 
-O quero dizer é que com o mesmo nível de falta de zelo foram feitas 
+O que quero dizer é que com o mesmo nível de falta de zelo foram feitas 
 muitas das frameworks que o pessoal da web tem usado hoje em dia.
 
 Não acredito mais que exita linguagem feia. São os malabarismos e a rebuscagem 
