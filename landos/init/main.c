@@ -260,6 +260,26 @@ void ExecRedPillApplication(void)
 {
     int Status = -1;
 
+
+    //
+    // mouse
+    //
+
+    // Are we running on qemu?
+    // Let's initialize the ps/2 support,
+    // This way we can use the mouse.
+
+    int isQEMU = FALSE;
+    isQEMU = rtl_get_system_metrics(300);
+    if (isQEMU==TRUE){
+        debug_print ("init.bin: Initializing ps2/support\n");
+        gramado_system_call ( 350, 1, 0, 0 );
+    }
+
+    //
+    // launcher
+    //
+
     debug_print ("init.bin: Launching launcher.bin\n");
 
     // We will not wait here.
@@ -442,6 +462,7 @@ int main ( int argc, char *argv[] )
     // Get the value in the file.
 
     // Get the current runlevel.
+    // #todo: Create rtl_get_current_runlevel()
 
     __current_runlevel = (int) gramado_system_call ( 288, 0, 0, 0 );
 

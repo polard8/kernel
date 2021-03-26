@@ -387,9 +387,22 @@ sysmonProcedure (
 
 
         //case 30: 
-        //case MSG_MOUSEKEYDOWN:
+        case MSG_MOUSEKEYDOWN:
             //printf("nothing\n");
-            //break;
+            switch (long1)
+            {
+                case 1:
+                    if ( window == bar_button_1 || 
+                         window == bar_button_2 )
+                    {
+                        gramado_system_call ( 9900,   
+                            (unsigned long) window, 
+                            (unsigned long) window, 
+                            (unsigned long) window );
+                    }
+                break;
+            }
+            break;
 
         //case 31:
         case MSG_MOUSEKEYUP:

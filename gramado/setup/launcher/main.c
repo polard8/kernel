@@ -90,31 +90,16 @@ launcherProcedure (
             goto done;
             break;
 
-		// MSG_MOUSEKEYDOWN
-		case 30:
-		    switch (long1)
-			{
-				//botão 1.
+
+        // MSG_MOUSEKEYDOWN
+        case 30:
+            switch (long1)
+            {
+                //botão 1.
                 case 1:
-                    if ( window == launcher_button_1 )
-                    {
-                        gramado_system_call ( 9900,   
-                            (unsigned long) window, 
-                            (unsigned long) window, 
-                            (unsigned long) window );
-                            break;
-                    }
-
-                    if ( window == launcher_button_2 )
-                    {
-                        gramado_system_call ( 9900,   
-                            (unsigned long) window, 
-                            (unsigned long) window, 
-                            (unsigned long) window );
-                            break;
-                    }
-
-                    if ( window == launcher_button_3 )
+                    if ( window == launcher_button_1 || 
+                         window == launcher_button_2 || 
+                         window == launcher_button_3 )
                     {
                         gramado_system_call ( 9900,   
                             (unsigned long) window, 
@@ -295,7 +280,8 @@ int main ( int argc, char *argv[] )
                            left, top, width, height,  
                            0, 0, COLOR_BLUE2CYAN, COLOR_BLUE2CYAN ); 
 
-    if ( (void *) hWindow == NULL ){
+    if ( (void *) hWindow == NULL )
+    {
         printf ("launcher: hWindow fail\n");
         gde_end_paint();
         goto fail;
@@ -311,7 +297,7 @@ int main ( int argc, char *argv[] )
     //--
 
 
-    gde_draw_text ( main_window, 8, 8, COLOR_WHITE, "Gramado OS 1.0");
+    gde_draw_text ( main_window, 8, 8, COLOR_WHITE, "Gramado OS 1.0" );
 
 
     // =========
@@ -387,9 +373,11 @@ int main ( int argc, char *argv[] )
 
     //
 
-
     gde_set_focus(hWindow);
+    gde_show_window (hWindow);
 
+    // #bugbug
+    // Is it working ?
     gde_show_backbuffer();
 
 
