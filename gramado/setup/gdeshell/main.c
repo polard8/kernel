@@ -2095,19 +2095,26 @@ do_compare:
 
     // gethostname 
     char *my_hostname;
-    char hostbuffer[256]; 
+    char hostbuffer[64]; 
     if ( gramado_strncmp ( prompt, "gethostname", 11 ) == 0 )
     {
+        //#obs: Isso funciona.
         gethostname (hostbuffer, sizeof(hostbuffer));
-        printf(">>> ");  printf (hostbuffer);  printf("\n");
-		//#obs: Isso funciona.
-		//vai colocar num buffer ba libc
-		//my_hostname = ( char *) __gethostname();
-		//printf(">> ");
-		//printf (my_hostname);
-		//printf("\n");
+        printf (hostbuffer);
+        //printf(">>> ");  
+        //printf (hostbuffer);  
+        printf("\n");
+
+        //#obs: Isso funciona.
+        //vai colocar num buffer ba libc
+        //my_hostname = ( char *) __gethostname();
+        //printf(">> ");
+        //printf (my_hostname);
+        //printf("\n");
+
         goto exit_cmp;
     }
+
 
     /*
     // getusername 
@@ -3024,19 +3031,17 @@ do_compare:
 
 
 
-    // user info
-    // Mas mostraremos as informa��es so usu�rio atual.
-    // IN: service, user id.
-    if ( gramado_strncmp( prompt, "user-info", 9 ) == 0 )
-    {
-        gramado_system_call (156, 0,0,0);
+    // user-info
+    // Show information for the current user.
+    // IN: service, user id. ???? wrong
+    if ( gramado_strncmp( prompt, "user-info", 9 ) == 0 ){
+        gramado_system_call (156,0,0,0);
         goto exit_cmp;
     }
 
 
     // volume-info
-    if ( gramado_strncmp( prompt, "volume-info", 11 ) == 0 )
-    {
+    if ( gramado_strncmp( prompt, "volume-info", 11 ) == 0 ){
         shellShowVolumeInfo();
         goto exit_cmp;
     }
@@ -3044,8 +3049,7 @@ do_compare:
 
 	// window
 	// Testing kgws.
-    if ( gramado_strncmp( prompt, "window", 6 ) == 0 )
-    {
+    if ( gramado_strncmp( prompt, "window", 6 ) == 0 ){
         shellShowWindowInfo();
         goto exit_cmp;
     }

@@ -71,34 +71,27 @@ void ShowUserInfo (int user_id){
 
     if ( user_id < 0 || user_id >= USER_COUNT_MAX )
     {
+        printf ("ShowUserInfo: [FAIL] user_id\n");
         return;
     }
 
+    // Structure
 
     __User = (void *) userList[user_id];
 
     if ( (void *) __User == NULL ){
         printf ("ShowUserInfo: Error\n");
         return;
-        
-	}else{
-	    
-	    //buffer
-	    printf(__User->__username);
-	     
-		printf (" Id={%d} UserType={%d} \n", 
-		    __User->userId, 
-		    __User->userType );
-	
+    }else{
 
-		printf (" usession={%d} room={%d} desktop={%d} \n", 
-		    __User->usessionId, 
-		    __User->roomId,
-		    __User->desktopId );
-
-	    //...
+        printf(__User->__username);
+        printf (" Id={%d} UserType={%d} \n", 
+            __User->userId, __User->userType );
+        printf (" usession={%d} room={%d} desktop={%d} \n", 
+            __User->usessionId, __User->roomId, __User->desktopId );
+           // ...
     };
-	
+
     refresh_screen();
 }
 
@@ -129,7 +122,7 @@ void config_user (void)
  
 void *CreateUser ( char *name, int type ){
 
-    struct user_info_d *New;
+    struct user_info_d  *New;
 
     int Index = 0;
     int i=0;
@@ -140,33 +133,52 @@ void *CreateUser ( char *name, int type ){
     // only for a wrong name.
 
     // #alert
-    if ( (void*) name == NULL )
-    {
+    if ( (void*) name == NULL ){
         debug_print ("CreateUser: [FAIL] name\n");
+        panic ("CreateUser: [FIXME] name is not valid\n");
     }
 
     // #alert
-    if (*name == 0)
-    {
+    if (*name == 0){
         debug_print ("CreateUser: [FAIL] *name\n");
+        panic ("CreateUser: [FIXME] *name is not valid\n");
     }
 
+
+    // #todo
+    // We need to check the limits for the name size.
+    // Maybe copy the name into a local buffer.
+    // strlen(name);
+
+
+    // Structure.
 
     New = (void *) kmalloc ( sizeof(struct user_info_d) ); 
 
     if ( (void *) New == NULL ){
-        panic ("CreateUser: New");
+        panic ("CreateUser: New\n");
     } else {
-        New->used = 1;
+
+        New->used  = TRUE;
         New->magic = 1234;
 
         New->path = NULL;
         
-        if ( (void*) name != NULL ){
+        // The name.
+        // The name size.
+
+        if ( (void*) name != NULL )
+        {
             strcpy( New->__username, (const char *) name);
             New->userName_len = strlen(name);
+            
+            // #todo
+            // Check limits for this size.
+            // There is a standard definition for that size.
+            //if ( New->userName_len >= ???? ){}
         }
  
+
         New->userType = type;  
 
         //Session.
@@ -377,7 +389,8 @@ void init_user_info (void){
     // It's a global structure. 
     // (default,interactive)
 
-    //DefaultUser = (void *) CreateUser (default_user_name, USER_TYPE_INTERACTIVE);
+
+    // DefaultUser = (void *) CreateUser (USER_DEFAULT, USER_TYPE_INTERACTIVE);
     DefaultUser = (void *) CreateUser (USER_DEFAULT, USER_TYPE_INTERACTIVE);
 
     if ( (void *) DefaultUser == NULL ){

@@ -595,7 +595,9 @@ network_procedure (
 void networkSetstatus (int status)
 {
     if ( status < 0 || status > 1 )
+    {
         return;
+    }
 
     network_status = (int) status;
 }
@@ -698,24 +700,41 @@ int networkInit (void)
     if ( (void *) HostInfo == NULL ){
         panic("networkInit: HostInfo\n");
     }else{
-        HostInfo->used  = TRUE;
-        HostInfo->magic = 1234;
+
         // #todo object header
 
-        // #todo
-        // We need a name.
-        
-        HostInfo->__hostname[0] = 'h';
-        HostInfo->hostName_len = (size_t) HOST_NAME_MAX;
+        HostInfo->used  = TRUE;
+        HostInfo->magic = 1234;
+
+        //
+        // hostname
+        //
+
+        //HostInfo->__hostname[0] = 'h';
+        //HostInfo->hostName_len = (size_t) HOST_NAME_MAX;
+
+        sprintf(HostInfo->__hostname,"gramado");
+        HostInfo->hostName_len = (size_t) strlen("gramado");
+        if ( HostInfo->hostName_len >= HOST_NAME_MAX )
+        {
+            panic("networkInit: hostname\n");
+        }
+
 
         HostInfo->hostVersion = NULL;
 
         // #todo
         // Call some helpers to get these values.
+        // Maybe the init process needs to setup these values.
+        // It's because these values are found in files.
 
         HostInfo->hostVersionMajor    = 0;
         HostInfo->hostVersionMinor    = 0; 
         HostInfo->hostVersionRevision = 0;
+
+        // #todo
+        // Where is this information?
+
         HostInfo->hostArchitecture    = 0; 
 
         // ...
@@ -735,6 +754,7 @@ int networkInit (void)
     if ( (void *) LocalHostHTTPSocket == NULL ){
         panic ("networkInit: Couldn't create LocalHostHTTPSocket\n");
     }else{
+
         LocalHostHTTPSocket->ip   = 0;
         LocalHostHTTPSocket->port = 0;
         // ...
@@ -750,7 +770,7 @@ int networkInit (void)
     socket_init();
 
 	// Status
-    networkSetstatus (1);
+    networkSetstatus(1);
 
     debug_print ("networkInit: done\n");
     
