@@ -823,6 +823,7 @@ hangz:
 skip_test:
 
 
+/*
 #ifdef TEDITOR_VERBOSE
     gde_set_cursor (0,0);
     printf("\n");
@@ -830,7 +831,7 @@ skip_test:
     printf("main: # argv0={%s}\n", argv[0] );
     printf("main: # argv1={%s}\n", argv[1] );
 #endif
-
+*/
 
     //prompt_put_string("Testing ...");
     //prompt_flush(0);
@@ -863,24 +864,21 @@ skip_test:
 
     teditorTeditor();
 
-    // device limits
+
+    // Device limits.
+
     unsigned long deviceWidth  = gde_get_system_metrics(1);
     unsigned long deviceHeight = gde_get_system_metrics(2);
-
 
     if ( deviceWidth == 0 || deviceHeight == 0 ){
         printf ("GRAMCODE.BIN: [FAIL] device metrics\n");
         exit(1);
     }
 
-
-	//
-	// Window
-	//
-
+    // Main window
     // Forget the old configuration.
     // Let's do this again. full screen.
-    
+
     wpWindowLeft   = 0;
     wpWindowTop    = 0;
     wsWindowWidth  = deviceWidth;
@@ -992,7 +990,7 @@ skip_test:
 
     // #test 
     
-    //Terminal window.
+    // Terminal window.
     // #importante
     // Definindo a janela como sendo uma janela de terminal.
     // Isso faz com que as digitações tenham acesso ao 
@@ -1000,20 +998,22 @@ skip_test:
     // para essa janela e não apenas ao procedimento de janela do sistema.
     // # provavelmente isso marca os limites para a 
     // impressão de caractere em modo terminal 
-        
-    system_call ( SYSTEMCALL_SETTERMINALWINDOW, 
-         (unsigned long) editboxWindow, 
-         (unsigned long) editboxWindow, 
-         (unsigned long) editboxWindow );
+
+    system_call ( 
+        SYSTEMCALL_SETTERMINALWINDOW, 
+        (unsigned long) editboxWindow, 
+        (unsigned long) editboxWindow, 
+        (unsigned long) editboxWindow );
 
 
-
+    // cursor
     gde_set_cursor (8,8);
     
+    // cursor ?
     system_call ( 244, 
         (unsigned long) 0, (unsigned long) 0, (unsigned long) 0 ); 
-        
-    
+ 
+
     //Isso funcionou,
     //printf ("testing printf");
     //prompt_put_string("Testing prompt ...");
@@ -1059,6 +1059,7 @@ skip_test:
 
     // Se nenhum nome de arquivo foi especificado, 
     // então começamos a digitar.
+
     if ( (char *) argv[1] == NULL )
     {
         goto startTyping;
@@ -1066,10 +1067,14 @@ skip_test:
 
     // Ok, let's open the file
     
-    gde_set_cursor (0,0);
-    
-    printf("\n");
-    printf("Loading file ...\n");
+    gde_set_cursor(0,0);
+
+
+    debug_print ("GRAMCODE.BIN: Loading file ...\n");
+
+    // printf("\n");
+    // printf("Loading file ...\n");
+
 
     fp = fopen ( (char *) argv[1], "rb" );
 

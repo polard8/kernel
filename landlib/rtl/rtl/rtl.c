@@ -159,7 +159,9 @@ unsigned long rtl_to_ulong (long ch)
 // Let's build another routines that returns a pointer
 // for a event structure.
 
-int rtl_get_event (void)
+// #todo: helper: xxxScanApplicationQueue()
+
+int xxxScanApplicationQueue(void)
 {
     // clear
     RTLEventBuffer[0] = 0;
@@ -193,12 +195,24 @@ int rtl_get_event (void)
     return TRUE;
 }
 
+int rtl_get_event (void)
+{
+    int Status=-1;
+    
+    // #todo: Com esse if podemos selecionar mais de um modelo 
+    // para pegar input.
+    // if( ....
+    
+    Status = xxxScanApplicationQueue();
+
+    return (int) Status;
+}
+
 
 struct rtl_event_d *rtl_next_event (void)
 {
     // Not a pointer.
     struct rtl_event_d ev;
-
 
     // clean
     ev.window = NULL;

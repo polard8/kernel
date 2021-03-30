@@ -51,9 +51,19 @@ int current_mode;
 
 #include "view/window.h"
 #include "view/bmp.h"
+
+// h:0.0
 #include "view/screen.h"   // X-like
 #include "view/display.h"  // X-like
 #include "view/host.h"     // X-like h:0.0
+
+// Teremos isso aqui no window server,
+// kgws é outro ws par ao ambiente de setup e tera 
+// seu próprio gerenciamento.
+
+#include "view/security.h"
+
+
 #include "view/gui.h"
 #include "view/comp.h"
 #include "view/event.h"    // view inputs
@@ -106,6 +116,7 @@ struct gws_graphics_d
     
     struct gui_d  *gui;
 
+    // ...
 };
 struct gws_graphics_d *Currentgraphics;
 
@@ -255,6 +266,8 @@ void gwssrv_show_backbuffer (void);
 
 char *gwssrv_get_version(void);
 
+
+// init
 int gwsInit(void);
 
 unsigned long gws_get_device_width(void);

@@ -38,11 +38,22 @@ __HEAD
 
 ;;==================================
 ;; _kernel_begin:
+;;     Boot x86 entry point.
 ;;     The kernel starts here for x86 arch.
 ;;
 
 global _kernel_begin 
 _kernel_begin:
+
+    ;; #bugbug
+    ;; Porque estamos usando um jmp, sem nem mesmo configurarmos
+    ;; os registradores de segmento. Estamos confiando na configuração
+    ;; feita pelo BL.BIN.
+    ;; Bom mesmos seria começarmos com a configuração da gdt e dos 
+    ;; registradores de segmento.
+    
+    ;; #todo
+    ;; Precismos carregar a gdt o mais rápido possível.
 
     JMP START
 
@@ -96,13 +107,8 @@ align 4
 ; Restart the boot routine.
 START:
 
-    ; #test: Clean flags.
-    
-    ;push dword 0
-    ;popfd 
-
-    cli
     cld
+    cli
 
     ; IN: 
     ; al = 'G' (Graphic Mode).

@@ -403,6 +403,7 @@ int fflush (FILE *stream)
 
 // real flush.
 // called by fflush();
+
 int __fflush (FILE *stream)
 {
     ssize_t nwrite = -1;
@@ -417,7 +418,10 @@ int __fflush (FILE *stream)
         debug_print( "__fflush: [FAIL] stream\n");
         return (int) (-1);
     }else{
+        
+        // #todo
         // Check something!
+        // ...
     };
 
 
@@ -537,32 +541,32 @@ int __fflush (FILE *stream)
 
 int ____bfill (FILE *stream){
 
-    int nbyte = 0;
+    int n_read = 0;
 
 
-    // struct
     if ( (void *) stream == NULL )
     {
         debug_print ("____bfill: [FAIL] struct \n");
         printf      ("____bfill: [FAIL] struct \n");
-        
-        stream->_cnt = 0;
         return (int) (-1);
+    }
 
-    }else{
+    // Check buffer size.
+    if ( stream->_lbfsize != BUFSIZ )
+    {
+        debug_print ("____bfill: [FAIL.DEBUG] _lbfsize \n");
+        printf      ("____bfill: [FAIL.DEBUG] _lbfsize %d *hang\n",
+            stream->_lbfsize);
 
-        // Check buffer size.
-        if ( stream->_lbfsize != BUFSIZ )
-        {
-            debug_print ("____bfill: [FAIL] _lbfsize \n");
-            printf      ("____bfill: [FAIL] _lbfsize %d *hang\n",stream->_lbfsize);
-            stream->_cnt = 0; 
-            exit(1); //debug
-            //return EOF;
-        }
-        // ...
-    };
-
+        stream->_cnt = 0; 
+        
+        // #debug
+        // provisorio
+        exit(1); 
+        
+        //return EOF;
+    }
+    // ...
 
     //
     // == Read file ============================
@@ -594,10 +598,10 @@ int ____bfill (FILE *stream){
     // Se o buffer acabou é porque o ponteiro se deslocou até o fim.
     // Temos que reiniciar.
     
-    stream->_cnt = BUFSIZ-1;
-    stream->_p = stream->_base;
-    stream->_w =0;
-    stream->_r =0;
+    stream->_cnt = (BUFSIZ-1);
+    stream->_p   = stream->_base;
+    stream->_w   = 0;
+    stream->_r   = 0;
     
     // cnt tem a quantidade disponível para
     // leitura.
@@ -605,17 +609,28 @@ int ____bfill (FILE *stream){
     // A intenção dessa rotina é reencher o buffer em ring3,
     // pegando uma nova parte do arquivo que está em ring0.
 
-    stream->_cnt = (int) read ( 
-                             fileno(stream), 
-                             stream->_p,
-                             stream->_cnt ); 
+     
+    n_read = (int) read ( 
+                       fileno(stream), 
+                       stream->_p,
+                       stream->_cnt ); 
 
+
+    // saving
+    stream->_cnt = n_read;
+    
     // Read fail ou fim do arquivo
-    if (stream->_cnt < 0)
+    if (n_read < 0)
     {
         debug_print ("____bfill: [FAIL] read fail, nothing to read!\n");
         printf      ("____bfill: [FAIL] read fail, nothing to read!\n");
+        
         stream->_cnt = 0;
+
+        // #todo:
+        // flags, error, eof ...
+        // stream->
+        
         return EOF;
     }
 
@@ -623,26 +638,51 @@ int ____bfill (FILE *stream){
     // Couldn't read.
     // nada foi lido. Mas pode não ser ruin ... pois o arquivo
     // pode existir e estar vazio eu chegado ao fim.
-    if (stream->_cnt == 0)
+    // #todo
+    // Nesse caso um arquivos pode simplesmente ter chegado ao fim,
+    // e não ha erro nisso.
+
+    if (n_read == 0)
     {
-        debug_print ("____bfill: [FAIL] read fail. Zero bytes\n");
-        printf      ("____bfill: [FAIL] read fail. Zero bytes\n");
+        debug_print ("____bfill: [DEBUG] Couldn't read. No bytes\n");
+        
+        // #test
+        // No debug message for now.
+        // printf      ("____bfill: [FAIL] read fail. Zero bytes\n");
+        
+        // #todo:
+        // No more bytes. We are in the end of file.
+        stream->_cnt = 0;
+
+        // #todo:
+        // flags, error, eof ...
+        // stream->
+        
         return EOF;
     }
 
     // Overflow
     // Isso pode corromper memória.
-    if (stream->_cnt > BUFSIZ-1)
+    if (n_read > BUFSIZ-1)
     {
-        debug_print ("____bfill: [BUGBUG] read fail. too much bytes\n");
-        printf      ("____bfill: [BUGBUG] read fail. too much bytes\n");
-        exit (1);
+        debug_print ("____bfill: [ERROR.OVERFLOW] read fail. too much bytes\n");
+        printf      ("____bfill: [ERROR.OVERFLOW] read fail. too much bytes\n");
+        
+        // #debug
+        // #todo: Isso eh provisorio ...
+        
+        exit(1);
     }    
-    
+
     // Retornamos a quantidade disponível para leitura.
     // Isso será usado por __getc.
+
+    // #todo:
+    // flags, error, eof ...
+    // stream->
     
-    return (int) stream->_cnt;
+    return (int) n_read;
+    //return (int) stream->_cnt;
 }
 
 

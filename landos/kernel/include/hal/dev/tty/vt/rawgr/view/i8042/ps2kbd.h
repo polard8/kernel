@@ -196,6 +196,11 @@ struct ps2_keyboard_d
     keyboard_type_t type;
 
     int dummy;
+
+    // #todo
+    // int control_fd;
+    // int input_fd;
+    // pid_t pid;
 };
 
 

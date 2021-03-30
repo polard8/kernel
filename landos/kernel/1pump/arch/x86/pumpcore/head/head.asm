@@ -105,7 +105,7 @@ extern _x86main
 ;;    ecx = BootBlock pointer.
 ;;    edx = BootBlock pointer.
 ;;    ebp = BootBlock pointer.
-;; Called by _kernel_begin in hwi/init/x86/boot.asm
+;; Called by _kernel_begin in head_32.asm
 
 head_init:
 
@@ -141,28 +141,28 @@ head_init:
 
     ;; This flag tell us that we are in graphics mode.
     cmp al, byte 'G'
-    je .useGUI
+    je .LuseGUI
 
 ;; Fail. No GUI.
-.fail_nogui:
-    mov byte [0xb8000], byte "t"
+.Lfail_nogui:
+    mov byte [0xb8000], byte "T"
     mov byte [0xb8001], byte 9
-    mov byte [0xb8002], byte "m"
+    mov byte [0xb8002], byte "M"
     mov byte [0xb8003], byte 9
+.Lnogui_hang:
     cli
-.nogui_hang:
     hlt
-    jmp .nogui_hang
+    jmp .Lnogui_hang
 
 ;;
 ;; == Use GUI =======================================
 ;;
 
-.useGUI:
+.LuseGUI:
 
     ;; Check again.
     cmp al, byte 'G'
-    jne .fail_nogui
+    jne .Lfail_nogui
 
     ;; #important
     ;; Saving flags.
@@ -261,6 +261,7 @@ head_init:
     ;; gdt, idt, ldt, tss+tr.
 
     ;; No interrupts for now.
+    ;; It si already done is head_32.asm
 
     cli
     
@@ -275,6 +276,13 @@ head_init:
     ;; We have another configuration in another place.
 
     lgdt [_GDT_register] 
+
+
+    ;; #todo
+    ;; Vamos tentar colocar aqui a configuração dos registradores
+    ;; de segmento. Essa configuração no momento está logo abaixo.
+    ;; Pelo menos os segmentos de dados.
+
 
 
     ;;
@@ -480,8 +488,18 @@ pitEarlyInitialization:
     mov dr7, eax
     ;; ...
 
+
+    ;;
+    ;; Data
+    ;;
+    
+
     ;; Data segments for ring 0.
     ;;  ...
+    
+    ;; #todo
+    ;; Devemos antecipar essa configuração o máximo possível,
+    ;; colocarmos perto do carregamento do gdtr.
     
     ;xor eax, eax
     mov ax, word 0x10  
@@ -516,9 +534,21 @@ pitEarlyInitialization:
     mov dword [_KernelStatus], dword 1
     ;; mov dword [_KernelStatus], dword 0
 
+
+    ; # test: 
+    ; Clean flags.
+    ; # perigo
+    ; Como ficam as interrupções?
+
+    ;; push dword 0
+    ;; popfd 
+
+
     ;;
     ;; == Calling the C part ===============================
     ;;
+
+;; .Lcall_c_code:
 
     ;; We only have one argument. The arch type.
     ;; See: kernel/main.c 
@@ -531,15 +561,21 @@ pitEarlyInitialization:
     xor ecx, ecx
     xor edx, edx
 
+    ;; #bugbug
+    ;; We need to check what kind of jum we can use in this case.
+    ;; For AMD and for Intel.
+    ;; 32 ? 64 ?
+    ;; call ? ret ?
+    ;; There are limitations.
+
     call _kernel_main
 
     ;; We really don't wanna reach this point.
     ;; We are in graphics mode and we can't print an error message.
     ;; We will not return to boot.asm.
 
-    cli
-
 han__g:
+    cli
     hlt
     jmp han__g
 

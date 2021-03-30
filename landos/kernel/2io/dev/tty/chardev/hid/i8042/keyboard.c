@@ -349,12 +349,13 @@ irq1_KEYBOARD (void)
     // current_stdin os scancodes obtidos na digitação.
 
     // pt-br keyboard.
-    if (abnt2 == 1){
+    // Defined in kernel.h
+    if (abnt2 == TRUE){
         abnt2_keyboard_handler();
         return;
     }
 
-    if (abnt2 != 1){ panic("irq1_KEYBOARD: not abnt2\n"); }
+    if (abnt2 != TRUE){ panic("irq1_KEYBOARD: not abnt2\n"); }
 }
 
 

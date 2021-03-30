@@ -197,8 +197,10 @@ typedef enum {
 struct thread_d 
 {
     // Object control.
-    object_type_t  objectType;
-    object_class_t objectClass;
+
+    object_type_t   objectType;
+    object_class_t  objectClass;
+
     struct object_d *object;
 
     int used;
@@ -218,8 +220,8 @@ struct thread_d
     // Thread id and owner process id.
     int tid;
 
-    // Owner process.    
-    struct process_d *process; 
+    // Owner process.
+    struct process_d  *process; 
     int ownerPID;
 
 
@@ -228,8 +230,16 @@ struct thread_d
     // (SYSTEM, PERIODIC, RR, IDLE).
     thread_type_t type;
 
-    //flag, Estado atual da tarefa. ( RUNNING, DEAD ...).
+    //flag, Estado atual da tarefa. ( RUNNING, DEAD ... ).
     thread_state_t state;    
+
+
+    // #todo
+    // Identifica uma thread como sendo uma thread que 
+    // pertence à um servidor. Então as threads desse tipo 
+    // ganham mais prioridade e mais tempo de processamento.
+
+    // int isServerThread;
 
 
 	// flag. 
@@ -314,6 +324,8 @@ struct thread_d
 	// Usars uma estrutura.
 	// #todo: 
 	// Isso deve virar um ponteiro de estrutura.
+    // ?? O que faremos, pois temos mais de uma arquitetura.
+    // struct x86_context_d *context;
 
 	//stack frame;
     unsigned short ss;

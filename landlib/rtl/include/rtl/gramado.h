@@ -118,6 +118,7 @@ unsigned long RTLEventBuffer[32];
 // Get an event from the thread's event queue.
 // That old 'get system message'
 // Using a buffer
+int xxxScanApplicationQueue(void);
 int rtl_get_event (void);
 
 // ===========================================================
@@ -145,7 +146,7 @@ struct rtl_event_d
     unsigned long long4;
     unsigned long long5;
     unsigned long long6;
-    
+
     // 32-8
     //unsigned long pad[24];
 };

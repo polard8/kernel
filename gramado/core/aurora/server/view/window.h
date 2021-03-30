@@ -815,9 +815,17 @@ struct gws_window_d
 	//?? Qual janela o menu usará.
     struct gws_window_d *menu_window;   //Menu Window.
 
-    struct menu_d *sysMenu;         //menu de sistema.(control menu)
-    struct menu_d *barMenu;         //menu da barra de menu.
-    struct menu_d *defaultMenu;     //menu da janela (*importante)
+
+    
+    //#bugbug
+    //struct menu_d *sysMenu;         //menu de sistema.(control menu)
+    //struct menu_d *barMenu;         //menu da barra de menu.
+    //struct menu_d *defaultMenu;     //menu da janela (*importante)
+    //...
+
+    struct gwsssrv_menu_d  *sysMenu;         //menu de sistema.(control menu)
+    struct gwsssrv_menu_d  *barMenu;         //menu da barra de menu.
+    struct gwsssrv_menu_d  *defaultMenu;     //menu da janela (*importante)
     //...
 
     //
@@ -954,11 +962,15 @@ unsigned long zList[ZORDER_MAX];
 void wm_process_windows(void);
 
 
-
 void yellow_status( char *string );
 
 
-int is_within ( struct gws_window_d *window, unsigned long x, unsigned long y );
+int 
+is_within ( 
+    struct gws_window_d *window, 
+    unsigned long x, 
+    unsigned long y );
+
 
 //refaz zorder.
 void reset_zorder(void);
@@ -967,8 +979,7 @@ void invalidate_window (struct gws_window_d *window);
 
 // #todo
 // Precisamos usar o esquema de cores.
-void *
-gws_draw_button ( 
+void *gws_draw_button ( 
     unsigned char *string,
     int style,
     int state,
@@ -978,7 +989,6 @@ gws_draw_button (
     unsigned long width, 
     unsigned long height, 
     unsigned long color );
-
 
 
 int rect_validate_size( struct gws_rect_d *rect );

@@ -89,6 +89,11 @@ struct ps2_mouse_d
     object_class_t objectClass;
 
     int dummy;
+
+    // #todo
+    // int control_fd;
+    // int input_fd;
+    // pid_t pid;
 };
 
 

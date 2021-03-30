@@ -1300,8 +1300,8 @@ done:
  *     Handler de mouse. 
  *
  * Importante: 
- *     Se estamos aqui é porque os dados disponíveis no controlador 8042 
- * pertencem ao mouse.
+ *     Se estamos aqui é porque os dados disponíveis no 
+ * controlador 8042 pertencem ao mouse.
  *
  * Obs: 
  * Temos externs no início desse arquivo.
@@ -1333,12 +1333,11 @@ void mouseHandler (void)
     int posX = 0;
     int posY = 0;
 
-
 	// Lendo um char no controlador.
     char *_byte;
     
     
-    int msg_status=-1; //FAIL
+    int msg_status = -1; //FAIL
 
 
     // Disable keyboard.
