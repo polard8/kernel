@@ -206,12 +206,57 @@ void xxx_mouse_write (unsigned char data)
 
     // 0xD4 diz que eh para enviar o comando para o mouse.
     prepare_for_output();
-    out8 (I8042_STATUS, 0xD4);
+    out8 (I8042_STATUS, 0xD4); //port 0x64
 
     prepare_for_output();
-    out8 (I8042_BUFFER, data);
+    out8 (I8042_BUFFER, data);  //port 0x60
+    
+    // #todo
+    // Temos que checar o ack ??
+    // expect_ack();
 }
 
+
+/*
+// plan9-like
+int i8042auxcmd(int cmd);
+int i8042auxcmd(int cmd)
+{
+	unsigned int c;
+	int tries;
+
+	c = 0;
+	tries = 0;
+
+	//ilock(&i8042lock);
+	
+	do{
+		
+		if(tries++ > 2)
+			break;
+		
+        prepare_for_output();
+		outb(0x64, 0xD4);
+
+        prepare_for_output();
+		outb(0x60, cmd);
+
+        prepare_for_output();
+        prepare_for_input();
+		c = inb(Data);
+
+	} while(c == 0xFE || c == 0);
+	
+	//iunlock(&i8042lock);
+
+	if(c != 0xFA){
+		//print("i8042: %2.2ux returned to the %2.2ux command\n", c, cmd);
+		printf("i8042auxcmd: no ack\n");
+		return -1;
+	}
+	return 0;
+}
+*/
 
 
 
@@ -405,6 +450,19 @@ int ps2_mouse_globals_initialize (void)
  * ...
  */
 
+// inicialização:
+// Para o reset:
+// Avisamos o controlador de ps2 que vamos escrever no
+// dispositivo alxiliar.
+// Enviamos um comando de reset para o registrador de dados.
+// Esperamos por ack.
+// Esperamos completion code.
+// Esperamos id code.
+
+// Temos que pegar isso logo após o reset.
+#define MOUSE_COMPLETE      0xAA
+#define MOUSE_ID_BYTE       0x00
+
 void ps2mouse_initialize_device (void)
 {
 
@@ -432,15 +490,41 @@ void ps2mouse_initialize_device (void)
 
 //__enable_second_port :
 
+
     // reset mouse
-    //out8(0xD4, 0x64);      // tell the controller to address the mouse
-    //out8(0xFF, 0x60);
+    // #todo:
+    // Para o reset:
+    // Avisamos o controlador de ps2 que vamos escrever no
+    // dispositivo alxiliar.
+    // Enviamos um comando de reset para o registrador de dados.
+    // Esperamos por ack.
+    // Esperamos completion code.
+    // Esperamos id code.
+
+    // #todo
+    // Existe a possibilidade do reset falhar.
+    // E precismaos abortar se isso aocntecer.
+
+    // reset
     xxx_mouse_write(0xFF); 
+    expect_ack();
+
+    // #todo
+    // Precisamos pegar o completion code e o id code 
+    // após o reset.
+    // #define MOUSE_COMPLETE      0xAA
+    // #define MOUSE_ID_BYTE       0x00
+
 
     //++
     //======================================================
     // #obs:
     // A rotina abaixo habilita o segundo dispositivo. O mouse.
+    // Mas antes da habilitação temos uma rotina que não me lembro
+    // pra que serve, haha.
+    // #importante: 
+    // TALVEZ. Tô achando que essa rotina deva ser feita no 
+    // teclado, apos seu reset, e não aqui no mouse.
     
     // #bugbug
     // Essa nao eh uma rotina de habilitaçao do dispositivo secundario,
@@ -453,14 +537,8 @@ void ps2mouse_initialize_device (void)
     // Esperamos para ler e lemos.
     // 0x20 Read Command Byte
     // I8042_READ = 0x20
-
     wait_then_write(0x64,I8042_READ);
     status = wait_then_read(0x60) | 2;
-
-
-    // #bugbug
-    // O defeito pode estar aqui
-    //ja que nosso maior problema eh ficar se interrupçao.
 
     // Dizemos para o controlador entrar no modo escrita.
     // Esperamos para escrever e escrevemos.
@@ -484,10 +562,10 @@ void ps2mouse_initialize_device (void)
     // 0xA7 Disable Mouse
     // 0xA9 Check Mouse InterfaceReturns 0, if OK
 
+    // Enable mouse.
     wait_then_write(0x64,0xA8);
-    for (i=0; i<20000; i++)
-    {
-    };
+    expect_ack();
+    for (i=0; i<20000; i++){};
 
     //======================================================
     //-- 
@@ -496,9 +574,6 @@ void ps2mouse_initialize_device (void)
 	// 0xFF
 	// Espera o dados descer (ACK)
 	// Basic Assurance Test (BAT)
-
-
-
 
 
     // Set default settings.
@@ -545,18 +620,19 @@ void ps2mouse_initialize_device (void)
 
         xxx_mouse_write (PS2MOUSE_GET_DEVICE_ID);
         expect_ack();
+        
+        // Porque estamos lendo novamente?
         device_id = xxx_mouse_read();
     }
 
-    if (device_id == PS2MOUSE_INTELLIMOUSE_ID) {
-
+    if (device_id == PS2MOUSE_INTELLIMOUSE_ID){
         //m_has_wheel = true;
         ps2_mouse_has_wheel = 1;
         kprintf ("ps2mouse_initialize_device: Mouse wheel enabled!\n");
-        
     } else {
         kprintf ("ps2mouse_initialize_device: No mouse wheel detected!\n");
     };
+
 
 
 /*
@@ -588,12 +664,9 @@ void ps2mouse_initialize_device (void)
     xxx_mouse_write (0xE6);
     expect_ack();
 
-    // 0xF4 Enable streaming.
-    // Enable Data Reporting 
-    // 0xF5 Disable (Data Reporting)
-    xxx_mouse_write (PS2MOUSE_ENABLE_PACKET_STREAMING);  //0xf4
-    expect_ack();
 
+
+    // ============================
     // 0xF3 set sample rate.
     // Set Sample Rate, valid values are 10, 20, 40, 60, 80, 100, and 200. 
     xxx_mouse_write (0xF3);
@@ -602,25 +675,55 @@ void ps2mouse_initialize_device (void)
     expect_ack();
     
     
-    // 0xEA Set Stream Mode Send data on events
-    // 0xE9 Status Request
-    // 0xE7 Set Scaling 2:1 Accelerationmode
+    // Comands:
     // 0xE6 Set Scaling 1:1 Linear mode
-    
+    // 0xE7 Set Scaling 2:1 Accelerationmode
     // 0xE8 set resolution
+    // 0xE9 Status Request
+    // 0xEA Set Stream Mode Send data on events
+    
+    //=============================
+    // Set resolution.
     xxx_mouse_write (0xE8);
     expect_ack();
     xxx_mouse_write (0x03);  //resolution
     expect_ack();
-    
+
+
+    // =========================================================
+
+    //
+    // Enable transmission.
+    //
+
+    // #todo
+    // Podemos ter uma rotina somente para isso.
+    // E usarmos depois.
 
     // Wait for nothing!
     kbdc_wait (1);
     kbdc_wait (1);
+
+    // 0xF4 Enable streaming.
+    // Enable Data Reporting 
+    // 0xF5 Disable (Data Reporting)
+    // ================================  
+    // 0xf4: Enable mouse transmission.
+    // #todo: maybe we need to do this again.
+    // não precisamos de ack nesse caso.
+    // Temos que habilitar porque isso foi desabilitado durante 
+    // o reset.
+    xxx_mouse_write (PS2MOUSE_ENABLE_PACKET_STREAMING);  
+    // expect_ack();
+
+
     kbdc_wait (1);
     kbdc_wait (1);
-    
-    
+
+    // =========================================================
+
+
+
 //
 // ==========================================
 //
@@ -638,6 +741,10 @@ void ps2mouse_initialize_device (void)
     strcpy (newname,__tmpname);
 
 
+    //
+    // file
+    //
+
     // Agora registra o dispositivo pci na lista genérica
     // de dispositivos.
     // #importante: ele precisa de um arquivo 'file'.
@@ -649,9 +756,9 @@ void ps2mouse_initialize_device (void)
     if ( (void *) __file == NULL ){
         panic ("ps2mouse_initialize_device: __file fail, can't register device");    
     }else{
-        __file->used  = 1;
-        __file->magic = 1234;
-        __file->isDevice = 1;
+        __file->used     = TRUE;
+        __file->magic    = 1234;
+        __file->isDevice = TRUE;
 
         //
         // Register.
@@ -715,7 +822,8 @@ void ps2mouse_initialize_device (void)
     };
     
     // #test
-    // Drain the output buffer for the first time. Residual.
+    // Drain the output buffer for the first time. 
+    // Residual.
 
     I8042Controller_do_drain();
     
@@ -723,7 +831,7 @@ void ps2mouse_initialize_device (void)
 // ==========================================
 //
 
-    g_driver_ps2mouse_initialized = 1;
+    g_driver_ps2mouse_initialized = TRUE;
     
     __breaker_ps2mouse_initialized = 1;
 }
@@ -1378,6 +1486,24 @@ void mouseHandler (void)
     *_byte = (char) xxx_mouse_read();
 
 
+    // #todo
+    // Temos que checar se o primeiro byte é um ack ou um resend.
+    // isso acontece logo apos a inicialização.
+
+    // #define ACKNOWLEDGE         0xFA	
+    // #define RESEND              0xFE
+
+    if ( *_byte == 0xFA ){
+        printf ("mouseHandler: [test.first_byte] ack\n");
+        refresh_screen();
+    }
+
+    if ( *_byte == 0xFE ){
+        printf ("mouseHandler: [test.first_byte] resend\n");
+        refresh_screen();
+    }
+
+
     // count_mouse is a global variable.
     // É 'static int'.
 
@@ -1486,12 +1612,42 @@ void mouseHandler (void)
 // Danger Danger !!
 // =====================================================
 
+// #bugbug: 
+// Isso só server para mouse!
+
 void expect_ack (void)
 {
     // #bugbug
     // ? loop infinito  
+    // while ( xxx_mouse_read() != 0xFA );
+
+
+    unsigned char c=0;
+    int tries=0;
+
+    do 
+    {
+        if (tries>4)
+            break;
+        
+        tries++;
+        
+        // #bugbug
+        // Essa rotina so server para mouse.
+        
+        c = xxx_mouse_read();
     
-    while ( xxx_mouse_read() != 0xFA);
+    } while(c == 0xFE || c == 0);
+    
+    if ( c != 0xFA ){
+        //#debug
+        printf ("expect_ack: not ack\n");
+        return;
+        //return -1;
+    }
+
+    return;
+    //return 0;
 }
 
 

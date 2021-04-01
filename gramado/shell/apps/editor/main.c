@@ -1145,14 +1145,11 @@ int main ( int argc, char *argv[] ){
     //
     // loop
     //
-    
+
     //=================================
-    //get current thread
-    //set foreground thread.
-     
-    //int cThread = (int) sc82 (10010,0,0,0);
-    //sc82 (10011,cThread,cThread,cThread);
-    
+    // Set foreground thread.
+    // Get events scanning a queue in the foreground queue.
+
     rtl_focus_on_this_thread();
     
     while (1){
@@ -1166,11 +1163,8 @@ int main ( int argc, char *argv[] ){
                 RTLEventBuffer[3] );
         }
     };
+
     //=================================
-
-
-
-
 
 
     // #importante

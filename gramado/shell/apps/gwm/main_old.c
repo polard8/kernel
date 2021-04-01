@@ -1174,35 +1174,58 @@ _more:
 // Testing new main.
 int main ( int argc, char *argv[] ){
 
+    int fd = -1;
 
-    struct gws_display_d *Display;
-    int client_fd = -1;
+    // Porta para o Window Server 'ws' em gramado_ports[]
+    // Connecting to the window server in this machine.
+    struct sockaddr_in  addr_in;
 
+    addr_in.sin_family      = AF_INET;
+    addr_in.sin_port        = PORTS_WS;
+    addr_in.sin_addr.s_addr = IP(127,0,0,1); 
 
-
-    // IN: hostname:number.screen_number
-    Display = (struct gws_display_d *) gws_open_display("display:name.0");
-
-    if ( (void*) Display == NULL )
-    {
-        debug_print ("gwm: Couldn't open display\n");
-        printf      ("gwm: Couldn't open display\n");
-        exit(1);
-    }
-
-    client_fd = Display->fd;
-    
-    if ( client_fd <= 0 )
-    {
-        debug_print ("gwm: bad fd\n");
-        printf      ("gwm: bad fd\n");
-        exit(1);
-    }
 
     debug_print ("---------------------\n");
     debug_print ("gwm: Initializing ...\n");
 
 
+    //
+    // socket
+    // 
+
+    // #debug
+    //printf ("gwm: Creating socket\n");
+
+    // cria o soquete.
+    // AF_GRAMADO
+    //fd = socket ( 8000, SOCK_STREAM, 0 );
+    //fd = socket ( AF_INET, SOCK_RAW, 0 );
+    fd = socket ( AF_INET, SOCK_STREAM, 0 );
+        
+    if ( fd < 0 ){
+       printf ("gwm: Couldn't create socket\n");
+       exit(1);
+    }
+
+    //
+    // connect
+    // 
+
+    // Nessa hora colocamos no accept um fd.
+    // então o servidor escreverá em nosso arquivo.
+
+    // #debug
+    //printf ("gnst: Connecting to the address 'ws' ...\n");      
+    printf ("gwm: Connecting to ws via inet  ...\n");   
+
+    while (1){
+        if (connect (fd, (void *) &addr_in, sizeof(addr_in)) < 0){ 
+            gws_debug_print ("gwm: Connection Failed \n");
+            printf          ("gwm: Connection Failed \n"); 
+            //return -1;
+            //try again 
+        }else{ break; }; 
+    };
 
     //
     // Draw
@@ -1216,9 +1239,9 @@ int main ( int argc, char *argv[] ){
     // Create clients.
     //
     
-    create_bg_client(client_fd);
-    create_topbar_client(client_fd);
-    create_taskbar_client(client_fd);
+    create_bg_client(fd);
+    create_topbar_client(fd);
+    create_taskbar_client(fd);
     // ...
 
     
@@ -1244,7 +1267,7 @@ int main ( int argc, char *argv[] ){
     while (1){
         if ( rtl_get_event() == TRUE ){  
             gwmProcedure ( 
-                client_fd,
+                fd,
                 RTLEventBuffer[0], 
                 RTLEventBuffer[1], 
                 RTLEventBuffer[2], 

@@ -1,14 +1,13 @@
 ;
-; File: x86/hw.inc 
+; File: x86/pumpcore/hw.inc 
 ;
 ; Descrição:
 ;     Interrupções de hardware.
 ;     Irqs e interrupções reservadas (faults,etc).
 ;     Ordem: Primeiro as irqs, depois as outras.
 ;
-; Histórico:
-;     Versão: 1.0, 2015 - Esse arquivo foi criado por Fred Nora.
-;     Versão: 1.0, 2016 - Revisão.
+; History:
+;     2015 - Created by Fred Nora.
 ;
 
 
@@ -126,6 +125,8 @@ _irq0:
     ;; #important:
     ;; We are using the kernel segment registers.
     ;; Kernel data segments and stack.
+    ;; #bugbug: sempre a mesma pilha?
+    ;; Que pilha as interrupçoes de softwar estao usando?
 
     xor eax, eax
     mov ax, word KERNEL_DS
@@ -188,7 +189,7 @@ dummy_flush:
     mov al, 20h
     out 20h, al  
     IODELAY  
-    
+
     ; Acumulator.
     mov eax, dword [_contextEAX]
 
@@ -210,23 +211,11 @@ global _timer_test
 _timer_test:
     jmp unhandled_irq
     jmp $
-    ;cli
-    ;mov al, 20h
-    ;out 20h, al  
-    ;sti
-    ;iretd
-
-
-
-;--------------------------------------- 
-; timer_interrupt:
-;    Timer interrupt handler.
-;    Provisório.
-;
 
 timer_interrupt:
     jmp unhandled_irq
     jmp $
+
 
 
 

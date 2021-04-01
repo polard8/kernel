@@ -29,9 +29,8 @@ struct gwsssrv_menu_item_d
 // menu
 struct gwsssrv_menu_d
 {
-    struct gws_window_d *window;
-    struct gws_window_d *parent;
-
+    struct gws_window_d  *window;
+    struct gws_window_d  *parent;
 
     unsigned long x;
     unsigned long y;

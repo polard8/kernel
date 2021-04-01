@@ -806,17 +806,33 @@ void ps2kbd_initialize_device (void)
     //++
     //=================================================
     
+    //
+    // Reset
+    //
+    
     // #obs:
     // A rotina abaixo reseta o teclado.
     // #bugbug: Isso reseta o controlador ps2.
-    
+
+    // #todo:
+    // Podemos melhorar esse ack, e construirmos uma rotina
+    // de ack igual a que existe na inicialização de mouser.
+
+    // Reset.
     wait_then_write ( 0x60, 0xFF );
-
 	// ACK
+	// #bugbug: Danger, Danger !!
+	// loop infinito
     wait_ns (400);
     wait_ns (400);
-    while ( xxx_keyboard_read() != 0xFA );  // #bugbug: Danger, Danger !!
+    wait_ns (400);
+    wait_ns (400);
+    while ( xxx_keyboard_read() != 0xFA );  
 
+    // #todo
+    // Talvez tenhamos que pegar mais coisa depois do reset,
+    // assim como acontece no reset do mouse.
+    
     //=================================================
     //--
 
@@ -830,7 +846,7 @@ void ps2kbd_initialize_device (void)
     // Essa é uma rotina de auto-teste.
     // Conhecida como: Basic Assurance Test - (BAT).
 
-    if ( BAT_TEST () != 0 ){
+    if ( BAT_TEST() != 0 ){
         printf ("[WARMING] ps2kbd.c:  BAT_TEST ignored\n");
     }  
 

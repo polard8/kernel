@@ -318,7 +318,7 @@ typedef enum {
 struct gws_window_d 
 {
 
-    int id;   //unsigned long id;    //Window Id. 
+    int id;
     int used;
     int magic;
 
@@ -426,10 +426,10 @@ struct gws_window_d
     // 3
     // Titlebar
 
-    struct gws_window_d *titlebar;
-    struct gws_window_d *tb_minimize;
-    struct gws_window_d *tb_maximize;
-    struct gws_window_d *tb_close;
+    struct gws_window_d  *titlebar;
+    struct gws_window_d  *tb_minimize;
+    struct gws_window_d  *tb_maximize;
+    struct gws_window_d  *tb_close;
     int isMinimize;
     int isMaximize;
     int isClose;
@@ -812,21 +812,16 @@ struct gws_window_d
 	// Menus.
 	//
 
-	//?? Qual janela o menu usará.
-    struct gws_window_d *menu_window;   //Menu Window.
 
-
+    // O menu para gerenciamento dessa janela se ela for overlapped.
+    struct gws_window_d *menu_window;
+    struct gwsssrv_menu_d  *defaultMenu;     //menu da janela (*importante)
     
-    //#bugbug
-    //struct menu_d *sysMenu;         //menu de sistema.(control menu)
-    //struct menu_d *barMenu;         //menu da barra de menu.
-    //struct menu_d *defaultMenu;     //menu da janela (*importante)
-    //...
-
+    // Outros menus.
     struct gwsssrv_menu_d  *sysMenu;         //menu de sistema.(control menu)
     struct gwsssrv_menu_d  *barMenu;         //menu da barra de menu.
-    struct gwsssrv_menu_d  *defaultMenu;     //menu da janela (*importante)
-    //...
+
+    // ...
 
     //
     // button
@@ -835,8 +830,8 @@ struct gws_window_d
 	// suspenso
 	// Se a flag indicar que a janela é um botão, então 
 	// essa será a estrutura para o botão.
-	//struct button_d *button;
 
+	//struct button_d *button;
 
     int selected;         //seleção  de item de menu.
     const char *text;     // 
@@ -867,7 +862,6 @@ struct gws_window_d
 	
 	//struct button_d *current_button;  //Botão atual.      
     //struct button_d *buttonList;      //Lista encadeada de botões em uma janela.
-	
 
 
 	
@@ -892,12 +886,12 @@ struct gws_window_d
 
 //==================================================
     // Navigation.
-    struct gws_window_d *prev; 
-    struct gws_window_d *next; 
+    struct gws_window_d  *prev; 
+    struct gws_window_d  *next; 
 };
 
-
 // Windows.
+
 struct gws_window_d  *__root_window; 
 // If the window server has a taskbar.
 // maybe we don't need that.

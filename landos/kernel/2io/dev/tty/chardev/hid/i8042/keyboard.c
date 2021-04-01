@@ -223,6 +223,27 @@ sc_again:
     //===========================================
 
 
+    // #todo
+    // Temos que checar se o primeiro byte é um ack ou um resend.
+    // isso acontece logo apos a inicialização.
+
+    // #todo
+    // me parece que o primeiro byte pode ser um ack ou resend.
+    
+    // #define ACKNOWLEDGE         0xFA	
+    // #define RESEND              0xFE
+
+    if ( __raw == 0xFA ){
+        printf ("abnt2_keyboard_handler: [test.first_byte] ack\n");
+        refresh_screen();
+    }
+
+    if ( __raw == 0xFE ){
+        printf ("abnt2_keyboard_handler: [test.first_byte] resend\n");
+        refresh_screen();
+    }
+
+
     //
     // == Queue ====================================
     //
