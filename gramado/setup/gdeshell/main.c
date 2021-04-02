@@ -2693,54 +2693,10 @@ do_compare:
     // para testarmos o input via tty no estilo unix-like.
     // Veja as rotinas de input no kernel em: kgws.c e ps2kbd.c
 
-    FILE *f1;
-    int ch_test;
-    char t4buf[64];  //line
-    int t4_line_offset=0;
-    int t4nbytes=0;
+    
     if ( gramado_strncmp( prompt, "t4", 2 ) == 0 )
     {
-        
-        //stdout
-        printf ("t4: Open and reading a file\n");
-        printf ("t4: Change the input mode.\n");
-        //gramado_system_call(912,2000,2000,2000);  // INPUT_MODE_TTY
-        rtl_set_input_mode(2000);
-        
-        //f1 = fopen ("gramado.txt","rb");
-        f1 = stdin;
-        if ( f1 == NULL ){
-            printf ("fopen fail\n");  //stdout
-            goto exit_cmp;
-        }
-        rewind(f1);
-        printf ("Testing getc ... \n\n");
-        t4_line_offset=0;  
-        while (1){
-            //ch_test = (int) fgetc (f1);    //funcionou.
-            //ch_test = (int) getc(f1);  //funcionou. 
-            t4nbytes = read(0, &t4buf[t4_line_offset], 1);
-            if ( t4nbytes > 0 )
-            {
-                ch_test = t4buf[t4_line_offset]; //ultimo que pegamos.
-                if ( ch_test == 'q' ){ printf( "String={%s}\n",t4buf); break; }
-                
-                t4_line_offset++; 
-                if(t4_line_offset>=64){ printf("overflow: {%s}\n",t4buf); break; }
-                
-                //if ( ch_test == 'q' ){
-                //    printf("  EOF reached :)\n\n"); 
-                //    goto exit_cmp;
-                //}else{
-                //     printf("[%c]", ch_test);  fflush(stdout);  
-                //};
-            }
-        };
-        t4_line_offset = 0;
-        t4nbytes=0;
-        printf ("t4: Change the input mode.\n");
-        //gramado_system_call(912,1000,1000,1000);  // INPUT_MODE_SETUP
-        rtl_set_input_mode(1000);
+        t4_test();
         goto exit_cmp;
     }
 
@@ -6721,6 +6677,95 @@ char* gdeshell_GetExtensionAddress(char* string)
 	return (extension+1);
 }
 */
+
+
+// internal
+void t4_test(void)
+{
+    FILE *f1;
+    int ch_test;
+    char t4buf[64];  //line
+    int t4_line_offset=0;
+    int t4nbytes=0;
+
+    int i=0;
+    
+        //stdout
+        printf ("t4: Open and reading a file\n");
+        printf ("t4: Change the input mode.\n");
+        //gramado_system_call(912,2000,2000,2000);  // INPUT_MODE_TTY
+        rtl_set_input_mode(2000);
+        
+        //f1 = fopen ("gramado.txt","rb");
+        f1 = stdin;
+        if ( f1 == NULL ){
+            printf ("fopen fail\n");  //stdout
+            goto done;
+        }
+
+    rewind(f1);
+
+
+    for(i=0; i<64; i++)
+        t4buf[i] = 0;
+        
+
+    printf ("Testing getc ... \n\n");
+
+    t4_line_offset=0;  
+
+    while (1){
+
+    //ch_test = (int) fgetc (f1);    //funcionou.
+    //ch_test = (int) getc(f1);  //funcionou. 
+    t4nbytes = read(0, &t4buf[t4_line_offset], 1);
+
+    if ( t4nbytes > 0 )
+    {
+
+        // #bugbug
+        // Não estamos imprimindo aqui o caractere que pegamos,
+        // na verdade quem esta fazendo isso é o driver de teclado,
+        // especialmente para esse modo de input.
+
+        //ultimo que pegamos.
+        ch_test = t4buf[t4_line_offset];
+        
+        if ( ch_test == EOF ){ printf("EOF\n"); break; }
+         
+        if ( ch_test == 'q' ){ printf( "~~~~~ String={%s}\n",t4buf); break; }
+        
+        // Isso é para conferir se o char que está chegando aqui
+        // é o mesmo que o char digitado.
+        // Ou se não esta chegando char algum.
+        printf ("*[%c]*\n",ch_test);
+        
+        // circulate
+        t4_line_offset++; 
+        if(t4_line_offset >= 64){ printf("~~~~~ Overflow: {%s}\n",t4buf); break; }
+    }
+    
+    };
+    
+    t4_line_offset = 0;
+        t4nbytes=0;
+
+    for(i=0; i<64; i++)
+        t4buf[i] = 0;
+
+        //gramado_system_call(912,1000,1000,1000);  // INPUT_MODE_SETUP
+done:
+    for(i=0; i<64; i++)
+        t4buf[i] = 0;
+
+
+    printf ("t4: Change the input mode.\n");
+    rtl_set_input_mode(1000);
+    return;
+}
+
+
+
 
 
 // void gdeshell_os_polling(void);

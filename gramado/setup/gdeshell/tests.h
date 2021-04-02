@@ -6,7 +6,6 @@
 int desktopInitialize(void);
 
 
-
 #endif    
 
 
