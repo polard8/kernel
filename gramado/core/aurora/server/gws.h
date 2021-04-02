@@ -35,11 +35,10 @@ int current_mode;
 #include "globals.h"
 
 
-#include "render/r_render.h"
-
 // #view
+#include "view/render/r_render.h"
 #include "view/colors.h"
-#include "view/pixel.h"
+#include "view/display/bitblt.h"
 #include "view/char.h"
 #include "view/dtext.h"
 #include "view/line.h"

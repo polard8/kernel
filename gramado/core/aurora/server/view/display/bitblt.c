@@ -84,12 +84,19 @@ pixelBackBufferPutpixel2 (
 // Precismos considerar o limite do backbuffer.
 // Então teremos um Offset máximo.
 
+// #todo
+// Check some flags, just like rasterizations.
+// We will need a lot of parameters in this kind of function
+// Including the address of the backbuffer.
+
 int 
 pixelBackBufferPutpixel ( 
     unsigned long color, 
     int x, 
     int y )
 {
+
+    // #todo: It needs to be a parameter.
     // 0xC0800000 ??
     unsigned char *where = (unsigned char *) ____BACKBUFFER_VA;
 
@@ -101,6 +108,10 @@ pixelBackBufferPutpixel (
     unsigned long MaxOffset=0;
 
     int Offset=0;
+    
+    // #todo
+    // raster operation. rasterization.
+    // unsigned long rop;
 
 
     // 4MB limit

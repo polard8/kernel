@@ -81,39 +81,48 @@ static inline void __local_x86_set_cr3 (unsigned long value)
 
 void x86mainStartFirstThread (void){
 
-    struct thread_d *Thread;
+    struct thread_d  *Thread;
     int i=0;
 
 
     debug_print("x86mainStartFirstThread:\n");
 
-    // Select the idle thread.
+
+    // The first thread to run will the control thread 
+    // of the init process. It is called InitThread.
 
     Thread = InitThread; 
 
 
-    if ( (void *) Thread == NULL )
-    {
-        panic ("x86mainStartFirstThread: Thread\n");
-    } 
+    if ( (void *) Thread == NULL ){
+        panic("x86mainStartFirstThread: Thread\n");
+    }
 
-    if ( Thread->used != 1 || Thread->magic != 1234)
+    if ( Thread->used != TRUE || Thread->magic != 1234 )
     {
         printf ("x86mainStartFirstThread: tid={%d} magic \n", 
             Thread->tid);
          die();
     }
 
-    if ( Thread->saved != 0 )
-    {
-        panic ("x86mainStartFirstThread: saved\n");
+    // It its context is already saved, so this is not the fist time.
+    
+    if ( Thread->saved != FALSE ){
+        panic("x86mainStartFirstThread: saved\n");
     }
 
-    set_current ( Thread->tid );       
+    if ( Thread->tid < 0 ){
+        panic("x86mainStartFirstThread: tid\n");
+    }
+
+    // Set the current thread.
+    set_current( Thread->tid ); 
 
     // ...
 
-    // State  
+    // State
+    // The thread needs to be in Standby state.
+
     if ( Thread->state != STANDBY )
     {
         printf ("x86mainStartFirstThread: state tid={%d}\n", 
@@ -125,7 +134,11 @@ void x86mainStartFirstThread (void){
     if ( Thread->state == STANDBY )
     {
         Thread->state = RUNNING;
-        queue_insert_data ( queue, (unsigned long) Thread, QUEUE_RUNNING);
+        
+        queue_insert_data( 
+            queue, 
+            (unsigned long) Thread, 
+            QUEUE_RUNNING );
     }
 
     // Current process.
@@ -161,7 +174,7 @@ void x86mainStartFirstThread (void){
     // isso não é necessário se chamarmos spawn ela faz isso.
     __local_x86_set_cr3 ( (unsigned long) Thread->DirectoryPA );
     
-    // flush
+    // flush tlb
     asm ("movl %cr3, %eax");
     //#todo: delay.
     asm ("movl %eax, %cr3");  
@@ -169,7 +182,6 @@ void x86mainStartFirstThread (void){
 
     // See: x86/headlib.asm
     x86_clear_nt_flag ();   
-
 
 	//vamos iniciar antes para que
 	//possamos usar a current_tss quando criarmos as threads
@@ -211,6 +223,7 @@ void x86mainStartFirstThread (void){
 
 	//base dos arquivos.
 
+    // Image buffer
     unsigned char *buff1 = (unsigned char *) 0x00400000;
 
 
@@ -230,28 +243,41 @@ void x86mainStartFirstThread (void){
     refresh_screen ();
 
 
-    PROGRESS("-- Fly --------------------------------------------\n");
+    PROGRESS("-- Fly -----------------------------------\n");
+
+
+    // #important:
+    // This is an special scenario,
+    // Where we're gonna fly with the eflags = 0x3000,
+    // it means that the interrupts are disabled,
+    // and the init process will make a software interrupt
+    // to reenable the interrupts. 
+    // Softwre interrupts are not affecte by this flag, I guess.
+
+    // #bugbug
+    // This routine is very ugly and very gcc dependent.
+    // We deserve a better thing.
 
     // Fly!
     // We need to have the same stack in the TSS.
     // ss, esp, eflags, cs, eip;
 
-    asm volatile ( " movl $0x003FFFF0, %esp \n"
-                   " movl $0x23,       %ds:0x10(%esp)  \n"
-                   " movl $0x0044FFF0, %ds:0x0C(%esp)  \n"
-                   " movl $0x3000,     %ds:0x08(%esp)  \n"
-                   " movl $0x1B,       %ds:0x04(%esp)  \n"
-                   " movl $0x00401000, %ds:0x00(%esp)  \n"
-                   " movl $0x23, %eax  \n"
-                   " mov %ax, %ds      \n"
-                   " mov %ax, %es      \n"
-                   " mov %ax, %fs      \n"
-                   " mov %ax, %gs      \n"
-                   " iret              \n" );
-
+    asm volatile ( 
+        " movl $0x003FFFF0, %esp \n"
+        " movl $0x23,       %ds:0x10(%esp)  \n"
+        " movl $0x0044FFF0, %ds:0x0C(%esp)  \n"
+        " movl $0x3000,     %ds:0x08(%esp)  \n"
+        " movl $0x1B,       %ds:0x04(%esp)  \n"
+        " movl $0x00401000, %ds:0x00(%esp)  \n"
+        " movl $0x23, %eax  \n"
+        " mov %ax, %ds      \n"
+        " mov %ax, %es      \n"
+        " mov %ax, %fs      \n"
+        " mov %ax, %gs      \n"
+        " iret              \n" );
 
     // Paranoia
-    panic ("x86mainStartFirstThread: FAIL");
+    panic ("x86mainStartFirstThread: FAIL\n");
 }
 
 
@@ -329,7 +355,11 @@ void __x86StartInit (void){
 
 
 	//====================================================
-	//Create  
+	// Create
+
+    // #
+    // Criamos um thread em ring3.
+    // O valor de eflags é 0x3200.
 
     InitThread = (void *) create_CreateRing3InitThread();
 
@@ -344,18 +374,18 @@ void __x86StartInit (void){
         
         // [Processing time]
         current_process = InitProcess->pid;
-        current_thread = InitThread->tid;
+        current_thread  = InitThread->tid;
         
         // [Focus]
         active_process = current_process;
-        active_thread = current_thread;
+        active_thread  = current_thread;
+        
+        // foreground thread ?
         
         // [Scheduler stuff]
         next_thread = InitThread->tid;
-
     };
-    
-    
+
 
     InitProcess->Heap = (unsigned long) g_extraheap1_va;
 

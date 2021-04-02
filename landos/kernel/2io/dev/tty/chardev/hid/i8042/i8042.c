@@ -432,7 +432,8 @@ void ps2(void)
 
         // #todo
         // Now bit 5 of the Controller Configuration Byte should be clear - 
-        // if it's set then you know it can't be a "dual channel" PS/2 controller (because the second PS/2 port should be enabled).
+        // if it's set then you know it can't be a "dual channel" 
+        // PS/2 controller (because the second PS/2 port should be enabled).
         
         configuration |= 2;
         configuration &= ~(1 << 5);
@@ -443,7 +444,6 @@ void ps2(void)
         // send a command 0xA7 to disable the second PS/2 port again. 
         // Lembre-se, vamos reabilitar no final.
         wait_then_write (0x64,0xA7);  // Disable mouse port. ignored if it doesn't exist
-    
     }
     // ==============================
 
@@ -452,6 +452,10 @@ void ps2(void)
    // Enable IRQs for the ports that are usable
    if (keyboard_available || mouse_available) 
    {
+        //pega o config byte
+       //wait_then_write (0x64,I8042_READ);    // I8042_READ = 0x20    
+       //configuration = wait_then_read(0x60);
+
        configuration &= ~0x30; // renable clocks
        wait_then_write(I8042_STATUS, 0x60);
        wait_then_write(I8042_BUFFER, configuration);

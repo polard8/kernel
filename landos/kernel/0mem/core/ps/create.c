@@ -51,12 +51,12 @@ void *create_CreateRing0IdleThread(void)
     }else{  
 
         // Identificadores 
-        t->used = 1;
+        t->used  = TRUE;
         t->magic = 1234;
         t->tid = 0;  
-        t->ownerPID = (int) KernelProcess->pid; 
+        t->ownerPID     = (int) KernelProcess->pid; 
         t->name_address = (unsigned long) ThreadName; 
-        t->process = (void *) KernelProcess;
+        t->process      = (void *) KernelProcess;
 
         // Características.
         t->iopl  = RING0;
@@ -277,14 +277,14 @@ void *create_CreateRing0IdleThread(void)
     // #todo
     // This method really need a prefix.
     
+    // With this movement, this thread is gonna run in the next
+    // task switch.
+    
     // * MOVEMENT 1 (Initialized --> Standby).
-    SelectForExecution (t);    
+    SelectForExecution(t); 
 
     return (void *) t;
 }
-
-
-
 
 
 
@@ -333,13 +333,13 @@ void *create_CreateRing3InitThread (void)
         }else{
 
             // Identificadores 
-            InitThread->used = 1;
+            InitThread->used  = TRUE;
             InitThread->magic = 1234;
-            InitThread->tid = 1;
-            InitThread->ownerPID = (int) InitProcess->pid; 
+            InitThread->tid   = 1;
+            InitThread->ownerPID     = (int) InitProcess->pid; 
             InitThread->name_address = (unsigned long) ThreadName; 
-            InitThread->process = (void *) InitProcess;
-            
+            InitThread->process      = (void *) InitProcess;
+      
             // Caracteristicas.
             InitThread->iopl  = RING3; 
             InitThread->type  = THREAD_TYPE_IDLE;
@@ -454,26 +454,26 @@ void *create_CreateRing3InitThread (void)
 
     // Contadores.
     InitThread->standbyCount = 0;
-    InitThread->runningCount = 0;    //Tempo rodando antes de parar.
-    InitThread->readyCount = 0;      //Tempo de espera para retomar a execu��o.
+    InitThread->runningCount = 0;  // Tempo rodando antes de parar.
+    InitThread->readyCount   = 0;  // Tempo de espera para retomar a execu��o.
 
-    InitThread->initial_time_ms = get_systime_ms ();
-    InitThread->total_time_ms = 0;
+    InitThread->initial_time_ms = get_systime_ms();
+    InitThread->total_time_ms   = 0;
 
     // Quantidade de tempo rodando dado em ms.
     InitThread->runningCount_ms = 0;
 
-    InitThread->ready_limit = READY_LIMIT;
+    InitThread->ready_limit   = READY_LIMIT;
     InitThread->waitingCount  = 0;
     InitThread->waiting_limit = WAITING_LIMIT;
-    InitThread->blockedCount = 0;    //Tempo bloqueada.
+    InitThread->blockedCount  = 0;    //Tempo bloqueada.
     InitThread->blocked_limit = BLOCKED_LIMIT;
 
     InitThread->ticks_remaining = 1000;
 
     // Signal
     InitThread->signal = 0;
-    InitThread->umask = 0;
+    InitThread->umask  = 0;
 
     //
     // #obs: 
@@ -488,11 +488,17 @@ void *create_CreateRing3InitThread (void)
     // #todo: 
     // Isso deve ser uma estrutura de contexto.
 
+    // #
+    // 0x3200 é o estado inicial de eflags.
+    // Existe um spawn especial para essa thread,
+    // onde eflags inicia com o valor 0x3000.
+    // See: x86init.c
+
     // Stack frame.
 
     InitThread->ss     = 0x23; 
     InitThread->esp    = (unsigned long) CONTROLTHREAD_STACK; 
-    InitThread->eflags = 0x3200;    // #atencao!
+    InitThread->eflags = 0x3200;    // #atenção!
     InitThread->cs     = 0x1B;  
     InitThread->eip    = (unsigned long) CONTROLTHREAD_ENTRYPOINT; 
 

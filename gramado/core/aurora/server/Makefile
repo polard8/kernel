@@ -78,7 +78,7 @@ LIBCOBJ = ../../../../landlib/rtl/obj
 myObjects = crt0.o main.o rtl.o \
 ctype.o stdio.o stdlib.o string.o conio.o socket.o signal.o unistd.o \
 r_render.o \
-pixel.o line.o rect.o xxxinput.o char.o dtext.o createw.o gws.o comp.o window.o \
+bitblt.o line.o rect.o xxxinput.o char.o dtext.o createw.o gws.o comp.o window.o \
 grprim.o sprite.o demos.o bmp.o connect.o button.o font.o\
 termios.o ioctl.o fcntl.o    
 
@@ -91,10 +91,12 @@ main.o:
 	$(CC)  -c  main.c $(user_ccflags) -I $(LIBC) -I $(API02)  -I include/ -I . -o main.o
 all-c:
 
-	$(CC)  -c  render/r_render.c    $(user_ccflags) -I $(LIBC) -I include/ -I .  -o r_render.o
-	
+	$(CC)  -c view/render/r_render.c  $(user_ccflags) -I $(LIBC) -I include/ -I .  -o r_render.o
+
 	# view-like component
-	$(CC)  -c  view/pixel.c    $(user_ccflags) -I $(LIBC) -I include/ -I .  -o pixel.o
+
+	$(CC)  -c  view/display/bitblt.c    $(user_ccflags) -I $(LIBC) -I include/ -I .  -o bitblt.o
+
 	$(CC)  -c  view/char.c     $(user_ccflags) -I $(LIBC) -I include/ -I .  -o char.o
 	$(CC)  -c  view/dtext.c    $(user_ccflags) -I $(LIBC) -I include/ -I .  -o dtext.o
 	$(CC)  -c  view/line.c     $(user_ccflags) -I $(LIBC) -I include/ -I .  -o line.o

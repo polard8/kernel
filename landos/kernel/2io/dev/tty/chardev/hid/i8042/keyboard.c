@@ -184,7 +184,7 @@ void abnt2_keyboard_handler (void){
 
 
     // Disable mouse port.
-    wait_then_write (0x64,0xA7);
+    // wait_then_write (0x64,0xA7);
 
 
     // ??
@@ -292,7 +292,7 @@ sc_again:
 
 done:
     // Reenable the mouse port.
-    wait_then_write (0x64,0xA8);
+    //wait_then_write (0x64,0xA8);
     return;
 }
 
@@ -369,14 +369,41 @@ irq1_KEYBOARD (void)
     // >> No momento esse handler está colocando num buffer em
     // current_stdin os scancodes obtidos na digitação.
 
+    // Disable mouse port.
+    wait_then_write (0x64,0xA7);
+
+
     // pt-br keyboard.
     // Defined in kernel.h
     if (abnt2 == TRUE){
         abnt2_keyboard_handler();
-        return;
+        goto done;
+        //return;
     }
-
     if (abnt2 != TRUE){ panic("irq1_KEYBOARD: not abnt2\n"); }
+
+done:
+
+    // #bugbug
+    // Se estivermos usando uma inicialização reduzida,
+    // onde habilitamos somente a porta do teclado,
+    // não podemos habilitar a porta do mouse, sem a 
+    // devida inicialização.
+
+    // Só reabilitaremos se a configuração de ps2 
+    // nos disser que o segundo dispositivo esta em uso.
+    
+    // Reabilitando a porta de um dispositivo que
+    // ja foi devidamente inicializado.
+
+    if ( PS2.used == TRUE )
+    {
+        if ( PS2.mouse_initialized == TRUE )
+        {
+            // Reenable the mouse port.
+            wait_then_write (0x64,0xA8);
+        }
+    }
 }
 
 

@@ -814,7 +814,7 @@ void ps2mouse_initialize_device (void)
         
         if ( (void *) PS2MouseDeviceTTY == NULL )
         {
-           panic("ps2kbd_initialize_device: PS2MouseDeviceTTY fail");   
+            panic("ps2kbd_initialize_device: PS2MouseDeviceTTY fail");
         }
 
      
@@ -1449,8 +1449,7 @@ void mouseHandler (void)
 
 
     // Disable keyboard.
-    wait_then_write (0x64,0xAD); 
-
+    // wait_then_write (0x64,0xAD);
 
     //#todo: Isso é um teste.
     // O mouse ps2 está desabilitado porém recebendo as interupções
@@ -1462,7 +1461,7 @@ void mouseHandler (void)
     //if ( ps2_mouse_status == 0 )
     //{
     //      return;
-    // }
+    //}
 
 
 	//Char para o cursor provisório.
@@ -1602,7 +1601,7 @@ void mouseHandler (void)
     };
 
     // Reanable keyboard.
-    wait_then_write (0x64,0xAE); 
+    // wait_then_write (0x64,0xAE); 
 }
 
 

@@ -144,10 +144,23 @@ void gwssrv_debug_print (char *string)
 // #todo: We can use the rtl.
 int gwssrv_clone_and_execute ( char *name )
 {
-    //if( (void*) name == NULL ){ return -1; }
-    //if(*name == 0){ return -1 }
+    
+    if ( (void*) name == NULL ){ 
+        printf ("gwssrv_clone_and_execute: [FAIL] name\n");
+        return -1; 
+    }
+    
+    if (*name == 0){ 
+        printf ("gwssrv_clone_and_execute: [FAIL] *name\n");
+        return -1; 
+    }
 
-    return (int) gramado_system_call ( 900, (unsigned long) name, 0, 0 );
+    // #deprecated
+    // return (int) gramado_system_call ( 900, (unsigned long) name, 0, 0 );
+    
+    // #todo
+    // Use this one.
+    return (int) sc82 ( 900, (unsigned long) name, 0, 0 );
 }
 
 

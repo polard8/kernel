@@ -78,16 +78,19 @@ void spawn_thread (int id)
 	// #todo: 
 	// Filtrar tid.
 
-    if ( id < 0 || id >= THREAD_COUNT_MAX)
+    if ( id < 0 || id >= THREAD_COUNT_MAX )
     {
         printf ("spawn-spawn_thread: TID=%d", id );
-        die ();
+        die();
     }
 
 
 	//
 	// Pega na lista.
 	//
+
+    // #todo
+    // Check current thread validation.
 
 	// Pega e salva a atual.
 	// Ser� usada no caso de falha.
@@ -156,7 +159,7 @@ void spawn_thread (int id)
 		// Configura a pr�xima.
 		// A next ser� a antiga current salva anteriormente.
 
-        spawn_Pointer->next = (void *) Current;        
+        spawn_Pointer->next = (void *) Current; 
 
 
 		// * MOVEMENT 2 (Standby --> Running).
@@ -202,7 +205,7 @@ void spawn_thread (int id)
     IncrementDispatcherCount (SELECT_INITIALIZED_COUNT);
 
 
-	//Set cr3 and flush TLB.
+    // Set cr3 and flush TLB.
 
     spawnSetCr3 ( (unsigned long) spawn_Pointer->DirectoryPA );
 
@@ -248,12 +251,13 @@ void spawn_thread (int id)
     //Eax sujou. Isso é um problema para a thread clonada de fork()
     //Por isso que ela não deve usar o spawn ... e sim ficar ready.
 
-    asm volatile (" cli\n"
-                  " mov $0x23, %ax \n"
-                  " mov %ax, %ds \n"
-                  " mov %ax, %es \n"
-                  " mov %ax, %fs \n"
-                  " mov %ax, %gs \n");  
+    asm volatile ( 
+        " cli \n"
+        " mov $0x23, %ax \n"
+        " mov %ax, %ds   \n"
+        " mov %ax, %es   \n"
+        " mov %ax, %fs   \n"
+        " mov %ax, %gs   \n" );
 
 
 	//unsigned long argc = 1234;
@@ -273,30 +277,43 @@ void spawn_thread (int id)
     //da thread do processo pai. >> vamos suprimir isso.
     
     //asm (" mov $0x1234, %ebx \n");
-	
-	//#test
-	//Mudando eflags para iopl 3 antes de usarmos a pilha.
-	
-	asm (" pushl $0x3000 \n");
-	asm (" popfl \n");
-	
+
+
+    // #test
+    // Mudando eflags para iopl 3 antes de usarmos a pilha.
+
+    asm (" pushl $0x3000 \n");
+    asm (" popfl \n");
+
+
 	// #bugbug
 	// Os carinhas do gcc 9.1.0 resolveram sacanear.
 	// N�o posso usar mais isso porque eles tiveram um ataque de pelanca.
 	// Warning:
 	// "Listening the stack pointer register in a clobber list is deprecated."  
-	
-	
-	// Pilha para iret.
+
+
+    // Stack frame.
+    // Pilha para iret.
     // ss, esp, eip, cs, eip;
 
     //Pilha para iret.
-    asm ("pushl %0" :: "r" ((unsigned long) spawn_Pointer->ss     & 0xffff )  );    //ss.
-    asm ("pushl %0" :: "r" ((unsigned long) spawn_Pointer->esp             )  );    //esp.
-    asm ("pushl %0" :: "r" ((unsigned long) spawn_Pointer->eflags          )  );    //eflags.
-    asm ("pushl %0" :: "r" ((unsigned long) spawn_Pointer->cs     & 0xffff )  );    //cs.
-    asm ("pushl %0" :: "r" ((unsigned long) spawn_Pointer->eip             )  );    //eip.
+    asm ("pushl %0" :: "r" ((unsigned long) spawn_Pointer->ss     & 0xffff ) );  //ss.
+    asm ("pushl %0" :: "r" ((unsigned long) spawn_Pointer->esp             ) );  //esp.
+    asm ("pushl %0" :: "r" ((unsigned long) spawn_Pointer->eflags          ) );  //eflags.
+    asm ("pushl %0" :: "r" ((unsigned long) spawn_Pointer->cs     & 0xffff ) );  //cs.
+    asm ("pushl %0" :: "r" ((unsigned long) spawn_Pointer->eip             ) );  //eip.
     
+
+    // #bugbug
+    // As interrupções estão habilitadas ?
+    // Qual é o valor de eflags no stack frame ?
+
+    // Lembrando que no caso do processo init
+    // saltamos com as interrupções desabilitadas,
+    // mas no caso das outras threads precisamos saltar com as
+    // interrupções habilitadas.
+
 
     // #bugbug
     // Why the EOI ?

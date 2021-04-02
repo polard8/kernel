@@ -761,8 +761,17 @@ void *gde_extra_services (
 	// See: See: ps/action/clone.c
 
     // IN: name, dir address.
-    if ( number == 900 ){
+    if ( number == 900 )
+    {
         debug_print("gde_extra_services: [900] clone and execute\n"); 
+        
+        // #todo
+        // Now we have the same service in sc2() syscall,
+        // so the goal is deprecate this one.
+        
+        // #test
+        panic ("gde_extra_services: [900] [DEPRECATED] clone and execute\n");
+        
         return (void *) clone_and_execute_process( (const char *) arg2 );
     }
 
