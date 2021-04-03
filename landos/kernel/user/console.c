@@ -1785,6 +1785,10 @@ int VirtualConsole_initialize(void)
 // called by devices that are not block devices.
 // probably keyboard and serial devices.
 // See: keyboard.c and serial.c
+// Called by abnt2_keyboard_handler().
+
+// #todo
+// Maybe we need the foreground_thread as a parameter.
 
 void console_interrupt(int device_type, int data)
 {

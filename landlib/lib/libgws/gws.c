@@ -38,6 +38,14 @@
 #include "include/gws.h"  
 
 
+
+
+// #test
+// #todo
+// Default display used by the library.
+// struct gws_display_d *__gwsCurrentDisplay;
+
+
 // #todo
 // + draw line
 // ...
@@ -3587,6 +3595,17 @@ void gws_close_display( struct gws_display_d *display)
 
     display = NULL;
 }
+
+
+
+/*
+  // #todo
+  // Send some pending requests.
+void gws_flush_display ( struct gws_display_d *display );
+void gws_flush_display ( struct gws_display_d *display )
+{
+}
+*/
 
 
 //

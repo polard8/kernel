@@ -200,8 +200,8 @@ void abnt2_keyboard_handler (void){
     // O byte pode ser uma resposta à um comando ou 
     // um scancode.
 
-    unsigned char __raw=0;
-    unsigned char val=0;
+    unsigned char __raw = 0;
+    unsigned char val   = 0;
 
 sc_again:
 
@@ -217,7 +217,7 @@ sc_again:
     /* get the raw byte for the key struck */
     __raw = in8(0x60);
 
-    val   = in8(0x61);       /* strobe the keyboard to ack the char */
+    val = in8(0x61);         /* strobe the keyboard to ack the char */
     out8(0x61, val | 0x80);  /* strobe the bit high */
     out8(0x61, val);         /* now strobe it low */
     //===========================================

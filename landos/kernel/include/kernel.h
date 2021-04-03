@@ -130,18 +130,17 @@ extern unsigned long stack0_krn_ptr;
 
 // rawgr -
 // #view presentation output.
-#include "hal/dev/tty/vt/rawgr/view/display.h"
-#include "hal/dev/tty/vt/rawgr/view/screen.h"
-#include "hal/dev/tty/vt/rawgr/view/video.h"
-
+#include "user/rawgr/view/display.h"
+#include "user/rawgr/view/screen.h"
+#include "user/rawgr/view/video.h"
 
 // Render
-#include "hal/dev/tty/vt/render/r_render.h"
+#include "user/render/r_render.h"
 
 
 // #model. data model.
-#include "hal/dev/tty/vt/rawgr/model/fonts.h"
-#include "hal/dev/tty/vt/rawgr/model/ascii.h" 
+#include "user/rawgr/model/fonts.h"
+#include "user/rawgr/model/ascii.h" 
 
 
 // fs
@@ -157,11 +156,10 @@ extern unsigned long stack0_krn_ptr;
 
 // rawgr - 
 // view - input and presentation
-#include "hal/dev/tty/vt/rawgr/view/prompt.h"
+#include "user/rawgr/view/prompt.h"
 
 // view - showing the data.
-#include "hal/dev/tty/vt/rawgr/view/bmp2.h"
-
+#include "user/rawgr/view/bmp2.h"
 
 
 // hal
@@ -208,14 +206,14 @@ extern unsigned long stack0_krn_ptr;
 
 // rawgr - window server
 // inputs
-#include "hal/dev/tty/vt/rawgr/view/xproc.h"
-#include "hal/dev/tty/vt/rawgr/view/keyboard.h"
-#include "hal/dev/tty/vt/rawgr/view/mouse.h"
-#include "hal/dev/tty/vt/rawgr/view/vk.h"
-#include "hal/dev/tty/vt/rawgr/view/kbdabnt2.h"
+#include "user/rawgr/view/xproc.h"
+#include "user/rawgr/view/keyboard.h"
+#include "user/rawgr/view/mouse.h"
+#include "user/rawgr/view/vk.h"
+#include "user/rawgr/view/kbdabnt2.h"
 
 // #view. drawing routines.
-#include "hal/dev/tty/vt/rawgr/view/ldisc.h"
+#include "user/rawgr/view/ldisc.h"
 
 //storage (^)
 #include "hal/dev/blkdev/ide.h"
@@ -258,41 +256,39 @@ extern unsigned long stack0_krn_ptr;
 #include "land/ps/mk.h"
 
 
-
 // rawgr - 
 // model business logic
-#include "hal/dev/tty/vt/rawgr/model/kgwm.h"
-#include "hal/dev/tty/vt/rawgr/model/ws.h"
+#include "user/kgwm.h"
+#include "user/ws.h"
 
 // #view - designers
-#include "hal/dev/tty/vt/rawgr/view/window.h"
-#include "hal/dev/tty/vt/rawgr/view/menu.h"
-#include "hal/dev/tty/vt/rawgr/view/pbar.h"
-#include "hal/dev/tty/vt/rawgr/view/bmp.h"
-#include "hal/dev/tty/vt/rawgr/view/line.h"
+#include "user/rawgr/view/window.h"
+#include "user/rawgr/view/menu.h"
+#include "user/rawgr/view/pbar.h"
+#include "user/rawgr/view/bmp.h"
+#include "user/rawgr/view/line.h"
 
 // #view. presentation
-#include "hal/dev/tty/vt/rawgr/view/terminal.h"
-#include "hal/dev/tty/vt/rawgr/view/guiconf.h"
+#include "user/terminal.h"
+#include "user/rawgr/view/guiconf.h"
 
 
 //
 // == Security ===============================
 //
 
-#include "land/security/usession.h"
-#include "land/security/room.h"
-#include "land/security/desktop.h"
-#include "land/security/user.h"
-#include "land/security/security.h"
+#include "user/security/usession.h"
+#include "user/security/room.h"
+#include "user/security/desktop.h"
+#include "user/security/user.h"
+#include "user/security/security.h"
 
 
 // rawgr - window server, and beyond
-#include "hal/dev/tty/vt/rawgr/logon.h"
-#include "hal/dev/tty/vt/rawgr/logoff.h"
 
-// model. business logic
-#include "hal/dev/tty/vt/rawgr/model/kgws.h"
+#include "user/logon.h"
+#include "user/logoff.h"
+#include "user/kgws.h"
 
 
 // tty
@@ -302,18 +298,16 @@ extern unsigned long stack0_krn_ptr;
 #include "hal/dev/tty/pty.h"
 
 
-#include "hal/dev/tty/vt/vt.h"
-#include "hal/dev/tty/vt/console.h"
+#include "user/vt.h"
+#include "user/console.h"
 
 
 // =============================
 // rawgr - i8042 ps2 controller.
-#include "hal/dev/tty/vt/rawgr/view/i8042/i8042.h"
-#include "hal/dev/tty/vt/rawgr/view/i8042/ps2mouse.h"
-#include "hal/dev/tty/vt/rawgr/view/i8042/ps2kbd.h"
-#include "hal/dev/tty/vt/rawgr/view/i8042/ps2.h"
-
-
+#include "user/rawgr/view/i8042/i8042.h"
+#include "user/rawgr/view/i8042/ps2mouse.h"
+#include "user/rawgr/view/i8042/ps2kbd.h"
+#include "user/rawgr/view/i8042/ps2.h"
 
 
 //
@@ -376,7 +370,7 @@ extern unsigned long stack0_krn_ptr;
 
 // rawgr - 
 // view. input support.
-#include "hal/dev/tty/vt/rawgr/view/cursor.h"
+#include "user/rawgr/view/cursor.h"
 
 
 #include "land/messages.h"

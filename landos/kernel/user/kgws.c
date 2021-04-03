@@ -87,7 +87,15 @@ void kgws_disable(void)
 
 //=================================
 
+/*
+ ******************* 
+ * kgws_put_console:
+ * 
+ *     Colocamos na tty PS2KeyboardDeviceTTY ou imprimimos na tela.
+ * 
+ */
 
+// Somente para SETUP INPUT MODE.
 
 int 
 kgws_put_console ( 
@@ -96,7 +104,6 @@ kgws_put_console (
     unsigned long ascii_code,
     unsigned long raw_byte )
 {
-
 
     //==============
     // [event block]
@@ -128,21 +135,42 @@ kgws_put_console (
     
     // only one standard event
     unsigned long event_buffer[5];
-    char xxxbug[4];
-    int xxxi=0;//iterator.
-    
-    if ( current_input_mode == INPUT_MODE_TTY ){
 
-    if ( (void *) PS2KeyboardDeviceTTY != NULL )
+
+    int i=0;    //iterator.
+    char bugBuffer[4];
+
+
+    //
+    // SETUP INPUT MODE
+    //
+
+    if ( current_input_mode == INPUT_MODE_SETUP )
     {
-        // ok. This is a valid tty pointer.
+        printf("kgws_put_console: This routine is only for SETUP INPUT MODE\n");
+        goto fail;
+        //refresh_screen();
+        //return -1;
+    }
+
+
+    //
+    // TTY INPUT MODE
+    //
+
+    if ( current_input_mode == INPUT_MODE_TTY )
+    {
+
+        if ( (void *) PS2KeyboardDeviceTTY != NULL )
+        {
+            // ok. This is a valid tty pointer.
        
         // #test
         // Let's write something ...
-        event_buffer[0] = (unsigned long) Event_Window;                      // window pointer 
-        event_buffer[1] = (unsigned long) Event_Message;                     // message number.
-        event_buffer[2] = (unsigned long) Event_LongASCIICode & 0x000000ff;  // ascii code
-        event_buffer[3] = (unsigned long) Event_LongRawByte   & 0x000000ff;  // raw byte
+            event_buffer[0] = (unsigned long) Event_Window;                      // window pointer 
+            event_buffer[1] = (unsigned long) Event_Message;                     // message number.
+            event_buffer[2] = (unsigned long) Event_LongASCIICode & 0x000000ff;  // ascii code
+            event_buffer[3] = (unsigned long) Event_LongRawByte   & 0x000000ff;  // raw byte
        
         // #todo
         // >> PS2KeyboardDeviceTTY->_rbuffer
@@ -159,21 +187,21 @@ kgws_put_console (
         
         //quanto a fila eh canonica, escrevemos somente os keydown.
                 
-        //xxxbug[0] = 'x';  //fake bytes
-        xxxbug[0] = Event_LongASCIICode & 0x000000ff;
+            //xxxbug[0] = 'x';  //fake bytes
+            bugBuffer[0] = Event_LongASCIICode & 0x000000ff;
 
         // ?? #bugbug
         // Explique melhor isso. ... estamos escrevendo um byte 
         // no arquivo '0' ???
         //if ( Event_Message == MSG_KEYDOWN)
-        sys_write(0,xxxbug,1);
+            sys_write(0,bugBuffer,1);
         
         // coloca o raw byte no buffer de raw byte.
         //file_write_buffer ( PS2KeyboardDeviceTTY->_rbuffer, "dirty", 5);
         
-        //canonica
-        //if ( Event_Message == MSG_KEYDOWN)
-        file_write_buffer ( PS2KeyboardDeviceTTY->_cbuffer, xxxbug , 1);
+            //canonica
+            //if ( Event_Message == MSG_KEYDOWN)
+            file_write_buffer ( PS2KeyboardDeviceTTY->_cbuffer, bugBuffer , 1);
         
         // #bugbug
         // Estamos colocando um evento no buffer 'bruto'.
@@ -189,28 +217,32 @@ kgws_put_console (
          
          // Sinalizamos que temos um novo evento.
          
-   
+         // #todo
+         // Precisamos de uma flag que diga que é para imprimirmos na tela.
          
          // o teclado esta escrevendo na tty
          // ela decide se faz echo no console ou nao,
          // dependendo da configuraçao da tty.
          // #test: fazendo echo
-         if ( (Event_Message == MSG_KEYDOWN) && ((char)xxxbug[0] != '\n') )
-         {
-             // ainda nao pode ler.
-             PS2KeyboardDeviceTTY->new_event = FALSE;
+            if ( (Event_Message == MSG_KEYDOWN) && ((char)bugBuffer[0] != '\n') )
+            {
+                // ainda nao pode ler.
+                PS2KeyboardDeviceTTY->new_event = FALSE;
          
-             console_write ( 
-                 (int) fg_console, 
-                 (const void *) xxxbug, 
-                 (size_t) 1 );
+                console_write ( 
+                    (int) fg_console, 
+                    (const void *) bugBuffer, 
+                    (size_t) 1 );
 
-             refresh_screen(); //#bugbug: teste
-         }
-         //pode ler
-         if ( (Event_Message == MSG_KEYDOWN) && ((char)xxxbug[0] == 'q') )
-         {
-             PS2KeyboardDeviceTTY->new_event = TRUE;
+                
+                // #bugbug:
+                // Usado somente para teste.
+                refresh_screen(); 
+            }
+            //pode ler
+            if ( (Event_Message == MSG_KEYDOWN) && ((char)bugBuffer[0] == 'q') )
+            {
+                PS2KeyboardDeviceTTY->new_event = TRUE;
 
              // da proxima vez escreveremos no inicio do buffer.
              //PS2KeyboardDeviceTTY->_rbuffer->_w = 0;
@@ -218,19 +250,26 @@ kgws_put_console (
              //PS2KeyboardDeviceTTY->_rbuffer->_p = PS2KeyboardDeviceTTY->_rbuffer->_base; 
              //PS2KeyboardDeviceTTY->_rbuffer->_cnt = PS2KeyboardDeviceTTY->_rbuffer->_lbfsize;
              //for( xxxi=0; xxxi<BUFSIZ; xxxi++){ PS2KeyboardDeviceTTY->_rbuffer->_p[xxxi] = 0; };
-         }
+            }
   
-    }
+        }
+        
+        // ok
+        return 0;
     } //fim do current input mode. (TTY MODE)
 
 
-
-
-    return 0;
+fail:
+    refresh_screen();
+    // fail
+    return -1;
 }
 
 
 // keyboard events.
+// Envia eventos para a fila na thread em foreground.
+// Chama um diálogo local para algumas combinações de teclas.
+
 int 
 kgws_event_dialog ( 
     int tid,
@@ -446,17 +485,22 @@ KGWS_SEND_KEYBOARD_MESSAGE (
 // Eh ele que le na fila de RAW bytes de constroi uma fila de eventos.
 // Esses eventos serao lidos pelos cliente.
 
-    struct process_d  *__p;
-    struct thread_d   *t;
-
-
     // Step 0 
     // Declarações de variáveis.
 
 
+    struct process_d  *__p;
+    struct thread_d   *t;
+
+
+    unsigned long status = 0;
+    int msg_status = -1;
+    int save_pos = 0;
+
+
     // Pegando o argumento e convertendo para ascii
-    unsigned char Keyboard_RawByte=0;
-    unsigned char Keyboard_ScanCode=0;        // The scancode.
+    unsigned char Keyboard_RawByte  =0;
+    unsigned char Keyboard_ScanCode =0;    // The scancode.
 
     //==============
     // [event block]
@@ -471,22 +515,13 @@ KGWS_SEND_KEYBOARD_MESSAGE (
     Event_Window = NULL;
 
 
-    
-    unsigned long status=0;    //
-    
-    int msg_status = -1;
-    
-    int save_pos = 0;
-
 
     if (tid<0){
         debug_print("KGWS_SEND_KEYBOARD_MESSAGE: tid\n");
         return -1;
     }
 
-
-
-
+    // =============
     // Step1
     // Pegar o RawByte.
     // O driver pegou o scancode e passou para a disciplina de linha 
@@ -494,22 +529,22 @@ KGWS_SEND_KEYBOARD_MESSAGE (
 
     Keyboard_RawByte = raw_byte;
 
-
 	// Obs: 
 	// Observe que daqui pra frente todas as rotinas poderiam 
 	// estar em user mode.
 
-
     // #debug.
     // Show the scancode if the flag is enabled.
-
+    // Talvez isso nem seja necess'ario.
+    
     // rawbyteStatus
-    if (scStatus == 1){
-        printk ("raw byte {%d,%x} ", Keyboard_RawByte, Keyboard_RawByte );
+    if (scStatus == TRUE){
+        printk ("raw byte {%d,%x} ", 
+            Keyboard_RawByte, Keyboard_RawByte );
         // Refresh screen?
     }
 
-
+    // ==========
     // Step 2
     // Tratar as mensagens.
     // Traduzir rawbyte em evento.
@@ -919,7 +954,11 @@ done:
              (int)               Event_Message,
              (unsigned long)     Event_LongASCIICode,
              (unsigned long)     Event_LongRawByte );
+
+        // #bugbug: O retorno deve ser o mesmo do diálogo acima.
+        return 0;
     } 
+
 
     // Se o caso não é enviar para o tty,
     // então vamos enviar para o procedimento do sistema
@@ -940,18 +979,26 @@ done:
     //}
 
 
-    kgws_event_dialog ( 
-        (int) tid,
-        (struct window_d *) Event_Window,
-        (int)               Event_Message,
-        (unsigned long)     Event_LongASCIICode,
-        (unsigned long)     Event_LongRawByte );
+    // #bugbug
+    // Bem, na verdade esse tipo de input pode ser usado para
+    // além do ambiente de setup. Podemos usar também
+    // nos window server e seus clientes.
+
+    if ( current_input_mode == INPUT_MODE_SETUP )
+    {
+        kgws_event_dialog ( 
+            (int) tid,
+            (struct window_d *) Event_Window,
+            (int)               Event_Message,
+            (unsigned long)     Event_LongASCIICode,
+            (unsigned long)     Event_LongRawByte );
+        
+        // #bugbug: O retorno deve ser o mesmo do diálogo acima.
+        return 0;
+    }
 
 
-    // #todo #bugbug
-    // Esse retorno é o mesmo retorno do diálogo acima.
-
-    return 0;
+    return -1;
 }
 
 

@@ -225,8 +225,7 @@ void __initDialog ( int message )
  ******************************************************************* 
  * __local_ps2kbd_procedure:
  * 
- *       This function handle the emergency keys F5, F6, F6 and F8.
- *       MSG_SYSKEYUP only.
+ *       Some combinations with control + F1~F12
  */
 
 // Local function.
@@ -255,16 +254,15 @@ __local_ps2kbd_procedure (
     int Status = -1;
 
 
-    if (msg<0)
+    if (msg<0){
         return 0;
-
+    }
 
     switch (msg){
 
         // Pressionadas: teclas de funçao
         case MSG_SYSKEYDOWN: 
-            switch (long1)  
-            {
+            switch (long1){
 
                 case VK_F1:
                     if (ctrl_status == 1){
@@ -569,6 +567,16 @@ int BAT_TEST (void){
 }
 
 
+/*
+ *************************
+ * ps2kbd_globals_initialize:
+ * 
+ *     ioControl_keyboard,
+ *     PS2keyboardTTY
+ *     
+ * 
+ */
+
 // Initialize globals.
 
 int ps2kbd_globals_initialize (void){
@@ -586,11 +594,11 @@ int ps2kbd_globals_initialize (void){
     if ( (void *) ioControl_keyboard == NULL ){
         panic ("ps2_keyboard_initialize: [FAIL] ioControl_keyboard\n");
     }else{
-        
-        ioControl_keyboard->id = 0;
 
         ioControl_keyboard->used  = TRUE;
         ioControl_keyboard->magic = 1234;
+
+        ioControl_keyboard->id = 0;
 
 		// qual thread está usando o dispositivo ?
         ioControl_keyboard->tid = 0;  
@@ -647,14 +655,14 @@ int ps2kbd_globals_initialize (void){
     file *current_stdin;
 
     slot = get_free_slots_in_the_file_table();
-    if(slot<0 || slot >=NUMBER_OF_FILES)
-        panic("ps2kbd_globals_initialize: current_stdin file slot");
-   
+    if (slot<0 || slot >=NUMBER_OF_FILES){
+        panic("ps2kbd_globals_initialize: current_stdin file slot\n");
+    }
     current_stdin =  (file *) file_table[slot];
     current_stdin->filetable_index = slot;
     current_stdin->____object = ObjectTypeFile; //Regular file (tty buffer)
-    current_stdin->used  = TRUE;
-    current_stdin->magic = 1234;
+    current_stdin->used   = TRUE;
+    current_stdin->magic  = 1234;
     current_stdin->_flags = (__SWR | __SRD); 
     
     // Struct.
@@ -673,8 +681,8 @@ int ps2kbd_globals_initialize (void){
     current_stdin->_p = (unsigned char *) &current_stdin_data_buffer[0];    
     current_stdin->_r = 0;
     current_stdin->_w = 0;
-    current_stdin->_cnt = 128;  //Limitando. na verdade e' 4KB.
-    current_stdin->_tmpfname = "KBDIN   TXT";
+    current_stdin->_cnt       = 128;  //Limitando. na verdade e' 4KB.
+    current_stdin->_tmpfname  = "KBDIN   TXT";
     current_stdin->fd_counter = 1;
 
     // #test
@@ -686,7 +694,6 @@ int ps2kbd_globals_initialize (void){
     };
     keybuffer_head = 0;
     keybuffer_tail = 0;
-
 
     // Exportando o buffer para o driver usar.
     // Acessível através da tty.
@@ -703,14 +710,14 @@ int ps2kbd_globals_initialize (void){
     file *current_stdout;
 
     slot = get_free_slots_in_the_file_table();
-    if(slot<0 || slot >=NUMBER_OF_FILES)
-        panic("ps2kbd_globals_initialize: current_stdout file slot");
-   
+    if(slot<0 || slot >=NUMBER_OF_FILES){
+        panic("ps2kbd_globals_initialize: current_stdout file slot\n");
+    }
     current_stdout = (file *) file_table[slot];
     current_stdout->filetable_index = slot;
     current_stdout->____object = ObjectTypeFile; //Regular file (tty buffer)
-    current_stdout->used  = TRUE;
-    current_stdout->magic = 1234;
+    current_stdout->used   = TRUE;
+    current_stdout->magic  = 1234;
     current_stdout->_flags = (__SWR | __SRD); 
     
     // Struct.
@@ -729,19 +736,14 @@ int ps2kbd_globals_initialize (void){
     current_stdout->_p = (unsigned char *) &current_stdout_data_buffer[0];    
     current_stdout->_r = 0;
     current_stdout->_w = 0;
-    current_stdout->_cnt = 128;  //Limitando. na verdade e' 4KB.
-    current_stdout->_tmpfname = "KBDOUT  TXT";
+    current_stdout->_cnt       = 128;  //Limitando. na verdade e' 4KB.
+    current_stdout->_tmpfname  = "KBDOUT  TXT";
     current_stdout->fd_counter = 1;
 
     PS2keyboardTTY._obuffer = current_stdout;
 
 
 
-	//
-	// Set abnt2.
-	//
-
-    abnt2 = (int) TRUE;
 
     //Checar quem está tentando inicializar o módulo.
 
@@ -752,22 +754,29 @@ int ps2kbd_globals_initialize (void){
 
     //Key status.
  
-    key_status        = 0;
-    escape_status     = 0;
-    tab_status        = 0;
-    winkey_status     = 0;
-    ctrl_status       = 0;
-    alt_status        = 0;
-    shift_status      = 0;
-    capslock_status   = 0;
-    scrolllock_status = 0;
-    numlock_status    = 0;
-    //...
+    key_status        = FALSE;
+    escape_status     = FALSE;
+    tab_status        = FALSE;
+    winkey_status     = FALSE;
+    ctrl_status       = FALSE;
+    alt_status        = FALSE;
+    shift_status      = FALSE;
+    capslock_status   = FALSE;
+    scrolllock_status = FALSE;
+    numlock_status    = FALSE;
+    // ...
+
+
+	//
+	// Set abnt2.
+	//
+
+    abnt2 = (int) TRUE;
 
 
 	//Debug support.
-	scStatus = 0;    
-    
+	scStatus = 0;
+
     return 0;
 }
 
