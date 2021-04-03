@@ -404,8 +404,8 @@ all-c:
 	$(CC) -c user/draw/view/tbar.c      $(KINCLUDE) $(CFLAGS) -o tbar.o
 	$(CC) -c user/draw/view/xproc.c     $(KINCLUDE) $(CFLAGS) -o xproc.o
 
-	$(CC) -c user/draw/logoff.c  $(KINCLUDE) $(CFLAGS) -o logoff.o
-	$(CC) -c user/draw/logon.c   $(KINCLUDE) $(CFLAGS) -o logon.o
+	$(CC) -c user/logoff.c  $(KINCLUDE) $(CFLAGS) -o logoff.o
+	$(CC) -c user/logon.c   $(KINCLUDE) $(CFLAGS) -o logon.o
 
 	$(CC) -c user/input.c            $(KINCLUDE) $(CFLAGS) -o input.o
 	$(CC) -c user/output.c           $(KINCLUDE) $(CFLAGS) -o output.o
