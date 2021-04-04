@@ -1830,6 +1830,8 @@ void console_interrupt(int device_type, int data)
             debug_print("console_interrupt: input from network device\n");
             break;
 
+        // ...
+
         default:
             debug_print("console_interrupt: [FAIL] Default input device\n");
             break;

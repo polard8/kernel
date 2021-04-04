@@ -76,22 +76,20 @@ void gwsDisableTextCursor ()
 }
 */ 
 
-//abrir o servidor de janelas. 
+
+// #bugbug
+// A função diz que estamos tratando do ws, mas a flag afeta o wm.
 int gwsOpen (void)
 {
-	//Aberto.
-	kgwm_status = 1;
-	//..
-
+    kgwm_status = TRUE;
     return 0;
 }
 
-
-//fechar o servidor de janelas
+// #bugbug
+// A função diz que estamos tratando do ws, mas a flag afeta o wm.
 int gwsClose (void)
 {
-	kgwm_status = 0;
-
+    kgwm_status = FALSE;
     return 0;
 }
 
@@ -101,15 +99,16 @@ int kgwmRegisterWindowManager ( int pid )
 {
     int Status = 0;
 
+    if ( pid < 0 ){
+        printf("kgwmRegisterWindowManager: pid\n");
+    }
 
-    if ( kgwm_status != 1 )
-    {
+    if ( kgwm_status != TRUE ){
         Status = 1;
         goto fail;
-    
     }else{
         kgwm_wm_PID = (int) pid;
-        kgwm_wm_status = 1;
+        kgwm_wm_status = TRUE;
         return 0;
     };
 
@@ -151,24 +150,24 @@ SetGuiParameters(
 	// Checa validade da estrutura.
 
     if ( (void *) gui == NULL ){
-        debug_print ("SetGuiParameters: gui\n");
+        debug_print ("SetGuiParameters: [FAIL] gui\n");
         return;
-
     }else{
-        gui->refresh = refresh; 
-        gui->screenStatus = screen;
+        gui->refresh          = refresh; 
+        gui->screenStatus     = screen;
         gui->backgroundStatus = background; 
-        gui->mainStatus = main;
-        gui->logoStatus = logo; 
-        gui->taskbarStatus = taskbar;
-        gui->menuStatus = menu;
-        gui->infoboxStatus = infobox;
+        gui->mainStatus       = main;
+        gui->logoStatus       = logo; 
+        gui->taskbarStatus    = taskbar;
+        gui->menuStatus       = menu;
+        gui->infoboxStatus    = infobox;
         gui->messageboxStatus = messagebox;
-        gui->debugStatus = debug;
+        gui->debugStatus      = debug;
         gui->navigationbarStatus = navigationbar; 
         gui->gridStatus = grid;
-		//...
+        // ...
     };
+
 
     //
     // #todo: 
@@ -189,20 +188,20 @@ SetGuiParameters(
 
 void gui_create_screen (void){
 
-    struct window_d *hWindow; 
-
-    unsigned long Left = (unsigned long) SCREEN_DEFAULT_LEFT;
-    unsigned long Top  = (unsigned long) SCREEN_DEFAULT_TOP;
-    
-    unsigned long Width  = (unsigned long) screenGetWidth ();
-    unsigned long Height = (unsigned long) screenGetHeight ();
+    struct window_d  *hWindow; 
 
 
-	// #IMPORTANTE: 
+    unsigned long Left   = (unsigned long) SCREEN_DEFAULT_LEFT;
+    unsigned long Top    = (unsigned long) SCREEN_DEFAULT_TOP;
+    unsigned long Width  = (unsigned long) screenGetWidth();
+    unsigned long Height = (unsigned long) screenGetHeight();
+
+
+	// #important: 
 	// Não tem Parent Window!
 
     if ( (void *) gui == NULL ){
-        debug_print ("gui_create_screen: gui\n");
+        debug_print ("gui_create_screen: [FAIL] gui\n");
         return;
     }
 
@@ -210,13 +209,13 @@ void gui_create_screen (void){
 	//Pintado uma janela simples, toda preta, do tamanho da tela 
 	//do sispositivo.
 
-    hWindow = (void *) CreateWindow ( 1, 0, VIEW_MINIMIZED, "Screen",
+    hWindow = (void *) CreateWindow ( 
+                           1, 0, VIEW_MINIMIZED, "Screen",
                            Left, Top, Width, Height,
                            0, 0, 0, COLOR_BLACK );
 
     if ( (void *) hWindow == NULL ){
-         panic ("gui_create_screen: hWindow");
-
+         panic ("gui_create_screen: [FAIL] hWindow\n");
     }else{
         RegisterWindow (hWindow);
         set_active_window (hWindow); 
@@ -265,15 +264,14 @@ void gui_create_background (void){
  
     struct window_d *hWindow; 
 
-    unsigned long Left = (unsigned long) SCREEN_DEFAULT_LEFT;
-    unsigned long Top  = (unsigned long) SCREEN_DEFAULT_TOP;
-    
-    unsigned long Width  = (unsigned long) screenGetWidth ();
-    unsigned long Height = (unsigned long) screenGetHeight ();
 
+    unsigned long Left   = (unsigned long) SCREEN_DEFAULT_LEFT;
+    unsigned long Top    = (unsigned long) SCREEN_DEFAULT_TOP;
+    unsigned long Width  = (unsigned long) screenGetWidth();
+    unsigned long Height = (unsigned long) screenGetHeight();
 
     if ( (void *) gui == NULL ){
-        debug_print ("gui_create_background: gui\n");
+        debug_print ("gui_create_background: [FAIL] gui\n");
         return;
     }
 
@@ -284,19 +282,17 @@ void gui_create_background (void){
 	//Penso que é nessa janela que podemos carregar uma imagem de 
 	//pano de fundo.
 
-    hWindow = (void *) CreateWindow ( 1, 0, VIEW_MINIMIZED, "Background", 
+    hWindow = (void *) CreateWindow ( 
+                           1, 0, VIEW_MINIMIZED, "Background", 
                            Left, Top, Width, Height,
                            gui->screen, 0, 0, 0x00008080 );
 
-
     if ( (void *) hWindow == NULL ){
-        panic ("gui_create_background:");
-
+        panic ("gui_create_background:\n");
     }else{
         RegisterWindow (hWindow);
         set_active_window (hWindow); 
         windowLock (hWindow);  
-
 
         //Estrutura gui.
         if ( (void *) gui != NULL ){
@@ -309,7 +305,6 @@ void gui_create_background (void){
 
 		//Nothing.
     };
-
 
 done:
     SetFocus (hWindow);
@@ -329,46 +324,42 @@ void gui_create_taskbar (void){
 
     struct window_d *hWindow; 
 
-    unsigned long Left = (unsigned long) SCREEN_DEFAULT_LEFT;
-    unsigned long Top  = (unsigned long) SCREEN_DEFAULT_TOP;
-    
-    unsigned long Width  = (unsigned long) screenGetWidth ();
-    unsigned long Height = (unsigned long) screenGetHeight ();
 
+    unsigned long Left   = (unsigned long) SCREEN_DEFAULT_LEFT;
+    unsigned long Top    = (unsigned long) SCREEN_DEFAULT_TOP;
+    unsigned long Width  = (unsigned long) screenGetWidth();
+    unsigned long Height = (unsigned long) screenGetHeight();
 
     if ( (void *) gui == NULL ){
         debug_print ("gui_create_taskbar: gui\n");
         return;
     }
 
-
     // draw bar
 
     Height = (Height/8);
 
-    hWindow = (void *) CreateWindow ( 1, 0, VIEW_MINIMIZED, "taskbar", 
+    hWindow = (void *) CreateWindow ( 
+                           1, 0, VIEW_MINIMIZED, "taskbar", 
                            Left, Top, Width, Height, 
                            gui->screen, 0, 0, COLOR_WHITE );
 
     if ( (void *) hWindow == NULL){
-        panic ("gui_create_taskbar:\n");
-
+        panic ("gui_create_taskbar: [FAIL] \n");
     }else{
         RegisterWindow (hWindow);
         windowLock (hWindow); 
 
         if ( (void *) gui != NULL )
         {
-            gui->taskbarStatus = (int) 1;
-            gui->taskbar = (void *) hWindow;
+            gui->taskbarStatus = TRUE;
+            gui->taskbar       = (void *) hWindow;
         }
 
 		//...
     };
 
-	//...
-
-    //return; 
+	// ...
 }
 
 
@@ -393,22 +384,21 @@ void gui_create_mainwindow (void){
 
     struct window_d *hWindow; 
 
-    unsigned long Left = (unsigned long) SCREEN_DEFAULT_LEFT;
-    unsigned long Top  = (unsigned long) SCREEN_DEFAULT_TOP;
-    
-    unsigned long Width  = (unsigned long) screenGetWidth ();
-    unsigned long Height = (unsigned long) screenGetHeight ();
+
+    unsigned long Left   = (unsigned long) SCREEN_DEFAULT_LEFT;
+    unsigned long Top    = (unsigned long) SCREEN_DEFAULT_TOP;
+    unsigned long Width  = (unsigned long) screenGetWidth();
+    unsigned long Height = (unsigned long) screenGetHeight();
 
 
 	//estrutura gui.
     if ( (void *) gui == NULL ){
-        panic ("gui_create_mainwindow: gui\n");
+        panic ("gui_create_mainwindow: [FAIL] gui\n");
     }
-
 
 	//janela taskbar.
     if ( (void *) gui->taskbar == NULL ){
-        panic ("gui_create_mainwindow: taskbar\n");
+        panic ("gui_create_mainwindow: [FAIL] taskbar\n");
     }
 
 
@@ -427,15 +417,14 @@ void gui_create_mainwindow (void){
 	//É onde ficam as janelas dos aplicativos.
 	//A janela principal perence ao desktop
 
-    hWindow = (void *) CreateWindow ( 1, 0, VIEW_MINIMIZED, "desktop window", 
+    hWindow = (void *) CreateWindow ( 
+                           1, 0, VIEW_MINIMIZED, "desktop window", 
                            Left, Top, Width, Height,           
                            gui->screen, 0, 0, COLOR_WHITE );   
 
     if ( (void *) hWindow == NULL){
-        panic ("gui_create_mainwindow:\n");
-
+        panic ("gui_create_mainwindow: [FAIL] hWindow\n");
      }else{   
-
         RegisterWindow (hWindow);
         windowLock (hWindow); 
         set_active_window (hWindow); 
@@ -444,8 +433,8 @@ void gui_create_mainwindow (void){
         //hWindow->desktop = (void*) desktop0;
 
         if ( (void *) gui == NULL ){
-            //message
-            return;
+            panic ("gui_create_mainwindow: [FAIL] gui\n");
+            //return;
         }else{
             gui->main = (void *) hWindow;
         };
@@ -474,7 +463,7 @@ void gui_create_mainwindow (void){
     {
         gui->desktop = (void *) gui->screen;
 
-        if ( (void *) gui->desktop == NULL)
+        if ( (void *) gui->desktop == NULL )
         { 
             SetFocus (hWindow);
             return; 
@@ -518,7 +507,6 @@ void gui_create_infobox (void){
     if ( (void *) gui == NULL ){
         debug_print ("gui_create_infobox: gui\n");
         return;
-    
     }else{
         gui->infobox = NULL;
     };    
@@ -534,7 +522,6 @@ void gui_create_messagebox (void){
     if ( (void *) gui == NULL ){
         debug_print ("gui_create_messagebox: gui\n");
         return;
-    
     }else{
         gui->messagebox = NULL;
     };
@@ -552,7 +539,6 @@ void gui_create_debug (void){
     if ( (void *) gui == NULL ){
         debug_print ("gui_create_debug: gui\n");
         return;
-    
     }else{
         gui->debug = NULL;
     };
@@ -590,7 +576,6 @@ void gui_create_grid (void){
  
     if ( (void *) gui == NULL ){
         return;
-        
     }else{
 		//initScreenGrid();
         gui->grid = NULL;
@@ -603,7 +588,7 @@ void gui_create_grid (void){
 
 void *guiGetScreenWindow (void){
 
-    if ( (void *) gui == NULL)
+    if ( (void *) gui == NULL )
     {
         return NULL;
     }
@@ -617,7 +602,8 @@ void *guiGetScreenWindow (void){
 
 void *guiGetDeveloperScreenWindow (void){
 
-    if ( (void *) gui == NULL){
+    if ( (void *) gui == NULL )
+    {
         //message
         return NULL;
     }
@@ -632,7 +618,8 @@ void *guiGetDeveloperScreenWindow (void){
 
 void *guiGetBackgroundWindow (void){
 
-    if ( (void *) gui == NULL){
+    if ( (void *) gui == NULL )
+    {
         //message
         return NULL;
     }
@@ -646,7 +633,7 @@ void *guiGetBackgroundWindow (void){
 
 void *guiGetLogoWindow (void){
 
-    if ( (void *) gui == NULL)
+    if ( (void *) gui == NULL )
     {
         return NULL;
     }
@@ -658,7 +645,7 @@ void *guiGetLogoWindow (void){
 //desktop window
 void *guiGetDesktopWindow (void){
 
-    if ( (void *) gui == NULL)
+    if ( (void *) gui == NULL )
     {
         return NULL;
     }
@@ -671,7 +658,7 @@ void *guiGetDesktopWindow (void){
 
 void *guiGetTaskbarWindow (void){
 
-    if ( (void *) gui == NULL)
+    if ( (void *) gui == NULL )
     {
          return NULL;
     }
@@ -686,7 +673,7 @@ void *guiGetTaskbarWindow (void){
 
 void *guiGetMainWindow (void){
 
-    if ( (void *) gui == NULL)
+    if ( (void *) gui == NULL )
     {
         return NULL;
     }
@@ -699,7 +686,7 @@ void *guiGetMainWindow (void){
 
 void *guiGetStatusbarWindow (void){
 
-    if ( (void *) gui == NULL)
+    if ( (void *) gui == NULL )
     {
         return NULL;
     }
@@ -712,7 +699,7 @@ void *guiGetStatusbarWindow (void){
 
 void *guiGetGridWindow (void){
 
-    if ( (void *) gui == NULL)
+    if ( (void *) gui == NULL )
     {
         return NULL;
     }
@@ -725,7 +712,7 @@ void *guiGetGridWindow (void){
 
 void *guiGetMenuWindow (void){
 
-    if ( (void *) gui == NULL)
+    if ( (void *) gui == NULL )
     {
         return NULL;
     }
@@ -738,7 +725,7 @@ void *guiGetMenuWindow (void){
 
 void *guiGetInfoboxWindow (void){
 
-    if ( (void *) gui == NULL)
+    if ( (void *) gui == NULL )
     {
         return NULL;
     }
@@ -752,7 +739,7 @@ void *guiGetInfoboxWindow (void){
 
 void *guiGetTooltipWindow (void){
 
-    if ( (void *) gui == NULL)
+    if ( (void *) gui == NULL )
     {
         return NULL;
     }
@@ -765,7 +752,7 @@ void *guiGetTooltipWindow (void){
 
 void *guiGetMessageboxWindow (void){
 
-    if ( (void *) gui == NULL)
+    if ( (void *) gui == NULL )
     {
         return NULL;
     }
@@ -778,7 +765,7 @@ void *guiGetMessageboxWindow (void){
 
 void *guiGetDialogboxWindow (void){
 
-    if ( (void *) gui == NULL)
+    if ( (void *) gui == NULL )
     {
         return NULL;
     }
@@ -791,7 +778,7 @@ void *guiGetDialogboxWindow (void){
 
 void *guiGetDebugWindow (void){
 
-    if ( (void *) gui == NULL)
+    if ( (void *) gui == NULL )
     {
         return NULL;
     }
@@ -805,7 +792,7 @@ void *guiGetDebugWindow (void){
 
 void *guiGetMbhWindowWindow (void){
 
-    if ( (void *) gui == NULL)
+    if ( (void *) gui == NULL )
     {
         return NULL;
     }
@@ -817,7 +804,7 @@ void *guiGetMbhWindowWindow (void){
 //top bar.
 void *guiGetTopbarWindow (void){
 
-    if ( (void *) gui == NULL)
+    if ( (void *) gui == NULL )
     {
         return NULL;
     }
@@ -831,7 +818,7 @@ void *guiGetTopbarWindow (void){
 
 void *guiGetNavigationbarWindow (void){
 
-    if ( (void *) gui == NULL)
+    if ( (void *) gui == NULL )
     {
         return NULL;
     }
@@ -845,7 +832,7 @@ void *guiGetNavigationbarWindow (void){
 
 void *guiGetShellWindowWindow (void){
 
-    if ( (void *) gui == NULL)
+    if ( (void *) gui == NULL )
     {
         return NULL;
     }
@@ -876,9 +863,8 @@ guiSetUpMainWindow (
     unsigned long height )
 {
 
-    unsigned long Left = (unsigned long) SCREEN_DEFAULT_LEFT;
-    unsigned long Top  = (unsigned long) SCREEN_DEFAULT_TOP;
-    
+    unsigned long Left   = (unsigned long) SCREEN_DEFAULT_LEFT;
+    unsigned long Top    = (unsigned long) SCREEN_DEFAULT_TOP;
     unsigned long Width  = (unsigned long) screenGetWidth ();
     unsigned long Height = (unsigned long) screenGetHeight ();
 
@@ -895,8 +881,8 @@ guiSetUpMainWindow (
     { return; }
 
 
-    if ( (void *) gui->main == NULL )
-    {
+    if ( (void *) gui->main == NULL ){
+        // msg?
         return;
 
     }else{
@@ -911,7 +897,7 @@ guiSetUpMainWindow (
 int register_wm_process ( pid_t pid ){
 
     if (pid<0 || pid >= PROCESS_COUNT_MAX ){
-        debug_print("register_wm_process: pid fail\n");
+        debug_print("register_wm_process: [FAIL] pid\n");
         return -1;
     }
 
@@ -948,10 +934,10 @@ kgwm_mouse_dialog (
     
     // #todo
     // Checar validade da estrutura.
-    
-    if ( window->isControl == 1 ){
-        return (unsigned long) kgwm_window_control_dialog ( window,
-                                   msg, long1, long2 ); 
+
+    if ( window->isControl == TRUE ){
+        return (unsigned long) kgwm_window_control_dialog ( 
+                                   window, msg, long1, long2 ); 
     } 
 
     return 0;
@@ -968,13 +954,12 @@ kgwm_window_control_dialog (
 {
 
     //#bugbug
-    if ( window->isControl != 1 ){
-        panic ("kgwm_window_control_dialog: isControl ?");
+    if ( window->isControl != TRUE ){
+        panic ("kgwm_window_control_dialog: isControl ?\n");
     }
 
 
-    switch (msg)
-    {
+    switch (msg){
 
         // mouse button down
         case 30:
@@ -1055,7 +1040,7 @@ kgwm_window_control_dialog (
 
 int init_gramado (void)
 {
-    debug_print ("init_gramado: [DELETE THIS]\n");
+    debug_print ("init_gramado: [?? fixme]\n");
     return 0;
 }
 
