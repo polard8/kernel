@@ -1,6 +1,6 @@
 
 
-    Graphical shell 
+    Graphical Shell 
 
     This is the user interface.
     It uses the libgws and the gwssrv.

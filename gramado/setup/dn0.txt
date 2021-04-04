@@ -1,8 +1,10 @@
 
 
-    grass/
 
+    Gramado Setup.
 
-    This is the grass patch environment.
-    The applications here uses the window server inside the base kernel.
+    The setup environment.
+    This environment is used to install/upgrade the system.
+    It uses the graphics resources inside the base kernel,
+not the loadable window server.
 

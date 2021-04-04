@@ -1,4 +1,12 @@
 	
+    Gramado Core.
+    Gramado COre services.
+
+    aurora - The window server.
+    gnssrv - The network server.
+
+    --------------------------
+
     todo: Create a Makefile here.
 
       services/
