@@ -26,7 +26,7 @@ when this device is a keyboard device.
 
     Step3:
     kgws_put_console() will send raw data to a keyboard tty.
-    kgws_event_dialog() will send an evento to a queue in the foreground thread.
+    kgws_event_dialog() will send an event to a queue in the foreground thread.
 
 
 

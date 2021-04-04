@@ -1,0 +1,10 @@
+
+    See:
+    DNINPUT.TXT
+
+    Input modes support:
+
+    Now the system has two input modes: The 'setup mode' and the 'tty mode'.
+For the 'setup mode' we are getting input events from the foreground thread.
+For the 'tty mode', we are getting input from the keyboard tty.
+
