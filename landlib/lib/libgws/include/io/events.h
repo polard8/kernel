@@ -34,7 +34,7 @@ struct gws_event_d
 {
     //standard msg block
     int wid;    // window id.
-    int msg;   // msg. (event type).
+    int msg;    // msg. (event type).
     unsigned long long1;
     unsigned long long2;
 

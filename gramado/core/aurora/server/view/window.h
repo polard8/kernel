@@ -328,8 +328,24 @@ struct gws_window_d
     unsigned long type;  //tipo ... (editbox, normal, ...)  style???
 
 
+    // Hierarquia. 
+    // parent->level + 1;
+    // Não é z-order.
+
+    int level;
+
     // The window belongs to this client.
     struct gws_client_d  *client;
+
+    
+    // #todo
+    // Para sabermos quem receberá o reply no caso
+    // de eventos.
+    // Quando um cliente solicitar por eventos em uma dada janela
+    // com foco, então essa janela deve registrar qual é o fd do
+    // cliente que receberá o reply com informações sobre o evento.
+
+    int client_fd;
 
 
 	// Características dessa janela..
@@ -1092,6 +1108,8 @@ int gws_show_window_rect (struct gws_window_d *window);
 
 
 void demoTerry(void);
+
+struct gws_window_d *createwCreateRootWindow(void);
 
 // In: style = estilo do frame.
 int 

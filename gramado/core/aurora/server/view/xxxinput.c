@@ -511,3 +511,22 @@ gwssrv_get_system_message(void)
 
 
 
+/*
+// #todo
+// Select what kind of input a window wants to receive.
+int 
+gwssrv_select_input(
+    struct gwssrv_window_d *window,
+    unsigned long mask );
+int 
+gwssrv_select_input(
+    struct gwssrv_window_d *window,
+    unsigned long mask )
+{
+    return -1;
+}
+*/    
+
+
+
+

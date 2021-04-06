@@ -1801,9 +1801,78 @@ draw_frame:
     }
 
 
+    // ===============
+    
+    //
+    // level
+    //
+    
+    // #test
+    
+    if ( (void*) pWindow != NULL )
+    {
+        __w->level = (pWindow->level + 1);
+    }
+
+    if ( (void*) pWindow == NULL )
+    {
+        __w->level = 0;
+    }
+
+    // ===============
+
+
 //done:
     return (void *) __w;   
 }
+
+
+// Create root window
+// Called by gwsInit in gws.c.
+
+struct gws_window_d *createwCreateRootWindow(void)
+{
+    struct gws_window_d *w;
+
+
+    unsigned long left   = 0;
+    unsigned long top    = 0;
+    unsigned long width  = __device_width;
+    unsigned long height = __device_height;
+
+    // (root window)
+    // #bugbug: EStamos usado device info sem checar.
+    
+    w = (struct gws_window_d *) createwCreateWindow ( 
+                                    WT_SIMPLE,  1, 1, "RootWindow",  
+                                    left, top, width, height,
+                                    NULL, 0, COLOR_BLACK, COLOR_BLACK );
+    if ( (void*) w == NULL)
+    {
+        debug_print("createwCreateRootWindow: [FAIL] w\n");
+        printf     ("createwCreateRootWindow: [FAIL] w\n");
+        exit(1);
+    }
+
+    w->used  = TRUE;
+    w->magic = 1234;
+
+        // Register.
+        // WindowId = gwsRegisterWindow (__root_window);
+
+        // if (WindowId<0){
+        // gwssrv_debug_print ("create_background: Couldn't register window\n");
+        //return;
+        //}
+
+
+    // Root window
+    gwsDefineInitialRootWindow (w);
+
+
+    return (struct gws_window_d *) w;
+}
+
 
 
 //

@@ -112,8 +112,10 @@ unsigned long  rtl_to_ulong  (long ch);
 #define RTL_WAIT_FOR_EVENTS  1
 #define RTL_POOL_FOR_EVENTS  2
 
+
 //  The buffer for the event elements.
 unsigned long RTLEventBuffer[32];
+
 
 // Get an event from the thread's event queue.
 // That old 'get system message'

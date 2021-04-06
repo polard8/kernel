@@ -142,7 +142,7 @@ startCLI:
 ;; == Enable all the interrupts ======================================
 ;;
 
-.enableInterrupts:
+.LenableInterrupts:
 
     mov al, 0
     out 0xA1, al 
@@ -229,12 +229,15 @@ startGUI:
     ;;===============
     ;; Setup machine
 
+
     cli
 
     ; GDT and IDT. 
+
     lgdt [lgdt_opcode]
     lidt [lidt_opcode]
 
+    ;; PIC
     ;; #todo: 
     ;; Nessa hora alguns vetores podem ser configurados.
     ;; Primeiro as excess�es e depois as ISRs.
@@ -243,12 +246,6 @@ startGUI:
     ;; Todos os componentes APIC s�o ignorados e o sistema opera
     ;; no modo single-thread usando LINT0.
 
-
-;.setupPICMODE:
-
-	; PIC.
-
-	cli
 	mov al, 00010001b    ; Begin PIC 1 initialization.
 	out 0x20, al
 	mov al, 00010001b    ; Begin PIC 2 initialization.
@@ -265,8 +262,6 @@ startGUI:
 	out 0x21, al
 	out 0xA1, al
 
-
-	
 	;;@todo:
 	;;Init RTC.
 
@@ -352,28 +347,28 @@ startGUI:
 
     ;; ...
 
-    ; mask all interrupts.
-    ; ====================
-    
-    cli 
+
+    ; Mask all interrupts.
     mov al, 255
     out 0xA1, al
     out 0x21, al
 
 
-	; Setup registers.
+    ; Setup data registers and stack.
+
 	mov ax, word 0x10  
 	mov ds, ax
 	mov es, ax 
 	;mov fs, ax
 	;mov gs, ax 
-	
 	;; #bugbug
 	;; Missing ss register. (This is a test) (out. 2020)
 	mov ss, ax
-
 	mov eax, stack_ptr
 	mov esp, eax 
+
+    ;; #bugbug
+    ;; Determinando tipo de volume.
 
 
 	; Configura volume.
@@ -439,7 +434,8 @@ startGUI:
 	; o mapa de caracteres do BIOS.
 
 
-.testingStrings:
+.LtestingStrings:
+
     nop
     
 	; #todo: 
@@ -477,7 +473,7 @@ startGUI:
     ; c =  y
     ; d =  Char.    
   
-.TestingPrintChar:  
+.LTestingPrintChar:  
 	
 	;push eax
 	;push ebx
@@ -541,7 +537,7 @@ startGUI:
 	;jmp $
 
 
-.TestingPrintString:
+.LTestingPrintString:
 
 	;; Cursor.
 	mov dword [g_cursor_x], 4
@@ -628,7 +624,7 @@ startGUI:
 	jne .peFail
 
 
-.preparandoArgumentos:
+.LpreparandoArgumentos:
  
     ;;
     ;;  ## Boot Block ## 
@@ -729,10 +725,10 @@ startGUI:
     mov ebx, dword [ModeInfo_PhysBasePtr]  ;LFB address (endere�o f�sico)
 
     mov ebp, dword BootBlock
-    mov ecx, ebp                           ;tabela
-    mov edx, ebp                           ;tabela
+    mov ecx, ebp                ; Table
+    mov edx, ebp                ; Table
 
-.goBL:
+.LgoBL:
 
 
 ;;

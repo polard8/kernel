@@ -53,8 +53,17 @@ int k_fclose (file *f)
         debug_print("k_fclose: f\n");
         return EOF;
     }else{
-        f->used = 1;
+
+        // #todo
+        // Talvez possamos reaproveitar a estrutura
+        // mudando o magic e não estragando a estrutura.
+
+        f->used  = TRUE;
         f->magic = 1234;
+        
+        // #maybe
+        // f->magic = 216;
+        
         f->pid = (pid_t) 0;
         f->uid = (uid_t) 0;
         f->gid = (gid_t) 0;
@@ -80,6 +89,9 @@ int k_fclose (file *f)
         
         // kill
         // free() ?
+        
+        // #maybe
+        // Talvez vamos reaproveitar a estrutura.
         
         f = NULL;
     };
@@ -115,6 +127,9 @@ int k_fclose (file *f)
 // #todo: 
 // Precisamos inicializar corretamente a estrutura antes de 
 // retornarmos o ponteiro.
+
+// #todo
+// somente para a fat do volume1.
 
 file *k_fopen ( const char *filename, const char *mode )
 {
@@ -168,7 +183,7 @@ file *k_fopen ( const char *filename, const char *mode )
         printf("k_fopen: [FAIL] Process\n");
         goto fail;
     }else{
-        if ( Process->used != 1 || Process->magic != 1234 ){
+        if ( Process->used != TRUE || Process->magic != 1234 ){
             printf("k_fopen: [FAIL] Process validation\n");
             goto fail;
         }
@@ -183,6 +198,7 @@ file *k_fopen ( const char *filename, const char *mode )
     };
 
     // Check slot validation. 
+    // if ( __slot < 3 ){
     if ( __slot == -1 ){
         printf ("k_fopen: No free slots\n");
         goto fail;
@@ -220,8 +236,7 @@ file *k_fopen ( const char *filename, const char *mode )
     // #todo
     // Não devemos alocar se o arquivo for grande.
 
-    if ( Size <= 0 )
-    {
+    if ( Size <= 0 ){
         panic ("k_fopen: [FAIL] Size\n");
     }
 
@@ -241,7 +256,7 @@ file *k_fopen ( const char *filename, const char *mode )
     {
         Process->Objects[__slot] = (unsigned long) 0;
         
-        kprintf ("k_fopen: file_buffer \n");
+        kprintf ("k_fopen: [FAIL] file_buffer \n");
         goto fail;
     }
 
@@ -256,12 +271,12 @@ file *k_fopen ( const char *filename, const char *mode )
         kprintf ("k_fopen: f\n");
         goto fail;
     }else{
-        
-        f->used = TRUE;
+
+        f->used  = TRUE;
         f->magic = 1234;
-        f->pid = (pid_t) current_process;
-        f->uid = (uid_t) current_user;
-        f->gid = (gid_t) current_group;
+        f->pid   = (pid_t) current_process;
+        f->uid   = (uid_t) current_user;
+        f->gid   = (gid_t) current_group;
         
         // #bugbug [FIXME]
         // We need a type in read().
@@ -286,10 +301,12 @@ file *k_fopen ( const char *filename, const char *mode )
         f->_p        = file_buffer;
         f->_bf._base = file_buffer;
 
-        // Size.
+        // Size
 
         f->_lbfsize  = Size;
         f->_cnt      = Size;
+        
+        // Offsets
 
         f->_r = 0;
         f->_w = 0;
@@ -381,14 +398,27 @@ int k_openat (int dirfd, const char *pathname, int flags)
 {
     file *f;
 
-
     debug_print ("k_openat: [FIXME]\n");
 
     // The directory
-    if ( dirfd < 0 )
-    { 
+    if ( dirfd < 0 ){ 
         debug_print("k_openat: [FAIL] dirfd\n");
         goto fail; 
+    }
+
+
+    //
+    // filename
+    //
+
+    if ( (void*) pathname == NULL ){
+        kprintf ("k_openat: [FAIL] pathname\n");
+        goto fail;
+    }
+
+    if (*pathname == 0){
+        kprintf ("k_openat: [FAIL] *pathname\n");
+        goto fail;
     }
 
 
@@ -400,9 +430,8 @@ int k_openat (int dirfd, const char *pathname, int flags)
 
     f = (file *) k_fopen ( (const char *) pathname, "r" );
 
-    if ( (void *) f == NULL )
-    {
-        kprintf ("k_openat: f\n");
+    if ( (void *) f == NULL ){
+        kprintf ("k_openat: [FAIL] f\n");
         goto fail;
     }
 
@@ -756,6 +785,15 @@ int vsprintf(char *string, const char *format, va_list ap)
 
 int kputs ( const char *str )
 {
+
+    // #todo
+    // Validation
+    
+    //if ( (void*) str == NULL )
+    //{
+        //
+    //}
+
     return (int) printf ("%s",str);
 }
 
@@ -935,11 +973,14 @@ int k_fgetc(file *f)
     int ch = 0;
 
 
-    if ( (void *) f == NULL ){
+    if ( (void *) f == NULL )
+    {
         printf ("k_fgetc: f\n");
-        refresh_screen();
-        return EOF;
-    }else{
+        goto fail;
+        //refresh_screen();
+        //return EOF;
+    }
+
 
 		 //(--(p)->_r < 0 ? __srget(p) : (int)(*(p)->_p++))
 		
@@ -967,28 +1008,37 @@ int k_fgetc(file *f)
 		//#debug
 		//nao podemos acessar um ponteiro nulo... no caso endereço.
 
-        if ( f->_p == 0 ){
-            printf ("k_fgetc: f->_p \n");
-            refresh_screen();
-            return EOF;
-            
-       }else{
-		   
-			// #obs: 
-			// Tem que ter a opção de pegarmos usando o posicionamento
-			// no buffer. O terminal gosta dessas coisas.
-			
-		    //Pega o char no posicionamento absoluto do arquivo
-		    ch = (int) *f->_p;
-				
-            f->_p++;
-            f->_cnt--;
 
-            return (int) ch;
-		}
-		//fail
+    // if ( (void*) f->_p == NULL ){
+    if ( f->_p == 0 ){
+    
+        printf ("k_fgetc: [FAIL] f->_p \n");
+        goto fail;
+        //refresh_screen();
+        //return EOF;
+
+    }else{
+ 
+	// #obs: 
+	// Tem que ter a opção de pegarmos usando o posicionamento
+	// no buffer. O terminal gosta dessas coisas.
+
+        //
+        // Pega o char no posicionamento absoluto do arquivo
+        //
+
+        ch = (int) *f->_p;
+
+        f->_p++;
+        f->_cnt--;
+
+        return (int) ch;
     };
 
+		//fail
+
+
+fail:
 
 	//#debug
     printf ("k_fgetc: fail\n");
@@ -1014,6 +1064,7 @@ int k_feof ( file *f )
     if ( (void *) f == NULL ){
         return (int) (-1);
     } else {
+
         ch = k_fgetc (f);
 
         if ( ch == EOF ){
@@ -1022,7 +1073,6 @@ int k_feof ( file *f )
              return 0;
         };
     };
-
 
 	//checar se o eof foi atingido.
 	// return( (stream->_flag & _IOEOF) );
@@ -1448,6 +1498,10 @@ void stdio_ClearToStartOfLine()
  *     ...
  */
 
+// #bugbug
+// Acho que essa rotina em rin0 não é usada!
+// Usamos apenas a que tem em ring3.
+
 unsigned long input ( unsigned long ch )
 {
     int i=0;
@@ -1456,13 +1510,25 @@ unsigned long input ( unsigned long ch )
     char c = (char) ch;
 
 
+    // Input mode.
+    
+    // #bugbug:
+    // Estamos nos referindo ao tipo de linha, 
+    // se é simples ou multiplas linhas.
+    //  Mas temos outra flag relativa à imput mode 
+    // que trata dos eventos.
+    
+    // See: ???
+    // Onde estão as flags ???
+
     if ( g_inputmode == INPUT_MODE_LINE )
     {
         if (prompt_pos >= PROMPT_SIZE)
         {
-            printf ("kstdio-input: INPUT_MODE_LINE full buffer!\n");
-            refresh_screen ();
-            return (unsigned long) 0; 
+            printf ("kstdio-input: [FAIL] INPUT_MODE_LINE full buffer!\n");
+            goto fail;
+            // refresh_screen ();
+            //return (unsigned long) 0; 
         }
     }
 
@@ -1471,9 +1537,10 @@ unsigned long input ( unsigned long ch )
     {
         if (prompt_pos >= PROMPT_SIZE)
         {
-            printf("kstdio-input: INPUT_MODE_MULTIPLE_LINES full buffer\n");
-            refresh_screen();
-            return (unsigned long) 0; 
+            printf("kstdio-input: [FAIL] INPUT_MODE_MULTIPLE_LINES full buffer\n");
+            goto fail;
+            //refresh_screen();
+            //return (unsigned long) 0; 
         }
     }
 
@@ -1523,9 +1590,8 @@ unsigned long input ( unsigned long ch )
 			prompt_pos--;
 			prompt[prompt_pos] = (char ) '\0';
 			break;
-			
-		//...	
 
+		//...
 
         // Para qualquer caractere que não sejam os especiais tratados acima.
         default:
@@ -1534,11 +1600,15 @@ unsigned long input ( unsigned long ch )
             break;
     };
 
+
+
 input_more:
     return 0;
-
 input_done:
     return VK_RETURN;
+fail:
+    refresh_screen();
+    return (unsigned long) 0; 
 }
 
 
@@ -1563,30 +1633,38 @@ input_done:
 // em memória compartilhada, usado o alocaro apropriado.
 // kmalloc com certeza e ring0.
 
+// In this routine:
+// + Initializing the structures for stdin, stdout and stderr
+
 int stdioInitialize (void)
 {
     
     kstdio_standard_streams_initialized =  FALSE;
 
     int Status = 0;
-    int i=0;
     int slot=-1;
+
+    // register ?
+    int i=0;
+
+    file *tmp;
+    struct inode_d *tmp_inode;    
 
 
     int cWidth  = get_char_width();
     int cHeight = get_char_height();
 
     if ( cWidth == 0 || cHeight == 0 ){
-        panic ("kstdio-stdioInitialize: Char info");
+        panic ("kstdio-stdioInitialize: [FAIL] Char info\n");
     }
 
     // Os buffers dos arquivos acima.
     // prompt[]
     // Esses prompts são usados como arquivos.
     // São buffers para as streams.
-    //See: kstdio.h
-    
-    //limpando.
+    // See: kstdio.h
+
+    // Clean
     for ( i=0; i<PROMPT_SIZE; i++ )
     {
         prompt[i]     = (char) '\0';
@@ -1602,14 +1680,13 @@ int stdioInitialize (void)
 
     //=====================
     // file table
-    file *tmp;
     for (i=0; i<NUMBER_OF_FILES;i++)
     {
         tmp = (void*) kmalloc (sizeof(file));
         if ((void*)tmp==NULL){
             panic("kstdio-stdioInitialize: tmp\n");
         }
-        tmp->used = 1;
+        tmp->used  = TRUE;
         tmp->magic = 1234;
         tmp->____object = ObjectTypeFile; //Regular file
         tmp->_flags = 0; // (__SWR | __SRD); 
@@ -1623,14 +1700,13 @@ int stdioInitialize (void)
 
     //===================================
     // inode table
-    struct inode_d *tmp_inode;    
     for (i=0; i<32;i++)
     {
         tmp_inode = (void*) kmalloc (sizeof(struct inode_d));
         if ((void*)tmp_inode==NULL){
             panic("kstdio-stdioInitialize: tmp_inode\n");
         }
-        tmp_inode->used = 1;
+        tmp_inode->used  = TRUE;
         tmp_inode->magic = 1234;
         tmp_inode->filestruct_counter = 0;
         tmp_inode->path[0] = 0;
@@ -1651,25 +1727,25 @@ int stdioInitialize (void)
     // pega slot em file_table[] para stdin
     slot = get_free_slots_in_the_file_table();
     if(slot<0 || slot >=NUMBER_OF_FILES){
-        panic("klibc-stdioInitialize: file slot");
+        panic("kstdio-stdioInitialize: file slot");
     }
     stdin = file_table[slot];
     stdin->filetable_index = slot;
     // Configurando a estrutura de stdin. 
     stdin->_file = 0;  //fd
-    stdin->____object = ObjectTypeTTY;  //ObjectTypeFile; //Regular file
-    stdin->used = 1;
+    stdin->____object = ObjectTypeTTY;  // TTY
+    stdin->used  = TRUE;
     stdin->magic = 1234;
     stdin->sync.sender = -1;
     stdin->sync.receiver = -1;
-    stdin->sync.can_read = TRUE;
-    stdin->sync.can_write = FALSE;  //#this is a test
+    stdin->sync.can_read    = TRUE;
+    stdin->sync.can_write   = FALSE;  //#this is a test
     stdin->sync.can_execute = FALSE;
-    stdin->sync.can_accept = FALSE;
+    stdin->sync.can_accept  = FALSE;
     stdin->sync.can_connect = FALSE;
     stdin->_flags = (__SWR | __SRD); 
-    stdin->_base = &prompt[0];    //See: include/kernel/stdio.h
-    stdin->_p =  &prompt[0];
+    stdin->_base     = &prompt[0];    //See: include/kernel/stdio.h
+    stdin->_p        = &prompt[0];
     stdin->_bf._base = stdin->_base;
     stdin->_lbfsize = PROMPT_SIZE; //128; //#todo
     stdin->_r = 0;
@@ -1677,17 +1753,17 @@ int stdioInitialize (void)
     stdin->_cnt = PROMPT_SIZE;
     stdin->_tmpfname = "KSTDIN  TXT";
     stdin->fd_counter = 1;
-    
+
     // inode support.
     // pega slot em inode_table[] 
     slot = get_free_slots_in_the_inode_table();
     if(slot<0 || slot >=32){
-        panic("klibc-stdioInitialize: stdin inode slot");
+        panic("kstdio-stdioInitialize: [FAIL] stdin inode slot\n");
     }
     stdin->inode = inode_table[slot];
     stdin->inodetable_index = slot;
     if( (void*) stdin->inode == NULL ){
-        panic("klib-stdioInitialize: stdin inode struct");
+        panic("kstdio-stdioInitialize: [FAIL] stdin inode struct\n");
     }
     stdin->inode->filestruct_counter = 1; //inicialize
     memcpy( (void*) stdin->inode->path, (const void*) stdin->_tmpfname, sizeof( stdin->inode->path ) );
@@ -1698,7 +1774,7 @@ int stdioInitialize (void)
     // pega slot em file_table[] para stdout
     slot = get_free_slots_in_the_file_table();
     if(slot<0 || slot >=NUMBER_OF_FILES){
-        panic("klibc-stdioInitialize: slot");
+        panic("kstdio-stdioInitialize: slot\n");
     }
     stdout = file_table[slot];
     stdout->filetable_index = slot;
@@ -1706,21 +1782,21 @@ int stdioInitialize (void)
     // This is a virtual console device. Used to output
     // directly into the virtual console.
     stdout->_file = 1;
-    stdout->____object = ObjectTypeVirtualConsole;
-    stdout->used = 1;
+    stdout->____object = ObjectTypeVirtualConsole;  // Virtual console.
+    stdout->used  = TRUE;
     stdout->magic = 1234;
     stdout->sync.sender = -1;
     stdout->sync.receiver = -1;
-    stdout->sync.can_read = TRUE;
-    stdout->sync.can_write = TRUE;
+    stdout->sync.can_read    = TRUE;
+    stdout->sync.can_write   = TRUE;
     stdout->sync.can_execute = FALSE;
-    stdout->sync.can_accept = FALSE;
+    stdout->sync.can_accept  = FALSE;
     stdout->sync.can_connect = FALSE;
     stdout->_flags = (__SWR | __SRD); 
-    stdout->_base = &prompt_out[0];  //See: include/kernel/stdio.h
-    stdout->_p = &prompt_out[0];
+    stdout->_base     = &prompt_out[0];  //See: include/kernel/stdio.h
+    stdout->_p        = &prompt_out[0];
     stdout->_bf._base = stdout->_base;
-    stdout->_lbfsize = PROMPT_SIZE; //128; //#todo
+    stdout->_lbfsize  = PROMPT_SIZE; //128; //#todo
     stdout->_r = 0;
     stdout->_w = 0;
     stdout->_cnt = PROMPT_SIZE;
@@ -1731,15 +1807,18 @@ int stdioInitialize (void)
     // pega slot em inode_table[] 
     slot = get_free_slots_in_the_inode_table();
     if(slot<0 || slot >=32){
-        panic("klibc-stdioInitialize: stdout inode slot");
+        panic("kstdio-stdioInitialize: stdout inode slot\n");
     }
     stdout->inode = inode_table[slot];
     stdout->inodetable_index = slot;
     if( (void*) stdout->inode == NULL ){
-        panic("klib-stdioInitialize: stdout inode struct");
+        panic("kstdio-stdioInitialize: stdout inode struct\n");
     }
     stdout->inode->filestruct_counter = 1; //inicialize
-    memcpy( (void*) stdout->inode->path, (const void*) stdout->_tmpfname, sizeof( stdout->inode->path ) );
+    memcpy( 
+        (void*)       stdout->inode->path, 
+        (const void*) stdout->_tmpfname, 
+        sizeof( stdout->inode->path ) );
     // ... 
 
 
@@ -1747,27 +1826,27 @@ int stdioInitialize (void)
     // pega slot em file_table[] para stderr
     slot = get_free_slots_in_the_file_table();
     if(slot<0 || slot >=NUMBER_OF_FILES){
-        panic("klibc-stdioInitialize: slot");
+        panic("kstdio-stdioInitialize: slot");
     }
     stderr = file_table[slot];
     stderr->filetable_index = slot;
     // Configurando a estrutura de stderr.
     stderr->_file = 2;
-    stderr->____object = ObjectTypeFile;
-    stderr->used = 1;
+    stderr->____object = ObjectTypeFile;  // Regular file.
+    stderr->used  = TRUE;
     stderr->magic = 1234;
     stderr->sync.sender = -1;
     stderr->sync.receiver = -1;
-    stderr->sync.can_read = TRUE;
-    stderr->sync.can_write = TRUE;
+    stderr->sync.can_read    = TRUE;
+    stderr->sync.can_write   = TRUE;
     stderr->sync.can_execute = FALSE;
-    stderr->sync.can_accept = FALSE;
+    stderr->sync.can_accept  = FALSE;
     stderr->sync.can_connect = FALSE;
     stderr->_flags = (__SWR | __SRD); 
-    stderr->_base = &prompt_err[0];  //See: include/kernel/stdio.h
-    stderr->_p =  &prompt_err[0];
+    stderr->_base     = &prompt_err[0];  //See: include/kernel/stdio.h
+    stderr->_p        = &prompt_err[0];
     stderr->_bf._base = stderr->_base;
-    stderr->_lbfsize = PROMPT_SIZE; //128; //#todo
+    stderr->_lbfsize  = PROMPT_SIZE; //128; //#todo
     stderr->_r = 0;
     stderr->_w = 0;
     stderr->_cnt = PROMPT_SIZE;
@@ -1778,12 +1857,12 @@ int stdioInitialize (void)
     // pega slot em inode_table[] 
     slot = get_free_slots_in_the_inode_table();
     if(slot<0 || slot >=32){
-        panic("klibc-stdioInitialize: stderr inode slot");
+        panic("kstdio-stdioInitialize: stderr inode slot\n");
     }
     stderr->inode = inode_table[slot];
     stderr->inodetable_index = slot;
     if( (void*) stderr->inode == NULL ){
-        panic("klib-stdioInitialize: stderr inode struct");
+        panic("kstdio-stdioInitialize: stderr inode struct\n");
     }
     stderr->inode->filestruct_counter = 1; //inicialize
     //copy the name.
@@ -1802,6 +1881,7 @@ int stdioInitialize (void)
 	
     g_inputmode = INPUT_MODE_MULTIPLE_LINES;
 
+
     //
     // Virtual console.
     //
@@ -1815,8 +1895,8 @@ int stdioInitialize (void)
     for (i=0; i<4; i++){
         CONSOLE_TTYS[i].cursor_x = 0;   
         CONSOLE_TTYS[i].cursor_y = 0;     
-        CONSOLE_TTYS[i].cursor_left = 0; 
-        CONSOLE_TTYS[i].cursor_top = 0;  
+        CONSOLE_TTYS[i].cursor_left   = 0; 
+        CONSOLE_TTYS[i].cursor_top    = 0;  
         CONSOLE_TTYS[i].cursor_right  = (SavedX/cWidth); 
         CONSOLE_TTYS[i].cursor_bottom = (SavedY/cHeight); 
         CONSOLE_TTYS[i].cursor_color = COLOR_WHITE;  
@@ -1847,13 +1927,18 @@ fail:
 void k_setbuf (file *f, char *buf)
 {
 
-    if ( (void *) f == NULL )
-    {
-        // #todo
-        // Maybe we need a message here.
-        return;
 
-    }else{
+    if ( (void *) f == NULL ){
+        debug_print("k_setbuf: f\n");
+        return;
+    }
+
+
+    if ( (void *) buf == NULL ){
+        debug_print("k_setbuf: buf\n");
+        return;
+    }
+
 
 		//#todo
 		//se o buffer é válido.
@@ -1866,14 +1951,21 @@ void k_setbuf (file *f, char *buf)
         //}
         
         // Udate stream.
-        f->_bf._base = buf;
+    f->_bf._base = buf;
         //stream->_lbfsize = size;        
         // ?? stream->bufmode = mode;
 
-        f->_p = buf;
-        // ??stream->cnt = 0;
-        //...
-    };
+    f->_p = buf;
+    // f->_p = f->_bf._base
+    
+    // ??stream->cnt = 0;
+    
+    
+    // #todo
+    // Setup all the buffer elements.
+    
+    // ...
+    
 }
 
 
@@ -1884,6 +1976,24 @@ void k_setbuf (file *f, char *buf)
  
 void k_setbuffer (file *f, char *buf, size_t size)
 {
+
+  // #todo
+  // Check parameters.
+
+
+    /*
+    if ( (void *) f == NULL ){
+        debug_print("k_setbuffer: f\n");
+        return;
+    }
+
+
+    if ( (void *) buf == NULL ){
+        debug_print("k_setbuffer: buf\n");
+        return;
+    }
+    */
+
 
     if ( (void *) f == NULL )
     {
@@ -1927,7 +2037,7 @@ void k_setlinebuf (file *f)
     
     if ( (void *) f == NULL )
     {
-       return;
+        return;
     }
 }
 
@@ -1941,6 +2051,9 @@ void k_setlinebuf (file *f)
 
 int k_setvbuf (file *f, char *buf, int mode, size_t size)
 {
+
+    // #todo
+
 
     if ( (void *) f == NULL )
     {
@@ -1981,7 +2094,7 @@ regularfile_ioctl (
     unsigned long request, 
     unsigned long arg )
 {
-    debug_print ("regularfile_ioctl: TODO\n");
+    debug_print ("regularfile_ioctl: [TODO]\n");
     return -1;
 }
 

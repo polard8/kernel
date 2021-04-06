@@ -1,5 +1,5 @@
 ;
-; File: bm/stage3/pm.inc
+; File: stage3/pm.inc
 ;
 ;     +Enable Protected Mode with no Paging.
 ;
@@ -96,6 +96,14 @@ Gramado_pm32:
 
     ; Aqui estamos selecionando o modo '0'.
     mov byte [BOOT.modo], bl
+    
+    
+    
+    ;; ldt
+
+    ;; xor   bx, bx
+    ;; lldt  bx
+
 
 	;;
 	;; Reconfigurando registradores.

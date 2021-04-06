@@ -421,9 +421,12 @@ int gwsInit(void)
     CurrentDisplay = (void *) malloc (sizeof(struct gws_display_d));
     
     if ( (void*) CurrentDisplay == NULL ){
+
+        // #todo: fail and exit.
         debug_print("gwsInit: [FAIL] CurrentDisplay\n");
         return -1;
         //while(1);
+ 
     }else{
  
         CurrentDisplay->id = 0; //
@@ -444,9 +447,12 @@ int gwsInit(void)
     DeviceScreen  = (void *) malloc (sizeof(struct gws_screen_d));
 
     if ( (void*) DeviceScreen == NULL ){
+
+        // #todo: fail and exit.
         debug_print("gwsInit: [FAIL] DeviceScreen\n");
         return -1;
         //while(1);
+
     }else{
 
         DeviceScreen->id = 0; 
@@ -530,7 +536,9 @@ int gwsInit(void)
     //
     
     // First level structure for the GUI.
+
     gui = (void *) malloc( sizeof( struct gui_d) );
+
     if ( (void *) gui == NULL )
     {
         debug_print("gwsInit: gui\n");
@@ -539,9 +547,26 @@ int gwsInit(void)
         //return -1;
     }
 
-    // tmp window
-    struct gws_window_d *tmpW;
+
+    //
+    // Root window.
+    //
     
+    // See:
+    // createw.c
+
+    struct gws_window_d *tmpRootWindow;
+    
+    tmpRootWindow = (struct gws_window_d *) createwCreateRootWindow();
+
+    if ( (void*) tmpRootWindow == NULL)
+    {
+        debug_print("gwsInit: [FAIL] Couldn't create root window\n");
+        printf     ("gwsInit: [FAIL] Couldn't create root window\n");
+        exit(1);
+    }
+
+
     // #bugbug
     // Its is not a screen. It is only a window.
     // It is the main window of the gui structure.
@@ -550,58 +575,19 @@ int gwsInit(void)
 
     if ( (void *) gui != NULL )
     {
-
-        //
         // screen
-        //
-
         // Isso foi criado logo acima.
+
         gui->_screen = DeviceScreen;
 
-        //
         // display
-        //
-        
         // Isso foi criado logo acima.
+
         gui->_display = CurrentDisplay;
 
-        //
-        // screen window
-        //
-
-        // (root window)
-        tmpW = (struct gws_window_d *) createwCreateWindow ( 
-                                           WT_SIMPLE, 
-                                           1, 1, "screen-window",  
-                                           0, 0, 
-                                           __device_width, __device_height,   
-                                           NULL, 0, xCOLOR_GRAY3, xCOLOR_GRAY3 );
-
-        if ( (void*) tmpW == NULL)
-        {
-            debug_print("gwsInit: [FAIL] screen window\n");
-            printf     ("gwsInit: [FAIL] screen window\n");
-            exit(1);
-            //return -1;    
-        }
-
-        tmpW->used  = TRUE;
-        tmpW->magic = 1234;
-
-        // Register.
-        // WindowId = gwsRegisterWindow (__root_window);
-
-        // if (WindowId<0){
-        // gwssrv_debug_print ("create_background: Couldn't register window\n");
-        //return;
-        //}
-
-        // Root window
-        gwsDefineInitialRootWindow (tmpW);
-
         // Screen window and main window.
-        gui->screen_window = tmpW;
-        gui->main_window   = tmpW;
+        gui->screen_window = tmpRootWindow;
+        gui->main_window   = tmpRootWindow;
     } 
 
 

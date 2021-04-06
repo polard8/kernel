@@ -163,7 +163,12 @@ unsigned long rtl_to_ulong (long ch)
 
 int xxxScanApplicationQueue(void)
 {
-    // clear
+
+        // #todo
+        // Talvez limpar todo o buffer.
+        // 32 slots.
+
+    // Clean
     RTLEventBuffer[0] = 0;
     RTLEventBuffer[1] = 0;
     RTLEventBuffer[2] = 0;
@@ -179,25 +184,32 @@ int xxxScanApplicationQueue(void)
 
     // Check if it is a valid event.
 
-    // No, we do not have an event. Yield and clear.
+    // No, we do not have an event. 
+    // Yield and clear.
     if ( RTLEventBuffer[1] == 0 ){
+
         sc82 (265,0,0,0);
+
+        // #todo
+        // Talvez limpar todo o buffer.
+        // 32 slots.
 
         RTLEventBuffer[0] = 0;
         RTLEventBuffer[1] = 0;
         RTLEventBuffer[2] = 0;
         RTLEventBuffer[3] = 0;
 
-        return FALSE; 
+        return FALSE;
     }
 
     // Yes, we have an event.
     return TRUE;
 }
 
+
 int rtl_get_event (void)
 {
-    int Status=-1;
+    int Status = -1;
     
     // #todo: Com esse if podemos selecionar mais de um modelo 
     // para pegar input.
@@ -212,18 +224,17 @@ int rtl_get_event (void)
 struct rtl_event_d *rtl_next_event (void)
 {
     // Not a pointer.
-    struct rtl_event_d ev;
+    struct rtl_event_d    rtlEvent;
 
-    // clean
-    ev.window = NULL;
-    ev.msg = 0;
-    ev.long1 = 0;
-    ev.long2 = 0;
-
-    ev.long3 = 0;
-    ev.long4 = 0;
-    ev.long5 = 0;
-    ev.long6 = 0;
+    // Clean
+    rtlEvent.window = NULL;
+    rtlEvent.msg    = 0;
+    rtlEvent.long1  = 0;
+    rtlEvent.long2  = 0;
+    rtlEvent.long3  = 0;
+    rtlEvent.long4  = 0;
+    rtlEvent.long5  = 0;
+    rtlEvent.long6  = 0;
 
     // Get event from the thread's event queue.
     
@@ -233,37 +244,36 @@ struct rtl_event_d *rtl_next_event (void)
 
     rtl_enter_critical_section(); 
     gramado_system_call ( 111,
-        (unsigned long) &ev,
-        (unsigned long) &ev,
-        (unsigned long) &ev );
+        (unsigned long) &rtlEvent,
+        (unsigned long) &rtlEvent,
+        (unsigned long) &rtlEvent );
     rtl_exit_critical_section(); 
 
     // Check if it is a valid event.
 
-    // No, we do not have an event. Yield and clear.
-    if ( ev.msg == 0 ){
+    // No, we do not have an event. 
+    // Yield and clear.
+    // Clean
+
+    if ( rtlEvent.msg == 0 ){
 
         sc82 (265,0,0,0);
 
-        // clean
-
-        ev.window = NULL;  
-        ev.msg = 0;  
-        ev.long1 = 0;  
-        ev.long2 = 0;
-        
-        ev.long3 = 0;  
-        ev.long4 = 0;  
-        ev.long5 = 0;  
-        ev.long6 = 0;
+        rtlEvent.window = NULL;
+        rtlEvent.msg    = 0;
+        rtlEvent.long1  = 0;
+        rtlEvent.long2  = 0;
+        rtlEvent.long3  = 0;
+        rtlEvent.long4  = 0;
+        rtlEvent.long5  = 0;
+        rtlEvent.long6  = 0;
 
         return NULL; 
     }
 
     // Yes, we have an event.
-    return (struct rtl_event_d *) &ev;
+    return (struct rtl_event_d *) &rtlEvent;
 }
-
 
 
 //P (Proberen) testar.
@@ -271,25 +281,25 @@ void rtl_enter_critical_section (void)
 {
     int S=0;
 
-    // Pega o valor do spinlock rpincipal.
-    while (1){
+    // Pega o valor do spinlock principal.
+    // Se deixou de ser 0 então posso entrar.
+    // Se ainda for 0, continuo no while.
+    // Yield thread if we have no message.
+
+    while (TRUE){
 
         S = (int) gramado_system_call ( 
                       SYSTEMCALL_GET_KERNELSEMAPHORE, 0, 0, 0 );
-     
-		// Se deixou de ser 0 então posso entrar.
-		// Se ainda for 0, continuo no while.
+
         if ( S == 1 ){ goto done; }
-        
-        //#wait
-        //gramado_system_call (265,0,0,0); //yield thread.
+
         sc82 (265,0,0,0);
     };
 
     //Nothing
 
 done:
-    //Muda para zero para que ninguém entre.
+    //Muda para zero para que ninguem entre.
     gramado_system_call ( SYSTEMCALL_CLOSE_KERNELSEMAPHORE, 0, 0, 0 );
     return;
 }
@@ -344,9 +354,10 @@ void rtl_start_thread (void *thread)
 
 
 
+// Vamos escrever em uma janela indefinida. NULL.
+// provavelmente a janela principal.
+// #todo: Change string to 'const char *'
 
-//vamos escrever em uma janela indefinida. NULL.
-//provavelmente a janela principal.
 int 
 rtl_draw_text ( 
     unsigned long x, 
@@ -357,14 +368,29 @@ rtl_draw_text (
 
     unsigned long msg[8];
 
-    msg[0] = (unsigned long) 0; //window;
+
+    if ( (void*) string == NULL ){
+        debug_print("rtl_draw_text: string\n");
+        return -1;
+    }
+
+    if ( *string == 0 ){
+        debug_print("rtl_draw_text: *string\n");
+        return -1;
+    }
+
+
+    msg[0] = (unsigned long) 0;  // window;
     msg[1] = (unsigned long) x;
     msg[2] = (unsigned long) y;
     msg[3] = (unsigned long) color;
     msg[4] = (unsigned long) string;
-    // ...
+    msg[5] = (unsigned long) 0;
+    msg[6] = (unsigned long) 0;
+    msg[7] = (unsigned long) 0; 
 
-    return (int) gramado_system_call ( SYSTEMCALL_DRAWTEXT, 
+    return (int) gramado_system_call ( 
+                     SYSTEMCALL_DRAWTEXT, 
                     (unsigned long) &msg[0], 
                     (unsigned long) &msg[0], 
                     (unsigned long) &msg[0] );
@@ -466,14 +492,18 @@ void AddSwap( unsigned int* x, unsigned int* y )
 /*
  *************************************************** 
  * rtl_copy_text:
+ * 
  *      Copy a string of bytes given the source, the destination,
  * the width and the height.
  *      It copies in chuncks of 64 bytes.
- *      
+ * 
+ *    #?? doom style.
  */
+
 
 // #bugbug
 // Not tested yet.
+
 int 
 rtl_copy_text ( 
     unsigned long src, 
@@ -512,7 +542,7 @@ rtl_copy_text (
         { 
             memcpy ( __dest, __src+((y&63)<<6),64 );
             __dest += 64; 
-        } 
+        };
         if (__width&63) 
         { 
             memcpy (__dest, __src+((y&63)<<6), __width&63 ); 
@@ -570,6 +600,7 @@ int rtl_file_exists (const char *filename)
 
 void rtl_reboot(void)
 {
+    debug_print ("rtl_reboot:\n");
     gramado_system_call (110,0,0,0);
 }
 
@@ -580,10 +611,11 @@ void rtl_reboot(void)
 // OUT: -1= error; FALSE= nao pode ler; TRUE= pode ler.
 int rtl_sleep_if_socket_is_empty(int fd)
 {
-    if (fd<0)
+    if (fd<0){
         return -1;   //error
-    
-    return (int) gramado_system_call( 913,fd,fd,fd);
+    }
+
+    return (int) gramado_system_call(913,fd,fd,fd);
 }
 
 
@@ -1434,6 +1466,7 @@ void rtl_test_pipe (void)
 // =========================
 // path count
 // Credits: Sirius OS.
+// #todo: Change to 'const char *'
 
 size_t rtl_path_count (unsigned char *path)
 {

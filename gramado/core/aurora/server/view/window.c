@@ -481,6 +481,17 @@ int serviceCreateWindow (void){
         return -1;
     }
 
+    //
+    // The client's fd.
+    //
+
+    // #todo
+    // We need to register the client's fd.
+    // It is gonna be used to send replies, just like
+    // input events.
+    
+    // Window->client_fd = ?;
+
 
     // Building the next response.
     // It will be sent in the socket loop.
@@ -2000,10 +2011,10 @@ int gwssrv_init_windows (void)
     register int i=0;
 
     //window.h
-    windows_count      =0;
-    window_with_focus  =0;
-    active_window      =0;
-    top_window         =0;
+    windows_count     = 0;
+    window_with_focus = 0;
+    active_window     = 0;
+    top_window        = 0;
     //...
     
     show_fps_window = FALSE;
@@ -2099,6 +2110,7 @@ set_window_vert (
     tss->window_bottom = j;
 }
 */
+
 
 //
 // End.
