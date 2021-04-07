@@ -620,6 +620,9 @@ void *CreateWindow (
         // Tipo é unsigned long pois poderá ser um conjunto de flags.
 
         window->type = (unsigned long) type;
+        
+        // #debug
+        // if ( type == WT_OVERLAPPED ){ panic("CreateWindow: __OVERLAPPED__\n"); }
 
         // #todo: 
         // Criar instância.
@@ -971,6 +974,7 @@ void *CreateWindow (
 
         // Simple window. (Sem barra de títulos).
         case WT_SIMPLE:
+        case WT_OVERLAPPED:
             Background = TRUE;
             window->backgroundUsed = TRUE;
             break;
@@ -1357,7 +1361,7 @@ void *CreateWindow (
 
             window->rcClient->objectType  = ObjectTypeRectangle;
             window->rcClient->objectClass = ObjectClassGuiObjects;
-            window->rcClient->used = TRUE;
+            window->rcClient->used  = TRUE;
             window->rcClient->magic = 1234;
 
 			// janela.
@@ -1380,7 +1384,8 @@ void *CreateWindow (
 			//#bugbug
 			//Janela simples não deve ter área de cliente.
 
-            if ( window->type == WT_SIMPLE )
+            //if ( window->type == WT_SIMPLE )
+            if ( window->type == WT_OVERLAPPED || window->type == WT_SIMPLE )
             {
                  //#debug
                  //printf("createw: l={%d} t={%d} w={%d} h={%d}\n", 
@@ -1556,7 +1561,11 @@ done:
 
 
 
-// #todo: talvez deletar essa função e usar CreateWindow.
+// #todo: 
+// Talvez deletar essa função e usar CreateWindow.
+
+// Chamada por serviceCreateWindow em sci.c
+
 void *kgws_create_window ( 
     unsigned long type, 
     unsigned long status, 
@@ -1587,8 +1596,16 @@ void *kgws_create_window (
        // Essa rotina cria janelas simples, sem molduras, dos seguintes tipos:
        // WT_SIMPLE, WT_POPUP, WT_BUTTON, WT_STATUSBAR e WT_ICON
 
+        //__w = (void *) CreateWindow ( 
+        //                   WT_SIMPLE, status, view, 
+        //                   (char *) windowname, 
+        //                   x, y, width, height, 
+        //                   (struct window_d *) pWindow, 
+        //                   desktopid, 
+        //                   clientcolor, color );      
+
         __w = (void *) CreateWindow ( 
-                           WT_SIMPLE, status, view, 
+                           WT_OVERLAPPED, status, view, 
                            (char *) windowname, 
                            x, y, width, height, 
                            (struct window_d *) pWindow, 

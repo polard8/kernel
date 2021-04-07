@@ -1210,6 +1210,11 @@ void *gde_create_window (
 
 
 	unsigned long message_buffer[12];
+
+
+
+    gde_debug_print ("gde_create_window: \n");
+
 	message_buffer[0]  = (unsigned long) type;
 	message_buffer[1]  = (unsigned long) status;
 	message_buffer[2]  = (unsigned long) view;
@@ -1225,10 +1230,7 @@ void *gde_create_window (
 
 
     // #bugbug
-    // Now we need to use the window server to create windows.
-    // maybe this function can call the window server clint side
-    // functions.
-    gde_debug_print ("gde_create_window: \n");
+    // Maybe we need to use sc82()
 
     Window = (void *) system_call ( 
                           118 , 

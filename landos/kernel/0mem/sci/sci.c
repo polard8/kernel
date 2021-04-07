@@ -2000,6 +2000,7 @@ void *sci0 (
         // CREATE WINDOW
         // Cria uma janela usando os recursos do kgws.
         // Chamamos uma fun��o nesse documento.
+        // See: Essa rotina está nesse documento.
         case SYS_118:
             return (void *) serviceCreateWindow ( (char *)  arg2 );
             break;
@@ -2762,15 +2763,19 @@ done:
  */
 
 // #todo
-// Esse servi�o deve ir para o m�dulo /kgws
+// Esse serviço deve ir para o módulo user/
 
 unsigned long serviceCreateWindow ( char *message_buffer ){
 
     unsigned long *message_address = (unsigned long *) message_buffer;
 
-	//Ponteiro para a janela criada pelo servi�o.
-    struct window_d *NewWindow;  
-    struct window_d *ParentWindow;  
+	// Ponteiro para a janela criada pelo servi�o.
+
+    struct window_d  *NewWindow;  
+    struct window_d  *ParentWindow;  
+
+    // ??
+    // Onde esses ponteiros foram criados?
 
     cwArg1 = message_address[0];             // Type. 
     cwArg2 = message_address[1];             // WindowStatus 
@@ -2784,7 +2789,7 @@ unsigned long serviceCreateWindow ( char *message_buffer ){
 	//parent window.
 	//message_address[8];
 	//cwArg9 = gui->screen;  //@todo: O argumento arg4 est� enviando parent window. 
-    cwArg9 = (struct window_d *) message_address[8];    //parent
+    cwArg9       = (struct window_d *) message_address[8];    //parent
     ParentWindow = (struct window_d *) message_address[8];    //parent
 
 	//onde?
@@ -2809,7 +2814,7 @@ unsigned long serviceCreateWindow ( char *message_buffer ){
     unsigned long WindowHeight = 480;  
 
     unsigned long WindowClientAreaColor = COLOR_WHITE;  
-    unsigned long WindowColor = COLOR_WHITE;  
+    unsigned long WindowColor           = COLOR_WHITE;  
 
 
 	//#todo: Checar a validade da esturtura,
@@ -2817,16 +2822,14 @@ unsigned long serviceCreateWindow ( char *message_buffer ){
 	//WindowColor = CurrentColorScheme->elements[csiWindowBackground];  
 
 
-    WindowType = cwArg1; 
+    WindowType   = cwArg1; 
     WindowStatus = cwArg2; 
-    WindowView = cwArg3; 
-    WindowName = (char *) cwArg4; 
-
-    WindowX = cwArg5; 
-    WindowY = cwArg6; 
-    WindowWidth = cwArg7; 
+    WindowView   = cwArg3; 
+    WindowName   = (char *) cwArg4; 
+    WindowX      = cwArg5; 
+    WindowY      = cwArg6; 
+    WindowWidth  = cwArg7; 
     WindowHeight = cwArg8;
-
 
 	//#todo
 	//gui->screen  = cwArg9; 
@@ -2834,14 +2837,16 @@ unsigned long serviceCreateWindow ( char *message_buffer ){
 
 	//Obs: 11 - A cor da �rea de cliente ser� escolhida pelo app.   
     WindowClientAreaColor = (unsigned long) cwArg11;  
-    WindowColor = (unsigned long) cwArg12;     
+    WindowColor           = (unsigned long) cwArg12;     
+
 
 
     struct thread_d *t;
+
     int desktopID;
 
 
-    desktopID = (int) get_current_desktop_id ();
+    desktopID = (int) get_current_desktop_id();
 
 
     //
@@ -2854,8 +2859,9 @@ unsigned long serviceCreateWindow ( char *message_buffer ){
     if ( (void *) ParentWindow != NULL )
     {
         WindowX = ParentWindow->left + WindowX;
-        WindowY = ParentWindow->top + WindowY;
+        WindowY = ParentWindow->top  + WindowY;
     }
+
 
     // Importante:
 	// Nesse momento � fundamental saber qual � a parent window da janela que 
@@ -2870,20 +2876,23 @@ unsigned long serviceCreateWindow ( char *message_buffer ){
 	
 	//#test
 	// testando novo m�todo de pintura.
+	
+	// See:
+	// user/
 
-    NewWindow = (void *) kgws_create_window ( WindowType, WindowStatus, 
-                             WindowView, WindowName, 
+    NewWindow = (void *) kgws_create_window ( 
+                             WindowType, 
+                             WindowStatus, 
+                             WindowView, 
+                             WindowName, 
                              WindowX, WindowY, WindowWidth, WindowHeight,
                              cwArg9, desktopID, 
                              (unsigned long) WindowClientAreaColor, 
                              (unsigned long) WindowColor );
 
-
-    if ( (void *) NewWindow == NULL )
-    { 
-        //?? Mensagem. 
+    if ( (void *) NewWindow == NULL ){ 
+        debug_print("serviceCreateWindow: [FAIL] NewWindow\n");
         return 0;
-
     }else{
 
 		//se a janela foi criada com sucesso, podemos desativar a flag.
@@ -2912,13 +2921,19 @@ unsigned long serviceCreateWindow ( char *message_buffer ){
 		// #importante
 		// Se a tarefa atual est� pintando, vamos melhorar a sua prioridade.
 		// Possivelmente a thread de controle da janela � a thread atual.
-		
-		t = (void *) threadList[current_thread];
-		
-		set_thread_priority ( t, PRIORITY_MAX );
-		
-		NewWindow->control = t;
 
+        //
+        // thread.
+        //
+        
+        // Declarando a thread associada à janela.
+        // É a current_thread.
+
+        t = (void *) threadList[current_thread];
+
+        set_thread_priority ( t, PRIORITY_MAX );
+
+        NewWindow->control = t;
 
         return (unsigned long) NewWindow;
     };
