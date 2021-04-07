@@ -334,7 +334,7 @@ kgws_event_dialog (
                        if ( shift_status == 1 || ctrl_status == 1 || alt_status == 1 )
                        {
                            debug_print ("kgws_event_dialog: >>>> [MSG_SYSKEYUP] to system procedure\n"); 
-                            __local_ps2kbd_procedure ( 
+                            __kgwm_ps2kbd_procedure ( 
                                             Event_Window, 
                             (int)           Event_Message, 
                             (unsigned long) Event_LongASCIICode, 

@@ -98,7 +98,8 @@ si_send_message_to_ws (
                 case VK_F7: 
                 case VK_F8:
                     debug_print ("si_send_message_to_ws: >>>> [MSG_SYSKEYUP] to system procedure\n");  
-                    __local_ps2kbd_procedure ( window, 
+                    __kgwm_ps2kbd_procedure ( 
+                        window, 
                         (int) msg, 
                         (unsigned long) long1, 
                         (unsigned long) long2 );  
@@ -209,7 +210,8 @@ si_send_longmessage_to_ws (
                 case VK_F7:
                 case VK_F8:
                     debug_print ("si_send_longmessage_to_ws: >>>> [MSG_SYSKEYUP] to system procedure\n");  
-                    __local_ps2kbd_procedure ( window, 
+                    __kgwm_ps2kbd_procedure ( 
+                        window, 
                         (int) msg, 
                         (unsigned long) long1, 
                         (unsigned long) long2 );  

@@ -69,14 +69,6 @@ int ps2tty_get_byte_from_input_buffer (void);
 void ps2tty_put_byte_into_input_buffer( char c );
 
 
-unsigned long 
-__local_ps2kbd_procedure ( 
-    struct window_d *window, 
-    int msg, 
-    unsigned long long1, 
-    unsigned long long2 ); 
-
-
 #endif   
 
 

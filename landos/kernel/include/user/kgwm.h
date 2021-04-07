@@ -13,6 +13,22 @@
 int kgwm_mode;
 
 
+//
+// == prototypes ===============================
+//
+
+
+void __kgwm_initDialog ( int message );
+
+unsigned long 
+__kgwm_ps2kbd_procedure ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 ); 
+
+
+
 // Registrar um window manager.
 int kgwmRegisterWindowManager( int pid );
 
