@@ -154,16 +154,35 @@ createwDrawFrame (
     
     Type = window->type;
 
-    int Valid=FALSE;
+    int useFrame=FALSE;
+    int useIcon=FALSE;
+    int useTitleString=FALSE;
+    int useBorder=FALSE;
+    // ...
 
     switch (Type){
-    case WT_EDITBOX:     Valid=TRUE; break;
-    case WT_OVERLAPPED:  Valid=TRUE; break;
-    case WT_BUTTON:      Valid=TRUE; break;
+    
+    case WT_EDITBOX:     
+        useFrame=TRUE; 
+        useIcon=FALSE;
+        useBorder=TRUE;
+        break;
+    
+    case WT_OVERLAPPED:  
+        useFrame=TRUE; 
+        useIcon=TRUE;
+        useTitleString=TRUE;
+        useBorder=TRUE;
+        break;
+    
+    case WT_BUTTON:      
+        useFrame=TRUE;
+        useIcon=FALSE; 
+        break;
     };
 
-    if ( Valid == FALSE ){
-        gwssrv_debug_print ("createwDrawFrame: Invalid type\n");
+    if ( useFrame == FALSE ){
+        gwssrv_debug_print ("createwDrawFrame: [ERROR] This type does not use a frame.\n");
         return -1;
     }
 
@@ -187,28 +206,40 @@ createwDrawFrame (
             border_color = COLOR_BLACK;  // COLOR_INACTIVEBORDER;
             border_size = 2;
         };
+        
+        window->border_size = 0;
+        window->borderUsed = FALSE;
+        if (useBorder==TRUE){
+            window->border_color = border_color;
+            window->border_size  = border_size;
+            window->borderUsed   = TRUE;
+        }
+        
+        
+
+        // Draw the border of an edit box.
 
         // board1, borda de cima e esquerda.
         rectBackbufferDrawRectangle( 
             window->left, window->top, 
-            window->width, border_size, 
-            border_color, 1 );
+            window->width, window->border_size, 
+            window->border_color, 1 );
 
         rectBackbufferDrawRectangle( 
             window->left, window->top, 
-            border_size, window->height, 
-            border_color, 1 );
+            window->border_size, window->height, 
+            window->border_color, 1 );
 
         // board2, borda direita e baixo.
         rectBackbufferDrawRectangle( 
             (window->left + window->width - border_size), window->top,  
-            border_size, window->height, 
-            border_color, 1 );
+            window->border_size, window->height, 
+            window->border_color, 1 );
 
         rectBackbufferDrawRectangle ( 
-            window->left, (window->top + window->height - border_size), 
-            window->width, border_size, 
-            border_color, 1 );
+            window->left, (window->top + window->height - window->border_size), 
+            window->width, window->border_size, 
+            window->border_color, 1 );
 
         // ok
         return 0;
@@ -242,29 +273,38 @@ createwDrawFrame (
             //border_size = 8;
         };
 
+        window->border_size = 0;
+        window->borderUsed = FALSE;
+        if (useBorder==TRUE){
+            window->border_color = border_color;
+            window->border_size = border_size;
+            window->borderUsed = TRUE;
+        }
+
+
         // Quatro bordas.
          
         // board1, borda de cima e esquerda.
         rectBackbufferDrawRectangle( 
             parent->left + window->left, parent->top + window->top, 
-            window->width, border_size, 
-            border_color, 1 );
+            window->width, window->border_size, 
+            window->border_color, 1 );
 
         rectBackbufferDrawRectangle( 
             parent->left + window->left, parent->top + window->top, 
-            border_size, window->height, 
-            border_color, 1 );
+            window->border_size, window->height, 
+            window->border_color, 1 );
 
         //board2, borda direita e baixo.
         rectBackbufferDrawRectangle( 
-            (parent->left + window->left + window->width - border_size), (parent->top + window->top), 
-            border_size, window->height, 
-            border_color, 1 );
+            (parent->left + window->left + window->width - window->border_size), (parent->top + window->top), 
+            window->border_size, window->height, 
+            window->border_color, 1 );
 
         rectBackbufferDrawRectangle ( 
-            (parent->left + window->left), (parent->top + window->top + window->height - border_size), 
-            window->width, border_size, 
-            border_color, 1 );
+            (parent->left + window->left), (parent->top + window->top + window->height - window->border_size), 
+            window->width, window->border_size, 
+            window->border_color, 1 );
 
 
         //
@@ -316,22 +356,32 @@ createwDrawFrame (
         // bmp.c
         // IN: index, x, y.
 
-        gwssrv_display_system_icon( 
-            1, 
-            (TitleBar->left +4), 
-            (TitleBar->top  +4) );
-        window->has_icon = TRUE;
+        window->titlebarHasIcon = FALSE;
 
-    
+        if( useIcon == TRUE ){
+            gwssrv_display_system_icon( 
+                1, 
+                (TitleBar->left +4), 
+                (TitleBar->top  +4) );
+             window->titlebarHasIcon = TRUE;
+         }
+
+        //
         // string
+        //
+        
+        // #bugbug: Use 'const char *'
         TitleBar->name = (char *) strdup ( (const char *) window->name );
         
-        //dtextDrawString ( (window->left) + offset, (window->top)  +8, 
-            //COLOR_WHITE, window->name );
-            
-        dtextDrawString ( 
-            (TitleBar->left) + offset, (TitleBar->top)  +8, 
-            COLOR_WHITE, TitleBar->name );
+
+        if ( useTitleString == TRUE ){
+            dtextDrawString ( 
+                (TitleBar->left) + offset, 
+                (TitleBar->top)  + 8, 
+                COLOR_WHITE, 
+                TitleBar->name );
+        }
+
         //  control ?
         // ... 
         

@@ -417,6 +417,18 @@ struct gws_window_d
 //==================================================
 
 
+    // In the window stack we have two major components:
+    // + The frame (top frame and bottom frame).
+    // + The Client area.
+    
+
+    // Top frame has: title bar, tool bar, menu bar ...
+    
+    unsigned long top_frame_Height;
+    unsigned long client_area_Height;
+    unsigned long bottom_frame_Height;
+
+
     //
     // == window stack ================================
     //
@@ -450,7 +462,7 @@ struct gws_window_d
     int isMaximize;
     int isClose;
     unsigned long titlebar_height;
-    int has_icon;     // If the title bar uses or not an icon.
+    int titlebarHasIcon;     // If the title bar uses or not an icon.
     int titlebar_style;
     int titlebarUsed;
 
@@ -467,6 +479,7 @@ struct gws_window_d
     // Borders
 
     unsigned long border_size;
+    unsigned long border_color;
     int border_style;
     int borderUsed;
 
