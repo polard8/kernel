@@ -44,6 +44,16 @@
 
 
 
+// Position.
+// Position in cell.
+// Main classes for the processes and threads.
+
+
+#define KING           1
+#define SPECIAL_GUEST  2
+#define BETA           3
+
+
 #define PROCESS_MAGIC  1234
 
 
@@ -319,14 +329,20 @@ struct process_info_d
 
 struct process_d 
 {
+    
     // Controle do objeto do tipo processo.
+    
     object_type_t  objectType;
     object_class_t objectClass;
+    
     struct object_d *object;
 
     int used;
     int magic;
     
+    int position;
+
+
     // Other process can't take some actions on this process 
     // if it is protected. ex: It can't be killed by another process.
     int _protected;

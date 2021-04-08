@@ -1183,7 +1183,8 @@ int initGraphics (void){
     
     grInit();
 
- 
+    //while(1){}
+     
     //
     // == demos ==================================
     //
@@ -1550,6 +1551,8 @@ int initGraphics (void){
     
     // refresh
     gws_show_backbuffer();
+
+    // while(1){}
 
     // Change
     // Se encontrar o 0x80 muda para 0x50 caso contrario mude para 0x00

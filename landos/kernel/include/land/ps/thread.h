@@ -205,6 +205,10 @@ struct thread_d
 
     int used;
     int magic;
+    
+    
+    int position;
+
 
     // #todo
     // Other process can't take some actions on this thread

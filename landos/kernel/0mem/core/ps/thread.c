@@ -910,11 +910,16 @@ get_next:
         goto get_next;
     
     }else{
-        // Object and validation.
+
+
         Thread->objectType  = ObjectTypeThread;
         Thread->objectClass = ObjectClassKernelObjects;
-        Thread->used = 1;
-        Thread->magic = 1234;
+
+        Thread->used  = TRUE;
+        Thread->magic = THREAD_MAGIC;
+
+        // Undefined
+        Thread->position = 0;
 
         // c,Put in list.
         // Iniciamos em 100. 

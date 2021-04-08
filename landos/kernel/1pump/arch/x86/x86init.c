@@ -350,6 +350,9 @@ void __x86StartInit (void){
     if ( (void *) InitProcess == NULL ){
         panic ("__x86StartInit: InitProcess\n");
     }else{
+
+        InitProcess->position = SPECIAL_GUEST;
+ 
         fs_initialize_process_cwd ( InitProcess->pid, "/" );
     };
 
@@ -366,6 +369,8 @@ void __x86StartInit (void){
     if ( (void *) InitThread == NULL ){
         panic ("__x86StartInit: InitThread\n");
     }else{
+
+        InitThread->position = SPECIAL_GUEST;
 
         //IdleThread->ownerPID = (int) InitProcess->pid;
 
@@ -426,8 +431,8 @@ int x86main (void)
 
     if (current_arch != CURRENT_ARCH_X86)
     {
-        debug_print ("[x86] x86main: Arch fail\n");
-        panic       ("[x86] x86main: Arch fail\n"); 
+        debug_print ("[x86] x86main: current_arch fail\n");
+        panic       ("[x86] x86main: current_arch fail\n"); 
     }
 
 
@@ -463,6 +468,9 @@ int x86main (void)
     gSystemStatus = 1;
     gSystemEdition = 0;
     
+    //
+    // hypervisor
+    //
     
     g_is_qemu = FALSE;
 
@@ -664,6 +672,9 @@ int x86main (void)
     if ( (void *) KernelProcess == NULL ){
         panic ("[x86] x86main: KernelProcess\n");
     }else{
+
+        KernelProcess->position = KING;
+
         fs_initialize_process_cwd ( KernelProcess->pid, "/" ); 
         //...
     };
@@ -690,6 +701,16 @@ int x86main (void)
         panic ("x86main: RING0IDLEThread\n");
     }else{
 
+        // Idle thread
+        // #todo
+        // We can use a method in the scheduler for this.
+        // Or in the dispatcher?
+
+        ____IDLE = (struct thread_d *) RING0IDLEThread;
+
+
+        RING0IDLEThread->position = KING;
+        
         // #todo
         //processor->IdleThread  = (void *) RING0IDLEThread;    
         //____IDLE = (void *) RING0IDLEThread;  
@@ -732,7 +753,7 @@ int x86main (void)
     PROGRESS("Kernel:1:8\n"); 
     // Cria e inicializa apenas o INIT.BIN
 
-    __x86StartInit ();
+    __x86StartInit();
 
     //printf("*breakpoint\n");
     //refresh_screen();

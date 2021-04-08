@@ -485,6 +485,15 @@ bmpDisplayBMP (
     unsigned long left, top, bottom;
 
 
+    // Zoom support.
+    // #bugbug: Pinta de baixo pra cime e espaçado.
+    int useZoom=FALSE;
+    int ZoomFactor=16;
+    int iZoom=0;
+    int jZoom=0;
+
+
+
     unsigned long X=0;
     unsigned long Y=0;
     unsigned long Width=0;
@@ -838,7 +847,7 @@ bmpDisplayBMP (
 			//
 			// # Put pixel #
 			//
-			
+				
 			//Nesse momento j� temos a cor selecionada 
 			//no formato 0xaarrggbb ... 
 			//Agora se a flag de mascara estiver selecionada,
@@ -854,20 +863,26 @@ bmpDisplayBMP (
                 case BMP_CHANGE_COLOR_TRANSPARENT:
                     if ( color != bmp_selected_color )
                     {
-                        pixelBackBufferPutpixel ( 
+
+                        if (useZoom==FALSE){
+                            pixelBackBufferPutpixel ( //original, funciona.
+                                (unsigned long) color, 
+                                 (unsigned long) left, 
+                                 (unsigned long) bottom);
+                        }
+                        
+                        // zoom.
+                        if (useZoom==TRUE){
+                            for(iZoom=0; iZoom < ZoomFactor; iZoom++){
+                            for(jZoom=0; jZoom < ZoomFactor; jZoom++){ 
+
+                            pixelBackBufferPutpixel ( 
                             (unsigned long) color, 
-                            (unsigned long) left, 
-                            (unsigned long) bottom );
+                            (unsigned long) left   +j*ZoomFactor +iZoom, 
+                            (unsigned long) bottom +i*ZoomFactor +jZoom );
+                            }}
+                        }
 
-		                //my_buffer_put_pixel ( (unsigned long) color, 
-			            //    (unsigned long) left, 
-						//    (unsigned long) bottom, 
-						//    0 );	
-
-		                //backbuffer_putpixel ( (unsigned long) color, 
-			                //(unsigned long) left, 
-						    //(unsigned long) bottom, 
-						    //0 );
 
                     }
                     break;

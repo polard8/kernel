@@ -1102,8 +1102,9 @@ struct process_d *create_process (
     unsigned long directory_address )
 {
 
+    struct process_d  *Process;
     pid_t PID = -1;
-    struct process_d *Process;
+
 
     // Para a entrada vazia no array de processos.
     struct process_d *EmptyEntry; 
@@ -1144,8 +1145,7 @@ struct process_d *create_process (
         panic ("create_process: [ERROR] base_address\n");
     }
 
-    if( ppid < 0 )
-    {
+    if( ppid < 0 ){
         panic ("create_process: [ERROR] ppid\n");
     }
   
@@ -1190,7 +1190,7 @@ struct process_d *create_process (
     // #todo: 
     // Aqui pode retornar NULL.
     if ( (void *) Process == NULL ){
-        panic ("process-create_process: Process");
+        panic ("create_process: Process\n");
     }
 
 
@@ -1220,13 +1220,17 @@ struct process_d *create_process (
  
  
      //====================
-    
 
-    // Object and validation
     Process->objectType  = ObjectTypeProcess;
     Process->objectClass = ObjectClassKernelObjects;
-    Process->used = 1;
-    Process->magic = 1234;
+
+    Process->used  = TRUE;
+    Process->magic = PROCESS_MAGIC;
+
+    // Undefined
+    Process->position = 0;
+
+    Process->iopl = iopl; 
 
     // Not a protected process!
     Process->_protected = 0;
@@ -1473,7 +1477,7 @@ struct process_d *create_process (
     if ( g_heap_count < 0 || 
          g_heap_count >= g_heap_count_max )
     {
-        panic ("create_process: [FAIL] g_heap_count limits");
+        panic ("create_process: [FAIL] g_heap_count limits\n");
     }
 
 
@@ -1530,10 +1534,6 @@ struct process_d *create_process (
     Process->StackEnd    = (unsigned long) (Process->Stack - Process->StackSize);  
     Process->StackOffset = (unsigned long) UPROCESS_DEFAULT_STACK_OFFSET;  //??
 
-
-    // iopl.
-
-    Process->iopl = iopl; 
 
 
 		//PPL - (Process Permition Level).(gdef.h)
