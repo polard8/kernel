@@ -493,7 +493,7 @@ prints (
     }
 
 
-    if( !(pad & PAD_RIGHT) ) 
+    if ( !(pad & PAD_RIGHT) ) 
     {
         for ( ; width > 0; --width)
         {
@@ -713,7 +713,8 @@ int print ( char **out, int *varg ){
 
 /*
  ***************************************************
- * printf:
+ * printk:
+ * 
  *     @field 2
  *     The printf function.
  *     Assuming sizeof(void *) == sizeof(int).
@@ -751,12 +752,14 @@ int printk ( const char *format, ... )
     
     if ( KeInitPhase < 3 )
     {
-        if ( current_runlevel == DEFAULT_RUNLEVEL ){
+        // default = 5, see: config.h
+        //if ( current_runlevel == DEFAULT_RUNLEVEL )
+        if ( current_runlevel == 5 )
+        {
             debug_print("kernel: printk quiet for KeInitPhase < 3 and runlevel 5\n");
             return 0;
         }
     }
-    
 
     //Atençao:
     // print() nao analisa flags.

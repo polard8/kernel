@@ -1560,25 +1560,31 @@ struct process_d *create_process (
     Process->priority      = (unsigned long) Priority;
 
 
-        //Que tipo de scheduler o processo utiliza. (rr, realtime ...).
-        //Process->scheduler_type = ; 
+    //Que tipo de scheduler o processo utiliza. (rr, realtime ...).
+    //Process->scheduler_type = ; 
 
-		//Process->step
-		//Process->quantum
-		//Process->timeout
-		//Process->ticks_remaining
+    
+    // Syscalls counter.
+    Process->syscalls_counter = 0;
 
-		//As threads do processo iniciam com esse quantum.
-		//Process->ThreadQuantum   
+    // #todo
+    // Counters
 
+    //Process->step
+    //Process->quantum
+    //Process->timeout
+    //Process->ticks_remaining
 
-		//Process->threadCount = 0;    //N�mero de threads do processo.
-		
-		//Process->tList[32] 
+    //As threads do processo iniciam com esse quantum.
+    //Process->ThreadQuantum   
+
 
     //
     // == Thread =====================
     //
+
+    //Process->threadCount = 0;    //N�mero de threads do processo.
+    //Process->tList[32] 
 
     Process->threadListHead = NULL;
 
@@ -1823,37 +1829,42 @@ void show_process_information (void)
 {
     // loop
     int i=0;
-    
     struct process_d *p;
-
 
     printf ("\n\n show_process_information: \n\n");
 
 
     for ( i=0; i<PROCESS_COUNT_MAX; i++ )
     {
+
         p = (void *) processList[i];
 
         if ( (void *) p != NULL && 
-                      p->used == 1 && 
+                      p->used  == TRUE && 
                       p->magic == 1234 )
         { 
 
             //printf("\n");
             printf("\n=====================================\n");
-            printf(">>[%s]\n",p->__processname);
+            printf(">>[%s]\n", p->__processname);
             printf("PID=%d PPID=%d \n", p->pid,  p->ppid );
             
-            printf("image-base =%x image-size =%d \n", p->Image, p->ImageSize );
-            printf("heap-base  =%x heap-size  =%d \n", p->Heap, p->HeapSize );
-            printf("stack-base =%x stack-size =%d \n", p->Stack, p->StackSize );
+            printf("image-base =%x image-size =%d \n", 
+                p->Image, p->ImageSize );
+            printf("heap-base  =%x heap-size  =%d \n", 
+                p->Heap,  p->HeapSize );
+            printf("stack-base =%x stack-size =%d \n", 
+                p->Stack, p->StackSize );
 
-            printf("dir-pa=%x dir-va=%x \n", p->DirectoryPA, p->DirectoryVA );
+            printf("dir-pa=%x dir-va=%x \n", 
+                p->DirectoryPA, p->DirectoryVA );
 
-            printf("iopl=%d prio=%d state=%d \n", p->iopl, p->priority, p->state );
+            printf("iopl=%d prio=%d state=%d \n", 
+                p->iopl, p->priority, p->state );
+
+            printf("syscalls = { %d }\n", p->syscalls_counter );
         }
-
-		//Nothing.
+    // Nothing.
     };
 
     refresh_screen();

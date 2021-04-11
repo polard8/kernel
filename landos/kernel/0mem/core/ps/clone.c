@@ -1057,6 +1057,9 @@ do_clone:
 
     if ( Status != 0 )
     {
+        // #todo
+        // We need a helper function for that.
+
         // Kill control thread
         Clone->control->used  = FALSE;
         Clone->control->magic = 0;
@@ -1089,6 +1092,9 @@ do_clone:
     
     if ( Status < 0 )
     {
+        // #todo
+        // We need a helper function for that.
+
         // Kill control thread.
         Clone->control->used  = FALSE;
         Clone->control->magic = 0;
@@ -1192,8 +1198,9 @@ do_clone:
     Clone->StackSize = (32*1024);    //isso foi usado na rotina de alocação.
     Clone->StackEnd = ( Clone->Stack - Clone->StackSize );
 
-
+    //
     // Process name.
+    //
 
     // name.
     strcpy ( Clone->__processname, (const char *) filename );   
@@ -1246,6 +1253,12 @@ do_clone:
 		//refresh_screen();
 		//while(1){}
 
+
+    //
+    // syscall counter
+    // 
+
+    Clone->syscalls_counter = 0;
 
 
     //

@@ -1,6 +1,5 @@
-
-// Talvez todas as rotinas de tratamento ter�o seus wrappers 
-// em sci/sys/.
+// Talvez todas as rotinas de tratamento 
+// terao seus wrappers em sci/sys/.
 
 
 /*
@@ -9,7 +8,7 @@
  * 
  *       (SCI) = SYSTEM CALL INTERFACE
  *
- * Esse � o arquivo principal da sci.
+ * Esse é o arquivo principal da sci.
  *
  *       GERENCIA OS SERVI�OS OFERECIDOS PELAS INTERFACES /sys.h E /system.h.   
  *
@@ -25,9 +24,6 @@
  *
  * History:
  *     2015 - Created by Fred Nora.
- *     2016 - Revision.
- *     2017 - Revision.
- *     //...
  */
 
 
@@ -38,11 +34,13 @@
 // Constantes internas.
 //
 
-//#BUGBUG
+
+// #BUGBUG
 // Esse m�ximo de servi�os para a interrup��o 200 n�o existir� mais.
 // um n�mero grande de servi�os poder� ser atendido por essa interup��o,
 // esses 255 servi�os s�o os servi�os que ser�o atendidos em kernel mode
 // aqui no kernel base.
+
 #define SERVICE_NUMBER_MAX 255
 
 
@@ -55,20 +53,19 @@
 //...
 
 // Create Window support.
-int cwFlag;                //flag (alerta que os argumentos est�o dispon�veis)
-unsigned long cwArg1;      //WindowType
-unsigned long cwArg2;      //WindowStatus
-unsigned long cwArg3;      //WindowView
-char *cwArg4;              //WindowName
-unsigned long cwArg5;      //WindowX
-unsigned long cwArg6;      //WindowY
-unsigned long cwArg7;      //WindowWidth
-unsigned long cwArg8;      //WindowHeight
-struct window_d * cwArg9;  //gui->screen Parent window
-int  cwArg10;               // desktopID 
+int cwFlag;                // flag (alerta que os argumentos est�o dispon�veis)
+unsigned long cwArg1;      // WindowType
+unsigned long cwArg2;      // WindowStatus
+unsigned long cwArg3;      // WindowView
+char *cwArg4;              // WindowName
+unsigned long cwArg5;      // WindowX
+unsigned long cwArg6;      // WindowY
+unsigned long cwArg7;      // WindowWidth
+unsigned long cwArg8;      // WindowHeight
+struct window_d * cwArg9;  // gui->screen Parent window
+int  cwArg10;              // desktopID 
 unsigned long cwArg11;     // WindowClientAreaColor
 unsigned long cwArg12;     // WindowColor
-
 
 
 //
@@ -90,7 +87,6 @@ void *gde_extra_services (
     unsigned long arg3, 
     unsigned long arg4 )
 {
-
 
     struct process_d *__p;
     struct process_d *__net_process;
@@ -1203,16 +1199,36 @@ void *sci0 (
     int __i=0;    //usado na string
 
 
-    //======================
+    // Current process.
+    struct process_d *p;
+
 
     // #debug
     // debug_print("sci0:\n");
 
+    //
     // Profiler
+    //
+
+
     // Counting interrupt of this type. 
     // system interrupt. (0x80)
 
     g_profiler_ints_gde_services++;
+
+
+    // Profiling in the process structure.
+
+    if (current_process<0)
+        panic("sci0: current_process\n");
+
+    p = (struct process_d *) processList[current_process];
+
+    if ( (void*) p == NULL )
+        panic("sci0: p\n");
+
+    // Counting ...
+    p->syscalls_counter++;
 
 
     // #todo
@@ -3009,7 +3025,28 @@ void *sci2 (
     unsigned long *a3 = (unsigned long*) arg3;
     unsigned long *a4 = (unsigned long*) arg4;
 
+
+    struct process_d *p;
+
     //debug_print("sci2: [TODO]\n");
+
+
+
+
+    // Profiling in the process structure.
+
+    if (current_process<0)
+        panic("sci2: current_process\n");
+
+    p = (struct process_d *) processList[current_process];
+
+    if ( (void*) p == NULL )
+        panic("sci2: p\n");
+
+    // Counting ...
+    p->syscalls_counter++;
+
+
 
 
         //set magic

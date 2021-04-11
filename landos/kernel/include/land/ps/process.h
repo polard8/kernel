@@ -690,7 +690,14 @@ struct process_d
 
 	//Que tipo de scheduler o processo utiliza. (rr, realtime ...).
 	//int scheduler_type;    
- 
+
+
+    //
+    // syscalls counter.
+    //
+
+    unsigned long syscalls_counter;
+
 	//
 	// Temporiza��o da tarefa. 
 	//

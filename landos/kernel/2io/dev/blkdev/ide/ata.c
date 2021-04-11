@@ -222,40 +222,65 @@ unsigned char ata_assert_dever (char nport)
  * ide_identify_device:
  */
 
+// ??
+// O número da porta identica qual disco queremos pegar informações.
+// Slavaremos algumas informações na estrutura de disco.
+
 int ide_identify_device ( uint8_t nport )
 {
-    unsigned char status=0;
 
+    struct disk_d  *disk;
+
+    // Signature bytes.
     unsigned char lba1 = 0; 
     unsigned char lba2 = 0;
 
-    struct disk_d *disk;
-    
     char name_buffer[32];
 
+    unsigned char status=0;
 
 
-    ata_assert_dever (nport);
+    // #todo:
+    // Rever esse assert. 
+    // Precisamos de uma mensagem de erro aqui.
+    
+    ata_assert_dever(nport);
 
-	// ?
-	// Ponto flutuante
-	// Sem unidade conectada ao barramento
+    // ??
+    // Ponto flutuante
+    // Sem unidade conectada ao barramento
 
-    if ( ata_status_read() == 0xff )
+    // #todo
+    // Precisamos de uma mensagem aqui.
+
+    if ( ata_status_read() == 0xFF )
     {
+        //debug_print(...);
         return (int) -1;
     }
 
+
+
+    // #bugbug
+    // O que é isso?
+    // Se estamos escrevendo em uma porta de input/output
+    // então temos que nos certificar que esses valores 
+    // são válidos.
+
     out8 ( ata.cmd_block_base_address + ATA_REG_SECCOUNT, 0 );  // Sector Count 7:0
-    out8 ( ata.cmd_block_base_address + ATA_REG_LBA0,     0 );  // LBA 7-0
+    out8 ( ata.cmd_block_base_address + ATA_REG_LBA0,     0 );  // LBA  7-0
     out8 ( ata.cmd_block_base_address + ATA_REG_LBA1,     0 );  // LBA 15-8
     out8 ( ata.cmd_block_base_address + ATA_REG_LBA2,     0 );  // LBA 23-16
 
-
-    // Select device,
+    // Select device
     out8 ( 
         ( ata.cmd_block_base_address + ATA_REG_DEVSEL), 
         0xE0 | ata.dev_num << 4 );
+
+
+    //
+    // Solicitando informações sobre o disco.
+    //
 
     // cmd
     ata_wait (400);
@@ -267,29 +292,85 @@ int ide_identify_device ( uint8_t nport )
     // Devido unidades ATAPI, ao menos que pesquisamos pelo Bit ERROR
     // Melhor seria fazermos polling
 
-	//Sem unidade no canal
+    //Sem unidade no canal
 
     ata_wait (400);
     
-    if ( ata_status_read() == 0 ){  
+    if ( ata_status_read() == 0 )
+    {
+        // ??
+        // Talvez precismos de uma mensagem de erro.
         return (int) -1;
     }
 
 
-    lba1 = in8 ( ata.cmd_block_base_address + ATA_REG_LBA1 );
-    lba2 = in8 ( ata.cmd_block_base_address + ATA_REG_LBA2 );
+    // #todo
+    // Use esses registradores para pegar mais informações.
+    // See:
+    // hal/dev/blkdev/ata.h
 
+    // See
+    // https://wiki.osdev.org/ATA_PIO_Mode
+    // https://wiki.osdev.org/PCI_IDE_Controller
+    
+    /*
+    // #exemplo:
+    // get the "signature bytes" 
+    unsigned cl=inb(ctrl->base + REG_CYL_LO);	
+	unsigned ch=inb(ctrl->base + REG_CYL_HI);
+	differentiate ATA, ATAPI, SATA and SATAPI 
+	if (cl==0x14 && ch==0xEB) return ATADEV_PATAPI;
+	if (cl==0x69 && ch==0x96) return ATADEV_SATAPI;
+	if (cl==0 && ch == 0) return ATADEV_PATA;
+	if (cl==0x3c && ch==0xc3) return ATADEV_SATA;
+    */
+
+    // Saving.
+    // lba1 = in8( ata.cmd_block_base_address + ATA_REG_LBA1 );
+    // lba2 = in8( ata.cmd_block_base_address + ATA_REG_LBA2 );
+
+    // REG_CYL_LO = 4
+    // REG_CYL_HI = 5
+
+    // Getting signature bytes.
+    lba1 = in8( ata.cmd_block_base_address + 4 );
+    lba2 = in8( ata.cmd_block_base_address + 5 );
+
+
+
+
+    /*
+    // #test
+    // Isso provavelmente é o número de setores envolvidos em
+    // uma operação de leitura ou escrita.
+    //===============
+    unsigned long NumberOfSectors=0;
+    NumberOfSectors = in8( ata.cmd_block_base_address + ATA_REG_SECCOUNT );
+    if (NumberOfSectors>0){
+       printf(">>>> %d | *breakpoint\n",NumberOfSectors);
+       refresh_screen();
+       while(1){}
+    }
+    */
+    //===============
+
+    
+    // #test
+    // vamos pegar mais informações. 
+    
+    
 
     //
     // # Type
     //
 
-	// # PATA
+    // ==========================
+    // # PATA
     if ( lba1 == 0 && lba2 == 0 )
     {
         // kputs("Unidade PATA\n");
         // aqui esperamos pelo DRQ
-        // e eviamoos 256 word de dados PIO
+        // e eviamos 256 word de dados PIO
 
         ata_wait_drq();
         ata_pio_read ( ata_identify_dev_buf, 512 );
@@ -361,7 +442,8 @@ int ide_identify_device ( uint8_t nport )
         return (int) 0;
 
 
-	// # SATA
+    // ==========================
+    // #SATA
     }
     else if ( lba1 == 0x3C && lba2 == 0xC3 ){
 
@@ -435,10 +517,11 @@ int ide_identify_device ( uint8_t nport )
         return (int) 0;
 
 
+    // ==========================
     // # PATAPI
     }
-    else if ( lba1 == 0x14 && lba2 == 0xEB )
-    {
+    else if ( lba1 == 0x14 && lba2 == 0xEB ){
+
         //kputs("Unidade PATAPI\n");   
         ata_cmd_write(ATA_CMD_IDENTIFY_PACKET_DEVICE);
         ata_wait(400);
@@ -494,6 +577,7 @@ int ide_identify_device ( uint8_t nport )
         return (int) 0x80;
 
 
+    // ==========================
     // # SATAPI
     }
     else if (lba1 == 0x69  && lba2 == 0x96){
@@ -549,7 +633,7 @@ int ide_identify_device ( uint8_t nport )
         }
 
         return (int) 0x80;
-    }
+    };
 
     // fail ??
     // Is something wrong here?
@@ -669,6 +753,11 @@ void ide_mass_storage_initialize (void)
 
 // This routine was called by ata_initialize.
 
+// #todo
+// Agora essa função precisa receber um ponteiro 
+// para a estrutura de disco usada pelo gramado.
+// Para salvarmos os valores que pegamos nos registradores.
+
 int ide_dev_init (char port)
 {
 
@@ -713,6 +802,9 @@ int ide_dev_init (char port)
         return (int) 1;
     }
 
+
+    unsigned long value=0;
+    unsigned long value2=0;
 
     // Unidades ATA.
     if ( data == 0 )
@@ -760,6 +852,33 @@ int ide_dev_init (char port)
 
         new_dev->dev_size = (new_dev->dev_total_num_sector_lba48 * 512);
 
+        // Pegando o size.
+        // Quantidade de setores.
+        // Uma parte está em 61 e outra em 60.
+ 
+        value = ata_identify_dev_buf[61];  
+        value = ( value << 16 );           
+        value = ( value & 0xFFFF0000 );    
+        
+        value2 = ata_identify_dev_buf[60];  
+        value2 = ( value2 & 0x0000FFFF );  
+        
+        new_dev->dev_total_num_sector = value | value2;
+        
+        new_dev->_MaxLBA = new_dev->dev_total_num_sector;
+              
+        //if ( new_dev->dev_total_num_sector > 0 )
+        //{
+        //     printf ("#debug: >>>> ata Size %d\n", 
+        //         new_dev->dev_total_num_sector );
+        //     refresh_screen();
+        //     while(1){}
+        //}
+
+
+        // #todo
+        // Agora essa função precisa receber um ponteiro 
+        // para a estrutura de disco usada pelo gramado.
 
           // Unidades ATAPI. 
     }else if( data == 0x80 )
@@ -805,6 +924,34 @@ int ide_dev_init (char port)
               // We need to get this information in some place.
 
               new_dev->dev_size = (new_dev->dev_total_num_sector_lba48 * 2048);
+
+              // Pegando o size.
+              // Quantidade de setores.
+              // Uma parte está em 61 e outra em 60.
+ 
+              value = ata_identify_dev_buf[61];  
+              value = ( value << 16 );           
+              value = ( value & 0xFFFF0000 );    
+        
+              value2 = ata_identify_dev_buf[60];  
+              value2 = ( value2 & 0x0000FFFF );  
+        
+              new_dev->dev_total_num_sector = value | value2;
+        
+              new_dev->_MaxLBA = new_dev->dev_total_num_sector;
+              
+              //if ( new_dev->dev_total_num_sector > 0 )
+              //{
+              //   printf ("#debug: >>>> atapi Size %d\n", 
+              //       new_dev->dev_total_num_sector );
+              //   refresh_screen();
+              //   while(1){}
+              //}
+
+             // #todo
+             // Agora essa função precisa receber um ponteiro 
+             // para a estrutura de disco usada pelo gramado.
+
 
           }else{
                debug_print ("ide_dev_init: [ERROR] not ATA, not ATAPI.\n");

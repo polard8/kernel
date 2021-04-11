@@ -136,6 +136,9 @@ sixth..     ide5, usually PCI, probed
 	// display manager (with GUI) 	
 	// Same as runlevel 3 + display manager.
 	// Full multi-user graphical mode. 
+
+
+// #define DEFAULT_RUNLEVEL 0
 #define DEFAULT_RUNLEVEL 5
 
 
