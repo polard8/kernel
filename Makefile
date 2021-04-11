@@ -8,7 +8,7 @@ VERSION_MINOR = 0
 VERSION_BUILD = 228
 KERNELVERSION = $(VERSION_MAJOR)$(if $(VERSION_MINOR),.$(VERSION_MINOR)$(if $(VERSION_BUILD),.$(VERSION_BUILD)))
 
-# Documentation.
+# Documentation...
 # See: base/GRAMADO/DOCS/
 # To see the targets execute "make help".
 
