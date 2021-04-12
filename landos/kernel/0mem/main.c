@@ -89,8 +89,11 @@ void preinit_Globals(int arch_type)
     // Kernel status.
     KernelStatus = KERNEL_NULL;
     
-    gdefShowLogo = FALSE;
-    gdefShowProgressBar = TRUE;
+
+
+
+
+
     // ...
 
     // Kernel symbol table.
@@ -241,7 +244,7 @@ int kernel_main (int arch_type)
     */
 
 
-
+    // The mode.
     debug_print ("mode: ");
 
     switch (current_mode){
@@ -254,6 +257,7 @@ int kernel_main (int arch_type)
         // ...
         default:  debug_print ("Not defined\n");  break;
     };
+
 
     // The architecture.
     debug_print ("arch: ");

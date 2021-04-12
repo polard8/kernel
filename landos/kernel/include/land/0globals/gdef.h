@@ -150,9 +150,7 @@ unsigned long blSavedCylinders;
 //...
 
 
-int gdefShowLogo;
-int gdefShowProgressBar;
-//...
+
 
 /*
  * Os Type:

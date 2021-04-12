@@ -1,11 +1,7 @@
 /*
  */
 
-
-
-void CreateProgressBar(void);
-void IncrementProgressBar(void);
-
+int nothingPBAR;
 
 
 //

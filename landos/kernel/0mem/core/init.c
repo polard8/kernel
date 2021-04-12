@@ -337,15 +337,6 @@ int init (void){
     PROGRESS("Kernel:2:2\n"); 
     // Create the progress bar.
 
-    //
-    // == progress bar ===================================
-    //
-    
-    // Precisa ser depois de inicializar as globais
-    // pois considera o runlevel.
-
-    CreateProgressBar();
-
 
 #ifdef EXECVE_VERBOSE
     printk ("core-init: init_globals ok\n");     
@@ -670,10 +661,6 @@ int init (void){
     printf("=========================\n");
     printf("core-init: end of phase 0\n");
     
-    // 1. Fim da fase 0.
-    IncrementProgressBar();
-    //refresh_screen();
-    //while(1){}
 
     //
     // == phase 1 ? ================================================
@@ -857,10 +844,6 @@ int init (void){
     printf("=========================\n");
     printf("core-init: end of phase 1\n");
 
-    //2 - fim da fase 1.
-    IncrementProgressBar();
-    //refresh_screen();
-    //while(1){}
 
     //
     // == phase 2 ? ================================================

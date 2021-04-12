@@ -31,12 +31,16 @@ void show_cpu_intel_parameters (void)
 {
     //Title.
     printf("\nx86 CPU Info:\n\n");
-	//printf("=============\n");
-	
-	//
+    //printf("=============\n");
+
+
+    // #todo
+    // Check the pointer validation.
+
+
     // Vendor, Name, is apic supported ?, Max feature id,
     // L2 Line size, L2 cache size,
-    //
+
 
     printf("            Vendor: {%s}\n", &processor->Vendor[0] );
     printf("               Cpu: {%s}\n", &processor->BrandName[0] );
@@ -60,22 +64,23 @@ void show_cpu_intel_parameters (void)
         (unsigned long) processor->Extended_Family_ID );
 
 
+    //printf("ApicSupport={%x}\n", processor->isApic);
 
-
-	//printf("ApicSupport={%x}\n", processor->isApic);
     printf("    Max feature id: {%d}\n", 
         (unsigned long) processor->MaxFeatureId );
-	
-	//Bits 0-7: Cache Line Size.
-	printf("      L2 line size: {%d Byte}\n", 
-	    (unsigned long) processor->L2LineSize ); 	
+
+    //Bits 0-7: Cache Line Size.
+    printf("      L2 line size: {%d Byte}\n", 
+        (unsigned long) processor->L2LineSize ); 
 
 
-	// L2 Associativity. 
+    // L2 Associativity. 
+    // Bits 12-15: L2 Associativity.
+    
+    unsigned long L2Associativity = processor->L2Associativity;
 
-    switch (processor->L2Associativity){
+    switch (L2Associativity){
 
-        //Bits 12-15: L2 Associativity.
         case 0x00:
             printf ("  L2 Associativity: {Disabled}\n");
             break; 
@@ -112,25 +117,27 @@ void show_cpu_intel_parameters (void)
 	//36 ou 39 indica memória extendida. normal é 32=(4GB).
 	// maximum physical address bits  
 	//maximum linear (virtual) address bits 
-	
-	printf("[Largest virtual and physical address sizes]\n");
-	
-	printf("            PA Lim: {%d}\n", 
-	    (unsigned long) processor->Physical_Address_Size );
-		
-	printf("            VA Lim: {%d}\n", 
-	    (unsigned long) processor->Virtual_Address_Size );
-	
-	//printf("     Memory Size: {%d}\n",(unsigned long) processor->MemorySize);
-	
-	//Continua...
+
+
+    printf("[Largest virtual and physical address sizes]\n");
+
+    printf("            PA Lim: {%d}\n", 
+        (unsigned long) processor->Physical_Address_Size );
+
+    printf("            VA Lim: {%d}\n", 
+        (unsigned long) processor->Virtual_Address_Size );
+
+    //printf("     Memory Size: {%d}\n",(unsigned long) processor->MemorySize);
+
+
+    // Continua ...
+
 
     //como não usa janelas devemos dar refresh na tela todo por enquanto.
 
-	//#bugbug: isso é lento.
+    // Show.
     refresh_screen();
 }
-
 
 
 //

@@ -1,8 +1,7 @@
 /*
- * File: x86fault.c
+ * File: ps/x86/x86fault.c
  * 
  *     x86 faults.
- *     x86 faulter.
  *
  * History:
  *     2015 - Created by Fred Nora.
@@ -69,10 +68,10 @@ void x86fault_initialize(void)
  * faults:
  *
  *    #importante:
- *    +Quem chamou isso, pois temos a intenção de retornar,
- *     inicializando outra a mesma thread, as agora com a inclusão da 
- *     página faltante, ou reinicializar com outra thread, pois fechamos 
- *     a que estava com problemas.  
+ *    Quem chamou isso? Pois temos a intenção de retornar,
+ *    inicializando outra a mesma thread, as agora com a inclusão da 
+ *    página faltante, ou reinicializar com outra thread, pois fechamos 
+ *    a que estava com problemas.  
  *    Por fim ainda temos o caso quando não iremos retornar.
  */
 
@@ -80,8 +79,12 @@ void faults ( unsigned long number ){
 
     struct thread_d  *t;
 
+    unsigned long Step=0;
+    unsigned long upRunningThreads = (unsigned long) UPProcessorBlock.threads_counter;
+
     // ??
     // Isso impede a reentrada ??
+
     asm ("cli");
 
     kprintf ("\n\n ======================= \n\n");
@@ -125,18 +128,27 @@ void faults ( unsigned long number ){
         goto fail;
     }
 
-
     t = (void *) threadList[current_thread];
 
     if ( (void *) t == NULL ){
         printf ("x86fault-faults: [FAIL] t\n");
         goto fail;
-    }else{
+    }
 
-	    // Salva o contexto se a tarefa já esteve rodando.
-	    // #bugbug
-        // Devemos salvar também quando ainda não rodou, pois
-        // podemos errar na inicialização da thread.
+    if ( t->used != TRUE || t->magic != 1234 )
+    {
+        printf ("x86fault-faults: [FAIL] t validation\n");
+        goto fail;
+    }
+
+
+    Step = t->step;
+
+    // Salva o contexto se a tarefa já esteve rodando.
+
+    // #bugbug
+    // Devemos salvar também quando ainda não rodou, pois
+    // podemos errar na inicialização da thread.
         
         /* 
         if ( ProcessorBlock.threads_counter >= 1 && 
@@ -155,23 +167,17 @@ void faults ( unsigned long number ){
         // salvando os registradores
         // que refletem o momento em que houve a exceção.
         // Isso é perfeito para a int 3.
-        printf ("x86fault-faults: Saving context\n");
-        save_current_context();
+    printf ("x86fault-faults: [DEBUG] Saving context\n");
+    save_current_context();
 
-        printf ("Number={%d}\n", 
-            number);               
-        printf ("TID %d Step %d \n", 
-            current_thread, 
-            t->step );
-        printf ("Running Threads %d \n", 
-            UPProcessorBlock.threads_counter ); 
+    printf ("Number = {%d}\n", number); 
+    printf ("TID %d | Step %d \n", current_thread, Step );
+    printf ("UP Running Threads: %d \n", upRunningThreads );
 
-        //printf ("Init Phase %d \n", KeInitPhase);
-        //printf ("logonStatus %d | guiStatus %d \n", logonStatus, guiStatus );
+    //printf ("Init Phase %d \n", KeInitPhase);
+    //printf ("logonStatus %d | guiStatus %d \n", logonStatus, guiStatus );
 
-        refresh_screen(); 
-    };
-
+    refresh_screen(); 
 
     // OPÇÃO. 
     // KiInformation ();

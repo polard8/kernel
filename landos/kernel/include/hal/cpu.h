@@ -23,6 +23,7 @@
 #define Processor_NULL  0 
 #define Processor_INTEL 1
 #define Processor_AMD   2
+// ...
 
 // #todo:
 // More brands.
@@ -31,6 +32,7 @@
 
 
 // Intel modes.
+// #todo: We need better names.
 #define SI_RM 0    // Real Mode.
 #define SI_PM 1    // Protected Mode.
 #define SI_LM 2    // Long Mode.
@@ -72,12 +74,11 @@ struct processor_d
 	
 	//@todo: quantas vezes um processador foi interrompido.
 	// ULONG   InterruptCount;             // per precessor counts
-	
-	
+
     unsigned char Type;
 	
 	//@todo: ULONG MHz;
-	
+
 
     // 0x0.
     // cpuid vars.
@@ -191,8 +192,8 @@ struct processor_d
 
 	//...
 
+    // navigation
 
-	// Next.
     struct processor_d  *next;
 };
 struct processor_d *processor;
@@ -211,16 +212,15 @@ struct processor_d *processor;
 
 struct ProcessorBlock_d
 {
-	// Object
-    object_type_t objectType;
-    object_class_t objectClass;
 
+    object_type_t   objectType;
+    object_class_t  objectClass;
 
     int id;
 
     int used;
     int magic;
-    
+
     // status flag.
     // Aweked
     int status;
@@ -228,14 +228,14 @@ struct ProcessorBlock_d
 
     // Processor Info. (Intel x86 only)
 
-    struct processor_d *processorInfo;
+    struct processor_d  *processorInfo;
     //struct processor_d *Intel_processorInfo;
 
 	//
 	// ==== Process ====
 	//
-	
-	//int running_processes;
+
+    //int running_processes;
     int processes_counter;
 
     struct process_d *CurrentProcess;  
@@ -249,8 +249,9 @@ struct ProcessorBlock_d
 
 
     // Number of total threads in this processor.
-    int threads_counter;
-    
+    unsigned long threads_counter;
+
+
     // Number of threads running in this processor.
     //int running_threads;   
 
@@ -277,7 +278,7 @@ struct ProcessorBlock_d
 //processors count
 int processors_count;
 
-//all processors's structs.
+// all processors's structs.
 // ProcessorBlock_d
 unsigned long processorsList[PROCESSORS_MAX_COUNT];
 
@@ -288,10 +289,8 @@ unsigned long processorsList[PROCESSORS_MAX_COUNT];
 // == prototypes ===========================================
 //
 
-
 int detect_IsQEMU(void);
 
- 
 int cpuHasMSR (void);
 void cpuGetMSR(unsigned long msr, unsigned long *lo, unsigned long *hi);
 void cpuSetMSR(unsigned long msr, unsigned long lo, unsigned long hi);
@@ -302,14 +301,13 @@ int cpu_get_parameters (void);
 
 unsigned long get_processor_feature(int i);
 
-//#bugbug
-//Esse nome não é apropriado.
-//@todo: Isso deve isr para include/ke.h.
+// #bugbug
+// Esse nome não é apropriado.
+// #todo: 
+// Isso deve isr para include/ke.h.
 int KeTestCPU (void);   
 
-
 void init_cpu (void);
-
 
 #endif   
 

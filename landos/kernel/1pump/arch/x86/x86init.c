@@ -568,11 +568,6 @@ int x86main (void)
     printf("======================\n");
     printf("x86main: end of phase 2\n");
 
-    // 3 - fim da fase 2.
-    IncrementProgressBar();
-    
-    //refresh_screen();
-    //while(1){}
 
 //
 // == phase 3 ? ================================================
@@ -785,7 +780,7 @@ int x86main (void)
 
     //Inicializando as variáveis do cursor piscante do terminal.
     //isso é um teste.
-    timer_cursor_used = 0;   //desabilitado.
+    timer_cursor_used   = 0;   //desabilitado.
     timer_cursor_status = 0;
 
 
