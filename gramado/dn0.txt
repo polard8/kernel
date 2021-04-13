@@ -13,4 +13,4 @@
 	Gramado Core  - The window system and beyond.
 	Gramado Edge  - UI for network support.
 	Gramado Setup - The setup environment. Used to install/upgrade the system.
-	Gramado Shell - The shell environment. The user environment.
+	Gramado Shell - A graphical shell. The user environment.

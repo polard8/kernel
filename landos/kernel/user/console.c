@@ -1769,11 +1769,14 @@ int VirtualConsole_initialize(void)
 		// O video já foi inicializado em main.c.
 		// Isso atualiza a estrutura de console do console atual.
 
-		// BANNER !
-        //Welcome message. (Poderia ser um banner.) ??
-        
-    set_up_cursor (0,1);
- 
+    // BANNER !
+    // Welcome message. (Poderia ser um banner.) ??
+
+
+    // Cursor:
+    // See: 0mem/core/system.c
+    
+    set_up_cursor(0,0);
 
     return 0;
 }

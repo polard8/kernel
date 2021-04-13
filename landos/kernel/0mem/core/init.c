@@ -268,7 +268,7 @@ void init_globals (void){
 	
 	//#bugbug isso esta dando problemas.
 //#ifdef EXECVE_VERBOSE
-    backgroundDraw ( (unsigned long) COLOR_BLUE ); 
+    // backgroundDraw ( (unsigned long) COLOR_BLUE ); 
 //#endif
 
     //printf("#breakpoint glob");
@@ -638,7 +638,17 @@ int init (void){
     printk ("init_architecture_independent: init_window_manager\n");
 #endif
 
+    // debug
+    //printf("W\n");
+    //refresh_screen();
+    //while(1){}
+    
     init_window_manager();
+
+    // debug
+    //printf("~W\n");
+    //refresh_screen();
+    //while(1){}
 
 
     // More? ...
@@ -799,6 +809,13 @@ int init (void){
     // Continua ...
 
     // Done.
+
+
+    // debug
+    //printf("~P\n");
+    //refresh_screen();
+    //while(1){}
+
 
 //
 // ====================================================================

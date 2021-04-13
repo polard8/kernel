@@ -1049,7 +1049,12 @@ int mmSetUpPaging (void)
     unsigned long *extraheap2_page_table = (unsigned long *) PAGETABLE_EXTRAHEAP2;
     unsigned long *extraheap3_page_table = (unsigned long *) PAGETABLE_EXTRAHEAP3;
 
-    //...
+    // ...
+    
+    
+    debug_print("mmSetUpPaging:\n");
+    
+    
 
 	//
 	// SYSTEM MEMORY * PAGED POOLS 
@@ -1062,9 +1067,12 @@ int mmSetUpPaging (void)
 
     // Message. (verbose).
 
-#ifdef PS_VERBOSE
-    printf ("mmSetUpPaging: Initializing Pages..\n");
-#endif
+
+// #debug
+//#ifdef PS_VERBOSE
+    // printf ("mmSetUpPaging: Initializing Pages..\n");
+    // refresh_screen();
+//#endif
 
 
 	//
@@ -1450,10 +1458,10 @@ int mmSetUpPaging (void)
     // Endere�o virtual do pool de heaps.
     // Os heaps nessa �rea ser�o dados para os processos.
 
-    g_heappool_va = (unsigned long) XXXHEAPPOOL_VA; //0xC1000000;
-    g_heap_count = 0;
+    g_heappool_va    = (unsigned long) XXXHEAPPOOL_VA; //0xC1000000;
+    g_heap_count     = 0;
     g_heap_count_max = G_DEFAULT_PROCESSHEAP_COUNTMAX;
-    g_heap_size = G_DEFAULT_PROCESSHEAP_SIZE;
+    g_heap_size      = G_DEFAULT_PROCESSHEAP_SIZE;
 
 
     // >> (user mode).
@@ -1486,8 +1494,8 @@ int mmSetUpPaging (void)
     // +++++++
     // Extra heap 1.
     // >>> (user mode).
-    g_extraheap1_va = (unsigned long) XXXEXTRAHEAP1_VA;  //0xC1400000;
-    g_extraheap1_size = G_DEFAULT_EXTRAHEAP_SIZE;        //4MB
+    g_extraheap1_va   = (unsigned long) XXXEXTRAHEAP1_VA;  //0xC1400000;
+    g_extraheap1_size = G_DEFAULT_EXTRAHEAP_SIZE;          //4MB
 
 
     // 4096 KB = (4 MB).
@@ -1509,8 +1517,8 @@ int mmSetUpPaging (void)
     // +++++++
     // Extra heap 2.
     // >>> (user mode).
-    g_extraheap2_va = (unsigned long) XXXEXTRAHEAP2_VA;  //0xC1800000;
-    g_extraheap2_size = G_DEFAULT_EXTRAHEAP_SIZE;        //4MB
+    g_extraheap2_va   = (unsigned long) XXXEXTRAHEAP2_VA;  //0xC1800000;
+    g_extraheap2_size = G_DEFAULT_EXTRAHEAP_SIZE;          //4MB
 
 
     // 4096 KB = (4 MB).
@@ -1729,21 +1737,6 @@ int mmSetUpPaging (void)
 	//     #verbose.
 
 
-#ifdef PS_VERBOSE
-    printf ("Debug:\n");
-    printf ("Setup CR3={%x}\n", (unsigned long) &page_directory[0]);
-    printf ("Page={%x} \n",     (unsigned long) &km_page_table[0]);
-    printf ("Page={%x} \n",     (unsigned long) &km2_page_table[0]);
-    printf ("Page={%x} \n",     (unsigned long) &um_page_table[0]);
-    printf ("Page={%x} \n",     (unsigned long) &cga_page_table[0]);
-    printf ("Page={%x} \n",     (unsigned long) &frontbuffer_page_table[0]);
-    printf ("Page={%x} \n",     (unsigned long) &backbuffer_page_table[0]);
-    printf ("Page={%x} \n",     (unsigned long) &pagedpool_page_table[0]);
-    // ...
-	//refresh_screen();
-	//while(1){};
-#endif
-
 	// Obs: 
 	// Podemos reaproveitas pagetables em diferentes processos.
 
@@ -1824,7 +1817,7 @@ int mmSetUpPaging (void)
     if ( (void *) kfp != NULL  )
     {
 		kfp->id = 0;
-		kfp->used = 1;
+		kfp->used  = TRUE;
 		kfp->magic = 1234;
 		
 		//?? Come�a em 0 MB. ??
@@ -1858,7 +1851,7 @@ int mmSetUpPaging (void)
     if ( (void *) small_fp != NULL  )
     {
 		small_fp->id = 1;
-		small_fp->used = 1;
+		small_fp->used  = TRUE;
 		small_fp->magic = 1234;
 		
 		//Come�a em 4 MB.
@@ -1897,7 +1890,7 @@ int mmSetUpPaging (void)
     if( (void *) pageable_fp != NULL  )
     {
 		pageable_fp->id = 5;   //quinto �ndice.
-		pageable_fp->used = 1;
+		pageable_fp->used  = TRUE;
 		pageable_fp->magic = 1234;
 		
 		//Come�a em 20 MB.
@@ -1921,9 +1914,11 @@ int mmSetUpPaging (void)
 
 // Done.
 	
-#ifdef MK_VERBOSE
-    printf ("Done\n");
-#endif
+//#ifdef MK_VERBOSE
+//    printf ("Done\n");
+//#endif
+
+    debug_print("mmSetUpPaging: done\n");
 
     return 0;
 }

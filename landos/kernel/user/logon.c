@@ -75,7 +75,7 @@ int ExitLogon (void);
  *     Usu�rio.
  */
 
-// It was called by init() in init.c
+// It was called by KGWS_initialize() in kgws.c
 
 int init_logon_manager (void){
 
@@ -99,7 +99,12 @@ int init_logon_manager (void){
     // obs: Essa tela nao dura muito tempo,
     // pois logo vem a inicializa�ao das janelas.
 
-    backgroundDraw ( (unsigned long) COLOR_BLACK ); 
+    // #???
+    // Ja fizemos isso na inicializaçao do kernel
+    // Se fizermos novamente, ainda teremos strings
+    // sujando a tela.
+
+    //backgroundDraw ( (unsigned long) COLOR_BLACK ); 
 
 	//
 	// Aten��o
@@ -119,6 +124,14 @@ int init_logon_manager (void){
     kprintf ("\n");
     kprintf ("init_logon_manager: Initializing user environment!\n");
     kprintf ("\n");
+
+
+
+    // debug
+    //printf("L\n");
+    //refresh_screen();
+    //while(1){}
+
 
     // #todo:
     // Podemos mudar o nome dessa fun�ao para logonSetupVersion()
@@ -267,11 +280,36 @@ int init_logon_manager (void){
 	    // ...
     };
 
+    // debug
+    //printf("L\n");
+    //refresh_screen();
+    //while(1){}
 
-    if ( (void *) CurrentUser == NULL )
-    {
+
+
+    if ( (void *) CurrentUser == NULL ){
         panic ("init_logon_manager: CurrentUser\n");
     }
+
+
+
+    //
+    // The splash string !
+    //
+
+    kprintf ("init_logon_manager: Done\n"); 
+    kprintf (":: Welcome to Gramado Operating System! ::\n"); 
+
+    //printf("*breakpoint\n");
+    //refresh_screen();
+    //while(1){}
+
+    // debug
+    //printf("L: Gramado\n");
+    //refresh_screen();
+    //while(1){}
+
+
 
      //printf("*breakpoint\n");
      //refresh_screen();
@@ -281,7 +319,6 @@ int init_logon_manager (void){
     // The screen window will be the main window too.
 
     logon_create_screen_window(); 
-
 
     if ( (void *) gui->screen == NULL ){
         panic("init_logon_manager: No sreen window\n");
@@ -293,26 +330,35 @@ int init_logon_manager (void){
 
     // Write something into the main window.
 
+
+    // ##
+    // Estamos suspendendo isso somente para termos
+    // um fluxo contimuo de strings na inicializaçao
+    // e nao uma parada para splash screen.
+    
+    /*
     if ( (void *) gui->main != NULL )
     {
         draw_text ( 
             gui->main, 8, 8, 
             COLOR_WHITE, "Gramado Operating System" );
     }
-
-
-     //printf("*breakpoint\n");
-     //refresh_screen();
-     //while(1){}
+    */
 
     // ...
 
-done:
+    // debug
+    //printf("L: Gramado\n");
+    //refresh_screen();
+    //while(1){}
 
+
+    //nao funciona
+    //set_up_cursor(0,0);
+
+    // done
     logonStatus      = TRUE;
     gui->initialised = TRUE;
-
-    kprintf ("init_logon_manager: Done\n"); 
 
     return 0;
 }
@@ -380,9 +426,9 @@ void logon_create_screen_window (void){
     unsigned long Height = (unsigned long) screenGetHeight();
 
 
-    if ( Width == 0 || Height == 0 )
+    if ( Width == 0 || Height == 0 ){
         panic("logon_create_screen_window: w h\n");
-
+    }
 
 	// Screen
 	// Obs: N�o tem 'parent window' !!!
@@ -393,7 +439,7 @@ void logon_create_screen_window (void){
     hWindow = (void *) CreateWindow ( 
                            WT_SIMPLE, 0, VIEW_FULL, "Screen",
                            Left, Top, Width, Height, 
-                           NULL, 0, 0, COLOR_BLACK ); 
+                           NULL, 0, 0, COLOR_GRAY ); 
 
     if ( (void *) hWindow == NULL ){
        panic ("logon_create_screen_window: hWindow\n");
@@ -419,6 +465,8 @@ void logon_create_screen_window (void){
 			// #debug
 			// refresh_screen();
 			// while(1){}
+
+            show_window_rect(hWindow);
         };
     };
 }

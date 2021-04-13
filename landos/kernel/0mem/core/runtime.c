@@ -42,8 +42,7 @@ int init_runtime (void)
     // Current arch.
     //
 
-    switch (current_arch)
-    {
+    switch (current_arch){
 
         // Init Memory Manager for x86:
         // Heap, Stack, Pages, mmblocks, memory sizes, memory zones ...
@@ -110,12 +109,8 @@ int init_runtime (void)
 #endif
 
 
-    //
-    // == Done ===========================================
-    //
-
-    g_module_runtime_initialized = 1;
-
+    debug_print ("init_runtime: done\n");
+    //refresh_screen();
     return 0; 
 
 fail:
@@ -137,6 +132,9 @@ int KiInitRuntime (void)
 // called by main.c
 int Runtime_initialize(void)
 {
+
+    debug_print ("Runtime_initialize:\n");
+    
     int Status = (int) init_runtime();
 
     if ( Status < 0 )
@@ -149,6 +147,10 @@ int Runtime_initialize(void)
 
     // ...
 
+    debug_print ("Runtime_initialize: done\n");
+    
+    g_module_runtime_initialized = TRUE;
+    
     return 0;
 }
 

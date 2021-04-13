@@ -114,20 +114,10 @@ void backgroundDraw (unsigned long color)
     for ( i=0; i<SavedY; i++ ){
         my_buffer_horizontal_line ( 0, i, SavedX, color );
     };
-
-
-    //#todo
-    //Criar uma funçao para isso.
     
     // Cursor.
-    CONSOLE_TTYS[fg_console].cursor_x = 0;
-    CONSOLE_TTYS[fg_console].cursor_y = 0;
-
-	// #bugbug
-	// Será que nesse momento as dimensões do char já estão configuradas ??
-
-	//g_cursor_right  = (SavedX/8);
-	//g_cursor_bottom = (SavedY/8);
+    // Nao funciona
+    set_up_cursor(0,0);
 }
 
 
@@ -201,7 +191,7 @@ int backgroundInit (void){
     return 0; 
 }
 
-
+// Called by kernel_main().
 int Background_initialize(void)
 {
 
@@ -217,27 +207,52 @@ int Background_initialize(void)
     // a runtime.
     // #bugbug: slow.
 
+    //printf ("XXX\n");
+    //refresh_screen();
+    //while(1){}
+    
     backgroundDraw ( (unsigned long) COLOR_BLACK );
 
+    // Cursor.
+    // Nao funciona
+    // set_up_cursor(0,4);
 
     // #debug
     // Breakpoint
     // This is used to debug.
     // Show info and hang.
 
-    printf ("kernel_main: [BREAKPOINT] Show bootblock\n");
+
+    //
+    // The first char!
+    //
+   
+    // This is the first char ever for 
+    // the new background.
+
+    printf ("$\n");
+
+
+    // ========================================
+    
+    printf ("Background_initialize: [DEBUG] Show bootblock info\n");
     printf ("Boot block pa %x\n",SavedBootBlock); 
     printf ("lfb %x\n",BootBlock.lfb);
     printf ("x   %d\n",BootBlock.x);
     printf ("y   %d\n",BootBlock.y);
     printf ("bpp %d\n",BootBlock.bpp);
     printf (">>>  Gramado mode %d\n", BootBlock.gramado_mode);
+    
+    //
+    // Refresh
+    //
+
     refresh_screen();
     //while(1){}
 
-
     return 0;
 }
+
 
 //
 // End.

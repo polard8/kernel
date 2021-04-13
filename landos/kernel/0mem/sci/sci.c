@@ -1478,9 +1478,11 @@ void *sci0 (
 
         // 34 - Setup cursor for the current virtual console.
         // See: core/system.c
+        // IN: x,y
         case SYS_VIDEO_SETCURSOR: 
             set_up_cursor ( 
-                (unsigned long) arg2, (unsigned long) arg3 );
+                (unsigned long) arg2, 
+                (unsigned long) arg3 );
             return NULL;
             break; 
 

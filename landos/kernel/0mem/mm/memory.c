@@ -1079,6 +1079,8 @@ int mmInit (void){
 
 	// Continua...
 
+    debug_print("mmInit: done\n");
+
     return (int) Status;
 
 fail:

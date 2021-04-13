@@ -579,11 +579,21 @@ int x86main (void)
     PROGRESS("Kernel:1:3\n"); 
     // Initialize all the kernel graphics support.
 
+
+
     // Initialize all the kernel graphics support.
     // some extra things like virtual terminal and tty.
     // #todo: rever essa inicializaçao.
-    // See; windows/model/kgws.c
+    // See: users/kgws.c
+
     KGWS_initialize();
+
+
+    // debug
+    //printf("~kgws\n");
+    //refresh_screen();
+    //while(1){}
+
 
 
     PROGRESS("Kernel:1:4\n"); 
@@ -591,6 +601,13 @@ int x86main (void)
 
     //ws.c
     ws_init();
+
+
+    // debug
+    //printf("~ws\n");
+    //refresh_screen();
+    //while(1){}
+
 
     // #debug:  
     // Esperamos alcaçarmos esse alvo.
@@ -743,12 +760,24 @@ int x86main (void)
     };
 
 
+    // debug
+    //printf("I\n");
+    //refresh_screen();
+    //while(1){}
+
+
     //============================================================
 
     PROGRESS("Kernel:1:8\n"); 
     // Cria e inicializa apenas o INIT.BIN
 
     __x86StartInit();
+
+    // debug
+    //printf("~I\n");
+    //refresh_screen();
+    //while(1){}
+
 
     //printf("*breakpoint\n");
     //refresh_screen();
@@ -947,11 +976,19 @@ done:
     debug_print ("[x86] x86main: done\n");
     debug_print ("==============\n");
 
+
+
+    // debug
+    //printf("T\n");
+    //refresh_screen();
+    //while(1){}
+
+
     //
     // Starting idle thread.
     //
 
-    // Return to assembly file, (head.s).
+
     if ( KernelStatus == KERNEL_INITIALIZED )
     {
         debug_print ("[x86] x86main: Initializing INIT ..\n");
@@ -961,14 +998,15 @@ done:
     refresh_screen();
 #endif
 
+        //
+        // No return!
+        //
+
         x86mainStartFirstThread(); 
 
-        printf ("[x86] x86main: No idle thread selected\n");
-        goto fail;
+        panic("x86mainStartFirstThread: Couldn't spawn the first thread!\n");
     }
 
-    // ok
-    return 0;
 
     // ===============================
 

@@ -175,7 +175,7 @@ void preinit_OutputSupport(void)
 {
 
     // Virtual Console.
-    // See: tty/console.c
+    // See: user/console.c
     debug_print ("[Kernel] kernel_main: Initializing virtual consoles ...\n");
     VirtualConsole_initialize();
 }
@@ -316,30 +316,46 @@ int kernel_main (int arch_type)
         debug_print ("[Kernel] kernel_main: Using GUI\n");
     }
 
-    // In dd/hid/video.c
+    // In hid/video.c
     Video_initialize();
-
-
+    //printf("1\n");
 
     PROGRESS("Kernel:0:4\n");
     // Runtime
+
 
     // #bugbug:
     // We need the runtime initialization for the messages.
     // What about to initialize it early?! now!!!!
     // See: core/runtime.c
 
+    // #bugbug
+    // Here the background is not initialized yet,
+    // so, we have a lot of dirty things.
+
     debug_print ("[Kernel] kernel_main: Initializing runtime\n");
     Runtime_initialize();
-
-
+    //printf("2\n");
+    
     PROGRESS("Kernel:0:5\n");
     // Clear the screen.
     // print some basic info.
 
+    //
+    // Background
+    //
+
+    // Initializing background 
+    // for the very first time.
+    // Now we have a black screen.
+    // But the cursor position is wrong yet.
+    
     // See: dev/tty/vt/draw/view/bg.c
     Background_initialize();
 
+
+    //refresh_screen();
+    //while(1){}
 
 
     PROGRESS("Kernel:0:6\n"); 

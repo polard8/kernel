@@ -1993,6 +1993,13 @@ int KGWS_initialize(void)
     printf ("KGWS_initialize: calling init_logon_manager ...\n");
     init_logon_manager();
 
+
+    // debug
+    //printf("kkkkkk\n");
+    //refresh_screen();
+    //while(1){}
+
+
     return 0;
 }
 
