@@ -1,6 +1,6 @@
 	gramado/
 
-	Todo o Gramado pode ser considerado um 'window system'.
+	~Todo o Gramado pode ser considerado um 'window system'.
 	O sistema operacional host para ele 'e o landos, mas
 	poderemos tentar portar o window system para outro sistema.
 	Para isso precisamos manter o isolamento da pasta ws/.
