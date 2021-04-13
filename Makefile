@@ -76,7 +76,7 @@ PHONY := all
 # All the steps.
 all:  \
 build-landos-files \
-build-gws-files    \
+build-gramado-files \
 /mnt/gramadovhd    \
 vhd-mount          \
 vhd-copy-files     \
@@ -104,7 +104,10 @@ build-landos-files: \
 /usr/local/gramado-build \
 land-boot \
 land-lib \
-land-os    
+land-os \
+land-cmd \
+land-setup    
+
 
 
 /usr/local/gramado-build:
@@ -139,11 +142,6 @@ land-lib:
 	@echo "Compiling rtl ..."
 	$(Q) $(MAKE) -C landlib/rtl/
 
-	#::libcore
-	@echo "==================="
-	@echo "Compiling libcore ..."
-	$(Q) $(MAKE) -C landlib/libcore/
-
 	#::lib
 	@echo "==================="
 	@echo "Compiling  lib ..."
@@ -172,98 +170,79 @@ land-os:
 	# See: x86/x86init.c
 	sudo cp landos/init/INIT.BIN  base/
 
+#cmd - commands.
+land-cmd:
+	#::cmd
+	$(Q) $(MAKE) -C landos/cmd/
+	-sudo cp landos/cmd/bin/CAT.BIN        base/
+#	-sudo cp landos/cmd/bin/FALSE.BIN      base/
+	-sudo cp landos/cmd/bin/REBOOT.BIN     base/
+	-sudo cp landos/cmd/bin/SHUTDOWN.BIN     base/
+#	-sudo cp landos/cmd/bin/TRUE.BIN       base/
+
+#	-sudo cp landos/cmd/bin/SHOWFUN.BIN    base/
+#	-sudo cp landos/cmd/bin/UNAME.BIN      base/
+
+land-setup:
+	#::setup
+	$(Q) $(MAKE) -C landos/setup/
+
+	sudo cp landos/setup/bin/GDESHELL.BIN  base/
+	sudo cp landos/setup/bin/GRAMCODE.BIN  base/
+	sudo cp landos/setup/bin/SYSMON.BIN    base/
+
+	sudo cp landos/setup/bin/LAUNCHER.BIN  base/
+
+	#sudo cp landos/setup/bin/C4.BIN       base/
+	#sudo cp landos/setup/bin/GRAMC.BIN    base/
+	#sudo cp landos/setup/bin/GRAMC4.BIN   base/
+	#sudo cp landos/setup/bin/GRAMCNF.BIN  base/
+
+	sudo cp landos/setup/bin/GFE.BIN       base/
+	#sudo cp landos/setup/bin/REBOOT2.BIN       base/
+	#sudo cp landos/setup/bin/REBOOT3.BIN       base/
 
 #===================================================
 #:::1
 # ~ Step 1 - Gramado Window System files.
 
-PHONY := build-gws-files 
-build-gws-files: \
-gramado-cmd \
-gramado-setup \
-gramado-core \
-gramado-shell \
-gramado-edge \
+PHONY := build-gramado-files 
+build-gramado-files: \
+gramado-ws \
+gramado-services \
 desert    
 
-# order
-# cmd > setup > core > edge > desert
+gramado-ws:
 
-#cmd - commands.
-gramado-cmd:
-	#::cmd
-	$(Q) $(MAKE) -C gramado/cmd/
-	-sudo cp gramado/cmd/bin/CAT.BIN        base/
-#	-sudo cp gramado/cmd/bin/FALSE.BIN      base/
-	-sudo cp gramado/cmd/bin/REBOOT.BIN     base/
-	-sudo cp gramado/cmd/bin/SHUTDOWN.BIN     base/
-#	-sudo cp gramado/cmd/bin/TRUE.BIN       base/
+	#:: Gramado WS
+	@echo "==================="
+	@echo "Compiling Gramado WS and some clients"
+	$(Q) $(MAKE) -C gramado/ws/
 
-#	-sudo cp gramado/cmd/bin/SHOWFUN.BIN    base/
-#	-sudo cp gramado/cmd/bin/UNAME.BIN      base/
+	# ws and some clients
 
-gramado-setup:
-	#::setup
-	$(Q) $(MAKE) -C gramado/setup/
+# server and main client.
+	-sudo cp gramado/ws/bin/GWS.BIN       base/ 
+	-sudo cp gramado/ws/bin/GWSSRV.BIN    base/
 
-	sudo cp gramado/setup/bin/GDESHELL.BIN  base/
-	sudo cp gramado/setup/bin/GRAMCODE.BIN  base/
-	sudo cp gramado/setup/bin/SYSMON.BIN    base/
+# well teste clients
+	-sudo cp gramado/ws/bin/EDITOR.BIN    base/
+	-sudo cp gramado/ws/bin/GWM.BIN       base/
+	-sudo cp gramado/ws/bin/TERMINAL.BIN  base/
+	-sudo cp gramado/ws/bin/FILEMAN.BIN   base/
 
-	sudo cp gramado/setup/bin/LAUNCHER.BIN  base/
+# extra clients
+	-sudo cp gramado/ws/bin/*.BIN        base/PROGRAMS/
 
-	#sudo cp gramado/setup/bin/C4.BIN       base/
-	#sudo cp gramado/setup/bin/GRAMC.BIN    base/
-	#sudo cp gramado/setup/bin/GRAMC4.BIN   base/
-	#sudo cp gramado/setup/bin/GRAMCNF.BIN  base/
 
-	#sudo cp gramado/setup/bin/GFE.BIN       base/
-	#sudo cp gramado/setup/bin/REBOOT2.BIN       base/
-	#sudo cp gramado/setup/bin/REBOOT3.BIN       base/
-	
-gramado-core:
+gramado-services:
 	#::hard Services
 	@echo "==================="
 	@echo "Compiling hard..."
-	$(Q) $(MAKE) -C gramado/core/gnssrv/ 
+	$(Q) $(MAKE) -C gramado/services/gnssrv/ 
 	# gns
-	-sudo cp gramado/core/gnssrv/bin/GNS.BIN     base/
-	-sudo cp gramado/core/gnssrv/bin/GNSSRV.BIN  base/
-
-
-	#::aurora Aurora Window Server.
-	@echo "==================="
-	@echo "Compiling Aurora window server ..."
-	$(Q) $(MAKE) -C gramado/core/aurora/
-	# gws
-	-sudo cp gramado/core/aurora/bin/GWS.BIN     base/ 
-	-sudo cp gramado/core/aurora/bin/GWSSRV.BIN  base/
-
-
-gramado-shell:
-
-	#::apps
-	$(Q) $(MAKE) -C gramado/shell/apps/
-	-sudo cp gramado/shell/apps/bin/EDITOR.BIN     base/
-	-sudo cp gramado/shell/apps/bin/FILEMAN.BIN    base/
-	-sudo cp gramado/shell/apps/bin/GWM.BIN        base/
-#	-sudo cp gramado/shell/apps/bin/S2.BIN         base/
-#	-sudo cp gramado/shell/apps/bin/S3.BIN         base/
-	-sudo cp gramado/shell/apps/bin/TERMINAL.BIN   base/
-
-	#::ui
-	$(Q) $(MAKE) -C gramado/shell/ui/
-	-sudo cp gramado/shell/ui/bin/LAUNCH1.BIN      base/
-
-gramado-edge:
-
-	# todo aqui é frescura.
-	# podemos colocar no subdiretorio gramado/
-	# com isso vamos iniciar a aventura de pegar as coisas em subdiretórios.
-
-	#::net
-	$(Q) $(MAKE) -C gramado/edge/net/
-	-sudo cp gramado/edge/net/bin/*.BIN      base/PROGRAMS/
+	-sudo cp gramado/services/gnssrv/bin/GNS.BIN     base/
+	-sudo cp gramado/services/gnssrv/bin/GNSSRV.BIN  base/
 
 #========================================
 
@@ -341,10 +320,10 @@ clean:
 	@echo "(Step 6) Deleting the object files ..."
 	-rm *.o
 	-rm -rf landlib/rtl/obj/*.o
-	-rm -rf landlib/libcore/obj/*.o
 	-rm -rf landlib/lib/libgns/obj/*.o
-	-rm -rf landlib/lib/libgws/obj/*.o
 	-rm -rf landlib/lib/libio01/obj/*.o
+
+	
 	@echo "Success?"
 # clean ISO and VHD.
 clean2:
@@ -352,11 +331,11 @@ clean2:
 	-rm *.VHD
 # clean gramado
 clean3:
-	-rm gramado/cmd/bin/*.BIN
-	-rm gramado/setup/bin/*.BIN
-	-rm gramado/shell/apps/bin/*.BIN
-	-rm gramado/shell/ui/bin/*.BIN
-	-rm gramado/edge/net/bin/*.BIN
+
+	-rm landos/setup/bin/*.BIN
+	-rm landos/cmd/bin/*.BIN
+
+	-rm gramado/ws/bin/*.BIN
 
 # clean base
 clean4:
@@ -377,14 +356,12 @@ clean-system-files:
 	-rm -rf landlib/fonts/bin/*.FON
 	-rm -rf landos/kernel/KERNEL.BIN
 	-rm -rf landos/init/*.BIN
+	-rm -rf landos/cmd/bin/*.BIN
+	-rm -rf landos/setup/bin/*.BIN
 
-	-rm -rf gramado/cmd/bin/*.BIN
-	-rm -rf gramado/setup/bin/*.BIN
-	-rm -rf gramado/core/aurora/bin/*.BIN
-	-rm -rf gramado/core/gnssrv/bin/*.BIN
-	-rm -rf gramado/shell/apps/bin/*.BIN
-	-rm -rf gramado/shell/ui/bin/*.BIN
-	-rm -rf gramado/edge/net/bin/*.BIN
+	-rm -rf gramado/ws/bin/*.BIN
+
+	-rm -rf gramado/services/gnssrv/bin/*.BIN
 # ...
 
 
@@ -539,11 +516,10 @@ help:
 	@echo " $ make land-boot     - make landos bootloader"
 	@echo " $ make land-lib      - make landos library"
 	@echo " $ make land-os       - make landos kernel and init process"
-	@echo " $ make gramado-core  - make gramado os core applications"
-	@echo " $ make gramado-cmd   - make gramado os commands"
-	@echo " $ make gramado-setup - make gramado os setup applications"
-	@echo " $ make gramado-shell - make gramado os shell applications"
-	@echo " $ make gramado-edge  - make gramado os edge applications"
+	@echo " $ make land-cmd      - make gramado os commands"
+	@echo " $ make land-setup    - make gramado os setup applications"
+	@echo " $ make gramado-ws - make gramado os ws applications"
+	@echo " $ make gramado-services  - make gramado os services applications"
 	@echo " $ make clean         - Remove all .o files"
 	@echo " $ make clean-all     - Remove all the object files"
 	@echo " $ ./run              - Run the system on qemu"
