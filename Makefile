@@ -217,32 +217,32 @@ gramado-ws:
 	#:: Gramado WS
 	@echo "==================="
 	@echo "Compiling Gramado WS and some clients"
-	$(Q) $(MAKE) -C gramado/ws/
+	$(Q) $(MAKE) -C ws/
 
 	# ws and some clients
 
 # server and main client.
-	-sudo cp gramado/ws/bin/GWS.BIN       base/ 
-	-sudo cp gramado/ws/bin/GWSSRV.BIN    base/
+	-sudo cp ws/bin/GWS.BIN       base/ 
+	-sudo cp ws/bin/GWSSRV.BIN    base/
 
 # well teste clients
-	-sudo cp gramado/ws/bin/EDITOR.BIN    base/
-	-sudo cp gramado/ws/bin/GWM.BIN       base/
-	-sudo cp gramado/ws/bin/TERMINAL.BIN  base/
-	-sudo cp gramado/ws/bin/FILEMAN.BIN   base/
+	-sudo cp ws/bin/EDITOR.BIN    base/
+	-sudo cp ws/bin/GWM.BIN       base/
+	-sudo cp ws/bin/TERMINAL.BIN  base/
+	-sudo cp ws/bin/FILEMAN.BIN   base/
 
 # extra clients
-	-sudo cp gramado/ws/bin/*.BIN        base/PROGRAMS/
+	-sudo cp ws/bin/*.BIN        base/PROGRAMS/
 
 
 gramado-services:
 	#::hard Services
 	@echo "==================="
 	@echo "Compiling hard..."
-	$(Q) $(MAKE) -C gramado/services/gnssrv/ 
+	$(Q) $(MAKE) -C services/gnssrv/ 
 	# gns
-	-sudo cp gramado/services/gnssrv/bin/GNS.BIN     base/
-	-sudo cp gramado/services/gnssrv/bin/GNSSRV.BIN  base/
+	-sudo cp services/gnssrv/bin/GNS.BIN     base/
+	-sudo cp services/gnssrv/bin/GNSSRV.BIN  base/
 
 #========================================
 
@@ -335,7 +335,7 @@ clean3:
 	-rm landos/setup/bin/*.BIN
 	-rm landos/cmd/bin/*.BIN
 
-	-rm gramado/ws/bin/*.BIN
+	-rm ws/bin/*.BIN
 
 # clean base
 clean4:
@@ -359,9 +359,8 @@ clean-system-files:
 	-rm -rf landos/cmd/bin/*.BIN
 	-rm -rf landos/setup/bin/*.BIN
 
-	-rm -rf gramado/ws/bin/*.BIN
-
-	-rm -rf gramado/services/gnssrv/bin/*.BIN
+	-rm -rf ws/bin/*.BIN
+	-rm -rf services/gnssrv/bin/*.BIN
 # ...
 
 

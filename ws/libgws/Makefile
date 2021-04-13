@@ -32,7 +32,7 @@ CFLAGS = -m32 \
 	
 
 
-LIBS  = -I. -I ../../../landlib/rtl/include/
+LIBS  = -I. -I ../../landlib/rtl/include/
 
 
 

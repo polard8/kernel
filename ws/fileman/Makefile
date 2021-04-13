@@ -37,8 +37,8 @@ CFLAGS = -m32 \
 
 
 
-LIBC      = ../../../landlib/rtl/include/
-LIBCOBJ   = ../../../landlib/rtl/obj
+LIBC      = ../../landlib/rtl/include/
+LIBCOBJ   = ../../landlib/rtl/obj
 LIBGWS    = ../libgws/include/
 LIBGWSOBJ = ../libgws/obj
 

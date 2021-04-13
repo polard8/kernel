@@ -1,4 +1,4 @@
-# terminal
+#
 
 #history:
 #2019 - Created by Fred Nora.
@@ -37,19 +37,20 @@ CFLAGS = -m32 \
 	
 
 
-LIBC      = ../../../landlib/rtl/include/
-LIBCOBJ   = ../../../landlib/rtl/obj
+LIBC      = ../../landlib/rtl/include/
+LIBCOBJ   = ../../landlib/rtl/obj
 LIBGWS    = ../libgws/include/
 LIBGWSOBJ = ../libgws/obj
 
-	##
-	## Objects
-	##
+	#
+	# Objects
+	#
 
 myObjects = crt0.o main.o rtl.o \
-ctype.o stdio.o fcntl.o stdlib.o string.o \
-unistd.o termios.o ioctl.o socket.o \
-connect.o events.o rw.o gws.o    
+ctype.o stdio.o fcntl.o stdlib.o string.o unistd.o termios.o ioctl.o \
+socket.o \
+gws.o connect.o events.o rw.o    
+
 
 
 
@@ -59,7 +60,7 @@ all: main.o all-c hello-link finalize clean
 	@echo "Ok?"
 
 main.o:
-	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -I $(LIBGWS) -I include/ -o main.o
+	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -I $(LIBGWS) -o main.o
 
 all-c:
 
@@ -77,22 +78,21 @@ all-c:
 	cp $(LIBCOBJ)/ioctl.o  .
 	cp $(LIBCOBJ)/socket.o  .
 
-	# libgws
+
 	cp $(LIBGWSOBJ)/connect.o .
 	cp $(LIBGWSOBJ)/events.o .
-	cp $(LIBGWSOBJ)/rw.o .
 	cp $(LIBGWSOBJ)/gws.o .
-
-
+	cp $(LIBGWSOBJ)/rw.o .
+	
+	
 hello-link:
-	ld -m elf_i386 -T ../link.ld -o TERMINAL.BIN $(myObjects)    
-
+	ld -m elf_i386 -T ../link.ld -o GWS.BIN $(myObjects)    
 
 finalize:
-	cp TERMINAL.BIN  ../bin
+	cp GWS.BIN  ../bin
 
 clean:
 	-rm *.o
-	-rm TERMINAL.BIN 
+	-rm GWS.BIN 
 	
 	

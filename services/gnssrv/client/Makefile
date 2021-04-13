@@ -1,4 +1,4 @@
-# terminal
+#
 
 #history:
 #2019 - Created by Fred Nora.
@@ -19,7 +19,6 @@ EXTRAVERSION =
 #We need to simplify these flags
 
 
-
 CFLAGS = -m32 \
 	-std=gnu89 \
 	-nodefaultlibs \
@@ -38,19 +37,14 @@ CFLAGS = -m32 \
 
 LIBC      = ../../../landlib/rtl/include/
 LIBCOBJ   = ../../../landlib/rtl/obj
-LIBGWS    = ../libgws/include/
-LIBGWSOBJ = ../libgws/obj
-
 
 	##
 	## Objects
 	##
 
 myObjects = crt0.o main.o rtl.o \
-ctype.o stdio.o fcntl.o stdlib.o string.o unistd.o termios.o \
-ioctl.o socket.o \
-gws.o connect.o events.o rw.o    
-
+ctype.o stdio.o fcntl.o stdlib.o string.o \
+unistd.o termios.o ioctl.o socket.o    
 
 
 
@@ -61,7 +55,8 @@ all: main.o all-c hello-link finalize clean
 	@echo "Ok?"
 
 main.o:
-	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -I $(LIBGWS) -I include/ -o main.o
+	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -I include/ -o main.o
+
 
 all-c:
 
@@ -79,23 +74,18 @@ all-c:
 	cp $(LIBCOBJ)/ioctl.o  .
 	cp $(LIBCOBJ)/socket.o  .
 
-
-	cp $(LIBGWSOBJ)/connect.o .
-	cp $(LIBGWSOBJ)/events.o .
-	cp $(LIBGWSOBJ)/gws.o .
-	cp $(LIBGWSOBJ)/rw.o .
 	
 	
 hello-link:
-	ld -m elf_i386 -T ../link.ld -o EDITOR.BIN $(myObjects)    
+	ld -m elf_i386 -T ../link.ld -o GNS.BIN $(myObjects)    
 
 
 
 finalize:
-	cp EDITOR.BIN  ../bin
+	cp GNS.BIN  ../bin
 
 clean:
 	-rm *.o
-	-rm EDITOR.BIN 
-	
+	-rm GNS.BIN 
+
 	

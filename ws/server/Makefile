@@ -61,8 +61,8 @@ user_ldflags = -m elf_i386 -T ../link.ld
 #todo
 #path longo. vamos mudar  as libs de lugar para gramado/libs.
 
-LIBC    = ../../../landlib/rtl/include/
-LIBCOBJ = ../../../landlib/rtl/obj
+LIBC    = ../../landlib/rtl/include/
+LIBCOBJ = ../../landlib/rtl/obj
 
 #GWS_INCLUDES  = include/    
 #RENDERER      = renderer/include/  

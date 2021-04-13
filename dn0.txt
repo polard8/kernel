@@ -1,4 +1,6 @@
-	O usuário default poderia ter acesso somente aos recursos
-	que ja estão bem consolidados.
-	Os recursos em fase de desenvolvimento poderiam ser acionados
-	somente por usuários especiais, administrador ou redpill.
+	gramado/
+
+	Todo o Gramado pode ser considerado um 'window system'.
+	O sistema operacional host para ele 'e o landos, mas
+	poderemos tentar portar o window system para outro sistema.
+	Para isso precisamos manter o isolamento da pasta ws/.

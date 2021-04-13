@@ -37,8 +37,8 @@ CFLAGS = -m32 \
 #todo
 #path longo. vamos mudar  as libs de lugar para gramado/libs.
 
-LIBC    = ../../../../landlib/rtl/include/
-LIBCOBJ = ../../../../landlib/rtl/obj
+LIBC    = ../../../landlib/rtl/include/
+LIBCOBJ = ../../../landlib/rtl/obj
 
 
 GWS_INCLUDES  = include/    

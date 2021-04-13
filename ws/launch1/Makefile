@@ -18,6 +18,8 @@ EXTRAVERSION =
 #todo:
 #We need to simplify these flags
 
+
+
 CFLAGS = -m32 \
 	-std=gnu89 \
 	-nodefaultlibs \
@@ -32,10 +34,11 @@ CFLAGS = -m32 \
 	-fno-stack-protector \
 	-s \
 	-Werror=strict-prototypes    
+	
 
 
-LIBC      = ../../../landlib/rtl/include/
-LIBCOBJ   = ../../../landlib/rtl/obj
+LIBC      = ../../landlib/rtl/include/
+LIBCOBJ   = ../../landlib/rtl/obj
 LIBGWS    = ../libgws/include/
 LIBGWSOBJ = ../libgws/obj
 
@@ -45,10 +48,9 @@ LIBGWSOBJ = ../libgws/obj
 	##
 
 myObjects = crt0.o main.o rtl.o \
-ctype.o stdio.o fcntl.o stdlib.o string.o \
-unistd.o termios.o ioctl.o socket.o \
+ctype.o stdio.o fcntl.o stdlib.o string.o unistd.o termios.o \
+ioctl.o socket.o \
 gws.o connect.o events.o rw.o    
-
 
 
 .PHONY: all all-c hello-link finalize clean
@@ -83,15 +85,15 @@ all-c:
 	
 	
 hello-link:
-	ld -m elf_i386 -T ../link.ld -o BROWSER.BIN $(myObjects)    
+	ld -m elf_i386 -T ../link.ld -o LAUNCH1.BIN $(myObjects)    
 
 
 
 finalize:
-	cp BROWSER.BIN  ../bin
+	cp LAUNCH1.BIN  ../bin
 
 clean:
 	-rm *.o
-	-rm BROWSER.BIN 
-	
+	-rm LAUNCH1.BIN 
+
 	
