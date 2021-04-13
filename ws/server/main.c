@@ -1152,12 +1152,15 @@ int initGraphics (void){
         //gwssrv_display_system_icon ( 4, 8, 160 );
         // ...
     }else{
-        gwssrv_display_system_icon ( 1, 8, 100 );
-        //gwssrv_display_system_icon ( 2, 8, 120 );
+        gwssrv_display_system_icon ( 1,   200, 200 );
+        //gwssrv_display_system_icon ( 2,   400, 400 );
+        //gwssrv_display_system_icon ( 3, 200, 200 );
+        //gwssrv_display_system_icon ( 4,   600, 600 );
     };
 
     //#debug breakpoint
     //while(1){}
+    
     
     
     //
@@ -1549,10 +1552,16 @@ int initGraphics (void){
     plotCharBackbufferDrawcharTransparentZ (  (8*6), 0, COLOR_RED, 'O', 0 );
     */
     
-    // refresh
+
+    //
+    // Refresh
+    //
+
     gws_show_backbuffer();
 
     // while(1){}
+
+
 
     // Change
     // Se encontrar o 0x80 muda para 0x50 caso contrario mude para 0x00

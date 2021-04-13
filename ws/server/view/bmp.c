@@ -486,12 +486,13 @@ bmpDisplayBMP (
 
 
     // Zoom support.
-    // #bugbug: Pinta de baixo pra cime e espaçado.
+    // It is working.
+    // But we need to work in the 'position' thing
+    // and accept some function parameters for that effect.
     int useZoom=FALSE;
-    int ZoomFactor=16;
-    int iZoom=0;
-    int jZoom=0;
-
+    int ZoomFactor=8;
+    int iwZoom=0;
+    int ihZoom=0;
 
 
     unsigned long X=0;
@@ -770,7 +771,7 @@ bmpDisplayBMP (
                     nibble_count_16colors = 2222;
                     //base = base + 0;
                 };
-            };
+            }
 
             // >> 256 cores
             // Próximo pixel para 8bpp
@@ -867,20 +868,24 @@ bmpDisplayBMP (
                         if (useZoom==FALSE){
                             pixelBackBufferPutpixel ( //original, funciona.
                                 (unsigned long) color, 
-                                 (unsigned long) left, 
-                                 (unsigned long) bottom);
+                                (unsigned long) left, 
+                                (unsigned long) bottom);
                         }
+
+                        // #test
+                        // Testing zoom support.
                         
                         // zoom.
                         if (useZoom==TRUE){
-                            for(iZoom=0; iZoom < ZoomFactor; iZoom++){
-                            for(jZoom=0; jZoom < ZoomFactor; jZoom++){ 
+                            for (ihZoom=0; ihZoom < (ZoomFactor+1); ihZoom++){
+                            for (iwZoom=0; iwZoom < (ZoomFactor+1); iwZoom++){ 
 
                             pixelBackBufferPutpixel ( 
-                            (unsigned long) color, 
-                            (unsigned long) left   +j*ZoomFactor +iZoom, 
-                            (unsigned long) bottom +i*ZoomFactor +jZoom );
-                            }}
+                                (unsigned long) color, 
+                                (unsigned long) left   + (j * ZoomFactor) + iwZoom, 
+                                (unsigned long) bottom - (i * ZoomFactor) + ihZoom );
+                            
+                            };};
                         }
 
 
@@ -968,7 +973,7 @@ bmpDisplayBMP (
 
         // Reiniciamos o x.
 
-        left = x;    
+        left = x;
     };
 
 
