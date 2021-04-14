@@ -247,7 +247,7 @@ my_write_hd_sector (
  *     Inicializa o módulo.
  */
 
-int init_hdd();
+int init_hdd(void);
 
 //
 // End.

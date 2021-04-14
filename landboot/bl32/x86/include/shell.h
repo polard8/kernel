@@ -44,6 +44,9 @@ unsigned long shellCompare();
 void shellHelp();
 //...
 
+
+int rescueShell(void);
+
 //
 // End.
 //

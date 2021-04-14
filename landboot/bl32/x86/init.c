@@ -202,19 +202,23 @@ int init (){
 #ifdef BL_VERBOSE	
 	printf("init: file system..\n");
 #endif
-    fsInit ();
-	
-	
-	//inicia o shell do bootloader.
+    fsInit();
+
+
+
+    //inicia o shell do bootloader.
+    //Inicializando variáveis.
 #ifdef BL_VERBOSE	
 	printf("init: BL-Shell..\n");
 #endif
-	shellInit ();    //Inicializando variáveis.
-	
+	shellInit();    
+
+
+
 #ifdef BL_VERBOSE
 	printf("init: Timer..\n");
 #endif
-	BltimerInit ();
+	BltimerInit();
 
 
 

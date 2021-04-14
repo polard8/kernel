@@ -494,6 +494,25 @@ void shellInit (){
 }
 
 
+// rescue shell
+// Called bu BlMain().
+
+int rescueShell(void)
+{ 
+    // #todo
+    // This is a work in progress.
+    printf ("rescueShell: [TODO] This is a work in progress\n");
+    
+    // #todo
+    //# ugly test.
+    //blShellMain(0,NULL);
+    
+    // while(1){}
+    
+    return -1;
+}
+
+
 //
 // End.
 //

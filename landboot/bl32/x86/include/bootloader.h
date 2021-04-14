@@ -1,7 +1,7 @@
 /*
  * File: bootloader.h 
  * 
- *     #todo: Change the naem to 'bl.h'
+ *     #todo: Change the name to 'bl.h'
  *
  * Descrição:
  *     Header principal do Boot Loader de 32 bits, BL.BIN.
@@ -13,7 +13,6 @@
  * History:
  * =========
  *     2013 - Created by Fred Nora.
- *     2020 - Revision.
  */
 
 // Modes.

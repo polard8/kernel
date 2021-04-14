@@ -202,7 +202,7 @@ Entry_0:
 	 */
 
     for ( i=0; i < 1024; i++ ){
-        ptKM[i] = kernel_address | 3;     //0011 binário.
+        ptKM[i]        = kernel_address | 3;     //0011 binário.
         kernel_address = kernel_address + 4096;    //4KB page.
     };
     //Criando a primeira entrada do diretório.
@@ -226,7 +226,7 @@ Entry_1:
 	 */
 
     for (i=0; i < 1024; i++){
-        ptUM[i] = user_address | 7;    //0111 em binário.
+        ptUM[i]      = user_address | 7;    //0111 em binário.
         user_address = user_address + 4096;     //4096 = 4KB.
     };
     //Criando a entrada número 1 do diretório.
@@ -252,7 +252,7 @@ Entry_2:
 	 */
 
     for ( i=0; i < 1024; i++ ){
-        ptVGA[i] = vga_address | 7;    //0111 em binário.
+        ptVGA[i]    = vga_address | 7;    //0111 em binário.
         vga_address = vga_address + 4096;       //4KB.
     };
     //Criando a entrada número 2 no diretório.
@@ -275,7 +275,7 @@ Entry_768:
 	 */
 
     for ( i=0; i < 1024; i++ ){
-        ptKM2[i] = kernel_base | 3;    //0011 binário.
+        ptKM2[i]    = kernel_base | 3;    //0011 binário.
         kernel_base = kernel_base + 4096;       //4KB.
     };
     //Criando a entrada de número 768 do diretório.
@@ -302,7 +302,7 @@ Entry_769:
 	 */
 
     for ( i=0; i < 1024; i++ ){
-        ptLFB[i] = lfb_address | 7;    //0111 em binário.
+        ptLFB[i]    = lfb_address | 7;    //0111 em binário.
         lfb_address = lfb_address + 4096;       //4KB.
     };
     //Criando a entrada número 769 do diretório.
@@ -325,7 +325,7 @@ Entry_770:
 
     for ( i=0; i < 1024; i++ ){
         ptBACKBUFFER[i] = buff_address | 7;    //0111 em binário.
-        buff_address = buff_address + 4096;       //4KB.
+        buff_address    = buff_address + 4096;       //4KB.
     };
     //Criando a entrada número 770 do diretório.
     page_directory[770] = (unsigned long) &ptBACKBUFFER[0];

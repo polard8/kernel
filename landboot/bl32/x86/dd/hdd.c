@@ -448,10 +448,9 @@ my_write_hd_sector (
  ***************************************
  * init_hdd:
  *     Inicializa o driver de hd.
- *     @todo: Mudar para hddInit().
  */
 
-int init_hdd (){
+int init_hdd(void){
 
     // #todo: 
     // We need to do something here. haha

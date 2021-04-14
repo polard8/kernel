@@ -32,8 +32,7 @@ void panic (const char *msg)
 {
     if ( (void*) msg != NULL )
     {
-        if ( *msg != 0 )
-        {
+        if ( *msg != 0 ){
             printf ("BL.BIN: [PANIC] %s\n", msg );
         }
     }
@@ -185,16 +184,16 @@ static int prints (
 		if (len >= width) width = 0;
 		else width -= len;
 		if (pad & PAD_ZERO) padchar = '0';
-    };
+    }
 
-	if ( !(pad & PAD_RIGHT) ) 
-	{
+    if ( !(pad & PAD_RIGHT) ) 
+    {
 		for ( ; width > 0; --width)
 		{
 		    printchar (out, padchar);
 			++pc;
 		};
-	};
+    }
 
 
 	for ( ; *string ; ++string )
@@ -272,8 +271,8 @@ static int printi (
 	};
 
 
-	if (neg) 
-	{
+    if (neg) 
+    {
 		if ( width && (pad & PAD_ZERO) ) 
 		{
 		    printchar (out, '-');
@@ -282,7 +281,7 @@ static int printi (
 		}else{
 			*--s = '-';
 		};
-	};
+    }
 
 
 // Done.
@@ -299,6 +298,7 @@ done:
 
 static int print (char **out, int *varg)
 {
+
 	register int width, pad;
 	register int pc = 0;
 	register char *format = (char *)(*varg++);
@@ -311,16 +311,16 @@ static int print (char **out, int *varg)
 		{
 			++format;
 			width = pad = 0;
-			
-			if (*format == '\0') break;
-			if (*format == '%')  goto out;
-			
+
+            if (*format == '\0') { break;    }
+            if (*format == '%' ) { goto out; }
+
 			if (*format == '-')
 			{
 				++format;
 				pad = PAD_RIGHT;
-			};
-			
+			}
+
 			while (*format == '0')
 			{
 				++format;
@@ -368,17 +368,19 @@ static int print (char **out, int *varg)
 				pc += prints (out, scr, width, pad);
 				continue;
 			}
-		}
-		else 
-		{
-		    out:
-			    printchar (out, *format);
-			    ++pc;
-		};
+		}else{
+
+            out:
+                printchar (out, *format);
+                 ++pc;
+        };
 	};
-	
-	if (out) **out = '\0';
-	return pc;
+
+    if (out){ 
+        **out = '\0'; 
+    }
+
+    return pc;
 }
 
 
@@ -425,12 +427,14 @@ static void printchar (char **str, int c)
 {
 
 	//extern int putchar(int c);
-    if (str) 
-    {
+    if (str) {
+
 		**str = c;
 		++(*str);
-    }
-    else (void) putchar (c);
+
+    } else { 
+        putchar (c);
+    };
 }
 
 
@@ -498,7 +502,7 @@ void outbyte (int c)
         g_cursor_y++;    //proxima linha
         prev = Ch;
         return; 
-    };
+    }
 
     //tab
     if ( Ch == '\t' )
@@ -534,9 +538,8 @@ void outbyte (int c)
     {
         g_cursor_x = 0;
         g_cursor_y++;  
-    }
-    else
-    {
+    
+    }else{
         g_cursor_x++;    //Incrementa coluna.                             
     };
     
@@ -546,9 +549,8 @@ void outbyte (int c)
     { 
 	    scroll();
         g_cursor_y = 74; //isso pode ir para dentro da função scroll().
-    };
+    }
 
-    
 	// #importante:
 	// Imprime os caracteres normais.
 
@@ -806,7 +808,7 @@ my_buffer_horizontal_line (
     {
         my_buffer_put_pixel ( color, x1, y, 0 );
         x1++;  
-    }
+    };
 }
 
 
@@ -846,11 +848,12 @@ my_buffer_put_pixel (
 	
 	char b, g, r, a;
 	
-	b = (color & 0xFF);	
-	g = (color & 0xFF00) >> 8;
+	b = (color & 0xFF);
+	g = (color & 0xFF00)   >> 8;
 	r = (color & 0xFF0000) >> 16;
 	a = (color >> 24) + 1;
-	
+
+
 	int x = (int) bx;
 	int y = (int) cx;
 	
@@ -859,17 +862,27 @@ my_buffer_put_pixel (
 	//24bpp
 	int bytes_count=0;
 	
-	switch (SavedBPP)
-	{
-		case 32:
-		    bytes_count = 4;
-		    break;
-		
-		case 24:
-		    bytes_count = 3;
-			break;
-	}
-	
+
+    switch (SavedBPP){
+
+    case 32:
+        bytes_count = 4;
+        break;
+
+    case 24:
+        bytes_count = 3;
+        break;
+
+    // ...
+
+    //#bugbug
+    default:
+        bytes_count = 3;
+        break;
+    };
+
+
+
 	// #importante
 	// Pegamos a largura do dispositivo.
 	
@@ -877,10 +890,10 @@ my_buffer_put_pixel (
 	
 	int offset = (int) ( (bytes_count*width*y) + (bytes_count*x) );
 	
-	where[offset] = b;
+	where[offset]    = b;
 	where[offset +1] = g;
 	where[offset +2] = r;
-	
+
 	//teste
 	if ( SavedBPP == 32 )
 	{
@@ -902,9 +915,14 @@ my_buffer_char_blt (
     unsigned long c )
 { 
 
-    int x2, y2;
+    int x2=0; 
+    int y2=0;
     unsigned char bit_mask = 0x80;
-    char *work_char = (char*) 0x000FFA6E + (c * 8);    //char height.     
+
+    // Font address and char address.
+    //char height = 8
+
+    char *work_char = (char*) 0x000FFA6E + (c * 8);
 
 
     for ( y2=0; y2<8; y2++ )
@@ -913,9 +931,10 @@ my_buffer_char_blt (
 
         for ( x2=0; x2<8; x2++ )
         {
-            if( (*work_char & bit_mask) )
-                my_buffer_put_pixel( color, x + x2, y, 0); 
-                bit_mask = ( bit_mask >> 1 );
+            if ( (*work_char & bit_mask) ){
+                my_buffer_put_pixel( color, x + x2, y, 0);
+            } 
+            bit_mask = ( bit_mask >> 1 );
         };
                        
 		y++;            //Próxima linha.
@@ -978,14 +997,26 @@ void refresh_screen2()
 */
 
 
-void
-clear_backbuffer(void)
+
+// color black
+// 800x600x32
+void clear_backbuffer(void)
 {
+    int i=0;
+
+    // Backbuffer address.
+    // Is this a good address ?
+    // almos 16MB mark?
+
+    // #todo
+    // We can use unsigned longs.
+
     unsigned char *backbuffer  = (unsigned char *) (0x1000000 - 0x800000); 
 
-    int i=0;
-    for(i=0; i<(800*600*6); i++)
-        backbuffer[i]=0;  //color black
+    for (i=0; i<(800*600*4); i++)
+    {
+        backbuffer[i] = 0;
+    };
 }
 
 
@@ -1037,13 +1068,13 @@ carrega_bitmap_16x16 (
 {
 
     asm volatile (" \n "
-		          : // no inputs
-		          : "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
-	
+        : // no inputs
+        : "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
+
     // Coloca no buffer. 
-	// Não precisa esperar o retraço vertical.
-	
-	my_buffer_load_bitmap_16x16 (); 
+    // Não precisa esperar o retraço vertical.
+
+    my_buffer_load_bitmap_16x16 (); 
 }
 
 

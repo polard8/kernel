@@ -39,9 +39,10 @@
 //
 
 unsigned long init_testing_memory_size (int mb);
-void BlLoadKernel(void);
-void BlSetupPaging(void);
 
+int BlLoadKernel(void);
+
+void BlSetupPaging(void);
 
 
 
@@ -154,6 +155,11 @@ ____go:
 
 void BlMain (void){
 
+    // #todo
+    // Podemos cair num shell de recuperaçcao
+    // caso o carregamento der errado.
+
+
     int Status = (-1);
 
     // main flags.
@@ -224,6 +230,9 @@ void BlMain (void){
     // printf("habilitando as interrupcoes\n");
     // refresh_screen();
 
+    // #todo:
+    // Talvez devamos adiar esse sti.
+
     asm ("sti");
 
 
@@ -270,14 +279,19 @@ void BlMain (void){
 	//Carrega arquivos.
 #ifdef BL_VERBOSE
     printf ("BlMain: Loading files..\n");
-    refresh_screen ();
+    refresh_screen();
 #endif
+
+
+    // #todo
+    // Maybe we need the return from these routines.
 
 
     // Load root dir.
 
     fs_load_rootdirEx();
     g_fat16_root_status = TRUE;
+
 
     // Load FAT.
 
@@ -307,12 +321,21 @@ void BlMain (void){
     //
 
 
-   // Loading kernel image.
-    BlLoadKernel();
-
-
     // ?? maybe.
     // BlLoadConfigFiles ();   
+
+
+    // Loading kernel image.
+    // Helper function in this document.
+
+    Status = BlLoadKernel();
+
+    if (Status<0)
+    {
+         printf("BlMain: BlLoadKernel fail. \n");
+         goto run_rescue_shell;
+    }
+
 
 
 	// Paging:
@@ -341,6 +364,8 @@ void BlMain (void){
     //clear_backbuffer();  //black
 
 
+
+    // ============================================
 	
 	//@todo: Atualizar status.
 
@@ -360,6 +385,52 @@ void BlMain (void){
     while(1){};
 #endif
 
+
+
+done:
+    return;
+
+
+    // ============================================
+
+    //
+    // rescue Shell
+    //
+
+
+run_rescue_shell:
+
+    printf("BlMain: Initializing rescue shell\n");
+    refresh_screen();
+
+    // #todo
+    // Vamos criar um shell de recuperação que
+    // funcione caso o carregamento falhe.
+    // Mas para isso as rotinas de carregamento
+    // precisam de retorno tipo int.
+    
+    // See:
+    // ?
+    
+    Status = rescueShell();
+
+    if( Status < 0)
+    {
+        printf("BlMain: rescueShell fail. *hang\n");
+        refresh_screen();
+        
+        // abort();
+        
+        while(1){
+            asm ("cli");
+            asm ("hlt");
+        };
+    }
+    
+    
+    // ok
+    // Vamos excutar o que o rescue shell carregou.
+    return;
 }
 
 
@@ -370,13 +441,6 @@ void BlMain (void){
  *     The entry point is at 0x00101000.
  */ 
 
-void BlLoadKernel(void)
-{
-    int Status = -1;
-
-    char *image_name = "KERNEL.BIN";
-
-
     // #todo
     // This way can chose the filename from a
     // configuration file.
@@ -385,14 +449,39 @@ void BlLoadKernel(void)
 
     // This routine will build the pathname
     // to search in the default folder.
+    
+    // Called by BlMain()
 
-    //Status = (int) load_kernel("KERNEL.BIN");
+int BlLoadKernel(void)
+{
+    int Status = -1;
+
+    // Standard name.
+    // #todo: Maybe we need some options, some config file.
+
+    char *image_name = "KERNEL.BIN";
+
+    // #bugbug
+    // Precisamos que essa rotina retorne
+    // para termos a change de inicializarmos o
+    // rescue shell. Mas acontece que por enquanto
+    // essa função aborta ao primeiro sinal de perigo.
+
+
     Status = (int) load_kernel(image_name);
 
-    if ( Status != 0 ){
-        printf ("BlLoadKernel:\n");
-        die();
+    // Fail
+    if ( Status != 0 )
+    {
+        printf ("BlLoadKernel: load_kernel fail\n");
+        refresh_screen();
+        
+        return (int) (-1);
+        //die();
     }
+    
+    // ok
+    return Status;
 }
 
 

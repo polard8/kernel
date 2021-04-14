@@ -54,6 +54,8 @@ void updateProgressBar();
 // Address.
 // pa = 0x00100000.
 // va = 0xC0000000.
+
+// Called by BlLoadKernel()
  
 int load_kernel (const char *file_name)
 {
@@ -90,13 +92,15 @@ int load_kernel (const char *file_name)
     // Load kernel image
     //
 
-    //
+
+    // The name given by function parameter.
     strcpy (Path, "/GRAMADO");
     strcat (Path, "/");
     strcat (Path, kernel_name );
 
     // Default
     strcpy (DefaultPath, "/GRAMADO/KERNEL.BIN");
+
 
     // Load KERNEL.BIN on a physical address.
     // Search the file in the /LANDOS/ and /BOOT/ subdirectories
@@ -106,11 +110,14 @@ int load_kernel (const char *file_name)
     Status = (int) load_path( Path, (unsigned long) kernel_pa );
 
     // Fail
+    // Try default name.
+
     if ( Status != 0 ){
         // Try again
         Status = (int) load_path( DefaultPath,(unsigned long) kernel_pa );
     }
 
+    // Fail.
     if (Status != 0 ){
         printf("load_kernel: [FAIL] Couldn't load the kernel image\n");
         goto fail;    
@@ -151,7 +158,7 @@ int load_kernel (const char *file_name)
 
 	
     // Multiboot magic signature.
-    // O header está em 0xC0001000.	
+    // O header está em 0xC0001000.
     // 0x1BADB002
     // tem um jmp antes do header.
 
@@ -165,6 +172,7 @@ int load_kernel (const char *file_name)
 		printf ("load_kernel: [FAIL] 0x1BADB002 found!\n");
 		//refresh_screen();
 		//while(1){}
+
     }
 
 
@@ -183,13 +191,23 @@ int load_kernel (const char *file_name)
     return 0; 
 
 
+    // =================================
+
 // Fail 
-// O Kernel não pôde ser carregado.	
+// O Kernel não pôde ser carregado.
 
 fail:
+
     printf ("load_kernel: Fail\n");
-    abort ();
+    refresh_screen();
+
+    // #test
+    // Vamos retornar para dar a chace ao rescue shell.
+    // abort();
+    
+    return (int) (-1);
 }
+
 
 
  

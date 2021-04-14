@@ -456,9 +456,8 @@ void FreeHeap (void *ptr){
  * 
  * @todo: Rotinas de automação da criação de heaps para processos.
  */
-//int memoryInitializeHeapManager() 
 
-int init_heap (){
+int init_heap(void){
 
     int i=0;
 

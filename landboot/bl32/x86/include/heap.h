@@ -145,7 +145,8 @@ unsigned long heapList[HEAP_COUNT_MAX];
 
 unsigned long heapAllocateMemory ( unsigned long size );
 void FreeHeap (void *ptr);
-int init_heap ();
+
+int init_heap(void);
 
 
 
