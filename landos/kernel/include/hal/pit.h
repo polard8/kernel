@@ -148,54 +148,60 @@ unsigned long timer_handler_address;    //global _irq0:
  *
  */
 
-//typedef struct timer_d timer_t; 
 struct timer_d 
 {
-	//Object.
-	object_type_t objectType;
-	object_class_t objectClass;
-	
-	int id;
-	
-	int used;
-	int magic;
-	
+    object_type_t   objectType;
+    object_class_t  objectClass;
+
+    int used;
+    int magic;
+
+    int id;
+
 	//1 = one shot 
 	//2 = intermitent
-	int type;
+    int type;
 
 
-    //owner.
+    // Owner
     struct process_d  *process;
     struct thread_d   *thread;
 
     int pid;
     int tid;
 
-	struct window_d   *window;
+    // ??
+    struct window_d   *window;
 
-	
-	int count_down;     //--
-	int initial_count_down; //base fixa
-	
-	//quantas vezes o timer se esgotou.
-	unsigned long times;
-	
-	int status;  //??
-	
-	unsigned long flag; //f
-	unsigned long error; //e
-	
-	//Navegação.
-	struct timer_d *next;
+    // Counter
+    int count_down;          // Decrementing
+    int initial_count_down;  // base fixa
+
+    // Quantas vezes o timer se esgotou.
+    unsigned long times;
+
+    // ??
+    int status;
+
+    unsigned long flag;
+
+    unsigned long error;
+
+    //Navigation
+
+    struct timer_d  *next;
 };
-//timer_t *Timer;
+
+// struct timer_d *XXXXXXTimer;
 
 
-//lista de timers.
+// lista de timers.
 unsigned long timerList[32];
 
 
+//
+// == prototypes ===========================
+//
 
 
 //Global para inicialização do módulo interno.

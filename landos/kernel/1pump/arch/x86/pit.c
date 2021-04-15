@@ -17,10 +17,6 @@
  *
  * Histórico:
  *     Versão: 1.0, 2013 - Esse arquivo foi criado por Fred Nora.
- *     Versão: 1.0, 2014 - Revisão. 
- *     Versão: 1.0, 2015 - Aprimoramento geral das rotinas básicas.
- *     Versão: 1.0, 2016 - Revisão.
- *     ...
  */
 
  
@@ -96,9 +92,13 @@ int timerLock;
 int timerError;
 
 
+//
+// Text cursor
+//
 
-int timerShowTextCursor;     //se tá habilitado ou não
-int timerTextCursorStatus;   //0=apaga 1=acende 
+int timerShowTextCursor;  
+
+
 
 //??
 //unsigned long timerCountSeconds;  //Count Seconds.
@@ -112,7 +112,7 @@ int timerTextCursorStatus;   //0=apaga 1=acende
 
 //Rotina principal.
 void pitTimer(void); 
-//...
+// ...
 
 
 /*
@@ -169,16 +169,20 @@ void pitTimer (void){
     // Timers.
     int i = 0;
 
-    struct timer_d  *t;
+    struct timer_d  *Timer;
+
     struct thread_d *Thread;
 
 
+    /*
+    // #delete
+    // I was used by the old blinking cursor support.
     unsigned long __cWidth  = gwsGetCurrentFontCharWidth();
     unsigned long __cHeight = gwsGetCurrentFontCharHeight();
-
     if ( __cWidth == 0  ||  __cHeight == 0 ){
         panic ("pitTimer: char size\n");
     }
+    */
 
 
     //#bugbug
@@ -298,130 +302,99 @@ void pitTimer (void){
 
     if ( jiffies % 100 == 0 ){ extra = 1; }
 
-	//
-	// ## cursor blink ##
-	//
-	
-	//#todo:
-	//podemos chamar uma função
-	
-	//#todo rever isso.
-	//de tempos em tempos atualiza o cursor
-	//a cada segundo. sendo ele 100 ou 1000 ... tanto faz.
-	//#todo: mas poderia ser exatamente o hz configurado par ao mouse
-	
-	
-	//#bubug
-	//estamos desabilitando isso pois 
-	//pode ser a causa de problemas na maquina real.
-	// alguma problema com os valores da TTY
+
+
+    //
+    // The blinking cursor.
+    //
+    
+    // #test
+    // The goal:
+    // Show the blinking cursor on a virtual console in fullscreen mode.
+    // Ok. It is working on qemu
+    // See: user/console.c
 
     /*
-	//if ( jiffies % mouse_cursor_hz == 0 )
-	//if ( jiffies % sys_time_hz == 0 )
-    if ( jiffies % 70 == 0 )
+    //if ( (jiffies % mouse_cursor_hz) == 0 )
+    if ( (jiffies % (1000/2) ) == 0 )
     {
-        // Se o cursor piscante está habilitado.
-        // Essa flag é acionada pelo aplicativo.
-
-        if (timerShowTextCursor == 1)
-        {
-            // Apaga.
-            if ( timerTextCursorStatus != 1 )
-            { 
-                refresh_rectangle ( (TTY[current_vc].cursor_x + 1)  * __cWidth, 
-                    TTY[current_vc].cursor_y * __cHeight, 
-                    16, 16 );
-
-                timerTextCursorStatus = 1;
-                goto cursorExit;
-            }
-
-            // Acende.
-            if ( timerTextCursorStatus == 1 )
-            {
-                bmpDisplayCursorBMP ( shared_buffer_cursor_icon, 
-                    (TTY[current_vc].cursor_x + 1) * __cWidth, 
-                    TTY[current_vc].cursor_y       * __cHeight );
-         
-                timerTextCursorStatus = 0;
-                goto cursorExit;
-            }
+        if (timerShowTextCursor == TRUE){
+            consoleBlinkTextCursor();
         }
     }
     */
+    
 
+    //
+    // Timers
+    //
 
-cursorExit:
 
     // Lista de timers.
     // Podemos percorrer a lista de timer e decrementar,
     // quando um timer chegar a 0, mandamos uma mensagem
     // para a thread associada à esse timer..
 
+    // #todo
+    // Call a helper function for that.
+
 
     for ( i=0; i<32; i++ )
     {
-		//pega um da lista
-	    t = (struct timer_d *) timerList[i];
+        // pega um da lista
+        Timer = (struct timer_d *) timerList[i];
 
-        //checa
-        if ( (void *) t != NULL )
+        if ( (void *) Timer != NULL )
         {
-			//validação.
-			if ( t->used == 1 && t->magic == 1234 )
-			{
-				if ( t->count_down > 0 )
-				{
-				    t->count_down--;
+            if ( Timer->used == TRUE && Timer->magic == 1234 )
+            {
+                if ( Timer->count_down > 0 )
+                {
+                    Timer->count_down--;
                     
-                    //Chegamos ao 0.
-                    if ( t->count_down == 0 )
+                    // Chegamos ao 0.
+                    if ( Timer->count_down == 0 )
                     {
-						//enviamos a mensagem para a thread que é dona do timer.
-						//#todo: podemos usar uma função para isso.
-						
-						//Thread = (struct thread_d *) t->thread;
-						Thread = (struct thread_d *) threadList[ t->tid ];
-						
-						//se a thread for válida.
-						//if ( (void *) t->thread != NULL )
-						if ( (void *) Thread != NULL )
-						{
-							if ( Thread->used == 1 && Thread->magic == 1234 )
-							{
-                                //Send system message to the thread.
-                                Thread->window_list[ Thread->tail_pos ] = t->window; //#bugbug:fail
-                                Thread->msg_list[ Thread->tail_pos ]    = MSG_TIMER;    
-                                Thread->long1_list[ Thread->tail_pos ]  = t->times;   //quantas vezes esse timer se esgotou.
-                                Thread->long2_list[ Thread->tail_pos ]  = t->status;  //?/status.
+                        // Enviamos a mensagem para a thread 
+                        // que é dona do timer.
+                        // #todo:
+                        // Create a helper function for that.
+
+                        //Thread = (struct thread_d *) Timer->thread;
+                        Thread = (struct thread_d *) threadList[ Timer->tid ];
+
+                        if ( (void *) Thread != NULL )
+                        {
+                            if ( Thread->used == TRUE && Thread->magic == 1234 )
+                            {
+                                // Send system message to the thread.
+                                Thread->window_list[ Thread->tail_pos ] = Timer->window;  //#bugbug:fail
+                                Thread->msg_list[    Thread->tail_pos ] = MSG_TIMER;    
+                                Thread->long1_list[  Thread->tail_pos ] = Timer->times;   //quantas vezes esse timer se esgotou.
+                                Thread->long2_list[  Thread->tail_pos ] = Timer->status;  //status.
 
                                 Thread->tail_pos++;
-                                if ( Thread->tail_pos >= 31 )
+                                if ( Thread->tail_pos >= 31 ){
                                     Thread->tail_pos = 0;
-
-                                //#debug ok
+                                }
+                                //#debug
                                 //printf("*"); refresh_screen();
-							}
-							
-						}
-						
+                            }
+                        }
+
 						//analisando o tipo.
 						//dependendo do tipo, devemos parar ou recomeçar.
-						
-						//one shot
-                        if ( t->type == 1 ){ t->count_down = 0; }
-						//intermitente
-                        if ( t->type == 2 ){t->count_down = t->initial_count_down;}
-                        
+						//one shot or intermitente
+
+                        if ( Timer->type == 1 ){ Timer->count_down = 0; }
+                        if ( Timer->type == 2 ){ Timer->count_down = Timer->initial_count_down; }
                         //...
-					}	
-				}
-			    
-			}
-		}
-		//nothing
+                    }
+                }
+            }
+        }
     };
+
 
 done:
     return;

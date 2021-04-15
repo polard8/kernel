@@ -43,6 +43,10 @@ extern unsigned long SavedX;
 extern unsigned long SavedY;
 
 
+//0=apaga 1=acende 
+int consoleTextCursorStatus;
+
+
 // Esse eh o marcador de estagio do escape sequence.
 // Usado para manipular csi
 static unsigned long __EscapeSequenceStage = 0;
@@ -1671,6 +1675,63 @@ void console_init_virtual_console (int n)
 // ============================================
 //
 
+// Ok. It is owrking on qemu
+// Used by pitTimer() in pit.c
+void consoleBlinkTextCursor(void)
+{
+
+    unsigned long __cWidth  = gwsGetCurrentFontCharWidth();
+    unsigned long __cHeight = gwsGetCurrentFontCharHeight();
+
+
+    // ------------------------------------
+
+    if ( __cWidth == 0  ||  __cHeight == 0 ){
+        panic ("pitBlinkTextCursor: char size\n");
+    }
+
+    // fail
+    if ( fg_console < 0 )
+        return;
+
+
+    // fail
+    if ( (void*) shared_buffer_cursor_icon == NULL )
+        return;
+
+
+    // Apaga.
+    // Apaga mostrando o conteúdo do backbuffer.
+         
+    if ( consoleTextCursorStatus != TRUE )
+    { 
+        refresh_rectangle ( 
+                    (CONSOLE_TTYS[fg_console].cursor_x + 1)  * __cWidth, 
+                    CONSOLE_TTYS[fg_console].cursor_y        * __cHeight, 
+                    32, 
+                    32 );
+
+        consoleTextCursorStatus = TRUE;
+        goto done;
+    }
+
+    // Acende.
+    // Acende mostrando um BMP diretamente no lfb.
+
+    if ( consoleTextCursorStatus == TRUE )
+    {
+        bmpDisplayCursorBMP ( 
+                    shared_buffer_cursor_icon, 
+                    (CONSOLE_TTYS[fg_console].cursor_x + 1) * __cWidth, 
+                    CONSOLE_TTYS[fg_console].cursor_y       * __cHeight );
+         
+        consoleTextCursorStatus = FALSE;
+        goto done;
+    }
+
+done:
+    return;
+}
 
 /*
  ********************************************** 
@@ -1689,10 +1750,17 @@ console_ioctl (
     debug_print ("console_ioctl: TODO\n");
 
     
-    if(fd<0){
-        debug_print ("console_ioctl: fd\n");
+    if (fd<0){
+        debug_print ("console_ioctl: [ERROR] fd\n");
         return -1;
     }
+
+    if (fg_console<0){
+        debug_print ("console_ioctl: [ERROR] fg_console\n");
+        return -1;
+    }
+
+
 
 
     switch (request){

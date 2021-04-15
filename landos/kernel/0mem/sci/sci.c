@@ -2665,23 +2665,28 @@ void *sci0 (
         case SYS_GETCURSORY:  return (void *) get_cursor_y();  break;
 
 
+
         // 244 - Enable text cursor.
+        // The blinking cursor used in the virtual console.
+        // See: x86/pit.c
         case 244:
-            debug_print ("sci0: 244 Enable text cursor\n");
-            timerEnableTextCursor ();
-            //timerShowTextCursor = 1;
+            debug_print ("sci0: [244] Enable text cursor\n");
+            timerEnableTextCursor();
             //gwsEnableTextCursor ();
             return NULL;
             break;
 
+
         // 245 - Disable text cursor.
+        // The blinking cursor used in the virtual console.
+        // See: x86/pit.c
         case 245:
-            debug_print ("sci0: 245 Disable text cursor\n");
-            timerDisableTextCursor ();
-            //timerShowTextCursor = 0;
+            debug_print ("sci0: [245] Disable text cursor\n");
+            timerDisableTextCursor();
             //gwsDisableTextCursor ();
             return NULL;
             break;
+
 
         // =====================================
         // 246 ~ 249 reservado para libc support.

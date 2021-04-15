@@ -827,8 +827,8 @@ void *guiGetNavigationbarWindow (void){
 }
 
 
-//janela do shell do kernel base.
-//naõ é um processo.
+// janela do shell do kernel base.
+// naõ é um processo.
 
 void *guiGetShellWindowWindow (void){
 

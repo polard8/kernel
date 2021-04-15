@@ -91,7 +91,14 @@ void console_init_virtual_console (int n);
 
 void jobcontrol_switch_console(int n);
 
-int console_ioctl ( int fd, unsigned long request, unsigned long arg );
+
+void consoleBlinkTextCursor(void);
+
+int 
+console_ioctl ( 
+    int fd, 
+    unsigned long request, 
+    unsigned long arg );
 
 int VirtualConsole_initialize(void);
 
