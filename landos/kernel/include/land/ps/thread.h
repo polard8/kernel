@@ -91,44 +91,12 @@ typedef enum {
 
 /*
  * thread_type_t:
- *     Enumerando os tipos de threads:
- *
- *   idle     - Threads do tipo idle.     
- *   rr       - Threads do tipo round robin.
- *   periodic - Threads do tipo periódicas. 
- *   system   - Threads do tipo system.
- *   ...
- *
- * Ordem de implantação:
- * ====================
- *     (De acordo com a ordem de construção de um sistema).
- *
- *    TYPE_NULL     0
- *    TYPE_SYSTEM   1  // Fundamentais para o funcionamento do sistema.  
- *                     // Primeiras tarefas rodando quando o O.S. está sendo criado.
- *                    
- *    TYPE_IDLE     2  // Exclusivo para Threads do tipo idle. 
- *                     // ( Vários tipos de rotinas podem ser realizadas durante o período
- *                     // que o processador estiver ocioso. O usuário pode configurar
- *                     // o que o sistema deve fazer nesses momentos de ociosidade).
- *
- *    TYPE_PERIODIC 3  // Tarefas periódicas. 
- *                     // (Rodam de tempos em tempos, como o deadthread collector).
- *
- *    TYPE_RR       4  // Threads tipo round robin. 
- *                     //(Confinadas em um processador, Não importa a prioridade, nem o deadline).
- *
- *    TYPE_REALTIME 5  // Realtime + round robin. 
- *                     // (Confinadas em um processador, Importa a prioridade o dead line, o step
- *                     //  principalmente é sistemicamente importante que se cumpra a execução em tempo.) 
- *
- *    TYPE_UI       6  // UI user interface thread @todo:
  * 
- *    TYPE_IO       7  // i/o thread @todo
- *
- *    Continua ...
+ *     Enumerando os tipos de threads:
+ * 
+
  */
- 
+
 typedef enum {
 
     THREAD_TYPE_NULL,
@@ -143,6 +111,39 @@ typedef enum {
 
 }thread_type_t;
 
+
+
+/*
+    THREAD_INPUTMODEL_NULL,      // Not defined.
+    THREAD_INPUTMODEL_KERNEL,    // Kernel thread running in ring0.
+    THREAD_INPUTMODEL_COMMAND,   // Command running on console or terminal.
+    THREAD_INPUTMODEL_KGWS,      // Running on Setup environment and using kgws.
+    THREAD_INPUTMODEL_LOADABLEWINDOWSERVER   // Using the current loadable window server.
+    // ...
+*/
+
+
+/*
+This part is about input redirection ...
+What is the place where i need to send the 
+input that came from the hardware?
+If the input model is an unix-like stuff, 
+so i need to send the input to a file and 
+an application will read this file.
+if the input model is windows-like, 
+so i will send the input to an event queue in the raw input thread.
+*/
+
+typedef enum {
+
+    THREAD_INPUTMODEL_NULL,      // Not defined.
+    THREAD_INPUTMODEL_KERNEL,    // Kernel thread running in ring0.
+    THREAD_INPUTMODEL_COMMAND,   // Command running on console or terminal.
+    THREAD_INPUTMODEL_UNIXLIKE,  // Send the input to a file.
+    THREAD_INPUTMODEL_KGWS,      // Running on Setup environment and using kgws.
+    THREAD_INPUTMODEL_LOADABLEWINDOWSERVER   // Using the current loadable window server.
+
+}thread_inputmodel_t;
 
 
 /*
@@ -207,6 +208,8 @@ struct thread_d
     int magic;
     
     
+    
+    
     int position;
 
 
@@ -233,6 +236,8 @@ struct thread_d
     // Tipo de tarefa.
     // (SYSTEM, PERIODIC, RR, IDLE).
     thread_type_t type;
+
+    thread_inputmodel_t input_model;
 
     //flag, Estado atual da tarefa. ( RUNNING, DEAD ... ).
     thread_state_t state;    

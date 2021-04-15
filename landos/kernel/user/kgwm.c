@@ -1040,16 +1040,40 @@ kgwm_window_control_dialog (
 
 
 // Only one parameter.
+// Remember, the input process's control thread 
+// has a defined input model.
 void __kgwm_initDialog ( int message )
 {
+    struct thread_d  *t;
     int tid = -1;
+    thread_type_t InputModel;
 
     if(message < 0){
         debug_print("__kgwm_initDialog: [FAIL] message\n");
         return;
     }
 
-    tid = (int) InitProcess->control->tid;
+    // #todo
+    // Check validations.
+
+
+    // process pointer
+    if ( (void*) InitProcess == NULL )
+        panic ("__kgwm_initDialog: InitProcess\n");
+
+
+    // thread pointer
+    t = (struct thread_d  *) InitProcess->control;
+
+    if ( (void*) t == NULL )
+        panic ("__kgwm_initDialog: t\n");
+
+
+    // input model
+    InputModel = t->input_model;
+
+    // tid
+    tid = (int) t->tid;
 
     if (tid<0){
         panic("__kgwm_initDialog: [ERROR] tid\n");
@@ -1101,6 +1125,11 @@ void __kgwm_initDialog ( int message )
 // must not allow a single thread to monopolize the mouse cursor 
 // by altering its shape or confining it to a small area of the screen.
 
+// #todo
+// This functions is the moment to check the current input model,
+// and take a decision. It will help us to compose the event message.
+// It is because each environment uses its own event format.
+
 unsigned long 
 __kgwm_ps2kbd_procedure ( 
     struct window_d *window, 
@@ -1109,10 +1138,18 @@ __kgwm_ps2kbd_procedure (
     unsigned long long2 )
 {
 
-   // #test
-   // Testando uma rotina de pintura que usa escape sequence.
-   // Queremos que ela funcione na máquina real.
-   // Vamos testar os ponteiros.
+    // #test
+    // Testando uma rotina de pintura que usa escape sequence.
+    // Queremos que ela funcione na máquina real.
+    // Vamos testar os ponteiros.
+
+
+    // #todo
+    // We need the structure of the current thread.
+    // This way we have the current input model for this thread
+    // and we can compose an event for this environment.
+
+    // struct thread_d  *t;
 
 
     char buffer[128];

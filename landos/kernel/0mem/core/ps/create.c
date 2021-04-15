@@ -54,13 +54,18 @@ void *create_CreateRing0IdleThread(void)
         panic ("create_CreateRing0IdleThread: kThread \n");
     }else{  
 
-        // #todo
-        // Object support.
-
-        // Identificadores 
-
+        kThread->objectType  = ObjectTypeThread;
+        kThread->objectClass = ObjectClassKernelObjects;
         kThread->used  = TRUE;
         kThread->magic = 1234;
+
+
+        kThread->type = THREAD_TYPE_SYSTEM; 
+
+        // #todo
+        // #important
+        // This will affect the input model
+        kThread->input_model = THREAD_INPUTMODEL_KERNEL;
 
         kThread->position = KING;
 

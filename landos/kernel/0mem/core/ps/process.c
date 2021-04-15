@@ -687,8 +687,8 @@ int processCopyMemory ( struct process_d *process ){
 
 int processCopyProcess ( pid_t p1, pid_t p2 ){
 
-    struct process_d *Process1;
-    struct process_d *Process2;
+    struct process_d  *Process1;
+    struct process_d  *Process2;
     
     int Status=0;
     int i=0;
