@@ -1083,6 +1083,19 @@ void __kgwm_initDialog ( int message )
 // Isso nao seria trabalho do window manager?
 // kgwm
 
+
+// #important:
+// Isso garante que o usuário sempre podera alterar o foco
+// entre as janelas do kgws usando o teclado, pois essa rotina
+// é independente da thread que está em foreground.
+
+// #todo
+// Talvez a gente possa usar algo semelhando quando o window
+// server estiver ativo. Mas possivelmente precisaremos 
+// usar outra rotina e não essa. Pois lidaremos com uma estrutura
+// de janela diferente, que esta localizada em ring3.
+
+
 unsigned long 
 __kgwm_ps2kbd_procedure ( 
     struct window_d *window, 

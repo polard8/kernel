@@ -1302,25 +1302,45 @@ int gde_close_window (struct window_d *window)
 
 
 /*
+ ****************************************************
  * gde_set_focus:
  *     Set Focus. 
  */
 
+        // 62
+        // Set focus on a given window and
+        // put the thread associated in foreground
+        // to receive keyboard input events. 
+        // #todo: This is valid for windows that belongs to
+        // the kgws window system.
+        // #bugbug: What about the windows that belongs to the
+        // gwssrv? Maybe we need to check that condition
+        // or create another routine to se focus on that kind of window.
+        // See: setup/libcore/api.c
+        // #obs: This is a good input model.
+
+
 int gde_set_focus (struct window_d *window)
 {
 
-    if ( (void *) window == NULL ){
-        gde_debug_print ("gde_set_focus: fail\n");
-        return (int) 1;
-    }else{
-        return (int) system_call ( SYSTEMCALL_SETFOCUS, 
-                        (unsigned long) window, 
-                        (unsigned long) window, 
-                        (unsigned long) window );
-    };
+    // #
+    // Actually this is an opaque pointer.
+    // The structure belongs to the kgws inside the
+    // base kernel.
 
-    //#todo: Maybe '-1'
-    return 2;
+    if ( (void *) window == NULL )
+    {
+        gde_debug_print ("gde_set_focus: [FAIL] window\n");
+        return (int) -1;
+    }
+
+    // SYSTEMCALL_SETFOCUS = 62;
+    
+    return (int) gramado_system_call ( 
+                     SYSTEMCALL_SETFOCUS, 
+                     (unsigned long) window, 
+                     (unsigned long) window, 
+                     (unsigned long) window );
 }
 
 

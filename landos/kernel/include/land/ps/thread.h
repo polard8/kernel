@@ -579,6 +579,31 @@ struct thread_d
 
 
     //
+    // LIS - Local Input State
+    //
+    
+    // #important
+    // Here we have some elements to handle the input events
+    // in this thread.
+    // + We have a block for single shot event.
+    // + We have a block for a queue of events.
+    // + We have a set of variables to handle the flow.
+    // ...
+    
+    // Keyboard input and window focus information:
+    // + Which window has keyboard focus?
+    // + Which window is active?
+    // + Which keys are considered pressed down?
+    // + The state of the caret.
+    
+    // Mouse cursor management information
+    // + Which window has mouse capture?
+    // + The shape of the mouse cursor?
+    // + The visibility of the mouse cursor.
+
+    // ...
+
+    //
     // == kernel event ====================================
     //
 

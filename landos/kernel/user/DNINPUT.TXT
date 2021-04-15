@@ -3,6 +3,10 @@
     Keyboard input routines:
     ========================
 
+
+    // ----------------------------------------------------------------
+
+
     The keyboard driver will call the function console_interrupt() passing the type
 of the device as a parameter. So, this function will call KGWS_SEND_KEYBOARD_MESSAGE()
 when this device is a keyboard device.

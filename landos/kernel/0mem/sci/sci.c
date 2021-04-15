@@ -1657,6 +1657,14 @@ void *sci0 (
         // Set focus on a given window and
         // put the thread associated in foreground
         // to receive keyboard input events. 
+        // #todo: This is valid for windows that belongs to
+        // the kgws window system.
+        // #bugbug: What about the windows that belongs to the
+        // gwssrv? Maybe we need to check that condition
+        // or create another routine to se focus on that kind of window.
+        // See: setup/libcore/api.c
+        // #obs: This is a good input model.
+
         case SYS_SETFOCUS: 
             SetFocus ( (struct window_d *) hWnd ); 
             return NULL;
@@ -1667,6 +1675,7 @@ void *sci0 (
         case SYS_GETFOCUS: 
             return (void *) window_with_focus;  
             break;
+
 
         // 64
         case SYS_KILLFOCUS:
