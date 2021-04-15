@@ -1422,6 +1422,24 @@ int gde_get_active_window (void)
 }
 
 
+
+/*
+// #todo
+int gde_bring_window_to_top(struct window_d *window);
+int gde_bring_window_to_top(struct window_d *window)
+{
+    return -1;
+}
+*/
+
+
+// #todo
+// mouse capture suport.
+// gde_set_capture()
+// gde_release_capture()
+
+
+
 /*
  * gde_show_current_process_info:
  *     Mostra informações sobre o processo atual.

@@ -1095,6 +1095,11 @@ void __kgwm_initDialog ( int message )
 // usar outra rotina e não essa. Pois lidaremos com uma estrutura
 // de janela diferente, que esta localizada em ring3.
 
+// From Windows:
+// Because the mouse, like the keyboard, 
+// must be shared among all the different threads, the OS 
+// must not allow a single thread to monopolize the mouse cursor 
+// by altering its shape or confining it to a small area of the screen.
 
 unsigned long 
 __kgwm_ps2kbd_procedure ( 

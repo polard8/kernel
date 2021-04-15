@@ -602,6 +602,14 @@ struct thread_d
     // + The visibility of the mouse cursor.
 
     // ...
+ 
+    // #todo
+    // We don't need to have a window as an element in the event.
+    // We can include this window later when the app calls get_message().
+    // When the thread calls GetMessage(), 
+    // the keyboard event is removed from the queue and 
+    // assigned to the window that currently has input focus.
+    
 
     //
     // == kernel event ====================================
@@ -687,6 +695,14 @@ struct thread_d
 	//struct thread_d *sendersList; //Lista encadeada de threads querendo enviar mensagem
 	//struct thread_d *nextSender;  //próxima thread a enviar mensagem.
 	
+
+
+    // Each thread has its own mouse shape. ?
+    // Each window has its own mouse shape. ?
+    //int mouse_pointer_type;
+
+    // Is this valid for a thread or for a window?
+    // int mouse_is_captured;
 
 
     //
