@@ -4,8 +4,8 @@
  * Descrição:
  *     Header do gerenciador de user sections.
  *     
+ *     WINDOW -> DESKTOP -> ROOM           -> USER SECTION.
  *     WINDOW -> DESKTOP -> WINDOW STATION -> USER SECTION.
- *
  *
  * Obs: Uma estrutura de user session pode armazenas ponteiros para
  *      +Desktop Pool. (Window Station). 
@@ -16,9 +16,8 @@
  *  Tipos de usuários: 
  *     Interactive e non_interactive.
  *
- * Histórico:
- *     Versão 1.0, 2015 - Esse arquivo foi criado por Fred Nora.
- *     Versão 1.0, 2016 - Revisão do header.
+ * History:
+ *     2015 - Created by Fred Nora.
  *     ...
  */
 
@@ -34,10 +33,11 @@ unsigned long usersession_start;
 
 
 
-// The persisten window server.
+// The persistent window server.
 // This is a window server embedded into the base kernel.
 // It is used for the setup/installation environment and
 // for some raw environment.
+// kgws
 
 struct raw_graphics_d
 {
@@ -121,24 +121,56 @@ struct desktop_environment_d *DesktopEnvironment;
 
 
 /*
- * User section structure (u.session)
+ * **********************************************
+ * usession_d:
+ *     The user section structure. 
+ *     (u.session)
  */ 
+
 
 struct usession_d
 {
-    // object control
 
-    object_type_t  objectType;
-    object_class_t objectClass;
+    object_type_t   objectType;
+    object_class_t  objectClass;
 
-    struct object_d *object;
-
-    // SID - Session ID.
-    int id;
+    struct object_d  *object;
 
     int used;
     int magic;
+
+    // SID - Session ID.
+    int sid;
+ 
+     // The user in this session.
+    uid_t uid;
+
+    // Initial process for this session.
+    pid_t initial_pid;
+
+    // The session leader.
+    // The leader process for this process.
+    // The leader has some privileges in its session.
+    pid_t leader_pid;
+
+
+    // #todo
+    // All the process in this group will be killed when the
+    // session ends.
     
+    // gid_t gid;
+
+
+    int initialized;
+
+
+    // ??
+    // What is the virtual terminal used by this session?
+    // What is the virtual console used by this session?
+    // This session has a terminal or console?
+    
+    //int tty;
+
     
     //
     //  main info
@@ -152,7 +184,7 @@ struct usession_d
     // It belong to the base kernel.
     // This is all we have when the system has no
     // loadable window server installed on it.
-    struct raw_graphics_d        *raw_graphics;
+    struct raw_graphics_d  *raw_graphics;
 
 
     // =========================================================
@@ -170,11 +202,6 @@ struct usession_d
 
     // =========================================================
 
- 
-    int uid; // *IMPORTANTE , ID do usuário da secção.
-
-
-    int initialized;
 
     unsigned long BeginTime;
     unsigned long EndTime;

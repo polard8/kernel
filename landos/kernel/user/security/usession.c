@@ -49,12 +49,12 @@ set_current_user_session (
         return; 
     }
 
-    if ( usession->id < 0 ){
-        debug_print ("set_current_user_session: [FAIL] id \n");
+    if ( usession->sid < 0 ){
+        debug_print ("set_current_user_session: [FAIL] sid \n");
         return; 
     }
 
-    current_usersession = (int) usession->id;
+    current_usersession = (int) usession->sid;
 
     CurrentUserSession = usession;
 }
@@ -120,7 +120,7 @@ void *CreateUserSession (int user_id)
             usessionList[i] = (unsigned long) NewUserSession; 
 
             // User session id.
-            NewUserSession->id = i;
+            NewUserSession->sid = i;
 
             return (void *) NewUserSession;
         }
@@ -176,7 +176,7 @@ void close_user_session (void)
     CurrentUserSession->EndTime = (unsigned long) 0;
 
 
-    CurrentUserSession->id = 0; 
+    CurrentUserSession->sid   = 0; 
 
     CurrentUserSession->used  = FALSE; 
     CurrentUserSession->magic = 0; 
