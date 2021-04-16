@@ -1547,7 +1547,8 @@ void gde_minimize_window (struct window_d *window)
 void gde_update_window (struct window_d *window)
 {
 
-    if ( (void*) window == NULL ){
+    if ( (void*) window == NULL )
+    {
         return;
     }
 
@@ -1559,13 +1560,13 @@ void gde_update_window (struct window_d *window)
 }
 
 
-void *gde_get_foregroung_window (void)
+void *gde_get_foreground_window (void)
 {
     system_call ( SYSTEMCALL_GETFOREGROUNDWINDOW, 0, 0, 0 );
 }
 
 
-void gde_set_foregroung_window (struct window_d *window)
+void gde_set_foreground_window (struct window_d *window)
 {
 
     if ( (void*) window == NULL )

@@ -226,8 +226,8 @@ int main ( int argc, char *argv[] ){
                            0, 0, color, color ); 
 
     if ( (void *) hWindow == NULL ){
-        printf ("gfe: hWindow fail");
-        gde_end_paint ();
+        printf ("gfe: [FAIL] hWindow\n");
+        gde_end_paint();
         goto fail;
     }else{
         gde_register_window (hWindow);

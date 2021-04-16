@@ -47,7 +47,7 @@ int running = 1;
  
 
 int 
-reboot2Procedure ( 
+reboot3Procedure ( 
     struct window_d *window, 
     int msg, 
     unsigned long long1, 
@@ -56,12 +56,12 @@ reboot2Procedure (
 
 /*
  * *********************************
- * reboot2Procedure:
+ * reboot3Procedure:
  *     Dialog.
  */
 
 int 
-reboot2Procedure ( 
+reboot3Procedure ( 
     struct window_d *window, 
     int msg, 
     unsigned long long1, 
@@ -493,7 +493,7 @@ int main ( int argc, char *argv[] ){
 
 
     //#todo: Usar outro método para enviar a mensagem.
-    //reboot2Procedure ( (struct window_d *) hWindow, 
+    //reboot3Procedure ( (struct window_d *) hWindow, 
      //   (int) MSG_CREATE, 
      //   (unsigned long) 0, 
      //   (unsigned long) 0 );
@@ -902,22 +902,27 @@ Mainloop:
 
     while (running)
     {
-		gde_enter_critical_section ();
-		system_call ( 111,
-		    (unsigned long) &message_buffer[0],
-			(unsigned long) &message_buffer[0],
-			(unsigned long) &message_buffer[0] );
+
+        gde_enter_critical_section ();
+        system_call ( 
+            111,
+            (unsigned long) &message_buffer[0],
+            (unsigned long) &message_buffer[0],
+            (unsigned long) &message_buffer[0] );
         gde_exit_critical_section ();
+
 
         //if ( message_buffer[1] != 0 )
             //gdeyield();
-            
+
+
         if ( message_buffer[1] != 0 )
         {
-            reboot2Procedure ( (struct window_d *) message_buffer[0], 
-                (int) message_buffer[1], 
-                (unsigned long) message_buffer[2], 
-                (unsigned long) message_buffer[3] );
+            reboot3Procedure ( 
+                (struct window_d *) message_buffer[0], 
+                (int)               message_buffer[1], 
+                (unsigned long)     message_buffer[2], 
+                (unsigned long)     message_buffer[3] );
 
             message_buffer[0] = 0;
             message_buffer[1] = 0;

@@ -234,10 +234,10 @@ int main ( int argc, char *argv[] )
 
     int char_count = 0;
 
-    unsigned long left;
-    unsigned long top;
-    unsigned long width;
-    unsigned long height;
+    unsigned long left=0;
+    unsigned long top=0;
+    unsigned long width=0;
+    unsigned long height=0;
 
     unsigned long deviceWidth  = gde_get_system_metrics(1);
     unsigned long deviceHeight = gde_get_system_metrics(2);
@@ -313,7 +313,7 @@ int main ( int argc, char *argv[] )
     {
         printf ("Couldn't create button 1\n");
         gde_exit_critical_section (); 
-        return 1;
+        goto fail;
     }else{
         gde_register_window (launcher_button_1);
         gde_show_window (launcher_button_1);
@@ -336,9 +336,8 @@ int main ( int argc, char *argv[] )
     {
         printf ("Couldn't create button 2\n");
         gde_exit_critical_section (); 
-        return 1;
+        goto fail;
     }else{
-
         gde_register_window (launcher_button_2);
         gde_show_window (launcher_button_2);
         gde_show_backbuffer ();
@@ -360,7 +359,7 @@ int main ( int argc, char *argv[] )
     {
         printf ("Couldn't create button 3\n");
         gde_exit_critical_section (); 
-        return 1;
+        goto fail;
     }else{
 
         gde_register_window (launcher_button_3);
@@ -422,6 +421,7 @@ Mainloop:
 
 fail:
     printf ("fail.\n");
+    // exit(1);
 
 done:
     //running = 0;

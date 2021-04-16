@@ -188,19 +188,19 @@ land-setup:
 	$(Q) $(MAKE) -C landos/setup/
 
 	sudo cp landos/setup/bin/GDESHELL.BIN  base/
-	sudo cp landos/setup/bin/GRAMCODE.BIN  base/
-	sudo cp landos/setup/bin/SYSMON.BIN    base/
-
 	sudo cp landos/setup/bin/LAUNCHER.BIN  base/
+	sudo cp landos/setup/bin/SYSMON.BIN    base/
+	sudo cp landos/setup/bin/GRAMCODE.BIN  base/
+
+	-sudo cp landos/setup/bin/GFE.BIN      base/
+	-sudo cp landos/setup/bin/REBOOT2.BIN  base/
+	-sudo cp landos/setup/bin/REBOOT3.BIN  base/
 
 	#sudo cp landos/setup/bin/C4.BIN       base/
 	#sudo cp landos/setup/bin/GRAMC.BIN    base/
 	#sudo cp landos/setup/bin/GRAMC4.BIN   base/
 	#sudo cp landos/setup/bin/GRAMCNF.BIN  base/
 
-	sudo cp landos/setup/bin/GFE.BIN       base/
-	#sudo cp landos/setup/bin/REBOOT2.BIN       base/
-	#sudo cp landos/setup/bin/REBOOT3.BIN       base/
 
 #===================================================
 #:::1

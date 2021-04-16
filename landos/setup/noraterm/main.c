@@ -6781,18 +6781,18 @@ int main ( int argc, char *argv[] ){
 	
 	
 	// Se não há argumentos.
-	if (argc < 1)
-	{
+
+    if (argc < 1){
+
 		//printf("No args !\n");
 		//#Test.
-        //fprintf( stderr,"Starting Shell with no arguments...\n");	 	
-		
-		die ("SHELL.BIN: No args \n");
-		
-		goto noArgs; 
-		
-	}else{
-		
+        //fprintf( stderr,"Starting Shell with no arguments...\n");
+
+        die ("NORATERM.BIN: [FAIL] No args \n");
+        goto noArgs; 
+
+    }else{
+
 		
 		// #importante
 		// Precisamos de 9 argumentos.
@@ -6800,9 +6800,8 @@ int main ( int argc, char *argv[] ){
 		
 		// #importante
 		// Não podemos comparar com um ponteiro nulo, se não é PF.
-		
-		if (argc < 2)
-		{
+
+		if (argc < 2){
 		    printf ("main: argc=%d we need 2 or more \n", argc );
 			return 1;
 		}
@@ -6833,12 +6832,12 @@ int main ( int argc, char *argv[] ){
 		// 3
 		// --interactive
 	    if ( strncmp ( (char *) argv[3], "--interactive", 13 ) == 0 )
-		{	
+		{
 			interactive = 1;
 			
             printf ("Initializing an interactive shell ...\n");
             //printf ("arg[0]={%s}\n",argv[0]);			
-        };
+        }
 		
 		// 4
 		// --login
@@ -6848,7 +6847,7 @@ int main ( int argc, char *argv[] ){
 			
 			//printf("Initializing login ...\n");
             //printf("arg[1]={%s}\n",argv[1]);    
-        };			
+        }
 
 		
         // 5
@@ -6858,7 +6857,7 @@ int main ( int argc, char *argv[] ){
 		if ( strncmp ( (char *) argv[5], "--headless", 10 ) == 0 )
 		{	
 			headless = 1;	
-		};
+		}
 		
         // 6
 		// --taskbar
@@ -6866,19 +6865,19 @@ int main ( int argc, char *argv[] ){
 		if ( strncmp ( (char *) argv[6], "--taskbar", 9 ) == 0 )
 		{	
 			taskbar = 1;	
-		};
+		}
 		
 		if ( strncmp ( (char *) argv[6], "--notaskbar", 11 ) == 0 )
 		{	
 			taskbar = 0;	
-		};		
+		}
 
 		// 7
 		// Shell funcionando no modo servidor.
 		if ( strncmp ( (char *) argv[7], "--gws", 5 ) == 0 )
 		{	
 			//gws_shell = 1;	
-		};
+		}
 
 		// 8
 		// Shell funcionando no modo desktop.
@@ -6886,12 +6885,12 @@ int main ( int argc, char *argv[] ){
 		if ( strncmp ( (char *) argv[8], "--desktop", 9 ) == 0 )
 		{	
 			desktop = 1;	
-		};
+		}
 		
 		if ( strncmp ( (char *) argv[8], "--nodesktop", 11 ) == 0 )
 		{	
 			desktop = 0;	
-		};		
+		}
 		
 		
 		//se version _quit = 1;
@@ -6986,16 +6985,16 @@ noArgs:
 
 
 
-     // background.
-     __bgleft = 1;
-     __bgtop  = 1 +36;
+     // background
+     __bgleft   = 1;
+     __bgtop    = 1 +36;
      __bgwidth  = wsWindowWidth -2;
      __bgheight = wsWindowHeight -38;
 
 
-     // bar.
-     __barleft = 2;
-     __bartop  = 2;
+     // bar
+     __barleft   = 2;
+     __bartop    = 2;
      __barwidth  = __bgwidth -4;
      __barheight = 34; 
 
@@ -7012,8 +7011,8 @@ noArgs:
     // Usado para desenhar agora em relação
     // a sua janela mãe.
 
-    unsigned long __terminal_left  = 2;
-    unsigned long __terminal_top   = __barheight +2; 
+    unsigned long __terminal_left   = 2;
+    unsigned long __terminal_top    = __barheight +2; 
     unsigned long __terminal_width  = __bgwidth  -4; 
     unsigned long __terminal_height = __bgheight -__barheight -4;  
 
@@ -7043,12 +7042,10 @@ noArgs:
                             __bgleft, __bgtop, __bgwidth, __bgheight,
                             hWindow, 0, 0xF5DEB3, 0xF5DEB3 ); 
 
-    if ( (void *) client_bg == NULL )
-    {
-		printf ("client_bg window fail \n");
-		die( ":( \n");
+    if ( (void *) client_bg == NULL ){
+        printf ("client_bg window fail \n");
+        die( ":( \n");
     }else{
-		
         gde_register_window  (client_bg);
         gde_show_window (client_bg );
         client_background_window = client_bg;
@@ -7078,11 +7075,9 @@ noArgs:
                             client_bg, 0, 
                             COLOR_TERMINAL2, COLOR_TERMINAL2 );
  
-    if ( (void *) hWindow2 == NULL )
-    {
-        die ("NORATERM: hWindow2 \n");
+    if ( (void *) hWindow2 == NULL ){
+        die ("NORATERM: [FAIL] hWindow2 \n");
     }else{
-
         gde_register_window (hWindow2);
         gde_set_focus (hWindow2);
         gde_show_window (hWindow2);
@@ -7134,18 +7129,16 @@ noArgs:
     int father_pid = getpid();
     
     //IN: window, father's pid
-    vt_ret = (int) gramado_system_call ( 270, 
+    vt_ret = (int) gramado_system_call ( 
+                       270, 
                        (unsigned long) hWindow2, 
                        (unsigned long) father_pid, 
                        0 );
 
-    if (vt_ret < 0)
-    {
-        printf ("noraterm: We couldn't create the terminal\n");
+    if (vt_ret < 0){
+        printf ("noraterm: [FAIL] We couldn't create the terminal\n");
         exit(1);  
     }
-
-
 
 
     //
@@ -7158,7 +7151,8 @@ noArgs:
 
 	//++
     gde_enter_critical_section ();  
-    client_bar_Window = (void *) gde_create_window ( WT_SIMPLE, 1, 1, 
+    client_bar_Window = (void *) gde_create_window ( 
+                                     WT_SIMPLE, 1, 1, 
                                      "client-bar",     
                                     __barleft, __bartop, 
                                     __barwidth, __barheight, 
@@ -7179,18 +7173,18 @@ noArgs:
     //
     // == Bar buttons =========
     //
-    
+
 	//++
     gde_enter_critical_section (); 
-	bar_button_1 = (void *) gde_create_window ( WT_BUTTON, 1, 1, " 1 ",  
-                                     ((__barwidth/4)*0), 1, 
-                                     (__barwidth/4)-2, 32,    
-                                     client_bar_Window, 0, 
-                                     xCOLOR_GRAY3, xCOLOR_GRAY3 );
+    bar_button_1 = (void *) gde_create_window ( 
+                                WT_BUTTON, 1, 1, " 1 ",  
+                                ((__barwidth/4)*0), 1, 
+                                 (__barwidth/4)-2, 32,    
+                                client_bar_Window, 0, 
+                                xCOLOR_GRAY3, xCOLOR_GRAY3 );
 
-    if ( (void *) bar_button_1 == NULL )
-    {
-		printf ("Couldn't create PID button\n");
+    if ( (void *) bar_button_1 == NULL ){
+		printf ("noraterm: Couldn't create PID button\n");
 		return 1;
     }else{
         gde_register_window (bar_button_1);
@@ -7413,7 +7407,7 @@ no_internal_shell:
 	{
         printf ("noraterm: Internal shell is not interactive\n");	
 		goto skip_input;
-	};
+	}
 
 	
 	//
@@ -7472,7 +7466,7 @@ no_internal_shell:
  
 	
 	//
-	// **** Mensagens  ****
+	// Mensagens
 	//
 	
 	//printf("Tentando pegar mensagem enviada para o procedimento de janela.");

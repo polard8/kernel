@@ -6,7 +6,7 @@
  * History:
  *     2017 -  Created by fred Nora.
  */
- 
+
 // Window manager into the kernel base.
  
 // #obs:
@@ -58,24 +58,7 @@ void gui_create_navigationbar (void);
 void gui_create_grid (void);
 
 
-
-//
-// cursor
-//
-
-
-/*
-void gwsEnableTextCursor ()
-{
-    g_show_text_cursor = 1;
-}
-
-void gwsDisableTextCursor ()
-{
-    g_show_text_cursor = 0;
-}
-*/ 
-
+// =======================================
 
 // #bugbug
 // A função diz que estamos tratando do ws, mas a flag afeta o wm.
@@ -260,19 +243,21 @@ void gui_create_screen (void){
  * Cria buffer dedicado.
  */
 
+// #todo
+// Change the return type to 'int'.
+
 void gui_create_background (void){
  
-    struct window_d *hWindow; 
-
+    struct window_d  *hWindow; 
 
     unsigned long Left   = (unsigned long) SCREEN_DEFAULT_LEFT;
     unsigned long Top    = (unsigned long) SCREEN_DEFAULT_TOP;
     unsigned long Width  = (unsigned long) screenGetWidth();
     unsigned long Height = (unsigned long) screenGetHeight();
 
+
     if ( (void *) gui == NULL ){
-        debug_print ("gui_create_background: [FAIL] gui\n");
-        return;
+        panic ("gui_create_background: [FAIL] gui\n");
     }
 
 
@@ -283,32 +268,47 @@ void gui_create_background (void){
 	//pano de fundo.
 
     hWindow = (void *) CreateWindow ( 
-                           1, 0, VIEW_MINIMIZED, "Background", 
+                           WT_SIMPLE, 0, VIEW_MINIMIZED, "Background", 
                            Left, Top, Width, Height,
                            gui->screen, 0, 0, 0x00008080 );
 
     if ( (void *) hWindow == NULL ){
-        panic ("gui_create_background:\n");
-    }else{
-        RegisterWindow (hWindow);
-        set_active_window (hWindow); 
-        windowLock (hWindow);  
+        panic ("gui_create_background: hWindow\n");
+    }
 
-        //Estrutura gui.
-        if ( (void *) gui != NULL ){
-            gui->background = (void *) hWindow;
-        }
+    if ( hWindow->used != TRUE || hWindow->magic != 1234 )
+    {
+        panic ("gui_create_background: hWindow validation\n");
+    }
 
-		//Desktop.
-        //a janela pertence ao desktop 0
-        //hWindow->desktop = (void*) desktop0;
+    // Register
 
-		//Nothing.
-    };
+    RegisterWindow (hWindow);
 
-done:
+    // Activate.
+    // ?? Is this right ??
+
+    set_active_window (hWindow); 
+    
+    // Set focus
+
     SetFocus (hWindow);
-    return; 
+
+    // Lock
+    
+    windowLock (hWindow);  
+
+
+    // Save the pointe in the main structure.
+    
+    if ( (void *) gui != NULL )
+    {
+        gui->background = (void *) hWindow;
+    }
+
+    // Desktop.
+    // a janela pertence ao desktop 0
+    // hWindow->desktop = (void*) desktop0; 
 }
 
 
@@ -320,7 +320,8 @@ done:
  * e que servirá de referência para a janela gui->main
  */
 
-void gui_create_taskbar (void){
+void gui_create_taskbar (void)
+{
 
     struct window_d *hWindow; 
 
@@ -478,14 +479,10 @@ void gui_create_mainwindow (void){
 }
 
 
-
-
-
 void gui_create_logo (void)
 { 
-    debug_print ("gui_create_logo: deprecated\n");
+    debug_print ("gui_create_logo: Nothing for now\n");
 }
-
 
 void gui_create_controlmenu (void)
 { 
@@ -552,10 +549,9 @@ void gui_create_debug (void){
 }
 
 
-// deletar
 void gui_create_navigationbar (void)
 {
-    debug_print ("gui_create_navigationbar: deprecated\n");
+    debug_print ("gui_create_navigationbar: Nothing for now\n");
 }
 
 
@@ -853,8 +849,9 @@ void *guiGetShellClientWindowWindow (void){
 }
 
 
-// reposiciona e muda o tamanho da gui->main window.
+// Reposiciona e muda o tamanho da gui->main window.
 // configura a área de trabalho.
+
 void 
 guiSetUpMainWindow ( 
     unsigned long x, 
@@ -894,20 +891,37 @@ guiSetUpMainWindow (
 }
 
 
+/*
+ *********************** 
+ * register_wm_process: 
+ * 
+ *     Register the loadable wm process.
+ */
+
+// #todo
+// We need to have a loadable window manager first,
+// this is not valid for the kgws environmet.
+
 int register_wm_process ( pid_t pid ){
 
-    if (pid<0 || pid >= PROCESS_COUNT_MAX ){
+    if ( pid<0 || pid >= PROCESS_COUNT_MAX )
+    {
         debug_print("register_wm_process: [FAIL] pid\n");
         return -1;
     }
 
+    // We can't
+    // The system already has a wm.
+
     if ( __gpidWindowManager != 0 ){
-        debug_print("register_wm_process:\n");
+        debug_print("register_wm_process: [FAIL] The system already has a wm\n");
         return -1;
     }
 
+    // Register.
+
     __gpidWindowManager = (pid_t) pid;
-    
+
     return 0;
 }
 

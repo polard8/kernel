@@ -1196,7 +1196,8 @@ void shellCreateEditBox(void);
 
 
 struct window_d *shellCreateMainWindow( int status );
-//struct window_d *shellCreatemainWindow ();
+
+int commodore_ui(struct window_d *window);
 
 
 //
@@ -1213,7 +1214,6 @@ bmpDisplayBMP (
     unsigned long y, 
     int width, 
     int height );
-
 
 //um comando no shell aponta o script para executar.
 int shellExecuteThisScript ( char *script_name );

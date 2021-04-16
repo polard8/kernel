@@ -3229,8 +3229,8 @@ void gde_update_window (struct window_d *window);
 
 
 // foreground window.
-void *gde_get_foregroung_window (void);
-void gde_set_foregroung_window (struct window_d *window);
+void *gde_get_foreground_window (void);
+void gde_set_foreground_window (struct window_d *window);
 
 
 //

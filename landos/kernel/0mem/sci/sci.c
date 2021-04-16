@@ -2672,7 +2672,6 @@ void *sci0 (
         case 244:
             debug_print ("sci0: [244] Enable text cursor\n");
             timerEnableTextCursor();
-            //gwsEnableTextCursor ();
             return NULL;
             break;
 
@@ -2683,7 +2682,6 @@ void *sci0 (
         case 245:
             debug_print ("sci0: [245] Disable text cursor\n");
             timerDisableTextCursor();
-            //gwsDisableTextCursor ();
             return NULL;
             break;
 
@@ -2696,7 +2694,7 @@ void *sci0 (
         // See: sci/posix/kstdio.c
         // IN: dirfd, pathname, flags.
         case 246:
-            debug_print ("sci0: 246 k_openat\n");
+            debug_print ("sci0: [246] k_openat\n");
             return (void *) k_openat ( 
                                 (int)          arg2, 
                                 (const char *) arg3, 
@@ -2706,7 +2704,7 @@ void *sci0 (
         // 247 - pipe() support.
         // IN: array, flags.
         case 247:
-            debug_print ("sci0: 247 sys_pipe\n");
+            debug_print ("sci0: [247] sys_pipe\n");
             return (void *) sys_pipe ( (int *) arg2, (int) arg3 ); 
             break;
 
@@ -2723,7 +2721,7 @@ void *sci0 (
         
         // IN: pathname, argv, envp.
         case 248:
-            debug_print ("sci0: 248 sys_execve\n");
+            debug_print ("sci0: [248] sys_execve\n");
             return (void *) sys_execve ( 
                                 (const char *) arg2, 
                                 (char **)      arg3, 
@@ -2748,25 +2746,14 @@ void *sci0 (
         // Maybe all these calls using sys_show_system_info(), needs 
         // to use the sci2. int 0x82.
 
-        // 251
+        // 251~255
         // See: sci/sys/sys.c
-        case SYS_SHOWDISKINFO:  sys_show_system_info(1);  break;
 
-        // 252
-        // See: sci/sys/sys.c
-        case SYS_SHOWVOLUMEINFO: sys_show_system_info(2);  break;
-
-        // 253
-        // See: sci/sys/sys.c
-        case SYS_MEMORYINFO:  sys_show_system_info(3);  break;
-
-        // 254
-        // See: sci/sys/sys.c
-        case SYS_SHOWPCIINFO:  sys_show_system_info(4);  break;
-
-        // 255
-        // See: sci/sys/sys.c
-        case SYS_SHOWKERNELINFO: sys_show_system_info(5);  break;
+        case SYS_SHOWDISKINFO:    sys_show_system_info(1);  break;
+        case SYS_SHOWVOLUMEINFO:  sys_show_system_info(2);  break;
+        case SYS_MEMORYINFO:      sys_show_system_info(3);  break;
+        case SYS_SHOWPCIINFO:     sys_show_system_info(4);  break;
+        case SYS_SHOWKERNELINFO:  sys_show_system_info(5);  break;
 
 
 		// #todo:
@@ -2790,6 +2777,8 @@ done:
 /*
  ******************************************************
  * serviceCreateWindow:
+ * 
+ *     Create a window using kgws.
  *     Cria uma janela com base nos argumentos passados no buffer.
  *     Essa rotina � o servi�o 118.
  */
@@ -2797,7 +2786,12 @@ done:
 // #todo
 // Esse serviço deve ir para o módulo user/
 
-unsigned long serviceCreateWindow ( char *message_buffer ){
+// IN: User buffer for the parameters.
+unsigned long 
+serviceCreateWindow ( char *message_buffer )
+{
+    // #todo
+    // We need to check if this is a valid address.
 
     unsigned long *message_address = (unsigned long *) message_buffer;
 
@@ -2877,21 +2871,22 @@ unsigned long serviceCreateWindow ( char *message_buffer ){
 
     int desktopID;
 
-
     desktopID = (int) get_current_desktop_id();
 
+    //if (desktopID<0)
+        //debug_print("serviceCreateWindow: invalid desktop id\n");
+
 
     //
-    // Create.
+    // Create
     //
-    
-    
+
     // #test
     // Ok isso funcionou.
     if ( (void *) ParentWindow != NULL )
     {
-        WindowX = ParentWindow->left + WindowX;
-        WindowY = ParentWindow->top  + WindowY;
+        WindowX = (ParentWindow->left + WindowX);
+        WindowY = (ParentWindow->top  + WindowY);
     }
 
 
@@ -2925,27 +2920,28 @@ unsigned long serviceCreateWindow ( char *message_buffer ){
     if ( (void *) NewWindow == NULL ){ 
         debug_print("serviceCreateWindow: [FAIL] NewWindow\n");
         return 0;
-    }else{
+    }
 
-		//se a janela foi criada com sucesso, podemos desativar a flag.
-		//*importante, nesse momento precisamos desativar a flag.
+    // Flag
+    // Se a janela foi criada com sucesso, podemos desativar a flag.
+    // #importante: Nesse momento precisamos desativar a flag.
 
-		cwFlag = 0;                  
-		
-        // Obs: 
-		// Quem solicitou a cria��o da janela pode estar em user mode
-        // por�m a estrutura da janela est� em kernel mode. #bugbug
-		// Obs:
-		// Para preencher as informa��es da estrutura, a aplica��o
-		// pode enviar diversas chamadas, Se n�o enviar, ser�o considerados
-		// os valores padr�o referentes ao tipo de janela criada.
-		// Cada tipo tem suas caracter�sticas e mesmo que o solicitante
-		// n�o seja espec�fico nos detalhes ele ter� a janela do tipo que deseja.
-		
-        //  
-        //@todo: Pode-se refinar os par�metros da janela na estrutura.
-		//NewWindow->
-		//...
+    cwFlag = 0;
+
+    // Obs: 
+    // Quem solicitou a cria��o da janela pode estar em user mode
+    // por�m a estrutura da janela est� em kernel mode. #bugbug
+    // Obs:
+	// Para preencher as informa��es da estrutura, a aplica��o
+	// pode enviar diversas chamadas, Se n�o enviar, ser�o considerados
+	// os valores padr�o referentes ao tipo de janela criada.
+	// Cada tipo tem suas caracter�sticas e mesmo que o solicitante
+	// n�o seja espec�fico nos detalhes ele ter� a janela do tipo que deseja.
+
+    //  
+    // #todo: Pode-se refinar os par�metros da janela na estrutura.
+    //NewWindow->
+    //...
 		
 		//@todo: N�o registrar, quem criou que registre a janela.
 		//RegisterWindow(NewWindow);
@@ -2954,21 +2950,37 @@ unsigned long serviceCreateWindow ( char *message_buffer ){
 		// Se a tarefa atual est� pintando, vamos melhorar a sua prioridade.
 		// Possivelmente a thread de controle da janela � a thread atual.
 
-        //
-        // thread.
-        //
-        
-        // Declarando a thread associada à janela.
-        // É a current_thread.
+    //
+    // Thread
+    //
 
-        t = (void *) threadList[current_thread];
+    // Declarando a thread associada à janela.
+    // É a current_thread.
 
-        set_thread_priority ( t, PRIORITY_MAX );
+    if (current_thread<0){
+        panic ("serviceCreateWindow: [FAIL] Invalid current thread\n");
+    }
 
-        NewWindow->control = t;
+    t = (void *) threadList[current_thread];
 
-        return (unsigned long) NewWindow;
-    };
+    if ( (void*) t == NULL ){
+        panic ("serviceCreateWindow: [FAIL] t\n");
+    }
+
+    if ( t->used != TRUE || t->magic != 1234 ){
+        panic ("serviceCreateWindow: [FAIL] t validation\n");
+    }
+
+    // Change the priority.
+
+    set_thread_priority ( t, PRIORITY_MAX );
+
+    
+    // The thread associated with this new kgws window.
+    
+    NewWindow->control = t;
+
+    return (unsigned long) NewWindow;
 }
 
 
@@ -2982,14 +2994,16 @@ unsigned long serviceCreateWindow ( char *message_buffer ){
  * stdio_terminalmode_flag = n�o transparente.
  */
 
-// #todo
-// Change the name. service_console_putchar()
-
 // #bugbug
 // Where is the prototype?
 
 void servicesPutChar ( int c )
 {
+    if ( fg_console < 0 ){
+        // #todo: Message
+        return;
+    }
+
     console_putchar ( (int) c, fg_console );
 }
 
@@ -3009,11 +3023,15 @@ void *sci1 (
 {
     debug_print ("sci1: [TODO]\n");
 
-    switch (number)
-    {
+
+
+    switch (number){
+
         case 1:
             return NULL;
             break;  
+        
+        // ...
         
         default:
             break;
@@ -3051,13 +3069,20 @@ void *sci2 (
 
     // Profiling in the process structure.
 
-    if (current_process<0)
+    if (current_process<0){
         panic("sci2: current_process\n");
+    }
 
     p = (struct process_d *) processList[current_process];
 
-    if ( (void*) p == NULL )
+    if ( (void*) p == NULL ){
         panic("sci2: p\n");
+    }
+
+    if ( p->used != TRUE || p->magic != 1234 ){
+        panic("sci2: p validation\n");
+    }
+
 
     // Counting ...
     p->syscalls_counter++;

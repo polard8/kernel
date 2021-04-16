@@ -168,6 +168,63 @@ struct window_d *shellCreateMainWindow ( int status ){
     return (struct window_d *) w;
 }
 
+// IN: The console window
+int commodore_ui(struct window_d *window)
+{
+
+    return -1;
+    
+    /*
+    struct window_d  *w;  
+
+
+    printf("commodore_ui: Starting ...\n");
+
+    w = (struct window_d *) window;
+
+    if ( (void*) w == NULL ){
+        printf("commodore_ui: w\n");
+        return -1;
+    }
+    
+    //++
+    gde_enter_critical_section ();
+
+    // Set terminal window.
+    // This way the kernel will use this window to print the chars
+    // in terminal mode.
+    
+    gramado_system_call ( 
+        SYSTEMCALL_SETTERMINALWINDOW, 
+        (unsigned long) w, 
+        (unsigned long) w, 
+        (unsigned long) w );
+        
+    gde_replace_window(w,40,40);
+    gde_resize_window(w,320,280);
+
+    //terminal_rect.left   = wpWindowLeft;
+    //terminal_rect.top    = wpWindowTop;
+    //terminal_rect.width  = wsWindowWidth;
+    //terminal_rect.height = wsWindowHeight;
+    
+    gde_redraw_window(w,TRUE);
+    
+    
+    shellSetCursor(0,0);
+    
+    
+    // gde_show_window(w);
+
+    gde_exit_critical_section ();
+    //--
+    
+    */
+    
+    return -1;
+}
+
+
 
 // Create window test.
 void testCreateWindow (void)

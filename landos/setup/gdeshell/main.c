@@ -1931,6 +1931,13 @@ do_compare:
         goto exit_cmp;
     }
     
+    // goal: Changing the main window size.
+    if ( strncmp( prompt, "commodore", 9 ) == 0 )
+    {
+        commodore_ui(hWindow);
+        goto exit_cmp;
+    }
+
     if ( strncmp( prompt, "flush", 5 ) == 0 )
     {
         printf ("gdeshell: Testing fflush\n");
@@ -3948,19 +3955,20 @@ int shellCheckPassword (void)
 			}else{
 				printf("# USERNAME FAIL #\n");
 				login_status = 0;
-			};				
+			};
 
         }else{
-			
-			printf("# USERNAME FAIL #\n");
-			login_status = 0;
-		};
+            printf("# USERNAME FAIL #\n");
+            login_status = 0;
+        };
 
 
-		while ( *c && *c != 'P' ){			
+		while ( *c && *c != 'P' )
+		{
 			c++;
 		};
-		
+
+
 		if ( c[0] == 'P' &&
              c[1] == 'A' &&
              c[2] == 'S' &&
@@ -6388,7 +6396,7 @@ void shellRefreshVisibleArea (void){
     for ( i=textTopRow; i<textBottomRow; i++ ){
         for ( j=0; j<80; j++ ){
             printf ("%c", LINES[i].CHARS[j] );
-        }
+        };
     };
 
 
@@ -7054,6 +7062,10 @@ _ok:
     gde_exit_critical_section ();
     //--
     // =================================
+
+
+
+
 
     // #breakpoint
     // printf ("gdeshell: *breakpoint\n");
