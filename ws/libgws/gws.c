@@ -2947,7 +2947,7 @@ gws_create_window (
 
     // Waiting to read the response.
     int value=0;
-    while(1){
+    while (1){
         value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
         if (value == ACTION_REPLY ) { break; }
         if (value == ACTION_ERROR ) { return -1; }
@@ -2997,9 +2997,11 @@ void gws_yield_n_times (unsigned long n)
 {
     int i=0;
 
+    if (n == 0)
+        n=1;
+
     for (i=0;i<n;i++){
         sc82 (265,0,0,0);
-        //gws_system_call(265,0,0,0); 
     };
 }
 
@@ -3071,8 +3073,7 @@ void gws_start_thread (void *thread)
 
     // Is it a pointer to the ring0 thread structure?
 
-    if ( (void*) thread == NULL )
-    {
+    if ( (void*) thread == NULL ){
         debug_print ("gws_start_thread: thread\n");
         return;
     }
@@ -3151,7 +3152,6 @@ void gws_enter_critical_section (void)
         if ( S == 1 ){ goto done; }
         
         //yield thread.
-        //gws_system_call (265,0,0,0); 
         sc82 (265,0,0,0);
     };
 
@@ -3253,7 +3253,7 @@ struct gws_menu_d *gws_create_menu (
     menu->width  = width;
     menu->height = height;
 
-    menu->color=color;
+    menu->color = color;
 
     // ??
     // Are we selection am item.
@@ -3606,6 +3606,30 @@ void gws_flush_display ( struct gws_display_d *display )
 {
 }
 */
+
+
+
+int gws_enable_input_method(int method)
+{
+    switch (method){
+
+    // Event queue in the current thread.
+    case 1:
+        gws_debug_print ("gws_enable_input_method: [1] \n");
+        rtl_focus_on_this_thread();
+        return 0;
+        break;
+    
+    // ...
+    
+    default:
+        gws_debug_print ("gws_enable_input_method: [FAIL] Invalid method\n");
+        break;
+    };
+    
+fail:
+    return -1;
+}
 
 
 //

@@ -793,14 +793,14 @@ struct msg_d
 
 struct window_d
 {
-    // Identificadores.
-    object_type_t objectType;
-    object_class_t objectClass;
 
+    object_type_t   objectType;
+    object_class_t  objectClass;
 
-	//object control
     struct object_d *object;
 
+    int used;
+    int magic;
 
     unsigned long id;    //Window Id. 
 
@@ -808,9 +808,6 @@ struct window_d
     unsigned long type;  //tipo ... (editbox, normal, ...)  style???
 
 
-	//Segurança.
-    int used;
-    int magic;
 
 
 	// Características dessa janela..
@@ -990,14 +987,6 @@ struct window_d
     int desktop_id;
     struct desktop_d *desktop; 
 
-
-// Gramado v 0.1 usa essa estrutura somente até aqui.
-//==================================================
-
-//
-// Update 
-//
-
 //==================================================
 
 	// Relação entre janelas.
@@ -1008,8 +997,6 @@ struct window_d
     //colocando a janela acima das outras.
     struct window_d *child_with_focus; 
 
-
- 
 //==================================================
     struct window_d *statusbar;
     struct window_d *toolbar;
@@ -1208,17 +1195,16 @@ struct window_d
 
 //==================================================    
 
-    // Flag par indicar se a janela é um item de menu ou um botão.
-    int isMenu;   
+    // This window is a ...
+
+    int isMenu;
     int isMenuItem;
-    
-    int isControl;  // Window control ...
-    int isButton;  //#importante: Indica que a janela é um botão.
-    int isEditBox; //#importante: Indica que a janela é um editbox.
+    int isControl;
+    int isButton;
+    int isEditBox;
     int isCheckBox;
     int isIcon;
-     
-	//...
+    // ...
 
 //==================================================    
 
@@ -1233,11 +1219,11 @@ struct window_d
 
 //==================================================    
 
-    struct window_d *minimize;
-    struct window_d *maximize;
-    struct window_d *close;
-    
-    //#teste
+    // Controls
+
+    struct window_d  *minimize;
+    struct window_d  *maximize;
+    struct window_d  *close;
     int isMinimize;
     int isMaximize;
     int isClose;
@@ -1300,7 +1286,7 @@ struct window_d
     int isTerminal;
     struct vt_d *terminal;
 
-    // Navegation.
+    // Navigation.
     struct window_d *prev; 
     struct window_d *next; 
 };
@@ -1316,14 +1302,15 @@ struct window_d *window_Conductor;
 struct window_d *window_rootConductor;
 //...
 
+//
+// Window list.
+//
 
-
- /*
- * Lista de janelas.
- * @todo: Na verdade poderia ser alocação dinâmica
- * pois o numero de janelas é muito grande. isso deixaria o kernel grande demais.
- */ 
 unsigned long windowList[WINDOW_COUNT_MAX];
+
+
+// ===================================
+
 
 //
 // Browser support. (SHELL.BIN)
@@ -2007,9 +1994,15 @@ int button_up ( struct window_d *window );
 
 // Focus support.
 
-void SetFocus ( struct window_d *window );
-void *GetFocus (void); 
-void KillFocus ( struct window_d *window );
+
+void kgwmSetFocus ( struct window_d *window );
+
+void *kgwmGetFocus (void); 
+
+void kgwmKillFocus ( struct window_d *window );
+
+
+
 
 //foreground window support
 
@@ -2018,10 +2011,10 @@ void *windowGetForegroundWindow (void);
 int windowSetForegroundWindow(struct window_d *window);
 
 //parent.
-void *GetParentWindow(struct window_d * hwnd);
+void *GetParentWindow(struct window_d *hwnd);
 
 //desktop
-void *GetWindowDesktop(struct window_d * hwnd);
+void *GetWindowDesktop(struct window_d *hwnd);
 
 
 // pegando ponteiros para estrutura de janela na estrutura 'gui->'.
@@ -2395,10 +2388,11 @@ int is_window_full(struct window_d *window);
 int is_window_maximized(struct window_d *window);
 int is_window_minimized(struct window_d *window);
 
-void set_active_window (struct window_d *window);
-int get_active_window (void);
 
-void change_active_window (int id);
+
+void *kgwmGetActiveWindow (void);
+void kgwmSetActiveWindow (struct window_d *window);
+
 
 void CloseWindow(struct window_d *window);
 

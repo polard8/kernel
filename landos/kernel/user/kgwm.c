@@ -4,7 +4,7 @@
  *     kgwm - kernel gramado window manager.
  * 
  * History:
- *     2017 -  Created by fred Nora.
+ *     2017 -  Created by Fred Nora.
  */
 
 // Window manager into the kernel base.
@@ -201,7 +201,7 @@ void gui_create_screen (void){
          panic ("gui_create_screen: [FAIL] hWindow\n");
     }else{
         RegisterWindow (hWindow);
-        set_active_window (hWindow); 
+        kgwmSetActiveWindow (hWindow); 
 
         // Isso impede que rotinas mudem as caracteríscicas 
         // da janela principal 
@@ -288,11 +288,11 @@ void gui_create_background (void){
     // Activate.
     // ?? Is this right ??
 
-    set_active_window (hWindow); 
+    kgwmSetActiveWindow (hWindow); 
     
     // Set focus
 
-    SetFocus (hWindow);
+    kgwmSetFocus (hWindow);
 
     // Lock
     
@@ -428,7 +428,7 @@ void gui_create_mainwindow (void){
      }else{   
         RegisterWindow (hWindow);
         windowLock (hWindow); 
-        set_active_window (hWindow); 
+        kgwmSetActiveWindow (hWindow); 
 
         //a janela pertence ao desktop 0
         //hWindow->desktop = (void*) desktop0;
@@ -466,7 +466,7 @@ void gui_create_mainwindow (void){
 
         if ( (void *) gui->desktop == NULL )
         { 
-            SetFocus (hWindow);
+            kgwmSetFocus (hWindow);
             return; 
         }
     }
@@ -475,7 +475,7 @@ void gui_create_mainwindow (void){
 	//Não registrar pois main menu ja está registrada.
 	//RegisterWindow(gui->desktop);
 
-    SetFocus (hWindow);
+    kgwmSetFocus (hWindow);
 }
 
 

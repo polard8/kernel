@@ -1320,21 +1320,18 @@ int gde_close_window (struct window_d *window)
         // #obs: This is a good input model.
 
 
+
+// #
+// Actually this is an opaque pointer.
+// The structure belongs to the kgws inside the base kernel.
+// SYSTEMCALL_SETFOCUS = 62;
+
 int gde_set_focus (struct window_d *window)
 {
-
-    // #
-    // Actually this is an opaque pointer.
-    // The structure belongs to the kgws inside the
-    // base kernel.
-
-    if ( (void *) window == NULL )
-    {
+    if ( (void *) window == NULL ){
         gde_debug_print ("gde_set_focus: [FAIL] window\n");
         return (int) -1;
     }
-
-    // SYSTEMCALL_SETFOCUS = 62;
     
     return (int) gramado_system_call ( 
                      SYSTEMCALL_SETFOCUS, 
@@ -1347,13 +1344,22 @@ int gde_set_focus (struct window_d *window)
 /*
  * gde_get_focus:
  *     Get Focus. 
+ *     Get the pointer for the window with focus.
  */
 
-// ??
-
-int gde_get_focus (void)
+struct window_d *gde_get_focus (void)
 {
-    return (int) system_call ( SYSTEMCALL_GETFOCUS, 0, 0, 0 );
+    struct window_d *w;
+
+
+    w = system_call ( SYSTEMCALL_GETFOCUS, 0, 0, 0 );
+    
+    if ( (void *) w == NULL ){
+         gde_debug_print("gde_get_focus: [FIXME] Invalid pointer\n");
+         return NULL;
+    }
+
+    return (struct window_d *) w;
 }
 
 
@@ -1363,24 +1369,21 @@ int gde_get_focus (void)
  *     Kill Focus. 
  */
 
-// deprecated
-
 int gde_kill_focus (struct window_d *window)
 {
 
     if ( (void *) window == NULL ){
         gde_debug_print ("gde_kill_focus: fail\n");
-        return (int) 1;
-    }else{
+        return (int) -1;
+    }
 
-        return (int) system_call ( SYSTEMCALL_KILLFOCUS, 
-                         (unsigned long) window, 
-                         (unsigned long) window, 
-                         (unsigned long) window );
-    };
+    return (int) system_call ( 
+                     SYSTEMCALL_KILLFOCUS, 
+                     (unsigned long) window, 
+                     (unsigned long) window, 
+                     (unsigned long) window );
 
-    //#todo: Maybe '-1'
-    return (int) 2;
+    return (int) -1;
 }
 
 
@@ -1389,8 +1392,6 @@ int gde_kill_focus (struct window_d *window)
  *     Set Active Window.
  *     @todo: Esse retorno pode ser void??. 
  */
-
-// deprecated.
 
 int gde_set_active_window (struct window_d *window)
 {
@@ -1411,14 +1412,22 @@ int gde_set_active_window (struct window_d *window)
 
 /*
  * gde_get_active_window:
- *     Get Active Window Id.
+ *     Get Active Window 
  */
 
-// deprecated
-
-int gde_get_active_window (void)
+struct window_d *gde_get_active_window (void)
 {
-    return (int) system_call ( SYSTEMCALL_GETACTIVEWINDOW, 0, 0, 0 );
+    struct window_d *aWindow;
+    
+    
+    aWindow = (struct window_d *) system_call ( SYSTEMCALL_GETACTIVEWINDOW, 0, 0, 0 );
+    
+    if ( (void*) aWindow == NULL ){
+        gde_debug_print("gde_get_active_window: [FAIL] Invalid pointer\n");
+        return NULL;
+    }
+    
+    return (struct window_d *) aWindow;
 }
 
 

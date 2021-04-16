@@ -3170,8 +3170,10 @@ int gde_close_window (struct window_d *window);
 //Set Focus.
 int gde_set_focus (struct window_d *window);
 
-//Get Focus.
-int gde_get_focus (void);
+
+// Get Focus.
+// Get the pointer for the window with focus.
+struct window_d *gde_get_focus (void);
 
 //Kill Focus.
 int gde_kill_focus (struct window_d *window);
@@ -3180,7 +3182,7 @@ int gde_kill_focus (struct window_d *window);
 int gde_set_active_window (struct window_d *window);
 
 //Get Active Window.
-int gde_get_active_window (void);
+struct window_d *gde_get_active_window (void);
 
 //Client area.
 void *gde_get_client_area_rect (void);

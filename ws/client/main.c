@@ -818,15 +818,18 @@ int main ( int argc, char *argv[] )
     // set foreground thread.
     // #todo: We need to create a rtl function for this.
     // See: rtl.c
-
     //int cThread = (int) pthread_self();
     //sc82 (10011,cThread,cThread,cThread);
+    // rtl_focus_on_this_thread();
+    
+    // Enable input method number 1.
+    // Event queue in the current thread.
 
-    rtl_focus_on_this_thread();
+    gws_enable_input_method(1);
 
     //=================================
 
-    while(1){
+    while (1){
 
         if ( rtl_get_event() == TRUE )
         {  

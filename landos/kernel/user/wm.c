@@ -1190,12 +1190,9 @@ void windowShowWindowList (void){
             return;
  
         }else{
-
             RegisterWindow (hWindow);
-
-            set_active_window (hWindow);
-
-            SetFocus (hWindow);
+            kgwmSetActiveWindow (hWindow);
+            kgwmSetFocus (hWindow);
         };
 
 
@@ -1246,7 +1243,7 @@ void windowShowWindowList (void){
 
         show_active_window();
         show_window_with_focus();
-        SetFocus(hWindow);
+        kgwmSetFocus(hWindow);
 
 
         // Voltando a margem normal a margem
@@ -1274,7 +1271,7 @@ void windowShowWindowList (void){
 	
 	refresh_screen ();
     
-	//SetFocus(hWindow);
+	//kgwmSetFocus(hWindow);
 }
 
 
@@ -2037,7 +2034,7 @@ int redraw_screen (void){
                 }
 
                 //retira o foco.
-                //KillFocus(__window);
+                //kgwmKillFocus(__window);
 
                 // durty.
                 // se ela foi marcada como suja e precisa ser repintada.
@@ -2345,9 +2342,10 @@ void CloseWindow ( struct window_d *window ){
 	    //}
 	
 		//...
-		
-	    // Focus.
-	    KillFocus(window);
+
+        // Focus
+
+        kgwmKillFocus (window);
 
 		
         //Se temos uma janela mãe válida. Ela herda o foco.
@@ -2356,16 +2354,14 @@ void CloseWindow ( struct window_d *window ){
 	    {
             if( window->parent->used == 1 && 
 			    window->parent->magic == 1234 )
-            {			
+            {
                 set_current_window (window->parent);
-                 
-	            set_active_window (window->parent);
-	            
-                SetFocus (window->parent);
-            }; 		
+
+                kgwmSetActiveWindow (window->parent);
+                kgwmSetFocus (window->parent);
+            }; 
         };
-		
-		
+
 	    // devemos retirar a janela da zorder list 
 	
 	    z = (int) window->z;
@@ -2414,128 +2410,53 @@ void DestroyWindow ( struct window_d *window )
 
 
 /*
- * get_active_window:
+ * kgwmGetActiveWindow:
  *     Obtem o id da janela ativa.
  */
  
-int get_active_window (void)
+void *kgwmGetActiveWindow (void)
 {
-    return (int) active_window;  
+    struct window_d  *aWindow;
+
+
+    if (active_window < 0){
+        debug_print ("kgwmGetActiveWindow: [FIXME] active_window underflow\n");
+        return NULL;
+    }
+
+    if (active_window >= WINDOW_COUNT_MAX ){
+        debug_print ("kgwmGetActiveWindow: [FIXME] active_window overflow\n");
+        return NULL;
+    }
+
+    aWindow = (struct window_d *) windowList[active_window];
+
+    if ( (void*) aWindow == NULL ){
+        debug_print ("kgwmGetActiveWindow: [FIXME] Invalid pointer\n");
+        return NULL;
+    }
+    
+    if ( aWindow->used != TRUE || aWindow->magic != 1234 ){
+        debug_print ("kgwmGetActiveWindow: [FIXME] validation\n");
+        return NULL;
+    }
+
+    return (struct window_d *) aWindow;
 }
+
 
 
 /*
  ****************************************************
- * set_active_window:
+ * kgwmSetActiveWindow:
  *     Seleciona qual será a janela ativa.
  *     Ativa uma janela.
  */
- 
-// wm. 
- 
-void set_active_window (struct window_d *window){
-	
-	/*
-	
-	//devemos desativar a antiga janela ativa.
-	int save = active_window;
-	
-	struct window_d *old;
-	
-	
-	//Check window.
-	
-	if ( (void *) window == NULL )
-	{ 
-	    return; 
-	
-	} else {
 
-	    if ( window->used == 1 && window->magic == 1234 )
-		{
-			
-			//#importante:
-			//se a janela já for a janela ativa, não precisamos ativa.
-			if( window->id == active_window )
-			{ 
-		        return;
-			}
-			
-			// Se não tem uma janela mãe ou 
-            // se ajanela mãe for uma das janelas básicas.			
-			if ( window->parent == NULL ||
-			     window->parent == gui->main ||
-				 window->parent == gui->screen )
-			{
-		        window->active = 1;
-				window->relationship_status = (unsigned long) WINDOW_REALATIONSHIPSTATUS_FOREGROUND;
-
-			    //Estrutura global
-	            ActiveWindow = (void *) window;
-
-		        //Variável global
-                active_window = (int) window->id;
-                goto exit;				
-			}			
-			
-			//se tem janela mãe e a janela mãe 
-			//não for uma das janelas básicas.
-			//então a janela mão será ativada.
-			
-			if ( window->parent != NULL && 
-			     window->parent != gui->main && 
-			     window->parent != gui->screen )
-			{
-				
-	            set_active_window (window->parent);
-                goto exit;				
-			}
-
-            //??
-            //return; 			
-		}
-	};
-	//Nothing.
-	
-    	
-	
-//desativar a antiga janela ativa.
-exit:
-
-    old = (void *) windowList[save];
-	
-	if ( (void *) old != NULL )
-	{
-		if ( old->used == 1 && old->magic == 1234 )
-		{
-            old->relationship_status = (unsigned long) WINDOW_REALATIONSHIPSTATUS_BACKGROUND;
-		    old->active = 0;
-		}
-		
-	};
-	
-	
-	*/
-
-    return;	
-}
-
-
-/*
- * change_active_window:
- *     @todo: Trocar a janela ativa
- */
-
-// wm.
-
-void change_active_window (int id){
-	
-	//todo: Limits. Max.
-    
-	if (id < 0)
-	    return;
-
-	active_window = (int) id;
+void kgwmSetActiveWindow (struct window_d *window)
+{
+    debug_print ("kgwmSetActiveWindow: [FIXME] \n");
+    return;
 }
 
 
@@ -2571,70 +2492,32 @@ void show_window_with_focus (void)
  *     Fecha a janela ativa.
  */
 
-// wm.
+void CloseActiveWindow (void)
+{
 
-void CloseActiveWindow (void){
-
-    struct window_d *Window;	
-    int Offset=0;
+    debug_print ("CloseActiveWindow: [FIXME] \n");
 
 
-    Offset = (int) get_active_window ();
+    // DestroyWindow ( kgwmGetActiveWindow() );
 
-    if (Offset < 0){
-       //message
-       return;
-    }
-
-	//struct.
-	Window = (void *) windowList[Offset];
-	
-	//Nothing to do.
-    if ( (void *) Window == NULL ){
-        //message
-        return;
-
-    }else{
-  
-		//Torna ativa a próxima janela.
-	    if ( (void *) Window->next != NULL ){
-	        set_active_window(Window->next);
-
-	    }else{
-			
-	        //Torna ativa a janela mãe.
-	        if ( (void *) Window->parent != NULL )
-			{
-	            set_active_window(Window->parent);
-	        }
-		};
-    };
-
-
-    DestroyWindow (Window);
+    return;
 }
-
-
-
-// #todo: 
-// windowSetFocus(.) e windowGetFocus() windowSwitchFocus()
-
 
 void windowBlockFocus (void)
 {
-    gFocusBlocked = (int) 1;
+    gFocusBlocked = (int) TRUE;
 }
 
 
 void windowUnblockFocus (void)
 {
-    gFocusBlocked = (int) 0;
+    gFocusBlocked = (int) FALSE;
 }
 
 
 /*
  *****************************************************
- * SetFocus:
+ * kgwmSetFocus:
  * 
  *     + Seta o foco em uma janela.
  *     + Configura o cursor.
@@ -2664,7 +2547,7 @@ void windowUnblockFocus (void)
 // Setar o foco na janela e marcar a thread de controle associada a
 // essa janela como foreground thread, para que ela receba input.
 
-void SetFocus ( struct window_d *window )
+void kgwmSetFocus ( struct window_d *window )
 {
     // priority stuff
     
@@ -2679,13 +2562,13 @@ void SetFocus ( struct window_d *window )
 	// Sem foco do teclado não funciona.
 
 
-    debug_print("wm-Setfocus:\n");
+    debug_print ("kgwmSetFocus:\n");
 
     if ( (void *) window == NULL ){
-        panic ("SetFocus: window\n");
+        panic ("kgwmSetFocus: window\n");
     }else{
-        if ( window->used != 1 || window->magic != 1234 ){
-            panic("SetFocus: Validation");
+        if ( window->used != TRUE || window->magic != 1234 ){
+            panic("kgwmSetFocus: Validation");
         }
 
         // #todo
@@ -2697,7 +2580,7 @@ void SetFocus ( struct window_d *window )
         
         window_with_focus = (int) window->id;
         
-        window->focus = 1; 
+        window->focus = TRUE; 
 
         WindowWithFocus = (void *) window;
     };
@@ -2742,18 +2625,39 @@ void SetFocus ( struct window_d *window )
 
 
 /*
- * GetFocus: 
+ * kgwmGetFocus: 
  *     Pega o ponteiro para a estrutura da janela com o foco de entrada.
  */
 
 // wm.
 
-void *GetFocus (void){
+void *kgwmGetFocus (void)
+{
+    struct window_d *w;
 
-    if ( window_with_focus < 0 )
+    if ( window_with_focus < 0 ){
+        debug_print("kgwmGetFocus: [FAIL] window_with_focus underflow\n");
         return NULL;
+    }
 
-    return (void *) windowList[window_with_focus];
+    if ( window_with_focus >= WINDOW_COUNT_MAX ){
+        debug_print("kgwmGetFocus: [FAIL] window_with_focus overflow\n");
+        return NULL;
+    }
+
+    w = (struct window_d *) windowList[window_with_focus];
+
+    if ( (void *) w == NULL ){
+        debug_print("kgwmGetFocus: [FAIL] Invalid pointer\n");
+        return NULL;
+    }
+
+    if ( w->used != TRUE || w->magic != 1234){
+        debug_print("kgwmGetFocus: [FAIL] validation\n");
+        return NULL;
+    }
+
+    return (struct window_d *) w;
 }
 
 
@@ -2796,21 +2700,18 @@ int windowSetForegroundWindow ( struct window_d *window ){
 	if ( (void *) window == NULL ){
 		printf ("windowSetForegroundWindow: window\n");
 		goto fail;
-		
 	}else{
-	    SetFocus (window);
-	    set_active_window (window);
-	     
-		//...
+
+        kgwmSetFocus (window);
+        kgwmSetActiveWindow (window);
+		// ...
 	};
-	
+
 	// #todo: 
 	// Aumentar a prioridade da thread.
 
-
 done:
     return 0;
-
 fail:
     return (int) 1;
 }
@@ -2896,9 +2797,9 @@ void windowSwitchFocus (void){
 	    goto fail; 
 		
 	}else{
-		
-	    KillFocus (window);  
-		
+
+        kgwmKillFocus (window);  
+
 		//Se a próxima janela é válida.
 		if( (void*) window->next != NULL )
 		{
@@ -2913,22 +2814,21 @@ void windowSwitchFocus (void){
 		        window_with_focus = (int) NextID;
 	        }else{
 			    window_with_focus = (int) CurrentID;	
-			}			
+			}
 
 		    window = (void*) windowList[window_with_focus];			
-            SetFocus(window);
-			goto done;			
+            kgwmSetFocus(window);
+			goto done;
 		}else{
 			
 		    window_with_focus = (int) CurrentID;	
 		    window = (void*) windowList[window_with_focus];			
-            SetFocus(window);
-            goto done;  			
+            kgwmSetFocus(window);
+            goto done; 
             
 		};
 		
 		//Fail.
-		
 	};
 	
 	//Nothing.
@@ -2952,18 +2852,20 @@ fail:
 
 /*
  *************************************
- * KillFocus:
+ * kgwmKillFocus:
  *     Uma janela perde o foco.
  */
  
-void KillFocus ( struct window_d *window )
+void kgwmKillFocus ( struct window_d *window )
 {
 
     // #debug
     // suspensa para testes na máquina real
     // Nao queremos ficar sem foco algum.
-
+    
+    debug_print ("kgwmKillFocus: [FIXME] \n");
     return;
+
 
 	//
 	// ====== cut here for now =====
@@ -2971,7 +2873,7 @@ void KillFocus ( struct window_d *window )
 
 
     if ( (void *) window == NULL ){
-        printf ("KillFocus: window\n");
+        printf ("kgwmKillFocus: window\n");
         goto fail; 
     }else {
         if ( window->used == 1 && window->magic == 1234 )
@@ -3021,9 +2923,10 @@ void MinimizeWindow (struct window_d *window){
 			//goto fail; 
 	    }
 
-        KillFocus (window);
-	    window->view = (int) VIEW_MINIMIZED;		
-	};
+        kgwmKillFocus (window);
+
+        window->view = (int) VIEW_MINIMIZED;		
+    };
 }
 
 
@@ -3068,11 +2971,11 @@ void MaximizeWindow (struct window_d *window){
 	
 done:
 
-    set_active_window (window);
-    SetFocus (window);
+    kgwmSetActiveWindow (window);
+    kgwmSetFocus (window);
     window->view = (int) VIEW_MAXIMIZED;
     return;
-    
+
 fail:
     return;
 }
@@ -3428,21 +3331,11 @@ void set_top_window (int id)
 
 // Fecha a janela ativa.
 
-void closeActiveWindow (void){
-
-    struct window_d *w;
-    int ID=0;
-
-
-    ID = get_active_window();
-
-	if (ID<0)
-		return;
-	
-	w = (void *) windowList[ID];
-	
-	CloseWindow (w);
+void closeActiveWindow (void)
+{
+    CloseActiveWindow();
 }
+
 
 
 //encontrando um slot livre na z-order global de 
@@ -4122,9 +4015,9 @@ doswitch:
 		
 		//Isso também atualiza o cursor.
 		//pode ser um problema quando saímos do modo fullscreen.
-		SetFocus (window);		
-		 
-	};		
+
+        kgwmSetFocus (window); 
+	};
 	
 	
     ldisc_init_modifier_keys();

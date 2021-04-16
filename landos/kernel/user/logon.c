@@ -391,7 +391,7 @@ int ExitLogon (void)
 		if ( (void *) gui->screen != NULL )
 		{
 			// ?
-		    SetFocus (gui->screen);
+		    kgwmSetFocus (gui->screen);
 	    }
 		
 		//...

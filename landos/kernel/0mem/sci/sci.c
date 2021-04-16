@@ -1644,13 +1644,13 @@ void *sci0 (
 
         // 60
         case SYS_SETACTIVEWINDOW:
-            set_active_window (hWnd);
+            kgwmSetActiveWindow (hWnd);
             return NULL;
             break;
 
-        // 61 - Id. (int).
+        // 61 - 
         case SYS_GETACTIVEWINDOW:
-            return (void *) get_active_window (); 
+            return (void *) kgwmGetActiveWindow(); 
             break;
 
         // 62
@@ -1666,20 +1666,22 @@ void *sci0 (
         // #obs: This is a good input model.
 
         case SYS_SETFOCUS: 
-            SetFocus ( (struct window_d *) hWnd ); 
+            kgwmSetFocus ( (struct window_d *) hWnd ); 
             return NULL;
             break;
 
         // 63 id
-        //#todo: use method.
+        // #todo: use method.
+        // We need to return a pointer?
+        // See kgwmGetFocus() in user/wm.c
         case SYS_GETFOCUS: 
-            return (void *) window_with_focus;  
+            debug_print("sci.c: [63] SYS_GETFOCUS\n");
+            return (void *) kgwmGetFocus();
             break;
-
 
         // 64
         case SYS_KILLFOCUS:
-            KillFocus ( (struct window_d *) hWnd ); 
+            kgwmKillFocus ( (struct window_d *) hWnd ); 
             return NULL;
             break;
 
