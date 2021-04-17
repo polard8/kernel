@@ -754,7 +754,7 @@ editorSetCursor(
 int 
 editorProcedure ( 
     int fd,
-    void *window, 
+    void *window, // maybe: ignore. use long3.
     int msg, 
     unsigned long long1, 
     unsigned long long2 )

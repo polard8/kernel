@@ -2162,6 +2162,64 @@ void _draw(int fd, int c)
                 //terminal_drawchar_response((int) fd);
 }
 
+// local
+int 
+terminalProcedure ( 
+    int fd,
+    void *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 )
+
+{
+
+    int SendToChild = FALSE;
+
+
+    //int stdin_fd=0;
+    //stdin_fd = stdin->_file;
+
+
+    // #important
+    // The terminal application can handle
+    // many kinds of input, but we will send
+    // only keydown to the child via stdin.
+
+    if ( msg == MSG_KEYDOWN )
+    {
+        if (SendToChild == TRUE)
+        {
+            printf ("terminal: [TODO] Send input to child\n");
+            return 0;
+        }
+        
+        // We will not send to the child, 
+        // so print it.
+        
+        // #todo: 
+        // Print it using the libgws.
+        // Using a terminal routine for that.
+        // terminalPrintChar();
+        // gws_...()
+
+        // Using the virtual console.
+        printf ("%c", long1 );
+        fflush(stdout);
+        return 0;
+    }
+
+
+    if ( msg == MSG_SYSKEYDOWN )
+    {
+        if ( long1 == VK_F4 ){
+            printf("terminal: Exiting ...\n");
+            exit(0);
+        }
+    }
+
+    return 0;
+}
+
 
 
 //
@@ -2382,26 +2440,15 @@ int main ( int argc, char *argv[] )
 
     while (1){
         if ( rtl_get_event() == TRUE ){  
-            
-            // #todo
-            // terminalProcedure ( 
-            //    client_fd,
-            //    RTLEventBuffer[0], 
-            //    RTLEventBuffer[1], 
-            //    RTLEventBuffer[2], 
-            //    RTLEventBuffer[3] );
-        
-            // F1
-            if ( RTLEventBuffer[1] == MSG_SYSKEYDOWN )
-            {
-                if ( RTLEventBuffer[2] == VK_F4 ){
-                    printf("terminal: Exiting ...\n");
-                    exit(0);
-                }
-            }
-        
+            terminalProcedure ( 
+                client_fd,
+                RTLEventBuffer[0], 
+                RTLEventBuffer[1], 
+                RTLEventBuffer[2], 
+                RTLEventBuffer[3] ); 
         }
     };
+
 
  
 //exit:
