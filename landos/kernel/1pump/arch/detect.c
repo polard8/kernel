@@ -25,23 +25,18 @@
 int detect_IsQEMU(void)
 {
 
-
-    if( (void*) processor == NULL )
-    {
+    if ( (void *) processor == NULL ){
         panic ("detect_IsQEMU: FAIL\n");
-        //return -1;
     }
 
     if ( processor->hvName[0] == CPUID_HV_QEMU_1 &&
          processor->hvName[1] == CPUID_HV_QEMU_2 &&
          processor->hvName[2] == CPUID_HV_QEMU_3 )
     {
-         //panic ("detect_IsQEMU: TRUE\n");
          g_is_qemu = TRUE;
          return TRUE;
     }
 
-    //panic ("detect_IsQEMU: FALSE\n");
     g_is_qemu = FALSE;
 
     return FALSE;
@@ -99,8 +94,9 @@ int KeTestCPU (void)
     processors_count = 1;
     
     // Clenning th list.
-    for (i=0; i<PROCESSORS_MAX_COUNT; i++)
+    for (i=0; i<PROCESSORS_MAX_COUNT; i++){
         processorsList[i] = 0;
+    };
 
    
     // If we are in a UP system, so we're gonna use
@@ -109,7 +105,9 @@ int KeTestCPU (void)
     
     // ...
 
-    get_cpu_intel_parameters ();
+    // See: x86.c
+    
+    get_cpu_intel_parameters();
  
     return 0;
 }

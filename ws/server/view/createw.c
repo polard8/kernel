@@ -126,6 +126,10 @@ createwDrawFrame (
     unsigned long border_size=0;
 
 
+    // COLOR_BLUE1 = Light blue
+    unsigned long TitleBarColor = 0x00000E80;     // Dark blue
+
+
     gwssrv_debug_print ("createwDrawFrame:\n");
 
  
@@ -332,7 +336,7 @@ createwDrawFrame (
                                 border_size, border_size, 
                                 (window->width - border_size - border_size), window->titlebar_height, 
                                 (struct gws_window_d *) window, 
-                                0, COLOR_BLUE1, COLOR_BLUE1 );  
+                                0, TitleBarColor, TitleBarColor );  
 
         if ( (void *) TitleBar == NULL ){
             gwssrv_debug_print ("createwDrawFrame: TitleBar fail \n");

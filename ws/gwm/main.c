@@ -93,7 +93,15 @@ unsigned long menu0Itens[8];
 // ...
 
 
+//
+// Windows
+//
 
+int wStartMenu = -1;
+// ...
+
+
+// ==========================
 int MOUSE_WINDOW = -1;
 
 // i8042 mouse status bit.
@@ -293,18 +301,30 @@ gwmProcedure (
 
     switch (msg){
 
+
+        case MSG_KEYDOWN:
+            switch(long1){
+                case VK_TAB:  update(fd);  break;
+            };
+            break;
+
+
         case MSG_SYSKEYDOWN:
             switch(long1)
             {
                 case VK_F1:
                     printf ("F1\n");
+                    // #test
+                    gws_clone_and_execute("terminal.bin");
                     break;
 
                 case VK_F2:
                     printf ("F2\n");
+                    // #test
+                    gws_clone_and_execute("editor.bin");
                     //create_tester_client(fd);
                     //test_create_menu (fd,c_tester->window);
-                    test_create_menu (fd,c_bg->window);
+                    //test_create_menu (fd,c_bg->window);
                     //gws_refresh_window(fd,c_topbar->window);
                     break;
                 
@@ -318,13 +338,27 @@ gwmProcedure (
                     //gws_draw_text(
                     //    fd, c_bg->window,
                     //    80, 80, COLOR_YELLOW, "DUCK");
-                        
                     break;
+                
+                case VK_F4:
+                    printf("gwm: Exiting ...\n");
+                    exit(0);
+                    break;
+                
+                default:
+                    break;
+                
+                // ...
             };
             break;
 
+
         case MSG_SYSKEYUP:
             //printf ("MSG_SYSKEYUP:\n");
+            break;
+        
+        default:
+            // Nothing
             break;
     };
 
@@ -449,14 +483,14 @@ void parse_data_packet (int fd, char data, char x, char y)
 
 
 
-        if ( MOUSE_WINDOW > 0 ){
+    if ( MOUSE_WINDOW > 0 ){
 
-            gws_change_window_position(fd,MOUSE_WINDOW, mouse_x, mouse_y);
-            //gws_change_window_position(fd,c_tester->title_window, i*10, i*10);
+        gws_change_window_position(fd,MOUSE_WINDOW, mouse_x, mouse_y);
+        //gws_change_window_position(fd,c_tester->title_window, i*10, i*10);
 
-            gws_redraw_window(fd,MOUSE_WINDOW,1); 
-            //gws_redraw_window(fd,c_tester->title_window,1); 
-        }
+        gws_redraw_window(fd,MOUSE_WINDOW,1); 
+        //gws_redraw_window(fd,c_tester->title_window,1); 
+    }
 }
 
 
@@ -694,6 +728,8 @@ int create_bg_client(int fd)
     unsigned long w = gws_get_system_metrics(1);
     unsigned long h = gws_get_system_metrics(2);
 
+    int hasMouseWindow = FALSE;
+
 
     savedW = w;
     savedH = h;
@@ -729,9 +765,9 @@ int create_bg_client(int fd)
 
         //c_bg
         c_bg->window = gws_create_window (fd,
-            WT_SIMPLE,1,1,"BG",
+            WT_SIMPLE,1,1,"Background",
             0, 0, w, h,
-            0,0, 0xD5D5D5, 0xD5D5D5); 
+            0,0, COLOR_BACKGROUND, COLOR_BACKGROUND); 
         
         if (c_bg->window < 0){
             printf ("gwm: c_bg->window fail\n");
@@ -747,6 +783,8 @@ int create_bg_client(int fd)
     // == Mouse window ==================
     //
 
+    if (hasMouseWindow==TRUE){
+
     // Window.
     MOUSE_WINDOW = gws_create_window (
                        fd,
@@ -757,6 +795,7 @@ int create_bg_client(int fd)
     if ( MOUSE_WINDOW < 0){
         printf ("gwm: MOUSE_WINDOW fail\n");
         exit(1);
+    }
     }
 
     return 0;
@@ -840,9 +879,31 @@ int create_taskbar_client(int fd)
     //
     // == Taskbar (Client) ==================================
     //
-    
+
+    int button0_window = -1;    // Start menu button
     int button1_window = -1;
     int button2_window = -1;
+
+
+    unsigned long ButtonAreaWidth=120;
+    unsigned long ButtonMaxWidth=120;
+    int ButtonMaxNumber=2;
+
+    //
+    // hack
+    //
+    
+    if ( w == 320 || w == 640 ){
+        ButtonAreaWidth = w-100;
+        ButtonMaxWidth = ButtonAreaWidth/3;
+        ButtonMaxNumber=3;
+    }
+
+    if ( w > 640 ){
+        ButtonAreaWidth = w-100;
+        ButtonMaxWidth = ButtonAreaWidth/4;
+        ButtonMaxNumber=4;
+    }
 
 
     //if (fd<0)
@@ -884,22 +945,37 @@ int create_taskbar_client(int fd)
         c_taskbar->title_window = -1;  //todo 
 
         // ================================
-        // button1
-        button1_window = gws_create_window (fd,
-                              WT_BUTTON,1,1,"App1",
-                              2, 2, 120, 28,
+        // button0
+        button0_window = gws_create_window (fd,
+                              WT_BUTTON,1,1,"Start",
+                              2, 2, 80, 28,
                               c_taskbar->window, 0,COLOR_GRAY, COLOR_GRAY);
 
-        taskbarList[0] = button1_window;
+
+        wStartMenu = button0_window;
+        taskbarList[0] = button0_window;
 
         // ================================
-         // button2
-        button2_window = gws_create_window (fd,
+        // button1
+        button1_window = gws_create_window (fd,
                               WT_BUTTON,1,1,"App2",
-                              2 + 120 + 2, 2, 120, 28,
+                              2 +ButtonMaxWidth+2 , 2, 
+                              ButtonMaxWidth, 28,
                               c_taskbar->window, 0,COLOR_GRAY, COLOR_GRAY);
 
-        taskbarList[1] = button2_window;
+        taskbarList[1] = button1_window;
+
+
+        // ================================
+        // button2
+        button2_window = gws_create_window (fd,
+                              WT_BUTTON,1,1,"App2",
+                              2 +ButtonMaxWidth+2 +ButtonMaxWidth+2, 
+                              2, ButtonMaxWidth, 28,
+                              c_taskbar->window, 0,COLOR_GRAY, COLOR_GRAY);
+
+        taskbarList[2] = button2_window;
+
 
         wmclientList[2] = (unsigned long) c_taskbar;
     };
@@ -1143,13 +1219,13 @@ int update(int fd)
 
     if ( (void*) c_bg != NULL ){
         gws_redraw_window(fd,c_bg->window,TRUE);
-        if ( (void*) c_topbar != NULL ){
-            gws_redraw_window(fd,c_topbar->window,TRUE);
+        //if ( (void*) c_topbar != NULL ){
+            //gws_redraw_window(fd,c_topbar->window,TRUE);
             if ( (void*) c_taskbar != NULL ){
                 gws_redraw_window(fd,c_taskbar->window,TRUE);
                 //goto _more;
             }
-        }
+        //}
     }
 
     //return -1;
@@ -1217,7 +1293,7 @@ int main ( int argc, char *argv[] ){
     //
     
     create_bg_client(client_fd);
-    create_topbar_client(client_fd);
+    //create_topbar_client(client_fd);
     create_taskbar_client(client_fd);
     // ...
 

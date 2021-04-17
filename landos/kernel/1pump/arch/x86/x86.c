@@ -727,7 +727,17 @@ void get_cpu_intel_parameters (void)
     // EAX=7, ECX=0: Extended Features
     // EAX=7, ECX=1: Extended Features
     
-   
+
+    // ==========================================================
+    // hypervisor level 4000_0000h
+    cpuid ( 0x40000000, eax, ebx, ecx, edx );
+    processor->hvName[0] = ebx;
+    processor->hvName[1] = ecx;
+    processor->hvName[2] = edx;
+    processor->hvName[3] = 0;
+
+
+
     //========================================
     // EAX=80000000h: Get Highest Extended Function Implemented
 

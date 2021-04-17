@@ -2280,16 +2280,17 @@ int main ( int argc, char *argv[] )
     //terminal_createwindow_response(client_fd); 
 
 
-
+    // main window
     unsigned long mwLeft   = 8;
     unsigned long mwTop    = 8;
     unsigned long mwWidth  = (w/2);
-    unsigned long mwHeight = h - 16;
+    unsigned long mwHeight = (h/2);  //h-16;
 
-    unsigned long wLeft   = 4;
+    // client window ?
+    unsigned long wLeft   = 2;
     unsigned long wTop    = 36;  // title bar
-    unsigned long wWidth  =  mwWidth - 8;
-    unsigned long wHeight =  mwHeight - 36 - 8;
+    unsigned long wWidth  =  mwWidth  - 4;
+    unsigned long wHeight =  mwHeight - 36 - 4;
 
 
     //
@@ -2299,7 +2300,7 @@ int main ( int argc, char *argv[] )
     main_window = gws_create_window (client_fd,
                       WT_OVERLAPPED, 1, 1, "Terminal",
                       mwLeft, mwTop, mwWidth, mwHeight,
-                      0,0,COLOR_RED, COLOR_RED);
+                      0,0,COLOR_RED,COLOR_RED);
 
     //
     // terminal window.
@@ -2370,30 +2371,37 @@ int main ( int argc, char *argv[] )
     // com o input no terminal
     
     // Write something in the standard stream and call shell.bin.
-    test_standard_stream(client_fd);
+    // test_standard_stream(client_fd);
 
     //
     // Loop!
     //
 
-    // loop
-    // This the loop that gets messages from the window server;
-    //  terminal_loop(client_fd);
 
-    //get current thread
-    //int cThread = (int) sc82 (10010,0,0,0);
-    //set foreground thread.
-    //sc82 (10011,cThread,cThread,cThread);
+    rtl_focus_on_this_thread();
 
-    
-    while(1){
-    
-        // #todo
-        // Setup this thread as foreground thread
-        // to receive the input.
-        // See: gws.c
-        // rtl_get_event()
-    }; 
+    while (1){
+        if ( rtl_get_event() == TRUE ){  
+            
+            // #todo
+            // terminalProcedure ( 
+            //    client_fd,
+            //    RTLEventBuffer[0], 
+            //    RTLEventBuffer[1], 
+            //    RTLEventBuffer[2], 
+            //    RTLEventBuffer[3] );
+        
+            // F1
+            if ( RTLEventBuffer[1] == MSG_SYSKEYDOWN )
+            {
+                if ( RTLEventBuffer[2] == VK_F4 ){
+                    printf("terminal: Exiting ...\n");
+                    exit(0);
+                }
+            }
+        
+        }
+    };
 
  
 //exit:

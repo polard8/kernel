@@ -19,9 +19,9 @@
 
 
 // Vendor Strings. 
-#define CPUID_VENDOR_INTEL         "GenuineIntel"  // Intel.     
+#define CPUID_VENDOR_INTEL         "GenuineIntel"  // Intel.
 #define CPUID_VENDOR_AMD           "AuthenticAMD"  // AMD.
-#define CPUID_VENDOR_OLDAMD        "AMDisbetter!"  // AMD.   
+#define CPUID_VENDOR_OLDAMD        "AMDisbetter!"  // AMD.
 #define CPUID_VENDOR_VIA           "CentaurHauls"  // VIA.
 #define CPUID_VENDOR_SIS           "SiS SiS SiS "  // SIS.
 #define CPUID_VENDOR_OLDTRANSMETA  "TransmetaCPU"
@@ -46,12 +46,18 @@
 #define CPUID_VENDOR_AMD_3    0x444d4163    //"cAMD"
 
 
+//" KVMKVMKVM " – KVM
+//"TCGTCGTCGTCG" – QEMU
+//"Microsoft Hv" – Microsoft Hyper-V or Windows Virtual PC
+//"VMwareVMware" – VMware
+// ...
 
 // QEMU hypervisor
 // invertido
-#define CPUID_HV_QEMU_1  0x54474354  // 0x54434754    // TCGT
-#define CPUID_HV_QEMU_2  0x43544743 // 0x43475443    // CGTC
-#define CPUID_HV_QEMU_3  0x47435447 // 0x47544347    // GTCG
+// "TCGTCGTCGTCG"
+#define CPUID_HV_QEMU_1  0x54474354  // 0x54434754  TCGT
+#define CPUID_HV_QEMU_2  0x43544743  // 0x43475443  CGTC
+#define CPUID_HV_QEMU_3  0x47435447  // 0x47544347  GTCG
 
 
 

@@ -807,9 +807,19 @@ editorProcedure (
             break;
 
         // 22 = MSG_SYSKEYDOWN
-        case 22:
-            printf ("MSG_SYSKEYDOWN\n");
+        //case 22:
+            //printf ("MSG_SYSKEYDOWN\n");
+            //break;
+
+        case MSG_SYSKEYDOWN:
+            switch(long1)
+            {
+                case VK_F1:
+                    gws_clone_and_execute("terminal.bin");
+                    break;
+            }
             break;
+
 
         default:
             return 0;

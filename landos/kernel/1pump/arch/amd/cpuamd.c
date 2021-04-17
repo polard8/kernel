@@ -141,7 +141,9 @@ void get_cpu_amd_parameters (void)
     //CPUID Fn0000_000D_EBX_x3E Processor Extended State Enumeration (ECX=62)
     //CPUID Fn0000_000D_ECX_x3E Processor Extended State Enumeration (ECX=62)
     //CPUID Fn0000_000D_EDX_x3E Processor Extended State Enumeration (ECX=62)
-    
+
+
+
     // ==========================================================
     // hypervisor level 4000_0000h
     cpuid ( 0x40000000, eax, ebx, ecx, edx );
