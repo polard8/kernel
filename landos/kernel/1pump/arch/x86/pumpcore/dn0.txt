@@ -1,14 +1,16 @@
+	Pumpcore - This is the niddle.
 
-	appmx:
-	Application multiplexer.
-	This is the entrypoint for the applications via software interrupt.
 
-	bootmx:
-	Boot multiplexer.
-	This is called by boot.asm to make the initialization.
+	head_32.asm:
+	The entry point for the kernel.
 
-	iomx:
-	This is the entrypoint for the devices via hardware interrupt.
+	head/
+	Initialization.
 
-	boot.asm:
-	This is the entrypoint of the kernel via BL.BIN.
+	hw/
+	Hardware interrupts.
+
+	sw/
+	Software interrupts.
+
+
