@@ -363,13 +363,16 @@ gws_send_event (
 unsigned long gws_explode_byte (unsigned char data);
 
 
+
 void
 gws_async_command ( 
     int fd, 
     unsigned long request,
-    unsigned long sub_request );
+    unsigned long sub_request,
+    unsigned long data );
 
 
+void gws_send_wm_magic ( int fd, int pid );
 
 struct gws_display_d *gws_open_display(char *display_name);
 

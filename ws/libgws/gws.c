@@ -3464,6 +3464,7 @@ int gws_create_empty_directory ( char *dir_name )
 }
 
 
+
 // Send async request.
 // No response.
 // IN: fd, request number, subrequest.
@@ -3471,7 +3472,8 @@ void
 gws_async_command ( 
     int fd, 
     unsigned long request,
-    unsigned long sub_request )
+    unsigned long sub_request,
+    unsigned long data )
 {
 
     // Isso permite ler a mensagem na forma de longs.
@@ -3524,6 +3526,24 @@ gws_async_command (
     // No return.
 
     return; 
+}
+
+
+// #test
+// No response.
+// Sending the wm's pid to the ws.
+// Don't trust in method. There is no response.
+// We can use this to broadcast.
+void gws_send_wm_magic ( int fd, int pid )
+{
+
+    if(fd<0)
+        return;
+
+    if(pid<0)
+        return;
+
+    gws_async_command(fd,7,0,pid);
 }
 
 

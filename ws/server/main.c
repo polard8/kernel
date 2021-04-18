@@ -84,7 +84,12 @@ char *displayNum;
 char *screenNum;
 
 int running = FALSE;
+
 int ____saved_server_fd = -1;
+
+// The wm sends us its pid
+int ____saved_wm_magic_pid = -1;
+
 
 int Notify_PongClient=FALSE;
 int NoReply = FALSE;
@@ -430,13 +435,9 @@ void xxxHandleNextClientRequest (int fd)
     // Fail, cleaning.
     if (fd<0){
         gwssrv_debug_print ("xxxHandleNextClientRequest: xxxHandleNextClientRequest fd\n");
-        message_buffer[0] = 0;
-        message_buffer[1] = 0;
-        message_buffer[2] = 0;
-        message_buffer[3] = 0;
-        gwssrv_yield(); 
-        return;
+        goto exit2;
     }
+
 
 //__loop:
 
@@ -462,21 +463,15 @@ void xxxHandleNextClientRequest (int fd)
     }
     */
 
-    int value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
-
-    //printf ("VALUE {%d} \n", value);
-
     // #important
     // We can handle only requests.
+    // Drop it!
 
-    if ( value != ACTION_REQUEST )
-    {
-        //printf("not a request\n");
+    int value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
+
+    if ( value != ACTION_REQUEST ){
         gwssrv_yield();
-        // exit(0);  //debug
-        
-        // drop it!
-        return;
+        goto exit0;
     }
 
     // #todo
@@ -492,17 +487,12 @@ void xxxHandleNextClientRequest (int fd)
     n_reads = read ( fd, __buffer, sizeof(__buffer) );
     //n_reads = recv ( fd, __buffer, sizeof(__buffer), 0 );
 
+
     // Precisamos fechar o client e yield.
     // Cleaning
-    if (n_reads <= 0)
-    {
+    if (n_reads <= 0){
         gwssrv_debug_print ("xxxHandleNextClientRequest: read fail\n");
-        message_buffer[0] = 0;
-        message_buffer[1] = 0;
-        message_buffer[2] = 0;
-        message_buffer[3] = 0;
-        gwssrv_yield(); 
-        return;
+        goto exit2;
     }
 
     // Nesse momento lemos alguma coisa.   
@@ -512,16 +502,11 @@ void xxxHandleNextClientRequest (int fd)
     //
  
     // Invalid request. Yield and clean.
-    if (message_buffer[1] == 0 )
-    {
+    if (message_buffer[1] == 0 ){
         gwssrv_debug_print ("xxxHandleNextClientRequest: Invalid request!\n");
-        message_buffer[0] = 0;
-        message_buffer[1] = 0;
-        message_buffer[2] = 0;
-        message_buffer[3] = 0;
-        gwssrv_yield();
-        return;
+        goto exit2;
     }
+
 
     // #test
     // Input solicitado por um cliente
@@ -589,11 +574,10 @@ void xxxHandleNextClientRequest (int fd)
     // Entao precisamos modificar a flag de sincronizaçao.
     // que ainda deve estar sinalizando um request.
     
-    if (NoReply == TRUE)
-    {
+    if (NoReply == TRUE){
         rtl_set_file_sync( 
             fd, SYNC_REQUEST_SET_ACTION, ACTION_NULL );
-        return;
+        goto exit0;
     }
 
     //gwssrv_debug_print ("Sending response ...\n");  
@@ -668,20 +652,31 @@ void xxxHandleNextClientRequest (int fd)
         gwssrv_debug_print ("xxxHandleNextClientRequest:  response fail\n");
         printf("gwssrv-xxxHandleNextClientRequest: Couldn't send reply\n");
         //close(fd);
-        gwssrv_yield();
-        return;
+        goto exit2;
     }
 
     // YES, We sent a response.
     if (n_writes>0){
        gwssrv_debug_print ("xxxHandleNextClientRequest: Response sent\n");
+        goto exit0;
     }
 
-    // #bugbug
-    // Isso deixa as coisas mais lentas.
+    // ??
 
+exit2:
+    message_buffer[0] = 0;
+    message_buffer[1] = 0;
+    message_buffer[2] = 0;
+    message_buffer[3] = 0;
+    message_buffer[4] = 0;
+    message_buffer[5] = 0;
+exit1:
     gwssrv_yield();
+exit0:
+    return;
 }
+
+
 
 /*
  //#test
@@ -1766,16 +1761,18 @@ int serviceAsyncCommand (void)
     unsigned long message_id =0;
     unsigned long request_id =0;
     unsigned long subrequest_id = 0;
-
+    unsigned long Data = 0;
 
     //
     // parameters
     //
 
-    // window_id      = message_address[0];
+    // window_id   = message_address[0];
     message_id     = message_address[1]; 
     request_id     = message_address[2]; 
     subrequest_id  = message_address[3];
+    Data          = message_address[4];
+
 
     // ...
 
@@ -1784,46 +1781,49 @@ int serviceAsyncCommand (void)
 
     if (message_id != 2222)
     {
-        gwssrv_debug_print ("gwssrv_init_client_support: [ERROR] message id\n");
-                    printf ("gwssrv_init_client_support: [ERROR] message id\n");
+        gwssrv_debug_print ("serviceAsyncCommand: [ERROR] message id\n");
+                    printf ("serviceAsyncCommand: [ERROR] message id\n");
         return -1;
     }
 
 
     // #debug
-    // printf ("gwssrv_init_client_support: [request %d] \n", request_id);
+    // printf ("serviceAsyncCommand: [request %d] \n", request_id);
  
     switch (request_id){
 
         // 1 =  Close server.
         case 1:
-            gwssrv_debug_print ("gwssrv_init_client_support: [request 1] Closing server\n");
-                        //printf ("gwssrv_init_client_support: [request 1] Closing server\n");
-            printf("gwssrv: Close server\n");
+            gwssrv_debug_print ("serviceAsyncCommand: [request 1] Closing server\n");
+                        //printf ("serviceAsyncCommand: [request 1] Closing server\n");
+            printf("serviceAsyncCommand: Close server\n");
             exit(0);
             break;
 
         case 2:
-            gwssrv_debug_print ("gwssrv_init_client_support: [request 2] \n");
+            gwssrv_debug_print ("serviceAsyncCommand: [request 2] \n");
             printf("PING\n");
             //Notify_CloseClient = TRUE;
             //Notify_PongClient = TRUE;
             //exit(0);
+            return 0;
             break;
 
         case 3:
-            gwssrv_debug_print ("gwssrv_init_client_support: [request 3] hello\n");
+            gwssrv_debug_print ("serviceAsyncCommand: [request 3] hello\n");
             printf("HELLO\n");
             //exit(0);
+            return 0;
             break;
         
         // See: demos.c
         case 4:
             if (current_mode == GRAMADO_JAIL)
             {
-                gwssrv_debug_print("gwssrv_init_client_support: [request 4] demo\n"); 
+                gwssrv_debug_print("serviceAsyncCommand: [request 4] demo\n"); 
                 demos_startup_animation(subrequest_id);
                 gwssrv_show_backbuffer();
+                return 0;
             }
             break;
 
@@ -1833,6 +1833,7 @@ int serviceAsyncCommand (void)
            {
                rectBackbufferDrawRectangle ( 
                    0, 0, 320, 200, COLOR_BLACK, 1 );
+               return 0;
            }
            break;
 
@@ -1846,11 +1847,20 @@ int serviceAsyncCommand (void)
             show_fps_window = FALSE;
             break;
 
+         // Register wm pid
+         case 7:
+            gwssrv_debug_print ("serviceAsyncCommand: [7] Register wm pid\n");
+             //printf ("serviceAsyncCommand: [7] [BREAKPOINT] Register wm pid\n");
+             ____saved_wm_magic_pid = (int) Data;
+             //exit(0);
+             return 0;
+             break;
+
         // ...
                 
         default:
-            gwssrv_debug_print ("gwssrv_init_client_support: [ERROR] bad request\n");
-                     // printf ("gwssrv_init_client_support: [ERROR] bad request\n");
+            gwssrv_debug_print ("serviceAsyncCommand: [ERROR] bad request\n");
+                     // printf ("serviceAsyncCommand: [ERROR] bad request\n");
             // return -1;
             break;
     };

@@ -1304,6 +1304,15 @@ int main ( int argc, char *argv[] ){
     //gws_show_background();
     //while(1){}
 
+
+    /*
+    // #test
+    // Sending the wm's pid to the ws.
+    // Don't trust in method. There is no response.
+    pid_t pid = getpid();
+    gws_send_wm_magic(client_fd,pid);
+    */
+
     //
     // == Loop ==============================
     //

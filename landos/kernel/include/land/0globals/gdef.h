@@ -176,10 +176,14 @@ typedef enum {
 }os_type_t;
 
 
+//
+// The boot block structure.
+//
 
 
 struct boot_block_d
 {
+    unsigned long bootblock_address;  //pa ?? va ??
     unsigned long lfb;
     unsigned long x;
     unsigned long y;
@@ -193,6 +197,7 @@ struct boot_block_d
     unsigned long boot_mode; 
     unsigned long gramado_mode;
     //...
+    int initialized;
 };
 
 struct boot_block_d BootBlock;

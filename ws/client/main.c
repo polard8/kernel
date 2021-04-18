@@ -313,32 +313,32 @@ gwsProcedure (
                     // #test
                     // Setup the flag to show or not the fps window.
                     // Request number 6.
-                    gws_async_command(fd,6,TRUE);
+                    gws_async_command(fd,6,TRUE,0);
                     break;
 
 
                 // 9~12
                 case VK_F9 : 
-                    gws_async_command(fd,4,1);
-                    //gws_async_command(fd,1,0);
-                    //gws_async_command(fd,4,9);  // cat
-                    //gws_async_command(fd,4,1);
-                    //gws_async_command(fd,4,2);
+                    gws_async_command(fd,4,1,0);
+                    //gws_async_command(fd,1,0,0);
+                    //gws_async_command(fd,4,9,0);  // cat
+                    //gws_async_command(fd,4,1,0);
+                    //gws_async_command(fd,4,2,0);
                     //gws_clone_and_execute("browser.bin"); 
                     break;
                 case VK_F10: 
-                    gws_async_command(fd,4,6);
+                    gws_async_command(fd,4,6,0);
                     //gws_clone_and_execute("browser.bin"); 
                     break;
                 case VK_F11: 
-                    gws_async_command(fd,4,7);
+                    gws_async_command(fd,4,7,0);
                     //gws_clone_and_execute("browser.bin"); 
                     break;
                 case VK_F12: 
-                    //gws_async_command(fd,4,9);
-                    //gws_async_command(fd,4,10);   //triangle
-                    gws_async_command(fd,4,11); //polygon
-                    //gws_async_command(fd,4,12); //lines
+                    //gws_async_command(fd,4,9,0);
+                    //gws_async_command(fd,4,10,0);   //triangle
+                    gws_async_command(fd,4,11,0); //polygon
+                    //gws_async_command(fd,4,12,0); //lines
                     //gws_clone_and_execute("browser.bin"); 
                     break;
  
@@ -459,7 +459,7 @@ int main ( int argc, char *argv[] )
 
     //while(1){
     // Hello
-    //gws_async_command(client_fd,3,0);
+    //gws_async_command(client_fd,3,0,0);
     //}
 
 
@@ -728,7 +728,7 @@ int main ( int argc, char *argv[] )
 
 
     // #test: Chamando um demo.
-    // gws_async_command(client_fd,4,9); //cat
+    // gws_async_command(client_fd,4,9,0); //cat
 
 
 
@@ -809,7 +809,7 @@ int main ( int argc, char *argv[] )
     // Setup the flag to show or not the fps window.
     // Request number 6.
 
-    gws_async_command(client_fd,6,FALSE);
+    gws_async_command(client_fd,6,FALSE,0);
 
 
     //=================================
@@ -852,14 +852,14 @@ int main ( int argc, char *argv[] )
 
     // Isso ehestranho ... um cliente remoto nao deve poder fazer isso.
     //gws_debug_print ("gws: Sending command to close the server. \n");
-    gws_async_command(client_fd,1,0);
+    gws_async_command(client_fd,1,0,0);
     //exit(0);
 
     // Asking to server to send me an notification
     // telling me to close myself
     
     //gws_debug_print ("gws: Pinging\n");
-    //gws_async_command(client_fd,2,0);
+    //gws_async_command(client_fd,2,0,0);
 
 
     while(1){}
@@ -886,7 +886,7 @@ int main ( int argc, char *argv[] )
              event_buffer[3] == 'g' )
         {
             printf("PONG\n");
-            gws_async_command(client_fd,1,0);
+            gws_async_command(client_fd,1,0,0);
         }
     };
     */

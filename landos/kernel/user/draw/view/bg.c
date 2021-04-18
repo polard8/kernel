@@ -217,39 +217,6 @@ int Background_initialize(void)
     // Nao funciona
     // set_up_cursor(0,4);
 
-    // #debug
-    // Breakpoint
-    // This is used to debug.
-    // Show info and hang.
-
-
-    //
-    // The first char!
-    //
-   
-    // This is the first char ever for 
-    // the new background.
-
-    printf ("$\n");
-
-
-    // ========================================
-    
-    printf ("Background_initialize: [DEBUG] Show bootblock info\n");
-    printf ("Boot block pa %x\n",SavedBootBlock); 
-    printf ("lfb %x\n",BootBlock.lfb);
-    printf ("x   %d\n",BootBlock.x);
-    printf ("y   %d\n",BootBlock.y);
-    printf ("bpp %d\n",BootBlock.bpp);
-    printf (">>>  Gramado mode %d\n", BootBlock.gramado_mode);
-    
-    //
-    // Refresh
-    //
-
-    refresh_screen();
-    //while(1){}
-
     return 0;
 }
 

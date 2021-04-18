@@ -79,8 +79,11 @@ struct kernel_d Kernel;
 
 
 // internal
+// #todo: Talvez isso precise retornar int.
 void preinit_Globals(int arch_type)
 {
+    BootBlock.initialized = FALSE;
+    
     // Current arch support.
     // We received this arg from Assembly.
 
@@ -88,10 +91,6 @@ void preinit_Globals(int arch_type)
 
     // Kernel status.
     KernelStatus = KERNEL_NULL;
-    
-
-
-
 
 
     // ...
@@ -104,9 +103,12 @@ void preinit_Globals(int arch_type)
     // #bugbug
     // Talvez esse endereço nao esteja acessivel ao kernel.
 
-     //See gdef.h
+    //See:
+    //landos/kernel/include/land/0globals/gdef.h
+
     unsigned long *base = (unsigned long *) SavedBootBlock;
-    
+
+    BootBlock.bootblock_address  = (unsigned long) SavedBootBlock;
     BootBlock.lfb                = (unsigned long) base[0];  //  0
     BootBlock.x                  = (unsigned long) base[1];  //  4
     BootBlock.y                  = (unsigned long) base[2];  //  8
@@ -119,7 +121,8 @@ void preinit_Globals(int arch_type)
     BootBlock.cylinders          = (unsigned long) base[9];  // 36
     BootBlock.boot_mode          = (unsigned long) base[10]; // 40
     BootBlock.gramado_mode       = (unsigned long) base[11]; // 44
-    
+    BootBlock.initialized = TRUE;
+
     //
     // == gramado mode =============================================
     //
@@ -163,6 +166,8 @@ void preinit_Globals(int arch_type)
     stdio_verbosemode_flag = TRUE;
 }
 
+// internal
+// #todo: Talvez isso precise retornar int.
 void preinit_Serial(void)
 {
     // Serial
@@ -171,6 +176,8 @@ void preinit_Serial(void)
     serial_init();
 }
 
+// internal
+// #todo: Talvez isso precise retornar int.
 void preinit_OutputSupport(void)
 {
 
@@ -196,10 +203,13 @@ void preinit_OutputSupport(void)
  * 
  */
 
+// #progress
+// name:level:sublevel
+
 int kernel_main (int arch_type)
 {
-
     int Status = (-1);
+
 
     // Globals
     // We do not have output yet
@@ -211,23 +221,30 @@ int kernel_main (int arch_type)
 
     preinit_Serial();
 
-
+    // =================================================
+    
+    //
     // #progress
     // name:level:sublevel
+    //
 
-    PROGRESS("-------------------------------------------------\n");
+    PROGRESS("----------------\n");
+    PROGRESS("  GRAMADO LAND  \n");
     // Now we have serial port output.
+
+    // =================================================
+
 
     PROGRESS("Kernel:0:1\n");
     // Initialize the virtual console structures.
-    // We do not have all the runtime support yet.
+    // #IMPORTAT: We do not have all the runtime support yet.
+    // We can't use printf yet.
 
     preinit_OutputSupport();
 
 
     PROGRESS("Kernel:0:2\n");
     // Show some basic info.
-    // Banner.
 
     debug_print ("Initializing landos kernel ...\n");
 
@@ -255,7 +272,12 @@ int kernel_main (int arch_type)
         case GRAMADO_CASTLE: debug_print ("GRAMADO_CASTLE\n"); break;
         //case GRAMADO_CALIFORNIA:
         // ...
-        default:  debug_print ("Not defined\n");  break;
+
+        // We can't use printf yet.
+        default:  
+            debug_print ("[FAIL] Not defined\n");  
+            goto fail1;
+            break;
     };
 
 
@@ -263,17 +285,22 @@ int kernel_main (int arch_type)
     debug_print ("arch: ");
     
     switch (current_arch){
+
         case CURRENT_ARCH_X86:  
             debug_print ("x86\n");  
             break;
+
+        // We can't use printf yet.
         case CURRENT_ARCH_X86_64:
-            debug_print ("x86_64 (Not supported)\n");
-            goto fail;
+            debug_print ("x86_64 [FAIL] Not supported\n");
+            goto fail1;
             break;
         // ...
+
+        // We can't use printf yet.
         default:
-            debug_print ("Not defined\n");
-            goto fail;
+            debug_print ("? [FAIL] Not defined\n");
+            goto fail1;
             break; 
     };
 
@@ -301,28 +328,40 @@ int kernel_main (int arch_type)
         debug_print ("[Kernel] kernel_main: GUI_ON\n");
         // ...
 
+    // We can't use printf yet.
     }else{
         g_useGUI          = GUI_OFF;
         VideoBlock.useGui = GUI_OFF;
-
-        // No message support at the moment ?!
         debug_print ("[Kernel] kernel_main: GUI_OFF\n");
         debug_print ("[Kernel] kernel_main: Text mode not supported! *hang");
-        asm ("cli \n");
-        while (1){  asm ("hlt \n");  };
+        goto fail1;
     };
+
 
     if (VideoBlock.useGui == GUI_ON){
         debug_print ("[Kernel] kernel_main: Using GUI\n");
     }
 
+    // ================================================
+
+    // Now we will initialize the video support,
+    // the runtime support and clean the background.
+    // This way we're gonna be able to use 'printf'.
+
+    //
+    // Video
+    //
+
     // In hid/video.c
     Video_initialize();
-    //printf("1\n");
 
     PROGRESS("Kernel:0:4\n");
     // Runtime
 
+
+    //
+    // Runtime
+    //
 
     // #bugbug:
     // We need the runtime initialization for the messages.
@@ -349,13 +388,40 @@ int kernel_main (int arch_type)
     // for the very first time.
     // Now we have a black screen.
     // But the cursor position is wrong yet.
-    
-    // See: dev/tty/vt/draw/view/bg.c
+
+    // See: user/draw/view/bg.c
     Background_initialize();
 
 
-    //refresh_screen();
-    //while(1){}
+    // ================================================
+
+    //
+    // The first char!
+    //
+   
+    // This is the first char ever for 
+    // the new background.
+
+    //See:
+    //landos/kernel/include/land/0globals/gdef.h
+
+    printf ("$\n");
+    printf ("GRAMADO LAND\n");
+
+    if ( BootBlock.initialized != TRUE ){
+        panic ("kernel_main: [FAIL] BootBlock not initialized!\n");
+    }
+
+    printf ("Boot block address %x\n",BootBlock.bootblock_address);  
+    printf ("lfb %x\n",BootBlock.lfb);
+    printf ("x   %d\n",BootBlock.x);
+    printf ("y   %d\n",BootBlock.y);
+    printf ("bpp %d\n",BootBlock.bpp);
+    printf (">>>  Gramado mode %d\n", BootBlock.gramado_mode);
+    refresh_screen();
+
+    // #debug
+    // while(1){}
 
 
     PROGRESS("Kernel:0:6\n"); 
@@ -370,7 +436,8 @@ int kernel_main (int arch_type)
 
         // See: x86/x86init.c
         case CURRENT_ARCH_X86:
-            debug_print ("[Kernel] kernel_main: Initializing x86 arch ...\n");
+            debug_print ("kernel_main: Initializing x86 arch ...\n");
+            printf("kernel_main: Initializing x86 arch ...\n");
             Status = (int) x86main();
             if (Status < 0)
                 panic("[Kernel] kernel_main: CURRENT_ARCH_X86 fail\n");
@@ -378,10 +445,10 @@ int kernel_main (int arch_type)
 
         // See:
         case CURRENT_ARCH_X86_64:
-            debug_print ("[Kernel] kernel_main: Initializing x86_64 arch ...\n");
-            debug_print ("[Kernel] kernel_main: Current arch not supported !\n *hang");
+            printf("kernel_main: [FAIL] x86_64 is not supported!\n");
+            debug_print ("[Kernel] kernel_main: [FAIL] x86_64 is not supported!\n");
             //Status = (int) x86_64main();
-            goto fail;
+            goto fail2;
             break;
 
         // See:
@@ -390,9 +457,9 @@ int kernel_main (int arch_type)
         // ...
 
         default:
-            debug_print ("[Kernel] kernel_main: Current arch not defined!\n ");
-            debug_print ("*Hang\n");
-            goto fail;
+            debug_print ("kernel_main: [FAIL] Current arch not defined!\n");
+            printf("kernel_main: [FAIL] Current arch not defined!");
+            goto fail2;
             break;
     };
 
@@ -400,10 +467,27 @@ int kernel_main (int arch_type)
     PROGRESS("Kernel:0:7\n"); 
     debug_print ("kernel_main: Something is wrong\n");
 
-fail:
+
+//
+// Fail
+//
+
+// Rule 22:
+// " When in doubt, know your way out. "
+
+// Console support.
+fail2:
+    printf ("kernel_main: Fail. *HANG\n");
+    refresh_screen();
+    
+// Only serial debug support.
+fail1:    
     PROGRESS("Kernel:0:0\n"); 
     debug_print ("[Kernel] kernel_main-fail:  *hang \n");
-    return (-1);
+
+// No output support.
+fail0:
+    return (int) (-1);
 }
 
 
