@@ -2338,10 +2338,11 @@ gws_plot0 (
         return -1;
     }
 
+    // Request
     __gws_plot0_request ( fd, x, y, z, color );
     rtl_set_file_sync ( fd, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );    
 
-
+    // Response
     // Waiting to read the response.
     while (1){
         Value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
@@ -2372,10 +2373,7 @@ gws_plotcube (
         return -1;
     }
 
-    //
     // Request
-    //
-
     // Enviamos um request e 
     // sinalizamos que tem um request no socket.
 
@@ -2383,26 +2381,14 @@ gws_plotcube (
     rtl_set_file_sync ( fd, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );
 
 
-    //int CanRead=-1;
-    //CanRead = rtl_sleep_if_socket_is_empty(fd);
-    
-    //if(CanRead != TRUE)
-    //    return -1; // no response.
-    
-    // YES, We can read the response.
-    //if(CanRead == TRUE)
-    
+    // Response
     // Waiting to read the response.
-
     while (1){
         Value = rtl_get_file_sync ( fd, SYNC_REQUEST_GET_ACTION );
         if (Value == ACTION_REPLY ) { break; }
         if (Value == ACTION_ERROR ) { return -1; }
         gws_yield();
     };
-
-    // Response.
-
     __gws_plotcube_response(fd);
 
     return 0;
@@ -2431,20 +2417,11 @@ gws_plotrectangle (
         return -1;
     }
 
+    // Request
     __gws_plotrectangle_request ( fd, (struct gr_rectangle_d *) rect );
     rtl_set_file_sync ( fd, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST ); 
 
-
-    //int CanRead=-1;
-    //CanRead = rtl_sleep_if_socket_is_empty(fd);
-    
-    //if(CanRead != TRUE)
-    //    return -1; // no response.
-    
-    // YES, We can read the response.
-    //if(CanRead == TRUE)
-
-
+    // Response
     // Waiting to read the response.
     while (1){
         Value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
@@ -2484,8 +2461,9 @@ gws_draw_char (
         return -1;
     }
 
-    gws_debug_print("gws_draw_char: request\n");
 
+    // Request
+    gws_debug_print("gws_draw_char: request\n");
     __gws_drawchar_request (
         (int) fd,             // fd
         (int) window,         // window id
@@ -2496,28 +2474,15 @@ gws_draw_char (
     rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );
 
 
-    // #todo
-    // We realy need a response ?
-    gws_debug_print("gws_draw_char: response\n");
-
     // Response
-    //int CanRead=-1;
-    //CanRead = rtl_sleep_if_socket_is_empty(fd);
-    
-    //if(CanRead != TRUE)
-    //    return -1; // no response.
-    
-    // YES, We can read the response.
-    //if(CanRead == TRUE)
-     
     // Waiting to read the response.
+    gws_debug_print("gws_draw_char: response\n");
     while (1){
         Value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
         if (Value == ACTION_REPLY ) { break; }
         if (Value == ACTION_ERROR ) { return -1; }
         gws_yield();
     };
-
     response = __gws_drawchar_response ((int) fd);  
 
     gws_debug_print("gws_draw_char: done\n");
@@ -2553,20 +2518,21 @@ gws_draw_text (
 
     gws_debug_print("gws_draw_text: request\n");
 
+
+    // Request
     __gws_drawtext_request (
-        (int) fd,             // fd,
-        (int) window,         // window id,
-        (unsigned long) x,    // left,
-        (unsigned long) y,    // top,
+        (int) fd,             // fd
+        (int) window,         // window id
+        (unsigned long) x,    // left
+        (unsigned long) y,    // top
         (unsigned long) color,
         (char *) string );
     rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );
 
-    gws_debug_print("gws_draw_text: response\n");
 
-
-    
+    // Response
     // Waiting to read the response.
+    gws_debug_print("gws_draw_text: response\n");
     while (1){
         Value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
         if (Value == ACTION_REPLY ) { break; }
@@ -2577,6 +2543,7 @@ gws_draw_text (
     response = __gws_drawtext_response ((int) fd);  
 
     gws_debug_print("gws_draw_text: done\n");
+
     return (int) response;
 }
 
@@ -2865,10 +2832,12 @@ gws_redraw_window (
     // #todo
     // check the return values.
 
+
+    // Request
     __gws_redraw_window_request (fd,window,flags);
     rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );
 
-
+    // Response
     // Waiting to read the response.
     while (1){
         value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
@@ -2877,6 +2846,7 @@ gws_redraw_window (
         gws_yield();
     };
     __gws_redraw_window_reponse (fd);
+
     return 0;
 }
 
@@ -2906,9 +2876,12 @@ int gws_refresh_window (int fd, int window )
         return -1;
     }
 
+
+    // Request
     __gws_refresh_window_request(fd,window);
     rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );
 
+    // Response
     // Waiting to read the response.
     int value=0;
     while (1){
@@ -2918,6 +2891,7 @@ int gws_refresh_window (int fd, int window )
         gws_yield();
     };
     __gws_refresh_window_reponse(fd);
+ 
     return 0;
 }
 
@@ -2930,9 +2904,7 @@ int gws_refresh_window (int fd, int window )
  *     Given it's type.
  */
 
-
 // OUT: wid
-
 
 int
 gws_create_window ( 
@@ -2951,10 +2923,14 @@ gws_create_window (
     unsigned long color )      //12, Color (bg) (para janela simples).
  
 {
+    int value=0;
+
     int wid = -1;
+    char *Name;
+
 
     gws_debug_print("gws_create_window:\n");
-        
+
 
     if (fd<0){
         return -1;
@@ -2968,7 +2944,7 @@ gws_create_window (
     //#todo
     // use more arguments.
 
-    char *Name;
+
     // O nome passado.
     Name = windowname;
     if ( (void*) Name == NULL ){
@@ -2976,27 +2952,17 @@ gws_create_window (
     }
 
 
-
-
-    // Request.
-    __gws_createwindow_request ( fd, 
+    // Request
+    __gws_createwindow_request ( 
+        fd, 
         x, y, width, height, 
         color, type, parentwindow, Name);
     rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );
 
-     
     // Response
-    //int CanRead=-1;
-    //CanRead = rtl_sleep_if_socket_is_empty(fd);
-    
-    //if(CanRead != TRUE)
-    //    return -1; // no response.
-
-    // YES, We can read the response.
-    //if(CanRead == TRUE)
-
     // Waiting to read the response.
-    int value=0;
+    // Return the index returned by the window server.
+
     while (1){
         value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
         if (value == ACTION_REPLY ) { break; }
@@ -3005,9 +2971,8 @@ gws_create_window (
     };
     wid = (int) __gws_createwindow_response(fd); 
 
-    // Return the index returned by the window server.
-    
     gws_debug_print("gws_create_window: done\n");
+
     return (int) wid;
 }
 
@@ -3025,9 +2990,8 @@ void gws_refresh_yield (int fd)
 
     //refresh background
     gws_refresh_window (fd, -4); 
-    
-    //yield
-    sc82 (265,0,0,0);
+
+    gws_yield();
 }
 
 
@@ -3040,19 +3004,19 @@ void gws_refresh_yield2 (int fd, int window)
 
     gws_refresh_window (fd, window);
 
-    sc82 (265,0,0,0);
+    gws_yield();
 }
 
 void gws_yield_n_times (unsigned long n)
 {
     int i=0;
 
-    if (n == 0)
-        n=1;
 
-    for (i=0;i<n;i++){
-        sc82 (265,0,0,0);
-    };
+    if (n == 0){
+        n=1;
+    }
+
+    for (i=0; i<n; i++){  gws_yield();  };
 }
 
 
@@ -3156,6 +3120,9 @@ int gws_clone_and_execute ( char *name )
         return -1; 
     }
 
+    // #todo
+    // Ret = (int) rtl_clone_and_execute(name);
+    
     Ret = (int) sc82 ( 900, (unsigned long) name, 0, 0 );
 
     if (Ret<0){
@@ -3169,17 +3136,10 @@ int gws_clone_and_execute ( char *name )
 // Get system metrics.
 unsigned long gws_get_system_metrics (int index)
 {
-    //if (index<0){
-        //gde_debug_print ("gde_get_system_metrics: fail\n");
-        //return 0;
-    //}
-    
-    //#define	SYSTEMCALL_GETSYSTEMMETRICS  250
-    
-    return (unsigned long) gws_system_call ( 250, 
-                               (unsigned long) index, 
-                               (unsigned long) index, 
-                               (unsigned long) index );
+    // #todo: 
+    // Check parameter limits
+
+    return (unsigned long) rtl_get_system_metrics( (int) index );
 }
 
 
@@ -3434,8 +3394,14 @@ unsigned long gws_explode_byte (unsigned char data)
 
 
 // Create empty file.
+// #todo: Change parameter type to const char 
 int gws_create_empty_file ( char *file_name )
 {
+
+	// #todo
+	// Use rtl, not a systemcall.
+
+
     int __ret = 0;
 
 
@@ -3465,8 +3431,13 @@ int gws_create_empty_file ( char *file_name )
 
 
 // Create empty directory.
+// #todo: Change parameter type to const char 
 int gws_create_empty_directory ( char *dir_name )
 {
+
+	// #todo
+	// Use rtl, not a systemcall.
+
     int __ret=0;
 
 
