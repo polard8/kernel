@@ -1,5 +1,5 @@
 ;
-; File: x86/head.asm 
+; File: x86/pumpcore/head.asm 
 ; 
 ;     The kernel entry point for x86 processors.
 ;     32 bit.
@@ -109,14 +109,15 @@ extern _x86main
 
 head_init:
 
-    ;; Saving ...
+; Saving
+
     mov dword [_kArg1], eax
     mov dword [_kArg2], ebx
     mov dword [_kArg3], ecx
     mov dword [_kArg4], edx
 
-    ;; #debug
-    ;; The vga memory was mapped in 0x800000 by the boot loader.
+; #debug
+; The vga memory was mapped in 0x800000 by the boot loader.
 
     ;mov byte [0x800000], byte "K"
     ;mov byte [0x800001], byte 9
@@ -139,11 +140,12 @@ head_init:
     ;; Magic byte for gui mode.
     ;;
 
-    ;; This flag tell us that we are in graphics mode.
+; This flag tell us that we are in graphics mode.
+
     cmp al, byte 'G'
     je .LuseGUI
 
-;; Fail. No GUI.
+; Fail. No GUI.
 .Lfail_nogui:
     mov byte [0xb8000], byte "T"
     mov byte [0xb8001], byte 9
@@ -154,29 +156,30 @@ head_init:
     hlt
     jmp .Lnogui_hang
 
-;;
-;; == Use GUI =======================================
-;;
+;
+; == Use GUI =======================================
+;
 
 .LuseGUI:
 
-    ;; Check again.
+; Check again.
+
     cmp al, byte 'G'
     jne .Lfail_nogui
 
-    ;; #important
-    ;; Saving flags.
-    ;; 1=gui
+; #important
+; Saving flags.
+; 1=gui
 
     mov dword [_g_useGUI],       dword 1
     mov dword [_SavedBootMode],  dword 1
 
 
-    ;;
-    ;; == Boot block ========================================
-    ;;
+;
+; == Boot block ========================================
+;
 
-    ;; Now we're gonna grap all the offsets in the block.
+; Now we're gonna grap all the offsets in the block.
 
     ;; #todo:
     ;; We need to put all these information in the same document
@@ -194,9 +197,10 @@ head_init:
     ;;mov dword [_SavedBootBlock], ebp
 
 
-    ; 0 - LFB.
-    ; FrontBuffer Address, (LFB)
-    ; Physical address.
+; 0 - LFB.
+; FrontBuffer Address, (LFB)
+; Physical address.
+
     xor eax, eax
     mov eax, dword [edx +0] 
     mov dword [_SavedLFB],          eax
@@ -253,15 +257,16 @@ head_init:
     ;; We can create a robust bootblock.
     ;; ...
 
-    ;;
-    ;; == Interrupts support ==============================
-    ;;
+;
+; == Interrupts support ==============================
+;
 
-    ;; Theis is the order here:
+    ;; This is the order here:
     ;; gdt, idt, ldt, tss+tr.
 
-    ;; No interrupts for now.
-    ;; It si already done is head_32.asm
+
+; No interrupts for now. 
+; It was already done is head_32.asm
 
     cli
     
@@ -269,11 +274,11 @@ head_init:
     ;; Memory management registes:
     ;; GDTR, IDTR, LDTR and TR.
 
-    ;;
-    ;; == GDT ================================================
-    ;;
+;
+; == GDT ================================================
+;
 
-    ;; We have another configuration in another place.
+; We have another configuration in another place.
 
     lgdt [_GDT_register] 
 
@@ -284,30 +289,31 @@ head_init:
     ;; Pelo menos os segmentos de dados.
 
 
+;
+; == IDT ================================================
+;
 
-    ;;
-    ;; == IDT ================================================
-    ;;
-
-    ;; We have another configuration in another place.
+; We have another configuration in another place.
 
     call setup_idt      ; Create a common handler, 'unhandled_int'.
     call setup_faults   ; Setup vectors for faults and exceptions.
     call setup_vectors  ; Some new vectors.
     lidt [_IDT_register] 
 
-    ;;
-    ;; == LDT ================================================
-    ;;
+;
+; == LDT ================================================
+;
 
-    ;; Clear LDT
+; Clear LDT
+
     xor eax, eax
     lldt ax
 
 
-    ;;
-    ;; == TR. (tss) ======================================
-    ;;
+;
+; == TR. (tss) ======================================
+;
+
 
     ;; The tr configuration is little bit confused here.
     ;; There is another configuration in another place.
@@ -327,41 +333,44 @@ head_init:
     ;; We already did this. (103)
     ;; mov word [gdt6], tss0_end - tss0 - 1 
 
-    ;; This is the address os our tss ?
+; This is the address os our tss ?
+
     mov eax, dword tss0
 
-    ;; This is the place for the tss0 into the gdt.
+; This is the place for the tss0 into the gdt.
+
     mov [gdt6 + 2], ax
     shr eax, 16
     mov [gdt6 + 4],  al
     mov [gdt6 + 7],  ah
 
-    ;; Load TR.
-    ;; 0x2B = (0x28+3).
+; Load TR.
+; 0x2B = (0x28+3).
+
     mov ax, word 0x2B
     ltr ax
 
-    ;;
-    ;; ========================================================
-    ;;
+;
+; ========================================================
+;
 
-
-    ;; Jump to flush it.
+; Jump to flush it.
 
     jmp 8:_trJumpToFlush
     nop
 _trJumpToFlush:
     nop
 
-    ;; Order:
-    ;; PIC and PIT early initialization 
+
+; Order:
+; PIC and PIT early initialization 
 
 
-    ;;
-    ;; == PIC ========================================
-    ;;
+;
+; == PIC ========================================
+;
 
-    ; Early PIC initialization.
+; Early PIC initialization.
 
 picEarlyInitialization:
 
@@ -401,9 +410,9 @@ picEarlyInitialization:
     out 0xA1, al
     IODELAY
 
-    ;; =======================
-    ;; Mask all interrupts.
-    ;; =======================
+
+; Mask all interrupts.
+
 
     cli
     mov  al, 255
@@ -413,11 +422,11 @@ picEarlyInitialization:
     IODELAY
 
 
-    ;;
-    ;; == PIT ========================================
-    ;;
+;
+; == PIT ========================================
+;
 
-    ; Early PIT initialization.
+; Early PIT initialization.
 
 pitEarlyInitialization:
 
@@ -443,11 +452,11 @@ pitEarlyInitialization:
     IODELAY
 
 
-    ;;
-    ;; == RTC ========================================
-    ;;
+;
+; == RTC ========================================
+;
 
-    ; Early RTC initialization.
+; Early RTC initialization.
 
 ;rtcEarlyInitialization:
     ;#todo 
@@ -459,9 +468,8 @@ pitEarlyInitialization:
     ;; memory caching control.
 
 
-    ;; =======================
-    ;; Unmask all interrupts.
-    ;; =======================
+
+; Unmask all interrupts.
 
     mov al, 0
     out 0xa1, al
@@ -469,19 +477,20 @@ pitEarlyInitialization:
     out 0x21, al
     IODELAY
 
-    ;; No interrupts.
+; No interrupts.
+
     cli
 
 
-    ;;
-    ;; == Set up registers ==================================
-    ;;
+;
+; == Set up registers ==================================
+;
 
-    ;; Debug registers:
-    ;; DR0 ~ DR7
 
-    ; Debug registers.
-    ; Disable break points.
+; Debug registers:
+; DR0 ~ DR7
+; Debug registers.
+; Disable break points.
 
     xor eax, eax
     ;mov dr2, eax
@@ -489,14 +498,10 @@ pitEarlyInitialization:
     ;; ...
 
 
-    ;;
-    ;; Data
-    ;;
-    
+;
+; Data segments for ring 0.
+;
 
-    ;; Data segments for ring 0.
-    ;;  ...
-    
     ;; #todo
     ;; Devemos antecipar essa configuração o máximo possível,
     ;; colocarmos perto do carregamento do gdtr.
@@ -509,12 +514,12 @@ pitEarlyInitialization:
     ;mov gs, ax
     ;; ...
 
-    ;;
-    ;; STACK
-    ;;
+;
+; Stack
+;
 
-    ;; Initialize and save.
-    ;; Is it the same in the tss ?
+; Initialize and save.
+; Is it the same in the tss ?
     
     mov eax, 0x003FFFF0 
     mov esp, eax 
@@ -522,9 +527,9 @@ pitEarlyInitialization:
     mov dword [_kernel_stack_start_pa], eax 
 
 
-    ;;
-    ;; == Kernel Status ===================================
-    ;;
+;
+; == Kernel Status ===================================
+;
 
     ;; #bugbug
     ;; It does not make sanse.
@@ -544,14 +549,16 @@ pitEarlyInitialization:
     ;; popfd 
 
 
-    ;;
-    ;; == Calling the C part ===============================
-    ;;
+;
+; == Calling the C part ===============================
+;
+
 
 ;; .Lcall_c_code:
 
-    ;; We only have one argument. The arch type.
-    ;; See: kernel/main.c 
+
+; We only have one argument. The arch type.
+; See: kernel/main.c 
 
     mov eax, dword HEAD_CURRENT_ARCH_X86
     push eax
@@ -561,18 +568,18 @@ pitEarlyInitialization:
     xor ecx, ecx
     xor edx, edx
 
-    ;; #bugbug
-    ;; We need to check what kind of jum we can use in this case.
-    ;; For AMD and for Intel.
-    ;; 32 ? 64 ?
-    ;; call ? ret ?
-    ;; There are limitations.
+; #bugbug
+; We need to check what kind of jum we can use in this case.
+; For AMD and for Intel.
+; 32 ? 64 ?
+; call ? ret ?
+; There are limitations.
 
     call _kernel_main
 
-    ;; We really don't wanna reach this point.
-    ;; We are in graphics mode and we can't print an error message.
-    ;; We will not return to boot.asm.
+; We really don't wanna reach this point.
+; We are in graphics mode and we can't print an error message.
+; We will not return to boot.asm.
 
 han__g:
     cli
@@ -580,9 +587,9 @@ han__g:
     jmp han__g
 
 
-	;
-	; ====================================
-	;
+;
+; == Data area ==================================
+;
 
 
 ;; ====================================================

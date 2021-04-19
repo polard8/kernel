@@ -21,13 +21,15 @@ __HEAD
 
 [bits 32]
 
-    ; Imports.
+; Imports.
+
     extern _code_begin
     extern _data_end
     extern _bss_end
 
 
-    ; Multiboot support.
+; Multiboot support.
+
     MULTIBOOT_MAGIC        equ  0x1badb002
     MULTIBOOT_PAGE_ALIGN   equ  0x1
     MULTIBOOT_MEMORY_INFO  equ  0x2
@@ -45,15 +47,14 @@ __HEAD
 global _kernel_begin 
 _kernel_begin:
 
-    ;; #bugbug
-    ;; Porque estamos usando um jmp, sem nem mesmo configurarmos
-    ;; os registradores de segmento. Estamos confiando na configuração
-    ;; feita pelo BL.BIN.
-    ;; Bom mesmos seria começarmos com a configuração da gdt e dos 
-    ;; registradores de segmento.
-    
-    ;; #todo
-    ;; Precismos carregar a gdt o mais rápido possível.
+; #bugbug
+; Porque estamos usando um jmp, sem nem mesmo configurarmos
+; os registradores de segmento. Estamos confiando na configuração
+; feita pelo BL.BIN.
+; Bom mesmos seria começarmos com a configuração da gdt e dos 
+; registradores de segmento.
+; #todo
+; Precismos carregar a gdt o mais rápido possível.
 
     JMP START
 
@@ -79,17 +80,17 @@ mboot_start:
     dd  multiboot_flags
     dd  multiboot_checksum
 
-    ; fields used if MULTIBOOT_AOUT_KLUDGE is set in 
-    ; MULTIBOOT_HEADER_FLAGS
+; fields used if MULTIBOOT_AOUT_KLUDGE is set in 
+; MULTIBOOT_HEADER_FLAGS
 
-    ;; for MULTIBOOT_MEMORY_INFO
+; for MULTIBOOT_MEMORY_INFO
     dd  0x00000000    ;; header_addr   - mboot_start    ; these are PHYSICAL addresses
     dd  0x00000000    ;; load_addr     - _code_begin    ; start of kernel .text (code) section
     dd  0x00000000    ;; load_end_addr - _data_end      ; end of kernel .data section
     dd  0x00000000    ;; bss_end_addr  - _bss_end       ; end of kernel BSS
     dd  0x00000000    ;; entry_addr    - _kernel_begin  ; kernel entry point (initial EIP)
 
-    ;; for MULTIBOOT_VIDEO_MODE
+; for MULTIBOOT_VIDEO_MODE
     dd  0x00000000    ;; mode_type 
     dd  800           ;; width 
     dd  600           ;; height 
@@ -110,19 +111,25 @@ START:
     cld
     cli
 
-    ; IN: 
-    ; al = 'G' (Graphic Mode).
-    ; al = 'T' (Text Mode).
-    ; ebx = LFB.
-    ; ecx = BootBlock pointer.
-    ; edx = BootBlock pointer.
-    ; ebp = BootBlock pointer.
-    ; #importante
-    ; AL e EBX foram configurados pelo BL.BIN ??
-    ; See: head.asm
+; IN: 
+; al = 'G' (Graphic Mode).
+; al = 'T' (Text Mode).
+; ebx = LFB.
+; ecx = BootBlock pointer.
+; edx = BootBlock pointer.
+; ebp = BootBlock pointer.
+; #importante
+; AL e EBX foram configurados pelo BL.BIN ??
+; See: head.asm
 
     call head_init
 
+; #todo
+; Maybe we can export this
+; as a main loop for all processes.
+; For now we have a idle thread.
+
+; _IdleLoop:
 loop:
     cli
     hlt
@@ -135,16 +142,19 @@ loop:
 ; Esses includes são padronizados. Não acrescentar outros.
 
 
-    ;Inicialização.
-    ;Funções de apoio à inicialização do Kernel 32bit.
+; Inicialização.
+; Funções de apoio à inicialização do Kernel 32bit.
+
     %include "head/head.asm" 
     %include "head/headlib.asm" 
 
-    ;Interrupções de hardware (irqs) e faults.
+; Interrupções de hardware (irqs) e faults.
+
     %include "hw/hw.asm"
     %include "hw/hwlib.asm"
 
-    ;Interrupções de software.
+; Interrupções de software.
+
     %include "sw/sw.asm"
     %include "sw/swlib.asm"
 
