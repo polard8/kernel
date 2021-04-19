@@ -444,29 +444,38 @@ pid_t vfork(void)
 }
 
 
-/*
- * setuid:
- *
- */
-
-// SVr4,  POSIX.1-2001.   
-// Not quite	compatible with	the 4.4BSD call, which
-// sets all	of the real, saved, and	effective user IDs.	  
-
+// ===============================
+// uid
 int setuid ( uid_t uid )
 {
 	//#todo: ainda não temos a suystem call.
 	//SYSTEMCALL_SETCURRENTUSERID
 	return (uid_t) gramado_system_call ( 151, 0, 0, 0 );
 }
-
-
 uid_t getuid (void)
 {
     return (uid_t) gramado_system_call ( 152, 0, 0, 0 );
 }
 
+// ===============================
+// gid
+int setgid(gid_t gid)
+{
+    return -1;
+}
+gid_t getgid (void)
+{
+	//SYSTEMCALL_GETCURRENTGROUPID
+    return (gid_t) gramado_system_call ( 154, 0, 0, 0 );
+}
 
+
+// ===============================
+// euid
+int seteuid(uid_t euid)
+{
+    return -1;
+}
 uid_t geteuid (void)
 {
     debug_print ("geteuid: [TODO]\n");
@@ -475,11 +484,21 @@ uid_t geteuid (void)
 } 
 
 
-/*
- * getpid:
- *
- */
 
+// ===============================
+// egid
+int setegid(gid_t egid)
+{
+    return -1;
+}
+gid_t getegid(void)
+{
+    return -1;
+}
+
+
+// ===============================
+// pid
 pid_t getpid (void)
 {
     return (pid_t) gramado_system_call ( 
@@ -487,11 +506,8 @@ pid_t getpid (void)
 }
 
 
-/*
- * getppid:
- *
- */
-
+// ===============================
+// ppid
 pid_t getppid (void)
 {
     return (pid_t) gramado_system_call ( 
@@ -579,17 +595,6 @@ pid_t getpgid(pid_t pid)
 
 
 
-/*
- * getgid:
- *
- */
-
-gid_t getgid (void)
-{
-	//SYSTEMCALL_GETCURRENTGROUPID
-
-    return (gid_t) gramado_system_call ( 154, 0, 0, 0 );
-}
 
 
 

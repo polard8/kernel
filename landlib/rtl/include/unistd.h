@@ -165,16 +165,36 @@ pid_t fork (void);
 pid_t vfork(void);
 
 
-int setuid ( uid_t uid );
 
+
+
+
+// uid
+int setuid ( uid_t uid );
 uid_t getuid (void);
+
+
+// gid
+int setgid(gid_t gid);
+gid_t getgid (void);
+
+
+// euid
+int seteuid(uid_t euid);
 uid_t geteuid (void); 
 
-// POSIX.1-2001, 4.3BSD, SVr4.
+// egid
+int setegid(gid_t egid);
+gid_t getegid(void);
+
+
+// pid
 pid_t getpid (void);
+
+//ppid
 pid_t getppid (void);
 
-gid_t getgid (void);
+
 
 
 int dup (int oldfd);
