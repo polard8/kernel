@@ -295,8 +295,9 @@ int e1000_interrupt_flag;
 
 int e1000_irq_count;
 
+
 //
-// ## prototypes ##
+// == prototypes ===========================
 //
 
 
@@ -356,7 +357,11 @@ void nic_i8254x_transmit (void);
 //eeprom
 uint32_t E1000ReadEEPROM ( struct intel_nic_info_d *d, uint8_t addr );
 
-
+int 
+e1000_ioctl ( 
+    int fd, 
+    unsigned long request, 
+    unsigned long arg );
 
 #endif   
 

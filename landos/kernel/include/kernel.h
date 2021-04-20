@@ -320,7 +320,13 @@ extern unsigned long stack0_krn_ptr;
 #include "rtl/net/arp.h"
 #include "rtl/net/udp.h"
 #include "rtl/net/tcp.h"
-#include "rtl/net/nicintel.h"    //intel nic - network interface controller.
+
+
+// 
+// intel nic - network interface controller.
+#include "hal/dev/tty/net/nicintel.h"    
+
+
 #include "rtl/net/in.h"
 #include "rtl/net/un.h"
 #include "rtl/net/nports.h"     //(network) Network Ports  (sw)

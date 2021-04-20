@@ -949,13 +949,13 @@ int get_free_slots_in_the_file_table(void)
     file *tmp;
     int i=0;
 
-    
-    for (i=0;i<NUMBER_OF_FILES; i++)
+
+    for (i=0; i<NUMBER_OF_FILES; i++)
     {
         tmp = (void*) file_table[i];
         
         // Nenhum file descritor está usando essa estrutura.
-        if (tmp->used == 1 && 
+        if (tmp->used  == TRUE && 
             tmp->magic == 1234 && 
             tmp->fd_counter == 0)
         { 
@@ -980,8 +980,7 @@ int get_free_slots_in_the_inode_table(void)
         
         // Se nenhum descritor de estrutura de arquivo 
         // está usando essa estrutura inode.
-        
-        if (tmp->used == 1 && 
+        if (tmp->used  == TRUE && 
             tmp->magic == 1234 && 
             tmp->filestruct_counter == 0)
         { 
@@ -1015,10 +1014,9 @@ void fsCheckMbrFile ( unsigned char *buffer )
 
     printf ("fsCheckMbrFile: Testing MBR ...\n");
 
-    if ( (void *) mbr == NULL )
-    {
-         printf ("fsCheckMbrFile: buffer fail\n");
-         return;
+    if ( (void *) mbr == NULL ){
+         printf ("fsCheckMbrFile: [FAIL] mbr\n");
+         goto fail;
     }
 
     // Read sector '0'
@@ -1102,7 +1100,6 @@ void fsCheckVbrFile ( unsigned char *buffer )
 
 fail:
     printf ("fsCheckVbrFile: fail\n");
-
 done:
     printf ("Done\n");
     refresh_screen();
@@ -1118,7 +1115,8 @@ done:
 //void set_spc (int spc, int volume_id)
 void set_spc (int spc)
 {
-    panic("set_spc: [TODO] Sectors per cluster in a given volume.\n");
+    // panic("set_spc: [TODO] Sectors per cluster in a given volume.\n");
+    panic("set_spc: [TODO] \n");
 }
 
 
@@ -1131,7 +1129,8 @@ void set_spc (int spc)
 //int get_spc (int volume_id)
 int get_spc (void)
 {
-    panic("get_spc: [TODO] Sectors per cluster in a given volume.\n");
+    //panic("get_spc: [TODO] Sectors per cluster in a given volume.\n");
+    panic("get_spc: [TODO] \n");
     return (int) -1;
 }
 
@@ -1684,17 +1683,17 @@ sys_load_path (
     
     if ( (void*) path == NULL ){
         debug_print ("sys_load_path: [FAIL] path\n");
-        return (int) -1;
+        return (int) (-1);
     }
 
     if (*path == 0){
         debug_print ("sys_load_path: [FAIL] *path\n");
-        return (int) -1;
+        return (int) (-1);
     }
 
     if ( u_address_len == 0 ){
         debug_print ("sys_load_path: [FAIL] u_addres_len\n");
-        return (int) -1;
+        return (int) (-1);
     }
 
     //
@@ -1708,7 +1707,7 @@ sys_load_path (
 
     if (Status<0){
         debug_print ("sys_load_path: fail\n");
-        return (int) -1;
+        return (int) (-1);
     }
 
     debug_print ("sys_load_path: done\n");
@@ -1805,7 +1804,7 @@ void fs_init_structures (void)
     }else{
         root->objectType  = ObjectTypeFileSystem;
         root->objectClass = ObjectClassKernelObjects;
-        root->used  = 1;
+        root->used  = TRUE;
         root->magic = 1234;
 
         // pointer
@@ -1911,19 +1910,19 @@ void fs_show_root_fs_info(void)
              goto fail;
         }
 
-        printf ("name = %s \n",        root->name );
-        printf ("Object type %d \n",   root->objectType );
-        printf ("Object class %d \n",  root->objectClass );
-        printf ("type = %d \n",        root->type );
-        printf ("Dir entries %d \n",   root->dir_entries );
-        printf ("Entry size %d \n",    root->entry_size );
-        //printf ("",root-> );
-
-        refresh_screen();
-        return;
+        printf ("name = %s \n",       root->name );
+        printf ("Object type %d \n",  root->objectType );
+        printf ("Object class %d \n", root->objectClass );
+        printf ("type = %d \n",       root->type );
+        printf ("Dir entries %d \n",  root->dir_entries );
+        printf ("Entry size %d \n",   root->entry_size );
+        // ...
+        goto done;
     }; 
 
 fail:
+    printf("fail\n");
+done:
     refresh_screen();
     return;
 }
@@ -1986,8 +1985,7 @@ int fsInit (void){
     if ( (void *) volume1_rootdir == NULL ){
         panic ("fsInit: volume1_rootdir \n");
     } else {
-
-        volume1_rootdir->used = 1;
+        volume1_rootdir->used  = TRUE;
         volume1_rootdir->magic = 1234;
         volume1_rootdir->____object = ObjectTypeVolume;
 
@@ -2038,14 +2036,10 @@ int fsInit (void){
     volume2_rootdir = file_table[slot];
     volume2_rootdir->filetable_index = slot;
 
-    if ( (void *) volume2_rootdir == NULL )
-    {
+    if ( (void *) volume2_rootdir == NULL ){
         panic ("fsInit: volume2_rootdir\n");
-
-
     }else{
-
-        volume2_rootdir->used = 1;
+        volume2_rootdir->used  = TRUE;
         volume2_rootdir->magic = 1234;
         volume2_rootdir->____object = ObjectTypeVolume;
  
@@ -2070,9 +2064,9 @@ int fsInit (void){
         }
         volume2_rootdir->inode->filestruct_counter = 1;  //inicialize
         memcpy ( 
-            (void*) volume2_rootdir->inode->path, 
+            (void*)       volume2_rootdir->inode->path, 
             (const void*) volume2_rootdir->_tmpfname, 
-            sizeof( volume2_rootdir->inode->path ) );
+            sizeof(       volume2_rootdir->inode->path ) );
         // ... 
     };
 
@@ -2105,7 +2099,7 @@ int fsInit (void){
             panic ("fsInit: pipe0base\n");
         }
 
-        pipe_gramadocore_init_execve->used = 1;
+        pipe_gramadocore_init_execve->used  = TRUE;
         pipe_gramadocore_init_execve->magic = 1234;
 
         pipe_gramadocore_init_execve->_base = (unsigned char *) pipe0base;
@@ -2122,21 +2116,23 @@ int fsInit (void){
     };
 
 
-	//
-	// PWD
-	//
+    // Initialize directory facility structures.
 
+    init_directory_facilities();
+
+    // CWD Structure.
     // Inicializa o pwd support.
+
     fsInitializeWorkingDiretoryString();
 
-	//
-	// target dir struct
-	//
-
+    // Target dir struct
     // Inicializa a estrutura de suporte ao target dir.
+
     fsInitTargetDir(VOLUME1_ROOTDIR_ADDRESS,"/");
 
-    // Done.
+
+// done:
+
     debug_print ("fsInit: done\n");
 
     return 0;
@@ -2594,8 +2590,8 @@ int fs_print_process_cwd (int pid)
 // sys_pwd -  Service 170.
 void sys_pwd (void)
 {
-    if ( current_process < 0 )
-    {
+
+    if ( current_process < 0 ){
         printf("sys_pwd: [FAIL] current_process\n");
         return;
     }
@@ -3590,13 +3586,21 @@ int fs_create_empty_file ( char *file_name, int type )
 // See: fs_create_empty_file()
 int sys_create_empty_file ( char *file_name )
 {
-    //#bugbug: We need a buffer in another place.
+
+    // file *f;
+
+    int __ret = -1;
+
+    // #bugbug: 
+    // We need a buffer in another place.
+
     char buffer[512];
 
+    int size_in_bytes     = 512;
     int number_of_sectors = 1;
-    int size_in_bytes = 512;  
-    int __ret=0;
-        
+
+
+
     //#todo
     //the file structure.
     // file *f;
@@ -3616,22 +3620,28 @@ int sys_create_empty_file ( char *file_name )
 
 
     fs_fntos ( (char *) file_name );
-    
+
+    // 0x20 = file.
     // See: write.c
     __ret = (int) fsSaveFile ( 
                       VOLUME1_FAT_ADDRESS, 
                       VOLUME1_ROOTDIR_ADDRESS, 
                       FAT16_ROOT_ENTRIES,
-                      (char *)         file_name,    
-                      (unsigned long)  number_of_sectors,       
+                      (char *)         file_name,
+                      (unsigned long)  number_of_sectors, 
                       (unsigned long)  size_in_bytes,  
-                      (char *)         &buffer[0],          
-                      (char)           0x20 );  //0x20 = file.                  
+                      (char *)         &buffer[0], 
+                      (char)           0x20 ); 
 
-    //#todo
-    //the file structure.
+    if (__ret<0){
+        debug_print("sys_create_empty_file: fail\n");
+        return -1;
+    }
+    
+    // #todo
+    // the file structure.
 
-    return __ret;
+    return (int) __ret;
 }
 
 
@@ -3649,9 +3659,13 @@ int fs_create_empty_directory ( char *dir_name, int type )
 
     file *f;
 
+    // #bugbug: 
+    // We need a buffer in another place.
+
     char buffer[512];
+
+    int size_in_bytes     = 512;
     int number_of_sectors = 1;
-    int size_in_bytes = 512;  
 
     debug_print ("fs_create_empty_directory:\n");
 
@@ -3673,9 +3687,8 @@ int fs_create_empty_directory ( char *dir_name, int type )
     // file structure
     
     f = (file *) kmalloc ( sizeof( struct file_d ) );
-    
-    if ( (void *) f == NULL )
-    {
+
+    if ( (void *) f == NULL ){
         debug_print ("fs_create_empty_directory: f\n");
         return -1;
     }
@@ -3687,17 +3700,23 @@ int fs_create_empty_directory ( char *dir_name, int type )
    
     //f->type = type;
     // #todo: fd ...
-    
+
+
+    // 0x10 = directory. 
     __ret = (int) fsSaveFile ( 
                       VOLUME1_FAT_ADDRESS, 
                       VOLUME1_ROOTDIR_ADDRESS, 
                       FAT16_ROOT_ENTRIES,
-                      (char *)         dir_name,    
-                      (unsigned long)  number_of_sectors,       
-                      (unsigned long)  size_in_bytes,  
-                      (char *)         &buffer[0],          
-                      (char)           0x10 );  //0x10 = directory.                  
+                      (char *)         dir_name,
+                      (unsigned long)  number_of_sectors,
+                      (unsigned long)  size_in_bytes, 
+                      (char *)         &buffer[0], 
+                      (char)           0x10 ); 
 
+    if (__ret<0){
+        debug_print("fs_create_empty_directory: fail\n");
+        return -1;
+    }
 
     //#todo
     //the file structure.
@@ -3713,16 +3732,20 @@ int fs_create_empty_directory ( char *dir_name, int type )
 // See: fs_create_empty_directory
 int sys_create_empty_directory ( char *dir_name )
 {
-    // #bugbug
+
+    int __ret=0;
+
+    // #bugbug: 
+    // We need a buffer in another place.
+
     char buffer[512];
 
+    int size_in_bytes     = 512; 
     int number_of_sectors = 1;
-    int size_in_bytes = 512;  
 
-    int __ret=0;    
-    
+
+
     debug_print ("sys_create_empty_directory:\n");
-
 
     if ( (void*) dir_name == NULL ){
         debug_print ("sys_create_empty_directory: dir_name\n");
@@ -3736,18 +3759,23 @@ int sys_create_empty_directory ( char *dir_name )
 
     fs_fntos ( (char *) dir_name );
 
+
      // See: write.c
+     // 0x10 = directory. 
     __ret = (int) fsSaveFile ( 
                       VOLUME1_FAT_ADDRESS, 
                       VOLUME1_ROOTDIR_ADDRESS, 
                       FAT16_ROOT_ENTRIES,
-                      (char *)         dir_name,    
-                      (unsigned long)  number_of_sectors,       
-                      (unsigned long)  size_in_bytes,  
-                      (char *)         &buffer[0],          
-                      (char)           0x10 );  //0x10 = directory.                  
+                      (char *)         dir_name,
+                      (unsigned long)  number_of_sectors, 
+                      (unsigned long)  size_in_bytes, 
+                      (char *)         &buffer[0], 
+                      (char)           0x10 ); 
 
-
+    if (__ret<0){
+        debug_print("sys_create_empty_directory: fail\n");
+        return -1;
+    }
 
     return (int) __ret;
 }
@@ -5227,7 +5255,7 @@ fs_save_dir (
 }
 
 
-
+// OUT: ?
 int
 fs_save_file ( 
     char *file_name, 
@@ -5237,15 +5265,17 @@ fs_save_file (
     char flag )  
 {
 
+    int __Ret = -1;
+
     debug_print ("fs_save_file: [TEST]\n");
 
 
-    if( (void*) file_name == NULL ){
+    if ( (void*) file_name == NULL ){
         debug_print ("fs_save_file: [ERROR] file_name\n");
         return -1;
     }
 
-    if(*file_name == 0){
+    if (*file_name == 0){
         debug_print ("fs_save_file: [ERROR] *file_name\n");
         return -1;
     }
@@ -5254,15 +5284,23 @@ fs_save_file (
     // #todo
     // Check more parameters.
 
-    return (int) fsSaveFile ( 
-                     VOLUME1_FAT_ADDRESS,
-                     VOLUME1_ROOTDIR_ADDRESS,
-                     FAT16_ROOT_ENTRIES,
-                     (char *)        file_name,
-                     (unsigned long) file_size,
-                     (unsigned long) size_in_bytes,
-                     (char *)        file_address,
-                     (char)          flag );
+
+    __Ret = (int) fsSaveFile ( 
+                      VOLUME1_FAT_ADDRESS,
+                      VOLUME1_ROOTDIR_ADDRESS,
+                      FAT16_ROOT_ENTRIES,
+                      (char *)        file_name,
+                      (unsigned long) file_size,
+                      (unsigned long) size_in_bytes,
+                      (char *)        file_address,
+                      (char)          flag );
+
+    if (__Ret<0){
+        debug_print("fs_save_file: fail\n");
+        return (int) (-1);
+    }
+
+    return (int) __Ret;
 }
 
 

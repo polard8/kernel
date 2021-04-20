@@ -41,7 +41,9 @@ techniques:
  
  */
  
- 
+// See:
+// https://wiki.osdev.org/Intel_8254x
+
  
 #include <kernel.h>
 
@@ -49,17 +51,6 @@ techniques:
 // How many buffers.
 #define SEND_BUFFER_MAX       8
 #define RECEIVE_BUFFER_MAX   32
-
-
-
-
-/*
-// #todo
-// We need a ioctl for nic devices.
-int e1000_ioctl ( int fd, unsigned long request, unsigned long arg );
-int e1000_ioctl ( int fd, unsigned long request, unsigned long arg )
-{}
-*/
 
 
 
@@ -1317,20 +1308,16 @@ E1000ReadEEPROM (
 }
 
 
-/*
-int 
-e1000_ioctl ( 
-    int fd, 
-    unsigned long request, 
-    unsigned long arg );
 int 
 e1000_ioctl ( 
     int fd, 
     unsigned long request, 
     unsigned long arg )
 {
+    debug_print ("e1000_ioctl: [TODO] \n");
+    return -1;
 }
-*/
+
 
 
 //
