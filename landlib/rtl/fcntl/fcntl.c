@@ -105,8 +105,7 @@ int openat (int dirfd, const char *pathname, int flags){
  * open:
  *
  */
- 
- 
+
 // #obs
 // Isso precisa abrir um arquivo, colocar o ponteiro na 
 // lista de arquivos abertos e retornar o índice. 
@@ -117,14 +116,14 @@ int open (const char *pathname, int flags, mode_t mode){
     char tmp_path[64];
 
 
-
     // #importante
     // adaptando para fat16.
     // #todo: devemos fazer isso em ring0, não aqui.
     // isso funcionou.
-    stdio_fntos( (char *) pathname);
+
+    stdio_fntos( (char *) pathname );
     sprintf(tmp_path,pathname);
-    
+
     //
     // size
     //
@@ -149,10 +148,12 @@ int open (const char *pathname, int flags, mode_t mode){
     // A chamada não oferecerá um endereço em ring3,
     // pois não dá pra confiar na biblioteca,
     // o kernel não pode confiar na qualidade da libc.
-    
-    
-    //IN: service, pathname, flags, mode 
-    fd = (int) gramado_system_call ( 16,  
+
+    // IN: 
+    // service, pathname, flags, mode 
+
+    fd = (int) gramado_system_call ( 
+                   16,  
                    (unsigned long) tmp_path, 
                    (unsigned long) flags,  
                    (unsigned long) mode );

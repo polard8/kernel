@@ -6,8 +6,6 @@
  *
  * History:
  *    2015 - Created by Fred Nora.
- *    2016 - Revision.
- *    ...
  */
 
 
@@ -59,6 +57,9 @@ search_in_dir (
     // O número de entradas poderia ser passado via argumento.
 
     char NameX[13];
+    
+    // Copy here
+    char NameBuffer[13];
 
 
 	// Buffer.
@@ -66,6 +67,75 @@ search_in_dir (
 	// O endereço do diretório foi passado via argumento.
 
     char *dir = (char *) dir_address;
+
+
+    // #bugbug
+    // Vamos checar o tamanho da string
+    // Me parece que quando um nome tem extensão
+    // com menos de três letras, então as últimas 
+    // letras etão com '0' e não espaços.
+
+    size_t stringSize = 0;
+
+
+    debug_print ("search_in_dir: $\n");
+    
+    //
+    // Copy file name
+    //
+
+    stringSize = strlen(file_name);
+    printf ("Name size = {%d}\n",stringSize);
+
+
+    strncpy (NameBuffer, file_name, stringSize);
+
+
+
+    if (stringSize < 11 )
+    {
+        //while(stringSize<11)
+        //{
+        //    strcat(NameBuffer," ");
+        //    stringSize++;
+        //}
+        //printf ("NameBuffer={%s}\n",NameBuffer);
+            
+            //#debug
+        //refresh_screen();
+            //while(1){}
+    
+        if (stringSize == 10)
+        { 
+            NameBuffer[10] = ' '; 
+            stringSize=11;
+        }
+        
+        if (stringSize ==  9)
+        { 
+            NameBuffer[10] = ' '; 
+            NameBuffer[9]  = ' '; 
+            stringSize=11;
+        }
+        
+        if (stringSize ==  8)
+        { 
+            NameBuffer[10] = ' '; 
+            NameBuffer[9]  = ' '; 
+            NameBuffer[8]  = ' '; 
+            stringSize=11;
+        }
+        
+    }
+    
+    NameBuffer[11] = 0;    
+    
+
+    // hack hack
+    if (stringSize != 11 ){
+        printf ("search_in_dir: [ERROR] Wrong name size. {%d} \n", stringSize);
+        goto fail;
+    }
 
 
     if ( (void*) file_name == NULL ){
@@ -113,19 +183,28 @@ search_in_dir (
             memcpy( NameX, &dir[j], 11 );
             NameX[11] = 0;
 
-            Status = (int) strncmp ( file_name, NameX, 11 );
-
-            // Found!
-            if (Status == 0){ return 1; }
+            //Status = (int) strncmp ( file_name, NameX, 11 );
+            Status = (int) strncmp ( NameBuffer, NameX, 11 );
             
+            // Found!
+            if (Status == 0)
+            {
+                // #debug
+                debug_print("search_in_dir: Found $\n");
+                printf ("search_in_dir: Found\n"); 
+                return (int) TRUE; 
+            }
+
             //Nothing.
-        };   
+        }   
 		//Próxima entrada. Repete 512 vezes.
         j += 0x20;
     };
 
 fail:
+    debug_print("search_in_dir: Not found $\n");
     printf ("search_in_dir: File not found\n");
+    // return FALSE;
     return (int) -1;
 }
 

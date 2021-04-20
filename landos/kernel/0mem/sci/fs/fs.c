@@ -2775,7 +2775,7 @@ int fs_search_inode_table( char *path )
  ************************************* 
  * sys_read_file: 
  * 
- *     This is called by sys_open()
+ *     This is called by sys_open() in sys.c
  */
 
 // usada por open()
@@ -2787,26 +2787,23 @@ int fs_search_inode_table( char *path )
 // #bugbug
 // Na minha m�quina real, �s vezes d� problemas no tamanho do arquivo.
 
-
 // #bugbug
 // Estamos alocando mem�ria em ring para carregar o arquivo
 // e depois estamos usando o buffer em ring3 passado pelo usu�rio.
 // >>> vamos confiar no usu�rio e usarmos
 
-
-    // #bugbug
-    // precisamos colocar os arquivos também na lista
-    // global de arquivos abertos. file_table[]
-    // E na lista de inodes. inode_table[]
-    // See: fs.c
-
+// #bugbug
+// precisamos colocar os arquivos também na lista
+// global de arquivos abertos. file_table[]
+// E na lista de inodes. inode_table[]
+// See: fs.c
 
 // #bugbug
 // Nao seria o read() usado para ler um arquivo ja aberto ??
-// sim. a rotina de suporte para read esta em sys_read e nao chama essa aqui.
+// sim. a rotina de suporte para read esta em sys_read e 
+// nao chama essa aqui.
 // essa aqui poderia ter outro nome, pois ela carrega um arquivo
 // poderia chamar-se load.
-
 
 int 
 sys_read_file_from_disk ( 
@@ -2814,21 +2811,20 @@ sys_read_file_from_disk (
     int flags, 
     mode_t mode )
 {
+    int __ret = -1;
 
-    file *__file;
+    file  *__file;
     size_t FileSize=-1;
     
     struct process_d *p;
 
     int __slot = -1;  // ofd.
     int Status = -1;
-    int __ret = -1;
 
     void *buff;
 
 
-
-    debug_print ("sys_read_file_from_disk:\n");
+    debug_print ("sys_read_file_from_disk: $\n");
 
 
     if ( (void*) file_name == NULL ){
@@ -2844,9 +2840,14 @@ sys_read_file_from_disk (
 
     // Convertendo o formato do nome do arquivo.    
     // >>> "12345678XYZ"
+    // #bugbug: Isso ja foi feito em ring3 por open().
 
     fs_fntos ( (char *) file_name );
 
+
+    // #debug
+    printf ("FILE={%s}\n",file_name);
+    refresh_screen();
 
     // #bugbug
     // We need to search in the inode list. inode_table[]
@@ -2860,7 +2861,18 @@ sys_read_file_from_disk (
 
     Status = (int) search_in_dir ( file_name, VOLUME1_ROOTDIR_ADDRESS );
 
-    if (Status != 1)
+    // Quando não existe, tentamos criar.
+    // #bugbug: Então 'cat' não deve chamar essa função.
+
+    // found
+    if (Status == TRUE)
+    {
+        debug_print("sys_read_file_from_disk: Found\n");
+        refresh_screen();
+        goto __go;
+    }
+    
+    if (Status != TRUE)
     {
          //#debug
          printf ("sys_read_file_from_disk: [FIXME] File not found!\n");
@@ -2875,6 +2887,7 @@ sys_read_file_from_disk (
              if ((void*)buff==NULL)
              {
                  debug_print("sys_read_file_from_disk: buff fail\n");
+                 refresh_screen();
                  return -1; 
              }
 
@@ -2898,11 +2911,16 @@ sys_read_file_from_disk (
               //--
               
               // Ok
-              if (__ret == 0){
+              if (__ret == 0)
+              {
+                  debug_print("sys_read_file_from_disk: Created new file\n");
+                  refresh_screen();
                   goto __go;
               }
          }
-         
+
+         printf("sys_read_file_from_disk: [FIXME] Can't create new file\n");
+         refresh_screen();
          return (int) (-1);
     }
 
@@ -3023,6 +3041,10 @@ __OK:
     }
 
 
+    // #debug
+    printf ("FILE_AGAIN={%s}\n",file_name);
+    refresh_screen();
+    
     // File size.
     // #bugbug: OUT: 'unsigned long'
     FileSize = (size_t) fsRootDirGetFileSize( (unsigned char *) file_name );
@@ -4292,6 +4314,9 @@ unsigned long fsRootDirGetFileSize ( unsigned char *file_name )
     //...
 
 
+    debug_print ("fsRootDirGetFileSize: $\n");
+
+
     if ( (void*) file_name == NULL ){
         printk("fsRootDirGetFileSize: [ERROR] file_name\n");
         goto fail;
@@ -4328,10 +4353,17 @@ unsigned long fsRootDirGetFileSize ( unsigned char *file_name )
     //podemos alterar para pegar de um arquivo que esteja no diretório alvo.	
 
 
-	// Carregando o diretório raiz.
-    fs_load_rootdir( VOLUME1_ROOTDIR_ADDRESS, VOLUME1_ROOTDIR_LBA, 32 );
+    // #bugbug
+    // Estamos chamando isso toda vez que
+    // tentamos abrir um arquivo.
 
-	
+    // Carregando o diretório raiz.
+    fs_load_rootdir ( 
+        VOLUME1_ROOTDIR_ADDRESS, 
+        VOLUME1_ROOTDIR_LBA, 
+        32 );
+
+
 	//#todo:
 	//precisamos na verdade carregarmos o diretório corrente.
 	

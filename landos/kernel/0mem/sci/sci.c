@@ -1423,11 +1423,14 @@ void *sci0 (
         //rede: 12,13,14,15
 
         // 16 - open()
-        //See: sys.c
+        // In ring0, see: sci/sys/sys.c
+        // In ring3, see: fcntl.c
         // IN: pathname, flags, mode
         //OUT: fd
+
         case SYS_OPEN:
-            debug_print ("sci0: SYS_OPEN\n");
+            debug_print ("$ --------------- \n");
+            debug_print ("sci0: SYS_OPEN $\n");
             return (void *) sys_open ( 
                                 (const char *) arg2, 
                                 (int)          arg3, 
@@ -1439,6 +1442,7 @@ void *sci0 (
         // See: sys.c
         // IN: fd
         case SYS_CLOSE:
+            debug_print ("$ --------------- \n");
             debug_print ("sci0: SYS_CLOSE\n");
             return (void *) sys_close( (int) arg2 );
             break;

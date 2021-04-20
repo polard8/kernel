@@ -167,6 +167,24 @@ char *strcpy ( char *to, const char *from ){
     return (to);
 }
 
+char *strncpy (char *s1, const char *s2, size_t n){
+
+    char *s = s1;
+
+    while (n > 0 && *s2 != '\0')
+    {
+        *s++ = *s2++;
+        n--;
+    };
+
+    while (n > 0)
+    {
+        *s++ = '\0';
+        n--;
+    };
+
+    return (char *) s1;
+}
 
 /*
  * strcat - acrescenta uma string ao fim de outra. 

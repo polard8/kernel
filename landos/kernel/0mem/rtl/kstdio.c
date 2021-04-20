@@ -104,7 +104,7 @@ int k_fclose (file *f)
 
 /*
  ******************************************
- * fopen:
+ * k_fopen:
  *     Open a file.
  *     
  *     #todo: 

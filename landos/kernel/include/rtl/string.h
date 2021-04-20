@@ -26,6 +26,8 @@ int str_cmp(unsigned char *str1, unsigned char *str2);
 size_t strlen(const char *s);
 
 char *strcpy(char *to, const char *from);
+char *strncpy (char *s1, const char *s2, size_t n);
+
 char *strcat(char *to, const char *from);
 void bcopy(char *from, char *to, int len);
 void  bzero(char *cp, int len);

@@ -1164,6 +1164,9 @@ FILE *fopen ( const char *filename, const char *mode ){
     // Open.
     //
 
+    // See:
+    // fcntl.c
+
     fd = open (filename, flags, oflags);  
     
     if (fd < 0){
@@ -1180,17 +1183,17 @@ FILE *fopen ( const char *filename, const char *mode ){
         printf ("fopen: __stream fail\n");
         return NULL;
     }else{
-        __stream->used = 1;
+        __stream->used  = TRUE;
         __stream->magic = 1234;
         __stream->_file = fd;
 
         //buffer
         __stream->_lbfsize = BUFSIZ;
-        __stream->_cnt = BUFSIZ; 
+        __stream->_cnt     = BUFSIZ; 
         __stream->_r = 0;
         __stream->_w = 0;
         
-        __stream->_flags = flags;        
+        __stream->_flags = flags; 
 
         // File name.
         // Saving the name in ring3.

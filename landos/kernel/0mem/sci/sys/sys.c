@@ -454,21 +454,37 @@ int sys_fcntl ( int fd, int cmd, unsigned long arg )
 // vamos retornar o indice da tabela de arquivos abertos 
 // do processo atual.
 
+// Syscall 16.
+
 int 
 sys_open (
     const char *pathname, 
     int flags, 
     mode_t mode )
 {
-
+    int _ret=-1;
+ 
     // ??
     // creat chama open.
     // open tenta ler num arquivo que nao existe?
-    
 
-    // See: fs.c
+
+    debug_print ("sys_open: $ \n");
+
+    // See: sci/fs/fs.c
     // OUT: fd
-    return (int) sys_read_file_from_disk ( (char *) pathname, flags, mode );
+
+    _ret = (int) sys_read_file_from_disk ( 
+                     (char *) pathname, 
+                     flags, 
+                     mode );
+
+    if ( _ret<0){
+        printf ("sys_open: fail\n");
+        return -1;
+    }
+    
+    return (int) _ret;
 }
 
 
