@@ -122,18 +122,15 @@ START:
 ; AL e EBX foram configurados pelo BL.BIN ??
 ; See: head.asm
 
-    call head_init
+    ;call head_init
+    jmp head_init
 
-; #todo
-; Maybe we can export this
-; as a main loop for all processes.
-; For now we have a idle thread.
+    ; Not reached 
 
-; _IdleLoop:
-loop:
+not_reached_loop:
     cli
     hlt
-    jmp loop
+    jmp not_reached_loop
 
 
 

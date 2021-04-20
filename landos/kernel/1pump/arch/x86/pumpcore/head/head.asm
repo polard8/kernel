@@ -311,7 +311,7 @@ head_init:
 
 
 ;
-; == TR. (tss) ======================================
+; == TR (tss) ======================================
 ;
 
 
@@ -356,7 +356,8 @@ head_init:
 
 ; Jump to flush it.
 
-    jmp 8:_trJumpToFlush
+    ;; jmp 8:_trJumpToFlush
+    jmp __BOOT_CS:_trJumpToFlush
     nop
 _trJumpToFlush:
     nop
@@ -416,7 +417,7 @@ picEarlyInitialization:
 
     cli
     mov  al, 255
-    out  0xa1,  al
+    out  0xA1,  al
     IODELAY
     out  0x21,  al
     IODELAY
@@ -463,16 +464,14 @@ pitEarlyInitialization:
     ; Nothing for now
 
 
-
     ;; #todo: 
     ;; memory caching control.
-
 
 
 ; Unmask all interrupts.
 
     mov al, 0
-    out 0xa1, al
+    out 0xA1, al
     IODELAY
     out 0x21, al
     IODELAY
@@ -505,14 +504,15 @@ pitEarlyInitialization:
     ;; #todo
     ;; Devemos antecipar essa configuração o máximo possível,
     ;; colocarmos perto do carregamento do gdtr.
-    
+
     ;xor eax, eax
-    mov ax, word 0x10  
+    ;mov ax, word 0x10
+    mov ax, word  __BOOT_DS
     mov ds, ax
     mov es, ax
-    ;mov fs, ax
-    ;mov gs, ax
-    ;; ...
+    mov fs, ax
+    mov gs, ax
+
 
 ;
 ; Stack
@@ -558,7 +558,7 @@ pitEarlyInitialization:
 
 
 ; We only have one argument. The arch type.
-; See: kernel/main.c 
+; See: kernel/0mem/main.c 
 
     mov eax, dword HEAD_CURRENT_ARCH_X86
     push eax
@@ -581,10 +581,18 @@ pitEarlyInitialization:
 ; We are in graphics mode and we can't print an error message.
 ; We will not return to boot.asm.
 
-han__g:
+    jmp _EarlyRing0IdleThread
+
+; #todo
+; Maybe we can export this
+; as a main loop for all processes.
+; For now we have a idle thread.
+
+global _EarlyRing0IdleThread
+_EarlyRing0IdleThread:
     cli
     hlt
-    jmp han__g
+    jmp _EarlyRing0IdleThread
 
 
 ;
@@ -674,7 +682,8 @@ NULL_SEL equ $-_gdt
     dd 0
     dd 0
 ;Selector 8 - Code, kernel mode.  
-CODE_SEL equ $-_gdt
+__BOOT_CS equ $-_gdt
+CODE_SEL  equ $-_gdt
     dw 0xFFFF
     dw 0
     db 0
@@ -682,7 +691,8 @@ CODE_SEL equ $-_gdt
     db 0xCF
     db 0
 ;Selector 0x10 - Data, kernel mode.
-DATA_SEL equ $-_gdt
+__BOOT_DS equ $-_gdt
+DATA_SEL  equ $-_gdt
     dw 0xFFFF
     dw 0
     db 0 
@@ -746,9 +756,8 @@ global _end_gdt
 _end_gdt:
     dd 0
 
-;
-; GDT_register - registro
-;
+; _GDT_register
+
 global  _GDT_register
 _GDT_register:
     dw  (_end_gdt-_gdt)-1

@@ -1,5 +1,5 @@
 /*
- * File: kernel/main.c
+ * File: kernel/0mem/main.c
  *     This is the main file for the kernel.
  *     It's architecture independent.
  *     The Assembly code passed the control for us, so now
@@ -30,7 +30,7 @@ extern unsigned long SavedBootBlock;
 
 
 //
-// == kernel data ================================================
+// == kernel data ==============================
 //
 
 // char copyright[] =

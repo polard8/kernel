@@ -383,13 +383,13 @@ create_request (
 
 
     kernel_request = number;
+
     REQUEST.kernel_request = number;
-    REQUEST.status = status;
+    REQUEST.status         = status;
 
 
     if (timeout < 0 ){
         REQUEST.timeout = 0;
-
     }else{
         REQUEST.timeout = timeout;
     };
@@ -422,23 +422,21 @@ create_request (
 
 void clear_request (void)
 {
+
     REQUEST.kernel_request = 0;
-
-    REQUEST.status = 0;
-    REQUEST.timeout = 0;
-
+    REQUEST.status     = 0;
+    REQUEST.timeout    = 0;
     REQUEST.target_pid = 0;
     REQUEST.target_tid = 0;
 
     REQUEST.window = NULL;
-    REQUEST.msg = 0;
-    REQUEST.long1 = 0;
-    REQUEST.long2 = 0;
-
-    REQUEST.long3 = 0;
-    REQUEST.long4 = 0;
-    REQUEST.long5 = 0;
-    REQUEST.long6 = 0;
+    REQUEST.msg    = 0;
+    REQUEST.long1  = 0;
+    REQUEST.long2  = 0;
+    REQUEST.long3  = 0;
+    REQUEST.long4  = 0;
+    REQUEST.long5  = 0;
+    REQUEST.long6  = 0;
 
     // The number of the current request.
     kernel_request = 0;
