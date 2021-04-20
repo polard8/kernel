@@ -10,6 +10,50 @@
 #define ____FS_H
 
 
+struct directory_facility_d
+{
+    unsigned long dir_address;
+    char          dir_name[9]; //8+1
+    int name_size;
+    int initialized;
+};
+
+// Found in the base/ of the project.
+struct directory_facility_d directory_facility_RootDir;
+struct directory_facility_d directory_facility_EFIDir;
+struct directory_facility_d directory_facility_GramadoDir;
+struct directory_facility_d directory_facility_ProgramsDir;
+struct directory_facility_d directory_facility_ubaseDir;
+struct directory_facility_d directory_facility_usersDir;
+// ...
+
+// Found in the system partition.
+// struct directory_facility_d directory_facility_???;
+// ...
+
+
+//
+// == pwd =============================
+//
+
+// See: landos/kernel/include/rtl/fs/path.h
+// A string do diretório de trabalho.
+
+
+struct cwd_d 
+{
+    //char current_workingdiretory_string[WORKINGDIRECTORY_STRING_MAX];
+    //int pwd_initialized;
+
+    char path[WORKINGDIRECTORY_STRING_MAX];
+    int size;
+    int initialized;
+};
+struct cwd_d CWD;
+
+
+
+
 // -----------------
 
 // #todo
@@ -94,13 +138,8 @@ int fat_cache_loaded;
 static char *____root_name = "/";
 
 
-//
-// == pwd =============================
-//
 
-// A string do diretório de trabalho.
-char current_workingdiretory_string[WORKINGDIRECTORY_STRING_MAX];
-int pwd_initialized;
+
 
 
 //
@@ -171,19 +210,22 @@ struct target_dir_d
     int used;
     int magic;
 
+    // Buffer where the directory was loaded.
+    unsigned long current_dir_address;
+
 	//ponteiro para a string do caminho
 	//char *pwd_string;  
 
     //file name 8.3 (11 bytes;)
     char name[32];
 
-    // Buffer where the directory was loaded.
-    unsigned long current_dir_address;
 
     // ??
     // The number of entries ?
 
     // ...
+    
+    int initialized;
 };
 
 struct target_dir_d current_target_dir;
@@ -239,7 +281,9 @@ struct dir_d
     int used;
     int magic;
 
-    // #todo: Precisaremos dessas coisas.
+    // #todo: 
+    // Precisaremos dessas coisas.
+
     struct inode_d *inode;
     file *_file;
 
@@ -322,6 +366,8 @@ struct filesystem_d
     unsigned long dataarea_lba;      //lba
 
     //...
+
+    // struct filesystem_d *next;
 };
 
 struct filesystem_d *root;
@@ -394,8 +440,12 @@ struct file_context_d
 
 
 //
-// == Prototypes ================================================
+// == Prototypes =====================
 //
+
+
+int init_directory_facilities(void);
+
 
 void fs_fat16_cache_not_saved(void);
 
@@ -475,8 +525,11 @@ void fs_pathname_backup ( int pid, int n );
 
 // usada por open();
 // IN: name, flags, mode
-int sys_read_file_from_disk ( char *file_name,  int flags, mode_t mode );
-
+int 
+sys_read_file_from_disk ( 
+    char *file_name,  
+    int flags, 
+    mode_t mode );
 
 int
 sys_write_file_to_disk ( 
@@ -764,7 +817,8 @@ void fsCheckVbrFile ( unsigned char *buffer );
 
 
 int fsLoadFileFromCurrentTargetDir (void);
-void fsInitTargetDir (void);
+
+void fsInitTargetDir (unsigned long dir_address, char *name);
 
 
 void fs_show_root_fs_info(void);

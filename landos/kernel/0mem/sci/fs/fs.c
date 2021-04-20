@@ -502,6 +502,7 @@ fsListFiles (
 
     // #todo: 
     // Checar mais limites.
+    // Use this: if ( disk_id < 0 || volume_id < 0 || directory_id < 0 )
 
     if ( disk_id == -1 || volume_id == -1 || directory_id == -1 )
     {
@@ -2133,7 +2134,7 @@ int fsInit (void){
 	//
 
     // Inicializa a estrutura de suporte ao target dir.
-    fsInitTargetDir();
+    fsInitTargetDir(VOLUME1_ROOTDIR_ADDRESS,"/");
 
     // Done.
     debug_print ("fsInit: done\n");
@@ -2141,7 +2142,51 @@ int fsInit (void){
     return 0;
 }
 
+int init_directory_facilities(void)
+{
 
+    // '/'
+    directory_facility_RootDir.dir_address = VOLUME1_ROOTDIR_ADDRESS;
+    directory_facility_RootDir.dir_name[0] = '/';
+    directory_facility_RootDir.dir_name[1] = 0;
+    directory_facility_RootDir.name_size = 1;
+    directory_facility_RootDir.initialized = TRUE;
+
+    // EFI/
+    directory_facility_EFIDir.dir_address = 0;
+    directory_facility_EFIDir.dir_name[0] = 0;
+    directory_facility_EFIDir.name_size = 0;
+    directory_facility_EFIDir.initialized = FALSE;
+
+    // GRAMADO/
+    directory_facility_GramadoDir.dir_address = 0;
+    directory_facility_GramadoDir.dir_name[0] = 0;
+    directory_facility_GramadoDir.name_size = 0;
+    directory_facility_GramadoDir.initialized = FALSE;
+
+    // PROGRAMS/
+    directory_facility_ProgramsDir.dir_address = 0;
+    directory_facility_ProgramsDir.dir_name[0] = 0;
+    directory_facility_ProgramsDir.name_size = 0;
+    directory_facility_ProgramsDir.initialized = FALSE;
+
+
+    // UBASE/
+    directory_facility_ubaseDir.dir_address = 0;
+    directory_facility_ubaseDir.dir_name[0] = 0;
+    directory_facility_ubaseDir.name_size = 0;
+    directory_facility_ubaseDir.initialized = FALSE;
+
+    // USERS/
+    directory_facility_usersDir.dir_address = 0;
+    directory_facility_usersDir.dir_name[0] = 0;
+    directory_facility_usersDir.name_size = 0;
+    directory_facility_usersDir.initialized = FALSE;
+
+
+    // ok
+    return 0;
+}
 
 /*
  *****************************************************
@@ -2161,11 +2206,12 @@ int fat16Init (void)
 	// Type - Configura o tipo de sistema de arquivos usado. 
 	// No caso, (fat16).
 	//
-	// @todo: Deve-se checar o volume ativo e ver qual sistema de arquivos est�
-	//        sendo usado, ent�o depois definir configurar o tipo.
-	//        O sistema operacional pode salvar o tipo usado. Nesse caso 
-	//        apenas checar se ouve altera��es nas configura��es de sistema de arquivos.
-	//        O registro de configura��es de disco pode ser armazenado em arquivos de metadados.
+	// #todo: 
+	// Deve-se checar o volume ativo e ver qual sistema de arquivos est�
+	// sendo usado, ent�o depois definir configurar o tipo.
+	// O sistema operacional pode salvar o tipo usado. Nesse caso 
+	// apenas checar se ouve altera��es nas configura��es de sistema de arquivos.
+	// O registro de configura��es de disco pode ser armazenado em arquivos de metadados.
 
     set_filesystem_type (FS_TYPE_FAT16);
 
@@ -2237,6 +2283,10 @@ void fsInitializeWorkingDiretoryString (void)
 
     debug_print ("fsInitializeWorkingDiretoryString:\n");
 
+    // See: 
+    // kernel/include/rtl/fs/fs.h
+
+    CWD.initialized = FALSE;
 
     // volume string 
     
@@ -2254,23 +2304,31 @@ void fsInitializeWorkingDiretoryString (void)
 	//  ## volume list ##
 	//primeiro colocamos a string que indica a lista de volumes. 
 
-    sprintf ( current_workingdiretory_string, FS_ROOT_STRING ); 
+    sprintf ( CWD.path, FS_ROOT_STRING ); 
 
 	//'/'
 	// ## separador ##
-    strcat ( current_workingdiretory_string, FS_PATHNAME_SEPARATOR );
+    strcat ( CWD.path, FS_PATHNAME_SEPARATOR );
 
 
 	//
-	//  ## volume root dir ##
+	// volume root dir 
 	//
+
+    // #todo
+    // Check overflow.
+
+    if ( current_volume < 0 ){
+        panic ("fsInitializeWorkingDiretoryString: current_volume\n");
+    }
+
 
     v = (struct volume_d *) volumeList[current_volume];
 
     if ( (void *) v == NULL ){
         panic ("fsInitializeWorkingDiretoryString: v\n");
     }else{
-        if ( v->used != 1 || v->magic != 1234 ){
+        if ( v->used != TRUE || v->magic != 1234 ){
             panic ("fsInitializeWorkingDiretoryString: validation\n");
         }
 
@@ -2302,9 +2360,8 @@ void fsInitializeWorkingDiretoryString (void)
         // path string na estrutura do volume.
         
         string_size = sizeof(current_volume_string);
-        
-        if(string_size >= 32)
-        {
+
+        if (string_size >= 32){
             debug_print ("fsInitializeWorkingDiretoryString: [FIXME] string size\n"); 
             return;
         }
@@ -2319,41 +2376,97 @@ void fsInitializeWorkingDiretoryString (void)
         // What is the limit for this string ? 32 bytes.
         // See: rtl/fs/path.h and globals.h
 
-        strcat ( current_workingdiretory_string, v->path_string );
-	    //strcat ( current_workingdiretory_string, current_volume_string );
+        strcat ( CWD.path, v->path_string );
+	    //strcat ( CWD.path, current_volume_string );
+	    
+        CWD.path[31] = 0;
     };
 
     // #bugbug
     // What is the limit for this string ? 32 bytes.
     // See: rtl/fs/path.h and globals.h
 
-    // ## separador ##
-    strcat ( current_workingdiretory_string, FS_PATHNAME_SEPARATOR );
+    // Separador
+
+    strcat ( 
+        CWD.path, 
+        FS_PATHNAME_SEPARATOR );
+
+
+    //
+    // Size
+    //
+
+    // #test
+
+    CWD.path[31] = 0;
+
+    int size;
+    size = strlen(CWD.path);
+
+    if (size > 31)
+        size = 31;
+
+    CWD.size = size;
 
 	//More ?...
-    pwd_initialized = 1;
 
     debug_print ("fsInitializeWorkingDiretoryString: done\n");
+
+    // See: 
+    // kernel/include/rtl/fs/fs.h
+
+    CWD.initialized = TRUE;
 }
 
 
 /*
  ***************************
  * fsInitTargetDir:
- *     Para inicializarmos o sistema ja' com um alvo, no caso o root dir. 
+ * 
+ *     Para inicializarmos o sistema ja' com um alvo, 
+ * no caso o root dir. 
  */
 
-void fsInitTargetDir (void)
+void fsInitTargetDir (unsigned long dir_address, char *name)
 {
     int i=0;
     
+    
+    current_target_dir.used  = TRUE;
+    current_target_dir.magic = 1234;
+
     for ( i=0; i<11; i++ ){
         current_target_dir.name[i] = '\0';
     };
 
-    current_target_dir.current_dir_address = VOLUME1_ROOTDIR_ADDRESS;
-    current_target_dir.name[0] = '/';  //root dir
-    current_target_dir.name[1] = 0;
+
+    // Dir address
+    
+    if (dir_address == 0)
+        panic("fsInitTargetDir: dir_address\n");
+
+    //current_target_dir.current_dir_address = VOLUME1_ROOTDIR_ADDRESS;
+    current_target_dir.current_dir_address = dir_address;
+
+    // Dir name
+    
+    if ( (void*) name == NULL )
+        panic("fsInitTargetDir: name\n");
+
+    if (*name == 0)
+        panic("fsInitTargetDir: *name\n");
+
+    //current_target_dir.name[0] = '/';
+    //current_target_dir.name[1] = 0;
+
+    // Limits: Copy 8 bytes only
+    for ( i=0; i<8; i++ ){
+        current_target_dir.name[i] = name[i];
+    };
+
+// done:
+    current_target_dir.initialized = TRUE;
 }
 
 
@@ -2517,9 +2630,9 @@ void fsUpdateWorkingDiretoryString ( char *string )
 
 
     // Initialized ?
-    if ( pwd_initialized == 0 )
+    if ( CWD.initialized != TRUE )
     {
-        debug_print ("fsUpdateWorkingDiretoryString: [FAIL] pwd_initialized\n"); 
+        debug_print ("fsUpdateWorkingDiretoryString: [FAIL] CWD not initialized\n"); 
         
         // #todo
         // Call the initialization routine.
@@ -2580,9 +2693,9 @@ void fsUpdateWorkingDiretoryString ( char *string )
             
             for ( i=0; i<32; i++ )
             {
-                current_workingdiretory_string[i] = p->cwd_string[i];
+                CWD.path[i] = p->cwd_string[i];
             };
-            current_workingdiretory_string[31] = 0; //finaliza
+            CWD.path[31] = 0; //finaliza
 
             // #bugbug: rever isso.
             // Nome do diretório alvo atual.
@@ -2640,32 +2753,21 @@ void sys_cd_command ( const char *string )
 
     if ( string[1] == 0 )
     {
-        //$ cd /
-        if (string[0] == '/')
-        {
+
+        // $ cd /
+        // We also need to clean the name in the process structure.
+        if (string[0] == '/'){
             debug_print("sys_cd_command: reseting\n");
             
-            fsInitTargetDir();
+            //if ( directory_facility_RootDir.initialized == TRUE){
+            //    fsInitTargetDir(
+            //        directory_facility_RootDir.dir_address,
+            //        directory_facility_RootDir.dir_name );
+            //}
 
-
-            // We also need to clean the name in the process structure.
-            
+            fsInitTargetDir(VOLUME1_ROOTDIR_ADDRESS,"/");
             //#bugbug: invalid pid
             //fs_initialize_process_cwd ( current_directory, "/" );
-
-            return;
-        }
-
-        //$ cd ~
-        if (string[0] == '~')
-        {
-            debug_print("sys_cd_command: going to Home\n");
-
-            // fsInitTargetDir();
-            
-            //#bugbug: invalid pid
-            //fs_initialize_process_cwd ( current_directory, "~" );
-            
             return;
         }
 
@@ -2705,26 +2807,34 @@ void fs_pathname_backup ( int pid, int n ){
     int i=0;
 
 
-    if ( pwd_initialized == 0 ){
-        printf ("fs_pathname_backup: pwd not initialized\n"); 
+    // CWD
+
+    if ( CWD.initialized != TRUE ){
+        printf ("fs_pathname_backup: [FAIL] CWD not initialized\n"); 
         return;
     } 
 
 
+    // pid
+
     if ( pid<0 ){
-        printf ("fs_pathname_backup: PID\n"); 
+        printf ("fs_pathname_backup: [FAIL] pid\n"); 
         return;
     }
 
+    // n
+
+    if (n<0) {  return;  }
+    if (n==0){  return;  }
+
+    // Process
 
     p = (struct process_d *) processList[pid];
 
     if ( (void *) p == NULL ){
         panic ("fsUpdateWorkingDiretoryString: p\n");
-
     }else{
-
-        if ( p->used != 1 || p->magic != 1234 ){
+        if ( p->used != TRUE || p->magic != 1234 ){
             panic ("fsUpdateWorkingDiretoryString: validation\n");
         }
 
@@ -2744,13 +2854,13 @@ void fs_pathname_backup ( int pid, int n ){
 
         // Atualizando a string global.
         for ( i=0; i<32; i++ ){
-            current_workingdiretory_string[i] = p->cwd_string[i];
-        }
+            CWD.path[i] = p->cwd_string[i];
+        };
 
         // Name.
         for ( i=0; i< 11; i++ ){
             current_target_dir.name[i] = '\0';
-        }
+        };
     };
 }
 

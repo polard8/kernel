@@ -90,18 +90,22 @@ fatLoadCluster (
 
 // #bugbug
 // Essa rotina e' independente do sistema de arquivos.
+// Change name to dest_buffer
 
 void read_lba ( unsigned long address, unsigned long lba )
 {
     // #todo
     // Fazer algum filtro de argumentos ??
 
+    // if ( address == 0 ){}
+
+
     // See: volume.h
 
     switch (g_currentvolume_fatbits){
 
         case 32:
-            debug_print ("read_lba: FAT32 not supported\n");
+            debug_print ("read_lba: [FAIL] FAT32 not supported\n");
             return;
             break;
 

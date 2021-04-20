@@ -302,11 +302,12 @@ findEmptyDirectoryEntry (
     if ( number_of_entries < 0 ){ goto fail; }
 
 
+    // The entry size is 32 bytes.
+
     for ( i=0; i<number_of_entries; i++ )
     {
         if ( dir[j] == 0 ){ return (int) i; }
 
-        // Next entry.
         j = (j+32);
     };
 
@@ -404,15 +405,14 @@ unsigned short fs_find_n_empty_entries ( int n )
 
     };
 
+    // Finaliza a lista com uma assinatura.
 
-	//Finaliza a lista com uma assinatura.
     file_cluster_list[l] = 0xFFF8; 
 
 
+// Retorna o primeiro da lista.
 done:
-    //Retorna o primeiro da lista.
     return (unsigned short) file_cluster_list[0];
-
 fail:
     return (unsigned short) 0;
 }

@@ -28,6 +28,10 @@
 //                      unsigned long address, 
 //                      int spc )
 
+
+// #todo
+// Return 'int'.
+
 void 
 fatWriteCluster ( 
     unsigned long sector, 
@@ -38,6 +42,11 @@ fatWriteCluster (
 
     // #todo
     // We need some limits here for now.
+
+    if (spc == 0){
+        debug_print("fatWriteCluster: spc\n");
+        return;
+    }
 
     for ( i=0; i < spc; i++ )
     {
@@ -69,7 +78,7 @@ void write_lba ( unsigned long address, unsigned long lba )
 	// Check lba limits.
 
     if (address == 0){
-        debug_print ("write_lba: Limits\n");
+        debug_print ("write_lba: [FAIL] Limits\n");
         goto fail;
     }
 
@@ -151,19 +160,24 @@ write_clusters (
  *     @todo: Identificar parâmetros do sistema de arquivos atual. 
  */
 
-
-//int fs_save_rootdir (void)
-int fs_save_rootdir (unsigned long root_address, unsigned long root_lba, size_t root_size)
+int 
+fs_save_rootdir ( 
+    unsigned long root_address, 
+    unsigned long root_lba, 
+    size_t root_size )
 {
 
+    // #todo
+    // Descrever essas variáveis.
+    
     int r=0;
     int roff=0;
     int rlbaoff=0;
 
 
-    unsigned long RootAddress=0;
-    unsigned long RootLBA=0;
-    size_t        RootSize=0;
+    unsigned long RootAddress = 0;
+    unsigned long RootLBA     = 0;
+    size_t        RootSize    = 0;
 
 
     RootAddress = root_address;
@@ -230,19 +244,26 @@ int fs_save_rootdir (unsigned long root_address, unsigned long root_lba, size_t 
 }
 
 
-
 // Save fat into the disk.
-int fs_save_fat (unsigned long fat_address, unsigned long fat_lba, size_t fat_size)
+int 
+fs_save_fat ( 
+    unsigned long fat_address, 
+    unsigned long fat_lba, 
+    size_t fat_size )
 {
+
+    // #todo
+    // Descrever essas variáveis.
+
     int f=0;
     int off=0;
     int lbaoff=0;
 
 
-    unsigned long __fatAddress=0;
-    unsigned long __fatLBA=0;
-    size_t        __fatSize=0;
-    
+    unsigned long __fatAddress = 0;
+    unsigned long __fatLBA     = 0;
+    size_t        __fatSize    = 0;
+
     __fatAddress = fat_address;
     __fatLBA     = fat_lba;
     __fatSize    = fat_size;   //fat size in sectors. 246?
@@ -297,11 +318,11 @@ int fs_save_fat (unsigned long fat_address, unsigned long fat_lba, size_t fat_si
     // #debug
     debug_print ("fs_save_fat: Done\n");
     printf      ("fs_save_fat: Done\n"); 
+
     refresh_screen ();
 
     return 0;
 }
-
 
 
 //

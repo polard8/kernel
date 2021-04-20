@@ -18,6 +18,10 @@ unsigned int pipe_max_size = 4096;
 
 
 // Duplicate a file stream.
+// #todo
+// Here is not the place for this function.
+// Move it to rtl.
+
 int sys_dup ( int oldfd ){
 
     file *f_old;
@@ -35,7 +39,7 @@ int sys_dup ( int oldfd ){
         debug_print("sys_dup: [FAIL]\n");
         return -1;
     }else{
-        if ( Process->used != 1 || Process->magic != 1234 ){
+        if ( Process->used != TRUE || Process->magic != 1234 ){
             debug_print("sys_dup: [FAIL]\n");
             return -1;
         }
@@ -88,7 +92,7 @@ int sys_dup ( int oldfd ){
             return -1;
         }
 
-        f_new->used  = 1;
+        f_new->used  = TRUE;
         f_new->magic = 1234;
 
         // herdando.
@@ -112,6 +116,9 @@ fail:
     return -1;
  }
 
+// #todo
+// Here is not the place for this function.
+// Move it to rtl.
 
 int sys_dup2 (int oldfd, int newfd){
 
@@ -148,18 +155,17 @@ int sys_dup2 (int oldfd, int newfd){
     f_old = (file *) Process->Objects[oldfd];
 
     if ( (void *) f_old == NULL ){
-		Process->Objects[slot] = (unsigned long) 0;
-	    return -1;
+        Process->Objects[slot] = (unsigned long) 0;
+        return -1;
     }else{
 
         f_new = (file *) Process->Objects[slot];
-
         if ( (void *) f_new == NULL ){
-		    Process->Objects[slot] = (unsigned long) 0;
-	        return -1;
+            Process->Objects[slot] = (unsigned long) 0;
+            return -1;
         }
 
-        f_new->used  = 1;
+        f_new->used  = TRUE;
         f_new->magic = 1234;
 
         // Herdado.
@@ -179,42 +185,47 @@ int sys_dup2 (int oldfd, int newfd){
 fail:
 	//errno = ?;
     return -1;
- }
+}
 
+
+// #todo
+// Here is not the place for this function.
+// Move it to rtl.
 
 int sys_dup3 (int oldfd, int newfd, int flags){
 	
 	//#todo: flags.
 
-	file *f_old;
-	file *f_new;
-	
-	struct process_d *Process;
+    file  *f_old;
+    file  *f_new;
+
+    struct process_d *Process;
 
 
-	Process = (void *) processList[current_process];
-	
+    Process = (void *) processList[current_process];
+
+    // #todo
+    // Error messages
+
     if ( (void *) Process == NULL ){
-		return -1;
+        return -1;
+    }else{
 
-	}else{
-	
-	     if ( Process->used != 1 || Process->magic != 1234 )
-		 {
-		     return -1;
-		 }
-		
+         if ( Process->used != 1 || Process->magic != 1234 )
+         {
+             return -1;
+         }
 		 //ok
-	};
+    };
 
-	
-    int slot = newfd;	
-	
+
+    int slot = newfd;
+
 	if ( slot == -1 ) {
 		Process->Objects[slot] = (unsigned long) 0;
 	    return -1;
-	}	
-	
+	}
+
 	//#todo: filtrar oldfd
 	
 	f_old = (file *) Process->Objects[oldfd];
@@ -232,7 +243,7 @@ int sys_dup3 (int oldfd, int newfd, int flags){
 	        return -1;
 		}
 
-        f_new->used  = 1;
+        f_new->used  = TRUE;
         f_new->magic = 1234;
 
         // Herdado
@@ -252,7 +263,7 @@ int sys_dup3 (int oldfd, int newfd, int flags){
 
 fail:
 	//errno = ?;
-	return -1;
+    return (int) (-1);
  }
 
 
@@ -384,9 +395,11 @@ int sys_pipe ( int *pipefd, int flags )
 
     // As duas estruturas compartilham o mesmo buffer.
     }else{
-        f1->used = 1; 
+        
+        f1->used  = TRUE;  
         f1->magic = 1234;
-        f2->used = 1; 
+ 
+        f2->used  = TRUE;  
         f2->magic = 1234;
 
         // File: object type.
@@ -505,29 +518,38 @@ int is_packetized(struct file *file)
 }
 */
 
-int pipe_ioctl ( int fd, unsigned long request, unsigned long arg )
-{
-    debug_print ("pipe_ioctl: TODO\n");
-    
-    if (fd<0)
-        return -1;    
 
+int 
+pipe_ioctl ( 
+    int fd, 
+    unsigned long request, 
+    unsigned long arg )
+{
+
+    debug_print ("pipe_ioctl: TODO\n");
+
+
+    if (fd<0){
+        debug_print("pipe_ioctl: [FAIL] fd\n");
+        return -1;    
+    }
 
     switch (request){
 
     // ...
     
     default:
+        debug_print("pipe_ioctl: [FAIL] default\n");
         break;
     };
+
 
     return -1;
 }
 
 
 
-
-
-
-
+//
+// End.
+//
 
