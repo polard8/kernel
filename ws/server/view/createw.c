@@ -122,12 +122,12 @@ createwDrawFrame (
 
     int Type=0;
 
-    unsigned long border_color=0;
-    unsigned long border_size=0;
+    unsigned long border_color = 0;
+    unsigned long border_size  = 0;
 
 
-    // COLOR_BLUE1 = Light blue
-    unsigned long TitleBarColor = 0x00000E80;     // Dark blue
+    //unsigned long TitleBarColor = 0x00000E80;     // Dark blue
+    unsigned long TitleBarColor = COLOR_BLUE1;    // Light blue
 
 
     gwssrv_debug_print ("createwDrawFrame:\n");
