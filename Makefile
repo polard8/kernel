@@ -5,10 +5,10 @@ PRODUCT_NAME  = Gramado
 EDITION_NAME  = Land
 VERSION_MAJOR = 1
 VERSION_MINOR = 0
-VERSION_BUILD = 232
+VERSION_BUILD = 233
 KERNELVERSION = $(VERSION_MAJOR)$(if $(VERSION_MINOR),.$(VERSION_MINOR)$(if $(VERSION_BUILD),.$(VERSION_BUILD)))
 
-# Documentation.
+# Documentation
 # See: base/GRAMADO/DOCS/
 # To see the targets execute "make help".
 
