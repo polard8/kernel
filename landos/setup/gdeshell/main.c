@@ -65,8 +65,6 @@ int ShellFlag = 0;
 //O shell est� rodadndo.
 int _running = 1;
 
-int __home = FALSE;
-int __temple = FALSE;
 
 /* Non-zero when we are executing a top-level command. */
 //o shell est� executando um comando que 
@@ -147,105 +145,56 @@ int interactive = TRUE;
 
 int remember_on_history = FALSE;
 
-
-/* 
- * ??
- * Non-zero means this shell is restricted. 
- */
-
+// ??
+// Non-zero means this shell is restricted. 
 int restricted = FALSE;
 
-/* 
- * ??
- * Special debugging helper. 
- */
-
+// ??
+// Special debugging helper. 
 int debugging_login_shell = FALSE;
-
 
 // A double pointer to save the environment.
 // The environment that the shell passes to other commands. 
-
 char **shell_environment;
 
-
-
 // The number of commands executed so far. 
-
 int current_command_number = 1;
 
 
-/* The environment at the top-level REP loop.  We use this in the case of
-   error return. */
-//jmp_buf top_level, catch;
+/* 
+ The environment at the top-level REP loop.  
+ We use this in the case of error return. */
+// jmp_buf top_level, catch;
 
-
-/* Non-zero is the recursion depth for commands. */
+// Non-zero is the recursion depth for commands. 
 int indirection_level = 0;
 
-
-/* 
- * The number of times BASH has been executed.  
- * This is set by initialize_variables () in variables.c. 
- */
-
+// The number of times BASH has been executed.  
+// This is set by initialize_variables () in variables.c. 
 int shell_level = 0;
 
-
-/* The name of the .(shell)rc file. */
+// The name of the .(shell)rc file. 
 char *bashrc_file = "~/.bashrc";
 
-/*nome do arquivo de configura��o*/
+// nome do arquivo de configuração
 char *shell_config_file = "./shellcnf.txt";
 
-
-/* Non-zero means to act more like the Bourne shell on startup. */
+// Non-zero means to act more like the Bourne shell on startup. 
 int act_like_sh = 0;
 
-
-
-/* Values for the long-winded argument names. */
+// Values for the long-winded argument names. 
 int debugging = 0;		/* Do debugging things. */
 int no_rc = 0;			/* Don't execute ~/.bashrc */
 int no_profile = 0;		/* Don't execute .profile */
 int do_version = 0;		/* Display interesting version info. */
-/* Be quiet when starting up. */
-//inicializa��o silenciosa. Suprime alguns verboses.
-int quiet = 0;	
-int make_login_shell = 0;	/* Make this shell be a `-bash' shell. */
-int no_line_editing = 0;	/* Don't do fancy line editing. */
-int no_brace_expansion = 0;	/* Non-zero means no foo{a,b} -> fooa fooa. */
 
-
-//
-// ## Arguments support ##
-//
-
-
-/* Some long-winded argument names.  These are obviously new. */
-#define Int    1
-#define Charp  2
-
-struct {
-
-    char *name;
-    int *value;
-    int type;
-
-} long_args[] = {
-
-    { "debug",             &debugging,           Int   },
-    { "norc",              &no_rc,               Int   },
-    { "noprofile",         &no_profile,          Int   },
-    { "rcfile",            (int *) &bashrc_file, Charp },
-    { "version",           &do_version,          Int   },
-    { "quiet",             &quiet,               Int   },
-    { "login",             &make_login_shell,    Int   },
-    { "nolineediting",     &no_line_editing,     Int   },
-    { "nobraceexpansion",  &no_brace_expansion,  Int   },
-    { (char *) NULL,       (int *) 0x0,          0     }
-
-};
+// Be quiet when starting up. 
+// Inicialização silenciosa. 
+// Suprime alguns verboses.
+int quiet = 0;
+int make_login_shell   = 0;  /* Make this shell be a `-bash' shell. */
+int no_line_editing    = 0;  /* Don't do fancy line editing. */
+int no_brace_expansion = 0;  /* Non-zero means no foo{a,b} -> fooa fooa. */
 
 
 int shellStatus;
@@ -254,60 +203,17 @@ int shellError;
 
 //... 
 
-/*
-//argument buffer
-char **argbuf;
-int argbuf_length;
-int argbuf_index;
-*/
 
-/*
-struct {
-	
-  char *word;
-  int token;
-  
-} token_word_alist[] = {
-  {"if", IF},
-  {"then", THEN},
-  {"else", ELSE},
-  {"elif", ELIF},
-  {"fi", FI},
-  {"case", CASE},
-  {"esac", ESAC},
-  {"for", FOR},
-  {"while", WHILE},
-  {"until", UNTIL},
-  {"do", DO},
-  {"done", DONE},
-  {"in", IN},
-  {"function", FUNCTION},
-  {"{", '{'},
-  {"}", '}'},
-  { (char *) NULL, 0 }
-};
-*/
-
-
-
-// status de algumas inicializa��es de duporte a janelas.
+// Status de algumas inicializações de duporte a janelas.
 int sm_initialized = 0;
 int wl_initialized = 0;
 int ws_initialized = 0;
 int wp_initialized = 0;
 
 
-
-
-
-//
-// ===============================================================
-//
-
-//
-// ## timer ##
-//
-
+//++
+// ===============================
+// TIMER
 int objectX;
 int objectY;
 int deltaX;
@@ -316,11 +222,13 @@ int deltaY;
 int deltaValue = 1;
 int __count=0;
 unsigned long CPU_USAGE[32];
+// ===============================
+//--
 
 
 
 //
-// == Prototypes =====================================================
+// == Prototypes =====================================
 //
 
 
@@ -331,9 +239,7 @@ SendARP (
     unsigned long target_ip, 
     unsigned long target_mac );
 
-
 void testSendARP (void);
-
 
 int
 __SendMessageToProcess ( 
@@ -343,11 +249,7 @@ __SendMessageToProcess (
     unsigned long long1,
     unsigned long long2 );
 
-
 int gdeshell_save_config_file (void);
-
-
-// ==== Prototypes ====
 
 void die (char *str);
 void error ( char *msg, char *arg1, char *arg2 );
@@ -547,23 +449,26 @@ void ram_test (void){
 }
 
 
+// Process stats.
 void process_stats(void){
 
-    register int i=0;
-    
-    unsigned long __process_image_pa = 0;
-    unsigned long __process_image_va = 0;
+    register int i = 0;
+    unsigned long __process_image_pa   = 0;
+    unsigned long __process_image_va   = 0;
     unsigned long __process_image_size = 0;
 
+    // #todo
+    // We need some defines for these numbers.
 
     for (i=100; i<109; i++)
     {
-        __process_image_pa = gde_get_process_stats(i,18);
-        __process_image_va = gde_get_process_stats(i,17);  
-        
-        __process_image_size = gde_get_process_stats (i,51);  
-        printf ("> pid %d: image_size=%d ", i, __process_image_size);
-        printf ("pa=%x ", __process_image_pa);
+        __process_image_pa   = gde_get_process_stats(i,18);
+        __process_image_va   = gde_get_process_stats(i,17);
+        __process_image_size = gde_get_process_stats(i,51);
+
+        printf ("> pid %d: image_size=%d ", 
+            i, __process_image_size );
+        printf ("pa=%x ",   __process_image_pa);
         printf ("va=%x \n", __process_image_va);
     };
 
@@ -575,18 +480,14 @@ void fake_sleep (unsigned long t)
 {
     unsigned long i = (unsigned long) ( t * 512 );
 
+    if (i == 0){  i=512;  }
 
-    if (i == 0){
-        i=512;
-    }
-    
     while (i > 0){ i--; }
 }
 
 
-
-
-//Arg: Endere�os dos buffers contendo os chars.
+// IN: 
+// Endereços dos buffers contendo os chars.
 
 int 
 SendARP ( 
@@ -594,6 +495,7 @@ SendARP (
     unsigned long target_ip, 
     unsigned long target_mac )
 {
+
     gde_debug_print ("gdeshell-SendARP: [TODO]\n");
 
 	//#todo:
@@ -609,7 +511,8 @@ SendARP (
 }
 
 
-// testando o envio de um arp request usando os servi�os do kernel.
+// Testando o envio de um arp request 
+// usando os serviços do kernel.
 void testSendARP (void)
 {
 	uint8_t source_ip_address[4];
@@ -661,37 +564,31 @@ __SendMessageToProcess (
 
     unsigned long message_buffer[5];
 
-
     if (pid<0){
         // todo: message
         return -1;
     }
-	
+
 	message_buffer[0] = (unsigned long) window;
 	message_buffer[1] = (unsigned long) message;
 	message_buffer[2] = (unsigned long) long1;
 	message_buffer[3] = (unsigned long) long2;
-	//...
+	// ...
 
-    return (int) system_call ( 112 , 
+    return (int) system_call ( 
+                     112, 
                      (unsigned long) &message_buffer[0], 
                      (unsigned long) pid, 
                      (unsigned long) pid );
 }
-//
-// ===============================================================
-//
-
-
 
 
 // Usado para testar o timer.
 void update_cpu_usage (void)
 {
-    unsigned long __idle_value=0;
-    unsigned long __value=0;
     int i=0;
-
+    unsigned long __idle_value =0;
+    unsigned long __value =0;
 
     __count++;
     //printf ("%d ",__count);
@@ -702,28 +599,26 @@ void update_cpu_usage (void)
     //CPU_USAGE[__count] = __value;
     CPU_USAGE[__count] = __idle_value;
     
-    if (__count < 32)
-    {
+    if (__count < 32){
         return;
-    
     }else{
 
         __count = 0;
 
         // Clean
-        gde_redraw_window ( cpu_window, 1 );
+        gde_redraw_window ( cpu_window, TRUE );
 
         // Draw
         for (i=1; i<32; i++)
         {
-            // IN:
+            // IN: ?
             gde_draw_text ( 
                 cpu_window, 
                 (i*smCharHeight), CPU_USAGE[i], 
                  COLOR_BLACK, "+");
         };
 
-        // Show
+        // Show window.
         gde_show_window (cpu_window);
     };
 }
@@ -732,34 +627,34 @@ void update_cpu_usage (void)
 // Usado para testar o timer.
 void updateObject (void)
 {
-   //RECT rc;
-   //GetClientRect(hwnd, &rc);
+    //RECT rc;
+    //GetClientRect(hwnd, &rc);
 
-   objectX += deltaX;
-   objectY += deltaY;
+    objectX += deltaX;
+    objectY += deltaY;
 
-   if ( objectX < 2 )
-   {
-      objectX = 2;
-      deltaX = deltaValue;
-   }
-   else if ( objectX > 78 ){
-      objectX = 78; 
-      deltaX = -deltaValue;    // Muda a dire��o.
-   }
+    if ( objectX < 2 )
+    {
+        objectX = 2;
+        deltaX = deltaValue;
+    }
+    else if ( objectX > 78 ){
+        objectX = 78; 
+        deltaX = -deltaValue;    // Muda a direção.
+    };
    
    
-   if (objectY < 2)
-   {
-      objectY = 2;
-      deltaY = deltaValue;
-   }
-   else if ( objectY > 24 ){
-      objectY = 24; 
-      deltaY = -deltaValue;
-   }
+    if (objectY < 2)
+    {
+        objectY = 2;
+        deltaY = deltaValue;
+    }
+    else if ( objectY > 24 ){
+        objectY = 24; 
+        deltaY = -deltaValue;
+    };
 
-    
+
 	//
 	// == Draw char ==============================
 	//
@@ -772,163 +667,46 @@ void updateObject (void)
     //shellInsertNextChar ( (char) 'T' );  
 
     shellSetCursor ( objectX, objectY );
+
+    // #test
     printf ("%c", (char) 'X');
+    fflush(stdout);
 }
 
 
 
-// interna
-// cria a janela
-// #todo: 
-// This was a cool test, but it is time to delete it.
-
-struct window_d *xmas_tree_window;
-void *xmas_tree_buffer;
-
+// Deprecated
 void xmas_tree_create (char *file_name)
 {
-
     debug_print("xmas_tree_create: deprecated\n");
-    return;
-    
-    /*
-    xmas_tree_window = (void *) gde_create_window ( 
-                                    WT_SIMPLE, 1, 1, 
-                                    "XTREE",     
-                                    10, 10, 90, 130,    
-                                    0, 0, COLOR_GREEN, COLOR_GREEN );
-    if ( (void *) xmas_tree_window == NULL )
-    { 
-        return; 
-    }
-    
-    gde_register_window ( (struct window_d *) xmas_tree_window );
-
-    // testando malloc.
-    xmas_tree_buffer = (void *) malloc (1024*50); 
-
-    //existe um buffer
-    shellui_fntos ( (char *) file_name );
-
-    // #todo: 
-    // Usar alguma rotina da API especifica para carregar arquivo.
-    // na verdade tem que fazer essas rotinas na API.
-
-    // load file.
-
-    gramado_system_call ( 
-        SYSTEMCALL_READ_FILE, 
-        (unsigned long) file_name, 
-        (unsigned long) xmas_tree_buffer, 
-        (unsigned long) xmas_tree_buffer );
-    */
 }
 
-
-// interna
-// voce a janela
-// #todo: 
-// This was a cool test, but it is time to delete it.
-
+// Deprecated
 void xmas_tree (void)
 {
-   //RECT rc;
-   //GetClientRect(hwnd, &rc);
-
-   objectX += deltaX;
-   objectY += deltaY;
-
-   if ( objectX < 2 )
-   {
-      objectX = 2;
-      deltaX = deltaValue;
-   }
-   else if ( objectX > 78 ){
-      objectX = 78; 
-      deltaX = -deltaValue;    // Muda a dire��o.
-   }
-   
-   
-   if (objectY < 2)
-   {
-      objectY = 2;
-      deltaY = deltaValue;
-   }
-   else if ( objectY > 24 ){
-      objectY = 24; 
-      deltaY = -deltaValue;
-   }
-
-    
-	//
-	// ## test ##
-	//
-	
-	//update.
-	//textCurrentRow = objectX;
-    //textCurrentCol = objectY;
-   
-    //putchar.
-	//shellInsertNextChar ( (char) 'T' );  
-	
-	shellSetCursor ( objectX, objectY );
-	
-	//printf ("%c", (char) 'X');
-	//shellDisplayBMPEx ( (char *) tokenList[i], (int) (200) );
-	
-    gde_replace_window ( 
-        (struct window_d *) xmas_tree_window, 
-        objectX, 
-        objectY );
-    
-    //decodificando ??
-	gde_display_bmp ( (char *) xmas_tree_buffer, objectX, objectY ); 
-    
-    //gde_redraw_window( (struct window_d *) xmas_tree_window, 1); 
-    //apiShowWindow ((struct window_d *) xmas_tree_window);
-    
-    gde_show_backbuffer ();
+    debug_print("xmas_tree: deprecated\n");
 }
 
-
-//
-// ===============================================================
-//
-
-
-
-//
-// ==== Internals ====
-//
-
-// #todo
-// Delete this test.
-
+// Deprecated
 void lionlionlion(void)
 {
-    if (__home == TRUE && __temple == TRUE)
-    { 
-        printf ("lion lion lion\n"); 
-        gde_clone_and_execute("gwssrv.bin");
-        exit(0);
-    } 
-    __home   = FALSE;
-    __temple = FALSE; 
+    debug_print("xmas_tree: deprecated\n");
 }
 
-
-//backspace
+// Backspace support.
 void do_back(void)
 {
     // Apaga o char na tela, na linha de comandos e no buffer.
     if ( textCurrentCol > 0 )
     { 
-          // ok. funcionou. 
-          // a linha de comandos. prompt[]
+        // ok. funcionou. 
+        // a linha de comandos. prompt[]
+        
         putchar(0x8);  input(0x8);  // volta
         putchar(0x20); input(0x20); // apaga
         putchar(0x8);  input(0x8);  // volta
         fflush(stdout);             // mostra sem mudar de linha.
+        
         //o buffer.
         //volta um char no buffer e apaga na nova posiçao.
         textCurrentCol--; 
@@ -936,18 +714,15 @@ void do_back(void)
     }
 }
 
-static inline void pause (void)
+
+static inline void pause(void)
 {
     asm volatile ("pause" ::: "memory"); 
 } 
 
-
-/* 
- REP NOP (PAUSE) 
- is a good thing to insert into busy-wait loops. 
- */
-
-static inline void rep_nop (void)
+// REP NOP (PAUSE) 
+// is a good thing to insert into busy-wait loops. 
+static inline void rep_nop(void)
 {
     asm volatile ("rep;nop": : :"memory");
 }
@@ -955,24 +730,22 @@ static inline void rep_nop (void)
 #define cpu_relax()  rep_nop()
 
 
-// vamos apenas carregar um arquivo qualquer.
+// #test:
+// Carregando um arquivo usando pathname.
 // OK: funcionou no qemu.
-
 void __load_path_test(void)
 {
     char __path[] = "/GRAMADO/TEST1.CPP";
 
+    // Endereço onde carregar o arquivo.
     void *__address = 0;
     unsigned long ___size_limit=0;
 
-    //___size_limit = (200*1024); // 200KB
     ___size_limit = (1*1024);
 
-    // endereço para carregar o arquivo
     __address = (void *) malloc (___size_limit);
     
-    if ( (void*) __address == NULL )
-    {
+    if ( (void*) __address == NULL ){
         printf ("__load_path_test: [FAIL] __address\n");
         return;
     }
@@ -991,122 +764,31 @@ void __load_path_test(void)
     int mark = (___size_limit - 1);
     buffer[mark] = 0;
     
-    // show:
+// show:
+
     printf ( "File = {%s}\n", buffer );
-    
     printf ("__load_path_test: done\n");
+    return;
 }
 
 
-// #bugbug: 
-// parameter?
-
-void quit ( int status )
+// Exit the main loop.
+void quit (void)
 {
     _running = FALSE;
 }
- 
-
-
-/*
-
- // ?? what is this ??
-
-void reader_loop ();
-void reader_loop ()
-{
-    extern int indirection_level;
-    
-	int our_indirection_level;
-    
-	COMMAND *current_command = (COMMAND *) NULL;
-
-    our_indirection_level = ++indirection_level;
-
-    while (!EOF_Reached)
-    {
-        sighandler sigint_sighandler ();
-        
-		int code = setjmp (top_level);
-
-        signal (SIGINT, sigint_sighandler);
-
-        if (code != NOT_JUMPED)
- 	    {
-	        indirection_level = our_indirection_level;
-
-	        switch (code)
-	        {
-	            //Some kind of throw to top_level has occured. 
-	            case FORCE_EOF:
-	            case EXITPROG:
-	                current_command = (COMMAND *) NULL;
-	                EOF_Reached = EOF;
-	                goto exec_done;
-
-	            case DISCARD:
-	                //Obstack free command elements, etc. 
-	                break;
-					
-	            default:
-	                programming_error ("Bad jump %d", code);
-	        }
-	   }
-
-      executing = 0;
-		
-      dispose_used_env_vars ();
-
-      if (read_command () == 0)
-	  {
-	      if (global_command) 
-		  {
-	          current_command = global_command;
-
-	          current_command_number++;
-
-	          //POSIX spec: "-n  The shell reads commands but does
-	          //not execute them; this can be used to check for shell
-	          //script syntax errors.  The shell ignores the -n option
-	          //for interactive shells. " 
-
-	          if (interactive || !read_but_dont_execute)
-	          {
-		          executing = 1;
-		          execute_command (current_command);
-	          }
-
-	         exec_done:
-	         
-			  if (current_command)
-	             dispose_command (current_command);
-	             QUIT;
-	      }
-		  
-	  }else{
-		  
-	      // Parse error, maybe discard rest of stream if not interactive. 
-	      if (!interactive)
-	          EOF_Reached = EOF;
-	  };
-		
-      if (just_one_command)
-	      EOF_Reached = EOF;
-    
-	}; //while
-	
-    indirection_level--;
-}
-*/
 
 
 
 /*
- ***********************************************
+ *********************************************************
  * shellProcedure:
+ * 
  *     Procedimento de janela.
+ * 
  *     LOCAL
  */
+
 
 unsigned long 
 shellProcedure ( 
@@ -1121,8 +803,9 @@ shellProcedure (
     int q=0;
     int c=0;
 
-    // #bugbug: Use returns in the cases.
-    
+    // #bugbug: 
+    // Use 'return' statement in the all cases.
+
     switch (msg){
 
         case MSG_KEYDOWN:
@@ -1173,7 +856,6 @@ shellProcedure (
                 
                 case 0x47: 
                     printf ("HOME\n");
-                    lionlionlion();
                     goto done; 
                     break;
                     
@@ -1377,37 +1059,36 @@ done:
 }
 
 
-// #todo: Delete
+// Deprecated
 void shellWaitCmd (void)
 {
-	// Nothing.
+    debug_print ("shellWaitCmd: deprecated\n");
 }
-
 
 
 /*
  ****************
  * shellCompare:
  *     Compara comandos digitados com palavras chave.
- *     Compara a palavra em 'prompt[]' com outras e chama o servi�o.
+ *     Compara a palavra em 'prompt[]' com outras e chama o serviço.
  * o enter foi o caractere digitado, vamos comparar palavras.
  *
  * Credits:
  * + Stephen Brennan - https://brennan.io/2015/01/16/write-a-shell-in-c/
- * + Frederico Martins Nora (frednora)
+ * + Frederico Martins Nora - (frednora)
  */
 
 
+// Tokenizer support.
 #define LSH_TOK_DELIM   " \t\r\n\a" 
 #define LSH_TOK_DELIM2  " \t\r\n\a+!:=/.<>;|&" 
 #define SPACE " "
 #define TOKENLIST_MAX_DEFAULT 80
 
-
 unsigned long shellCompare (struct window_d *window)
 {
-    // Token support.
 
+    // Tokenizer support.
     char *tokenList[TOKENLIST_MAX_DEFAULT];
     char *token;
     int ____token_count=0;
@@ -1420,41 +1101,50 @@ unsigned long shellCompare (struct window_d *window)
     unsigned long ret_value=0;
     int q=0;    //dialog
     char *c;
-    int absolute=0;     // #bugbug: Absolute pathname?
 
+    // #bugbug: 
+    // Absolute pathname?
+    // This is a work in progress.
+
+    int Absolute = FALSE;     
+
+    //
+    // The command line.
+    //
 
 	// #importante:
+	// The shared memory for the commandod line
 	// Transferir toda alinha de comando para a mem�ria compartilhada.
 	// Obs: 
 	// Possivelmente isso n�o continua� assim, mas por enquanto t� bom.
+    // Linha de 80 chars no max.
 
     unsigned char *shared_memory = (unsigned char *) (0xC0800000 -0x100);
 
-    // Linha de 80 chars no max.
-    for ( i=0; i<80; i++ )
-    {  
+    for ( i=0; i<80; i++ ){  
         shared_memory[i] = prompt[i];  
     };
 
+HandleCmdLine:
 
     // Temos uma linha de comando em prompt[]
     // Digitada pelo usu�rio de gdeshel.
     // Quem pegou o input de teclado ??
     // N�o foi o terminal virtual. Como deveria ser.
- 
-NewCmdLine:
 
     // #debug
     // printf("prompt:{%s}\n",prompt);
 
-    // Lidando com chars da linha de comando.
-
-    c = prompt;
+    //
+    // The first char.
+    //
 
 	// $(NULL)
 	// [ENTER] finalizou a atring antes de ter digitado alguma coisa.
 	// Se alguem pressiona [ENTER] com prompt vazio d� page fault ?
 	// Isso cancela caso o buffer esteja vazio.
+
+    c = prompt;
 
     if ( *c == '\0' )
     {
@@ -1538,10 +1228,12 @@ fixing_command_line:
 
 
 		//#bugbug
-        //se estamos aqui � porque copiamos quase 80 chars.		
+        //se estamos aqui � porque copiamos quase 80 chars.
     };
 
+    //
     // Command line ok.
+    //
 
 commandlineOk:
 
@@ -1563,27 +1255,24 @@ commandlineOk:
 	// de arquivo dentro do diret�rio atual. Como: 'name' ou name1/name2,
 	// sem barra ou ponto.
 	// $/ � o diret�rio raiz do volume do sistema.
-	// $v/ � o diret�rio raiz do vfs.	
- 
+	// $v/ � o diret�rio raiz do vfs.
 
-    absolute = absolute_pathname ( (char *) prompt );
 
-    switch (absolute){
-        case 0:  goto this_directory;  break;
-        case 1:  goto check_directory; break;
-        case 2:
-        default:
-            goto this_directory;
-            break;
+    Absolute = absolute_pathname ( (char *) prompt );
+
+    switch (Absolute){
+        case 0:   goto this_directory;   break;
+        case 1:   goto check_directory;  break;
+        default:  goto this_directory;   break;
     };
 
 
-//precisamos checar em que diret�rio 
-//o programa est�.
-//o comando tem um pathname absoluto ...
-//Precisamos invocar esse programa 
-//que est� em um diret�rio apontado no pathname.
-//ex: ../cmd 	
+// Precisamos checar em que diret�rio 
+// o programa est�.
+// o comando tem um pathname absoluto ...
+// Precisamos invocar esse programa 
+// que est� em um diret�rio apontado no pathname.
+// ex: ../cmd 	
 
 check_directory:
 	
@@ -1726,7 +1415,8 @@ this_directory:
 
 do_compare:
 
-    // Vamos mostrar o output na proxima linha.
+    // Vamos mostrar o output na próxima linha.
+
     shellInsertLF();
 
 
@@ -1815,7 +1505,7 @@ do_compare:
 
         printf ("\n");
         goto exit_cmp;
-    };
+    }
     //--
     // =============================================================
 
@@ -1828,15 +1518,6 @@ do_compare:
     // #obs:
     // Em ordem alfabética.
 
-    if ( strncmp ( prompt, "350", 3 ) == 0 ){
-        __home = TRUE;
-        goto exit_cmp;
-    }
-
-    if ( strncmp ( prompt, "1156", 4 ) == 0 ){
-        __temple = TRUE;
-        goto exit_cmp;
-    }
 
     // about 
     if ( strncmp ( prompt, "about", 5 ) == 0 ){
