@@ -43,23 +43,24 @@
 #define GROUP_COUNT_MAX    4     //Group count.
 
 
+//
+// Standard user names.
+//
 
-#define USER_ADMIN        "admin" 
-#define USER_ALL          "all" 
-#define USER_DEFAULT      "default" 
-#define USER_SUPERUSER    "su" 
-#define USER_SYSTEM       "system" 
-//...
+// Interactive
+// Used by special real users.
+#define USER_NAME_ROOT    "root" 
+
+// Non interactive
+// Used by some system services.
+#define USER_NAME_SYSTEM  "system" 
 
 
-
-
- 
 //User types.  
 typedef enum {
-    USER_TYPE_NULL,            //0 
-    USER_TYPE_INTERACTIVE,     //1
-    USER_TYPE_NONINTERACTIVE,  //2
+    USER_TYPE_NULL,            // 0
+    USER_TYPE_INTERACTIVE,     // 1 ex: 'root'
+    USER_TYPE_NONINTERACTIVE,  // 2 ex: 'system'
     // ...
 }user_type_t;
 
@@ -329,9 +330,6 @@ struct user_info_d
 
 
 
-
-
-
     //??
     char *path;             // '/root/user/(name)'
     
@@ -396,23 +394,22 @@ struct user_info_d
 	// todo: tipo, tamanho ... 
 	//
 		
-    //Continua...
-	struct user_info_d *Next;  //Próximo usuário.(troca.).
+    // Continua...
+    
+    // navigation.
+    struct user_info_d  *Next;
 }; 
 
-struct user_info_d *CurrentUser;    // Current user !!!
-struct user_info_d *SystemUser;     // O sistema é o usuário '0'.
-struct user_info_d *DefaultUser;    // O usuário padrão.
-//...
+struct user_info_d *RootUser;       // Super user
+struct user_info_d *CurrentUser;    // Current user
 
-
-
-//List.
+// user list:
+// root user is the user '0'.
 unsigned long userList[USER_COUNT_MAX];
+
  
-  
 //
-// Protótipos.
+// Protótipos =========================
 //  
 
 
@@ -427,6 +424,14 @@ int init_user_environment_manager(int argc, char *argv[]);
 
 
 void init_user_info (void);
+
+
+
+
+int User_initialize(void);
+
+
+int is_superuser(void);
 
 void *CreateUser (char *name, int type);
 

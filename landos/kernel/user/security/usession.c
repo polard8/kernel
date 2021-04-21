@@ -199,8 +199,9 @@ void close_user_session (void)
 
 void init_user_session (void){
 
+    uid_t uid = -1;
+
     int i = 0;
-    int CurrentUser_ID = 0;
 
 
     debug_print ("init_user_session:\n");
@@ -213,43 +214,43 @@ void init_user_session (void){
         usessionList[i] = (unsigned long) 0;
     };
 
-	//
-	// User.
-	//
 
-    CurrentUser_ID = (int) GetCurrentUserId();
+    //
+    // User
+    //
 
-    if ( CurrentUser_ID < 0 || CurrentUser_ID >= USER_COUNT_MAX )
+    // We need a user to create a user session.
+
+    uid = (int) GetCurrentUserId();
+
+    if ( uid < 0 || uid >= USER_COUNT_MAX )
     {
-        CurrentUserSession = NULL;
-		//panic ("init_user_session: CurrentUser_ID");
-        return;
+        panic ("init_user_session: uid\n");
     }
 
-	
+
 	//
 	// User Session.
 	//
 	
 	//Struct.
 	
-    usession0 = (void *) CreateUserSession (CurrentUser_ID);
+    usession0 = (void *) CreateUserSession (uid);
 
-    if ( (void *) usession0 == NULL )
-    {
+    if ( (void *) usession0 == NULL ){
         panic ("init_user_session: [FAIL] usession0\n");
     }
 
-    
-    //CurrentUserSession = (void *) usession0;
+    // Set current user session.
     set_current_user_session(usession0);
 
-	//Open.
-    open_user_session ();
+    //Open
+    open_user_session();
 
-	//...
+    // ...
 
-    CurrentUserSession->initialized = TRUE;
+    // Initialize this session.
+    usession0->initialized = TRUE;
 }
 
 

@@ -1,6 +1,7 @@
 /*
- * File: logon.c
+ * File: user/logon.c
  *
+ * 
  * Descri��o:
  *     Kernel Mode Logon Support Routines.
  *     @todo: Esse m�dulo deve prepara o ambiente para rodar o processo logon.bin.
@@ -79,7 +80,7 @@ int ExitLogon (void);
 
 int init_logon_manager (void){
 
-    struct window_d *hWindow; 
+    struct window_d  *hWindow; 
     int z=0;
 
 
@@ -162,12 +163,6 @@ int init_logon_manager (void){
 	    // tty support.
 	    // As mensagens do kernel precisam usar esses parametros.
 	    // o kernel usa a tty0.
-	
-	    //#importante
-	    //Logo antes user session, room e desktop.
-	    //Assim essas informa�~oes ficar~ao na estrutura de tty.
-	    //assim saberemos qual usu'ario est'a usando a tty0
-	    // deve ser o 'root'.
 
 
         // Limpa a lista
@@ -179,24 +174,9 @@ int init_logon_manager (void){
         vt_init_module();
 
 
+        // See: userenv.c
+        User_initialize();
 
-	// =========
-	//
-	// @todo: Usu�rio e sess�o devem ser independentes do modo de v�deo. 
-	//        Text ou Graphics.
-	// @todo: Essas informa��es s�o independentes da arquitetura,
-	//      Essa rotina pode ir pra outro lugar.
-	
-//UserInfo:
-	
-//#ifdef EXECVE_VERBOSE	  
-    //printf ("init_user_info\n");
-//#endif
-
-
-        // Initialize user info structure
-        printf ("init_logon_manager: init_user_info\n");
-        init_user_info ();   
 
         // See: ws.h
         // hostname:Displaynumber.Screennumber
@@ -205,16 +185,6 @@ int init_logon_manager (void){
         // display and screen
         current_display = 0;
         current_screen  = 0;
-
-        //
-        // Security
-        //
- 
-        // User session, room (Window Station), desktop, 
-        current_usersession  = 0;
-        current_room         = 0;
-        current_desktop      = 0;
-
 
         // window and menu.
         current_window  = 0;
@@ -230,28 +200,6 @@ int init_logon_manager (void){
         zorderCounter = 0;
 
 
-		// Initialize user Session, room and Desktop.
-  
-		//user section.
-#ifdef KERNEL_VERBOSE		
-		printf ("init_logon_manager: initializing user session\n");
-#endif
-        init_user_session();
-
-
-		//initialize window station default.
-#ifdef KERNEL_VERBOSE
-		printf ("init_logon_manager: initializing room\n");   
-#endif
-        init_room_manager();
-
-
-	    //initialize desktop default.
-#ifdef KERNEL_VERBOSE
-		printf ("init_logon_manager: initializing desktop\n");   
-#endif
-        init_desktop();
-
 
         // #test
         // Mostrando as mensagens antes de pintarmos a primeira janela.
@@ -262,8 +210,10 @@ int init_logon_manager (void){
         refresh_screen();
         //while(1){}
 
-	    //Inicia estrutura.
-		//window.c
+
+
+        // Inicia estrutura.
+        // window.c
 
 #ifdef KERNEL_VERBOSE
 		printf ("init_logon_manager: initializing windows\n");   

@@ -332,39 +332,9 @@ UpdateUserInfo (
 /*
  *******************************
  * init_user_info:
- *     Configurar informações sobre o usuário default.
- *
- *     #bugbug: Na verdade o que queremos é que seja feita a 
- * inicialização do ambiente de usuário com as configurações 
- * do usuário atual e não o default.
- *
- * #importante:
- *      Esse é o momento certo para inicializar todas as preferências 
- * salvas no perfil do usuário.
- *  
- * Configurar o ambiente do usuário significa:
- *     Selecionar suas preferências de fonte e cores.
- *     Selecionar suas preferências de estilos de elementos gráficos.
- *     etc ...
- *
- * Obs: 
- *     Deve ser possível configurar usuários independente se 
- *     a interface gráfica está habilitada ou não.
- *
- * Obs:
- *     Utiliza as informações do usuário ativo. 
- *     O usuário ativo pode ser trocado.
- *     pode ser criar e deletar usuários.
- *
- * #importante: As informações de usuário ficam 
- * em /root/user/(name)
- * 
- * Obs: Nessa hora o VFS ja deve estar montado
- * então pegaremos informações sobre qual é o usuário atual.
- * /root/user/password.txt
- * /root/user/username.txt
- * /root/user/config.txt
- * ...
+ *     
+ *     Initialize the support for user structure.
+ *     Start with the root user.
  */
 
 
@@ -375,7 +345,7 @@ void init_user_info (void){
     int i=0;
 
 
-    debug_print ("init_user_info:\n");
+    debug_print ("init_user_info: Creating super user.\n");
 
 
     //Initialize list.
@@ -385,50 +355,72 @@ void init_user_info (void){
     };
 
 
+    //
+    // root
+    //
+
     // Create default user. 
     // It's a global structure. 
-    // (default,interactive)
+    // (root,interactive)
 
+    RootUser = (void *) CreateUser(
+                            USER_NAME_ROOT, 
+                            USER_TYPE_INTERACTIVE );
 
-    // DefaultUser = (void *) CreateUser (USER_DEFAULT, USER_TYPE_INTERACTIVE);
-    DefaultUser = (void *) CreateUser (USER_DEFAULT, USER_TYPE_INTERACTIVE);
-
-    if ( (void *) DefaultUser == NULL ){
-        panic ("init_user_info: DefaultUser\n");
+    if ( (void *) RootUser == NULL ){
+        panic ("init_user_info: RootUser\n");
     }else{
 
         // Atualizando a lista de permissões.
         // Liberando tudo.
-        for (i=0; i<128; i++){ DefaultUser->permissions[i]=1; }
  
-        //Coloca no início da lista.
+        for (i=0; i<128; i++){ RootUser->permissions[i] = TRUE; }
+ 
 
-        //userList[0] = (unsigned long) SystemUser;    //System.
-        userList[1] = (unsigned long) DefaultUser;     //Default.
-        //userList[2] = (unsigned long) 0;               //0.
-        //userList[3] = (unsigned long) 0;             //0.
-        //...
+        Id = (int) RootUser->userId;
 
-        //Configura o usuário atual.
-        Id = (int) DefaultUser->userId;
+        if (Id != 0){
+            panic ("init_user_info: RootUser is not 0\n");
+        }
+ 
         SetCurrentUserId (Id);
-        CurrentUser = (void *) DefaultUser;
+        CurrentUser = (void *) RootUser;
 
-		//Configura o grupo atual ao qual o usuário pertence.
-		SetCurrentGroupId (0);
-		
-		//#bugbug: falha na máquina real.
-		//interna
-		//__setusername ( (char *) USER_DEFAULTNAME);
-		
-		//...
-		
-		//g_logged = (int) 1;
-	};
-	
-    // Continua...??!!
+        // gid
+        // Configura o grupo atual ao qual o usuário pertence.
+        
+        SetCurrentGroupId (0);
+
+        // ...
+
+        
+        //
+        // The root user. '0'
+        //
+        
+        userList[0] = (unsigned long) RootUser; 
+    };
+
+
+    debug_print("init_user_info: done\n");
 }
 
+
+int is_superuser(void)
+{
+    uid_t uid = -1;
+    
+    uid = GetCurrentUserId();
+
+    // Is 'root' ?
+
+    if ( uid == 0 )
+    {
+        return TRUE;
+    }
+    
+    return FALSE;
+}
 
 
 /*
@@ -518,12 +510,51 @@ int __setusername ( const char *new_username)
 int 
 init_user_environment_manager ( int argc, char *argv[] )
 {
-
     //...
-
     //g_module_uem_initialized = 1;
     userenvironmentStatus = TRUE;
+    return 0;
+}
 
+
+
+int User_initialize(void)
+{
+
+    debug_print("User_initialize:\n");
+
+    current_user = 0;
+
+    // User session, room (Window Station), desktop, 
+    current_usersession  = 0;
+    current_room         = 0;
+    current_desktop      = 0;
+
+    // Initialize user info structure
+    printf ("User_initialize: init_user_info\n");
+    init_user_info ();   
+
+    //
+    // Security
+    //
+ 
+
+    // Initialize User Session, room and Desktop.
+    // user section
+    printf ("User_initialize: initializing user session\n");
+    init_user_session();
+
+    // room
+    // initialize window station default.
+    printf ("User_initialize: initializing room\n");   
+    init_room_manager();
+
+    // desktop
+    printf ("User_initialize: initializing desktop\n");   
+    init_desktop();
+
+
+    debug_print("User_initialize: done\n");
     return 0;
 }
 

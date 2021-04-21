@@ -2403,6 +2403,14 @@ void *sci0 (
         // Essa rotina mostra o pathname usado pelo processo.
         // See: fs.c
         case SYS_PWD:
+            // #test
+            // Isso é um teste. Essa chamada não precisa disso.
+            if (is_superuser() == TRUE )
+            {
+                debug_print("sci0: [SYS_PWD] Yes, I'm the super user.\n");
+                printf ("sci0: [SYS_PWD] Yes, I'm the super user.\n");
+                refresh_screen();
+            }
             sys_pwd();
             return NULL;
             break;
