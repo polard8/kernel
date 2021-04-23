@@ -17,7 +17,7 @@ all:
 
 # Extra clients
 	make -C browser
-	make -C launch1
+
 
 # clean the lib
 	-rm -rf libgws/obj/*.o

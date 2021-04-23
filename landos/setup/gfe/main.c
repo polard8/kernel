@@ -50,8 +50,11 @@ gfeProcedure (
     switch (msg)
     {
 
+        // #??
+        // Isso é uma mensagem enviada pelo kernel
+        // quando criamos uma janela overlapped.
         case MSG_CREATE: 
-            printf ("MSG_CREATE:\n"); 
+            // printf ("MSG_CREATE:\n"); 
             return 0;
             break;
 
@@ -211,18 +214,18 @@ int main ( int argc, char *argv[] ){
     }
 
     // main window
-    left = 0;
-    top  = 0;  
+    left   = 0;
+    top    = 0;  
     width  = deviceWidth;
     height = deviceHeight;
-    color = COLOR_GRAY;
+    color  = COLOR_GRAY;
 
 
     //++
     gde_begin_paint (); 
     hWindow = (void *) gde_create_window ( 
                            WT_OVERLAPPED, 1, 1, "GFE",
-                           left, top, width, height,    
+                           left, top, width, height, 
                            0, 0, color, color ); 
 
     if ( (void *) hWindow == NULL ){
@@ -251,20 +254,23 @@ int main ( int argc, char *argv[] ){
 	//  ## Testing file support. ##
 	//
 
-	//++
+
+    /*
+    //++
     void *b = (void *) malloc (1024*30); 
 
     if ( (void *) b == NULL ){
         debug_print ("gfe: allocation fail\n");
         goto fail;
     }else{
-        gramado_system_call ( SYSTEMCALL_READ_FILE, 
+        gramado_system_call ( 
+            SYSTEMCALL_READ_FILE, 
             (unsigned long) "FOLDER  BMP", 
             (unsigned long) b, 
             (unsigned long) b );
     };
     //--
-
+    */
 
     //
     // == Tests =========================================
@@ -277,11 +283,12 @@ int main ( int argc, char *argv[] ){
 
     debug_print ("gfe: Creating grid window\n");
 
-    gw_left    = 4;
-    gw_top     = 4;
-    gw_width   = width/3;
-    gw_height  = height/2;
-    gw_color   = COLOR_RED;   //grid window.
+    //grid window.
+    gw_left    = 2;  // borda.
+    gw_top     = 2;  // borda.
+    gw_width   = width  -4;
+    gw_height  = height -4;
+    gw_color   = COLOR_NAVAJOWHITE; //xCOLOR_GRAY7;
 
 	//++
     gde_begin_paint(); 
@@ -359,10 +366,10 @@ int main ( int argc, char *argv[] ){
         // Usando a API para exibir o bmp carregado. 
         // ACHO QUE ISSO SOMENTE PINTA NO BACKBUFFER
 
-        gde_display_bmp ( 
-            (char *) b, 
-            200, 
-            (1 + 60 + (i*24)) ); 
+        //gde_display_bmp ( 
+        //    (char *) b, 
+        //    200, 
+        //    (1 + 60 + (i*24)) ); 
     };
  
  
@@ -378,11 +385,11 @@ int main ( int argc, char *argv[] ){
     //está quase funcionando novamente.
     //é questão de posicionamento.
 
-    mw_left    = width/2;
+    mw_left    = 2;
     mw_top     = 2;
-    mw_width   = width/3;
-    mw_height  = height/2;
-    mw_color   = COLOR_GREEN;    // menu window.
+    mw_width   = width/2;
+    mw_height  = height -4;
+    mw_color   = COLOR_GRAY;    // menu window.
 
 
 	//++
@@ -397,13 +404,18 @@ int main ( int argc, char *argv[] ){
         gde_end_paint ();
         goto fail;
     }else{
-        gde_register_window (mWindow);            
+        gde_register_window (mWindow);
         gde_show_window (mWindow); 
     };
     gde_end_paint ();
     //--
 
-	 
+
+    gde_draw_text(
+        main_window, 8, 8, COLOR_TEXT, "GFE.BIN: File explorer");
+    gde_show_window (main_window); 
+
+
 	 // Isso é uma rotina de teste.
 	 // #obs: Acho que isso cria menu.
 	 // Criaremos o menu de acordo com a janela mãe
@@ -417,7 +429,7 @@ int main ( int argc, char *argv[] ){
 
 
 
-    //Setando o foco para recebermos as mensagens de sistema.
+    // Setando o foco para recebermos as mensagens de sistema.
     gde_set_focus(hWindow);
 
     // Refresh Window

@@ -1576,6 +1576,13 @@ int rtl_focus_on_this_thread(void)
 }
 
 
+void rtl_yield(void)
+{
+    gramado_system_call (265,0,0,0); //yield thread.
+}
+
+
+
 /* compare two ASCII strings ignoring case */
 // #todo: toupper support.
 /*

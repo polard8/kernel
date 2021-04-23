@@ -62,7 +62,7 @@
 // Window types.
 #include "window/wt.h"
 // Colors.
-#include "window/colours.h"
+#include "window/colors.h"
 // Windows.
 #include "window/window.h"
 

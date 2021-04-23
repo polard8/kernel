@@ -3554,6 +3554,13 @@ int libcore_get_event (void)
 }
 
 
+
+void gde_yield(void)
+{
+    gramado_system_call (265,0,0,0); //yield thread.
+}
+
+
 //
 // End.
 //

@@ -237,6 +237,8 @@ int rtl_clone_and_execute ( char *name );
 // set foreground thread.
 int rtl_focus_on_this_thread(void);
 
+void rtl_yield(void);
+
 #endif
 
 

@@ -14,6 +14,7 @@
 #include "gramcode.h"
 
 
+// minimum
 #define WINDOW_LEFT      0
 #define WINDOW_TOP       0
 #define WINDOW_WIDTH   320 
@@ -35,13 +36,30 @@ int running = 1;
 //static unsigned char dest_msg[512];
 
 
+// #todo
+// Used to save the file with the function gde_save_file()
+struct FileData
+{
+    char *file_name;
+
+    // Size in sectors.
+    unsigned long file_size; 
+
+    // Size in bytes
+    unsigned long size_in_bytes;
+
+    // The pointer for the text buffer.
+    char *file_address;
+};
+
+
 //
 // internal
 //
 
 
 void editorClearScreen(void); 
-int editor_save_file (void);
+int editor_save_file (char *file_name);
 void teditorTeditor (void);
 void shellInitSystemMetrics(void);
 void shellInitWindowLimits(void);
@@ -112,14 +130,23 @@ void editorClearScreen (void){
  * Estamos usando a API.
  */
 
-int editor_save_file (void){
+int editor_save_file (char *file_name){
 
-    char file_1_name[] = "FILE1234TXT";
+    //char file_1_name[] = "FILE1234TXT";
     int Ret=0;
     unsigned long number_of_sectors = 0;
     size_t len = 0;
 
 
+    if ( (void*) file_name == NULL ){
+        printf("Invalid file name\n");
+        return -1;
+    }
+
+    if ( *file_name == 0 ){
+        printf("Invalid file name\n");
+        return -1;
+    }
 
     // #importante:
     // Não podemos chamar a API sem que todos os argumentos 
@@ -164,19 +191,17 @@ int editor_save_file (void){
     printf ("editor_save_file: Saving ...\n");
 
 
-	// Lenght in bytes.
 
-	//len = (size_t) strlen (file_1);
+    // Lenght in bytes.
+
     len = (size_t) strlen ( RAW_TEXT );
 
-    if (len <= 0)
-    {
+    if (len <= 0){
         printf ("editor_save_file: [FAIL] Empty file.\n");
         return (int) 1;
     }
 
-    if (len > 2048)
-    {
+    if (len > 2048){
         printf ("editor_save_file: [FAIL] Limits. The  file is too long.\n");
         return (int) 1;
     }
@@ -210,17 +235,23 @@ int editor_save_file (void){
         return (int) 1;
     }
 
-
-    // Save
+ 
+    // Save file.
+    // IN:
     // name, number of sectors, size in bytes, address, flag.
 
     Ret = (int) gde_save_file ( 
-                    file_1_name,
+                    file_name,
                     number_of_sectors, 
                     len,
                     &RAW_TEXT[0], 
                     0x20 );
 
+    
+    if ( Ret < 0 ){
+        printf ("fail\n");
+    }
+    
     printf ("done\n");
 
     return (int) Ret;
@@ -321,7 +352,7 @@ void *teditorProcedure (
                         // pressionada
                         if ( key_state == TRUE )
                         {
-                            editor_save_file();
+                            editor_save_file("FILE1234TXT");
                             key_state = FALSE;
                             return NULL;
                             break;
@@ -356,7 +387,7 @@ void *teditorProcedure (
                 case VK_F1: 
                     debug_print(" [F1] ");
                     //saveCreateButton();
-                    editor_save_file ();
+                    editor_save_file ("FILE1234TXT");
                     break;
 
                 case VK_F2: debug_print(" [F2] "); break;
@@ -411,7 +442,7 @@ void *teditorProcedure (
                             (unsigned long) window, 
                             (unsigned long) window );
 
-                        editor_save_file();
+                        editor_save_file("FILE1234TXT");
                         return 0;
                     }
                     
@@ -908,7 +939,7 @@ skip_test:
     //++
     gde_begin_paint (); 
     hWindow = (void *) gde_create_window ( 
-                           WT_OVERLAPPED, 1, 1, "GRAMCODE",  //WT_OVERLAPPED, 1, 1, argv[1],
+                           WT_OVERLAPPED, 1, 1, "Gramcode",
                            wpWindowLeft, wpWindowTop, 
                            wsWindowWidth, wsWindowHeight,    
                            0, 0, COLOR_GRAY, COLOR_GRAY );
@@ -938,7 +969,7 @@ skip_test:
 	//++
     gde_enter_critical_section ();  
     editbox_bg_Window = (void *) gde_create_window ( 
-                                     WT_SIMPLE, 1, 1, "editbox-bg",     
+                                     WT_SIMPLE, 1, 1, "editbox-bg", 
                                      bgw_left, bgw_top, 
                                      bgw_width, bgw_height, 
                                      hWindow, 0, 0x303030, 0x303030 );
@@ -1083,6 +1114,7 @@ skip_test:
         goto startTyping;
 
     // Mostrando o arquivo.
+    // #todo: Create a helper function.
     }else{
 
         printf ("\n");
@@ -1101,21 +1133,12 @@ skip_test:
             };
         };
 
-    //ok
+
+    // ok
 
 out:
 
-//#ifdef TEDITOR_VERBOSE
-		//printf("...\n");
-        //printf("..\n");
-        //printf(".\n");
-//#endif
-
-
-//
-//    ======== Start typing ========
-//
-
+    // Start typing
 
 startTyping:
 
@@ -1141,24 +1164,22 @@ startTyping:
 
 	// Habilitando o cursor.
 
-    gramado_system_call ( 244, 
+    gramado_system_call ( 
+        244, 
         (unsigned long) 0, 
         (unsigned long) 0, 
         (unsigned long) 0 );
 
-		//saiu.
-        printf("\n");
-        //printf(".\n");
-        //printf(".\n");
-	};
+    //saiu.
+
+    printf("\n");
+
+    };
 
 
-
-   
     //printf ("testing printf");   //Isso funcionou,
     //prompt_put_string("Testing prompt ...");  //isso não.
     //prompt_flush(0); //isso não.
- 
 
     // #importante:
     // Nessa hora podemos usar esse loop para pegarmos mensagens 
@@ -1171,19 +1192,20 @@ startTyping:
 
 Mainloop:
 
-
-    while (running)
-    {
+    while (running){
+        
         gde_enter_critical_section(); 
-        gramado_system_call ( 111,
+        gramado_system_call ( 
+            111,
             (unsigned long) &message_buffer[0],
             (unsigned long) &message_buffer[0],
             (unsigned long) &message_buffer[0] );
         gde_exit_critical_section(); 
 
-        //if ( message_buffer[1] == 0 )
-            //gde_yield();
-            
+        //if ( message_buffer[1] == 0 ){
+        //    gde_yield();
+        //}
+
         if ( message_buffer[1] != 0 )
         {
             teditorProcedure ( 

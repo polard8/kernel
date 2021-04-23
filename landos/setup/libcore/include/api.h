@@ -47,6 +47,15 @@
 #include <stddef.h>
 
 
+// Modes.
+#define GDE_GRAMADO_JAIL        0x00
+#define GDE_GRAMADO_P1          0x01
+#define GDE_GRAMADO_HOME        0x02
+#define GDE_GRAMADO_P2          0x03
+#define GDE_GRAMADO_CASTLE      0x04
+#define GDE_GRAMADO_CALIFORNIA  0x05
+// ...
+
 
 //
 // == events ===========================================
@@ -1016,8 +1025,8 @@ typedef enum {
 #define COLOR_TEST_38 0x400040
 #define COLOR_TEST_39 0x800040
 #define COLOR_TEST_40 0x000000  //COLOR_BTNSHADOW ~ preto text
-#define COLOR_TEST_41 0x008080  //vrde escuro
-#define COLOR_TEST_42 0x408080  //vrde escuro
+#define COLOR_TEST_41 0x008080  //verde escuro
+#define COLOR_TEST_42 0x408080  //verde escuro
 #define COLOR_TEST_43 0x808080  //COLOR_APPWORKSPACE (cinza)
 #define COLOR_TEST_44 0x808040 
 #define COLOR_TEST_45 0xC0C0C0  //silver
@@ -1115,7 +1124,7 @@ typedef enum {
 #define COLOR_MINTCREAM           0xF5FFFA
 #define COLOR_MISTYROSE           0xFFE4E1
 #define COLOR_MOCCASIN            0xFFE4B5
-#define COLOR_NAVAJOWHITE         0xFFDEAD //branco areioso.
+#define COLOR_NAVAJOWHITE         0xFFDEAD   // branco areioso.
 #define COLOR_NAVY                0x000080
 #define COLOR_OLDLACE             0xFDF5E6
 #define COLOR_OLIVE               0x808000
@@ -3377,7 +3386,7 @@ void *gde_fopen (const char *filename, const char *mode);
 int
 gde_save_file ( 
     char *file_name, 
-    unsigned long file_size, 
+    unsigned long file_size,  // size in sectors.
     unsigned long size_in_bytes, 
     char *file_address, 
     char flag );
@@ -3663,6 +3672,8 @@ execute_new_process (
     char *envp[] );
 
 // ==================================
+
+void gde_yield(void);
 
 //
 // End.

@@ -798,7 +798,7 @@ new_message:
  * main: 
  * 
  */
- 
+
 int main ( int argc, char *argv[] ){
 
     int client_fd = -1;
@@ -854,19 +854,16 @@ int main ( int argc, char *argv[] ){
     //printf ("gnst: Connecting to the address 'ws' ...\n");      
     printf ("browser: Connecting to the address via inet  ...\n");    
 
-    while (1){
-
+    while (TRUE){
         if (connect (client_fd, (void *) &addr_in, sizeof(addr_in)) < 0){ 
-            
             debug_print("browser: Connection Failed \n"); 
             printf     ("browser: Connection Failed \n"); 
             //return -1; 
-        
         // try again
         }else{ break; }; 
     };
- 
- 
+
+
     //
     // messages
     //
@@ -908,7 +905,7 @@ int main ( int argc, char *argv[] ){
     unsigned long w_height = (h/2); 
 
     unsigned long viewwindowx = ( ( w - w_width ) >> 1 );
-    unsigned long viewwindowy = ( ( h - w_height) >> 1 ); 
+    unsigned long viewwindowy = ( ( h - w_height) >> 1 );
 
 
     if ( w == 320 )
@@ -925,7 +922,8 @@ int main ( int argc, char *argv[] ){
 
     // ===================
     // main window
-    main_window = gws_create_window (client_fd,
+    main_window = gws_create_window ( 
+                      client_fd,
                       WT_OVERLAPPED, 1, 1, "Browser",
                       viewwindowx, viewwindowy, w_width, w_height,
                       0, 0, COLOR_GRAY, COLOR_GRAY );
@@ -937,22 +935,24 @@ int main ( int argc, char *argv[] ){
 
     // ===================
     // address bar
-    addressbar_window = gws_create_window (client_fd,
-        WT_EDITBOX,1,1,"address-bar",
-        4, 32 +4, 
-        (w_width-32-4-4-4), 32,
-        main_window, 0, COLOR_WHITE, COLOR_WHITE );
+    addressbar_window = gws_create_window (
+                            client_fd,
+                            WT_EDITBOX,1,1,"address-bar",
+                            4, 32 +4, 
+                            (w_width-32-4-4-4), 32,
+                            main_window, 0, COLOR_WHITE, COLOR_WHITE );
 
-    if ( addressbar_window < 0 )             
+    if ( addressbar_window < 0 ){
         debug_print("browser: addressbar_window fail\n"); 
+    }
 
-     gws_draw_text (
-        (int) client_fd,             // fd,
-        (int) addressbar_window,              // window id,
-        (unsigned long) 8,    // left,
-        (unsigned long) 8,    // top,
-        (unsigned long) COLOR_BLACK,
+    // IN: fd, window id, left, top, color, string
+    gws_draw_text (
+        (int) client_fd,
+        (int) addressbar_window,
+         8, 8, (unsigned long) COLOR_BLACK,
         "http://www.google.com");
+
 
     // ===================
     // button

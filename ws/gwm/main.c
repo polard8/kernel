@@ -298,6 +298,8 @@ gwmProcedure (
 {
     //printf ("gwmProcedure:\n");
 
+    int f12Status = -1;
+
 
     switch (msg){
 
@@ -329,7 +331,9 @@ gwmProcedure (
                     break;
                 
                 case VK_F3: 
+                    if(fd<0){ break; }
                     update(fd); 
+                    //gws_clone_and_execute("browser.bin");
                     //gws_redraw_window (fd, c_bg->window, 1);
                     //gws_redraw_window (fd, c_topbar->window, 1);
                     //gws_redraw_window (fd, c_taskbar->window, 1);
@@ -342,6 +346,14 @@ gwmProcedure (
                 
                 case VK_F4:
                     printf("gwm: Exiting ...\n");
+                    exit(0);
+                    break;
+                    
+                // #test
+                case VK_F12:
+                    printf("gwm: Shutting down ...\n");
+                    f12Status = (int) gws_clone_and_execute("shutdown.bin");
+                    if (f12Status<0){ break; } // fail
                     exit(0);
                     break;
                 

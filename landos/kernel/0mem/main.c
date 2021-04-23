@@ -265,12 +265,19 @@ int kernel_main (int arch_type)
     debug_print ("mode: ");
 
     switch (current_mode){
+        // Standard modes.
         case GRAMADO_JAIL:   debug_print ("GRAMADO_JAIL\n");   break;
         case GRAMADO_P1:     debug_print ("GRAMADO_P1\n");     break;
         case GRAMADO_HOME:   debug_print ("GRAMADO_HOME\n");   break;
         case GRAMADO_P2:     debug_print ("GRAMADO_P2\n");     break;
         case GRAMADO_CASTLE: debug_print ("GRAMADO_CASTLE\n"); break;
-        //case GRAMADO_CALIFORNIA:
+        // Super modes.
+        case GRAMADO_CALIFORNIA:  
+            debug_print ("GRAMADO_CALIFORNIA\n"); 
+            break;
+        //case GRAMADO_CALIFORNIA2:  
+        //    debug_print ("GRAMADO_CALIFORNIA2\n"); 
+        //    break;
         // ...
 
         // We can't use printf yet.

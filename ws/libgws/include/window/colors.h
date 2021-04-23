@@ -218,7 +218,7 @@
 #define COLOR_MINTCREAM           0xF5FFFA
 #define COLOR_MISTYROSE           0xFFE4E1
 #define COLOR_MOCCASIN            0xFFE4B5
-#define COLOR_NAVAJOWHITE         0xFFDEAD //branco areioso.
+#define COLOR_NAVAJOWHITE         0xFFDEAD  // branco areioso. boa.
 #define COLOR_NAVY                0x000080
 #define COLOR_OLDLACE             0xFDF5E6
 #define COLOR_OLIVE               0x808000

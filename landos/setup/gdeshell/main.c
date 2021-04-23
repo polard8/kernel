@@ -803,6 +803,8 @@ shellProcedure (
     int q=0;
     int c=0;
 
+    int f12Status = -1;
+
     // #bugbug: 
     // Use 'return' statement in the all cases.
 
@@ -908,8 +910,13 @@ shellProcedure (
                 //case VK_F9:  printf("NOTHING\n");  break;
                 //case VK_F10: printf("NOTHING\n");  break;
                 //case VK_F11: printf("NOTHING\n");  break;
-                //case VK_F12: printf("NOTHING\n");  break;
-
+                case VK_F12: 
+                    //printf("NOTHING\n");  
+                    printf("gws.bin: Shutting down ...\n");
+                    f12Status = (int) rtl_clone_and_execute("shutdown.bin");
+                    if (f12Status<0){ goto done; break; } // fail
+                    exit(0);
+                    break;
             };
             goto done;
             break;
@@ -918,20 +925,17 @@ shellProcedure (
         //case MSG_SYSKEYUP:
             //break;
 
-
-        case MSG_MOUSEKEYDOWN:
+        //case MSG_MOUSEKEYDOWN:
         // case 30:
-            printf ("gdeshell: MSG_MOUSEKEYDOWN\n");
-            goto done;
-            break;
+            //printf ("gdeshell: MSG_MOUSEKEYDOWN\n");
+            //goto done;
+            //break;
 
-
-        case MSG_MOUSEKEYUP:
+        //case MSG_MOUSEKEYUP:
         //case 31:
-            printf ("gdeshell: MSG_MOUSEKEYUP\n"); 
-            goto done;
-            break;
-
+            //printf ("gdeshell: MSG_MOUSEKEYUP\n"); 
+            //goto done;
+            //break;
 
 
         // Commands
@@ -1911,9 +1915,12 @@ do_compare:
     // gramado
     // Initialize the window server and the window server
     // will call the first client.
+    int OpenGramadoStatus=-1;
     if ( gramado_strncmp( prompt, "gramado", 7 ) == 0 )
     {
-        printf ("type: $ gwssrv &\n");
+        //printf ("type: $ gwssrv &\n");
+        OpenGramadoStatus = openGramado();
+        if(OpenGramadoStatus==TRUE){ exit(0); }
         goto exit_cmp;
     }
     
@@ -6454,32 +6461,53 @@ done:
 }
 
 
+// Called by the command "gramado"
+// OUT: TRUE if it works
+int openGramado(void)
+{
+    int CurrentMode = -1;
+    int Status = -1;
+    
+    CurrentMode = gde_get_system_metrics(130);
+    
+    switch ( CurrentMode ){
+
+    case GDE_GRAMADO_JAIL:
+    case GDE_GRAMADO_P1:
+        Status = (int) gde_clone_and_execute("gwssrv.bin");
+        break;
+
+    case GDE_GRAMADO_HOME:
+    case GDE_GRAMADO_P2:
+    case GDE_GRAMADO_CASTLE:
+    case GDE_GRAMADO_CALIFORNIA:
+        Status = (int) gde_clone_and_execute("launcher.bin");
+        break;
+
+    default:
+        return -1;
+        break;
+    };
+
+// Check status
+    
+    if(Status<0){
+        return -1;
+    }
+
+    return TRUE;
+}
 
 
-
+// This is the main event loop for gdeshell.bin
+// See: libcore/api.c
 // void gdeshell_os_polling(void);
 void gdeshell_os_polling(void)
 {
-    //
-    // == Main loop =================================================
-    //
-    
-    int EventStatus=FALSE;  // No event.
-
-// Mainloop:
-
-    // See: libcore/api.c
+    int EventStatus = FALSE;
 
     while (_running){
-
-        // Polling on gramado os.
-
         EventStatus = (int) libcore_get_event();
-
-        // We've got an event. 
-        // Call the window procedure. 
-        // Call event handler!
-        
         if ( EventStatus == TRUE )
         {
             shellProcedure ( 
@@ -6488,15 +6516,10 @@ void gdeshell_os_polling(void)
                 (unsigned long)     LibCoreEventBuffer[2], 
                 (unsigned long)     LibCoreEventBuffer[3] );
         }
-        
+
         // #bugbug
-        // #todo
-        // Check if we need to clean the buffer.
-        // LibCoreEventBuffer[0] = 0;
-        // ...
-        
-        //pool or sleep.
-        //if ( mode == ??
+        // Maybe the library will clear the message buffer.
+        LibCoreEventBuffer[1] = 0;
     };
 }
 

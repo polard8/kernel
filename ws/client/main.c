@@ -218,18 +218,15 @@ int gws(void)
     // Como o domínio é AF_GRAMADO, então o endereço é "w","s".
 
     printf ("gws: Trying to connect to the address 'ws' ...\n");      
-        
-    while (1){
 
+    while (TRUE){
         if ( connect (client_fd, (struct sockaddr *) &addr, addrlen ) < 0 )
         { 
             gws_debug_print ("gws: Connection Failed\n");
             printf          ("gws: Connection Failed \n"); 
             //exit(1);
-            
         }else{ break; };
     };
-
 
     return (int) client_fd;
 }
@@ -244,6 +241,9 @@ gwsProcedure (
     unsigned long long1, 
     unsigned long long2 )
 {
+
+    int f12Status = -1;
+
     switch (msg){
 
         // 20 = MSG_KEYDOWN
@@ -334,12 +334,18 @@ gwsProcedure (
                     gws_async_command(fd,4,7,0);
                     //gws_clone_and_execute("browser.bin"); 
                     break;
+
+                // #test
                 case VK_F12: 
                     //gws_async_command(fd,4,9,0);
                     //gws_async_command(fd,4,10,0);   //triangle
-                    gws_async_command(fd,4,11,0); //polygon
+                    //gws_async_command(fd,4,11,0); //polygon
                     //gws_async_command(fd,4,12,0); //lines
                     //gws_clone_and_execute("browser.bin"); 
+                    printf("gws.bin: Shutting down ...\n");
+                    f12Status = (int) gws_clone_and_execute("shutdown.bin");
+                    if (f12Status<0){ break; } // fail
+                    exit(0);
                     break;
  
                 // ...
