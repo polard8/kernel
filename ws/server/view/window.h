@@ -1124,9 +1124,15 @@ void demoTerry(void);
 
 struct gws_window_d *createwCreateRootWindow(void);
 
+
+// #important: 
+// O frame de uma janela deve fazer parte do window manager
+// e não das primitivas do window server.
+// Estamos falando da parte do ws que opera como wm,
+// ou oferece recursos que serão usados pelo wm.
 // In: style = estilo do frame.
 int 
-createwDrawFrame ( 
+wmDrawFrame ( 
     struct gws_window_d *parent,
     struct gws_window_d *window,
     unsigned long x,

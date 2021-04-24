@@ -2171,58 +2171,77 @@ replace_window (
 {
 
     if ( (void *) window == NULL ){
-		//message
-        return 1;
-   
-    } else {
-		
-        //@todo: Checar limites.
-	
-        window->left = (unsigned long) x;
-        window->top  = (unsigned long) y; 
-        
-        if (window->clientAreaUsed == 1)
+        debug_print ("replace_window: window\n");
+        return -1;
+    } 
+
+    // #todo
+    // Check lock
+    
+    //if ( window->locked == TRUE ){
+    //    debug_print ("replace_window: Locked\n")
+    //    return -1;
+    //}
+
+
+    // #todo: 
+    // Checar limites.
+
+    window->left = (unsigned long) x;
+    window->top  = (unsigned long) y; 
+
+
+    // Client area
+
+    if (window->clientAreaUsed == TRUE)
+    {
+        if ( (void *) window->rcClient != NULL )
         {
-			if ( (void *) window->rcClient != NULL )
-			{
-				//validade da estrutura de retângulo
-				if ( window->rcClient->used == 1 &&
-				     window->rcClient->magic == 1234 )
-				{
-					if ( window->type == WT_SIMPLE )
-					{
+            if ( window->rcClient->used  == TRUE &&
+                 window->rcClient->magic == 1234 )
+            {
+                    // #bugbug
+                    // Isso precisa estar em conformidade
+                    // com os padrões encontrados em createw.c
+
+                    if ( window->type == WT_SIMPLE )
+                    {
                         window->rcClient->left = (unsigned long) (window->left);
                         window->rcClient->top  = (unsigned long) (window->top);
-					}
-					
+                    }
+
                     if ( window->type == WT_OVERLAPPED )
                     {
                         window->rcClient->left = (unsigned long) (window->left +1);
                         window->rcClient->top  = (unsigned long) (window->top  +2 +32 +2);
-			        }
-			        
+                    }
+
                     if ( window->type == WT_EDITBOX || 
                          window->type == WT_EDITBOX_MULTIPLE_LINES )
                     {
                         window->rcClient->left = (unsigned long) (window->left +1);
                         window->rcClient->top  = (unsigned long) (window->top  +1);
                     }
-				} 
-			}
+            } 
         }
- 
-        if (window->statusbarUsed == 1)
+    }
+
+
+    // Status bar
+
+    if (window->statusbarUsed == TRUE)
+    {
+        if ( (void *) window->statusbar != NULL )
         {
-			if ( (void *) window->statusbar != NULL )
-			{
-				window->bottom = window->top + window->height; 
+            window->bottom = (window->top + window->height); 
 
-			    window->statusbar->left = window->left +1;
-			    window->statusbar->top  = window->bottom -25 -1;
-            }
+            window->statusbar->left = (window->left +1);
+            window->statusbar->top  = (window->bottom -25 -1);
         }
-    };
+    }
 
+
+// done:
     return 0;
 }
 
@@ -2236,23 +2255,17 @@ replace_window (
  * @todo: Rever o retorno.
  */
 
-// wm. 
- 
-int is_window_full ( struct window_d *window )
-{
+// Checa modo tela cheia.
+
+int is_window_full ( struct window_d *window ){
 
     if ( (void *) window == NULL ){
-        return 0;
-
+        return FALSE;
     } else {
+        if ( window->view == VIEW_FULL ){ return (int) TRUE; }
+    };
 
-        //Checa modo tela cheia.
-        if ( window->view == VIEW_FULL ){ return (int) 1; }
-
-		//...
-	};
-
-    return 0;
+    return FALSE;
 }
 
 
@@ -2264,45 +2277,32 @@ int is_window_full ( struct window_d *window )
  *     retorno 1, modo maximizada.
  * @todo: Rever o retorno.
  */
- 
-//wm.
- 
-int is_window_maximized (struct window_d *window){
-	
-    if ( (void *) window == NULL ){
-	    return 0;    
-		
-	} else {
-	    
-		//Checa se já está maximizada.
-        if ( window->view == VIEW_MAXIMIZED ){ return (int) 1; }
-		//...
-	};
 
-	return 0;
+// Checa se já está maximizada.
+
+int is_window_maximized (struct window_d *window){
+
+    if ( (void *) window == NULL ){
+        return FALSE;
+    } else {
+        if ( window->view == VIEW_MAXIMIZED ){ return (int) TRUE; }
+    };
+
+    return FALSE;
 }
 
 
+// Checa se já está minimizada.
 
-/*
- * is_window_minimized:
- */
- 
-// wm stuff
+int is_window_minimized (struct window_d *window){
 
-int is_window_minimized (struct window_d *window){	
-    
-	if ( (void *) window == NULL){
-	    return 0;
+    if ( (void *) window == NULL){
+        return FALSE;
+    } else {
+        if ( window->view == VIEW_MINIMIZED ){ return (int) TRUE; }
+    };
 
-	} else {
-		
-	    // Checa se já está minimizada.
-        if ( window->view == VIEW_MINIMIZED ){ return (int) 1; }
-		//...
-	};
-	
-	return 0;    
+    return FALSE;
 }
 
 
@@ -2323,69 +2323,87 @@ int is_window_minimized (struct window_d *window){
  
 void CloseWindow ( struct window_d *window ){
 
-    int Offset;
-    int z;
-
+    int Offset=0;
+    int z=0;
 
 
     if ( (void *) window == NULL ){
-        //message 
+        debug_print("Closewindow: window\n");
         return; 
+    }
 
-    }else{
+    // #todo
+    //if (window->locked == TRUE){
+    //    debug_print("Closewindow: Locked\n");
+    //    return; 
+    //}
 
-	    //Obs:
-	    // Não fechamos a janela principal.
-	    //Se for a janela principal.
-	    //if( (void*) window == (void*) gui->main ){
-	    //	return;
-	    //}
-	
-		//...
 
-        // Focus
+    // Obs:
+    // Não fechamos a janela principal.
+    // Se for a janela principal.
+    // if( (void*) window == (void*) gui->main ){
+    //     return;
+    // }
 
-        kgwmKillFocus (window);
+    // ...
 
-		
-        //Se temos uma janela mãe válida. Ela herda o foco.
-		
-	    if ( (void *) window->parent != NULL )
-	    {
-            if( window->parent->used == 1 && 
-			    window->parent->magic == 1234 )
-            {
-                set_current_window (window->parent);
+    // Focus
+    // Se temos uma janela mãe válida. Ela herda o foco.
+    // #bugbug
+    // Isso é meio recursivo.
+    // O foco não vai acabar parando na root window?
 
-                kgwmSetActiveWindow (window->parent);
-                kgwmSetFocus (window->parent);
-            }; 
-        };
+    kgwmKillFocus (window);
 
-	    // devemos retirar a janela da zorder list 
-	
-	    z = (int) window->z;
-
-        if ( z >= 0 && z < KGWS_ZORDER_MAX )
+    if ( (void *) window->parent != NULL )
+    {
+        if ( window->parent->used  == TRUE && 
+             window->parent->magic == 1234 )
         {
-	        Windows[z] = (unsigned long) 0;	
-	    
-		    //atualiza o contador.
-            zorderCounter--;
-            if (zorderCounter < 0 ){ zorderCounter = 0; }
-        }
-	
-        //Sinaliza para o GC.
+            set_current_window (window->parent);
 
-        window->used  = WINDOW_GC;      // 216;
-        window->magic = WINDOW_CLOSED;  // 4321;
+            kgwmSetActiveWindow (window->parent);
+            kgwmSetFocus (window->parent);
+        } 
+    }
 
-		//...
-	};
-	
-	//...
+    // Devemos retirar a janela fechada da zorder list. 
+
+    z = (int) window->z;
+
+    if ( z >= 0 && z < KGWS_ZORDER_MAX )
+    {
+        Windows[z] = (unsigned long) 0;
+
+        zorderCounter--;
+        if (zorderCounter < 0 ){ zorderCounter = 0; }
+    }
+
+    // Sinaliza para o GC.
+    // Com essas flags o GC poderá
+    // liberar essa memória para uso futuro.
+    // #todo:
+    // Usar um free();
+    // Ou free_object();
+
+    window->used  = WINDOW_GC;      // 216;
+    window->magic = WINDOW_CLOSED;  // 4321;
+
+    // ...
 }
 
+/*
+int free_window_object( struct window_d *window );
+int free_window_object( struct window_d *window )
+{
+	// #todo
+	// Checar a estrutura de objecto
+	// e marcar para o GC liberar para uso futuro.
+
+	return 0;
+}
+*/
 
 /*
  ******************************************************

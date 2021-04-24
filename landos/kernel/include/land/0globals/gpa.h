@@ -9,9 +9,10 @@
 
 
 // Primeiros 4 MB.
-#define SMALLSYSTEM_ORIGIN_ADDRESS   0
-#define MEDIUMSYSTEM_ORIGIN_ADDRESS  0
-#define LARGESYSTEM_ORIGIN_ADDRESS   0
+#define SYSTEM_ORIGIN  0
+#define SMALLSYSTEM_ORIGIN_ADDRESS   SYSTEM_ORIGIN
+#define MEDIUMSYSTEM_ORIGIN_ADDRESS  SYSTEM_ORIGIN
+#define LARGESYSTEM_ORIGIN_ADDRESS   SYSTEM_ORIGIN
 
 
 
@@ -33,7 +34,7 @@
 // me parece que o próximo endereço usado é o MBR em 0x00020000. 
 // #todo: Possivelmente podemos mudar o MBR de lugar usando o alocador.
 // #OBS: Os endereços físico e virtual são iguais.
-// See: mm/x86/pages.c
+// See: mm/pages.c
 
 #define  ____DANGER_TABLE_POINTER_HEAP_BASE    0x1000
 
@@ -47,7 +48,7 @@
 
 
 // Podemos alocar memória para isso, liberando esse espaço?
-#define MBR_ADDRESS            0x00020000  
+#define MBR_ADDRESS    0x00020000  
 
 
 //Podemos alocar memória para isso, liberando esse espaço?
@@ -168,116 +169,153 @@
 // eh possivel, temos espaço.
 // 0x0009FFF0 ??
 
-
+//==============
 // vga
 // The address of the VGA buffer.
 #define VGA_PA  0x000A0000
 
-
+//==============
 // mda
 // The address of the MDA buffer.
 // Monocrome.
 #define MDA_PA  0x000B0000
 
+//==============
 // cga
 // The address of the CGA buffer.
 // colors.
 #define CGA_PA            0x000B8000
-#define SMALLSYSTEM_CGA   0x000B8000
-#define MEDIUMSYSTEM_CGA  0x000B8000
-#define LARGESYSTEM_CGA   0x000B8000
+#define SMALLSYSTEM_CGA   CGA_PA
+#define MEDIUMSYSTEM_CGA  CGA_PA
+#define LARGESYSTEM_CGA   CGA_PA
 
 
 //
-// == 1 MB =========================================================
+// == 1 MB ==================================================
 //
 
-#define KERNEL_BASE              0x00100000  // 1MB físico.
-#define SMALLSYSTEM_KERNELBASE   0x00100000  // KERNEL_BASE
-#define MEDIUMSYSTEM_KERNELBASE  0x00100000  // KERNEL_BASE
-#define LARGESYSTEM_KERNELBASE   0x00100000  // KERNEL_BASE
+// 1MB físico.
+// #importante: 
+// Foram mapeados 4mb para a imagem do kernel e
+// para o heap e a stack.
+#define KERNEL_BASE    0x00100000
+#define SMALLSYSTEM_KERNELBASE   KERNEL_BASE
+#define MEDIUMSYSTEM_KERNELBASE  KERNEL_BASE
+#define LARGESYSTEM_KERNELBASE   KERNEL_BASE
 
 
+// O kernel base ocupa as seguintes posições:
+// 0x00100000 + 0          - Início da imagem.
+// 0x00100000 + 0x00200000 - Início do heap. 
+// 0x00100000 + 0x003D0000 - Fim do heap.
+// 0x00100000 + 0x003E0000 - Fim da stack;
+// 0x00100000 + 0x003FFFF0 - Início da stack.
+
+// Explicando:
+// Temos 4MB mapeados, começando no primeiro mega.
+// A imagem tem 2MB, começando do primeiro mega.
+// O heap começa no terceiro mega e tem quase 2MB.
+// A stack começa pouco antes do quinto mega e tem 127 KB apenas.
+
+// Definições somente para controle.
+#define KERNEL_HEAP_START_PA   (KERNEL_BASE + 0x00200000)
+#define KERNEL_HEAP_END_PA     (KERNEL_BASE + 0x003D0000)
+#define KERNEL_STACK_END_PA    (KERNEL_BASE + 0x003E0000)
+#define KERNEL_STACK_START_PA  (KERNEL_BASE + 0x003FFFF0)
+
+// Repare que a stack e parte do heap 
+// ultrapassam a marca de 4mb.
 
 //
 // == 4 MB =========================================================
 //
 
+// Danger Danger Danger !!!
+
+// #available 
+// (Somente os megas 5,6 e 7. O mega 4 é usado pela stack.)
+// Então 3 desse quatro megas nem estão mapeados.
+
 // Nothing
 // Aqui estava a area de user mode, 
 // mas mudamos para a marca de 32 MB.
-// lembrando que o kernel base foi carregado na marca de 1MB
-// e tem 2 MB de heap e stack.
-// A ideia eh aproveitar todos os 4MB mapeados para 
-// o kernel base. Por enquanto o quarto mega
-// esta desperdiçado.
-
+// Lembrando que o kernel base foi carregado na marca de 1MB
+// e tem 2 MB de tamanho.
+// Em seguida vem o heap com quase 2 MB e a stack, com 127 KB.
+// A ideia é aproveitar todos os 4MB mapeados para 
+// o kernel base. Por enquanto o quarto mega esta desperdiçado.
 
 
 //
 // == 8 MB =========================================================
 //
 
+//pa?
 //16-8 = 8
-#define SMALLSYSTEM_BACKBUFFER   0x800000  //(0x01000000 - 0x800000)  
-#define MEDIUMSYSTEM_BACKBUFFER  0x800000  //(0x01000000 - 0x800000) 
-#define LARGESYSTEM_BACKBUFFER   0x800000  //(0x01000000 - 0x800000)  
+//(0x01000000 - 0x800000)
+#define BACKBUFFER  0x800000
+#define SMALLSYSTEM_BACKBUFFER   BACKBUFFER
+#define MEDIUMSYSTEM_BACKBUFFER  BACKBUFFER
+#define LARGESYSTEM_BACKBUFFER   BACKBUFFER
 
+//pa?
 //16-4 = 12
-#define SMALLSYSTEM_PAGEDPOLL_START   0xC00000  //(0x01000000 - 0x400000) 
-#define MEDIUMSYSTEM_PAGEDPOLL_START  0xC00000  //(0x01000000 - 0x400000) 
-#define LARGESYSTEM_PAGEDPOLL_START   0xC00000  //(0x01000000 - 0x400000) 
+//(0x01000000 - 0x400000)
+#define PAGEDPOOL  0xC00000
+#define SMALLSYSTEM_PAGEDPOLL_START   PAGEDPOOL
+#define MEDIUMSYSTEM_PAGEDPOLL_START  PAGEDPOOL
+#define LARGESYSTEM_PAGEDPOLL_START   PAGEDPOOL
 
 
 //
 // == 16 MB =========================================================
 //
 
-#define SMALLSYSTEM_HEAPPOLL_START   (0x01000000) 
-#define MEDIUMSYSTEM_HEAPPOLL_START  (0x01000000)
-#define LARGESYSTEM_HEAPPOLL_START   (0x01000000)
+#define HEAPPOOL  0x01000000
+#define SMALLSYSTEM_HEAPPOLL_START   HEAPPOOL
+#define MEDIUMSYSTEM_HEAPPOLL_START  HEAPPOOL
+#define LARGESYSTEM_HEAPPOLL_START   HEAPPOOL
 
-//16+4 = 20
-#define SMALLSYSTEM_EXTRAHEAP1_START     (0x01000000 + 0x400000) //20mb
-#define MEDIUMSYSTEM_EXTRAHEAP1_START    (0x01000000 + 0x400000) 
-#define LARGESYSTEM_EXTRAHEAP1_START     (0x01000000 + 0x400000) 
+//16+4 = 20 MB
+#define EXTRAHEAP1  (0x01000000 + 0x400000)
+#define SMALLSYSTEM_EXTRAHEAP1_START     EXTRAHEAP1
+#define MEDIUMSYSTEM_EXTRAHEAP1_START    EXTRAHEAP1 
+#define LARGESYSTEM_EXTRAHEAP1_START     EXTRAHEAP1 
 
-//16+8 = 24
-#define SMALLSYSTEM_EXTRAHEAP2_START    (0x01000000 + 0x800000) //24mb 
-#define MEDIUMSYSTEM_EXTRAHEAP2_START   (0x01000000 + 0x800000) 
-#define LARGESYSTEM_EXTRAHEAP2_START    (0x01000000 + 0x800000) 
+//16+8 = 24 MB
+#define EXTRAHEAP2  (0x01000000 + 0x800000)
+#define SMALLSYSTEM_EXTRAHEAP2_START    EXTRAHEAP2
+#define MEDIUMSYSTEM_EXTRAHEAP2_START   EXTRAHEAP2 
+#define LARGESYSTEM_EXTRAHEAP2_START    EXTRAHEAP2 
 
-//16+12 = 28
-#define SMALLSYSTEM_EXTRAHEAP3_START  (0x01000000 + 0xC00000) //28mb 
-#define MEDIUMSYSTEM_EXTRAHEAP3_START (0x01000000 + 0xC00000) 
-#define LARGESYSTEM_EXTRAHEAP3_START  (0x01000000 + 0xC00000) 
-
-
-//##################################################################
-
+//16+12 = 28 MB
+#define EXTRAHEAP3  (0x01000000 + 0xC00000)
+#define SMALLSYSTEM_EXTRAHEAP3_START     EXTRAHEAP3
+#define MEDIUMSYSTEM_EXTRAHEAP3_START    EXTRAHEAP3 
+#define LARGESYSTEM_EXTRAHEAP3_START     EXTRAHEAP3 
 
 //
 // == 32 MB =========================================================
 //
 
 
-// Essa eh uma area em user mode.
-// migrou de marca de 4mb para ca, para das mais espaço para
+// #atenção:
+// Essa é uma area em user mode.
+// Migrou de marca de 4mb para cá, para das mais espaço para
 // o kernel base.
 
-#define USER_BASE              0x02000000    // 32 MB mark
-#define SMALLSYSTEM_USERBASE   0x02000000
-#define MEDIUMSYSTEM_USERBASE  0x02000000
-#define LARGESYSTEM_USERBASE   0x02000000 
-
+// 32 MB mark
+#define USER_BASE  0x02000000 
+#define SMALLSYSTEM_USERBASE     USER_BASE
+#define MEDIUMSYSTEM_USERBASE    USER_BASE
+#define LARGESYSTEM_USERBASE     USER_BASE 
 
 
 //
 // == 64 MB =========================================================
 //
 
-
-#define FRAME_TABLE_START_PA (0x04000000)   // 64 mb mark. 
+#define FRAME_TABLE_START_PA  (0x04000000)   // 64 mb mark. 
 
 
 
@@ -285,12 +323,17 @@
 // == 128 MB =========================================================
 //
 
+// 0x08000000
+// #available
+
 
 
 //
 // == 256 MB =========================================================
 //
 
+// 0x10000000
+// #available
 
 // Área de memória para uma frame table grande.
 // De onde pegaremos os frames para mapearmos.
@@ -309,6 +352,34 @@
 // == 512 MB =========================================================
 //
 
+// 0x20000000
+// #available
+
+
+//
+// == 1GB =========================================================
+//
+
+// 0x40000000
+// #available
+
+//
+// == 2GB =========================================================
+//
+
+// 0x80000000
+// #available
+
+//
+// == 3GB =========================================================
+//
+
+// 0xC0000000
+// #available
+
+
+
+// =================================================================
 
 /*
     // endereços comuns

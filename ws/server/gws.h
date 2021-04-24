@@ -38,7 +38,7 @@ int current_mode;
 // #view
 #include "view/render/r_render.h"
 #include "view/colors.h"
-#include "view/display/bitblt.h"
+#include "view/bitblt.h"
 #include "view/char.h"
 #include "view/dtext.h"
 #include "view/line.h"

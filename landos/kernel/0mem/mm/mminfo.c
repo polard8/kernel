@@ -218,7 +218,32 @@ void memoryShowMemoryInfo (void){
 	
 #endif
 */
-	
+
+
+
+    //
+    // kernel image 
+    //
+
+
+    //#todo
+    //unsigned long imageStart = KERNEL_IMAGE_BASE;
+    //unsigned long imageEnd;
+    //unsigned long imageSize = 
+
+    unsigned long imageAvailableAreaStart = KERNEL_IMAGE_BASE;
+    unsigned long imageAvailableAreaEnd   = (kernel_heap_start - 8);
+    unsigned long imageAvailableAreaSize_in_Bytes = (imageAvailableAreaEnd - imageAvailableAreaStart);
+    unsigned long imageAvailableAreaSize_in_KB    = (imageAvailableAreaSize_in_Bytes/1024);
+
+    printf("\n\n");
+    printf("IMAGE SIZE: #todo \n");
+
+    printf("\n\n");
+    printf("IMAGE AVAILABLE AREA:  [%x...%x] Total={%d KB} \n",
+        imageAvailableAreaStart, 
+        imageAvailableAreaEnd, 
+        imageAvailableAreaSize_in_KB );
 
     //
     //  heap e stack 

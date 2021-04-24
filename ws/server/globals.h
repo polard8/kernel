@@ -332,6 +332,36 @@ struct vid_d
 struct vid_d vidConfig;
 */
 
+// ===============================================================
+
+//
+// Metrics - Consistent UI style
+//
+
+// Conjunto de meditas consistentes
+// que caracterizam um estilo próprio.
+
+// The icon on title bar.
+#define METRICS_ICON_LEFT    4
+#define METRICS_ICON_TOP     4
+
+// Border size consistente, por questão de estilo.
+// Para jaleas de aplicativos. Overlapped.
+// Mas o aplicativo pode customizar.
+#define METRICS_BORDER_SIZE  2
+
+
+// Usado para explicitar se a janela é ativa ou não
+// e como separador entre a barra de títulos e a segunda
+// área da janela de aplicativo.
+// Usado somente por overlapped window.
+#define METRICS_TITLEBAR_ORNAMENT_SIZE    1
+
+// ...
+
+// ===============================================================
+
+
 
 
 //

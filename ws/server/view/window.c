@@ -74,6 +74,380 @@ void __update_fps(void)
 
 
 /*
+ ********************************
+ * wmDrawFrame:
+ * 
+ */
+
+// #importante:
+// Essa rotina será chamada depois que criarmos uma janela básica,
+// mas só para alguns tipos de janelas, pois nem todos os tipos 
+// precisam de um frame. Ou ainda, cada tipo de janela tem um 
+// frame diferente. Por exemplo: Podemos considerar que um checkbox 
+// tem um tipo de frame.
+// Toda janela criada pode ter um frame.
+// Durante a rotina de criação do frame para uma janela que ja existe
+// podemos chamar a rotina de criação da caption bar, que vai criar os
+// botões de controle ... mas nem toda janela que tem frame precisa
+// de uma caption bar (Title bar).
+// Estilo do frame:
+// Dependendo do estilo do frame, podemos ou nao criar a caption bar.
+// Por exemplo: Uma editbox tem um frame mas não tem uma caption bar.
+
+
+// IN:
+// parent = parent window ??
+// window = The window where to build the frame.
+// x
+// y
+// width
+// height
+// style = Estilo do frame.
+
+// OUT:
+// 0   = ok, no erros;
+// < 0 = not ok. something is wrong.
+
+int 
+wmDrawFrame ( 
+    struct gws_window_d *parent,
+    struct gws_window_d *window,
+    unsigned long x,
+    unsigned long y,
+    unsigned long width,
+    unsigned long height,
+    int style ) 
+{
+
+    // Overlapped.
+    // Janela de aplicativos.
+    struct gws_window_d  *tbWindow;
+
+    int Type=0;
+
+    unsigned long border_size = 0;
+    unsigned long border_color = 0;
+
+
+
+    //unsigned long TitleBarColor = 0x00000E80;     // Dark blue
+    unsigned long TitleBarColor = COLOR_BLUE1;    // Light blue
+
+
+    gwssrv_debug_print ("wmDrawFrame:\n");
+
+ 
+    // #todo
+    // check parent;
+    //if ( (void*) parent == NULL ){}
+
+    // #todo
+    // check window.
+    if ( (void*) window == NULL ){
+        gwssrv_debug_print ("wmDrawFrame: [FAIL] window\n");
+        return -1;
+    }
+
+    // #todo
+    // Desenhar o frame e depois desenhar a barra de títulos
+    // caso esse estilo de frame precise de uma barra.
+
+    // Editbox
+    // EDITBOX NÃO PRECISA DE BARRA DE TÍTULOS.
+    // MAS PRECISA DE FRAME ... QUE SERÃO AS BORDAS.
+    
+    //
+    // Type
+    //
+    
+    Type = window->type;
+
+    int useFrame=FALSE;
+    int useIcon=FALSE;
+    int useTitleString=FALSE;
+    int useBorder=FALSE;
+    // ...
+
+    switch (Type){
+    
+    case WT_EDITBOX:     
+        useFrame=TRUE; 
+        useIcon=FALSE;
+        useBorder=TRUE;
+        break;
+    
+    case WT_OVERLAPPED:  
+        useFrame=TRUE; 
+        useIcon=TRUE;
+        useTitleString=TRUE;
+        useBorder=TRUE;
+        break;
+    
+    case WT_BUTTON:      
+        useFrame=TRUE;
+        useIcon=FALSE; 
+        break;
+    };
+
+    if ( useFrame == FALSE ){
+        gwssrv_debug_print ("wmDrawFrame: [ERROR] This type does not use a frame.\n");
+        return -1;
+    }
+
+
+    // ===============================================
+    // editbox
+    
+    if ( Type == WT_EDITBOX )
+    {
+
+        // #todo
+        // The window structure has a element for border size
+        // and a flag to indicate that border is used.
+        // It also has a border style.
+
+        // Se tiver o foco.
+        if ( window->focus == TRUE ){
+            border_color = COLOR_BLUE;
+            border_size = 4;
+        }else{
+            border_color = COLOR_BLACK;  // COLOR_INACTIVEBORDER;
+            border_size = 2;
+        };
+        
+        window->border_size = 0;
+        window->borderUsed = FALSE;
+        if (useBorder==TRUE){
+            window->border_color = border_color;
+            window->border_size  = border_size;
+            window->borderUsed   = TRUE;
+        }
+        
+        
+
+        // Draw the border of an edit box.
+
+        // board1, borda de cima e esquerda.
+        rectBackbufferDrawRectangle( 
+            window->left, window->top, 
+            window->width, window->border_size, 
+            window->border_color, 1 );
+
+        rectBackbufferDrawRectangle( 
+            window->left, window->top, 
+            window->border_size, window->height, 
+            window->border_color, 1 );
+
+        // board2, borda direita e baixo.
+        rectBackbufferDrawRectangle( 
+            (window->left + window->width - border_size), window->top,  
+            window->border_size, window->height, 
+            window->border_color, 1 );
+
+        rectBackbufferDrawRectangle ( 
+            window->left, (window->top + window->height - window->border_size), 
+            window->width, window->border_size, 
+            window->border_color, 1 );
+
+        // ok
+        return 0;
+    }
+
+
+    // ===============================================
+    // overlapped
+
+    // string at center?
+    size_t tmp_size = (size_t) strlen ( (const char *) window->name );
+    unsigned long offset = 
+        ( ( (unsigned long) window->width - ( (unsigned long) tmp_size * (unsigned long) gcharWidth) ) / 2 );
+
+    if ( Type == WT_OVERLAPPED )
+    {
+
+        // #todo
+        // Maybe we nned border size and padding size.
+        
+        // Consistente para overlapped.
+        border_size = METRICS_BORDER_SIZE;
+        // ...
+        
+        // #todo
+        // The window structure has a element for border size
+        // and a flag to indicate that border is used.
+        // It also has a border style.
+
+        // Se tiver o foco.
+        if ( window->focus == TRUE ){
+            border_color = COLOR_BLUE1;
+        }else{
+            border_color = COLOR_INACTIVEBORDER;
+        };
+
+        window->border_size = 0;
+        window->borderUsed = FALSE;
+        if (useBorder==TRUE){
+            window->border_color = border_color;
+            window->border_size  = border_size;
+            window->borderUsed   = TRUE;
+        }
+
+
+        // Quatro bordas.
+         
+        // board1, borda de cima e esquerda.
+        rectBackbufferDrawRectangle( 
+            parent->left + window->left, parent->top + window->top, 
+            window->width, window->border_size, 
+            window->border_color, 1 );
+
+        rectBackbufferDrawRectangle( 
+            parent->left + window->left, parent->top + window->top, 
+            window->border_size, window->height, 
+            window->border_color, 1 );
+
+        //board2, borda direita e baixo.
+        rectBackbufferDrawRectangle( 
+            (parent->left + window->left + window->width - window->border_size), (parent->top + window->top), 
+            window->border_size, window->height, 
+            window->border_color, 1 );
+
+        rectBackbufferDrawRectangle ( 
+            (parent->left + window->left), (parent->top + window->top + window->height - window->border_size), 
+            window->width, window->border_size, 
+            window->border_color, 1 );
+
+
+        //
+        // Title bar.
+        //
+
+        // #todo
+        // The window structure has a flag to indicate that
+        // we are using titlebar.
+        // It also has a title bar style.
+        // Based on this style, we can setup some
+        // ornaments for this title bar.
+
+        // #todo
+        // Simple title bar.
+        // We're gonna have a wm inside the window server.
+        // The title bar will be very simple.
+        // We're gonna have a client area.
+        
+        // #bugbug
+        // Isso vai depender da resolução da tela.
+        // Um tamanho fixo pode fica muito fino em uma resolução alta
+        // e muito largo em uma resolução muito baixa.
+        
+        window->titlebar_height = 32;
+
+        // Title bar
+        tbWindow = (void *) createwCreateWindow2 ( 
+                                WT_SIMPLE, 1, 1, "TITLE", 
+                                border_size, border_size, 
+                                (window->width - border_size - border_size), window->titlebar_height, 
+                                (struct gws_window_d *) window, 
+                                0, TitleBarColor, TitleBarColor );  
+
+        if ( (void *) tbWindow == NULL ){
+            gwssrv_debug_print ("wmDrawFrame: tbWindow fail \n");
+            return -1;
+        }
+
+        tbWindow->type = WT_SIMPLE;
+
+        window->titlebar = tbWindow;
+
+
+        // Ornamento:
+        // border on bottom.
+        // Usado para explicitar se a janela é ativa ou não
+        // e como separador entre a barra de títulos e a segunda
+        // área da janela de aplicativo.
+        // Usado somente por overlapped window.
+
+        rectBackbufferDrawRectangle ( 
+            tbWindow->left, ( (tbWindow->top) + (tbWindow->height) - METRICS_TITLEBAR_ORNAMENT_SIZE ),  
+            tbWindow->width, METRICS_TITLEBAR_ORNAMENT_SIZE, 
+            COLOR_BLACK, 1 );
+
+
+        //
+        // Icon
+        //
+
+        // #
+        // O posicionamento em relação
+        // à janela é consistente por questão de estilo.
+        
+        // See:
+        // bmp.c
+        // IN: index, x, y.
+
+        window->titlebarHasIcon = FALSE;
+
+        if( useIcon == TRUE ){
+            gwssrv_display_system_icon( 
+                1, 
+                (tbWindow->left + METRICS_ICON_LEFT), 
+                (tbWindow->top  + METRICS_ICON_TOP) );
+             window->titlebarHasIcon = TRUE;
+         }
+
+        //
+        // string
+        //
+        
+        // #todo
+        // Temos que gerenciar o posicionamento da string.
+        
+        // #bugbug: Use 'const char *'
+        tbWindow->name = (char *) strdup ( (const char *) window->name );
+        
+        //#todo: validation
+        //if ( (void*) tbWindow->name == NULL ){}
+        
+        if ( useTitleString == TRUE ){
+            dtextDrawString ( 
+                (tbWindow->left) + offset, 
+                (tbWindow->top)  + 8, 
+                COLOR_WHITE, 
+                tbWindow->name );
+        }
+
+        //  control ?
+        // ... 
+        
+        // ok
+        return 0;
+    }
+
+
+    // ===============================================
+    // button
+
+    //button
+    if ( Type == WT_BUTTON )
+    {
+        gwssrv_debug_print ("wmDrawFrame: [TODO] frame for button\n");
+        
+        //todo frame or not
+        //just like the edit box.   
+        
+        // ok     
+        return 0;
+    }
+
+    // ===============================================
+    // more ... ??
+
+    // ok
+    return 0;
+}
+
+
+/*
  *************************************************************** 
  * wm_process_windows: 
  *
@@ -1156,7 +1530,7 @@ draw_frame:
          window->type == WT_EDITBOX || 
          window->type == WT_BUTTON )
     {
-        createwDrawFrame ( 
+        wmDrawFrame ( 
             (struct gws_window_d *) window->parent,  //parent.
             (struct gws_window_d *) window,          //bg do botão em relação à sua parent. 
             0, 0, window->width, window->height, 

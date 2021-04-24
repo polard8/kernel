@@ -95,7 +95,7 @@ all-c:
 
 	# view-like component
 
-	$(CC)  -c  view/display/bitblt.c    $(user_ccflags) -I $(LIBC) -I include/ -I .  -o bitblt.o
+	$(CC)  -c  view/bitblt.c    $(user_ccflags) -I $(LIBC) -I include/ -I .  -o bitblt.o
 
 	$(CC)  -c  view/char.c     $(user_ccflags) -I $(LIBC) -I include/ -I .  -o char.o
 	$(CC)  -c  view/dtext.c    $(user_ccflags) -I $(LIBC) -I include/ -I .  -o dtext.o

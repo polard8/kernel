@@ -136,46 +136,30 @@
 //Ela pode ter no máximo 1 MB.
 //O código do kernel tem 1MB de tamanho,
 //logo em seguida começa o heap;
-#define CODE_START  0xC0000000   //0x100000pys  
-#define CODE_END    0xC00FFFFF   //0x1FFFFFpys  
-#define CODE_SIZE (CODE_END-CODE_START)
 
 
 //
-// #importante
-// Vamos testar outro tamanho de stack para o kernel.
-// Mudaremos de 8KB para 128KB.
-// 0x8000 0x20000
+// heap and stack
 //
 
-
-
-//
-// ## KERNEL HEAP ##
-//
-
-//kernel heap.(Endereço virtual do heap do processo Kernel).
-//O heap deve começa depois do kernel e antes da pilha..
-// heapstart = kernelstart + kernel size 
-//considerando o kernel de 1 mega
-
-#define KERNEL_HEAP_START  (0xC0000000 + 0x100000)   //kernel start + kernel size.
-#define KERNEL_HEAP_END    (0xC02FFFF0 - 0x20000)    //(0xC02FFFF0 - 0x8000)     //stack start - stack size
+// heap
+#define KERNEL_HEAP_START  0xC0200000 
+#define KERNEL_HEAP_END    0xC03D0000
 #define KERNEL_HEAP_SIZE   (KERNEL_HEAP_END - KERNEL_HEAP_START)
 
+// Tem um espaço perdido para
+// evitar colisão.
+
+// stack
+#define KERNEL_STACK_END    0xC03E0000
+#define KERNEL_STACK_START  0xC03FFFF0 
+#define KERNEL_STACK_SIZE   (KERNEL_STACK_START-KERNEL_STACK_END)
+
+
 
 //
-// ## KERNEL STACK ##
+// LFB
 //
-
-//@todo: Crir estrutura de pilha.
-//kernel stack. (Endereço virtual da pilha do processo Kernel).
-//Obs: O Heap e a Stack estão dentro dos limites de 4MB de
-//tamanho da imagem do kernel base.
-//32kb
-#define KERNEL_STACK_SIZE   0x20000  //0x8000                                      
-#define KERNEL_STACK_START  0xC02FFFF0                                        
-#define KERNEL_STACK_END    (KERNEL_STACK_START - KERNEL_STACK_SIZE)  
 
 
 //Endereço virtual padrão para o Linear Frame Buffer. (LFB).
@@ -184,18 +168,29 @@
 #define FRONTBUFFER_VA              0xC0400000
 
 
+//
+// Shared memory for command line.
+//
+
+// #IMPORTANTE
+// Essa área de memória compartilhada tem sido usada pelos processos
+// para troca de mensagens. O shell está passando a linha de comandos.
+// #bugbug: 
+// Isso tá dentro da memória de vídeo, que são 4MB e começa em 0xC0400000. 
+
+//#define SHARED_MEMORY (0xC0800000 -0x100)
+
+
+//
+// backbuffer
+//
+
 
 //Endereço virtual padrão para o BackBuffer. (buffer1)
 #define DEFAULT_BACKBUFFER_VIRTUALADDRESS  0xC0800000
 #define BACKBUFFER_ADDRESS                 0xC0800000
 #define BACKBUFFER_VA                      0xC0800000
 
-
-//#IMPORTANTE
-//Essa área de memória compartilhada tem sido usada pelos processos
-//para troca de mensagens. O shell está passando a linha de comandos.
-//#bugbug: Isso tá dentro da memória de vídeo, que são 4MB e começa em 0xC0400000. 
-//#define SHARED_MEMORY (0xC0800000 -0x100)
 
 #define XXXPAGEDPOOL_VA  0xC0C00000
 

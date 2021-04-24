@@ -1,5 +1,5 @@
 /*
- * File: pages.c
+ * File: mm/pages.c
  *
  *     Faz a configura��o da pagina��o de mem�ria e oferece rotinas de
  * suporte ao mapeamento de mem�ria f�sica.
@@ -1144,8 +1144,8 @@ int mmSetUpPaging (void)
 
     for ( i=0; i < 1024; ++i )
     {
-        km_page_table[i] = (unsigned long) SMALL_origin_pa | 3;     
-        SMALL_origin_pa  = (unsigned long) SMALL_origin_pa + 4096;  
+        km_page_table[i] = (unsigned long) SMALL_origin_pa | 3; 
+        SMALL_origin_pa  = (unsigned long) SMALL_origin_pa + 4096; 
     };
     page_directory[ENTRY_KERNELMODE_PAGES] = (unsigned long) &km_page_table[0];      
     page_directory[ENTRY_KERNELMODE_PAGES] = (unsigned long) page_directory[ENTRY_KERNELMODE_PAGES] | 3;  
@@ -1288,6 +1288,11 @@ int mmSetUpPaging (void)
 
     // #importante:	
     // O endere�o f�sico e virtual s�o iguais para essa tabela.
+    // #todo
+    // Não precisamos mapear todos os 4MB para esse fim.
+    // somente o tamanho da memória de video.
+    // NO fim das contas a gente nem usa essa memória, pois o
+    // kernel ainda não suporta o modo texto. Mas quem sabe algum dia.
 
     for ( i=0; i < 1024; ++i )
     {
