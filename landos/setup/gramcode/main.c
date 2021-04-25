@@ -385,14 +385,18 @@ void *teditorProcedure (
 				//#teste: Isso é um improviso.
 				//Criando o botão para salvar o arquivo.
                 case VK_F1: 
-                    debug_print(" [F1] ");
+                    debug_print(" [F1] \n");
                     //saveCreateButton();
                     editor_save_file ("FILE1234TXT");
                     break;
 
-                case VK_F2: debug_print(" [F2] "); break;
-                case VK_F3: debug_print(" [F3] "); break;
-                case VK_F4: debug_print(" [F4] "); break;
+                case VK_F2: debug_print(" [F2] \n"); break;
+                case VK_F3: debug_print(" [F3] \n"); break;
+                case VK_F4: 
+                    debug_print(" [F4] \n"); 
+                    // switch the foreground thread.
+                    gramado_system_call (301,0,0,0);
+                    break;
 
             default:
                     gde_debug_print("teditorProcedure: [MSG_SYSKEYDOWN] default message\n");
@@ -455,6 +459,16 @@ void *teditorProcedure (
             };
             return 0; 
             break;
+
+        // #test
+        // update
+        // Enviado pelo kernel quando a thread volta a ter o input.
+        case 11216:
+            gde_redraw_window (hWindow,TRUE);
+            gde_redraw_window (save_button, 1);
+            break;
+
+
 
         default:
             gde_debug_print ("teditorProcedure: [FIXME] default message\n");

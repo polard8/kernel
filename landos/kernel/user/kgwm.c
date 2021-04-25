@@ -891,6 +891,223 @@ guiSetUpMainWindow (
 }
 
 
+// service 301
+// Change active window.
+// Switch to the next window.
+// It changes the foreground thread.
+// The new foreground thread will be the thread
+// associated with this new window.
+// Valid for overlapped windows.
+
+int kgwm_next(void)
+{
+
+    struct window_d *wActive;  // active window
+    struct window_d *n;  // next window
+
+    struct thread_d *t;
+
+
+    debug_print("kgwm_next: [FIXME]\n");
+
+    //#debug
+    //return -1;
+
+
+
+    wActive = (struct window_d *) windowList[active_window];
+    
+    // #todo
+    // Se não temos uma janela ativa 
+    // então temos que providenciar uma.
+
+    if ( (void*) wActive == NULL ){
+        panic ("kgwm_next: wActive\n");
+    }
+    
+    if (wActive->used != TRUE || wActive->magic != 1234 )
+    {
+        panic ("kgwm_next: wActive validation\n");
+    }
+
+    // Somente para esse tipo.
+    if ( wActive->type != WT_OVERLAPPED ){
+        panic("kgwm_next: wActive Invalid type\n");
+    }
+
+    //
+    // Get next
+    //
+    
+    n = (struct window_d *) wActive->next;
+    
+    // Se a próxima indicada na navegação é válida. Usaremos ela.
+    if ( (void*) n != NULL )
+    {
+        if (n->used == TRUE && n->magic == 1234 )
+        {
+            debug_print ("kgwm_next: next gotten\n");
+            goto __go;
+        }
+    }
+
+    // A next é inválida,
+    // então vamos usar a lista que está no desktop.
+
+    if ( (void*) CurrentDesktop == NULL ){
+        panic ("kgwm_next: CurrentDesktop\n");
+    }
+
+    if ( CurrentDesktop->desktopUsed  != TRUE && 
+         CurrentDesktop->desktopMagic != 1234 )
+    {
+        panic ("kgwm_next: CurrentDesktop validation\n");
+    }
+
+
+    //
+    //  Check list
+    //
+
+
+    // Procurar a janela ativa dentro da lista.
+    int i=0;
+    struct window_d *tmp;
+
+    i = CurrentDesktop->lHead;
+
+    // limits
+    if (CurrentDesktop->lHead < 0 ||CurrentDesktop->lHead >= 8)
+    {
+        CurrentDesktop->lHead = 0;
+    }
+
+    tmp = (struct window_d *) CurrentDesktop->list[i]; 
+    
+    // circula
+    // se der certo ou nao
+    CurrentDesktop->lHead++;
+    if (CurrentDesktop->lHead >= 8)
+    {
+        CurrentDesktop->lHead = 0;
+    }
+
+
+    // fail
+    if ( (void*) tmp == NULL )
+    {
+        // list overflow
+        n = (struct window_d *) wActive;
+        debug_print("kgwm_next: [fail] list FAIL. Back to active\n");
+        goto __go;
+    }        
+    
+    if ( (void*) tmp != NULL )
+    {
+        if ( tmp->used == TRUE && tmp->magic == 1234 )
+        {
+            n = (struct window_d *) tmp;
+            debug_print("kgwm_next: [ok] One from the list\n");
+            goto __go;
+        }
+    }
+
+
+
+//
+// == Go ===========================
+//
+
+__go:
+
+    // Last check.
+
+    if ( (void*) n == NULL ){
+        panic("kgwm_next: [__go] invalid n\n");
+    }
+
+    if (n->used != TRUE || n->magic != 1234 )
+    {
+        panic("kgwm_next: [__go] n validation\n");
+    }
+
+    // Is it a overlapped window?
+    if (n->type != WT_OVERLAPPED){
+        panic("kgwm_next: [__go] not WT_OVERLAPPED\n");
+    }
+
+    //
+    // Thread
+    //
+
+    // tid
+    // #todo: overflow?
+
+    if (n->tid < 0){
+        panic("kgwm_next: [__go] no tid for this window\n");
+    }
+
+    // Change the foreground thread.
+    
+    // Temos que tomar cuidado pra não colocarmos
+    // como foreground thread, uma thread que está num estado
+    // ruim, como zumbi.
+    
+    t = (struct thread_d *) threadList[ n->tid ];
+
+    if ( (void*) t == NULL ){
+        panic("kgwm_next: [__go] invalid thread\n");
+    } 
+
+     if ( t->used != TRUE || t->magic != 1234 )
+     {
+          panic("kgwm_next: [FAIL] thread validation\n");
+     } 
+
+     if ( t->state == READY || 
+          t->state == RUNNING )
+     {
+         // ok
+         // A next é válida.
+
+         debug_print("kgwm_next: [DONE]\n");
+         
+         // Change the active window.
+         active_window = n->id;
+            
+         // Change the foreground window.
+         foreground_thread = n->tid;
+         
+         //#test
+         debug_print("kgwm_next:  [DONE] redraw window\n");
+         redraw_window(n,TRUE);
+         
+         // #debug
+         draw_text(n,8,8,COLOR_RED,n->name);
+         refresh_screen();
+
+         // Envia uma mensagem para a thread pedindo
+         // pra ela atualizar a janela principal.
+         // 11216.
+         kgws_send_to_tid (
+             (int) n->tid,               // tid
+             (struct window_d *) n,      // NULL
+             (int)               11216,  // Message Code
+             (unsigned long)     0,      // MAGIC signature, ascii code
+             (unsigned long)     0 );    // MAGIC signature, raw byte
+            
+         debug_print("kgwm_next:  [DONE] done\n");
+         return 0;
+     } 
+     
+     // drop
+     // Se a condição acima não foi atendida
+     // então continuaremos com a configuação antiga.
+     
+     // panic("kgwm_next: [FAIL] thread state\n");
+}
+
+
 /*
  *********************** 
  * register_wm_process: 
@@ -1052,7 +1269,7 @@ kgwm_window_control_dialog (
 }
 
 
-
+// Send a message to the Init process.
 // Only one parameter.
 // Remember, the input process's control thread 
 // has a defined input model.
@@ -1110,17 +1327,17 @@ void __kgwm_initDialog ( int message )
 
 /*
  ******************************************************************* 
- * __local_ps2kbd_procedure:
+ * __kgwm_ps2kbd_procedure:
  * 
  *       Some combinations with control + F1~F12
  */
 
 // Local function.
 
-// #bugbug
-// Isso nao seria trabalho do window manager?
-// kgwm
-
+// Called by kgws_event_dialog in kgws.c
+// Called by si_send_longmessage_to_ws and si_send_message_to_ws
+// in siws.c 
+// #bugbug: We don't wanna call the window server. Not now.
 
 // #important:
 // Isso garante que o usuário sempre podera alterar o foco
@@ -1268,10 +1485,12 @@ __kgwm_ps2kbd_procedure (
                     return 0;
                     break;
 
-
+                // Send a message to the Init process.
+                // 9216 - Launch the redpill application
                 case VK_F6:
                     if (ctrl_status == 1){
-                        __kgwm_initDialog(9216);  // launch redpill application
+                        __kgwm_initDialog(9216); 
+                        return 0; 
                     }
                     if (alt_status == 1){
                         printf ("__kgwm_ps2kbd_procedure: alt + f6\n");
@@ -1366,8 +1585,9 @@ __kgwm_ps2kbd_procedure (
 
                 case VK_F12:
                     if (ctrl_status == 1){
-                        printf ("__kgwm_ps2kbd_procedure: control + f12\n");
-                        refresh_screen();
+                        //printf ("__kgwm_ps2kbd_procedure: control + f12\n");
+                        //refresh_screen();
+                        kgwm_next();   //#test: change input thread.
                     }
                     if (alt_status == 1){
                         printf ("__kgwm_ps2kbd_procedure: alt + f12\n");

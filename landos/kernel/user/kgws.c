@@ -270,6 +270,8 @@ fail:
 // Envia eventos para a fila na thread em foreground.
 // Chama um diálogo local para algumas combinações de teclas.
 
+// Called by KGWS_SEND_KEYBOARD_MESSAGE in this document.
+
 int 
 kgws_event_dialog ( 
     int tid,
@@ -514,6 +516,12 @@ KGWS_SEND_KEYBOARD_MESSAGE (
     // pois os outros elementos já foram incializados logo acima.
     Event_Window = NULL;
 
+    // true for keyup and false for keydown.
+    // int Break = TRUE;
+
+
+
+
 
 
     if (tid<0){
@@ -555,6 +563,8 @@ KGWS_SEND_KEYBOARD_MESSAGE (
     // ligado. tecla liberada.
     if ( (Keyboard_RawByte & LDISC_KEY_RELEASED) != 0 ) // liberada.
     {
+        // Break = TRUE;
+        
         // Desativando o bit de paridade caso esteja ligado.
 
         Keyboard_ScanCode = Keyboard_RawByte;
@@ -673,7 +683,9 @@ KGWS_SEND_KEYBOARD_MESSAGE (
     // * Tecla (pressionada) ...........
     // bit desligado. tecla pressionada.
     if ( (Keyboard_RawByte & LDISC_KEY_RELEASED) == 0 )  // pressionada.
-    { 
+    {
+        // Break = FALSE;
+        
         Keyboard_ScanCode = Keyboard_RawByte;
         Keyboard_ScanCode &= LDISC_KEY_MASK; //Desativando o bit de paridade caso esteja ligado.
 
@@ -829,6 +841,9 @@ KGWS_SEND_KEYBOARD_MESSAGE (
         
     };  // Fim do else
 
+
+// == Dispatch =======================================================
+
     // Done.
     // Para finalizar, vamos enviar a mensagem para fila certa.
 
@@ -925,7 +940,6 @@ done:
     // em unsigned long.
 
 
-
     //
     // == dispatch event ======================================
     //
@@ -936,8 +950,9 @@ done:
     // + para a fila na thread em foreground.
 
 
-    // ===========================
-
+// ===========================
+// INPUT_MODE_TTY
+    
     // #todo
     // Send the message to the TYY,
     // this way the foreground process is able to read it
@@ -945,8 +960,8 @@ done:
     // See:
     // devmgr.h ps2kbd.c
     // ...
-    
-    
+
+
     if ( current_input_mode == INPUT_MODE_TTY )
     {
          kgws_put_console ( 
@@ -979,6 +994,9 @@ done:
     //}
 
 
+// ===========================
+// INPUT_MODE_SETUP
+
     // #bugbug
     // Bem, na verdade esse tipo de input pode ser usado para
     // além do ambiente de setup. Podemos usar também
@@ -997,6 +1015,19 @@ done:
         return 0;
     }
 
+// ===========================
+// INPUT_MODE_WS
+
+
+    // #todo
+    // This is a work in progress
+    // We're gonna send messages to the applications
+    // on an environment with a loadable window server.
+    
+    if ( current_input_mode == INPUT_MODE_WS )
+    {
+        panic("KGWS_SEND_KEYBOARD_MESSAGE: [TODO] INPUT_MODE_WS input mode\n");
+    }
 
     return -1;
 }

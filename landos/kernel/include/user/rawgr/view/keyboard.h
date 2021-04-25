@@ -61,9 +61,7 @@ struct keyboard_message_d keyboard_queue[8];
 //
 
 
-void abnt2_keyboard_handler (void);
-
-
+void DeviceInterface_PS2Keyboard(void);
 
 int ps2tty_get_byte_from_input_buffer (void);
 void ps2tty_put_byte_into_input_buffer( char c );

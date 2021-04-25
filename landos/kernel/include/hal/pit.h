@@ -242,7 +242,7 @@ struct timer_d *create_timer (
 
 int new_timer_id (void);
 
-
+void DeviceInterface_PIT(void); 
 
 #endif   
 

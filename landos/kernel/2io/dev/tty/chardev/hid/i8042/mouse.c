@@ -44,8 +44,8 @@ irq12_MOUSE (void)
 
     wait_then_write (0x64,0xAD);    // Disable keyboard.
     
-    mouseHandler();
-    
+    DeviceInterface_PS2Mouse();
+
     // #bugbug
     // E se isso falhar?
     wait_then_write (0x64,0xAE);    // Reanable keyboard.

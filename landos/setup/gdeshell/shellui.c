@@ -155,11 +155,19 @@ struct window_d *shellCreateMainWindow ( int status ){
     // We have the argument 'status'.
     // Is it used here?
 
+    // backup
+    //w = (void *) gde_create_window ( 
+    //                 1, 1, 1, "gdeshell",
+    //                 wpWindowLeft, wpWindowTop, 
+    //                 wsWindowWidth, wsWindowHeight,    
+    //                 0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
+
     w = (void *) gde_create_window ( 
-                     1, 1, 1, "gdeshell",
+                     WT_OVERLAPPED, 1, 1, "gdeshell",
                      wpWindowLeft, wpWindowTop, 
                      wsWindowWidth, wsWindowHeight,    
                      0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
+
 
     // #bugbug
     // Por causa do gerenciamento da sessão crítica essa função 

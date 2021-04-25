@@ -971,9 +971,11 @@ shellProcedure (
         //ele faz uma chamada ao procedimento de janela do aplicativo com a mensagem 
         //MSG_CREATE, se o aplicativo retornar -1, ent�o a rotina em kernel mode que 
         //esta criando a janela, cancela a janela que est� criando e retorn NULL.		
-        case MSG_CREATE: 
-            printf ("MSG_CREATE\n"); 
-            break;
+        
+        // suspenso: não criaremos coisas quando da criação da janela principal.
+        //case MSG_CREATE: 
+            //printf ("MSG_CREATE\n"); 
+            //break;
 
 
         // #IMPORTANTE
@@ -6755,13 +6757,19 @@ _ok:
     gde_enter_critical_section ();
     // IN: status.
     hWindow = shellCreateMainWindow(1);
-    if ( (void *) hWindow == NULL )
-    {
+    if ( (void *) hWindow == NULL ){
         printf ("gdeshell: shellCreateMainWindow FAIL!\n");
         gde_exit_critical_section ();
         exit(1);
     }
     gde_register_window (hWindow);
+    
+
+    // a janela ativa tem que ser uma janela do tipo
+    // overlapped.
+    // agora o gdeshell tem uma janela overlapped.
+    gde_set_active_window (hWindow); 
+    
     gde_show_window (hWindow);
     gde_exit_critical_section ();
     //--

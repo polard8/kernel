@@ -105,26 +105,29 @@ int timerShowTextCursor;
 //...
 
 
-//
-// Funções internas.
-//
 
-
-//Rotina principal.
-void pitTimer(void); 
-// ...
 
 
 /*
- ************************************
- * irq0_TIMER:
- *     Chama o handler do kernel que está no kernel base.
- * #todo: Observar alguns procedimentos antes de chamar a rotina.
+ *****************************************************
+ * DeviceInterface_PIT: 
+ *    
+ *     device interface for pit device.
+ *
+ *     (Contagem de tempo, tempo das tarefas, 
+ * quantum ...).
+ *     (tick tick tick)
  */
- 
-__VOID_IRQ 
-irq0_TIMER (void)
-{
+
+void DeviceInterface_PIT (void){
+
+    // Timers.
+    int i = 0;
+
+    struct timer_d  *Timer;
+
+    struct thread_d *Thread;
+
 
     // Se o timer não estiver inicializado !
     if ( __breaker_timer_initialized == 0 )
@@ -139,39 +142,6 @@ irq0_TIMER (void)
     g_profiler_ints_irq0++;
 
 
-	//#debug
-	//vamos checar se o primeiro iret está trazendo
-	//o fluxo para cá.
-	//quando não houver falha vai fazer uma bagunça...
-	//mas no caso de falha vai ficar limpo.
-	//também podemos usar o debug via porta serial.
-	//kprintf ("#debug KiTimer ");
-	//refresh_screen();
-	//refresh_screen();
-	//while(1){}
-
-    pitTimer();
-}
-
-
-
-/*
- *****************************************************
- * pitTimer: 
- *     Handler chamado pelo ISR do timer (IRQ 0).
- *     (Contagem de tempo, tempo das tarefas, 
- * quantum ...).
- *     (tick tick tick)
- */
-
-void pitTimer (void){
-
-    // Timers.
-    int i = 0;
-
-    struct timer_d  *Timer;
-
-    struct thread_d *Thread;
 
 
     /*
@@ -401,6 +371,22 @@ done:
 //fail:
     //return;
 }
+
+
+
+/*
+ ************************************
+ * irq0_TIMER:
+ *     Chama o handler do kernel que está no kernel base.
+ * #todo: Observar alguns procedimentos antes de chamar a rotina.
+ */
+ 
+__VOID_IRQ 
+irq0_TIMER (void)
+{
+    DeviceInterface_PIT();
+}
+
 
 
 void timerEnableTextCursor (void)

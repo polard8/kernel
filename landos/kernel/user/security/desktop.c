@@ -431,6 +431,9 @@ set_current_menuVScroll (
 
 void init_desktop (void){
 
+    int i=0;
+
+
     debug_print ("init_desktop:\n");
 
     //printf("init_desktop: Initializing..\n");
@@ -458,7 +461,13 @@ void init_desktop (void){
         desktops_count = 1;
         desktop0->desktopId = 0;
 
-    
+        desktop0->lTail = 0;
+        desktop0->lHead = 0;
+        for (i=0; i<8; i++){
+            desktop0->list[i] = (unsigned long) 0;
+        };
+
+
 	    // #todo
 	    // Depois precisamos colocar aqui
 	    // o pid do processo kernel.

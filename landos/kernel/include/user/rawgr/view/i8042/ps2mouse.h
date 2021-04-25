@@ -191,8 +191,7 @@ int load_mouse_bmp (void);
 void ps2mouse_parse_data_packet (void);
 
 //ps2mouse.c
-void mouseHandler (void); 
-
+void DeviceInterface_PS2Mouse(void);
 
 
 int ps2_mouse_globals_initialize (void);

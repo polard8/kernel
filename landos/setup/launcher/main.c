@@ -86,6 +86,11 @@ launcherProcedure (
                     gde_clone_and_execute("sysmon.bin");
                     exit(0);
                     break;
+                
+                case VK_F4:
+                    // switch the foreground thread.
+                    gramado_system_call (301,0,0,0);
+                    break;
             };
             goto done;
             break;
@@ -209,6 +214,16 @@ launcherProcedure (
             gde_message_box (3,"launcher","MSG_CLOSE");
             gde_close_window (main_window );
             gde_exit(0);
+            break;
+
+        // #test
+        // update
+        // Enviado pelo kernel quando a thread volta a ter o input.
+        case 11216:
+            gde_redraw_window (main_window,TRUE);
+            gde_redraw_window (launcher_button_1, 1);
+            gde_redraw_window (launcher_button_2, 1);
+            gde_redraw_window (launcher_button_3, 1);
             break;
 
         default:
@@ -373,6 +388,9 @@ int main ( int argc, char *argv[] )
     //
 
     gde_set_focus(hWindow);
+
+    gde_set_active_window(hWindow);
+        
     gde_show_window (hWindow);
 
     // #bugbug

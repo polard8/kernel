@@ -40,6 +40,7 @@
 
 
 // Setup input mode.
+// Used by applications using the kgws window server.
 // This is the mode used when we do not have a 
 // loadble ring3 window server.
 // Send the input event to the thread associated with the
@@ -50,6 +51,11 @@
 // In this mode we're gonna send the input to the tty buffer.
 // This way a virtual terminal can share the input with its client.
 #define INPUT_MODE_TTY    2000
+
+// ws input mode.
+// Used for the applications running on an envronment
+// with a loadable window server. Just like gws window server.
+#define INPUT_MODE_WS     3000
 
 // ...
 

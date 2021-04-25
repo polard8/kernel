@@ -1415,7 +1415,7 @@ done:
  * Temos externs no início desse arquivo.
  */
 
-void mouseHandler (void)
+void DeviceInterface_PS2Mouse(void)
 {
 
 	// #importante:

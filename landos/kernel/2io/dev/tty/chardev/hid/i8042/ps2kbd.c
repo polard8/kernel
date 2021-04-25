@@ -1318,6 +1318,240 @@ void *__do_111 ( unsigned long buffer )
 
 
 
+/*
+ *************************** 
+ * ps2tty_get_byte_from_input_buffer:
+ */
+
+// Low level keyboard reader.
+// Isso poderia usar uma rotina de tty
+
+// #importante
+// Isso é usado pelo serviço que pega mensagens de input. (111).
+// Pega o scancode.
+// Renova a fila do teclado
+// O teclado esta lidando no momento com um buffer pequeno, 128 bytes.
+
+// Called by thread_getchar in thread.c
+
+// #bugbug
+// Nada foi colocado do buffer de input ainda.
+// KGWS_SEND_KEYBOARD_MESSAGE colocou ascii code no buffer canonico.
+
+int ps2tty_get_byte_from_input_buffer (void)
+{
+    unsigned long SC = 0;
+
+    // Getting a byte from the input buffer
+    // of the ps2 keyboard tty.
+
+    SC = (unsigned char) PS2keyboardTTY._rbuffer->_base[keybuffer_head];
+
+    // Clean the slot.
+
+    PS2keyboardTTY._rbuffer->_base[keybuffer_head] = 0;
+
+    // Increment and round the queue.
+
+    keybuffer_head++;
+
+    if ( keybuffer_head >= PS2keyboardTTY._rbuffer->_lbfsize )
+    { 
+        keybuffer_head = 0; 
+    }
+
+    // Return the byte.
+
+    return (int) SC; 
+}
+
+
+void ps2tty_put_byte_into_input_buffer( char c )
+{
+    debug_print ("ps2tty_put_byte_into_input_buffer: [FIXME]\n");
+    
+    // #todo: 
+    // Aqui podemos retornar.
+    // Pois vamos precisar dessa estrutura para o buffer.
+    
+    if ( (void *) PS2keyboardTTY._rbuffer == NULL )
+    {
+        panic ("put_scancode: PS2keyboardTTY._rbuffer \n");
+    }
+
+    // #bugbug
+    // Checar a validade.
+
+    PS2keyboardTTY._rbuffer->_base[keybuffer_tail++] = (char) c;
+    
+    if ( keybuffer_tail >= PS2keyboardTTY._rbuffer->_lbfsize )
+    {
+        keybuffer_tail = 0;
+    }
+
+}
+
+
+
+/*
+ * *******************************************************
+ * DeviceInterface_PS2Keyboard: 
+ * 
+ *     Keyboard handler for abnt2 keyboard.
+ *     fica dentro do driver de teclado.
+ *
+ *     A interrupção de teclado vai chamar essa rotina.
+ *     @todo: Usar keyboardABNT2Handler().
+ * void keyboardABNT2Handler() 
+ * Esse será o handler do driver de teclado
+ * ele pega o scacode e passa para a entrada do line discipline dentro do kernel.
+ *
+ * @TODO: ISSO DEVERÁ IR PARA UM ARQUIVO MENOR ... OU AINDA PARA UM DRIVER.
+ * Pega o scacode cru e envia para a disciplina de linhas que deve ficar no kernelbase.
+ * Essa é a parte do driver de dispositivo de caractere.
+ *
+ * #importante:
+ * O driver deverá de alguma maneira notificar o kernel sobrea a ocorrência
+ * do evento de input. Para que o kernel acorde as trheads que estão esperando 
+ * por eventos desse tipo.
+ */
+
+	//#importante:
+	// Provavelmente uma interrupção irá fazer esse trabalho de 
+	// enviar o scancode para o kernel para que ele coloque na fila.
+	// Nesse momento o kernel de sentir-se alertado sobre o evento de 
+	// input e acordar a threa que está esperando por esse tipo de evento. 
+	
+	// #obs: 
+    // Esse buffer está em gws/user.h 
+
+
+// Low level keyboard writter.
+// Isso poderia usar uma rotina de tty
+// O teclado esta lidando no momento com um buffer pequeno, 128 bytes.
+
+// PUT SCANCODE
+
+
+void DeviceInterface_PS2Keyboard(void){
+
+    static int __has_e0_prefix = 0;
+    static int __has_e1_prefix = 0;
+
+
+    // Disable mouse port.
+    // wait_then_write (0x64,0xA7);
+
+
+    // ??
+    // See: Serenity os.
+    //u8 status = IO::in8(I8042_STATUS);
+    //if (!(((status & I8042_WHICH_BUFFER) == I8042_KEYBOARD_BUFFER) && (status & I8042_BUFFER_FULL)))
+        //return;
+
+
+    //não precisamos perguntar para o controlador se
+    //podemos ler, porque foi uma interrupção que nos trouxe aqui.
+    // #obs:
+    // O byte pode ser uma resposta à um comando ou 
+    // um scancode.
+
+    unsigned char __raw = 0;
+    unsigned char val   = 0;
+
+sc_again:
+
+    //===========================================
+    // #test
+    // Testing with ack
+    // credits: minix
+    // #define KEYBD   0x60  /* I/O port for keyboard data */
+    // #define PORT_B  0x61  /* I/O port for 8255 port B (kbd, beeper...) */
+    // #define KBIT    0x80  /* bit used to ack characters to keyboard */
+
+
+    /* get the raw byte for the key struck */
+    __raw = in8(0x60);
+
+    val = in8(0x61);         /* strobe the keyboard to ack the char */
+    out8(0x61, val | 0x80);  /* strobe the bit high */
+    out8(0x61, val);         /* now strobe it low */
+    //===========================================
+
+
+    // #todo
+    // Temos que checar se o primeiro byte é um ack ou um resend.
+    // isso acontece logo apos a inicialização.
+
+    // #todo
+    // me parece que o primeiro byte pode ser um ack ou resend.
+    
+    // #define ACKNOWLEDGE         0xFA	
+    // #define RESEND              0xFE
+
+    if ( __raw == 0xFA ){
+        printf ("abnt2_keyboard_handler: [test.first_byte] ack\n");
+        refresh_screen();
+    }
+
+    if ( __raw == 0xFE ){
+        printf ("abnt2_keyboard_handler: [test.first_byte] resend\n");
+        refresh_screen();
+    }
+
+
+    //
+    // == Queue ====================================
+    //
+
+     // #bugbug
+     // [Enter] in the numerical keyboard isn't working.
+     // teclas do teclado extendido.
+     // Nesse caso pegaremos dois sc da fila.
+    // #obs:
+    // O scancode é enviado para a rotina,
+    // mas ela precisa conferir ke0 antes de construir a mensagem,
+    // para assim usar o array certo.
+    // See: ws/ps2kbd.c
+    
+    // #bugbug
+    // Esse tratamento do scancode não faz sentido quando temos um
+    // window server instalado. Nesse caso deveríamos deixar o
+    // window server pegar os scancodes.
+    // Mas por enquanto, essa rotina manda mensagens para o ws
+    // caso tenha um instalado.
+
+
+     if ( __raw == 0 )   {                      goto done;  }
+     if ( __raw == 0xE0 ){ __has_e0_prefix = 1; goto done;  }
+     if ( __raw == 0xE1 ){ __has_e1_prefix = 1; goto done;  }
+
+    // + Build the message and send it to the thread's queue.
+    // This routine will select the target thread.
+    // + Or send the message to the input TTY.
+    // This way the foreground process is able to get this data.
+    // See: ps2kbd.c
+    // See: vt/console.c
+
+    // IN: 
+    // device type, data.
+    // 1=keyboard
+
+    console_interrupt (
+        CONSOLE_DEVICE_KEYBOARD,
+        __raw );
+
+
+    // Clean the mess.
+    __has_e0_prefix = 0;
+    __has_e1_prefix = 0;
+
+done:
+    // Reenable the mouse port.
+    //wait_then_write (0x64,0xA8);
+    return;
+}
+
 
 
 

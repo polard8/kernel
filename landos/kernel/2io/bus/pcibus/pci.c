@@ -522,12 +522,30 @@ static const char* sbc_subclass_strings[] = {
 */
 
 
-//
-// Funções internas.
-//
 
+void DeviceInterface_SharedPCIDevice0(void)
+{
+    debug_print ("DeviceInterface_SharedPCIDevice0:\n");
+    // g_profiler_ints_irq???++;
+}
 
-// ...
+void DeviceInterface_SharedPCIDevice1(void)
+{
+    debug_print ("DeviceInterface_SharedPCIDevice1:\n");
+    // g_profiler_ints_irq???++;
+}
+
+void DeviceInterface_SharedPCIDevice2(void)
+{
+    debug_print ("DeviceInterface_SharedPCIDevice2:\n");
+    // g_profiler_ints_irq???++;
+}
+
+void DeviceInterface_SharedPCIDevice3(void)
+{
+    debug_print ("DeviceInterface_SharedPCIDevice3:\n");
+    // g_profiler_ints_irq???++;
+}
 
 
 // Obs: 
@@ -553,9 +571,7 @@ static const char* sbc_subclass_strings[] = {
 __VOID_IRQ 
 irq_SHARED0(void)
 {
-    debug_print ("irq_SHARED0:\n");
-    //...
-    return;
+    DeviceInterface_SharedPCIDevice0();
 }
 
 
@@ -574,9 +590,7 @@ irq_SHARED0(void)
 __VOID_IRQ 
 irq_SHARED1 (void)
 {
-    debug_print ("irq_SHARED1:\n");
-    //...
-    return;
+    DeviceInterface_SharedPCIDevice1();
 }
 
 
@@ -595,9 +609,7 @@ irq_SHARED1 (void)
 __VOID_IRQ 
 irq_SHARED2 (void)
 {
-    debug_print ("irq_SHARED2:\n");
-    //...
-    return;
+    DeviceInterface_SharedPCIDevice2();
 }
 
 
@@ -616,9 +628,7 @@ irq_SHARED2 (void)
 __VOID_IRQ 
 irq_SHARED3 (void)
 {
-    debug_print ("irq_SHARED3:\n");
-	//...
-    return;
+    DeviceInterface_SharedPCIDevice3();
 }
 
 

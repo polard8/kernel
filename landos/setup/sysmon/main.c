@@ -354,6 +354,8 @@ sysmonProcedure (
 
                 case VK_F4: 
                     debug_print("sysmon: [F4]\n"); 
+                    // switch the foreground thread.
+                    gramado_system_call (301,0,0,0);
                     return 0;
                     break;
 
@@ -467,6 +469,14 @@ sysmonProcedure (
             goto done;
             break;
 
+        // #test
+        // update
+        // Enviado pelo kernel quando a thread volta a ter o input.
+        case 11216:
+            gde_redraw_window (main_window,TRUE);
+            gde_redraw_window (data_window,TRUE);
+            break;
+
         default:
             //debug_print ("sysmon: default message");
             break;
@@ -567,7 +577,7 @@ int main ( int argc, char *argv[] ){
     // The main window.
     gde_begin_paint (); 
     hWindow = (void *) gde_create_window (  
-                           WT_OVERLAPPED, 1, 1, "SYSMON", 
+                           WT_OVERLAPPED, 1, 1, "Sysmon", 
                            left, top, width, height, 
                            0, 0, color, color );  
 
@@ -783,7 +793,9 @@ int main ( int argc, char *argv[] ){
     // ====================================================
 
     gde_set_focus(hWindow);
-
+    gde_set_active_window(hWindow);
+    gde_show_window (hWindow);
+    
 	//
 	// == Loop ===================
 	//

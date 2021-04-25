@@ -775,7 +775,7 @@ typedef enum {
 #define BUFFER_MSG_NULL   0 
 #define CAT_MSG_NULL      0  
 
- 
+
 //window (1-19)  
 #define MSG_CREATE        1
 #define MSG_DESTROY       2
@@ -864,7 +864,6 @@ typedef enum {
 //...
 
 
-
 //
 //  terminal commands
 //
@@ -875,15 +874,22 @@ typedef enum {
 //...
 
 
-
 // o evento de rolagem aconteceu ...
 // O número do evento será entregue em long1.
 #define MSG_HSCROLL 2000
 #define MSG_VSCROLL 2001
 
 
+// Next thred associated with a window
+// The application needs to send a syscall
+// telling to the kgwm to switch the control thread
+// to the thread associated with the next overlapped window.
+#define MSG_NEXT  2010
 
 
+//
+// CMD
+//
 
 #define CMD_ABOUT 1000
 #define CMD_EXIT 1001

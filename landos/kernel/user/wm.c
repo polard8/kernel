@@ -2471,9 +2471,30 @@ void *kgwmGetActiveWindow (void)
  *     Ativa uma janela.
  */
 
+// #todo
+// change to 'int'
+
 void kgwmSetActiveWindow (struct window_d *window)
 {
+
     debug_print ("kgwmSetActiveWindow: [FIXME] \n");
+
+    if ( (void*) window == NULL )
+    {
+        panic("kgwmSetActiveWindow: window\n");
+    }
+    
+    if (window->used != TRUE || window->magic != 1234 )
+    {
+        panic ("kgwmSetActiveWindow: window validation\n");
+    }
+
+    // Change the active window.
+    
+    active_window = (int) window->id;
+
+    debug_print ("kgwmSetActiveWindow: done\n");
+
     return;
 }
 

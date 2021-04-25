@@ -471,6 +471,8 @@ void *CreateWindow (
 
     unsigned long __tmp_color=0;
 
+    // Usado para manipular lista encadeada.
+    struct window_d   *tmp;
 
 	//salvar para depois restaurar os valores originais no fim da rotina.
 	//unsigned long saveLeft;
@@ -591,16 +593,15 @@ void *CreateWindow (
 		// Agora vamos inicializar os elementos da estrutura de acordo 
 		// com os parâmetros passados via argumento.
 
-        // Object support.
         window->objectType  = ObjectTypeWindow;
         window->objectClass = ObjectClassGuiObjects;
-
         window->used  = TRUE;
         window->magic = 1234;
 
-		// #importante
-		// Id. A janela recebe um id somente na hora de registrar.
-		// window->id = ??.
+        // #importante
+        // Id. 
+        // A janela recebe um id somente na hora de registrar.
+        // window->id = ??.
 
         // Name.
         // #todo: 
@@ -615,14 +616,50 @@ void *CreateWindow (
         }
         
         window->name = windowname;
+        
+        window->tid = current_thread;
 
         // Window type.
         // Tipo é unsigned long pois poderá ser um conjunto de flags.
 
         window->type = (unsigned long) type;
-        
-        // #debug
-        // if ( type == WT_OVERLAPPED ){ panic("CreateWindow: __OVERLAPPED__\n"); }
+
+
+        //lista de oberlapped windows no desktop atual.
+        // #todo: We need a helper function for that.
+        if ( type == WT_OVERLAPPED )
+        {
+            if ( (void *) CurrentDesktop == NULL ){
+                panic("CreateWindow: [FAIL] CurrentDesktop\n");
+            }
+            
+            if ( CurrentDesktop->desktopUsed != TRUE ||
+                 CurrentDesktop->desktopMagic != 1234 )
+            {
+                panic("CreateWindow: [FAIL] CurrentDesktop validation\n");
+            }
+            
+            // put it in the list.
+            
+            if ( CurrentDesktop->lTail < 0 || CurrentDesktop->lTail >= 8 )
+            {
+                CurrentDesktop->lTail = 0;
+            }
+            
+            // #todo: melhorar isso.
+            // coloca no lugar certo.
+            
+            // coloca no tail
+            
+            CurrentDesktop->list[ CurrentDesktop->lTail  ] = (unsigned long) window;
+            
+            // circula tail
+            CurrentDesktop->lTail++;
+            if ( CurrentDesktop->lTail >= 8 )
+            {
+                CurrentDesktop->lTail = 0;
+            }
+        }
 
         // #todo: 
         // Criar instância.

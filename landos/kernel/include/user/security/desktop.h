@@ -35,7 +35,6 @@ struct desktop_d
     object_type_t   objectType;
     object_class_t  objectClass;
 
-    //object control
     struct object_d *object;
 
 
@@ -163,15 +162,23 @@ struct desktop_d
     // Windows
     //
 
+    int lTail;
+    int lHead;
+    unsigned long list[8];
+
+    //struct window_d *o_list;
+
+    
+
     // Only the app window. 'Overlapped'.
 
-    unsigned long windows[256];
+    //unsigned long windows[256];
 
     //
     // Menus
     //
 
-    unsigned long menus[256]; 
+    // unsigned long menus[256]; 
 
 
 	//Continua ...

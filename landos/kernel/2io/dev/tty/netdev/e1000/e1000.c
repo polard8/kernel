@@ -378,29 +378,10 @@ e1000_init_nic (
 }
 
 
-/*
- *******************************************
- *    >>>> HANDLER <<<<
- *******************************************
- * irq_E1000:
- *     
- *     Esse é o handler da interrupção para o NIC intel 8086:100E.
- *     Esse é o driver do controlador, ele não atua sobre protocolos 
- * de rede, então deve-se enviar uma mensagem para o servidor de rede 
- * para ele analizar o conteúdo do buffer, para assim decidir qual 
- * é o protocolo e redirecionar para a rotina de tratamento do 
- * protocolo específico.
- *     Esse é o driver do controlador, ele deve solicitar ao kernel
- * qual é o PID do processo que é o servidor de rede, e enviar
- * a mensagem para ele, contendo o endereço do buffer.
- */
 
-// Isso é chamado pelo assembly.
 
-__VOID_IRQ 
-irq_E1000 (void)
+void DeviceInterface_e1000(void)
 {
-
     uint32_t status=0;
     uint32_t val=0;
     uint16_t old=0;
@@ -580,8 +561,33 @@ irq_E1000 (void)
     };
     
     // Outro status qualquer.
+
 }
 
+/*
+ *******************************************
+ *    >>>> HANDLER <<<<
+ *******************************************
+ * irq_E1000:
+ *     
+ *     Esse é o handler da interrupção para o NIC intel 8086:100E.
+ *     Esse é o driver do controlador, ele não atua sobre protocolos 
+ * de rede, então deve-se enviar uma mensagem para o servidor de rede 
+ * para ele analizar o conteúdo do buffer, para assim decidir qual 
+ * é o protocolo e redirecionar para a rotina de tratamento do 
+ * protocolo específico.
+ *     Esse é o driver do controlador, ele deve solicitar ao kernel
+ * qual é o PID do processo que é o servidor de rede, e enviar
+ * a mensagem para ele, contendo o endereço do buffer.
+ */
+
+// Isso é chamado pelo assembly.
+
+__VOID_IRQ 
+irq_E1000 (void)
+{
+    DeviceInterface_e1000();
+}
 
 
 

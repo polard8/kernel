@@ -113,7 +113,7 @@ struct rtc_d *rtc;
 // IRQ8.
 //
 
-void rtc_irq (void);
+void DeviceInterface_RTC(void);
 
 
 //

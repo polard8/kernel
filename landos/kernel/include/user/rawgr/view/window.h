@@ -793,7 +793,6 @@ struct msg_d
 
 struct window_d
 {
-
     object_type_t   objectType;
     object_class_t  objectClass;
 
@@ -802,12 +801,21 @@ struct window_d
     int used;
     int magic;
 
+    // #todo
+    // Change to 'int'
     unsigned long id;    //Window Id. 
 
     char *name;          //Window name.
     unsigned long type;  //tipo ... (editbox, normal, ...)  style???
 
 
+    // Created by this thread.
+    // This is valid for overlapped windows 
+    // created by applications.
+    // When the kernel creates primitives just like the root window,
+    // so this window will receive the number -1.
+
+    int tid;
 
 
 	// Características dessa janela..
@@ -830,7 +838,6 @@ struct window_d
     unsigned long right;       //margem direita  
     unsigned long bottom;      //margem inferior  
 
-
     unsigned long width;
     unsigned long height;
 
@@ -838,6 +845,7 @@ struct window_d
 	// Deslocamento dentro da janela?
     unsigned long x;           //deslocamento x
     unsigned long y;           //deslocamento y 
+
     int z;                     // z order.
     
     //invalidadas.
@@ -2002,6 +2010,8 @@ void *kgwmGetFocus (void);
 void kgwmKillFocus ( struct window_d *window );
 
 
+// service 301
+int kgwm_next(void);
 
 
 //foreground window support

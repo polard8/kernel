@@ -940,6 +940,12 @@ struct pci_device_d *scan_pci_device_list2 (
 int pci_setup_devices (void);
 
 
+void DeviceInterface_SharedPCIDevice0(void);
+void DeviceInterface_SharedPCIDevice1(void);
+void DeviceInterface_SharedPCIDevice2(void);
+void DeviceInterface_SharedPCIDevice3(void);
+
+
 //Inicia o pci.
 
 int init_pci (void);

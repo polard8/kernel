@@ -1397,16 +1397,16 @@ int gde_set_active_window (struct window_d *window)
 {
     if ( (void *) window == NULL ){
         gde_debug_print ("gde_set_active_window: fail\n");
-        return (int) 1;
+        return (int) -1;
     }else{
-        return (int) system_call ( SYSTEMCALL_SETACTIVEWINDOW, 
+        return (int) gramado_system_call ( 
+                         SYSTEMCALL_SETACTIVEWINDOW, 
                          (unsigned long) window, 
                          (unsigned long) window, 
                          (unsigned long) window );
     };
 
-    //#todo: Maybe '-1'
-    return 2;
+    return -2;
 }
 
 

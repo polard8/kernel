@@ -61,44 +61,26 @@ int rtcError;
 //int rtcError;
 //...
  
-
- 
-/*
- **********************************************
- * irq8_RTC:
- *     irq8 interrupt handler.
- *     System CMOS, Realtime clock.
- *     Isso é uma interface para chamar a rotina verdadeira.
- */
-
-__VOID_IRQ 
-irq8_RTC (void)
-{
-
-	// Se o rtc não estiver inicializado !
-    if ( __breaker_rtc_initialized == 0 )
-        return;
-
-
-	// Contando as interrupções desse tipo.
-    g_profiler_ints_irq8++;
-
-	//...
-
-    rtc_irq();
-}
- 
  
 /*
  *******************************************
- * rtc_irq: 
+ * DeviceInterface_RTC: 
  *     irq8 interrupt handler.
  *     System CMOS, Realtime clock. 
  */
 
-void rtc_irq (void){
+void DeviceInterface_RTC(void){
 
     unsigned i=0;
+
+	// Se o rtc não estiver inicializado !
+    if ( __breaker_rtc_initialized == 0 ){
+        return;
+    }
+
+    // Contando as interrupções desse tipo.
+    g_profiler_ints_irq8++;
+
 
     g_ticks++;
 
@@ -117,6 +99,21 @@ void rtc_irq (void){
 	//out8(0xA0, 0x20);
 	//out8(0x20, 0x20);
 }
+
+/*
+ **********************************************
+ * irq8_RTC:
+ *     irq8 interrupt handler.
+ *     System CMOS, Realtime clock.
+ *     Isso é uma interface para chamar a rotina verdadeira.
+ */
+
+__VOID_IRQ 
+irq8_RTC (void)
+{
+    DeviceInterface_RTC();
+}
+
 
 
 /*

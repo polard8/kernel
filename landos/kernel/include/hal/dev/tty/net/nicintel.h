@@ -363,6 +363,11 @@ e1000_ioctl (
     unsigned long request, 
     unsigned long arg );
 
+
+// See: e1000.c
+void DeviceInterface_e1000(void);
+
+
 #endif   
 
 

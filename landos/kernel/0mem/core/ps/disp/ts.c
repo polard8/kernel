@@ -557,15 +557,14 @@ dispatch_current:
     Current = (void *) threadList[current_thread];
 
     if ( (void *) Current == NULL ){
-        panic ("ts-task_switch.dispatch_current: Struct");
-
+        panic ("ts-task_switch.dispatch_current: Struct\n");
     }else{
 
         if ( Current->used != 1 || 
              Current->magic != 1234 || 
              Current->state != READY )
         {
-            panic ("ts-task_switch.dispatch_current: validation");
+            panic ("task_switch.dispatch_current: validation\n");
         }
 
         Current->runningCount = 0;

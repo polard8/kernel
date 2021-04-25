@@ -301,8 +301,20 @@ void *gde_extra_services (
                             (unsigned char *)   arg3, 
                             (unsigned char *)   arg4 );
     }
+
+
+    // Change active window.
+    // Switch to the next window.
+    // It changes the foreground thread.
+    // The new foreground thread will be the thread
+    // associated with this new window.
+    // Valid for overlapped windows.
     
-    
+    if (number == 301){
+        return (void*) kgwm_next();
+    }
+
+
     /*
     // Close a process, given it's pid and the exit code.
     if ( number == 333 )

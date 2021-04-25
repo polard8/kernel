@@ -17,16 +17,7 @@ void disk_reset_ata_irq_invoked (void);
 
 
 
-
-
-/*
- ***********************************
- * irq14_PRIMARY_IDE
- *     irq 14 handler
- */
-
-__VOID_IRQ 
-irq14_PRIMARY_IDE (void)
+void DeviceInterface_PrimaryIDE(void)
 {
     // Se o ata1 não estiver inicializado !
     if ( __breaker_ata1_initialized == 0 )
@@ -35,22 +26,14 @@ irq14_PRIMARY_IDE (void)
     //
     // profiler
     //
-    
-	// Contando as interrupções desse tipo.
-	g_profiler_ints_irq14++;
-	
-    ata_irq_invoked = 1; 
+
+    // Contando as interrupções desse tipo.
+    g_profiler_ints_irq14++;
+
+    ata_irq_invoked = TRUE;
 }
 
-
-/*
- ***********************************
- * irq15_SECONDARY_IDE
- *     irq 15 handler
- */
-
-__VOID_IRQ 
-irq15_SECONDARY_IDE (void)
+void DeviceInterface_SecondaryIDE(void)
 {
     // Se o ata2 não estiver inicializado !
     if ( __breaker_ata2_initialized == 0 )
@@ -59,11 +42,30 @@ irq15_SECONDARY_IDE (void)
     //
     // profiler
     //
-    
-	// Contando as interrupções desse tipo.
-	g_profiler_ints_irq15++;
-	
-    ata_irq_invoked = 1; 
+
+    // Contando as interrupções desse tipo.
+    g_profiler_ints_irq15++;
+
+    ata_irq_invoked = TRUE;
+}
+
+
+// ============================
+// irq14_PRIMARY_IDE
+//     irq 14 handler
+__VOID_IRQ 
+irq14_PRIMARY_IDE (void)
+{
+    DeviceInterface_PrimaryIDE();
+}
+
+// ============================
+// irq15_SECONDARY_IDE
+//     irq 15 handler
+__VOID_IRQ 
+irq15_SECONDARY_IDE (void)
+{
+    DeviceInterface_SecondaryIDE();
 }
 
 

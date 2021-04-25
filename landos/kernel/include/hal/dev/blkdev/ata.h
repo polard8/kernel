@@ -471,6 +471,11 @@ uint32_t diskPCIScanDevice ( int class );
 int diskATAPCIConfigurationSpace ( struct pci_device_d *D );
 
 
+
+void DeviceInterface_PrimaryIDE(void);
+void DeviceInterface_SecondaryIDE(void);
+
+
 /*
  *******************************************************
  * ata_initialize:
