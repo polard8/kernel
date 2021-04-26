@@ -381,6 +381,14 @@ void gws_close_display( struct gws_display_d *display);
 
 int gws_enable_input_method(int method);
 
+int 
+gws_default_procedure ( 
+    int fd,
+    int window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 );
+
 //
 // End.
 //

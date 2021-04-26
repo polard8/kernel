@@ -318,7 +318,7 @@ gwsProcedure (
 
 
                 // 9~12
-                case VK_F9 : 
+                case VK_F9: 
                     gws_async_command(fd,4,1,0);
                     //gws_async_command(fd,1,0,0);
                     //gws_async_command(fd,4,9,0);  // cat
@@ -342,10 +342,10 @@ gwsProcedure (
                     //gws_async_command(fd,4,11,0); //polygon
                     //gws_async_command(fd,4,12,0); //lines
                     //gws_clone_and_execute("browser.bin"); 
-                    printf("gws.bin: Shutting down ...\n");
-                    f12Status = (int) gws_clone_and_execute("shutdown.bin");
-                    if (f12Status<0){ break; } // fail
-                    exit(0);
+                    //printf("gws.bin: Shutting down ...\n");
+                    //f12Status = (int) gws_clone_and_execute("shutdown.bin");
+                    //if (f12Status<0){ break; } // fail
+                    //exit(0);
                     break;
  
                 // ...
@@ -358,7 +358,8 @@ gwsProcedure (
     // consumiu o evento passado à ele.
 
 done:
-    return TRUE;
+    //return TRUE;
+    return (int) gws_default_procedure(fd,0,msg,long1,long2);
 }
 
 

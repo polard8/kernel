@@ -3499,10 +3499,14 @@ gws_async_command (
     // ?? Precisamos mesmo de um loop para isso. ??
 
     while (1){
+        
         message_buffer[0] = 0;                 // window. 
         message_buffer[1] = GWS_AsyncCommand;  // message number.
+        
+        // parameters
         message_buffer[2] = request;           // request
         message_buffer[3] = sub_request;       // sub request
+        message_buffer[4] = data;              // data
         // ...
 
         // Write!
@@ -3672,6 +3676,65 @@ fail:
     return -1;
 }
 
+
+
+// Default procedure.
+// Call the window server.
+// The purpose is sending commands to the window manager 
+// that lives inside the window server. 
+int 
+gws_default_procedure (
+    int fd, 
+    int window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 )
+{
+
+    gws_debug_print ("gws_default_procedure:\n");
+    
+    if (fd<0)
+        return -1;
+
+    if (msg<0)
+        return -1;
+
+    //
+    // Messages
+    //
+    
+    // Vamos mandar para o servidor algumas
+    // mensagens que interessam ao window manager 
+    // dentro do window server.
+    
+    switch (msg){
+
+    case MSG_SYSKEYDOWN:
+        switch (long1){
+            case VK_F12:
+                printf("gsw_default_procedure: VK_F12\n");
+                gws_async_command(fd,8,1,1);
+                break;
+        };
+        break;
+        
+        
+    // Essa mensagem foi enviada pelo kernel.
+    //case 11316:
+        //printf("gsw_default_procedure: 11316\n");
+        //exit(0);
+        //gws_async_command(fd,8,1,1);
+        //break;
+    
+    default:
+        // printf("gsw_default_procedure: msg={%d}\n",msg);
+        break;
+    };
+    
+    // ...
+    
+    return 0;
+}
 
 //
 // End.

@@ -1600,7 +1600,6 @@ __kgwm_ps2kbd_procedure (
                         refresh_screen();
                     }
                     if (shift_status == 1){
-                        //kgwm_mode = KGWM_QUAD;
                         printf ("__kgwm_ps2kbd_procedure: shift + f12\n");
                         refresh_screen();
                     }

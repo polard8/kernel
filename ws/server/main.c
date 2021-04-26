@@ -1768,10 +1768,10 @@ int serviceAsyncCommand (void)
     //
 
     // window_id   = message_address[0];
-    message_id     = message_address[1]; 
+    message_id     = message_address[1];   // message
     request_id     = message_address[2]; 
     subrequest_id  = message_address[3];
-    Data          = message_address[4];
+    Data           = message_address[4];
 
 
     // ...
@@ -1855,6 +1855,19 @@ int serviceAsyncCommand (void)
              //exit(0);
              return 0;
              break;
+             
+        // 8
+        // Window Manager requests. Power Trio.
+        // As mensages aqui interessam somente ao window manager
+        // que esta dentro do window server.
+        case 8:
+            printf ("serviceAsyncCommand: [8] \n");
+            if (subrequest_id = 1)
+            {
+                
+                //exit(0);
+            }
+            break;
 
         // ...
                 

@@ -70,15 +70,15 @@ LIBCOBJ = ../../landlib/rtl/obj
 #TERMINAL      = terminal/include/   
 
 
-	##
-	## Objects
-	##
-	
+#
+# Objects
+#
+
 
 myObjects = crt0.o main.o rtl.o \
 ctype.o stdio.o stdlib.o string.o conio.o socket.o signal.o unistd.o \
 r_render.o \
-bitblt.o line.o rect.o xxxinput.o char.o dtext.o createw.o gws.o comp.o window.o \
+bitblt.o line.o rect.o xxxinput.o char.o dtext.o createw.o gws.o comp.o wm.o \
 grprim.o sprite.o demos.o bmp.o connect.o button.o font.o\
 termios.o ioctl.o fcntl.o    
 
@@ -105,7 +105,7 @@ all-c:
 	$(CC)  -c  view/xxxinput.c  $(user_ccflags) -I $(LIBC) -I include/ -I .  -o xxxinput.o
 
 	$(CC)  -c  view/createw.c  $(user_ccflags) -I $(LIBC) -I include/ -I .  -o createw.o
-	$(CC)  -c  view/window.c   $(user_ccflags) -I $(LIBC) -I include/ -I .  -o window.o
+
 	$(CC)  -c  view/button.c   $(user_ccflags) -I $(LIBC) -I include/ -I .  -o button.o
 	$(CC)  -c  view/comp.c     $(user_ccflags) -I $(LIBC) -I include/ -I .  -o comp.o
 
@@ -121,6 +121,9 @@ all-c:
 	$(CC)  -c  model/connect.c  $(user_ccflags) -I $(LIBC) -I include/ -I .  -o connect.o
 	$(CC)  -c  model/gws.c      $(user_ccflags) -I $(LIBC) -I include/ -I .  -o gws.o
 	# ...
+
+
+	$(CC)  -c  wm.c   $(user_ccflags) -I $(LIBC) -I include/ -I .  -o wm.o
 
 	#
 	# == imported objects =============================
