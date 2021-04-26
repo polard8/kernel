@@ -899,6 +899,8 @@ guiSetUpMainWindow (
 // associated with this new window.
 // Valid for overlapped windows.
 
+// control + f12
+
 int kgwm_next(void)
 {
 
@@ -1401,8 +1403,9 @@ __kgwm_ps2kbd_procedure (
 
                 case VK_F1:
                     if (ctrl_status == 1){
-                        printf ("__kgwm_ps2kbd_procedure: control + f1\n");
-                        refresh_screen();
+                        //printf ("__kgwm_ps2kbd_procedure: control + f1\n");
+                        //refresh_screen();
+                        powertrio_select_client(0);
                     }
                     if (alt_status == 1){
                         printf ("__kgwm_ps2kbd_procedure: alt + f1\n");
@@ -1418,8 +1421,9 @@ __kgwm_ps2kbd_procedure (
 
                 case VK_F2:
                     if (ctrl_status == 1){
-                        printf ("__kgwm_ps2kbd_procedure: control + f2\n");
-                        refresh_screen();
+                        //printf ("__kgwm_ps2kbd_procedure: control + f2\n");
+                        //refresh_screen();
+                        powertrio_select_client(1);                    
                     }
                     if (alt_status == 1){
                         printf ("__kgwm_ps2kbd_procedure: alt + f2\n");
@@ -1435,8 +1439,9 @@ __kgwm_ps2kbd_procedure (
 
                 case VK_F3:
                     if (ctrl_status == 1){
-                        printf ("__kgwm_ps2kbd_procedure: control + f3\n");
-                        refresh_screen();
+                        //printf ("__kgwm_ps2kbd_procedure: control + f3\n");
+                        //refresh_screen();
+                        powertrio_select_client(2);
                     }
                     if (alt_status == 1){
                         printf ("__kgwm_ps2kbd_procedure: alt + f3\n");
@@ -1569,7 +1574,8 @@ __kgwm_ps2kbd_procedure (
 
                 case VK_F11:
                     if (ctrl_status == 1){
-                        __kgwm_initDialog(9221); // launch gnssrv
+                        //__kgwm_initDialog(9221); // launch gnssrv
+                        powertrio_next();
                     }
                     if (alt_status == 1){
                         printf ("__kgwm_ps2kbd_procedure: alt + f11\n");

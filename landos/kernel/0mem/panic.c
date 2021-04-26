@@ -34,7 +34,7 @@ void panic ( const char *format, ... )
 }
 
 
-// Clena and panic.
+// Clean and panic.
 void panic2 ( const char *format, ... )
 {
     register int *varg = (int *) (&format);

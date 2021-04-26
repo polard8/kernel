@@ -29,11 +29,7 @@ int KiSignal(void);
 
 
 // Spawn support. Spawn a thread.
-void KiSpawnTask (int id);
-
-
-
-
+void KiSpawnThread (int tid);
 
 
 // #todo: 

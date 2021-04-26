@@ -2943,13 +2943,19 @@ process_execve (
     // pois ate o momento somente o kernel tem mais que isso.
 
     unsigned long BUGBUG_IMAGE_SIZE_LIMIT = (512 * 4096);
-    
-    
+
     // Load file from root dir.
 
-    Status = (int) fsLoadFile ( VOLUME1_FAT_ADDRESS, 
+    // #todo
+    // Esses endereços podem ser passados via parâmetros?
+
+    // #bugbug
+    // The limit of entries is '32'.
+
+    Status = (int) fsLoadFile ( 
+                       VOLUME1_FAT_ADDRESS, 
                        VOLUME1_ROOTDIR_ADDRESS, 
-                       32, //#bugbug: Number of entries.
+                       32,
                        (unsigned char *) arg1, 
                        (unsigned long) process->Image, 
                        BUGBUG_IMAGE_SIZE_LIMIT );
@@ -3196,20 +3202,18 @@ format_ok:
         //refresh_screen();
         //while(1){}
 
-        KiSpawnTask ( Thread->tid );
-
         // No return!
-                
-        panic ("process_execve: KiSpawnTask returned ");
+
+        KiSpawnThread ( Thread->tid );
+
+        panic ("process_execve: KiSpawnThread returned\n");
     };
 
 	// fail
-	
+
 fail:
-
     printf ("process_execve: Fail\n");
-	// refresh_screen ();
-
+    // refresh_screen ();
 done:
 
 	//#debug

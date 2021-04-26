@@ -364,12 +364,6 @@ all-c:
 
 	# user
 
-	# security
-	$(CC) -c user/security/desktop.c   $(KINCLUDE) $(CFLAGS) -o desktop.o
-	$(CC) -c user/security/room.c      $(KINCLUDE) $(CFLAGS) -o room.o
-	$(CC) -c user/security/userenv.c   $(KINCLUDE) $(CFLAGS) -o userenv.o
-	$(CC) -c user/security/usession.c  $(KINCLUDE) $(CFLAGS) -o usession.o
-
 	$(CC) -c user/console.c   $(KINCLUDE) $(CFLAGS) -o console.o
 	$(CC) -c user/terminal.c  $(KINCLUDE) $(CFLAGS) -o terminal.o
 	$(CC) -c user/vt.c        $(KINCLUDE) $(CFLAGS) -o vt.o
@@ -385,30 +379,37 @@ all-c:
 	$(CC) -c user/wm.c    $(KINCLUDE) $(CFLAGS) -o wm.o
 
 	# data model
-	$(CC) -c user/draw/model/font.c  $(KINCLUDE) $(CFLAGS) -o font.o
+	$(CC) -c user/model/font.c  $(KINCLUDE) $(CFLAGS) -o font.o
 
-	# Window Server. kgws
-	$(CC) -c user/draw/view/bg.c        $(KINCLUDE) $(CFLAGS) -o bg.o
-	$(CC) -c user/draw/view/bmp.c       $(KINCLUDE) $(CFLAGS) -o bmp.o
-	$(CC) -c user/draw/view/button.c    $(KINCLUDE) $(CFLAGS) -o button.o
-	$(CC) -c user/draw/view/char.c      $(KINCLUDE) $(CFLAGS) -o char.o
-	$(CC) -c user/draw/view/createw.c   $(KINCLUDE) $(CFLAGS) -o createw.o
-	$(CC) -c user/draw/view/dtext.c     $(KINCLUDE) $(CFLAGS) -o dtext.o
-	$(CC) -c user/draw/view/line.c      $(KINCLUDE) $(CFLAGS) -o line.o
-	$(CC) -c user/draw/view/menu.c      $(KINCLUDE) $(CFLAGS) -o menu.o
-	$(CC) -c user/draw/view/mbar.c      $(KINCLUDE) $(CFLAGS) -o mbar.o
-	$(CC) -c user/draw/view/pixel.c     $(KINCLUDE) $(CFLAGS) -o pixel.o
-	$(CC) -c user/draw/view/pbar.c      $(KINCLUDE) $(CFLAGS) -o pbar.o
-	$(CC) -c user/draw/view/rect.c      $(KINCLUDE) $(CFLAGS) -o rect.o
-	$(CC) -c user/draw/view/sbar.c      $(KINCLUDE) $(CFLAGS) -o sbar.o
-	$(CC) -c user/draw/view/tbar.c      $(KINCLUDE) $(CFLAGS) -o tbar.o
-	$(CC) -c user/draw/view/xproc.c     $(KINCLUDE) $(CFLAGS) -o xproc.o
+	# kernel gramado window system.
+	$(CC) -c user/view/bg.c       $(KINCLUDE) $(CFLAGS) -o bg.o
+	$(CC) -c user/view/bmp.c      $(KINCLUDE) $(CFLAGS) -o bmp.o
+	$(CC) -c user/view/button.c   $(KINCLUDE) $(CFLAGS) -o button.o
+	$(CC) -c user/view/char.c     $(KINCLUDE) $(CFLAGS) -o char.o
+	$(CC) -c user/view/createw.c  $(KINCLUDE) $(CFLAGS) -o createw.o
+	$(CC) -c user/view/dtext.c    $(KINCLUDE) $(CFLAGS) -o dtext.o
+	$(CC) -c user/view/line.c     $(KINCLUDE) $(CFLAGS) -o line.o
+	$(CC) -c user/view/menu.c     $(KINCLUDE) $(CFLAGS) -o menu.o
+	$(CC) -c user/view/mbar.c     $(KINCLUDE) $(CFLAGS) -o mbar.o
+	$(CC) -c user/view/pixel.c    $(KINCLUDE) $(CFLAGS) -o pixel.o
+	$(CC) -c user/view/pbar.c     $(KINCLUDE) $(CFLAGS) -o pbar.o
+	$(CC) -c user/view/rect.c     $(KINCLUDE) $(CFLAGS) -o rect.o
+	$(CC) -c user/view/sbar.c     $(KINCLUDE) $(CFLAGS) -o sbar.o
+	$(CC) -c user/view/tbar.c     $(KINCLUDE) $(CFLAGS) -o tbar.o
+	$(CC) -c user/view/xproc.c    $(KINCLUDE) $(CFLAGS) -o xproc.o
+	$(CC) -c user/view/input.c    $(KINCLUDE) $(CFLAGS) -o input.o
+	$(CC) -c user/view/output.c   $(KINCLUDE) $(CFLAGS) -o output.o
 
-	$(CC) -c user/logoff.c  $(KINCLUDE) $(CFLAGS) -o logoff.o
-	$(CC) -c user/logon.c   $(KINCLUDE) $(CFLAGS) -o logon.o
 
-	$(CC) -c user/input.c            $(KINCLUDE) $(CFLAGS) -o input.o
-	$(CC) -c user/output.c           $(KINCLUDE) $(CFLAGS) -o output.o
+	# security
+	$(CC) -c user/security/desktop.c   $(KINCLUDE) $(CFLAGS) -o desktop.o
+	$(CC) -c user/security/room.c      $(KINCLUDE) $(CFLAGS) -o room.o
+	$(CC) -c user/security/userenv.c   $(KINCLUDE) $(CFLAGS) -o userenv.o
+	$(CC) -c user/security/usession.c  $(KINCLUDE) $(CFLAGS) -o usession.o
+	$(CC) -c user/security/logoff.c    $(KINCLUDE) $(CFLAGS) -o logoff.o
+	$(CC) -c user/security/logon.c     $(KINCLUDE) $(CFLAGS) -o logon.o
+
+
 
 
 ## Step2 link-kernel-image  - Linking the kernel image.

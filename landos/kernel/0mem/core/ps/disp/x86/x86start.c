@@ -7,7 +7,6 @@
  * 
  * History:
  *     2015 - Created by Fred Nora.
- *     2016 - Revision. 
  */
 
 
@@ -38,20 +37,23 @@ start_task (
     unsigned long *task_address )
 {
 
-	// #todo: filtrar argumentos.
+    // #todo: 
+    // Filtrar argumentos.
+
+    //if (id<0)
+    //    panic("start_task: id\n");
+
 	//  start_new_task_status:
 	//      É uma FLAG. Indica que existe uma thread querendo ser executada 
 	//  pela primeira vez.
 	// #todo: 
 	//  Isso poderia estar na estrutura 'ProcessorBlock' ?!
 
-
     start_new_task_status = 1; 
 
     // Id e Address.
-    start_new_task_id = (int) id; 
+    start_new_task_id      = (int) id; 
     start_new_task_address = (unsigned long) task_address;
-
 
     // mais ??!!
 }
@@ -69,18 +71,9 @@ void switch_to_user_mode (void)
 }
 
 
-/*
- ******************
- * executa_tarefa:
- *     Executa uma nova thread.
- *     @todo: Mudar o nome. startExecuteThread(...)
- *          
- */
-
-//unsigned long startExecuteThread(int tid, unsigned long *thread_address)
 
 // #todo
-// Deletar isso ou mudar de nome.
+// Deletar isso
 
 unsigned long 
 executa_tarefa ( 
@@ -164,9 +157,12 @@ executa_tarefa (
     asm (" pushl %0" :: "r" (eip)    ); 
 
 
-    // ??
+    // #bugbug
     // Em que momento essa funçao foi chamada.
     // Se ouve uma interrupcao de timer entao ...
+
+    // #bugbug
+    // EOI, only for the first pic ?
 
     out8 ( 0x20, 0x20 ); 
 
@@ -197,22 +193,16 @@ unsigned long KiExecutaTarefa ( int id, unsigned long *task_address )
 
 int KiInitTask (int id)
 {
-	//@todo: Algum filtro.
-
     if (id < 0){
-        //...
         return (int) 0;
     }
-
-	//Nothing.
 
     return (int) init_task (id);
 }
 
-
 void KiInitTasks (void)
 {
-    init_tasks ();
+    init_tasks();
 }
 
 

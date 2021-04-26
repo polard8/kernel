@@ -89,7 +89,13 @@ launcherProcedure (
                 
                 case VK_F4:
                     // switch the foreground thread.
-                    gramado_system_call (301,0,0,0);
+                    //gramado_system_call (301,0,0,0);
+                    gramado_system_call (302,(unsigned long) main_window,0,0);
+                    gramado_system_call (303,0,0,0);
+                    break;
+                
+                case VK_F5:
+                    gramado_system_call (304,0,0,0);
                     break;
             };
             goto done;

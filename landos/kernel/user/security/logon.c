@@ -366,6 +366,11 @@ int ExitLogon (void)
  *     ...
  */
 
+
+// #bugbug
+// Mudar o nome de 'screen window' para 'root window'
+// pis confunde com a entidade 'screen' usada em outros ambiente.
+
 void logon_create_screen_window (void){
 
     struct window_d *hWindow;

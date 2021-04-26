@@ -917,9 +917,8 @@ int init_threads (void);
 int GetCurrentThreadId (void);
 
 
-// Usadas durante a inicialização e execução de uma thread.
-// @todo: mudar apenas o protótipo para thread.h
-void spawn_thread (int id);
+
+void spawn_thread (int tid);
 
 
 // ## Finalizações ##

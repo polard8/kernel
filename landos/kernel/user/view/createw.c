@@ -898,16 +898,11 @@ void *CreateWindow (
 
         window->terminal_used  = FALSE;
         window->terminal_magic = (int) 0;
-
-        window->terminal_tab   = FALSE;
-
-        // The margins
         window->terminal_left   = (unsigned long) 0;
         window->terminal_top    = (unsigned long) 0;
-
-        // Dimensions
         window->terminal_width  = (unsigned long) 0;
         window->terminal_height = (unsigned long) 0;
+        window->terminal_tab   = FALSE;
 
 		//Desktop support.
 		//window->desktop = (void*) Desktop; //configurado anteriormente.
@@ -965,8 +960,8 @@ void *CreateWindow (
 
         window->locked = FALSE;
 
-		//Linked list.
-		//window->linkedlist = NULL;
+        //Linked list.
+        //window->linkedlist = NULL;
 
         // navigation
         window->prev = (void *) Parent;
@@ -1011,9 +1006,15 @@ void *CreateWindow (
 
         // Simple window. (Sem barra de títulos).
         case WT_SIMPLE:
+            Background = TRUE;
+            window->backgroundUsed = TRUE;
+            break;
+ 
         case WT_OVERLAPPED:
             Background = TRUE;
             window->backgroundUsed = TRUE;
+            Border = TRUE;
+            window->borderUsed = TRUE;
             break;
 
 

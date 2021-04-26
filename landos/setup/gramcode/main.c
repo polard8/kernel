@@ -393,9 +393,11 @@ void *teditorProcedure (
                 case VK_F2: debug_print(" [F2] \n"); break;
                 case VK_F3: debug_print(" [F3] \n"); break;
                 case VK_F4: 
-                    debug_print(" [F4] \n"); 
+                    //debug_print(" [F4] \n"); 
                     // switch the foreground thread.
-                    gramado_system_call (301,0,0,0);
+                    //gramado_system_call (301,0,0,0);
+                    //gramado_system_call (302,(unsigned long) hWindow,0,0);
+                    //gramado_system_call (303,0,0,0);
                     break;
 
             default:

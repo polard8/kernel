@@ -1343,21 +1343,21 @@ int redraw_window (struct window_d *window, unsigned long flags ){
     unsigned long __tmp_color=0;
 
 
+    debug_print ("redraw_window:\n");
+
     if ( (void *) window == NULL ){
-        //msg
-		goto fail;
-		
-    }else{
+        debug_print ("redraw_window: [FAIL] window\n");
+        goto fail;
+    }
 
-        if ( window->used != 1 || window->magic != 1234 )
-        {
-		    goto fail;
-        }
-		
-		//...
-    };
+    if ( window->used != TRUE || window->magic != 1234 )
+    {
+        debug_print ("redraw_window: [FAIL] window validation\n");
+        goto fail;
+    }
 
-
+    // ...
+ 
 	// Ok. 
 	// Pelo jeito já temos uma estrutura válida.
 
@@ -1366,17 +1366,16 @@ int redraw_window (struct window_d *window, unsigned long flags ){
 	//if( window->redraw != 1 ){ return (int) 0;}
 	
 	
-	// Minimized ? 
-	// Se tiver minimizada, não precisa repintar.
-	
-	Status = (int) is_window_minimized (window);
+    // Minimized ? 
+    // Se tiver minimizada, não precisa repintar.
+
+    Status = (int) is_window_minimized (window);
     
-	if (Status == 1)
-	{
-		//?? tem qua mudar alguma flag antes ??
-	    goto done;
-	}	
-	
+    if (Status == TRUE){
+        debug_print ("redraw_window: Minimized\n");
+        goto done;
+    }
+
 	//E se ela estiver travada ??
 	//O que significa travada?? não pode se mover??
 	// ?? travada pra quem ??
@@ -1406,22 +1405,18 @@ int redraw_window (struct window_d *window, unsigned long flags ){
 	// *Importante: 
 	// Checando se o esquema de cores está funcionando.
 	// obs: Essa checagem está se tornando repetitiva.
-	
-	if ( (void *) CurrentColorScheme == NULL )
-	{
-		panic ("redraw_window: CurrentColorScheme");
-		
-	} else {
-		
-		if ( CurrentColorScheme->used != 1 || 
-		     CurrentColorScheme->magic != 1234 )
-		{
-		    panic ("redraw_window: CurrentColorScheme validation");
-		}
-	};
-	
-	
-	// ****************************
+
+    if ( (void *) CurrentColorScheme == NULL ){
+        panic ("redraw_window: CurrentColorScheme");
+    } else {
+        if ( CurrentColorScheme->used  != TRUE || 
+             CurrentColorScheme->magic != 1234 )
+        {
+            panic ("redraw_window: CurrentColorScheme validation\N");
+        }
+    };
+
+
 	// Importante:
 	// Agora, na hora de efetivamente redezenhar, 
 	// podemos ver na estrutura quais são os elementos 
@@ -1433,12 +1428,13 @@ int redraw_window (struct window_d *window, unsigned long flags ){
 	// Ex: O usuário pode ter redimencionado ou arrastado 
 	// elementos da janela, ou ocultado apenas. 
 	// Afinal, feito escolhas ... 
-	//******************************
-	
-    //
-	// # Redraw #
-	//	
-	
+
+
+//
+// Redraw 
+//
+
+
 	// Cada estilo de design tem suas características,
 	// essas características precisas ser registradas 
 	// na estrutura de janela, bem como o próprio estilo 
@@ -1446,18 +1442,22 @@ int redraw_window (struct window_d *window, unsigned long flags ){
 	
 //redrawBegin:
 
-	//#bugbug
-    if ( window->view == VIEW_NULL )
-    { goto fail; }
+    // #bugbug
+    if ( window->view == VIEW_NULL ){ 
+        debug_print ("redraw_window: VIEW_NULL\n");
+        goto fail; 
+    }
 
 
+    if ( window->type == WT_OVERLAPPED ){
+        debug_print ("redraw_window: Overlapped\n");
+    }
 
-    // Sombra.
-    // Para overlapped?
-    if (window->shadowUsed == 1)
+    // Shadow for overlapped windows only.
+    // #bugbug
+    // A sombra deve ter suas dimensões registradas também.
+    if (window->shadowUsed == TRUE)
     {
-		//#bugbug
-		//A sombra deve ter suas dimensões registradas também.
         if ( window->type == WT_OVERLAPPED )
         {
             // @todo: Adicionar a largura das bordas verticais 
@@ -1467,96 +1467,88 @@ int redraw_window (struct window_d *window, unsigned long flags ){
 			// Cinza escuro.  CurrentColorScheme->elements[??] 
 			// @TODO: criar elemento sombra no esquema. 
 
-			if (window->focus == 1)
-			{ __tmp_color = xCOLOR_GRAY1; }    //mais escuro
-			if (window->focus == 0)
-			{ __tmp_color = xCOLOR_GRAY2; }    //mais claro
+            if (window->focus == TRUE) { __tmp_color = xCOLOR_GRAY1; }
+            if (window->focus == FALSE){ __tmp_color = xCOLOR_GRAY2; } 
 
-			drawDataRectangle ( window->left +1, window->top  +1, 
-				window->width  +1 +1, window->height +1 +1, 
-				__tmp_color );             
-        };
-        
-        //...                
-    };
+            drawDataRectangle ( 
+                window->left +1, 
+                window->top  +1, 
+                window->width  +2, 
+                window->height +2, 
+                __tmp_color ); 
+        }
+    }
 
 
-    // Background.
-    // Para todos os tipos.
-    if (window->backgroundUsed == 1)
+    // Background for all types.
+    if (window->backgroundUsed == TRUE){
+        drawDataRectangle ( 
+            window->left, 
+            window->top, 
+            window->width, 
+            window->height, 
+            window->bg_color ); 
+    }
+
+
+    // Border for some types only.
+    // #importante:
+    // devemos tratar a borda para cada tipo de janela individualmente.
+    if ( window->borderUsed == TRUE )
     {
-        drawDataRectangle ( window->left, window->top, 
-            window->width, window->height, window->bg_color ); 
-    };
+        debug_print ("redraw_window: [DEBUG] Border used\n");
+
+        // Button
+        if ( window->type == WT_BUTTON )
+        {
+            if ( window->focus == TRUE ){
+                border_color = COLOR_BLUE;  border_size = 2;
+            }else{
+                border_color = 0xF4F7FC;    border_size = 1;
+            };
+        }
+
+        // Editbox
+        if ( window->type == WT_EDITBOX )
+        {
+            if ( window->focus == TRUE ){
+                border_color = COLOR_BLUE;  border_size = 2;
+            }else{
+                border_color = 0xF4F7FC;    border_size = 1;
+            };
+        }
+
+        // Overlapped 
+        if ( window->type == WT_OVERLAPPED )
+        {
+            // Active?
+            if (window->active == TRUE){ 
+                debug_print ("redraw_window: Active\n");
+                border_color = COLOR_BLUE;
+                border_size = 2; 
+                if ( window->focus == TRUE )
+                {
+                    border_color = COLOR_YELLOW; 
+                    border_size = 3; 
+                }
+            }else{
+                debug_print ("redraw_window: Not active\n");
+                border_color = 0xF4F7FC;
+                border_size = 1;
+            };
+        }
+
+        // Simple
+        if ( window->type == WT_SIMPLE )
+        {
+            if ( window->focus == TRUE ){
+                border_color = COLOR_GRAY;  border_size = 2;
+            }else{
+                border_color = 0xF4F7FC;    border_size = 1;
+            };
+        }
 
 
-
-
-	// Borda.
-	// Para os casos de editbox por exemplo.
-	// Para vários tipos.
-    if ( window->borderUsed == 1 )
-    {
-		//#importante:
-		//devemos tratar a borda para cada tipo de janela individualmente.
-		
-		//botão
-		if ( window->type == WT_BUTTON )
-		{
-			//se o botão tiver o foco.
-			if ( window->focus == 1 ){
-				border_color = COLOR_BLUE;
-			    border_size = 2;
-			}else{
-			    border_color = 0xF4F7FC;	
-			    border_size = 1;
-			}
-		};
-
-		//editbox
-		if ( window->type == WT_EDITBOX )
-		{
-			//se tiver o foco.
-			if ( window->focus == 1 ){
-				border_color = COLOR_BLUE;
-			    border_size = 2;
-			}else{
-			    border_color = 0xF4F7FC;	
-			    border_size = 1;
-			}
-		};		
-		
-		//overlapped (app)
-		if ( window->type == WT_OVERLAPPED )
-		{
-			//se tiver o foco.
-			if ( window->focus == 1 ){
-				border_color = COLOR_BLUE;
-			    border_size = 2;
-				
-				if (window->active == 1){
-				    border_size = 3;	
-				}
-				
-			}else{
-			    border_color = 0xF4F7FC;	
-			    border_size = 1;
-			}
-		};	
-
-		//simple.
-		if ( window->type == WT_SIMPLE )
-		{
-			//se tiver o foco.
-			if ( window->focus == 1 ){
-				border_color = COLOR_GRAY;
-			    border_size = 2;
-			}else{
-			    border_color = 0xF4F7FC;	
-			    border_size = 1;
-			}
-		};
-		
 		//board1, borda de cima e esquerda.    
 		drawDataRectangle ( window->left, window->top, 
 			window->width, border_size, border_color );
@@ -1969,20 +1961,21 @@ int redraw_window (struct window_d *window, unsigned long flags ){
 		// Vamos mostrar um pouco mais.
 		// #todo: Esse extra deve ser do tamanho da sombra.
 
-    if ( flags == 1 )
-    {
-        refresh_rectangle ( window->left, window->top, 
-            window->width +4, window->height +4 );
+    if ( flags == TRUE ){
+        refresh_rectangle ( 
+            window->left, 
+            window->top, 
+            window->width +4, 
+            window->height +4 );
     }
 
-
-	//Continua ...
+    // ...
 
 done:
+    debug_print ("redraw_window: done\n");
     return 0; 
-
-
 fail:
+    debug_print ("redraw_window: fail\n");
     return (int) 1;
 }
 
@@ -2898,37 +2891,31 @@ fail:
 void kgwmKillFocus ( struct window_d *window )
 {
 
-    // #debug
-    // suspensa para testes na máquina real
-    // Nao queremos ficar sem foco algum.
-    
     debug_print ("kgwmKillFocus: [FIXME] \n");
-    return;
 
 
-	//
-	// ====== cut here for now =====
-	//
-
-
-    if ( (void *) window == NULL ){
-        printf ("kgwmKillFocus: window\n");
+    if ( (void *) window == NULL )
+    {
+        debug_print ("kgwmKillFocus: window\n");
         goto fail; 
-    }else {
-        if ( window->used == 1 && window->magic == 1234 )
-        {
-            window_with_focus = 0; //#test
+    }
 
-            window->focus = 0;
+    if ( window->used != TRUE || window->magic != 1234 )
+    {
+        debug_print ("kgwmKillFocus: window validation\n");
+        goto fail; 
+    }
 
-            WindowWithFocus = NULL;
+    window->focus = FALSE;
+        
+    // CUIDADO!
+    //window_with_focus = 0;
+    //WindowWithFocus = NULL;
+    //foreground_process = 0;
+    //foreground_thread = 0;
 
-            foreground_process = 0;
-            foreground_thread = 0;
-            return;
-        };
-    };
-
+done:
+    return;
 fail:
     return;
 }
@@ -3057,6 +3044,8 @@ int init_window_manager (void){
 
 	// todo:  
 	// Continua fazendo inicializações de procedimento de janela.	
+
+    powertrio_initialize();
 
     return 0;
 }
@@ -4087,7 +4076,363 @@ scroll_client_window (struct window_d *window)
 }
 
 
+// Initialize the structures used by the Power Trio window manager.
+// Called by init_window_manager()
+int powertrio_initialize(void)
+{
+    int i=0;
+    struct powertrio_client_d  *Client;
+
+
+    PowerTrio.initialized = FALSE;
+
+    // Creating clients
+
+    for (i=0; i<3; i++){
+        Client = (struct powertrio_client_d *) kmalloc( sizeof( struct powertrio_client_d ) );
+        if ( (void*) Client == NULL ){
+            panic("powertrio_initialize: [FAIL] Client\n");
+        }
+        Client->index = (int) i;
+        Client->used  = TRUE;
+        Client->magic = 1234;
+        Client->window = NULL;
+        Client->next = NULL;
+        powertrioList[i] = (unsigned long) Client;
+    };
+
+    PowerTrio.tail = 0;
+    PowerTrio.head = 0;
+    PowerTrio.selected = 0;
+
+// done:
+    PowerTrio.initialized = TRUE;
+    return 0;
+}
+
+
+// Add a window in a given slot.
+int powertrio_set_window ( int index, struct window_d *window )
+{
+    struct powertrio_client_d *c;
+
+
+    if (PowerTrio.initialized != TRUE ){
+        debug_print ("powertrio_set_window: Power Trio is not initialized\n");
+        return -1;
+    }
+
+    if (index<0)   {  return -1;  }
+    if (index >= 3){  return -1;  }
+
+    if ( (void*) window == NULL ){  return -1;  }
+
+    if (window->used != TRUE || window->magic != 1234 )
+    {
+        return -1;
+    }
+
+    // Get client for this index
+    c = (struct powertrio_client_d *) powertrioList[index];
+    
+    if ( (void*) c == NULL ){  return -1;  }
+
+    if (c->used != TRUE || c->magic != 1234 )
+    {
+        return -1;
+    }
+
+    if (c->index != index){
+        debug_print ("powertrio_set_window: [ERROR] c->index\n");
+        return -1;
+    }
+
+    // Saving.
+    c->window = (struct window_d *) window;
+    
+    // #todo
+    // Select ?
+    
+    return 0;
+}
+
+// Add a window in the next slot of a circular queue.
+int powertrio_queue( struct window_d *window )
+{
+
+    if (PowerTrio.initialized != TRUE ){
+        debug_print ("powertrio_queue: Power Trio is not initialized\n");
+        return -1;
+    }
+
+    if ( (void*) window == NULL ){  return -1;  }
+    
+    if (window->used != TRUE || window->magic != 1234 )
+    {
+        return -1;
+    }
+
+    if (window->type != WT_OVERLAPPED ){
+        debug_print ("powertrio_queue: invalid type \n");
+        return -1;
+    }
+
+    // check
+    if ( PowerTrio.tail <= 0 || PowerTrio.tail >= 3 )
+    {
+        PowerTrio.tail = 0;
+    }
+
+    // Coloca essa janela nesse dado slot.
+    powertrio_set_window (
+        PowerTrio.tail,     // Slot
+        window );           // Window
+
+    
+    // Circula
+    PowerTrio.tail++;
+    
+    if ( PowerTrio.tail >= 3 ){
+        PowerTrio.tail = 0;
+    }
+
+    return 0;
+}
+
+
+// Rearrange the windows in the screen
+// and refresh the screen.
+int powertrio_arrange_and_update(void)
+{
+    int i=0;
+    struct powertrio_client_d *c;
+
+    struct window_d *window;
+
+    // Limiting the name size.
+    char NameBuffer[32];
+
+    // Screen info
+    unsigned long DeviceWidth  = (unsigned long) screenGetWidth();
+    unsigned long DeviceHeight = (unsigned long) screenGetHeight();
+
+    // Client info
+    unsigned long l = (unsigned long) 0;
+    unsigned long t = (unsigned long) 0;
+    unsigned long w = (unsigned long) 0;
+    unsigned long h = (unsigned long) 0;
+
+
+    int Selected = FALSE;
+    int Update = FALSE;
+
+
+    if (PowerTrio.initialized != TRUE ){
+        debug_print ("powertrio_arrange_and_update: Power Trio is not initialized\n");
+        return -1;
+    }
+
+    // main window
+    // See: logon.c
+
+    if ( (void*) gui == NULL ){
+        panic ("powertrio_arrange_and_update: gui\n");
+    }
+
+    // Do now refresh now.
+    if ( (void*) gui->main != NULL ){
+        redraw_window ( gui->main, FALSE );
+    }
+
+    //
+    // Loop
+    //
+    
+    // Only three windows.
+    
+    for (i=0; i<3; i++){
+
+    Selected = FALSE;
+    Update = TRUE;
+        
+    // Get client for this index
+    c = (struct powertrio_client_d *) powertrioList[i];
+    
+    // Não atualize esse cliente.
+    if ( (void*) c == NULL ){  Update = FALSE;  }
+
+    // Não atualize esse cliente.
+    if (c->used != TRUE || c->magic != 1234 )
+    {  
+        Update = FALSE;  
+    }
+
+    // Get the window for this client.
+    window = (struct window_d *) c->window;
+
+    // Não atualize esse cliente.
+    if( (void*) window == NULL){  Update = FALSE;  }
+
+    // Não atualize esse cliente.
+    if (window->used != TRUE || window->magic != 1234 )
+    { 
+        Update = FALSE; 
+    }
+
+    //
+    // Rearrange
+    //
+
+    // Use 'if' statement, not switch.
+
+    if (i == 0){
+        l=8; 
+        t=8; 
+        w = (DeviceWidth >> 1) -32; 
+        h = DeviceHeight       -32;
+        if ( PowerTrio.selected == 0){ Selected = TRUE; }
+    }
+
+    if (i == 1){
+        l = DeviceWidth >> 1; 
+        t = 8;
+        w = (DeviceWidth  >> 1) -32;
+        h = (DeviceHeight >> 1) -32;
+        if ( PowerTrio.selected == 1){ Selected = TRUE; }
+    }
+
+    if (i == 2){
+        l = DeviceWidth  >> 1;
+        t = DeviceHeight >> 1;
+        w = (DeviceWidth  >> 1) -32;
+        h = (DeviceHeight >> 1) -32;
+        if ( PowerTrio.selected == 2){ Selected = TRUE; }
+    }
+
+    //
+    // Update
+    //
+
+    // Só atualizamos se não houve problemas.
+    if ( Update == TRUE ){
+
+        // Activate and set focus.
+        // A janela mão tem o foco, se alguem clicar em
+        // alguma janela filha, então o foco muda.
+        if ( Selected == TRUE ) { 
+            c->window->active = TRUE;  
+            kgwmSetFocus(c->window);
+        }
+
+        // Deactivate and lose focus.
+        if ( Selected == FALSE ){ 
+            c->window->active = FALSE; 
+            kgwmKillFocus(c->window);
+        }
+
+        // Replace, resize and redraw the window.
+        replace_window( c->window, l, t );
+        resize_window ( c->window, w, h );
+        redraw_window ( c->window, TRUE );
+
+        // Show the name, 
+        // refresh the screen and 
+        // send a message to the application to update the window.
+
+        if ( Selected == TRUE )
+        {
+            // [debug]:: Name
+            strncpy(NameBuffer, c->window->name, 32);
+            NameBuffer[31]=0;
+            draw_text(c->window,8,8,COLOR_YELLOW,NameBuffer);
+            
+            // Refresh the screen,
+            // Remenber, we also apdated the root window.
+            
+            refresh_screen();
+                
+            // No message.
+            if ( c->window->tid < 0 ){ return -1; }
+            
+            // Send message. (11216)
+            // Envia uma mensagem para a thread pedindo
+            // pra ela atualizar a janela principal.
+
+            kgws_send_to_tid (
+                (int) c->window->tid,           // tid
+                (struct window_d *) c->window,  // NULL
+                (int)               11216,      // Message Code
+                (unsigned long)     0,          // MAGIC signature, ascii code
+                (unsigned long)     0 );        // MAGIC signature, raw byte
+            }
+        }
+    };
+
+// done:
+    debug_print ("powertrio_arrange_and_update: done\n");
+    return 0;    
+}
+
+
+// Select the next client in the list.
+// control + f11
+int powertrio_next(void)
+{
+    if (PowerTrio.initialized != TRUE ){
+        debug_print ("powertrio_next: Power Trio is not initialized\n");
+        return -1;
+    }
+
+    // Circula
+    PowerTrio.selected++;
+    if ( PowerTrio.selected < 0 || PowerTrio.selected >= 3 )
+    {
+        PowerTrio.selected = 0;
+    }
+
+    // Rearrange and update.
+    
+    powertrio_arrange_and_update();
+ 
+    return 0;
+}
+
+// Select a given client.
+// This client will have the active window and the focus.
+int powertrio_select_client(int index)
+{
+    if (PowerTrio.initialized != TRUE ){
+        debug_print ("powertrio_select_client: Power Trio is not initialized\n");
+        return -1;
+    }    
+    
+    PowerTrio.selected = index;
+
+    if ( PowerTrio.selected < 0 || PowerTrio.selected >= 3 )
+    {
+        PowerTrio.selected = 0;
+    }
+
+    powertrio_arrange_and_update();
+    
+    return 0;
+}
+
+
 //
 // End.
 //
+
+
+
+
+
+
+
+
+
+
+
+
+
 

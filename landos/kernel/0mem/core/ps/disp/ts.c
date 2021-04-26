@@ -10,20 +10,18 @@
  *
  * History:
  *     2015 - Created by Fred Nora.
- *     2016 - 2019 Revision.
- *     //...
+ *     2016 - 2021 Revision and small changes.
  */
 
 
 #include <kernel.h>
- 
- 
+
+
 //
 // Variáveis internas.
 //
-  
-int lock_taskswitch;  
 
+int lock_taskswitch;  
 
 
 //
@@ -80,28 +78,24 @@ void taskswitchFlushTLB(){
 
 void psTaskSwitch (void){
 
-	//Limits.
-
-
-    if ( current_thread < 0 || current_thread >= THREAD_COUNT_MAX )
-    {
-        printf ("psTaskSwitch: current_thread %d", current_thread ); 
-        die();
-    }
-
-
+    // Check current process limits.
     if ( current_process < 0 || current_process >= PROCESS_COUNT_MAX )
     {
         printf ("psTaskSwitch: current_thread %d", current_process );
         die();
     }
 
+    // Check current thread limits.
+    if ( current_thread < 0 || current_thread >= THREAD_COUNT_MAX )
+    {
+        printf ("psTaskSwitch: current_thread %d", current_thread ); 
+        die();
+    }
 
 #ifdef SERIAL_DEBUG_VERBOSE
-	debug_print (".");
-	//debug_print ("ts ");
+    debug_print (".");
+    // debug_print ("ts ");
 #endif
-
 
     //
     // real task switch
@@ -121,6 +115,29 @@ void psTaskSwitch (void){
 }
 
 
+// Internal
+// Call extra routines scheduled to this moment.
+// called by task_switch.
+// #importante:
+// Checaremos por atividades extras que foram agendadas pelo 
+// mecanismo de request. Isso depois do contexto ter sido 
+// salvo e antes de selecionarmos a próxima thread.
+
+void tsCallExtraRoutines(void)
+{
+    // Kernel requests.
+    KiRequest();
+
+    // Unix signals.
+    KiSignal();
+
+    // ...
+
+    // #todo: 
+    // Talvez possamos incluir mais atividades extras.
+}
+
+
 /*
  **********************************************************
  * task_switch:
@@ -136,18 +153,23 @@ void task_switch (void){
 
     struct process_d  *P;
     struct thread_d   *Current;
-    int New=0;
-    int Max=0;
+
+    pid_t pid = -1;
 
 
-    Max = PRIORITY_MAX;
+    // Current thread. 
 
-	// Current thread. 
+
+    // Check current thread limits.
+    if ( current_thread < 0 || current_thread >= THREAD_COUNT_MAX )
+    {
+        panic ("ts-task_switch: current_thread\n");
+    }
 
     Current = (void *) threadList[current_thread]; 
 
     if ( (void *) Current == NULL ){
-        panic ("ts-task_switch: Current");
+        panic ("ts-task_switch: Current\n");
     }
     
     // #todo
@@ -156,33 +178,33 @@ void task_switch (void){
 
 
     // Current process. 
+    
+    pid = (pid_t) Current->ownerPID;
 
-    P = (void *) processList[ Current->ownerPID  ];
+    // #todo: Check overflow too.
+    if (pid<0){
+        panic ("ts-task_switch: pid\n");
+    }
 
+    P = (void *) processList[pid];
 
     if ( (void *) P == NULL ){
-        panic ("ts-task_switch: P");
+        panic ("ts-task_switch: P\n");
     }
 
-
-    if ( (void *) P != NULL )
+    // validation
+    if ( P->used != TRUE && P->magic != 1234 )
     {
-        if ( P->used == 1 && P->magic == 1234 ){
-            current_process = (int) P->pid;
-
-        }else{
-		    //??
-			//? fail ??
-        };
-		//...
+        panic ("ts-task_switch: P validation\n");
     }
 
+   // Update the global variable.
 
-    //...
+   current_process = (int) P->pid;
 
-    //
-    //  ======== ## Conting ## ========
-    //
+//
+//  == Conting =================================
+//
 
     // 1 second = 1000 milliseconds
     // sys_time_hz = 600 ticks per second.
@@ -234,39 +256,39 @@ The remainder ??
 
 
 
-	//
-	// == locked ===============================
-	//
+//
+// == Locked ? ===============================
+//
 
-    // Taskswitch locked ?, Return without saving.
+    // Taskswitch locked? 
+    // Return without saving.
+
     if ( task_switch_status == LOCKED ){
         IncrementDispatcherCount (SELECT_CURRENT_COUNT);
         return; 
-    }  //FI LOCKED
+    }
 
 
-
-	//
-	// == unlocked ==============================
-	//
+//
+// == Unlocked ? ==============================
+//
 
     // Nesse momento a thread atual sofre preempção por tempo
     // Em seguida tentamos selecionar outra thread.
 
     if ( task_switch_status == UNLOCKED )
     {
-		//
-		// ## SAVE CONTEXT ##
-		//
+        //
+        // ## SAVE CONTEXT ##
+        //
 
         save_current_context();
-        Current->saved = 1;
+        Current->saved = TRUE;
 
 		// #obs:
 		// A preempção acontecerá por dois possíveis motivos.
 		// + Se o timeslice acabar.
 		// + Se a flag de yield foi acionada.
-
 
 		// #importante:
 		// Se a thread ainda não esgotou seu quantum, 
@@ -278,7 +300,7 @@ The remainder ??
             // Coloca no estado de pronto e limpa a flag.
             if ( Current->state == RUNNING && Current->_yield == 1 )
             {
-                Current->state = READY;
+                Current->state  = READY;
                 Current->_yield = 0;
                 goto try_next;
             }
@@ -294,11 +316,11 @@ The remainder ??
 
         }else{
 
-			//
-			// ======== ## PREEMPT ## ========
-			//
+            //
+            // ==== ## PREEMPT ## ====
+            //
 
-			// * MOVEMENT 3 (Running --> Ready).
+            // >> MOVEMENT 3 (Running --> Ready).
 
             if ( Current->state == RUNNING )
             {
@@ -316,68 +338,58 @@ The remainder ??
                 if ( Current->preempted == PREEMPTABLE )
                 {
                     //debug_print (" preempt_q1 ");
-                    queue_insert_head ( queue, (unsigned long) Current, 
-                        QUEUE_READY );
+                    queue_insert_head ( 
+                        queue, (unsigned long) Current, QUEUE_READY );
                 }
 
                 if ( Current->preempted == UNPREEMPTABLE )
                 {
                     //debug_print (" preempt_q2 ");
-                    queue_insert_data ( queue, (unsigned long) Current, 
-                        QUEUE_READY );
+                    queue_insert_data ( 
+                        queue, (unsigned long) Current, QUEUE_READY );
                 }
             }
 
             //debug_print (" ok ");
 
 
-			//
-			// ======== ## EXTRA ## ========
-			//
+            //
+            // == EXTRA ===============================================
+            //
 
+            // Call extra routines scheduled to this moment.
 
-            // #importante:
-            // Checaremos por atividades extras que foram agendadas pelo 
-            // mecanismo de request. Isso depois do contexto ter sido 
-            // salvo e antes de selecionarmos a próxima thread.
-
-            if (extra == 1)
-            {
-                // Kernel requests.
-                KiRequest();
-                
-                // Unix signals.
-                KiSignal();
-                
-                // ...
-
-                // #todo: 
-                // Talvez possamos incluir mais atividades extras.
-                // Continua ...
-
-                extra = 0;
+            if (extra == TRUE){
+                tsCallExtraRoutines();
+                extra = FALSE;
             }
-
 
 			// Dead thread collector
 			// Avalia se é necessário acordar a thread do dead thread collector.
 			// É uma thread em ring 0.
 			// Só chamamos se ele ja estiver inicializado e rodando.
-            
-            if (dead_thread_collector_status == 1){
+			
+			// #bugbug
+			// precismos rever essa questão pois isso pode estar
+			// fazendo a idle thread dormir. Isso pode prejudicar
+			// a contagem.
+
+			// See: core/ps/threadi.c
+
+            if (dead_thread_collector_status == TRUE)
+            {
+                // #bugbug
+                // #todo: This is a work in progress!
                 check_for_dead_thread_collector();
             }
 
+            //
+            // === Spawn nre thread ==================================
+            //
 
-			//
-			// === Spawn ? =======================================
-			//
-
-			// #importante:
-			// Checar se uma thread está em standby, esperando pra 
-			// rodar pela primeira vez. Nesse caso essa 
-			// função não retornará.
-            // ts/sched/schedi.c
+            // Check for a thread in standby.
+            // In this case, this routine will not return.
+            // See: ts/sched/schedi.c
 
             check_for_standby(); 
             goto try_next;
@@ -398,17 +410,15 @@ The remainder ??
     goto dispatch_current; 
 
 
-	//
-	// == NEXT ================================================
-	//
+//
+// == TRY NEXT THREAD ========================================
+//
 
 try_next: 
 
-
 #ifdef SERIAL_DEBUG_VERBOSE
-	debug_print(" N ");
+    debug_print(" N ");
 #endif
-
 
     // We have only ONE thread.
     // Is that thread the idle thread?
@@ -491,11 +501,13 @@ try_next:
 
 go_ahead:
 
-	//###########################################//
-	//                                           //
-	//    #### We have a thread now ####         //
-	//                                           //
-	//###########################################//
+
+//################################//
+//                                //
+//    # We have a thread now #    //
+//                                //
+//################################//
+
 
     Current = (void *) Conductor;
 
@@ -507,7 +519,7 @@ go_ahead:
 
     }else{
 
-        if ( Current->used != 1 || Current->magic != 1234 )
+        if ( Current->used != TRUE || Current->magic != 1234 )
         {
             debug_print ("task_switch: val \n");
             KiScheduler ();
@@ -540,35 +552,39 @@ go_ahead:
 
 
 
-	// ======================================
-	//    ####  Dispatch current ####
-	// ======================================
+// ===========================
+//    # Dispatch current #
+// ============================
 
 dispatch_current:
-
 
 #ifdef SERIAL_DEBUG_VERBOSE	
     debug_print (" DISPATCH_CURRENT \n");
 #endif
 
+    // Validation
 
-    // Validation.
+    // Check current thread limits.
+    if ( current_thread < 0 || current_thread >= THREAD_COUNT_MAX )
+    {
+        panic ("ts-task_switch: [Dispatch current] current_thread\n");
+    }
 
     Current = (void *) threadList[current_thread];
 
     if ( (void *) Current == NULL ){
         panic ("ts-task_switch.dispatch_current: Struct\n");
-    }else{
+    }
 
-        if ( Current->used != 1 || 
-             Current->magic != 1234 || 
-             Current->state != READY )
-        {
-            panic ("task_switch.dispatch_current: validation\n");
-        }
+    // Validation
+    if ( Current->used  != TRUE || 
+         Current->magic != 1234 || 
+         Current->state != READY )
+    {
+        panic ("task_switch.dispatch_current: validation\n");
+    }
 
-        Current->runningCount = 0;
-    };
+    Current->runningCount = 0;
 
 
 	//
@@ -580,18 +596,21 @@ dispatch_current:
         
     IncrementDispatcherCount (SELECT_DISPATCHER_COUNT);
 
-
-	//
-	// * MOVEMENT 4 (Ready --> Running).
-	//
+    //
+    // MOVEMENT 4 (Ready --> Running).
+    //
 
     dispatcher(DISPATCHER_CURRENT); 
 
-	//
-	//  #### DONE ####
-	//
+//
+// == DONE ======================================================
+//
+
+   // Wi will return in the end of this function
 
 //done:
+
+    // Owner validation.
 
     if ( Current->ownerPID < 0 || 
          Current->ownerPID >= THREAD_COUNT_MAX )
@@ -632,6 +651,10 @@ dispatch_current:
                     P->name );
                 die();
             }
+
+            //
+            // Done
+            //
 
             current_process_pagedirectory_address = (unsigned long) P->DirectoryPA;
             return;

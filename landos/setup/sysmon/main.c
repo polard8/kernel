@@ -353,12 +353,17 @@ sysmonProcedure (
                     break;
 
                 case VK_F4: 
-                    debug_print("sysmon: [F4]\n"); 
+                    //debug_print("sysmon: [F4]\n"); 
                     // switch the foreground thread.
-                    gramado_system_call (301,0,0,0);
+                    //gramado_system_call (301,0,0,0);
+                    gramado_system_call (302,(unsigned long) main_window,0,0);
+                    gramado_system_call (303,0,0,0);
                     return 0;
                     break;
 
+                case VK_F5:
+                    gramado_system_call (304,0,0,0);
+                    break;
             };
             goto done;
             break;
@@ -474,7 +479,7 @@ sysmonProcedure (
         // Enviado pelo kernel quando a thread volta a ter o input.
         case 11216:
             gde_redraw_window (main_window,TRUE);
-            gde_redraw_window (data_window,TRUE);
+            //gde_redraw_window (data_window,TRUE);
             break;
 
         default:

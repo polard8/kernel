@@ -770,33 +770,52 @@ void kill_all_threads (void)
 }
 
 
+
 // se a flag estiver habilitada, então devemos acorar a
 // thread do dead thread collector.
-void check_for_dead_thread_collector (void){
-	
-	// #importante
-	// Essa flag é acionada quando uma thread entra em estado zombie.
-	
-	switch (dead_thread_collector_flag)
-	{
-		// waik up
-		case 1:
-			
-			// Liberamos a thread.
-			// O próprio dead thread collector vai sinalizar que 
-			// quer dormir, dai o case default faz isso.
-			
-            release ( RING0IDLEThread->tid );
+// #bugbug
+// precismos rever essa questão pois isso pode estar
+// fazendo a idle thread dormir. Isso pode prejudicar
+// a contagem.
+// #bugbug
+// Por que estamos atuando sobre a idle thread do processo kernel?
+// Isso está errado, penso o propósito era ter alguma ação sobre
+// alguma thread que entrou no estado zumbi.
+// #action: Estamos suspendendo essa ação sobre a idle thread.
+
+// Called by task_switch().
+
+void check_for_dead_thread_collector (void)
+{
+    // #importante
+    // Essa flag é acionada quando uma thread 
+    // entra em estado zombie.
+
+    switch (dead_thread_collector_flag)
+    {
+        // waik up
+        // Liberamos a thread.
+        // O próprio dead thread collector vai sinalizar que 
+        // quer dormir, dai o case default faz isso.
+
+        case 1:
+            // #suspenso
+            // release ( RING0IDLEThread->tid );
             break;
-			
-		// sleep
-		default:
-			block_for_a_reason ( RING0IDLEThread->tid, 
-			    WAIT_REASON_BLOCKED );
-			dead_thread_collector_flag = 0;
-			break;
-	};
+
+        // sleep
+        default:
+            // #suspenso
+            //block_for_a_reason ( 
+            //    RING0IDLEThread->tid, 
+            //    WAIT_REASON_BLOCKED );
+            
+            dead_thread_collector_flag = FALSE;
+            break;
+    };
 }
+
+
 
 //
 // End.

@@ -314,6 +314,19 @@ void *gde_extra_services (
         return (void*) kgwm_next();
     }
 
+    // Coloca a janela em um dos 3 clientes do Power Trio.
+    if (number == 302){
+        return (void*) powertrio_queue( (struct window_d *) arg2 );
+    }
+
+    // rearrange e atualize o power trio
+    if (number == 303){
+        return (void*) powertrio_arrange_and_update();
+    }
+
+    if (number == 304){
+        return (void*) powertrio_next();
+    }
 
     /*
     // Close a process, given it's pid and the exit code.
@@ -3196,6 +3209,21 @@ void *sci2 (
         yield (current_thread); 
         return NULL; 
     }
+
+    // Coloca a janela em um dos 3 clientes do Power Trio.
+    if (number == 302){
+        return (void*) powertrio_queue( (struct window_d *) arg2 );
+    }
+
+    // rearrange e atualize o power trio
+    if (number == 303){
+        return (void*) powertrio_arrange_and_update();
+    }
+
+    if (number == 304){
+        return (void*) powertrio_next();
+    }
+
 
 	// 900
 	// Clona e executa o filho dado o nome do filho.

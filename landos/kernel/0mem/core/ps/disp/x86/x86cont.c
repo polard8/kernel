@@ -17,9 +17,9 @@
 extern void set_page_dir (void);
 
 
-static inline void ckSetCr3 ( unsigned long value )
+static inline void ckSetCr3 ( unsigned long physical_address )
 {
-    asm ( "mov %0, %%cr3" : : "r" (value) );
+    asm ( "mov %0, %%cr3" : : "r" (physical_address) );
 }
 
 
@@ -31,16 +31,6 @@ static inline uint32_t ckGetCr3()
     return ret;
 }
 */
-
-
-//
-// Vari�veis internas. 
-//
-
-//int contextStatus;
-//int contextError;
-//int contextCpuType;
-//...
 
 
 // Context:
@@ -124,54 +114,56 @@ void save_current_context (void){
 	// Continua...
 
 
-    // Structure ~ Colocando o contexto na estrutura.	
+    // Structure ~ Colocando o contexto na estrutura.
+
+    if ( current_thread < 0 || current_thread >= THREAD_COUNT_MAX )
+    {
+        printk ("save_current_context: TID=%d\n", current_thread );
+        die ();
+    }
 
     t = (void *) threadList[current_thread];
 
-    if ( (void *) t == NULL ){
-        printf ("save_current_context error: Struct Thread={%d}\n",
+    if ( (void *) t == NULL )
+    {
+        printf ("save_current_context: [ERROR] Struct Thread={%d}\n",
             current_thread );
         show_process_information ();    
         die ();
+    }
 
-    }else{
+    if ( t->used != TRUE || t->magic != 1234 )
+    {
+        printf ("save_current_context: [ERROR] Validation Thread={%d}\n",
+            current_thread );
+        show_process_information ();    
+        die();
+    }
 
-        if ( t->used != 1 || t->magic != 1234 ){
-	        printf ("save_current_context error: Validation Thread={%d}\n",
-		        current_thread );
-		    show_process_information ();    
-            die();
-        }
+    // Fill the structure.
 
-	    // 
-	    // @todo: Checar. 
-	    //
+    // Stack frame
+    t->ss     = (unsigned long) contextss[0];      // usermode
+    t->esp    = (unsigned long) contextesp[0];     // usermode
+    t->eflags = (unsigned long) contexteflags[0];
+    t->cs     = (unsigned long) contextcs[0];
+    t->eip    = (unsigned long) contexteip[0];
 
+    // Segments
+    t->ds = (unsigned long) contextds[0];
+    t->es = (unsigned long) contextes[0];
+    t->fs = (unsigned long) contextfs[0];
+    t->gs = (unsigned long) contextgs[0];
 
-        t->ss     = (unsigned long) contextss[0];      //usermode.
-        t->esp    = (unsigned long) contextesp[0];     //usermode.
-        t->eflags = (unsigned long) contexteflags[0];
-        t->cs     = (unsigned long) contextcs[0];
-        t->eip    = (unsigned long) contexteip[0];
+    t->eax = (unsigned long) contexteax[0];
+    t->ebx = (unsigned long) contextebx[0];
+    t->ecx = (unsigned long) contextecx[0];
+    t->edx = (unsigned long) contextedx[0];
+    t->esi = (unsigned long) contextesi[0];
+    t->edi = (unsigned long) contextedi[0];
+    t->ebp = (unsigned long) contextebp[0];
 
-        t->ds = (unsigned long) contextds[0];
-        t->es = (unsigned long) contextes[0];
-        t->fs = (unsigned long) contextfs[0];
-        t->gs = (unsigned long) contextgs[0];
-
-        t->eax = (unsigned long) contexteax[0];
-        t->ebx = (unsigned long) contextebx[0];
-        t->ecx = (unsigned long) contextecx[0];
-        t->edx = (unsigned long) contextedx[0];
-        t->esi = (unsigned long) contextesi[0];
-        t->edi = (unsigned long) contextedi[0];
-        t->ebp = (unsigned long) contextebp[0];
-        //Continua...
-    };
-
-	//
-	// Flag. ??? Saved.
-	//
+    // ...
 }
 
 
@@ -190,7 +182,7 @@ void save_current_context (void){
 
 void restore_current_context (void){
 
-    struct thread_d *t;
+    struct thread_d  *t;
 
     // Context.
     unsigned long *contextss  = (unsigned long *) &contextSS;
@@ -212,69 +204,67 @@ void restore_current_context (void){
     // Continua ...
 
 
-    // Structure.
+    if ( current_thread < 0 || current_thread >= THREAD_COUNT_MAX )
+    {
+        printk ("restore_current_context: TID=%d\n", current_thread );
+        die ();
+    }
+
     t = (void *) threadList[current_thread]; 
 
-    if ( (void *) t == NULL ){
+    if ( (void *) t == NULL )
+    {
         printf("restore_current_context error: t\n");
         show_process_information ();    
-        die ();
+        die();
+    }
 
-    } else {
+    // Validation
+    if ( t->used != TRUE || t->magic != 1234 )
+    {
+        printf("restore_current_context error: t validation\n");
+        show_process_information ();    
+        die();
+    }
 
-        //
-        // Restore.
-        //
+    //
+    // Restore
+    //
 
-        contextss[0]     = (unsigned long) t->ss & 0xffff;  // usermode.
-        contextesp[0]    = (unsigned long) t->esp;          // usermode. 
-        contexteflags[0] = (unsigned long) t->eflags;
-        contextcs[0]     = (unsigned long) t->cs & 0xffff;  
-        contexteip[0]    = (unsigned long) t->eip;
+    // Stack frame
+    contextss[0]     = (unsigned long) t->ss & 0xffff;  // usermode
+    contextesp[0]    = (unsigned long) t->esp;          // usermode 
+    contexteflags[0] = (unsigned long) t->eflags;
+    contextcs[0]     = (unsigned long) t->cs & 0xffff;  
+    contexteip[0]    = (unsigned long) t->eip;
 
-        contextds[0] = (unsigned long) t->ds & 0xffff;
-        contextes[0] = (unsigned long) t->es & 0xffff; 
-        contextfs[0] = (unsigned long) t->fs & 0xffff; 
-        contextgs[0] = (unsigned long) t->gs & 0xffff; 
- 
-        contexteax[0] = (unsigned long) t->eax;  
-        contextebx[0] = (unsigned long) t->ebx; 
-        contextecx[0] = (unsigned long) t->ecx;  
-        contextedx[0] = (unsigned long) t->edx; 
-        contextesi[0] = (unsigned long) t->esi;  
-        contextedi[0] = (unsigned long) t->edi; 
-        contextebp[0] = (unsigned long) t->ebp;  
-        // Continua...
-		
-		
-		//
-		//  ## CR3 ##
-		//
-		
-		// #importante
-		// Esse � o grande momento.
-		// � nessa hora em que colocamos o endere�o F�SICO do 
-		// diret�rio de p�ginas usado pela thread no registrador CR3.
-		
-		ckSetCr3 ( (unsigned long) t->DirectoryPA );
+    // Segments
+    contextds[0] = (unsigned long) t->ds & 0xffff;
+    contextes[0] = (unsigned long) t->es & 0xffff; 
+    contextfs[0] = (unsigned long) t->fs & 0xffff; 
+    contextgs[0] = (unsigned long) t->gs & 0xffff; 
 
-		
-		//
-		//  ## flush TLB ##
-		//
-	    
-		// #bugbug
-		// Esse flush � desnecess�rio, pois o assembly faz isso 
-		// pouco antes do iretd.
+    contexteax[0] = (unsigned long) t->eax;  
+    contextebx[0] = (unsigned long) t->ebx; 
+    contextecx[0] = (unsigned long) t->ecx;  
+    contextedx[0] = (unsigned long) t->edx; 
+    contextesi[0] = (unsigned long) t->esi;  
+    contextedi[0] = (unsigned long) t->edi; 
+    contextebp[0] = (unsigned long) t->ebp;  
+    // Continua...
 
-        asm ("movl %cr3, %eax");
-        // asm ("nop");
-        asm ("movl %eax, %cr3");
-    };
 
-	//
-	//flag ??...
-	//
+    // Restore CR3
+
+    ckSetCr3 ( (unsigned long) t->DirectoryPA );
+
+    // Flush TLB
+
+    asm ("movl %cr3, %eax");
+    // asm ("nop");
+    // asm ("nop");
+    // asm ("nop");
+    asm ("movl %eax, %cr3");
 }
 
 

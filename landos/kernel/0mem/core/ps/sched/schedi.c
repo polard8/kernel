@@ -9,9 +9,6 @@
  *
  * History:
  *     2015 - Created by Fred Nora.
- *     2016 - More basic functions.
- *     2018 - More basic functions.
- *     //...
  */
 
 
@@ -21,7 +18,7 @@
 
 /*
  *****************************
- * do_wait:
+ * do_waitpid:
  *     espera por qualquer um do processo filho.
  */
 
@@ -931,18 +928,23 @@ int SelectNextThread (int current)
 /*
  *****************************************
  * check_for_standby:
+ *
+ * Check for a thread in standby.
+ * In this case, this routine will not return.
  * 
- *     Procura na lista de threads no estado StandyBy.
+ * Procura na lista de threads no estado StandyBy.
  * Se tiver uma thread nessa lista, ela se torna 
  * a current. Para rodar pela primeira vez, atravéz de Spawn.
  * Não retorna se encontrar uma threa na lista.
  */
- 
+
+// Called by task_switch().
+
 void check_for_standby (void){
 
     // loop
     register int i = 0;
-    register int Max = 32;
+    register int Max = 32;  // max what?
 
     int newId=0;
 
@@ -961,7 +963,7 @@ void check_for_standby (void){
 
         if ( (void *) New != NULL )
         {
-            if ( New->used == 1 && 
+            if ( New->used  == TRUE && 
                  New->magic == 1234 && 
                  New->state == STANDBY ) 
             {
@@ -986,24 +988,20 @@ void check_for_standby (void){
 
     return;
 
-
-	//
-	//  ======== ## SPAWN ## ========
-	//
-
+//
+//  == SPAWN ===============
+//
 
     // spawn.c
 
 do_spawn:
 
-
 #ifdef SERIAL_DEBUG_VERBOSE
     debug_print(" SPAWN \n");
 #endif 
 
-
-   // action/spawn.c
-   KiSpawnTask ( current_thread );
+   // See: spawn.c
+   KiSpawnThread ( current_thread );
 
     // Not reached.
     panic ("schedi-check_for_standby: ERROR");

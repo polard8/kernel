@@ -19,8 +19,6 @@
  *
  * History:
  *     2015 - Created by Fred Nora.
- *     2018 - Revision.
- *     //...
  */
 
 
@@ -853,20 +851,17 @@ void dispatch_thread (struct thread_d *thread){
  
     switch (thread->state)
     {
-	    //Se vai rodar pela primeira vez
-		case INITIALIZED:
-		    thread->saved = 0;
-			KiSpawnTask(current_thread);
-			//spawn_task(current_thread);
-	        break;
-		//Continua ?? ...	
-		
-        //Nothing for now.
-		default:
-            printf("dispatch_thread fail: State!\n");
-		    break;
-    };
+        // Se vai rodar pela primeira vez
+        case INITIALIZED:
+            thread->saved = 0;
+            KiSpawnThread(current_thread);
+            break;
+        // ...
 
+        default:
+            printf("dispatch_thread fail: State!\n");
+            break;
+    };
 
 fail:
     panic ("dispatch-dispatch_thread: fail");

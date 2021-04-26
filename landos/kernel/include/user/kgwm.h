@@ -5,13 +5,39 @@
 #define __KGWM_H    1
 
 
-#define KGWM_SINGLE    1000
-#define KGWM_DOUBLE    2000
-#define KGWM_TRIPLE    3000 
-#define KGWM_QUAD      4000
+struct powertrio_client_d
+{
+    int used;
+    int magic;
+    
+    // Position in the list.
+    // Maximum 3 clients.
+    int index;
 
-int kgwm_mode;
+    struct window_d *window;
 
+    struct powertrio_client_d *next;
+};
+
+struct powertrio_wm_d
+{
+    int initialized;
+    
+    int selected;
+    int head;
+    int tail;
+};
+struct powertrio_wm_d  PowerTrio;
+
+
+unsigned long powertrioList[3];
+
+int powertrio_initialize(void);
+int powertrio_set_window ( int index, struct window_d *window );
+int powertrio_queue( struct window_d *window );
+int powertrio_arrange_and_update(void);
+int powertrio_next(void);
+int powertrio_select_client(int index);
 
 //
 // == prototypes ===============================
