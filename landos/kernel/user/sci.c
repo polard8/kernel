@@ -319,11 +319,12 @@ void *gde_extra_services (
         return (void*) powertrio_queue( (struct window_d *) arg2 );
     }
 
-    // rearrange e atualize o power trio
+    // Rearrange e atualize o power trio.
     if (number == 303){
         return (void*) powertrio_arrange_and_update();
     }
 
+    // Change the active window.
     if (number == 304){
         return (void*) powertrio_next();
     }

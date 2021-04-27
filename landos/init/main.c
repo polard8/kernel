@@ -299,13 +299,14 @@ int initDialog (int message)
 
     switch (message)
     {
-        // redpill application
+
+        // reboot
         case 9216:
-            debug_print ("init.bin: [9216] Launching redpill application\n");
-            printf      ("init.bin: [9216] Launching redpill application\n");
-            ExecRedPillApplication();
+            debug_print ("init.bin: [9216] Launching reboot\n");
+            printf      ("init.bin: [9216] Launching reboot\n");
+            rtl_clone_and_execute("reboot.bin");
             break;
-     
+
         // gdeshell
         case 9217:
             debug_print ("init.bin: [9217] Launching the command interpreter\n");
@@ -313,19 +314,20 @@ int initDialog (int message)
             ExecCommandInterpreter();
             break;
 
-        // sysmon
+        // redpill application
         case 9218:
-            debug_print ("init.bin: [9218] Launching sysmon\n");
-            printf      ("init.bin: [9218] Launching sysmon\n");
+            debug_print ("init.bin: [9218] Launching redpill application\n");
+            printf      ("init.bin: [9218] Launching redpill application\n");
+            ExecRedPillApplication();
+            break;
+     
+        // sysmon
+        case 9219:
+            debug_print ("init.bin: [9219] Launching sysmon\n");
+            printf      ("init.bin: [9219] Launching sysmon\n");
             rtl_clone_and_execute("sysmon.bin");
             break;
 
-        // reboot
-        case 9219:
-            debug_print ("init.bin: [9219] Launching reboot\n");
-            printf      ("init.bin: [9219] Launching reboot\n");
-            rtl_clone_and_execute("reboot.bin");
-            break;
 
         // servers ...
         

@@ -316,7 +316,7 @@ kgws_event_dialog (
     // Mas precisa da tid também.
     
     switch (Event_Message){
-       
+
         // Para os dois casos.
         // quando o control ou a tecla de funçao forem pressionadas ou liberadas.
         case MSG_SYSKEYDOWN: 
@@ -345,7 +345,7 @@ kgws_event_dialog (
                         return 0;
                         }
                         // caso nenhuma tecla de controle esteja pressionada,
-                        //enviaremos a tecla de funçao para a alicaçao.
+                        // enviaremos a tecla de funçao para a alicaçao.
                         if (current_input_mode == INPUT_MODE_SETUP)
                         {
                             //if ( EnableKGWS == FALSE ){ return 0; }
@@ -377,20 +377,11 @@ kgws_event_dialog (
                     // Only for the setup input mode.
                     if (current_input_mode == INPUT_MODE_SETUP)
                     {
-                        //if ( EnableKGWS == FALSE ){ return 0; }
-                        //kgws_send_to_controlthread_of_currentwindow ( 
-                        //                    Event_Window,
-                        //    (int)           Event_Message, 
-                        //    (unsigned long) Event_LongASCIICode, 
-                        //    (unsigned long) Event_LongRawByte );
-
                         kgws_send_to_tid (  tid,
                                             Event_Window,
                             (int)           Event_Message, 
                             (unsigned long) Event_LongASCIICode, 
                             (unsigned long) Event_LongRawByte );
-
-                            
                         debug_print ("kgws_event_dialog: >>>> [MSG_SYSKEYUP.function] to wwf\n");        
                     }
                     

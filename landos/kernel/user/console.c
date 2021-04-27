@@ -469,10 +469,10 @@ void _console_outbyte (int c, int console_number)
     int cWidth  = get_char_width();
     int cHeight = get_char_height();
 
-
-    if(console_number<0)
+    // #todo: Check verflow
+    if (console_number < 0){
         return;
-
+    }
 
     if ( cWidth == 0 || cHeight == 0 )
     {
@@ -547,7 +547,6 @@ void _console_outbyte (int c, int console_number)
 
 void console_outbyte (int c, int console_number)
 {
-
     // Copy.
     register int Ch = c;
 
@@ -557,10 +556,12 @@ void console_outbyte (int c, int console_number)
     unsigned long __cHeight = gwsGetCurrentFontCharHeight();
 
 
-    if(console_number<0)
+    // #todo: Check overflow.
+    if (console_number<0){
         return;
+    }
 
-    if ( __cWidth == 0  ||  __cHeight == 0 )
+    if ( __cWidth == 0 || __cHeight == 0 )
     {
         panic ("console_outbyte: [FAIL] char size\n");
     }
@@ -785,16 +786,13 @@ void console_putchar ( int c, int console_number ){
     int cHeight = get_char_height();
 
 
-    //if(console_number<0)
-        //return;
 
     if ( cWidth == 0 || cHeight == 0 )
     {
         panic ("console_putchar: char\n");
     }
 
-
-	// flag on.
+    // flag on.
     stdio_terminalmode_flag = TRUE;
 
     // #todo
@@ -905,6 +903,7 @@ console_read (
 // Tem escape sequence
 // console number, buffer, size.
 
+// IN: 
 ssize_t 
 console_write ( 
     int console_number, 
@@ -913,11 +912,13 @@ console_write (
 {
 
     // loop
-    int i=0;  
+    int i=0;
     
     char ch=0; 
     char *data = (char *) buf;
     size_t StringSize=0;
+
+
 
     //debug_print ("console_write: [test]\n");
 
@@ -988,19 +989,19 @@ console_write (
 
                // ?? \n
                }else if (ch==10 || ch==11 || ch==12){
-                   console_putchar ( ch, console_number );  // \n ???
-               
-               // Enter ?
+                   console_putchar ( ch, console_number );
+
+               // Enter ? cr \n
                }else if (ch==13){ 
-                   console_putchar ( ch, console_number );  //cr \n
-               
-               // backspace
+                   console_putchar ( ch, console_number ); 
+
+               // Backspace
                }else if (ch==8) {
-                   console_putchar ( ch, console_number );  // backspace.
-               
-               // Tab.S
+                   console_putchar ( ch, console_number );
+
+               // Tab.S. horizontal tab
                } else if (ch==9) {
-                   console_putchar ( ch, console_number );  // horizontal tab
+                   console_putchar ( ch, console_number ); 
                };
                break;
             
@@ -1130,57 +1131,84 @@ console_write (
 
                     // mudamos o cursor e saimos da escape sequence
                     case 'G': case '`':
-						if (par[0]) par[0]--;
-						__local_gotoxy (par[0], CONSOLE_TTYS[console_number].cursor_y, console_number);
-						break;
+                        if (par[0]){  par[0]--;  }
+                        __local_gotoxy ( 
+                            par[0], 
+                            CONSOLE_TTYS[console_number].cursor_y, 
+                            console_number );
+                        break;
 
-                    // mudamos o cursor e saimos da escape sequence
+                    // Mudamos o cursor e saimos da escape sequence
                     case 'A':
-						if (!par[0]) par[0]++;
-						__local_gotoxy ( CONSOLE_TTYS[console_number].cursor_x,  CONSOLE_TTYS[console_number].cursor_y - par[0], console_number);
-						break;
+                        if (!par[0]){  par[0]++;  }
+                        __local_gotoxy ( 
+                            CONSOLE_TTYS[console_number].cursor_x,  
+                            CONSOLE_TTYS[console_number].cursor_y - par[0], 
+                            console_number );
+                        break;
 
                     case 'B': case 'e':
-						if (!par[0]) par[0]++;
-						__local_gotoxy ( CONSOLE_TTYS[console_number].cursor_x, CONSOLE_TTYS[console_number].cursor_y + par[0], console_number);
-						break;
+                        if (!par[0]){  par[0]++;  }
+                        __local_gotoxy ( 
+                            CONSOLE_TTYS[console_number].cursor_x, 
+                            CONSOLE_TTYS[console_number].cursor_y + par[0], 
+                            console_number );
+                        break;
 
                     // mudamos o cursor e saimos da escape sequence 
                     case 'C': case 'a':
-						if (!par[0]) par[0]++;
-						__local_gotoxy ( CONSOLE_TTYS[console_number].cursor_x + par[0], CONSOLE_TTYS[console_number].cursor_y, console_number);
-						break;
+                        if (!par[0]){  par[0]++;  }
+                        __local_gotoxy ( 
+                            CONSOLE_TTYS[console_number].cursor_x + par[0], 
+                            CONSOLE_TTYS[console_number].cursor_y, 
+                            console_number );
+                        break;
 
                     // mudamos o cursor e saimos da escape sequence
                     case 'D':
-						if (!par[0]) par[0]++;
-						__local_gotoxy ( CONSOLE_TTYS[console_number].cursor_x - par[0], CONSOLE_TTYS[console_number].cursor_y, console_number);
-						break;
+                        if (!par[0]){  par[0]++;  }
+                        __local_gotoxy ( 
+                            CONSOLE_TTYS[console_number].cursor_x - par[0], 
+                            CONSOLE_TTYS[console_number].cursor_y, 
+                            console_number );
+                        break;
 
                     // mudamos o cursor e saimos da escape sequence
-					case 'E':
-						if (!par[0]) par[0]++;
-						__local_gotoxy (0, CONSOLE_TTYS[console_number].cursor_y + par[0], console_number);
-						break;
+                    case 'E':
+                        if (!par[0]){  par[0]++;  }
+                        __local_gotoxy ( 
+                            0, 
+                            CONSOLE_TTYS[console_number].cursor_y + par[0], 
+                            console_number );
+                        break;
 
                     // mudamos o cursor e saimos da escape sequence
-					case 'F':
-						if (!par[0]) par[0]++;
-						__local_gotoxy (0, CONSOLE_TTYS[console_number].cursor_y - par[0], console_number);
-						break;
+                    case 'F':
+                        if (!par[0]){  par[0]++;  }
+                        __local_gotoxy ( 
+                            0, 
+                            CONSOLE_TTYS[console_number].cursor_y - par[0], 
+                            console_number );
+                        break;
 
                     // mudamos o cursor e saimos da escape sequence
-					case 'd':
-						if (par[0]) par[0]--;
-						__local_gotoxy ( CONSOLE_TTYS[console_number].cursor_x, par[0], console_number);
-						break;
+                    case 'd':
+                        if (par[0]){  par[0]--;  }
+                        __local_gotoxy ( 
+                            CONSOLE_TTYS[console_number].cursor_x, 
+                            par[0], 
+                            console_number );
+                        break;
 
                     // mudamos o cursor e saimos da escape sequence
-					case 'H': case 'f':
-						if (par[0]) par[0]--;
-						if (par[1]) par[1]--;
-						__local_gotoxy (par[1],par[0], console_number);
-						break;
+                    case 'H': case 'f':
+                        if (par[0]){  par[0]--;  }
+                        if (par[1]){  par[1]--;  }
+                        __local_gotoxy ( 
+                            par[1],
+                            par[0], 
+                            console_number );
+                        break;
 
                     // Outros tratadores.
                     case 'J': csi_J  (par[0]);                 break;
@@ -1197,32 +1225,33 @@ console_write (
                     // Essa rotina cheaca os parametros e configura o atributo
                     // de acordo com o ultimo parametro.
                     case 'm': 
-                        csi_m (); 
+                        csi_m(); 
                         break;
+
 
                     // ??  #bugbug
                     // 0x1b[r
                     // Isso ajusta o top e o bottom.
                     case 'r':
-						if (par[0])  { par[0]--; }
-						if (!par[1]) { par[1] = CONSOLE_TTYS[console_number].cursor_bottom; }  
-						if (par[0] < par[1] &&
-						    par[1] <= CONSOLE_TTYS[console_number].cursor_bottom ) 
-						{
-                            // ajuste feito por 'r'.
-							CONSOLE_TTYS[console_number].cursor_top    = par[0];
-							CONSOLE_TTYS[console_number].cursor_bottom = par[1];
-						}
+                        if (par[0])  { par[0]--; }
+                        if (!par[1]) { par[1] = CONSOLE_TTYS[console_number].cursor_bottom; }  
+                        if (par[0] < par[1] &&
+                            par[1] <= CONSOLE_TTYS[console_number].cursor_bottom ) 
+                        {
+                            // Ajuste feito por 'r'.
+                            CONSOLE_TTYS[console_number].cursor_top    = par[0];
+                            CONSOLE_TTYS[console_number].cursor_bottom = par[1];
+                        }
                         break;
 
-                    // salva o cursor
+                    // Save cursor
                     case 's': 
-                        __local_save_cur( console_number ); 
+                        __local_save_cur( console_number );
                         break;
 
-                    // restaura o cursor.
+                    // Restore cursor
                     case 'u': 
-                        __local_restore_cur (console_number);
+                        __local_restore_cur(console_number);
                         break;
                 };
                 break;
@@ -1235,12 +1264,8 @@ console_write (
         };
     };  // FOR 
 
-
-   //printf ("console_write: done\n");
-   //refresh_screen();
-
-    return StringSize;
-
+// done:
+    return (ssize_t) StringSize;
 fail:
     refresh_screen();
     return -1;
@@ -1284,15 +1309,13 @@ void console_scroll (int console_number){
     register int i=0;
 
 
-    if ( VideoBlock.useGui != 1 )
+    if ( VideoBlock.useGui != TRUE )
     {
         debug_print ("console_scroll: no GUI\n");
         panic       ("console_scroll: no GUI\n");
     }
 
-    // #bugbug
-    // Max limits ?
- 
+    // #todo: check overflow
     if ( console_number < 0 ){
         panic ("console_scroll: [FAIL] console_number\n");
     }
@@ -1522,11 +1545,10 @@ void console_init_virtual_console (int n)
 {
     int ConsoleIndex = -1;
 
-    ConsoleIndex = n;
-
-
 
     debug_print ("console_init_virtual_console:\n");
+
+    ConsoleIndex = n;
 
     if ( ConsoleIndex < 0 || ConsoleIndex >= CONSOLETTYS_COUNT_MAX  )
     {
@@ -1584,7 +1606,7 @@ void console_init_virtual_console (int n)
     CONSOLE_TTYS[ConsoleIndex].flags = 0;
 
     // not stopped
-    CONSOLE_TTYS[ConsoleIndex].stopped = 0;
+    CONSOLE_TTYS[ConsoleIndex].stopped = FALSE;
 
     // process
     //CONSOLE_TTYS[ConsoleIndex].process = KernelProcess;
@@ -1749,18 +1771,17 @@ console_ioctl (
 {
     debug_print ("console_ioctl: TODO\n");
 
-    
+    // #todo: Check overflow
     if (fd<0){
         debug_print ("console_ioctl: [ERROR] fd\n");
         return -1;
     }
 
+    // #todo: Check overflow
     if (fg_console<0){
         debug_print ("console_ioctl: [ERROR] fg_console\n");
         return -1;
     }
-
-
 
 
     switch (request){
@@ -1869,6 +1890,8 @@ void console_interrupt(int device_type, int data)
     // foreground representa a thred com 'foco de entrada'
     // >> então, se não tivermos uma thread com foco de entrada,
     // podemos mandar a mensagem para outra thread ?
+
+    // #todo: Check overflow
 
     if ( foreground_thread < 0 )
     {

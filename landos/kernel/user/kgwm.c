@@ -1271,18 +1271,30 @@ kgwm_window_control_dialog (
 }
 
 
+// #todo
+// Send a message to the control thread of a given pid.
+/*
+void __kgwm_pidSendMessage ( pid_t pid, int message );
+void __kgwm_pidSendMessage ( pid_t pid, int message )
+{}
+*/
+
+
 // Send a message to the Init process.
 // Only one parameter.
 // Remember, the input process's control thread 
 // has a defined input model.
-void __kgwm_initDialog ( int message )
+
+void __kgwm_SendMessageToInitProcess ( int message )
 {
     struct thread_d  *t;
     int tid = -1;
+
     thread_type_t InputModel;
 
-    if(message < 0){
-        debug_print("__kgwm_initDialog: [FAIL] message\n");
+
+    if (message < 0){
+        debug_print("__kgwm_SendMessageToInitProcess: [FAIL] message\n");
         return;
     }
 
@@ -1291,37 +1303,53 @@ void __kgwm_initDialog ( int message )
 
 
     // process pointer
-    if ( (void*) InitProcess == NULL )
-        panic ("__kgwm_initDialog: InitProcess\n");
+    if ( (void*) InitProcess == NULL ){
+        panic ("__kgwm_SendMessageToInitProcess: InitProcess\n");
+    }
 
+    if ( InitProcess->used != TRUE || InitProcess->magic != 1234 )
+    {
+        panic ("__kgwm_SendMessageToInitProcess: InitProcess validation\n");
+    }
 
     // thread pointer
     t = (struct thread_d  *) InitProcess->control;
 
-    if ( (void*) t == NULL )
-        panic ("__kgwm_initDialog: t\n");
+    if ( (void*) t == NULL ){
+        panic ("__kgwm_SendMessageToInitProcess: t\n");
+    }
 
+    if ( t->used != TRUE || t->magic != 1234 )
+    {
+        panic ("__kgwm_SendMessageToInitProcess: t validation\n");
+    }
 
-    // input model
+    // Get the input model of this thread.
     InputModel = t->input_model;
 
-    // tid
+    // #todo
+    // Check input model.
+
+    // Get tid.
+
     tid = (int) t->tid;
 
+    // #todo: Check overflow
+
     if (tid<0){
-        panic("__kgwm_initDialog: [ERROR] tid\n");
+        panic("__kgwm_SendMessageToInitProcess: [ERROR] tid\n");
     }
 
     // Calling the init process.
     // keyboard events only
-    // IN: tid, window, ascii code, raw byte.
+
+    // IN: tid, window, message code, ascii code, raw byte.
 
     kgws_send_to_tid (
-        (int) tid,                       // tid
-        (struct window_d *) 0,           // NULL
-        (int)               message,     // Message Code
-        (unsigned long)     12,          // MAGIC signature, ascii code
-        (unsigned long)     34 );        // MAGIC signature, raw byte
+        (int) tid,
+        (struct window_d *) 0,
+        (int)               message,
+        (unsigned long) 12, (unsigned long) 34 );
 }
 
 
@@ -1397,14 +1425,19 @@ __kgwm_ps2kbd_procedure (
 
     switch (msg){
 
+
+        case MSG_KEYDOWN:
+            switch (long1){
+            case VK_TAB: printf("TAB\n"); refresh_screen(); break;
+            };
+            break;
+
         // Pressionadas: teclas de funçao
         case MSG_SYSKEYDOWN: 
             switch (long1){
 
                 case VK_F1:
-                    if (ctrl_status == 1){
-                        //printf ("__kgwm_ps2kbd_procedure: control + f1\n");
-                        //refresh_screen();
+                    if (ctrl_status == TRUE){
                         powertrio_select_client(0);
                     }
                     if (alt_status == 1){
@@ -1412,35 +1445,27 @@ __kgwm_ps2kbd_procedure (
                         refresh_screen();
                     }
                     if (shift_status == 1){
-                        printf ("__kgwm_ps2kbd_procedure: shift + f1\n");
-                        jobcontrol_switch_console(1);
-                        refresh_screen();
+                        jobcontrol_switch_console(0);
                     }
                     return 0;
                     break;
 
                 case VK_F2:
-                    if (ctrl_status == 1){
-                        //printf ("__kgwm_ps2kbd_procedure: control + f2\n");
-                        //refresh_screen();
-                        powertrio_select_client(1);                    
+                    if (ctrl_status == TRUE){
+                         powertrio_select_client(1);
                     }
                     if (alt_status == 1){
                         printf ("__kgwm_ps2kbd_procedure: alt + f2\n");
                         refresh_screen();
                     }
                     if (shift_status == 1){
-                        printf ("__kgwm_ps2kbd_procedure: shift + f2\n");
-                        jobcontrol_switch_console(2);
-                        refresh_screen();
+                        jobcontrol_switch_console(1);
                     }
                     return 0;
                     break;
 
                 case VK_F3:
-                    if (ctrl_status == 1){
-                        //printf ("__kgwm_ps2kbd_procedure: control + f3\n");
-                        //refresh_screen();
+                    if (ctrl_status == TRUE){
                         powertrio_select_client(2);
                     }
                     if (alt_status == 1){
@@ -1448,25 +1473,21 @@ __kgwm_ps2kbd_procedure (
                         refresh_screen();
                     }
                     if (shift_status == 1){
-                        printf ("__kgwm_ps2kbd_procedure: shift + f3\n");
-                        jobcontrol_switch_console(3);
-                        refresh_screen();
+                        jobcontrol_switch_console(2);
                     }
                     return 0;
                     break;
 
                 case VK_F4:
-                    if (ctrl_status == 1){
-                        printf ("__kgwm_ps2kbd_procedure: control + f4\n");
-                        refresh_screen();
+                    if (ctrl_status == TRUE){
+                        powertrio_next();
                     }
                     if (alt_status == 1){
                         printf ("__kgwm_ps2kbd_procedure: alt + f4\n");
                         refresh_screen();
                     }
                     if (shift_status == 1){
-                        printf ("__kgwm_ps2kbd_procedure: shift + f4\n");
-                        refresh_screen();
+                        jobcontrol_switch_console(3);
                     }
                     return 0;
                     break;
@@ -1474,18 +1495,16 @@ __kgwm_ps2kbd_procedure (
 
                 // Reboot
                 case VK_F5:
-                    if (ctrl_status == 1){
-                    reboot();
-                    //__load_path_test(); //local ok
-                    //do_clone_execute_process ("init2.bin");
+                    if (ctrl_status == TRUE){
+                        powertrio_select_client(0);
+                        //reboot();
                     }
-                    if (alt_status == 1){
+                    if (alt_status == TRUE){
                         printf ("__kgwm_ps2kbd_procedure: alt + f5\n");
                         refresh_screen();
                     }
-                    if (shift_status == 1){
-                        printf ("__kgwm_ps2kbd_procedure: shift + f5\n");
-                        refresh_screen();
+                    if (shift_status == TRUE){
+                        kgwm_next();
                     }
                     return 0;
                     break;
@@ -1493,115 +1512,112 @@ __kgwm_ps2kbd_procedure (
                 // Send a message to the Init process.
                 // 9216 - Launch the redpill application
                 case VK_F6:
-                    if (ctrl_status == 1){
-                        __kgwm_initDialog(9216); 
+                    if (ctrl_status == TRUE){
+                        powertrio_select_client(1);
+                        // #todo: 
+                        // shutdown. Only the ring3 applications
+                        // can shutdown via qemu for now. 
+                        //__kgwm_SendMessageToInitProcess(9216); 
                         return 0; 
                     }
-                    if (alt_status == 1){
+                    if (alt_status == TRUE){
                         printf ("__kgwm_ps2kbd_procedure: alt + f6\n");
                         refresh_screen();
                     }
-                    if (shift_status == 1){
-                        printf ("__kgwm_ps2kbd_procedure: shift + f6\n");
-                        refresh_screen();
+                    if (shift_status == TRUE){
+                        kgwm_next();
                     }
                     return 0;
                     break;
 
                 // Test 1.
                 case VK_F7:
-                    if (ctrl_status == 1){
-                        __kgwm_initDialog(9217);  // launch gdeshell
+                    if (ctrl_status == TRUE){
+                        powertrio_select_client(2);
+                       // Send message to init process to launch gdeshell.
+                        //__kgwm_SendMessageToInitProcess(9217);
                     }
-                    if (alt_status == 1){
+                    if (alt_status == TRUE){
                         printf ("__kgwm_ps2kbd_procedure: alt + f7\n");
                         refresh_screen();
                     }
-                    if (shift_status == 1){
-                        printf ("__kgwm_ps2kbd_procedure: shift + f7\n");
-                        refresh_screen();
+                    if (shift_status == TRUE){
+                        kgwm_next();
                     }
                     return 0;
                     break;
 
                 // Test 2.
                 case VK_F8:
-                    if (ctrl_status == 1){
-                        __kgwm_initDialog(9218);  // launch sysmon
+                    if (ctrl_status == TRUE){
+                        powertrio_next();
+                        // Send message to init process to launch the launcher.
+                        //__kgwm_SendMessageToInitProcess(9216); 
+                        //__kgwm_SendMessageToInitProcess(9218);  // launch sysmon
                     }
-                    if (alt_status == 1){
+                    if (alt_status == TRUE){
                         printf ("__kgwm_ps2kbd_procedure: alt + f8\n");
                         refresh_screen();
                     }
-                    if (shift_status == 1){
-                        printf ("__kgwm_ps2kbd_procedure: shift + f8\n");
-                        refresh_screen();
+                    if (shift_status == TRUE){
+                        kgwm_next();
                     }
                     return 0;
                     break;
 
                 case VK_F9:
-                    if (ctrl_status == 1){
-                        __kgwm_initDialog(9219);  // launch reboot application
+                    if (ctrl_status == TRUE){
+                        powertrio_select_client(0);
                     }
-                    if (alt_status == 1){
+                    if (alt_status == TRUE){
                         printf ("__kgwm_ps2kbd_procedure: alt + f9\n");
                         refresh_screen();
                     }
-                    if (shift_status == 1){
-                        //kgwm_mode = KGWM_SINGLE;
-                        printf ("__kgwm_ps2kbd_procedure: shift + f9\n");
-                        refresh_screen();
+                    if (shift_status == TRUE){
+                        __kgwm_SendMessageToInitProcess(9216);  //reboot
+                        //reboot();
                     }
                     return 0;
                     break;
 
                 case VK_F10:
-                    if (ctrl_status == 1){
-                        __kgwm_initDialog(9220); // launch gwssrv
+                    if (ctrl_status == TRUE){
+                        powertrio_select_client(1);
                     }
-                    if (alt_status == 1){
+                    if (alt_status == TRUE){
                         printf ("__kgwm_ps2kbd_procedure: alt + f10\n");
                         refresh_screen();
                     }
-                    if (shift_status == 1){
-                        //kgwm_mode = KGWM_DOUBLE;
-                        printf ("__kgwm_ps2kbd_procedure: shift + f10\n");
-                        refresh_screen();
+                    if (shift_status == TRUE){
+                        __kgwm_SendMessageToInitProcess(9217);  //gdeshell
                     }
                     return 0;
                     break;
 
                 case VK_F11:
-                    if (ctrl_status == 1){
-                        //__kgwm_initDialog(9221); // launch gnssrv
-                        powertrio_next();
+                    if (ctrl_status == TRUE){
+                        powertrio_select_client(2);
                     }
-                    if (alt_status == 1){
+                    if (alt_status == TRUE){
                         printf ("__kgwm_ps2kbd_procedure: alt + f11\n");
                         refresh_screen();
                     }
-                    if (shift_status == 1){
-                        //kgwm_mode = KGWM_TRIPLE;
-                        printf ("__kgwm_ps2kbd_procedure: shift + f11\n");
-                        refresh_screen();
+                    if (shift_status == TRUE){
+                        __kgwm_SendMessageToInitProcess(9218);  // redpill application
                     }
                     return 0;
                     break;
 
                 case VK_F12:
-                    if (ctrl_status == 1){
-                        //printf ("__kgwm_ps2kbd_procedure: control + f12\n");
-                        //refresh_screen();
-                        kgwm_next();   //#test: change input thread.
+                    if (ctrl_status == TRUE){
+                        powertrio_next();
                     }
-                    if (alt_status == 1){
+                    if (alt_status == TRUE){
                         printf ("__kgwm_ps2kbd_procedure: alt + f12\n");
                         refresh_screen();
                     }
-                    if (shift_status == 1){
-                        printf ("__kgwm_ps2kbd_procedure: shift + f12\n");
-                        refresh_screen();
+                    if (shift_status == TRUE){
+                        __kgwm_SendMessageToInitProcess(9219);  // sysmon
                     }
                     return 0;
                     break;

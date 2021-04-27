@@ -98,7 +98,7 @@ ifeq ($(ARCH),x86)
 	pci.o pciinfo.o pciscan.o \
 	console.o tty.o tty_io.o pty.o vt.o\
 	usb.o \
-	video.o vsync.o screen.o r_render.o xproc.o \
+	video.o vsync.o screen.o r_render.o dialog.o \
 	i8042.o keyboard.o mouse.o ps2kbd.o ps2mouse.o \
 	apic.o pic.o rtc.o serial.o pit.o  
 
@@ -259,11 +259,6 @@ all-c:
 	$(CC) -c 0mem/rtl/unistd.c  $(KINCLUDE) $(CFLAGS) -o unistd.o
 
 
-	# == SCI - System Call Interface ==============================
-	$(CC) -c 0mem/sci/sci.c $(KINCLUDE) $(CFLAGS) -o sci.o
-	
-
-
 	# fs
 	$(CC) -c 0mem/sci/fs/cf.c      $(KINCLUDE) $(CFLAGS) -o cf.o
 	$(CC) -c 0mem/sci/fs/format.c  $(KINCLUDE) $(CFLAGS) -o format.o
@@ -365,9 +360,10 @@ all-c:
 	# user
 
 	$(CC) -c user/console.c   $(KINCLUDE) $(CFLAGS) -o console.o
+	$(CC) -c user/sci.c       $(KINCLUDE) $(CFLAGS) -o sci.o
 	$(CC) -c user/terminal.c  $(KINCLUDE) $(CFLAGS) -o terminal.o
 	$(CC) -c user/vt.c        $(KINCLUDE) $(CFLAGS) -o vt.o
-
+	$(CC) -c user/dialog.c    $(KINCLUDE) $(CFLAGS) -o dialog.o
 
     # Draw - kgws
     # Window Manager.
@@ -396,7 +392,6 @@ all-c:
 	$(CC) -c user/view/rect.c     $(KINCLUDE) $(CFLAGS) -o rect.o
 	$(CC) -c user/view/sbar.c     $(KINCLUDE) $(CFLAGS) -o sbar.o
 	$(CC) -c user/view/tbar.c     $(KINCLUDE) $(CFLAGS) -o tbar.o
-	$(CC) -c user/view/xproc.c    $(KINCLUDE) $(CFLAGS) -o xproc.o
 	$(CC) -c user/view/input.c    $(KINCLUDE) $(CFLAGS) -o input.o
 	$(CC) -c user/view/output.c   $(KINCLUDE) $(CFLAGS) -o output.o
 

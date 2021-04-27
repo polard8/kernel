@@ -4075,6 +4075,9 @@ scroll_client_window (struct window_d *window)
     return 0;
 }
 
+//
+// == Power Trio =====================================
+//
 
 // Initialize the structures used by the Power Trio window manager.
 // Called by init_window_manager()
@@ -4156,7 +4159,10 @@ int powertrio_set_window ( int index, struct window_d *window )
     return 0;
 }
 
+
+// Service 302:
 // Add a window in the next slot of a circular queue.
+// Coloca a janela em um dos 3 clientes do Power Trio.
 int powertrio_queue( struct window_d *window )
 {
 
@@ -4200,8 +4206,10 @@ int powertrio_queue( struct window_d *window )
 }
 
 
+// Service 303:
 // Rearrange the windows in the screen
 // and refresh the screen.
+// Rearrange e atualize o power trio.
 int powertrio_arrange_and_update(void)
 {
     int i=0;
@@ -4374,8 +4382,11 @@ int powertrio_arrange_and_update(void)
 }
 
 
+// Service 304:
+// Change the active window.
 // Select the next client in the list.
-// control + f11
+// control + f4  
+// control + f11 por enquanto.
 int powertrio_next(void)
 {
     if (PowerTrio.initialized != TRUE ){

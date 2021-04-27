@@ -44,7 +44,7 @@ int powertrio_select_client(int index);
 //
 
 
-void __kgwm_initDialog ( int message );
+void __kgwm_SendMessageToInitProcess ( int message );
 
 unsigned long 
 __kgwm_ps2kbd_procedure ( 
