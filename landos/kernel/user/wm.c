@@ -4367,13 +4367,13 @@ int powertrio_arrange_and_update(void)
             // pra ela atualizar a janela principal.
 
             kgws_send_to_tid (
-                (int) c->window->tid,           // tid
-                (struct window_d *) c->window,  // NULL
+                (int)               c->window->tid,  // tid
+                (struct window_d *) c->window,       // NULL
                 (int)               11216,      // Message Code
-                (unsigned long)     0,          // MAGIC signature, ascii code
-                (unsigned long)     0 );        // MAGIC signature, raw byte
-            }
+                (unsigned long)     0,          //0 
+                (unsigned long)     0 );        //0 
         }
+    }
     };
 
 // done:

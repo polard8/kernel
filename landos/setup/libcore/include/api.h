@@ -3204,12 +3204,12 @@ void *gde_get_client_area_rect (void);
 void gde_set_client_area_rect (struct rect_d *r);
 
 
-//resize
+// resize
 void 
 gde_resize_window ( 
     struct window_d *window, 
-    unsigned long x, 
-    unsigned long y );
+    unsigned long width, 
+    unsigned long height );
 
 
 //redraw

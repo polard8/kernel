@@ -59,17 +59,14 @@ gws_send_event (
     unsigned long long2=0;
 
 
-    if ( (void*) event == NULL )
-    {
+    if ( (void*) event == NULL ){
         gws_debug_print ("gws_send_event: fail\n");
         return; 
-        
     }else{
-
-        wid = (int)              event->wid;
-        msg    = (int)           event->msg; 
-        long1  = (unsigned long) event->long1;
-        long2  = (unsigned long) event->long2;
+        wid   = (int)           event->wid;
+        msg   = (int)           event->msg;
+        long1 = (unsigned long) event->long1;
+        long2 = (unsigned long) event->long2;
     };
     
     
@@ -83,10 +80,10 @@ gws_send_event (
         message_buffer[3] = (unsigned long) 0;     // Nothing
 
         // The standard stack.
-        message_buffer[4] = (unsigned long) wid;   //  
-        message_buffer[5] = (unsigned long) msg;   //  
-        message_buffer[6] = (unsigned long)long1;  // 
-        message_buffer[7] = (unsigned long)long2;  // 
+        message_buffer[4] = (unsigned long) wid;
+        message_buffer[5] = (unsigned long) msg;
+        message_buffer[6] = (unsigned long) long1; 
+        message_buffer[7] = (unsigned long) long2; 
         //...
 
 
@@ -102,7 +99,7 @@ gws_send_event (
         if (n_writes>0){ break; }
     }
 
-    return;         
+    return;
 }
 
 
@@ -115,22 +112,6 @@ gws_send_event (
 // so we need to tell him to draw the input pointer
 // inside the window limits.
 // the window server will draw the next char inside the window with focus.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

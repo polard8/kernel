@@ -1467,16 +1467,17 @@ void gde_show_current_process_info (void)
 void 
 gde_resize_window ( 
     struct window_d *window, 
-    unsigned long x, 
-    unsigned long y )
+    unsigned long width, 
+    unsigned long height )
 {
 
-    if ( (void*) window == NULL ){
-        return;
-    }
+    if ( (void *) window == NULL ){  return;  }
 
     gramado_system_call ( 
-        SYSTEMCALL_RESIZEWINDOW, (unsigned long) window, x, y );
+        SYSTEMCALL_RESIZEWINDOW, 
+        (unsigned long) window, 
+        width, 
+        height );
 }
 
 

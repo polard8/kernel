@@ -221,7 +221,7 @@ int gws_initialize_library (void)
 
     // PID do window server.
     int wsPID = -1;
-    
+
 
     wsPID = gws_initialize_connection();
 
@@ -474,7 +474,7 @@ __gws_redraw_window_request (
                        0 );
        
         if(n_writes>0){ break; }
-    }
+    };
 
     return 0; 
 }
@@ -659,7 +659,7 @@ __gws_change_window_position_request (
                         0 );
 
         if (n_writes>0){ break; }
-    }
+    };
 
     return 0; 
 }
@@ -1325,9 +1325,10 @@ int __gws_plotcube_response (int fd)
     gws_debug_print ("__gws_plotcube_response: Waiting ...\n");      
 
     int y=0;
-    for(y=0; y<15; y++)
-        gws_yield();   // See: libgws/
 
+    for(y=0; y<15; y++){
+        gws_yield();
+    };
 
     // #todo
     // Podemos checar antes se o fd 
@@ -1547,9 +1548,9 @@ int __gws_plotrectangle_response (int fd)
     gws_debug_print ("__gws_plotrectangle_response: Waiting ...\n");      
 
     int y=0;
-    for(y=0; y<15; y++)
-        gws_yield();   // See: libgws/
-
+    for(y=0; y<15; y++){
+        gws_yield();
+    };
 
     // #todo
     // Podemos checar antes se o fd 
@@ -1754,8 +1755,9 @@ int __gws_drawchar_response(int fd)
     gws_debug_print ("__gws_drawchar_response: Waiting ...\n");      
 
     int y=0;
-    for(y=0; y<15; y++)
-        gws_yield();   // See: libgws/
+    for(y=0; y<15; y++){
+        gws_yield();
+    };
 
 
     // #todo
@@ -1951,7 +1953,7 @@ __gws_drawtext_request (
         {
             message_buffer[string_off] = *string;
             string_off++; string++;
-        }
+        };
         message_buffer[string_off] = 0;
         //message_buffer[256] = 0;
 
@@ -1993,8 +1995,9 @@ int __gws_drawtext_response(int fd)
     gws_debug_print ("gws_drawtext_response: Waiting ...\n");      
 
     int y=0;
-    for(y=0; y<15; y++)
-        gws_yield();   // See: libgws/
+    for (y=0; y<15; y++){
+        gws_yield();
+    };
 
 
     // #todo
@@ -2167,11 +2170,11 @@ __gws_createwindow_request (
         char buf[256];
         int i=0;
         int string_off= 14;    // String offset.
-        for(i=0; i<250; i++)
+        for (i=0; i<250; i++)
         {
             message_buffer[string_off] = *Name; //#todo: Temos que receber esse ponteiro via argumento
             string_off++; Name++;
-        }
+        };
         message_buffer[string_off] = 0;
 
         // Write!
@@ -2208,10 +2211,11 @@ int __gws_createwindow_response(int fd)
     // obs: Nesse momento deveríamos estar dormindo.
 
     // #debug
-    gws_debug_print ("libgws-__gws_createwindow_response: Waiting ...\n");      
+    gws_debug_print ("__gws_createwindow_response: Waiting ...\n");      
 
-    for(y=0; y<15; y++)
-        gws_yield();   // See: libgws/
+    for (y=0; y<15; y++){
+        gws_yield();
+    };
 
 
     // #todo
@@ -2423,7 +2427,7 @@ gws_plotrectangle (
 
     // Response
     // Waiting to read the response.
-    while (1){
+    while (TRUE){
         Value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
         if (Value == ACTION_REPLY ) { break; }
         if (Value == ACTION_ERROR ) { return -1; }
@@ -2520,11 +2524,12 @@ gws_draw_text (
 
 
     // Request
+    // IN: fd, window, x, y, color, string
     __gws_drawtext_request (
-        (int) fd,             // fd
-        (int) window,         // window id
-        (unsigned long) x,    // left
-        (unsigned long) y,    // top
+        (int) fd,
+        (int) window,
+        (unsigned long) x,
+        (unsigned long) y,
         (unsigned long) color,
         (char *) string );
     rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );
@@ -2602,22 +2607,21 @@ gws_send_message_to_process (
     unsigned long long1,
     unsigned long long2 )
 {
-    unsigned long message_buffer[5];
+    unsigned long message_buffer[8];
 
 
     if ( pid<0 ){
-        // msg?
-        return -1;
+        gws_debug_print ("gws_send_message_to_process: [FAIL] pid\n");
+        return (int) (-1);
     }
-
 
     message_buffer[0] = (unsigned long) window;
     message_buffer[1] = (unsigned long) message;
     message_buffer[2] = (unsigned long) long1;
     message_buffer[3] = (unsigned long) long2;
 
-    message_buffer[4] = 0; 
-    message_buffer[5] = 0; 
+    message_buffer[4] = 0;  // this pid
+    message_buffer[5] = 0;  // tid
     // ...
 
     return (int) gws_system_call ( 
@@ -2642,12 +2646,11 @@ gws_send_message_to_thread (
     unsigned long long1,
     unsigned long long2 )
 {
+    unsigned long message_buffer[8];
 
-    unsigned long message_buffer[5];
-
-    if (tid < 0){
-        //?msg
-        return -1;
+    if ( tid<0 ){
+        gws_debug_print ("gws_send_message_to_thread: [FAIL] tid\n");
+        return (int) (-1);
     }
 
 
@@ -2656,8 +2659,8 @@ gws_send_message_to_thread (
     message_buffer[2] = (unsigned long) long1;
     message_buffer[3] = (unsigned long) long2;
 
-    message_buffer[4] = 0; 
-    message_buffer[5] = 0; 
+    message_buffer[4] = 0;  // this tid
+    message_buffer[5] = 0;  // tid
     // ...
 
     return (int) gws_system_call ( 
@@ -2730,6 +2733,10 @@ gws_load_path (
                        (unsigned long) path, 
                        (unsigned long) buffer, 
                        (unsigned long) buffer_len );
+
+    //if (status<0){
+    // #todo: message
+    //}
 
     return (int) status;
 }
@@ -2805,8 +2812,8 @@ gws_resize_window(
         gws_yield();
     };
     __gws_resize_window_reponse(fd);
-    
-    
+
+
     return 0;
 }
 
@@ -2820,7 +2827,8 @@ gws_redraw_window (
    unsigned long flags )
 {
     int value=0;
-    
+
+
     if (fd<0){
         return -1;
     }
@@ -2884,7 +2892,7 @@ int gws_refresh_window (int fd, int window )
     // Response
     // Waiting to read the response.
     int value=0;
-    while (1){
+    while (TRUE){
         value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
         if (value == ACTION_REPLY ) { break; }
         if (value == ACTION_ERROR ) { return -1; }
@@ -2971,6 +2979,10 @@ gws_create_window (
     };
     wid = (int) __gws_createwindow_response(fd); 
 
+    //if (wid<0{
+    // #todo: message
+    //}
+
     gws_debug_print("gws_create_window: done\n");
 
     return (int) wid;
@@ -2988,7 +3000,8 @@ void gws_refresh_yield (int fd)
 {
     if (fd<0){  return;  }
 
-    //refresh background
+    // refresh background
+    // ?? parameters ?
     gws_refresh_window (fd, -4); 
 
     gws_yield();
@@ -3157,12 +3170,10 @@ void gws_enter_critical_section (void)
     // FALSE = CLOSED.
     // yield thread if closed.
 
-    while (1){
+    while (TRUE){
         S = (int) gws_system_call ( 226, 0, 0, 0 );
         if ( S == 1 ){ goto done; }
-        
-        //yield thread.
-        sc82 (265,0,0,0);
+        gws_yield();
     };
 
     // Close the gate. turn FALSE.
@@ -3246,6 +3257,8 @@ struct gws_menu_d *gws_create_menu (
         debug_print("gws_create_menu: [FAIL] fd\n");
         return (struct gws_menu_d *) 0;
     }
+
+    // Menu.
 
     menu = (struct gws_menu_d *) malloc( sizeof(struct gws_menu_d) );
 
@@ -3595,26 +3608,25 @@ struct gws_display_d *gws_open_display(char *display_name)
     Display->connected = FALSE;
     // ...
 
-    if( (void*) display_name == NULL ){
+    if ( (void*) display_name == NULL ){
         printf ("gws_open_display: [FAIL] display_name\n");
         return NULL;
     }
 
-    if( *display_name == 0 ){
+    if ( *display_name == 0 ){
         printf ("gws_open_display: [FAIL] *display_name\n");
         return NULL;
     }
 
 
-    while (1){
+   // #bugbug 
+   // Loop infinito?
 
-        // #bugbug Loop infinito.
-        
+    while (TRUE){
         if (connect (client_fd, (void *) &addr_in, addrlen ) < 0)
-        { 
+        {
             gws_debug_print("gws_open_display: Connection Failed \n");
             printf         ("gws_open_display: Connection Failed \n"); 
-        
         }else{ break; }; 
     };
 
@@ -3629,6 +3641,7 @@ void gws_close_display( struct gws_display_d *display)
     // #todo
     
     if ( (void*) display == NULL ){
+        gws_debug_print("gws_close_display: display\n");
         return;
     }
 

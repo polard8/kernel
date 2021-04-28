@@ -1066,28 +1066,37 @@ void csiparse (void) {
 
 
 
-void techo(char *buf, int len) {
+void techo(char *buf, int len)
+{
 
-    for(; len > 0; buf++, len--)
+    // #todo
+    // Ugly thing
+    
+    for ( ; len > 0; buf++, len-- )
     {
 		char c = *buf;
 
-		if(c == '\033') {		/* escape */
+        /* escape */
+        if (c == '\033') {		
 			tputc("^", 1);
 			tputc("[", 1);
-		} else if(c < '\x20') {	/* control code */
+
+        /* control code */
+        } else if(c < '\x20') {	
 			if(c != '\n' && c != '\r' && c != '\t') {
 				c |= '\x40';
 				tputc("^", 1);
 			}
 			tputc(&c, 1);
-		} else {
-			break;
-		}
-	};
-	
-	if(len)
-		tputc (buf, len);
+        
+        } else {
+            break;
+        };
+    };
+
+    if (len){
+        tputc (buf, len);
+    }
 }
 
 
@@ -1129,19 +1138,19 @@ void tputc (char *c, int len){
 	 
 	 //string normal
 	 //if(term.esc & ESC_STR) 
-	 if (__sequence_status == 0)
-	 {
-		 switch (ascii)
-		 {
-			 //deixou de ser string normal e
-			 //entramos em uma sequência
-			 //logo abaixo esse char será tratado novamente.
-		     case '\033':
-		         term.esc = ESC_START;
+	if (__sequence_status == 0)
+	{
+        switch (ascii) 
+        {
+            // Deixou de ser string normal e
+            // entramos em uma sequência
+            // logo abaixo esse char será tratado novamente.
+
+            case '\033':
+                term.esc = ESC_START;
                  __sequence_status = 1;
                  break;
-             
-             
+
              //
              // #importante
              // 
@@ -1159,73 +1168,76 @@ void tputc (char *c, int len){
                  terminal_write_char ( (int) ascii); 
                  return;
          }
-	 }
+    }
 
 
-	 //control codes. (dentro de um range)
-	 if(control){
-		 
-		 switch(ascii)
-		 {
+    // Control codes. 
+    // (dentro de um range)
 
-		    //case '\v': /* VT */
-		    //case '\a': /* BEL */    
-		    		    		    
-		    case '\t': /* HT */
-		    case '\b': /* BS */
-		    case '\r': /* CR */
-		    case '\f': /* LF */
+    if (control){
+ 
+        switch (ascii)
+        {
+            //case '\v':   /* VT */
+            //case '\a':   /* BEL */
+
+            case '\t': /* HT */
+            case '\b': /* BS */
+            case '\r': /* CR */
+            case '\f': /* LF */
             case '\n': /* LF */
                 //#deixa o kernel lidar com isso por enquanto.
                 //printf ("%c",ascii);
                 terminal_write_char ( (int) ascii);
-                return;	
+                return;
                 break;
-		    
-		    //^[
-		    //case '\e':
-			//case '\033':
-		    case '\x1b':
-		        term.esc = ESC_START;
-		        __sequence_status = 1;
-		        //printf (" {ESCAPE} ");
-		        terminal_write_char ( (int) '$');
-		        return;
-		        break;
-		        
-		    case '\016':	/* SO */
-            case '\017': /* SI */
-		        return;
-		        break;
-		        
-		    case '\032':	/* SUB */
-		    case '\030':	/* CAN */
+
+            //^[
+            //case '\e':
+            //case '\033':
+            case '\x1b':
+                term.esc = ESC_START;
+                __sequence_status = 1;
+                //printf (" {ESCAPE} ");
+                terminal_write_char ( (int) '$');
+                return;
+                break;
+
+            case '\016':  /* SO */
+            case '\017':  /* SI */
+                return;
+                break;
+
+
+            case '\032':	/* SUB */
+            case '\030':	/* CAN */
 			    //csireset ();
 			    //printf (" {reset?} ");
                 terminal_write_char ( (int) '$');
                 return;
-		        break;
-		            
-		    case '\005':	/* ENQ (IGNORED) */
-		    case '\000':	/* NUL (IGNORED) */
-		    case '\021':	/* XON (IGNORED) */
-		    case '\023':	/* XOFF (IGNORED) */
-		    //case 0177:	/* DEL (IGNORED) */
+                break;
+
+
+            case '\005':	/* ENQ (IGNORED) */
+            case '\000':	/* NUL (IGNORED) */
+            case '\021':	/* XON (IGNORED) */
+            case '\023':	/* XOFF (IGNORED) */
+            //case 0177:	/* DEL (IGNORED) */
                 //Nothing;
                 return;
-                
+
             //...    
-		 }
-		        
-		 //...	 
-		 
-	 // Um 1b já foi encontrado.
-	 } else if(term.esc & ESC_START) {
-	 
-	     // Um [ já foi encontrado.
-	     //#todo parse csi
-	     if(term.esc & ESC_CSI){
-		      
+        }
+
+        // ... 
+
+    // Um 1b já foi encontrado.
+    } else if(term.esc & ESC_START) {
+
+	    // Um [ já foi encontrado.
+	    //#todo parse csi
+        if (term.esc & ESC_CSI){
+
 		      switch(ascii)
 		      {
 		     	//quando acaba a sequencia.
@@ -1257,24 +1269,23 @@ void tputc (char *c, int len){
 		              return;
 		              break;
 		      }
-		 
-		 } else if(term.esc & ESC_STR_END){ 
-			 
-			 
+
+        } else if(term.esc & ESC_STR_END){ 
+
 			 //...
-	 
+
 	     } else if(term.esc & ESC_ALTCHARSET){
-			 
-			 switch(ascii)
-			 {
-			      case 'A': /* UK (IGNORED) */
-			      case '<': /* multinational charset (IGNORED) */
-			      case '5': /* Finnish (IGNORED) */
-			      case 'C': /* Finnish (IGNORED) */
-			      case 'K': /* German (IGNORED) */
-                      break;
-			 }
-			 
+
+			switch(ascii)
+			{
+			    case 'A':  /* UK (IGNORED) */
+			    case '<':  /* multinational charset (IGNORED) */
+			    case '5':  /* Finnish (IGNORED) */
+			    case 'C':  /* Finnish (IGNORED) */
+			    case 'K':  /* German (IGNORED) */
+                    break;
+			 };
+
 	     } else if(term.esc & ESC_TEST) {
 			 
 		    //...
@@ -1387,9 +1398,9 @@ void tputc (char *c, int len){
 	     //...
 	     
 	     return;
-	 };
-	 
-	 //...
+    };
+
+    // ...
 }
 
 
@@ -1407,8 +1418,8 @@ void tputc (char *c, int len){
 
 int print_buffer (void){
 
-    int c;
-    int i;
+    int c=0;
+    int i=0;
 
     int charsize = 1;    /* size of utf8 char in bytes */
 
@@ -1426,8 +1437,7 @@ int print_buffer (void){
    
     //#todo limits
     
-    if ( len >= LINE_BUFFER_SIZE )
-    {
+    if ( len >= LINE_BUFFER_SIZE ){
         gde_message_box (3,"noraterm","print_buffer: buffer limit");
         return -1;
     }
@@ -1476,22 +1486,19 @@ int print_buffer (void){
 // Limpando só o buffer de linha. Não é o buffer de arquivo. 
 
 void initialize_buffer (void){
-	
-	int i;
-	
-	for (i=0; i<LINE_BUFFER_SIZE; i++)
-	{
-		LINE_BUFFER[i] = 0;
-	}
-	
-    line_buffer_tail = 0;  //entrada.
-    line_buffer_head = 0;  //saída.
-    
-    line_buffer_buffersize = LINE_BUFFER_SIZE;	
+
+    int i=0;
+
+    for (i=0; i<LINE_BUFFER_SIZE; i++)
+    {
+        LINE_BUFFER[i] = 0;
+    };
+
+    line_buffer_tail = 0;  // in
+    line_buffer_head = 0;  // out
+
+    line_buffer_buffersize = LINE_BUFFER_SIZE;
 }
-
-
-
 
 
 
@@ -2008,7 +2015,7 @@ void *noratermProcedure (
 			goto done;
 			break;
 
-        // Commands.		
+        // Commands
 		case MSG_COMMAND:
             switch (long1)
 			{
@@ -2197,14 +2204,14 @@ void *noratermProcedure (
 					
 					break;
 
-				case 2: printf("button 2\n"); break;
-				case 3: printf("button 3\n"); break;
+                case 2: printf("button 2\n"); break;
+                case 3: printf("button 3\n"); break;
             };
             goto done;
             break;
 
 
-		// MSG_MOUSEKEYUP	
+		// MSG_MOUSEKEYUP
 		case 31:
 		    switch (long1)
 			{
@@ -2276,15 +2283,15 @@ void *noratermProcedure (
                         gramado_system_call (900, (unsigned long) "hello.bin", 0, 0);
                         
                         ____this_tty_id = (int) gramado_system_call ( 266, getpid(), 0, 0 );
-                                           
-                       while(1)
+
+                       while (1)
                        {
                            if ( read ( ____this_tty_id, __rbuf2, 32 ) > 0 )
                            {     
                                printf (__rbuf2);
                                fflush (stdout);
                            }
-                       }
+                       };
                         
                         
                         break;
@@ -2312,11 +2319,11 @@ void *noratermProcedure (
                        // então vamos suspender o read  
                        
                         //yield. test
-                        gramado_system_call ( 265,0,0,0);          
-                        gramado_system_call ( 265,0,0,0);          
-                        gramado_system_call ( 265,0,0,0);                                  
-                                          
-                       while(1)
+                        gramado_system_call ( 265,0,0,0); 
+                        gramado_system_call ( 265,0,0,0); 
+                        gramado_system_call ( 265,0,0,0); 
+
+                       while (1)
                        {
                            read ( ____this_tty_id, __rbuf2, 32 );     
                            printf (__rbuf2);
@@ -2329,11 +2336,10 @@ void *noratermProcedure (
                     }
 
 
-				
 				    //printf("up button 1\n");
 					if (window == taskbar_button1)
 					{
-	                    //terminalTestButtons ();	
+	                    //terminalTestButtons ();
 		                //refresh_screen ();
 						printf ("Start menu \n");
 					}
@@ -2343,24 +2349,24 @@ void *noratermProcedure (
 					if ( window == reboot_button )
                     {
 					    printf("Rebooting...\n");
-		                system("reboot"); 	
+		                system("reboot"); 
 					}
-					
-					//botão de close
-					if ( window == close_button )
-				    {
+
+                    // botão de close
+                    if ( window == close_button )
+                    {
 					    //APIresize_window ( window, 200, 200 );
 					    //APIredraw_window ( window, 1 );
 					    //refresh_screen (); //não precisa isso	
 
-						running = 0;
-                        ShellFlag = SHELLFLAG_EXIT;						
-					}  
-					
-					break;
+                        running = 0;
+                        ShellFlag = SHELLFLAG_EXIT;
+                    } 
 
-				case 2: debug_print("up button 2\n"); break;
-				case 3: debug_print("up button 3\n"); break;
+                    break;
+
+                case 2: debug_print("up button 2\n"); break;
+                case 3: debug_print("up button 3\n"); break;
             };
             goto done;
             break;
@@ -2378,7 +2384,6 @@ void *noratermProcedure (
 			    //APIresize_window ( window, 200, 200 );
 				//APIredraw_window ( window, 1 );	
 			}
-            
 		    break;
 
 		//entered	
@@ -2416,13 +2421,15 @@ void *noratermProcedure (
 		    {
 				//MessageBox (3,"noraterm","set focus");
 				//repinta janelas filhas.
+				// Isso funciona. 
+				// Mas o problema é quando a janela muda de tamanho.
 				gde_redraw_window ( main_window, 1);
 				gde_redraw_window ( client_background_window, 1);
 				gde_redraw_window ( client_window, 1);
 				gde_redraw_window ( client_bar_Window, 1);
-				gde_redraw_window ( bar_button_1, 1); //botões
-				gde_redraw_window ( bar_button_2, 1); //botões
-				gde_redraw_window ( bar_button_3, 1); //botões 
+				gde_redraw_window ( bar_button_1, 1);
+				gde_redraw_window ( bar_button_2, 1);
+				gde_redraw_window ( bar_button_3, 1);
 			}
 			break;
 			
@@ -2447,9 +2454,9 @@ void *noratermProcedure (
 				gde_redraw_window ( client_background_window, 1);
 				gde_redraw_window ( client_window, 1);
 				gde_redraw_window ( client_bar_Window, 1);
-				gde_redraw_window ( bar_button_1, 1); //botões
-				gde_redraw_window ( bar_button_2, 1); //botões
-				gde_redraw_window ( bar_button_3, 1); //botões 
+				gde_redraw_window ( bar_button_1, 1);
+				gde_redraw_window ( bar_button_2, 1);
+				gde_redraw_window ( bar_button_3, 1);
 			}
 			break;
 
@@ -2461,9 +2468,9 @@ void *noratermProcedure (
             
             
          //#test
-         case MSG_HSCROLL:
+         //case MSG_HSCROLL:
              //#todo
-             break;   
+             //break;   
 
          //#test
          case MSG_VSCROLL:
@@ -2474,31 +2481,12 @@ void *noratermProcedure (
              break;   
 
 
-		//@todo: isso ainda não existe na biblioteca. criar.	
-        //case MSG_CLS:
-            //limparemos o retãngulo da área de cliente,
-			//mesmo que estejamos em full screen. 
-		//	break;		
-		
-		//mudaremos o curso usando long1 e long2.
-		//case MSG_SETCURSOR:
-		//    break;
-		
-		//case MSG_HSCROLL:
-		//    break;
-		//case MSG_VSCROLL:
-		//    break;
-		
-		
-		//case MSG_FULLSCREEN:
-		//    break;
-		
-		
-		//case COMMAND_SET_WINDOW_SIZE:
-		//    break;
-		
-		//case COMMAND_HIDE_WINDOW:
-        //    break; 
+		//case MSG_SETCURSOR:  break;
+		//case MSG_HSCROLL:  break;
+		//case MSG_VSCROLL:  break;
+		//case MSG_FULLSCREEN:  break;
+		//case COMMAND_SET_WINDOW_SIZE:  break;
+		//case COMMAND_HIDE_WINDOW:  break; 
 
 		
 		//#importante
@@ -2666,7 +2654,7 @@ void *noratermProcedure (
 		//...
 
        default:
-            debug_print("noraterm: default message");
+            debug_print("noraterm: default message\n");
             goto done;
             break;
     };
@@ -2710,19 +2698,19 @@ void shellWaitCmd (void){
 
 	
 	//asm("sti");    //@todo; Não habilitar!
-	
-    //Loop.  
-	
-    do{	 
-		if ( prompt_status == 1 )
-		{
-			prompt_status = 0;     
-			return;
-	    };
-	
-	} while (1);
 
-    prompt_status = 0;	
+
+    // Loop
+
+    do {
+        if ( prompt_status == 1 )
+        {
+            prompt_status = 0; 
+            return;
+        }
+    } while (1);
+
+    prompt_status = 0;
 }
 
 
@@ -2775,7 +2763,7 @@ unsigned long shellCompare (struct window_d *window){
 	//linha de 80 chars no máx.
 	for ( i=0; i<80; i++ ){
 		shared_memory[i] = prompt[i];
-	}
+	};
 	
 	
     // Temos uma linha de comando em prompt[]
@@ -3191,26 +3179,12 @@ do_compare:
 	//isso é um teste.
 	//mostra informações sobre o aplicativo usando 
 	//um message box ou uma janela.
-	if ( strncmp( prompt, "about", 5 ) == 0 )
-	{
-		shellSendMessage ( NULL, MSG_COMMAND, CMD_ABOUT, 0);
-		
-        //chama message box com mensagem about.
-        //apiSendMessage ( (struct window_d *) 0, 
-		//                 (int) MSG_COMMAND, 
-		//				 (unsigned long) CMD_ABOUT, 
-		//				 (unsigned long) 0 );
-						 
-	    goto exit_cmp;
-	};
-
-	// Imprime a tabela ascii usando a fonte atual.
-    // 128 chars.	
-    //if( strncmp( prompt, "ascii", 5 ) == 0 )
-    //{
-		//shellASCII();
-	//	goto exit_cmp;
-	//}
+    
+    if ( strncmp( prompt, "about", 5 ) == 0 )
+    {
+        shellSendMessage ( NULL, MSG_COMMAND, CMD_ABOUT, 0);
+        goto exit_cmp;
+    }
 
 
 	//bmp exemplo.bmp
@@ -3230,7 +3204,7 @@ do_compare:
 		   terminalDisplayBMPEx ( (char *) tokenList[i], (int) (200) );
 		};
 		goto exit_cmp;
-    };	
+    }
 	
 	
 
@@ -3257,7 +3231,7 @@ do_compare:
 				//Apaga o nome do último diretório.
 			    shell_pathname_backup ( current_workingdiretory_string, 1 ); 
                 goto exit_cmp;				
-		    }			
+		    }
 			
 	        // updating the current working directory string.
 	        shellUpdateWorkingDiretoryString ( (char *) tokenList[i] );
@@ -3274,7 +3248,7 @@ do_compare:
 		//e onde se encontra o arquivo que queremos.
 		//cd_buitins();
 	    goto exit_cmp;
-	};	
+	}
 
 	// clear-screen-buffer
 	if ( strncmp( prompt, "clear-screen-buffer", 19 ) == 0 )
@@ -3288,7 +3262,7 @@ do_compare:
 	{
 		shellSendMessage ( NULL, MSG_CLOSE, 0, 0);
 	    goto exit_cmp;
-	}		
+	}
 
 
     // cls - Clear the screen.
@@ -3340,7 +3314,7 @@ do_compare:
 			//...
 		};
 		goto exit_cmp;
-    };		
+    }
 	
 	
 	
@@ -3350,20 +3324,19 @@ do_compare:
 	// del
 	// o que segue o comando del é um pathname.
 	//@todo: podemos checar se o pathname é absoluto,
-	//e onde se encontra o arquivo que queremos.		
+	//e onde se encontra o arquivo que queremos.
 	if ( strncmp( prompt, "del", 3 ) == 0 )
 	{
 		del_builtins();
 	    goto exit_cmp;
-	};	
+	}
 
     // desktop.
 	if ( strncmp( prompt, "desktop", 7 ) == 0 )
 	{
         desktopInitialize();
         goto exit_cmp;
-	};	
-	
+	}
 
 
 	// dir - Lista os arquivos no estilo DOS.
@@ -3405,15 +3378,15 @@ do_compare:
         //se o pathname for null então o comando atua sobre o pwd		
 		//dir_builtins();
         goto exit_cmp;
-    };
-	
+    }
+
     // disk-info
-	if ( strncmp( prompt, "disk-info", 9 ) == 0 )
-	{
-	    shellShowDiskInfo();
+    if ( strncmp( prompt, "disk-info", 9 ) == 0 )
+    {
+        shellShowDiskInfo();
         goto exit_cmp;
-    };	
-	
+    }
+
 	
 	// echo - Echo de terminal.
     if ( strncmp( prompt, "echo", 4 ) == 0 )

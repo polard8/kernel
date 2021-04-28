@@ -90,11 +90,9 @@ int gws_connect (void){
         return (int)(-1); 
     }    
 
-    // Ok.
     // Saving
     ____gws_connected = Status;
     ____gws_client_fd = fd;
-
 
     // Return fd.
     return (int) fd;
@@ -161,8 +159,14 @@ int gws_initialize_connection (void)
     // ?? Ou o qual o processo pertence ??
     
     __gws__desktop__id = (int) gws_system_call (519,0,0,0);
-   
-    
+
+
+    // #todo
+    if (__gws__desktop__id < 0){
+        
+    }
+
+
     // Get ws PID for a given desktop
     __ws__pid = (int) gws_system_call ( 512,
                          (unsigned long) __gws__desktop__id,
@@ -171,7 +175,7 @@ int gws_initialize_connection (void)
         
         
     
-    if (__ws__pid<0){
+    if (__ws__pid < 0){
         return -1;
     }
 
@@ -201,7 +205,7 @@ int gws_initialize_connection (void)
     //gws_send_message_to_process ( __ws__pid, 
     //    0, 2020, 0, 0 );     
 
-    return __ws__pid;
+    return (int) __ws__pid;
 }
 
 

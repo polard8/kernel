@@ -28,10 +28,9 @@ __gws_recv (
     size_t len, 
     int flags )
 {
-   // flags ?
-   return (ssize_t) read ( sockfd, (const void *) buf, len );
+    // flags ?
+    return (ssize_t) read ( sockfd, (const void *) buf, len );
 }
-
 
 
 ssize_t gws_write_to_server (int fd, const void *buf, size_t count)
@@ -39,11 +38,11 @@ ssize_t gws_write_to_server (int fd, const void *buf, size_t count)
     return (ssize_t) write ( fd, (const void *) buf, count );
 }
 
+
 ssize_t gws_read_from_server (int fd, const void *buf, size_t count)
 {
-   return (ssize_t) read ( fd, (const void *) buf, count );
-}   
-   
-	
-	
-	
+    return (ssize_t) read ( fd, (const void *) buf, count );
+}
+
+
+
