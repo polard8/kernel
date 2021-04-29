@@ -1759,10 +1759,16 @@ static unsigned long vga_256colors_palette[256] = {
 //Continua...
 
 
+// window status
+#define WINDOW_STATUS_ACTIVE       1
+#define WINDOW_STATUS_INACTIVE     0
+
+
 //
 // Task Bar support.
 //
 
+/*
 //Suporte a barra de tarefas.
 #define BARRA_DE_TAREFAS_X        0
 #define BARRA_DE_TAREFAS_Y        560    //748,460.
@@ -1772,7 +1778,7 @@ static unsigned long vga_256colors_palette[256] = {
 #define AREA_DE_TAREFAS_Y  548    
 #define AREA_DE_TAREFAS_LARGURA  (BARRA_DE_TAREFAS_LARGURA - MENU_INICIAR_LARGURA)
 #define AREA_DE_TAREFAS_ALTURA   20
-
+*/
 
 
 //
@@ -2093,13 +2099,14 @@ static unsigned long vga_256colors_palette[256] = {
 //... 
 
 
-//apresentação.
-#define VIEW_NULL      0
-#define VIEW_FULL      1000
-#define VIEW_MAXIMIZED 1001
-#define VIEW_MINIMIZED 1002
-#define VIEW_NORMAL    1003 //Normal (restaurada)
-//...
+// Apresentação.
+#define VIEW_NULL       0
+#define VIEW_FULL       1
+#define VIEW_MAXIMIZED  2  
+#define VIEW_MINIMIZED  4
+#define VIEW_NORMAL     8  // Normal (restaurada)
+// ...
+
 
 //botões
 #define BN_CLICKED  200
@@ -3162,18 +3169,18 @@ int gde_dialog_box ( int type, char *string1, char *string2 );
 // #todo: Change windowname type to 'const char *'
 
 void *gde_create_window ( 
-    unsigned long type,        //1-Tipo de janela, (popup,normal,...).
-    unsigned long status,      //2-Estado da janela, (ativa ou não).
-    unsigned long view,        //3-(min, max ...).
-    char *windowname,          //4-Título.  
-    unsigned long x,           //5-Deslocamento em relação às margens do Desktop. 
-    unsigned long y,           //6-Deslocamento em relação às margens do Desktop.
-    unsigned long width,       //7-Largura da janela.
-    unsigned long height,      //8-Altura da janela.
-    struct window_d *pWindow,  //9-Endereço da estrutura da janela mãe.
-    unsigned long onde,        //10-Ambiente.( Estão no desktop, barra, cliente ...)
-    unsigned long clientcolor, //11- Cor da área de cliente.
-    unsigned long color );     //12-Color (bg) (para janela simples).
+    unsigned long type,        // 1 - Tipo de janela, (popup,normal,...).
+    unsigned long status,      // 2 - Estado da janela, (ativa ou não).
+    unsigned long view,        // 3 - (min, max ...).
+    char *windowname,          // 4 - Título.  
+    unsigned long x,           // 5 - Deslocamento em relação às margens do Desktop. 
+    unsigned long y,           // 6 - Deslocamento em relação às margens do Desktop.
+    unsigned long width,       // 7 - Largura da janela.
+    unsigned long height,      // 8 - Altura da janela.
+    struct window_d *pWindow,  // 9 - Endereço da estrutura da janela mãe.
+    unsigned long desktop_id,  //10 - Desktop id.
+    unsigned long clientcolor, //11 - Cor da área de cliente.
+    unsigned long color );     //12 - Color (bg) (para janela simples).
 
 
 //Register Window.

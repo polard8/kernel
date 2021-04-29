@@ -110,64 +110,47 @@ void shellCreateEditBox (void)
 // Por causa do gerenciamento da sessão crítica essa função 
 // deverá retornar NULL se falhar.
 
-struct window_d *shellCreateMainWindow ( int status ){
+struct window_d *gdeshellCreateMainWindow (void){
 
     struct window_d *w;
+    //struct window_d *p;
 
-     //#bugbug
-     //shellShell já inicializou isso com a métrica do sistema.
-
-    //
     // Limits.
-    //
+    // #bugbug
+    // shellShell já inicializou isso com a métrica do sistema.
 
-    if ( wpWindowLeft > 50 )
-        wpWindowLeft = 50;
-
-    if ( wpWindowTop > 50 )
-        wpWindowTop = 50;
-
-    if ( wsWindowWidth > 2048 )
-        wsWindowWidth = 2048;
-
-    if ( wsWindowHeight > 2048 )
-        wsWindowHeight = 2048;
-
-    // no zeros.
-
-    if ( wsWindowWidth == 0 ) { wsWindowWidth  = 100; }
+    // Not zero.
+    if ( wsWindowWidth  == 0 ){ wsWindowWidth  = 100; }
     if ( wsWindowHeight == 0 ){ wsWindowHeight = 100; }
 
-
-    /*
-     // #debug
-     printf("l={%d} t={%d} w={%d} h={%d}\n", 
-         wpWindowLeft, wpWindowTop, wsWindowWidth, wsWindowHeight ); 
-     while (1){ asm ("pause"); }
-    */
-
+    // Limits
+    if ( wpWindowLeft > 0 ){ wpWindowLeft = 0; }
+    if ( wpWindowTop  > 0 ){ wpWindowTop  = 0; }
+    if ( wsWindowWidth  > 2048 ){ wsWindowWidth  = 2048; }
+    if ( wsWindowHeight > 2048 ){ wsWindowHeight = 2048; }
 
     //
     // Draw
-    //
-    
+    // 
+
     // #todo
-    // We have the argument 'status'.
-    // Is it used here?
+    // Parent window.
+    // Get root window.
 
-    // backup
-    //w = (void *) gde_create_window ( 
-    //                 1, 1, 1, "gdeshell",
-    //                 wpWindowLeft, wpWindowTop, 
-    //                 wsWindowWidth, wsWindowHeight,    
-    //                 0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
+    // #todo
+    unsigned long DesktopId = 0;
 
-    w = (void *) gde_create_window ( 
-                     WT_OVERLAPPED, 1, 1, "gdeshell",
-                     wpWindowLeft, wpWindowTop, 
-                     wsWindowWidth, wsWindowHeight,    
-                     0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
-
+    w = (struct window_d *) gde_create_window ( 
+                                WT_OVERLAPPED, 
+                                WINDOW_STATUS_ACTIVE,
+                                VIEW_FULL,
+                                "gdeshell",
+                                wpWindowLeft,  wpWindowTop, 
+                                wsWindowWidth, wsWindowHeight,    
+                                NULL,  // No parent window. 
+                                DesktopId, 
+                                GDESHELL_CLIENTWINDOW_COLOR, 
+                                GDESHELL_WINDOW_COLOR );
 
     // #bugbug
     // Por causa do gerenciamento da sessão crítica essa função 
@@ -175,6 +158,7 @@ struct window_d *shellCreateMainWindow ( int status ){
 
     return (struct window_d *) w;
 }
+
 
 // IN: The console window
 int commodore_ui(struct window_d *window)

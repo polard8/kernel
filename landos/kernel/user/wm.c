@@ -4242,15 +4242,14 @@ int powertrio_arrange_and_update(void)
 
     // main window
     // See: logon.c
-
     if ( (void*) gui == NULL ){
         panic ("powertrio_arrange_and_update: gui\n");
     }
-
     // Do now refresh now.
     if ( (void*) gui->main != NULL ){
         redraw_window ( gui->main, FALSE );
     }
+
 
     //
     // Loop

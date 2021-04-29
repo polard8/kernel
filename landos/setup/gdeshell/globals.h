@@ -12,6 +12,11 @@
 #define __GLOBALS_H 1
 
 
+
+#define GDESHELL_CLIENTWINDOW_COLOR  xCOLOR_GRAY1
+#define GDESHELL_WINDOW_COLOR        xCOLOR_GRAY1
+
+
 //"global command" stuff 
 #define glob_percent_sign '%' 
 #define glob_underscore '_'

@@ -11,10 +11,9 @@
  * 
  * History:
  *     2014 - Created by Fred Nora.
- *     2016 - Review.
  */
 
- 
+
 // z order support.
 
 #define KGWS_ZORDER_BOTTOM  0 
@@ -300,13 +299,14 @@ int window_getch (void);
 
 
 
-//apresentação.
-#define VIEW_NULL      0
-#define VIEW_FULL      1000  // * Full screen.
-#define VIEW_MAXIMIZED 1001  
-#define VIEW_MINIMIZED 1002
-#define VIEW_NORMAL    1003  //Normal (restaurada)
-//...
+// Apresentação.
+#define VIEW_NULL       0
+#define VIEW_FULL       1
+#define VIEW_MAXIMIZED  2  
+#define VIEW_MINIMIZED  4
+#define VIEW_NORMAL     8  // Normal (restaurada)
+// ...
+
 
 //
 // ## botoes  ##
@@ -2570,7 +2570,7 @@ void *CreateWindow (
     unsigned long width,        //7  - largura da janela  
     unsigned long height,       //8  - altura
     struct window_d *pWindow,   //9  - id da janela mae, se for zero, essa é a janela mae.
-    int desktopid,              //10 - desktop ID.
+    int desktop_id,              //10 - desktop ID.
     unsigned long clientcolor,  //11 - Client Area Color.
     unsigned long color         //12 - cor do bg (para janelas simples, tipo 1)
 );

@@ -375,6 +375,10 @@ print_ethernet_header (
     printf("\n");
     printf("Ethernet Header\n");
 
+
+    if ( (void*) eth == NULL )
+        return;
+
     // Destination MAC
     // Source MAC
     // Protocol type.
@@ -392,15 +396,16 @@ print_ethernet_header (
 }
 
 
-void print_arp_header ( char *Buffer )
+void print_arp_header ( char *arp_buffer )
 {
     // O header ARP começa depois do header de ethernet.
-    struct gdeshell_ether_arp *h = (struct gdeshell_ether_arp *) (Buffer + ETHERNET_HEADER_LENGHT);
+    //struct gdeshell_ether_arp *h = (struct gdeshell_ether_arp *) (Buffer + ETHERNET_HEADER_LENGHT);
+    struct gdeshell_ether_arp *h = (struct gdeshell_ether_arp *) arp_buffer;
     int i=0;
 
     // Filter
 
-    if ( (void*) Buffer == NULL ){
+    if ( (void*) arp_buffer == NULL ){
         printf ("print_arp_header: [FAIL] Buffer\n");
         return;
     }
@@ -441,11 +446,157 @@ void print_arp_header ( char *Buffer )
     //==================================
 }
 
-void print_ipv4_header ( char *Buffer )
+void print_ipv4_header ( char *ipv4_buffer )
 {
-    printf ("print_ipv4_header: [TODO]\n");
-    printf ("\n\n");
+    char *buf     = (char *) ipv4_buffer;
+    //char *payload = (char *) ipv4_buffer + ?;
+
+    char Version_IHL = 0;
+    unsigned int Version = 0;
+    unsigned int Lenght = 0;
+
+    //int PayloadBaseOffset = 20;
+    //int PayloadOffsetMultiplier = 0;
+    int PayloadOffset = 0;    
+
+    // pega versao e lenght
+    Version_IHL = (char) buf[0];
+ 
+    
+    Version = (unsigned int) (Version_IHL >> 4) & 0xf;
+    Lenght  = (unsigned int) (Version_IHL     ) & 0xf;
+    
+    // Because an IPv4 header is a minimum of 20 bytes in size, 
+    // the smallest value of the IHL field is 5.
+    // With a maximum IHL value of 0xF, 
+    // the maximum size of the IPv4 header, 
+    // including options, is 60 bytes (15 x 4).
+    // 20 de header + 40 de options
+
+    // Nunca menor que 5.
+    if ( Lenght < 5 ){ Lenght = 5; }
+
+    if ( Lenght > 0xF ){ 
+        printf ("Invalid IHL\n");
+        return;
+    }
+
+    PayloadOffset = (int)( 4 * Lenght );
+
+
+
+    //protocol
+    char Protocol_char = 0;
+    int Protocol = 0;
+
+    Protocol_char = (char) buf[9];  
+    Protocol = (int) Protocol_char;
+
+    // 6
+    // 17 
+
+    //printf ("ipv4: Ver=%d ihl=%d Protocol=%d PayloadOffset=%d\n",
+    //    Version,
+    //    Lenght,
+    //    Protocol,
+    //    PayloadOffset );
+    
+    
+    //
+    // payload
+    //
+        
+    // limit
+    // buf[PayloadOffset+32] = 0;
+
+    if ( Protocol == 6 ){
+        //printf ("TCP: \n");
+        print_tcp_header( (char *) &buf[PayloadOffset] );
+    }
+    
+    if ( Protocol == 17 ){
+        //printf ("UDP: \n");
+        print_udp_header( (char *) &buf[PayloadOffset] );
+    }
+} 
+
+
+void print_udp_header ( char *udp_buffer )
+{
+    char *buf = (char *) udp_buffer;
+
+    int payloadOffset = 8;
+
+
+    buf[payloadOffset + 150] = 0;  //finaliza a string
+    printf("[PAYLOAD UDP]: %s\n", &buf[payloadOffset] );
 }
+
+
+void print_tcp_header ( char *tcp_buffer )
+{
+    char *buf  = (char *) tcp_buffer;
+
+    unsigned short *buf16 = (unsigned short *) tcp_buffer;
+    unsigned long *buf32 = (unsigned long *) tcp_buffer;
+
+    unsigned short SourcePort=0;
+    unsigned short DestinationPort=0;
+
+    DestinationPort = (unsigned short) buf16[1]; //segunda short
+
+    printf ("tcp: Destination Port = {%d}\n",DestinationPort);
+
+    unsigned long SequenceNumber=0;
+    SequenceNumber = (unsigned long) buf32[1];  // segunda long
+
+    char Data8 = 0;
+    unsigned int Lenght = 0;
+    int PayloadOffset = 0;    
+
+    // lenght e reservado
+    Data8 = (char) buf[12];
+    Lenght = (unsigned int) (Data8 >> 4) & 0xf;
+
+    
+    // Because an IPv4 header is a minimum of 20 bytes in size, 
+    // the smallest value of the IHL field is 5.
+    // With a maximum IHL value of 0xF, 
+    // the maximum size of the IPv4 header, 
+    // including options, is 60 bytes (15 x 4).
+    // 20 de header + 40 de options
+
+    // Nunca menor que 5.
+    if ( Lenght < 5 ){ Lenght = 5; }
+
+    if ( Lenght > 0xF ){ 
+        printf ("Invalid len\n");
+        return;
+    }
+
+    PayloadOffset = (int)( 4 * Lenght );
+
+    //printf ("tcp: len=%d PayloadOffset=%d \n", Lenght, PayloadOffset );
+
+   
+    //printf ("Sequence Number = {%d}\n",SequenceNumber);
+   
+    //
+    // payload
+    //
+    
+    // #todo: segment size?
+    // The default TCP Maximum Segment Size is 536?
+    // Maximum segment size = 1460 bytes ?
+    
+    // limit
+    buf[PayloadOffset + 32] = 0;
+
+    //if (DestinationPort == 80){
+        printf ("[PAYLOAD TCP]: %s\n", &buf[PayloadOffset]);
+    //}
+} 
+
 
 
 /*
@@ -531,7 +682,7 @@ int network_decode_buffer ( unsigned long buffer_address )
     int i=0;
     int c;
     char *buf     = (char *) buffer_address;
-    char *payload = (char *) buffer_address + 54;
+    //char *payload = (char *) buffer_address + 54;
 
     Type = gdeshell_FromNetByteOrder16(eh->type);
     
@@ -548,14 +699,13 @@ int network_decode_buffer ( unsigned long buffer_address )
             // printf ("[0x0800]: IPV4 received\n");
 
 
-            //print_ipv4_header ((char *)buffer_address);
-            
+           print_ipv4_header ( (char *) buffer_address + ETHERNET_HEADER_LENGHT );
 
            //#test
            //notificando ...(ok funcionou.)
            //network_procedure ( NULL, 3000, 0,0 ); 
 
-           printf("[PAYLOAD]: %s\n", &buf[54] );
+           //printf("[PAYLOAD]: %s\n", &buf[51] );
                        
            //printf("[PAYLOAD]:\n");
            //for(i=54; i< 200; i++)
@@ -581,7 +731,7 @@ int network_decode_buffer ( unsigned long buffer_address )
 
             printf ("[0x0806]: ARP received\n");
 
-            print_arp_header ((char *)buffer_address);
+            print_arp_header ((char *)buffer_address + ETHERNET_HEADER_LENGHT );
                    
             //printf("\nARP ");
             //do_arp ((unsigned long) buffer_address );

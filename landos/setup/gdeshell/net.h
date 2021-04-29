@@ -120,8 +120,11 @@ void
 print_ethernet_header ( 
     const unsigned char *Buffer, 
     int Size );
-void print_arp_header ( char *Buffer );
-void print_ipv4_header ( char *Buffer );
+
+void print_arp_header ( char *arp_buffer );
+void print_ipv4_header ( char *ipv4_buffer );
+void print_udp_header ( char *udp_buffer );
+void print_tcp_header ( char *tcp_buffer );
 
 
 //========================

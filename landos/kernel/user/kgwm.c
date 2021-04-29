@@ -903,9 +903,8 @@ guiSetUpMainWindow (
 
 int kgwm_next(void)
 {
-
-    struct window_d *wActive;  // active window
-    struct window_d *n;  // next window
+    struct window_d  *wActive;  // active window
+    struct window_d  *n;        // next window
 
     struct thread_d *t;
 
@@ -914,14 +913,31 @@ int kgwm_next(void)
 
     //#debug
     //return -1;
-
-
-
-    wActive = (struct window_d *) windowList[active_window];
     
+    
+    // #test
+    //===============
+    // main window
+    // See: logon.c
+    if ( (void*) gui == NULL ){
+        panic ("kgwm_next: gui\n");
+    }
+    // Do now refresh now.
+    if ( (void*) gui->main != NULL ){
+        redraw_window ( gui->main, FALSE );
+    }
+    //===============
+
     // #todo
     // Se não temos uma janela ativa 
     // então temos que providenciar uma.
+
+    if ( active_window < 0){
+        panic ("kgwm_next: [FAIL] active_window\n");
+        //return -1;
+    }
+
+    wActive = (struct window_d *) windowList[active_window];
 
     if ( (void*) wActive == NULL ){
         panic ("kgwm_next: wActive\n");
@@ -973,16 +989,21 @@ int kgwm_next(void)
 
 
     // Procurar a janela ativa dentro da lista.
+    // É uma list de janelas que pertencem ao desktop atual.
+
     int i=0;
     struct window_d *tmp;
 
-    i = CurrentDesktop->lHead;
+
+    int NewWindowSelected=FALSE;
 
     // limits
     if (CurrentDesktop->lHead < 0 ||CurrentDesktop->lHead >= 8)
     {
         CurrentDesktop->lHead = 0;
     }
+
+    i = CurrentDesktop->lHead;
 
     tmp = (struct window_d *) CurrentDesktop->list[i]; 
     
@@ -994,26 +1015,34 @@ int kgwm_next(void)
         CurrentDesktop->lHead = 0;
     }
 
-
     // fail
     if ( (void*) tmp == NULL )
     {
-        // list overflow
         n = (struct window_d *) wActive;
         debug_print("kgwm_next: [fail] list FAIL. Back to active\n");
         goto __go;
     }        
-    
+
+    // ok
     if ( (void*) tmp != NULL )
     {
+        if ( tmp->used != TRUE && tmp->magic != 1234 )
+        {
+            n = (struct window_d *) wActive;
+            debug_print("kgwm_next: [fail] list FAIL. Back to active\n");
+            goto __go;
+        }
+
+        // New window!
+        
         if ( tmp->used == TRUE && tmp->magic == 1234 )
         {
+            NewWindowSelected = TRUE;
             n = (struct window_d *) tmp;
             debug_print("kgwm_next: [ok] One from the list\n");
             goto __go;
         }
     }
-
 
 
 //
@@ -1074,16 +1103,25 @@ __go:
 
          debug_print("kgwm_next: [DONE]\n");
          
-         // Change the active window.
+         
+         // Old active window
+         debug_print("kgwm_next:  [DONE] kill focus of old active window\n");
+         if ( NewWindowSelected == TRUE )
+         {
+             wActive->active = FALSE;
+             kgwmKillFocus(wActive);
+             redraw_window(wActive,TRUE);
+         }
+         
+         // New active window.
+         debug_print("kgwm_next:  [DONE] redraw new active window\n");
          active_window = n->id;
-            
-         // Change the foreground window.
-         foreground_thread = n->tid;
-         
-         //#test
-         debug_print("kgwm_next:  [DONE] redraw window\n");
+         n->active = TRUE;
+         kgwmSetFocus(n);  // Focus
+         foreground_thread = n->tid;          // Change the foreground window.
          redraw_window(n,TRUE);
-         
+
+
          // #debug
          draw_text(n,8,8,COLOR_RED,n->name);
          refresh_screen();

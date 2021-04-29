@@ -1192,11 +1192,9 @@ shell_gramado_core_init_execve (
 // shelui.c
 //
 
+struct window_d *gdeshellCreateMainWindow(void);
+
 void shellCreateEditBox(void);
-
-
-struct window_d *shellCreateMainWindow( int status );
-
 int commodore_ui(struct window_d *window);
 
 

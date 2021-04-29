@@ -478,6 +478,11 @@ void process_stats(void){
 
 void fake_sleep (unsigned long t)
 {
+
+    if (t==0){
+        t=1;
+    }
+
     unsigned long i = (unsigned long) ( t * 512 );
 
     if (i == 0){  i=512;  }
@@ -513,6 +518,7 @@ SendARP (
 
 // Testando o envio de um arp request 
 // usando os serviços do kernel.
+// #todo: Move this routine to net.c
 void testSendARP (void)
 {
 	uint8_t source_ip_address[4];
@@ -785,10 +791,8 @@ void quit (void)
  * shellProcedure:
  * 
  *     Procedimento de janela.
- * 
  *     LOCAL
  */
-
 
 unsigned long 
 shellProcedure ( 
@@ -804,6 +808,10 @@ shellProcedure (
     int c=0;
 
     int f12Status = -1;
+
+    if (msg<0){
+        return 0;
+    }
 
     // #bugbug: 
     // Use 'return' statement in the all cases.
@@ -3803,9 +3811,9 @@ void shellPrompt (void)
     for ( i=0; i<PROMPT_MAX_DEFAULT; i++ ){ prompt[i] = (char) '\0'; };
     
     prompt[0] = (char) '\0';
-    prompt_pos = 0;
+    prompt_pos    = 0;
     prompt_status = 0;
-    prompt_max = PROMPT_MAX_DEFAULT;  
+    prompt_max    = PROMPT_MAX_DEFAULT;  
 
     // Prompt
     printf("\n");
@@ -3820,24 +3828,27 @@ void shellPrompt (void)
  *     Limpa o buffer da tela.
  */
 
+// #todo
+// We can create a function with 'char' and 'attribute' as parameters.
+
 void shellClearBuffer (void)
 {
     int i=0;
     int j=0;
 
-	//inicializamos com espa�os.
-	for ( i=0; i<32; i++ )
-	{
-		for ( j=0; j<80; j++ )
-		{
-		    LINES[i].CHARS[j] = (char) ' ';
-		    LINES[i].ATTRIBUTES[j] = (char) 7;
-	    }
-		
-		LINES[i].left = 0;
-		LINES[i].right = 0;
-		LINES[i].pos = 0;
-	};
+    // Inicializamos com espaços.
+    for ( i=0; i<32; i++ )
+    {
+        for ( j=0; j<80; j++ )
+        {
+            LINES[i].CHARS[j]      = (char) ' ';
+            LINES[i].ATTRIBUTES[j] = (char) 7;
+        };
+
+        LINES[i].left  = 0;
+        LINES[i].right = 0;
+        LINES[i].pos   = 0;
+    };
 }
 
 
@@ -3880,25 +3891,22 @@ void shellTestLoadFile (void){
 
 	//#importante:
 	//precisa ser arquivo pequeno.
-	
 
-    f = fopen ("gramado.txt","rb");  	
-	
+
+    f = fopen ("gramado.txt","rb"); 
+
 	//pequeno
 	//f = fopen ("init.txt","rb");  
 	
 	//grande
-	//f = fopen ("init.txt","rb");  	
-	
-    if( f == NULL ){
-        printf("shellTestLoadFile: f fail\n");
+	//f = fopen ("init.txt","rb"); 
+
+    if ( (void*) f == NULL ){
+        printf("shellTestLoadFile: [FAIL] f\n");
         return;
+    }
 
-    }else{
-		//printf("fopen ok\n");
-    };
 
-	
 	//#test 
 	//testando com um arquivo com texto pequeno.
 	//enviando para o buffer de words, 
@@ -3992,9 +4000,10 @@ void shellTestThreads (void)
 
     printf ("shellTestThreads: Creating the thread.\n");
 
-    Thread  = (void *) gde_create_thread ( (unsigned long) &shellThread, 
-                                (unsigned long) (&StackAddress[0] + (2*1024) - 4), 
-                                "ThreadTest1" );
+    Thread  = (void *) gde_create_thread ( 
+                           (unsigned long) &shellThread, 
+                           (unsigned long) (&StackAddress[0] + (2*1024) - 4), 
+                           "ThreadTest1" );
 
     if ( (void *) Thread == NULL ){
         printf ("shellTestThreads: [FAIL] Thread\n");
@@ -4054,9 +4063,8 @@ void shellClearScreen (void){
 
     w = (void *) shell_info.terminal_window;
 
-    if ( (void *) w != NULL )
-    {
-        gde_redraw_window ( w, 1 );
+    if ( (void *) w != NULL ){
+        gde_redraw_window (w,TRUE);
     }
 
 
@@ -4108,12 +4116,17 @@ void shellRefreshScreen (void)
     int i=0;
     int j=0;
 
-	//desabilita o cursor
-	system_call ( 245, 
-	    (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);
-
+    // Desabilita o cursor
+    system_call ( 245, 
+        (unsigned long) 0, (unsigned long) 0, (unsigned long) 0 );
 
     // loop
+    
+    //if ( textTopRow < 0 )
+    //    return;
+
+    //if ( textBottomRow < 0 )
+    //    return;
 
     for ( i=textTopRow; i<textBottomRow; i++ ){
         for ( j=0; j<80; j++ ){
@@ -4122,9 +4135,9 @@ void shellRefreshScreen (void)
         printf ("\n");
     };
 
-	//reabilita o cursor
-	system_call ( 244, 
-	    (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);
+    // Reabilita o cursor
+    system_call ( 244, 
+        (unsigned long) 0, (unsigned long) 0, (unsigned long) 0 );
 }
 
 
@@ -4638,17 +4651,8 @@ void shellShowSystemInfo (void)
     printf ("\n");
     printf ("Gramado OS\n");
 
-    //
-    // Get
-    //
-
-    // get memory size.
+    // Get memory size and show.
     __mm_size_mb = (unsigned long) gramado_system_call (292,0,0,0);
-    
-
-    //
-    // Show
-    //
 
     printf ("Memory: %d MB \n",__mm_size_mb);
     
@@ -5038,10 +5042,11 @@ void shell_fntos (char *name)
 
 
     //transforma em mai�scula
-   while ( *name && *name != '.' )
+    while ( *name && *name != '.' )
     {
-        if(*name >= 'a' && *name <= 'z')
+        if (*name >= 'a' && *name <= 'z'){
             *name -= 0x20;
+        }
 
         name++;
         ns++;
@@ -5052,8 +5057,10 @@ void shell_fntos (char *name)
     // ent�o constroi a extens�o.
     for ( i=0; i < 3 && name[i+1]; i++ )
     {
-        if(name[i+1] >= 'a' && name[i+1] <= 'z')
+        if (name[i+1] >= 'a' && name[i+1] <= 'z')
+        {
             name[i+1] -= 0x20;
+        }
 
         ext[i] = name[i+1];
     };
@@ -5104,8 +5111,11 @@ feedterminalDialog (
     unsigned long long1, 
     unsigned long long2 )
 {
-	//int q;
 
+    printf ("feedterminalDialog: deprecated\n");
+    return 0;
+
+    /*
 	switch (msg)
 	{
 	
@@ -5164,7 +5174,7 @@ feedterminalDialog (
 		    break;
 	
     };
-
+    */
 
     return 0;
 }
@@ -5207,13 +5217,18 @@ void *xmalloc( int size){
  *     #todo: Isso pode ir para a libc.
  */
 
-char *concat ( char *s1, char *s2, char *s3 ){
-	
+char *concat ( char *s1, char *s2, char *s3 )
+{
+
     int len1 = (int) strlen (s1);
     int len2 = (int) strlen (s2);
     int len3 = (int) strlen (s3);
   
     char *result = (char *) xmalloc ( len1 +len2 +len3 +1 );
+
+    // #todo
+    //if (void*) result == NULL )
+        //return NULL;
 
     strcpy ( result, s1);
     strcpy ( result +len1, s2 );
@@ -5281,13 +5296,20 @@ int shellExecuteThisScript ( char *script_name ){
 
 	//#todo:
 	//Essa fun��o deve chamar o interpretador de script	
-	
+
     FILE *script_file;
-    int i;
-	
+    int i=0;
+
+
+    if ( (void*) script_name == NULL )
+        return -1;
+    
+    if ( *script_name == 0 )
+        return -1;
+
 	// Aqui temos que carregar o arquivo de script indicado 
 	// nos argumentos.
-	
+
     printf ("shellExecuteThisScript:\n");
     printf ("Initializing script ...\n");
     printf ("CurrentFile={%s}\n",script_name);
@@ -5298,10 +5320,9 @@ int shellExecuteThisScript ( char *script_name ){
 	
     script_file = fopen (script_name,"rw");
 
-    if ( (void *) script_file == NULL )
-    {
+    if ( (void *) script_file == NULL ){
         printf ("shellExecuteThisScript: Can't open script file!\n");
-        die ("*");
+        die ("*hang\n");
     }
 
 
@@ -6756,7 +6777,7 @@ _ok:
     //++
     gde_enter_critical_section ();
     // IN: status.
-    hWindow = shellCreateMainWindow(1);
+    hWindow = gdeshellCreateMainWindow();
     if ( (void *) hWindow == NULL ){
         printf ("gdeshell: shellCreateMainWindow FAIL!\n");
         gde_exit_critical_section ();

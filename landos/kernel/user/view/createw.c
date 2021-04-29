@@ -392,7 +392,7 @@ void *CreateWindow (
     unsigned long width, 
     unsigned long height, 
     struct window_d *pWindow, 
-    int desktopid, 
+    int desktop_id, 
     unsigned long clientcolor, 
     unsigned long color ) 
 {
@@ -518,6 +518,12 @@ void *CreateWindow (
     } else {
         Parent = (void *) pWindow;
     };
+
+ 
+    // Desktop id.
+    if ( desktop_id < 0 ){
+        debug_print ("CreateWindow: [FIXME] Invalid desktop_id\n");
+    }
 
 
 	// Devemos checar se a janela está no mesmo desktop 

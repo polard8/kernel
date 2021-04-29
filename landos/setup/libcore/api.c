@@ -1186,16 +1186,16 @@ dbProcedure (
  */
 
 void *gde_create_window ( 
-    unsigned long type,        //1, Tipo de janela (popup,normal,...)
-    unsigned long status,      //2, Estado da janela (ativa ou nao)
-    unsigned long view,        //3, (min, max ...)
-    char *windowname,          //4, Título. 
-    unsigned long x,           //5, Deslocamento em relação às margens do Desktop. 
-    unsigned long y,           //6, Deslocamento em relação às margens do Desktop.
-    unsigned long width,       //7, Largura da janela.
-    unsigned long height,      //8, Altura da janela.
-    struct window_d *pWindow,  //9, Endereço da estrutura da janela mãe.
-    unsigned long onde,        //10, Ambiente.( Est� no desktop, barra, cliente ...)
+    unsigned long type,        // 1, Tipo de janela (popup,normal,...)
+    unsigned long status,      // 2, Estado da janela (ativa ou nao)
+    unsigned long view,        // 3, (min, max ...)
+    char *windowname,          // 4, Título. 
+    unsigned long x,           // 5, Deslocamento em relação às margens do Desktop. 
+    unsigned long y,           // 6, Deslocamento em relação às margens do Desktop.
+    unsigned long width,       // 7, Largura da janela.
+    unsigned long height,      // 8, Altura da janela.
+    struct window_d *pWindow,  // 9, Endereço da estrutura da janela mãe.
+    unsigned long desktop_id,  //10, Desktop id.
     unsigned long clientcolor, //11, Cor da área de cliente
     unsigned long color )      //12, Color (bg) (para janela simples).
 { 
@@ -1224,10 +1224,9 @@ void *gde_create_window (
 	message_buffer[6]  = (unsigned long) width;
 	message_buffer[7]  = (unsigned long) height;
 	message_buffer[8]  = (unsigned long) pWindow;
-	message_buffer[9]  = (unsigned long) onde;
+	message_buffer[9]  = (unsigned long) desktop_id;
 	message_buffer[10] = (unsigned long) clientcolor;
 	message_buffer[11] = (unsigned long) color;
-
 
     // #bugbug
     // Maybe we need to use sc82()
