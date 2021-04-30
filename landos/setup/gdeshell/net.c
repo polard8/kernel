@@ -527,6 +527,8 @@ void print_udp_header ( char *udp_buffer )
 
     int payloadOffset = 8;
 
+    // #todo
+    // check the destination por in the second short.
 
     buf[payloadOffset + 150] = 0;  //finaliza a string
     printf("[PAYLOAD UDP]: %s\n", &buf[payloadOffset] );

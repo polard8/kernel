@@ -285,6 +285,7 @@ void gwssrv_wait_message(void);
 
 void gwssrv_yield(void);
 
+void serviceExitGWS(void);
 
 //
 // End.

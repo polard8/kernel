@@ -225,9 +225,12 @@ gramado-ws:
 	-sudo cp ws/bin/GWS.BIN       base/ 
 	-sudo cp ws/bin/GWSSRV.BIN    base/
 
+# Main clients
+	-sudo cp ws/bin/LOGON.BIN     base/
+	-sudo cp ws/bin/GWM.BIN       base/
+
 # well teste clients
 	-sudo cp ws/bin/EDITOR.BIN    base/
-	-sudo cp ws/bin/GWM.BIN       base/
 	-sudo cp ws/bin/TERMINAL.BIN  base/
 	-sudo cp ws/bin/FILEMAN.BIN   base/
 

@@ -1749,6 +1749,24 @@ int serviceNextEvent (void)
 }
 
 
+// #todo
+// Close all the clients and close the server.
+void serviceExitGWS(void)
+{
+    printf ("serviceExitGWS: \n");
+    
+    // Kill all the clients.
+    printf ("[TODO] Kill all the clients\n");
+
+    // #todo
+    // Deallocate resources used by the server.
+
+    // Close the server.
+    printf ("[TODO] Close all the clients\n");
+    exit(0);
+}
+
+
 // No response.
 int serviceAsyncCommand (void)
 {
@@ -1792,11 +1810,15 @@ int serviceAsyncCommand (void)
  
     switch (request_id){
 
-        // 1 =  Close server.
+        // 1 =  Exit GWS
+        // #todo:
+        // Close all the clients and close the server.
         case 1:
-            gwssrv_debug_print ("serviceAsyncCommand: [request 1] Closing server\n");
+            gwssrv_debug_print ("serviceAsyncCommand: [request 1]  Exit GWS\n");
                         //printf ("serviceAsyncCommand: [request 1] Closing server\n");
-            printf("serviceAsyncCommand: Close server\n");
+            printf("serviceAsyncCommand: Exit GWS\n");
+            serviceExitGWS();
+            printf("serviceAsyncCommand: [FAIL] fail when closing the GWS\n");
             exit(0);
             break;
 
@@ -1868,6 +1890,7 @@ int serviceAsyncCommand (void)
                 //exit(0);
             }
             break;
+            
 
         // ...
                 
@@ -2165,19 +2188,10 @@ int main (int argc, char **argv)
         //printf ("gwssrv: Calling child \n"); 
 
 
-        if ( window_server->launch_first_client == TRUE ){
-        // main tests
-        gwssrv_clone_and_execute ("gws.bin");      // command gws.bin
-        //gwssrv_clone_and_execute ("editor.bin"); 
-        //gwssrv_clone_and_execute ("fileman.bin"); 
-        //gwssrv_clone_and_execute ("terminal.bin"); 
-
-        //gwssrv_clone_and_execute ("launch1.bin"); 
-        //gwssrv_clone_and_execute ("browser.bin");
-        //gwssrv_clone_and_execute ("gwm.bin");     // window manager
-        //gwssrv_clone_and_execute ("s2.bin");      // shell  
-        //gwssrv_clone_and_execute ("s3.bin");      // hello
-        // ...
+        if ( window_server->launch_first_client == TRUE )
+        {
+            // #todo: Get the status.
+            gwssrv_clone_and_execute ("logon.bin");
         }
 
         // Wait

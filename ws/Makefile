@@ -9,10 +9,14 @@ all:
 
 # clients
 
+
+# main clients.
+	make -C logon
+	make -C gwm
+
 # Well tested clients
 	make -C editor
 	make -C fileman
-	make -C gwm
 	make -C terminal  
 
 # Extra clients
