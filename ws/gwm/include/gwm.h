@@ -58,8 +58,7 @@ struct wm_client_d  *c_taskbar;
 struct wm_client_d  *c_tester;   // Usado para fazer testes de pintura e posicionamento.
 // ...
 
-
-unsigned long wmclientList[1024];
+unsigned long wmClientList[32];
 
 
 

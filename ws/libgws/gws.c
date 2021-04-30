@@ -2133,6 +2133,10 @@ __gws_createwindow_request (
     int n_writes = 0;   // For sending requests.
 
 
+    int client_pid = rtl_current_process();
+    int client_tid = rtl_current_thread();
+
+
     char *Name;
     // O nome passado.
     Name = name;
@@ -2164,7 +2168,15 @@ __gws_createwindow_request (
         message_buffer[8]  = bg_color;
         message_buffer[9]  = type;
         message_buffer[10] = parent; 
-        // ...
+
+        message_buffer[11] = 0;  // #todo
+        
+        // #goal
+        // The purpose here is to find a facility to
+        // switch the active window.
+
+        message_buffer[12] = client_pid;  // pid
+        message_buffer[13] = client_tid;  // tid
 
         //string support.
         char buf[256];

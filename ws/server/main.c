@@ -844,8 +844,8 @@ gwsProcedure (
         break;
 
     // Create Window
-    
     // Usará o buffer global
+    // See: wm.c
     case GWS_CreateWindow:
         gwssrv_debug_print ("gwssrv: [1001] serviceCreateWindow\n");
         serviceCreateWindow();

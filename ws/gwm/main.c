@@ -198,7 +198,10 @@ gwmProcedure (
 void test_create_menu ( int fd, int window )
 {
 
-    int MenuOnTop = TRUE;
+    unsigned long deviceWidth  = gws_get_system_metrics(1);
+    unsigned long deviceHeight = gws_get_system_metrics(2);
+
+    int MenuOnTop = FALSE;
 
     struct gws_menu_d *menu;
     struct gws_menu_item_d *menu_item;
@@ -215,8 +218,12 @@ void test_create_menu ( int fd, int window )
     }
 
 
-    menuX = 0;
-    menuY = (savedH -32 -300);   // altura, menos a taskbar, altura do menu
+    unsigned long menuWidth  = deviceWidth >> 1;
+    unsigned long menuHeight = deviceHeight >> 1; 
+
+
+    menuX = 8;
+    menuY = (deviceHeight - 32 - menuHeight);
 
     if (MenuOnTop == TRUE)
     {
@@ -233,8 +240,8 @@ void test_create_menu ( int fd, int window )
                 (int) 4,                // count
                 (unsigned long) menuX,  // x
                 (unsigned long) menuY,  // y
-                (unsigned long) 280,
-                (unsigned long) 280,
+                (unsigned long) menuWidth,
+                (unsigned long) menuHeight,
                 (unsigned long) COLOR_WINDOW );
 
     if ((void*) menu == NULL)
@@ -304,6 +311,7 @@ gwmProcedure (
     switch (msg){
 
 
+
         case MSG_KEYDOWN:
             switch(long1){
                 case VK_TAB:  update(fd);  break;
@@ -348,6 +356,11 @@ gwmProcedure (
                     printf("gwm: Exiting ...\n");
                     exit(0);
                     break;
+                
+                case VK_F5:
+                    test_create_menu (fd,c_bg->window);
+                    return 0;
+                    break;
                     
                 // #test
                 case VK_F12:
@@ -365,9 +378,9 @@ gwmProcedure (
             break;
 
 
-        case MSG_SYSKEYUP:
+        //case MSG_SYSKEYUP:
             //printf ("MSG_SYSKEYUP:\n");
-            break;
+            //break;
         
         default:
             // Nothing
@@ -619,7 +632,7 @@ update_all_windows(int fd);
     
     for (i=0; i<9; i++)
     {    
-        c = (struct wm_client_d  *) wmclientList[i];
+        c = (struct wm_client_d  *) wmClientList[i];
             
         if ( (void*) c != NULL )
         {
@@ -788,7 +801,7 @@ int create_bg_client(int fd)
         //printf ("w={%x}\n",c_bg->window);
         gws_refresh_window(fd,c_bg->window);
 
-        wmclientList[0] = (unsigned long) c_bg;
+        wmClientList[0] = (unsigned long) c_bg;
     };
 
     //
@@ -875,7 +888,7 @@ int create_topbar_client(int fd)
         topbarList[0] = button1_window;
         
         c_topbar->title_window = -1;  //todo;
-        wmclientList[1] = (unsigned long) c_topbar;
+        wmClientList[1] = (unsigned long) c_topbar;
     };
 
     return 0;
@@ -989,7 +1002,7 @@ int create_taskbar_client(int fd)
         taskbarList[2] = button2_window;
 
 
-        wmclientList[2] = (unsigned long) c_taskbar;
+        wmClientList[2] = (unsigned long) c_taskbar;
     };
 
     return 0;
@@ -1069,7 +1082,7 @@ int create_tester_client(int fd)
              
         
         // save
-        wmclientList[3] = (unsigned long) c_tester;
+        wmClientList[3] = (unsigned long) c_tester;
     } 
     //gws_exit_critical_section();
 
@@ -1247,7 +1260,7 @@ _more:
     //0=bg 1=topbar 2=taskbar
     for ( i=3; i<32; i++ )
     {
-        c = (struct wm_client_d *) wmclientList[i];
+        c = (struct wm_client_d *) wmClientList[i];
         if ( (void*) c != NULL ){
             gws_redraw_window(fd,c->window,1);
         }
@@ -1267,7 +1280,7 @@ int main ( int argc, char *argv[] ){
     int client_fd = -1;
 
 
-
+    
     // IN: hostname:number.screen_number
     Display = (struct gws_display_d *) gws_open_display("display:name.0");
 
@@ -1291,6 +1304,14 @@ int main ( int argc, char *argv[] ){
     debug_print ("gwm: Initializing ...\n");
 
 
+
+    // Clear the client list
+    int i=0;
+    
+    for (i=0; i<32; i++)
+    {
+        wmClientList[i] = 0;
+    };
 
     //
     // Draw

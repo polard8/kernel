@@ -335,9 +335,10 @@ struct gws_window_d
     int level;
 
     // The window belongs to this client.
+    // Talvez a tid da control thread do cliente 
+    // pode ficar nessa estrutura.
     struct gws_client_d  *client;
 
-    
     // #todo
     // Para sabermos quem receberá o reply no caso
     // de eventos.
@@ -347,6 +348,10 @@ struct gws_window_d
 
     int client_fd;
 
+    // #test
+    // tid da control thread do cliente.
+    int client_pid;
+    int client_tid;
 
 	// Características dessa janela..
 
@@ -580,16 +585,6 @@ struct gws_window_d
     struct gws_window_d *childListHead;  //Lista encadeada de janelas filhas.
     int childCount;                  //Tamanho da lista.
 
-
-// 
-//==================================================
-
-
-// 
-//==================================================	
-
-
-    
 // 
 //==================================================	
 

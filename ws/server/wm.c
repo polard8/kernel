@@ -733,6 +733,12 @@ void destroy_window (struct gws_window_d *window)
  * nesse documento.
  */
 
+// Called by gwsProcedure in main.c
+
+// #todo
+// Receive the tid of the client in the request packet.
+// Save it as an argument of the window structure.
+
 int serviceCreateWindow (void){
 
     //loop
@@ -757,6 +763,10 @@ int serviceCreateWindow (void){
     unsigned long type=0;
 
 
+    // tid da control thread do cliente.
+    int ClientPID = -1;
+    int ClientTID = -1;
+
 
     gwssrv_debug_print ("serviceCreateWindow:\n");
     //printf ("serviceCreateWindow:\n");
@@ -776,6 +786,16 @@ int serviceCreateWindow (void){
 
     // Parent window ID.
     pw = message_address[10]; 
+
+    // ? = message_address[11];  //#todo
+    ClientPID = message_address[12];  // client pid
+    ClientTID = message_address[13];  // client tid
+
+    // #debug
+    //printf ("serviceCreateWindow: pid=%d tid=%d *breakpoint\n", 
+    //    ClientPID, ClientTID );
+    //while(1){}
+
 
     //++
     // String support 
@@ -854,6 +874,19 @@ int serviceCreateWindow (void){
         next_response[1] = 0;  // msg code.
         return -1;
     }
+
+
+
+
+
+    // #test
+    // Save the tid of the client.
+    
+    Window->client_pid = ClientPID;
+    Window->client_tid = ClientTID;
+
+
+
 
     //
     // The client's fd.
