@@ -524,14 +524,42 @@ void print_ipv4_header ( char *ipv4_buffer )
 void print_udp_header ( char *udp_buffer )
 {
     char *buf = (char *) udp_buffer;
+    unsigned short *buf16 = (unsigned short *) udp_buffer;
+
+    unsigned short SourcePort=0;
+    unsigned short DestinationPort=0;
 
     int payloadOffset = 8;
+
+    SourcePort      = (unsigned short) buf16[0]; //primeira short
+    DestinationPort = (unsigned short) buf16[1]; //segunda short
+
+    SourcePort      = gdeshell_FromNetByteOrder16(SourcePort);
+    DestinationPort = gdeshell_FromNetByteOrder16(DestinationPort);
+    
+    printf ("udp: s={%x} d={%x} \n", 
+        SourcePort, DestinationPort);
+
+
+    // Drop
+    if ( DestinationPort != 34884 ){
+        return;
+    }
+
 
     // #todo
     // check the destination por in the second short.
 
     buf[payloadOffset + 150] = 0;  //finaliza a string
-    printf("[PAYLOAD UDP]: %s\n", &buf[payloadOffset] );
+
+
+    // 34884 em decimal.
+    // 4488 no header.
+    // 8844 convertido.
+
+    if ( DestinationPort == 34884 ){
+        printf("[PAYLOAD UDP 34884]: %s\n", &buf[payloadOffset] );
+    }
 }
 
 
@@ -547,7 +575,21 @@ void print_tcp_header ( char *tcp_buffer )
 
     DestinationPort = (unsigned short) buf16[1]; //segunda short
 
-    printf ("tcp: Destination Port = {%d}\n",DestinationPort);
+
+    //SourcePort      = gdeshell_FromNetByteOrder16(SourcePort);
+    DestinationPort = gdeshell_FromNetByteOrder16(DestinationPort);
+
+
+    //printf ("tcp: Destination Port = {%d}\n",DestinationPort);
+
+    //#debug
+    return;
+    
+    // Drop
+    if ( DestinationPort != 34884 ){
+        return;
+    }
+
 
     unsigned long SequenceNumber=0;
     SequenceNumber = (unsigned long) buf32[1];  // segunda long
@@ -594,8 +636,8 @@ void print_tcp_header ( char *tcp_buffer )
     // limit
     buf[PayloadOffset + 32] = 0;
 
-    //if (DestinationPort == 80){
-        printf ("[PAYLOAD TCP]: %s\n", &buf[PayloadOffset]);
+    //if (DestinationPort == 34884){
+        printf ("[PAYLOAD TCP 34884]: %s\n", &buf[PayloadOffset]);
     //}
 } 
 
@@ -826,17 +868,31 @@ void network_loop(void)
     // + Decode the buffer.
     // + ...
 
+    int msgStatus = FALSE;
+
     while (TRUE){
 
-        // IN: Service, buffer, lenght, nothing.
-        gramado_system_call ( 
-            890, 
-            (unsigned long) &buf[0], 
-            (unsigned long) 1500, 
-            0 );
-
-        network_decode_buffer ((unsigned long) &buf[0]);
+        msgStatus = FALSE;
         
+        // IN: Service, buffer, lenght, nothing.
+        msgStatus = gramado_system_call ( 
+                        890, 
+                        (unsigned long) &buf[0], 
+                        (unsigned long) 1500, 
+                        0 );
+
+
+        if (msgStatus == FALSE){
+            //printf("Status FALSE\n");
+        }
+
+        if (msgStatus == TRUE){
+            //printf("Status TRUE\n");
+            network_decode_buffer ((unsigned long) &buf[0]);
+            
+            for (i=0; i<4096; i++){  buf[i] = 0;  };
+        }
+
         //#test: OK. o led indica que esta enviando.
         //envia um pacote
         //gdeshell_send_packet();

@@ -139,8 +139,9 @@ int network_buffer_in( void *buffer, int len )
 
     //circula.
     NETWORK_BUFFER.receive_tail++;
-    if (NETWORK_BUFFER.receive_tail >= 32)
+    if (NETWORK_BUFFER.receive_tail >= 32){
         NETWORK_BUFFER.receive_tail=0;
+    }
 
 	// #todo
 	// MTU: maximim transmition unit.
@@ -157,12 +158,21 @@ int network_buffer_in( void *buffer, int len )
     // Pega o destination buffer.
     if (tail<32)
     {
+        // Se o buffer está cheio é porque ele não foi consumido.
+        // Vamos sobrepor ?
+        if ( NETWORK_BUFFER.receive_status[tail] == TRUE )
+        {
+        }
+        
         dst_buffer = (void*) NETWORK_BUFFER.receive_buffer[tail];
        
         if ((void*)dst_buffer != NULL){
             memcpy( dst_buffer, buffer, len);
         }        
     
+        // Avisamos que esse buffer está cheio.
+        NETWORK_BUFFER.receive_status[tail] = TRUE;
+        
         //printf("network_buffer_in: ok\n");
         //refresh_screen();
         return 0;//ok
@@ -179,8 +189,6 @@ int network_buffer_in( void *buffer, int len )
  *     The app receives a packet from the system.
  */
 
-// IN:
-// usermode buffer, max size.
 
 // #bugbug
 // Na verdade o tamanho total é no mínimo 
@@ -188,13 +196,19 @@ int network_buffer_in( void *buffer, int len )
 // #todo:
 // Devemos respeitar o tamanho indicado pelo usuário.
 
+// IN:
+// usermode buffer, max size.
+// OUT: ??
+
 int 
 sys_network_receive (
     void *ubuf, 
     int size )
 {
-
     void *src_buffer;
+
+    int Size=0;
+
     int head=0;
 
     debug_print("sys_network_receive:\n");
@@ -202,17 +216,33 @@ sys_network_receive (
 
     if ( (void*) ubuf == NULL ){
         debug_print("sys_network_receive: [ERROR] ubuf\n");
-        return -1;
+        return FALSE;
     }
 
-    if (size<=0){
-        debug_print("sys_network_receive: [ERROR] size\n");
-        return -1;
+
+    Size = size;
+
+    if (Size<=0){
+        debug_print("sys_network_receive: [ERROR] Size\n");
+        return FALSE;
+    }
+
+    if (Size>1500){
+        Size=1500;
+        debug_print("sys_network_receive: [FIXME] Size limit\n");
+        //return -1;
     }
 
     // #todo
     // Onde está essa estrutura?
     // See: include/rtl/net/network.h
+
+
+    // #todo
+    // O problema aqui é que estamos relendo o mesmo buffer
+    // depois de cicularmos.
+    // Sendo assim, temos que ter um status de cada um dos buffers.
+    // #todo: ... ainda não sei se aqui ou no driver.
 
     // Pega do head. 
     // Primeiro da fila.
@@ -225,34 +255,54 @@ sys_network_receive (
         NETWORK_BUFFER.receive_head=0;
     }
 
-
     if (head<32)
     {
-        src_buffer = NETWORK_BUFFER.receive_buffer[head];
-    
-        if((void*)ubuf== NULL){
-            printf("sys_network_receive: [FAIL] ubuf\n");
-            goto fail;
+
+        // Desistimos desse buffer, pois ele está vazio.
+        if ( NETWORK_BUFFER.receive_status[head] == FALSE )
+        {
+            debug_print("sys_network_receive: [] Empty buffer \n");
+            return FALSE;
         }
+
+        // SE O BUFFER ESTA CHEIO
+        if ( NETWORK_BUFFER.receive_status[head] == TRUE )
+        {
         
-        if((void*)src_buffer== NULL){
-            printf("sys_network_receive: [FAIL] src_buffer\n");
-            goto fail;
+            src_buffer = NETWORK_BUFFER.receive_buffer[head];
+    
+            // Source buffer
+            if ((void*)src_buffer== NULL){
+                printf("sys_network_receive: [FAIL] src_buffer\n");
+                goto fail;
+            }
+
+            // Destination buffer
+            if ((void*)ubuf== NULL){
+                printf("sys_network_receive: [FAIL] ubuf\n");
+                goto fail;
+            }
+
+            // Copy
+
+            // Copia do kernel para user mode.
+            if ( (void *) ubuf != NULL ){
+                memcpy( ubuf, src_buffer, Size);
+            } 
+
+            // Now the buffer is empty
+            // Então esse buffer não será lido por essa rotina
+            // até que o driver mude essa flag.
+            NETWORK_BUFFER.receive_status[head] =  FALSE;
+        
+            // ok: temos mensagem.
+            return TRUE;
         }
-
-        // Copy.
-
-        // Copia do kernel para user mode.
-        if ( (void *) ubuf != NULL ){
-            memcpy( ubuf, src_buffer, size);
-        } 
-
-        return 0;
     }
 
 fail:
     refresh_screen();        
-    return -1;
+    return FALSE;  // não temos mensagem.
 }
 
 
@@ -663,6 +713,7 @@ int networkInit (void)
             panic("networkInit: [FAIL] receive nbuffer\n");
         }
         NETWORK_BUFFER.receive_buffer[i] = (unsigned long) nbuffer;
+        NETWORK_BUFFER.receive_status[i] = FALSE;  //EMPTY
     };
     NETWORK_BUFFER.receive_tail =0;
     NETWORK_BUFFER.receive_head =0;
@@ -678,6 +729,7 @@ int networkInit (void)
             panic("networkInit: [FAIL] send nbuffer\n");
         }
         NETWORK_BUFFER.send_buffer[i] = (unsigned long) nbuffer;
+        NETWORK_BUFFER.send_status[i] = FALSE;  //EMPTY 
     };
     NETWORK_BUFFER.send_tail =0;
     NETWORK_BUFFER.send_head =0;

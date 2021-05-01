@@ -1,4 +1,5 @@
 # Credits: https://wiki.python.org/moin/UdpCommunication
+# 34884 = 8844
 
 import socket
 
@@ -7,7 +8,7 @@ import socket
 
 #Send to Gramado on virtualbox.
 UDP_IP = "192.1.1.112"
-UDP_PORT = 5005
+UDP_PORT = 34884
 MESSAGE = b"Hey Gramado!"
 
 print("UDP target IP: %s" % UDP_IP)

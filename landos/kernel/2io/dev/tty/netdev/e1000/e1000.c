@@ -434,7 +434,7 @@ void DeviceInterface_e1000(void)
 
 
     //
-    // Status.
+    // Status
     //
 
     // Status
@@ -443,7 +443,7 @@ void DeviceInterface_e1000(void)
     // 0x04 - Linkup
     // Start link.
     if (status & 0x04){
-        printf ("Start link\n");
+        printf ("DeviceInterface_e1000: Start link\n");
         refresh_screen();
         val = E1000ReadCommand ( currentNIC, 0 );
         E1000WriteCommand ( currentNIC, 0, val | 0x40 );
@@ -459,29 +459,26 @@ void DeviceInterface_e1000(void)
 
     // 0x80 - Reveive.
     } else if (status & 0x80){
-        //printf("xxxe1000handler: handler for NIC e1000");
-        //printf("e1000 handler ");
-        //refresh_screen();
+        
+        // #debug
+        // printf("DeviceInterface_e1000:  [DEBUG] Receive\n");
+        // refresh_screen();
 
         // #todo
         // Esse sequência está funcionando. Não mudar.
         // Precisamos entender ela melhor.
         // Todos os buffers de recebimento.
         // Olhamos um bit do status de todos os buffers.
+        // Sairemos do while qunado encontrarmos um buffer com o bit desativado.
    
         while ( (currentNIC->legacy_rx_descs[currentNIC->rx_cur].status & 0x01) == 0x01 ) 
         {
              old = currentNIC->rx_cur;
              len = currentNIC->legacy_rx_descs[old].length;
 
-             //#test: Apenas pegando o buffer para usarmos lodo adinate.
+             //#test: Apenas pegando o buffer para usarmos logo adinate.
              buffer = (unsigned char *) currentNIC->rx_descs_virt[old];
 
-             //se a inicialização está completa.
-             //if(____network_late_flag == 1){
-             //    network_buffer_in ( (void *) buffer, (int) len );
-             //}  
-                  
             //#bugbug: Não mais chamaremos a rotina de tratamento nesse momento.
             //chamaremos logo adiante, usando o buffer que pegamos acima.
 
@@ -496,7 +493,21 @@ void DeviceInterface_e1000(void)
 
             // ?? Provavelmente seleciona o buffer.
             E1000WriteCommand ( currentNIC, 0x2818, old );
+
+             // Se o bit de statos estava acionado, então copiamos esse
+             // buffer para outro acessível pelos aplicativos.
+             
+             if (____network_late_flag == TRUE){
+                 network_buffer_in ( (void *) buffer, (int) len );
+                 //printf("DeviceInterface_e1000: [DEBUG] iret\n");
+                 //refresh_screen();
+                 return;
+             }  
         };
+
+        // #test
+        // Retornamos pois mandamos os dados para o buffer durante o while
+        return;
 
         //
         // == ## Reagindo ## ===========================
@@ -541,21 +552,20 @@ void DeviceInterface_e1000(void)
         // bom seria que o processo init ou o network server acionasse
         // a flag que libera esse diálogo.
 
-        //#todo
-        if(____network_late_flag == TRUE)
-        {
-            // #importante
-            // Coloca o pacote em um dos buffers de entrada.
-            // Esses buffers são compartilhados e os aplicativos poderão ler.
-            // Enfileirar o buffer
+        // #todo
+        // #importante
+        // Coloca o pacote em um dos buffers de entrada.
+        // Esses buffers são compartilhados e os aplicativos poderão ler.
+        // Enfileirar o buffer
 
-            network_buffer_in ( (void *) buffer, (int) len );
-            
+        //if (____network_late_flag == TRUE)
+        //{
+        //    network_buffer_in ( (void *) buffer, (int) len );
             // Decodificar o buffer.
             // 8000 - decode buffer.
             //network_driver_dialog ( NULL, (int) 8000, 
                 //(unsigned long) &buffer[0], (unsigned long) &buffer[0] );
-        }
+        //}
 
         return;
     };
