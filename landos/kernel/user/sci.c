@@ -753,8 +753,9 @@ void *gde_extra_services (
 
     //==========================
     // 890 ~ 899 network stuff 
-    
-    // 890 - Receive.
+
+
+    // 890 - Receive
     // Colocaremos um pacode em um endereço indicado pelo usuário.
     // See: sci/net/network/network.c
     // IN: ubuf, len.
@@ -762,23 +763,18 @@ void *gde_extra_services (
     int status890=FALSE;
     if ( number == 890 ){
         status890 = (int) sys_network_receive ( (void *) arg2, (int) arg3 );
-        //if (status890 == TRUE)
-        //    printf("Status TRUE\n");
-        //if (status890 == FALSE)
-        //    printf("Status FALSE\n");
-        //refresh_screen();
         return (void *) status890; 
     }
 
-
-
-    // 891 - Send.
+    // 891 - Send
     // O usuário envia um buffer com um pacote.
     // See: sci/net/network/network.c
     // IN: ubuf, len.
+    // OUT: ?
+    int status891=FALSE;
     if ( number == 891 ){
-        return (void *) sys_network_send ( 
-                            (void *) arg2, (int) arg3 );
+        status891 = sys_network_send ( (void *) arg2, (int) arg3 );
+        return (void *) status891; 
     }
 
 

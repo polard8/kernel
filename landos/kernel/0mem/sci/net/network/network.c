@@ -1,5 +1,5 @@
 /*
- * File: sci/net/network.c
+ * File: sci/net/network/network.c
  *     
  *     Network sopport. 
  *     Ring 0, kernel base.
@@ -189,7 +189,6 @@ int network_buffer_in( void *buffer, int len )
  *     The app receives a packet from the system.
  */
 
-
 // #bugbug
 // Na verdade o tamanho total é no mínimo 
 // 14 + 20 + 20 + 1460.
@@ -205,20 +204,18 @@ sys_network_receive (
     void *ubuf, 
     int size )
 {
+
     void *src_buffer;
-
     int Size=0;
-
     int head=0;
 
-    debug_print("sys_network_receive:\n");
 
+    debug_print("sys_network_receive:\n");
 
     if ( (void*) ubuf == NULL ){
         debug_print("sys_network_receive: [ERROR] ubuf\n");
         return FALSE;
     }
-
 
     Size = size;
 
@@ -368,6 +365,7 @@ int network_buffer_out ( void *buffer, int len )
     {
         src_buffer = (void*) NETWORK_BUFFER.send_buffer[head];
        
+        // Aqui pode estar errado.
         if ((void*)src_buffer != NULL){
             memcpy( buffer, src_buffer, len );
         } 
@@ -397,16 +395,20 @@ sys_network_send (
 {
     void *src_buffer;
     int tail=0;
+    int Size=0;
 
     // #bugbug
     // Do not use this buffer here.
     // It is too big to be inside the kernel.
 
-    char xxxbuffer[4096];
-
+    //char xxxbuffer[4096];
+    char xxxbuffer[2048];
 
     debug_print("sys_network_send:\n");
 
+
+    // O buffer em ring3 onde está os dados 
+    // que o usuário quer enviar.
 
     if ( (void*) ubuf == NULL )
     {
@@ -414,6 +416,22 @@ sys_network_send (
         return -1;
     }
 
+
+    Size = size;
+
+    if (Size<=0){
+        debug_print("sys_network_send: [ERROR] Size\n");
+        return FALSE;
+    }
+
+    if (Size>1500){
+        Size=1500;
+        debug_print("sys_network_send: [FIXME] Size limit\n");
+        //return -1;
+    }
+
+
+    // ---
 
     // O aplicativo esta colocando no tail.
     tail = NETWORK_BUFFER.send_tail;
@@ -430,20 +448,20 @@ sys_network_send (
     {
         src_buffer = NETWORK_BUFFER.send_buffer[tail];
     
-        if ((void*)ubuf== NULL){
-            printf("sys_network_send: [FAIL] ubuf\n");
+        if ((void*)src_buffer== NULL){
+            printf("sys_network_send: [FAIL] src_buffer\n");
             goto fail;
         }
 
-        if ((void*)src_buffer== NULL){
-            printf("sys_network_send: [FAIL] src_buffer\n");
+        if ((void*)ubuf== NULL){
+            printf("sys_network_send: [FAIL] ubuf\n");
             goto fail;
         }
 
         // Copiamos do buffer do usuario para um dos buffers
         // do nic.
         if ( (void *) ubuf != NULL ){
-            memcpy ( src_buffer, ubuf, size); 
+            memcpy ( src_buffer, ubuf, Size ); 
         }
         
         // #bugbug
@@ -457,13 +475,10 @@ sys_network_send (
         // Coloque nesse buffer o conteúdo do head
         // na lista de buffers para enviar.
         // depois enviaremos abaixo.
-        
-        // ??
-        // 
+
         network_buffer_out (xxxbuffer,1500);
-        
-        // ??
         network_send_packet (xxxbuffer,1500);
+
 
         // OK.
         return 0;
@@ -1466,21 +1481,44 @@ network_SendIPV4_UDP (
 
 
 
-//IN: 
-//buffer: a packet sent by the user.
+// Low level routine to send a packet to the network
+// using the nic controller.
+// #todo: Move this routine to io/ folder.
+// This routine belongs to device driver.
+// IN: 
+// buffer: a packet sent by the user.
+
+// #bugbug
+// Esse buffer aí nem fou usado.
+// Talvez precisamos copiar o conteúdo que está nesse buffer
+// para o buffer encontrado da estrutura do driver de dispositivo.
+
 void network_send_packet(void *ubuffer, int len)
 {
     debug_print ("network_send_packet: done\n");
-    
+
+    // The current nic controller.
+    // #todo: We need to receive this pointer as a parameter.
+
     if ( currentNIC == NULL ){
         printf ("network_send_packet: currentNIC fail\n");
         return;
     }
-    
-    //#bugbug
-    //è esse o buffer certo para enviar???
+
+
+    // Pegamos o buffer que usaremos para enviar.
+    // #bugbug
+    // É esse o buffer certo para enviar?
+
     uint16_t old = currentNIC->tx_cur;
+
     unsigned char *dst_buf = (unsigned char *) currentNIC->tx_descs_virt[old];
+
+    // #todo
+    // Precisamos copiar o conteúdo de ubuffer em dst_buf ?
+
+
+    // Configuramos o seu tamanho.
 
     currentNIC->legacy_tx_descs[old].length = (len);
 
@@ -1495,20 +1533,15 @@ void network_send_packet(void *ubuffer, int len)
 	//currentNIC->legacy_tx_descs[0].cmd = TDESC_CMD_IFCS | TDESC_CMD_RS | TDESC_CMD_EOP;
 	//currentNIC->legacy_tx_descs[0].cmd = TDESC_EOP | TDESC_RS; //intel code
 
-	//cmd
+	// cmd
     currentNIC->legacy_tx_descs[old].cmd = 0x1B;
 
-	//status
+	// status
     currentNIC->legacy_tx_descs[old].status = 0;
-
-	// Current TX.
-	// Qual � o buffer atual para transmiss�o.
-    currentNIC->tx_cur = ( currentNIC->tx_cur + 1 ) % 8;
 
 
 	//css
 	//currentNIC->legacy_tx_descs[0].css
-
 
 	//??
 	//special ?
@@ -1516,22 +1549,26 @@ void network_send_packet(void *ubuffer, int len)
 
 
 
-
-	//
-	// ==== # SEND # ======
-	//
-
+//
+// == Send ========================================
+//
 
 
     // #importante: 
     // Diga ao controlador qual é o índice do descritor a ser usado 
     // para transmitir dados.
 
-	// TDH	= 0x3810,    /* Tx Descriptor Head */
-	// TDT	= 0x3818,    /* Tx Descriptor Tail */
+    // TDH	= 0x3810,    /* Tx Descriptor Head */
+    // TDT	= 0x3818,    /* Tx Descriptor Tail */
 
-	// *( (volatile unsigned int *)(currentNIC->mem_base + 0x3810)) = 0;
+    // ?
+    // *( (volatile unsigned int *)(currentNIC->mem_base + 0x3810)) = 0;
+
+    // #bugbug: Esse é o indice depois de circularmos.
+    // Deveríamos usar aqui o 'old', que é o indice antes de circularmos.
+    // *( (volatile unsigned int *)(currentNIC->mem_base + 0x3818)) = old;
     *( (volatile unsigned int *)(currentNIC->mem_base + 0x3818)) = currentNIC->tx_cur;
+
 
 
 	// #debug
@@ -1545,11 +1582,14 @@ void network_send_packet(void *ubuffer, int len)
          if ( (currentNIC->legacy_tx_descs[old].status & 0xFF) == 1 )
          {
               debug_print ("network_send_packet: done [timeout]\n");
-              //printf ("Ok");
-              return;
+              printf ("Ok");
+              goto done;
+              //return;
          }
     }
-    
+
+done:
+
     //#todo
     /*
     while ( !(currentNIC->legacy_tx_descs[old].status & 0xFF) )
@@ -1557,6 +1597,16 @@ void network_send_packet(void *ubuffer, int len)
         // Nothing.
     };
     */
+
+    // Circulando depois de usarmos.
+    // Current TX.
+    // Qual é o buffer atual para transmissao.
+    // ?? Acho que aqui estamos circulando e definindo qual
+    // será o próximo que usaremos quando chamarmos essa 
+    // rotina novamente.
+
+    currentNIC->tx_cur = ( currentNIC->tx_cur + 1 ) % 8;
+
 
     debug_print ("metwork_send_packet: done\n");
 }

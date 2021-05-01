@@ -287,27 +287,21 @@ void __shellTestARP (void)
 /*
  *************************** 
  * network_initialize:
- *     
+ * 
  */
 
 void network_initialize (void)
 {
-
-    //
-    // Initialize network support.
-    //
-
-
     debug_print("network_initialize:\n");
-    printf     ("network_initialize: Initializing the ring0 network manager...\n");
+
+    // Initialize network support.
+
+    printf ("network_initialize: Initializing the ring0 network manager...\n");
     gramado_system_call (968,0,0,0);
 
-    //
     // Send ARP packet.
-    //
 
-    debug_print("network_initialize: Sending arp\n");
-    printf     ("network_initialize: Sending arp\n");
+    printf ("network_initialize: Sending arp\n");
     __shellTestARP();
 }
 
