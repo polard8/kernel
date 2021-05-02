@@ -477,8 +477,6 @@ void print_ipv4_header ( char *ipv4_buffer )
 
     PayloadOffset = (int)( 4 * Lenght );
 
-
-
     //protocol
     char Protocol_char = 0;
     int Protocol = 0;
@@ -486,31 +484,29 @@ void print_ipv4_header ( char *ipv4_buffer )
     Protocol_char = (char) buf[9];  
     Protocol = (int) Protocol_char;
 
-    // 6
-    // 17 
-
     //printf ("ipv4: Ver=%d ihl=%d Protocol=%d PayloadOffset=%d\n",
     //    Version,
     //    Lenght,
     //    Protocol,
     //    PayloadOffset );
-    
+
+    printf ("ipv4: Ver=%d Protocol=%d \n",
+        Version, Protocol );
     
     //
-    // payload
+    // Protocol
     //
-        
-    // limit
-    // buf[PayloadOffset+32] = 0;
 
     if ( Protocol == 6 ){
         //printf ("TCP: \n");
         print_tcp_header( (char *) &buf[PayloadOffset] );
+        return;
     }
     
     if ( Protocol == 17 ){
         //printf ("UDP: \n");
         print_udp_header( (char *) &buf[PayloadOffset] );
+        return;
     }
 } 
 
@@ -530,15 +526,15 @@ void print_udp_header ( char *udp_buffer )
 
     SourcePort      = gdeshell_FromNetByteOrder16(SourcePort);
     DestinationPort = gdeshell_FromNetByteOrder16(DestinationPort);
-    
+
     printf ("udp: s={%x} d={%x} \n", 
         SourcePort, DestinationPort);
 
 
     // Drop
-    if ( DestinationPort != 34884 ){
-        return;
-    }
+    //if ( DestinationPort != 34884 ){
+    //    return;
+    //}
 
 
     // #todo
@@ -554,6 +550,10 @@ void print_udp_header ( char *udp_buffer )
     if ( DestinationPort == 34884 ){
         printf("[PAYLOAD UDP 34884]: %s\n", &buf[payloadOffset] );
     }
+
+    if ( DestinationPort == 80 ){
+        printf("[PAYLOAD UDP 80]: %s\n", &buf[payloadOffset] );
+    }
 }
 
 
@@ -567,22 +567,27 @@ void print_tcp_header ( char *tcp_buffer )
     unsigned short SourcePort=0;
     unsigned short DestinationPort=0;
 
+
+    SourcePort      = (unsigned short) buf16[0]; //segunda short
     DestinationPort = (unsigned short) buf16[1]; //segunda short
 
 
-    //SourcePort      = gdeshell_FromNetByteOrder16(SourcePort);
+    SourcePort      = gdeshell_FromNetByteOrder16(SourcePort);
     DestinationPort = gdeshell_FromNetByteOrder16(DestinationPort);
 
+    // #debug: it works
+    printf ("tcp: s={%x} d={%x} \n", 
+        SourcePort, DestinationPort);
 
-    //printf ("tcp: Destination Port = {%d}\n",DestinationPort);
+    // Drop
+    //if ( DestinationPort != 34884 ){
+    //    return;
+    //}
+
 
     //#debug
-    return;
+    //return;
     
-    // Drop
-    if ( DestinationPort != 34884 ){
-        return;
-    }
 
 
     unsigned long SequenceNumber=0;
@@ -630,9 +635,15 @@ void print_tcp_header ( char *tcp_buffer )
     // limit
     buf[PayloadOffset + 32] = 0;
 
-    //if (DestinationPort == 34884){
+
+    // gramado
+    if (DestinationPort == 34884 ){
         printf ("[PAYLOAD TCP 34884]: %s\n", &buf[PayloadOffset]);
-    //}
+    }
+    
+    if (DestinationPort == 80 ){
+        printf ("[PAYLOAD TCP 80]: %s\n", &buf[PayloadOffset]);
+    }
 } 
 
 
@@ -733,32 +744,10 @@ int network_decode_buffer ( unsigned long buffer_address )
         
         case 0x0800:
             if ( IgnoreIPV4 == TRUE ){ return 0; }
- 
             // printf ("[0x0800]: IPV4 received\n");
-
-
-           print_ipv4_header ( (char *) buffer_address + ETHERNET_HEADER_LENGHT );
-
-           //#test
-           //notificando ...(ok funcionou.)
-           //network_procedure ( NULL, 3000, 0,0 ); 
-
-           //printf("[PAYLOAD]: %s\n", &buf[51] );
-                       
-           //printf("[PAYLOAD]:\n");
-           //for(i=54; i< 200; i++)
-           //{
-           //    c = buf[i];
-           //    printf("%c",c);
-           //}
-           
-           // #debug
-           //printf("todo: Internet Protocol version 4 (IPv4)\n");
-           //printf("IPv4 ");
-           //do_ipv4 ( (unsigned long) buffer_address );
-           //refresh_screen ();
-           return 0;
-           break;
+            print_ipv4_header ( (char *) buffer_address + ETHERNET_HEADER_LENGHT );
+            return 0;
+            break;
 
         //::: ARP
         //0x0806	Address Resolution Protocol (ARP)
@@ -766,17 +755,11 @@ int network_decode_buffer ( unsigned long buffer_address )
         //fazermos tudo aqui. kkk.
         case 0x0806:
             if ( IgnoreARP == TRUE ){ return 0; }
-
-            printf ("[0x0806]: ARP received\n");
-
+            //printf ("[0x0806]: ARP received\n");
             print_arp_header ((char *)buffer_address + ETHERNET_HEADER_LENGHT );
-                   
-            //printf("\nARP ");
-            //do_arp ((unsigned long) buffer_address );
-            //refresh_screen ();
             return 0;
             break;
-            
+
         //::: SNMP
         // Simple Network Management Protocol.
         case 0x814C:
@@ -784,20 +767,12 @@ int network_decode_buffer ( unsigned long buffer_address )
             printf ("[0x814C]: SNMP received\n");
             return 0;
             break;
-            
-        
-            
+
         //::: IPV6
         //0x86DD	Internet Protocol Version 6 (IPv6)
         case 0x86DD:
             if ( IgnoreIPV6 == TRUE ){ return 0; }
             printf ("[0x86DD]: IPV6 received\n");
-
-            //refresh_screen ();
-        
-            //printf ("IPv6 ");
-            //do_ipv6 ( (unsigned long) buffer_address );
-            //refresh_screen ();
             return 0;
             break;
 
@@ -884,7 +859,8 @@ void network_loop(void)
             //printf("Status TRUE\n");
             network_decode_buffer ((unsigned long) &buf[0]);
             
-            for (i=0; i<4096; i++){  buf[i] = 0;  };
+            //for (i=0; i<4096; i++){  buf[i] = 0;  };
+            for (i=0; i<128; i++){  buf[i] = 0;  };
         }
 
         //#test: OK. o led indica que esta enviando.

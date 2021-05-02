@@ -43,12 +43,16 @@ techniques:
  
 // See:
 // https://wiki.osdev.org/Intel_8254x
+// https://wiki.osdev.org/Intel_Ethernet_i217
+// ...
 
  
 #include <kernel.h>
 
 
 // How many buffers.
+// #define E1000_NUM_TX_DESC 8
+// #define E1000_NUM_RX_DESC 32
 #define SEND_BUFFER_MAX       8
 #define RECEIVE_BUFFER_MAX   32
 
@@ -487,22 +491,27 @@ void DeviceInterface_e1000(void)
 
             // zera.
             currentNIC->legacy_rx_descs[old].status = 0;
-            
-            // circula. (32 buffers)
-            currentNIC->rx_cur = (currentNIC->rx_cur + 1) % RECEIVE_BUFFER_MAX; 
 
-            // ?? Provavelmente seleciona o buffer.
+            // ?? Provavelmente seleciona o buffer antes de circular.
             E1000WriteCommand ( currentNIC, 0x2818, old );
+            
 
              // Se o bit de statos estava acionado, então copiamos esse
              // buffer para outro acessível pelos aplicativos.
              
-             if (____network_late_flag == TRUE){
+             // Envia para o buffer do gramado.
+             if (____network_late_flag == TRUE)
+             {
                  network_buffer_in ( (void *) buffer, (int) len );
                  //printf("DeviceInterface_e1000: [DEBUG] iret\n");
                  //refresh_screen();
-                 return;
              }  
+
+             // circula. (32 buffers)
+             // Seleciona o próximo buffer.
+             currentNIC->rx_cur = (currentNIC->rx_cur + 1) % RECEIVE_BUFFER_MAX; 
+            
+             return;
         };
 
         // #test
@@ -745,6 +754,9 @@ int e1000_reset_controller (void){
     // tx_descs_phys conterá o endereço físico e
     // legacy_tx_descs conterá o endereço virtual.
 
+    // IN:  size, return virtual address.
+    // OUT: physical address
+
     currentNIC->tx_descs_phys = E1000AllocCont ( 0x1000, (uint32_t *)(&currentNIC->legacy_tx_descs) );
 
 	// We failed, unmap everything
@@ -761,8 +773,13 @@ int e1000_reset_controller (void){
     for ( i=0; i < 8; i++ ) 
     {
         // Alloc the phys/virt address of this transmit desc
-        // alocamos memória para o buffer, salvamos o endereço físico do buffer e 
+        // alocamos memória para o buffer, 
+        // salvamos o endereço físico do buffer e 
         // obtemos o endereço virtual do buffer.		
+
+        // IN:  size, return virtual address.
+        // OUT: physical address
+
         currentNIC->legacy_tx_descs[i].addr  = E1000AllocCont ( 0x3000, &currentNIC->tx_descs_virt[i] );
         currentNIC->legacy_tx_descs[i].addr2 = 0;
 
@@ -772,6 +789,9 @@ int e1000_reset_controller (void){
         {
             panic ("e1000_reset_controller: [FAIL] dev->rx_descs[i].addr\n");
         }
+        
+        // #test: Configurando o tamanho do buffer
+        currentNIC->legacy_tx_descs[i].length = 0x3000;
 
         //cmd: bits
         //IDE VLE DEXT RSV RS IC IFCS EOP
@@ -820,6 +840,10 @@ int e1000_reset_controller (void){
     for ( i=0; i < 32; i++ ) 
     {
         // Alloc the phys/virt address of this transmit desc
+
+        // IN:  size, return virtual address.
+        // OUT: physical address
+
         currentNIC->legacy_rx_descs[i].addr  = E1000AllocCont ( 0x3000, (uint32_t *) &currentNIC->rx_descs_virt[i] );
         currentNIC->legacy_rx_descs[i].addr2 = 0;
 
@@ -829,6 +853,9 @@ int e1000_reset_controller (void){
         {
             panic ("e1000_reset_controller: [FAIL] dev->rx_descs[i].addr\n");
         }
+
+        // #test: Configurando o tamanho do buffer
+        currentNIC->legacy_rx_descs[i].length = 0x3000;
 
         currentNIC->legacy_rx_descs[i].status = 0;
     };
@@ -1076,8 +1103,12 @@ E1000ReadCommand (
 
 
 /*
+ ********************************************************
  * E1000AllocCont: ??
- * retorna o endereço físico e coloca o virtual em *virt
+ *     
+ *     Retorna o endereço físico e 
+ * coloca o virtual em *virt
+ * 
  * ah ... então eu vou alocar usando endereços virtuais
  * ... e traduzir para físico 
  * ... colocar o virtual em *virt e retornar o físico.
@@ -1087,7 +1118,8 @@ E1000ReadCommand (
 // + alocamos um endereço virtual
 // + convertemos para fisico
 
-// IN: size, return pointer.
+// IN:  size, return virtual address.
+// OUT: physical address
 
 uint32_t 
 E1000AllocCont ( 

@@ -126,9 +126,13 @@ int network_buffer_in( void *buffer, int len )
         panic ("network_buffer_in: buffer\n");
     }
 
+    // #todo
+    // Veja na configuração do dispositivo, que o buffer 
+    // configurado para o hardware é de 0x3000 bytes.
     if(len>1500){
         debug_print("network_buffer_in: [FIXME] len\n");
-        return -1;
+        len = 1500;
+        //return -1;
     }
 
     if (NETWORK_BUFFER.initialized != TRUE){
@@ -151,10 +155,11 @@ int network_buffer_in( void *buffer, int len )
     //refresh_screen();
 
 
-        
-    if(tail<0)
+    if (tail<0){
         return -1;
-        
+    }
+
+
     // Pega o destination buffer.
     if (tail<32)
     {
@@ -162,8 +167,18 @@ int network_buffer_in( void *buffer, int len )
         // Vamos sobrepor ?
         if ( NETWORK_BUFFER.receive_status[tail] == TRUE )
         {
+            // #bugbug
+            // #todo: Podemos criar um contador de vezes que isso acontece.
+            
+            //
+            // Isso acontece frequentemente.
+            //
+            
+            // panic ("network_buffer_in: [TEST] Not responding ...\n");
+            //printf ("network_buffer_in: [FIXME] Can't write. This buffer is full.\n");
+            //refresh_screen();
         }
-        
+
         dst_buffer = (void*) NETWORK_BUFFER.receive_buffer[tail];
        
         if ((void*)dst_buffer != NULL){
@@ -185,6 +200,7 @@ int network_buffer_in( void *buffer, int len )
 /*
  ******************************************
  * sys_network_receive:
+ * 
  *     Service 890.
  *     The app receives a packet from the system.
  */
@@ -269,14 +285,20 @@ sys_network_receive (
             src_buffer = NETWORK_BUFFER.receive_buffer[head];
     
             // Source buffer
+            // pertence ao driver de dispositivo
+            // não pode ser null de jeito nenhum, senão a inicialização falhou.
             if ((void*)src_buffer== NULL){
-                printf("sys_network_receive: [FAIL] src_buffer\n");
-                goto fail;
+                panic ("sys_network_receive: [FAIL] src_buffer\n");
+                //printf("sys_network_receive: [FAIL] src_buffer\n");
+                //goto fail;
             }
 
             // Destination buffer
             if ((void*)ubuf== NULL){
                 printf("sys_network_receive: [FAIL] ubuf\n");
+                
+                // #test libera o buffer
+                NETWORK_BUFFER.receive_status[head] =  FALSE;
                 goto fail;
             }
 
@@ -327,9 +349,13 @@ int network_buffer_out ( void *buffer, int len )
 
     // #bugbug:
     // Isso pode ser maior se considerarmos todos os headers.
+    // #todo
+    // Veja na configuração do dispositivo, que o buffer 
+    // configurado para o hardware é de 0x3000 bytes.
     if (len>1500){
         debug_print("network_buffer_out: [FIXME] len\n");
-        return -1;
+        len=1500;
+        //return -1;
     }
 
     if (NETWORK_BUFFER.initialized != TRUE){
