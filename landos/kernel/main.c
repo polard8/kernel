@@ -486,7 +486,7 @@ int kernel_main (int arch_type)
 fail2:
     printf ("kernel_main: Fail. *HANG\n");
     refresh_screen();
-    
+
 // Only serial debug support.
 fail1:    
     PROGRESS("Kernel:0:0\n"); 
@@ -499,64 +499,21 @@ fail0:
 
 
 
-// ==============  idle thread in ring 0  ===============
-//#test
-//Ok, está funcionando. :)
-// Esse negócio do cli e dead)thread_collector funcionou bem,
-// mas precisamos atualizar o contador de threads rodando.
-// Precisa decrementar o contador, e´o problema está aí,
-// precisa checar se decrementar esse contador causa algum efeito 
-// negativo.
-// É necessário de decrementemos o contador.
-// Isso é uma thread em ring 0 que será usada como idle.
-// #importante
-// Suspendemos o uso do dead thread collector por enquanto.
-// Para usarmos a instrução hlt e calcularmos 
-// quanto tempo ficamos parados e quanto tempo ficamos rodando.
-// ring0 thread.
-// Protóripo de função interna.
+// == Idle thread in ring 0  ===============
+// #test
+
+// #bugbug
+// This thread will start to run at the moment when
+// the init process enable the interrupts.
 
 void ring0_IdleThread (void)
 {
 
-	// Initializing ...
-	// #importante:
-	// Quando a thread inicializa ela muda o status do dead thread collector,
-	// liberando rotinas que dependam dele estar funcionando.
-
-    // deprecated.
-    // dead_thread_collector_status = 1;
-
-
-    //
-    // loop.
-    //
-
-    // sti/hlt 
-
-	// Importante:
-	// Efetuamos o halt com as interrupções habilitadas.
-	// Então na primeira interrupção o sistema volta a funcionar.
-	// Se as interrupções estivessem desabilitadas, então esse hlt
-	// paralizatia o sistema.
-	
-	// #Ok, essa função é muito boa,
-	// Mas o ideia é chamarmos ela apenas quando o
-	// sistema estiver ocioso, para que não fiquemos um quantum inteiro
-	// inativo.
-	
-	// Avisa que o dead thread collector pode dormir.
-	// Não chamaremos a função agora porque estamos usando ele.
-	// Vamos apenas sinalizar que queremos que ele durma.
-
 Loop:
-    //dead_thread_collector ();
     asm ("sti");
-    //dead_thread_collector_flag = 0;
     asm ("hlt");
     goto Loop;
 }
-
 
 
 //

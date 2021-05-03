@@ -707,10 +707,19 @@ int x86main (void)
 	// obs: Mesmo não sendo ela o primeiro TID.
 	// See: core/ps/create.c
 
-    RING0IDLEThread = (void *) create_CreateRing0IdleThread();
+    // #bugbug
+    // O problema é que se essa thread começa afuncionar
+    // antes mesmo do processo init habilitar as interrupções,
+    // então o sistema vai falhar.
+    // #todo
+    // Como essa thread funciona sendo apenas uma rotina sti/hlt,
+    // podemos deixar ela como idle thread somente nos estágios 
+    // iniciais, sendo substituida por outra quando fot possível.
 
-    if ( (void *) RING0IDLEThread == NULL ){
-        panic ("x86main: RING0IDLEThread\n");
+    EarlyRING0IDLEThread = (void *) create_CreateRing0IdleThread();
+
+    if ( (void *) EarlyRING0IDLEThread == NULL ){
+        panic ("x86main: EarlyRING0IDLEThread\n");
     }else{
 
         // Idle thread
@@ -718,47 +727,32 @@ int x86main (void)
         // We can use a method in the scheduler for this.
         // Or in the dispatcher?
 
-        ____IDLE = (struct thread_d *) RING0IDLEThread;
+        ____IDLE = (struct thread_d *) EarlyRING0IDLEThread;
 
 
-        RING0IDLEThread->position = KING;
+        EarlyRING0IDLEThread->position = KING;
         
         // #todo
-        //processor->IdleThread  = (void *) RING0IDLEThread;    
-        //____IDLE = (void *) RING0IDLEThread;  
+        //processor->IdleThread  = (void *) EarlyRING0IDLEThread;    
+        //____IDLE = (void *) EarlyRING0IDLEThread;  
 
-        //RING0IDLEThread->ownerPID =  (int) KernelProcess->pid; 
+        //EarlyRING0IDLEThread->ownerPID =  (int) KernelProcess->pid; 
 
-        RING0IDLEThread->tss = current_tss;
-		
-		// priority and quantum.
-	    //set_thread_priority ( (struct thread_d *) RING0IDLEThread,
-	        //PRIORITY_HIGH4 );
+        EarlyRING0IDLEThread->tss = current_tss;
 
-	    //set_thread_priority ( (struct thread_d *) RING0IDLEThread,
-	        //PRIORITY_LOW1 );
-
-
-	    //set_thread_priority ( (struct thread_d *) RING0IDLEThread,
-	        //PRIORITY_LOW3 );
-
-        // funcionou no mínimo.
-        // com multiplicador 3. quantum = (1*3=3)
-        set_thread_priority ( (struct thread_d *) RING0IDLEThread,
+        set_thread_priority ( 
+            (struct thread_d *) EarlyRING0IDLEThread,
             PRIORITY_MIN );
-
-        //set_thread_priority ( (struct thread_d *) RING0IDLEThread,
-            //PRIORITY_NORMAL );
 
 		// #importante
 		// Sinalizando que ainda não podemos usar as rotinas que dependam
 		// de que o dead thread collector esteja funcionando.
 		// Esse status só muda quando a thread rodar.
 
-		dead_thread_collector_status = 0;
-		//...
-    };
+        dead_thread_collector_status = FALSE;
 
+        // ...
+    };
 
     // debug
     //printf("I\n");

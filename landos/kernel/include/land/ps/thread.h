@@ -767,12 +767,22 @@ struct thread_d *____IDLE;
 // Essa é a criada para o processo kernel.
 // Ela roda em ring0 e será usada como idle.
 // RING0 IDLE Thread. TID=3
-struct thread_d *RING0IDLEThread;    
+
+    // #bugbug
+    // O problema é que se essa thread começa afuncionar
+    // antes mesmo do processo init habilitar as interrupções,
+    // então o sistema vai falhar.
+    // #todo
+    // Como essa thread funciona sendo apenas uma rotina sti/hlt,
+    // podemos deixar ela como idle thread somente nos estágios 
+    // iniciais, sendo substituida por outra quando fot possível.
+
+struct thread_d *EarlyRING0IDLEThread;    
 
 
 // Essa é a thread de controle do processo init2.bin
 // É o primeiro processo em ring3.
-// Idle Thread. TID=0
+// Idle Thread. TID=0    
 struct thread_d *InitThread;         
 
 
