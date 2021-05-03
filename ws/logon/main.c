@@ -236,7 +236,7 @@ int gws(void)
 
 // local
 int 
-gwsProcedure ( 
+logonProcedure ( 
     int fd,
     void *window, 
     int msg, 
@@ -290,7 +290,7 @@ gwsProcedure (
                     //gws_redraw_window(fd, logon_window, 1); 
                     //gws_refresh_window(fd, logon_window);
                     //break;
-                
+
                 default:
                     printf("%c",long1); fflush(stdout);
                     break;
@@ -305,12 +305,14 @@ gwsProcedure (
                 
                 // UI
                 case VK_F1: 
-                    gws_clone_and_execute("gwm.bin");       
+                    gws_clone_and_execute("gwm.bin");
+                    return 0;
                     break;
                 
                 // REBOOT
                 case VK_F2: 
                     gws_clone_and_execute("reboot.bin");  
+                    return 0;
                     break;
                     
                 //case VK_F3: gws_clone_and_execute("fileman.bin");   break;
@@ -857,7 +859,7 @@ int main ( int argc, char *argv[] )
             // Nesse caso chamados 'continue;'
             // Caso contrário podemos chamar outros diálogos.
 
-            gwsProcedure ( 
+            logonProcedure ( 
                 client_fd,
                 (void*) RTLEventBuffer[0], 
                 RTLEventBuffer[1], 

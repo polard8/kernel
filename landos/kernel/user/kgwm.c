@@ -1641,7 +1641,8 @@ __kgwm_ps2kbd_procedure (
                         refresh_screen();
                     }
                     if (shift_status == TRUE){
-                        __kgwm_SendMessageToInitProcess(9218);  // redpill application
+                       // #bugbug: Something is wrong with this routine.
+                       //__kgwm_SendMessageToInitProcess(9218);  // redpill application
                     }
                     return 0;
                     break;

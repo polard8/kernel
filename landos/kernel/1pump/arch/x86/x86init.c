@@ -716,7 +716,7 @@ int x86main (void)
     // podemos deixar ela como idle thread somente nos estágios 
     // iniciais, sendo substituida por outra quando fot possível.
 
-    EarlyRING0IDLEThread = (void *) create_CreateRing0IdleThread();
+    EarlyRING0IDLEThread = (void *) create_CreateEarlyRing0IdleThread();
 
     if ( (void *) EarlyRING0IDLEThread == NULL ){
         panic ("x86main: EarlyRING0IDLEThread\n");

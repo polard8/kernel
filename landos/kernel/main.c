@@ -506,9 +506,9 @@ fail0:
 // This thread will start to run at the moment when
 // the init process enable the interrupts.
 
-void ring0_IdleThread (void)
+void early_ring0_IdleThread (void)
 {
-
+// #danger: Do NOT change this function.
 Loop:
     asm ("sti");
     asm ("hlt");

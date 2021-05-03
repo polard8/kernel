@@ -15,7 +15,7 @@
  * thread rodando.
  */
 
-void *create_CreateRing0IdleThread(void)
+void *create_CreateEarlyRing0IdleThread(void)
 {
     
     struct thread_d  *kThread;
@@ -29,16 +29,16 @@ void *create_CreateRing0IdleThread(void)
     register int q=0;    // Message queue.
 
 
-    char *ThreadName = "Ring0IdleThread";
+    char *ThreadName = "EarlyRing0IdleThread";
 
     // Stack pointer.
-    void *ring0IdleStack; 
+    void *earlyRing0IdleStack; 
 
 
     // The kernel process.
 
     if ( (void *) KernelProcess == NULL ){
-        panic ("create_CreateRing0IdleThread: KernelProcess\n");
+        panic ("create_CreateEarlyRing0IdleThread: KernelProcess\n");
     }
 
     // ??
@@ -51,7 +51,7 @@ void *create_CreateRing0IdleThread(void)
     kThread = (void *) kmalloc ( sizeof(struct thread_d) );
 
     if ( (void *) kThread == NULL ){
-        panic ("create_CreateRing0IdleThread: kThread \n");
+        panic ("create_CreateEarlyRing0IdleThread: kThread \n");
     }else{  
 
         kThread->objectType  = ObjectTypeThread;
@@ -98,19 +98,23 @@ void *create_CreateRing0IdleThread(void)
     // nesse caso serve para a thread idle em ring 0.
     // 8KB
 
-    ring0IdleStack = (void *) kmalloc (8*1024);
+    int StackSize = (8*1024);
 
-    if ( (void *) ring0IdleStack == NULL ){
-        panic ("create_CreateRing0IdleThread: ring0IdleStack\n");
+    earlyRing0IdleStack = (void *) kmalloc (StackSize);
+
+    if ( (void *) earlyRing0IdleStack == NULL ){
+        panic ("create_CreateEarlyRing0IdleThread: earlyRing0IdleStack\n");
     }
 
+    // #todo
+    // Clear stack
 
     // Page Directory
 
     kThread->DirectoryPA = (unsigned long ) KernelProcess->DirectoryPA;
 
     if ( kThread->DirectoryPA == 0 ){
-        panic("create_CreateRing0IdleThread: kThread->DirectoryPA\n");
+        panic("create_CreateEarlyRing0IdleThread: kThread->DirectoryPA\n");
     }
 
     // loop
@@ -220,10 +224,10 @@ void *create_CreateRing0IdleThread(void)
 
     // Stack frame.
     kThread->ss     = 0x10 | 0; 
-    kThread->esp    = (unsigned long) ( ring0IdleStack + (8*1024) );  //Stack
+    kThread->esp    = (unsigned long) ( earlyRing0IdleStack + (8*1024) );  //Stack
     kThread->eflags = 0x0200;    // # Atenção !!  
     kThread->cs     = 8 | 0; 
-    kThread->eip    = (unsigned long) ring0_IdleThread;  //See: main.c
+    kThread->eip    = (unsigned long) early_ring0_IdleThread;  //See: main.c
 
     kThread->ds = 0x10 | 0;
     kThread->es = 0x10 | 0;

@@ -844,14 +844,16 @@ struct thread_list_d
 // ==  prototypes ============================================
 //
 
-void ring0_IdleThread (void);
 
+// Early ring0 idle thread.
+void early_ring0_IdleThread (void);
+void *create_CreateEarlyRing0IdleThread (void);
 
-void *create_CreateRing0IdleThread (void);
+// Control thread for ring 3 init process.
 void *create_CreateRing3InitThread (void);
 
 
-//clona uma thread e retorna o ponteira da clone.
+// Clona uma thread e retorna o ponteira da clone.
 struct thread_d *threadCopyThread ( struct thread_d *thread );
 
 
