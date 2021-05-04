@@ -211,7 +211,7 @@ int sys_dup3 (int oldfd, int newfd, int flags){
         return -1;
     }else{
 
-         if ( Process->used != 1 || Process->magic != 1234 )
+         if ( Process->used != TRUE || Process->magic != 1234 )
          {
              return -1;
          }
@@ -221,10 +221,10 @@ int sys_dup3 (int oldfd, int newfd, int flags){
 
     int slot = newfd;
 
-	if ( slot == -1 ) {
-		Process->Objects[slot] = (unsigned long) 0;
-	    return -1;
-	}
+    if ( slot == -1 ) {
+        Process->Objects[slot] = (unsigned long) 0;
+        return -1;
+    }
 
 	//#todo: filtrar oldfd
 	
@@ -238,10 +238,11 @@ int sys_dup3 (int oldfd, int newfd, int flags){
 
         f_new = (file *) Process->Objects[slot];
 
-		if ( (void *) f_new == NULL ){
-		    Process->Objects[slot] = (unsigned long) 0;
-	        return -1;
-		}
+        if ( (void *) f_new == NULL )
+        {
+            Process->Objects[slot] = (unsigned long) 0;
+            return -1;
+        }
 
         f_new->used  = TRUE;
         f_new->magic = 1234;
@@ -396,10 +397,10 @@ int sys_pipe ( int *pipefd, int flags )
     // As duas estruturas compartilham o mesmo buffer.
     }else{
         
-        f1->used  = TRUE;  
+        f1->used  = TRUE;
         f1->magic = 1234;
- 
-        f2->used  = TRUE;  
+        
+        f2->used  = TRUE;
         f2->magic = 1234;
 
         // File: object type.

@@ -18,8 +18,9 @@
 /*
  **********************************************************************
  * search_in_dir:
- *    Procura por um arquivo, dado o endereço do diretório, com o diretório 
- * já carregado na memória.
+ * 
+ *    Procura por um arquivo, dado o endereço do diretório, 
+ * com o diretório já carregado na memória.
  *
  *   file_name: Nome do arquivo.
  *     address: Endereço na memória onde o diretório está.

@@ -631,18 +631,19 @@ int print ( char **out, int *varg ){
     {
         if ( *format == '%' ) 
         {
-			++format;
-			width = pad = 0;
+            ++format;
+
+            width = pad = 0;
 
             if ( *format == '\0' ) { break; }
             if ( *format == '%' )  { goto ____out; }
 
-			if ( *format == '-' ) 
-			{
-				++format;
-				pad = PAD_RIGHT;
-			};
-			
+            if ( *format == '-' )
+            {
+                ++format;
+                pad = PAD_RIGHT;
+            }
+
 			while ( *format == '0' ) 
 			{
 				++format;
@@ -703,9 +704,8 @@ int print ( char **out, int *varg ){
     };
 
     // Se o buffer existe, finaliza a string ?
-    
-    if (out){ **out = '\0'; }
 
+    if (out){ **out = '\0'; }
 
     return (int) pc;
 }
@@ -762,7 +762,7 @@ int vsprintf(char *string, const char *format, va_list ap)
 
 /*
  ******************
- * puts: 
+ * kputs: 
  *     provisório ...
  */
 
@@ -822,13 +822,12 @@ int fprintf ( file *f, const char *format, ... )
     register int *varg = (int *) (&format);
     size_t len = 0;
     int status = -1;
-    
+
 
     if ( (void *) f == NULL ){
         panic ("kstdio-fprintf: f\n");
-
     }else{
-        if ( f->used != 1 || f->magic != 1234 ){
+        if ( f->used != TRUE || f->magic != 1234 ){
             panic ("kstdio-fprintf: f validation\n");
         }
         //...
@@ -857,7 +856,6 @@ int fprintf ( file *f, const char *format, ... )
 
     f->_p = (f->_p + len);
 
-
     return (int) status;
 }
 
@@ -870,21 +868,21 @@ int fprintf ( file *f, const char *format, ... )
 
 int k_fputs ( const char *str, file *f )
 {
-    int size = 0;
+    int Size = 0;
 
 
     if ( (void *) f == NULL ){
         return (int) (-1);
     } else {
-        size = (int) strlen (str);
+        Size = (int) strlen (str);
 
-        if ( size > f->_cnt ){ return (int) (-1); }
+        if ( Size > f->_cnt ){ return (int) (-1); }
 
-        f->_cnt = (int) (f->_cnt - size);
+        f->_cnt = (int) (f->_cnt - Size);
 
         sprintf ( f->_p, str );
 
-        f->_p = (f->_p + size);
+        f->_p = (f->_p + Size);
 
         return 0;
     };
@@ -896,7 +894,7 @@ int k_fputs ( const char *str, file *f )
 
 /*
  *********************************
- * ungetc:
+ * k_ungetc:
  */
 
 int k_ungetc ( int c, file *f )
@@ -920,12 +918,6 @@ int k_ungetc ( int c, file *f )
 }
 
 
-/*
- *************************
- * k_ftell: 
- * 
- */
-
 long k_ftell (file *f)
 {
     if ( (void *) f == NULL ){ return EOF; }
@@ -934,8 +926,7 @@ long k_ftell (file *f)
 }
 
 
-
-// fileno: Return the fd.
+// k_fileno: Return the fd.
 int k_fileno ( file *f )
 {
     if ( (void *) f == NULL ){ return EOF; }
@@ -1081,7 +1072,7 @@ int k_ferror ( file *f ){
 
 /*
  **************************************
- * fseek:
+ * k_fseek:
  *     offset argument is the position that you want to seek to,
  *     and whence is what that offset is relative to.
  */
@@ -1248,7 +1239,7 @@ int k_fputc ( int ch, file *f )
 
 /*
  ********************************** 
- * fscanf:
+ * k_fscanf:
  *
  */
  
@@ -1305,13 +1296,6 @@ int vfprintf(file *stream, const char *format, va_list ap)
 */
 
 
-
-
-/*
- * k_rewind
- *
- */
-
 void k_rewind ( file *f )
 {
     //fseek (f, 0L, SEEK_SET);
@@ -1323,11 +1307,11 @@ void k_rewind ( file *f )
 
 
 /*
- *************************************************************
+ *******************************************************
  * printchar:
  *     Coloca o caractere na string ou imprime.
- * Essa função chama uma rotina que deverá tratar o caractere e em seguida 
- * enviá-lo para a tela.
+ * Essa função chama uma rotina que deverá tratar o caractere e 
+ * em seguida enviá-lo para a tela.
  * Essa rotina é chamada pelas funções: /print/printi/prints.
  */
 
@@ -1640,6 +1624,11 @@ int stdioInitialize (void)
     if ( cWidth == 0 || cHeight == 0 ){
         panic ("kstdio-stdioInitialize: [FAIL] Char info\n");
     }
+    
+
+    // Ùltimo erro registrado.
+    errno = 0;
+    
 
     // Os buffers dos arquivos acima.
     // prompt[]
@@ -1663,7 +1652,7 @@ int stdioInitialize (void)
 
     //=====================
     // file table
-    for (i=0; i<NUMBER_OF_FILES;i++)
+    for (i=0; i<NUMBER_OF_FILES; i++)
     {
         tmp = (void*) kmalloc (sizeof(file));
         if ((void*)tmp==NULL){
@@ -1683,7 +1672,7 @@ int stdioInitialize (void)
 
     //===================================
     // inode table
-    for (i=0; i<32;i++)
+    for (i=0; i<32; i++)
     {
         tmp_inode = (void*) kmalloc (sizeof(struct inode_d));
         if ((void*)tmp_inode==NULL){
@@ -1740,7 +1729,7 @@ int stdioInitialize (void)
     // inode support.
     // pega slot em inode_table[] 
     slot = get_free_slots_in_the_inode_table();
-    if(slot<0 || slot >=32){
+    if(slot<0 || slot >=NUMBER_OF_FILES){
         panic("kstdio-stdioInitialize: [FAIL] stdin inode slot\n");
     }
     stdin->inode = inode_table[slot];
@@ -1789,7 +1778,7 @@ int stdioInitialize (void)
     // inode support.
     // pega slot em inode_table[] 
     slot = get_free_slots_in_the_inode_table();
-    if(slot<0 || slot >=32){
+    if(slot<0 || slot >=NUMBER_OF_FILES){
         panic("kstdio-stdioInitialize: stdout inode slot\n");
     }
     stdout->inode = inode_table[slot];
@@ -1839,7 +1828,7 @@ int stdioInitialize (void)
     // inode support.
     // pega slot em inode_table[] 
     slot = get_free_slots_in_the_inode_table();
-    if(slot<0 || slot >=32){
+    if(slot<0 || slot >=NUMBER_OF_FILES){
         panic("kstdio-stdioInitialize: stderr inode slot\n");
     }
     stderr->inode = inode_table[slot];
@@ -1876,16 +1865,16 @@ int stdioInitialize (void)
     // console.h
 
     for (i=0; i<4; i++){
-        CONSOLE_TTYS[i].cursor_x = 0;   
-        CONSOLE_TTYS[i].cursor_y = 0;     
-        CONSOLE_TTYS[i].cursor_left   = 0; 
-        CONSOLE_TTYS[i].cursor_top    = 0;  
-        CONSOLE_TTYS[i].cursor_right  = (SavedX/cWidth); 
-        CONSOLE_TTYS[i].cursor_bottom = (SavedY/cHeight); 
-        CONSOLE_TTYS[i].cursor_color = COLOR_WHITE;  
+        CONSOLE_TTYS[i].cursor_x = 0;
+        CONSOLE_TTYS[i].cursor_y = 0;
+        CONSOLE_TTYS[i].cursor_left   = 0;
+        CONSOLE_TTYS[i].cursor_top    = 0;
+        CONSOLE_TTYS[i].cursor_right  = (SavedX/cWidth);
+        CONSOLE_TTYS[i].cursor_bottom = (SavedY/cHeight);
+        CONSOLE_TTYS[i].cursor_color = COLOR_WHITE;
     };
 
-	// Done !
+    // Done !
 
     kstdio_standard_streams_initialized = TRUE;
 
@@ -1956,7 +1945,7 @@ void k_setbuf (file *f, char *buf)
  * k_setbuffer:
  * 
  */
- 
+
 void k_setbuffer (file *f, char *buf, size_t size)
 {
 

@@ -162,6 +162,18 @@ void x86mainStartFirstThread (void){
     turn_task_switch_on();
 
 
+
+
+    // #todo
+    // Isso deve ser liberado pelo processo init
+    // depois que ele habilitar as interrupções.
+    
+    taskswitch_lock();
+    scheduler_lock();
+
+
+
+
     // timerInit8253 ( HZ );
     // timerInit8253 ( 800 );
     // timerInit8253 ( 900 );
@@ -447,12 +459,12 @@ int x86main (void)
     PROGRESS("Kernel:1:1\n"); 
     // sse support.
 
-    x86_sse_init ();
+    x86_sse_init();
 
 
 
 //
-// =====================================================================
+// =================================================================
 //
 
     //
@@ -465,13 +477,18 @@ int x86main (void)
     // edition flag.
     
     KeInitPhase = 0;
+
     gSystemStatus = 1;
-    gSystemEdition = 0;
     
+    // ?? #todo: this is not a x86 thing.
+    gSystemEdition = 0;
+
     //
     // hypervisor
     //
-    
+
+    // ?? #todo: this is not a x86 thing.
+
     g_is_qemu = FALSE;
 
 
@@ -499,15 +516,6 @@ int x86main (void)
     {
         KiAbort();
     }
-
-    // Disable interrupts, lock taskswitch and scheduler.
-    //Set scheduler type. (Round Robin).
-    // #todo: call a hal routine for cli.
-
-    asm ("cli");  
-    taskswitch_lock();
-    scheduler_lock();
-    schedulerType = SCHEDULER_RR; 
 
 
 	// Obs: 
@@ -643,6 +651,10 @@ int x86main (void)
     printf      ("[x86] x86main: Initializing GDT\n");
         
     x86_init_gdt();
+    
+    // #todo
+    // Depois de renovarmos a GDT precisamos
+    // recarregar os registradores de segmento.
 
     //printf("*breakpoint\n");
     //refresh_screen();

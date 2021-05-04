@@ -2590,10 +2590,10 @@ int fs_print_process_cwd (int pid)
 // sys_pwd -  Service 170.
 void sys_pwd (void)
 {
+    // #todo: Check overflow.
 
     if ( current_process < 0 ){
-        printf("sys_pwd: [FAIL] current_process\n");
-        return;
+        panic ("sys_pwd: [FAIL] current_process\n");
     }
 
     fs_print_process_cwd (current_process);
@@ -2999,8 +2999,8 @@ sys_read_file_from_disk (
 
              //++
              // See: sci/fs/write.c
-             taskswitch_lock ();
-             scheduler_lock ();
+             //taskswitch_lock ();
+             //scheduler_lock ();
 
              __ret = (int) fsSaveFile ( 
                                VOLUME1_FAT_ADDRESS, 
@@ -3012,8 +3012,8 @@ sys_read_file_from_disk (
                               (char *) buff,          // buffer ?
                               (char) 0x20 );          // flag 
 
-              scheduler_unlock ();
-              taskswitch_unlock ();
+              //scheduler_unlock ();
+              //taskswitch_unlock ();
               //--
               
               // Ok
@@ -3397,8 +3397,8 @@ int fsLoadFileFromCurrentTargetDir (void)
 
 
     //++
-    taskswitch_lock ();
-    scheduler_lock ();
+    //taskswitch_lock ();
+    //scheduler_lock ();
     Ret = (int) fsLoadFile ( 
                     VOLUME1_FAT_ADDRESS,                       // fat cache address
                     current_target_dir.current_dir_address,    // src dir address 
@@ -3406,8 +3406,8 @@ int fsLoadFileFromCurrentTargetDir (void)
                     (unsigned char *) current_target_dir.name,                 // file name 
                     (unsigned long)   current_target_dir.current_dir_address,  // file address
                     4096 );                                    // #bugbug buffer limit 4KB.
-    scheduler_unlock ();
-    taskswitch_unlock ();
+    //scheduler_unlock ();
+    //taskswitch_unlock ();
     //--
 
 
@@ -3474,8 +3474,8 @@ sys_write_file_to_disk (
 
     //++
     // See: sci/fs/write.c
-    taskswitch_lock ();
-    scheduler_lock ();
+    //taskswitch_lock ();
+    //scheduler_lock ();
 
     __ret = (int) fsSaveFile ( 
                       VOLUME1_FAT_ADDRESS, 
@@ -3487,8 +3487,8 @@ sys_write_file_to_disk (
                       (char *) file_address,          
                       (char) flag );                  
 
-    scheduler_unlock ();
-    taskswitch_unlock ();
+    //scheduler_unlock ();
+    //taskswitch_unlock ();
     //--
 
     debug_print ("sys_write_file_to_disk: done\n");

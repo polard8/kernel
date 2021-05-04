@@ -1146,7 +1146,7 @@ int sys_socket ( int family, int type, int protocol )
 
     if (family < 0){
         debug_print ("sys_socket: [FAIL] family not supported\n");
-        goto fail;
+        return (int) (-EINVAL);
     }
 
     // Check if this is a valid type.
@@ -1624,10 +1624,11 @@ sys_connect (
 
     //client_socket_fd é um soquete de quem quer se conecta
     //o addr indica o alvo.
-    if ( client_socket_fd < 0 || client_socket_fd >= 32 )
+    if ( client_socket_fd < 0 || client_socket_fd >= NUMBER_OF_FILES )
     {
+        debug_print ("sys_connect: client_socket_fd\n");
         printf ("sys_connect: [FAIL] client_socket_fd\n");
-        goto fail;
+        return (int) (-EINVAL);
     }
 
 
@@ -2071,12 +2072,11 @@ int sys_socket_shutdown (int socket, int how)
 
 
     // Invalid fd.
-    if ( socket < 0 ){
+    if ( socket < 0 || socket >= NUMBER_OF_FILES ){
         debug_print ("sys_socket_shutdown: [FAIL] fd\n");
         printf      ("sys_socket_shutdown: [FAIL] fd\n");
-        goto fail;
+        return (int) (-EINVAL);
     }
-    
 
     //
     // Process
@@ -2282,12 +2282,13 @@ sys_accept (
 
     // fd
     // ?? Esse é o socket do servidor.
-    if ( fdServer < 0 || fdServer >= 32 )
+    if ( fdServer < 0 || fdServer >= NUMBER_OF_FILES )
     {
         debug_print ("sys_accept: [FAIL] fdServer\n");
         printf      ("sys_accept: [FAIL] fdServer\n");
-        goto fail;
+        return (int) (-EINVAL);
     }
+
 
     // Check addr structure.
     // #bugbug: Ainda não sabemos qual é a estrutura de
@@ -2569,18 +2570,18 @@ sys_bind (
     debug_print ("sys_bind:\n");
 
 
-    if(Verbose==TRUE){
+    if (Verbose==TRUE){
         printf("sys_bind: PID %d | fd %d | \n",
             current_process, sockfd );
     }
 
 
     // fd
-    if ( sockfd < 0 || sockfd >= 32 )
+    if ( sockfd < 0 || sockfd >= NUMBER_OF_FILES )
     {
         debug_print ("sys_bind: sockfd fail\n");
         printf      ("sys_bind: sockfd fail\n");
-        goto fail;
+        return (int) (-EINVAL);
     }
 
     // Check addr structure.
@@ -2830,11 +2831,11 @@ int sys_listen (int sockfd, int backlog)
         sockfd, backlog);
 
 
-    if ( sockfd < 0 )
+    if ( sockfd < 0 || sockfd >= NUMBER_OF_FILES )
     {
         debug_print ("sys_listen: [FAIL] fd\n");
         printf      ("sys_listen: [FAIL] fd\n");
-        goto fail;
+        return (int) (-EINVAL);
     }
 
     // Wrong n. Ajusting to default.

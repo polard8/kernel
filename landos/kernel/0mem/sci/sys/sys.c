@@ -335,9 +335,13 @@ int sys_serial_debug_printk ( char *s )
 
 int sys_ioctl ( int fd, unsigned long request, unsigned long arg )
 {
-    if (fd<0){
-        debug_print ("sys_ioctl: Invalid fd\n");
-        return -1;
+
+    // fd.
+    if ( fd < 0 || fd >= NUMBER_OF_FILES )
+    {
+        debug_print("sys_ioctl: fd\n");
+        printf     ("sys_ioctl: fd\n");
+        return (int) (-EINVAL);
     }
 
     // Enquanto sys_ioctl eh chamada pelos applicativos,
@@ -359,11 +363,14 @@ int sys_fcntl ( int fd, int cmd, unsigned long arg )
     debug_print ("sys_fcntl:\n");
 
 
-    if ( fd < 0 ){
-        debug_print ("sys_fcntl: fd\n");
-        return -1;
+    // fd.
+    if ( fd < 0 || fd >= NUMBER_OF_FILES )
+    {
+        debug_print("sys_fcntl: fd\n");
+        printf     ("sys_fcntl: fd\n");
+        return (int) (-EINVAL);
     }
- 
+
     if ( cmd < 0 ){
         debug_print ("sys_fcntl: cmd\n");
         return -1;
@@ -587,7 +594,6 @@ int sys_sleep_if_socket_is_empty ( int fd )
 
 int sys_close (int fd)
 {
-
     struct process_d *p;
     file *object;
 
@@ -607,11 +613,12 @@ int sys_close (int fd)
     if ( fd < 0 || fd >= NUMBER_OF_FILES )
     {
         debug_print("sys_close: fd\n");
-        goto fail;
+        return (int) (-EINVAL);
     }
 
     // Process.
 
+    // #todo: Check overflow.
     if ( current_process < 0 ){
         debug_print("sys_close: current_process\n");
         goto fail;
@@ -1060,12 +1067,17 @@ int sys_read (unsigned int fd, char *ubuf, int count)
     int ubuf_len=0;
 
 
+    // #bugbug
+    // O argumento é 'unsigned int'
+    // Não precisa checar <0.
+    // Deveria ser apenas int?
+
     // fd.
-    if (fd<0 || fd>31)
+    if ( fd < 0 || fd >= NUMBER_OF_FILES )
     {
-        debug_print ("sys_read: fd\n");
-        printf      ("sys_read: fd\n");
-        goto fail;
+        debug_print("sys_read: fd\n");
+        printf     ("sys_read: fd\n");
+        return (int) (-EINVAL);
     }
 
     // buf.
@@ -1539,8 +1551,16 @@ int sys_write (unsigned int fd, char *ubuf, int count)
     // fd, ubuf, count.
     // todo: Check validation for the memory region. 
 
-    if (fd<0 || fd>31){
-        debug_print ("sys_write: fd\n");  goto fail;
+    //if (fd<0 || fd>31){
+    //    debug_print ("sys_write: fd\n");  goto fail;
+    //}
+
+    // fd.
+    if ( fd < 0 || fd >= NUMBER_OF_FILES )
+    {
+        debug_print("sys_write: fd\n");
+        printf     ("sys_write: fd\n");
+        return (int) (-EINVAL);
     }
 
     if ( (char *) ubuf == (char *) 0 ){
@@ -2427,13 +2447,13 @@ unsigned long sys_get_file_size ( char *path ){
     }
 
 
-    taskswitch_lock();
-    scheduler_lock();
+    //taskswitch_lock();
+    //scheduler_lock();
     
     Size = (unsigned long) fsRootDirGetFileSize ( (unsigned char *) path ); 
     
-    scheduler_unlock();
-    taskswitch_unlock();
+    //scheduler_unlock();
+    //taskswitch_unlock();
     
     return (unsigned long) Size; 
 }

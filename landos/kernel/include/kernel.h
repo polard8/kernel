@@ -108,6 +108,7 @@ extern unsigned long stack0_krn_ptr;
 
 // rtl 
 // Inside the base kernel
+#include "rtl/errno.h"
 #include "rtl/cdefs.h"
 #include "rtl/stddef.h"
 #include "rtl/types.h"

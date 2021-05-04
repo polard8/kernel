@@ -621,7 +621,30 @@ void *gde_extra_services (
     }
 
 
-    
+
+    if (number == 640){
+        taskswitch_lock();
+        return NULL;
+    }
+
+    if (number == 641){
+        taskswitch_unlock();
+        return NULL;
+    }
+
+
+    if (number == 642){
+        scheduler_lock();
+        return NULL;
+    }
+
+
+    if (number == 643){
+        scheduler_unlock();
+        return NULL;
+    }
+
+
 	// 714 - get ws PID
 	// IN: desktop
     if ( number == 714 )
@@ -1318,6 +1341,7 @@ void *sci0 (
 
         // 1 (i/o) Essa rotina pode ser usada por 
         // um driver em user mode.
+        // #todo: This operation needs permition.
         case SYS_READ_LBA: 
             my_read_hd_sector ( 
                 (unsigned long) arg2, (unsigned long) arg3, 0 , 0 ); 
@@ -1326,6 +1350,7 @@ void *sci0 (
 
         // 2 (i/o) Essa rotina pode ser usada por 
         // um driver em user mode.
+        // #todo: This operation needs permition.
         case SYS_WRITE_LBA: 
             my_write_hd_sector ( 
                 (unsigned long) arg2, (unsigned long) arg3, 0 , 0 ); 
@@ -1473,7 +1498,7 @@ void *sci0 (
         // See: sys.c
         // IN: fd
         case SYS_CLOSE:
-            debug_print ("$ --------------- \n");
+            debug_print ("$ ------------ \n");
             debug_print ("sci0: SYS_CLOSE\n");
             return (void *) sys_close( (int) arg2 );
             break;
@@ -1549,26 +1574,28 @@ void *sci0 (
         //38
         //get host name  
         case SYS_GETHOSTNAME:
-            return (void *) __gethostname ( (char *) arg2);
+            return (void *) __gethostname ( (char *) arg2 );
             break;
 
 
         //39
         //set host name 
+        // #todo: This operation needs permition?
         case SYS_SETHOSTNAME:
-            return (void *) __sethostname ( (const char *) arg2); 
+            return (void *) __sethostname ( (const char *) arg2 ); 
             break;
 
         //40
         //get user name 
         case SYS_GETUSERNAME:
-           return (void *) __getusername ( (char *) arg2);
+           return (void *) __getusername ( (char *) arg2 );
             break;
             
         //41
         //set user name 
+        // #todo: This operation needs permition?
         case SYS_SETUSERNAME:
-            return (void *) __setusername ( (const char *) arg2); 
+            return (void *) __setusername ( (const char *) arg2 ); 
             break;
            
 
@@ -1795,15 +1822,16 @@ void *sci0 (
   
         case SYS_EXIT:
             debug_print ("sci0: SYS_EXIT\n");
-            create_request ( (unsigned long) 12,  // number 
-                (int) 1,                          // status 
-                (int) 0,                          // timeout. 0=imediatamente.
-                (int) current_process,            // target_pid
-                (int) current_thread,             // target_tid
-                NULL,                             // window 
-                (int) 0,                          // msg  ??
-                (unsigned long) arg2,             // long1  
-                (unsigned long) arg3 );           // long2
+            create_request ( 
+                (unsigned long) 12,      // number 
+                (int) 1,                 // status 
+                (int) 0,                 // timeout. 0=imediatamente.
+                (int) current_process,   // target_pid
+                (int) current_thread,    // target_tid
+                NULL,                    // window 
+                (int) 0,                 // msg  ??
+                (unsigned long) arg2,    // long1  
+                (unsigned long) arg3 );  // long2
             return NULL;
             break;
 
@@ -2099,6 +2127,7 @@ void *sci0 (
 		// 126
 		// Permitindo que drivers e servidores em usermode acessem
 		// as portas.
+        // #todo: This operation needs permition?
         case SYS_USERMODE_PORT_IN:
 			// #bugbug
 			// #todo: 
@@ -2113,6 +2142,7 @@ void *sci0 (
 		// 127
 		// Permitindo que drivers e servidores em usermode acessem
 		// as portas.
+        // #todo: This operation needs permition?
         case SYS_USERMODE_PORT_OUT:
 			//#bugbug
 			//#todo: 
@@ -2805,13 +2835,18 @@ void *sci0 (
 		// Need to check the system call ID to ensure it's valid 
 		// If it s invalid, return ENOSYS Function not implemented error
 
+        // #todo
+        // Maybe kill the caller.
+
         default:
-            debug_print ("sci0: Default\n");
-            printf      ("sci0: Default {%d}\n", number );
+            debug_print ("sci0: [FIXME] Default\n");
+            printf      ("sci0: [FIXME] Default SYSCALL {%d}\n", number );
             refresh_screen ();
             return NULL;
             break;
     };
+
+   // ?
 
 done:
     return NULL;
@@ -3082,7 +3117,10 @@ void *sci1 (
             break;
     };
 
-    panic (" @ sci1\n");
+    // #todo
+    // Maybe kill the caller.
+
+    panic ("sci1: [FIXME] default syscall\n");
 }
 
 
@@ -3135,17 +3173,18 @@ void *sci2 (
 
 
 
-        //set magic
+    //set magic
+    // #todo: This operation needs permition?
     if ( number == 1 ){
-            CONSOLE_TTYS[fg_console].magic = arg2;
-            return NULL;
-     }
-            
-        //get magic
+        CONSOLE_TTYS[fg_console].magic = arg2;
+        return NULL;
+    }
+
+    //get magic
     if ( number == 2 ){
-            return (void*) CONSOLE_TTYS[fg_console].magic;
-     }
-        
+        return (void*) CONSOLE_TTYS[fg_console].magic;
+    }
+
     if ( number == 3 ){
             return (void*) systemGetSystemMetrics(arg2);
     }
@@ -3167,7 +3206,6 @@ void *sci2 (
                             (char *)       arg3, 
                             (int)          arg4 );
     }
-     
 
     if ( number == 19 ){
         debug_print("sc2: [19] write\n");
@@ -3304,7 +3342,11 @@ void *sci2 (
         return NULL;
     }
 
-    panic (" @ sci2: default \n");
+
+    // #todo
+    // Maybe kill the caller.
+
+    panic ("sci2: [FIXME] default syscall \n");
 }
 
 

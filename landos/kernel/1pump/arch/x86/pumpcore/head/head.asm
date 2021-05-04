@@ -288,6 +288,22 @@ head_init:
     ;; de segmento. Essa configuração no momento está logo abaixo.
     ;; Pelo menos os segmentos de dados.
 
+    ; #todo
+    ; Temos que configurar os registradores novamente,
+    ; logo após configurarmos a GDT.
+    
+    ; #todo
+    ; Devemos fazer o mesmo se o código em C carregar uma 
+    ; nova GDT, e ele faz.
+
+    ;xor eax, eax
+    ;mov ax, word 0x10
+    mov ax, word  __BOOT_DS
+    mov ds, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
+
 
 ;
 ; == IDT ================================================

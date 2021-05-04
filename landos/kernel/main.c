@@ -80,33 +80,27 @@ struct kernel_d Kernel;
 
 // internal
 // #todo: Talvez isso precise retornar int.
+
 void preinit_Globals(int arch_type)
 {
-    BootBlock.initialized = FALSE;
-    
-    // Current arch support.
-    // We received this arg from Assembly.
 
-    current_arch = arch_type;
-
-    // Kernel status.
-    KernelStatus = KERNEL_NULL;
-
-
-    // ...
-
-    // Kernel symbol table.
-    // #todo: maybe we will load a kernel.map file.
-    g_kernel_symbols_available = FALSE;
-
-
-    // #bugbug
-    // Talvez esse endereço nao esteja acessivel ao kernel.
+//
+// == Boot block ======================================
+//
 
     //See:
     //landos/kernel/include/land/0globals/gdef.h
+    
+    BootBlock.initialized = FALSE;
 
     unsigned long *base = (unsigned long *) SavedBootBlock;
+
+    // #todo
+    // Check address validation
+    
+    //if ( (void *) == NULL ){
+        //FAIL
+    //}
 
     BootBlock.bootblock_address  = (unsigned long) SavedBootBlock;
     BootBlock.lfb                = (unsigned long) base[0];  //  0
@@ -123,6 +117,27 @@ void preinit_Globals(int arch_type)
     BootBlock.gramado_mode       = (unsigned long) base[11]; // 44
     BootBlock.initialized = TRUE;
 
+    // ==============================================
+
+    // Kernel status.
+    KernelStatus = KERNEL_NULL;
+
+    // Current arch support.
+    // We received this arg from Assembly.
+
+    current_arch = arch_type;
+
+
+    // runlevel
+    
+    current_runlevel = DEFAULT_RUNLEVEL;
+    //current_runlevel = 5;
+
+    // Kernel symbol table.
+    // #todo: maybe we will load a kernel.map file.
+    g_kernel_symbols_available = FALSE;
+
+
     //
     // == gramado mode =============================================
     //
@@ -137,15 +152,28 @@ void preinit_Globals(int arch_type)
     current_mode = (char) BootBlock.gramado_mode;
 
 
-    //
-    // == input mode =============================================
-    //
+//
+// == No preemptions ==============================
+//
 
-    // This is the default initial input mode.
-    // This mode is gonna change only when we load
-    // a ring3 window server.
-    
-    current_input_mode = INPUT_MODE_SETUP;
+    // Para evitar que exista qualquer tipo de preempção
+    // devemos usar essas flags, que serão destravadas
+    // no fim da rotina do processo init.bin.
+
+    // #bugbug
+    // Talvez alguma rotina de carregamento de arquivo esteja
+    // usando essas flags e travando e destravando isso.
+    // Uma delas pode destravas antes mesmo o processo init
+    // fazer seu trabalho.
+
+    // Disable interrupts, lock taskswitch and scheduler.
+    //Set scheduler type. (Round Robin).
+    // #todo: call a hal routine for cli.
+
+    asm ("cli");  // #todo: isso é dependente da arquitetura.
+    taskswitch_lock();
+    scheduler_lock();
+    schedulerType = SCHEDULER_RR; 
 
     // Initializing the global spinlock.
     // #todo: Isso pode ir para init_globals
@@ -155,15 +183,29 @@ void preinit_Globals(int arch_type)
     __spinlock_ipc = TRUE;
 
 
-	//
-	// Verbose mode.
-	//
+
+//
+// == input mode =============================================
+//
+
+    // This is the default initial input mode.
+    // This mode is gonna change only when we load
+    // a ring3 window server.
+    
+    current_input_mode = INPUT_MODE_SETUP;
+
+
+//
+// == Verbose mode ================================
+//
 
 	// #obs:
 	// Verbose mode do kernel.
 	// Initializes a new line when '\n' is found.
 
     stdio_verbosemode_flag = TRUE;
+
+    // ...
 }
 
 // internal

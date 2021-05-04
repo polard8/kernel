@@ -184,6 +184,9 @@ void CheckRedPill(void)
     int nwrites = 0;
 
 
+    // #todo
+    // Clear buffer.
+
     // flag
 
     __redpill = FALSE;
@@ -240,7 +243,7 @@ void CheckRedPill(void)
 // #todo
 // Use sc82 system call.
 
-void ExecCommandInterpreter(void)
+int ExecCommandInterpreter(void)
 {
     int Status = -1;
 
@@ -254,12 +257,18 @@ void ExecCommandInterpreter(void)
 
     //if (Status<0)
         // ...
+
+    return Status;
 }
 
-void ExecRedPillApplication(void)
+
+int ExecRedPillApplication(void)
 {
     int Status = -1;
 
+
+    debug_print ("init.bin: Initializing ps2/support\n");
+    //return; 
 
     //
     // mouse
@@ -269,12 +278,18 @@ void ExecRedPillApplication(void)
     // Let's initialize the ps/2 support,
     // This way we can use the mouse.
 
+    // #bugbug
+    // Suspendendo essa inicialização ...
+    // Estamos tendo problemas com a redpill, talvez por causa disso.
+
+    /*
     int isQEMU = FALSE;
     isQEMU = rtl_get_system_metrics(300);
     if (isQEMU==TRUE){
         debug_print ("init.bin: Initializing ps2/support\n");
         gramado_system_call ( 350, 1, 0, 0 );
     }
+    */
 
     //
     // launcher
@@ -288,6 +303,7 @@ void ExecRedPillApplication(void)
     Status = (int) rtl_clone_and_execute("launcher.bin");
     //if (Status<0)
         // ...
+    return Status;
 }
 
 
@@ -435,6 +451,21 @@ int main ( int argc, char *argv[] )
     //asm ("int $129 \n");
 
 
+    // #important
+    // O task switching e o scheduler só vão funcionar
+    // depois que o processo init habilitar as interrupções.
+
+    // #bugbug
+    // O processo init está rodando sozinho, mas tem seus ticks
+    // contados até que sofra preempção.
+    // Não queremos que ele sofra prempção antes de habilitar
+    // o taskswitch e o scheduler.
+    
+    //#test
+    
+    gramado_system_call (641,0,0,0);  // unlock taskswitch
+    gramado_system_call (643,0,0,0);  // unlock scheduler
+
     //
     // == Runlevel ======================================
     //
@@ -548,7 +579,11 @@ int main ( int argc, char *argv[] )
                 ExecRedPillApplication();
                 break;
             }
+            
             debug_print ("init.bin: Launching the command interpreter\n");
+            
+            // #todo
+            // We need a return in this function.
             ExecCommandInterpreter();
             break;
     };
