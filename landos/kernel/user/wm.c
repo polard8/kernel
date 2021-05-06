@@ -1048,7 +1048,7 @@ int get_current_window_id()
 
 /*
  *******************************************************
- * RegisterWindow: 
+ * RegisterWindow: (API)
  *     Registrando uma janela numa lista de janelas.
  */
 
@@ -1060,7 +1060,7 @@ int RegisterWindow (struct window_d *window){
     int Offset = 0; 
 
 
-    debug_print ("RegisterWindow:\n");
+    debug_print ("RegisterWindow: [API]\n");
 
     if ( (void *) window == NULL ){
         debug_print ("RegisterWindow: window\n");
@@ -1296,7 +1296,7 @@ void windowShowWindowList (void){
 
 /*
  *********************************************************
- * redraw_window:
+ * redraw_window: (API)
  * 
  *  #todo: Isso deveria ficar no mesmo lugar que createw.
  * 
@@ -1362,7 +1362,7 @@ int redraw_window (struct window_d *window, unsigned long flags ){
     unsigned long __tmp_color=0;
 
 
-    debug_print ("redraw_window:\n");
+    debug_print ("redraw_window: [API]\n");
 
     if ( (void *) window == NULL ){
         debug_print ("redraw_window: [FAIL] window\n");
@@ -2009,8 +2009,7 @@ fail:
  * incluir todos os elementos da janela. 
  * Do mesmo jeito que o usuário modificou de acordo com suas preferências.
  */
- 
-//wm.
+
 
 // Vamos procurar na lista por ponteiros válidos.
 // Repintaremos todas as janelas com ponteiros válidos. 
@@ -2074,24 +2073,26 @@ done:
 
 /*
  *********************************************
- * resize_window:
- *     Muda as dimensões da janela.
- */	
+ * resize_window: (API)
+ * 
+ *     Change dimentions.
+ */
 
-// wm. 
- 
 int 
 resize_window ( 
     struct window_d *window, 
     unsigned long cx, 
     unsigned long cy )
 {
+
+    debug_print ("resize_window: [API]\n");
  
-	if ( (void *) window == NULL ){
+ 
+    if ( (void *) window == NULL ){
 		//message
 	    return 1;    
-	
-	} else {	
+
+    } else {	
 	    
 		//@todo: Checar limites.
 	
@@ -2169,18 +2170,19 @@ resize_window (
 
 /*
  ****************************************************
- * replace_window:
+ * replace_window: (API)
  *     Muda os valores do posicionamento da janela.
  */
- 
-// wm. 
- 
+
 int 
 replace_window ( 
     struct window_d *window, 
     unsigned long x, 
     unsigned long y )
 {
+
+
+    debug_print ("replace_window: [API]\n");
 
     if ( (void *) window == NULL ){
         debug_print ("replace_window: window\n");
@@ -2320,7 +2322,8 @@ int is_window_minimized (struct window_d *window){
 
 /*
  ***********************************************
- * CloseWindow:
+ * CloseWindow: (API)
+ * 
  *     Fecha uma janela. (Destrói).
  *
  *     Obs: O ato de fechar uma janela está associado
@@ -2330,14 +2333,14 @@ int is_window_minimized (struct window_d *window){
  * signifcicar apenas sinalizar para o GC que ele 
  * pode atuar sobre a estrutura.
  */
- 
-// wm.
- 
+
 void CloseWindow ( struct window_d *window ){
 
     int Offset=0;
     int z=0;
 
+
+    debug_print ("CloseWindow: [API]\n");
 
     if ( (void *) window == NULL ){
         debug_print("Closewindow: window\n");
@@ -2568,7 +2571,7 @@ void windowUnblockFocus (void)
 
 /*
  *****************************************************
- * kgwmSetFocus:
+ * kgwmSetFocus: (API)
  * 
  *     + Seta o foco em uma janela.
  *     + Configura o cursor.
@@ -2588,8 +2591,6 @@ void windowUnblockFocus (void)
  *
  * ...
  */
-
-// wm.
 
 // #bugbug
 // Revendo a questão de repintar a janela mãe quando se seta o foco. 
@@ -2612,8 +2613,8 @@ void kgwmSetFocus ( struct window_d *window )
 	// Testando com uma versão simplificada, pois isso está falhado na máquina real.
 	// Sem foco do teclado não funciona.
 
+    debug_print ("kgwmSetFocus: [API]\n");
 
-    debug_print ("kgwmSetFocus:\n");
 
     if ( (void *) window == NULL ){
         panic ("kgwmSetFocus: window\n");
@@ -2676,15 +2677,17 @@ void kgwmSetFocus ( struct window_d *window )
 
 
 /*
- * kgwmGetFocus: 
+ ***********************************
+ * kgwmGetFocus: (API)
  *     Pega o ponteiro para a estrutura da janela com o foco de entrada.
  */
-
-// wm.
 
 void *kgwmGetFocus (void)
 {
     struct window_d *w;
+
+
+    debug_print ("kgwmGetFocus: [API]\n");
 
     if ( window_with_focus < 0 ){
         debug_print("kgwmGetFocus: [FAIL] window_with_focus underflow\n");
@@ -2900,18 +2903,16 @@ fail:
 
 /*
  *************************************
- * kgwmKillFocus:
+ * kgwmKillFocus: (API)
  *     Uma janela perde o foco.
  */
- 
+
 void kgwmKillFocus ( struct window_d *window )
 {
 
-    debug_print ("kgwmKillFocus: [FIXME] \n");
+    debug_print ("kgwmKillFocus: [API] [FIXME] \n");
 
-
-    if ( (void *) window == NULL )
-    {
+    if ( (void *) window == NULL ){
         debug_print ("kgwmKillFocus: window\n");
         goto fail; 
     }
@@ -2939,19 +2940,16 @@ fail:
 
 /*
  ******************************************
- * MinimizeWindow:
+ * MinimizeWindow: (API)
  *     Minimiza uma janela.
- *     @todo windowMinimize()
  */
- 
-// wm.
- 
+
 void MinimizeWindow (struct window_d *window){
 
     int Status = FALSE;
 
 
-    debug_print ("MinimizeWindow:\n");
+    debug_print ("MinimizeWindow: (API)\n");
 
     if ( (void *) window == NULL ){
         printf ("MinimizeWindow: window\n");
@@ -2981,19 +2979,18 @@ void MinimizeWindow (struct window_d *window){
 
 /*
  **************************************
- * MaximizeWindow:
+ * MaximizeWindow: (API)
+ * 
  *     Maximiza uma janela.
- *     @todo: windowMazimize()
  */
 
 void MaximizeWindow (struct window_d *window){
 
     int Status=0;
-
     int RedrawAndShow = TRUE;
 
 
-    debug_print ("MaximizeWindow:\n");
+    debug_print ("MaximizeWindow: [API]\n");
 
     if ( (void *) window == NULL){
         printf ("MaximizeWindow: window\n");

@@ -1278,11 +1278,15 @@ struct window_d
 	// HANDLE_STATUS_OPEN ou HANDLE_STATUS_CLOSE
 	int handle_status;
 
-//==================================================
 
-	// Trava. Se travada, não pode mudar nada.
-	// Enables or disables mouse and keyboard input to the 
-	// specified window or control.
+//==================================================
+    // Trava. 
+    // Se travada, não pode mudar nada.
+    // Podemos travar a janela mãe quando 
+    // estamos criando uma janela filha.
+    // Enables or disables mouse and keyboard input to the 
+    // specified window or control.
+
     int locked; 
 
 //==================================================

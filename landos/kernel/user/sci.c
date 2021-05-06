@@ -2981,12 +2981,12 @@ serviceCreateWindow ( char *message_buffer )
 	//@todo: #bugbug a estrutura rect_d apresenta problema quando passada por argumento
 	//com um endere�o da �rea de mem�ria do app.
 	
-	
-	//#test
-	// testando novo m�todo de pintura.
-	
+
+
+    // Calling the API service implementation.
+
 	// See:
-	// user/
+	// createw.c in user/
 
     NewWindow = (void *) kgws_create_window ( 
                              WindowType, 

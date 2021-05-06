@@ -358,8 +358,10 @@ DrawFrame (
 /*
  ****************************************************************
  * CreateWindow: 
- *     Função secundária. Cria uma janela simples. Apenas alguns tipos.
+ *     Worker function called by kgws_create_window();
+ * 
  */
+
 
 //1  - Tipo de janela (popup,normal,...) 
 //2  - Estado da janela. (poderia ter vários bits ??)
@@ -381,6 +383,10 @@ DrawFrame (
 
 // #todo
 // use 'const char *' for name
+
+// #todo
+// Use window->locked to lock the parent when the created window 
+// is a child window.
 
 void *CreateWindow ( 
     unsigned long type, 
@@ -512,6 +518,10 @@ void *CreateWindow (
     // #bugbug
     // Some types really needs a parent window.
     // For example, buttons, taht do not exists by it self.
+    
+    // #todo
+    // If we have a parent window, make sure that
+    // it is in the same desktop.
 
     if ( (void *) pWindow == NULL ){
         Parent = (void *) gui->screen;  // #hackhack
@@ -519,6 +529,10 @@ void *CreateWindow (
         Parent = (void *) pWindow;
     };
 
+
+    // Make sure that we have a desktop.
+    // If not, so maybe we can use this window as root window
+    // for this desktop.
  
     // Desktop id.
     if ( desktop_id < 0 ){
@@ -1605,8 +1619,11 @@ done:
 
 
 
-// #todo: 
-// Talvez deletar essa função e usar CreateWindow.
+/*
+ ******************************
+ * kgws_create_window: (API)
+ * 
+ */
 
 // Chamada por serviceCreateWindow em sci.c
 
@@ -1628,7 +1645,8 @@ void *kgws_create_window (
     struct window_d *__w;
     int z=0;
 
- 
+    debug_print ("kgws_create_window: [API]\n");
+
     // No caso dos tipos com moldura então criaremos em duas etapas.
     // no futuro todas serão criadas em duas etapas e 
     // CreateWindow será mais imples.

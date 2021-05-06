@@ -1968,6 +1968,10 @@ console_interrupt(
 // The tty has a window, but we are not using it, we are using
 // the margins for the console.
 
+// #todo
+// Quando estivermos colocando o cursor em uma janela e
+// a janela não for válida, então colocamos o cursor na posição 0,0.
+
 void set_up_cursor ( unsigned long x, unsigned long y )
 {
     if (fg_console<0){ return; }

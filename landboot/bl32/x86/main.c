@@ -40,7 +40,7 @@
 
 unsigned long init_testing_memory_size (int mb);
 
-int BlLoadKernel(void);
+int LandOSLoadKernelImage(void);
 
 void BlSetupPaging(void);
 
@@ -325,14 +325,14 @@ void BlMain (void){
     // BlLoadConfigFiles ();   
 
 
-    // Loading kernel image.
+    // Loading the kernel image.
     // Helper function in this document.
 
-    Status = BlLoadKernel();
+    //Status = AnotherOSLoadKernelImage();
+    Status = LandOSLoadKernelImage();
 
-    if (Status<0)
-    {
-         printf("BlMain: BlLoadKernel fail. \n");
+    if (Status<0){
+         printf("BlMain: LandOSLoadKernelImage fail. \n");
          goto run_rescue_shell;
     }
 
@@ -427,16 +427,17 @@ run_rescue_shell:
         };
     }
     
-    
     // ok
     // Vamos excutar o que o rescue shell carregou.
+
     return;
 }
 
 
 /*
- ***************************************************************
- * BlLoadKernel: 
+ ************************************
+ * LandOSLoadKernelImage: 
+ * 
  *     It loads the kernel image at 0x00100000.
  *     The entry point is at 0x00101000.
  */ 
@@ -452,7 +453,7 @@ run_rescue_shell:
     
     // Called by BlMain()
 
-int BlLoadKernel(void)
+int LandOSLoadKernelImage(void)
 {
     int Status = -1;
 
@@ -473,11 +474,10 @@ int BlLoadKernel(void)
     // Fail
     if ( Status != 0 )
     {
-        printf ("BlLoadKernel: load_kernel fail\n");
+        printf ("LandOSLoadKernelImage: load_kernel fail\n");
         refresh_screen();
         
         return (int) (-1);
-        //die();
     }
     
     // ok

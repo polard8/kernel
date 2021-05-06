@@ -104,22 +104,27 @@ struct desktop_d
 	
 	//Heap do desktop.
     struct heap_d *heap;
-	
-    //
-	// Control Menu.
-	//
-		
+
+
+//
+// Windows and menus
+//
+
+    // #todo
+    // The root window fot this desktop
+
+    // struct window_d *root_window;
+
+
+    // Control Menu.
     struct window_d *menuWindow;   //Ponteiro para a janela do menu.
     struct menu_d *sysMenu;        //control menu do sistema.(no icone da janela.)
     struct menu_d *dialogsysMenu;  //control menu para dialogo. (todos outros control menus)
     struct menu_d *menuHScroll;    //menu genérico horizontal. (usado no momento) ??
     struct menu_d *menuVScroll;    //menu genérico vertical.   (usado no momento) ??
 
-    
-	//
-	// Janelas.
-	//
-	
+
+
 	//Parametros da janela ativa.
 	int active_window;             //Id da janela ativa.  
 	struct window_d *activeWindow;    //Ponteiro da estrutura da janela ativa.
@@ -159,8 +164,11 @@ struct desktop_d
 	//struct window_d *programmanager;
 
     //
-    // Windows
+    // List of overlapped windows.
     //
+    
+    // Only application windows,
+    // that one with a frame.
 
     int lTail;
     int lHead;

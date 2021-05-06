@@ -793,6 +793,18 @@ struct platform_d
 
     //kernel struct ...
     //struct kernel_d *Kernel;
+
+
+    // #test #todo
+    // unsigned long vesa_lfb_pa;
+    
+    // void *kernel_entrypoint; 
+
+    // Entry point for application processors.
+    // 32 bit part.
+    // void *ap_entrypoint;
+
+    // ...
 };
 struct platform_d *Platform; 
 

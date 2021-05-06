@@ -55,8 +55,11 @@ void updateProgressBar();
 // pa = 0x00100000.
 // va = 0xC0000000.
 
-// Called by BlLoadKernel()
- 
+// Called by LandOSLoadKernelImage()
+
+// #todo
+// Change to elfLoadKernelImage(.)
+
 int load_kernel (const char *file_name)
 {
     int Status = -1;
