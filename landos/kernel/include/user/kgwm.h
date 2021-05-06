@@ -23,14 +23,16 @@ struct powertrio_wm_d
 {
     int initialized;
     
+    struct desktop_d *desktop;
+    
     int selected;
     int head;
     int tail;
+    
+    unsigned long list[3];
 };
 struct powertrio_wm_d  PowerTrio;
 
-
-unsigned long powertrioList[3];
 
 int powertrio_initialize(void);
 int powertrio_set_window ( int index, struct window_d *window );

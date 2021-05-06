@@ -2006,7 +2006,7 @@ int KGWS_initialize(void)
     // Cria Background, main window, navigation bar.
     // de acordo com predefinição.
     // See:
-    // windows/logon.c
+    // logon.c
 
     if ( g_useGUI != 1 ){
         panic("KGWS_initialize: NO GUI");
@@ -2015,6 +2015,10 @@ int KGWS_initialize(void)
     printf ("KGWS_initialize: calling init_logon_manager ...\n");
     init_logon_manager();
 
+
+    // Nesse momento ja temos ate desktop,
+    // e vamos precisar de desktop pra configurarmos o power trio
+    powertrio_initialize();
 
     // debug
     //printf("kkkkkk\n");

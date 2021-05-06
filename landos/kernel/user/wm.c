@@ -3051,22 +3051,24 @@ fail:
  *     Inicializa o gerenciamento de janelas.
  *     @todo windowmanagerInit()
  */
- 
-// wm. 
- 
+
 int init_window_manager (void){
-	
+
+    debug_print ("init_window_manager: deprecated\n");
+
     // Aloca memória para a estrutura do procedimento 
-	// de janela da thread atual.
+    // de janela da thread atual.
 
     // #bugbug 
     // Não sei se estamos realmente usando isso.	
-	
-	WindowProcedure = (void *) kmalloc ( sizeof( struct window_procedure_d ) );
+
+    WindowProcedure = NULL;
+
+    /*
+    WindowProcedure = (void *) kmalloc ( sizeof( struct window_procedure_d ) );
 
     if ( (void *) WindowProcedure == NULL ){
         panic ("init_window_manager: WindowProcedure\n");
-
 	}else{
 		
  	    // Configura a janela ativa. 
@@ -3075,15 +3077,12 @@ int init_window_manager (void){
 		// janela filha,então a janela mãe será a 
 		// janela ativa.
 	    	
-	    WindowProcedure->active_window = (int) 0;
+	    WindowProcedure->active_window     = (int) 0;
 	    WindowProcedure->window_with_focus = (int) 0;
 		//...
-	};
+    };
+    */
 
-	// todo:  
-	// Continua fazendo inicializações de procedimento de janela.	
-
-    powertrio_initialize();
 
     return 0;
 }
@@ -4131,6 +4130,16 @@ int powertrio_initialize(void)
 
     PowerTrio.initialized = FALSE;
 
+    // Setup the desktop used by the Power Trio.
+    // #todo: It needs to be a valid pointer.
+
+    //if ( (void*) CurrentDesktop == NULL ){
+    //    panic ("powertrio_initialize: CurrentDesktop\n");
+    //}
+
+    // PowerTrio.desktop = (struct desktop_d *) CurrentDesktop;
+
+
     // Creating clients
 
     for (i=0; i<3; i++){
@@ -4143,7 +4152,8 @@ int powertrio_initialize(void)
         Client->magic = 1234;
         Client->window = NULL;
         Client->next = NULL;
-        powertrioList[i] = (unsigned long) Client;
+
+        PowerTrio.list[i] = (unsigned long) Client;
     };
 
     PowerTrio.tail = 0;
@@ -4178,8 +4188,9 @@ int powertrio_set_window ( int index, struct window_d *window )
     }
 
     // Get client for this index
-    c = (struct powertrio_client_d *) powertrioList[index];
-    
+
+    c = (struct powertrio_client_d *) PowerTrio.list[index];
+
     if ( (void*) c == NULL ){  return -1;  }
 
     if (c->used != TRUE || c->magic != 1234 )
@@ -4305,7 +4316,8 @@ int powertrio_arrange_and_update(void)
     Update = TRUE;
         
     // Get client for this index
-    c = (struct powertrio_client_d *) powertrioList[i];
+
+    c = (struct powertrio_client_d *) PowerTrio.list[i];
     
     // Não atualize esse cliente.
     if ( (void*) c == NULL ){  Update = FALSE;  }

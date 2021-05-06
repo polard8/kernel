@@ -1653,8 +1653,12 @@ __kgwm_ps2kbd_procedure (
                         refresh_screen();
                     }
                     if (shift_status == TRUE){
-                        __kgwm_SendMessageToInitProcess(9216);  //reboot
-                        //reboot();
+                        // #goal
+                        // This is a emergency keycombination.
+                        // We can't call another process and 
+                        // we want to reboot the machine.
+                        sys_reboot();
+                        //__kgwm_SendMessageToInitProcess(9216);  //reboot
                     }
                     return 0;
                     break;
