@@ -1539,6 +1539,7 @@ void *sci0 (
         // 34 - Setup cursor for the current virtual console.
         // See: core/system.c
         // IN: x,y
+        // #todo: Essa rotina dever pertencer ao user/
         case SYS_VIDEO_SETCURSOR: 
             set_up_cursor ( 
                 (unsigned long) arg2, 

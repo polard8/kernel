@@ -159,6 +159,8 @@ static char *systemSwapFilePathName      = "/root/swap";  //'Arquivo' de paginaç
  *     @todo: Isso pode ir para outro lugar.   
  */
 
+// #todo: Maybe move this to user/
+
 void set_up_color ( unsigned long color )
 {
     g_system_color = (unsigned long) color;
@@ -174,6 +176,8 @@ void set_up_color ( unsigned long color )
  *     @todo: Isso pode ir para outro lugar.
  */
 
+// #todo: Maybe move this to user/
+
 void 
 set_up_text_color ( 
     unsigned char forecolor, 
@@ -183,47 +187,10 @@ set_up_text_color (
 }
 
 
-/*
- * set_up_cursor:
- *     Setup cursor for the current virtual console.
- */
 
-// We can move this to another place.
-
-void set_up_cursor ( unsigned long x, unsigned long y )
-{
-    if (fg_console<0){ return; }
-
-    CONSOLE_TTYS[fg_console].cursor_x = (unsigned long) x;
-    CONSOLE_TTYS[fg_console].cursor_y = (unsigned long) y;
-}
-
-/*
- * get_cursor_x:
- *     Pega o valor de x.
- *     @todo: Isso pode ir para outro lugar.
- */
-
-unsigned long get_cursor_x (void)
-{
-    return (unsigned long) CONSOLE_TTYS[fg_console].cursor_x;
-}
-
-/*
- * get_cursor_y:
- *     Pega o valor de y.
- *     @todo: Isso pode ir para outro lugar.
- */
-
-unsigned long get_cursor_y (void)
-{
-    return (unsigned long) CONSOLE_TTYS[fg_console].cursor_y; 
-}
-
-
+// used?
 void *systemNull (void)
 {
-    // ?
     return NULL;
 }
 

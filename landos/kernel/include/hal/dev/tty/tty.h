@@ -134,9 +134,9 @@ struct tty_line_d
 struct tty_d
 {
 
-    //
-    // == Identification =============
-    //
+//
+// == Identification =============
+//
     
     object_type_t  objectType;
     object_class_t objectClass;
@@ -150,10 +150,9 @@ struct tty_d
     char name[64];      // 
     size_t Name_len;    // len 
 
-    
-    //
-    // == (1) storage ========
-    //
+//
+// == (1) storage ========
+//
     
     // The buffer. The box.
 
@@ -300,7 +299,7 @@ struct tty_d
 
     // Window.
     // When we are using the kgws.
-    struct window_d *window;
+    struct window_d  *window;
 
     //
     // system metrics.
@@ -312,19 +311,19 @@ struct tty_d
 
     unsigned long cursor_color;
 
-    //
-    // Print support
-    //
+//
+// Print support
+//
 
     // print position in chars.
     unsigned long cursor_x;
     unsigned long cursor_y;
 
-    //margin in chars.
+    // margin in chars.
     unsigned long cursor_left;     // margem esquerda dada em linhas
     unsigned long cursor_top;      // margem superior dada em linhas
 
-    //limits in chars.
+    // limits in chars.
     unsigned long cursor_right;    // margem direita dada em linhas
     unsigned long cursor_bottom;   // margem inferior dada em linhas
 

@@ -23,6 +23,13 @@ struct powertrio_wm_d
 {
     int initialized;
     
+    // Se o PowerTrio não está em uso,
+    // então as combinações de tecla precisam gerar
+    // mensagens que serão entregues para outro window manager,
+    // no caso o window manager carregável. gwm.bin
+
+    //int Enabled;
+
     struct desktop_d *desktop;
     
     int selected;

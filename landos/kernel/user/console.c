@@ -1951,6 +1951,52 @@ console_interrupt(
 }
 
 
+/*
+ * set_up_cursor:
+ *     Setup cursor for the current virtual console.
+ */
+
+// #todo
+// Maybe change to console_set_up_cursor();
+
+// We need a routine to change the cursor inside a wigen window.
+// The console has a window ? No ? ... but it has a dimension.
+// See the tty structure at hal/dev/tty/tty.h
+
+// We need to know that there is a difference between 
+// printing at a given console and printing at a given window.
+// The tty has a window, but we are not using it, we are using
+// the margins for the console.
+
+void set_up_cursor ( unsigned long x, unsigned long y )
+{
+    if (fg_console<0){ return; }
+
+    CONSOLE_TTYS[fg_console].cursor_x = (unsigned long) x;
+    CONSOLE_TTYS[fg_console].cursor_y = (unsigned long) y;
+}
+
+
+/*
+ * get_cursor_x:
+ *     Pega o valor de x.
+ *     @todo: Isso pode ir para outro lugar.
+ */
+unsigned long get_cursor_x (void)
+{
+    return (unsigned long) CONSOLE_TTYS[fg_console].cursor_x;
+}
+
+/*
+ * get_cursor_y:
+ *     Pega o valor de y.
+ *     @todo: Isso pode ir para outro lugar.
+ */
+unsigned long get_cursor_y (void)
+{
+    return (unsigned long) CONSOLE_TTYS[fg_console].cursor_y; 
+}
+
 //
 // End.
 //

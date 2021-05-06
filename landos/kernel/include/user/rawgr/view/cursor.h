@@ -119,12 +119,12 @@ cursor_t *DeveloperWindowCursor; //test?? Cursor da janela do desenvolvedor.
 //...
 
 
-//Cursor.
-
+// Cursor.
+// See: console.c
 void set_up_cursor (unsigned long x, unsigned long y);
-
 unsigned long get_cursor_x (void);
 unsigned long get_cursor_y (void);
+
 
 //
 // End.
