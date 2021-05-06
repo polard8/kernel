@@ -2430,7 +2430,12 @@ void show_active_window (void);
 int z_order_get_free_slot (void);
 
 int get_zorder ( struct window_d *window );
-struct window_d *getTopWindow (struct window_d *window);
+
+
+// Pegando a o ponteiro da janela que está 
+// no topo da lista
+
+struct window_d *getTopWindow (void);
 
 
 
@@ -2486,7 +2491,7 @@ void windowShowWWFMessageBuffers (void);
 
 
 //color support.
-void windowSetUpColorScheme (int type);
+int windowInitializeColorSchemeSupport (void);
 int windowSelectColorScheme ( int type );
 
 

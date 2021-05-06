@@ -1397,6 +1397,8 @@ void ps2tty_put_byte_into_input_buffer( char c )
  * *******************************************************
  * DeviceInterface_PS2Keyboard: 
  * 
+ *     Vamos pegar o raw code.
+ * 
  *     Keyboard handler for abnt2 keyboard.
  *     fica dentro do driver de teclado.
  *
@@ -1421,10 +1423,9 @@ void ps2tty_put_byte_into_input_buffer( char c )
 	// enviar o scancode para o kernel para que ele coloque na fila.
 	// Nesse momento o kernel de sentir-se alertado sobre o evento de 
 	// input e acordar a threa que está esperando por esse tipo de evento. 
-	
-	// #obs: 
-    // Esse buffer está em gws/user.h 
 
+    // #obs: 
+    // Esse buffer está em gws/user.h 
 
 // Low level keyboard writter.
 // Isso poderia usar uma rotina de tty
@@ -1432,15 +1433,10 @@ void ps2tty_put_byte_into_input_buffer( char c )
 
 // PUT SCANCODE
 
-
 void DeviceInterface_PS2Keyboard(void){
 
     static int __has_e0_prefix = 0;
     static int __has_e1_prefix = 0;
-
-
-    // Disable mouse port.
-    // wait_then_write (0x64,0xA7);
 
 
     // ??
@@ -1469,16 +1465,32 @@ sc_again:
     // #define PORT_B  0x61  /* I/O port for 8255 port B (kbd, beeper...) */
     // #define KBIT    0x80  /* bit used to ack characters to keyboard */
 
+//
+// Get the raw byte for the key struck.
+//
 
-    /* get the raw byte for the key struck */
     __raw = in8(0x60);
 
-    val = in8(0x61);         /* strobe the keyboard to ack the char */
-    out8(0x61, val | 0x80);  /* strobe the bit high */
-    out8(0x61, val);         /* now strobe it low */
+
+    //===========================================
+    
+    // Get
+    
+    // strobe the keyboard to ack the char
+    val = in8(0x61); 
+    
+    // Send back
+    
+    // Strobe the bit high 
+    out8(0x61, val | 0x80);  
+    
+    // now strobe it low
+    out8(0x61, val);         
     //===========================================
 
 
+
+    //===========================================
     // #todo
     // Temos que checar se o primeiro byte é um ack ou um resend.
     // isso acontece logo apos a inicialização.
@@ -1490,19 +1502,25 @@ sc_again:
     // #define RESEND              0xFE
 
     if ( __raw == 0xFA ){
-        printf ("abnt2_keyboard_handler: [test.first_byte] ack\n");
+
+        //#test
+        printf ("DeviceInterface_PS2Keyboard: [test.first_byte] ack\n");
         refresh_screen();
     }
 
     if ( __raw == 0xFE ){
-        printf ("abnt2_keyboard_handler: [test.first_byte] resend\n");
+        
+        //#test
+        printf ("DeviceInterface_PS2Keyboard: [test.first_byte] resend\n");
         refresh_screen();
     }
+    //===========================================
 
 
-    //
-    // == Queue ====================================
-    //
+
+//
+// == Queue ====================================
+//
 
      // #bugbug
      // [Enter] in the numerical keyboard isn't working.
@@ -1526,18 +1544,30 @@ sc_again:
      if ( __raw == 0xE0 ){ __has_e0_prefix = 1; goto done;  }
      if ( __raw == 0xE1 ){ __has_e1_prefix = 1; goto done;  }
 
+
+// do_put:
+
     // + Build the message and send it to the thread's queue.
     // This routine will select the target thread.
     // + Or send the message to the input TTY.
     // This way the foreground process is able to get this data.
     // See: ps2kbd.c
-    // See: vt/console.c
+    // See: user/console.c
 
     // IN: 
     // device type, data.
     // 1=keyboard
 
+    if ( foreground_thread < 0 ){
+        debug_print ("DeviceInterface_PS2Keyboard: Invalid foreground_thread\n");
+        // Clean the mess.
+        __has_e0_prefix = 0;
+        __has_e1_prefix = 0;
+        goto done;
+    }
+
     console_interrupt (
+        foreground_thread,
         CONSOLE_DEVICE_KEYBOARD,
         __raw );
 
@@ -1547,8 +1577,6 @@ sc_again:
     __has_e1_prefix = 0;
 
 done:
-    // Reenable the mouse port.
-    //wait_then_write (0x64,0xA8);
     return;
 }
 

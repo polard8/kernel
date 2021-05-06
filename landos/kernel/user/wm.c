@@ -1,7 +1,7 @@
 /*
- * File: model/wm.c 
+ * File: wm.c 
  *
- *  wm. - kernel Window Manager.
+ *  wm - Kernel Window Manager.
  * 
  * Descrição:
  *     Arquivo principal do Window Manager.
@@ -20,8 +20,8 @@
  * o LFB,(FrontBuffer).
  *       
  *
+ * History:
  *    2013 - Created by Fred Nora.
- *     ...
  */
 
 
@@ -30,11 +30,10 @@
 // coisas que pertencem ao window manager ou são de suporte ao 
 // window manager. 
 
- 
+
 #include <kernel.h>
  
 
- 
 // 
 // Argumentos passados pelo Boot Loader em head.s. 
 //
@@ -496,7 +495,6 @@ void windowSetForegroundWindow(struct window_d *window)
 
 
 //get parent window
-//wm.
 void *GetParentWindow (struct window_d * hwnd){
 
     if ( (void *) hwnd == NULL ){
@@ -509,8 +507,7 @@ void *GetParentWindow (struct window_d * hwnd){
 
 
 //get the desktop of a window.
-//wm.
-void *GetWindowDesktop (struct window_d * hwnd){
+void *GetWindowDesktop (struct window_d *hwnd){
 
     if ( (void *) hwnd == NULL ){
         //message
@@ -523,7 +520,7 @@ void *GetWindowDesktop (struct window_d * hwnd){
 
 /*
  * =====================================================
- * windowSetUpColorScheme:
+ * windowInitializeColorSchemeSupport:
  *     Isso configura os esquemas de cores utilizados 
  * pelo sistema.
  *     Essa rotina é chamada apenas uma vez na inicialização
@@ -542,25 +539,27 @@ void *GetWindowDesktop (struct window_d * hwnd){
  * em user mode criem esquemas de cores e habilite eles.
  */
 
-void windowSetUpColorScheme (int type){
-	
-    struct color_scheme_d *humility;
-    struct color_scheme_d *pride;	
-	
-	//
-	// * HUMILITY
-	//
-	
+int windowInitializeColorSchemeSupport (void){
+
+    struct color_scheme_d  *humility;
+    struct color_scheme_d  *pride;
+
+    int Type = ColorSchemeHumility;
+
+
+//
+// HUMILITY
+//
+
     //Criando o esquema de cores humility. (cinza)
     humility = (void *) kmalloc ( sizeof(struct color_scheme_d) );
-    
-	if( (void *) humility == NULL ){
-		panic ("windowSetUpColorScheme: humility");
-		
-	}else{
+
+    if( (void *) humility == NULL ){
+        panic ("windowSetUpColorScheme: humility");
+    }else{
         humility->objectType  = ObjectTypeColorScheme;
         humility->objectClass = ObjectClassGuiObjects;
-        humility->used  = 1;
+        humility->used  = TRUE;
         humility->magic = 1234;
         humility->name  = "Humility";
 
@@ -584,22 +583,22 @@ void windowSetUpColorScheme (int type){
 
 		//Sanvando na estrutura padrão para o esquema humility.
 		HumilityColorScheme = (void*) humility;
-	};
-	
-	//
-	// * PRIDE 
-	//
-	
+    };
+
+
+//
+// PRIDE 
+//
+
     //Criando o esquema de cores PRIDE. (colorido)
     pride = (void *) kmalloc ( sizeof(struct color_scheme_d) );
     
     if ( (void *) pride == NULL ){
         panic ("windowSetUpColorScheme: pride");
-
     }else{
         pride->objectType  = ObjectTypeColorScheme;
         pride->objectClass = ObjectClassGuiObjects;
-        pride->used  = 1;
+        pride->used  = TRUE;
         pride->magic = 1234;
         pride->name  = "Pride";
 
@@ -623,14 +622,14 @@ void windowSetUpColorScheme (int type){
 
 		//Sanvando na estrutura padrão para o esquema pride.
 		PrideColorScheme = (void *) pride;
-	};
+    };
 
 
 	// Configurando qual será o esquema padrão.
 	// @todo; Criar uma função que selecione qual dois esquemas serão usados
 	//        apenas selecionando o ponteiro da estrutura.  
 
-    switch (type){
+    switch (Type){
 
     case ColorSchemeNull: 
         CurrentColorScheme = (void *) humility;
@@ -648,6 +647,8 @@ void windowSetUpColorScheme (int type){
         CurrentColorScheme = (void *) humility;
         break;
     };
+
+    return 0;
 }
 
 
@@ -1050,62 +1051,80 @@ int get_current_window_id()
  * RegisterWindow: 
  *     Registrando uma janela numa lista de janelas.
  */
- 
-// window server stuff. 
- 
+
+// Belongs to kgws.
+
 int RegisterWindow (struct window_d *window){
 
     struct window_d *Empty; 
     int Offset = 0; 
 
 
+    debug_print ("RegisterWindow:\n");
+
     if ( (void *) window == NULL ){
-        //message
-        return (int) 1;
+        debug_print ("RegisterWindow: window\n");
+        return (int) -1;
+    }
+    
+    if ( window->used != TRUE || window->magic != 1234 )
+    {
+        debug_print ("RegisterWindow: window validation\n");
+        return (int) -1;
     }
 
 
 	// Contagem de janelas e limites.
 	// (é diferente de id, pois id representa a posição
 	// da janela na lista de janelas).
-	
-	windows_count++;
+
+    // Global
+
+    windows_count++;
 
     if ( windows_count >= WINDOW_COUNT_MAX ){
-        panic ("RegisterWindow: Limits");
+        panic ("RegisterWindow: windows_count\n");
     }
 
-	// Create empty.	
-	
-//Loop.	
+    // Create empty.
+
+// Loop
+
 get_next:
 
-	Offset++;
-	
-	//Limite da lista, volta ao início da lista.
-	
+    // #bugbug
+    // Infinity loop?
+
+    // Search empty slot
+    // Limite da lista, volta ao início da lista.
+
+    Offset++;
+
     if (Offset >= WINDOW_COUNT_MAX){
         Offset = 0;
     }
-    
-	//Get empty.
- 	Empty = (void *) windowList[Offset]; 
-	
+
+    // Get empty
+
+    Empty = (void *) windowList[Offset]; 
+
     if ( (void *) Empty != NULL ){
         goto get_next;
-
     }else{
-	    
-		//coloca na lista.
-		//Onde está vazio, registra o ponteiro.
-	    windowList[Offset] = (unsigned long) window; 	
-		
-		//configura o id.
-		window->id = (int) Offset;
-		
-		//...
+
+        // Coloca na lista.
+        // Onde está vazio, registra o ponteiro.
+
+        windowList[Offset] = (unsigned long) window; 
+
+        // Configura o id.
+
+        window->id = (int) Offset;
+
+        // ...
     }; 
 
+    // ok
     return 0;
 }
 
@@ -2749,17 +2768,15 @@ fail:
 }
 
 
-//coloca a janela acima das outras.
+// Coloca a janela acima das outras.
 int raise_window ( struct window_d *window ){
-
 
     struct window_d *parent;
 
-	if ( (void *) window == NULL ){
+    if ( (void *) window == NULL ){
 		//message
-		return -1;
-
-	}else{
+        return -1;
+    }else{
 
       // #bugbug
       // a janela filha nunca é a janela ativa.
@@ -2788,6 +2805,7 @@ int raise_window ( struct window_d *window ){
 /*
  ********************************
  * windowSwitchFocus:
+ * 
  *     Muda a janela que está com foco de entrada.
  *     @todo: Selecionar a janela indicada como next 
  * na estrutura.
@@ -2797,9 +2815,7 @@ int raise_window ( struct window_d *window ){
  * estamos.
  * Muda quando trocamos a janela ativa, muda quando trocamos o desktop.
  */
- 
-// wm ? 
- 
+
 void windowSwitchFocus (void){
 
 	int Max=0;
@@ -2827,7 +2843,7 @@ void windowSwitchFocus (void){
 	{
 		printf("windowSwitchFocus: window\n");
 	    goto fail; 
-		
+
 	}else{
 
         kgwmKillFocus (window);  
@@ -2932,27 +2948,34 @@ fail:
  
 void MinimizeWindow (struct window_d *window){
 
-    int Status=0;
+    int Status = FALSE;
 
 
-    if( (void *) window == NULL ){
+    debug_print ("MinimizeWindow:\n");
+
+    if ( (void *) window == NULL ){
         printf ("MinimizeWindow: window\n");
         return;
+    }
 
-    }else{
+    if ( window->used != TRUE || window->magic != 1234 )
+    {
+        printf ("MinimizeWindow: window validation\n");
+        return;
+    }
 
-        Status = (int) is_window_minimized (window);
+    // Get status
+    
+    Status = (int) is_window_minimized (window);
 
-        if (Status == 1){
-		    printf ("MinimizeWindow: Status\n");
-	        return;
-			//goto fail; 
-	    }
+    if (Status == TRUE){
+        printf ("MinimizeWindow: Status\n");
+        return;
+    }
 
-        kgwmKillFocus (window);
+    kgwmKillFocus (window);
 
-        window->view = (int) VIEW_MINIMIZED;		
-    };
+    window->view = (int) VIEW_MINIMIZED;
 }
 
 
@@ -2963,43 +2986,58 @@ void MinimizeWindow (struct window_d *window){
  *     @todo: windowMazimize()
  */
 
-// wm. 
- 
 void MaximizeWindow (struct window_d *window){
 
     int Status=0;
 
+    int RedrawAndShow = TRUE;
 
 
-    if( (void *) window == NULL){
+    debug_print ("MaximizeWindow:\n");
+
+    if ( (void *) window == NULL){
         printf ("MaximizeWindow: window\n");
         goto fail; 
     }
 
-	Status = (int) is_window_maximized(window);
-
-    if (Status == 1){
-		printf ("MaximizeWindow: Status\n");
-	    goto fail; 
+    if ( window->used != TRUE || window->magic != 1234 )
+    {
+        printf ("MaximizeWindow: window validation\n");
+        return;
     }
 
-    //redimensionar.
+    Status = (int) is_window_maximized(window);
+
+    if (Status == TRUE){
+        printf ("MaximizeWindow: Status\n");
+        goto fail; 
+    }
+
+    if ( (void *) gui == NULL){
+        panic ("MaximizeWindow: gui\n");
+    }
+
+    // Redimensionar ao tamanho da janela main.
+    // A janela main eh o desktop menos a barra.
+
     if ( gui->main != NULL )
     {
-        window->left = gui->main->left;             
-        window->top = gui->main->top;                   
-        window->width = gui->main->width;             
+        window->left   = gui->main->left;
+        window->top    = gui->main->top;
+        window->width  = gui->main->width;
         window->height = gui->main->height;
     }
 
-	// todo: 
-	// Redraw ?!
-	
 done:
 
     kgwmSetActiveWindow (window);
     kgwmSetFocus (window);
     window->view = (int) VIEW_MAXIMIZED;
+
+    if (RedrawAndShow == TRUE){
+        redraw_window(window,TRUE);
+    }
+
     return;
 
 fail:
@@ -3189,9 +3227,9 @@ int init_windows (void){
 	//@todo: Isso poderia ter um argumento, selecionado entre o 
 	//tipo 1 e 2, humility e pride.
 	//ColorSchemeHumility ou ColorSchemePride
-	windowSetUpColorScheme(ColorSchemeHumility);
-	//windowSetUpColorScheme(ColorSchemePride);	
-	
+
+    windowInitializeColorSchemeSupport();
+
 	//input buffer support ??
 	//output buffer support ??
 	
@@ -3280,25 +3318,31 @@ int init_windows (void){
 	//
 	// Continua ...
 	//
-	
-done:	
 
-	return 0;
-	
+
+done:
+    return 0;
 fail:
-	return (int) 1;
+    return (int) 1;
 }
 
 
-//pegando a z-order de uma janela.
-// wm
+// Pegando a z-order de uma janela.
 
 int get_zorder ( struct window_d *window )
 {
 
-    if ( (void *) window != NULL ){ return (int) window->z; }
+    if ( (void *) window != NULL )
+    { 
+        return (int) -1;
+    }
 
-    return (int) -1;
+    if ( window->used != TRUE || window->magic != 1234 )
+    { 
+        return (int) -1;
+    }
+
+    return (int) window->z; 
 }
 
 
@@ -3318,24 +3362,18 @@ int get_zorder ( struct window_d *window )
 	//??
 	// Uma estrutura de janela pode ter uma variável top_window indicando o id 
 	// da janela que está no topo da z-order da janela.
-	
-//pegando a o id da janela que está no topo da lista de uma janela.
-// wm
 
-struct window_d *getTopWindow (struct window_d *window)
+
+// Pegando a o ponteiro da janela que está 
+// no topo da lista
+
+struct window_d *getTopWindow (void)
 {
-	
-	if ( (void *) window == NULL )
-	{
-		return (struct window_d *) Windows[KGWS_ZORDER_TOP];
-	}
-	
-	return NULL;
+    return (struct window_d *) Windows[KGWS_ZORDER_TOP];
 }
 
 
 // Obtendo a janela de nível mais alto.
-// wm
 int get_top_window (void)
 {
     return (int) top_window;
@@ -3343,17 +3381,30 @@ int get_top_window (void)
 
 
 // Setando a top window.
-// wm
 void set_top_window (int id)
 {
-    struct window_d *w;
+    struct window_d  *w;
+
+    // #bugbug
+    // Check limits
+
+    if ( id<0 || id>=WINDOW_COUNT_MAX)
+        return;
 
     w = (struct window_d *) windowList[id];
     
     if ( (void *) w != NULL ){
-        Windows[KGWS_ZORDER_TOP] = (unsigned long) w;    
-        top_window = (int) id;
+        return;
     }
+    
+    if ( w->used != TRUE || w->magic != 1234 )
+    {
+        return;
+    }
+
+    top_window = (int) id;
+
+    Windows[KGWS_ZORDER_TOP] = (unsigned long) w;    
 }
 
 
@@ -3365,11 +3416,8 @@ void closeActiveWindow (void)
 }
 
 
-
 //encontrando um slot livre na z-order global de 
 //overlapped windows.
-
-// wm
 
 int z_order_get_free_slot (void){
 
@@ -3397,7 +3445,7 @@ int z_order_get_free_slot (void){
 			}
 
 			goto done;
-		};
+		}
 		//Nothing
 	};
 	
@@ -3436,9 +3484,15 @@ int windowLoadGramadoIcons (void){
 	//@todo checar a validade dos ponteiros.
 
 
-    // 4 pages.
-    unsigned long tmp_size = (4*4096);
+    // #bugbug
+    // Size determinado, mas não sabemos o tamanho dos ícones.
 
+    // 4 pages.
+    // 16 KB ? Is it enough ?
+    // Sim, os ícones que estamos usam possuem no máximo 2KB.
+    // See: base/
+
+    unsigned long tmp_size = (4*4096);
 
     // See: window.h
     shared_buffer_app_icon       = (void *) allocPages(4);
@@ -3666,7 +3720,7 @@ int windowScan ( unsigned long x, unsigned long y ){
 
         if ( (void *) w != NULL )
         {
-            if ( w->used == 1 && w->magic == 1234 )
+            if ( w->used == TRUE && w->magic == 1234 )
             {
 
 				// #bugbug
@@ -3696,7 +3750,7 @@ int windowScan ( unsigned long x, unsigned long y ){
                     {
 
                         WID = w->id;
-                        window_mouse_over = w->id;
+                        window_mouse_over = WID;
 
                         return (int) WID;
                     }
@@ -3735,14 +3789,9 @@ int windowScan ( unsigned long x, unsigned long y ){
 					// ...
 				}; 
 				*/
-
-
-
-			};
-		};
-
-	}; //for
-
+            }
+        }
+    }; //for
 
     return (int) -1;
 }
@@ -3777,7 +3826,7 @@ int windowOverLappedScan ( unsigned long x, unsigned long y ){
 
         if ( (void *) w != NULL )
         {
-            if ( w->used == 1 && w->magic == 1234 )
+            if ( w->used == TRUE && w->magic == 1234 )
             {
 
 				// #bugbug
@@ -3811,12 +3860,11 @@ int windowOverLappedScan ( unsigned long x, unsigned long y ){
                     {
                         //printf ("o ");
                         WID = w->id;
-                        window_mouse_over = w->id;
+                        window_mouse_over = WID;
 
                         return (int) WID;
                     }
                 }
-
 
 
 				// Dentro da área da janela.
@@ -3851,21 +3899,20 @@ int windowOverLappedScan ( unsigned long x, unsigned long y ){
 				}; 
 				*/
 
-
-
-			};
-		};
+            }
+        }
     }; //for
 
     return (int) -1;
 }
 
 
+// Envia uma mensagem PAINT para o aplicativo atualizar 
+// a área de trabalho.
 
+    // #wrong
+    // We need to put the message in the queue.
 
-
-
-//Envia uma mensagem PAINT para o aplicativo atualizar a área de trabalho.
 void windowUpdateWindow ( struct window_d *window )
 {
     // bugbug: esse send está falhando.
@@ -3888,11 +3935,14 @@ void windowUpdateWindow ( struct window_d *window )
 
         if ( (void *) window->control != NULL )
         {
-            if ( window->control->used == 1 || 
+            if ( window->control->used  == TRUE || 
                  window->control->magic == 1234 )
             {
 
                 // Single kernel event.
+
+                // #wrong
+                // We need to put it in the queue.
 
                 window->control->ke_window = window;
                 window->control->ke_msg    = MSG_PAINT;
@@ -3925,12 +3975,10 @@ int fsStatus;
 // uma janela entra ou sai do modo full screen.
 // #todo: isso pode ir pra outro lugar, provavelmente gws.
 
-// wm
-
 int windowSwitchFullScreen (void){
-	
-	struct window_d *window;
-	
+
+    struct window_d  *window;
+
 	//1 = entrar ; 0 = sair.
 	int flag;
 	
@@ -3938,48 +3986,44 @@ int windowSwitchFullScreen (void){
 	// printf ("windowSwitchFullScreen: Initializing ...\n");
 	
 	//#teste
-	
-	//se a janela ativa já é a fullscreen 
-	//então é hora de sair.
-	
-	if ( fsStatus == 1 )
-	{
-	    //sair
-		current_window    = active_window;
-	    window_with_focus = active_window;
-	    fullscreen_window = 0;		
-		flag = 0;
-		fsStatus = 0;
-		goto doswitch;
-	}
-	
-	
-	//selecionando a janela ativa para entrar em fullscreen.
-	
-	//entrar.
-	current_window    = active_window;
-	window_with_focus = active_window;
-	fullscreen_window = active_window;
-	flag = 1;  
-    fsStatus = 1;
-	
-doswitch:
-	
-	
-	//
-	// # Window #
-	//
-	
-	window = (struct window_d *) windowList[current_window];
 
-    if ( (void *) window ==  NULL  )
+
+    // Se a janela ativa já é a fullscreen 
+    // então é hora de sair.
+
+    if ( fsStatus == TRUE )
     {
-		printf("windowSwitchFullScreen: window\n");
-		goto fail;
-		
-	}else{
-		
-		if ( window->used != 1 || window->magic != 1234 )
+        current_window    = active_window;
+        window_with_focus = active_window;
+        fullscreen_window = 0;		
+        flag = FALSE;
+        fsStatus = FALSE;
+        goto doswitch;
+    }
+
+    // Caso contrário.
+    // Selecionando a janela ativa para entrar em fullscreen.
+
+    current_window    = active_window;
+    window_with_focus = active_window;
+    fullscreen_window = active_window;
+    flag = TRUE; 
+    fsStatus = TRUE;
+
+doswitch:
+
+	//
+	// Window 
+	//
+
+    window = (struct window_d *) windowList[current_window];
+
+    if ( (void *) window ==  NULL  ){
+        printf("windowSwitchFullScreen: window\n");
+        goto fail;
+    }else{
+
+		if ( window->used != TRUE || window->magic != 1234 )
 		{
 			printf("windowSwitchFullScreen: window validation\n");
 			goto fail;
@@ -3991,8 +4035,8 @@ doswitch:
 			printf("windowSwitchFullScreen: rcClient\n");
 			goto fail;
 		}else{
-			
-			if( window->rcClient->used != 1 || 
+
+			if( window->rcClient->used  != TRUE || 
 			    window->rcClient->magic != 1234 )
 			{
 			    printf("windowSwitchFullScreen: rect validation\n");
@@ -4009,18 +4053,18 @@ doswitch:
 					save_client_rect_top    = window->rcClient->top;
 					save_client_rect_width  = window->rcClient->width;
 					save_client_rect_height = window->rcClient->height;
-					
-				    window->rcClient->left = (unsigned long) 0;
-				    window->rcClient->top  = (unsigned long) 0;
+
+				    window->rcClient->left   = (unsigned long) 0;
+				    window->rcClient->top    = (unsigned long) 0;
 				    window->rcClient->width  = (unsigned long) systemGetSystemMetrics( 1 ); //screen width. 1
-				    window->rcClient->height =  (unsigned long) systemGetSystemMetrics( 2 ); //screen height.2
+				    window->rcClient->height = (unsigned long) systemGetSystemMetrics( 2 ); //screen height.2
 			        
                     window->view = VIEW_FULL;
 					
                     backgroundDraw( (unsigned long) window->rcClient->bg_color );  
-					refresh_screen();					
-				};
-			
+					refresh_screen();
+				}
+
 				//sair
 			    if( flag == 0 )	
 				{
@@ -4033,11 +4077,11 @@ doswitch:
 				    window->rcClient->width  = (unsigned long) save_client_rect_width; 
 				    window->rcClient->height = (unsigned long) save_client_rect_height; 
 			    
-				    window->view = VIEW_NORMAL;				
+				    window->view = VIEW_NORMAL;
 					
 					//flag = 1 ( refresh rectangle.)
-					redraw_window ( (struct window_d *) window, 1 );
-				};			
+					redraw_window ( (struct window_d *) window, TRUE );
+				}
 			
 		};
 		
@@ -4046,12 +4090,9 @@ doswitch:
 
         kgwmSetFocus (window); 
 	};
-	
-	
+
     ldisc_init_modifier_keys();
-	ldisc_init_lock_keys();
-		
-	//refresh_screen();
+    ldisc_init_lock_keys();
 
 done:
     printf("DONE\n");
@@ -4062,7 +4103,7 @@ done:
 fail:
     printf ("FAIL\n");
     refresh_screen();
-    
+
     return 1;
 }
 
@@ -4081,6 +4122,7 @@ scroll_client_window (struct window_d *window)
 
 // Initialize the structures used by the Power Trio window manager.
 // Called by init_window_manager()
+
 int powertrio_initialize(void)
 {
     int i=0;

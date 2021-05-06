@@ -77,22 +77,38 @@ int gwsClose (void)
 }
 
 
+// #bugbug
 // Registrar um window manager.
+// #todo: We need a global structure to handle this situation.
+// not a global variable.
+
 int kgwmRegisterWindowManager ( int pid )
 {
-    int Status = 0;
+    int Status = FALSE;
+
+
+    debug_print ("kgwmRegisterWindowManager: [FIXME]\n");
 
     if ( pid < 0 ){
         printf("kgwmRegisterWindowManager: pid\n");
     }
 
+    // #bugbug
+    // We need to fix everything here.
+
+    // Se o kgwm está em uso?
+    // Então não podemos realiza essa operação.
     if ( kgwm_status != TRUE ){
-        Status = 1;
+        Status = FALSE;
         goto fail;
+
+    // Se o kgwm não está em uso então podemos
+    // selecionar um processo que será usado como wm ?
     }else{
+        // kgwm_status = FALSE;
         kgwm_wm_PID = (int) pid;
         kgwm_wm_status = TRUE;
-        return 0;
+        return TRUE;
     };
 
 fail:
@@ -891,6 +907,9 @@ guiSetUpMainWindow (
 }
 
 
+
+
+// =====================================================
 // service 301
 // Change active window.
 // Switch to the next window.
@@ -899,7 +918,15 @@ guiSetUpMainWindow (
 // associated with this new window.
 // Valid for overlapped windows.
 
-// control + f12
+// control + [f5~f8] 
+
+
+// The list is a element o a given desktop, ex: CurrentDesktop->list[i].
+// So, this way we can have differentt desktops using this list.
+// #test: Maybe one desktop, using the gws, can use the window structure
+// that belongs to kgws to handle the app windows, given to the kgwm
+// the opportunity to switch between those windows, 
+// changing the active window. 
 
 int kgwm_next(void)
 {
@@ -907,6 +934,15 @@ int kgwm_next(void)
     struct window_d  *n;        // next window
 
     struct thread_d *t;
+
+
+    // #todo:
+    // Talvez possamos receber esse ponteiro via argumento.
+    // Por enquanto vamos usar o CurrentDesktop.
+
+    struct desktop_d  *TargetDesktop;
+
+    TargetDesktop = (struct desktop_d  *) CurrentDesktop;
 
 
     debug_print("kgwm_next: [FIXME]\n");
@@ -972,14 +1008,14 @@ int kgwm_next(void)
     // A next é inválida,
     // então vamos usar a lista que está no desktop.
 
-    if ( (void*) CurrentDesktop == NULL ){
-        panic ("kgwm_next: CurrentDesktop\n");
+    if ( (void *) TargetDesktop == NULL ){
+        panic ("kgwm_next: TargetDesktop\n");
     }
 
-    if ( CurrentDesktop->desktopUsed  != TRUE && 
-         CurrentDesktop->desktopMagic != 1234 )
+    if ( TargetDesktop->desktopUsed  != TRUE && 
+         TargetDesktop->desktopMagic != 1234 )
     {
-        panic ("kgwm_next: CurrentDesktop validation\n");
+        panic ("kgwm_next: TargetDesktop validation\n");
     }
 
 
@@ -998,21 +1034,23 @@ int kgwm_next(void)
     int NewWindowSelected=FALSE;
 
     // limits
-    if (CurrentDesktop->lHead < 0 ||CurrentDesktop->lHead >= 8)
+    if (TargetDesktop->lHead < 0 || TargetDesktop->lHead >= 8)
     {
-        CurrentDesktop->lHead = 0;
+        TargetDesktop->lHead = 0;
     }
 
-    i = CurrentDesktop->lHead;
+    i = TargetDesktop->lHead;
 
-    tmp = (struct window_d *) CurrentDesktop->list[i]; 
+    // Get the window
+
+    tmp = (struct window_d *) TargetDesktop->list[i]; 
     
     // circula
     // se der certo ou nao
-    CurrentDesktop->lHead++;
-    if (CurrentDesktop->lHead >= 8)
+    TargetDesktop->lHead++;
+    if (TargetDesktop->lHead >= 8)
     {
-        CurrentDesktop->lHead = 0;
+        TargetDesktop->lHead = 0;
     }
 
     // fail
@@ -1223,6 +1261,9 @@ kgwm_window_control_dialog (
     unsigned long long1,
     unsigned long long2 )
 {
+
+    // #todo: Check pointer.
+
 
     //#bugbug
     if ( window->isControl != TRUE ){

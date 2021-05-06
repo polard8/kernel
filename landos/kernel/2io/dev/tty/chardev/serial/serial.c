@@ -40,7 +40,10 @@ void serial1_handler (void)
     // IN: device type and data.
     // 1=keyboard
     // 2=COM port
-    console_interrupt(CONSOLE_DEVICE_SERIAL,0);
+    console_interrupt(
+        foreground_thread,
+        CONSOLE_DEVICE_SERIAL,
+        0 );
     
     //
     // profiler
@@ -62,7 +65,10 @@ void serial2_handler (void)
     // IN: device type and data.
     // 1=keyboard
     // 2=COM port
-    console_interrupt(CONSOLE_DEVICE_SERIAL,0);
+    console_interrupt(
+        foreground_thread,
+        CONSOLE_DEVICE_SERIAL,
+        0 );
 
     //
     // profiler
@@ -84,7 +90,10 @@ void serial3_handler (void)
     // IN: device type and data.
     // 1=keyboard
     // 2=COM port
-    console_interrupt(CONSOLE_DEVICE_SERIAL,0);
+    console_interrupt(
+        foreground_thread,
+        CONSOLE_DEVICE_SERIAL,
+        0);
 }
 
 
@@ -99,7 +108,7 @@ void serial4_handler (void)
     // IN: device type and data.
     // 1=keyboard
     // 2=COM port
-    console_interrupt(CONSOLE_DEVICE_SERIAL,0);
+    console_interrupt(foreground_thread,CONSOLE_DEVICE_SERIAL,0);
 }
 
 //=====================================

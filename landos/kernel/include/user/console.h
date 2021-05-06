@@ -102,7 +102,7 @@ console_ioctl (
 
 int VirtualConsole_initialize(void);
 
-void console_interrupt(int device_type, int data);
+void console_interrupt(int target_thread, int device_type, int data);
 
 #endif    
 

@@ -98,13 +98,13 @@ irq1_KEYBOARD (void)
     //  
 
 
-	// Se o teclado ps2 não estiver inicializado !
-    if ( __breaker_ps2keyboard_initialized == 0 ){
+    // Se o teclado ps2 não estiver inicializado !
+    if ( __breaker_ps2keyboard_initialized == FALSE ){
         return;
     }
 
 
-	// Contando as interrupções desse tipo.
+    // Contando as interrupções desse tipo.
     g_profiler_ints_irq1++;
 
 
@@ -147,6 +147,8 @@ irq1_KEYBOARD (void)
     
     // pt-br keyboard.
     // Defined in kernel.h
+    // See: ps2kbd.c
+
     if (abnt2 == TRUE){
         DeviceInterface_PS2Keyboard();
         goto done;
@@ -170,9 +172,8 @@ done:
 
     if ( PS2.used == TRUE )
     {
-        if ( PS2.mouse_initialized == TRUE )
-        {
-            // Reenable the mouse port.
+        // Reenable the mouse port.
+        if ( PS2.mouse_initialized == TRUE ){
             wait_then_write (0x64,0xA8);
         }
     }

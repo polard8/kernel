@@ -1877,13 +1877,31 @@ int VirtualConsole_initialize(void)
 // called by devices that are not block devices.
 // probably keyboard and serial devices.
 // See: keyboard.c and serial.c
-// Called by abnt2_keyboard_handler().
+// Called by DeviceInterface_PS2Keyboard() in ps2kbd.c
 
-// #todo
-// Maybe we need the foreground_thread as a parameter.
 
-void console_interrupt(int device_type, int data)
+void 
+console_interrupt(
+    int target_thread, 
+    int device_type, 
+    int data)
 {
+
+    //int TargetThread = foreground_thread;
+    int TargetThread = target_thread;
+    int DeviceType   = device_type;
+    int Data         = data;
+    
+    
+    // #todo
+    // Essa rotina deve ser um wrapper,
+    // que chamara uma helper function dependendo
+    // do input model. Uma helper function para
+    // cada input model.
+    // Event or unix-like.
+    
+    // int InputModel = ?;
+    
 
     // #todo
     // E se não tivermos uma foreground thread ?
@@ -1893,9 +1911,9 @@ void console_interrupt(int device_type, int data)
 
     // #todo: Check overflow
 
-    if ( foreground_thread < 0 )
+    if ( TargetThread < 0 )
     {
-        debug_print ("console_interrupt: [FAIL] foreground_thread\n");
+        debug_print ("console_interrupt: [FAIL] TargetThread\n");
         
         // #todo
         // Maybe we can set the idle thread if it fail.
@@ -1904,14 +1922,14 @@ void console_interrupt(int device_type, int data)
     }
 
 
-    switch (device_type){
+    switch (DeviceType){
 
         // keyboard
         // data =  raw byte.
         // See: vt/draw/model/kgws.c
         case CONSOLE_DEVICE_KEYBOARD:
             debug_print("console_interrupt: input from keyboard device\n");
-            KGWS_SEND_KEYBOARD_MESSAGE (foreground_thread, data);
+            KGWS_SEND_KEYBOARD_MESSAGE (TargetThread, Data);
             break;
 
         // COM port
