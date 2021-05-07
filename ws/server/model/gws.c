@@ -374,9 +374,13 @@ int gwssrv_init_globals(void)
     }
 
 
-    // refresh the device screen ??
+    // Refresh the device screen?
 
     refresh_device_screen_flag = FALSE;
+
+    // Refresh the valid screen?
+    
+    refresh_valid_screen_flag = FALSE;
 
 
     //background_color = xCOLOR_GRAY3;
@@ -624,7 +628,7 @@ void validate(void)
     dirty = FALSE;
 }
 
-//
+// Check the frame validation
 int isdirty(void)
 {
     return (int) dirty;
@@ -642,6 +646,7 @@ void validate_background(void)
     background = FALSE;
 }
 
+// Check the background validation.
 int is_background_dirty(void)
 {
     return (int) background;
@@ -669,46 +674,44 @@ void refresh_screen(void)
 // #todo: move to view/
 void refresh_device_screen(void)
 {
+    debug_print ("refresh_device_screen:\n");
+
     gws_show_backbuffer();
+    refresh_device_screen_flag = FALSE; // Invalidate.
 }
 
 
-// Refresh the valid screen
+// Refresh the valid screen of the current display.
 // #todo: move to view/
 void refresh_valid_screen(void)
 {
-    //todo
-    //refresh the root window of the valid screen.
-    
+
+    debug_print ("refresh_valid_screen:\n");
+
     if ( (void*) CurrentDisplay == NULL ){
         printf("refresh_valid_screen: [ERROR] CurrentDisplay\n");
         exit (1);
     }
-    
-    // The valid screen is the device screen.
-    if ( CurrentDisplay->valid_screen == CurrentDisplay->device_screen )
-    {
-        gws_show_backbuffer();
+
+//
+// The valid SCREEN
+//
+
+    // Se a valid screen não existe.
+    if ( (void*) CurrentDisplay->valid_screen == NULL ){
+        debug_print ("refresh_valid_screen: [FAIL] No valid screen\n");
         return;
     }
-    
-    // Well the valid screen is not the device screen.
-    
-    // The window server will frequently refresh only the
-    // valid screen ... it will be only a part of the
-    // device screen in a higher resolution.
-    // It depends on the fps rate ...
-    // If the fps is very high so we can use the device screen as
-    // a fixed valid screen.
-    
-    // #todo
-    // This kind of window is NOT well define yet.
-    // We nned to use this pointer.
-    // refresh >> CurrentDisplay->valid_screen
-    // gws_show_window_rect( CurrentDisplay->valid_screen->root );
-    // ...
-}
 
+    // A valid screen é justamente a screen do device.
+    if ( CurrentDisplay->valid_screen == CurrentDisplay->device_screen )
+    {
+        debug_print ("refresh_valid_screen: show the device screen\n");
+        gws_show_backbuffer();
+    }
+
+    refresh_valid_screen_flag = FALSE; // Invalidate.
+}
 
 
 // Função padrão para todos os servidores ???

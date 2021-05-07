@@ -25,6 +25,9 @@ static unsigned long ____new_time=0;
 
 void __update_fps(void)
 {
+
+    debug_print ("__update_fps:\n");
+
     // counter
     frames_count++;
 
@@ -459,6 +462,8 @@ wmDrawFrame (
  *     se estivermos usando graficos em full screen.
  */
 
+// Called by compositor().
+
 void wm_process_windows (void)
 {
     int dirty_status = -1;
@@ -466,17 +471,32 @@ void wm_process_windows (void)
 
 
     gwssrv_debug_print("wm_process_windows:\n");
+
+//
+// == Checl frame validation  ===========================
+//
     
-    //
-    // == dirty rectangles ===========================
-    //
-    
+    // Se algo foi modificado no frame.
     dirty_status = isdirty();
     
     // Nothing to do.
-    if (dirty_status != TRUE)
+    if (dirty_status == FALSE)
     {
-        validate();  // Validate again.
+        gwssrv_debug_print("wm_process_windows: [Not dirty] Nothing to do\n");
+        
+        // Validate the frame.
+        // Ok, we can return or sleep.
+        validate();
+        
+        // Mostrar o status se ele estiver habilitado.
+        // O problema é que isso conta como frame também aqueles
+        // que não foram modificados. 
+        // ok, por enquanto.
+        // Temos que marcar mesmo quando não ha commits.
+        // na verdade devemos contar o fps por janela. 
+        
+        __update_fps();
+        
         return;
     }
 
@@ -485,25 +505,36 @@ void wm_process_windows (void)
 
     //t_start = rtl_get_progress_time();
     
-    //
-    // == dirty background ==============================
-    //
-    
+//
+// == Dirty background ==============================
+//
+
+    // Check the background validation.
+
     background_status = is_background_dirty();
     
     // The background is dirty.
     // Show the whole screen.
+    // #todo
+    // update fps
+
     if (background_status == TRUE)
     {
-        // #todo
-        // update fps
     
         gws_show_backbuffer();
-        validate_background();  // Validate again.
+        validate_background();  // Validate the background.
+        validate();             // Validate the frame.
         return;
     }
 
+//
+// Check the root window validation.
+//
 
+    // ##
+    // Suspendendo isso por enquanto.
+    
+    /*
     // bg window (root window)
     if ( (void*) __root_window != NULL )
     {
@@ -519,7 +550,16 @@ void wm_process_windows (void)
             }
         }
     }
+    */
+    
+//
+// Checking the embedded taskbar validation.
+//
 
+    // ##
+    // Suspendendo isso por enquanto.
+
+    /*
     // taskbar window
     if ( (void*) __taskbar_window != NULL )
     {
@@ -535,7 +575,12 @@ void wm_process_windows (void)
             }
         }
     }
+    */
 
+
+//
+// == Redrawing dirty windows ====================
+//
 
     // Redrawing all the dirty windows.
     // redraw using zorder.
@@ -555,31 +600,27 @@ void wm_process_windows (void)
         {
             if ( tmp->used == TRUE && tmp->magic == 1234 )
             {
+
+                // Redesenha e mostra.
+                // #todo: poderiamos apenas redesenhar e marcar 
+                // o retangulo da janela como sujo, 
+                // para efetuarmos o refresh mais abaixo.
+                // Se mudarmos o segundo argumento para '0', 
+                // nao da refresh da janela agora.
+                // #bugbug: Mas se nao efetuarmos o refresh agora,
+                // temos necessariamente que efetuar logo abaixo.
+                // #bugbug
+                // Tem a possiblidade de construirmos um box
+                // contendo todos os retângulos sujos e
+                // da somente dar refresh do box.
+
+                // Redraw the window and show.
                 // This window is dirty.
+
                 if (tmp->dirty == TRUE)
                 {
-                    //gws_show_window_rect(tmp);
-                    
-                    // redesenha e mostra.
-                    // #todo: poderiamos apenas redesenhar e marcar 
-                    // o retangulo da janela como sujo, 
-                    // para efetuarmso o refresh mais abaixo.
-                    // Se mudarmos o segundo argumento para '0', 
-                    // nao da refresh da janela agora.
-                    // #bugbug: Mas se nao efetuarmos o refresh agora,
-                    // temos necessariamente que efetuar logo abaixo.
-
-                    // #bugbug
-                    // Tem a possiblidade de construirmos um box
-                    // contendo todos os retângulos sujos e
-                    // da somente dar refresh do box.
-                    
-                    // Redraw the window.
-                    
                     gwssrv_redraw_window(tmp,TRUE); 
-                    
-                    // Validate again. 
-                    
+                    // Validate the window
                     tmp->dirty = FALSE;
                 }
             }
@@ -600,18 +641,29 @@ void wm_process_windows (void)
     // Essa flag estara sempre acionada se estivermos 
     // rodando graficos em modo fullscreen.
 
+
+    // #bugbug
+    // Essas rotinas efetuam refresh de áreas grandes da tela,
+    // como a tela toda. Não devem ser chamadas com frequência.
+
     // Refresh the device screen
 
+    // #obs
+    // Pois a rotina acima está mostrando as janelas sujas.
+    // Vamos precisar das rotinas abaixo para o graphics engine
+    
+    /*
     if ( refresh_device_screen_flag == TRUE ){
         gwssrv_debug_print("== R (device) ==\n");  //debug 
         refresh_device_screen();
-    
-    // Refresh only the 'valid screen'.
-    }else{
+    }
+
+    // Refresh only the 'valid screen'.    
+    if ( refresh_valid_screen_flag == TRUE ){
         gwssrv_debug_print("== R (valid) ==\n");  //debug
         refresh_valid_screen();
-    };
-
+    }
+    */
 
     // #todo
     // call a helper function for that.
@@ -622,7 +674,7 @@ void wm_process_windows (void)
 
 
 
-// yellow bar.
+// yellow bar. (rectangle not window)
 // developer status.
 void yellow_status( char *string )
 {
@@ -636,11 +688,14 @@ void yellow_status( char *string )
     unsigned long bar_size = w;
 
 
+    debug_print ("yellow_status:\n");
+    
     //#todo
     //if ( (void*) string == NULL ){ return; }
     //if ( *string == 0 ){ return; }
 
 
+    // Desenha a barra no backbuffer
 
     if ( current_mode == GRAMADO_JAIL ){
         //bar_size = w;
@@ -654,9 +709,16 @@ void yellow_status( char *string )
             0, 0, bar_size, 24, COLOR_YELLOW, 1 );
     };
 
+    // Escreve as strings
+
     dtextDrawString ( offset_string1, 8, COLOR_BLACK, string );
     dtextDrawString ( offset_string2, 8, COLOR_BLACK, "FPS" );
-        
+    
+    // Mostra o retângulo.
+     
+    if (bar_size == 0)
+        bar_size = 32;
+ 
     gws_refresh_rectangle(0,0,bar_size,24);
 }
 

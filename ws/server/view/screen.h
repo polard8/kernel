@@ -5,7 +5,7 @@
 
 
 int refresh_device_screen_flag;
-
+int refresh_valid_screen_flag;
 
 struct gws_screen_d
 {
