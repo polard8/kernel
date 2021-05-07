@@ -1,18 +1,18 @@
 /*
  * File: loader.c
  *
- * Descrição:
+ * Descriï¿½ï¿½o:
  *     Rotinas para carregar o Kernel, os programas do sistema e os arquivos 
- * de inicialização.
+ * de inicializaï¿½ï¿½o.
  *
- * Obs: Por enquanto o módulo loader somente carrega imagens do tipo PE. (M$)
+ * Obs: Por enquanto o mï¿½dulo loader somente carrega imagens do tipo PE. (M$)
  * @todo: Incluir suporte a imgens do tipo ELF.
  * 
  * In this file:
- *     + load_kernel: Carrega o KERNEL.BIN.
+ *     + elfLoadKernelImage: Carrega o KERNEL.BIN.
  *     + load_files: Carrega IDLE.BIN, SHELL.BIN, TASKMAN.BIN.
  *
- * Históry:
+ * Histï¿½ry:
  *     2015 - Created by Fred Nora.
  *     2016 - Revision.
  *     ...
@@ -39,7 +39,7 @@
 int total = 1000;
 int step = 0;
 
-//protótipos de funções locais.
+//protï¿½tipos de funï¿½ï¿½es locais.
 size_t blstrlen(const char *s);
 void DoProgress( char label[], int step, int total );
 void updateProgressBar();
@@ -47,9 +47,9 @@ void updateProgressBar();
 */
 
 
-/* load_kernel: Carrega o KERNEL.BIN na memória. */
+/* elfLoadKernelImage: Carrega o KERNEL.BIN na memï¿½ria. */
  
-int load_kernel (){
+int elfLoadKernelImage (){
 	
     int Status;
 
@@ -64,17 +64,17 @@ int load_kernel (){
 	//Message.
 	
 #ifdef BL_VERBOSE	
-	printf ("load_kernel: Loading %s .. PA=%x | VA=%x \n", 
+	printf ("elfLoadKernelImage: Loading %s .. PA=%x | VA=%x \n", 
 	    kernel_name, kernel_pa, kernel_va );
 #endif
 														
-    //Carregando KERNEL.BIN no endereço físico.
+    //Carregando KERNEL.BIN no endereï¿½o fï¿½sico.
 	
 	Status = (int) fsLoadFile ("KERNEL  BIN", kernel_pa );
     
 	if (Status != 0 )
 	{
-        printf("load_kernel fail: Load\n");  		
+        printf("elfLoadKernelImage fail: Load\n");  		
         goto fail;    
 	};
 	
@@ -82,8 +82,8 @@ int load_kernel (){
 	// updateProgressBar();
 	
 	/*
-	 * Checando arquivo na memória. 
-	 * Validação. 
+	 * Checando arquivo na memï¿½ria. 
+	 * Validaï¿½ï¿½o. 
 	 * (Portable Executable - PE)
 	 *
 	 * @todo: 
@@ -107,7 +107,7 @@ int load_kernel (){
 	// Check for .ELF file. 0x7f 0x45 0x4c 0x46 (.ELF)	
 	if ( kernel[0] != 0x7F || kernel[1] != 'E' || kernel[2] != 'L' || kernel[3] != 'F' )
 	{	
-	    printf ("load_kernel fail: %s Validation\n", kernel_name );  
+	    printf ("elfLoadKernelImage fail: %s Validation\n", kernel_name );  
 		goto fail;	
 	}
 
@@ -115,7 +115,7 @@ int load_kernel (){
 	// Check for intel i386. 0x014C.
 	//if ( kernel[0] != 0x4C || kernel[1] != 0x01 )
 	//{	
-	//    printf ("load_kernel fail: %s Validation\n", kernel_name );  
+	//    printf ("elfLoadKernelImage fail: %s Validation\n", kernel_name );  
 	//	goto fail;	
 	//};
 	
@@ -125,20 +125,20 @@ int load_kernel (){
 	
 	
 	// #importante:
-	// Checando se o kernel base contém o header 
+	// Checando se o kernel base contï¿½m o header 
 	// do multiboot.
 	// Obs: Para o Gramado Boot isso significa apenas
-	// mais um ítem de segurança, pois o Gramado Boot
-	// fará a inicialização do mesmo modo de sempre e enviará 
+	// mais um ï¿½tem de seguranï¿½a, pois o Gramado Boot
+	// farï¿½ a inicializaï¿½ï¿½o do mesmo modo de sempre e enviarï¿½ 
 	// os mesmos argumentos de sempre.
-	// Porém se um multiboot carregar o kernel, certamente 
-	// não passará os mesmos argumentos que o Gramado Boot,
-	// então o kernel inicializará de forma diferente,
+	// Porï¿½m se um multiboot carregar o kernel, certamente 
+	// nï¿½o passarï¿½ os mesmos argumentos que o Gramado Boot,
+	// entï¿½o o kernel inicializarï¿½ de forma diferente,
 	// provavelmente apenas em modo texto.
 
 	
 	// Multiboot magic signature.
-    // O header está em 0xC0001000.	
+    // O header estï¿½ em 0xC0001000.	
 	// 0x1BADB002
 	// tem um jmp antes do header.
 	
@@ -166,10 +166,10 @@ int load_kernel (){
 	
 
 // Fail 
-// O Kernel não pôde ser carregado.	
+// O Kernel nï¿½o pï¿½de ser carregado.	
 
 fail:
-    printf("load_kernel: Fail\n");
+    printf("elfLoadKernelImage: Fail\n");
     abort ();
 	//die();	
 };
@@ -188,7 +188,7 @@ fail:
  *
  * @todo:
  *     Deve existir uma lista de arquivos. 
- *     Essa função carregará os arquivos da lista.
+ *     Essa funï¿½ï¿½o carregarï¿½ os arquivos da lista.
  *
  *     Mudar para loaderLoadFiles()
  */ 
@@ -206,7 +206,7 @@ int load_files (){
 	
 	//
 	// @todo: Carregar mais arquivos. Especialmente os arquivos 
-	// de configuração e os arquivos de componentes da interface gráfica.
+	// de configuraï¿½ï¿½o e os arquivos de componentes da interface grï¿½fica.
 	//
 	
 	//@todo: Path.
@@ -216,24 +216,24 @@ int load_files (){
 	
 	/*
 	 * Address:
-	 *     Endereços físicos para carregar os aplicativos.
+	 *     Endereï¿½os fï¿½sicos para carregar os aplicativos.
 	 *
 	 * @todo: 
-	 *     Os endereços lógicos dos aplicativos deverão ser o mesmo. 
-	 * Todos terão o endereço lógico 0x00400000. Para isso, cada processo 
-	 * deverá ter seu próprio diretório de páginas. Isso ainda está em fase de
-	 * implementação.         
+	 *     Os endereï¿½os lï¿½gicos dos aplicativos deverï¿½o ser o mesmo. 
+	 * Todos terï¿½o o endereï¿½o lï¿½gico 0x00400000. Para isso, cada processo 
+	 * deverï¿½ ter seu prï¿½prio diretï¿½rio de pï¿½ginas. Isso ainda estï¿½ em fase de
+	 * implementaï¿½ï¿½o.         
 	 *
-	 * Por enquanto todos processos estão usando o mesmo diretório de páginas
-	 * e cada um é carregado em um endereço lógico diferente, definido à seguir.
+	 * Por enquanto todos processos estï¿½o usando o mesmo diretï¿½rio de pï¿½ginas
+	 * e cada um ï¿½ carregado em um endereï¿½o lï¿½gico diferente, definido ï¿½ seguir.
 	 * 
 	 */
 	 
 	
 	// #todo:
-	// Todos eles deverão ter o mesmo endereço virtual.
-	// Então eles serão carregados em endereços físicos 
-	// mas serão mapedos depois pelo kernel.
+	// Todos eles deverï¿½o ter o mesmo endereï¿½o virtual.
+	// Entï¿½o eles serï¿½o carregados em endereï¿½os fï¿½sicos 
+	// mas serï¿½o mapedos depois pelo kernel.
 	
 	// 0x00400000, 0x00450000, 0x004A0000; 
 	
@@ -244,8 +244,8 @@ int load_files (){
 	
 	
 	// Limites: 
-	// O endereço base deve estar acima do limite mínimo estabelecido 
-	// para um processo de usuário.
+	// O endereï¿½o base deve estar acima do limite mï¿½nimo estabelecido 
+	// para um processo de usuï¿½rio.
 	
 	if ( INIT_ADDRESS < USER_BASE || 
 	     SHELL_ADDRESS < USER_BASE || 
@@ -312,9 +312,9 @@ int load_files (){
 
 
 	// Continua? 
-	//     O Boot Loader pode carregar vários arquivos. Principalmete 
-	// arquivos de configuração e módulos do kernel com endereço definido.
-	// Pode também carregar imagens para a interface gráfica. Além de fontes e
+	//     O Boot Loader pode carregar vï¿½rios arquivos. Principalmete 
+	// arquivos de configuraï¿½ï¿½o e mï¿½dulos do kernel com endereï¿½o definido.
+	// Pode tambï¿½m carregar imagens para a interface grï¿½fica. Alï¿½m de fontes e
 	// drivers. 
 	
 	
@@ -322,10 +322,10 @@ int load_files (){
 	//  ## Validation ##
 	//
 	
-	// Checando os arquivos carregados na memória se são realmente do tipo 
+	// Checando os arquivos carregados na memï¿½ria se sï¿½o realmente do tipo 
 	// PE, 386. 
 	// #todo: 
-	// Aqui pode haver opções, como ELF.  
+	// Aqui pode haver opï¿½ï¿½es, como ELF.  
 	
 	// Init. 
 	// Shell.

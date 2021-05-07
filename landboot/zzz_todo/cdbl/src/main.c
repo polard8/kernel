@@ -4,35 +4,35 @@
  *
  * File: main.c 
  *
- * Descrição:
+ * Descriï¿½ï¿½o:
  *    Arquivo principal do Boot Loader do sistema de 32bit para desktops.
- *    M0 - Módulos em ring0.
+ *    M0 - Mï¿½dulos em ring0.
  *
- * Atribuições:
+ * Atribuiï¿½ï¿½es:
  *    + Carregar o Kernel.
- *    + Carregar os módulos do kernel. (idle, shell, task manager).
- *    + Carregar os metafiles de inicialização.
+ *    + Carregar os mï¿½dulos do kernel. (idle, shell, task manager).
+ *    + Carregar os metafiles de inicializaï¿½ï¿½o.
  *    + Carregar os aplicativos.
- *    + Fazer a configuração inicial da paginação.
+ *    + Fazer a configuraï¿½ï¿½o inicial da paginaï¿½ï¿½o.
  *    + Passar o comando para o Kernel.
  *
  * Obs:
- * O Kernel será carregado em 0x00100000, entry point em 0x00101000.
- * Esses são endereços físicos. Os endereços lógicos do Kernel são 0xC0000000 
+ * O Kernel serï¿½ carregado em 0x00100000, entry point em 0x00101000.
+ * Esses sï¿½o endereï¿½os fï¿½sicos. Os endereï¿½os lï¿½gicos do Kernel sï¿½o 0xC0000000 
  * para base e 0xC0001000 para entry point.
  *
  * Sobre o Boot Loader:
  * O BL foi carregado em 0x00020000 com entry point em 0x00021000.
- * As funções normais do Boot Loader começam com 'Bl'.
- * As funções que utilizem recursos importados do Boot Manager começam 
+ * As funï¿½ï¿½es normais do Boot Loader comeï¿½am com 'Bl'.
+ * As funï¿½ï¿½es que utilizem recursos importados do Boot Manager comeï¿½am 
  * com 'Ble', que significa algo como Boot Loader Extention.
  *
  * In this file:
  *     + BlMain        - Entrada da parte em C do boot loader. 
  *     + BlLoadKernel  - Carrega o kernel.
- *     + BlLoadFiles   - Carrega os módulos do Kernel, aplicativos e 
-                         metafiles de inicilização.
- *     + BlSetupPaging - Configura a paginação.
+ *     + BlLoadFiles   - Carrega os mï¿½dulos do Kernel, aplicativos e 
+                         metafiles de inicilizaï¿½ï¿½o.
+ *     + BlSetupPaging - Configura a paginaï¿½ï¿½o.
  *     ...
  *
  * History:
@@ -45,7 +45,7 @@
 #include <bootloader.h>
 
 
-// Protótipos de funções internas.
+// Protï¿½tipos de funï¿½ï¿½es internas.
 void BlLoadKernel();
 void BlLoadFiles();
 void BlSetupPaging();
@@ -66,12 +66,12 @@ void BlSetupPaging();
  *     Entrada da parte em C do Boot Loader. 
  *
  * In this function:
- *     + Inicializações.
+ *     + Inicializaï¿½ï¿½es.
  *     + Carrega kernel.
- *     + Carrega módulos do kernel e 
- *       metafiles de inicialização.
- *     + Configura a paginação.
- *     + Retorna para head.s, o código em 
+ *     + Carrega mï¿½dulos do kernel e 
+ *       metafiles de inicializaï¿½ï¿½o.
+ *     + Configura a paginaï¿½ï¿½o.
+ *     + Retorna para head.s, o cï¿½digo em 
  *       assembly que chamou essa rotina.
  */
  
@@ -84,7 +84,7 @@ void BlMain (){
 	//VideoBlock.useGui = 1;			
 	//VideoBlock.useGui = 0;				
 	
-	//INIT ~ Faz inicializações básicas.
+	//INIT ~ Faz inicializaï¿½ï¿½es bï¿½sicas.
 	init (); 
 	
 	
@@ -119,7 +119,7 @@ void BlMain (){
 	//*Importante:
     // ===========
     //     Daqui pra frente vamos carregar os arquivos. Lembrando que
-    // o Boot Loader ainda não sabe carregar de outro dispositivo se não IDE. 
+    // o Boot Loader ainda nï¿½o sabe carregar de outro dispositivo se nï¿½o IDE. 
     
     //
 	// Inicia os carregamentos.
@@ -133,8 +133,8 @@ void BlMain (){
 
     
 	// #importante:
-	// Carregando o diretório raiz e a fat na memória.
-	// Evitando repetição de carregamento.
+	// Carregando o diretï¿½rio raiz e a fat na memï¿½ria.
+	// Evitando repetiï¿½ï¿½o de carregamento.
 	
 	
 	// Ok isso deu certo.
@@ -155,9 +155,9 @@ void BlMain (){
 	
 	
 	// @Todo: (Pensando na possibilidade)
-	// Aqui podemos ter acondição de carregarmos apenas o krnel base.
-	// Essa opção deverá ser habilitada através de um arquivo de configuração.
-	// Ou no header do kernel base poderá ter a indicação de quais módulos 
+	// Aqui podemos ter acondiï¿½ï¿½o de carregarmos apenas o krnel base.
+	// Essa opï¿½ï¿½o deverï¿½ ser habilitada atravï¿½s de um arquivo de configuraï¿½ï¿½o.
+	// Ou no header do kernel base poderï¿½ ter a indicaï¿½ï¿½o de quais mï¿½dulos 
 	// deve-se carregar.
 	
 	
@@ -167,16 +167,16 @@ void BlMain (){
 
     
     // Paging:
-    //     Depois carregar o kernel e os módulos 
-	//     nos seus endereços físicos, 
-    //     configura a paginação e 
+    //     Depois carregar o kernel e os mï¿½dulos 
+	//     nos seus endereï¿½os fï¿½sicos, 
+    //     configura a paginaï¿½ï¿½o e 
 	//     volta para o assembly para 
 	//     configurar os registradores e 
 	//     passar o comando para o kernel.
 	//
 	// Obs:
-	//     Essa configuração básica não impede
-	//     que o kernel faça uma reconfiguração completa.
+	//     Essa configuraï¿½ï¿½o bï¿½sica nï¿½o impede
+	//     que o kernel faï¿½a uma reconfiguraï¿½ï¿½o completa.
     
 #ifdef BL_VERBOSE	
 	printf("BlMain: Initializing pages..\n");
@@ -220,7 +220,7 @@ void BlLoadKernel (){
 	
     int Status;
 	
-	Status = (int) load_kernel ();	
+	Status = (int) elfLoadKernelImage ();	
 	
 	if ( Status != 0 )
 	{
@@ -242,7 +242,7 @@ void BlLoadFiles (){
 	
 	int Status;
 	
-	// Está em loader.c
+	// Estï¿½ em loader.c
 	Status = (int) load_files ();
 	
 	if ( Status != 0 )
@@ -257,31 +257,31 @@ void BlLoadFiles (){
 /*
  ********************************************************************
  * BlSetupPaging:
- *     Configura as páginas.
+ *     Configura as pï¿½ginas.
  *
  * In this function:
  *
  * @diretorio:
  *   page_directory = 0x9C000
- *   OBS: Esse diretório criado será usado pelas primeiros processos durante
- * essa fase de construção do sistema.
- *        O ideal é um diretório por processo.
- *        Toda vez que o kernel iniciar a execução de um processo ele deve 
- * carregar o endereço do diretorio do processo em CR3.
- *       Por enquanto só tem um diretório criado.
+ *   OBS: Esse diretï¿½rio criado serï¿½ usado pelas primeiros processos durante
+ * essa fase de construï¿½ï¿½o do sistema.
+ *        O ideal ï¿½ um diretï¿½rio por processo.
+ *        Toda vez que o kernel iniciar a execuï¿½ï¿½o de um processo ele deve 
+ * carregar o endereï¿½o do diretorio do processo em CR3.
+ *       Por enquanto sï¿½ tem um diretï¿½rio criado.
  *
- * @páginas:
+ * @pï¿½ginas:
  *   km_page_table  = 0x8C000 (RING 0).
  *   um_page_table  = 0x8E000 (RING 3).
  *   vga_page_table = 0x8F000 (RING 3).
  *   lfb_page_table = ?? (RING 3).
  *
  *  @todo: 
- *      Esses endereços precisam ser registrados em variáveis globais ou
+ *      Esses endereï¿½os precisam ser registrados em variï¿½veis globais ou
  * dentro de uma estrutura para se passado para o Kernel.
 * 
- *      Essa deve ser uma interface que chama as rotinas de configuração
- * da paginação. 
+ *      Essa deve ser uma interface que chama as rotinas de configuraï¿½ï¿½o
+ * da paginaï¿½ï¿½o. 
  * 
  */ 
 void BlSetupPaging (){
@@ -312,8 +312,8 @@ void BlAbort (){
 /*
  *****************************************************************
  * BlKernelModuleMain:
- *     Se é o kernel que está chamando o Boot Loader na forma de 
- * módulo do kernel em kernel mode.
+ *     Se ï¿½ o kernel que estï¿½ chamando o Boot Loader na forma de 
+ * mï¿½dulo do kernel em kernel mode.
  *
  */
  
@@ -328,8 +328,8 @@ void BlKernelModuleMain (){
 /*
  **************************************************
  * die:
- *     A intenção dessa rotina deixar o processador no 
- * estado hlt durante um erro fatal. Para que ele não fique 
+ *     A intenï¿½ï¿½o dessa rotina deixar o processador no 
+ * estado hlt durante um erro fatal. Para que ele nï¿½o fique 
  * funcionando a 100% num loop infinito.
  */
 
