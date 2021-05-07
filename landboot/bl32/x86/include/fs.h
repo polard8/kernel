@@ -1,10 +1,8 @@
 /*
  * File: fs.h 
  *
- * Descri��o:
- *    Header do sistema de arquivos do Boot Loader.
- *
- * 2015 - Created by Fred Nora.
+ * History:
+ *     2015 - Created by Fred Nora.
  */
 
 
@@ -13,8 +11,8 @@
 
 
 
-#define SECTOR_SIZE 512 
-//#define SECTOR_SIZE 4096  //Novo padr�o. 
+#define SECTOR_SIZE    512 
+//#define SECTOR_SIZE    4096  // New standard
 
 
 //
