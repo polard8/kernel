@@ -469,12 +469,12 @@ int LandOSLoadKernelImage(void)
     // essa função aborta ao primeiro sinal de perigo.
 
 
-    Status = (int) load_kernel(image_name);
+    Status = (int) elfLoadKernelImage(image_name);
 
     // Fail
     if ( Status != 0 )
     {
-        printf ("LandOSLoadKernelImage: load_kernel fail\n");
+        printf ("LandOSLoadKernelImage: elfLoadKernelImage fail\n");
         refresh_screen();
         
         return (int) (-1);

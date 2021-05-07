@@ -1,9 +1,9 @@
 ;
 ; File: lib16/s2fat12.inc
 ;
-; Descrição:
+; Descriï¿½ï¿½o:
 ;     Suporte ao sistema de arquivos fat12 para 16bit real mode.
-; Obs: fat12 também pode ser usado em HDs, VHDs e outras mídias, como 
+; Obs: fat12 tambï¿½m pode ser usado em HDs, VHDs e outras mï¿½dias, como 
 ; emuladores de floppy.
 ;
 ; History:
@@ -16,8 +16,8 @@
 ;   
 ; Reads "cx" sectors from disk starting at "ax" into 
 ; memory location "es:bx".
-; ~Lê 'cx' setores do 'disco' começando em 'ax' e coloca na 
-; memória em 'es:bx'.
+; ~Lï¿½ 'cx' setores do 'disco' comeï¿½ando em 'ax' e coloca na 
+; memï¿½ria em 'es:bx'.
 ;---------------------------------------------------------------------
 
 ;s2fat12ReadSectors:
@@ -114,15 +114,15 @@ carregar_begin:
     sti
     call Device.ResetFloppy    ;reseta FDC.
     ;Carrega o arquivo.
-load_kernel32_sys: 
+elfLoadKernelImage32_sys: 
 
     push ax
 	mov ax, word [carregar_nome]
-	mov word [ImageNamePos], ax     ;; Atualiza o endereço do nome do arquivo a ser lido    
+	mov word [ImageNamePos], ax     ;; Atualiza o endereï¿½o do nome do arquivo a ser lido    
 	mov ax, word [carregar_seg]
-	mov word [destino_seg] , ax     ;; Atualiza o Segmento que será carregado o arquivo
+	mov word [destino_seg] , ax     ;; Atualiza o Segmento que serï¿½ carregado o arquivo
 	mov ax, word [carregar_off]
-	mov word [destino_off] , ax     ;; Atualiza o Offset que será carregado o arquivo
+	mov word [destino_off] , ax     ;; Atualiza o Offset que serï¿½ carregado o arquivo
 	pop ax
     ;Load root. 
 LOAD_ROOT:
@@ -152,7 +152,7 @@ LOAD_ROOT:
 .LOOP:
     push    cx
     mov     cx, 0x000B                  ;; eleven character name
-    mov     si, word [ImageNamePos]     ;;'ImageNamePos' comtem o endereço do nome do arquivo 
+    mov     si, word [ImageNamePos]     ;;'ImageNamePos' comtem o endereï¿½o do nome do arquivo 
     push    di
     rep  cmpsb                     ; test for entry match
     pop     di
@@ -182,7 +182,7 @@ LOAD_FAT:
     ; read image file into memory ;; 'es:bx' (0050:0000)
 
     ; #obs: 
-    ; Os segmentos sarão atualizados para carregar o arquivo, depois de 
+    ; Os segmentos sarï¿½o atualizados para carregar o arquivo, depois de 
     ; carregado o arquivo, os segmentos precisam voltar pra zero.
     
     mov   ax, word [destino_seg]    ;Destination for image.
@@ -247,7 +247,7 @@ FAILURE:
     int 0x16
     int 0x19
 
-;Variáveis.
+;Variï¿½veis.
 carregar_nome: dw 0    ;Nome.
 carregar_seg:  dw 0    ;Segmento.
 carregar_off:  dw 0    ;Offset.
@@ -261,7 +261,7 @@ msg_debug_end  db "fat12: 4 Ok",0
 ;; ===================================================
 ; buffer: 
 ;     BUFFER, usado para carregar FAT e ROOTDIR.
-;     @todo: Rever esse buffer, precisamos de espaço no boot manager.
+;     @todo: Rever esse buffer, precisamos de espaï¿½o no boot manager.
 
 buffer:       
     times (512*2) db 0

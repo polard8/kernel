@@ -1,7 +1,7 @@
 /*
  * File: fs.h 
  *
- * Descrição:
+ * Descriï¿½ï¿½o:
  *    Header do sistema de arquivos do Boot Loader.
  *
  * Version 1.0, 2015 - Created.
@@ -10,7 +10,7 @@
  
  
 #define SECTOR_SIZE 512 
-//#define SECTOR_SIZE 4096  //Novo padrão. 
+//#define SECTOR_SIZE 4096  //Novo padrï¿½o. 
 
 
 //
@@ -31,11 +31,11 @@
 
 
 //teste 
-#define FAT_ERRO_1   0xffff9     //Não há entradas vazias. 
+#define FAT_ERRO_1   0xffff9     //Nï¿½o hï¿½ entradas vazias. 
 #define FAT_ERRO_2   0xffff8   
 #define FAT_ERRO_3   0xffff7
 #define FAT_ERRO_4   0xffff6
-#define FAT_STATUS_1 0xffff5    //Não há mais entradas cheias.
+#define FAT_STATUS_1 0xffff5    //Nï¿½o hï¿½ mais entradas cheias.
 #define FAT_STATUS_2 0xffff4
 #define FAT_STATUS_3 0xffff3
 #define FAT_STATUS_4 0xffff2
@@ -45,8 +45,8 @@
 //
 // #importante:
 // Status de carregamento.
-// Se o diretório raiz já está carregado na memória.
-// Se a FAT já está carregada na memória.
+// Se o diretï¿½rio raiz jï¿½ estï¿½ carregado na memï¿½ria.
+// Se a FAT jï¿½ estï¿½ carregada na memï¿½ria.
 //
 
 int g_fat16_root_status;
@@ -59,10 +59,10 @@ int g_fat16_fat_status;
 int g_file_system_type;
 
 // 
-// Buffer para salvar uma entrada de diretório.
+// Buffer para salvar uma entrada de diretï¿½rio.
 //
 
-char buffer_dir_entry[512];    //@todo: Tamanho da entrada? Desperdício?   
+char buffer_dir_entry[512];    //@todo: Tamanho da entrada? Desperdï¿½cio?   
 
 //
 // Lista de clusters em um arquivo.
@@ -77,8 +77,8 @@ unsigned short file_cluster_list[1024];    //@todo: Tamanho de arquivos ?
  *     Structure for partition table.
  *   
  * @todo:    
- *     Na verdade essa é uma estrutura para um entrada na tabela de 
- * partições do MBR.
+ *     Na verdade essa ï¿½ uma estrutura para um entrada na tabela de 
+ * partiï¿½ï¿½es do MBR.
  *          
  */ 
 typedef struct partition_table_d partition_table_t;
@@ -97,7 +97,7 @@ partition_table_t partition;
 
 
 /*
- * Protótipos.
+ * Protï¿½tipos.
  */
 
 
@@ -128,7 +128,7 @@ void fatLoadCluster( unsigned long sector,
 // Loading files.
 //
 
-int load_kernel();
+int elfLoadKernelImage();
 int load_files();					 
 				
 				
