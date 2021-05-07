@@ -282,8 +282,19 @@ void *teditorProcedure (
 
     switch (msg)
     {
+
+        // #bugbug
+        // O fato de chamarmos essa rotina de criar botão
+        // faz com que o window manager não funcione no kernel.
+        // Talvez tenha a ver com a perda da indicação da janela ativa.
+        // #ok: Isso mesmo. Quando criamos o botão, perdemos a indicação
+        // da janela ativa, que foi feita anteriormente.
+        // Temos que olhar a rotina de criação de botão.
+        // #status: Esse problema foi corrigido com a revisão
+        // da rotina de criação de janelas.
         case MSG_CREATE: 
             saveCreateButton(); 
+            //gde_set_active_window(hWindow);
             goto done;
             break;
 
@@ -392,12 +403,13 @@ void *teditorProcedure (
 
                 case VK_F2: debug_print(" [F2] \n"); break;
                 case VK_F3: debug_print(" [F3] \n"); break;
+                
                 case VK_F4: 
                     //debug_print(" [F4] \n"); 
                     // switch the foreground thread.
-                    //gramado_system_call (301,0,0,0);
-                    //gramado_system_call (302,(unsigned long) hWindow,0,0);
-                    //gramado_system_call (303,0,0,0);
+                    gramado_system_call (302,(unsigned long) hWindow,0,0);
+                    gramado_system_call (303,0,0,0);
+                    return 0;
                     break;
 
             default:
@@ -466,11 +478,12 @@ void *teditorProcedure (
         // update
         // Enviado pelo kernel quando a thread volta a ter o input.
         case 11216:
+            if ( window == hWindow ){
             gde_redraw_window (hWindow,TRUE);
-            gde_redraw_window (save_button, 1);
+            gde_redraw_window (save_button, TRUE);
+            }
+            return 0;
             break;
-
-
 
         default:
             gde_debug_print ("teditorProcedure: [FIXME] default message\n");
@@ -720,16 +733,19 @@ int saveCreateButton(void)
 
     //++
     gde_enter_critical_section (); 
-    save_button = (void *) gde_create_window ( WT_BUTTON, 1, 1, 
-                                " Save [F1] ", 
-                                4, 4, 100, 24,
-                                hWindow, 0, 
-                                xCOLOR_GRAY3, xCOLOR_GRAY3 );
+    save_button = (void *) gde_create_window ( 
+                               WT_BUTTON, 
+                               WINDOW_STATUS_INACTIVE,  // Not active 
+                               1, 
+                               " Save [F1] ", 
+                               4, 4, 100, 24,
+                               hWindow, 0, 
+                               xCOLOR_GRAY3, xCOLOR_GRAY3 );
 
     if ( (void *) save_button == NULL ){
         gde_exit_critical_section ();
         printf ("Couldn't create save button\n");
-        return 1;
+        return -1;
     }
     gde_register_window (save_button);
     gde_show_window (save_button);
@@ -955,7 +971,10 @@ skip_test:
     //++
     gde_begin_paint (); 
     hWindow = (void *) gde_create_window ( 
-                           WT_OVERLAPPED, 1, 1, "Gramcode",
+                           WT_OVERLAPPED, 
+                           WINDOW_STATUS_ACTIVE,   // Active 
+                           1, 
+                           "Gramcode",
                            wpWindowLeft, wpWindowTop, 
                            wsWindowWidth, wsWindowHeight,    
                            0, 0, COLOR_GRAY, COLOR_GRAY );
@@ -966,7 +985,6 @@ skip_test:
         goto fail;
     }else{
         gde_register_window (hWindow);
-        gde_set_active_window (hWindow);       
         gde_show_window (hWindow);
     };
     gde_end_paint ();
@@ -985,7 +1003,10 @@ skip_test:
 	//++
     gde_enter_critical_section ();  
     editbox_bg_Window = (void *) gde_create_window ( 
-                                     WT_SIMPLE, 1, 1, "editbox-bg", 
+                                     WT_SIMPLE, 
+                                     1,  // Active #bugbug 
+                                     1, 
+                                     "editbox-bg", 
                                      bgw_left, bgw_top, 
                                      bgw_width, bgw_height, 
                                      hWindow, 0, 0x303030, 0x303030 );
@@ -1016,7 +1037,10 @@ skip_test:
     //++
     gde_enter_critical_section();
     editboxWindow = (void *) gde_create_window ( 
-                                 WT_EDITBOX, 1, 1, "editbox", 
+                                 WT_EDITBOX, 
+                                 1,  // Active #bugbug 
+                                 1, 
+                                 "editbox", 
                                  ebw_left, ebw_top, 
                                  ebw_width, ebw_height, 
                                  editbox_bg_Window, 0, 
@@ -1029,7 +1053,7 @@ skip_test:
         while(1){}
     }
     gde_register_window (editboxWindow);
-    gde_set_focus (editboxWindow);
+    //gde_set_focus (editboxWindow);
     gde_show_window (editboxWindow);
     gde_exit_critical_section ();  
     //--
@@ -1081,7 +1105,15 @@ skip_test:
 	//update_statuts_bar("# Status bar string 1","# Status bar string 2");
 	//apiEndPaint();
 	
-	
+
+
+    // ====================================================
+
+    gde_set_focus(hWindow);
+    gde_set_active_window(hWindow);
+    gde_show_window (hWindow);
+
+
 	
 	
     //

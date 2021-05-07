@@ -83,6 +83,10 @@ reboot2Procedure (
     switch (msg)
     {
 
+        case MSG_CREATE:
+            return 0;
+            break;
+            
         case MSG_SYSKEYDOWN:
             switch (long1)
             {
@@ -124,6 +128,12 @@ reboot2Procedure (
                     debug_print ("reboot2: Unexpected return");
                     goto done;
                     break;
+            
+                case VK_F4:
+                    gramado_system_call (302,(unsigned long) main_window,0,0);
+                    gramado_system_call (303,0,0,0);
+                    return 0;
+                    break;
             };
             goto done;
             break;
@@ -131,73 +141,6 @@ reboot2Procedure (
 
         case MSG_SYSKEYUP:
             goto done;
-            break;
-
-
-        //vamos criar um botão.
-        case MSG_CREATE:
-            return 0;
-           // VAMOS TESTAR A CONCEXÃO COM O PROCESSO PAI.
-           // que será o noraterm.
-
-           // link by pid
-           // #todo: Create the function link_by_pid()
-           //gramado_system_call ( 267,
-           //    getpid(),    //master
-           //    getppid(),   //slave pai(terminal)
-           //    0 );
-        
-           //____this_tty_id = gramado_system_call ( 266, getpid(), 0, 0 );        
-
-           //write ( ____this_tty_id, __wbuf2, __w_size2 = sprintf (__wbuf2,"writting from reboot2 ...\n") );    
-
-           /*
-            //++
-            gde_enter_critical_section (); 
-            test_button = (void *) gde_create_window ( WT_BUTTON, 1, 1, 
-                                       "MSG_CREATE",  
-                                       10, 60, 
-                                       (width/3), (height/8),   
-                                        main_window, 0, 
-                                        xCOLOR_GRAY3, xCOLOR_GRAY3 );
-
-            if ( (void *) test_button == NULL )
-            {
-                printf ("Couldn't create test_button\n");
-                gde_exit_critical_section ();
-                return 1;
-            }else{
-
-                gde_register_window (test_button);
-                gde_show_window  (test_button);
-                //gde_show_backbuffer ();
-            };
-            gde_exit_critical_section (); 
-	        //--
-	        
-            //++
-            gde_enter_critical_section (); 
-            check_box_window = (void *) gde_create_window ( WT_CHECKBOX, 1, 1, 
-                                           "MSG_CREATE",  
-                                           40, 150, 
-                                           20, 20,   
-                                           main_window, 0, COLOR_WHITE, COLOR_WHITE );
-
-            if ( (void *) check_box_window == NULL )
-            {
-                printf ("Couldn't create test_button\n");
-                gde_exit_critical_section ();
-                return 1;
-            }else{
-
-                gde_register_window (check_box_window);
-                gde_show_window  (check_box_window);
-                //gde_show_backbuffer ();
-            };
-            gde_exit_critical_section (); 
-	        //--
-	        */
-	        goto done;
             break;
 
 
@@ -393,13 +336,23 @@ reboot2Procedure (
              break;
              
          case MSG_MOUSE_DOUBLECLICKED:
-             if ( window == main_window )
-             {
-				 gde_maximize_window (window);
-				 gde_redraw_window (window, 1);
+             if ( window == main_window ){
+                 gde_maximize_window (window);
+                 gde_redraw_window (window,TRUE);
              }
              break;
 
+        // #test
+        // update
+        // Enviado pelo kernel quando a thread volta a ter o input.
+        case 11216:
+            if ( window == main_window ){
+                gde_redraw_window (main_window,TRUE);
+                gde_redraw_window (reboot_button,TRUE);
+                gde_redraw_window (__icon1,TRUE);
+            }
+            return 0;
+            break;
  
         default:
             debug_print("reboot2: default message");
@@ -469,7 +422,9 @@ int main ( int argc, char *argv[] ){
 	//++
     gde_begin_paint ();
     hWindow = (void *) gde_create_window ( 
-                           WT_OVERLAPPED, 1, 1, 
+                           WT_OVERLAPPED, 
+                           WINDOW_STATUS_ACTIVE, 
+                           1, 
                            "Reboot2",
                            left, top, width, height, 
                            0, 0, COLOR_BLUE, COLOR_BLUE );  
@@ -701,7 +656,9 @@ int main ( int argc, char *argv[] ){
 	//++
     gde_enter_critical_section (); 
     reboot_button = (void *) gde_create_window ( 
-                                 WT_BUTTON, 1, 1, 
+                                 WT_BUTTON, 
+                                 WINDOW_STATUS_INACTIVE, // Not active. 
+                                 1, 
                                  " Reboot [F3] ",  
                                  (width/3), ((height/4)*2), 
                                  (width/3), (height/8),   
@@ -751,11 +708,13 @@ int main ( int argc, char *argv[] ){
 	//--
 
 
+
+    // ====================================================
+
     gde_set_focus(main_window);
-     
-    // #debug
-    // gde_show_backbuffer ();
-    //while (1){}
+    gde_set_active_window(main_window);
+    gde_show_window (main_window);
+
 
 
 	//
@@ -765,7 +724,6 @@ int main ( int argc, char *argv[] ){
     unsigned long message_buffer[5];
 
 Mainloop:
-
 
     while (running)
     {

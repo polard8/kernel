@@ -694,22 +694,23 @@ void console_outbyte (int c, int console_number)
     }
 
 
-    //#@todo#bugbug 
-    //retirei esse retorno para o espaço, com isso 
-    // o ascii 32 foi pintado, mas como todos os 
-    //bits estão desligados, não pintou nada.
-    //space 
-    //if( c == ' ' )  
-    //{
-    //    g_cursor_x++; 
-    //    prev = c;
-    //    return; 
-    //};
+    // #bugbug 
+    // Com isso o ascii 0x20 foi pintado, 
+    // mas como todos os bits do char na fonte estão desligados, 
+    // então não pinta coisa alguma.
+
+    if( Ch == 0x20 )  
+    {
+        CONSOLE_TTYS[console_number].cursor_x++;
+        prev = Ch;
+        return; 
+    }
 
 
     // Backspace ?
 
-    if ( Ch == 8 )
+    //if ( Ch == '\b' )
+    if ( Ch == 0x8 )
     {
         CONSOLE_TTYS[console_number].cursor_x--; 
         prev = Ch;

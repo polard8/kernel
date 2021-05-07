@@ -128,6 +128,12 @@ reboot3Procedure (
                     debug_print ("reboot2: Unexpected return");
                     goto done;
                     break;
+                
+                case VK_F4:
+                    gramado_system_call (302,(unsigned long) main_window,0,0);
+                    gramado_system_call (303,0,0,0);
+                    return 0;
+                    break;
             };
             goto done;
             break;
@@ -397,13 +403,22 @@ reboot3Procedure (
              break;
              
          case MSG_MOUSE_DOUBLECLICKED:
-             if ( window == main_window )
-             {
-				 gde_maximize_window (window);
-				 gde_redraw_window (window, 1);
+             if ( window == main_window ){
+                 gde_maximize_window (window);
+                 gde_redraw_window (window, 1);
              }
              break;
 
+        case 11216:
+            if (window == main_window){
+                gde_redraw_window (main_window,TRUE);
+                gde_redraw_window (__icon1,TRUE);
+                gde_redraw_window (__icon2,TRUE);
+                gde_redraw_window (__icon3,TRUE);
+                gde_redraw_window (__icon4,TRUE);
+            }
+            return 0;
+            break;
  
         default:
             debug_print("reboot2: default message");
@@ -472,7 +487,9 @@ int main ( int argc, char *argv[] ){
 	//++
     gde_begin_paint ();
     hWindow = (void *) gde_create_window ( 
-                           WT_OVERLAPPED, 1, 1, 
+                           WT_OVERLAPPED, 
+                           WINDOW_STATUS_ACTIVE, 
+                           1, 
                            "Reboot2",
                            left, top, width, height, 
                            0, 0, COLOR_WINDOW, COLOR_WINDOW );  
@@ -714,7 +731,10 @@ int main ( int argc, char *argv[] ){
 	//++
     gde_enter_critical_section (); 
     __icon1 = (void *) gde_create_window ( 
-                           WT_ICON, 1, 1, " Icon1 ",  
+                           WT_ICON, 
+                           WINDOW_STATUS_INACTIVE, 
+                           1, 
+                           " Icon1 ",  
                            (10), (10), (64), (64),   
                            hWindow, 0, xCOLOR_GRAY3, xCOLOR_GRAY3 );
     if ( (void *) __icon1 == NULL ){
@@ -732,7 +752,9 @@ int main ( int argc, char *argv[] ){
 	//++
     gde_enter_critical_section (); 
     reboot_button = (void *) gde_create_window ( 
-                                 WT_BUTTON, 1, 1, 
+                                 WT_BUTTON, 
+                                 WINDOW_STATUS_INACTIVE, 
+                                 1, 
                                  " Reboot [F1] ",  
                                  (80), (10), (200), (64),   
                                  hWindow, 0, 
@@ -756,7 +778,10 @@ int main ( int argc, char *argv[] ){
 	//++
     gde_enter_critical_section (); 
     __icon2 = (void *) gde_create_window ( 
-                           WT_ICON, 1, 1, " Icon2 ",  
+                           WT_ICON, 
+                           WINDOW_STATUS_INACTIVE, 
+                           1, 
+                           " Icon2 ",  
                            (10), (100), (64), (64),   
                            hWindow, 0, xCOLOR_GRAY3, xCOLOR_GRAY3 );
     if ( (void *) __icon2 == NULL ){
@@ -774,7 +799,9 @@ int main ( int argc, char *argv[] ){
 	//++
     gde_enter_critical_section (); 
     reboot_button = (void *) gde_create_window ( 
-                                 WT_BUTTON, 1, 1, 
+                                 WT_BUTTON, 
+                                 WINDOW_STATUS_INACTIVE, 
+                                 1, 
                                  " Reboot [F2] ",  
                                  (80), (100), (200), (64),   
                                  hWindow, 0, 
@@ -799,7 +826,10 @@ int main ( int argc, char *argv[] ){
 	//++
     gde_enter_critical_section (); 
     __icon3 = (void *) gde_create_window ( 
-                           WT_ICON, 1, 1, " Icon3 ",  
+                           WT_ICON, 
+                           WINDOW_STATUS_INACTIVE, 
+                           1, 
+                           " Icon3 ",  
                            (10), (200), (64), (64),   
                            hWindow, 0, xCOLOR_GRAY3, xCOLOR_GRAY3 );
     if ( (void *) __icon3 == NULL ){
@@ -817,7 +847,9 @@ int main ( int argc, char *argv[] ){
 	//++
     gde_enter_critical_section (); 
     reboot_button = (void *) gde_create_window ( 
-                                 WT_BUTTON, 1, 1, 
+                                 WT_BUTTON, 
+                                 WINDOW_STATUS_INACTIVE, 
+                                 1, 
                                  " Reboot [F3] ",  
                                  (80), (200), (200), (64),   
                                  hWindow, 0, 
@@ -841,7 +873,10 @@ int main ( int argc, char *argv[] ){
 	//++
     gde_enter_critical_section (); 
     __icon4 = (void *) gde_create_window ( 
-                           WT_ICON, 1, 1, " Icon4 ",  
+                           WT_ICON, 
+                           WINDOW_STATUS_INACTIVE, 
+                           1, 
+                           " Icon4 ",  
                            (10), (300), (64), (64),   
                            hWindow, 0, xCOLOR_GRAY3, xCOLOR_GRAY3 );
     if ( (void *) __icon4 == NULL ){
@@ -859,7 +894,9 @@ int main ( int argc, char *argv[] ){
 	//++
     gde_enter_critical_section (); 
     reboot_button = (void *) gde_create_window ( 
-                                 WT_BUTTON, 1, 1, 
+                                 WT_BUTTON, 
+                                 WINDOW_STATUS_INACTIVE, 
+                                 1, 
                                  " Reboot [F4] ",  
                                  (80), (300), (200), (64),   
                                  hWindow, 0, 
@@ -879,26 +916,22 @@ int main ( int argc, char *argv[] ){
 
 
 
-
-    //
-    // show
-    //
+//
+// Show
+//
 
     gde_set_focus(main_window);
-     
-    // #debug
-    // gde_show_backbuffer ();
-    //while (1){}
+    gde_set_active_window(main_window);
+    gde_show_window (main_window);
 
 
-	//
-	// == Loop =================================
-	//
+//
+// == Loop =================================
+//
 
     unsigned long message_buffer[5];
 
 Mainloop:
-
 
     while (running)
     {
@@ -931,10 +964,8 @@ Mainloop:
         }
     };
 
-
 fail:
     printf ("fail.\n");
-
 done:
     //running = 0;
     return 0;

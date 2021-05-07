@@ -710,8 +710,11 @@ void *CreateWindow (
 
         // active 
         if ( status == WINDOW_STATUS_ACTIVE )
-        { 
-            active_window = (int) window->id;  
+        {
+
+            if ( type == WT_OVERLAPPED ){
+                active_window = (int) window->id;
+            }
             
             // set_active_window(window); 
             // window->active = WINDOW_STATUS_ACTIVE;
@@ -1056,8 +1059,9 @@ void *CreateWindow (
         //do botão que são acionadas através das características 
         //da janela.
         
-        //Nothing for now ...
-        //Deixaremos a rotina de desenhar o botão fazer tudo por enquanto.          
+        // Nothing for now ...
+        // Deixaremos a rotina de desenhar o botão 
+        // fazer tudo por enquanto. 
         case WT_BUTTON:
             break;
 
@@ -1546,8 +1550,10 @@ void *CreateWindow (
 
     if ( (unsigned long) type == WT_BUTTON )
     {
-		// window->button aqui fica a estrutura de botão
-		// caso a janela for um botão.
+
+        // Draw the button. (worker function)
+        // Retorna a estrutura de botão.
+        // See: button.c
 
         window->button = (struct button_d *) draw_button ( 
                                                  windowname, 
@@ -1555,17 +1561,26 @@ void *CreateWindow (
                                                  window->left, window->top, 
                                                  window->width, window->height, 
                                                  window->bg_color );
+
+        if ( (void*) window->button == NULL ){
+            panic ("CreateWindow: [DEBUG] window->button fail\n");
+            //return NULL;
+        }
+
+        // Para repintar precisamos olhar na estrutura de botão
+        // e encontrarmos a janela.
         
-        //para repintar precisamos olhar na estrutura de botão
-        //e encontrarmos a janela.
-        window->button->window = window;
-        
+        window->button->window = (struct window_d *) window;
+
         // #bugbug
         // E se retornar NULL ?
         //if ( (void *) window->button == NULL ){} 
         
-        //#test
-        window->parent = Parent;
+        // #test
+        // A janela mãe da janela do botão.
+        window->parent = (struct window_d *) Parent;
+        
+        // Yes, we are a button.
         window->isButton = TRUE;
     }
 

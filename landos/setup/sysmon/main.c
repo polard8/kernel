@@ -331,6 +331,9 @@ sysmonProcedure (
 
     switch (msg){
 
+       // case MSG_CREATE:
+       //     break;
+            
         case MSG_SYSKEYDOWN:
             switch (long1)
             {  
@@ -478,8 +481,11 @@ sysmonProcedure (
         // update
         // Enviado pelo kernel quando a thread volta a ter o input.
         case 11216:
-            gde_redraw_window (main_window,TRUE);
-            //gde_redraw_window (data_window,TRUE);
+            if (window == main_window){
+                gde_redraw_window (main_window,TRUE);
+                //gde_redraw_window (data_window,TRUE);
+            }
+            return 0;
             break;
 
         default:
@@ -582,7 +588,10 @@ int main ( int argc, char *argv[] ){
     // The main window.
     gde_begin_paint (); 
     hWindow = (void *) gde_create_window (  
-                           WT_OVERLAPPED, 1, 1, "Sysmon", 
+                           WT_OVERLAPPED, 
+                           WINDOW_STATUS_ACTIVE,  // Active window 
+                           1, 
+                           "Sysmon", 
                            left, top, width, height, 
                            0, 0, color, color );  
 
@@ -617,7 +626,10 @@ int main ( int argc, char *argv[] ){
     // Almost the same size of the main window.
     gde_enter_critical_section ();  
     client_window = (void *) gde_create_window ( 
-                                 WT_SIMPLE, 1, 1, "client-bg",     
+                                 WT_SIMPLE, 
+                                 WINDOW_STATUS_INACTIVE,  
+                                 1, 
+                                 "client-bg",     
                                  cw_left, cw_top, cw_width, cw_height, 
                                  main_window, 0, 
                                  cw_color, cw_color); //0xF5DEB3, 0xF5DEB3 );
@@ -642,7 +654,10 @@ int main ( int argc, char *argv[] ){
     //++
     // Client bar.
     gde_enter_critical_section ();  
-    client_bar_Window = (void *) gde_create_window ( WT_SIMPLE, 1, 1, 
+    client_bar_Window = (void *) gde_create_window ( 
+                                    WT_SIMPLE, 
+                                    WINDOW_STATUS_INACTIVE, 
+                                    1, 
                                     "client-bar",     
                                     cbw_left, cbw_top, cbw_width, cbw_height, 
                                     client_window, 0, 
@@ -667,7 +682,10 @@ int main ( int argc, char *argv[] ){
     //++
     //bar button [ F1 ]
     gde_enter_critical_section (); 
-    bar_button_1 = (void *) gde_create_window ( WT_BUTTON, 1, 1, 
+    bar_button_1 = (void *) gde_create_window ( 
+                                WT_BUTTON, 
+                                WINDOW_STATUS_INACTIVE, 
+                                1, 
                                 "F1",  
                                 1, 1, 20, 40-4,    
                                 client_bar_Window, 0, 
@@ -689,7 +707,10 @@ int main ( int argc, char *argv[] ){
     //++
     //bar button [ F2 ]
     gde_enter_critical_section (); 
-    bar_button_2 = (void *) gde_create_window ( WT_BUTTON, 1, 1, 
+    bar_button_2 = (void *) gde_create_window ( 
+                                WT_BUTTON, 
+                                WINDOW_STATUS_INACTIVE,
+                                1, 
                                 "F2",
                                 20+2, 1, 20, 40-4,    
                                 client_bar_Window, 0, 
@@ -719,7 +740,10 @@ int main ( int argc, char *argv[] ){
     //++
     // White window.
     gde_enter_critical_section ();  
-    data_window = (void *) gde_create_window ( WT_SIMPLE, 1, 1, 
+    data_window = (void *) gde_create_window ( 
+                               WT_SIMPLE, 
+                               WINDOW_STATUS_INACTIVE, 
+                               1, 
                                "DataWindow",     
                                 dw_left, dw_top, dw_width, dw_height,  
                                 client_window, 0, 
@@ -770,7 +794,9 @@ int main ( int argc, char *argv[] ){
     if(i==0){ window_color = COLOR_GRAY; }else{ window_color = COLOR_WHITE; };
     gde_enter_critical_section ();  
     CurrentWindow = (void *) gde_create_window ( 
-                               WT_SIMPLE, 1, 1, 
+                               WT_SIMPLE, 
+                               WINDOW_STATUS_INACTIVE, 
+                               1, 
                                "DataWindow",     
                                 0, (i*Height), Width, Height,  
                                 data_window, 0, 

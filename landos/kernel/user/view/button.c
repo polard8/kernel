@@ -1,5 +1,5 @@
 /*
- * File: kgws/button.c
+ * File: view/button.c
  *
  * Descrição:
  *     Rotinas de criação e gerenciamento de botões. 
@@ -186,15 +186,12 @@ void *draw_button (
     b = (void *) kmalloc ( sizeof(struct button_d) );
 
     if ( (void *) b == NULL ){
+        debug_print ("draw_button: b\n");
         return NULL;
-
     }else{
-
-        // Object.
-        b->objectType = ObjectTypeButton;
+        b->objectType  = ObjectTypeButton;
         b->objectClass = ObjectClassGuiObjects;
-
-        b->used = 1;
+        b->used  = TRUE;
         b->magic = 1234;
 
         // button states:
@@ -203,23 +200,22 @@ void *draw_button (
         // 3. Expanded/Toggled/Selected
         // 4. Disabled
         // 5. Hover and Active
+        b->state = (int) state;
 
-		b->state = (int) state;
+        // The caller will fix it.
+        // b->window = NULL;
 
-		//b->window = (void *) window; 
-		b->string = string; 
+        b->string = string; 
 
         b->x = x;
         b->y = y;
-        b->width = width;
+        b->width  = width;
         b->height = height;
  
         b->color = color; 
  
-		b->Next = NULL; 
-		//...
+        b->Next = NULL; 
     };
-
 
 	//Devemos colocar o ponteiro na lista encadeada de botões 
 	//dentro da estrutura da janela.
@@ -311,33 +307,35 @@ void *draw_button (
    
     // Temos a intenção de usar estilos diferentes, como flat design,
 	// por exemplo.
-	
-	//
-	// ## bg ##
-	//
-	
-	drawDataRectangle ( x, y, width, height, color );
-    
-	//
-	// ## 4 bordas ##
-	//
+
+
+//
+// Background
+//
+
+    drawDataRectangle ( x, y, width, height, color );
+
+
+//
+// Borders
+//
 
 	// #todo
 	// As cores das bordas deve estar no esquema de cores.
 	
 	//board1, borda de cima e esquerda.
-	drawDataRectangle ( x, y, width, 1, border1 );
-	drawDataRectangle ( x, y, 1, height, border1 );
+    drawDataRectangle ( x, y, width, 1, border1 );
+    drawDataRectangle ( x, y, 1, height, border1 );
 
 	//board2, borda direita e baixo.
-	drawDataRectangle ( x +width -1, y, 1, height, border2 );
-	drawDataRectangle ( x, y +height -1, width, 1, border2 );
+    drawDataRectangle ( x +width -1, y, 1, height, border2 );
+    drawDataRectangle ( x, y +height -1, width, 1, border2 );
 
-	
-    //
-    // Do draw label.
-    //
-	
+//
+// Label
+//
+
+
 	// Se vamos usar uma imagem ao invés de uma string.
 	//if(useImage == 1{ ... goto done;}
 	
@@ -358,7 +356,6 @@ void *draw_button (
         draw_string (
             (x +offset), (y +8), 
             COLOR_WHITE, string );
-
     }else{
 
 		//b->width
@@ -373,7 +370,10 @@ void *draw_button (
     };
 
 
-	//Retornando o ponteiro para a estrutura do botão.
+// done:
+
+    // Retornando o ponteiro para a estrutura do botão.
+
     return (void *) b;  
 }
 

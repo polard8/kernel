@@ -244,17 +244,16 @@ launcherProcedure (
             
             if (window == main_window){
                 gde_redraw_window (main_window,TRUE);
+                //gde_resize_window(launcher_button_1, (newWidth-4), (newHeight/8));
+                gde_redraw_window (launcher_button_1, TRUE);
+
+                //gde_resize_window(launcher_button_2, (newWidth-4), (newHeight/8));
+                gde_redraw_window (launcher_button_2, TRUE);
+
+                //gde_resize_window(launcher_button_3, (newWidth-4), (newHeight/8));
+                gde_redraw_window (launcher_button_3, TRUE);
             }
-
-            //gde_resize_window(launcher_button_1, (newWidth-4), (newHeight/8));
-            gde_redraw_window (launcher_button_1, TRUE);
-
-            //gde_resize_window(launcher_button_2, (newWidth-4), (newHeight/8));
-            gde_redraw_window (launcher_button_2, TRUE);
-
-            //gde_resize_window(launcher_button_3, (newWidth-4), (newHeight/8));
-            gde_redraw_window (launcher_button_3, TRUE);
-            
+          
             return 0;
             break;
 
@@ -323,7 +322,10 @@ int main ( int argc, char *argv[] )
     //++
     gde_begin_paint();
     hWindow = (void *) gde_create_window ( 
-                           WT_OVERLAPPED, 1, 1, "Launcher",
+                           WT_OVERLAPPED, 
+                           WINDOW_STATUS_ACTIVE, 
+                           1, 
+                           "Launcher",
                            left, top, width, height,  
                            0, 0, COLOR_BLUE2CYAN, COLOR_BLUE2CYAN ); 
 

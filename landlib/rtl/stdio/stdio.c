@@ -2516,33 +2516,32 @@ int gramado_input ( const char *string, va_list arglist )
 // ??
 // E esse retorno ??
 
-unsigned long 
-input ( unsigned long ch )
+unsigned long input ( unsigned long ch )
 {
-    // Save cursor position.
-    unsigned long tmpX=0; 
-    unsigned long tmpY=0;
-
     // Convert.
-    char c = (char) ch;    
+    char c = (char) ch;
 
     // Ajust prompt max.
     if ( prompt_max == 0 || prompt_max >= PROMPT_MAX_DEFAULT )
     {
         prompt_max = PROMPT_MAX_DEFAULT;
     }
-	
+
 	//Filtra limite.
 	//retornar 1??
 
     if ( prompt_pos > prompt_max )
     {
-        printf ("input: Full buffer!\n");
+        printf ("input: [FAIL] Full buffer!\n");
         return (unsigned long) 0;   
     }
 
 
     // Trata caractere digitado.
+
+    // #obs: 
+    // Não deve ser trabalho de input() atualizar
+    // o cursor do console. Ele somente atua sobre o buffer em ring3.
 
     switch (c){
 
@@ -2578,12 +2577,6 @@ input ( unsigned long ch )
             }
             //Se nao estamos no inicio da linha.
             prompt_pos--;              //volta um no buffer.
-            //Muda a posicao do cursor.
-            //Altera a tela no modo gráfico com janelas.
-            tmpX = stdioGetCursorX(); 
-            tmpY = stdioGetCursorY();
-            tmpX--;
-            stdioSetCursor(tmpX,tmpY);
             break;
 
 
@@ -3844,7 +3837,7 @@ kvprintf (
 				{
 					ladjust = !ladjust;
 					width = -width;
-				};
+				}
 				
 			} else {
 				
@@ -4133,8 +4126,9 @@ kvprintf (
 				while (width--)
 					PCHAR(padc);
 
-			while (*p)
-				PCHAR(*p--);
+            while (*p){
+                PCHAR(*p--);
+            };
 
 			if (ladjust && width && (width -= tmp) > 0)
 				while (width--)

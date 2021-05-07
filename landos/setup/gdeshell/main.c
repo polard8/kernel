@@ -708,15 +708,37 @@ void do_back(void)
         // ok. funcionou. 
         // a linha de comandos. prompt[]
         
-        putchar(0x8);  input(0x8);  // volta
-        putchar(0x20); input(0x20); // apaga
-        putchar(0x8);  input(0x8);  // volta
-        fflush(stdout);             // mostra sem mudar de linha.
-        
+        //putchar(0x8);  input(0x8);  // volta
+        //putchar(0x20); input(0x20); // apaga
+        //putchar(0x8);  input(0x8);  // volta
+        //fflush(stdout);             // mostra sem mudar de linha.
+
         //o buffer.
         //volta um char no buffer e apaga na nova posiçao.
-        textCurrentCol--; 
-        LINES[textCurrentRow].CHARS[textCurrentCol] = 0; 
+        //textCurrentCol--; 
+        //LINES[textCurrentRow].CHARS[textCurrentCol] = 0; 
+
+
+        //========================================
+        // novo teste
+        
+        // #obs: Não deve ser trabalho de input() atualizar
+        // o cursor do console. Ele somente atua sobre o buffer em ring3.
+        
+        input ( (unsigned long) 0x8 );  
+        shellInsertNextChar ( (char) 0x8 );
+
+        // O espaço (0x20) não pinta coisa alguma,
+        // então não dá apagar com ele.
+        // Vamos usar a fonte do BIOS que fica em 0x000FFA6E,
+        // provavlemente é essa que o gdeshell está usando. 
+        // IBM Character Fonts (126), o último dos moicanos.
+        
+        input ( (unsigned long) 0x20 );  
+        shellInsertNextChar ( (char) 126 );
+
+        input ( (unsigned long) 0x8 );  
+        shellInsertNextChar ( (char) 0x8 );
     }
 }
 
@@ -838,9 +860,10 @@ shellProcedure (
                     goto done;
                     break; 
 
-                // #todo: tem que inserir no buffer tambem
+                // #todo: 
+                // Tem que inserir no buffer tambem
                 case VK_TAB: 
-                    printf ("\t");
+                    printf("\t");
                     // for( shellInsertNextChar ( ' ' ); ...
                     goto done; 
                     break;
@@ -852,6 +875,8 @@ shellProcedure (
                 //case 0x7f:   // del
                 case 0x8:      // backspace
                 case VK_BACK:  // 0x0E
+                    // #bugbug
+                    // It is not working .... again!
                     do_back();
                     goto done;
                     break;
