@@ -72,8 +72,8 @@ void xxxThread (void){
 
 
 /*
- *************************************************************
- * shellTestThreads:
+ ********************************************
+ * ____test_threads:
  *     Cria um thread e executa.
  *     #bugbug ...j� funcionou uma vez, mas agora est� com problemas.
  *     @todo: na hora de criar a thread precisamos passar o PID desse processo.
@@ -225,7 +225,7 @@ void gwssrv_start_thread (void *thread)
 
 int service_drain_input (void)
 {
-    gwssrv_debug_print ("gwssrv: service_drain_input [TODO]\n");
+    gwssrv_debug_print ("service_drain_input: [TODO]\n");
     //handle_ipc_message();
     return -1;
 }
@@ -256,8 +256,10 @@ void gws_show_backbuffer(void)
     // Create this flag. 
     // if (!paint_ready) return;
 
+    //if ( (void*) gui == NULL ){}
 
-    if( (void *) gui->screen_window == NULL )
+
+    if ( (void *) gui->screen_window == NULL )
     {
         debug_print("gws_show_backbuffer: [PANIC] screen window fail\n");
         return;
@@ -418,25 +420,28 @@ int gwsInit(void)
     // Current display, current screen, current root window.
 
 
-    //
-    // == Display ===============================================
-    //
+//
+// == Display ===============================================
+//
 
     CurrentDisplay = (void *) malloc (sizeof(struct gws_display_d));
     
     if ( (void*) CurrentDisplay == NULL ){
 
-        // #todo: fail and exit.
         debug_print("gwsInit: [FAIL] CurrentDisplay\n");
-        return -1;
+        printf ("gwsInit: [FAIL] CurrentDisplay\n");
+        exit(1);
+        
+        // #todo: fail and exit.
+        //debug_print("gwsInit: [FAIL] CurrentDisplay\n");
+        //return -1;
         //while(1);
  
     }else{
- 
-        CurrentDisplay->id = 0; //
-        
         CurrentDisplay->used  = TRUE; 
         CurrentDisplay->magic = 1234; 
+
+        CurrentDisplay->id = 0; //
 
         // ??
         CurrentDisplay->fd = 0;
@@ -444,25 +449,29 @@ int gwsInit(void)
         //...
     };
 
-    //
-    // == Screen ===============================================
-    //
+
+//
+// == Screen ===============================================
+//
     
     DeviceScreen  = (void *) malloc (sizeof(struct gws_screen_d));
 
     if ( (void*) DeviceScreen == NULL ){
 
-        // #todo: fail and exit.
         debug_print("gwsInit: [FAIL] DeviceScreen\n");
-        return -1;
+        printf("gwsInit: [FAIL] DeviceScreen\n");
+        exit(1);
+        
+        // #todo: fail and exit.
+        //debug_print("gwsInit: [FAIL] DeviceScreen\n");
+        //return -1;
         //while(1);
 
     }else{
-
-        DeviceScreen->id = 0; 
-
         DeviceScreen->used  = TRUE;
         DeviceScreen->magic = 1234;
+
+        DeviceScreen->id = 0; 
         
         //#todo:
         DeviceScreen->flags = 0;
@@ -535,9 +544,10 @@ int gwsInit(void)
     // as primeira janelas são criadas logo abaixo.
     gwssrv_init_windows();    
 
-    //
-    // gui structure.
-    //
+
+//
+// == gui structure ============================================
+//
     
     // First level structure for the GUI.
 
@@ -548,13 +558,12 @@ int gwsInit(void)
         debug_print("gwsInit: gui\n");
         printf     ("gwsInit: gui\n");
         exit(1);
-        //return -1;
     }
 
 
-    //
-    // Root window.
-    //
+//
+// == Root window ===============================================
+//
     
     // See:
     // createw.c
@@ -612,6 +621,8 @@ int gwsInit(void)
     
     gwssrv_show_backbuffer();
     
+    validate();
+    
     return 0;
 }
 
@@ -653,11 +664,13 @@ int is_background_dirty(void)
 }
 
 
-
 void gwssrv_set_keyboard_focus(int window)
 {
-    if(window<0)
+
+    // #todo: max limit.
+    if (window<0){
         return;
+    }
 
     set_window_with_focus(window);
 }
@@ -714,17 +727,34 @@ void refresh_valid_screen(void)
 }
 
 
-// Função padrão para todos os servidores ???
-// #todo: temos que criar isso.
+
+/*
+ * serverInit
+ * 
+ */
+
+// Is it used?
 
 int serverInit (void)
 {
+    int Status = -1;
+    
     printf ("serverInit: Initializing gws server ...\n");
 
-    return (int) gwsInit();
+    Status = (int) gwsInit();
+
+    if (Status<0){
+        printf ("serverInit: fail\n");
+    }
+    
+    return (int) Status;
 }
 
 
+
+//
+// End.
+//
 
 
 

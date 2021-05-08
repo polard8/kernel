@@ -466,7 +466,7 @@ wmDrawFrame (
 
 void wm_process_windows (void)
 {
-    int dirty_status = -1;
+    int __Dirty = -1;
     int background_status = -1;
 
 
@@ -477,16 +477,14 @@ void wm_process_windows (void)
 //
     
     // Se algo foi modificado no frame.
-    dirty_status = isdirty();
+    __Dirty = isdirty();
     
     // Nothing to do.
-    if (dirty_status == FALSE)
+    if (__Dirty == FALSE)
     {
         gwssrv_debug_print("wm_process_windows: [Not dirty] Nothing to do\n");
         
-        // Validate the frame.
         // Ok, we can return or sleep.
-        validate();
         
         // Mostrar o status se ele estiver habilitado.
         // O problema é que isso conta como frame também aqueles
@@ -520,8 +518,8 @@ void wm_process_windows (void)
 
     if (background_status == TRUE)
     {
-    
         gws_show_backbuffer();
+        
         validate_background();  // Validate the background.
         validate();             // Validate the frame.
         return;
@@ -627,7 +625,6 @@ void wm_process_windows (void)
         }
     };
 
-
     // #test
     // Let's refresh only the valid screen.
     // We will refresh the device screen only if 
@@ -669,6 +666,9 @@ void wm_process_windows (void)
     // call a helper function for that.
 
     __update_fps();
+    
+    // Validate the frame.
+    validate();
 }   
 
 
@@ -750,7 +750,20 @@ is_within (
 }
 
 
+// validate
+void validate_window (struct gws_window_d *window)
+{
+    if ( (void*) window != NULL )
+    {
+        if ( window->used == TRUE && window->magic == 1234 )
+        {
+            window->dirty = FALSE;
+        }
+    }
+}
 
+
+// Invalidate
 void invalidate_window (struct gws_window_d *window)
 {
     if ( (void*) window != NULL )
@@ -1879,6 +1892,12 @@ fail:
  *     #todo: criar um define chamado refresh_window.
  */
 
+// ??
+// Devemos validar essa janela, para que ela 
+// não seja redesenhada sem antes ter sido suja?
+// E se validarmos alguma janela que não está pronta?
+// #test: validando
+
 int gws_show_window_rect (struct gws_window_d *window)
 {
     struct gws_window_d  *p;
@@ -1919,6 +1938,11 @@ int gws_show_window_rect (struct gws_window_d *window)
             gws_refresh_rectangle ( 
                 window->left, window->top, 
                 window->width, window->height ); 
+            
+            
+            // Com isso o compositor não vai redesenhar
+            // até que alguém invalide ela.
+            validate_window(window);
 
             return 0;
         }
@@ -2354,8 +2378,9 @@ gws_resize_window (
     
 
     // #test
+    //window->dirty = TRUE;
+    invalidate_window(window);
 
-    window->dirty = TRUE;
     //__root_window->dirty = 1;
 
     return 0;
@@ -2429,6 +2454,7 @@ gwssrv_change_window_position (
     
     //#test
     //window->dirty = 1;
+    invalidate_window(window);
     
     return 0;
 }

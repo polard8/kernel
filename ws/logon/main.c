@@ -332,27 +332,27 @@ logonProcedure (
 
                 // 9~12
                 case VK_F9: 
-                    gws_async_command(fd,1,0,0);  // Exit GWS
+                    //gws_async_command(fd,1,0,0);  // Exit GWS
                     //gws_async_command(fd,4,1,0);
                     //gws_async_command(fd,1,0,0);
-                    //gws_async_command(fd,4,9,0);  // cat
+                    gws_async_command(fd,4,9,0);  // cat
                     //gws_async_command(fd,4,1,0);
                     //gws_async_command(fd,4,2,0);
                     //gws_clone_and_execute("browser.bin"); 
                     break;
                 case VK_F10: 
-                    //gws_async_command(fd,4,6,0);
+                    gws_async_command(fd,4,6,0);
                     //gws_clone_and_execute("browser.bin"); 
                     break;
                 case VK_F11: 
-                    //gws_async_command(fd,4,7,0);
+                    gws_async_command(fd,4,7,0);
                     //gws_clone_and_execute("browser.bin"); 
                     break;
 
                 // #test
                 case VK_F12: 
                     //gws_async_command(fd,4,9,0);
-                    //gws_async_command(fd,4,10,0);   //triangle
+                    gws_async_command(fd,4,10,0);   //triangle
                     //gws_async_command(fd,4,11,0); //polygon
                     //gws_async_command(fd,4,12,0); //lines
                     //gws_clone_and_execute("browser.bin"); 

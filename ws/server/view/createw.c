@@ -41,15 +41,21 @@
 
 void demoTerry(void)
 {
-     createwCreateWindow ( WT_SIMPLE, 
-         1, 1, "terry0",  
+     createwCreateWindow ( 
+         WT_SIMPLE, 
+         1, 
+         1, 
+         "terry0",  
          0, 0, 240 +8+8, 320 +8+8,   
          gui->screen_window, 0, 
          COLOR_WHITE, COLOR_WHITE );
   
      struct gws_window_d *terry;
-     terry = (struct gws_window_d *) createwCreateWindow ( WT_SIMPLE, 
-         1, 1, "terry",  
+     terry = (struct gws_window_d *) createwCreateWindow ( 
+         WT_SIMPLE, 
+         1, 
+         1, 
+         "terry",  
          8, 8, 240, 320,   
          gui->screen_window, 0, 
          COLOR_WHITE, COLOR_WHITE );
@@ -1278,7 +1284,7 @@ void *createwCreateWindow2 (
 // Não podemos usar a estrutura de janela
 // da api.
 
-// #todo: change name to const char *
+// #todo: change name to 'const char *'
 
 void *createwCreateWindow ( 
     unsigned long type, 
@@ -1302,16 +1308,16 @@ void *createwCreateWindow (
     // kinds of windows for now:
     // overlapped, editbox, button and simple.
 
-    int Valid=FALSE;
+    int ValidType=FALSE;
 
     switch (type){
-    case WT_OVERLAPPED:  Valid=TRUE; break;
-    case WT_EDITBOX:     Valid=TRUE; break;
-    case WT_BUTTON:      Valid=TRUE; break;
-    case WT_SIMPLE:      Valid=TRUE; break;
+    case WT_OVERLAPPED:  ValidType=TRUE; break;
+    case WT_EDITBOX:     ValidType=TRUE; break;
+    case WT_BUTTON:      ValidType=TRUE; break;
+    case WT_SIMPLE:      ValidType=TRUE; break;
     };
 
-    if ( Valid == FALSE ){
+    if ( ValidType == FALSE ){
         gwssrv_debug_print ("createwCreateWindow: Invalid type\n");
         return NULL;
     }
@@ -1474,14 +1480,16 @@ draw_frame:
         // #todo
         // __w->useStandardFrame
 
-        if ( (void*) __w != NULL ) {
-        wmDrawFrame ( 
-            (struct gws_window_d *) pWindow,  //parent.
-            (struct gws_window_d *) __w,      //bg do botão em relação à sua parent. 
-            0, 0, width, height, 
-            1 );  //style
+        if ( (void*) __w != NULL )
+        {
+            wmDrawFrame ( 
+                (struct gws_window_d *) pWindow,  //parent.
+                (struct gws_window_d *) __w,      //bg do botão em relação à sua parent. 
+                0, 0, width, height, 
+                1 );  //style
         }
     }
+
 
 //draw_menubar:
 // ...
@@ -1496,7 +1504,10 @@ draw_frame:
 // ...
 
 
-    //__w->dirty = 1;
+
+//
+// z order for overlapped.
+//
 
 
     // Quando criamos uma overlapped, ela deve vicar no topo da pilha.
@@ -1517,11 +1528,11 @@ draw_frame:
     }
 
 
-    // ===============
-    
-    //
-    // level
-    //
+// ===============
+
+//
+// level
+//
     
     // #test
     
