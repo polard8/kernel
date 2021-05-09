@@ -1553,7 +1553,8 @@ void DeviceInterface_PS2Mouse(void)
             // No caso de outro input mode, deixaremos os
             // dados num arquivo. 
             
-            if (current_input_mode == INPUT_MODE_SETUP )
+            //if (current_input_mode == INPUT_MODE_SETUP )
+            if ( IOControl.useEventQueue == TRUE )
             {
                 // #todo
                 // Nao precisamos fazer esse parse aqui ...

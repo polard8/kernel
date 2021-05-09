@@ -23,6 +23,24 @@
 // ...
 
 //
+// IO Control
+//
+
+// #todo
+// include/user/ is a better place for this structure.
+// But it needs to a global thing.
+
+struct io_control_d
+{
+    int initialized;
+
+    int useTTY;
+    int useEventQueue;
+};
+struct io_control_d  IOControl;
+
+
+//
 // == input modes ==================================================
 //
 
@@ -476,7 +494,7 @@ typedef enum {
 int current_mode;
 
 // INPUT_MODE_SETUP, INPUT_MODE_WS ...
-int current_input_mode;
+//int current_input_mode;
 
 // x86 ...
 int current_arch;

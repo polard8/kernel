@@ -188,11 +188,21 @@ void preinit_Globals(int arch_type)
 // == input mode =============================================
 //
 
+    // #deprecated
+
     // This is the default initial input mode.
     // This mode is gonna change only when we load
     // a ring3 window server.
     
-    current_input_mode = INPUT_MODE_SETUP;
+    //current_input_mode = INPUT_MODE_SETUP;
+
+//
+// IO Control
+//
+
+    IOControl.useTTY = FALSE;        // Model not implemented yet.
+    IOControl.useEventQueue = TRUE;  // The current model.
+    IOControl.initialized = TRUE;
 
 
 //

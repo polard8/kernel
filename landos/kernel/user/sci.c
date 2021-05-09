@@ -831,15 +831,24 @@ void *gde_extra_services (
     if ( number == 901 ){ return NULL; }
     
     
-    //
-    // input mode
-    //
-    
+//
+// input mode
+//
+
+    // #deprecated:
     // get current input mode.
-    if ( number == 911 ){ return (void*) current_input_mode; }
-    
+    if ( number == 911 ){ 
+        panic("sci.c: [911] [DEPRECATED] get current input mode.\n");
+        //return (void*) current_input_mode; 
+    }
+
+    // #deprecated:
     // set current input mode.
-    if ( number == 912 ){ current_input_mode = arg2; return NULL; }
+    if ( number == 912 ){ 
+        panic("sci.c: [912] [DEPRECATED] set current input mode.\n");
+        //current_input_mode = arg2; 
+        //return NULL; 
+    }
 
 
 

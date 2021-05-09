@@ -32,7 +32,8 @@ void kgws_enable(void)
     refresh_screen();
     
     // Sending event messages to the thread associated with the wwf.
-    current_input_mode = INPUT_MODE_SETUP;
+    //current_input_mode = INPUT_MODE_SETUP;
+    IOControl.useEventQueue = TRUE;
     
     EnableKGWS = TRUE;
 }
@@ -47,7 +48,10 @@ void kgws_disable(void)
         
     // Using unix-like TTY mode for input.
     // using the stdin.
-    current_input_mode = INPUT_MODE_TTY;
+    // current_input_mode = INPUT_MODE_TTY;
+    
+    // #bugbug: This is a test yet.
+    //IOControl.useEventQueue = FALSE;
     
     EnableKGWS = FALSE;
 }
@@ -123,7 +127,9 @@ sendto_tty (
     // The event mode is not the mode we want.
     // We want the tty mode to put the chars into the keyboard tty.
 
-    if ( current_input_mode != INPUT_MODE_TTY ){
+    //if ( current_input_mode != INPUT_MODE_TTY )
+    if ( IOControl.useTTY != TRUE )
+    {
         panic("sendto_tty: [ERROR] Wrong input mode\n");
     }
 
@@ -131,7 +137,8 @@ sendto_tty (
 // TTY INPUT MODE
 //
 
-    if ( current_input_mode == INPUT_MODE_TTY )
+    //if ( current_input_mode == INPUT_MODE_TTY )
+    if ( IOControl.useTTY == TRUE )
     {
 
         if ( (void *) tty != NULL )
@@ -276,7 +283,9 @@ sendto_eventqueue (
 
 
 
-    if (current_input_mode != INPUT_MODE_EVENTS){
+    //if (current_input_mode != INPUT_MODE_EVENTS)
+    if ( IOControl.useEventQueue != TRUE )
+    {
         panic("sendto_eventqueue: [ERROR] Wrong input mode\n");
     }
 
@@ -327,7 +336,8 @@ sendto_eventqueue (
                         }
                         // caso nenhuma tecla de controle esteja pressionada,
                         // enviaremos a tecla de funçao para a alicaçao.
-                        if (current_input_mode == INPUT_MODE_SETUP)
+                        //if (current_input_mode == INPUT_MODE_SETUP)
+                        if ( IOControl.useEventQueue == TRUE )
                         {
                             //if ( EnableKGWS == FALSE ){ return 0; }
                             //kgws_send_to_controlthread_of_currentwindow ( 
@@ -356,7 +366,8 @@ sendto_eventqueue (
                 // Only for the setup input mode.
                 default:
                     // Only for the setup input mode.
-                    if (current_input_mode == INPUT_MODE_SETUP)
+                    //if (current_input_mode == INPUT_MODE_SETUP)
+                    if ( IOControl.useEventQueue == TRUE )
                     {
                         kgws_send_to_tid (  tid,
                                             Event_Window,
@@ -387,7 +398,8 @@ sendto_eventqueue (
         // See: ws/kgws.c
         default:
            // Only for the setup input mode.
-           if (current_input_mode == INPUT_MODE_SETUP)
+           //if (current_input_mode == INPUT_MODE_SETUP)
+           if ( IOControl.useEventQueue == TRUE )
            {
                //if ( EnableKGWS == FALSE ){ return 0; }
                //kgws_send_to_controlthread_of_currentwindow ( 
@@ -497,7 +509,7 @@ UserInput_SendKeyboardMessage (
 
 
     if (tid<0){
-        debug_print("KGWS_SEND_KEYBOARD_MESSAGE: tid\n");
+        debug_print("UserInput_SendKeyboardMessage: tid\n");
         return -1;
     }
 
@@ -912,9 +924,20 @@ done:
     // em unsigned long.
 
 
-    //
-    // == dispatch event ======================================
-    //
+//
+// == dispatch event ======================================
+//
+
+    if ( IOControl.initialized != TRUE ){
+        panic ("UserInput_SendKeyboardMessage: IO Control not initialized\n");
+    }
+
+    if ( IOControl.useTTY != TRUE && 
+         IOControl.useEventQueue != TRUE )
+    {
+        panic ("UserInput_SendKeyboardMessage: [IO Control] No valid mode\n");
+    }
+
 
     // Mandaremos o evento para 3 lugares possiveis.
     // + para o tty de teclado.
@@ -934,8 +957,11 @@ done:
     // ...
 
 
-    if ( current_input_mode == INPUT_MODE_TTY )
+    //if ( current_input_mode == INPUT_MODE_TTY )
+    if ( IOControl.useTTY == TRUE )
     {
+         panic ("UserInput_SendKeyboardMessage: [FIXME] File permission issue\n");
+
          sendto_tty (   
              (struct tty_d *)    PS2KeyboardDeviceTTY,
              (struct window_d *) Event_Window,
@@ -975,7 +1001,8 @@ done:
     // além do ambiente de setup. Podemos usar também
     // nos window server e seus clientes.
 
-    if ( current_input_mode == INPUT_MODE_SETUP )
+    //if ( current_input_mode == INPUT_MODE_SETUP )
+    if ( IOControl.useEventQueue == TRUE )
     {
         sendto_eventqueue ( 
             (int) tid,
@@ -997,10 +1024,10 @@ done:
     // We're gonna send messages to the applications
     // on an environment with a loadable window server.
     
-    if ( current_input_mode == INPUT_MODE_WS )
-    {
-        panic("KGWS_SEND_KEYBOARD_MESSAGE: [TODO] INPUT_MODE_WS input mode\n");
-    }
+    //if ( current_input_mode == INPUT_MODE_WS )
+    //{
+    //    panic("KGWS_SEND_KEYBOARD_MESSAGE: [TODO] INPUT_MODE_WS input mode\n");
+    //}
 
     return -1;
 }
