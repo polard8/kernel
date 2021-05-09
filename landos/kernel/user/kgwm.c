@@ -1275,25 +1275,26 @@ struct PS2MouseEvent_d
     // Se houve ou não alguma ação envolvendo botões.
     int button_action;
 
+    // Salvaremos aqui o último total ticks pra pegarmos um delta, 
+    // se o delta for menor que o limite então temos um duploclick.
 
-    //salvaremos aqui o último total ticks pra
-    //pegarmos um delta, se o delta for menor que o limite
-    //então temos um duploclick.
     unsigned long current_totalticks;
     unsigned long last_totalticks;
     unsigned long delta_totalticks;
 };
 
+// #todo: Rever isso.
 int flagRefreshMouseOver;
+
+// Declaration.
+// Used in kgwm_mouse_scan_windows.
 
 struct PS2MouseEvent_d PS2MouseEvent;
 
-
+// Scan.
 
 int kgwm_mouse_scan_windows (void)
 {
-
-
     // #importante:
     // Essa será a thread que receberá a mensagem.
 
@@ -1307,31 +1308,28 @@ int kgwm_mouse_scan_windows (void)
     int wID = -1;
 
 
-    //
     // Chamar o driver de mouse ps2 pra pegar as informações
     // sobre o mouse;
-    //
     
     // #todo
     // Temos que pegar um pacote com todas as informações de uma vez.
 
     // Pegando as informações.
-    PS2MouseEvent.saved_x      = ps2_mouse_get_info (1);
-    PS2MouseEvent.saved_y      = ps2_mouse_get_info (2);
-    PS2MouseEvent.x            = ps2_mouse_get_info (3);
-    PS2MouseEvent.y            = ps2_mouse_get_info (4);
-    PS2MouseEvent.moving                              = ps2_mouse_get_info (5);
-    //PS2MouseEvent.drag_status      = ps2_mouse_get_info (6);
-    PS2MouseEvent.button_action      = ps2_mouse_get_info (7);
-    PS2MouseEvent.buttom_1     = ps2_mouse_get_info (8);
-    PS2MouseEvent.buttom_2     = ps2_mouse_get_info (9);
-    PS2MouseEvent.buttom_3     = ps2_mouse_get_info (10);
+    PS2MouseEvent.saved_x  = ps2_mouse_get_info (1);
+    PS2MouseEvent.saved_y  = ps2_mouse_get_info (2);
+    PS2MouseEvent.x        = ps2_mouse_get_info (3);
+    PS2MouseEvent.y        = ps2_mouse_get_info (4);
+    PS2MouseEvent.moving   = ps2_mouse_get_info (5);
+    //PS2MouseEvent.drag_status  = ps2_mouse_get_info (6);
+    PS2MouseEvent.button_action  = ps2_mouse_get_info (7);
+    PS2MouseEvent.buttom_1 = ps2_mouse_get_info (8);
+    PS2MouseEvent.buttom_2 = ps2_mouse_get_info (9);
+    PS2MouseEvent.buttom_3 = ps2_mouse_get_info (10);
     PS2MouseEvent.old_buttom_1 = ps2_mouse_get_info (11);
     PS2MouseEvent.old_buttom_2 = ps2_mouse_get_info (12);
     PS2MouseEvent.old_buttom_3 = ps2_mouse_get_info (13);
-    //PS2MouseEvent.pressed   = ps2_mouse_get_info (14);
+    //PS2MouseEvent.pressed = ps2_mouse_get_info (14);
     // ...
-
 
     //printf ("b=%d ",buttom_1);
 
@@ -1415,11 +1413,8 @@ int kgwm_mouse_scan_windows (void)
 
     // #test
     // Estamos em cima de qual janela?
-    
-    wID = (int) top_at ( 
-                    PS2MouseEvent.x, 
-                    PS2MouseEvent.y );
 
+    wID = (int) top_at ( PS2MouseEvent.x, PS2MouseEvent.y );
 
     // #bugbug
     // Estamos sempre recebendo a janela gui->screen
@@ -1459,7 +1454,7 @@ int kgwm_mouse_scan_windows (void)
         }
      
         return -1;
-     };
+     }
 
 
     //++
@@ -1519,7 +1514,7 @@ int kgwm_mouse_scan_windows (void)
 		//===============================================
 		// ***Se houve mudança em relação ao estado anterior.
 		// Nesse momento um drag pode terminar
-        if ( PS2MouseEvent.button_action == 1 )
+        if ( PS2MouseEvent.button_action == TRUE )
         {
 			//printf ("[Action ");
 			
@@ -1771,8 +1766,9 @@ int kgwm_mouse_scan_windows (void)
                             t->long1_list[ t->tail_pos ] = 3;
                             t->long2_list[ t->tail_pos ] = 0;
                             t->tail_pos++;
-                            if ( t->tail_pos >= 31 )
+                            if ( t->tail_pos >= 31 ){
                                 t->tail_pos = 0;
+                            }
 
 
 							//estamos carregando o objeto
@@ -1801,8 +1797,9 @@ int kgwm_mouse_scan_windows (void)
                         t->long1_list[ t->tail_pos ]  = 3;
                         t->long2_list[ t->tail_pos ]  = 0;
                         t->tail_pos++;
-                        if ( t->tail_pos >= 31 )
+                        if ( t->tail_pos >= 31 ){
                            t->tail_pos = 0;
+                        }
 
 
 						// Não estamos mais carregando um objeto.
@@ -1814,9 +1811,8 @@ int kgwm_mouse_scan_windows (void)
                 }
             }; 
 
-
 			// Ação concluída.
-            PS2MouseEvent.button_action = 0;
+            PS2MouseEvent.button_action = FALSE;
             return 0;
         };
 
@@ -1831,7 +1827,7 @@ int kgwm_mouse_scan_windows (void)
         //a não ser que quando pressionamos o botão ele envie várias
         //interrupções, igual no teclado.
 
-        if ( PS2MouseEvent.button_action == 0 )
+        if ( PS2MouseEvent.button_action == FALSE )
         {
 			//printf ("[ No Action \n");
 
@@ -1862,8 +1858,9 @@ int kgwm_mouse_scan_windows (void)
                     t->long1_list[ t->tail_pos ]  = 0;
                     t->long2_list[ t->tail_pos ]  = 0;
                     t->tail_pos++;
-                    if ( t->tail_pos >= 31 )
+                    if ( t->tail_pos >= 31 ){
                         t->tail_pos = 0;
+                    }
 
                     
                     if ( Window->type == WT_EDITBOX )
@@ -1872,16 +1869,15 @@ int kgwm_mouse_scan_windows (void)
                     }
                     if ( PS2MouseEvent.drag_status == 1 )
                     {
-
                         // New way. Use this one!
                         t->window_list[ t->tail_pos ] = Window;
                         t->msg_list[ t->tail_pos ]    = MSG_MOUSE_DRAG;
                         t->long1_list[ t->tail_pos ]  = 0;
                         t->long2_list[ t->tail_pos ]  = 0;
                         t->tail_pos++;
-                        if ( t->tail_pos >= 31 )
+                        if ( t->tail_pos >= 31 ){
                             t->tail_pos = 0;
-
+                        }
                     }
                 }
 
@@ -1902,9 +1898,9 @@ int kgwm_mouse_scan_windows (void)
                     t->long1_list[ t->tail_pos ]  = 0;
                     t->long2_list[ t->tail_pos ]  = 0;
                     t->tail_pos++;
-                    if ( t->tail_pos >= 31 )
+                    if ( t->tail_pos >= 31 ){
                         t->tail_pos = 0;
-
+                    }
 
                    //#bugbug
                    //aqui entraria a fila de mensagens.
@@ -1979,7 +1975,7 @@ int kgwm_mouse_scan_windows (void)
 
 			// Ação concluída.
 			// Para o caso de um valor incostante na flag.
-            PS2MouseEvent.button_action = 0;
+            PS2MouseEvent.button_action = FALSE;
             return 0;
         };
     };
