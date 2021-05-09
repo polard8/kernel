@@ -68,6 +68,10 @@ __kgwm_ps2kbd_procedure (
 int kgwmRegisterWindowManager( int pid );
 
 
+// Aqui o servidor de janelas escaneia as janelas para saber 
+// se o mouse está sobre alguma ... durante a rotina
+// são solicitadas informações diretamente no driver de mouse ps2.
+int kgwm_mouse_scan_windows (void);
 
 // Mouse dialog.
 unsigned long
@@ -84,6 +88,8 @@ kgwm_window_control_dialog (
     int msg,
     unsigned long long1,
     unsigned long long2 );
+
+
 
 
 #endif    

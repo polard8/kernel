@@ -1571,9 +1571,9 @@ void DeviceInterface_PS2Mouse(void)
                 // janela 'a qual o mouse esta passando por cima.
                  // Isso nao muda a thread que esta em foreground.
 
-                // vt/draw/model/kgws.c
+                // user/kgwm.c
 
-                kgws_mouse_scan_windows();
+                kgwm_mouse_scan_windows();
             }
 
             

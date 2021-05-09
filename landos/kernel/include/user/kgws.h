@@ -41,36 +41,46 @@ void kgws_enable(void);
 void kgws_disable(void);
 
 
+
+
 // ========================================
 
+// Sent data to keyboard tty.
+// Called by UserInput_SendKeyboardMessage.
 int 
-kgws_put_console ( 
+sendto_tty ( 
+    struct tty_d *target_tty,
     struct window_d *window, 
     int message,
     unsigned long ascii_code,
     unsigned long raw_byte );
 
+
+// Send data to event queue in a given thread structure.
+// Called by UserInput_SendKeyboardMessage.
 int 
-kgws_event_dialog ( 
+sendto_eventqueue ( 
     int tid,
     struct window_d *window, 
     int message,
     unsigned long ascii_code,
     unsigned long raw_byte );
 
+
+
 // Send message.
 // Pega um scancode, transforma em caractere e envia na forma de mensagem
 // para a thread de controle associada com a janela que tem o foco de entrada.
 
-int KGWS_SEND_KEYBOARD_MESSAGE ( int tid, unsigned char raw_byte );
+int 
+UserInput_SendKeyboardMessage( 
+    int tid, 
+    unsigned char raw_byte );
 
 
 // ==============================================
 
-// Aqui o servidor de janelas escaneia as janelas para saber 
-// se o mouse está sobre alguma ... durante a rotina
-// são solicitadas informações diretamente no driver de mouse ps2.
-int kgws_mouse_scan_windows (void);
+
 
 
 int kgwsRegisterWindowServer(int pid);

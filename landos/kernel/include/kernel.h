@@ -45,7 +45,8 @@
 // loadble ring3 window server.
 // Send the input event to the thread associated with the
 // window with focus in the window server embedded inside the kernel.
-#define INPUT_MODE_SETUP  1000
+#define INPUT_MODE_EVENTS  1000
+#define INPUT_MODE_SETUP   INPUT_MODE_EVENTS
 
 // tty input mode.
 // In this mode we're gonna send the input to the tty buffer.
@@ -53,7 +54,7 @@
 #define INPUT_MODE_TTY    2000
 
 // ws input mode.
-// Used for the applications running on an envronment
+// Used for the applications running on an environment
 // with a loadable window server. Just like gws window server.
 #define INPUT_MODE_WS     3000
 

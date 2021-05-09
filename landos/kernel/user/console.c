@@ -1892,17 +1892,7 @@ console_interrupt(
     int TargetThread = target_thread;
     int DeviceType   = device_type;
     int Data         = data;
-    
-    
-    // #todo
-    // Essa rotina deve ser um wrapper,
-    // que chamara uma helper function dependendo
-    // do input model. Uma helper function para
-    // cada input model.
-    // Event or unix-like.
-    
-    // int InputModel = ?;
-    
+
 
     // #todo
     // E se não tivermos uma foreground thread ?
@@ -1930,7 +1920,7 @@ console_interrupt(
         // See: vt/draw/model/kgws.c
         case CONSOLE_DEVICE_KEYBOARD:
             debug_print("console_interrupt: input from keyboard device\n");
-            KGWS_SEND_KEYBOARD_MESSAGE (TargetThread, Data);
+            UserInput_SendKeyboardMessage (TargetThread, Data);
             break;
 
         // COM port
