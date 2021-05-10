@@ -351,8 +351,8 @@ logonProcedure (
 
                 // #test
                 case VK_F12: 
-                    //gws_async_command(fd,4,9,0);
-                    gws_async_command(fd,4,10,0);   //triangle
+                    gws_async_command(fd,4,1,0);  // testando janela.
+                    //gws_async_command(fd,4,10,0);   //triangle
                     //gws_async_command(fd,4,11,0); //polygon
                     //gws_async_command(fd,4,12,0); //lines
                     //gws_clone_and_execute("browser.bin"); 

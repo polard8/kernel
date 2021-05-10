@@ -126,10 +126,10 @@ int grInit (void)
     HotSpotX = (w>>1);
     HotSpotY = (h>>1);
 
-    //
-    // == Camera ===================================================
-    //
-    
+//
+// == Camera ==========
+//
+
     gwssrv_debug_print ("grInit: camera\n");
         
     // initialize the current camera.
@@ -138,14 +138,14 @@ int grInit (void)
     
     // change some attributes for the current camera.
     camera ( 
-        -40, -40, 0,  // position vector
-        -40, 40, 0,   // upview vector
-        10, 10, 10 ); // lookat vector
-    
-    
-    //
-    // == Projection ================================================
-    //
+        -40, -40, 0,     // position vector
+        -40,  40, 0,     // upview vector
+         10,  10, 10 );  // lookat vector
+
+
+//
+// == Projection =========
+//
 
     gwssrv_debug_print ("grInit: projection\n");
     
@@ -230,15 +230,16 @@ camera (
 
 int projection_initialize(void)
 {
+
+
     CurrentProjection = (void *) malloc ( sizeof( struct gr_projection_d ) );
     
-    if ( (void*) CurrentProjection == NULL )
-    {
+    if ( (void*) CurrentProjection == NULL ){
         printf("projection_initialize fail\n");
         exit(1);
     }
 
-    //perspective or orthogonal
+    // #todo: Perspective or orthogonal
     CurrentProjection->type = 1; 
 
     // ??
@@ -327,8 +328,19 @@ gr_clamp(
 
 // 3D fullscreen, origin in center.
 
-int grPlot0 (int z, int x, int y, unsigned long color)
+
+int 
+grPlot0 ( 
+    struct gws_window_d *clipping_window,   
+    int z, 
+    int x, 
+    int y, 
+    unsigned long color )
 {
+
+// #todo
+// We can use a 'clipping window' and draw only inside this window.
+// If the clipping window is NULL, so we need to use the root window.
 
     // #todo
     // This is a work in progress
@@ -336,8 +348,9 @@ int grPlot0 (int z, int x, int y, unsigned long color)
 
     // Draw flag.
     int Draw = TRUE;
-    
-    
+    int UseClipping = FALSE;
+
+
     int UsingDepthBuffer = FALSE;
     
     int UsingAlphaBlending = FALSE;
@@ -382,9 +395,36 @@ int grPlot0 (int z, int x, int y, unsigned long color)
      int X=0;
      int Y=0;
 
-    //
-    // Device screen structure
-    //
+
+//
+// The clippping window.
+//
+
+    struct gws_window_d *w;
+
+    // #todo
+    // If the clipping window is invalid, 
+    // so we're gonna use the root window.
+    // #todo:
+    // Maybe we need to use the device context structure,
+    // or something like that.
+    
+    UseClipping = FALSE;
+    
+    if ( (void*) clipping_window != NULL )
+    {
+        if ( clipping_window->used  == TRUE && 
+             clipping_window->magic == 1234 )
+        {
+            UseClipping = TRUE;
+            w = (struct gws_window_d *) clipping_window;
+        }
+    }
+
+
+//
+// Device screen structure
+//
 
     // See: screen.h
 
@@ -543,9 +583,23 @@ draw:
                 //color = get??()
             }
             
-            // device screen
-            // 2D, No clipping or transformation.
-            pixelBackBufferPutpixel ( color, X, Y ); 
+            // Se NÃO temos uma janela válida.
+            if ( UseClipping == FALSE ){
+                // device screen
+                // 2D, No clipping or transformation.
+                pixelBackBufferPutpixel ( color, X, Y ); 
+            }
+
+            // Se temos uma janela válida.
+            if ( UseClipping == TRUE ){
+                if ( X >= w->left  &&
+                     X <= w->right &&
+                     Y >= w->top  &&
+                     Y <= w->bottom )
+                 {
+                     pixelBackBufferPutpixel ( color, X, Y ); 
+                 }
+            }
             
             // #todo
             // This is a work in progress
@@ -600,7 +654,7 @@ int serviceGrPlot0 (void){
     // pegar os argumentos no buffer e chamar a rotina de plotagem de pixel.
     // Acho que esse serviço nao retorna uma mensagem ao cliente.
     
-    grPlot0 ( (int) z, (int) x, (int) y, (unsigned long) color );
+    grPlot0 ( NULL, (int) z, (int) x, (int) y, (unsigned long) color );
 
     return 0;
 }
@@ -666,15 +720,14 @@ plotLine3d (
     y1 = x1;
     z1 = x1;
 
-
     for (;;) {
 
-      grPlot0 ( z0, x0, y0, color );
-      
+        grPlot0 ( NULL, z0, x0, y0, color );
+     
         if (i-- == 0) { break; }
-        x1 -= dx; if (x1 < 0) { x1 += dm; x0 += sx; } 
-        y1 -= dy; if (y1 < 0) { y1 += dm; y0 += sy; } 
-        z1 -= dz; if (z1 < 0) { z1 += dm; z0 += sz; } 
+        x1 -= dx; if (x1 < 0) { x1 += dm; x0 += sx; }
+        y1 -= dy; if (y1 < 0) { y1 += dm; y0 += sy; }
+        z1 -= dz; if (z1 < 0) { z1 += dm; z0 += sz; }
     };
 }
 
@@ -682,6 +735,7 @@ plotLine3d (
 // #todo
 // plot line given two colors.
 // interpolation ?
+
 void 
 plotLine3d2 (
     int x0, int y0, int z0, unsigned long color1,
@@ -716,8 +770,8 @@ plotLine3d2 (
        
     for (;;) {  
 
-        grPlot0 ( z0, x0, y0, color1);
-        //grPlot0 ( z0, x0, y0, color2);
+        grPlot0 ( NULL, z0, x0, y0, color1 );
+        //grPlot0 ( NULL, z0, x0, y0, color2 );
       
         if (i-- == 0) break;
         x1 -= dx; if (x1 < 0) { x1 += dm; x0 += sx; } 
@@ -834,12 +888,13 @@ ras_rectangleZ (
 }
 
 
-// scaling
-// Inflate cube
+// Scaling: Inflate cube.
 int xxxInflateCubeZ ( struct gr_cube_d *cube, int value )
 {
-    if ( (void*) cube == NULL )
+
+    if ( (void*) cube == NULL ){
         return -1;
+    }
 
     //int value = z;
     //int value = z*2;
@@ -861,7 +916,7 @@ int xxxInflateCubeZ ( struct gr_cube_d *cube, int value )
     cube->p[3].y = (cube->p[3].y - value);
     cube->p[3].z = (cube->p[3].z - value);
 
-    //north points ==========================================
+    //north points ================================
     cube->p[4].x = (cube->p[4].x - value);
     cube->p[4].y = (cube->p[4].y + value);
     cube->p[4].z = (cube->p[4].z + value);
@@ -881,12 +936,12 @@ int xxxInflateCubeZ ( struct gr_cube_d *cube, int value )
     return 0;
 }
 
-// scaling
-// Ieflate cube
+// Scaling: Deflate cube.
 int xxxDeflateCubeZ ( struct gr_cube_d *cube, int value )
 {
-    if ( (void*) cube == NULL )
+    if ( (void*) cube == NULL ){
         return -1;
+    }
 
 
     // south points ==========================
@@ -928,15 +983,15 @@ int xxxDeflateCubeZ ( struct gr_cube_d *cube, int value )
 
 
 
-//#test
+// Triangle.
 int xxxTriangleZ ( struct gr_triandle_d *triangle )
 {
 
-    if ( (void*) triangle == NULL )
+    if ( (void*) triangle == NULL ){
         return -1;
+    }
 
-
-    // circular, sentido horario, começando pelo ponto de cima.
+    // Circular, sentido horario, começando pelo ponto de cima.
 
     plotLine3d (
         triangle->p[0].x, triangle->p[0].y, triangle->p[0].z, 
@@ -952,7 +1007,6 @@ int xxxTriangleZ ( struct gr_triandle_d *triangle )
         triangle->p[2].x, triangle->p[2].y, triangle->p[2].z, 
         triangle->p[0].x, triangle->p[0].y, triangle->p[0].z, 
         triangle->p[0].color );
-
 
     return 0;
 }
@@ -1022,15 +1076,14 @@ do_polypoint:
     for ( i=0; i<NumberOfElements; i++ )
     {
         v1 = (struct gr_vec3D_d *) list[i];
-        if ( (void*) v1 == NULL )
-        { 
+        if ( (void*) v1 == NULL ){ 
             gwssrv_debug_print(">>>> BREAK\n");
             break; 
         }
 
         // draw
 
-        grPlot0 ( v1->z, v1->x, v1->y, v1->color );
+        grPlot0 ( NULL, v1->z, v1->x, v1->y, v1->color );
     };
     return 0;
 
@@ -1373,10 +1426,10 @@ plotCircle (
       //setPixel(xm+x, ym-y); /* III. Quadrant */
       //setPixel(xm+y, ym+x); /*  IV. Quadrant */
 
-      grPlot0 ( 0, xm-x, ym+y, color);
-      grPlot0 ( 0, xm-y, ym-x, color);
-      grPlot0 ( 0, xm+x, ym-y, color);
-      grPlot0 ( 0, xm+y, ym+x, color);
+      grPlot0 ( NULL, 0, xm-x, ym+y, color);
+      grPlot0 ( NULL, 0, xm-y, ym-x, color);
+      grPlot0 ( NULL, 0, xm+x, ym-y, color);
+      grPlot0 ( NULL, 0, xm+y, ym+x, color);
       
       r = err;
       
@@ -1425,11 +1478,11 @@ plotCircleZ (
       //setPixel(xm+x, ym-y); /* III. Quadrant */
       //setPixel(xm+y, ym+x); /*  IV. Quadrant */
       
-      grPlot0 ( z, xm-x, ym+y, color);
-      grPlot0 ( z, xm-y, ym-x, color);
-      grPlot0 ( z, xm+x, ym-y, color);
-      grPlot0 ( z, xm+y, ym+x, color);
-      
+      grPlot0 ( NULL, z, xm-x, ym+y, color);
+      grPlot0 ( NULL, z, xm-y, ym-x, color);
+      grPlot0 ( NULL, z, xm+x, ym-y, color);
+      grPlot0 ( NULL, z, xm+y, ym+x, color);
+
       r = err;
       
       // #ugly routine.
@@ -1519,10 +1572,10 @@ plotEllipseRect (
 
 
     do {
-       grPlot0 ( 0, x1, y0, color);  //   I. Quadrant
-       grPlot0 ( 0, x0, y0, color);  //  II. Quadrant
-       grPlot0 ( 0, x0, y1, color);  // III. Quadrant
-       grPlot0 ( 0, x1, y1, color);  //  IV. Quadrant
+       grPlot0 ( NULL, 0, x1, y0, color);  //   I. Quadrant
+       grPlot0 ( NULL, 0, x0, y0, color);  //  II. Quadrant
+       grPlot0 ( NULL, 0, x0, y1, color);  // III. Quadrant
+       grPlot0 ( NULL, 0, x1, y1, color);  //  IV. Quadrant
        
        e2 = (2*err);
        if (e2 <= dy) { y0++; y1--; err += dy += a; }  /* y step */ 
@@ -1533,13 +1586,12 @@ plotEllipseRect (
 
     /* too early stop of flat ellipses a=1 */
     while (y0-y1 < b) {
-        grPlot0 ( 0, x0-1,    y0, color);  //-> finish tip of ellipse
-        grPlot0 ( 0, x1+1,  y0++, color);
-        grPlot0 ( 0, x0-1,    y1, color);
-        grPlot0 ( 0, x1+1,  y1--, color);
+        grPlot0 ( NULL, 0, x0-1,    y0, color);  //-> finish tip of ellipse
+        grPlot0 ( NULL, 0, x1+1,  y0++, color);
+        grPlot0 ( NULL, 0, x0-1,    y1, color);
+        grPlot0 ( NULL, 0, x1+1,  y1--, color);
     };
 }
-
 
 
 void 
@@ -1561,11 +1613,10 @@ plotEllipseRectZ (
 
 
     do {
-       grPlot0 ( z, x1, y0, color);  //   I. Quadrant
-       grPlot0 ( z, x0, y0, color);  //  II. Quadrant
-       grPlot0 ( z, x0, y1, color);  // III. Quadrant
-       grPlot0 ( z, x1, y1, color);  //  IV. Quadrant
-       
+       grPlot0 ( NULL, z, x1, y0, color);  //   I. Quadrant
+       grPlot0 ( NULL, z, x0, y0, color);  //  II. Quadrant
+       grPlot0 ( NULL, z, x0, y1, color);  // III. Quadrant
+       grPlot0 ( NULL, z, x1, y1, color);  //  IV. Quadrant
        
        e2 = (2*err);
        if (e2 <= dy) { y0++; y1--; err += dy += a; }  /* y step */ 
@@ -1577,10 +1628,10 @@ plotEllipseRectZ (
     /* too early stop of flat ellipses a=1 */
     
     while (y0-y1 < b) {
-        grPlot0 ( z, x0-1,    y0, color);  // -> finish tip of ellipse
-        grPlot0 ( z, x1+1,  y0++, color);
-        grPlot0 ( z, x0-1,    y1, color);
-        grPlot0 ( z, x1+1,  y1--, color);
+        grPlot0 ( NULL, z, x0-1,    y0, color);  // -> finish tip of ellipse
+        grPlot0 ( NULL, z, x1+1,  y0++, color);
+        grPlot0 ( NULL, z, x0-1,    y1, color);
+        grPlot0 ( NULL, z, x1+1,  y1--, color);
     };
 }
 
@@ -1641,7 +1692,7 @@ void noraDrawingStuff3 (int x, int y, int z)
             if ( _x != 0 )
             {
                 if ( _y % _x == 0 ){
-                    grPlot0 (_z, _x, _y,COLOR_BLACK);
+                    grPlot0 ( NULL, _z, _x, _y,COLOR_BLACK );
                 }
             }
         };
@@ -1895,7 +1946,7 @@ plotCharBackbufferDrawcharTransparent (
             if ( ( *work_char & bit_mask ) ){
  
                 // IN: z,x,y,color.
-                grPlot0 ( 0, x + x2, y, color ); 
+                grPlot0 ( NULL, 0, x + x2, y, color ); 
             }
 
             // Rotate bitmask.
@@ -2036,7 +2087,7 @@ plotCharBackbufferDrawcharTransparentZ (
             {
                 // começa do fim
                 // IN: z,x,y,color.
-                grPlot0 ( z, x + x2, (y + gcharWidth), color ); 
+                grPlot0 ( NULL, z, x + x2, (y + gcharWidth), color ); 
             }
 
             // Rotate bitmask.
@@ -2239,7 +2290,7 @@ plotQuadBezierSeg (
       
       /* plot curve */
       //setPixel(x0,y0); 
-      grPlot0(x0,y0,z0,color);
+      grPlot0( NULL, x0, y0, z0, color );
 
       if (x0 == x2 && y0 == y2) return;  /* last pixel -> curve finished */
       y1 = 2*err < dx;                  /* save value for test of y step */
@@ -2261,5 +2312,8 @@ plotQuadBezierSeg (
 
 
 
+//
+// End.
+//
 
 

@@ -70,7 +70,7 @@ void demoTerry(void)
     //    8, 240, 
     //    8, 320, 0 );
 
-    if( (void*) terry != NULL){
+    if ( (void*) terry != NULL){
         dtextDrawText ( (struct gws_window_d *) terry,
             20, 20, COLOR_BLUE, "Demo: Terry's window" );
         dtextDrawText ( (struct gws_window_d *) terry,
@@ -80,8 +80,9 @@ void demoTerry(void)
 
 
 /*
- ***************************************************************************
- * createwCreateWindow2: 
+ ********************
+ * xxxCreateWindow: 
+ * 
  *     Cria uma janela com base em uma struct. Retorna o endereço da estrutura 
  * da janela criada, para que possa ser registrada na lista windowList[].
  * Obs: A contagem é feita quando registra a janela.
@@ -97,14 +98,14 @@ void demoTerry(void)
  * a barra de títulos faz parte da moldura.
  * O AS DIMENSÕES DO FRAME PODEM SER VARIADOS, DEPENDENDO DO ESTILO DA JANELA.
  *
- * Cria a janela dependendo do tipo:                              
+ * Cria a janela dependendo do tipo:
  * =================================
  * WT_NULL          0 
  * WT_SIMPLE        1
  * WT_EDITBOX       2  // igual simples, mais uma bordinha preta.
  * WT_OVERLAPPED    3  // sobreposta(completa)(barra de titulo + borda +client area)
  * WT_POPUP         4  // um tipo especial de sobreposta,  //usada em dialog ou 
- *                        message box. (com ou sem barra de titulo ou borda)					   
+ *                        message box. (com ou sem barra de titulo ou borda)
  * WT_CHECKBOX      5  // Caixa de seleção. Caixa de verificação. Quadradinho.
  * WT_SCROLLBAR     6  // Cria uma scroll bar. Para ser usada como janela filha.
  * CONTINUA ...
@@ -123,8 +124,7 @@ void demoTerry(void)
 //11 - Client Area Color.
 //12 - color (bg) (para janela simples)
 
-
-void *createwCreateWindow2 ( 
+void *xxxCreateWindow ( 
     unsigned long type, 
     unsigned long status, 
     unsigned long view, 
@@ -351,15 +351,15 @@ void *createwCreateWindow2 (
         // Por enquanto no backbuffer.
 
         // Erro.
-        debug_print ("createwCreateWindow2: window struct \n");
-        printf ("createwCreateWindow2: window struct \n");
+        debug_print ("xxxCreateWindow: window struct \n");
+        printf ("xxxCreateWindow: window struct \n");
         gwssrv_show_backbuffer ();
     
        // Using the kgws. The window server inside the kernel.
        //gde_message_box ( 3,
-         //  "createwCreateWindow2:",
+         //  "xxxCreateWindow:",
           // "window struct fail!" );
-       printf("createwCreateWindow2: window struct fail!\n");
+       printf("xxxCreateWindow: window struct fail!\n");
        while(1){}
  
        //return NULL; 
@@ -785,8 +785,8 @@ void *createwCreateWindow2 (
         // ...
 
         default:
-            debug_print("createwCreateWindow2: [DEBUG] default\n");
-                 printf("createwCreateWindow2: [DEBUG] default\n");
+            debug_print("xxxCreateWindow: [DEBUG] default\n");
+                 printf("xxxCreateWindow: [DEBUG] default\n");
             while(1){}
             //return NULL;
             break;
@@ -1013,7 +1013,7 @@ void *createwCreateWindow2 (
             //remeber: the first window do not have a parent.
             if ( (void*) Parent == NULL )
             { 
-                gwssrv_debug_print ("createwCreateWindow2: [Shadow] Parent\n"); 
+                gwssrv_debug_print ("xxxCreateWindow: [Shadow] Parent\n"); 
                 //exit(1); 
                 rectBackbufferDrawRectangle ( 
                     (window->left +1),     (window->top +1), 
@@ -1072,7 +1072,7 @@ void *createwCreateWindow2 (
         //#bugbug
         //Remember: The first window do not have a parent.
         if ( (void*) Parent == NULL ){ 
-            gwssrv_debug_print ("createwCreateWindow2: [Background] Parent\n"); 
+            gwssrv_debug_print ("xxxCreateWindow: [Background] Parent\n"); 
             //exit(1); 
             rectBackbufferDrawRectangle ( 
                 window->left, window->top, 
@@ -1114,7 +1114,7 @@ void *createwCreateWindow2 (
                 break;
 
             case BS_PRESS:
-                buttonSelected = 1;
+                buttonSelected = TRUE;
                 buttonBorderColor1 = COLOR_WHITE; 
                 buttonBorderColor2 = xCOLOR_GRAY3;
                 buttonBorderColor2_light = xCOLOR_GRAY5; 
@@ -1133,7 +1133,7 @@ void *createwCreateWindow2 (
 
             case BS_DEFAULT:
             default: 
-                buttonSelected = 0;
+                buttonSelected = FALSE;
                 buttonBorderColor1 = COLOR_WHITE;
                 buttonBorderColor2 = xCOLOR_GRAY3; 
                 buttonBorderColor2_light = xCOLOR_GRAY5;
@@ -1148,7 +1148,7 @@ void *createwCreateWindow2 (
 
         //#debug
         if ( (void*) Parent == NULL ){
-            gwssrv_debug_print ("createwCreateWindow2: [WT_BUTTON] Parent NULL\n"); 
+            gwssrv_debug_print ("xxxCreateWindow: [WT_BUTTON] Parent NULL\n"); 
         }
 
 
@@ -1230,23 +1230,22 @@ void *createwCreateWindow2 (
                  window->width-2, 1, 
                  COLOR_BLACK, 1 );
 
-            
-            
+
             // Button label
-            if (buttonSelected == 1){
+
+            if (buttonSelected == TRUE){
                 dtextDrawString ( 
-                    (window->left) + offset, 
+                    (window->left) +offset, 
                     (window->top)  +8, 
                     COLOR_WHITE, windowname );
-            }else{
-                // (largura do botão, menos a largura da string)/2
-                // #debug: Rotina provisória
-                //dtextDrawString ( x +20, y +20, COLOR_TERMINALTEXT, string );
+            }
+
+            if (buttonSelected == FALSE){
                 dtextDrawString ( 
                     (window->left) +offset,  
                     (window->top)  +8,  
                     COLOR_BLACK, windowname );
-            };
+            }
         }
 
       //todo
@@ -1351,7 +1350,7 @@ void *createwCreateWindow (
     // Overlapped
     if ( type == WT_OVERLAPPED )
     {
-        __w = (void *) createwCreateWindow2 ( 
+        __w = (void *) xxxCreateWindow ( 
                            WT_SIMPLE, status, view, 
                            (char *) windowname, 
                            x, y, width, height, 
@@ -1359,7 +1358,7 @@ void *createwCreateWindow (
                            desktopid, clientcolor, color ); 
 
          if ( (void *) __w == NULL ){
-             gwssrv_debug_print ("createwCreateWindow: createwCreateWindow2 fail \n");
+             gwssrv_debug_print ("createwCreateWindow: xxxCreateWindow fail \n");
              return NULL;
          }
 
@@ -1378,7 +1377,7 @@ void *createwCreateWindow (
         //if ( (void*) pWindow == NULL ){ return NULL; }
         
         // Podemos usar o esquema padrão de cores ...
-        __w = (void *) createwCreateWindow2 ( 
+        __w = (void *) xxxCreateWindow ( 
                            WT_SIMPLE, status, view, 
                            (char *) windowname, 
                            x, y, width, height, 
@@ -1386,7 +1385,7 @@ void *createwCreateWindow (
                            desktopid, clientcolor, color ); 
 
          if ( (void *) __w == NULL ){
-             gwssrv_debug_print ("createwCreateWindow: createwCreateWindow2 fail \n");
+             gwssrv_debug_print ("createwCreateWindow: xxxCreateWindow fail \n");
              return NULL;
          }
 
@@ -1407,7 +1406,7 @@ void *createwCreateWindow (
         //if ( (void*) pWindow == NULL ){ return NULL; }
         
         // Podemos usar o esquema padrão de cores ...
-        __w = (void *) createwCreateWindow2 ( 
+        __w = (void *) xxxCreateWindow ( 
                            WT_BUTTON, status, view, 
                            (char *) windowname, 
                            x, y, width, height, 
@@ -1415,7 +1414,7 @@ void *createwCreateWindow (
                            desktopid, clientcolor, color ); 
 
          if ( (void *) __w == NULL ){
-             gwssrv_debug_print ("createwCreateWindow: createwCreateWindow2 fail \n");
+             gwssrv_debug_print ("createwCreateWindow: xxxCreateWindow fail \n");
              return NULL;
          }
 
@@ -1428,7 +1427,7 @@ void *createwCreateWindow (
     // Types with no frame!
     if ( type == WT_SIMPLE )
     {
-        __w = (void *) createwCreateWindow2 ( 
+        __w = (void *) xxxCreateWindow ( 
                            WT_SIMPLE, status, view, 
                            (char *) windowname, 
                            x, y, width, height, 
@@ -1436,7 +1435,7 @@ void *createwCreateWindow (
                            desktopid, clientcolor, color );  
 
          if ( (void *) __w == NULL ){
-             gwssrv_debug_print ("createwCreateWindow: createwCreateWindow2 fail \n");
+             gwssrv_debug_print ("createwCreateWindow: xxxCreateWindow fail \n");
              return NULL;
          }
 
@@ -1479,6 +1478,8 @@ draw_frame:
         
         // #todo
         // __w->useStandardFrame
+
+        // See: wm.c
 
         if ( (void*) __w != NULL )
         {
@@ -1550,7 +1551,7 @@ draw_frame:
 
 
 //done:
-    return (void *) __w;   
+    return (void *) __w;
 }
 
 

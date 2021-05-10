@@ -30,6 +30,10 @@
 // include/user/ is a better place for this structure.
 // But it needs to a global thing.
 
+// This is the idea:
+// Instead of selecting the io model,
+// we will select the components that will be used in the input system.
+
 struct io_control_d
 {
     int initialized;

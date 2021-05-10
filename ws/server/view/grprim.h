@@ -282,8 +282,14 @@ int projection_initialize(void);
 int view(int near, int far);
 
 
-// Point.
-int grPlot0 (int z, int x, int y, unsigned long color);
+// Point. 
+int 
+grPlot0 (
+    struct gws_window_d *clipping_window,   
+    int z, 
+    int x, 
+    int y, 
+    unsigned long color );
 
 
 int serviceGrPlot0(void);

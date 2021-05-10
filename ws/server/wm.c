@@ -132,9 +132,9 @@ wmDrawFrame (
     unsigned long border_color = 0;
 
 
-
     //unsigned long TitleBarColor = 0x00000E80;     // Dark blue
-    unsigned long TitleBarColor = COLOR_BLUE1;    // Light blue
+    //unsigned long TitleBarColor = COLOR_BLUE1;    // Light blue (Um pouco fosco) inactive?
+    unsigned long TitleBarColor = 0x001473E6;       // Claro.  active?
 
 
     gwssrv_debug_print ("wmDrawFrame:\n");
@@ -346,7 +346,7 @@ wmDrawFrame (
         window->titlebar_height = 32;
 
         // Title bar
-        tbWindow = (void *) createwCreateWindow2 ( 
+        tbWindow = (void *) xxxCreateWindow ( 
                                 WT_SIMPLE, 1, 1, "TITLE", 
                                 border_size, border_size, 
                                 (window->width - border_size - border_size), window->titlebar_height, 

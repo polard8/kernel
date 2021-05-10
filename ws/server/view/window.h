@@ -5,6 +5,7 @@
  *     2020 - Created by Fred Nora.
  */
 
+
 #ifndef ____WINDOW_H
 #define ____WINDOW_H    1
 
@@ -1138,10 +1139,10 @@ wmDrawFrame (
     unsigned long y,
     unsigned long width,
     unsigned long height,
-    int style );          
+    int style );
 
 
-void *createwCreateWindow2 ( 
+void *xxxCreateWindow ( 
     unsigned long type, 
     unsigned long status, 
     unsigned long view, 

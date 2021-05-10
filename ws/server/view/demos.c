@@ -214,6 +214,37 @@ void demoFred2(void)
 //matrix multiplication
 void demoSA1(void)
 {
+
+    int useClippingWindow =  FALSE;
+    
+    //++
+    //=================
+    struct gws_window_d *w;
+
+
+    if ( useClippingWindow == TRUE )
+    {
+        w = (struct gws_window_d *) createwCreateWindow ( 
+                                    WT_SIMPLE, 1, 1, "Window", 
+                                    100, 120, 100, 100, 
+                                    __root_window, 0, 
+                                    COLOR_PINK, COLOR_YELLOW ); 
+    
+        gwsRegisterWindow(w);
+        gws_show_window_rect(w);
+    
+        if ( (void*) w == NULL ){
+            printf ("demoSA1: Invalid clipping window\n");
+            //useClippingWindow = FALSE;
+            return;
+        }
+    }
+    
+    //=================
+    //--
+
+
+
     register int i=0;
 
     // To store result
@@ -252,10 +283,20 @@ void demoSA1(void)
        
             // PLot for dots.
             // z,x,y
-            grPlot0 ( res[0][2], res[0][0], res[0][1], COLOR_WHITE); 
-            grPlot0 ( res[1][2], res[1][0], res[1][1], COLOR_WHITE); 
-            grPlot0 ( res[2][2], res[2][0], res[2][1], COLOR_WHITE); 
-            grPlot0 ( res[3][2], res[3][0], res[3][1], COLOR_WHITE); 
+            if ( useClippingWindow == TRUE){
+            grPlot0 ( w, res[0][2], res[0][0], res[0][1], COLOR_WHITE); 
+            grPlot0 ( w, res[1][2], res[1][0], res[1][1], COLOR_WHITE); 
+            grPlot0 ( w, res[2][2], res[2][0], res[2][1], COLOR_WHITE); 
+            grPlot0 ( w, res[3][2], res[3][0], res[3][1], COLOR_WHITE); 
+            }
+
+            // NO clipping window
+            if ( useClippingWindow == FALSE){
+            grPlot0 ( NULL, res[0][2], res[0][0], res[0][1], COLOR_WHITE); 
+            grPlot0 ( NULL, res[1][2], res[1][0], res[1][1], COLOR_WHITE); 
+            grPlot0 ( NULL, res[2][2], res[2][0], res[2][1], COLOR_WHITE); 
+            grPlot0 ( NULL, res[3][2], res[3][0], res[3][1], COLOR_WHITE); 
+            }
           
             // New projection matrix.
             
@@ -958,10 +999,10 @@ void demoMatrix1(void)
     //int  r[10][10];
 
 
-    //grPlot0 ( 0, -50, -50, COLOR_WHITE ); 
-    //grPlot0 ( 0, 50, -50, COLOR_WHITE ); 
-    //grPlot0 ( 0, 50, 50, COLOR_WHITE ); 
-    //grPlot0 ( 0, -50, 50, COLOR_WHITE ); 
+    //grPlot0 ( NULL,  0, -50, -50, COLOR_WHITE ); 
+    //grPlot0 ( NULL,  0, 50, -50, COLOR_WHITE ); 
+    //grPlot0 ( NULL,  0, 50, 50, COLOR_WHITE ); 
+    //grPlot0 ( NULL,  0, -50, 50, COLOR_WHITE ); 
    
     // rows and columns for the first matrix
     // rows and columns for the second matrix
@@ -1002,10 +1043,10 @@ void demoMatrix1(void)
        multiply4 ( projection4x4, mat2, res );
        
        //z,x,y
-       grPlot0 ( res[0][2], res[0][0], res[0][1], COLOR_WHITE); 
-       grPlot0 ( res[1][2], res[1][0], res[1][1], COLOR_WHITE); 
-       grPlot0 ( res[2][2], res[2][0], res[2][1], COLOR_WHITE); 
-       grPlot0 ( res[3][2], res[3][0], res[3][1], COLOR_WHITE); 
+       grPlot0 ( NULL, res[0][2], res[0][0], res[0][1], COLOR_WHITE); 
+       grPlot0 ( NULL, res[1][2], res[1][0], res[1][1], COLOR_WHITE); 
+       grPlot0 ( NULL, res[2][2], res[2][0], res[2][1], COLOR_WHITE); 
+       grPlot0 ( NULL, res[3][2], res[3][0], res[3][1], COLOR_WHITE); 
    
        
        projection4x4[0][0] = i%5;

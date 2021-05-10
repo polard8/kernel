@@ -125,7 +125,8 @@ PlotSprite3D (
         
         case SPRITE_POINT:
             gwssrv_debug_print("PlotSprite3D: [SPRITE_POINT] \n");
-            grPlot0 ( 
+            grPlot0 (
+                NULL, 
                 (int) (z + sprite->z1), 
                 (int) (x + sprite->x1), 
                 (int) (y + sprite->y1), 
@@ -162,10 +163,9 @@ PlotSprite3D (
 
     };
     
-        if ( just_one == TRUE )
-            break;
+        if ( just_one == TRUE ){  break;  }
     };
-   
+
 
     // #todo
     // Restaura para o padrao os elemento da estrutura display.
