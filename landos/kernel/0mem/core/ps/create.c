@@ -175,6 +175,8 @@ void *create_CreateEarlyRing0IdleThread(void)
 
     // Temporizadores.
     
+    
+    // Jiffies
     kThread->step = 0;
     
 
@@ -472,6 +474,8 @@ void *create_CreateRing3InitThread (void)
     t->preempted = UNPREEMPTABLE; 
 
     // Temporizadores.
+
+    // Jiffies
     InitThread->step = 0; 
         
     //t->quantum  = QUANTUM_BASE;

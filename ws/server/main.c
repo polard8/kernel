@@ -2114,6 +2114,11 @@ int main (int argc, char **argv)
         window_server->registration_status = TRUE;
 
 
+        // #test
+        // Double shot the current thread.
+        // See: sched.c
+        gramado_system_call (667,0,0,0);
+
         // #todo
         // Daqui pra frente é conexão com cliente.
         // Lembrando que o servidor vai se conectar à mais de um cliente.

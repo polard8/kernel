@@ -645,6 +645,13 @@ void *gde_extra_services (
     }
 
 
+    // Double shot the current thread.
+    // See: sched.c
+    if (number == 667 ){
+        sched_double_shot();
+        return NULL;
+    }
+
 	// 714 - get ws PID
 	// IN: desktop
     if ( number == 714 )

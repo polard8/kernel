@@ -452,6 +452,10 @@ struct thread_d *threadCopyThread ( struct thread_d *thread ){
     // thread->eip
     // thread->esp
     
+    // #todo:We need a better name
+    // use a buffer for that
+    // char nameBuffer[32];
+    
     clone = (struct thread_d *) create_thread ( 
                                     NULL, NULL, NULL, 
                                     thread->eip, thread->esp,
@@ -463,14 +467,19 @@ struct thread_d *threadCopyThread ( struct thread_d *thread ){
     }
 
 
+//
+// Saving ...
+//
+
     // Saving.
     // See: thread.h
+
     ClonedThread = clone;
 
-	//
-	// Caracteristicas.
-	//
 
+//
+// input model
+//
 
     // type and input model.
 
@@ -529,7 +538,14 @@ struct thread_d *threadCopyThread ( struct thread_d *thread ){
     // quantum_limit - (9*2);  O boost n�o deve ultrapassar o limite. 
 
 
-    clone->step          = thread->step; 
+//
+// == Jiffies ==============
+//
+
+    clone->step = 0;
+
+    // clone->step          = thread->step; 
+    
     clone->quantum       = thread->quantum; 
     clone->quantum_limit = thread->quantum_limit;
 
@@ -1044,6 +1060,9 @@ get_next:
         // step: 
         // How many jiffies. total_jiffies.
         // Quantas vezes ela já rodou no total.
+        
+        // Jiffies.
+        
         Thread->step = 0;
 
         // Quantum. 

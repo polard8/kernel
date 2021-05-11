@@ -275,7 +275,7 @@ void show_slot (int tid){
 
         // Show one slot.
         printf ("\n");
-        printf ("TID   PID   pdPA  Prio  State *Quan *Jiffies initial_eip eflags   tName \n");
+        printf ("TID   PID   pdPA  Prio  State Quan *Jiffies initial_eip eflags   tName \n");
         printf ("====  ====  ====  ====  ===== ==== ====    ==========  ======  ===== \n");
         printf ("%d    %d    %x   %d    %d    %d   %d      %x          %x      %s \n", 
             t->tid, 
@@ -284,7 +284,7 @@ void show_slot (int tid){
             t->priority, 
             t->state,
             t->quantum,    // Quantum
-            t->step,       // Jiffies
+            t->step,       // >>> Jiffies
             t->initial_eip,
             t->eflags,
             t->name_address );

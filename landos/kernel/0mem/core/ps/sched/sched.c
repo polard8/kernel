@@ -142,7 +142,8 @@ struct thread_d *pick_next_thread (void){
 prepare_next:
 
 	//
-	// # Checando a validade da next thread. #
+	// # Checando a validade da next thread. # 
+	// THREAD_COUNT_MAX
 	//
 
     next = (void *) threadList[next_thread];
@@ -182,6 +183,31 @@ prepare_next:
     return NULL;
 }
 
+
+// Double shot the current thread.
+void sched_double_shot(void)
+{
+    struct thread_d  *t;
+
+    // #todo:
+    // Check max limit
+    
+    if (current_thread < 0 || current_thread >= THREAD_COUNT_MAX)
+    {
+        return;  //fail
+    }
+
+    t = (void *) threadList[current_thread];
+    
+    if ( (void*) t == NULL ){ return; }
+    
+    if ( t->used != TRUE || t->magic != 1234 )
+    {
+        return;  //fail
+    }
+    
+    t->DoubleShot = TRUE;
+}
 
 
 
@@ -263,8 +289,23 @@ int scheduler (void){
                 tmpConductor       = (void *) tmpConductor->next; 
                 tmpConductor->next = (void *) TmpThread;
             }
+
+            // Double shot
+            // for special threads. Just like the window server.
+            if ( TmpThread->DoubleShot == TRUE )
+            {
+                if ( TmpThread->used  == TRUE && 
+                     TmpThread->magic == 1234 && 
+                     TmpThread->state == READY )
+                {
+                    // The tmpConductor and it's next.
+                    tmpConductor       = (void *) tmpConductor->next; 
+                    tmpConductor->next = (void *) TmpThread;
+                }
+            }
         }
     };
+
 
     // #todo
     // Let's try some other lists.

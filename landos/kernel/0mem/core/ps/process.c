@@ -676,7 +676,12 @@ int processCopyMemory ( struct process_d *process ){
  *
  *     Isso � chamado por do_fork_process.
  */
- 
+
+// Called by clone_and_execute_process at clone.c
+
+// #
+// It will also copy the control thread.
+
 // IN:
 // p1 = atual.
 // p2 = clone. 
@@ -968,6 +973,10 @@ int processCopyProcess ( pid_t p1, pid_t p2 ){
 	// chamarmos o fork, que � onde est� o �ltimo ponto de salvamento.
 
 
+//
+// == Clone the control thread =================================
+//
+
     // Clonando a thread de controle.
     // obs: Isso precisa funcionar direito. Não podemos ficar sem isso.
     // See: thread.c
@@ -978,9 +987,9 @@ int processCopyProcess ( pid_t p1, pid_t p2 ){
         panic ("processCopyProcess: threadCopyThread fail");
     }
 
-    //
-    // Directory.
-    //
+//
+// Page Directory.
+//
 
 	// #importante
 	// Um diret�rio de p�ginas para a thread de controle.
@@ -989,32 +998,28 @@ int processCopyProcess ( pid_t p1, pid_t p2 ){
 	// � importante deixarmos esse endere�o na estrutura da thread, pois
 	// � a� que o taskswitch espera encontra-lo.
 
-
     Process2->control->DirectoryPA = Process2->DirectoryPA;
+
+
+//
+// Owner PID
+//
 
     Process2->control->ownerPID = Process2->pid;
 
 
-	//?? herda a lista de threads ??
+    //#todo: review
+    
+    //?? herda a lista de threads ??
     Process2->threadListHead = Process1->threadListHead;
-
     Process2->zombieChildListHead = Process1->zombieChildListHead;
-
     Process2->dialog_address = Process1->dialog_address;
 
-    //#bugbug
-    //deleta isso.
-    //message support.
-    //Process2->window = Process1->window;    //arg1. 
-    //Process2->msg    = Process1->msg;       //arg2.
-    //Process2->long1  = Process1->long1;     //arg3.
-    //Process2->long2  = Process1->long2;     //arg4.
 
+//
+// == TTY ======================
+//
 
-    //
-    // == TTY ======================
-    //
-    
     // Vamos criar uma tty para o processo clone.
     // Ela será uma tty privada, mas precisa ter um
     // uma estrutura de arquivo que aponte para ela

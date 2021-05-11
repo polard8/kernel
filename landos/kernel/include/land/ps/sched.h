@@ -83,6 +83,8 @@ int KiSelectNextThread (int current);
 
 struct thread_d *pick_next_thread (void);
 
+// Double shot the current thread.
+void sched_double_shot(void);
 
 int scheduler (void);
 

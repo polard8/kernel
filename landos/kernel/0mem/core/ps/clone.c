@@ -285,6 +285,7 @@ do_clone:
     //  Control thread.
     //
     
+    // Is the control thread a valid thread at this moment?
 
     //====
     Clone->control->ownerPID      = Clone->pid;
@@ -294,7 +295,7 @@ do_clone:
     Clone->control->priority      = Current->control->priority;
     Clone->control->iopl          = Current->control->iopl;
     Clone->control->preempted     = Current->control->preempted;
-    Clone->control->step          = 0;//Current->control->step;
+    Clone->control->step          = 0;  // Jiffies
     Clone->control->quantum       = Current->control->quantum;
     Clone->control->quantum_limit = Current->control->quantum_limit;
 
@@ -982,6 +983,7 @@ do_clone:
         panic ("clone_and_execute_process: [FAIL] processCopyMemory\n");
     }
 
+    // #important: It will also copy the control thread.
     Status = processCopyProcess( Current->pid, Clone->pid );
     if ( Status != 0 ){
         panic ("clone_and_execute_process: [FAIL] processCopyProcess\n");
@@ -1059,6 +1061,10 @@ do_clone:
     {
         // #todo
         // We need a helper function for that.
+        
+        
+        // #??
+        // Is this a valid thread at this moment?
 
         // Kill control thread
         Clone->control->used  = FALSE;

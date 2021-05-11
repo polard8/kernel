@@ -407,6 +407,9 @@ struct thread_d
     unsigned long preempted;
 
 
+    // #test: escalonado duas vezes consecutivas.
+    int DoubleShot;
+
 	//
 	// ORDEM: 
 	// O que segue é referenciado durante o processo de dispatch.
