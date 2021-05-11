@@ -64,6 +64,14 @@ gfeProcedure (
             {  
                 case VK_F1: debug_print ("F1\n"); break;
                 case VK_F2: debug_print ("F2\n"); break;
+                case VK_F3: debug_print ("F3\n"); break;
+                case VK_F4: 
+                    debug_print ("F4\n");
+                    // switch the foreground thread.
+                    //gramado_system_call (301,0,0,0);
+                    gramado_system_call (302,(unsigned long) main_window,0,0);
+                    gramado_system_call (303,0,0,0);
+                    break;
             };
             goto done;
             break;
@@ -112,18 +120,28 @@ gfeProcedure (
             goto done;
             break;
 
-		case MSG_SETFOCUS:
-		    if ( window == main_window )
-			{
-				gde_redraw_window ( main_window, 1);
-				gde_redraw_window ( gWindow, 1);
-				gde_redraw_window ( mWindow, 1);
-		    }
-		    break;
+        case MSG_SETFOCUS:
+            if ( window == main_window ){
+                gde_redraw_window ( main_window, TRUE);
+                gde_redraw_window ( gWindow,     TRUE);
+                gde_redraw_window ( mWindow,     TRUE);
+            }
+            break;
 
 
         //case MSG_KILLFOCUS: 
             //break;
+
+        // #test
+        // update
+        // Enviado pelo kernel quando a thread volta a ter o input.
+        case 11216:
+            if ( window == main_window ){
+            gde_redraw_window (main_window,TRUE);
+            //gde_redraw_window (save_button, TRUE);
+            }
+            return 0;
+            break;
 
         default:
             debug_print ("gfe: default message\n"); 
@@ -432,6 +450,10 @@ int main ( int argc, char *argv[] ){
     // Setando o foco para recebermos as mensagens de sistema.
     gde_set_focus(hWindow);
 
+    gde_set_active_window(hWindow);
+
+    gde_show_window (hWindow);
+    
     // Refresh Window
     gde_show_backbuffer ();
 
