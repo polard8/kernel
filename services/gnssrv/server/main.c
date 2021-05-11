@@ -125,6 +125,7 @@ void gns_send_error_response (int fd, int code, char *error_message)
 // Messages sended via socket.
 // obs: read and write use the buffer '__buffer'
 // in the top of this file.
+// Called by main.
 
 void xxxHandleNextRequest(int fd){
 
@@ -136,8 +137,8 @@ void xxxHandleNextRequest(int fd){
 
 
     // Fail. Cleaning
-    if (fd<0)
-    {
+
+    if (fd<0){
         debug_print ("gnssrv: xxxHandleNextRequest fd\n");
         message_buffer[0] = 0;
         message_buffer[1] = 0;
@@ -151,12 +152,12 @@ void xxxHandleNextRequest(int fd){
     // Check if we heave a new request.
     
     int value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
+
     if ( value != ACTION_REQUEST )
     {
         gnssrv_yield();
         return;           // drop it!
     }
-
 
 
 //__loop:
@@ -236,10 +237,10 @@ void xxxHandleNextRequest(int fd){
     }
 
 
-    //
-    // Sending reply.
-    // 
-     
+//
+// Sending reply.
+// 
+ 
     //debug_print ("Sending response ...\n");  
 
     //# it works.
@@ -267,6 +268,10 @@ void xxxHandleNextRequest(int fd){
     debug_print ("gnssrv: Sending response ...\n");
 
 
+//
+// == Response =============================== 
+//
+
     // set response
     rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REPLY );
     
@@ -288,8 +293,9 @@ void xxxHandleNextRequest(int fd){
 
     // Cleaning
     int c=0;
-    for(c=0; c<32; c++)
+    for(c=0; c<32; c++){
         next_response[c] = 0;
+    };
 
 
     debug_print ("gnssrv: Response sent\n"); 
@@ -617,9 +623,9 @@ int main (int argc, char **argv){
 
 
 
-    //
-    // bind
-    // 
+//
+// bind
+// 
  
     // #debug
     printf ("gnssrv: bind\n");
@@ -666,9 +672,9 @@ int main (int argc, char **argv){
     };
 
 
-    //
-    // =======================================
-    //
+//
+// == Accept =====================================
+//
 
 // loop:
     debug_print ("gnssrv: Entering main loop.\n");

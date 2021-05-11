@@ -333,9 +333,9 @@ int main ( int argc, char *argv[] ){
     debug_print ("gns.bin: Initializing ...\n");
 
 
-    //
-    // Socket
-    // 
+//
+// Socket
+// 
 
     // #debug
     printf ("gns.bin: Creating socket\n");
@@ -352,9 +352,9 @@ int main ( int argc, char *argv[] ){
     }
 
 
-    //
-    // Connect
-    // 
+//
+// Connect
+// 
 
     //nessa hora colocamos no accept um fd.
     //então o servidor escreverá em nosso arquivo.
