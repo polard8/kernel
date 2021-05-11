@@ -13,7 +13,7 @@
  *
  * History:
  *     2015 - Created by Fred Nora.
- *     2020 - A lot of new functions.
+ *     2020 - New functions.
  */
 
 
@@ -125,7 +125,8 @@ int stdio_atoi (char *s){
 
 
     //     sign = (*s == '-');
-    if (*s == '-' || *s == '+'){
+    if (*s == '-' || *s == '+')
+    {
         s++;
     }
 
@@ -339,7 +340,7 @@ _strout (
 
 
 //
-// ================= low level =====================
+// == low level =====================
 //
 
 // #importante
@@ -471,9 +472,9 @@ int __fflush (FILE *stream)
     } 
 
 
-    //
-    // == Write =====================================
-    //
+//
+// == Write =============
+//
 
     // #todo: 
     // This is the desired way.
@@ -502,7 +503,7 @@ int __fflush (FILE *stream)
 
         return EOF;
     }
-    
+
     // #todo
     // Something is wrong
     if ( nwrite != Count )
@@ -568,9 +569,11 @@ int ____bfill (FILE *stream){
     }
     // ...
 
-    //
-    // == Read file ============================
-    //
+
+//
+// == Read file ============================
+//
+
 
     // #importante:
     // Colocaremos no offset e não na base. 
@@ -609,7 +612,6 @@ int ____bfill (FILE *stream){
     // A intenção dessa rotina é reencher o buffer em ring3,
     // pegando uma nova parte do arquivo que está em ring0.
 
-     
     n_read = (int) read ( 
                        fileno(stream), 
                        stream->_p,
@@ -680,12 +682,17 @@ int ____bfill (FILE *stream){
     // #todo:
     // flags, error, eof ...
     // stream->
-    
+
+
     return (int) n_read;
-    //return (int) stream->_cnt;
 }
 
 
+/*
+ *******************************
+ * __getc:
+ * 
+ */
 
 // #todo:
 // #importante
@@ -811,14 +818,24 @@ int __getc ( FILE *stream )
 
     debug_print ("__getc: [BUGBUG] Unexpected return\n");
     printf      ("__getc: [BUGBUG] Unexpected return\n");
+
     return EOF;
 }
 
 
 
+/*
+ ******************* 
+ * __putc:
+ * 
+ */
+
 int __putc (int ch, FILE *stream)
 {
-     
+
+    // #todo
+    //if ( ch<0 ){}
+
     //assert (stream);
     //assert (stream->_w < stream->_lbfsize);
     
@@ -854,23 +871,23 @@ int __putc (int ch, FILE *stream)
         printf     ("__putc: [BUGBUG] Overflow 2\n");
         stream->_cnt = 0;
         fflush (stream);
-        return ch;
+
+        return (int) ch;
     }
 
 
     //if (stream->_flags == _IONBF || (stream->_flags == _IOLBF && ch == '\n'))
-    if ( ch == '\n')
+    if ( ch == '\n' )
     { 
         fflush(stream);
-        return ch;
+        return (int) ch;
     }
 
 
     //if (stream->eof || stream->error)
         //return EOF;
- 
- 
-    return ch;
+
+    return (int) ch;
 }
 
 
@@ -973,7 +990,7 @@ char *fgets (char *s, int size, FILE *stream)
     {
         *cs++ = c;
         
-        if (c=='\n') { break; }
+        if (c=='\n'){ break; }
     };
 
     // Nesse momento, acabou o size, ou
@@ -981,7 +998,7 @@ char *fgets (char *s, int size, FILE *stream)
     
     // Se o último char for EOF
     // e não pegamos char algum. 
-    if ( c<0 && cs==s ) { return (NULL); }
+    if ( c<0 && cs==s ) { return NULL; }
     
     // Finalizamos a string construída.
     *cs++ = '\0';
@@ -995,6 +1012,9 @@ int fputs ( const char *s, FILE *stream ){
 
     register int c=0;
     register int r=0;
+
+    //#todo
+    //if ( (void*) s == NULL ){}
 
     while (c = *s++){
         r = putc(c,stream);
@@ -1011,14 +1031,18 @@ int fputs ( const char *s, FILE *stream ){
 
 int getw (FILE *stream){
 
-    register i;
+    register int i=0;
+
+    //#todo
+    //if ( (void*) stream == NULL ){}
 
     i = getc(stream);
 
 	//#todo
 	//if (stream->_flags&_IOEOF)
 		//return(-1);
-		
+
+
     if (stream->eof == 1 ){
         return EOF;
     }
@@ -1031,6 +1055,10 @@ int getw (FILE *stream){
 //#test
 int putw (int w, FILE *stream)
 {
+
+    //#todo
+    //if ( (void*) stream == NULL ){}
+
     putc ( w,      stream);
     putc ( w >> 8, stream);
 
@@ -1133,6 +1161,14 @@ FILE *fopen ( const char *filename, const char *mode ){
     int oflags=0;     
 
 
+    // #todo
+    // Check filename validation
+    
+    //if ( (void*) filename == NULL ){}
+    //if ( *filename == 0 ){}
+
+
+
     // #todo:
     // The 'mode' passed via argment will give us the 'flags'
     // used in open().
@@ -1159,10 +1195,11 @@ FILE *fopen ( const char *filename, const char *mode ){
         //fprintf(stderr, "FIXME(LibC): fopen('%s', '%s')\n", pathname, mode);
         //ASSERT_NOT_REACHED();
     };
-    
-    //
-    // Open.
-    //
+
+
+//
+// Open.
+//
 
     // See:
     // fcntl.c

@@ -5,9 +5,10 @@
 
     Dispatcher:
     The attribution of a dispatcher is context switch, task switch and spawn.
-    Context Switching
-    Switching to user mode
-    Jumping to the proper location in the user program to restart that program
+    Context Switching. Saving and restoring the context of a thread.
+    Switching between threads.
+    Switching to user mode, by jumping to the proper location 
+    in the user program to restart that program.
 
     Scheduler:
     The scheduler will create the next round. 

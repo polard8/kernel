@@ -241,13 +241,20 @@ int scheduler (void){
     // The global conductor.
     Conductor = (void *) tmpConductor->next;
 
+
+//
+// Walking ...
+//
+
     // READY threads in the threadList[].
+ 
     for ( i=0; i < THREAD_COUNT_MAX; ++i )
     {
         TmpThread = (void *) threadList[i];
 
         if ( (void *) TmpThread != NULL )
         {
+            // Single shot
             if ( TmpThread->used  == TRUE && 
                  TmpThread->magic == 1234 && 
                  TmpThread->state == READY )

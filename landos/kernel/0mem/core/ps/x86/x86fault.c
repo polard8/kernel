@@ -67,6 +67,9 @@ void x86fault_initialize(void)
  *****************************************
  * faults:
  *
+ *    x86 faults and exceptions.
+ *    [0~31]
+ * 
  *    #importante:
  *    Quem chamou isso? Pois temos a intenção de retornar,
  *    inicializando outra a mesma thread, as agora com a inclusão da 
@@ -74,6 +77,12 @@ void x86fault_initialize(void)
  *    a que estava com problemas.  
  *    Por fim ainda temos o caso quando não iremos retornar.
  */
+
+// #bugbug
+// Actualy this routine is for all the non maskable interrupts
+// mapped in the system.
+// Some of the non maskable interrupts are reserved,
+// Here comes only the not reserved ones.
 
 void faults ( unsigned long number ){
 
@@ -86,6 +95,15 @@ void faults ( unsigned long number ){
     // Isso impede a reentrada ??
 
     asm ("cli");
+
+    // Hello
+    debug_print ("faults: [x86]\n");
+
+    // ul
+    if (number > 31){
+        debug_print ("faults: [ERROR] Invalid number\n");
+    }  
+
 
     kprintf ("\n\n ======================= \n\n");
     kprintf ("x86fault-faults: *FAULTS: totalticks=%d \n\n", jiffies );
@@ -141,8 +159,13 @@ void faults ( unsigned long number ){
         goto fail;
     }
 
+//
+// Get thread info:
+//
 
-    Step = t->step;
+    Step = (unsigned long) t->step;
+    // ...
+
 
     // Salva o contexto se a tarefa já esteve rodando.
 
@@ -227,6 +250,14 @@ void faults ( unsigned long number ){
             printf ("PF\n");
             do_pagefault();
             break;
+        
+        // #test
+        //  Floating point error.
+        case 16:
+            printf ("FP error\n");
+            break;
+        
+            
 
         // ...
 

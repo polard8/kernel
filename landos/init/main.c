@@ -92,7 +92,7 @@ int idleError;
 // == Prototypes =============================================
 //
 
-void enable_maskable_interrupts(void);
+void x86_enable_maskable_interrupts(void);
 
 
 static inline void pause2 (void)
@@ -118,8 +118,10 @@ static inline void rep_nop (void)
 // interna
 // Uma interrup√ßao para habilitar as interrup√ßoes mascaraveis.
 // So depois disso a interrup√ßao de timer vai funcionar.
+// This is Intel processors.
+// [32~255]
 
-void enable_maskable_interrupts(void)
+void x86_enable_maskable_interrupts(void)
 {
     debug_print ("init.bin: Enable maskable interrupts\n");
     debug_print ("init.bin: Calling int 199\n");
@@ -443,12 +445,12 @@ int main ( int argc, char *argv[] )
     // asm ("int $3 \n");
     // while(1){}
 
-    //
-    // Enable the maskable interrupts.
-    //
+//
+// Enable the maskable interrupts.
+//
 
-    enable_maskable_interrupts ();
-    //asm ("int $129 \n");
+    x86_enable_maskable_interrupts();
+
 
 
     // #important
@@ -461,9 +463,16 @@ int main ( int argc, char *argv[] )
     // N„o queremos que ele sofra prempÁ„o antes de habilitar
     // o taskswitch e o scheduler.
     
-    //#test
-    
+//
+// Unlock the taskswitching support.
+//
+
     gramado_system_call (641,0,0,0);  // unlock taskswitch
+
+//
+// Unlock the scheduler embedded into the base kernel.
+//
+
     gramado_system_call (643,0,0,0);  // unlock scheduler
 
     //
