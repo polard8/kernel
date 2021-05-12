@@ -20,6 +20,21 @@
 //...
 
 
+// The window manager needs to get some information
+// about the window.
+
+struct gws_window_info_d
+{
+    //int window;
+    int type;
+    unsigned long width;
+    unsigned long height;
+    unsigned long border_width;
+    // ...
+};
+
+
+
 #endif    
 
 
